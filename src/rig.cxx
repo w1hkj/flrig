@@ -115,9 +115,9 @@ void ptw32_init(void)
 }
 #endif // __WIN32__
 
-#ifndef __WIN32__
-Pixmap  Rig_icon_pixmap;
 #define KNAME "Flrig"
+#if !defined(__WIN32__) && !defined(__APPLE__)
+Pixmap  Rig_icon_pixmap;
 
 void make_pixmap(Pixmap *xpm, const char **data)
 {
@@ -246,9 +246,7 @@ int main (int argc, char *argv[])
 
 	mainwindow->resize( progStatus.mainX, progStatus.mainY, mainwindow->w(), btnInitializing->h() + 24 );
 
-#ifndef __WIN32__
 	mainwindow->xclass(KNAME);
-#endif
 
 #ifdef __WIN32__
 	mainwindow->icon((char *)LoadIcon(fl_display, MAKEINTRESOURCE(IDI_ICON)));
