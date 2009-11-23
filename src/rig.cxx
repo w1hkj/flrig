@@ -22,7 +22,7 @@
 #include <FL/Fl_Menu_Item.H>
 
 #ifdef WIN32
-#  include "rigrc.h"
+#  include "flrigrc.h"
 #  include "compat.h"
 #  define dirent fl_dirent_no_thanks
 #endif
