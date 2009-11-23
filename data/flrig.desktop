@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Flrig
+GenericName=Amateur Radio Data Encapsulation
+Comment=Amateur Radio Communications
+Exec=flrig
+Icon=flrig
+Terminal=false
+Type=Application
+Categories=Network;HamRadio;

@@ -1,0 +1,221 @@
+# Copyright (c) 2008 Dave Freese, W1HKJ (w1hkj AT w1hkj DOT com)
+
+bin_PROGRAMS = flrig
+
+flrig_CPPFLAGS = @FLRIG_BUILD_CPPFLAGS@
+flrig_CXXFLAGS = @FLRIG_BUILD_CXXFLAGS@
+flrig_CFLAGS = $(flrig_CXXFLAGS)
+flrig_LDFLAGS = @FLRIG_BUILD_LDFLAGS@
+flrig_LDADD = @FLRIG_BUILD_LDADD@
+
+MINGW32_SRC = flrig-rc.rc include/flrigrc.h
+
+# We distribute these but do not always compile them
+EXTRA_flrig_SOURCES = $(FLRIG_WIN32_RES_SRC) $(MINGW32_SRC)
+
+flrig_SOURCES =
+
+if MINGW32
+if HAVE_WINDRES
+  flrig_SOURCES += $(MINGW32_SRC)
+endif
+endif
+
+########################################################################
+
+
+FLRIG_VERSION_MAJOR = @FLRIG_VERSION_MAJOR@
+FLRIG_VERSION_MINOR = @FLRIG_VERSION_MINOR@
+FLRIG_VERSION_PATCH = @FLRIG_VERSION_PATCH@
+FLRIG_VERSION = @FLRIG_VERSION@
+
+.EXPORT_ALL_VARIABLES: nsisinst appbundle
+
+# Sources that are generated,
+BUILT_SOURCES =
+# not distributed,
+nodist_flrig_SOURCES = $(BUILT_SOURCES)
+# and deleted by the clean targets
+CLEANFILES = $(BUILT_SOURCES)
+CLEAN_LOCAL =
+
+if MINGW32
+if HAVE_WINDRES
+.rc.o:
+	$(WINDRES) -I$(srcdir)/include -I$(srcdir)/../data/win32 $< -O coff $@
+endif
+endif
+
+install-data-local:
+	if test -f $(srcdir)/../data/flrig.xpm; then \
+	    $(mkinstalldirs) $(DESTDIR)/$(datadir)/pixmaps; \
+	    $(INSTALL_DATA) $(srcdir)/../data/flrig.xpm $(DESTDIR)/$(datadir)/pixmaps; \
+	fi
+	if test -f $(srcdir)/../data/flrig.desktop; then \
+	    $(mkinstalldirs) $(DESTDIR)/$(datadir)/applications; \
+	    $(INSTALL_DATA) $(srcdir)/../data/flrig.desktop $(DESTDIR)/$(datadir)/applications; \
+	fi
+
+uninstall-local:
+	rm -f $(DESTDIR)/$(datadir)/pixmaps/flrig.xpm
+	rm -f $(DESTDIR)/$(datadir)/applications/flrig.desktop
+
+FL_SRC = rigpanel.fl
+
+if HAVE_FLUID
+flgen: $(FL_SRC)
+	(cd $(srcdir)/include; \
+	for f in $(FL_SRC); do \
+	    c=$${f%.fl}.cxx; \
+		h=$${f%.fl}.h; \
+		h=$${h##*/}; \
+	    $(FLUID) -c -o ../$$c -h $$h ../$$f; \
+	done)
+endif
+
+
+INSTALLER_FILE = flrig-$(FLRIG_VERSION)_setup.exe
+APPBUNDLE=flrig-$(FLRIG_VERSION)
+APPBUNDLE_NOLIBS=$(APPBUNDLE)-nolibs
+
+if HAVE_NSIS
+nsisinst: $(bin_PROGRAMS)
+	sh $(srcdir)/../scripts/mknsisinst.sh "$(srcdir)/../data" .
+    CLEANFILES += $(INSTALLER_FILE)
+endif
+
+if DARWIN
+appbundle: $(bin_PROGRAMS)
+	sh $(srcdir)/../scripts/mkappbundle.sh "$(srcdir)/../data" .
+    CLEAN_LOCAL += $(APPBUNDLE_NOLIBS) $(APPBUNDLE) $(APPBUNDLE)*.dmg
+endif
+
+#if HAVE_ASCIIDOC
+#$(builddir)/../doc/guide.html: $(builddir)/../doc/guide.txt
+#	$(MAKE) -C $(builddir)/../doc $(AM_MAKEFLAGS) guide.html
+
+#$(builddir)/dialogs/guide.cxx: $(builddir)/../doc/guide.html
+#	mkdir -p $(builddir)/dialogs
+#	sed 's/"/\\"/g; s/$$/\\n\\/g; 1 s/.*/const char* szBeginner = "&/; $$ s/.*/&n";/' $< > $@
+#dialogs/htmlstrings.cxx: $(builddir)/dialogs/guide.cxx
+
+#distclean-local:
+#	@if test "$(builddir)" != "$(srcdir)"; then \
+#	    rm -f $(builddir)/dialogs/guide.cxx; \
+#        fi
+#endif
+
+clean-local:
+	-rm -rf $(CLEAN_LOCAL)
+
+# Sources that we build. It is OK to have headers here.
+flrig_SOURCES += \
+	combo.cxx \
+	debug.cxx \
+	dialogs.cxx \
+	Fl_SigBar.cxx \
+	FreqControl.cxx \
+	images.cxx \
+	ptt.cxx \
+	rig.cxx \
+	rig_io.cxx \
+	rigpanel.cxx \
+	rigbase.cxx \
+	rigs/FT100D.cxx \
+	rigs/FT450.cxx \
+	rigs/FT817.cxx \
+	rigs/FT857D.cxx \
+	rigs/FT950.cxx \
+	rigs/FT2000.cxx \
+	rigs/IC706MKIIG.cxx \
+	rigs/IC728.cxx \
+	rigs/IC735.cxx \
+	rigs/ICgeneric.cxx \
+	rigs/K2.cxx \
+	rigs/K3.cxx \
+	rigs/TS140.cxx \
+	rigs/TS2000.cxx \
+	rigs/TT516.cxx \
+	rigs/TT538.cxx \
+	rigs/TT550.cxx \
+	rigs/TT563.cxx \
+	rigs.cxx \
+	serial.cxx \
+	status.cxx \
+	support.cxx \
+	util.cxx \
+	ValueSlider.cxx \
+	xml_io.cxx 
+
+# Additional source files that are distributed
+EXTRA_DIST = \
+	$(srcdir)/config.h \
+	$(srcdir)/include/combo.h \
+	$(srcdir)/include/compat.h \
+	$(srcdir)/include/compat-mingw.h \
+	$(srcdir)/include/debug.h \
+	$(srcdir)/include/dialogs.h \
+	$(srcdir)/include/fileselect.h \
+	$(srcdir)/include/flrigrc.h \
+	$(srcdir)/include/Fl_SigBar.h \
+	$(srcdir)/include/FreqControl.h \
+	$(srcdir)/include/FT100D.h \
+	$(srcdir)/include/FT450.h \
+	$(srcdir)/include/FT817.h \
+	$(srcdir)/include/FT857D.h \
+	$(srcdir)/include/FT890.h \
+	$(srcdir)/include/FT950.h \
+	$(srcdir)/include/FT1000MV.h \
+	$(srcdir)/include/FT2000.h \
+	$(srcdir)/include/generic.h \
+	$(srcdir)/include/gettext.h \
+	$(srcdir)/include/IC706MKIIG.h \
+	$(srcdir)/include/IC728.h \
+	$(srcdir)/include/IC735.h \
+	$(srcdir)/include/ICgeneric.h \
+	$(srcdir)/include/images.h \
+	$(srcdir)/include/K2.h \
+	$(srcdir)/include/K3.h \
+	$(srcdir)/include/mingw.h \
+	$(srcdir)/include/ptt.h \
+	$(srcdir)/include/rig.h \
+	$(srcdir)/include/rigbase.h \
+	$(srcdir)/include/rig_io.h \
+	$(srcdir)/include/rigpanel.h \
+	$(srcdir)/include/serial.h \
+	$(srcdir)/include/status.h \
+	$(srcdir)/include/support.h \
+	$(srcdir)/include/TS140.h \
+	$(srcdir)/include/TS2000.h \
+	$(srcdir)/include/TT516.h \
+	$(srcdir)/include/TT538.h \
+	$(srcdir)/include/TT550.h \
+	$(srcdir)/include/TT563.h \
+	$(srcdir)/include/util.h \
+	$(srcdir)/include/ValueSlider.h \
+	$(srcdir)/include/xml_io.h \
+	$(srcdir)/images/alc.xbm \
+	$(srcdir)/images/fwd.xbm \
+	$(srcdir)/images/P200.xbm \
+	$(srcdir)/images/P50.xbm \
+	$(srcdir)/images/S60.xbm \
+	$(srcdir)/images/swr.xbm \
+	$(srcdir)/images/P100.xbm \
+	$(srcdir)/images/P25.xbm \
+	$(srcdir)/images/smeter.xbm \
+	$(srcdir)/images/SWR.xbm
+
+# Additional non-source files that are distributed
+# Additional source files that support non-Linux cross compilation
+EXTRA_DIST += \
+	$(srcdir)/../data/flrig.desktop \
+	$(srcdir)/../data/flrig.xpm \
+	$(srcdir)/../data/win32/fl_app.nsi \
+	$(srcdir)/../data/win32/flrig.ico \
+	$(srcdir)/../scripts/mknsisinst.sh \
+	$(srcdir)/../scripts/build4mingw.sh \
+	$(srcdir)/../data/mac/Info.plist.in \
+	$(srcdir)/../data/mac/flrig.icns \
+	$(srcdir)/../scripts/mkappbundle.sh \
+	$(FLRIG_WIN32_SRC) \
+	$(FLRIG_FL_SRC)

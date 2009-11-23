@@ -1,0 +1,16 @@
+Flwrap is a software utility for Amateur Radio use.  Its purpose is to
+encapsulate both text and binary files in a way that allows them to be
+
+	transmitted over any of several digital modes
+	verified at the receipt end for correctness
+
+The latest version can always be found at:
+
+  http://www.w1hkj.com/Wrap.html
+
+Visit this page for extensive documentation and an archive of XML files for
+transceivers supported by RigCAT.
+
+Join the linuxham Yahoo group for support, news and updates on W1HKJ software:
+
+  http://groups.yahoo.com/group/linuxham/join

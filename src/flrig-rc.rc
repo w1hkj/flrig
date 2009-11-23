@@ -1,0 +1,7 @@
+#include <windows.h> // include for version info constants
+#include "flrigrc.h"
+
+IDI_ICON ICON DISCARDABLE "flrig.ico"
+
+//A ICON MOVEABLE PURE LOADONCALL DISCARDABLE "flrig.ico"
+
