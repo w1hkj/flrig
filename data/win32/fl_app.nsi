@@ -104,6 +104,7 @@ Section "FLRIG"
 	SectionIn RO
 	SetOutPath $INSTDIR
 	File "${FLRIG_BINARY}"
+	File /nonfatal "${MINGWM_DLL}" "${PTW32_DLL}"
 SectionEnd
 
 # Start Menu path
@@ -114,8 +115,8 @@ SectionEnd
 Section "Start Menu Shortcuts"
     CreateDirectory "${SM_PATH}"
 	CreateShortCut "${SM_PATH}\${FLRIG_NAME}.lnk" "$INSTDIR\${FLRIG_BINARY}" "" "$INSTDIR\${FLRIG_BINARY}" 0
-	CreateShortCut "${SM_PATH}\${FLRIG_NAME} Beginners' Guide.lnk" "${GUIDE_URL}"
-	CreateShortCut "${SM_PATH}\${FLRIG_NAME} Documentation.lnk" "${FLRIG_DOCS_URL}"
+#	CreateShortCut "${SM_PATH}\${FLRIG_NAME} Beginners' Guide.lnk" "${GUIDE_URL}"
+#	CreateShortCut "${SM_PATH}\${FLRIG_NAME} Documentation.lnk" "${FLRIG_DOCS_URL}"
     CreateShortCut "${SM_PATH}\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
 SectionEnd
 

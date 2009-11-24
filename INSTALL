@@ -1,7 +1,7 @@
-Installation Instructions for flwrap
+Installation Instructions for flrig
 ************************************
 
-To compile flwrap you will need:
+To compile flrig you will need:
 
   * A recent C++ compiler.  The GNU C++ compilers in the 4.x series are
     known to work.
@@ -12,27 +12,27 @@ To compile flwrap you will need:
 	required.
 
 Once you have installed the required packages, the following commands
-should be sufficient to compile flwrap and install it under /usr/local:
+should be sufficient to compile flrig and install it under /usr/local:
 
   ./configure
   make
   make install    (you may need superuser privileges for installation)
 
 The `install' target installs the executable, an icon, and a .desktop
-file.  After installation, an flwrap launcher should appear somewhere in
+file.  After installation, an flrig launcher should appear somewhere in
 your applications menu.
 
-Create the desktop launcher.  Flwrap is designed as a desktop application
+Create the desktop launcher.  flrig is designed as a desktop application
 that accepts target files to be wrapped or unwrapped by dropping the
 file onto the desktop launcher.
 
 Windows installation notes
 **************************
 
-flwrap supports win32 systems as a cross compiled application using the
+flrig supports win32 systems as a cross compiled application using the
 MinGW win32 environment.
 
-To build an internationalized version of flwrap, install these
+To build an internationalized version of flrig, install these
 additional packages:
 
   gettext gettext-devel libiconv libiconv2
