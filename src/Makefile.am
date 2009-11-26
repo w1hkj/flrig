@@ -8,7 +8,13 @@ flrig_CFLAGS = $(flrig_CXXFLAGS)
 flrig_LDFLAGS = @FLRIG_BUILD_LDFLAGS@
 flrig_LDADD = @FLRIG_BUILD_LDADD@
 
-MINGW32_SRC = flrig-rc.rc include/flrigrc.h
+MINGW32_SRC = \
+	flrig-rc.rc \
+	include/flrigrc.h \
+	mingw.c \
+	include/compat.h \
+	include/compat-mingw.h
+
 
 # We distribute these but do not always compile them
 EXTRA_flrig_SOURCES = $(FLRIG_WIN32_RES_SRC) $(MINGW32_SRC)
@@ -116,7 +122,6 @@ flrig_SOURCES += \
 	Fl_SigBar.cxx \
 	FreqControl.cxx \
 	images.cxx \
-	mingw.c \
 	ptt.cxx \
 	rig.cxx \
 	rig_io.cxx \
@@ -151,63 +156,61 @@ flrig_SOURCES += \
 
 # Additional source files that are distributed
 EXTRA_DIST = \
-	$(srcdir)/config.h \
-	$(srcdir)/include/combo.h \
-	$(srcdir)/include/compat.h \
-	$(srcdir)/include/compat-mingw.h \
-	$(srcdir)/include/debug.h \
-	$(srcdir)/include/dialogs.h \
-	$(srcdir)/include/fileselect.h \
-	$(srcdir)/include/flrigrc.h \
-	$(srcdir)/include/Fl_SigBar.h \
-	$(srcdir)/include/FreqControl.h \
-	$(srcdir)/include/FT100D.h \
-	$(srcdir)/include/FT450.h \
-	$(srcdir)/include/FT817.h \
-	$(srcdir)/include/FT857D.h \
-	$(srcdir)/include/FT890.h \
-	$(srcdir)/include/FT950.h \
-	$(srcdir)/include/FT1000MV.h \
-	$(srcdir)/include/FT2000.h \
-	$(srcdir)/include/generic.h \
-	$(srcdir)/include/gettext.h \
-	$(srcdir)/include/IC706MKIIG.h \
-	$(srcdir)/include/IC728.h \
-	$(srcdir)/include/IC735.h \
-	$(srcdir)/include/ICgeneric.h \
-	$(srcdir)/include/images.h \
-	$(srcdir)/include/K2.h \
-	$(srcdir)/include/K3.h \
-	$(srcdir)/include/mingw.h \
-	$(srcdir)/include/ptt.h \
-	$(srcdir)/include/rig.h \
-	$(srcdir)/include/rigbase.h \
-	$(srcdir)/include/rig_io.h \
-	$(srcdir)/include/rigpanel.h \
-	$(srcdir)/include/serial.h \
-	$(srcdir)/include/sockxml_io.h \
-	$(srcdir)/include/status.h \
-	$(srcdir)/include/support.h \
-	$(srcdir)/include/threads.h \
-	$(srcdir)/include/TS140.h \
-	$(srcdir)/include/TS2000.h \
-	$(srcdir)/include/TT516.h \
-	$(srcdir)/include/TT538.h \
-	$(srcdir)/include/TT550.h \
-	$(srcdir)/include/TT563.h \
-	$(srcdir)/include/util.h \
-	$(srcdir)/include/ValueSlider.h \
-	$(srcdir)/include/socket.h \
-	$(srcdir)/images/alc.xbm \
-	$(srcdir)/images/fwd.xbm \
-	$(srcdir)/images/P200.xbm \
-	$(srcdir)/images/P50.xbm \
-	$(srcdir)/images/S60.xbm \
-	$(srcdir)/images/swr.xbm \
-	$(srcdir)/images/P100.xbm \
-	$(srcdir)/images/P25.xbm \
-	$(srcdir)/images/smeter.xbm \
-	$(srcdir)/images/SWR.xbm
+	config.h \
+	include/combo.h \
+	include/debug.h \
+	include/dialogs.h \
+	include/fileselect.h \
+	include/flrigrc.h \
+	include/Fl_SigBar.h \
+	include/FreqControl.h \
+	include/FT100D.h \
+	include/FT450.h \
+	include/FT817.h \
+	include/FT857D.h \
+	include/FT890.h \
+	include/FT950.h \
+	include/FT1000MV.h \
+	include/FT2000.h \
+	include/generic.h \
+	include/gettext.h \
+	include/IC706MKIIG.h \
+	include/IC728.h \
+	include/IC735.h \
+	include/ICgeneric.h \
+	include/images.h \
+	include/K2.h \
+	include/K3.h \
+	include/mingw.h \
+	include/ptt.h \
+	include/rig.h \
+	include/rigbase.h \
+	include/rig_io.h \
+	include/rigpanel.h \
+	include/serial.h \
+	include/sockxml_io.h \
+	include/status.h \
+	include/support.h \
+	include/threads.h \
+	include/TS140.h \
+	include/TS2000.h \
+	include/TT516.h \
+	include/TT538.h \
+	include/TT550.h \
+	include/TT563.h \
+	include/util.h \
+	include/ValueSlider.h \
+	include/socket.h \
+	images/alc.xbm \
+	images/fwd.xbm \
+	images/P200.xbm \
+	images/P50.xbm \
+	images/S60.xbm \
+	images/swr.xbm \
+	images/P100.xbm \
+	images/P25.xbm \
+	images/smeter.xbm \
+	images/SWR.xbm
 
 # Additional non-source files that are distributed
 # Additional source files that support non-Linux cross compilation
