@@ -4,7 +4,7 @@
 #include "serial.h"
 #include "support.h"
 #include "rigpanel.h"
-#include "xml_io.h"
+#include "sockxml_io.h"
 
 #include <string>
 
@@ -92,7 +92,6 @@ void cbCancelXcvrDialog()
 
 	btnOkXcvrDialog->labelcolor(FL_BLACK);
 	dlgXcvrConfig->hide();
-	pthread_mutex_unlock(&mutex_noop);
 }
 
 void cbOkXcvrDialog()
@@ -179,7 +178,7 @@ void cbOkXcvrDialog()
 
 	initRig();
 
-	wait_query = true;
+//	wait_query = true;
 	send_name();
 	send_modes();
 	send_bandwidths();
@@ -187,7 +186,7 @@ void cbOkXcvrDialog()
 	send_sideband();
 	send_bandwidth_changed();
 	send_new_freq();
-	wait_query = false;
+//	wait_query = false;
 
 	cbCancelXcvrDialog();
 }

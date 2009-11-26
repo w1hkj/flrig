@@ -116,6 +116,7 @@ flrig_SOURCES += \
 	Fl_SigBar.cxx \
 	FreqControl.cxx \
 	images.cxx \
+	mingw.c \
 	ptt.cxx \
 	rig.cxx \
 	rig_io.cxx \
@@ -145,7 +146,8 @@ flrig_SOURCES += \
 	support.cxx \
 	util.cxx \
 	ValueSlider.cxx \
-	xml_io.cxx 
+	socket.cxx \
+	sockxml_io.cxx
 
 # Additional source files that are distributed
 EXTRA_DIST = \
@@ -183,8 +185,10 @@ EXTRA_DIST = \
 	$(srcdir)/include/rig_io.h \
 	$(srcdir)/include/rigpanel.h \
 	$(srcdir)/include/serial.h \
+	$(srcdir)/include/sockxml_io.h \
 	$(srcdir)/include/status.h \
 	$(srcdir)/include/support.h \
+	$(srcdir)/include/threads.h \
 	$(srcdir)/include/TS140.h \
 	$(srcdir)/include/TS2000.h \
 	$(srcdir)/include/TT516.h \
@@ -193,7 +197,7 @@ EXTRA_DIST = \
 	$(srcdir)/include/TT563.h \
 	$(srcdir)/include/util.h \
 	$(srcdir)/include/ValueSlider.h \
-	$(srcdir)/include/xml_io.h \
+	$(srcdir)/include/socket.h \
 	$(srcdir)/images/alc.xbm \
 	$(srcdir)/images/fwd.xbm \
 	$(srcdir)/images/P200.xbm \

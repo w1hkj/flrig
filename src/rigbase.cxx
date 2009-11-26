@@ -3,13 +3,13 @@
 #include "debug.h"
 #include "rig_io.h"
 
-static const char *szNO_RIG = "none";
-static const char *szNOMODES[] = {"LSB", "USB", NULL};
-static const char *szNOBWS[] = {"NONE", NULL};
+const char *szNORIG = "NONE";
+const char *szNOMODES[] = {"LSB", "USB", NULL};
+const char *szNOBWS[] = {"NONE", NULL};
 
 rigbase::rigbase()
 {
-	name_ = szNO_RIG;
+	name_ = szNORIG;
 	modes_ = szNOMODES;
 	bandwidths_ = szNOBWS;
 

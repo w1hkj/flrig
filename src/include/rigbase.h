@@ -184,4 +184,8 @@ public:
 extern rigbase *rigs[];
 extern int rig_nbr;
 
+extern const char *szNORIG;
+extern const char *szNOMODES[];
+extern const char *szNOBWS[];
+
 #endif

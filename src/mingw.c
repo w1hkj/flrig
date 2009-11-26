@@ -30,6 +30,7 @@
 
 #include <ctype.h>
 #include "compat.h"
+#include "util.h"
 
 /* default mode for stdin, stdout and stderr */
 unsigned int _CRT_fmode = _O_BINARY;

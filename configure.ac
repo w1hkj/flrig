@@ -48,10 +48,40 @@ AC_PROG_CXX
 AC_PROG_CC
 AC_USE_SYSTEM_EXTENSIONS
 
-# Checks for libraries.
-
 # Checks for header files.
-AC_CHECK_HEADERS([stdlib.h string.h])
+AC_HEADER_STDC
+AC_HEADER_DIRENT
+AC_CHECK_HEADERS([arpa/inet.h execinfo.h fcntl.h limits.h memory.h netdb.h netinet/in.h regex.h stdint.h stdlib.h string.h strings.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h sys/utsname.h termios.h unistd.h values.h linux/ppdev.h dev/ppbus/ppi.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_HEADER_STDBOOL
+AC_C_CONST
+AC_C_INLINE
+AC_TYPE_INT16_T
+AC_TYPE_INT32_T
+AC_TYPE_INT64_T
+AC_TYPE_INT8_T
+AC_C_RESTRICT
+AC_TYPE_SIZE_T
+AC_HEADER_TIME
+AC_STRUCT_TM
+AC_TYPE_UINT16_T
+AC_TYPE_UINT32_T
+AC_TYPE_UINT64_T
+AC_TYPE_UINT8_T
+AC_C_VOLATILE
+
+# Checks for library functions.
+AC_FUNC_CLOSEDIR_VOID
+AC_FUNC_ERROR_AT_LINE
+AC_PROG_GCC_TRADITIONAL
+dnl AC_FUNC_MALLOC
+dnl AC_FUNC_REALLOC
+AC_FUNC_SELECT_ARGTYPES
+AC_TYPE_SIGNAL
+AC_FUNC_STRFTIME
+AC_FUNC_STRTOD
+AC_CHECK_FUNCS([getaddrinfo gethostbyname hstrerror gmtime_r localtime_r memmove memset mkdir select setenv snprintf socket socketpair strcasecmp strcasestr strchr strdup strerror strlcpy strncasecmp strrchr strstr strtol uname unsetenv vsnprintf])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
@@ -100,7 +130,11 @@ AC_CHECK_FLTK
 # Substitute XMLRPC_CFLAGS and XMLRPC_LIBS in Makefile
 # Define USE_XMLRPC in config.h
 # Set ENABLE_XMLRPC Makefile conditional
-AC_FLRIG_XMLRPC
+#AC_FLRIG_XMLRPC
+
+### Non-POSIX compatibility (i.e. mingw32)
+# Sets various Makefile conditionals; see m4/np-compat.m4
+AC_FL_NP_COMPAT
 
 ### build info
 # Define various build variables in config.h

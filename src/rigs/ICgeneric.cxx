@@ -276,7 +276,7 @@ bool RIG_ICOM::sendICcommand(string cmd, int nbr)
 		}
 
 // look for preamble at beginning
-		LOG_INFO("got %s", str2hex(replystr.c_str(), replystr.length()));
+//		LOG_INFO("got %s", str2hex(replystr.c_str(), replystr.length()));
 		if (replystr.find(pre_fm) == string::npos)  {
 			LOG_ERROR("preamble");
 			continue;

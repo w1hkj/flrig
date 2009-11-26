@@ -26,7 +26,7 @@
 #include "rig_io.h"
 #include "serial.h"
 #include "support.h"
-#include "xml_io.h"
+#include "sockxml_io.h"
 
 extern Fl_Double_Window *mainwindow;
 extern string RigHomeDir;
@@ -40,7 +40,6 @@ extern string title;
 extern pthread_t *serial_thread;
 extern pthread_t *digi_thread;
 extern pthread_mutex_t mutex_serial;
-extern pthread_mutex_t mutex_digiloop;
-extern pthread_mutex_t mutex_noop;
+extern pthread_mutex_t mutex_xmlrpc;
 
 #endif

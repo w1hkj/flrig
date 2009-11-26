@@ -16,8 +16,8 @@
 #include "rig.h"
 #include "dialogs.h"
 #include "rigbase.h"
-#include "xml_io.h"
 #include "ptt.h"
+#include "sockxml_io.h"
 
 using namespace std;
 
@@ -195,13 +195,13 @@ void setFocus()
 
 void setBW()
 {
-//	wait_query = true;
+	wait_query = true;
 	pthread_mutex_lock(&mutex_serial);
 		vfoA.iBW = opBW->index();
 		selrig->set_bandwidth(vfoA.iBW);
 	pthread_mutex_unlock(&mutex_serial);
 	send_bandwidth_changed();
-//	wait_query = false;
+	wait_query = false;
 }
 
 bool bws_changed = false;
@@ -231,7 +231,7 @@ void updateBandwidthControl()
 
 void setMode()
 {
-//	wait_query = true;
+	wait_query = true;
 	pthread_mutex_lock(&mutex_serial);
 		if (selrig->restore_mbw)
 			selrig->set_bandwidth(selrig->last_bw);
@@ -249,7 +249,7 @@ void setMode()
 	send_sideband();
 	if (bws_changed) send_bandwidths();
 	send_bandwidth_changed();
-//	wait_query = false;
+	wait_query = false;
 }
 
 void sortList() {
@@ -338,7 +338,9 @@ int movFreq() {
 		vfoA.freq = FreqDisp->value();
 		selrig->set_vfoA(vfoA.freq);
 	pthread_mutex_unlock(&mutex_serial);
+	wait_query = true;
 	send_new_freq();
+	wait_query = false;
 	return 1;
 }
 
@@ -785,7 +787,9 @@ void setFreqDisp(void *d)
 {
 	FreqDisp->value(vfoA.freq);
 	FreqDisp->redraw();
+	wait_query = true;
 	send_new_freq();
+	wait_query = false;
 }
 
 void updateSmeter(void *d) // 0 to 100;
@@ -825,6 +829,7 @@ void setPTT( void *d)
 
 void cbExit()
 {
+
 	pthread_mutex_lock(&mutex_serial);
 		if (selrig->has_mode_control)
 			selrig->set_mode(transceiver_mode);
@@ -832,11 +837,18 @@ void cbExit()
 			updateBandwidthControl();
 			selrig->set_bandwidth(transceiver_bw);
 		}
+		run_serial_thread = false;
 	pthread_mutex_unlock(&mutex_serial);
 
-	run_serial_thread = false;
 	pthread_join(*serial_thread, NULL);
 	RigSerial.ClosePort();
+
+	pthread_mutex_lock(&mutex_xmlrpc);
+	run_digi_loop = false;
+	pthread_mutex_unlock(&mutex_xmlrpc);
+	pthread_join(*digi_thread, NULL);
+	
+	send_no_rig();
 
 	progStatus.rig_nbr = rig_nbr;
 
@@ -987,6 +999,9 @@ void adjust_control_positions()
 		btnPTT->resize(btnPTT->x(), y, btnPTT->w(), 18);
 		btnPTT->redraw();
 	}
+
+	btnInitializing->hide();
+
 	mainwindow->size( mainwindow->w(), y + 20);
 	mainwindow->redraw();
 
@@ -1016,6 +1031,8 @@ void initXcvrTab()
 
 void initRig()
 {
+	wait_query = true;
+
 	pthread_mutex_lock(&mutex_serial);
 	selrig->initialize();
 	if (selrig->has_mode_control)
@@ -1255,6 +1272,21 @@ void initRig()
 
 	buildlist();
 
+	FreqDisp->value( vfoA.freq = progStatus.freq );
+
+	pthread_mutex_lock(&mutex_serial);
+		selrig->set_vfoA(progStatus.freq);
+		opMODE->index( vfoA.imode = progStatus.opMODE );
+		selrig->set_mode(progStatus.opMODE);
+
+		updateBandwidthControl();
+		opBW->index( vfoA.iBW = progStatus.opBW );
+		selrig->set_bandwidth(progStatus.opBW);
+	pthread_mutex_unlock(&mutex_serial);
+
+	fldigi_online = false;
+
+	wait_query = false;
 }
 
 void init_title()
@@ -1336,9 +1368,7 @@ void initStatusConfigDialog()
 		selectCommPort->value(progStatus.xcvr_serial_port.c_str());
 	}
 	if (!startAuxSerial()) {
-		if (progStatus.aux_serial_port.compare("NONE") == 0) {
-			LOG_WARN("Aux port not selected");
-		} else {
+		if (progStatus.aux_serial_port.compare("NONE") != 0) {
 			LOG_WARN("%s cannot be accessed", progStatus.aux_serial_port.c_str());
 			progStatus.aux_serial_port = "NONE";
 			selectAuxPort->value(progStatus.aux_serial_port.c_str());
@@ -1346,6 +1376,7 @@ void initStatusConfigDialog()
 	}
 	if (!startSepSerial()) {
 		if (progStatus.sep_serial_port.compare("NONE") != 0) {
+			LOG_WARN("%s cannot be accessed", progStatus.sep_serial_port.c_str());
 			progStatus.sep_serial_port = "NONE";
 			selectSepPTTPort->value(progStatus.sep_serial_port.c_str());
 		}
@@ -1353,34 +1384,9 @@ void initStatusConfigDialog()
 
 	initRig();
 
-	wait_query = true;
-
-	FreqDisp->value( vfoA.freq = progStatus.freq );
-
-	pthread_mutex_lock(&mutex_serial);
-		selrig->set_vfoA(progStatus.freq);
-		opMODE->index( vfoA.imode = progStatus.opMODE );
-		selrig->set_mode(progStatus.opMODE);
-
-		updateBandwidthControl();
-		opBW->index( vfoA.iBW = progStatus.opBW );
-		selrig->set_bandwidth(progStatus.opBW);
-	pthread_mutex_unlock(&mutex_serial);
-
-	send_name();
-	send_modes();
-	send_bandwidths();
-	send_mode_changed();
-	send_sideband();
-	send_bandwidth_changed();
-	send_new_freq();
-
-	wait_query = false;
-
 	vfoB.freq = progStatus.freq_B;
 	vfoB.imode = progStatus.imode_B;
 	vfoB.iBW = progStatus.iBW_B;
-
 
 	snprintf(szVfoB, sizeof(szVfoB), "%13.3f", vfoB.freq / 1000.0);
 	txtInactive->label(szVfoB);

@@ -47,7 +47,7 @@
 #include "debug.h"
 #include "util.h"
 #include "gettext.h"
-#include "xml_io.h"
+#include "sockxml_io.h"
 
 Fl_Double_Window *mainwindow;
 string RigHomeDir;
@@ -56,10 +56,10 @@ string defFileName;
 string title;
 
 pthread_t *serial_thread = 0;
+pthread_t *digi_thread = 0;
+
 pthread_mutex_t mutex_serial = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_xmlrpc = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t mutex_noop   = PTHREAD_MUTEX_INITIALIZER;
-
 
 //----------------------------------------------------------------------
 
@@ -170,14 +170,14 @@ void exit_main(Fl_Widget *w)
 }
 
 extern void open_rig_socket();
-extern void open_xmlrpc();
+extern bool run_digi_loop;
 
 void startup(void*)
 {
 	btnInitializing->show();
-    init_xmlrpc();
+	mainwindow->redraw();
 	initStatusConfigDialog();
-	btnInitializing->hide();
+
 }
 
 int main (int argc, char *argv[])
@@ -225,6 +225,8 @@ int main (int argc, char *argv[])
 		exit(1);
 	}
 
+	Fl::lock();
+
 #if defined(__WIN32__) && defined(PTW32_STATIC_LIB)
 	ptw32_init();
 #endif
@@ -232,6 +234,15 @@ int main (int argc, char *argv[])
 	bypass_serial_thread_loop = true;
 	serial_thread = new pthread_t;
 	if (pthread_create(serial_thread, NULL, serial_thread_loop, NULL)) {
+		perror("pthread_create");
+		exit(EXIT_FAILURE);
+	}
+
+    open_rig_socket();
+
+	wait_query = true;
+	digi_thread = new pthread_t;      
+	if (pthread_create(digi_thread, NULL, digi_loop, NULL)) {
 		perror("pthread_create");
 		exit(EXIT_FAILURE);
 	}
@@ -255,9 +266,8 @@ int main (int argc, char *argv[])
 	mainwindow->show();
 #endif
 
-	Fl::add_timeout(0.10, startup);
-	
-	Fl::lock();
+	Fl::add_timeout(0.250, startup);
+
 	return Fl::run();
 
 }
