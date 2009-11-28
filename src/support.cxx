@@ -704,7 +704,7 @@ void cbPTT()
 	if (localptt) {
 		wait_query = true;
 		rigPTT(PTT);
-		wait_query - false;
+		wait_query = false;
 	} else {
 		wait_query = true;
 		send_ptt_changed(PTT);

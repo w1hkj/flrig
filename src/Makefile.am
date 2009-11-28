@@ -202,14 +202,11 @@ EXTRA_DIST = \
 	include/ValueSlider.h \
 	include/socket.h \
 	images/alc.xbm \
-	images/fwd.xbm \
-	images/P200.xbm \
-	images/P50.xbm \
-	images/S60.xbm \
-	images/swr.xbm \
-	images/P100.xbm \
 	images/P25.xbm \
-	images/smeter.xbm \
+	images/P50.xbm \
+	images/P100.xbm \
+	images/P200.xbm \
+	images/S60.xbm \
 	images/SWR.xbm
 
 # Additional non-source files that are distributed

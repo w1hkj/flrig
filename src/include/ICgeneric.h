@@ -11,6 +11,7 @@ protected:
 	string ok;
 	string bad;
 	const char *_mode_type;
+public:
 	RIG_ICOM() {
 		pre_to = "\xFE\xFE\x56\xE0";
 		pre_fm = "\xFE\xFE\xE0\x56";
@@ -18,7 +19,7 @@ protected:
 		ok = "\xFE\xFE\xE0\x56\xFB\xFD";
 		bad = "\xFE\xFE\xE0\x56\xFA\xFD";
 	}
-	~RIG_ICOM() {}
+	virtual ~RIG_ICOM() {}
 	void checkresponse(int n);
 	bool sendICcommand(string str, int nbr);
 
@@ -27,7 +28,7 @@ protected:
 class RIG_IC746 : public RIG_ICOM {
 public:
 	RIG_IC746();
-	~RIG_IC746(){}
+	virtual ~RIG_IC746(){}
 
 	long get_vfoA(void);
 	void set_vfoA(long);
@@ -80,7 +81,7 @@ protected:
 class RIG_IC746PRO : public RIG_IC746 {
 public:
 	RIG_IC746PRO();
-	~RIG_IC746PRO(){}
+	virtual ~RIG_IC746PRO(){}
 	void set_mode(int val);
 	int  get_mode();
 	int  adjust_bandwidth(int m);
@@ -91,7 +92,7 @@ public:
 class RIG_IC756PRO2 : public RIG_IC746PRO {
 public:
 	RIG_IC756PRO2();
-	~RIG_IC756PRO2(){}
+	virtual ~RIG_IC756PRO2(){}
 	void set_attenuator(int val);
 	int  get_attenuator();
 	void set_preamp(int val);

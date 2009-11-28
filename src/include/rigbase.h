@@ -96,7 +96,7 @@ protected:
 
 public:
 	rigbase();
-	~rigbase(){}
+	virtual ~rigbase(){}
 
 	virtual void initialize() {}
 
