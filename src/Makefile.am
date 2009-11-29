@@ -157,6 +157,7 @@ flrig_SOURCES += \
 # Additional source files that are distributed
 EXTRA_DIST = \
 	config.h \
+	flrig_icon.cxx \
 	include/combo.h \
 	include/debug.h \
 	include/dialogs.h \

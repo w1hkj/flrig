@@ -49,6 +49,8 @@
 #include "gettext.h"
 #include "sockxml_io.h"
 
+#include "flrig_icon.cxx"
+
 Fl_Double_Window *mainwindow;
 string RigHomeDir;
 string TempDir;
@@ -259,10 +261,15 @@ int main (int argc, char *argv[])
 
 	mainwindow->xclass(KNAME);
 
-#ifdef __WIN32__
-	mainwindow->icon((char *)LoadIcon(fl_display, MAKEINTRESOURCE(IDI_ICON)));
+#if defined(__WOE32__)
+#  ifndef IDI_ICON
+#    define IDI_ICON 101
+#  endif
+	mainwindow->icon((char*)LoadIcon(fl_display, MAKEINTRESOURCE(IDI_ICON)));
 	mainwindow->show (argc, argv);
-#else
+#elif !defined(__APPLE__)
+	make_pixmap(&Rig_icon_pixmap, flrig_icon);
+	mainwindow->icon((char *)Rig_icon_pixmap);
 	mainwindow->show();
 #endif
 
