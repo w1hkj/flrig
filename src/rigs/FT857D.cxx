@@ -106,24 +106,28 @@ void RIG_FT857D::set_PTT_control(int val)
 	sendCommand(cmd, 0);
 }
 
+// mod submitted by Rich, WA4SXZ, for power_out and smeter
+
 int  RIG_FT857D::get_power_out(void)
 {
-	int val = 0;
-	init_cmd();
-	cmd[4] = 0xF7;
-	if (sendCommand(cmd,1)) {
-LOG_INFO("%s => %d",str2hex(replybuff,1), (val = replybuff[0] && 0x0F));
-	}
-	return 0;
+   init_cmd();
+   cmd[4] = 0xF7;
+   if (sendCommand(cmd,1)) {
+       int fwdpwr = replybuff[0];
+       fwdpwr = fwdpwr * 100 / 15;
+       return fwdpwr;
+   }
+   return 0;
 }
 
 int  RIG_FT857D::get_smeter(void)
 {
-	int val = 0;
-	init_cmd();
-	cmd[4] = 0xE7;
-	if (sendCommand(cmd,1)) {
-LOG_INFO("%s => %d",str2hex(replybuff,1), (val = replybuff[0] && 0x0F));
-	}
-	return 0;
+   init_cmd();
+   cmd[4] = 0xE7;
+   if (sendCommand(cmd,1)) {
+       int sval = replybuff[0];
+       sval = (sval-1) * 100 / 15;
+       return sval;
+   }
+   return 0;
 }
