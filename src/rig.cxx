@@ -240,7 +240,7 @@ int main (int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-    open_rig_socket();
+//    open_rig_socket();
 
 	wait_query = true;
 	digi_thread = new pthread_t;      

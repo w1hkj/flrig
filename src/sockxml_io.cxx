@@ -87,12 +87,17 @@ double val_double(string buf);
 int    val_int(string buf);
 string val_string(string buf);
 bool   val_bool(string buf);
+string array(const char **data);
+string payload(const char *methodname, const char *dtype, const char *data);
+string header(int len);
 
 string xml_rigbws;
 string xml_rigmodes;
 char xml_nufreq[20];
 
 Address *adr = NULL;
+Socket  *sck = NULL;
+
 bool run_digi_loop = true;
 bool wait_query = false;
 bool fldigi_online = false;
@@ -112,9 +117,75 @@ void open_rig_socket()
 		LOG_WARN("%s", e.what());
 		delete adr;
 		adr = NULL;
+		throw;
 	}
 }
 
+void sendquery(const char *methodname, const char *dtype, const char *data)
+{
+	if (!adr) 
+		try {
+			open_rig_socket();
+		} catch (const SocketException& e) {
+			throw;
+		}
+
+	string content = payload(methodname, dtype, data);
+	querybuffer.clear();
+	querybuffer.append(header(content.length()));
+	querybuffer.append(content);
+	replybuffer.clear();
+	try {
+		pthread_mutex_lock(&mutex_xmlrpc);
+			sck = new Socket(*adr);
+			sck->set_timeout(0.1);
+			sck->connect();
+			sck->send(querybuffer);
+			sck->recv(replybuffer);
+			delete sck;
+			sck = NULL;
+		pthread_mutex_unlock(&mutex_xmlrpc);
+		LOG_INFO("\n%s\n%s",
+			querybuffer.c_str(),
+			replybuffer.c_str());
+	} catch (const SocketException& e) {
+		LOG_INFO("%s %s", methodname, e.what());
+		pthread_mutex_unlock(&mutex_xmlrpc);
+		delete sck;
+		sck = NULL;
+		throw;
+	}
+}
+
+void sendcmd(const char *methodname, const char *dtype, const char *data )
+{
+	if (!adr || !fldigi_online) return;
+
+	string content = payload(methodname, dtype, data);
+	cmdbuffer.clear();
+	cmdbuffer.append(header(content.length()));
+	cmdbuffer.append(content);
+
+	try {
+		pthread_mutex_lock(&mutex_xmlrpc);
+			sck = new Socket(*adr);
+			sck->set_timeout(0.1);
+			sck->connect();
+			sck->send(cmdbuffer);
+			sck->recv(inpbuffer);
+			delete sck;
+			sck = NULL;
+		pthread_mutex_unlock(&mutex_xmlrpc);
+		LOG_INFO("\n%s\n%s",
+			cmdbuffer.c_str(),
+			inpbuffer.c_str());
+	} catch (const SocketException& e) {
+		LOG_INFO("%s failed\n%s", methodname, e.what());
+		delete sck;
+		sck = NULL;
+		pthread_mutex_unlock(&mutex_xmlrpc);
+	}
+}
 
 // --------------------------------------------------------------------
 // send functions
@@ -164,32 +235,6 @@ string header(int len)
 	hdr.append(XML_HEADER).append(slen.str().c_str());
 	hdr.append(XML_EOL).append(XML_EOL);
 	return hdr;
-}
-
-void sendcmd(const char *methodname, const char *dtype, const char *data )
-{
-	if (!adr || !fldigi_online) return;
-
-	string content = payload(methodname, dtype, data);
-	cmdbuffer.clear();
-	cmdbuffer.append(header(content.length()));
-	cmdbuffer.append(content);
-
-	try {
-		pthread_mutex_lock(&mutex_xmlrpc);
-			Socket sckt(*adr);
-			sckt.set_timeout(0.1);
-			sckt.connect();
-			sckt.send(cmdbuffer);
-			sckt.recv(inpbuffer);
-		pthread_mutex_unlock(&mutex_xmlrpc);
-		LOG_INFO("\n%s\n%s",
-			cmdbuffer.c_str(),
-			inpbuffer.c_str());
-	} catch (const SocketException& e) {
-		LOG_INFO("%s failed\n%s", methodname, e.what());
-		pthread_mutex_unlock(&mutex_xmlrpc);
-	}
 }
 
 void send_new_freq()
@@ -292,33 +337,6 @@ bool val_bool(string buf)
 	if (!val.length()) return false;
 	bool bval = atoi(val.c_str());
 	return bval;
-}
-
-void sendquery(const char *methodname, const char *dtype, const char *data)
-{
-	if (!adr) return;
-
-	string content = payload(methodname, dtype, data);
-	querybuffer.clear();
-	querybuffer.append(header(content.length()));
-	querybuffer.append(content);
-	replybuffer.clear();
-	try {
-		pthread_mutex_lock(&mutex_xmlrpc);
-			Socket sckt(*adr);
-			sckt.set_timeout(0.1);
-			sckt.connect();
-			sckt.send(querybuffer);
-			sckt.recv(replybuffer);
-		pthread_mutex_unlock(&mutex_xmlrpc);
-		LOG_INFO("\n%s\n%s",
-			querybuffer.c_str(),
-			replybuffer.c_str());
-	} catch (const SocketException& e) {
-		LOG_INFO("%s %s", methodname, e.what());
-		pthread_mutex_unlock(&mutex_xmlrpc);
-		throw;
-	}
 }
 
 static bool ptt_now_is = false;
@@ -431,9 +449,7 @@ void check_for_bandwidth_change()
 }
 
 #define REG_UPDATE_INTERVAL 200 // milliseconds
-#define WAIT_UPDATE_INTERVAL 2000 // milliseconds
-
-int check_xml_interval = REG_UPDATE_INTERVAL;
+#define CHECK_UPDATE_COUNT   10  // 10x regular update interval
 
 void send_rig_info()
 {
@@ -449,7 +465,6 @@ void send_rig_info()
 		sendquery(main_set_frequency, XML_DOUBLE, xml_freq.str().c_str());
 		sendquery(main_set_mode, XML_STRING, selrig->modes_[vfoA.imode]);
 		sendquery(main_set_bandwidth, XML_STRING, selrig->bandwidths_[vfoA.iBW]);
-		check_xml_interval = REG_UPDATE_INTERVAL;
 		fldigi_online = true;
 	} catch (...) {
 		throw;
@@ -472,11 +487,13 @@ void send_no_rig()
 
 void * digi_loop(void *d)
 {
+	int try_count = CHECK_UPDATE_COUNT;
 	for (;;) {
-		MilliSleep(check_xml_interval);
+		MilliSleep(REG_UPDATE_INTERVAL);
 		if (!run_digi_loop) break;
 		try {
-			if (!fldigi_online && !wait_query) send_rig_info();
+			if (!fldigi_online && !wait_query) 
+				if (!try_count--) send_rig_info();
 			if (!wait_query) check_for_ptt_change();
 			if (!run_digi_loop) break;
 			if (!wait_query) check_for_frequency_change();
@@ -485,7 +502,7 @@ void * digi_loop(void *d)
 			if (!run_digi_loop) break;
 			if (!wait_query) check_for_bandwidth_change();
 		} catch (...) {
-			check_xml_interval = WAIT_UPDATE_INTERVAL;
+			try_count = CHECK_UPDATE_COUNT;
 			fldigi_online = false;
 		}
 	}
