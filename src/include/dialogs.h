@@ -1,8 +1,10 @@
+#include <string>
+
 #include "support.h"
 
 struct CPT {
 	int nbr;
-	char *szPort;
+	std::string szPort;
 };
 
 extern Fl_Double_Window *dlgDisplayConfig;

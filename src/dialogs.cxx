@@ -40,18 +40,16 @@ void initCommPortTable () {
 	char szTestPort[] = "COMxx";
 	for (int i = 0; i < 12; i++) {
 		commPortTable[i].nbr = 0;
-		commPortTable[i].szPort = 0;
+		commPortTable[i].szPort = "";
 	}
-	commPortTable[0].szPort = new char(6);
-	strcpy(commPortTable[0].szPort,"NONE");
+	commPortTable[0].szPort = "NONE";
 	iNbrCommPorts = 0;
 	for (int i = 1; i < 12; i++) {
 		sprintf(szTestPort, "COM%d", i);
 		if (RigSerial.CheckPort (szTestPort) == true) {
 			iNbrCommPorts++;
-			commPortTable[iNbrCommPorts].szPort = new char(strlen(szTestPort)+1);
 			commPortTable[iNbrCommPorts].nbr = i;
-			strcpy(commPortTable[iNbrCommPorts].szPort, szTestPort);
+			commPortTable[iNbrCommPorts].szPort = szTestPort;
 		}
 	}
 #else
@@ -59,18 +57,16 @@ void initCommPortTable () {
 	char szTestUSB[] = "ttyUSBx";
 	for (int i = 0; i < 8; i++) {
 		commPortTable[i].nbr = 0;
-		commPortTable[i].szPort = 0;
+		commPortTable[i].szPort = "";
 	}
-	commPortTable[0].szPort = new char(15);
-	strcpy(commPortTable[0].szPort,"NONE");
+	commPortTable[0].szPort = "NONE";
 	iNbrCommPorts = 0;
 	for (int i = 1; i < 8; i++) {
 		szTestPort[4] = '0' + i - 1;
 		if (RigSerial.CheckPort(szTestPort)) {
 			iNbrCommPorts++;
-			commPortTable[iNbrCommPorts].szPort = new char(15);
 			commPortTable[iNbrCommPorts].nbr = i;
-			strcpy(commPortTable[iNbrCommPorts].szPort, szTestPort);
+			commPortTable[iNbrCommPorts].szPort = szTestPort;
 		}
 	}
 	int j = 0;
@@ -78,9 +74,8 @@ void initCommPortTable () {
 		szTestUSB[6] = '0' + j - 1;
 		if (RigSerial.CheckPort(szTestUSB)) {
 			iNbrCommPorts++;
-			commPortTable[iNbrCommPorts].szPort = new char(15);
 			commPortTable[iNbrCommPorts].nbr = j + 8;
-			strcpy(commPortTable[iNbrCommPorts].szPort, szTestUSB);
+			commPortTable[iNbrCommPorts].szPort = szTestUSB;
 		}
 	}
 #endif
@@ -178,7 +173,6 @@ void cbOkXcvrDialog()
 
 	initRig();
 
-//	wait_query = true;
 	send_name();
 	send_modes();
 	send_bandwidths();
@@ -186,7 +180,6 @@ void cbOkXcvrDialog()
 	send_sideband();
 	send_bandwidth_changed();
 	send_new_freq();
-//	wait_query = false;
 
 	cbCancelXcvrDialog();
 }
@@ -211,9 +204,9 @@ void createXcvrDialog()
 	selectAuxPort->clear();
 	selectSepPTTPort->clear();
 	for (int i = 0; i <= iNbrCommPorts; i++) {
-		selectCommPort->add(commPortTable[i].szPort);
-		selectAuxPort->add(commPortTable[i].szPort);
-		selectSepPTTPort->add(commPortTable[i].szPort);
+		selectCommPort->add(commPortTable[i].szPort.c_str());
+		selectAuxPort->add(commPortTable[i].szPort.c_str());
+		selectSepPTTPort->add(commPortTable[i].szPort.c_str());
 	}
 	mnuBaudrate->clear();
 	for (int i = 0; szBaudRates[i] != NULL; i++)
