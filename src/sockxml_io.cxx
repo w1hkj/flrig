@@ -77,19 +77,17 @@ const char * XML_RESPONE      = "methodResponse>";
 const char * XML_OPEN         = "<";
 const char * XML_CLOSE        = "</";
 
-string cmdbuffer;
-string querybuffer;
-string inpbuffer;
-string replybuffer;
+string xmlout_buffer;
+string xmlrep_buffer;
 
 string extract(string buf, string what);
 double val_double(string buf);
 int    val_int(string buf);
 string val_string(string buf);
 bool   val_bool(string buf);
-string array(const char **data);
-string payload(const char *methodname, const char *dtype, const char *data);
-string header(int len);
+void   array(const char **data, string &arry);
+void   payload(const char *methodname, const char *dtype, const char *data, string &content);
+void   header(int len, string &hdr);
 
 string xml_rigbws;
 string xml_rigmodes;
@@ -102,8 +100,10 @@ bool run_digi_loop = true;
 bool wait_query = false;
 bool fldigi_online = false;
 
-void sendcmd(const char *, const char *, const char *);
-void sendquery(const char *, const char *, const char *);
+void send_xml(const char *, const char *, const char *);
+void send_xml(const char *, const char *, const char *);
+
+int  Nconnects = 0;
 
 //=====================================================================
 // socket ops
@@ -112,16 +112,23 @@ void sendquery(const char *, const char *, const char *);
 void open_rig_socket()
 {
 	try {
-		adr = new Address(tcpip_address.c_str(), tcpip_port.c_str());
+		if (!adr)
+			adr = new Address(tcpip_address.c_str(), tcpip_port.c_str());
 	} catch (const SocketException& e) {
-		LOG_WARN("%s", e.what());
+		LOG_ERROR("%s", e.what());
 		delete adr;
 		adr = NULL;
 		throw;
 	}
 }
 
-void sendquery(const char *methodname, const char *dtype, const char *data)
+void close_rig_socket()
+{
+	delete adr;
+	adr = NULL;
+}
+
+void send_xml(const char *methodname, const char *dtype, const char *data)
 {
 	if (!adr) 
 		try {
@@ -130,60 +137,34 @@ void sendquery(const char *methodname, const char *dtype, const char *data)
 			throw;
 		}
 
-	string content = payload(methodname, dtype, data);
-	querybuffer.clear();
-	querybuffer.append(header(content.length()));
-	querybuffer.append(content);
-	replybuffer.clear();
+	string content;
+	string hdr;
+	payload(methodname, dtype, data, content);
+	header(content.length(), hdr);
+	xmlout_buffer.clear();
+	xmlout_buffer.append(hdr);
+	xmlout_buffer.append(content);
+	xmlrep_buffer.clear();
 	try {
-		pthread_mutex_lock(&mutex_xmlrpc);
-			sck = new Socket(*adr);
-			sck->set_timeout(0.1);
-			sck->connect();
-			sck->send(querybuffer);
-			sck->recv(replybuffer);
-			delete sck;
-			sck = NULL;
-		pthread_mutex_unlock(&mutex_xmlrpc);
+		sck = new Socket(*adr);
+		sck->set_timeout(0.1);
+		sck->connect();
+		sck->send(xmlout_buffer);
+		sck->recv(xmlrep_buffer);
+		delete sck;
+		sck = NULL;
+		Nconnects++;
+//		if (Nconnects % 1000 == 0)
+//			LOG_WARN("Connects: %d", Nconnects);
 		LOG_INFO("\n%s\n%s",
-			querybuffer.c_str(),
-			replybuffer.c_str());
+			xmlout_buffer.c_str(),
+			xmlrep_buffer.c_str());
 	} catch (const SocketException& e) {
-		LOG_INFO("%s %s", methodname, e.what());
-		pthread_mutex_unlock(&mutex_xmlrpc);
+//		LOG_ERROR("Connects : %d", Nconnects);
+		LOG_ERROR("%s %s", methodname, e.what());
 		delete sck;
 		sck = NULL;
 		throw;
-	}
-}
-
-void sendcmd(const char *methodname, const char *dtype, const char *data )
-{
-	if (!adr || !fldigi_online) return;
-
-	string content = payload(methodname, dtype, data);
-	cmdbuffer.clear();
-	cmdbuffer.append(header(content.length()));
-	cmdbuffer.append(content);
-
-	try {
-		pthread_mutex_lock(&mutex_xmlrpc);
-			sck = new Socket(*adr);
-			sck->set_timeout(0.1);
-			sck->connect();
-			sck->send(cmdbuffer);
-			sck->recv(inpbuffer);
-			delete sck;
-			sck = NULL;
-		pthread_mutex_unlock(&mutex_xmlrpc);
-		LOG_INFO("\n%s\n%s",
-			cmdbuffer.c_str(),
-			inpbuffer.c_str());
-	} catch (const SocketException& e) {
-		LOG_INFO("%s failed\n%s", methodname, e.what());
-		delete sck;
-		sck = NULL;
-		pthread_mutex_unlock(&mutex_xmlrpc);
 	}
 }
 
@@ -193,9 +174,9 @@ void sendcmd(const char *methodname, const char *dtype, const char *data )
 #define XO(p)  append(XML_OPEN).append(p)
 #define XC(p)  append(XML_CLOSE).append(p)
 
-string array(const char **data)
+void array(const char **data, string &arry)
 {
-	string arry("");
+	arry.clear();
 	arry.append("<param><value><array><data>").append(XML_EOL);
 	while (*data) {
 		arry.append("<value><string>").append(*data);
@@ -203,12 +184,11 @@ string array(const char **data)
 		data++;
 	}
 	arry.append("</data></array></value></param>").append(XML_EOL);
-	return arry;
 }
 
-string payload(const char *methodname, const char *dtype, const char *data)
+void payload(const char *methodname, const char *dtype, const char *data, string &built)
 {
-	string built;
+	built.clear();
 	built.append(XML_PROLOGUE);
 	built.append("<methodCall>\r\n");
 	built.append("<methodName>").append(methodname).append("</methodName>\r\n");
@@ -223,18 +203,15 @@ string payload(const char *methodname, const char *dtype, const char *data)
 	}
 	built.append("</params>\r\n");
 	built.append("</methodCall>\r\n");
-	return built;
 }
 
-string header(int len)
+void header(int len, string &hdr)
 {
-	string hdr;
 	stringstream slen;
 	slen << len;
 	hdr.clear();
 	hdr.append(XML_HEADER).append(slen.str().c_str());
 	hdr.append(XML_EOL).append(XML_EOL);
-	return hdr;
 }
 
 void send_new_freq()
@@ -242,54 +219,85 @@ void send_new_freq()
 	stringstream xml_freq;
 	xml_freq << vfoA.freq;
 
-	sendcmd(main_set_frequency, XML_DOUBLE, xml_freq.str().c_str());
+	pthread_mutex_lock(&mutex_xmlrpc);
+	try {
+		send_xml(main_set_frequency, XML_DOUBLE, xml_freq.str().c_str());
+	} catch (...) {}
+	pthread_mutex_unlock(&mutex_xmlrpc);
 
-	inpbuffer.clear();
 }
 
 void send_modes()
 {
 	if (!selrig->modes_) return;
-	xml_rigmodes = array(selrig->modes_);
-	sendcmd(main_set_modes, XML_ARRAY, xml_rigmodes.c_str());
+	pthread_mutex_lock(&mutex_xmlrpc);
+	try {
+		array(selrig->modes_, xml_rigmodes);
+		send_xml(main_set_modes, XML_ARRAY, xml_rigmodes.c_str());
+	} catch (...) {}
+	pthread_mutex_unlock(&mutex_xmlrpc);
 }
 
 void send_bandwidths()
 {
 	if (!selrig->bandwidths_) return;
-	xml_rigbws = array(selrig->bandwidths_);
-	sendcmd(main_set_bandwidths, XML_ARRAY, xml_rigbws.c_str());
+	pthread_mutex_lock(&mutex_xmlrpc);
+	try {
+		array(selrig->bandwidths_, xml_rigbws);
+		send_xml(main_set_bandwidths, XML_ARRAY, xml_rigbws.c_str());
+	} catch (...) {}
+	pthread_mutex_unlock(&mutex_xmlrpc);
 }
 
 void send_name()
 {
-	sendcmd(main_set_name, XML_STRING, selrig->name_);
+	pthread_mutex_lock(&mutex_xmlrpc);
+	try {
+			send_xml(main_set_name, XML_STRING, selrig->name_);
+	} catch (...) {}
+	pthread_mutex_unlock(&mutex_xmlrpc);
 }
 
 void send_ptt_changed(bool PTT)
 {
-	if (PTT)
-		sendcmd(main_set_tx, XML_NIL, "");
-	else
-		sendcmd(main_set_rx, XML_NIL, "");
+	pthread_mutex_lock(&mutex_xmlrpc);
+	try {
+		if (PTT)
+			send_xml(main_set_tx, XML_NIL, "");
+		else
+			send_xml(main_set_rx, XML_NIL, "");
+	} catch (...) {}
+	pthread_mutex_unlock(&mutex_xmlrpc);
 }
 
 void send_mode_changed()
 {
 	if (!selrig->modes_) return;
-	sendcmd(main_set_mode, XML_STRING, selrig->modes_[vfoA.imode]);
+	pthread_mutex_lock(&mutex_xmlrpc);
+	try {
+		send_xml(main_set_mode, XML_STRING, selrig->modes_[vfoA.imode]);
+	} catch (...) {}
+	pthread_mutex_unlock(&mutex_xmlrpc);
 }
 
 void send_bandwidth_changed()
 {
 	if (!selrig->bandwidths_) return;
-	sendcmd(main_set_bandwidth, XML_STRING, selrig->bandwidths_[vfoA.iBW]);
+	pthread_mutex_lock(&mutex_xmlrpc);
+	try {
+		send_xml(main_set_bandwidth, XML_STRING, selrig->bandwidths_[vfoA.iBW]);
+	} catch (...) {}
+	pthread_mutex_unlock(&mutex_xmlrpc);
 }
 
 void send_sideband()
 {
-	sendcmd(main_set_sideband, XML_STRING,
+	pthread_mutex_lock(&mutex_xmlrpc);
+	try {
+		send_xml(main_set_sideband, XML_STRING,
 			selrig->get_modetype(vfoA.imode) == 'U' ? "USB" : "LSB" );
+	} catch (...) {}
+	pthread_mutex_unlock(&mutex_xmlrpc);
 }
 
 // --------------------------------------------------------------------
@@ -343,8 +351,8 @@ static bool ptt_now_is = false;
 void check_for_ptt_change()
 {
 	try {
-		sendquery(main_get_trx_state, XML_NIL, "");
-		bool nuptt = (val_string(replybuffer) == "TX");
+		send_xml(main_get_trx_state, XML_NIL, "");
+		bool nuptt = (val_string(xmlrep_buffer) == "TX");
 		if (nuptt != ptt_now_is) {
 			ptt_now_is = nuptt;
 			Fl::awake( setPTT, (void*)nuptt);
@@ -357,6 +365,9 @@ void check_for_ptt_change()
 void setvfo(void *d)
 {
 	long newfreq = (long)d;
+	if (newfreq == vfoA.freq) return;
+	if (!newfreq) return;
+
 	pthread_mutex_lock(&mutex_serial);
 		selrig->set_vfoA(newfreq);
 	pthread_mutex_unlock(&mutex_serial);
@@ -367,12 +378,10 @@ void setvfo(void *d)
 void check_for_frequency_change()
 {
 	try {
-		sendquery(main_get_frequency, XML_NIL, "");
+		send_xml(main_get_frequency, XML_NIL, "");
 
-		long newfreq = (long)val_double(replybuffer);
-		if (newfreq && newfreq != vfoA.freq)
-			Fl::awake(setvfo, (void *)newfreq);
-		replybuffer.clear();
+		long newfreq = (long)val_double(xmlrep_buffer);
+		Fl::awake(setvfo, (void *)newfreq);
 	} catch (...) {
 		throw;
 	}
@@ -401,9 +410,9 @@ void check_for_mode_change()
 	}
 
 	try {
-		sendquery(main_get_mode, XML_NIL, "");
+		send_xml(main_get_mode, XML_NIL, "");
 
-		string new_mode = val_string(replybuffer);
+		string new_mode = val_string(xmlrep_buffer);
 		if (new_mode != selrig->modes_[vfoA.imode]) {
 			int imode = 0;
 			while (selrig->modes_[imode] != NULL &&
@@ -433,9 +442,9 @@ void check_for_bandwidth_change()
 	if (!selrig->bandwidths_) return;
 
 	try {
-		sendquery(main_get_bandwidth, XML_NIL, "");
+		send_xml(main_get_bandwidth, XML_NIL, "");
 
-		string new_bw = val_string(replybuffer);
+		string new_bw = val_string(xmlrep_buffer);
 		if (new_bw != selrig->bandwidths_[vfoA.iBW]) {
 			int ibw = 0;
 			while (selrig->bandwidths_[ibw] != NULL &&
@@ -448,23 +457,23 @@ void check_for_bandwidth_change()
 	}
 }
 
-#define REG_UPDATE_INTERVAL 200 // milliseconds
-#define CHECK_UPDATE_COUNT   10  // 10x regular update interval
+#define REG_UPDATE_INTERVAL  50 // milliseconds
+#define CHECK_UPDATE_COUNT   (2000 / REG_UPDATE_INTERVAL)
 
 void send_rig_info()
 {
 	stringstream xml_freq;
 	xml_freq << vfoA.freq;
 
-	xml_rigbws = array(selrig->bandwidths_);
-	xml_rigmodes = array(selrig->modes_);
+	array(selrig->bandwidths_, xml_rigbws);
+	array(selrig->modes_, xml_rigmodes);
 	try {
-		sendquery(main_set_name, XML_STRING, selrig->name_);
-		sendquery(main_set_bandwidths, XML_ARRAY, xml_rigbws.c_str());
-		sendquery(main_set_modes, XML_ARRAY, xml_rigmodes.c_str());
-		sendquery(main_set_frequency, XML_DOUBLE, xml_freq.str().c_str());
-		sendquery(main_set_mode, XML_STRING, selrig->modes_[vfoA.imode]);
-		sendquery(main_set_bandwidth, XML_STRING, selrig->bandwidths_[vfoA.iBW]);
+		send_xml(main_set_name, XML_STRING, selrig->name_);
+		send_xml(main_set_bandwidths, XML_ARRAY, xml_rigbws.c_str());
+		send_xml(main_set_modes, XML_ARRAY, xml_rigmodes.c_str());
+		send_xml(main_set_frequency, XML_DOUBLE, xml_freq.str().c_str());
+		send_xml(main_set_mode, XML_STRING, selrig->modes_[vfoA.imode]);
+		send_xml(main_set_bandwidth, XML_STRING, selrig->bandwidths_[vfoA.iBW]);
 		fldigi_online = true;
 	} catch (...) {
 		throw;
@@ -474,13 +483,13 @@ void send_rig_info()
 
 void send_no_rig()
 {
-	xml_rigbws = array(szNOBWS);
-	xml_rigmodes = array(szNOMODES);
+	array(szNOBWS, xml_rigbws);
+	array(szNOMODES, xml_rigmodes);
 	try {
-		sendquery(main_set_name, XML_STRING, szNORIG);
-		sendquery(main_set_bandwidths, XML_ARRAY, xml_rigbws.c_str());
-		sendquery(main_set_modes, XML_ARRAY, xml_rigmodes.c_str());
-		sendquery(main_set_mode, XML_STRING, "USB");
+		send_xml(main_set_name, XML_STRING, szNORIG);
+		send_xml(main_set_bandwidths, XML_ARRAY, xml_rigbws.c_str());
+		send_xml(main_set_modes, XML_ARRAY, xml_rigmodes.c_str());
+		send_xml(main_set_mode, XML_STRING, "USB");
 	} catch (...) {
 	}
 }
@@ -491,20 +500,26 @@ void * digi_loop(void *d)
 	for (;;) {
 		MilliSleep(REG_UPDATE_INTERVAL);
 		if (!run_digi_loop) break;
+		pthread_mutex_lock(&mutex_xmlrpc);
 		try {
-			if (!fldigi_online && !wait_query) 
+			if (!fldigi_online && !wait_query) {
 				if (!try_count--) send_rig_info();
-			if (!wait_query) check_for_ptt_change();
-			if (!run_digi_loop) break;
-			if (!wait_query) check_for_frequency_change();
-			if (!run_digi_loop) break;
-			if (!wait_query) check_for_mode_change();
-			if (!run_digi_loop) break;
-			if (!wait_query) check_for_bandwidth_change();
+			} else {
+				if (!wait_query) check_for_ptt_change();
+				if (!run_digi_loop) break;
+				if (!wait_query) check_for_frequency_change();
+				if (!run_digi_loop) break;
+				if (!wait_query) check_for_mode_change();
+				if (!run_digi_loop) break;
+				if (!wait_query) check_for_bandwidth_change();
+			}
 		} catch (...) {
 			try_count = CHECK_UPDATE_COUNT;
+//			close_rig_socket();
 			fldigi_online = false;
 		}
+		pthread_mutex_unlock(&mutex_xmlrpc);
+
 	}
 	return NULL;
 }
