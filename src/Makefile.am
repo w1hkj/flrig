@@ -151,8 +151,35 @@ flrig_SOURCES += \
 	support.cxx \
 	util.cxx \
 	ValueSlider.cxx \
-	socket.cxx \
-	sockxml_io.cxx
+	xml_io.cxx \
+	xmlrpcpp/XmlRpc.h \
+	xmlrpcpp/XmlRpcClient.cpp \
+	xmlrpcpp/XmlRpcClient.h \
+	xmlrpcpp/XmlRpcDispatch.cpp \
+	xmlrpcpp/XmlRpcDispatch.h \
+	xmlrpcpp/XmlRpcException.h \
+	xmlrpcpp/XmlRpcMutex.cpp \
+	xmlrpcpp/XmlRpcMutex.h \
+	xmlrpcpp/XmlRpcServer.cpp \
+	xmlrpcpp/XmlRpcServer.h \
+	xmlrpcpp/XmlRpcServerConnection.cpp \
+	xmlrpcpp/XmlRpcServerConnection.h \
+	xmlrpcpp/XmlRpcServerMethod.cpp \
+	xmlrpcpp/XmlRpcServerMethod.h \
+	xmlrpcpp/XmlRpcSocket.cpp \
+	xmlrpcpp/XmlRpcSocket.h \
+	xmlrpcpp/XmlRpcSource.cpp \
+	xmlrpcpp/XmlRpcSource.h \
+	xmlrpcpp/XmlRpcThread.cpp \
+	xmlrpcpp/XmlRpcThread.h \
+	xmlrpcpp/XmlRpcThreadedServer.cpp \
+	xmlrpcpp/XmlRpcThreadedServer.h \
+	xmlrpcpp/XmlRpcUtil.cpp \
+	xmlrpcpp/XmlRpcUtil.h \
+	xmlrpcpp/XmlRpcValue.cpp \
+	xmlrpcpp/XmlRpcValue.h \
+	xmlrpcpp/base64.h
+
 
 # Additional source files that are distributed
 EXTRA_DIST = \
@@ -189,7 +216,7 @@ EXTRA_DIST = \
 	include/rig_io.h \
 	include/rigpanel.h \
 	include/serial.h \
-	include/sockxml_io.h \
+	include/xml_io.h \
 	include/status.h \
 	include/support.h \
 	include/threads.h \
@@ -201,7 +228,6 @@ EXTRA_DIST = \
 	include/TT563.h \
 	include/util.h \
 	include/ValueSlider.h \
-	include/socket.h \
 	images/alc.xbm \
 	images/P25.xbm \
 	images/P50.xbm \

@@ -47,7 +47,7 @@
 #include "debug.h"
 #include "util.h"
 #include "gettext.h"
-#include "sockxml_io.h"
+#include "xml_io.h"
 
 #include "flrig_icon.cxx"
 
@@ -240,7 +240,7 @@ int main (int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-//    open_rig_socket();
+	open_rig_xmlrpc();
 
 	wait_query = true;
 	digi_thread = new pthread_t;      

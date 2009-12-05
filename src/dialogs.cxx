@@ -4,7 +4,7 @@
 #include "serial.h"
 #include "support.h"
 #include "rigpanel.h"
-#include "sockxml_io.h"
+#include "xml_io.h"
 
 #include <string>
 

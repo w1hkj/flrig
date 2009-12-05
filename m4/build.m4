@@ -5,7 +5,10 @@ AC_DEFUN([AC_FLRIG_SH_DQ], [
 AC_DEFUN([AC_FLRIG_BUILD_INFO], [
 # Define build flags and substitute in Makefile.in
 # CPPFLAGS
-  FLRIG_BUILD_CPPFLAGS="-I\$(srcdir) -I\$(srcdir)/include"
+  FLRIG_BUILD_CPPFLAGS="-I\$(srcdir) -I\$(srcdir)/include -I\$(srcdir)/xmlrpcpp"
+  if test "x$target_win32" = "xyes"; then
+      FLRIG_BUILD_CPPFLAGS="$FLRIG_BUILD_CPPFLAGS -D_WINDOWS"
+  fi
 # CXXFLAGS
   FLRIG_BUILD_CXXFLAGS="$FLTK_CFLAGS -pipe -Wall -fexceptions $OPT_CFLAGS $DEBUG_CFLAGS \
 $PTW32_CFLAGS"

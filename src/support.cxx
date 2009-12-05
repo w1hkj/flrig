@@ -17,7 +17,7 @@
 #include "dialogs.h"
 #include "rigbase.h"
 #include "ptt.h"
-#include "sockxml_io.h"
+#include "xml_io.h"
 
 using namespace std;
 
