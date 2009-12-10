@@ -350,18 +350,10 @@ void * digi_loop(void *d)
 			} else {
  				if (!wait_query) get_all_status();
 				if (!run_digi_loop) break;
-				// if (!wait_query) check_for_ptt_change();
-				// if (!run_digi_loop) break;
-				// if (!wait_query) check_for_frequency_change();
-				// if (!run_digi_loop) break;
-				// if (!wait_query) check_for_mode_change();
-				// if (!run_digi_loop) break;
-				// if (!wait_query) check_for_bandwidth_change();
 			}
 		} catch (const XmlRpc::XmlRpcException& e) {
 			LOG_ERROR("%s", e.getMessage().c_str());
 			try_count = CHECK_UPDATE_COUNT;
-//			close_rig_xmlrpc();
 			fldigi_online = false;
 		}
 		pthread_mutex_unlock(&mutex_xmlrpc);

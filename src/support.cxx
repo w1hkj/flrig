@@ -843,12 +843,14 @@ void cbExit()
 	pthread_join(*serial_thread, NULL);
 	RigSerial.ClosePort();
 
+	try {
+		send_no_rig();
+	} catch (...) { }
+
 	pthread_mutex_lock(&mutex_xmlrpc);
 	run_digi_loop = false;
 	pthread_mutex_unlock(&mutex_xmlrpc);
 	pthread_join(*digi_thread, NULL);
-	
-	send_no_rig();
 
 	progStatus.rig_nbr = rig_nbr;
 
