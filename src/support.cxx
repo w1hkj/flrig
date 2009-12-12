@@ -26,8 +26,6 @@ rigbase *selrig = rigs[0];
 extern bool test;
 int freqval = 0;
 
-extern void resetWatchDog();
-
 FREQMODE vfoB = {7070000, 0, 0};
 FREQMODE vfoA = {14070000, 0, 0};
 int transceiver_bw = 0;
@@ -63,6 +61,17 @@ int  powerlevel = 0;
 
 // the following functions are ONLY CALLED by the serial loop
 
+bool check_freq()
+{
+	if (vfoA.freq == FreqDisp->value()) return false;
+	wait_query = true;
+	vfoA.freq = FreqDisp->value();
+	selrig->set_vfoA(vfoA.freq);
+	send_new_freq();
+	wait_query = false;
+	return true;
+}
+
 // read current vfo frequency
 void read_vfo()
 {
@@ -71,7 +80,7 @@ void read_vfo()
 		freq = selrig->get_vfoA();
 	if (freq != vfoA.freq) {
 		vfoA.freq = freq;
-		Fl::awake(setFreqDisp);//, (void*)0);
+		Fl::awake(setFreqDisp);
 	}
 }
 
@@ -124,7 +133,7 @@ void * serial_thread_loop(void *d)
 	for(;;) {
 		if (!run_serial_thread) break;
 
-		MilliSleep(progStatus.serloop_timing / 2);
+		MilliSleep(progStatus.serloop_timing);
 
 		if (bypass_serial_thread_loop) goto serial_bypass_loop;
 // rig specific data reads
@@ -136,12 +145,7 @@ void * serial_thread_loop(void *d)
 			resetxmt = true;
 
 			pthread_mutex_lock(&mutex_serial);
-				read_vfo();
-			pthread_mutex_unlock(&mutex_serial);
-
-			MilliSleep(progStatus.serloop_timing / 2);
-
-			pthread_mutex_lock(&mutex_serial);
+				if (!check_freq()) read_vfo();
 				read_smeter();
 			pthread_mutex_unlock(&mutex_serial);
 
@@ -168,11 +172,6 @@ void * serial_thread_loop(void *d)
 
 			pthread_mutex_lock(&mutex_serial);
 				read_power_out();
-			pthread_mutex_unlock(&mutex_serial);
-
-			MilliSleep(progStatus.serloop_timing / 2);
-
-			pthread_mutex_lock(&mutex_serial);
 				read_swr();
 				read_alc();
 			pthread_mutex_unlock(&mutex_serial);
@@ -334,13 +333,13 @@ void buildlist() {
 }
 
 int movFreq() {
-	pthread_mutex_lock(&mutex_serial);
-		vfoA.freq = FreqDisp->value();
-		selrig->set_vfoA(vfoA.freq);
-	pthread_mutex_unlock(&mutex_serial);
-	wait_query = true;
-	send_new_freq();
-	wait_query = false;
+//	pthread_mutex_lock(&mutex_serial);
+//		vfoA.freq = FreqDisp->value();
+//		selrig->set_vfoA(vfoA.freq);
+//	pthread_mutex_unlock(&mutex_serial);
+//	wait_query = true;
+//	send_new_freq();
+//	wait_query = false;
 	return 1;
 }
 

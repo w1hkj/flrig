@@ -19,7 +19,7 @@
 using namespace std;
 using XmlRpc::XmlRpcValue;
 
-static const double TIMEOUT = 2.0;
+static const double TIMEOUT = 0.5;//2.0;
 static const char* tcpip_address = "127.0.0.1";
 static const int tcpip_port      = 7362;
 
@@ -303,7 +303,7 @@ static void check_for_bandwidth_change(void)
 }
 
 #define REG_UPDATE_INTERVAL  50 // milliseconds
-#define CHECK_UPDATE_COUNT   (2000 / REG_UPDATE_INTERVAL)
+#define CHECK_UPDATE_COUNT   (500 / REG_UPDATE_INTERVAL)
 
 static void send_rig_info()
 {
