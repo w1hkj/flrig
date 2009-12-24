@@ -72,7 +72,7 @@ int RIG_FT857D::get_mode()
 	cmd[4] = 0x03;
 
 	if (sendCommand(cmd, 5)) {
-		int mode = cmd[4];
+		int mode = replybuff[0];
 		for (int i = 0; i < 8; i++)
 			if (FT857D_mode_val[i] == mode) {
 				mode_ = i;
