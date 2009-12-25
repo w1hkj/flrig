@@ -54,7 +54,7 @@ extern void cbExit();
 
 extern void setVolumeControl(void *);
 extern void setModeControl(void *);
-extern void updateBandwidthControl();
+extern void updateBandwidthControl(void *d = NULL);
 extern void updateBW(void *);
 extern void setBWControl(void *);
 extern void setNotchControl(void *);
@@ -98,6 +98,7 @@ extern void cb_compression();
 extern void setLower();
 extern void setUpper();
 
+extern void closeRig();
 extern void cbExit();
 
 extern void about();
