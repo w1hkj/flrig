@@ -6,6 +6,8 @@
  * Copyright 2009, Dave Freese, W1HKJ
  *
  */
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "FT857D.h"
 
@@ -34,6 +36,7 @@ RIG_FT857D::RIG_FT857D() {
 	comm_dtrptt = false;
 	mode_ = 1;
 	bw_ = 0;
+	has_mode_control = true;
 };
 
 RIG_FT897D::RIG_FT897D() {
@@ -51,9 +54,15 @@ long RIG_FT857D::get_vfoA ()
 	init_cmd();
 	cmd[4] = 0x03;
 
-	if (sendCommand(cmd, 5))
+	if (sendCommand(cmd, 5)) {
 		freq_ = fm_bcd(replybuff, 8) * 10;
-
+		int mode = replybuff[4];
+		for (int i = 0; i < 8; i++)
+			if (FT857D_mode_val[i] == mode) {
+				mode_ = i;
+				break;
+			}
+	}
 	return freq_;
 }
 
@@ -68,17 +77,7 @@ void RIG_FT857D::set_vfoA (long freq)
 
 int RIG_FT857D::get_mode()
 {
-	init_cmd();
-	cmd[4] = 0x03;
-
-	if (sendCommand(cmd, 5)) {
-		int mode = replybuff[0];
-		for (int i = 0; i < 8; i++)
-			if (FT857D_mode_val[i] == mode) {
-				mode_ = i;
-				break;
-			}
-	}
+// read by get_vfoA
 	return mode_;
 }
 
@@ -93,7 +92,7 @@ void RIG_FT857D::set_mode(int val)
 	mode_ = val;
 	init_cmd();
 	cmd[0] = FT857D_mode_val[val];
-	cmd[4] = 7;
+	cmd[4] = 0x07;
 	sendCommand(cmd, 0);
 }
 

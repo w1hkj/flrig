@@ -91,6 +91,9 @@ void cbCancelXcvrDialog()
 
 void cbOkXcvrDialog()
 {
+	// close the current rig control
+	closeRig();
+
 	string p1 = selectCommPort->value();
 	string p2 = selectAuxPort->value();
 	string p3 = selectSepPTTPort->value();

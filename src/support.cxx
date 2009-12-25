@@ -30,6 +30,10 @@ FREQMODE vfoB = {7070000, 0, 0};
 FREQMODE vfoA = {14070000, 0, 0};
 int transceiver_bw = 0;
 int transceiver_mode = 0;
+long transceiver_freq = 7070000;
+
+bool bws_changed = false;
+const char **old_bws = NULL;
 
 bool localptt = false;
 bool remoteptt = false;
@@ -61,33 +65,94 @@ int  powerlevel = 0;
 
 // the following functions are ONLY CALLED by the serial loop
 
-bool check_freq()
-{
-	if (vfoA.freq == FreqDisp->value()) return false;
-	wait_query = true;
-	vfoA.freq = FreqDisp->value();
-	selrig->set_vfoA(vfoA.freq);
-	send_new_freq();
-	wait_query = false;
-	return true;
-}
-
 // read current vfo frequency
 void read_vfo()
 {
-	if (RigSerial.IsOpen() == false) return;
-	static long  freq = 0;
-		freq = selrig->get_vfoA();
+	if (vfoA.freq != FreqDisp->value()) {
+		wait_query = true;
+		vfoA.freq = FreqDisp->value();
+		selrig->set_vfoA(vfoA.freq);
+		send_new_freq();
+		wait_query = false;
+		return;
+	}
+	long  freq = selrig->get_vfoA();
 	if (freq != vfoA.freq) {
 		vfoA.freq = freq;
 		Fl::awake(setFreqDisp);
 	}
 }
 
+void setModeControl(void *)
+{
+	opMODE->index(vfoA.imode);
+}
+
+void read_mode()
+{
+	int nu_mode = opMODE->index();
+	if (vfoA.imode != nu_mode) {
+		wait_query = true;
+		if (selrig->restore_mbw)
+			selrig->set_bandwidth(selrig->last_bw);
+		vfoA.imode = nu_mode;
+		selrig->set_mode(vfoA.imode);
+		if (selrig->restore_mbw) {
+			vfoA.iBW = selrig->last_bw = selrig->get_bandwidth();
+		} else
+			selrig->set_bandwidth(vfoA.iBW);
+		Fl::awake(updateBandwidthControl);
+
+		send_mode_changed();
+		send_sideband();
+		if (bws_changed) send_bandwidths();
+		send_bandwidth_changed();
+		wait_query = false;
+		return;
+	}
+	nu_mode = selrig->get_mode();
+	if (vfoA.imode != nu_mode) {
+		vfoA.imode = nu_mode;
+		wait_query = true;
+		Fl::awake(setModeControl);
+		Fl::awake(updateBandwidthControl);
+		send_mode_changed();
+		send_sideband();
+		if (bws_changed) send_bandwidths();
+		send_bandwidth_changed();
+		wait_query = false;
+	}
+}
+
+void setBWControl(void *)
+{
+	opBW->index(vfoA.iBW);
+}
+
+void read_bandwidth()
+{
+	int nu_BW = opBW->index();
+	if (vfoA.iBW != nu_BW) {
+		wait_query = true;
+		vfoA.iBW = nu_BW;
+		selrig->set_bandwidth(vfoA.iBW);
+		send_bandwidth_changed();
+		wait_query = false;
+		return;
+	}
+	nu_BW = selrig->get_bandwidth();
+	if (vfoA.iBW != nu_BW) {
+		wait_query = true;
+		vfoA.iBW = nu_BW;
+		Fl::awake(setBWControl);
+		send_bandwidth_changed();
+		wait_query = false;
+	}
+}
+
 // read current signal level
 void read_smeter()
 {
-	if (RigSerial.IsOpen() == false) return;
 	int  sig;
 		sig = selrig->get_smeter();
 	if (sig == -1) return;
@@ -97,8 +162,6 @@ void read_smeter()
 // read power out
 void read_power_out()
 {
-	if (RigSerial.IsOpen() == false) return;
-//	if (!selrig->has_power_control) return;
 	int sig;
 		sig = selrig->get_power_out();
 	Fl::awake(updateFwdPwr, (void*)sig);
@@ -107,8 +170,6 @@ void read_power_out()
 // read swr
 void read_swr()
 {
-	if (RigSerial.IsOpen() == false) return;
-//	if (!selrig->has_swr_control) return;
 	int sig;
 		sig = selrig->get_swr();
 	Fl::awake(updateSWR, (void*)sig);
@@ -117,7 +178,6 @@ void read_swr()
 // alc
 void read_alc()
 {
-	if (RigSerial.IsOpen() == false) return;
 	if (!selrig->has_alc_control) return;
 	int sig;
 		sig = selrig->get_alc();
@@ -129,7 +189,7 @@ static bool resetxmt = true;
 
 void * serial_thread_loop(void *d)
 {
-//  static int  loopcount = 0;
+  static int  loopcount = 0;
 	for(;;) {
 		if (!run_serial_thread) break;
 
@@ -145,8 +205,13 @@ void * serial_thread_loop(void *d)
 			resetxmt = true;
 
 			pthread_mutex_lock(&mutex_serial);
-				if (!check_freq()) read_vfo();
+				read_vfo();
 				read_smeter();
+				switch (loopcount) {
+					case 0: read_mode(); break;
+					case 1: read_bandwidth(); break;
+				}
+				if (++loopcount == 2) loopcount = 0;
 			pthread_mutex_unlock(&mutex_serial);
 
 /*
@@ -203,10 +268,7 @@ void setBW()
 	wait_query = false;
 }
 
-bool bws_changed = false;
-const char **old_bws = NULL;
-
-void updateBandwidthControl()
+void updateBandwidthControl(void *d)
 {
 	bws_changed = false;
 	if (selrig->has_bandwidth_control) {
@@ -230,25 +292,7 @@ void updateBandwidthControl()
 
 void setMode()
 {
-	wait_query = true;
-	pthread_mutex_lock(&mutex_serial);
-		if (selrig->restore_mbw)
-			selrig->set_bandwidth(selrig->last_bw);
-		vfoA.imode = opMODE->index();
-		selrig->set_mode(vfoA.imode);
-		updateBandwidthControl();
-		if (selrig->restore_mbw) {
-			vfoA.iBW = selrig->last_bw = selrig->get_bandwidth();
-			opBW->index(vfoA.iBW);
-		} else
-			selrig->set_bandwidth(vfoA.iBW);
-	pthread_mutex_unlock(&mutex_serial);
-
-	send_mode_changed();
-	send_sideband();
-	if (bws_changed) send_bandwidths();
-	send_bandwidth_changed();
-	wait_query = false;
+return;
 }
 
 void sortList() {
@@ -826,31 +870,18 @@ void setPTT( void *d)
 	rigPTT(val);
 }
 
+void closeRig()
+{
+	// restore initial rig settings
+	pthread_mutex_lock(&mutex_serial);
+	selrig->set_vfoA(transceiver_freq);
+	selrig->set_mode(transceiver_mode);
+	selrig->set_bandwidth(transceiver_bw);
+	pthread_mutex_unlock(&mutex_serial);
+}
+
 void cbExit()
 {
-
-	pthread_mutex_lock(&mutex_serial);
-		if (selrig->has_mode_control)
-			selrig->set_mode(transceiver_mode);
-		if (selrig->has_bandwidth_control) {
-			updateBandwidthControl();
-			selrig->set_bandwidth(transceiver_bw);
-		}
-		run_serial_thread = false;
-	pthread_mutex_unlock(&mutex_serial);
-
-	pthread_join(*serial_thread, NULL);
-	RigSerial.ClosePort();
-
-	try {
-		send_no_rig();
-	} catch (...) { }
-
-	pthread_mutex_lock(&mutex_xmlrpc);
-	run_digi_loop = false;
-	pthread_mutex_unlock(&mutex_xmlrpc);
-	pthread_join(*digi_thread, NULL);
-
 	progStatus.rig_nbr = rig_nbr;
 
 	progStatus.freq = vfoA.freq;
@@ -878,6 +909,27 @@ void cbExit()
 	progStatus.saveLastState();
 
 	saveFreqList();
+
+	closeRig();
+	// shutdown serial thread
+	pthread_mutex_lock(&mutex_serial);
+		run_serial_thread = false;
+	pthread_mutex_unlock(&mutex_serial);
+	pthread_join(*serial_thread, NULL);
+
+	// close down the serial port
+	RigSerial.ClosePort();
+
+	// restore fldigi to its no-rig state
+	try {
+		send_no_rig();
+	} catch (...) { }
+
+	// shutdown xmlrpc thread
+	pthread_mutex_lock(&mutex_xmlrpc);
+	run_digi_loop = false;
+	pthread_mutex_unlock(&mutex_xmlrpc);
+	pthread_join(*digi_thread, NULL);
 
 	if (dlgDisplayConfig && dlgDisplayConfig->visible())
 		dlgDisplayConfig->hide();
@@ -1033,15 +1085,14 @@ void initXcvrTab()
 void initRig()
 {
 	wait_query = true;
-
+// disable the serial thread
 	pthread_mutex_lock(&mutex_serial);
+
 	selrig->initialize();
-	if (selrig->has_mode_control)
-		transceiver_mode = selrig->get_mode();
-	if (selrig->has_bandwidth_control) {
-		transceiver_bw = selrig->get_bandwidth();
-		selrig->last_bw = transceiver_bw;
-	}
+	transceiver_freq = selrig->get_vfoA();
+	transceiver_mode = selrig->get_mode();
+	transceiver_bw = selrig->get_bandwidth();
+	if (selrig->restore_mbw) selrig->last_bw = transceiver_bw;
 
 	rigmodes_.clear();
 	opMODE->clear();
@@ -1255,34 +1306,32 @@ void initRig()
 	if (selrig->has_compON || selrig->has_compression)
 		selrig->set_compression();
 
-	vfoB.freq  = vfoA.freq  = selrig->deffreq_;
-	vfoB.imode = vfoA.imode = selrig->def_mode;
-	vfoB.iBW   = vfoA.iBW   = selrig->defbw_;
+	adjust_control_positions();
+	initXcvrTab();
 
+	buildlist();
+
+	vfoA.freq = progStatus.freq;
+	vfoA.imode = progStatus.opMODE;
+	vfoA.iBW = progStatus.opBW;
 	FreqDisp->value( vfoA.freq );
-	opMODE->index( vfoA.imode  );
-	opBW->index( vfoA.iBW );
 
+	vfoB.freq = progStatus.freq_B;
+	vfoB.imode = progStatus.imode_B;
+	vfoB.iBW = progStatus.iBW_B;
 	snprintf(szVfoB, sizeof(szVfoB), "%13.3f", vfoB.freq / 1000.0);
 	txtInactive->label(szVfoB);
 	txtInactive->redraw();
 
-	adjust_control_positions();
-	initXcvrTab();
-	pthread_mutex_unlock(&mutex_serial);
+	selrig->set_vfoA(vfoA.freq);
+	opMODE->index( vfoA.imode );
+	selrig->set_mode(vfoA.imode);
 
-	buildlist();
+	updateBandwidthControl();
+	opBW->index( vfoA.iBW );
+	selrig->set_bandwidth(vfoA.iBW);
 
-	FreqDisp->value( vfoA.freq = progStatus.freq );
-
-	pthread_mutex_lock(&mutex_serial);
-		selrig->set_vfoA(progStatus.freq);
-		opMODE->index( vfoA.imode = progStatus.opMODE );
-		selrig->set_mode(progStatus.opMODE);
-
-		updateBandwidthControl();
-		opBW->index( vfoA.iBW = progStatus.opBW );
-		selrig->set_bandwidth(progStatus.opBW);
+	// enable the serial thread
 	pthread_mutex_unlock(&mutex_serial);
 
 	fldigi_online = false;
@@ -1385,13 +1434,13 @@ void initStatusConfigDialog()
 
 	initRig();
 
-	vfoB.freq = progStatus.freq_B;
-	vfoB.imode = progStatus.imode_B;
-	vfoB.iBW = progStatus.iBW_B;
+//	vfoB.freq = progStatus.freq_B;
+//	vfoB.imode = progStatus.imode_B;
+//	vfoB.iBW = progStatus.iBW_B;
 
-	snprintf(szVfoB, sizeof(szVfoB), "%13.3f", vfoB.freq / 1000.0);
-	txtInactive->label(szVfoB);
-	txtInactive->redraw();
+//	snprintf(szVfoB, sizeof(szVfoB), "%13.3f", vfoB.freq / 1000.0);
+//	txtInactive->label(szVfoB);
+//	txtInactive->redraw();
 
 	bypass_serial_thread_loop = false;
 
