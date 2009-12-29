@@ -26,20 +26,19 @@ static const int tcpip_port      = 7362;
 // these are get only
 static const char* main_get_trx_state   = "main.get_trx_state";
 // these are set only
-static const char* main_set_name        = "main.set_rig_name";
-static const char* main_set_modes       = "main.set_rig_modes";
-static const char* main_set_bandwidths  = "main.set_rig_bandwidths";
 static const char* main_set_tx          = "main.tx";
 static const char* main_set_rx          = "main.rx";
+static const char* main_set_name        = "rig.set_name";
+static const char* main_set_modes       = "rig.set_modes";
+static const char* main_set_bandwidths  = "rig.set_bandwidths";
 // these are get/set
 static const char* main_get_frequency   = "main.get_frequency";
-static const char* main_set_frequency   = "main.set_rig_frequency";
-//static const char* main_get_sideband    = "main.get_sideband";
-static const char* main_set_sideband    = "main.set_sideband";
-static const char* main_set_mode        = "main.set_rig_mode";
-static const char* main_get_mode        = "main.get_rig_mode";
-static const char* main_set_bandwidth   = "main.set_rig_bandwidth";
-static const char* main_get_bandwidth   = "main.get_rig_bandwidth";
+static const char* main_set_wf_sideband = "main.set_wf_sideband";
+static const char* main_set_frequency   = "rig.set_frequency";
+static const char* main_set_mode        = "rig.set_mode";
+static const char* main_get_mode        = "rig.get_mode";
+static const char* main_set_bandwidth   = "rig.set_bandwidth";
+static const char* main_get_bandwidth   = "rig.get_bandwidth";
 
 static XmlRpc::XmlRpcClient* client;
 static XmlRpcValue* status_query;
@@ -212,7 +211,7 @@ void send_sideband()
 	auto_mutex lock(mutex_xmlrpc);
 	try {
 		XmlRpcValue sideband(selrig->get_modetype(vfoA.imode) == 'U' ? "USB" : "LSB"), res;
-		execute(main_set_sideband, sideband, res);
+		execute(main_set_wf_sideband, sideband, res);
 	} catch (...) { }
 }
 
