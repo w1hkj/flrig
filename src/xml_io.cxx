@@ -228,116 +228,97 @@ static void check_for_ptt_change(const XmlRpcValue& trx_state)
 		Fl::awake(setPTT, (void*)nuptt);
 	}
 }
-/*
-static void check_for_ptt_change(void)
-{
-	XmlRpcValue trx_state;
-	execute(main_get_trx_state, XmlRpcValue(), trx_state);
-	check_for_ptt_change(trx_state);
-}
-*/
+
+bool updatingVFO = false;
 
 void setvfo(void *d)
 {
 	long newfreq = (long)d;
-	if (newfreq == vfoA.freq) return;
-	if (!newfreq) return;
-
+	LOG_INFO("%ld", newfreq);
 	pthread_mutex_lock(&mutex_serial);
 		selrig->set_vfoA(newfreq);
 	pthread_mutex_unlock(&mutex_serial);
 	vfoA.freq = newfreq;
 	FreqDisp->value(newfreq);
+	updatingVFO = false;
 }
 
 static void check_for_frequency_change(const XmlRpcValue& freq)
 {
+	if (updatingVFO) return;
 	double f = freq;
 	long newfreq = (long)f;
+	if (newfreq == vfoA.freq || updatingVFO == true || !f) return;
+	updatingVFO = true;
 	Fl::awake(setvfo, (void *)newfreq);
 }
-/*
-static void check_for_frequency_change(void)
-{
-	XmlRpcValue freq;
-	execute(main_get_frequency, XmlRpcValue(), freq);
-	check_for_frequency_change(freq);
-}
-*/
+
+bool updatingMode = false;
 
 static void updateModeControl(void *d)
 {
-	if (!run_digi_loop)
-		return;
+	if (!run_digi_loop) return;
 	int md = (long)d;
-	auto_mutex lock(mutex_serial);
-	vfoA.imode = md;
-	opMODE->index(vfoA.imode);
-	selrig->set_mode(vfoA.imode);
-	updateBandwidthControl();
+	LOG_INFO("%d", md);
+	pthread_mutex_lock(&mutex_serial);
+		vfoA.imode = md;
+		opMODE->index(vfoA.imode);
+		selrig->set_mode(vfoA.imode);
+		updateBandwidthControl();
+		selrig->set_bandwidth(vfoA.iBW);
+	pthread_mutex_unlock(&mutex_serial);
 	send_sideband();
 	send_bandwidths();
 	send_bandwidth_changed();
+	updatingMode = false;
 }
 
 static void check_for_mode_change(const XmlRpcValue& new_mode)
 {
-	if (!selrig->modes_) {
-		LOG_INFO("%s", "no mode change");
+	if (!selrig->modes_ || updatingMode) 
 		return;
-	}
 
 	if (new_mode != selrig->modes_[vfoA.imode]) {
 		long imode = 0;
 		while (selrig->modes_[imode] != NULL && new_mode != selrig->modes_[imode])
 			imode++;
 		if (selrig->modes_[imode] != NULL) {
+			updatingMode = true;
 			Fl::awake(updateModeControl, (void*)imode);
 			return;
 		}
 	}
 }
-/*
-static void check_for_mode_change(void)
-{
-	XmlRpcValue new_mode;
-	execute(main_get_mode, XmlRpcValue(), new_mode);
-	check_for_mode_change(new_mode);
-}
-*/
+
+bool updatingBW = false;
 
 void updateBW(void *d)
 {
 	if (!run_digi_loop) return;
-	vfoA.iBW = (long)d;
 	pthread_mutex_lock(&mutex_serial);
+		vfoA.iBW = (long)d;
 		opBW->index(vfoA.iBW);
 		selrig->set_bandwidth(vfoA.iBW);
 	pthread_mutex_unlock(&mutex_serial);
+	updatingBW = false;
+	LOG_INFO("%d", vfoA.iBW);
 }
 
 static void check_for_bandwidth_change(const XmlRpcValue& new_bw)
 {
-	if (!selrig->bandwidths_)
+	if (!selrig->bandwidths_ || updatingBW || updatingMode)
 		return;
 
 	if (new_bw != selrig->bandwidths_[vfoA.iBW]) {
 		long ibw = 0;
 		while (selrig->bandwidths_[ibw] != NULL && new_bw != selrig->bandwidths_[ibw])
 			ibw++;
-		if (selrig->bandwidths_[ibw] != NULL)
+		if (selrig->bandwidths_[ibw] != NULL) {
+			updatingBW = true;
 			Fl::awake(updateBW, (void*)ibw);
+		}
 	}
 }
-
-/*
-static void check_for_bandwidth_change(void)
-{
-	XmlRpcValue new_bw;
-	execute(main_get_bandwidth, XmlRpcValue(), new_bw);
-	check_for_bandwidth_change(new_bw);
-}
-*/
 
 #define REG_UPDATE_INTERVAL  50 // milliseconds
 #define CHECK_UPDATE_COUNT   (1000 / REG_UPDATE_INTERVAL)

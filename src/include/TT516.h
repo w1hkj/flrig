@@ -45,6 +45,7 @@ public:
 //	int  get_mic_gain();
 //	void get_mic_min_max_step(int &min, int &max, int &step);
 	void checkresponse();
+	int  adjust_bandwidth(int);
 };
 
 

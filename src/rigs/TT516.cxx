@@ -41,6 +41,12 @@ static const char *TT516_widths[] = {
 "1400", "1500", "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300",
 "2400", "2500", "2600", "2700", "2800", "2900", "3000", NULL};
 
+static const char *TT516_AM_widths[] = {
+"400", "500", "600", "700", "800", "900", "1000", "1100", "1200", "1350",
+"1400", "1500", "1600", "1700", "1800", "1900", "2000", "2200", "2400", "2600",
+"2800", "3000", "3200", "3400", "3600", "3800", "4000", "4200", "4400", "4600",
+"4800", "5000", "5200", "5400", "5600", "5800", "6000", NULL};
+
 static char TT516setBW[]		= "*Wx\r";
 static char TT516setPBT[]		= "*Pxx\r";
 static char TT516setMODE[]		= "*Mnn\r";
@@ -79,9 +85,9 @@ RIG_TT516::RIG_TT516() {
 	serloop_timing = 200;
 	
 	mode_ = 3;
-	bw_ = 30;
+	bw_ = 36;
 	def_mode = 3;
-	defbw_ = 30;
+	defbw_ = 36;
 	deffreq_ = 14070000;
 	max_power = 25;
 
@@ -176,6 +182,19 @@ int RIG_TT516::get_mode()
 int RIG_TT516::get_modetype(int n)
 {
 	return TT516mode_type[n];
+}
+
+int RIG_TT516::adjust_bandwidth(int m)
+{
+	if (m == 0) { // AM
+		bandwidths_ = TT516_AM_widths;
+		bw_ = 36;
+	} else {
+		bandwidths_ = TT516_widths;
+		if (m == 3) bw_ = 12;
+		else bw_ = 36;
+	}
+	return bw_;
 }
 
 void RIG_TT516::set_bandwidth(int val)
