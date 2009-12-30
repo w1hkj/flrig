@@ -408,8 +408,8 @@ void cbABactive()
 		selrig->set_vfoA(vfoA.freq);
 		if (vfoA.imode != vfoB.imode) {
 			opMODE->index(vfoA.imode);
-			selrig->set_mode(vfoA.imode);
 			updateBandwidthControl();
+			selrig->set_mode(vfoA.imode);
 		}
 		if (vfoA.iBW != vfoB.iBW) {
 			opBW->index(vfoA.iBW);
