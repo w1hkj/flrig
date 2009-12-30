@@ -66,8 +66,8 @@ long RIG_FT100D::get_vfoA ()
 		mode_ = replybuff[5] & 0x0F;
 // interpret bandwidth bits
 		int bw =  (replybuff[5] >> 4) & 0x03;
-		if (bw == 0) bw_ = 2;
-		else if (bw == 1) bw_ = 3;
+		if (bw == 0) bw_ = 3;
+		else if (bw == 1) bw_ = 2;
 		else if (bw == 2) bw_ = 1;
 		else if (bw == 3) bw_ = 0;
 	}
