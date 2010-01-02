@@ -107,7 +107,7 @@ RIG_TT550::RIG_TT550() {
 	comm_timeout = 50;
 	comm_rtscts = true;
 	comm_rtsplus = false;
-	comm_dtrplus = false;
+	comm_dtrplus = true;
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
