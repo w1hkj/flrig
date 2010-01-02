@@ -84,7 +84,7 @@ RIG_TT538::RIG_TT538() {
 	comm_timeout = 50;
 	comm_rtscts = true;
 	comm_rtsplus = false;
-	comm_dtrplus = false;
+	comm_dtrplus = true;
 	comm_catptt = false;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
