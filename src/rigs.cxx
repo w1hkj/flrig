@@ -9,6 +9,7 @@
 
 #include "FT100D.h"
 #include "FT450.h"
+#include "FT767.h"
 #include "FT817.h"
 #include "FT857D.h"
 #include "FT950.h"
@@ -29,6 +30,7 @@
 rigbase			rig_null;
 RIG_FT100D		rig_FT100D;
 RIG_FT450		rig_FT450;
+RIG_FT767		rig_FT767;
 RIG_FT817		rig_FT817;
 RIG_FT857D		rig_FT857D;
 RIG_FT897D		rig_FT897D;
@@ -58,6 +60,7 @@ rigbase *rigs[] = {
 	&rig_null,
 	&rig_FT100D,
 	&rig_FT450,
+	&rig_FT767,
 	&rig_FT817,
 	&rig_FT857D,
 	&rig_FT897D,
