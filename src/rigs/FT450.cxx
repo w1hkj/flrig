@@ -198,7 +198,7 @@ void RIG_FT450::set_preamp(int val)
 int RIG_FT450::get_preamp()
 {
 	if (sendCommand("PA0;", 5, false))
-		return (replybuff[3] == '1' ? 1 : 0);
+		return (replybuff[3] == '1' ? 0 : 1);
 	return 0;
 }
 
