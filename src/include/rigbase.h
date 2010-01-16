@@ -181,17 +181,25 @@ public:
 
 	virtual void set_line_out() {}
 	virtual void set_agc_level() {}
+	virtual void set_cw_weight() {}
 	virtual void set_cw_wpm() {}
+	virtual void enable_keyer() {}
+	virtual void set_cw_qsk() {}
 	virtual void set_cw_vol() {}
 	virtual void set_cw_spot() {}
+	virtual void set_spot_onoff() {}
 	virtual void set_vox_onoff() {}
 	virtual void set_vox_gain() {}
 	virtual void set_vox_anti() {}
 	virtual void set_vox_hang() {}
+	virtual void set_mon_vol() {}
+	virtual void set_squelch_level() {}
 	virtual void set_compression() {}
 	virtual void set_auto_notch(int v) {}
+	virtual void tuner_bypass() {}
+	virtual void enable_xmtr() {}
+	virtual void enable_tloop() {}
 
-// need all of the get's for the above
 };
 
 extern rigbase *rigs[];

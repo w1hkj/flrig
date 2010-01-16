@@ -104,11 +104,18 @@ extern void cb_tt550_agc_level();
 extern void cb_tt550_cw_wpm();
 extern void cb_tt550_cw_vol();
 extern void cb_tt550_cw_spot();
+extern void cb_tt550_cw_weight();
+extern void cb_tt550_spot_onoff();
+extern void cb_tt550_enable_keyer();
 extern void cb_tt550_vox_gain();
 extern void cb_tt550_vox_anti();
 extern void cb_tt550_vox_hang();
 extern void cb_tt550_vox_onoff();
 extern void cb_tt550_compression();
+extern void cb_tt550_mon_vol();
+extern void cb_tt550_tuner_bypass();
+extern void cb_tt550_enable_xmtr();
+extern void cb_tt550_enable_tloop();
 
 extern void closeRig();
 extern void cbExit();

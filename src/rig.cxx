@@ -69,34 +69,9 @@ extern void saveFreqList();
 
 void * flrig_terminate(void) {
 	std::cerr << "terminating" << std::endl;
-	
 	fl_message("Closing flrig");
-
-	progStatus.rig_nbr = rig_nbr;
-	progStatus.opMODE = opMODE->index();
-	progStatus.opBW = opBW->index();
-	progStatus.freq = FreqDisp->value();
-	progStatus.imode_B = vfoB.imode;
-	progStatus.iBW_B = vfoB.iBW;
-	progStatus.freq_B = vfoB.freq;
-
-	progStatus.mute = btnVol->value();
-	progStatus.volume = sldrVOLUME->value();
-	progStatus.power_level = sldrPOWER->value();
-	progStatus.mic_gain = sldrMICGAIN->value();
-	progStatus.notch = btnNotch->value();
-	progStatus.notch_val = sldrNOTCH->value();
-	progStatus.shift = btnIFsh->value();
-	progStatus.shift_val = sldrIFSHIFT->value();
-	progStatus.noise = btnNOISE->value();
-	progStatus.attenuator = btnAttenuator->value();
-	progStatus.preamp = btnPreamp->value();
-
-	progStatus.saveLastState();
-
-	saveFreqList();
-
-	exit(1);
+	cbExit();
+	return 0;
 }
 
 void showEvents(void *)

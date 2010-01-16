@@ -9,6 +9,8 @@
 
 // TenTec Pegasus computer controlled transceiver
 
+#include <math.h>
+
 #include "TT550.h"
 #include "support.h"
 #include "util.h"
@@ -84,12 +86,12 @@ static char TT550setAUXHANG[]	= "UTn\r";	// 0..255; 0 = none
 //static char TT550setBLANKER[]	= "Dn\r";	// 0..7; 0 = off
 static char TT550setSPEECH[]	= "Yn\r";	// 0..127; 0 = off
 
-//static char TT550setDISABLE[]	= "#0\r";	// disable transmitter
+static char TT550setDISABLE[]	= "#0\r";	// disable transmitter
 static char TT550setENABLE[]	= "#1\r";	// enable transmitter
 static char TT550setTLOOP_OFF[]	= "#2\r";	// disable T loop
-//static char TT550setTLOOP_ON[]	= "#3\r";	// enable T loop
-//static char TT550setKEYER_ON[]	= "#6\r";	// enable keyer
-//static char TT550setKEYER_OFF[]	= "#7\r";	// disable keyer
+static char TT550setTLOOP_ON[]	= "#3\r";	// enable T loop
+static char TT550setKEYER_ON[]	= "#6\r";	// enable keyer
+static char TT550setKEYER_OFF[]	= "#7\r";	// disable keyer
 //static char TT550setALIVE_OFF[]	= "#8\r";	// disable keep alive
 //static char TT550setALIVE_ON[]	= "#9\r";	// enable keep alive
 
@@ -129,7 +131,7 @@ RIG_TT550::RIG_TT550() {
 	RitFreq = 0;
 	PbtFreq = 0;
 	XitFreq = 0;
-	Bfo = 700;
+	Bfo = 600;
 
 	ATTlevel = 0;
 	RFgain = 100;
@@ -164,7 +166,7 @@ RIG_TT550::RIG_TT550() {
 	has_mode_control = true;
 
 	auto_notch = noise_reduction = false;
-	
+
 	use_line_in = true;
 
 }
@@ -176,77 +178,91 @@ void RIG_TT550::showresponse(string s)
 
 void RIG_TT550::showASCII(string s)
 {
-	if (s[s.length() - 1] == '\r') s[s.length() - 1] = 0;
-	printf("%s\n", s.c_str());
+	string ss = "";
+	for (size_t i = 0; i < s.length(); i++)
+		if (!(s[i] == '\r' || s[i] == '\n'))
+			ss += replystr[i];
+	LOG_WARN("%s", ss.c_str());
 }
 
 void RIG_TT550::initialize()
 {
 	clearSerialPort();
 
-	string s;
 	cmd = TT550restart; // wake up radio
 	sendCommand(cmd, 0, true);
 	MilliSleep(200);
-	readResponse();
-	for (size_t i = 0; i < replystr.length(); i++)
-		if (replystr[i] != '\r' && replystr[i] != '\n') s += replystr[i];
-	showASCII(s);
-
-	MilliSleep(100);
-	cmd = TT550restart; // wake up radio
+	cmd = TT550restart; // wake up radio, Jupiter seems to need 2 calls
 	sendCommand(cmd, 16, true);
-	for (size_t i = 0; i < replystr.length(); i++)
-		if (replystr[i] != '\r' && replystr[i] != '\n') s += replystr[i];
-//	LOG_WARN("%s", s.c_str());
-	showASCII(s);
+	showASCII(replystr);
 
 	if (replystr.find("RADIO") == string::npos) { // not in radio mode
 		cmd = TT550init; // put into radio mode
 		sendCommand(cmd, 0, true);//13, true);
 		MilliSleep( 1000 );
 		readResponse();
-		s.clear();
-		for (size_t i = 0; i < replystr.length(); i++)
-			if (replystr[i] != '\r' && replystr[i] != '\n') s += replystr[i];
-//		LOG_WARN("%s", s.c_str());
-		showASCII(s);
+		showASCII(replystr);
 	}
 
 	cmd = "?V\r";
 	sendCommand(cmd, 20, true);
-	s.clear();
-	for (size_t i = 0; i < replystr.length(); i++)
-		if (replystr[i] != '\r' && replystr[i] != '\n') s += replystr[i];
-//	LOG_WARN("%s", s.c_str());
-	showASCII(s);
+	showASCII(replystr);
 
 //	set_noise_reduction(noise_reduction);
 	set_auto_notch(auto_notch);
 	set_compression();
+
 	set_vox_hang();
 	set_vox_anti();
 	set_vox_gain();
 	set_vox_onoff();
+
 	set_cw_spot();
 	set_cw_vol();
 	set_cw_wpm();
+	set_cw_qsk();
+	enable_keyer();
+
 	set_agc_level();
 	set_line_out();
 	set_mic_gain(100);
 	set_rf_gain(RFgain);
-	setXit(XitFreq);
-	setRit(RitFreq);
-	setBfo(Bfo);
-	set_volume_control(20);
+	
+	XitFreq = progStatus.xit_freq;
+	RitFreq = progStatus.rit_freq;
+	Bfo = progStatus.bfo_freq;
+	set_vfoA(freq_);
+
+//	setXit(XitFreq);
+//	setRit(RitFreq);
+//	setBfo(Bfo);
+
+//	set_volume_control(20);
 	set_attenuator(0);
-	set_mon_volume(0);
-	set_squelch_level(0);
+	set_mon_vol();
+	set_squelch_level();
 	set_if_shift(PbtFreq);
-	set_cw_qsk();
 	set_aux_hang();
-	cmd = TT550setENABLE;
-	cmd.append(TT550setTLOOP_OFF);
+
+	enable_tloop();
+	enable_xmtr();
+}
+
+void RIG_TT550::enable_xmtr()
+{
+	if (progStatus.tt550_enable_xmtr)
+		cmd = TT550setENABLE;
+	else
+		cmd = TT550setDISABLE;
+	sendCommand(cmd, 0, true);
+}
+
+void RIG_TT550::enable_tloop()
+{
+	if (progStatus.tt550_enable_tloop)
+		cmd = TT550setTLOOP_ON;
+	else
+		cmd = TT550setTLOOP_OFF;
 	sendCommand(cmd, 0, true);
 }
 
@@ -479,10 +495,15 @@ void RIG_TT550::set_attenuator(int val)
 
 void RIG_TT550::set_volume_control(int val)
 {
+// 0 <= val <= 100
 	cmd = TT550setVolume;
-	cmd[1] = val * 2.55;
-	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
+	cmd[1] = 0xFF & (int)(127.0 * log(val ? val : 1) / log(100));
 	sendCommand(cmd, 0, true);
+}
+
+int RIG_TT550::get_volume_control()
+{
+	return progStatus.volume;
 }
 
 int RIG_TT550::get_smeter()
@@ -524,7 +545,7 @@ int RIG_TT550::get_power_out()
 
 void RIG_TT550::setBfo(int val)
 {
-	Bfo = val;
+	progStatus.bfo_freq = Bfo = val;
 	set_vfoA(freq_);
 }
 
@@ -535,7 +556,7 @@ int RIG_TT550::getBfo()
 
 void RIG_TT550::setRit(int val)
 {
-	RitFreq = val;
+	progStatus.rit_freq = RitFreq = val;
 	if (RitFreq) RitActive = true;
 	set_vfoA(freq_);
 }
@@ -547,7 +568,7 @@ int RIG_TT550::getRit()
 
 void RIG_TT550::setXit(int val)
 {
-	XitFreq = val;
+	progStatus.xit_freq = XitFreq = val;
 	if (XitFreq) XitActive = true;
 	set_vfoA(freq_);
 }
@@ -599,12 +620,11 @@ void RIG_TT550::set_agc_level()
 
 void RIG_TT550::set_cw_wpm()
 {
-// 3:1 dash:dot, weight = 1
 	cmd = TT550setCWWPM;
-	int ditfactor = 7200 / progStatus.tt550_cw_wpm;
-//	int ditfactor = (int)(0.50/(progStatus.tt550_cw_wpm*0.4166*0.0001667));
-	int spcfactor = ditfactor;
-	int dahfactor = ditfactor * 3;
+	int duration = 7200 / progStatus.tt550_cw_wpm;
+	int ditfactor = duration * progStatus.tt550_cw_weight;
+	int spcfactor = duration * (2.0 - progStatus.tt550_cw_weight);
+	int dahfactor = duration * 3;
 	cmd[1] = 0xFF & (ditfactor >> 8);
 	cmd[2] = 0xFF & ditfactor;
 	cmd[3] = 0xFF & (spcfactor >> 8);
@@ -616,19 +636,50 @@ void RIG_TT550::set_cw_wpm()
 
 void RIG_TT550::set_cw_vol()
 {
+	int val = progStatus.tt550_cw_vol;
 	cmd = TT550setCWMONVOL;
-	cmd[1] = (0x3F) & (int)(progStatus.tt550_cw_vol * 0.63);
+	cmd[1] = 0xFF & (int)(127.0 * log(val ? val : 1) / log(100));
 	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
 	sendCommand(cmd, 0, true);
 }
 
 void RIG_TT550::set_cw_spot()
 {
+	int val = progStatus.tt550_cw_spot;
 	cmd = TT550setCWSPOTLVL;
-	cmd[1] = (0xFF) & (int)(progStatus.tt550_cw_spot * 2.55);
+	cmd[1] = 0xFF & (int)(127.0 * log(val ? val : 1) / log(100));
+	if (!progStatus.tt550_spot_onoff) cmd[1] = 0;
 	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
 	sendCommand(cmd, 0, true);
 }
+
+void RIG_TT550::set_spot_onoff()
+{
+	set_cw_spot();
+}
+
+void RIG_TT550::set_cw_weight()
+{
+	set_cw_wpm();
+}
+
+void RIG_TT550::set_cw_qsk()
+{
+	cmd = TT550setCWQSK;
+	cmd[2] = (0xFF) & (int)(progStatus.tt550_cw_qsk * 2.55);
+	if (cmd[2] == 0x0D) cmd[2] = 0x0E;
+	sendCommand(cmd, 0, true);
+}
+
+void RIG_TT550::enable_keyer()
+{
+	if (progStatus.tt550_enable_keyer)
+		cmd = TT550setKEYER_ON;
+	else
+		cmd = TT550setKEYER_OFF;
+	sendCommand(cmd, 0, true);
+}
+
 
 void RIG_TT550::set_vox_onoff()
 {
@@ -658,13 +709,6 @@ void RIG_TT550::set_vox_hang()
 	cmd = TT550setVOXHANG;
 	cmd[2] = (0xFF) & (int)(progStatus.tt550_vox_hang * 2.55);
 	if (cmd[2] == 0x0D) cmd[2] = 0x0E;
-	sendCommand(cmd, 0, true);
-}
-
-void RIG_TT550::set_cw_qsk()
-{
-	cmd = TT550setCWQSK;
-	cmd[2] = 0;
 	sendCommand(cmd, 0, true);
 }
 
@@ -718,20 +762,24 @@ void RIG_TT550::set_power_control(double val)
 
 }
 
-void RIG_TT550::set_mon_volume(double val)
+void RIG_TT550::set_mon_vol()
 {
 	cmd = TT550setMONVOL;
-	cmd[1] = (unsigned char)(val * 2.55);
+	cmd[1] = (unsigned char)(progStatus.tt550_mon_vol * 2.55);
 	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
 	sendCommand(cmd, 0, true);
 }
 
-void RIG_TT550::set_squelch_level(double val)
+void RIG_TT550::set_squelch_level()
 {
 	cmd = TT550setSQUELCH;
-	cmd[1] = (unsigned char)(val * 2.55);
+	cmd[1] = (unsigned char)(progStatus.tt550_squelch_level * 2.55);
 	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
 	sendCommand(cmd, 0, true);
+}
+
+void RIG_TT550::tuner_bypass()
+{
 }
 
 // callbacks for tt550 transceiver
@@ -760,6 +808,21 @@ void cb_tt550_cw_spot()
 	selrig->set_cw_spot();
 }
 
+void cb_tt550_cw_weight()
+{
+	selrig->set_cw_weight();
+}
+
+void cb_tt550_enable_keyer()
+{
+	selrig->enable_keyer();
+}
+
+void cb_tt550_spot_onoff()
+{
+	selrig->set_spot_onoff();
+}
+
 void cb_tt550_vox_gain()
 {
 	selrig->set_vox_gain();
@@ -785,7 +848,25 @@ void cb_tt550_compression()
 	selrig->set_compression();
 }
 
+void cb_tt550_mon_vol()
+{
+	selrig->set_mon_vol();
+}
 
+void cb_tt550_tuner_bypass()
+{
+	selrig->tuner_bypass();
+}
+
+void cb_tt550_enable_xmtr()
+{
+	selrig->enable_xmtr();
+}
+
+void cb_tt550_enable_tloop()
+{
+	selrig->enable_tloop();
+}
 
 //======================================================================
 // data strings captured from TenTec Windows control program for Pegasus
