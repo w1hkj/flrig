@@ -16,7 +16,7 @@ decl {\#include "support.h"} {}
 Function {Rig_window()} {open
 } {
   Fl_Window {} {
-    label Flrig open
+    label Flrig
     xywh {892 74 340 370} type Double color 52 align 80
     code0 {\#include <stdlib.h>} visible
   } {
@@ -39,7 +39,7 @@ Function {Rig_window()} {open
       } {
         MenuItem mnuControls {
           label {Xcvr setup}
-          callback {show_controls();} selected
+          callback {show_controls();}
           xywh {0 0 36 21} divider
         }
         MenuItem mnuColorConfig {
@@ -773,108 +773,153 @@ Function {make_TT550()} {open
 } {
   Fl_Window {} {
     label {TT550 Setup} open
-    xywh {476 128 340 187} type Double align 0 visible
+    xywh {545 74 337 255} type Double align 0 visible
   } {
     Fl_Group {} {
       label CW open
-      xywh {2 3 335 50} box ENGRAVED_FRAME align 21
+      xywh {2 2 333 90} box ENGRAVED_FRAME align 21
     } {
       Fl_Counter cnt_tt550_cw_wpm {
         label wpm
-        callback {progStatus.tt550_cw_wpm = o->value();
+        callback {progStatus.tt550_cw_wpm = (int)o->value();
 cb_tt550_cw_wpm();}
-        xywh {37 23 70 22} type Simple align 1 minimum 5 maximum 80 step 1 value 24
+        xywh {9 35 70 22} type Simple align 1 minimum 5 maximum 80 step 1 value 24
         code0 {o->value(progStatus.tt550_cw_wpm);}
       }
       Fl_Counter cnt_tt550_cw_vol {
-        label Mon
-        callback {progStatus.tt550_cw_vol=o->value();
+        label {S-T vol}
+        callback {progStatus.tt550_cw_vol=(int)o->value();
 cb_tt550_cw_vol();}
-        xywh {113 23 70 22} type Simple align 1 minimum 5 maximum 80 step 1 value 24
+        tooltip {Side tone volume} xywh {90 35 70 22} type Simple align 1 minimum 5 maximum 80 step 1 value 24
         code0 {o->value(progStatus.tt550_cw_vol);}
       }
       Fl_Counter cnt_tt550_cw_spot {
-        label spot
-        callback {progStatus.tt550_cw_spot=o->value();
+        label {Spot Vol}
+        callback {progStatus.tt550_cw_spot=(int)o->value();
 cb_tt550_cw_spot();}
-        xywh {189 23 70 22} type Simple align 1 minimum 0 maximum 100 step 1
+        tooltip {Spot volume} xywh {254 35 70 22} type Simple align 1 minimum 0 maximum 100 step 1 value 20
         code0 {o->value(progStatus.tt550_cw_spot);}
       }
-      Fl_Light_Button btn_tt550_Spot {
+      Fl_Light_Button btn_tt550_spot_onoff {
         label Spot
-        xywh {266 23 64 22}
+        callback {progStatus.tt550_spot_onoff=o->value();
+cb_tt550_spot_onoff();}
+        xywh {258 64 64 22}
+        code0 {o->value(progStatus.tt550_spot_onoff);}
+      }
+      Fl_Counter cnt_tt550_cw_weight {
+        label Weight
+        callback {progStatus.tt550_cw_weight = o->value();
+cb_tt550_cw_weight();}
+        xywh {173 35 70 22} type Simple align 1 minimum 0.75 maximum 1.5 step 0.05 value 1
+        code0 {o->value(progStatus.tt550_cw_weight);}
+      }
+      Fl_Check_Button btn_tt550_enable_keyer {
+        label {Keyer ON/OFF}
+        callback {progStatus.tt550_enable_keyer=o->value();
+cb_tt550_enable_keyer();}
+        tooltip {Enable keyer} xywh {98 67 70 15} down_box DOWN_BOX value 1
+        code0 {o->value(progStatus.tt550_enable_keyer);}
       }
     }
     Fl_Group {} {
       label Vox open
-      xywh {2 54 335 50} box ENGRAVED_FRAME align 21
+      xywh {2 92 333 50} box ENGRAVED_FRAME align 21
     } {
       Fl_Counter cnt_tt550_vox_gain {
         label gain
-        callback {progStatus.tt550_vox_gain=o->value();
+        callback {progStatus.tt550_vox_gain=(int)o->value();
 cb_tt550_vox_gain();}
-        xywh {37 75 70 22} type Simple align 1 minimum 0 maximum 100 step 1
+        xywh {37 112 69 22} type Simple align 1 minimum 0 maximum 100 step 1
         code0 {o->value(progStatus.tt550_vox_gain);}
       }
       Fl_Counter cnt_tt550_anti_vox {
         label anti
-        callback {progStatus.tt550_vox_anti=o->value();
+        callback {progStatus.tt550_vox_anti=(int)o->value();
 cb_tt550_vox_anti();}
-        xywh {113 75 70 22} type Simple align 1 minimum 0 maximum 100 step 1
+        xywh {112 112 70 22} type Simple align 1 minimum 0 maximum 100 step 1
         code0 {o->value(progStatus.tt550_vox_anti);}
       }
       Fl_Counter cnt_tt550_vox_hang {
         label hang
-        callback {progStatus.tt550_vox_hang = o->value();
+        callback {progStatus.tt550_vox_hang = (int)o->value();
 cb_tt550_vox_hang();}
-        xywh {189 75 70 22} type Simple align 1 minimum 0 maximum 100 step 1
+        xywh {187 112 69 22} type Simple align 1 minimum 0 maximum 100 step 1
         code0 {o->value(progStatus.tt550_vox_hang);}
       }
       Fl_Light_Button btn_tt550_vox {
         label VOX
         callback {progStatus.tt550_vox_onoff=o->value();
 cb_tt550_vox_onoff();}
-        xywh {266 75 64 22}
+        xywh {264 112 64 22}
         code0 {o->value(progStatus.tt550_vox_onoff);}
       }
     }
     Fl_Group {} {
-      label {Speech Comp.} open
-      xywh {2 105 335 40} box ENGRAVED_FRAME align 21
+      label Speech open
+      xywh {2 142 333 50} box ENGRAVED_FRAME align 21
     } {
       Fl_Light_Button btn_tt550_CompON {
         label On
         callback {progStatus.tt550_compON=o->value();
 cb_tt550_compression();}
-        xywh {266 114 64 22}
+        xywh {264 162 64 22}
         code0 {o->value(progStatus.tt550_compON);}
       }
       Fl_Counter cnt_tt550_compression {
-        label level
-        callback {progStatus.tt550_compression=o->value();
+        label Comp
+        callback {progStatus.tt550_compression=(int)o->value();
 cb_tt550_compression();}
-        xywh {189 114 70 22} type Simple align 4 minimum 0 maximum 100 step 1
+        xywh {187 162 69 22} type Simple align 1 minimum 0 maximum 100 step 1
         code0 {o->value(progStatus.tt550_compression);}
+      }
+      Fl_Counter cnt_tt550_mon_vol {
+        label {Mon vol}
+        callback {progStatus.tt550_mon_vol=(int)o->value();
+cb_tt550_mon_vol();}
+        tooltip {Side tone volume} xywh {112 162 70 22} type Simple align 1 minimum 0 maximum 100 step 1 value 25
+        code0 {o->value(progStatus.tt550_mon_vol);}
       }
     }
     Fl_Group {} {
-      label {Misc.} open
-      xywh {4 146 335 40} box ENGRAVED_FRAME align 21
+      label {Misc.} open selected
+      xywh {2 192 333 60} box ENGRAVED_FRAME align 21
     } {
       Fl_Group cbo_tt550_agc_level {
         label AGC
         callback {progStatus.tt550_agc_level = o->index();
 cb_tt550_agc_level();} open
-        tooltip {Select Transceiver} xywh {215 155 80 22} box DOWN_BOX color 53 align 8
+        tooltip {Select Transceiver} xywh {214 202 80 22} box DOWN_BOX color 53 align 8
         code0 {\#include "combo.h"}
+        code1 {o->add("slow"); o->add("med"); o->add("fast");}
         class Fl_ComboBox
       } {}
       Fl_Counter cnt_tt550_line_out {
         label {line out}
-        callback {progStatus.tt550_line_out = o->value();
+        callback {progStatus.tt550_line_out = (int)o->value();
 cb_tt550_line_out();}
-        xywh {114 155 70 22} type Simple align 4 minimum 0 maximum 100 step 1 value 20
+        xywh {115 202 69 22} type Simple align 4 minimum 0 maximum 100 step 1 value 20
         code0 {o->value(progStatus.tt550_line_out);}
+      }
+      Fl_Check_Button btn_tt550_enable_xmtr {
+        label {Xmtr ON}
+        callback {progStatus.tt550_enable_xmtr=o->value();
+cb_tt550_enable_xmtr();}
+        xywh {14 229 70 15} down_box DOWN_BOX
+        code0 {o->value(progStatus.tt550_enable_xmtr);}
+      }
+      Fl_Check_Button btn_tt550_enable_tloop {
+        label {Tloop ON}
+        callback {progStatus.tt550_enable_tloop=o->value();
+cb_tt550_enable_tloop();}
+        xywh {114 229 70 15} down_box DOWN_BOX
+        code0 {o->value(progStatus.tt550_enable_tloop);}
+      }
+      Fl_Check_Button btn_tt550_tuner_bypass {
+        label {Tuner bypass}
+        callback {progStatus.tt550_tuner_bypass=o->value();
+cb_tt550_tuner_bypass();}
+        xywh {215 229 70 15} down_box DOWN_BOX
       }
     }
   }

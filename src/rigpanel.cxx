@@ -1625,44 +1625,63 @@ Fl_Double_Window* make_XcvrXtra() {
 Fl_Counter *cnt_tt550_cw_wpm=(Fl_Counter *)0;
 
 static void cb_cnt_tt550_cw_wpm(Fl_Counter* o, void*) {
-  progStatus.tt550_cw_wpm = o->value();
+  progStatus.tt550_cw_wpm = (int)o->value();
 cb_tt550_cw_wpm();
 }
 
 Fl_Counter *cnt_tt550_cw_vol=(Fl_Counter *)0;
 
 static void cb_cnt_tt550_cw_vol(Fl_Counter* o, void*) {
-  progStatus.tt550_cw_vol=o->value();
+  progStatus.tt550_cw_vol=(int)o->value();
 cb_tt550_cw_vol();
 }
 
 Fl_Counter *cnt_tt550_cw_spot=(Fl_Counter *)0;
 
 static void cb_cnt_tt550_cw_spot(Fl_Counter* o, void*) {
-  progStatus.tt550_cw_spot=o->value();
+  progStatus.tt550_cw_spot=(int)o->value();
 cb_tt550_cw_spot();
 }
 
-Fl_Light_Button *btn_tt550_Spot=(Fl_Light_Button *)0;
+Fl_Light_Button *btn_tt550_spot_onoff=(Fl_Light_Button *)0;
+
+static void cb_btn_tt550_spot_onoff(Fl_Light_Button* o, void*) {
+  progStatus.tt550_spot_onoff=o->value();
+cb_tt550_spot_onoff();
+}
+
+Fl_Counter *cnt_tt550_cw_weight=(Fl_Counter *)0;
+
+static void cb_cnt_tt550_cw_weight(Fl_Counter* o, void*) {
+  progStatus.tt550_cw_weight = o->value();
+cb_tt550_cw_weight();
+}
+
+Fl_Check_Button *btn_tt550_enable_keyer=(Fl_Check_Button *)0;
+
+static void cb_btn_tt550_enable_keyer(Fl_Check_Button* o, void*) {
+  progStatus.tt550_enable_keyer=o->value();
+cb_tt550_enable_keyer();
+}
 
 Fl_Counter *cnt_tt550_vox_gain=(Fl_Counter *)0;
 
 static void cb_cnt_tt550_vox_gain(Fl_Counter* o, void*) {
-  progStatus.tt550_vox_gain=o->value();
+  progStatus.tt550_vox_gain=(int)o->value();
 cb_tt550_vox_gain();
 }
 
 Fl_Counter *cnt_tt550_anti_vox=(Fl_Counter *)0;
 
 static void cb_cnt_tt550_anti_vox(Fl_Counter* o, void*) {
-  progStatus.tt550_vox_anti=o->value();
+  progStatus.tt550_vox_anti=(int)o->value();
 cb_tt550_vox_anti();
 }
 
 Fl_Counter *cnt_tt550_vox_hang=(Fl_Counter *)0;
 
 static void cb_cnt_tt550_vox_hang(Fl_Counter* o, void*) {
-  progStatus.tt550_vox_hang = o->value();
+  progStatus.tt550_vox_hang = (int)o->value();
 cb_tt550_vox_hang();
 }
 
@@ -1683,8 +1702,15 @@ cb_tt550_compression();
 Fl_Counter *cnt_tt550_compression=(Fl_Counter *)0;
 
 static void cb_cnt_tt550_compression(Fl_Counter* o, void*) {
-  progStatus.tt550_compression=o->value();
+  progStatus.tt550_compression=(int)o->value();
 cb_tt550_compression();
+}
+
+Fl_Counter *cnt_tt550_mon_vol=(Fl_Counter *)0;
+
+static void cb_cnt_tt550_mon_vol(Fl_Counter* o, void*) {
+  progStatus.tt550_mon_vol=(int)o->value();
+cb_tt550_mon_vol();
 }
 
 Fl_ComboBox *cbo_tt550_agc_level=(Fl_ComboBox *)0;
@@ -1697,19 +1723,40 @@ cb_tt550_agc_level();
 Fl_Counter *cnt_tt550_line_out=(Fl_Counter *)0;
 
 static void cb_cnt_tt550_line_out(Fl_Counter* o, void*) {
-  progStatus.tt550_line_out = o->value();
+  progStatus.tt550_line_out = (int)o->value();
 cb_tt550_line_out();
+}
+
+Fl_Check_Button *btn_tt550_enable_xmtr=(Fl_Check_Button *)0;
+
+static void cb_btn_tt550_enable_xmtr(Fl_Check_Button* o, void*) {
+  progStatus.tt550_enable_xmtr=o->value();
+cb_tt550_enable_xmtr();
+}
+
+Fl_Check_Button *btn_tt550_enable_tloop=(Fl_Check_Button *)0;
+
+static void cb_btn_tt550_enable_tloop(Fl_Check_Button* o, void*) {
+  progStatus.tt550_enable_tloop=o->value();
+cb_tt550_enable_tloop();
+}
+
+Fl_Check_Button *btn_tt550_tuner_bypass=(Fl_Check_Button *)0;
+
+static void cb_btn_tt550_tuner_bypass(Fl_Check_Button* o, void*) {
+  progStatus.tt550_tuner_bypass=o->value();
+cb_tt550_tuner_bypass();
 }
 
 Fl_Double_Window* make_TT550() {
   Fl_Double_Window* w;
-  { Fl_Double_Window* o = new Fl_Double_Window(340, 187, _("TT550 Setup"));
+  { Fl_Double_Window* o = new Fl_Double_Window(337, 255, _("TT550 Setup"));
     w = o;
     o->align(FL_ALIGN_CENTER);
-    { Fl_Group* o = new Fl_Group(2, 3, 335, 50, _("CW"));
+    { Fl_Group* o = new Fl_Group(2, 2, 333, 90, _("CW"));
       o->box(FL_ENGRAVED_FRAME);
       o->align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE);
-      { Fl_Counter* o = cnt_tt550_cw_wpm = new Fl_Counter(37, 23, 70, 22, _("wpm"));
+      { Fl_Counter* o = cnt_tt550_cw_wpm = new Fl_Counter(9, 35, 70, 22, _("wpm"));
         cnt_tt550_cw_wpm->type(1);
         cnt_tt550_cw_wpm->minimum(5);
         cnt_tt550_cw_wpm->maximum(80);
@@ -1719,7 +1766,8 @@ Fl_Double_Window* make_TT550() {
         cnt_tt550_cw_wpm->align(FL_ALIGN_TOP);
         o->value(progStatus.tt550_cw_wpm);
       } // Fl_Counter* cnt_tt550_cw_wpm
-      { Fl_Counter* o = cnt_tt550_cw_vol = new Fl_Counter(113, 23, 70, 22, _("Mon"));
+      { Fl_Counter* o = cnt_tt550_cw_vol = new Fl_Counter(90, 35, 70, 22, _("S-T vol"));
+        cnt_tt550_cw_vol->tooltip(_("Side tone volume"));
         cnt_tt550_cw_vol->type(1);
         cnt_tt550_cw_vol->minimum(5);
         cnt_tt550_cw_vol->maximum(80);
@@ -1729,23 +1777,44 @@ Fl_Double_Window* make_TT550() {
         cnt_tt550_cw_vol->align(FL_ALIGN_TOP);
         o->value(progStatus.tt550_cw_vol);
       } // Fl_Counter* cnt_tt550_cw_vol
-      { Fl_Counter* o = cnt_tt550_cw_spot = new Fl_Counter(189, 23, 70, 22, _("spot"));
+      { Fl_Counter* o = cnt_tt550_cw_spot = new Fl_Counter(254, 35, 70, 22, _("Spot Vol"));
+        cnt_tt550_cw_spot->tooltip(_("Spot volume"));
         cnt_tt550_cw_spot->type(1);
         cnt_tt550_cw_spot->minimum(0);
         cnt_tt550_cw_spot->maximum(100);
         cnt_tt550_cw_spot->step(1);
+        cnt_tt550_cw_spot->value(20);
         cnt_tt550_cw_spot->callback((Fl_Callback*)cb_cnt_tt550_cw_spot);
         cnt_tt550_cw_spot->align(FL_ALIGN_TOP);
         o->value(progStatus.tt550_cw_spot);
       } // Fl_Counter* cnt_tt550_cw_spot
-      { btn_tt550_Spot = new Fl_Light_Button(266, 23, 64, 22, _("Spot"));
-      } // Fl_Light_Button* btn_tt550_Spot
+      { Fl_Light_Button* o = btn_tt550_spot_onoff = new Fl_Light_Button(258, 64, 64, 22, _("Spot"));
+        btn_tt550_spot_onoff->callback((Fl_Callback*)cb_btn_tt550_spot_onoff);
+        o->value(progStatus.tt550_spot_onoff);
+      } // Fl_Light_Button* btn_tt550_spot_onoff
+      { Fl_Counter* o = cnt_tt550_cw_weight = new Fl_Counter(173, 35, 70, 22, _("Weight"));
+        cnt_tt550_cw_weight->type(1);
+        cnt_tt550_cw_weight->minimum(0.75);
+        cnt_tt550_cw_weight->maximum(1.5);
+        cnt_tt550_cw_weight->step(0.05);
+        cnt_tt550_cw_weight->value(1);
+        cnt_tt550_cw_weight->callback((Fl_Callback*)cb_cnt_tt550_cw_weight);
+        cnt_tt550_cw_weight->align(FL_ALIGN_TOP);
+        o->value(progStatus.tt550_cw_weight);
+      } // Fl_Counter* cnt_tt550_cw_weight
+      { Fl_Check_Button* o = btn_tt550_enable_keyer = new Fl_Check_Button(98, 67, 70, 15, _("Keyer ON/OFF"));
+        btn_tt550_enable_keyer->tooltip(_("Enable keyer"));
+        btn_tt550_enable_keyer->down_box(FL_DOWN_BOX);
+        btn_tt550_enable_keyer->value(1);
+        btn_tt550_enable_keyer->callback((Fl_Callback*)cb_btn_tt550_enable_keyer);
+        o->value(progStatus.tt550_enable_keyer);
+      } // Fl_Check_Button* btn_tt550_enable_keyer
       o->end();
     } // Fl_Group* o
-    { Fl_Group* o = new Fl_Group(2, 54, 335, 50, _("Vox"));
+    { Fl_Group* o = new Fl_Group(2, 92, 333, 50, _("Vox"));
       o->box(FL_ENGRAVED_FRAME);
       o->align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE);
-      { Fl_Counter* o = cnt_tt550_vox_gain = new Fl_Counter(37, 75, 70, 22, _("gain"));
+      { Fl_Counter* o = cnt_tt550_vox_gain = new Fl_Counter(37, 112, 69, 22, _("gain"));
         cnt_tt550_vox_gain->type(1);
         cnt_tt550_vox_gain->minimum(0);
         cnt_tt550_vox_gain->maximum(100);
@@ -1754,7 +1823,7 @@ Fl_Double_Window* make_TT550() {
         cnt_tt550_vox_gain->align(FL_ALIGN_TOP);
         o->value(progStatus.tt550_vox_gain);
       } // Fl_Counter* cnt_tt550_vox_gain
-      { Fl_Counter* o = cnt_tt550_anti_vox = new Fl_Counter(113, 75, 70, 22, _("anti"));
+      { Fl_Counter* o = cnt_tt550_anti_vox = new Fl_Counter(112, 112, 70, 22, _("anti"));
         cnt_tt550_anti_vox->type(1);
         cnt_tt550_anti_vox->minimum(0);
         cnt_tt550_anti_vox->maximum(100);
@@ -1763,7 +1832,7 @@ Fl_Double_Window* make_TT550() {
         cnt_tt550_anti_vox->align(FL_ALIGN_TOP);
         o->value(progStatus.tt550_vox_anti);
       } // Fl_Counter* cnt_tt550_anti_vox
-      { Fl_Counter* o = cnt_tt550_vox_hang = new Fl_Counter(189, 75, 70, 22, _("hang"));
+      { Fl_Counter* o = cnt_tt550_vox_hang = new Fl_Counter(187, 112, 69, 22, _("hang"));
         cnt_tt550_vox_hang->type(1);
         cnt_tt550_vox_hang->minimum(0);
         cnt_tt550_vox_hang->maximum(100);
@@ -1772,34 +1841,45 @@ Fl_Double_Window* make_TT550() {
         cnt_tt550_vox_hang->align(FL_ALIGN_TOP);
         o->value(progStatus.tt550_vox_hang);
       } // Fl_Counter* cnt_tt550_vox_hang
-      { Fl_Light_Button* o = btn_tt550_vox = new Fl_Light_Button(266, 75, 64, 22, _("VOX"));
+      { Fl_Light_Button* o = btn_tt550_vox = new Fl_Light_Button(264, 112, 64, 22, _("VOX"));
         btn_tt550_vox->callback((Fl_Callback*)cb_btn_tt550_vox);
         o->value(progStatus.tt550_vox_onoff);
       } // Fl_Light_Button* btn_tt550_vox
       o->end();
     } // Fl_Group* o
-    { Fl_Group* o = new Fl_Group(2, 105, 335, 40, _("Speech Comp."));
+    { Fl_Group* o = new Fl_Group(2, 142, 333, 50, _("Speech"));
       o->box(FL_ENGRAVED_FRAME);
       o->align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE);
-      { Fl_Light_Button* o = btn_tt550_CompON = new Fl_Light_Button(266, 114, 64, 22, _("On"));
+      { Fl_Light_Button* o = btn_tt550_CompON = new Fl_Light_Button(264, 162, 64, 22, _("On"));
         btn_tt550_CompON->callback((Fl_Callback*)cb_btn_tt550_CompON);
         o->value(progStatus.tt550_compON);
       } // Fl_Light_Button* btn_tt550_CompON
-      { Fl_Counter* o = cnt_tt550_compression = new Fl_Counter(189, 114, 70, 22, _("level"));
+      { Fl_Counter* o = cnt_tt550_compression = new Fl_Counter(187, 162, 69, 22, _("Comp"));
         cnt_tt550_compression->type(1);
         cnt_tt550_compression->minimum(0);
         cnt_tt550_compression->maximum(100);
         cnt_tt550_compression->step(1);
         cnt_tt550_compression->callback((Fl_Callback*)cb_cnt_tt550_compression);
-        cnt_tt550_compression->align(FL_ALIGN_LEFT);
+        cnt_tt550_compression->align(FL_ALIGN_TOP);
         o->value(progStatus.tt550_compression);
       } // Fl_Counter* cnt_tt550_compression
+      { Fl_Counter* o = cnt_tt550_mon_vol = new Fl_Counter(112, 162, 70, 22, _("Mon vol"));
+        cnt_tt550_mon_vol->tooltip(_("Side tone volume"));
+        cnt_tt550_mon_vol->type(1);
+        cnt_tt550_mon_vol->minimum(0);
+        cnt_tt550_mon_vol->maximum(100);
+        cnt_tt550_mon_vol->step(1);
+        cnt_tt550_mon_vol->value(25);
+        cnt_tt550_mon_vol->callback((Fl_Callback*)cb_cnt_tt550_mon_vol);
+        cnt_tt550_mon_vol->align(FL_ALIGN_TOP);
+        o->value(progStatus.tt550_mon_vol);
+      } // Fl_Counter* cnt_tt550_mon_vol
       o->end();
     } // Fl_Group* o
-    { Fl_Group* o = new Fl_Group(4, 146, 335, 40, _("Misc."));
+    { Fl_Group* o = new Fl_Group(2, 192, 333, 60, _("Misc."));
       o->box(FL_ENGRAVED_FRAME);
       o->align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE);
-      { cbo_tt550_agc_level = new Fl_ComboBox(215, 155, 80, 22, _("AGC"));
+      { Fl_ComboBox* o = cbo_tt550_agc_level = new Fl_ComboBox(214, 202, 80, 22, _("AGC"));
         cbo_tt550_agc_level->tooltip(_("Select Transceiver"));
         cbo_tt550_agc_level->box(FL_DOWN_BOX);
         cbo_tt550_agc_level->color((Fl_Color)53);
@@ -1811,9 +1891,10 @@ Fl_Double_Window* make_TT550() {
         cbo_tt550_agc_level->callback((Fl_Callback*)cb_cbo_tt550_agc_level);
         cbo_tt550_agc_level->align(FL_ALIGN_RIGHT);
         cbo_tt550_agc_level->when(FL_WHEN_RELEASE);
+        o->add("slow"); o->add("med"); o->add("fast");
         cbo_tt550_agc_level->end();
       } // Fl_ComboBox* cbo_tt550_agc_level
-      { Fl_Counter* o = cnt_tt550_line_out = new Fl_Counter(114, 155, 70, 22, _("line out"));
+      { Fl_Counter* o = cnt_tt550_line_out = new Fl_Counter(115, 202, 69, 22, _("line out"));
         cnt_tt550_line_out->type(1);
         cnt_tt550_line_out->minimum(0);
         cnt_tt550_line_out->maximum(100);
@@ -1823,6 +1904,20 @@ Fl_Double_Window* make_TT550() {
         cnt_tt550_line_out->align(FL_ALIGN_LEFT);
         o->value(progStatus.tt550_line_out);
       } // Fl_Counter* cnt_tt550_line_out
+      { Fl_Check_Button* o = btn_tt550_enable_xmtr = new Fl_Check_Button(14, 229, 70, 15, _("Xmtr ON"));
+        btn_tt550_enable_xmtr->down_box(FL_DOWN_BOX);
+        btn_tt550_enable_xmtr->callback((Fl_Callback*)cb_btn_tt550_enable_xmtr);
+        o->value(progStatus.tt550_enable_xmtr);
+      } // Fl_Check_Button* btn_tt550_enable_xmtr
+      { Fl_Check_Button* o = btn_tt550_enable_tloop = new Fl_Check_Button(114, 229, 70, 15, _("Tloop ON"));
+        btn_tt550_enable_tloop->down_box(FL_DOWN_BOX);
+        btn_tt550_enable_tloop->callback((Fl_Callback*)cb_btn_tt550_enable_tloop);
+        o->value(progStatus.tt550_enable_tloop);
+      } // Fl_Check_Button* btn_tt550_enable_tloop
+      { btn_tt550_tuner_bypass = new Fl_Check_Button(215, 229, 70, 15, _("Tuner bypass"));
+        btn_tt550_tuner_bypass->down_box(FL_DOWN_BOX);
+        btn_tt550_tuner_bypass->callback((Fl_Callback*)cb_btn_tt550_tuner_bypass);
+      } // Fl_Check_Button* btn_tt550_tuner_bypass
       o->end();
     } // Fl_Group* o
     o->end();

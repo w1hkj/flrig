@@ -42,7 +42,7 @@ struct status {
 	int		imode_B;
 	int		freq_B;
 
-	bool	mute;
+	bool	spkr_on;
 	int		volume;
 	int		power_level;
 	int		mic_gain;
@@ -71,18 +71,38 @@ struct status {
 	int		attenuator;
 	int		preamp;
 
+//============= transceiver specific prameters
 //tt550 controls
 	int		tt550_line_out;
 	int		tt550_agc_level;
+
 	int		tt550_cw_wpm;
+	double	tt550_cw_weight;
 	int		tt550_cw_vol;
 	int		tt550_cw_spot;
+	bool	tt550_spot_onoff;
+	int		tt550_cw_qsk;
+	bool	tt550_enable_keyer;
+
 	bool	tt550_vox_onoff;
 	int		tt550_vox_gain;
 	int		tt550_vox_anti;
 	int		tt550_vox_hang;
+
+	int		tt550_mon_vol;
+	int		tt550_squelch_level;
 	int		tt550_compression;
 	bool	tt550_compON;
+	bool	tt550_tuner_bypass;
+
+	bool	tt550_enable_xmtr;
+	bool	tt550_enable_tloop;
+
+//and others
+	int		bfo_freq;
+	int		rit_freq;
+	int		xit_freq;
+// =========================
 
 	int		s_red;
 	int		s_green;

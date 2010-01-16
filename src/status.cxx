@@ -57,7 +57,7 @@ status progStatus = {
 	0,			// vfoB bw;
 	0,			// vfoB mode;
 	7070000,	// vfoB freq
-	false,		// bool mute;
+	false,		// bool spkr_on;
 	20,			// int  volume;
 	20,			// int  power_level;
 	10,			// int  mic_gain;
@@ -90,15 +90,32 @@ status progStatus = {
 //tt550 controls
 	100,		// tt550_line_out;
 	1,			// tt550_agc_level;
+
 	24,			// tt550_cw_wpm;
+	1.0,		// tt550_cw_weight;
 	0,			// tt550_cw_vol;
 	0,			// tt550_cw_spot;
+	false,		// tt550_cw_spot_onoff;
+	0,			// tt550_cw_qsk;
+	true,		// tt550_enable_keyer;
+
 	false,		// tt550_vox_onoff;
 	0,			// tt550_vox_gain;
 	0,			// tt550_vox_anti;
 	0,			// tt550_vox_hang;
+
+	0,			// tt550_mon_vol;
+	0,			// tt550_squelch_level;
 	0,			// tt550_int  compression;
 	false,		// tt550_bool compON;
+	false,		// tt550_tuner_bypass;
+
+	true,		// tt550_enable_xmtr;
+	false,		// tt550_enable_tloop;
+
+	600,		// bfo_freq;
+	0,			// rit_freq;
+	0,			// xit_freq;
 
 	232,		// int	 s_red;
 	255,		// int	 s_green;
@@ -183,7 +200,7 @@ void status::saveLastState()
 	spref.set("mode_B", imode_B);
 	spref.set("freq_B", freq_B);
 
-	spref.set("bool_mute", mute);
+	spref.set("bool_spkr_on", spkr_on);
 	spref.set("int_volume", volume);
 	spref.set("int_power", power_level);
 	spref.set("int_mic", mic_gain);
@@ -197,15 +214,32 @@ void status::saveLastState()
 	if (rig_nbr == TT550) {
 		spref.set("tt550_line_out", tt550_line_out);
 		spref.set("tt550_agc_level", tt550_agc_level);
+
 		spref.set("tt550_cw_wpm", tt550_cw_wpm);
+		spref.set("tt550_cw_weight", tt550_cw_weight);
 		spref.set("tt550_cw_vol", tt550_cw_vol);
 		spref.set("tt550_cw_spot", tt550_cw_spot);
+		spref.set("tt550_spot_onoff", tt550_spot_onoff);
+		spref.set("tt550_cw_qsk", tt550_cw_qsk);
+		spref.set("tt550_enable_keyer", tt550_enable_keyer);
+
 		spref.set("tt550_vox_onoff", tt550_vox_onoff);
 		spref.set("tt550_vox_gain", tt550_vox_gain);
 		spref.set("tt550_vox_anti", tt550_vox_anti);
 		spref.set("tt550_vox_hang", tt550_vox_hang);
+
+		spref.set("tt550_mon_vol", tt550_mon_vol);
+		spref.set("tt550_squelch_level", tt550_squelch_level);
 		spref.set("tt550_compression", tt550_compression);
 		spref.set("tt550_compON", tt550_compON);
+		spref.set("tt550_tuner_bypass", tt550_tuner_bypass);
+		spref.set("tt550_enable_xmtr", tt550_enable_xmtr);
+		spref.set("tt550_enable_tloop", tt550_enable_tloop);
+
+		spref.set("tt550_bfo_freq", bfo_freq);
+		spref.set("tt550_rit_freq", rit_freq);
+		spref.set("tt550_xit_freq", xit_freq);
+
 	} else {
 		spref.set("line_out", line_out);
 		spref.set("agc_level", agc_level);
@@ -318,7 +352,7 @@ bool status::loadXcvrState(const char *xcvr)
 		spref.get("mode_B", imode_B, imode_B);
 		spref.get("freq_B", freq_B, freq_B);
 
-		if (spref.get("bool_mute", i, i)) mute = i;
+		if (spref.get("bool_spkr_on", i, i)) spkr_on = i;
 		spref.get("int_volume", volume, volume);
 		spref.get("int_power", power_level, power_level);
 		spref.get("int_mic", mic_gain, mic_gain);
@@ -332,16 +366,35 @@ bool status::loadXcvrState(const char *xcvr)
 		if (rig_nbr == TT550) {
 			spref.get("tt550_line_out", tt550_line_out, tt550_line_out);
 			spref.get("tt550_agc_level", tt550_agc_level, tt550_agc_level);
+
 			spref.get("tt550_cw_wpm", tt550_cw_wpm, tt550_cw_wpm);
+			spref.get("tt550_cw_weight", tt550_cw_weight, tt550_cw_weight);
 			spref.get("tt550_cw_vol", tt550_cw_vol, tt550_cw_vol);
 			spref.get("tt550_cw_spot", tt550_cw_spot, tt550_cw_spot);
+			if (spref.get("tt550_spot_onoff", i, i)) tt550_spot_onoff = i;
+			spref.get("tt550_cw_qsk", tt550_cw_qsk, tt550_cw_qsk);
+			if (spref.get("tt550_enable_keyer", i, i)) tt550_enable_keyer = i;
+
+
 			if (spref.get("tt550_vox_onoff", i, i)) tt550_vox_onoff = i;
 			spref.get("tt550_vox_gain", tt550_vox_gain, tt550_vox_gain);
 			spref.get("tt550_vox_anti", tt550_vox_anti, tt550_vox_anti);
 			spref.get("tt550_vox_hang", tt550_vox_hang, tt550_vox_hang);
+
+			spref.get("tt550_mon_vol", tt550_mon_vol, tt550_mon_vol);
+			spref.get("tt550_squelch_level", tt550_squelch_level, tt550_squelch_level);
 			spref.get("tt550_compression", tt550_compression, tt550_compression);
 			if (spref.get("tt550_compON", i, i)) tt550_compON = i;
-		} else {
+			if (spref.get("tt550_tuner_bypass", i, i)) tt550_tuner_bypass = i;
+			if (spref.get("tt550_enable_xmtr", i, i)) tt550_enable_xmtr = i;
+			if (spref.get("tt550_enable_tloop", i, i)) tt550_enable_tloop = i;
+
+			spref.get("tt550_bfo_freq", bfo_freq, bfo_freq);
+			spref.get("tt550_rit_freq", rit_freq, rit_freq);
+			spref.get("tt550_xit_freq", xit_freq, xit_freq);
+
+		} 
+		else {
 			spref.get("line_out", line_out, line_out);
 			spref.get("agc_level", agc_level, agc_level);
 			spref.get("cw_wpm", cw_wpm, cw_wpm);

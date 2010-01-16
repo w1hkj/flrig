@@ -903,7 +903,7 @@ void cbExit()
 	progStatus.imode_B = vfoB.imode;
 	progStatus.iBW_B = vfoB.iBW;
 
-	progStatus.mute = btnVol->value();
+	progStatus.spkr_on = btnVol->value();
 	progStatus.volume = sldrVOLUME->value();
 	progStatus.power_level = sldrPOWER->value();
 	progStatus.mic_gain = sldrMICGAIN->value();
@@ -1090,16 +1090,22 @@ void adjust_control_positions()
 void initXcvrTab()
 {
 	if (rig_nbr == TT550) {
-		cnt_tt550_line_out->activate();
-		cbo_tt550_agc_level->activate();
-		cnt_tt550_cw_wpm->activate();
-		cnt_tt550_cw_vol->activate();
-		cnt_tt550_cw_spot->activate();
-		btn_tt550_vox->activate();
-		cnt_tt550_vox_gain->activate();
-		cnt_tt550_anti_vox->activate();
-		cnt_tt550_vox_hang->activate();
-		cnt_tt550_compression->activate();
+		cnt_tt550_line_out->activate(); cnt_tt550_line_out->value(progStatus.tt550_line_out);
+		cbo_tt550_agc_level->activate(); cbo_tt550_agc_level->index(progStatus.tt550_agc_level);
+		cnt_tt550_cw_wpm->activate(); cnt_tt550_cw_wpm->value(progStatus.tt550_cw_wpm);
+		cnt_tt550_cw_vol->activate(); cnt_tt550_cw_vol->value(progStatus.tt550_cw_vol);
+		cnt_tt550_cw_spot->activate(); cnt_tt550_cw_spot->value(progStatus.tt550_cw_spot);
+		cnt_tt550_cw_weight->activate(); cnt_tt550_cw_weight->value(progStatus.tt550_cw_weight);
+		btn_tt550_spot_onoff->activate(); btn_tt550_spot_onoff->value(progStatus.tt550_spot_onoff);
+		btn_tt550_enable_keyer->activate(); btn_tt550_enable_keyer->value(progStatus.tt550_enable_keyer);
+		btn_tt550_vox->activate(); btn_tt550_vox->value(progStatus.tt550_vox_onoff);
+		cnt_tt550_vox_gain->activate(); cnt_tt550_vox_gain->value(progStatus.tt550_vox_gain);
+		cnt_tt550_anti_vox->activate(); cnt_tt550_anti_vox->value(progStatus.tt550_vox_anti);
+		cnt_tt550_vox_hang->activate(); cnt_tt550_vox_hang->value(progStatus.tt550_vox_hang);
+		btn_tt550_CompON->activate(); btn_tt550_CompON->value(progStatus.tt550_compON);
+		cnt_tt550_compression->activate(); cnt_tt550_compression->value(progStatus.tt550_compression);
+		cnt_tt550_mon_vol->activate(); cnt_tt550_mon_vol->value(progStatus.tt550_mon_vol);
+		btn_tt550_tuner_bypass->activate(); btn_tt550_tuner_bypass->value(progStatus.tt550_tuner_bypass);
 	} else {
 		if (selrig->has_agc_level) cbo_agc_level->activate(); else cbo_agc_level->deactivate();
 		if (selrig->has_cw_wpm) cnt_cw_wpm->activate(); else cnt_cw_wpm->deactivate();
@@ -1162,6 +1168,7 @@ void initRig()
 	}
 
 	if (selrig->has_rit) {
+		cntRIT->value(progStatus.rit_freq);
 		cntRIT->activate();
 		cntRIT->show();
 	} else {
@@ -1170,6 +1177,7 @@ void initRig()
 	}
 
 	if (selrig->has_xit) {
+		cntXIT->value(progStatus.xit_freq);
 		cntXIT->activate();
 		cntXIT->show();
 	} else {
@@ -1178,6 +1186,7 @@ void initRig()
 	}
 
 	if (selrig->has_bfo) {
+		cntBFO->value(progStatus.bfo_freq);
 		cntBFO->activate();
 		cntBFO->show();
 	} else {
@@ -1188,7 +1197,7 @@ void initRig()
 	if (selrig->has_volume_control) {
 		progStatus.volume = selrig->get_volume_control();
 		sldrVOLUME->value(progStatus.volume);
-		if (progStatus.mute == 0) {
+		if (progStatus.spkr_on == 0) {
 			btnVol->value(0);
 			sldrVOLUME->deactivate();
 			selrig->set_volume_control(0);
