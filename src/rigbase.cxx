@@ -39,7 +39,6 @@ rigbase::rigbase()
 	has_rf_control =
 	has_sql_control = 
 	restore_mbw =
-	has_line_out =
 	has_agc_level =
 	has_cw_wpm =
 	has_cw_vol =
@@ -48,6 +47,7 @@ rigbase::rigbase()
 	has_vox_gain =
 	has_vox_anti =
 	has_vox_hang =
+	has_auto_notch = 
 	has_compression = false;
 
 	freq_ = 14070000L;

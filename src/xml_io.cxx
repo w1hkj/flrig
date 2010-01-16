@@ -25,20 +25,25 @@ static const int tcpip_port      = 7362;
 
 // these are get only
 static const char* main_get_trx_state   = "main.get_trx_state";
+
 // these are set only
 static const char* main_set_tx          = "main.tx";
 static const char* main_set_rx          = "main.rx";
-static const char* main_set_name        = "rig.set_name";
-static const char* main_set_modes       = "rig.set_modes";
-static const char* main_set_bandwidths  = "rig.set_bandwidths";
+static const char* rig_set_name         = "rig.set_name";
+static const char* rig_set_modes        = "rig.set_modes";
+static const char* rig_set_bandwidths   = "rig.set_bandwidths";
+static const char* rig_take_control     = "rig.take_control";
+static const char* rig_release_control  = "rig.release_control";
+
 // these are get/set
 static const char* main_get_frequency   = "main.get_frequency";
 static const char* main_set_wf_sideband = "main.set_wf_sideband";
-static const char* main_set_frequency   = "rig.set_frequency";
-static const char* main_set_mode        = "rig.set_mode";
-static const char* main_get_mode        = "rig.get_mode";
-static const char* main_set_bandwidth   = "rig.set_bandwidth";
-static const char* main_get_bandwidth   = "rig.get_bandwidth";
+static const char* rig_set_frequency    = "rig.set_frequency";
+static const char* rig_set_mode         = "rig.set_mode";
+static const char* rig_get_mode         = "rig.get_mode";
+static const char* rig_set_bandwidth    = "rig.set_bandwidth";
+static const char* rig_get_bandwidth    = "rig.get_bandwidth";
+
 
 static XmlRpc::XmlRpcClient* client;
 static XmlRpcValue* status_query;
@@ -46,6 +51,7 @@ static XmlRpcValue* status_query;
 bool run_digi_loop = true;
 bool wait_query = false;
 bool fldigi_online = false;
+bool rig_reset = false;
 
 class auto_mutex
 {
@@ -76,7 +82,7 @@ void open_rig_xmlrpc()
 	status_query = new XmlRpcValue;
 	const char* status_methods[] = {
 		main_get_trx_state, main_get_frequency,
-		main_get_mode, main_get_bandwidth
+		rig_get_mode, rig_get_bandwidth
 	};
 	for (size_t i = 0; i < sizeof(status_methods)/sizeof(*status_methods); i++) {
 		(*status_query)[0][i]["methodName"] = status_methods[i];
@@ -107,7 +113,7 @@ void send_new_freq()
 	auto_mutex lock(mutex_xmlrpc);
 	try {
 		XmlRpcValue freq((double)vfoA.freq), res;
-		execute(main_set_frequency, freq, res);
+		execute(rig_set_frequency, freq, res);
 	}
 	catch (...) { }
 }
@@ -120,7 +126,7 @@ static void send_modes_(const char** md_array)
 	int i = 0;
 	for (const char** mode = md_array; *mode; mode++, i++)
 		modes[0][i] = *mode;
-	execute(main_set_modes, modes, res);
+	execute(rig_set_modes, modes, res);
 }
 
 static void send_modes_e() 
@@ -144,7 +150,7 @@ static void send_bandwidths_(const char** bw_array)
 	int i = 0;
 	for (const char** bw = bw_array; *bw; bw++, i++)
 		bandwidths[0][i] = *bw;
-	execute(main_set_bandwidths, bandwidths, res);
+	execute(rig_set_bandwidths, bandwidths, res);
 }
 
 static void send_bandwidths_e() 
@@ -167,7 +173,7 @@ void send_name()
 	auto_mutex lock(mutex_xmlrpc);
 	try {
 		XmlRpcValue res;
-		execute(main_set_name, XmlRpcValue(selrig->name_), res);
+		execute(rig_set_name, XmlRpcValue(selrig->name_), res);
 	} catch (...) { }
 }
 
@@ -189,7 +195,7 @@ void send_mode_changed()
 	auto_mutex lock(mutex_xmlrpc);
 	try {
 		XmlRpcValue mode(selrig->modes_[vfoA.imode]), res;
-		execute(main_set_mode, mode, res);
+		execute(rig_set_mode, mode, res);
 	} catch (...) { }
 }
 
@@ -201,7 +207,7 @@ void send_bandwidth_changed()
 	auto_mutex lock(mutex_xmlrpc);
 	try {
 		XmlRpcValue bandwidth(selrig->bandwidths_[vfoA.iBW]), res;
-		execute(main_set_bandwidth, bandwidth, res);
+		execute(rig_set_bandwidth, bandwidth, res);
 	} catch (...) { }
 }
 
@@ -326,12 +332,18 @@ static void check_for_bandwidth_change(const XmlRpcValue& new_bw)
 static void send_rig_info()
 {
 	XmlRpcValue res;
-	execute(main_set_name, selrig->name_, res);
+	rig_reset = false;
+	execute(rig_take_control, XmlRpcValue(), res);
+	execute(rig_set_name, selrig->name_, res);
 	send_bandwidths_e();
 	send_modes_e();
-	execute(main_set_frequency, (double)vfoA.freq, res);
-	execute(main_set_mode, selrig->modes_[vfoA.imode], res);
-	execute(main_set_bandwidth, selrig->bandwidths_[vfoA.iBW], res);
+	execute(rig_set_frequency, (double)vfoA.freq, res);
+	execute(rig_set_mode, selrig->modes_[vfoA.imode], res);
+	execute(rig_set_bandwidth, selrig->bandwidths_[vfoA.iBW], res);
+
+	XmlRpcValue sideband(selrig->get_modetype(vfoA.imode) == 'U' ? "USB" : "LSB");
+	execute(main_set_wf_sideband, sideband, res);
+
 	fldigi_online = true;
 }
 
@@ -339,10 +351,13 @@ void send_no_rig()
 {
 	auto_mutex lock(mutex_xmlrpc);
 	XmlRpcValue res;
-	execute(main_set_name, szNORIG, res);
+	execute(rig_set_name, szNORIG, res);
 	send_bandwidths_(szNOBWS);
 	send_modes_(szNOMODES);
-	execute(main_set_mode, "USB", res);
+	execute(rig_set_mode, "USB", res);
+	XmlRpcValue sideband("USB");
+	execute(main_set_wf_sideband, sideband, res);
+	execute(rig_release_control, XmlRpcValue(), res);
 }
 
 static void get_all_status()
@@ -363,8 +378,9 @@ void * digi_loop(void *d)
 		if (!run_digi_loop) break;
 		pthread_mutex_lock(&mutex_xmlrpc);
 		try {
-			if (!fldigi_online && !wait_query) {
-				if (!try_count--) send_rig_info();
+			if (rig_reset) send_rig_info();
+			else if (!fldigi_online) {
+				if (!wait_query && !try_count--) send_rig_info();
 			} else {
  				if (!wait_query) get_all_status();
 				if (!run_digi_loop) break;

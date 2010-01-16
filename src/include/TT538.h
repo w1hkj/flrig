@@ -9,7 +9,7 @@ private:
 	double refpwr;
 	double fwdv;
 	double refv;
-	void showresponse();
+	void showresponse(string s);
 public:
 	RIG_TT538();
 	~RIG_TT538(){}
@@ -46,7 +46,7 @@ public:
 //	void set_mic_gain(int val);
 //	int  get_mic_gain();
 //	void get_mic_min_max_step(int &min, int &max, int &step);
-	void checkresponse();
+	void checkresponse(string s);
 };
 
 

@@ -71,6 +71,19 @@ struct status {
 	int		attenuator;
 	int		preamp;
 
+//tt550 controls
+	int		tt550_line_out;
+	int		tt550_agc_level;
+	int		tt550_cw_wpm;
+	int		tt550_cw_vol;
+	int		tt550_cw_spot;
+	bool	tt550_vox_onoff;
+	int		tt550_vox_gain;
+	int		tt550_vox_anti;
+	int		tt550_vox_hang;
+	int		tt550_compression;
+	bool	tt550_compON;
+
 	int		s_red;
 	int		s_green;
 	int		s_blue;

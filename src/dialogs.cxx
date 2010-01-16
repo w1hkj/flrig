@@ -5,6 +5,7 @@
 #include "support.h"
 #include "rigpanel.h"
 #include "xml_io.h"
+#include "rigbase.h"
 
 #include <string>
 
@@ -26,6 +27,8 @@ using namespace std;
 Fl_Double_Window *dlgDisplayConfig = NULL;
 Fl_Double_Window *dlgXcvrConfig = NULL;
 Fl_Double_Window *dlgMemoryDialog = NULL;
+Fl_Double_Window *dlgControls = NULL;
+Fl_Double_Window *tt550_controls = NULL;
 
 //==============================================================
 // Transceiver dialog
@@ -94,6 +97,13 @@ void cbOkXcvrDialog()
 	// close the current rig control
 	closeRig();
 
+	pthread_mutex_lock(&mutex_serial);
+		RigSerial.ClosePort();
+		AuxSerial.ClosePort();
+		SepSerial.ClosePort();
+	pthread_mutex_unlock(&mutex_serial);
+
+
 	string p1 = selectCommPort->value();
 	string p2 = selectAuxPort->value();
 	string p3 = selectSepPTTPort->value();
@@ -116,12 +126,6 @@ void cbOkXcvrDialog()
 		rig_nbr = selectRig->index();
 		selrig = rigs[rig_nbr];
 	}
-
-	pthread_mutex_lock(&mutex_serial);
-		RigSerial.ClosePort();
-		AuxSerial.ClosePort();
-		SepSerial.ClosePort();
-	pthread_mutex_unlock(&mutex_serial);
 
 	progStatus.rig_nbr = rig_nbr;
 
@@ -176,13 +180,13 @@ void cbOkXcvrDialog()
 
 	initRig();
 
-	send_name();
-	send_modes();
-	send_bandwidths();
-	send_mode_changed();
-	send_sideband();
-	send_bandwidth_changed();
-	send_new_freq();
+//	send_name();
+//	send_modes();
+//	send_bandwidths();
+//	send_mode_changed();
+//	send_sideband();
+//	send_bandwidth_changed();
+//	send_new_freq();
 
 	cbCancelXcvrDialog();
 }
@@ -202,6 +206,9 @@ void configXcvr()
 void createXcvrDialog()
 {
 	dlgXcvrConfig = XcvrDialog();
+	dlgControls = make_XcvrXtra();
+	tt550_controls = make_TT550();
+
 	initCommPortTable();
 	selectCommPort->clear();
 	selectAuxPort->clear();
@@ -353,3 +360,10 @@ void openMemoryDialog()
 	dlgMemoryDialog->show();
 }
 
+void show_controls()
+{
+	if (rig_nbr == TT550)
+		tt550_controls->show();
+	else
+		dlgControls->show();
+}

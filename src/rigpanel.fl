@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0109 
+version 1.0110 
 i18n_type 1 
 i18n_include "gettext.h" 
 i18n_function _ 
@@ -13,10 +13,11 @@ decl {\#include "status.h"} {}
 
 decl {\#include "support.h"} {} 
 
-Function {Rig_window()} {} {
+Function {Rig_window()} {open
+} {
   Fl_Window {} {
-    label Flrig
-    xywh {876 68 340 370} type Double color 52 align 80
+    label Flrig open
+    xywh {892 74 340 370} type Double color 52 align 80
     code0 {\#include <stdlib.h>} visible
   } {
     Fl_Menu_Bar {} {open
@@ -36,21 +37,26 @@ Function {Rig_window()} {} {
         label {&Config} open
         xywh {10 10 100 20}
       } {
-        MenuItem mnuTooltips {
-          label Tooltips
-          callback {progStatus.tooltips=mnuTooltips->value();
-Fl_Tooltip::enable(progStatus.tooltips);}
-          xywh {0 0 36 21} type Toggle
-          code0 {\#include <FL/Fl_Tooltip.H>}
-          code1 {progStatus.tooltips ? o->set() :o->clear();}
+        MenuItem mnuControls {
+          label {Xcvr setup}
+          callback {show_controls();} selected
+          xywh {0 0 36 21} divider
         }
         MenuItem mnuColorConfig {
           label Colors
           callback {setDisplayColors();}
-          xywh {0 0 34 21} divider
+          xywh {0 0 34 21}
+        }
+        MenuItem mnuTooltips {
+          label Tooltips
+          callback {progStatus.tooltips=mnuTooltips->value();
+Fl_Tooltip::enable(progStatus.tooltips);}
+          xywh {0 0 36 21} type Toggle divider
+          code0 {\#include <FL/Fl_Tooltip.H>}
+          code1 {progStatus.tooltips ? o->set() :o->clear();}
         }
         MenuItem mnuConfigXcvr {
-          label Transceiver
+          label {Xcvr select}
           callback {configXcvr();}
           xywh {0 0 34 21}
         }
@@ -196,17 +202,22 @@ Fl_Tooltip::enable(progStatus.tooltips);}
     Fl_Light_Button btnAttenuator {
       label Att
       callback {cbAttenuator();}
-      tooltip {Attenuator On/Off} xywh {4 323 60 18} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
+      tooltip {Attenuator On/Off} xywh {6 323 45 18} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
     }
     Fl_Light_Button btnPreamp {
       label Pre
       callback {cbPreamp();}
-      tooltip {Preamp On/Off} xywh {72 323 60 18} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
+      tooltip {Preamp On/Off} xywh {55 323 45 18} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
     }
     Fl_Light_Button btnNOISE {
       label NB
       callback {cbNoise();}
-      tooltip {Noise Blanker On/Off} xywh {140 323 60 18} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
+      tooltip {Noise Blanker On/Off} xywh {104 323 45 18} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
+    }
+    Fl_Light_Button btnAutoNotch {
+      label AN
+      callback {cbAN();}
+      tooltip {Auto Notch On/Off} xywh {154 323 45 18} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
     }
     Fl_Button btnTune {
       label Tune
@@ -222,11 +233,11 @@ Fl_Tooltip::enable(progStatus.tooltips);}
       xywh {0 76 209 60} box DOWN_BOX color 55 selection_color 55
     } {
       Fl_Box scaleSmeter {
-        image {../images/S60-rev.xpm} xywh {2 79 205 20} box FLAT_BOX color 55 selection_color 55
+        image {images/S60.xbm} xywh {2 79 205 20} box FLAT_BOX color 55 selection_color 55
       }
       Fl_Button btnALC_SWR {
         callback {cbALC_SWR();}
-        tooltip {Press SWR / ALC} image {../images/SWR-rev.xpm} xywh {2 79 205 20} box FLAT_BOX down_box FLAT_BOX color 255 hide
+        tooltip {Press SWR / ALC} image {images/SWR.xbm} xywh {2 79 205 20} box FLAT_BOX down_box FLAT_BOX color 255 hide
       }
       Fl_Box sldrRcvSignal {
         xywh {4 101 181 6} box FLAT_BOX color 198
@@ -248,7 +259,7 @@ Fl_Tooltip::enable(progStatus.tooltips);}
         class Fl_SigBar
       }
       Fl_Box scalePower {
-        image {../images/P100-rev.xpm} xywh {2 115 205 20} box FLAT_BOX color 55 selection_color 55
+        image {images/P100.xbm} xywh {2 115 205 20} box FLAT_BOX color 55 selection_color 55
       }
     }
     Fl_Box boxControl {
@@ -307,7 +318,7 @@ Function {DisplayDialog()} {} {
       xywh {8 8 209 32} box DOWN_BOX color 215 selection_color 215 labelcolor 50
     } {
       Fl_Box scaleSmeterColor {
-        image {../images/S75-rev.xpm} xywh {10 10 205 20} box FLAT_BOX color 215 selection_color 215
+        image {images/S60.xbm} xywh {10 10 205 20} box FLAT_BOX color 215 selection_color 215
         code0 {o->color(scaleSmeter->color());}
       }
       Fl_Box sldrRcvSignalColor {
@@ -396,11 +407,10 @@ selectFreq();}
   }
 } 
 
-Function {XcvrDialog()} {open
-} {
+Function {XcvrDialog()} {} {
   Fl_Window {} {
-    label {Transceiver Setup} open
-    xywh {448 66 410 257} type Double visible
+    label {I/O Ports} open
+    xywh {448 66 410 257} type Double hide
   } {
     Fl_Tabs {} {open
       xywh {0 8 408 245}
@@ -475,7 +485,7 @@ progStatus.stopbits = 2;
 } else
 o->value(true);
 btnOkXcvrDialog->labelcolor(FL_RED);
-btnOkXcvrDialog->redraw();} selected
+btnOkXcvrDialog->redraw();}
             xywh {278 132 22 15} down_box DOWN_BOX align 8
             code0 {o->value(progStatus.stopbits == 2);}
           }
@@ -570,109 +580,6 @@ btnOkXcvrDialog->redraw();}
         }
       }
       Fl_Group {} {
-        label Xcvr
-        xywh {2 30 404 220} hide
-      } {
-        Fl_Group {} {
-          label {Misc.} open
-          xywh {4 36 398 40} box ENGRAVED_FRAME align 21
-        } {
-          Fl_Spinner cnt_line_out {
-            label Line
-            callback {progStatus.line_out=o->value();
-cb_line_out();}
-            tooltip {Line out volume} xywh {55 43 50 25} align 8 minimum 0 value 100
-            code0 {o->value(progStatus.line_out);}
-          }
-          Fl_Group cbo_agc_level {
-            label AGC
-            callback {progStatus.agc_level = o->index();
-cb_agc_level();} open
-            tooltip {Select Transceiver} xywh {240 43 70 25} box DOWN_BOX color 53 align 8
-            code0 {\#include "combo.h"}
-            class Fl_ComboBox
-          } {}
-        }
-        Fl_Group {} {
-          label CW open
-          xywh {4 77 398 40} box ENGRAVED_FRAME align 21
-        } {
-          Fl_Spinner cnt_cw_wpm {
-            label WPM
-            callback {progStatus.cw_wpm = o->value();
-cb_cw_wpm();}
-            tooltip {Keying speed} xywh {55 84 48 25} align 8 minimum 8 maximum 60 value 20
-            code0 {o->value(progStatus.cw_wpm);}
-          }
-          Fl_Spinner cnt_cw_vol {
-            label Vol
-            callback {progStatus.cw_vol=o->value();
-cb_cw_vol();}
-            tooltip {Sidetone volume} xywh {151 84 48 25} align 8 minimum 0 value 100
-            code0 {o->value(progStatus.cw_vol);}
-          }
-          Fl_Spinner cnt_cw_spot {
-            label Spot
-            callback {progStatus.cw_spot=o->value();
-cb_cw_spot();}
-            tooltip {Spot level} xywh {240 84 47 25} align 8 minimum 0 value 100
-            code0 {o->value(progStatus.cw_spot);}
-          }
-        }
-        Fl_Group {} {
-          label Vox open
-          xywh {4 118 398 40} box ENGRAVED_FRAME align 21
-        } {
-          Fl_Spinner cnt_vox_gain {
-            label Gain
-            callback {progStatus.vox_gain=o->value();
-cb_vox_gain();}
-            xywh {54 125 50 25} align 8 minimum 0 value 1
-            code0 {o->value(progStatus.vox_gain);}
-          }
-          Fl_Spinner cnt_anti_vox {
-            label Anti
-            callback {progStatus.vox_anti=o->value();
-cb_vox_anti();}
-            xywh {150 125 50 25} align 8 minimum 0 value 1
-            code0 {o->value(progStatus.vox_anti);}
-          }
-          Fl_Spinner cnt_vox_hang {
-            label Hang
-            callback {progStatus.vox_hang = o->value();
-cb_vox_hang();}
-            xywh {238 125 50 25} align 8 minimum 0 value 1
-            code0 {o->value(progStatus.vox_hang);}
-          }
-          Fl_Light_Button btn_vox {
-            label VOX
-            callback {progStatus.vox_onoff=o->value();
-cb_vox_onoff();}
-            xywh {338 125 50 25}
-            code0 {o->value(progStatus.vox_onoff);}
-          }
-        }
-        Fl_Group {} {
-          label {Speech Comp.} open
-          xywh {4 160 398 40} box ENGRAVED_FRAME align 21
-        } {
-          Fl_Spinner cnt_compression {
-            label Level
-            callback {progStatus.compression=o->value();
-cb_compression();}
-            tooltip {Speech Compression} xywh {238 167 50 25} align 8 minimum 0 value 1
-            code0 {o->value(progStatus.compression);}
-          }
-          Fl_Light_Button btnCompON {
-            label On
-            callback {progStatus.compON=o->value();
-cb_compression();}
-            xywh {150 167 50 25}
-            code0 {o->value(progStatus.compON);}
-          }
-        }
-      }
-      Fl_Group {} {
         label PTT open
         xywh {2 30 404 220} hide
       } {
@@ -748,6 +655,227 @@ Serial Port for a special Control Signals}
       label Init
       callback {cbOkXcvrDialog();}
       xywh {347 2 60 25}
+    }
+  }
+} 
+
+Function {make_XcvrXtra()} {} {
+  Fl_Window {} {
+    label Controls open
+    xywh {469 784 340 187} type Double align 0 hide
+  } {
+    Fl_Group {} {
+      label CW open
+      xywh {2 3 335 50} box ENGRAVED_FRAME align 21
+    } {
+      Fl_Counter cnt_cw_wpm {
+        label wpm
+        callback {progStatus.cw_wpm = o->value();
+cb_cw_wpm();}
+        xywh {37 23 70 22} type Simple align 1 minimum 5 maximum 80 step 1 value 24
+        code0 {o->value(progStatus.cw_wpm);}
+      }
+      Fl_Counter cnt_cw_vol {
+        label Mon
+        callback {progStatus.cw_vol=o->value();
+cb_cw_vol();}
+        xywh {113 23 70 22} type Simple align 1 minimum 5 maximum 80 step 1 value 24
+        code0 {o->value(progStatus.cw_vol);}
+      }
+      Fl_Counter cnt_cw_spot {
+        label spot
+        callback {progStatus.cw_spot=o->value();
+cb_cw_spot();}
+        xywh {189 23 70 22} type Simple align 1 minimum 0 maximum 100 step 1
+        code0 {o->value(progStatus.cw_spot);}
+      }
+      Fl_Light_Button btnSpot {
+        label Spot
+        xywh {266 23 64 22}
+      }
+    }
+    Fl_Group {} {
+      label Vox open
+      xywh {2 54 335 50} box ENGRAVED_FRAME align 21
+    } {
+      Fl_Counter cnt_vox_gain {
+        label gain
+        callback {progStatus.vox_gain=o->value();
+cb_vox_gain();}
+        xywh {37 75 70 22} type Simple align 1 minimum 0 maximum 100 step 1
+        code0 {o->value(progStatus.vox_gain);}
+      }
+      Fl_Counter cnt_anti_vox {
+        label anti
+        callback {progStatus.vox_anti=o->value();
+cb_vox_anti();}
+        xywh {113 75 70 22} type Simple align 1 minimum 0 maximum 100 step 1
+        code0 {o->value(progStatus.vox_anti);}
+      }
+      Fl_Counter cnt_vox_hang {
+        label hang
+        callback {progStatus.vox_hang = o->value();
+cb_vox_hang();}
+        xywh {189 75 70 22} type Simple align 1 minimum 0 maximum 100 step 1
+        code0 {o->value(progStatus.vox_hang);}
+      }
+      Fl_Light_Button btn_vox {
+        label VOX
+        callback {progStatus.vox_onoff=o->value();
+cb_vox_onoff();}
+        xywh {266 75 64 22}
+        code0 {o->value(progStatus.vox_onoff);}
+      }
+    }
+    Fl_Group {} {
+      label {Speech Comp.} open
+      xywh {2 105 335 40} box ENGRAVED_FRAME align 21
+    } {
+      Fl_Light_Button btnCompON {
+        label On
+        callback {progStatus.compON=o->value();
+cb_compression();}
+        xywh {266 114 64 22}
+        code0 {o->value(progStatus.compON);}
+      }
+      Fl_Counter cnt_compression {
+        label level
+        callback {progStatus.compression=o->value();
+cb_compression();}
+        xywh {189 114 70 22} type Simple align 4 minimum 0 maximum 100 step 1
+        code0 {o->value(progStatus.compression);}
+      }
+    }
+    Fl_Group {} {
+      label {Misc.} open
+      xywh {4 146 335 40} box ENGRAVED_FRAME align 21
+    } {
+      Fl_Group cbo_agc_level {
+        label AGC
+        callback {progStatus.agc_level = o->index();
+cb_agc_level();} open
+        tooltip {Select Transceiver} xywh {215 155 80 22} box DOWN_BOX color 53 align 8
+        code0 {\#include "combo.h"}
+        class Fl_ComboBox
+      } {}
+      Fl_Counter cnt_line_out {
+        label {line out}
+        callback {progStatus.cw_wpm = o->value();
+cb_cw_wpm();}
+        xywh {114 155 70 22} type Simple align 4 minimum 0 maximum 100 step 1 value 20
+        code0 {o->value(progStatus.line_out);}
+      }
+    }
+  }
+} 
+
+Function {make_TT550()} {open
+} {
+  Fl_Window {} {
+    label {TT550 Setup} open
+    xywh {476 128 340 187} type Double align 0 visible
+  } {
+    Fl_Group {} {
+      label CW open
+      xywh {2 3 335 50} box ENGRAVED_FRAME align 21
+    } {
+      Fl_Counter cnt_tt550_cw_wpm {
+        label wpm
+        callback {progStatus.tt550_cw_wpm = o->value();
+cb_tt550_cw_wpm();}
+        xywh {37 23 70 22} type Simple align 1 minimum 5 maximum 80 step 1 value 24
+        code0 {o->value(progStatus.tt550_cw_wpm);}
+      }
+      Fl_Counter cnt_tt550_cw_vol {
+        label Mon
+        callback {progStatus.tt550_cw_vol=o->value();
+cb_tt550_cw_vol();}
+        xywh {113 23 70 22} type Simple align 1 minimum 5 maximum 80 step 1 value 24
+        code0 {o->value(progStatus.tt550_cw_vol);}
+      }
+      Fl_Counter cnt_tt550_cw_spot {
+        label spot
+        callback {progStatus.tt550_cw_spot=o->value();
+cb_tt550_cw_spot();}
+        xywh {189 23 70 22} type Simple align 1 minimum 0 maximum 100 step 1
+        code0 {o->value(progStatus.tt550_cw_spot);}
+      }
+      Fl_Light_Button btn_tt550_Spot {
+        label Spot
+        xywh {266 23 64 22}
+      }
+    }
+    Fl_Group {} {
+      label Vox open
+      xywh {2 54 335 50} box ENGRAVED_FRAME align 21
+    } {
+      Fl_Counter cnt_tt550_vox_gain {
+        label gain
+        callback {progStatus.tt550_vox_gain=o->value();
+cb_tt550_vox_gain();}
+        xywh {37 75 70 22} type Simple align 1 minimum 0 maximum 100 step 1
+        code0 {o->value(progStatus.tt550_vox_gain);}
+      }
+      Fl_Counter cnt_tt550_anti_vox {
+        label anti
+        callback {progStatus.tt550_vox_anti=o->value();
+cb_tt550_vox_anti();}
+        xywh {113 75 70 22} type Simple align 1 minimum 0 maximum 100 step 1
+        code0 {o->value(progStatus.tt550_vox_anti);}
+      }
+      Fl_Counter cnt_tt550_vox_hang {
+        label hang
+        callback {progStatus.tt550_vox_hang = o->value();
+cb_tt550_vox_hang();}
+        xywh {189 75 70 22} type Simple align 1 minimum 0 maximum 100 step 1
+        code0 {o->value(progStatus.tt550_vox_hang);}
+      }
+      Fl_Light_Button btn_tt550_vox {
+        label VOX
+        callback {progStatus.tt550_vox_onoff=o->value();
+cb_tt550_vox_onoff();}
+        xywh {266 75 64 22}
+        code0 {o->value(progStatus.tt550_vox_onoff);}
+      }
+    }
+    Fl_Group {} {
+      label {Speech Comp.} open
+      xywh {2 105 335 40} box ENGRAVED_FRAME align 21
+    } {
+      Fl_Light_Button btn_tt550_CompON {
+        label On
+        callback {progStatus.tt550_compON=o->value();
+cb_tt550_compression();}
+        xywh {266 114 64 22}
+        code0 {o->value(progStatus.tt550_compON);}
+      }
+      Fl_Counter cnt_tt550_compression {
+        label level
+        callback {progStatus.tt550_compression=o->value();
+cb_tt550_compression();}
+        xywh {189 114 70 22} type Simple align 4 minimum 0 maximum 100 step 1
+        code0 {o->value(progStatus.tt550_compression);}
+      }
+    }
+    Fl_Group {} {
+      label {Misc.} open
+      xywh {4 146 335 40} box ENGRAVED_FRAME align 21
+    } {
+      Fl_Group cbo_tt550_agc_level {
+        label AGC
+        callback {progStatus.tt550_agc_level = o->index();
+cb_tt550_agc_level();} open
+        tooltip {Select Transceiver} xywh {215 155 80 22} box DOWN_BOX color 53 align 8
+        code0 {\#include "combo.h"}
+        class Fl_ComboBox
+      } {}
+      Fl_Counter cnt_tt550_line_out {
+        label {line out}
+        callback {progStatus.tt550_line_out = o->value();
+cb_tt550_line_out();}
+        xywh {114 155 70 22} type Simple align 4 minimum 0 maximum 100 step 1 value 20
+        code0 {o->value(progStatus.tt550_line_out);}
+      }
     }
   }
 } 

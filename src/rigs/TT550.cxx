@@ -11,6 +11,8 @@
 
 #include "TT550.h"
 #include "support.h"
+#include "util.h"
+#include "debug.h"
 
 static const char TT550name_[] = "TT-550";
 
@@ -63,26 +65,28 @@ static char TT550setAGC[]		= "Gc\r";
 static char TT550setRFGAIN[]	= "An\r";
 static char TT550setATT[]		= "Bc\r";
 static char TT550setCWWPM[]		= "Eabcdef\r";
-//static char TT550setMONVOL[]	= "Hn\r";
+static char TT550setMONVOL[]	= "Hn\r";
 static char TT550setCWMONVOL[]	= "Jn\r";
-//static char TT550setNRNOTCH[]	= "Kna\r";
+static char TT550setNRNOTCH[]	= "Kna\r";
 static char TT550setLINEOUT[]	= "Ln\r"; // 63 - min, 0 - max
-//static char TT550setMICLINE[]	= "Ocn\r"; // *******************************************
-//static char TT550setPOWER[]		= "Pn\r"; // ****************************************
+static char TT550setMICLINE[]	= "O1cn\r"; // *******************************************
+static char TT550setPOWER[]		= "Pn\r"; // ****************************************
 static char TT550setXMT[]		= "Q1\r";
 static char TT550setRCV[]		= "Q0\r";
-//static char TT550setSQUELCH[]	= "Sn\r";	// 0..19; 6db / unit
+static char TT550setSQUELCH[]	= "Sn\r";	// 0..19; 6db / unit
 static char TT550setVOX[]		= "Uc\r";	// '0' = off; '1' = on
 static char TT550setVOXGAIN[]	= "UGn\r";	// 0 <= n <= 255
 static char TT550setANTIVOX[]	= "UAn\r";	// 0..255
 static char TT550setVOXHANG[]	= "UHn\r";	// 0..255; n= delay*0.0214 sec
 static char TT550setCWSPOTLVL[]	= "Fn\r";	// 0..255; 0 = off
+static char TT550setCWQSK[]		= "UQn\r";	// 0..255; 0 = none
+static char TT550setAUXHANG[]	= "UTn\r";	// 0..255; 0 = none
 //static char TT550setBLANKER[]	= "Dn\r";	// 0..7; 0 = off
 static char TT550setSPEECH[]	= "Yn\r";	// 0..127; 0 = off
 
 //static char TT550setDISABLE[]	= "#0\r";	// disable transmitter
-//static char TT550setENABLE[]	= "#1\r";	// enable transmitter
-//static char TT550setTLOOP_OFF[]	= "#2\r";	// disable T loop
+static char TT550setENABLE[]	= "#1\r";	// enable transmitter
+static char TT550setTLOOP_OFF[]	= "#2\r";	// disable T loop
 //static char TT550setTLOOP_ON[]	= "#3\r";	// enable T loop
 //static char TT550setKEYER_ON[]	= "#6\r";	// enable keyer
 //static char TT550setKEYER_OFF[]	= "#7\r";	// disable keyer
@@ -92,8 +96,9 @@ static char TT550setSPEECH[]	= "Yn\r";	// 0..127; 0 = off
 //static char TT550getAGC[]		= "?Y\r";	// 0..255
 //static char TT550getFWDPWR[]	= "?F\r";	// F<0..255>
 //static char TT550getREFPWR[]	= "?R\r";	// R<0..255>
-static char TT550getSMETER[]	= "?S\r";	// S<0..255><0..255>
+static char TT550getSIGNAL_LEVEL[]	= "?S\r";	// S<0..255><0..255>
 //static char TT550getFWDREF[]	= "?S\r";	// T<0..255><0..255>
+
 
 RIG_TT550::RIG_TT550() {
 // base class values	
@@ -129,15 +134,12 @@ RIG_TT550::RIG_TT550() {
 	ATTlevel = 0;
 	RFgain = 100;
 
-	has_power_control =
-	has_micgain_control =
 	has_notch_control =
-	has_tune_control =
-	has_noise_control =
 	has_preamp_control =
+	has_micgain_control =
 	has_swr_control = false;
 
-	has_line_out =
+	has_power_control =
 	has_agc_level =
 	has_cw_wpm =
 	has_cw_vol =
@@ -156,32 +158,106 @@ RIG_TT550::RIG_TT550() {
 	has_ifshift_control =
 	has_ptt_control =
 	has_bandwidth_control =
+	has_auto_notch = 
+	has_tune_control =
+	has_noise_control =
 	has_mode_control = true;
 
+	auto_notch = noise_reduction = false;
+	
+	use_line_in = true;
+
+}
+
+void RIG_TT550::showresponse(string s)
+{
+	LOG_WARN("%s: %s", s.c_str(), str2hex((char *)replybuff, strlen((char *)replybuff)));
+}
+
+void RIG_TT550::showASCII(string s)
+{
+	if (s[s.length() - 1] == '\r') s[s.length() - 1] = 0;
+	printf("%s\n", s.c_str());
 }
 
 void RIG_TT550::initialize()
 {
-	sendCommand(TT550restart, 20, true);
-	cmd = TT550init;
-	cmd[1] = 1;
+	clearSerialPort();
+
+	string s;
+	cmd = TT550restart; // wake up radio
+	sendCommand(cmd, 0, true);
+	MilliSleep(200);
+	readResponse();
+	for (size_t i = 0; i < replystr.length(); i++)
+		if (replystr[i] != '\r' && replystr[i] != '\n') s += replystr[i];
+	showASCII(s);
+
+	MilliSleep(100);
+	cmd = TT550restart; // wake up radio
+	sendCommand(cmd, 16, true);
+	for (size_t i = 0; i < replystr.length(); i++)
+		if (replystr[i] != '\r' && replystr[i] != '\n') s += replystr[i];
+//	LOG_WARN("%s", s.c_str());
+	showASCII(s);
+
+	if (replystr.find("RADIO") == string::npos) { // not in radio mode
+		cmd = TT550init; // put into radio mode
+		sendCommand(cmd, 0, true);//13, true);
+		MilliSleep( 1000 );
+		readResponse();
+		s.clear();
+		for (size_t i = 0; i < replystr.length(); i++)
+			if (replystr[i] != '\r' && replystr[i] != '\n') s += replystr[i];
+//		LOG_WARN("%s", s.c_str());
+		showASCII(s);
+	}
+
+	cmd = "?V\r";
 	sendCommand(cmd, 20, true);
+	s.clear();
+	for (size_t i = 0; i < replystr.length(); i++)
+		if (replystr[i] != '\r' && replystr[i] != '\n') s += replystr[i];
+//	LOG_WARN("%s", s.c_str());
+	showASCII(s);
+
+//	set_noise_reduction(noise_reduction);
+	set_auto_notch(auto_notch);
+	set_compression();
+	set_vox_hang();
+	set_vox_anti();
+	set_vox_gain();
+	set_vox_onoff();
+	set_cw_spot();
+	set_cw_vol();
+	set_cw_wpm();
+	set_agc_level();
+	set_line_out();
+	set_mic_gain(100);
+	set_rf_gain(RFgain);
+	setXit(XitFreq);
+	setRit(RitFreq);
+	setBfo(Bfo);
+	set_volume_control(20);
+	set_attenuator(0);
+	set_mon_volume(0);
+	set_squelch_level(0);
+	set_if_shift(PbtFreq);
+	set_cw_qsk();
+	set_aux_hang();
+	cmd = TT550setENABLE;
+	cmd.append(TT550setTLOOP_OFF);
+	sendCommand(cmd, 0, true);
 }
 
-void RIG_TT550::checkresponse()
+void RIG_TT550::shutdown()
 {
-	if (RigSerial.IsOpen() == false)
-		return;
-	if (replybuff[0] == 'G')
-		return;
-	LOG_ERROR("\nsent  %s\nreply %s",
-		str2hex(cmd.c_str(), cmd.length()),
-		str2hex((char *)replybuff, strlen((char *)replybuff)));
-}
-
-void RIG_TT550::showresponse()
-{
-	LOG_INFO("%s", str2hex((char *)replybuff, strlen((char *)replybuff)));
+	cmd = "Vx\r";
+	cmd[1] = 0;
+	sendCommand(cmd, 0, true); // volume = zero
+	cmd = "Lx\r";
+	cmd[1] = 0x3F;
+	sendCommand(cmd, 0, true); // line out = minimum
 }
 
 void RIG_TT550::set_vfoRX(long freq)
@@ -199,17 +275,15 @@ void RIG_TT550::set_vfoRX(long freq)
 
 	long lFreq = freq + VfoAdj + RitAdj;
 
-	lFreq += (mode_ == TT550_USB_MODE) ? PbtAdj : -PbtAdj;
-
 	if(mode_ == TT550_USB_MODE) {
 		IBfo = FiltAdj + 200;
-		lFreq += IBfo;
+		lFreq += (IBfo + PbtAdj);
 		IBfo = IBfo + PbtAdj;
 	}
 
 	if(mode_ == TT550_LSB_MODE) {
 		IBfo = FiltAdj + 200;
-		lFreq -= IBfo;
+		lFreq -= (IBfo + PbtAdj);
 		IBfo = IBfo + PbtAdj;
 	}
 
@@ -230,6 +304,7 @@ void RIG_TT550::set_vfoRX(long freq)
 	}
 
 	lFreq -= 1250;
+
 	NVal = lFreq / 2500 + 18000;
 	FVal = (int)((lFreq % 2500) * 5.46);
 
@@ -238,10 +313,11 @@ void RIG_TT550::set_vfoRX(long freq)
 	cmd += NVal & 0xff;
 	cmd += (FVal >> 8) & 0xff;
 	cmd += FVal & 0xff;
+
+	TBfo = (int)((IBfo + 8000)*2.73);
 	cmd += (TBfo >> 8) & 0xff;
 	cmd += TBfo & 0xff;
 	cmd += '\r';
-
 	sendCommand(cmd, 0, true);
 }
 
@@ -301,7 +377,6 @@ void RIG_TT550::set_vfoTX(long freq)
 	cmd += (TBfo >> 8) & 0xff;
 	cmd += TBfo & 0xff;
 	cmd += '\r';
-
 	sendCommand(cmd, 0, true);
 }
 
@@ -328,7 +403,7 @@ void RIG_TT550::set_mode(int val)
 {
 	mode_ = val;
 	cmd = TT550setMODE;
-	cmd[2] = cmd[3] = TT550mode_chr[val];
+	cmd[1] = cmd[2] = TT550mode_chr[val];
 	sendCommand(cmd, 0, true);
 	set_vfoA(freq_);
 }
@@ -397,38 +472,31 @@ void RIG_TT550::get_if_min_max_step(int &min, int &max, int &step)
 void RIG_TT550::set_attenuator(int val)
 {
 	cmd = TT550setATT;
-	if (val) cmd[2] = '1';
-	else     cmd[2] = '0';
+	if (val) cmd[1] = '1';
+	else     cmd[1] = '0';
 	sendCommand(cmd, 0, true);
-}
-
-void RIG_TT550::set_noise(bool b)
-{
-//	cmd = TT550setNB;
-//	if (b)
-//		cmd[2] = '4';
-//	else
-//		cmd[2] = '0';
-//	sendCommand(cmd, 2, true);
 }
 
 void RIG_TT550::set_volume_control(int val)
 {
 	cmd = TT550setVolume;
 	cmd[1] = val * 2.55;
+	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
 	sendCommand(cmd, 0, true);
 }
-
 
 int RIG_TT550::get_smeter()
 {
 	double sig = 0.0;
-	cmd = TT550getSMETER;
-	sendCommand(cmd, 3, true);
+	cmd = TT550getSIGNAL_LEVEL;
+	sendCommand(cmd, 6, true);
 	if (replybuff[0] == 'S') {
-		sig = (50.0 / 9.0) * (replybuff[1] + replybuff[2] / 256.0);
+		int sval;
+		replybuff[5] = 0;
+		sscanf(&replybuff[1], "%4x", &sval);
+		sig = sval / 256.0;
 	}
-	return (int)sig;
+	return (int)(sig * 50.0 / 9.0);
 }
 
 int RIG_TT550::get_swr()
@@ -443,12 +511,11 @@ int RIG_TT550::get_swr()
 
 int RIG_TT550::get_power_out()
 {
-//	fwdpwr = refpwr = fwdv = refv = 0;
-	cmd = TT550getSMETER;
-	sendCommand(cmd, 3, true);
+	cmd = TT550getSIGNAL_LEVEL;
+	sendCommand(cmd, 4, true);
 	if (replybuff[0] == 'T') {
-		fwdpwr = (unsigned char)replybuff[1] / 2.56;
-		refpwr = (unsigned char)replybuff[2] / 2.56;
+		fwdpwr = 0.8*fwdpwr + 0.2*(unsigned char)replybuff[1];
+		refpwr = 0.8*refpwr + 0.2*(unsigned char)replybuff[2];
 	}
 	fwdv = sqrtf(fwdpwr);
 	refv = sqrtf(refpwr);
@@ -469,6 +536,7 @@ int RIG_TT550::getBfo()
 void RIG_TT550::setRit(int val)
 {
 	RitFreq = val;
+	if (RitFreq) RitActive = true;
 	set_vfoA(freq_);
 }
 
@@ -480,6 +548,7 @@ int RIG_TT550::getRit()
 void RIG_TT550::setXit(int val)
 {
 	XitFreq = val;
+	if (XitFreq) XitActive = true;
 	set_vfoA(freq_);
 }
 
@@ -492,6 +561,7 @@ void RIG_TT550::set_rf_gain(int val)
 {
 	cmd = TT550setRFGAIN;
 	cmd[1] = (unsigned char)(255 - val * 2.55);
+	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
 	RFgain = val;
 	sendCommand(cmd, 0, true);
 }
@@ -511,14 +581,15 @@ void RIG_TT550::get_rf_min_max_step(int &min, int &max, int &step)
 void RIG_TT550::set_line_out()
 {
 	cmd = TT550setLINEOUT;
-	cmd[1] = (0x3F) & (int)((100 - progStatus.line_out) * .63);
+	cmd[1] = (0x3F) & (int)((100 - progStatus.tt550_line_out) * .63);
+	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
 	sendCommand(cmd, 0, true);
 }
 
 void RIG_TT550::set_agc_level()
 {
 	cmd = TT550setAGC;
-	switch (progStatus.agc_level) {
+	switch (progStatus.tt550_agc_level) {
 		case 0 : cmd[1] = '1'; break;
 		case 1 : cmd[1] = '2'; break;
 		case 2 : cmd[1] = '3'; break;
@@ -528,8 +599,10 @@ void RIG_TT550::set_agc_level()
 
 void RIG_TT550::set_cw_wpm()
 {
+// 3:1 dash:dot, weight = 1
 	cmd = TT550setCWWPM;
-	int ditfactor = (int)(0.50/progStatus.cw_wpm*0.4166*0.0001667);
+	int ditfactor = 7200 / progStatus.tt550_cw_wpm;
+//	int ditfactor = (int)(0.50/(progStatus.tt550_cw_wpm*0.4166*0.0001667));
 	int spcfactor = ditfactor;
 	int dahfactor = ditfactor * 3;
 	cmd[1] = 0xFF & (ditfactor >> 8);
@@ -544,14 +617,16 @@ void RIG_TT550::set_cw_wpm()
 void RIG_TT550::set_cw_vol()
 {
 	cmd = TT550setCWMONVOL;
-	cmd[1] = (0x3F) & (int)(progStatus.cw_vol * 0.63);
+	cmd[1] = (0x3F) & (int)(progStatus.tt550_cw_vol * 0.63);
+	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
 	sendCommand(cmd, 0, true);
 }
 
 void RIG_TT550::set_cw_spot()
 {
 	cmd = TT550setCWSPOTLVL;
-	cmd[1] = (0xFF) & (int)(progStatus.cw_spot * 2.55);
+	cmd[1] = (0xFF) & (int)(progStatus.tt550_cw_spot * 2.55);
+	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
 	sendCommand(cmd, 0, true);
 }
 
@@ -565,27 +640,230 @@ void RIG_TT550::set_vox_onoff()
 void RIG_TT550::set_vox_gain()
 {
 	cmd = TT550setVOXGAIN;
-	cmd[2] = (0xFF) & (int)(progStatus.vox_gain * 2.55);
+	cmd[2] = (0xFF) & (int)(progStatus.tt550_vox_gain * 2.55);
+	if (cmd[2] == 0x0D) cmd[2] = 0x0E;
 	sendCommand(cmd, 0, true);
 }
 
 void RIG_TT550::set_vox_anti()
 {
 	cmd = TT550setANTIVOX;
-	cmd[2] = (0xFF) & (int)(progStatus.vox_anti * 2.55);
+	cmd[2] = (0xFF) & (int)(progStatus.tt550_vox_anti * 2.55);
+	if (cmd[2] == 0x0D) cmd[2] = 0x0E;
 	sendCommand(cmd, 0, true);
 }
 
 void RIG_TT550::set_vox_hang()
 {
 	cmd = TT550setVOXHANG;
-	cmd[2] = (0xFF) & (int)(progStatus.vox_hang * 2.55);
+	cmd[2] = (0xFF) & (int)(progStatus.tt550_vox_hang * 2.55);
+	if (cmd[2] == 0x0D) cmd[2] = 0x0E;
+	sendCommand(cmd, 0, true);
+}
+
+void RIG_TT550::set_cw_qsk()
+{
+	cmd = TT550setCWQSK;
+	cmd[2] = 0;
+	sendCommand(cmd, 0, true);
+}
+
+void RIG_TT550::set_aux_hang()
+{
+	cmd = TT550setAUXHANG;
+	cmd[2] = 0;
 	sendCommand(cmd, 0, true);
 }
 
 void RIG_TT550::set_compression()
 {
 	cmd = TT550setSPEECH;
-	cmd[1] = (0x7F) & (int)(progStatus.compression * 1.27);
+	cmd[1] = (0x7F) & (int)(progStatus.tt550_compression * 1.27);
+	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
 	sendCommand(cmd, 0, true);
 }
+
+void RIG_TT550::set_auto_notch(int v)
+{
+	auto_notch = v;
+	cmd = TT550setNRNOTCH;
+	cmd[1] = noise_reduction ? '1' : '0';
+	cmd[2] = auto_notch ? '1' : '0';
+	sendCommand(cmd, 0, true);
+}
+
+void RIG_TT550::set_noise_reduction(int b)
+{
+	noise_reduction = b;
+	cmd = TT550setNRNOTCH;
+	cmd[1] = noise_reduction ? '1' : '0';
+	cmd[2] = auto_notch ? '1' : '0';
+	sendCommand(cmd, 0, true);
+}
+
+void RIG_TT550::set_mic_gain(int v)
+{
+	cmd = TT550setMICLINE;
+	cmd[2] = use_line_in ? 1 : 0;
+	cmd[3] = (unsigned char)(v * 0.15);
+	sendCommand(cmd, 0, true);
+}
+
+void RIG_TT550::set_power_control(double val)
+{
+	cmd =  TT550setPOWER;
+	cmd[1] = (unsigned char)(val * 2.55);
+	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
+	sendCommand(cmd, 0, true);
+
+}
+
+void RIG_TT550::set_mon_volume(double val)
+{
+	cmd = TT550setMONVOL;
+	cmd[1] = (unsigned char)(val * 2.55);
+	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
+	sendCommand(cmd, 0, true);
+}
+
+void RIG_TT550::set_squelch_level(double val)
+{
+	cmd = TT550setSQUELCH;
+	cmd[1] = (unsigned char)(val * 2.55);
+	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
+	sendCommand(cmd, 0, true);
+}
+
+// callbacks for tt550 transceiver
+void cb_tt550_line_out()
+{
+	selrig->set_line_out();
+}
+
+void cb_tt550_agc_level()
+{
+	selrig->set_agc_level();
+}
+
+void cb_tt550_cw_wpm()
+{
+	selrig->set_cw_wpm();
+}
+
+void cb_tt550_cw_vol()
+{
+	selrig->set_cw_vol();
+}
+
+void cb_tt550_cw_spot()
+{
+	selrig->set_cw_spot();
+}
+
+void cb_tt550_vox_gain()
+{
+	selrig->set_vox_gain();
+}
+
+void cb_tt550_vox_anti()
+{
+	selrig->set_vox_anti();
+}
+
+void cb_tt550_vox_hang()
+{
+	selrig->set_vox_hang();
+}
+
+void cb_tt550_vox_onoff()
+{
+	selrig->set_vox_onoff();
+}
+
+void cb_tt550_compression()
+{
+	selrig->set_compression();
+}
+
+
+
+//======================================================================
+// data strings captured from TenTec Windows control program for Pegasus
+//======================================================================
+
+/*
+       Pegasus Control Program Startup, Query and Close Sequences
+       ==========================================================
+
+========================= start program ======================================
+WRITE Length 3: 
+58 58 0D                                  "XX"
+
+READ  Length 2: 
+0D 0D 
+READ  Length 14:
+20 20 52 41 44 49 4F 20 53 54 41 52 54 0D "  RADIO START"
+
+WRITE Length 3: 
+3F 56 0D                                  "?V"  version?
+READ  Length 13:
+56 45 52 20 31 32 39 31 2D 35 33 38 0D    "VER 1291.538"
+
+WRITE Length 7: 
+4D 31 31 0D                               "M11" mode - USB / USB
+50 2B 0D                                  "P+"  power = 16.8 watts
+
+WRITE Length 28: 
+47 31 0D                                  "G1" agc - slow
+4E 51 5C 0A A9 67 70 0D                   "N...." Receive tuning factor
+54 51 5C 0A A9 12 20 0D                   "T...." Transmit tuning factor
+57 0A 0D                                  "W." Width 3000
+56 3E 0D                                  "V." Volume 24
+4C 00 0D                                  "L0" Line out - 0, full output
+
+WRITE Length 3: 
+50 2B 0D                                  "P+" power = 16.8 watts
+
+WRITE Length 3: 
+4A 29 0D                                  "J." sidetone volume = 16
+
+WRITE Length 13:
+4F 31 01 00 0D                            "O1." select line in, gain factor = 1
+55 47 0F 0D                               "UG." Vox gain = 15
+55 48 0F 0D                               "UH." Vox hang = 15
+
+WRITE Length 16: 
+55 41 5D 0D                               "UA." Antivox = 36
+55 30 0D                                  "U0" Vox OFF
+48 00 0D                                  "H." Audio monitor volume = 0
+23 32 0D                                  "#2" Disable 'T' loop
+23 31 0D                                  "#1" Enable transmitter
+
+WRITE Length 26: 
+43 0A 0D                                  "C." Transmit filter width = 3000
+23 36 0D                                  "#6" Enable keyer
+53 00 0D                                  "S." Squelch = 0, OFF
+52 0F 0D                                  "R." UNKNOWN
+45 01 1F 03 5D 01 1F 0D                   "E...." Keyer timing 
+44 00 0D                                  "D." Noise blanker = 0, OFF
+59 00 0D                                  "Y." Speech processor = 0, OFF
+
+WRITE Length 8: 
+55 51 00 0D                               "UQ." set CW QSK = 0..255
+55 54 00 0D                               "UT." set AUX TX HANG = 0..255 (aux T/R delay)
+
+============================ smeter query ======================================
+WRITE Length 3: 
+3F 53 0D                                  "?S" read smeter
+READ	Length 6: 
+53 30 39 31 42 0D                         "S...." smeter value
+
+============================== close program ====================================
+
+WRITE Length 3: 
+56 00 0D                                  "V0" volume = ZERO
+
+WRITE Length 3: 
+4C 3F 0D                                  "L." Line out = 63, MINIMUM
+
+*/

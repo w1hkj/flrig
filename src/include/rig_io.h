@@ -20,6 +20,7 @@ extern bool startXcvrSerial();
 extern bool startAuxSerial();
 extern bool startSepSerial();
 
+extern int readResponse();
 extern int sendCommand(string s, int retnbr, bool loghex = true);
 
 extern void clearSerialPort();
