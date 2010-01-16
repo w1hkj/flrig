@@ -93,14 +93,13 @@ void read_mode()
 	int nu_mode = opMODE->index();
 	if (vfoA.imode != nu_mode) {
 		wait_query = true;
-		if (selrig->restore_mbw)
-			selrig->set_bandwidth(selrig->last_bw);
-		vfoA.imode = nu_mode;
-		selrig->set_mode(vfoA.imode);
 		if (selrig->restore_mbw) {
-			vfoA.iBW = selrig->last_bw = selrig->get_bandwidth();
-		} else
-			selrig->set_bandwidth(vfoA.iBW);
+			selrig->set_bandwidth(selrig->last_bw);
+			selrig->last_bw = vfoA.iBW;
+		}
+		vfoA.imode = nu_mode;
+		selrig->adjust_bandwidth(vfoA.imode);
+		selrig->set_mode(vfoA.imode);
 		Fl::awake(updateBandwidthControl);
 
 		send_mode_changed();
@@ -114,6 +113,7 @@ void read_mode()
 	if (vfoA.imode != nu_mode) {
 		vfoA.imode = nu_mode;
 		wait_query = true;
+		selrig->adjust_bandwidth(vfoA.imode);
 		Fl::awake(setModeControl);
 		Fl::awake(updateBandwidthControl);
 		send_mode_changed();
@@ -163,7 +163,7 @@ void read_smeter()
 void read_power_out()
 {
 	int sig;
-		sig = selrig->get_power_out();
+	sig = selrig->get_power_out();
 	Fl::awake(updateFwdPwr, (void*)sig);
 }
 
@@ -468,9 +468,9 @@ void selectFreq() {
 		selrig->set_vfoA(vfoA.freq);
 
 		opMODE->index(vfoA.imode);
+		updateBandwidthControl();
 		selrig->set_mode(vfoA.imode);
 
-		updateBandwidthControl();
 		opBW->index(vfoA.iBW);
 		selrig->set_bandwidth(vfoA.iBW);
 
@@ -514,14 +514,20 @@ void addFreq() {
 
 void cbRIT()
 {
+	if (selrig->has_rit)
+		selrig->setRit((int)cntRIT->value());
 }
 
 void cbXIT()
 {
+	if (selrig->has_xit)
+		selrig->setXit((int)cntXIT->value());
 }
 
 void cbBFO()
 {
+	if (selrig->has_bfo)
+		selrig->setBfo((int)cntBFO->value());
 }
 
 void cbAttenuator()
@@ -585,6 +591,10 @@ void cbbtnNotch()
 		selrig->set_notch(true, sldrNOTCH->value());
 	}
 	pthread_mutex_unlock(&mutex_serial);
+}
+
+void cbAN()
+{
 }
 
 void setNotchButton(void *d)
@@ -877,6 +887,7 @@ void closeRig()
 	selrig->set_vfoA(transceiver_freq);
 	selrig->set_mode(transceiver_mode);
 	selrig->set_bandwidth(transceiver_bw);
+	selrig->shutdown();
 	pthread_mutex_unlock(&mutex_serial);
 }
 
@@ -910,12 +921,18 @@ void cbExit()
 
 	saveFreqList();
 
-	closeRig();
+//	closeRig();
 	// shutdown serial thread
+
 	pthread_mutex_lock(&mutex_serial);
 		run_serial_thread = false;
 	pthread_mutex_unlock(&mutex_serial);
 	pthread_join(*serial_thread, NULL);
+
+	selrig->set_vfoA(transceiver_freq);
+	selrig->set_mode(transceiver_mode);
+	selrig->set_bandwidth(transceiver_bw);
+	selrig->shutdown();
 
 	// close down the serial port
 	RigSerial.ClosePort();
@@ -1029,6 +1046,8 @@ void adjust_control_positions()
 	btnPreamp->redraw();
 	btnNOISE->position( btnNOISE->x(), y);
 	btnNOISE->redraw();
+	btnAutoNotch->position( btnAutoNotch->x(), y);
+	btnAutoNotch->redraw();
 	btnTune->position( btnTune->x(), y);
 	btnTune->redraw();
 
@@ -1070,21 +1089,34 @@ void adjust_control_positions()
 
 void initXcvrTab()
 {
-	if (selrig->has_line_out) cnt_line_out->activate(); else cnt_line_out->deactivate();
-	if (selrig->has_agc_level) cbo_agc_level->activate(); else cbo_agc_level->deactivate();
-	if (selrig->has_cw_wpm) cnt_cw_wpm->activate(); else cnt_cw_wpm->deactivate();
-	if (selrig->has_cw_vol) cnt_cw_vol->activate(); else cnt_cw_vol->deactivate();
-	if (selrig->has_cw_spot) cnt_cw_spot->activate(); else cnt_cw_spot->deactivate();
-	if (selrig->has_vox_onoff) btn_vox->activate(); else btn_vox->deactivate();
-	if (selrig->has_vox_gain) cnt_vox_gain->activate(); else cnt_vox_gain->deactivate();
-	if (selrig->has_vox_anti) cnt_anti_vox->activate(); else cnt_anti_vox->deactivate();
-	if (selrig->has_vox_hang) cnt_vox_hang->activate(); else cnt_vox_hang->deactivate();
-	if (selrig->has_compression) cnt_compression->activate(); else cnt_compression->deactivate();
+	if (rig_nbr == TT550) {
+		cnt_tt550_line_out->activate();
+		cbo_tt550_agc_level->activate();
+		cnt_tt550_cw_wpm->activate();
+		cnt_tt550_cw_vol->activate();
+		cnt_tt550_cw_spot->activate();
+		btn_tt550_vox->activate();
+		cnt_tt550_vox_gain->activate();
+		cnt_tt550_anti_vox->activate();
+		cnt_tt550_vox_hang->activate();
+		cnt_tt550_compression->activate();
+	} else {
+		if (selrig->has_agc_level) cbo_agc_level->activate(); else cbo_agc_level->deactivate();
+		if (selrig->has_cw_wpm) cnt_cw_wpm->activate(); else cnt_cw_wpm->deactivate();
+		if (selrig->has_cw_vol) cnt_cw_vol->activate(); else cnt_cw_vol->deactivate();
+		if (selrig->has_cw_spot) cnt_cw_spot->activate(); else cnt_cw_spot->deactivate();
+		if (selrig->has_vox_onoff) btn_vox->activate(); else btn_vox->deactivate();
+		if (selrig->has_vox_gain) cnt_vox_gain->activate(); else cnt_vox_gain->deactivate();
+		if (selrig->has_vox_anti) cnt_anti_vox->activate(); else cnt_anti_vox->deactivate();
+		if (selrig->has_vox_hang) cnt_vox_hang->activate(); else cnt_vox_hang->deactivate();
+		if (selrig->has_compression) cnt_compression->activate(); else cnt_compression->deactivate();
+	}
 }
 
 void initRig()
 {
 	wait_query = true;
+
 // disable the serial thread
 	pthread_mutex_lock(&mutex_serial);
 
@@ -1103,8 +1135,8 @@ void initRig()
 		}
 		opMODE->activate();
 		opMODE->index(progStatus.opMODE);
-		selrig->set_mode(progStatus.opMODE);
 		updateBandwidthControl();
+		selrig->set_mode(progStatus.opMODE);
 	} else {
 		opMODE->add(" ");
 		opMODE->index(0);
@@ -1152,8 +1184,9 @@ void initRig()
 		cntBFO->deactivate();
 		cntBFO->hide();
 	}
-	
+
 	if (selrig->has_volume_control) {
+		progStatus.volume = selrig->get_volume_control();
 		sldrVOLUME->value(progStatus.volume);
 		if (progStatus.mute == 0) {
 			btnVol->value(0);
@@ -1297,6 +1330,12 @@ void initRig()
 		btnPTT->hide();
 	}
 
+	if (selrig->has_auto_notch) {
+		btnAutoNotch->show();
+	} else {
+		btnAutoNotch->hide();
+	}
+
 	if (selrig->has_swr_control)
 		btnALC_SWR->activate();
 	else {
@@ -1325,9 +1364,9 @@ void initRig()
 
 	selrig->set_vfoA(vfoA.freq);
 	opMODE->index( vfoA.imode );
+	updateBandwidthControl();
 	selrig->set_mode(vfoA.imode);
 
-	updateBandwidthControl();
 	opBW->index( vfoA.iBW );
 	selrig->set_bandwidth(vfoA.iBW);
 
@@ -1335,7 +1374,7 @@ void initRig()
 	pthread_mutex_unlock(&mutex_serial);
 
 	fldigi_online = false;
-
+	rig_reset = true;
 	wait_query = false;
 }
 
@@ -1476,11 +1515,6 @@ void cbAuxPort()
 	AuxSerial.setDTR(progStatus.aux_dtr);
 }
 
-void cb_line_out()
-{
-	selrig->set_line_out();
-}
-
 void cb_agc_level()
 {
 	selrig->set_agc_level();
@@ -1525,3 +1559,9 @@ void cb_compression()
 {
 	selrig->set_compression();
 }
+
+void cb_auto_notch()
+{
+	selrig->set_auto_notch(btnAutoNotch->value());
+}
+

@@ -30,8 +30,13 @@ private:
 	bool RitActive;
 	int XitFreq;
 	bool XitActive;
+	
+	bool auto_notch;
+	bool noise_reduction;
 
-	void showresponse();
+	void showresponse(string s);
+	void showASCII(string s);
+
 	void set_vfoRX(long freq);
 	void set_vfoTX(long freq);
 
@@ -40,6 +45,7 @@ public:
 	~RIG_TT550(){}
 	
 	void initialize();
+	void shutdown();
 
 	long get_vfoA();
 	void set_vfoA(long);
@@ -49,7 +55,7 @@ public:
 //	int  get_power_control();
 	void set_volume_control(int val);
 //	int  get_volume_control();
-//	void set_power_control(double val);
+	void set_power_control(double val);
 	void set_PTT_control(int val);
 //	void tune_rig();
 	void set_attenuator(int val);
@@ -67,16 +73,14 @@ public:
 //	void set_notch(bool on, int val);
 //	bool get_notch(int &val);
 //	void get_notch_min_max_step(int &min, int &max, int &step);
-	void set_noise(bool b);
-//	void set_mic_gain(int val);
+//	void set_noise(bool b);
+	void set_mic_gain(int val);
 //	int  get_mic_gain();
 //	void get_mic_min_max_step(int &min, int &max, int &step);
 	void set_rf_gain(int val);
 	int  get_rf_gain();
 	void get_rf_min_max_step(int &min, int &max, int &step);
 	int  adjust_bandwidth(int m);
-
-	void checkresponse();
 
 	void setRit(int v);
 	int  getRit();
@@ -94,7 +98,13 @@ public:
 	void set_vox_gain();
 	void set_vox_anti();
 	void set_vox_hang();
+	void set_aux_hang();
+	void set_cw_qsk();
 	void set_compression();
+	void set_auto_notch(int b);
+	void set_noise_reduction(int b);
+	void set_mon_volume(double v);
+	void set_squelch_level(double val);
 
 };
 

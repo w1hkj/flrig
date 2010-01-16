@@ -28,5 +28,5 @@ void rigPTT(bool on)
 	else if (SepSerial.IsOpen() && (progStatus.sep_dtrptt || progStatus.sep_rtsptt) )
 		SepSerial.SetPTT(on);
 	else
-		LOG_WARN("No PTT i/o connected");
+		LOG_INFO("No PTT i/o connected");
 }

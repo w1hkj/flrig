@@ -98,6 +98,18 @@ extern void cb_compression();
 extern void setLower();
 extern void setUpper();
 
+// callbacks for tt550 transceiver
+extern void cb_tt550_line_out();
+extern void cb_tt550_agc_level();
+extern void cb_tt550_cw_wpm();
+extern void cb_tt550_cw_vol();
+extern void cb_tt550_cw_spot();
+extern void cb_tt550_vox_gain();
+extern void cb_tt550_vox_anti();
+extern void cb_tt550_vox_hang();
+extern void cb_tt550_vox_onoff();
+extern void cb_tt550_compression();
+
 extern void closeRig();
 extern void cbExit();
 
@@ -112,6 +124,7 @@ extern void setNR();
 extern void cbNoise();
 extern void cbbtnNotch();
 extern void setNotch();
+extern void cbAN();
 extern void setIFshift();
 extern void cbIFsh();
 extern void setVolume();
@@ -139,6 +152,7 @@ extern void initConfigDialog();
 extern void initStatusConfigDialog();
 extern void initRigCombo();
 extern void createXcvrDialog();
+extern void show_controls();
 extern void cbUseRepeatButtons(bool on);
 extern void preamp_label(const char *, bool on);
 extern void atten_label(const char *, bool on);

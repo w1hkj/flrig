@@ -12,6 +12,16 @@
 
 using namespace std;
 
+enum {
+	NONE, 
+	FT100D, FT450, FT767, FT817, FT857D, FT897D, FT950, FT2000,
+	IC706MKIIG, IC728, IC735, IC746, IC746PRO, IC756PRO2, IC756PRO3, 
+	IC7000, IC7200, IC7700, IC910H,
+	K2, K3,
+	TS140, TS2000, 
+	TT516, TT538, TT550, TT563,
+};
+
 class rigbase {
 public:
 	const char * name_;
@@ -63,7 +73,6 @@ public:
 	bool has_rf_control;
 	bool has_sql_control;
 
-	bool has_line_out;
 	bool has_agc_level;
 	bool has_cw_wpm;
 	bool has_cw_vol;
@@ -74,6 +83,8 @@ public:
 	bool has_vox_hang;
 	bool has_compression;
 	bool has_compON;
+	bool has_auto_notch;
+	bool use_line_in;
 
 	bool restore_mbw;
 
@@ -99,6 +110,7 @@ public:
 	virtual ~rigbase(){}
 
 	virtual void initialize() {}
+	virtual void shutdown() {}
 
 	virtual long get_vfoA(void) {return freq_;}
 	virtual void set_vfoA(long f) {freq_ = f;}
@@ -177,7 +189,8 @@ public:
 	virtual void set_vox_anti() {}
 	virtual void set_vox_hang() {}
 	virtual void set_compression() {}
-	
+	virtual void set_auto_notch(int v) {}
+
 // need all of the get's for the above
 };
 

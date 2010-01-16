@@ -59,7 +59,7 @@ static char TT538getFREQA[]		= "?A\r";
 //static char TT538getFWDPWR[]	= "?F\r";
 //static char TT538getAGC[]		= "?G\r";
 //static char TT538getSQLCH[]		= "?H\r";
-//static char TT538getRF[]		= "?I\r";
+static char TT538getRF[]		= "?I\r";
 static char TT538getATT[]		= "?J\r";
 //static char TT538getNB[]		= "?K\r";
 static char TT538getMODE[]		= "?M\r";
@@ -115,20 +115,18 @@ RIG_TT538::RIG_TT538() {
 
 }
 
-void RIG_TT538::checkresponse()
+void RIG_TT538::checkresponse(string s)
 {
 	if (RigSerial.IsOpen() == false)
 		return;
-	if (replybuff[0] == 'G')
-		return;
-	LOG_ERROR("\nsent  %s\nreply %s",
+	LOG_ERROR("%s:\nsent  %s\nreply %s\n", s.c_str(),
 		str2hex(cmd.c_str(), cmd.length()),
 		str2hex((char *)replybuff, strlen((char *)replybuff)));
 }
 
-void RIG_TT538::showresponse()
+void RIG_TT538::showresponse(string s)
 {
-	LOG_INFO("%s", str2hex((char *)replybuff, strlen((char *)replybuff)));
+	printf("%s: %s\n", s.c_str(),str2hex((char *)replybuff, strlen((char *)replybuff)));
 }
 
 long RIG_TT538::get_vfoA ()
@@ -137,12 +135,10 @@ long RIG_TT538::get_vfoA ()
 	bool ret = sendCommand(cmd, 8, true);
 	if (ret == true && replybuff[0] == 'A') {
 		int f = 0;
-		for (size_t n = 1; n < 5; n++) {
+		for (size_t n = 1; n < 5; n++)
 			f = f*256 + (unsigned char)replybuff[n];
 		freq_ = f;
-}
-	} else
-		checkresponse();
+	}
 	return freq_;
 }
 
@@ -154,8 +150,7 @@ void RIG_TT538::set_vfoA (long freq)
 	cmd[4] = freq & 0xff; freq = freq >> 8;
 	cmd[3] = freq & 0xff; freq = freq >> 8;
 	cmd[2] = freq & 0xff;
-	sendCommand(cmd, 2, true);
-	checkresponse();
+	sendCommand(cmd, 0, true);
 	return ;
 }
 
@@ -164,8 +159,7 @@ void RIG_TT538::set_mode(int val)
 	mode_ = val;
 	cmd = TT538setMODE;
 	cmd[2] = cmd[3] = TT538mode_chr[val];
-	sendCommand(cmd, 2, true);
-	checkresponse();
+	sendCommand(cmd, 0, true);
 }
 
 int RIG_TT538::get_mode()
@@ -188,8 +182,7 @@ void RIG_TT538::set_bandwidth(int val)
 	bw_ = val;
 	cmd = TT538setBW;
 	cmd[2] = 33 - val;
-	sendCommand(cmd, 2, true);
-	checkresponse();
+	sendCommand(cmd, 0, true);
 }
 
 int RIG_TT538::get_bandwidth()
@@ -207,8 +200,7 @@ void RIG_TT538::set_if_shift(int val)
 	short int si = val;
 	cmd[2] = (si & 0xff00) >> 8;
 	cmd[3] = (si & 0xff);
-	sendCommand(cmd, 2, true);
-	checkresponse();
+	sendCommand(cmd, 0, true);
 }
 
 bool RIG_TT538::get_if_shift(int &val)
@@ -229,8 +221,7 @@ void RIG_TT538::set_attenuator(int val)
 	cmd = TT538setATT;
 	if (val) cmd[2] = '1';
 	else     cmd[2] = '0';
-	sendCommand(cmd, 2, true);
-	checkresponse();
+	sendCommand(cmd, 0, true);
 }
 
 
@@ -247,25 +238,23 @@ int RIG_TT538::get_smeter()
 {
 	double sig = 0.0;
 	cmd = TT538getSMETER;
-	sendCommand(cmd, 8, true);
+	sendCommand(cmd, 6, true);
 	if (replybuff[0] == 'S') {
-		char szval[]= "00.00";
-		szval[0] = replybuff[1];
-		szval[1] = replybuff[2];
-		szval[3] = replybuff[3];
-		szval[4] = replybuff[4];
-		float sval = atof(szval);
-		sig = (50.0 * sval / 9.0);
+		int sval;
+		replybuff[5] = 0;
+		sscanf(&replybuff[1], "%4x", &sval);
+		sig = sval / 256.0;
 	}
-	return (int)sig;
+	return (int)(sig * 50.0 / 9.0);
 }
 
 int RIG_TT538::get_volume_control()
 {
 	cmd = TT538getVOL;
-	sendCommand(cmd, 5, true);
+	sendCommand(cmd, 3, true);
+showresponse("af");
 	if (replybuff[0] == 'U')
-		return (int)(replybuff[1] / 1.27);
+		return (int)((replybuff[1] & 0x7F) / 1.27);
 	return 0;
 }
 
@@ -273,72 +262,18 @@ void RIG_TT538::set_volume_control(int vol)
 {
 	cmd = TT538setVOL;
 	cmd[2] = 0x7F & (int)(vol * 1.27);
-	sendCommand(cmd, 2, true);
+	sendCommand(cmd, 0, true);
 }
 
 void RIG_TT538::set_rf_gain(int val)
 {
 	cmd = TT538setRF;
 	cmd[2] = 0x7F & (int)(val * 1.27);
-	sendCommand(cmd, 2, true);
+	sendCommand(cmd, 0, true);
 }
 
 int  RIG_TT538::get_rf_gain()
 {
-	cmd = TT538setRF;
-	sendCommand(cmd, 5, true);
-	if (replybuff[0] == 'I')
-		return (int)(replybuff[1] / 1.27);
-	return 0;
+	return 100; 
+// Jupiter does not reply with values as specified in the programmers manual
 }
-
-////////////////////////////////////////////////////////////////////////
-//               NOT IMPLEMENTED IN JUPITER ONLY MODE                 //
-////////////////////////////////////////////////////////////////////////
-/*
-void RIG_TT538::set_noise(bool b)
-{
-	cmd = TT538setNB;
-	if (b)
-		cmd[2] = '4';
-	else
-		cmd[2] = '0';
-	sendCommand(cmd, 2, true);
-}
-
-int RIG_TT538::get_power_out()
-{
-	fwdpwr = refpwr = fwdv = refv = 0;
-	cmd = TT538getFWDPWR;
-	sendCommand(cmd, 5, true);
-	if (replybuff[0] == 'F') {
-		fwdv = 1.0 * (unsigned char)replybuff[1];
-		cmd = TT538getREFPWR;
-		sendCommand(cmd, 5, true);
-		if (replybuff[0] == 'R')
-			refv = 1.0 * (unsigned char)replybuff[1];
-	}
-	fwdpwr = 30.0 * (fwdv * fwdv) / (256 * 256);
-	refpwr = 30.0 * (refv * refv) / (256 * 256);
-	return fwdpwr;
-}
-
-int RIG_TT538::get_swr()
-{
-	double swr = (fwdv + refv) / (fwdv - refv + .0001);
-	swr -= 1.0;
-	swr *= 25.0;
-	if (swr < 0) swr = 0;
-	if (swr > 100) swr = 100;
-	return (int)swr;
-}
-
-// Tranceiver PTT on/off
-void RIG_TT538::set_PTT_control(int val)
-{
-	if (val) sendCommand(TT538setXMT, 2, true);
-	else     sendCommand(TT538setRCV, 2, true);
-	checkresponse();
-}
-
-*/

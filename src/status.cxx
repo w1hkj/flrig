@@ -87,6 +87,19 @@ status progStatus = {
 	0,			// int  attenuator
 	0,			// int  preamp;
 
+//tt550 controls
+	100,		// tt550_line_out;
+	1,			// tt550_agc_level;
+	24,			// tt550_cw_wpm;
+	0,			// tt550_cw_vol;
+	0,			// tt550_cw_spot;
+	false,		// tt550_vox_onoff;
+	0,			// tt550_vox_gain;
+	0,			// tt550_vox_anti;
+	0,			// tt550_vox_hang;
+	0,			// tt550_int  compression;
+	false,		// tt550_bool compON;
+
 	232,		// int	 s_red;
 	255,		// int	 s_green;
 	232,		// int	 s_blue;
@@ -181,17 +194,31 @@ void status::saveLastState()
 	spref.set("rfgain", rfgain);
 	spref.set("squelch", squelch);
 
-	spref.set("line_out", line_out);
-	spref.set("agc_level", agc_level);
-	spref.set("cw_wpm", cw_wpm);
-	spref.set("cw_vol", cw_vol);
-	spref.set("cw_spot", cw_spot);
-	spref.set("vox_onoff", vox_onoff);
-	spref.set("vox_gain", vox_gain);
-	spref.set("vox_anti", vox_anti);
-	spref.set("vox_hang", vox_hang);
-	spref.set("compression", compression);
-	spref.set("compON", compON);
+	if (rig_nbr == TT550) {
+		spref.set("tt550_line_out", tt550_line_out);
+		spref.set("tt550_agc_level", tt550_agc_level);
+		spref.set("tt550_cw_wpm", tt550_cw_wpm);
+		spref.set("tt550_cw_vol", tt550_cw_vol);
+		spref.set("tt550_cw_spot", tt550_cw_spot);
+		spref.set("tt550_vox_onoff", tt550_vox_onoff);
+		spref.set("tt550_vox_gain", tt550_vox_gain);
+		spref.set("tt550_vox_anti", tt550_vox_anti);
+		spref.set("tt550_vox_hang", tt550_vox_hang);
+		spref.set("tt550_compression", tt550_compression);
+		spref.set("tt550_compON", tt550_compON);
+	} else {
+		spref.set("line_out", line_out);
+		spref.set("agc_level", agc_level);
+		spref.set("cw_wpm", cw_wpm);
+		spref.set("cw_vol", cw_vol);
+		spref.set("cw_spot", cw_spot);
+		spref.set("vox_onoff", vox_onoff);
+		spref.set("vox_gain", vox_gain);
+		spref.set("vox_anti", vox_anti);
+		spref.set("vox_hang", vox_hang);
+		spref.set("compression", compression);
+		spref.set("compON", compON);
+	}
 
 	spref.set("noise_reduction", noise_reduction);
 	spref.set("noise_red_val", noise_reduction_val);
@@ -302,17 +329,31 @@ bool status::loadXcvrState(const char *xcvr)
 		spref.get("rfgain", rfgain, rfgain);
 		spref.get("squelch", squelch, squelch);
 
-		spref.get("line_out", line_out, line_out);
-		spref.get("agc_level", agc_level, agc_level);
-		spref.get("cw_wpm", cw_wpm, cw_wpm);
-		spref.get("cw_vol", cw_vol, cw_vol);
-		spref.get("cw_spot", cw_spot, cw_spot);
-		if (spref.get("vox_onoff", i, i)) vox_onoff = i;
-		spref.get("vox_gain", vox_gain, vox_gain);
-		spref.get("vox_anti", vox_anti, vox_anti);
-		spref.get("vox_hang", vox_hang, vox_hang);
-		spref.get("compression", compression, compression);
-		if (spref.get("compON", i, i)) compON = i;
+		if (rig_nbr == TT550) {
+			spref.get("tt550_line_out", tt550_line_out, tt550_line_out);
+			spref.get("tt550_agc_level", tt550_agc_level, tt550_agc_level);
+			spref.get("tt550_cw_wpm", tt550_cw_wpm, tt550_cw_wpm);
+			spref.get("tt550_cw_vol", tt550_cw_vol, tt550_cw_vol);
+			spref.get("tt550_cw_spot", tt550_cw_spot, tt550_cw_spot);
+			if (spref.get("tt550_vox_onoff", i, i)) tt550_vox_onoff = i;
+			spref.get("tt550_vox_gain", tt550_vox_gain, tt550_vox_gain);
+			spref.get("tt550_vox_anti", tt550_vox_anti, tt550_vox_anti);
+			spref.get("tt550_vox_hang", tt550_vox_hang, tt550_vox_hang);
+			spref.get("tt550_compression", tt550_compression, tt550_compression);
+			if (spref.get("tt550_compON", i, i)) tt550_compON = i;
+		} else {
+			spref.get("line_out", line_out, line_out);
+			spref.get("agc_level", agc_level, agc_level);
+			spref.get("cw_wpm", cw_wpm, cw_wpm);
+			spref.get("cw_vol", cw_vol, cw_vol);
+			spref.get("cw_spot", cw_spot, cw_spot);
+			if (spref.get("vox_onoff", i, i)) vox_onoff = i;
+			spref.get("vox_gain", vox_gain, vox_gain);
+			spref.get("vox_anti", vox_anti, vox_anti);
+			spref.get("vox_hang", vox_hang, vox_hang);
+			spref.get("compression", compression, compression);
+			if (spref.get("compON", i, i)) compON = i;
+		}
 
 		if (spref.get("noise_reduction", i, i)) noise_reduction = i;
 		spref.get("noise_red_val", noise_reduction_val, noise_reduction_val);

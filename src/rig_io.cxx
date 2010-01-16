@@ -123,10 +123,23 @@ bool startSepSerial()
 
 #define RXBUFFSIZE 2000
 char replybuff[RXBUFFSIZE+1];
-static   char retbuf[3];
 string replystr;
 
 // redesign the delay between reads.
+
+int readResponse()
+{
+	int numread = 0;
+	char retbuf;
+	memset(replybuff, 0, RXBUFFSIZE + 1);
+	while (numread < RXBUFFSIZE) {
+		retbuf = 0;
+		if (RigSerial.ReadBuffer(&retbuf, 1) == 0) break;
+		replybuff[numread] = retbuf;
+		numread++;
+	}
+	return numread;
+}
 
 int sendCommand (string s, int retnbr, bool b)
 {
@@ -144,15 +157,8 @@ int sendCommand (string s, int retnbr, bool b)
 	LOG_DEBUG("sent %s", b ? str2hex(s.data(), s.length()) : s.c_str());
 
 	RigSerial.WriteBuffer(s.c_str(), numwrite);
-	memset(replybuff, 0, RXBUFFSIZE + 1);
-	numread = 0;
 	MilliSleep( readafter );
-	while (numread < RXBUFFSIZE) {
-		memset(retbuf, 0, 2);
-		if (RigSerial.ReadBuffer(retbuf, 1) == 0) break;
-		replybuff[numread] = retbuf[0];
-		numread++;
-	}
+	numread = readResponse();
 	LOG_DEBUG("reply %s", b ? str2hex(replybuff, numread) : replybuff);
 	if (numread > retnbr) {
 		memmove(replybuff, replybuff + numread - retnbr, retnbr+1);
