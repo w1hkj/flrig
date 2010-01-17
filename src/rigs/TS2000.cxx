@@ -79,7 +79,7 @@ RIG_TS2000::RIG_TS2000() {
 	mode_ = 1;
 	bw_ = 8;
 	def_mode = 1;
-	defbw_ = 20;
+	defbw_ = 8;
 	deffreq_ = 14070000;
 
 	has_micgain_control =
