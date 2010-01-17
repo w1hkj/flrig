@@ -1106,6 +1106,7 @@ void initXcvrTab()
 		cnt_tt550_compression->activate(); cnt_tt550_compression->value(progStatus.tt550_compression);
 		cnt_tt550_mon_vol->activate(); cnt_tt550_mon_vol->value(progStatus.tt550_mon_vol);
 		btn_tt550_tuner_bypass->activate(); btn_tt550_tuner_bypass->value(progStatus.tt550_tuner_bypass);
+		mnuKeepData->deactivate();
 	} else {
 		if (selrig->has_agc_level) cbo_agc_level->activate(); else cbo_agc_level->deactivate();
 		if (selrig->has_cw_wpm) cnt_cw_wpm->activate(); else cnt_cw_wpm->deactivate();
@@ -1116,6 +1117,7 @@ void initXcvrTab()
 		if (selrig->has_vox_anti) cnt_anti_vox->activate(); else cnt_anti_vox->deactivate();
 		if (selrig->has_vox_hang) cnt_vox_hang->activate(); else cnt_vox_hang->deactivate();
 		if (selrig->has_compression) cnt_compression->activate(); else cnt_compression->deactivate();
+		mnuKeepData->activate();
 	}
 }
 
@@ -1130,7 +1132,14 @@ void initRig()
 	transceiver_freq = selrig->get_vfoA();
 	transceiver_mode = selrig->get_mode();
 	transceiver_bw = selrig->get_bandwidth();
+
 	if (selrig->restore_mbw) selrig->last_bw = transceiver_bw;
+
+	if (progStatus.use_rig_data) {
+		progStatus.freq = transceiver_freq;
+		progStatus.opMODE = transceiver_mode;
+		progStatus.opBW = transceiver_bw;
+	}
 
 	rigmodes_.clear();
 	opMODE->clear();

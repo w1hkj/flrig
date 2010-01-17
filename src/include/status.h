@@ -41,6 +41,7 @@ struct status {
 	int		iBW_B;
 	int		imode_B;
 	int		freq_B;
+	bool	use_rig_data;
 
 	bool	spkr_on;
 	int		volume;
