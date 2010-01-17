@@ -1139,7 +1139,9 @@ void initRig()
 		progStatus.freq = transceiver_freq;
 		progStatus.opMODE = transceiver_mode;
 		progStatus.opBW = transceiver_bw;
-	}
+		mnuKeepData->set();
+	} else
+		mnuKeepData->clear();
 
 	rigmodes_.clear();
 	opMODE->clear();
