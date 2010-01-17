@@ -92,6 +92,7 @@ struct status {
 	int		tt550_mon_vol;
 	int		tt550_squelch_level;
 	int		tt550_compression;
+	int		tt550_nb_level;
 	bool	tt550_compON;
 	bool	tt550_tuner_bypass;
 

@@ -83,7 +83,7 @@ static char TT550setVOXHANG[]	= "UHn\r";	// 0..255; n= delay*0.0214 sec
 static char TT550setCWSPOTLVL[]	= "Fn\r";	// 0..255; 0 = off
 static char TT550setCWQSK[]		= "UQn\r";	// 0..255; 0 = none
 static char TT550setAUXHANG[]	= "UTn\r";	// 0..255; 0 = none
-//static char TT550setBLANKER[]	= "Dn\r";	// 0..7; 0 = off
+static char TT550setBLANKER[]	= "Dn\r";	// 0..7; 0 = off
 static char TT550setSPEECH[]	= "Yn\r";	// 0..127; 0 = off
 
 static char TT550setDISABLE[]	= "#0\r";	// disable transmitter
@@ -778,6 +778,20 @@ void RIG_TT550::set_squelch_level()
 	sendCommand(cmd, 0, true);
 }
 
+void RIG_TT550::set_nb_level()
+{
+	cmd = TT550setBLANKER;
+	cmd[1] = progStatus.tt550_nb_level;
+	if (!progStatus.noise) cmd[1] = 0;
+	sendCommand(cmd, 0, true);
+}
+
+void RIG_TT550::set_noise(bool b)
+{
+	progStatus.noise = b;
+	set_nb_level();
+}
+
 void RIG_TT550::tuner_bypass()
 {
 }
@@ -866,6 +880,12 @@ void cb_tt550_enable_xmtr()
 void cb_tt550_enable_tloop()
 {
 	selrig->enable_tloop();
+}
+
+void cb_tt550_nb_level()
+{
+	progStatus.tt550_nb_level = cbo_tt550_nb_level->index();
+	selrig->set_nb_level();
 }
 
 //======================================================================

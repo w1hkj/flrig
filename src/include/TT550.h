@@ -73,7 +73,7 @@ public:
 //	void set_notch(bool on, int val);
 //	bool get_notch(int &val);
 //	void get_notch_min_max_step(int &min, int &max, int &step);
-//	void set_noise(bool b);
+	void set_noise(bool b);
 	void set_mic_gain(int val);
 //	int  get_mic_gain();
 //	void get_mic_min_max_step(int &min, int &max, int &step);
@@ -112,6 +112,7 @@ public:
 	void tuner_bypass();
 	void enable_xmtr();
 	void enable_tloop();
+	void set_nb_level();
 
 };
 
