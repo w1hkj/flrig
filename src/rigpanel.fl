@@ -16,11 +16,11 @@ decl {\#include "support.h"} {}
 Function {Rig_window()} {open
 } {
   Fl_Window {} {
-    label Flrig
+    label Flrig open
     xywh {892 74 340 370} type Double color 52 align 80
     code0 {\#include <stdlib.h>} visible
   } {
-    Fl_Menu_Bar {} {open
+    Fl_Menu_Bar {} {open selected
       xywh {2 2 336 20} textsize 12
     } {
       Submenu {} {
@@ -40,7 +40,13 @@ Function {Rig_window()} {open
         MenuItem mnuControls {
           label {Xcvr setup}
           callback {show_controls();}
-          xywh {0 0 36 21} divider
+          xywh {0 0 36 21}
+        }
+        MenuItem mnuKeepData {
+          label {Keep Freq/Mode}
+          callback {progStatus.use_rig_data=o->value();}
+          xywh {0 0 36 21} type Toggle divider
+          code0 {progStatus.use_rig_data ? o->set() :o->clear();}
         }
         MenuItem mnuColorConfig {
           label Colors
@@ -410,7 +416,7 @@ selectFreq();}
 Function {XcvrDialog()} {} {
   Fl_Window {} {
     label {I/O Ports} open
-    xywh {448 66 410 257} type Double hide
+    xywh {456 474 410 257} type Double hide
   } {
     Fl_Tabs {} {open
       xywh {0 8 408 245}
@@ -903,7 +909,7 @@ cb_tt550_nb_level();} open
       Fl_Group cbo_tt550_agc_level {
         label AGC
         callback {progStatus.tt550_agc_level = o->index();
-cb_tt550_agc_level();} open selected
+cb_tt550_agc_level();} open
         tooltip {Select Transceiver} xywh {226 212 80 22} box DOWN_BOX color 53 align 5
         code0 {\#include "combo.h"}
         code1 {o->index(progStatus.tt550_agc_level);}

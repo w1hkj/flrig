@@ -15,6 +15,10 @@ static void cb_mnuControls(Fl_Menu_*, void*) {
   show_controls();
 }
 
+static void cb_mnuKeepData(Fl_Menu_* o, void*) {
+  progStatus.use_rig_data=o->value();
+}
+
 static void cb_mnuColorConfig(Fl_Menu_*, void*) {
   setDisplayColors();
 }
@@ -49,7 +53,8 @@ Fl_Menu_Item menu_[] = {
  {_("E&xit"), 0,  (Fl_Callback*)cb_mnuExit, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
  {_("&Config"), 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
- {_("Xcvr setup"), 0,  (Fl_Callback*)cb_mnuControls, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("Xcvr setup"), 0,  (Fl_Callback*)cb_mnuControls, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("Keep Freq/Mode"), 0,  (Fl_Callback*)cb_mnuKeepData, 0, 130, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Colors"), 0,  (Fl_Callback*)cb_mnuColorConfig, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Tooltips"), 0,  (Fl_Callback*)cb_mnuTooltips, 0, 130, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Xcvr select"), 0,  (Fl_Callback*)cb_mnuConfigXcvr, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
@@ -325,7 +330,10 @@ Fl_Double_Window* Rig_window() {
     o->align(FL_ALIGN_CLIP|FL_ALIGN_INSIDE);
     { Fl_Menu_Bar* o = new Fl_Menu_Bar(2, 2, 336, 20);
       o->textsize(12);
-      { Fl_Menu_Item* o = &menu_[6];
+      { Fl_Menu_Item* o = &menu_[5];
+        progStatus.use_rig_data ? o->set() :o->clear();
+      }
+      { Fl_Menu_Item* o = &menu_[7];
         progStatus.tooltips ? o->set() :o->clear();
       }
       o->menu(menu_);
