@@ -228,6 +228,21 @@ void createXcvrDialog()
 	cbo_agc_level->add("fast");
 	cbo_agc_level->index(progStatus.agc_level);
 
+	cbo_tt550_agc_level->add("slow");
+	cbo_tt550_agc_level->add("med");
+	cbo_tt550_agc_level->add("fast");
+	cbo_tt550_agc_level->index(progStatus.tt550_agc_level);
+
+	cbo_tt550_nb_level->add("NONE");
+	cbo_tt550_nb_level->add("1");
+	cbo_tt550_nb_level->add("2");
+	cbo_tt550_nb_level->add("3");
+	cbo_tt550_nb_level->add("4");
+	cbo_tt550_nb_level->add("5");
+	cbo_tt550_nb_level->add("6");
+	cbo_tt550_nb_level->add("7");
+	cbo_tt550_nb_level->index(progStatus.tt550_nb_level);
+
 	initRigCombo();
 }
 

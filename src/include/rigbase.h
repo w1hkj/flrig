@@ -199,6 +199,7 @@ public:
 	virtual void tuner_bypass() {}
 	virtual void enable_xmtr() {}
 	virtual void enable_tloop() {}
+	virtual void set_nb_level() {}
 
 };
 

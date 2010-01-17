@@ -106,7 +106,8 @@ status progStatus = {
 
 	0,			// tt550_mon_vol;
 	0,			// tt550_squelch_level;
-	0,			// tt550_int  compression;
+	0,			// tt550_compression;
+	1,			// tt550_nb_level;
 	false,		// tt550_bool compON;
 	false,		// tt550_tuner_bypass;
 
@@ -231,6 +232,7 @@ void status::saveLastState()
 		spref.set("tt550_mon_vol", tt550_mon_vol);
 		spref.set("tt550_squelch_level", tt550_squelch_level);
 		spref.set("tt550_compression", tt550_compression);
+		spref.set("tt550_nb_level", tt550_nb_level);
 		spref.set("tt550_compON", tt550_compON);
 		spref.set("tt550_tuner_bypass", tt550_tuner_bypass);
 		spref.set("tt550_enable_xmtr", tt550_enable_xmtr);
@@ -384,6 +386,7 @@ bool status::loadXcvrState(const char *xcvr)
 			spref.get("tt550_mon_vol", tt550_mon_vol, tt550_mon_vol);
 			spref.get("tt550_squelch_level", tt550_squelch_level, tt550_squelch_level);
 			spref.get("tt550_compression", tt550_compression, tt550_compression);
+			spref.get("tt550_nb_level", tt550_nb_level, tt550_nb_level);
 			if (spref.get("tt550_compON", i, i)) tt550_compON = i;
 			if (spref.get("tt550_tuner_bypass", i, i)) tt550_tuner_bypass = i;
 			if (spref.get("tt550_enable_xmtr", i, i)) tt550_enable_xmtr = i;
