@@ -58,7 +58,6 @@ RIG_TS570::RIG_TS570() {
 	defbw_ = 1;
 	deffreq_ = 14070000;
 
-	has_micgain_control =
 	has_notch_control =
 	has_ifshift_control =
 	has_swr_control = false;
@@ -132,29 +131,43 @@ void RIG_TS570::set_vfoA (long freq)
 // SM cmd 0 ... 100 (rig values 0 ... 15)
 int RIG_TS570::get_smeter()
 {
-	cmd = "SM;";
-	if(sendTScommand(cmd, 7, false)) {
-		replybuff[6] = 0;
-		int mtr = atoi(&replybuff[2]);
-		mtr = (mtr * 100) / 16;
-		return mtr;
-	}
-	return 0;
+    cmd = "SM;";
+    if(sendTScommand(cmd, 7, false)) {
+	replybuff[6] = 0;
+	int mtr = atoi(&replybuff[2]);
+	mtr = (mtr * 100) / 16;
+	return mtr;
+    }
+    return 0;
 }
 
 // RM cmd 0 ... 100 (rig values 0 ... 8)
 int RIG_TS570::get_swr()
 {
-	cmd = "RM1;";
-	if (sendTScommand(cmd, 8, false)) {
-		replybuff[7] = 0;
-		int mtr = atoi(&replybuff[3]);
-		mtr = (mtr * 100) / 9;
-	}
-	return 0;
+    cmd = "RM1;RM;"; // select measurement '1' (swr) and read meter
+    if (sendTScommand(cmd, 8, false)) {
+	replybuff[7] = 0;
+	int mtr = atoi(&replybuff[3]);
+	mtr = (mtr * 100) / 9;
+	return mtr;
+    }
+    return 0;
 }
 
-// Transceiver power level
+// power output measurement 0 ... 15
+int RIG_TS570::get_power_out()
+{
+    cmd = "SM;";
+    if (sendTScommand(cmd, 6, false)) {
+	replybuff[5] = 0;
+	int mtr = atoi(&replybuff[2]);
+	mtr = (mtr * 100) / 16;
+	return mtr;
+    }
+    return 0;
+}
+
+// (xcvr power level is in 5W increments)
 void RIG_TS570::set_power_control(double val)
 {
 	int ival = (int)val;
@@ -166,7 +179,7 @@ void RIG_TS570::set_power_control(double val)
 	sendTScommand(cmd, 0, false);
 }
 
-int RIG_TS570::get_power_out()
+int RIG_TS570::get_power_control()
 {
 	cmd = "PC;";
 	if (sendTScommand(cmd, 6, false)) {
@@ -174,11 +187,6 @@ int RIG_TS570::get_power_out()
 		int mtr = atoi(&replybuff[2]);
 		return mtr;
 	}
-	return 0;
-}
-
-int RIG_TS570::get_power_control()
-{
 	return 0;
 }
 
@@ -261,19 +269,27 @@ int RIG_TS570::get_preamp()
 
 void RIG_TS570::set_widths()
 {
-	if (mode_ == 0 || mode_ == 1 || mode_ == 3) {
-		bandwidths_ = TS570_SSBwidths;
-		bw_ = 1;
-	} else if (mode_ == 2 || mode_ == 6) {
-		bandwidths_ = TS570_CWwidths;
-		bw_ = 5;
-	} else if (mode_ == 5 || mode_ == 7) {
-		bandwidths_ = TS570_FSKwidths;
-		bw_ = 2;
-	} else {
-		bandwidths_ = TS570_SSBwidths;
-		bw_ = 1;
-	}
+    switch (mode_) {
+    case 0:
+    case 1:
+    case 3:
+    case 4:
+	bandwidths_ = TS570_SSBwidths;
+	bw_ = 1;
+	break;
+    case 2:
+    case 6:
+	bandwidths_ = TS570_CWwidths;
+	bw_ = 5;
+	break;
+    case 5:
+    case 7:
+	bandwidths_ = TS570_FSKwidths;
+	bw_ = 2;
+	break;
+    default:
+	break;
+    }
 }
 
 void RIG_TS570::set_mode(int val)
@@ -305,58 +321,64 @@ int RIG_TS570::adjust_bandwidth(int val)
 	
 void RIG_TS570::set_bandwidth(int val)
 {
-	bw_ = val;
-	if (mode_ == 0 || mode_ == 1 || mode_ == 3)
-		sendTScommand(TS570_SSBbw[bw_], 5, false);
-	else if (mode_ == 2 || mode_ == 6)
-		sendTScommand(TS570_CWbw[bw_], 5, false);
-	else if (mode_ == 5 || mode_ == 7)
-		sendTScommand(TS570_FSKbw[bw_], 7, false);
-	else
-		sendTScommand(TS570_SSBbw[bw_], 5, false);
+    bw_ = val;
+
+    switch (mode_) {
+    case 0:
+    case 1:
+    case 3:
+    case 4:
+	sendTScommand(TS570_SSBbw[bw_], 5, false);
+	break;
+    case 2:
+    case 6:
+	sendTScommand(TS570_CWbw[bw_], 5, false);
+	break;
+    case 5:
+    case 7:
+	sendTScommand(TS570_FSKbw[bw_], 7, false);
+	break;
+    default:
+	break;
+    }
 }
 
 int RIG_TS570::get_bandwidth()
 {
-  bw_ = 0;
-  return bw_;
+    int i;
+
+    sendTScommand("FW;", 7, false);
+
+    switch (mode_) {
+    case 0:
+    case 1:
+    case 3:
+    case 4:
+	for (i = 0; TS570_SSBbw[i] != NULL; i++)
+	    if (strncmp(replybuff, TS570_SSBbw[i], 7) == 0)  break;
+	if (TS570_SSBbw[i] != NULL) bw_ = i;
+	else bw_ = 1;
+	break;
+    case 2:
+    case 6:
+	for (i = 0; TS570_CWbw[i] != NULL; i++)
+	    if (strncmp(replybuff, TS570_CWbw[i], 7) == 0)  break;
+	if (TS570_CWbw[i] != NULL) bw_ = i;
+	else bw_ = 1;
+	break;
+    case 5:
+    case 7:
+	for (i = 0; TS570_FSKbw[i] != NULL; i++)
+	    if (strncmp(replybuff, TS570_FSKbw[i], 7) == 0)  break;
+	if (TS570_FSKbw[i] != NULL) bw_ = i;
+	else bw_ = 1;
+	break;
+    default:
+	break;
+    }
+
+    return bw_;
 }
-/*
-int RIG_TS2000::get_bandwidth()
-{
-	int i = 0;
-	if (mode_ == 0 || mode_ == 1 || mode_ == 3) {
-		sendTScommand("SH;", 5, false);
-		for (i = 0; i < 9; i++)
-			if (strcmp(replybuff, TS2000_SSBupper[i]) == 0)
-				break;
-		if (i == 9) i = 8;
-		bw_ = i;
-	} else if (mode_ == 2) {
-		sendTScommand("FW;", 7, false);
-		for (i = 0; i < 11; i++)
-			if (strcmp(replybuff, TS2000_CWbw[i]) == 0)
-				break;
-		if (i == 11) i = 10;
-		bw_ = i;
-	} else if (mode_ == 5 || mode_ == 7) {
-		sendTScommand("FW;", 7, false);
-		for (i = 0; i < 4; i++)
-			if (strcmp(replybuff, TS2000_FSKbw[i]) == 0)
-				break;
-		if (i == 4) i = 3;
-		bw_ = i;
-	} else {
-		sendTScommand("SL;", 5, false);
-		for (i = 0; i < 8; i++)
-			if (strcmp(replybuff, TS2000_AMbw[i]) == 0)
-				break;
-		if (i == 8) i = 7;
-		bw_ = i;
-	}
-	return bw_;
-}
-*/
 
 int RIG_TS570::get_modetype(int n)
 {
