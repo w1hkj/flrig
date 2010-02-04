@@ -320,6 +320,8 @@ bool status::loadXcvrState(const char *xcvr)
 
 		spref.get("xcvr_serial_port", defbuffer, "NONE", 199);
 		xcvr_serial_port = defbuffer;
+		if (xcvr_serial_port.find("tty") == 0) 
+			xcvr_serial_port.insert(0, "/dev/");
 
 		spref.get("rig", rig_nbr, rig_nbr);
 		spref.get("comm_baudrate", comm_baudrate, comm_baudrate);
