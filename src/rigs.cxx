@@ -21,6 +21,7 @@
 #include "K2.h"
 #include "K3.h"
 #include "TS140.h"
+#include "TS570.h"
 #include "TS2000.h"
 #include "TT516.h"
 #include "TT538.h"
@@ -50,6 +51,7 @@ RIG_IC910H		rig_IC910H;
 RIG_K2			rig_K2;
 RIG_K3			rig_K3;
 RIG_TS140		rig_TS140;
+RIG_TS570		rig_TS570;
 RIG_TS2000		rig_TS2000;
 RIG_TT516		rig_TT516;
 RIG_TT538		rig_TT538;
@@ -80,6 +82,7 @@ rigbase *rigs[] = {
 	&rig_K2,
 	&rig_K3,
 	&rig_TS140,
+	&rig_TS570,
 	&rig_TS2000,
 	&rig_TT516,
 	&rig_TT538,
