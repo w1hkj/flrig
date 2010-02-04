@@ -12,8 +12,7 @@
 #include "TS570.h"
 #include "support.h"
 
-static const char TS570name_[] = "TS-570D";
-static const char TS570Sname_[] = "TS-570S";
+static const char TS570name_[] = "TS-570";
 
 static const char *TS570modes_[] = {
 		"LSB", "USB", "CW", "FM", "AM", "FSK", "CW-R", "FSK-R", NULL};
@@ -95,8 +94,7 @@ void RIG_TS570::initialize()
 	cmd = "AC001;"; sendTScommand(cmd, 6, false);
 	get_preamp();
 	get_attenuator();
-	if ((is_TS570S = get_ts570id()) == true)
-	  name_ = TS570Sname_;
+	is_TS570S = get_ts570id();
 }
 
 bool RIG_TS570::get_ts570id()
@@ -131,25 +129,27 @@ void RIG_TS570::set_vfoA (long freq)
 	sendTScommand(cmd, 0, false);
 }
 
+// SM cmd 0 ... 100 (rig values 0 ... 15)
 int RIG_TS570::get_smeter()
 {
 	cmd = "SM;";
 	if(sendTScommand(cmd, 7, false)) {
 		replybuff[6] = 0;
 		int mtr = atoi(&replybuff[2]);
-		mtr = (mtr * 100) / 30;
+		mtr = (mtr * 100) / 16;
 		return mtr;
 	}
 	return 0;
 }
 
+// RM cmd 0 ... 100 (rig values 0 ... 8)
 int RIG_TS570::get_swr()
 {
 	cmd = "RM1;";
 	if (sendTScommand(cmd, 8, false)) {
 		replybuff[7] = 0;
 		int mtr = atoi(&replybuff[3]);
-		mtr = (mtr * 100) / 30;
+		mtr = (mtr * 100) / 9;
 	}
 	return 0;
 }
@@ -182,7 +182,7 @@ int RIG_TS570::get_power_control()
 	return 0;
 }
 
-// Volume control return 0 ... 100
+// Volume control return 0 ... 100  (rig values 0 ... 255)
 int RIG_TS570::get_volume_control()
 {
 	cmd = "AG;";
