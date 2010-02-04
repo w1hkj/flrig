@@ -210,8 +210,9 @@ void * serial_thread_loop(void *d)
 				switch (loopcount) {
 					case 0: read_mode(); break;
 					case 1: read_bandwidth(); break;
+					default: break;
 				}
-				if (++loopcount == 2) loopcount = 0;
+				++loopcount; loopcount %= 2;
 			pthread_mutex_unlock(&mutex_serial);
 
 /*
