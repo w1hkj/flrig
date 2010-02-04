@@ -71,7 +71,7 @@ static bool open_serial(const char* dev)
 void init_port_combos()
 {
 	int retval;
-	clear combos();
+	clear_combos();
 
 	char ttyname[21];
 	const char tty_fmt[] = "//./COM%u";
