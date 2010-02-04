@@ -168,7 +168,7 @@ void status::saveLastState()
 	spref.set("version", PACKAGE_VERSION);
 	spref.set("mainx", mX);
 	spref.set("mainy", mY);
-	spref.set("rig", rig_nbr);
+
 	spref.set("xcvr_serial_port", xcvr_serial_port.c_str());
 	spref.set("comm_baudrate", comm_baudrate);
 	spref.set("comm_stopbits", stopbits);
@@ -323,7 +323,13 @@ bool status::loadXcvrState(const char *xcvr)
 		if (xcvr_serial_port.find("tty") == 0) 
 			xcvr_serial_port.insert(0, "/dev/");
 
-		spref.get("rig", rig_nbr, rig_nbr);
+		rig_nbr = NONE;
+		for (int i = NONE; i < LAST_RIG; i++)
+			if (strcmp(rigs[i]->name_, xcvr) == 0) {
+				rig_nbr = i;
+				break;
+			}
+
 		spref.get("comm_baudrate", comm_baudrate, comm_baudrate);
 		spref.get("comm_stopbits", stopbits, stopbits);
 		spref.get("comm_retries", comm_retries, comm_retries);
