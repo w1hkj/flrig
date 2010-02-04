@@ -141,6 +141,7 @@ flrig_SOURCES += \
 	rigs/K2.cxx \
 	rigs/K3.cxx \
 	rigs/TS140.cxx \
+	rigs/TS570.cxx \
 	rigs/TS2000.cxx \
 	rigs/TT516.cxx \
 	rigs/TT538.cxx \
@@ -223,6 +224,7 @@ EXTRA_DIST = \
 	include/support.h \
 	include/threads.h \
 	include/TS140.h \
+	include/TS570.h \
 	include/TS2000.h \
 	include/TT516.h \
 	include/TT538.h \
