@@ -245,8 +245,8 @@ int main (int argc, char *argv[])
 #elif !defined(__APPLE__)
 	make_pixmap(&Rig_icon_pixmap, flrig_icon);
 	mainwindow->icon((char *)Rig_icon_pixmap);
-	mainwindow->show();
 #endif
+	mainwindow->show();
 
 	Fl::add_timeout(0.250, startup);
 
