@@ -9,9 +9,6 @@
 
 using namespace std;
 
-void com_to_tty(std::string& port);
-void tty_to_com(std::string& port);
-
 #ifndef __WIN32__
 
 #include <termios.h>
