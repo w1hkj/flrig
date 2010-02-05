@@ -24,6 +24,10 @@ using namespace std;
 #include <termios.h>
 #endif
 
+#ifdef __APPLE__
+#  include <glob.h>
+#endif
+
 Fl_Double_Window *dlgDisplayConfig = NULL;
 Fl_Double_Window *dlgXcvrConfig = NULL;
 Fl_Double_Window *dlgMemoryDialog = NULL;
