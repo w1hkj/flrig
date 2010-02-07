@@ -337,6 +337,8 @@ static void send_rig_info()
 	execute(rig_set_name, selrig->name_, res);
 	send_bandwidths_e();
 	send_modes_e();
+MilliSleep(200);
+
 	execute(rig_set_frequency, (double)vfoA.freq, res);
 	execute(rig_set_mode, selrig->modes_[vfoA.imode], res);
 	execute(rig_set_bandwidth, selrig->bandwidths_[vfoA.iBW], res);
