@@ -19,12 +19,12 @@
 static const char TT550name_[] = "TT-550";
 
 enum TT550_MODES { 
-TT550_AM_MODE, TT550_USB_MODE, TT550_LSB_MODE, TT550_CW_MODE, TT550_FM_MODE };
+TT550_AM_MODE, TT550_USB_MODE, TT550_LSB_MODE, TT550_CW_MODE, TT550_DIGI_MODE, TT550_FM_MODE };
 
 static const char *TT550modes_[] = {
-		"AM", "USB", "LSB", "CW", "FM", NULL};
-static const char TT550mode_chr[] =  { '0', '1', '2', '3', '4' };
-static const char TT550mode_type[] = { 'U', 'U', 'L', 'L', 'U' };
+		"AM", "USB", "LSB", "CW", "DIGI", "FM", NULL};
+static const char TT550mode_chr[] =  { '0', '1', '2', '3', '1', '4' };
+static const char TT550mode_type[] = { 'U', 'U', 'L', 'L', 'U', 'U' };
 
 static const char *TT550_widths[] = {
  "300",  "330",  "375",  "450",  "525",  "600",  "675",  "750",  "900", "1050", 
@@ -120,8 +120,8 @@ RIG_TT550::RIG_TT550() {
 	comm_dtrptt = false;
 	serloop_timing = 100;
 	
-	mode_ = 3;
-	bw_ = 30;
+	mode_ = 1;
+	bw_ = 20;
 	def_mode = 1;
 	defbw_ = 20;
 	deffreq_ = 14070000;
@@ -276,6 +276,8 @@ void RIG_TT550::shutdown()
 	sendCommand(cmd, 0, true); // line out = minimum
 }
 
+int DigiAdj = 0;
+
 void RIG_TT550::set_vfoRX(long freq)
 {
 	freq_ = freq;
@@ -290,6 +292,14 @@ void RIG_TT550::set_vfoRX(long freq)
 	int FiltAdj = (TT550_filter_width[bw_])/2;		// filter bw (Hz)
 
 	long lFreq = freq + VfoAdj + RitAdj;
+
+	if(mode_ == TT550_DIGI_MODE) {
+		DigiAdj = 1500 - FiltAdj - 200;
+		DigiAdj = DigiAdj < 0 ? 0 : DigiAdj;
+		IBfo = FiltAdj + 200;
+		lFreq += (IBfo + PbtAdj + DigiAdj);
+		IBfo = IBfo + PbtAdj + DigiAdj;
+	}
 
 	if(mode_ == TT550_USB_MODE) {
 		IBfo = FiltAdj + 200;
@@ -353,12 +363,13 @@ void RIG_TT550::set_vfoTX(long freq)
 	FilterBw = TT550_filter_width[bw_];
 	if (FilterBw < 900) FilterBw = 900;
 	if (FilterBw > 3900) FilterBw = 3900;
+	if (mode_ == TT550_DIGI_MODE) FilterBw = 3000;
 
 	bwBFO = (FilterBw/2) + 200;
 
 	IBfo = (bwBFO > IBfo) ?  bwBFO : IBfo ;
 
-	if (mode_ == TT550_USB_MODE) {
+	if (mode_ == TT550_USB_MODE || mode_ == TT550_DIGI_MODE) {
 		lFreq += IBfo;
 		TBfo = (int)(IBfo * 2.73);
 	}
@@ -480,9 +491,9 @@ bool RIG_TT550::get_if_shift(int &val)
 
 void RIG_TT550::get_if_min_max_step(int &min, int &max, int &step)
 {
-	min = -2900;
-	max = 2900;
-	step = 100;
+	min = -500;
+	max = 500;
+	step = 50;
 }
 
 void RIG_TT550::set_attenuator(int val)
