@@ -22,7 +22,7 @@ private:
 	int ATTlevel;
 	int RFgain;
 
-	int VfoAdj;
+	double VfoAdj;
 
 	int PbtFreq;
 	bool PbtActive;
@@ -88,6 +88,8 @@ public:
 	int  getXit();
 	void setBfo(int v);
 	int  getBfo();
+
+	void setVfoAdj(double v);
 
 	void set_auto_notch(int v);
 	void set_noise_reduction(int b);

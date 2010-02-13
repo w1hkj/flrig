@@ -117,6 +117,7 @@ extern void cb_tt550_tuner_bypass();
 extern void cb_tt550_enable_xmtr();
 extern void cb_tt550_enable_tloop();
 extern void cb_tt550_nb_level();
+extern void cb_tt550_adj_vfo();
 
 extern void closeRig();
 extern void cbExit();

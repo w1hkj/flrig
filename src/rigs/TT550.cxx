@@ -127,7 +127,7 @@ RIG_TT550::RIG_TT550() {
 	deffreq_ = 14070000;
 	max_power = 100;
 
-	VfoAdj = 0;
+	VfoAdj = -0.9;
 	RitFreq = 0;
 	PbtFreq = 0;
 	XitFreq = 0;
@@ -233,6 +233,8 @@ void RIG_TT550::initialize()
 	Bfo = progStatus.bfo_freq;
 	set_vfoA(freq_);
 
+	VfoAdj = progStatus.tt550_vfo_adj;
+
 //	setXit(XitFreq);
 //	setRit(RitFreq);
 //	setBfo(Bfo);
@@ -291,7 +293,7 @@ void RIG_TT550::set_vfoRX(long freq)
 
 	int FiltAdj = (TT550_filter_width[bw_])/2;		// filter bw (Hz)
 
-	long lFreq = freq + VfoAdj + RitAdj;
+	long lFreq = freq * (1 + VfoAdj * 1e-6) + RitAdj;
 
 	if(mode_ == TT550_DIGI_MODE) {
 		DigiAdj = 1500 - FiltAdj - 200;
@@ -356,7 +358,7 @@ void RIG_TT550::set_vfoTX(long freq)
 	int FilterBw = 0;		// Filter Bandwidth determined from table
 
 	int XitAdj;
-	long lFreq = freq;
+	long lFreq = freq * (1 + VfoAdj * 1e-6);
 
 	lFreq += XitAdj = XitActive ? XitFreq : 0;
 
@@ -563,6 +565,11 @@ void RIG_TT550::setBfo(int val)
 int RIG_TT550::getBfo()
 {
 	return Bfo;
+}
+
+void RIG_TT550::setVfoAdj(double v)
+{
+	VfoAdj = v;
 }
 
 void RIG_TT550::setRit(int val)
@@ -897,6 +904,12 @@ void cb_tt550_nb_level()
 {
 	progStatus.tt550_nb_level = cbo_tt550_nb_level->index();
 	selrig->set_nb_level();
+}
+
+void cb_tt550_adj_vfo()
+{
+	selrig->setVfoAdj(progStatus.tt550_vfo_adj);
+	selrig->set_vfoA(selrig->get_vfoA());
 }
 
 //======================================================================
