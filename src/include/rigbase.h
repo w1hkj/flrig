@@ -178,6 +178,7 @@ public:
 	virtual int  getXit() {return 0;}
 	virtual void setBfo(int v) {}
 	virtual int  getBfo() {return 0;}
+	virtual void setVfoAdj(double v) {}
 
 	virtual void set_line_out() {}
 	virtual void set_agc_level() {}

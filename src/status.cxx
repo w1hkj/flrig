@@ -116,6 +116,8 @@ status progStatus = {
 	true,		// tt550_enable_xmtr;
 	false,		// tt550_enable_tloop;
 
+	0.0,		// tt550_vfo_adj;
+
 	600,		// bfo_freq;
 	0,			// rit_freq;
 	0,			// xit_freq;
@@ -241,6 +243,7 @@ void status::saveLastState()
 		spref.set("tt550_enable_xmtr", tt550_enable_xmtr);
 		spref.set("tt550_enable_tloop", tt550_enable_tloop);
 
+		spref.set("tt550_vfo_adj", tt550_vfo_adj);
 		spref.set("tt550_bfo_freq", bfo_freq);
 		spref.set("tt550_rit_freq", rit_freq);
 		spref.set("tt550_xit_freq", xit_freq);
@@ -404,6 +407,7 @@ bool status::loadXcvrState(const char *xcvr)
 			if (spref.get("tt550_enable_xmtr", i, i)) tt550_enable_xmtr = i;
 			if (spref.get("tt550_enable_tloop", i, i)) tt550_enable_tloop = i;
 
+			spref.get("tt550_vfo_adj", tt550_vfo_adj, tt550_vfo_adj);
 			spref.get("tt550_bfo_freq", bfo_freq, bfo_freq);
 			spref.get("tt550_rit_freq", rit_freq, rit_freq);
 			spref.get("tt550_xit_freq", xit_freq, xit_freq);

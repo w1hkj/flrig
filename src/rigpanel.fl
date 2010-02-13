@@ -20,7 +20,7 @@ Function {Rig_window()} {open
     xywh {892 74 340 370} type Double color 52 align 80
     code0 {\#include <stdlib.h>} visible
   } {
-    Fl_Menu_Bar {} {open selected
+    Fl_Menu_Bar {} {open
       xywh {2 2 336 20} textsize 12
     } {
       Submenu {} {
@@ -779,7 +779,7 @@ Function {make_TT550()} {open
 } {
   Fl_Window {} {
     label {TT550 Setup} open
-    xywh {545 74 337 263} type Double align 0 visible
+    xywh {545 74 337 314} type Double align 0 visible
   } {
     Fl_Group {} {
       label CW open
@@ -934,6 +934,18 @@ cb_tt550_enable_tloop();}
         callback {progStatus.tt550_tuner_bypass=o->value();
 cb_tt550_tuner_bypass();}
         xywh {215 239 70 15} down_box DOWN_BOX
+      }
+    }
+    Fl_Group {} {open
+      xywh {2 261 333 50} box ENGRAVED_FRAME
+    } {
+      Fl_Counter cnt_tt550_vfo_adj {
+        label {Vfo Adj(ppm)}
+        callback {progStatus.tt550_vfo_adj=o->value();
+cb_tt550_adj_vfo();} selected
+        xywh {116 274 100 22} type Simple align 36
+        code0 {o->value(progStatus.tt550_vfo_adj);}
+        code1 {o->lstep(1.0);}
       }
     }
   }

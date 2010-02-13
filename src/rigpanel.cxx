@@ -1763,9 +1763,16 @@ static void cb_btn_tt550_tuner_bypass(Fl_Check_Button* o, void*) {
 cb_tt550_tuner_bypass();
 }
 
+Fl_Counter *cnt_tt550_vfo_adj=(Fl_Counter *)0;
+
+static void cb_cnt_tt550_vfo_adj(Fl_Counter* o, void*) {
+  progStatus.tt550_vfo_adj=o->value();
+cb_tt550_adj_vfo();
+}
+
 Fl_Double_Window* make_TT550() {
   Fl_Double_Window* w;
-  { Fl_Double_Window* o = new Fl_Double_Window(337, 263, _("TT550 Setup"));
+  { Fl_Double_Window* o = new Fl_Double_Window(337, 314, _("TT550 Setup"));
     w = o;
     o->align(FL_ALIGN_CENTER);
     { Fl_Group* o = new Fl_Group(2, 2, 333, 90, _("CW"));
@@ -1948,6 +1955,18 @@ Fl_Double_Window* make_TT550() {
         btn_tt550_tuner_bypass->down_box(FL_DOWN_BOX);
         btn_tt550_tuner_bypass->callback((Fl_Callback*)cb_btn_tt550_tuner_bypass);
       } // Fl_Check_Button* btn_tt550_tuner_bypass
+      o->end();
+    } // Fl_Group* o
+    { Fl_Group* o = new Fl_Group(2, 261, 333, 50);
+      o->box(FL_ENGRAVED_FRAME);
+      { Fl_Counter* o = cnt_tt550_vfo_adj = new Fl_Counter(116, 274, 100, 22, _("Vfo Adj(ppm)"));
+        cnt_tt550_vfo_adj->type(1);
+        cnt_tt550_vfo_adj->step(0.1);
+        cnt_tt550_vfo_adj->callback((Fl_Callback*)cb_cnt_tt550_vfo_adj);
+        cnt_tt550_vfo_adj->align(36);
+        o->value(progStatus.tt550_vfo_adj);
+        o->lstep(1.0);
+      } // Fl_Counter* cnt_tt550_vfo_adj
       o->end();
     } // Fl_Group* o
     o->end();
