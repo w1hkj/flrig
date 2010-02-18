@@ -881,16 +881,19 @@ void setPTT( void *d)
 	rigPTT(val);
 }
 
+
 void closeRig()
 {
 	// restore initial rig settings
 	pthread_mutex_lock(&mutex_serial);
+	selrig->setVfoAdj(0);
 	selrig->set_vfoA(transceiver_freq);
 	selrig->set_mode(transceiver_mode);
 	selrig->set_bandwidth(transceiver_bw);
 	selrig->shutdown();
 	pthread_mutex_unlock(&mutex_serial);
 }
+
 
 void cbExit()
 {
@@ -930,6 +933,7 @@ void cbExit()
 	pthread_mutex_unlock(&mutex_serial);
 	pthread_join(*serial_thread, NULL);
 
+	selrig->setVfoAdj(0);
 	selrig->set_vfoA(transceiver_freq);
 	selrig->set_mode(transceiver_mode);
 	selrig->set_bandwidth(transceiver_bw);
@@ -1179,6 +1183,13 @@ void initRig()
 		opBW->deactivate();
 	}
 
+	if (selrig->has_vfo_adj) {
+		cnt_vfo_adj->value(progStatus.vfo_adj);
+		cnt_vfo_adj->activate();
+	} else {
+		cnt_vfo_adj->deactivate();
+	}
+	
 	if (selrig->has_rit) {
 		cntRIT->value(progStatus.rit_freq);
 		cntRIT->activate();
@@ -1586,3 +1597,15 @@ void cb_auto_notch()
 	selrig->set_auto_notch(btnAutoNotch->value());
 }
 
+void cb_vfo_adj()
+{
+	pthread_mutex_lock(&mutex_serial);
+		long f = selrig->get_vfoA();
+		selrig->setVfoAdj(progStatus.vfo_adj);
+		selrig->set_vfoA(f);
+	pthread_mutex_unlock(&mutex_serial);
+}
+
+void cb_line_out()
+{
+}

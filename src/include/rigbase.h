@@ -50,6 +50,7 @@ public:
 	int  max_power;
 	int  last_bw;
 
+	bool has_vfo_adj;
 	bool has_rit;
 	bool has_xit;
 	bool has_bfo;

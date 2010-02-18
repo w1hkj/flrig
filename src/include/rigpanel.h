@@ -131,6 +131,7 @@ extern Fl_Light_Button *btnCompON;
 extern Fl_Counter *cnt_compression;
 extern Fl_ComboBox *cbo_agc_level;
 extern Fl_Counter *cnt_line_out;
+extern Fl_Counter *cnt_vfo_adj;
 Fl_Double_Window* make_XcvrXtra();
 extern Fl_Counter *cnt_tt550_cw_wpm;
 extern Fl_Counter *cnt_tt550_cw_vol;

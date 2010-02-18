@@ -116,8 +116,7 @@ status progStatus = {
 	true,		// tt550_enable_xmtr;
 	false,		// tt550_enable_tloop;
 
-	0.0,		// tt550_vfo_adj;
-
+	0.0,		// vfo_adj;
 	600,		// bfo_freq;
 	0,			// rit_freq;
 	0,			// xit_freq;
@@ -242,12 +241,6 @@ void status::saveLastState()
 		spref.set("tt550_tuner_bypass", tt550_tuner_bypass);
 		spref.set("tt550_enable_xmtr", tt550_enable_xmtr);
 		spref.set("tt550_enable_tloop", tt550_enable_tloop);
-
-		spref.set("tt550_vfo_adj", tt550_vfo_adj);
-		spref.set("tt550_bfo_freq", bfo_freq);
-		spref.set("tt550_rit_freq", rit_freq);
-		spref.set("tt550_xit_freq", xit_freq);
-
 	} else {
 		spref.set("line_out", line_out);
 		spref.set("agc_level", agc_level);
@@ -268,6 +261,11 @@ void status::saveLastState()
 	spref.set("bool_noise", noise);
 	spref.set("int_preamp", preamp);
 	spref.set("int_att", attenuator);
+
+	spref.set("vfo_adj", vfo_adj);
+	spref.set("bfo_freq", bfo_freq);
+	spref.set("rit_freq", rit_freq);
+	spref.set("xit_freq", xit_freq);
 
 	uchar red, green, blue;
 
@@ -406,12 +404,6 @@ bool status::loadXcvrState(const char *xcvr)
 			if (spref.get("tt550_tuner_bypass", i, i)) tt550_tuner_bypass = i;
 			if (spref.get("tt550_enable_xmtr", i, i)) tt550_enable_xmtr = i;
 			if (spref.get("tt550_enable_tloop", i, i)) tt550_enable_tloop = i;
-
-			spref.get("tt550_vfo_adj", tt550_vfo_adj, tt550_vfo_adj);
-			spref.get("tt550_bfo_freq", bfo_freq, bfo_freq);
-			spref.get("tt550_rit_freq", rit_freq, rit_freq);
-			spref.get("tt550_xit_freq", xit_freq, xit_freq);
-
 		} 
 		else {
 			spref.get("line_out", line_out, line_out);
@@ -433,6 +425,11 @@ bool status::loadXcvrState(const char *xcvr)
 		if (spref.get("bool_noise", i, i)) noise = i;
 		spref.get("int_preamp", preamp, preamp);
 		spref.get("int_att", attenuator, attenuator);
+
+		spref.get("vfo_adj", vfo_adj, vfo_adj);
+		spref.get("bfo_freq", bfo_freq, bfo_freq);
+		spref.get("rit_freq", rit_freq, rit_freq);
+		spref.get("xit_freq", xit_freq, xit_freq);
 
 		spref.get("s_red", s_red, s_red);
 		spref.get("s_green", s_green, s_green);

@@ -665,10 +665,11 @@ Serial Port for a special Control Signals}
   }
 } 
 
-Function {make_XcvrXtra()} {} {
+Function {make_XcvrXtra()} {open
+} {
   Fl_Window {} {
     label Controls open
-    xywh {469 784 340 187} type Double align 0 hide
+    xywh {446 431 340 239} type Double align 0 visible
   } {
     Fl_Group {} {
       label CW open
@@ -754,7 +755,7 @@ cb_compression();}
     }
     Fl_Group {} {
       label {Misc.} open
-      xywh {4 146 335 40} box ENGRAVED_FRAME align 21
+      xywh {2 146 335 40} box ENGRAVED_FRAME align 21
     } {
       Fl_Group cbo_agc_level {
         label AGC
@@ -766,10 +767,22 @@ cb_agc_level();} open
       } {}
       Fl_Counter cnt_line_out {
         label {line out}
-        callback {progStatus.cw_wpm = o->value();
-cb_cw_wpm();}
+        callback {progStatus.line_out = o->value();
+cb_line_out();}
         xywh {114 155 70 22} type Simple align 4 minimum 0 maximum 100 step 1 value 20
         code0 {o->value(progStatus.line_out);}
+      }
+    }
+    Fl_Group {} {open
+      xywh {2 186 335 50} box ENGRAVED_FRAME
+    } {
+      Fl_Counter cnt_vfo_adj {
+        label {Vfo Adj(ppm)}
+        callback {progStatus.vfo_adj=o->value();
+cb_vfo_adj();}
+        xywh {119 199 100 22} type Simple align 36
+        code0 {o->value(progStatus.vfo_adj);}
+        code1 {o->lstep(1.0);}
       }
     }
   }
@@ -941,10 +954,10 @@ cb_tt550_tuner_bypass();}
     } {
       Fl_Counter cnt_tt550_vfo_adj {
         label {Vfo Adj(ppm)}
-        callback {progStatus.tt550_vfo_adj=o->value();
-cb_tt550_adj_vfo();} selected
+        callback {progStatus.vfo_adj=o->value();
+cb_vfo_adj();} selected
         xywh {116 274 100 22} type Simple align 36
-        code0 {o->value(progStatus.tt550_vfo_adj);}
+        code0 {o->value(progStatus.vfo_adj);}
         code1 {o->lstep(1.0);}
       }
     }

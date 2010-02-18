@@ -1497,13 +1497,20 @@ cb_agc_level();
 Fl_Counter *cnt_line_out=(Fl_Counter *)0;
 
 static void cb_cnt_line_out(Fl_Counter* o, void*) {
-  progStatus.cw_wpm = o->value();
-cb_cw_wpm();
+  progStatus.line_out = o->value();
+cb_line_out();
+}
+
+Fl_Counter *cnt_vfo_adj=(Fl_Counter *)0;
+
+static void cb_cnt_vfo_adj(Fl_Counter* o, void*) {
+  progStatus.vfo_adj=o->value();
+cb_vfo_adj();
 }
 
 Fl_Double_Window* make_XcvrXtra() {
   Fl_Double_Window* w;
-  { Fl_Double_Window* o = new Fl_Double_Window(340, 187, _("Controls"));
+  { Fl_Double_Window* o = new Fl_Double_Window(340, 239, _("Controls"));
     w = o;
     o->align(FL_ALIGN_CENTER);
     { Fl_Group* o = new Fl_Group(2, 3, 335, 50, _("CW"));
@@ -1596,7 +1603,7 @@ Fl_Double_Window* make_XcvrXtra() {
       } // Fl_Counter* cnt_compression
       o->end();
     } // Fl_Group* o
-    { Fl_Group* o = new Fl_Group(4, 146, 335, 40, _("Misc."));
+    { Fl_Group* o = new Fl_Group(2, 146, 335, 40, _("Misc."));
       o->box(FL_ENGRAVED_FRAME);
       o->align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE);
       { cbo_agc_level = new Fl_ComboBox(215, 155, 80, 22, _("AGC"));
@@ -1623,6 +1630,18 @@ Fl_Double_Window* make_XcvrXtra() {
         cnt_line_out->align(FL_ALIGN_LEFT);
         o->value(progStatus.line_out);
       } // Fl_Counter* cnt_line_out
+      o->end();
+    } // Fl_Group* o
+    { Fl_Group* o = new Fl_Group(2, 186, 335, 50);
+      o->box(FL_ENGRAVED_FRAME);
+      { Fl_Counter* o = cnt_vfo_adj = new Fl_Counter(119, 199, 100, 22, _("Vfo Adj(ppm)"));
+        cnt_vfo_adj->type(1);
+        cnt_vfo_adj->step(0.1);
+        cnt_vfo_adj->callback((Fl_Callback*)cb_cnt_vfo_adj);
+        cnt_vfo_adj->align(36);
+        o->value(progStatus.vfo_adj);
+        o->lstep(1.0);
+      } // Fl_Counter* cnt_vfo_adj
       o->end();
     } // Fl_Group* o
     o->end();
@@ -1766,8 +1785,8 @@ cb_tt550_tuner_bypass();
 Fl_Counter *cnt_tt550_vfo_adj=(Fl_Counter *)0;
 
 static void cb_cnt_tt550_vfo_adj(Fl_Counter* o, void*) {
-  progStatus.tt550_vfo_adj=o->value();
-cb_tt550_adj_vfo();
+  progStatus.vfo_adj=o->value();
+cb_vfo_adj();
 }
 
 Fl_Double_Window* make_TT550() {
@@ -1964,7 +1983,7 @@ Fl_Double_Window* make_TT550() {
         cnt_tt550_vfo_adj->step(0.1);
         cnt_tt550_vfo_adj->callback((Fl_Callback*)cb_cnt_tt550_vfo_adj);
         cnt_tt550_vfo_adj->align(36);
-        o->value(progStatus.tt550_vfo_adj);
+        o->value(progStatus.vfo_adj);
         o->lstep(1.0);
       } // Fl_Counter* cnt_tt550_vfo_adj
       o->end();

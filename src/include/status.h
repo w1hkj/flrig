@@ -101,7 +101,7 @@ struct status {
 	bool	tt550_enable_tloop;
 
 //and others
-	double	tt550_vfo_adj;
+	double	vfo_adj;
 	int		bfo_freq;
 	int		rit_freq;
 	int		xit_freq;
