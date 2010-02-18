@@ -31,17 +31,20 @@
 
 static const char TT538name_[] = "TT-538";
 
+//static const char *TT538modes_[] = { "D-USB", "USB", "LSB", "CW", "AM", "FM", NULL}
+//static const char TT538mode_chr[] =  { '1', '1', '2', '3', '0', '4' };
+//static const char TT538mode_type[] = { 'U', 'U', 'L', 'L', 'U', 'U' };
 static const char *TT538modes_[] = {
 		"AM", "USB", "LSB", "CW", "FM", NULL};
 static const char TT538mode_chr[] =  { '0', '1', '2', '3', '4' };
 static const char TT538mode_type[] = { 'U', 'U', 'L', 'U', 'U' };
 
-// filter # is 33 - index
+// filter # is 38 - index
 static const char *TT538_widths[] = {
- "300",  "330",  "375",  "450",  "525",  "600",  "675",  "750",  "900", "1050",
-"1200", "1350", "1500", "1650", "1800", "1950", "2100", "2250", "2400", "2550",
-"2700", "2850", "3000", "3300", "3600", "3900", "4200", "4500", "4800", "5100",
-"5400", "5700", "6000", "8000", NULL};
+"150",   "165",  "180",  "225",  "260",  "300",  "330",  "375",  "450",  "525",
+"600",   "675",  "750",  "900", "1050", "1200", "1350", "1500", "1650", "1800",
+"1950", "2100", "2250", "2400", "2550", "2700", "2850", "3000", "3300", "3600",
+"3900", "4200", "4500", "4800", "5100", "5400", "5700", "6000", "8000", NULL};
 
 static char TT538setFREQA[]		= "*Annnn\r";
 //static char TT538setFREQB[]		= "*Bnnnn\r";
@@ -59,11 +62,11 @@ static char TT538getFREQA[]		= "?A\r";
 //static char TT538getFWDPWR[]	= "?F\r";
 //static char TT538getAGC[]		= "?G\r";
 //static char TT538getSQLCH[]		= "?H\r";
-static char TT538getRF[]		= "?I\r";
+//static char TT538getRF[]		= "?I\r";
 static char TT538getATT[]		= "?J\r";
 //static char TT538getNB[]		= "?K\r";
 static char TT538getMODE[]		= "?M\r";
-//static char TT538getPBT[]		= "?P\r";
+static char TT538getPBT[]		= "?P\r";
 static char TT538getSMETER[]	= "?S\r";
 static char TT538getVOL[]		= "?U\r";
 static char TT538getBW[]		= "?W\r";
@@ -71,6 +74,9 @@ static char TT538getBW[]		= "?W\r";
 //static char TT538getREFPWR[]	= "?R\r";
 //static char TT538setXMT[]		= "#1\r";
 //static char TT538setRCV[]		= "#0\r";
+
+static char TT538setXMT[]		= "Q1\r";
+static char TT538setRCV[]		= "Q0\r";
 
 RIG_TT538::RIG_TT538() {
 // base class values
@@ -85,17 +91,20 @@ RIG_TT538::RIG_TT538() {
 	comm_rtscts = true;
 	comm_rtsplus = false;
 	comm_dtrplus = true;
-	comm_catptt = false;
+	comm_catptt = true;// false;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
 	serloop_timing = 200;
 
 	mode_ = 1;
-	bw_ = 30;
+	bw_ = 25;
 	def_mode = 3;
-	defbw_ = 15;
+	defbw_ = 25;
 	deffreq_ = 14070000;
 	max_power = 100;
+	pbt = 0;
+	VfoAdj = progStatus.vfo_adj;
+	vfo_corr = 0;
 
 	has_power_control =
 	has_micgain_control =
@@ -111,7 +120,8 @@ RIG_TT538::RIG_TT538() {
 	has_ifshift_control =
 	has_ptt_control =
 	has_bandwidth_control =
-	has_mode_control = true;
+	has_mode_control = 
+	has_vfo_adj = true;
 
 }
 
@@ -129,29 +139,46 @@ void RIG_TT538::showresponse(string s)
 	printf("%s: %s\n", s.c_str(),str2hex((char *)replybuff, strlen((char *)replybuff)));
 }
 
+void RIG_TT538::initialize()
+{
+	VfoAdj = progStatus.vfo_adj;
+}
+
+void RIG_TT538::shutdown()
+{
+	set_if_shift(0);
+}
+
 long RIG_TT538::get_vfoA ()
 {
 	cmd = TT538getFREQA;
-	bool ret = sendCommand(cmd, 8, true);
+	bool ret = sendCommand(cmd, 6, true);
 	if (ret == true && replybuff[0] == 'A') {
 		int f = 0;
 		for (size_t n = 1; n < 5; n++)
 			f = f*256 + (unsigned char)replybuff[n];
 		freq_ = f;
 	}
-	return freq_;
+	return (long)(freq_ - vfo_corr);
 }
 
 void RIG_TT538::set_vfoA (long freq)
 {
 	freq_ = freq;
+	vfo_corr = (freq / 1e6) * VfoAdj + 0.5;
+	long xfreq = freq_ + vfo_corr;
 	cmd = TT538setFREQA;
-	cmd[5] = freq & 0xff; freq = freq >> 8;
-	cmd[4] = freq & 0xff; freq = freq >> 8;
-	cmd[3] = freq & 0xff; freq = freq >> 8;
-	cmd[2] = freq & 0xff;
+	cmd[5] = xfreq & 0xff; xfreq = xfreq >> 8;
+	cmd[4] = xfreq & 0xff; xfreq = xfreq >> 8;
+	cmd[3] = xfreq & 0xff; xfreq = xfreq >> 8;
+	cmd[2] = xfreq & 0xff;
 	sendCommand(cmd, 0, true);
 	return ;
+}
+
+void RIG_TT538::setVfoAdj(double v)
+{
+	VfoAdj = v;
 }
 
 void RIG_TT538::set_mode(int val)
@@ -165,7 +192,7 @@ void RIG_TT538::set_mode(int val)
 int RIG_TT538::get_mode()
 {
 	cmd = TT538getMODE;
-	sendCommand(cmd, 6, true);
+	sendCommand(cmd, 4, true);
 	if (replybuff[0] == 'M') {
 		mode_ = replybuff[1] - '0';
 	}
@@ -181,21 +208,23 @@ void RIG_TT538::set_bandwidth(int val)
 {
 	bw_ = val;
 	cmd = TT538setBW;
-	cmd[2] = 33 - val;
+	cmd[2] = 38 - val;
 	sendCommand(cmd, 0, true);
+	set_if_shift(pbt);
 }
 
 int RIG_TT538::get_bandwidth()
 {
 	cmd = TT538getBW;
-	sendCommand(cmd, 5, true);
+	sendCommand(cmd, 3, true);
 	if (replybuff[0] == 'W')
-		bw_ = 33 - (unsigned char)replybuff[1];
+		bw_ = 38 - (unsigned char)replybuff[1];
 	return bw_;
 }
 
 void RIG_TT538::set_if_shift(int val)
 {
+	pbt = val;
 	cmd = TT538setPBT;
 	short int si = val;
 	cmd[2] = (si & 0xff00) >> 8;
@@ -206,14 +235,16 @@ void RIG_TT538::set_if_shift(int val)
 bool RIG_TT538::get_if_shift(int &val)
 {
 	val = 0;
+	cmd = TT538getPBT;
+	sendCommand(cmd, 3, true);
 	return false;
 }
 
 void RIG_TT538::get_if_min_max_step(int &min, int &max, int &step)
 {
-	min = -8000;
-	max = 8000;
-	step = 100;
+	min = -2000;
+	max = 2000;
+	step = 10;
 }
 
 void RIG_TT538::set_attenuator(int val)
@@ -228,7 +259,7 @@ void RIG_TT538::set_attenuator(int val)
 int RIG_TT538::get_attenuator()
 {
 	cmd = TT538getATT;
-	sendCommand(cmd, 5, true);
+	sendCommand(cmd, 3, true);
 	if (replybuff[0] == 'J' && replybuff[1] == '1')
 		return 1;
 	return 0;
@@ -275,4 +306,11 @@ int  RIG_TT538::get_rf_gain()
 {
 	return 100; 
 // Jupiter does not reply with values as specified in the programmers manual
+}
+
+// Tranceiver PTT on/off
+void RIG_TT538::set_PTT_control(int val)
+{
+	if (val) sendCommand(TT538setXMT, 0, true);
+	else     sendCommand(TT538setRCV, 0, true);
 }

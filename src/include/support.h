@@ -97,6 +97,8 @@ extern void cb_vox_onoff();
 extern void cb_compression();
 extern void setLower();
 extern void setUpper();
+extern void cb_vfo_adj();
+extern void cb_line_out();
 
 // callbacks for tt550 transceiver
 extern void cb_tt550_line_out();
@@ -117,7 +119,6 @@ extern void cb_tt550_tuner_bypass();
 extern void cb_tt550_enable_xmtr();
 extern void cb_tt550_enable_tloop();
 extern void cb_tt550_nb_level();
-extern void cb_tt550_adj_vfo();
 
 extern void closeRig();
 extern void cbExit();

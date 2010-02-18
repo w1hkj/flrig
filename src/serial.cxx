@@ -68,7 +68,7 @@ bool Cserial::CheckPort(string dev)  {
 ///////////////////////////////////////////////////////
 bool Cserial::OpenPort()  {
 
-	if ((fd = open( device.c_str(), O_RDWR | O_NOCTTY | O_NDELAY)) < 0)
+	if ((fd = open( device.c_str(), O_RDWR | O_NOCTTY | O_NDELAY )) < 0)
 		return false;
 // save current port settings
 	tcflush (fd, TCIFLUSH);
@@ -76,25 +76,36 @@ bool Cserial::OpenPort()  {
 	tcgetattr (fd, &oldtio);
 	newtio = oldtio;
 
+	// 8 data bits
 	newtio.c_cflag &= ~CSIZE;
-	newtio.c_cflag |= CS8 | CLOCAL | CREAD;
-
+	newtio.c_cflag |= CS8;
+	// enable receiver, set local mode
+	newtio.c_cflag |= (CLOCAL | CREAD);
+	// no parity
 	newtio.c_cflag &= ~PARENB;
 
 	if (stopbits == 1)
-		newtio.c_cflag &= ~CSTOPB; // 1 stop bit
+		// 1 stop bit
+		newtio.c_cflag &= ~CSTOPB;
 	else
-		newtio.c_cflag |= CSTOPB; // 2 stop bit
+		// 2 stop bit
+		newtio.c_cflag |= CSTOPB;
 
 	if (rtscts)
+		// h/w handshake
 		newtio.c_cflag |= CRTSCTS;
 	else
+		// no h/w handshake
 		newtio.c_cflag &= ~CRTSCTS;
 
+	// raw input
 	newtio.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+	// raw output
 	newtio.c_oflag &= ~OPOST;
-
+	// software flow control disabled
 	newtio.c_iflag &= ~IXON;
+	// do not translate CR to NL
+	newtio.c_iflag &= ~ICRNL;
 
 	switch(baud) {
 		case 300:
