@@ -49,6 +49,8 @@ public:
 	long deffreq_;
 	int  max_power;
 	int  last_bw;
+	int  bpf_center;
+	int  pbt;
 
 	bool has_vfo_adj;
 	bool has_rit;
@@ -86,6 +88,7 @@ public:
 	bool has_compON;
 	bool has_auto_notch;
 	bool use_line_in;
+	bool has_bpf_center;
 
 	bool restore_mbw;
 

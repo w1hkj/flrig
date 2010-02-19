@@ -9,7 +9,6 @@ private:
 	double refpwr;
 	double fwdv;
 	double refv;
-	int    pbt;
 	double VfoAdj;
 	int    vfo_corr;
 

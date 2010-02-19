@@ -99,6 +99,7 @@ extern void setLower();
 extern void setUpper();
 extern void cb_vfo_adj();
 extern void cb_line_out();
+extern void cb_bpf_center();
 
 // callbacks for tt550 transceiver
 extern void cb_tt550_line_out();
