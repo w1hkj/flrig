@@ -1183,13 +1183,20 @@ void initRig()
 		opBW->deactivate();
 	}
 
+	if (selrig->has_bpf_center) {
+		cnt_bpf_center->value(progStatus.bpf_center);
+		cnt_bpf_center->activate();
+	} else {
+		cnt_bpf_center->deactivate();
+	}
+
 	if (selrig->has_vfo_adj) {
 		cnt_vfo_adj->value(progStatus.vfo_adj);
 		cnt_vfo_adj->activate();
 	} else {
 		cnt_vfo_adj->deactivate();
 	}
-	
+
 	if (selrig->has_rit) {
 		cntRIT->value(progStatus.rit_freq);
 		cntRIT->activate();
@@ -1608,4 +1615,9 @@ void cb_vfo_adj()
 
 void cb_line_out()
 {
+}
+
+void cb_bpf_center()
+{
+	selrig->set_if_shift(selrig->pbt);
 }

@@ -46,6 +46,12 @@ static const char *TT538_widths[] = {
 "1950", "2100", "2250", "2400", "2550", "2700", "2850", "3000", "3300", "3600",
 "3900", "4200", "4500", "4800", "5100", "5400", "5700", "6000", "8000", NULL};
 
+static const int TT538_numeric_widths[] = {
+150,   165,  180,  225,  260,  300,  330,  375,  450,  525,
+600,   675,  750,  900, 1050, 1200, 1350, 1500, 1650, 1800,
+1950, 2100, 2250, 2400, 2550, 2700, 2850, 3000, 3300, 3600,
+3900, 4200, 4500, 4800, 5100, 5400, 5700, 6000, 8000};
+
 static char TT538setFREQA[]		= "*Annnn\r";
 //static char TT538setFREQB[]		= "*Bnnnn\r";
 //static char TT538setAGC[]		= "*Gn\r";
@@ -114,6 +120,7 @@ RIG_TT538::RIG_TT538() {
 	has_noise_control =
 	has_swr_control = false;
 
+	has_bpf_center = 
 	has_volume_control =
 	has_rf_control =
 	has_attenuator_control =
@@ -173,6 +180,7 @@ void RIG_TT538::set_vfoA (long freq)
 	cmd[3] = xfreq & 0xff; xfreq = xfreq >> 8;
 	cmd[2] = xfreq & 0xff;
 	sendCommand(cmd, 0, true);
+	set_if_shift(pbt);
 	return ;
 }
 
@@ -226,17 +234,24 @@ void RIG_TT538::set_if_shift(int val)
 {
 	pbt = val;
 	cmd = TT538setPBT;
+	int bpval = progStatus.bpf_center - 200 - TT538_numeric_widths[bw_]/2;
 	short int si = val;
+	if ((mode_ == 1 || mode_ == 2) && progStatus.use_bpf_center)
+		si += (bpval > 0 ? bpval : 0);
 	cmd[2] = (si & 0xff00) >> 8;
 	cmd[3] = (si & 0xff);
 	sendCommand(cmd, 0, true);
+	sendCommand(TT538getPBT, 4, true);
+	if (replybuff[1] != cmd[2] || replybuff[2] != cmd[3]) {
+		sendCommand(cmd, 0, true);
+	}
 }
 
 bool RIG_TT538::get_if_shift(int &val)
 {
 	val = 0;
 	cmd = TT538getPBT;
-	sendCommand(cmd, 3, true);
+	sendCommand(cmd, 4, true);
 	return false;
 }
 

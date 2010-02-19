@@ -120,6 +120,8 @@ status progStatus = {
 	600,		// bfo_freq;
 	0,			// rit_freq;
 	0,			// xit_freq;
+	1500,		// bpf_center;
+	true,		// use_bpf_center;
 
 	232,		// int	 s_red;
 	255,		// int	 s_green;
@@ -266,6 +268,8 @@ void status::saveLastState()
 	spref.set("bfo_freq", bfo_freq);
 	spref.set("rit_freq", rit_freq);
 	spref.set("xit_freq", xit_freq);
+	spref.set("bpf_center", bpf_center);
+	spref.set("use_bpf_center", use_bpf_center);
 
 	uchar red, green, blue;
 
@@ -430,6 +434,8 @@ bool status::loadXcvrState(const char *xcvr)
 		spref.get("bfo_freq", bfo_freq, bfo_freq);
 		spref.get("rit_freq", rit_freq, rit_freq);
 		spref.get("xit_freq", xit_freq, xit_freq);
+		spref.get("bpf_center", bpf_center, bpf_center);
+		spref.get("use_bpf_center", i, i); use_bpf_center = i;
 
 		spref.get("s_red", s_red, s_red);
 		spref.get("s_green", s_green, s_green);

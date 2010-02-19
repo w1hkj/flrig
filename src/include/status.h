@@ -105,6 +105,8 @@ struct status {
 	int		bfo_freq;
 	int		rit_freq;
 	int		xit_freq;
+	int		bpf_center;
+	bool	use_bpf_center;
 // =========================
 
 	int		s_red;

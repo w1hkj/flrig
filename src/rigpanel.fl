@@ -773,16 +773,29 @@ cb_line_out();}
         code0 {o->value(progStatus.line_out);}
       }
     }
-    Fl_Group {} {open
+    Fl_Group {} {open selected
       xywh {2 186 335 50} box ENGRAVED_FRAME
     } {
       Fl_Counter cnt_vfo_adj {
         label {Vfo Adj(ppm)}
         callback {progStatus.vfo_adj=o->value();
 cb_vfo_adj();}
-        xywh {119 199 100 22} type Simple align 36
+        xywh {12 207 96 22} type Simple align 33
         code0 {o->value(progStatus.vfo_adj);}
-        code1 {o->lstep(1.0);}
+      }
+      Fl_Counter cnt_bpf_center {
+        label {BPF Center Freq}
+        callback {progStatus.bpf_center=o->value();
+cb_bpf_center();}
+        tooltip {Bandpass Filter Center Freq} xywh {161 207 96 22} type Simple align 33 minimum 600 maximum 2500 step 10 value 1500
+        code0 {o->value(progStatus.bpf_center);}
+      }
+      Fl_Check_Button btn_use_bpf_center {
+        label On
+        callback {progStatus.use_bpf_center = o->value();
+cb_bpf_center();}
+        tooltip {Use Filter Center Freq Adj} xywh {261 211 70 15} down_box DOWN_BOX value 1
+        code0 {o->value(progStatus.use_bpf_center);}
       }
     }
   }
@@ -955,7 +968,7 @@ cb_tt550_tuner_bypass();}
       Fl_Counter cnt_tt550_vfo_adj {
         label {Vfo Adj(ppm)}
         callback {progStatus.vfo_adj=o->value();
-cb_vfo_adj();} selected
+cb_vfo_adj();}
         xywh {116 274 100 22} type Simple align 36
         code0 {o->value(progStatus.vfo_adj);}
         code1 {o->lstep(1.0);}

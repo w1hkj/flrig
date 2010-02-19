@@ -48,7 +48,8 @@ rigbase::rigbase()
 	has_vox_anti =
 	has_vox_hang =
 	has_auto_notch = 
-	has_compression = false;
+	has_compression =
+	has_bpf_center =  false;
 
 	freq_ = 14070000L;
 	mode_ = 1;
@@ -57,6 +58,8 @@ rigbase::rigbase()
 	deffreq_ = 14070000L;
 	def_mode = 1;
 	defbw_ = 0;
+	bpf_center = 0;
+	pbt = 0;
 
 	max_power = 100;
 

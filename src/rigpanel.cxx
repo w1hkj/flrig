@@ -1508,6 +1508,20 @@ static void cb_cnt_vfo_adj(Fl_Counter* o, void*) {
 cb_vfo_adj();
 }
 
+Fl_Counter *cnt_bpf_center=(Fl_Counter *)0;
+
+static void cb_cnt_bpf_center(Fl_Counter* o, void*) {
+  progStatus.bpf_center=o->value();
+cb_bpf_center();
+}
+
+Fl_Check_Button *btn_use_bpf_center=(Fl_Check_Button *)0;
+
+static void cb_btn_use_bpf_center(Fl_Check_Button* o, void*) {
+  progStatus.use_bpf_center = o->value();
+cb_bpf_center();
+}
+
 Fl_Double_Window* make_XcvrXtra() {
   Fl_Double_Window* w;
   { Fl_Double_Window* o = new Fl_Double_Window(340, 239, _("Controls"));
@@ -1634,14 +1648,31 @@ Fl_Double_Window* make_XcvrXtra() {
     } // Fl_Group* o
     { Fl_Group* o = new Fl_Group(2, 186, 335, 50);
       o->box(FL_ENGRAVED_FRAME);
-      { Fl_Counter* o = cnt_vfo_adj = new Fl_Counter(119, 199, 100, 22, _("Vfo Adj(ppm)"));
+      { Fl_Counter* o = cnt_vfo_adj = new Fl_Counter(12, 207, 96, 22, _("Vfo Adj(ppm)"));
         cnt_vfo_adj->type(1);
         cnt_vfo_adj->step(0.1);
         cnt_vfo_adj->callback((Fl_Callback*)cb_cnt_vfo_adj);
-        cnt_vfo_adj->align(36);
+        cnt_vfo_adj->align(33);
         o->value(progStatus.vfo_adj);
-        o->lstep(1.0);
       } // Fl_Counter* cnt_vfo_adj
+      { Fl_Counter* o = cnt_bpf_center = new Fl_Counter(161, 207, 96, 22, _("BPF Center Freq"));
+        cnt_bpf_center->tooltip(_("Bandpass Filter Center Freq"));
+        cnt_bpf_center->type(1);
+        cnt_bpf_center->minimum(600);
+        cnt_bpf_center->maximum(2500);
+        cnt_bpf_center->step(10);
+        cnt_bpf_center->value(1500);
+        cnt_bpf_center->callback((Fl_Callback*)cb_cnt_bpf_center);
+        cnt_bpf_center->align(33);
+        o->value(progStatus.bpf_center);
+      } // Fl_Counter* cnt_bpf_center
+      { Fl_Check_Button* o = btn_use_bpf_center = new Fl_Check_Button(261, 211, 70, 15, _("On"));
+        btn_use_bpf_center->tooltip(_("Use Filter Center Freq Adj"));
+        btn_use_bpf_center->down_box(FL_DOWN_BOX);
+        btn_use_bpf_center->value(1);
+        btn_use_bpf_center->callback((Fl_Callback*)cb_btn_use_bpf_center);
+        o->value(progStatus.use_bpf_center);
+      } // Fl_Check_Button* btn_use_bpf_center
       o->end();
     } // Fl_Group* o
     o->end();
