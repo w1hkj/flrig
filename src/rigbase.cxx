@@ -49,7 +49,8 @@ rigbase::rigbase()
 	has_vox_hang =
 	has_auto_notch = 
 	has_compression =
-	has_bpf_center =  false;
+	has_bpf_center =
+	has_special =  false;
 
 	freq_ = 14070000L;
 	mode_ = 1;

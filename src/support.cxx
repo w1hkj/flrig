@@ -1116,12 +1116,25 @@ void initXcvrTab()
 		if (selrig->has_agc_level) cbo_agc_level->activate(); else cbo_agc_level->deactivate();
 		if (selrig->has_cw_wpm) cnt_cw_wpm->activate(); else cnt_cw_wpm->deactivate();
 		if (selrig->has_cw_vol) cnt_cw_vol->activate(); else cnt_cw_vol->deactivate();
-		if (selrig->has_cw_spot) cnt_cw_spot->activate(); else cnt_cw_spot->deactivate();
+		if (selrig->has_cw_spot) {
+			cnt_cw_spot->activate(); 
+			btnSpot->activate();
+		} else {
+			cnt_cw_spot->deactivate();
+			btnSpot->deactivate();
+		}
 		if (selrig->has_vox_onoff) btn_vox->activate(); else btn_vox->deactivate();
 		if (selrig->has_vox_gain) cnt_vox_gain->activate(); else cnt_vox_gain->deactivate();
 		if (selrig->has_vox_anti) cnt_anti_vox->activate(); else cnt_anti_vox->deactivate();
 		if (selrig->has_vox_hang) cnt_vox_hang->activate(); else cnt_vox_hang->deactivate();
-		if (selrig->has_compression) cnt_compression->activate(); else cnt_compression->deactivate();
+		if (selrig->has_compression) {
+			cnt_compression->activate();
+			btnCompON->activate();
+		} else {
+			cnt_compression->deactivate();
+			btnCompON->deactivate();
+		}
+		cnt_line_out->deactivate();
 		mnuKeepData->activate();
 	}
 }
@@ -1183,11 +1196,18 @@ void initRig()
 		opBW->deactivate();
 	}
 
+	if (selrig->has_special)
+		btnSpecial->show();
+	else
+		btnSpecial->hide();
+
 	if (selrig->has_bpf_center) {
 		cnt_bpf_center->value(progStatus.bpf_center);
 		cnt_bpf_center->activate();
+		btn_use_bpf_center->activate();
 	} else {
 		cnt_bpf_center->deactivate();
+		btn_use_bpf_center->deactivate();
 	}
 
 	if (selrig->has_vfo_adj) {
@@ -1620,4 +1640,9 @@ void cb_line_out()
 void cb_bpf_center()
 {
 	selrig->set_if_shift(selrig->pbt);
+}
+
+void cb_special()
+{
+	selrig->set_special(btnSpecial->value());
 }

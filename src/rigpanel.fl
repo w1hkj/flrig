@@ -413,10 +413,11 @@ selectFreq();}
   }
 } 
 
-Function {XcvrDialog()} {} {
+Function {XcvrDialog()} {open
+} {
   Fl_Window {} {
     label {I/O Ports} open
-    xywh {456 474 410 257} type Double hide
+    xywh {817 604 410 257} type Double visible
   } {
     Fl_Tabs {} {open
       xywh {0 8 408 245}
@@ -673,7 +674,7 @@ Function {make_XcvrXtra()} {open
   } {
     Fl_Group {} {
       label CW open
-      xywh {2 3 335 50} box ENGRAVED_FRAME align 21
+      xywh {2 3 335 46} box ENGRAVED_FRAME align 21
     } {
       Fl_Counter cnt_cw_wpm {
         label wpm
@@ -703,65 +704,65 @@ cb_cw_spot();}
     }
     Fl_Group {} {
       label Vox open
-      xywh {2 54 335 50} box ENGRAVED_FRAME align 21
+      xywh {2 49 335 46} box ENGRAVED_FRAME align 21
     } {
       Fl_Counter cnt_vox_gain {
         label gain
         callback {progStatus.vox_gain=o->value();
 cb_vox_gain();}
-        xywh {37 75 70 22} type Simple align 1 minimum 0 maximum 100 step 1
+        xywh {37 68 70 22} type Simple align 1 minimum 0 maximum 100 step 1
         code0 {o->value(progStatus.vox_gain);}
       }
       Fl_Counter cnt_anti_vox {
         label anti
         callback {progStatus.vox_anti=o->value();
 cb_vox_anti();}
-        xywh {113 75 70 22} type Simple align 1 minimum 0 maximum 100 step 1
+        xywh {113 68 70 22} type Simple align 1 minimum 0 maximum 100 step 1
         code0 {o->value(progStatus.vox_anti);}
       }
       Fl_Counter cnt_vox_hang {
         label hang
         callback {progStatus.vox_hang = o->value();
 cb_vox_hang();}
-        xywh {189 75 70 22} type Simple align 1 minimum 0 maximum 100 step 1
+        xywh {189 68 70 22} type Simple align 1 minimum 0 maximum 100 step 1
         code0 {o->value(progStatus.vox_hang);}
       }
       Fl_Light_Button btn_vox {
         label VOX
         callback {progStatus.vox_onoff=o->value();
 cb_vox_onoff();}
-        xywh {266 75 64 22}
+        xywh {266 68 64 22}
         code0 {o->value(progStatus.vox_onoff);}
       }
     }
     Fl_Group {} {
       label {Speech Comp.} open
-      xywh {2 105 335 40} box ENGRAVED_FRAME align 21
+      xywh {2 96 335 36} box ENGRAVED_FRAME align 21
     } {
       Fl_Light_Button btnCompON {
         label On
         callback {progStatus.compON=o->value();
 cb_compression();}
-        xywh {266 114 64 22}
+        xywh {266 103 64 22}
         code0 {o->value(progStatus.compON);}
       }
       Fl_Counter cnt_compression {
         label level
         callback {progStatus.compression=o->value();
 cb_compression();}
-        xywh {189 114 70 22} type Simple align 4 minimum 0 maximum 100 step 1
+        xywh {189 103 70 22} type Simple align 4 minimum 0 maximum 100 step 1
         code0 {o->value(progStatus.compression);}
       }
     }
     Fl_Group {} {
-      label {Misc.} open
-      xywh {2 146 335 40} box ENGRAVED_FRAME align 21
+      label {Misc.} open selected
+      xywh {2 133 335 103} box ENGRAVED_FRAME align 17
     } {
       Fl_Group cbo_agc_level {
         label AGC
         callback {progStatus.agc_level = o->index();
 cb_agc_level();} open
-        tooltip {Select Transceiver} xywh {215 155 80 22} box DOWN_BOX color 53 align 8
+        tooltip {Select Transceiver} xywh {250 158 80 22} box DOWN_BOX color 53
         code0 {\#include "combo.h"}
         class Fl_ComboBox
       } {}
@@ -769,33 +770,34 @@ cb_agc_level();} open
         label {line out}
         callback {progStatus.line_out = o->value();
 cb_line_out();}
-        xywh {114 155 70 22} type Simple align 4 minimum 0 maximum 100 step 1 value 20
+        xywh {260 204 70 22} type Simple align 1 minimum 0 maximum 100 step 1 value 20
         code0 {o->value(progStatus.line_out);}
       }
-    }
-    Fl_Group {} {open selected
-      xywh {2 186 335 50} box ENGRAVED_FRAME
-    } {
       Fl_Counter cnt_vfo_adj {
         label {Vfo Adj(ppm)}
         callback {progStatus.vfo_adj=o->value();
 cb_vfo_adj();}
-        xywh {12 207 96 22} type Simple align 33
+        xywh {20 204 96 22} type Simple align 33
         code0 {o->value(progStatus.vfo_adj);}
       }
       Fl_Counter cnt_bpf_center {
         label {BPF Center Freq}
         callback {progStatus.bpf_center=o->value();
 cb_bpf_center();}
-        tooltip {Bandpass Filter Center Freq} xywh {161 207 96 22} type Simple align 33 minimum 600 maximum 2500 step 10 value 1500
+        tooltip {Bandpass Filter Center Freq} xywh {20 158 96 22} type Simple align 33 minimum 600 maximum 2500 step 10 value 1500
         code0 {o->value(progStatus.bpf_center);}
       }
       Fl_Check_Button btn_use_bpf_center {
         label On
         callback {progStatus.use_bpf_center = o->value();
 cb_bpf_center();}
-        tooltip {Use Filter Center Freq Adj} xywh {261 211 70 15} down_box DOWN_BOX value 1
+        tooltip {Use Filter Center Freq Adj} xywh {120 161 50 15} down_box DOWN_BOX value 1
         code0 {o->value(progStatus.use_bpf_center);}
+      }
+      Fl_Light_Button btnSpecial {
+        label Special
+        callback {cb_special();}
+        xywh {148 205 74 20}
       }
     }
   }

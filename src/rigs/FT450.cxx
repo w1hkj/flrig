@@ -54,7 +54,8 @@ RIG_FT450::RIG_FT450() {
 	has_ifshift_control =
 	has_ptt_control =
 	has_tune_control =
-	has_swr_control = true;
+	has_swr_control =
+	has_special = true;
 	
 // derived specific
 	notch_on = false;
@@ -173,7 +174,7 @@ void RIG_FT450::set_PTT_control(int val)
 
 void RIG_FT450::tune_rig()
 {
-	sendCommand("AC002;",0);
+	sendCommand("AC002;",0, false);
 }
 
 void RIG_FT450::set_attenuator(int val)
@@ -370,4 +371,11 @@ void RIG_FT450::get_mic_min_max_step(int &min, int &max, int &step)
 	min = 0;
 	max = 100;
 	step = 1;
+}
+
+void RIG_FT450::set_special(int v)
+{
+	if (v) cmd = "VR1;";
+	else   cmd = "VR0;";
+	sendCommand(cmd, 0, false);
 }

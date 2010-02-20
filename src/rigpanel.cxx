@@ -1522,12 +1522,18 @@ static void cb_btn_use_bpf_center(Fl_Check_Button* o, void*) {
 cb_bpf_center();
 }
 
+Fl_Light_Button *btnSpecial=(Fl_Light_Button *)0;
+
+static void cb_btnSpecial(Fl_Light_Button*, void*) {
+  cb_special();
+}
+
 Fl_Double_Window* make_XcvrXtra() {
   Fl_Double_Window* w;
   { Fl_Double_Window* o = new Fl_Double_Window(340, 239, _("Controls"));
     w = o;
     o->align(FL_ALIGN_CENTER);
-    { Fl_Group* o = new Fl_Group(2, 3, 335, 50, _("CW"));
+    { Fl_Group* o = new Fl_Group(2, 3, 335, 46, _("CW"));
       o->box(FL_ENGRAVED_FRAME);
       o->align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE);
       { Fl_Counter* o = cnt_cw_wpm = new Fl_Counter(37, 23, 70, 22, _("wpm"));
@@ -1563,10 +1569,10 @@ Fl_Double_Window* make_XcvrXtra() {
       } // Fl_Light_Button* btnSpot
       o->end();
     } // Fl_Group* o
-    { Fl_Group* o = new Fl_Group(2, 54, 335, 50, _("Vox"));
+    { Fl_Group* o = new Fl_Group(2, 49, 335, 46, _("Vox"));
       o->box(FL_ENGRAVED_FRAME);
       o->align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE);
-      { Fl_Counter* o = cnt_vox_gain = new Fl_Counter(37, 75, 70, 22, _("gain"));
+      { Fl_Counter* o = cnt_vox_gain = new Fl_Counter(37, 68, 70, 22, _("gain"));
         cnt_vox_gain->type(1);
         cnt_vox_gain->minimum(0);
         cnt_vox_gain->maximum(100);
@@ -1575,7 +1581,7 @@ Fl_Double_Window* make_XcvrXtra() {
         cnt_vox_gain->align(FL_ALIGN_TOP);
         o->value(progStatus.vox_gain);
       } // Fl_Counter* cnt_vox_gain
-      { Fl_Counter* o = cnt_anti_vox = new Fl_Counter(113, 75, 70, 22, _("anti"));
+      { Fl_Counter* o = cnt_anti_vox = new Fl_Counter(113, 68, 70, 22, _("anti"));
         cnt_anti_vox->type(1);
         cnt_anti_vox->minimum(0);
         cnt_anti_vox->maximum(100);
@@ -1584,7 +1590,7 @@ Fl_Double_Window* make_XcvrXtra() {
         cnt_anti_vox->align(FL_ALIGN_TOP);
         o->value(progStatus.vox_anti);
       } // Fl_Counter* cnt_anti_vox
-      { Fl_Counter* o = cnt_vox_hang = new Fl_Counter(189, 75, 70, 22, _("hang"));
+      { Fl_Counter* o = cnt_vox_hang = new Fl_Counter(189, 68, 70, 22, _("hang"));
         cnt_vox_hang->type(1);
         cnt_vox_hang->minimum(0);
         cnt_vox_hang->maximum(100);
@@ -1593,20 +1599,20 @@ Fl_Double_Window* make_XcvrXtra() {
         cnt_vox_hang->align(FL_ALIGN_TOP);
         o->value(progStatus.vox_hang);
       } // Fl_Counter* cnt_vox_hang
-      { Fl_Light_Button* o = btn_vox = new Fl_Light_Button(266, 75, 64, 22, _("VOX"));
+      { Fl_Light_Button* o = btn_vox = new Fl_Light_Button(266, 68, 64, 22, _("VOX"));
         btn_vox->callback((Fl_Callback*)cb_btn_vox);
         o->value(progStatus.vox_onoff);
       } // Fl_Light_Button* btn_vox
       o->end();
     } // Fl_Group* o
-    { Fl_Group* o = new Fl_Group(2, 105, 335, 40, _("Speech Comp."));
+    { Fl_Group* o = new Fl_Group(2, 96, 335, 36, _("Speech Comp."));
       o->box(FL_ENGRAVED_FRAME);
       o->align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE);
-      { Fl_Light_Button* o = btnCompON = new Fl_Light_Button(266, 114, 64, 22, _("On"));
+      { Fl_Light_Button* o = btnCompON = new Fl_Light_Button(266, 103, 64, 22, _("On"));
         btnCompON->callback((Fl_Callback*)cb_btnCompON);
         o->value(progStatus.compON);
       } // Fl_Light_Button* btnCompON
-      { Fl_Counter* o = cnt_compression = new Fl_Counter(189, 114, 70, 22, _("level"));
+      { Fl_Counter* o = cnt_compression = new Fl_Counter(189, 103, 70, 22, _("level"));
         cnt_compression->type(1);
         cnt_compression->minimum(0);
         cnt_compression->maximum(100);
@@ -1617,10 +1623,10 @@ Fl_Double_Window* make_XcvrXtra() {
       } // Fl_Counter* cnt_compression
       o->end();
     } // Fl_Group* o
-    { Fl_Group* o = new Fl_Group(2, 146, 335, 40, _("Misc."));
+    { Fl_Group* o = new Fl_Group(2, 133, 335, 103, _("Misc."));
       o->box(FL_ENGRAVED_FRAME);
-      o->align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE);
-      { cbo_agc_level = new Fl_ComboBox(215, 155, 80, 22, _("AGC"));
+      o->align(FL_ALIGN_TOP|FL_ALIGN_INSIDE);
+      { cbo_agc_level = new Fl_ComboBox(250, 158, 80, 22, _("AGC"));
         cbo_agc_level->tooltip(_("Select Transceiver"));
         cbo_agc_level->box(FL_DOWN_BOX);
         cbo_agc_level->color((Fl_Color)53);
@@ -1630,32 +1636,28 @@ Fl_Double_Window* make_XcvrXtra() {
         cbo_agc_level->labelsize(14);
         cbo_agc_level->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
         cbo_agc_level->callback((Fl_Callback*)cb_cbo_agc_level);
-        cbo_agc_level->align(FL_ALIGN_RIGHT);
+        cbo_agc_level->align(FL_ALIGN_TOP);
         cbo_agc_level->when(FL_WHEN_RELEASE);
         cbo_agc_level->end();
       } // Fl_ComboBox* cbo_agc_level
-      { Fl_Counter* o = cnt_line_out = new Fl_Counter(114, 155, 70, 22, _("line out"));
+      { Fl_Counter* o = cnt_line_out = new Fl_Counter(260, 204, 70, 22, _("line out"));
         cnt_line_out->type(1);
         cnt_line_out->minimum(0);
         cnt_line_out->maximum(100);
         cnt_line_out->step(1);
         cnt_line_out->value(20);
         cnt_line_out->callback((Fl_Callback*)cb_cnt_line_out);
-        cnt_line_out->align(FL_ALIGN_LEFT);
+        cnt_line_out->align(FL_ALIGN_TOP);
         o->value(progStatus.line_out);
       } // Fl_Counter* cnt_line_out
-      o->end();
-    } // Fl_Group* o
-    { Fl_Group* o = new Fl_Group(2, 186, 335, 50);
-      o->box(FL_ENGRAVED_FRAME);
-      { Fl_Counter* o = cnt_vfo_adj = new Fl_Counter(12, 207, 96, 22, _("Vfo Adj(ppm)"));
+      { Fl_Counter* o = cnt_vfo_adj = new Fl_Counter(20, 204, 96, 22, _("Vfo Adj(ppm)"));
         cnt_vfo_adj->type(1);
         cnt_vfo_adj->step(0.1);
         cnt_vfo_adj->callback((Fl_Callback*)cb_cnt_vfo_adj);
         cnt_vfo_adj->align(33);
         o->value(progStatus.vfo_adj);
       } // Fl_Counter* cnt_vfo_adj
-      { Fl_Counter* o = cnt_bpf_center = new Fl_Counter(161, 207, 96, 22, _("BPF Center Freq"));
+      { Fl_Counter* o = cnt_bpf_center = new Fl_Counter(20, 158, 96, 22, _("BPF Center Freq"));
         cnt_bpf_center->tooltip(_("Bandpass Filter Center Freq"));
         cnt_bpf_center->type(1);
         cnt_bpf_center->minimum(600);
@@ -1666,13 +1668,16 @@ Fl_Double_Window* make_XcvrXtra() {
         cnt_bpf_center->align(33);
         o->value(progStatus.bpf_center);
       } // Fl_Counter* cnt_bpf_center
-      { Fl_Check_Button* o = btn_use_bpf_center = new Fl_Check_Button(261, 211, 70, 15, _("On"));
+      { Fl_Check_Button* o = btn_use_bpf_center = new Fl_Check_Button(120, 161, 50, 15, _("On"));
         btn_use_bpf_center->tooltip(_("Use Filter Center Freq Adj"));
         btn_use_bpf_center->down_box(FL_DOWN_BOX);
         btn_use_bpf_center->value(1);
         btn_use_bpf_center->callback((Fl_Callback*)cb_btn_use_bpf_center);
         o->value(progStatus.use_bpf_center);
       } // Fl_Check_Button* btn_use_bpf_center
+      { btnSpecial = new Fl_Light_Button(148, 205, 74, 20, _("Special"));
+        btnSpecial->callback((Fl_Callback*)cb_btnSpecial);
+      } // Fl_Light_Button* btnSpecial
       o->end();
     } // Fl_Group* o
     o->end();
