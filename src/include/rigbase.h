@@ -89,6 +89,7 @@ public:
 	bool has_auto_notch;
 	bool use_line_in;
 	bool has_bpf_center;
+	bool has_special;
 
 	bool restore_mbw;
 
@@ -205,6 +206,7 @@ public:
 	virtual void enable_xmtr() {}
 	virtual void enable_tloop() {}
 	virtual void set_nb_level() {}
+	virtual void set_special(int v) {}
 
 };
 
