@@ -299,21 +299,21 @@ int RIG_TT538::get_volume_control()
 	cmd = TT538getVOL;
 	sendCommand(cmd, 3, true);
 	if (replybuff[0] == 'U')
-		return (int)(((replybuff[1] & 0x7F) / 1.28) - 1);
+		return (int)((replybuff[1] & 0x7F) / 1.27);
 	return 0;
 }
 
 void RIG_TT538::set_volume_control(int vol)
 {
 	cmd = TT538setVOL;
-	cmd[2] = 0x7F & ((int)(vol * 1.28) + 1);
+	cmd[2] = 0x7F & (int)(vol * 1.27);
 	sendCommand(cmd, 0, true);
 }
 
 void RIG_TT538::set_rf_gain(int val)
 {
 	cmd = TT538setRF;
-	cmd[2] = 0x7F & ((int)(val * 1.28) + 1);
+	cmd[2] = 0x7F & (int)(val * 1.27);
 	sendCommand(cmd, 0, true);
 }
 
