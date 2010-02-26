@@ -27,6 +27,7 @@
 #include "TT538.h"
 #include "TT550.h"
 #include "TT563.h"
+#include "TT588.h"
 
 rigbase			rig_null;
 RIG_FT100D		rig_FT100D;
@@ -57,6 +58,7 @@ RIG_TT516		rig_TT516;
 RIG_TT538		rig_TT538;
 RIG_TT550		rig_TT550;
 RIG_TT563		rig_TT563;
+RIG_TT588		rig_TT588;
 
 rigbase *rigs[] = {
 	&rig_null,
@@ -88,6 +90,7 @@ rigbase *rigs[] = {
 	&rig_TT538,
 	&rig_TT550,
 	&rig_TT563,
+	&rig_TT588,
 	NULL
 };
 
