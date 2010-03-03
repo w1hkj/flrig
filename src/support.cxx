@@ -1439,7 +1439,7 @@ void initRig()
 
 void init_title()
 {
-	title = PACKAGE_STRING;
+	title = PACKAGE;
 	title += " ";
 	title.append(selrig->name_);
 	mainwindow->label(title.c_str());
