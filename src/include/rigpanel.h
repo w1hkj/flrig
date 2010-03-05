@@ -69,6 +69,7 @@ extern Fl_Menu_Item menu_[];
 #define mnuHelp (menu_+14)
 #define mnuAbout (menu_+15)
 #define mnuEventLog (menu_+16)
+#define mnuOnLineHelp (menu_+17)
 extern Fl_Group *grpMeterColor;
 extern Fl_Box *scaleSmeterColor;
 extern Fl_SigBar *sldrRcvSignalColor;

@@ -93,7 +93,12 @@ Fl_Tooltip::enable(progStatus.tooltips);}
         MenuItem mnuEventLog {
           label {Event log}
           callback {cbEventLog();}
-          xywh {0 0 34 21}
+          xywh {0 0 34 21} divider
+        }
+        MenuItem mnuOnLineHelp {
+          label {On Line Help}
+          callback {visit_URL((void *)("http://www.w1hkj.com/flrig-help/index.html"));} selected
+          xywh {0 0 36 21}
         }
       }
     }
@@ -755,7 +760,7 @@ cb_compression();}
       }
     }
     Fl_Group {} {
-      label {Misc.} open selected
+      label {Misc.} open
       xywh {2 133 335 103} box ENGRAVED_FRAME align 17
     } {
       Fl_Group cbo_agc_level {

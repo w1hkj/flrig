@@ -974,16 +974,6 @@ void cbALC_SWR()
 	btnALC_SWR->redraw();
 }
 
-void about()
-{
-	string msg = "\
-%s\n\
-Version %s\n\
-copyright W1HKJ, 2009\n\
-w1hkj@@w1hkj.com";
-	fl_message(msg.c_str(), PACKAGE_TARNAME, PACKAGE_VERSION);
-}
-
 void adjust_control_positions()
 {
 	int y = 118;
@@ -1646,3 +1636,4 @@ void cb_special()
 {
 	selrig->set_special(btnSpecial->value());
 }
+
