@@ -64,6 +64,63 @@ pthread_mutex_t mutex_serial = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_xmlrpc = PTHREAD_MUTEX_INITIALIZER;
 
 //----------------------------------------------------------------------
+void about()
+{
+	string msg = "\
+%s\n\
+Version %s\n\
+copyright W1HKJ, 2009\n\
+w1hkj@@w1hkj.com";
+	fl_message(msg.c_str(), PACKAGE_TARNAME, PACKAGE_VERSION);
+}
+
+void visit_URL(void* arg)
+{
+	const char* url = reinterpret_cast<const char *>(arg);
+#ifndef __WOE32__
+	const char* browsers[] = {
+#  ifdef __APPLE__
+		getenv("FLDIGI_BROWSER"), // valid for any OS - set by user
+		"open"                    // OS X
+#  else
+		"fl-xdg-open",            // Puppy Linux
+		"xdg-open",               // other Unix-Linux distros
+		getenv("FLDIGI_BROWSER"), // force use of spec'd browser
+		getenv("BROWSER"),        // most Linux distributions
+		"sensible-browser",
+		"firefox",
+		"mozilla"                 // must be something out there!
+#  endif
+	};
+	switch (fork()) {
+	case 0:
+#  ifndef NDEBUG
+		unsetenv("MALLOC_CHECK_");
+		unsetenv("MALLOC_PERTURB_");
+#  endif
+		for (size_t i = 0; i < sizeof(browsers)/sizeof(browsers[0]); i++)
+			if (browsers[i])
+				execlp(browsers[i], browsers[i], url, (char*)0);
+		exit(EXIT_FAILURE);
+	case -1:
+		fl_alert(_("Could not run a web browser:\n%s\n\n"
+			 "Open this URL manually:\n%s"),
+			 strerror(errno), url);
+	}
+#else
+	// gurgle... gurgle... HOWL
+	// "The return value is cast as an HINSTANCE for backward
+	// compatibility with 16-bit Windows applications. It is
+	// not a true HINSTANCE, however. The only thing that can
+	// be done with the returned HINSTANCE is to cast it to an
+	// int and compare it with the value 32 or one of the error
+	// codes below." (Error codes omitted to preserve sanity).
+	if ((int)ShellExecute(NULL, "open", url, NULL, NULL, SW_SHOWNORMAL) <= 32)
+		fl_alert(_("Could not open url:\n%s\n"), url);
+#endif
+}
+
+//----------------------------------------------------------------------
 
 extern void saveFreqList();
 
