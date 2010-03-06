@@ -23,7 +23,7 @@ RIG_K2::RIG_K2() {
 	name_ = K2name_;
 	modes_ = K2modes_;
 	bandwidths_ = K2_widths;
-	comm_baudrate = BR38400;
+	comm_baudrate = BR4800;
 	stopbits = 2;
 	comm_retries = 2;
 	comm_wait = 5;
