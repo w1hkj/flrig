@@ -77,7 +77,7 @@ public:
 	void set_noise(bool b);
 	void set_mic_gain(int val);
 //	int  get_mic_gain();
-//	void get_mic_min_max_step(int &min, int &max, int &step);
+	void get_mic_min_max_step(int &min, int &max, int &step);
 	void set_rf_gain(int val);
 	int  get_rf_gain();
 	void get_rf_min_max_step(int &min, int &max, int &step);

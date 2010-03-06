@@ -146,9 +146,9 @@ RIG_TT550::RIG_TT550() {
 
 	has_notch_control =
 	has_preamp_control =
-	has_micgain_control =
 	has_swr_control = false;
 
+	has_micgain_control =
 	has_power_control =
 	has_agc_level =
 	has_cw_wpm =
@@ -233,7 +233,7 @@ void RIG_TT550::initialize()
 
 	set_agc_level();
 	set_line_out();
-	set_mic_gain(100);
+	set_mic_gain(progStatus.mic_gain);
 	set_rf_gain(RFgain);
 	
 	XitFreq = progStatus.xit_freq;
@@ -775,8 +775,15 @@ void RIG_TT550::set_mic_gain(int v)
 {
 	cmd = TT550setMICLINE;
 	cmd[2] = use_line_in ? 1 : 0;
-	cmd[3] = (unsigned char)(v * 0.15);
+	cmd[3] = (unsigned char) v;//(unsigned char)(v * 0.15);
 	sendCommand(cmd, 0, true);
+}
+
+void RIG_TT550::get_mic_min_max_step(int &min, int &max, int &step)
+{
+	min = 0;
+	max = 15;
+	step = 1;
 }
 
 void RIG_TT550::set_power_control(double val)
