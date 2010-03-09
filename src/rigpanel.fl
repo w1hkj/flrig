@@ -97,7 +97,7 @@ Fl_Tooltip::enable(progStatus.tooltips);}
         }
         MenuItem mnuOnLineHelp {
           label {On Line Help}
-          callback {visit_URL((void *)("http://www.w1hkj.com/flrig-help/index.html"));} selected
+          callback {visit_URL((void *)("http://www.w1hkj.com/flrig-help/index.html"));}
           xywh {0 0 36 21}
         }
       }
@@ -675,7 +675,7 @@ Function {make_XcvrXtra()} {open
 } {
   Fl_Window {} {
     label Controls open
-    xywh {446 431 340 239} type Double align 0 visible
+    xywh {455 628 340 239} type Double align 0 visible
   } {
     Fl_Group {} {
       label CW open
@@ -812,11 +812,11 @@ Function {make_TT550()} {open
 } {
   Fl_Window {} {
     label {TT550 Setup} open
-    xywh {545 74 337 314} type Double align 0 visible
+    xywh {519 75 340 370} type Double align 0 visible
   } {
     Fl_Group {} {
       label CW open
-      xywh {2 2 333 90} box ENGRAVED_FRAME align 21
+      xywh {2 2 336 90} box ENGRAVED_FRAME align 21
     } {
       Fl_Counter cnt_tt550_cw_wpm {
         label wpm
@@ -863,7 +863,7 @@ cb_tt550_enable_keyer();}
     }
     Fl_Group {} {
       label Vox open
-      xywh {2 92 333 50} box ENGRAVED_FRAME align 21
+      xywh {2 93 336 50} box ENGRAVED_FRAME align 21
     } {
       Fl_Counter cnt_tt550_vox_gain {
         label gain
@@ -896,7 +896,7 @@ cb_tt550_vox_onoff();}
     }
     Fl_Group {} {
       label Speech open
-      xywh {2 142 333 50} box ENGRAVED_FRAME align 21
+      xywh {2 144 336 50} box ENGRAVED_FRAME align 21
     } {
       Fl_Light_Button btn_tt550_CompON {
         label On
@@ -921,7 +921,7 @@ cb_tt550_mon_vol();}
       }
     }
     Fl_Group {} {open
-      xywh {2 192 333 68} box ENGRAVED_FRAME align 21
+      xywh {2 195 336 68} box ENGRAVED_FRAME align 21
     } {
       Fl_Counter cnt_tt550_line_out {
         label {line out}
@@ -970,15 +970,41 @@ cb_tt550_tuner_bypass();}
       }
     }
     Fl_Group {} {open
-      xywh {2 261 333 50} box ENGRAVED_FRAME
+      xywh {2 264 336 50} box ENGRAVED_FRAME
     } {
       Fl_Counter cnt_tt550_vfo_adj {
         label {Vfo Adj(ppm)}
         callback {progStatus.vfo_adj=o->value();
 cb_vfo_adj();}
-        xywh {116 274 100 22} type Simple align 36
+        xywh {13 282 100 22} type Simple align 33
         code0 {o->value(progStatus.vfo_adj);}
         code1 {o->lstep(1.0);}
+      }
+      Fl_Group op_tt550_XmtBW {
+        label {Xmt BW}
+        callback {progStatus.tt550_xmt_bw = o->index();
+cb_tt550_setXmtBW();} open
+        tooltip {Select Transceiver Bandwidth} xywh {126 282 80 22} box DOWN_BOX color 55 labelsize 12 align 5
+        code0 {o->index(progStatus.tt550_xmt_bw);}
+        class Fl_ComboBox
+      } {}
+      Fl_Check_Button btn_tt550_use_xmt_bw {
+        label Enable
+        callback {progStatus.tt550_use_xmt_bw = o->value();
+cb_tt550_setXmtBW();} selected
+        xywh {215 284 26 15} down_box DOWN_BOX
+        code0 {o->value(progStatus.tt550_use_xmt_bw);}
+      }
+    }
+    Fl_Group {} {open
+      xywh {2 315 336 50} box ENGRAVED_FRAME
+    } {
+      Fl_Check_Button btnAccInp {
+        label {Acc Inp.}
+        callback {progStatus.use_line_in=o->value();
+cb_tt550_use_line_in();}
+        tooltip {enable to use accessory audio input} xywh {15 330 77 15} down_box DOWN_BOX
+        code0 {o->value(progStatus.use_line_in);}
       }
     }
   }

@@ -157,5 +157,8 @@ extern Fl_Check_Button *btn_tt550_enable_xmtr;
 extern Fl_Check_Button *btn_tt550_enable_tloop;
 extern Fl_Check_Button *btn_tt550_tuner_bypass;
 extern Fl_Counter *cnt_tt550_vfo_adj;
+extern Fl_ComboBox *op_tt550_XmtBW;
+extern Fl_Check_Button *btn_tt550_use_xmt_bw;
+extern Fl_Check_Button *btnAccInp;
 Fl_Double_Window* make_TT550();
 #endif

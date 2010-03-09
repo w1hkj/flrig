@@ -24,7 +24,7 @@ private:
 
 	double VfoAdj;
 
-	int PbtFreq;
+//	int PbtFreq;
 	bool PbtActive;
 	int RitFreq;
 	bool RitActive;
@@ -119,5 +119,6 @@ public:
 
 };
 
+extern const char *TT550_xmt_widths[];
 
 #endif

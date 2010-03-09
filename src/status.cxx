@@ -88,6 +88,7 @@ status progStatus = {
 	false,		// bool noise;
 	0,			// int  attenuator
 	0,			// int  preamp;
+	false,		// bool use_line_in;
 
 //tt550 controls
 	100,		// tt550_line_out;
@@ -115,6 +116,9 @@ status progStatus = {
 
 	true,		// tt550_enable_xmtr;
 	false,		// tt550_enable_tloop;
+
+	14,			// tt550_xmt_bw;
+	false,		// tt550_use_xmt_bw;
 
 	0.0,		// vfo_adj;
 	600,		// bfo_freq;
@@ -263,6 +267,8 @@ void status::saveLastState()
 	spref.set("bool_noise", noise);
 	spref.set("int_preamp", preamp);
 	spref.set("int_att", attenuator);
+
+	spref.set("use_line_in", use_line_in);
 
 	spref.set("vfo_adj", vfo_adj);
 	spref.set("bfo_freq", bfo_freq);
@@ -429,6 +435,8 @@ bool status::loadXcvrState(const char *xcvr)
 		if (spref.get("bool_noise", i, i)) noise = i;
 		spref.get("int_preamp", preamp, preamp);
 		spref.get("int_att", attenuator, attenuator);
+
+		if (spref.get("use_line_in", i, i)) use_line_in = i;
 
 		spref.get("vfo_adj", vfo_adj, vfo_adj);
 		spref.get("bfo_freq", bfo_freq, bfo_freq);

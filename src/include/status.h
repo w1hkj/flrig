@@ -72,6 +72,8 @@ struct status {
 	int		attenuator;
 	int		preamp;
 
+	bool	use_line_in;
+
 //============= transceiver specific prameters
 //tt550 controls
 	int		tt550_line_out;
@@ -99,6 +101,9 @@ struct status {
 
 	bool	tt550_enable_xmtr;
 	bool	tt550_enable_tloop;
+
+	int		tt550_xmt_bw;
+	bool	tt550_use_xmt_bw;
 
 //and others
 	double	vfo_adj;

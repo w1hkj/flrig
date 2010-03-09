@@ -19,6 +19,8 @@
 #include "ptt.h"
 #include "xml_io.h"
 
+#include "TT550.h"
+
 using namespace std;
 
 rigbase *selrig = rigs[0];
@@ -1102,6 +1104,12 @@ void initXcvrTab()
 		cnt_tt550_mon_vol->activate(); cnt_tt550_mon_vol->value(progStatus.tt550_mon_vol);
 		btn_tt550_tuner_bypass->activate(); btn_tt550_tuner_bypass->value(progStatus.tt550_tuner_bypass);
 		mnuKeepData->deactivate();
+		op_tt550_XmtBW->clear();
+		for (int i = 0; TT550_xmt_widths[i] != NULL; i++) {
+			op_tt550_XmtBW->add(TT550_xmt_widths[i]);
+		}
+		op_tt550_XmtBW->activate();
+		op_tt550_XmtBW->index(progStatus.tt550_xmt_bw);
 	} else {
 		if (selrig->has_agc_level) cbo_agc_level->activate(); else cbo_agc_level->deactivate();
 		if (selrig->has_cw_wpm) cnt_cw_wpm->activate(); else cnt_cw_wpm->deactivate();
@@ -1629,11 +1637,15 @@ void cb_line_out()
 
 void cb_bpf_center()
 {
-	selrig->set_if_shift(selrig->pbt);
+	pthread_mutex_lock(&mutex_serial);
+		selrig->set_if_shift(selrig->pbt);
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_special()
 {
-	selrig->set_special(btnSpecial->value());
+	pthread_mutex_lock(&mutex_serial);
+		selrig->set_special(btnSpecial->value());
+	pthread_mutex_unlock(&mutex_serial);
 }
 

@@ -62,6 +62,7 @@ void RIG_FT817::set_vfoA (long freq)
 	cmd = to_bcd(freq, 8);
 	cmd += 0x01;
 	sendCommand(cmd, 0);
+	LOG_INFO("%s", str2hex(cmd.c_str(), 5));
 }
 
 int RIG_FT817::get_mode()
@@ -93,6 +94,7 @@ void RIG_FT817::set_mode(int val)
 	cmd[0] = FT817_mode_val[val];
 	cmd[4] = 7;
 	sendCommand(cmd, 0);
+	LOG_INFO("%s", str2hex(cmd.c_str(), 5));
 }
 
 // Tranceiver PTT on/off
