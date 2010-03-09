@@ -26,31 +26,35 @@ static const char *TT550modes_[] = {
 static const char TT550mode_chr[] =  { '0', '1', '2', '3', '1', '4' };
 static const char TT550mode_type[] = { 'U', 'U', 'L', 'L', 'U', 'U' };
 
-// filter # is 38 - index
 static const char *TT550_widths[] = {
-"150",   "165",  "180",  "225",  "260",  "300",  "330",  "375",  "450",  "525",
-"600",   "675",  "750",  "900", "1050", "1200", "1350", "1500", "1650", "1800",
-"1950", "2100", "2250", "2400", "2550", "2700", "2850", "3000", "3300", "3600",
-"3900", "4200", "4500", "4800", "5100", "5400", "5700", "6000", "8000", NULL};
-//static const char *TT550_widths[] = {
-// "300",  "330",  "375",  "450",  "525",  "600",  "675",  "750",  "900", "1050", 
-//"1200", "1350", "1500", "1650", "1800", "1950", "2100", "2250", "2400", "2550",
-//"2700", "2850", "3000", "3300", "3600", "3900", "4200", "4500", "4800", "5100",
-//"5400", "5700", "6000", "8000", NULL};
+"300",  "330",  "375",  "450",  "525",   "600",  "675",  "750",  "900", "1050", 
+"1200", "1350", "1500", "1650", "1800", "1950", "2100", "2250", "2400", "2550", 
+"2700", "2850", "3000", "3300", "3600", "3900", "4200", "4500", "4800", "5100", 
+"5400", "5700", "6000", "8000", NULL};
 
 static const int TT550_filter_nbr[] = {
-38, 37, 36, 35, 34,
 32, 31, 30, 29, 28, 27, 26, 25, 24, 23,
 22, 21, 20, 19, 18, 17, 16, 15, 14, 13,
 12, 11, 10,  9,  8,  7,  6,  5,  4,  3,
  2,  1,  0, 33 };
  
 static const int TT550_filter_width[] = {
-150, 165, 180, 225, 260,
  300,  330,  375,  450,  525,  600,  675,  750,  900, 1050, 
 1200, 1350, 1500, 1650, 1800, 1950, 2100, 2250, 2400, 2550, 
 2700, 2850, 3000, 3300, 3600, 3900, 4200, 4500, 4800, 5100, 
 5400, 5700, 6000, 8000 };
+
+const char *TT550_xmt_widths[] = {
+"900", "1050",  "1200", "1350", "1500", "1650", "1800", "1950", "2100", "2250",
+"2400", "2550", "2700", "2850", "3000", "3300", "3600", "3900", NULL};
+
+static const int TT550_xmt_filter_nbr[] = {
+24, 23, 22, 21, 20, 19, 18, 17, 16,
+15, 14, 13, 12, 11, 10,  9,  8,  7};
+ 
+static const int TT550_xmt_filter_width[] = {
+ 900, 1050, 1200, 1350, 1500, 1650, 1800, 1950, 2100,
+2250, 2400, 2550, 2700, 2850, 3000, 3300, 3600, 3900 };
 
 static char TT550restart[]		= "XX\r";
 static char TT550init[]			= "P1\r";
@@ -137,7 +141,7 @@ RIG_TT550::RIG_TT550() {
 
 	VfoAdj = 0;
 	RitFreq = 0;
-	PbtFreq = 0;
+//	PbtFreq = 0;
 	XitFreq = 0;
 	Bfo = 600;
 
@@ -174,8 +178,6 @@ RIG_TT550::RIG_TT550() {
 	has_mode_control = true;
 
 	auto_notch = noise_reduction = false;
-
-	use_line_in = true;
 
 }
 
@@ -233,6 +235,7 @@ void RIG_TT550::initialize()
 
 	set_agc_level();
 	set_line_out();
+	use_line_in = progStatus.use_line_in;
 	set_mic_gain(progStatus.mic_gain);
 	set_rf_gain(RFgain);
 	
@@ -251,7 +254,7 @@ void RIG_TT550::initialize()
 	set_attenuator(0);
 	set_mon_vol();
 	set_squelch_level();
-	set_if_shift(PbtFreq);
+	set_if_shift(pbt);//PbtFreq);
 	set_aux_hang();
 
 	enable_tloop();
@@ -296,7 +299,7 @@ void RIG_TT550::set_vfoRX(long freq)
     int TBfo = 0;			// temporary BFO (Hz)
 	int IBfo = 0;			// Intermediate BFO Freq (Hz)
 
-	int PbtAdj = PbtActive ? PbtFreq : 0;	// passband adj (Hz)
+	int PbtAdj = PbtActive ? pbt : 0;//PbtFreq : 0;	// passband adj (Hz)
 	int	RitAdj = RitActive ? RitFreq : 0;	// RIT adj (Hz)
 
 	int FiltAdj = (TT550_filter_width[bw_])/2;		// filter bw (Hz)
@@ -370,13 +373,15 @@ void RIG_TT550::set_vfoTX(long freq)
 
 	lFreq += XitAdj = XitActive ? XitFreq : 0;
 
-	FilterBw = TT550_filter_width[bw_];
+	if (progStatus.tt550_use_xmt_bw)
+		FilterBw = TT550_xmt_filter_width[progStatus.tt550_xmt_bw];
+	else
+		FilterBw = TT550_filter_width[bw_];
 	if (FilterBw < 900) FilterBw = 900;
 	if (FilterBw > 3900) FilterBw = 3900;
-	if (mode_ == TT550_DIGI_MODE) FilterBw = 3000;
+//	if (mode_ == TT550_DIGI_MODE) FilterBw = 3000;
 
 	bwBFO = (FilterBw/2) + 200;
-
 	IBfo = (bwBFO > IBfo) ?  bwBFO : IBfo ;
 
 	if (mode_ == TT550_USB_MODE || mode_ == TT550_DIGI_MODE) {
@@ -442,7 +447,8 @@ void RIG_TT550::set_mode(int val)
 	cmd = TT550setMODE;
 	cmd[1] = cmd[2] = TT550mode_chr[val];
 	sendCommand(cmd, 0, true);
-	set_vfoA(freq_);
+	set_bandwidth(bw_);
+//	set_vfoA(freq_);
 }
 
 int RIG_TT550::get_mode()
@@ -459,7 +465,9 @@ void RIG_TT550::set_bandwidth(int val)
 {
 	bw_ = val;
 	int rxbw = TT550_filter_nbr[bw_];
-	int txbw = TT550_filter_nbr[bw_];
+	int txbw = rxbw;
+	if (progStatus.tt550_use_xmt_bw)
+		txbw = TT550_xmt_filter_nbr[progStatus.tt550_xmt_bw];
 	if (txbw < 7) txbw = 7;
 	if (txbw > 24) txbw = 24;
 	cmd = TT550setRcvBW;
@@ -487,14 +495,16 @@ int RIG_TT550::adjust_bandwidth(int md)
 
 void RIG_TT550::set_if_shift(int val)
 {
-	PbtFreq = val;
-	if (PbtFreq) PbtActive = true;
+//	PbtFreq = val;
+//	if (PbtFreq) PbtActive = true;
+	pbt = val;
+	if (pbt) PbtActive = true;
 	set_vfoRX(freq_);
 }
 
 bool RIG_TT550::get_if_shift(int &val)
 {
-	val = PbtFreq;
+	val = pbt;//PbtFreq;
 	if (!val) return false;
 	return true;
 }
@@ -653,10 +663,10 @@ void RIG_TT550::set_cw_wpm()
 	int dahfactor = duration * 3;
 	cmd[1] = 0xFF & (ditfactor >> 8);
 	cmd[2] = 0xFF & ditfactor;
-	cmd[3] = 0xFF & (spcfactor >> 8);
-	cmd[4] = 0xFF & spcfactor;
-	cmd[5] = 0xFF & (dahfactor >> 8);
-	cmd[6] = 0xFF & dahfactor;
+	cmd[3] = 0xFF & (dahfactor >> 8);
+	cmd[4] = 0xFF & dahfactor;
+	cmd[5] = 0xFF & (spcfactor >> 8);
+	cmd[6] = 0xFF & spcfactor;
 	sendCommand(cmd, 0, true);
 }
 
@@ -773,9 +783,10 @@ void RIG_TT550::set_noise_reduction(int b)
 
 void RIG_TT550::set_mic_gain(int v)
 {
+	progStatus.mic_gain = v;
 	cmd = TT550setMICLINE;
 	cmd[2] = use_line_in ? 1 : 0;
-	cmd[3] = (unsigned char) v;//(unsigned char)(v * 0.15);
+	cmd[3] = (unsigned char) v;
 	sendCommand(cmd, 0, true);
 }
 
@@ -832,93 +843,144 @@ void RIG_TT550::tuner_bypass()
 // callbacks for tt550 transceiver
 void cb_tt550_line_out()
 {
+	pthread_mutex_lock(&mutex_serial);
 	selrig->set_line_out();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_tt550_agc_level()
 {
+	pthread_mutex_lock(&mutex_serial);
 	selrig->set_agc_level();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_tt550_cw_wpm()
 {
+	pthread_mutex_lock(&mutex_serial);
 	selrig->set_cw_wpm();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_tt550_cw_vol()
 {
+	pthread_mutex_lock(&mutex_serial);
 	selrig->set_cw_vol();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_tt550_cw_spot()
 {
+	pthread_mutex_lock(&mutex_serial);
 	selrig->set_cw_spot();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_tt550_cw_weight()
 {
+	pthread_mutex_lock(&mutex_serial);
 	selrig->set_cw_weight();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_tt550_enable_keyer()
 {
+	pthread_mutex_lock(&mutex_serial);
 	selrig->enable_keyer();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_tt550_spot_onoff()
 {
+	pthread_mutex_lock(&mutex_serial);
 	selrig->set_spot_onoff();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_tt550_vox_gain()
 {
+	pthread_mutex_lock(&mutex_serial);
 	selrig->set_vox_gain();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_tt550_vox_anti()
 {
+	pthread_mutex_lock(&mutex_serial);
 	selrig->set_vox_anti();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_tt550_vox_hang()
 {
+	pthread_mutex_lock(&mutex_serial);
 	selrig->set_vox_hang();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_tt550_vox_onoff()
 {
+	pthread_mutex_lock(&mutex_serial);
 	selrig->set_vox_onoff();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_tt550_compression()
 {
+	pthread_mutex_lock(&mutex_serial);
 	selrig->set_compression();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_tt550_mon_vol()
 {
+	pthread_mutex_lock(&mutex_serial);
 	selrig->set_mon_vol();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_tt550_tuner_bypass()
 {
+	pthread_mutex_lock(&mutex_serial);
 	selrig->tuner_bypass();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_tt550_enable_xmtr()
 {
+	pthread_mutex_lock(&mutex_serial);
 	selrig->enable_xmtr();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_tt550_enable_tloop()
 {
+	pthread_mutex_lock(&mutex_serial);
 	selrig->enable_tloop();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_tt550_nb_level()
 {
+	pthread_mutex_lock(&mutex_serial);
 	progStatus.tt550_nb_level = cbo_tt550_nb_level->index();
 	selrig->set_nb_level();
+	pthread_mutex_unlock(&mutex_serial);
+}
+
+void cb_tt550_use_line_in()
+{
+	pthread_mutex_lock(&mutex_serial);
+	selrig->use_line_in = progStatus.use_line_in;
+	selrig->set_mic_gain(progStatus.mic_gain);
+	pthread_mutex_unlock(&mutex_serial);
+}
+
+void cb_tt550_setXmtBW()
+{
+	pthread_mutex_lock(&mutex_serial);
+	selrig->set_bandwidth(selrig->bw_);
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 //======================================================================
