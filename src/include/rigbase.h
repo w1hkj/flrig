@@ -52,6 +52,12 @@ public:
 	int  bpf_center;
 	int  pbt;
 
+	bool PbtActive;
+	int RitFreq;
+	bool RitActive;
+	int XitFreq;
+	bool XitActive;
+
 	bool has_vfo_adj;
 	bool has_rit;
 	bool has_xit;
@@ -179,8 +185,8 @@ public:
 
 	virtual void setRit(int v) {}
 	virtual int  getRit() {return 0;}
-	virtual void setXit(int v) {}
-	virtual int  getXit() {return 0;}
+	virtual void setXit(int v) { XitFreq = v;}
+	virtual int  getXit() {return XitFreq;}
 	virtual void setBfo(int v) {}
 	virtual int  getBfo() {return 0;}
 	virtual void setVfoAdj(double v) {}

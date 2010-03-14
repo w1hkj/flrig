@@ -140,9 +140,6 @@ RIG_TT550::RIG_TT550() {
 	max_power = 100;
 
 	VfoAdj = 0;
-	RitFreq = 0;
-//	PbtFreq = 0;
-	XitFreq = 0;
 	Bfo = 600;
 
 	ATTlevel = 0;

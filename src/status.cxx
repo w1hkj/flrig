@@ -89,6 +89,7 @@ status progStatus = {
 	0,			// int  attenuator
 	0,			// int  preamp;
 	false,		// bool use_line_in;
+	false,		// bool split;
 
 //tt550 controls
 	100,		// tt550_line_out;

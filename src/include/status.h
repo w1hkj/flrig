@@ -74,6 +74,8 @@ struct status {
 
 	bool	use_line_in;
 
+	bool	split;
+
 //============= transceiver specific prameters
 //tt550 controls
 	int		tt550_line_out;
