@@ -325,6 +325,12 @@ static void cb_cntBFO(Fl_Counter*, void*) {
   cbBFO();
 }
 
+Fl_Light_Button *btnSplit=(Fl_Light_Button *)0;
+
+static void cb_btnSplit(Fl_Light_Button* o, void*) {
+  progStatus.split = o->value();
+}
+
 Fl_Button *btnInitializing=(Fl_Button *)0;
 
 Fl_Double_Window* Rig_window() {
@@ -736,7 +742,7 @@ Fl_Double_Window* Rig_window() {
       btnMicLine->callback((Fl_Callback*)cb_btnMicLine);
       btnMicLine->hide();
     } // Fl_Light_Button* btnMicLine
-    { cntRIT = new Fl_Counter(35, 138, 70, 18, _("RIT"));
+    { cntRIT = new Fl_Counter(24, 138, 65, 18, _("RIT"));
       cntRIT->type(1);
       cntRIT->labelsize(12);
       cntRIT->minimum(-1000);
@@ -745,7 +751,7 @@ Fl_Double_Window* Rig_window() {
       cntRIT->callback((Fl_Callback*)cb_cntRIT);
       cntRIT->align(FL_ALIGN_LEFT);
     } // Fl_Counter* cntRIT
-    { cntXIT = new Fl_Counter(148, 138, 70, 18, _("XIT"));
+    { cntXIT = new Fl_Counter(115, 138, 65, 18, _("XIT"));
       cntXIT->type(1);
       cntXIT->labelsize(12);
       cntXIT->minimum(-1000);
@@ -754,7 +760,7 @@ Fl_Double_Window* Rig_window() {
       cntXIT->callback((Fl_Callback*)cb_cntXIT);
       cntXIT->align(FL_ALIGN_LEFT);
     } // Fl_Counter* cntXIT
-    { cntBFO = new Fl_Counter(261, 138, 70, 18, _("BFO"));
+    { cntBFO = new Fl_Counter(212, 138, 65, 18, _("BFO"));
       cntBFO->type(1);
       cntBFO->labelsize(12);
       cntBFO->minimum(0);
@@ -764,6 +770,15 @@ Fl_Double_Window* Rig_window() {
       cntBFO->callback((Fl_Callback*)cb_cntBFO);
       cntBFO->align(FL_ALIGN_LEFT);
     } // Fl_Counter* cntBFO
+    { Fl_Light_Button* o = btnSplit = new Fl_Light_Button(282, 138, 55, 18, _("Split"));
+      btnSplit->tooltip(_("Rx-1 / Tx-2"));
+      btnSplit->down_box(FL_THIN_DOWN_BOX);
+      btnSplit->color((Fl_Color)FL_LIGHT1);
+      btnSplit->selection_color((Fl_Color)113);
+      btnSplit->labelsize(12);
+      btnSplit->callback((Fl_Callback*)cb_btnSplit);
+      o->value(progStatus.split);
+    } // Fl_Light_Button* btnSplit
     { btnInitializing = new Fl_Button(0, 25, 340, 135, _("Initializing\n\nPlease wait"));
       btnInitializing->box(FL_FLAT_BOX);
       btnInitializing->color((Fl_Color)206);

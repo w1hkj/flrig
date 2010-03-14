@@ -24,13 +24,6 @@ private:
 
 	double VfoAdj;
 
-//	int PbtFreq;
-	bool PbtActive;
-	int RitFreq;
-	bool RitActive;
-	int XitFreq;
-	bool XitActive;
-	
 	bool auto_notch;
 	bool noise_reduction;
 

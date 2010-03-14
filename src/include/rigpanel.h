@@ -54,6 +54,7 @@ extern Fl_Light_Button *btnMicLine;
 extern Fl_Counter *cntRIT;
 extern Fl_Counter *cntXIT;
 extern Fl_Counter *cntBFO;
+extern Fl_Light_Button *btnSplit;
 extern Fl_Button *btnInitializing;
 Fl_Double_Window* Rig_window();
 extern Fl_Menu_Item menu_[];

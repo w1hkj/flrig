@@ -17,7 +17,7 @@ Function {Rig_window()} {open
 } {
   Fl_Window {} {
     label Flrig open
-    xywh {892 74 340 370} type Double color 52 align 80
+    xywh {876 76 340 370} type Double color 52 align 80
     code0 {\#include <stdlib.h>} visible
   } {
     Fl_Menu_Bar {} {open
@@ -299,22 +299,28 @@ cbAuxPort();}
     Fl_Counter cntRIT {
       label RIT
       callback {cbRIT();}
-      xywh {35 138 70 18} type Simple labelsize 12 align 4 minimum -1000 maximum 1000 step 10
+      xywh {24 138 65 18} type Simple labelsize 12 align 4 minimum -1000 maximum 1000 step 10
     }
     Fl_Counter cntXIT {
       label XIT
       callback {cbXIT();}
-      xywh {148 138 70 18} type Simple labelsize 12 align 4 minimum -1000 maximum 1000 step 10
+      xywh {115 138 65 18} type Simple labelsize 12 align 4 minimum -1000 maximum 1000 step 10
     }
     Fl_Counter cntBFO {
       label BFO
       callback {cbBFO();}
-      xywh {261 138 70 18} type Simple labelsize 12 align 4 minimum 0 maximum 1000 step 10 value 600
+      xywh {212 138 65 18} type Simple labelsize 12 align 4 minimum 0 maximum 1000 step 10 value 600
+    }
+    Fl_Light_Button btnSplit {
+      label Split
+      callback {progStatus.split = o->value();}
+      tooltip {Rx-1 / Tx-2} xywh {282 138 55 18} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
+      code0 {o->value(progStatus.split);}
     }
     Fl_Button btnInitializing {
       label {Initializing
 
-Please wait}
+Please wait} selected
       xywh {0 25 340 135} box FLAT_BOX color 206 labelfont 1 labelsize 24
     }
   }
@@ -812,7 +818,7 @@ Function {make_TT550()} {open
 } {
   Fl_Window {} {
     label {TT550 Setup} open
-    xywh {519 75 340 370} type Double align 0 visible
+    xywh {519 77 340 370} type Double align 0 visible
   } {
     Fl_Group {} {
       label CW open
@@ -991,7 +997,7 @@ cb_tt550_setXmtBW();} open
       Fl_Check_Button btn_tt550_use_xmt_bw {
         label Enable
         callback {progStatus.tt550_use_xmt_bw = o->value();
-cb_tt550_setXmtBW();} selected
+cb_tt550_setXmtBW();}
         xywh {215 284 26 15} down_box DOWN_BOX
         code0 {o->value(progStatus.tt550_use_xmt_bw);}
       }

@@ -424,7 +424,7 @@ void cbABactive()
 	if (vfoA.imode != vfoB.imode)
 		send_mode_changed();
 		send_sideband();
-	if (bws_changed) {
+	if (vfoA.iBW != vfoB.iBW) {
 		send_bandwidths();
 		send_bandwidth_changed();
 	}
@@ -435,10 +435,6 @@ void cbABactive()
 
 void cbA2B()
 {
-	if (Fl::event_button() == FL_RIGHT_MOUSE) {
-		cbABactive();
-		return;
-	}
 	vfoB.freq = FreqDisp->value();
 	vfoB.imode = opMODE->index();
 	vfoB.iBW = opBW->index();
@@ -523,8 +519,7 @@ void cbRIT()
 
 void cbXIT()
 {
-	if (selrig->has_xit)
-		selrig->setXit((int)cntXIT->value());
+	selrig->setXit((int)cntXIT->value());
 }
 
 void cbBFO()
@@ -979,15 +974,14 @@ void cbALC_SWR()
 void adjust_control_positions()
 {
 	int y = 118;
-	if (selrig->has_rit || selrig->has_xit || selrig->has_bfo) {
-		y += 20;
-		cntRIT->position( cntRIT->x(), y );
-		cntXIT->position( cntXIT->x(), y );
-		cntBFO->position( cntBFO->x(), y );
-		cntRIT->redraw();
-		cntXIT->redraw();
-		cntBFO->redraw();
-	}
+	y += 20;
+	cntRIT->position( cntRIT->x(), y );
+	cntXIT->position( cntXIT->x(), y );
+	cntBFO->position( cntBFO->x(), y );
+	btnSplit->position( btnSplit->x(), y);
+	cntRIT->redraw();
+	cntXIT->redraw();
+	cntBFO->redraw();
 	if (selrig->has_volume_control) {
 		y += 20;
 		sldrVOLUME->position( sldrVOLUME->x(), y );
@@ -1211,36 +1205,26 @@ void initRig()
 	if (selrig->has_vfo_adj) {
 		cnt_vfo_adj->value(progStatus.vfo_adj);
 		cnt_vfo_adj->activate();
-	} else {
+	} else
 		cnt_vfo_adj->deactivate();
-	}
 
 	if (selrig->has_rit) {
 		cntRIT->value(progStatus.rit_freq);
 		cntRIT->activate();
-		cntRIT->show();
-	} else {
+	} else
 		cntRIT->deactivate();
-		cntRIT->hide();
-	}
 
 	if (selrig->has_xit) {
 		cntXIT->value(progStatus.xit_freq);
 		cntXIT->activate();
-		cntXIT->show();
-	} else {
-		cntXIT->deactivate();
-		cntXIT->hide();
 	}
+		cntXIT->deactivate();
 
 	if (selrig->has_bfo) {
 		cntBFO->value(progStatus.bfo_freq);
 		cntBFO->activate();
-		cntBFO->show();
-	} else {
+	} else
 		cntBFO->deactivate();
-		cntBFO->hide();
-	}
 
 	if (selrig->has_volume_control) {
 		progStatus.volume = selrig->get_volume_control();
