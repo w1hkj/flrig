@@ -26,13 +26,7 @@ const char *IC746modes_[] = {
 const char IC746_mode_type[] =
 	{ 'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U'};
 
-const char *IC746_widths[] = {
-  "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
-"600",   "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
-"1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
-"2600", "2700", "2800", "2900", "3000", "3100", "3200", "3300", "3400", "3500",
-"3600",
-NULL};
+const char *IC746_widths[] = { "NARR", "WIDE", NULL};
 
 const char *IC746_AMFMwidths[] = { "FILT-1", "FILT-2", "FILT-3", NULL };
 
@@ -570,11 +564,11 @@ int RIG_IC746::get_mode()
 
 void RIG_IC746::set_bandwidth(int val)
 {
-	if (bandwidths_ == IC746_AMFMwidths) {
-		filter_nbr = val + 1;
-		set_mode(mode_);
-		return;
-	}
+//	if (bandwidths_ == IC746_AMFMwidths) {
+//		filter_nbr = val + 1;
+//		set_mode(mode_);
+//		return;
+//	}
 
 	bw_ = val;
 	cmd = pre_to;
@@ -602,20 +596,22 @@ int  RIG_IC746::get_bandwidth()
 
 int RIG_IC746::adjust_bandwidth(int m)
 {
-	if (m == 0 || m == 1 || m == 8 || m == 9) { //SSB
-		bandwidths_ = IC746_widths;
-		return (bw_ = 32);
-	}
-	if (m == 3 || m == 6) { //CW
-		bandwidths_ = IC746_widths;
-		return (bw_ = 14);
-	}
-	if (m == 4 || m == 7) { //RTTY
-		bandwidths_ = IC746_widths;
-		return (bw_ = 28);
-	}
-	bandwidths_ = IC746_AMFMwidths;
-	return (bw_ = 0);
+	bandwidths_ = IC746_widths;
+	return bw_ = 1;
+//	if (m == 0 || m == 1 || m == 8 || m == 9) { //SSB
+//		bandwidths_ = IC746_widths;
+//		return (bw_ = 1);
+//	}
+//	if (m == 3 || m == 6) { //CW
+//		bandwidths_ = IC746_widths;
+//		return (bw_ = 14);
+//	}
+//	if (m == 4 || m == 7) { //RTTY
+//		bandwidths_ = IC746_widths;
+//		return (bw_ = 28);
+//	}
+//	bandwidths_ = IC746_AMFMwidths;
+//	return (bw_ = 0);
 }
 
 
