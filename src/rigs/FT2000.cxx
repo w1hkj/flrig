@@ -74,9 +74,9 @@ RIG_FT2000::RIG_FT2000() {
 bool RIG_FT2000::sendFTcommand(string cmd, int retnbr, bool loghex)
 {
 	bool ret = sendCommand(cmd, retnbr, loghex);
-	LOG_INFO("%s", cmd.c_str());
+	LOG_INFO("cmd:   %s", cmd.c_str());
 	if (retnbr)
-		LOG_INFO("%s", replybuff);
+		LOG_INFO("reply: %s", replybuff);
 	return ret;
 }
 
