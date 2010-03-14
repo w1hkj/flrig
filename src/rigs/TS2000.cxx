@@ -374,7 +374,6 @@ int RIG_TS2000::get_modetype(int n)
 void RIG_TS2000::set_mic_gain(int val)
 {
 	cmd = "MG000;";
-	val = (int)(val * 2.55); // convert to 0 .. 255
 	for (int i = 3; i > 0; i--) {
 		cmd[1+i] += val % 10;
 		val /= 10;
