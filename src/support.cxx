@@ -1227,6 +1227,11 @@ void initRig()
 		cntBFO->deactivate();
 
 	if (selrig->has_volume_control) {
+		int min, max, step;
+		selrig->get_vol_min_max_step(min, max, step);
+		sldrVOLUME->minimum(min);
+		sldrVOLUME->maximum(max);
+		sldrVOLUME->step(step);
 		progStatus.volume = selrig->get_volume_control();
 		sldrVOLUME->value(progStatus.volume);
 		if (progStatus.spkr_on == 0) {

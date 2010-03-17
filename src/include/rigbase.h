@@ -134,6 +134,8 @@ public:
 	virtual void get_pc_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 100; step = 1; }
 	virtual int  get_volume_control() {return 0;}
+	virtual void get_vol_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 100; step = 1; }
 	virtual void set_volume_control(int val) {}
 	virtual void set_PTT_control(int val) {}
 	virtual void tune_rig() {}
