@@ -136,21 +136,25 @@ int RIG_FT450::get_volume_control()
 	cmd = "AG0;";
 	if (sendCommand(cmd, 7, false))  {
 		cmd[6] = 0;
-		int val = atoi(&replybuff[3]);
-		return (int)(val / 2.55);
+		return atoi(&replybuff[3]);
 	}
 	return 0;
 }
 
 void RIG_FT450::set_volume_control(int val) 
 {
-	int ivol = (int)(val * 2.55);
+	int ivol = val;
 	cmd = "AG0000;";
 	for (int i = 5; i > 2; i--) {
 		cmd[i] += ivol % 10;
 		ivol /= 10;
 	}
 	sendCommand(cmd, 0, false);
+}
+
+void RIG_FT450::get_vol_min_max_step(int &min, int &max, int &step)
+{
+	min = 0; max = 255; step = 1;
 }
 
 // Transceiver power level
