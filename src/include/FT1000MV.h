@@ -1,13 +1,13 @@
-#ifndef FT897DMV_H
-#define FT897DMV_H
+#ifndef FT1000MV_H
+#define FT1000MV_H
 
 #include "rigbase.h"
 
-class RIG_FT897D : public rig_base {
-public:
-	RIG_FT897D();
-	~RIG_FT897D(){};
 
+class RIG_FT1000MV : public rigbase {
+public :
+	RIG_FT1000MV();
+	~RIG_FT1000MV() {};
 	long get_vfoA();
 	void set_vfoA(long);
 	void set_PTT_control(int val);
@@ -19,12 +19,6 @@ public:
 
 private:
 	void init_cmd();
-};
-
-class RIG_FT1000MV : public RIG_FT897D{
-public :
-	RIG_FT1000MV();
-	~RIG_FT1000MV() {};
 };
 
 #endif
