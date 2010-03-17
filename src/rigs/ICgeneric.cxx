@@ -26,9 +26,7 @@ const char *IC746modes_[] = {
 const char IC746_mode_type[] =
 	{ 'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U'};
 
-const char *IC746_widths[] = { "NARR", "WIDE", NULL};
-
-const char *IC746_AMFMwidths[] = { "FILT-1", "FILT-2", "FILT-3", NULL };
+const char *IC746_widths[] = { "NORM", "NARR", NULL};
 
 RIG_IC746::RIG_IC746() {
 	name_ = IC746name_;
@@ -49,10 +47,11 @@ RIG_IC746::RIG_IC746() {
 	comm_rtsptt = false;
 	comm_dtrptt = false;
 	mode_ = 1;
-	bw_ = 28;
+	bw_ = 0;
 	deffreq_ = 14070000L;
 	def_mode = 1;
-	defbw_ = 28;
+	defbw_ = 0;
+	filter_nbr = 1;
 
 	has_power_control = true;
 	has_volume_control = true;
@@ -102,6 +101,8 @@ const char *IC746PRO_RTTYwidths[] = {
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
 "2600", "2700",
 NULL};
+
+const char *IC746PRO_AMFMwidths[] = { "FILT-1", "FILT-2", "FILT-3", NULL };
 
 RIG_IC746PRO::RIG_IC746PRO() {
 	name_ = IC746PROname_;
@@ -321,29 +322,11 @@ int RIG_IC746::get_smeter()
 		return 0;
 }
 
-int RIG_IC746::get_swr()
-{
-	cmd = pre_to;
-	cmd.append("\x15\x12");
-	cmd.append( post );
-	sendICcommand (cmd, 9);
-	return fm_bcd(&replystr[6],3) / 3.6;
-}
-
-int RIG_IC746::get_alc()
-{
-	cmd = pre_to;
-	cmd.append("\x15\x13");
-	cmd.append( post );
-	sendICcommand (cmd, 9);
-	return fm_bcd(&replystr[6],3);
-}
-
 // Volume control val 0 ... 100
 int ICvol = 0;
 void RIG_IC746::set_volume_control(int val)
 {
-	ICvol = (int)(val * 2.55);
+	ICvol = (int)(val);
 	cmd = pre_to;
 	cmd.append("\x14\x01");
 	cmd.append(to_bcd(ICvol, 3));
@@ -358,32 +341,14 @@ int RIG_IC746::get_volume_control()
 	cmd.append("\x14\x01");
 	cmd.append( post );
 	if(sendICcommand (cmd, 9))
-		return ((int)(fm_bcd(&replystr[6],3) / 2.55));
+		return ((int)(fm_bcd(&replystr[6],3)));
 	checkresponse(9);
-	return ICvol / 2.55;
+	return ICvol;
 }
 
-// Transceiver power level return power in watts
-int RIG_IC746::get_power_out()
+void RIG_IC746::get_vol_min_max_step(int &min, int &max, int &step)
 {
-	cmd = pre_to;
-	cmd.append("\x15\x11");
-	cmd.append( post );
-	if (sendICcommand (cmd, 9)) {
-		int pwr = (int)(fm_bcd(&replystr[6],3) / 2.55 );
-		return pwr;
-	}
-	return 0;
-}
-
-int RIG_IC746::get_power_control()
-{
-	cmd = pre_to;
-	cmd.append("\x14\x0A");
-	cmd.append( post );
-	if(sendICcommand (cmd, 9))
-		return (int)(fm_bcd(&replystr[6],3) / 2.55);
-	return 0;
+	min = 0; max = 255; step = 1;
 }
 
 // Tranceiver PTT on/off
@@ -393,15 +358,6 @@ void RIG_IC746::set_PTT_control(int val)
 	cmd += '\x1c';
 	cmd += '\x00';
 	cmd += (unsigned char) val;
-	cmd.append( post );
-	sendICcommand (cmd, 6);
-	checkresponse(6);
-}
-
-void RIG_IC746::tune_rig()
-{
-	cmd = pre_to;
-	cmd.append("\x1c\x01\x02");
 	cmd.append( post );
 	sendICcommand (cmd, 6);
 	checkresponse(6);
@@ -564,19 +520,8 @@ int RIG_IC746::get_mode()
 
 void RIG_IC746::set_bandwidth(int val)
 {
-//	if (bandwidths_ == IC746_AMFMwidths) {
-//		filter_nbr = val + 1;
-//		set_mode(mode_);
-//		return;
-//	}
-
-	bw_ = val;
-	cmd = pre_to;
-	cmd.append("\x1A\x03");
-	cmd.append(to_bcd(val, 2));
-	cmd.append( post );
-	sendICcommand(cmd, 6);
-	checkresponse(6);
+	filter_nbr = val + 1;
+	set_mode(mode_);
 }
 
 int RIG_IC746::get_modetype(int n)
@@ -584,89 +529,9 @@ int RIG_IC746::get_modetype(int n)
 	return _mode_type[n];
 }
 
-int  RIG_IC746::get_bandwidth()
+int RIG_IC746::get_bandwidth()
 {
-	cmd = pre_to;
-	cmd += "\x1A\x03";
-	cmd.append( post );
-	if (sendICcommand(cmd, 8))
-		bw_ = (fm_bcd(&replystr[6],2));
-	return bw_;
-}
-
-int RIG_IC746::adjust_bandwidth(int m)
-{
-	bandwidths_ = IC746_widths;
-	return bw_ = 1;
-//	if (m == 0 || m == 1 || m == 8 || m == 9) { //SSB
-//		bandwidths_ = IC746_widths;
-//		return (bw_ = 1);
-//	}
-//	if (m == 3 || m == 6) { //CW
-//		bandwidths_ = IC746_widths;
-//		return (bw_ = 14);
-//	}
-//	if (m == 4 || m == 7) { //RTTY
-//		bandwidths_ = IC746_widths;
-//		return (bw_ = 28);
-//	}
-//	bandwidths_ = IC746_AMFMwidths;
-//	return (bw_ = 0);
-}
-
-
-bool IC_notchon = false;
-void RIG_IC746::set_notch(bool on, int val)
-{
-	int notch = (int)(val/20.0 + 128);
-	if (notch > 256) notch = 255;
-	if (on != IC_notchon) {
-		cmd = pre_to;
-		cmd.append("\x16\x48");
-		cmd += on ? '\x01' : '\x00';
-		cmd.append(post);
-		sendICcommand(cmd,6);
-		checkresponse(6);
-		IC_notchon = on;
-	}
-
-	if (on) {
-		cmd = pre_to;
-		cmd.append("\x14\x0D");
-		cmd.append(to_bcd(notch,3));
-		cmd.append(post);
-		sendICcommand(cmd,6);
-		checkresponse(6);
-	}
-
-}
-
-bool RIG_IC746::get_notch(int &val)
-{
-	bool on = false;
-	val = 0;
-	cmd = pre_to;
-	cmd.append("\x16\x48");
-	cmd.append(post);
-	if (sendICcommand(cmd,8)) {
-		on = replystr[6] ? 1 : 0;
-		cmd = pre_to;
-		cmd.append("\x14\x0D");
-		cmd.append(post);
-		if (sendICcommand(cmd,9))
-			val = 20*(fm_bcd(&replystr[6],3) - 128);
-		else
-			checkresponse(9);
-		return on;
-	}
-	return on;
-}
-
-void RIG_IC746::get_notch_min_max_step(int &min, int &max, int &step)
-{
-	min = -1280;
-	max = 1280;
-	step = 20;
+	return filter_nbr - 1;
 }
 
 void RIG_IC746::set_mic_gain(int val)
@@ -678,17 +543,6 @@ void RIG_IC746::set_mic_gain(int val)
 	cmd.append(post);
 	sendICcommand(cmd, 6);
 	checkresponse(6);
-}
-
-int RIG_IC746::get_mic_gain()
-{
-	cmd = pre_to;
-	cmd.append("\x14\x0B");
-	cmd.append(post);
-	if (sendICcommand (cmd, 9))
-		return ((int)(fm_bcd(&replystr[6],3) / 2.55));
-	checkresponse(9);
-	return 0;
 }
 
 void RIG_IC746::get_mic_gain_min_max_step(int &min, int &max, int &step)
@@ -716,19 +570,6 @@ void RIG_IC746::set_if_shift(int val)
 	checkresponse(6);
 }
 
-bool RIG_IC746::get_if_shift(int val)
-{
-	val = 0;
-	cmd = pre_to;
-	cmd.append("\x14\x07");
-	cmd.append(post);
-	if (sendICcommand(cmd,9)) {
-		val = (int)((fm_bcd(&replystr[6],3) - 128) * 50 / 128.0);
-		return true;
-	}
-	return false;
-}
-
 void RIG_IC746::get_if_min_max_step(int &min, int &max, int &step)
 {
 	min = -50;
@@ -748,18 +589,6 @@ void RIG_IC746::set_squelch(int val)
 	checkresponse(6);
 }
 
-int  RIG_IC746::get_squelch()
-{
-	cmd = pre_to;
-	cmd.append("\x14\x03");
-	cmd.append( post );
-	if(sendICcommand (cmd, 9))
-		return ((int)(fm_bcd(&replystr[6],3) / 2.55));
-	checkresponse(9);
-	return ICvol;
-	return 0;
-}
-
 int ICrfg = 0;
 void RIG_IC746::set_rf_gain(int val)
 {
@@ -772,18 +601,6 @@ void RIG_IC746::set_rf_gain(int val)
 	checkresponse(6);
 }
 
-int  RIG_IC746::get_rf_gain()
-{
-	cmd = pre_to;
-	cmd.append("\x14\x02");
-	cmd.append( post );
-	if(sendICcommand (cmd, 9))
-		return ((int)(fm_bcd(&replystr[6],3) / 2.55));
-	checkresponse(9);
-	return ICvol;
-	return 0;
-}
-
 void RIG_IC746::set_power_control(double val)
 {
 	cmd = pre_to;
@@ -793,6 +610,54 @@ void RIG_IC746::set_power_control(double val)
 	sendICcommand (cmd, 6);
 	checkresponse(6);
 }
+
+//int RIG_IC746::get_mic_gain()
+//{
+//	cmd = pre_to;
+//	cmd.append("\x14\x0B");
+//	cmd.append(post);
+//	if (sendICcommand (cmd, 9))
+//		return ((int)(fm_bcd(&replystr[6],3) / 2.55));
+//	checkresponse(9);
+//	return 0;
+//}
+
+//bool RIG_IC746::get_if_shift(int val)
+//{
+//	val = 0;
+//	cmd = pre_to;
+//	cmd.append("\x14\x07");
+//	cmd.append(post);
+//	if (sendICcommand(cmd,9)) {
+//		val = (int)((fm_bcd(&replystr[6],3) - 128) * 50 / 128.0);
+//		return true;
+//	}
+//	return false;
+//}
+
+//int  RIG_IC746::get_squelch()
+//{
+//	cmd = pre_to;
+//	cmd.append("\x14\x03");
+//	cmd.append( post );
+//	if(sendICcommand (cmd, 9))
+//		return ((int)(fm_bcd(&replystr[6],3) / 2.55));
+//	checkresponse(9);
+//	return ICvol;
+//	return 0;
+//}
+
+//int  RIG_IC746::get_rf_gain()
+//{
+//	cmd = pre_to;
+//	cmd.append("\x14\x02");
+//	cmd.append( post );
+//	if(sendICcommand (cmd, 9))
+//		return ((int)(fm_bcd(&replystr[6],3) / 2.55));
+//	checkresponse(9);
+//	return ICvol;
+//	return 0;
+//}
 
 //======================================================================
 // IC746PRO unique commands
@@ -872,8 +737,80 @@ int RIG_IC746PRO::adjust_bandwidth(int m)
 		bandwidths_ = IC746PRO_RTTYwidths;
 		return (bw_ = 28);
 	}
-	bandwidths_ = IC746_AMFMwidths;
+	bandwidths_ = IC746PRO_AMFMwidths;
+	filter_nbr = 1;
 	return (bw_ = 0);
+}
+
+int RIG_IC746PRO::get_swr()
+{
+	cmd = pre_to;
+	cmd.append("\x15\x12");
+	cmd.append( post );
+	sendICcommand (cmd, 9);
+	return fm_bcd(&replystr[6],3) / 3.6;
+}
+
+int RIG_IC746PRO::get_alc()
+{
+	cmd = pre_to;
+	cmd.append("\x15\x13");
+	cmd.append( post );
+	sendICcommand (cmd, 9);
+	return fm_bcd(&replystr[6],3);
+}
+
+// Transceiver power level return power in watts
+int RIG_IC746PRO::get_power_out()
+{
+	cmd = pre_to;
+	cmd.append("\x15\x11");
+	cmd.append( post );
+	if (sendICcommand (cmd, 9)) {
+		int pwr = (int)(fm_bcd(&replystr[6],3) / 2.55 );
+		return pwr;
+	}
+	return 0;
+}
+
+void RIG_IC746PRO::tune_rig()
+{
+	cmd = pre_to;
+	cmd.append("\x1c\x01\x02");
+	cmd.append( post );
+	sendICcommand (cmd, 6);
+	checkresponse(6);
+}
+
+void RIG_IC746PRO::set_bandwidth(int val)
+{
+	if (bandwidths_ == IC746PRO_AMFMwidths) {
+		filter_nbr = val + 1;
+		set_mode(mode_);
+		return;
+	}
+
+	bw_ = val;
+	cmd = pre_to;
+	cmd.append("\x1A\x03");
+	cmd.append(to_bcd(val, 2));
+	cmd.append( post );
+	sendICcommand(cmd, 6);
+	checkresponse(6);
+}
+
+int  RIG_IC746PRO::get_bandwidth()
+{
+	if (bandwidths_ == IC746PRO_AMFMwidths) {
+		bw_ = filter_nbr - 1;
+		return bw_;
+	}
+	cmd = pre_to;
+	cmd += "\x1A\x03";
+	cmd.append( post );
+	if (sendICcommand(cmd, 8))
+		bw_ = (fm_bcd(&replystr[6],2));
+	return bw_;
 }
 
 int RIG_IC746PRO::get_attenuator()
@@ -895,6 +832,60 @@ void RIG_IC746PRO::set_attenuator(int val)
 	cmd.append( post );
 	sendICcommand(cmd,6);
 	checkresponse(6);
+}
+
+bool IC_notchon = false;
+void RIG_IC746PRO::set_notch(bool on, int val)
+{
+	int notch = (int)(val/20.0 + 128);
+	if (notch > 256) notch = 255;
+	if (on != IC_notchon) {
+		cmd = pre_to;
+		cmd.append("\x16\x48");
+		cmd += on ? '\x01' : '\x00';
+		cmd.append(post);
+		sendICcommand(cmd,6);
+		checkresponse(6);
+		IC_notchon = on;
+	}
+
+	if (on) {
+		cmd = pre_to;
+		cmd.append("\x14\x0D");
+		cmd.append(to_bcd(notch,3));
+		cmd.append(post);
+		sendICcommand(cmd,6);
+		checkresponse(6);
+	}
+
+}
+
+bool RIG_IC746PRO::get_notch(int &val)
+{
+	bool on = false;
+	val = 0;
+	cmd = pre_to;
+	cmd.append("\x16\x48");
+	cmd.append(post);
+	if (sendICcommand(cmd,8)) {
+		on = replystr[6] ? 1 : 0;
+		cmd = pre_to;
+		cmd.append("\x14\x0D");
+		cmd.append(post);
+		if (sendICcommand(cmd,9))
+			val = 20*(fm_bcd(&replystr[6],3) - 128);
+		else
+			checkresponse(9);
+		return on;
+	}
+	return on;
+}
+
+void RIG_IC746PRO::get_notch_min_max_step(int &min, int &max, int &step)
+{
+	min = -1280;
+	max = 1280;
+	step = 20;
 }
 
 //======================================================================
