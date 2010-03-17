@@ -13,6 +13,8 @@
 #include "FT817.h"
 #include "FT857D.h"
 #include "FT950.h"
+#include "FT1000.h"
+#include "FT1000MV.h"
 #include "FT2000.h"
 #include "IC706MKIIG.h"
 #include "IC728.h"
@@ -37,6 +39,8 @@ RIG_FT817		rig_FT817;
 RIG_FT857D		rig_FT857D;
 RIG_FT897D		rig_FT897D;
 RIG_FT950		rig_FT950;
+RIG_FT1000		rig_FT1000;
+RIG_FT1000MV	rig_FT1000MV;
 RIG_FT2000		rig_FT2000;
 RIG_IC706MKIIG	rig_IC706MKIIG;
 RIG_IC728		rig_IC728;
@@ -69,6 +73,8 @@ rigbase *rigs[] = {
 	&rig_FT857D,
 	&rig_FT897D,
 	&rig_FT950,
+	&rig_FT1000,
+	&rig_FT1000MV,
 	&rig_FT2000,
 	&rig_IC706MKIIG,
 	&rig_IC728,
