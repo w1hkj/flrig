@@ -401,7 +401,6 @@ bool status::loadXcvrState(const char *xcvr)
 			spref.get("tt550_cw_qsk", tt550_cw_qsk, tt550_cw_qsk);
 			if (spref.get("tt550_enable_keyer", i, i)) tt550_enable_keyer = i;
 
-
 			if (spref.get("tt550_vox_onoff", i, i)) tt550_vox_onoff = i;
 			spref.get("tt550_vox_gain", tt550_vox_gain, tt550_vox_gain);
 			spref.get("tt550_vox_anti", tt550_vox_anti, tt550_vox_anti);
