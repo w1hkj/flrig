@@ -68,7 +68,7 @@ static char TT538getFREQA[]		= "?A\r";
 //static char TT538getFWDPWR[]	= "?F\r";
 //static char TT538getAGC[]		= "?G\r";
 //static char TT538getSQLCH[]		= "?H\r";
-//static char TT538getRF[]		= "?I\r";
+static char TT538getRF[]		= "?I\r";
 static char TT538getATT[]		= "?J\r";
 //static char TT538getNB[]		= "?K\r";
 static char TT538getMODE[]		= "?M\r";
@@ -143,7 +143,7 @@ void RIG_TT538::checkresponse(string s)
 
 void RIG_TT538::showresponse(string s)
 {
-	printf("%s: %s\n", s.c_str(),str2hex((char *)replybuff, strlen((char *)replybuff)));
+	printf("%s : %s\n", s.c_str(), str2hex(replystr.c_str(), replystr.length()));
 }
 
 void RIG_TT538::initialize()
@@ -294,33 +294,64 @@ int RIG_TT538::get_smeter()
 	return (int)(sig * 50.0 / 9.0);
 }
 
+static int gaintable[] = {
+0, 2, 3, 4, 6, 7, 8, 9, 11, 12,
+13, 14, 16, 17, 18, 19, 21, 22, 23, 24,
+26, 27, 28, 30, 31, 32, 33, 35, 36, 37,
+38, 40, 41, 42, 43, 45, 46, 47, 48, 50,
+51, 52, 53, 55, 56, 57, 58, 60, 61, 62,
+64, 65, 66, 68, 69, 70, 71, 72, 74, 75,
+76, 77, 79, 80, 81, 82, 84, 85, 86, 88,
+89, 90, 91, 92, 94, 95, 96, 98, 99, 100,
+101, 103, 104, 105, 107, 108, 109, 110, 111, 113,
+114, 115, 117, 118, 119, 120, 121, 123, 127, 125, 127 };
+
+static int pot2val(int n)
+{
+	int i = 0;
+	for (i = 0; i < 100; i++)
+		if (gaintable[i] >= n) break;
+	return gaintable[i];
+}
+
+static int val2pot(int n)
+{
+	return gaintable[n];
+}
+
 int RIG_TT538::get_volume_control()
 {
 	cmd = TT538getVOL;
 	sendCommand(cmd, 3, true);
-	if (replybuff[0] == 'U')
-		return (int)((replybuff[1] & 0x7F) / 1.27);
+	if (replybuff[0] == 'U') {
+		return  pot2val(replybuff[1] & 0x7F);
+	}
 	return 0;
 }
 
 void RIG_TT538::set_volume_control(int vol)
 {
 	cmd = TT538setVOL;
-	cmd[2] = 0x7F & (int)(vol * 1.27);
+	cmd[2] = val2pot(vol);
 	sendCommand(cmd, 0, true);
 }
 
 void RIG_TT538::set_rf_gain(int val)
 {
 	cmd = TT538setRF;
-	cmd[2] = 0x7F & (int)(val * 1.27);
+	cmd[2] = val2pot(val);
 	sendCommand(cmd, 0, true);
 }
 
 int  RIG_TT538::get_rf_gain()
 {
+//	cmd = TT538getRF;
+//	sendCommand(cmd, 3, true);
+//showresponse(cmd);
 	return 100; 
 // Jupiter does not reply with values as specified in the programmers manual
+// Panel RF gain 0..50% replies with 80H..00H
+// Panel RF gain 50..100% replies with 00H
 }
 
 // Tranceiver PTT on/off
