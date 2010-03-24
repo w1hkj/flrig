@@ -51,6 +51,8 @@
 
 #include "flrig_icon.cxx"
 
+int parse_args(int argc, char **argv, int& idx);
+
 Fl_Double_Window *mainwindow;
 string RigHomeDir;
 string TempDir;
@@ -62,6 +64,9 @@ pthread_t *digi_thread = 0;
 
 pthread_mutex_t mutex_serial = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_xmlrpc = PTHREAD_MUTEX_INITIALIZER;
+
+bool RIG_DEBUG = 0;
+bool XML_DEBUG = 0;
 
 //----------------------------------------------------------------------
 void about()
@@ -218,20 +223,8 @@ int main (int argc, char *argv[])
 {
 	std::terminate_handler(flrig_terminate);
 
-	if (argc > 1) {
-		if (strcasecmp("--help", argv[1]) == 0) {
-			printf("\
-  --help this help text\n\
-  --version\n\
-\n\
-  Usage: flrig\n");
-			return 0;
-		} 
-		if (strcasecmp("--version", argv[1]) == 0) {
-			printf("Version: "VERSION"\n");
-			return 0;
-		}
-	}
+	int arg_idx;
+	Fl::args(argc, argv, arg_idx, parse_args);
 
 	mainwindow = Rig_window();
 	mainwindow->callback(exit_main);
@@ -304,7 +297,7 @@ int main (int argc, char *argv[])
 	mainwindow->icon((char *)Rig_icon_pixmap);
 	mainwindow->show(argc, argv);
 #else
-	mainwindow->show();
+	mainwindow->show(argc, argv);
 #endif
 
 	Fl::add_timeout(0.250, startup);
@@ -313,3 +306,36 @@ int main (int argc, char *argv[])
 
 }
 
+int parse_args(int argc, char **argv, int& idx)
+{
+	if (strcasecmp("--help", argv[1]) == 0) {
+		printf("Usage: \n\
+  --help this help text\n\
+  --version\n\
+  --debug\n\
+  --rig_debug\n\
+  --xml_debug\n\n");
+		exit(0);
+	} 
+	if (strcasecmp("--version", argv[1]) == 0) {
+		printf("Version: "VERSION"\n");
+		exit (0);
+	}
+	if (strcasecmp("--rig_debug", argv[1]) == 0) {
+		RIG_DEBUG = 1;
+		idx++;
+		return 1;
+	}
+	if (strcasecmp("--xml_debug", argv[1]) == 0) {
+		XML_DEBUG = 1;
+		idx++;
+		return 1;
+	}
+	if (strcasecmp("--debug", argv[1]) == 0) {
+		RIG_DEBUG = 1;
+		XML_DEBUG = 1;
+		idx++;
+		return 1;
+	}
+	return 0;
+}

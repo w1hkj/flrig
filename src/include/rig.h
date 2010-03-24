@@ -42,4 +42,7 @@ extern pthread_t *digi_thread;
 extern pthread_mutex_t mutex_serial;
 extern pthread_mutex_t mutex_xmlrpc;
 
+extern bool RIG_DEBUG;
+extern bool XML_DEBUG;
+
 #endif

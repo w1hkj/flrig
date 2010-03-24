@@ -12,7 +12,6 @@
 #include "debug.h"
 #include "support.h"
 
-
 //=============================================================================
 // IC-746
 //
@@ -144,9 +143,18 @@ RIG_IC756PRO3::RIG_IC756PRO3() {
 
 const char IC7000name_[] = "IC-7000";
 
+const char *IC7000modes_[] = {
+		"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R", NULL};
+
+const char IC7000_mode_type[] =
+	{ 'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U' };
+
 RIG_IC7000::RIG_IC7000() {
 	name_ = IC7000name_;
+	modes_ = IC7000modes_;
+	_mode_type = IC7000_mode_type;
 	pre_to[2] = ok[3] = bad[3] = pre_fm[3] = 0x70;
+	restore_mbw = false;
 };
 
 //=============================================================================
@@ -262,30 +270,33 @@ void RIG_ICOM::checkresponse(int n)
 
 bool RIG_ICOM::sendICcommand(string cmd, int nbr)
 {
-	for (int i = 0; i < progStatus.comm_retries; i++) {
-		if (i) clearSerialPort();
-		if (sendCommand(cmd, nbr, true) != nbr) {
-			if (RigSerial.IsOpen())
+	if (RigSerial.IsOpen()) {
+		for (int i = 0; i < progStatus.comm_retries; i++) {
+			if (i) clearSerialPort();
+			if (sendCommand(cmd, nbr, true) != nbr) {
 				LOG_ERROR("sendCommand() failed");
-			continue;
-		}
+				continue;
+			}
 
 // look for preamble at beginning
-//		LOG_INFO("got %s", str2hex(replystr.c_str(), replystr.length()));
-		if (replystr.find(pre_fm) == string::npos)  {
-			LOG_ERROR("preamble");
-			continue;
-		}
+			if (replystr.find(pre_fm) == string::npos)  {
+				LOG_ERROR("preamble");
+				continue;
+			}
 
 // look for postamble
-		if (replystr.find(post) == string::npos) {
-			LOG_ERROR("postample 0x%X", (unsigned char)post[0]);
-			continue;
+			if (replystr.find(post) == string::npos) {
+				LOG_ERROR("postample 0x%X", (unsigned char)post[0]);
+				continue;
+			}
+			return true;
 		}
-		return true;
+		LOG_ERROR("Exceeded retry count");
+		return false;
+	} else {
+		sendCommand(cmd, nbr, true);
+		return false;
 	}
-	LOG_ERROR("Exceeded retry count");
-
 	return false;
 }
 
@@ -309,6 +320,8 @@ void RIG_IC746::set_vfoA (long freq)
 	cmd.append( post );
 	sendICcommand(cmd, 6);
 	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 int RIG_IC746::get_smeter()
@@ -333,6 +346,8 @@ void RIG_IC746::set_volume_control(int val)
 	cmd.append( post );
 	sendICcommand (cmd, 6);
 	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 int RIG_IC746::get_volume_control()
@@ -361,6 +376,8 @@ void RIG_IC746::set_PTT_control(int val)
 	cmd.append( post );
 	sendICcommand (cmd, 6);
 	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 void RIG_IC746::set_attenuator(int val)
@@ -376,6 +393,8 @@ void RIG_IC746::set_attenuator(int val)
 		if (preamp_level < 0) preamp_level = 2;
 		set_preamp(1);
 	}
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 int RIG_IC746::get_attenuator()
@@ -407,6 +426,8 @@ void RIG_IC746::set_preamp(int val)
 	cmd.append( post );
 	sendICcommand (cmd, 6);
 	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 int RIG_IC746::get_preamp()
@@ -439,6 +460,8 @@ void RIG_IC746::set_noise(bool val)
 	cmd.append(post);
 	sendICcommand(cmd, 6);
 	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 int RIG_IC746::get_noise()
@@ -459,6 +482,8 @@ void RIG_IC746::set_noise_reduction(int val)
 	cmd.append(post);
 	sendICcommand(cmd, 6);
 	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 int RIG_IC746::get_noise_reduction()
@@ -480,6 +505,8 @@ void RIG_IC746::set_noise_reduction_val(int val)
 	cmd.append(post);
 	sendICcommand(cmd,6);
 	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 int RIG_IC746::get_noise_reduction_val()
@@ -503,6 +530,8 @@ void RIG_IC746::set_mode(int val)
 	cmd.append( post );
 	sendICcommand (cmd, 6);
 	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 int RIG_IC746::get_mode()
@@ -522,6 +551,8 @@ void RIG_IC746::set_bandwidth(int val)
 {
 	filter_nbr = val + 1;
 	set_mode(mode_);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 int RIG_IC746::get_modetype(int n)
@@ -543,6 +574,8 @@ void RIG_IC746::set_mic_gain(int val)
 	cmd.append(post);
 	sendICcommand(cmd, 6);
 	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 void RIG_IC746::get_mic_gain_min_max_step(int &min, int &max, int &step)
@@ -560,13 +593,18 @@ void RIG_IC746::set_if_shift(int val)
 	cmd.append("\x14\x07");
 	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
-	if (sendICcommand(cmd,6)) {
-		cmd = pre_to;
-		cmd.append("\x14\x08");
-		cmd.append(to_bcd(shift, 3));
-		cmd.append(post);
-		sendICcommand(cmd,6);
-	}
+	sendICcommand(cmd,6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+	checkresponse(6);
+
+	cmd = pre_to;
+	cmd.append("\x14\x08");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	sendICcommand(cmd,6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	checkresponse(6);
 }
 
@@ -587,6 +625,8 @@ void RIG_IC746::set_squelch(int val)
 	cmd.append( post );
 	sendICcommand (cmd, 6);
 	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 int ICrfg = 0;
@@ -599,6 +639,8 @@ void RIG_IC746::set_rf_gain(int val)
 	cmd.append( post );
 	sendICcommand (cmd, 6);
 	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 void RIG_IC746::set_power_control(double val)
@@ -609,6 +651,8 @@ void RIG_IC746::set_power_control(double val)
 	cmd.append( post );
 	sendICcommand (cmd, 6);
 	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 //int RIG_IC746::get_mic_gain()
@@ -681,6 +725,8 @@ void RIG_IC746PRO::set_mode(int val)
 	cmd += filter_nbr;
 	cmd.append( post );
 	sendICcommand (cmd, 6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	checkresponse(6);
 	if (datamode) { // LSB / USB ==> use DATA mode
 		cmd = pre_to;
@@ -688,6 +734,8 @@ void RIG_IC746PRO::set_mode(int val)
 		cmd.append(post);
 		sendICcommand(cmd, 6);
 		checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	}
 }
 
@@ -780,6 +828,9 @@ void RIG_IC746PRO::tune_rig()
 	cmd.append( post );
 	sendICcommand (cmd, 6);
 	checkresponse(6);
+	if (RIG_DEBUG)
+		if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 void RIG_IC746PRO::set_bandwidth(int val)
@@ -797,6 +848,8 @@ void RIG_IC746PRO::set_bandwidth(int val)
 	cmd.append( post );
 	sendICcommand(cmd, 6);
 	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 int  RIG_IC746PRO::get_bandwidth()
@@ -832,6 +885,8 @@ void RIG_IC746PRO::set_attenuator(int val)
 	cmd.append( post );
 	sendICcommand(cmd,6);
 	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 bool IC_notchon = false;
@@ -857,6 +912,8 @@ void RIG_IC746PRO::set_notch(bool on, int val)
 		sendICcommand(cmd,6);
 		checkresponse(6);
 	}
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 
 }
 
@@ -918,6 +975,8 @@ void RIG_IC756PRO2::set_attenuator(int val)
 	cmd.append( post );
 	sendICcommand(cmd,6);
 	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 int RIG_IC756PRO2::get_attenuator()
@@ -962,6 +1021,8 @@ void RIG_IC756PRO2::set_preamp(int val)
 	cmd.append( post );
 	sendICcommand (cmd, 6);
 	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 int RIG_IC756PRO2::get_preamp()
@@ -1006,6 +1067,8 @@ void RIG_IC756PRO3::set_mode(int val)
 	cmd += filter_nbr;
 	cmd.append( post );
 	sendICcommand (cmd, 6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	checkresponse(6);
 	if (datamode) { // LSB / USB ==> use DATA mode
 		cmd = pre_to;
@@ -1013,6 +1076,8 @@ void RIG_IC756PRO3::set_mode(int val)
 		cmd.append(post);
 		sendICcommand(cmd, 6);
 		checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	}
 }
 
@@ -1053,6 +1118,61 @@ int RIG_IC756PRO3::get_mode()
 // IC7000 unique commands
 //======================================================================
 
+void RIG_IC7000::set_mode(int val)
+{
+	mode_ = val;
+	switch (val) {
+		case 7  : val = 8; break;
+		case 6  : val = 7; break;
+		default: break;
+	}
+	cmd = pre_to;
+	cmd += '\x06';
+	cmd += val;
+	cmd += filter_nbr;
+	cmd.append( post );
+	sendICcommand (cmd, 6);
+	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+}
+
+int RIG_IC7000::get_mode()
+{
+	int md;
+	cmd = pre_to;
+	cmd += '\x04';
+	cmd.append(post);
+	if (sendICcommand (cmd, 8 )) {
+		md = replystr[5];
+		if (md > 6) md--;
+		filter_nbr = replystr[6];
+	} else {
+		checkresponse(8);
+	}
+	return mode_;
+}
+
+int RIG_IC7000::adjust_bandwidth(int m)
+{
+	filter_nbr = 1;
+	if (m == 0 || m == 1) { //SSB
+		bandwidths_ = IC746PRO_SSBwidths;
+		return (bw_ = 32);
+	}
+	if (m == 3 || m == 6) { //CW
+		bandwidths_ = IC746PRO_SSBwidths;
+		return (bw_ = 14);
+	}
+	if (m == 4 || m == 7) { //RTTY
+		bandwidths_ = IC746PRO_RTTYwidths;
+		return (bw_ = 28);
+	}
+	bandwidths_ = IC746PRO_AMFMwidths;
+	return (bw_ = 0);
+}
+
+
 int RIG_IC7000::get_attenuator()
 {
 	cmd = pre_to;
@@ -1071,6 +1191,8 @@ void RIG_IC7000::set_attenuator(int val)
 	cmd.append( post );
 	sendICcommand(cmd,6);
 	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 void RIG_IC7000::set_preamp(int val)
@@ -1082,6 +1204,8 @@ void RIG_IC7000::set_preamp(int val)
 	cmd.append( post );
 	sendICcommand (cmd, 6);
 	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 int RIG_IC7000::get_preamp()
@@ -1115,13 +1239,17 @@ void RIG_IC7600::set_mode(int val)
 	cmd += filter_nbr;
 	cmd.append( post );
 	sendICcommand (cmd, 6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	checkresponse(6);
 	if (datamode) { // LSB / USB ==> use DATA mode
 		cmd = pre_to;
-		cmd.append("\x1A\x06\x01\x01");
+		cmd.append("\x1A\x06\x01");
 		cmd.append(post);
 		sendICcommand(cmd, 6);
 		checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	}
 }
 
@@ -1135,10 +1263,7 @@ int RIG_IC7600::get_mode()
 		md = replystr[5];
 		if (md > 6) md--;
 		filter_nbr = replystr[6];
-		cmd = pre_to;
-		cmd.append("\x1A\x06");
-		cmd.append(post);
-		if (sendICcommand(cmd, 9)) {
+		if (sendICcommand(cmd, 8)) {
 			if (replystr[6]) {
 				switch (md) {
 					case 0 : md = 8; break;
@@ -1155,7 +1280,6 @@ int RIG_IC7600::get_mode()
 	}
 	return mode_;
 }
-
 
 //======================================================================
 // IC910H
@@ -1187,6 +1311,8 @@ void RIG_IC910H::set_vfoA (long freq)
 	cmd.append( post );
 	sendICcommand(cmd, 6);
 	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 
@@ -1215,6 +1341,8 @@ void RIG_IC910H::set_compression()
 		sendICcommand(cmd, 6);
 		checkresponse(6);
 	}
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 void RIG_IC910H::set_vox_onoff()
@@ -1224,6 +1352,8 @@ void RIG_IC910H::set_vox_onoff()
 	cmd += progStatus.vox_onoff ? 1 : 0;
 	cmd.append(post);
 	sendCommand(cmd, 6, true);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 void RIG_IC910H::set_vox_gain()
@@ -1233,6 +1363,8 @@ void RIG_IC910H::set_vox_gain()
 	cmd.append(to_bcd(progStatus.vox_gain * 2.55, 3));
 	cmd.append(post);
 	sendCommand(cmd, 6, true);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 void RIG_IC910H::set_vox_anti()
@@ -1242,6 +1374,8 @@ void RIG_IC910H::set_vox_anti()
 	cmd.append(to_bcd(progStatus.vox_anti * 2.55, 3));
 	cmd.append(post);
 	sendCommand(cmd, 6, true);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 void RIG_IC910H::set_vox_hang()
@@ -1251,5 +1385,7 @@ void RIG_IC910H::set_vox_hang()
 	cmd.append(to_bcd(progStatus.vox_hang * 2.55, 3));
 	cmd.append(post);
 	sendCommand(cmd, 6, true);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
