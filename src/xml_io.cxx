@@ -240,7 +240,8 @@ bool updatingVFO = false;
 void setvfo(void *d)
 {
 	long newfreq = (long)d;
-	LOG_INFO("%ld", newfreq);
+	if (XML_DEBUG)
+		LOG_INFO("%ld", newfreq);
 	pthread_mutex_lock(&mutex_serial);
 		selrig->set_vfoA(newfreq);
 	pthread_mutex_unlock(&mutex_serial);
@@ -265,7 +266,8 @@ static void updateModeControl(void *d)
 {
 	if (!run_digi_loop) return;
 	int md = (long)d;
-	LOG_INFO("%d", md);
+	if (XML_DEBUG)
+		LOG_INFO("%d", md);
 	pthread_mutex_lock(&mutex_serial);
 		vfoA.imode = md;
 		opMODE->index(vfoA.imode);
@@ -307,7 +309,8 @@ void updateBW(void *d)
 		selrig->set_bandwidth(vfoA.iBW);
 	pthread_mutex_unlock(&mutex_serial);
 	updatingBW = false;
-	LOG_INFO("%d", vfoA.iBW);
+	if (XML_DEBUG)
+		LOG_INFO("%d", vfoA.iBW);
 }
 
 static void check_for_bandwidth_change(const XmlRpcValue& new_bw)
@@ -388,7 +391,8 @@ void * digi_loop(void *d)
 				if (!run_digi_loop) break;
 			}
 		} catch (const XmlRpc::XmlRpcException& e) {
-			LOG_INFO("%s", e.getMessage().c_str());
+			if (XML_DEBUG)
+				LOG_INFO("%s", e.getMessage().c_str());
 			try_count = CHECK_UPDATE_COUNT;
 			fldigi_online = false;
 		}

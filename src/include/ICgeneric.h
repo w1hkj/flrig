@@ -43,13 +43,13 @@ public:
 	int  get_noise_reduction();
 	void set_noise_reduction_val(int val);
 	int  get_noise_reduction_val();
-	void set_attenuator(int val);
-	int  get_attenuator();
-	void set_preamp(int val);
-	int  get_preamp();
+	virtual void set_attenuator(int val);
+	virtual int  get_attenuator();
+	virtual void set_preamp(int val);
+	virtual int  get_preamp();
 	virtual void set_mode(int val);
 	virtual int  get_mode();
-	int  get_modetype(int n);
+	virtual int  get_modetype(int n);
 	virtual void set_bandwidth(int val);
 	virtual int  get_bandwidth();
 	void set_mic_gain(int val);
@@ -74,17 +74,17 @@ class RIG_IC746PRO : public RIG_IC746 {
 public:
 	RIG_IC746PRO();
 	virtual ~RIG_IC746PRO(){}
-	void set_mode(int val);
-	int  get_mode();
-	void set_bandwidth(int val);
-	int  get_bandwidth();
+	virtual void set_mode(int val);
+	virtual int  get_mode();
+	virtual void set_bandwidth(int val);
+	virtual int  get_bandwidth();
 	int  get_swr();
 	int  get_alc();
 	int  get_power_out();
-	void set_attenuator(int val);
-	int  get_attenuator();
+	virtual void set_attenuator(int val);
+	virtual int  get_attenuator();
 	void tune_rig();
-	int  adjust_bandwidth(int m);
+	virtual int  adjust_bandwidth(int m);
 	void set_notch(bool on, int val);
 	bool get_notch(int &val);
 	void get_notch_min_max_step(int &min, int &max, int &step);
@@ -112,6 +112,9 @@ class RIG_IC7000 : public RIG_IC746PRO {
 public:
 	RIG_IC7000();
 	~RIG_IC7000(){}
+	void set_mode(int val);
+	int  get_mode();
+	int  adjust_bandwidth(int m);
 	void set_attenuator( int val );
 	int  get_attenuator();
 	void set_preamp(int val);
