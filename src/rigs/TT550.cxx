@@ -110,8 +110,10 @@ static char TT550setKEYER_ON[]	= "#7\r";	// disable keyer
 //static char TT550getAGC[]		= "?Y\r";	// 0..255
 //static char TT550getFWDPWR[]	= "?F\r";	// F<0..255>
 //static char TT550getREFPWR[]	= "?R\r";	// R<0..255>
-static char TT550getSIGNAL_LEVEL[]	= "?S\r";	// S<0..255><0..255>
-//static char TT550getFWDREF[]	= "?S\r";	// T<0..255><0..255>
+static char TT550getSIG_LEVEL[]	= "?S\r";	// S<0..255><0..255>
+static char TT550getFWDREF[]	= "?S\r";	// T<0..255><0..255>
+
+static char TT550setAMCARRIER[] 		= "R \r";	// enables AM mode transmit
 
 
 RIG_TT550::RIG_TT550() {
@@ -146,9 +148,9 @@ RIG_TT550::RIG_TT550() {
 	RFgain = 100;
 
 	has_notch_control =
-	has_preamp_control =
-	has_swr_control = false;
+	has_preamp_control = false;
 
+	has_swr_control = 
 	has_micgain_control =
 	has_power_control =
 	has_agc_level =
@@ -188,7 +190,7 @@ void RIG_TT550::showASCII(string s)
 	string ss = "";
 	for (size_t i = 0; i < s.length(); i++)
 		if (!(s[i] == '\r' || s[i] == '\n'))
-			ss += replystr[i];
+			ss += s[i];
 	LOG_WARN("%s", ss.c_str());
 }
 
@@ -256,6 +258,10 @@ void RIG_TT550::initialize()
 	set_aux_hang();
 
 	set_volume_control(progStatus.volume);
+
+	cmd = TT550setAMCARRIER;
+	cmd[1] = 0x0F;
+	sendCommand(cmd, 0, true); 
 
 	enable_tloop();
 	enable_xmtr();
@@ -444,11 +450,27 @@ void RIG_TT550::set_PTT_control(int val)
 void RIG_TT550::set_mode(int val)
 {
 	mode_ = val;
-	cmd = TT550setMODE;
-	cmd[1] = cmd[2] = TT550mode_chr[val];
-	sendCommand(cmd, 0, true);
+	if (mode_ == TT550_AM_MODE) {
+
+		cmd = TT550setMODE;
+		cmd[1] = cmd[2] = TT550mode_chr[val];
+		sendCommand(cmd, 0, true);
+
+		cmd =  TT550setPOWER;
+		cmd[1] = 0xFF;
+		sendCommand(cmd, 0, true);
+
+		set_power_control(progStatus.tt550_AM_level);
+
+	} else {
+
+		cmd = TT550setMODE;
+		cmd[1] = cmd[2] = TT550mode_chr[val];
+		sendCommand(cmd, 0, true);
+		set_power_control(progStatus.power_level);
+
+	}
 	set_bandwidth(bw_);
-//	set_vfoA(freq_);
 }
 
 int RIG_TT550::get_mode()
@@ -539,7 +561,7 @@ int RIG_TT550::get_volume_control()
 int RIG_TT550::get_smeter()
 {
 	double sig = 0.0;
-	cmd = TT550getSIGNAL_LEVEL;
+	cmd = TT550getSIG_LEVEL;
 	sendCommand(cmd, 6, true);
 	if (replybuff[0] == 'S') {
 		int sval;
@@ -562,12 +584,13 @@ int RIG_TT550::get_swr()
 
 int RIG_TT550::get_power_out()
 {
-	cmd = TT550getSIGNAL_LEVEL;
+	cmd = TT550getFWDREF;
 	sendCommand(cmd, 4, true);
 	if (replybuff[0] == 'T') {
 		fwdpwr = 0.8*fwdpwr + 0.2*(unsigned char)replybuff[1];
 		refpwr = 0.8*refpwr + 0.2*(unsigned char)replybuff[2];
 	}
+LOG_INFO("%s // %4.1f : %4.1f", str2hex(replystr.c_str(), replystr.length()), fwdpwr, refpwr);
 	fwdv = sqrtf(fwdpwr);
 	refv = sqrtf(refpwr);
 	return fwdpwr;
@@ -798,11 +821,17 @@ void RIG_TT550::get_mic_min_max_step(int &min, int &max, int &step)
 
 void RIG_TT550::set_power_control(double val)
 {
-	cmd =  TT550setPOWER;
-	cmd[1] = (unsigned char)(val * 2.55);
+	if (mode_ == TT550_AM_MODE) {
+		progStatus.tt550_AM_level = (int)val;
+		cmd = TT550setAMCARRIER;
+		cmd[1] = (unsigned char)(val * .64);
+	} else {
+		progStatus.power_level = (int) val;
+		cmd =  TT550setPOWER;
+		cmd[1] = (unsigned char)(val * 2.55);
+	}
 	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
 	sendCommand(cmd, 0, true);
-
 }
 
 void RIG_TT550::set_mon_vol()

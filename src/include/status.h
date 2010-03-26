@@ -107,6 +107,8 @@ struct status {
 	int		tt550_xmt_bw;
 	bool	tt550_use_xmt_bw;
 
+	int		tt550_AM_level;
+
 //and others
 	double	vfo_adj;
 	int		bfo_freq;

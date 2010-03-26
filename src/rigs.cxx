@@ -1,35 +1,10 @@
 //=============================================================================
 // Reference Transceiver unique drivers
 
-
-#include "rigbase.h"
+#include "rigs.h"
 #include "util.h"
 #include "debug.h"
 #include "rig_io.h"
-
-#include "FT100D.h"
-#include "FT450.h"
-#include "FT767.h"
-#include "FT817.h"
-#include "FT857D.h"
-#include "FT950.h"
-#include "FT1000.h"
-#include "FT1000MV.h"
-#include "FT2000.h"
-#include "IC706MKIIG.h"
-#include "IC728.h"
-#include "IC735.h"
-#include "ICgeneric.h"
-#include "K2.h"
-#include "K3.h"
-#include "TS140.h"
-#include "TS570.h"
-#include "TS2000.h"
-#include "TT516.h"
-#include "TT538.h"
-#include "TT550.h"
-#include "TT563.h"
-#include "TT588.h"
 
 rigbase			rig_null;
 RIG_FT100D		rig_FT100D;

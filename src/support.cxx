@@ -13,13 +13,12 @@
 #include "debug.h"
 #include "gettext.h"
 #include "rig_io.h"
-#include "rig.h"
 #include "dialogs.h"
 #include "rigbase.h"
 #include "ptt.h"
 #include "xml_io.h"
 
-#include "TT550.h"
+#include "rigs.h"
 
 using namespace std;
 
@@ -52,6 +51,9 @@ Cserial AuxSerial;
 Cserial SepSerial;
 
 bool using_buttons = false;
+
+enum { SWR_IMAGE, ALC_IMAGE };
+int meter_image = SWR_IMAGE;
 
 //=============================================================================
 // loop for serial i/o thread
@@ -726,6 +728,8 @@ void setPower()
 	double pwr = sldrPOWER->value();
 	pthread_mutex_lock(&mutex_serial);
 		powerlevel = (int)pwr;
+		if (selrig != &rig_TT550)
+			progStatus.power_level = pwr;
 		selrig->set_power_control(pwr);
 	pthread_mutex_unlock(&mutex_serial);
 }
@@ -763,7 +767,7 @@ void cbPTT()
 		rigPTT(PTT);
 		wait_query = false;
 	}
-
+	ALC_SWR_image();
 }
 
 void setSQUELCH()
@@ -783,6 +787,8 @@ void setRFGAIN()
 
 void updateALC(void * d)
 {
+	if (meter_image != ALC_IMAGE) return;
+
 	double data = (long)d;
 	Fl_Image *img = btnALC_SWR->image();
 	if (img == &image_alc) {
@@ -793,6 +799,8 @@ void updateALC(void * d)
 
 void updateSWR(void * d)
 {
+	if (meter_image != SWR_IMAGE) return;
+
 	double data = (long)d;
 	Fl_Image *img = btnALC_SWR->image();
 	if (img == &image_swr) {
@@ -800,8 +808,6 @@ void updateSWR(void * d)
 		sldrALC_SWR->redraw();
 	}
 }
-
-float fp_ = 0.0, rp_ = 0.0;
 
 void updateFwdPwr(void *d)
 {
@@ -877,6 +883,7 @@ void setPTT( void *d)
 	PTT = d;
 	btnPTT->value(val);
 	rigPTT(val);
+	ALC_SWR_image();
 }
 
 
@@ -907,7 +914,7 @@ void cbExit()
 
 	progStatus.spkr_on = btnVol->value();
 	progStatus.volume = sldrVOLUME->value();
-	progStatus.power_level = sldrPOWER->value();
+	progStatus.power_level = 0;//sldrPOWER->value();
 	progStatus.mic_gain = sldrMICGAIN->value();
 	progStatus.notch = btnNotch->value();
 	progStatus.notch_val = sldrNOTCH->value();
@@ -964,12 +971,26 @@ void cbExit()
 
 void cbALC_SWR()
 {
-	Fl_Image *img = btnALC_SWR->image();
-	if (img == &image_swr)
+	if (!selrig->has_alc_control) return;
+	if (meter_image == SWR_IMAGE) {
 		btnALC_SWR->image(image_alc);
-	else
+		meter_image = ALC_IMAGE;
+	} else {
 		btnALC_SWR->image(image_swr);
+		meter_image = SWR_IMAGE;
+	}
 	btnALC_SWR->redraw();
+}
+
+void ALC_SWR_image()
+{
+	if (!PTT) {
+		btnALC_SWR->hide();
+		scaleSmeter->show();
+	} else {
+		btnALC_SWR->show();
+		scaleSmeter->hide();
+	}
 }
 
 void adjust_control_positions()
@@ -1233,6 +1254,7 @@ void initRig()
 		sldrVOLUME->minimum(min);
 		sldrVOLUME->maximum(max);
 		sldrVOLUME->step(step);
+		sldrVOLUME->redraw();
 		progStatus.volume = selrig->get_volume_control();
 		sldrVOLUME->value(progStatus.volume);
 		if (progStatus.spkr_on == 0) {
@@ -1283,6 +1305,7 @@ void initRig()
 		sldrIFSHIFT->minimum(min);
 		sldrIFSHIFT->maximum(max);
 		sldrIFSHIFT->step(step);
+		sldrIFSHIFT->redraw();
 		if (progStatus.shift) {
 			btnIFsh->value(1);
 			sldrIFSHIFT->value(progStatus.shift_val);
@@ -1306,6 +1329,7 @@ void initRig()
 		sldrNOTCH->minimum(min);
 		sldrNOTCH->maximum(max);
 		sldrNOTCH->step(step);
+		sldrNOTCH->redraw();
 		btnNotch->value(progStatus.notch);
 		sldrNOTCH->value(progStatus.notch_val);
 		selrig->set_notch(progStatus.notch, progStatus.notch_val);
@@ -1322,6 +1346,7 @@ void initRig()
 		sldrMICGAIN->minimum(min);
 		sldrMICGAIN->maximum(max);
 		sldrMICGAIN->step(step);
+		sldrMICGAIN->redraw();
 		sldrMICGAIN->value(progStatus.mic_gain);
 		selrig->set_mic_gain(progStatus.mic_gain);
 		sldrMICGAIN->show();
@@ -1330,9 +1355,19 @@ void initRig()
 	}
 
 	if (selrig->has_power_control) {
-		selrig->set_power_control(progStatus.power_level);
+		int min, max, step;
+		selrig->get_pc_min_max_step(min, max, step);
+		sldrPOWER->minimum(min);
+		sldrPOWER->maximum(max);
+		sldrPOWER->step(step);
+		sldrPOWER->redraw();
+		if (min > progStatus.power_level)
+			progStatus.power_level = min;
+		if (max < progStatus.power_level)
+			progStatus.power_level = max;
 		sldrPOWER->value(progStatus.power_level);
 		sldrPOWER->show();
+		selrig->set_power_control(progStatus.power_level);
 	} else {
 		sldrPOWER->hide();
 	}
@@ -1436,7 +1471,7 @@ void init_title()
 void initConfigDialog()
 {
 	selectCommPort->index(0);
-	rigbase *selrig = rigs[selectRig->index()];
+	rigbase *srig = rigs[selectRig->index()];
 
 	progStatus.loadXcvrState(selrig->name_);
 
@@ -1444,19 +1479,19 @@ void initConfigDialog()
 	btnOneStopBit->value( progStatus.stopbits == 1 );
 	btnTwoStopBit->value( progStatus.stopbits == 2 );
 
-	mnuBaudrate->index( selrig->comm_baudrate );
-	btnOneStopBit->value( selrig->stopbits == 1 );
-	btnTwoStopBit->value( selrig->stopbits == 2 );
-	cntRigCatRetries->value( selrig->comm_retries );
-	cntRigCatTimeout->value( selrig->comm_timeout );
-	cntRigCatWait->value( selrig->comm_wait );
-	btnRigCatEcho->value( selrig->comm_echo );
-	btncatptt->value( selrig->comm_catptt );
-	btnrtsptt->value( selrig->comm_rtsptt );
-	btndtrptt->value( selrig->comm_dtrptt );
-	chkrtscts->value( selrig->comm_rtscts );
-	btnrtsplus->value( selrig->comm_rtsplus );
-	btndtrplus->value( selrig->comm_dtrplus );
+	mnuBaudrate->index( srig->comm_baudrate );
+	btnOneStopBit->value( srig->stopbits == 1 );
+	btnTwoStopBit->value( srig->stopbits == 2 );
+	cntRigCatRetries->value( srig->comm_retries );
+	cntRigCatTimeout->value( srig->comm_timeout );
+	cntRigCatWait->value( srig->comm_wait );
+	btnRigCatEcho->value( srig->comm_echo );
+	btncatptt->value( srig->comm_catptt );
+	btnrtsptt->value( srig->comm_rtsptt );
+	btndtrptt->value( srig->comm_dtrptt );
+	chkrtscts->value( srig->comm_rtscts );
+	btnrtsplus->value( srig->comm_rtsplus );
+	btndtrplus->value( srig->comm_dtrplus );
 }
 
 void initStatusConfigDialog()

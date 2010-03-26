@@ -219,6 +219,7 @@ EXTRA_DIST = \
 	include/mingw.h \
 	include/ptt.h \
 	include/rig.h \
+	incluce/rigs.h \
 	include/rigbase.h \
 	include/rig_io.h \
 	include/rigpanel.h \
