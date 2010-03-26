@@ -61,7 +61,7 @@ status progStatus = {
 
 	false,		// bool spkr_on;
 	20,			// int  volume;
-	20,			// int  power_level;
+	0,			// int  power_level;
 	10,			// int  mic_gain;
 	false,		// bool notch;
 	0,			// int  notch_val;
@@ -120,6 +120,8 @@ status progStatus = {
 
 	14,			// tt550_xmt_bw;
 	false,		// tt550_use_xmt_bw;
+	
+	25,			// tt550_AM_level;
 
 	0.0,		// vfo_adj;
 	600,		// bfo_freq;
@@ -248,6 +250,8 @@ void status::saveLastState()
 		spref.set("tt550_tuner_bypass", tt550_tuner_bypass);
 		spref.set("tt550_enable_xmtr", tt550_enable_xmtr);
 		spref.set("tt550_enable_tloop", tt550_enable_tloop);
+
+		spref.set("tt550_AM_level", tt550_AM_level);
 	} else {
 		spref.set("line_out", line_out);
 		spref.set("agc_level", agc_level);
@@ -414,6 +418,8 @@ bool status::loadXcvrState(const char *xcvr)
 			if (spref.get("tt550_tuner_bypass", i, i)) tt550_tuner_bypass = i;
 			if (spref.get("tt550_enable_xmtr", i, i)) tt550_enable_xmtr = i;
 			if (spref.get("tt550_enable_tloop", i, i)) tt550_enable_tloop = i;
+
+			spref.get("tt550_AM_level", tt550_AM_level, tt550_AM_level);
 		} 
 		else {
 			spref.get("line_out", line_out, line_out);

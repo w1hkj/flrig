@@ -49,6 +49,8 @@ public:
 	void set_volume_control(int val);
 	int  get_volume_control();
 	void set_power_control(double val);
+	void get_pc_min_max_step(int &min, int &max, int &step) {
+		min = 5; max = 100; step = 1; }
 	void set_PTT_control(int val);
 //	void tune_rig();
 	void set_attenuator(int val);
