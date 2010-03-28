@@ -1192,13 +1192,13 @@ static void cb_btnOkXcvrDialog(Fl_Return_Button*, void*) {
 
 Fl_Double_Window* XcvrDialog() {
   Fl_Double_Window* w;
-  { Fl_Double_Window* o = new Fl_Double_Window(410, 257, _("I/O Ports"));
+  { Fl_Double_Window* o = new Fl_Double_Window(482, 257, _("I/O Ports"));
     w = o;
-    { Fl_Tabs* o = new Fl_Tabs(0, 8, 408, 245);
-      { Fl_Group* o = new Fl_Group(2, 30, 404, 220, _("Primary"));
-        { Fl_Group* o = new Fl_Group(8, 34, 195, 140);
+    { Fl_Tabs* o = new Fl_Tabs(0, 8, 477, 245);
+      { Fl_Group* o = new Fl_Group(2, 30, 475, 222, _("Primary"));
+        { Fl_Group* o = new Fl_Group(5, 34, 195, 140);
           o->box(FL_ENGRAVED_FRAME);
-          { selectRig = new Fl_ComboBox(72, 38, 126, 22, _("Rig:"));
+          { selectRig = new Fl_ComboBox(41, 38, 155, 22, _("Rig:"));
             selectRig->tooltip(_("Select Transceiver"));
             selectRig->box(FL_DOWN_BOX);
             selectRig->color((Fl_Color)53);
@@ -1258,10 +1258,10 @@ Fl_Double_Window* XcvrDialog() {
           } // Fl_Counter* query_interval
           o->end();
         } // Fl_Group* o
-        { Fl_Group* o = new Fl_Group(206, 74, 193, 99);
+        { Fl_Group* o = new Fl_Group(202, 74, 270, 99);
           o->tooltip(_("Two stop bits"));
           o->box(FL_ENGRAVED_FRAME);
-          { selectCommPort = new Fl_ComboBox(278, 80, 113, 20, _("Ser. Port"));
+          { selectCommPort = new Fl_ComboBox(278, 82, 190, 22, _("Ser. Port"));
             selectCommPort->tooltip(_("Xcvr serial port"));
             selectCommPort->box(FL_DOWN_BOX);
             selectCommPort->color((Fl_Color)53);
@@ -1275,7 +1275,7 @@ Fl_Double_Window* XcvrDialog() {
             selectCommPort->when(FL_WHEN_RELEASE);
             selectCommPort->end();
           } // Fl_ComboBox* selectCommPort
-          { mnuBaudrate = new Fl_ComboBox(278, 105, 113, 22, _("Baud:"));
+          { mnuBaudrate = new Fl_ComboBox(278, 111, 190, 22, _("Baud:"));
             mnuBaudrate->tooltip(_("Xcvr baudrate"));
             mnuBaudrate->box(FL_DOWN_BOX);
             mnuBaudrate->color((Fl_Color)53);
@@ -1289,20 +1289,20 @@ Fl_Double_Window* XcvrDialog() {
             mnuBaudrate->when(FL_WHEN_RELEASE);
             mnuBaudrate->end();
           } // Fl_ComboBox* mnuBaudrate
-          { Fl_Check_Button* o = btnTwoStopBit = new Fl_Check_Button(278, 132, 22, 15, _("2 -StopBits"));
+          { Fl_Check_Button* o = btnTwoStopBit = new Fl_Check_Button(250, 144, 22, 15, _("2 -StopBits"));
             btnTwoStopBit->down_box(FL_DOWN_BOX);
             btnTwoStopBit->callback((Fl_Callback*)cb_btnTwoStopBit);
             btnTwoStopBit->align(FL_ALIGN_RIGHT);
             o->value(progStatus.stopbits == 2);
           } // Fl_Check_Button* btnTwoStopBit
-          { Fl_Check_Button* o = btnOneStopBit = new Fl_Check_Button(238, 132, 22, 15, _("1"));
+          { Fl_Check_Button* o = btnOneStopBit = new Fl_Check_Button(210, 144, 22, 15, _("1"));
             btnOneStopBit->tooltip(_("One Stop Bit"));
             btnOneStopBit->down_box(FL_DOWN_BOX);
             btnOneStopBit->callback((Fl_Callback*)cb_btnOneStopBit);
             btnOneStopBit->align(FL_ALIGN_RIGHT);
             o->value(progStatus.stopbits == 1);
           } // Fl_Check_Button* btnOneStopBit
-          { Fl_Check_Button* o = btnRigCatEcho = new Fl_Check_Button(278, 152, 22, 15, _("Echo "));
+          { Fl_Check_Button* o = btnRigCatEcho = new Fl_Check_Button(397, 144, 22, 15, _("Echo "));
             btnRigCatEcho->down_box(FL_DOWN_BOX);
             btnRigCatEcho->callback((Fl_Callback*)cb_btnRigCatEcho);
             btnRigCatEcho->align(FL_ALIGN_RIGHT);
@@ -1310,9 +1310,9 @@ Fl_Double_Window* XcvrDialog() {
           } // Fl_Check_Button* btnRigCatEcho
           o->end();
         } // Fl_Group* o
-        { Fl_Group* o = new Fl_Group(206, 34, 193, 35);
+        { Fl_Group* o = new Fl_Group(202, 34, 270, 38);
           o->box(FL_ENGRAVED_FRAME);
-          { Fl_Input* o = server_port = new Fl_Input(307, 41, 83, 22, _("Fldigi port:"));
+          { Fl_Input* o = server_port = new Fl_Input(307, 41, 100, 22, _("Fldigi port:"));
             server_port->tooltip(_("xmlrpc server address (7362)\nchange requires restart"));
             server_port->type(2);
             server_port->callback((Fl_Callback*)cb_server_port);
@@ -1320,40 +1320,40 @@ Fl_Double_Window* XcvrDialog() {
           } // Fl_Input* server_port
           o->end();
         } // Fl_Group* o
-        { Fl_Group* o = new Fl_Group(8, 175, 391, 73);
+        { Fl_Group* o = new Fl_Group(4, 175, 470, 73);
           o->box(FL_ENGRAVED_FRAME);
-          { Fl_Round_Button* o = btncatptt = new Fl_Round_Button(30, 180, 149, 22, _("PTT via CAT"));
+          { Fl_Round_Button* o = btncatptt = new Fl_Round_Button(67, 180, 149, 22, _("PTT via CAT"));
             btncatptt->tooltip(_("PTT is a CAT command (not hardware)"));
             btncatptt->down_box(FL_ROUND_DOWN_BOX);
             btncatptt->selection_color((Fl_Color)FL_SELECTION_COLOR);
             btncatptt->callback((Fl_Callback*)cb_btncatptt);
             o->value(progStatus.comm_catptt);
           } // Fl_Round_Button* btncatptt
-          { Fl_Round_Button* o = btnrtsptt = new Fl_Round_Button(30, 203, 149, 22, _("PTT via RTS"));
+          { Fl_Round_Button* o = btnrtsptt = new Fl_Round_Button(67, 203, 149, 22, _("PTT via RTS"));
             btnrtsptt->tooltip(_("RTS is ptt line"));
             btnrtsptt->down_box(FL_ROUND_DOWN_BOX);
             btnrtsptt->callback((Fl_Callback*)cb_btnrtsptt);
             o->value(progStatus.comm_rtsptt);
           } // Fl_Round_Button* btnrtsptt
-          { Fl_Round_Button* o = btndtrptt = new Fl_Round_Button(30, 226, 149, 22, _("PTT via DTR"));
+          { Fl_Round_Button* o = btndtrptt = new Fl_Round_Button(67, 226, 149, 22, _("PTT via DTR"));
             btndtrptt->tooltip(_("DTR is ptt line"));
             btndtrptt->down_box(FL_ROUND_DOWN_BOX);
             btndtrptt->callback((Fl_Callback*)cb_btndtrptt);
             o->value(progStatus.comm_dtrptt);
           } // Fl_Round_Button* btndtrptt
-          { Fl_Check_Button* o = chkrtscts = new Fl_Check_Button(214, 178, 171, 21, _("RTS/CTS flow control"));
+          { Fl_Check_Button* o = chkrtscts = new Fl_Check_Button(251, 178, 171, 21, _("RTS/CTS flow control"));
             chkrtscts->tooltip(_("Xcvr uses RTS/CTS handshake"));
             chkrtscts->down_box(FL_DOWN_BOX);
             chkrtscts->callback((Fl_Callback*)cb_chkrtscts);
             o->value(progStatus.comm_rtscts);
           } // Fl_Check_Button* chkrtscts
-          { Fl_Check_Button* o = btnrtsplus = new Fl_Check_Button(214, 201, 171, 21, _("RTS +12 v"));
+          { Fl_Check_Button* o = btnrtsplus = new Fl_Check_Button(251, 201, 171, 21, _("RTS +12 v"));
             btnrtsplus->tooltip(_("Initial state of RTS"));
             btnrtsplus->down_box(FL_DOWN_BOX);
             btnrtsplus->callback((Fl_Callback*)cb_btnrtsplus);
             o->value(progStatus.comm_rtsplus);
           } // Fl_Check_Button* btnrtsplus
-          { Fl_Check_Button* o = btndtrplus = new Fl_Check_Button(214, 224, 171, 21, _("DTR +12 v"));
+          { Fl_Check_Button* o = btndtrplus = new Fl_Check_Button(251, 224, 171, 21, _("DTR +12 v"));
             btndtrplus->tooltip(_("Initial state of DTR"));
             btndtrplus->down_box(FL_DOWN_BOX);
             btndtrplus->callback((Fl_Callback*)cb_btndtrplus);
@@ -1363,12 +1363,12 @@ Fl_Double_Window* XcvrDialog() {
         } // Fl_Group* o
         o->end();
       } // Fl_Group* o
-      { Fl_Group* o = new Fl_Group(2, 30, 404, 220, _("PTT"));
+      { Fl_Group* o = new Fl_Group(2, 30, 470, 218, _("PTT"));
         o->hide();
-        { new Fl_Box(9, 41, 395, 37, _("Use only if your setup requires a separate\nSerial Port for a PTT control lin\
+        { new Fl_Box(52, 72, 395, 37, _("Use only if your setup requires a separate\nSerial Port for a PTT control lin\
 e"));
         } // Fl_Box* o
-        { selectSepPTTPort = new Fl_ComboBox(84, 88, 117, 22, _("PTT Port"));
+        { selectSepPTTPort = new Fl_ComboBox(127, 119, 190, 22, _("PTT Port"));
           selectSepPTTPort->tooltip(_("Aux control port"));
           selectSepPTTPort->box(FL_DOWN_BOX);
           selectSepPTTPort->color((Fl_Color)53);
@@ -1382,25 +1382,25 @@ e"));
           selectSepPTTPort->when(FL_WHEN_RELEASE);
           selectSepPTTPort->end();
         } // Fl_ComboBox* selectSepPTTPort
-        { Fl_Round_Button* o = btnSepRTSptt = new Fl_Round_Button(67, 126, 127, 22, _("PTT via RTS"));
+        { Fl_Round_Button* o = btnSepRTSptt = new Fl_Round_Button(110, 157, 127, 22, _("PTT via RTS"));
           btnSepRTSptt->tooltip(_("RTS is ptt line"));
           btnSepRTSptt->down_box(FL_ROUND_DOWN_BOX);
           btnSepRTSptt->callback((Fl_Callback*)cb_btnSepRTSptt);
           o->value(progStatus.sep_rtsptt);
         } // Fl_Round_Button* btnSepRTSptt
-        { Fl_Check_Button* o = btnSepRTSplus = new Fl_Check_Button(228, 126, 127, 22, _("RTS +12 v"));
+        { Fl_Check_Button* o = btnSepRTSplus = new Fl_Check_Button(271, 157, 127, 22, _("RTS +12 v"));
           btnSepRTSplus->tooltip(_("Initial state of RTS"));
           btnSepRTSplus->down_box(FL_DOWN_BOX);
           btnSepRTSplus->callback((Fl_Callback*)cb_btnSepRTSplus);
           o->value(progStatus.sep_rtsplus);
         } // Fl_Check_Button* btnSepRTSplus
-        { Fl_Round_Button* o = btnSepDTRptt = new Fl_Round_Button(67, 152, 127, 22, _("PTT via DTR"));
+        { Fl_Round_Button* o = btnSepDTRptt = new Fl_Round_Button(110, 183, 127, 22, _("PTT via DTR"));
           btnSepDTRptt->tooltip(_("DTR is ptt line"));
           btnSepDTRptt->down_box(FL_ROUND_DOWN_BOX);
           btnSepDTRptt->callback((Fl_Callback*)cb_btnSepDTRptt);
           o->value(progStatus.sep_dtrptt);
         } // Fl_Round_Button* btnSepDTRptt
-        { Fl_Check_Button* o = btnSepDTRplus = new Fl_Check_Button(228, 152, 127, 22, _("DTR +12 v"));
+        { Fl_Check_Button* o = btnSepDTRplus = new Fl_Check_Button(271, 183, 127, 22, _("DTR +12 v"));
           btnSepDTRplus->tooltip(_("Initial state of DTR"));
           btnSepDTRplus->down_box(FL_DOWN_BOX);
           btnSepDTRplus->callback((Fl_Callback*)cb_btnSepDTRplus);
@@ -1408,9 +1408,9 @@ e"));
         } // Fl_Check_Button* btnSepDTRplus
         o->end();
       } // Fl_Group* o
-      { Fl_Group* o = new Fl_Group(2, 30, 404, 220, _("Aux"));
+      { Fl_Group* o = new Fl_Group(2, 30, 470, 220, _("Aux"));
         o->hide();
-        { selectAuxPort = new Fl_ComboBox(84, 88, 117, 22, _("Aux Port"));
+        { selectAuxPort = new Fl_ComboBox(130, 131, 190, 22, _("Aux Port"));
           selectAuxPort->tooltip(_("Aux control port"));
           selectAuxPort->box(FL_DOWN_BOX);
           selectAuxPort->color((Fl_Color)53);
@@ -1424,17 +1424,17 @@ e"));
           selectAuxPort->when(FL_WHEN_RELEASE);
           selectAuxPort->end();
         } // Fl_ComboBox* selectAuxPort
-        { new Fl_Box(9, 41, 395, 37, _("Use only if your setup requires a separate\nSerial Port for a special Control\
+        { new Fl_Box(55, 84, 395, 37, _("Use only if your setup requires a separate\nSerial Port for a special Control\
  Signals"));
         } // Fl_Box* o
         o->end();
       } // Fl_Group* o
       o->end();
     } // Fl_Tabs* o
-    { btnCancelCommConfig = new Fl_Button(277, 2, 60, 25, _("Cancel"));
+    { btnCancelCommConfig = new Fl_Button(346, 2, 60, 25, _("Cancel"));
       btnCancelCommConfig->callback((Fl_Callback*)cb_btnCancelCommConfig);
     } // Fl_Button* btnCancelCommConfig
-    { btnOkXcvrDialog = new Fl_Return_Button(347, 2, 60, 25, _("Init"));
+    { btnOkXcvrDialog = new Fl_Return_Button(416, 2, 60, 25, _("Init"));
       btnOkXcvrDialog->callback((Fl_Callback*)cb_btnOkXcvrDialog);
     } // Fl_Return_Button* btnOkXcvrDialog
     o->end();
