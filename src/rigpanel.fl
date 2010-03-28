@@ -320,7 +320,7 @@ cbAuxPort();}
     Fl_Button btnInitializing {
       label {Initializing
 
-Please wait} selected
+Please wait}
       xywh {0 25 340 135} box FLAT_BOX color 206 labelfont 1 labelsize 24
     }
   }
@@ -428,24 +428,24 @@ Function {XcvrDialog()} {open
 } {
   Fl_Window {} {
     label {I/O Ports} open
-    xywh {817 604 410 257} type Double visible
+    xywh {523 594 482 257} type Double visible
   } {
     Fl_Tabs {} {open
-      xywh {0 8 408 245}
+      xywh {0 8 477 245}
     } {
       Fl_Group {} {
         label Primary open
-        xywh {2 30 404 220}
+        xywh {2 30 475 222}
       } {
         Fl_Group {} {open
-          xywh {8 34 195 140} box ENGRAVED_FRAME
+          xywh {5 34 195 140} box ENGRAVED_FRAME
         } {
           Fl_Group selectRig {
             label {Rig:}
             callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();
 initConfigDialog();} open
-            tooltip {Select Transceiver} xywh {72 38 126 22} box DOWN_BOX color 53 align 4
+            tooltip {Select Transceiver} xywh {41 38 155 22} box DOWN_BOX color 53 align 4
             code0 {\#include "combo.h"}
             class Fl_ComboBox
           } {}
@@ -479,20 +479,20 @@ btnOkXcvrDialog->redraw();}
           }
         }
         Fl_Group {} {open
-          tooltip {Two stop bits} xywh {206 74 193 99} box ENGRAVED_FRAME
+          tooltip {Two stop bits} xywh {202 74 270 99} box ENGRAVED_FRAME
         } {
           Fl_Group selectCommPort {
             label {Ser. Port}
             callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();} open
-            tooltip {Xcvr serial port} xywh {278 80 113 20} box DOWN_BOX color 53 align 4
+            tooltip {Xcvr serial port} xywh {278 82 190 22} box DOWN_BOX color 53 align 4
             class Fl_ComboBox
           } {}
           Fl_Group mnuBaudrate {
             label {Baud:}
             callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();} open
-            tooltip {Xcvr baudrate} xywh {278 105 113 22} box DOWN_BOX color 53 align 4
+            tooltip {Xcvr baudrate} xywh {278 111 190 22} box DOWN_BOX color 53 align 4
             class Fl_ComboBox
           } {}
           Fl_Check_Button btnTwoStopBit {
@@ -504,7 +504,7 @@ progStatus.stopbits = 2;
 o->value(true);
 btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();}
-            xywh {278 132 22 15} down_box DOWN_BOX align 8
+            xywh {250 144 22 15} down_box DOWN_BOX align 8
             code0 {o->value(progStatus.stopbits == 2);}
           }
           Fl_Check_Button btnOneStopBit {
@@ -516,30 +516,30 @@ progStatus.stopbits = 1;
 o->value(true);
 btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();}
-            tooltip {One Stop Bit} xywh {238 132 22 15} down_box DOWN_BOX align 8
+            tooltip {One Stop Bit} xywh {210 144 22 15} down_box DOWN_BOX align 8
             code0 {o->value(progStatus.stopbits == 1);}
           }
           Fl_Check_Button btnRigCatEcho {
             label {Echo }
             callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();}
-            xywh {278 152 22 15} down_box DOWN_BOX align 8
+            xywh {397 144 22 15} down_box DOWN_BOX align 8
             code0 {o->value(progStatus.comm_echo);}
           }
         }
         Fl_Group {} {open
-          xywh {206 34 193 35} box ENGRAVED_FRAME
+          xywh {202 34 270 38} box ENGRAVED_FRAME
         } {
           Fl_Input server_port {
             label {Fldigi port:}
             callback {progStatus.server_port = o->value();}
             tooltip {xmlrpc server address (7362)
-change requires restart} xywh {307 41 83 22} type Int
+change requires restart} xywh {307 41 100 22} type Int
             code0 {o->value(progStatus.server_port.c_str());}
           }
         }
         Fl_Group {} {open
-          xywh {8 175 391 73} box ENGRAVED_FRAME
+          xywh {4 175 470 73} box ENGRAVED_FRAME
         } {
           Fl_Round_Button btncatptt {
             label {PTT via CAT}
@@ -549,7 +549,7 @@ change requires restart} xywh {307 41 83 22} type Int
   }
 btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();}
-            tooltip {PTT is a CAT command (not hardware)} xywh {30 180 149 22} down_box ROUND_DOWN_BOX selection_color 15
+            tooltip {PTT is a CAT command (not hardware)} xywh {67 180 149 22} down_box ROUND_DOWN_BOX selection_color 15
             code0 {o->value(progStatus.comm_catptt);}
           }
           Fl_Round_Button btnrtsptt {
@@ -559,8 +559,8 @@ btnOkXcvrDialog->redraw();}
   btncatptt->value(0);
 }
 btnOkXcvrDialog->labelcolor(FL_RED);
-btnOkXcvrDialog->redraw();}
-            tooltip {RTS is ptt line} xywh {30 203 149 22} down_box ROUND_DOWN_BOX
+btnOkXcvrDialog->redraw();} selected
+            tooltip {RTS is ptt line} xywh {67 203 149 22} down_box ROUND_DOWN_BOX
             code0 {o->value(progStatus.comm_rtsptt);}
           }
           Fl_Round_Button btndtrptt {
@@ -571,46 +571,46 @@ btnOkXcvrDialog->redraw();}
 }
 btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();}
-            tooltip {DTR is ptt line} xywh {30 226 149 22} down_box ROUND_DOWN_BOX
+            tooltip {DTR is ptt line} xywh {67 226 149 22} down_box ROUND_DOWN_BOX
             code0 {o->value(progStatus.comm_dtrptt);}
           }
           Fl_Check_Button chkrtscts {
             label {RTS/CTS flow control}
             callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();}
-            tooltip {Xcvr uses RTS/CTS handshake} xywh {214 178 171 21} down_box DOWN_BOX
+            tooltip {Xcvr uses RTS/CTS handshake} xywh {251 178 171 21} down_box DOWN_BOX
             code0 {o->value(progStatus.comm_rtscts);}
           }
           Fl_Check_Button btnrtsplus {
             label {RTS +12 v}
             callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();}
-            tooltip {Initial state of RTS} xywh {214 201 171 21} down_box DOWN_BOX
+            tooltip {Initial state of RTS} xywh {251 201 171 21} down_box DOWN_BOX
             code0 {o->value(progStatus.comm_rtsplus);}
           }
           Fl_Check_Button btndtrplus {
             label {DTR +12 v}
             callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();}
-            tooltip {Initial state of DTR} xywh {214 224 171 21} down_box DOWN_BOX
+            tooltip {Initial state of DTR} xywh {251 224 171 21} down_box DOWN_BOX
             code0 {o->value(progStatus.comm_dtrplus);}
           }
         }
       }
       Fl_Group {} {
         label PTT open
-        xywh {2 30 404 220} hide
+        xywh {2 30 470 218} hide
       } {
         Fl_Box {} {
           label {Use only if your setup requires a separate
 Serial Port for a PTT control line}
-          xywh {9 41 395 37}
+          xywh {52 72 395 37}
         }
         Fl_Group selectSepPTTPort {
           label {PTT Port}
           callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();} open
-          tooltip {Aux control port} xywh {84 88 117 22} box DOWN_BOX color 53 align 4
+          tooltip {Aux control port} xywh {127 119 190 22} box DOWN_BOX color 53 align 4
           class Fl_ComboBox
         } {}
         Fl_Round_Button btnSepRTSptt {
@@ -619,14 +619,14 @@ btnOkXcvrDialog->redraw();} open
   btnSepDTRptt->value(0);
 btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();}
-          tooltip {RTS is ptt line} xywh {67 126 127 22} down_box ROUND_DOWN_BOX
+          tooltip {RTS is ptt line} xywh {110 157 127 22} down_box ROUND_DOWN_BOX
           code0 {o->value(progStatus.sep_rtsptt);}
         }
         Fl_Check_Button btnSepRTSplus {
           label {RTS +12 v}
           callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();}
-          tooltip {Initial state of RTS} xywh {228 126 127 22} down_box DOWN_BOX
+          tooltip {Initial state of RTS} xywh {271 157 127 22} down_box DOWN_BOX
           code0 {o->value(progStatus.sep_rtsplus);}
         }
         Fl_Round_Button btnSepDTRptt {
@@ -635,44 +635,44 @@ btnOkXcvrDialog->redraw();}
   btnSepRTSptt->value(0);
 btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();}
-          tooltip {DTR is ptt line} xywh {67 152 127 22} down_box ROUND_DOWN_BOX
+          tooltip {DTR is ptt line} xywh {110 183 127 22} down_box ROUND_DOWN_BOX
           code0 {o->value(progStatus.sep_dtrptt);}
         }
         Fl_Check_Button btnSepDTRplus {
           label {DTR +12 v}
           callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();}
-          tooltip {Initial state of DTR} xywh {228 152 127 22} down_box DOWN_BOX
+          tooltip {Initial state of DTR} xywh {271 183 127 22} down_box DOWN_BOX
           code0 {o->value(progStatus.sep_dtrplus);}
         }
       }
       Fl_Group {} {
         label Aux open
-        xywh {2 30 404 220} hide
+        xywh {2 30 470 220} hide
       } {
         Fl_Group selectAuxPort {
           label {Aux Port}
           callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();} open
-          tooltip {Aux control port} xywh {84 88 117 22} box DOWN_BOX color 53 align 4
+          tooltip {Aux control port} xywh {130 131 190 22} box DOWN_BOX color 53 align 4
           class Fl_ComboBox
         } {}
         Fl_Box {} {
           label {Use only if your setup requires a separate
 Serial Port for a special Control Signals}
-          xywh {9 41 395 37}
+          xywh {55 84 395 37}
         }
       }
     }
     Fl_Button btnCancelCommConfig {
       label Cancel
       callback {cbCancelXcvrDialog();}
-      xywh {277 2 60 25}
+      xywh {346 2 60 25}
     }
     Fl_Return_Button btnOkXcvrDialog {
       label Init
       callback {cbOkXcvrDialog();}
-      xywh {347 2 60 25}
+      xywh {416 2 60 25}
     }
   }
 } 
@@ -681,7 +681,7 @@ Function {make_XcvrXtra()} {open
 } {
   Fl_Window {} {
     label Controls open
-    xywh {455 628 340 239} type Double align 0 visible
+    xywh {131 633 340 239} type Double align 0 visible
   } {
     Fl_Group {} {
       label CW open
