@@ -134,7 +134,7 @@ flrig_SOURCES += \
 	rigs/FT857D.cxx \
 	rigs/FT950.cxx \
 	rigs/FT1000.cxx \
-	rigs/FT1000MV.cxx \
+	rigs/FT1000MP.cxx \
 	rigs/FT2000.cxx \
 	rigs/IC706MKIIG.cxx \
 	rigs/IC728.cxx \
@@ -205,7 +205,7 @@ EXTRA_DIST = \
 	include/FT890.h \
 	include/FT950.h \
 	include/FT1000.h \
-	include/FT1000MV.h \
+	include/FT1000MP.h \
 	include/FT2000.h \
 	include/generic.h \
 	include/gettext.h \
@@ -219,7 +219,7 @@ EXTRA_DIST = \
 	include/mingw.h \
 	include/ptt.h \
 	include/rig.h \
-	incluce/rigs.h \
+	include/rigs.h \
 	include/rigbase.h \
 	include/rig_io.h \
 	include/rigpanel.h \
