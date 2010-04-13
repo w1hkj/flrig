@@ -133,6 +133,10 @@ public:
 	~RIG_IC7600(){}
 	void set_mode(int val);
 	int  get_mode();
+
+	void set_attenuator( int val );	//alh
+	int  get_attenuator();		//alh
+
 };
 
 class RIG_IC7700 : public RIG_IC746PRO {

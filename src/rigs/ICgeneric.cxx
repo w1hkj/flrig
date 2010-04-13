@@ -1281,6 +1281,63 @@ int RIG_IC7600::get_mode()
 	return mode_;
 }
 
+// alh added ++++++++++++++++++++++++++++
+
+void RIG_IC7600::set_attenuator(int val)
+{
+	int cmdval = 0;
+	if (atten_level == 0) {
+		atten_level = 1;
+		atten_label("6 dB", true);
+		cmdval = 0x06;
+	} else if (atten_level == 1) {
+		atten_level = 2;
+		atten_label("12 dB", true);
+		cmdval = 0x12;
+	} else if (atten_level == 2) {
+		atten_level = 3;
+		atten_label("18 dB", true);
+		cmdval = 0x18;
+	} else if (atten_level == 3) {
+		atten_level = 0;
+		atten_label("Att", false);
+		cmdval = 0x00;
+	}
+	cmd = pre_to;
+	cmd += '\x11';
+	cmd += cmdval;
+	cmd.append( post );
+	sendICcommand(cmd,6);
+	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+}
+
+int RIG_IC7600::get_attenuator()
+{
+	cmd = pre_to;
+	cmd += '\x11';
+	cmd.append( post );
+	if (sendICcommand(cmd,7)) {
+		if (replystr[5] == 0x06) {
+			atten_level = 1;
+			atten_label("6 dB", true);
+		} else if (replystr[6] == 0x12) {
+			atten_level = 2;
+			atten_label("12 dB", true);
+		} else if (replystr[6] == 0x18) {
+			atten_level = 3;
+			atten_label("18 dB", true);
+		} else if (replystr[6] == 0x00) {
+			atten_level = 0;
+			atten_label("Att", false);
+		}
+	}
+	return atten_level;
+}
+
+// ++++++++++++++++++++++++               end of alh addition
+
 //======================================================================
 // IC910H
 //======================================================================

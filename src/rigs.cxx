@@ -27,6 +27,7 @@ RIG_IC756PRO2	rig_IC756PRO2;
 RIG_IC756PRO3	rig_IC756PRO3;
 RIG_IC7000		rig_IC7000;
 RIG_IC7200		rig_IC7200;
+RIG_IC7600		rig_IC7600;	//alh
 RIG_IC7700		rig_IC7700;
 RIG_IC910H		rig_IC910H;
 RIG_K2			rig_K2;
@@ -62,6 +63,7 @@ rigbase *rigs[] = {
 	&rig_IC756PRO3,
 	&rig_IC7000,
 	&rig_IC7200,
+	&rig_IC7600,	//alh
 	&rig_IC7700,
 	&rig_IC910H,
 	&rig_K2,
