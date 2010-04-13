@@ -48,6 +48,7 @@ extern RIG_IC756PRO2	rig_IC756PRO2;
 extern RIG_IC756PRO3	rig_IC756PRO3;
 extern RIG_IC7000		rig_IC7000;
 extern RIG_IC7200		rig_IC7200;
+extern RIG_IC7600		rig_IC7600;	//alh
 extern RIG_IC7700		rig_IC7700;
 extern RIG_IC910H		rig_IC910H;
 extern RIG_K2			rig_K2;
