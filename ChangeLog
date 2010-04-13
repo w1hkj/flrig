@@ -1,7 +1,12 @@
-2010-03-27  David Freese  <w1hkj@w1hkj.com>
+2010-04-13  Andrew Hart, VE3NVK  <andylhart@gmail.com>
 
-	20b8124: OS X serial device
-	5c92ce83: FT1000 FT1000MV update
+	96005f5: IC7600 update
+
+2010-03-29  David Freese  <w1hkj@w1hkj.com>
+
+	3fbeee1: FT1000 series
+	fa215e2: OS X serial device
+	e2a1ff0: FT1000 FT1000MV update
 	fe2bc28: TT550 AM mod
 	8079933: DLL dependency
 	462bc39: IC7000 mods
