@@ -728,7 +728,7 @@ void setPower()
 	double pwr = sldrPOWER->value();
 	pthread_mutex_lock(&mutex_serial);
 		powerlevel = (int)pwr;
-		if (selrig != &rig_TT550)
+//		if (selrig != &rig_TT550)
 			progStatus.power_level = pwr;
 		selrig->set_power_control(pwr);
 	pthread_mutex_unlock(&mutex_serial);
@@ -914,7 +914,7 @@ void cbExit()
 
 	progStatus.spkr_on = btnVol->value();
 	progStatus.volume = sldrVOLUME->value();
-	progStatus.power_level = 0;//sldrPOWER->value();
+	progStatus.power_level = sldrPOWER->value();
 	progStatus.mic_gain = sldrMICGAIN->value();
 	progStatus.notch = btnNotch->value();
 	progStatus.notch_val = sldrNOTCH->value();
