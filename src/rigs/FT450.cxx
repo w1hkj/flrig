@@ -96,16 +96,26 @@ int RIG_FT450::get_smeter()
 	return 0;
 }
 
+// measured by W3NR
+//  SWR..... mtr ... display
+//  6:1..... 255 ... 100
+//  3:1..... 132 ...  50
+//  2:1..... 066 ...  26
+//  2.5:1... 099 ...  39
+//  1.5:1... 033 ...  13
+//  1.1:1... 008 ...   3
+
 int RIG_FT450::get_swr()
 {
 	cmd = "RM6;";
 	if (sendCommand(cmd, 7, false)) {
 		replybuff[6] = 0;
 		int mtr = atoi(&replybuff[3]);
-		return mtr / 2.56;
+		return mtr / 2.55;
 	}
 	return 0;
 }
+
 
 int RIG_FT450::get_power_out()
 {

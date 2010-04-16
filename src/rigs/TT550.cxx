@@ -574,9 +574,12 @@ int RIG_TT550::get_smeter()
 
 int RIG_TT550::get_swr()
 {
-	double swr = (fwdv + refv) / (fwdv - refv + .0001);
-	swr -= 1.0;
-	swr *= 25.0;
+	double swr, nu;
+	if (fwdpwr == 0) return 0;
+	if (fwdpwr == refpwr) return 100;
+	nu = sqrt(refpwr / fwdpwr);
+	swr = (1 + nu) / (1 - nu) - 1.0;
+	swr *= 16.67;
 	if (swr < 0) swr = 0;
 	if (swr > 100) swr = 100;
 	return (int)swr;
@@ -591,8 +594,6 @@ int RIG_TT550::get_power_out()
 		refpwr = 0.8*refpwr + 0.2*(unsigned char)replybuff[2];
 	}
 LOG_INFO("%s // %4.1f : %4.1f", str2hex(replystr.c_str(), replystr.length()), fwdpwr, refpwr);
-	fwdv = sqrtf(fwdpwr);
-	refv = sqrtf(refpwr);
 	return fwdpwr;
 }
 
