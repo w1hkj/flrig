@@ -176,7 +176,7 @@ void read_power_out()
 void read_swr()
 {
 	int sig;
-		sig = selrig->get_swr();
+	sig = selrig->get_swr();
 	Fl::awake(updateSWR, (void*)sig);
 }
 
@@ -788,33 +788,28 @@ void setRFGAIN()
 void updateALC(void * d)
 {
 	if (meter_image != ALC_IMAGE) return;
-
 	double data = (long)d;
-	Fl_Image *img = btnALC_SWR->image();
-	if (img == &image_alc) {
-		sldrALC_SWR->value(data);
-		sldrALC_SWR->redraw();
-	}
+	sldrALC_SWR->value(data);
+	sldrALC_SWR->redraw();
 }
 
 void updateSWR(void * d)
 {
 	if (meter_image != SWR_IMAGE) return;
-
 	double data = (long)d;
-	Fl_Image *img = btnALC_SWR->image();
-	if (img == &image_swr) {
-		sldrALC_SWR->value(data);
-		sldrALC_SWR->redraw();
-	}
+	sldrALC_SWR->value(data);
+	sldrALC_SWR->redraw();
 }
 
 void updateFwdPwr(void *d)
 {
 	double power = (long)d;
 	if (!sldrFwdPwr->visible()) {
-		sldrRcvSignal->hide();
 		sldrFwdPwr->show();
+		if (selrig->has_swr_control) {
+			sldrRcvSignal->hide();
+			sldrALC_SWR->show();
+		}
 	}
 	sldrFwdPwr->value(power);
 	sldrFwdPwr->redraw();
@@ -856,6 +851,7 @@ void updateSmeter(void *d) // 0 to 100;
 	if (!sldrRcvSignal->visible()) {
 		sldrFwdPwr->hide();
 		sldrRcvSignal->show();
+		sldrALC_SWR->hide();
 	}
 	sldrRcvSignal->value(swr);
 	sldrRcvSignal->redraw();
