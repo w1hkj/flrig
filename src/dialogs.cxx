@@ -254,6 +254,7 @@ void cbOkXcvrDialog()
 		RigSerial.ClosePort();
 		AuxSerial.ClosePort();
 		SepSerial.ClosePort();
+		bypass_serial_thread_loop = true;
 	pthread_mutex_unlock(&mutex_serial);
 
 
@@ -333,22 +334,14 @@ void cbOkXcvrDialog()
 
 	initRig();
 
-//	send_name();
-//	send_modes();
-//	send_bandwidths();
-//	send_mode_changed();
-//	send_sideband();
-//	send_bandwidth_changed();
-//	send_new_freq();
-
 	cbCancelXcvrDialog();
 }
 
 void configXcvr()
 {
-	pthread_mutex_lock(&mutex_serial);
-		bypass_serial_thread_loop = true;
-	pthread_mutex_unlock(&mutex_serial);
+//	pthread_mutex_lock(&mutex_serial);
+//		bypass_serial_thread_loop = true;
+//	pthread_mutex_unlock(&mutex_serial);
 
 	selectCommPort->value(progStatus.xcvr_serial_port.c_str());
 	selectAuxPort->value(progStatus.aux_serial_port.c_str());
