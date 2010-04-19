@@ -1,5 +1,8 @@
-2010-04-15  David Freese  <w1hkj@w1hkj.com>
+2010-04-19  David Freese  <w1hkj@w1hkj.com>
 
+	8fac7d6: Build static distribution
+	ff09e24: K3 mods
+	3f7ac25: Exec during config
 	5c111de: SWR enable
 	b36ef3c: Power - 7600
 
