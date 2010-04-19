@@ -18,7 +18,7 @@ const char modenbr[] =
 static const char K3_mode_type[] =
 	{ 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L' };
 
-const char *K3_widths[] = {"NARR", "NORM", "WIDE", NULL};
+const char *K3_widths[] = {"FL-1", "FL-2", "FL-3", "FL-4", NULL};
 
 RIG_K3::RIG_K3() {
 // base class values	
@@ -26,7 +26,7 @@ RIG_K3::RIG_K3() {
 	modes_ = K3modes_;
 	bandwidths_ = K3_widths;
 	comm_baudrate = BR38400;
-	stopbits = 2;
+	stopbits = 1;
 	comm_retries = 2;
 	comm_wait = 5;
 	comm_timeout = 50;
@@ -55,10 +55,16 @@ RIG_K3::RIG_K3() {
 
 }
 
+void RIG_K3::initialize()
+{
+	cmd = "K31;";
+	sendCommand(cmd, 0, false);
+}
+
 long RIG_K3::get_vfoA ()
 {
 	cmd = "FA;";
-	if (sendCommand(cmd, 11, false)) {
+	if (sendCommand(cmd, 14, false)) {
 		long f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replybuff[n] - '0';
@@ -81,13 +87,22 @@ void RIG_K3::set_vfoA (long freq)
 // Volume control
 void RIG_K3::set_volume_control(double val) 
 {
-	int ivol = (int)(val * 255);
+	int ivol = (int)(val * 2.55);
 	cmd = "AG000;";
 	for (int i = 4; i > 2; i--) {
 		cmd[i] += ivol % 10;
 		ivol /= 10;
 	}
 	sendCommand(cmd, 0, false);
+}
+
+int RIG_K3::get_volume_control()
+{
+	cmd = "AG;";
+	sendCommand(cmd, 6, false);
+	replybuff[5] = 0;
+	int v = atoi(&replybuff[2]);
+	return (int)(v / 2.55);
 }
 
 void RIG_K3::set_mode(int val)
@@ -135,17 +150,6 @@ int RIG_K3::get_attenuator()
 	if (sendCommand("RA;", 5, false))
 		return (replybuff[3] == '1' ? 1 : 0);
    return 0;
-}
-
-int RIG_K3::get_power_control()
-{
-	cmd = "PC;";
-	if (sendCommand(cmd, 6, false)) {
-		replybuff[5] = 0;
-		int mtr = atoi(&replybuff[2]);
-		return mtr;
-	}
-	return 0;
 }
 
 // Transceiver power level
@@ -215,25 +219,40 @@ void RIG_K3::set_noise(bool on)
 //result in the generation of FA/FB/FR/FT responses. (3) Both FW and FW$ can be used in BSET mode (one
 //exception: at present, FW/FW$ SET can’t be used in BSET mode with diversity receive in effect). (4) In K22
 //mode, a legacy 6th digit is added to the response. It is always 0. In the K2, it indicated audio filter on/off status.
-/*
+
 void RIG_K3::set_bandwidth(int val)
 {
+	bw_ = val;
+	cmd = "K30;K22;FW0000x;K20;K31;";
+	cmd[14] = '0' + val;
+	sendCommand(cmd, 0, false);
 }
-*/
 
-
-/*
-int RIG_K3::get_swr()
+int RIG_K3::get_bandwidth()
 {
+	cmd = "K30;K22;FW;K20;K31;";
+	sendCommand(cmd, 9, false);
+	bw_ = replybuff[5] - '0';
+	return bw_;
 }
+
+//int RIG_K3::get_swr()
+//{
+//}
 
 int RIG_K3::get_power_out()
 {
+	cmd = "PC;";
+	if (sendCommand(cmd, 6, false)) {
+		replybuff[5] = 0;
+		int mtr = atoi(&replybuff[2]);
+		return mtr;
+	}
+	return 0;
 }
 
-void RIG_K3::tune_rig()
-{
-}
+//void RIG_K3::tune_rig()
+//{
+//}
 
 
-*/

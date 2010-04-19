@@ -8,12 +8,13 @@ public:
 	RIG_K3();
 	~RIG_K3(){}
 
+	void initialize();
 	long get_vfoA();
 	void set_vfoA(long);
 	void set_volume_control(double val);
+	int  get_volume_control();
 	void set_mode(int val);
 	int  get_mode();
-	int  get_power_control();
 	void set_power_control(double val);
 	void get_pc_min_max_step(int &, int &, int &);
 	void set_PTT_control(int val);
@@ -24,12 +25,13 @@ public:
 	int  get_smeter();
 	void set_noise(bool on);
 	int  get_modetype(int n);
+	void set_bandwidth(int val);
+	int  get_bandwidth();
+	int  get_power_out();
 
 /*
 	int  get_swr();
-	int  get_power_out();
 	void tune_rig();
-	void set_bandwidth(int val);
 */
 };
 
