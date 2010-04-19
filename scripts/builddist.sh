@@ -1,7 +1,7 @@
 # build file to generate the distribution binary tarball
 
 make clean
-./configure --prefix=/tmp/flrig-build
+./configure --prefix=/tmp/flrig-build --enable-static
 make install-strip
 tar czf flrig-$1.bin.tgz -C /tmp/flrig-build/bin flrig
 
