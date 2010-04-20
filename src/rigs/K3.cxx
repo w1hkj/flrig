@@ -85,11 +85,11 @@ void RIG_K3::set_vfoA (long freq)
 }
 
 // Volume control
-void RIG_K3::set_volume_control(double val) 
+void RIG_K3::set_volume_control(int val) 
 {
 	int ivol = (int)(val * 2.55);
 	cmd = "AG000;";
-	for (int i = 4; i > 2; i--) {
+	for (int i = 4; i > 1; i--) {
 		cmd[i] += ivol % 10;
 		ivol /= 10;
 	}
@@ -116,7 +116,7 @@ int RIG_K3::get_mode()
 {
 	sendCommand("MD;", 4, false);
 	int md = replybuff[2] - '1';
-	if (md == 8) md--;
+	if (md == 9) md--;
 	return md;
 }
 

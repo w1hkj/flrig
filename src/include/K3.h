@@ -11,7 +11,7 @@ public:
 	void initialize();
 	long get_vfoA();
 	void set_vfoA(long);
-	void set_volume_control(double val);
+	void set_volume_control(int val);
 	int  get_volume_control();
 	void set_mode(int val);
 	int  get_mode();
