@@ -121,7 +121,7 @@ public:
 	int  get_preamp();
 };
 
-class RIG_IC7200 : public RIG_IC746PRO {
+class RIG_IC7200 : public RIG_IC756PRO3 {
 public:
 	RIG_IC7200();
 	~RIG_IC7200(){}
