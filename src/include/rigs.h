@@ -13,6 +13,7 @@
 //#include "Mark-V.h"
 #include "FT2000.h"
 #include "IC706MKIIG.h"
+#include "IC718.h"
 #include "IC728.h"
 #include "IC735.h"
 #include "ICgeneric.h"
@@ -40,10 +41,11 @@ extern RIG_FT1000MP	rig_FT1000MP;
 //extern RIG_MARK_V		rig_MARK_V;
 extern RIG_FT2000		rig_FT2000;
 extern RIG_IC706MKIIG	rig_IC706MKIIG;
+extern RIG_IC718		rig_IC718;
 extern RIG_IC728		rig_IC728;
 extern RIG_IC735		rig_IC735;
 extern RIG_IC746		rig_IC746;
-extern RIG_IC746PRO	rig_IC746PRO;
+extern RIG_IC746PRO		rig_IC746PRO;
 extern RIG_IC756PRO2	rig_IC756PRO2;
 extern RIG_IC756PRO3	rig_IC756PRO3;
 extern RIG_IC7000		rig_IC7000;

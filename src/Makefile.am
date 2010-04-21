@@ -137,6 +137,7 @@ flrig_SOURCES += \
 	rigs/FT1000MP.cxx \
 	rigs/FT2000.cxx \
 	rigs/IC706MKIIG.cxx \
+	rigs/IC718.cxx \
 	rigs/IC728.cxx \
 	rigs/IC735.cxx \
 	rigs/ICgeneric.cxx \
@@ -210,6 +211,7 @@ EXTRA_DIST = \
 	include/generic.h \
 	include/gettext.h \
 	include/IC706MKIIG.h \
+	include/IC718.h \
 	include/IC728.h \
 	include/IC735.h \
 	include/ICgeneric.h \
