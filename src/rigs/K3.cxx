@@ -116,7 +116,7 @@ int RIG_K3::get_mode()
 {
 	sendCommand("MD;", 4, false);
 	int md = replybuff[2] - '1';
-	if (md == 9) md--;
+	if (md == 8) md--;
 	return md;
 }
 
