@@ -125,6 +125,9 @@ class RIG_IC7200 : public RIG_IC756PRO3 {
 public:
 	RIG_IC7200();
 	~RIG_IC7200(){}
+
+	int  get_mode();
+	void set_mode(int m);
 };
 
 class RIG_IC7600 : public RIG_IC746PRO {
