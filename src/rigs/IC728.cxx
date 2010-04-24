@@ -35,7 +35,8 @@ RIG_IC728::RIG_IC728() {
 	mode_ = 1;
 	bw_ = 0;
 
-	pre_to[2] = ok[3] = bad[3] = pre_fm[3] = 0x38;
+	defaultCIV = 0x38;
+	adjustCIV(defaultCIV);
 
 	has_attenuator_control =
 	has_preamp_control =

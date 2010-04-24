@@ -173,6 +173,9 @@ extern void preamp_label(const char *, bool on);
 extern void atten_label(const char *, bool on);
 
 // Display Dialog
+extern void cbUSBaudio();
+extern void cbCIVdefault();
+extern void cbCIV();
 extern void cbOkXcvrDialog();
 extern void cbCancelXcvrDialog();
 extern void initCommPortTable ();

@@ -17,6 +17,10 @@ rigbase::rigbase()
 
 	stopbits = 2;
 
+	CIV = 0;
+	defaultCIV = 0;
+	USBaudio = false;
+
 	comm_echo =
 	has_rit =
 	has_xit =

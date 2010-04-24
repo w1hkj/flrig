@@ -240,6 +240,35 @@ void init_port_combos()
 }
 #endif //__FreeBSD__
 
+void cbCIVdefault()
+{
+	char hexstr[8];
+	int picked = selectRig->index();
+	rigbase *srig = rigs[picked];
+	snprintf(hexstr, sizeof(hexstr), "0x%2X", srig->defaultCIV);
+	txtCIV->value(hexstr);
+	progStatus.CIV = srig->defaultCIV;
+	srig->adjustCIV(progStatus.CIV);
+printf("CIV %2X\n", srig->CIV);
+}
+
+void cbCIV()
+{
+	int picked = selectRig->index();
+	int adr = 0;
+	rigbase *srig = rigs[picked];
+	sscanf(txtCIV->value(), "0x%2X", &adr);
+//	progStatus.CIV = atol(txtCIV->value());
+	progStatus.CIV = adr;
+	srig->adjustCIV(progStatus.CIV);
+printf("CIV %2X\n", srig->CIV);
+}
+
+void cbUSBaudio()
+{
+	progStatus.USBaudio = btnUSBaudio->value();
+}
+
 void cbCancelXcvrDialog()
 {
 	bypass_serial_thread_loop = false;
@@ -337,18 +366,35 @@ void cbOkXcvrDialog()
 
 	initRig();
 
-	cbCancelXcvrDialog();
+	btnOkXcvrDialog->labelcolor(FL_BLACK);
+
 }
 
 void configXcvr()
 {
-//	pthread_mutex_lock(&mutex_serial);
-//		bypass_serial_thread_loop = true;
-//	pthread_mutex_unlock(&mutex_serial);
 
 	selectCommPort->value(progStatus.xcvr_serial_port.c_str());
 	selectAuxPort->value(progStatus.aux_serial_port.c_str());
 	selectSepPTTPort->value(progStatus.sep_serial_port.c_str());
+
+	if (rig_nbr >= IC706MKIIG && rig_nbr <= IC910H) {
+		char hexstr[8];
+		snprintf(hexstr, sizeof(hexstr), "0x%2X", selrig->CIV);
+		txtCIV->value(hexstr);
+		txtCIV->activate();
+		btnCIVdefault->activate();
+		if (rig_nbr == IC7200 || rig_nbr == IC7600) {
+			btnUSBaudio->value(progStatus.USBaudio);
+			btnUSBaudio->activate();
+		} else
+			btnUSBaudio->deactivate();
+	} else {
+		txtCIV->value("");
+		txtCIV->deactivate();
+		btnCIVdefault->deactivate();
+		btnUSBaudio->value(0);
+		btnUSBaudio->deactivate();
+	}
 
 	dlgXcvrConfig->show();
 }

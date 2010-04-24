@@ -38,7 +38,8 @@ RIG_IC706MKIIG::RIG_IC706MKIIG() {
 	has_attenuator_control = true;
 //	has_swr_control = true;
 	
-	pre_to[2] = ok[3] = bad[3] = pre_fm[3] = 0x58;
+	defaultCIV = 0x58;
+	adjustCIV(defaultCIV);
 };
 
 //=============================================================================

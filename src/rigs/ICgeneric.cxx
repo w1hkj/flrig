@@ -28,6 +28,7 @@ const char IC746_mode_type[] =
 const char *IC746_widths[] = { "NORM", "NARR", NULL};
 
 RIG_IC746::RIG_IC746() {
+	defaultCIV = 0x56;
 	name_ = IC746name_;
 	modes_ = IC746modes_;
 	bandwidths_ = IC746_widths;
@@ -104,16 +105,17 @@ NULL};
 const char *IC746PRO_AMFMwidths[] = { "FILT-1", "FILT-2", "FILT-3", NULL };
 
 RIG_IC746PRO::RIG_IC746PRO() {
+	defaultCIV = 0x66;
 	name_ = IC746PROname_;
 	modes_ = IC746PROmodes_;
 	bandwidths_ = IC746PRO_SSBwidths;
 	_mode_type = IC746PRO_mode_type;
-	pre_to[2] = ok[3] = bad[3] = pre_fm[3] = 0x66;
 	atten_level = 0;
 	preamp_level = 0;
 	def_mode = 9;
 	defbw_ = 32;
 	deffreq_ = 14070000;
+	adjustCIV(defaultCIV);
 };
 
 //=============================================================================
@@ -122,10 +124,11 @@ RIG_IC746PRO::RIG_IC746PRO() {
 const char IC756PRO2name_[] = "IC-756PRO-II";
 
 RIG_IC756PRO2::RIG_IC756PRO2() {
+	defaultCIV = 0x64;
 	name_ = IC756PRO2name_;
-	pre_to[2] = ok[3] = bad[3] = pre_fm[3] = 0x64;
 	atten_level = 0;
 	preamp_level = 0;
+	adjustCIV(defaultCIV);
 };
 
 //=============================================================================
@@ -134,8 +137,9 @@ RIG_IC756PRO2::RIG_IC756PRO2() {
 const char IC756PRO3name_[] = "IC-756PRO-III";
 
 RIG_IC756PRO3::RIG_IC756PRO3() {
+	defaultCIV = 0x6E;
 	name_ = IC756PRO3name_;
-	pre_to[2] = ok[3] = bad[3] = pre_fm[3] = 0x6E;
+	adjustCIV(defaultCIV);
 };
 
 //=============================================================================
@@ -150,10 +154,11 @@ const char IC7000_mode_type[] =
 	{ 'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U' };
 
 RIG_IC7000::RIG_IC7000() {
+	defaultCIV = 0x70;
 	name_ = IC7000name_;
 	modes_ = IC7000modes_;
 	_mode_type = IC7000_mode_type;
-	pre_to[2] = ok[3] = bad[3] = pre_fm[3] = 0x70;
+	adjustCIV(defaultCIV);
 	restore_mbw = false;
 };
 
@@ -163,8 +168,9 @@ RIG_IC7000::RIG_IC7000() {
 const char IC7200name_[] = "IC-7200";
 
 RIG_IC7200::RIG_IC7200() {
+	defaultCIV = 0x76;
 	name_ = IC7200name_;
-	pre_to[2] = ok[3] = bad[3] = pre_fm[3] = 0x76;
+	adjustCIV(defaultCIV);
 };
 
 //=============================================================================
@@ -181,11 +187,11 @@ const char IC7600_mode_type[] =
 	  'L', 'U' };
 
 RIG_IC7600::RIG_IC7600() {
+	defaultCIV = 0x7A;
 	name_ = IC7600name_;
 	modes_ = IC7600modes_;
 	_mode_type = IC7600_mode_type;
-//	bandwidths_ = IC7600_widths;
-	pre_to[2] = ok[3] = bad[3] = pre_fm[3] = 0x7A;
+	adjustCIV(defaultCIV);
 };
 
 //=============================================================================
@@ -194,8 +200,9 @@ RIG_IC7600::RIG_IC7600() {
 const char IC7700name_[] = "IC-7700";
 
 RIG_IC7700::RIG_IC7700() {
+	defaultCIV = 0x74;
 	name_ = IC7700name_;
-	pre_to[2] = ok[3] = bad[3] = pre_fm[3] = 0x74;
+	adjustCIV(defaultCIV);
 };
 
 //=============================================================================
@@ -212,12 +219,11 @@ const char *IC910H_widths[] = {"none", NULL};
 
 
 RIG_IC910H::RIG_IC910H() {
+	defaultCIV = 0x60;
 	name_ = IC910Hname_;
 	modes_ = IC910Hmodes_;
 	_mode_type = IC910H_mode_type;
 	bandwidths_ = IC910H_widths;
-
-	pre_to[2] = ok[3] = bad[3] = pre_fm[3] = 0x60;
 
 	deffreq_ = 1296070000L;
 	def_mode = 1;
@@ -250,9 +256,16 @@ RIG_IC910H::RIG_IC910H() {
 	restore_mbw = true;
 
 	comp_is_on = !progStatus.compON;
+	adjustCIV(defaultCIV);
 };
 
 //=============================================================================
+
+void RIG_ICOM::adjustCIV(uchar adr)
+{
+	CIV = adr;
+	pre_to[2] = ok[3] = bad[3] = pre_fm[3] = CIV;
+}
 
 void RIG_ICOM::checkresponse(int n)
 {
@@ -501,7 +514,7 @@ void RIG_IC746::set_noise_reduction_val(int val)
 {
 	cmd = pre_to;
 	cmd.append("\x14\x06");
-	cmd.append(to_bcd(val * 2.55, 3));
+	cmd.append(to_bcd(val * 255 / 100, 3));
 	cmd.append(post);
 	sendICcommand(cmd,6);
 	checkresponse(6);
@@ -567,7 +580,7 @@ int RIG_IC746::get_bandwidth()
 
 void RIG_IC746::set_mic_gain(int val)
 {
-	val = (int)(val * 2.55);
+	val = (int)(val * 255 / 100);
 	cmd = pre_to;
 	cmd.append("\x14\x0B");
 	cmd.append(to_bcd(val,3));
@@ -618,7 +631,7 @@ void RIG_IC746::get_if_min_max_step(int &min, int &max, int &step)
 int ICsql = 0;
 void RIG_IC746::set_squelch(int val)
 {
-	ICsql = (int)(val * 2.55);
+	ICsql = (int)(val * 255 / 100);
 	cmd = pre_to;
 	cmd.append("\x14\x03");
 	cmd.append(to_bcd(ICsql, 3));
@@ -632,7 +645,7 @@ void RIG_IC746::set_squelch(int val)
 int ICrfg = 0;
 void RIG_IC746::set_rf_gain(int val)
 {
-	ICrfg = (int)(val * 2.55);
+	ICrfg = (int)(val * 255 / 100);
 	cmd = pre_to;
 	cmd.append("\x14\x02");
 	cmd.append(to_bcd(ICrfg, 3));
@@ -647,7 +660,7 @@ void RIG_IC746::set_power_control(double val)
 {
 	cmd = pre_to;
 	cmd.append("\x14\x0A");
-	cmd.append(to_bcd((int)(val * 2.55), 3));
+	cmd.append(to_bcd((int)(val * 255 / 100), 3));
 	cmd.append( post );
 	sendICcommand (cmd, 6);
 	checkresponse(6);
@@ -1287,6 +1300,26 @@ int RIG_IC7200::get_mode()
 	return mode_;
 }
 
+void RIG_IC7200::set_mic_gain(int v)
+{
+	ICvol = (int)(v * 255 / 100);
+	if (!progStatus.USBaudio) {
+		cmd = pre_to;
+		cmd.append("\x14\x01");
+		cmd.append(to_bcd(ICvol, 3));
+		cmd.append( post );
+	} else {
+		cmd = pre_to;
+		cmd.append("\x1A\x03\x25");
+		cmd.append(to_bcd(ICvol, 3));
+		cmd.append( post );
+	}
+	sendICcommand (cmd, 6);
+	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+}
+
 //======================================================================
 // IC7600 unique commands
 //======================================================================
@@ -1347,6 +1380,28 @@ int RIG_IC7600::get_mode()
 		checkresponse(8);
 	}
 	return mode_;
+}
+
+void RIG_IC7600::set_mic_gain(int v)
+{
+	ICvol = (int)(v * 255 / 100);
+LOG_INFO("%d", ICvol);
+	if (!progStatus.USBaudio) {
+		cmd = pre_to;
+		cmd.append("\x14\x01");
+		cmd.append(to_bcd(ICvol, 3));
+		cmd.append( post );
+	} else {
+		cmd = pre_to;
+		cmd += '\x1A'; cmd += '\x05';
+		cmd += '\x00'; cmd += '\x29';
+		cmd.append(to_bcd(ICvol, 3));
+		cmd.append( post );
+	}
+	sendICcommand (cmd, 6);
+	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 // alh added ++++++++++++++++++++++++++++
@@ -1446,7 +1501,7 @@ void RIG_IC910H::set_compression()
 	if (progStatus.compON) {
 		cmd = pre_to;
 		cmd.append("\x14\x0E");
-		cmd.append(to_bcd(progStatus.compression * 2.55, 3));
+		cmd.append(to_bcd(progStatus.compression * 255 / 100, 3));
 		cmd.append( post );
 		sendICcommand(cmd, 6);
 		checkresponse(6);
@@ -1485,7 +1540,7 @@ void RIG_IC910H::set_vox_gain()
 {
 	cmd = pre_to;
 	cmd.append("\x1A\x02");
-	cmd.append(to_bcd(progStatus.vox_gain * 2.55, 3));
+	cmd.append(to_bcd(progStatus.vox_gain * 255 / 100, 3));
 	cmd.append(post);
 	sendCommand(cmd, 6, true);
 	if (RIG_DEBUG)
@@ -1496,7 +1551,7 @@ void RIG_IC910H::set_vox_anti()
 {
 	cmd = pre_to;
 	cmd.append("\x1A\x04");
-	cmd.append(to_bcd(progStatus.vox_anti * 2.55, 3));
+	cmd.append(to_bcd(progStatus.vox_anti * 255 / 100, 3));
 	cmd.append(post);
 	sendCommand(cmd, 6, true);
 	if (RIG_DEBUG)
@@ -1507,7 +1562,7 @@ void RIG_IC910H::set_vox_hang()
 {
 	cmd = pre_to;
 	cmd.append("\x1A\x03");
-	cmd.append(to_bcd(progStatus.vox_hang * 2.55, 3));
+	cmd.append(to_bcd(progStatus.vox_hang * 255 / 100, 3));
 	cmd.append(post);
 	sendCommand(cmd, 6, true);
 	if (RIG_DEBUG)
