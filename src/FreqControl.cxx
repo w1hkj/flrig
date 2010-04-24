@@ -73,6 +73,7 @@ void cbSelectDigit (Fl_Widget *btn, void * nbr)
 
 cFreqControl::cFreqControl(int x, int y, int w, int h, const char *lbl):
 			  Fl_Group(x,y,w,h,"") {
+	font_number = FL_COURIER;
 	ONCOLOR = FL_YELLOW;
 	OFFCOLOR = FL_BLACK;
 	SELCOLOR = fl_rgb_color(100, 100, 100);
@@ -116,7 +117,7 @@ cFreqControl::cFreqControl(int x, int y, int w, int h, const char *lbl):
 			fcHeight-4,
 			" ");
 		Digit[n]->box(FL_FLAT_BOX); 
-		Digit[n]->labelfont(FL_COURIER);
+		Digit[n]->labelfont(font_number);
 		Digit[n]->labelcolor(ONCOLOR);
 		Digit[n]->color(OFFCOLOR, SELCOLOR);
 		Digit[n]->labelsize(fcHeight);
@@ -127,7 +128,7 @@ cFreqControl::cFreqControl(int x, int y, int w, int h, const char *lbl):
 
 	decbx = new Fl_Box(fcFirst + (nD - 3) * fcWidth + 2, fcTop + 2, pw, fcHeight-4,".");
 	decbx->box(FL_FLAT_BOX);
-	decbx->labelfont(FL_COURIER);
+	decbx->labelfont(font_number);
 	decbx->labelcolor(ONCOLOR);
 	decbx->color(OFFCOLOR);
 	decbx->labelsize(fcHeight);
@@ -171,6 +172,15 @@ void cFreqControl::updatevalue()
 	}
 	decbx->label(".");
 	redraw();//damage();
+}
+
+void cFreqControl::font(Fl_Font fnt)
+{
+	font_number = fnt;
+	for (int n = 0; n < nD; n++)
+		Digit[n]->labelfont(fnt);
+	decbx->labelfont(fnt);
+	redraw();
 }
 
 void cFreqControl::SetONOFFCOLOR( Fl_Color ONcolor, Fl_Color OFFcolor)

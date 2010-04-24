@@ -229,8 +229,10 @@ int main (int argc, char *argv[])
 	mainwindow = Rig_window();
 	mainwindow->callback(exit_main);
 
+	fntbrowser = new Font_Browser;
 	dlgMemoryDialog = Memory_Dialog();
 	dlgDisplayConfig = DisplayDialog();
+
 
 	char dirbuf[FL_PATH_MAX + 1];
 #ifdef __WIN32__

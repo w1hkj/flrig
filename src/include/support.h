@@ -183,6 +183,7 @@ extern void cbCloseMemory();
 
 extern void cbOkDisplayDialog();
 extern void cbCancelDisplayDialog();
+extern void cbPrefFont();
 extern void cbPrefBackground();
 extern void cbPrefForeground();
 

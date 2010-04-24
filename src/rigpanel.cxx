@@ -834,6 +834,12 @@ static void cb_btnOkDisplayDialog(Fl_Return_Button*, void*) {
 
 Fl_Box *lblTest=(Fl_Box *)0;
 
+Fl_Button *prefFont=(Fl_Button *)0;
+
+static void cb_prefFont(Fl_Button*, void*) {
+  cbPrefFont();
+}
+
 Fl_Button *prefForeground=(Fl_Button *)0;
 
 static void cb_prefForeground(Fl_Button*, void*) {
@@ -848,7 +854,7 @@ static void cb_prefBackground(Fl_Button*, void*) {
 
 Fl_Double_Window* DisplayDialog() {
   Fl_Double_Window* w;
-  { Fl_Double_Window* o = new Fl_Double_Window(326, 106, _("Flrig Colors"));
+  { Fl_Double_Window* o = new Fl_Double_Window(404, 106, _("Flrig Colors"));
     w = o;
     { grpMeterColor = new Fl_Group(8, 8, 209, 32);
       grpMeterColor->box(FL_DOWN_BOX);
@@ -875,37 +881,39 @@ Fl_Double_Window* DisplayDialog() {
       } // Fl_SigBar* sldrRcvSignalColor
       grpMeterColor->end();
     } // Fl_Group* grpMeterColor
-    { btnBacklight = new Fl_Button(9, 44, 90, 24, _("Backlight"));
+    { btnBacklight = new Fl_Button(16, 44, 90, 24, _("Backlight"));
       btnBacklight->callback((Fl_Callback*)cb_btnBacklight);
     } // Fl_Button* btnBacklight
-    { btMeterColor = new Fl_Button(9, 73, 90, 24, _("S meter"));
+    { btMeterColor = new Fl_Button(16, 73, 90, 24, _("S meter"));
       btMeterColor->callback((Fl_Callback*)cb_btMeterColor);
     } // Fl_Button* btMeterColor
-    { btnSWRColor = new Fl_Button(105, 44, 90, 24, _("SWR meter"));
+    { btnSWRColor = new Fl_Button(117, 44, 90, 24, _("SWR meter"));
       btnSWRColor->callback((Fl_Callback*)cb_btnSWRColor);
     } // Fl_Button* btnSWRColor
-    { btnPwrColor = new Fl_Button(105, 73, 90, 24, _("Pwr meter"));
+    { btnPwrColor = new Fl_Button(117, 73, 90, 24, _("Pwr meter"));
       btnPwrColor->callback((Fl_Callback*)cb_btnPwrColor);
     } // Fl_Button* btnPwrColor
-    { btnCancel = new Fl_Button(204, 73, 55, 24, _("Cancel"));
+    { btnCancel = new Fl_Button(278, 73, 55, 24, _("Cancel"));
       btnCancel->callback((Fl_Callback*)cb_btnCancel);
     } // Fl_Button* btnCancel
-    { btnOkDisplayDialog = new Fl_Return_Button(267, 73, 55, 24, _("OK"));
+    { btnOkDisplayDialog = new Fl_Return_Button(337, 73, 55, 24, _("OK"));
       btnOkDisplayDialog->callback((Fl_Callback*)cb_btnOkDisplayDialog);
     } // Fl_Return_Button* btnOkDisplayDialog
-    { Fl_Box* o = lblTest = new Fl_Box(222, 8, 40, 60, _("8"));
+    { lblTest = new Fl_Box(222, 8, 170, 30, _("14070.000"));
       lblTest->box(FL_DOWN_BOX);
       lblTest->color((Fl_Color)35);
       lblTest->selection_color((Fl_Color)FL_FOREGROUND_COLOR);
       lblTest->labelfont(4);
-      lblTest->labelsize(56);
+      lblTest->labelsize(28);
       lblTest->labelcolor((Fl_Color)230);
-      o->labelsize(o->h()-8);
     } // Fl_Box* lblTest
-    { prefForeground = new Fl_Button(267, 8, 55, 24, _("Color"));
+    { prefFont = new Fl_Button(222, 42, 55, 24, _("Font"));
+      prefFont->callback((Fl_Callback*)cb_prefFont);
+    } // Fl_Button* prefFont
+    { prefForeground = new Fl_Button(279, 42, 55, 24, _("Digit"));
       prefForeground->callback((Fl_Callback*)cb_prefForeground);
     } // Fl_Button* prefForeground
-    { prefBackground = new Fl_Button(267, 42, 55, 24, _("Back"));
+    { prefBackground = new Fl_Button(337, 42, 55, 24, _("Back"));
       prefBackground->callback((Fl_Callback*)cb_prefBackground);
     } // Fl_Button* prefBackground
     o->end();
@@ -1132,6 +1140,14 @@ static void cb_btndtrplus(Fl_Check_Button*, void*) {
 btnOkXcvrDialog->redraw();
 }
 
+Fl_Input *txtCIV=(Fl_Input *)0;
+
+static void cb_txtCIV(Fl_Input* o, void*) {
+  printf("%s/n", o->value());
+}
+
+Fl_Check_Button *btnUSBaudio=(Fl_Check_Button *)0;
+
 Fl_ComboBox *selectSepPTTPort=(Fl_ComboBox *)0;
 
 static void cb_selectSepPTTPort(Fl_ComboBox*, void*) {
@@ -1320,45 +1336,58 @@ Fl_Double_Window* XcvrDialog() {
           } // Fl_Input* server_port
           o->end();
         } // Fl_Group* o
-        { Fl_Group* o = new Fl_Group(4, 175, 470, 73);
+        { Fl_Group* o = new Fl_Group(4, 175, 299, 73);
           o->box(FL_ENGRAVED_FRAME);
-          { Fl_Round_Button* o = btncatptt = new Fl_Round_Button(67, 180, 149, 22, _("PTT via CAT"));
+          { Fl_Round_Button* o = btncatptt = new Fl_Round_Button(15, 180, 149, 22, _("PTT via CAT"));
             btncatptt->tooltip(_("PTT is a CAT command (not hardware)"));
             btncatptt->down_box(FL_ROUND_DOWN_BOX);
             btncatptt->selection_color((Fl_Color)FL_SELECTION_COLOR);
             btncatptt->callback((Fl_Callback*)cb_btncatptt);
             o->value(progStatus.comm_catptt);
           } // Fl_Round_Button* btncatptt
-          { Fl_Round_Button* o = btnrtsptt = new Fl_Round_Button(67, 203, 149, 22, _("PTT via RTS"));
+          { Fl_Round_Button* o = btnrtsptt = new Fl_Round_Button(15, 203, 149, 22, _("PTT via RTS"));
             btnrtsptt->tooltip(_("RTS is ptt line"));
             btnrtsptt->down_box(FL_ROUND_DOWN_BOX);
             btnrtsptt->callback((Fl_Callback*)cb_btnrtsptt);
             o->value(progStatus.comm_rtsptt);
           } // Fl_Round_Button* btnrtsptt
-          { Fl_Round_Button* o = btndtrptt = new Fl_Round_Button(67, 226, 149, 22, _("PTT via DTR"));
+          { Fl_Round_Button* o = btndtrptt = new Fl_Round_Button(15, 226, 149, 22, _("PTT via DTR"));
             btndtrptt->tooltip(_("DTR is ptt line"));
             btndtrptt->down_box(FL_ROUND_DOWN_BOX);
             btndtrptt->callback((Fl_Callback*)cb_btndtrptt);
             o->value(progStatus.comm_dtrptt);
           } // Fl_Round_Button* btndtrptt
-          { Fl_Check_Button* o = chkrtscts = new Fl_Check_Button(251, 178, 171, 21, _("RTS/CTS flow control"));
+          { Fl_Check_Button* o = chkrtscts = new Fl_Check_Button(129, 178, 171, 21, _("RTS/CTS flow control"));
             chkrtscts->tooltip(_("Xcvr uses RTS/CTS handshake"));
             chkrtscts->down_box(FL_DOWN_BOX);
             chkrtscts->callback((Fl_Callback*)cb_chkrtscts);
             o->value(progStatus.comm_rtscts);
           } // Fl_Check_Button* chkrtscts
-          { Fl_Check_Button* o = btnrtsplus = new Fl_Check_Button(251, 201, 171, 21, _("RTS +12 v"));
+          { Fl_Check_Button* o = btnrtsplus = new Fl_Check_Button(129, 201, 171, 21, _("RTS +12 v"));
             btnrtsplus->tooltip(_("Initial state of RTS"));
             btnrtsplus->down_box(FL_DOWN_BOX);
             btnrtsplus->callback((Fl_Callback*)cb_btnrtsplus);
             o->value(progStatus.comm_rtsplus);
           } // Fl_Check_Button* btnrtsplus
-          { Fl_Check_Button* o = btndtrplus = new Fl_Check_Button(251, 224, 171, 21, _("DTR +12 v"));
+          { Fl_Check_Button* o = btndtrplus = new Fl_Check_Button(129, 224, 171, 21, _("DTR +12 v"));
             btndtrplus->tooltip(_("Initial state of DTR"));
             btndtrplus->down_box(FL_DOWN_BOX);
             btndtrplus->callback((Fl_Callback*)cb_btndtrplus);
             o->value(progStatus.comm_dtrplus);
           } // Fl_Check_Button* btndtrplus
+          o->end();
+        } // Fl_Group* o
+        { Fl_Group* o = new Fl_Group(304, 175, 168, 73);
+          o->box(FL_ENGRAVED_FRAME);
+          o->align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE);
+          { txtCIV = new Fl_Input(320, 186, 58, 22, _("CI-V adr"));
+            txtCIV->type(2);
+            txtCIV->callback((Fl_Callback*)cb_txtCIV);
+            txtCIV->align(FL_ALIGN_RIGHT);
+          } // Fl_Input* txtCIV
+          { btnUSBaudio = new Fl_Check_Button(320, 218, 70, 15, _("USB audio"));
+            btnUSBaudio->down_box(FL_DOWN_BOX);
+          } // Fl_Check_Button* btnUSBaudio
           o->end();
         } // Fl_Group* o
         o->end();

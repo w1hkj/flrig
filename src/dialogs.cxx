@@ -6,6 +6,7 @@
 #include "rigpanel.h"
 #include "xml_io.h"
 #include "rigbase.h"
+#include "font_browser.h"
 
 #include <string>
 
@@ -33,6 +34,8 @@ Fl_Double_Window *dlgXcvrConfig = NULL;
 Fl_Double_Window *dlgMemoryDialog = NULL;
 Fl_Double_Window *dlgControls = NULL;
 Fl_Double_Window *tt550_controls = NULL;
+Font_Browser     *fntbrowser = NULL;
+
 
 //======================================================================
 // test comm ports
@@ -386,7 +389,25 @@ void createXcvrDialog()
 	initRigCombo();
 }
 
-// Frequency display colors
+// Frequency display font / colors
+
+void cbFreqControlFontBrowser(Fl_Widget*, void*) {
+	Fl_Font fnt = fntbrowser->fontNumber();
+	progStatus.fontnbr = fnt;
+	lblTest->labelfont(fnt);
+	dlgDisplayConfig->redraw();
+	FreqDisp->font(fnt);
+	fntbrowser->hide();
+}
+
+void cbPrefFont()
+{
+	fntbrowser->fontNumber(progStatus.fontnbr);
+	fntbrowser->fontFilter(Font_Browser::FIXED_WIDTH);
+	fntbrowser->fontFilter(Font_Browser::ALL_TYPES);
+	fntbrowser->callback(cbFreqControlFontBrowser);
+	fntbrowser->show();
+}
 
 uchar fg_red, fg_green, fg_blue;
 uchar bg_red, bg_green, bg_blue;
