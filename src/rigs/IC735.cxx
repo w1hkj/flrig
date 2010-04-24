@@ -38,7 +38,8 @@ RIG_IC735::RIG_IC735() {
 	has_mode_control = true;
 	has_bandwidth_control = true;
 
-	pre_to[2] = ok[3] = bad[3] = pre_fm[3] = 0x04;
+	defaultCIV = 0x04;
+	adjustCIV(defaultCIV);
 
 };
 

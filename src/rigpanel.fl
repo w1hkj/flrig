@@ -544,7 +544,7 @@ change requires restart} xywh {307 41 100 22} type Int
           }
         }
         Fl_Group {} {open
-          xywh {4 175 299 73} box ENGRAVED_FRAME
+          xywh {4 175 243 73} box ENGRAVED_FRAME
         } {
           Fl_Round_Button btncatptt {
             label {PTT via CAT}
@@ -580,38 +580,45 @@ btnOkXcvrDialog->redraw();}
             code0 {o->value(progStatus.comm_dtrptt);}
           }
           Fl_Check_Button chkrtscts {
-            label {RTS/CTS flow control}
+            label {RTS/CTS}
             callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();}
-            tooltip {Xcvr uses RTS/CTS handshake} xywh {129 178 171 21} down_box DOWN_BOX
+            tooltip {Xcvr uses RTS/CTS handshake} xywh {129 178 98 21} down_box DOWN_BOX
             code0 {o->value(progStatus.comm_rtscts);}
           }
           Fl_Check_Button btnrtsplus {
             label {RTS +12 v}
             callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();}
-            tooltip {Initial state of RTS} xywh {129 201 171 21} down_box DOWN_BOX
+            tooltip {Initial state of RTS} xywh {129 201 102 21} down_box DOWN_BOX
             code0 {o->value(progStatus.comm_rtsplus);}
           }
           Fl_Check_Button btndtrplus {
             label {DTR +12 v}
             callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();}
-            tooltip {Initial state of DTR} xywh {129 224 171 21} down_box DOWN_BOX
+            tooltip {Initial state of DTR} xywh {129 224 100 21} down_box DOWN_BOX
             code0 {o->value(progStatus.comm_dtrplus);}
           }
         }
         Fl_Group {} {open
-          xywh {304 175 168 73} box ENGRAVED_FRAME align 21
+          xywh {247 175 225 73} box ENGRAVED_FRAME align 21
         } {
           Fl_Input txtCIV {
             label {CI-V adr}
-            callback {progStatus.CIV = atol(o->value());} selected
-            tooltip {Enter hex value, ie: 0x5F} xywh {320 186 58 22} type Int align 8
+            callback {progStatus.CIV = atol(o->value());
+cbCIV();}
+            tooltip {Enter hex value, ie: 0x5F} xywh {261 183 58 22} type Int align 8
           }
           Fl_Check_Button btnUSBaudio {
             label {USB audio}
-            xywh {320 218 70 15} down_box DOWN_BOX
+            callback {cbUSBaudio();}
+            xywh {261 215 104 15} down_box DOWN_BOX
+          }
+          Fl_Button btnCIVdefault {
+            label Default
+            callback {cbCIVdefault();}
+            xywh {387 183 69 22}
           }
         }
       }
@@ -683,8 +690,8 @@ Serial Port for a special Control Signals}
       }
     }
     Fl_Button btnCancelCommConfig {
-      label Cancel
-      callback {cbCancelXcvrDialog();}
+      label Close
+      callback {cbCancelXcvrDialog();} selected
       xywh {346 2 60 25}
     }
     Fl_Return_Button btnOkXcvrDialog {

@@ -1157,6 +1157,9 @@ void initRig()
 	pthread_mutex_lock(&mutex_serial);
 
 	selrig->initialize();
+
+	if (progStatus.CIV > 0) selrig->adjustCIV(progStatus.CIV);
+
 	transceiver_freq = selrig->get_vfoA();
 	transceiver_mode = selrig->get_mode();
 	transceiver_bw = selrig->get_bandwidth();
@@ -1466,8 +1469,9 @@ void init_title()
 
 void initConfigDialog()
 {
+	int picked = selectRig->index();
+	rigbase *srig = rigs[picked];
 	selectCommPort->index(0);
-	rigbase *srig = rigs[selectRig->index()];
 
 	progStatus.loadXcvrState(selrig->name_);
 
@@ -1488,12 +1492,34 @@ void initConfigDialog()
 	chkrtscts->value( srig->comm_rtscts );
 	btnrtsplus->value( srig->comm_rtsplus );
 	btndtrplus->value( srig->comm_dtrplus );
+
+	if (picked >= IC706MKIIG && picked <= IC910H) {
+		char hexstr[8];
+		snprintf(hexstr, sizeof(hexstr), "0x%2X", srig->CIV);
+		txtCIV->value(hexstr);
+		txtCIV->activate();
+		btnCIVdefault->activate();
+		if (picked == IC7200 || picked == IC7600) {
+			btnUSBaudio->value(progStatus.USBaudio = false);
+			btnUSBaudio->activate();
+		} else
+			btnUSBaudio->deactivate();
+	} else {
+		txtCIV->value("");
+		txtCIV->deactivate();
+		btnCIVdefault->deactivate();
+		btnUSBaudio->value(false);
+		btnUSBaudio->deactivate();
+	}
 }
 
 void initStatusConfigDialog()
 {
 	rig_nbr = progStatus.rig_nbr;
 	selrig = rigs[rig_nbr];
+
+	if (rig_nbr >= IC706MKIIG && rig_nbr <= IC910H)
+		if (progStatus.CIV) selrig->adjustCIV(progStatus.CIV);
 
 	selectRig->index(rig_nbr);
 	mnuBaudrate->index( progStatus.comm_baudrate );

@@ -13,6 +13,7 @@ protected:
 	const char *_mode_type;
 public:
 	RIG_ICOM() {
+		CIV = 0x56;
 		pre_to = "\xFE\xFE\x56\xE0";
 		pre_fm = "\xFE\xFE\xE0\x56";
 		post = "\xFD";
@@ -22,7 +23,7 @@ public:
 	virtual ~RIG_ICOM() {}
 	void checkresponse(int n);
 	bool sendICcommand(string str, int nbr);
-
+	void adjustCIV(uchar adr);
 };
 
 class RIG_IC746 : public RIG_ICOM {
@@ -52,7 +53,7 @@ public:
 	virtual int  get_modetype(int n);
 	virtual void set_bandwidth(int val);
 	virtual int  get_bandwidth();
-	void set_mic_gain(int val);
+	virtual void set_mic_gain(int val);
 //	int  get_mic_gain();
 	void get_mic_gain_min_max_step(int &min, int &max, int &step);
 	void set_if_shift(int val);
@@ -128,6 +129,7 @@ public:
 
 	int  get_mode();
 	void set_mode(int m);
+	void set_mic_gain(int v);
 };
 
 class RIG_IC7600 : public RIG_IC746PRO {
@@ -139,7 +141,7 @@ public:
 
 	void set_attenuator( int val );	//alh
 	int  get_attenuator();		//alh
-
+	void set_mic_gain(int v);
 };
 
 class RIG_IC7700 : public RIG_IC746PRO {
@@ -158,6 +160,7 @@ public:
 	void set_vox_gain();
 	void set_vox_anti();
 	void set_vox_hang();
+
 private:
 	bool comp_is_on;
 };

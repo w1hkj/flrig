@@ -48,6 +48,10 @@ public:
 	bool comm_rtsptt;
 	bool comm_dtrptt;
 	int  serloop_timing;
+	int  CIV;
+	int  defaultCIV;
+	bool USBaudio;
+
 	int  mode_;
 	int  bw_;
 	long freq_;
@@ -223,6 +227,7 @@ public:
 	virtual void set_nb_level() {}
 	virtual void set_special(int v) {}
 
+	virtual void adjustCIV(uchar adr) {}
 };
 
 extern rigbase *rigs[];

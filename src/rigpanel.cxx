@@ -1143,10 +1143,21 @@ btnOkXcvrDialog->redraw();
 Fl_Input *txtCIV=(Fl_Input *)0;
 
 static void cb_txtCIV(Fl_Input* o, void*) {
-  printf("%s/n", o->value());
+  progStatus.CIV = atol(o->value());
+cbCIV();
 }
 
 Fl_Check_Button *btnUSBaudio=(Fl_Check_Button *)0;
+
+static void cb_btnUSBaudio(Fl_Check_Button*, void*) {
+  cbUSBaudio();
+}
+
+Fl_Button *btnCIVdefault=(Fl_Button *)0;
+
+static void cb_btnCIVdefault(Fl_Button*, void*) {
+  cbCIVdefault();
+}
 
 Fl_ComboBox *selectSepPTTPort=(Fl_ComboBox *)0;
 
@@ -1336,7 +1347,7 @@ Fl_Double_Window* XcvrDialog() {
           } // Fl_Input* server_port
           o->end();
         } // Fl_Group* o
-        { Fl_Group* o = new Fl_Group(4, 175, 299, 73);
+        { Fl_Group* o = new Fl_Group(4, 175, 243, 73);
           o->box(FL_ENGRAVED_FRAME);
           { Fl_Round_Button* o = btncatptt = new Fl_Round_Button(15, 180, 149, 22, _("PTT via CAT"));
             btncatptt->tooltip(_("PTT is a CAT command (not hardware)"));
@@ -1357,19 +1368,19 @@ Fl_Double_Window* XcvrDialog() {
             btndtrptt->callback((Fl_Callback*)cb_btndtrptt);
             o->value(progStatus.comm_dtrptt);
           } // Fl_Round_Button* btndtrptt
-          { Fl_Check_Button* o = chkrtscts = new Fl_Check_Button(129, 178, 171, 21, _("RTS/CTS flow control"));
+          { Fl_Check_Button* o = chkrtscts = new Fl_Check_Button(129, 178, 98, 21, _("RTS/CTS"));
             chkrtscts->tooltip(_("Xcvr uses RTS/CTS handshake"));
             chkrtscts->down_box(FL_DOWN_BOX);
             chkrtscts->callback((Fl_Callback*)cb_chkrtscts);
             o->value(progStatus.comm_rtscts);
           } // Fl_Check_Button* chkrtscts
-          { Fl_Check_Button* o = btnrtsplus = new Fl_Check_Button(129, 201, 171, 21, _("RTS +12 v"));
+          { Fl_Check_Button* o = btnrtsplus = new Fl_Check_Button(129, 201, 102, 21, _("RTS +12 v"));
             btnrtsplus->tooltip(_("Initial state of RTS"));
             btnrtsplus->down_box(FL_DOWN_BOX);
             btnrtsplus->callback((Fl_Callback*)cb_btnrtsplus);
             o->value(progStatus.comm_rtsplus);
           } // Fl_Check_Button* btnrtsplus
-          { Fl_Check_Button* o = btndtrplus = new Fl_Check_Button(129, 224, 171, 21, _("DTR +12 v"));
+          { Fl_Check_Button* o = btndtrplus = new Fl_Check_Button(129, 224, 100, 21, _("DTR +12 v"));
             btndtrplus->tooltip(_("Initial state of DTR"));
             btndtrplus->down_box(FL_DOWN_BOX);
             btndtrplus->callback((Fl_Callback*)cb_btndtrplus);
@@ -1377,17 +1388,22 @@ Fl_Double_Window* XcvrDialog() {
           } // Fl_Check_Button* btndtrplus
           o->end();
         } // Fl_Group* o
-        { Fl_Group* o = new Fl_Group(304, 175, 168, 73);
+        { Fl_Group* o = new Fl_Group(247, 175, 225, 73);
           o->box(FL_ENGRAVED_FRAME);
           o->align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE);
-          { txtCIV = new Fl_Input(320, 186, 58, 22, _("CI-V adr"));
+          { txtCIV = new Fl_Input(261, 183, 58, 22, _("CI-V adr"));
+            txtCIV->tooltip(_("Enter hex value, ie: 0x5F"));
             txtCIV->type(2);
             txtCIV->callback((Fl_Callback*)cb_txtCIV);
             txtCIV->align(FL_ALIGN_RIGHT);
           } // Fl_Input* txtCIV
-          { btnUSBaudio = new Fl_Check_Button(320, 218, 70, 15, _("USB audio"));
+          { btnUSBaudio = new Fl_Check_Button(261, 215, 104, 15, _("USB audio"));
             btnUSBaudio->down_box(FL_DOWN_BOX);
+            btnUSBaudio->callback((Fl_Callback*)cb_btnUSBaudio);
           } // Fl_Check_Button* btnUSBaudio
+          { btnCIVdefault = new Fl_Button(387, 183, 69, 22, _("Default"));
+            btnCIVdefault->callback((Fl_Callback*)cb_btnCIVdefault);
+          } // Fl_Button* btnCIVdefault
           o->end();
         } // Fl_Group* o
         o->end();
@@ -1460,7 +1476,7 @@ e"));
       } // Fl_Group* o
       o->end();
     } // Fl_Tabs* o
-    { btnCancelCommConfig = new Fl_Button(346, 2, 60, 25, _("Cancel"));
+    { btnCancelCommConfig = new Fl_Button(346, 2, 60, 25, _("Close"));
       btnCancelCommConfig->callback((Fl_Callback*)cb_btnCancelCommConfig);
     } // Fl_Button* btnCancelCommConfig
     { btnOkXcvrDialog = new Fl_Return_Button(416, 2, 60, 25, _("Init"));

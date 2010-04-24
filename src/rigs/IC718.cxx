@@ -62,7 +62,8 @@ RIG_IC718::RIG_IC718() {
 	has_rf_control = true;
 //	has_sql_control = true;
 
-	pre_to[2] = ok[3] = bad[3] = pre_fm[3] = 0x5E;
+	defaultCIV = 0x5E;
+	adjustCIV(defaultCIV);
 };
 
 //=============================================================================
@@ -94,7 +95,7 @@ void RIG_IC718::set_vfoA (long freq)
 // Volume control val 0 ... 100
 void RIG_IC718::set_volume_control(int val)
 {
-	int ICvol = (int)(val * 2.55);
+	int ICvol = (int)(val * 255 / 100);
 	cmd = pre_to;
 	cmd.append("\x14\x01");
 	cmd.append(to_bcd(ICvol, 3));
@@ -193,7 +194,7 @@ void RIG_IC718::set_noise_reduction_val(int val)
 {
 	cmd = pre_to;
 	cmd.append("\x14\x06");
-	cmd.append(to_bcd(val * 2.55, 3));
+	cmd.append(to_bcd(val * 255 / 100, 3));
 	cmd.append(post);
 	sendICcommand(cmd,6);
 	checkresponse(6);
@@ -243,7 +244,7 @@ int RIG_IC718::get_preamp()
 
 void RIG_IC718::set_rf_gain(int val)
 {
-	int ICrfg = (int)(val * 2.55);
+	int ICrfg = (int)(val * 255 / 100);
 	cmd = pre_to;
 	cmd.append("\x14\x02");
 	cmd.append(to_bcd(ICrfg, 3));
@@ -256,7 +257,7 @@ void RIG_IC718::set_rf_gain(int val)
 
 void RIG_IC718::set_squelch(int val)
 {
-	int ICsql = (int)(val * 2.55);
+	int ICsql = (int)(val * 255 / 100);
 	cmd = pre_to;
 	cmd.append("\x14\x03");
 	cmd.append(to_bcd(ICsql, 3));
@@ -271,7 +272,7 @@ void RIG_IC718::set_power_control(double val)
 {
 	cmd = pre_to;
 	cmd.append("\x14\x0A");
-	cmd.append(to_bcd((int)(val * 2.55), 3));
+	cmd.append(to_bcd((int)(val * 255 / 100), 3));
 	cmd.append( post );
 	sendICcommand (cmd, 6);
 	checkresponse(6);
@@ -281,7 +282,7 @@ void RIG_IC718::set_power_control(double val)
 
 void RIG_IC718::set_mic_gain(int val)
 {
-	val = (int)(val * 2.55);
+	val = (int)(val * 255 / 100);
 	cmd = pre_to;
 	cmd.append("\x14\x0B");
 	cmd.append(to_bcd(val,3));
