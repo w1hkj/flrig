@@ -62,6 +62,7 @@ public:
 	void updatevalue();
 	void value(long lv);
 	long value(){return val;};
+	void font(Fl_Font fnt);
 	void SetONCOLOR (uchar r, uchar g, uchar b);
 	void SetOFFCOLOR (uchar r, uchar g, uchar b);
 	void GetONCOLOR (uchar &r, uchar &g, uchar &b) {
@@ -82,6 +83,7 @@ private:
 	static const char	 	*Label[];
 	int					mult[MAX_DIGITS];
 	Fl_Box				*decbx;
+	Fl_Font  font_number;
 	Fl_Color OFFCOLOR;
 	Fl_Color ONCOLOR;
 	Fl_Color SELCOLOR;

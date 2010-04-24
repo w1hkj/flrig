@@ -50,6 +50,8 @@ status progStatus = {
 	false,		// bool	sep_dtrptt;
 	false,		// bool	sep_rtsplus;
 	false,		// bool	sep_dtrplus;
+	0,			// int	CIV;
+	false,		// bool	USBaudio;
 
 	0,			// int  opBW;
 	1,			// int  opMODE;
@@ -154,6 +156,8 @@ status progStatus = {
 	0,			// int	 swrGreen;
 	180,		// int	 swrBlue;
 
+	FL_COURIER,	// Fl_Font fontnbr;
+
 	false,		// bool	 tooltips;
 
 	"7362"		// string server_port
@@ -194,6 +198,8 @@ void status::saveLastState()
 	spref.set("rts_cts_flow", comm_rtscts);
 	spref.set("rts_plus", comm_rtsplus);
 	spref.set("dtr_plus", comm_dtrplus);
+	spref.set("civadr", CIV);
+	spref.set("usbaudio", USBaudio);
 
 	spref.set("aux_serial_port", aux_serial_port.c_str());
 	spref.set("aux_rts", aux_rts);
@@ -316,6 +322,8 @@ void status::saveLastState()
 	spref.set("swr_green", swrGreen);
 	spref.set("swr_blue", swrBlue);
 
+	spref.set("fontnbr", fontnbr);
+
 	spref.set("tooltips", tooltips);
 
 	spref.set("server_port", server_port.c_str());
@@ -360,6 +368,8 @@ bool status::loadXcvrState(const char *xcvr)
 		if (spref.get("rts_cts_flow", i, i)) comm_rtscts = i;
 		if (spref.get("rts_plus", i, i)) comm_rtsplus = i;
 		if (spref.get("dtr_plus", i, i)) comm_dtrplus = i;
+		spref.get("civadr", CIV, CIV);
+		if (spref.get("usbaudio", i, i)) USBaudio = i;
 
 		spref.get("aux_serial_port", defbuffer, "NONE", 199);
 		aux_serial_port = defbuffer;
@@ -475,6 +485,9 @@ bool status::loadXcvrState(const char *xcvr)
 		spref.get("swr_green", swrGreen, swrGreen);
 		spref.get("swr_blue", swrBlue, swrBlue);
 
+		i = (int)fontnbr;
+		spref.get("fontnbr", i, i); fontnbr = (Fl_Font)i;
+		i = 0;
 		if (spref.get("tooltips", i, i)) tooltips = i;
 
 		spref.get("server_port", defbuffer, "7362", 199);
@@ -485,6 +498,7 @@ bool status::loadXcvrState(const char *xcvr)
 	FreqDisp->SetONOFFCOLOR(
 		fl_rgb_color(fg_red, fg_green, fg_blue),
 		fl_rgb_color(bg_red, bg_green, bg_blue));
+	FreqDisp->font(fontnbr);
 	txtInactive->color(fl_rgb_color (bg_red, bg_green, bg_blue));
 	txtInactive->labelcolor(fl_rgb_color (fg_red, fg_green, fg_blue));
 	txtInactive->redraw();

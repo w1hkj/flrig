@@ -82,6 +82,7 @@ extern Fl_Button *btnCancel;
 #include <FL/Fl_Return_Button.H>
 extern Fl_Return_Button *btnOkDisplayDialog;
 extern Fl_Box *lblTest;
+extern Fl_Button *prefFont;
 extern Fl_Button *prefForeground;
 extern Fl_Button *prefBackground;
 Fl_Double_Window* DisplayDialog();
@@ -112,6 +113,8 @@ extern Fl_Round_Button *btndtrptt;
 extern Fl_Check_Button *chkrtscts;
 extern Fl_Check_Button *btnrtsplus;
 extern Fl_Check_Button *btndtrplus;
+extern Fl_Input *txtCIV;
+extern Fl_Check_Button *btnUSBaudio;
 extern Fl_ComboBox *selectSepPTTPort;
 extern Fl_Round_Button *btnSepRTSptt;
 extern Fl_Check_Button *btnSepRTSplus;

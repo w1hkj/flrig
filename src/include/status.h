@@ -2,6 +2,9 @@
 #define _status_H
 
 #include <string>
+#include <FL/Fl.H>
+#include <FL/Enumerations.H>
+
 #include "rig.h"
 
 using namespace std;
@@ -34,6 +37,8 @@ struct status {
 	bool	sep_dtrptt;
 	bool	sep_rtsplus;
 	bool	sep_dtrplus;
+	int		CIV;
+	bool	USBaudio;
 
 	int		opBW;
 	int		opMODE;
@@ -141,6 +146,8 @@ struct status {
 	int		swrRed;
 	int		swrGreen;
 	int		swrBlue;
+
+	Fl_Font	fontnbr;
 
 	bool	tooltips;
 
