@@ -19,16 +19,16 @@ bool DEBUG_718 = true;
 const char IC718name_[] = "IC-718";
 const char *IC718modes_[] = { "LSB", "USB", "AM", "CW", "RTTY", "CW-R", "RTTY-R", NULL};
 const char IC718_mode_type[] = { 'L', 'U', 'U', 'L', 'L', 'U', 'U'};
-//const char *IC718_widths[] = { "NARR", "WIDE", NULL};
+const char *IC718_widths[] = { "Wide", "Med", "Narr", NULL};
 
 RIG_IC718::RIG_IC718() {
 	name_ = IC718name_;
 	modes_ = IC718modes_;
 	_mode_type = IC718_mode_type;
+	bandwidths_ = IC718_widths;
 
-//	bandwidths_ = IC718_widths;
 	comm_baudrate = BR9600;
-	stopbits = 2;
+	stopbits = 1;
 	comm_retries = 2;
 	comm_wait = 5;
 	comm_timeout = 50;
@@ -41,6 +41,7 @@ RIG_IC718::RIG_IC718() {
 	comm_dtrptt = false;
 	mode_ = 1;
 	bw_ = 0;
+	filter_nbr = 1;
 
 //	has_swr_control = true;
 	has_power_control = true;
@@ -90,6 +91,8 @@ void RIG_IC718::set_vfoA (long freq)
 	cmd.append( post );
 	sendICcommand(cmd, 6);
 	checkresponse(6);
+	if (DEBUG_718)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 // Volume control val 0 ... 100
@@ -112,7 +115,7 @@ int RIG_IC718::get_volume_control()
 	cmd.append("\x14\x01");
 	cmd.append( post );
 	if(sendICcommand (cmd, 9))
-		return ((int)(fm_bcd(&replystr[6],3) / 2.55));
+		return ((int)(fm_bcd(&replystr[6],3) * 100 / 255));
 	checkresponse(9);
 	return 0;
 }
@@ -128,7 +131,11 @@ int RIG_IC718::get_smeter()
 	cmd.append("\x15\x02");
 	cmd.append( post );
 	if (sendICcommand (cmd, 9)) {
-		return fm_bcd(&replystr[6], 3) / 2.55;
+		int mtr = fm_bcd(&replystr[6], 3);
+		mtr = (int)(1.3 * mtr - 36.0);
+		if (mtr < 0) mtr = 0;
+		if (mtr > 255) mtr = 255;
+		return (mtr * 100 / 255);
 	} else
 		return 0;
 }
@@ -208,7 +215,7 @@ int RIG_IC718::get_noise_reduction_val()
 	cmd.append("\x14\x06");
 	cmd.append(post);
 	if(sendICcommand (cmd, 9))
-		return ((int)(fm_bcd(&replystr[6],3) / 2.55));
+		return ((int)(fm_bcd(&replystr[6],3) * 100 / 255));
 	checkresponse(9);
 	return 0;
 }
@@ -293,8 +300,48 @@ void RIG_IC718::set_mic_gain(int val)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
+void RIG_IC718::set_mode(int val)
+{
+	mode_ = val;
+	cmd = pre_to;
+	cmd += '\x06';
+	cmd += val > 5 ? val + 1 : val;
+	cmd += filter_nbr;
+	cmd.append( post );
+	sendICcommand (cmd, 6);
+	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+}
+
+int RIG_IC718::get_mode()
+{
+	cmd = pre_to;
+	cmd += '\x04';
+	cmd.append(post);
+	if (sendICcommand (cmd, 8 )) {
+		mode_ = replystr[5];
+		if (mode_ > 6) mode_--;
+		filter_nbr = replystr[6];
+	}
+	return mode_;
+}
+
 int RIG_IC718::get_modetype(int n)
 {
 	return _mode_type[n];
+}
+
+void RIG_IC718::set_bandwidth(int val)
+{
+	filter_nbr = val + 1;
+	set_mode(mode_);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+}
+
+int RIG_IC718::get_bandwidth()
+{
+	return filter_nbr - 1;
 }
 

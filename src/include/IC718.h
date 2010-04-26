@@ -27,7 +27,14 @@ public:
 	void set_squelch(int val);
 	void set_power_control(double val);
 	void set_mic_gain(int val);
+	void set_mode(int val);
+	int  get_mode();
 	int  get_modetype(int n);
+	void set_bandwidth(int val);
+	int  get_bandwidth();
+
+protected:
+	int  filter_nbr;
 };
 
 #endif
