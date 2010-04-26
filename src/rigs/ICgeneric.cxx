@@ -1279,7 +1279,7 @@ int RIG_IC7200::get_mode()
 		if (md > 6) md--;
 		filter_nbr = replystr[6];
 		cmd = pre_to;
-		cmd.append("\x1A\x06");
+		cmd.append("\x1A\x04");
 		cmd.append(post);
 		if (sendICcommand(cmd, 9)) {
 			if (replystr[6]) {
