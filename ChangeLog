@@ -1,7 +1,9 @@
-2010-04-24  David Freese  <w1hkj@w1hkj.com>
+2010-04-26  David Freese  <w1hkj@w1hkj.com>
 
-	5675be5: ICOM update
-	fb7063a: Freq Control Widget
+	04ef71f: IC7200 Data mode
+	cf066d3: IC718 corrections
+	5df3c55: ICOM update
+	b0b0afc: Freq Control Widget
 	9d9864b: IC7200 changes
 	195fcd9: IC718
 	526150b: K3 mode
