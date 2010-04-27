@@ -262,6 +262,16 @@ void RIG_IC718::set_rf_gain(int val)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
+int RIG_IC718::get_rf_gain()
+{
+	cmd = pre_to;
+	cmd.append("\x14\x02").append(post);
+	if (sendICcommand (cmd, 9))
+		return ((int)(fm_bcd(&replystr[6],3) * 100 / 255));
+	checkresponse(9);
+	return 0;
+}
+
 void RIG_IC718::set_squelch(int val)
 {
 	int ICsql = (int)(val * 255 / 100);
