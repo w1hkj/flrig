@@ -24,6 +24,7 @@ public:
 	void set_preamp(int val);
 	int  get_preamp();
 	void set_rf_gain(int val);
+	int  get_rf_gain();
 	void set_squelch(int val);
 	void set_power_control(double val);
 	void set_mic_gain(int val);
