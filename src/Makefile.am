@@ -66,12 +66,12 @@ uninstall-local:
 	rm -f $(DESTDIR)/$(datadir)/pixmaps/flrig.xpm
 	rm -f $(DESTDIR)/$(datadir)/applications/flrig.desktop
 
-FL_SRC = rigpanel.fl
+FLRIG_FL_SRC = rigpanel.fl
 
 if HAVE_FLUID
-flgen: $(FL_SRC)
+flgen: $(FLRIG_FL_SRC)
 	(cd $(srcdir)/include; \
-	for f in $(FL_SRC); do \
+	for f in $(FLRIG_FL_SRC); do \
 	    c=$${f%.fl}.cxx; \
 		h=$${f%.fl}.h; \
 		h=$${h##*/}; \
