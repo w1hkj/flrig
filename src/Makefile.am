@@ -138,6 +138,7 @@ flrig_SOURCES += \
 	rigs/FT1000.cxx \
 	rigs/FT1000MP.cxx \
 	rigs/FT2000.cxx \
+	rigs/IC703.cxx \
 	rigs/IC706MKIIG.cxx \
 	rigs/IC718.cxx \
 	rigs/IC728.cxx \
@@ -146,6 +147,7 @@ flrig_SOURCES += \
 	rigs/K2.cxx \
 	rigs/K3.cxx \
 	rigs/TS140.cxx \
+	rigs/TS450S.cxx \
 	rigs/TS570.cxx \
 	rigs/TS2000.cxx \
 	rigs/TT516.cxx \
@@ -214,6 +216,7 @@ EXTRA_DIST = \
 	include/FT2000.h \
 	include/generic.h \
 	include/gettext.h \
+	include/IC703.h \
 	include/IC706MKIIG.h \
 	include/IC718.h \
 	include/IC728.h \
@@ -235,6 +238,7 @@ EXTRA_DIST = \
 	include/support.h \
 	include/threads.h \
 	include/TS140.h \
+	include/TS450S.h \
 	include/TS570.h \
 	include/TS2000.h \
 	include/TT516.h \
