@@ -40,6 +40,8 @@ RIG_IC703::RIG_IC703() {
 
 	has_mode_control =
 	has_bandwidth_control =
+	has_compON =
+	has_vox_onoff =
 	has_preamp_control =
 	has_attenuator_control = true;
 	
@@ -209,4 +211,46 @@ int RIG_IC703::get_swr()
 	if (sendICcommand (cmd, 9))
 		return fm_bcd(&replystr[6], 3) * 100 / 255;
 	return 0;
+}
+
+void RIG_IC703::set_compression()
+{
+	if (progStatus.compON) {
+		cmd = pre_to;
+		cmd.append("\x16\x44");
+		cmd += '\x01';
+		cmd.append(post);
+		sendICcommand(cmd, 6);
+		checkresponse(6);
+	} else {
+		cmd = pre_to;
+		cmd.append("\x16\x44");
+		cmd += '\x00';
+		cmd.append(post);
+		sendICcommand(cmd, 6);
+		checkresponse(6);
+	}
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+}
+
+void RIG_IC703::set_vox_onoff()
+{
+	if (progStatus.vox_onoff) {
+		cmd = pre_to;
+		cmd.append("\x16\x46");
+		cmd += '\x01';
+		cmd.append(post);
+		sendICcommand(cmd, 6);
+		checkresponse(6);
+	} else {
+		cmd = pre_to;
+		cmd.append("\x16\x46");
+		cmd += '\x00';
+		cmd.append(post);
+		sendICcommand(cmd, 6);
+		checkresponse(6);
+	}
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
