@@ -1,7 +1,7 @@
 #ifndef _IC703_H
 #define _IC703_H
 
-#include "ICgeneric.h"
+#include "ICbase.h"
 
 class RIG_IC703 : public RIG_ICOM {
 public:

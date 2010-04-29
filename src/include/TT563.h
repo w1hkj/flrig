@@ -1,7 +1,7 @@
 #ifndef _TT563_H
 #define _TT563_H
 
-#include "ICgeneric.h"
+#include "ICbase.h"
 
 class RIG_TT563 : public RIG_ICOM {
 public:
