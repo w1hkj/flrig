@@ -8,8 +8,6 @@
  */
 
 #include "IC718.h"
-#include "debug.h"
-#include "rig.h"
 
 bool DEBUG_718 = true;
 
