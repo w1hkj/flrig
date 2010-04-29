@@ -25,6 +25,8 @@ public:
 	int  get_attenuator();
 	void set_preamp(int val);
 	int  get_preamp();
+	void set_compression();
+	void set_vox_onoff();
 
 protected:
 	int  preamp_level;
