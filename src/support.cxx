@@ -1137,13 +1137,14 @@ void initXcvrTab()
 		if (selrig->has_vox_gain) cnt_vox_gain->activate(); else cnt_vox_gain->deactivate();
 		if (selrig->has_vox_anti) cnt_anti_vox->activate(); else cnt_anti_vox->deactivate();
 		if (selrig->has_vox_hang) cnt_vox_hang->activate(); else cnt_vox_hang->deactivate();
-		if (selrig->has_compression) {
+		if (selrig->has_compression)
 			cnt_compression->activate();
-			btnCompON->activate();
-		} else {
+		else
 			cnt_compression->deactivate();
+		if (selrig->has_compON)
+			btnCompON->activate();
+		else
 			btnCompON->deactivate();
-		}
 		cnt_line_out->deactivate();
 		mnuKeepData->activate();
 	}

@@ -43,25 +43,20 @@ RIG_IC718::RIG_IC718() {
 	bw_ = 0;
 	filter_nbr = 1;
 
-//	has_swr_control = true;
 	has_power_control = true;
 	has_volume_control = true;
 	has_mode_control = true;
 	has_bandwidth_control = true;
 	has_micgain_control = true;
-//	has_notch_control = true;
 	has_attenuator_control = true;
 	has_preamp_control = true;
-//	has_ifshift_control = true;
-//	has_ptt_control = true;
-//	has_tune_control = true;
-//	has_swr_control = true;
 	has_noise_control = true;
 	has_noise_reduction = true;
 	has_noise_reduction_control = true;
-//	has_alc_control = true;
+	has_auto_notch = true;
 	has_rf_control = true;
-//	has_sql_control = true;
+	has_compON = true;
+	has_vox_onoff = true;
 
 	defaultCIV = 0x5E;
 	adjustCIV(defaultCIV);
@@ -355,3 +350,60 @@ int RIG_IC718::get_bandwidth()
 	return filter_nbr - 1;
 }
 
+// added by Jason Turning - N6WBL
+void RIG_IC718::set_auto_notch(int val)
+{
+	cmd = pre_to;
+	cmd += '\x16';
+	cmd += '\x41';
+	cmd += (unsigned char)val;
+	cmd.append( post );
+	sendICcommand (cmd, 6);
+	checkresponse(6);
+	if (DEBUG_718)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+}
+
+void RIG_IC718::set_compression()
+{
+	if (progStatus.compON) {
+		cmd = pre_to;
+		cmd.append("\x16\x44");
+		cmd += '\x01';
+		cmd.append(post);
+		sendICcommand(cmd, 6);
+		checkresponse(6);
+	} else {
+		cmd = pre_to;
+		cmd.append("\x16\x44");
+		cmd += '\x00';
+		cmd.append(post);
+		sendICcommand(cmd, 6);
+		checkresponse(6);
+	}
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+}
+
+void RIG_IC718::set_vox_onoff()
+{
+	if (progStatus.vox_onoff) {
+		cmd = pre_to;
+		cmd.append("\x16\x46");
+		cmd += '\x01';
+		cmd.append(post);
+		sendICcommand(cmd, 6);
+		checkresponse(6);
+	} else {
+		cmd = pre_to;
+		cmd.append("\x16\x46");
+		cmd += '\x00';
+		cmd.append(post);
+		sendICcommand(cmd, 6);
+		checkresponse(6);
+	}
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+}
+
+// N6WBL

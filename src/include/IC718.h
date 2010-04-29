@@ -33,6 +33,9 @@ public:
 	int  get_modetype(int n);
 	void set_bandwidth(int val);
 	int  get_bandwidth();
+	void set_compression();
+	void set_auto_notch(int val);
+	void set_vox_onoff();
 
 protected:
 	int  filter_nbr;
