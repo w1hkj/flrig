@@ -12,6 +12,7 @@
 #include "FT1000MP.h"
 //#include "Mark-V.h"
 #include "FT2000.h"
+#include "IC703.h"
 #include "IC706MKIIG.h"
 #include "IC718.h"
 #include "IC728.h"
@@ -20,6 +21,7 @@
 #include "K2.h"
 #include "K3.h"
 #include "TS140.h"
+#include "TS450S.h"
 #include "TS570.h"
 #include "TS2000.h"
 #include "TT516.h"
@@ -56,6 +58,7 @@ extern RIG_IC910H		rig_IC910H;
 extern RIG_K2			rig_K2;
 extern RIG_K3			rig_K3;
 extern RIG_TS140		rig_TS140;
+extern RIG_TS450S		rig_TS450S;
 extern RIG_TS570		rig_TS570;
 extern RIG_TS2000		rig_TS2000;
 extern RIG_TT516		rig_TT516;

@@ -20,6 +20,7 @@ RIG_FT1000MP	rig_FT1000MP;
 //RIG_MARK_V	rig_MARK_V;
 RIG_FT2000		rig_FT2000;
 
+RIG_IC703		rig_IC703;
 RIG_IC706MKIIG	rig_IC706MKIIG;
 RIG_IC718		rig_IC718;
 RIG_IC728		rig_IC728;
@@ -38,6 +39,7 @@ RIG_K2			rig_K2;
 RIG_K3			rig_K3;
 
 RIG_TS140		rig_TS140;
+RIG_TS450S		rig_TS450S;
 RIG_TS570		rig_TS570;
 RIG_TS2000		rig_TS2000;
 
@@ -60,6 +62,7 @@ rigbase *rigs[] = {
 	&rig_FT1000MP,
 //	&rig_MARK_V,
 	&rig_FT2000,
+	&rig_IC703,
 	&rig_IC706MKIIG,
 	&rig_IC718,
 	&rig_IC728,
@@ -76,6 +79,7 @@ rigbase *rigs[] = {
 	&rig_K2,
 	&rig_K3,
 	&rig_TS140,
+	&rig_TS450S,
 	&rig_TS570,
 	&rig_TS2000,
 	&rig_TT516,
