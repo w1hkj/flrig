@@ -90,6 +90,8 @@ status progStatus = {
 	false,		// bool noise;
 	0,			// int  attenuator
 	0,			// int  preamp;
+	0,			// int  auto_notch;
+
 	false,		// bool use_line_in;
 	false,		// bool split;
 

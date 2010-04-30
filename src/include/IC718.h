@@ -35,6 +35,7 @@ public:
 	int  get_bandwidth();
 	void set_compression();
 	void set_auto_notch(int val);
+	int  get_auto_notch();
 	void set_vox_onoff();
 
 protected:

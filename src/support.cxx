@@ -596,6 +596,9 @@ void cbbtnNotch()
 
 void cbAN()
 {
+	pthread_mutex_lock(&mutex_serial);
+		selrig->set_auto_notch(btnAutoNotch->value());
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void setNotchButton(void *d)
@@ -921,7 +924,7 @@ void cbExit()
 	progStatus.noise = btnNOISE->value();
 	progStatus.attenuator = btnAttenuator->value();
 	progStatus.preamp = btnPreamp->value();
-
+	progStatus.auto_notch = btnAutoNotch->value();
 	progStatus.saveLastState();
 
 	saveFreqList();
@@ -1413,6 +1416,9 @@ void initRig()
 	}
 
 	if (selrig->has_auto_notch) {
+		btnAutoNotch->label("AN");
+		progStatus.auto_notch = selrig->get_auto_notch();
+		btnAutoNotch->value(progStatus.auto_notch);
 		btnAutoNotch->show();
 	} else {
 		btnAutoNotch->hide();
@@ -1426,6 +1432,7 @@ void initRig()
 
 	if (selrig->has_compON || selrig->has_compression)
 		selrig->set_compression();
+
 
 	adjust_control_positions();
 	initXcvrTab();
@@ -1612,6 +1619,13 @@ void atten_label(const char * l, bool on = false)
 	btnAttenuator->value(on);
 	btnAttenuator->label(l);
 	btnAttenuator->redraw_label();
+}
+
+void auto_notch_label(const char * l, bool on = false)
+{
+	btnAutoNotch->value(on);
+	btnAutoNotch->label(l);
+	btnAutoNotch->redraw_label();
 }
 
 void cbAuxPort()
