@@ -171,6 +171,7 @@ extern void show_controls();
 extern void cbUseRepeatButtons(bool on);
 extern void preamp_label(const char *, bool on);
 extern void atten_label(const char *, bool on);
+extern void auto_notch_label(const char *,bool on);
 
 // Display Dialog
 extern void cbUSBaudio();

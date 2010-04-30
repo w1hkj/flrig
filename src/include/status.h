@@ -76,6 +76,7 @@ struct status {
 	bool	noise;
 	int		attenuator;
 	int		preamp;
+	int		auto_notch;
 
 	bool	use_line_in;
 

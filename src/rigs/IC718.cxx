@@ -362,6 +362,21 @@ void RIG_IC718::set_auto_notch(int val)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
+int RIG_IC718::get_auto_notch()
+{
+	cmd = pre_to;
+	cmd += '\x16';
+	cmd += '\x41';
+	cmd.append( post );
+	if (sendICcommand (cmd, 8)) {
+		if (replystr[6] == 0x01)
+			auto_notch_label("AN", true);
+		else
+			auto_notch_label("AN", false);
+	}
+	return replystr[6];
+}
+
 void RIG_IC718::set_compression()
 {
 	if (progStatus.compON) {

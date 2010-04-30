@@ -222,6 +222,7 @@ public:
 	virtual void set_squelch_level() {}
 	virtual void set_compression() {}
 	virtual void set_auto_notch(int v) {}
+	virtual int  get_auto_notch() {return 0;}
 	virtual void tuner_bypass() {}
 	virtual void enable_xmtr() {}
 	virtual void enable_tloop() {}
