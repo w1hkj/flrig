@@ -104,7 +104,7 @@ static char TT550setTLOOP_OFF[]	= "#2\r";	// disable T loop
 static char TT550setTLOOP_ON[]	= "#3\r";	// enable T loop
 static char TT550setKEYER_OFF[]	= "#6\r";	// enable keyer
 static char TT550setKEYER_ON[]	= "#7\r";	// disable keyer
-//static char TT550setALIVE_OFF[]	= "#8\r";	// disable keep alive
+static char TT550setALIVE_OFF[]	= "#8\r";	// disable keep alive
 //static char TT550setALIVE_ON[]	= "#9\r";	// enable keep alive
 
 //static char TT550getAGC[]		= "?Y\r";	// 0..255
@@ -265,6 +265,7 @@ void RIG_TT550::initialize()
 
 	enable_tloop();
 	enable_xmtr();
+
 }
 
 void RIG_TT550::enable_xmtr()
@@ -867,6 +868,13 @@ void RIG_TT550::set_noise(bool b)
 
 void RIG_TT550::tuner_bypass()
 {
+}
+
+void RIG_TT550::read_stream()
+{
+	if (readResponse()) {
+		showresponse("read stream");
+	}
 }
 
 // callbacks for tt550 transceiver

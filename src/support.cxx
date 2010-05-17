@@ -68,6 +68,12 @@ bool PTT = false;
 int  powerlevel = 0;
 
 // the following functions are ONLY CALLED by the serial loop
+// read any data stream sent by transceiver
+
+void read_stream()
+{
+	selrig->read_stream();
+}
 
 // read current vfo frequency
 void read_vfo()
@@ -210,6 +216,7 @@ void * serial_thread_loop(void *d)
 			resetxmt = true;
 
 			pthread_mutex_lock(&mutex_serial);
+				read_stream();
 				read_vfo();
 				read_smeter();
 				switch (loopcount) {

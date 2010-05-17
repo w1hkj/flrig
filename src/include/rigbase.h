@@ -230,6 +230,8 @@ public:
 	virtual void set_special(int v) {}
 
 	virtual void adjustCIV(uchar adr) {}
+
+	virtual void read_stream() {}
 };
 
 extern rigbase *rigs[];
