@@ -130,13 +130,11 @@ string replystr;
 int readResponse()
 {
 	int numread = 0;
-	char retbuf;
+	size_t n;
 	memset(replybuff, 0, RXBUFFSIZE + 1);
 	while (numread < RXBUFFSIZE) {
-		retbuf = 0;
-		if (RigSerial.ReadBuffer(&retbuf, 1) == 0) break;
-		replybuff[numread] = retbuf;
-		numread++;
+		if ((n = RigSerial.ReadBuffer(&replybuff[numread], RXBUFFSIZE - numread)) == 0) break;
+		numread += n;
 	}
 	return numread;
 }

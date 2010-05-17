@@ -112,6 +112,7 @@ public:
 	void enable_tloop();
 	void set_nb_level();
 
+	void read_stream();
 };
 
 extern const char *TT550_xmt_widths[];
