@@ -49,9 +49,15 @@ long RIG_FT817::get_vfoA ()
 	init_cmd();
 	cmd[4] = 0x03;
 
-	if (sendCommand(cmd, 5))
+	if (sendCommand(cmd, 5)) {
 		freq_ = fm_bcd(replybuff, 8) * 10;
-
+		int mode = replybuff[4];
+		for (int i = 0; i < 8; i++)
+			if (FT817_mode_val[i] == mode) {
+				mode_ = i;
+				break;
+			}
+	}
 	return freq_;
 }
 
@@ -62,22 +68,11 @@ void RIG_FT817::set_vfoA (long freq)
 	cmd = to_bcd(freq, 8);
 	cmd += 0x01;
 	sendCommand(cmd, 0);
-	LOG_INFO("%s", str2hex(cmd.c_str(), 5));
 }
 
 int RIG_FT817::get_mode()
 {
-	init_cmd();
-	cmd[4] = 0x03;
-
-	if (sendCommand(cmd, 5)) {
-		int mode = cmd[4];
-		for (int i = 0; i < 8; i++)
-			if (FT817_mode_val[i] == mode) {
-				mode_ = i;
-				break;
-			}
-	}
+// read by get_vfoA
 	return mode_;
 }
 
@@ -92,38 +87,39 @@ void RIG_FT817::set_mode(int val)
 	mode_ = val;
 	init_cmd();
 	cmd[0] = FT817_mode_val[val];
-	cmd[4] = 7;
+	cmd[4] = 0x07;
 	sendCommand(cmd, 0);
-	LOG_INFO("%s", str2hex(cmd.c_str(), 5));
 }
 
 // Tranceiver PTT on/off
 void RIG_FT817::set_PTT_control(int val)
 {
 	init_cmd();
-	if (val) cmd[4] = 0x88;
-	else	 cmd[4] = 0x08;
+	if (val) cmd[4] = 0x08;
+	else	 cmd[4] = 0x88;
 	sendCommand(cmd, 0);
 }
 
 int  RIG_FT817::get_power_out(void)
 {
-	int val = 0;
-	init_cmd();
-	cmd[4] = 0xF7;
-	if (sendCommand(cmd,5)) {
-LOG_INFO("%s => %d",str2hex(replybuff,5), (val = replybuff[0] && 0x0F));		
-	}
-	return 0;
+   init_cmd();
+   cmd[4] = 0xF7;
+   if (sendCommand(cmd,1)) {
+       int fwdpwr = replybuff[0];
+       fwdpwr = fwdpwr * 100 / 15;
+       return fwdpwr;
+   }
+   return 0;
 }
 
 int  RIG_FT817::get_smeter(void)
 {
-	int val = 0;
-	init_cmd();
-	cmd[4] = 0xE7;
-	if (sendCommand(cmd,5)) {
-LOG_INFO("%s => %d",str2hex(replybuff,5), (val = replybuff[0] && 0x0F));
-	}
-	return 0;
+   init_cmd();
+   cmd[4] = 0xE7;
+   if (sendCommand(cmd,1)) {
+       int sval = replybuff[0];
+       sval = (sval-1) * 100 / 15;
+       return sval;
+   }
+   return 0;
 }
