@@ -945,9 +945,11 @@ void cbExit()
 	pthread_join(*serial_thread, NULL);
 
 	selrig->setVfoAdj(0);
-	selrig->set_vfoA(transceiver_freq);
-	selrig->set_mode(transceiver_mode);
-	selrig->set_bandwidth(transceiver_bw);
+	if (progStatus.restore_rig_data) {
+		selrig->set_vfoA(transceiver_freq);
+		selrig->set_mode(transceiver_mode);
+		selrig->set_bandwidth(transceiver_bw);
+	}
 	selrig->shutdown();
 
 	// close down the serial port

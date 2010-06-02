@@ -16,7 +16,7 @@ decl {\#include "support.h"} {}
 Function {Rig_window()} {open
 } {
   Fl_Window {} {
-    label Flrig
+    label Flrig open
     xywh {928 85 340 370} type Double color 52 align 80
     code0 {\#include <stdlib.h>} visible
   } {
@@ -42,10 +42,16 @@ Function {Rig_window()} {open
           callback {show_controls();}
           xywh {0 0 36 21}
         }
+        MenuItem mnuRestoreData {
+          label {Restore Freq/Mode}
+          callback {progStatus.restore_rig_data=o->value();}
+          tooltip {Restore on exit} xywh {10 10 36 21} type Toggle value 1
+          code0 {progStatus.restore_rig_data ? o->set() :o->clear();}
+        }
         MenuItem mnuKeepData {
           label {Keep Freq/Mode}
-          callback {progStatus.use_rig_data=o->value();}
-          xywh {0 0 36 21} type Toggle divider
+          callback {progStatus.use_rig_data=o->value();} selected
+          tooltip {Use xcvr freq/mode on startup} xywh {0 0 36 21} type Toggle value 1 divider
           code0 {progStatus.use_rig_data ? o->set() :o->clear();}
         }
         MenuItem mnuColorConfig {
@@ -326,8 +332,7 @@ Please wait}
   }
 } 
 
-Function {DisplayDialog()} {open
-} {
+Function {DisplayDialog()} {} {
   Fl_Window {} {
     label {Flrig Colors} open
     xywh {493 143 404 106} type Double hide
@@ -429,11 +434,10 @@ selectFreq();}
   }
 } 
 
-Function {XcvrDialog()} {open
-} {
+Function {XcvrDialog()} {} {
   Fl_Window {} {
     label {I/O Ports} open
-    xywh {763 498 482 257} type Double visible
+    xywh {497 520 482 257} type Double hide
   } {
     Fl_Tabs {} {open
       xywh {0 8 477 245}
@@ -691,7 +695,7 @@ Serial Port for a special Control Signals}
     }
     Fl_Button btnCancelCommConfig {
       label Close
-      callback {cbCancelXcvrDialog();} selected
+      callback {cbCancelXcvrDialog();}
       xywh {346 2 60 25}
     }
     Fl_Return_Button btnOkXcvrDialog {
@@ -702,8 +706,7 @@ Serial Port for a special Control Signals}
   }
 } 
 
-Function {make_XcvrXtra()} {open
-} {
+Function {make_XcvrXtra()} {} {
   Fl_Window {} {
     label Controls open
     xywh {562 139 340 239} type Double align 0 hide
@@ -839,8 +842,7 @@ cb_bpf_center();}
   }
 } 
 
-Function {make_TT550()} {open
-} {
+Function {make_TT550()} {} {
   Fl_Window {} {
     label {TT550 Setup} open
     xywh {519 77 340 370} type Double align 0 hide

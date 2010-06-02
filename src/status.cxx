@@ -59,7 +59,8 @@ status progStatus = {
 	0,			// vfoB bw;
 	0,			// vfoB mode;
 	7070000,	// vfoB freq
-	false,		// bool use_rig_data;
+	true,		// bool use_rig_data;
+	true,		// bool restore_rig_data;
 
 	false,		// bool spkr_on;
 	20,			// int  volume;
@@ -221,6 +222,7 @@ void status::saveLastState()
 	spref.set("mode_B", imode_B);
 	spref.set("freq_B", freq_B);
 	spref.set("use_rig_data", use_rig_data);
+	spref.set("restore_rig_data", restore_rig_data);
 
 	spref.set("bool_spkr_on", spkr_on);
 	spref.set("int_volume", volume);
@@ -393,6 +395,7 @@ bool status::loadXcvrState(const char *xcvr)
 		spref.get("mode_B", imode_B, imode_B);
 		spref.get("freq_B", freq_B, freq_B);
 		if (spref.get("use_rig_data", i, i)) use_rig_data = i;
+		if (spref.get("restore_rig_data", i, i)) restore_rig_data = i;
 
 		if (spref.get("bool_spkr_on", i, i)) spkr_on = i;
 		spref.get("int_volume", volume, volume);
