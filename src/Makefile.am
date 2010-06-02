@@ -202,6 +202,7 @@ flrig_SOURCES += \
 EXTRA_DIST = \
 	config.h \
 	flrig_icon.cxx \
+	rigpanel.fl \
 	include/combo.h \
 	include/debug.h \
 	include/dialogs.h \
