@@ -1,5 +1,28 @@
-2010-04-26  David Freese  <w1hkj@w1hkj.com>
+2010-06-02  David Freese  <w1hkj@w1hkj.com>
 
+	b567f0f: Restore Xcvr
+	a58d4f6: FT817 mods
+	eda4e7e: Fluid source
+	8654ddb: Read Stream
+
+2010-04-30  Jason Turning, N6WBL  <jturning@sbcglobal.net>
+
+	2594d0a: IC718 Auto Notch
+
+2010-04-29  David Freese  <w1hkj@w1hkj.com>
+
+	b97848d: ICgeneric split
+	500628b: IC703 Compression
+	739a7b4: IC703 / TS450S
+
+2010-04-29  Jason Turning, N6WBL  <jturning@sbcglobal.net>
+
+	32492ac: IC718 additions
+
+2010-04-27  David Freese  <w1hkj@w1hkj.com>
+
+	3f5e11e: IC718 rf gain
+	52f8e17: Added rigpanel.fl
 	04ef71f: IC7200 Data mode
 	cf066d3: IC718 corrections
 	5df3c55: ICOM update
