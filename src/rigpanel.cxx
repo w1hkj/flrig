@@ -15,12 +15,12 @@ static void cb_mnuControls(Fl_Menu_*, void*) {
   show_controls();
 }
 
-static void cb_mnuRestoreData(Fl_Menu_* o, void*) {
-  progStatus.restore_rig_data=o->value();
+static void cb_mnuRestoreData(Fl_Menu_*, void*) {
+  progStatus.restore_rig_data = !progStatus.restore_rig_data;
 }
 
-static void cb_mnuKeepData(Fl_Menu_* o, void*) {
-  progStatus.use_rig_data=o->value();
+static void cb_mnuKeepData(Fl_Menu_*, void*) {
+  progStatus.use_rig_data= !progStatus.use_rig_data;
 }
 
 static void cb_mnuColorConfig(Fl_Menu_*, void*) {
@@ -346,12 +346,6 @@ Fl_Double_Window* Rig_window() {
     o->align(FL_ALIGN_CLIP|FL_ALIGN_INSIDE);
     { Fl_Menu_Bar* o = new Fl_Menu_Bar(2, 2, 336, 20);
       o->textsize(12);
-      { Fl_Menu_Item* o = &menu_[5];
-        progStatus.restore_rig_data ? o->set() :o->clear();
-      }
-      { Fl_Menu_Item* o = &menu_[6];
-        progStatus.use_rig_data ? o->set() :o->clear();
-      }
       { Fl_Menu_Item* o = &menu_[8];
         progStatus.tooltips ? o->set() :o->clear();
       }

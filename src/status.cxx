@@ -19,6 +19,7 @@
 #include "rig.h"
 #include "support.h"
 #include "config.h"
+#include "rigpanel.h"
 
 string last_xcvr_used = "none";
 
@@ -523,6 +524,12 @@ bool status::loadXcvrState(const char *xcvr)
 	sldrFwdPwr->redraw();
 	sldrRcvSignal->redraw();
 	sldrALC_SWR->redraw();
+
+	if (use_rig_data) mnuKeepData->set();
+	else mnuKeepData->clear();
+
+	if (restore_rig_data) mnuRestoreData->set();
+	else mnuRestoreData->clear();
 
 	return true;
 }

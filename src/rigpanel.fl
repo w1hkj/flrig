@@ -44,15 +44,13 @@ Function {Rig_window()} {open
         }
         MenuItem mnuRestoreData {
           label {Restore Freq/Mode}
-          callback {progStatus.restore_rig_data=o->value();}
+          callback {progStatus.restore_rig_data = !progStatus.restore_rig_data;}
           tooltip {Restore on exit} xywh {10 10 36 21} type Toggle value 1
-          code0 {progStatus.restore_rig_data ? o->set() :o->clear();}
         }
         MenuItem mnuKeepData {
           label {Keep Freq/Mode}
-          callback {progStatus.use_rig_data=o->value();} selected
+          callback {progStatus.use_rig_data= !progStatus.use_rig_data;} selected
           tooltip {Use xcvr freq/mode on startup} xywh {0 0 36 21} type Toggle value 1 divider
-          code0 {progStatus.use_rig_data ? o->set() :o->clear();}
         }
         MenuItem mnuColorConfig {
           label Colors
