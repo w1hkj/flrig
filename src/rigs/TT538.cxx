@@ -117,9 +117,9 @@ RIG_TT538::RIG_TT538() {
 	has_notch_control =
 	has_preamp_control =
 	has_tune_control =
-	has_noise_control =
-	has_swr_control = false;
+	has_noise_control = false;
 
+	has_swr_control =
 	has_bpf_center = 
 	has_volume_control =
 	has_rf_control =
@@ -149,6 +149,7 @@ void RIG_TT538::showresponse(string s)
 void RIG_TT538::initialize()
 {
 	VfoAdj = progStatus.vfo_adj;
+	fwdpwr = refpwr = 0.0;
 }
 
 void RIG_TT538::shutdown()
@@ -359,4 +360,29 @@ void RIG_TT538::set_PTT_control(int val)
 {
 	if (val) sendCommand(TT538setXMT, 0, true);
 	else     sendCommand(TT538setRCV, 0, true);
+}
+
+int RIG_TT538::get_power_out()
+{
+	sendCommand("?S\r", 4, true); // same as get smeter in receive
+	if (replybuff[0] == 'T') {
+		fwdpwr = 0.8*fwdpwr + 0.2*(unsigned char)replybuff[1];
+		refpwr = 0.8*refpwr + 0.2*(unsigned char)replybuff[2];
+	}
+LOG_INFO("%s // %4.1f : %4.1f", str2hex(replystr.c_str(), replystr.length()), fwdpwr, refpwr);
+	return (int)fwdpwr;
+}
+
+int RIG_TT538::get_swr()
+{
+	double swr, nu;
+	if (fwdpwr == 0) return 0;
+	if (fwdpwr == refpwr) return 100;
+	nu = sqrt(refpwr / fwdpwr);
+	swr = (1 + nu) / (1 - nu) - 1.0;
+	swr *= 16.67;
+	if (swr < 0) swr = 0;
+	if (swr > 100) swr = 100;
+LOG_INFO("swr %4.2f", swr);
+	return (int)swr;
 }
