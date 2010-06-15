@@ -37,8 +37,8 @@ public:
 	bool get_if_shift(int &val);
 	void get_if_min_max_step(int &min, int &max, int &step);
 	void setVfoAdj(double v);
-//	int  get_swr();
-//	int  get_power_out();
+	int  get_swr();
+	int  get_power_out();
 //	int  get_power_control();
 //	void set_power_control(double val);
 	void set_PTT_control(int val);
