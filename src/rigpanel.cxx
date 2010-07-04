@@ -1103,7 +1103,7 @@ Fl_Round_Button *btnrtsptt=(Fl_Round_Button *)0;
 
 static void cb_btnrtsptt(Fl_Round_Button* o, void*) {
   if (o->value() == 1) {
-  btndtrptt->value(0);
+//  btndtrptt->value(0);
   btncatptt->value(0);
 }
 btnOkXcvrDialog->labelcolor(FL_RED);
@@ -1114,7 +1114,7 @@ Fl_Round_Button *btndtrptt=(Fl_Round_Button *)0;
 
 static void cb_btndtrptt(Fl_Round_Button* o, void*) {
   if (o->value() == 1) {
-  btnrtsptt->value(0);
+//  btnrtsptt->value(0);
   btncatptt->value(0);
 }
 btnOkXcvrDialog->labelcolor(FL_RED);

@@ -13,10 +13,9 @@ decl {\#include "status.h"} {}
 
 decl {\#include "support.h"} {} 
 
-Function {Rig_window()} {open
-} {
+Function {Rig_window()} {} {
   Fl_Window {} {
-    label Flrig open
+    label Flrig
     xywh {928 85 340 370} type Double color 52 align 80
     code0 {\#include <stdlib.h>} visible
   } {
@@ -49,7 +48,7 @@ Function {Rig_window()} {open
         }
         MenuItem mnuKeepData {
           label {Keep Freq/Mode}
-          callback {progStatus.use_rig_data= !progStatus.use_rig_data;} selected
+          callback {progStatus.use_rig_data= !progStatus.use_rig_data;}
           tooltip {Use xcvr freq/mode on startup} xywh {0 0 36 21} type Toggle value 1 divider
         }
         MenuItem mnuColorConfig {
@@ -432,10 +431,11 @@ selectFreq();}
   }
 } 
 
-Function {XcvrDialog()} {} {
+Function {XcvrDialog()} {open
+} {
   Fl_Window {} {
     label {I/O Ports} open
-    xywh {497 520 482 257} type Double hide
+    xywh {561 138 482 257} type Double visible
   } {
     Fl_Tabs {} {open
       xywh {0 8 477 245}
@@ -562,7 +562,7 @@ btnOkXcvrDialog->redraw();}
           Fl_Round_Button btnrtsptt {
             label {PTT via RTS}
             callback {if (o->value() == 1) {
-  btndtrptt->value(0);
+//  btndtrptt->value(0);
   btncatptt->value(0);
 }
 btnOkXcvrDialog->labelcolor(FL_RED);
@@ -573,11 +573,11 @@ btnOkXcvrDialog->redraw();}
           Fl_Round_Button btndtrptt {
             label {PTT via DTR}
             callback {if (o->value() == 1) {
-  btnrtsptt->value(0);
+//  btnrtsptt->value(0);
   btncatptt->value(0);
 }
 btnOkXcvrDialog->labelcolor(FL_RED);
-btnOkXcvrDialog->redraw();}
+btnOkXcvrDialog->redraw();} selected
             tooltip {DTR is ptt line} xywh {15 226 149 22} down_box ROUND_DOWN_BOX
             code0 {o->value(progStatus.comm_dtrptt);}
           }
