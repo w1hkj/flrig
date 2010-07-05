@@ -52,7 +52,7 @@ public:
 	void get_pc_min_max_step(int &min, int &max, int &step) {
 		min = 5; max = 100; step = 1; }
 	void set_PTT_control(int val);
-//	void tune_rig();
+	void tune_rig();
 	void set_attenuator(int val);
 //	int  get_attenuator() {return 0}
 //	void set_preamp(int val);

@@ -365,6 +365,7 @@ void RIG_TT550::set_vfoRX(long freq)
 	cmd += TBfo & 0xff;
 	cmd += '\r';
 	sendCommand(cmd, 0, true);
+LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_TT550::set_vfoTX(long freq)
@@ -427,6 +428,7 @@ void RIG_TT550::set_vfoTX(long freq)
 	cmd += TBfo & 0xff;
 	cmd += '\r';
 	sendCommand(cmd, 0, true);
+LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_TT550::set_vfoA (long freq)
@@ -444,8 +446,10 @@ long RIG_TT550::get_vfoA ()
 // Tranceiver PTT on/off
 void RIG_TT550::set_PTT_control(int val)
 {
-	if (val) sendCommand(TT550setXMT, 0, true);
-	else     sendCommand(TT550setRCV, 0, true);
+	if (val) cmd = TT550setXMT;
+	else     cmd = TT550setRCV;
+	sendCommand(cmd, 0, true);
+LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_TT550::set_mode(int val)
@@ -468,10 +472,33 @@ void RIG_TT550::set_mode(int val)
 		cmd = TT550setMODE;
 		cmd[1] = cmd[2] = TT550mode_chr[val];
 		sendCommand(cmd, 0, true);
+LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 		set_power_control(progStatus.power_level);
-
 	}
 	set_bandwidth(bw_);
+}
+
+static int ret_mode = TT550_CW_MODE;
+static void tt550_tune_off(void *)
+{
+	pthread_mutex_lock(&mutex_serial);
+		selrig->set_power_control(0);
+		selrig->set_PTT_control(0);
+		sendCommand("$0\r", 0, true);
+LOG_INFO("%s", str2hex("$0\r", 3));
+		selrig->set_mode(ret_mode);
+	pthread_mutex_unlock(&mutex_serial);
+}
+
+void RIG_TT550::tune_rig()
+{
+	ret_mode = mode_;
+	set_mode(TT550_CW_MODE);
+	set_power_control(5);
+	sendCommand("$1\r", 0, true);
+LOG_INFO("%s", str2hex("$1\r", 3));
+	set_PTT_control(1);
+	Fl::add_timeout(5.0, tt550_tune_off);
 }
 
 int RIG_TT550::get_mode()
@@ -496,9 +523,11 @@ void RIG_TT550::set_bandwidth(int val)
 	cmd = TT550setRcvBW;
 	cmd[1] = rxbw;
 	sendCommand(cmd, 0, true);
+LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 	cmd = TT550setXmtBW;
 	cmd[1] = txbw;
 	sendCommand(cmd, 0, true);
+LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 	set_vfoA(freq_);
 }
 
@@ -545,6 +574,7 @@ void RIG_TT550::set_attenuator(int val)
 	if (val) cmd[1] = '1';
 	else     cmd[1] = '0';
 	sendCommand(cmd, 0, true);
+LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_TT550::set_volume_control(int val)
@@ -552,6 +582,7 @@ void RIG_TT550::set_volume_control(int val)
 	cmd = TT550setVolume;
 	cmd[1] = 0xFF & ((val * 255) / 100);
 	sendCommand(cmd, 0, true);
+LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_TT550::get_volume_control()
@@ -594,7 +625,7 @@ int RIG_TT550::get_power_out()
 		fwdpwr = 0.8*fwdpwr + 0.2*(unsigned char)replybuff[1];
 		refpwr = 0.8*refpwr + 0.2*(unsigned char)replybuff[2];
 	}
-LOG_INFO("%s // %4.1f : %4.1f", str2hex(replystr.c_str(), replystr.length()), fwdpwr, refpwr);
+//LOG_INFO("%s // %4.1f : %4.1f", str2hex(replystr.c_str(), replystr.length()), fwdpwr, refpwr);
 	return fwdpwr;
 }
 
