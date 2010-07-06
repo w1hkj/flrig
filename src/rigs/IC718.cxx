@@ -308,7 +308,7 @@ void RIG_IC718::set_mode(int val)
 	mode_ = val;
 	cmd = pre_to;
 	cmd += '\x06';
-	cmd += val > 5 ? val + 1 : val;
+	cmd += val > 5 ? val + 2 : val;
 	cmd += filter_nbr;
 	cmd.append( post );
 	sendICcommand (cmd, 6);
@@ -324,7 +324,7 @@ int RIG_IC718::get_mode()
 	cmd.append(post);
 	if (sendICcommand (cmd, 8 )) {
 		mode_ = replystr[5];
-		if (mode_ > 6) mode_--;
+		if (mode_ > 6) mode_ -= 2;
 		filter_nbr = replystr[6];
 	}
 	return mode_;
