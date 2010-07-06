@@ -1,16 +1,47 @@
 #ifndef _IC7200_H
 #define _IC7200_H
 
-#include "IC756.h"
+#include "ICbase.h"
 
-class RIG_IC7200 : public RIG_IC756PRO3 {
+class RIG_IC7200 : public RIG_ICOM {
 public:
 	RIG_IC7200();
 	~RIG_IC7200(){}
 
+	long get_vfoA ();
+	void set_vfoA (long freq);
+	void set_PTT_control(int val);
+	void set_volume_control(int val);
+	int  get_volume_control();
+	void get_vol_min_max_step(int &min, int &max, int &step);
+	void set_attenuator(int val);
+	int  get_smeter();
+	void set_noise(bool val);
+	int  get_noise();
+	void set_noise_reduction(int val);
+	int  get_noise_reduction();
+	void set_noise_reduction_val(int val);
+	int  get_noise_reduction_val();
+	void set_preamp(int val);
+	int  get_preamp();
+	void set_rf_gain(int val);
+	int  get_rf_gain();
+	void set_squelch(int val);
+	void set_power_control(double val);
+	void set_mic_gain(int val);
+	void set_mode(int val);
 	int  get_mode();
-	void set_mode(int m);
-	void set_mic_gain(int v);
+	int  get_modetype(int n);
+	void set_bandwidth(int val);
+	int  get_bandwidth();
+	int  adjust_bandwidth(int m);
+	void set_compression();
+	void set_auto_notch(int val);
+	int  get_auto_notch();
+	void set_vox_onoff();
+
+protected:
+	int  filter_nbr;
 };
 
 #endif
