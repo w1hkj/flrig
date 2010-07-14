@@ -1,6 +1,9 @@
-2010-07-04  David Freese  <w1hkj@w1hkj.com>
+2010-07-14  David Freese  <w1hkj@w1hkj.com>
 
-	8de1f01: TT550 work
+	9a6e9c4: IC703-CIV
+	1d5dc71: IC7200 update
+	7b3adae: IC718 update
+	7cacc8a: TT550 Auto Tuner
 	6654181: RTS-DTR ptt
 	8091162: TT-538 Po/SWR
 	66f7861: Menu update
@@ -68,3 +71,57 @@
 	f8b355b: K2 serial baud rate
 	8ee433c: Pegasus TT550 mic gain
 	2792b74: On Line Help link
+	3c372e6: Omni-VII TT588
+	568ff59: Jupiter-TT538 update
+	ae6a40a: TS570 update
+	ae2ccbd: FT450 update
+	5a807ed: Jupiter update
+	800af3a: Jupiter-TT538 update
+	ecbe0a5: TT550 Vfo Adjust
+	c018a65: TT550 new mode
+	4d56b12: XMLRPC sync delay
+	881c3ed: OS X missing include
+	f7dbe5d: WIN32 build fix
+	61f1e71: Status File Change
+	1329194: Serial Port Discovery
+	3373096: TT-570 update
+	8a0f254: TT-538 update
+
+2010-02-04  André - M0JEK  <m0jek@me.com>
+
+	9f0d0bc: OS X exit on start
+
+2010-02-04  Chris Sylvain  <kb3cs@arrl.net>
+
+	ee6911a: TS-570 S-meter scale adjusted
+	4341cab: Add initial Kenwood TS-570 support
+	35e8af5: Use modulo arithmetic on loopcount in serial loop
+	c581acc: TS570 bandwidth control and basic metering
+
+2010-01-17  David Freese  <w1hkj@w1hkj.com>
+
+	4e275fe: Use defaults fix
+	658c462: TS2000 fix
+	d517094: Use rig data
+	1b13be1: TT550 noise blanker addition
+	02a6077: TT538 / TT550 additional controls
+	edc73ce: TT538 / TT550
+	8ecf733: FT450 Preamp Read
+	5ff0ca1: TT550 work
+	c9a9206: Jupiter-Pegasus DTR line
+	ca14ecd: FT767 transceiver
+	88db85e: XML_IO Race Condition
+	8b336f5: FT100D fix
+	98fc2e9: XMLRPC mod
+	681d3ca: Mode-Bandwidth Annunciation
+	bdbc63a: FT-857D update
+
+
+=Version 0.9.98=
+
+	84f04dd: FT-857D get_mode correction
+
+
+=Version 0.9.97=
+
+	2a4f12a: Socket not available checks
