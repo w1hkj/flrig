@@ -1510,7 +1510,7 @@ void initConfigDialog()
 	btnrtsplus->value( srig->comm_rtsplus );
 	btndtrplus->value( srig->comm_dtrplus );
 
-	if (picked >= IC706MKIIG && picked <= IC910H) {
+	if (picked >= IC703 && picked <= IC910H) {
 		char hexstr[8];
 		snprintf(hexstr, sizeof(hexstr), "0x%2X", srig->CIV);
 		txtCIV->value(hexstr);
