@@ -148,20 +148,27 @@ int sendCommand (string s, int retnbr, bool b)
 					(9 + progStatus.stopbits) * 1000.0 / RigSerial.Baud());
 
 	if (RigSerial.IsOpen() == false) {
-		LOG_DEBUG("command: %s", b ? str2hex(s.data(), s.length()) : s.c_str());
+		LOG_INFO("command: %s", b ? str2hex(s.data(), s.length()) : s.c_str());
 		return 0;
 	}
 
-	LOG_DEBUG("sent %s", b ? str2hex(s.data(), s.length()) : s.c_str());
+	if (RIG_DEBUG)
+		LOG_INFO("out:%3d, %s", s.length(), b ? str2hex(s.data(), s.length()) : s.c_str());
 
 	RigSerial.WriteBuffer(s.c_str(), numwrite);
 	MilliSleep( readafter );
 	numread = readResponse();
-	LOG_DEBUG("reply %s", b ? str2hex(replybuff, numread) : replybuff);
+
+	if (RIG_DEBUG)
+		LOG_INFO("in :%3d, %s", numread, b ? str2hex(replybuff, numread) : replybuff);
+
 	if (numread > retnbr) {
-		memmove(replybuff, replybuff + numread - retnbr, retnbr+1);
+		memmove(replybuff, replybuff + numread - retnbr - 1, retnbr);
 		numread = retnbr;
 	}
+
+	if (RIG_DEBUG)
+		LOG_INFO("rep:%3d, %s", numread, b ? str2hex(replybuff, numread) : replybuff);
 
 	replystr.clear();
 	for (int i = 0; i < numread; replystr += replybuff[i++]);

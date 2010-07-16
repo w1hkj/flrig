@@ -249,7 +249,6 @@ void cbCIVdefault()
 	txtCIV->value(hexstr);
 	progStatus.CIV = srig->defaultCIV;
 	srig->adjustCIV(progStatus.CIV);
-printf("CIV %2X\n", srig->CIV);
 }
 
 void cbCIV()
@@ -258,10 +257,8 @@ void cbCIV()
 	int adr = 0;
 	rigbase *srig = rigs[picked];
 	sscanf(txtCIV->value(), "0x%2X", &adr);
-//	progStatus.CIV = atol(txtCIV->value());
 	progStatus.CIV = adr;
 	srig->adjustCIV(progStatus.CIV);
-printf("CIV %2X\n", srig->CIV);
 }
 
 void cbUSBaudio()
@@ -377,7 +374,7 @@ void configXcvr()
 	selectAuxPort->value(progStatus.aux_serial_port.c_str());
 	selectSepPTTPort->value(progStatus.sep_serial_port.c_str());
 
-	if (rig_nbr >= IC706MKIIG && rig_nbr <= IC910H) {
+	if (rig_nbr >= IC703 && rig_nbr <= IC910H) {
 		char hexstr[8];
 		snprintf(hexstr, sizeof(hexstr), "0x%2X", selrig->CIV);
 		txtCIV->value(hexstr);
