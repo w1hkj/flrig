@@ -55,7 +55,7 @@ long RIG_IC703::get_vfoA ()
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
-	if (!sendCommand(cmd, 11)) {
+	if (!sendICcommand(cmd, 11)) {
 		checkresponse(11);
 		return freq_;
 	}
@@ -72,8 +72,6 @@ void RIG_IC703::set_vfoA (long freq)
 	cmd.append( post );
 	sendICcommand(cmd, 6);
 	checkresponse(6);
-	if (RIG_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 void RIG_IC703::set_mode(int val)
@@ -86,8 +84,6 @@ void RIG_IC703::set_mode(int val)
 	cmd.append( post );
 	sendICcommand (cmd, 6);
 	checkresponse(6);
-	if (RIG_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 int RIG_IC703::get_mode()

@@ -1468,6 +1468,25 @@ void initRig()
 	opBW->index( vfoA.iBW );
 	selrig->set_bandwidth(vfoA.iBW);
 
+	if (selrig->CIV) {
+		char hexstr[8];
+		snprintf(hexstr, sizeof(hexstr), "0x%2X", selrig->CIV);
+		txtCIV->value(hexstr);
+		txtCIV->activate();
+		btnCIVdefault->activate();
+		if (strstr(selrig->name_, "IC-7200") || strstr(selrig->name_, "IC-7600")) {
+			btnUSBaudio->value(progStatus.USBaudio = false);
+			btnUSBaudio->activate();
+		} else
+			btnUSBaudio->deactivate();
+	} else {
+		txtCIV->value("");
+		txtCIV->deactivate();
+		btnCIVdefault->deactivate();
+		btnUSBaudio->value(false);
+		btnUSBaudio->deactivate();
+	}
+
 	// enable the serial thread
 	pthread_mutex_unlock(&mutex_serial);
 
@@ -1535,7 +1554,7 @@ void initStatusConfigDialog()
 	rig_nbr = progStatus.rig_nbr;
 	selrig = rigs[rig_nbr];
 
-	if (rig_nbr >= IC706MKIIG && rig_nbr <= IC910H)
+	if (rig_nbr >= IC703 && rig_nbr <= IC910H)
 		if (progStatus.CIV) selrig->adjustCIV(progStatus.CIV);
 
 	selectRig->index(rig_nbr);
