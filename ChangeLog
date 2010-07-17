@@ -1,5 +1,6 @@
-2010-07-16  David Freese  <w1hkj@w1hkj.com>
+2010-07-17  David Freese  <w1hkj@w1hkj.com>
 
+	6e82fef: Echo suppression
 	d57238d: IC703 bug fixes
 	9a6e9c4: IC703-CIV
 	1d5dc71: IC7200 update
@@ -125,3 +126,4 @@
 
 =Version 0.9.97=
 
+	2a4f12a: Socket not available checks
