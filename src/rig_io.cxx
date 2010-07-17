@@ -163,7 +163,7 @@ int sendCommand (string s, int retnbr, bool b)
 		LOG_INFO("in :%3d, %s", numread, b ? str2hex(replybuff, numread) : replybuff);
 
 	if (numread > retnbr) {
-		memmove(replybuff, replybuff + numread - retnbr - 1, retnbr);
+		memmove(replybuff, replybuff + numread - retnbr, retnbr);
 		numread = retnbr;
 	}
 
