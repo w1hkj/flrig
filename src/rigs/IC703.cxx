@@ -21,6 +21,7 @@ const char *IC703_widths[] = { "NARR", "MED", "WIDE", NULL};
 RIG_IC703::RIG_IC703() {
 	name_ = IC703name_;
 	modes_ = IC703modes_;
+ 	_mode_type = IC703_mode_type;
 	bandwidths_ = IC703_widths;
 	comm_baudrate = BR9600;
 	stopbits = 2;
