@@ -1,3 +1,7 @@
+2010-07-30  Frank Tomesh, AB2ZO  <fjt@ka1gl.net>
+
+	f1a4670: IC703 seg fault fix
+
 2010-07-17  David Freese  <w1hkj@w1hkj.com>
 
 	6e82fef: Echo suppression
@@ -126,4 +130,3 @@
 
 =Version 0.9.97=
 
-	2a4f12a: Socket not available checks
