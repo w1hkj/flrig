@@ -28,6 +28,7 @@ RIG_TS450S::RIG_TS450S() {
 // base class values
 	name_ = TS450Sname_;
 	modes_ = TS450Smodes_;
+	_mode_type = TS450S_mode_type;
 	bandwidths_ = TS450S_widths;
 	comm_baudrate = BR4800;
 	stopbits = 2;
@@ -164,6 +165,11 @@ int RIG_TS450S::get_mode()
 	if (md == 8) md = 7;
 	mode_ = md;
 	return mode_;
+}
+
+int RIG_TS450S::get_modetype(int n)
+{
+	return _mode_type[n];
 }
 
 void RIG_TS450S::set_bandwidth(int val)

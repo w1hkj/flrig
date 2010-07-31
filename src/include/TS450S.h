@@ -8,7 +8,7 @@ private:
 	bool beatcancel_on;
 	bool preamp_on;
 	bool att_on;
-	bool is_TS450S;
+	const char *_mode_type;
 public:
 	RIG_TS450S();
 	~RIG_TS450S(){}
@@ -22,6 +22,7 @@ public:
 	void set_PTT_control(int val);
 	void set_mode(int val);
 	int  get_mode();
+	int  get_modetype(int n);
 	void set_bandwidth(int val);
 	int  get_bandwidth();
 
