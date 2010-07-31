@@ -12,7 +12,7 @@ dnl major and minor must be integers; patch may
 dnl contain other characters or be empty
 m4_define(FLRIG_MAJOR,  [1])
 m4_define(FLRIG_MINOR,  [0])
-m4_define(FLRIG_PATCH,  [.0bK])
+m4_define(FLRIG_PATCH,  [.0bL])
 
 AC_INIT([FLRIG], FLRIG_MAJOR.FLRIG_MINOR[]FLRIG_PATCH, [w1hkj AT w1hkj DOT com])
 
