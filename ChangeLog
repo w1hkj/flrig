@@ -1,3 +1,8 @@
+2010-07-31  David Freese  <w1hkj@w1hkj.com>
+
+	bc9b4c3: TS480 HX/SAT
+	054e92a: TS450 update
+
 2010-07-30  Frank Tomesh, AB2ZO  <fjt@ka1gl.net>
 
 	f1a4670: IC703 seg fault fix
@@ -124,9 +129,4 @@
 
 
 =Version 0.9.98=
-
-	84f04dd: FT-857D get_mode correction
-
-
-=Version 0.9.97=
 
