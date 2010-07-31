@@ -40,6 +40,8 @@ RIG_K3			rig_K3;
 
 RIG_TS140		rig_TS140;
 RIG_TS450S		rig_TS450S;
+RIG_TS480HX		rig_TS480HX;
+RIG_TS480SAT	rig_TS480SAT;
 RIG_TS570		rig_TS570;
 RIG_TS2000		rig_TS2000;
 
@@ -73,13 +75,15 @@ rigbase *rigs[] = {
 	&rig_IC756PRO3,
 	&rig_IC7000,
 	&rig_IC7200,
-	&rig_IC7600,	//alh
+	&rig_IC7600,
 	&rig_IC7700,
 	&rig_IC910H,
 	&rig_K2,
 	&rig_K3,
 	&rig_TS140,
 	&rig_TS450S,
+	&rig_TS480HX,
+	&rig_TS480SAT,
 	&rig_TS570,
 	&rig_TS2000,
 	&rig_TT516,
