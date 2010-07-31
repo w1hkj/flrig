@@ -29,6 +29,8 @@
 #include "K3.h"
 #include "TS140.h"
 #include "TS450S.h"
+#include "TS480HX.h"
+#include "TS480SAT.h"
 #include "TS570.h"
 #include "TS2000.h"
 #include "TT516.h"
@@ -66,6 +68,8 @@ extern RIG_K2			rig_K2;
 extern RIG_K3			rig_K3;
 extern RIG_TS140		rig_TS140;
 extern RIG_TS450S		rig_TS450S;
+extern RIG_TS480HX		rig_TS480HX;
+extern RIG_TS480SAT		rig_TS480SAT;
 extern RIG_TS570		rig_TS570;
 extern RIG_TS2000		rig_TS2000;
 extern RIG_TT516		rig_TT516;
