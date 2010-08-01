@@ -65,10 +65,10 @@ bool RIG_TS480HX::sendTScommand(string cmd, int retnbr, bool loghex)
 {
 	int ret = sendCommand(cmd, retnbr, loghex);
 	if (RigSerial.IsOpen()) {
-		LOG_INFO("%s", cmd.c_str());
-		if (retnbr)
-			LOG_INFO("%s", replybuff);
-		return ret;
+//		LOG_INFO("%s", cmd.c_str());
+//		if (retnbr)
+//			LOG_INFO("%s", replybuff);
+//		return ret;
 	}
 	return 0;
 }
@@ -119,15 +119,15 @@ int RIG_TS480HX::get_smeter()
 // RM cmd 0 ... 100 (rig values 0 ... 8)
 int RIG_TS480HX::get_swr()
 {
-	cmd = "RM1;RM;"; // select measurement '1' (swr) and read meter
-	if (!sendTScommand(cmd, 8, false))
+	cmd = "RM;"; // select measurement '1' (swr) and read meter
+	if (!sendTScommand(cmd, 24, false))
 		return 0;
 	if (replystr.find("RM") != 0) {
 		clearSerialPort();
 		return 0;
 	}
-	replybuff[8] = 0;
-	int mtr = atoi(&replybuff[3]);
+	replybuff[7] = 0;
+	int mtr = atoi(&replybuff[4]);
 	mtr = (mtr * 100) / 10;
 	return mtr;
 }
@@ -183,7 +183,7 @@ void RIG_TS480HX::set_bandwidth(int val)
 int RIG_TS480HX::get_bandwidth()
 {
 	cmd = "SL;";
-	if (sendTScommand(cmd, 4, false)) {
+	if (sendTScommand(cmd, 5, false)) {
 		bw_ = replybuff[3] - '0';
 		if (bw_ < 0) bw_ = 0;
 		if (bw_ > 6) bw_ = 6;
