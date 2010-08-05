@@ -27,6 +27,7 @@ public:
 	int  get_preamp();
 	void set_compression();
 	void set_vox_onoff();
+	void set_PTT_control(int val);
 
 protected:
 	int  preamp_level;

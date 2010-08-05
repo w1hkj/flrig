@@ -108,9 +108,11 @@ void read_mode()
 			selrig->last_bw = vfoA.iBW;
 		}
 		vfoA.imode = nu_mode;
-		selrig->adjust_bandwidth(vfoA.imode);
-		selrig->set_mode(vfoA.imode);
-		selrig->set_bandwidth(vfoA.iBW);
+		if (selrig->adjust_bandwidth(vfoA.imode) != -1) {
+			selrig->set_mode(vfoA.imode);
+			selrig->set_bandwidth(vfoA.iBW);
+		} else
+			selrig->set_mode(vfoA.imode);
 		Fl::awake(updateBandwidthControl);
 
 		send_mode_changed();

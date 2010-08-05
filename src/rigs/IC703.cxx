@@ -13,8 +13,9 @@
 // IC-703
 //
 const char IC703name_[] = "IC-703";
-const char *IC703modes_[] = { "LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R", NULL};
-const char IC703_mode_type[] = {'L', 'U', 'U', 'L', 'L', 'U', 'U', 'U' };
+const char *IC703modes_[] = { "LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R",
+	"D-LSB", "D-USB", NULL};
+const char IC703_mode_type[] = {'L', 'U', 'U', 'L', 'L', 'U', 'U', 'U', 'L', 'U' };
 
 const char *IC703_widths[] = { "NARR", "MED", "WIDE", NULL};
 
@@ -38,6 +39,7 @@ RIG_IC703::RIG_IC703() {
 	mode_ = 1;
 	bw_ = 0;
 
+	has_ptt_control =
 	has_mode_control =
 	has_bandwidth_control =
 	has_compON =
@@ -77,14 +79,25 @@ void RIG_IC703::set_vfoA (long freq)
 
 void RIG_IC703::set_mode(int val)
 {
+	bool data_mode = val > 7 ? true : false;
 	mode_ = val;
 	cmd = pre_to;
 	cmd += '\x06';
-	cmd += val > 5 ? val + 1 : val;
-	cmd += bw_ + 1; // filter #1
+	if (val > 7) val -= 8;
+	else if (val > 5) val++;
+	cmd += val;
+	cmd += bw_ + 1;
 	cmd.append( post );
 	sendICcommand (cmd, 6);
 	checkresponse(6);
+	if (val < 2) {
+		cmd = pre_to;
+		cmd.append("\x1A\x04");
+		cmd += data_mode ? 0x01 : 0x00;
+		cmd.append( post );
+		sendICcommand( cmd, 6 );
+		checkresponse(6);
+	}
 }
 
 int RIG_IC703::get_mode()
@@ -96,6 +109,14 @@ int RIG_IC703::get_mode()
 		mode_ = replystr[5];
 		if (mode_ > 6) mode_--;
 		bw_ = replystr[6] - 1;
+		if (mode_ < 2) {
+			cmd = pre_to;
+			cmd.append("\x1A\x04");
+			cmd.append(post);
+			if (sendICcommand(cmd, 8))
+				if (replystr[6])
+					mode_ += 8;
+		}
 	}
 	return mode_;
 }
@@ -250,3 +271,18 @@ void RIG_IC703::set_vox_onoff()
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
+
+// Tranceiver PTT on/off
+void RIG_IC703::set_PTT_control(int val)
+{
+	cmd = pre_to;
+	cmd += '\x1c';
+	cmd += '\x00';
+	cmd += (unsigned char) val;
+	cmd.append( post );
+	sendICcommand (cmd, 6);
+	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+}
+
