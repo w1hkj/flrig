@@ -1,6 +1,8 @@
-2010-08-01  David Freese  <w1hkj@w1hkj.com>
+2010-08-05  David Freese  <w1hkj@w1hkj.com>
 
-	0716f84: TS480 HX-SAT
+	699c420: IC703
+	626d3b0: Config Dir
+	c1027a8: TS480 HX/SAT
 	9b8479b: Combo Widget
 	bc9b4c3: TS480 HX/SAT
 	054e92a: TS450 update
@@ -126,4 +128,3 @@
 	88db85e: XML_IO Race Condition
 	8b336f5: FT100D fix
 	98fc2e9: XMLRPC mod
-	681d3ca: Mode-Bandwidth Annunciation
