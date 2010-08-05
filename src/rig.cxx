@@ -224,6 +224,8 @@ int main (int argc, char *argv[])
 	std::terminate_handler(flrig_terminate);
 
 	int arg_idx;
+	RigHomeDir.clear();
+
 	Fl::args(argc, argv, arg_idx, parse_args);
 
 	mainwindow = Rig_window();
@@ -240,7 +242,8 @@ int main (int argc, char *argv[])
 #else
 	fl_filename_expand(dirbuf, sizeof(dirbuf) - 1, "$HOME/.flrig/");
 #endif
-	RigHomeDir = dirbuf;
+	if (RigHomeDir.empty())
+		RigHomeDir = dirbuf;
 	checkdirectories();
 
 	try {
@@ -314,6 +317,7 @@ int parse_args(int argc, char **argv, int& idx)
 		printf("Usage: \n\
   --help this help text\n\
   --version\n\
+  --config-dir <DIR>\n\
   --debug\n\
   --rig_debug\n\
   --xml_debug\n\n");
@@ -336,6 +340,11 @@ int parse_args(int argc, char **argv, int& idx)
 	if (strcasecmp("--debug", argv[1]) == 0) {
 		RIG_DEBUG = 1;
 		XML_DEBUG = 1;
+		idx++;
+		return 1;
+	}
+	if (strcasecmp("--config-dir", argv[1]) == 0) {
+		RigHomeDir = argv[2];
 		idx++;
 		return 1;
 	}
