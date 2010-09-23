@@ -1,5 +1,6 @@
-2010-08-05  David Freese  <w1hkj@w1hkj.com>
+2010-09-22  David Freese  <w1hkj@w1hkj.com>
 
+	68ae4e4: Rig Ordering
 	699c420: IC703
 	626d3b0: Config Dir
 	c1027a8: TS480 HX/SAT
@@ -126,5 +127,3 @@
 	c9a9206: Jupiter-Pegasus DTR line
 	ca14ecd: FT767 transceiver
 	88db85e: XML_IO Race Condition
-	8b336f5: FT100D fix
-	98fc2e9: XMLRPC mod
