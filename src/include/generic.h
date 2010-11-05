@@ -20,8 +20,8 @@ extern void GENERIC_set_PTT_control(int val);
 extern void GENERIC_tune_rig();
 extern void GENERIC_set_attenuator(int val);
 extern void GENERIC_set_preamp(int val);
-extern void GENERIC_set_mode(int val);
-extern void GENERIC_set_mode(int val);
-extern void GENERIC_set_bandwidth(int val);
+extern void GENERIC_set_modeA(int val);
+extern void GENERIC_set_modeA(int val);
+extern void GENERIC_set_bwA(int val);
 
 #endif

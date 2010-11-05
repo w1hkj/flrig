@@ -62,8 +62,8 @@ RIG_IC7200::RIG_IC7200() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	mode_ = 1;
-	bw_ = 0;
+	modeA = 1;
+	bwA = 0;
 	filter_nbr = 1;
 
 	has_power_control = true;
@@ -95,15 +95,15 @@ long RIG_IC7200::get_vfoA ()
 	cmd.append( post );
 	if (!sendCommand(cmd, 11)) {
 		checkresponse(11);
-		return freq_;
+		return freqA;
 	}
-	freq_ = fm_bcd_be(&replystr[5], 10);
-	return freq_;
+	freqA = fm_bcd_be(&replystr[5], 10);
+	return freqA;
 }
 
 void RIG_IC7200::set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	cmd = pre_to;
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 10 ) );
@@ -344,9 +344,9 @@ void RIG_IC7200::set_mic_gain(int val)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
-void RIG_IC7200::set_mode(int val)
+void RIG_IC7200::set_modeA(int val)
 {
-	mode_ = val;
+	modeA = val;
 	cmd = pre_to;
 	cmd += '\x06';
 	cmd += val > 5 ? val + 2 : val;
@@ -358,17 +358,17 @@ void RIG_IC7200::set_mode(int val)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
-int RIG_IC7200::get_mode()
+int RIG_IC7200::get_modeA()
 {
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
 	if (sendICcommand (cmd, 8 )) {
-		mode_ = replystr[5];
-		if (mode_ > 6) mode_ -= 2;
+		modeA = replystr[5];
+		if (modeA > 6) modeA -= 2;
 		filter_nbr = replystr[6];
 	}
-	return mode_;
+	return modeA;
 }
 
 int RIG_IC7200::get_modetype(int n)
@@ -380,23 +380,23 @@ int RIG_IC7200::adjust_bandwidth(int m)
 {
 	if (m == 0 || m == 1 ) { //SSB
 		bandwidths_ = IC7200_SSBwidths;
-		return (bw_ = 32);
+		return (bwA = 32);
 	}
 	if (m == 3 || m == 5) { //CW
 		bandwidths_ = IC7200_SSBwidths;
-		return (bw_ = 14);
+		return (bwA = 14);
 	}
 	if (m == 4 || m == 7) { //RTTY
 		bandwidths_ = IC7200_RTTYwidths;
-		return (bw_ = 28);
+		return (bwA = 28);
 	}
 	bandwidths_ = IC7200_AMwidths;
-	return (bw_ = 0);
+	return (bwA = 0);
 }
 
-void RIG_IC7200::set_bandwidth(int val)
+void RIG_IC7200::set_bwA(int val)
 {
-	bw_ = val;
+	bwA = val;
 	cmd = pre_to;
 	cmd.append("\x1A\x02");
 	cmd.append(to_bcd(val, 2));
@@ -407,14 +407,14 @@ void RIG_IC7200::set_bandwidth(int val)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
-int  RIG_IC7200::get_bandwidth()
+int  RIG_IC7200::get_bwA()
 {
 	cmd = pre_to;
 	cmd += "\x1A\x02";
 	cmd.append( post );
 	if (sendICcommand(cmd, 8))
-		bw_ = (fm_bcd(&replystr[6],2));
-	return bw_;
+		bwA = (fm_bcd(&replystr[6],2));
+	return bwA;
 }
 
 void RIG_IC7200::set_auto_notch(int val)

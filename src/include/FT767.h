@@ -10,8 +10,8 @@ public:
 
 	long get_vfoA();
 	void set_vfoA(long);
-	void set_mode(int val);
-	int  get_mode();
+	void set_modeA(int val);
+	int  get_modeA();
 	bool snd_cmd(string cmd, size_t n);
 
 private:

@@ -52,8 +52,8 @@ RIG_TS570::RIG_TS570() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	mode_ = 1;
-	bw_ = 1;
+	modeA = 1;
+	bwA = 1;
 	def_mode = 1;
 	defbw_ = 1;
 	deffreq_ = 14070000;
@@ -109,21 +109,21 @@ long RIG_TS570::get_vfoA ()
 {
 	cmd = "FA;";
 	if (!sendTScommand(cmd, 14, false))
-		return freq_;
+		return freqA;
 	if (replystr.find("FA") != 0) {
 		clearSerialPort();
-		return freq_;
+		return freqA;
 	}
 	int f = 0;
 	for (size_t n = 2; n < 13; n++)
 		f = f*10 + replybuff[n] - '0';
-	freq_ = f;
-	return freq_;
+	freqA = f;
+	return freqA;
 }
 
 void RIG_TS570::set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	cmd = "FA00000000000;";
 	for (int i = 12; i > 1; i--) {
 		cmd[i] += freq % 10;
@@ -296,32 +296,32 @@ int RIG_TS570::get_preamp()
 
 void RIG_TS570::set_widths()
 {
-	switch (mode_) {
+	switch (modeA) {
 	case 0:
 	case 1:
 	case 3:
 	case 4:
 	bandwidths_ = TS570_SSBwidths;
-	bw_ = 1;
+	bwA = 1;
 	break;
 	case 2:
 	case 6:
 	bandwidths_ = TS570_CWwidths;
-	bw_ = 5;
+	bwA = 5;
 	break;
 	case 5:
 	case 7:
 	bandwidths_ = TS570_FSKwidths;
-	bw_ = 2;
+	bwA = 2;
 	break;
 	default:
 	break;
 	}
 }
 
-void RIG_TS570::set_mode(int val)
+void RIG_TS570::set_modeA(int val)
 {
-	mode_ = val;
+	modeA = val;
 	cmd = "MD";
 	cmd += TS570_mode_chr[val];
 	cmd += ';';
@@ -329,90 +329,90 @@ void RIG_TS570::set_mode(int val)
 	set_widths();
 }
 
-int RIG_TS570::get_mode()
+int RIG_TS570::get_modeA()
 {
 	if (!sendTScommand("MD;", 4, false))
-		return mode_;
+		return modeA;
 	if (replystr.find("MD") != 0) {
 		clearSerialPort();
-		return mode_;
+		return modeA;
 	}
 	int md = replybuff[2];
 	md = md - '1';
 	if (md == 8) md = 7;
-	mode_ = md;
+	modeA = md;
 	set_widths();
-	return mode_;
+	return modeA;
 }
 
 int RIG_TS570::adjust_bandwidth(int val)
 {
-	return bw_;
+	return bwA;
 }
 
-void RIG_TS570::set_bandwidth(int val)
+void RIG_TS570::set_bwA(int val)
 {
-	bw_ = val;
+	bwA = val;
 
-	switch (mode_) {
+	switch (modeA) {
 	case 0:
 	case 1:
 	case 3:
 	case 4:
-	sendTScommand(TS570_SSBbw[bw_], 5, false);
+	sendTScommand(TS570_SSBbw[bwA], 5, false);
 	break;
 	case 2:
 	case 6:
-	sendTScommand(TS570_CWbw[bw_], 5, false);
+	sendTScommand(TS570_CWbw[bwA], 5, false);
 	break;
 	case 5:
 	case 7:
-	sendTScommand(TS570_FSKbw[bw_], 7, false);
+	sendTScommand(TS570_FSKbw[bwA], 7, false);
 	break;
 	default:
 	break;
 	}
 }
 
-int RIG_TS570::get_bandwidth()
+int RIG_TS570::get_bwA()
 {
 	int i;
 
-	if (!sendTScommand("FW;", 7, false)) return bw_;
+	if (!sendTScommand("FW;", 7, false)) return bwA;
 	if (replystr.find("FW") != 0) {
 		clearSerialPort();
-		return bw_;
+		return bwA;
 	}
 
-	switch (mode_) {
+	switch (modeA) {
 	case 0:
 	case 1:
 	case 3:
 	case 4:
 	for (i = 0; TS570_SSBbw[i] != NULL; i++)
 		if (strncmp(replybuff, TS570_SSBbw[i], 7) == 0)  break;
-	if (TS570_SSBbw[i] != NULL) bw_ = i;
-	else bw_ = 1;
+	if (TS570_SSBbw[i] != NULL) bwA = i;
+	else bwA = 1;
 	break;
 	case 2:
 	case 6:
 	for (i = 0; TS570_CWbw[i] != NULL; i++)
 		if (strncmp(replybuff, TS570_CWbw[i], 7) == 0)  break;
-	if (TS570_CWbw[i] != NULL) bw_ = i;
-	else bw_ = 1;
+	if (TS570_CWbw[i] != NULL) bwA = i;
+	else bwA = 1;
 	break;
 	case 5:
 	case 7:
 	for (i = 0; TS570_FSKbw[i] != NULL; i++)
 		if (strncmp(replybuff, TS570_FSKbw[i], 7) == 0)  break;
-	if (TS570_FSKbw[i] != NULL) bw_ = i;
-	else bw_ = 1;
+	if (TS570_FSKbw[i] != NULL) bwA = i;
+	else bwA = 1;
 	break;
 	default:
 	break;
 	}
 
-	return bw_;
+	return bwA;
 }
 
 int RIG_TS570::get_modetype(int n)

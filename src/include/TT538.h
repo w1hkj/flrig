@@ -10,7 +10,6 @@ private:
 	double fwdv;
 	double refv;
 	double VfoAdj;
-	int    vfo_corr;
 
 	void showresponse(string s);
 public:
@@ -21,16 +20,30 @@ public:
 
 	long get_vfoA();
 	void set_vfoA(long);
+
+	long get_vfoB();
+	void set_vfoB(long);
+
+	void set_modeA(int val);
+	int  get_modeA();
+//	void set_modeB(int val);
+//	int  get_modeB();
+	int  get_modetype(int n);
+
+	void set_bwA(int val);
+	int  get_bwA();
+//	void set_bwB(int val);
+//	int  get_bwB();
+
+	bool twovfos() { return true; }
+//	void set_split(bool);
+	bool can_split() {return false;}
+
 	int  get_smeter();
 	void set_volume_control(int val);
 	int  get_volume_control();
 	void set_attenuator(int val);
 	int  get_attenuator();
-	void set_mode(int val);
-	int  get_mode();
-	int  get_modetype(int n);
-	void set_bandwidth(int val);
-	int  get_bandwidth();
 	void set_rf_gain(int val);
 	int  get_rf_gain();
 	void set_if_shift(int val);

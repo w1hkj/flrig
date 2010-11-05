@@ -64,25 +64,25 @@ void RIG_IC910H::set_vfoA (long freq)
 {
 	long nufreq;
 	if (freq > 1300000000L) nufreq = 1300000000L;
-	else if (freq > 450000000L && freq < 1240000000L && freq_ <= 450000000L)
+	else if (freq > 450000000L && freq < 1240000000L && freqA <= 450000000L)
 		nufreq = 1240000000L;
-	else if (freq > 450000000L && freq < 1240000000L && freq_ >= 1240000000L)
+	else if (freq > 450000000L && freq < 1240000000L && freqA >= 1240000000L)
 		nufreq = 450000000L;
-	else if (freq > 148000000L && freq < 430000000L && freq_ <= 148000000L)
+	else if (freq > 148000000L && freq < 430000000L && freqA <= 148000000L)
 		nufreq = 430000000L;
-	else if (freq > 148000000L && freq < 430000000L && freq_ >= 430000000L)
+	else if (freq > 148000000L && freq < 430000000L && freqA >= 430000000L)
 		nufreq = 148000000L;
 	else if (freq < 144000000L) nufreq = 144000000L;
 	else nufreq = freq;
-	freq_ = nufreq;
+	freqA = nufreq;
 
-	if (freq_ != freq) {
-		vfoA.freq = freq_;
+	if (freqA != freq) {
+		vfoA.freq = freqA;
 		setFreqDisp((void*)0);
 	}
 	cmd = pre_to;
 	cmd += '\x05';
-	cmd.append( to_bcd_be( freq_, 10 ) );
+	cmd.append( to_bcd_be( freqA, 10 ) );
 	cmd.append( post );
 	sendICcommand(cmd, 6);
 	checkresponse(6);

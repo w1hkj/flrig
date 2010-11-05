@@ -32,8 +32,8 @@ RIG_IC735::RIG_IC735() {
 	comm_catptt = false;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	mode_ = 1;
-	bw_ = 0;
+	modeA = 1;
+	bwA = 0;
 
 	has_mode_control = true;
 	has_bandwidth_control = true;
@@ -52,15 +52,15 @@ long RIG_IC735::get_vfoA ()
 	cmd.append( post );
 	if (!sendCommand(cmd, 10)) {
 		checkresponse(10);
-		return freq_;
+		return freqA;
 	}
-	freq_ = fm_bcd_be(&replystr[5], 8);
-	return freq_;
+	freqA = fm_bcd_be(&replystr[5], 8);
+	return freqA;
 }
 
 void RIG_IC735::set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	cmd = pre_to;
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 8 ) );
@@ -69,24 +69,24 @@ void RIG_IC735::set_vfoA (long freq)
 	checkresponse(5);
 }
 
-void RIG_IC735::set_mode(int val)
+void RIG_IC735::set_modeA(int val)
 {
-	mode_ = val;
+	modeA = val;
 	cmd = pre_to;
 	cmd += "\x06";
-	cmd += mode_;		   // set the mode byte
+	cmd += modeA;		   // set the mode byte
 	cmd.append( post );
 	sendCommand(cmd, 6);
 	checkresponse(6);
 }
 
-void RIG_IC735::set_bandwidth(int val)
+void RIG_IC735::set_bwA(int val)
 {
-	bw_ = val;
+	bwA = val;
 	cmd = pre_to;
 	cmd += "\0x06";
-	cmd += mode_;
-	cmd += bw_;
+	cmd += modeA;
+	cmd += bwA;
 	cmd.append(post);
 	sendCommand(cmd, 6);
 	checkresponse(6);

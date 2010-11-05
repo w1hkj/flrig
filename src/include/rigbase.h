@@ -54,9 +54,12 @@ public:
 	int  defaultCIV;
 	bool USBaudio;
 
-	int  mode_;
-	int  bw_;
-	long freq_;
+	int  modeA;
+	int  bwA;
+	long freqA;
+	int  modeB;
+	int  bwB;
+	long freqB;
 	int  def_mode;
 	int  defbw_;
 	long deffreq_;
@@ -70,6 +73,7 @@ public:
 	bool RitActive;
 	int XitFreq;
 	bool XitActive;
+	bool split;
 
 	bool has_vfo_adj;
 	bool has_rit;
@@ -136,8 +140,27 @@ public:
 	virtual void initialize() {}
 	virtual void shutdown() {}
 
-	virtual long get_vfoA(void) {return freq_;}
-	virtual void set_vfoA(long f) {freq_ = f;}
+	virtual long get_vfoA(void) {return freqA;}
+	virtual void set_vfoA(long f) {freqA = f;}
+	virtual long get_vfoB(void) {return freqB;}
+	virtual void set_vfoB(long f) {freqB = f;}
+
+	virtual void set_modeA(int val) {modeA = val;}
+	virtual int  get_modeA() {return modeA;}
+	virtual int  get_modetype(int n) {return 'U';}
+	virtual void set_modeB(int val) {modeB = val;}
+	virtual int  get_modeB() {return modeB;}
+
+	virtual void set_bwA(int val) {bwA = val;}
+	virtual int  get_bwA() {return bwA;}
+	virtual void set_bwB(int val) {bwB = val;}
+	virtual int  get_bwB() {return bwB;}
+	virtual int  adjust_bandwidth(int m) {return -1;}
+
+	virtual bool can_split() { return false;}
+	virtual void set_split(bool val) {split = val;}
+	virtual bool twovfos() {return false;}
+
 	virtual int  get_smeter(void) {return -1;}
 	virtual int  get_swr(void) {return 0;}
 	virtual int  get_alc(void) {return 0;}
@@ -156,12 +179,6 @@ public:
 	virtual int  get_attenuator() {return 0;}
 	virtual void set_preamp(int val) {}
 	virtual int  get_preamp() {return 0;}
-	virtual void set_mode(int val) {mode_ = val;}
-	virtual int  get_mode() {return mode_;}
-	virtual int  get_modetype(int n) {return 'U';}
-	virtual void set_bandwidth(int val) {bw_ = val;}
-	virtual int  adjust_bandwidth(int m) {return -1;}
-	virtual int  get_bandwidth() {return bw_;}
 	virtual void set_if_shift(int val) {}
 	virtual bool get_if_shift(int &val) {val = 0; return false;}
 	virtual void get_if_min_max_step(int &min, int &max, int &step) {

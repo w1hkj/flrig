@@ -31,8 +31,8 @@ RIG_TS140::RIG_TS140() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	mode_ = 1;
-	bw_ = 2;
+	modeA = 1;
+	bwA = 2;
 
 	has_mode_control =
 	has_ptt_control = true;
@@ -94,14 +94,14 @@ long RIG_TS140::get_vfoA ()
 		long f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replybuff[n] - '0';
-		freq_ = f;
+		freqA = f;
 	}
-	return freq_;
+	return freqA;
 }
 
 void RIG_TS140::set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	cmd = "FA00000000000;";
 	for (int i = 12; i > 1; i--) {
 		cmd[i] += freq % 10;
@@ -122,7 +122,7 @@ int RIG_TS140::get_modetype(int n)
 	return TS140_mode_type[n];
 }
 
-void RIG_TS140::set_mode(int val)
+void RIG_TS140::set_modeA(int val)
 {
 	if (val == 5) val++;
 	cmd = "MD0;";
@@ -130,16 +130,16 @@ void RIG_TS140::set_mode(int val)
 	sendCommand(cmd, 0, false);
 }
 
-int RIG_TS140::get_mode()
+int RIG_TS140::get_modeA()
 {
-	mode_ = 0;
+	modeA = 0;
 	if (sendCommand("IF;", 38, false)) {
 		int md = replybuff[29] - '1';
 		if (md < 0) md = 0;
 		if (md > 5) md = 5;
-		mode_ = md;
+		modeA = md;
 	}
-	return mode_;
+	return modeA;
 }
 
 
@@ -218,7 +218,7 @@ void RIG_TS140::tune_rig()
 	sendCommand("AC002;",0);
 }
 
-void RIG_TS140::set_bandwidth(int val)
+void RIG_TS140::set_bwA(int val)
 {
 	switch (val) {
 		case 0 : sendCommand("SH000;",0); break;

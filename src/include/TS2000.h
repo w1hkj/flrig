@@ -29,11 +29,11 @@ public:
 	int  get_attenuator();
 	void set_preamp(int val);
 	int  get_preamp();
-	void set_mode(int val);
-	int  get_mode();
+	void set_modeA(int val);
+	int  get_modeA();
 	int  get_modetype(int n);
-	void set_bandwidth(int val);
-	int  get_bandwidth();
+	void set_bwA(int val);
+	int  get_bwA();
 	int  adjust_bandwidth(int val);
 	void set_widths();
 	void set_if_shift(int val);

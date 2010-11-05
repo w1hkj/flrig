@@ -56,9 +56,9 @@ rigbase::rigbase()
 	has_bpf_center =
 	has_special =  false;
 
-	freq_ = 14070000L;
-	mode_ = 1;
-	bw_ = 0;
+	freqA = 14070000L;
+	modeA = 1;
+	bwA = 0;
 
 	deffreq_ = 14070000L;
 	def_mode = 1;

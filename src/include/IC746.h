@@ -25,11 +25,11 @@ public:
 	virtual int  get_attenuator();
 	virtual void set_preamp(int val);
 	virtual int  get_preamp();
-	virtual void set_mode(int val);
-	virtual int  get_mode();
+	virtual void set_modeA(int val);
+	virtual int  get_modeA();
 	virtual int  get_modetype(int n);
-	virtual void set_bandwidth(int val);
-	virtual int  get_bandwidth();
+	virtual void set_bwA(int val);
+	virtual int  get_bwA();
 	virtual void set_mic_gain(int val);
 //	int  get_mic_gain();
 	void get_mic_gain_min_max_step(int &min, int &max, int &step);
@@ -53,10 +53,10 @@ class RIG_IC746PRO : public RIG_IC746 {
 public:
 	RIG_IC746PRO();
 	virtual ~RIG_IC746PRO(){}
-	virtual void set_mode(int val);
-	virtual int  get_mode();
-	virtual void set_bandwidth(int val);
-	virtual int  get_bandwidth();
+	virtual void set_modeA(int val);
+	virtual int  get_modeA();
+	virtual void set_bwA(int val);
+	virtual int  get_bwA();
 	int  get_swr();
 	int  get_alc();
 	int  get_power_out();

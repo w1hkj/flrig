@@ -7,8 +7,8 @@ class RIG_IC7000 : public RIG_IC746PRO {
 public:
 	RIG_IC7000();
 	~RIG_IC7000(){}
-	void set_mode(int val);
-	int  get_mode();
+	void set_modeA(int val);
+	int  get_modeA();
 	int  adjust_bandwidth(int m);
 	void set_attenuator( int val );
 	int  get_attenuator();

@@ -150,7 +150,7 @@ void debug::log(level_e level, const char* func, const char* srcf, int line, con
 	estr.append(sztemp);
 
 	va_end(args);
-
+/*
 #ifndef __WIN32__
 	if (tty) {
 		if (level <= DEBUG_LEVEL && level > QUIET_LEVEL) {
@@ -160,8 +160,9 @@ void debug::log(level_e level, const char* func, const char* srcf, int line, con
 		}
 	}
 #else
+*/
 	fflush(wfile);
-#endif
+//#endif
 
     Fl::awake(sync_text, 0);
 

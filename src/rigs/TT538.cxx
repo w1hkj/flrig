@@ -53,7 +53,7 @@ static const int TT538_numeric_widths[] = {
 3900, 4200, 4500, 4800, 5100, 5400, 5700, 6000, 8000};
 
 static char TT538setFREQA[]		= "*Annnn\r";
-//static char TT538setFREQB[]		= "*Bnnnn\r";
+static char TT538setFREQB[]		= "*Bnnnn\r";
 //static char TT538setAGC[]		= "*Gn\r";
 //static char TT538setSQLCH[]		= "*Hc\r";
 static char TT538setRF[]		= "*Ic\r";
@@ -65,6 +65,7 @@ static char TT538setVOL[]		= "*Un\r";
 static char TT538setBW[]		= "*Wx\r";
 
 static char TT538getFREQA[]		= "?A\r";
+static char TT538getFREQB[]		= "?B\r";
 //static char TT538getFWDPWR[]	= "?F\r";
 //static char TT538getAGC[]		= "?G\r";
 //static char TT538getSQLCH[]		= "?H\r";
@@ -102,15 +103,14 @@ RIG_TT538::RIG_TT538() {
 	comm_dtrptt = false;
 	serloop_timing = 200;
 
-	mode_ = 1;
-	bw_ = 25;
+	modeA = 1;
+	bwA = 25;
 	def_mode = 3;
 	defbw_ = 25;
 	deffreq_ = 14070000;
 	max_power = 100;
 	pbt = 0;
 	VfoAdj = progStatus.vfo_adj;
-	vfo_corr = 0;
 
 	has_power_control =
 	has_micgain_control =
@@ -143,7 +143,7 @@ void RIG_TT538::checkresponse(string s)
 
 void RIG_TT538::showresponse(string s)
 {
-	printf("%s : %s\n", s.c_str(), str2hex(replystr.c_str(), replystr.length()));
+	LOG_INFO("%s : %s", s.c_str(), replystr.c_str());
 }
 
 void RIG_TT538::initialize()
@@ -165,17 +165,43 @@ long RIG_TT538::get_vfoA ()
 		int f = 0;
 		for (size_t n = 1; n < 5; n++)
 			f = f*256 + (unsigned char)replybuff[n];
-		freq_ = f;
+		freqA = f;
 	}
-	return (long)(freq_ - vfo_corr);
+	return (long)(freqA / (1 + VfoAdj/1e6));
 }
 
 void RIG_TT538::set_vfoA (long freq)
 {
-	freq_ = freq;
-	vfo_corr = (freq / 1e6) * VfoAdj + 0.5;
-	long xfreq = freq_ + vfo_corr;
+	freqA = freq;
+	long xfreq = freqA * (1 + VfoAdj/1e6) + 0.5;
 	cmd = TT538setFREQA;
+	cmd[5] = xfreq & 0xff; xfreq = xfreq >> 8;
+	cmd[4] = xfreq & 0xff; xfreq = xfreq >> 8;
+	cmd[3] = xfreq & 0xff; xfreq = xfreq >> 8;
+	cmd[2] = xfreq & 0xff;
+	sendCommand(cmd, 0, true);
+	set_if_shift(pbt);
+	return ;
+}
+
+long RIG_TT538::get_vfoB ()
+{
+	cmd = TT538getFREQB;
+	bool ret = sendCommand(cmd, 6, true);
+	if (ret == true && replybuff[0] == 'A') {
+		int f = 0;
+		for (size_t n = 1; n < 5; n++)
+			f = f*256 + (unsigned char)replybuff[n];
+		freqA = f;
+	}
+	return (long)(freqB / (1 + VfoAdj/1e6));
+}
+
+void RIG_TT538::set_vfoB (long freq)
+{
+	freqB = freq;
+	long xfreq = freqB * (1 + VfoAdj/1e6) + 0.5;
+	cmd = TT538setFREQB;
 	cmd[5] = xfreq & 0xff; xfreq = xfreq >> 8;
 	cmd[4] = xfreq & 0xff; xfreq = xfreq >> 8;
 	cmd[3] = xfreq & 0xff; xfreq = xfreq >> 8;
@@ -190,22 +216,25 @@ void RIG_TT538::setVfoAdj(double v)
 	VfoAdj = v;
 }
 
-void RIG_TT538::set_mode(int val)
+void RIG_TT538::set_modeA(int val)
 {
-	mode_ = val;
+	modeA = val;
 	cmd = TT538setMODE;
-	cmd[2] = cmd[3] = TT538mode_chr[val];
+	cmd[2] = TT538mode_chr[val];
+	cmd[3] = cmd[2];
 	sendCommand(cmd, 0, true);
+	showresponse(cmd);
 }
 
-int RIG_TT538::get_mode()
+int RIG_TT538::get_modeA()
 {
 	cmd = TT538getMODE;
 	sendCommand(cmd, 4, true);
+showresponse(cmd);
 	if (replybuff[0] == 'M') {
-		mode_ = replybuff[1] - '0';
+		modeA = replybuff[1] - '0';
 	}
-	return mode_;
+	return modeA;
 }
 
 int RIG_TT538::get_modetype(int n)
@@ -213,31 +242,31 @@ int RIG_TT538::get_modetype(int n)
 	return TT538mode_type[n];
 }
 
-void RIG_TT538::set_bandwidth(int val)
+void RIG_TT538::set_bwA(int val)
 {
-	bw_ = val;
+	bwA = val;
 	cmd = TT538setBW;
 	cmd[2] = 38 - val;
 	sendCommand(cmd, 0, true);
 	set_if_shift(pbt);
 }
 
-int RIG_TT538::get_bandwidth()
+int RIG_TT538::get_bwA()
 {
 	cmd = TT538getBW;
 	sendCommand(cmd, 3, true);
 	if (replybuff[0] == 'W')
-		bw_ = 38 - (unsigned char)replybuff[1];
-	return bw_;
+		bwA = 38 - (unsigned char)replybuff[1];
+	return bwA;
 }
 
 void RIG_TT538::set_if_shift(int val)
 {
 	pbt = val;
 	cmd = TT538setPBT;
-	int bpval = progStatus.bpf_center - 200 - TT538_numeric_widths[bw_]/2;
+	int bpval = progStatus.bpf_center - 200 - TT538_numeric_widths[bwA]/2;
 	short int si = val;
-	if ((mode_ == 1 || mode_ == 2) && progStatus.use_bpf_center)
+	if ((modeA == 1 || modeA == 2) && progStatus.use_bpf_center)
 		si += (bpval > 0 ? bpval : 0);
 	cmd[2] = (si & 0xff00) >> 8;
 	cmd[3] = (si & 0xff);

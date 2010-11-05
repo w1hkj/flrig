@@ -36,8 +36,8 @@ RIG_K3::RIG_K3() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	mode_ = 1;
-	bw_ = 2;
+	modeA = 1;
+	bwA = 2;
 
 	has_power_control =
 	has_volume_control =
@@ -68,14 +68,14 @@ long RIG_K3::get_vfoA ()
 		long f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replybuff[n] - '0';
-		freq_ = f;
+		freqA = f;
 	}
-	return freq_;
+	return freqA;
 }
 
 void RIG_K3::set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	cmd = "FA00000000000;";
 	for (int i = 12; i > 1; i--) {
 		cmd[i] += freq % 10;
@@ -105,14 +105,14 @@ int RIG_K3::get_volume_control()
 	return (int)(v / 2.55);
 }
 
-void RIG_K3::set_mode(int val)
+void RIG_K3::set_modeA(int val)
 {
 	cmd = "MD0;";
 	cmd[2] = modenbr[val];
 	sendCommand(cmd, 0, false);
 }
 
-int RIG_K3::get_mode()
+int RIG_K3::get_modeA()
 {
 	sendCommand("MD;", 4, false);
 	int md = replybuff[2] - '1';
@@ -220,20 +220,20 @@ void RIG_K3::set_noise(bool on)
 //exception: at present, FW/FW$ SET can’t be used in BSET mode with diversity receive in effect). (4) In K22
 //mode, a legacy 6th digit is added to the response. It is always 0. In the K2, it indicated audio filter on/off status.
 
-void RIG_K3::set_bandwidth(int val)
+void RIG_K3::set_bwA(int val)
 {
-	bw_ = val;
+	bwA = val;
 	cmd = "K30;K22;FW0000x;K20;K31;";
 	cmd[14] = '0' + val;
 	sendCommand(cmd, 0, false);
 }
 
-int RIG_K3::get_bandwidth()
+int RIG_K3::get_bwA()
 {
 	cmd = "K30;K22;FW;K20;K31;";
 	sendCommand(cmd, 9, false);
-	bw_ = replybuff[5] - '0';
-	return bw_;
+	bwA = replybuff[5] - '0';
+	return bwA;
 }
 
 //int RIG_K3::get_swr()

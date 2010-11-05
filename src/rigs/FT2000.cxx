@@ -46,8 +46,8 @@ RIG_FT2000::RIG_FT2000() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	mode_ = 1;
-	bw_ = 2;
+	modeA = 1;
+	bwA = 2;
 	def_mode = 10;
 	defbw_ = 2;
 	deffreq_ = 14070000;
@@ -87,14 +87,14 @@ long RIG_FT2000::get_vfoA ()
 		int f = 0;
 		for (size_t n = 2; n < 10; n++)
 			f = f*10 + replybuff[n] - '0';
-		freq_ = f;
+		freqA = f;
 	}
-	return freq_;
+	return freqA;
 }
 
 void RIG_FT2000::set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	cmd = "FA00000000;";
 	for (int i = 9; i > 1; i--) {
 		cmd[i] += freq % 10;
@@ -294,20 +294,20 @@ int RIG_FT2000::get_preamp()
 }
 
 
-void RIG_FT2000::set_mode(int val)
+void RIG_FT2000::set_modeA(int val)
 {
-	mode_ = val;
+	modeA = val;
 	cmd = "MD0";
 	cmd += FT2000_mode_chr[val];
 	cmd += ';';
 	sendFTcommand(cmd, 0, false);
 }
 
-int RIG_FT2000::get_mode()
+int RIG_FT2000::get_modeA()
 {
 	if (sendFTcommand("MD0;", 5, false))
-		mode_ = replybuff[3] - '1';
-	return mode_;
+		modeA = replybuff[3] - '1';
+	return modeA;
 }
 
 int RIG_FT2000::adjust_bandwidth(int m)
@@ -315,27 +315,27 @@ int RIG_FT2000::adjust_bandwidth(int m)
 	switch (m) {
 		case 0 : case 1 :
 			bandwidths_ = FT2000_SSBwidths;
-			bw_ = 0;
+			bwA = 0;
 			break;
 		case 2 : case 6 :
 			bandwidths_ = FT2000_CWwidths;
-			bw_ = 0;
+			bwA = 0;
 			break;
 		case 5 : case 7 : case 8 : case 11 :
 			bandwidths_ = FT2000_PKT_RTTYwidths;
-			bw_ = 0;
+			bwA = 0;
 			break;
 		case 3 : case 4 : case 9 : case 10 :
 			bandwidths_ = FT2000_AMFMwidths;
-			bw_ = 0;
+			bwA = 0;
 			break;
 	}
-	return bw_;
+	return bwA;
 }
 
-void RIG_FT2000::set_bandwidth(int val)
+void RIG_FT2000::set_bwA(int val)
 {
-	bw_ = val;
+	bwA = val;
 
 	if (val == 0) {
 		sendFTcommand("NA00;", 0, false);
@@ -343,7 +343,7 @@ void RIG_FT2000::set_bandwidth(int val)
 	}
 
 	val--;
-	switch (mode_) {
+	switch (modeA) {
 //SSB
 		case 0 : case 1 :
 			cmd = "EX106";
@@ -378,9 +378,9 @@ void RIG_FT2000::set_bandwidth(int val)
 	sendFTcommand("NA10;", 0, false);
 }
 
-int RIG_FT2000::get_bandwidth()
+int RIG_FT2000::get_bwA()
 {
-	return bw_;
+	return bwA;
 }
 
 int RIG_FT2000::get_modetype(int n)

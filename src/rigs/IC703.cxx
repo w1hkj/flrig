@@ -36,8 +36,8 @@ RIG_IC703::RIG_IC703() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	mode_ = 1;
-	bw_ = 0;
+	modeA = 1;
+	bwA = 0;
 
 	has_ptt_control =
 	has_mode_control =
@@ -60,15 +60,15 @@ long RIG_IC703::get_vfoA ()
 	cmd.append( post );
 	if (!sendICcommand(cmd, 11)) {
 		checkresponse(11);
-		return freq_;
+		return freqA;
 	}
-	freq_ = fm_bcd_be(&replystr[5], 10);
-	return freq_;
+	freqA = fm_bcd_be(&replystr[5], 10);
+	return freqA;
 }
 
 void RIG_IC703::set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	cmd = pre_to;
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 10 ) );
@@ -77,16 +77,16 @@ void RIG_IC703::set_vfoA (long freq)
 	checkresponse(6);
 }
 
-void RIG_IC703::set_mode(int val)
+void RIG_IC703::set_modeA(int val)
 {
 	bool data_mode = val > 7 ? true : false;
-	mode_ = val;
+	modeA = val;
 	cmd = pre_to;
 	cmd += '\x06';
 	if (val > 7) val -= 8;
 	else if (val > 5) val++;
 	cmd += val;
-	cmd += bw_ + 1;
+	cmd += bwA + 1;
 	cmd.append( post );
 	sendICcommand (cmd, 6);
 	checkresponse(6);
@@ -100,31 +100,31 @@ void RIG_IC703::set_mode(int val)
 	}
 }
 
-int RIG_IC703::get_mode()
+int RIG_IC703::get_modeA()
 {
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
 	if (sendICcommand (cmd, 8 )) {
-		mode_ = replystr[5];
-		if (mode_ > 6) mode_--;
-		bw_ = replystr[6] - 1;
-		if (mode_ < 2) {
+		modeA = replystr[5];
+		if (modeA > 6) modeA--;
+		bwA = replystr[6] - 1;
+		if (modeA < 2) {
 			cmd = pre_to;
 			cmd.append("\x1A\x04");
 			cmd.append(post);
 			if (sendICcommand(cmd, 8))
 				if (replystr[6])
-					mode_ += 8;
+					modeA += 8;
 		}
 	}
-	return mode_;
+	return modeA;
 }
 
-void RIG_IC703::set_bandwidth(int val)
+void RIG_IC703::set_bwA(int val)
 {
-	bw_ = val;
-	set_mode(mode_);
+	bwA = val;
+	set_modeA(modeA);
 }
 
 int RIG_IC703::get_modetype(int n)
@@ -132,9 +132,9 @@ int RIG_IC703::get_modetype(int n)
 	return _mode_type[n];
 }
 
-int RIG_IC703::get_bandwidth()
+int RIG_IC703::get_bwA()
 {
-	return bw_;
+	return bwA;
 }
 
 void RIG_IC703::set_attenuator(int val)

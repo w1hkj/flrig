@@ -13,9 +13,10 @@ decl {\#include "status.h"} {}
 
 decl {\#include "support.h"} {} 
 
-Function {Rig_window()} {} {
+Function {Rig_window()} {open
+} {
   Fl_Window {} {
-    label Flrig
+    label Flrig open
     xywh {928 85 340 370} type Double color 52 align 80
     code0 {\#include <stdlib.h>} visible
   } {
@@ -200,6 +201,12 @@ Fl_Tooltip::enable(progStatus.tooltips);}
       callback {cbABactive();}
       tooltip {Swap VFOs} xywh {211 117 40 18} down_box DOWN_BOX color 50 selection_color 134 labelsize 12
     }
+    Fl_Light_Button btnSplit {
+      label Split
+      callback {cb_set_split(o->value());} selected
+      tooltip {Rx-1 / Tx-2} xywh {282 138 55 18} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
+      code0 {o->value(progStatus.split);}
+    }
     Fl_Group opMODE {
       label Mode
       callback {setMode();} open
@@ -314,12 +321,6 @@ cbAuxPort();}
       callback {cbBFO();}
       xywh {212 138 65 18} type Simple labelsize 12 align 4 minimum 0 maximum 1000 step 10 value 600
     }
-    Fl_Light_Button btnSplit {
-      label Split
-      callback {progStatus.split = o->value();}
-      tooltip {Rx-1 / Tx-2} xywh {282 138 55 18} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
-      code0 {o->value(progStatus.split);}
-    }
     Fl_Button btnInitializing {
       label {Initializing
 
@@ -431,11 +432,10 @@ selectFreq();}
   }
 } 
 
-Function {XcvrDialog()} {open
-} {
+Function {XcvrDialog()} {} {
   Fl_Window {} {
     label {I/O Ports} open
-    xywh {561 138 482 257} type Double visible
+    xywh {561 138 482 257} type Double hide
   } {
     Fl_Tabs {} {open
       xywh {0 8 477 245}
@@ -577,7 +577,7 @@ btnOkXcvrDialog->redraw();}
   btncatptt->value(0);
 }
 btnOkXcvrDialog->labelcolor(FL_RED);
-btnOkXcvrDialog->redraw();} selected
+btnOkXcvrDialog->redraw();}
             tooltip {DTR is ptt line} xywh {15 226 149 22} down_box ROUND_DOWN_BOX
             code0 {o->value(progStatus.comm_dtrptt);}
           }

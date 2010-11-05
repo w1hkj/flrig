@@ -34,9 +34,9 @@ RIG_IC7000::RIG_IC7000() {
 // IC7000 unique commands
 //======================================================================
 
-void RIG_IC7000::set_mode(int val)
+void RIG_IC7000::set_modeA(int val)
 {
-	mode_ = val;
+	modeA = val;
 	switch (val) {
 		case 7  : val = 8; break;
 		case 6  : val = 7; break;
@@ -53,7 +53,7 @@ void RIG_IC7000::set_mode(int val)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
-int RIG_IC7000::get_mode()
+int RIG_IC7000::get_modeA()
 {
 	int md;
 	cmd = pre_to;
@@ -66,7 +66,7 @@ int RIG_IC7000::get_mode()
 	} else {
 		checkresponse(8);
 	}
-	return mode_;
+	return modeA;
 }
 
 int RIG_IC7000::adjust_bandwidth(int m)
@@ -74,18 +74,18 @@ int RIG_IC7000::adjust_bandwidth(int m)
 	filter_nbr = 1;
 	if (m == 0 || m == 1) { //SSB
 		bandwidths_ = IC746PRO_SSBwidths;
-		return (bw_ = 32);
+		return (bwA = 32);
 	}
 	if (m == 3 || m == 6) { //CW
 		bandwidths_ = IC746PRO_SSBwidths;
-		return (bw_ = 14);
+		return (bwA = 14);
 	}
 	if (m == 4 || m == 7) { //RTTY
 		bandwidths_ = IC746PRO_RTTYwidths;
-		return (bw_ = 28);
+		return (bwA = 28);
 	}
 	bandwidths_ = IC746PRO_AMFMwidths;
-	return (bw_ = 0);
+	return (bwA = 0);
 }
 
 

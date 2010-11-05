@@ -9,6 +9,7 @@
 
 
 #include "FT450.h"
+#include "rig.h"
 
 static const char FT450name_[] = "FT-450";
 
@@ -35,8 +36,8 @@ RIG_FT450::RIG_FT450() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	mode_ = 1;
-	bw_ = 2;
+	modeA = 1;
+	bwA = 2;
 	def_mode = 10;
 	defbw_ = 2;
 	deffreq_ = 14070000;
@@ -61,6 +62,14 @@ RIG_FT450::RIG_FT450() {
 	notch_on = false;
 }
 
+void RIG_FT450::initialize()
+{
+// enable vfoA vfoB split operation
+	cmd = "EX04646;";
+	sendCommand(cmd, 0, false);
+	LOG_INFO("cmd: %s\nreply: %s", cmd.c_str(), replystr.c_str());
+}
+
 long RIG_FT450::get_vfoA ()
 {
 	cmd = "FA;";
@@ -68,20 +77,56 @@ long RIG_FT450::get_vfoA ()
 		int f = 0;
 		for (size_t n = 2; n < 10; n++)
 			f = f*10 + replybuff[n] - '0';
-		freq_ = f;
+		freqA = f;
 	}
-	return freq_;
+	return freqA;
 }
 
 void RIG_FT450::set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	cmd = "FA00000000;";
 	for (int i = 9; i > 1; i--) {
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
 	sendCommand(cmd, 0, false);
+	RIG_DEBUG = true;
+	sendCommand(cmd, 0, false);
+	RIG_DEBUG = false;
+}
+
+long RIG_FT450::get_vfoB ()
+{
+	cmd = "FB;";
+	if (sendCommand(cmd, 11, false)) {
+		int f = 0;
+		for (size_t n = 2; n < 10; n++)
+			f = f*10 + replybuff[n] - '0';
+		freqB = f;
+	}
+	return freqB;
+}
+
+void RIG_FT450::set_vfoB (long freq)
+{
+	freqB = freq;
+	cmd = "FB00000000;";
+	for (int i = 9; i > 1; i--) {
+		cmd[i] += freq % 10;
+		freq /= 10;
+	}
+	RIG_DEBUG = true;
+	sendCommand(cmd, 0, false);
+	RIG_DEBUG = false;
+}
+
+void RIG_FT450::set_split(bool on)
+{
+	if (on) cmd = "FT1;";
+	else cmd = "FT0;";
+	sendCommand(cmd, 0, false);
+	LOG_INFO("cmd: %s\nreply: %s", cmd.c_str(), replystr.c_str());
 }
 
 int RIG_FT450::get_smeter()
@@ -218,29 +263,29 @@ int RIG_FT450::get_preamp()
 }
 
 
-void RIG_FT450::set_mode(int val)
+void RIG_FT450::set_modeA(int val)
 {
-	mode_ = val;
+	modeA = val;
 	cmd = "MD0";
 	cmd += mode_chr[val];
 	cmd += ';';
 	sendCommand(cmd, 0, false);
 }
 
-int RIG_FT450::get_mode()
+int RIG_FT450::get_modeA()
 {
 	if (sendCommand("MD0;", 5, false)) {
 		int md = replybuff[3];
 		if (md <= '9') md = md - '1';
 		else md = 9 + md - 'B';
-		mode_ = md;
+		modeA = md;
 	}
-	return mode_;
+	return modeA;
 }
 
-void RIG_FT450::set_bandwidth(int val)
+void RIG_FT450::set_bwA(int val)
 {
-	bw_ = val;
+	bwA = val;
 	switch (val) {
 		case 0 : cmd = "SH000;"; break;
 		case 1 : cmd = "SH016;"; break;
@@ -250,15 +295,15 @@ void RIG_FT450::set_bandwidth(int val)
 	sendCommand(cmd, 0, false);
 }
 
-int RIG_FT450::get_bandwidth()
+int RIG_FT450::get_bwA()
 {
 	if (sendCommand("SH0;", 6, false)) {
 		replybuff[5] = 0;
-		if (strcmp(&replybuff[3],"00") == 0) bw_ = 0;
-		if (strcmp(&replybuff[3],"16") == 0) bw_ = 1;
-		if (strcmp(&replybuff[3],"31") == 0) bw_ = 2;
+		if (strcmp(&replybuff[3],"00") == 0) bwA = 0;
+		if (strcmp(&replybuff[3],"16") == 0) bwA = 1;
+		if (strcmp(&replybuff[3],"31") == 0) bwA = 2;
 	}
-	return bw_;
+	return bwA;
 }
 
 int RIG_FT450::get_modetype(int n)

@@ -17,8 +17,8 @@ class RIG_IC756PRO3 : public RIG_IC756PRO2 {
 public:
 	RIG_IC756PRO3();
 	~RIG_IC756PRO3(){}
-	void set_mode(int val);
-	int  get_mode();
+	void set_modeA(int val);
+	int  get_modeA();
 };
 
 #endif

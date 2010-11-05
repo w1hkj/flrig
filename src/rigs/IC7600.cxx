@@ -33,9 +33,9 @@ RIG_IC7600::RIG_IC7600() {
 //======================================================================
 // IC7600 unique commands
 //======================================================================
-void RIG_IC7600::set_mode(int val)
+void RIG_IC7600::set_modeA(int val)
 {
-	mode_ = val;
+	modeA = val;
 	bool datamode = false;
 	switch (val) {
 		case 9  : val = 1; datamode = true; break;
@@ -64,7 +64,7 @@ void RIG_IC7600::set_mode(int val)
 	}
 }
 
-int RIG_IC7600::get_mode()
+int RIG_IC7600::get_modeA()
 {
 	int md;
 	cmd = pre_to;
@@ -82,14 +82,14 @@ int RIG_IC7600::get_mode()
 					default : break;
 				}
 			}
-			mode_ = md;
+			modeA = md;
 		} else {
 			checkresponse(8);
 		}
 	} else {
 		checkresponse(8);
 	}
-	return mode_;
+	return modeA;
 }
 
 void RIG_IC7600::set_mic_gain(int v)
