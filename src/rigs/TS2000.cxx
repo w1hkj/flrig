@@ -76,8 +76,8 @@ RIG_TS2000::RIG_TS2000() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	mode_ = 1;
-	bw_ = 8;
+	modeA = 1;
+	bwA = 8;
 	def_mode = 1;
 	defbw_ = 8;
 	deffreq_ = 14070000;
@@ -127,14 +127,14 @@ long RIG_TS2000::get_vfoA ()
 		int f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replybuff[n] - '0';
-		freq_ = f;
+		freqA = f;
 	}
-	return freq_;
+	return freqA;
 }
 
 void RIG_TS2000::set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	cmd = "FA00000000000;";
 	for (int i = 12; i > 1; i--) {
 		cmd[i] += freq % 10;
@@ -273,24 +273,24 @@ int RIG_TS2000::get_preamp()
 
 void RIG_TS2000::set_widths()
 {
-	if (mode_ == 0 || mode_ == 1 || mode_ == 3) {
+	if (modeA == 0 || modeA == 1 || modeA == 3) {
 		bandwidths_ = TS2000_SSBwidths;
-		bw_ = 8;
-	} else if (mode_ == 2 || mode_ == 6) {
+		bwA = 8;
+	} else if (modeA == 2 || modeA == 6) {
 		bandwidths_ = TS2000_CWwidths;
-		bw_ = 7;
-	} else if (mode_ == 5 || mode_ == 7) {
+		bwA = 7;
+	} else if (modeA == 5 || modeA == 7) {
 		bandwidths_ = TS2000_FSKwidths;
-		bw_ = 1;
+		bwA = 1;
 	} else {
 		bandwidths_ = TS2000_AMwidths;
-		bw_ = 5;
+		bwA = 5;
 	}
 }
 
-void RIG_TS2000::set_mode(int val)
+void RIG_TS2000::set_modeA(int val)
 {
-	mode_ = val;
+	modeA = val;
 	cmd = "MD";
 	cmd += TS2000_mode_chr[val];
 	cmd += ';';
@@ -298,71 +298,71 @@ void RIG_TS2000::set_mode(int val)
 	set_widths();
 }
 
-int RIG_TS2000::get_mode()
+int RIG_TS2000::get_modeA()
 {
 	if (sendTScommand("MD;", 4, false)) {
 		int md = replybuff[2];
 		md = md - '1';
 		if (md == 8) md = 7;
-		mode_ = md;
+		modeA = md;
 	}
 	set_widths();
-	return mode_;
+	return modeA;
 }
 
 int RIG_TS2000::adjust_bandwidth(int val)
 {
-	return bw_;
+	return bwA;
 }
 	
-void RIG_TS2000::set_bandwidth(int val)
+void RIG_TS2000::set_bwA(int val)
 {
-	bw_ = val;
-	if (mode_ == 0 || mode_ == 1 || mode_ == 3) {
-		sendTScommand(TS2000_SSBlower[bw_], 5, false);
-		sendTScommand(TS2000_SSBupper[bw_], 5, false);
+	bwA = val;
+	if (modeA == 0 || modeA == 1 || modeA == 3) {
+		sendTScommand(TS2000_SSBlower[bwA], 5, false);
+		sendTScommand(TS2000_SSBupper[bwA], 5, false);
 	}
-	else if (mode_ == 2 || mode_ == 6)
-		sendTScommand(TS2000_CWbw[bw_], 5, false);
-	else if (mode_ == 5 || mode_ == 7)
-		sendTScommand(TS2000_FSKbw[bw_], 7, false);
+	else if (modeA == 2 || modeA == 6)
+		sendTScommand(TS2000_CWbw[bwA], 5, false);
+	else if (modeA == 5 || modeA == 7)
+		sendTScommand(TS2000_FSKbw[bwA], 7, false);
 	else
-		sendTScommand(TS2000_AMbw[bw_], 5, false);
+		sendTScommand(TS2000_AMbw[bwA], 5, false);
 }
 
-int RIG_TS2000::get_bandwidth()
+int RIG_TS2000::get_bwA()
 {
 	int i = 0;
-	if (mode_ == 0 || mode_ == 1 || mode_ == 3) {
+	if (modeA == 0 || modeA == 1 || modeA == 3) {
 		sendTScommand("SH;", 5, false);
 		for (i = 0; i < 9; i++)
 			if (strcmp(replybuff, TS2000_SSBupper[i]) == 0)
 				break;
 		if (i == 9) i = 8;
-		bw_ = i;
-	} else if (mode_ == 2) {
+		bwA = i;
+	} else if (modeA == 2) {
 		sendTScommand("FW;", 7, false);
 		for (i = 0; i < 11; i++)
 			if (strcmp(replybuff, TS2000_CWbw[i]) == 0)
 				break;
 		if (i == 11) i = 10;
-		bw_ = i;
-	} else if (mode_ == 5 || mode_ == 7) {
+		bwA = i;
+	} else if (modeA == 5 || modeA == 7) {
 		sendTScommand("FW;", 7, false);
 		for (i = 0; i < 4; i++)
 			if (strcmp(replybuff, TS2000_FSKbw[i]) == 0)
 				break;
 		if (i == 4) i = 3;
-		bw_ = i;
+		bwA = i;
 	} else {
 		sendTScommand("SL;", 5, false);
 		for (i = 0; i < 8; i++)
 			if (strcmp(replybuff, TS2000_AMbw[i]) == 0)
 				break;
 		if (i == 8) i = 7;
-		bw_ = i;
+		bwA = i;
 	}
-	return bw_;
+	return bwA;
 }
 
 int RIG_TS2000::get_modetype(int n)

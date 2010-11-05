@@ -32,8 +32,8 @@ RIG_IC728::RIG_IC728() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	mode_ = 1;
-	bw_ = 0;
+	modeA = 1;
+	bwA = 0;
 
 	defaultCIV = 0x38;
 	adjustCIV(defaultCIV);
@@ -61,15 +61,15 @@ long RIG_IC728::get_vfoA ()
 	cmd.append( post );
 	if (!sendCommand(cmd, 10)) {
 		checkresponse(10);
-		return freq_;
+		return freqA;
 	}
-	freq_ = fm_bcd_be(&replystr[5], 8);
-	return freq_;
+	freqA = fm_bcd_be(&replystr[5], 8);
+	return freqA;
 }
 
 void RIG_IC728::set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	cmd = pre_to;
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 8 ) );

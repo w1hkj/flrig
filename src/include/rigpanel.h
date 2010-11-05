@@ -28,6 +28,7 @@ extern Fl_Box *txtInactive;
 #include <FL/Fl_Button.H>
 extern Fl_Button *btnA2B;
 extern Fl_Button *btnABactive;
+extern Fl_Light_Button *btnSplit;
 #include "combo.h"
 extern Fl_ComboBox *opMODE;
 extern Fl_ComboBox *opBW;
@@ -54,7 +55,6 @@ extern Fl_Light_Button *btnMicLine;
 extern Fl_Counter *cntRIT;
 extern Fl_Counter *cntXIT;
 extern Fl_Counter *cntBFO;
-extern Fl_Light_Button *btnSplit;
 extern Fl_Button *btnInitializing;
 Fl_Double_Window* Rig_window();
 extern Fl_Menu_Item menu_[];

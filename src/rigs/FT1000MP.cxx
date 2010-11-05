@@ -46,8 +46,8 @@ RIG_FT1000MP::RIG_FT1000MP() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	mode_ = 1;
-	bw_ = 1;
+	modeA = 1;
+	bwA = 1;
 
 	has_mode_control =
 	has_bandwidth_control =
@@ -88,32 +88,32 @@ long RIG_FT1000MP::get_vfoA ()
 //replybuff[1] = 0x00; replybuff[2] = 0x50; replybuff[3] = 0x42; replybuff[4] = 0x01;
 //replybuff[7] = 0x82;
 //replybuff[8] = 0x03;
-		freq_ = 0;
+		freqA = 0;
 		for (int i = 4; i > 0; i--) {
-			freq_ = freq_ * 10 + ((replybuff[i] & 0xF0) >> 4);
-			freq_ = freq_ * 10 + (replybuff[i] & 0x0F);
+			freqA = freqA * 10 + ((replybuff[i] & 0xF0) >> 4);
+			freqA = freqA * 10 + (replybuff[i] & 0x0F);
 		}
-		freq_ *= 10;
-		mode_ = replybuff[7] & 0x07;
+		freqA *= 10;
+		modeA = replybuff[7] & 0x07;
 		alt = (replybuff[8] & 0x80) == 0x80 ? 1 : 0;
-		if (mode_ > 1)
-			mode_ = 2 * mode_ + alt - 2;
-		bw_ = replybuff[8] & 0x07;
-		bw_ = (bw_ > 4) ? 4 : bw_;
+		if (modeA > 1)
+			modeA = 2 * modeA + alt - 2;
+		bwA = replybuff[8] & 0x07;
+		bwA = (bwA > 4) ? 4 : bwA;
 	}
 LOG_INFO(
 "\ndata: %s\nfreq: %ld\nmode: %s\nbw: %s", 
 str2hex(replybuff,16), 
-freq_,
-FT1000MP_modes[mode_],
-FT1000MP_widths[bw_]
+freqA,
+FT1000MP_modes[modeA],
+FT1000MP_widths[bwA]
 );
-	return freq_;
+	return freqA;
 }
 
 void RIG_FT1000MP::set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	init_cmd();
 	freq /=10; // 1000MP does not support 1 Hz resolution
 	for (int i = 0; i < 4; i++) {
@@ -125,19 +125,19 @@ LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 	sendCommand(cmd, 0);
 }
 
-int RIG_FT1000MP::get_mode()
+int RIG_FT1000MP::get_modeA()
 {
-	return mode_;
+	return modeA;
 }
 
-void RIG_FT1000MP::set_mode(int val)
+void RIG_FT1000MP::set_modeA(int val)
 {
-	mode_ = val;
+	modeA = val;
 	init_cmd();
 	cmd[3] = val;
 	cmd[4] = 0x0C;
 	sendCommand(cmd, 0);
-LOG_INFO("%s, %s", FT1000MP_modes[mode_], str2hex(cmd.c_str(),5));
+LOG_INFO("%s, %s", FT1000MP_modes[modeA], str2hex(cmd.c_str(),5));
 }
 
 int RIG_FT1000MP::get_modetype(int n)
@@ -145,21 +145,21 @@ int RIG_FT1000MP::get_modetype(int n)
 	return FT1000MP_mode_type[n];
 }
 
-int RIG_FT1000MP::get_bandwidth()
+int RIG_FT1000MP::get_bwA()
 {
-	return bw_;
+	return bwA;
 }
 
-void RIG_FT1000MP::set_bandwidth(int val)
+void RIG_FT1000MP::set_bwA(int val)
 {
-	bw_ = val;
+	bwA = val;
 	int bw = val--;
 	if (bw < 0) bw = 4;
 	init_cmd();
 	cmd[3] = bw;
 	cmd[4] = 0x8C;
 	sendCommand(cmd, 0);
-LOG_INFO("%s, %s", FT1000MP_widths[bw_], str2hex(cmd.c_str(), 5));
+LOG_INFO("%s, %s", FT1000MP_widths[bwA], str2hex(cmd.c_str(), 5));
 }
 
 // Tranceiver PTT on/off

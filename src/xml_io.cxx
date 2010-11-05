@@ -271,9 +271,9 @@ static void updateModeControl(void *d)
 	pthread_mutex_lock(&mutex_serial);
 		vfoA.imode = md;
 		opMODE->index(vfoA.imode);
-		selrig->set_mode(vfoA.imode);
+		selrig->set_modeA(vfoA.imode);
 		updateBandwidthControl();
-		selrig->set_bandwidth(vfoA.iBW);
+		selrig->set_bwA(vfoA.iBW);
 	pthread_mutex_unlock(&mutex_serial);
 	send_sideband();
 	send_bandwidths();
@@ -306,7 +306,7 @@ void updateBW(void *d)
 	pthread_mutex_lock(&mutex_serial);
 		vfoA.iBW = (long)d;
 		opBW->index(vfoA.iBW);
-		selrig->set_bandwidth(vfoA.iBW);
+		selrig->set_bwA(vfoA.iBW);
 	pthread_mutex_unlock(&mutex_serial);
 	updatingBW = false;
 	if (XML_DEBUG)

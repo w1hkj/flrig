@@ -34,8 +34,8 @@ RIG_FT857D::RIG_FT857D() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	mode_ = 1;
-	bw_ = 0;
+	modeA = 1;
+	bwA = 0;
 	has_mode_control = true;
 };
 
@@ -55,30 +55,30 @@ long RIG_FT857D::get_vfoA ()
 	cmd[4] = 0x03;
 
 	if (sendCommand(cmd, 5)) {
-		freq_ = fm_bcd(replybuff, 8) * 10;
+		freqA = fm_bcd(replybuff, 8) * 10;
 		int mode = replybuff[4];
 		for (int i = 0; i < 8; i++)
 			if (FT857D_mode_val[i] == mode) {
-				mode_ = i;
+				modeA = i;
 				break;
 			}
 	}
-	return freq_;
+	return freqA;
 }
 
 void RIG_FT857D::set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	freq /=10; // 857D does not support 1 Hz resolution
 	cmd = to_bcd(freq, 8);
 	cmd += 0x01;
 	sendCommand(cmd, 0);
 }
 
-int RIG_FT857D::get_mode()
+int RIG_FT857D::get_modeA()
 {
 // read by get_vfoA
-	return mode_;
+	return modeA;
 }
 
 int RIG_FT857D::get_modetype(int n)
@@ -87,9 +87,9 @@ int RIG_FT857D::get_modetype(int n)
 }
 
 
-void RIG_FT857D::set_mode(int val)
+void RIG_FT857D::set_modeA(int val)
 {
-	mode_ = val;
+	modeA = val;
 	init_cmd();
 	cmd[0] = FT857D_mode_val[val];
 	cmd[4] = 0x07;

@@ -51,8 +51,8 @@ RIG_FT950::RIG_FT950() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	mode_ = 1;
-	bw_ = 2;
+	modeA = 1;
+	bwA = 2;
 	def_mode = 10;
 	defbw_ = 2;
 	deffreq_ = 14070000;
@@ -93,14 +93,14 @@ long RIG_FT950::get_vfoA ()
 		int f = 0;
 		for (size_t n = 2; n < 10; n++)
 			f = f*10 + replybuff[n] - '0';
-		freq_ = f;
+		freqA = f;
 	}
-	return freq_;
+	return freqA;
 }
 
 void RIG_FT950::set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	cmd = "FA00000000;";
 	for (int i = 9; i > 1; i--) {
 		cmd[i] += freq % 10;
@@ -284,20 +284,20 @@ int RIG_FT950::get_preamp()
 
 void RIG_FT950::update_bandwidths()
 {
-	if (mode_ == 2 || mode_ == 5 || mode_ == 6 || mode_ == 8) {
+	if (modeA == 2 || modeA == 5 || modeA == 6 || modeA == 8) {
 		bandwidths_ = FT950_widths_CW;
 		bw_vals_ = FT950_wvals_CW;
-		bw_ = 7; // 500 Hz
+		bwA = 7; // 500 Hz
 	} else {
 		bandwidths_ = FT950_widths_SSB;
 		bw_vals_ = FT950_wvals_SSB;
-		bw_ = 13; // 2400 Hz
+		bwA = 13; // 2400 Hz
 	}
 }
 
-void RIG_FT950::set_mode(int val)
+void RIG_FT950::set_modeA(int val)
 {
-	mode_ = val;
+	modeA = val;
 	cmd = "MD0";
 	cmd += FT950_mode_chr[val];
 	cmd += ';';
@@ -305,18 +305,18 @@ void RIG_FT950::set_mode(int val)
 	update_bandwidths();
 }
 
-int RIG_FT950::get_mode()
+int RIG_FT950::get_modeA()
 {
 	if (sendCommand("MD0;", 5, false))
-		mode_ = replybuff[3];
+		modeA = replybuff[3];
 	update_bandwidths();
-	return mode_;
+	return modeA;
 }
 
-void RIG_FT950::set_bandwidth(int val)
+void RIG_FT950::set_bwA(int val)
 {
 	int bw_indx = bw_vals_[val];
-	bw_ = val;
+	bwA = val;
 	cmd = "SH0";
 	cmd += '0' + bw_indx / 10;
 	cmd += '0' + bw_indx % 10;
@@ -324,7 +324,7 @@ void RIG_FT950::set_bandwidth(int val)
 	sendCommand(cmd, 0, false);
 }
 
-int RIG_FT950::get_bandwidth()
+int RIG_FT950::get_bwA()
 {
 	int i = 0;
 	int limit = sizeof(bw_vals_)/sizeof(int);
@@ -334,8 +334,8 @@ int RIG_FT950::get_bandwidth()
 		for (i = 0; i < limit; i++)
 			if (bw_vals_[i] == bw_indx) break;
 	}
-	if (i < limit) bw_ = i;
-	return bw_;
+	if (i < limit) bwA = i;
+	return bwA;
 }
 
 int RIG_FT950::get_modetype(int n)

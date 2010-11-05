@@ -42,8 +42,8 @@ RIG_FT1000::RIG_FT1000() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	mode_ = 1;
-	bw_ = 0;
+	modeA = 1;
+	bwA = 0;
 
 	has_mode_control =
 	has_bandwidth_control =
@@ -122,33 +122,33 @@ long RIG_FT1000::get_vfoA ()
 	cmd[3] = 2; cmd[4] = 0x10;
 	if (sendCommand(cmd, 1636)) {
 		replybuff[9] = 0;
-		freq_ = fm_bcd(&replybuff[6], 8) * 10;
-		bw_ = replybuff[13] & 0x07;
+		freqA = fm_bcd(&replybuff[6], 8) * 10;
+		bwA = replybuff[13] & 0x07;
 	}
-	return freq_;
+	return freqA;
 }
 
 void RIG_FT1000::set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	freq /=10; // 1000 does not support 1 Hz resolution
 	cmd = to_bcd(freq, 8);
 	cmd += 0x0A;
 	sendCommand(cmd, 0);
 }
 
-int RIG_FT1000::get_mode()
+int RIG_FT1000::get_modeA()
 {
 	init_cmd();
 	cmd[4] = 0x0C;
 	if (sendCommand(cmd, 5))
-		mode_ = cmd[4];
-	return mode_;
+		modeA = cmd[4];
+	return modeA;
 }
 
-void RIG_FT1000::set_mode(int val)
+void RIG_FT1000::set_modeA(int val)
 {
-	mode_ = val;
+	modeA = val;
 	init_cmd();
 	cmd[3] = val;
 	cmd[4] = 0x0C;
@@ -160,18 +160,18 @@ int RIG_FT1000::get_modetype(int n)
 	return FT1000_mode_type[n];
 }
 
-void RIG_FT1000::set_bandwidth(int n)
+void RIG_FT1000::set_bwA(int n)
 {
 	init_cmd();
 	cmd[3] = n;
 	cmd[4] = 0x8C;
 	sendCommand(cmd, 0);
-	bw_ = n;
+	bwA = n;
 }
 
-int RIG_FT1000::get_bandwidth()
+int RIG_FT1000::get_bwA()
 {
-	return bw_;
+	return bwA;
 }
 
 // Tranceiver PTT on/off

@@ -41,8 +41,8 @@ RIG_TS450S::RIG_TS450S() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	mode_ = 1;
-	bw_ = 1;
+	modeA = 1;
+	bwA = 1;
 	def_mode = 1;
 	defbw_ = 1;
 	deffreq_ = 14070000;
@@ -79,21 +79,21 @@ long RIG_TS450S::get_vfoA ()
 {
 	cmd = "FA;";
 	if (!sendTScommand(cmd, 14, false))
-		return freq_;
+		return freqA;
 	if (replystr.find("FA") != 0) {
 		clearSerialPort();
-		return freq_;
+		return freqA;
 	}
 	int f = 0;
 	for (size_t n = 2; n < 13; n++)
 		f = f*10 + replybuff[n] - '0';
-	freq_ = f;
-	return freq_;
+	freqA = f;
+	return freqA;
 }
 
 void RIG_TS450S::set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	cmd = "FA00000000000;";
 	for (int i = 12; i > 1; i--) {
 		cmd[i] += freq % 10;
@@ -143,28 +143,28 @@ void RIG_TS450S::set_PTT_control(int val)
 	sendTScommand(cmd, 4, false);
 }
 
-void RIG_TS450S::set_mode(int val)
+void RIG_TS450S::set_modeA(int val)
 {
-	mode_ = val;
+	modeA = val;
 	cmd = "MD";
 	cmd += TS450S_mode_chr[val];
 	cmd += ';';
 	sendTScommand(cmd, 4, false);
 }
 
-int RIG_TS450S::get_mode()
+int RIG_TS450S::get_modeA()
 {
 	if (!sendTScommand("MD;", 4, false))
-		return mode_;
+		return modeA;
 	if (replystr.find("MD") != 0) {
 		clearSerialPort();
-		return mode_;
+		return modeA;
 	}
 	int md = replybuff[2];
 	md = md - '1';
 	if (md == 8) md = 7;
-	mode_ = md;
-	return mode_;
+	modeA = md;
+	return modeA;
 }
 
 int RIG_TS450S::get_modetype(int n)
@@ -172,27 +172,27 @@ int RIG_TS450S::get_modetype(int n)
 	return _mode_type[n];
 }
 
-void RIG_TS450S::set_bandwidth(int val)
+void RIG_TS450S::set_bwA(int val)
 {
-	bw_ = val;
+	bwA = val;
 	cmd = "FL";
 	cmd.append(TS450S_filters[val]).append(TS450S_filters[val]);
 	cmd += ';';
 	sendTScommand(cmd, 0, false);
 }
 
-int RIG_TS450S::get_bandwidth()
+int RIG_TS450S::get_bwA()
 {
 	cmd = "FL;";
 	if (!sendTScommand(cmd, 9, false))
-		return bw_;
+		return bwA;
 	replybuff[8] = 0;
-	bw_ = 0;
-	while (TS450S_filters[bw_]) {
-		if (strcmp(&replybuff[5], TS450S_filters[bw_]) == 0)
-			return bw_;
-		bw_++;
+	bwA = 0;
+	while (TS450S_filters[bwA]) {
+		if (strcmp(&replybuff[5], TS450S_filters[bwA]) == 0)
+			return bwA;
+		bwA++;
 	}
-	bw_ = 0;
-	return bw_;
+	bwA = 0;
+	return bwA;
 }

@@ -65,8 +65,8 @@ pthread_t *digi_thread = 0;
 pthread_mutex_t mutex_serial = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_xmlrpc = PTHREAD_MUTEX_INITIALIZER;
 
-bool RIG_DEBUG = 1;
-bool XML_DEBUG = 0;
+bool RIG_DEBUG = false;
+bool XML_DEBUG = false;
 
 //----------------------------------------------------------------------
 void about()

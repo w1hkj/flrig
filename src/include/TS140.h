@@ -10,8 +10,8 @@ public:
 
 	long get_vfoA();
 	void set_vfoA(long);
-	void set_mode(int val);
-	int  get_mode();
+	void set_modeA(int val);
+	int  get_modeA();
 	int  get_modetype(int);
 //	void set_attenuator(int val);
 //	int  get_attenuator();
@@ -25,7 +25,7 @@ public:
 //	void set_power_control(double val);
 	void set_PTT_control(int val);
 //	void tune_rig();
-//	void set_bandwidth(int val);
+//	void set_bwA(int val);
 
 };
 

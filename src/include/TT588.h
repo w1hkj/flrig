@@ -26,11 +26,11 @@ public:
 	int  get_volume_control();
 	void set_attenuator(int val);
 	int  get_attenuator();
-	void set_mode(int val);
-	int  get_mode();
+	void set_modeA(int val);
+	int  get_modeA();
 	int  get_modetype(int n);
-	void set_bandwidth(int val);
-	int  get_bandwidth();
+	void set_bwA(int val);
+	int  get_bwA();
 	void set_rf_gain(int val);
 	int  get_rf_gain();
 	void set_if_shift(int val);

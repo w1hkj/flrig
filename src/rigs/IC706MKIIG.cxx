@@ -32,8 +32,8 @@ RIG_IC706MKIIG::RIG_IC706MKIIG() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	mode_ = 1;
-	bw_ = 0;
+	modeA = 1;
+	bwA = 0;
 
 	has_attenuator_control = true;
 //	has_swr_control = true;
@@ -51,15 +51,15 @@ long RIG_IC706MKIIG::get_vfoA ()
 	cmd.append( post );
 	if (!sendCommand(cmd, 11)) {
 		checkresponse(11);
-		return freq_;
+		return freqA;
 	}
-	freq_ = fm_bcd_be(&replystr[5], 10);
-	return freq_;
+	freqA = fm_bcd_be(&replystr[5], 10);
+	return freqA;
 }
 
 void RIG_IC706MKIIG::set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	cmd = pre_to;
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 10 ) );

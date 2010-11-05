@@ -29,11 +29,11 @@ public:
 	void set_squelch(int val);
 	void set_power_control(double val);
 	void set_mic_gain(int val);
-	void set_mode(int val);
-	int  get_mode();
+	void set_modeA(int val);
+	int  get_modeA();
 	int  get_modetype(int n);
-	void set_bandwidth(int val);
-	int  get_bandwidth();
+	void set_bwA(int val);
+	int  get_bwA();
 	int  adjust_bandwidth(int m);
 	void set_compression();
 	void set_auto_notch(int val);

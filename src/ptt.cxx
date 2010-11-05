@@ -17,17 +17,33 @@
 
 using namespace std;
 
+// used for transceivers with a single vfo, called only by rigPTT
+static void fake_split(int on)
+{
+	static  FREQMODE temp;
+	if (on) {
+		selrig->set_vfoA(vfoB.freq);
+		selrig->set_modeA(vfoB.imode);
+		selrig->set_bwA(vfoB.iBW);
+	} else {
+		selrig->set_vfoA(vfoA.freq);
+		selrig->set_modeA(vfoA.imode);
+		selrig->set_bwA(vfoA.iBW);
+	}
+}
+
 // add fake rit to this function and to set_vfoA ??
 
 void rigPTT(bool on)
 {
-	if (on && progStatus.split)
-		cbABactive();
+	wait_query = true;
+	pthread_mutex_lock(&mutex_serial);
+
+	if (on && progStatus.split && !selrig->can_split())
+		fake_split(on);
 
 	if (progStatus.comm_catptt) {
-		pthread_mutex_lock(&mutex_serial);
-			selrig->set_PTT_control(on);
-		pthread_mutex_unlock(&mutex_serial);
+		selrig->set_PTT_control(on);
 	} else if (progStatus.comm_dtrptt || progStatus.comm_rtsptt)
 		RigSerial.SetPTT(on);
 	else if (SepSerial.IsOpen() && (progStatus.sep_dtrptt || progStatus.sep_rtsptt) )
@@ -35,6 +51,9 @@ void rigPTT(bool on)
 	else
 		LOG_INFO("No PTT i/o connected");
 
-	if (!on && progStatus.split)
-		cbABactive();
+	if (!on && progStatus.split && !selrig->can_split())
+		fake_split(on);
+
+	pthread_mutex_unlock(&mutex_serial);
+	wait_query = false;
 }

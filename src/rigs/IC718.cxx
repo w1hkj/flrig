@@ -37,8 +37,8 @@ RIG_IC718::RIG_IC718() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	mode_ = 1;
-	bw_ = 0;
+	modeA = 1;
+	bwA = 0;
 	filter_nbr = 1;
 
 	has_power_control = true;
@@ -69,15 +69,15 @@ long RIG_IC718::get_vfoA ()
 	cmd.append( post );
 	if (!sendCommand(cmd, 11)) {
 		checkresponse(11);
-		return freq_;
+		return freqA;
 	}
-	freq_ = fm_bcd_be(&replystr[5], 10);
-	return freq_;
+	freqA = fm_bcd_be(&replystr[5], 10);
+	return freqA;
 }
 
 void RIG_IC718::set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	cmd = pre_to;
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 10 ) );
@@ -303,9 +303,9 @@ void RIG_IC718::set_mic_gain(int val)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
-void RIG_IC718::set_mode(int val)
+void RIG_IC718::set_modeA(int val)
 {
-	mode_ = val;
+	modeA = val;
 	cmd = pre_to;
 	cmd += '\x06';
 	cmd += val > 5 ? val + 2 : val;
@@ -317,17 +317,17 @@ void RIG_IC718::set_mode(int val)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
-int RIG_IC718::get_mode()
+int RIG_IC718::get_modeA()
 {
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
 	if (sendICcommand (cmd, 8 )) {
-		mode_ = replystr[5];
-		if (mode_ > 6) mode_ -= 2;
+		modeA = replystr[5];
+		if (modeA > 6) modeA -= 2;
 		filter_nbr = replystr[6];
 	}
-	return mode_;
+	return modeA;
 }
 
 int RIG_IC718::get_modetype(int n)
@@ -335,15 +335,15 @@ int RIG_IC718::get_modetype(int n)
 	return _mode_type[n];
 }
 
-void RIG_IC718::set_bandwidth(int val)
+void RIG_IC718::set_bwA(int val)
 {
 	filter_nbr = val + 1;
-	set_mode(mode_);
+	set_modeA(modeA);
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
-int RIG_IC718::get_bandwidth()
+int RIG_IC718::get_bwA()
 {
 	return filter_nbr - 1;
 }

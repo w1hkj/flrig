@@ -39,8 +39,8 @@ RIG_TS480HX::RIG_TS480HX() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	mode_ = 1;
-	bw_ = 1;
+	modeA = 1;
+	bwA = 1;
 	def_mode = 1;
 	defbw_ = 1;
 	deffreq_ = 14070000;
@@ -77,21 +77,21 @@ long RIG_TS480HX::get_vfoA ()
 {
 	cmd = "FA;";
 	if (!sendTScommand(cmd, 14, false))
-		return freq_;
+		return freqA;
 	if (replystr.find("FA") != 0) {
 		clearSerialPort();
-		return freq_;
+		return freqA;
 	}
 	int f = 0;
 	for (size_t n = 2; n < 13; n++)
 		f = f*10 + replybuff[n] - '0';
-	freq_ = f;
-	return freq_;
+	freqA = f;
+	return freqA;
 }
 
 void RIG_TS480HX::set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	cmd = "FA00000000000;";
 	for (int i = 12; i > 1; i--) {
 		cmd[i] += freq % 10;
@@ -141,28 +141,28 @@ void RIG_TS480HX::set_PTT_control(int val)
 	sendTScommand(cmd, 4, false);
 }
 
-void RIG_TS480HX::set_mode(int val)
+void RIG_TS480HX::set_modeA(int val)
 {
-	mode_ = val;
+	modeA = val;
 	cmd = "MD";
 	cmd += TS480HX_mode_chr[val];
 	cmd += ';';
 	sendTScommand(cmd, 4, false);
 }
 
-int RIG_TS480HX::get_mode()
+int RIG_TS480HX::get_modeA()
 {
 	if (!sendTScommand("MD;", 4, false))
-		return mode_;
+		return modeA;
 	if (replystr.find("MD") != 0) {
 		clearSerialPort();
-		return mode_;
+		return modeA;
 	}
 	int md = replybuff[2];
 	md = md - '1';
 	if (md == 8) md = 7;
-	mode_ = md;
-	return mode_;
+	modeA = md;
+	return modeA;
 }
 
 int RIG_TS480HX::get_modetype(int n)
@@ -170,9 +170,9 @@ int RIG_TS480HX::get_modetype(int n)
 	return _mode_type[n];
 }
 
-void RIG_TS480HX::set_bandwidth(int val)
+void RIG_TS480HX::set_bwA(int val)
 {
-	bw_ = val;
+	bwA = val;
 	cmd = "SH01"; // set center frequency to 1500
 	sendTScommand(cmd, 0, false);
 	cmd = "SL00";
@@ -180,15 +180,15 @@ void RIG_TS480HX::set_bandwidth(int val)
 	sendTScommand(cmd, 0, false);
 }
 
-int RIG_TS480HX::get_bandwidth()
+int RIG_TS480HX::get_bwA()
 {
 	cmd = "SL;";
 	if (sendTScommand(cmd, 5, false)) {
-		bw_ = replybuff[3] - '0';
-		if (bw_ < 0) bw_ = 0;
-		if (bw_ > 6) bw_ = 6;
+		bwA = replybuff[3] - '0';
+		if (bwA < 0) bwA = 0;
+		if (bwA > 6) bwA = 6;
 	}
-	return bw_;
+	return bwA;
 }
 
 void RIG_TS480HX::set_volume_control(int val)
@@ -217,7 +217,7 @@ void RIG_TS480HX::set_power_control(double val)
 {
 	cmd = "PC";
 	char szval[4];
-	if (mode_ == 4 && val > 50) val = 50; // AM mode limitation
+	if (modeA == 4 && val > 50) val = 50; // AM mode limitation
 	snprintf(szval, sizeof(szval), "%03d", (int)val);
 	cmd += szval;
 	cmd += ';';

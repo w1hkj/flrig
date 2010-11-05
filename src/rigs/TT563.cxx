@@ -36,8 +36,8 @@ RIG_TT563::RIG_TT563() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	mode_ = 1;
-	bw_ = 0;
+	modeA = 1;
+	bwA = 0;
 
 	has_mode_control = true;
 	has_ptt_control = true;
@@ -53,15 +53,15 @@ long RIG_TT563::get_vfoA ()
 	cmd.append( post );
 	if (!sendICcommand(cmd, 11)) {
 		checkresponse(11);
-		return freq_;
+		return freqA;
 	}
-	freq_ = fm_bcd_be(&replystr[5], 10);
-	return freq_;
+	freqA = fm_bcd_be(&replystr[5], 10);
+	return freqA;
 }
 
 void RIG_TT563::set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	cmd = pre_to;
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 8 ) );
@@ -80,27 +80,27 @@ void RIG_TT563::set_PTT_control(int val)
 	checkresponse(6);
 }
 
-void RIG_TT563::set_mode(int md)
+void RIG_TT563::set_modeA(int md)
 {
-	mode_ = md;
+	modeA = md;
 	cmd = pre_to;
 	cmd += '\x06';
-	cmd += mode_;
+	cmd += modeA;
 	cmd.append(post);
 	sendICcommand(cmd, 6);
 	checkresponse(6);
 }
 
-int RIG_TT563::get_mode()
+int RIG_TT563::get_modeA()
 {
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
 	if( sendICcommand (cmd, 8 )) {
-		mode_ = replystr[5];
-		bw_ = replystr[6];
+		modeA = replystr[5];
+		bwA = replystr[6];
 	}
-	return mode_;
+	return modeA;
 }
 
 int RIG_TT563::get_modetype(int n)

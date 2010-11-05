@@ -91,8 +91,8 @@ RIG_TT588::RIG_TT588() {
 	comm_dtrptt = false;
 	serloop_timing = 200;
 
-	mode_ = 1;
-	bw_ = 25;
+	modeA = 1;
+	bwA = 25;
 	def_mode = 3;
 	defbw_ = 25;
 	deffreq_ = 14070000;
@@ -154,16 +154,16 @@ long RIG_TT588::get_vfoA ()
 		int f = 0;
 		for (size_t n = 1; n < 5; n++)
 			f = f*256 + (unsigned char)replybuff[n];
-		freq_ = f;
+		freqA = f;
 	}
-	return (long)(freq_ - vfo_corr);
+	return (long)(freqA - vfo_corr);
 }
 
 void RIG_TT588::set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	vfo_corr = (freq / 1e6) * VfoAdj + 0.5;
-	long xfreq = freq_ + vfo_corr;
+	long xfreq = freqA + vfo_corr;
 	cmd = TT588setFREQA;
 	cmd[5] = xfreq & 0xff; xfreq = xfreq >> 8;
 	cmd[4] = xfreq & 0xff; xfreq = xfreq >> 8;
@@ -179,22 +179,22 @@ void RIG_TT588::setVfoAdj(double v)
 	VfoAdj = v;
 }
 
-void RIG_TT588::set_mode(int val)
+void RIG_TT588::set_modeA(int val)
 {
-	mode_ = val;
+	modeA = val;
 	cmd = TT588setMODE;
 	cmd[2] = cmd[3] = TT588mode_chr[val];
 	sendCommand(cmd, 0, true);
 }
 
-int RIG_TT588::get_mode()
+int RIG_TT588::get_modeA()
 {
 	cmd = TT588getMODE;
 	sendCommand(cmd, 4, true);
 	if (replybuff[0] == 'M') {
-		mode_ = replybuff[1] - '0';
+		modeA = replybuff[1] - '0';
 	}
-	return mode_;
+	return modeA;
 }
 
 int RIG_TT588::get_modetype(int n)
@@ -202,31 +202,31 @@ int RIG_TT588::get_modetype(int n)
 	return TT588mode_type[n];
 }
 
-void RIG_TT588::set_bandwidth(int val)
+void RIG_TT588::set_bwA(int val)
 {
-	bw_ = val;
+	bwA = val;
 	cmd = TT588setBW;
 	cmd[2] = 37 - val;
 	sendCommand(cmd, 0, true);
 	set_if_shift(pbt);
 }
 
-int RIG_TT588::get_bandwidth()
+int RIG_TT588::get_bwA()
 {
 	cmd = TT588getBW;
 	sendCommand(cmd, 3, true);
 	if (replybuff[0] == 'W')
-		bw_ = 37 - (unsigned char)replybuff[1];
-	return bw_;
+		bwA = 37 - (unsigned char)replybuff[1];
+	return bwA;
 }
 
 void RIG_TT588::set_if_shift(int val)
 {
 	pbt = val;
 	cmd = TT588setPBT;
-	int bpval = progStatus.bpf_center - 200 - TT588_numeric_widths[bw_]/2;
+	int bpval = progStatus.bpf_center - 200 - TT588_numeric_widths[bwA]/2;
 	short int si = val;
-	if ((mode_ == 1 || mode_ == 2) && progStatus.use_bpf_center)
+	if ((modeA == 1 || modeA == 2) && progStatus.use_bpf_center)
 		si += (bpval > 0 ? bpval : 0);
 	cmd[2] = (si & 0xff00) >> 8;
 	cmd[3] = (si & 0xff);

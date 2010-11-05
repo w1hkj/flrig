@@ -10,8 +10,8 @@ public:
 
 	long get_vfoA();
 	void set_vfoA(long);
-	void set_mode(int val);
-	void set_bandwidth(int val);
+	void set_modeA(int val);
+	void set_bwA(int val);
 };
 
 #endif

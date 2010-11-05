@@ -36,8 +36,8 @@ RIG_FT100D::RIG_FT100D() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	mode_ = 1;
-	bw_ = 2;
+	modeA = 1;
+	bwA = 2;
 
 	has_mode_control =
 	has_bandwidth_control =
@@ -61,38 +61,38 @@ long RIG_FT100D::get_vfoA ()
 // vfo value is in bytes 1..3; binary MSB in byte 1
 		for (size_t n = 1; n < 5; n++)
 			f = f * 256 + (unsigned char)replybuff[n];
-		freq_ = f * 1.25; // 100D resolution is 1.25 Hz / bit for read
+		freqA = f * 1.25; // 100D resolution is 1.25 Hz / bit for read
 // interpret mode bits
-		mode_ = replybuff[5] & 0x0F;
+		modeA = replybuff[5] & 0x0F;
 // interpret bandwidth bits
 		int bw =  (replybuff[5] >> 4) & 0x03;
-		if (bw == 0) bw_ = 3;
-		else if (bw == 1) bw_ = 2;
-		else if (bw == 2) bw_ = 1;
-		else if (bw == 3) bw_ = 0;
+		if (bw == 0) bwA = 3;
+		else if (bw == 1) bwA = 2;
+		else if (bw == 2) bwA = 1;
+		else if (bw == 3) bwA = 0;
 	}
-	return freq_;
+	return freqA;
 }
 
 void RIG_FT100D::set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	freq /=10; // 100D does not support 1 Hz resolution
 	cmd = to_bcd_be(freq, 8);
 	cmd += 0x0A;
 	sendCommand(cmd, 0);
 }
 
-int RIG_FT100D::get_mode()
+int RIG_FT100D::get_modeA()
 {
 // combined with get_vfoA
 // do not need a separate read for mode
-	return mode_;
+	return modeA;
 }
 
-void RIG_FT100D::set_mode(int val)
+void RIG_FT100D::set_modeA(int val)
 {
-	mode_ = val;
+	modeA = val;
 	init_cmd();
 	cmd[3] = FT100D_mode_val[val];
 	cmd[4] = 0x0C;
@@ -108,7 +108,7 @@ void RIG_FT100D::set_PTT_control(int val)
 	sendCommand(cmd, 0);
 }
 
-void RIG_FT100D::set_bandwidth (int val)
+void RIG_FT100D::set_bwA (int val)
 {
 	init_cmd();
 	cmd[3] = FT100D_bw_val[val];
@@ -116,9 +116,9 @@ void RIG_FT100D::set_bandwidth (int val)
 	sendCommand(cmd, 0);
 }
 
-int RIG_FT100D::get_bandwidth()
+int RIG_FT100D::get_bwA()
 {
-	return bw_;
+	return bwA;
 }
 
 int RIG_FT100D::get_smeter()

@@ -36,8 +36,8 @@ RIG_MARK_V::RIG_MARK_V() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	mode_ = 1;
-	bw_ = 0;
+	modeA = 1;
+	bwA = 0;
 
 	has_mode_control =
 	has_bandwidth_control =
@@ -62,19 +62,19 @@ replybuff[1] = 0x01;
 replybuff[2] = 0x08;
 replybuff[3] = 0x53;
 replybuff[4] = 0x00;
-		freq_ = 0;
+		freqA = 0;
 		for (int i = 4; i > 0; i--) {
-			freq_ = freq_ * 10 + (replybuff[i] & 0x0F);
-			freq_ = freq_ * 10 + ((replybuff[i] & 0xF0) >> 4);
+			freqA = freqA * 10 + (replybuff[i] & 0x0F);
+			freqA = freqA * 10 + ((replybuff[i] & 0xF0) >> 4);
 		}
-		freq_ *= 10;
+		freqA *= 10;
 //	}
-	return freq_;
+	return freqA;
 }
 
 void RIG_MARK_V::set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	freq /=10; // 1000MP does not support 1 Hz resolution
 	cmd = to_bcd_be(freq, 8);
 	cmd += 0x0A;
@@ -82,18 +82,18 @@ LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 	sendCommand(cmd, 0);
 }
 
-int RIG_MARK_V::get_mode()
+int RIG_MARK_V::get_modeA()
 {
 	init_cmd();
 	cmd[4] = 0x0C;
 	if (sendCommand(cmd, 5))
-		mode_ = cmd[4];
-	return mode_;
+		modeA = cmd[4];
+	return modeA;
 }
 
-void RIG_MARK_V::set_mode(int val)
+void RIG_MARK_V::set_modeA(int val)
 {
-	mode_ = val;
+	modeA = val;
 	init_cmd();
 	cmd[3] = val;
 	cmd[4] = 0x0C;

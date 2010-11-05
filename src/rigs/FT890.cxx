@@ -52,12 +52,12 @@ RIG RIG_FT890 = {
 	NULL, // FT890_get_attenuator,
 	NULL, // FT890_set_preamp,
 	NULL, // FT890_get_preamp,
-	FT890_set_mode,
-	FT890_get_mode,
+	FT890_set_modeA,
+	FT890_get_modeA,
 	NULL, // FT890_get_modetype,
-	NULL, // FT890_set_bandwidth,
+	NULL, // FT890_set_bwA,
 	NULL, // adjust_bandwidth,
-	NULL, // FT890_get_bandwidth,
+	NULL, // FT890_get_bwA,
 	NULL, // FT890_set_if_shift,
 	NULL, // FT890_get_if_shift,
 	NULL, // FT890_get_if_min_max_step,
@@ -103,28 +103,28 @@ long FT890_get_vfoA ()
 		for (size_t n = 1; n < 4; n++) {
 			f = f*256 + replybuff[n];
 		}
-		freq_ = f * 10; // 890 resolution is 10 Hz
+		freqA = f * 10; // 890 resolution is 10 Hz
 // interpret mode byte
 		int md = replybuff[6];
 		int flg = replybuff[8] & 0xC0; // bits 6 & 7
 		switch (md) {
-			case 0: mode_ = 0; break;
-			case 1: mode_ = 1; break;
-			case 2: mode_ = 2;
-					if (flg && 0x80 == 0x80) mode_ = 3;
+			case 0: modeA = 0; break;
+			case 1: modeA = 1; break;
+			case 2: modeA = 2;
+					if (flg && 0x80 == 0x80) modeA = 3;
 					break;
 			case 3: currmode = 4;
-					if (flg && 0x40 == 0x40) mode_ = 5;
+					if (flg && 0x40 == 0x40) modeA = 5;
 					break;
-			case 4: mode_ = 6; break;
+			case 4: modeA = 6; break;
 		}
 	}
-	return freq_;
+	return freqA;
 }
 
 void FT890_set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	init_cmd();
 	freq /=10; // 890 does not support 1 Hz resolution
 	for (size_t i = 0; i < 4; i++) {
@@ -135,16 +135,16 @@ void FT890_set_vfoA (long freq)
 	sendCommand(cmd, 0);
 }
 
-int FT890_get_mode()
+int FT890_get_modeA()
 {
 // combined with get_vfoA
 // do not need a separate read for mode
-	return mode_;
+	return modeA;
 }
 
-void FT890_set_mode(int val)
+void FT890_set_modeA(int val)
 {
-	mode_ = val;
+	modeA = val;
 	init_cmd();
 	cmd[3] = FT890_mode_val[val];
 	cmd[4] = 0x0C;
@@ -230,11 +230,11 @@ int FT890_get_preamp()
 }
 
 
-void FT890_set_bandwidth(int val)
+void FT890_set_bwA(int val)
 {
 }
 
-int FT890_get_bandwidth()
+int FT890_get_bwA()
 {
 	return 0;
 }

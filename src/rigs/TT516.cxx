@@ -84,8 +84,8 @@ RIG_TT516::RIG_TT516() {
 	comm_dtrptt = false;
 	serloop_timing = 200;
 	
-	mode_ = 3;
-	bw_ = 36;
+	modeA = 3;
+	bwA = 36;
 	def_mode = 3;
 	defbw_ = 36;
 	deffreq_ = 14070000;
@@ -132,16 +132,16 @@ long RIG_TT516::get_vfoA ()
 		int f = 0;
 		for (size_t n = 1; n < 5; n++) {
 			f = f*256 + (unsigned char)replybuff[n];
-		freq_ = f;
+		freqA = f;
 }
 	} else
 		checkresponse();
-	return freq_;
+	return freqA;
 }
 
 void RIG_TT516::set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	cmd = TT516setFREQA;
 	cmd[5] = freq & 0xff; freq = freq >> 8;
 	cmd[4] = freq & 0xff; freq = freq >> 8;
@@ -160,23 +160,23 @@ void RIG_TT516::set_PTT_control(int val)
 	checkresponse();
 }
 
-void RIG_TT516::set_mode(int val)
+void RIG_TT516::set_modeA(int val)
 {
-	mode_ = val;
+	modeA = val;
 	cmd = TT516setMODE;
 	cmd[2] = cmd[3] = TT516mode_chr[val];
 	sendCommand(cmd, 2, true);
 	checkresponse();
 }
 
-int RIG_TT516::get_mode()
+int RIG_TT516::get_modeA()
 {
 	cmd = TT516getMODE;
 	sendCommand(cmd, 6, true);
 	if (replybuff[0] == 'M') {
-		mode_ = replybuff[1] - '0';
+		modeA = replybuff[1] - '0';
 	}
-	return mode_;
+	return modeA;
 }
 
 int RIG_TT516::get_modetype(int n)
@@ -188,31 +188,31 @@ int RIG_TT516::adjust_bandwidth(int m)
 {
 	if (m == 0) { // AM
 		bandwidths_ = TT516_AM_widths;
-		bw_ = 36;
+		bwA = 36;
 	} else {
 		bandwidths_ = TT516_widths;
-		if (m == 3) bw_ = 12;
-		else bw_ = 36;
+		if (m == 3) bwA = 12;
+		else bwA = 36;
 	}
-	return bw_;
+	return bwA;
 }
 
-void RIG_TT516::set_bandwidth(int val)
+void RIG_TT516::set_bwA(int val)
 {
-	bw_ = val;
+	bwA = val;
 	cmd = TT516setBW;
 	cmd[2] = val;
 	sendCommand(cmd, 2, true);
 	checkresponse();
 }
 
-int RIG_TT516::get_bandwidth()
+int RIG_TT516::get_bwA()
 {
 	cmd = TT516getBW;
 	sendCommand(cmd, 5, true);
 	if (replybuff[0] == 'W')
-		bw_ = (unsigned char)replybuff[1];
-	return bw_;
+		bwA = (unsigned char)replybuff[1];
+	return bwA;
 }
 
 void RIG_TT516::set_if_shift(int val)

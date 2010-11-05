@@ -148,7 +148,10 @@ int sendCommand (string s, int retnbr, bool b)
 					(9 + progStatus.stopbits) * 1000.0 / RigSerial.Baud());
 
 	if (RigSerial.IsOpen() == false) {
-		LOG_INFO("command: %s", b ? str2hex(s.data(), s.length()) : s.c_str());
+		if (RIG_DEBUG)
+			LOG_INFO("cmd: %s", b ? str2hex(s.data(), s.length()) : s.c_str());
+		else
+			LOG_DEBUG("cmd: %s", b ? str2hex(s.data(), s.length()) : s.c_str());
 		return 0;
 	}
 

@@ -140,9 +140,9 @@ int RIG_IC756PRO2::get_preamp()
 // IC756ProIII unique commands
 //======================================================================
 
-void RIG_IC756PRO3::set_mode(int val)
+void RIG_IC756PRO3::set_modeA(int val)
 {
-	mode_ = val;
+	modeA = val;
 	bool datamode = false;
 	switch (val) {
 		case 10 : val = 5; datamode = true; break;
@@ -172,7 +172,7 @@ void RIG_IC756PRO3::set_mode(int val)
 	}
 }
 
-int RIG_IC756PRO3::get_mode()
+int RIG_IC756PRO3::get_modeA()
 {
 	int md;
 	cmd = pre_to;
@@ -194,13 +194,13 @@ int RIG_IC756PRO3::get_mode()
 					default : break;
 				}
 			}
-			mode_ = md;
+			modeA = md;
 		} else {
 			checkresponse(8);
 		}
 	} else {
 		checkresponse(8);
 	}
-	return mode_;
+	return modeA;
 }
 

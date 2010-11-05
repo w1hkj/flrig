@@ -81,6 +81,7 @@ extern int  movFreq();
 extern void adjustFreqs();
 extern void cbABactive();
 extern void cbA2B();
+extern void cb_set_split(int);
 extern void cbRIT();
 extern void cbXIT();
 extern void cbBFO();

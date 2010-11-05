@@ -32,8 +32,8 @@ RIG_FT767::RIG_FT767() {
 	comm_catptt = false;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	mode_ = 1;
-	bw_ = 0;
+	modeA = 1;
+	bwA = 0;
 	has_mode_control = true;
 };
 
@@ -58,30 +58,30 @@ long RIG_FT767::get_vfoA ()
 	cmd[4] = 0x01; // CHECK command
 
 	if (snd_cmd(cmd, 86)) {
-		freq_ = fm_bcd(replybuff, 14) * 10; // VFO-A in positions 14-17
-		mode_ = replybuff[19];
+		freqA = fm_bcd(replybuff, 14) * 10; // VFO-A in positions 14-17
+		modeA = replybuff[19];
 	}
-	return freq_;
+	return freqA;
 }
 
 void RIG_FT767::set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	freq /=10; // 767 does not support 1 Hz resolution
 	cmd = to_bcd(freq, 8);
 	cmd += 0x08; // SET FREQUENCY
 	snd_cmd(cmd, 5); // value returned is discarded -- might need to check for correct
 }
 
-int RIG_FT767::get_mode()
+int RIG_FT767::get_modeA()
 {
 // read by get_vfoA
-	return mode_;
+	return modeA;
 }
 
-void RIG_FT767::set_mode(int val)
+void RIG_FT767::set_modeA(int val)
 {
-	mode_ = val;
+	modeA = val;
 	init_cmd();
 	cmd[3] = 0x10 + val; // 0x10 = LSB ... 0x15 = FSK
 	cmd[4] = 0x0A; // MODESEL

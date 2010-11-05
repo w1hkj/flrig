@@ -39,8 +39,8 @@ RIG_K2::RIG_K2() {
 	comm_catptt = false;
 	comm_rtsptt = false;
 	comm_dtrptt = true;
-	mode_ = 1;
-	bw_ = 0;
+	modeA = 1;
+	bwA = 0;
 
 	has_attenuator_control = true;
 	has_preamp_control = true;
@@ -73,14 +73,14 @@ long RIG_K2::get_vfoA ()
 		long f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replybuff[n] - '0';
-		freq_ = f;
+		freqA = f;
 	}
-	return freq_;
+	return freqA;
 }
 
 void RIG_K2::set_vfoA (long freq)
 {
-	freq_ = freq;
+	freqA = freq;
 	cmd = "FA00000000000;";
 	for (int i = 12; i > 1; i--) {
 		cmd[i] += freq % 10;
@@ -115,7 +115,7 @@ int RIG_K2::get_preamp()
 	return 0;
 }
 
-void RIG_K2::set_mode(int val)
+void RIG_K2::set_modeA(int val)
 {
 	val++;
 	cmd = "MD0;";
@@ -123,7 +123,7 @@ void RIG_K2::set_mode(int val)
 	sendCommand(cmd, 0, false);
 }
 
-int RIG_K2::get_mode()
+int RIG_K2::get_modeA()
 {
 	sendCommand("MD;",4);
 	int md = replybuff[2] - '0';
@@ -136,7 +136,7 @@ int RIG_K2::get_modetype(int n)
 	return K2_mode_type[n];
 }
 
-void RIG_K2::set_bandwidth(int val)
+void RIG_K2::set_bwA(int val)
 {
 	switch (val) {
 		case 0 : sendCommand("FW00001;",0); break;
@@ -147,7 +147,7 @@ void RIG_K2::set_bandwidth(int val)
 	}
 }
 
-int RIG_K2::get_bandwidth()
+int RIG_K2::get_bwA()
 {
 	sendCommand("FW;",9);
 	int bw = replybuff[6] - '0';
