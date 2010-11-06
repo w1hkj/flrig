@@ -9,6 +9,7 @@
 #include <FL/Fl_Tooltip.H>
 #include "FreqControl.h"
 extern cFreqControl *FreqDisp;
+extern cFreqControl *FreqDispB;
 #include <FL/Fl_Light_Button.H>
 extern Fl_Light_Button *btnVol;
 #include "ValueSlider.h"

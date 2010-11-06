@@ -132,6 +132,8 @@ RIG_TT538::RIG_TT538() {
 
 }
 
+static int corrA = 0, corrB = 0;
+
 void RIG_TT538::checkresponse(string s)
 {
 	if (RigSerial.IsOpen() == false)
@@ -167,7 +169,7 @@ long RIG_TT538::get_vfoA ()
 			f = f*256 + (unsigned char)replybuff[n];
 		freqA = f;
 	}
-	return (long)(freqA / (1 + VfoAdj/1e6));
+	return (long)(freqA / (1 + VfoAdj/1e6) + 0.5);
 }
 
 void RIG_TT538::set_vfoA (long freq)
@@ -188,13 +190,13 @@ long RIG_TT538::get_vfoB ()
 {
 	cmd = TT538getFREQB;
 	bool ret = sendCommand(cmd, 6, true);
-	if (ret == true && replybuff[0] == 'A') {
+	if (ret == true && replybuff[0] == 'B') {
 		int f = 0;
 		for (size_t n = 1; n < 5; n++)
 			f = f*256 + (unsigned char)replybuff[n];
-		freqA = f;
+		freqB = f;
 	}
-	return (long)(freqB / (1 + VfoAdj/1e6));
+	return (long)(freqB / (1 + VfoAdj/1e6) + 0.5);
 }
 
 void RIG_TT538::set_vfoB (long freq)

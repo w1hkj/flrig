@@ -440,6 +440,7 @@ void cbFreqControlFontBrowser(Fl_Widget*, void*) {
 	lblTest->labelfont(fnt);
 	dlgDisplayConfig->redraw();
 	FreqDisp->font(fnt);
+	FreqDispB->font(fnt);
 	fntbrowser->hide();
 }
 
@@ -517,7 +518,8 @@ void cbSWRMeterColor()
 void cbOkDisplayDialog()
 {
 	FreqDisp->SetONOFFCOLOR(lblTest->labelcolor(), lblTest->color());
-	
+	FreqDispB->SetONOFFCOLOR(lblTest->labelcolor(), lblTest->color());
+
 	txtInactive->color(lblTest->color());
 	txtInactive->labelcolor(lblTest->labelcolor());
 	txtInactive->redraw();

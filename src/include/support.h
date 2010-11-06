@@ -212,6 +212,7 @@ extern void serial_timer(void *);
 extern void init_xmlrpc();
 
 extern void setFreqDisp(void *d);
+extern void setFreqDispB(void *d);
 extern void updateSmeter(void *d);
 extern void updateFwdPwr(void *d);
 extern void updateALC(void *d);

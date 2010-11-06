@@ -82,6 +82,8 @@ Fl_Menu_Item menu_[] = {
 
 cFreqControl *FreqDisp=(cFreqControl *)0;
 
+cFreqControl *FreqDispB=(cFreqControl *)0;
+
 Fl_Light_Button *btnVol=(Fl_Light_Button *)0;
 
 static void cb_btnVol(Fl_Light_Button*, void*) {
@@ -340,18 +342,18 @@ Fl_Button *btnInitializing=(Fl_Button *)0;
 
 Fl_Double_Window* Rig_window() {
   Fl_Double_Window* w;
-  { Fl_Double_Window* o = new Fl_Double_Window(340, 370, _("Flrig"));
+  { Fl_Double_Window* o = new Fl_Double_Window(424, 330, _("Flrig"));
     w = o;
     o->color((Fl_Color)FL_LIGHT2);
     o->align(FL_ALIGN_CLIP|FL_ALIGN_INSIDE);
-    { Fl_Menu_Bar* o = new Fl_Menu_Bar(2, 2, 336, 20);
+    { Fl_Menu_Bar* o = new Fl_Menu_Bar(0, 2, 424, 20);
       o->textsize(12);
       { Fl_Menu_Item* o = &menu_[8];
         progStatus.tooltips ? o->set() :o->clear();
       }
       o->menu(menu_);
     } // Fl_Menu_Bar* o
-    { FreqDisp = new cFreqControl(0, 25, 340, 50, _("10"));
+    { FreqDisp = new cFreqControl(1, 24, 210, 35, _("10"));
       FreqDisp->box(FL_DOWN_BOX);
       FreqDisp->color((Fl_Color)FL_BACKGROUND_COLOR);
       FreqDisp->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
@@ -362,9 +364,20 @@ Fl_Double_Window* Rig_window() {
       FreqDisp->align(FL_ALIGN_CENTER);
       FreqDisp->when(FL_WHEN_RELEASE);
       FreqDisp->SetONOFFCOLOR (FL_YELLOW, FL_BLACK);
-      FreqDisp->setCallBack(movFreq);
     } // cFreqControl* FreqDisp
-    { btnVol = new Fl_Light_Button(4, 162, 55, 18, _("Vol"));
+    { FreqDispB = new cFreqControl(212, 24, 210, 35, _("10"));
+      FreqDispB->box(FL_DOWN_BOX);
+      FreqDispB->color((Fl_Color)FL_BACKGROUND_COLOR);
+      FreqDispB->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
+      FreqDispB->labeltype(FL_NORMAL_LABEL);
+      FreqDispB->labelfont(0);
+      FreqDispB->labelsize(14);
+      FreqDispB->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
+      FreqDispB->align(FL_ALIGN_CENTER);
+      FreqDispB->when(FL_WHEN_RELEASE);
+      FreqDispB->SetONOFFCOLOR (FL_YELLOW, FL_BLACK);
+    } // cFreqControl* FreqDispB
+    { btnVol = new Fl_Light_Button(2, 125, 60, 18, _("Vol"));
       btnVol->tooltip(_("Speaker on/off"));
       btnVol->down_box(FL_THIN_DOWN_BOX);
       btnVol->value(1);
@@ -373,7 +386,7 @@ Fl_Double_Window* Rig_window() {
       btnVol->labelsize(12);
       btnVol->callback((Fl_Callback*)cb_btnVol);
     } // Fl_Light_Button* btnVol
-    { Fl_Wheel_Value_Slider* o = sldrVOLUME = new Fl_Wheel_Value_Slider(60, 162, 277, 18);
+    { Fl_Wheel_Value_Slider* o = sldrVOLUME = new Fl_Wheel_Value_Slider(68, 125, 355, 18);
       sldrVOLUME->tooltip(_("Adjust Audio Volume"));
       sldrVOLUME->type(5);
       sldrVOLUME->box(FL_THIN_DOWN_BOX);
@@ -391,7 +404,7 @@ Fl_Double_Window* Rig_window() {
       sldrVOLUME->when(FL_WHEN_CHANGED);
       o->reverse(true);
     } // Fl_Wheel_Value_Slider* sldrVOLUME
-    { Fl_Wheel_Value_Slider* o = sldrRFGAIN = new Fl_Wheel_Value_Slider(60, 182, 277, 18, _("RF"));
+    { Fl_Wheel_Value_Slider* o = sldrRFGAIN = new Fl_Wheel_Value_Slider(68, 145, 355, 18, _("RF"));
       sldrRFGAIN->tooltip(_("Adjust RF gain"));
       sldrRFGAIN->type(5);
       sldrRFGAIN->box(FL_THIN_DOWN_BOX);
@@ -410,7 +423,7 @@ Fl_Double_Window* Rig_window() {
       sldrRFGAIN->when(FL_WHEN_CHANGED);
       o->reverse(true);
     } // Fl_Wheel_Value_Slider* sldrRFGAIN
-    { Fl_Wheel_Value_Slider* o = sldrSQUELCH = new Fl_Wheel_Value_Slider(60, 202, 277, 18, _("SQL"));
+    { Fl_Wheel_Value_Slider* o = sldrSQUELCH = new Fl_Wheel_Value_Slider(68, 165, 355, 18, _("SQL"));
       sldrSQUELCH->tooltip(_("Adjust Squelch"));
       sldrSQUELCH->type(5);
       sldrSQUELCH->box(FL_THIN_DOWN_BOX);
@@ -429,7 +442,7 @@ Fl_Double_Window* Rig_window() {
       sldrSQUELCH->when(FL_WHEN_CHANGED);
       o->reverse(true);
     } // Fl_Wheel_Value_Slider* sldrSQUELCH
-    { btnNR = new Fl_Light_Button(4, 222, 55, 18, _("NR"));
+    { btnNR = new Fl_Light_Button(2, 185, 60, 18, _("NR"));
       btnNR->tooltip(_("Noise Reduction On/Off"));
       btnNR->down_box(FL_THIN_DOWN_BOX);
       btnNR->color((Fl_Color)FL_LIGHT1);
@@ -437,7 +450,7 @@ Fl_Double_Window* Rig_window() {
       btnNR->labelsize(12);
       btnNR->callback((Fl_Callback*)cb_btnNR);
     } // Fl_Light_Button* btnNR
-    { Fl_Wheel_Value_Slider* o = sldrNR = new Fl_Wheel_Value_Slider(60, 222, 277, 18);
+    { Fl_Wheel_Value_Slider* o = sldrNR = new Fl_Wheel_Value_Slider(68, 185, 355, 18);
       sldrNR->tooltip(_("Adjust noise reduction"));
       sldrNR->type(5);
       sldrNR->box(FL_THIN_DOWN_BOX);
@@ -455,7 +468,7 @@ Fl_Double_Window* Rig_window() {
       sldrNR->when(FL_WHEN_CHANGED);
       o->reverse(true);
     } // Fl_Wheel_Value_Slider* sldrNR
-    { btnIFsh = new Fl_Light_Button(4, 243, 55, 18, _("IFsh"));
+    { btnIFsh = new Fl_Light_Button(2, 206, 60, 18, _("IFsh"));
       btnIFsh->tooltip(_("IF Shift On/Off"));
       btnIFsh->down_box(FL_THIN_DOWN_BOX);
       btnIFsh->color((Fl_Color)FL_LIGHT1);
@@ -463,7 +476,7 @@ Fl_Double_Window* Rig_window() {
       btnIFsh->labelsize(12);
       btnIFsh->callback((Fl_Callback*)cb_btnIFsh);
     } // Fl_Light_Button* btnIFsh
-    { Fl_Wheel_Value_Slider* o = sldrIFSHIFT = new Fl_Wheel_Value_Slider(60, 243, 277, 18);
+    { Fl_Wheel_Value_Slider* o = sldrIFSHIFT = new Fl_Wheel_Value_Slider(68, 206, 355, 18);
       sldrIFSHIFT->tooltip(_("Adjust IF Shift"));
       sldrIFSHIFT->type(5);
       sldrIFSHIFT->box(FL_THIN_DOWN_BOX);
@@ -482,7 +495,7 @@ Fl_Double_Window* Rig_window() {
       sldrIFSHIFT->when(FL_WHEN_CHANGED);
       o->reverse(true);
     } // Fl_Wheel_Value_Slider* sldrIFSHIFT
-    { btnNotch = new Fl_Light_Button(4, 263, 55, 18, _("Ntch"));
+    { btnNotch = new Fl_Light_Button(2, 226, 60, 18, _("Ntch"));
       btnNotch->tooltip(_("Notch - Manual (off) Auto (on)"));
       btnNotch->down_box(FL_THIN_DOWN_BOX);
       btnNotch->color((Fl_Color)FL_LIGHT1);
@@ -490,7 +503,7 @@ Fl_Double_Window* Rig_window() {
       btnNotch->labelsize(12);
       btnNotch->callback((Fl_Callback*)cb_btnNotch);
     } // Fl_Light_Button* btnNotch
-    { Fl_Wheel_Value_Slider* o = sldrNOTCH = new Fl_Wheel_Value_Slider(60, 263, 277, 18);
+    { Fl_Wheel_Value_Slider* o = sldrNOTCH = new Fl_Wheel_Value_Slider(68, 226, 355, 18);
       sldrNOTCH->tooltip(_("Adjust Notch Frequency"));
       sldrNOTCH->type(5);
       sldrNOTCH->box(FL_THIN_DOWN_BOX);
@@ -509,7 +522,7 @@ Fl_Double_Window* Rig_window() {
       sldrNOTCH->when(FL_WHEN_CHANGED);
       o->reverse(true);
     } // Fl_Wheel_Value_Slider* sldrNOTCH
-    { Fl_Wheel_Value_Slider* o = sldrMICGAIN = new Fl_Wheel_Value_Slider(60, 283, 277, 18, _("MIC"));
+    { Fl_Wheel_Value_Slider* o = sldrMICGAIN = new Fl_Wheel_Value_Slider(68, 246, 355, 18, _("MIC"));
       sldrMICGAIN->tooltip(_("Adjuts Mic Gain"));
       sldrMICGAIN->type(5);
       sldrMICGAIN->box(FL_THIN_DOWN_BOX);
@@ -527,7 +540,7 @@ Fl_Double_Window* Rig_window() {
       sldrMICGAIN->when(FL_WHEN_CHANGED);
       o->reverse(true);
     } // Fl_Wheel_Value_Slider* sldrMICGAIN
-    { Fl_Wheel_Value_Slider* o = sldrPOWER = new Fl_Wheel_Value_Slider(60, 303, 277, 18, _("PWR"));
+    { Fl_Wheel_Value_Slider* o = sldrPOWER = new Fl_Wheel_Value_Slider(68, 266, 355, 18, _("PWR"));
       sldrPOWER->tooltip(_("Adjust power level"));
       sldrPOWER->type(5);
       sldrPOWER->box(FL_THIN_DOWN_BOX);
@@ -554,8 +567,9 @@ Fl_Double_Window* Rig_window() {
       txtInactive->labelsize(16);
       txtInactive->labelcolor((Fl_Color)FL_LIGHT2);
       txtInactive->align(FL_ALIGN_RIGHT|FL_ALIGN_INSIDE);
+      txtInactive->hide();
     } // Fl_Box* txtInactive
-    { btnA2B = new Fl_Button(211, 96, 40, 18, _("1 > 2"));
+    { btnA2B = new Fl_Button(215, 62, 60, 18, _("A -> B"));
       btnA2B->tooltip(_("Active -> Inactive"));
       btnA2B->down_box(FL_DOWN_BOX);
       btnA2B->color((Fl_Color)FL_LIGHT1);
@@ -563,7 +577,7 @@ Fl_Double_Window* Rig_window() {
       btnA2B->labelsize(12);
       btnA2B->callback((Fl_Callback*)cb_btnA2B);
     } // Fl_Button* btnA2B
-    { btnABactive = new Fl_Button(211, 117, 40, 18, _("1 / 2"));
+    { btnABactive = new Fl_Button(288, 62, 60, 18, _("A / B"));
       btnABactive->tooltip(_("Swap VFOs"));
       btnABactive->down_box(FL_DOWN_BOX);
       btnABactive->color((Fl_Color)FL_LIGHT1);
@@ -571,7 +585,7 @@ Fl_Double_Window* Rig_window() {
       btnABactive->labelsize(12);
       btnABactive->callback((Fl_Callback*)cb_btnABactive);
     } // Fl_Button* btnABactive
-    { Fl_Light_Button* o = btnSplit = new Fl_Light_Button(282, 138, 55, 18, _("Split"));
+    { Fl_Light_Button* o = btnSplit = new Fl_Light_Button(361, 62, 60, 18, _("Split"));
       btnSplit->tooltip(_("Rx-1 / Tx-2"));
       btnSplit->down_box(FL_THIN_DOWN_BOX);
       btnSplit->color((Fl_Color)FL_LIGHT1);
@@ -580,7 +594,7 @@ Fl_Double_Window* Rig_window() {
       btnSplit->callback((Fl_Callback*)cb_btnSplit);
       o->value(progStatus.split);
     } // Fl_Light_Button* btnSplit
-    { opMODE = new Fl_ComboBox(255, 96, 80, 18, _("Mode"));
+    { opMODE = new Fl_ComboBox(322, 82, 100, 18, _("Mode"));
       opMODE->tooltip(_("Select transceiver operating mode"));
       opMODE->box(FL_FLAT_BOX);
       opMODE->color((Fl_Color)FL_BACKGROUND_COLOR);
@@ -594,7 +608,7 @@ Fl_Double_Window* Rig_window() {
       opMODE->when(FL_WHEN_RELEASE);
       opMODE->end();
     } // Fl_ComboBox* opMODE
-    { opBW = new Fl_ComboBox(255, 117, 80, 18, _("BW"));
+    { opBW = new Fl_ComboBox(215, 82, 100, 18, _("BW"));
       opBW->tooltip(_("Select Transceiver Bandwidth"));
       opBW->box(FL_FLAT_BOX);
       opBW->color((Fl_Color)FL_BACKGROUND_COLOR);
@@ -608,7 +622,7 @@ Fl_Double_Window* Rig_window() {
       opBW->when(FL_WHEN_RELEASE);
       opBW->end();
     } // Fl_ComboBox* opBW
-    { btnAttenuator = new Fl_Light_Button(6, 323, 45, 18, _("Att"));
+    { btnAttenuator = new Fl_Light_Button(2, 286, 60, 18, _("Att"));
       btnAttenuator->tooltip(_("Attenuator On/Off"));
       btnAttenuator->down_box(FL_THIN_DOWN_BOX);
       btnAttenuator->color((Fl_Color)FL_LIGHT1);
@@ -616,7 +630,7 @@ Fl_Double_Window* Rig_window() {
       btnAttenuator->labelsize(12);
       btnAttenuator->callback((Fl_Callback*)cb_btnAttenuator);
     } // Fl_Light_Button* btnAttenuator
-    { btnPreamp = new Fl_Light_Button(55, 323, 45, 18, _("Pre"));
+    { btnPreamp = new Fl_Light_Button(74, 286, 60, 18, _("Pre"));
       btnPreamp->tooltip(_("Preamp On/Off"));
       btnPreamp->down_box(FL_THIN_DOWN_BOX);
       btnPreamp->color((Fl_Color)FL_LIGHT1);
@@ -624,7 +638,7 @@ Fl_Double_Window* Rig_window() {
       btnPreamp->labelsize(12);
       btnPreamp->callback((Fl_Callback*)cb_btnPreamp);
     } // Fl_Light_Button* btnPreamp
-    { btnNOISE = new Fl_Light_Button(104, 323, 45, 18, _("NB"));
+    { btnNOISE = new Fl_Light_Button(146, 286, 60, 18, _("NB"));
       btnNOISE->tooltip(_("Noise Blanker On/Off"));
       btnNOISE->down_box(FL_THIN_DOWN_BOX);
       btnNOISE->color((Fl_Color)FL_LIGHT1);
@@ -632,7 +646,7 @@ Fl_Double_Window* Rig_window() {
       btnNOISE->labelsize(12);
       btnNOISE->callback((Fl_Callback*)cb_btnNOISE);
     } // Fl_Light_Button* btnNOISE
-    { btnAutoNotch = new Fl_Light_Button(154, 323, 45, 18, _("AN"));
+    { btnAutoNotch = new Fl_Light_Button(218, 286, 60, 18, _("AN"));
       btnAutoNotch->tooltip(_("Auto Notch On/Off"));
       btnAutoNotch->down_box(FL_THIN_DOWN_BOX);
       btnAutoNotch->color((Fl_Color)FL_LIGHT1);
@@ -640,12 +654,12 @@ Fl_Double_Window* Rig_window() {
       btnAutoNotch->labelsize(12);
       btnAutoNotch->callback((Fl_Callback*)cb_btnAutoNotch);
     } // Fl_Light_Button* btnAutoNotch
-    { btnTune = new Fl_Button(208, 323, 60, 18, _("Tune"));
+    { btnTune = new Fl_Button(290, 286, 60, 18, _("Tune"));
       btnTune->tooltip(_("Momentary Tune"));
       btnTune->color((Fl_Color)FL_LIGHT1);
       btnTune->callback((Fl_Callback*)cb_btnTune);
     } // Fl_Button* btnTune
-    { btnPTT = new Fl_Light_Button(276, 323, 60, 18, _("PTT"));
+    { btnPTT = new Fl_Light_Button(362, 286, 60, 18, _("PTT"));
       btnPTT->tooltip(_("Xmt On/Off"));
       btnPTT->down_box(FL_THIN_DOWN_BOX);
       btnPTT->color((Fl_Color)FL_LIGHT1);
@@ -653,17 +667,17 @@ Fl_Double_Window* Rig_window() {
       btnPTT->labelsize(12);
       btnPTT->callback((Fl_Callback*)cb_btnPTT);
     } // Fl_Light_Button* btnPTT
-    { grpMeters = new Fl_Group(0, 76, 209, 60);
-      grpMeters->box(FL_DOWN_BOX);
+    { grpMeters = new Fl_Group(1, 62, 210, 60);
+      grpMeters->box(FL_THIN_DOWN_BOX);
       grpMeters->color((Fl_Color)55);
       grpMeters->selection_color((Fl_Color)55);
-      { scaleSmeter = new Fl_Box(2, 79, 205, 20);
+      { scaleSmeter = new Fl_Box(3, 64, 205, 20);
         scaleSmeter->box(FL_FLAT_BOX);
         scaleSmeter->color((Fl_Color)55);
         scaleSmeter->selection_color((Fl_Color)55);
         scaleSmeter->image(image_S60);
       } // Fl_Box* scaleSmeter
-      { btnALC_SWR = new Fl_Button(2, 79, 205, 20);
+      { btnALC_SWR = new Fl_Button(2, 64, 205, 20);
         btnALC_SWR->tooltip(_("Press SWR / ALC"));
         btnALC_SWR->box(FL_FLAT_BOX);
         btnALC_SWR->down_box(FL_FLAT_BOX);
@@ -672,7 +686,7 @@ Fl_Double_Window* Rig_window() {
         btnALC_SWR->callback((Fl_Callback*)cb_btnALC_SWR);
         btnALC_SWR->hide();
       } // Fl_Button* btnALC_SWR
-      { Fl_SigBar* o = sldrRcvSignal = new Fl_SigBar(4, 101, 181, 6);
+      { Fl_SigBar* o = sldrRcvSignal = new Fl_SigBar(5, 86, 181, 6);
         sldrRcvSignal->box(FL_FLAT_BOX);
         sldrRcvSignal->color((Fl_Color)198);
         sldrRcvSignal->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
@@ -682,10 +696,11 @@ Fl_Double_Window* Rig_window() {
         sldrRcvSignal->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
         sldrRcvSignal->align(FL_ALIGN_CENTER);
         sldrRcvSignal->when(FL_WHEN_RELEASE);
+        sldrRcvSignal->hide();
         o->minimum(0);
         o->maximum(100);
       } // Fl_SigBar* sldrRcvSignal
-      { Fl_SigBar* o = sldrALC_SWR = new Fl_SigBar(4, 101, 201, 6);
+      { Fl_SigBar* o = sldrALC_SWR = new Fl_SigBar(5, 86, 201, 6);
         sldrALC_SWR->box(FL_FLAT_BOX);
         sldrALC_SWR->color((Fl_Color)198);
         sldrALC_SWR->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
@@ -699,7 +714,7 @@ Fl_Double_Window* Rig_window() {
         o->minimum(0);
         o->maximum(100);
       } // Fl_SigBar* sldrALC_SWR
-      { Fl_SigBar* o = sldrFwdPwr = new Fl_SigBar(4, 108, 201, 6);
+      { Fl_SigBar* o = sldrFwdPwr = new Fl_SigBar(5, 93, 201, 6);
         sldrFwdPwr->box(FL_FLAT_BOX);
         sldrFwdPwr->color((Fl_Color)FL_DARK_RED);
         sldrFwdPwr->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
@@ -713,7 +728,7 @@ Fl_Double_Window* Rig_window() {
         o->minimum(0);
         o->maximum(100);
       } // Fl_SigBar* sldrFwdPwr
-      { scalePower = new Fl_Box(2, 115, 205, 20);
+      { scalePower = new Fl_Box(3, 100, 205, 20);
         scalePower->box(FL_FLAT_BOX);
         scalePower->color((Fl_Color)55);
         scalePower->selection_color((Fl_Color)55);
@@ -721,12 +736,12 @@ Fl_Double_Window* Rig_window() {
       } // Fl_Box* scalePower
       grpMeters->end();
     } // Fl_Group* grpMeters
-    { boxControl = new Fl_Box(3, 348, 130, 17, _("Auxilliary Control:"));
+    { boxControl = new Fl_Box(3, 311, 130, 17, _("Auxilliary Controls:"));
       boxControl->box(FL_FLAT_BOX);
       boxControl->color((Fl_Color)FL_LIGHT2);
       boxControl->align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE);
     } // Fl_Box* boxControl
-    { Fl_Light_Button* o = btnAuxRTS = new Fl_Light_Button(208, 347, 60, 18, _("RTS"));
+    { Fl_Light_Button* o = btnAuxRTS = new Fl_Light_Button(218, 310, 60, 18, _("RTS"));
       btnAuxRTS->tooltip(_("RTS control pin"));
       btnAuxRTS->down_box(FL_THIN_DOWN_BOX);
       btnAuxRTS->color((Fl_Color)FL_LIGHT1);
@@ -735,7 +750,7 @@ Fl_Double_Window* Rig_window() {
       btnAuxRTS->callback((Fl_Callback*)cb_btnAuxRTS);
       o->value(progStatus.aux_rts);
     } // Fl_Light_Button* btnAuxRTS
-    { Fl_Light_Button* o = btnAuxDTR = new Fl_Light_Button(140, 347, 60, 18, _("DTR"));
+    { Fl_Light_Button* o = btnAuxDTR = new Fl_Light_Button(146, 310, 60, 18, _("DTR"));
       btnAuxDTR->tooltip(_("DTR control pin"));
       btnAuxDTR->down_box(FL_THIN_DOWN_BOX);
       btnAuxDTR->color((Fl_Color)FL_LIGHT1);
@@ -753,25 +768,28 @@ Fl_Double_Window* Rig_window() {
       btnMicLine->callback((Fl_Callback*)cb_btnMicLine);
       btnMicLine->hide();
     } // Fl_Light_Button* btnMicLine
-    { cntRIT = new Fl_Counter(24, 138, 65, 18, _("RIT"));
+    { cntRIT = new Fl_Counter(215, 102, 54, 18, _("R"));
+      cntRIT->tooltip(_("RIT"));
       cntRIT->type(1);
       cntRIT->labelsize(12);
       cntRIT->minimum(-1000);
       cntRIT->maximum(1000);
       cntRIT->step(10);
       cntRIT->callback((Fl_Callback*)cb_cntRIT);
-      cntRIT->align(FL_ALIGN_LEFT);
+      cntRIT->align(FL_ALIGN_RIGHT);
     } // Fl_Counter* cntRIT
-    { cntXIT = new Fl_Counter(115, 138, 65, 18, _("XIT"));
+    { cntXIT = new Fl_Counter(285, 102, 54, 18, _("X"));
+      cntXIT->tooltip(_("XIT"));
       cntXIT->type(1);
       cntXIT->labelsize(12);
       cntXIT->minimum(-1000);
       cntXIT->maximum(1000);
       cntXIT->step(10);
       cntXIT->callback((Fl_Callback*)cb_cntXIT);
-      cntXIT->align(FL_ALIGN_LEFT);
+      cntXIT->align(FL_ALIGN_RIGHT);
     } // Fl_Counter* cntXIT
-    { cntBFO = new Fl_Counter(212, 138, 65, 18, _("BFO"));
+    { cntBFO = new Fl_Counter(357, 102, 54, 18, _("B"));
+      cntBFO->tooltip(_("BFO"));
       cntBFO->type(1);
       cntBFO->labelsize(12);
       cntBFO->minimum(0);
@@ -779,10 +797,9 @@ Fl_Double_Window* Rig_window() {
       cntBFO->step(10);
       cntBFO->value(600);
       cntBFO->callback((Fl_Callback*)cb_cntBFO);
-      cntBFO->align(FL_ALIGN_LEFT);
+      cntBFO->align(FL_ALIGN_RIGHT);
     } // Fl_Counter* cntBFO
-    { btnInitializing = new Fl_Button(0, 25, 340, 135, _("Initializing\n\nPlease wait"));
-      btnInitializing->box(FL_FLAT_BOX);
+    { btnInitializing = new Fl_Button(0, 23, 424, 100, _("Initializing\n\nPlease wait"));
       btnInitializing->color((Fl_Color)206);
       btnInitializing->labelfont(1);
       btnInitializing->labelsize(24);
