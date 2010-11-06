@@ -1,5 +1,8 @@
-2010-09-22  David Freese  <w1hkj@w1hkj.com>
+2010-11-06  David Freese  <w1hkj@w1hkj.com>
 
+	27441c7: Dual VFO mod
+	61ea3d2: VFO A-B
+	3d64fc0: K2 Update
 	68ae4e4: Rig Ordering
 	699c420: IC703
 	626d3b0: Config Dir
@@ -127,3 +130,76 @@
 	c9a9206: Jupiter-Pegasus DTR line
 	ca14ecd: FT767 transceiver
 	88db85e: XML_IO Race Condition
+	8b336f5: FT100D fix
+	98fc2e9: XMLRPC mod
+	681d3ca: Mode-Bandwidth Annunciation
+	bdbc63a: FT-857D update
+
+
+=Version 0.9.98=
+
+	84f04dd: FT-857D get_mode correction
+
+
+=Version 0.9.97=
+
+	2a4f12a: Socket not available checks
+
+
+=Version 0.9.96=
+
+	8017748: Improve transceiver response
+	848b980: Exception handler
+
+
+=Version 0.9.95=
+
+
+2009-12-05  Stelios Bounanos  <vcs@enotty.net>
+
+	40c3797: Use XML-RPC
+
+2009-12-01  David Freese  <w1hkj@w1hkj.com>
+
+	ab5c7e5: Thread conflict fix
+	f0acfb4: Socket allocation
+	a5f326a: Mem Leak Fix
+
+
+=Version 0.9.94=
+
+	0b301f0: FT857D mod
+	b5ef8e3: Window Decoration
+	09ec7ef: OSX Build mods
+
+
+=Version 0.9.93=
+
+
+2009-11-27  Stelios Bounanos  <vcs@enotty.net>
+
+	0a75d3d: Disable win32 snprintf workaround
+
+
+=Version 0.9.92=
+
+
+2009-11-26  David Freese  <w1hkj@w1hkj.com>
+
+	e126caa: No Curl Mod
+
+
+=Version 0.9.91=
+
+	f902afc: Dependencies
+	bd30e7a: Build fixes
+
+2009-11-23  Stelios Bounanos  <vcs@enotty.net>
+
+	59a7b99: Fix OS X compilation
+	7cb8e32: Fix resource include
+	818bb9d: Add pthreads-w32 build flags
+
+
+=Version 0.9.9=
+
