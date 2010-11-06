@@ -20,6 +20,7 @@ RIG_TS140::RIG_TS140() {
 // base class values	
 	name_ = TS140name_;
 	modes_ = TS140modes_;
+	bandwidths_ = NULL;
 	comm_baudrate = BR9600;
 	stopbits = 2;
 	comm_retries = 2;

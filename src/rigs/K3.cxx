@@ -38,7 +38,10 @@ RIG_K3::RIG_K3() {
 	comm_dtrptt = false;
 	modeA = 1;
 	bwA = 2;
+	modeB = 1;
+	bwB = 2;
 
+	has_bandwidth_control =
 	has_power_control =
 	has_volume_control =
 	has_mode_control =
@@ -47,7 +50,6 @@ RIG_K3::RIG_K3() {
 	has_preamp_control = true;
 
 	has_micgain_control =
-	has_bandwidth_control =
 	has_notch_control =
 	has_ifshift_control =
 	has_tune_control =
@@ -59,6 +61,10 @@ void RIG_K3::initialize()
 {
 	cmd = "K31;";
 	sendCommand(cmd, 0, false);
+	modeA = 1;
+	bwA = 2;
+	modeB = 1;
+	bwB = 2;
 }
 
 long RIG_K3::get_vfoA ()
@@ -231,8 +237,8 @@ void RIG_K3::set_bwA(int val)
 int RIG_K3::get_bwA()
 {
 	cmd = "K30;K22;FW;K20;K31;";
-	sendCommand(cmd, 9, false);
-	bwA = replybuff[5] - '0';
+	if ( sendCommand(cmd, 9, false) )
+		bwA = replybuff[5] - '0';
 	return bwA;
 }
 

@@ -338,13 +338,15 @@ static void send_rig_info()
 	rig_reset = false;
 	execute(rig_take_control, XmlRpcValue(), res);
 	execute(rig_set_name, selrig->name_, res);
-	send_bandwidths_e();
+	if (selrig->bandwidths_)
+		send_bandwidths_e();
 	send_modes_e();
 MilliSleep(200);
 
 	execute(rig_set_frequency, (double)vfoA.freq, res);
 	execute(rig_set_mode, selrig->modes_[vfoA.imode], res);
-	execute(rig_set_bandwidth, selrig->bandwidths_[vfoA.iBW], res);
+	if (selrig->bandwidths_)
+		execute(rig_set_bandwidth, selrig->bandwidths_[vfoA.iBW], res);
 
 	XmlRpcValue sideband(selrig->get_modetype(vfoA.imode) == 'U' ? "USB" : "LSB");
 	execute(main_set_wf_sideband, sideband, res);

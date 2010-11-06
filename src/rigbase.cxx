@@ -59,6 +59,9 @@ rigbase::rigbase()
 	freqA = 14070000L;
 	modeA = 1;
 	bwA = 0;
+	freqB = 14070000L;
+	modeB = 1;
+	bwB = 0;
 
 	deffreq_ = 14070000L;
 	def_mode = 1;

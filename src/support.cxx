@@ -78,6 +78,10 @@ void read_stream()
 // read current vfo frequency
 void read_vfo()
 {
+	if (vfoB.freq != FreqDispB->value()) {
+		vfoB.freq = FreqDispB->value();
+		selrig->set_vfoB(vfoB.freq);
+	}
 	if (vfoA.freq != FreqDisp->value()) {
 		wait_query = true;
 		vfoA.freq = FreqDisp->value();
@@ -90,6 +94,11 @@ void read_vfo()
 	if (freq != vfoA.freq) {
 		vfoA.freq = freq;
 		Fl::awake(setFreqDisp);
+	}
+	freq = selrig->get_vfoB();
+	if (freq != vfoB.freq) {
+		vfoB.freq = freq;
+		Fl::awake(setFreqDispB);
 	}
 }
 
@@ -392,13 +401,10 @@ void buildlist() {
 }
 
 int movFreq() {
-//	pthread_mutex_lock(&mutex_serial);
-//		vfoA.freq = FreqDisp->value();
-//		selrig->set_vfoA(vfoA.freq);
-//	pthread_mutex_unlock(&mutex_serial);
-//	wait_query = true;
-//	send_new_freq();
-//	wait_query = false;
+	return 1;
+}
+
+int movFreqB() {
 	return 1;
 }
 
@@ -415,27 +421,29 @@ void cbABactive()
 		vfoB = temp;
 
 		FreqDisp->value(vfoA.freq);
+		FreqDispB->value(vfoB.freq);
 
-		snprintf(szVfoB, sizeof(szVfoB), "%13.3f", vfoB.freq / 1000.0);
-		txtInactive->label(szVfoB);
-		txtInactive->redraw_label();
+		selrig->set_vfoB(vfoB.freq);
+		selrig->set_modeB(vfoB.imode);
+		selrig->set_bwB(vfoB.iBW);
 
 		selrig->set_vfoA(vfoA.freq);
-		selrig->set_vfoB(vfoB.freq);
 		if (vfoA.imode != vfoB.imode) {
 			opMODE->index(vfoA.imode);
+			int bw = vfoA.iBW;
 			updateBandwidthControl();
+			vfoA.iBW = bw;
 			selrig->set_modeA(vfoA.imode);
-			selrig->set_modeB(vfoB.imode);
 		}
 		if (vfoA.iBW != vfoB.iBW) {
 			opBW->index(vfoA.iBW);
 			selrig->set_bwA(vfoA.iBW);
-			selrig->set_bwB(vfoB.iBW);
 		}
 	pthread_mutex_unlock(&mutex_serial);
 
-	send_new_freq();
+// update fldigi
+	if (vfoA.freq != vfoB.freq)
+		send_new_freq();
 	if (vfoA.imode != vfoB.imode)
 		send_mode_changed();
 		send_sideband();
@@ -460,9 +468,7 @@ void cbA2B()
 		selrig->set_bwB(vfoB.iBW);
 	pthread_mutex_unlock(&mutex_serial);
 
-	snprintf(szVfoB, sizeof(szVfoB), "%13.3f", vfoB.freq / 1000.0);
-	txtInactive->label(szVfoB);
-	txtInactive->redraw_label();
+	FreqDispB->value(vfoB.freq);
 
 	wait_query = false;
 }
@@ -879,6 +885,12 @@ void setFreqDisp(void *d)
 	wait_query = false;
 }
 
+void setFreqDispB(void *)
+{
+	FreqDispB->value(vfoB.freq);
+	FreqDispB->redraw();
+}
+
 void updateSmeter(void *d) // 0 to 100;
 {
 	double swr = (long)d;
@@ -1027,15 +1039,7 @@ void ALC_SWR_image()
 
 void adjust_control_positions()
 {
-	int y = 118;
-	y += 20;
-	cntRIT->position( cntRIT->x(), y );
-	cntXIT->position( cntXIT->x(), y );
-	cntBFO->position( cntBFO->x(), y );
-	btnSplit->position( btnSplit->x(), y);
-	cntRIT->redraw();
-	cntXIT->redraw();
-	cntBFO->redraw();
+	int y = cntRIT->y() + 2;
 	if (selrig->has_volume_control) {
 		y += 20;
 		sldrVOLUME->position( sldrVOLUME->x(), y );
@@ -1480,9 +1484,7 @@ void initRig()
 	vfoB.freq = progStatus.freq_B;
 	vfoB.imode = progStatus.imode_B;
 	vfoB.iBW = progStatus.iBW_B;
-	snprintf(szVfoB, sizeof(szVfoB), "%13.3f", vfoB.freq / 1000.0);
-	txtInactive->label(szVfoB);
-	txtInactive->redraw();
+	FreqDispB->value(vfoB.freq);
 
 	selrig->set_vfoA(vfoA.freq);
 	opMODE->index( vfoA.imode );

@@ -505,6 +505,10 @@ bool status::loadXcvrState(const char *xcvr)
 		fl_rgb_color(fg_red, fg_green, fg_blue),
 		fl_rgb_color(bg_red, bg_green, bg_blue));
 	FreqDisp->font(fontnbr);
+	FreqDispB->SetONOFFCOLOR(
+		fl_rgb_color(fg_red, fg_green, fg_blue),
+		fl_rgb_color(bg_red, bg_green, bg_blue));
+	FreqDispB->font(fontnbr);
 	txtInactive->color(fl_rgb_color (bg_red, bg_green, bg_blue));
 	txtInactive->labelcolor(fl_rgb_color (fg_red, fg_green, fg_blue));
 	txtInactive->redraw();
