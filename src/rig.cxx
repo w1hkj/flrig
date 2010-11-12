@@ -313,39 +313,39 @@ int main (int argc, char *argv[])
 
 int parse_args(int argc, char **argv, int& idx)
 {
-	if (strcasecmp("--help", argv[1]) == 0) {
+	if (strcasecmp("--help", argv[idx]) == 0) {
 		printf("Usage: \n\
   --help this help text\n\
   --version\n\
   --config-dir <DIR>\n\
-  --debug\n\
+  --debug (both rig and xml)\n\
   --rig_debug\n\
   --xml_debug\n\n");
 		exit(0);
 	} 
-	if (strcasecmp("--version", argv[1]) == 0) {
+	if (strcasecmp("--version", argv[idx]) == 0) {
 		printf("Version: "VERSION"\n");
 		exit (0);
 	}
-	if (strcasecmp("--rig_debug", argv[1]) == 0) {
+	if (strcasecmp("--rig_debug", argv[idx]) == 0) {
 		RIG_DEBUG = 1;
 		idx++;
 		return 1;
 	}
-	if (strcasecmp("--xml_debug", argv[1]) == 0) {
+	if (strcasecmp("--xml_debug", argv[idx]) == 0) {
 		XML_DEBUG = 1;
 		idx++;
 		return 1;
 	}
-	if (strcasecmp("--debug", argv[1]) == 0) {
+	if (strcasecmp("--debug", argv[idx]) == 0) {
 		RIG_DEBUG = 1;
 		XML_DEBUG = 1;
 		idx++;
 		return 1;
 	}
-	if (strcasecmp("--config-dir", argv[1]) == 0) {
-		RigHomeDir = argv[2];
-		idx++;
+	if (strcasecmp("--config-dir", argv[idx]) == 0) {
+		RigHomeDir = argv[idx + 1];
+		idx += 2;
 		return 1;
 	}
 	return 0;
