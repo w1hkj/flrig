@@ -1446,7 +1446,9 @@ void initRig()
 		btnTune->hide();
 	}
 
-	if (selrig->has_ptt_control) {
+	if (selrig->has_ptt_control ||
+		progStatus.comm_dtrptt || progStatus.comm_rtsptt ||
+		progStatus.sep_dtrptt || progStatus.sep_rtsptt) {
 		btnPTT->show();
 	} else {
 		btnPTT->hide();
