@@ -88,6 +88,26 @@ RIG_IC7200::RIG_IC7200() {
 
 //=============================================================================
 
+void RIG_IC7200::select_vfoA()
+{
+	cmd = pre_to;
+	cmd += '\x07';
+	cmd += '\x00';
+	cmd.append(post);
+	sendICcommand(cmd, 6);
+	checkresponse(6);
+}
+
+void RIG_IC7200::select_vfoB()
+{
+	cmd = pre_to;
+	cmd += '\x07';
+	cmd += '\x01';
+	cmd.append(post);
+	sendICcommand(cmd, 6);
+	checkresponse(6);
+}
+
 long RIG_IC7200::get_vfoA ()
 {
 	cmd = pre_to;
@@ -107,6 +127,38 @@ void RIG_IC7200::set_vfoA (long freq)
 	cmd = pre_to;
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 10 ) );
+	cmd.append( post );
+	sendICcommand(cmd, 6);
+	checkresponse(6);
+	if (DEBUG_7200)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+}
+
+long RIG_IC7200::get_vfoB ()
+{
+	return freqB;
+}
+
+void RIG_IC7200::set_vfoB (long freq)
+{
+	select_vfoB();
+	freqB = freq;
+	cmd = pre_to;
+	cmd += '\x05';
+	cmd.append( to_bcd_be( freq, 10 ) );
+	cmd.append( post );
+	sendICcommand(cmd, 6);
+	checkresponse(6);
+	if (DEBUG_7200)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+	select_vfoA();
+}
+
+void RIG_IC7200::set_split(bool b)
+{
+	cmd = pre_to;
+	cmd += '\x0F';
+	cmd += b ? '\x01' : '\x00';
 	cmd.append( post );
 	sendICcommand(cmd, 6);
 	checkresponse(6);
