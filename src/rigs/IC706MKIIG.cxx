@@ -14,7 +14,7 @@
 //
 const char IC706MKIIGname_[] = "IC-706MKIIG";
 const char *IC706MKIIGmodes_[] = { "LSB", "USB", "AM", "CW", "RTTY", "FM", "WFM", NULL};
-const char *IC706MKIIG_widths[] = { "NARR", "WIDE", NULL};
+const char *IC706MKIIG_widths[] = { "WIDE", "NARR", NULL};
 
 RIG_IC706MKIIG::RIG_IC706MKIIG() {
 	name_ = IC706MKIIGname_;
@@ -35,14 +35,35 @@ RIG_IC706MKIIG::RIG_IC706MKIIG() {
 	modeA = 1;
 	bwA = 0;
 
+	has_mode_control = true;
+	has_bandwidth_control = true;
 	has_attenuator_control = true;
-//	has_swr_control = true;
-	
+
 	defaultCIV = 0x58;
 	adjustCIV(defaultCIV);
 };
 
 //=============================================================================
+
+void RIG_IC706MKIIG::select_vfoA()
+{
+	cmd = pre_to;
+	cmd += '\x07';
+	cmd += '\x00';
+	cmd.append(post);
+	sendICcommand(cmd, 6);
+	checkresponse(6);
+}
+
+void RIG_IC706MKIIG::select_vfoB()
+{
+	cmd = pre_to;
+	cmd += '\x07';
+	cmd += '\x01';
+	cmd.append(post);
+	sendICcommand(cmd, 6);
+	checkresponse(6);
+}
 
 long RIG_IC706MKIIG::get_vfoA ()
 {
@@ -66,6 +87,77 @@ void RIG_IC706MKIIG::set_vfoA (long freq)
 	cmd.append( post );
 	sendICcommand(cmd, 6);
 	checkresponse(6);
+}
+
+long RIG_IC706MKIIG::get_vfoB ()
+{
+	return freqB;
+}
+
+void RIG_IC706MKIIG::set_vfoB (long freq)
+{
+	select_vfoB();
+	freqB = freq;
+	cmd = pre_to;
+	cmd += '\x05';
+	cmd.append( to_bcd_be( freq, 10 ) );
+	cmd.append( post );
+	sendICcommand(cmd, 6);
+	checkresponse(6);
+	select_vfoA();
+}
+
+void RIG_IC706MKIIG::set_split(bool b)
+{
+	cmd = pre_to;
+	cmd += '\x0F';
+	cmd += b ? '\x01' : '\x00';
+	cmd.append( post );
+	sendICcommand(cmd, 6);
+	checkresponse(6);
+}
+
+void RIG_IC706MKIIG::set_modeA(int val)
+{
+	modeA = val;
+	cmd = pre_to;
+	cmd += '\x06';
+	cmd += val > 5 ? val + 2 : val;
+	cmd += bwA;
+	cmd.append( post );
+	sendICcommand (cmd, 6);
+	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+}
+
+int RIG_IC706MKIIG::get_modeA()
+{
+	cmd = pre_to;
+	cmd += '\x04';
+	cmd.append(post);
+	if (sendICcommand (cmd, 8 )) {
+		modeA = replystr[5];
+		if (modeA > 6) modeA -= 2;
+		bwA = replystr[6];
+	}
+	return modeA;
+}
+
+int RIG_IC706MKIIG::get_modetype(int n)
+{
+	return _mode_type[n];
+}
+
+void RIG_IC706MKIIG::set_bwA(int val)
+{
+	bwA = val;
+	set_modeA(modeA);
+}
+
+int  RIG_IC706MKIIG::get_bwA()
+{
+	return bwA;
 }
 
 void RIG_IC706MKIIG::set_attenuator(int val)

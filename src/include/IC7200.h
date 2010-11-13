@@ -8,8 +8,15 @@ public:
 	RIG_IC7200();
 	~RIG_IC7200(){}
 
+	void select_vfoA();
+	void select_vfoB();
+
 	long get_vfoA ();
 	void set_vfoA (long freq);
+
+	long get_vfoB(void);
+	void set_vfoB(long f);
+
 	void set_PTT_control(int val);
 	void set_volume_control(int val);
 	int  get_volume_control();
@@ -39,6 +46,8 @@ public:
 	void set_auto_notch(int val);
 	int  get_auto_notch();
 	void set_vox_onoff();
+	void set_split(bool);
+	bool can_split() { return true; }
 
 protected:
 	int  filter_nbr;

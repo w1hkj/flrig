@@ -8,8 +8,14 @@ public:
 	RIG_IC746();
 	virtual ~RIG_IC746(){}
 
-	long get_vfoA(void);
-	void set_vfoA(long);
+	void select_vfoA();
+	void select_vfoB();
+
+	virtual long get_vfoA(void);
+	virtual void set_vfoA(long f);
+	virtual long get_vfoB(void);
+	virtual void set_vfoB(long f);
+
 	int  get_smeter();
 	void set_volume_control(int val);
 	int  get_volume_control();
@@ -67,6 +73,8 @@ public:
 	void set_notch(bool on, int val);
 	bool get_notch(int &val);
 	void get_notch_min_max_step(int &min, int &max, int &step);
+	
+	bool twovfos() { return true; }
 };
 
 extern const char *IC746modes_[];

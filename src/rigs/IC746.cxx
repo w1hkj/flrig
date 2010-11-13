@@ -115,8 +115,29 @@ RIG_IC746PRO::RIG_IC746PRO() {
 	adjustCIV(defaultCIV);
 };
 
+void RIG_IC746::select_vfoA()
+{
+	cmd = pre_to;
+	cmd += '\x07';
+	cmd += '\x00';
+	cmd.append(post);
+	sendICcommand(cmd, 6);
+	checkresponse(6);
+}
+
+void RIG_IC746::select_vfoB()
+{
+	cmd = pre_to;
+	cmd += '\x07';
+	cmd += '\x01';
+	cmd.append(post);
+	sendICcommand(cmd, 6);
+	checkresponse(6);
+}
+
 long RIG_IC746::get_vfoA ()
 {
+	select_vfoA();
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
@@ -128,6 +149,7 @@ long RIG_IC746::get_vfoA ()
 
 void RIG_IC746::set_vfoA (long freq)
 {
+	select_vfoA();
 	freqA = freq;
 	cmd = pre_to;
 	cmd += '\x05';
@@ -135,8 +157,40 @@ void RIG_IC746::set_vfoA (long freq)
 	cmd.append( post );
 	sendICcommand(cmd, 6);
 	checkresponse(6);
+RIG_DEBUG = true;
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+RIG_DEBUG = false;
+}
+
+long RIG_IC746::get_vfoB ()
+{
+	select_vfoB();
+	cmd = pre_to;
+	cmd += '\x03';
+	cmd.append( post );
+	if (!sendICcommand(cmd, 11))
+		return freqB;
+	freqB = fm_bcd_be(&replystr[5], 10);
+	select_vfoA();
+	return freqB;
+}
+
+void RIG_IC746::set_vfoB (long freq)
+{
+	select_vfoB();
+	freqB = freq;
+	cmd = pre_to;
+	cmd += '\x05';
+	cmd.append( to_bcd_be( freq, 10 ) );
+	cmd.append( post );
+	sendICcommand(cmd, 6);
+	checkresponse(6);
+RIG_DEBUG = true;
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+RIG_DEBUG = false;
+	select_vfoA();
 }
 
 int RIG_IC746::get_smeter()
