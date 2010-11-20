@@ -14,12 +14,15 @@
 //
 const char IC706MKIIGname_[] = "IC-706MKIIG";
 const char *IC706MKIIGmodes_[] = { "LSB", "USB", "AM", "CW", "RTTY", "FM", "WFM", NULL};
+const char IC706MKIIG_mode_type[] =
+	{ 'L', 'U', 'U', 'L', 'L', 'U', 'U'};
 const char *IC706MKIIG_widths[] = { "WIDE", "NARR", NULL};
 
 RIG_IC706MKIIG::RIG_IC706MKIIG() {
 	name_ = IC706MKIIGname_;
 	modes_ = IC706MKIIGmodes_;
 	bandwidths_ = IC706MKIIG_widths;
+	_mode_type = IC706MKIIG_mode_type;
 	comm_baudrate = BR9600;
 	stopbits = 2;
 	comm_retries = 2;
