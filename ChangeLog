@@ -1,6 +1,11 @@
-2010-11-06  David Freese  <w1hkj@w1hkj.com>
+2010-11-19  David Freese  <w1hkj@w1hkj.com>
 
-	a72052c: Dual VFO mod
+	80986aa: IC706 mode type
+	a06277c: IC7200 digi mode
+	4e7d1f3: H/W PTT control
+	4022e57: ICOM dual vfo
+	4ec4702: Parse Args
+	92d90b9: Dual VFO mod
 	61ea3d2: VFO A-B
 	3d64fc0: K2 Update
 	68ae4e4: Rig Ordering
