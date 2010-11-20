@@ -1,5 +1,5 @@
 /*
- * Icom 7200, 7700 ... drivers
+ * Icom 7200
  *
  * a part of flrig
  *
@@ -15,8 +15,14 @@ bool DEBUG_7200 = true;
 // IC-7200
 
 const char IC7200name_[] = "IC-7200";
-const char *IC7200modes_[] = { "LSB", "USB", "AM", "CW", "RTTY", "CW-R", "RTTY-R", NULL};
-const char IC7200_mode_type[] = { 'L', 'U', 'U', 'L', 'L', 'U', 'U'};
+const char *IC7200modes_[] = { 
+"LSB", "USB", "AM", "CW", "RTTY", "CW-R", "RTTY-R", 
+"LSB-D", "USB-D", NULL};
+
+const char IC7200_mode_type[] = { 
+'L', 'U', 'U', 'L', 'L', 'U', 'U',
+'L', 'U' };
+
 const char *IC7200_SSBwidths[] = {
   "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
 "600",   "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
@@ -399,6 +405,7 @@ void RIG_IC7200::set_mic_gain(int val)
 void RIG_IC7200::set_modeA(int val)
 {
 	modeA = val;
+	if (val > 6) val -= 7;
 	cmd = pre_to;
 	cmd += '\x06';
 	cmd += val > 5 ? val + 2 : val;
@@ -406,7 +413,16 @@ void RIG_IC7200::set_modeA(int val)
 	cmd.append( post );
 	sendICcommand (cmd, 6);
 	checkresponse(6);
-	if (RIG_DEBUG)
+	if (DEBUG_7200)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+	cmd = pre_to;
+	cmd += '\x1A'; cmd += '\x04';
+	if (modeA > 6) cmd += '\x01';
+	else cmd += '\x00';
+	cmd.append( post);
+	sendICcommand (cmd, 6);
+	checkresponse(6);
+	if (DEBUG_7200)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
@@ -420,6 +436,15 @@ int RIG_IC7200::get_modeA()
 		if (modeA > 6) modeA -= 2;
 		filter_nbr = replystr[6];
 	}
+	cmd = pre_to;
+	cmd += '\x1A'; cmd += '\04';
+	cmd.append(post);
+	if (sendICcommand (cmd, 9 )) {
+		if ((replystr[6] & 0x01) == 0x01) {
+			if (modeA == 0) modeA = 7;
+			if (modeA == 1) modeA = 8;
+		}
+	}
 	return modeA;
 }
 
@@ -430,20 +455,30 @@ int RIG_IC7200::get_modetype(int n)
 
 int RIG_IC7200::adjust_bandwidth(int m)
 {
-	if (m == 0 || m == 1 ) { //SSB
-		bandwidths_ = IC7200_SSBwidths;
-		return (bwA = 32);
+	switch (m) {
+		case 2: // AM
+			bandwidths_ = IC7200_AMwidths;
+			bwA = 0;
+			break;
+		case 3:
+		case 5: // CW
+			bandwidths_ = IC7200_SSBwidths;
+			bwA = 14;
+			break;
+		case 4:
+		case 6: // RTTY
+			bandwidths_ = IC7200_RTTYwidths;
+			bwA = 28;
+			break;
+		case 0:
+		case 1:
+		case 7:
+		case 8: 
+		default: // SSB
+			bandwidths_ = IC7200_SSBwidths;
+			bwA = 32;
 	}
-	if (m == 3 || m == 5) { //CW
-		bandwidths_ = IC7200_SSBwidths;
-		return (bwA = 14);
-	}
-	if (m == 4 || m == 7) { //RTTY
-		bandwidths_ = IC7200_RTTYwidths;
-		return (bwA = 28);
-	}
-	bandwidths_ = IC7200_AMwidths;
-	return (bwA = 0);
+	return bwA;
 }
 
 void RIG_IC7200::set_bwA(int val)
