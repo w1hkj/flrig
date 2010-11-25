@@ -24,17 +24,14 @@
 
 #define LISTSIZE 200
 
-struct FREQMODE {
-	long freq;
-	int imode;
-	int iBW;
-};
-
+extern FREQMODE vfo;
 extern FREQMODE vfoA;
 extern FREQMODE vfoB;
+extern FREQMODE xmlvfo;
+
+extern bool useB;
 extern bool PTT;
 extern bool localptt;
-extern bool remoteptt;
 
 extern Cserial RigSerial;
 extern Cserial AuxSerial;
@@ -77,10 +74,13 @@ extern void clearList();
 extern void saveFreqList();
 extern void readList();
 extern void selectFreq();
-extern int  movFreq();
+extern int  movFreqA();
+extern int  movFreqB();
 extern void adjustFreqs();
 extern void cbABactive();
 extern void cbA2B();
+extern void cb_selectA();
+extern void cb_selectB();
 extern void cb_set_split(int);
 extern void cbRIT();
 extern void cbXIT();
@@ -211,7 +211,7 @@ extern void serial_timer(void *);
 
 extern void init_xmlrpc();
 
-extern void setFreqDisp(void *d);
+extern void setFreqDispA(void *d);
 extern void setFreqDispB(void *d);
 extern void updateSmeter(void *d);
 extern void updateFwdPwr(void *d);
@@ -221,6 +221,6 @@ extern void updateSquelch(void *d);
 extern void updateRFgain(void *d);
 extern void zeroXmtMeters(void *d);
 extern void reset_power_controlImage( void *d );
-extern void ALC_SWR_image();
+extern void ALC_SWR_image(void *d = NULL);
 
 #endif
