@@ -51,13 +51,14 @@ static char TT516setBW[]		= "*Wx\r";
 static char TT516setPBT[]		= "*Pxx\r";
 static char TT516setMODE[]		= "*Mnn\r";
 static char TT516setFREQA[]		= "*Annnn\r";
-//static char TT516setFREQB[]		= "*Bnnnn\r";
+static char TT516setFREQB[]		= "*Bnnnn\r";
 static char TT516setNB[]		= "*Kn\r";
 static char TT516setXMT[]		= "#1\r";
 static char TT516setRCV[]		= "#0\r";
-//static char TT516setSPLIT[]		= "*On\r";
+static char TT516setSPLIT[]		= "*On\r";
 static char TT516setATT[]		= "*Jn\r";
 static char TT516getFREQA[]		= "?A\r";
+static char TT516getFREQB[]		= "?B\r";
 static char TT516getFWDPWR[]	= "?F\r";
 static char TT516getATT[]		= "?J\r";
 static char TT516getMODE[]		= "?M\r";
@@ -65,6 +66,7 @@ static char TT516getMODE[]		= "?M\r";
 static char TT516getREFPWR[]	= "?R\r";
 static char TT516getSMETER[]	= "?S\r";
 static char TT516getBW[]		= "?W\r";
+static char TT516setVfo[]		= "*EVx\r";
 
 RIG_TT516::RIG_TT516() {
 // base class values	
@@ -85,7 +87,7 @@ RIG_TT516::RIG_TT516() {
 	serloop_timing = 200;
 	
 	modeA = 3;
-	bwA = 36;
+	A.iBW = 36;
 	def_mode = 3;
 	defbw_ = 36;
 	deffreq_ = 14070000;
@@ -132,16 +134,16 @@ long RIG_TT516::get_vfoA ()
 		int f = 0;
 		for (size_t n = 1; n < 5; n++) {
 			f = f*256 + (unsigned char)replybuff[n];
-		freqA = f;
-}
+			A.freq = f;
+		}
 	} else
 		checkresponse();
-	return freqA;
+	return A.freq;
 }
 
 void RIG_TT516::set_vfoA (long freq)
 {
-	freqA = freq;
+	A.freq = freq;
 	cmd = TT516setFREQA;
 	cmd[5] = freq & 0xff; freq = freq >> 8;
 	cmd[4] = freq & 0xff; freq = freq >> 8;
@@ -149,7 +151,66 @@ void RIG_TT516::set_vfoA (long freq)
 	cmd[2] = freq & 0xff;
 	sendCommand(cmd, 2, true);
 	checkresponse();
-	return ;
+	return;
+}
+
+long RIG_TT516::get_vfoB ()
+{
+	cmd = TT516getFREQB;
+	bool ret = sendCommand(cmd, 8, true);
+	if (ret == true && replybuff[0] == 'B') {
+		int f = 0;
+		for (size_t n = 1; n < 5; n++) {
+			f = f*256 + (unsigned char)replybuff[n];
+			B.freq = f;
+		}
+	} else
+		checkresponse();
+	return B.freq;
+}
+
+void RIG_TT516::set_vfoB (long freq)
+{
+	B.freq = freq;
+	cmd = TT516setFREQB;
+	cmd[5] = freq & 0xff; freq = freq >> 8;
+	cmd[4] = freq & 0xff; freq = freq >> 8;
+	cmd[3] = freq & 0xff; freq = freq >> 8;
+	cmd[2] = freq & 0xff;
+	sendCommand(cmd, 2, true);
+	checkresponse();
+	return;
+}
+
+void RIG_TT516::selectA()
+{
+	cmd = TT516setVfo;
+	cmd[3] = 'A';
+	sendCommand(cmd, 2, true);
+	checkresponse();
+	inuse = onA;
+	set_bwA(A.iBW);
+	return;
+}
+
+void RIG_TT516::selectB()
+{
+	cmd = TT516setVfo;
+	cmd[3] = 'B';
+	sendCommand(cmd, 2, true);
+	checkresponse();
+	inuse = onB;
+	set_bwB(B.iBW);
+	return;
+}
+
+void RIG_TT516::set_split(bool val)
+{
+	cmd = TT516setSPLIT;
+	cmd[2] = val ? '\x01' : '\x00';
+	sendCommand(cmd, 2, true);
+	checkresponse();
+	return;
 }
 
 // Tranceiver PTT on/off
@@ -158,25 +219,6 @@ void RIG_TT516::set_PTT_control(int val)
 	if (val) sendCommand(TT516setXMT, 2, true);
 	else     sendCommand(TT516setRCV, 2, true);
 	checkresponse();
-}
-
-void RIG_TT516::set_modeA(int val)
-{
-	modeA = val;
-	cmd = TT516setMODE;
-	cmd[2] = cmd[3] = TT516mode_chr[val];
-	sendCommand(cmd, 2, true);
-	checkresponse();
-}
-
-int RIG_TT516::get_modeA()
-{
-	cmd = TT516getMODE;
-	sendCommand(cmd, 6, true);
-	if (replybuff[0] == 'M') {
-		modeA = replybuff[1] - '0';
-	}
-	return modeA;
 }
 
 int RIG_TT516::get_modetype(int n)
@@ -188,31 +230,97 @@ int RIG_TT516::adjust_bandwidth(int m)
 {
 	if (m == 0) { // AM
 		bandwidths_ = TT516_AM_widths;
-		bwA = 36;
+		inuse == onA ? A.iBW = 36 : B.iBW = 36;
 	} else {
 		bandwidths_ = TT516_widths;
-		if (m == 3) bwA = 12;
-		else bwA = 36;
+		if (m == 3) inuse == onA ? A.iBW = 12 : B.iBW = 12;
+		else inuse == onA ? A.iBW = 36 : B.iBW = 36;
 	}
-	return bwA;
+	return inuse == onA ? A.iBW : B.iBW;
 }
 
-void RIG_TT516::set_bwA(int val)
+void RIG_TT516::set_modeA(int val)
 {
-	bwA = val;
-	cmd = TT516setBW;
-	cmd[2] = val;
+	A.imode = val;
+	cmd = TT516setMODE;
+	cmd[2] = TT516mode_chr[A.imode];
+	cmd[3] = TT516mode_chr[B.imode];
 	sendCommand(cmd, 2, true);
 	checkresponse();
 }
 
+int RIG_TT516::get_modeA()
+{
+	cmd = TT516getMODE;
+	sendCommand(cmd, 6, true);
+	if (replybuff[0] == 'M') {
+		A.imode = replybuff[1] - '0';
+	}
+	return A.imode;
+}
+
+void RIG_TT516::set_modeB(int val)
+{
+	B.imode = val;
+	cmd = TT516setMODE;
+	cmd[2] = TT516mode_chr[A.imode];
+	cmd[3] = TT516mode_chr[B.imode];
+	sendCommand(cmd, 2, true);
+	checkresponse();
+}
+
+int RIG_TT516::get_modeB()
+{
+	cmd = TT516getMODE;
+	sendCommand(cmd, 6, true);
+	if (replybuff[0] == 'M') {
+		B.imode = replybuff[2] - '0';
+	}
+	return B.imode;
+}
+
 int RIG_TT516::get_bwA()
 {
-	cmd = TT516getBW;
-	sendCommand(cmd, 5, true);
-	if (replybuff[0] == 'W')
-		bwA = (unsigned char)replybuff[1];
-	return bwA;
+	if (inuse == onA) {
+		cmd = TT516getBW;
+		sendCommand(cmd, 5, true);
+		if (replybuff[0] == 'W')
+			A.iBW = (unsigned char)replybuff[1];
+	}
+	return A.iBW;
+}
+
+void RIG_TT516::set_bwA(int val)
+{
+	A.iBW = val;
+	if (inuse == onA) {
+		cmd = TT516setBW;
+		cmd[2] = val;
+		sendCommand(cmd, 2, true);
+		checkresponse();
+	}
+}
+
+int RIG_TT516::get_bwB()
+{
+	if (inuse == onB) {
+		cmd = TT516getBW;
+		sendCommand(cmd, 5, true);
+		if (replybuff[0] == 'W')
+			B.iBW = (unsigned char)replybuff[1];
+	}
+	return B.iBW;
+}
+
+void RIG_TT516::set_bwB(int val)
+{
+	B.iBW = val;
+	if (inuse == onB) {
+		cmd = TT516setBW;
+		cmd[2] = val;
+		sendCommand(cmd, 2, true);
+		checkresponse();
+	}
 }
 
 void RIG_TT516::set_if_shift(int val)
