@@ -34,6 +34,7 @@
 #include "TS570.h"
 #include "TS2000.h"
 #include "TT516.h"
+#include "DELTA-II.h"
 #include "TT538.h"
 #include "TT550.h"
 #include "TT563.h"
@@ -74,9 +75,10 @@ extern RIG_TS480SAT		rig_TS480SAT;	// 29
 extern RIG_TS570		rig_TS570;		// 30
 extern RIG_TS2000		rig_TS2000;		// 31
 extern RIG_TT516		rig_TT516;		// 32
-extern RIG_TT538		rig_TT538;		// 32
-extern RIG_TT550		rig_TT550;		// 34
-extern RIG_TT563		rig_TT563;		// 35
-extern RIG_TT588		rig_TT588;		// 36
+extern RIG_TT535		rig_TT535;		// 33
+extern RIG_TT538		rig_TT538;		// 34
+extern RIG_TT550		rig_TT550;		// 35
+extern RIG_TT563		rig_TT563;		// 36
+extern RIG_TT588		rig_TT588;		// 37
 
 #endif
