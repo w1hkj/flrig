@@ -1,7 +1,10 @@
-2010-11-19  David Freese  <w1hkj@w1hkj.com>
+2011-01-05  David Freese  <w1hkj@w1hkj.com>
 
-	80986aa: IC706 mode type
-	a06277c: IC7200 digi mode
+	a4db46a: TT 535 Delta-II
+	5408a0f: TT516 dual vfo
+	8f7cf0d: A B vfo select
+	ffebee9: IC706 mode type
+	8a07b42: IC7200 digi mode
 	4e7d1f3: H/W PTT control
 	4022e57: ICOM dual vfo
 	4ec4702: Parse Args
