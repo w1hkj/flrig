@@ -7,7 +7,10 @@
 
 #include <cstdlib>
 #include <string>
+#include <vector>
+#include <queue>
 
+#include "xml_io.h"
 #include "support.h"
 #include "debug.h"
 #include "rig.h"
@@ -18,6 +21,10 @@
 
 using namespace std;
 using XmlRpc::XmlRpcValue;
+
+extern queue<FREQMODE> queA;
+extern queue<FREQMODE> queB;
+extern queue<bool> quePTT;
 
 static const double TIMEOUT = 0.5;//2.0;
 static const char* tcpip_address = "127.0.0.1";
@@ -49,9 +56,12 @@ static XmlRpc::XmlRpcClient* client;
 static XmlRpcValue* status_query;
 
 bool run_digi_loop = true;
+bool bypass_digi_loop = true;
 bool wait_query = false;
 bool fldigi_online = false;
 bool rig_reset = false;
+bool xml_query = false;
+bool ptt_on = false;
 
 class auto_mutex
 {
@@ -107,15 +117,22 @@ static inline void execute(const char* name, const XmlRpcValue& param, XmlRpcVal
 // --------------------------------------------------------------------
 // send functions
 // --------------------------------------------------------------------
-void send_new_freq()
+void snf(void *)
 {
-	if (!fldigi_online) return;
 	auto_mutex lock(mutex_xmlrpc);
 	try {
-		XmlRpcValue freq((double)vfoA.freq), res;
+		XmlRpcValue freq((double)xmlvfo.freq), res;
 		execute(rig_set_frequency, freq, res);
 	}
 	catch (...) { }
+}
+
+void send_new_freq(long freq)
+{
+	xml_query = false;
+	if (!fldigi_online) return;
+	xmlvfo.freq = freq;
+	Fl::awake(snf);
 }
 
 static void send_modes_(const char** md_array)
@@ -134,12 +151,18 @@ static void send_modes_e()
 	send_modes_(selrig->modes_);
 }
 
-void send_modes() { 
-	if (!fldigi_online) return;
+void snm(void *)
+{
 	auto_mutex lock(mutex_xmlrpc); 
 	try { 
 		send_modes_e(); 
 	} catch (...) { } 
+}
+
+void send_modes() { 
+	xml_query = false;
+	if (!fldigi_online) return;
+	Fl::awake(snm);
 }
 
 static void send_bandwidths_(const char** bw_array)
@@ -158,13 +181,19 @@ static void send_bandwidths_e()
 	send_bandwidths_(selrig->bandwidths_);
 }
 
-void send_bandwidths()
+void sbs(void *)
 {
-	if (!fldigi_online) return;
 	auto_mutex lock(mutex_xmlrpc);
 	try { 
 		send_bandwidths_e(); 
 	} catch (...) { } 
+}
+
+void send_bandwidths()
+{
+	xml_query = false;
+	if (!fldigi_online) return;
+	Fl::awake(sbs);
 }
 
 void send_name()
@@ -184,174 +213,188 @@ void send_ptt_changed(bool PTT)
 	try {
 		XmlRpcValue res;
 		execute((PTT ? main_set_tx : main_set_rx), XmlRpcValue(), res);
+		ptt_on = PTT;
 	} catch (...) { }
 }
 
-void send_mode_changed()
+void smc(void *m)
 {
-	if (!fldigi_online) return;
-	if (!selrig->modes_)
-		return;
 	auto_mutex lock(mutex_xmlrpc);
 	try {
-		XmlRpcValue mode(selrig->modes_[vfoA.imode]), res;
+		XmlRpcValue mode(selrig->modes_[(int)m]), res;
 		execute(rig_set_mode, mode, res);
 	} catch (...) { }
 }
 
-void send_bandwidth_changed()
+void send_new_mode(int m)
 {
-	if (!fldigi_online) return;
-	if (!selrig->bandwidths_)
-		return;
+	xml_query = false;
+	if (!fldigi_online || !selrig->modes_) return;
+	Fl::awake(smc, (void *)m);
+}
+
+void sbc(void *val)
+{
+	int bw = (int)val;
 	auto_mutex lock(mutex_xmlrpc);
 	try {
-		XmlRpcValue bandwidth(selrig->bandwidths_[vfoA.iBW]), res;
+		XmlRpcValue bandwidth(selrig->bandwidths_[bw]), res;
 		execute(rig_set_bandwidth, bandwidth, res);
+	} catch (...) { }
+}
+
+void send_new_bandwidth(int bw)
+{
+	xml_query = false;
+	if (!fldigi_online || !selrig->bandwidths_) return;
+	Fl::awake(sbc, (void*)bw);
+}
+
+void ssb(void *)
+{
+	auto_mutex lock(mutex_xmlrpc);
+	try {
+		XmlRpcValue sideband(selrig->get_modetype(vfo.imode) == 'U' ? "USB" : "LSB"), res;
+		execute(main_set_wf_sideband, sideband, res);
 	} catch (...) { }
 }
 
 void send_sideband()
 {
 	if (!fldigi_online) return;
-	auto_mutex lock(mutex_xmlrpc);
-	try {
-		XmlRpcValue sideband(selrig->get_modetype(vfoA.imode) == 'U' ? "USB" : "LSB"), res;
-		execute(main_set_wf_sideband, sideband, res);
-	} catch (...) { }
+	Fl::awake(ssb);
 }
 
 // --------------------------------------------------------------------
 // receive functions
 // --------------------------------------------------------------------
 
-static bool ptt_now_is = false;
+
 static void check_for_ptt_change(const XmlRpcValue& trx_state)
 {
 	bool nuptt = trx_state == "TX";
-	if (nuptt != ptt_now_is) {
-		ptt_now_is = nuptt;
-		Fl::awake(setPTT, (void*)nuptt);
+	if (nuptt != ptt_on) {
+		ptt_on = nuptt;
+		Fl::awake(setPTT, (void*)ptt_on);
 	}
-}
-
-bool updatingVFO = false;
-
-void setvfo(void *d)
-{
-	long newfreq = (long)d;
-	if (XML_DEBUG)
-		LOG_INFO("%ld", newfreq);
-	pthread_mutex_lock(&mutex_serial);
-		selrig->set_vfoA(newfreq);
-	pthread_mutex_unlock(&mutex_serial);
-	vfoA.freq = newfreq;
-	FreqDisp->value(newfreq);
-	updatingVFO = false;
 }
 
 static void check_for_frequency_change(const XmlRpcValue& freq)
 {
-	if (updatingVFO) return;
 	double f = freq;
 	long newfreq = (long)f;
-	if (newfreq == vfoA.freq || updatingVFO == true || !f) return;
-	updatingVFO = true;
-	Fl::awake(setvfo, (void *)newfreq);
+	if (newfreq != xmlvfo.freq) {
+		xmlvfo.freq = newfreq;
+		if (useB) {
+			queB.push(xmlvfo);
+			Fl::awake(setFreqDispB, (void *)xmlvfo.freq);
+		} else {
+			queA.push(xmlvfo);
+			Fl::awake(setFreqDispA, (void *)xmlvfo.freq);
+		}
+	}
 }
 
-bool updatingMode = false;
-
-static void updateModeControl(void *d)
+static void update_mode_change(void *d)
 {
-	if (!run_digi_loop) return;
-	int md = (long)d;
-	if (XML_DEBUG)
-		LOG_INFO("%d", md);
+	int imode = (int)d;
+	vfo.imode = imode;
+	useB ? vfoB.imode = imode : vfoA.imode = imode;
+
 	pthread_mutex_lock(&mutex_serial);
-		vfoA.imode = md;
-		opMODE->index(vfoA.imode);
-		selrig->set_modeA(vfoA.imode);
-		updateBandwidthControl();
-		selrig->set_bwA(vfoA.iBW);
+	if (selrig->restore_mbw) {
+		selrig->set_bwA(selrig->last_bw);
+		selrig->last_bw = vfo.iBW;
+	}
+	if (selrig->adjust_bandwidth(vfo.imode) != -1) {
+		if (!useB) {
+			selrig->set_modeA(vfo.imode);
+			selrig->set_bwA(vfo.iBW);
+		} else {
+			selrig->set_modeB(vfo.imode);
+			selrig->set_bwB(vfo.iBW);
+		}
+	} else
+		if (!useB)
+			selrig->set_modeA(vfo.imode);
+		else
+			selrig->set_modeB(vfo.imode);
 	pthread_mutex_unlock(&mutex_serial);
-	send_sideband();
-	send_bandwidths();
-	send_bandwidth_changed();
-	updatingMode = false;
+
+	opMODE->index(imode);
+	send_bandwidths_e();
+	updateBandwidthControl(NULL);
+	return;
 }
 
 static void check_for_mode_change(const XmlRpcValue& new_mode)
 {
-	if (!selrig->modes_ || updatingMode) 
+	if (!selrig->modes_) 
 		return;
-
-	if (new_mode != selrig->modes_[vfoA.imode]) {
+	string smode = new_mode;
+	if (smode != selrig->modes_[vfo.imode]) {
 		long imode = 0;
-		while (selrig->modes_[imode] != NULL && new_mode != selrig->modes_[imode])
+		while (selrig->modes_[imode] != NULL && smode != selrig->modes_[imode])
 			imode++;
-		if (selrig->modes_[imode] != NULL) {
-			updatingMode = true;
-			Fl::awake(updateModeControl, (void*)imode);
-			return;
-		}
+		if (selrig->modes_[imode] != NULL && imode != vfo.imode)
+			Fl::awake(update_mode_change, (void *)imode);
 	}
 }
 
-bool updatingBW = false;
-
-void updateBW(void *d)
+static void update_bandwidth_change(void *d)
 {
-	if (!run_digi_loop) return;
-	pthread_mutex_lock(&mutex_serial);
-		vfoA.iBW = (long)d;
-		opBW->index(vfoA.iBW);
-		selrig->set_bwA(vfoA.iBW);
-	pthread_mutex_unlock(&mutex_serial);
-	updatingBW = false;
-	if (XML_DEBUG)
-		LOG_INFO("%d", vfoA.iBW);
+	int ibw = (int)d;
+	vfo.iBW = useB ? vfoB.iBW = ibw : vfoA.iBW = ibw;
+	selrig->set_bwA(ibw);
+	opBW->index(ibw);
+	return;
 }
+
 
 static void check_for_bandwidth_change(const XmlRpcValue& new_bw)
 {
-	if (!selrig->bandwidths_ || updatingBW || updatingMode)
+	if (!selrig->bandwidths_)
 		return;
 
-	if (new_bw != selrig->bandwidths_[vfoA.iBW]) {
-		long ibw = 0;
-		while (selrig->bandwidths_[ibw] != NULL && new_bw != selrig->bandwidths_[ibw])
+	string sbw = new_bw;
+	if (sbw != selrig->bandwidths_[vfo.iBW]) {
+		int ibw = 0;
+		while (selrig->bandwidths_[ibw] != NULL && sbw != selrig->bandwidths_[ibw])
 			ibw++;
-		if (selrig->bandwidths_[ibw] != NULL) {
-			updatingBW = true;
-			Fl::awake(updateBW, (void*)ibw);
-		}
+		if (selrig->bandwidths_[ibw] != NULL && ibw != vfo.iBW)
+			Fl::awake(update_bandwidth_change, (void *)ibw);
 	}
 }
 
 #define REG_UPDATE_INTERVAL  50 // milliseconds
-#define CHECK_UPDATE_COUNT   (1000 / REG_UPDATE_INTERVAL)
+#define CHECK_UPDATE_COUNT   (5000 / REG_UPDATE_INTERVAL)
 
 static void send_rig_info()
 {
 	XmlRpcValue res;
-	rig_reset = false;
-	execute(rig_take_control, XmlRpcValue(), res);
-	execute(rig_set_name, selrig->name_, res);
-	if (selrig->bandwidths_)
-		send_bandwidths_e();
-	send_modes_e();
-MilliSleep(200);
+	try {
+		execute(rig_take_control, XmlRpcValue(), res);
+		execute(rig_set_name, selrig->name_, res);
+		if (selrig->bandwidths_) send_bandwidths_e();
+		send_modes_e();
+//MilliSleep(200);
 
-	execute(rig_set_frequency, (double)vfoA.freq, res);
-	execute(rig_set_mode, selrig->modes_[vfoA.imode], res);
-	if (selrig->bandwidths_)
-		execute(rig_set_bandwidth, selrig->bandwidths_[vfoA.iBW], res);
+//printf("fldigi init:\nvfo %ld, mode %s, bandwidth %s\n",
+//vfo.freq, 
+//selrig->modes_[vfo.imode],
+//selrig->bandwidths_ ? selrig->bandwidths_[vfo.iBW] : "none");
 
-	XmlRpcValue sideband(selrig->get_modetype(vfoA.imode) == 'U' ? "USB" : "LSB");
-	execute(main_set_wf_sideband, sideband, res);
+		execute(rig_set_frequency, (double)vfo.freq, res);
+		execute(rig_set_mode, selrig->modes_[vfo.imode], res);
+		if (selrig->bandwidths_)
+			execute(rig_set_bandwidth, selrig->bandwidths_[vfo.iBW], res);
 
-	fldigi_online = true;
+		XmlRpcValue sideband(selrig->get_modetype(vfo.imode) == 'U' ? "USB" : "LSB");
+		execute(main_set_wf_sideband, sideband, res);
+
+		fldigi_online = true;
+		rig_reset = false;
+	} catch (...) { }
 }
 
 void send_no_rig()
@@ -370,11 +413,17 @@ void send_no_rig()
 static void get_all_status()
 {
 	XmlRpcValue status;
-	execute("system.multicall", *status_query, status);
-	check_for_ptt_change(status[0][0]);
-	check_for_frequency_change(status[1][0]);
-	check_for_mode_change(status[2][0]);
-	check_for_bandwidth_change(status[3][0]);
+	try {
+		execute("system.multicall", *status_query, status);
+		check_for_ptt_change(status[0][0]);
+		if (!ptt_on && xml_query) {
+			check_for_mode_change(status[2][0]);
+			check_for_bandwidth_change(status[3][0]);
+			check_for_frequency_change(status[1][0]);
+		}
+	} catch (...) {
+	}
+	xml_query = false;
 }
 
 void * digi_loop(void *d)
@@ -383,15 +432,13 @@ void * digi_loop(void *d)
 	for (;;) {
 		MilliSleep(REG_UPDATE_INTERVAL);
 		if (!run_digi_loop) break;
+		if (bypass_digi_loop) continue;
 		pthread_mutex_lock(&mutex_xmlrpc);
 		try {
-			if (rig_reset) send_rig_info();
-			else if (!fldigi_online) {
-				if (!wait_query && !try_count--) send_rig_info();
-			} else {
- 				if (!wait_query) get_all_status();
-				if (!run_digi_loop) break;
-			}
+			if (rig_reset || (!fldigi_online && !try_count--))
+				send_rig_info();
+			else get_all_status();
+			if (!run_digi_loop) break;
 		} catch (const XmlRpc::XmlRpcException& e) {
 			if (XML_DEBUG)
 				LOG_INFO("%s", e.getMessage().c_str());
@@ -399,7 +446,6 @@ void * digi_loop(void *d)
 			fldigi_online = false;
 		}
 		pthread_mutex_unlock(&mutex_xmlrpc);
-
 	}
 	return NULL;
 }

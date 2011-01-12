@@ -80,7 +80,7 @@ Fl_Menu_Item menu_[] = {
  {0,0,0,0,0,0,0,0,0}
 };
 
-cFreqControl *FreqDisp=(cFreqControl *)0;
+cFreqControl *FreqDispA=(cFreqControl *)0;
 
 cFreqControl *FreqDispB=(cFreqControl *)0;
 
@@ -157,6 +157,18 @@ static void cb_sldrPOWER(Fl_Wheel_Value_Slider*, void*) {
 }
 
 Fl_Box *txtInactive=(Fl_Box *)0;
+
+Fl_Button *btnA=(Fl_Button *)0;
+
+static void cb_btnA(Fl_Button*, void*) {
+  cb_selectA();
+}
+
+Fl_Button *btnB=(Fl_Button *)0;
+
+static void cb_btnB(Fl_Button*, void*) {
+  cb_selectB();
+}
 
 Fl_Button *btnA2B=(Fl_Button *)0;
 
@@ -353,19 +365,20 @@ Fl_Double_Window* Rig_window() {
       }
       o->menu(menu_);
     } // Fl_Menu_Bar* o
-    { FreqDisp = new cFreqControl(1, 24, 210, 35, _("10"));
-      FreqDisp->box(FL_DOWN_BOX);
-      FreqDisp->color((Fl_Color)FL_BACKGROUND_COLOR);
-      FreqDisp->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
-      FreqDisp->labeltype(FL_NORMAL_LABEL);
-      FreqDisp->labelfont(0);
-      FreqDisp->labelsize(14);
-      FreqDisp->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
-      FreqDisp->align(FL_ALIGN_CENTER);
-      FreqDisp->when(FL_WHEN_RELEASE);
-      FreqDisp->SetONOFFCOLOR (FL_YELLOW, FL_BLACK);
-    } // cFreqControl* FreqDisp
-    { FreqDispB = new cFreqControl(212, 24, 210, 35, _("10"));
+    { cFreqControl* o = FreqDispA = new cFreqControl(1, 24, 210, 35, _("10"));
+      FreqDispA->box(FL_DOWN_BOX);
+      FreqDispA->color((Fl_Color)FL_BACKGROUND_COLOR);
+      FreqDispA->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
+      FreqDispA->labeltype(FL_NORMAL_LABEL);
+      FreqDispA->labelfont(0);
+      FreqDispA->labelsize(14);
+      FreqDispA->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
+      FreqDispA->align(FL_ALIGN_CENTER);
+      FreqDispA->when(FL_WHEN_CHANGED);
+      FreqDispA->SetONOFFCOLOR (FL_YELLOW, FL_BLACK);
+      o->setCallBack(movFreqA);
+    } // cFreqControl* FreqDispA
+    { cFreqControl* o = FreqDispB = new cFreqControl(213, 24, 210, 35, _("10"));
       FreqDispB->box(FL_DOWN_BOX);
       FreqDispB->color((Fl_Color)FL_BACKGROUND_COLOR);
       FreqDispB->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
@@ -374,8 +387,9 @@ Fl_Double_Window* Rig_window() {
       FreqDispB->labelsize(14);
       FreqDispB->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
       FreqDispB->align(FL_ALIGN_CENTER);
-      FreqDispB->when(FL_WHEN_RELEASE);
+      FreqDispB->when(FL_WHEN_CHANGED);
       FreqDispB->SetONOFFCOLOR (FL_YELLOW, FL_BLACK);
+      o->setCallBack(movFreqB);
     } // cFreqControl* FreqDispB
     { btnVol = new Fl_Light_Button(2, 125, 60, 18, _("Vol"));
       btnVol->tooltip(_("Speaker on/off"));
@@ -569,15 +583,31 @@ Fl_Double_Window* Rig_window() {
       txtInactive->align(FL_ALIGN_RIGHT|FL_ALIGN_INSIDE);
       txtInactive->hide();
     } // Fl_Box* txtInactive
-    { btnA2B = new Fl_Button(215, 62, 60, 18, _("A -> B"));
-      btnA2B->tooltip(_("Active -> Inactive"));
+    { btnA = new Fl_Button(213, 62, 25, 20, _("A"));
+      btnA->tooltip(_("Select vfo A"));
+      btnA->down_box(FL_DOWN_BOX);
+      btnA->color((Fl_Color)FL_LIGHT1);
+      btnA->selection_color((Fl_Color)134);
+      btnA->labelsize(12);
+      btnA->callback((Fl_Callback*)cb_btnA);
+    } // Fl_Button* btnA
+    { btnB = new Fl_Button(240, 62, 25, 20, _("B"));
+      btnB->tooltip(_("Select vfo B"));
+      btnB->down_box(FL_DOWN_BOX);
+      btnB->color((Fl_Color)FL_LIGHT1);
+      btnB->selection_color((Fl_Color)134);
+      btnB->labelsize(12);
+      btnB->callback((Fl_Callback*)cb_btnB);
+    } // Fl_Button* btnB
+    { btnA2B = new Fl_Button(267, 62, 50, 20, _("A -> B"));
+      btnA2B->tooltip(_("Copy A to B"));
       btnA2B->down_box(FL_DOWN_BOX);
       btnA2B->color((Fl_Color)FL_LIGHT1);
       btnA2B->selection_color((Fl_Color)134);
       btnA2B->labelsize(12);
       btnA2B->callback((Fl_Callback*)cb_btnA2B);
     } // Fl_Button* btnA2B
-    { btnABactive = new Fl_Button(288, 62, 60, 18, _("A / B"));
+    { btnABactive = new Fl_Button(319, 62, 50, 20, _("A / B"));
       btnABactive->tooltip(_("Swap VFOs"));
       btnABactive->down_box(FL_DOWN_BOX);
       btnABactive->color((Fl_Color)FL_LIGHT1);
@@ -585,8 +615,8 @@ Fl_Double_Window* Rig_window() {
       btnABactive->labelsize(12);
       btnABactive->callback((Fl_Callback*)cb_btnABactive);
     } // Fl_Button* btnABactive
-    { Fl_Light_Button* o = btnSplit = new Fl_Light_Button(361, 62, 60, 18, _("Split"));
-      btnSplit->tooltip(_("Rx-1 / Tx-2"));
+    { Fl_Light_Button* o = btnSplit = new Fl_Light_Button(372, 62, 50, 20, _("Split"));
+      btnSplit->tooltip(_("Rx-A / Tx-B"));
       btnSplit->down_box(FL_THIN_DOWN_BOX);
       btnSplit->color((Fl_Color)FL_LIGHT1);
       btnSplit->selection_color((Fl_Color)113);
@@ -594,7 +624,7 @@ Fl_Double_Window* Rig_window() {
       btnSplit->callback((Fl_Callback*)cb_btnSplit);
       o->value(progStatus.split);
     } // Fl_Light_Button* btnSplit
-    { opMODE = new Fl_ComboBox(322, 82, 100, 18, _("Mode"));
+    { opMODE = new Fl_ComboBox(322, 84, 100, 18, _("Mode"));
       opMODE->tooltip(_("Select transceiver operating mode"));
       opMODE->box(FL_FLAT_BOX);
       opMODE->color((Fl_Color)FL_BACKGROUND_COLOR);
@@ -608,7 +638,7 @@ Fl_Double_Window* Rig_window() {
       opMODE->when(FL_WHEN_RELEASE);
       opMODE->end();
     } // Fl_ComboBox* opMODE
-    { opBW = new Fl_ComboBox(215, 82, 100, 18, _("BW"));
+    { opBW = new Fl_ComboBox(215, 84, 100, 18, _("BW"));
       opBW->tooltip(_("Select Transceiver Bandwidth"));
       opBW->box(FL_FLAT_BOX);
       opBW->color((Fl_Color)FL_BACKGROUND_COLOR);
@@ -768,7 +798,7 @@ Fl_Double_Window* Rig_window() {
       btnMicLine->callback((Fl_Callback*)cb_btnMicLine);
       btnMicLine->hide();
     } // Fl_Light_Button* btnMicLine
-    { cntRIT = new Fl_Counter(215, 102, 54, 18, _("R"));
+    { cntRIT = new Fl_Counter(215, 104, 54, 18, _("R"));
       cntRIT->tooltip(_("RIT"));
       cntRIT->type(1);
       cntRIT->labelsize(12);
@@ -778,7 +808,7 @@ Fl_Double_Window* Rig_window() {
       cntRIT->callback((Fl_Callback*)cb_cntRIT);
       cntRIT->align(FL_ALIGN_RIGHT);
     } // Fl_Counter* cntRIT
-    { cntXIT = new Fl_Counter(285, 102, 54, 18, _("X"));
+    { cntXIT = new Fl_Counter(285, 104, 54, 18, _("X"));
       cntXIT->tooltip(_("XIT"));
       cntXIT->type(1);
       cntXIT->labelsize(12);
@@ -788,7 +818,7 @@ Fl_Double_Window* Rig_window() {
       cntXIT->callback((Fl_Callback*)cb_cntXIT);
       cntXIT->align(FL_ALIGN_RIGHT);
     } // Fl_Counter* cntXIT
-    { cntBFO = new Fl_Counter(357, 102, 54, 18, _("B"));
+    { cntBFO = new Fl_Counter(357, 104, 54, 18, _("B"));
       cntBFO->tooltip(_("BFO"));
       cntBFO->type(1);
       cntBFO->labelsize(12);
@@ -1294,7 +1324,7 @@ Fl_Double_Window* XcvrDialog() {
           { Fl_Counter* o = query_interval = new Fl_Counter(123, 141, 75, 22, _("qry intvl (ms):"));
             query_interval->tooltip(_("Interval between Xvr queries"));
             query_interval->type(1);
-            query_interval->minimum(100);
+            query_interval->minimum(50);
             query_interval->maximum(5000);
             query_interval->step(50);
             query_interval->value(200);

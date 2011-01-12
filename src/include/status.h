@@ -40,9 +40,9 @@ struct status {
 	int		CIV;
 	bool	USBaudio;
 
-	int		opBW;
-	int		opMODE;
-	int		freq;
+	int		iBW_A;
+	int		imode_A;
+	int		freq_A;
 	int		iBW_B;
 	int		imode_B;
 	int		freq_B;

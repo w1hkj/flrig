@@ -60,6 +60,8 @@ RIG_IC910H::RIG_IC910H() {
 	adjustCIV(defaultCIV);
 };
 
+
+// this looks like trouble
 void RIG_IC910H::set_vfoA (long freq)
 {
 	long nufreq;
@@ -78,7 +80,7 @@ void RIG_IC910H::set_vfoA (long freq)
 
 	if (freqA != freq) {
 		vfoA.freq = freqA;
-		setFreqDisp((void*)0);
+		setFreqDispA((void*)0);
 	}
 	cmd = pre_to;
 	cmd += '\x05';
