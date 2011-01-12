@@ -12,6 +12,14 @@
 
 using namespace std;
 
+struct FREQMODE {
+	long freq;
+	int imode;
+	int iBW;
+};
+
+enum {onA, onB};
+
 enum {
 	NONE,
 	FT100D, FT450, FT767, FT817, FT857D, // 5
@@ -54,12 +62,18 @@ public:
 	int  defaultCIV;
 	bool USBaudio;
 
+	FREQMODE A;
+	FREQMODE B;
+	int  inuse;
+
 	int  modeA;
 	int  bwA;
 	long freqA;
 	int  modeB;
 	int  bwB;
 	long freqB;
+
+
 	int  def_mode;
 	int  defbw_;
 	long deffreq_;
@@ -140,21 +154,23 @@ public:
 	virtual void initialize() {}
 	virtual void shutdown() {}
 
-	virtual long get_vfoA(void) {return freqA;}
-	virtual void set_vfoA(long f) {freqA = f;}
-	virtual long get_vfoB(void) {return freqB;}
-	virtual void set_vfoB(long f) {freqB = f;}
+	virtual long get_vfoA(void) {return A.freq;}
+	virtual void set_vfoA(long f) {A.freq = f;}
+	virtual long get_vfoB(void) {return B.freq;}
+	virtual void set_vfoB(long f) {B.freq = f; set_vfoA(f);}
 
-	virtual void set_modeA(int val) {modeA = val;}
-	virtual int  get_modeA() {return modeA;}
+	virtual void set_modeA(int val) {A.imode = val;}
+	virtual int  get_modeA() {return A.imode;}
 	virtual int  get_modetype(int n) {return 'U';}
-	virtual void set_modeB(int val) {modeB = val;}
-	virtual int  get_modeB() {return modeB;}
+	virtual void set_modeB(int val) {B.imode = val; set_modeA(val);}
+	virtual int  get_modeB() {return B.imode;}
+	virtual void selectA(){}
+	virtual void selectB(){}
 
-	virtual void set_bwA(int val) {bwA = val;}
-	virtual int  get_bwA() {return bwA;}
-	virtual void set_bwB(int val) {bwB = val;}
-	virtual int  get_bwB() {return bwB;}
+	virtual void set_bwA(int val) {A.iBW = val;}
+	virtual int  get_bwA() {return A.iBW;}
+	virtual void set_bwB(int val) {B.iBW = val; set_bwA(val);}
+	virtual int  get_bwB() {return B.iBW;}
 	virtual int  adjust_bandwidth(int m) {return -1;}
 
 	virtual bool can_split() { return false;}

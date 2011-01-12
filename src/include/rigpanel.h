@@ -8,7 +8,7 @@
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Tooltip.H>
 #include "FreqControl.h"
-extern cFreqControl *FreqDisp;
+extern cFreqControl *FreqDispA;
 extern cFreqControl *FreqDispB;
 #include <FL/Fl_Light_Button.H>
 extern Fl_Light_Button *btnVol;
@@ -27,6 +27,8 @@ extern Fl_Wheel_Value_Slider *sldrPOWER;
 #include <FL/Fl_Box.H>
 extern Fl_Box *txtInactive;
 #include <FL/Fl_Button.H>
+extern Fl_Button *btnA;
+extern Fl_Button *btnB;
 extern Fl_Button *btnA2B;
 extern Fl_Button *btnABactive;
 extern Fl_Light_Button *btnSplit;

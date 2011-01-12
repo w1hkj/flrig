@@ -56,6 +56,14 @@ rigbase::rigbase()
 	has_bpf_center =
 	has_special =  false;
 
+	A.freq = 14070000L;
+	A.imode = 1;
+	A.iBW = 0;
+	B.freq = 14070000L;
+	B.imode = 1;
+	B.iBW = 0;
+	inuse = onA;
+
 	freqA = 14070000L;
 	modeA = 1;
 	bwA = 0;

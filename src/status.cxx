@@ -215,13 +215,14 @@ void status::saveLastState()
 	spref.set("sep_rtsplus", sep_rtsplus);
 	spref.set("set_dtrplus", sep_dtrplus);
 
-	spref.set("bandwidth", opBW);
-	spref.set("mode", opMODE);
-	spref.set("frequency", freq);
+	spref.set("bw_A", iBW_A);
+	spref.set("mode_A", imode_A);
+	spref.set("freq_A", freq_A);
 
 	spref.set("bw_B", iBW_B);
 	spref.set("mode_B", imode_B);
 	spref.set("freq_B", freq_B);
+
 	spref.set("use_rig_data", use_rig_data);
 	spref.set("restore_rig_data", restore_rig_data);
 
@@ -293,28 +294,18 @@ void status::saveLastState()
 	spref.set("bpf_center", bpf_center);
 	spref.set("use_bpf_center", use_bpf_center);
 
-	uchar red, green, blue;
-
-	Fl::get_color(scaleSmeter->color(), red, green, blue);
-	s_red = red; s_green = green; s_blue = blue;
 	spref.set("s_red", s_red);
 	spref.set("s_green", s_green);
 	spref.set("s_blue", s_blue);
 
-	FreqDisp->GetONCOLOR(red, green, blue);
-	fg_red = red; fg_green = green; fg_blue = blue;
 	spref.set("fg_red", fg_red);
 	spref.set("fg_green", fg_green);
 	spref.set("fg_blue", fg_blue);
 
-	FreqDisp->GetOFFCOLOR(red, green, blue);
-	bg_red = red; bg_green = green; bg_blue = blue;
 	spref.set("bg_red", bg_red);
 	spref.set("bg_green", bg_green);
 	spref.set("bg_blue", bg_blue);
 
-	Fl::get_color(sldrRcvSignal->color(), red, green, blue);
-	meter_red = red; meter_green = green; meter_blue = blue;
 	spref.set("meter_red", meter_red);
 	spref.set("meter_green", meter_green);
 	spref.set("meter_blue", meter_blue);
@@ -388,13 +379,14 @@ bool status::loadXcvrState(const char *xcvr)
 		if (spref.get("sep_rtsplus", i, i)) sep_rtsplus = i;
 		if (spref.get("sep_dtrplus", i, i)) sep_dtrplus = i;
 
-		spref.get("bandwidth", opBW, opBW);
-		spref.get("mode", opMODE, opMODE);
-		spref.get("frequency", freq, freq);
+		spref.get("bw_A", iBW_A, iBW_A);
+		spref.get("mode_A", imode_A, imode_A);
+		spref.get("freq_A", freq_A, freq_A);
 
 		spref.get("bw_B", iBW_B, iBW_B);
 		spref.get("mode_B", imode_B, imode_B);
 		spref.get("freq_B", freq_B, freq_B);
+	
 		if (spref.get("use_rig_data", i, i)) use_rig_data = i;
 		if (spref.get("restore_rig_data", i, i)) restore_rig_data = i;
 
@@ -501,17 +493,14 @@ bool status::loadXcvrState(const char *xcvr)
 
 	}
 
-	FreqDisp->SetONOFFCOLOR(
+	FreqDispA->SetONOFFCOLOR(
 		fl_rgb_color(fg_red, fg_green, fg_blue),
 		fl_rgb_color(bg_red, bg_green, bg_blue));
-	FreqDisp->font(fontnbr);
+	FreqDispA->font(fontnbr);
 	FreqDispB->SetONOFFCOLOR(
 		fl_rgb_color(fg_red, fg_green, fg_blue),
-		fl_rgb_color(bg_red, bg_green, bg_blue));
+		fl_color_average(fl_rgb_color(bg_red, bg_green, bg_blue), FL_BLACK, 0.87));
 	FreqDispB->font(fontnbr);
-	txtInactive->color(fl_rgb_color (bg_red, bg_green, bg_blue));
-	txtInactive->labelcolor(fl_rgb_color (fg_red, fg_green, fg_blue));
-	txtInactive->redraw();
 
 	Fl_Color clr = fl_rgb_color(s_red, s_green, s_blue);
 	scaleSmeter->color(clr);

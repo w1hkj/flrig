@@ -334,9 +334,9 @@ void cbOkXcvrDialog()
 	progStatus.sep_rtsplus = btnSepRTSplus->value();
 	progStatus.sep_rtsptt = btnSepRTSptt->value();
 
-	progStatus.opMODE = selrig->def_mode;
-	progStatus.opBW   = selrig->defbw_;
-	progStatus.freq   = selrig->deffreq_;
+	progStatus.imode_B  = progStatus.imode_A  = selrig->def_mode;
+	progStatus.iBW_B    = progStatus.iBW_A    = selrig->defbw_;
+	progStatus.freq_B   = progStatus.freq_A   = selrig->deffreq_;
 
 	init_title();
 
@@ -439,7 +439,7 @@ void cbFreqControlFontBrowser(Fl_Widget*, void*) {
 	progStatus.fontnbr = fnt;
 	lblTest->labelfont(fnt);
 	dlgDisplayConfig->redraw();
-	FreqDisp->font(fnt);
+	FreqDispA->font(fnt);
 	FreqDispB->font(fnt);
 	fntbrowser->hide();
 }
@@ -517,8 +517,12 @@ void cbSWRMeterColor()
 
 void cbOkDisplayDialog()
 {
-	FreqDisp->SetONOFFCOLOR(lblTest->labelcolor(), lblTest->color());
-	FreqDispB->SetONOFFCOLOR(lblTest->labelcolor(), lblTest->color());
+	FreqDispA->SetONOFFCOLOR(
+		fl_rgb_color(fg_red, fg_green, fg_blue),
+		fl_rgb_color(bg_red, bg_green, bg_blue));
+	FreqDispB->SetONOFFCOLOR(
+		fl_rgb_color(fg_red, fg_green, fg_blue),
+		fl_color_average(fl_rgb_color(bg_red, bg_green, bg_blue), FL_BLACK, 0.87));
 
 	txtInactive->color(lblTest->color());
 	txtInactive->labelcolor(lblTest->labelcolor());
@@ -556,9 +560,9 @@ void setDisplayColors()
 	if (dlgDisplayConfig == NULL)
 		return;
 
-	FreqDisp->GetONCOLOR(red,green,blue);
+	FreqDispA->GetONCOLOR(red,green,blue);
 	lblTest->labelcolor(fl_rgb_color(red,green,blue));
-	FreqDisp->GetOFFCOLOR(red,green,blue);
+	FreqDispA->GetOFFCOLOR(red,green,blue);
 	lblTest->color(fl_rgb_color(red,green,blue));
 	scaleSmeterColor->color(scaleSmeter->color());
 	grpMeterColor->color(scaleSmeterColor->color());
