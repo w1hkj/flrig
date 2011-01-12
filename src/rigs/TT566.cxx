@@ -15,8 +15,8 @@
 const char RIG_TT566name_[] = "Orion-II";
 
 const char *RIG_TT566modes_[] = {
-		"LSB", "USB", "UCW", "AM", "FM", NULL};
-static const char RIG_TT566_mode_type[] = {'L', 'U', 'U', 'U', 'U'};
+		"USB", "LSB", "UCW", "LCW", "AM", "FM", "FSK", NULL};
+static const char RIG_TT566_mode_type[] = {'U', 'L', 'U', 'L', 'U', 'U', 'L'};
 
 const char *RIG_TT566widths[] = { 
 "100",  "200",  "300",  "400",  "500",

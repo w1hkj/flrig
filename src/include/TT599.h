@@ -24,6 +24,7 @@ public:
 	int  get_bwA();
 	void set_bwB(int bw);
 	int  get_bwB();
+	bool twovfos() { return true;}
 
 	void set_PTT_control(int val);
 	int  get_modetype(int n);
