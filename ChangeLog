@@ -1,10 +1,11 @@
-2011-01-10  David Freese  <w1hkj@w1hkj.com>
+2011-01-12  David Freese  <w1hkj@w1hkj.com>
 
-	a7380fd: Orion-II TT565
-	f2b9883: TT599-Eagle
-	c2f6376: TT 535 Delta-II
-	5408a0f: TT516 dual vfo
-	8f7cf0d: A B vfo select
+	41ce371: TT566-TT599 correction
+	61b6eba: Orion-II TT566
+	997229c: TT599-Eagle
+	e3a3124: TT 535 Delta-II
+	9ef17a0: TT516 dual vfo
+	397984a: A B vfo select
 	ffebee9: IC706 mode type
 	8a07b42: IC7200 digi mode
 	4e7d1f3: H/W PTT control
