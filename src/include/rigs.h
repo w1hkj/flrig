@@ -39,6 +39,7 @@
 #include "TT550.h"
 #include "TT563.h"
 #include "TT588.h"
+#include "TT599.h"
 
 extern rigbase			rig_null;		// 0
 extern RIG_FT100D		rig_FT100D;		// 1
@@ -80,5 +81,6 @@ extern RIG_TT538		rig_TT538;		// 34
 extern RIG_TT550		rig_TT550;		// 35
 extern RIG_TT563		rig_TT563;		// 36
 extern RIG_TT588		rig_TT588;		// 37
+extern RIG_TT599		rig_TT599;		// 38
 
 #endif

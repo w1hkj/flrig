@@ -165,6 +165,7 @@ flrig_SOURCES += \
 	rigs/TT550.cxx \
 	rigs/TT563.cxx \
 	rigs/TT588.cxx \
+	rigs/TT599.cxx \
 	rigs.cxx \
 	serial.cxx \
 	status.cxx \
@@ -267,6 +268,7 @@ EXTRA_DIST = \
 	include/TT550.h \
 	include/TT563.h \
 	include/TT588.h \
+	include/TT599.h \
 	include/util.h \
 	include/ValueSlider.h \
 	images/alc.xbm \
