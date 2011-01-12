@@ -183,7 +183,8 @@ long rigbase::fm_binary_be(char *binary_be, int len)
 
 string rigbase::to_decimal_be(long d, int len)
 {
-	static string sdec_be = "";
+	static string sdec_be;
+	sdec_be.clear();
 	for (int i = 0; i < len; i++) {
 		sdec_be += (char)((d % 10) + '0');
 		d /= 10;
@@ -193,7 +194,8 @@ string rigbase::to_decimal_be(long d, int len)
 
 string rigbase::to_decimal(long d, int len)
 {
-	static string sdec = "";
+	static string sdec;
+	sdec.clear();
 	string sdec_be = to_decimal_be(d, len);
 	int bcdlen = sdec_be.size();
 	for (int i = bcdlen - 1; i >= 0; i--)
