@@ -15,8 +15,8 @@
 const char RIG_TT599name_[] = "Eagle";
 
 const char *RIG_TT599modes_[] = {
-		"LSB", "USB", "UCW", "AM", "FM", NULL};
-static const char RIG_TT599_mode_type[] = {'L', 'U', 'U', 'U', 'U'};
+		"USB", "LSB", "CWL", "AM", "FM", NULL};
+static const char RIG_TT599_mode_type[] = {'U', 'L', 'L', 'U', 'U'};
 
 const char *RIG_TT599widths[] = { 
 "100",  "200",  "300",  "400",  "500",
@@ -63,10 +63,10 @@ RIG_TT599::RIG_TT599() {
 long RIG_TT599::get_vfoA ()
 {
 	cmd = "?AF\r";
-	if (!sendCommand(cmd, 12)) {
-		return freqA;
+	if (sendCommand(cmd, 12) == 12) {
+		freqA = fm_decimal(&replystr[3], 8);
 	}
-	freqA = fm_decimal(&replystr[3], 8);
+	LOG_INFO("vfo A : %s", replystr.c_str());
 	return freqA;
 }
 
@@ -81,18 +81,18 @@ void RIG_TT599::set_vfoA (long freq)
 
 long RIG_TT599::get_vfoB ()
 {
-	cmd = "?AF\r";
-	if (!sendCommand(cmd, 12)) {
-		return freqB;
+	cmd = "?BF\r";
+	if (sendCommand(cmd, 12) == 12) {
+		freqB = fm_decimal(&replystr[3], 8);
 	}
-	freqA = fm_decimal(&replystr[3], 8);
+	LOG_INFO("vfo B : %s", replystr.c_str());
 	return freqB;
 }
 
 void RIG_TT599::set_vfoB (long freq)
 {
 	freqB = freq;
-	cmd = "*AF";
+	cmd = "*BF";
 	cmd.append( to_decimal( freq, 8 ) );
 	cmd += '\r';
 	sendCommand(cmd, 0);
@@ -116,7 +116,7 @@ void RIG_TT599::set_modeA(int md)
 int RIG_TT599::get_modeA()
 {
 	cmd = "?RMM\r";
-	if( sendCommand (cmd, 6 )) {
+	if( sendCommand (cmd, 6 ) == 6) {
 		modeA = replystr[4] - '0';
 	}
 	return modeA;
@@ -134,7 +134,7 @@ void RIG_TT599::set_modeB(int md)
 int RIG_TT599::get_modeB()
 {
 	cmd = "?RMM\r";
-	if( sendCommand (cmd, 6 )) {
+	if( sendCommand (cmd, 6 ) == 6) {
 		modeB = replystr[4] - '0';
 	}
 	return modeB;
@@ -152,16 +152,17 @@ void RIG_TT599::set_bwA(int bw)
 int RIG_TT599::get_bwA()
 {
 	cmd = "?RMF\r";
-	sendCommand(cmd, 9);
-	string bwstr = "";
-	if (replystr.length() == 9) bwstr = replystr.substr(4, 4);
-	if (replystr.length() == 8) bwstr = replystr.substr(4, 3);
-	if (replystr.empty()) return bwA;
-	for (size_t i = 0; i < sizeof(RIG_TT599widths); i++)
-		if (bwstr == RIG_TT599widths[i]) {
-			bwA = i;
-			break;
-		}
+	if (sendCommand(cmd, 9) == 9) {
+		string bwstr = "";
+		if (replystr.length() == 9) bwstr = replystr.substr(4, 4);
+		if (replystr.length() == 8) bwstr = replystr.substr(4, 3);
+		if (replystr.empty()) return bwA;
+		for (size_t i = 0; i < sizeof(RIG_TT599widths); i++)
+			if (bwstr == RIG_TT599widths[i]) {
+				bwA = i;
+				break;
+			}
+	}
 	return bwA;
 }
 
@@ -177,16 +178,17 @@ void RIG_TT599::set_bwB(int bw)
 int RIG_TT599::get_bwB()
 {
 	cmd = "?RMF\r";
-	sendCommand(cmd, 9);
-	string bwstr = "";
-	if (replystr.length() == 9) bwstr = replystr.substr(4, 4);
-	if (replystr.length() == 8) bwstr = replystr.substr(4, 3);
-	if (replystr.empty()) return bwB;
-	for (size_t i = 0; i < sizeof(RIG_TT599widths); i++)
-		if (bwstr == RIG_TT599widths[i]) {
-			bwB = i;
-			break;
-		}
+	if (sendCommand(cmd, 9) == 9) {
+		string bwstr = "";
+		if (replystr.length() == 9) bwstr = replystr.substr(4, 4);
+		if (replystr.length() == 8) bwstr = replystr.substr(4, 3);
+		if (replystr.empty()) return bwB;
+		for (size_t i = 0; i < sizeof(RIG_TT599widths); i++)
+			if (bwstr == RIG_TT599widths[i]) {
+				bwB = i;
+				break;
+			}
+	}
 	return bwB;
 }
 
@@ -266,10 +268,11 @@ int  RIG_TT599::get_smeter()
 {
 	int dbm = 0;
 	cmd = "?S\r";
-	sendCommand(cmd, 9);
-	if (replystr.find("@SRM") == 0)
-		sscanf(&replystr[4], "%d", &dbm);
-	LOG_INFO("smeter: %s", str2hex(replystr.c_str(), replystr.length()));
+	if (sendCommand(cmd, 9) == 9) {
+		if (replystr.find("@SRM") == 0)
+			sscanf(&replystr[4], "%d", &dbm);
+		LOG_INFO("smeter: %s", str2hex(replystr.c_str(), replystr.length()));
+	}
 	return dbm;
 }
 
@@ -288,13 +291,14 @@ int  RIG_TT599::get_power_out()
 {
 	fwdpwr = 0; refpwr = 0;
 	cmd = "?S\r";
-	sendCommand(cmd, 12);
-	if (replystr.find("@SRF") == 0) {
-		sscanf(&replystr[4], "%d", &fwdpwr);
-		size_t n = 4;
-		while ( replystr[n] != 'R' && n < replystr.length()) n++;
-		if (n < replystr.length()) n++;
-		sscanf(&replystr[n], "%d", &refpwr);
+	if (sendCommand(cmd, 12) == 12) {
+		if (replystr.find("@SRF") == 0) {
+			sscanf(&replystr[4], "%d", &fwdpwr);
+			size_t n = 4;
+			while ( replystr[n] != 'R' && n < replystr.length()) n++;
+			if (n < replystr.length()) n++;
+			sscanf(&replystr[n], "%d", &refpwr);
+		}
 	}
 	return fwdpwr;
 }
