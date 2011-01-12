@@ -164,6 +164,7 @@ flrig_SOURCES += \
 	rigs/TT538.cxx \
 	rigs/TT550.cxx \
 	rigs/TT563.cxx \
+	rigs/TT566.cxx \
 	rigs/TT588.cxx \
 	rigs/TT599.cxx \
 	rigs.cxx \
@@ -267,6 +268,7 @@ EXTRA_DIST = \
 	include/TT538.h \
 	include/TT550.h \
 	include/TT563.h \
+	include/TT566.h \
 	include/TT588.h \
 	include/TT599.h \
 	include/util.h \

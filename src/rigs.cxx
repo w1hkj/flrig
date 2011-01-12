@@ -50,6 +50,7 @@ RIG_TT535		rig_TT535;
 RIG_TT538		rig_TT538;
 RIG_TT550		rig_TT550;
 RIG_TT563		rig_TT563;
+RIG_TT566		rig_TT566;
 RIG_TT588		rig_TT588;
 RIG_TT599		rig_TT599;
 
@@ -93,6 +94,7 @@ rigbase *rigs[] = {
 	&rig_TT538,
 	&rig_TT550,
 	&rig_TT563,
+	&rig_TT566,
 	&rig_TT588,
 	&rig_TT599,
 	NULL
