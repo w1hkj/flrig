@@ -219,9 +219,10 @@ void send_ptt_changed(bool PTT)
 
 void smc(void *m)
 {
+	int md = (int)(reinterpret_cast<long>(m));
 	auto_mutex lock(mutex_xmlrpc);
 	try {
-		XmlRpcValue mode(selrig->modes_[(int)m]), res;
+		XmlRpcValue mode(selrig->modes_[md]), res;
 		execute(rig_set_mode, mode, res);
 	} catch (...) { }
 }
@@ -235,7 +236,7 @@ void send_new_mode(int m)
 
 void sbc(void *val)
 {
-	int bw = (int)val;
+	int bw = (int)(reinterpret_cast<long>(val));
 	auto_mutex lock(mutex_xmlrpc);
 	try {
 		XmlRpcValue bandwidth(selrig->bandwidths_[bw]), res;
@@ -297,7 +298,7 @@ static void check_for_frequency_change(const XmlRpcValue& freq)
 
 static void update_mode_change(void *d)
 {
-	int imode = (int)d;
+	int imode = (int)(reinterpret_cast<long>(d));
 	vfo.imode = imode;
 	useB ? vfoB.imode = imode : vfoA.imode = imode;
 
@@ -343,7 +344,7 @@ static void check_for_mode_change(const XmlRpcValue& new_mode)
 
 static void update_bandwidth_change(void *d)
 {
-	int ibw = (int)d;
+	int ibw = (int)(reinterpret_cast<long>(d));
 	vfo.iBW = useB ? vfoB.iBW = ibw : vfoA.iBW = ibw;
 	selrig->set_bwA(ibw);
 	opBW->index(ibw);
