@@ -28,8 +28,8 @@ rigbase *selrig = rigs[0];
 extern bool test;
 int freqval = 0;
 
-FREQMODE vfoA = {14070000, 0, 0};
-FREQMODE vfoB = {7070000, 0, 0};
+FREQMODE vfoA = {14070000, 0, 0, UI};
+FREQMODE vfoB = {7070000, 0, 0, UI};
 FREQMODE vfo = vfoA;
 FREQMODE transceiverA;
 FREQMODE transceiverB;
@@ -258,8 +258,12 @@ static bool resetxmt = true;
 
 void serviceA()
 {
+	FREQMODE A;
 	while (!queA.empty()) {
-		vfoA = queA.front();
+		A = queA.front();
+		vfoA.freq = A.freq;
+		vfoA.imode = A.imode;
+		vfoA.iBW = A.iBW;
 		queA.pop();
 		if (!useB) {
 			pthread_mutex_lock(&mutex_serial);
@@ -271,14 +275,24 @@ void serviceA()
 			if (vfoA.freq != vfo.freq) {
 				selrig->set_vfoA(vfoA.freq);
 				send_new_freq(vfoA.freq);
+				if (A.src == XML) {
+					Fl::awake(setFreqDispA, (void *)vfoA.freq);
+				}
 			}
 			if (vfoA.imode != vfo.imode) {
 				selrig->set_modeA(vfoA.imode);
 				send_new_mode(vfoA.imode);
+				if (A.src == XML) {
+					Fl::awake(setModeControl);
+					Fl::awake(updateBandwidthControl);
+				}
 			}
 			if (vfoA.iBW != vfo.iBW) {
 				selrig->set_bwA(vfoA.iBW);
 				send_new_bandwidth(vfoA.iBW);
+				if (A.src == XML) {
+					Fl::awake(setBWControl);
+				}
 			}
 			vfo = vfoA;
 
@@ -293,8 +307,12 @@ void serviceA()
 
 void serviceB()
 {
+	FREQMODE B;
 	while (!queB.empty()) {
-		vfoB = queB.front();
+		B = queB.front();
+		vfoB.freq = B.freq;
+		vfoB.iBW = B.iBW;
+		vfoB.imode = B.imode;
 		queB.pop();
 		if (useB ) {
 			pthread_mutex_lock(&mutex_serial);
@@ -307,14 +325,24 @@ void serviceB()
 			if (vfoB.freq != vfo.freq) {
 				selrig->set_vfoB(vfoB.freq);
 				send_new_freq(vfoB.freq);
+				if (B.src == XML) {
+					Fl::awake(setFreqDispA, (void *)vfoA.freq);
+				}
 			}
 			if (vfoB.imode != vfo.imode) {
 				selrig->set_modeB(vfoB.imode);
 				send_new_mode(vfoB.imode);
+				if (B.src == XML) {
+					Fl::awake(setModeControl);
+					Fl::awake(updateBandwidthControl);
+				}
 			}
 			if (vfoB.iBW != vfo.iBW) {
 				selrig->set_bwB(vfoB.iBW);
 				send_new_bandwidth(vfoB.iBW);
+				if (B.src == XML) {
+					Fl::awake(setBWControl);
+				}
 			}
 			vfo = vfoB;
 

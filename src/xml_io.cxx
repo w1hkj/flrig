@@ -26,7 +26,7 @@ extern queue<FREQMODE> queA;
 extern queue<FREQMODE> queB;
 extern queue<bool> quePTT;
 
-static const double TIMEOUT = 0.5;//2.0;
+static const double TIMEOUT = 0.5;
 static const char* tcpip_address = "127.0.0.1";
 static const int tcpip_port      = 7362;
 
@@ -285,17 +285,23 @@ static void check_for_frequency_change(const XmlRpcValue& freq)
 	double f = freq;
 	long newfreq = (long)f;
 	if (newfreq != xmlvfo.freq) {
-		xmlvfo.freq = newfreq;
 		if (useB) {
+			xmlvfo = vfo;
+			xmlvfo.freq = newfreq;
+			xmlvfo.src = XML;
 			queB.push(xmlvfo);
-			Fl::awake(setFreqDispB, (void *)xmlvfo.freq);
+//			Fl::awake(setFreqDispB, (void *)xmlvfo.freq);
 		} else {
+			xmlvfo = vfo;
+			xmlvfo.freq = newfreq;
+			xmlvfo.src = XML;
 			queA.push(xmlvfo);
-			Fl::awake(setFreqDispA, (void *)xmlvfo.freq);
+//			Fl::awake(setFreqDispA, (void *)xmlvfo.freq);
 		}
 	}
 }
 
+/*
 static void update_mode_change(void *d)
 {
 	int imode = (int)(reinterpret_cast<long>(d));
@@ -327,6 +333,7 @@ static void update_mode_change(void *d)
 	updateBandwidthControl(NULL);
 	return;
 }
+*/
 
 static void check_for_mode_change(const XmlRpcValue& new_mode)
 {
@@ -334,14 +341,27 @@ static void check_for_mode_change(const XmlRpcValue& new_mode)
 		return;
 	string smode = new_mode;
 	if (smode != selrig->modes_[vfo.imode]) {
-		long imode = 0;
+		int imode = 0;
 		while (selrig->modes_[imode] != NULL && smode != selrig->modes_[imode])
 			imode++;
-		if (selrig->modes_[imode] != NULL && imode != vfo.imode)
-			Fl::awake(update_mode_change, (void *)imode);
+		if (selrig->modes_[imode] != NULL && imode != vfo.imode) {
+			if (useB) {
+				xmlvfo = vfo;
+				xmlvfo.imode = imode;
+				xmlvfo.src = XML;
+				queB.push(xmlvfo);
+			} else {
+				xmlvfo = vfo;
+				xmlvfo.imode = imode;
+				xmlvfo.src = XML;
+				queA.push(xmlvfo);
+			}
+//			Fl::awake(update_mode_change, (void *)imode);
+		}
 	}
 }
 
+/*
 static void update_bandwidth_change(void *d)
 {
 	int ibw = (int)(reinterpret_cast<long>(d));
@@ -350,7 +370,7 @@ static void update_bandwidth_change(void *d)
 	opBW->index(ibw);
 	return;
 }
-
+*/
 
 static void check_for_bandwidth_change(const XmlRpcValue& new_bw)
 {
@@ -362,8 +382,20 @@ static void check_for_bandwidth_change(const XmlRpcValue& new_bw)
 		int ibw = 0;
 		while (selrig->bandwidths_[ibw] != NULL && sbw != selrig->bandwidths_[ibw])
 			ibw++;
-		if (selrig->bandwidths_[ibw] != NULL && ibw != vfo.iBW)
-			Fl::awake(update_bandwidth_change, (void *)ibw);
+		if (selrig->bandwidths_[ibw] != NULL && ibw != vfo.iBW) {
+			if (useB) {
+				xmlvfo = vfo;
+				xmlvfo.iBW = ibw;
+				xmlvfo.src = XML;
+				queB.push(xmlvfo);
+			} else {
+				xmlvfo = vfo;
+				xmlvfo.iBW = ibw;
+				xmlvfo.src = XML;
+				queA.push(xmlvfo);
+			}
+//			Fl::awake(update_bandwidth_change, (void *)ibw);
+		}
 	}
 }
 

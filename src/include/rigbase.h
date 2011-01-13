@@ -14,11 +14,13 @@ using namespace std;
 
 struct FREQMODE {
 	long freq;
-	int imode;
-	int iBW;
+	int  imode;
+	int  iBW;
+	int  src;
 };
 
 enum {onA, onB};
+enum {UI, XML};
 
 enum {
 	NONE,
