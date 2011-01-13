@@ -13,8 +13,7 @@ decl {\#include "status.h"} {}
 
 decl {\#include "support.h"} {} 
 
-Function {Rig_window()} {open
-} {
+Function {Rig_window()} {} {
   Fl_Window {} {
     label Flrig open
     xywh {577 57 424 330} type Double color 52 align 80
@@ -454,7 +453,7 @@ Function {XcvrDialog()} {open
 } {
   Fl_Window {} {
     label {I/O Ports} open
-    xywh {561 138 482 257} type Double hide
+    xywh {590 428 482 257} type Double visible
   } {
     Fl_Tabs {} {open
       xywh {0 8 477 245}
@@ -500,7 +499,7 @@ btnOkXcvrDialog->redraw();}
           Fl_Counter query_interval {
             label {qry intvl (ms):}
             callback {progStatus.serloop_timing = (int)o->value();} selected
-            tooltip {Interval between Xvr queries} xywh {123 141 75 22} type Simple align 4 minimum 50 maximum 5000 step 50 value 200
+            tooltip {Interval between Xvr queries} xywh {123 141 75 22} type Simple align 4 minimum 50 maximum 5000 step 50 value 100
             code0 {o->value(progStatus.serloop_timing);}
           }
         }

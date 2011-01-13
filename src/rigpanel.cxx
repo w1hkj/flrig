@@ -1327,7 +1327,7 @@ Fl_Double_Window* XcvrDialog() {
             query_interval->minimum(50);
             query_interval->maximum(5000);
             query_interval->step(50);
-            query_interval->value(200);
+            query_interval->value(100);
             query_interval->callback((Fl_Callback*)cb_query_interval);
             query_interval->align(FL_ALIGN_LEFT);
             o->value(progStatus.serloop_timing);
