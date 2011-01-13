@@ -62,12 +62,21 @@ RIG_FT450::RIG_FT450() {
 	notch_on = false;
 }
 
+void RIG_FT450::select_vfoA()
+{
+	cmd = "SV0;";
+	sendCommand(cmd, 0, false);
+}
+
+void RIG_FT450::select_vfoB()
+{
+	cmd = "SV1;";
+	sendCommand(cmd, 0, false);
+}
+
 void RIG_FT450::initialize()
 {
-// enable vfoA vfoB split operation
-	cmd = "EX04646;";
-	sendCommand(cmd, 0, false);
-	LOG_INFO("cmd: %s\nreply: %s", cmd.c_str(), replystr.c_str());
+	select_vfoA();
 }
 
 long RIG_FT450::get_vfoA ()
@@ -110,14 +119,16 @@ long RIG_FT450::get_vfoB ()
 
 void RIG_FT450::set_vfoB (long freq)
 {
+	RIG_DEBUG = true;
+
 	freqB = freq;
 	cmd = "FB00000000;";
 	for (int i = 9; i > 1; i--) {
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	RIG_DEBUG = true;
 	sendCommand(cmd, 0, false);
+
 	RIG_DEBUG = false;
 }
 
