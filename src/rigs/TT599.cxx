@@ -61,6 +61,13 @@ RIG_TT599::RIG_TT599() {
 };
 
 
+void RIG_TT599::initialize()
+{
+	split = false;
+	cmd = "*KVAAA\r";
+	sendCommand(cmd, 0);
+}
+
 long RIG_TT599::get_vfoA ()
 {
 	cmd = "?AF\r";
@@ -323,3 +330,11 @@ int  RIG_TT599::get_power_out()
 	}
 	return fwdpwr;
 }
+
+void  RIG_TT599:: set_split(bool val)
+{
+	split = val;
+	cmd = val ? "*KVAAB\r" : "*KVAAA\r";
+	sendCommand(cmd, 0);
+}
+
