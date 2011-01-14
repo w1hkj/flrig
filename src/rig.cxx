@@ -345,6 +345,8 @@ int parse_args(int argc, char **argv, int& idx)
 	}
 	if (strcasecmp("--config-dir", argv[idx]) == 0) {
 		RigHomeDir = argv[idx + 1];
+		if (RigHomeDir[RigHomeDir.length()-1] != '/')
+			RigHomeDir += '/';
 		idx += 2;
 		return 1;
 	}
