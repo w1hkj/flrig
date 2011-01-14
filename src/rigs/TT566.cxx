@@ -63,10 +63,9 @@ RIG_TT566::RIG_TT566() {
 long RIG_TT566::get_vfoA ()
 {
 	cmd = "?AF\r";
-	if (!sendCommand(cmd, 12)) {
-		return freqA;
+	if (sendCommand(cmd, 12) == 12) {
+		freqA = fm_decimal(&replystr[3], 8);
 	}
-	freqA = fm_decimal(&replystr[3], 8);
 	return freqA;
 }
 
@@ -81,18 +80,17 @@ void RIG_TT566::set_vfoA (long freq)
 
 long RIG_TT566::get_vfoB ()
 {
-	cmd = "?AF\r";
-	if (!sendCommand(cmd, 12)) {
-		return freqB;
+	cmd = "?BF\r";
+	if (sendCommand(cmd, 12) == 12) {
+		freqB = fm_decimal(&replystr[3], 8);
 	}
-	freqA = fm_decimal(&replystr[3], 8);
 	return freqB;
 }
 
 void RIG_TT566::set_vfoB (long freq)
 {
 	freqB = freq;
-	cmd = "*AF";
+	cmd = "*BF";
 	cmd.append( to_decimal( freq, 8 ) );
 	cmd += '\r';
 	sendCommand(cmd, 0);
@@ -116,7 +114,7 @@ void RIG_TT566::set_modeA(int md)
 int RIG_TT566::get_modeA()
 {
 	cmd = "?RMM\r";
-	if( sendCommand (cmd, 6 )) {
+	if( sendCommand (cmd, 6 ) == 6) {
 		modeA = replystr[4] - '0';
 	}
 	return modeA;
@@ -134,7 +132,7 @@ void RIG_TT566::set_modeB(int md)
 int RIG_TT566::get_modeB()
 {
 	cmd = "?RMM\r";
-	if( sendCommand (cmd, 6 )) {
+	if( sendCommand (cmd, 6 ) == 6) {
 		modeB = replystr[4] - '0';
 	}
 	return modeB;
@@ -152,16 +150,21 @@ void RIG_TT566::set_bwA(int bw)
 int RIG_TT566::get_bwA()
 {
 	cmd = "?RMF\r";
-	sendCommand(cmd, 9);
-	string bwstr = "";
-	if (replystr.length() == 9) bwstr = replystr.substr(4, 4);
-	if (replystr.length() == 8) bwstr = replystr.substr(4, 3);
-	if (replystr.empty()) return bwA;
-	for (size_t i = 0; i < sizeof(RIG_TT566widths); i++)
-		if (bwstr == RIG_TT566widths[i]) {
-			bwA = i;
-			break;
+printf("bws %d\n", (int)sizeof(RIG_TT566widths));
+	if (sendCommand(cmd, 9) == 9) {
+		string bwstr = "";
+		if (replystr.length() == 9) bwstr = replystr.substr(4, 4);
+		if (replystr.length() == 8) bwstr = replystr.substr(4, 3);
+		if (replystr.empty()) return bwA;
+		int i = 0;
+		while( RIG_TT566widths[i] != NULL) {
+			if (bwstr == RIG_TT566widths[i]) {
+				bwB = i;
+				break;
+			}
+			i++;
 		}
+	}
 	return bwA;
 }
 
@@ -177,16 +180,20 @@ void RIG_TT566::set_bwB(int bw)
 int RIG_TT566::get_bwB()
 {
 	cmd = "?RMF\r";
-	sendCommand(cmd, 9);
-	string bwstr = "";
-	if (replystr.length() == 9) bwstr = replystr.substr(4, 4);
-	if (replystr.length() == 8) bwstr = replystr.substr(4, 3);
-	if (replystr.empty()) return bwB;
-	for (size_t i = 0; i < sizeof(RIG_TT566widths); i++)
-		if (bwstr == RIG_TT566widths[i]) {
-			bwB = i;
-			break;
+	if (sendCommand(cmd, 9) == 9) {
+		string bwstr = "";
+		if (replystr.length() == 9) bwstr = replystr.substr(4, 4);
+		if (replystr.length() == 8) bwstr = replystr.substr(4, 3);
+		if (replystr.empty()) return bwB;
+		int i = 0;
+		while( RIG_TT566widths[i] != NULL) {
+			if (bwstr == RIG_TT566widths[i]) {
+				bwB = i;
+				break;
+			}
+			i++;
 		}
+	}
 	return bwB;
 }
 

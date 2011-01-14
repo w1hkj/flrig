@@ -66,7 +66,8 @@ long RIG_TT599::get_vfoA ()
 	if (sendCommand(cmd, 12) == 12) {
 		freqA = fm_decimal(&replystr[3], 8);
 	}
-	LOG_INFO("vfo A : %s", replystr.c_str());
+	LOG_INFO("vfo A (%d)\n%s\n%s", 
+		replystr.length(), replystr.c_str(), str2hex(replystr.c_str(), replystr.length()));
 	return freqA;
 }
 
@@ -76,6 +77,7 @@ void RIG_TT599::set_vfoA (long freq)
 	cmd = "*AF";
 	cmd.append( to_decimal( freq, 8 ) );
 	cmd += '\r';
+	LOG_INFO("set A : %s", cmd.c_str());
 	sendCommand(cmd, 0);
 }
 
@@ -85,7 +87,8 @@ long RIG_TT599::get_vfoB ()
 	if (sendCommand(cmd, 12) == 12) {
 		freqB = fm_decimal(&replystr[3], 8);
 	}
-	LOG_INFO("vfo B : %s", replystr.c_str());
+	LOG_INFO("vfo B (%d) (%d)\n%s\n%s", 
+		replystr.length(), replystr.c_str(), str2hex(replystr.c_str(), replystr.length()));
 	return freqB;
 }
 
@@ -95,6 +98,7 @@ void RIG_TT599::set_vfoB (long freq)
 	cmd = "*BF";
 	cmd.append( to_decimal( freq, 8 ) );
 	cmd += '\r';
+	LOG_INFO("set B : %s", cmd.c_str());
 	sendCommand(cmd, 0);
 }
 
@@ -157,11 +161,14 @@ int RIG_TT599::get_bwA()
 		if (replystr.length() == 9) bwstr = replystr.substr(4, 4);
 		if (replystr.length() == 8) bwstr = replystr.substr(4, 3);
 		if (replystr.empty()) return bwA;
-		for (size_t i = 0; i < sizeof(RIG_TT599widths); i++)
+		int i = 0;
+		while( RIG_TT599widths[i] != NULL) {
 			if (bwstr == RIG_TT599widths[i]) {
-				bwA = i;
+				bwB = i;
 				break;
 			}
+			i++;
+		}
 	}
 	return bwA;
 }
@@ -183,11 +190,14 @@ int RIG_TT599::get_bwB()
 		if (replystr.length() == 9) bwstr = replystr.substr(4, 4);
 		if (replystr.length() == 8) bwstr = replystr.substr(4, 3);
 		if (replystr.empty()) return bwB;
-		for (size_t i = 0; i < sizeof(RIG_TT599widths); i++)
+		int i = 0;
+		while( RIG_TT599widths[i] != NULL) {
 			if (bwstr == RIG_TT599widths[i]) {
 				bwB = i;
 				break;
 			}
+			i++;
+		}
 	}
 	return bwB;
 }
