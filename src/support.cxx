@@ -72,17 +72,8 @@ bool run_serial_thread = true;
 bool PTT = false;
 int  powerlevel = 0;
 
-bool data_changed = false;
-
 // the following functions are ONLY CALLED by the serial loop
 // read any data stream sent by transceiver
-
-void read_stream()
-{
-	pthread_mutex_lock(&mutex_serial);
-	selrig->read_stream();
-	pthread_mutex_unlock(&mutex_serial);
-}
 
 // read current vfo frequency
 void read_vfo()
@@ -102,10 +93,8 @@ void read_vfo()
 			pthread_mutex_lock(&mutex_xmlrpc);
 			bypass_digi_loop = false;
 			pthread_mutex_unlock(&mutex_xmlrpc);
-			data_changed = true;
 		}
 	} else {
-		freq = selrig->get_vfoB();
 		if (freq != vfoB.freq) {
 			vfoB.freq = freq;
 			Fl::awake(setFreqDispB, (void *)vfoB.freq);
@@ -117,7 +106,6 @@ void read_vfo()
 			pthread_mutex_lock(&mutex_xmlrpc);
 			bypass_digi_loop = false;
 			pthread_mutex_unlock(&mutex_xmlrpc);
-			data_changed = true;
 		}
 	}
 	pthread_mutex_unlock(&mutex_serial);
@@ -148,7 +136,6 @@ void read_mode()
 			pthread_mutex_lock(&mutex_xmlrpc);
 			bypass_digi_loop = false;
 			pthread_mutex_unlock(&mutex_xmlrpc);
-			data_changed = true;
 		}
 	} else {
 		if (nu_mode != vfoB.imode) {
@@ -166,7 +153,6 @@ void read_mode()
 			pthread_mutex_lock(&mutex_xmlrpc);
 			bypass_digi_loop = false;
 			pthread_mutex_unlock(&mutex_xmlrpc);
-			data_changed = true;
 		}
 	}
 	pthread_mutex_unlock(&mutex_serial);
@@ -192,7 +178,6 @@ void read_bandwidth()
 			pthread_mutex_lock(&mutex_xmlrpc);
 			bypass_digi_loop = false;
 			pthread_mutex_unlock(&mutex_xmlrpc);
-			data_changed = true;
 		}
 	} else {
 		if (nu_BW != vfoB.iBW) {
@@ -205,7 +190,6 @@ void read_bandwidth()
 			pthread_mutex_lock(&mutex_xmlrpc);
 			bypass_digi_loop = false;
 			pthread_mutex_unlock(&mutex_xmlrpc);
-			data_changed = true;
 		}
 	}
 	pthread_mutex_unlock(&mutex_serial);
@@ -321,7 +305,6 @@ void serviceB()
 			bypass_digi_loop = true;
 			pthread_mutex_unlock(&mutex_xmlrpc);
 
-			data_changed = true;
 			if (vfoB.freq != vfo.freq) {
 				selrig->set_vfoB(vfoB.freq);
 				send_new_freq(vfoB.freq);
@@ -392,20 +375,20 @@ void * serial_thread_loop(void *d)
 			}
 			resetxmt = true;
 
-			read_stream();
-			read_smeter();
-			if (!xml_query) {
-				data_changed = false;
-				read_vfo();
-				switch (loopcount) {
-					case 0: read_mode(); break;
-					case 1: read_bandwidth(); break;
-					default: break;
-				}
-				loopcount = (loopcount + 1) % 2;
+			if (rig_nbr == TT550) {
+				pthread_mutex_lock(&mutex_serial);
+				selrig->read_stream();
+				pthread_mutex_unlock(&mutex_serial);
 			}
+			read_smeter();
 
-			if (!data_changed) xml_query = true;
+			read_vfo();
+			switch (loopcount) {
+				case 0: read_mode(); break;
+				case 1: read_bandwidth(); break;
+				default: break;
+			}
+			loopcount = (loopcount + 1) % 2;
 /*
 			switch (loopcount) {
 				case 0: read_volume(); loopcount++; break;

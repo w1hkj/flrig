@@ -150,7 +150,6 @@ void RIG_TT566::set_bwA(int bw)
 int RIG_TT566::get_bwA()
 {
 	cmd = "?RMF\r";
-printf("bws %d\n", (int)sizeof(RIG_TT566widths));
 	if (sendCommand(cmd, 9) == 9) {
 		string bwstr = "";
 		if (replystr.length() == 9) bwstr = replystr.substr(4, 4);
@@ -276,7 +275,7 @@ int  RIG_TT566::get_smeter()
 	sendCommand(cmd, 9);
 	if (replystr.find("@SRM") == 0)
 		sscanf(&replystr[4], "%d", &dbm);
-	LOG_INFO("smeter: %s", str2hex(replystr.c_str(), replystr.length()));
+	LOG_INFO("smeter: %s = %d", str2hex(replystr.c_str(), replystr.length()), dbm);
 	return dbm;
 }
 

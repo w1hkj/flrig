@@ -60,7 +60,6 @@ bool bypass_digi_loop = true;
 bool wait_query = false;
 bool fldigi_online = false;
 bool rig_reset = false;
-bool xml_query = false;
 bool ptt_on = false;
 
 class auto_mutex
@@ -129,7 +128,6 @@ void snf(void *)
 
 void send_new_freq(long freq)
 {
-	xml_query = false;
 	if (!fldigi_online) return;
 	xmlvfo.freq = freq;
 	Fl::awake(snf);
@@ -160,7 +158,6 @@ void snm(void *)
 }
 
 void send_modes() { 
-	xml_query = false;
 	if (!fldigi_online) return;
 	Fl::awake(snm);
 }
@@ -191,7 +188,6 @@ void sbs(void *)
 
 void send_bandwidths()
 {
-	xml_query = false;
 	if (!fldigi_online) return;
 	Fl::awake(sbs);
 }
@@ -229,7 +225,6 @@ void smc(void *m)
 
 void send_new_mode(int m)
 {
-	xml_query = false;
 	if (!fldigi_online || !selrig->modes_) return;
 	Fl::awake(smc, (void *)m);
 }
@@ -246,7 +241,6 @@ void sbc(void *val)
 
 void send_new_bandwidth(int bw)
 {
-	xml_query = false;
 	if (!fldigi_online || !selrig->bandwidths_) return;
 	Fl::awake(sbc, (void*)bw);
 }
@@ -449,14 +443,13 @@ static void get_all_status()
 	try {
 		execute("system.multicall", *status_query, status);
 		check_for_ptt_change(status[0][0]);
-		if (!ptt_on && xml_query) {
+		if (!ptt_on) {
 			check_for_mode_change(status[2][0]);
 			check_for_bandwidth_change(status[3][0]);
 			check_for_frequency_change(status[1][0]);
 		}
 	} catch (...) {
 	}
-	xml_query = false;
 }
 
 void * digi_loop(void *d)
