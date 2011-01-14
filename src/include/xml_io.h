@@ -6,7 +6,6 @@ extern bool fldigi_online;
 extern bool run_digi_loop;
 extern bool bypass_digi_loop;
 extern bool rig_reset;
-extern bool xml_query;
 
 extern void open_rig_xmlrpc();
 extern void send_new_freq(long);
