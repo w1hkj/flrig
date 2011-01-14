@@ -12,6 +12,8 @@ public:
 	RIG_TT599();
 	~RIG_TT599(){}
 
+	void initialize();
+
 	long get_vfoA();
 	void set_vfoA(long);
 	long get_vfoB();
@@ -24,6 +26,9 @@ public:
 	int  get_bwA();
 	void set_bwB(int bw);
 	int  get_bwB();
+
+	bool can_split() { return true;}
+	void set_split(bool val);
 	bool twovfos() { return true;}
 
 	void set_PTT_control(int val);
@@ -39,8 +44,6 @@ public:
 	int  get_smeter();
 	int  get_power_out();
 	int  get_swr();
-	
-
 
 //	void set_agc_level();
 };
