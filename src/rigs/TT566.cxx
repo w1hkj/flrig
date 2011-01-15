@@ -48,6 +48,9 @@ RIG_TT566::RIG_TT566() {
 	
 	max_power = 100;
 
+	has_rf_control =
+	has_volume_control =
+	has_ifshift_control =
 	has_swr_control =
 	has_mode_control =
 	has_bandwidth_control =
@@ -302,5 +305,67 @@ int  RIG_TT566::get_power_out()
 		if (n < replystr.length()) n++;
 		sscanf(&replystr[n], "%d", &refpwr);
 	}
+	LOG_INFO("pwr out: %s = %d, %d", str2hex(replystr.c_str(), replystr.length()), fwdpwr, refpwr);
 	return fwdpwr;
 }
+
+int RIG_TT566::get_volume_control()
+{
+	cmd = "?UM\r";
+	sendCommand(cmd, 6);
+	int val = 0;
+	if (replystr.length() > 4)
+		sscanf(&replystr[3], "%d", &val);
+	return val;
+}
+
+void RIG_TT566::set_volume_control(int val)
+{
+	cmd = "*UM";
+	cmd.append(to_decimal(val,2));
+	cmd += '\r';
+	sendCommand(cmd,0);
+}
+
+void RIG_TT566::set_if_shift(int val)
+{
+	char sznum[6];
+	snprintf(sznum, sizeof(sznum), "%d", val);
+	cmd = "*RMP";
+	cmd.append(sznum);
+	cmd += '\r';
+	sendCommand(cmd,0);
+}
+
+bool RIG_TT566::get_if_shift(int &val)
+{
+	int retval = 0;
+	cmd = "?RMP\r";
+	sendCommand(cmd, 9);
+	if (replystr.find("@RMP") == 0)
+		sscanf(&replystr[4], "%d", &retval);
+	val = retval;
+	if (val) return true;
+	return false;
+}
+
+void RIG_TT566::set_rf_gain(int val)
+{
+	char sznum[4];
+	snprintf(sznum, sizeof(sznum), "%d", val);
+	cmd = "*RMG";
+	cmd.append(sznum);
+	cmd += '\r';
+	sendCommand(cmd,0);
+}
+
+int  RIG_TT566::get_rf_gain()
+{
+	int retval = 0;
+	cmd = "?RMG\r";
+	sendCommand(cmd, 8);
+	if (replystr.find("@RMG") == 0)
+		sscanf(&replystr[4], "%d", &retval);
+	return retval;
+}
+
