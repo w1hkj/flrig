@@ -284,50 +284,14 @@ static void check_for_frequency_change(const XmlRpcValue& freq)
 			xmlvfo.freq = newfreq;
 			xmlvfo.src = XML;
 			queB.push(xmlvfo);
-//			Fl::awake(setFreqDispB, (void *)xmlvfo.freq);
 		} else {
 			xmlvfo = vfo;
 			xmlvfo.freq = newfreq;
 			xmlvfo.src = XML;
 			queA.push(xmlvfo);
-//			Fl::awake(setFreqDispA, (void *)xmlvfo.freq);
 		}
 	}
 }
-
-/*
-static void update_mode_change(void *d)
-{
-	int imode = (int)(reinterpret_cast<long>(d));
-	vfo.imode = imode;
-	useB ? vfoB.imode = imode : vfoA.imode = imode;
-
-	pthread_mutex_lock(&mutex_serial);
-	if (selrig->restore_mbw) {
-		selrig->set_bwA(selrig->last_bw);
-		selrig->last_bw = vfo.iBW;
-	}
-	if (selrig->adjust_bandwidth(vfo.imode) != -1) {
-		if (!useB) {
-			selrig->set_modeA(vfo.imode);
-			selrig->set_bwA(vfo.iBW);
-		} else {
-			selrig->set_modeB(vfo.imode);
-			selrig->set_bwB(vfo.iBW);
-		}
-	} else
-		if (!useB)
-			selrig->set_modeA(vfo.imode);
-		else
-			selrig->set_modeB(vfo.imode);
-	pthread_mutex_unlock(&mutex_serial);
-
-	opMODE->index(imode);
-	send_bandwidths_e();
-	updateBandwidthControl(NULL);
-	return;
-}
-*/
 
 static void check_for_mode_change(const XmlRpcValue& new_mode)
 {
@@ -350,21 +314,9 @@ static void check_for_mode_change(const XmlRpcValue& new_mode)
 				xmlvfo.src = XML;
 				queA.push(xmlvfo);
 			}
-//			Fl::awake(update_mode_change, (void *)imode);
 		}
 	}
 }
-
-/*
-static void update_bandwidth_change(void *d)
-{
-	int ibw = (int)(reinterpret_cast<long>(d));
-	vfo.iBW = useB ? vfoB.iBW = ibw : vfoA.iBW = ibw;
-	selrig->set_bwA(ibw);
-	opBW->index(ibw);
-	return;
-}
-*/
 
 static void check_for_bandwidth_change(const XmlRpcValue& new_bw)
 {
@@ -388,13 +340,12 @@ static void check_for_bandwidth_change(const XmlRpcValue& new_bw)
 				xmlvfo.src = XML;
 				queA.push(xmlvfo);
 			}
-//			Fl::awake(update_bandwidth_change, (void *)ibw);
 		}
 	}
 }
 
 #define REG_UPDATE_INTERVAL  50 // milliseconds
-#define CHECK_UPDATE_COUNT   (5000 / REG_UPDATE_INTERVAL)
+#define CHECK_UPDATE_COUNT   (1000 / REG_UPDATE_INTERVAL)
 
 static void send_rig_info()
 {
@@ -404,12 +355,6 @@ static void send_rig_info()
 		execute(rig_set_name, selrig->name_, res);
 		if (selrig->bandwidths_) send_bandwidths_e();
 		send_modes_e();
-//MilliSleep(200);
-
-//printf("fldigi init:\nvfo %ld, mode %s, bandwidth %s\n",
-//vfo.freq, 
-//selrig->modes_[vfo.imode],
-//selrig->bandwidths_ ? selrig->bandwidths_[vfo.iBW] : "none");
 
 		execute(rig_set_frequency, (double)vfo.freq, res);
 		execute(rig_set_mode, selrig->modes_[vfo.imode], res);
@@ -449,6 +394,7 @@ static void get_all_status()
 			check_for_frequency_change(status[1][0]);
 		}
 	} catch (...) {
+		throw;
 	}
 }
 
