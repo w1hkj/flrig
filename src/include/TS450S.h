@@ -13,6 +13,8 @@ public:
 	RIG_TS450S();
 	~RIG_TS450S(){}
 
+	void initialize();
+
 	bool sendTScommand(string, int, bool);
 
 	long get_vfoA();

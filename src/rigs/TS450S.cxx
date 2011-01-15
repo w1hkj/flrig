@@ -75,6 +75,12 @@ bool RIG_TS450S::sendTScommand(string cmd, int retnbr, bool loghex)
 	return 0;
 }
 
+void RIG_TS450S::initialize()
+{
+	cmd = "RM1;"; // select measurement '1' (swr)
+	sendTScommand(cmd, 0, false);
+}
+
 long RIG_TS450S::get_vfoA ()
 {
 	cmd = "FA;";
@@ -121,7 +127,7 @@ int RIG_TS450S::get_smeter()
 // RM cmd 0 ... 100 (rig values 0 ... 8)
 int RIG_TS450S::get_swr()
 {
-	cmd = "RM1;RM;"; // select measurement '1' (swr) and read meter
+	cmd = "RM;";
 	if (!sendTScommand(cmd, 8, false))
 		return 0;
 	if (replystr.find("RM") != 0) {
@@ -130,7 +136,7 @@ int RIG_TS450S::get_swr()
 	}
 	replybuff[7] = 0;
 	int mtr = atoi(&replybuff[3]);
-	mtr = (mtr * 100) / 30;
+	mtr = (mtr * 50) / 30;
 	return mtr;
 }
 
