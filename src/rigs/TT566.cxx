@@ -275,7 +275,7 @@ int  RIG_TT566::get_smeter()
 {
 	int dbm = 0;
 	cmd = "?S\r";
-	sendCommand(cmd, 9);
+	sendCommand(cmd, 12);
 	if (replystr.find("@SRM") == 0)
 		sscanf(&replystr[4], "%d", &dbm);
 	LOG_INFO("smeter: %s = %d", str2hex(replystr.c_str(), replystr.length()), dbm);
