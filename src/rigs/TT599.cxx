@@ -15,8 +15,8 @@
 const char RIG_TT599name_[] = "Eagle";
 
 const char *RIG_TT599modes_[] = {
-		"USB", "LSB", "CWL", "AM", "FM", NULL};
-static const char RIG_TT599_mode_type[] = {'U', 'L', 'L', 'U', 'U'};
+		"USB", "LSB", "CWU", "CWL", "AM", "FM", NULL};
+static const char RIG_TT599_mode_type[] = {'U', 'L', 'U', 'L', 'U', 'U'};
 
 const char *RIG_TT599widths[] = { 
 "100",  "200",  "300",  "400",  "500",
@@ -292,16 +292,18 @@ int  RIG_TT599::get_attenuator()
 	return 0;
 }
 
+int smeter_count = 10;
 int  RIG_TT599::get_smeter()
 {
 	int dbm = 0;
 	cmd = "?S\r";
-	if (sendCommand(cmd, 7) == 7) {
-		if (replystr.find("@SRM") == 0)
-			sscanf(&replystr[4], "%d", &dbm);
+	sendCommand(cmd, 7);
+	size_t pos = replystr.find("@SRM");
+	if (pos != string::npos) {
+		sscanf(&replystr[pos +  4], "%d", &dbm);
 		LOG_INFO("%s", str2hex(replystr.c_str(), replystr.length()));
 	}
-	return dbm;
+	return 5 * dbm / 6;
 }
 
 int  RIG_TT599::get_swr()
