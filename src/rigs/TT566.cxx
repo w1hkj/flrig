@@ -279,7 +279,7 @@ int  RIG_TT566::get_smeter()
 	if (replystr.find("@SRM") == 0)
 		sscanf(&replystr[4], "%d", &dbm);
 	LOG_INFO("smeter: %s = %d", str2hex(replystr.c_str(), replystr.length()), dbm);
-	return dbm;
+	return 5 * dbm / 6; // 60 = S9 --> 50% of full scale of flrig display
 }
 
 int  RIG_TT566::get_swr()
