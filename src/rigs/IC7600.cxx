@@ -95,10 +95,9 @@ int RIG_IC7600::get_modeA()
 void RIG_IC7600::set_mic_gain(int v)
 {
 	ICvol = (int)(v * 255 / 100);
-LOG_INFO("%d", ICvol);
 	if (!progStatus.USBaudio) {
 		cmd = pre_to;
-		cmd.append("\x14\x01");
+		cmd.append("\x14\x0B");
 		cmd.append(to_bcd(ICvol, 3));
 		cmd.append( post );
 	} else {
@@ -111,7 +110,7 @@ LOG_INFO("%d", ICvol);
 	sendICcommand (cmd, 6);
 	checkresponse(6);
 	if (RIG_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+		LOG_WARN("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 // alh added ++++++++++++++++++++++++++++

@@ -157,10 +157,8 @@ void RIG_IC746::set_vfoA (long freq)
 	cmd.append( post );
 	sendICcommand(cmd, 6);
 	checkresponse(6);
-RIG_DEBUG = true;
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-RIG_DEBUG = false;
 }
 
 long RIG_IC746::get_vfoB ()
@@ -186,10 +184,8 @@ void RIG_IC746::set_vfoB (long freq)
 	cmd.append( post );
 	sendICcommand(cmd, 6);
 	checkresponse(6);
-RIG_DEBUG = true;
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-RIG_DEBUG = false;
 	select_vfoA();
 }
 

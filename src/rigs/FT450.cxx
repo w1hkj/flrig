@@ -100,9 +100,7 @@ void RIG_FT450::set_vfoA (long freq)
 		freq /= 10;
 	}
 	sendCommand(cmd, 0, false);
-	RIG_DEBUG = true;
 	sendCommand(cmd, 0, false);
-	RIG_DEBUG = false;
 }
 
 long RIG_FT450::get_vfoB ()
@@ -119,8 +117,6 @@ long RIG_FT450::get_vfoB ()
 
 void RIG_FT450::set_vfoB (long freq)
 {
-	RIG_DEBUG = true;
-
 	freqB = freq;
 	cmd = "FB00000000;";
 	for (int i = 9; i > 1; i--) {
@@ -128,8 +124,6 @@ void RIG_FT450::set_vfoB (long freq)
 		freq /= 10;
 	}
 	sendCommand(cmd, 0, false);
-
-	RIG_DEBUG = false;
 }
 
 void RIG_FT450::set_split(bool on)
