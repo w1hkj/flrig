@@ -328,18 +328,18 @@ int parse_args(int argc, char **argv, int& idx)
 		exit (0);
 	}
 	if (strcasecmp("--rig_debug", argv[idx]) == 0) {
-		RIG_DEBUG = 1;
+		RIG_DEBUG = true;
 		idx++;
 		return 1;
 	}
 	if (strcasecmp("--xml_debug", argv[idx]) == 0) {
-		XML_DEBUG = 1;
+		XML_DEBUG = true;
 		idx++;
 		return 1;
 	}
 	if (strcasecmp("--debug", argv[idx]) == 0) {
-		RIG_DEBUG = 1;
-		XML_DEBUG = 1;
+		RIG_DEBUG = true;
+		XML_DEBUG = true;
 		idx++;
 		return 1;
 	}
