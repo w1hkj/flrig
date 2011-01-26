@@ -174,6 +174,7 @@ public:
 	virtual void set_bwB(int val) {B.iBW = val; set_bwA(val);}
 	virtual int  get_bwB() {return B.iBW;}
 	virtual int  adjust_bandwidth(int m) {return -1;}
+	virtual const char **bwtable(int m) {return bandwidths_;}
 
 	virtual bool can_split() { return false;}
 	virtual void set_split(bool val) {split = val;}

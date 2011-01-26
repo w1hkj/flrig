@@ -295,6 +295,13 @@ void RIG_FT950::update_bandwidths()
 	}
 }
 
+const char ** RIG_FT950::bwtable(int n)
+{
+	if (n == 2 || n == 5 || n == 6 || n == 8)
+		return FT950_widths_CW;
+	return FT950_widths_SSB;
+}
+
 void RIG_FT950::set_modeA(int val)
 {
 	modeA = val;

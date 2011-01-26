@@ -36,7 +36,7 @@ static void fake_split(int on)
 
 void rigPTT(bool on)
 {
-	wait_query = true;
+//	wait_query = true;
 	pthread_mutex_lock(&mutex_serial);
 
 	if (on && progStatus.split && !selrig->can_split())
@@ -55,5 +55,5 @@ void rigPTT(bool on)
 		fake_split(on);
 
 	pthread_mutex_unlock(&mutex_serial);
-	wait_query = false;
+//	wait_query = false;
 }

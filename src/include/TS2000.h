@@ -48,6 +48,7 @@ public:
 	void get_mic_min_max_step(int &min, int &max, int &step);
 
 	bool sendTScommand(string, int, bool);
+	const char **bwtable(int);
 
 };
 

@@ -272,7 +272,7 @@ int main (int argc, char *argv[])
 
 	open_rig_xmlrpc();
 
-	wait_query = true;
+//	wait_query = true;
 	digi_thread = new pthread_t;      
 	if (pthread_create(digi_thread, NULL, digi_loop, NULL)) {
 		perror("pthread_create");

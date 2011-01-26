@@ -333,6 +333,25 @@ int RIG_FT2000::adjust_bandwidth(int m)
 	return bwA;
 }
 
+const char **RIG_FT2000::bwtable(int m)
+{
+	switch (m) {
+		case 0 : case 1 :
+			return FT2000_SSBwidths;
+			break;
+		case 2 : case 6 :
+			return FT2000_CWwidths;
+			break;
+		case 5 : case 7 : case 8 : case 11 :
+			return FT2000_PKT_RTTYwidths;
+			break;
+		case 3 : case 4 : case 9 : case 10 :
+			return FT2000_AMFMwidths;
+			break;
+	}
+	return FT2000_SSBwidths;
+}
+
 void RIG_FT2000::set_bwA(int val)
 {
 	bwA = val;

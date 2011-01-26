@@ -481,6 +481,30 @@ int RIG_IC7200::adjust_bandwidth(int m)
 	return bwA;
 }
 
+const char ** RIG_IC7200::bwtable(int m)
+{
+	switch (m) {
+		case 2: // AM
+			return IC7200_AMwidths;
+			break;
+		case 3:
+		case 5: // CW
+			return IC7200_SSBwidths;
+			break;
+		case 4:
+		case 6: // RTTY
+			return IC7200_RTTYwidths;
+			break;
+		case 0:
+		case 1:
+		case 7:
+		case 8: 
+		default: // SSB
+			return IC7200_SSBwidths;
+	}
+	return IC7200_SSBwidths;
+}
+
 void RIG_IC7200::set_bwA(int val)
 {
 	bwA = val;

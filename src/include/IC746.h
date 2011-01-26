@@ -73,8 +73,10 @@ public:
 	void set_notch(bool on, int val);
 	bool get_notch(int &val);
 	void get_notch_min_max_step(int &min, int &max, int &step);
-	
+
 	bool twovfos() { return true; }
+	const char **bwtable(int);
+
 };
 
 extern const char *IC746modes_[];
