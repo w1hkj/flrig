@@ -655,6 +655,17 @@ int RIG_IC746PRO::adjust_bandwidth(int m)
 	return (bwA = 0);
 }
 
+const char **RIG_IC746PRO::bwtable(int m)
+{
+	if (m == 0 || m == 1 || m == 8 || m == 9) //SSB
+		return IC746PRO_SSBwidths;
+	if (m == 3 || m == 6) //CW
+		return IC746PRO_SSBwidths;
+	if (m == 4 || m == 7) //RTTY
+		return IC746PRO_RTTYwidths;
+	return IC746PRO_AMFMwidths;
+}
+
 int RIG_IC746PRO::get_swr()
 {
 	cmd = pre_to;

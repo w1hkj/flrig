@@ -288,6 +288,17 @@ void RIG_TS2000::set_widths()
 	}
 }
 
+const char **RIG_TS2000::bwtable(int m)
+{
+	if (m == 0 || m == 1 || m == 3)
+		return TS2000_SSBwidths;
+	else if (m == 2 || m == 6)
+		return TS2000_CWwidths;
+	else if (m == 5 || m == 7)
+		return TS2000_FSKwidths;
+	return TS2000_AMwidths;
+}
+
 void RIG_TS2000::set_modeA(int val)
 {
 	modeA = val;

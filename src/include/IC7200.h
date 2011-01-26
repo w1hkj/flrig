@@ -48,6 +48,7 @@ public:
 	void set_vox_onoff();
 	void set_split(bool);
 	bool can_split() { return true; }
+	const char **bwtable(int);
 
 protected:
 	int  filter_nbr;

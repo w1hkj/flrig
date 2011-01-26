@@ -319,6 +319,27 @@ void RIG_TS570::set_widths()
 	}
 }
 
+const char **RIG_TS570::bwtable(int m)
+{
+	switch (m) {
+		case 0:
+		case 1:
+		case 3:
+		case 4:
+			return TS570_SSBwidths;
+			break;
+		case 2:
+		case 6:
+			return TS570_CWwidths;
+			break;
+		case 5:
+		case 7:
+			return TS570_FSKwidths;
+			break;
+	}
+	return TS570_SSBwidths;
+}
+
 void RIG_TS570::set_modeA(int val)
 {
 	modeA = val;

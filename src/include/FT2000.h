@@ -46,6 +46,7 @@ public:
 	int  adjust_bandwidth(int);
 
 	bool sendFTcommand(string, int, bool);
+	const char **bwtable(int);
 
 };
 

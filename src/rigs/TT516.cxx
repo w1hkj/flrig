@@ -239,6 +239,12 @@ int RIG_TT516::adjust_bandwidth(int m)
 	return inuse == onA ? A.iBW : B.iBW;
 }
 
+const char **RIG_TT516::bwtable(int m)
+{
+	if (m == 0) return TT516_AM_widths;
+	return TT516_widths;
+}
+
 void RIG_TT516::set_modeA(int val)
 {
 	A.imode = val;
