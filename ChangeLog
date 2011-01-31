@@ -1,5 +1,11 @@
-2011-01-15  David Freese  <w1hkj@w1hkj.com>
+2011-01-25  David Freese  <w1hkj@w1hkj.com>
 
+	bd00562: Que management
+	ae0347b: IC7600 IC746 FT450
+	9cb6b9d: Orion-II smeter
+	d2a5697: Eagle CWU-smeter
+	e78c7fb: Orion-II Smeter
+	0f1eea4: Exception handling
 	c10115c: TS450S init
 	01d6148: Orion-II
 	72b812d: Eagle split
