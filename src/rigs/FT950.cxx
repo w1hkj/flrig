@@ -4,6 +4,7 @@
  * a part of flrig
  * 
  * Copyright 2009, Dave Freese, W1HKJ
+ * Copyright 2011, Terry Embry, KJ4EED
  * 
  */
 
@@ -11,6 +12,8 @@
 #include "FT950.h"
 #include "debug.h"
 #include "support.h"
+
+#define WVALS_LIMIT 100
 
 static const char FT950name_[] = "FT-950";
 
@@ -26,13 +29,20 @@ static const char *FT950_widths_SSB[] = {
 "1950", "2100", "2250", "2400", "2450", "2500", "2600", "2700",
 "2800", "2900", "3000", NULL };
 static int FT950_wvals_SSB[] = {
-1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
+1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20, WVALS_LIMIT};
 
 static const char *FT950_widths_CW[] = {
 "100", "200", "300", "400", "500",
 "800", "1200", "1400", "1700", "2000", "2400", NULL };
 static int FT950_wvals_CW[] = {
-3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
+3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, WVALS_LIMIT };
+
+static const int FT950_wvals_AMFM[] = { 0, WVALS_LIMIT };
+static const char *FT950_widths_AMnar[]  = {  "6000", NULL };
+static const char *FT950_widths_AMwide[] = {  "9000", NULL };
+static const char *FT950_widths_FMnar[]  = { "12500", NULL };
+static const char *FT950_widths_FMwide[] = { "25000", NULL };
+
 
 RIG_FT950::RIG_FT950() {
 // base class values	
@@ -108,6 +118,37 @@ void RIG_FT950::set_vfoA (long freq)
 	}
 	sendCommand(cmd, 0, false);
 }
+
+long RIG_FT950::get_vfoB ()
+{
+	cmd = "FB;";
+	if (sendCommand(cmd, 11, false)) {
+		int f = 0;
+		for (size_t n = 2; n < 10; n++)
+			f = f*10 + replybuff[n] - '0';
+		freqB = f;
+	}
+	return freqB;
+}
+
+
+void RIG_FT950::set_vfoB (long freq)
+{
+	freqB = freq;
+	cmd = "FB00000000;";
+	for (int i = 9; i > 1; i--) {
+		cmd[i] += freq % 10;
+		freq /= 10;
+	}
+	sendCommand(cmd, 0, false);
+}
+
+
+bool RIG_FT950::twovfos()
+{
+	return true;
+}
+
 
 int RIG_FT950::get_smeter()
 {
@@ -282,17 +323,26 @@ int RIG_FT950::get_preamp()
 }
 
 
-void RIG_FT950::update_bandwidths()
+int RIG_FT950::adjust_bandwidth(int val)
 {
-	if (modeA == 2 || modeA == 5 || modeA == 6 || modeA == 8) {
+	if (val == 2 || val == 5 || val == 6 || val == 8) {
 		bandwidths_ = FT950_widths_CW;
 		bw_vals_ = FT950_wvals_CW;
-		bwA = 7; // 500 Hz
+		bwA = get_bwA();
+	} else if (val == 3 || val == 4 || val == 10 || val == 12) {
+		if (val == 3) bandwidths_ = FT950_widths_FMwide;
+		else if (val ==  4) bandwidths_ = FT950_widths_AMwide;
+		else if (val == 10) bandwidths_ = FT950_widths_FMnar;
+		else if (val == 12) bandwidths_ = FT950_widths_AMnar;
+		bw_vals_ = FT950_wvals_AMFM;
+		bwA = 0;
 	} else {
 		bandwidths_ = FT950_widths_SSB;
 		bw_vals_ = FT950_wvals_SSB;
-		bwA = 13; // 2400 Hz
+		bwA = get_bwA();
 	}
+	bwB = bwA;
+	return bwA;
 }
 
 const char ** RIG_FT950::bwtable(int n)
@@ -309,14 +359,18 @@ void RIG_FT950::set_modeA(int val)
 	cmd += FT950_mode_chr[val];
 	cmd += ';';
 	sendCommand(cmd, 0, false);
-	update_bandwidths();
+	adjust_bandwidth(modeA);
 }
 
 int RIG_FT950::get_modeA()
 {
-	if (sendCommand("MD0;", 5, false))
-		modeA = replybuff[3];
-	update_bandwidths();
+	if (sendCommand("MD0;", 5, false)) {
+		int md = replybuff[3];
+		if (md <= '9') md = md - '1';
+		else md = 9 + md - 'A';
+		modeA = md;
+	}
+	adjust_bandwidth(modeA);
 	return modeA;
 }
 
@@ -324,6 +378,9 @@ void RIG_FT950::set_bwA(int val)
 {
 	int bw_indx = bw_vals_[val];
 	bwA = val;
+	if (modeA == 3 || modeA == 4 || modeA == 10 || modeA == 12) {
+		return;
+	}
 	cmd = "SH0";
 	cmd += '0' + bw_indx / 10;
 	cmd += '0' + bw_indx % 10;
@@ -334,14 +391,16 @@ void RIG_FT950::set_bwA(int val)
 int RIG_FT950::get_bwA()
 {
 	int i = 0;
-	int limit = sizeof(bw_vals_)/sizeof(int);
-	if (sendCommand("SH0;", 6, false)) {
+	if (modeA == 3 || modeA == 4 || modeA == 10 || modeA == 12) {
+		bwA = 0;
+		return bwA;	
+	} else if (sendCommand("SH0;", 6, false)) {
 		replybuff[5] = 0;
 		int bw_indx = atoi(&replybuff[3]);
-		for (i = 0; i < limit; i++)
+		for (i = 0; bw_vals_[i] < WVALS_LIMIT; i++)
 			if (bw_vals_[i] == bw_indx) break;
 	}
-	if (i < limit) bwA = i;
+	if (bw_vals_[i]  < WVALS_LIMIT) bwA = i;
 	return bwA;
 }
 

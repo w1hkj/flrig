@@ -6,7 +6,7 @@
 class RIG_FT950 : public rigbase {
 private:
 	bool notch_on;
-	void update_bandwidths();
+	// void update_bandwidths();
 protected:
 	int  preamp_level;
 	int  atten_level;
@@ -17,6 +17,9 @@ public:
 	void initialize();
 	long get_vfoA();
 	void set_vfoA(long);
+	long get_vfoB();
+	void set_vfoB(long);
+	bool twovfos();
 	int  get_smeter();
 	int  get_swr();
 	int  get_power_out();
@@ -35,7 +38,7 @@ public:
 	int  get_modetype(int n);
 	void set_bwA(int val);
 	int  get_bwA();
-	int  adjust_bandwidth();
+	int  adjust_bandwidth(int val);
 	void set_if_shift(int val);
 	bool get_if_shift(int &val);
 	void get_if_min_max_step(int &min, int &max, int &step);

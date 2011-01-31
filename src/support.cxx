@@ -105,6 +105,13 @@ void read_vfo()
 			bypass_digi_loop = false;
 			pthread_mutex_unlock(&mutex_xmlrpc);
 		}
+		if ( selrig->twovfos() ) {
+			freq = selrig->get_vfoB();
+			if (freq != vfoB.freq) {
+				vfoB.freq = freq;
+				Fl::awake(setFreqDispB, (void *)vfoB.freq);
+			}
+		}
 	} else {
 		if (freq != vfoB.freq) {
 			vfoB.freq = freq;
@@ -1053,13 +1060,14 @@ void zeroXmtMeters(void *d)
 void setFreqDispA(void *d)
 {
 	long f = (long)d;
-	FreqDispA->value(f);//vfoA.freq);
+	FreqDispA->value(f);
 	FreqDispA->redraw();
 }
 
-void setFreqDispB(void *)
+void setFreqDispB(void *d)
 {
-	FreqDispB->value(vfoB.freq);
+	long f = (long)d;
+	FreqDispB->value(f);
 	FreqDispB->redraw();
 }
 
@@ -1392,6 +1400,9 @@ void initRig()
 		progStatus.freq_A = transceiverA.freq;
 		progStatus.imode_A = transceiverA.imode;
 		progStatus.iBW_A = transceiverA.iBW;
+		progStatus.freq_B = transceiverB.freq;
+		progStatus.imode_B = transceiverB.imode;
+		progStatus.iBW_B = transceiverB.iBW;
 		mnuKeepData->set();
 	} else
 		mnuKeepData->clear();
