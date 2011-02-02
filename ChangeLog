@@ -1,6 +1,14 @@
-2011-01-25  David Freese  <w1hkj@w1hkj.com>
 
-	bd00562: Que management
+
+=Version 1.0.1=
+
+2011-01-31  Terry Embry, KJ4EED  <mrtembry@yahoo.com>
+
+	d33ef33: FT950 update
+
+2011-01-26  David Freese  <w1hkj@w1hkj.com>
+
+	d3a2af4: Que management
 	ae0347b: IC7600 IC746 FT450
 	9cb6b9d: Orion-II smeter
 	d2a5697: Eagle CWU-smeter
