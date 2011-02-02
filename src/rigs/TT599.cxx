@@ -74,8 +74,8 @@ long RIG_TT599::get_vfoA ()
 	if (sendCommand(cmd, 12) == 12) {
 		freqA = fm_decimal(&replystr[3], 8);
 	}
-	LOG_INFO("(%d) : %s : %s", 
-		replystr.length(), replystr.c_str(), str2hex(replystr.c_str(), replystr.length()));
+//	LOG_INFO("(%ld) : %s : %s", 
+//		replystr.length(), replystr.c_str(), str2hex(replystr.c_str(), replystr.length()));
 	return freqA;
 }
 
@@ -85,7 +85,7 @@ void RIG_TT599::set_vfoA (long freq)
 	cmd = "*AF";
 	cmd.append( to_decimal( freq, 8 ) );
 	cmd += '\r';
-	LOG_INFO("set A : %s", cmd.c_str());
+//	LOG_INFO("set A : %s", cmd.c_str());
 	sendCommand(cmd, 0);
 }
 
@@ -95,8 +95,8 @@ long RIG_TT599::get_vfoB ()
 	if (sendCommand(cmd, 12) == 12) {
 		freqB = fm_decimal(&replystr[3], 8);
 	}
-	LOG_INFO("(%d): %s  : %s", 
-		replystr.length(), replystr.c_str(), str2hex(replystr.c_str(), replystr.length()));
+//	LOG_INFO("(%ld): %s  : %s", 
+//		replystr.length(), replystr.c_str(), str2hex(replystr.c_str(), replystr.length()));
 	return freqB;
 }
 
@@ -106,7 +106,7 @@ void RIG_TT599::set_vfoB (long freq)
 	cmd = "*BF";
 	cmd.append( to_decimal( freq, 8 ) );
 	cmd += '\r';
-	LOG_INFO("set B : %s", cmd.c_str());
+//	LOG_INFO("set B : %s", cmd.c_str());
 	sendCommand(cmd, 0);
 }
 
@@ -131,8 +131,8 @@ int RIG_TT599::get_modeA()
 	if( sendCommand (cmd, 6 ) == 6) {
 		modeA = replystr[4] - '0';
 	}
-	LOG_INFO("(%d): %s  : %s", 
-		replystr.length(), replystr.c_str(), str2hex(replystr.c_str(), replystr.length()));
+//	LOG_INFO("(%ld): %s  : %s", 
+//		replystr.length(), replystr.c_str(), str2hex(replystr.c_str(), replystr.length()));
 	return modeA;
 }
 
@@ -151,8 +151,8 @@ int RIG_TT599::get_modeB()
 	if( sendCommand (cmd, 6 ) == 6) {
 		modeB = replystr[4] - '0';
 	}
-	LOG_INFO("(%d): %s  : %s", 
-		replystr.length(), replystr.c_str(), str2hex(replystr.c_str(), replystr.length()));
+//	LOG_INFO("(%ld): %s  : %s", 
+//		replystr.length(), replystr.c_str(), str2hex(replystr.c_str(), replystr.length()));
 	return modeB;
 }
 
@@ -169,8 +169,8 @@ int RIG_TT599::get_bwA()
 {
 	cmd = "?RMF\r";
 	int ret = sendCommand(cmd, 9);
-	LOG_INFO("(%d) : %s : %s", 
-		replystr.length(), replystr.c_str(), str2hex(replystr.c_str(), replystr.length()));
+//	LOG_INFO("(%ld) : %s : %s", 
+//		replystr.length(), replystr.c_str(), str2hex(replystr.c_str(), replystr.length()));
 	if (ret <= 9) {
 		string bwstr = "";
 		if (replystr.length() == 9) bwstr = replystr.substr(4, 4);
@@ -201,8 +201,8 @@ int RIG_TT599::get_bwB()
 {
 	cmd = "?RMF\r";
 	int ret = sendCommand(cmd, 9);
-	LOG_INFO("(%d) : %s : %s", 
-		replystr.length(), replystr.c_str(), str2hex(replystr.c_str(), replystr.length()));
+//	LOG_INFO("(%/d) : %s : %s", 
+//		replystr.length(), replystr.c_str(), str2hex(replystr.c_str(), replystr.length()));
 	if (ret <= 9) {
 		string bwstr = "";
 		if (replystr.length() == 9) bwstr = replystr.substr(4, 4);
@@ -301,7 +301,7 @@ int  RIG_TT599::get_smeter()
 	size_t pos = replystr.find("@SRM");
 	if (pos != string::npos) {
 		sscanf(&replystr[pos +  4], "%d", &dbm);
-		LOG_INFO("%s", str2hex(replystr.c_str(), replystr.length()));
+//		LOG_INFO("%s", str2hex(replystr.c_str(), replystr.length()));
 	}
 	return 5 * dbm / 6;
 }
