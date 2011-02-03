@@ -31,7 +31,7 @@ RIG_IC746::RIG_IC746() {
 	_mode_type = IC746_mode_type;
 
 	comm_baudrate = BR9600;
-	stopbits = 2;
+	stopbits = 1;
 	comm_retries = 2;
 	comm_wait = 5;
 	comm_timeout = 50;
