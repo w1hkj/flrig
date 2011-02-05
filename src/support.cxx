@@ -1385,6 +1385,9 @@ void initRig()
 
 	selrig->initialize();
 
+	FreqDispA->set_precision(selrig->precision);
+	FreqDispB->set_precision(selrig->precision);
+
 	if (progStatus.CIV > 0) selrig->adjustCIV(progStatus.CIV);
 
 	transceiverA.freq = selrig->get_vfoA();
@@ -1464,18 +1467,33 @@ void initRig()
 
 	if (selrig->has_rit) {
 		cntRIT->value(progStatus.rit_freq);
+		int min, max, step;
+		selrig->get_RIT_min_max_step(min, max, step);
+		cntRIT->minimum(min);
+		cntRIT->maximum(max);
+		cntRIT->step(step);
 		cntRIT->activate();
 	} else
 		cntRIT->deactivate();
 
 	if (selrig->has_xit) {
 		cntXIT->value(progStatus.xit_freq);
+		int min, max, step;
+		selrig->get_XIT_min_max_step(min, max, step);
+		cntXIT->minimum(min);
+		cntXIT->maximum(max);
+		cntXIT->step(step);
 		cntXIT->activate();
 	} else
 		cntXIT->deactivate();
 
 	if (selrig->has_bfo) {
 		cntBFO->value(progStatus.bfo_freq);
+		int min, max, step;
+		selrig->get_BFO_min_max_step(min, max, step);
+		cntBFO->minimum(min);
+		cntBFO->maximum(max);
+		cntBFO->step(step);
 		cntBFO->activate();
 	} else
 		cntBFO->deactivate();
@@ -1647,7 +1665,10 @@ void initRig()
 	}
 
 	if (selrig->has_auto_notch) {
-		btnAutoNotch->label("AN");
+		if (rig_nbr == RAY152)
+			btnAutoNotch->label("AGC");
+		else
+			btnAutoNotch->label("AN");
 		progStatus.auto_notch = selrig->get_auto_notch();
 		btnAutoNotch->value(progStatus.auto_notch);
 		btnAutoNotch->show();

@@ -26,18 +26,20 @@ enum {
 	NONE,
 	FT100D, FT450, FT767, FT817, FT857D, // 5
 	FT897D, FT950, FT1000MP, FT2000,
-	
+
 	IC703,								// 10
 	IC706MKIIG, IC718, IC728, IC735, IC746, // 15
 	IC746PRO, IC756PRO2, IC756PRO3, IC7000, IC7200, // 20
 	IC7600, IC7700, IC910H,
-	
+
 	K2, K3, // 25
-	
-	TS140, TS450S, TS480HX, TS480SAT, TS570, // 30
+
+	RAY152,
+
+	TS140, TS450S, TS480HX, TS480SAT, TS570, // 31
 	TS590S, TS2000,
-	 
-	TT516, TT535, TT538, TT550, TT563, TT566, TT588, TT599, // 40
+
+	TT516, TT535, TT538, TT550, TT563, TT566, TT588, TT599, // 41
 	LAST_RIG
 };
 
@@ -74,7 +76,7 @@ public:
 	int  modeB;
 	int  bwB;
 	long freqB;
-
+	int  precision;
 
 	int  def_mode;
 	int  defbw_;
@@ -236,10 +238,19 @@ public:
 
 	virtual void setRit(int v) {}
 	virtual int  getRit() {return 0;}
+	virtual void get_RIT_min_max_step(int &min, int &max, int &step) {
+		min = -100; max = 100; step = 1; }
+
 	virtual void setXit(int v) { XitFreq = v;}
 	virtual int  getXit() {return XitFreq;}
+	virtual void get_XIT_min_max_step(int &min, int &max, int &step) {
+		min = -100; max = 100; step = 1; }
+
 	virtual void setBfo(int v) {}
 	virtual int  getBfo() {return 0;}
+	virtual void get_BFO_min_max_step(int &min, int &max, int &step) {
+		min = -100; max = 100; step = 1; }
+
 	virtual void setVfoAdj(double v) {}
 
 	virtual void set_line_out() {}

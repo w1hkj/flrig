@@ -93,10 +93,18 @@ public:
 
 	void setRit(int v);
 	int  getRit();
+	void get_RIT_min_max_step(int &min, int &max, int &step) {
+		min = -500; max = 500; step = 1; }
+
 	void setXit(int v);
 	int  getXit();
+	void get_XIT_min_max_step(int &min, int &max, int &step) {
+		min = -500; max = 500; step = 1; }
+
 	void setBfo(int v);
 	int  getBfo();
+	void get_BFO_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 1000; step = 10; }
 
 	void setVfoAdj(double v);
 
