@@ -57,6 +57,7 @@ RIG_FT1000MP::RIG_FT1000MP() {
 	B.freq = 3580000;
 	B.imode = 1;
 	B.iBW = 1;
+	precision = 10;
 
 	has_mode_control =
 	has_bandwidth_control =
