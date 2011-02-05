@@ -85,13 +85,14 @@ RIG_TT516::RIG_TT516() {
 	comm_rtsptt = false;
 	comm_dtrptt = false;
 	serloop_timing = 200;
-	
-	modeA = 3;
+
+	A.imode = 3;
 	A.iBW = 36;
 	def_mode = 3;
 	defbw_ = 36;
 	deffreq_ = 14070000;
 	max_power = 25;
+	precision = 10;
 
 	has_power_control =
 	has_volume_control =
