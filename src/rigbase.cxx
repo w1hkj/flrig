@@ -63,6 +63,7 @@ rigbase::rigbase()
 	B.imode = 1;
 	B.iBW = 0;
 	inuse = onA;
+	precision = 1;
 
 	freqA = 14070000L;
 	modeA = 1;

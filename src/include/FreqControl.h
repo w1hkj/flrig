@@ -76,9 +76,14 @@ public:
 	void do_callback() { if (cbFunc) cbFunc(); }
 	int  handle(int event);
 	void visual_beep();
-	
+
+	void set_precision(int val) {
+		if (val % 10) val = 1;
+		precision = (val < 1) ? 1 : (val > 1000) ? 1000 : val;
+	}
+
 private:
-	Fl_Repeat_Button	  		*Digit[MAX_DIGITS];
+	Fl_Repeat_Button	  	*Digit[MAX_DIGITS];
 	Fl_Float_Input			*finp;
 	static const char	 	*Label[];
 	int					mult[MAX_DIGITS];
@@ -98,6 +103,7 @@ private:
 	static void freq_input_cb(Fl_Widget* input, void* arg);
 protected:
 	long val, oldval;
+	int  precision;
 };
 
 #endif 

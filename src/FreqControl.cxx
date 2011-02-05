@@ -38,6 +38,7 @@ const char *cFreqControl::Label[10] = {
 	"0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 	
 void cFreqControl::IncFreq (int nbr) {
+	if (nbr < log10(precision)) return;
 	double v = val;
 	v += mult[nbr];
 	if (v <= maxVal) {
@@ -48,6 +49,7 @@ void cFreqControl::IncFreq (int nbr) {
 }
 
 void cFreqControl::DecFreq (int nbr) {
+	if (nbr < log10(precision)) return;
 	long v = 1;
 	v = val - mult[nbr];
 	if (v >= minVal)
@@ -142,6 +144,8 @@ cFreqControl::cFreqControl(int x, int y, int w, int h, const char *lbl):
 	finp->hide();
 	parent()->remove(finp);
 
+	precision = 1;
+
 //	tooltip(_("Enter frequency or change with\nLeft/Right/Up/Down/Pg_Up/Pg_Down"));
 }
 
@@ -156,6 +160,8 @@ cFreqControl::~cFreqControl()
 
 void cFreqControl::updatevalue()
 {
+	val /= precision;
+	val *= precision;
 	long v = val;
 	int i;
 	if (likely(v > 0L)) {

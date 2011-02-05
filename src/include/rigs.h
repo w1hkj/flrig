@@ -27,6 +27,7 @@
 #include "IC7700.h"
 #include "K2.h"
 #include "K3.h"
+#include "RAY152.h"
 #include "TS140.h"
 #include "TS450S.h"
 #include "TS480HX.h"
@@ -71,20 +72,21 @@ extern RIG_IC7700		rig_IC7700;		// 22
 extern RIG_IC910H		rig_IC910H;		// 23
 extern RIG_K2			rig_K2;			// 24
 extern RIG_K3			rig_K3;			// 25
-extern RIG_TS140		rig_TS140;		// 26
-extern RIG_TS450S		rig_TS450S;		// 27
-extern RIG_TS480HX		rig_TS480HX;	// 28
-extern RIG_TS480SAT		rig_TS480SAT;	// 29
-extern RIG_TS570		rig_TS570;		// 30
-extern RIG_TS590S		rig_TS590S;		// 31
-extern RIG_TS2000		rig_TS2000;		// 32
-extern RIG_TT516		rig_TT516;		// 33
-extern RIG_TT535		rig_TT535;		// 34
-extern RIG_TT538		rig_TT538;		// 35
-extern RIG_TT550		rig_TT550;		// 36
-extern RIG_TT563		rig_TT563;		// 37
-extern RIG_TT566		rig_TT566;		// 38
-extern RIG_TT588		rig_TT588;		// 39
-extern RIG_TT599		rig_TT599;		// 40
+extern RIG_RAY152		rig_RAY152;		// 26
+extern RIG_TS140		rig_TS140;		// 27
+extern RIG_TS450S		rig_TS450S;		// 28
+extern RIG_TS480HX		rig_TS480HX;	// 29
+extern RIG_TS480SAT		rig_TS480SAT;	// 30
+extern RIG_TS570		rig_TS570;		// 31
+extern RIG_TS590S		rig_TS590S;		// 32
+extern RIG_TS2000		rig_TS2000;		// 33
+extern RIG_TT516		rig_TT516;		// 34
+extern RIG_TT535		rig_TT535;		// 35
+extern RIG_TT538		rig_TT538;		// 36
+extern RIG_TT550		rig_TT550;		// 37
+extern RIG_TT563		rig_TT563;		// 38
+extern RIG_TT566		rig_TT566;		// 39
+extern RIG_TT588		rig_TT588;		// 40
+extern RIG_TT599		rig_TT599;		// 41
 
 #endif

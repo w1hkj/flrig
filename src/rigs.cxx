@@ -38,6 +38,8 @@ RIG_IC910H		rig_IC910H;
 RIG_K2			rig_K2;
 RIG_K3			rig_K3;
 
+RIG_RAY152		rig_RAY152;
+
 RIG_TS140		rig_TS140;
 RIG_TS450S		rig_TS450S;
 RIG_TS480HX		rig_TS480HX;
@@ -84,6 +86,7 @@ rigbase *rigs[] = {
 	&rig_IC910H,
 	&rig_K2,
 	&rig_K3,
+	&rig_RAY152,
 	&rig_TS140,
 	&rig_TS450S,
 	&rig_TS480HX,

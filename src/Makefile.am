@@ -153,6 +153,7 @@ flrig_SOURCES += \
 	rigs/IC7700.cxx \
 	rigs/K2.cxx \
 	rigs/K3.cxx \
+	rigs/RAY152.cxx \
 	rigs/TS140.cxx \
 	rigs/TS450S.cxx \
 	rigs/TS480HX.cxx \
@@ -246,6 +247,7 @@ EXTRA_DIST = \
 	include/images.h \
 	include/K2.h \
 	include/K3.h \
+	include/RAY152.h \
 	include/mingw.h \
 	include/ptt.h \
 	include/rig.h \
