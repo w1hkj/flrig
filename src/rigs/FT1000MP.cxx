@@ -3,32 +3,36 @@
  *
  * a part of flrig
  *
- * Copyright 2009, Dave Freese, W1HKJ
+ * Copyright 2011, Dave Freese, W1HKJ
  *
  */
 
 #include "FT1000MP.h"
 
-static const char FT1000MPname_[] = "FT-1000MP **";
+static const char FT1000MPname_[] = "FT-1000MP";
 
 static const char *FT1000MP_modes[] = {
-	"LSB", "USB", 
-	"CW-U", "CW-L", 
-	"AM", "AM-syn", 
-	"FM", "FM-alt", 
+	"LSB",    "USB", 
+	"CW-L",   "CW-U", 
+	"AM",     "AM-syn", 
+	"FM",     "FM-alt", 
 	"RTTY-L", "RTTY-U", 
-	"PKT-L", "PKT-FM", NULL};
+	"PKT-L",  "PKT-FM", NULL};
 
 static const char FT1000MP_mode_type[] = {
 	'L', 'U', 
-	'U', 'L', 
+	'L', 'U', 
 	'U', 'U', 
 	'U', 'U',
 	'L', 'U', 
 	'L', 'U' };
 
 static const char *FT1000MP_widths[] = {
-"6.0 K", "2.4 K", "2.0 K", "500", "250", NULL };
+"---/6", "---/2.4",  "---/2", "---/500", "---/250",
+"2.4/6",  "2.4/2.4", "2.4/2", "2.4/500", "2.4/250",
+"2/6",    "2/2.4",   "2/2",   "2/500",   "2/250",
+"500/6",  "500/2.4", "500/2", "500/500", "500/250",
+"250/6",  "250/24.", "250/2", "250/500", "250/250", NULL };
 
 RIG_FT1000MP::RIG_FT1000MP() {
 // base class values
@@ -36,18 +40,23 @@ RIG_FT1000MP::RIG_FT1000MP() {
 	modes_ = FT1000MP_modes;
 	bandwidths_ = FT1000MP_widths;
 	comm_baudrate = BR4800;
+	stopbits = 2;
 	comm_retries = 2;
 	comm_wait = 5;
 	comm_timeout = 50;
 	serloop_timing = 200;
-	comm_rtscts = false;
+	comm_rtscts = true;
 	comm_rtsplus = false;
 	comm_dtrplus = true;
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	modeA = 1;
-	bwA = 1;
+	A.freq = 14070000;
+	A.imode = 1;
+	A.iBW = 1;
+	B.freq = 3580000;
+	B.imode = 1;
+	B.iBW = 1;
 
 	has_mode_control =
 	has_bandwidth_control =
@@ -62,10 +71,21 @@ void RIG_FT1000MP::init_cmd()
 	for (size_t i = 0; i < 5; i++) cmd[i] = 0;
 }
 
+void RIG_FT1000MP::initialize()
+{
+	init_cmd();
+	cmd[4] = 0x81; // switch antenna tuner on
+	sendCommand(cmd,0);
+LOG_INFO("%s", str2hex(cmd.c_str(), 5));
+//	selectA();
+}
+
 // returns 16 bytes
 // 0 - band selection
 // 1,2,3,4 operating frequency
-//    00 50 42 01 ==> 01425000
+//    00 50 42 01 ==> 01425000 from page 78 is totally erroneous !!!!!!
+// should be
+//    01 5B E6 80
 // 5,6 clarifier offset
 // 7 operating mode
 //    b7 - alternate user mode
@@ -77,43 +97,59 @@ void RIG_FT1000MP::init_cmd()
 //
 long RIG_FT1000MP::get_vfoA ()
 {
+	unsigned char *p = 0;
 	int ret = 0;
 	int alt = 0;
 	init_cmd();
-	cmd[3] = 2; 
+	cmd[3] = 0x03;  // read both vfo's
 	cmd[4] = 0x10;
-	ret = sendCommand(cmd, 16);
-	if (ret == 16) {
-//{
-//replybuff[1] = 0x00; replybuff[2] = 0x50; replybuff[3] = 0x42; replybuff[4] = 0x01;
-//replybuff[7] = 0x82;
-//replybuff[8] = 0x03;
-		freqA = 0;
-		for (int i = 4; i > 0; i--) {
-			freqA = freqA * 10 + ((replybuff[i] & 0xF0) >> 4);
-			freqA = freqA * 10 + (replybuff[i] & 0x0F);
-		}
-		freqA *= 10;
-		modeA = replybuff[7] & 0x07;
-		alt = (replybuff[8] & 0x80) == 0x80 ? 1 : 0;
-		if (modeA > 1)
-			modeA = 2 * modeA + alt - 2;
-		bwA = replybuff[8] & 0x07;
-		bwA = (bwA > 4) ? 4 : bwA;
-	}
+	ret = sendCommand(cmd, 32);
+	if (ret == 32) {
+		p = (unsigned char *)(&replybuff[1]);
+		A.freq = ((((((p[0]<<8) + p[1])<<8) + p[2])<<8) + p[3])*10/16;
+
+		A.imode = (replybuff[7] >> 5) & 0x07;
+		alt = replybuff[8] & 0x01;
+		if (A.imode > 1)
+			A.imode = 2 * A.imode + alt - 2;
+
+		A.iBW = 5*((replybuff[8] >> 1) & 0x07) + ((replybuff[8] >> 5) & 0x07);
+		if (A.iBW > 24) A.iBW = 24;
+
+		p = (unsigned char *)(&replybuff[17]);
+		B.freq = ((((((p[0]<<8) + p[1])<<8) + p[2])<<8) + p[3])*10/16;
+
+		modeB = (replybuff[16+7] >> 5) & 0x07;
+		alt = replybuff[16+8] & 0x01;
+		if (modeB > 1)
+			modeB = 2 * modeB + alt - 2;
+
+		B.iBW = 5*((replybuff[16+8] >> 1) & 0x07) + ((replybuff[16+8] >> 5) & 0x07);
+		if (B.iBW > 24) B.iBW = 24;
+/*
 LOG_INFO(
-"\ndata: %s\nfreq: %ld\nmode: %s\nbw: %s", 
-str2hex(replybuff,16), 
-freqA,
-FT1000MP_modes[modeA],
-FT1000MP_widths[bwA]
+"\ndata: %s\nA: %ld\nmode: %s\nbw: %s\nB: %ld\nmode: %s\nbw: %s", 
+str2hex(replybuff,32), 
+A.freq,
+FT1000MP_modes[A.imode],
+FT1000MP_widths[A.iBW],
+B.freq,
+FT1000MP_modes[modeB],
+FT1000MP_widths[B.iBW]
 );
-	return freqA;
+*/
+	}
+	return A.freq;
+}
+
+long RIG_FT1000MP::get_vfoB ()
+{
+	return B.freq;
 }
 
 void RIG_FT1000MP::set_vfoA (long freq)
 {
-	freqA = freq;
+	A.freq = freq;
 	init_cmd();
 	freq /=10; // 1000MP does not support 1 Hz resolution
 	for (int i = 0; i < 4; i++) {
@@ -125,19 +161,48 @@ LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 	sendCommand(cmd, 0);
 }
 
+void RIG_FT1000MP::set_vfoB (long freq)
+{
+	B.freq = freq;
+	init_cmd();
+	freq /=10; // 1000MP does not support 1 Hz resolution
+	for (int i = 0; i < 4; i++) {
+		cmd[i] = (unsigned char)(freq % 10); freq /= 10;
+		cmd[i] |= (unsigned char)((freq % 10) * 16); freq /= 10;
+	}
+	cmd[4] = 0x8A;
+LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
+	sendCommand(cmd, 0);
+}
+
 int RIG_FT1000MP::get_modeA()
 {
-	return modeA;
+	return A.imode;
+}
+
+int RIG_FT1000MP::get_modeB()
+{
+	return B.imode;
 }
 
 void RIG_FT1000MP::set_modeA(int val)
 {
-	modeA = val;
+	A.imode = val;
 	init_cmd();
 	cmd[3] = val;
 	cmd[4] = 0x0C;
 	sendCommand(cmd, 0);
-LOG_INFO("%s, %s", FT1000MP_modes[modeA], str2hex(cmd.c_str(),5));
+LOG_INFO("%s, %s", FT1000MP_modes[A.imode], str2hex(cmd.c_str(),5));
+}
+
+void RIG_FT1000MP::set_modeB(int val)
+{
+	B.imode = val;
+	init_cmd();
+	cmd[3] = val;
+	cmd[4] = 0x0C;
+	sendCommand(cmd, 0);
+LOG_INFO("%s, %s", FT1000MP_modes[B.imode], str2hex(cmd.c_str(),5));
 }
 
 int RIG_FT1000MP::get_modetype(int n)
@@ -147,20 +212,86 @@ int RIG_FT1000MP::get_modetype(int n)
 
 int RIG_FT1000MP::get_bwA()
 {
-	return bwA;
+	return A.iBW;
 }
 
 void RIG_FT1000MP::set_bwA(int val)
 {
-	bwA = val;
-	int bw = val--;
-	if (bw < 0) bw = 4;
+	int first_if = val / 5;
+	int second_if = val % 5;
+	if (!first_if) first_if += 5;
+	--first_if;
+	if (!second_if) second_if += 5;
+	--second_if;
+	second_if += 0x80;
+
+	A.iBW = val;
+
 	init_cmd();
-	cmd[3] = bw;
+	cmd[0] = 0x01;
+	cmd[3] = first_if;
 	cmd[4] = 0x8C;
 	sendCommand(cmd, 0);
-LOG_INFO("%s, %s", FT1000MP_widths[bwA], str2hex(cmd.c_str(), 5));
+LOG_INFO("%s, %s", FT1000MP_widths[A.iBW], str2hex(cmd.c_str(), 5));
+	cmd[3] = second_if;
+	sendCommand(cmd, 0);
+LOG_INFO("%s, %s", FT1000MP_widths[A.iBW], str2hex(cmd.c_str(), 5));
 }
+
+int RIG_FT1000MP::get_bwB()
+{
+	return B.iBW;
+}
+
+void RIG_FT1000MP::set_bwB(int val)
+{
+	B.iBW = val;
+	int first_if = val / 5;
+	int second_if = val % 5;
+	if (!first_if) first_if += 5;
+	--first_if;
+	if (!second_if) second_if += 5;
+	--second_if;
+	second_if += 0x80;
+
+	init_cmd();
+	cmd[0] = 0x02;
+	cmd[3] = first_if;
+	cmd[4] = 0x8C;
+	sendCommand(cmd, 0);
+LOG_INFO("%s, %s", FT1000MP_widths[B.iBW], str2hex(cmd.c_str(), 5));
+	cmd[3] = second_if;
+	sendCommand(cmd, 0);
+LOG_INFO("%s, %s", FT1000MP_widths[B.iBW], str2hex(cmd.c_str(), 5));
+}
+
+void RIG_FT1000MP::selectA()
+{
+	init_cmd();
+	cmd[4] = 0x05;
+	sendCommand(cmd, 0);
+LOG_INFO("%s", str2hex(cmd.c_str(), 5));
+}
+
+void RIG_FT1000MP::selectB()
+{
+	init_cmd();
+	cmd[3] = 0x01;
+	cmd[4] = 0x05;
+	sendCommand(cmd, 0);
+LOG_INFO("%s", str2hex(cmd.c_str(), 5));
+}
+
+void RIG_FT1000MP::set_split(bool val)
+{
+	split = val;
+	init_cmd();
+	cmd[3] = val ? 0x01 : 0x00;
+	cmd[4] = 0x01;
+	sendCommand(cmd, 0);
+LOG_INFO("%s", str2hex(cmd.c_str(), 5));
+}
+
 
 // Tranceiver PTT on/off
 void RIG_FT1000MP::set_PTT_control(int val)
@@ -170,6 +301,15 @@ void RIG_FT1000MP::set_PTT_control(int val)
 	else	 cmd[3] = 0;
 	cmd[4] = 0x0F;
 	sendCommand(cmd, 0);
+LOG_INFO("%s", str2hex(cmd.c_str(), 5));
+}
+
+void RIG_FT1000MP::tune_rig()
+{
+	init_cmd();
+	cmd[4] = 0x82; // start antenna tuner
+	sendCommand(cmd,0);
+LOG_INFO("%s", str2hex(cmd.c_str(), 5));
 }
 
 int  RIG_FT1000MP::get_power_out(void)
