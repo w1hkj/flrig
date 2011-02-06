@@ -163,9 +163,8 @@ long RIG_RAY152::get_vfoA ()
 void RIG_RAY152::set_vfoA (long freq)
 {
 	A.freq = freq;
-	cmd = "FT0000000\r";
+	cmd = "FT000000\r";
 	freq /= 100;
-	cmd[8] += freq % 10; freq /= 10;
 	cmd[7] += freq % 10; freq /= 10;
 	cmd[6] += freq % 10; freq /= 10;
 	cmd[5] += freq % 10; freq /= 10;
@@ -187,9 +186,8 @@ long RIG_RAY152::get_vfoB ()
 void RIG_RAY152::set_vfoB (long freq)
 {
 	B.freq = freq;
-	cmd = "FT0000000\r";
+	cmd = "FT000000\r";
 	freq /= 100;
-	cmd[8] += freq % 10; freq /= 10;
 	cmd[7] += freq % 10; freq /= 10;
 	cmd[6] += freq % 10; freq /= 10;
 	cmd[5] += freq % 10; freq /= 10;
