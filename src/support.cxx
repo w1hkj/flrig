@@ -141,7 +141,7 @@ void read_mode()
 	if (!useB) {
 		if (nu_mode != vfoA.imode) {
 			vfoA.imode = vfo.imode = nu_mode;
-			selrig->adjust_bandwidth(nu_mode);
+			selrig->set_bwA(selrig->adjust_bandwidth(nu_mode));
 			Fl::awake(setModeControl);
 			Fl::awake(updateBandwidthControl);
 			pthread_mutex_lock(&mutex_xmlrpc);
@@ -158,7 +158,7 @@ void read_mode()
 	} else {
 		if (nu_mode != vfoB.imode) {
 			vfoB.imode = vfo.imode = nu_mode;
-			selrig->adjust_bandwidth(nu_mode);
+			selrig->set_bwB(selrig->adjust_bandwidth(nu_mode));
 			Fl::awake(setModeControl);
 			Fl::awake(updateBandwidthControl);
 			pthread_mutex_lock(&mutex_xmlrpc);
@@ -1430,7 +1430,7 @@ void initRig()
 	rigbws_.clear();
 	opBW->clear();
 	if (selrig->has_bandwidth_control) {
-		selrig->adjust_bandwidth(vfoA.imode);
+//		selrig->adjust_bandwidth(vfoA.imode);
 		old_bws = selrig->bandwidths_;
 		for (int i = 0; selrig->bandwidths_[i] != NULL; i++) {
 			rigbws_.push_back(selrig->bandwidths_[i]);

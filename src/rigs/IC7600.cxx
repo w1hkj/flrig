@@ -33,9 +33,31 @@ RIG_IC7600::RIG_IC7600() {
 //======================================================================
 // IC7600 unique commands
 //======================================================================
+
+void RIG_IC7600::select_vfoA()
+{
+	cmd = pre_to;
+	cmd += '\x07';
+	cmd += '\xD0';
+	cmd.append(post);
+	sendICcommand(cmd, 6);
+	checkresponse(6);
+}
+
+void RIG_IC7600::select_vfoB()
+{
+	cmd = pre_to;
+	cmd += '\x07';
+	cmd += '\xD1';
+	cmd.append(post);
+	sendICcommand(cmd, 6);
+	checkresponse(6);
+}
+
+
 void RIG_IC7600::set_modeA(int val)
 {
-	modeA = val;
+	A.imode = val;
 	bool datamode = false;
 	switch (val) {
 		case 9  : val = 1; datamode = true; break;
@@ -73,7 +95,7 @@ int RIG_IC7600::get_modeA()
 	if (sendICcommand (cmd, 8 )) {
 		md = replystr[5];
 		if (md > 6) md--;
-		filter_nbr = replystr[6];
+		A.iBW = replystr[6];
 		if (sendICcommand(cmd, 8)) {
 			if (replystr[6]) {
 				switch (md) {
@@ -82,14 +104,73 @@ int RIG_IC7600::get_modeA()
 					default : break;
 				}
 			}
-			modeA = md;
+			A.imode = md;
 		} else {
 			checkresponse(8);
 		}
 	} else {
 		checkresponse(8);
 	}
-	return modeA;
+	return A.imode;
+}
+
+void RIG_IC7600::set_modeB(int val)
+{
+	B.imode = val;
+	bool datamode = false;
+	switch (val) {
+		case 9  : val = 1; datamode = true; break;
+		case 8  : val = 0; datamode = true; break;
+		case 7  : val = 8; break;
+		case 6  : val = 7; break;
+		default: break;
+	}
+	cmd = pre_to;
+	cmd += '\x06';
+	cmd += val;
+	cmd += filter_nbr;
+	cmd.append( post );
+	sendICcommand (cmd, 6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+	checkresponse(6);
+	if (datamode) { // LSB / USB ==> use DATA mode
+		cmd = pre_to;
+		cmd.append("\x1A\x06\x01");
+		cmd.append(post);
+		sendICcommand(cmd, 6);
+		checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+	}
+}
+
+int RIG_IC7600::get_modeB()
+{
+	int md;
+	cmd = pre_to;
+	cmd += '\x04';
+	cmd.append(post);
+	if (sendICcommand (cmd, 8 )) {
+		md = replystr[5];
+		if (md > 6) md--;
+		B.iBW = replystr[6];
+		if (sendICcommand(cmd, 8)) {
+			if (replystr[6]) {
+				switch (md) {
+					case 0 : md = 8; break;
+					case 1 : md = 9; break;
+					default : break;
+				}
+			}
+			B.imode = md;
+		} else {
+			checkresponse(8);
+		}
+	} else {
+		checkresponse(8);
+	}
+	return B.imode;
 }
 
 void RIG_IC7600::set_mic_gain(int v)

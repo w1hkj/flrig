@@ -8,8 +8,8 @@ public:
 	RIG_IC746();
 	virtual ~RIG_IC746(){}
 
-	void select_vfoA();
-	void select_vfoB();
+	virtual void select_vfoA();
+	virtual void select_vfoB();
 
 	virtual long get_vfoA(void);
 	virtual void set_vfoA(long f);
@@ -31,11 +31,17 @@ public:
 	virtual int  get_attenuator();
 	virtual void set_preamp(int val);
 	virtual int  get_preamp();
+
+	virtual int  get_modetype(int n);
 	virtual void set_modeA(int val);
 	virtual int  get_modeA();
-	virtual int  get_modetype(int n);
 	virtual void set_bwA(int val);
 	virtual int  get_bwA();
+	virtual void set_modeB(int val);
+	virtual int  get_modeB();
+	virtual void set_bwB(int val);
+	virtual int  get_bwB();
+
 	virtual void set_mic_gain(int val);
 //	int  get_mic_gain();
 	void get_mic_gain_min_max_step(int &min, int &max, int &step);
@@ -50,7 +56,6 @@ public:
 protected:
 	int  preamp_level;
 	int  atten_level;
-	int  filter_nbr;
 	int  ICvol;
 
 };
@@ -61,8 +66,14 @@ public:
 	virtual ~RIG_IC746PRO(){}
 	virtual void set_modeA(int val);
 	virtual int  get_modeA();
+
 	virtual void set_bwA(int val);
 	virtual int  get_bwA();
+	virtual void set_modeB(int val);
+	virtual int  get_modeB();
+	virtual void set_bwB(int val);
+	virtual int  get_bwB();
+
 	int  get_swr();
 	int  get_alc();
 	int  get_power_out();
@@ -74,7 +85,7 @@ public:
 	bool get_notch(int &val);
 	void get_notch_min_max_step(int &min, int &max, int &step);
 
-	bool twovfos() { return true; }
+	bool twovfos() { return false; }
 	const char **bwtable(int);
 
 };
