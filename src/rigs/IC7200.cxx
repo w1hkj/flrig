@@ -68,8 +68,8 @@ RIG_IC7200::RIG_IC7200() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	modeA = 1;
-	bwA = 0;
+	A.imode = 1;
+	A.iBW = 0;
 	filter_nbr = 1;
 
 	has_power_control = true;
@@ -402,14 +402,37 @@ void RIG_IC7200::set_mic_gain(int val)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
+int RIG_IC7200::get_modeA()
+{
+	int md = A.imode;
+	cmd = pre_to;
+	cmd += '\x04';
+	cmd.append(post);
+	if (sendICcommand (cmd, 8 )) {
+		md = replystr[5];
+		if (md > 6) md -= 2;
+		A.iBW = replystr[6];
+	}
+	cmd = pre_to;
+	cmd += '\x1A'; cmd += '\04';
+	cmd.append(post);
+	if (sendICcommand (cmd, 9 )) {
+		if ((replystr[6] & 0x01) == 0x01) {
+			if (md == 0) md = 7;
+			if (md == 1) md = 8;
+		}
+	}
+	return (A.imode = md);
+}
+
 void RIG_IC7200::set_modeA(int val)
 {
-	modeA = val;
+	A.imode = val;
 	if (val > 6) val -= 7;
 	cmd = pre_to;
 	cmd += '\x06';
 	cmd += val > 5 ? val + 2 : val;
-	cmd += filter_nbr;
+	cmd += A.iBW;
 	cmd.append( post );
 	sendICcommand (cmd, 6);
 	checkresponse(6);
@@ -417,7 +440,7 @@ void RIG_IC7200::set_modeA(int val)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	cmd = pre_to;
 	cmd += '\x1A'; cmd += '\x04';
-	if (modeA > 6) cmd += '\x01';
+	if (A.imode > 6) cmd += '\x01';
 	else cmd += '\x00';
 	cmd.append( post);
 	sendICcommand (cmd, 6);
@@ -426,26 +449,51 @@ void RIG_IC7200::set_modeA(int val)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
-int RIG_IC7200::get_modeA()
+int RIG_IC7200::get_modeB()
 {
+	int md;
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
 	if (sendICcommand (cmd, 8 )) {
-		modeA = replystr[5];
-		if (modeA > 6) modeA -= 2;
-		filter_nbr = replystr[6];
+		md = replystr[5];
+		if (md > 6) md -= 2;
+		B.iBW = replystr[6];
 	}
 	cmd = pre_to;
 	cmd += '\x1A'; cmd += '\04';
 	cmd.append(post);
 	if (sendICcommand (cmd, 9 )) {
 		if ((replystr[6] & 0x01) == 0x01) {
-			if (modeA == 0) modeA = 7;
-			if (modeA == 1) modeA = 8;
+			if (md == 0) md = 7;
+			if (md == 1) md = 8;
 		}
 	}
-	return modeA;
+	return (B.imode = md);
+}
+
+void RIG_IC7200::set_modeB(int val)
+{
+	B.imode = val;
+	if (val > 6) val -= 7;
+	cmd = pre_to;
+	cmd += '\x06';
+	cmd += val > 5 ? val + 2 : val;
+	cmd += B.iBW;
+	cmd.append( post );
+	sendICcommand (cmd, 6);
+	checkresponse(6);
+	if (DEBUG_7200)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+	cmd = pre_to;
+	cmd += '\x1A'; cmd += '\x04';
+	if (B.imode > 6) cmd += '\x01';
+	else cmd += '\x00';
+	cmd.append( post);
+	sendICcommand (cmd, 6);
+	checkresponse(6);
+	if (DEBUG_7200)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 int RIG_IC7200::get_modetype(int n)
@@ -507,7 +555,7 @@ const char ** RIG_IC7200::bwtable(int m)
 
 void RIG_IC7200::set_bwA(int val)
 {
-	bwA = val;
+	A.iBW = val;
 	cmd = pre_to;
 	cmd.append("\x1A\x02");
 	cmd.append(to_bcd(val, 2));
@@ -520,12 +568,37 @@ void RIG_IC7200::set_bwA(int val)
 
 int  RIG_IC7200::get_bwA()
 {
+	int bw = A.iBW;
 	cmd = pre_to;
 	cmd += "\x1A\x02";
 	cmd.append( post );
 	if (sendICcommand(cmd, 8))
-		bwA = (fm_bcd(&replystr[6],2));
-	return bwA;
+		bw = (fm_bcd(&replystr[6],2));
+	return (A.iBW = bw);
+}
+
+void RIG_IC7200::set_bwB(int val)
+{
+	B.iBW = val;
+	cmd = pre_to;
+	cmd.append("\x1A\x02");
+	cmd.append(to_bcd(val, 2));
+	cmd.append( post );
+	sendICcommand(cmd, 6);
+	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+}
+
+int  RIG_IC7200::get_bwB()
+{
+	int bw = B.iBW;
+	cmd = pre_to;
+	cmd += "\x1A\x02";
+	cmd.append( post );
+	if (sendICcommand(cmd, 8))
+		bw = (fm_bcd(&replystr[6],2));
+	return (B.iBW = bw);
 }
 
 void RIG_IC7200::set_auto_notch(int val)

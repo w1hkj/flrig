@@ -17,6 +17,17 @@ public:
 	long get_vfoB(void);
 	void set_vfoB(long f);
 
+	int  get_modetype(int n);
+	void set_modeA(int val);
+	int  get_modeA();
+	void set_bwA(int val);
+	int  get_bwA();
+
+	void set_modeB(int val);
+	int  get_modeB();
+	void set_bwB(int val);
+	int  get_bwB();
+
 	void set_PTT_control(int val);
 	void set_volume_control(int val);
 	int  get_volume_control();
@@ -36,11 +47,6 @@ public:
 	void set_squelch(int val);
 	void set_power_control(double val);
 	void set_mic_gain(int val);
-	void set_modeA(int val);
-	int  get_modeA();
-	int  get_modetype(int n);
-	void set_bwA(int val);
-	int  get_bwA();
 	int  adjust_bandwidth(int m);
 	void set_compression();
 	void set_auto_notch(int val);

@@ -42,12 +42,13 @@ RIG_IC746::RIG_IC746() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	modeA = 1;
-	bwA = 0;
-	deffreq_ = 14070000L;
-	def_mode = 1;
-	defbw_ = 0;
-	filter_nbr = 1;
+	A.imode = 1;
+	A.iBW = 0;
+	A.freq = 14070000L;
+	B.imode = 1;
+	B.iBW = 0;
+	B.freq = 14070000L;
+	A.iBW = 1;
 	ICvol = 0;
 
 	has_power_control = true;
@@ -137,20 +138,18 @@ void RIG_IC746::select_vfoB()
 
 long RIG_IC746::get_vfoA ()
 {
-	select_vfoA();
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
 	if (!sendICcommand(cmd, 11))
-		return freqA;
-	freqA = fm_bcd_be(&replystr[5], 10);
-	return freqA;
+		return A.freq;
+	A.freq = fm_bcd_be(&replystr[5], 10);
+	return A.freq;
 }
 
 void RIG_IC746::set_vfoA (long freq)
 {
-	select_vfoA();
-	freqA = freq;
+	A.freq = freq;
 	cmd = pre_to;
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 10 ) );
@@ -163,21 +162,18 @@ void RIG_IC746::set_vfoA (long freq)
 
 long RIG_IC746::get_vfoB ()
 {
-	select_vfoB();
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
 	if (!sendICcommand(cmd, 11))
-		return freqB;
-	freqB = fm_bcd_be(&replystr[5], 10);
-	select_vfoA();
-	return freqB;
+		return B.freq;
+	B.freq = fm_bcd_be(&replystr[5], 10);
+	return B.freq;
 }
 
 void RIG_IC746::set_vfoB (long freq)
 {
-	select_vfoB();
-	freqB = freq;
+	B.freq = freq;
 	cmd = pre_to;
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 10 ) );
@@ -186,7 +182,6 @@ void RIG_IC746::set_vfoB (long freq)
 	checkresponse(6);
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-	select_vfoA();
 }
 
 int RIG_IC746::get_smeter()
@@ -387,11 +382,11 @@ int RIG_IC746::get_noise_reduction_val()
 
 void RIG_IC746::set_modeA(int val)
 {
-	modeA = val;
+	A.imode = val;
 	cmd = pre_to;
 	cmd += '\x06';
 	cmd += val > 5 ? val + 1 : val;
-	cmd += filter_nbr; // filter #1
+	cmd += A.iBW; // filter #1
 	cmd.append( post );
 	sendICcommand (cmd, 6);
 	checkresponse(6);
@@ -405,29 +400,69 @@ int RIG_IC746::get_modeA()
 	cmd += '\x04';
 	cmd.append(post);
 	if (sendICcommand (cmd, 8 )) {
-		modeA = replystr[5];
-		if (modeA > 6) modeA--;
-		filter_nbr = replystr[6];
+		A.imode = replystr[5];
+		if (A.imode > 6) A.imode--;
+		A.iBW = replystr[6];
 	}
-	return modeA;
+	return A.imode;
 }
 
 void RIG_IC746::set_bwA(int val)
 {
-	filter_nbr = val + 1;
-	set_modeA(modeA);
+	A.iBW = val + 1;
+	set_modeA(A.imode);
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+}
+
+int RIG_IC746::get_bwA()
+{
+	return A.iBW - 1;
+}
+
+void RIG_IC746::set_modeB(int val)
+{
+	B.imode = val;
+	cmd = pre_to;
+	cmd += '\x06';
+	cmd += val > 5 ? val + 1 : val;
+	cmd += B.iBW; // filter #1
+	cmd.append( post );
+	sendICcommand (cmd, 6);
+	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+}
+
+int RIG_IC746::get_modeB()
+{
+	cmd = pre_to;
+	cmd += '\x04';
+	cmd.append(post);
+	if (sendICcommand (cmd, 8 )) {
+		B.imode = replystr[5];
+		if (B.imode > 6) B.imode--;
+		B.iBW = replystr[6];
+	}
+	return B.imode;
+}
+
+void RIG_IC746::set_bwB(int val)
+{
+	B.iBW = val + 1;
+	set_modeB(B.imode);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+}
+
+int RIG_IC746::get_bwB()
+{
+	return B.iBW - 1;
 }
 
 int RIG_IC746::get_modetype(int n)
 {
 	return _mode_type[n];
-}
-
-int RIG_IC746::get_bwA()
-{
-	return filter_nbr - 1;
 }
 
 void RIG_IC746::set_mic_gain(int val)
@@ -574,7 +609,7 @@ void RIG_IC746::set_power_control(double val)
 
 void RIG_IC746PRO::set_modeA(int val)
 {
-	modeA = val;
+	A.imode = val;
 	bool datamode = false;
 	switch (val) {
 		case 10 : val = 5; datamode = true; break;
@@ -587,7 +622,7 @@ void RIG_IC746PRO::set_modeA(int val)
 	cmd = pre_to;
 	cmd += '\x06';
 	cmd += val;
-	cmd += filter_nbr;
+	cmd += A.iBW;
 	cmd.append( post );
 	sendICcommand (cmd, 6);
 	if (RIG_DEBUG)
@@ -613,7 +648,7 @@ int RIG_IC746PRO::get_modeA()
 	if (sendICcommand (cmd, 8 )) {
 		md = replystr[5];
 		if (md > 6) md--;
-		filter_nbr = replystr[6];
+		A.iBW = replystr[6];
 		cmd = pre_to;
 		cmd.append("\x1A\x06");
 		cmd.append(post);
@@ -626,33 +661,96 @@ int RIG_IC746PRO::get_modeA()
 					default : break;
 				}
 			}
-			modeA = md;
+			A.imode = md;
 		} else {
 			checkresponse(8);
 		}
 	} else {
 		checkresponse(8);
 	}
-	return modeA;
+	return A.imode;
+}
+
+void RIG_IC746PRO::set_modeB(int val)
+{
+	B.imode = val;
+	bool datamode = false;
+	switch (val) {
+		case 10 : val = 5; datamode = true; break;
+		case 9  : val = 1; datamode = true; break;
+		case 8  : val = 0; datamode = true; break;
+		case 7  : val = 8; break;
+		case 6  : val = 7; break;
+		default: break;
+	}
+	cmd = pre_to;
+	cmd += '\x06';
+	cmd += val;
+	cmd += B.iBW;
+	cmd.append( post );
+	sendICcommand (cmd, 6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+	checkresponse(6);
+	if (datamode) { // LSB / USB ==> use DATA mode
+		cmd = pre_to;
+		cmd.append("\x1A\x06\x01");
+		cmd.append(post);
+		sendICcommand(cmd, 6);
+		checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+	}
+}
+
+int RIG_IC746PRO::get_modeB()
+{
+	int md;
+	cmd = pre_to;
+	cmd += '\x04';
+	cmd.append(post);
+	if (sendICcommand (cmd, 8 )) {
+		md = replystr[5];
+		if (md > 6) md--;
+		B.iBW = replystr[6];
+		cmd = pre_to;
+		cmd.append("\x1A\x06");
+		cmd.append(post);
+		if (sendICcommand(cmd, 8)) {
+			if (replystr[6]) {
+				switch (md) {
+					case 0 : md = 8; break;
+					case 1 : md = 9; break;
+					case 5 : md = 10; break;
+					default : break;
+				}
+			}
+			B.imode = md;
+		} else {
+			checkresponse(8);
+		}
+	} else {
+		checkresponse(8);
+	}
+	return B.imode;
 }
 
 int RIG_IC746PRO::adjust_bandwidth(int m)
 {
 	if (m == 0 || m == 1 || m == 8 || m == 9) { //SSB
 		bandwidths_ = IC746PRO_SSBwidths;
-		return (bwA = 32);
+		return (32);
 	}
 	if (m == 3 || m == 6) { //CW
 		bandwidths_ = IC746PRO_SSBwidths;
-		return (bwA = 14);
+		return (14);
 	}
 	if (m == 4 || m == 7) { //RTTY
 		bandwidths_ = IC746PRO_RTTYwidths;
-		return (bwA = 28);
+		return (28);
 	}
 	bandwidths_ = IC746PRO_AMFMwidths;
-	filter_nbr = 1;
-	return (bwA = 0);
+	return (0);
 }
 
 const char **RIG_IC746PRO::bwtable(int m)
@@ -712,12 +810,12 @@ void RIG_IC746PRO::tune_rig()
 void RIG_IC746PRO::set_bwA(int val)
 {
 	if (bandwidths_ == IC746PRO_AMFMwidths) {
-		filter_nbr = val + 1;
-		set_modeA(modeA);
+		A.iBW = val + 1;
+		set_modeA(A.imode);
 		return;
 	}
 
-	bwA = val;
+	A.iBW = val;
 	cmd = pre_to;
 	cmd.append("\x1A\x03");
 	cmd.append(to_bcd(val, 2));
@@ -731,15 +829,46 @@ void RIG_IC746PRO::set_bwA(int val)
 int  RIG_IC746PRO::get_bwA()
 {
 	if (bandwidths_ == IC746PRO_AMFMwidths) {
-		bwA = filter_nbr - 1;
-		return bwA;
+		return A.iBW - 1;
 	}
 	cmd = pre_to;
 	cmd += "\x1A\x03";
 	cmd.append( post );
 	if (sendICcommand(cmd, 8))
-		bwA = (fm_bcd(&replystr[6],2));
-	return bwA;
+		A.iBW = (fm_bcd(&replystr[6],2));
+	return A.iBW;
+}
+
+void RIG_IC746PRO::set_bwB(int val)
+{
+	if (bandwidths_ == IC746PRO_AMFMwidths) {
+		B.iBW = val + 1;
+		set_modeB(B.imode);
+		return;
+	}
+
+	B.iBW = val;
+	cmd = pre_to;
+	cmd.append("\x1A\x03");
+	cmd.append(to_bcd(val, 2));
+	cmd.append( post );
+	sendICcommand(cmd, 6);
+	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+}
+
+int  RIG_IC746PRO::get_bwB()
+{
+	if (bandwidths_ == IC746PRO_AMFMwidths) {
+		return B.iBW - 1;
+	}
+	cmd = pre_to;
+	cmd += "\x1A\x03";
+	cmd.append( post );
+	if (sendICcommand(cmd, 8))
+		B.iBW = (fm_bcd(&replystr[6],2));
+	return B.iBW;
 }
 
 int RIG_IC746PRO::get_attenuator()

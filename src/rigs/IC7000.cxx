@@ -36,7 +36,7 @@ RIG_IC7000::RIG_IC7000() {
 
 void RIG_IC7000::set_modeA(int val)
 {
-	modeA = val;
+	A.imode = val;
 	switch (val) {
 		case 7  : val = 8; break;
 		case 6  : val = 7; break;
@@ -45,7 +45,7 @@ void RIG_IC7000::set_modeA(int val)
 	cmd = pre_to;
 	cmd += '\x06';
 	cmd += val;
-	cmd += filter_nbr;
+	cmd += A.iBW;
 	cmd.append( post );
 	sendICcommand (cmd, 6);
 	checkresponse(6);
@@ -55,23 +55,58 @@ void RIG_IC7000::set_modeA(int val)
 
 int RIG_IC7000::get_modeA()
 {
-	int md;
+	int md = A.imode;
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
 	if (sendICcommand (cmd, 8 )) {
 		md = replystr[5];
 		if (md > 6) md--;
-		filter_nbr = replystr[6];
+		A.iBW = replystr[6];
 	} else {
 		checkresponse(8);
 	}
-	return modeA;
+	return (A.imode = md);
+}
+
+void RIG_IC7000::set_modeB(int val)
+{
+	B.imode = val;
+	switch (val) {
+		case 7  : val = 8; break;
+		case 6  : val = 7; break;
+		default: break;
+	}
+	cmd = pre_to;
+	cmd += '\x06';
+	cmd += val;
+	cmd += A.iBW;
+	cmd.append( post );
+	sendICcommand (cmd, 6);
+	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+}
+
+int RIG_IC7000::get_modeB()
+{
+	int md = B.imode;
+	cmd = pre_to;
+	cmd += '\x04';
+	cmd.append(post);
+	if (sendICcommand (cmd, 8 )) {
+		md = replystr[5];
+		if (md > 6) md--;
+		B.iBW = replystr[6];
+	} else {
+		checkresponse(8);
+	}
+	return (B.imode = md);
 }
 
 int RIG_IC7000::adjust_bandwidth(int m)
 {
-	filter_nbr = 1;
+	A.iBW = 1;
 	if (m == 0 || m == 1) { //SSB
 		bandwidths_ = IC746PRO_SSBwidths;
 		return (bwA = 32);
