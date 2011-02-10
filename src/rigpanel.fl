@@ -13,7 +13,8 @@ decl {\#include "status.h"} {}
 
 decl {\#include "support.h"} {} 
 
-Function {Rig_window()} {} {
+Function {Rig_window()} {open
+} {
   Fl_Window {} {
     label Flrig open
     xywh {577 57 424 330} type Double color 52 align 80
@@ -198,25 +199,28 @@ Fl_Tooltip::enable(progStatus.tooltips);}
       label {1296000.000}
       tooltip {Vfo \#2} xywh {211 76 128 19} box DOWN_BOX color 72 labelfont 4 labelsize 16 labelcolor 52 align 24 hide
     }
-    Fl_Button btnA {
-      label A
-      callback {cb_selectA();}
-      tooltip {Select vfo A} xywh {213 62 25 20} down_box DOWN_BOX color 50 selection_color 134 labelsize 12
+    Fl_Light_Button btnA {
+      label vfoA
+      callback {if (btnA->value()==1)
+	cb_selectA();
+btnA->value(1);
+btnB->value(0);}
+      tooltip {Rx-A / Tx-B} xywh {213 62 50 20} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
+      code0 {o->value(!useB);}
     }
-    Fl_Button btnB {
-      label B
-      callback {cb_selectB();}
-      tooltip {Select vfo B} xywh {240 62 25 20} down_box DOWN_BOX color 50 selection_color 134 labelsize 12
+    Fl_Light_Button btnB {
+      label vfoB
+      callback {if (btnB->value()==1)
+	cb_selectB();
+btnB->value(1);
+btnA->value(0);} selected
+      tooltip {Rx-A / Tx-B} xywh {266 62 50 20} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
+      code0 {o->value(useB);}
     }
     Fl_Button btnA2B {
       label {A -> B}
       callback {cbA2B();}
-      tooltip {Copy A to B} xywh {267 62 50 20} down_box DOWN_BOX color 50 selection_color 134 labelsize 12
-    }
-    Fl_Button btnABactive {
-      label {A / B}
-      callback {cbABactive();}
-      tooltip {Swap VFOs} xywh {319 62 50 20} down_box DOWN_BOX color 50 selection_color 134 labelsize 12
+      tooltip {Copy A to B} xywh {319 62 50 20} down_box DOWN_BOX color 50 selection_color 134 labelsize 12
     }
     Fl_Light_Button btnSplit {
       label Split
@@ -342,7 +346,7 @@ cbAuxPort();}
       label {Initializing
 
 Please wait}
-      xywh {0 23 424 100} color 206 labelfont 1 labelsize 24
+      xywh {0 23 424 100} color 206 labelfont 1 labelsize 24 hide
     }
   }
 } 
@@ -449,11 +453,10 @@ selectFreq();}
   }
 } 
 
-Function {XcvrDialog()} {open
-} {
+Function {XcvrDialog()} {} {
   Fl_Window {} {
-    label {I/O Ports} open
-    xywh {590 428 482 257} type Double visible
+    label {I/O Ports}
+    xywh {590 428 482 257} type Double hide
   } {
     Fl_Tabs {} {open
       xywh {0 8 477 245}
@@ -498,7 +501,7 @@ btnOkXcvrDialog->redraw();}
           }
           Fl_Counter query_interval {
             label {qry intvl (ms):}
-            callback {progStatus.serloop_timing = (int)o->value();} selected
+            callback {progStatus.serloop_timing = (int)o->value();}
             tooltip {Interval between Xvr queries} xywh {123 141 75 22} type Simple align 4 minimum 50 maximum 5000 step 50 value 100
             code0 {o->value(progStatus.serloop_timing);}
           }
