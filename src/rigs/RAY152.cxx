@@ -269,15 +269,18 @@ LOG_INFO("%s", cmd.c_str());
 
 int RIG_RAY152::get_smeter(void)
 {
-	sendCommand("U\r", 5);
+	cmd = "U\r";
+	sendCommand(cmd, 5);
 	if (replystr[0] == 'U') {
 		int val;
 		sscanf(&replystr[1], "%d", &val);
-		val /= 128;
-		val *= 100;
+		val = (int)(60.0 * (256.0 / (val + 16.0) - 1.0));
+		if (val > 100) val = 100;
+		if (val < 0) val = 0;
+//LOG_INFO("%s => %d", cmd.c_str(), val);
 		return val;
 	}
-	return -1;
+	return 0;
 }
 
 int RIG_RAY152::get_power_out(void)
