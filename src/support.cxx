@@ -267,10 +267,12 @@ static bool resetxmt = true;
 
 void serviceA()
 {
+	if (useB) return;
 	while (!queA.empty()) {
 		vfoA = queA.front();
 		queA.pop();
-		if (!useB) {
+	}
+//		if (!useB) {
 			if (RIG_DEBUG)
 				LOG_WARN("%s", print(vfoA));
 			pthread_mutex_lock(&mutex_serial);
@@ -290,7 +292,7 @@ void serviceA()
 			if (vfoA.imode != vfo.imode) {
 				selrig->set_modeA(vfoA.imode);
 				vfo.imode = vfoA.imode;
-				vfo.iBW = selrig->get_bwA();//vfoA.iBW;
+				vfo.iBW = vfoA.iBW; //selrig->get_bwA();
 				Fl::awake(setModeControl);
 				Fl::awake(updateBandwidthControl);
 				Fl::awake(setBWControl);
@@ -298,7 +300,7 @@ void serviceA()
 					send_new_mode(vfoA.imode);
 				}
 				send_sideband();
-//				selrig->set_bwA(vfoA.iBW);
+				selrig->set_bwA(vfoA.iBW);
 				send_bandwidths();
 				send_new_bandwidth(vfoA.iBW);
 			} else if (vfoA.iBW != vfo.iBW) {
@@ -314,16 +316,18 @@ void serviceA()
 			pthread_mutex_unlock(&mutex_xmlrpc);
 
 			pthread_mutex_unlock(&mutex_serial);
-		}
-	}
+//		}
+//	}
 }
 
 void serviceB()
 {
+	if (!useB) return;
 	while (!queB.empty()) {
 		vfoB = queB.front();
 		queB.pop();
-		if (useB ) {
+	}
+//		if (useB ) {
 			if (RIG_DEBUG)
 				LOG_WARN("%s", print(vfoB));
 			pthread_mutex_lock(&mutex_serial);
@@ -342,8 +346,8 @@ void serviceB()
 			}
 			if (vfoB.imode != vfo.imode) {
 				selrig->set_modeB(vfoB.imode);
-				vfo.imode = vfoB.imode;
-				vfo.iBW = selrig->get_bwB();//vfoB.iBW;
+				vfo.imode = vfoB.imode; // selrig->get_bwB();
+				vfo.iBW = vfoB.iBW;
 				Fl::awake(setModeControl);
 				Fl::awake(updateBandwidthControl);
 				Fl::awake(setBWControl);
@@ -351,7 +355,7 @@ void serviceB()
 					send_new_mode(vfoB.imode);
 				}
 				send_sideband();
-//				selrig->set_bwB(vfoB.iBW);
+				selrig->set_bwB(vfoB.iBW);
 				send_bandwidths();
 				send_new_bandwidth(vfoB.iBW);
 			} else if (vfoB.iBW != vfo.iBW) {
@@ -367,8 +371,8 @@ void serviceB()
 			pthread_mutex_unlock(&mutex_xmlrpc);
 
 			pthread_mutex_unlock(&mutex_serial);
-		}
-	}
+//		}
+//	}
 }
 
 void servicePTT()
@@ -603,13 +607,6 @@ int movFreqB() {
 	return 1;
 }
 
-void cbABactive()
-{
-	if (useB) cb_selectA();
-	else cb_selectB();
-	return;
-}
-
 void cbA2B()
 {
 	vfoB = vfoA;
@@ -662,10 +659,10 @@ void cb_selectA() {
 
 	pthread_mutex_lock(&mutex_serial);
 	useB = false;
-	while (!queA.empty()) queA.pop();
+//	while (!queA.empty()) queA.pop();
 	selrig->selectA();
-	vfoA.src = UI;
-	queA.push(vfoA);
+//	vfoA.src = UI;
+//	queA.push(vfoA);
 	pthread_mutex_unlock(&mutex_serial);
 
 	pthread_mutex_lock(&mutex_xmlrpc);
@@ -690,10 +687,10 @@ void cb_selectB() {
 
 	pthread_mutex_lock(&mutex_serial);
 	useB = true;
-	while (!queB.empty()) queB.pop();
+//	while (!queB.empty()) queB.pop();
 	selrig->selectB();
-	vfoB.src = UI;
-	queB.push(vfoB);
+//	vfoB.src = UI;
+//	queB.push(vfoB);
 	pthread_mutex_unlock(&mutex_serial);
 
 	pthread_mutex_lock(&mutex_xmlrpc);
@@ -1398,12 +1395,15 @@ void initRig()
 	if (progStatus.CIV > 0) selrig->adjustCIV(progStatus.CIV);
 
 	if (selrig->has_get_info) selrig->get_info();
+	selrig->selectA();
 	transceiverA.freq = selrig->get_vfoA();
 	transceiverA.imode = selrig->get_modeA();
 	transceiverA.iBW = selrig->get_bwA();
+	selrig->selectB();
 	transceiverB.freq = selrig->get_vfoB();
 	transceiverB.imode = selrig->get_modeB();
 	transceiverB.iBW = selrig->get_bwB();
+	selrig->selectA();
 
 	if (selrig->restore_mbw) selrig->last_bw = transceiverA.iBW;
 
@@ -1469,6 +1469,7 @@ void initRig()
 
 	if (selrig->has_vfo_adj) {
 		cnt_vfo_adj->value(progStatus.vfo_adj);
+		selrig->setVfoAdj(progStatus.vfo_adj);
 		cnt_vfo_adj->activate();
 	} else
 		cnt_vfo_adj->deactivate();
@@ -1732,7 +1733,7 @@ void initRig()
 		txtCIV->activate();
 		btnCIVdefault->activate();
 		if (strstr(selrig->name_, "IC-7200") || strstr(selrig->name_, "IC-7600")) {
-			btnUSBaudio->value(progStatus.USBaudio = false);
+			btnUSBaudio->value(progStatus.USBaudio = true);
 			btnUSBaudio->activate();
 		} else
 			btnUSBaudio->deactivate();
@@ -1800,7 +1801,7 @@ void initConfigDialog()
 		txtCIV->activate();
 		btnCIVdefault->activate();
 		if (picked == IC7200 || picked == IC7600) {
-			btnUSBaudio->value(progStatus.USBaudio = false);
+			btnUSBaudio->value(progStatus.USBaudio = true);
 			btnUSBaudio->activate();
 		} else
 			btnUSBaudio->deactivate();
@@ -1972,9 +1973,9 @@ void cb_vfo_adj()
 {
 	pthread_mutex_lock(&mutex_serial);
 		if (selrig->has_get_info) selrig->get_info();
-		long f = selrig->get_vfoA();
+//		long f = selrig->get_vfoA();
 		selrig->setVfoAdj(progStatus.vfo_adj);
-		selrig->set_vfoA(f);
+//		selrig->set_vfoA(f);
 	pthread_mutex_unlock(&mutex_serial);
 }
 

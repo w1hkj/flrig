@@ -17,6 +17,12 @@ public:
 	void set_modeB(int val);
 	int  get_modeB();
 
+	void set_bwA(int val);
+	int  get_bwA();
+
+	void set_bwB(int val);
+	int  get_bwB();
+
 	void set_attenuator( int val );	//alh
 	int  get_attenuator();		//alh
 	void set_mic_gain(int v);
