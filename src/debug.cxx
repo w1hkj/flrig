@@ -111,7 +111,7 @@ void debug::start(const char* filename)
 	text = new Fl_Text_Display(pad, slider->h()+pad, window->w()-2*pad, window->h()-slider->h()-2*pad, 0);
 	text->textfont(FL_COURIER);
 	text->textsize(FL_NORMAL_SIZE);
-    text->wrap_mode(true, 60);
+    text->wrap_mode(true, 160);
 	window->resizable(text);
 	
 	buffer = new Fl_Text_Buffer();

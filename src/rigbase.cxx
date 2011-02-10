@@ -54,7 +54,8 @@ rigbase::rigbase()
 	has_auto_notch = 
 	has_compression =
 	has_bpf_center =
-	has_special =  false;
+	has_special =  
+	has_get_info = false;
 
 	A.freq = 14070000L;
 	A.imode = 1;

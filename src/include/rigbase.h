@@ -134,6 +134,7 @@ public:
 
 	bool restore_mbw;
 
+	bool has_get_info;
 
 protected:
 	string cmd;
@@ -158,6 +159,7 @@ public:
 	virtual void initialize() {}
 	virtual void shutdown() {}
 
+	virtual void get_info(void) {}
 	virtual long get_vfoA(void) {return A.freq;}
 	virtual void set_vfoA(long f) {A.freq = f;}
 	virtual long get_vfoB(void) {return B.freq;}
