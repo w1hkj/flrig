@@ -43,6 +43,7 @@ public :
 private:
 	bool tune_on;
 	void init_cmd();
+	void get_info(void);
 };
 
 #endif

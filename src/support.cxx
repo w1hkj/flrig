@@ -91,8 +91,10 @@ void read_vfo()
 {
 // transceiver changed ?
 	pthread_mutex_lock(&mutex_serial);
-	long  freq = useB ? selrig->get_vfoB() : selrig->get_vfoA();
-	if (!useB) {
+	if (selrig->has_get_info) selrig->get_info();
+	long  freq;
+	if (!useB) { // vfo-A
+		freq = selrig->get_vfoA();
 		if (freq != vfoA.freq) {
 			vfoA.freq = freq;
 			Fl::awake(setFreqDispA, (void *)vfoA.freq);
@@ -112,7 +114,8 @@ void read_vfo()
 				Fl::awake(setFreqDispB, (void *)vfoB.freq);
 			}
 		}
-	} else {
+	} else { // vfo-B
+		freq = selrig->get_vfoB();
 		if (freq != vfoB.freq) {
 			vfoB.freq = freq;
 			Fl::awake(setFreqDispB, (void *)vfoB.freq);
@@ -137,8 +140,9 @@ void setModeControl(void *)
 void read_mode()
 {
 	pthread_mutex_lock(&mutex_serial);
-	int nu_mode = useB ? selrig->get_modeB() : selrig->get_modeA();
+	int nu_mode;
 	if (!useB) {
+		nu_mode = selrig->get_modeA();
 		if (nu_mode != vfoA.imode) {
 			vfoA.imode = vfo.imode = nu_mode;
 			selrig->set_bwA(selrig->adjust_bandwidth(nu_mode));
@@ -156,6 +160,7 @@ void read_mode()
 			pthread_mutex_unlock(&mutex_xmlrpc);
 		}
 	} else {
+		nu_mode = selrig->get_modeB();
 		if (nu_mode != vfoB.imode) {
 			vfoB.imode = vfo.imode = nu_mode;
 			selrig->set_bwB(selrig->adjust_bandwidth(nu_mode));
@@ -184,8 +189,9 @@ void setBWControl(void *)
 void read_bandwidth()
 {
 	pthread_mutex_lock(&mutex_serial);
-	int nu_BW = useB ? selrig->get_bwB() : selrig->get_bwA();
+	int nu_BW;
 	if (!useB) {
+		nu_BW = selrig->get_bwA();
 		if (nu_BW != vfoA.iBW) {
 			vfoA.iBW = vfo.iBW = nu_BW;
 			Fl::awake(setBWControl);
@@ -198,6 +204,7 @@ void read_bandwidth()
 			pthread_mutex_unlock(&mutex_xmlrpc);
 		}
 	} else {
+		nu_BW = selrig->get_bwB();
 		if (nu_BW != vfoB.iBW) {
 			vfoB.iBW = vfo.iBW = nu_BW;
 			Fl::awake(setBWControl);
@@ -283,7 +290,7 @@ void serviceA()
 			if (vfoA.imode != vfo.imode) {
 				selrig->set_modeA(vfoA.imode);
 				vfo.imode = vfoA.imode;
-				vfo.iBW = vfoA.iBW;
+				vfo.iBW = selrig->get_bwA();//vfoA.iBW;
 				Fl::awake(setModeControl);
 				Fl::awake(updateBandwidthControl);
 				Fl::awake(setBWControl);
@@ -291,7 +298,7 @@ void serviceA()
 					send_new_mode(vfoA.imode);
 				}
 				send_sideband();
-				selrig->set_bwA(vfoA.iBW);
+//				selrig->set_bwA(vfoA.iBW);
 				send_bandwidths();
 				send_new_bandwidth(vfoA.iBW);
 			} else if (vfoA.iBW != vfo.iBW) {
@@ -336,7 +343,7 @@ void serviceB()
 			if (vfoB.imode != vfo.imode) {
 				selrig->set_modeB(vfoB.imode);
 				vfo.imode = vfoB.imode;
-				vfo.iBW = vfoB.iBW;
+				vfo.iBW = selrig->get_bwB();//vfoB.iBW;
 				Fl::awake(setModeControl);
 				Fl::awake(updateBandwidthControl);
 				Fl::awake(setBWControl);
@@ -344,7 +351,7 @@ void serviceB()
 					send_new_mode(vfoB.imode);
 				}
 				send_sideband();
-				selrig->set_bwB(vfoB.iBW);
+//				selrig->set_bwB(vfoB.iBW);
 				send_bandwidths();
 				send_new_bandwidth(vfoB.iBW);
 			} else if (vfoB.iBW != vfo.iBW) {
@@ -1390,6 +1397,7 @@ void initRig()
 
 	if (progStatus.CIV > 0) selrig->adjustCIV(progStatus.CIV);
 
+	if (selrig->has_get_info) selrig->get_info();
 	transceiverA.freq = selrig->get_vfoA();
 	transceiverA.imode = selrig->get_modeA();
 	transceiverA.iBW = selrig->get_bwA();
@@ -1963,6 +1971,7 @@ void cb_auto_notch()
 void cb_vfo_adj()
 {
 	pthread_mutex_lock(&mutex_serial);
+		if (selrig->has_get_info) selrig->get_info();
 		long f = selrig->get_vfoA();
 		selrig->setVfoAdj(progStatus.vfo_adj);
 		selrig->set_vfoA(f);
