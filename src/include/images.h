@@ -7,6 +7,7 @@ extern Fl_Bitmap image_p25;
 extern Fl_Bitmap image_p50;
 extern Fl_Bitmap image_p100;
 extern Fl_Bitmap image_p200;
+extern Fl_Bitmap image_p200log;
 
 extern Fl_Bitmap image_smeter;
 extern Fl_Bitmap image_swr;

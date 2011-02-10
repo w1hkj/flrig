@@ -444,7 +444,7 @@ int  RIG_FT1000MP::get_power_out(void)
 		if (pwr < 0) pwr = 0;
 		LOG_INFO("%s => %d",str2hex(replybuff,1), pwr);
 	}
-	return pwr;
+	return (int)(200 * sqrt(pwr/200.0) + 0.5);
 }
 
 int  RIG_FT1000MP::get_smeter(void)
