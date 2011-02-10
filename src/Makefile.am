@@ -282,6 +282,7 @@ EXTRA_DIST = \
 	images/P50.xbm \
 	images/P100.xbm \
 	images/P200.xbm \
+	images/P200log.xbm \
 	images/S60.xbm \
 	images/SWR.xbm
 

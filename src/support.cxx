@@ -957,9 +957,15 @@ void set_power_controlImage(double pwr)
 		sldrFwdPwr->minimum(0.0);
 	}
 	else {
-		scalePower->image(image_p200);
-		sldrFwdPwr->maximum(200.0);
-		sldrFwdPwr->minimum(0.0);
+		if (rig_nbr == FT1000MP) {
+			scalePower->image(image_p200log);
+			sldrFwdPwr->maximum(200.0);
+			sldrFwdPwr->minimum(0.0);
+		} else {
+			scalePower->image(image_p200);
+			sldrFwdPwr->maximum(200.0);
+			sldrFwdPwr->minimum(0.0);
+		}
 	}
 	scalePower->redraw();
 	return;
