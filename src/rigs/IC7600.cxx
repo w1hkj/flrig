@@ -15,12 +15,13 @@
 const char IC7600name_[] = "IC-7600";
 
 const char *IC7600modes_[] = {
-		"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R",
-		"D-LSB", "D-USB", NULL};
+	"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R", "PSK", "PSK-R", NULL};
 
-const char IC7600_mode_type[] =
-	{ 'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U',
-	  'L', 'U' };
+const char IC7600_mode_type[] = { 
+	'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U', 'U', 'L' };
+
+const char IC7600_mode_nbr[] = {
+	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07, 0x08, 0x12, 0x13 };
 
 RIG_IC7600::RIG_IC7600() {
 	defaultCIV = 0x7A;
@@ -41,6 +42,8 @@ void RIG_IC7600::select_vfoA()
 	cmd += '\xD0';
 	cmd.append(post);
 	sendICcommand(cmd, 6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 	checkresponse(6);
 }
 
@@ -51,126 +54,95 @@ void RIG_IC7600::select_vfoB()
 	cmd += '\xD1';
 	cmd.append(post);
 	sendICcommand(cmd, 6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 	checkresponse(6);
 }
-
 
 void RIG_IC7600::set_modeA(int val)
 {
 	A.imode = val;
-	bool datamode = false;
-	switch (val) {
-		case 9  : val = 1; datamode = true; break;
-		case 8  : val = 0; datamode = true; break;
-		case 7  : val = 8; break;
-		case 6  : val = 7; break;
-		default: break;
-	}
 	cmd = pre_to;
 	cmd += '\x06';
-	cmd += val;
-	cmd += filter_nbr;
+	cmd += IC7600_mode_nbr[val];
+	cmd += A.iBW;
 	cmd.append( post );
 	sendICcommand (cmd, 6);
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	checkresponse(6);
-	if (datamode) { // LSB / USB ==> use DATA mode
-		cmd = pre_to;
-		cmd.append("\x1A\x06\x01");
-		cmd.append(post);
-		sendICcommand(cmd, 6);
-		checkresponse(6);
-	if (RIG_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-	}
 }
 
 int RIG_IC7600::get_modeA()
 {
-	int md;
+	int md = 0;
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	if (sendICcommand (cmd, 8 )) {
-		md = replystr[5];
-		if (md > 6) md--;
+		for (md = 0; md < 10; md++) if (replystr[5] == IC7600_mode_nbr[md]) break;
+		if (md == 10) md = 0;
 		A.iBW = replystr[6];
-		if (sendICcommand(cmd, 8)) {
-			if (replystr[6]) {
-				switch (md) {
-					case 0 : md = 8; break;
-					case 1 : md = 9; break;
-					default : break;
-				}
-			}
-			A.imode = md;
-		} else {
-			checkresponse(8);
-		}
-	} else {
+		A.imode = md;
+	} else
 		checkresponse(8);
-	}
 	return A.imode;
 }
 
 void RIG_IC7600::set_modeB(int val)
 {
 	B.imode = val;
-	bool datamode = false;
-	switch (val) {
-		case 9  : val = 1; datamode = true; break;
-		case 8  : val = 0; datamode = true; break;
-		case 7  : val = 8; break;
-		case 6  : val = 7; break;
-		default: break;
-	}
 	cmd = pre_to;
 	cmd += '\x06';
-	cmd += val;
-	cmd += filter_nbr;
+	cmd += IC7600_mode_nbr[val];
+	cmd += B.iBW;
 	cmd.append( post );
 	sendICcommand (cmd, 6);
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	checkresponse(6);
-	if (datamode) { // LSB / USB ==> use DATA mode
-		cmd = pre_to;
-		cmd.append("\x1A\x06\x01");
-		cmd.append(post);
-		sendICcommand(cmd, 6);
-		checkresponse(6);
-	if (RIG_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-	}
 }
 
 int RIG_IC7600::get_modeB()
 {
-	int md;
+	int md = 0;
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	if (sendICcommand (cmd, 8 )) {
-		md = replystr[5];
-		if (md > 6) md--;
+		for (md = 0; md < 10; md++) if (replystr[5] == IC7600_mode_nbr[md]) break;
+		if (md == 10) md = 0;
 		B.iBW = replystr[6];
-		if (sendICcommand(cmd, 8)) {
-			if (replystr[6]) {
-				switch (md) {
-					case 0 : md = 8; break;
-					case 1 : md = 9; break;
-					default : break;
-				}
-			}
-			B.imode = md;
-		} else {
-			checkresponse(8);
-		}
-	} else {
+		B.imode = md;
+	} else
 		checkresponse(8);
-	}
 	return B.imode;
+}
+
+int RIG_IC7600::get_bwA()
+{
+	return A.iBW;
+}
+
+void RIG_IC7600::set_bwA(int val)
+{
+	A.iBW = val;
+	set_modeA(A.imode);
+}
+
+int RIG_IC7600::get_bwB()
+{
+	return B.iBW;
+}
+
+void RIG_IC7600::set_bwB(int val)
+{
+	B.iBW = val;
+	set_modeB(B.imode);
 }
 
 void RIG_IC7600::set_mic_gain(int v)
