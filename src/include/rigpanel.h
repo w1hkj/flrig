@@ -26,11 +26,10 @@ extern Fl_Wheel_Value_Slider *sldrMICGAIN;
 extern Fl_Wheel_Value_Slider *sldrPOWER;
 #include <FL/Fl_Box.H>
 extern Fl_Box *txtInactive;
+extern Fl_Light_Button *btnA;
+extern Fl_Light_Button *btnB;
 #include <FL/Fl_Button.H>
-extern Fl_Button *btnA;
-extern Fl_Button *btnB;
 extern Fl_Button *btnA2B;
-extern Fl_Button *btnABactive;
 extern Fl_Light_Button *btnSplit;
 #include "combo.h"
 extern Fl_ComboBox *opMODE;

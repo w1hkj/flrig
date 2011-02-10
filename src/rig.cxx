@@ -213,7 +213,7 @@ extern bool run_digi_loop;
 
 void startup(void*)
 {
-	btnInitializing->show();
+//	btnInitializing->show();
 	mainwindow->redraw();
 	initStatusConfigDialog();
 
@@ -288,6 +288,7 @@ int main (int argc, char *argv[])
 	sldrALC_SWR->value(0);
 
 	mainwindow->resize( progStatus.mainX, progStatus.mainY, mainwindow->w(), btnInitializing->h() + 24 );
+	btnInitializing->show();
 
 	mainwindow->xclass(KNAME);
 

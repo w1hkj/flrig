@@ -158,28 +158,28 @@ static void cb_sldrPOWER(Fl_Wheel_Value_Slider*, void*) {
 
 Fl_Box *txtInactive=(Fl_Box *)0;
 
-Fl_Button *btnA=(Fl_Button *)0;
+Fl_Light_Button *btnA=(Fl_Light_Button *)0;
 
-static void cb_btnA(Fl_Button*, void*) {
-  cb_selectA();
+static void cb_btnA(Fl_Light_Button*, void*) {
+  if (btnA->value()==1)
+	cb_selectA();
+btnA->value(1);
+btnB->value(0);
 }
 
-Fl_Button *btnB=(Fl_Button *)0;
+Fl_Light_Button *btnB=(Fl_Light_Button *)0;
 
-static void cb_btnB(Fl_Button*, void*) {
-  cb_selectB();
+static void cb_btnB(Fl_Light_Button*, void*) {
+  if (btnB->value()==1)
+	cb_selectB();
+btnB->value(1);
+btnA->value(0);
 }
 
 Fl_Button *btnA2B=(Fl_Button *)0;
 
 static void cb_btnA2B(Fl_Button*, void*) {
   cbA2B();
-}
-
-Fl_Button *btnABactive=(Fl_Button *)0;
-
-static void cb_btnABactive(Fl_Button*, void*) {
-  cbABactive();
 }
 
 Fl_Light_Button *btnSplit=(Fl_Light_Button *)0;
@@ -583,23 +583,25 @@ Fl_Double_Window* Rig_window() {
       txtInactive->align(FL_ALIGN_RIGHT|FL_ALIGN_INSIDE);
       txtInactive->hide();
     } // Fl_Box* txtInactive
-    { btnA = new Fl_Button(213, 62, 25, 20, _("A"));
-      btnA->tooltip(_("Select vfo A"));
-      btnA->down_box(FL_DOWN_BOX);
+    { Fl_Light_Button* o = btnA = new Fl_Light_Button(213, 62, 50, 20, _("vfoA"));
+      btnA->tooltip(_("Rx-A / Tx-B"));
+      btnA->down_box(FL_THIN_DOWN_BOX);
       btnA->color((Fl_Color)FL_LIGHT1);
-      btnA->selection_color((Fl_Color)134);
+      btnA->selection_color((Fl_Color)113);
       btnA->labelsize(12);
       btnA->callback((Fl_Callback*)cb_btnA);
-    } // Fl_Button* btnA
-    { btnB = new Fl_Button(240, 62, 25, 20, _("B"));
-      btnB->tooltip(_("Select vfo B"));
-      btnB->down_box(FL_DOWN_BOX);
+      o->value(!useB);
+    } // Fl_Light_Button* btnA
+    { Fl_Light_Button* o = btnB = new Fl_Light_Button(266, 62, 50, 20, _("vfoB"));
+      btnB->tooltip(_("Rx-A / Tx-B"));
+      btnB->down_box(FL_THIN_DOWN_BOX);
       btnB->color((Fl_Color)FL_LIGHT1);
-      btnB->selection_color((Fl_Color)134);
+      btnB->selection_color((Fl_Color)113);
       btnB->labelsize(12);
       btnB->callback((Fl_Callback*)cb_btnB);
-    } // Fl_Button* btnB
-    { btnA2B = new Fl_Button(267, 62, 50, 20, _("A -> B"));
+      o->value(useB);
+    } // Fl_Light_Button* btnB
+    { btnA2B = new Fl_Button(319, 62, 50, 20, _("A -> B"));
       btnA2B->tooltip(_("Copy A to B"));
       btnA2B->down_box(FL_DOWN_BOX);
       btnA2B->color((Fl_Color)FL_LIGHT1);
@@ -607,14 +609,6 @@ Fl_Double_Window* Rig_window() {
       btnA2B->labelsize(12);
       btnA2B->callback((Fl_Callback*)cb_btnA2B);
     } // Fl_Button* btnA2B
-    { btnABactive = new Fl_Button(319, 62, 50, 20, _("A / B"));
-      btnABactive->tooltip(_("Swap VFOs"));
-      btnABactive->down_box(FL_DOWN_BOX);
-      btnABactive->color((Fl_Color)FL_LIGHT1);
-      btnABactive->selection_color((Fl_Color)134);
-      btnABactive->labelsize(12);
-      btnABactive->callback((Fl_Callback*)cb_btnABactive);
-    } // Fl_Button* btnABactive
     { Fl_Light_Button* o = btnSplit = new Fl_Light_Button(372, 62, 50, 20, _("Split"));
       btnSplit->tooltip(_("Rx-A / Tx-B"));
       btnSplit->down_box(FL_THIN_DOWN_BOX);
@@ -833,6 +827,7 @@ Fl_Double_Window* Rig_window() {
       btnInitializing->color((Fl_Color)206);
       btnInitializing->labelfont(1);
       btnInitializing->labelsize(24);
+      btnInitializing->hide();
     } // Fl_Button* btnInitializing
     o->end();
   } // Fl_Double_Window* o
