@@ -83,6 +83,8 @@ RIG_FT1000MP::RIG_FT1000MP() {
 	precision = 10;
 	max_power = 200;
 
+	has_swr_control =
+	has_alc_control =
 	has_mode_control =
 	has_bandwidth_control =
 	has_ptt_control =
@@ -451,6 +453,32 @@ int  RIG_FT1000MP::get_smeter(void)
 {
 	unsigned char val = 0;
 	init_cmd();
+	cmd[4] = 0xF7;
+	if (sendCommand(cmd,5)) {
+		val = (unsigned char)(replybuff[0]);
+		LOG_INFO("%s => %d",str2hex(replybuff,1), val);
+	}
+	return val * 100 / 255;
+}
+
+int  RIG_FT1000MP::get_swr(void)
+{
+	unsigned char val = 0;
+	init_cmd();
+	cmd[0] = 0x85;
+	cmd[4] = 0xF7;
+	if (sendCommand(cmd,5)) {
+		val = (unsigned char)(replybuff[0]);
+		LOG_INFO("%s => %d",str2hex(replybuff,1), val);
+	}
+	return val * 100 / 255;
+}
+
+int  RIG_FT1000MP::get_alc(void)
+{
+	unsigned char val = 0;
+	init_cmd();
+	cmd[0] = 0x81;
 	cmd[4] = 0xF7;
 	if (sendCommand(cmd,5)) {
 		val = (unsigned char)(replybuff[0]);

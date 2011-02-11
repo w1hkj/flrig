@@ -39,6 +39,8 @@ public :
 
 	int  get_power_out(void);
 	int  get_smeter(void);
+	int  get_swr(void);
+	int  get_alc(void);
 
 private:
 	bool tune_on;
