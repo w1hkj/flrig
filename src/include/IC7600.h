@@ -8,8 +8,8 @@ public:
 	RIG_IC7600();
 	~RIG_IC7600(){}
 
-	void select_vfoA();
-	void select_vfoB();
+	void selectA();
+	void selectB();
 
 	void set_modeA(int val);
 	int  get_modeA();
@@ -22,6 +22,8 @@ public:
 
 	void set_bwB(int val);
 	int  get_bwB();
+
+	int  adjust_bandwidths(int val);
 
 	void set_attenuator( int val );	//alh
 	int  get_attenuator();		//alh

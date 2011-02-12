@@ -23,10 +23,34 @@ const char IC7600_mode_type[] = {
 const char IC7600_mode_nbr[] = {
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07, 0x08, 0x12, 0x13 };
 
+const char IC7600_ssb_bws[] = {
+"50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500", 
+"600",   "700",  "800",  "900",
+"1000", "1100", "1200", "1300", "1400", "1500", "1600", "1700", "1800", "1900",
+"2000", "2100", "2200", "2300", "2400", "2500", "2600", "2700", "2800", "2900",
+"3000", "3100", "3200", "3300", "3400", "3500", "3600", NULL };
+
+const char IC7600_rtty_bws[] = {
+"50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
+"600",   "700",  "800",  "900",
+"1000", "1100", "1200", "1300", "1400", "1500", "1600", "1700", "1800", "1900",
+"2000", "2100", "2200", "2300", "2400", "2500", "2600", "2700", NULL };
+
+const char IC7600_am_bws[] = {
+"200",   "400",  "600",  "800", "1000", "1200", "1400", "1600", "1800", "2000",
+"2200", "2400", "2600", "2800", "3000", "3200", "3400", "3600", "3800", "4000",
+"4200", "4400", "4600", "4800", "5000", "5200", "5400", "5600", "5800", "6000",
+"6200", "6400", "6600", "6800", "7000", "7200", "7400", "7600", "7800", "8000",
+"8200", "8400", "8600", "8800", "9000", "9200", "9400", "9600", "9800", "10000", NULL };
+
+const char IC7600_fm_bws[] = {
+"FIXED", NULL };
+
 RIG_IC7600::RIG_IC7600() {
 	defaultCIV = 0x7A;
 	name_ = IC7600name_;
 	modes_ = IC7600modes_;
+	bws_ = IC7600_ssb_bws;
 	_mode_type = IC7600_mode_type;
 	adjustCIV(defaultCIV);
 };
@@ -35,27 +59,23 @@ RIG_IC7600::RIG_IC7600() {
 // IC7600 unique commands
 //======================================================================
 
-void RIG_IC7600::select_vfoA()
+void RIG_IC7600::selectA()
 {
 	cmd = pre_to;
 	cmd += '\x07';
 	cmd += '\xD0';
 	cmd.append(post);
 	sendICcommand(cmd, 6);
-	if (RIG_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 	checkresponse(6);
 }
 
-void RIG_IC7600::select_vfoB()
+void RIG_IC7600::selectB()
 {
 	cmd = pre_to;
 	cmd += '\x07';
 	cmd += '\xD1';
 	cmd.append(post);
 	sendICcommand(cmd, 6);
-	if (RIG_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 	checkresponse(6);
 }
 
@@ -65,11 +85,8 @@ void RIG_IC7600::set_modeA(int val)
 	cmd = pre_to;
 	cmd += '\x06';
 	cmd += IC7600_mode_nbr[val];
-	cmd += A.iBW;
 	cmd.append( post );
 	sendICcommand (cmd, 6);
-	if (RIG_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	checkresponse(6);
 }
 
@@ -79,12 +96,9 @@ int RIG_IC7600::get_modeA()
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
-	if (RIG_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	if (sendICcommand (cmd, 8 )) {
 		for (md = 0; md < 10; md++) if (replystr[5] == IC7600_mode_nbr[md]) break;
 		if (md == 10) md = 0;
-		A.iBW = replystr[6];
 		A.imode = md;
 	} else
 		checkresponse(8);
@@ -97,11 +111,8 @@ void RIG_IC7600::set_modeB(int val)
 	cmd = pre_to;
 	cmd += '\x06';
 	cmd += IC7600_mode_nbr[val];
-	cmd += B.iBW;
 	cmd.append( post );
 	sendICcommand (cmd, 6);
-	if (RIG_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	checkresponse(6);
 }
 
@@ -111,12 +122,9 @@ int RIG_IC7600::get_modeB()
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
-	if (RIG_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	if (sendICcommand (cmd, 8 )) {
 		for (md = 0; md < 10; md++) if (replystr[5] == IC7600_mode_nbr[md]) break;
 		if (md == 10) md = 0;
-		B.iBW = replystr[6];
 		B.imode = md;
 	} else
 		checkresponse(8);
@@ -125,25 +133,76 @@ int RIG_IC7600::get_modeB()
 
 int RIG_IC7600::get_bwA()
 {
+	if (A.imode == 5) return 0;
+	cmd = pre_to;
+	cmd.append("\x1a\x03");
+	cmd.append(post);
+	if (sendICcommand (cmd, 9)) {
+		A.iBW = fm_bcd(&replystr[7), 2)
+	};
 	return A.iBW;
 }
 
 void RIG_IC7600::set_bwA(int val)
 {
 	A.iBW = val;
-	set_modeA(A.imode);
+	if (A.imode == 5) return;
+	cmd = pre_to;
+	cmd.append("\x1a\x03");
+	cmd.append(to_bcd(A.iBW, 2));
+	cmd.append(post);
+	sendICcommand (cmd, 6);
+	checkresponse(6);
 }
 
 int RIG_IC7600::get_bwB()
 {
+	if (B.imode == 5) return 0;
+	cmd = pre_to;
+	cmd.append("\x1a\x03");
+	cmd.append(post);
+	if (sendICcommand (cmd, 9)) {
+		B.iBW = fm_bcd(&replystr[7), 2)
+	};
 	return B.iBW;
 }
 
 void RIG_IC7600::set_bwB(int val)
 {
 	B.iBW = val;
-	set_modeB(B.imode);
+	if (B.imode == 5) return;
+	cmd = pre_to;
+	cmd.append("\x1a\x03");
+	cmd.append(to_bcd(A.iBW, 2));
+	cmd.append(post);
+	sendICcommand (cmd, 6);
+	checkresponse(6);
 }
+
+int RIG_IC7600::adjust_bandwidth(int m)
+{
+	int bw = 0;
+	switch (m) {
+		case 2: // AM
+			bandwidths_ = IC7600_am_bws;
+			bw = 19;
+			break;
+		case 5: // FM
+			bandwidths_ = IC7600_fm_bws;
+			bw = 0;
+			break;
+		case 4: case 7: // RTTY
+			bandwidths_ = IC7600_rtty_bws;
+			bw = 12;
+			break;
+		case 0: case 1: case 3: case 6: case 8: case 9: 
+		default: // SSB
+			bandwidths_ = IC7600_ssb_bws;
+			bw = 35;
+	}
+	return bw;
+}
+
 
 void RIG_IC7600::set_mic_gain(int v)
 {
