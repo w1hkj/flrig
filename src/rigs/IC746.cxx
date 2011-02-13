@@ -555,6 +555,19 @@ void RIG_IC746::set_power_control(double val)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
+void RIG_IC746::set_split(bool val)
+{
+printf("split %d\n", val);
+	cmd = pre_to;
+	cmd += 0x0F;
+	cmd += val ? 0x10 : 0x00;
+	cmd.append(post);
+	sendICcommand(cmd, 6);
+	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+}
+
 //int RIG_IC746::get_mic_gain()
 //{
 //	cmd = pre_to;
