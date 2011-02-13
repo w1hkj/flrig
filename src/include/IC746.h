@@ -53,6 +53,10 @@ public:
 	void set_rf_gain(int val);
 //	int  get_rf_gain();
 	void set_power_control(double val);
+
+	void set_split(bool val);
+	bool can_split() { return true;}
+
 protected:
 	int  preamp_level;
 	int  atten_level;

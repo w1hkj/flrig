@@ -618,6 +618,11 @@ void cbA2B()
 
 void cb_set_split(int val)
 {
+	if (useB) {
+		btnA->value(1);
+		btnB->value(0);
+		cb_selectA();
+	}
 	progStatus.split = val;
 	pthread_mutex_lock(&mutex_serial);
 		selrig->set_split(val);
@@ -667,6 +672,10 @@ void cb_selectA() {
 }
 
 void cb_selectB() {
+	if (progStatus.split) {
+		btnSplit->value(0);
+		cb_set_split(0);
+	}
 	pthread_mutex_lock(&mutex_xmlrpc);
 	bypass_digi_loop = true;
 	pthread_mutex_unlock(&mutex_xmlrpc);
