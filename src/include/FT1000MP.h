@@ -42,6 +42,8 @@ public :
 	int  get_swr(void);
 	int  get_alc(void);
 
+	int  def_bandwidth(int m);
+
 private:
 	bool tune_on;
 	void init_cmd();
