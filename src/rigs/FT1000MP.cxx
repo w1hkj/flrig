@@ -23,6 +23,9 @@ static const char *FT1000MP_modes[] = {
 	"PKT-L",  "PKT-FM",		// 6, 6+
 	NULL};
 
+static const int FT1000MP_def_bw[] = {
+6, 6, 18, 18, 0, 0, 0, 18, 18, 6, 6 };
+
 static const char FT1000MP_mode_type[] = {
 	'L', 
 	'U', 
@@ -365,6 +368,12 @@ LOG_INFO("%s, %s", FT1000MP_widths[B.iBW], str2hex(cmd.c_str(), 5));
 	sendCommand(cmd, 0);
 LOG_INFO("%s, %s", FT1000MP_widths[B.iBW], str2hex(cmd.c_str(), 5));
 }
+
+int  RIG_FT1000MP::def_bandwidth(int m)
+{
+	return FT1000MP_def_bw[m];
+}
+
 
 void RIG_FT1000MP::selectA()
 {
