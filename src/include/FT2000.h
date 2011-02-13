@@ -44,6 +44,7 @@ public:
 	int  get_mic_gain();
 	void get_mic_min_max_step(int &min, int &max, int &step);
 	int  adjust_bandwidth(int);
+	int  def_bandwidth(int);
 
 	bool sendFTcommand(string, int, bool);
 	const char **bwtable(int);

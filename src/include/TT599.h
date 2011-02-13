@@ -45,6 +45,9 @@ public:
 	int  get_power_out();
 	int  get_swr();
 
+	int  adjust_bandwidth(int);
+	int  def_bandwidth(int);
+
 //	void set_agc_level();
 };
 

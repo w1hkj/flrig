@@ -90,6 +90,7 @@ public:
 	int  get_rf_gain();
 	void get_rf_min_max_step(int &min, int &max, int &step);
 	int  adjust_bandwidth(int m);
+	int  def_bandwidth(int m);
 
 	void setRit(int v);
 	int  getRit();

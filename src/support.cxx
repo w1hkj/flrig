@@ -498,6 +498,7 @@ void setMode()
 {
 	FREQMODE fm = vfo;
 	fm.imode = opMODE->index();
+	fm.iBW = selrig->def_bandwidth(fm.imode);
 	fm.src = UI;
 	useB ? queB.push(fm) : queA.push(fm);
 }
@@ -652,11 +653,12 @@ void cb_selectA() {
 	Fl::flush();
 
 	pthread_mutex_lock(&mutex_serial);
-	useB = false;
-//	while (!queA.empty()) queA.pop();
+	if (queA.empty()) {
+		vfoA.src = UI;
+		queA.push(vfoA);
+	}
 	selrig->selectA();
-//	vfoA.src = UI;
-//	queA.push(vfoA);
+	useB = false;
 	pthread_mutex_unlock(&mutex_serial);
 
 	pthread_mutex_lock(&mutex_xmlrpc);
@@ -680,11 +682,12 @@ void cb_selectB() {
 	Fl::flush();
 
 	pthread_mutex_lock(&mutex_serial);
-	useB = true;
-//	while (!queB.empty()) queB.pop();
+	if (queB.empty()) {
+		vfoB.src = UI;
+		queB.push(vfoB);
+	}
 	selrig->selectB();
-//	vfoB.src = UI;
-//	queB.push(vfoB);
+	useB = true;
 	pthread_mutex_unlock(&mutex_serial);
 
 	pthread_mutex_lock(&mutex_xmlrpc);

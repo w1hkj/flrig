@@ -368,7 +368,40 @@ int RIG_TS570::get_modeA()
 
 int RIG_TS570::adjust_bandwidth(int val)
 {
-	return bwA;
+	switch (val) {
+	case 0:
+	case 1:
+	case 3:
+	case 4:
+		bandwidths_ = TS570_SSBwidths;
+		return 1;
+	case 2:
+	case 6:
+		bandwidths_ = TS570_CWwidths;
+		return 5;
+	case 5:
+	case 7:
+		bandwidths_ = TS570_FSKwidths;
+		return 2;
+	}
+	return 1;
+}
+
+int RIG_TS570::def_bandwidth(int val)
+{
+	switch (val) {
+	case 0:
+	case 1:
+	case 3:
+	case 4:
+		return 1;
+	case 2:
+	case 6:
+		return 5;
+	case 5:
+	case 7:
+		return 2;
+	}
 }
 
 void RIG_TS570::set_bwA(int val)

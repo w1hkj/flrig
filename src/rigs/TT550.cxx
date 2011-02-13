@@ -23,6 +23,9 @@ TT550_AM_MODE, TT550_USB_MODE, TT550_LSB_MODE, TT550_CW_MODE, TT550_DIGI_MODE, T
 
 static const char *TT550modes_[] = {
 		"AM", "USB", "LSB", "CW", "DIGI", "FM", NULL};
+
+static const int TT550_def_bw[] = { 32, 20, 20, 10, 20, 32 };
+
 static const char TT550mode_chr[] =  { '0', '1', '2', '3', '1', '4' };
 static const char TT550mode_type[] = { 'U', 'U', 'L', 'L', 'U', 'U' };
 
@@ -558,11 +561,12 @@ int RIG_TT550::get_bwA()
 
 int RIG_TT550::adjust_bandwidth(int md)
 {
-	if (md == TT550_AM_MODE) bwA = 32;
-	if (md == TT550_CW_MODE) bwA = 10;
-	if (md == TT550_LSB_MODE || md == TT550_USB_MODE) bwA = 20;
-	if (md == TT550_FM_MODE) bwA = 32;
-	return bwA;
+	return (bwA = def_bandwidth(md));
+}
+
+int RIG_TT550::def_bandwidth(int m)
+{
+	return TT550_def_bw[m];
 }
 
 void RIG_TT550::set_if_shift(int val)

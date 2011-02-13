@@ -14,6 +14,7 @@ public:
 	int  get_modeB();
 
 	int  adjust_bandwidth(int m);
+	int  def_bandwidth(int m);
 	void set_attenuator( int val );
 	int  get_attenuator();
 	void set_preamp(int val);

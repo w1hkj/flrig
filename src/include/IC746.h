@@ -81,6 +81,7 @@ public:
 	virtual int  get_attenuator();
 	void tune_rig();
 	virtual int  adjust_bandwidth(int m);
+	virtual int  def_bandwidth(int m);
 	void set_notch(bool on, int val);
 	bool get_notch(int &val);
 	void get_notch_min_max_step(int &min, int &max, int &step);

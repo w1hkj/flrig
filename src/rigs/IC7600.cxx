@@ -17,42 +17,44 @@ const char IC7600name_[] = "IC-7600";
 const char *IC7600modes_[] = {
 	"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R", "PSK", "PSK-R", NULL};
 
-const char IC7600_mode_type[] = { 
+const char IC7600_mode_type[] = {
 	'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U', 'U', 'L' };
 
 const char IC7600_mode_nbr[] = {
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07, 0x08, 0x12, 0x13 };
 
-const char IC7600_ssb_bws[] = {
-"50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500", 
+const char *IC7600_ssb_bws[] = {
+"50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
 "600",   "700",  "800",  "900",
 "1000", "1100", "1200", "1300", "1400", "1500", "1600", "1700", "1800", "1900",
 "2000", "2100", "2200", "2300", "2400", "2500", "2600", "2700", "2800", "2900",
 "3000", "3100", "3200", "3300", "3400", "3500", "3600", NULL };
 
-const char IC7600_rtty_bws[] = {
+const char *IC7600_rtty_bws[] = {
 "50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
 "600",   "700",  "800",  "900",
 "1000", "1100", "1200", "1300", "1400", "1500", "1600", "1700", "1800", "1900",
 "2000", "2100", "2200", "2300", "2400", "2500", "2600", "2700", NULL };
 
-const char IC7600_am_bws[] = {
+const char *IC7600_am_bws[] = {
 "200",   "400",  "600",  "800", "1000", "1200", "1400", "1600", "1800", "2000",
 "2200", "2400", "2600", "2800", "3000", "3200", "3400", "3600", "3800", "4000",
 "4200", "4400", "4600", "4800", "5000", "5200", "5400", "5600", "5800", "6000",
 "6200", "6400", "6600", "6800", "7000", "7200", "7400", "7600", "7800", "8000",
 "8200", "8400", "8600", "8800", "9000", "9200", "9400", "9600", "9800", "10000", NULL };
 
-const char IC7600_fm_bws[] = {
+const char *IC7600_fm_bws[] = {
 "FIXED", NULL };
 
 RIG_IC7600::RIG_IC7600() {
 	defaultCIV = 0x7A;
 	name_ = IC7600name_;
 	modes_ = IC7600modes_;
-	bws_ = IC7600_ssb_bws;
+	bandwidths_ = IC7600_ssb_bws;
 	_mode_type = IC7600_mode_type;
 	adjustCIV(defaultCIV);
+
+	has_bandwidth_control = true;
 };
 
 //======================================================================
@@ -138,8 +140,8 @@ int RIG_IC7600::get_bwA()
 	cmd.append("\x1a\x03");
 	cmd.append(post);
 	if (sendICcommand (cmd, 9)) {
-		A.iBW = fm_bcd(&replystr[7), 2)
-	};
+		A.iBW = fm_bcd(&replystr[7], 2);
+	}
 	return A.iBW;
 }
 
@@ -162,8 +164,8 @@ int RIG_IC7600::get_bwB()
 	cmd.append("\x1a\x03");
 	cmd.append(post);
 	if (sendICcommand (cmd, 9)) {
-		B.iBW = fm_bcd(&replystr[7), 2)
-	};
+		B.iBW = fm_bcd(&replystr[7], 2);
+	}
 	return B.iBW;
 }
 
@@ -195,14 +197,47 @@ int RIG_IC7600::adjust_bandwidth(int m)
 			bandwidths_ = IC7600_rtty_bws;
 			bw = 12;
 			break;
-		case 0: case 1: case 3: case 6: case 8: case 9: 
-		default: // SSB
+		case 3: case 6: // CW
 			bandwidths_ = IC7600_ssb_bws;
-			bw = 35;
+			bw = 12;
+			break;
+		case 8: case 9: // PKT
+			bandwidths_ = IC7600_ssb_bws;
+			bw = 34;
+			break;
+		case 0: case 1: // SSB
+		default:
+			bandwidths_ = IC7600_ssb_bws;
+			bw = 34;
 	}
 	return bw;
 }
 
+int RIG_IC7600::def_bandwidth(int m)
+{
+	int bw = 0;
+	switch (m) {
+		case 2: // AM
+			bw = 19;
+			break;
+		case 5: // FM
+			bw = 0;
+			break;
+		case 4: case 7: // RTTY
+			bw = 12;
+			break;
+		case 3: case 6: // CW
+			bw = 12;
+			break;
+		case 8: case 9: // PKT
+			bw = 34;
+			break;
+		case 0: case 1: // SSB
+		default:
+			bw = 34;
+	}
+	return bw;
+}
 
 void RIG_IC7600::set_mic_gain(int v)
 {

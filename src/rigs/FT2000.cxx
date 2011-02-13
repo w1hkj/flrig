@@ -16,6 +16,7 @@ static const char FT2000name_[] = "FT-2000";
 
 static const char *FT2000modes_[] = {
 "LSB", "USB", "CW", "FM", "AM", "RTTY-L", "CW-R", "PKT-L", "RTTY-U", "PKT-FM", "FM-N", "PKT-U", NULL};
+
 static const char FT2000_mode_chr[] =  { 
 '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C' };
 static const char FT2000_mode_type[] = { 
@@ -331,6 +332,11 @@ int RIG_FT2000::adjust_bandwidth(int m)
 			break;
 	}
 	return bwA;
+}
+
+int RIG_FT2000::def_bandwidth(int m)
+{
+	return 0;
 }
 
 const char **RIG_FT2000::bwtable(int m)

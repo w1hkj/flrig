@@ -156,8 +156,8 @@ void RIG_IC746::set_vfoA (long freq)
 	cmd.append( post );
 	sendICcommand(cmd, 6);
 	checkresponse(6);
-	if (RIG_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+//	if (RIG_DEBUG)
+//		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 long RIG_IC746::get_vfoB ()
@@ -180,8 +180,8 @@ void RIG_IC746::set_vfoB (long freq)
 	cmd.append( post );
 	sendICcommand(cmd, 6);
 	checkresponse(6);
-	if (RIG_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+//	if (RIG_DEBUG)
+//		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 int RIG_IC746::get_smeter()
@@ -747,6 +747,21 @@ int RIG_IC746PRO::adjust_bandwidth(int m)
 	}
 	if (m == 4 || m == 7) { //RTTY
 		bandwidths_ = IC746PRO_RTTYwidths;
+		return (28);
+	}
+	bandwidths_ = IC746PRO_AMFMwidths;
+	return (0);
+}
+
+int RIG_IC746PRO::def_bandwidth(int m)
+{
+	if (m == 0 || m == 1 || m == 8 || m == 9) { //SSB
+		return (32);
+	}
+	if (m == 3 || m == 6) { //CW
+		return (14);
+	}
+	if (m == 4 || m == 7) { //RTTY
 		return (28);
 	}
 	bandwidths_ = IC746PRO_AMFMwidths;
