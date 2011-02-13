@@ -62,6 +62,7 @@ public:
 //	void get_mic_min_max_step(int &min, int &max, int &step);
 	void checkresponse();
 	int  adjust_bandwidth(int);
+	int  def_bandwidth(int);
 	const char **bwtable(int);
 };
 

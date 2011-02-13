@@ -38,6 +38,7 @@ public:
 	void set_bwA(int val);
 	int  get_bwA();
 	int  adjust_bandwidth(int val);
+	int  def_bandwidth(int val);
 	void set_widths();
 	//	void set_if_shift(int val);
 	//	bool get_if_shift(int &val);

@@ -529,6 +529,27 @@ int RIG_IC7200::adjust_bandwidth(int m)
 	return bwA;
 }
 
+int RIG_IC7200::def_bandwidth(int m)
+{
+	switch (m) {
+		case 2: // AM
+			return 0;
+		case 3:
+		case 5: // CW
+			return 14;
+		case 4:
+		case 6: // RTTY
+			return 28;
+		case 0:
+		case 1:
+		case 7:
+		case 8: 
+		default: // SSB
+			return 32;
+	}
+	return 32;
+}
+
 const char ** RIG_IC7200::bwtable(int m)
 {
 	switch (m) {

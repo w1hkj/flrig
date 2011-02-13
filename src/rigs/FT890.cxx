@@ -1,4 +1,6 @@
 /*
+ * UNFINISHED !!
+ *
  * Yaesu FT-890 drivers
  * 
  * a part of flrig

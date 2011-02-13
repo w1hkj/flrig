@@ -21,6 +21,9 @@ static const char *FT950modes_[] = {
 "LSB", "USB", "CW", "FM", "AM", "RTTY-L",
 "CW-R", "PKT-L", "RTTY-U", "PKT-FM",
 "FM-N", "PKT-U", "AM-N", NULL};
+
+static const int FT950_def_bw[] = { 19, 19, 5, 0, 0, 5, 5, 19, 5, 0, 0, 19, 0 };
+
 static const char FT950_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D' };
 static const char FT950_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L', 'U', 'U', 'U', 'U', 'U' };
 
@@ -28,16 +31,19 @@ static const char *FT950_widths_SSB[] = {
 "200", "400", "600", "850", "1100", "1350", "1500", "1650", "1800",
 "1950", "2100", "2250", "2400", "2450", "2500", "2600", "2700",
 "2800", "2900", "3000", NULL };
+
 static int FT950_wvals_SSB[] = {
 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20, WVALS_LIMIT};
 
 static const char *FT950_widths_CW[] = {
 "100", "200", "300", "400", "500",
 "800", "1200", "1400", "1700", "2000", "2400", NULL };
+
 static int FT950_wvals_CW[] = {
 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, WVALS_LIMIT };
 
 static const int FT950_wvals_AMFM[] = { 0, WVALS_LIMIT };
+
 static const char *FT950_widths_AMnar[]  = {  "6000", NULL };
 static const char *FT950_widths_AMwide[] = {  "9000", NULL };
 static const char *FT950_widths_FMnar[]  = { "12500", NULL };
@@ -322,7 +328,6 @@ int RIG_FT950::get_preamp()
 	return preamp_level;
 }
 
-
 int RIG_FT950::adjust_bandwidth(int val)
 {
 	if (val == 2 || val == 5 || val == 6 || val == 8) {
@@ -343,6 +348,11 @@ int RIG_FT950::adjust_bandwidth(int val)
 	}
 	bwB = bwA;
 	return bwA;
+}
+
+int RIG_FT950::def_bandwidth(int val)
+{
+	return FT950_def_bw[val];
 }
 
 const char ** RIG_FT950::bwtable(int n)

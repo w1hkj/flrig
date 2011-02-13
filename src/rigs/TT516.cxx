@@ -32,6 +32,8 @@ static const char TT516name_[] = "TT-516";
 
 static const char *TT516modes_[] = {
 		"AM", "USB", "LSB", "CW", "FM", NULL};
+
+static int TT516_def_bw[] = { 26, 36, 36, 12, 36 };
 static const char TT516mode_chr[] =  { '0', '1', '2', '3', '4' };
 static const char TT516mode_type[] = { 'U', 'U', 'L', 'U', 'U' };
 
@@ -227,23 +229,21 @@ int RIG_TT516::get_modetype(int n)
 	return TT516mode_type[n];
 }
 
-int RIG_TT516::adjust_bandwidth(int m)
-{
-	if (m == 0) { // AM
-		bandwidths_ = TT516_AM_widths;
-		inuse == onA ? A.iBW = 36 : B.iBW = 36;
-	} else {
-		bandwidths_ = TT516_widths;
-		if (m == 3) inuse == onA ? A.iBW = 12 : B.iBW = 12;
-		else inuse == onA ? A.iBW = 36 : B.iBW = 36;
-	}
-	return inuse == onA ? A.iBW : B.iBW;
-}
-
 const char **RIG_TT516::bwtable(int m)
 {
 	if (m == 0) return TT516_AM_widths;
 	return TT516_widths;
+}
+
+int RIG_TT516::def_bandwidth(int m)
+{
+	return TT516_def_bw[m];
+}
+
+int RIG_TT516::adjust_bandwidth(int m)
+{
+	bwtable(m);
+	return def_bandwidth(m);
 }
 
 void RIG_TT516::set_modeA(int val)

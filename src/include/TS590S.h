@@ -29,6 +29,7 @@ public:
 	int  get_modeB();
 
 	int  adjust_bandwidth(int val);
+	int  def_bandwidth(int val);
 	void set_widths();
 	void set_active_bandwidth();
 	int  get_active_bandwidth();

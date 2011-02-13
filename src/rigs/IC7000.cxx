@@ -123,6 +123,20 @@ int RIG_IC7000::adjust_bandwidth(int m)
 	return (bwA = 0);
 }
 
+int RIG_IC7000::def_bandwidth(int m)
+{
+	if (m == 0 || m == 1) { //SSB
+		return 32;
+	}
+	if (m == 3 || m == 6) { //CW
+		return 14;
+	}
+	if (m == 4 || m == 7) { //RTTY
+		return 28;
+	}
+	return 0;
+}
+
 
 int RIG_IC7000::get_attenuator()
 {

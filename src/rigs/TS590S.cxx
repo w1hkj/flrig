@@ -426,9 +426,21 @@ const char **RIG_TS590S::bwtable(int m)
 	return TS590S_AMwidths;
 }
 
+int RIG_TS590S::def_bandwidth(int val)
+{
+	if (val == 0 || val == 1 || val == 3 || val == 8 || val == 9 || val == 10)
+		return 8;
+	else if (val == 2 || val == 6)
+		return 7;
+	else if (val == 5 || val == 7)
+		return 1;
+	return 5;
+}
+
 int RIG_TS590S::adjust_bandwidth(int val)
 {
-	return active_bandwidth;
+	bandwidths_ = bwtable(val);
+	return def_bandwidth(val);
 }
 
 void RIG_TS590S::set_active_bandwidth()

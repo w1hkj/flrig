@@ -16,6 +16,7 @@ const char RIG_TT599name_[] = "Eagle";
 
 const char *RIG_TT599modes_[] = {
 		"USB", "LSB", "CWU", "CWL", "AM", "FM", NULL};
+static const int  RIG_TT599_def_bw[] = { 19, 19, 7, 7, 24, 19 };
 static const char RIG_TT599_mode_type[] = {'U', 'L', 'U', 'L', 'U', 'U'};
 
 const char *RIG_TT599widths[] = { 
@@ -220,6 +221,15 @@ int RIG_TT599::get_bwB()
 	return bwB;
 }
 
+int  RIG_TT599::adjust_bandwidth(int m)
+{
+	return RIG_TT599_def_bw[m];
+}
+
+int  RIG_TT599::def_bandwidth(int m)
+{
+	return RIG_TT599_def_bw[m];
+}
 
 int RIG_TT599::get_modetype(int n)
 {

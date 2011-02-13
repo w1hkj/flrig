@@ -23,7 +23,8 @@ public:
 	void set_bwB(int val);
 	int  get_bwB();
 
-	int  adjust_bandwidths(int val);
+	int  adjust_bandwidth(int m);
+	int  def_bandwidth(int m);
 
 	void set_attenuator( int val );	//alh
 	int  get_attenuator();		//alh

@@ -48,6 +48,7 @@ public:
 	void set_power_control(double val);
 	void set_mic_gain(int val);
 	int  adjust_bandwidth(int m);
+	int  def_bandwidth(int m);
 	void set_compression();
 	void set_auto_notch(int val);
 	int  get_auto_notch();
