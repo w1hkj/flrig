@@ -1297,6 +1297,22 @@ void adjust_control_positions()
 	btnTune->position( btnTune->x(), y);
 	btnTune->redraw();
 
+	if (rig_nbr == FT1000MP) {
+		y -= 20;
+		btnTune->position( btnTune->x(), y);
+		btnTune->redraw();
+		btnAutoNotch->position( btnAutoNotch->x(), y);
+		btnAutoNotch->redraw();
+		btnPTT->position( btnPTT->x(), y);
+		btnPTT->redraw();
+	}
+
+	if (rig_nbr == FT100D) {
+		y -= 20;
+		btnPTT->position( btnPTT->x(), y);
+		btnPTT->redraw();
+	}
+
 	int use_AuxPort = (progStatus.aux_serial_port != "NONE");
 	if (use_AuxPort) {
 		btnPTT->resize(btnPTT->x(), y, btnPTT->w(), 38);
@@ -1493,9 +1509,10 @@ void initRig()
 		cntRIT->minimum(min);
 		cntRIT->maximum(max);
 		cntRIT->step(step);
-		cntRIT->activate();
-	} else
-		cntRIT->deactivate();
+		cntRIT->show();
+	} else {
+		cntRIT->hide();
+	}
 
 	if (selrig->has_xit) {
 		cntXIT->value(progStatus.xit_freq);
@@ -1504,9 +1521,10 @@ void initRig()
 		cntXIT->minimum(min);
 		cntXIT->maximum(max);
 		cntXIT->step(step);
-		cntXIT->activate();
-	} else
-		cntXIT->deactivate();
+		cntXIT->show();
+	} else {
+		cntXIT->hide();
+	}
 
 	if (selrig->has_bfo) {
 		cntBFO->value(progStatus.bfo_freq);
@@ -1515,9 +1533,10 @@ void initRig()
 		cntBFO->minimum(min);
 		cntBFO->maximum(max);
 		cntBFO->step(step);
-		cntBFO->activate();
-	} else
-		cntBFO->deactivate();
+		cntBFO->show();
+	} else {
+		cntBFO->hide();
+	}
 
 	if (selrig->has_volume_control) {
 		int min, max, step;
@@ -1688,6 +1707,8 @@ void initRig()
 	if (selrig->has_auto_notch) {
 		if (rig_nbr == RAY152)
 			btnAutoNotch->label("AGC");
+		else if (rig_nbr == FT1000MP)
+			btnAutoNotch->label("Tuner");
 		else
 			btnAutoNotch->label("AN");
 		progStatus.auto_notch = selrig->get_auto_notch();

@@ -42,12 +42,16 @@ public :
 	int  get_swr(void);
 	int  get_alc(void);
 
+	void set_auto_notch(int v); // usurped for Tuner ON/OFF control
+	int  get_auto_notch();
+
 	int  def_bandwidth(int m);
 
 private:
 	bool tune_on;
 	void init_cmd();
 	bool get_info(void);
+	bool tuner_on;
 };
 
 #endif
