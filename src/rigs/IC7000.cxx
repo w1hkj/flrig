@@ -28,6 +28,9 @@ RIG_IC7000::RIG_IC7000() {
 	_mode_type = IC7000_mode_type;
 	adjustCIV(defaultCIV);
 	restore_mbw = false;
+
+	has_auto_notch = true;
+
 };
 
 //======================================================================
@@ -184,3 +187,14 @@ int RIG_IC7000::get_preamp()
 	return 0;
 }
 
+void RIG_IC7000::set_auto_notch(int val)
+{
+	cmd = pre_to;
+	cmd.append("\x16\x41");
+	cmd += val ? 0x01 : 0x00;
+	cmd.append(post);
+	sendICcommand (cmd, 6);
+	checkresponse(6);
+	if (RIG_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+}
