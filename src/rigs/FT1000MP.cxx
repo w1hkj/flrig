@@ -196,7 +196,7 @@ const unsigned char amsync[] = {
 0x08, 0x00, 0x57, 0x67, 0x02, 0x00, 0x00, 0x01, 0x11, 0x00, 0x11, 0x91, 0x11, 0x11, 0x11, 0xFA
 };
 
-void RIG_FT1000MP::get_info(void)
+bool RIG_FT1000MP::get_info(void)
 {
 	unsigned char *p = 0;
 	int ret = 0;
@@ -230,7 +230,9 @@ void RIG_FT1000MP::get_info(void)
 		B.imode = i + ((alt == 128) ? 1 : 0);
 		B.iBW = 5*((p[8] & 0x70) >> 4) + (p[8] & 0x07);
 		if (B.iBW > 24) B.iBW = 24;
+		return true;
 	}
+	return false;
 }
 
 long RIG_FT1000MP::get_vfoA ()
