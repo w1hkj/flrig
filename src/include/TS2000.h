@@ -16,6 +16,23 @@ public:
 
 	long get_vfoA();
 	void set_vfoA(long);
+	void set_modeA(int val);
+	int  get_modeA();
+	void set_bwA(int val);
+	int  get_bwA();
+
+	long get_vfoB();
+	void set_vfoB(long);
+	void set_modeB(int val);
+	int  get_modeB();
+	void set_bwB(int val);
+	int  get_bwB();
+	int  def_bandwidth(int);
+
+	int  get_modetype(int n);
+	int  adjust_bandwidth(int val);
+	int  set_widths(int val);
+
 	int  get_smeter();
 	int  get_swr();
 	int  get_power_out();
@@ -29,13 +46,6 @@ public:
 	int  get_attenuator();
 	void set_preamp(int val);
 	int  get_preamp();
-	void set_modeA(int val);
-	int  get_modeA();
-	int  get_modetype(int n);
-	void set_bwA(int val);
-	int  get_bwA();
-	int  adjust_bandwidth(int val);
-	void set_widths();
 	void set_if_shift(int val);
 	bool get_if_shift(int &val);
 	void get_if_min_max_step(int &min, int &max, int &step);
