@@ -402,6 +402,7 @@ int RIG_TS570::def_bandwidth(int val)
 	case 7:
 		return 2;
 	}
+	return 2;
 }
 
 void RIG_TS570::set_bwA(int val)
