@@ -18,26 +18,14 @@ static const char *TS2000modes_[] = {
 static const char TS2000_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '9' };
 static const char TS2000_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'U' };
 
-/*
-static const char *TS2000_SSBwidths[] = {
-  "10",   "50",  "100",  "200",  "300",  "400", 
- "500",  "600",  "700",  "800",  "900", "1000",
-"1400", "1600", "1800", "2000", "2200", "2400",
-"2600", "2800", "3000", "3400", "4000", "5000", NULL};
-static const char *TS2000_SSBbw[] = {
-"SL00;", "SL01;", "SL02;", "SL03;", "SL04;", "SL05;", 
-"SL06;", "SL07;", "SL08;", "SL09;", "SL10;", "SL11;",
-"SH00;", "SH01;", "SH02;", "SH03;", "SH04;", "SH05;", 
-"SH06;", "SH07;", "SH08;", "SH09;", "SH10;", "SH11;" };
-*/
 static const char *TS2000_SSBwidths[] = {
 "400", "800", "1200", "1600", "2000", "2200", "2400", "2600", "2800", NULL};
 
 static const char *TS2000_SSBlower[] = {
-"SL11", "SL09", "SL07", "SL05", "SL03", "SL03", "SL03", "SL03", "SL03", NULL };
+"SL11;", "SL09;", "SL07;", "SL05;", "SL03;", "SL03;", "SL03;", "SL03;", "SL03;", NULL };
 
 static const char *TS2000_SSBupper[] = {
-"SH00", "SH01", "SH02", "SH03", "SH04", "SH05", "SH06", "SH07", "SH08", NULL };
+"SH00;", "SH01;", "SH02;", "SH03;", "SH04;", "SH05;", "SH06;", "SH07;", "SH08;", NULL };
 
 static const char *TS2000_CWwidths[] = {
 "50", "80", "100", "150", "200", 
@@ -76,11 +64,9 @@ RIG_TS2000::RIG_TS2000() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	modeA = 1;
-	bwA = 8;
-	def_mode = 1;
-	defbw_ = 8;
-	deffreq_ = 14070000;
+	B.imode = A.imode = 1;
+	B.iBW = A.iBW = 8;
+	B.freq = A.freq = 14070000;
 
 	has_micgain_control =
 	has_notch_control =
@@ -123,30 +109,57 @@ void RIG_TS2000::initialize()
 long RIG_TS2000::get_vfoA ()
 {
 	cmd = "FA;";
-	if (sendTScommand(cmd, 14, false)) {
+	if (sendTScommand(cmd, 14, false) == 14) {
 		int f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replybuff[n] - '0';
-		freqA = f;
+		A.freq = f;
 	}
-	return freqA;
+	return A.freq;
 }
 
 void RIG_TS2000::set_vfoA (long freq)
 {
-	freqA = freq;
+	A.freq = freq;
 	cmd = "FA00000000000;";
 	for (int i = 12; i > 1; i--) {
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
+if (RIG_DEBUG)
+	LOG_INFO("%s", cmd.c_str());
+	sendTScommand(cmd, 0, false);
+}
+
+long RIG_TS2000::get_vfoB ()
+{
+	cmd = "FB;";
+	if (sendTScommand(cmd, 14, false) == 14) {
+		int f = 0;
+		for (size_t n = 2; n < 13; n++)
+			f = f*10 + replybuff[n] - '0';
+		B.freq = f;
+	}
+	return B.freq;
+}
+
+void RIG_TS2000::set_vfoB (long freq)
+{
+	B.freq = freq;
+	cmd = "FA00000000000;";
+	for (int i = 12; i > 1; i--) {
+		cmd[i] += freq % 10;
+		freq /= 10;
+	}
+if (RIG_DEBUG)
+	LOG_INFO("%s", cmd.c_str());
 	sendTScommand(cmd, 0, false);
 }
 
 int RIG_TS2000::get_smeter()
 {
 	cmd = "SM0;";
-	if(sendTScommand(cmd, 8, false)) {
+	if(sendTScommand(cmd, 8, false) == 8) {
 		replybuff[7] = 0;
 		int mtr = atoi(&replybuff[5]);
 		mtr = (mtr * 100) / 30;
@@ -158,7 +171,7 @@ int RIG_TS2000::get_smeter()
 int RIG_TS2000::get_swr()
 {
 	cmd = "RM1;";
-	if (sendTScommand(cmd, 8, false)) {
+	if (sendTScommand(cmd, 8, false) == 8) {
 		replybuff[7] = 0;
 		int mtr = atoi(&replybuff[5]);
 		mtr = (mtr * 100) / 30;
@@ -175,13 +188,15 @@ void RIG_TS2000::set_power_control(double val)
 		cmd[i] += ival % 10;
 		ival /= 10;
 	}
+if (RIG_DEBUG)
+	LOG_INFO("%s", cmd.c_str());
 	sendTScommand(cmd, 0, false);
 }
 
 int RIG_TS2000::get_power_out()
 {
 	cmd = "PC;";
-	if (sendTScommand(cmd, 6, false)) {
+	if (sendTScommand(cmd, 6, false) == 6) {
 		replybuff[5] = 0;
 		int mtr = atoi(&replybuff[2]);
 		return mtr;
@@ -198,7 +213,7 @@ int RIG_TS2000::get_power_control()
 int RIG_TS2000::get_volume_control()
 {
 	cmd = "AG0;";
-	if (sendTScommand(cmd, 8, false))  {
+	if (sendTScommand(cmd, 8, false) == 8)  {
 		cmd[7] = 0;
 		int val = atoi(&replybuff[3]);
 		return (int)(val / 2.55);
@@ -214,6 +229,8 @@ void RIG_TS2000::set_volume_control(int val)
 		cmd[i] += ivol % 10;
 		ivol /= 10;
 	}
+if (RIG_DEBUG)
+	LOG_INFO("%s", cmd.c_str());
 	sendTScommand(cmd, 0, false);
 }
 
@@ -222,12 +239,16 @@ void RIG_TS2000::set_PTT_control(int val)
 {
 	if (val) cmd = "TX;";
 	else	 cmd = "RX;";
+if (RIG_DEBUG)
+	LOG_INFO("%s", cmd.c_str());
 	sendTScommand(cmd, 4, false);
 }
 
 void RIG_TS2000::tune_rig()
 {
 	cmd = "AC111;";
+if (RIG_DEBUG)
+	LOG_INFO("%s", cmd.c_str());
 	sendTScommand(cmd, 0, false);
 }
 
@@ -236,13 +257,15 @@ void RIG_TS2000::set_attenuator(int val)
 	att_level = val;
 	if (val) cmd = "RA01;";
 	else     cmd = "RA00;";
+if (RIG_DEBUG)
+	LOG_INFO("%s", cmd.c_str());
 	sendTScommand(cmd, 0, false);
 }
 
 int RIG_TS2000::get_attenuator()
 {
 	cmd = "RA;";
-	if (sendTScommand(cmd, 7, false)) {
+	if (sendTScommand(cmd, 7, false) == 7) {
 		if (replybuff[2] == '0' && replybuff[3] == '0')
 			att_level = 0;
 		else
@@ -256,13 +279,15 @@ void RIG_TS2000::set_preamp(int val)
 	preamp_level = val;
 	if (val) cmd = "PA1;";
 	else     cmd = "PA0;";
+if (RIG_DEBUG)
+	LOG_INFO("%s", cmd.c_str());
 	sendTScommand(cmd, 0, false);
 }
 
 int RIG_TS2000::get_preamp()
 {
 	cmd = "PA;";
-	if (sendTScommand(cmd, 5, false) ) {
+	if (sendTScommand(cmd, 5, false) == 5) {
 		if (replystr[2] == '1') 
 			preamp_level = 1;
 		else
@@ -271,21 +296,23 @@ int RIG_TS2000::get_preamp()
 	return preamp_level;
 }
 
-void RIG_TS2000::set_widths()
+int RIG_TS2000::set_widths(int val)
 {
-	if (modeA == 0 || modeA == 1 || modeA == 3) {
+	int bw;
+	if (val == 0 || val == 1 || val == 3) {
 		bandwidths_ = TS2000_SSBwidths;
-		bwA = 8;
-	} else if (modeA == 2 || modeA == 6) {
+		bw = 8;
+	} else if (val == 2 || val == 6) {
 		bandwidths_ = TS2000_CWwidths;
-		bwA = 7;
-	} else if (modeA == 5 || modeA == 7) {
+		bw = 7;
+	} else if (val == 5 || val == 7) {
 		bandwidths_ = TS2000_FSKwidths;
-		bwA = 1;
+		bw = 1;
 	} else {
 		bandwidths_ = TS2000_AMwidths;
-		bwA = 5;
+		bw = 5;
 	}
+	return bw;
 }
 
 const char **RIG_TS2000::bwtable(int m)
@@ -301,79 +328,206 @@ const char **RIG_TS2000::bwtable(int m)
 
 void RIG_TS2000::set_modeA(int val)
 {
-	modeA = val;
+	A.imode = val;
 	cmd = "MD";
 	cmd += TS2000_mode_chr[val];
 	cmd += ';';
+if (RIG_DEBUG)
+	LOG_INFO("%s", cmd.c_str());
 	sendTScommand(cmd, 4, false);
-	set_widths();
+	A.iBW = set_widths(val);
 }
 
 int RIG_TS2000::get_modeA()
 {
-	if (sendTScommand("MD;", 4, false)) {
+	if (sendTScommand("MD;", 4, false) == 4) {
 		int md = replybuff[2];
 		md = md - '1';
 		if (md == 8) md = 7;
-		modeA = md;
+		A.imode = md;
+		A.iBW = set_widths(A.imode);
 	}
-	set_widths();
-	return modeA;
+	return A.imode;
+}
+
+void RIG_TS2000::set_modeB(int val)
+{
+	B.imode = val;
+	cmd = "MD";
+	cmd += TS2000_mode_chr[val];
+	cmd += ';';
+if (RIG_DEBUG)
+	LOG_INFO("%s", cmd.c_str());
+	sendTScommand(cmd, 4, false);
+	B.iBW = set_widths(val);
+}
+
+int RIG_TS2000::get_modeB()
+{
+	if (sendTScommand("MD;", 4, false) == 4) {
+		int md = replybuff[2];
+		md = md - '1';
+		if (md == 8) md = 7;
+		B.imode = md;
+		B.iBW = set_widths(B.imode);
+	}
+	return B.imode;
 }
 
 int RIG_TS2000::adjust_bandwidth(int val)
 {
-	return bwA;
+	int bw;
+	if (val == 0 || val == 1 || val == 3) {
+		bw = 8;
+	} else if (val == 2 || val == 6) {
+		bw = 7;
+	} else if (val == 5 || val == 7) {
+		bw = 1;
+	} else {
+		bw = 5;
+	}
+	return bw;
 }
-	
+
+int RIG_TS2000::def_bandwidth(int val)
+{
+	return adjust_bandwidth(val);
+}
+
 void RIG_TS2000::set_bwA(int val)
 {
-	bwA = val;
-	if (modeA == 0 || modeA == 1 || modeA == 3) {
-		sendTScommand(TS2000_SSBlower[bwA], 5, false);
-		sendTScommand(TS2000_SSBupper[bwA], 5, false);
+	A.iBW = val;
+	string sent = "";
+	if (A.imode == 0 || A.imode == 1 || A.imode == 3) {
+		cmd = TS2000_SSBlower[A.iBW];
+		sendTScommand(cmd, 5, false);
+		sent.append(cmd);
+		cmd = TS2000_SSBupper[A.iBW];
+		sendTScommand(cmd, 5, false);
+		sent.append(cmd);
 	}
-	else if (modeA == 2 || modeA == 6)
-		sendTScommand(TS2000_CWbw[bwA], 5, false);
-	else if (modeA == 5 || modeA == 7)
-		sendTScommand(TS2000_FSKbw[bwA], 7, false);
-	else
-		sendTScommand(TS2000_AMbw[bwA], 5, false);
+	else if (A.imode == 2 || A.imode == 6) {
+		cmd = TS2000_CWbw[A.iBW];
+		sendTScommand(cmd, 5, false);
+		sent.append(cmd);
+	}else if (A.imode == 5 || A.imode == 7) {
+		cmd = TS2000_FSKbw[A.iBW];
+		sendTScommand(cmd, 7, false);
+		sent.append(cmd);
+	} else {
+		cmd = TS2000_AMbw[A.iBW];
+		sendTScommand(cmd, 5, false);
+		sent.append(cmd);
+	}
+if (RIG_DEBUG)
+	LOG_INFO("%s", sent.c_str());
 }
 
 int RIG_TS2000::get_bwA()
 {
 	int i = 0;
-	if (modeA == 0 || modeA == 1 || modeA == 3) {
-		sendTScommand("SH;", 5, false);
-		for (i = 0; i < 9; i++)
-			if (strcmp(replybuff, TS2000_SSBupper[i]) == 0)
-				break;
-		if (i == 9) i = 8;
-		bwA = i;
-	} else if (modeA == 2) {
-		sendTScommand("FW;", 7, false);
-		for (i = 0; i < 11; i++)
-			if (strcmp(replybuff, TS2000_CWbw[i]) == 0)
-				break;
-		if (i == 11) i = 10;
-		bwA = i;
-	} else if (modeA == 5 || modeA == 7) {
-		sendTScommand("FW;", 7, false);
-		for (i = 0; i < 4; i++)
-			if (strcmp(replybuff, TS2000_FSKbw[i]) == 0)
-				break;
-		if (i == 4) i = 3;
-		bwA = i;
+	if (A.imode == 0 || A.imode == 1 || A.imode == 3) {
+		if (sendTScommand("SH;", 5, false) == 5) {
+			for (i = 0; i < 9; i++)
+				if (strcmp(replybuff, TS2000_SSBupper[i]) == 0)
+					break;
+			if (i == 9) i = 8;
+			A.iBW = i;
+		}
+	} else if (A.imode == 2) {
+		if (sendTScommand("FW;", 7, false) == 7) {
+			for (i = 0; i < 11; i++)
+				if (strcmp(replybuff, TS2000_CWbw[i]) == 0)
+					break;
+			if (i == 11) i = 10;
+			A.iBW = i;
+		}
+	} else if (A.imode == 5 || A.imode == 7) {
+		if (sendTScommand("FW;", 7, false) == 7) {
+			for (i = 0; i < 4; i++)
+				if (strcmp(replybuff, TS2000_FSKbw[i]) == 0)
+					break;
+			if (i == 4) i = 3;
+			A.iBW = i;
+		}
 	} else {
-		sendTScommand("SL;", 5, false);
-		for (i = 0; i < 8; i++)
-			if (strcmp(replybuff, TS2000_AMbw[i]) == 0)
-				break;
-		if (i == 8) i = 7;
-		bwA = i;
+		if (sendTScommand("SL;", 5, false) == 5) {
+			for (i = 0; i < 8; i++)
+				if (strcmp(replybuff, TS2000_AMbw[i]) == 0)
+					break;
+			if (i == 8) i = 7;
+			A.iBW = i;
+		}
 	}
-	return bwA;
+	return A.iBW;
+}
+
+void RIG_TS2000::set_bwB(int val)
+{
+	B.iBW = val;
+	string sent = "";
+	if (B.imode == 0 || B.imode == 1 || B.imode == 3) {
+		cmd = TS2000_SSBlower[B.iBW];
+		sendTScommand(cmd, 5, false);
+		sent.append(cmd);
+		cmd = TS2000_SSBupper[B.iBW];
+		sendTScommand(cmd, 5, false);
+		sent.append(cmd);
+	}
+	else if (A.imode == 2 || B.imode == 6) {
+		cmd = TS2000_CWbw[B.iBW];
+		sendTScommand(cmd, 5, false);
+		sent.append(cmd);
+	}else if (B.imode == 5 || B.imode == 7) {
+		cmd = TS2000_FSKbw[B.iBW];
+		sendTScommand(cmd, 7, false);
+		sent.append(cmd);
+	} else {
+		cmd = TS2000_AMbw[B.iBW];
+		sendTScommand(cmd, 5, false);
+		sent.append(cmd);
+	}
+if (RIG_DEBUG)
+	LOG_INFO("%s", sent.c_str());
+}
+
+int RIG_TS2000::get_bwB()
+{
+	int i = 0;
+	if (B.imode == 0 || B.imode == 1 || B.imode == 3) {
+		if (sendTScommand("SH;", 5, false) == 5) {
+			for (i = 0; i < 9; i++)
+				if (strcmp(replybuff, TS2000_SSBupper[i]) == 0)
+					break;
+			if (i == 9) i = 8;
+			B.iBW = i;
+		}
+	} else if (B.imode == 2) {
+		if (sendTScommand("FW;", 7, false) == 7) {
+			for (i = 0; i < 11; i++)
+				if (strcmp(replybuff, TS2000_CWbw[i]) == 0)
+					break;
+			if (i == 11) i = 10;
+			B.iBW = i;
+		}
+	} else if (B.imode == 5 || B.imode == 7) {
+		if (sendTScommand("FW;", 7, false) == 7) {
+			for (i = 0; i < 4; i++)
+				if (strcmp(replybuff, TS2000_FSKbw[i]) == 0)
+					break;
+			if (i == 4) i = 3;
+			B.iBW = i;
+		}
+	} else {
+		if (sendTScommand("SL;", 5, false) == 5) {
+			for (i = 0; i < 8; i++)
+				if (strcmp(replybuff, TS2000_AMbw[i]) == 0)
+					break;
+			if (i == 8) i = 7;
+			B.iBW = i;
+		}
+	}
+	return B.iBW;
 }
 
 int RIG_TS2000::get_modetype(int n)
@@ -389,15 +543,19 @@ void RIG_TS2000::set_mic_gain(int val)
 		cmd[1+i] += val % 10;
 		val /= 10;
 	}
+if (RIG_DEBUG)
+	LOG_INFO("%s", cmd.c_str());
 	sendTScommand(cmd, 0, false);
 }
 
 int RIG_TS2000::get_mic_gain()
 {
-	sendTScommand("MG;", 6, false);
-	replybuff[5] = 0;
-	int val = atoi(&replybuff[2]);
-	return val;
+	if (sendTScommand("MG;", 6, false) == 6) {
+		replybuff[5] = 0;
+		int val = atoi(&replybuff[2]);
+		return val;
+	}
+	return 0;
 }
 
 void RIG_TS2000::get_mic_min_max_step(int &min, int &max, int &step)
@@ -413,6 +571,8 @@ void RIG_TS2000::set_noise(bool b)
 		cmd = "NB1;";
 	else
 		cmd = "NB0;";
+if (RIG_DEBUG)
+	LOG_INFO("%s", cmd.c_str());
 	sendTScommand(cmd, 0, false);
 }
 
@@ -431,18 +591,21 @@ void RIG_TS2000::set_if_shift(int val)
 		cmd[3+i] += val % 10;
 		val /= 10;
 	}
+if (RIG_DEBUG)
+	LOG_INFO("%s", cmd.c_str());
 	sendTScommand(cmd, 0, false);
 }
 
 bool RIG_TS2000::get_if_shift(int &val)
 {
 	static int oldval = 0;
-	sendTScommand("IS;", 8, false);
-	replybuff[8] = 0;
-	val = atoi(&replybuff[3]);
-	if (val != 0 || oldval != val) {
-		oldval = val;
-		return true;
+	if (sendTScommand("IS;", 8, false) == 8) {
+		replybuff[8] = 0;
+		val = atoi(&replybuff[3]);
+		if (val != 0 || oldval != val) {
+			oldval = val;
+			return true;
+		}
 	}
 	oldval = val;
 	return false;
@@ -459,12 +622,16 @@ void RIG_TS2000::set_notch(bool on, int val)
 {
 	cmd = "BP00000;";
 	if (on == false) {
+if (RIG_DEBUG)
+	LOG_INFO("%s", cmd.c_str());
 		sendTScommand(cmd, 0, false);
 		notch_on = false;
 		return;
 	}
 	if (!notch_on) {
 		cmd[6] = '1'; // notch ON
+if (RIG_DEBUG)
+	LOG_INFO("%s", cmd.c_str());
 		sendTScommand(cmd, 0, false);
 		cmd[6] = '0';
 		notch_on = true;
@@ -478,6 +645,8 @@ void RIG_TS2000::set_notch(bool on, int val)
 		cmd[3 + i] += val % 10;
 		val /=10;
 	}
+if (RIG_DEBUG)
+	LOG_INFO("%s", cmd.c_str());
 	sendTScommand(cmd, 0, false);
 }
 
@@ -485,7 +654,7 @@ bool  RIG_TS2000::get_notch(int &val)
 {
 	bool ison = false;
 	cmd = "BP00;";
-	if (sendTScommand(cmd, 8, false)) {
+	if (sendTScommand(cmd, 8, false) == 8) {
 		if (replybuff[6] == '1') {
 			ison = true;
 			cmd = "BP01;";
