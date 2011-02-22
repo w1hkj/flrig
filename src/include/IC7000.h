@@ -19,6 +19,9 @@ public:
 	int  get_attenuator();
 	void set_preamp(int val);
 	int  get_preamp();
+
+	void set_auto_notch(int v);
+
 };
 
 
