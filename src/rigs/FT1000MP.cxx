@@ -85,6 +85,7 @@ RIG_FT1000MP::RIG_FT1000MP() {
 	B.iBW = 1;
 	precision = 10;
 	max_power = 200;
+	tuner_on = false;
 
 	has_swr_control =
 	has_alc_control =
@@ -93,6 +94,9 @@ RIG_FT1000MP::RIG_FT1000MP() {
 	has_ptt_control =
 	has_tune_control = 
 	has_get_info = true;
+// auto_notch used for Tuner ON/OFF control
+	has_auto_notch = true;
+
 
 };
 
@@ -419,9 +423,25 @@ LOG_INFO("%s", str2hex(cmd.c_str(), 5));
 void RIG_FT1000MP::tune_rig()
 {
 	init_cmd();
-	cmd[4] = 0x82; // start antenna tuner
+	cmd[4] = 0x82; // initiate tuner cycle
 	sendCommand(cmd,0);
 	LOG_INFO("%s", str2hex(cmd.c_str(), 5));
+}
+
+// used to turn tuner ON/OFF
+void RIG_FT1000MP::set_auto_notch(int v)
+{
+	tuner_on = v;
+	init_cmd();
+	cmd[3] = v ? 0x01 : 0x00;
+	cmd[4] = 0x81; // start antenna tuner
+	sendCommand(cmd,0);
+	LOG_INFO("%s", str2hex(cmd.c_str(), 5));
+}
+
+int RIG_FT1000MP::get_auto_notch()
+{
+	return tuner_on;
 }
 
 int  RIG_FT1000MP::get_power_out(void)
