@@ -1307,7 +1307,7 @@ void adjust_control_positions()
 		btnPTT->redraw();
 	}
 
-	if (rig_nbr == FT100D) {
+	if (rig_nbr == FT100D || rig_nbr == FT847) {
 		y -= 20;
 		btnPTT->position( btnPTT->x(), y);
 		btnPTT->redraw();
