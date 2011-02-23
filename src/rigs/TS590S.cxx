@@ -257,7 +257,7 @@ void RIG_TS590S::set_volume_control(int val)
 // Tranceiver PTT on/off
 void RIG_TS590S::set_PTT_control(int val)
 {
-	if (val) cmd = "TX;";
+	if (val) cmd = "TX1;";
 	else	 cmd = "RX;";
 	sendTScommand(cmd, 4, false);
 }
