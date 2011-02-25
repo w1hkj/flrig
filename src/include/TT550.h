@@ -19,6 +19,8 @@ private:
 	int TFreq;
 	int Bfo;
 
+	bool onA;
+
 	int ATTlevel;
 	int RFgain;
 
@@ -33,6 +35,9 @@ private:
 	void set_vfoRX(long freq);
 	void set_vfoTX(long freq);
 
+	void process_stream(string s);
+	void process_freq_entry(char c);
+
 public:
 	RIG_TT550();
 	~RIG_TT550(){}
@@ -44,6 +49,9 @@ public:
 	void set_vfoA(long);
 	long get_vfoB();
 	void set_vfoB(long);
+
+	void selectA();
+	void selectB();
 
 	void set_modeA(int val);
 	int  get_modeA();

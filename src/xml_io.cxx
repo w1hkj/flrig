@@ -216,7 +216,6 @@ void send_ptt_changed(bool PTT)
 	try {
 		XmlRpcValue res;
 		execute((PTT ? main_set_tx : main_set_rx), XmlRpcValue(), res);
-		ptt_on = PTT;
 	} catch (...) { 
 		fldigi_online = false;
 	}
@@ -285,7 +284,7 @@ bool xmlvfo_changed = false;
 
 static void check_for_ptt_change(const XmlRpcValue& trx_state)
 {
-	bool nuptt = trx_state == "TX";
+	bool nuptt = (trx_state == "TX");
 	if (nuptt != ptt_on) {
 		ptt_on = nuptt;
 		Fl::awake(setPTT, (void*)ptt_on);

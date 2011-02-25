@@ -54,12 +54,12 @@ status progStatus = {
 	0,			// int	CIV;
 	false,		// bool	USBaudio;
 
-	0,			// int  opBW;
-	1,			// int  opMODE;
-	7070000,	// long frequency;
-	0,			// vfoB bw;
-	0,			// vfoB mode;
-	7070000,	// vfoB freq
+	0,			// int  iBW_A;
+	1,			// int  imode_A;
+	7070000,	// long freq_A;
+	0,			// int  iBW_B;
+	0,			// int  imode_B;
+	7070000,	// long freq_B;
 	true,		// bool use_rig_data;
 	true,		// bool restore_rig_data;
 

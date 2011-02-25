@@ -221,6 +221,6 @@ extern void updateSquelch(void *d);
 extern void updateRFgain(void *d);
 extern void zeroXmtMeters(void *d);
 extern void reset_power_controlImage( void *d );
-extern void ALC_SWR_image(void *d = NULL);
+extern void update_UI_PTT(void *d = NULL);
 
 #endif
