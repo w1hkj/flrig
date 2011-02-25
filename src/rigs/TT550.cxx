@@ -118,6 +118,7 @@ static char TT550getFWDREF[]	= "?S\r";	// T<0..255><0..255>
 
 static char TT550setAMCARRIER[] 		= "R \r";	// enables AM mode transmit
 
+static string xcvrstream = "";
 
 RIG_TT550::RIG_TT550() {
 // base class values	
@@ -269,6 +270,9 @@ void RIG_TT550::initialize()
 	enable_tloop();
 	enable_xmtr();
 
+	xcvrstream.clear();
+	onA = true;
+
 }
 
 void RIG_TT550::enable_xmtr()
@@ -303,8 +307,6 @@ int DigiAdj = 0;
 
 void RIG_TT550::set_vfoRX(long freq)
 {
-	freqA = freq;
-
 	int NVal = 0, FVal = 0;	// N value / finetune value
     int TBfo = 0;			// temporary BFO (Hz)
 	int IBfo = 0;			// Intermediate BFO Freq (Hz)
@@ -445,9 +447,13 @@ void RIG_TT550::set_split(bool val)
 
 void RIG_TT550::set_vfoA (long freq)
 {
-	set_vfoRX(freq);
-	if (!split)
-		set_vfoTX(freq);
+	freqA = freq;
+	if (onA) {
+		set_vfoRX(freq);
+		if (!split)
+			set_vfoTX(freq);
+		xcvrstream.clear();
+	}
 	return ;
 }
 
@@ -459,6 +465,14 @@ long RIG_TT550::get_vfoA ()
 void RIG_TT550::set_vfoB (long freq)
 {
 	freqB = freq;
+	if (!onA) {
+		set_vfoRX(freqB);
+		set_vfoTX(freqB);
+	} else if (split) {
+		set_vfoRX(freqA);
+		set_vfoTX(freqB);
+	}
+	xcvrstream.clear();
 }
 
 long RIG_TT550::get_vfoB ()
@@ -614,15 +628,91 @@ int RIG_TT550::get_volume_control()
 	return progStatus.volume;
 }
 
+void RIG_TT550::process_freq_entry(char c)
+{
+	static bool have_decimal = false;
+	float ffreq = 0.0;
+	long freq = 0;
+	if (xcvrstream.empty()) have_decimal = false;
+	if (c != '\r') {
+		xcvrstream += c;
+		if (!have_decimal && c == '.') have_decimal = true;
+		else if (have_decimal && c == '.') {
+			xcvrstream.clear();
+			have_decimal = false;
+			if (onA) FreqDispA->value(freqA);
+			else FreqDispB->value(freqB);
+		}
+		ffreq = 0;
+		sscanf(xcvrstream.c_str(), "%f", &ffreq);
+		if (have_decimal) ffreq *= 1000;
+		freq = (long) ffreq;
+		if (onA) FreqDispA->value(freq);
+		else FreqDispB->value(freq);
+		LOG_WARN("%ld", freq);
+	} else {
+		ffreq = 0;
+		sscanf(xcvrstream.c_str(), "%f", &ffreq);
+		if (have_decimal) ffreq *= 1000;
+		freq = (long) ffreq;
+		if (freq < 50000) freq *= 1000;
+		if (onA) {
+			freqA = freq;
+			set_vfoA(freqA);
+		} else {
+			freqB = freq;
+			set_vfoB(freqB);
+		}
+		xcvrstream.clear();
+		have_decimal = false;
+	}
+}
+
+void RIG_TT550::process_stream(string s)
+{
+	for (size_t i = 0; i < s.length(); i++) {
+		if (s[i] == 'U') {
+			i++;
+			if (isdigit(s[i]) || s[i] == '.' || s[i] == '\r') process_freq_entry(s[i]);
+		}
+	}
+}
+
+void RIG_TT550::selectA()
+{
+	onA = true;
+	xcvrstream.clear();
+}
+
+void RIG_TT550::selectB()
+{
+	onA = false;
+	xcvrstream.clear();
+}
+
 int RIG_TT550::get_smeter()
 {
 	double sig = 0.0;
 	cmd = TT550getSIG_LEVEL;
-	sendCommand(cmd, 6, true);
-	if (replybuff[0] == 'S') {
+	sendCommand(cmd, -1, true);//6, true);
+	if (replystr[0] != 'S') {
+		string leading;
+		while(replystr.length() && replystr[0] != 'S') {
+			leading += replystr[0];
+			replystr.erase(0,1);
+		}
+		process_stream(leading);
+	}
+	size_t p = replystr.find('\r');
+	if (p != replystr.length() - 1) {
+		string trailing = replystr.substr(p+1);
+		process_stream(trailing);
+	}
+
+	if (replystr[0] == 'S') {
 		int sval;
-		replybuff[5] = 0;
-		sscanf(&replybuff[1], "%4x", &sval);
+		replystr[5] = 0;
+		sscanf(&replystr[1], "%4x", &sval);
 		sig = sval / 256.0;
 	}
 	return (int)(sig * 50.0 / 9.0);
@@ -656,11 +746,16 @@ int RIG_TT550::get_power_out()
 void RIG_TT550::setBfo(int val)
 {
 	progStatus.bfo_freq = Bfo = val;
-	set_vfoRX(freqA);
-	if (split)
+	if (!onA) {
+		set_vfoRX(freqB);
 		set_vfoTX(freqB);
-	else
+	} else if (split) {
+		set_vfoRX(freqA);
+		set_vfoTX(freqB);
+	} else {
+		set_vfoRX(freqA);
 		set_vfoTX(freqA);
+	}
 }
 
 int RIG_TT550::getBfo()
@@ -677,7 +772,16 @@ void RIG_TT550::setRit(int val)
 {
 	progStatus.rit_freq = RitFreq = val;
 	if (RitFreq) RitActive = true;
-	set_vfoA(freqA);
+	if (!onA) {
+		set_vfoRX(freqB);
+		set_vfoTX(freqB);
+	} else if (split) {
+		set_vfoRX(freqA);
+		set_vfoTX(freqB);
+	} else {
+		set_vfoRX(freqA);
+		set_vfoTX(freqA);
+	}
 }
 
 int RIG_TT550::getRit()
@@ -689,10 +793,16 @@ void RIG_TT550::setXit(int val)
 {
 	progStatus.xit_freq = XitFreq = val;
 	if (XitFreq) XitActive = true;
-	if (split)
+	if (!onA) {
+		set_vfoRX(freqB);
 		set_vfoTX(freqB);
-	else
+	} else if (split) {
+		set_vfoRX(freqA);
+		set_vfoTX(freqB);
+	} else {
+		set_vfoRX(freqA);
 		set_vfoTX(freqA);
+	}
 }
 
 int RIG_TT550::getXit()
@@ -934,8 +1044,9 @@ void RIG_TT550::tuner_bypass()
 
 void RIG_TT550::read_stream()
 {
-	if (readResponse()) {
-		showresponse("read stream");
+	if (xcvrstream.length()) {
+		LOG_WARN("%s", str2hex(xcvrstream.c_str(), xcvrstream.length()));
+		xcvrstream.clear();
 	}
 }
 

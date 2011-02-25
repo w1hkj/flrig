@@ -162,7 +162,7 @@ int sendCommand (string s, int retnbr, bool b)
 	if (RIG_DEBUG)
 		LOG_DEBUG("ret :%3d, %s", numread, b ? str2hex(replybuff, numread) : replybuff);
 
-	if (numread > retnbr) {
+	if (retnbr != -1 && numread > retnbr) {
 		memmove(replybuff, replybuff + numread - retnbr, retnbr);
 		numread = retnbr;
 	}
