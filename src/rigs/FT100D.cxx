@@ -124,10 +124,11 @@ if (RIG_DEBUG)
 
 long RIG_FT100D::get_vfoA ()
 {
-	get_info();
-	A.freq = afreq;
-	A.imode = amode;
-	A.iBW = aBW;
+	if (get_info()) {
+		A.freq = afreq;
+		A.imode = amode;
+		A.iBW = aBW;
+	}
 	return A.freq;
 }
 
@@ -173,10 +174,11 @@ int RIG_FT100D::get_bwA()
 
 long RIG_FT100D::get_vfoB()
 {
-	get_info();
-	B.freq = afreq;
-	B.imode = amode;
-	B.iBW = aBW;
+	if (get_info()) {
+		B.freq = afreq;
+		B.imode = amode;
+		B.iBW = aBW;
+	}
 	return B.freq;
 }
 
