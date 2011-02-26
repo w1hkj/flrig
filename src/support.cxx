@@ -617,16 +617,18 @@ int movFreqB() {
 
 void cbA2B()
 {
-	vfoB = vfoA;
-
-	pthread_mutex_lock(&mutex_serial);
-		selrig->set_vfoB(vfoB.freq);
-		selrig->set_modeB(vfoB.imode);
-		selrig->set_bwB(vfoB.iBW);
-	pthread_mutex_unlock(&mutex_serial);
-
-	FreqDispB->value(vfoB.freq);
+	queB.push(vfoA);
+	FreqDispB->value(vfoA.freq);
 	FreqDispB->redraw();
+//	vfoB = vfoA;
+//	pthread_mutex_lock(&mutex_serial);
+//		selrig->set_vfoB(vfoB.freq);
+//		selrig->set_modeB(vfoB.imode);
+//		selrig->set_bwB(vfoB.iBW);
+//	pthread_mutex_unlock(&mutex_serial);
+
+//	FreqDispB->value(vfoB.freq);
+//	FreqDispB->redraw();
 }
 
 void cb_set_split(int val)
@@ -673,10 +675,10 @@ void cb_selectA() {
 	pthread_mutex_lock(&mutex_serial);
 	selrig->selectA();
 	useB = false;
-	if (queA.empty()) {
+//	if (queA.empty()) {
 		vfoA.src = UI;
 		queA.push(vfoA);
-	}
+//	}
 	pthread_mutex_unlock(&mutex_serial);
 
 	pthread_mutex_lock(&mutex_xmlrpc);
@@ -706,10 +708,10 @@ void cb_selectB() {
 	pthread_mutex_lock(&mutex_serial);
 	selrig->selectB();
 	useB = true;
-	if (queB.empty()) {
+//	if (queB.empty()) {
 		vfoB.src = UI;
 		queB.push(vfoB);
-	}
+//	}
 	pthread_mutex_unlock(&mutex_serial);
 
 	pthread_mutex_lock(&mutex_xmlrpc);
@@ -1752,18 +1754,6 @@ void initRig()
 
 	buildlist();
 
-	vfoA.freq = progStatus.freq_A;
-	vfoA.imode = progStatus.imode_A;
-	vfoA.iBW = progStatus.iBW_A;
-	FreqDispA->value( vfoA.freq );
-	queA.push(vfoA);
-
-	vfoB.freq = progStatus.freq_B;
-	vfoB.imode = progStatus.imode_B;
-	vfoB.iBW = progStatus.iBW_B;
-	FreqDispB->value(vfoB.freq);
-	queB.push(vfoB);
-
 	if (selrig->CIV) {
 		char hexstr[8];
 		snprintf(hexstr, sizeof(hexstr), "0x%2X", selrig->CIV);
@@ -1781,6 +1771,26 @@ void initRig()
 		btnCIVdefault->deactivate();
 		btnUSBaudio->value(false);
 		btnUSBaudio->deactivate();
+	}
+
+	vfoA.freq = progStatus.freq_A;
+	vfoA.imode = progStatus.imode_A;
+	vfoA.iBW = progStatus.iBW_A;
+	FreqDispA->value( vfoA.freq );
+
+	vfoB.freq = progStatus.freq_B;
+	vfoB.imode = progStatus.imode_B;
+	vfoB.iBW = progStatus.iBW_B;
+	FreqDispB->value(vfoB.freq);
+
+	if (rig_nbr == TT550) {
+		selrig->set_vfoA(vfoA.freq);
+		selrig->set_modeA(vfoA.imode);
+		selrig->set_bwA(vfoA.iBW);
+		selrig->selectA();
+		selrig->set_vfoB(vfoB.freq);
+		selrig->set_modeB(vfoB.imode);
+		selrig->set_bwB(vfoB.iBW);
 	}
 
 	// enable the serial thread
