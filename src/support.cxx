@@ -248,7 +248,8 @@ void read_swr()
 	pthread_mutex_lock(&mutex_serial);
 	sig = selrig->get_swr();
 	pthread_mutex_unlock(&mutex_serial);
-	Fl::awake(updateSWR, (void*)sig);
+	if (sig > -1)
+		Fl::awake(updateSWR, (void*)sig);
 }
 
 // alc
@@ -620,15 +621,6 @@ void cbA2B()
 	queB.push(vfoA);
 	FreqDispB->value(vfoA.freq);
 	FreqDispB->redraw();
-//	vfoB = vfoA;
-//	pthread_mutex_lock(&mutex_serial);
-//		selrig->set_vfoB(vfoB.freq);
-//		selrig->set_modeB(vfoB.imode);
-//		selrig->set_bwB(vfoB.iBW);
-//	pthread_mutex_unlock(&mutex_serial);
-
-//	FreqDispB->value(vfoB.freq);
-//	FreqDispB->redraw();
 }
 
 void cb_set_split(int val)
@@ -997,8 +989,7 @@ void setPower()
 	double pwr = sldrPOWER->value();
 	pthread_mutex_lock(&mutex_serial);
 		powerlevel = (int)pwr;
-//		if (selrig != &rig_TT550)
-			progStatus.power_level = pwr;
+		progStatus.power_level = pwr;
 		selrig->set_power_control(pwr);
 	pthread_mutex_unlock(&mutex_serial);
 }

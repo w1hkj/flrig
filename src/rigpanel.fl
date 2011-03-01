@@ -21,7 +21,7 @@ Function {Rig_window()} {open
     code0 {\#include <stdlib.h>} visible
   } {
     Fl_Menu_Bar {} {open
-      xywh {0 2 424 20} textsize 12
+      xywh {0 0 424 22} textsize 12
     } {
       Submenu {} {
         label {&Files} open
@@ -105,6 +105,9 @@ Fl_Tooltip::enable(progStatus.tooltips);}
           xywh {0 0 36 21}
         }
       }
+    }
+    Fl_Output txt_encA {selected
+      xywh {334 0 90 22} box THIN_DOWN_BOX color 215 align 20 hide
     }
     Fl_Box FreqDispA {
       label 10
@@ -213,7 +216,7 @@ btnB->value(0);}
       callback {if (btnB->value()==1)
 	cb_selectB();
 btnB->value(1);
-btnA->value(0);} selected
+btnA->value(0);}
       tooltip {Rx-A / Tx-B} xywh {266 62 50 20} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
       code0 {o->value(useB);}
     }

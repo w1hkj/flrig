@@ -80,6 +80,8 @@ Fl_Menu_Item menu_[] = {
  {0,0,0,0,0,0,0,0,0}
 };
 
+Fl_Output *txt_encA=(Fl_Output *)0;
+
 cFreqControl *FreqDispA=(cFreqControl *)0;
 
 cFreqControl *FreqDispB=(cFreqControl *)0;
@@ -358,13 +360,19 @@ Fl_Double_Window* Rig_window() {
     w = o;
     o->color((Fl_Color)FL_LIGHT2);
     o->align(FL_ALIGN_CLIP|FL_ALIGN_INSIDE);
-    { Fl_Menu_Bar* o = new Fl_Menu_Bar(0, 2, 424, 20);
+    { Fl_Menu_Bar* o = new Fl_Menu_Bar(0, 0, 424, 22);
       o->textsize(12);
       { Fl_Menu_Item* o = &menu_[8];
         progStatus.tooltips ? o->set() :o->clear();
       }
       o->menu(menu_);
     } // Fl_Menu_Bar* o
+    { txt_encA = new Fl_Output(334, 0, 90, 22);
+      txt_encA->box(FL_THIN_DOWN_BOX);
+      txt_encA->color((Fl_Color)215);
+      txt_encA->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
+      txt_encA->hide();
+    } // Fl_Output* txt_encA
     { cFreqControl* o = FreqDispA = new cFreqControl(1, 24, 210, 35, _("10"));
       FreqDispA->box(FL_DOWN_BOX);
       FreqDispA->color((Fl_Color)FL_BACKGROUND_COLOR);
