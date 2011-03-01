@@ -35,6 +35,7 @@ private:
 	void set_vfoRX(long freq);
 	void set_vfoTX(long freq);
 
+	void process_encoder( string s );
 	void process_stream(string s);
 	void process_freq_entry(char c);
 

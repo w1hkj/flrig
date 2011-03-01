@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Tooltip.H>
+#include <FL/Fl_Output.H>
+extern Fl_Output *txt_encA;
 #include "FreqControl.h"
 extern cFreqControl *FreqDispA;
 extern cFreqControl *FreqDispB;
