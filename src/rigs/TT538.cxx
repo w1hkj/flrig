@@ -188,7 +188,8 @@ void RIG_TT538::set_vfoA (long freq)
 
 long RIG_TT538::get_vfoB ()
 {
-	cmd = TT538getFREQB;
+//	cmd = TT538getFREQB;
+	cmd = TT538getFREQA;
 	bool ret = sendCommand(cmd, 6, true);
 	if (ret == true && replybuff[0] == 'B') {
 		int f = 0;
@@ -203,7 +204,8 @@ void RIG_TT538::set_vfoB (long freq)
 {
 	freqB = freq;
 	long xfreq = freqB * (1 + VfoAdj/1e6) + 0.5;
-	cmd = TT538setFREQB;
+//	cmd = TT538setFREQB;
+	cmd = TT538setFREQA;
 	cmd[5] = xfreq & 0xff; xfreq = xfreq >> 8;
 	cmd[4] = xfreq & 0xff; xfreq = xfreq >> 8;
 	cmd[3] = xfreq & 0xff; xfreq = xfreq >> 8;

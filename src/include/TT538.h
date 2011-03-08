@@ -35,7 +35,7 @@ public:
 //	void set_bwB(int val);
 //	int  get_bwB();
 
-	bool twovfos() { return true; }
+	bool twovfos() { return false; }
 //	void set_split(bool);
 	bool can_split() {return false;}
 
