@@ -19,6 +19,8 @@ private:
 	int TFreq;
 	int Bfo;
 
+	int encoder_count;
+
 	bool onA;
 
 	int ATTlevel;

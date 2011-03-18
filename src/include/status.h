@@ -116,6 +116,9 @@ struct status {
 
 	int		tt550_AM_level;
 
+	int		tt550_encoder_step;
+	int		tt550_encoder_sensitivity;
+
 //and others
 	double	vfo_adj;
 	int		bfo_freq;
@@ -123,6 +126,7 @@ struct status {
 	int		xit_freq;
 	int		bpf_center;
 	bool	use_bpf_center;
+
 // =========================
 
 	int		s_red;

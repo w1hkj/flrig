@@ -135,6 +135,8 @@ status progStatus = {
 	0,			// xit_freq;
 	1500,		// bpf_center;
 	true,		// use_bpf_center;
+	100,		// encoder_step;
+	10,			// encoder_sensitivity;
 
 	232,		// int	 s_red;
 	255,		// int	 s_green;
@@ -263,7 +265,13 @@ void status::saveLastState()
 		spref.set("tt550_enable_xmtr", tt550_enable_xmtr);
 		spref.set("tt550_enable_tloop", tt550_enable_tloop);
 
+		spref.set("tt550_xmt_bw", tt550_xmt_bw);
+		spref.set("tt550_use_xmt_bw", tt550_use_xmt_bw);
+
 		spref.set("tt550_AM_level", tt550_AM_level);
+
+		spref.set("tt550_encoder_step", tt550_encoder_step);
+		spref.set("tt550_encoder_sensitivity", tt550_encoder_sensitivity);
 	} else {
 		spref.set("line_out", line_out);
 		spref.set("agc_level", agc_level);
@@ -427,7 +435,12 @@ bool status::loadXcvrState(const char *xcvr)
 			if (spref.get("tt550_enable_xmtr", i, i)) tt550_enable_xmtr = i;
 			if (spref.get("tt550_enable_tloop", i, i)) tt550_enable_tloop = i;
 
+			spref.get("tt550_xmt_bw", tt550_xmt_bw, tt550_xmt_bw);
+			if (spref.get("tt550_use_xmt_bw", i, i)) tt550_use_xmt_bw = i;
+
 			spref.get("tt550_AM_level", tt550_AM_level, tt550_AM_level);
+			spref.get("tt550_encoder_step", tt550_encoder_step, tt550_encoder_step);
+			spref.get("tt550_encoder_sensitivity", tt550_encoder_sensitivity, tt550_encoder_sensitivity);
 		} 
 		else {
 			spref.get("line_out", line_out, line_out);
