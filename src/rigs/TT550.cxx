@@ -59,6 +59,8 @@ static const int TT550_xmt_filter_width[] = {
  900, 1050, 1200, 1350, 1500, 1650, 1800, 1950, 2100,
 2250, 2400, 2550, 2700, 2850, 3000, 3300, 3600, 3900 };
 
+static const int TT550_steps[] = { 1, 10, 100, 1000, 10000 };
+
 static char TT550restart[]		= "XX\r";
 static char TT550init[]			= "P1\r";
 //static char TT550isRADIO[]		= " RADIO START";
@@ -273,6 +275,7 @@ void RIG_TT550::initialize()
 	xcvrstream.clear();
 	onA = true;
 
+	encoder_count = 0;
 }
 
 void RIG_TT550::enable_xmtr()
@@ -705,12 +708,31 @@ void RIG_TT550::process_encoder(string s)
 LOG_WARN("%s", str2hex(s.substr(0,5).c_str(), 5));
 	int encoder = ((unsigned char)s[1] << 8) | (unsigned char)s[2];
 	if (encoder > 16383) encoder -= 65536;
+
+// reset when user changes direction on encoder wheel
+	if (encoder_count > 0 && encoder < 0) encoder_count = 0;
+	if (encoder_count < 0 && encoder > 0) encoder_count = 0;
+
+	encoder_count += encoder;
+	encoder = 0;
+
+	while (encoder_count > progStatus.tt550_encoder_sensitivity) {
+		encoder_count -= progStatus.tt550_encoder_sensitivity;
+		encoder++;
+	}
+	while (encoder_count < -progStatus.tt550_encoder_sensitivity) {
+		encoder_count += progStatus.tt550_encoder_sensitivity;
+		encoder--;
+	}
+	if (encoder == 0) return;
+	if (progStatus.tt550_encoder_step < 0) progStatus.tt550_encoder_step = 0;
+	if (progStatus.tt550_encoder_step > 4) progStatus.tt550_encoder_step = 4;
 	if (onA) {
-		freqA += encoder;
+		freqA += encoder*TT550_steps[progStatus.tt550_encoder_step];
 		set_vfoA(freqA);
 		Fl::awake(setFreqDispA, (void *)freqA);
 	} else {
-		freqB += encoder;
+		freqB += encoder*TT550_steps[progStatus.tt550_encoder_step];
 		set_vfoB(freqB);
 		Fl::awake(setFreqDispB, (void *)freqB);
 	}
@@ -726,7 +748,7 @@ void RIG_TT550::process_stream(string s)
 			i++;
 		} else if (s[i] == 0x21 ) { // '!'
 			process_encoder(s.substr(i));
-			i += 4;
+			i += 5;
 		}
 	}
 }
@@ -751,9 +773,9 @@ int RIG_TT550::get_smeter()
 
 	if (replystr[0] != 'S') {
 		string leading;
-		while(replystr.length() && replystr[0] != 'S') {
-			leading += replystr[0];
-			replystr.erase(0,1);
+		while((replystr.length() >= 5) && replystr[0] != 'S') {
+			leading += replystr.substr(0, 5);
+			replystr.erase(0,5);
 		}
 		process_stream(leading);
 	}
@@ -820,6 +842,10 @@ int RIG_TT550::getBfo()
 void RIG_TT550::setVfoAdj(double v)
 {
 	VfoAdj = v;
+	if (onA)
+		set_vfoRX(freqA);
+	else
+		set_vfoRX(freqB);
 }
 
 void RIG_TT550::setRit(int val)

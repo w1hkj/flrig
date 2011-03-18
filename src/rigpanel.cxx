@@ -1963,9 +1963,21 @@ static void cb_btnAccInp(Fl_Check_Button* o, void*) {
 cb_tt550_use_line_in();
 }
 
+Fl_Counter *cnt_tt550_encoder_sensitivity=(Fl_Counter *)0;
+
+static void cb_cnt_tt550_encoder_sensitivity(Fl_Counter* o, void*) {
+  progStatus.tt550_encoder_sensitivity = o->value();
+}
+
+Fl_Choice *sel_550_step_size=(Fl_Choice *)0;
+
+static void cb_sel_550_step_size(Fl_Choice* o, void*) {
+  progStatus.tt550_encoder_step = o->value();
+}
+
 Fl_Double_Window* make_TT550() {
   Fl_Double_Window* w;
-  { Fl_Double_Window* o = new Fl_Double_Window(340, 370, _("TT550 Setup"));
+  { Fl_Double_Window* o = new Fl_Double_Window(340, 402, _("TT550 Setup"));
     w = o;
     o->align(FL_ALIGN_CENTER);
     { Fl_Group* o = new Fl_Group(2, 2, 336, 90, _("CW"));
@@ -2153,7 +2165,6 @@ Fl_Double_Window* make_TT550() {
     { Fl_Group* o = new Fl_Group(2, 264, 336, 50);
       o->box(FL_ENGRAVED_FRAME);
       { Fl_Counter* o = cnt_tt550_vfo_adj = new Fl_Counter(13, 282, 100, 22, _("Vfo Adj(ppm)"));
-        cnt_tt550_vfo_adj->type(1);
         cnt_tt550_vfo_adj->step(0.1);
         cnt_tt550_vfo_adj->callback((Fl_Callback*)cb_cnt_tt550_vfo_adj);
         cnt_tt550_vfo_adj->align(33);
@@ -2182,14 +2193,37 @@ Fl_Double_Window* make_TT550() {
       } // Fl_Check_Button* btn_tt550_use_xmt_bw
       o->end();
     } // Fl_Group* o
-    { Fl_Group* o = new Fl_Group(2, 315, 336, 50);
+    { Fl_Group* o = new Fl_Group(2, 315, 336, 33);
       o->box(FL_ENGRAVED_FRAME);
-      { Fl_Check_Button* o = btnAccInp = new Fl_Check_Button(15, 330, 77, 15, _("Acc Inp."));
+      { Fl_Check_Button* o = btnAccInp = new Fl_Check_Button(48, 325, 272, 10, _("Acc Inp."));
         btnAccInp->tooltip(_("enable to use accessory audio input"));
         btnAccInp->down_box(FL_DOWN_BOX);
         btnAccInp->callback((Fl_Callback*)cb_btnAccInp);
         o->value(progStatus.use_line_in);
       } // Fl_Check_Button* btnAccInp
+      o->end();
+    } // Fl_Group* o
+    { Fl_Group* o = new Fl_Group(2, 349, 336, 52, _("Encoder"));
+      o->box(FL_ENGRAVED_FRAME);
+      o->align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE);
+      { Fl_Counter* o = cnt_tt550_encoder_sensitivity = new Fl_Counter(96, 372, 80, 21, _("Sensitivity"));
+        cnt_tt550_encoder_sensitivity->tooltip(_("1 - most sensitive"));
+        cnt_tt550_encoder_sensitivity->type(1);
+        cnt_tt550_encoder_sensitivity->minimum(1);
+        cnt_tt550_encoder_sensitivity->maximum(25);
+        cnt_tt550_encoder_sensitivity->step(1);
+        cnt_tt550_encoder_sensitivity->value(10);
+        cnt_tt550_encoder_sensitivity->callback((Fl_Callback*)cb_cnt_tt550_encoder_sensitivity);
+        cnt_tt550_encoder_sensitivity->align(FL_ALIGN_TOP);
+        o->value(progStatus.tt550_encoder_sensitivity);
+      } // Fl_Counter* cnt_tt550_encoder_sensitivity
+      { Fl_Choice* o = sel_550_step_size = new Fl_Choice(211, 372, 72, 22, _("Step size"));
+        sel_550_step_size->down_box(FL_BORDER_BOX);
+        sel_550_step_size->callback((Fl_Callback*)cb_sel_550_step_size);
+        sel_550_step_size->align(FL_ALIGN_TOP);
+        o->add("1|10|100|1 K|10 K");
+        o->value(progStatus.tt550_encoder_step);
+      } // Fl_Choice* sel_550_step_size
       o->end();
     } // Fl_Group* o
     o->end();

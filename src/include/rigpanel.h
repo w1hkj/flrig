@@ -170,5 +170,8 @@ extern Fl_Counter *cnt_tt550_vfo_adj;
 extern Fl_ComboBox *op_tt550_XmtBW;
 extern Fl_Check_Button *btn_tt550_use_xmt_bw;
 extern Fl_Check_Button *btnAccInp;
+extern Fl_Counter *cnt_tt550_encoder_sensitivity;
+#include <FL/Fl_Choice.H>
+extern Fl_Choice *sel_550_step_size;
 Fl_Double_Window* make_TT550();
 #endif

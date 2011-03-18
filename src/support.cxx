@@ -467,13 +467,12 @@ serial_bypass_loop: ;
 }
 
 //=============================================================================
-static bool nofocus = false;
 
 void setFocus()
 {
-	if (nofocus) return;
-	if (Fl::focus() != FreqDispA)
-		Fl::focus(FreqDispA);
+//	if (nofocus) return;
+	if (useB) Fl::focus(FreqDispB);
+	else Fl::focus(FreqDispA);
 }
 
 void setBW()
@@ -482,6 +481,7 @@ void setBW()
 	fm.src = UI;
 	fm.iBW = opBW->index();
 	useB ? queB.push(fm) : queA.push(fm);
+	setFocus();
 }
 
 void updateBandwidthControl(void *d)
@@ -515,6 +515,7 @@ void setMode()
 	fm.iBW = selrig->def_bandwidth(fm.imode);
 	fm.src = UI;
 	useB ? queB.push(fm) : queA.push(fm);
+	setFocus();
 }
 
 void sortList() {
@@ -621,6 +622,7 @@ void cbA2B()
 	queB.push(vfoA);
 	FreqDispB->value(vfoA.freq);
 	FreqDispB->redraw();
+	setFocus();
 }
 
 void cb_set_split(int val)
@@ -634,6 +636,7 @@ void cb_set_split(int val)
 	pthread_mutex_lock(&mutex_serial);
 		selrig->set_split(val);
 	pthread_mutex_unlock(&mutex_serial);
+	setFocus();
 }
 
 void set_vfo_mode_bw()
@@ -676,6 +679,7 @@ void cb_selectA() {
 	pthread_mutex_lock(&mutex_xmlrpc);
 	bypass_digi_loop = false;
 	pthread_mutex_unlock(&mutex_xmlrpc);
+	setFocus();
 }
 
 void cb_selectB() {
@@ -709,6 +713,7 @@ void cb_selectB() {
 	pthread_mutex_lock(&mutex_xmlrpc);
 	bypass_digi_loop = false;
 	pthread_mutex_unlock(&mutex_xmlrpc);
+	setFocus();
 }
 
 void setLower()
@@ -736,6 +741,7 @@ void selectFreq() {
 		FreqDispB->value(fm.freq);
 		queB.push(fm);
 	}
+	setFocus();
 }
 
 void delFreq() {
@@ -749,6 +755,7 @@ void delFreq() {
 		numinlist--;
 		updateSelect();
 	}
+	setFocus();
 }
 
 void addFreq() {
@@ -764,23 +771,27 @@ void addFreq() {
 	addtoList(freq, mode, bw);
 	updateSelect();
 	FreqDispA->visual_beep();
+	setFocus();
 }
 
 void cbRIT()
 {
 	if (selrig->has_rit)
 		selrig->setRit((int)cntRIT->value());
+	setFocus();
 }
 
 void cbXIT()
 {
 	selrig->setXit((int)cntXIT->value());
+	setFocus();
 }
 
 void cbBFO()
 {
 	if (selrig->has_bfo)
 		selrig->setBfo((int)cntBFO->value());
+	setFocus();
 }
 
 void cbAttenuator()
@@ -788,6 +799,7 @@ void cbAttenuator()
 	pthread_mutex_lock(&mutex_serial);
 		selrig->set_attenuator(btnAttenuator->value());
 	pthread_mutex_unlock(&mutex_serial);
+	setFocus();
 }
 
 void setAttControl(void *d)
@@ -801,6 +813,7 @@ void cbPreamp()
 	pthread_mutex_lock(&mutex_serial);
 		selrig->set_preamp(btnPreamp->value());
 	pthread_mutex_unlock(&mutex_serial);
+	setFocus();
 }
 
 void setPreampControl(void *d)
@@ -814,6 +827,7 @@ void cbNoise()
 	pthread_mutex_lock(&mutex_serial);
 		selrig->set_noise(btnNOISE->value());
 	pthread_mutex_unlock(&mutex_serial);
+	setFocus();
 }
 
 void cbNR()
@@ -821,6 +835,7 @@ void cbNR()
 	pthread_mutex_lock(&mutex_serial);
 		selrig->set_noise_reduction(btnNR->value());
 	pthread_mutex_unlock(&mutex_serial);
+	setFocus();
 }
 
 void setNR()
@@ -828,6 +843,7 @@ void setNR()
 	pthread_mutex_lock(&mutex_serial);
 		selrig->set_noise_reduction_val(sldrNR->value());
 	pthread_mutex_unlock(&mutex_serial);
+	setFocus();
 }
 
 void setNoiseControl(void *d)
@@ -844,6 +860,7 @@ void cbbtnNotch()
 		selrig->set_notch(true, sldrNOTCH->value());
 	}
 	pthread_mutex_unlock(&mutex_serial);
+	setFocus();
 }
 
 void cbAN()
@@ -851,6 +868,7 @@ void cbAN()
 	pthread_mutex_lock(&mutex_serial);
 		selrig->set_auto_notch(btnAutoNotch->value());
 	pthread_mutex_unlock(&mutex_serial);
+	setFocus();
 }
 
 void setNotchButton(void *d)
@@ -903,11 +921,13 @@ void cbIFsh()
 		sldrIFSHIFT->deactivate();
 	}
 	setIFshift();
+	setFocus();
 }
 
 void cbEventLog()
 {
 	debug::show();
+	setFocus();
 }
 
 void setVolume()
@@ -931,6 +951,7 @@ void cbMute()
 			selrig->set_volume_control(progStatus.volume);
 		pthread_mutex_unlock(&mutex_serial);
 	}
+	setFocus();
 }
 
 void setMicGain()
@@ -945,6 +966,7 @@ void cbbtnMicLine()
 	pthread_mutex_lock(&mutex_serial);
 		selrig->set_mic_line(btnMicLine->value());
 	pthread_mutex_unlock(&mutex_serial);
+	setFocus();
 }
 
 void setMicGainControl(void* d)
@@ -992,6 +1014,7 @@ void setPower()
 		progStatus.power_level = pwr;
 		selrig->set_power_control(pwr);
 	pthread_mutex_unlock(&mutex_serial);
+	setFocus();
 }
 
 void reset_power_controlImage( void *d )
@@ -1005,6 +1028,7 @@ void cbTune()
 	pthread_mutex_lock(&mutex_serial);
 		selrig->tune_rig();
 	pthread_mutex_unlock(&mutex_serial);
+	setFocus();
 }
 
 void cbPTT()
@@ -1014,6 +1038,7 @@ void cbPTT()
 	else
 		quePTT.push(btnPTT->value());
 	return;
+	setFocus();
 }
 
 void setSQUELCH()
@@ -1021,6 +1046,7 @@ void setSQUELCH()
 	pthread_mutex_lock(&mutex_serial);
 		selrig->set_squelch((int)sldrSQUELCH->value());
 	pthread_mutex_unlock(&mutex_serial);
+	setFocus();
 }
 
 void setRFGAIN()
@@ -1028,6 +1054,7 @@ void setRFGAIN()
 	pthread_mutex_lock(&mutex_serial);
 		selrig->set_rf_gain((int)sldrRFGAIN->value());
 	pthread_mutex_unlock(&mutex_serial);
+	setFocus();
 }
 
 
@@ -1229,6 +1256,7 @@ void cbALC_SWR()
 		meter_image = SWR_IMAGE;
 	}
 	btnALC_SWR->redraw();
+	setFocus();
 }
 
 void update_UI_PTT(void *d)
@@ -1797,6 +1825,7 @@ void initRig()
 	bypass_digi_loop = false;
 	pthread_mutex_unlock(&mutex_xmlrpc);
 
+	setFocus();
 }
 
 void init_title()
@@ -2011,10 +2040,7 @@ void cb_auto_notch()
 void cb_vfo_adj()
 {
 	pthread_mutex_lock(&mutex_serial);
-		if (selrig->has_get_info) selrig->get_info();
-//		long f = selrig->get_vfoA();
 		selrig->setVfoAdj(progStatus.vfo_adj);
-//		selrig->set_vfoA(f);
 	pthread_mutex_unlock(&mutex_serial);
 }
 
