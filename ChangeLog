@@ -1,11 +1,43 @@
 
 
+=Version 1.1.0=
+
+2011-03-18  David Freese  <w1hkj@w1hkj.com>
+
+	8258086: TT550 update
+	0a5bdc1: TT538 vfob
+	2c5ade4: TS590S vfo read-write
+	2b915d6: TT550 remote
+	ef29ed7: A-B startup race
+	7e07540: TT550 keypad
+	95d95bc: FT847
+	bcab820: TS590 ptt
+	493b695: TS2000 update
+	277941b: FT1000MP Tuner
+	6abfdd2: TS570 compile error
+	25946ef: IC7000 auto notch
+	b4708a3: FT100D
+	d814bc8: FT1000MP def bw
+	5f1fbcd: IC series split
+	4d20762: Default BW
+	c53afce: IC7600 A/B mods
+	c541e1a: FT1000MP swr/alc
+	6abdb0c: RAY 152 smeter
+	21b2310: FT1000MP power scale
+	bb21b62: IC7600 update
+	c01be68: FT1000MP Bandwidth
+	b1fe8c6: Button A/B
+	268f4fb: ICOM select race
+	867f0d0: RAY152 - vfo
+
+
 =Version 1.0.1.1=
 
-2011-02-03  David Freese  <w1hkj@w1hkj.com>
-
-	30b6934: TS590S
-	c116fdd: FT1000MP mods
+	80633b6: FT1000MP vfo precision
+	78c3697: TT516 update
+	beaff06: Raytheon 152
+	de3bebd: TS590S
+	fbf17df: FT1000MP mods
 	7432862: IC746 family
 
 
