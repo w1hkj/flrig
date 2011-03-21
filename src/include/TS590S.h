@@ -45,7 +45,7 @@ public:
 	void set_split(bool val);
 	bool twovfos() {return true;}
 
-//	int  get_smeter();
+	int  get_smeter();
 //	int  get_swr();
 //	int  get_power_out();
 	int  get_power_control();

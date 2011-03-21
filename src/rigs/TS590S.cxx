@@ -197,22 +197,24 @@ void RIG_TS590S::set_vfoB (long freq)
 	sendTScommand(cmd, 0, true);
 }
 
-/*
- * commented out
- * pending resolution of return data stability
- * 
+int TS590S_meter_val = 0;
+
 int RIG_TS590S::get_smeter()
 {
 	cmd = "SM0;";
 	if(sendTScommand(cmd, 8) == 8) {
-		replybuff[7] = 0;
-		int mtr = atoi(&replybuff[5]);
-		mtr = (mtr * 100) / 30;
-		return mtr;
+		TS590S_meter_val = atoi(&replybuff[3]);
+	} else {
+		TS590S_meter_val *= 9;
+		TS590S_meter_val /= 10;
 	}
-	return 0;
+	return TS590S_meter_val * 10 / 3;
 }
 
+/*
+ * commented out
+ * pending resolution of return data stability
+ * 
 int RIG_TS590S::get_swr()
 {
 	cmd = "RM1;";
