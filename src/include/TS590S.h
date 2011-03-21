@@ -38,13 +38,16 @@ public:
 	void set_bwB(int val);
 	int  get_bwB();
 
-	bool can_split() { return false;}
-	void set_split(bool val) {split = val;}
+	void selectA();
+	void selectB();
+
+	bool can_split() { return true;}
+	void set_split(bool val);
 	bool twovfos() {return true;}
 
-	int  get_smeter();
-	int  get_swr();
-	int  get_power_out();
+//	int  get_smeter();
+//	int  get_swr();
+//	int  get_power_out();
 	int  get_power_control();
 	void set_volume_control(int val);
 	int  get_volume_control();
