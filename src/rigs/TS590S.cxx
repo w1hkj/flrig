@@ -116,11 +116,33 @@ bool RIG_TS590S::sendTScommand(string cmd, int retnbr, bool db = false)
 
 void RIG_TS590S::initialize()
 {
-	cmd = "FR0;"; sendTScommand(cmd, 4);
-	cmd = "AC000;"; sendTScommand(cmd, 6);
+	selectA();
+	cmd = "AC000;"; sendTScommand(cmd, 0);
 	get_preamp();
 	get_attenuator();
 	RIG_DEBUG = true;
+}
+
+void RIG_TS590S::selectA()
+{
+	cmd = "FR0;";
+	sendTScommand(cmd, 0, true);
+}
+
+void RIG_TS590S::selectB()
+{
+	cmd = "FR1;";
+	sendTScommand(cmd, 0, true);
+}
+
+void RIG_TS590S::set_split(bool val) 
+{
+	split = val;
+	if (val)
+		cmd = "FT1;";
+	else
+		cmd = "FR0;";
+	sendTScommand(cmd, 0, true);
 }
 
 long RIG_TS590S::get_vfoA ()
@@ -175,6 +197,10 @@ void RIG_TS590S::set_vfoB (long freq)
 	sendTScommand(cmd, 0, true);
 }
 
+/*
+ * commented out
+ * pending resolution of return data stability
+ * 
 int RIG_TS590S::get_smeter()
 {
 	cmd = "SM0;";
@@ -210,6 +236,7 @@ int RIG_TS590S::get_power_out()
 	}
 	return 0;
 }
+*/
 
 // Transceiver power level
 void RIG_TS590S::set_power_control(double val)

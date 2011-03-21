@@ -627,10 +627,17 @@ void cbA2B()
 
 void cb_set_split(int val)
 {
-	if (useB) {
-		btnA->value(1);
-		btnB->value(0);
-		cb_selectA();
+	if (val) {
+		if (useB) {
+			btnA->value(1);
+			btnB->value(0);
+			cb_selectA();
+		} else {
+			vfoB.freq = FreqDispB->value();
+			pthread_mutex_lock(&mutex_serial);
+				selrig->set_vfoB(vfoB.freq);
+			pthread_mutex_unlock(&mutex_serial);
+		}
 	}
 	progStatus.split = val;
 	pthread_mutex_lock(&mutex_serial);
@@ -1162,27 +1169,31 @@ void closeRig()
 {
 	// restore initial rig settings
 	pthread_mutex_lock(&mutex_serial);
-	selrig->setVfoAdj(0);
 	selrig->set_vfoA(transceiverA.freq);
 	selrig->set_modeA(transceiverA.imode);
 	selrig->set_bwA(transceiverA.iBW);
 	selrig->set_vfoB(transceiverB.freq);
 	selrig->set_modeB(transceiverB.imode);
 	selrig->set_bwB(transceiverB.iBW);
-	selrig->shutdown();
 	pthread_mutex_unlock(&mutex_serial);
 }
 
 
 void cbExit()
 {
+	// shutdown xmlrpc thread
+	pthread_mutex_lock(&mutex_xmlrpc);
+	run_digi_loop = false;
+	pthread_mutex_unlock(&mutex_xmlrpc);
+	pthread_join(*digi_thread, NULL);
+
 	progStatus.rig_nbr = rig_nbr;
 
-	progStatus.freq_A = vfoA.freq;
+	progStatus.freq_A = FreqDispA->value();//vfoA.freq;
 	progStatus.imode_A = vfoA.imode;
 	progStatus.iBW_A = vfoA.iBW;
 
-	progStatus.freq_B = vfoB.freq;
+	progStatus.freq_B = FreqDispB->value();//vfoB.freq;
 	progStatus.imode_B = vfoB.imode;
 	progStatus.iBW_B = vfoB.iBW;
 
@@ -1204,8 +1215,7 @@ void cbExit()
 
 	saveFreqList();
 
-//	closeRig();
-	// shutdown serial thread
+// shutdown serial thread
 
 	pthread_mutex_lock(&mutex_serial);
 		run_serial_thread = false;
@@ -1213,11 +1223,15 @@ void cbExit()
 	pthread_join(*serial_thread, NULL);
 
 	selrig->setVfoAdj(0);
-	if (progStatus.restore_rig_data) {
+	if (progStatus.restore_rig_data){
 		selrig->set_vfoA(transceiverA.freq);
 		selrig->set_modeA(transceiverA.imode);
 		selrig->set_bwA(transceiverA.iBW);
+		selrig->set_vfoB(transceiverB.freq);
+		selrig->set_modeB(transceiverB.imode);
+		selrig->set_bwB(transceiverB.iBW);
 	}
+
 	selrig->shutdown();
 
 	// close down the serial port
@@ -1227,12 +1241,6 @@ void cbExit()
 	try {
 		send_no_rig();
 	} catch (...) { }
-
-	// shutdown xmlrpc thread
-	pthread_mutex_lock(&mutex_xmlrpc);
-	run_digi_loop = false;
-	pthread_mutex_unlock(&mutex_xmlrpc);
-	pthread_join(*digi_thread, NULL);
 
 	if (dlgDisplayConfig && dlgDisplayConfig->visible())
 		dlgDisplayConfig->hide();
@@ -1802,11 +1810,19 @@ void initRig()
 	vfoB.iBW = progStatus.iBW_B;
 	FreqDispB->value(vfoB.freq);
 
+
 	if (rig_nbr == TT550) {
 		selrig->set_vfoA(vfoA.freq);
 		selrig->set_modeA(vfoA.imode);
 		selrig->set_bwA(vfoA.iBW);
 		selrig->selectA();
+		selrig->set_vfoB(vfoB.freq);
+		selrig->set_modeB(vfoB.imode);
+		selrig->set_bwB(vfoB.iBW);
+	} else {
+		selrig->set_vfoA(vfoA.freq);
+		selrig->set_modeA(vfoA.imode);
+		selrig->set_bwA(vfoA.iBW);
 		selrig->set_vfoB(vfoB.freq);
 		selrig->set_modeB(vfoB.imode);
 		selrig->set_bwB(vfoB.iBW);
