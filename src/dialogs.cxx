@@ -268,8 +268,6 @@ void cbUSBaudio()
 
 void cbCancelXcvrDialog()
 {
-	bypass_serial_thread_loop = false;
-
 	btnOkXcvrDialog->labelcolor(FL_BLACK);
 	dlgXcvrConfig->hide();
 }
@@ -362,9 +360,9 @@ void cbOkXcvrDialog()
 	}
 
 	initRig();
+	bypass_serial_thread_loop = false;
 
 	btnOkXcvrDialog->labelcolor(FL_BLACK);
-
 }
 
 void configXcvr()

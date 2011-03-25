@@ -459,8 +459,8 @@ selectFreq();}
 Function {XcvrDialog()} {open
 } {
   Fl_Window {} {
-    label {I/O Ports}
-    xywh {69 636 482 257} type Double hide
+    label {I/O Ports} open
+    xywh {605 444 482 257} type Double visible
   } {
     Fl_Tabs {} {open
       xywh {0 8 477 245}
@@ -483,23 +483,20 @@ initConfigDialog();} open
           } {}
           Fl_Counter cntRigCatRetries {
             label Retries
-            callback {btnOkXcvrDialog->labelcolor(FL_RED);
-btnOkXcvrDialog->redraw();}
+            callback {progStatus.comm_retries = (int)o->value();} selected
             tooltip {Number of  times to resend
 command before giving up} xywh {123 63 75 22} type Simple align 4 minimum 1 maximum 10 step 1 value 5
             code0 {o->value(progStatus.comm_retries);}
           }
           Fl_Counter cntRigCatTimeout {
             label {Retry intvl (ms)}
-            callback {btnOkXcvrDialog->labelcolor(FL_RED);
-btnOkXcvrDialog->redraw();}
+            callback {progStatus.comm_timeout = (int)o->value();}
             tooltip {Time between retries is msec} xywh {123 89 75 22} type Simple align 4 minimum 2 maximum 200 step 1 value 10
             code0 {o->value(progStatus.comm_timeout);}
           }
           Fl_Counter cntRigCatWait {
             label {Cmd Intvl (ms)}
-            callback {btnOkXcvrDialog->labelcolor(FL_RED);
-btnOkXcvrDialog->redraw();}
+            callback {progStatus.comm_wait = (int)o->value();}
             tooltip {Millseconds between sequential commands} xywh {123 115 75 22} type Simple align 4 minimum 0 maximum 100 step 1 value 5
             code0 {o->value(progStatus.comm_wait);}
           }
@@ -865,11 +862,10 @@ cb_bpf_center();}
   }
 } 
 
-Function {make_TT550()} {open
-} {
+Function {make_TT550()} {} {
   Fl_Window {} {
     label {TT550 Setup} open
-    xywh {608 465 340 402} type Double align 0 visible
+    xywh {608 465 340 402} type Double align 0 hide
   } {
     Fl_Group {} {
       label CW open
@@ -1076,7 +1072,7 @@ cb_tt550_use_line_in();}
       }
       Fl_Choice sel_550_step_size {
         label {Step size}
-        callback {progStatus.tt550_encoder_step = o->value();} open selected
+        callback {progStatus.tt550_encoder_step = o->value();} open
         xywh {211 372 72 22} down_box BORDER_BOX align 1
         code0 {o->add("1|10|100|1 K|10 K");}
         code1 {o->value(progStatus.tt550_encoder_step);}
