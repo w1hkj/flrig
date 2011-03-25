@@ -402,11 +402,11 @@ void servicePTT()
 
 void * serial_thread_loop(void *d)
 {
-  static int  loopcount = 0;
+  static int  loopcount = progStatus.serloop_timing / 10;//0;
 	for(;;) {
 		if (!run_serial_thread) break;
 
-		MilliSleep(progStatus.serloop_timing);
+		MilliSleep(10);//progStatus.serloop_timing);
 
 		if (bypass_serial_thread_loop) goto serial_bypass_loop;
 
@@ -421,43 +421,40 @@ void * serial_thread_loop(void *d)
 			if (resetrcv) {
 				Fl::awake(zeroXmtMeters, 0);
 				resetrcv = false;
+				loopcount = progStatus.serloop_timing / 10;
 			}
 			resetxmt = true;
 
-			read_smeter();
-
-			read_vfo();
-
-			switch (loopcount) {
-				case 0: read_mode(); break;
-				case 1: read_bandwidth(); break;
-				default: break;
+			if (!loopcount--) {
+				read_smeter();
+				read_vfo();
+				read_mode();
+				read_bandwidth();
+//				read_volume();
+//				read_mode();
+//				read_bandwidth();
+//				read_notch();
+//				read_ifshift();
+//				read_power_control();
+//				read_preamp_att();
+//				read_mic_gain();
+//				read_squelch();
+//				read_rfgain();
+				loopcount = progStatus.serloop_timing / 10;
 			}
-			loopcount = (loopcount + 1) % 2;
-/*
-			switch (loopcount) {
-				case 0: read_volume(); loopcount++; break;
-				case 1: read_mode(); loopcount++; break;
-				case 2: read_bandwidth(); loopcount++; break;
-				case 3: read_notch(); loopcount++; break;
-				case 4: read_ifshift(); loopcount++; break;
-				case 5: read_power_control(); loopcount++; break;
-				case 6: read_preamp_att(); loopcount++; break;
-				case 7: read_mic_gain(); loopcount++; break;
-				case 8: read_squelch(); loopcount++; break;
-				case 9: read_rfgain(); loopcount = 0;
-			}
-*/
 		} else {
 			if (resetxmt) {
 				Fl::awake(updateSmeter, (void *)(0));
 				resetxmt = false;
+				loopcount = progStatus.serloop_timing / 10;
 			}
 			resetrcv = true;
-
-			read_power_out();
-			read_swr();
-			read_alc();
+			if (!loopcount--) {
+				read_power_out();
+				read_swr();
+				read_alc();
+				loopcount = progStatus.serloop_timing / 10;
+			}
 
 		}
 serial_bypass_loop: ;
@@ -1471,6 +1468,33 @@ void initRig()
 	FreqDispA->set_precision(selrig->precision);
 	FreqDispB->set_precision(selrig->precision);
 
+	vfoA.freq = progStatus.freq_A;
+	vfoA.imode = progStatus.imode_A;
+	vfoA.iBW = progStatus.iBW_A;
+	FreqDispA->value( vfoA.freq );
+
+	vfoB.freq = progStatus.freq_B;
+	vfoB.imode = progStatus.imode_B;
+	vfoB.iBW = progStatus.iBW_B;
+	FreqDispB->value(vfoB.freq);
+
+	if (rig_nbr == TT550) {
+		selrig->set_vfoA(vfoA.freq);
+		selrig->set_modeA(vfoA.imode);
+		selrig->set_bwA(vfoA.iBW);
+		selrig->selectA();
+		selrig->set_vfoB(vfoB.freq);
+		selrig->set_modeB(vfoB.imode);
+		selrig->set_bwB(vfoB.iBW);
+	} else {
+		selrig->set_vfoA(vfoA.freq);
+		selrig->set_modeA(vfoA.imode);
+		selrig->set_bwA(vfoA.iBW);
+		selrig->set_vfoB(vfoB.freq);
+		selrig->set_modeB(vfoB.imode);
+		selrig->set_bwB(vfoB.iBW);
+	}
+
 	if (progStatus.CIV > 0) selrig->adjustCIV(progStatus.CIV);
 
 	if (selrig->has_get_info) selrig->get_info();
@@ -1800,6 +1824,7 @@ void initRig()
 		btnUSBaudio->deactivate();
 	}
 
+/*
 	vfoA.freq = progStatus.freq_A;
 	vfoA.imode = progStatus.imode_A;
 	vfoA.iBW = progStatus.iBW_A;
@@ -1809,7 +1834,6 @@ void initRig()
 	vfoB.imode = progStatus.imode_B;
 	vfoB.iBW = progStatus.iBW_B;
 	FreqDispB->value(vfoB.freq);
-
 
 	if (rig_nbr == TT550) {
 		selrig->set_vfoA(vfoA.freq);
@@ -1827,7 +1851,7 @@ void initRig()
 		selrig->set_modeB(vfoB.imode);
 		selrig->set_bwB(vfoB.iBW);
 	}
-
+*/
 	// enable the serial thread
 	pthread_mutex_unlock(&mutex_serial);
 

@@ -1062,23 +1062,20 @@ initConfigDialog();
 
 Fl_Counter *cntRigCatRetries=(Fl_Counter *)0;
 
-static void cb_cntRigCatRetries(Fl_Counter*, void*) {
-  btnOkXcvrDialog->labelcolor(FL_RED);
-btnOkXcvrDialog->redraw();
+static void cb_cntRigCatRetries(Fl_Counter* o, void*) {
+  progStatus.comm_retries = (int)o->value();
 }
 
 Fl_Counter *cntRigCatTimeout=(Fl_Counter *)0;
 
-static void cb_cntRigCatTimeout(Fl_Counter*, void*) {
-  btnOkXcvrDialog->labelcolor(FL_RED);
-btnOkXcvrDialog->redraw();
+static void cb_cntRigCatTimeout(Fl_Counter* o, void*) {
+  progStatus.comm_timeout = (int)o->value();
 }
 
 Fl_Counter *cntRigCatWait=(Fl_Counter *)0;
 
-static void cb_cntRigCatWait(Fl_Counter*, void*) {
-  btnOkXcvrDialog->labelcolor(FL_RED);
-btnOkXcvrDialog->redraw();
+static void cb_cntRigCatWait(Fl_Counter* o, void*) {
+  progStatus.comm_wait = (int)o->value();
 }
 
 Fl_Counter *query_interval=(Fl_Counter *)0;

@@ -144,6 +144,7 @@ int sendCommand (string s, int retnbr, bool b)
 	int numread = 0;
 	int numwrite = (int)s.size();
 	int readafter = progStatus.comm_wait;
+	int tries = progStatus.comm_retries;
 	readafter += (int)(ceilf((retnbr + progStatus.comm_echo ? numwrite : 0)) *
 					(9 + progStatus.stopbits) * 1000.0 / RigSerial.Baud());
 
@@ -157,12 +158,23 @@ int sendCommand (string s, int retnbr, bool b)
 
 	RigSerial.WriteBuffer(s.c_str(), numwrite);
 	MilliSleep( readafter );
-	numread = readResponse();
+
+	replystr.clear();
+
+	if (!retnbr) {
+		numread = readResponse();
+		memset(replybuff, 0, RXBUFFSIZE + 1);
+		return 0;
+	}
+
+	while (tries-- && ((numread = readResponse()) < retnbr)) {
+		MilliSleep( readafter );
+	}
 
 	if (RIG_DEBUG)
 		LOG_DEBUG("ret :%3d, %s", numread, b ? str2hex(replybuff, numread) : replybuff);
 
-	if (retnbr != -1 && numread > retnbr) {
+	if (retnbr >= 0 && numread > retnbr) {
 		memmove(replybuff, replybuff + numread - retnbr, retnbr);
 		numread = retnbr;
 	}
@@ -170,7 +182,6 @@ int sendCommand (string s, int retnbr, bool b)
 	if (RIG_DEBUG)
 		LOG_INFO("rsp:%3d, %s", numread, b ? str2hex(replybuff, numread) : replybuff);
 
-	replystr.clear();
 	for (int i = 0; i < numread; replystr += replybuff[i++]);
 
 	return numread;

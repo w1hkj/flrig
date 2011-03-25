@@ -583,6 +583,8 @@ int RIG_TT550::adjust_bandwidth(int md)
 
 int RIG_TT550::def_bandwidth(int m)
 {
+	if (m < 0) m = 0;
+	if (m > 4) m = 4;
 	return TT550_def_bw[m];
 }
 
