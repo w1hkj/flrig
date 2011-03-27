@@ -431,14 +431,12 @@ void createXcvrDialog()
 }
 
 // Frequency display font / colors
+Fl_Font selfont;
 
 void cbFreqControlFontBrowser(Fl_Widget*, void*) {
-	Fl_Font fnt = fntbrowser->fontNumber();
-	progStatus.fontnbr = fnt;
-	lblTest->labelfont(fnt);
+	selfont = fntbrowser->fontNumber();
+	lblTest->labelfont(selfont);
 	dlgDisplayConfig->redraw();
-	FreqDispA->font(fnt);
-	FreqDispB->font(fnt);
 	fntbrowser->hide();
 }
 
@@ -453,94 +451,149 @@ void cbPrefFont()
 
 uchar fg_red, fg_green, fg_blue;
 uchar bg_red, bg_green, bg_blue;
-uchar sl_red, sl_green, sl_blue;
+uchar smeterRed, smeterGreen, smeterBlue;
+uchar peakRed, peakGreen, peakBlue;
+uchar pwrRed, pwrGreen, pwrBlue;
+uchar swrRed, swrGreen, swrBlue;
+Fl_Color bgclr;
 
-void cbPrefBackground()
+void cbBacklightColor()
 {
-	const char *title = "Background color";
-	Fl::get_color(lblTest->color(), bg_red, bg_green, bg_blue);
-	if (fl_color_chooser(title, bg_red, bg_green, bg_blue))
-		lblTest->color(fl_rgb_color (bg_red, bg_green, bg_blue));
-	dlgDisplayConfig->redraw();
+	uchar r = bg_red, g = bg_green, b = bg_blue;
+	if (fl_color_chooser("Background color", r, g, b)) {
+		bg_red = r; bg_green = g; bg_blue = b;
+		bgclr = fl_rgb_color(r, g, b);
+		lblTest->color(bgclr);
+		sldrRcvSignalColor->color( fl_rgb_color (smeterRed, smeterGreen, smeterBlue), bgclr );
+		sldrPWRcolor->color(fl_rgb_color (pwrRed, pwrGreen, pwrBlue), bgclr);
+		sldrSWRcolor->color(fl_rgb_color (swrRed, swrGreen, swrBlue), bgclr);
+		scaleSmeterColor->color(bgclr);
+		scalePWRcolor->color(bgclr);
+		scaleSWRcolor->color(bgclr);
+		grpMeterColor->color(bgclr);
+		dlgDisplayConfig->redraw();
+	}
 }
 
 void cbPrefForeground()
 {
-	const char *title = "Foreground color";
-	Fl::get_color(lblTest->labelcolor(), bg_red, bg_green, bg_blue);
-	if (fl_color_chooser(title, fg_red, fg_green, fg_blue))
-		lblTest->labelcolor(fl_rgb_color (fg_red, fg_green, fg_blue));
-	dlgDisplayConfig->redraw();
-}
-
-void cbBacklightColor()
-{
-	uchar red, green, blue;
-	Fl::get_color(scaleSmeterColor->color(), red, green, blue);
-	if (fl_color_chooser("Backlight color", red, green, blue)) {
-		scaleSmeterColor->color(fl_rgb_color (red, green, blue));
-		grpMeterColor->color(fl_rgb_color (red, green, blue));
+	uchar r = fg_red, g = fg_green, b = fg_blue;
+	if (fl_color_chooser("Foreground color", r, g, b)) {
+		fg_red = r; fg_green = g; fg_blue = b;
+		lblTest->labelcolor(fl_rgb_color (r, g, b));
+		dlgDisplayConfig->redraw();
 	}
-	grpMeterColor->redraw();
 }
 
 void cbSMeterColor()
 {
-	uchar red, green, blue;
-	Fl::get_color(sldrRcvSignalColor->color(), red, green, blue);
-	if (fl_color_chooser("S Meter color", red, green, blue))
-		sldrRcvSignalColor->color(fl_rgb_color (red, green, blue));
-	grpMeterColor->redraw();
+	uchar r = smeterRed, g = smeterGreen, b = smeterBlue;
+	if (fl_color_chooser("S Meter color", r, g, b)) {
+		smeterRed = r; smeterGreen = g; smeterBlue = b;
+		sldrRcvSignalColor->color(
+			fl_rgb_color (r, g, b),
+			bgclr );
+		dlgDisplayConfig->redraw();
+	}
 }
 
-uchar pRed, pGreen, pBlue;
+void cbPeakMeterColor()
+{
+	uchar r = peakRed, g = peakGreen, b = peakBlue;
+	if (fl_color_chooser("Peak value color", r, g, b)) {
+		peakRed = r; peakGreen = g; peakBlue = b;
+		sldrRcvSignalColor->PeakColor(fl_rgb_color (r, g, b));
+		sldrPWRcolor->PeakColor(fl_rgb_color (r, g, b));
+		sldrSWRcolor->PeakColor(fl_rgb_color (r, g, b));
+		dlgDisplayConfig->redraw();
+	}
+}
 
 void cbPwrMeterColor()
 {
-	pRed = progStatus.pwrRed;
-	pGreen = progStatus.pwrGreen;
-	pBlue = progStatus.pwrBlue;
-	fl_color_chooser("Power color", pRed, pGreen, pBlue);
+	uchar r = pwrRed, g = pwrGreen, b = pwrBlue;
+	if (fl_color_chooser("Power color", r, g, b)) {
+		pwrRed = r; pwrGreen = g; pwrBlue = b;
+		sldrPWRcolor->color(
+			fl_rgb_color (r, g, b),
+			bgclr );
+		dlgDisplayConfig->redraw();
+	}
 }
-
-uchar sRed, sGreen, sBlue;
 
 void cbSWRMeterColor()
 {
-	sRed = progStatus.swrRed;
-	sGreen = progStatus.swrGreen;
-	sBlue = progStatus.swrBlue;
-	fl_color_chooser("Power color", sRed, sGreen, sBlue);
+	uchar r = swrRed, g = swrGreen, b = swrBlue;
+	if (fl_color_chooser("Power color", r, g, b)) {
+		swrRed = r; swrGreen = g; swrBlue = b;
+		sldrSWRcolor->color(
+			fl_rgb_color (swrRed, swrGreen, swrBlue),
+			bgclr );
+		dlgDisplayConfig->redraw();
+	}
 }
 
 void cbOkDisplayDialog()
 {
-	FreqDispA->SetONOFFCOLOR(
-		fl_rgb_color(fg_red, fg_green, fg_blue),
-		fl_rgb_color(bg_red, bg_green, bg_blue));
-	FreqDispB->SetONOFFCOLOR(
-		fl_rgb_color(fg_red, fg_green, fg_blue),
-		fl_color_average(fl_rgb_color(bg_red, bg_green, bg_blue), FL_BLACK, 0.87));
+	progStatus.swrRed = swrRed;
+	progStatus.swrGreen = swrGreen;
+	progStatus.swrBlue = swrBlue;
+
+	progStatus.pwrRed = pwrRed;
+	progStatus.pwrGreen = pwrGreen;
+	progStatus.pwrBlue = pwrBlue;
+
+	progStatus.smeterRed = smeterRed;
+	progStatus.smeterGreen = smeterGreen;
+	progStatus.smeterBlue = smeterBlue;
+
+	progStatus.peakRed = peakRed;
+	progStatus.peakGreen = peakGreen;
+	progStatus.peakBlue = peakBlue;
+
+	progStatus.fg_red = fg_red;
+	progStatus.fg_green = fg_green;
+	progStatus.fg_blue = fg_blue;
+
+	progStatus.bg_red = bg_red;
+	progStatus.bg_green = bg_green;
+	progStatus.bg_blue = bg_blue;
+
+	progStatus.fontnbr = selfont;
+	FreqDispA->font(selfont);
+	FreqDispB->font(selfont);
+
+	if (useB) {
+		FreqDispB->SetONOFFCOLOR( fl_rgb_color(fg_red, fg_green, fg_blue), bgclr);
+		FreqDispA->SetONOFFCOLOR(
+			fl_rgb_color(fg_red, fg_green, fg_blue),
+			fl_color_average(bgclr, FL_BLACK, 0.87));
+	} else {
+		FreqDispA->SetONOFFCOLOR( fl_rgb_color(fg_red, fg_green, fg_blue), bgclr);
+		FreqDispB->SetONOFFCOLOR(
+			fl_rgb_color(fg_red, fg_green, fg_blue),
+			fl_color_average(bgclr, FL_BLACK, 0.87));
+	}
 
 	txtInactive->color(lblTest->color());
 	txtInactive->labelcolor(lblTest->labelcolor());
 	txtInactive->redraw();
 
-	scaleSmeter->color(scaleSmeterColor->color());
-	scalePower->color(scaleSmeterColor->color());
-	btnALC_SWR->color(scaleSmeterColor->color());
-	grpMeters->color(scaleSmeterColor->color());
-	
-	sldrRcvSignal->color(sldrRcvSignalColor->color(), scaleSmeter->color());
-	sldrFwdPwr->color(fl_rgb_color(pRed, pGreen, pBlue), scaleSmeter->color());
-	sldrALC_SWR->color(fl_rgb_color(sRed, sGreen, sBlue), scaleSmeter->color());
-	progStatus.swrRed = sRed;
-	progStatus.swrGreen = sGreen;
-	progStatus.swrBlue = sBlue;
-	progStatus.pwrRed = pRed;
-	progStatus.pwrGreen = pGreen;
-	progStatus.pwrBlue = pBlue;
+	scaleSmeter->color(bgclr);
+	scalePower->color(bgclr);
+	btnALC_SWR->color(bgclr);
 
+	sldrFwdPwr->color(fl_rgb_color (pwrRed, pwrGreen, pwrBlue), bgclr);
+	sldrFwdPwr->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
+
+	sldrRcvSignal->color(fl_rgb_color (smeterRed, smeterGreen, smeterBlue), bgclr);
+	sldrRcvSignal->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
+
+	sldrALC_SWR->color(fl_rgb_color (swrRed, swrGreen, swrBlue), bgclr);
+	sldrALC_SWR->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
+	sldrALC_SWR->redraw();
+
+	grpMeters->color(bgclr);
 	grpMeters->redraw();
 
 	dlgDisplayConfig->hide();
@@ -553,21 +606,65 @@ void cbCancelDisplayDialog()
 
 void setDisplayColors()
 {
-	unsigned char red, green, blue;
-
 	if (dlgDisplayConfig == NULL)
 		return;
 
-	FreqDispA->GetONCOLOR(red,green,blue);
-	lblTest->labelcolor(fl_rgb_color(red,green,blue));
-	FreqDispA->GetOFFCOLOR(red,green,blue);
-	lblTest->color(fl_rgb_color(red,green,blue));
-	scaleSmeterColor->color(scaleSmeter->color());
-	grpMeterColor->color(scaleSmeterColor->color());
-	sldrRcvSignalColor->color(sldrRcvSignal->color(), scaleSmeter->color());
+	swrRed = progStatus.swrRed;
+	swrGreen = progStatus.swrGreen;
+	swrBlue = progStatus.swrBlue;
+
+	pwrRed = progStatus.pwrRed;
+	pwrGreen = progStatus.pwrGreen;
+	pwrBlue = progStatus.pwrBlue;
+
+	smeterRed = progStatus.smeterRed;
+	smeterGreen = progStatus.smeterGreen;
+	smeterBlue = progStatus.smeterBlue;
+
+	peakRed = progStatus.peakRed;
+	peakGreen = progStatus.peakGreen;
+	peakBlue = progStatus.peakBlue;
+
+	fg_red = progStatus.fg_red;
+	fg_green = progStatus.fg_green;
+	fg_blue = progStatus.fg_blue;
+
+	bg_red = progStatus.bg_red;
+	bg_green = progStatus.bg_green;
+	bg_blue = progStatus.bg_blue;
+
+	bgclr = fl_rgb_color(bg_red, bg_green, bg_blue);
+
+	lblTest->labelcolor(fl_rgb_color(fg_red, fg_green, fg_blue));
+	lblTest->color(bgclr);
+
+	scaleSmeterColor->color(bgclr);
+	scalePWRcolor->color(bgclr);
+	scaleSWRcolor->color(bgclr);
+	grpMeterColor->color(bgclr);
+
+	sldrRcvSignalColor->color(
+		fl_rgb_color (smeterRed, smeterGreen, smeterBlue),
+		bgclr );
+	sldrPWRcolor->color(
+		fl_rgb_color (pwrRed, pwrGreen, pwrBlue),
+		bgclr );
+	sldrSWRcolor->color(
+		fl_rgb_color (swrRed, swrGreen, swrBlue),
+		bgclr );
+
 	sldrRcvSignalColor->minimum(0);
 	sldrRcvSignalColor->maximum(100);
 	sldrRcvSignalColor->value(25);
+
+	sldrPWRcolor->minimum(0);
+	sldrPWRcolor->maximum(100);
+	sldrPWRcolor->value(25);
+
+	sldrSWRcolor->minimum(0);
+	sldrSWRcolor->maximum(100);
+	sldrSWRcolor->value(25);
+
 	dlgDisplayConfig->show();
 }
 

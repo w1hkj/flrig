@@ -701,8 +701,8 @@ Fl_Double_Window* Rig_window() {
     } // Fl_Light_Button* btnPTT
     { grpMeters = new Fl_Group(1, 62, 210, 60);
       grpMeters->box(FL_THIN_DOWN_BOX);
-      grpMeters->color((Fl_Color)55);
-      grpMeters->selection_color((Fl_Color)55);
+      grpMeters->color((Fl_Color)215);
+      grpMeters->selection_color((Fl_Color)215);
       { scaleSmeter = new Fl_Box(3, 64, 205, 20);
         scaleSmeter->box(FL_FLAT_BOX);
         scaleSmeter->color((Fl_Color)55);
@@ -848,6 +848,14 @@ Fl_Box *scaleSmeterColor=(Fl_Box *)0;
 
 Fl_SigBar *sldrRcvSignalColor=(Fl_SigBar *)0;
 
+Fl_SigBar *sldrSWRcolor=(Fl_SigBar *)0;
+
+Fl_Box *scaleSWRcolor=(Fl_Box *)0;
+
+Fl_SigBar *sldrPWRcolor=(Fl_SigBar *)0;
+
+Fl_Box *scalePWRcolor=(Fl_Box *)0;
+
 Fl_Button *btnBacklight=(Fl_Button *)0;
 
 static void cb_btnBacklight(Fl_Button*, void*) {
@@ -870,6 +878,12 @@ Fl_Button *btnPwrColor=(Fl_Button *)0;
 
 static void cb_btnPwrColor(Fl_Button*, void*) {
   cbPwrMeterColor();
+}
+
+Fl_Button *btnPeakColor=(Fl_Button *)0;
+
+static void cb_btnPeakColor(Fl_Button*, void*) {
+  cbPeakMeterColor();
 }
 
 Fl_Button *btnCancel=(Fl_Button *)0;
@@ -898,17 +912,11 @@ static void cb_prefForeground(Fl_Button*, void*) {
   cbPrefForeground();
 }
 
-Fl_Button *prefBackground=(Fl_Button *)0;
-
-static void cb_prefBackground(Fl_Button*, void*) {
-  cbPrefBackground();
-}
-
 Fl_Double_Window* DisplayDialog() {
   Fl_Double_Window* w;
-  { Fl_Double_Window* o = new Fl_Double_Window(404, 106, _("Flrig Colors"));
+  { Fl_Double_Window* o = new Fl_Double_Window(290, 183, _("Flrig Colors"));
     w = o;
-    { grpMeterColor = new Fl_Group(8, 8, 209, 32);
+    { grpMeterColor = new Fl_Group(7, 8, 210, 100);
       grpMeterColor->box(FL_DOWN_BOX);
       grpMeterColor->color((Fl_Color)215);
       grpMeterColor->selection_color((Fl_Color)215);
@@ -920,7 +928,7 @@ Fl_Double_Window* DisplayDialog() {
         scaleSmeterColor->image(image_S60);
         o->color(scaleSmeter->color());
       } // Fl_Box* scaleSmeterColor
-      { sldrRcvSignalColor = new Fl_SigBar(12, 30, 201, 6);
+      { sldrRcvSignalColor = new Fl_SigBar(12, 30, 200, 6);
         sldrRcvSignalColor->box(FL_FLAT_BOX);
         sldrRcvSignalColor->color((Fl_Color)198);
         sldrRcvSignalColor->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
@@ -931,27 +939,68 @@ Fl_Double_Window* DisplayDialog() {
         sldrRcvSignalColor->align(FL_ALIGN_CENTER);
         sldrRcvSignalColor->when(FL_WHEN_RELEASE);
       } // Fl_SigBar* sldrRcvSignalColor
+      { Fl_SigBar* o = sldrSWRcolor = new Fl_SigBar(12, 61, 200, 6);
+        sldrSWRcolor->box(FL_FLAT_BOX);
+        sldrSWRcolor->color((Fl_Color)198);
+        sldrSWRcolor->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
+        sldrSWRcolor->labeltype(FL_NORMAL_LABEL);
+        sldrSWRcolor->labelfont(0);
+        sldrSWRcolor->labelsize(14);
+        sldrSWRcolor->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
+        sldrSWRcolor->align(FL_ALIGN_CENTER);
+        sldrSWRcolor->when(FL_WHEN_RELEASE);
+        o->minimum(0);
+        o->maximum(100);
+      } // Fl_SigBar* sldrSWRcolor
+      { scaleSWRcolor = new Fl_Box(10, 41, 205, 20);
+        scaleSWRcolor->box(FL_FLAT_BOX);
+        scaleSWRcolor->color((Fl_Color)215);
+        scaleSWRcolor->selection_color((Fl_Color)215);
+        scaleSWRcolor->image(image_SWR);
+      } // Fl_Box* scaleSWRcolor
+      { Fl_SigBar* o = sldrPWRcolor = new Fl_SigBar(10, 78, 200, 6);
+        sldrPWRcolor->box(FL_FLAT_BOX);
+        sldrPWRcolor->color((Fl_Color)91);
+        sldrPWRcolor->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
+        sldrPWRcolor->labeltype(FL_NORMAL_LABEL);
+        sldrPWRcolor->labelfont(0);
+        sldrPWRcolor->labelsize(14);
+        sldrPWRcolor->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
+        sldrPWRcolor->align(FL_ALIGN_CENTER);
+        sldrPWRcolor->when(FL_WHEN_RELEASE);
+        o->minimum(0);
+        o->maximum(100);
+      } // Fl_SigBar* sldrPWRcolor
+      { scalePWRcolor = new Fl_Box(10, 84, 205, 20);
+        scalePWRcolor->box(FL_FLAT_BOX);
+        scalePWRcolor->color((Fl_Color)215);
+        scalePWRcolor->selection_color((Fl_Color)215);
+        scalePWRcolor->image(image_P100);
+      } // Fl_Box* scalePWRcolor
       grpMeterColor->end();
     } // Fl_Group* grpMeterColor
-    { btnBacklight = new Fl_Button(16, 44, 90, 24, _("Backlight"));
+    { btnBacklight = new Fl_Button(221, 116, 60, 24, _("Back"));
       btnBacklight->callback((Fl_Callback*)cb_btnBacklight);
     } // Fl_Button* btnBacklight
-    { btMeterColor = new Fl_Button(16, 73, 90, 24, _("S meter"));
+    { btMeterColor = new Fl_Button(221, 8, 60, 22, _("Smeter"));
       btMeterColor->callback((Fl_Callback*)cb_btMeterColor);
     } // Fl_Button* btMeterColor
-    { btnSWRColor = new Fl_Button(117, 44, 90, 24, _("SWR meter"));
+    { btnSWRColor = new Fl_Button(221, 33, 60, 22, _("SWR"));
       btnSWRColor->callback((Fl_Callback*)cb_btnSWRColor);
     } // Fl_Button* btnSWRColor
-    { btnPwrColor = new Fl_Button(117, 73, 90, 24, _("Pwr meter"));
+    { btnPwrColor = new Fl_Button(221, 58, 60, 22, _("Pwr"));
       btnPwrColor->callback((Fl_Callback*)cb_btnPwrColor);
     } // Fl_Button* btnPwrColor
-    { btnCancel = new Fl_Button(278, 73, 55, 24, _("Cancel"));
+    { btnPeakColor = new Fl_Button(221, 84, 60, 22, _("Peak"));
+      btnPeakColor->callback((Fl_Callback*)cb_btnPeakColor);
+    } // Fl_Button* btnPeakColor
+    { btnCancel = new Fl_Button(154, 149, 60, 24, _("Cancel"));
       btnCancel->callback((Fl_Callback*)cb_btnCancel);
     } // Fl_Button* btnCancel
-    { btnOkDisplayDialog = new Fl_Return_Button(337, 73, 55, 24, _("OK"));
+    { btnOkDisplayDialog = new Fl_Return_Button(221, 149, 60, 24, _("OK"));
       btnOkDisplayDialog->callback((Fl_Callback*)cb_btnOkDisplayDialog);
     } // Fl_Return_Button* btnOkDisplayDialog
-    { lblTest = new Fl_Box(222, 8, 170, 30, _("14070.000"));
+    { lblTest = new Fl_Box(29, 114, 170, 30, _("14070.000"));
       lblTest->box(FL_DOWN_BOX);
       lblTest->color((Fl_Color)35);
       lblTest->selection_color((Fl_Color)FL_FOREGROUND_COLOR);
@@ -959,15 +1008,12 @@ Fl_Double_Window* DisplayDialog() {
       lblTest->labelsize(28);
       lblTest->labelcolor((Fl_Color)230);
     } // Fl_Box* lblTest
-    { prefFont = new Fl_Button(222, 42, 55, 24, _("Font"));
+    { prefFont = new Fl_Button(8, 149, 60, 24, _("Font"));
       prefFont->callback((Fl_Callback*)cb_prefFont);
     } // Fl_Button* prefFont
-    { prefForeground = new Fl_Button(279, 42, 55, 24, _("Digit"));
+    { prefForeground = new Fl_Button(77, 149, 60, 24, _("Color"));
       prefForeground->callback((Fl_Callback*)cb_prefForeground);
     } // Fl_Button* prefForeground
-    { prefBackground = new Fl_Button(337, 42, 55, 24, _("Back"));
-      prefBackground->callback((Fl_Callback*)cb_prefBackground);
-    } // Fl_Button* prefBackground
     o->end();
   } // Fl_Double_Window* o
   return w;

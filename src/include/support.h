@@ -195,6 +195,7 @@ extern void cbPrefForeground();
 extern void cbSMeterColor();
 extern void cbPwrMeterColor();
 extern void cbSWRMeterColor();
+extern void cbPeakMeterColor();
 extern void cbBacklightColor();
 
 extern void * serial_thread_loop( void * );

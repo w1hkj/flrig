@@ -1,16 +1,15 @@
+// "$Id: Fl_SigBar.H
 //
-// "$Id: Fl_SigBar.cxx 4288 2005-04-16 00:13:17Z mike $"
+// Signal Bar widget definitions.
 //
-// SigBar bar widget routines.
+// Copyright 2011 Dave Freese, W1HKJ
 //
-// Copyright 2000-2005 by Michael Sweet.
-//
-// This library is free software; you can redistribute it and/or
+// This source code is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
 //
-// This library is distributed in the hope that it will be useful,
+// This source code is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Library General Public License for more details.
@@ -20,9 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
 // USA.
 //
-// Please report all bugs and problems on the following page:
-//
-//	 http://www.fltk.org/str.php
+// Please report all bugs and problems to: w1hkj@w1hkj.com
 //
 // Contents:
 //
@@ -44,9 +41,8 @@
 
 //
 // Fl_SigBar is a SigBar bar widget based off Fl_Widget that shows a
-// standard SigBar bar...
+// standard Signal Bar with a peak reading indicator ...
 //
-
 
 //
 // 'Fl_SigBar::draw()' - Draw the check button.
@@ -82,6 +78,10 @@ void Fl_SigBar::draw()
 			draw_box(box(), x(), y(), w(), h(), active_r() ? color2() : fl_inactive(color2()));
 			fl_pop_clip();
 
+			fl_clip(tx + PeakPos, y(), 2, h());
+			draw_box(box(), x(), y(), w(), h(), pkcolor);
+			fl_pop_clip();
+
 		} else
 			draw_box(box(), x(), y(), w(), h(), color2());
 	} else {
@@ -102,7 +102,7 @@ void Fl_SigBar::draw()
 			fl_pop_clip();
 			
 			fl_clip(x(), ty + PeakPos, w(), 2);
-			draw_box(box(), x(), y(), w(), h(), color2());
+			draw_box(box(), x(), y(), w(), h(), pkcolor);
 			fl_pop_clip();
 
 		} else
@@ -123,6 +123,7 @@ Fl_SigBar::Fl_SigBar(int X, int Y, int W, int H, const char* l)
 	peakv_ = 0.0f;
 	value_ = 0.0f;
 	horiz = true;
+	pkcolor = FL_RED;
 	for (int i = 0; i < 11; i++) peak_[i] = 0.0f;
 }
 

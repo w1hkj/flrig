@@ -1,16 +1,16 @@
 //
-// "$Id: Fl_SigBar.H 4288 2005-04-16 00:13:17Z mike $"
+// "$Id: Fl_SigBar.H
 //
-// SigBar bar widget definitions.
+// Signal Bar widget definitions.
 //
-// Copyright 2000-2005 by Michael Sweet.
+// Copyright 2011 Dave Freese, W1HKJ
 //
-// This library is free software; you can redistribute it and/or
+// This source code is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Library General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
 //
-// This library is distributed in the hope that it will be useful,
+// This source code is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Library General Public License for more details.
@@ -20,26 +20,18 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
 // USA.
 //
-// Please report all bugs and problems on the following page:
-//
-//	 http://www.fltk.org/str.php
-//
+// Please report all bugs and problems to: w1hkj@w1hkj.com
 
 #ifndef _Fl_SigBar_H_
-#  define _Fl_SigBar_H_
-
-//
-// Include necessary headers.
-//
+#define _Fl_SigBar_H_
 
 #include <FL/Fl_Widget.H>
-
 
 //
 // SigBar class...
 //
 
-class FL_EXPORT Fl_SigBar : public Fl_Widget
+class Fl_SigBar : public Fl_Widget
 {
 	float	value_,
 		peakv_,
@@ -48,6 +40,7 @@ class FL_EXPORT Fl_SigBar : public Fl_Widget
 		peak_[11];
 	int aging_;
 	bool horiz;
+	Fl_Color pkcolor;
 
 protected:
 
@@ -72,11 +65,9 @@ public:
 	}
 	void peak(float);
 	float peak() { return peakv_;};
+	void PeakColor(Fl_Color c) { pkcolor = c; };
+	Fl_Color PeakColor() { return pkcolor; }
 	void horizontal(bool yes) { horiz = yes; };
 };
 
-#endif // !_Fl_SigBar_H_
-
-//
-// End of "$Id: Fl_SigBar.H 4288 2005-04-16 00:13:17Z mike $".
-//
+#endif
