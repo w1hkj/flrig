@@ -1479,13 +1479,15 @@ void initRig()
 	FreqDispB->value(vfoB.freq);
 
 	if (rig_nbr == TT550) {
+		selrig->selectA();
 		selrig->set_vfoA(vfoA.freq);
 		selrig->set_modeA(vfoA.imode);
 		selrig->set_bwA(vfoA.iBW);
-		selrig->selectA();
+		selrig->selectB();
 		selrig->set_vfoB(vfoB.freq);
 		selrig->set_modeB(vfoB.imode);
 		selrig->set_bwB(vfoB.iBW);
+		selrig->selectA();
 	} else {
 		selrig->set_vfoA(vfoA.freq);
 		selrig->set_modeA(vfoA.imode);
@@ -1824,7 +1826,7 @@ void initRig()
 		btnUSBaudio->deactivate();
 	}
 
-/*
+
 	vfoA.freq = progStatus.freq_A;
 	vfoA.imode = progStatus.imode_A;
 	vfoA.iBW = progStatus.iBW_A;
@@ -1836,13 +1838,10 @@ void initRig()
 	FreqDispB->value(vfoB.freq);
 
 	if (rig_nbr == TT550) {
+		selrig->selectA();
 		selrig->set_vfoA(vfoA.freq);
 		selrig->set_modeA(vfoA.imode);
 		selrig->set_bwA(vfoA.iBW);
-		selrig->selectA();
-		selrig->set_vfoB(vfoB.freq);
-		selrig->set_modeB(vfoB.imode);
-		selrig->set_bwB(vfoB.iBW);
 	} else {
 		selrig->set_vfoA(vfoA.freq);
 		selrig->set_modeA(vfoA.imode);
@@ -1851,7 +1850,7 @@ void initRig()
 		selrig->set_modeB(vfoB.imode);
 		selrig->set_bwB(vfoB.iBW);
 	}
-*/
+
 	// enable the serial thread
 	pthread_mutex_unlock(&mutex_serial);
 

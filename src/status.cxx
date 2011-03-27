@@ -138,29 +138,29 @@ status progStatus = {
 	100,		// encoder_step;
 	10,			// encoder_sensitivity;
 
-	232,		// int	 s_red;
-	255,		// int	 s_green;
-	232,		// int	 s_blue;
-
 	232,		// int	 bg_red;
-	255,		// int	 bg_green;
+	256,		// int	 bg_green;
 	232,		// int	 bg_blue;
 
 	0,			// int	 fg_red;
 	0,			// int	 fg_green;
 	0,			// int	 fg_blue;
 
-	0,			// int	 meter_red;
-	180,		// int	 meter_green;
-	0,			// int	 meter_blue;
+	148,		// int	swrRed;
+	0,			// int	swrGreen;
+	148,		// int	swrBlue;
 
-	180,		// int	 pwrRed;
-	0,			// int	 pwrGreen;
-	0,			// int	 pwrBlue
+	180,		// int	pwrRed;
+	0,			// int	pwrGreen;
+	0,			// int	pwrBlue;
 
-	148,		// int	 swrRed;
-	0,			// int	 swrGreen;
-	180,		// int	 swrBlue;
+	0,			// int	smeterRed;
+	180,		// int	smeterGreen;
+	0,			//int	smeterBlue;
+
+	255,		// int	peakRed;
+	0,			// int	peakGreen;
+	0,			// int	peakBlue;
 
 	FL_COURIER,	// Fl_Font fontnbr;
 
@@ -302,10 +302,6 @@ void status::saveLastState()
 	spref.set("bpf_center", bpf_center);
 	spref.set("use_bpf_center", use_bpf_center);
 
-	spref.set("s_red", s_red);
-	spref.set("s_green", s_green);
-	spref.set("s_blue", s_blue);
-
 	spref.set("fg_red", fg_red);
 	spref.set("fg_green", fg_green);
 	spref.set("fg_blue", fg_blue);
@@ -314,9 +310,9 @@ void status::saveLastState()
 	spref.set("bg_green", bg_green);
 	spref.set("bg_blue", bg_blue);
 
-	spref.set("meter_red", meter_red);
-	spref.set("meter_green", meter_green);
-	spref.set("meter_blue", meter_blue);
+	spref.set("smeter_red", smeterRed);
+	spref.set("smeter_green", smeterGreen);
+	spref.set("smeter_blue", smeterBlue);
 
 	spref.set("power_red", pwrRed);
 	spref.set("power_green", pwrGreen);
@@ -325,6 +321,10 @@ void status::saveLastState()
 	spref.set("swr_red", swrRed);
 	spref.set("swr_green", swrGreen);
 	spref.set("swr_blue", swrBlue);
+
+	spref.set("peak_red", peakRed);
+	spref.set("peak_green", peakGreen);
+	spref.set("peak_blue", peakBlue);
 
 	spref.set("fontnbr", fontnbr);
 
@@ -472,10 +472,6 @@ bool status::loadXcvrState(const char *xcvr)
 		spref.get("bpf_center", bpf_center, bpf_center);
 		spref.get("use_bpf_center", i, i); use_bpf_center = i;
 
-		spref.get("s_red", s_red, s_red);
-		spref.get("s_green", s_green, s_green);
-		spref.get("s_blue", s_blue, s_blue);
-
 		spref.get("fg_red", fg_red, fg_red);
 		spref.get("fg_green", fg_green, fg_green);
 		spref.get("fg_blue", fg_blue, fg_blue);
@@ -484,9 +480,9 @@ bool status::loadXcvrState(const char *xcvr)
 		spref.get("bg_green", bg_green, bg_green);
 		spref.get("bg_blue", bg_blue, bg_blue);
 
-		spref.get("meter_red", meter_red, meter_red);
-		spref.get("meter_green", meter_green, meter_green);
-		spref.get("meter_blue", meter_blue, meter_blue);
+		spref.get("smeter_red", smeterRed, smeterRed);
+		spref.get("smeter_green", smeterGreen, smeterGreen);
+		spref.get("smeter_blue", smeterBlue, smeterBlue);
 
 		spref.get("power_red", pwrRed, pwrRed);
 		spref.get("power_green", pwrGreen, pwrGreen);
@@ -495,6 +491,10 @@ bool status::loadXcvrState(const char *xcvr)
 		spref.get("swr_red", swrRed, swrRed);
 		spref.get("swr_green", swrGreen, swrGreen);
 		spref.get("swr_blue", swrBlue, swrBlue);
+
+		spref.get("peak_red", peakRed, peakRed);
+		spref.get("peak_green", peakGreen, peakGreen);
+		spref.get("peak_blue", peakBlue, peakBlue);
 
 		i = (int)fontnbr;
 		spref.get("fontnbr", i, i); fontnbr = (Fl_Font)i;
@@ -506,30 +506,31 @@ bool status::loadXcvrState(const char *xcvr)
 
 	}
 
+	Fl_Color bgclr = fl_rgb_color(bg_red, bg_green, bg_blue);
+
 	FreqDispA->SetONOFFCOLOR(
 		fl_rgb_color(fg_red, fg_green, fg_blue),
-		fl_rgb_color(bg_red, bg_green, bg_blue));
+		bgclr);
 	FreqDispA->font(fontnbr);
 	FreqDispB->SetONOFFCOLOR(
 		fl_rgb_color(fg_red, fg_green, fg_blue),
-		fl_color_average(fl_rgb_color(bg_red, bg_green, bg_blue), FL_BLACK, 0.87));
+		fl_color_average(bgclr, FL_BLACK, 0.87));
 	FreqDispB->font(fontnbr);
 
-	Fl_Color clr = fl_rgb_color(s_red, s_green, s_blue);
-	scaleSmeter->color(clr);
-	scalePower->color(clr);
-	btnALC_SWR->color(clr);
-	grpMeters->color(clr);
+	scaleSmeter->color(bgclr);
+	scalePower->color(bgclr);
+	btnALC_SWR->color(bgclr);
 
-	Fl_Color mclr = fl_rgb_color (meter_red, meter_green, meter_blue);
-	Fl_Color pclr = fl_rgb_color (pwrRed, pwrGreen, pwrBlue);
-	Fl_Color sclr = fl_rgb_color (swrRed, swrGreen, swrBlue);
-	sldrFwdPwr->color(pclr, clr);
-	sldrRcvSignal->color(mclr, clr);
-	sldrALC_SWR->color(sclr, clr);
-	sldrFwdPwr->redraw();
-	sldrRcvSignal->redraw();
-	sldrALC_SWR->redraw();
+	sldrFwdPwr->color(fl_rgb_color (pwrRed, pwrGreen, pwrBlue), bgclr);
+	sldrFwdPwr->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
+
+	sldrRcvSignal->color(fl_rgb_color (smeterRed, smeterGreen, smeterBlue), bgclr);
+	sldrRcvSignal->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
+
+	sldrALC_SWR->color(fl_rgb_color (swrRed, swrGreen, swrBlue), bgclr);
+	sldrALC_SWR->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
+
+	grpMeters->color(bgclr);
 
 	if (use_rig_data) mnuKeepData->set();
 	else mnuKeepData->clear();

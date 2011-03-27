@@ -129,10 +129,6 @@ struct status {
 
 // =========================
 
-	int		s_red;
-	int		s_green;
-	int		s_blue;
-
 	int		bg_red;
 	int		bg_green;
 	int		bg_blue;
@@ -141,17 +137,21 @@ struct status {
 	int		fg_green;
 	int		fg_blue;
 
-	int		meter_red;
-	int		meter_green;
-	int		meter_blue;
+	int		swrRed;
+	int		swrGreen;
+	int		swrBlue;
 
 	int		pwrRed;
 	int		pwrGreen;
 	int		pwrBlue;
 
-	int		swrRed;
-	int		swrGreen;
-	int		swrBlue;
+	int		smeterRed;
+	int		smeterGreen;
+	int		smeterBlue;
+
+	int		peakRed;
+	int		peakGreen;
+	int		peakBlue;
 
 	Fl_Font	fontnbr;
 

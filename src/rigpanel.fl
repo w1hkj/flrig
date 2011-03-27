@@ -16,7 +16,7 @@ decl {\#include "support.h"} {}
 Function {Rig_window()} {open
 } {
   Fl_Window {} {
-    label Flrig
+    label Flrig open
     xywh {577 57 424 330} type Double color 52 align 80
     code0 {\#include <stdlib.h>} visible
   } {
@@ -274,8 +274,8 @@ btnA->value(0);}
       callback {cbPTT();}
       tooltip {Xmt On/Off} xywh {362 286 60 18} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
     }
-    Fl_Group grpMeters {open
-      xywh {1 62 210 60} box THIN_DOWN_BOX color 55 selection_color 55
+    Fl_Group grpMeters {open selected
+      xywh {1 62 210 60} box THIN_DOWN_BOX color 215 selection_color 215
     } {
       Fl_Box scaleSmeter {
         image {images/S60.xbm} xywh {3 64 205 20} box FLAT_BOX color 55 selection_color 55
@@ -354,71 +354,90 @@ Please wait}
   }
 } 
 
-Function {DisplayDialog()} {} {
+Function {DisplayDialog()} {open
+} {
   Fl_Window {} {
     label {Flrig Colors} open
-    xywh {493 143 404 106} type Double hide
+    xywh {578 418 290 183} type Double visible
   } {
     Fl_Group grpMeterColor {open
-      xywh {8 8 209 32} box DOWN_BOX color 215 selection_color 215 labelcolor 50
+      xywh {7 8 210 100} box DOWN_BOX color 215 selection_color 215 labelcolor 50
     } {
       Fl_Box scaleSmeterColor {
         image {images/S60.xbm} xywh {10 10 205 20} box FLAT_BOX color 215 selection_color 215
         code0 {o->color(scaleSmeter->color());}
       }
       Fl_Box sldrRcvSignalColor {
-        xywh {12 30 201 6} box FLAT_BOX color 198
+        xywh {12 30 200 6} box FLAT_BOX color 198
         class Fl_SigBar
+      }
+      Fl_Box sldrSWRcolor {
+        xywh {12 61 200 6} box FLAT_BOX color 198
+        code0 {o->minimum(0);}
+        code1 {o->maximum(100);}
+        class Fl_SigBar
+      }
+      Fl_Box scaleSWRcolor {
+        image {images/SWR.xbm} xywh {10 41 205 20} box FLAT_BOX color 215 selection_color 215
+      }
+      Fl_Box sldrPWRcolor {
+        xywh {10 78 200 6} box FLAT_BOX color 91
+        code0 {o->minimum(0);}
+        code1 {o->maximum(100);}
+        class Fl_SigBar
+      }
+      Fl_Box scalePWRcolor {
+        image {images/P100.xbm} xywh {10 84 205 20} box FLAT_BOX color 215 selection_color 215
       }
     }
     Fl_Button btnBacklight {
-      label Backlight
+      label Back
       callback {cbBacklightColor();}
-      xywh {16 44 90 24}
+      xywh {221 116 60 24}
     }
     Fl_Button btMeterColor {
-      label {S meter}
+      label Smeter
       callback {cbSMeterColor();}
-      xywh {16 73 90 24}
+      xywh {221 8 60 22}
     }
     Fl_Button btnSWRColor {
-      label {SWR meter}
+      label SWR
       callback {cbSWRMeterColor();}
-      xywh {117 44 90 24}
+      xywh {221 33 60 22}
     }
     Fl_Button btnPwrColor {
-      label {Pwr meter}
+      label Pwr
       callback {cbPwrMeterColor();}
-      xywh {117 73 90 24}
+      xywh {221 58 60 22}
+    }
+    Fl_Button btnPeakColor {
+      label Peak
+      callback {cbPeakMeterColor();}
+      xywh {221 84 60 22}
     }
     Fl_Button btnCancel {
       label Cancel
       callback {cbCancelDisplayDialog();}
-      xywh {278 73 55 24}
+      xywh {154 149 60 24}
     }
     Fl_Return_Button btnOkDisplayDialog {
       label OK
       callback {cbOkDisplayDialog();}
-      xywh {337 73 55 24}
+      xywh {221 149 60 24}
     }
     Fl_Box lblTest {
       label {14070.000}
-      xywh {222 8 170 30} box DOWN_BOX color 35 selection_color 0 labelfont 4 labelsize 28 labelcolor 230
+      xywh {29 114 170 30} box DOWN_BOX color 35 selection_color 0 labelfont 4 labelsize 28 labelcolor 230
     }
     Fl_Button prefFont {
       label Font
       callback {cbPrefFont();}
-      xywh {222 42 55 24}
+      xywh {8 149 60 24}
     }
     Fl_Button prefForeground {
-      label Digit
+      label Color
       callback {cbPrefForeground();}
-      xywh {279 42 55 24}
-    }
-    Fl_Button prefBackground {
-      label Back
-      callback {cbPrefBackground();}
-      xywh {337 42 55 24}
+      xywh {77 149 60 24}
     }
   }
 } 
@@ -456,11 +475,10 @@ selectFreq();}
   }
 } 
 
-Function {XcvrDialog()} {open
-} {
+Function {XcvrDialog()} {} {
   Fl_Window {} {
     label {I/O Ports} open
-    xywh {605 444 482 257} type Double visible
+    xywh {605 444 482 257} type Double hide
   } {
     Fl_Tabs {} {open
       xywh {0 8 477 245}
@@ -483,7 +501,7 @@ initConfigDialog();} open
           } {}
           Fl_Counter cntRigCatRetries {
             label Retries
-            callback {progStatus.comm_retries = (int)o->value();} selected
+            callback {progStatus.comm_retries = (int)o->value();}
             tooltip {Number of  times to resend
 command before giving up} xywh {123 63 75 22} type Simple align 4 minimum 1 maximum 10 step 1 value 5
             code0 {o->value(progStatus.comm_retries);}

@@ -761,18 +761,7 @@ void RIG_TT550::process_stream(string s)
 int RIG_TT550::get_smeter()
 {
 	cmd = TT550getSIG_LEVEL;
-	sendCommand(cmd, -1, true);//6, true);
-
-//if (datastream[dp] != 0x80) {
-//replystr.clear();
-//for (int i = 0; i < 5; i++) {
-//	replystr += ' ';
-//	replystr[i] = datastream[dp + i];
-//}
-//dp += 5;
-//}
-//	if (replystr.empty()) return 0;
-
+	sendCommand(cmd, -1, true);
 	if (replystr[0] != 'S') {
 		string leading;
 		while((replystr.length() >= 5) && replystr[0] != 'S') {
@@ -789,11 +778,16 @@ int RIG_TT550::get_smeter()
 
 	if (replystr[0] == 'S') {
 		int sval;
-		replystr[5] = 0;
+		float fval;
 		sscanf(&replystr[1], "%4x", &sval);
-		Fl::awake(updateSWR, (void*)(sval/256));
+		fval = sval/256.0;
+		if (fval <= 9) sval = (int)(fval * 50.0 / 9.0);
+		else sval = 50 + (int)((fval - 9.0)*50.0 / 60.0);
+		if (sval < 0) sval = 0;
+		if (sval > 100) sval = 100;
+		return sval;
 	}
-	return -1;
+	return 0;
 }
 
 int RIG_TT550::get_swr()

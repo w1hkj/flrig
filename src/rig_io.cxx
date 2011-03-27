@@ -139,13 +139,16 @@ int readResponse()
 	return numread;
 }
 
+// retnbr = 0 ... N read N bytes
+// retnbr = -1 .. read indeterminiate # bytes
+
 int sendCommand (string s, int retnbr, bool b)
 {
 	int numread = 0;
 	int numwrite = (int)s.size();
 	int readafter = progStatus.comm_wait;
 	int tries = progStatus.comm_retries;
-	readafter += (int)(ceilf((retnbr + progStatus.comm_echo ? numwrite : 0)) *
+	readafter += (int)(ceilf((retnbr == -1 ? 20 : retnbr + progStatus.comm_echo ? numwrite : 0)) *
 					(9 + progStatus.stopbits) * 1000.0 / RigSerial.Baud());
 
 	if (RigSerial.IsOpen() == false) {
@@ -161,7 +164,7 @@ int sendCommand (string s, int retnbr, bool b)
 
 	replystr.clear();
 
-	if (!retnbr) {
+	if (retnbr == 0) {
 		numread = readResponse();
 		memset(replybuff, 0, RXBUFFSIZE + 1);
 		return 0;
