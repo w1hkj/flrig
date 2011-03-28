@@ -225,7 +225,6 @@ void RIG_TT550::initialize()
 
 	set_volume_control(0);
 
-//	set_noise_reduction(noise_reduction);
 	set_auto_notch(auto_notch);
 	set_compression();
 
@@ -1039,8 +1038,13 @@ void RIG_TT550::set_auto_notch(int v)
 {
 	auto_notch = v;
 	cmd = TT550setNRNOTCH;
-	cmd[1] = noise_reduction ? '1' : '0';
-	cmd[2] = auto_notch ? '1' : '0';
+	if (v) {
+		cmd[1] = '0';
+		cmd[2] = '1';
+	} else {
+		cmd[1] = noise_reduction ? '1' : '0';
+		cmd[2] = '0';
+	}
 	sendCommand(cmd, 0, true);
 }
 
@@ -1048,8 +1052,11 @@ void RIG_TT550::set_noise_reduction(int b)
 {
 	noise_reduction = b;
 	cmd = TT550setNRNOTCH;
-	cmd[1] = noise_reduction ? '1' : '0';
-	cmd[2] = auto_notch ? '1' : '0';
+	if (b) {
+		cmd[1] = '1'; cmd[2] = '0';
+	} else {
+		cmd[1] = '0'; cmd[2] = auto_notch ? '1' : '0';
+	}
 	sendCommand(cmd, 0, true);
 }
 
@@ -1104,14 +1111,13 @@ void RIG_TT550::set_nb_level()
 {
 	cmd = TT550setBLANKER;
 	cmd[1] = progStatus.tt550_nb_level;
-	if (!progStatus.noise) cmd[1] = 0;
 	sendCommand(cmd, 0, true);
 }
 
 void RIG_TT550::set_noise(bool b)
 {
 	progStatus.noise = b;
-	set_nb_level();
+	set_noise_reduction(b);
 }
 
 void RIG_TT550::tuner_bypass()
