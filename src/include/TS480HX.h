@@ -13,20 +13,36 @@ public:
 	RIG_TS480HX();
 	~RIG_TS480HX(){}
 
-	bool sendTScommand(string, int, bool);
+	bool sendTScommand(string, int);
+
+	void initialize();
 
 	long get_vfoA();
 	void set_vfoA(long);
+	long get_vfoB();
+	void set_vfoB(long);
+
+	int  get_modetype(int n);
+	void set_modeA(int val);
+	int  get_modeA();
+	void set_modeB(int val);
+	int  get_modeB();
+
 	int  get_smeter();
 	int  get_swr();
 	void set_PTT_control(int val);
-	void set_modeA(int val);
-	int  get_modeA();
-	int  get_modetype(int n);
+
 	void set_bwA(int val);
 	int  get_bwA();
+	void set_bwB(int val);
+	int  get_bwB();
+	void selectA();
+	void selectB();
 
-//	int  get_power_out();
+	bool can_split() { return true;}
+	void set_split(bool val);
+	bool twovfos() {return true;}
+
 	void set_volume_control(int val);
 	int  get_volume_control();
 	void set_power_control(double val);
@@ -35,23 +51,6 @@ public:
 		min = 5; max = 200; step = 1; }
 	void set_attenuator(int val);
 	int  get_attenuator();
-
-//	void tune_rig();
-//	void set_preamp(int val);
-//	int  get_preamp();
-//	int  adjust_bandwidth(int val);
-//	void set_widths();
-	//	void set_if_shift(int val);
-	//	bool get_if_shift(int &val);
-	//	void get_if_min_max_step(int &min, int &max, int &step);
-	//	void set_notch(bool on, int val);
-	//	bool get_notch(int &val);
-	//	void get_notch_min_max_step(int &min, int &max, int &step);
-//	void set_beatcancel(int val);
-//	int  get_beatcancel();
-//	void set_mic_gain(int val);
-//	int  get_mic_gain();
-//	void get_mic_min_max_step(int &min, int &max, int &step);
 
 };
 
