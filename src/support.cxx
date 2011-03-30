@@ -238,7 +238,8 @@ void read_power_out()
 	pthread_mutex_lock(&mutex_serial);
 	sig = selrig->get_power_out();
 	pthread_mutex_unlock(&mutex_serial);
-	Fl::awake(updateFwdPwr, (void*)sig);
+	if (sig > -1)
+		Fl::awake(updateFwdPwr, (void*)sig);
 }
 
 // read swr
@@ -260,7 +261,8 @@ void read_alc()
 	pthread_mutex_lock(&mutex_serial);
 		sig = selrig->get_alc();
 	pthread_mutex_unlock(&mutex_serial);
-	Fl::awake(updateALC, (void*)sig);
+	if (sig > -1)
+		Fl::awake(updateALC, (void*)sig);
 }
 
 static bool resetrcv = true;

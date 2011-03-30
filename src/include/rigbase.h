@@ -186,8 +186,8 @@ public:
 	virtual bool twovfos() {return false;}
 
 	virtual int  get_smeter(void) {return -1;}
-	virtual int  get_swr(void) {return 0;}
-	virtual int  get_alc(void) {return 0;}
+	virtual int  get_swr(void) {return -1;}
+	virtual int  get_alc(void) {return -1;}
 	virtual int  get_power_out(void) {return -1;}
 	virtual int  get_power_control(void) {return 0;}
 	virtual void set_power_control(double val) {}
