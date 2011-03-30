@@ -1,8 +1,17 @@
 
 
-=Version 1.1.1=
+=Version 1.1.2=
 
-2011-03-20  David Freese  <w1hkj@w1hkj.com>
+2011-03-30  David Freese  <w1hkj@w1hkj.com>
+
+	4d18b89: TS480HX/SAT update
+	3444ca3: TT550 noise reduction
+	4465b45: Meters / Colors
+	4c5b946: Serial thread timing
+	95ca6ce: TS590S smeter
+
+
+=Version 1.1.1=
 
 	145649f: TS590S update
 
