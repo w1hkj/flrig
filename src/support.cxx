@@ -2001,6 +2001,13 @@ void initRigCombo()
 	selectRig->index(rig_nbr = 0);
 }
 
+void nb_label(const char * l, bool on = false)
+{
+	btnNOISE->value(on);
+	btnNOISE->label(l);
+	btnNOISE->redraw_label();
+}
+
 void preamp_label(const char * l, bool on = false)
 {
 	btnPreamp->value(on);

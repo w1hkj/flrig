@@ -83,6 +83,8 @@ RIG_TS590S::RIG_TS590S() {
 	active_mode = 1;
 	active_bandwidth = 8;
 
+	nb_level = 2;
+
 	def_mode = 1;
 	defbw_ = 8;
 	deffreq_ = 14070000;
@@ -197,48 +199,50 @@ void RIG_TS590S::set_vfoB (long freq)
 	sendTScommand(cmd, 0, true);
 }
 
-int TS590S_meter_val = 0;
-
 int RIG_TS590S::get_smeter()
 {
+	int mtr = 0;
 	cmd = "SM0;";
-	if(sendTScommand(cmd, 8) == 8) {
-		TS590S_meter_val = atoi(&replybuff[3]);
-	} else {
-		TS590S_meter_val *= 9;
-		TS590S_meter_val /= 10;
+	int ret = sendTScommand(cmd, 8);
+	LOG_INFO("%s => %s", cmd.c_str(), replystr.c_str());
+
+	if (replystr.find("SM0") != 0)
+		return 0;
+	if(ret == 8) {
+		replystr[7] = 0;
+		mtr = atoi(&replystr[3]);
+		mtr *= 50;
+		mtr /= 15;
+		if (mtr > 100) mtr = 100;
 	}
-	return TS590S_meter_val * 10 / 3;
+	return mtr;
 }
 
-/*
- * commented out
- * pending resolution of return data stability
- * 
-int RIG_TS590S::get_swr()
-{
-	cmd = "RM1;";
-	if (sendTScommand(cmd, 8) == 8) {
-		replybuff[7] = 0;
-		int mtr = atoi(&replybuff[5]);
-		mtr = (mtr * 100) / 30;
-		return mtr;
-	}
-	return 0;
-}
+//int RIG_TS590S::get_swr()
+//{
+//	cmd = "RM1;";
+//	if (sendTScommand(cmd, 8) == 8) {
+//		replybuff[7] = 0;
+//		int mtr = atoi(&replybuff[5]);
+//		mtr = (mtr * 100) / 30;
+//		return mtr;
+//	}
+//	return 0;
+//}
 
 int RIG_TS590S::get_power_out()
 {
+	int mtr = 0;
 	cmd = "SM0;";
 	if (sendTScommand(cmd, 8) == 8) {
-		replybuff[7] = 0;
-		int mtr = atoi(&replybuff[5]);
-		mtr = (mtr * 100) / 30;
-		return mtr;
+		mtr = atoi(&replybuff[3]);
+		mtr *= 50;
+		mtr /= 18;
+		if (mtr > 100) mtr = 100;
 	}
-	return 0;
+	return mtr;
 }
-*/
+
 
 // Transceiver power level
 void RIG_TS590S::set_power_control(double val)
@@ -584,12 +588,21 @@ void RIG_TS590S::get_mic_min_max_step(int &min, int &max, int &step)
 	step = 1;
 }
 
-void RIG_TS590S::set_noise(bool b)
+void RIG_TS590S::set_noise(bool val)
 {
-	if (b)
-		cmd = "NB1;";
-	else
-		cmd = "NB0;";
+	if (nb_level == 0) {
+		nb_level = 1;
+		nb_label("NB 1", true);
+	} else if (nb_level == 1) {
+		nb_level = 2;
+		nb_label("NB 2", true);
+	} else if (nb_level == 2) {
+		nb_level = 0;
+		nb_label("NB", false);
+	}
+	cmd = "NB0;";
+	cmd[2] += nb_level;
+	LOG_INFO("%s", cmd.c_str());
 	sendTScommand(cmd, 0);
 }
 
