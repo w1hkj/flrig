@@ -8,6 +8,7 @@ private:
 	bool notch_on;
 	int  preamp_level;
 	int  att_level;
+	int  nb_level;
 	bool data_mode;
 	int  active_mode;
 	int  active_bandwidth;
@@ -47,7 +48,7 @@ public:
 
 	int  get_smeter();
 //	int  get_swr();
-//	int  get_power_out();
+	int  get_power_out();
 	int  get_power_control();
 	void set_volume_control(int val);
 	int  get_volume_control();
