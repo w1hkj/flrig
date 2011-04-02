@@ -1490,18 +1490,13 @@ void initRig()
 		selrig->set_modeB(vfoB.imode);
 		selrig->set_bwB(vfoB.iBW);
 		selrig->selectA();
-	} else {
-		selrig->set_vfoA(vfoA.freq);
-		selrig->set_modeA(vfoA.imode);
-		selrig->set_bwA(vfoA.iBW);
-		selrig->set_vfoB(vfoB.freq);
-		selrig->set_modeB(vfoB.imode);
-		selrig->set_bwB(vfoB.iBW);
-	}
+	} 
 
 	if (progStatus.CIV > 0) selrig->adjustCIV(progStatus.CIV);
 
-	if (selrig->has_get_info) selrig->get_info();
+	if (selrig->has_get_info)
+		selrig->get_info();
+
 	selrig->selectA();
 	transceiverA.freq = selrig->get_vfoA();
 	transceiverA.imode = selrig->get_modeA();
@@ -1845,12 +1840,15 @@ void initRig()
 		selrig->set_modeA(vfoA.imode);
 		selrig->set_bwA(vfoA.iBW);
 	} else {
+		selrig->selectA();
 		selrig->set_vfoA(vfoA.freq);
 		selrig->set_modeA(vfoA.imode);
 		selrig->set_bwA(vfoA.iBW);
+		selrig->selectB();
 		selrig->set_vfoB(vfoB.freq);
 		selrig->set_modeB(vfoB.imode);
 		selrig->set_bwB(vfoB.iBW);
+		selrig->selectA();
 	}
 
 	// enable the serial thread

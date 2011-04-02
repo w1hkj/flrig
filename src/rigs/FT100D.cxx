@@ -63,8 +63,6 @@ void RIG_FT100D::init_cmd()
 
 void RIG_FT100D::initialize()
 {
-	selectA();
-	
 }
 
 void RIG_FT100D::selectA()
