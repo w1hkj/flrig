@@ -139,7 +139,7 @@ status progStatus = {
 	10,			// encoder_sensitivity;
 
 	232,		// int	 bg_red;
-	256,		// int	 bg_green;
+	255,		// int	 bg_green;
 	232,		// int	 bg_blue;
 
 	0,			// int	 fg_red;

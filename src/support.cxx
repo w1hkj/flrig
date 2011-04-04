@@ -40,8 +40,9 @@ queue<FREQMODE> queB;
 queue<bool> quePTT;
 
 bool useB = false;
+bool changed_vfo = false;
+bool pushedB = false;
 
-bool bws_changed = false;
 const char **old_bws = NULL;
 
 //bool localptt = false;
@@ -96,15 +97,13 @@ void read_vfo()
 	if (!useB) { // vfo-A
 		freq = selrig->get_vfoA();
 		if (freq != vfoA.freq) {
+			pthread_mutex_lock(&mutex_xmlrpc);
 			vfoA.freq = freq;
 			Fl::awake(setFreqDispA, (void *)vfoA.freq);
 			vfo = vfoA;
-			pthread_mutex_lock(&mutex_xmlrpc);
-			bypass_digi_loop = true;
-			pthread_mutex_unlock(&mutex_xmlrpc);
-			send_new_freq(vfo.freq);
-			pthread_mutex_lock(&mutex_xmlrpc);
-			bypass_digi_loop = false;
+			try {
+				send_new_freq(vfo.freq);
+			} catch (...) {}
 			pthread_mutex_unlock(&mutex_xmlrpc);
 		}
 		if ( selrig->twovfos() ) {
@@ -117,15 +116,13 @@ void read_vfo()
 	} else { // vfo-B
 		freq = selrig->get_vfoB();
 		if (freq != vfoB.freq) {
+			pthread_mutex_lock(&mutex_xmlrpc);
 			vfoB.freq = freq;
 			Fl::awake(setFreqDispB, (void *)vfoB.freq);
 			vfo = vfoB;
-			pthread_mutex_lock(&mutex_xmlrpc);
-			bypass_digi_loop = true;
-			pthread_mutex_unlock(&mutex_xmlrpc);
-			send_new_freq(vfo.freq);
-			pthread_mutex_lock(&mutex_xmlrpc);
-			bypass_digi_loop = false;
+			try {
+				send_new_freq(vfo.freq);
+			} catch (...) {}
 			pthread_mutex_unlock(&mutex_xmlrpc);
 		}
 	}
@@ -144,38 +141,34 @@ void read_mode()
 	if (!useB) {
 		nu_mode = selrig->get_modeA();
 		if (nu_mode != vfoA.imode) {
+			pthread_mutex_lock(&mutex_xmlrpc);
 			vfoA.imode = vfo.imode = nu_mode;
-			selrig->set_bwA(selrig->adjust_bandwidth(nu_mode));
+			selrig->set_bwA(vfo.iBW = selrig->adjust_bandwidth(nu_mode));
+			try {
+				send_bandwidths();
+				send_new_mode(nu_mode);
+				send_sideband();
+				send_new_bandwidth(vfo.iBW);
+			} catch (...) {}
+			pthread_mutex_unlock(&mutex_xmlrpc);
 			Fl::awake(setModeControl);
 			Fl::awake(updateBandwidthControl);
-			pthread_mutex_lock(&mutex_xmlrpc);
-			bypass_digi_loop = true;
-			pthread_mutex_unlock(&mutex_xmlrpc);
-			send_new_mode(nu_mode);
-			send_sideband();
-			if (bws_changed) send_bandwidths();
-			send_new_bandwidth(vfo.iBW);
-			pthread_mutex_lock(&mutex_xmlrpc);
-			bypass_digi_loop = false;
-			pthread_mutex_unlock(&mutex_xmlrpc);
 		}
 	} else {
 		nu_mode = selrig->get_modeB();
 		if (nu_mode != vfoB.imode) {
+			pthread_mutex_lock(&mutex_xmlrpc);
 			vfoB.imode = vfo.imode = nu_mode;
-			selrig->set_bwB(selrig->adjust_bandwidth(nu_mode));
+			selrig->set_bwB(vfo.iBW = selrig->adjust_bandwidth(nu_mode));
+			try {
+				send_bandwidths();
+				send_new_mode(nu_mode);
+				send_sideband();
+				send_new_bandwidth(vfo.iBW);
+			} catch (...) {}
+			pthread_mutex_unlock(&mutex_xmlrpc);
 			Fl::awake(setModeControl);
 			Fl::awake(updateBandwidthControl);
-			pthread_mutex_lock(&mutex_xmlrpc);
-			bypass_digi_loop = true;
-			pthread_mutex_unlock(&mutex_xmlrpc);
-			send_new_mode(nu_mode);
-			send_sideband();
-			if (bws_changed) send_bandwidths();
-			send_new_bandwidth(vfo.iBW);
-			pthread_mutex_lock(&mutex_xmlrpc);
-			bypass_digi_loop = false;
-			pthread_mutex_unlock(&mutex_xmlrpc);
 		}
 	}
 	pthread_mutex_unlock(&mutex_serial);
@@ -193,27 +186,23 @@ void read_bandwidth()
 	if (!useB) {
 		nu_BW = selrig->get_bwA();
 		if (nu_BW != vfoA.iBW) {
+			pthread_mutex_lock(&mutex_xmlrpc);
 			vfoA.iBW = vfo.iBW = nu_BW;
 			Fl::awake(setBWControl);
-			pthread_mutex_lock(&mutex_xmlrpc);
-			bypass_digi_loop = true;
-			pthread_mutex_unlock(&mutex_xmlrpc);
-			send_new_bandwidth(vfo.iBW);
-			pthread_mutex_lock(&mutex_xmlrpc);
-			bypass_digi_loop = false;
+			try {
+				send_new_bandwidth(vfo.iBW);
+			} catch (...) {}
 			pthread_mutex_unlock(&mutex_xmlrpc);
 		}
 	} else {
 		nu_BW = selrig->get_bwB();
 		if (nu_BW != vfoB.iBW) {
 			vfoB.iBW = vfo.iBW = nu_BW;
+			pthread_mutex_lock(&mutex_xmlrpc);
 			Fl::awake(setBWControl);
-			pthread_mutex_lock(&mutex_xmlrpc);
-			bypass_digi_loop = true;
-			pthread_mutex_unlock(&mutex_xmlrpc);
-			send_new_bandwidth(vfo.iBW);
-			pthread_mutex_lock(&mutex_xmlrpc);
-			bypass_digi_loop = false;
+			try {
+				send_new_bandwidth(vfo.iBW);
+			} catch (...) {}
 			pthread_mutex_unlock(&mutex_xmlrpc);
 		}
 	}
@@ -282,8 +271,11 @@ void serviceA()
 	pthread_mutex_lock(&mutex_serial);
 
 	pthread_mutex_lock(&mutex_xmlrpc);
-	bypass_digi_loop = true;
-	pthread_mutex_unlock(&mutex_xmlrpc);
+
+	if (changed_vfo && !useB) {
+		selrig->selectA();
+		changed_vfo = false;
+	}
 
 // if TT550 and on the B vfo
 	if ((rig_nbr == TT550) && useB) {
@@ -296,34 +288,37 @@ void serviceA()
 		Fl::awake(setFreqDispA, (void *)vfoA.freq);
 		vfo.freq = vfoA.freq;
 		if (vfoA.src == UI)
-			send_new_freq(vfoA.freq);
+			try {
+				send_new_freq(vfoA.freq);
+			} catch (...) {}
 	}
 // adjust for change in bandwidths_
 	if (vfoA.imode != vfo.imode) {
 		selrig->set_modeA(vfoA.imode);
 		vfo.imode = vfoA.imode;
-		vfo.iBW = vfoA.iBW; //selrig->get_bwA();
+		vfo.iBW = vfoA.iBW = selrig->adjust_bandwidth(vfo.imode);
 		Fl::awake(setModeControl);
 		Fl::awake(updateBandwidthControl);
 		Fl::awake(setBWControl);
-		if (vfoA.src == UI) {
-			send_new_mode(vfoA.imode);
-		}
-		send_sideband();
 		selrig->set_bwA(vfoA.iBW);
-		send_bandwidths();
-		send_new_bandwidth(vfoA.iBW);
+		try {
+			if (vfoA.src == UI)
+				send_new_mode(vfoA.imode);
+			send_sideband();
+			send_bandwidths();
+			send_new_bandwidth(vfoA.iBW);
+		} catch (...) {}
 	} else if (vfoA.iBW != vfo.iBW) {
 		selrig->set_bwA(vfoA.iBW);
 		vfo.iBW = vfoA.iBW;
 		Fl::awake(setBWControl);
 		if (vfoA.src == UI)
-			send_new_bandwidth(vfoA.iBW);
+			try {
+				send_new_bandwidth(vfoA.iBW);
+			} catch (...) {}
 	}
 
 end_serviceA:
-	pthread_mutex_lock(&mutex_xmlrpc);
-	bypass_digi_loop = false;
 	pthread_mutex_unlock(&mutex_xmlrpc);
 
 	pthread_mutex_unlock(&mutex_serial);
@@ -334,7 +329,8 @@ void serviceB()
 	if ((rig_nbr != TT550) && !useB)
 		return;
 
-	if (queB.empty()) return;
+	if (queB.empty()) 
+		return;
 
 	while (!queB.empty()) {
 		vfoB = queB.front();
@@ -343,10 +339,13 @@ void serviceB()
 	if (RIG_DEBUG)
 		LOG_INFO("%s", print(vfoB));
 	pthread_mutex_lock(&mutex_serial);
-	pthread_mutex_lock(&mutex_xmlrpc);
-	bypass_digi_loop = true;
 
-	pthread_mutex_unlock(&mutex_xmlrpc);
+	pthread_mutex_lock(&mutex_xmlrpc);
+
+	if (changed_vfo && useB) {
+		selrig->selectB();
+		changed_vfo = false;
+	}
 
 // if TT550 and split or on vfoA just update the B vfo
 	if ((rig_nbr == TT550) && !useB) {
@@ -354,41 +353,44 @@ void serviceB()
 		goto end_serviceB;
 	}
 
-	if (vfoB.freq != vfo.freq) {
+	if (vfoB.freq != vfo.freq || pushedB) {
 		selrig->set_vfoB(vfoB.freq);
 		vfo.freq = vfoB.freq;
 		if (vfoB.src == XML)
 			Fl::awake(setFreqDispB, (void *)vfoB.freq);
 		else
-			send_new_freq(vfoB.freq);
+			try {
+				send_new_freq(vfoB.freq);
+			} catch (...) {}
 	}
-	if (vfoB.imode != vfo.imode) {
+	if (vfoB.imode != vfo.imode || pushedB) {
 		selrig->set_modeB(vfoB.imode);
-		vfo.imode = vfoB.imode; // selrig->get_bwB();
-		vfo.iBW = vfoB.iBW;
+		vfo.imode = vfoB.imode;
+		vfo.iBW = vfoB.iBW = selrig->adjust_bandwidth(vfo.imode);
 		Fl::awake(setModeControl);
 		Fl::awake(updateBandwidthControl);
 		Fl::awake(setBWControl);
-		if (vfoB.src == UI) {
-			send_new_mode(vfoB.imode);
-		}
-		send_sideband();
 		selrig->set_bwB(vfoB.iBW);
-		send_bandwidths();
-		send_new_bandwidth(vfoB.iBW);
-	} else if (vfoB.iBW != vfo.iBW) {
+		try {
+			if (vfoB.src == UI)
+				send_new_mode(vfoB.imode);
+			send_sideband();
+			send_bandwidths();
+			send_new_bandwidth(vfoB.iBW);
+		} catch (...) {}
+	} else if (vfoB.iBW != vfo.iBW || pushedB) {
 		selrig->set_bwB(vfoB.iBW);
 		vfo.iBW = vfoB.iBW;
 		Fl::awake(setBWControl);
 		if (vfoB.src == UI)
-			send_new_bandwidth(vfoB.iBW);
+			try {
+				send_new_bandwidth(vfoB.iBW);
+			} catch (...) {}
 	}
+	pushedB = false;
 
 end_serviceB:
-	pthread_mutex_lock(&mutex_xmlrpc);
-	bypass_digi_loop = false;
 	pthread_mutex_unlock(&mutex_xmlrpc);
-
 	pthread_mutex_unlock(&mutex_serial);
 }
 
@@ -485,11 +487,9 @@ void setBW()
 
 void updateBandwidthControl(void *d)
 {
-	bws_changed = false;
 	if (selrig->has_bandwidth_control) {
 		if (selrig->adjust_bandwidth(vfo.imode) != -1) {
 			if (old_bws != selrig->bandwidths_) {
-				bws_changed = true;
 				old_bws = selrig->bandwidths_;
 				opBW->clear();
 				rigbws_.clear();
@@ -621,6 +621,7 @@ void cbA2B()
 	queB.push(vfoA);
 	FreqDispB->value(vfoA.freq);
 	FreqDispB->redraw();
+	pushedB = true;
 	setFocus();
 }
 
@@ -651,18 +652,16 @@ void set_vfo_mode_bw()
 	opMODE->index(vfo.imode);
 	updateBandwidthControl();
 
-	send_new_freq(vfo.freq);
-	send_new_mode(vfo.imode);
-	send_sideband();
-	send_bandwidths();
-	send_new_bandwidth(vfo.iBW);
+	try {
+		send_new_freq(vfo.freq);
+		send_new_mode(vfo.imode);
+		send_sideband();
+		send_bandwidths();
+		send_new_bandwidth(vfo.iBW);
+	} catch (...) {}
 }
 
 void cb_selectA() {
-	pthread_mutex_lock(&mutex_xmlrpc);
-	bypass_digi_loop = true;
-	pthread_mutex_unlock(&mutex_xmlrpc);
-
 	FreqDispA->SetONOFFCOLOR(
 		fl_rgb_color(progStatus.fg_red, progStatus.fg_green, progStatus.fg_blue),
 		fl_rgb_color(progStatus.bg_red, progStatus.bg_green, progStatus.bg_blue));
@@ -674,17 +673,13 @@ void cb_selectA() {
 	Fl::flush();
 
 	pthread_mutex_lock(&mutex_serial);
-	selrig->selectA();
+	changed_vfo = true;
 	useB = false;
 	if (queA.empty()) {
 		vfoA.src = UI;
 		queA.push(vfoA);
 	}
 	pthread_mutex_unlock(&mutex_serial);
-
-	pthread_mutex_lock(&mutex_xmlrpc);
-	bypass_digi_loop = false;
-	pthread_mutex_unlock(&mutex_xmlrpc);
 	setFocus();
 }
 
@@ -693,10 +688,6 @@ void cb_selectB() {
 		btnSplit->value(0);
 		cb_set_split(0);
 	}
-	pthread_mutex_lock(&mutex_xmlrpc);
-	bypass_digi_loop = true;
-	pthread_mutex_unlock(&mutex_xmlrpc);
-
 	FreqDispB->SetONOFFCOLOR(
 		fl_rgb_color(progStatus.fg_red, progStatus.fg_green, progStatus.fg_blue),
 		fl_rgb_color(progStatus.bg_red, progStatus.bg_green, progStatus.bg_blue));
@@ -708,17 +699,13 @@ void cb_selectB() {
 	Fl::flush();
 
 	pthread_mutex_lock(&mutex_serial);
-	selrig->selectB();
+	changed_vfo = true;
 	useB = true;
 	if (queB.empty()) {
 		vfoB.src = UI;
 		queB.push(vfoB);
 	}
 	pthread_mutex_unlock(&mutex_serial);
-
-	pthread_mutex_lock(&mutex_xmlrpc);
-	bypass_digi_loop = false;
-	pthread_mutex_unlock(&mutex_xmlrpc);
 	setFocus();
 }
 
@@ -1459,8 +1446,6 @@ void initRig()
 
 // disable xml loop
 	pthread_mutex_lock(&mutex_xmlrpc);
-	bypass_digi_loop = true;
-	pthread_mutex_unlock(&mutex_xmlrpc);
 
 // disable the serial thread
 	pthread_mutex_lock(&mutex_serial);
@@ -1485,27 +1470,24 @@ void initRig()
 		selrig->set_vfoA(vfoA.freq);
 		selrig->set_modeA(vfoA.imode);
 		selrig->set_bwA(vfoA.iBW);
-		selrig->selectB();
 		selrig->set_vfoB(vfoB.freq);
 		selrig->set_modeB(vfoB.imode);
 		selrig->set_bwB(vfoB.iBW);
+	} else {
+		if (progStatus.CIV > 0)
+			selrig->adjustCIV(progStatus.CIV);
+		if (selrig->has_get_info)
+			selrig->get_info();
 		selrig->selectA();
-	} 
-
-	if (progStatus.CIV > 0) selrig->adjustCIV(progStatus.CIV);
-
-	if (selrig->has_get_info)
-		selrig->get_info();
-
-	selrig->selectA();
-	transceiverA.freq = selrig->get_vfoA();
-	transceiverA.imode = selrig->get_modeA();
-	transceiverA.iBW = selrig->get_bwA();
-	selrig->selectB();
-	transceiverB.freq = selrig->get_vfoB();
-	transceiverB.imode = selrig->get_modeB();
-	transceiverB.iBW = selrig->get_bwB();
-	selrig->selectA();
+		transceiverA.freq = selrig->get_vfoA();
+		transceiverA.imode = selrig->get_modeA();
+		transceiverA.iBW = selrig->get_bwA();
+		selrig->selectB();
+		transceiverB.freq = selrig->get_vfoB();
+		transceiverB.imode = selrig->get_modeB();
+		transceiverB.iBW = selrig->get_bwB();
+		selrig->selectA();
+	}
 
 	if (selrig->restore_mbw) selrig->last_bw = transceiverA.iBW;
 
@@ -1823,7 +1805,7 @@ void initRig()
 		btnUSBaudio->deactivate();
 	}
 
-
+/*
 	vfoA.freq = progStatus.freq_A;
 	vfoA.imode = progStatus.imode_A;
 	vfoA.iBW = progStatus.iBW_A;
@@ -1850,19 +1832,30 @@ void initRig()
 		selrig->set_bwB(vfoB.iBW);
 		selrig->selectA();
 	}
+*/
 
 	// enable the serial thread
+
 	pthread_mutex_unlock(&mutex_serial);
 
-	cb_selectA();
-
-// enable xml loop
-	pthread_mutex_lock(&mutex_xmlrpc);
 	fldigi_online = false;
 	rig_reset = true;
-//	wait_query = false;
-	bypass_digi_loop = false;
+
+// initialize fldigi
+	try {
+		send_modes();
+		send_bandwidths();
+		send_new_freq(vfoA.freq);
+		send_new_mode(vfoA.imode);
+		send_sideband();
+		send_new_bandwidth(vfoA.iBW);
+	} catch (...) {}
+	
+// enable xml loop
+//	bypass_digi_loop = false;
 	pthread_mutex_unlock(&mutex_xmlrpc);
+
+	cb_selectA();
 
 	setFocus();
 }
