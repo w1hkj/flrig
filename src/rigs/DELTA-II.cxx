@@ -17,12 +17,10 @@ const char RIG_TT535name_[] = "DELTA-II";
 const char *RIG_TT535modes_[] = {
 		"LSB", "USB", "AM", "CW", "FM", NULL};
 static const char RIG_TT535_mode_type[] = {'L', 'U', 'U', 'L', 'U'};
-//const char *RIG_TT535widths[] = { "NARR", "WIDE", NULL};
 
 RIG_TT535::RIG_TT535() {
 	name_ = RIG_TT535name_;
 	modes_ = RIG_TT535modes_;
-//	bandwidths_ = RIG_TT535widths;
 	comm_baudrate = BR1200;
 	stopbits = 1;
 	comm_retries = 2;

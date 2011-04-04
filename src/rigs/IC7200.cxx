@@ -431,17 +431,18 @@ void RIG_IC7200::set_modeA(int val)
 	if (val > 6) val -= 7;
 	cmd = pre_to;
 	cmd += '\x06';
-	cmd += val > 5 ? val + 2 : val;
-	cmd += A.iBW;
+	cmd += val > 4 ? val + 2 : val;
 	cmd.append( post );
 	sendICcommand (cmd, 6);
 	checkresponse(6);
 	if (DEBUG_7200)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+
 	cmd = pre_to;
 	cmd += '\x1A'; cmd += '\x04';
 	if (A.imode > 6) cmd += '\x01';
 	else cmd += '\x00';
+//	cmd += '\x01';
 	cmd.append( post);
 	sendICcommand (cmd, 6);
 	checkresponse(6);
@@ -451,7 +452,7 @@ void RIG_IC7200::set_modeA(int val)
 
 int RIG_IC7200::get_modeB()
 {
-	int md;
+	int md = B.imode;
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
@@ -478,17 +479,18 @@ void RIG_IC7200::set_modeB(int val)
 	if (val > 6) val -= 7;
 	cmd = pre_to;
 	cmd += '\x06';
-	cmd += val > 5 ? val + 2 : val;
-	cmd += B.iBW;
+	cmd += val > 4 ? val + 2 : val;
 	cmd.append( post );
 	sendICcommand (cmd, 6);
 	checkresponse(6);
 	if (DEBUG_7200)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+
 	cmd = pre_to;
 	cmd += '\x1A'; cmd += '\x04';
 	if (B.imode > 6) cmd += '\x01';
 	else cmd += '\x00';
+//	cmd += '\x01';
 	cmd.append( post);
 	sendICcommand (cmd, 6);
 	checkresponse(6);
@@ -583,7 +585,7 @@ void RIG_IC7200::set_bwA(int val)
 	cmd.append( post );
 	sendICcommand(cmd, 6);
 	checkresponse(6);
-	if (RIG_DEBUG)
+	if (DEBUG_7200)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
@@ -607,7 +609,7 @@ void RIG_IC7200::set_bwB(int val)
 	cmd.append( post );
 	sendICcommand(cmd, 6);
 	checkresponse(6);
-	if (RIG_DEBUG)
+	if (DEBUG_7200)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
@@ -667,7 +669,7 @@ void RIG_IC7200::set_compression()
 		sendICcommand(cmd, 6);
 		checkresponse(6);
 	}
-	if (RIG_DEBUG)
+	if (DEBUG_7200)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
@@ -688,7 +690,7 @@ void RIG_IC7200::set_vox_onoff()
 		sendICcommand(cmd, 6);
 		checkresponse(6);
 	}
-	if (RIG_DEBUG)
+	if (DEBUG_7200)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
