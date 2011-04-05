@@ -55,6 +55,14 @@ RIG_FT100D::RIG_FT100D() {
 
 }
 
+int  RIG_FT100D::adjust_bandwidth(int m)
+{
+	if (m == 0 || m == 1 || m == 5) return 2;
+	if (m == 2 || m == 3 ) return 1;
+	if (m == 4 || m == 6 || m == 7) return 3;
+	return 2;
+}
+
 void RIG_FT100D::init_cmd()
 {
 	cmd = "00000";

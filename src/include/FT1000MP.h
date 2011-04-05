@@ -46,6 +46,7 @@ public :
 	int  get_auto_notch();
 
 	int  def_bandwidth(int m);
+	int  adjust_bandwidth(int);
 
 private:
 	bool tune_on;

@@ -220,6 +220,15 @@ int RIG_TT588::get_bwA()
 	return bwA;
 }
 
+int  RIG_TT588::adjust_bandwidth(int m)
+{
+	if (m == 0) return 31;
+	if (m == 1 || m == 2) return 22;
+	if (m == 3 || m == 5) return 7;
+	if (m == 4 || m == 6) return 22;
+	return 22;
+}
+
 void RIG_TT588::set_if_shift(int val)
 {
 	pbt = val;

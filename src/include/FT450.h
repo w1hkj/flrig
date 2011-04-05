@@ -56,6 +56,7 @@ public:
 	
 	void set_special(int v);
 
+	int  adjust_bandwidth(int m);
 };
 
 

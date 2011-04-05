@@ -12,6 +12,9 @@ public:
 	void set_vfoA(long);
 	void set_modeA(int val);
 	void set_bwA(int val);
+
+	int  adjust_bandwidth(int m) { return 1; }
+
 };
 
 #endif

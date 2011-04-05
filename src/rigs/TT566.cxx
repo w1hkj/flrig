@@ -63,6 +63,17 @@ RIG_TT566::RIG_TT566() {
 
 };
 
+int  RIG_TT566::adjust_bandwidth(int m)
+{
+	switch (m) {
+		case 0 : case 1 : return 19;
+		case 2 : case 3 : return 4;
+		case 4 : case 5 : return 24;
+		case 6 : default : return 7;
+	}
+	return 19;
+}
+
 long RIG_TT566::get_vfoA ()
 {
 	cmd = "?AF\r";

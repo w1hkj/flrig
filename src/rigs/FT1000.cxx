@@ -24,6 +24,7 @@ static const char FT1000_mode_type[] = {
 static const char *FT1000_widths[] = {
 "2400", "2000", "500", "250", "6000", NULL };
 
+
 // FT1000 class
 RIG_FT1000::RIG_FT1000() {
 // base class values
@@ -114,6 +115,18 @@ void RIG_FT1000::init_cmd()
 {
 	cmd = "00000";
 	for (size_t i = 0; i < 5; i++) cmd[i] = 0;
+}
+
+int  RIG_FT1000::adjust_bandwidth(int m)
+{
+	if (m == 0 || m == 1 || m == 8 || m == 9 || m == 10 || m == 11)
+		return 0;
+	if ( m == 3 ) return 0;
+	if ( m == 4 ) return 2;
+	if ( m == 4 ) return 4;
+	if ( m == 5 ) return 0;
+	if ( m == 6 || m == 7 || m == 11) return 0;
+	return 0;
 }
 
 long RIG_FT1000::get_vfoA ()

@@ -18,6 +18,8 @@ public:
 	void set_modeB(int val);
 	int  get_modeB();
 	int  get_modetype(int n);
+
+	int  adjust_bandwidth(int m);
 };
 
 #endif

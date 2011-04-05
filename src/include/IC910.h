@@ -14,6 +14,8 @@ public:
 	void set_vox_anti();
 	void set_vox_hang();
 
+	int  adjust_bandwidth(int m) { return 0; }
+
 private:
 	bool comp_is_on;
 };

@@ -67,6 +67,9 @@ public:
 //	void get_mic_min_max_step(int &min, int &max, int &step);
 	void checkresponse(string s);
 	void shutdown();
+
+	int  adjust_bandwidth(int m);
+
 };
 
 

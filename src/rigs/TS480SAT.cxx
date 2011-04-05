@@ -319,6 +319,12 @@ int RIG_TS480SAT::get_bwB()
 	return bwB;
 }
 
+int  RIG_TS480SAT::adjust_bandwidth(int m)
+{
+	if (m == 2 || m == 6) return 3;
+	return 6;
+}
+
 void RIG_TS480SAT::set_volume_control(int val)
 {
 	cmd = "AG";

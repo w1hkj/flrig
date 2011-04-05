@@ -17,6 +17,8 @@ public:
 	int  get_power_out(void);
 	int  get_smeter(void);
 
+	int  adjust_bandwidth(int m) { return 0; }
+
 private:
 	void init_cmd();
 };

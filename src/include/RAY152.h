@@ -51,6 +51,8 @@ public:
 	void set_auto_notch(int v);
 	int  get_auto_notch();
 
+	int  adjust_bandwidths(int m) { return 0; }
+	
 private:
 	int vol;
 	int rfg;

@@ -53,6 +53,8 @@ public:
 	void get_rf_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 100; step = 1; }
 
+	int  adjust_bandwidth(int m);
+
 //	void set_agc_level();
 };
 

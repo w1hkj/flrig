@@ -56,6 +56,11 @@ RIG_K2::RIG_K2() {
 	has_swr_control = false;
 }
 
+int  RIG_K2::adjust_bandwidth(int m)
+{
+	return 0;
+}
+
 void RIG_K2::initialize()
 {
 //enable extended command mode	

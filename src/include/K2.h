@@ -29,6 +29,8 @@ public:
 	int  get_smeter();
 	int  get_power_out();
 
+	int  adjust_bandwidth(int m);
+
 };
 
 #endif
