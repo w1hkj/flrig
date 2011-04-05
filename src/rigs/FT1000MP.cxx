@@ -60,6 +60,7 @@ static const char *FT1000MP_widths[] = {
 "500/6.0", "500/2.4", "500/2.0", "500/500", "500/250",
 "250/6.0", "250/2.4", "250/2.0", "250/500", "250/250", NULL };
 
+
 RIG_FT1000MP::RIG_FT1000MP() {
 // base class values
 	name_ = FT1000MPname_;
@@ -380,6 +381,10 @@ int  RIG_FT1000MP::def_bandwidth(int m)
 	return FT1000MP_def_bw[m];
 }
 
+int  RIG_FT1000MP::adjust_bandwidth(int m)
+{
+	return FT1000MP_def_bw[m];
+}
 
 void RIG_FT1000MP::selectA()
 {

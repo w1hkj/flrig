@@ -43,7 +43,10 @@ RIG_TT535::RIG_TT535() {
 
 };
 
-// I don't believe that get_vfoA is a valid 535 CAT command
+int  RIG_TT535::adjust_bandwidth(int m)
+{
+	return 0;
+}
 
 long RIG_TT535::get_vfoA ()
 {

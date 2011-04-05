@@ -52,6 +52,7 @@ static const int TT538_numeric_widths[] = {
 1950, 2100, 2250, 2400, 2550, 2700, 2850, 3000, 3300, 3600,
 3900, 4200, 4500, 4800, 5100, 5400, 5700, 6000, 8000};
 
+
 static char TT538setFREQA[]		= "*Annnn\r";
 static char TT538setFREQB[]		= "*Bnnnn\r";
 //static char TT538setAGC[]		= "*Gn\r";
@@ -262,6 +263,15 @@ int RIG_TT538::get_bwA()
 	if (replybuff[0] == 'W')
 		bwA = 38 - (unsigned char)replybuff[1];
 	return bwA;
+}
+
+int  RIG_TT538::adjust_bandwidth(int m)
+{
+	if (m == 0) return 37;
+	if (m == 1 || m == 2) return 27;
+	if (m == 3) return 10;
+	if (m == 4) return 27;
+	return 27;
 }
 
 void RIG_TT538::set_if_shift(int val)

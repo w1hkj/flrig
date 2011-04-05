@@ -38,6 +38,8 @@ public:
 	int  get_auto_notch();
 	void set_vox_onoff();
 
+	int  adjust_bandwidth(int m);
+
 protected:
 	int  filter_nbr;
 };

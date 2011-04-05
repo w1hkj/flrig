@@ -20,6 +20,8 @@ public :
 	int  get_smeter(void);
 	void tune_rig();
 
+	int  adjust_bandwidth(int);
+
 private:
 	void init_cmd();
 };

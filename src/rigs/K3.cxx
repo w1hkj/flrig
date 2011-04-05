@@ -57,6 +57,11 @@ RIG_K3::RIG_K3() {
 
 }
 
+int  RIG_K3::adjust_bandwidth(int m)
+{
+	return 0;
+}
+
 void RIG_K3::initialize()
 {
 	cmd = "K31;";

@@ -33,6 +33,8 @@ public:
 	int  get_smeter();
 	int  get_power_out();
 
+	int  adjust_bandwidth(int m) { return 0; }
+
 private:
 	void init_cmd();
 };

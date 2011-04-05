@@ -14,6 +14,9 @@ public:
 	void set_modeA(int val);
 	int  get_modeA();
 	int  get_modetype(int n);
+
+	int  adjust_bandwidth(int m) { return 1; }
+
 };
 
 #endif

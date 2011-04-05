@@ -52,6 +52,8 @@ public:
 	void set_attenuator(int val);
 	int  get_attenuator();
 
+	int  adjust_bandwidth(int m);
+
 };
 
 

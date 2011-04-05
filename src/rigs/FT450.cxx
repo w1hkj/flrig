@@ -62,6 +62,11 @@ RIG_FT450::RIG_FT450() {
 	notch_on = false;
 }
 
+int  RIG_FT450::adjust_bandwidth(int m)
+{
+	return 1;
+}
+
 void RIG_FT450::select_vfoA()
 {
 	cmd = "SV0;";

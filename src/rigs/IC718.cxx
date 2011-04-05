@@ -61,6 +61,10 @@ RIG_IC718::RIG_IC718() {
 };
 
 //=============================================================================
+int  RIG_IC718::adjust_bandwidth(int m)
+{
+	return 0;
+}
 
 long RIG_IC718::get_vfoA ()
 {

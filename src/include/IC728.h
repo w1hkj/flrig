@@ -10,6 +10,9 @@ public:
 
 	long get_vfoA();
 	void set_vfoA(long);
+
+	int  adjust_bandwidth(int m) { return 1; }
+
 };
 
 #endif

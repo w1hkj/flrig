@@ -48,6 +48,8 @@ public:
 	int  get_swr();
 	int  get_power_out();
 
+	int  adjust_bandwidth(int);
+
 private:
 	void init_cmd();
 };

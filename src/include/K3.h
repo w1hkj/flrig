@@ -29,6 +29,8 @@ public:
 	int  get_bwA();
 	int  get_power_out();
 
+	int  adjust_bandwidth(int m);
+
 /*
 	int  get_swr();
 	void tune_rig();

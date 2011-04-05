@@ -28,6 +28,8 @@ public:
 	void set_bwA(int val);
 	int  get_bwA();
 
+	int  adjust_bandwidth(int val) { return 0; }
+
 //	int  get_power_out();
 //	int  get_power_control();
 //	void set_volume_control(int val);
