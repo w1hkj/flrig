@@ -101,20 +101,22 @@ void RIG_IC7600::set_modeA(int val)
 	sendICcommand (cmd, 6);
 	checkresponse(6);
 // digital set / clear
-	cmd = pre_to;
-	cmd += '\x1A'; cmd += '\x06';
-	switch (A.imode) {
-		case 10 : case 13 : cmd += '\x01'; cmd += '\x01';break;
-		case 11 : case 14 : cmd += '\x02'; cmd += '\x01';break;
-		case 12 : case 15 : cmd += '\x03'; cmd += '\x01';break;
-		default :
-			cmd += '\x00'; cmd += '\x00';
+	if (A.imode >= 10) {
+		cmd = pre_to;
+		cmd += '\x1A'; cmd += '\x06';
+		switch (A.imode) {
+			case 10 : case 13 : cmd += '\x01'; cmd += '\x01';break;
+			case 11 : case 14 : cmd += '\x02'; cmd += '\x01';break;
+			case 12 : case 15 : cmd += '\x03'; cmd += '\x01';break;
+			default :
+				cmd += '\x00'; cmd += '\x00';
+		}
+		cmd.append( post);
+		if (IC7600_DEBUG)
+			LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+		sendICcommand (cmd, 6);
+		checkresponse(6);
 	}
-	cmd.append( post);
-	if (IC7600_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-	sendICcommand (cmd, 6);
-	checkresponse(6);
 }
 
 int RIG_IC7600::get_modeA()
@@ -129,13 +131,15 @@ int RIG_IC7600::get_modeA()
 		A.imode = md;
 	} else
 		checkresponse(8);
-	cmd = pre_to;
-	cmd += '\x1A'; cmd += '\x06';
-	cmd.append(post);
-	if (sendICcommand(cmd, 9)) {
-		if (replystr[6] > 0 && A.imode < 2) {
-			if (replystr[6] < 4)
-				A.imode = 9 + A.imode * 3 + replystr[6];
+	if (md == 0 || md == 1) {
+		cmd = pre_to;
+		cmd += '\x1A'; cmd += '\x06';
+		cmd.append(post);
+		if (sendICcommand(cmd, 9)) {
+			if (replystr[6] > 0 && A.imode < 2) {
+				if (replystr[6] < 4)
+					A.imode = 9 + A.imode * 3 + replystr[6];
+			}
 		}
 	}
 	return A.imode;
@@ -153,20 +157,22 @@ void RIG_IC7600::set_modeB(int val)
 	sendICcommand (cmd, 6);
 	checkresponse(6);
 // digital set / clear
-	cmd = pre_to;
-	cmd += '\x1A'; cmd += '\x06';
-	switch (B.imode) {
-		case 10 : case 13 : cmd += '\x01'; cmd += '\x01';break;
-		case 11 : case 14 : cmd += '\x02'; cmd += '\x01';break;
-		case 12 : case 15 : cmd += '\x03'; cmd += '\x01';break;
-		default :
-			cmd += '\x00'; cmd += '\x00';
+	if (B.imode >= 10) {
+		cmd = pre_to;
+		cmd += '\x1A'; cmd += '\x06';
+		switch (B.imode) {
+			case 10 : case 13 : cmd += '\x01'; cmd += '\x01';break;
+			case 11 : case 14 : cmd += '\x02'; cmd += '\x01';break;
+			case 12 : case 15 : cmd += '\x03'; cmd += '\x01';break;
+			default :
+				cmd += '\x00'; cmd += '\x00';
+		}
+		cmd.append( post);
+		if (IC7600_DEBUG)
+			LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+		sendICcommand (cmd, 6);
+		checkresponse(6);
 	}
-	cmd.append( post);
-	if (IC7600_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-	sendICcommand (cmd, 6);
-	checkresponse(6);
 }
 
 int RIG_IC7600::get_modeB()
@@ -181,13 +187,15 @@ int RIG_IC7600::get_modeB()
 		B.imode = md;
 	} else
 		checkresponse(8);
-	cmd = pre_to;
-	cmd += '\x1A'; cmd += '\x06';
-	cmd.append(post);
-	if (sendICcommand(cmd, 9)) {
-		if (replystr[6] > 0 && B.imode < 2) {
-			if (replystr[6] < 4)
-				B.imode = 9 + B.imode * 3 + replystr[6];
+	if (md == 0 || md == 1) {
+		cmd = pre_to;
+		cmd += '\x1A'; cmd += '\x06';
+		cmd.append(post);
+		if (sendICcommand(cmd, 9)) {
+			if (replystr[6] > 0 && B.imode < 2) {
+				if (replystr[6] < 4)
+					B.imode = 9 + B.imode * 3 + replystr[6];
+			}
 		}
 	}
 	return B.imode;
@@ -199,8 +207,8 @@ int RIG_IC7600::get_bwA()
 	cmd = pre_to;
 	cmd.append("\x1a\x03");
 	cmd.append(post);
-	if (sendICcommand (cmd, 9)) {
-		A.iBW = fm_bcd(&replystr[7], 2);
+	if (sendICcommand (cmd, 8)) {
+		A.iBW = fm_bcd(&replystr[6], 2);
 	}
 	return A.iBW;
 }
@@ -225,8 +233,8 @@ int RIG_IC7600::get_bwB()
 	cmd = pre_to;
 	cmd.append("\x1a\x03");
 	cmd.append(post);
-	if (sendICcommand (cmd, 9)) {
-		B.iBW = fm_bcd(&replystr[7], 2);
+	if (sendICcommand (cmd, 8)) {
+		B.iBW = fm_bcd(&replystr[6], 2);
 	}
 	return B.iBW;
 }
