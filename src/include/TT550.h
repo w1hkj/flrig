@@ -20,6 +20,7 @@ private:
 	int Bfo;
 
 	int encoder_count;
+	int keypad_timeout;
 
 	bool onA;
 
@@ -32,14 +33,22 @@ private:
 	bool noise_reduction;
 
 	void showresponse(string s);
-	void showASCII(string s);
+	void showASCII(string, string);
 
 	void set_vfoRX(long freq);
 	void set_vfoTX(long freq);
 
 	void process_encoder( string s );
-	void process_stream(string s);
+	void process_keypad(char c);
 	void process_freq_entry(char c);
+	void process_fkey(char c);
+	void fkey_clear();
+	void fkey_cw_plus();
+	void fkey_cw_minus();
+	void fkey_band_plus();
+	void fkey_band_minus();
+	void fkey_step_plus();
+	void fkey_step_minus();
 
 public:
 	RIG_TT550();
@@ -84,7 +93,7 @@ public:
 	void tune_rig();
 	void set_attenuator(int val);
 //	int  get_attenuator() {return 0}
-//	void set_preamp(int val);
+	void set_preamp(int val);
 //	int  get_preamp();
 	void set_if_shift(int val);
 	bool get_if_shift(int &val);
@@ -96,6 +105,7 @@ public:
 	void set_noise(bool b);
 	void set_mic_gain(int val);
 //	int  get_mic_gain();
+	void set_mic_line(int val);
 	void get_mic_min_max_step(int &min, int &max, int &step);
 	void set_rf_gain(int val);
 	int  get_rf_gain();
@@ -145,7 +155,7 @@ public:
 	void enable_tloop();
 	void set_nb_level();
 
-	void read_stream();
+
 };
 
 extern const char *TT550_xmt_widths[];

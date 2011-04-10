@@ -79,8 +79,6 @@ struct status {
 	int		preamp;
 	int		auto_notch;
 
-	bool	use_line_in;
-
 	bool	split;
 
 //============= transceiver specific prameters
@@ -111,6 +109,8 @@ struct status {
 	bool	tt550_enable_xmtr;
 	bool	tt550_enable_tloop;
 
+	bool	tt550_use_line_in;
+
 	int		tt550_xmt_bw;
 	bool	tt550_use_xmt_bw;
 
@@ -118,6 +118,11 @@ struct status {
 
 	int		tt550_encoder_step;
 	int		tt550_encoder_sensitivity;
+	int		tt550_keypad_timeout;
+
+	int		tt550_F1_func;
+	int		tt550_F2_func;
+	int		tt550_F3_func;
 
 //and others
 	double	vfo_adj;

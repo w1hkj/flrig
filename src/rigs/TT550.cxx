@@ -10,6 +10,8 @@
 // TenTec Pegasus computer controlled transceiver
 
 #include <math.h>
+#include <vector>
+#include <queue>
 
 #include "TT550.h"
 #include "support.h"
@@ -63,18 +65,10 @@ static const int TT550_steps[] = { 1, 10, 100, 1000, 10000 };
 
 static char TT550restart[]		= "XX\r";
 static char TT550init[]			= "P1\r";
-//static char TT550isRADIO[]		= " RADIO START";
+//static char TT550isRADIO[]	= " RADIO START";
 //static char TT550isDSP[]		= " DSP START";
 
 //static char TT550setFREQ[]		= "N123456\r";
-// <1> high byte of 16 bit coarse tuning factor
-// <2> low  byte of 16 bit coarse tuning factor
-// <3> high byte of 16 bit fine tuning factor
-// <4> low  byte of 16 bit fine tuning factor
-// <5> high byte of 16 bit BFO factor
-// <6> low  byte of 16 bit BFO factor
-// filter, mode & bfo all effect the tuning factors
-
 
 static char TT550setMODE[]		= "Mnn\r";
 static char TT550setRcvBW[]		= "Wx\r";
@@ -118,7 +112,7 @@ static char TT550setALIVE_OFF[]	= "#8\r";	// disable keep alive
 static char TT550getSIG_LEVEL[]	= "?S\r";	// S<0..255><0..255>
 static char TT550getFWDREF[]	= "?S\r";	// T<0..255><0..255>
 
-static char TT550setAMCARRIER[] 		= "R \r";	// enables AM mode transmit
+static char TT550setAMCARRIER[]	= "R \r";	// enables AM mode transmit
 
 static string xcvrstream = "";
 
@@ -188,40 +182,38 @@ RIG_TT550::RIG_TT550() {
 
 void RIG_TT550::showresponse(string s)
 {
-	LOG_INFO("%s: %s", s.c_str(), str2hex((char *)replybuff, strlen((char *)replybuff)));
+	LOG_WARN("%s: %s", s.c_str(), str2hex((char *)replybuff, strlen((char *)replybuff)));
 }
 
-void RIG_TT550::showASCII(string s)
+void RIG_TT550::showASCII(string s1, string s)
 {
-	string ss = "";
-	for (size_t i = 0; i < s.length(); i++)
-		if (!(s[i] == '\r' || s[i] == '\n'))
-			ss += s[i];
-	LOG_WARN("%s", ss.c_str());
+	while (s[0] == ' ' || s[0] == '\r' || s[0] == '\n') s.erase(0,1);
+	for (size_t i = 0; i < s.length(); i++) {
+		if (s[i] == '\r' || s[i] == '\n') s[i] = ' ';
+	}
+	LOG_WARN("%9s : %s", s1.c_str(), s.c_str());
 }
 
 void RIG_TT550::initialize()
 {
 	clearSerialPort();
 
-	cmd = TT550restart; // wake up radio
-	sendCommand(cmd, 0, true);
-	MilliSleep(200);
-	cmd = TT550restart; // wake up radio, Jupiter seems to need 2 calls
-	sendCommand(cmd, 16, true);
-	showASCII(replystr);
+	cmd = TT550restart;
+	sendCommand(cmd, -1, true);
 
-	if (replystr.find("RADIO") == string::npos) { // not in radio mode
+	if (replystr.find("RADIO") == string::npos) {
+		showASCII("Power up", "DSP START");
 		cmd = TT550init; // put into radio mode
-		sendCommand(cmd, 0, true);//13, true);
-		MilliSleep( 1000 );
-		readResponse();
-		showASCII(replystr);
+		sendCommand(cmd, -1, true);
 	}
+	showASCII("Init", replystr);
 
 	cmd = "?V\r";
-	sendCommand(cmd, 20, true);
-	showASCII(replystr);
+	sendCommand(cmd, -1, true);
+	showASCII("Version", replystr);
+
+	cmd = TT550setALIVE_OFF;
+	sendCommand(cmd, 0, true);
 
 	set_volume_control(0);
 
@@ -241,8 +233,9 @@ void RIG_TT550::initialize()
 
 	set_agc_level();
 	set_line_out();
-	use_line_in = progStatus.use_line_in;
+//	use_line_in = progStatus.use_line_in;
 	set_mic_gain(progStatus.mic_gain);
+	set_mic_line(0);
 	set_rf_gain(RFgain);
 	
 	XitFreq = progStatus.xit_freq;
@@ -272,6 +265,8 @@ void RIG_TT550::initialize()
 	enable_xmtr();
 
 	xcvrstream.clear();
+	keypad_timeout = 0;
+
 	onA = true;
 
 	encoder_count = 0;
@@ -667,22 +662,28 @@ void RIG_TT550::process_freq_entry(char c)
 	long freq = 0;
 	if (xcvrstream.empty()) have_decimal = false;
 	if (c != '\r') {
-		xcvrstream += c;
-		if (!have_decimal && c == '.') have_decimal = true;
-		else if (have_decimal && c == '.') {
-			xcvrstream.clear();
-			have_decimal = false;
-			Fl::awake(hide_encA, NULL);
-			return;
+		if ((c >= '0' && c <= '9') || c == '.') {
+			xcvrstream += c;
+			if (!have_decimal && c == '.') have_decimal = true;
+			else if (have_decimal && c == '.') {
+				xcvrstream.clear();
+				have_decimal = false;
+				keypad_timeout = 0;
+				Fl::awake(hide_encA, NULL);
+				return;
+			}
+			ffreq = 0;
+			sscanf(xcvrstream.c_str(), "%f", &ffreq);
+			if (have_decimal) ffreq *= 1000;
+			freq = (long) ffreq;
+			if (!txt_encA->visible())
+				Fl::awake(show_encA, NULL);
+			Fl::awake(update_encA, (void*)xcvrstream.c_str());
+//			LOG_WARN("%s => %ld", str2hex(xcvrstream.c_str(), xcvrstream.length()), freq);
+			keypad_timeout = progStatus.tt550_keypad_timeout / progStatus.serloop_timing;
 		}
-		ffreq = 0;
-		sscanf(xcvrstream.c_str(), "%f", &ffreq);
-		if (have_decimal) ffreq *= 1000;
-		freq = (long) ffreq;
-		Fl::awake(show_encA, NULL);
-		Fl::awake(update_encA, (void*)xcvrstream.c_str());
-		LOG_WARN("%s => %ld", str2hex(xcvrstream.c_str(), xcvrstream.length()), freq);
 	} else {
+		keypad_timeout = 0;
 		if (xcvrstream.empty()) return;
 		ffreq = 0;
 		sscanf(xcvrstream.c_str(), "%f", &ffreq);
@@ -704,89 +705,259 @@ void RIG_TT550::process_freq_entry(char c)
 	}
 }
 
+//static const char *tt550_fkey_strings[] = {"None","Clear","CW++","CW--","Band++","Band--","Step++","Step--"};
+
+void RIG_TT550::fkey_clear()
+{
+//	LOG_WARN("%s", tt550_fkey_strings[1]);
+	xcvrstream.clear();
+	keypad_timeout = 0;
+	Fl::awake(hide_encA, NULL);
+}
+
+void RIG_TT550::fkey_cw_plus()
+{
+//	LOG_WARN("%s", tt550_fkey_strings[2]);
+	if (progStatus.tt550_cw_wpm >= 80) return;
+	progStatus.tt550_cw_wpm++;
+	cnt_tt550_cw_wpm->value(progStatus.tt550_cw_wpm);
+	cnt_tt550_cw_wpm->redraw();
+	selrig->set_cw_wpm();
+}
+
+void RIG_TT550::fkey_cw_minus()
+{
+//	LOG_WARN("%s", tt550_fkey_strings[3]);
+	if (progStatus.tt550_cw_wpm <= 5) return;
+	progStatus.tt550_cw_wpm--;
+	cnt_tt550_cw_wpm->value(progStatus.tt550_cw_wpm);
+	cnt_tt550_cw_wpm->redraw();
+	selrig->set_cw_wpm();
+}
+
+struct BANDS { int lo; int hi; int digi; };
+
+static BANDS ibands[] = {
+{ 0, 1800000, 28120000 },
+{ 1800000, 2000000, 1807000 },
+{ 3500000, 4000000, 3580000 },
+{ 7000000, 7300000, 7035000 },
+{ 10100000, 10150000, 10140000 },
+{ 14000000, 14350000, 14070000 },
+{ 18068000, 18168000, 18100000 },
+{ 21000000, 21450000, 21070000 },
+{ 24890000, 24990000, 24920000 },
+{ 28000000, 29700000, 28120000 },
+{ 29700000, 0, 1807000 }
+};
+
+extern queue<FREQMODE> queA;
+extern queue<FREQMODE> queB;
+extern bool useB;
+
+void RIG_TT550::fkey_band_plus()
+{
+	FREQMODE vfoplus = vfo;
+	for (size_t i = 1; i < sizeof(ibands) / sizeof(BANDS); i++) {
+		if (vfo.freq < ibands[i].lo) {
+			vfoplus.freq = ibands[i].digi;
+			break;
+		}
+	}
+	vfo.src = UI;
+	if (!useB)
+		queA.push(vfoplus);
+	else
+		queB.push(vfoplus);
+}
+
+void RIG_TT550::fkey_band_minus()
+{
+	FREQMODE vfoplus = vfo;
+	for (size_t i = sizeof(ibands) / sizeof(BANDS) - 2; i >= 0; i--) {
+		if (vfo.freq > ibands[i].hi) {
+			vfoplus.freq = ibands[i].digi;
+			break;
+		}
+	}
+	vfo.src = UI;
+	if (!useB)
+		queA.push(vfoplus);
+	else
+		queB.push(vfoplus);
+}
+
+void RIG_TT550::fkey_step_plus()
+{
+	progStatus.tt550_encoder_step++;
+	if (progStatus.tt550_encoder_step > 4) progStatus.tt550_encoder_step = 0;
+	sel_tt550_encoder_step->value(progStatus.tt550_encoder_step);
+	sel_tt550_encoder_step->redraw();
+}
+
+void RIG_TT550::fkey_step_minus()
+{
+	progStatus.tt550_encoder_step--;
+	if (progStatus.tt550_encoder_step < 0) progStatus.tt550_encoder_step = 4;
+	sel_tt550_encoder_step->value(progStatus.tt550_encoder_step);
+	sel_tt550_encoder_step->redraw();
+}
+
+void RIG_TT550::process_fkey(char c)
+{
+	if (c == 0x11) 
+		switch (progStatus.tt550_F1_func) {
+			case 1 : fkey_clear(); break;
+			case 2 : fkey_cw_plus(); break;
+			case 3 : fkey_cw_minus(); break;
+			case 4 : fkey_band_plus(); break;
+			case 5 : fkey_band_minus(); break;
+			case 6 : fkey_step_plus(); break;
+			case 7 : fkey_step_minus(); break;
+			default: ;
+		}
+	if (c == 0x12)
+		switch (progStatus.tt550_F2_func) {
+			case 1 : fkey_clear(); break;
+			case 2 : fkey_cw_plus(); break;
+			case 3 : fkey_cw_minus(); break;
+			case 4 : fkey_band_plus(); break;
+			case 5 : fkey_band_minus(); break;
+			case 6 : fkey_step_plus(); break;
+			case 7 : fkey_step_minus(); break;
+			default: ;
+		}
+	if (c == 0x13)
+		switch (progStatus.tt550_F3_func) {
+			case 1 : fkey_clear(); break;
+			case 2 : fkey_cw_plus(); break;
+			case 3 : fkey_cw_minus(); break;
+			case 4 : fkey_band_plus(); break;
+			case 5 : fkey_band_minus(); break;
+			case 6 : fkey_step_plus(); break;
+			case 7 : fkey_step_minus(); break;
+			default: ;
+		}
+}
+
+void RIG_TT550::process_keypad(char c)
+{
+	if (c < 0 || c > 0x7f) return;
+	if (c == 0x11 || c == 0x12 || c == 0x13)
+		process_fkey(c);
+	else
+		process_freq_entry(c);
+}
+
 void RIG_TT550::process_encoder(string s)
 {
-LOG_WARN("%s", str2hex(s.substr(0,5).c_str(), 5));
-	int encoder = ((unsigned char)s[1] << 8) | (unsigned char)s[2];
-	if (encoder > 16383) encoder -= 65536;
-
-// reset when user changes direction on encoder wheel
-	if (encoder_count > 0 && encoder < 0) encoder_count = 0;
-	if (encoder_count < 0 && encoder > 0) encoder_count = 0;
+	size_t p = 0;
+	int encval = 0, encoder = 0;
+	size_t len = s.length();
+	while (p < len) {
+		encval = ((unsigned char)s[p+1] << 8) | (unsigned char)s[p+2];
+		if (encval > 16383) encval -= 65536;
+		encoder += encval;
+		p += 5;
+	}
 
 	encoder_count += encoder;
 	encoder = 0;
 
-	while (encoder_count > progStatus.tt550_encoder_sensitivity) {
-		encoder_count -= progStatus.tt550_encoder_sensitivity;
-		encoder++;
-	}
-	while (encoder_count < -progStatus.tt550_encoder_sensitivity) {
-		encoder_count += progStatus.tt550_encoder_sensitivity;
-		encoder--;
-	}
-	if (encoder == 0) return;
-	if (progStatus.tt550_encoder_step < 0) progStatus.tt550_encoder_step = 0;
-	if (progStatus.tt550_encoder_step > 4) progStatus.tt550_encoder_step = 4;
-	if (onA) {
-		freqA += encoder*TT550_steps[progStatus.tt550_encoder_step];
-		set_vfoA(freqA);
-		Fl::awake(setFreqDispA, (void *)freqA);
-	} else {
-		freqB += encoder*TT550_steps[progStatus.tt550_encoder_step];
-		set_vfoB(freqB);
-		Fl::awake(setFreqDispB, (void *)freqB);
+	encoder = encoder_count / progStatus.tt550_encoder_sensitivity;
+	encoder_count -= encoder * progStatus.tt550_encoder_sensitivity;
+
+	if (encoder != 0) {
+		FREQMODE vfoplus = vfo;
+		vfoplus.src = UI;
+		vfoplus.freq += encoder*TT550_steps[progStatus.tt550_encoder_step];
+		if (!useB)
+			queA.push(vfoplus);
+		else
+			queB.push(vfoplus);
 	}
 }
-
-void RIG_TT550::process_stream(string s)
-{
-//LOG_WARN("%s", str2hex(s.c_str(), s.length()));
-	for (size_t i = 0; i < s.length(); i++) {
-		if (s[i] == 'U') {
-			i++;
-			if (isdigit(s[i]) || s[i] == '.' || s[i] == '\r') process_freq_entry(s[i]);
-			i++;
-		} else if (s[i] == 0x21 ) { // '!'
-			process_encoder(s.substr(i));
-			i += 5;
-		}
-	}
-}
-
-//extern unsigned char datastream[];
-//static int  dp = 0;
 
 int RIG_TT550::get_smeter()
 {
+	int sval = 0;
+	float fval;
+
 	cmd = TT550getSIG_LEVEL;
-	sendCommand(cmd, -1, true);
-	if (replystr[0] != 'S') {
-		string leading;
-		while((replystr.length() >= 5) && replystr[0] != 'S') {
-			leading += replystr.substr(0, 5);
-			replystr.erase(0,5);
-		}
-		process_stream(leading);
+	sendCommand(cmd, 11, true);
+
+	string meter = "";
+	string keys = "";
+	string encoder = "";
+
+	size_t p = 0;
+	size_t len = replystr.length();
+	char c;
+	while (p < len) {
+		c = replystr[p];
+		if (c == 'S' || c == 'U' || c == '!') break;
+		p++;
 	}
-	size_t p = replystr.find('\r');
-	if ((p != string::npos) && (p != replystr.length() - 1)) {
-		string trailing = replystr.substr(p+1);
-		process_stream(trailing);
+	while (p < len) {
+		if (replystr[p] == 'S') {
+			meter += replystr[p++];
+			if (p < len) meter += replystr[p++];
+			if (p < len) meter += replystr[p++];
+			if (p < len) meter += replystr[p++];
+			if (p < len) meter += replystr[p++];
+			if (p < len) meter += replystr[p++];
+		} else if (replystr[p] == 'U') {
+			keys += replystr[p++];
+			if (p < len) keys += replystr[p++];
+			if (p < len) keys += replystr[p++];
+		} else if (replystr[p] == '!') {
+			encoder += replystr[p++];
+			if (p < len) encoder += replystr[p++];
+			if (p < len) encoder += replystr[p++];
+			if (p < len) encoder += replystr[p++];
+			if (p < len) encoder += replystr[p++];
+		} else
+			break;
 	}
 
-	if (replystr[0] == 'S') {
-		int sval;
-		float fval;
-		sscanf(&replystr[1], "%4x", &sval);
-		fval = sval/256.0;
-		if (fval <= 9) sval = (int)(fval * 50.0 / 9.0);
-		else sval = 50 + (int)((fval - 9.0)*50.0 / 60.0);
-		if (sval < 0) sval = 0;
-		if (sval > 100) sval = 100;
-		return sval;
+	if (keypad_timeout) {
+		keypad_timeout--;
+		if (keypad_timeout == 0) {
+			xcvrstream.clear();
+			Fl::awake(hide_encA, NULL);
+		}
 	}
-	return 0;
+// process all smeter returns, retain last
+	p = 0;
+	len = meter.length();
+	if (len) {
+		while (p < len) {
+			sscanf(&replystr[p+1], "%4x", &sval);
+			fval = sval/256.0;
+			if (fval <= 9) sval = (int)(fval * 50.0 / 9.0);
+			else sval = 50 + (int)((fval - 9.0)*50.0 / 60.0);
+			if (sval < 0) sval = 0;
+			if (sval > 100) sval = 100;
+			p += 6;
+		}
+	}
+
+// process all keypad entries
+	p = 0;
+	len = keys.length();
+	if (len) {
+		while (p < len) {
+			process_keypad(keys[p+1]);
+			p += 3;
+		}
+	}
+
+// process all encoder changes
+	if (!encoder.empty()) {
+		process_encoder(encoder);
+	}
+
+	return sval;
 }
 
 int RIG_TT550::get_swr()
@@ -965,6 +1136,14 @@ void RIG_TT550::set_spot_onoff()
 	set_cw_spot();
 }
 
+// front panel Preamp control is hijacked for a spot control !
+
+void RIG_TT550::set_preamp(int val)
+{
+	progStatus.tt550_spot_onoff = val;
+	set_cw_spot();
+}
+
 void RIG_TT550::set_cw_weight()
 {
 	set_cw_wpm();
@@ -973,10 +1152,11 @@ void RIG_TT550::set_cw_weight()
 void RIG_TT550::set_cw_qsk()
 {
 	cmd = TT550setCWQSK;
-	cmd[2] = (0xFF) & (int)(progStatus.tt550_cw_qsk * 2.55);
+	cmd[2] = (0xFF) & (int)(progStatus.tt550_cw_qsk * 2);
 	if (cmd[2] == 0x0D) cmd[2] = 0x0E;
 	sendCommand(cmd, 0, true);
 }
+
 
 void RIG_TT550::enable_keyer()
 {
@@ -1063,10 +1243,22 @@ void RIG_TT550::set_noise_reduction(int b)
 void RIG_TT550::set_mic_gain(int v)
 {
 	progStatus.mic_gain = v;
-	cmd = TT550setMICLINE;
-	cmd[2] = use_line_in ? 1 : 0;
-	cmd[3] = (unsigned char) v;
-	sendCommand(cmd, 0, true);
+	if (!progStatus.tt550_use_line_in) {
+		cmd = TT550setMICLINE;
+		cmd[2] = 0;
+		cmd[3] = (unsigned char) v;
+		sendCommand(cmd, 0, true);
+	}
+}
+
+void RIG_TT550::set_mic_line(int v)
+{
+	if (progStatus.tt550_use_line_in) {
+		cmd = TT550setMICLINE;
+		cmd[2] = 1;
+		cmd[3] = 0;//(unsigned char) v;
+		sendCommand(cmd, 0, true);
+	}
 }
 
 void RIG_TT550::get_mic_min_max_step(int &min, int &max, int &step)
@@ -1122,14 +1314,6 @@ void RIG_TT550::set_noise(bool b)
 
 void RIG_TT550::tuner_bypass()
 {
-}
-
-void RIG_TT550::read_stream()
-{
-	if (xcvrstream.length()) {
-		LOG_WARN("%s", str2hex(xcvrstream.c_str(), xcvrstream.length()));
-		xcvrstream.clear();
-	}
 }
 
 // callbacks for tt550 transceiver
@@ -1263,8 +1447,10 @@ void cb_tt550_nb_level()
 void cb_tt550_use_line_in()
 {
 	pthread_mutex_lock(&mutex_serial);
-	selrig->use_line_in = progStatus.use_line_in;
-	selrig->set_mic_gain(progStatus.mic_gain);
+	if (progStatus.tt550_use_line_in)
+		selrig->set_mic_line(0);
+	else
+		selrig->set_mic_gain(progStatus.mic_gain);
 	pthread_mutex_unlock(&mutex_serial);
 }
 
@@ -1272,6 +1458,13 @@ void cb_tt550_setXmtBW()
 {
 	pthread_mutex_lock(&mutex_serial);
 	selrig->set_bwA(selrig->bwA);
+	pthread_mutex_unlock(&mutex_serial);
+}
+
+void cb_tt550_cw_qsk()
+{
+	pthread_mutex_lock(&mutex_serial);
+	selrig->set_cw_qsk();
 	pthread_mutex_unlock(&mutex_serial);
 }
 

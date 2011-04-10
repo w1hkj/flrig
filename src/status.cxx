@@ -94,19 +94,18 @@ status progStatus = {
 	0,			// int  preamp;
 	0,			// int  auto_notch;
 
-	false,		// bool use_line_in;
 	false,		// bool split;
 
 //tt550 controls
-	100,		// tt550_line_out;
+	80,			// tt550_line_out;
 	1,			// tt550_agc_level;
 
 	24,			// tt550_cw_wpm;
 	1.0,		// tt550_cw_weight;
-	0,			// tt550_cw_vol;
-	0,			// tt550_cw_spot;
+	10,			// tt550_cw_vol;
+	10,			// tt550_cw_spot;
 	false,		// tt550_cw_spot_onoff;
-	0,			// tt550_cw_qsk;
+	20,			// tt550_cw_qsk;
 	true,		// tt550_enable_keyer;
 
 	false,		// tt550_vox_onoff;
@@ -124,10 +123,19 @@ status progStatus = {
 	true,		// tt550_enable_xmtr;
 	false,		// tt550_enable_tloop;
 
+	true,		// tt550_use_line_in;
+
 	14,			// tt550_xmt_bw;
 	false,		// tt550_use_xmt_bw;
 	
 	25,			// tt550_AM_level;
+	0,			// tt550_encoder_step;
+	1,			// tt550_encoder_sensitivity;
+	2000,		// tt550_keypad_timeout;
+
+	0,			// tt550_F1_func;
+	0,			// tt550_F2_func;
+	0,			// tt550_F3_func;
 
 	0.0,		// vfo_adj;
 	600,		// bfo_freq;
@@ -135,8 +143,6 @@ status progStatus = {
 	0,			// xit_freq;
 	1500,		// bpf_center;
 	true,		// use_bpf_center;
-	100,		// encoder_step;
-	10,			// encoder_sensitivity;
 
 	232,		// int	 bg_red;
 	255,		// int	 bg_green;
@@ -270,8 +276,16 @@ void status::saveLastState()
 
 		spref.set("tt550_AM_level", tt550_AM_level);
 
+		spref.set("tt550_use_line_in", tt550_use_line_in);
+
 		spref.set("tt550_encoder_step", tt550_encoder_step);
 		spref.set("tt550_encoder_sensitivity", tt550_encoder_sensitivity);
+		spref.set("tt550_keypad_timeout", tt550_keypad_timeout);
+
+		spref.set("tt550_F1_func", tt550_F1_func);
+		spref.set("tt550_F2_func", tt550_F2_func);
+		spref.set("tt550_F3_func", tt550_F3_func);
+
 	} else {
 		spref.set("line_out", line_out);
 		spref.set("agc_level", agc_level);
@@ -292,8 +306,6 @@ void status::saveLastState()
 	spref.set("bool_noise", noise);
 	spref.set("int_preamp", preamp);
 	spref.set("int_att", attenuator);
-
-	spref.set("use_line_in", use_line_in);
 
 	spref.set("vfo_adj", vfo_adj);
 	spref.set("bfo_freq", bfo_freq);
@@ -438,9 +450,17 @@ bool status::loadXcvrState(const char *xcvr)
 			spref.get("tt550_xmt_bw", tt550_xmt_bw, tt550_xmt_bw);
 			if (spref.get("tt550_use_xmt_bw", i, i)) tt550_use_xmt_bw = i;
 
+			if (spref.get("tt550_use_line_in", i, i)) tt550_use_line_in = i;
+
 			spref.get("tt550_AM_level", tt550_AM_level, tt550_AM_level);
 			spref.get("tt550_encoder_step", tt550_encoder_step, tt550_encoder_step);
 			spref.get("tt550_encoder_sensitivity", tt550_encoder_sensitivity, tt550_encoder_sensitivity);
+			spref.get("tt550_keypad_timeout", tt550_keypad_timeout, tt550_keypad_timeout);
+
+			spref.get("tt550_F1_func", tt550_F1_func, tt550_F1_func);
+			spref.get("tt550_F2_func", tt550_F2_func, tt550_F2_func);
+			spref.get("tt550_F3_func", tt550_F3_func, tt550_F3_func);
+
 		} 
 		else {
 			spref.get("line_out", line_out, line_out);
@@ -462,8 +482,6 @@ bool status::loadXcvrState(const char *xcvr)
 		if (spref.get("bool_noise", i, i)) noise = i;
 		spref.get("int_preamp", preamp, preamp);
 		spref.get("int_att", attenuator, attenuator);
-
-		if (spref.get("use_line_in", i, i)) use_line_in = i;
 
 		spref.get("vfo_adj", vfo_adj, vfo_adj);
 		spref.get("bfo_freq", bfo_freq, bfo_freq);

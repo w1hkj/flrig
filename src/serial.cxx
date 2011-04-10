@@ -455,11 +455,10 @@ int Cserial::ReadChars (char *buf, int nchars, int msec)
 
 void Cserial::FlushBuffer()
 {
-	char c;
-	int count = 200;
-	while (ReadByte(c) == true) {
-		if (count-- == 0) break;
-	}
+#define TX_CLEAR 0x0004L
+#define RX_CLEAR 0x0008L
+	if (!hComm) return;
+	PurgeComm(hComm, RX_CLEAR);
 }
 
 ///////////////////////////////////////////////////////

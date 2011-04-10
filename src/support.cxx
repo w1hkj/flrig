@@ -287,7 +287,7 @@ void serviceA()
 		selrig->set_vfoA(vfoA.freq);
 		Fl::awake(setFreqDispA, (void *)vfoA.freq);
 		vfo.freq = vfoA.freq;
-		if (vfoA.src == UI)
+		if (vfoA.src != XML)
 			try {
 				send_new_freq(vfoA.freq);
 			} catch (...) {}
@@ -356,9 +356,8 @@ void serviceB()
 	if (vfoB.freq != vfo.freq || pushedB) {
 		selrig->set_vfoB(vfoB.freq);
 		vfo.freq = vfoB.freq;
-		if (vfoB.src == XML)
-			Fl::awake(setFreqDispB, (void *)vfoB.freq);
-		else
+		Fl::awake(setFreqDispB, (void *)vfoB.freq);
+		if (vfoB.src != XML)
 			try {
 				send_new_freq(vfoB.freq);
 			} catch (...) {}
@@ -429,7 +428,10 @@ void * serial_thread_loop(void *d)
 			}
 			resetxmt = true;
 
+if (rig_nbr == TT550) 
+	read_smeter();
 			if (!loopcount--) {
+if (rig_nbr != TT550)
 				read_smeter();
 				read_vfo();
 				read_mode();
@@ -769,21 +771,27 @@ void addFreq() {
 
 void cbRIT()
 {
+	pthread_mutex_lock(&mutex_serial);
 	if (selrig->has_rit)
 		selrig->setRit((int)cntRIT->value());
+	pthread_mutex_unlock(&mutex_serial);
 	setFocus();
 }
 
 void cbXIT()
 {
+	pthread_mutex_lock(&mutex_serial);
 	selrig->setXit((int)cntXIT->value());
+	pthread_mutex_unlock(&mutex_serial);
 	setFocus();
 }
 
 void cbBFO()
 {
 	if (selrig->has_bfo)
+	pthread_mutex_lock(&mutex_serial);
 		selrig->setBfo((int)cntBFO->value());
+	pthread_mutex_unlock(&mutex_serial);
 	setFocus();
 }
 
@@ -1383,22 +1391,42 @@ void adjust_control_positions()
 void initXcvrTab()
 {
 	if (rig_nbr == TT550) {
-		cnt_tt550_line_out->activate(); cnt_tt550_line_out->value(progStatus.tt550_line_out);
-		cbo_tt550_agc_level->activate(); cbo_tt550_agc_level->index(progStatus.tt550_agc_level);
-		cnt_tt550_cw_wpm->activate(); cnt_tt550_cw_wpm->value(progStatus.tt550_cw_wpm);
-		cnt_tt550_cw_vol->activate(); cnt_tt550_cw_vol->value(progStatus.tt550_cw_vol);
-		cnt_tt550_cw_spot->activate(); cnt_tt550_cw_spot->value(progStatus.tt550_cw_spot);
-		cnt_tt550_cw_weight->activate(); cnt_tt550_cw_weight->value(progStatus.tt550_cw_weight);
-		btn_tt550_spot_onoff->activate(); btn_tt550_spot_onoff->value(progStatus.tt550_spot_onoff);
-		btn_tt550_enable_keyer->activate(); btn_tt550_enable_keyer->value(progStatus.tt550_enable_keyer);
-		btn_tt550_vox->activate(); btn_tt550_vox->value(progStatus.tt550_vox_onoff);
-		cnt_tt550_vox_gain->activate(); cnt_tt550_vox_gain->value(progStatus.tt550_vox_gain);
-		cnt_tt550_anti_vox->activate(); cnt_tt550_anti_vox->value(progStatus.tt550_vox_anti);
-		cnt_tt550_vox_hang->activate(); cnt_tt550_vox_hang->value(progStatus.tt550_vox_hang);
-		btn_tt550_CompON->activate(); btn_tt550_CompON->value(progStatus.tt550_compON);
-		cnt_tt550_compression->activate(); cnt_tt550_compression->value(progStatus.tt550_compression);
-		cnt_tt550_mon_vol->activate(); cnt_tt550_mon_vol->value(progStatus.tt550_mon_vol);
-		btn_tt550_tuner_bypass->activate(); btn_tt550_tuner_bypass->value(progStatus.tt550_tuner_bypass);
+		cnt_tt550_line_out->activate(); 
+			cnt_tt550_line_out->value(progStatus.tt550_line_out);
+		cbo_tt550_agc_level->activate(); 
+			cbo_tt550_agc_level->index(progStatus.tt550_agc_level);
+		cnt_tt550_cw_wpm->activate(); 
+			cnt_tt550_cw_wpm->value(progStatus.tt550_cw_wpm);
+		cnt_tt550_cw_vol->activate(); 
+			cnt_tt550_cw_vol->value(progStatus.tt550_cw_vol);
+		cnt_tt550_cw_spot->activate(); 
+			cnt_tt550_cw_spot->value(progStatus.tt550_cw_spot);
+		cnt_tt550_cw_weight->activate(); 
+			cnt_tt550_cw_weight->value(progStatus.tt550_cw_weight);
+		cnt_tt550_cw_qsk->activate(); 
+			cnt_tt550_cw_qsk->value(progStatus.tt550_cw_qsk);
+		btn_tt550_enable_keyer->activate(); 
+			btn_tt550_enable_keyer->value(progStatus.tt550_enable_keyer);
+		btn_tt550_vox->activate(); 
+			btn_tt550_vox->value(progStatus.tt550_vox_onoff);
+		cnt_tt550_vox_gain->activate(); 
+			cnt_tt550_vox_gain->value(progStatus.tt550_vox_gain);
+		cnt_tt550_anti_vox->activate(); 
+			cnt_tt550_anti_vox->value(progStatus.tt550_vox_anti);
+		cnt_tt550_vox_hang->activate(); 
+			cnt_tt550_vox_hang->value(progStatus.tt550_vox_hang);
+		btn_tt550_CompON->activate(); 
+			btn_tt550_CompON->value(progStatus.tt550_compON);
+		cnt_tt550_compression->activate(); 
+			cnt_tt550_compression->value(progStatus.tt550_compression);
+		cnt_tt550_mon_vol->activate(); 
+			cnt_tt550_mon_vol->value(progStatus.tt550_mon_vol);
+		btn_tt550_tuner_bypass->activate(); 
+			btn_tt550_tuner_bypass->value(progStatus.tt550_tuner_bypass);
+		sel_tt550_encoder_step->activate(); 
+			sel_tt550_encoder_step->value(progStatus.tt550_encoder_step);
+		cnt_tt550_encoder_sensitivity->activate(); 
+			cnt_tt550_encoder_sensitivity->value(progStatus.tt550_encoder_sensitivity);
 		mnuRestoreData->clear();
 		mnuRestoreData->hide();
 		mnuKeepData->clear();
@@ -1556,36 +1584,36 @@ void initRig()
 		cnt_vfo_adj->deactivate();
 
 	if (selrig->has_rit) {
-		cntRIT->value(progStatus.rit_freq);
 		int min, max, step;
 		selrig->get_RIT_min_max_step(min, max, step);
 		cntRIT->minimum(min);
 		cntRIT->maximum(max);
 		cntRIT->step(step);
 		cntRIT->show();
+		cntRIT->value(progStatus.rit_freq);
 	} else {
 		cntRIT->hide();
 	}
 
 	if (selrig->has_xit) {
-		cntXIT->value(progStatus.xit_freq);
 		int min, max, step;
 		selrig->get_XIT_min_max_step(min, max, step);
 		cntXIT->minimum(min);
 		cntXIT->maximum(max);
 		cntXIT->step(step);
+		cntXIT->value(progStatus.xit_freq);
 		cntXIT->show();
 	} else {
 		cntXIT->hide();
 	}
 
 	if (selrig->has_bfo) {
-		cntBFO->value(progStatus.bfo_freq);
 		int min, max, step;
 		selrig->get_BFO_min_max_step(min, max, step);
 		cntBFO->minimum(min);
 		cntBFO->maximum(max);
 		cntBFO->step(step);
+		cntBFO->value(progStatus.bfo_freq);
 		cntBFO->show();
 	} else {
 		cntBFO->hide();
@@ -1725,13 +1753,20 @@ void initRig()
 		btnAttenuator->hide();
 	}
 
-	if (selrig->has_preamp_control) {
-		btnPreamp->label("Pre");
-		progStatus.preamp = selrig->get_preamp();
-		btnPreamp->value(progStatus.preamp);
+// hijack the preamp control for a SPOT button on the TT550 Pegasus
+	if (rig_nbr == TT550) {
+		btnPreamp->label("Spot");
+		btnPreamp->value(progStatus.tt550_spot_onoff);
 		btnPreamp->show();
 	} else {
-		btnPreamp->hide();
+		if (selrig->has_preamp_control) {
+			btnPreamp->label("Pre");
+			progStatus.preamp = selrig->get_preamp();
+			btnPreamp->value(progStatus.preamp);
+			btnPreamp->show();
+		} else {
+			btnPreamp->hide();
+		}
 	}
 
 	if (selrig->has_noise_control) {
