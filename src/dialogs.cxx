@@ -687,3 +687,8 @@ void show_controls()
 	else
 		dlgControls->show();
 }
+
+void cb_close_TT550_setup()
+{
+	tt550_controls->hide();
+}

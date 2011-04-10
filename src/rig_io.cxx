@@ -121,19 +121,19 @@ bool startSepSerial()
 	return true;
 }
 
-#define RXBUFFSIZE 2000
 char replybuff[RXBUFFSIZE+1];
 string replystr;
 
-// redesign the delay between reads.
-
-int readResponse()
+int readResponse(int nbr)
 {
 	int numread = 0;
 	size_t n;
 	memset(replybuff, 0, RXBUFFSIZE + 1);
-	while (numread < RXBUFFSIZE) {
-		if ((n = RigSerial.ReadBuffer(&replybuff[numread], RXBUFFSIZE - numread)) == 0) break;
+	if (nbr == -1)
+		return RigSerial.ReadBuffer(replybuff, RXBUFFSIZE);
+	while (numread < nbr) {
+		n = RigSerial.ReadBuffer(&replybuff[numread], nbr - numread);
+		if (n == 0) break;
 		numread += n;
 	}
 	return numread;
@@ -146,10 +146,10 @@ int sendCommand (string s, int retnbr, bool b)
 {
 	int numread = 0;
 	int numwrite = (int)s.size();
-	int readafter = progStatus.comm_wait;
-	int tries = progStatus.comm_retries;
-	readafter += (int)(ceilf((retnbr == -1 ? 20 : retnbr + progStatus.comm_echo ? numwrite : 0)) *
-					(9 + progStatus.stopbits) * 1000.0 / RigSerial.Baud());
+
+	int readafter = (int)(ceilf((retnbr == -1 ? 20 : retnbr + progStatus.comm_echo ? numwrite : 0)) *
+								(9 + progStatus.stopbits) * 1000.0 / RigSerial.Baud()) + 
+							progStatus.comm_wait;
 
 	if (RigSerial.IsOpen() == false) {
 		LOG_DEBUG("cmd:%3d, %s", s.length(), b ? str2hex(s.data(), s.length()) : s.c_str());
@@ -159,23 +159,28 @@ int sendCommand (string s, int retnbr, bool b)
 	if (RIG_DEBUG)
 		LOG_INFO("cmd:%3d, %s", s.length(), b ? str2hex(s.data(), s.length()) : s.c_str());
 
+	RigSerial.FlushBuffer();
+
 	RigSerial.WriteBuffer(s.c_str(), numwrite);
 	MilliSleep( readafter );
 
 	replystr.clear();
 
 	if (retnbr == 0) {
-		numread = readResponse();
+		RigSerial.FlushBuffer();
 		memset(replybuff, 0, RXBUFFSIZE + 1);
 		return 0;
 	}
 
-	while (tries-- && ((numread = readResponse()) < retnbr)) {
-		MilliSleep( readafter );
-	}
+	numread = readResponse((progStatus.comm_echo ? numwrite : 0) + retnbr);
 
 	if (RIG_DEBUG)
-		LOG_DEBUG("ret :%3d, %s", numread, b ? str2hex(replybuff, numread) : replybuff);
+		LOG_INFO("rsp:%3d, %s", numread, b ? str2hex(replybuff, numread) : replybuff);
+
+	if (progStatus.comm_echo && (numread >= numwrite)) {
+		memmove(replybuff, replybuff + numwrite, numread - numwrite);
+		numread -= numwrite;
+	}
 
 	if (retnbr >= 0 && numread > retnbr) {
 		memmove(replybuff, replybuff + numread - retnbr, retnbr);

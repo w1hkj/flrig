@@ -152,10 +152,10 @@ extern Fl_Check_Button *btn_use_bpf_center;
 extern Fl_Light_Button *btnSpecial;
 Fl_Double_Window* make_XcvrXtra();
 extern Fl_Counter *cnt_tt550_cw_wpm;
+extern Fl_Counter *cnt_tt550_cw_weight;
+extern Fl_Counter *cnt_tt550_cw_qsk;
 extern Fl_Counter *cnt_tt550_cw_vol;
 extern Fl_Counter *cnt_tt550_cw_spot;
-extern Fl_Light_Button *btn_tt550_spot_onoff;
-extern Fl_Counter *cnt_tt550_cw_weight;
 extern Fl_Check_Button *btn_tt550_enable_keyer;
 extern Fl_Counter *cnt_tt550_vox_gain;
 extern Fl_Counter *cnt_tt550_anti_vox;
@@ -176,6 +176,11 @@ extern Fl_Check_Button *btn_tt550_use_xmt_bw;
 extern Fl_Check_Button *btnAccInp;
 extern Fl_Counter *cnt_tt550_encoder_sensitivity;
 #include <FL/Fl_Choice.H>
-extern Fl_Choice *sel_550_step_size;
+extern Fl_Choice *sel_tt550_encoder_step;
+extern Fl_Counter *cnt_tt550_keypad_time_out;
+extern Fl_Button *btn_close_TT550_setup;
+extern Fl_Choice *sel_tt550_F1_func;
+extern Fl_Choice *sel_tt550_F2_func;
+extern Fl_Choice *sel_tt550_F3_func;
 Fl_Double_Window* make_TT550();
 #endif

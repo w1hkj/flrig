@@ -124,6 +124,7 @@ extern void cb_tt550_enable_tloop();
 extern void cb_tt550_nb_level();
 extern void cb_tt550_use_line_in();
 extern void cb_tt550_setXmtBW();
+extern void cb_tt550_cw_qsk();
 
 extern void closeRig();
 extern void cbExit();
@@ -169,6 +170,7 @@ extern void initStatusConfigDialog();
 extern void initRigCombo();
 extern void createXcvrDialog();
 extern void show_controls();
+extern void cb_close_TT550_setup();
 extern void cbUseRepeatButtons(bool on);
 extern void nb_label(const char *, bool on);
 extern void preamp_label(const char *, bool on);
