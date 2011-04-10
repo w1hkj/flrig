@@ -142,6 +142,14 @@ void RIG_IC7200::set_vfoA (long freq)
 
 long RIG_IC7200::get_vfoB ()
 {
+	cmd = pre_to;
+	cmd += '\x03';
+	cmd.append( post );
+	if (!sendCommand(cmd, 11)) {
+		checkresponse(11);
+		return freqB;
+	}
+	freqB = fm_bcd_be(&replystr[5], 10);
 	return freqB;
 }
 
@@ -157,7 +165,6 @@ void RIG_IC7200::set_vfoB (long freq)
 	checkresponse(6);
 	if (DEBUG_7200)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-	select_vfoA();
 }
 
 void RIG_IC7200::set_split(bool b)
