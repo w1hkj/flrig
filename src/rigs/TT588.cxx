@@ -32,16 +32,22 @@ static const char TT588mode_type[] = { 'U', 'U', 'L', 'U', 'U', 'L', 'L' };
 
 // filter # is 37 - index
 static const char *TT588_widths[] = {
-"200",   "250",  "300",  "350",  "400",  "450",  "500",  "600",  "700",  "800",
-"900",  "1100", "1200", "1400", "1600", "1800", "2000", "2200", "2400", "2500",
-"2600", "2800", "3000", "3200", "3400", "3600", "3800", "4000", "4500", "5000",
-"5500", "6000", "6500", "7000", "7500", "8000", "9000", "14000", NULL};
+"200",   "250",  "300",  "350",  "400",  "450",  "500",  
+"600",  "700",  "800", "900",  "1000", 
+"1200", "1400", "1600", "1800", "2000", "2200", "2400", 
+"2500", "2600", 
+"2800", "3000", "3200", "3400", "3600", "3800", "4000", 
+"4500", "5000", "5500", "6000", "6500", "7000", "7500", "8000", 
+"9000", "12000", NULL};
 
 static const int TT588_numeric_widths[] = {
-200,   250,  300,  350,  400,  450,  500,  600,  700,  800,
-900,  1100, 1200, 1400, 1600, 1800, 2000, 2200, 2400, 2500,
-2600, 2800, 3000, 3200, 3400, 3600, 3800, 4000, 4500, 5000,
-5500, 6000, 6500, 7000, 7500, 8000, 9000, 14000, NULL};
+200,   250,  300,  350,  400,  450,  500,
+600,  700,  800,  900,  1000, 
+1200, 1400, 1600, 1800, 2000, 2200, 2400, 
+2500, 2600, 
+2800, 3000, 3200, 3400, 3600, 3800, 4000,
+4500, 5000, 5500, 6000, 6500, 7000, 7500, 8000,
+9000, 12000, NULL};
 
 
 static char TT588setFREQA[]		= "*Annnn\r";
@@ -57,9 +63,8 @@ static char TT588setVOL[]		= "*Un\r";
 static char TT588setBW[]		= "*Wx\r";
 
 static char TT588getFREQA[]		= "?A\r";
-static char TT588getFWDPWR[]	= "?S\r";
 //static char TT588getAGC[]		= "?G\r";
-//static char TT588getSQLCH[]		= "?H\r";
+//static char TT588getSQLCH[]	= "?H\r";
 //static char TT588getRF[]		= "?I\r";
 static char TT588getATT[]		= "?J\r";
 //static char TT588getNB[]		= "?K\r";
@@ -69,9 +74,11 @@ static char TT588getSMETER[]	= "?S\r";
 static char TT588getVOL[]		= "?U\r";
 static char TT588getBW[]		= "?W\r";
 
+static char TT588getFWDPWR[]	= "?F\r";
+
 //static char TT588getREFPWR[]	= "?R\r";
 
-static char TT588setXMT[]		= "*Tnnr";
+static char TT588setXMT[]		= "*Tnn\r";
 
 RIG_TT588::RIG_TT588() {
 // base class values
@@ -281,16 +288,17 @@ int RIG_TT588::get_attenuator()
 
 int RIG_TT588::get_smeter()
 {
-	double sig = 0.0;
+	int sval = 0;
+	float fval = 0;
 	cmd = TT588getSMETER;
 	sendCommand(cmd, 6, true);
 	if (replybuff[0] == 'S') {
-		int sval;
-		replybuff[5] = 0;
 		sscanf(&replybuff[1], "%4x", &sval);
-		sig = sval / 256.0;
+		fval = sval/256.0;
+		sval = (int)(fval * 100.0 / 18.0);
+		if (sval > 100) sval = 100;
 	}
-	return (int)(sig * 50.0 / 9.0);
+	return (sval);
 }
 
 int RIG_TT588::get_volume_control()
@@ -347,7 +355,7 @@ int RIG_TT588::get_power_out()
 	cmd = TT588getFWDPWR;
 	sendCommand(cmd, 6, true);
 	fwdpwr = refpwr = 0;
-	if (replybuff[0] == 'S') {
+	if (replybuff[0] == 'F') {
 		fwdpwr = replybuff[1] & 0x7F;
 		refpwr = replybuff[2];
 	}
