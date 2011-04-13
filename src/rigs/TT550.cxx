@@ -934,10 +934,9 @@ int RIG_TT550::get_smeter()
 		while (p < len) {
 			sscanf(&replystr[p+1], "%4x", &sval);
 			fval = sval/256.0;
-			if (fval <= 9) sval = (int)(fval * 50.0 / 9.0);
-			else sval = 50 + (int)((fval - 9.0)*50.0 / 60.0);
-			if (sval < 0) sval = 0;
+			sval = (int)(fval * 100.0 / 18.0);
 			if (sval > 100) sval = 100;
+//printf("%s %6.2f %d\n", str2hex(&replystr[p+1],4), fval, sval);
 			p += 6;
 		}
 	}
