@@ -456,6 +456,7 @@ uchar peakRed, peakGreen, peakBlue;
 uchar pwrRed, pwrGreen, pwrBlue;
 uchar swrRed, swrGreen, swrBlue;
 Fl_Color bgclr;
+Fl_Color fgclr;
 
 void cbBacklightColor()
 {
@@ -480,7 +481,12 @@ void cbPrefForeground()
 	uchar r = fg_red, g = fg_green, b = fg_blue;
 	if (fl_color_chooser("Foreground color", r, g, b)) {
 		fg_red = r; fg_green = g; fg_blue = b;
+		fgclr = fl_rgb_color(r, g, b);
 		lblTest->labelcolor(fl_rgb_color (r, g, b));
+		scaleSmeterColor->labelcolor(fgclr);
+		scalePWRcolor->labelcolor(fgclr);
+		scaleSWRcolor->labelcolor(fgclr);
+		grpMeterColor->labelcolor(fgclr);
 		dlgDisplayConfig->redraw();
 	}
 }
@@ -580,8 +586,11 @@ void cbOkDisplayDialog()
 	txtInactive->redraw();
 
 	scaleSmeter->color(bgclr);
+	scaleSmeter->labelcolor(fgclr);
 	scalePower->color(bgclr);
+	scalePower->labelcolor(fgclr);
 	btnALC_SWR->color(bgclr);
+	btnALC_SWR->labelcolor(fgclr);
 
 	sldrFwdPwr->color(fl_rgb_color (pwrRed, pwrGreen, pwrBlue), bgclr);
 	sldrFwdPwr->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
@@ -634,14 +643,19 @@ void setDisplayColors()
 	bg_blue = progStatus.bg_blue;
 
 	bgclr = fl_rgb_color(bg_red, bg_green, bg_blue);
+	fgclr = fl_rgb_color(fg_red, fg_green, fg_blue);
 
 	lblTest->labelcolor(fl_rgb_color(fg_red, fg_green, fg_blue));
 	lblTest->color(bgclr);
 
 	scaleSmeterColor->color(bgclr);
+	scaleSmeterColor->labelcolor(fgclr);
 	scalePWRcolor->color(bgclr);
+	scalePWRcolor->labelcolor(fgclr);
 	scaleSWRcolor->color(bgclr);
+	scaleSWRcolor->labelcolor(fgclr);
 	grpMeterColor->color(bgclr);
+	grpMeterColor->labelcolor(fgclr);
 
 	sldrRcvSignalColor->color(
 		fl_rgb_color (smeterRed, smeterGreen, smeterBlue),

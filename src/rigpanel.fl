@@ -354,20 +354,21 @@ Please wait}
   }
 } 
 
-Function {DisplayDialog()} {} {
+Function {DisplayDialog()} {open
+} {
   Fl_Window {} {
     label {Flrig Colors} open
-    xywh {578 418 290 183} type Double hide
+    xywh {579 489 290 183} type Double visible
   } {
     Fl_Group grpMeterColor {open
-      xywh {7 8 210 100} box DOWN_BOX color 215 selection_color 215 labelcolor 50
+      xywh {7 8 210 100} box DOWN_BOX color 0 selection_color 215 labelcolor 50
     } {
       Fl_Box scaleSmeterColor {
-        image {images/S60.xbm} xywh {10 10 205 20} box FLAT_BOX color 215 selection_color 215
+        image {images/S60.xbm} xywh {10 10 205 20} box FLAT_BOX color 0 selection_color 215 labelcolor 6
         code0 {o->color(scaleSmeter->color());}
       }
       Fl_Box sldrRcvSignalColor {
-        xywh {12 30 200 6} box FLAT_BOX color 198
+        xywh {12 30 200 6} box FLAT_BOX color 198 selection_color 215
         class Fl_SigBar
       }
       Fl_Box sldrSWRcolor {
@@ -377,7 +378,7 @@ Function {DisplayDialog()} {} {
         class Fl_SigBar
       }
       Fl_Box scaleSWRcolor {
-        image {images/SWR.xbm} xywh {10 41 205 20} box FLAT_BOX color 215 selection_color 215
+        image {images/SWR.xbm} xywh {10 41 205 20} box FLAT_BOX color 0 selection_color 215 labelcolor 6
       }
       Fl_Box sldrPWRcolor {
         xywh {10 78 200 6} box FLAT_BOX color 91
@@ -386,12 +387,12 @@ Function {DisplayDialog()} {} {
         class Fl_SigBar
       }
       Fl_Box scalePWRcolor {
-        image {images/P100.xbm} xywh {10 84 205 20} box FLAT_BOX color 215 selection_color 215
+        image {images/P100.xbm} xywh {10 84 205 20} box FLAT_BOX color 0 selection_color 215 labelcolor 6
       }
     }
     Fl_Button btnBacklight {
       label Back
-      callback {cbBacklightColor();}
+      callback {cbBacklightColor();} selected
       xywh {221 116 60 24}
     }
     Fl_Button btMeterColor {
@@ -879,10 +880,9 @@ cb_bpf_center();}
   }
 } 
 
-Function {make_TT550()} {open
-} {
+Function {make_TT550()} {} {
   Fl_Window {} {
-    label {TT550 Setup} open
+    label {TT550 Setup}
     xywh {578 56 424 402} type Double align 0 visible
   } {
     Fl_Group {} {
@@ -1084,7 +1084,7 @@ cb_tt550_use_line_in();}
       }
     }
     Fl_Group {} {
-      label {Model 302} open selected
+      label {Model 302} open
       xywh {1 300 422 100} box ENGRAVED_FRAME align 21
     } {
       Fl_Counter cnt_tt550_encoder_sensitivity {

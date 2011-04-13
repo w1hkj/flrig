@@ -525,19 +525,19 @@ bool status::loadXcvrState(const char *xcvr)
 	}
 
 	Fl_Color bgclr = fl_rgb_color(bg_red, bg_green, bg_blue);
+	Fl_Color fgclr = fl_rgb_color(fg_red, fg_green, fg_blue);
 
-	FreqDispA->SetONOFFCOLOR(
-		fl_rgb_color(fg_red, fg_green, fg_blue),
-		bgclr);
+	FreqDispA->SetONOFFCOLOR( fgclr, bgclr );
 	FreqDispA->font(fontnbr);
-	FreqDispB->SetONOFFCOLOR(
-		fl_rgb_color(fg_red, fg_green, fg_blue),
-		fl_color_average(bgclr, FL_BLACK, 0.87));
+	FreqDispB->SetONOFFCOLOR( fgclr, fl_color_average(bgclr, FL_BLACK, 0.87));
 	FreqDispB->font(fontnbr);
 
 	scaleSmeter->color(bgclr);
+	scaleSmeter->labelcolor(fgclr);
 	scalePower->color(bgclr);
+	scalePower->labelcolor(fgclr);
 	btnALC_SWR->color(bgclr);
+	btnALC_SWR->labelcolor(fgclr);
 
 	sldrFwdPwr->color(fl_rgb_color (pwrRed, pwrGreen, pwrBlue), bgclr);
 	sldrFwdPwr->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
@@ -549,6 +549,7 @@ bool status::loadXcvrState(const char *xcvr)
 	sldrALC_SWR->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
 
 	grpMeters->color(bgclr);
+	grpMeters->labelcolor(fgclr);
 
 	if (use_rig_data) mnuKeepData->set();
 	else mnuKeepData->clear();
