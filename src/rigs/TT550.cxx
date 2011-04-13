@@ -1217,13 +1217,12 @@ void RIG_TT550::set_auto_notch(int v)
 {
 	auto_notch = v;
 	cmd = TT550setNRNOTCH;
-	if (v) {
 		cmd[1] = '0';
-		cmd[2] = '1';
-	} else {
 		cmd[1] = noise_reduction ? '1' : '0';
+	if (v)
+		cmd[2] = '1';
+	else
 		cmd[2] = '0';
-	}
 	sendCommand(cmd, 0, true);
 }
 
@@ -1231,11 +1230,11 @@ void RIG_TT550::set_noise_reduction(int b)
 {
 	noise_reduction = b;
 	cmd = TT550setNRNOTCH;
-	if (b) {
-		cmd[1] = '1'; cmd[2] = '0';
-	} else {
-		cmd[1] = '0'; cmd[2] = auto_notch ? '1' : '0';
-	}
+	if (b)
+		cmd[1] = '1'; 
+	else
+		cmd[1] = '0';
+	cmd[2] = auto_notch ? '1' : '0';
 	sendCommand(cmd, 0, true);
 }
 
