@@ -918,20 +918,21 @@ Fl_Double_Window* DisplayDialog() {
     w = o;
     { grpMeterColor = new Fl_Group(7, 8, 210, 100);
       grpMeterColor->box(FL_DOWN_BOX);
-      grpMeterColor->color((Fl_Color)215);
+      grpMeterColor->color((Fl_Color)FL_FOREGROUND_COLOR);
       grpMeterColor->selection_color((Fl_Color)215);
       grpMeterColor->labelcolor((Fl_Color)FL_LIGHT1);
       { Fl_Box* o = scaleSmeterColor = new Fl_Box(10, 10, 205, 20);
         scaleSmeterColor->box(FL_FLAT_BOX);
-        scaleSmeterColor->color((Fl_Color)215);
+        scaleSmeterColor->color((Fl_Color)FL_FOREGROUND_COLOR);
         scaleSmeterColor->selection_color((Fl_Color)215);
         scaleSmeterColor->image(image_S60);
+        scaleSmeterColor->labelcolor((Fl_Color)6);
         o->color(scaleSmeter->color());
       } // Fl_Box* scaleSmeterColor
       { sldrRcvSignalColor = new Fl_SigBar(12, 30, 200, 6);
         sldrRcvSignalColor->box(FL_FLAT_BOX);
         sldrRcvSignalColor->color((Fl_Color)198);
-        sldrRcvSignalColor->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
+        sldrRcvSignalColor->selection_color((Fl_Color)215);
         sldrRcvSignalColor->labeltype(FL_NORMAL_LABEL);
         sldrRcvSignalColor->labelfont(0);
         sldrRcvSignalColor->labelsize(14);
@@ -954,9 +955,10 @@ Fl_Double_Window* DisplayDialog() {
       } // Fl_SigBar* sldrSWRcolor
       { scaleSWRcolor = new Fl_Box(10, 41, 205, 20);
         scaleSWRcolor->box(FL_FLAT_BOX);
-        scaleSWRcolor->color((Fl_Color)215);
+        scaleSWRcolor->color((Fl_Color)FL_FOREGROUND_COLOR);
         scaleSWRcolor->selection_color((Fl_Color)215);
         scaleSWRcolor->image(image_SWR);
+        scaleSWRcolor->labelcolor((Fl_Color)6);
       } // Fl_Box* scaleSWRcolor
       { Fl_SigBar* o = sldrPWRcolor = new Fl_SigBar(10, 78, 200, 6);
         sldrPWRcolor->box(FL_FLAT_BOX);
@@ -973,9 +975,10 @@ Fl_Double_Window* DisplayDialog() {
       } // Fl_SigBar* sldrPWRcolor
       { scalePWRcolor = new Fl_Box(10, 84, 205, 20);
         scalePWRcolor->box(FL_FLAT_BOX);
-        scalePWRcolor->color((Fl_Color)215);
+        scalePWRcolor->color((Fl_Color)FL_FOREGROUND_COLOR);
         scalePWRcolor->selection_color((Fl_Color)215);
         scalePWRcolor->image(image_P100);
+        scalePWRcolor->labelcolor((Fl_Color)6);
       } // Fl_Box* scalePWRcolor
       grpMeterColor->end();
     } // Fl_Group* grpMeterColor
