@@ -76,6 +76,10 @@ extern Fl_Menu_Item menu_[];
 #define mnuAbout (menu_+16)
 #define mnuEventLog (menu_+17)
 #define mnuOnLineHelp (menu_+18)
+extern Fl_Box *lblTest;
+extern Fl_Button *prefFont;
+extern Fl_Button *prefForeground;
+extern Fl_Button *btnBacklight;
 extern Fl_Group *grpMeterColor;
 extern Fl_Box *scaleSmeterColor;
 extern Fl_SigBar *sldrRcvSignalColor;
@@ -83,17 +87,26 @@ extern Fl_SigBar *sldrSWRcolor;
 extern Fl_Box *scaleSWRcolor;
 extern Fl_SigBar *sldrPWRcolor;
 extern Fl_Box *scalePWRcolor;
-extern Fl_Button *btnBacklight;
 extern Fl_Button *btMeterColor;
 extern Fl_Button *btnSWRColor;
 extern Fl_Button *btnPwrColor;
 extern Fl_Button *btnPeakColor;
+#include <FL/Fl_Choice.H>
+extern Fl_Choice *mnuScheme;
+extern Fl_Button *pref_sys_foreground;
+extern Fl_Button *pref_sys_background;
+extern Fl_Button *prefsys_background2;
+extern Fl_Button *prefsys_defaults;
+extern Fl_Wheel_Value_Slider *sldrColors;
+extern Fl_Button *pref_slider_background;
+extern Fl_Button *pref_slider_select;
+extern Fl_Button *prefslider_defaults;
+extern Fl_Button *btnReset;
 extern Fl_Button *btnCancel;
 #include <FL/Fl_Return_Button.H>
 extern Fl_Return_Button *btnOkDisplayDialog;
-extern Fl_Box *lblTest;
-extern Fl_Button *prefFont;
-extern Fl_Button *prefForeground;
+extern Fl_Light_Button *btn_lighted;
+extern Fl_Button *btn_lighted_default;
 Fl_Double_Window* DisplayDialog();
 extern Fl_Button *btnAddFreq;
 extern Fl_Button *btnDelFreq;
@@ -175,7 +188,6 @@ extern Fl_ComboBox *op_tt550_XmtBW;
 extern Fl_Check_Button *btn_tt550_use_xmt_bw;
 extern Fl_Check_Button *btnAccInp;
 extern Fl_Counter *cnt_tt550_encoder_sensitivity;
-#include <FL/Fl_Choice.H>
 extern Fl_Choice *sel_tt550_encoder_step;
 extern Fl_Counter *cnt_tt550_keypad_time_out;
 extern Fl_Button *btn_close_TT550_setup;

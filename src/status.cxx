@@ -168,9 +168,35 @@ status progStatus = {
 	0,			// int	peakGreen;
 	0,			// int	peakBlue;
 
+	0,			// int	fg_sys_red;
+	0,			// int	fg_sys_green;
+	0,			// int	fg_sys_blue;
+
+	0xc0,		// int	bg_sys_red;
+	0xc0,		// int	bg_sys_green;
+	0xc0,		// int	bg_sys_blue;
+
+	255,		// int	bg2_sys_red;
+	255,		// int	bg2_sys_green;
+	255,		// int	bg2_sys_blue;
+
+	232,		// int		slider_red;
+	255,		// int		slider_green;
+	232,		// int		slider_blue;
+
+	0,			// int		slider_btn_red;
+	0,			// int		slider_btn_green;
+	128,		// int		slider_btn_blue;
+
+	255,		// int		lighted_btn_red;
+	255,		// int		lighted_btn_green;
+	0,			// int		lighted_btn_blue;
+
 	FL_COURIER,	// Fl_Font fontnbr;
 
 	false,		// bool	 tooltips;
+
+	"gtk+",		// string ui_scheme
 
 	"7362"		// string server_port
 
@@ -337,6 +363,30 @@ void status::saveLastState()
 	spref.set("peak_red", peakRed);
 	spref.set("peak_green", peakGreen);
 	spref.set("peak_blue", peakBlue);
+
+	spref.set("fg_sys_red", fg_sys_red);
+	spref.set("fg_sys_green", fg_sys_green);
+	spref.set("fg_sys_blue", fg_sys_blue);
+
+	spref.set("bg_sys_red", bg_sys_red);
+	spref.set("bg_sys_green", bg_sys_green);
+	spref.set("bg_sys_blue", bg_sys_blue);
+
+	spref.set("bg2_sys_red", bg2_sys_red);
+	spref.set("bg2_sys_green", bg2_sys_green);
+	spref.set("bg2_sys_blue", bg2_sys_blue);
+
+	spref.set("slider_red", slider_red);
+	spref.set("slider_green", slider_green);
+	spref.set("slider_blue", slider_blue);
+
+	spref.set("slider_btn_red", slider_btn_red);
+	spref.set("slider_btn_green", slider_btn_green);
+	spref.set("slider_btn_blue", slider_btn_blue);
+
+	spref.set("lighted_btn_red", lighted_btn_red);
+	spref.set("lighted_btn_green", lighted_btn_green);
+	spref.set("lighted_btn_blue", lighted_btn_blue);
 
 	spref.set("fontnbr", fontnbr);
 
@@ -514,6 +564,30 @@ bool status::loadXcvrState(const char *xcvr)
 		spref.get("peak_green", peakGreen, peakGreen);
 		spref.get("peak_blue", peakBlue, peakBlue);
 
+		spref.get("fg_sys_red", fg_sys_red, fg_sys_red);
+		spref.get("fg_sys_green", fg_sys_green, fg_sys_green);
+		spref.get("fg_sys_blue", fg_sys_blue, fg_sys_blue);
+
+		spref.get("bg_sys_red", bg_sys_red, bg_sys_red);
+		spref.get("bg_sys_green", bg_sys_green, bg_sys_green);
+		spref.get("bg_sys_blue", bg_sys_blue, bg_sys_blue);
+
+		spref.get("bg2_sys_red", bg2_sys_red, bg2_sys_red);
+		spref.get("bg2_sys_green", bg2_sys_green, bg2_sys_green);
+		spref.get("bg2_sys_blue", bg2_sys_blue, bg2_sys_blue);
+
+		spref.get("slider_red", slider_red, slider_red);
+		spref.get("slider_green", slider_green, slider_green);
+		spref.get("slider_blue", slider_blue, slider_blue);
+
+		spref.get("slider_btn_red", slider_btn_red, slider_btn_red);
+		spref.get("slider_btn_green", slider_btn_green, slider_btn_green);
+		spref.get("slider_btn_blue", slider_btn_blue, slider_btn_blue);
+
+		spref.get("lighted_btn_red", lighted_btn_red, lighted_btn_red);
+		spref.get("lighted_btn_green", lighted_btn_green, lighted_btn_green);
+		spref.get("lighted_btn_blue", lighted_btn_blue, lighted_btn_blue);
+
 		i = (int)fontnbr;
 		spref.get("fontnbr", i, i); fontnbr = (Fl_Font)i;
 		i = 0;
@@ -526,6 +600,10 @@ bool status::loadXcvrState(const char *xcvr)
 
 	Fl_Color bgclr = fl_rgb_color(bg_red, bg_green, bg_blue);
 	Fl_Color fgclr = fl_rgb_color(fg_red, fg_green, fg_blue);
+
+	Fl::background( bg_sys_red, bg_sys_green, bg_sys_blue);
+	Fl::background2( bg2_sys_red, bg2_sys_green, bg2_sys_blue);
+	Fl::foreground( fg_sys_red, fg_sys_green, fg_sys_blue);
 
 	FreqDispA->SetONOFFCOLOR( fgclr, bgclr );
 	FreqDispA->font(fontnbr);
@@ -550,6 +628,49 @@ bool status::loadXcvrState(const char *xcvr)
 
 	grpMeters->color(bgclr);
 	grpMeters->labelcolor(fgclr);
+
+	Fl_Color btn_lt_color = fl_rgb_color(lighted_btn_red, lighted_btn_green, lighted_btn_blue);
+	if (btnVol)				btnVol->selection_color(btn_lt_color);
+	if (btnNR)				btnNR->selection_color(btn_lt_color);
+	if (btnIFsh)			btnIFsh->selection_color(btn_lt_color);
+	if (btnNotch)			btnNotch->selection_color(btn_lt_color);
+	if (btnA)				btnA->selection_color(btn_lt_color);
+	if (btnB)				btnB->selection_color(btn_lt_color);
+	if (btnSplit)			btnSplit->selection_color(btn_lt_color);
+	if (btnAttenuator)		btnAttenuator->selection_color(btn_lt_color);
+	if (btnPreamp)			btnPreamp->selection_color(btn_lt_color);
+	if (btnNOISE)			btnNOISE->selection_color(btn_lt_color);
+	if (btnAutoNotch)		btnAutoNotch->selection_color(btn_lt_color);
+	if (btnTune)			btnTune->selection_color(btn_lt_color);
+	if (btnPTT)				btnPTT->selection_color(btn_lt_color);
+	if (btnAuxRTS)			btnAuxRTS->selection_color(btn_lt_color);
+	if (btnAuxDTR)			btnAuxDTR->selection_color(btn_lt_color);
+	if (btnMicLine)			btnMicLine->selection_color(btn_lt_color);
+	if (btnSpot)			btnSpot->selection_color(btn_lt_color);
+	if (btn_vox)			btn_vox->selection_color(btn_lt_color);
+	if (btnCompON)			btnCompON->selection_color(btn_lt_color);
+	if (btnSpecial)			btnSpecial->selection_color(btn_lt_color);
+	if (btn_tt550_vox)		btn_tt550_vox->selection_color(btn_lt_color);
+	if (btn_tt550_CompON)	btn_tt550_CompON->selection_color(btn_lt_color);
+
+	Fl_Color bg_slider = fl_rgb_color(slider_red, slider_green, slider_blue);
+	Fl_Color btn_slider = fl_rgb_color(slider_btn_red, slider_btn_green, slider_btn_blue);
+	if (sldrVOLUME)			sldrVOLUME->color(bg_slider);
+	if (sldrVOLUME)			sldrVOLUME->selection_color(btn_slider);
+	if (sldrRFGAIN)			sldrRFGAIN->color(bg_slider);
+	if (sldrRFGAIN)			sldrRFGAIN->selection_color(btn_slider);
+	if (sldrSQUELCH)		sldrSQUELCH->color(bg_slider);
+	if (sldrSQUELCH)		sldrSQUELCH->selection_color(btn_slider);
+	if (sldrNR)				sldrNR->color(bg_slider);
+	if (sldrNR)				sldrNR->selection_color(btn_slider);
+	if (sldrIFSHIFT)		sldrIFSHIFT->color(bg_slider);
+	if (sldrIFSHIFT)		sldrIFSHIFT->selection_color(btn_slider);
+	if (sldrNOTCH)			sldrNOTCH->color(bg_slider);
+	if (sldrNOTCH)			sldrNOTCH->selection_color(btn_slider);
+	if (sldrMICGAIN)		sldrMICGAIN->color(bg_slider);
+	if (sldrMICGAIN)		sldrMICGAIN->selection_color(btn_slider);
+	if (sldrPOWER)			sldrPOWER->color(bg_slider);
+	if (sldrPOWER)			sldrPOWER->selection_color(btn_slider);
 
 	if (use_rig_data) mnuKeepData->set();
 	else mnuKeepData->clear();

@@ -1,3 +1,7 @@
+#include <FL/Fl.H>
+#include <FL/x.H>
+#include <FL/fl_draw.H>
+
 #include "dialogs.h"
 #include "util.h"
 #include "debug.h"
@@ -29,6 +33,8 @@ using namespace std;
 #  include <glob.h>
 #endif
 
+#include "rig.h"
+
 Fl_Double_Window *dlgDisplayConfig = NULL;
 Fl_Double_Window *dlgXcvrConfig = NULL;
 Fl_Double_Window *dlgMemoryDialog = NULL;
@@ -36,6 +42,7 @@ Fl_Double_Window *dlgControls = NULL;
 Fl_Double_Window *tt550_controls = NULL;
 Font_Browser     *fntbrowser = NULL;
 
+Fl_Color flrig_def_color(int);
 
 //======================================================================
 // test comm ports
@@ -180,8 +187,6 @@ out:
 
 void init_port_combos()
 {
-	int retval;
-
 	clear_combos();
 
 	struct stat st;
@@ -455,8 +460,153 @@ uchar smeterRed, smeterGreen, smeterBlue;
 uchar peakRed, peakGreen, peakBlue;
 uchar pwrRed, pwrGreen, pwrBlue;
 uchar swrRed, swrGreen, swrBlue;
+
 Fl_Color bgclr;
 Fl_Color fgclr;
+
+Fl_Color fgsys;
+static uchar fg_sys_red, fg_sys_green, fg_sys_blue;
+
+Fl_Color bgsys;
+static uchar bg_sys_red, bg_sys_green, bg_sys_blue;
+
+Fl_Color bg2sys;
+static uchar bg2_sys_red, bg2_sys_green, bg2_sys_blue;
+
+Fl_Color bg_slider;
+static uchar bg_slider_red, bg_slider_green, bg_slider_blue;
+
+Fl_Color btn_slider;
+static uchar btn_slider_red, btn_slider_green, btn_slider_blue;
+
+Fl_Color btn_lt_color;
+static uchar btn_lt_color_red, btn_lt_color_green, btn_lt_color_blue;
+
+void cb_lighted_button()
+{
+	uchar r = btn_lt_color_red, g = btn_lt_color_green, b = btn_lt_color_blue;
+	if (fl_color_chooser("Foreground color", r, g, b)) {
+		btn_lt_color_red = r; btn_lt_color_green = g; btn_lt_color_blue = b;
+		btn_lt_color = fl_rgb_color(r, g, b);
+		btn_lighted->selection_color(btn_lt_color);
+		btn_lighted->value(1);
+		btn_lighted->redraw();
+	}
+}
+
+void cb_lighted_default()
+{
+	btn_lt_color = flrig_def_color(FL_YELLOW);
+	btn_lt_color_red = ((btn_lt_color >> 24) & 0xFF);
+	btn_lt_color_green = ((btn_lt_color >> 16) & 0xFF);
+	btn_lt_color_blue = ((btn_lt_color >> 8) & 0xFF);
+	btn_lighted->selection_color(btn_lt_color);
+	btn_lighted->value(1);
+	btn_lighted->redraw();
+}
+
+void cb_slider_defaults()
+{
+	bg_slider_red = 232;
+	bg_slider_green = 255;
+	bg_slider_blue = 232;
+
+	btn_slider_red = 0;
+	btn_slider_green = 0;
+	btn_slider_blue = 128;
+
+	bg_slider = fl_rgb_color( 232, 255, 232);
+	btn_slider = fl_rgb_color( 0, 0, 128);
+
+	sldrColors->color(bg_slider);
+	sldrColors->selection_color(btn_slider);
+	sldrColors->redraw();
+}
+
+void cb_slider_background()
+{
+	uchar r = bg_slider_red, g = bg_slider_green, b = bg_slider_blue;
+	if (fl_color_chooser("Foreground color", r, g, b)) {
+		bg_slider_red = r; bg_slider_green = g; bg_slider_blue = b;
+		bg_slider = fl_rgb_color(r, g, b);
+		sldrColors->color(bg_slider);
+		sldrColors->selection_color(btn_slider);
+		sldrColors->redraw();
+	}
+}
+
+void cb_slider_select()
+{
+	uchar r = btn_slider_red, g = btn_slider_green, b = btn_slider_blue;
+	if (fl_color_chooser("Foreground color", r, g, b)) {
+		btn_slider_red = r; btn_slider_green = g; btn_slider_blue = b;
+		btn_slider = fl_rgb_color(r, g, b);
+		sldrColors->color(bg_slider);
+		sldrColors->selection_color(btn_slider);
+		sldrColors->redraw();
+	}
+}
+
+void cb_sys_defaults()
+{
+	bgsys = flrig_def_color(FL_BACKGROUND_COLOR);
+	bg_sys_red = ((bgsys >> 24) & 0xFF);
+	bg_sys_green = ((bgsys >> 16) & 0xFF);
+	bg_sys_blue = ((bgsys >> 8) & 0xFF);
+
+	bg2sys = flrig_def_color(FL_BACKGROUND2_COLOR);
+	bg2_sys_red = ((bg2sys) >> 24 & 0xFF);
+	bg2_sys_green = ((bg2sys) >> 16 & 0xFF);
+	bg2_sys_blue = ((bg2sys) >> 8 & 0xFF);
+
+	fgsys = flrig_def_color(FL_FOREGROUND_COLOR);
+	fg_sys_red = (fgsys >> 24) & 0xFF;
+	fg_sys_green = (fgsys >> 16) & 0xFF;
+	fg_sys_blue = (fgsys >> 8) & 0xFF;
+
+	Fl::background(bg_sys_red, bg_sys_green, bg_sys_blue);
+	Fl::background2(bg2_sys_red, bg2_sys_green, bg2_sys_blue);
+	Fl::foreground(fg_sys_red, fg_sys_green, fg_sys_blue);
+
+	dlgDisplayConfig->redraw();
+	mainwindow->redraw();
+}
+
+void cb_sys_foreground()
+{
+	uchar r = fg_sys_red, g = fg_sys_green, b = fg_sys_blue;
+	if (fl_color_chooser("Foreground color", r, g, b)) {
+		fg_sys_red = r; fg_sys_green = g; fg_sys_blue = b;
+		fgsys = fl_rgb_color(r, g, b);
+		Fl::foreground(r, g, b);
+		dlgDisplayConfig->redraw();
+		mainwindow->redraw();
+	}
+}
+
+void cb_sys_background()
+{
+	uchar r = bg_sys_red, g = bg_sys_green, b = bg_sys_blue;
+	if (fl_color_chooser("Background color", r, g, b)) {
+		bg_sys_red = r; bg_sys_green = g; bg_sys_blue = b;
+		bgsys = fl_rgb_color(r, g, b);
+		Fl::background(r, g, b);
+		dlgDisplayConfig->redraw();
+		mainwindow->redraw();
+	}
+}
+
+void cb_sys_background2()
+{
+	uchar r = bg2_sys_red, g = bg2_sys_green, b = bg2_sys_blue;
+	if (fl_color_chooser("Background2 color", r, g, b)) {
+		bg2_sys_red = r; bg2_sys_green = g; bg2_sys_blue = b;
+		bg2sys = fl_rgb_color(r, g, b);
+		Fl::background2(r, g, b);
+		dlgDisplayConfig->redraw();
+		mainwindow->redraw();
+	}
+}
 
 void cbBacklightColor()
 {
@@ -482,13 +632,50 @@ void cbPrefForeground()
 	if (fl_color_chooser("Foreground color", r, g, b)) {
 		fg_red = r; fg_green = g; fg_blue = b;
 		fgclr = fl_rgb_color(r, g, b);
-		lblTest->labelcolor(fl_rgb_color (r, g, b));
+		lblTest->labelcolor(fgclr);
 		scaleSmeterColor->labelcolor(fgclr);
 		scalePWRcolor->labelcolor(fgclr);
 		scaleSWRcolor->labelcolor(fgclr);
 		grpMeterColor->labelcolor(fgclr);
 		dlgDisplayConfig->redraw();
 	}
+}
+
+void default_meters()
+{
+	Fl_Color c;
+	bg_red = 232; bg_green = 255; bg_blue = 232;
+	bgclr = fl_rgb_color( bg_red, bg_green, bg_blue);
+		lblTest->color(bgclr);
+		sldrRcvSignalColor->color( fl_rgb_color (smeterRed, smeterGreen, smeterBlue), bgclr );
+		sldrPWRcolor->color(fl_rgb_color (pwrRed, pwrGreen, pwrBlue), bgclr);
+		sldrSWRcolor->color(fl_rgb_color (swrRed, swrGreen, swrBlue), bgclr);
+		scaleSmeterColor->color(bgclr);
+		scalePWRcolor->color(bgclr);
+		scaleSWRcolor->color(bgclr);
+		grpMeterColor->color(bgclr);
+	fg_red = 0; fg_green = 0; fg_blue = 0;
+	fgclr = (Fl_Color)0;
+		lblTest->labelcolor(fgclr);
+		scaleSmeterColor->labelcolor(fgclr);
+		scalePWRcolor->labelcolor(fgclr);
+		scaleSWRcolor->labelcolor(fgclr);
+		grpMeterColor->labelcolor(fgclr);
+	smeterRed = 0; smeterGreen = 180; smeterBlue = 0;
+		c = fl_rgb_color (smeterRed, smeterGreen, smeterBlue);
+		sldrRcvSignalColor->color(c, bgclr );
+	peakRed = 255; peakGreen = 0; peakBlue = 0;
+		c = fl_rgb_color( peakRed, peakGreen, peakBlue );
+		sldrRcvSignalColor->PeakColor(c);
+		sldrPWRcolor->PeakColor(c);
+		sldrSWRcolor->PeakColor(c);
+	pwrRed = 180; pwrGreen = 0; pwrBlue = 0;
+		c = fl_rgb_color( pwrRed, pwrGreen, pwrBlue );
+		sldrPWRcolor->color(c, bgclr);
+	swrRed = 148; swrGreen = 0; swrBlue = 148;
+		c = fl_rgb_color(swrRed, swrGreen, swrBlue);
+		sldrSWRcolor->color(c, bgclr);
+	dlgDisplayConfig->redraw();
 }
 
 void cbSMeterColor()
@@ -539,7 +726,7 @@ void cbSWRMeterColor()
 	}
 }
 
-void cbOkDisplayDialog()
+void setColors()
 {
 	progStatus.swrRed = swrRed;
 	progStatus.swrGreen = swrGreen;
@@ -569,6 +756,30 @@ void cbOkDisplayDialog()
 	FreqDispA->font(selfont);
 	FreqDispB->font(selfont);
 
+	progStatus.fg_sys_red = fg_sys_red;
+	progStatus.fg_sys_green = fg_sys_green;
+	progStatus.fg_sys_blue = fg_sys_blue;
+
+	progStatus.bg_sys_red = bg_sys_red;
+	progStatus.bg_sys_green = bg_sys_green;
+	progStatus.bg_sys_blue = bg_sys_blue;
+
+	progStatus.bg2_sys_red = bg2_sys_red;
+	progStatus.bg2_sys_green = bg2_sys_green;
+	progStatus.bg2_sys_blue = bg2_sys_blue;
+
+	progStatus.slider_red = bg_slider_red;
+	progStatus.slider_green = bg_slider_green;
+	progStatus.slider_blue = bg_slider_blue;
+
+	progStatus.slider_btn_red = btn_slider_red;
+	progStatus.slider_btn_green = btn_slider_green;
+	progStatus.slider_btn_blue = btn_slider_blue;
+
+	progStatus.lighted_btn_red = btn_lt_color_red;
+	progStatus.lighted_btn_green = btn_lt_color_green;
+	progStatus.lighted_btn_blue = btn_lt_color_blue;
+
 	if (useB) {
 		FreqDispB->SetONOFFCOLOR( fl_rgb_color(fg_red, fg_green, fg_blue), bgclr);
 		FreqDispA->SetONOFFCOLOR(
@@ -594,9 +805,11 @@ void cbOkDisplayDialog()
 
 	sldrFwdPwr->color(fl_rgb_color (pwrRed, pwrGreen, pwrBlue), bgclr);
 	sldrFwdPwr->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
+	sldrFwdPwr->redraw();
 
 	sldrRcvSignal->color(fl_rgb_color (smeterRed, smeterGreen, smeterBlue), bgclr);
 	sldrRcvSignal->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
+	sldrRcvSignal->redraw();
 
 	sldrALC_SWR->color(fl_rgb_color (swrRed, swrGreen, swrBlue), bgclr);
 	sldrALC_SWR->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
@@ -605,6 +818,61 @@ void cbOkDisplayDialog()
 	grpMeters->color(bgclr);
 	grpMeters->redraw();
 
+	if (btnVol)				btnVol->selection_color(btn_lt_color);
+	if (btnNR)				btnNR->selection_color(btn_lt_color);
+	if (btnIFsh)			btnIFsh->selection_color(btn_lt_color);
+	if (btnNotch)			btnNotch->selection_color(btn_lt_color);
+	if (btnA)				btnA->selection_color(btn_lt_color);
+	if (btnB)				btnB->selection_color(btn_lt_color);
+	if (btnSplit)			btnSplit->selection_color(btn_lt_color);
+	if (btnAttenuator)		btnAttenuator->selection_color(btn_lt_color);
+	if (btnPreamp)			btnPreamp->selection_color(btn_lt_color);
+	if (btnNOISE)			btnNOISE->selection_color(btn_lt_color);
+	if (btnAutoNotch)		btnAutoNotch->selection_color(btn_lt_color);
+	if (btnTune)			btnTune->selection_color(btn_lt_color);
+	if (btnPTT)				btnPTT->selection_color(btn_lt_color);
+	if (btnAuxRTS)			btnAuxRTS->selection_color(btn_lt_color);
+	if (btnAuxDTR)			btnAuxDTR->selection_color(btn_lt_color);
+	if (btnMicLine)			btnMicLine->selection_color(btn_lt_color);
+	if (btnSpot)			btnSpot->selection_color(btn_lt_color);
+	if (btn_vox)			btn_vox->selection_color(btn_lt_color);
+	if (btnCompON)			btnCompON->selection_color(btn_lt_color);
+	if (btnSpecial)			btnSpecial->selection_color(btn_lt_color);
+	if (btn_tt550_vox)		btn_tt550_vox->selection_color(btn_lt_color);
+	if (btn_tt550_CompON)	btn_tt550_CompON->selection_color(btn_lt_color);
+
+	if (sldrVOLUME)			sldrVOLUME->color(bg_slider);
+	if (sldrVOLUME)			sldrVOLUME->selection_color(btn_slider);
+	if (sldrRFGAIN)			sldrRFGAIN->color(bg_slider);
+	if (sldrRFGAIN)			sldrRFGAIN->selection_color(btn_slider);
+	if (sldrSQUELCH)		sldrSQUELCH->color(bg_slider);
+	if (sldrSQUELCH)		sldrSQUELCH->selection_color(btn_slider);
+	if (sldrNR)				sldrNR->color(bg_slider);
+	if (sldrNR)				sldrNR->selection_color(btn_slider);
+	if (sldrIFSHIFT)		sldrIFSHIFT->color(bg_slider);
+	if (sldrIFSHIFT)		sldrIFSHIFT->selection_color(btn_slider);
+	if (sldrNOTCH)			sldrNOTCH->color(bg_slider);
+	if (sldrNOTCH)			sldrNOTCH->selection_color(btn_slider);
+	if (sldrMICGAIN)		sldrMICGAIN->color(bg_slider);
+	if (sldrMICGAIN)		sldrMICGAIN->selection_color(btn_slider);
+	if (sldrPOWER)			sldrPOWER->color(bg_slider);
+	if (sldrPOWER)			sldrPOWER->selection_color(btn_slider);
+
+	mainwindow->redraw();
+}
+
+void cb_reset_display_dialog()
+{
+	cb_sys_defaults();
+	cb_lighted_default();
+	cb_slider_defaults();
+	default_meters();
+	setColors();
+}
+
+void cbOkDisplayDialog()
+{
+	setColors();
 	dlgDisplayConfig->hide();
 }
 
@@ -645,6 +913,33 @@ void setDisplayColors()
 	bgclr = fl_rgb_color(bg_red, bg_green, bg_blue);
 	fgclr = fl_rgb_color(fg_red, fg_green, fg_blue);
 
+	fg_sys_red = progStatus.fg_sys_red;
+	fg_sys_green = progStatus.fg_sys_green;
+	fg_sys_blue = progStatus.fg_sys_blue;
+
+	bg_sys_red = progStatus.bg_sys_red;
+	bg_sys_green = progStatus.bg_sys_green;
+	bg_sys_blue = progStatus.bg_sys_blue;
+
+	bg2_sys_red = progStatus.bg2_sys_red;
+	bg2_sys_green = progStatus.bg2_sys_green;
+	bg2_sys_blue = progStatus.bg2_sys_blue;
+
+	bg_slider_red = progStatus.slider_red;
+	bg_slider_green = progStatus.slider_green;
+	bg_slider_blue = progStatus.slider_blue;
+
+	btn_slider_red = progStatus.slider_btn_red;
+	btn_slider_green = progStatus.slider_btn_green;
+	btn_slider_blue = progStatus.slider_btn_blue;
+
+	sldrColors->color(fl_rgb_color(bg_slider_red, bg_slider_green, bg_slider_blue));
+	sldrColors->selection_color(fl_rgb_color(btn_slider_red, btn_slider_green, btn_slider_blue));
+
+	btn_lt_color_red = progStatus.lighted_btn_red;
+	btn_lt_color_green = progStatus.lighted_btn_green;
+	btn_lt_color_blue = progStatus.lighted_btn_blue;
+
 	lblTest->labelcolor(fl_rgb_color(fg_red, fg_green, fg_blue));
 	lblTest->color(bgclr);
 
@@ -679,6 +974,16 @@ void setDisplayColors()
 	sldrSWRcolor->maximum(100);
 	sldrSWRcolor->value(25);
 
+	btn_lt_color = fl_rgb_color( btn_lt_color_red, btn_lt_color_green, btn_lt_color_blue);
+	btn_slider = fl_rgb_color( btn_slider_red, btn_slider_green, btn_slider_blue);
+	bg_slider = fl_rgb_color(bg_slider_red, bg_slider_green, bg_slider_blue);
+
+	btn_lighted->value(1);
+	btn_lighted->selection_color(btn_lt_color);
+
+	sldrColors->color(bg_slider);
+	sldrColors->selection_color(btn_slider);
+
 	dlgDisplayConfig->show();
 }
 
@@ -705,4 +1010,272 @@ void show_controls()
 void cb_close_TT550_setup()
 {
 	tt550_controls->hide();
+}
+
+// a replica of the default color map used by Fltk
+
+static unsigned flrig_cmap[256] = {
+	0x00000000,
+	0xff000000,
+	0x00ff0000,
+	0xffff0000,
+	0x0000ff00,
+	0xff00ff00,
+	0x00ffff00,
+	0xffffff00,
+	0x55555500,
+	0xc6717100,
+	0x71c67100,
+	0x8e8e3800,
+	0x7171c600,
+	0x8e388e00,
+	0x388e8e00,
+	0x00008000,
+	0xa8a89800,
+	0xe8e8d800,
+	0x68685800,
+	0x98a8a800,
+	0xd8e8e800,
+	0x58686800,
+	0x9c9ca800,
+	0xdcdce800,
+	0x5c5c6800,
+	0x9ca89c00,
+	0xdce8dc00,
+	0x5c685c00,
+	0x90909000,
+	0xc0c0c000,
+	0x50505000,
+	0xa0a0a000,
+	0x00000000,
+	0x0d0d0d00,
+	0x1a1a1a00,
+	0x26262600,
+	0x31313100,
+	0x3d3d3d00,
+	0x48484800,
+	0x55555500,
+	0x5f5f5f00,
+	0x6a6a6a00,
+	0x75757500,
+	0x80808000,
+	0x8a8a8a00,
+	0x95959500,
+	0xa0a0a000,
+	0xaaaaaa00,
+	0xb5b5b500,
+	0xc0c0c000,
+	0xcbcbcb00,
+	0xd5d5d500,
+	0xe0e0e000,
+	0xeaeaea00,
+	0xf5f5f500,
+	0xffffff00,
+	0x00000000,
+	0x00240000,
+	0x00480000,
+	0x006d0000,
+	0x00910000,
+	0x00b60000,
+	0x00da0000,
+	0x00ff0000,
+	0x3f000000,
+	0x3f240000,
+	0x3f480000,
+	0x3f6d0000,
+	0x3f910000,
+	0x3fb60000,
+	0x3fda0000,
+	0x3fff0000,
+	0x7f000000,
+	0x7f240000,
+	0x7f480000,
+	0x7f6d0000,
+	0x7f910000,
+	0x7fb60000,
+	0x7fda0000,
+	0x7fff0000,
+	0xbf000000,
+	0xbf240000,
+	0xbf480000,
+	0xbf6d0000,
+	0xbf910000,
+	0xbfb60000,
+	0xbfda0000,
+	0xbfff0000,
+	0xff000000,
+	0xff240000,
+	0xff480000,
+	0xff6d0000,
+	0xff910000,
+	0xffb60000,
+	0xffda0000,
+	0xffff0000,
+	0x00003f00,
+	0x00243f00,
+	0x00483f00,
+	0x006d3f00,
+	0x00913f00,
+	0x00b63f00,
+	0x00da3f00,
+	0x00ff3f00,
+	0x3f003f00,
+	0x3f243f00,
+	0x3f483f00,
+	0x3f6d3f00,
+	0x3f913f00,
+	0x3fb63f00,
+	0x3fda3f00,
+	0x3fff3f00,
+	0x7f003f00,
+	0x7f243f00,
+	0x7f483f00,
+	0x7f6d3f00,
+	0x7f913f00,
+	0x7fb63f00,
+	0x7fda3f00,
+	0x7fff3f00,
+	0xbf003f00,
+	0xbf243f00,
+	0xbf483f00,
+	0xbf6d3f00,
+	0xbf913f00,
+	0xbfb63f00,
+	0xbfda3f00,
+	0xbfff3f00,
+	0xff003f00,
+	0xff243f00,
+	0xff483f00,
+	0xff6d3f00,
+	0xff913f00,
+	0xffb63f00,
+	0xffda3f00,
+	0xffff3f00,
+	0x00007f00,
+	0x00247f00,
+	0x00487f00,
+	0x006d7f00,
+	0x00917f00,
+	0x00b67f00,
+	0x00da7f00,
+	0x00ff7f00,
+	0x3f007f00,
+	0x3f247f00,
+	0x3f487f00,
+	0x3f6d7f00,
+	0x3f917f00,
+	0x3fb67f00,
+	0x3fda7f00,
+	0x3fff7f00,
+	0x7f007f00,
+	0x7f247f00,
+	0x7f487f00,
+	0x7f6d7f00,
+	0x7f917f00,
+	0x7fb67f00,
+	0x7fda7f00,
+	0x7fff7f00,
+	0xbf007f00,
+	0xbf247f00,
+	0xbf487f00,
+	0xbf6d7f00,
+	0xbf917f00,
+	0xbfb67f00,
+	0xbfda7f00,
+	0xbfff7f00,
+	0xff007f00,
+	0xff247f00,
+	0xff487f00,
+	0xff6d7f00,
+	0xff917f00,
+	0xffb67f00,
+	0xffda7f00,
+	0xffff7f00,
+	0x0000bf00,
+	0x0024bf00,
+	0x0048bf00,
+	0x006dbf00,
+	0x0091bf00,
+	0x00b6bf00,
+	0x00dabf00,
+	0x00ffbf00,
+	0x3f00bf00,
+	0x3f24bf00,
+	0x3f48bf00,
+	0x3f6dbf00,
+	0x3f91bf00,
+	0x3fb6bf00,
+	0x3fdabf00,
+	0x3fffbf00,
+	0x7f00bf00,
+	0x7f24bf00,
+	0x7f48bf00,
+	0x7f6dbf00,
+	0x7f91bf00,
+	0x7fb6bf00,
+	0x7fdabf00,
+	0x7fffbf00,
+	0xbf00bf00,
+	0xbf24bf00,
+	0xbf48bf00,
+	0xbf6dbf00,
+	0xbf91bf00,
+	0xbfb6bf00,
+	0xbfdabf00,
+	0xbfffbf00,
+	0xff00bf00,
+	0xff24bf00,
+	0xff48bf00,
+	0xff6dbf00,
+	0xff91bf00,
+	0xffb6bf00,
+	0xffdabf00,
+	0xffffbf00,
+	0x0000ff00,
+	0x0024ff00,
+	0x0048ff00,
+	0x006dff00,
+	0x0091ff00,
+	0x00b6ff00,
+	0x00daff00,
+	0x00ffff00,
+	0x3f00ff00,
+	0x3f24ff00,
+	0x3f48ff00,
+	0x3f6dff00,
+	0x3f91ff00,
+	0x3fb6ff00,
+	0x3fdaff00,
+	0x3fffff00,
+	0x7f00ff00,
+	0x7f24ff00,
+	0x7f48ff00,
+	0x7f6dff00,
+	0x7f91ff00,
+	0x7fb6ff00,
+	0x7fdaff00,
+	0x7fffff00,
+	0xbf00ff00,
+	0xbf24ff00,
+	0xbf48ff00,
+	0xbf6dff00,
+	0xbf91ff00,
+	0xbfb6ff00,
+	0xbfdaff00,
+	0xbfffff00,
+	0xff00ff00,
+	0xff24ff00,
+	0xff48ff00,
+	0xff6dff00,
+	0xff91ff00,
+	0xffb6ff00,
+	0xffdaff00,
+	0xffffff00
+};
+
+Fl_Color flrig_def_color(int n)
+{
+	if ( n > 255 ) n = 255;
+	if (n < 0) n = 0;
+	return (Fl_Color)flrig_cmap[n];
 }
