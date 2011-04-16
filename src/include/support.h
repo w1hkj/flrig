@@ -12,15 +12,17 @@
 #include <sys/shm.h>
 #endif
 
+#include <FL/Fl.H>
+#include <FL/fl_draw.H>
+#include <FL/fl_show_colormap.H>
+#include <FL/fl_ask.H>
+
 #include "rig.h"
 #include "rigbase.h"
 #include "rig_io.h"
 #include "images.h"
 #include "serial.h"
 #include "status.h"
-
-#include <FL/fl_show_colormap.H>
-#include <FL/fl_ask.H>
 
 #define LISTSIZE 200
 
@@ -185,6 +187,7 @@ extern void cbOkXcvrDialog();
 extern void cbCancelXcvrDialog();
 extern void initCommPortTable ();
 extern void configXcvr();
+extern void setColors();
 extern void setDisplayColors();
 extern void openMemoryDialog();
 extern void cbCloseMemory();
@@ -200,6 +203,21 @@ extern void cbPwrMeterColor();
 extern void cbSWRMeterColor();
 extern void cbPeakMeterColor();
 extern void cbBacklightColor();
+
+extern void cb_sys_defaults();
+extern void cb_sys_foreground();
+extern void cb_sys_background();
+extern void cb_sys_background2();
+
+extern void cb_reset_display_dialog();
+extern void cb_slider_background();
+extern void cb_slider_select();
+extern void cb_slider_defaults();
+
+extern void cb_lighted_button();
+extern void cb_lighted_default();
+
+extern Fl_Color flrig_def_color(int);
 
 extern void * serial_thread_loop( void * );
 extern bool bypass_serial_thread_loop;

@@ -158,9 +158,35 @@ struct status {
 	int		peakGreen;
 	int		peakBlue;
 
+	int		fg_sys_red;
+	int		fg_sys_green;
+	int		fg_sys_blue;
+
+	int		bg_sys_red;
+	int		bg_sys_green;
+	int		bg_sys_blue;
+
+	int		bg2_sys_red;
+	int		bg2_sys_green;
+	int		bg2_sys_blue;
+
+	int		slider_red;
+	int		slider_green;
+	int		slider_blue;
+
+	int		slider_btn_red;
+	int		slider_btn_green;
+	int		slider_btn_blue;
+
+	int		lighted_btn_red;
+	int		lighted_btn_green;
+	int		lighted_btn_blue;
+
 	Fl_Font	fontnbr;
 
 	bool	tooltips;
+	
+	string	ui_scheme;
 
 	string server_port;
 

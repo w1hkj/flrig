@@ -16,9 +16,9 @@ decl {\#include "support.h"} {}
 Function {Rig_window()} {open
 } {
   Fl_Window {} {
-    label Flrig
-    xywh {577 57 424 330} type Double color 52 align 80 hide
-    code0 {\#include <stdlib.h>}
+    label Flrig open
+    xywh {577 57 424 330} type Double align 80
+    code0 {\#include <stdlib.h>} visible
   } {
     Fl_Menu_Bar {} {open
       xywh {0 0 424 22} textsize 12
@@ -107,7 +107,7 @@ Fl_Tooltip::enable(progStatus.tooltips);}
       }
     }
     Fl_Output txt_encA {
-      xywh {334 0 90 22} box THIN_DOWN_BOX color 215 align 20 hide
+      xywh {334 0 90 22} box THIN_DOWN_BOX align 20 hide
     }
     Fl_Box FreqDispA {
       label 10
@@ -128,11 +128,11 @@ Fl_Tooltip::enable(progStatus.tooltips);}
     Fl_Light_Button btnVol {
       label Vol
       callback {cbMute();}
-      tooltip {Speaker on/off} xywh {2 125 60 18} down_box THIN_DOWN_BOX value 1 color 50 selection_color 113 labelsize 12
+      tooltip {Speaker on/off} xywh {2 125 60 18} down_box THIN_DOWN_BOX value 1 labelsize 12
     }
     Fl_Value_Slider sldrVOLUME {
       callback {setVolume();}
-      tooltip {Adjust Audio Volume} xywh {68 125 355 18} type {Horz Knob} box THIN_DOWN_BOX color 206 selection_color 221 labelsize 12 align 16 maximum 100 step 1 textsize 12
+      tooltip {Adjust Audio Volume} xywh {68 125 355 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 16 maximum 100 step 1 textsize 12
       code0 {\#include "ValueSlider.h"}
       code1 {o->reverse(true);}
       class Fl_Wheel_Value_Slider
@@ -140,67 +140,67 @@ Fl_Tooltip::enable(progStatus.tooltips);}
     Fl_Value_Slider sldrRFGAIN {
       label RF
       callback {setRFGAIN();}
-      tooltip {Adjust RF gain} xywh {68 145 355 18} type {Horz Knob} box THIN_DOWN_BOX color 206 selection_color 221 align 4 maximum 100 step 1 value 15 textsize 12
+      tooltip {Adjust RF gain} xywh {68 145 355 18} type {Horz Knob} box THIN_DOWN_BOX align 4 maximum 100 step 1 value 15 textsize 12
       code0 {o->reverse(true);}
       class Fl_Wheel_Value_Slider
     }
     Fl_Value_Slider sldrSQUELCH {
       label SQL
       callback {setSQUELCH();}
-      tooltip {Adjust Squelch} xywh {68 165 355 18} type {Horz Knob} box THIN_DOWN_BOX color 206 selection_color 221 align 4 maximum 100 step 1 value 15 textsize 12
+      tooltip {Adjust Squelch} xywh {68 165 355 18} type {Horz Knob} box THIN_DOWN_BOX align 4 maximum 100 step 1 value 15 textsize 12
       code0 {o->reverse(true);}
       class Fl_Wheel_Value_Slider
     }
     Fl_Light_Button btnNR {
       label NR
       callback {cbNR();}
-      tooltip {Noise Reduction On/Off} xywh {2 185 60 18} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
+      tooltip {Noise Reduction On/Off} xywh {2 185 60 18} down_box THIN_DOWN_BOX labelsize 12
     }
     Fl_Value_Slider sldrNR {
       callback {setNR();}
-      tooltip {Adjust noise reduction} xywh {68 185 355 18} type {Horz Knob} box THIN_DOWN_BOX color 206 selection_color 221 labelsize 12 align 16 maximum 100 step 2 textsize 12
+      tooltip {Adjust noise reduction} xywh {68 185 355 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 16 maximum 100 step 2 textsize 12
       code0 {o->reverse(true);}
       class Fl_Wheel_Value_Slider
     }
     Fl_Light_Button btnIFsh {
       label IFsh
       callback {cbIFsh();}
-      tooltip {IF Shift On/Off} xywh {2 206 60 18} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
+      tooltip {IF Shift On/Off} xywh {2 206 60 18} down_box THIN_DOWN_BOX labelsize 12
     }
     Fl_Value_Slider sldrIFSHIFT {
       callback {setIFshift();}
-      tooltip {Adjust IF Shift} xywh {68 206 355 18} type {Horz Knob} box THIN_DOWN_BOX color 206 selection_color 221 labelsize 12 align 16 minimum -1000 maximum 1000 step 10 textsize 12
+      tooltip {Adjust IF Shift} xywh {68 206 355 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 16 minimum -1000 maximum 1000 step 10 textsize 12
       code0 {o->reverse(true);}
       class Fl_Wheel_Value_Slider
     }
     Fl_Light_Button btnNotch {
       label Ntch
       callback {cbbtnNotch();}
-      tooltip {Notch - Manual (off) Auto (on)} xywh {2 226 60 18} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
+      tooltip {Notch - Manual (off) Auto (on)} xywh {2 226 60 18} down_box THIN_DOWN_BOX labelsize 12
     }
     Fl_Value_Slider sldrNOTCH {
       callback {setNotch();}
-      tooltip {Adjust Notch Frequency} xywh {68 226 355 18} type {Horz Knob} box THIN_DOWN_BOX color 206 selection_color 221 align 16 minimum -1000 maximum 1000 step 10 textsize 12
+      tooltip {Adjust Notch Frequency} xywh {68 226 355 18} type {Horz Knob} box THIN_DOWN_BOX align 16 minimum -1000 maximum 1000 step 10 textsize 12
       code0 {o->reverse(true);}
       class Fl_Wheel_Value_Slider
     }
     Fl_Value_Slider sldrMICGAIN {
       label MIC
       callback {setMicGain();}
-      tooltip {Adjust Mic Gain} xywh {68 246 355 18} type {Horz Knob} box THIN_DOWN_BOX color 246 selection_color 221 align 4 maximum 100 step 1 textsize 12
+      tooltip {Adjust Mic Gain} xywh {68 246 355 18} type {Horz Knob} box THIN_DOWN_BOX align 4 maximum 100 step 1 textsize 12
       code0 {o->reverse(true);}
       class Fl_Wheel_Value_Slider
     }
     Fl_Value_Slider sldrPOWER {
       label PWR
       callback {setPower();}
-      tooltip {Adjust power level} xywh {68 266 355 18} type {Horz Knob} box THIN_DOWN_BOX color 246 selection_color 221 align 4 maximum 100 step 1 value 15 textsize 12
+      tooltip {Adjust power level} xywh {68 266 355 18} type {Horz Knob} box THIN_DOWN_BOX align 4 maximum 100 step 1 value 15 textsize 12
       code0 {o->reverse(true);}
       class Fl_Wheel_Value_Slider
     }
     Fl_Box txtInactive {
       label {1296000.000}
-      tooltip {Vfo \#2} xywh {211 76 128 19} box DOWN_BOX color 72 labelfont 4 labelsize 16 labelcolor 52 align 24 hide
+      tooltip {Vfo \#2} xywh {211 76 128 19} box DOWN_BOX labelfont 4 labelsize 16 align 24 hide
     }
     Fl_Light_Button btnA {
       label vfoA
@@ -208,7 +208,7 @@ Fl_Tooltip::enable(progStatus.tooltips);}
 	cb_selectA();
 btnA->value(1);
 btnB->value(0);}
-      tooltip {Rx-A / Tx-B} xywh {213 62 50 20} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
+      tooltip {Rx-A / Tx-B} xywh {213 62 50 20} down_box THIN_DOWN_BOX labelsize 12
       code0 {o->value(!useB);}
     }
     Fl_Light_Button btnB {
@@ -217,18 +217,18 @@ btnB->value(0);}
 	cb_selectB();
 btnB->value(1);
 btnA->value(0);}
-      tooltip {Rx-A / Tx-B} xywh {266 62 50 20} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
+      tooltip {Rx-A / Tx-B} xywh {266 62 50 20} down_box THIN_DOWN_BOX labelsize 12
       code0 {o->value(useB);}
     }
     Fl_Button btnA2B {
       label {A -> B}
       callback {cbA2B();}
-      tooltip {Copy A to B} xywh {319 62 50 20} down_box DOWN_BOX color 50 selection_color 134 labelsize 12
+      tooltip {Copy A to B} xywh {319 62 50 20} down_box DOWN_BOX labelsize 12
     }
     Fl_Light_Button btnSplit {
       label Split
       callback {cb_set_split(o->value());}
-      tooltip {Rx-A / Tx-B} xywh {372 62 50 20} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
+      tooltip {Rx-A / Tx-B} xywh {372 62 50 20} down_box THIN_DOWN_BOX labelsize 12
       code0 {o->value(progStatus.split);}
     }
     Fl_Group opMODE {
@@ -247,88 +247,88 @@ btnA->value(0);}
     Fl_Light_Button btnAttenuator {
       label Att
       callback {cbAttenuator();}
-      tooltip {Attenuator On/Off} xywh {2 286 60 18} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
+      tooltip {Attenuator On/Off} xywh {2 286 60 18} down_box THIN_DOWN_BOX labelsize 12
     }
     Fl_Light_Button btnPreamp {
       label Pre
       callback {cbPreamp();}
-      tooltip {Preamp On/Off} xywh {74 286 60 18} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
+      tooltip {Preamp On/Off} xywh {74 286 60 18} down_box THIN_DOWN_BOX labelsize 12
     }
     Fl_Light_Button btnNOISE {
       label NB
       callback {cbNoise();}
-      tooltip {Noise Blanker On/Off} xywh {146 286 60 18} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
+      tooltip {Noise Blanker On/Off} xywh {146 286 60 18} down_box THIN_DOWN_BOX labelsize 12
     }
     Fl_Light_Button btnAutoNotch {
       label AN
       callback {cbAN();}
-      tooltip {Auto Notch On/Off} xywh {218 286 60 18} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
+      tooltip {Auto Notch On/Off} xywh {218 286 60 18} down_box THIN_DOWN_BOX labelsize 12
     }
     Fl_Button btnTune {
       label Tune
       callback {cbTune();}
-      tooltip {Momentary Tune} xywh {290 286 60 18} color 50
+      tooltip {Momentary Tune} xywh {290 286 60 18}
     }
     Fl_Light_Button btnPTT {
       label PTT
       callback {cbPTT();}
-      tooltip {Xmt On/Off} xywh {362 286 60 18} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
+      tooltip {Xmt On/Off} xywh {362 286 60 18} down_box THIN_DOWN_BOX labelsize 12
     }
     Fl_Group grpMeters {open
-      xywh {1 62 210 60} box THIN_DOWN_BOX color 215 selection_color 215
+      xywh {1 62 210 60} box THIN_DOWN_BOX
     } {
       Fl_Box scaleSmeter {
-        image {images/S60.xbm} xywh {3 64 205 20} box FLAT_BOX color 55 selection_color 55
+        image {images/S60.xbm} xywh {3 64 205 20} box FLAT_BOX
       }
       Fl_Button btnALC_SWR {
         callback {cbALC_SWR();}
-        tooltip {Press SWR / ALC} image {images/SWR.xbm} xywh {2 64 205 20} box FLAT_BOX down_box FLAT_BOX color 255 hide
+        tooltip {Press SWR / ALC} image {images/SWR.xbm} xywh {2 64 205 20} box FLAT_BOX down_box FLAT_BOX hide
       }
       Fl_Box sldrRcvSignal {
-        xywh {5 86 181 6} box FLAT_BOX color 198 hide
+        xywh {5 86 181 6} box FLAT_BOX hide
         code0 {\#include "Fl_SigBar.h"}
         code1 {o->minimum(0);}
         code2 {o->maximum(100);}
         class Fl_SigBar
       }
       Fl_Box sldrALC_SWR {
-        xywh {5 86 201 6} box FLAT_BOX color 198 hide
+        xywh {5 86 201 6} box FLAT_BOX hide
         code0 {o->minimum(0);}
         code1 {o->maximum(100);}
         class Fl_SigBar
       }
       Fl_Box sldrFwdPwr {
-        xywh {5 93 201 6} box FLAT_BOX color 72 hide
+        xywh {5 93 201 6} box FLAT_BOX hide
         code0 {o->minimum(0);}
         code1 {o->maximum(100);}
         class Fl_SigBar
       }
       Fl_Box scalePower {
-        image {images/P100.xbm} xywh {3 100 205 20} box FLAT_BOX color 55 selection_color 55
+        image {images/P100.xbm} xywh {3 100 205 20} box FLAT_BOX
       }
     }
     Fl_Box boxControl {
       label {Auxilliary Controls:}
-      xywh {3 311 130 17} box FLAT_BOX color 52 align 16
+      xywh {3 311 130 17} box FLAT_BOX align 16
     }
     Fl_Light_Button btnAuxRTS {
       label RTS
       callback {progStatus.aux_rts = o->value();
 cbAuxPort();}
-      tooltip {RTS control pin} xywh {218 310 60 18} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
+      tooltip {RTS control pin} xywh {218 310 60 18} down_box THIN_DOWN_BOX labelsize 12
       code0 {o->value(progStatus.aux_rts);}
     }
     Fl_Light_Button btnAuxDTR {
       label DTR
       callback {progStatus.aux_dtr = o->value();
 cbAuxPort();}
-      tooltip {DTR control pin} xywh {146 310 60 18} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12
+      tooltip {DTR control pin} xywh {146 310 60 18} down_box THIN_DOWN_BOX labelsize 12
       code0 {o->value(progStatus.aux_dtr);}
     }
     Fl_Light_Button btnMicLine {
       label Mic
       callback {cbbtnMicLine();}
-      tooltip {Select Mic / Line audio inp.} xywh {3 283 55 18} down_box THIN_DOWN_BOX color 50 selection_color 113 labelsize 12 hide
+      tooltip {Select Mic / Line audio inp.} xywh {3 283 55 18} down_box THIN_DOWN_BOX labelsize 12 hide
     }
     Fl_Counter cntRIT {
       label R
@@ -357,87 +357,173 @@ Please wait}
 Function {DisplayDialog()} {open
 } {
   Fl_Window {} {
-    label {Flrig Colors} open
-    xywh {579 489 290 183} type Double visible
+    label {Flrig Colors} open selected
+    xywh {577 415 424 213} type Double visible
   } {
-    Fl_Group grpMeterColor {open
-      xywh {7 8 210 100} box DOWN_BOX color 0 selection_color 215 labelcolor 50
+    Fl_Group {} {open
+      xywh {2 2 218 70} box ENGRAVED_FRAME
     } {
-      Fl_Box scaleSmeterColor {
-        image {images/S60.xbm} xywh {10 10 205 20} box FLAT_BOX color 0 selection_color 215 labelcolor 6
-        code0 {o->color(scaleSmeter->color());}
+      Fl_Box lblTest {
+        label {14070.000}
+        xywh {5 6 210 35} box DOWN_BOX labelfont 4 labelsize 36
       }
-      Fl_Box sldrRcvSignalColor {
-        xywh {12 30 200 6} box FLAT_BOX color 198 selection_color 215
-        class Fl_SigBar
+      Fl_Button prefFont {
+        label Font
+        callback {cbPrefFont();}
+        xywh {10 46 60 22}
       }
-      Fl_Box sldrSWRcolor {
-        xywh {12 61 200 6} box FLAT_BOX color 198
-        code0 {o->minimum(0);}
-        code1 {o->maximum(100);}
-        class Fl_SigBar
+      Fl_Button prefForeground {
+        label Color
+        callback {cbPrefForeground();}
+        xywh {78 46 60 22}
       }
-      Fl_Box scaleSWRcolor {
-        image {images/SWR.xbm} xywh {10 41 205 20} box FLAT_BOX color 0 selection_color 215 labelcolor 6
-      }
-      Fl_Box sldrPWRcolor {
-        xywh {10 78 200 6} box FLAT_BOX color 91
-        code0 {o->minimum(0);}
-        code1 {o->maximum(100);}
-        class Fl_SigBar
-      }
-      Fl_Box scalePWRcolor {
-        image {images/P100.xbm} xywh {10 84 205 20} box FLAT_BOX color 0 selection_color 215 labelcolor 6
+      Fl_Button btnBacklight {
+        label Back
+        callback {cbBacklightColor();}
+        xywh {146 46 60 22}
       }
     }
-    Fl_Button btnBacklight {
-      label Back
-      callback {cbBacklightColor();} selected
-      xywh {221 116 60 24}
+    Fl_Group {} {open
+      xywh {2 74 284 107} box ENGRAVED_FRAME
+    } {
+      Fl_Group grpMeterColor {open
+        xywh {5 77 210 100} box DOWN_BOX
+      } {
+        Fl_Box scaleSmeterColor {
+          image {images/S60.xbm} xywh {8 79 205 20} box FLAT_BOX
+          code0 {o->color(scaleSmeter->color());}
+        }
+        Fl_Box sldrRcvSignalColor {
+          xywh {10 99 200 6} box FLAT_BOX
+          class Fl_SigBar
+        }
+        Fl_Box sldrSWRcolor {
+          xywh {10 130 200 6} box FLAT_BOX
+          code0 {o->minimum(0);}
+          code1 {o->maximum(100);}
+          class Fl_SigBar
+        }
+        Fl_Box scaleSWRcolor {
+          image {images/SWR.xbm} xywh {8 110 205 20} box FLAT_BOX
+        }
+        Fl_Box sldrPWRcolor {
+          xywh {8 147 200 6} box FLAT_BOX
+          code0 {o->minimum(0);}
+          code1 {o->maximum(100);}
+          class Fl_SigBar
+        }
+        Fl_Box scalePWRcolor {
+          image {images/P100.xbm} xywh {8 153 205 20} box FLAT_BOX
+        }
+      }
+      Fl_Button btMeterColor {
+        label Smeter
+        callback {cbSMeterColor();}
+        xywh {221 78 60 22}
+      }
+      Fl_Button btnSWRColor {
+        label SWR
+        callback {cbSWRMeterColor();}
+        xywh {221 103 60 22}
+      }
+      Fl_Button btnPwrColor {
+        label Pwr
+        callback {cbPwrMeterColor();}
+        xywh {221 128 60 22}
+      }
+      Fl_Button btnPeakColor {
+        label Peak
+        callback {cbPeakMeterColor();}
+        xywh {221 154 60 22}
+      }
     }
-    Fl_Button btMeterColor {
-      label Smeter
-      callback {cbSMeterColor();}
-      xywh {221 8 60 22}
+    Fl_Group {} {
+      label System open
+      xywh {220 2 202 70} box ENGRAVED_FRAME align 21
+    } {
+      Fl_Choice mnuScheme {
+        label UI
+        callback {progStatus.ui_scheme = o->text();
+Fl::scheme(progStatus.ui_scheme.c_str());} open
+        tooltip {Change application look and feel} xywh {227 22 80 22} down_box BORDER_BOX align 8
+        code0 {mnuScheme->add("base");}
+        code1 {mnuScheme->add("gtk+");}
+        code2 {mnuScheme->add("plastic");}
+        code3 {mnuScheme->value(mnuScheme->find_item(progStatus.ui_scheme.c_str()));}
+      } {}
+      Fl_Button pref_sys_foreground {
+        label Fgnd
+        callback {cb_sys_foreground();}
+        tooltip {Label color} xywh {227 46 60 22}
+      }
+      Fl_Button pref_sys_background {
+        label Bngd
+        callback {cb_sys_background();}
+        tooltip {Background - normal} xywh {291 46 60 22}
+      }
+      Fl_Button prefsys_background2 {
+        label Bgnd2
+        callback {cb_sys_background2();}
+        tooltip {Background - selected} xywh {356 46 60 22}
+      }
+      Fl_Button prefsys_defaults {
+        label Default
+        callback {cb_sys_defaults();}
+        tooltip {Background - selected} xywh {356 21 60 22}
+      }
     }
-    Fl_Button btnSWRColor {
-      label SWR
-      callback {cbSWRMeterColor();}
-      xywh {221 33 60 22}
+    Fl_Group {} {open
+      xywh {287 122 134 88} box ENGRAVED_FRAME
+    } {
+      Fl_Value_Slider sldrColors {
+        tooltip {Adjust power level} xywh {291 128 125 20} type {Horz Knob} box THIN_DOWN_BOX align 0 maximum 100 step 1 value 15 textsize 12
+        code0 {o->reverse(true);}
+        class Fl_Wheel_Value_Slider
+      }
+      Fl_Button pref_slider_background {
+        label Bngd
+        callback {cb_slider_background();}
+        tooltip {Background - normal} xywh {291 154 60 22}
+      }
+      Fl_Button pref_slider_select {
+        label Button
+        callback {cb_slider_select();}
+        tooltip {Background - normal} xywh {356 154 60 22}
+      }
+      Fl_Button prefslider_defaults {
+        label Default
+        callback {cb_slider_defaults();}
+        tooltip {Background - selected} xywh {324 183 60 22}
+      }
     }
-    Fl_Button btnPwrColor {
-      label Pwr
-      callback {cbPwrMeterColor();}
-      xywh {221 58 60 22}
-    }
-    Fl_Button btnPeakColor {
-      label Peak
-      callback {cbPeakMeterColor();}
-      xywh {221 84 60 22}
+    Fl_Button btnReset {
+      label Reset
+      callback {cb_reset_display_dialog();}
+      tooltip {Restore all flrig defaults} xywh {25 184 60 22}
     }
     Fl_Button btnCancel {
       label Cancel
       callback {cbCancelDisplayDialog();}
-      xywh {154 149 60 24}
+      tooltip {Discard current changes} xywh {113 184 60 22}
     }
     Fl_Return_Button btnOkDisplayDialog {
       label OK
       callback {cbOkDisplayDialog();}
-      xywh {221 149 60 24}
+      tooltip {Save Current Changes} xywh {201 184 60 22}
     }
-    Fl_Box lblTest {
-      label {14070.000}
-      xywh {29 114 170 30} box DOWN_BOX color 35 selection_color 0 labelfont 4 labelsize 28 labelcolor 230
-    }
-    Fl_Button prefFont {
-      label Font
-      callback {cbPrefFont();}
-      xywh {8 149 60 24}
-    }
-    Fl_Button prefForeground {
-      label Color
-      callback {cbPrefForeground();}
-      xywh {77 149 60 24}
+    Fl_Group {} {open
+      xywh {287 74 134 45} box ENGRAVED_FRAME
+    } {
+      Fl_Light_Button btn_lighted {
+        label {Lt Btn}
+        callback {cb_lighted_button();}
+        xywh {291 85 60 22}
+      }
+      Fl_Button btn_lighted_default {
+        label Default
+        callback {cb_lighted_default();}
+        tooltip {Background - selected} xywh {356 85 60 22}
+      }
     }
   }
 } 
@@ -450,17 +536,17 @@ Function {Memory_Dialog()} {} {
     Fl_Button btnAddFreq {
       label {Add @-1>}
       callback {addFreq();}
-      tooltip {Add to list} xywh {9 8 51 20} down_box DOWN_BOX color 50 selection_color 50 labelsize 12 align 20
+      tooltip {Add to list} xywh {9 8 51 20} down_box DOWN_BOX labelsize 12 align 20
     }
     Fl_Button btnDelFreq {
       label {Del @-11+}
       callback {delFreq();}
-      tooltip {Delete from list} xywh {10 38 50 20} down_box DOWN_BOX color 50 selection_color 50 labelsize 12 align 20
+      tooltip {Delete from list} xywh {10 38 50 20} down_box DOWN_BOX labelsize 12 align 20
     }
     Fl_Button btnClearList {
       label {Clr @-2square}
       callback {clearList()}
-      tooltip {Clear list} xywh {10 68 52 20} down_box DOWN_BOX color 50 selection_color 50 labelsize 12 align 20
+      tooltip {Clear list} xywh {10 68 52 20} down_box DOWN_BOX labelsize 12 align 20
     }
     Fl_Button {} {
       label Close
@@ -495,7 +581,7 @@ Function {XcvrDialog()} {} {
             callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();
 initConfigDialog();} open
-            tooltip {Select Transceiver} xywh {41 38 155 22} box DOWN_BOX color 53 align 4
+            tooltip {Select Transceiver} xywh {41 38 155 22} box DOWN_BOX align 4
             code0 {\#include "combo.h"}
             class Fl_ComboBox
           } {}
@@ -532,14 +618,14 @@ command before giving up} xywh {123 63 75 22} type Simple align 4 minimum 1 maxi
             label {Ser. Port}
             callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();} open
-            tooltip {Xcvr serial port} xywh {278 82 190 22} box DOWN_BOX color 53 align 4
+            tooltip {Xcvr serial port} xywh {278 82 190 22} box DOWN_BOX align 4
             class Fl_ComboBox
           } {}
           Fl_Group mnuBaudrate {
             label {Baud:}
             callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();} open
-            tooltip {Xcvr baudrate} xywh {278 111 190 22} box DOWN_BOX color 53 align 4
+            tooltip {Xcvr baudrate} xywh {278 111 190 22} box DOWN_BOX align 4
             class Fl_ComboBox
           } {}
           Fl_Check_Button btnTwoStopBit {
@@ -596,7 +682,7 @@ change requires restart} xywh {307 41 100 22} type Int
   }
 btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();}
-            tooltip {PTT is a CAT command (not hardware)} xywh {15 180 149 22} down_box ROUND_DOWN_BOX selection_color 15
+            tooltip {PTT is a CAT command (not hardware)} xywh {15 180 149 22} down_box ROUND_DOWN_BOX
             code0 {o->value(progStatus.comm_catptt);}
           }
           Fl_Round_Button btnrtsptt {
@@ -677,7 +763,7 @@ Serial Port for a PTT control line}
           label {PTT Port}
           callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();} open
-          tooltip {Aux control port} xywh {127 119 190 22} box DOWN_BOX color 53 align 4
+          tooltip {Aux control port} xywh {127 119 190 22} box DOWN_BOX align 4
           class Fl_ComboBox
         } {}
         Fl_Round_Button btnSepRTSptt {
@@ -721,7 +807,7 @@ btnOkXcvrDialog->redraw();}
           label {Aux Port}
           callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();} open
-          tooltip {Aux control port} xywh {130 131 190 22} box DOWN_BOX color 53 align 4
+          tooltip {Aux control port} xywh {130 131 190 22} box DOWN_BOX align 4
           class Fl_ComboBox
         } {}
         Fl_Box {} {
@@ -839,7 +925,7 @@ cb_compression();}
         label AGC
         callback {progStatus.agc_level = o->index();
 cb_agc_level();} open
-        tooltip {Select Transceiver} xywh {250 158 80 22} box DOWN_BOX color 53
+        tooltip {Select Transceiver} xywh {250 158 80 22} box DOWN_BOX
         code0 {\#include "combo.h"}
         class Fl_ComboBox
       } {}
@@ -883,7 +969,7 @@ cb_bpf_center();}
 Function {make_TT550()} {} {
   Fl_Window {} {
     label {TT550 Setup}
-    xywh {578 56 424 402} type Double align 0 visible
+    xywh {578 56 424 402} type Double align 0 hide
   } {
     Fl_Group {} {
       label CW open
@@ -1005,7 +1091,7 @@ cb_tt550_line_out();}
         label {NB level}
         callback {progStatus.tt550_nb_level = o->index();
 cb_tt550_nb_level();} open
-        tooltip {Select Transceiver} xywh {126 200 80 22} box DOWN_BOX color 53 align 5
+        tooltip {Select Transceiver} xywh {126 200 80 22} box DOWN_BOX align 5
         code0 {\#include "combo.h"}
         code1 {o->index(progStatus.tt550_nb_level);}
         class Fl_ComboBox
@@ -1014,7 +1100,7 @@ cb_tt550_nb_level();} open
         label AGC
         callback {progStatus.tt550_agc_level = o->index();
 cb_tt550_agc_level();} open
-        tooltip {Select Transceiver} xywh {226 200 80 22} box DOWN_BOX color 53 align 5
+        tooltip {Select Transceiver} xywh {226 200 80 22} box DOWN_BOX align 5
         code0 {\#include "combo.h"}
         code1 {o->index(progStatus.tt550_agc_level);}
         class Fl_ComboBox
@@ -1059,7 +1145,7 @@ cb_vfo_adj();}
         label {Xmt BW}
         callback {progStatus.tt550_xmt_bw = o->index();
 cb_tt550_setXmtBW();} open
-        tooltip {Select Transceiver Bandwidth} xywh {144 268 100 22} box DOWN_BOX color 55 labelsize 12 align 5
+        tooltip {Select Transceiver Bandwidth} xywh {144 268 100 22} box DOWN_BOX labelsize 12 align 5
         code0 {o->index(progStatus.tt550_xmt_bw);}
         class Fl_ComboBox
       } {}
