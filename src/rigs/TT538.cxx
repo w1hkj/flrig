@@ -54,7 +54,7 @@ static const int TT538_numeric_widths[] = {
 
 
 static char TT538setFREQA[]		= "*Annnn\r";
-static char TT538setFREQB[]		= "*Bnnnn\r";
+//static char TT538setFREQB[]		= "*Bnnnn\r";
 //static char TT538setAGC[]		= "*Gn\r";
 //static char TT538setSQLCH[]		= "*Hc\r";
 static char TT538setRF[]		= "*Ic\r";
@@ -66,11 +66,11 @@ static char TT538setVOL[]		= "*Un\r";
 static char TT538setBW[]		= "*Wx\r";
 
 static char TT538getFREQA[]		= "?A\r";
-static char TT538getFREQB[]		= "?B\r";
+//static char TT538getFREQB[]		= "?B\r";
 //static char TT538getFWDPWR[]	= "?F\r";
 //static char TT538getAGC[]		= "?G\r";
 //static char TT538getSQLCH[]		= "?H\r";
-static char TT538getRF[]		= "?I\r";
+//static char TT538getRF[]		= "?I\r";
 static char TT538getATT[]		= "?J\r";
 //static char TT538getNB[]		= "?K\r";
 static char TT538getMODE[]		= "?M\r";
@@ -133,7 +133,7 @@ RIG_TT538::RIG_TT538() {
 
 }
 
-static int corrA = 0, corrB = 0;
+//static int corrA = 0, corrB = 0;
 
 void RIG_TT538::checkresponse(string s)
 {
