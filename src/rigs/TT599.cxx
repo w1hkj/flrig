@@ -37,7 +37,7 @@ RIG_TT599::RIG_TT599() {
 	comm_retries = 2;
 	comm_wait = 10;
 	comm_timeout = 50;
-	comm_echo = true;
+	comm_echo = false;
 	comm_rtscts = true;
 	comm_rtsplus = false;
 	comm_dtrplus = true;
@@ -45,7 +45,7 @@ RIG_TT599::RIG_TT599() {
 	comm_rtsptt = false;
 	comm_dtrptt = false;
 	modeA = 1;
-	bwA = 19;
+	bwA = 16;
 	
 	max_power = 100;
 
@@ -61,22 +61,40 @@ RIG_TT599::RIG_TT599() {
 
 };
 
+static void nocr( string & s)
+{
+	for (size_t i = 0; i < s.length(); i++)
+		if (s[i] == '\r') s[i] = ' ';
+}
 
 void RIG_TT599::initialize()
 {
+	cmd = "X\r";
+	sendCommand(cmd, 0);
+	MilliSleep(200);
+	readResponse(-1);
+string s = cmd + replybuff;
+nocr(s);
+LOG_WARN("%s", s.c_str());
 	split = false;
 	cmd = "*KVAAA\r";
 	sendCommand(cmd, 0);
+	MilliSleep(200);
+	readResponse(-1);
+s = cmd + replybuff;
+nocr(s);
+LOG_WARN("%s", s.c_str());
 }
 
 long RIG_TT599::get_vfoA ()
 {
+	size_t p;
 	cmd = "?AF\r";
-	if (sendCommand(cmd, 12) == 12) {
-		freqA = fm_decimal(&replystr[3], 8);
+	sendCommand(cmd, -1);
+	if ((p = replystr.rfind("@AF")) != string::npos) {
+		freqA = fm_decimal(&replystr[p+3], 8);
 	}
-//	LOG_INFO("(%ld) : %s : %s", 
-//		replystr.length(), replystr.c_str(), str2hex(replystr.c_str(), replystr.length()));
+	if (!replystr.empty()) LOG_WARN("%s", replystr.c_str());
 	return freqA;
 }
 
@@ -86,18 +104,19 @@ void RIG_TT599::set_vfoA (long freq)
 	cmd = "*AF";
 	cmd.append( to_decimal( freq, 8 ) );
 	cmd += '\r';
-//	LOG_INFO("set A : %s", cmd.c_str());
+	LOG_WARN("set A : %s", cmd.c_str());
 	sendCommand(cmd, 0);
 }
 
 long RIG_TT599::get_vfoB ()
 {
+	size_t p;
 	cmd = "?BF\r";
-	if (sendCommand(cmd, 12) == 12) {
-		freqB = fm_decimal(&replystr[3], 8);
+	sendCommand(cmd, -1);
+	if ((p = replystr.rfind("@BF")) != string::npos) {
+		freqB = fm_decimal(&replystr[p+3], 8);
 	}
-//	LOG_INFO("(%ld): %s  : %s", 
-//		replystr.length(), replystr.c_str(), str2hex(replystr.c_str(), replystr.length()));
+	if (!replystr.empty()) LOG_WARN("%s", replystr.c_str());
 	return freqB;
 }
 
@@ -107,7 +126,7 @@ void RIG_TT599::set_vfoB (long freq)
 	cmd = "*BF";
 	cmd.append( to_decimal( freq, 8 ) );
 	cmd += '\r';
-//	LOG_INFO("set B : %s", cmd.c_str());
+	LOG_WARN("set B : %s", cmd.c_str());
 	sendCommand(cmd, 0);
 }
 
@@ -128,12 +147,13 @@ void RIG_TT599::set_modeA(int md)
 
 int RIG_TT599::get_modeA()
 {
+	size_t p;
 	cmd = "?RMM\r";
-	if( sendCommand (cmd, 6 ) == 6) {
-		modeA = replystr[4] - '0';
+	sendCommand(cmd, -1);
+	if ((p = replystr.rfind("@RMM")) != string::npos) {
+		modeA = replystr[p+4] - '0';
 	}
-//	LOG_INFO("(%ld): %s  : %s", 
-//		replystr.length(), replystr.c_str(), str2hex(replystr.c_str(), replystr.length()));
+	if (!replystr.empty()) LOG_WARN("%s", replystr.c_str());
 	return modeA;
 }
 
@@ -148,12 +168,13 @@ void RIG_TT599::set_modeB(int md)
 
 int RIG_TT599::get_modeB()
 {
+	size_t p;
 	cmd = "?RMM\r";
-	if( sendCommand (cmd, 6 ) == 6) {
-		modeB = replystr[4] - '0';
+	sendCommand(cmd, -1);
+	if ((p = replystr.rfind("@RMM")) != string::npos) {
+		modeB = replystr[p+4] - '0';
 	}
-//	LOG_INFO("(%ld): %s  : %s", 
-//		replystr.length(), replystr.c_str(), str2hex(replystr.c_str(), replystr.length()));
+	if (!replystr.empty()) LOG_WARN("%s", replystr.c_str());
 	return modeB;
 }
 
@@ -168,15 +189,18 @@ void RIG_TT599::set_bwA(int bw)
 
 int RIG_TT599::get_bwA()
 {
+	size_t p;
 	cmd = "?RMF\r";
-	int ret = sendCommand(cmd, 9);
-//	LOG_INFO("(%ld) : %s : %s", 
-//		replystr.length(), replystr.c_str(), str2hex(replystr.c_str(), replystr.length()));
-	if (ret <= 9) {
-		string bwstr = "";
-		if (replystr.length() == 9) bwstr = replystr.substr(4, 4);
-		if (replystr.length() == 8) bwstr = replystr.substr(4, 3);
-		if (replystr.empty()) return bwA;
+	sendCommand(cmd, -1);
+
+	if (!replystr.empty()) LOG_WARN("%s : %s", replystr.c_str(), str2hex(replystr.c_str(), replystr.length()));
+
+	if ((p = replystr.rfind("@RMF")) != string::npos) {
+		string bwstr = replystr.substr(p+4);
+		p = bwstr.find("\r");
+		if ( p != string::npos)
+			bwstr.erase(p, string::npos);
+		if (bwstr.empty()) return bwA;
 		int i = 0;
 		while( RIG_TT599widths[i] != NULL) {
 			if (bwstr == RIG_TT599widths[i]) {
@@ -200,19 +224,22 @@ void RIG_TT599::set_bwB(int bw)
 
 int RIG_TT599::get_bwB()
 {
+	size_t p;
 	cmd = "?RMF\r";
-	int ret = sendCommand(cmd, 9);
-//	LOG_INFO("(%/d) : %s : %s", 
-//		replystr.length(), replystr.c_str(), str2hex(replystr.c_str(), replystr.length()));
-	if (ret <= 9) {
-		string bwstr = "";
-		if (replystr.length() == 9) bwstr = replystr.substr(4, 4);
-		if (replystr.length() == 8) bwstr = replystr.substr(4, 3);
-		if (replystr.empty()) return bwB;
+	sendCommand(cmd, -1);
+
+	if (!replystr.empty()) LOG_WARN("%s", replystr.c_str());
+
+	if ((p = replystr.rfind("@RMF")) != string::npos) {
+		string bwstr = replystr.substr(p+4);
+		p = bwstr.find("\r");
+		if ( p != string::npos)
+			bwstr.erase(p, string::npos);
+		if (bwstr.empty()) return bwB;
 		int i = 0;
 		while( RIG_TT599widths[i] != NULL) {
 			if (bwstr == RIG_TT599widths[i]) {
-				bwB = i;
+				bwA = i;
 				break;
 			}
 			i++;
@@ -244,9 +271,12 @@ void RIG_TT599::set_preamp(int val)
 
 int RIG_TT599::get_preamp()
 {
+	size_t p;
 	cmd = "?RME\r";
-	if (sendCommand(cmd, 6) == 6)
-		return replystr[4] - '0';
+	sendCommand(cmd, -1);
+	if (!replystr.empty()) LOG_WARN("%s", replystr.c_str());
+	if ((p = replystr.rfind("@RME")) != string::npos)
+		return replystr[p+4] - '0';
 	return 0;
 }
 
@@ -257,11 +287,13 @@ int RIG_TT599::get_preamp()
 
 int  RIG_TT599::get_power_control(void)
 {
+	size_t p;
 	cmd = "?TP\r";
-	sendCommand(cmd, 0);
-	if (replystr.find("@TP") == 0) {
+	sendCommand(cmd, -1);
+	if (!replystr.empty()) LOG_WARN("%s", replystr.c_str());
+	if ((p = replystr.rfind("@TP")) != string::npos) {
 		int pwr;
-		sscanf("%d", &replystr[3], &pwr);
+		sscanf("%d", &replystr[p+3], &pwr);
 		return pwr;
 	}
 	return 0;
@@ -283,9 +315,11 @@ void RIG_TT599::set_auto_notch(int v)
 int  RIG_TT599::get_auto_notch()
 {
 	cmd = "?RMNA\r";
-	if (sendCommand(cmd, 7) == 7)
-		return replystr[5] - '0';
-	return 0;
+	sendCommand(cmd, -1);
+	LOG_WARN("%s", replystr.c_str());
+	if (replystr.rfind("@RMNA1") == string::npos)
+		return 0;
+	return 1;
 }
 
 void RIG_TT599::set_attenuator(int val)
@@ -296,28 +330,31 @@ void RIG_TT599::set_attenuator(int val)
 
 int  RIG_TT599::get_attenuator()
 {
+	size_t p;
 	cmd = "?RMT\r";
-	if (sendCommand(cmd, 6) == 6)
-		return replystr[4] - '0';
+	sendCommand(cmd, -1);
+	if (!replystr.empty()) LOG_WARN("%s", replystr.c_str());
+	if ((p = replystr.rfind("@RMT1")) != string::npos)
+		return 1;
 	return 0;
 }
 
 int smeter_count = 10;
 int  RIG_TT599::get_smeter()
 {
+	size_t p;
 	int dbm = 0;
 	cmd = "?S\r";
-	sendCommand(cmd, 7);
-	size_t pos = replystr.find("@SRM");
-	if (pos != string::npos) {
-		sscanf(&replystr[pos +  4], "%d", &dbm);
-//		LOG_INFO("%s", str2hex(replystr.c_str(), replystr.length()));
-	}
+	sendCommand(cmd, -1);
+	if (!replystr.empty()) LOG_WARN("%s", replystr.c_str());
+	if ((p = replystr.rfind("@SRM")) != string::npos)
+		sscanf(&replystr[p+4], "%d", &dbm);
 	return 5 * dbm / 6;
 }
 
 int  RIG_TT599::get_swr()
 {
+	return 0; // not implemented by TenTec
 	float swr = (sqrtf(fwdpwr) + sqrtf(refpwr))/(sqrt(fwdpwr) - sqrt(refpwr) + .0001);
 	swr -= 1.0;
 	swr *= 25.0;
@@ -329,15 +366,18 @@ int  RIG_TT599::get_swr()
 
 int  RIG_TT599::get_power_out()
 {
+	return 0; // not implemented by TenTec
+	size_t p;
 	fwdpwr = 0; refpwr = 0;
 	cmd = "?S\r";
-	if (sendCommand(cmd, 12) == 12) {
-		if (replystr.find("@SRF") == 0) {
-			sscanf(&replystr[4], "%d", &fwdpwr);
-			size_t n = 4;
-			while ( replystr[n] != 'R' && n < replystr.length()) n++;
-			if (n < replystr.length()) n++;
-			sscanf(&replystr[n], "%d", &refpwr);
+	sendCommand(cmd, -1);
+LOG_WARN("%s", replystr.c_str());
+	if ((p = replystr.rfind ("@STF")) != string::npos) {
+		sscanf(&replystr[p+4], "%d", &fwdpwr);
+		p = replystr.find("R", p+4);
+		if (p != string::npos) {
+			sscanf(&replystr[p+1], "%d", &refpwr);
+			refpwr /= 10;
 		}
 	}
 	return fwdpwr;

@@ -29,7 +29,7 @@ public:
 
 	bool can_split() { return true;}
 	void set_split(bool val);
-	bool twovfos() { return true;}
+	bool twovfos() { return false;}//true;}
 
 	void set_PTT_control(int val);
 	int  get_modetype(int n);
