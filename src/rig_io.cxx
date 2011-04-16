@@ -167,7 +167,6 @@ int sendCommand (string s, int retnbr, bool b)
 	replystr.clear();
 
 	if (retnbr == 0) {
-		RigSerial.FlushBuffer();
 		memset(replybuff, 0, RXBUFFSIZE + 1);
 		return 0;
 	}
