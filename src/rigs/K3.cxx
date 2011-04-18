@@ -18,7 +18,17 @@ const char modenbr[] =
 static const char K3_mode_type[] =
 	{ 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L' };
 
-const char *K3_widths[] = {"FL-1", "FL-2", "FL-3", "FL-4", NULL};
+const char *K3_widths[] = {
+"100", "200", "300", "400", "500", "600", "700", "800", "900", "1000",
+"1200", "1400", "1600", "1800", "2000", "2200", "2400", "2600", "2800", "3000",
+"3200", "3400", "3600", "4000", "4500", "5000", "6000",
+NULL};
+
+const char *K3_bwval[] = {
+"0010", "0020", "0030", "0040", "0050", "0060", "0070", "0080", "0090", "0100",
+"0120", "0140", "0160", "0180", "0200", "0220", "0240", "0260", "0280", "0300",
+"0320", "0340", "0360", "0400", "0450", "0500", "0600",
+ NULL };
 
 RIG_K3::RIG_K3() {
 // base class values	
@@ -37,9 +47,9 @@ RIG_K3::RIG_K3() {
 	comm_rtsptt = false;
 	comm_dtrptt = false;
 	modeA = 1;
-	bwA = 2;
+	bwA = 19;
 	modeB = 1;
-	bwB = 2;
+	bwB = 19;
 
 	has_bandwidth_control =
 	has_power_control =
@@ -64,18 +74,29 @@ int  RIG_K3::adjust_bandwidth(int m)
 
 void RIG_K3::initialize()
 {
-	cmd = "K31;";
+	cmd = "AI0;"; // disable auto-info
 	sendCommand(cmd, 0);
+	MilliSleep(100);
+
+	cmd = "K31;"; // K3 extended mode
+	sendCommand(cmd, 0);
+	MilliSleep(100);
+
+	cmd = "SWT49;"; // Fine tuning (1 Hz mode)
+	sendCommand(cmd, 0);
+	MilliSleep(100);
+
 	modeA = 1;
-	bwA = 2;
+	bwA = 19;
 	modeB = 1;
-	bwB = 2;
+	bwB = 19;
 }
 
 long RIG_K3::get_vfoA ()
 {
 	cmd = "FA;";
 	int ret = sendCommand(cmd);
+LOG_WARN("out: %s, ret: %s", cmd.c_str(), replystr.c_str());
 	if (ret < 14) return freqA;
 	size_t p = replystr.rfind("FA");
 	if (p == string::npos) return freqA;
@@ -91,6 +112,33 @@ void RIG_K3::set_vfoA (long freq)
 {
 	freqA = freq;
 	cmd = "FA00000000000;";
+	for (int i = 12; i > 1; i--) {
+		cmd[i] += freq % 10;
+		freq /= 10;
+	}
+	sendCommand(cmd, 0);
+}
+
+long RIG_K3::get_vfoB ()
+{
+	cmd = "FB;";
+	int ret = sendCommand(cmd);
+LOG_WARN("out: %s, ret: %s", cmd.c_str(), replystr.c_str());
+	if (ret < 14) return freqB;
+	size_t p = replystr.rfind("FB");
+	if (p == string::npos) return freqB;
+	
+	long f = 0;
+	for (size_t n = 2; n < 13; n++)
+		f = f*10 + replystr[p + n] - '0';
+	freqB = f;
+	return freqB;
+}
+
+void RIG_K3::set_vfoB (long freq)
+{
+	freqB = freq;
+	cmd = "FB00000000000;";
 	for (int i = 12; i > 1; i--) {
 		cmd[i] += freq % 10;
 		freq /= 10;
@@ -114,10 +162,11 @@ int RIG_K3::get_volume_control()
 {
 	cmd = "AG;";
 	int ret = sendCommand(cmd);
+LOG_WARN("out: %s, ret: %s", cmd.c_str(), replystr.c_str());
 	if (ret < 6) return 0;
 	size_t p = replystr.rfind("AG");
 	if (p == string::npos) return 0;
-	
+
 	replystr[p + 5] = 0;
 	int v = atoi(&replystr[p + 2]);
 	return (int)(v / 2.55);
@@ -125,6 +174,7 @@ int RIG_K3::get_volume_control()
 
 void RIG_K3::set_modeA(int val)
 {
+	modeA = val;
 	cmd = "MD0;";
 	cmd[2] = modenbr[val];
 	sendCommand(cmd, 0);
@@ -134,13 +184,36 @@ int RIG_K3::get_modeA()
 {
 	cmd = "MD;";
 	int ret = sendCommand(cmd);
-	if (ret < 4) return 0;
+LOG_WARN("out: %s, ret: %s", cmd.c_str(), replystr.c_str());
+	if (ret < 4) return modeA;
 	size_t p = replystr.rfind("MD");
-	if (p == string::npos) return 0;
+	if (p == string::npos) return modeA;
 	
 	int md = replystr[p + 2] - '1';
 	if (md == 8) md--;
-	return md;
+	return (modeA = md);
+}
+
+void RIG_K3::set_modeB(int val)
+{
+	modeB = val;
+	cmd = "MD$0;";
+	cmd[3] = modenbr[val];
+	sendCommand(cmd, 0);
+}
+
+int RIG_K3::get_modeB()
+{
+	cmd = "MD$;";
+	int ret = sendCommand(cmd);
+LOG_WARN("out: %s, ret: %s", cmd.c_str(), replystr.c_str());
+	if (ret < 4) return modeB;
+	size_t p = replystr.rfind("MD$");
+	if (p == string::npos) return modeB;
+	
+	int md = replystr[p + 3] - '1';
+	if (md == 8) md--;
+	return (modeB = md);
 }
 
 int RIG_K3::get_modetype(int n)
@@ -158,6 +231,7 @@ int RIG_K3::get_preamp()
 {
 	cmd = "PA;";
 	int ret = sendCommand(cmd);
+LOG_WARN("out: %s, ret: %s", cmd.c_str(), replystr.c_str());
 	if (ret < 4) return 0;
 	size_t p = replystr.rfind("PA");
 	if (p == string::npos) return 0;
@@ -175,6 +249,7 @@ int RIG_K3::get_attenuator()
 {
 	cmd = "RA;";
 	int ret = sendCommand(cmd);
+LOG_WARN("out: %s, ret: %s", cmd.c_str(), replystr.c_str());
 	if (ret < 5) return 0;
 	size_t p = replystr.rfind("RA");
 	if (p == string::npos) return 0;
@@ -221,6 +296,7 @@ int RIG_K3::get_smeter()
 {
 	cmd = "SM;";
 	int ret = sendCommand(cmd);
+LOG_WARN("out: %s, ret: %s", cmd.c_str(), replystr.c_str());
 	if (ret < 7) return 0;
 	size_t p = replystr.rfind("SM");
 	if (p == string::npos) return 0;
@@ -241,37 +317,64 @@ void RIG_K3::set_noise(bool on)
 //FW $ (Filter Bandwidth and Number; GET/SET)
 //K3 Extended SET/RSP format (K31): FWxxxx; where xxxx is 0-9999, the bandwidth in 10-Hz units. May be
 //quantized and/or range limited based on the present operating mode.
-//Basic and K2 Extended formats: See KIO2 Programmer’s Reference (K2). In K22 mode, direct selection of
-//crystal filters is possible by adding a 5th digit. However, K31 must not be in effect, or it will override the legacy K2
-//behavior and only allow direct bandwidth selection. For example, you could send K30;K22;FW00003;K20;K31;
-//to select filter #3 and then restore the original K2 and K3 command modes (yours may be different).
-//Notes: (1) In AI2/3 modes, moving the physical WIDTH control results in both FW and IS responses (width and
-//shift). (2) In diversity mode, FW matches the sub receiver’s filter bandwidth to the main receiver’s, which may
-//result in the generation of FA/FB/FR/FT responses. (3) Both FW and FW$ can be used in BSET mode (one
-//exception: at present, FW/FW$ SET can’t be used in BSET mode with diversity receive in effect). (4) In K22
-//mode, a legacy 6th digit is added to the response. It is always 0. In the K2, it indicated audio filter on/off status.
 
 void RIG_K3::set_bwA(int val)
 {
+	cmd = "FW";
 	bwA = val;
-	cmd = "K30;K22;FW0000x;K20;K31;";
-	cmd[14] = '0' + val;
+	cmd.append(K3_bwval[val]).append(";");
 	sendCommand(cmd, 0);
 }
 
 int RIG_K3::get_bwA()
 {
-	cmd = "K30;K22;FW;K20;K31;";
+	cmd = "FW;";
 	int ret = sendCommand(cmd);
-	if (ret != 9) return bwA;
-	bwA = replystr[5] - '0';
+LOG_WARN("out: %s, ret: %s", cmd.c_str(), replystr.c_str());
+	if (ret < 6) return bwA;
+	size_t p = replystr.rfind("FW");
+	if (p == string::npos) return bwA;
+	string bws = replystr.substr(p+2, 4); // "xxxx" iaw above manual exerpt
+	int n = 0;
+	while (K3_bwval[n] != NULL) {
+		if (bws <= K3_bwval[n]) break;
+		n++;
+	}
+	if (K3_bwval[n] != NULL) bwA = n;
 	return bwA;
+}
+
+void RIG_K3::set_bwB(int val)
+{
+	cmd = "FW$";
+	bwB = val;
+	cmd.append(K3_bwval[val]).append(";");
+	sendCommand(cmd, 0);
+}
+
+int RIG_K3::get_bwB()
+{
+	cmd = "FW$;";
+	int ret = sendCommand(cmd);
+LOG_WARN("out: %s, ret: %s", cmd.c_str(), replystr.c_str());
+	if (ret < 6) return bwB;
+	size_t p = replystr.rfind("FW$");
+	if (p == string::npos) return bwB;
+	string bws = replystr.substr(p+3, 4); // "xxxx" iaw above manual exerpt
+	int n = 0;
+	while (K3_bwval[n] != NULL) {
+		if (bws <= K3_bwval[n]) break;
+		n++;
+	}
+	if (K3_bwval[n] != NULL) bwB = n;
+	return bwB;
 }
 
 int RIG_K3::get_power_out()
 {
 	cmd = "PC;";
 	int ret = sendCommand(cmd);
+LOG_WARN("out: %s, ret: %s", cmd.c_str(), replystr.c_str());
 	if (ret < 6) return 0;
 	size_t p = replystr.rfind("PC");
 	if (p == string::npos) return 0;
