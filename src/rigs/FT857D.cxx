@@ -112,12 +112,13 @@ int  RIG_FT857D::get_power_out(void)
    init_cmd();
    cmd[4] = 0xF7;
    int ret = sendCommand(cmd);
-   if (ret == 1) {
+LOG_INFO("%d %x", ret, replybuff[0]);
+//   if (ret == 1) {
        int fwdpwr = replybuff[0];
        fwdpwr = fwdpwr * 100 / 15;
        return fwdpwr;
-   }
-   return 0;
+//   }
+//   return 0;
 }
 
 int  RIG_FT857D::get_smeter(void)
@@ -125,10 +126,11 @@ int  RIG_FT857D::get_smeter(void)
    init_cmd();
    cmd[4] = 0xE7;
    int ret = sendCommand(cmd);
-   if (ret == 1) {
+LOG_INFO("%d %x", ret, replybuff[0]);
+//   if (ret == 1) {
        int sval = replybuff[0];
        sval = (sval-1) * 100 / 15;
        return sval;
-   }
-   return 0;
+//   }
+//   return 0;
 }
