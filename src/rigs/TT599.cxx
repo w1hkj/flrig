@@ -72,16 +72,16 @@ void RIG_TT599::initialize()
 	cmd = "X\r";
 	sendCommand(cmd, 0);
 	MilliSleep(200);
-	readResponse(-1);
-string s = cmd + replybuff;
+	readResponse();
+string s = cmd + replystr;
 nocr(s);
 LOG_WARN("%s", s.c_str());
 	split = false;
 	cmd = "*KVAAA\r";
 	sendCommand(cmd, 0);
 	MilliSleep(200);
-	readResponse(-1);
-s = cmd + replybuff;
+	readResponse();
+s = cmd + replystr;
 nocr(s);
 LOG_WARN("%s", s.c_str());
 }
@@ -90,7 +90,7 @@ long RIG_TT599::get_vfoA ()
 {
 	size_t p;
 	cmd = "?AF\r";
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 	if ((p = replystr.rfind("@AF")) != string::npos) {
 		freqA = fm_decimal(&replystr[p+3], 8);
 	}
@@ -112,7 +112,7 @@ long RIG_TT599::get_vfoB ()
 {
 	size_t p;
 	cmd = "?BF\r";
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 	if ((p = replystr.rfind("@BF")) != string::npos) {
 		freqB = fm_decimal(&replystr[p+3], 8);
 	}
@@ -149,7 +149,7 @@ int RIG_TT599::get_modeA()
 {
 	size_t p;
 	cmd = "?RMM\r";
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 	if ((p = replystr.rfind("@RMM")) != string::npos) {
 		modeA = replystr[p+4] - '0';
 	}
@@ -170,7 +170,7 @@ int RIG_TT599::get_modeB()
 {
 	size_t p;
 	cmd = "?RMM\r";
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 	if ((p = replystr.rfind("@RMM")) != string::npos) {
 		modeB = replystr[p+4] - '0';
 	}
@@ -191,7 +191,7 @@ int RIG_TT599::get_bwA()
 {
 	size_t p;
 	cmd = "?RMF\r";
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 
 	if (!replystr.empty()) LOG_WARN("%s : %s", replystr.c_str(), str2hex(replystr.c_str(), replystr.length()));
 
@@ -226,7 +226,7 @@ int RIG_TT599::get_bwB()
 {
 	size_t p;
 	cmd = "?RMF\r";
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 
 	if (!replystr.empty()) LOG_WARN("%s", replystr.c_str());
 
@@ -273,7 +273,7 @@ int RIG_TT599::get_preamp()
 {
 	size_t p;
 	cmd = "?RME\r";
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 	if (!replystr.empty()) LOG_WARN("%s", replystr.c_str());
 	if ((p = replystr.rfind("@RME")) != string::npos)
 		return replystr[p+4] - '0';
@@ -289,7 +289,7 @@ int  RIG_TT599::get_power_control(void)
 {
 	size_t p;
 	cmd = "?TP\r";
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 	if (!replystr.empty()) LOG_WARN("%s", replystr.c_str());
 	if ((p = replystr.rfind("@TP")) != string::npos) {
 		int pwr;
@@ -315,7 +315,7 @@ void RIG_TT599::set_auto_notch(int v)
 int  RIG_TT599::get_auto_notch()
 {
 	cmd = "?RMNA\r";
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 	LOG_WARN("%s", replystr.c_str());
 	if (replystr.rfind("@RMNA1") == string::npos)
 		return 0;
@@ -332,7 +332,7 @@ int  RIG_TT599::get_attenuator()
 {
 	size_t p;
 	cmd = "?RMT\r";
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 	if (!replystr.empty()) LOG_WARN("%s", replystr.c_str());
 	if ((p = replystr.rfind("@RMT1")) != string::npos)
 		return 1;
@@ -345,7 +345,7 @@ int  RIG_TT599::get_smeter()
 	size_t p;
 	int dbm = 0;
 	cmd = "?S\r";
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 	if (!replystr.empty()) LOG_WARN("%s", replystr.c_str());
 	if ((p = replystr.rfind("@SRM")) != string::npos)
 		sscanf(&replystr[p+4], "%d", &dbm);
@@ -370,7 +370,7 @@ int  RIG_TT599::get_power_out()
 	size_t p;
 	fwdpwr = 0; refpwr = 0;
 	cmd = "?S\r";
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 LOG_WARN("%s", replystr.c_str());
 	if ((p = replystr.rfind ("@STF")) != string::npos) {
 		sscanf(&replystr[p+4], "%d", &fwdpwr);

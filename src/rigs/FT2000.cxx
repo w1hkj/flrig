@@ -72,24 +72,18 @@ RIG_FT2000::RIG_FT2000() {
 	notch_on = false;
 }
 
-bool RIG_FT2000::sendFTcommand(string cmd, int retnbr, bool loghex)
-{
-	bool ret = sendCommand(cmd, retnbr, loghex);
-	LOG_INFO("cmd:   %s", cmd.c_str());
-	if (retnbr)
-		LOG_INFO("reply: %s", replybuff);
-	return ret;
-}
-
 long RIG_FT2000::get_vfoA ()
 {
 	cmd = "FA;";
-	if (sendFTcommand(cmd, 11, false)) {
-		int f = 0;
-		for (size_t n = 2; n < 10; n++)
-			f = f*10 + replybuff[n] - '0';
-		freqA = f;
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 11) return freqA;
+	size_t p = replystr.rfind("FA");
+	if (p == string::npos) return freqA;
+	int f = 0;
+	for (size_t n = 2; n < 10; n++)
+		f = f*10 + replystr[p + n] - '0';
+	freqA = f;
+
 	return freqA;
 }
 
@@ -101,65 +95,70 @@ void RIG_FT2000::set_vfoA (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendFTcommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 int RIG_FT2000::get_smeter()
 {
 	cmd = "SM0;";
-	if(sendFTcommand(cmd, 7, false)) {
-		replybuff[6] = 0;
-		int mtr = atoi(&replybuff[3]);
-		mtr = mtr * 100.0 / 256.0;
-		return mtr;
-	}
-	return 0;
+	int ret = sendCommand(cmd);
+	if (ret < 7) return 0;
+	size_t p = replystr.rfind("SM");
+	if (p == string::npos) return 0;
+	replystr[p + 6] = 0;
+	int mtr = atoi(&replystr[p + 3]);
+	mtr = mtr * 100.0 / 256.0;
+	return mtr;
 }
 
 int RIG_FT2000::get_swr()
 {
 	cmd = "RM6;";
-	if (sendFTcommand(cmd, 7, false)) {
-		replybuff[6] = 0;
-		int mtr = atoi(&replybuff[3]);
-		return mtr / 2.56;
-	}
-	return 0;
+	int ret = sendCommand(cmd);
+	if (ret < 7) return 0;
+	size_t p = replystr.rfind("RM");
+	if (p == string::npos) return 0;
+	replystr[p + 6] = 0;
+	int mtr = atoi(&replystr[p + 3]);
+	return mtr / 2.56;
 }
 
 int RIG_FT2000::get_power_out()
 {
 	cmd = "RM5;";
-	if (sendFTcommand(cmd, 7, false)) {
-		replybuff[6] = 0;
-		double mtr = (double)(atoi(&replybuff[3]));
-		mtr = -6.6263535 + .11813178 * mtr + .0013607405 * mtr * mtr;
-		return (int)mtr;
-	}
-	return 0;
+	int ret = sendCommand(cmd);
+	if (ret < 7) return 0;
+	size_t p = replystr.rfind("RM");
+	if (p == string::npos) return 0;
+	replystr[p + 6] = 0;
+	double mtr = (double)(atoi(&replystr[p + 3]));
+	mtr = -6.6263535 + .11813178 * mtr + .0013607405 * mtr * mtr;
+	return (int)mtr;
 }
 
 int RIG_FT2000::get_power_control()
 {
 	cmd = "PC;";
-	if (sendFTcommand(cmd, 6, false)) {
-		replybuff[5] = 0;
-		int mtr = atoi(&replybuff[2]);
-		return mtr;
-	}
-	return 0;
+	int ret = sendCommand(cmd);
+	if (ret < 6) return 0;
+	size_t p = replystr.rfind("PC");
+	if (p == string::npos) return 0;
+	replystr[p + 5] = 0;
+	int mtr = atoi(&replystr[p + 2]);
+	return mtr;
 }
 
 // Volume control return 0 ... 100
 int RIG_FT2000::get_volume_control()
 {
 	cmd = "AG0;";
-	if (sendFTcommand(cmd, 7, false))  {
-		cmd[6] = 0;
-		int val = atoi(&replybuff[3]);
-		return (int)(val / 2.55);
-	}
-	return 0;
+	int ret = sendCommand(cmd);
+	if (ret < 7) return 0;
+	size_t p = replystr.rfind("AG");
+	if (p == string::npos) return 0;
+	replystr[p + 6] = 0;
+	int val = atoi(&replystr[p + 3]);
+	return (int)(val / 2.55);
 }
 
 void RIG_FT2000::set_volume_control(int val) 
@@ -170,7 +169,7 @@ void RIG_FT2000::set_volume_control(int val)
 		cmd[i] += ivol % 10;
 		ivol /= 10;
 	}
-	sendFTcommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 // Transceiver power level
@@ -182,19 +181,19 @@ void RIG_FT2000::set_power_control(double val)
 		cmd[i] += ival % 10;
 		ival /= 10;
 	}
-	sendFTcommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 // Tranceiver PTT on/off
 void RIG_FT2000::set_PTT_control(int val)
 {
-	if (val) sendFTcommand("TX1;", 0, false);
-	else	 sendFTcommand("TX0;", 0, false);
+	if (val) sendCommand("TX1;", 0);
+	else	 sendCommand("TX0;", 0);
 }
 
 void RIG_FT2000::tune_rig()
 {
-	sendFTcommand("AC002;",0, false);
+	sendCommand("AC002;",0);
 }
 
 void RIG_FT2000::set_attenuator(int val)
@@ -221,31 +220,40 @@ void RIG_FT2000::set_attenuator(int val)
 			atten_label("Att", false);
 			cmd = "RA00;";
 	}
-	sendFTcommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 int RIG_FT2000::get_attenuator()
 {
-	if (sendFTcommand("RA0;", 5, false)) {
-		int reply = replybuff[3];
-		switch (reply) {
-			case '1' :
-				atten_label("6 dB", true);
-				atten_level = 1;
-				break;
-			case '2' :
-				atten_label("12 dB", true);
-				atten_level = 2;
-				break;
-			case '3' :
-				atten_label("18 dB", true);
-				atten_level = 3;
-				break;
-			default :
-				atten_label("Att", false);
-				atten_level = 0;
-				break;
-		}
+	cmd = "RA0;";
+	int ret = sendCommand(cmd);
+	if (ret < 5) {
+		atten_label("Att", false);
+		return 0;
+	}
+	size_t p = replystr.rfind("RA");
+	if (p == string::npos) {
+		atten_label("Att", false);
+		return 0;
+	}
+	int reply = replystr[p + 3];
+	switch (reply) {
+		case '1' :
+			atten_label("6 dB", true);
+			atten_level = 1;
+			break;
+		case '2' :
+			atten_label("12 dB", true);
+			atten_level = 2;
+			break;
+		case '3' :
+			atten_label("18 dB", true);
+			atten_level = 3;
+			break;
+		default :
+			atten_label("Att", false);
+			atten_level = 0;
+			break;
 	}
 	return atten_level;
 }
@@ -269,27 +277,36 @@ void RIG_FT2000::set_preamp(int val)
 			preamp_label("Pre", false);
 			cmd = "PA00;";
 	}
-	sendFTcommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 int RIG_FT2000::get_preamp()
 {
-	if (sendFTcommand("PA0;", 5, false)) {
-		int reply = replybuff[3];
-		switch (reply) {
-			case '1' :
-				preamp_level = 1;
-				preamp_label("Pre 1", true);
-				break;
-			case '2' :
-				preamp_level = 2;
-				preamp_label("Pre 2", true);
-				break;
-			case '0' :
-			default :
-				preamp_level = 0;
-				preamp_label("Pre", false);
-		}
+	cmd = "PA0;";
+	int ret = sendCommand(cmd);
+	if (ret < 5) {
+		preamp_label("Pre", false);
+		return 0;
+	}
+	size_t p = replystr.rfind("PA");
+	if (p == string::npos) {
+		preamp_label("Pre", false);
+		return 0;
+	}
+	int reply = replystr[p + 3];
+	switch (reply) {
+		case '1' :
+			preamp_level = 1;
+			preamp_label("Pre 1", true);
+			break;
+		case '2' :
+			preamp_level = 2;
+			preamp_label("Pre 2", true);
+			break;
+		case '0' :
+		default :
+			preamp_level = 0;
+			preamp_label("Pre", false);
 	}
 	return preamp_level;
 }
@@ -301,13 +318,17 @@ void RIG_FT2000::set_modeA(int val)
 	cmd = "MD0";
 	cmd += FT2000_mode_chr[val];
 	cmd += ';';
-	sendFTcommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 int RIG_FT2000::get_modeA()
 {
-	if (sendFTcommand("MD0;", 5, false))
-		modeA = replybuff[3] - '1';
+	cmd = "MD0;";
+	int ret = sendCommand(cmd);
+	if (ret < 5) return modeA;
+	size_t p = replystr.rfind("MD");
+	if (p == string::npos) return modeA;
+	modeA = replystr[p + 3] - '1';
 	return modeA;
 }
 
@@ -363,7 +384,7 @@ void RIG_FT2000::set_bwA(int val)
 	bwA = val;
 
 	if (val == 0) {
-		sendFTcommand("NA00;", 0, false);
+		sendCommand("NA00;", 0);
 		return;
 	}
 
@@ -377,7 +398,7 @@ void RIG_FT2000::set_bwA(int val)
 			val %= 10;
 			cmd += val + '0';
 			cmd += ';';
-			sendFTcommand(cmd, 0, false);
+			sendCommand(cmd, 0);
 			break;
 //CW
 		case 2 : case 6 :
@@ -387,20 +408,20 @@ void RIG_FT2000::set_bwA(int val)
 			val %= 10;
 			cmd += val + '0';
 			cmd += ';';
-			sendFTcommand(cmd, 0, false);
+			sendCommand(cmd, 0);
 			break;
 //PKT-RTTY
 		case 5 : case 7 : case 8 : case 11 :
 			cmd = "EX1030";
 			cmd += val + '0';
 			cmd += ';';
-			sendFTcommand(cmd, 0, false);
+			sendCommand(cmd, 0);
 			break;
 //AM-FM
 		case 3 : case 4 : case 9 : case 10 :
 			break;
 	}
-	sendFTcommand("NA10;", 0, false);
+	sendCommand("NA10;", 0);
 }
 
 int RIG_FT2000::get_bwA()
@@ -422,15 +443,19 @@ void RIG_FT2000::set_if_shift(int val)
 		cmd[3+i] += val % 10;
 		val /= 10;
 	}
-	sendFTcommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 bool RIG_FT2000::get_if_shift(int &val)
 {
 	static int oldval = 0;
-	sendFTcommand("IS0;", 9, false);
-	replybuff[8] = 0;
-	val = atoi(&replybuff[3]);
+	int ret = sendCommand("IS0;");
+	if (ret < 9) return false;
+	size_t p = replystr.rfind("IS");
+	if (p == string::npos) return false;
+
+	replystr[p + 8] = 0;
+	val = atoi(&replystr[p + 3]);
 	if (val != 0 || oldval != val) {
 		oldval = val;
 		return true;
@@ -450,13 +475,13 @@ void RIG_FT2000::set_notch(bool on, int val)
 {
 	cmd = "BP00000;";
 	if (on == false) {
-		sendFTcommand(cmd, 0, false);
+		sendCommand(cmd, 0);
 		notch_on = false;
 		return;
 	}
 	if (!notch_on) {
 		cmd[6] = '1'; // notch ON
-		sendFTcommand(cmd, 0, false);
+		sendCommand(cmd, 0);
 		cmd[6] = '0';
 		notch_on = true;
 	}
@@ -469,24 +494,29 @@ void RIG_FT2000::set_notch(bool on, int val)
 		cmd[3 + i] += val % 10;
 		val /=10;
 	}
-	sendFTcommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 bool  RIG_FT2000::get_notch(int &val)
 {
 	bool ison = false;
 	cmd = "BP00;";
-	if (sendFTcommand(cmd, 8, false)) {
-		if (replybuff[6] == '1') {
-			ison = true;
-			cmd = "BP01;";
-			if (sendFTcommand(cmd, 8, false)) {
-				replybuff[7] = 0;
-				val = atoi(&replybuff[4]);
-				val -= 200;
-				val *= -9;
-			}
-		}
+	int ret = sendCommand(cmd);
+	if (ret < 8) return ison;
+	size_t p = replystr.rfind("BP");
+	if (p == string::npos) return ison;
+
+	if (replystr[p + 6] == '1') {
+		ison = true;
+		cmd = "BP01;";
+		ret = sendCommand(cmd);
+		if (ret < 8) return ison;
+		p = replystr.rfind("BP");
+		if (p == string::npos) return ison;
+		replystr[p + 7] = 0;
+		val = atoi(&replystr[p + 4]);
+		val -= 200;
+		val *= -9;
 	}
 	return ison;
 }
@@ -504,7 +534,7 @@ void RIG_FT2000::set_noise(bool b)
 		cmd = "NB01;";
 	else
 		cmd = "NB00;";
-	sendFTcommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 // val 0 .. 100
@@ -516,14 +546,18 @@ void RIG_FT2000::set_mic_gain(int val)
 		cmd[1+i] += val % 10;
 		val /= 10;
 	}
-	sendFTcommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 int RIG_FT2000::get_mic_gain()
 {
-	sendFTcommand("MG;", 6, false);
-	replybuff[5] = 0;
-	int val = atoi(&replybuff[2]);
+	cmd = "MG;";
+	int ret = sendCommand(cmd);
+	if (ret < 6) return 0;
+	size_t p = replystr.rfind("MG");
+	if (p == string::npos) return 0;
+	replystr[p + 5] = 0;
+	int val = atoi(&replystr[p + 2]);
 	return val;
 }
 

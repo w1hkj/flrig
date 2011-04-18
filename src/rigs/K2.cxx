@@ -64,9 +64,9 @@ int  RIG_K2::adjust_bandwidth(int m)
 void RIG_K2::initialize()
 {
 //enable extended command mode	
-	sendCommand("K22;", 0, false);
+	sendCommand("K22;", 0);
 //ensure K2 is in VFO A
-	sendCommand("FR0;",0, false);
+	sendCommand("FR0;",0);
 // get power output setting
     get_power_control();
 }
@@ -74,12 +74,14 @@ void RIG_K2::initialize()
 long RIG_K2::get_vfoA ()
 {
 	cmd = "FA;";
-	if (sendCommand(cmd, 14, false)) {
-		long f = 0;
-		for (size_t n = 2; n < 13; n++)
-			f = f*10 + replybuff[n] - '0';
-		freqA = f;
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 14) return freqA;
+	size_t p = replystr.rfind("FA");
+	if (p == string::npos) return freqA;
+	long f = 0;
+	for (size_t n = 2; n < 13; n++)
+		f = f*10 + replystr[p + n] - '0';
+	freqA = f;
 	return freqA;
 }
 
@@ -91,33 +93,39 @@ void RIG_K2::set_vfoA (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 void RIG_K2::set_attenuator(int val)
 {
-	if (val) sendCommand("RA01;", 0, false);
-	else	 sendCommand("RA00;", 0, false);
+	if (val) sendCommand("RA01;", 0);
+	else	 sendCommand("RA00;", 0);
 }
 
 int RIG_K2::get_attenuator()
 {
-	if (sendCommand("RA;", 5, false))
-		return (replybuff[3] == '1' ? 1 : 0);
-   return 0;
+	cmd = "RA;";
+	int ret = sendCommand(cmd);
+	if (ret < 5) return 0;
+	size_t p = replystr.rfind("RA");
+	if (p == string::npos) return 0;
+	return (replystr[p + 3] == '1' ? 1 : 0);
 }
 
 void RIG_K2::set_preamp(int val)
 {
-	if (val) sendCommand("PA1;", 0, false);
-	else	 sendCommand("PA0;", 0, false);
+	if (val) sendCommand("PA1;", 0);
+	else	 sendCommand("PA0;", 0);
 }
 
 int RIG_K2::get_preamp()
 {
-	if (sendCommand("PA;", 4, false))
-		return (replybuff[2] == '1' ? 1 : 0);
-	return 0;
+	cmd = "PA;";
+	int ret = sendCommand(cmd);
+	if (ret < 4) return 0;
+	size_t p = replystr.rfind("PA");
+	if (p == string::npos) return 0;
+	return (replystr[p + 2] == '1' ? 1 : 0);
 }
 
 void RIG_K2::set_modeA(int val)
@@ -125,13 +133,16 @@ void RIG_K2::set_modeA(int val)
 	val++;
 	cmd = "MD0;";
 	cmd[2] += val;
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 int RIG_K2::get_modeA()
 {
-	sendCommand("MD;",4);
-	int md = replybuff[2] - '0';
+	int ret = sendCommand("MD;");
+	if (ret < 4) return 0;
+	size_t p = replystr.rfind("MD");
+	if (p == string::npos) return 0;
+	int md = replystr[p + 2] - '0';
 	md--;
 	return md;
 }
@@ -154,8 +165,11 @@ void RIG_K2::set_bwA(int val)
 
 int RIG_K2::get_bwA()
 {
-	sendCommand("FW;",9);
-	int bw = replybuff[6] - '0';
+	int ret = sendCommand("FW;");
+	if (ret < 9) return 0;
+	size_t p = replystr.rfind("FW");
+	if (p == string::npos) return 0;
+	int bw = replystr[p + 6] - '0';
 	bw --;
 	return bw;
 }
@@ -168,41 +182,46 @@ void RIG_K2::tune_rig()
 int RIG_K2::get_smeter()
 {
 	cmd = "BG;";
-	if(sendCommand(cmd, 5)) {
-		int mtr = 10 * (replybuff[2] - '0') + replybuff[3] - '0';   //assemble two chars into 2 digit int
-		if (mtr > 10) {                                             //if int greater than 10 (bar mode)
-		    mtr -= 12;                                              //shift down to 0 thru 10
-		}
-		mtr *= 10;                                                  //normalize to 0 thru 100
-		return mtr;
+	int ret = sendCommand(cmd);
+	if (ret < 5) return 0;
+	size_t p = replystr.rfind("BG");
+	if (p == string::npos) return 0;
+	int mtr = 10 * (replystr[p + 2] - '0') 
+			+ replystr[p + 3] - '0';   //assemble two chars into 2 digit int
+	if (mtr > 10) {                    //if int greater than 10 (bar mode)
+	    mtr -= 12;                     //shift down to 0 thru 10
 	}
-	return 0;
+	mtr *= 10;                         //normalize to 0 thru 100
+	return mtr;
 }
 
 int RIG_K2::get_power_out()
 {
 	cmd = "BG;";
-	if(sendCommand(cmd, 5)) {
-		int mtr = 10 * (replybuff[2] - '0') + replybuff[3] - '0';   //assemble two chars into 2 digit int
-		if (mtr > 10) {                                             //if int greater than 10 (bar mode)
-		    mtr -= 12;                                              //shift down to 0 thru 10
-		}
-		mtr *= 10;                                                  //normalize to 0 thru 100
-		return mtr;
+	int ret = sendCommand(cmd);
+	if (ret < 5) return 0;
+	size_t p = replystr.rfind("BG");
+	if (p == string::npos) return 0;
+	int mtr = 10 * (replystr[p + 2] - '0') 
+			+ replystr[p + 3] - '0';   //assemble two chars into 2 digit int
+	if (mtr > 10) {                           //if int greater than 10 (bar mode)
+	    mtr -= 12;                            //shift down to 0 thru 10
 	}
-	return 0;
+	mtr *= 10;                                //normalize to 0 thru 100
+	return mtr;
 }
 
 int RIG_K2::get_power_control()
 {
 	cmd = "PC;";                        //init the get string
-	if (sendCommand(cmd,7)) {           //send it, if there's a response
-	    int mtr = (replybuff[4] - '0'   //pwr is the least sig digit
-	    + 10 * (replybuff[3] - '0')     //plus ten times the next sig digit
-	    + 100 * (replybuff[2] - '0'));   //plus one hundred times the most sig digit
-		return mtr;
-	}
-	return 0;                           //if no response, return nothing
+	int ret = sendCommand(cmd);
+	if (ret < 7) return 0;
+	size_t p = replystr.rfind("PC");
+	if (p == string::npos) return 0;
+    int mtr = (replystr[p + 4] - '0'   //pwr is the least sig digit
+		+ 10 * (replystr[p + 3] - '0')     //plus ten times the next sig digit
+	    + 100 * (replystr[p + 2] - '0'));   //plus one hundred times the most sig digit
+	return mtr;
 }
 
 void RIG_K2::set_power_control(double val)

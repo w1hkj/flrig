@@ -53,8 +53,8 @@ long RIG_FT857D::get_vfoA ()
 {
 	init_cmd();
 	cmd[4] = 0x03;
-
-	if (sendCommand(cmd, 5)) {
+	int ret = sendCommand(cmd);
+	if (ret == 5) {
 		freqA = fm_bcd(replybuff, 8) * 10;
 		int mode = replybuff[4];
 		for (int i = 0; i < 8; i++)
@@ -111,7 +111,8 @@ int  RIG_FT857D::get_power_out(void)
 {
    init_cmd();
    cmd[4] = 0xF7;
-   if (sendCommand(cmd,1)) {
+   int ret = sendCommand(cmd);
+   if (ret == 1) {
        int fwdpwr = replybuff[0];
        fwdpwr = fwdpwr * 100 / 15;
        return fwdpwr;
@@ -123,7 +124,8 @@ int  RIG_FT857D::get_smeter(void)
 {
    init_cmd();
    cmd[4] = 0xE7;
-   if (sendCommand(cmd,1)) {
+   int ret = sendCommand(cmd);
+   if (ret == 1) {
        int sval = replybuff[0];
        sval = (sval-1) * 100 / 15;
        return sval;

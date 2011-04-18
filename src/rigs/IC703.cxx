@@ -1,10 +1,10 @@
 /*
  * Icom IC-703
- * 
+ *
  * a part of flrig
- * 
+ *
  * Copyright 2009, Dave Freese, W1HKJ
- * 
+ *
  */
 
 #include "IC703.h"
@@ -46,7 +46,7 @@ RIG_IC703::RIG_IC703() {
 	has_vox_onoff =
 	has_preamp_control =
 	has_attenuator_control = true;
-	
+
 	defaultCIV = 0x68;
 	adjustCIV(defaultCIV);
 };
@@ -59,7 +59,7 @@ long RIG_IC703::get_vfoA ()
 	cmd += '\x03';
 	cmd.append( post );
 	if (!sendICcommand(cmd, 11)) {
-		checkresponse(11);
+		checkresponse();
 		return freqA;
 	}
 	freqA = fm_bcd_be(&replystr[5], 10);
@@ -74,7 +74,7 @@ void RIG_IC703::set_vfoA (long freq)
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append( post );
 	sendICcommand(cmd, 6);
-	checkresponse(6);
+	checkresponse();
 }
 
 void RIG_IC703::set_modeA(int val)
@@ -89,14 +89,14 @@ void RIG_IC703::set_modeA(int val)
 	cmd += bwA + 1;
 	cmd.append( post );
 	sendICcommand (cmd, 6);
-	checkresponse(6);
+	checkresponse();
 	if (val < 2) {
 		cmd = pre_to;
 		cmd.append("\x1A\x04");
 		cmd += data_mode ? 0x01 : 0x00;
 		cmd.append( post );
 		sendICcommand( cmd, 6 );
-		checkresponse(6);
+		checkresponse();
 	}
 }
 
@@ -117,7 +117,8 @@ int RIG_IC703::get_modeA()
 				if (replystr[6])
 					modeA += 8;
 		}
-	}
+	} else
+		checkresponse();
 	return modeA;
 }
 
@@ -144,7 +145,7 @@ void RIG_IC703::set_attenuator(int val)
 	cmd += val ? '\x20' : '\x00';
 	cmd.append( post );
 	sendCommand (cmd, 6);
-	checkresponse(6);
+	checkresponse();
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
@@ -156,6 +157,8 @@ int RIG_IC703::get_attenuator()
 	cmd.append( post );
 	if (sendICcommand (cmd, 7))
 		return replystr[6] == '\x20' ? 1 : 0;
+	else
+		checkresponse();
 	return 0;
 }
 
@@ -177,7 +180,7 @@ void RIG_IC703::set_preamp(int val)
 	cmd += (unsigned char) preamp_level;
 	cmd.append( post );
 	sendICcommand (cmd, 6);
-	checkresponse(6);
+	checkresponse();
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
@@ -199,7 +202,8 @@ int RIG_IC703::get_preamp()
 			preamp_label("Pre", false);
 			preamp_level = 0;
 		}
-	}
+	} else
+		checkresponse();
 	return preamp_level;
 }
 
@@ -209,6 +213,7 @@ int RIG_IC703::get_smeter()
 	cmd.append("\x15\x02").append(post);
 	if (sendICcommand (cmd, 9))
 		return fm_bcd(&replystr[6], 3) * 100 / 255;
+	checkresponse();
 	return 0;
 }
 
@@ -218,6 +223,7 @@ int RIG_IC703::get_power_out()
 	cmd.append("\x15\x11").append(post);
 	if (sendICcommand (cmd, 9))
 		return fm_bcd(&replystr[6], 3) * 100 / 255;
+	checkresponse();
 	return 0;
 }
 
@@ -227,6 +233,7 @@ int RIG_IC703::get_swr()
 	cmd.append("\x15\x12").append(post);
 	if (sendICcommand (cmd, 9))
 		return fm_bcd(&replystr[6], 3) * 100 / 255;
+	checkresponse();
 	return 0;
 }
 
@@ -238,17 +245,15 @@ void RIG_IC703::set_compression()
 		cmd += '\x01';
 		cmd.append(post);
 		sendICcommand(cmd, 6);
-		checkresponse(6);
+		checkresponse();
 	} else {
 		cmd = pre_to;
 		cmd.append("\x16\x44");
 		cmd += '\x00';
 		cmd.append(post);
 		sendICcommand(cmd, 6);
-		checkresponse(6);
+		checkresponse();
 	}
-	if (RIG_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 void RIG_IC703::set_vox_onoff()
@@ -259,17 +264,15 @@ void RIG_IC703::set_vox_onoff()
 		cmd += '\x01';
 		cmd.append(post);
 		sendICcommand(cmd, 6);
-		checkresponse(6);
+		checkresponse();
 	} else {
 		cmd = pre_to;
 		cmd.append("\x16\x46");
 		cmd += '\x00';
 		cmd.append(post);
 		sendICcommand(cmd, 6);
-		checkresponse(6);
+		checkresponse();
 	}
-	if (RIG_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 // Tranceiver PTT on/off
@@ -281,8 +284,6 @@ void RIG_IC703::set_PTT_control(int val)
 	cmd += (unsigned char) val;
 	cmd.append( post );
 	sendICcommand (cmd, 6);
-	checkresponse(6);
-	if (RIG_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+	checkresponse();
 }
 

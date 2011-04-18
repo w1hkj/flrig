@@ -51,11 +51,10 @@ long RIG_TT563::get_vfoA ()
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
-	if (!sendICcommand(cmd, 11)) {
-		checkresponse(11);
-		return freqA;
+	int ret = sendCommand(cmd);
+	if (ret >= 11) {
+		freqA = fm_bcd_be(&replystr[ret - 11 + 5], 10);
 	}
-	freqA = fm_bcd_be(&replystr[5], 10);
 	return freqA;
 }
 
@@ -66,8 +65,8 @@ void RIG_TT563::set_vfoA (long freq)
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 8 ) );
 	cmd.append( post );
-	sendICcommand(cmd, 6);
-	checkresponse(6);
+	sendCommand(cmd);
+	checkresponse();
 }
 
 void RIG_TT563::set_PTT_control(int val)
@@ -76,8 +75,8 @@ void RIG_TT563::set_PTT_control(int val)
 	cmd += '\x16';
 	cmd += val ? '\x01' : '\x02';
 	cmd.append( post );
-	sendICcommand(cmd,6);
-	checkresponse(6);
+	sendCommand(cmd);
+	checkresponse();
 }
 
 void RIG_TT563::set_modeA(int md)
@@ -87,8 +86,8 @@ void RIG_TT563::set_modeA(int md)
 	cmd += '\x06';
 	cmd += modeA;
 	cmd.append(post);
-	sendICcommand(cmd, 6);
-	checkresponse(6);
+	sendCommand(cmd);
+	checkresponse();
 }
 
 int RIG_TT563::get_modeA()
@@ -96,9 +95,10 @@ int RIG_TT563::get_modeA()
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
-	if( sendICcommand (cmd, 8 )) {
-		modeA = replystr[5];
-		bwA = replystr[6];
+	int ret = sendCommand(cmd);
+	if (ret >= 8) {
+		modeA = replystr[ret - 8 + 5];
+		bwA = replystr[ret - 8 + 6];
 	}
 	return modeA;
 }

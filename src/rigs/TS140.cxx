@@ -91,12 +91,13 @@ RIG_TS140::RIG_TS140() {
 long RIG_TS140::get_vfoA ()
 {
 	cmd = "IF;";
-	if (sendCommand(cmd, 38, false)) {
-		long f = 0;
-		for (size_t n = 2; n < 13; n++)
-			f = f*10 + replybuff[n] - '0';
-		freqA = f;
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 38) return freqA;
+
+	long f = 0;
+	for (size_t n = 2; n < 13; n++)
+		f = f*10 + replybuff[ret - 38 + n] - '0';
+	freqA = f;
 	return freqA;
 }
 
@@ -108,14 +109,14 @@ void RIG_TS140::set_vfoA (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 // Tranceiver PTT on/off
 void RIG_TS140::set_PTT_control(int val)
 {
-	if (val) sendCommand("TX;", 0, false);
-	else	 sendCommand("RX;", 0, false);
+	if (val) sendCommand("TX;", 0);
+	else	 sendCommand("RX;", 0);
 }
 
 int RIG_TS140::get_modetype(int n)
@@ -128,131 +129,20 @@ void RIG_TS140::set_modeA(int val)
 	if (val == 5) val++;
 	cmd = "MD0;";
 	cmd[2] = '1' + (val % 10);
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 int RIG_TS140::get_modeA()
 {
 	modeA = 0;
-	if (sendCommand("IF;", 38, false)) {
-		int md = replybuff[29] - '1';
-		if (md < 0) md = 0;
-		if (md > 5) md = 5;
-		modeA = md;
-	}
+	cmd = "IF;";
+	int ret = sendCommand(cmd);
+	if (ret < 38) return modeA;
+
+	int md = replybuff[ret - 38 + 29] - '1';
+	if (md < 0) md = 0;
+	if (md > 5) md = 5;
+	modeA = md;
+
 	return modeA;
 }
-
-
-/*
-int RIG_TS140::get_smeter()
-{
-	cmd = "SM0;";
-	if(sendCommand(cmd, 7)) {
-		replybuff[6] = 0;
-		int mtr = atoi(&replybuff[3]);
-		mtr = mtr * 100.0 / 256.0 - 128.0;
-		return mtr;
-	}
-	return 0;
-}
-
-int RIG_TS140::get_swr()
-{
-	cmd = "RM6;";
-	if (sendCommand(cmd,7)) {
-		replybuff[6] = 0;
-		int mtr = atoi(&replybuff[3]);
-		return mtr;
-	}
-	return 0;
-}
-
-int RIG_TS140::get_power_out()
-{
-	cmd = "RM5;";
-	if (sendCommand(cmd,7)) {
-		replybuff[6] = 0;
-		int mtr = atoi(&replybuff[3]);
-		return mtr;
-	}
-	return 0;
-}
-
-int RIG_TS140::get_power_control()
-{
-	cmd = "PC;";
-	if (sendCommand(cmd,6)) {
-		replybuff[5] = 0;
-		int mtr = atoi(&replybuff[2]);
-		return (mtr * 255 / 150);
-	}
-	return 0;
-}
-
-// Transceiver power level
-void RIG_TS140::set_power_control(double val)
-{
-	int ival = (int)val * 150 / 255;
-	cmd = "PC000;";
-	for (int i = 4; i > 1; i--) {
-		cmd[i] += ival % 10;
-		ival /= 10;
-	}
-	sendCommand(cmd,0);
-}
-
-// Volume control
-void RIG_TS140::set_volume_control(double val) 
-{
-	int ivol = (int)(val * 255);
-	cmd = "AG0000;";
-	for (int i = 5; i > 2; i--) {
-		cmd[i] += ivol % 10;
-		ivol /= 10;
-	}
-	sendCommand(cmd,0);
-}
-
-void RIG_TS140::tune_rig()
-{
-	sendCommand("AC002;",0);
-}
-
-void RIG_TS140::set_bwA(int val)
-{
-	switch (val) {
-		case 0 : sendCommand("SH000;",0); break;
-		case 1 : sendCommand("SH016;",0); break;
-		case 2 : sendCommand("SH031;",0); break;
-		default: sendCommand("SH031;",0);
-	}
-}
-
-void RIG_TS140::set_attenuator(int val)
-{
-	if (val) sendCommand("RA01;", 0, false);
-	else	 sendCommand("RA00;", 0, false);
-}
-
-int RIG_TS140::get_attenuator()
-{
-	if (sendCommand("RA0", 5, false))
-		return (replybuff[3] == '1' ? 1 : 0);
-   return 0;
-}
-
-void RIG_TS140::set_preamp(int val)
-{
-	if (val) sendCommand("PA01;", 0, false);
-	else	 sendCommand("PA00;", 0, false);
-}
-
-int RIG_TS140::get_preamp()
-{
-	if (sendCommand("PA0", 5, false))
-		return (replybuff[3] == '1' ? 1 : 0);
-	return 0;
-}
-
-*/

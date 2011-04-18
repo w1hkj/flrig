@@ -65,7 +65,7 @@ static char TT588setBW[]		= "*Wx\r";
 static char TT588getFREQA[]		= "?A\r";
 //static char TT588getAGC[]		= "?G\r";
 //static char TT588getSQLCH[]	= "?H\r";
-//static char TT588getRF[]		= "?I\r";
+static char TT588getRF[]		= "?I\r";
 static char TT588getATT[]		= "?J\r";
 //static char TT588getNB[]		= "?K\r";
 static char TT588getMODE[]		= "?M\r";
@@ -90,6 +90,7 @@ RIG_TT588::RIG_TT588() {
 	comm_retries = 2;
 	comm_wait = 20;
 	comm_timeout = 50;
+	comm_echo = false;
 	comm_rtscts = true;
 	comm_rtsplus = false;
 	comm_dtrplus = true;
@@ -129,20 +130,6 @@ RIG_TT588::RIG_TT588() {
 
 }
 
-void RIG_TT588::checkresponse(string s)
-{
-	if (RigSerial.IsOpen() == false)
-		return;
-	LOG_ERROR("%s:\nsent  %s\nreply %s\n", s.c_str(),
-		str2hex(cmd.c_str(), cmd.length()),
-		str2hex((char *)replybuff, strlen((char *)replybuff)));
-}
-
-void RIG_TT588::showresponse(string s)
-{
-	printf("%s: %s\n", s.c_str(),str2hex((char *)replybuff, strlen((char *)replybuff)));
-}
-
 void RIG_TT588::initialize()
 {
 	VfoAdj = progStatus.vfo_adj;
@@ -156,12 +143,15 @@ void RIG_TT588::shutdown()
 long RIG_TT588::get_vfoA ()
 {
 	cmd = TT588getFREQA;
-	bool ret = sendCommand(cmd, 6, true);
-	if (ret == true && replybuff[0] == 'A') {
-		int f = 0;
-		for (size_t n = 1; n < 5; n++)
-			f = f*256 + (unsigned char)replybuff[n];
-		freqA = f;
+	int ret = sendCommand(cmd);
+	if (ret >= 6) {
+		size_t p = replystr.rfind("A");
+		if (p != string::npos) {
+			int f = 0;
+			for (size_t n = 1; n < 5; n++)
+				f = f*256 + (unsigned char)replystr[p + n];
+			freqA = f;
+		}
 	}
 	return (long)(freqA - vfo_corr);
 }
@@ -176,7 +166,7 @@ void RIG_TT588::set_vfoA (long freq)
 	cmd[4] = xfreq & 0xff; xfreq = xfreq >> 8;
 	cmd[3] = xfreq & 0xff; xfreq = xfreq >> 8;
 	cmd[2] = xfreq & 0xff;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 	set_if_shift(pbt);
 	return ;
 }
@@ -191,16 +181,17 @@ void RIG_TT588::set_modeA(int val)
 	modeA = val;
 	cmd = TT588setMODE;
 	cmd[2] = cmd[3] = TT588mode_chr[val];
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 int RIG_TT588::get_modeA()
 {
 	cmd = TT588getMODE;
-	sendCommand(cmd, 4, true);
-	if (replybuff[0] == 'M') {
-		modeA = replybuff[1] - '0';
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 4) return modeA;
+	size_t p = replystr.rfind("M");
+	if (p == string::npos) return modeA;
+	modeA = replystr[p + 1] - '0';
 	return modeA;
 }
 
@@ -214,16 +205,18 @@ void RIG_TT588::set_bwA(int val)
 	bwA = val;
 	cmd = TT588setBW;
 	cmd[2] = 37 - val;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 	set_if_shift(pbt);
 }
 
 int RIG_TT588::get_bwA()
 {
 	cmd = TT588getBW;
-	sendCommand(cmd, 3, true);
-	if (replybuff[0] == 'W')
-		bwA = 37 - (unsigned char)replybuff[1];
+	int ret = sendCommand(cmd);
+	if (ret < 3) return bwA;
+	size_t p = replystr.rfind("W");
+	if (p == string::npos) return bwA;
+	bwA = 37 - (unsigned char)replystr[p + 1];
 	return bwA;
 }
 
@@ -246,18 +239,21 @@ void RIG_TT588::set_if_shift(int val)
 		si += (bpval > 0 ? bpval : 0);
 	cmd[2] = (si & 0xff00) >> 8;
 	cmd[3] = (si & 0xff);
-	sendCommand(cmd, 0, true);
-	sendCommand(TT588getPBT, 4, true);
-	if (replybuff[1] != cmd[2] || replybuff[2] != cmd[3]) {
-		sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
+	int ret = sendCommand(TT588getPBT);
+	if (ret >= 4) {
+		size_t p = replystr.rfind("P");
+		if (p == string::npos) return;
+		if (replystr[p+1] != cmd[2] || replystr[p+2] != cmd[3])
+			sendCommand(cmd, 0);
 	}
 }
 
 bool RIG_TT588::get_if_shift(int &val)
 {
 	val = 0;
-	cmd = TT588getPBT;
-	sendCommand(cmd, 4, true);
+//	cmd = TT588getPBT;
+//	sendCommand(cmd, 4, true);
 	return false;
 }
 
@@ -273,15 +269,18 @@ void RIG_TT588::set_attenuator(int val)
 	cmd = TT588setATT;
 	if (val) cmd[2] = '1';
 	else     cmd[2] = '0';
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 
 int RIG_TT588::get_attenuator()
 {
 	cmd = TT588getATT;
-	sendCommand(cmd, 3, true);
-	if (replybuff[0] == 'J' && replybuff[1] == '1')
+	int ret = sendCommand(cmd);
+	if (ret < 3) return 0;
+	size_t p = replystr.rfind("J");
+	if (p == string::npos) return 0;
+	if (replystr[p + 1] == '1')
 		return 1;
 	return 0;
 }
@@ -291,43 +290,52 @@ int RIG_TT588::get_smeter()
 	int sval = 0;
 	float fval = 0;
 	cmd = TT588getSMETER;
-	sendCommand(cmd, 6, true);
-	if (replybuff[0] == 'S') {
-		sscanf(&replybuff[1], "%4x", &sval);
-		fval = sval/256.0;
-		sval = (int)(fval * 100.0 / 18.0);
-		if (sval > 100) sval = 100;
-	}
-	return (sval);
+	int ret = sendCommand(cmd);
+	if (ret < 6) return sval;
+	size_t p = replystr.rfind("S");
+	if (p == string::npos) return sval;
+
+	sscanf(&replystr[p + 1], "%4x", &sval);
+	fval = sval/256.0;
+	sval = (int)(fval * 100.0 / 18.0);
+	if (sval > 100) sval = 100;
+
+	return sval;
 }
 
 int RIG_TT588::get_volume_control()
 {
 	cmd = TT588getVOL;
-	sendCommand(cmd, 3, true);
-	if (replybuff[0] == 'U')
-		return (int)((replybuff[1] & 0x7F) / 1.27);
-	return 0;
+	int ret = sendCommand(cmd);
+	if (ret < 3) return 0;
+	size_t p = replystr.rfind("U");
+	if (p == string::npos) return 0;
+
+	return (int)((replystr[p + 1] & 0x7F) / 1.27);
 }
 
 void RIG_TT588::set_volume_control(int vol)
 {
 	cmd = TT588setVOL;
 	cmd[2] = 0x7F & (int)(vol * 1.27);
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TT588::set_rf_gain(int val)
 {
 	cmd = TT588setRF;
-	cmd[2] = 0x7F & (int)(val * 1.27);
-	sendCommand(cmd, 0, true);
+	cmd[2] = 0x7F & (int)((100 - val) * 1.27);
+	sendCommand(cmd, 0);
 }
 
 int  RIG_TT588::get_rf_gain()
 {
-	return 100; 
-// Omni-VII does not reply with values as specified in the programmers manual
+	cmd = TT588getRF;
+	int ret = sendCommand(cmd);
+	if (ret < 3) return 100;
+	size_t p = replystr.rfind("I");
+	if (p == string::npos) return 100;
+	return 100 - (int)((replystr[p+1] & 0x7F) / 1.27);
 }
 
 // Tranceiver PTT on/off
@@ -344,21 +352,18 @@ void RIG_TT588::set_PTT_control(int val)
 		cmd[2] = 0;
 		cmd[3] = 0;
 	}
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 int RIG_TT588::get_power_out()
 {
-	query_cnt--;
-	if (!query_cnt)
-		set_PTT_control(1);
 	cmd = TT588getFWDPWR;
-	sendCommand(cmd, 6, true);
-	fwdpwr = refpwr = 0;
-	if (replybuff[0] == 'F') {
-		fwdpwr = replybuff[1] & 0x7F;
-		refpwr = replybuff[2];
-	}
+	int ret = sendCommand(cmd);
+	if (ret <  6) return 0;
+	size_t p = replystr.rfind("F");
+	if (p == string::npos) return 0;
+	fwdpwr = replystr[p + 1] & 0x7F;
+	refpwr = replystr[p + 2];
 	fwdv = sqrtf(fwdpwr);
 	refv = sqrtf(refpwr);
 	return fwdpwr;

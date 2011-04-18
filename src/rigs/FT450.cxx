@@ -70,13 +70,13 @@ int  RIG_FT450::adjust_bandwidth(int m)
 void RIG_FT450::select_vfoA()
 {
 	cmd = "SV0;";
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 void RIG_FT450::select_vfoB()
 {
 	cmd = "SV1;";
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 void RIG_FT450::initialize()
@@ -87,12 +87,13 @@ void RIG_FT450::initialize()
 long RIG_FT450::get_vfoA ()
 {
 	cmd = "FA;";
-	if (sendCommand(cmd, 11, false)) {
-		int f = 0;
-		for (size_t n = 2; n < 10; n++)
-			f = f*10 + replybuff[n] - '0';
-		freqA = f;
-	}
+	sendCommand(cmd);
+	size_t p = replystr.rfind("FA");
+	if (p == string::npos) return freqA;
+	int f = 0;
+	for (size_t n = 2; n < 10; n++)
+		f = f*10 + replystr[p+n] - '0';
+	freqA = f;
 	return freqA;
 }
 
@@ -104,19 +105,19 @@ void RIG_FT450::set_vfoA (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendCommand(cmd, 0, false);
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 long RIG_FT450::get_vfoB ()
 {
 	cmd = "FB;";
-	if (sendCommand(cmd, 11, false)) {
-		int f = 0;
-		for (size_t n = 2; n < 10; n++)
-			f = f*10 + replybuff[n] - '0';
-		freqB = f;
-	}
+	sendCommand(cmd);
+	size_t p = replystr.rfind("FB");
+	if (p == string::npos) return freqB;
+	int f = 0;
+	for (size_t n = 2; n < 10; n++)
+		f = f*10 + replystr[p+n] - '0';
+	freqB = f;
 	return freqB;
 }
 
@@ -128,27 +129,27 @@ void RIG_FT450::set_vfoB (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 void RIG_FT450::set_split(bool on)
 {
 	if (on) cmd = "FT1;";
 	else cmd = "FT0;";
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 	LOG_INFO("cmd: %s\nreply: %s", cmd.c_str(), replystr.c_str());
 }
 
 int RIG_FT450::get_smeter()
 {
 	cmd = "SM0;";
-	if(sendCommand(cmd, 7, false)) {
-		replybuff[6] = 0;
-		int mtr = atoi(&replybuff[3]);
-		mtr = mtr * 100.0 / 256.0;
-		return mtr;
-	}
-	return 0;
+	sendCommand(cmd);
+	size_t p = replystr.rfind("SM");
+	if (p == string::npos) return 0;
+	replystr[p+6] = 0;
+	int mtr = atoi(&replystr[p+3]);
+	mtr = mtr * 100.0 / 256.0;
+	return mtr;
 }
 
 // measured by W3NR
@@ -163,47 +164,47 @@ int RIG_FT450::get_smeter()
 int RIG_FT450::get_swr()
 {
 	cmd = "RM6;";
-	if (sendCommand(cmd, 7, false)) {
-		replybuff[6] = 0;
-		int mtr = atoi(&replybuff[3]);
-		return mtr / 2.55;
-	}
-	return 0;
+	sendCommand(cmd);
+	size_t p = replystr.rfind("RM");
+	if (p == string::npos) return 0;
+	replystr[p+6] = 0;
+	int mtr = atoi(&replystr[p+3]);
+	return mtr / 2.55;
 }
 
 
 int RIG_FT450::get_power_out()
 {
 	cmd = "RM5;";
-	if (sendCommand(cmd, 7, false)) {
-		replybuff[6] = 0;
-		double mtr = (double)(atoi(&replybuff[3]));
-		mtr = -6.6263535 + .11813178 * mtr + .0013607405 * mtr * mtr;
-		return (int)mtr;
-	}
-	return 0;
+	sendCommand(cmd);
+	size_t p = replystr.rfind("RM");
+	if (p == string::npos) return 0;
+	replystr[p+6] = 0;
+	double mtr = (double)(atoi(&replystr[p+3]));
+	mtr = -6.6263535 + .11813178 * mtr + .0013607405 * mtr * mtr;
+	return (int)mtr;
 }
 
 int RIG_FT450::get_power_control()
 {
 	cmd = "PC;";
-	if (sendCommand(cmd, 6, false)) {
-		replybuff[5] = 0;
-		int mtr = atoi(&replybuff[2]);
-		return mtr;
-	}
-	return 0;
+	sendCommand(cmd);
+	size_t p = replystr.rfind("PC");
+	if (p == string::npos) return 0;
+	replystr[p+5] = 0;
+	int mtr = atoi(&replystr[p+2]);
+	return mtr;
 }
 
 // Volume control return 0 ... 100
 int RIG_FT450::get_volume_control()
 {
 	cmd = "AG0;";
-	if (sendCommand(cmd, 7, false))  {
-		cmd[6] = 0;
-		return atoi(&replybuff[3]);
-	}
-	return 0;
+	sendCommand(cmd);
+	size_t p = replystr.rfind("AG");
+	if (p == string::npos) return 0;
+	cmd[p+6] = 0;
+	return atoi(&replystr[p+3]);
 }
 
 void RIG_FT450::set_volume_control(int val) 
@@ -214,7 +215,7 @@ void RIG_FT450::set_volume_control(int val)
 		cmd[i] += ivol % 10;
 		ivol /= 10;
 	}
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 void RIG_FT450::get_vol_min_max_step(int &min, int &max, int &step)
@@ -231,45 +232,47 @@ void RIG_FT450::set_power_control(double val)
 		cmd[i] += ival % 10;
 		ival /= 10;
 	}
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 // Tranceiver PTT on/off
 void RIG_FT450::set_PTT_control(int val)
 {
-	if (val) sendCommand("TX1;", 0, false);
-	else	 sendCommand("TX0;", 0, false);
+	if (val) sendCommand("TX1;", 0);
+	else	 sendCommand("TX0;", 0);
 }
 
 void RIG_FT450::tune_rig()
 {
-	sendCommand("AC002;",0, false);
+	sendCommand("AC002;", 0);
 }
 
 void RIG_FT450::set_attenuator(int val)
 {
-	if (val) sendCommand("RA01;", 0, false);
-	else	 sendCommand("RA00;", 0, false);
+	if (val) sendCommand("RA01;", 0);
+	else	 sendCommand("RA00;", 0);
 }
 
 int RIG_FT450::get_attenuator()
 {
-	if (sendCommand("RA0;", 5, false))
-		return (replybuff[3] == '1' ? 1 : 0);
-	return 0;
+	sendCommand("RA0;");
+	size_t p = replystr.rfind("RA");
+	if (p == string::npos) return 0;
+	return (replystr[p+3] == '1' ? 1 : 0);
 }
 
 void RIG_FT450::set_preamp(int val)
 {
-	if (val) sendCommand("PA00;", 0, false);
-	else	 sendCommand("PA01;", 0, false);
+	if (val) sendCommand("PA00;", 0);
+	else	 sendCommand("PA01;", 0);
 }
 
 int RIG_FT450::get_preamp()
 {
-	if (sendCommand("PA0;", 5, false))
-		return (replybuff[3] == '1' ? 0 : 1);
-	return 0;
+	sendCommand("PA0;");
+	size_t p = replystr.rfind("PA");
+	if (p == string::npos) return 0;
+	return (replystr[p+3] == '1' ? 0 : 1);
 }
 
 
@@ -279,17 +282,19 @@ void RIG_FT450::set_modeA(int val)
 	cmd = "MD0";
 	cmd += mode_chr[val];
 	cmd += ';';
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 int RIG_FT450::get_modeA()
 {
-	if (sendCommand("MD0;", 5, false)) {
-		int md = replybuff[3];
-		if (md <= '9') md = md - '1';
-		else md = 9 + md - 'B';
-		modeA = md;
-	}
+	sendCommand("MD0;");
+	size_t p = replystr.rfind("MD");
+	if (p == string::npos) return modeA;
+	
+	int md = replystr[p+3];
+	if (md <= '9') md = md - '1';
+	else md = 9 + md - 'B';
+	modeA = md;
 	return modeA;
 }
 
@@ -302,17 +307,18 @@ void RIG_FT450::set_bwA(int val)
 		case 2 : cmd = "SH031;"; break;
 		default: cmd = "SH031;";
 	}
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 int RIG_FT450::get_bwA()
 {
-	if (sendCommand("SH0;", 6, false)) {
-		replybuff[5] = 0;
-		if (strcmp(&replybuff[3],"00") == 0) bwA = 0;
-		if (strcmp(&replybuff[3],"16") == 0) bwA = 1;
-		if (strcmp(&replybuff[3],"31") == 0) bwA = 2;
-	}
+	sendCommand("SH0;");
+	size_t p = replystr.rfind("SH");
+	if (p == string::npos) return bwA;
+	string bws = replystr.substr(p+3,2);
+	if (bws == "00") bwA = 0;
+	else if (bws == "16") bwA = 1;
+	else if (bws == "31") bwA = 2;
 	return bwA;
 }
 
@@ -330,15 +336,17 @@ void RIG_FT450::set_if_shift(int val)
 		cmd[3+i] += val % 10;
 		val /= 10;
 	}
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 bool RIG_FT450::get_if_shift(int &val)
 {
 	static int oldval = 0;
-	sendCommand("IS0;", 9, false);
-	replybuff[8] = 0;
-	val = atoi(&replybuff[3]);
+	sendCommand("IS0;");
+	size_t p = replystr.rfind("IS");
+	if (p == string::npos) return false;
+	replystr[p+8] = 0;
+	val = atoi(&replystr[p+3]);
 	if (val != 0 || oldval != val) {
 		oldval = val;
 		return true;
@@ -358,13 +366,13 @@ void RIG_FT450::set_notch(bool on, int val)
 {
 	cmd = "BP00000;";
 	if (on == false) {
-		sendCommand(cmd, 0, false);
+		sendCommand(cmd, 0);
 		notch_on = false;
 		return;
 	}
 	if (!notch_on) {
 		cmd[6] = '1'; // notch ON
-		sendCommand(cmd, 0, false);
+		sendCommand(cmd, 0);
 		cmd[6] = '0';
 		notch_on = true;
 	}
@@ -377,23 +385,26 @@ void RIG_FT450::set_notch(bool on, int val)
 		cmd[3 + i] += val % 10;
 		val /=10;
 	}
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 bool  RIG_FT450::get_notch(int &val)
 {
 	bool ison = false;
 	cmd = "BP00;";
-	if (sendCommand(cmd, 8, false)) {
-		if (replybuff[6] == '1') {
-			ison = true;
-			cmd = "BP01;";
-			if (sendCommand(cmd, 8, false)) {
-				replybuff[7] = 0;
-				val = atoi(&replybuff[4]);
-				val -= 200;
-				val *= -9;
-			}
+	sendCommand(cmd);
+	size_t p = replystr.rfind("BP");
+	if (p == string::npos) return ison;
+	if (replystr[p+6] == '1') {
+		ison = true;
+		cmd = "BP01;";
+		sendCommand(cmd);
+		p = replystr.rfind("BP");
+		if (p != string::npos) {
+			replystr[p+7] = 0;
+			val = atoi(&replystr[p+4]);
+			val -= 200;
+			val *= -9;
 		}
 	}
 	return ison;
@@ -412,7 +423,7 @@ void RIG_FT450::set_noise(bool b)
 		cmd = "NB01;";
 	else
 		cmd = "NB00;";
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 // val 0 .. 100
@@ -424,15 +435,16 @@ void RIG_FT450::set_mic_gain(int val)
 		cmd[1+i] += val % 10;
 		val /= 10;
 	}
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 int RIG_FT450::get_mic_gain()
 {
-	sendCommand("MG;", 6, false);
-	replybuff[5] = 0;
-	int val = atoi(&replybuff[2]);
-	return val;
+	sendCommand("MG;");
+	size_t p = replystr.rfind("MG");
+	if (p == string::npos) return 0;
+	replystr[p+5] = 0;
+	return atoi(&replystr[p+2]);;
 }
 
 void RIG_FT450::get_mic_min_max_step(int &min, int &max, int &step)
@@ -446,5 +458,5 @@ void RIG_FT450::set_special(int v)
 {
 	if (v) cmd = "VR1;";
 	else   cmd = "VR0;";
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }

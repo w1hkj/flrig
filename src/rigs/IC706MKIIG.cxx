@@ -55,7 +55,7 @@ void RIG_IC706MKIIG::select_vfoA()
 	cmd += '\x00';
 	cmd.append(post);
 	sendICcommand(cmd, 6);
-	checkresponse(6);
+	checkresponse();
 }
 
 void RIG_IC706MKIIG::select_vfoB()
@@ -65,7 +65,7 @@ void RIG_IC706MKIIG::select_vfoB()
 	cmd += '\x01';
 	cmd.append(post);
 	sendICcommand(cmd, 6);
-	checkresponse(6);
+	checkresponse();
 }
 
 long RIG_IC706MKIIG::get_vfoA ()
@@ -74,7 +74,7 @@ long RIG_IC706MKIIG::get_vfoA ()
 	cmd += '\x03';
 	cmd.append( post );
 	if (!sendCommand(cmd, 11)) {
-		checkresponse(11);
+		checkresponse();
 		return freqA;
 	}
 	freqA = fm_bcd_be(&replystr[5], 10);
@@ -89,7 +89,7 @@ void RIG_IC706MKIIG::set_vfoA (long freq)
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append( post );
 	sendICcommand(cmd, 6);
-	checkresponse(6);
+	checkresponse();
 }
 
 long RIG_IC706MKIIG::get_vfoB ()
@@ -106,7 +106,7 @@ void RIG_IC706MKIIG::set_vfoB (long freq)
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append( post );
 	sendICcommand(cmd, 6);
-	checkresponse(6);
+	checkresponse();
 	select_vfoA();
 }
 
@@ -117,7 +117,7 @@ void RIG_IC706MKIIG::set_split(bool b)
 	cmd += b ? '\x01' : '\x00';
 	cmd.append( post );
 	sendICcommand(cmd, 6);
-	checkresponse(6);
+	checkresponse();
 }
 
 void RIG_IC706MKIIG::set_modeA(int val)
@@ -129,7 +129,7 @@ void RIG_IC706MKIIG::set_modeA(int val)
 	cmd += bwA;
 	cmd.append( post );
 	sendICcommand (cmd, 6);
-	checkresponse(6);
+	checkresponse();
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
@@ -170,7 +170,7 @@ void RIG_IC706MKIIG::set_attenuator(int val)
 	cmd += val ? '\x20' : '\x00';
 	cmd.append( post );
 	sendCommand (cmd, 6);
-	checkresponse(6);
+	checkresponse();
 }
 
 int RIG_IC706MKIIG::get_smeter()

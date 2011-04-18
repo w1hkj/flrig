@@ -97,7 +97,7 @@ void RIG_TS2000::initialize()
 long RIG_TS2000::get_vfoA ()
 {
 	cmd = "FA;";
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 LOG_WARN("%s", replystr.c_str());
 	size_t p = replystr.rfind("FA");
 	if (p != string::npos && (p + 12 < replystr.length())) {
@@ -119,13 +119,13 @@ void RIG_TS2000::set_vfoA (long freq)
 	}
 if (RIG_DEBUG)
 	LOG_INFO("%s", cmd.c_str());
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 }
 
 long RIG_TS2000::get_vfoB ()
 {
 	cmd = "FB;";
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 LOG_WARN("%s", replystr.c_str());
 	size_t p = replystr.rfind("FB");
 	if (p != string::npos && (p + 12 < replystr.length())) {
@@ -147,13 +147,13 @@ void RIG_TS2000::set_vfoB (long freq)
 	}
 if (RIG_DEBUG)
 	LOG_INFO("%s", cmd.c_str());
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 }
 
 int RIG_TS2000::get_smeter()
 {
 	cmd = "SM0;";
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 LOG_WARN("%s", replystr.c_str());
 	size_t p = replystr.rfind("SM");
 	if (p != string::npos && (p + 7 < replystr.length())) {
@@ -168,7 +168,7 @@ LOG_WARN("%s", replystr.c_str());
 int RIG_TS2000::get_swr()
 {
 	cmd = "RM1;";
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 LOG_WARN("%s", replystr.c_str());
 	size_t p = replystr.rfind("RM");
 	if (p != string::npos && (p + 7 < replystr.length())) {
@@ -190,13 +190,13 @@ void RIG_TS2000::set_power_control(double val)
 	}
 if (RIG_DEBUG)
 	LOG_INFO("%s", cmd.c_str());
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 }
 
 int RIG_TS2000::get_power_out()
 {
 	cmd = "PC;";
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 LOG_WARN("%s", replystr.c_str());
 	size_t p = replystr.rfind("PC");
 	if (p != string::npos && (p + 5 < replystr.length())) {
@@ -216,7 +216,7 @@ int RIG_TS2000::get_power_control()
 int RIG_TS2000::get_volume_control()
 {
 	cmd = "AG0;";
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 LOG_WARN("%s", replystr.c_str());
 	size_t p = replystr.rfind("AG");
 	if (p != string::npos && (p + 7 < replystr.length())) {
@@ -237,7 +237,7 @@ void RIG_TS2000::set_volume_control(int val)
 	}
 if (RIG_DEBUG)
 	LOG_INFO("%s", cmd.c_str());
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 }
 
 // Tranceiver PTT on/off
@@ -247,7 +247,7 @@ void RIG_TS2000::set_PTT_control(int val)
 	else	 cmd = "RX;";
 if (RIG_DEBUG)
 	LOG_INFO("%s", cmd.c_str());
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 }
 
 void RIG_TS2000::tune_rig()
@@ -255,7 +255,7 @@ void RIG_TS2000::tune_rig()
 	cmd = "AC111;";
 if (RIG_DEBUG)
 	LOG_INFO("%s", cmd.c_str());
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 }
 
 void RIG_TS2000::set_attenuator(int val)
@@ -265,13 +265,13 @@ void RIG_TS2000::set_attenuator(int val)
 	else     cmd = "RA00;";
 if (RIG_DEBUG)
 	LOG_INFO("%s", cmd.c_str());
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 }
 
 int RIG_TS2000::get_attenuator()
 {
 	cmd = "RA;";
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 LOG_WARN("%s", replystr.c_str());
 	size_t p = replystr.rfind("RA");
 	if (p != string::npos && (p+3 < replystr.length())) {
@@ -290,13 +290,13 @@ void RIG_TS2000::set_preamp(int val)
 	else     cmd = "PA0;";
 if (RIG_DEBUG)
 	LOG_INFO("%s", cmd.c_str());
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 }
 
 int RIG_TS2000::get_preamp()
 {
 	cmd = "PA;";
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 LOG_WARN("%s", replystr.c_str());
 	size_t p = replystr.rfind("PA");
 	if (p != string::npos && (p+2 < replystr.length())) {
@@ -346,14 +346,14 @@ void RIG_TS2000::set_modeA(int val)
 	cmd += ';';
 if (RIG_DEBUG)
 	LOG_INFO("%s", cmd.c_str());
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 	A.iBW = set_widths(val);
 }
 
 int RIG_TS2000::get_modeA()
 {
 	cmd = "MD;";
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 LOG_WARN("%s", replystr.c_str());
 	size_t p = replystr.rfind("MD");
 	if (p != string::npos && (p + 2 < replystr.length())) {
@@ -374,14 +374,14 @@ void RIG_TS2000::set_modeB(int val)
 	cmd += ';';
 if (RIG_DEBUG)
 	LOG_INFO("%s", cmd.c_str());
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 	B.iBW = set_widths(val);
 }
 
 int RIG_TS2000::get_modeB()
 {
 	cmd = "MD;";
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 LOG_WARN("%s", replystr.c_str());
 	size_t p = replystr.rfind("MD");
 	if (p != string::npos && (p + 2 < replystr.length())) {
@@ -420,23 +420,23 @@ void RIG_TS2000::set_bwA(int val)
 	string sent = "";
 	if (A.imode == 0 || A.imode == 1 || A.imode == 3) {
 		cmd = TS2000_SSBlower[A.iBW];
-		sendCommand(cmd, -1);
+		sendCommand(cmd);
 		sent.append(cmd);
 		cmd = TS2000_SSBupper[A.iBW];
-		sendCommand(cmd, -1);
+		sendCommand(cmd);
 		sent.append(cmd);
 	}
 	else if (A.imode == 2 || A.imode == 6) {
 		cmd = TS2000_CWbw[A.iBW];
-		sendCommand(cmd, -1);
+		sendCommand(cmd);
 		sent.append(cmd);
 	}else if (A.imode == 5 || A.imode == 7) {
 		cmd = TS2000_FSKbw[A.iBW];
-		sendCommand(cmd, -1);
+		sendCommand(cmd);
 		sent.append(cmd);
 	} else {
 		cmd = TS2000_AMbw[A.iBW];
-		sendCommand(cmd, -1);
+		sendCommand(cmd);
 		sent.append(cmd);
 	}
 if (RIG_DEBUG)
@@ -449,7 +449,7 @@ int RIG_TS2000::get_bwA()
 	size_t p;
 	if (A.imode == 0 || A.imode == 1 || A.imode == 3) {
 		cmd = "SH;";
-		sendCommand(cmd, -1);
+		sendCommand(cmd);
 LOG_WARN("%s", replystr.c_str());
 		p = replystr.rfind("SH");
 		if (p != string::npos) {
@@ -461,7 +461,7 @@ LOG_WARN("%s", replystr.c_str());
 		}
 	} else if (A.imode == 2) {
 		cmd = "FW;";
-		sendCommand(cmd, -1);
+		sendCommand(cmd);
 LOG_WARN("%s", replystr.c_str());
 		p = replystr.rfind("FW");
 		if (p != string::npos) {
@@ -474,7 +474,7 @@ LOG_WARN("%s", replystr.c_str());
 	} else if (A.imode == 5 || A.imode == 7) {
 		cmd = "FW;";
 LOG_WARN("%s", replystr.c_str());
-		sendCommand(cmd, -1);
+		sendCommand(cmd);
 		p = replystr.rfind("FW");
 		if (p != string::npos) {
 			for (i = 0; i < 4; i++)
@@ -485,7 +485,7 @@ LOG_WARN("%s", replystr.c_str());
 		}
 	} else {
 		cmd = "SL;";
-		sendCommand(cmd, -1);
+		sendCommand(cmd);
 LOG_WARN("%s", replystr.c_str());
 		p = replystr.rfind("SL");
 		if (p != string::npos) {
@@ -505,23 +505,23 @@ void RIG_TS2000::set_bwB(int val)
 	string sent = "";
 	if (B.imode == 0 || B.imode == 1 || B.imode == 3) {
 		cmd = TS2000_SSBlower[B.iBW];
-		sendCommand(cmd, -1);
+		sendCommand(cmd);
 		sent.append(cmd);
 		cmd = TS2000_SSBupper[B.iBW];
-		sendCommand(cmd, -1);
+		sendCommand(cmd);
 		sent.append(cmd);
 	}
 	else if (A.imode == 2 || B.imode == 6) {
 		cmd = TS2000_CWbw[B.iBW];
-		sendCommand(cmd, -1);
+		sendCommand(cmd);
 		sent.append(cmd);
 	}else if (B.imode == 5 || B.imode == 7) {
 		cmd = TS2000_FSKbw[B.iBW];
-		sendCommand(cmd, -1);
+		sendCommand(cmd);
 		sent.append(cmd);
 	} else {
 		cmd = TS2000_AMbw[B.iBW];
-		sendCommand(cmd, -1);
+		sendCommand(cmd);
 		sent.append(cmd);
 	}
 if (RIG_DEBUG)
@@ -534,7 +534,7 @@ int RIG_TS2000::get_bwB()
 	size_t p;
 	if (B.imode == 0 || B.imode == 1 || B.imode == 3) {
 		cmd = "SH;";
-		sendCommand(cmd, -1);
+		sendCommand(cmd);
 LOG_WARN("%s", replystr.c_str());
 		p = replystr.rfind("SH");
 		if (p != string::npos) {
@@ -546,7 +546,7 @@ LOG_WARN("%s", replystr.c_str());
 		}
 	} else if (B.imode == 2) {
 		cmd = "FW;";
-		sendCommand(cmd, -1);
+		sendCommand(cmd);
 LOG_WARN("%s", replystr.c_str());
 		p = replystr.rfind("FW");
 		if (p != string::npos) {
@@ -558,7 +558,7 @@ LOG_WARN("%s", replystr.c_str());
 		}
 	} else if (B.imode == 5 || B.imode == 7) {
 		cmd = "FW;";
-		sendCommand(cmd, -1);
+		sendCommand(cmd);
 LOG_WARN("%s", replystr.c_str());
 		p = replystr.rfind("FW");
 		if (p != string::npos) {
@@ -570,7 +570,7 @@ LOG_WARN("%s", replystr.c_str());
 		}
 	} else {
 		cmd = "SL;";
-		sendCommand(cmd, -1);
+		sendCommand(cmd);
 LOG_WARN("%s", replystr.c_str());
 		p = replystr.rfind("SL");
 		if (p != string::npos) {
@@ -599,13 +599,13 @@ void RIG_TS2000::set_mic_gain(int val)
 	}
 if (RIG_DEBUG)
 	LOG_INFO("%s", cmd.c_str());
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 }
 
 int RIG_TS2000::get_mic_gain()
 {
 	cmd = "MG;";
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 LOG_WARN("%s", replystr.c_str());
 	size_t p = replystr.rfind("MG");
 	if (p != string::npos && (p + 5 < replystr.length())) {
@@ -631,7 +631,7 @@ void RIG_TS2000::set_noise(bool b)
 		cmd = "NB0;";
 if (RIG_DEBUG)
 	LOG_INFO("%s", cmd.c_str());
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 }
 
 ///////////////////
@@ -651,14 +651,14 @@ void RIG_TS2000::set_if_shift(int val)
 	}
 if (RIG_DEBUG)
 	LOG_INFO("%s", cmd.c_str());
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 }
 
 bool RIG_TS2000::get_if_shift(int &val)
 {
 	static int oldval = 0;
 	cmd = "IS;";
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 LOG_WARN("%s", replystr.c_str());
 	size_t p = replystr.rfind("IS");
 	if (p != string::npos && (p + 8 < replystr.length())) {
@@ -686,7 +686,7 @@ void RIG_TS2000::set_notch(bool on, int val)
 	if (on == false) {
 if (RIG_DEBUG)
 	LOG_INFO("%s", cmd.c_str());
-		sendCommand(cmd, -1);
+		sendCommand(cmd);
 		notch_on = false;
 		return;
 	}
@@ -694,7 +694,7 @@ if (RIG_DEBUG)
 		cmd[6] = '1'; // notch ON
 if (RIG_DEBUG)
 	LOG_INFO("%s", cmd.c_str());
-		sendCommand(cmd, -1);
+		sendCommand(cmd);
 		cmd[6] = '0';
 		notch_on = true;
 	}
@@ -709,21 +709,21 @@ if (RIG_DEBUG)
 	}
 if (RIG_DEBUG)
 	LOG_INFO("%s", cmd.c_str());
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 }
 
 bool  RIG_TS2000::get_notch(int &val)
 {
 	bool ison = false;
 	cmd = "BP00;";
-	sendCommand(cmd, -1);
+	sendCommand(cmd);
 LOG_WARN("%s", replystr.c_str());
 	size_t p = replystr.rfind("BP");
 	if (p != string::npos && (p + 6 < replystr.length())) {
 		if (replystr[p+6] == '1') {
 			ison = true;
 			cmd = "BP01;";
-			sendCommand(cmd, -1);
+			sendCommand(cmd);
 LOG_WARN("%s", replystr.c_str());
 			p = replystr.rfind("BP");
 			if (p != string::npos && (p + 7 < replystr.length())) {

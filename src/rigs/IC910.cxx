@@ -87,7 +87,7 @@ void RIG_IC910H::set_vfoA (long freq)
 	cmd.append( to_bcd_be( freqA, 10 ) );
 	cmd.append( post );
 	sendICcommand(cmd, 6);
-	checkresponse(6);
+	checkresponse();
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
@@ -101,14 +101,14 @@ void RIG_IC910H::set_compression()
 		cmd.append(to_bcd(progStatus.compression * 255 / 100, 3));
 		cmd.append( post );
 		sendICcommand(cmd, 6);
-		checkresponse(6);
+		checkresponse();
 		if (comp_is_on != progStatus.compON) {
 			comp_is_on = progStatus.compON;
 			cmd = pre_to;
 			cmd.append("\x16\01");
 			cmd.append( post );
 			sendICcommand(cmd, 6);
-			checkresponse(6);
+			checkresponse();
 		}
 	} else if (comp_is_on != progStatus.compON) {
 		comp_is_on = progStatus.compON;
@@ -116,7 +116,7 @@ void RIG_IC910H::set_compression()
 		cmd.append("\x16\00");
 		cmd.append( post );
 		sendICcommand(cmd, 6);
-		checkresponse(6);
+		checkresponse();
 	}
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
@@ -128,7 +128,7 @@ void RIG_IC910H::set_vox_onoff()
 	cmd.append("\x16\x46");
 	cmd += progStatus.vox_onoff ? 1 : 0;
 	cmd.append(post);
-	sendCommand(cmd, 6, true);
+	sendICcommand(cmd, 6);
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
@@ -139,7 +139,7 @@ void RIG_IC910H::set_vox_gain()
 	cmd.append("\x1A\x02");
 	cmd.append(to_bcd(progStatus.vox_gain * 255 / 100, 3));
 	cmd.append(post);
-	sendCommand(cmd, 6, true);
+	sendICcommand(cmd, 6);
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
@@ -150,7 +150,7 @@ void RIG_IC910H::set_vox_anti()
 	cmd.append("\x1A\x04");
 	cmd.append(to_bcd(progStatus.vox_anti * 255 / 100, 3));
 	cmd.append(post);
-	sendCommand(cmd, 6, true);
+	sendICcommand(cmd, 6);
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
@@ -161,7 +161,7 @@ void RIG_IC910H::set_vox_hang()
 	cmd.append("\x1A\x03");
 	cmd.append(to_bcd(progStatus.vox_hang * 255 / 100, 3));
 	cmd.append(post);
-	sendCommand(cmd, 6, true);
+	sendICcommand(cmd, 6);
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }

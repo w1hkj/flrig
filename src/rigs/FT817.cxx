@@ -48,16 +48,16 @@ long RIG_FT817::get_vfoA ()
 {
 	init_cmd();
 	cmd[4] = 0x03;
+	int ret = sendCommand(cmd);
+	if (ret < 5) return freqA;
 
-	if (sendCommand(cmd, 5)) {
-		freqA = fm_bcd(replybuff, 8) * 10;
-		int mode = replybuff[4];
-		for (int i = 0; i < 8; i++)
-			if (FT817_mode_val[i] == mode) {
-				modeA = i;
-				break;
-			}
-	}
+	freqA = fm_bcd(replybuff, 8) * 10;
+	int mode = replybuff[4];
+	for (int i = 0; i < 8; i++)
+		if (FT817_mode_val[i] == mode) {
+			modeA = i;
+			break;
+		}
 	return freqA;
 }
 
@@ -102,24 +102,22 @@ void RIG_FT817::set_PTT_control(int val)
 
 int  RIG_FT817::get_power_out(void)
 {
-   init_cmd();
-   cmd[4] = 0xF7;
-   if (sendCommand(cmd,1)) {
-       int fwdpwr = replybuff[0];
-       fwdpwr = fwdpwr * 100 / 15;
-       return fwdpwr;
-   }
-   return 0;
+	init_cmd();
+	cmd[4] = 0xF7;
+	int ret = sendCommand(cmd);
+	if (!ret) return 0;
+	int fwdpwr = replybuff[0];
+	fwdpwr = fwdpwr * 100 / 15;
+	return fwdpwr;
 }
 
 int  RIG_FT817::get_smeter(void)
 {
-   init_cmd();
-   cmd[4] = 0xE7;
-   if (sendCommand(cmd,1)) {
-       int sval = replybuff[0];
-       sval = (sval-1) * 100 / 15;
-       return sval;
-   }
-   return 0;
+	init_cmd();
+	cmd[4] = 0xE7;
+	int ret = sendCommand(cmd);
+	if (!ret) return 0;
+	int sval = replybuff[0];
+	sval = (sval-1) * 100 / 15;
+	return sval;
 }

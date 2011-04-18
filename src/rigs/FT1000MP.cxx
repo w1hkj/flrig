@@ -211,11 +211,10 @@ bool RIG_FT1000MP::get_info(void)
 	init_cmd();
 	cmd[3] = 0x03;  // read both vfo's
 	cmd[4] = 0x10;
-	ret = sendCommand(cmd, 32);
+	ret = sendCommand(cmd);
 	p = (unsigned char *)replybuff;
-//	p = (unsigned char *)amsync; ret = 32;
-//LOG_INFO("%d : %s", ret, str2hex(p, ret));
-	if (ret == 32) {
+	if (ret >= 32) {
+		if (ret > 32) p += (ret - 32);
 		// vfo A data string
 		A.freq = ((((((p[1]<<8) + p[2])<<8) + p[3])<<8) + p[4])*10/16;
 		md = p[7] & 0x07;
@@ -459,29 +458,32 @@ int  RIG_FT1000MP::get_power_out(void)
 	init_cmd();
 	cmd[0] = 0x80;
 	cmd[4] = 0xF7;
-	if (sendCommand(cmd,5)) {
-		val = (unsigned char)(replybuff[0]);
-		if (val < 39) {
-			m = 10.0 / 39.0; b = 0;
-		} else if (val < 80) {
-			m = (25.0 - 15.0)/(80.0 - 39.0);
-			b = 25.0 - m * 80.0;
-		} else if (val < 122) {
-			m = (50.0 - 25.0)/(122.0 - 80.0);
-			b = 50.0 - m * 122.0;
-		} else if (val < 144) {
-			m = (75.0 - 50.0)/(144.0 - 122.0);
-			b = 75.0 - m * 144.0;
-		} else {
-			m = (200.0 - 75.0)/(255.0 - 144.0);
-			b = 200.0 - m * 255.0;
-		}
-		pout = m*val + b;
-		pwr = (int)pout;
-		if (pwr > 200) pwr = 200;
-		if (pwr < 0) pwr = 0;
-		LOG_INFO("%s => %d",str2hex(replybuff,1), pwr);
+
+	int ret = sendCommand(cmd);
+	if (ret < 5) return 0;
+	
+	val = (unsigned char)(replybuff[ret - 5]);
+	if (val < 39) {
+		m = 10.0 / 39.0; b = 0;
+	} else if (val < 80) {
+		m = (25.0 - 15.0)/(80.0 - 39.0);
+		b = 25.0 - m * 80.0;
+	} else if (val < 122) {
+		m = (50.0 - 25.0)/(122.0 - 80.0);
+		b = 50.0 - m * 122.0;
+	} else if (val < 144) {
+		m = (75.0 - 50.0)/(144.0 - 122.0);
+		b = 75.0 - m * 144.0;
+	} else {
+		m = (200.0 - 75.0)/(255.0 - 144.0);
+		b = 200.0 - m * 255.0;
 	}
+	pout = m*val + b;
+	pwr = (int)pout;
+	if (pwr > 200) pwr = 200;
+	if (pwr < 0) pwr = 0;
+	LOG_INFO("%s => %d",str2hex(replybuff,1), pwr);
+
 	return (int)(200 * sqrt(pwr/200.0) + 0.5);
 }
 
@@ -490,10 +492,12 @@ int  RIG_FT1000MP::get_smeter(void)
 	unsigned char val = 0;
 	init_cmd();
 	cmd[4] = 0xF7;
-	if (sendCommand(cmd,5)) {
-		val = (unsigned char)(replybuff[0]);
-		LOG_INFO("%s => %d",str2hex(replybuff,1), val);
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 5) return 0;
+
+	val = (unsigned char)(replybuff[ret - 5]);
+	LOG_INFO("%s => %d",str2hex(replybuff,1), val);
+
 	return val * 100 / 255;
 }
 
@@ -503,10 +507,12 @@ int  RIG_FT1000MP::get_swr(void)
 	init_cmd();
 	cmd[0] = 0x85;
 	cmd[4] = 0xF7;
-	if (sendCommand(cmd,5)) {
-		val = (unsigned char)(replybuff[0]);
-		LOG_INFO("%s => %d",str2hex(replybuff,1), val);
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 5) return 0;
+
+	val = (unsigned char)(replybuff[ret-5]);
+	LOG_INFO("%s => %d",str2hex(replybuff,1), val);
+
 	return val * 100 / 255;
 }
 
@@ -516,10 +522,12 @@ int  RIG_FT1000MP::get_alc(void)
 	init_cmd();
 	cmd[0] = 0x81;
 	cmd[4] = 0xF7;
-	if (sendCommand(cmd,5)) {
-		val = (unsigned char)(replybuff[0]);
-		LOG_INFO("%s => %d",str2hex(replybuff,1), val);
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 5) return 0;
+
+	val = (unsigned char)(replybuff[ret-5]);
+	LOG_INFO("%s => %d",str2hex(replybuff,1), val);
+
 	return val * 100 / 255;
 }
 

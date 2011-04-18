@@ -106,20 +106,10 @@ RIG_TS590S::RIG_TS590S() {
 	has_ptt_control = true;
 }
 
-bool RIG_TS590S::sendTScommand(string cmd, int retnbr, bool db = false)
-{
-	int ret = sendCommand(cmd, retnbr, false);
-	if (db) {
-		LOG_WARN("%s", cmd.c_str());
-		if (ret) LOG_WARN("%s", replystr.c_str());
-	}
-	return ret;
-}
-
 void RIG_TS590S::initialize()
 {
 	selectA();
-	cmd = "AC000;"; sendTScommand(cmd, 0);
+	cmd = "AC000;"; sendCommand(cmd);
 	get_preamp();
 	get_attenuator();
 	RIG_DEBUG = true;
@@ -128,13 +118,13 @@ void RIG_TS590S::initialize()
 void RIG_TS590S::selectA()
 {
 	cmd = "FR0;";
-	sendTScommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TS590S::selectB()
 {
 	cmd = "FR1;";
-	sendTScommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TS590S::set_split(bool val) 
@@ -144,21 +134,24 @@ void RIG_TS590S::set_split(bool val)
 		cmd = "FT1;";
 	else
 		cmd = "FR0;";
-	sendTScommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 long RIG_TS590S::get_vfoA ()
 {
 	cmd = "FA;";
-	if (sendTScommand(cmd, 14) == 14) {
-		long f = 0L;
-		long mul = 1L;
-		for (size_t n = 12; n > 1; n--) {
-			f += (replybuff[n] - '0') * mul;
-			mul *= 10;
-		}
-		A.freq = f;
+	int ret = sendCommand(cmd);
+	if (ret < 14) return A.freq;
+	size_t p = replystr.rfind("FA");
+	if (p == string::npos) return A.freq;
+
+	long f = 0L;
+	long mul = 1L;
+	for (size_t n = 12; n > 1; n--) {
+		f += (replystr[p + n] - '0') * mul;
+		mul *= 10;
 	}
+	A.freq = f;
 	return A.freq;
 }
 
@@ -170,21 +163,25 @@ void RIG_TS590S::set_vfoA (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendTScommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 long RIG_TS590S::get_vfoB ()
 {
 	cmd = "FB;";
-	if (sendTScommand(cmd, 14) == 14) {
-		long f = 0L;
-		long mul = 1L;
-		for (size_t n = 12; n > 1; n--) {
-			f += (replybuff[n] - '0') * mul;
-			mul *= 10;
-		}
-		B.freq = f;
+	int ret = sendCommand(cmd);
+	if (ret < 14) return B.freq;
+	size_t p = replystr.rfind("FB");
+	if (p == string::npos) return B.freq;
+
+	long f = 0L;
+	long mul = 1L;
+	for (size_t n = 12; n > 1; n--) {
+		f += (replystr[p + n] - '0') * mul;
+		mul *= 10;
 	}
+	B.freq = f;
+
 	return B.freq;
 }
 
@@ -196,50 +193,42 @@ void RIG_TS590S::set_vfoB (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendTScommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 int RIG_TS590S::get_smeter()
 {
 	int mtr = 0;
 	cmd = "SM0;";
-	int ret = sendTScommand(cmd, 8);
+	int ret = sendCommand(cmd);
 	LOG_INFO("%s => %s", cmd.c_str(), replystr.c_str());
 
-	if (replystr.find("SM0") != 0)
-		return 0;
-	if(ret == 8) {
-		replystr[7] = 0;
-		mtr = atoi(&replystr[3]);
-		mtr *= 50;
-		mtr /= 15;
-		if (mtr > 100) mtr = 100;
-	}
+	if (ret < 8) return 0;
+	size_t p = replystr.find("SM0");
+	if (p == string::npos) return 0;
+
+	replystr[p + 7] = 0;
+	mtr = atoi(&replystr[p + 3]);
+	mtr *= 50;
+	mtr /= 15;
+	if (mtr > 100) mtr = 100;
 	return mtr;
 }
-
-//int RIG_TS590S::get_swr()
-//{
-//	cmd = "RM1;";
-//	if (sendTScommand(cmd, 8) == 8) {
-//		replybuff[7] = 0;
-//		int mtr = atoi(&replybuff[5]);
-//		mtr = (mtr * 100) / 30;
-//		return mtr;
-//	}
-//	return 0;
-//}
 
 int RIG_TS590S::get_power_out()
 {
 	int mtr = 0;
 	cmd = "SM0;";
-	if (sendTScommand(cmd, 8) == 8) {
-		mtr = atoi(&replybuff[3]);
-		mtr *= 50;
-		mtr /= 18;
-		if (mtr > 100) mtr = 100;
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 8) return mtr;
+	size_t p = replystr.rfind("SM");
+	if (p == string::npos) return mtr;
+
+	mtr = atoi(&replystr[p + 3]);
+	mtr *= 50;
+	mtr /= 18;
+	if (mtr > 100) mtr = 100;
+
 	return mtr;
 }
 
@@ -253,30 +242,36 @@ void RIG_TS590S::set_power_control(double val)
 		cmd[i] += ival % 10;
 		ival /= 10;
 	}
-	sendTScommand(cmd, 0);
+	sendCommand(cmd, 0);
 }
 
 int RIG_TS590S::get_power_control()
 {
 	cmd = "PC;";
-	if (sendTScommand(cmd, 6) == 6) {
-		replybuff[5] = 0;
-		int mtr = atoi(&replybuff[2]);
-		return mtr;
+	int ret = sendCommand(cmd);
+	if (ret < 6) return 0;
+	size_t p = replystr.rfind("PC");
+	if (p == string::npos) return 0;
+	int mtr = 0;
+	if (ret >= 6) {
+		replystr[p + 5] = 0;
+		mtr = atoi(&replystr[p + 2]);
 	}
-	return 0;
+	return mtr;
 }
 
 // Volume control return 0 ... 100
 int RIG_TS590S::get_volume_control()
 {
 	cmd = "AG0;";
-	if (sendTScommand(cmd, 8) == 8)  {
-		cmd[7] = 0;
-		int val = atoi(&replybuff[3]);
-		return (int)(val / 2.55);
-	}
-	return 0;
+	int ret = sendCommand(cmd);
+	if (ret < 8) return 0;
+	size_t p = replystr.rfind("AG");
+	if (p == string::npos) return 0;
+
+	replystr[p + 7] = 0;
+	int val = atoi(&replystr[p + 3]);
+	return (int)(val / 2.55);
 }
 
 void RIG_TS590S::set_volume_control(int val) 
@@ -287,7 +282,7 @@ void RIG_TS590S::set_volume_control(int val)
 		cmd[i] += ivol % 10;
 		ivol /= 10;
 	}
-	sendTScommand(cmd, 0);
+	sendCommand(cmd, 0);
 }
 
 // Tranceiver PTT on/off
@@ -295,13 +290,13 @@ void RIG_TS590S::set_PTT_control(int val)
 {
 	if (val) cmd = "TX1;";
 	else	 cmd = "RX;";
-	sendTScommand(cmd, 4);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TS590S::tune_rig()
 {
 	cmd = "AC111;";
-	sendTScommand(cmd, 0);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TS590S::set_attenuator(int val)
@@ -309,18 +304,23 @@ void RIG_TS590S::set_attenuator(int val)
 	att_level = val;
 	if (val) cmd = "RA01;";
 	else     cmd = "RA00;";
-	sendTScommand(cmd, 0);
+	sendCommand(cmd, 0);
 }
 
 int RIG_TS590S::get_attenuator()
 {
 	cmd = "RA;";
-	if (sendTScommand(cmd, 7) == 7) {
-		if (replybuff[2] == '0' && replybuff[3] == '0')
-			att_level = 0;
-		else
-			att_level = 1;
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 7) return 0;
+	size_t p = replystr.rfind("RA");
+	if (p == string::npos) return 0;
+
+	if (replystr[p + 2] == '0' && 
+		replystr[p + 3] == '0')
+		att_level = 0;
+	else
+		att_level = 1;
+
 	return att_level;
 }
 
@@ -329,18 +329,21 @@ void RIG_TS590S::set_preamp(int val)
 	preamp_level = val;
 	if (val) cmd = "PA1;";
 	else     cmd = "PA0;";
-	sendTScommand(cmd, 0);
+	sendCommand(cmd, 0);
 }
 
 int RIG_TS590S::get_preamp()
 {
 	cmd = "PA;";
-	if (sendTScommand(cmd, 5) == 5) {
-		if (replystr[2] == '1') 
-			preamp_level = 1;
-		else
-			preamp_level = 0;
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 5) return 0;
+	size_t p = replystr.rfind("PA");
+	if (p == string::npos) return 0;
+
+	if (replystr[p  + 2] == '1') 
+		preamp_level = 1;
+	else
+		preamp_level = 0;
 	return preamp_level;
 }
 
@@ -354,7 +357,7 @@ void RIG_TS590S::set_modeA(int val)
 	cmd = "MD";
 	cmd += TS590S_mode_chr[val];
 	cmd += ';';
-	sendTScommand(cmd, 4, true);
+	sendCommand(cmd, 0);
 	if (val > 7) {
 		data_mode = true;
 		cmd = "DA1;";
@@ -362,7 +365,7 @@ void RIG_TS590S::set_modeA(int val)
 		data_mode = false;
 		cmd = "DA0;";
 	}
-	sendTScommand(cmd, 4, true);
+	sendCommand(cmd, 0);
 
 	set_widths();
 }
@@ -370,16 +373,25 @@ void RIG_TS590S::set_modeA(int val)
 int RIG_TS590S::get_modeA()
 {
 	int md = A.imode;
-	if (sendTScommand("MD;", 4) == 4) {
-		md = replybuff[2];
-		md = md - '1';
-		if (md == 8) md = 7;
-	}
-	if (sendTScommand("DA;", 4) == 4) {
-		if (replybuff[2] == '1') {
+	cmd = "MD;";
+	int ret = sendCommand(cmd);
+	if (ret < 4) return md;
+	size_t p = replystr.rfind("MD");
+	if (p == string::npos) return md;
+
+	md = replystr[p + 2];
+	md = md - '1';
+	if (md == 8) md = 7;
+	
+	if (md == 0 || md == 1) {
+		cmd = "DA;";
+		ret = sendCommand(cmd);
+		if (ret < 4) return A.imode;
+		p = replystr.rfind("DA");
+		if (p == string::npos) return A.imode;
+		if (replystr[p + 2] == '1') {
 			data_mode = true;
-			if (md == 0) md = 8;
-			if (md == 1) md = 9;
+			md += 8;
 		}
 	}
 	if (md != A.imode) {
@@ -395,7 +407,7 @@ void RIG_TS590S::set_modeB(int val)
 	cmd = "MD";
 	cmd += TS590S_mode_chr[val];
 	cmd += ';';
-	sendTScommand(cmd, 4, true);
+	sendCommand(cmd, 0);
 	if (val > 7) {
 		data_mode = true;
 		cmd = "DA1;";
@@ -403,23 +415,32 @@ void RIG_TS590S::set_modeB(int val)
 		data_mode = false;
 		cmd = "DA0;";
 	}
-	sendTScommand(cmd, 4, true);
+	sendCommand(cmd, 0);
 	set_widths();
 }
 
 int RIG_TS590S::get_modeB()
 {
 	int md = B.imode;
-	if (sendTScommand("MD;", 4) == 4) {
-		md = replybuff[2];
-		md = md - '1';
-		if (md == 8) md = 7;
-	}
-	if (sendTScommand("DA;", 4) == 4) {
-		if (replybuff[2] == '1') {
+	cmd = "MD;";
+	int ret = sendCommand(cmd);
+	if (ret < 4) return md;
+	size_t p = replystr.rfind("MD");
+	if (p == string::npos) return md;
+
+	md = replystr[p + 2];
+	md = md - '1';
+	if (md == 8) md = 7;
+	
+	if (md == 0 || md == 1) {
+		cmd = "DA;";
+		ret = sendCommand(cmd);
+		if (ret < 4) return B.imode;
+		p = replystr.rfind("DA");
+		if (p == string::npos) return B.imode;
+		if (replystr[p + 2] == '1') {
 			data_mode = true;
-			if (md == 0) md = 8;
-			if (md == 1) md = 9;
+			md += 8;
 		}
 	}
 	if (md != B.imode) {
@@ -483,15 +504,15 @@ void RIG_TS590S::set_active_bandwidth()
 {
 	if (active_mode == 0 || active_mode == 1 || active_mode == 3 ||
 		active_mode == 8 || active_mode == 9 || active_mode == 10) {
-		sendTScommand(TS590S_SSBlower[active_bandwidth], 5);
-		sendTScommand(TS590S_SSBupper[active_bandwidth], 5);
+		sendCommand(TS590S_SSBlower[active_bandwidth], 0);
+		sendCommand(TS590S_SSBupper[active_bandwidth], 0);
 	}
 	else if (active_mode == 2 || active_mode == 6)
-		sendTScommand(TS590S_CWbw[active_bandwidth], 5);
+		sendCommand(TS590S_CWbw[active_bandwidth], 0);
 	else if (active_mode == 5 || active_mode == 7)
-		sendTScommand(TS590S_FSKbw[active_bandwidth], 7);
+		sendCommand(TS590S_FSKbw[active_bandwidth], 0);
 	else
-		sendTScommand(TS590S_AMbw[active_bandwidth], 5);
+		sendCommand(TS590S_AMbw[active_bandwidth], 0);
 }
 
 void RIG_TS590S::set_bwA(int val)
@@ -509,37 +530,64 @@ void RIG_TS590S::set_bwB(int val)
 int RIG_TS590S::get_active_bandwidth()
 {
 	int i = 0;
+	int ret = 0;
+	size_t p = 0;
+	string test;
 	if (active_mode == 0 || active_mode == 1 || active_mode == 3) {
-		if (sendTScommand("SH;", 5) == 5) {
-			for (i = 0; i < 9; i++)
-				if (strcmp(replybuff, TS590S_SSBupper[i]) == 0)
-					break;
-			if (i == 9) i = 8;
-			active_bandwidth = i;
+		cmd = "SH;";
+		ret = sendCommand(cmd);
+		if (ret >= 5) {
+			p = replystr.rfind("SH");
+			if (p != string::npos) {
+				test = replystr.substr(p);
+				for (i = 0; i < 9; i++)
+					if (test.find(TS590S_SSBupper[i]) == 0)
+						break;
+				if (i == 9) i = 8;
+				active_bandwidth = i;
+			}
 		}
 	} else if (active_mode == 2) {
-		if (sendTScommand("FW;", 7) == 7) {
-			for (i = 0; i < 11; i++)
-				if (strcmp(replybuff, TS590S_CWbw[i]) == 0)
-					break;
-			if (i == 11) i = 10;
-			active_bandwidth = i;
+		cmd = "FW;";
+		ret = sendCommand(cmd);
+		if (ret >= 7) {
+			p = replystr.rfind("FW");
+			if (p != string::npos) {
+				test = replystr.substr(p);
+				for (i = 0; i < 11; i++)
+					if (test.find(TS590S_CWbw[i]) == 0)
+						break;
+				if (i == 11) i = 10;
+				active_bandwidth = i;
+			}
 		}
 	} else if (active_mode == 5 || active_mode == 7) {
-		if (sendTScommand("FW;", 7) == 7) {
-			for (i = 0; i < 4; i++)
-				if (strcmp(replybuff, TS590S_FSKbw[i]) == 0)
-					break;
-			if (i == 4) i = 3;
-			active_bandwidth = i;
+		cmd = "FW;";
+		ret = sendCommand(cmd);
+		if (ret >= 7) {
+			p = replystr.rfind("FW");
+			if (p != string::npos) {
+				test = replystr.substr(p);
+				for (i = 0; i < 4; i++)
+					if (test.find(TS590S_FSKbw[i]) == 0)
+						break;
+				if (i == 4) i = 3;
+				active_bandwidth = i;
+			}
 		}
 	} else {
-		if (sendTScommand("SL;", 5) == 5) {
-			for (i = 0; i < 8; i++)
-				if (strcmp(replybuff, TS590S_AMbw[i]) == 0)
-					break;
-			if (i == 8) i = 7;
-			active_bandwidth = i;
+		cmd = "SL;";
+		int ret = sendCommand(cmd);
+		if (ret >= 5) {
+			p = replystr.rfind("SL");
+			if (p != string::npos) {
+				test = replystr.substr(p);
+				for (i = 0; i < 8; i++)
+					if (test.find(TS590S_AMbw[i]) == 0)
+						break;
+				if (i == 8) i = 7;
+				active_bandwidth = i;
+			}
 		}
 	}
 	return active_bandwidth;
@@ -568,15 +616,19 @@ void RIG_TS590S::set_mic_gain(int val)
 		cmd[1+i] += val % 10;
 		val /= 10;
 	}
-	sendTScommand(cmd, 0);
+	sendCommand(cmd, 0);
 }
 
 int RIG_TS590S::get_mic_gain()
 {
 	int val = 0;
-	if (sendTScommand("MG;", 6) == 6) {
-		replybuff[5] = 0;
-		val = atoi(&replybuff[2]);
+	cmd = "MG;";
+	int ret = sendCommand(cmd);
+	if (ret >= 6) {
+		size_t p = replystr.rfind("MG");
+		if (p == string::npos) return val;
+		replystr[p + 5] = 0;
+		val = atoi(&replystr[p + 2]);
 	}
 	return val;
 }
@@ -603,7 +655,7 @@ void RIG_TS590S::set_noise(bool val)
 	cmd = "NB0;";
 	cmd[2] += nb_level;
 	LOG_INFO("%s", cmd.c_str());
-	sendTScommand(cmd, 0);
+	sendCommand(cmd, 0);
 }
 
 //======================================================================
@@ -623,19 +675,25 @@ void RIG_TS590S::set_if_shift(int val)
 			cmd[3+i] += val % 10;
 			val /= 10;
 		}
-		sendTScommand(cmd, 0);
+		sendCommand(cmd, 0);
 	}
 }
 
 bool RIG_TS590S::get_if_shift(int &val)
 {
 	static int oldval = 0;
-	sendTScommand("IS;", 8);
-	replybuff[8] = 0;
-	val = atoi(&replybuff[3]);
-	if (val != 0 || oldval != val) {
-		oldval = val;
-		return true;
+	size_t p = 0;
+	cmd = "IS;";
+	int ret = sendCommand(cmd);
+	if (ret >= 8) {
+		p = replystr.rfind("IS");
+		if (p == string::npos) return false;
+		replystr[p + 7] = 0;
+		val = atoi(&replystr[p + 3]);
+		if (val != 0 || oldval != val) {
+			oldval = val;
+			return true;
+		}
 	}
 	oldval = val;
 	return false;
@@ -652,13 +710,13 @@ void RIG_TS590S::set_notch(bool on, int val)
 {
 	cmd = "BP00000;";
 	if (on == false) {
-		sendTScommand(cmd, 0);
+		sendCommand(cmd, 0);
 		notch_on = false;
 		return;
 	}
 	if (!notch_on) {
 		cmd[6] = '1'; // notch ON
-		sendTScommand(cmd, 0);
+		sendCommand(cmd, 0);
 		cmd[6] = '0';
 		notch_on = true;
 	}
@@ -671,26 +729,18 @@ void RIG_TS590S::set_notch(bool on, int val)
 		cmd[3 + i] += val % 10;
 		val /=10;
 	}
-	sendTScommand(cmd, 0);
+	sendCommand(cmd, 0);
 }
+
+//tbd
 
 bool  RIG_TS590S::get_notch(int &val)
 {
-	bool ison = false;
-	cmd = "BP00;";
-	if (sendTScommand(cmd, 8) == 8) {
-		if (replybuff[6] == '1') {
-			ison = true;
-			cmd = "BP01;";
-			if (sendTScommand(cmd, 8) == 8) {
-				replybuff[7] = 0;
-				val = atoi(&replybuff[4]);
-				val -= 200;
-				val *= -9;
-			}
-		}
-	}
-	return ison;
+	return false;
+//	bool ison = false;
+//	cmd = "BP;";
+//	int ret = sendCommand(cmd);
+//	return ison;
 }
 
 void RIG_TS590S::get_notch_min_max_step(int &min, int &max, int &step)

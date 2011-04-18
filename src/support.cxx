@@ -428,17 +428,12 @@ void * serial_thread_loop(void *d)
 			}
 			resetxmt = true;
 
-if (rig_nbr == TT550) 
-	read_smeter();
 			if (!loopcount--) {
-if (rig_nbr != TT550)
 				read_smeter();
 				read_vfo();
 				read_mode();
 				read_bandwidth();
 //				read_volume();
-//				read_mode();
-//				read_bandwidth();
 //				read_notch();
 //				read_ifshift();
 //				read_power_control();

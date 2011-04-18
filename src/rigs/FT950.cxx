@@ -104,13 +104,15 @@ void RIG_FT950::initialize()
 
 long RIG_FT950::get_vfoA ()
 {
-	cmd = "FA;";
-	if (sendCommand(cmd, 11, false)) {
-		int f = 0;
-		for (size_t n = 2; n < 10; n++)
-			f = f*10 + replybuff[n] - '0';
-		freqA = f;
-	}
+	cmd = "FA";
+	sendCommand(cmd.append(";"));
+	size_t p = replystr.rfind(cmd);
+	if (p == string::npos) return freqA;
+	if (p + 9 >= replystr.length()) return freqA;
+	int f = 0;
+	for (size_t n = 2; n < 10; n++)
+		f = f*10 + replystr[p+n] - '0';
+	freqA = f;
 	return freqA;
 }
 
@@ -122,18 +124,20 @@ void RIG_FT950::set_vfoA (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 long RIG_FT950::get_vfoB ()
 {
-	cmd = "FB;";
-	if (sendCommand(cmd, 11, false)) {
-		int f = 0;
-		for (size_t n = 2; n < 10; n++)
-			f = f*10 + replybuff[n] - '0';
-		freqB = f;
-	}
+	cmd = "FB";
+	sendCommand(cmd.append(";"));
+	size_t p = replystr.rfind(cmd);
+	if (p == string::npos) return freqB;
+	if (p + 9 >= replystr.length()) return freqB;
+	int f = 0;
+	for (size_t n = 2; n < 10; n++)
+		f = f*10 + replystr[p+n] - '0';
+	freqB = f;
 	return freqB;
 }
 
@@ -146,7 +150,7 @@ void RIG_FT950::set_vfoB (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 
@@ -158,49 +162,54 @@ bool RIG_FT950::twovfos()
 
 int RIG_FT950::get_smeter()
 {
-	cmd = "SM0;";
-	if(sendCommand(cmd, 7, false)) {
-		replybuff[6] = 0;
-		int mtr = atoi(&replybuff[3]);
-		mtr = mtr * 100.0 / 256.0;
-		return mtr;
-	}
-	return 0;
+	cmd = "SM0";
+	sendCommand(cmd.append(";"));
+	size_t p = replystr.rfind(cmd);
+	if (p == string::npos) return 0;
+	if (p + 6 >= replystr.length()) return 0;
+	replystr[p+6] = 0;
+	int mtr = atoi(&replystr[p+3]);
+	mtr = mtr * 100.0 / 256.0;
+	return mtr;
 }
 
 int RIG_FT950::get_swr()
 {
-	cmd = "RM6;";
-	if (sendCommand(cmd, 7, false)) {
-		replybuff[6] = 0;
-		int mtr = atoi(&replybuff[3]);
-		return mtr / 2.56;
-	}
-	return 0;
+	cmd = "RM6";
+	sendCommand(cmd.append(";"));
+	size_t p = replystr.rfind(cmd);
+	if (p == string::npos) return 0;
+	if (p + 6 >= replystr.length()) return 0;
+	replystr[p+6] = 0;
+	int mtr = atoi(&replystr[p+3]);
+	return mtr / 2.56;
 }
 
 int RIG_FT950::get_power_out()
 {
-	cmd = "RM5;";
-	if (sendCommand(cmd, 7, false)) {
-		replybuff[6] = 0;
-		double mtr = (double)(atoi(&replybuff[3]));
-		mtr = -6.6263535 + .11813178 * mtr + .0013607405 * mtr * mtr;
-		return (int)mtr;
-	}
-	return 0;
+	cmd = "RM5";
+	sendCommand(cmd.append(";"));
+	size_t p = replystr.rfind(cmd);
+	if (p == string::npos) return 0;
+	if (p + 6 >= replystr.length()) return 0;
+	replystr[p+6] = 0;
+	double mtr = (double)(atoi(&replystr[p+3]));
+	mtr = -6.6263535 + .11813178 * mtr + .0013607405 * mtr * mtr;
+	return (int)mtr;
 }
 
 // Transceiver power level
 int RIG_FT950::get_power_control()
 {
-	cmd = "PC;";
-	if (sendCommand(cmd, 6, false)) {
-		replybuff[5] = 0;
-		int mtr = atoi(&replybuff[2]);
-		return mtr;
-	}
-	return 0;
+	cmd = "PC";
+	sendCommand(cmd.append(";"));
+	size_t p = replystr.rfind(cmd);
+	if (p == string::npos) return 0;
+	if (p + 5 >= replystr.length()) return 0;
+
+	replystr[p+5] = 0;
+	int mtr = atoi(&replystr[p+2]);
+	return mtr;
 }
 
 void RIG_FT950::set_power_control(double val)
@@ -213,19 +222,20 @@ void RIG_FT950::set_power_control(double val)
 		cmd[i] += ival % 10;
 		ival /= 10;
 	}
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 // Volume control return 0 ... 100
 int RIG_FT950::get_volume_control()
 {
-	cmd = "AG0;";
-	if (sendCommand(cmd, 7, false))  {
-		cmd[6] = 0;
-		int val = atoi(&replybuff[3]);
-		return (int)(val / 2.55);
-	}
-	return 0;
+	cmd = "AG0";
+	sendCommand(cmd.append(";"));
+	size_t p = replystr.rfind(cmd);
+	if (p == string::npos) return 0;
+	if (p + 6 >= replystr.length()) return 0;
+	cmd[p+6] = 0;
+	int val = atoi(&replystr[p+3]);
+	return (int)(val / 2.55);
 }
 
 void RIG_FT950::set_volume_control(int val) 
@@ -236,14 +246,14 @@ void RIG_FT950::set_volume_control(int val)
 		cmd[i] += ivol % 10;
 		ivol /= 10;
 	}
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 // Tranceiver PTT on/off
 void RIG_FT950::set_PTT_control(int val)
 {
-	if (val) sendCommand("TX1;", 0, false);
-	else	 sendCommand("TX0;", 0, false);
+	if (val) sendCommand("TX1;", 0);
+	else	 sendCommand("TX0;", 0);
 }
 
 void RIG_FT950::tune_rig()
@@ -273,23 +283,26 @@ void RIG_FT950::set_attenuator(int val)
 	}
 	cmd = "RA0;";
 	cmd[2] = '0' + atten_level;
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 int RIG_FT950::get_attenuator()
 {
-	if (sendCommand("RA0;", 5, false)) {
-		atten_level = replybuff[3] - '0';
-		if (atten_level == 1) {
-			atten_label("6 dB", false);
-		} else if (atten_level == 2) {
-			atten_label("12 dB", false);
-		} else if (atten_level == 3) {
-			atten_label("18 dB", false);
-		} else {
-			atten_level = 0;
-			atten_label("Att", false);
-		}
+	cmd = "RA0";
+	sendCommand(cmd.append(";"));
+	size_t p = replystr.rfind(cmd);
+	if (p == string::npos) return 0;
+	if (p + 3 >= replystr.length()) return 0;
+	atten_level = replystr[p+3] - '0';
+	if (atten_level == 1) {
+		atten_label("6 dB", false);
+	} else if (atten_level == 2) {
+		atten_label("12 dB", false);
+	} else if (atten_level == 3) {
+		atten_label("18 dB", false);
+	} else {
+		atten_level = 0;
+		atten_label("Att", false);
 	}
 	return atten_level;
 }
@@ -308,22 +321,25 @@ void RIG_FT950::set_preamp(int val)
 		preamp_label("Pre", false);
 	}
 	cmd[3] = '0' + preamp_level;
-	sendCommand (cmd, 0, false);
+	sendCommand (cmd, 0);
 }
 
 int RIG_FT950::get_preamp()
 {
-	if (sendCommand("PA0;", 5, false)) {
-		return (replybuff[3] == '1' ? 1 : 0);
-		preamp_level = replybuff[3] - '0';
-		if (preamp_level == 1) {
-			preamp_label("Pre 1", false);
-		} else if (preamp_level == 2) {
-			preamp_label("Pre 2", false);
-		} else {
-			preamp_label("Pre", false);
-			preamp_level = 0;
-		}
+	cmd = "PA0";
+	sendCommand(cmd.append(";"));
+	size_t p = replystr.rfind(cmd);
+	if (p == string::npos) return 0;
+	if (p + 3 >= replystr.length()) return 0;
+
+	preamp_level = replystr[p+3] - '0';
+	if (preamp_level == 1) {
+		preamp_label("Pre 1", false);
+	} else if (preamp_level == 2) {
+		preamp_label("Pre 2", false);
+	} else {
+		preamp_label("Pre", false);
+		preamp_level = 0;
 	}
 	return preamp_level;
 }
@@ -368,18 +384,23 @@ void RIG_FT950::set_modeA(int val)
 	cmd = "MD0";
 	cmd += FT950_mode_chr[val];
 	cmd += ';';
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 	adjust_bandwidth(modeA);
 }
 
 int RIG_FT950::get_modeA()
 {
-	if (sendCommand("MD0;", 5, false)) {
-		int md = replybuff[3];
-		if (md <= '9') md = md - '1';
-		else md = 9 + md - 'A';
-		modeA = md;
-	}
+	cmd = "MD0";
+	sendCommand(cmd.append(";"));
+	size_t p = replystr.rfind(cmd);
+	if (p == string::npos) return 0;
+	if (p + 3 >= replystr.length()) return 0;
+
+	int md = replystr[p+3];
+	if (md <= '9') md = md - '1';
+	else md = 9 + md - 'A';
+	modeA = md;
+
 	adjust_bandwidth(modeA);
 	return modeA;
 }
@@ -395,7 +416,7 @@ void RIG_FT950::set_bwA(int val)
 	cmd += '0' + bw_indx / 10;
 	cmd += '0' + bw_indx % 10;
 	cmd += ';';
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 int RIG_FT950::get_bwA()
@@ -404,12 +425,18 @@ int RIG_FT950::get_bwA()
 	if (modeA == 3 || modeA == 4 || modeA == 10 || modeA == 12) {
 		bwA = 0;
 		return bwA;	
-	} else if (sendCommand("SH0;", 6, false)) {
-		replybuff[5] = 0;
-		int bw_indx = atoi(&replybuff[3]);
-		for (i = 0; bw_vals_[i] < WVALS_LIMIT; i++)
-			if (bw_vals_[i] == bw_indx) break;
-	}
+	} 
+	cmd = "SH0";
+	sendCommand(cmd.append(";"));
+	size_t p = replystr.rfind(cmd);
+	if (p == string::npos) return 0;
+	if (p + 5 >= replystr.length()) return 0;
+	
+	replystr[p+5] = 0;
+	int bw_indx = atoi(&replystr[p+3]);
+	for (i = 0; bw_vals_[i] < WVALS_LIMIT; i++)
+		if (bw_vals_[i] == bw_indx) break;
+
 	if (bw_vals_[i]  < WVALS_LIMIT) bwA = i;
 	return bwA;
 }
@@ -428,15 +455,20 @@ void RIG_FT950::set_if_shift(int val)
 		cmd[3+i] += val % 10;
 		val /= 10;
 	}
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 bool RIG_FT950::get_if_shift(int &val)
 {
 	static int oldval = 0;
-	sendCommand("IS0;", 9, false);
-	replybuff[8] = 0;
-	val = atoi(&replybuff[3]);
+	cmd = "IS0";
+	sendCommand(cmd.append(";"));
+	size_t p = replystr.rfind(cmd);
+	if (p == string::npos) return 0;
+	if (p + 8 >= replystr.length()) return 0;
+
+	replystr[p+8] = 0;
+	val = atoi(&replystr[p+3]);
 	if (val != 0 || oldval != val) {
 		oldval = val;
 		return true;
@@ -456,13 +488,13 @@ void RIG_FT950::set_notch(bool on, int val)
 {
 	cmd = "BP00000;";
 	if (on == false) {
-		sendCommand(cmd, 0, false);
+		sendCommand(cmd, 0);
 		notch_on = false;
 		return;
 	}
 	if (!notch_on) {
 		cmd[6] = '1'; // notch ON
-		sendCommand(cmd, 0, false);
+		sendCommand(cmd, 0);
 		cmd[6] = '0';
 		notch_on = true;
 	}
@@ -474,23 +506,28 @@ void RIG_FT950::set_notch(bool on, int val)
 		cmd[3 + i] += val % 10;
 		val /=10;
 	}
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 bool  RIG_FT950::get_notch(int &val)
 {
 	bool ison = false;
-	cmd = "BP00;";
-	if (sendCommand(cmd, 8, false)) {
-		if (replybuff[6] == '1') {
-			ison = true;
-			cmd = "BP01;";
-			if (sendCommand(cmd, 8, false)) {
-				replybuff[7] = 0;
-				val = atoi(&replybuff[4]);
-				val *= 10;
-			}
-		}
+	cmd = "BP00";
+	sendCommand(cmd.append(";"));
+	size_t p = replystr.rfind(cmd);
+	if (p == string::npos) return ison;
+	if (p + 6 >= replystr.length()) return ison;
+
+	if (replystr[p+6] == '1') {
+		ison = true;
+		cmd = "BP01";
+		sendCommand(cmd.append(";"));
+		p = replystr.rfind(cmd);
+		if (p == string::npos) return ison;
+		if (p + 7 >= replystr.length()) return ison;
+		replystr[p+7] = 0;
+		val = atoi(&replystr[p+4]);
+		val *= 10;
 	}
 	return ison;
 }
@@ -508,7 +545,7 @@ void RIG_FT950::set_noise(bool b)
 		cmd = "NB01;";
 	else
 		cmd = "NB00;";
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 // val 0 .. 100
@@ -520,14 +557,19 @@ void RIG_FT950::set_mic_gain(int val)
 		cmd[1+i] += val % 10;
 		val /= 10;
 	}
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 int RIG_FT950::get_mic_gain()
 {
-	sendCommand("MG;", 6, false);
-	replybuff[5] = 0;
-	int val = atoi(&replybuff[2]);
+	cmd = "MG";
+	sendCommand(cmd.append(";"));
+	size_t p = replystr.rfind(cmd);
+	if (p == string::npos) return 0;
+	if (p + 5 >= replystr.length()) return 0;
+	
+	replystr[p+5] = 0;
+	int val = atoi(&replystr[p+2]);
 	return val;
 }
 
@@ -546,18 +588,20 @@ void RIG_FT950::set_rf_gain(int val)
 		cmd[i] = rfval % 10 + '0';
 		rfval /= 10;
 	}
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 int  RIG_FT950::get_rf_gain()
 {
 	int rfval = 0;
-	cmd = "RG0;";
-	if (sendCommand(cmd, 7, false)) {
-		for (int i = 3; i < 6; i++) {
-			rfval *= 10;
-			rfval += replybuff[i] - '0';
-		}
+	cmd = "RG0";
+	sendCommand(cmd.append(";"));
+	size_t p = replystr.rfind(cmd);
+	if (p == string::npos) return 0;
+	if (p + 5 >= replystr.length()) return 0;
+	for (int i = 3; i < 6; i++) {
+		rfval *= 10;
+		rfval += replystr[p+i] - '0';
 	}
 	return (int)(rfval / 2.55);
 }
