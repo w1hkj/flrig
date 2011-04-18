@@ -324,7 +324,7 @@ void RIG_TT588::set_volume_control(int vol)
 void RIG_TT588::set_rf_gain(int val)
 {
 	cmd = TT588setRF;
-	cmd[2] = 0x7F & (int)((100 - val) * 1.27);
+	cmd[2] = 0x7F & (int)(val * 1.27);
 	sendCommand(cmd, 0);
 }
 
@@ -335,15 +335,13 @@ int  RIG_TT588::get_rf_gain()
 	if (ret < 3) return 100;
 	size_t p = replystr.rfind("I");
 	if (p == string::npos) return 100;
-	return 100 - (int)((replystr[p+1] & 0x7F) / 1.27);
+	return (int)((replystr[p+1] & 0x7F) / 1.27);
 }
 
 // Tranceiver PTT on/off
 
-int query_cnt = 0;
 void RIG_TT588::set_PTT_control(int val)
 {
-	if (val) query_cnt = 2000 / progStatus.serloop_timing; // every 2 seconds
 	cmd = TT588setXMT;
 	if (val) {
 		cmd[2] = 0x04;
