@@ -392,6 +392,8 @@ void status::saveLastState()
 
 	spref.set("tooltips", tooltips);
 
+	spref.set("ui_scheme", ui_scheme.c_str());
+
 	spref.set("server_port", server_port.c_str());
 
 }
@@ -593,6 +595,9 @@ bool status::loadXcvrState(const char *xcvr)
 		i = 0;
 		if (spref.get("tooltips", i, i)) tooltips = i;
 
+		spref.get("ui_scheme", defbuffer, "gtk+", 199);
+		ui_scheme = defbuffer;
+
 		spref.get("server_port", defbuffer, "7362", 199);
 		server_port = defbuffer;
 
@@ -677,6 +682,8 @@ bool status::loadXcvrState(const char *xcvr)
 
 	if (restore_rig_data) mnuRestoreData->set();
 	else mnuRestoreData->clear();
+
+	Fl::scheme(ui_scheme.c_str());
 
 	return true;
 }
