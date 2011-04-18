@@ -139,9 +139,9 @@ void RIG_TT538::checkresponse(string s)
 {
 	if (RigSerial.IsOpen() == false)
 		return;
-	LOG_ERROR("%s:\nsent  %s\nreply %s\n", s.c_str(),
-		str2hex(cmd.c_str(), cmd.length()),
-		str2hex((char *)replybuff, strlen((char *)replybuff)));
+	string s1 = str2hex(cmd.c_str(), cmd.length());
+	string s2 = str2hex(replystr.c_str(), replystr.length());
+	LOG_ERROR("%s:\nsent  %s\nreply %s\n", s.c_str(), s1.c_str(), s2.c_str());
 }
 
 void RIG_TT538::showresponse(string s)
@@ -163,13 +163,16 @@ void RIG_TT538::shutdown()
 long RIG_TT538::get_vfoA ()
 {
 	cmd = TT538getFREQA;
-	bool ret = sendCommand(cmd, 6, true);
-	if (ret == true && replybuff[0] == 'A') {
-		int f = 0;
-		for (size_t n = 1; n < 5; n++)
-			f = f*256 + (unsigned char)replybuff[n];
-		freqA = f;
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 6) return (long)(freqA / (1 + VfoAdj/1e6) + 0.5);
+	size_t p = replystr.rfind("A");
+	if (p == string::npos) return (long)(freqA / (1 + VfoAdj/1e6) + 0.5);
+	
+	int f = 0;
+	for (size_t n = 1; n < 5; n++)
+		f = f*256 + (unsigned char)replystr[p + n];
+	freqA = f;
+
 	return (long)(freqA / (1 + VfoAdj/1e6) + 0.5);
 }
 
@@ -182,7 +185,7 @@ void RIG_TT538::set_vfoA (long freq)
 	cmd[4] = xfreq & 0xff; xfreq = xfreq >> 8;
 	cmd[3] = xfreq & 0xff; xfreq = xfreq >> 8;
 	cmd[2] = xfreq & 0xff;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd);
 	set_if_shift(pbt);
 	return ;
 }
@@ -191,13 +194,16 @@ long RIG_TT538::get_vfoB ()
 {
 //	cmd = TT538getFREQB;
 	cmd = TT538getFREQA;
-	bool ret = sendCommand(cmd, 6, true);
-	if (ret == true && replybuff[0] == 'B') {
-		int f = 0;
-		for (size_t n = 1; n < 5; n++)
-			f = f*256 + (unsigned char)replybuff[n];
-		freqB = f;
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 6) return (long)(freqB / (1 + VfoAdj/1e6) + 0.5);
+	size_t p = replystr.rfind("B");
+	if (p == string::npos) return (long)(freqB / (1 + VfoAdj/1e6) + 0.5);
+
+	int f = 0;
+	for (size_t n = 1; n < 5; n++)
+		f = f*256 + (unsigned char)replystr[p + n];
+	freqB = f;
+
 	return (long)(freqB / (1 + VfoAdj/1e6) + 0.5);
 }
 
@@ -211,7 +217,7 @@ void RIG_TT538::set_vfoB (long freq)
 	cmd[4] = xfreq & 0xff; xfreq = xfreq >> 8;
 	cmd[3] = xfreq & 0xff; xfreq = xfreq >> 8;
 	cmd[2] = xfreq & 0xff;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd);
 	set_if_shift(pbt);
 	return ;
 }
@@ -227,18 +233,17 @@ void RIG_TT538::set_modeA(int val)
 	cmd = TT538setMODE;
 	cmd[2] = TT538mode_chr[val];
 	cmd[3] = cmd[2];
-	sendCommand(cmd, 0, true);
-	showresponse(cmd);
+	sendCommand(cmd);
 }
 
 int RIG_TT538::get_modeA()
 {
 	cmd = TT538getMODE;
-	sendCommand(cmd, 4, true);
-showresponse(cmd);
-	if (replybuff[0] == 'M') {
-		modeA = replybuff[1] - '0';
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 4) return modeA;
+	size_t p = replystr.rfind("M");
+	if (p == string::npos) return modeA;
+	modeA = replystr[p+1] - '0';
 	return modeA;
 }
 
@@ -252,16 +257,18 @@ void RIG_TT538::set_bwA(int val)
 	bwA = val;
 	cmd = TT538setBW;
 	cmd[2] = 38 - val;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd);
 	set_if_shift(pbt);
 }
 
 int RIG_TT538::get_bwA()
 {
 	cmd = TT538getBW;
-	sendCommand(cmd, 3, true);
-	if (replybuff[0] == 'W')
-		bwA = 38 - (unsigned char)replybuff[1];
+	int ret = sendCommand(cmd);
+	if (ret < 3) return bwA;
+	size_t p = replystr.rfind("W");
+	if (p == string::npos) return bwA;
+	bwA = 38 - (unsigned char)replystr[p + 1];
 	return bwA;
 }
 
@@ -284,18 +291,21 @@ void RIG_TT538::set_if_shift(int val)
 		si += (bpval > 0 ? bpval : 0);
 	cmd[2] = (si & 0xff00) >> 8;
 	cmd[3] = (si & 0xff);
-	sendCommand(cmd, 0, true);
-	sendCommand(TT538getPBT, 4, true);
-	if (replybuff[1] != cmd[2] || replybuff[2] != cmd[3]) {
-		sendCommand(cmd, 0, true);
+	sendCommand(cmd);
+	int ret = sendCommand(TT538getPBT);
+	if (ret < 4) return;
+	size_t p = replystr.rfind("P");
+	if (p == string::npos) return;
+	if (replystr[p+1] != cmd[2] || replystr[p+2] != cmd[3]) {
+		sendCommand(cmd);
 	}
 }
 
 bool RIG_TT538::get_if_shift(int &val)
 {
 	val = 0;
-	cmd = TT538getPBT;
-	sendCommand(cmd, 4, true);
+//	cmd = TT538getPBT;
+//	sendCommand(cmd, 0);
 	return false;
 }
 
@@ -311,15 +321,18 @@ void RIG_TT538::set_attenuator(int val)
 	cmd = TT538setATT;
 	if (val) cmd[2] = '1';
 	else     cmd[2] = '0';
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd);
 }
 
 
 int RIG_TT538::get_attenuator()
 {
 	cmd = TT538getATT;
-	sendCommand(cmd, 3, true);
-	if (replybuff[0] == 'J' && replybuff[1] == '1')
+	int ret = sendCommand(cmd);
+	if (ret < 3) return 0;
+	size_t p = replystr.rfind("J");
+	if (p == string::npos) return 0;
+	if (replystr[p+1] == '1')
 		return 1;
 	return 0;
 }
@@ -328,13 +341,16 @@ int RIG_TT538::get_smeter()
 {
 	double sig = 0.0;
 	cmd = TT538getSMETER;
-	sendCommand(cmd, 6, true);
-	if (replybuff[0] == 'S') {
-		int sval;
-		replybuff[5] = 0;
-		sscanf(&replybuff[1], "%4x", &sval);
-		sig = sval / 256.0;
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 6) return 0;
+	size_t p = replystr.rfind("S");
+	if (p == string::npos) return 0;
+
+	int sval;
+	replystr[p+5] = 0;
+	sscanf(&replystr[p+1], "%4x", &sval);
+	sig = sval / 256.0;
+
 	return (int)(sig * 50.0 / 9.0);
 }
 
@@ -366,25 +382,26 @@ static int val2pot(int n)
 int RIG_TT538::get_volume_control()
 {
 	cmd = TT538getVOL;
-	sendCommand(cmd, 3, true);
-	if (replybuff[0] == 'U') {
-		return  pot2val(replybuff[1] & 0x7F);
-	}
-	return 0;
+	int ret = sendCommand(cmd);
+	if (ret < 3) return 0;
+	size_t p = replystr.rfind("U");
+	if (p == string::npos) return 0;
+
+	return  pot2val(replystr[p+1] & 0x7F);
 }
 
 void RIG_TT538::set_volume_control(int vol)
 {
 	cmd = TT538setVOL;
 	cmd[2] = val2pot(vol);
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd);
 }
 
 void RIG_TT538::set_rf_gain(int val)
 {
 	cmd = TT538setRF;
 	cmd[2] = val2pot(val);
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd);
 }
 
 int  RIG_TT538::get_rf_gain()
@@ -401,17 +418,20 @@ int  RIG_TT538::get_rf_gain()
 // Tranceiver PTT on/off
 void RIG_TT538::set_PTT_control(int val)
 {
-	if (val) sendCommand(TT538setXMT, 0, true);
-	else     sendCommand(TT538setRCV, 0, true);
+	if (val) sendCommand(TT538setXMT);
+	else     sendCommand(TT538setRCV);
 }
 
 int RIG_TT538::get_power_out()
 {
-	sendCommand("?S\r", 4, true); // same as get smeter in receive
-	if (replybuff[0] == 'T') {
-		fwdpwr = 0.8*fwdpwr + 0.2*(unsigned char)replybuff[1];
-		refpwr = 0.8*refpwr + 0.2*(unsigned char)replybuff[2];
-	}
+	int ret = sendCommand("?S\r"); // same as get smeter in receive
+	if (ret < 4) return fwdpwr;
+	size_t p = replystr.rfind("T");
+	if (p == string::npos) return fwdpwr;
+
+	fwdpwr = 0.8*fwdpwr + 0.2*(unsigned char)replystr[p+1];
+	refpwr = 0.8*refpwr + 0.2*(unsigned char)replystr[p+2];
+
 LOG_INFO("%s // %4.1f : %4.1f", str2hex(replystr.c_str(), replystr.length()), fwdpwr, refpwr);
 	return (int)fwdpwr;
 }

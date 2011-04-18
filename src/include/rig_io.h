@@ -22,8 +22,8 @@ extern bool startXcvrSerial();
 extern bool startAuxSerial();
 extern bool startSepSerial();
 
-extern int readResponse(int nbr = RXBUFFSIZE);
-extern int sendCommand(string s, int retnbr, bool loghex = true);
+extern int readResponse();
+extern int sendCommand(string s, int nread = -1);
 
 extern void clearSerialPort();
 extern int rig_nbr;

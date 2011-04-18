@@ -124,74 +124,35 @@ bool startSepSerial()
 char replybuff[RXBUFFSIZE+1];
 string replystr;
 
-int readResponse(int nbr)
+int readResponse()
 {
 	int numread = 0;
-	size_t n;
+	replystr.clear();
 	memset(replybuff, 0, RXBUFFSIZE + 1);
-	if (nbr == -1)
-		return RigSerial.ReadBuffer(replybuff, RXBUFFSIZE);
-	while (numread < nbr) {
-		n = RigSerial.ReadBuffer(&replybuff[numread], nbr - numread);
-		if (n == 0) break;
-		numread += n;
-	}
+	numread = RigSerial.ReadBuffer(replybuff, RXBUFFSIZE);
+	LOG_DEBUG("rsp:%3d, %s", numread, str2hex(replybuff, numread));
+	for (int i = 0; i < numread; replystr += replybuff[i++]);
 	return numread;
 }
 
-// retnbr = 0 ... N read N bytes
-// retnbr = -1 .. read indeterminiate # bytes
-
-int sendCommand (string s, int retnbr, bool b)
+int sendCommand (string s, int nread)
 {
-	int numread = 0;
 	int numwrite = (int)s.size();
 
-	int readafter = (int)(ceilf((retnbr == -1 ? 20 : retnbr + progStatus.comm_echo ? numwrite : 0)) *
-								(9 + progStatus.stopbits) * 1000.0 / RigSerial.Baud()) + 
-							progStatus.comm_wait;
-
-	if (RigSerial.IsOpen() == false) {
-		LOG_DEBUG("cmd:%3d, %s", s.length(), b ? str2hex(s.data(), s.length()) : s.c_str());
+	LOG_DEBUG("cmd:%3d, %s", s.length(), str2hex(s.data(), s.length()));
+	if (RigSerial.IsOpen() == false)
 		return 0;
-	}
-
-	if (RIG_DEBUG)
-		LOG_INFO("cmd:%3d, %s", s.length(), b ? str2hex(s.data(), s.length()) : s.c_str());
-
-	RigSerial.FlushBuffer();
 
 	RigSerial.WriteBuffer(s.c_str(), numwrite);
-	MilliSleep( readafter );
+	MilliSleep( progStatus.comm_wait );
 
-	replystr.clear();
-
-	if (retnbr == 0) {
-		memset(replybuff, 0, RXBUFFSIZE + 1);
+	if (nread == 0)
 		return 0;
-	}
+	if (nread > 0)
+		MilliSleep( (int)((nread + progStatus.comm_echo ? numwrite : 0)*11000.0/RigSerial.Baud()));
 
-	numread = readResponse((progStatus.comm_echo ? numwrite : 0) + retnbr);
+	return readResponse();
 
-	if (RIG_DEBUG)
-		LOG_INFO("rsp:%3d, %s", numread, b ? str2hex(replybuff, numread) : replybuff);
-
-	if (progStatus.comm_echo && (numread >= numwrite)) {
-		memmove(replybuff, replybuff + numwrite, numread - numwrite);
-		numread -= numwrite;
-	}
-
-	if (retnbr >= 0 && numread > retnbr) {
-		memmove(replybuff, replybuff + numread - retnbr, retnbr);
-		numread = retnbr;
-	}
-
-	if (RIG_DEBUG)
-		LOG_INFO("rsp:%3d, %s", numread, b ? str2hex(replybuff, numread) : replybuff);
-
-	for (int i = 0; i < numread; replystr += replybuff[i++]);
-
-	return numread;
 }
 
 void clearSerialPort()

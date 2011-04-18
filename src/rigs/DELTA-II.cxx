@@ -50,14 +50,6 @@ int  RIG_TT535::adjust_bandwidth(int m)
 
 long RIG_TT535::get_vfoA ()
 {
-//	cmd = pre_to;
-//	cmd += '\x03';
-//	cmd.append( post );
-//	if (!sendICcommand(cmd, 11)) {
-//		checkresponse(11);
-//		return freqA;
-//	}
-//	freqA = fm_bcd_be(&replystr[5], 10);
 	return freqA;
 }
 
@@ -69,8 +61,9 @@ void RIG_TT535::set_vfoA (long freq)
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 8 ) );
 	cmd.append( post );
-	sendICcommand(cmd, 6);
-	checkresponse(6);
+	int ret = sendCommand(cmd);
+	if (ret != 6);
+		checkresponse();
 }
 
 void RIG_TT535::set_vfoB (long freq)
@@ -80,20 +73,12 @@ void RIG_TT535::set_vfoB (long freq)
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 8 ) );
 	cmd.append( post );
-	sendICcommand(cmd, 6);
-	checkresponse(6);
+	if (sendCommand(cmd) != 6);
+		checkresponse();
 }
 
 long RIG_TT535::get_vfoB ()
 {
-//	cmd = pre_to;
-//	cmd += '\x03';
-//	cmd.append( post );
-//	if (!sendICcommand(cmd, 11)) {
-//		checkresponse(11);
-//		return freqA;
-//	}
-//	freqA = fm_bcd_be(&replystr[5], 10);
 	return freqB;
 }
 
@@ -117,8 +102,8 @@ void RIG_TT535::set_modeA(int md)
 	cmd += '\x06';
 	cmd += modeA;
 	cmd.append(post);
-	sendICcommand(cmd, 6);
-	checkresponse(6);
+	if (sendCommand(cmd) != 6);
+		checkresponse();
 }
 
 // same with get mode
@@ -142,20 +127,13 @@ void RIG_TT535::set_modeB(int md)
 	cmd += '\x06';
 	cmd += modeB;
 	cmd.append(post);
-	sendICcommand(cmd, 6);
-	checkresponse(6);
+	if (sendCommand(cmd) != 6);
+		checkresponse();
 }
 
 // same with get mode
 int RIG_TT535::get_modeB()
 {
-//	cmd = pre_to;
-//	cmd += '\x04';
-//	cmd.append(post);
-//	if( sendICcommand (cmd, 8 )) {
-//		modeA = replystr[5];
-//		bwA = replystr[6];
-//	}
 	return modeB;
 }
 

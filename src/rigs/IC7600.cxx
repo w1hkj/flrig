@@ -76,7 +76,7 @@ void RIG_IC7600::selectA()
 	cmd += '\xD0';
 	cmd.append(post);
 	sendICcommand(cmd, 6);
-	checkresponse(6);
+	checkresponse();
 }
 
 void RIG_IC7600::selectB()
@@ -86,7 +86,7 @@ void RIG_IC7600::selectB()
 	cmd += '\xD1';
 	cmd.append(post);
 	sendICcommand(cmd, 6);
-	checkresponse(6);
+	checkresponse();
 }
 
 void RIG_IC7600::set_modeA(int val)
@@ -99,7 +99,7 @@ void RIG_IC7600::set_modeA(int val)
 	if (IC7600_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	sendICcommand (cmd, 6);
-	checkresponse(6);
+	checkresponse();
 // digital set / clear
 	if (A.imode >= 10) {
 		cmd = pre_to;
@@ -115,7 +115,7 @@ void RIG_IC7600::set_modeA(int val)
 		if (IC7600_DEBUG)
 			LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 		sendICcommand (cmd, 6);
-		checkresponse(6);
+		checkresponse();
 	}
 }
 
@@ -130,7 +130,7 @@ int RIG_IC7600::get_modeA()
 		if (md == 10) md = 0;
 		A.imode = md;
 	} else
-		checkresponse(8);
+		checkresponse();
 	if (md == 0 || md == 1) {
 		cmd = pre_to;
 		cmd += '\x1A'; cmd += '\x06';
@@ -155,7 +155,7 @@ void RIG_IC7600::set_modeB(int val)
 	if (IC7600_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	sendICcommand (cmd, 6);
-	checkresponse(6);
+	checkresponse();
 // digital set / clear
 	if (B.imode >= 10) {
 		cmd = pre_to;
@@ -171,7 +171,7 @@ void RIG_IC7600::set_modeB(int val)
 		if (IC7600_DEBUG)
 			LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 		sendICcommand (cmd, 6);
-		checkresponse(6);
+		checkresponse();
 	}
 }
 
@@ -186,7 +186,7 @@ int RIG_IC7600::get_modeB()
 		if (md == 10) md = 0;
 		B.imode = md;
 	} else
-		checkresponse(8);
+		checkresponse();
 	if (md == 0 || md == 1) {
 		cmd = pre_to;
 		cmd += '\x1A'; cmd += '\x06';
@@ -224,7 +224,7 @@ void RIG_IC7600::set_bwA(int val)
 	if (IC7600_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	sendICcommand (cmd, 6);
-	checkresponse(6);
+	checkresponse();
 }
 
 int RIG_IC7600::get_bwB()
@@ -250,7 +250,7 @@ void RIG_IC7600::set_bwB(int val)
 	if (IC7600_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	sendICcommand (cmd, 6);
-	checkresponse(6);
+	checkresponse();
 }
 
 int RIG_IC7600::adjust_bandwidth(int m)
@@ -331,7 +331,7 @@ void RIG_IC7600::set_mic_gain(int v)
 		cmd.append( post );
 	}
 	sendICcommand (cmd, 6);
-	checkresponse(6);
+	checkresponse();
 	if (RIG_DEBUG)
 		LOG_WARN("%s", str2hex(cmd.data(), cmd.length()));
 }
@@ -363,7 +363,7 @@ void RIG_IC7600::set_attenuator(int val)
 	cmd += cmdval;
 	cmd.append( post );
 	sendICcommand(cmd,6);
-	checkresponse(6);
+	checkresponse();
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }

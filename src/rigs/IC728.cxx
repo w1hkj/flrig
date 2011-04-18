@@ -60,7 +60,7 @@ long RIG_IC728::get_vfoA ()
 	cmd += '\x03';
 	cmd.append( post );
 	if (!sendCommand(cmd, 10)) {
-		checkresponse(10);
+		checkresponse();
 		return freqA;
 	}
 	freqA = fm_bcd_be(&replystr[5], 8);
@@ -75,6 +75,6 @@ void RIG_IC728::set_vfoA (long freq)
 	cmd.append( to_bcd_be( freq, 8 ) );
 	cmd.append( post );
 	sendCommand(cmd, 6);
-	checkresponse(6);
+	checkresponse();
 }
 

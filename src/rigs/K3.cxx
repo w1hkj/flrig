@@ -65,7 +65,7 @@ int  RIG_K3::adjust_bandwidth(int m)
 void RIG_K3::initialize()
 {
 	cmd = "K31;";
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 	modeA = 1;
 	bwA = 2;
 	modeB = 1;
@@ -75,12 +75,15 @@ void RIG_K3::initialize()
 long RIG_K3::get_vfoA ()
 {
 	cmd = "FA;";
-	if (sendCommand(cmd, 14, false)) {
-		long f = 0;
-		for (size_t n = 2; n < 13; n++)
-			f = f*10 + replybuff[n] - '0';
-		freqA = f;
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 14) return freqA;
+	size_t p = replystr.rfind("FA");
+	if (p == string::npos) return freqA;
+	
+	long f = 0;
+	for (size_t n = 2; n < 13; n++)
+		f = f*10 + replystr[p + n] - '0';
+	freqA = f;
 	return freqA;
 }
 
@@ -92,7 +95,7 @@ void RIG_K3::set_vfoA (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 // Volume control
@@ -104,15 +107,19 @@ void RIG_K3::set_volume_control(int val)
 		cmd[i] += ivol % 10;
 		ivol /= 10;
 	}
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 int RIG_K3::get_volume_control()
 {
 	cmd = "AG;";
-	sendCommand(cmd, 6, false);
-	replybuff[5] = 0;
-	int v = atoi(&replybuff[2]);
+	int ret = sendCommand(cmd);
+	if (ret < 6) return 0;
+	size_t p = replystr.rfind("AG");
+	if (p == string::npos) return 0;
+	
+	replystr[p + 5] = 0;
+	int v = atoi(&replystr[p + 2]);
 	return (int)(v / 2.55);
 }
 
@@ -120,13 +127,18 @@ void RIG_K3::set_modeA(int val)
 {
 	cmd = "MD0;";
 	cmd[2] = modenbr[val];
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 int RIG_K3::get_modeA()
 {
-	sendCommand("MD;", 4, false);
-	int md = replybuff[2] - '1';
+	cmd = "MD;";
+	int ret = sendCommand(cmd);
+	if (ret < 4) return 0;
+	size_t p = replystr.rfind("MD");
+	if (p == string::npos) return 0;
+	
+	int md = replystr[p + 2] - '1';
 	if (md == 8) md--;
 	return md;
 }
@@ -138,29 +150,35 @@ int RIG_K3::get_modetype(int n)
 
 void RIG_K3::set_preamp(int val)
 {
-	if (val) sendCommand("PA1;", 0, false);
-	else	 sendCommand("PA0;", 0, false);
+	if (val) sendCommand("PA1;", 0);
+	else	 sendCommand("PA0;", 0);
 }
 
 int RIG_K3::get_preamp()
 {
-	if (sendCommand("PA;", 4, false))
-		return (replybuff[2] == '1' ? 1 : 0);
-	return 0;
+	cmd = "PA;";
+	int ret = sendCommand(cmd);
+	if (ret < 4) return 0;
+	size_t p = replystr.rfind("PA");
+	if (p == string::npos) return 0;
+	return (replystr[p + 2] == '1' ? 1 : 0);
 }
 
 //
 void RIG_K3::set_attenuator(int val)
 {
-	if (val) sendCommand("RA01;", 0, false);
-	else	 sendCommand("RA00;", 0, false);
+	if (val) sendCommand("RA01;", 0);
+	else	 sendCommand("RA00;", 0);
 }
 
 int RIG_K3::get_attenuator()
 {
-	if (sendCommand("RA;", 5, false))
-		return (replybuff[3] == '1' ? 1 : 0);
-   return 0;
+	cmd = "RA;";
+	int ret = sendCommand(cmd);
+	if (ret < 5) return 0;
+	size_t p = replystr.rfind("RA");
+	if (p == string::npos) return 0;
+	return (replystr[p + 3] == '1' ? 1 : 0);
 }
 
 // Transceiver power level
@@ -172,7 +190,7 @@ void RIG_K3::set_power_control(double val)
 		cmd[i] += ival % 10;
 		ival /= 10;
 	}
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 void RIG_K3::get_pc_min_max_step(int &min, int &max, int &step)
@@ -183,8 +201,8 @@ void RIG_K3::get_pc_min_max_step(int &min, int &max, int &step)
 // Tranceiver PTT on/off
 void RIG_K3::set_PTT_control(int val)
 {
-	if (val) sendCommand("TX;", 0, false);
-	else	 sendCommand("RX;", 0, false);
+	if (val) sendCommand("TX;", 0);
+	else	 sendCommand("RX;", 0);
 }
 
 //BG (Bargraph Read; GET only)
@@ -202,20 +220,22 @@ void RIG_K3::set_PTT_control(int val)
 int RIG_K3::get_smeter()
 {
 	cmd = "SM;";
-	if(sendCommand(cmd, 7, false)) {
-		replybuff[6] = 0;
-		int mtr = atoi(&replybuff[3]);
-		if (mtr <= 6) mtr = (int) (50.0 * mtr / 6.0);
-		else mtr = (int)(50 + (mtr - 6.0) * 50.0 / 9.0);
-		return mtr;
-	}
-	return 0;
+	int ret = sendCommand(cmd);
+	if (ret < 7) return 0;
+	size_t p = replystr.rfind("SM");
+	if (p == string::npos) return 0;
+
+	replystr[p + 6] = 0;
+	int mtr = atoi(&replystr[p + 3]);
+	if (mtr <= 6) mtr = (int) (50.0 * mtr / 6.0);
+	else mtr = (int)(50 + (mtr - 6.0) * 50.0 / 9.0);
+	return mtr;
 }
 
 void RIG_K3::set_noise(bool on)
 {
-	if (on) sendCommand("NB1;", 0, false);
-	else	sendCommand("NB0;", 0, false);
+	if (on) sendCommand("NB1;", 0);
+	else	sendCommand("NB0;", 0);
 }
 
 //FW $ (Filter Bandwidth and Number; GET/SET)
@@ -236,34 +256,27 @@ void RIG_K3::set_bwA(int val)
 	bwA = val;
 	cmd = "K30;K22;FW0000x;K20;K31;";
 	cmd[14] = '0' + val;
-	sendCommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 int RIG_K3::get_bwA()
 {
 	cmd = "K30;K22;FW;K20;K31;";
-	if ( sendCommand(cmd, 9, false) )
-		bwA = replybuff[5] - '0';
+	int ret = sendCommand(cmd);
+	if (ret != 9) return bwA;
+	bwA = replystr[5] - '0';
 	return bwA;
 }
-
-//int RIG_K3::get_swr()
-//{
-//}
 
 int RIG_K3::get_power_out()
 {
 	cmd = "PC;";
-	if (sendCommand(cmd, 6, false)) {
-		replybuff[5] = 0;
-		int mtr = atoi(&replybuff[2]);
-		return mtr;
-	}
-	return 0;
+	int ret = sendCommand(cmd);
+	if (ret < 6) return 0;
+	size_t p = replystr.rfind("PC");
+	if (p == string::npos) return 0;
+	replystr[p + 5] = 0;
+	int mtr = atoi(&replystr[p + 2]);
+	return mtr;
 }
-
-//void RIG_K3::tune_rig()
-//{
-//}
-
 

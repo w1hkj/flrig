@@ -20,49 +20,38 @@ void RIG_ICOM::adjustCIV(uchar adr)
 	pre_to[2] = ok[3] = bad[3] = pre_fm[3] = CIV;
 }
 
-void RIG_ICOM::checkresponse(int n)
+void RIG_ICOM::checkresponse()
 {
 	if (RigSerial.IsOpen() == false)
 		return;
 
-	if (replystr.find(ok) != string::npos)
-//	if (strcmp( replybuff, ok.c_str()) == 0)
+	if (replystr.rfind(ok) != string::npos)
 		return;
 
-	LOG_ERROR("\nsent  %s\nreply %s",
-		str2hex(cmd.c_str(), cmd.length()),
-		str2hex(replybuff, n));
+	string s1 = str2hex(cmd.c_str(), cmd.length());
+	string s2 = str2hex(replystr.c_str(), replystr.length());
+	LOG_ERROR("\nsent  %s\nreply %s", s1.c_str(), s2.c_str());
 }
 
 bool RIG_ICOM::sendICcommand(string cmd, int nbr)
 {
-	if (RigSerial.IsOpen()) {
-		for (int i = 0; i < progStatus.comm_retries; i++) {
-			if (i) clearSerialPort();
-			if (sendCommand(cmd, nbr, true) != nbr) {
-				LOG_ERROR("sendCommand() failed");
-				continue;
-			}
+	int ret = sendCommand(cmd);
+
+	if (ret < nbr) return false;
+
+	if (ret > nbr) replystr.erase(0, ret - nbr);
 
 // look for preamble at beginning
-			if (replystr.find(pre_fm) == string::npos)  {
-				LOG_ERROR("preamble");
-				continue;
-			}
-
-// look for postamble
-			if (replystr.find(post) == string::npos) {
-				LOG_ERROR("postample 0x%X", (unsigned char)post[0]);
-				continue;
-			}
-			return true;
-		}
-		LOG_ERROR("Exceeded retry count");
-		return false;
-	} else {
-		sendCommand(cmd, nbr, true);
+	if (replystr.rfind(pre_fm) == string::npos)  {
+		LOG_ERROR("preamble");
 		return false;
 	}
-	return false;
+
+// look for postamble
+	if (replystr.rfind(post) == string::npos) {
+		LOG_ERROR("postample 0x%X", (unsigned char)post[0]);
+		return false;
+	}
+	return true;
 }
 

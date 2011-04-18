@@ -51,7 +51,6 @@ RIG_TS480HX::RIG_TS480HX() {
 
 	has_noise_control =
 	has_micgain_control =
-	has_tune_control =
 	has_preamp_control =
 	has_notch_control =
 	has_ifshift_control =
@@ -62,50 +61,48 @@ RIG_TS480HX::RIG_TS480HX() {
 	has_bandwidth_control =
 	has_volume_control =
 	has_power_control =
+	has_tune_control = 
 	has_ptt_control = true;
-}
-
-bool RIG_TS480HX::sendTScommand(string cmd, int retnbr)
-{
-	int ret = sendCommand(cmd, retnbr, false);
-	if (RigSerial.IsOpen())
-		LOG_INFO("%s\n%s", cmd.c_str(), replystr.c_str());
-	else
-		LOG_INFO("%s", cmd.c_str());
-	return ret;
 }
 
 void RIG_TS480HX::initialize()
 {
 	selectA();
 	cmd = "AC000;"; 
-	sendTScommand(cmd, 0);
+	sendCommand(cmd, 0);
+	MilliSleep(100);
+	readResponse();
+LOG_WARN("%s", replystr.c_str());
 	cmd = "EX04500001;"; // set bandwidth controls for data modes
-	LOG_WARN("%s", cmd.c_str());
-	sendTScommand(cmd, 0);
+	sendCommand(cmd, 0);
+	MilliSleep(100);
+	readResponse();
+LOG_WARN("%s", replystr.c_str());
 	cmd = "SH01"; // set center frequency to 1500
-	LOG_WARN("%s", cmd.c_str());
-	sendTScommand(cmd, 0);
+	sendCommand(cmd, 0);
+	MilliSleep(100);
+	readResponse();
+LOG_WARN("%s", replystr.c_str());
 }
 
 void RIG_TS480HX::selectA()
 {
 	cmd = "FR0;";
-	LOG_WARN("%s", cmd.c_str());
-	sendTScommand(cmd, 0);
+	sendCommand(cmd);
+LOG_WARN("%s", replystr.c_str());
 	cmd = "FT0;";
-	LOG_WARN("%s", cmd.c_str());
-	sendTScommand(cmd, 0);
+	sendCommand(cmd);
+LOG_WARN("%s", replystr.c_str());
 }
 
 void RIG_TS480HX::selectB()
 {
 	cmd = "FR1;";
-	LOG_WARN("%s", cmd.c_str());
-	sendTScommand(cmd, 0);
+	sendCommand(cmd);
+LOG_WARN("%s", replystr.c_str());
 	cmd = "FT1;";
-	LOG_WARN("%s", cmd.c_str());
-	sendTScommand(cmd, 0);
+	sendCommand(cmd);
+LOG_WARN("%s", replystr.c_str());
 }
 
 void RIG_TS480HX::set_split(bool val) 
@@ -113,33 +110,32 @@ void RIG_TS480HX::set_split(bool val)
 	split = val;
 	if (val) {
 		cmd = "FR0;";
-	LOG_WARN("%s", cmd.c_str());
-		sendTScommand(cmd, 0);
+		sendCommand(cmd);
+LOG_WARN("%s", replystr.c_str());
 		cmd = "FT1;";
-	LOG_WARN("%s", cmd.c_str());
-		sendTScommand(cmd, 0);
+		sendCommand(cmd);
+LOG_WARN("%s", replystr.c_str());
 	} else {
 		cmd = "FR0;";
-	LOG_WARN("%s", cmd.c_str());
-		sendTScommand(cmd, 0);
+		sendCommand(cmd);
+LOG_WARN("%s", replystr.c_str());
 		cmd = "FT0;";
-	LOG_WARN("%s", cmd.c_str());
-		sendTScommand(cmd, 0);
+		sendCommand(cmd);
+LOG_WARN("%s", replystr.c_str());
 	}
 }
 
 long RIG_TS480HX::get_vfoA ()
 {
 	cmd = "FA;";
-	if (!sendTScommand(cmd, 14))
-		return freqA;
-	if (replystr.find("FA") != 0) {
-		clearSerialPort();
-		return freqA;
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 14) return freqA;
+	size_t p = replystr.rfind("FA");
+	if (p == string::npos) return freqA;
+
 	int f = 0;
 	for (size_t n = 2; n < 13; n++)
-		f = f*10 + replybuff[n] - '0';
+		f = f*10 + replystr[p + n] - '0';
 	freqA = f;
 	return freqA;
 }
@@ -153,21 +149,25 @@ void RIG_TS480HX::set_vfoA (long freq)
 		freq /= 10;
 	}
 	LOG_WARN("%s", cmd.c_str());
-	sendTScommand(cmd, 0);;
+	sendCommand(cmd, 0);
 }
 
 long RIG_TS480HX::get_vfoB ()
 {
 	cmd = "FB;";
-	if (sendTScommand(cmd, 14) == 14) {
-		long f = 0L;
-		long mul = 1L;
-		for (size_t n = 12; n > 1; n--) {
-			f += (replybuff[n] - '0') * mul;
-			mul *= 10;
-		}
-		B.freq = f;
+	int ret = sendCommand(cmd);
+	if (ret < 14) return B.freq;
+	size_t p = replystr.rfind("FB");
+	if (p == string::npos); return B.freq;
+	
+	long f = 0L;
+	long mul = 1L;
+	for (size_t n = 12; n > 1; n--) {
+		f += (replystr[p + n] - '0') * mul;
+		mul *= 10;
 	}
+	B.freq = f;
+
 	return B.freq;
 }
 
@@ -180,21 +180,21 @@ void RIG_TS480HX::set_vfoB (long freq)
 		freq /= 10;
 	}
 	LOG_WARN("%s", cmd.c_str());
-	sendTScommand(cmd, 0);
+	sendCommand(cmd, 0);
 }
 
 // SM cmd 0 ... 100 (rig values 0 ... 15)
 int RIG_TS480HX::get_smeter()
 {
 	cmd = "SM0;";
-	if(!sendTScommand(cmd, 8))
-		return 0;
-	if (replystr.find("SM") != 0) {
-		clearSerialPort();
-		return 0;
-	}
-	replybuff[7] = 0;
-	int mtr = atoi(&replybuff[3]);
+	int ret = sendCommand(cmd);
+	if (ret < 8) return 0;
+
+	size_t p = replystr.rfind("SM");
+	if (p == string::npos) return 0;
+
+	replystr[p + 7] = 0;
+	int mtr = atoi(&replystr[p + 3]);
 	mtr = (mtr * 100) / 20;
 	return mtr;
 }
@@ -205,11 +205,15 @@ int RIG_TS480HX::get_swr()
 	return -1; // disable to see if beeps go away
 	int mtr = 0;
 	cmd = "RM1;"; // select measurement '1' (swr) and read meter
-	if (sendTScommand(cmd, 8) == 8) {
-		replybuff[7] = 0;
-		mtr = atoi(&replybuff[4]);
-		mtr *= 10;
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 8) return mtr;
+	size_t p = replystr.rfind("RM");
+	if (p == string::npos) return mtr;
+
+	replystr[p + 7] = 0;
+	mtr = atoi(&replystr[p + 4]);
+	mtr *= 10;
+
 	return mtr;
 }
 
@@ -220,7 +224,7 @@ void RIG_TS480HX::set_PTT_control(int val)
 	if (val)	cmd = "TX1;"; // DTS transmission using ANI input
 	else	 	cmd = "RX;";
 	LOG_WARN("%s", cmd.c_str());
-	sendTScommand(cmd, 4);;
+	sendCommand(cmd, 0);
 }
 
 void RIG_TS480HX::set_modeA(int val)
@@ -230,18 +234,19 @@ void RIG_TS480HX::set_modeA(int val)
 	cmd += TS480HX_mode_chr[val];
 	cmd += ';';
 	LOG_WARN("%s", cmd.c_str());
-	sendTScommand(cmd, 4);;
+	sendCommand(cmd, 0);
 }
 
 int RIG_TS480HX::get_modeA()
 {
-	if (!sendTScommand(cmd, 4))
-		return modeA;
-	if (replystr.find("MD") != 0) {
-		clearSerialPort();
-		return modeA;
-	}
-	int md = replybuff[2];
+	cmd = "MD;";
+	int ret = sendCommand(cmd);
+	if (ret < 4) return modeA;
+
+	size_t p = replystr.rfind("MD");
+	if (p == string::npos) return modeA;
+
+	int md = replystr[p + 2];
 	md = md - '1';
 	if (md == 8) md = 7;
 	modeA = md;
@@ -255,18 +260,19 @@ void RIG_TS480HX::set_modeB(int val)
 	cmd += TS480HX_mode_chr[val];
 	cmd += ';';
 	LOG_WARN("%s", cmd.c_str());
-	sendTScommand(cmd, 4);;
+	sendCommand(cmd, 0);
 }
 
 int RIG_TS480HX::get_modeB()
 {
-	if (!sendTScommand(cmd, 4))
-		return modeB;
-	if (replystr.find("MD") != 0) {
-		clearSerialPort();
-		return modeB;
-	}
-	int md = replybuff[2];
+	cmd = "MD;";
+	int ret = sendCommand(cmd);
+	if (ret < 4) return modeB;
+
+	size_t p = replystr.rfind("MD");
+	if (p == string::npos) return modeB;
+
+	int md = replystr[p + 2];
 	md = md - '1';
 	if (md == 8) md = 7;
 	modeA = md;
@@ -284,17 +290,21 @@ void RIG_TS480HX::set_bwA(int val)
 	cmd = "SL00";
 	cmd[3] = '0' + val;
 	LOG_WARN("%s", cmd.c_str());
-	sendTScommand(cmd, 0);;
+	sendCommand(cmd, 0);
 }
 
 int RIG_TS480HX::get_bwA()
 {
 	cmd = "SL;";
-	if (sendTScommand(cmd, 5) == 5) {
-		bwA = replybuff[3] - '0';
-		if (bwA < 0) bwA = 0;
-		if (bwA > 6) bwA = 6;
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 5) return bwA;
+	size_t p = replystr.rfind("SL");
+	if (p == string::npos) return bwA;
+
+	bwA = replystr[p + 3] - '0';
+	if (bwA < 0) bwA = 0;
+	if (bwA > 6) bwA = 6;
+
 	return bwA;
 }
 
@@ -304,17 +314,21 @@ void RIG_TS480HX::set_bwB(int val)
 	cmd = "SL00";
 	cmd[3] = '0' + val;
 	LOG_WARN("%s", cmd.c_str());
-	sendTScommand(cmd, 0);;
+	sendCommand(cmd, 0);
 }
 
 int RIG_TS480HX::get_bwB()
 {
 	cmd = "SL;";
-	if (sendTScommand(cmd, 5) == 5) {
-		bwA = replybuff[3] - '0';
-		if (bwB < 0) bwB = 0;
-		if (bwB > 6) bwB = 6;
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 5) return bwB;
+	size_t p = replystr.rfind("SL");
+	if (p == string::npos) return bwB;
+
+	bwA = replystr[p + 3] - '0';
+	if (bwB < 0) bwB = 0;
+	if (bwB > 6) bwB = 6;
+
 	return bwB;
 }
 
@@ -332,41 +346,50 @@ void RIG_TS480HX::set_volume_control(int val)
 	cmd += szval;
 	cmd += ';';
 	LOG_WARN("%s", cmd.c_str());
-	sendTScommand(cmd, 0);;
+	sendCommand(cmd, 0);
 }
 
 int RIG_TS480HX::get_volume_control()
 {
-	cmd = "AG0";
 	int val = 0;
-	if (sendTScommand(cmd, 7) == 7) {
-		replybuff[6] = 0;
-		val = atoi(&replybuff[3]);
-		val = val * 100 / 255;
-	}
+	cmd = "AG0";
+	int ret = sendCommand(cmd);
+	if (ret < 7) return val;
+	size_t p = replystr.rfind("AG");
+	if (p == string::npos) return val;
+
+	replystr[p + 6] = 0;
+	val = atoi(&replystr[p + 3]);
+	val = val * 100 / 255;
+
 	return val;
 }
 
 void RIG_TS480HX::set_power_control(double val)
 {
 	cmd = "PC";
+	sendCommand(cmd, 0);
 	char szval[4];
 	if (modeA == 4 && val > 50) val = 50; // AM mode limitation
 	snprintf(szval, sizeof(szval), "%03d", (int)val);
 	cmd += szval;
 	cmd += ';';
 	LOG_WARN("%s", cmd.c_str());
-	sendTScommand(cmd, 0);;
+	sendCommand(cmd, 0);
 }
 
 int RIG_TS480HX::get_power_control()
 {
-	cmd = "PC;";
 	int val = 5;
-	if (sendTScommand(cmd, 6) == 6) {
-		replybuff[5] = 0;
-		val = atoi(&replybuff[2]);
-	}
+	cmd = "PC;";
+	int ret = sendCommand(cmd);
+	if (ret < 6) return val;
+	size_t p = replystr.rfind("PC");
+	if (p == string::npos) return val;
+
+	replystr[p + 5] = 0;
+	val = atoi(&replystr[p + 2]);
+
 	return val;
 }
 
@@ -374,15 +397,25 @@ void RIG_TS480HX::set_attenuator(int val)
 {
 	if (val)	cmd = "RA01";
 	else		cmd = "RA00";
-	sendTScommand(cmd, 0);;
+	sendCommand(cmd, 0);
 }
 
 int RIG_TS480HX::get_attenuator()
 {
 	cmd = "RA;";
-	if (sendTScommand(cmd, 7) == 7) {
-		return replybuff[3] - '0';
-	}
-	return 0;
+	int ret = sendCommand(cmd);
+	if (ret < 7) return 0;
+	size_t p = replystr.rfind("RA");
+	if (p == string::npos) return 0;
+	
+	return replystr[p + 3] - '0';
+
+}
+
+void RIG_TS480HX::tune_rig()
+{
+	cmd = "AC111;";
+	LOG_WARN("%s", cmd.c_str());
+	sendCommand(cmd, 0);
 }
 

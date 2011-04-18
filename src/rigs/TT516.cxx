@@ -113,34 +113,25 @@ RIG_TT516::RIG_TT516() {
 
 }
 
-void RIG_TT516::checkresponse()
-{
-	if (RigSerial.IsOpen() == false)
-		return;
-	if (replybuff[0] == 'G')
-		return;
-	LOG_ERROR("\nsent  %s\nreply %s",
-		str2hex(cmd.c_str(), cmd.length()),
-		str2hex((char *)replybuff, strlen((char *)replybuff)));
-}
-
 void RIG_TT516::showresponse()
 {
-	LOG_INFO("%s", str2hex((char *)replybuff, strlen((char *)replybuff)));
+	LOG_INFO("%s", str2hex(replystr.c_str(), replystr.length()));
 }
 
 long RIG_TT516::get_vfoA ()
 {
 	cmd = TT516getFREQA;
-	bool ret = sendCommand(cmd, 8, true);
-	if (ret == true && replybuff[0] == 'A') {
-		int f = 0;
-		for (size_t n = 1; n < 5; n++) {
-			f = f*256 + (unsigned char)replybuff[n];
-			A.freq = f;
-		}
-	} else
-		checkresponse();
+	int ret = sendCommand(cmd);
+	if (ret < 8) return A.freq;
+	size_t p = replystr.rfind("A");
+	if (p == string::npos) return A.freq;
+
+	int f = 0;
+	for (size_t n = 1; n < 5; n++) {
+		f = f*256 + (unsigned char)replystr[p+n];
+		A.freq = f;
+	}
+
 	return A.freq;
 }
 
@@ -152,23 +143,24 @@ void RIG_TT516::set_vfoA (long freq)
 	cmd[4] = freq & 0xff; freq = freq >> 8;
 	cmd[3] = freq & 0xff; freq = freq >> 8;
 	cmd[2] = freq & 0xff;
-	sendCommand(cmd, 2, true);
-	checkresponse();
+	sendCommand(cmd);
 	return;
 }
 
 long RIG_TT516::get_vfoB ()
 {
 	cmd = TT516getFREQB;
-	bool ret = sendCommand(cmd, 8, true);
-	if (ret == true && replybuff[0] == 'B') {
-		int f = 0;
-		for (size_t n = 1; n < 5; n++) {
-			f = f*256 + (unsigned char)replybuff[n];
-			B.freq = f;
-		}
-	} else
-		checkresponse();
+	int ret = sendCommand(cmd);
+	if (ret < 8) return B.freq;
+	size_t p = replystr.rfind("B");
+	if (p == string::npos) return B.freq;
+
+	int f = 0;
+	for (size_t n = 1; n < 5; n++) {
+		f = f*256 + (unsigned char)replystr[p+n];
+		B.freq = f;
+	}
+
 	return B.freq;
 }
 
@@ -180,8 +172,7 @@ void RIG_TT516::set_vfoB (long freq)
 	cmd[4] = freq & 0xff; freq = freq >> 8;
 	cmd[3] = freq & 0xff; freq = freq >> 8;
 	cmd[2] = freq & 0xff;
-	sendCommand(cmd, 2, true);
-	checkresponse();
+	sendCommand(cmd);
 	return;
 }
 
@@ -189,8 +180,7 @@ void RIG_TT516::selectA()
 {
 	cmd = TT516setVfo;
 	cmd[3] = 'A';
-	sendCommand(cmd, 2, true);
-	checkresponse();
+	sendCommand(cmd);
 	inuse = onA;
 	set_bwA(A.iBW);
 	return;
@@ -200,8 +190,7 @@ void RIG_TT516::selectB()
 {
 	cmd = TT516setVfo;
 	cmd[3] = 'B';
-	sendCommand(cmd, 2, true);
-	checkresponse();
+	sendCommand(cmd);
 	inuse = onB;
 	set_bwB(B.iBW);
 	return;
@@ -211,17 +200,15 @@ void RIG_TT516::set_split(bool val)
 {
 	cmd = TT516setSPLIT;
 	cmd[2] = val ? '\x01' : '\x00';
-	sendCommand(cmd, 2, true);
-	checkresponse();
+	sendCommand(cmd);
 	return;
 }
 
 // Tranceiver PTT on/off
 void RIG_TT516::set_PTT_control(int val)
 {
-	if (val) sendCommand(TT516setXMT, 2, true);
-	else     sendCommand(TT516setRCV, 2, true);
-	checkresponse();
+	if (val) sendCommand(TT516setXMT);
+	else     sendCommand(TT516setRCV);
 }
 
 int RIG_TT516::get_modetype(int n)
@@ -252,17 +239,19 @@ void RIG_TT516::set_modeA(int val)
 	cmd = TT516setMODE;
 	cmd[2] = TT516mode_chr[A.imode];
 	cmd[3] = TT516mode_chr[B.imode];
-	sendCommand(cmd, 2, true);
-	checkresponse();
+	sendCommand(cmd);
 }
 
 int RIG_TT516::get_modeA()
 {
 	cmd = TT516getMODE;
-	sendCommand(cmd, 6, true);
-	if (replybuff[0] == 'M') {
-		A.imode = replybuff[1] - '0';
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 6) return A.imode;
+	size_t p = replystr.rfind("M");
+	if (p == string::npos) return A.imode;
+
+	A.imode = replystr[p+1] - '0';
+
 	return A.imode;
 }
 
@@ -272,17 +261,19 @@ void RIG_TT516::set_modeB(int val)
 	cmd = TT516setMODE;
 	cmd[2] = TT516mode_chr[A.imode];
 	cmd[3] = TT516mode_chr[B.imode];
-	sendCommand(cmd, 2, true);
-	checkresponse();
+	sendCommand(cmd);
 }
 
 int RIG_TT516::get_modeB()
 {
 	cmd = TT516getMODE;
-	sendCommand(cmd, 6, true);
-	if (replybuff[0] == 'M') {
-		B.imode = replybuff[2] - '0';
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 6) return B.imode;
+	size_t p = replystr.rfind("M");
+	if (p == string::npos) return B.imode;
+
+	B.imode = replystr[p+2] - '0';
+
 	return B.imode;
 }
 
@@ -290,9 +281,11 @@ int RIG_TT516::get_bwA()
 {
 	if (inuse == onA) {
 		cmd = TT516getBW;
-		sendCommand(cmd, 5, true);
-		if (replybuff[0] == 'W')
-			A.iBW = (unsigned char)replybuff[1];
+		int ret = sendCommand(cmd);
+		if (ret < 5) return A.iBW;
+		size_t p = replystr.rfind("W");
+		if (p == string::npos) return A.iBW;
+		A.iBW = (unsigned char)replystr[p+1];
 	}
 	return A.iBW;
 }
@@ -303,8 +296,7 @@ void RIG_TT516::set_bwA(int val)
 	if (inuse == onA) {
 		cmd = TT516setBW;
 		cmd[2] = val;
-		sendCommand(cmd, 2, true);
-		checkresponse();
+		sendCommand(cmd);
 	}
 }
 
@@ -312,9 +304,11 @@ int RIG_TT516::get_bwB()
 {
 	if (inuse == onB) {
 		cmd = TT516getBW;
-		sendCommand(cmd, 5, true);
-		if (replybuff[0] == 'W')
-			B.iBW = (unsigned char)replybuff[1];
+		int ret = sendCommand(cmd);
+		if (ret < 5) return B.iBW;
+		size_t p = replystr.rfind("W");
+		if (p == string::npos) return B.iBW;
+		B.iBW = (unsigned char)replystr[p+1];
 	}
 	return B.iBW;
 }
@@ -325,8 +319,7 @@ void RIG_TT516::set_bwB(int val)
 	if (inuse == onB) {
 		cmd = TT516setBW;
 		cmd[2] = val;
-		sendCommand(cmd, 2, true);
-		checkresponse();
+		sendCommand(cmd);
 	}
 }
 
@@ -336,8 +329,7 @@ void RIG_TT516::set_if_shift(int val)
 	short int si = val;
 	cmd[2] = (si & 0xff00) >> 8;
 	cmd[3] = (si & 0xff);
-	sendCommand(cmd, 2, true);
-	checkresponse();
+	sendCommand(cmd);
 }
 
 bool RIG_TT516::get_if_shift(int &val)
@@ -358,16 +350,18 @@ void RIG_TT516::set_attenuator(int val)
 	cmd = TT516setATT;
 	if (val) cmd[2] = '1';
 	else     cmd[2] = '0';
-	sendCommand(cmd, 2, true);
-	checkresponse();
+	sendCommand(cmd);
 }
 
 
 int RIG_TT516::get_attenuator()
 {
 	cmd = TT516getATT;
-	sendCommand(cmd, 5, true);
-	if (replybuff[0] == 'J' && replybuff[1] == '1')
+	int ret = sendCommand(cmd);
+	if (ret < 5) return 0;
+	size_t p = replystr.rfind("J");
+	if (p == string::npos) return 0;
+	if (replystr[p+1] == '1')
 		return 1;
 	return 0;
 }
@@ -379,17 +373,20 @@ void RIG_TT516::set_noise(bool b)
 		cmd[2] = '4';
 	else
 		cmd[2] = '0';
-	sendCommand(cmd, 2, true);
+	sendCommand(cmd);
 }
 
 int RIG_TT516::get_smeter()
 {
 	double sig = 0.0;
 	cmd = TT516getSMETER;
-	sendCommand(cmd, 6, true);
-	if (replybuff[0] == 'S') {
-		sig = (50.0 / 9.0) * ((unsigned char)replybuff[1] + (unsigned char)replybuff[2] / 256.0);
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 6) return 0;
+	size_t p = replystr.rfind("S");
+	if (p == string::npos) return 0;
+
+	sig = (50.0 / 9.0) * ((unsigned char)replystr[p+1] + (unsigned char)replystr[p+2] / 256.0);
+
 	return (int)sig;
 }
 
@@ -407,15 +404,22 @@ int RIG_TT516::get_power_out()
 {
 	fwdpwr = refpwr = fwdv = refv = 0;
 	cmd = TT516getFWDPWR;
-	sendCommand(cmd, 5, true);
-	if (replybuff[0] == 'F') {
-		fwdv = 1.0 * (unsigned char)replybuff[1];
-		cmd = TT516getREFPWR;
-		sendCommand(cmd, 5, true);
-		if (replybuff[0] == 'R')
-			refv = 1.0 * (unsigned char)replybuff[1];
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 5) return fwdpwr;
+	size_t p = replystr.rfind("F");
+	if (p == string::npos) return fwdpwr;
+
+	fwdv = 1.0 * (unsigned char)replystr[p+1];
+	cmd = TT516getREFPWR;
+	ret = sendCommand(cmd);
+	if (ret < 5) return fwdpwr;
+	p = replystr.rfind("R");
+	if (p == string::npos) return fwdpwr;
+
+	refv = 1.0 * (unsigned char)replystr[p+1];
+
 	fwdpwr = 30.0 * (fwdv * fwdv) / (256 * 256);
 	refpwr = 30.0 * (refv * refv) / (256 * 256);
+
 	return fwdpwr;
 }

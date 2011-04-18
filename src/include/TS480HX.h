@@ -53,6 +53,7 @@ public:
 	int  get_attenuator();
 
 	int  adjust_bandwidth(int m);
+	void tune_rig();
 
 };
 

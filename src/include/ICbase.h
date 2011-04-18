@@ -23,7 +23,7 @@ public:
 		bad = "\xFE\xFE\xE0\x56\xFA\xFD";
 	}
 	virtual ~RIG_ICOM() {}
-	void checkresponse(int n);
+	void checkresponse();
 	bool sendICcommand(string str, int nbr);
 	void adjustCIV(uchar adr);
 };

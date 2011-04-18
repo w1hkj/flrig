@@ -51,7 +51,7 @@ void RIG_IC7000::set_modeA(int val)
 	cmd += A.iBW;
 	cmd.append( post );
 	sendICcommand (cmd, 6);
-	checkresponse(6);
+	checkresponse();
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
@@ -67,7 +67,7 @@ int RIG_IC7000::get_modeA()
 		if (md > 6) md--;
 		A.iBW = replystr[6];
 	} else {
-		checkresponse(8);
+		checkresponse();
 	}
 	return (A.imode = md);
 }
@@ -86,7 +86,7 @@ void RIG_IC7000::set_modeB(int val)
 	cmd += A.iBW;
 	cmd.append( post );
 	sendICcommand (cmd, 6);
-	checkresponse(6);
+	checkresponse();
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
@@ -102,7 +102,7 @@ int RIG_IC7000::get_modeB()
 		if (md > 6) md--;
 		B.iBW = replystr[6];
 	} else {
-		checkresponse(8);
+		checkresponse();
 	}
 	return (B.imode = md);
 }
@@ -158,7 +158,7 @@ void RIG_IC7000::set_attenuator(int val)
 	cmd += val ? '\x12' : '\x00';
 	cmd.append( post );
 	sendICcommand(cmd,6);
-	checkresponse(6);
+	checkresponse();
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
@@ -171,7 +171,7 @@ void RIG_IC7000::set_preamp(int val)
 	cmd += val ? 0x01 : 0x00;
 	cmd.append( post );
 	sendICcommand (cmd, 6);
-	checkresponse(6);
+	checkresponse();
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
@@ -194,7 +194,7 @@ void RIG_IC7000::set_auto_notch(int val)
 	cmd += val ? 0x01 : 0x00;
 	cmd.append(post);
 	sendICcommand (cmd, 6);
-	checkresponse(6);
+	checkresponse();
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }

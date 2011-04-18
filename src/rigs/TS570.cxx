@@ -74,23 +74,11 @@ RIG_TS570::RIG_TS570() {
 	has_ptt_control = true;
 }
 
-bool RIG_TS570::sendTScommand(string cmd, int retnbr, bool loghex)
-{
-	int ret = sendCommand(cmd, retnbr, loghex);
-	if (RigSerial.IsOpen()) {
-		LOG_INFO("%s", cmd.c_str());
-		if (retnbr)
-			LOG_INFO("%s", replybuff);
-		return ret;
-	}
-	return 0;
-}
-
 void RIG_TS570::initialize()
 {
-	cmd = "FR0;"; sendTScommand(cmd, 4, false);
-	cmd = "FT0;"; sendTScommand(cmd, 4, false);
-	cmd = "AC001;"; sendTScommand(cmd, 6, false);
+	cmd = "FR0;"; sendCommand(cmd, 0);
+	cmd = "FT0;"; sendCommand(cmd, 0);
+	cmd = "AC001;"; sendCommand(cmd, 0);
 	get_preamp();
 	get_attenuator();
 	is_TS570S = get_ts570id();
@@ -99,24 +87,26 @@ void RIG_TS570::initialize()
 bool RIG_TS570::get_ts570id()
 {
 	cmd = "ID;";
-	if (sendTScommand(cmd, 6, false)) {
-	if (replybuff[3] == '1' && replybuff[4] == '8')  return true;
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 6) return false;
+	size_t p = replystr.rfind("ID");
+	if (p == string::npos) return false;
+	if (replystr[p + 3] == '1' && 
+		replystr[p + 4] == '8')  return true;
 	return false;
 }
 
 long RIG_TS570::get_vfoA ()
 {
 	cmd = "FA;";
-	if (!sendTScommand(cmd, 14, false))
-		return freqA;
-	if (replystr.find("FA") != 0) {
-		clearSerialPort();
-		return freqA;
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 14) return freqA;
+	size_t p = replystr.rfind("FA");
+	if (p == string::npos) return freqA;
+	
 	int f = 0;
 	for (size_t n = 2; n < 13; n++)
-		f = f*10 + replybuff[n] - '0';
+		f = f*10 + replystr[p + n] - '0';
 	freqA = f;
 	return freqA;
 }
@@ -129,21 +119,20 @@ void RIG_TS570::set_vfoA (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendTScommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 // SM cmd 0 ... 100 (rig values 0 ... 15)
 int RIG_TS570::get_smeter()
 {
 	cmd = "SM;";
-	if(!sendTScommand(cmd, 7, false))
-		return 0;
-	if (replystr.find("SM") != 0) {
-		clearSerialPort();
-		return 0;
-	}
-	replybuff[6] = 0;
-	int mtr = atoi(&replybuff[2]);
+	int ret = sendCommand(cmd);
+	if (ret < 7) return 0;
+	size_t p = replystr.rfind("SM");
+	if (p == string::npos) return 0;
+	
+	replystr[p + 6] = 0;
+	int mtr = atoi(&replystr[p + 2]);
 	mtr = (mtr * 100) / 16;
 	return mtr;
 }
@@ -152,14 +141,13 @@ int RIG_TS570::get_smeter()
 int RIG_TS570::get_swr()
 {
 	cmd = "RM1;RM;"; // select measurement '1' (swr) and read meter
-	if (!sendTScommand(cmd, 8, false))
-		return 0;
-	if (replystr.find("RM") != 0) {
-		clearSerialPort();
-		return 0;
-	}
-	replybuff[7] = 0;
-	int mtr = atoi(&replybuff[3]);
+	int ret = sendCommand(cmd);
+	if (ret < 8) return 0;
+	size_t p = replystr.rfind("RM");
+	if (p == string::npos) return 0;
+	
+	replystr[p + 7] = 0;
+	int mtr = atoi(&replystr[p + 3]);
 	mtr = (mtr * 100) / 9;
 	return mtr;
 }
@@ -168,14 +156,13 @@ int RIG_TS570::get_swr()
 int RIG_TS570::get_power_out()
 {
 	cmd = "SM;";
-	if (!sendTScommand(cmd, 6, false))
-		return 0;
-	if (replystr.find("SM") != 0) {
-		clearSerialPort();
-		return 0;
-	}
-	replybuff[5] = 0;
-	int mtr = atoi(&replybuff[2]);
+	int ret = sendCommand(cmd);
+	if (ret < 6) return 0;
+	size_t p = replystr.rfind("SM");
+	if (p == string::npos) return 0;
+	
+	replystr[p + 5] = 0;
+	int mtr = atoi(&replystr[p + 2]);
 	mtr = (mtr * 100) / 16;
 	return mtr;
 }
@@ -189,20 +176,19 @@ void RIG_TS570::set_power_control(double val)
 		cmd[i] += ival % 10;
 		ival /= 10;
 	}
-	sendTScommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 int RIG_TS570::get_power_control()
 {
 	cmd = "PC;";
-	if (!sendTScommand(cmd, 6, false))
-		return 0;
-	if (replystr.find("PC") != 0) {
-		clearSerialPort();
-		return 0;
-	}
-	replybuff[5] = 0;
-	int mtr = atoi(&replybuff[2]);
+	int ret = sendCommand(cmd);
+	if (ret < 6) return 0;
+	size_t p = replystr.rfind("PC");
+	if (p == string::npos) return 0;
+	
+	replystr[p + 5] = 0;
+	int mtr = atoi(&replystr[p + 2]);
 	return mtr;
 }
 
@@ -210,14 +196,13 @@ int RIG_TS570::get_power_control()
 int RIG_TS570::get_volume_control()
 {
 	cmd = "AG;";
-	if (!sendTScommand(cmd, 6, false))
-		return 0;
-	if (replystr.find("AG") != 0) {
-		clearSerialPort();
-		return 0;
-	}
-	cmd[5] = 0;
-	int val = atoi(&replybuff[2]);
+	int ret = sendCommand(cmd);
+	if (ret < 6) return 0;
+	size_t p = replystr.rfind("AG");
+	if (p == string::npos) return 0;
+	
+	replystr[p + 5] = 0;
+	int val = atoi(&replystr[p + 2]);
 	return (int)(val / 2.55);
 }
 
@@ -229,7 +214,7 @@ void RIG_TS570::set_volume_control(int val)
 		cmd[i] += ivol % 10;
 		ivol /= 10;
 	}
-	sendTScommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 // Tranceiver PTT on/off
@@ -237,13 +222,13 @@ void RIG_TS570::set_PTT_control(int val)
 {
 	if (val) cmd = "TX;";
 	else	 cmd = "RX;";
-	sendTScommand(cmd, 4, false);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TS570::tune_rig()
 {
 	cmd = "AC 11;";
-	sendTScommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TS570::set_attenuator(int val)
@@ -251,19 +236,19 @@ void RIG_TS570::set_attenuator(int val)
 	att_on = val;
 	if (val) cmd = "RA01;";
 	else	 cmd = "RA00;";
-	sendTScommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 int RIG_TS570::get_attenuator()
 {
 	cmd = "RA;";
-	if (!sendTScommand(cmd, 7, false))
-		return att_on;
-	if (replystr.find("RA") != 0) {
-		clearSerialPort();
-		return att_on;
-	}
-	if (replybuff[2] == '0' && replybuff[3] == '0')
+	int ret = sendCommand(cmd);
+	if (ret < 7) return att_on;
+	size_t p = replystr.rfind("RA");
+	if (p == string::npos) return att_on;
+
+	if (replystr[p + 2] == '0' && 
+		replystr[p + 3] == '0')
 		att_on = 0;
 	else
 		att_on = 1;
@@ -275,19 +260,18 @@ void RIG_TS570::set_preamp(int val)
 	preamp_on = val;
 	if (val) cmd = "PA1;";
 	else	 cmd = "PA0;";
-	sendTScommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 int RIG_TS570::get_preamp()
 {
 	cmd = "PA;";
-	if (!sendTScommand(cmd, 5, false) )
-		return preamp_on;
-	if (replystr.find("PA") != 0) {
-		clearSerialPort();
-		return preamp_on;
-	}
-	if (replystr[2] == '1')
+	int ret = sendCommand(cmd);
+	if (ret < 5 ) return preamp_on;
+	size_t p = replystr.rfind("PA");
+	if (p == string::npos) return preamp_on;
+
+	if (replystr[p + 2] == '1')
 		preamp_on = 1;
 	else
 		preamp_on = 0;
@@ -346,19 +330,19 @@ void RIG_TS570::set_modeA(int val)
 	cmd = "MD";
 	cmd += TS570_mode_chr[val];
 	cmd += ';';
-	sendTScommand(cmd, 4, false);
+	sendCommand(cmd, 0);
 	set_widths();
 }
 
 int RIG_TS570::get_modeA()
 {
-	if (!sendTScommand("MD;", 4, false))
-		return modeA;
-	if (replystr.find("MD") != 0) {
-		clearSerialPort();
-		return modeA;
-	}
-	int md = replybuff[2];
+	cmd = "MD;";
+	int ret = sendCommand(cmd);
+	if (ret < 4) return modeA;
+	size_t p = replystr.rfind("MD");
+	if (p == string::npos) return modeA;
+
+	int md = replystr[p + 2];
 	md = md - '1';
 	if (md == 8) md = 7;
 	modeA = md;
@@ -414,15 +398,15 @@ void RIG_TS570::set_bwA(int val)
 	case 1:
 	case 3:
 	case 4:
-	sendTScommand(TS570_SSBbw[bwA], 5, false);
+	sendCommand(TS570_SSBbw[bwA], 0);
 	break;
 	case 2:
 	case 6:
-	sendTScommand(TS570_CWbw[bwA], 5, false);
+	sendCommand(TS570_CWbw[bwA], 0);
 	break;
 	case 5:
 	case 7:
-	sendTScommand(TS570_FSKbw[bwA], 7, false);
+	sendCommand(TS570_FSKbw[bwA], 0);
 	break;
 	default:
 	break;
@@ -433,36 +417,37 @@ int RIG_TS570::get_bwA()
 {
 	int i;
 
-	if (!sendTScommand("FW;", 7, false)) return bwA;
-	if (replystr.find("FW") != 0) {
-		clearSerialPort();
-		return bwA;
-	}
-
+	cmd = "FW;";
+	int ret = sendCommand(cmd);
+	if (ret < 7) return bwA;
+	size_t p = replystr.rfind("FW");
+	if (p == string::npos) return bwA;
+	string test = replystr.substr(p+2);
+	
 	switch (modeA) {
 	case 0:
 	case 1:
 	case 3:
 	case 4:
-	for (i = 0; TS570_SSBbw[i] != NULL; i++)
-		if (strncmp(replybuff, TS570_SSBbw[i], 7) == 0)  break;
-	if (TS570_SSBbw[i] != NULL) bwA = i;
-	else bwA = 1;
-	break;
+		for (i = 0; TS570_SSBbw[i] != NULL; i++)
+			if (test.find(TS570_SSBbw[i]) == 0)  break;
+		if (TS570_SSBbw[i] != NULL) bwA = i;
+		else bwA = 1;
+		break;
 	case 2:
 	case 6:
-	for (i = 0; TS570_CWbw[i] != NULL; i++)
-		if (strncmp(replybuff, TS570_CWbw[i], 7) == 0)  break;
-	if (TS570_CWbw[i] != NULL) bwA = i;
-	else bwA = 1;
-	break;
+		for (i = 0; TS570_CWbw[i] != NULL; i++)
+			if (test.rfind(TS570_CWbw[i]) == 0)  break;
+		if (TS570_CWbw[i] != NULL) bwA = i;
+		else bwA = 1;
+		break;
 	case 5:
 	case 7:
-	for (i = 0; TS570_FSKbw[i] != NULL; i++)
-		if (strncmp(replybuff, TS570_FSKbw[i], 7) == 0)  break;
-	if (TS570_FSKbw[i] != NULL) bwA = i;
-	else bwA = 1;
-	break;
+		for (i = 0; TS570_FSKbw[i] != NULL; i++)
+			if (test.rfind(TS570_FSKbw[i]) == 0)  break;
+		if (TS570_FSKbw[i] != NULL) bwA = i;
+		else bwA = 1;
+		break;
 	default:
 	break;
 	}
@@ -483,18 +468,19 @@ void RIG_TS570::set_mic_gain(int val)
 		cmd[i] += val % 10;
 		val /= 10;
 	}
-	sendTScommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 int RIG_TS570::get_mic_gain()
 {
-	if (!sendTScommand("MG;", 6, false)) return 0;
-	if (replystr.find("MG") != 0) {
-		clearSerialPort();
-		return 0;
-	}
-	replybuff[5] = 0;
-	int val = atoi(&replybuff[2]);
+	cmd = "MG;";
+	int ret = sendCommand(cmd);
+	if (ret < 6) return 0;
+	size_t p = replystr.rfind("MG");
+	if (p == string::npos) return 0;
+
+	replystr[p + 5] = 0;
+	int val = atoi(&replystr[p + 2]);
 	return val;
 }
 
@@ -511,19 +497,17 @@ void RIG_TS570::set_beatcancel(int val)
 		cmd = "BC1;";
 	else
 		cmd = "BC0;";
-	sendTScommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 int RIG_TS570::get_beatcancel()
 {
 	cmd = "BC;";
-	if (!sendTScommand(cmd, 5, false) )
-		return beatcancel_on;
-	if (replystr.find("BC") != 0) {
-		clearSerialPort();
-		return beatcancel_on;
-	}
-	if (replystr[2] == '1')
+	int ret = sendCommand(cmd);
+	if (ret < 5) return beatcancel_on;
+	if (replystr.rfind("BC") == string::npos) return beatcancel_on;
+
+	if (replystr[ret - 5 + 2] == '1')
 		beatcancel_on = 1;
 	else
 		beatcancel_on = 0;

@@ -76,7 +76,8 @@ total  64
 */
 void RIG_RAY152::get_data()
 {
-	sendCommand("O\r", 66);
+	int ret = sendCommand("O\r");
+	if (ret < 66) return;
 // test string
 //replystr = "A1\rC000\rD-05\rFT1407000\rFR1407000\rI0000\rM1\rN1\rP0\rQ000\rR100\rV128\rZ1\r";
 
@@ -145,8 +146,6 @@ void RIG_RAY152::initialize()
 	dumpdata = true;
 	get_data();
 	set_auto_notch(agc);
-//	set_volume_control(vol);
-//	set_rf_gain(rfg);
 }
 
 void RIG_RAY152::shutdown()
@@ -270,10 +269,11 @@ LOG_INFO("%s", cmd.c_str());
 int RIG_RAY152::get_smeter(void)
 {
 	cmd = "U\r";
-	sendCommand(cmd, 5);
-	if (replystr[0] == 'U') {
+	int ret = sendCommand(cmd);
+	if (ret < 5) return 0;
+	if (replystr[ret - 5] == 'U') {
 		int val;
-		sscanf(&replystr[1], "%d", &val);
+		sscanf(&replystr[ret - 5 + 1], "%d", &val);
 		val = (int)(60.0 * (256.0 / (val + 16.0) - 1.0));
 		if (val > 100) val = 100;
 		if (val < 0) val = 0;
@@ -285,10 +285,11 @@ int RIG_RAY152::get_smeter(void)
 
 int RIG_RAY152::get_power_out(void)
 {
-	sendCommand("U\r", 5);
-	if (replystr[0] == 'U') {
+	int ret = sendCommand("U\r");
+	if (ret < 5) return 0;
+	if (replystr[ret - 5] == 'U') {
 		int val;
-		sscanf(&replystr[1], "%d", &val);
+		sscanf(&replystr[ret - 5 + 1], "%d", &val);
 		val /= 128;
 		val *= 100;
 		return val;

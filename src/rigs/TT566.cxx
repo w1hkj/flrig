@@ -77,8 +77,9 @@ int  RIG_TT566::adjust_bandwidth(int m)
 long RIG_TT566::get_vfoA ()
 {
 	cmd = "?AF\r";
-	if (sendCommand(cmd, 12) == 12) {
-		freqA = fm_decimal(&replystr[3], 8);
+	int ret = sendCommand(cmd);
+	if (ret >= 12) {
+		freqA = fm_decimal(&replystr[ret - 12 + 3], 8);
 	}
 	return freqA;
 }
@@ -95,8 +96,9 @@ void RIG_TT566::set_vfoA (long freq)
 long RIG_TT566::get_vfoB ()
 {
 	cmd = "?BF\r";
-	if (sendCommand(cmd, 12) == 12) {
-		freqB = fm_decimal(&replystr[3], 8);
+	int ret = sendCommand(cmd);
+	if (ret >= 12) {
+		freqB = fm_decimal(&replystr[ret - 12 + 3], 8);
 	}
 	return freqB;
 }
@@ -122,14 +124,15 @@ void RIG_TT566::set_modeA(int md)
 	cmd = "*RMM";
 	cmd += '0' + md;
 	cmd += '\r';
-	sendCommand(cmd, 6);
+	sendCommand(cmd, 0);
 }
 
 int RIG_TT566::get_modeA()
 {
 	cmd = "?RMM\r";
-	if( sendCommand (cmd, 6 ) == 6) {
-		modeA = replystr[4] - '0';
+	int ret = sendCommand (cmd);
+	if (ret >= 6) {
+		modeA = replystr[ret - 6 + 4] - '0';
 	}
 	return modeA;
 }
@@ -146,8 +149,9 @@ void RIG_TT566::set_modeB(int md)
 int RIG_TT566::get_modeB()
 {
 	cmd = "?RMM\r";
-	if( sendCommand (cmd, 6 ) == 6) {
-		modeB = replystr[4] - '0';
+	int ret = sendCommand (cmd);
+	if (ret >= 6) {
+		modeB = replystr[ret - 6 + 4] - '0';
 	}
 	return modeB;
 }
@@ -164,10 +168,11 @@ void RIG_TT566::set_bwA(int bw)
 int RIG_TT566::get_bwA()
 {
 	cmd = "?RMF\r";
-	if (sendCommand(cmd, 9) == 9) {
+	int ret = sendCommand(cmd);
+	if (ret >= 8) {
 		string bwstr = "";
-		if (replystr.length() == 9) bwstr = replystr.substr(4, 4);
-		if (replystr.length() == 8) bwstr = replystr.substr(4, 3);
+		if (replystr.length() == 9) bwstr = replystr.substr(ret - 9 + 4, 4);
+		if (replystr.length() == 8) bwstr = replystr.substr(ret - 8 + 4, 3);
 		if (replystr.empty()) return bwA;
 		int i = 0;
 		while( RIG_TT566widths[i] != NULL) {
@@ -193,10 +198,11 @@ void RIG_TT566::set_bwB(int bw)
 int RIG_TT566::get_bwB()
 {
 	cmd = "?RMF\r";
-	if (sendCommand(cmd, 9) == 9) {
+	int ret = sendCommand(cmd);
+	if (ret >= 8) {
 		string bwstr = "";
-		if (replystr.length() == 9) bwstr = replystr.substr(4, 4);
-		if (replystr.length() == 8) bwstr = replystr.substr(4, 3);
+		if (replystr.length() == 9) bwstr = replystr.substr(ret - 9 + 4, 4);
+		if (replystr.length() == 8) bwstr = replystr.substr(ret - 8 + 4, 3);
 		if (replystr.empty()) return bwB;
 		int i = 0;
 		while( RIG_TT566widths[i] != NULL) {
@@ -225,8 +231,9 @@ void RIG_TT566::set_preamp(int val)
 int RIG_TT566::get_preamp()
 {
 	cmd = "?RME\r";
-	if (sendCommand(cmd, 6) == 6)
-		return replystr[4] - '0';
+	int ret = sendCommand(cmd);
+	if (ret >= 6)
+		return replystr[ret - 6 + 4] - '0';
 	return 0;
 }
 
@@ -238,13 +245,12 @@ int RIG_TT566::get_preamp()
 int  RIG_TT566::get_power_control(void)
 {
 	cmd = "?TP\r";
-	sendCommand(cmd, 0);
-	if (replystr.find("@TP") == 0) {
-		int pwr;
-		sscanf("%d", &replystr[3], &pwr);
-		return pwr;
-	}
-	return 0;
+	sendCommand(cmd);
+	size_t p = replystr.rfind("@TP");
+	if (p == string::npos) return 0;
+	int pwr;
+	sscanf("%d", &replystr[p+3], &pwr);
+	return pwr;
 }
 
 void RIG_TT566::set_power_control(double val) 
@@ -263,8 +269,9 @@ void RIG_TT566::set_auto_notch(int v)
 int  RIG_TT566::get_auto_notch()
 {
 	cmd = "?RMNA\r";
-	if (sendCommand(cmd, 7) == 7)
-		return replystr[5] - '0';
+	int ret = sendCommand(cmd);
+	if (ret >= 7)
+		return replystr[ret - 7 + 5] - '0';
 	return 0;
 }
 
@@ -277,8 +284,9 @@ void RIG_TT566::set_attenuator(int val)
 int  RIG_TT566::get_attenuator()
 {
 	cmd = "?RMT\r";
-	if (sendCommand(cmd, 6) == 6)
-		return replystr[4] - '0';
+	int ret = sendCommand(cmd);
+	if (ret >= 6)
+		return replystr[ret - 6 + 4] - '0';
 	return 0;
 }
 
@@ -286,9 +294,11 @@ int  RIG_TT566::get_smeter()
 {
 	int dbm = 0;
 	cmd = "?S\r";
-	sendCommand(cmd, 12);
-	if (replystr.find("@SRM") == 0)
-		sscanf(&replystr[4], "%d", &dbm);
+	int ret = sendCommand(cmd);
+	if (ret < 12) return 0;
+	size_t p = replystr.rfind("@SRM");
+	if (p == string::npos) return 0;
+	sscanf(&replystr[p + 4], "%d", &dbm);
 	LOG_INFO("smeter: %s = %d", str2hex(replystr.c_str(), replystr.length()), dbm);
 	return 5 * dbm / 6; // 60 = S9 --> 50% of full scale of flrig display
 }
@@ -308,14 +318,15 @@ int  RIG_TT566::get_power_out()
 {
 	fwdpwr = 0; refpwr = 0;
 	cmd = "?S\r";
-	sendCommand(cmd, 12);
-	if (replystr.find("@SRF") == 0) {
-		sscanf(&replystr[4], "%d", &fwdpwr);
-		size_t n = 4;
-		while ( replystr[n] != 'R' && n < replystr.length()) n++;
-		if (n < replystr.length()) n++;
-		sscanf(&replystr[n], "%d", &refpwr);
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 12) return 0;
+	size_t p = replystr.rfind("@SRF");
+	if (p == string::npos) return 0;
+	sscanf(&replystr[p + 4], "%d", &fwdpwr);
+	size_t n = 4;
+	while ( replystr[p + n] != 'R' && n < replystr.length()) n++;
+	if (n < replystr.length()) n++;
+	sscanf(&replystr[p + n], "%d", &refpwr);
 	LOG_INFO("pwr out: %s = %d, %d", str2hex(replystr.c_str(), replystr.length()), fwdpwr, refpwr);
 	return fwdpwr;
 }
@@ -323,10 +334,11 @@ int  RIG_TT566::get_power_out()
 int RIG_TT566::get_volume_control()
 {
 	cmd = "?UM\r";
-	sendCommand(cmd, 6);
+	int ret = sendCommand(cmd);
+	if (ret < 6) return 0;
 	int val = 0;
-	if (replystr.length() > 4)
-		sscanf(&replystr[3], "%d", &val);
+	size_t p = replystr.rfind("@UM");
+	sscanf(&replystr[p + 3], "%d", &val);
 	return val;
 }
 
@@ -352,9 +364,10 @@ bool RIG_TT566::get_if_shift(int &val)
 {
 	int retval = 0;
 	cmd = "?RMP\r";
-	sendCommand(cmd, 9);
-	if (replystr.find("@RMP") == 0)
-		sscanf(&replystr[4], "%d", &retval);
+	sendCommand(cmd);
+	size_t p = replystr.rfind("@RMP");
+	if (p == string::npos) return false;
+	sscanf(&replystr[p + 4], "%d", &retval);
 	val = retval;
 	if (val) return true;
 	return false;
@@ -375,8 +388,9 @@ int  RIG_TT566::get_rf_gain()
 	int retval = 0;
 	cmd = "?RMG\r";
 	sendCommand(cmd, 8);
-	if (replystr.find("@RMG") == 0)
-		sscanf(&replystr[4], "%d", &retval);
+	size_t p = replystr.rfind("@RMG");
+	if (p == string::npos) return retval;
+	sscanf(&replystr[p + 4], "%d", &retval);
 	return retval;
 }
 

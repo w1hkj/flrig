@@ -106,22 +106,20 @@ if (RIG_DEBUG)
 
 bool RIG_FT100D::get_info()
 {
-	int ret = 0;
-	
 	init_cmd();
 	cmd[4] = 0x10;
-	ret = sendCommand(cmd, 32);
+	int ret = sendCommand(cmd);
 if (RIG_DEBUG)
 	LOG_INFO("%s", str2hex(replybuff, ret));
 
-	if (ret == 32) {
+	if (ret >= 32) {
 		afreq = 0;
 		for (size_t n = 1; n < 5; n++)
-			afreq = afreq * 256 + (unsigned char)replybuff[n];
+			afreq = afreq * 256 + (unsigned char)replybuff[ret - 32 + n];
 		afreq = afreq * 1.25; // 100D resolution is 1.25 Hz / bit for read
-		amode = replybuff[5] & 0x07;
+		amode = replybuff[ret - 32 + 5] & 0x07;
 		if (amode > 7) amode = 7;
-		aBW = (replybuff[5] >> 4) & 0x03;
+		aBW = (replybuff[ret - 32 + 5] >> 4) & 0x03;
 		aBW = 3 - aBW;
 		return true;
 	}
@@ -247,8 +245,9 @@ int RIG_FT100D::get_smeter()
 {
 	init_cmd();
 	cmd[4] = 0xF7;
-	sendCommand(cmd, 9);
-	int sval = (200 -  (unsigned char)replybuff[3]) / 1.1;
+	int ret = sendCommand(cmd, 9);
+	if (ret < 9) return 0;
+	int sval = (200 -  (unsigned char)replybuff[ret - 9 + 3]) / 1.1;
 	if (sval < 0) sval = 0;
 	if (sval > 100) sval = 100;
 	return sval;
@@ -268,9 +267,10 @@ int RIG_FT100D::get_power_out()
 {
 	init_cmd();
 	cmd[4] = 0xF7;
-	sendCommand(cmd, 9);
-	fwdpwr = replybuff[1] / 2.56;
-	refpwr = replybuff[2] / 2.56;
+	int ret = sendCommand(cmd);
+	if (ret < 9) return 0;
+	fwdpwr = replybuff[ret - 9 + 1] / 2.56;
+	refpwr = replybuff[ret - 9 + 2] / 2.56;
 	return (int) fwdpwr;
 }
 

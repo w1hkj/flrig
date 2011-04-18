@@ -64,7 +64,7 @@ void RIG_IC756PRO2::set_attenuator(int val)
 	cmd += cmdval;
 	cmd.append( post );
 	sendICcommand(cmd,6);
-	checkresponse(6);
+	checkresponse();
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
@@ -110,7 +110,7 @@ void RIG_IC756PRO2::set_preamp(int val)
 	cmd += (unsigned char) preamp_level;
 	cmd.append( post );
 	sendICcommand (cmd, 6);
-	checkresponse(6);
+	checkresponse();
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
@@ -160,13 +160,13 @@ void RIG_IC756PRO3::set_modeA(int val)
 	sendICcommand (cmd, 6);
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-	checkresponse(6);
+	checkresponse();
 	if (datamode) { // LSB / USB ==> use DATA mode
 		cmd = pre_to;
 		cmd.append("\x1A\x06\x01");
 		cmd.append(post);
 		sendICcommand(cmd, 6);
-		checkresponse(6);
+		checkresponse();
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	}
@@ -196,10 +196,10 @@ int RIG_IC756PRO3::get_modeA()
 			}
 			A.imode = md;
 		} else {
-			checkresponse(8);
+			checkresponse();
 		}
 	} else {
-		checkresponse(8);
+		checkresponse();
 	}
 	return A.imode;
 }
@@ -224,13 +224,13 @@ void RIG_IC756PRO3::set_modeB(int val)
 	sendICcommand (cmd, 6);
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-	checkresponse(6);
+	checkresponse();
 	if (datamode) { // LSB / USB ==> use DATA mode
 		cmd = pre_to;
 		cmd.append("\x1A\x06\x01");
 		cmd.append(post);
 		sendICcommand(cmd, 6);
-		checkresponse(6);
+		checkresponse();
 	if (RIG_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	}
@@ -260,10 +260,10 @@ int RIG_IC756PRO3::get_modeB()
 			}
 			B.imode = md;
 		} else {
-			checkresponse(8);
+			checkresponse();
 		}
 	} else {
-		checkresponse(8);
+		checkresponse();
 	}
 	return B.imode;
 }

@@ -63,36 +63,24 @@ RIG_TS450S::RIG_TS450S() {
 	has_ptt_control = true;
 }
 
-bool RIG_TS450S::sendTScommand(string cmd, int retnbr, bool loghex)
-{
-	int ret = sendCommand(cmd, retnbr, loghex);
-	if (RigSerial.IsOpen()) {
-		LOG_INFO("%s", cmd.c_str());
-		if (retnbr)
-			LOG_INFO("%s", replybuff);
-		return ret;
-	}
-	return 0;
-}
-
 void RIG_TS450S::initialize()
 {
 	cmd = "RM1;"; // select measurement '1' (swr)
-	sendTScommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 long RIG_TS450S::get_vfoA ()
 {
 	cmd = "FA;";
-	if (!sendTScommand(cmd, 14, false))
-		return freqA;
-	if (replystr.find("FA") != 0) {
-		clearSerialPort();
-		return freqA;
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 14) return freqA;
+
+	size_t p = replystr.rfind("FA");
+	if (p == string::npos) return freqA;
+
 	int f = 0;
 	for (size_t n = 2; n < 13; n++)
-		f = f*10 + replybuff[n] - '0';
+		f = f*10 + replystr[p + n] - '0';
 	freqA = f;
 	return freqA;
 }
@@ -105,21 +93,21 @@ void RIG_TS450S::set_vfoA (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendTScommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 // SM cmd 0 ... 100 (rig values 0 ... 15)
 int RIG_TS450S::get_smeter()
 {
 	cmd = "SM;";
-	if(!sendTScommand(cmd, 7, false))
-		return 0;
-	if (replystr.find("SM") != 0) {
-		clearSerialPort();
-		return 0;
-	}
-	replybuff[6] = 0;
-	int mtr = atoi(&replybuff[2]);
+	int ret = sendCommand(cmd);
+	if (ret < 7) return 0;
+
+	size_t p = replystr.rfind("SM");
+	if (p == string::npos) return 0;
+
+	replystr[p + 6] = 0;
+	int mtr = atoi(&replystr[p + 2]);
 	mtr = (mtr * 100) / 30;
 	return mtr;
 }
@@ -128,14 +116,14 @@ int RIG_TS450S::get_smeter()
 int RIG_TS450S::get_swr()
 {
 	cmd = "RM;";
-	if (!sendTScommand(cmd, 8, false))
-		return 0;
-	if (replystr.find("RM") != 0) {
-		clearSerialPort();
-		return 0;
-	}
-	replybuff[7] = 0;
-	int mtr = atoi(&replybuff[3]);
+	int ret = sendCommand(cmd);
+	if (ret < 8) return 0;
+
+	size_t p = replystr.rfind("RM");
+	if (p == string::npos) return 0;
+	
+	replystr[p + 7] = 0;
+	int mtr = atoi(&replystr[p + 3]);
 	mtr = (mtr * 50) / 30;
 	return mtr;
 }
@@ -146,7 +134,7 @@ void RIG_TS450S::set_PTT_control(int val)
 {
 	if (val) cmd = "TX;";
 	else	 cmd = "RX;";
-	sendTScommand(cmd, 4, false);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TS450S::set_modeA(int val)
@@ -155,18 +143,19 @@ void RIG_TS450S::set_modeA(int val)
 	cmd = "MD";
 	cmd += TS450S_mode_chr[val];
 	cmd += ';';
-	sendTScommand(cmd, 4, false);
+	sendCommand(cmd, 0);
 }
 
 int RIG_TS450S::get_modeA()
 {
-	if (!sendTScommand("MD;", 4, false))
-		return modeA;
-	if (replystr.find("MD") != 0) {
-		clearSerialPort();
-		return modeA;
-	}
-	int md = replybuff[2];
+	cmd = "MD;";
+	int ret = sendCommand(cmd);
+	if (ret < 4) return modeA;
+
+	size_t p = replystr.rfind("MD");
+	if (p == string::npos) return modeA;
+
+	int md = replystr[p + 2];
 	md = md - '1';
 	if (md == 8) md = 7;
 	modeA = md;
@@ -184,18 +173,21 @@ void RIG_TS450S::set_bwA(int val)
 	cmd = "FL";
 	cmd.append(TS450S_filters[val]).append(TS450S_filters[val]);
 	cmd += ';';
-	sendTScommand(cmd, 0, false);
+	sendCommand(cmd, 0);
 }
 
 int RIG_TS450S::get_bwA()
 {
 	cmd = "FL;";
-	if (!sendTScommand(cmd, 9, false))
-		return bwA;
-	replybuff[8] = 0;
+	int ret = sendCommand(cmd);
+	if (ret < 9) return bwA;
+	size_t p = replystr.rfind("FL");
+	if (p == string::npos) return bwA;
+	
+	replystr[p + 8] = 0;
 	bwA = 0;
 	while (TS450S_filters[bwA]) {
-		if (strcmp(&replybuff[5], TS450S_filters[bwA]) == 0)
+		if (strcmp(&replystr[p + 5], TS450S_filters[bwA]) == 0)
 			return bwA;
 		bwA++;
 	}

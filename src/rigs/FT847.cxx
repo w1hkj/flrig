@@ -70,10 +70,7 @@ bool RIG_FT847::get_info()
 	
 	init_cmd();
 	cmd[4] = 0x03;
-	ret = sendCommand(cmd, 5);
-if (RIG_DEBUG)
-	LOG_INFO("%s", str2hex(replybuff, ret));
-
+	ret = sendCommand(cmd);
 unsigned char *p = (unsigned char *)replybuff;
 	if (ret == 5) {
 		afreq = ((((((p[0]<<8) + p[1])<<8) + p[2])<<8) + p[3])*10/16;
@@ -171,7 +168,8 @@ int RIG_FT847::get_smeter()
 	init_cmd();
 	cmd[4] = 0xE7;
 	int sval = 0;
-	if (sendCommand(cmd, 1) == 1)
+	int ret = sendCommand(cmd);
+	if (ret == 1)
 		sval = (replybuff[0] & 0x1F) / 32.0;
 	return sval;
 }
@@ -181,7 +179,8 @@ int RIG_FT847::get_power_out()
 	init_cmd();
 	cmd[4] = 0xF7;
 	fwdpwr = 0;
-	if (sendCommand(cmd, 1) == 1)
+	int ret = sendCommand(cmd);
+	if (ret == 1)
 		fwdpwr = (replybuff[0] & 0x1F) / 32.0;
 	return fwdpwr;
 }

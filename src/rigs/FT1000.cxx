@@ -133,11 +133,11 @@ long RIG_FT1000::get_vfoA ()
 {
 	init_cmd();
 	cmd[3] = 2; cmd[4] = 0x10;
-	if (sendCommand(cmd, 1636)) {
-		replybuff[9] = 0;
-		freqA = fm_bcd(&replybuff[6], 8) * 10;
-		bwA = replybuff[13] & 0x07;
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 17) return freqA;
+	replybuff[9] = 0;
+	freqA = fm_bcd(&replybuff[6], 8) * 10;
+	bwA = replybuff[13] & 0x07;
 	return freqA;
 }
 
@@ -154,8 +154,9 @@ int RIG_FT1000::get_modeA()
 {
 	init_cmd();
 	cmd[4] = 0x0C;
-	if (sendCommand(cmd, 5))
-		modeA = cmd[4];
+	int ret = sendCommand(cmd);
+	if (ret < 5) return modeA;
+	modeA = cmd[4];
 	return modeA;
 }
 
@@ -206,23 +207,19 @@ void RIG_FT1000::tune_rig()
 
 int  RIG_FT1000::get_power_out(void)
 {
-	int val = 0;
 	init_cmd();
 	cmd[4] = 0xF7;
-	if (sendCommand(cmd,1)) {
-LOG_INFO("%s => %d",str2hex(replybuff,1), (val = replybuff[0] && 0x0F));
-	}
-	return 0;
+	int ret = sendCommand(cmd);
+	if (ret < 5) return 0;
+	return replybuff[0] && 0x0F;
 }
 
 int  RIG_FT1000::get_smeter(void)
 {
-	int val = 0;
 	init_cmd();
 	cmd[4] = 0xF7;
-	if (sendCommand(cmd,5)) {
-LOG_INFO("%s => %d",str2hex(replybuff,1), (val = replybuff[0] && 0x0F));
-	}
-	return 0;
+	int ret = sendCommand(cmd);
+	if (ret < 5) return 0;
+	return replybuff[0] && 0x0F;
 }
 

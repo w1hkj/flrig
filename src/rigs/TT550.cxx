@@ -182,7 +182,7 @@ RIG_TT550::RIG_TT550() {
 
 void RIG_TT550::showresponse(string s)
 {
-	LOG_WARN("%s: %s", s.c_str(), str2hex((char *)replybuff, strlen((char *)replybuff)));
+	LOG_WARN("%s: %s", s.c_str(), str2hex(replystr.c_str(), replystr.length()));
 }
 
 void RIG_TT550::showASCII(string s1, string s)
@@ -196,24 +196,20 @@ void RIG_TT550::showASCII(string s1, string s)
 
 void RIG_TT550::initialize()
 {
-	clearSerialPort();
+//	clearSerialPort();
 
-	cmd = TT550restart;
-	sendCommand(cmd, -1, true);
+	sendCommand(TT550restart);
 
 	if (replystr.find("RADIO") == string::npos) {
 		showASCII("Power up", "DSP START");
-		cmd = TT550init; // put into radio mode
-		sendCommand(cmd, -1, true);
+		sendCommand(TT550init); // put into radio mode
 	}
 	showASCII("Init", replystr);
 
-	cmd = "?V\r";
-	sendCommand(cmd, -1, true);
+	sendCommand("?V\r");
 	showASCII("Version", replystr);
 
-	cmd = TT550setALIVE_OFF;
-	sendCommand(cmd, 0, true);
+	sendCommand(TT550setALIVE_OFF);
 
 	set_volume_control(0);
 
@@ -259,7 +255,7 @@ void RIG_TT550::initialize()
 
 	cmd = TT550setAMCARRIER;
 	cmd[1] = 0x0F;
-	sendCommand(cmd, 0, true); 
+	sendCommand(cmd, 0); 
 
 	enable_tloop();
 	enable_xmtr();
@@ -278,7 +274,7 @@ void RIG_TT550::enable_xmtr()
 		cmd = TT550setENABLE;
 	else
 		cmd = TT550setDISABLE;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TT550::enable_tloop()
@@ -287,17 +283,17 @@ void RIG_TT550::enable_tloop()
 		cmd = TT550setTLOOP_ON;
 	else
 		cmd = TT550setTLOOP_OFF;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TT550::shutdown()
 {
 	cmd = "Vx\r";
 	cmd[1] = 0;
-	sendCommand(cmd, 0, true); // volume = zero
+	sendCommand(cmd, 0); // volume = zero
 	cmd = "Lx\r";
 	cmd[1] = 0x3F;
-	sendCommand(cmd, 0, true); // line out = minimum
+	sendCommand(cmd, 0); // line out = minimum
 }
 
 int DigiAdj = 0;
@@ -366,7 +362,7 @@ void RIG_TT550::set_vfoRX(long freq)
 	cmd += (TBfo >> 8) & 0xff;
 	cmd += TBfo & 0xff;
 	cmd += '\r';
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 }
 
@@ -429,7 +425,7 @@ void RIG_TT550::set_vfoTX(long freq)
 	cmd += (TBfo >> 8) & 0xff;
 	cmd += TBfo & 0xff;
 	cmd += '\r';
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 }
 
@@ -482,7 +478,7 @@ void RIG_TT550::set_PTT_control(int val)
 {
 	if (val) cmd = TT550setXMT;
 	else     cmd = TT550setRCV;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 }
 
@@ -493,11 +489,11 @@ void RIG_TT550::set_modeA(int val)
 
 		cmd = TT550setMODE;
 		cmd[1] = cmd[2] = TT550mode_chr[val];
-		sendCommand(cmd, 0, true);
+		sendCommand(cmd, 0);
 
 		cmd =  TT550setPOWER;
 		cmd[1] = 0xFF;
-		sendCommand(cmd, 0, true);
+		sendCommand(cmd, 0);
 
 		set_power_control(progStatus.tt550_AM_level);
 
@@ -505,7 +501,7 @@ void RIG_TT550::set_modeA(int val)
 
 		cmd = TT550setMODE;
 		cmd[1] = cmd[2] = TT550mode_chr[val];
-		sendCommand(cmd, 0, true);
+		sendCommand(cmd, 0);
 LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 		set_power_control(progStatus.power_level);
 	}
@@ -518,7 +514,7 @@ static void tt550_tune_off(void *)
 	pthread_mutex_lock(&mutex_serial);
 		selrig->set_power_control(0);
 		selrig->set_PTT_control(0);
-		sendCommand("$0\r", 0, true);
+		sendCommand("$0\r", 0);
 LOG_INFO("%s", str2hex("$0\r", 3));
 		selrig->set_modeA(ret_mode);
 	pthread_mutex_unlock(&mutex_serial);
@@ -529,7 +525,7 @@ void RIG_TT550::tune_rig()
 	ret_mode = modeA;
 	set_modeA(TT550_CW_MODE);
 	set_power_control(5);
-	sendCommand("$1\r", 0, true);
+	sendCommand("$1\r", 0);
 LOG_INFO("%s", str2hex("$1\r", 3));
 	set_PTT_control(1);
 	Fl::add_timeout(5.0, tt550_tune_off);
@@ -556,11 +552,11 @@ void RIG_TT550::set_bwA(int val)
 	if (txbw > 24) txbw = 24;
 	cmd = TT550setRcvBW;
 	cmd[1] = rxbw;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 	cmd = TT550setXmtBW;
 	cmd[1] = txbw;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 	set_vfoA(freqA);
 }
@@ -610,7 +606,7 @@ void RIG_TT550::set_attenuator(int val)
 	cmd = TT550setATT;
 	if (val) cmd[1] = '1';
 	else     cmd[1] = '0';
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 }
 
@@ -618,7 +614,7 @@ void RIG_TT550::set_volume_control(int val)
 {
 	cmd = TT550setVolume;
 	cmd[1] = 0xFF & ((val * 255) / 100);
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 }
 
@@ -884,7 +880,7 @@ int RIG_TT550::get_smeter()
 	float fval;
 
 	cmd = TT550getSIG_LEVEL;
-	sendCommand(cmd, 11, true);
+	sendCommand(cmd);
 
 	string meter = "";
 	string keys = "";
@@ -975,11 +971,13 @@ int RIG_TT550::get_swr()
 int RIG_TT550::get_power_out()
 {
 	cmd = TT550getFWDREF;
-	sendCommand(cmd, 4, true);
-	if (replybuff[0] == 'T') {
-		fwdpwr = 0.8*fwdpwr + 0.2*(unsigned char)replybuff[1];
-		refpwr = 0.8*refpwr + 0.2*(unsigned char)replybuff[2];
-	}
+	int ret = sendCommand(cmd);
+	if (ret < 4) return fwdpwr;
+	size_t p = replystr.rfind("T");
+	if (p == string::npos) return fwdpwr;
+
+	fwdpwr = 0.8*fwdpwr + 0.2*(unsigned char)replystr[p+1];
+	refpwr = 0.8*refpwr + 0.2*(unsigned char)replystr[p+2];
 //LOG_INFO("%s // %4.1f : %4.1f", str2hex(replystr.c_str(), replystr.length()), fwdpwr, refpwr);
 	return fwdpwr;
 }
@@ -1061,7 +1059,7 @@ void RIG_TT550::set_rf_gain(int val)
 	cmd[1] = (unsigned char)(255 - val * 2.55);
 	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
 	RFgain = val;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 int  RIG_TT550::get_rf_gain()
@@ -1081,7 +1079,7 @@ void RIG_TT550::set_line_out()
 	cmd = TT550setLINEOUT;
 	cmd[1] = (0x3F) & (((100 - progStatus.tt550_line_out) * 63) / 100);
 	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TT550::set_agc_level()
@@ -1092,7 +1090,7 @@ void RIG_TT550::set_agc_level()
 		case 1 : cmd[1] = '2'; break;
 		case 2 : cmd[1] = '3'; break;
 	}
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TT550::set_cw_wpm()
@@ -1108,7 +1106,7 @@ void RIG_TT550::set_cw_wpm()
 	cmd[4] = 0xFF & dahfactor;
 	cmd[5] = 0xFF & (spcfactor >> 8);
 	cmd[6] = 0xFF & spcfactor;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TT550::set_cw_vol()
@@ -1117,7 +1115,7 @@ void RIG_TT550::set_cw_vol()
 	cmd = TT550setCWMONVOL;
 	cmd[1] = 0xFF & (val * 255) / 100;
 	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TT550::set_cw_spot()
@@ -1127,7 +1125,7 @@ void RIG_TT550::set_cw_spot()
 	cmd[1] = 0xFF & ((val * 255 ) / 100);
 	if (!progStatus.tt550_spot_onoff) cmd[1] = 0;
 	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TT550::set_spot_onoff()
@@ -1153,7 +1151,7 @@ void RIG_TT550::set_cw_qsk()
 	cmd = TT550setCWQSK;
 	cmd[2] = (0xFF) & (int)(progStatus.tt550_cw_qsk * 2);
 	if (cmd[2] == 0x0D) cmd[2] = 0x0E;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 
@@ -1163,7 +1161,7 @@ void RIG_TT550::enable_keyer()
 		cmd = TT550setKEYER_ON;
 	else
 		cmd = TT550setKEYER_OFF;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 
@@ -1171,7 +1169,7 @@ void RIG_TT550::set_vox_onoff()
 {
 	cmd = TT550setVOX;
 	cmd[1] = progStatus.vox_onoff ? '1' : '0';
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TT550::set_vox_gain()
@@ -1179,7 +1177,7 @@ void RIG_TT550::set_vox_gain()
 	cmd = TT550setVOXGAIN;
 	cmd[2] = (0xFF) & (int)(progStatus.tt550_vox_gain * 2.55);
 	if (cmd[2] == 0x0D) cmd[2] = 0x0E;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TT550::set_vox_anti()
@@ -1187,7 +1185,7 @@ void RIG_TT550::set_vox_anti()
 	cmd = TT550setANTIVOX;
 	cmd[2] = (0xFF) & (int)(progStatus.tt550_vox_anti * 2.55);
 	if (cmd[2] == 0x0D) cmd[2] = 0x0E;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TT550::set_vox_hang()
@@ -1195,14 +1193,14 @@ void RIG_TT550::set_vox_hang()
 	cmd = TT550setVOXHANG;
 	cmd[2] = (0xFF) & (int)(progStatus.tt550_vox_hang * 2.55);
 	if (cmd[2] == 0x0D) cmd[2] = 0x0E;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TT550::set_aux_hang()
 {
 	cmd = TT550setAUXHANG;
 	cmd[2] = 0;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TT550::set_compression()
@@ -1210,7 +1208,7 @@ void RIG_TT550::set_compression()
 	cmd = TT550setSPEECH;
 	cmd[1] = (0x7F) & (int)(progStatus.tt550_compression * 1.27);
 	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TT550::set_auto_notch(int v)
@@ -1223,7 +1221,7 @@ void RIG_TT550::set_auto_notch(int v)
 		cmd[2] = '1';
 	else
 		cmd[2] = '0';
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TT550::set_noise_reduction(int b)
@@ -1235,7 +1233,7 @@ void RIG_TT550::set_noise_reduction(int b)
 	else
 		cmd[1] = '0';
 	cmd[2] = auto_notch ? '1' : '0';
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TT550::set_mic_gain(int v)
@@ -1245,7 +1243,7 @@ void RIG_TT550::set_mic_gain(int v)
 		cmd = TT550setMICLINE;
 		cmd[2] = 0;
 		cmd[3] = (unsigned char) v;
-		sendCommand(cmd, 0, true);
+		sendCommand(cmd, 0);
 	}
 }
 
@@ -1255,7 +1253,7 @@ void RIG_TT550::set_mic_line(int v)
 		cmd = TT550setMICLINE;
 		cmd[2] = 1;
 		cmd[3] = 0;//(unsigned char) v;
-		sendCommand(cmd, 0, true);
+		sendCommand(cmd, 0);
 	}
 }
 
@@ -1278,7 +1276,7 @@ void RIG_TT550::set_power_control(double val)
 		cmd[1] = (unsigned char)(val * 2.55);
 	}
 	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TT550::set_mon_vol()
@@ -1286,7 +1284,7 @@ void RIG_TT550::set_mon_vol()
 	cmd = TT550setMONVOL;
 	cmd[1] = 0xFF & ((progStatus.tt550_mon_vol * 255) / 100);
 	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TT550::set_squelch_level()
@@ -1294,14 +1292,14 @@ void RIG_TT550::set_squelch_level()
 	cmd = TT550setSQUELCH;
 	cmd[1] = 0xFF & ((progStatus.tt550_squelch_level * 255) / 100);
 	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TT550::set_nb_level()
 {
 	cmd = TT550setBLANKER;
 	cmd[1] = progStatus.tt550_nb_level;
-	sendCommand(cmd, 0, true);
+	sendCommand(cmd, 0);
 }
 
 void RIG_TT550::set_noise(bool b)
