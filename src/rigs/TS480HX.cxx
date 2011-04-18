@@ -368,7 +368,6 @@ int RIG_TS480HX::get_volume_control()
 void RIG_TS480HX::set_power_control(double val)
 {
 	cmd = "PC";
-	sendCommand(cmd, 0);
 	char szval[4];
 	if (modeA == 4 && val > 50) val = 50; // AM mode limitation
 	snprintf(szval, sizeof(szval), "%03d", (int)val);
