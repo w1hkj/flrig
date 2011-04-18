@@ -796,27 +796,34 @@ void setColors()
 	txtInactive->labelcolor(lblTest->labelcolor());
 	txtInactive->redraw();
 
+	grpMeters->color(bgclr);
+
 	scaleSmeter->color(bgclr);
 	scaleSmeter->labelcolor(fgclr);
+
 	scalePower->color(bgclr);
 	scalePower->labelcolor(fgclr);
+
 	btnALC_SWR->color(bgclr);
 	btnALC_SWR->labelcolor(fgclr);
+	btnALC_SWR->redraw();
 
 	sldrFwdPwr->color(fl_rgb_color (pwrRed, pwrGreen, pwrBlue), bgclr);
 	sldrFwdPwr->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
-	sldrFwdPwr->redraw();
 
 	sldrRcvSignal->color(fl_rgb_color (smeterRed, smeterGreen, smeterBlue), bgclr);
 	sldrRcvSignal->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
-	sldrRcvSignal->redraw();
 
 	sldrALC_SWR->color(fl_rgb_color (swrRed, swrGreen, swrBlue), bgclr);
 	sldrALC_SWR->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
-	sldrALC_SWR->redraw();
 
-	grpMeters->color(bgclr);
 	grpMeters->redraw();
+
+//	scaleSmeter->redraw();
+//	scalePower->redraw();
+//	sldrFwdPwr->redraw();
+//	sldrRcvSignal->redraw();
+//	sldrALC_SWR->redraw();
 
 	if (btnVol)				btnVol->selection_color(btn_lt_color);
 	if (btnNR)				btnNR->selection_color(btn_lt_color);
@@ -983,6 +990,8 @@ void setDisplayColors()
 
 	sldrColors->color(bg_slider);
 	sldrColors->selection_color(btn_slider);
+
+	mnuScheme->value(mnuScheme->find_item(progStatus.ui_scheme.c_str()));
 
 	dlgDisplayConfig->show();
 }

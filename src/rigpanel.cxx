@@ -404,7 +404,7 @@ Fl_Double_Window* Rig_window() {
       btnVol->labelsize(12);
       btnVol->callback((Fl_Callback*)cb_btnVol);
     } // Fl_Light_Button* btnVol
-    { Fl_Wheel_Value_Slider* o = sldrVOLUME = new Fl_Wheel_Value_Slider(68, 125, 355, 18);
+    { Fl_Wheel_Value_Slider* o = sldrVOLUME = new Fl_Wheel_Value_Slider(66, 125, 355, 18);
       sldrVOLUME->tooltip(_("Adjust Audio Volume"));
       sldrVOLUME->type(5);
       sldrVOLUME->box(FL_THIN_DOWN_BOX);
@@ -422,7 +422,7 @@ Fl_Double_Window* Rig_window() {
       sldrVOLUME->when(FL_WHEN_CHANGED);
       o->reverse(true);
     } // Fl_Wheel_Value_Slider* sldrVOLUME
-    { Fl_Wheel_Value_Slider* o = sldrRFGAIN = new Fl_Wheel_Value_Slider(68, 145, 355, 18, _("RF"));
+    { Fl_Wheel_Value_Slider* o = sldrRFGAIN = new Fl_Wheel_Value_Slider(66, 145, 355, 18, _("RF"));
       sldrRFGAIN->tooltip(_("Adjust RF gain"));
       sldrRFGAIN->type(5);
       sldrRFGAIN->box(FL_THIN_DOWN_BOX);
@@ -441,7 +441,7 @@ Fl_Double_Window* Rig_window() {
       sldrRFGAIN->when(FL_WHEN_CHANGED);
       o->reverse(true);
     } // Fl_Wheel_Value_Slider* sldrRFGAIN
-    { Fl_Wheel_Value_Slider* o = sldrSQUELCH = new Fl_Wheel_Value_Slider(68, 165, 355, 18, _("SQL"));
+    { Fl_Wheel_Value_Slider* o = sldrSQUELCH = new Fl_Wheel_Value_Slider(66, 165, 355, 18, _("SQL"));
       sldrSQUELCH->tooltip(_("Adjust Squelch"));
       sldrSQUELCH->type(5);
       sldrSQUELCH->box(FL_THIN_DOWN_BOX);
@@ -466,7 +466,7 @@ Fl_Double_Window* Rig_window() {
       btnNR->labelsize(12);
       btnNR->callback((Fl_Callback*)cb_btnNR);
     } // Fl_Light_Button* btnNR
-    { Fl_Wheel_Value_Slider* o = sldrNR = new Fl_Wheel_Value_Slider(68, 185, 355, 18);
+    { Fl_Wheel_Value_Slider* o = sldrNR = new Fl_Wheel_Value_Slider(66, 185, 355, 18);
       sldrNR->tooltip(_("Adjust noise reduction"));
       sldrNR->type(5);
       sldrNR->box(FL_THIN_DOWN_BOX);
@@ -490,7 +490,7 @@ Fl_Double_Window* Rig_window() {
       btnIFsh->labelsize(12);
       btnIFsh->callback((Fl_Callback*)cb_btnIFsh);
     } // Fl_Light_Button* btnIFsh
-    { Fl_Wheel_Value_Slider* o = sldrIFSHIFT = new Fl_Wheel_Value_Slider(68, 206, 355, 18);
+    { Fl_Wheel_Value_Slider* o = sldrIFSHIFT = new Fl_Wheel_Value_Slider(66, 206, 355, 18);
       sldrIFSHIFT->tooltip(_("Adjust IF Shift"));
       sldrIFSHIFT->type(5);
       sldrIFSHIFT->box(FL_THIN_DOWN_BOX);
@@ -515,7 +515,7 @@ Fl_Double_Window* Rig_window() {
       btnNotch->labelsize(12);
       btnNotch->callback((Fl_Callback*)cb_btnNotch);
     } // Fl_Light_Button* btnNotch
-    { Fl_Wheel_Value_Slider* o = sldrNOTCH = new Fl_Wheel_Value_Slider(68, 226, 355, 18);
+    { Fl_Wheel_Value_Slider* o = sldrNOTCH = new Fl_Wheel_Value_Slider(66, 226, 355, 18);
       sldrNOTCH->tooltip(_("Adjust Notch Frequency"));
       sldrNOTCH->type(5);
       sldrNOTCH->box(FL_THIN_DOWN_BOX);
@@ -534,7 +534,7 @@ Fl_Double_Window* Rig_window() {
       sldrNOTCH->when(FL_WHEN_CHANGED);
       o->reverse(true);
     } // Fl_Wheel_Value_Slider* sldrNOTCH
-    { Fl_Wheel_Value_Slider* o = sldrMICGAIN = new Fl_Wheel_Value_Slider(68, 246, 355, 18, _("MIC"));
+    { Fl_Wheel_Value_Slider* o = sldrMICGAIN = new Fl_Wheel_Value_Slider(66, 246, 355, 18, _("MIC"));
       sldrMICGAIN->tooltip(_("Adjust Mic Gain"));
       sldrMICGAIN->type(5);
       sldrMICGAIN->box(FL_THIN_DOWN_BOX);
@@ -552,7 +552,7 @@ Fl_Double_Window* Rig_window() {
       sldrMICGAIN->when(FL_WHEN_CHANGED);
       o->reverse(true);
     } // Fl_Wheel_Value_Slider* sldrMICGAIN
-    { Fl_Wheel_Value_Slider* o = sldrPOWER = new Fl_Wheel_Value_Slider(68, 266, 355, 18, _("PWR"));
+    { Fl_Wheel_Value_Slider* o = sldrPOWER = new Fl_Wheel_Value_Slider(66, 266, 355, 18, _("PWR"));
       sldrPOWER->tooltip(_("Adjust power level"));
       sldrPOWER->type(5);
       sldrPOWER->box(FL_THIN_DOWN_BOX);
@@ -579,27 +579,27 @@ Fl_Double_Window* Rig_window() {
       txtInactive->align(FL_ALIGN_RIGHT|FL_ALIGN_INSIDE);
       txtInactive->hide();
     } // Fl_Box* txtInactive
-    { Fl_Light_Button* o = btnA = new Fl_Light_Button(213, 62, 50, 20, _("vfoA"));
+    { Fl_Light_Button* o = btnA = new Fl_Light_Button(212, 62, 52, 20, _("vfoA"));
       btnA->tooltip(_("Rx-A / Tx-B"));
       btnA->down_box(FL_THIN_DOWN_BOX);
       btnA->labelsize(12);
       btnA->callback((Fl_Callback*)cb_btnA);
       o->value(!useB);
     } // Fl_Light_Button* btnA
-    { Fl_Light_Button* o = btnB = new Fl_Light_Button(266, 62, 50, 20, _("vfoB"));
+    { Fl_Light_Button* o = btnB = new Fl_Light_Button(265, 62, 52, 20, _("vfoB"));
       btnB->tooltip(_("Rx-A / Tx-B"));
       btnB->down_box(FL_THIN_DOWN_BOX);
       btnB->labelsize(12);
       btnB->callback((Fl_Callback*)cb_btnB);
       o->value(useB);
     } // Fl_Light_Button* btnB
-    { btnA2B = new Fl_Button(319, 62, 50, 20, _("A -> B"));
+    { btnA2B = new Fl_Button(318, 62, 52, 20, _("A -> B"));
       btnA2B->tooltip(_("Copy A to B"));
       btnA2B->down_box(FL_DOWN_BOX);
       btnA2B->labelsize(12);
       btnA2B->callback((Fl_Callback*)cb_btnA2B);
     } // Fl_Button* btnA2B
-    { Fl_Light_Button* o = btnSplit = new Fl_Light_Button(372, 62, 50, 20, _("Split"));
+    { Fl_Light_Button* o = btnSplit = new Fl_Light_Button(371, 62, 52, 20, _("Split"));
       btnSplit->tooltip(_("Rx-A / Tx-B"));
       btnSplit->down_box(FL_THIN_DOWN_BOX);
       btnSplit->labelsize(12);
@@ -668,68 +668,72 @@ Fl_Double_Window* Rig_window() {
       btnPTT->labelsize(12);
       btnPTT->callback((Fl_Callback*)cb_btnPTT);
     } // Fl_Light_Button* btnPTT
-    { grpMeters = new Fl_Group(1, 62, 210, 60);
-      grpMeters->box(FL_THIN_DOWN_BOX);
-      { scaleSmeter = new Fl_Box(3, 64, 205, 20);
-        scaleSmeter->box(FL_FLAT_BOX);
-        scaleSmeter->image(image_S60);
-      } // Fl_Box* scaleSmeter
-      { btnALC_SWR = new Fl_Button(2, 64, 205, 20);
-        btnALC_SWR->tooltip(_("Press SWR / ALC"));
-        btnALC_SWR->box(FL_FLAT_BOX);
-        btnALC_SWR->down_box(FL_FLAT_BOX);
-        btnALC_SWR->image(image_SWR);
-        btnALC_SWR->callback((Fl_Callback*)cb_btnALC_SWR);
-        btnALC_SWR->hide();
-      } // Fl_Button* btnALC_SWR
-      { Fl_SigBar* o = sldrRcvSignal = new Fl_SigBar(5, 86, 181, 6);
-        sldrRcvSignal->box(FL_FLAT_BOX);
-        sldrRcvSignal->color((Fl_Color)FL_BACKGROUND_COLOR);
-        sldrRcvSignal->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
-        sldrRcvSignal->labeltype(FL_NORMAL_LABEL);
-        sldrRcvSignal->labelfont(0);
-        sldrRcvSignal->labelsize(14);
-        sldrRcvSignal->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
-        sldrRcvSignal->align(FL_ALIGN_CENTER);
-        sldrRcvSignal->when(FL_WHEN_RELEASE);
-        sldrRcvSignal->hide();
-        o->minimum(0);
-        o->maximum(100);
-      } // Fl_SigBar* sldrRcvSignal
-      { Fl_SigBar* o = sldrALC_SWR = new Fl_SigBar(5, 86, 201, 6);
-        sldrALC_SWR->box(FL_FLAT_BOX);
-        sldrALC_SWR->color((Fl_Color)FL_BACKGROUND_COLOR);
-        sldrALC_SWR->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
-        sldrALC_SWR->labeltype(FL_NORMAL_LABEL);
-        sldrALC_SWR->labelfont(0);
-        sldrALC_SWR->labelsize(14);
-        sldrALC_SWR->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
-        sldrALC_SWR->align(FL_ALIGN_CENTER);
-        sldrALC_SWR->when(FL_WHEN_RELEASE);
-        sldrALC_SWR->hide();
-        o->minimum(0);
-        o->maximum(100);
-      } // Fl_SigBar* sldrALC_SWR
-      { Fl_SigBar* o = sldrFwdPwr = new Fl_SigBar(5, 93, 201, 6);
-        sldrFwdPwr->box(FL_FLAT_BOX);
-        sldrFwdPwr->color((Fl_Color)FL_BACKGROUND_COLOR);
-        sldrFwdPwr->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
-        sldrFwdPwr->labeltype(FL_NORMAL_LABEL);
-        sldrFwdPwr->labelfont(0);
-        sldrFwdPwr->labelsize(14);
-        sldrFwdPwr->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
-        sldrFwdPwr->align(FL_ALIGN_CENTER);
-        sldrFwdPwr->when(FL_WHEN_RELEASE);
-        sldrFwdPwr->hide();
-        o->minimum(0);
-        o->maximum(100);
-      } // Fl_SigBar* sldrFwdPwr
-      { scalePower = new Fl_Box(3, 100, 205, 20);
-        scalePower->box(FL_FLAT_BOX);
-        scalePower->image(image_P100);
-      } // Fl_Box* scalePower
-      grpMeters->end();
-    } // Fl_Group* grpMeters
+    { Fl_Group* o = new Fl_Group(1, 62, 210, 60);
+      o->box(FL_DOWN_BOX);
+      { grpMeters = new Fl_Group(3, 63, 206, 57);
+        grpMeters->box(FL_FLAT_BOX);
+        { scaleSmeter = new Fl_Box(3, 63, 206, 20);
+          scaleSmeter->box(FL_FLAT_BOX);
+          scaleSmeter->image(image_S60);
+        } // Fl_Box* scaleSmeter
+        { btnALC_SWR = new Fl_Button(3, 63, 206, 20);
+          btnALC_SWR->tooltip(_("Press SWR / ALC"));
+          btnALC_SWR->box(FL_FLAT_BOX);
+          btnALC_SWR->down_box(FL_FLAT_BOX);
+          btnALC_SWR->image(image_SWR);
+          btnALC_SWR->callback((Fl_Callback*)cb_btnALC_SWR);
+          btnALC_SWR->hide();
+        } // Fl_Button* btnALC_SWR
+        { Fl_SigBar* o = sldrRcvSignal = new Fl_SigBar(5, 85, 181, 6);
+          sldrRcvSignal->box(FL_FLAT_BOX);
+          sldrRcvSignal->color((Fl_Color)FL_BACKGROUND_COLOR);
+          sldrRcvSignal->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
+          sldrRcvSignal->labeltype(FL_NORMAL_LABEL);
+          sldrRcvSignal->labelfont(0);
+          sldrRcvSignal->labelsize(14);
+          sldrRcvSignal->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
+          sldrRcvSignal->align(FL_ALIGN_CENTER);
+          sldrRcvSignal->when(FL_WHEN_RELEASE);
+          sldrRcvSignal->hide();
+          o->minimum(0);
+          o->maximum(100);
+        } // Fl_SigBar* sldrRcvSignal
+        { Fl_SigBar* o = sldrALC_SWR = new Fl_SigBar(5, 85, 201, 6);
+          sldrALC_SWR->box(FL_FLAT_BOX);
+          sldrALC_SWR->color((Fl_Color)FL_BACKGROUND_COLOR);
+          sldrALC_SWR->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
+          sldrALC_SWR->labeltype(FL_NORMAL_LABEL);
+          sldrALC_SWR->labelfont(0);
+          sldrALC_SWR->labelsize(14);
+          sldrALC_SWR->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
+          sldrALC_SWR->align(FL_ALIGN_CENTER);
+          sldrALC_SWR->when(FL_WHEN_RELEASE);
+          sldrALC_SWR->hide();
+          o->minimum(0);
+          o->maximum(100);
+        } // Fl_SigBar* sldrALC_SWR
+        { Fl_SigBar* o = sldrFwdPwr = new Fl_SigBar(5, 92, 201, 6);
+          sldrFwdPwr->box(FL_FLAT_BOX);
+          sldrFwdPwr->color((Fl_Color)FL_BACKGROUND_COLOR);
+          sldrFwdPwr->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
+          sldrFwdPwr->labeltype(FL_NORMAL_LABEL);
+          sldrFwdPwr->labelfont(0);
+          sldrFwdPwr->labelsize(14);
+          sldrFwdPwr->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
+          sldrFwdPwr->align(FL_ALIGN_CENTER);
+          sldrFwdPwr->when(FL_WHEN_RELEASE);
+          sldrFwdPwr->hide();
+          o->minimum(0);
+          o->maximum(100);
+        } // Fl_SigBar* sldrFwdPwr
+        { scalePower = new Fl_Box(3, 99, 206, 20);
+          scalePower->box(FL_FLAT_BOX);
+          scalePower->image(image_P100);
+        } // Fl_Box* scalePower
+        grpMeters->end();
+      } // Fl_Group* grpMeters
+      o->end();
+    } // Fl_Group* o
     { boxControl = new Fl_Box(3, 311, 130, 17, _("Auxilliary Controls:"));
       boxControl->box(FL_FLAT_BOX);
       boxControl->align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE);
@@ -755,7 +759,7 @@ Fl_Double_Window* Rig_window() {
       btnMicLine->callback((Fl_Callback*)cb_btnMicLine);
       btnMicLine->hide();
     } // Fl_Light_Button* btnMicLine
-    { cntRIT = new Fl_Counter(215, 104, 54, 18, _("R"));
+    { cntRIT = new Fl_Counter(213, 104, 54, 18, _("R"));
       cntRIT->tooltip(_("RIT"));
       cntRIT->type(1);
       cntRIT->labelsize(12);
@@ -765,7 +769,7 @@ Fl_Double_Window* Rig_window() {
       cntRIT->callback((Fl_Callback*)cb_cntRIT);
       cntRIT->align(FL_ALIGN_RIGHT);
     } // Fl_Counter* cntRIT
-    { cntXIT = new Fl_Counter(285, 104, 54, 18, _("X"));
+    { cntXIT = new Fl_Counter(283, 104, 54, 18, _("X"));
       cntXIT->tooltip(_("XIT"));
       cntXIT->type(1);
       cntXIT->labelsize(12);
@@ -775,7 +779,7 @@ Fl_Double_Window* Rig_window() {
       cntXIT->callback((Fl_Callback*)cb_cntXIT);
       cntXIT->align(FL_ALIGN_RIGHT);
     } // Fl_Counter* cntXIT
-    { cntBFO = new Fl_Counter(357, 104, 54, 18, _("B"));
+    { cntBFO = new Fl_Counter(355, 104, 54, 18, _("B"));
       cntBFO->tooltip(_("BFO"));
       cntBFO->type(1);
       cntBFO->labelsize(12);
@@ -942,11 +946,15 @@ Fl_Double_Window* DisplayDialog() {
     w = o;
     { Fl_Group* o = new Fl_Group(2, 2, 218, 70);
       o->box(FL_ENGRAVED_FRAME);
-      { lblTest = new Fl_Box(5, 6, 210, 35, _("14070.000"));
-        lblTest->box(FL_DOWN_BOX);
-        lblTest->labelfont(4);
-        lblTest->labelsize(36);
-      } // Fl_Box* lblTest
+      { Fl_Group* o = new Fl_Group(5, 6, 210, 35);
+        o->box(FL_DOWN_BOX);
+        { lblTest = new Fl_Box(7, 8, 206, 31, _("14070.000"));
+          lblTest->box(FL_FLAT_BOX);
+          lblTest->labelfont(4);
+          lblTest->labelsize(32);
+        } // Fl_Box* lblTest
+        o->end();
+      } // Fl_Group* o
       { prefFont = new Fl_Button(10, 46, 60, 22, _("Font"));
         prefFont->callback((Fl_Callback*)cb_prefFont);
       } // Fl_Button* prefFont
@@ -959,73 +967,76 @@ Fl_Double_Window* DisplayDialog() {
       o->end();
     } // Fl_Group* o
     { Fl_Group* o = new Fl_Group(2, 74, 284, 107);
-      o->box(FL_ENGRAVED_FRAME);
-      { grpMeterColor = new Fl_Group(5, 77, 210, 100);
-        grpMeterColor->box(FL_DOWN_BOX);
-        { Fl_Box* o = scaleSmeterColor = new Fl_Box(8, 79, 205, 20);
-          scaleSmeterColor->box(FL_FLAT_BOX);
-          scaleSmeterColor->image(image_S60);
-          o->color(scaleSmeter->color());
-        } // Fl_Box* scaleSmeterColor
-        { sldrRcvSignalColor = new Fl_SigBar(10, 99, 200, 6);
-          sldrRcvSignalColor->box(FL_FLAT_BOX);
-          sldrRcvSignalColor->color((Fl_Color)FL_BACKGROUND_COLOR);
-          sldrRcvSignalColor->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
-          sldrRcvSignalColor->labeltype(FL_NORMAL_LABEL);
-          sldrRcvSignalColor->labelfont(0);
-          sldrRcvSignalColor->labelsize(14);
-          sldrRcvSignalColor->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
-          sldrRcvSignalColor->align(FL_ALIGN_CENTER);
-          sldrRcvSignalColor->when(FL_WHEN_RELEASE);
-        } // Fl_SigBar* sldrRcvSignalColor
-        { Fl_SigBar* o = sldrSWRcolor = new Fl_SigBar(10, 130, 200, 6);
-          sldrSWRcolor->box(FL_FLAT_BOX);
-          sldrSWRcolor->color((Fl_Color)FL_BACKGROUND_COLOR);
-          sldrSWRcolor->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
-          sldrSWRcolor->labeltype(FL_NORMAL_LABEL);
-          sldrSWRcolor->labelfont(0);
-          sldrSWRcolor->labelsize(14);
-          sldrSWRcolor->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
-          sldrSWRcolor->align(FL_ALIGN_CENTER);
-          sldrSWRcolor->when(FL_WHEN_RELEASE);
-          o->minimum(0);
-          o->maximum(100);
-        } // Fl_SigBar* sldrSWRcolor
-        { scaleSWRcolor = new Fl_Box(8, 110, 205, 20);
-          scaleSWRcolor->box(FL_FLAT_BOX);
-          scaleSWRcolor->image(image_SWR);
-        } // Fl_Box* scaleSWRcolor
-        { Fl_SigBar* o = sldrPWRcolor = new Fl_SigBar(8, 147, 200, 6);
-          sldrPWRcolor->box(FL_FLAT_BOX);
-          sldrPWRcolor->color((Fl_Color)FL_BACKGROUND_COLOR);
-          sldrPWRcolor->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
-          sldrPWRcolor->labeltype(FL_NORMAL_LABEL);
-          sldrPWRcolor->labelfont(0);
-          sldrPWRcolor->labelsize(14);
-          sldrPWRcolor->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
-          sldrPWRcolor->align(FL_ALIGN_CENTER);
-          sldrPWRcolor->when(FL_WHEN_RELEASE);
-          o->minimum(0);
-          o->maximum(100);
-        } // Fl_SigBar* sldrPWRcolor
-        { scalePWRcolor = new Fl_Box(8, 153, 205, 20);
-          scalePWRcolor->box(FL_FLAT_BOX);
-          scalePWRcolor->image(image_P100);
-        } // Fl_Box* scalePWRcolor
-        grpMeterColor->end();
-      } // Fl_Group* grpMeterColor
-      { btMeterColor = new Fl_Button(221, 78, 60, 22, _("Smeter"));
-        btMeterColor->callback((Fl_Callback*)cb_btMeterColor);
-      } // Fl_Button* btMeterColor
-      { btnSWRColor = new Fl_Button(221, 103, 60, 22, _("SWR"));
-        btnSWRColor->callback((Fl_Callback*)cb_btnSWRColor);
-      } // Fl_Button* btnSWRColor
-      { btnPwrColor = new Fl_Button(221, 128, 60, 22, _("Pwr"));
-        btnPwrColor->callback((Fl_Callback*)cb_btnPwrColor);
-      } // Fl_Button* btnPwrColor
-      { btnPeakColor = new Fl_Button(221, 154, 60, 22, _("Peak"));
-        btnPeakColor->callback((Fl_Callback*)cb_btnPeakColor);
-      } // Fl_Button* btnPeakColor
+      { Fl_Group* o = new Fl_Group(5, 77, 210, 100);
+        o->box(FL_DOWN_BOX);
+        { grpMeterColor = new Fl_Group(7, 79, 206, 96);
+          grpMeterColor->box(FL_FLAT_BOX);
+          { Fl_Box* o = scaleSmeterColor = new Fl_Box(8, 79, 205, 20);
+            scaleSmeterColor->box(FL_FLAT_BOX);
+            scaleSmeterColor->image(image_S60);
+            o->color(scaleSmeter->color());
+          } // Fl_Box* scaleSmeterColor
+          { sldrRcvSignalColor = new Fl_SigBar(10, 99, 200, 6);
+            sldrRcvSignalColor->box(FL_FLAT_BOX);
+            sldrRcvSignalColor->color((Fl_Color)FL_BACKGROUND_COLOR);
+            sldrRcvSignalColor->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
+            sldrRcvSignalColor->labeltype(FL_NORMAL_LABEL);
+            sldrRcvSignalColor->labelfont(0);
+            sldrRcvSignalColor->labelsize(14);
+            sldrRcvSignalColor->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
+            sldrRcvSignalColor->align(FL_ALIGN_CENTER);
+            sldrRcvSignalColor->when(FL_WHEN_RELEASE);
+          } // Fl_SigBar* sldrRcvSignalColor
+          { Fl_SigBar* o = sldrSWRcolor = new Fl_SigBar(10, 130, 200, 6);
+            sldrSWRcolor->box(FL_FLAT_BOX);
+            sldrSWRcolor->color((Fl_Color)FL_BACKGROUND_COLOR);
+            sldrSWRcolor->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
+            sldrSWRcolor->labeltype(FL_NORMAL_LABEL);
+            sldrSWRcolor->labelfont(0);
+            sldrSWRcolor->labelsize(14);
+            sldrSWRcolor->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
+            sldrSWRcolor->align(FL_ALIGN_CENTER);
+            sldrSWRcolor->when(FL_WHEN_RELEASE);
+            o->minimum(0);
+            o->maximum(100);
+          } // Fl_SigBar* sldrSWRcolor
+          { scaleSWRcolor = new Fl_Box(8, 110, 205, 20);
+            scaleSWRcolor->box(FL_FLAT_BOX);
+            scaleSWRcolor->image(image_SWR);
+          } // Fl_Box* scaleSWRcolor
+          { Fl_SigBar* o = sldrPWRcolor = new Fl_SigBar(8, 147, 200, 6);
+            sldrPWRcolor->box(FL_FLAT_BOX);
+            sldrPWRcolor->color((Fl_Color)FL_BACKGROUND_COLOR);
+            sldrPWRcolor->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
+            sldrPWRcolor->labeltype(FL_NORMAL_LABEL);
+            sldrPWRcolor->labelfont(0);
+            sldrPWRcolor->labelsize(14);
+            sldrPWRcolor->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
+            sldrPWRcolor->align(FL_ALIGN_CENTER);
+            sldrPWRcolor->when(FL_WHEN_RELEASE);
+            o->minimum(0);
+            o->maximum(100);
+          } // Fl_SigBar* sldrPWRcolor
+          { scalePWRcolor = new Fl_Box(8, 153, 205, 20);
+            scalePWRcolor->box(FL_FLAT_BOX);
+            scalePWRcolor->image(image_P100);
+          } // Fl_Box* scalePWRcolor
+          grpMeterColor->end();
+        } // Fl_Group* grpMeterColor
+        { btMeterColor = new Fl_Button(221, 78, 60, 22, _("Smeter"));
+          btMeterColor->callback((Fl_Callback*)cb_btMeterColor);
+        } // Fl_Button* btMeterColor
+        { btnSWRColor = new Fl_Button(221, 103, 60, 22, _("SWR"));
+          btnSWRColor->callback((Fl_Callback*)cb_btnSWRColor);
+        } // Fl_Button* btnSWRColor
+        { btnPwrColor = new Fl_Button(221, 128, 60, 22, _("Pwr"));
+          btnPwrColor->callback((Fl_Callback*)cb_btnPwrColor);
+        } // Fl_Button* btnPwrColor
+        { btnPeakColor = new Fl_Button(221, 154, 60, 22, _("Peak"));
+          btnPeakColor->callback((Fl_Callback*)cb_btnPeakColor);
+        } // Fl_Button* btnPeakColor
+        o->end();
+      } // Fl_Group* o
       o->end();
     } // Fl_Group* o
     { Fl_Group* o = new Fl_Group(220, 2, 202, 70, _("System"));
@@ -1468,8 +1479,8 @@ Fl_Double_Window* XcvrDialog() {
             query_interval->type(1);
             query_interval->minimum(50);
             query_interval->maximum(5000);
-            query_interval->step(50);
-            query_interval->value(100);
+            query_interval->step(10);
+            query_interval->value(50);
             query_interval->callback((Fl_Callback*)cb_query_interval);
             query_interval->align(FL_ALIGN_LEFT);
             o->value(progStatus.serloop_timing);
