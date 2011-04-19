@@ -287,7 +287,7 @@ int RIG_TS480HX::get_modetype(int n)
 void RIG_TS480HX::set_bwA(int val)
 {
 	bwA = val;
-	cmd = "SL00";
+	cmd = "SL00;";
 	cmd[3] = '0' + val;
 	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd, 0);
@@ -311,7 +311,7 @@ int RIG_TS480HX::get_bwA()
 void RIG_TS480HX::set_bwB(int val)
 {
 	bwB = val;
-	cmd = "SL00";
+	cmd = "SL00;";
 	cmd[3] = '0' + val;
 	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd, 0);

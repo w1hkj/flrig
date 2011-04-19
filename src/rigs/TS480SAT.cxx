@@ -288,7 +288,7 @@ int RIG_TS480SAT::get_modetype(int n)
 void RIG_TS480SAT::set_bwA(int val)
 {
 	bwA = val;
-	cmd = "SL00";
+	cmd = "SL00;";
 	cmd[3] = '0' + val;
 	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd, 0);
@@ -312,7 +312,7 @@ int RIG_TS480SAT::get_bwA()
 void RIG_TS480SAT::set_bwB(int val)
 {
 	bwB = val;
-	cmd = "SL00";
+	cmd = "SL00;";
 	cmd[3] = '0' + val;
 	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd, 0);
@@ -369,7 +369,6 @@ int RIG_TS480SAT::get_volume_control()
 void RIG_TS480SAT::set_power_control(double val)
 {
 	cmd = "PC";
-	sendCommand(cmd, 0);
 	char szval[4];
 	if (modeA == 4 && val > 50) val = 50; // AM mode limitation
 	snprintf(szval, sizeof(szval), "%03d", (int)val);
