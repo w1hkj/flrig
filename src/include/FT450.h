@@ -17,8 +17,8 @@ public:
 	long get_vfoB();
 	void set_vfoB(long);
 
-	void select_vfoA();
-	void select_vfoB();
+	void select_A();
+	void select_B();
 	void set_modeA(int val);
 	int  get_modeA();
 	int  get_modetype(int n);

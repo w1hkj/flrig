@@ -8,8 +8,8 @@ public:
 	RIG_IC706MKIIG();
 	~RIG_IC706MKIIG(){}
 
-	void select_vfoA();
-	void select_vfoB();
+	void select_A();
+	void select_B();
 
 	long get_vfoA ();
 	void set_vfoA (long freq);
