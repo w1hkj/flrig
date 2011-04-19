@@ -59,6 +59,7 @@ public:
 
 protected:
 	int  filter_nbr;
+	void showresp(string);
 };
 
 #endif

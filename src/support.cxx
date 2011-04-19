@@ -672,10 +672,10 @@ void cb_selectA() {
 	pthread_mutex_lock(&mutex_serial);
 	changed_vfo = true;
 	useB = false;
-	if (queA.empty()) {
+//	if (queA.empty()) {
 		vfoA.src = UI;
 		queA.push(vfoA);
-	}
+//	}
 	pthread_mutex_unlock(&mutex_serial);
 	setFocus();
 }
@@ -698,10 +698,10 @@ void cb_selectB() {
 	pthread_mutex_lock(&mutex_serial);
 	changed_vfo = true;
 	useB = true;
-	if (queB.empty()) {
+//	if (queB.empty()) {
 		vfoB.src = UI;
 		queB.push(vfoB);
-	}
+//	}
 	pthread_mutex_unlock(&mutex_serial);
 	setFocus();
 }
