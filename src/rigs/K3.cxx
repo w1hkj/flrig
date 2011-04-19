@@ -16,18 +16,24 @@ const char *K3modes_[] =
 const char modenbr[] = 
 	{ '1', '2', '3', '4', '5', '6', '7', '9' };
 static const char K3_mode_type[] =
-	{ 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L' };
+	{ 'L', 'U', 'U', 'U', 'U', 'U', 'L', 'L' };
+static int def_mode_width[] = {
+39, 39, 15, 42, 42, 39, 15, 39 };
 
 const char *K3_widths[] = {
-"100", "200", "300", "400", "500", "600", "700", "800", "900", "1000",
-"1200", "1400", "1600", "1800", "2000", "2200", "2400", "2600", "2800", "3000",
-"3200", "3400", "3600", "4000", "4500", "5000", "6000",
+  "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500", 
+ "550",  "600",  "650",  "700",  "750",  "800",  "850",  "900",  "950", "1000",
+"1100", "1200", "1300", "1400", "1500", "1600", "1700", "1800", "1900", "2000",
+"2100", "2200", "2300", "2400", "2500", "2600", "2700", "2800", "2890", "3000",
+"3200", "3400", "3600", "3800", "4000",
 NULL};
 
 const char *K3_bwval[] = {
-"0010", "0020", "0030", "0040", "0050", "0060", "0070", "0080", "0090", "0100",
-"0120", "0140", "0160", "0180", "0200", "0220", "0240", "0260", "0280", "0300",
-"0320", "0340", "0360", "0400", "0450", "0500", "0600",
+"0005", "0010", "0015", "0020", "0025", "0030", "0035", "0040", "0045", "0050", 
+"0055", "0060", "0065", "0070", "0075", "0080", "0085", "0090", "0095", "0100",
+"0110", "0120", "0130", "0140", "0150", "0160", "0170", "0180", "0190", "0200",
+"0210", "0220", "0230", "0240", "0250", "0260", "0270", "0280", "0290", "0300",
+"0320", "0340", "0360", "0380", "0400",
  NULL };
 
 RIG_K3::RIG_K3() {
@@ -47,9 +53,9 @@ RIG_K3::RIG_K3() {
 	comm_rtsptt = false;
 	comm_dtrptt = false;
 	modeA = 1;
-	bwA = 19;
+	bwA = 39;
 	modeB = 1;
-	bwB = 19;
+	bwB = 39;
 
 	has_bandwidth_control =
 	has_power_control =
@@ -69,7 +75,12 @@ RIG_K3::RIG_K3() {
 
 int  RIG_K3::adjust_bandwidth(int m)
 {
-	return 0;
+	return def_mode_width[m];
+}
+
+int  RIG_K3::def_bandwidth(int m)
+{
+	return def_mode_width[m];
 }
 
 void RIG_K3::initialize()
@@ -77,14 +88,31 @@ void RIG_K3::initialize()
 	cmd = "AI0;"; // disable auto-info
 	sendCommand(cmd, 0);
 	MilliSleep(100);
+	showresp("disable auto-info");
 
 	cmd = "K31;"; // K3 extended mode
 	sendCommand(cmd, 0);
 	MilliSleep(100);
+	showresp("K3 extended mode");
 
 	cmd = "SWT49;"; // Fine tuning (1 Hz mode)
 	sendCommand(cmd, 0);
 	MilliSleep(100);
+	showresp("1 Hz fine tune mode");
+
+	cmd = "OM;"; // request options
+	sendCommand(cmd);
+	MilliSleep(50);
+	showresp("options");
+	if (replystr.find("P") == string::npos) {
+		minpwr = 0;
+		maxpwr = 12;
+		steppwr = 0.1;
+	} else {
+		minpwr = 0;
+		maxpwr = 120;
+		steppwr = 1;
+	}
 
 	modeA = 1;
 	bwA = 19;
@@ -96,7 +124,7 @@ long RIG_K3::get_vfoA ()
 {
 	cmd = "FA;";
 	int ret = sendCommand(cmd);
-LOG_WARN("out: %s, ret: %s", cmd.c_str(), replystr.c_str());
+	showresp("vfo A");
 	if (ret < 14) return freqA;
 	size_t p = replystr.rfind("FA");
 	if (p == string::npos) return freqA;
@@ -123,7 +151,7 @@ long RIG_K3::get_vfoB ()
 {
 	cmd = "FB;";
 	int ret = sendCommand(cmd);
-LOG_WARN("out: %s, ret: %s", cmd.c_str(), replystr.c_str());
+	showresp("vfo B");
 	if (ret < 14) return freqB;
 	size_t p = replystr.rfind("FB");
 	if (p == string::npos) return freqB;
@@ -162,7 +190,7 @@ int RIG_K3::get_volume_control()
 {
 	cmd = "AG;";
 	int ret = sendCommand(cmd);
-LOG_WARN("out: %s, ret: %s", cmd.c_str(), replystr.c_str());
+	showresp("audio volume");
 	if (ret < 6) return 0;
 	size_t p = replystr.rfind("AG");
 	if (p == string::npos) return 0;
@@ -184,7 +212,7 @@ int RIG_K3::get_modeA()
 {
 	cmd = "MD;";
 	int ret = sendCommand(cmd);
-LOG_WARN("out: %s, ret: %s", cmd.c_str(), replystr.c_str());
+	showresp("mode A");
 	if (ret < 4) return modeA;
 	size_t p = replystr.rfind("MD");
 	if (p == string::npos) return modeA;
@@ -206,7 +234,7 @@ int RIG_K3::get_modeB()
 {
 	cmd = "MD$;";
 	int ret = sendCommand(cmd);
-LOG_WARN("out: %s, ret: %s", cmd.c_str(), replystr.c_str());
+	showresp("mode B");
 	if (ret < 4) return modeB;
 	size_t p = replystr.rfind("MD$");
 	if (p == string::npos) return modeB;
@@ -231,7 +259,7 @@ int RIG_K3::get_preamp()
 {
 	cmd = "PA;";
 	int ret = sendCommand(cmd);
-LOG_WARN("out: %s, ret: %s", cmd.c_str(), replystr.c_str());
+	showresp("preamp");
 	if (ret < 4) return 0;
 	size_t p = replystr.rfind("PA");
 	if (p == string::npos) return 0;
@@ -249,7 +277,7 @@ int RIG_K3::get_attenuator()
 {
 	cmd = "RA;";
 	int ret = sendCommand(cmd);
-LOG_WARN("out: %s, ret: %s", cmd.c_str(), replystr.c_str());
+	showresp("attenuator");
 	if (ret < 5) return 0;
 	size_t p = replystr.rfind("RA");
 	if (p == string::npos) return 0;
@@ -268,9 +296,9 @@ void RIG_K3::set_power_control(double val)
 	sendCommand(cmd, 0);
 }
 
-void RIG_K3::get_pc_min_max_step(int &min, int &max, int &step)
+void RIG_K3::get_pc_min_max_step(double &min, double &max, double &step)
 {
-   min = 0; max = 120; step = 1; 
+   min = minpwr; max = maxpwr; step = steppwr; 
 }
 
 // Tranceiver PTT on/off
@@ -296,7 +324,7 @@ int RIG_K3::get_smeter()
 {
 	cmd = "SM;";
 	int ret = sendCommand(cmd);
-LOG_WARN("out: %s, ret: %s", cmd.c_str(), replystr.c_str());
+	showresp("s-meter");
 	if (ret < 7) return 0;
 	size_t p = replystr.rfind("SM");
 	if (p == string::npos) return 0;
@@ -330,7 +358,7 @@ int RIG_K3::get_bwA()
 {
 	cmd = "FW;";
 	int ret = sendCommand(cmd);
-LOG_WARN("out: %s, ret: %s", cmd.c_str(), replystr.c_str());
+	showresp("bandwidth A");
 	if (ret < 6) return bwA;
 	size_t p = replystr.rfind("FW");
 	if (p == string::npos) return bwA;
@@ -343,7 +371,6 @@ LOG_WARN("out: %s, ret: %s", cmd.c_str(), replystr.c_str());
 	if (K3_bwval[n] != NULL) bwA = n;
 	return bwA;
 }
-
 void RIG_K3::set_bwB(int val)
 {
 	cmd = "FW$";
@@ -356,7 +383,7 @@ int RIG_K3::get_bwB()
 {
 	cmd = "FW$;";
 	int ret = sendCommand(cmd);
-LOG_WARN("out: %s, ret: %s", cmd.c_str(), replystr.c_str());
+	showresp("bandwidth B");
 	if (ret < 6) return bwB;
 	size_t p = replystr.rfind("FW$");
 	if (p == string::npos) return bwB;
@@ -372,14 +399,15 @@ LOG_WARN("out: %s, ret: %s", cmd.c_str(), replystr.c_str());
 
 int RIG_K3::get_power_out()
 {
-	cmd = "PC;";
+	cmd = "BG;"; // responds BGnn; 0 < nn < 10
 	int ret = sendCommand(cmd);
-LOG_WARN("out: %s, ret: %s", cmd.c_str(), replystr.c_str());
-	if (ret < 6) return 0;
-	size_t p = replystr.rfind("PC");
+	showresp("power out");
+	if (ret < 5) return 0;
+	size_t p = replystr.rfind("BG");
 	if (p == string::npos) return 0;
-	replystr[p + 5] = 0;
-	int mtr = atoi(&replystr[p + 2]);
+	replystr[p + 4] = 0;
+	int mtr = atoi(&replystr[p + 2]) * 10;
+	if (mtr > 100) mtr = 100;
 	return mtr;
 }
 

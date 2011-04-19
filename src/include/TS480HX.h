@@ -47,7 +47,7 @@ public:
 	int  get_volume_control();
 	void set_power_control(double val);
 	int  get_power_control();
-	void get_pc_min_max_step(int &min, int &max, int &step) {
+	void get_pc_min_max_step(double &min, double &max, double &step) {
 		min = 5; max = 200; step = 1; }
 	void set_attenuator(int val);
 	int  get_attenuator();

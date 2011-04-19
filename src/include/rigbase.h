@@ -191,7 +191,7 @@ public:
 	virtual int  get_power_out(void) {return -1;}
 	virtual int  get_power_control(void) {return 0;}
 	virtual void set_power_control(double val) {}
-	virtual void get_pc_min_max_step(int &min, int &max, int &step) {
+	virtual void get_pc_min_max_step(double &min, double &max, double &step) {
 		min = 0; max = 100; step = 1; }
 	virtual int  get_volume_control() {return 0;}
 	virtual void get_vol_min_max_step(int &min, int &max, int &step) {
@@ -283,6 +283,9 @@ public:
 	virtual void adjustCIV(uchar adr) {}
 
 	virtual void read_stream() {}
+
+	virtual void showresp(string s) {}
+
 };
 
 extern rigbase *rigs[];

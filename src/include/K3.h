@@ -20,7 +20,7 @@ public:
 	void set_modeB(int val);
 	int  get_modeB();
 	void set_power_control(double val);
-	void get_pc_min_max_step(int &, int &, int &);
+	void get_pc_min_max_step(double &, double &, double &);
 	void set_PTT_control(int val);
 	void set_attenuator(int val);
 	int  get_attenuator();
@@ -36,9 +36,19 @@ public:
 	int  get_power_out();
 
 	int  adjust_bandwidth(int m);
+	int  def_bandwidth(int m);
 
 	bool twovfos() {return true;}
 
+	void showresp(string s) {
+		LOG_WARN("%s : %s ==> %s", s.c_str(), cmd.c_str(), replystr.c_str());
+	}
+
+
+private:
+	double  minpwr;
+	double  maxpwr;
+	double  steppwr;
 /*
 	int  get_swr();
 	void tune_rig();
