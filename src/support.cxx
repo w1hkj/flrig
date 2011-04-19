@@ -1721,7 +1721,7 @@ void initRig()
 	}
 
 	if (selrig->has_power_control) {
-		int min, max, step;
+		double min, max, step;
 		selrig->get_pc_min_max_step(min, max, step);
 		sldrPOWER->minimum(min);
 		sldrPOWER->maximum(max);
