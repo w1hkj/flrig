@@ -100,7 +100,7 @@ void RIG_IC7200::showresp(string s)
 	LOG_WARN("%s : %s ==> %s", s.c_str(), s1.c_str(), s2.c_str());
 }
 
-void RIG_IC7200::select_vfoA()
+void RIG_IC7200::select_A()
 {
 	cmd = pre_to;
 	cmd += '\x07';
@@ -111,7 +111,7 @@ void RIG_IC7200::select_vfoA()
 //	checkresponse();
 }
 
-void RIG_IC7200::select_vfoB()
+void RIG_IC7200::select_B()
 {
 	cmd = pre_to;
 	cmd += '\x07';
@@ -166,7 +166,7 @@ long RIG_IC7200::get_vfoB ()
 
 void RIG_IC7200::set_vfoB (long freq)
 {
-	select_vfoB();
+	select_B();
 	freqB = freq;
 	cmd = pre_to;
 	cmd += '\x05';

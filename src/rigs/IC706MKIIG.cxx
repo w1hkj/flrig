@@ -48,7 +48,7 @@ RIG_IC706MKIIG::RIG_IC706MKIIG() {
 
 //=============================================================================
 
-void RIG_IC706MKIIG::select_vfoA()
+void RIG_IC706MKIIG::select_A()
 {
 	cmd = pre_to;
 	cmd += '\x07';
@@ -58,7 +58,7 @@ void RIG_IC706MKIIG::select_vfoA()
 	checkresponse();
 }
 
-void RIG_IC706MKIIG::select_vfoB()
+void RIG_IC706MKIIG::select_B()
 {
 	cmd = pre_to;
 	cmd += '\x07';
@@ -99,7 +99,7 @@ long RIG_IC706MKIIG::get_vfoB ()
 
 void RIG_IC706MKIIG::set_vfoB (long freq)
 {
-	select_vfoB();
+	select_B();
 	freqB = freq;
 	cmd = pre_to;
 	cmd += '\x05';
@@ -107,7 +107,7 @@ void RIG_IC706MKIIG::set_vfoB (long freq)
 	cmd.append( post );
 	sendICcommand(cmd, 6);
 	checkresponse();
-	select_vfoA();
+	select_A();
 }
 
 void RIG_IC706MKIIG::set_split(bool b)
