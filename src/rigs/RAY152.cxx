@@ -57,6 +57,13 @@ RIG_RAY152::RIG_RAY152() {
 	has_auto_notch = true;
 };
 
+
+static void nocr( string & s)
+{
+	for (size_t i = 0; i < s.length(); i++)
+		if (s[i] == '\r') s[i] = ' ';
+}
+
 /*
 Data string returned by the 'O' command
 		3	A*\r         AGC ON/OFF
@@ -270,6 +277,9 @@ int RIG_RAY152::get_smeter(void)
 {
 	cmd = "U\r";
 	int ret = sendCommand(cmd);
+	string s = replystr;
+	nocr(s);
+LOG_WARN("%s", s.c_str());
 	if (ret < 5) return 0;
 	if (replystr[ret - 5] == 'U') {
 		int val;
@@ -277,7 +287,6 @@ int RIG_RAY152::get_smeter(void)
 		val = (int)(60.0 * (256.0 / (val + 16.0) - 1.0));
 		if (val > 100) val = 100;
 		if (val < 0) val = 0;
-//LOG_INFO("%s => %d", cmd.c_str(), val);
 		return val;
 	}
 	return 0;
