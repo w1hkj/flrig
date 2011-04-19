@@ -8,8 +8,8 @@ public:
 	RIG_IC746();
 	virtual ~RIG_IC746(){}
 
-	virtual void select_A();
-	virtual void select_B();
+	virtual void selectA();
+	virtual void selectB();
 
 	virtual long get_vfoA(void);
 	virtual void set_vfoA(long f);

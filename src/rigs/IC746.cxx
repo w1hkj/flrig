@@ -116,7 +116,7 @@ RIG_IC746PRO::RIG_IC746PRO() {
 	adjustCIV(defaultCIV);
 };
 
-void RIG_IC746::select_A()
+void RIG_IC746::selectA()
 {
 	cmd = pre_to;
 	cmd += '\x07';
@@ -126,7 +126,7 @@ void RIG_IC746::select_A()
 	checkresponse();
 }
 
-void RIG_IC746::select_B()
+void RIG_IC746::selectB()
 {
 	cmd = pre_to;
 	cmd += '\x07';

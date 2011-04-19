@@ -67,13 +67,13 @@ int  RIG_FT450::adjust_bandwidth(int m)
 	return 1;
 }
 
-void RIG_FT450::select_A()
+void RIG_FT450::selectA()
 {
 	cmd = "SV0;";
 	sendCommand(cmd, 0);
 }
 
-void RIG_FT450::select_B()
+void RIG_FT450::selectB()
 {
 	cmd = "SV1;";
 	sendCommand(cmd, 0);
@@ -81,7 +81,7 @@ void RIG_FT450::select_B()
 
 void RIG_FT450::initialize()
 {
-	select_A();
+	selectA();
 }
 
 long RIG_FT450::get_vfoA ()

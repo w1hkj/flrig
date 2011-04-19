@@ -8,8 +8,8 @@ public:
 	RIG_IC7200();
 	~RIG_IC7200(){}
 
-	void select_A();
-	void select_B();
+	void selectA();
+	void selectB();
 
 	long get_vfoA ();
 	void set_vfoA (long freq);
