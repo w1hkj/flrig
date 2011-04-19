@@ -1,6 +1,173 @@
-commit 0a8aa814f33a42cd80efa9f5ca2a137ab29de062
+commit 5d7f9c1d4a86641b78f00b471ade0e42dffb1621
 Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Apr 10 05:50:35 2011 -0500
+Date:   Tue Apr 19 11:30:10 2011 -0500
+
+    Version 1.1.3C4
+    
+      alpha release
+
+commit fd99d188bd1657e018a8cc48be19f2cda2260c5f
+Author: David Freese <w1hkj@w1hkj.com>
+Date:   Tue Apr 19 11:29:00 2011 -0500
+
+    Select A/B
+    
+      * Fixed incorrect method references for A/B selection
+        - FT450
+        - IC706MKIIG
+        - IC7200
+        - All IC746 derivatives
+
+commit b11057ed357ea60a02a9f44a28f1d0ce9fd99e83
+Author: David Freese <w1hkj@w1hkj.com>
+Date:   Tue Apr 19 08:53:32 2011 -0500
+
+    RAY152
+    
+      Added Smeter event statment
+
+commit c7dff8d68e740713ad88ba5653554a6187ef761d
+Author: David Freese <w1hkj@w1hkj.com>
+Date:   Tue Apr 19 08:53:18 2011 -0500
+
+    TS480HX/SAT
+    
+      * Update to class method set_power_control
+      * Corrected setBW methods - missing ';' in command string
+
+commit 29f68841e3a81d25568e505257f171106932c0af
+Author: David Freese <w1hkj@w1hkj.com>
+Date:   Tue Apr 19 08:17:56 2011 -0500
+
+    IC7200
+    
+      Added debugging statements
+
+commit 44566d0fb3144d9d420553894c73efacc3af75b1
+Author: David Freese <w1hkj@w1hkj.com>
+Date:   Mon Apr 18 16:20:40 2011 -0500
+
+    K3
+    
+      Overhaul of the K3 backend code
+
+commit 35ec168528b77c9bbc91dd6d251deb557e0756e1
+Author: David Freese <w1hkj@w1hkj.com>
+Date:   Mon Apr 18 14:44:30 2011 -0500
+
+    FT857D s-meter
+    
+      Debug lines added to smeter / pout methods
+
+commit 26d8185af4539824000ace13167b000f3f2e9f38
+Author: David Freese <w1hkj@w1hkj.com>
+Date:   Mon Apr 18 14:32:44 2011 -0500
+
+    TS480XH power control
+    
+      Correction to power control method
+
+commit 70bd622bae2306044d071a8ea8eb54b5b11f950f
+Author: David Freese <w1hkj@w1hkj.com>
+Date:   Mon Apr 18 14:29:06 2011 -0500
+
+    TT588 RF gain
+    
+      Corrected RF gain control inversion.
+
+commit 9df14fb461cd04f14cffeda0e98d988fd370abb7
+Author: David Freese <w1hkj@w1hkj.com>
+Date:   Mon Apr 18 10:27:52 2011 -0500
+
+    Serial Stream Parsing
+    
+      * Changed rig_io serial stream read/write functions
+      * Changed xcvr class methods to comply with new serial r/w
+        scheme.
+
+commit 68ac858a989b7eb1f9d2acf24923c11c629ba31c
+Author: David Freese <w1hkj@w1hkj.com>
+Date:   Mon Apr 18 10:27:48 2011 -0500
+
+    Colors-Scheme
+    
+      Tweaks to the color/scheme dialog, save, restore
+
+commit 2fbec07c8a0956ab98f56ccaba2c467ec43c6c54
+Author: David Freese <w1hkj@w1hkj.com>
+Date:   Sat Apr 16 15:35:19 2011 -0500
+
+    TT599
+    
+      * Enabled debug statements in tt599 class methods
+      * Changed method of parsing returned strings.  599 seems
+        to send unsolicited strings when xcvr vfo/mode/bw are
+        changed by operator
+      * Corrected ?S power response parser
+
+commit 927db3d696e171e817ab28540c61560ec49e941b
+Author: David Freese <w1hkj@w1hkj.com>
+Date:   Sat Apr 16 13:33:26 2011 -0500
+
+    TS2000
+    
+      Changed reply parsing to allow for unsolicited xcvr replies
+
+commit 13619050b9a32f651bca078cd566ce89b5829759
+Author: David Freese <w1hkj@w1hkj.com>
+Date:   Sat Apr 16 10:38:44 2011 -0500
+
+    TT538 code clean up
+    
+      * removed unused const char[] definitions
+      * removed unused variables
+
+commit 7e55bda325dd10e4d9dbe4c3acd3c2ec666156f7
+Author: David Freese <w1hkj@w1hkj.com>
+Date:   Sat Apr 16 10:38:39 2011 -0500
+
+    System colors
+    
+      * Added system color selection
+      * Added system style selection
+
+commit 65dc4b1fb79c47aa92d6cbfb91f94811e4260c2a
+Author: David Freese <w1hkj@w1hkj.com>
+Date:   Wed Apr 13 18:25:56 2011 -0500
+
+    Meter colors
+    
+      Added foreground color selection = frequency label color
+
+commit f9204b609152c022335924dc8715eac3acd481dd
+Author: David Freese <w1hkj@w1hkj.com>
+Date:   Wed Apr 13 17:51:00 2011 -0500
+
+    TT588
+    
+      * Modified Smeter conversion
+      * Corrected filter table
+
+commit 5ff58ace72f8d6b0ed5ba4c30e531594f34438ee
+Author: David Freese <w1hkj@w1hkj.com>
+Date:   Wed Apr 13 17:50:39 2011 -0500
+
+    TT550 Auto Notch
+    
+      * Changed auto-notch / noise-reduction to allow independent
+        enable disable
+
+commit ef7b1ce8ff98d4075ccfa4829388d8931f954a05
+Author: David Freese <w1hkj@w1hkj.com>
+Date:   Wed Apr 13 17:49:55 2011 -0500
+
+    TT550 smeter
+    
+      Rescaled smeter for Pegasus
+
+commit e93110a62ebdb88f888f359ff2d771634c86d761
+Author: David Freese <w1hkj@w1hkj.com>
+Date:   Sun Apr 10 05:50:47 2011 -0500
 
     Version 1.1.3
     
