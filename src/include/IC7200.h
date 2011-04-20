@@ -34,6 +34,9 @@ public:
 	void get_vol_min_max_step(int &min, int &max, int &step);
 	void set_attenuator(int val);
 	int  get_smeter();
+	int  get_power_out(void);
+	int  get_swr(void);
+	int  get_alc(void);
 	void set_noise(bool val);
 	int  get_noise();
 	void set_noise_reduction(int val);
