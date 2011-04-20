@@ -36,6 +36,8 @@ extern Fl_Light_Button *btnSplit;
 #include "combo.h"
 extern Fl_ComboBox *opMODE;
 extern Fl_ComboBox *opBW;
+#include <FL/Fl_Counter.H>
+extern Fl_Counter *cntK3bw;
 extern Fl_Light_Button *btnAttenuator;
 extern Fl_Light_Button *btnPreamp;
 extern Fl_Light_Button *btnNOISE;
@@ -55,7 +57,6 @@ extern Fl_Box *boxControl;
 extern Fl_Light_Button *btnAuxRTS;
 extern Fl_Light_Button *btnAuxDTR;
 extern Fl_Light_Button *btnMicLine;
-#include <FL/Fl_Counter.H>
 extern Fl_Counter *cntRIT;
 extern Fl_Counter *cntXIT;
 extern Fl_Counter *cntBFO;

@@ -11,7 +11,6 @@ private:
 	double refv;
 	double VfoAdj;
 
-	void showresponse(string s);
 public:
 	RIG_TT538();
 	~RIG_TT538(){}

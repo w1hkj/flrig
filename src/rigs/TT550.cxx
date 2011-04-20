@@ -180,11 +180,6 @@ RIG_TT550::RIG_TT550() {
 
 }
 
-void RIG_TT550::showresponse(string s)
-{
-	LOG_WARN("%s: %s", s.c_str(), str2hex(replystr.c_str(), replystr.length()));
-}
-
 void RIG_TT550::showASCII(string s1, string s)
 {
 	while (s[0] == ' ' || s[0] == '\r' || s[0] == '\n') s.erase(0,1);

@@ -144,11 +144,6 @@ void RIG_TT538::checkresponse(string s)
 	LOG_ERROR("%s:\nsent  %s\nreply %s\n", s.c_str(), s1.c_str(), s2.c_str());
 }
 
-void RIG_TT538::showresponse(string s)
-{
-	LOG_INFO("%s : %s", s.c_str(), replystr.c_str());
-}
-
 void RIG_TT538::initialize()
 {
 	VfoAdj = progStatus.vfo_adj;

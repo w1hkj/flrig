@@ -284,7 +284,9 @@ public:
 
 	virtual void read_stream() {}
 
-	virtual void showresp(string s) {}
+enum { ERR, WARN, INFO };
+enum { ASC, HEX };
+	void showresp(int level, int how, string s);
 
 };
 

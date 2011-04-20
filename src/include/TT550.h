@@ -32,7 +32,6 @@ private:
 	bool auto_notch;
 	bool noise_reduction;
 
-	void showresponse(string s);
 	void showASCII(string, string);
 
 	void set_vfoRX(long freq);

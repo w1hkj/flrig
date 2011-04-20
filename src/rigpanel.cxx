@@ -202,6 +202,12 @@ static void cb_opBW(Fl_ComboBox*, void*) {
   setBW();
 }
 
+Fl_Counter *cntK3bw=(Fl_Counter *)0;
+
+static void cb_cntK3bw(Fl_Counter*, void*) {
+  setBW();
+}
+
 Fl_Light_Button *btnAttenuator=(Fl_Light_Button *)0;
 
 static void cb_btnAttenuator(Fl_Light_Button*, void*) {
@@ -606,7 +612,7 @@ Fl_Double_Window* Rig_window() {
       btnSplit->callback((Fl_Callback*)cb_btnSplit);
       o->value(progStatus.split);
     } // Fl_Light_Button* btnSplit
-    { opMODE = new Fl_ComboBox(322, 84, 100, 18, _("Mode"));
+    { opMODE = new Fl_ComboBox(318, 84, 105, 18, _("Mode"));
       opMODE->tooltip(_("Select transceiver operating mode"));
       opMODE->box(FL_FLAT_BOX);
       opMODE->color((Fl_Color)FL_BACKGROUND_COLOR);
@@ -620,7 +626,7 @@ Fl_Double_Window* Rig_window() {
       opMODE->when(FL_WHEN_RELEASE);
       opMODE->end();
     } // Fl_ComboBox* opMODE
-    { opBW = new Fl_ComboBox(215, 84, 100, 18, _("BW"));
+    { opBW = new Fl_ComboBox(212, 84, 105, 18, _("Bandwidth"));
       opBW->tooltip(_("Select Transceiver Bandwidth"));
       opBW->box(FL_FLAT_BOX);
       opBW->color((Fl_Color)FL_BACKGROUND_COLOR);
@@ -634,6 +640,17 @@ Fl_Double_Window* Rig_window() {
       opBW->when(FL_WHEN_RELEASE);
       opBW->end();
     } // Fl_ComboBox* opBW
+    { cntK3bw = new Fl_Counter(212, 84, 105, 18);
+      cntK3bw->tooltip(_("Bandwidth"));
+      cntK3bw->labelsize(12);
+      cntK3bw->minimum(50);
+      cntK3bw->maximum(4000);
+      cntK3bw->step(10);
+      cntK3bw->value(4000);
+      cntK3bw->callback((Fl_Callback*)cb_cntK3bw);
+      cntK3bw->align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE);
+      cntK3bw->hide();
+    } // Fl_Counter* cntK3bw
     { btnAttenuator = new Fl_Light_Button(2, 286, 60, 18, _("Att"));
       btnAttenuator->tooltip(_("Attenuator On/Off"));
       btnAttenuator->down_box(FL_THIN_DOWN_BOX);

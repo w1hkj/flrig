@@ -113,11 +113,6 @@ RIG_TT516::RIG_TT516() {
 
 }
 
-void RIG_TT516::showresponse()
-{
-	LOG_INFO("%s", str2hex(replystr.c_str(), replystr.length()));
-}
-
 long RIG_TT516::get_vfoA ()
 {
 	cmd = TT516getFREQA;

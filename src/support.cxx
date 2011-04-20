@@ -176,7 +176,10 @@ void read_mode()
 
 void setBWControl(void *)
 {
-	opBW->index(vfo.iBW);
+	if (rig_nbr == K3)
+		cntK3bw->value(vfo.iBW);
+	else
+		opBW->index(vfo.iBW);
 }
 
 void read_bandwidth()
@@ -477,13 +480,23 @@ void setBW()
 {
 	FREQMODE fm = vfo;
 	fm.src = UI;
-	fm.iBW = opBW->index();
+	if (rig_nbr == K3)
+		fm.iBW = cntK3bw->value();
+	else
+		fm.iBW = opBW->index();
 	useB ? queB.push(fm) : queA.push(fm);
 	setFocus();
 }
 
 void updateBandwidthControl(void *d)
 {
+	if (rig_nbr == K3) {
+		vfo.iBW = selrig->adjust_bandwidth(vfo.imode);
+		cntK3bw->value(vfo.iBW);
+		useB ? vfoB.iBW = vfo.iBW : vfoA.iBW = vfo.iBW;
+		return;
+	}
+
 	if (selrig->has_bandwidth_control) {
 		if (selrig->adjust_bandwidth(vfo.imode) != -1) {
 			if (old_bws != selrig->bandwidths_) {
@@ -754,7 +767,11 @@ void addFreq() {
 	long freq = FreqDispA->value();
 	if (!freq) return;
 	int mode = opMODE->index();
-	int bw = opBW->index();
+	int bw;
+	if (rig_nbr == K3)
+		bw = cntK3bw->value();
+	else
+		bw = opBW->index();
 	for (int n = 0; n < numinlist; n++)
 		if (freq == oplist[n].freq && mode == oplist[n].imode) {
 			oplist[n].iBW = bw;
@@ -1544,19 +1561,26 @@ void initRig()
 	}
 
 	rigbws_.clear();
-	opBW->clear();
-	if (selrig->has_bandwidth_control) {
-		old_bws = selrig->bandwidths_;
-		for (int i = 0; selrig->bandwidths_[i] != NULL; i++) {
-			rigbws_.push_back(selrig->bandwidths_[i]);
-				opBW->add(selrig->bandwidths_[i]);
-			}
-		opBW->activate();
-		opBW->index(progStatus.iBW_A);
+	if (rig_nbr != K3) {
+		opBW->clear();
+		if (selrig->has_bandwidth_control) {
+			old_bws = selrig->bandwidths_;
+			for (int i = 0; selrig->bandwidths_[i] != NULL; i++) {
+				rigbws_.push_back(selrig->bandwidths_[i]);
+					opBW->add(selrig->bandwidths_[i]);
+				}
+			opBW->activate();
+			opBW->index(progStatus.iBW_A);
+		} else {
+			opBW->add(" ");
+			opBW->index(0);
+			opBW->deactivate();
+		}
+		cntK3bw->hide();
 	} else {
-		opBW->add(" ");
-		opBW->index(0);
-		opBW->deactivate();
+		opBW->hide();
+		cntK3bw->lstep(50);
+		cntK3bw->show();
 	}
 
 	if (selrig->has_special)
