@@ -233,14 +233,61 @@ int RIG_IC7200::get_smeter()
 	cmd.append( post );
 	int ret = sendICcommand(cmd, 9);
 	showresp(INFO, HEX, "get smeter");
+	int mtr= 0;
 	if (ret == 9) {
-		int mtr = fm_bcd(&replystr[6], 3);
-		mtr = (int)(1.3 * mtr - 36.0);
-		if (mtr < 0) mtr = 0;
-		if (mtr > 255) mtr = 255;
-		return (mtr * 100 / 255);
-	} else
-		return 0;
+		mtr = fm_bcd(&replystr[6], 3);
+		mtr = (int)(mtr /2.55);
+		if (mtr > 100) mtr = 100;
+	}
+	return mtr;
+}
+
+int RIG_IC7200::get_power_out(void) 
+{
+	cmd = pre_to;
+	cmd.append("\x15\x11");
+	cmd.append( post );
+	int ret = sendICcommand(cmd, 9);
+	showresp(INFO, HEX, "get power out");
+	int mtr= 0;
+	if (ret == 9) {
+		mtr = fm_bcd(&replystr[6], 3);
+		mtr = (int)(mtr /2.55);
+		if (mtr > 100) mtr = 100;
+	}
+	return mtr;
+}
+
+int RIG_IC7200::get_swr(void) 
+{
+	cmd = pre_to;
+	cmd.append("\x15\x12");
+	cmd.append( post );
+	int ret = sendICcommand(cmd, 9);
+	showresp(INFO, HEX, "get swr");
+	int mtr= 0;
+	if (ret == 9) {
+		mtr = fm_bcd(&replystr[6], 3);
+		mtr = (int)(mtr /2.55);
+		if (mtr > 100) mtr = 100;
+	}
+	return mtr;
+}
+
+int RIG_IC7200::get_alc(void)
+{
+	cmd = pre_to;
+	cmd.append("\x15\x13");
+	cmd.append( post );
+	int ret = sendICcommand(cmd, 9);
+	showresp(INFO, HEX, "get alc");
+	int mtr= 0;
+	if (ret == 9) {
+		mtr = fm_bcd(&replystr[6], 3);
+		mtr = (int)(mtr /2.55);
+		if (mtr > 100) mtr = 100;
+	}
+	return mtr;
 }
 
 void RIG_IC7200::set_attenuator(int val)
