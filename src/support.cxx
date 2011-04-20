@@ -1497,21 +1497,22 @@ void initRig()
 	FreqDispA->set_precision(selrig->precision);
 	FreqDispB->set_precision(selrig->precision);
 
-	vfoA.freq = progStatus.freq_A;
-	vfoA.imode = progStatus.imode_A;
-	vfoA.iBW = progStatus.iBW_A;
-	FreqDispA->value( vfoA.freq );
-
-	vfoB.freq = progStatus.freq_B;
-	vfoB.imode = progStatus.imode_B;
-	vfoB.iBW = progStatus.iBW_B;
-	FreqDispB->value(vfoB.freq);
-
 	if (rig_nbr == TT550) {
+		vfoA.freq = progStatus.freq_A;
+		vfoA.imode = progStatus.imode_A;
+		vfoA.iBW = progStatus.iBW_A;
+		if (vfoA.iBW == -1) vfoA.iBW = selrig->def_bandwidth(vfoA.imode);
+		FreqDispA->value( vfoA.freq );
 		selrig->selectA();
 		selrig->set_vfoA(vfoA.freq);
 		selrig->set_modeA(vfoA.imode);
 		selrig->set_bwA(vfoA.iBW);
+
+		vfoB.freq = progStatus.freq_B;
+		vfoB.imode = progStatus.imode_B;
+		vfoB.iBW = progStatus.iBW_B;
+		if (vfoB.iBW == -1) vfoB.iBW = selrig->def_bandwidth(vfoB.imode);
+		FreqDispB->value(vfoB.freq);
 		selrig->set_vfoB(vfoB.freq);
 		selrig->set_modeB(vfoB.imode);
 		selrig->set_bwB(vfoB.iBW);
@@ -1861,23 +1862,19 @@ void initRig()
 		btnUSBaudio->deactivate();
 	}
 
-/*
-	vfoA.freq = progStatus.freq_A;
-	vfoA.imode = progStatus.imode_A;
-	vfoA.iBW = progStatus.iBW_A;
-	FreqDispA->value( vfoA.freq );
+	if (rig_nbr != TT550) {
+		vfoA.freq = progStatus.freq_A;
+		vfoA.imode = progStatus.imode_A;
+		vfoA.iBW = progStatus.iBW_A;
+		if (vfoA.iBW == -1) vfoA.iBW = selrig->def_bandwidth(vfoA.imode);
+		FreqDispA->value( vfoA.freq );
 
-	vfoB.freq = progStatus.freq_B;
-	vfoB.imode = progStatus.imode_B;
-	vfoB.iBW = progStatus.iBW_B;
-	FreqDispB->value(vfoB.freq);
+		vfoB.freq = progStatus.freq_B;
+		vfoB.imode = progStatus.imode_B;
+		vfoB.iBW = progStatus.iBW_B;
+		if (vfoB.iBW == -1) vfoB.iBW = selrig->def_bandwidth(vfoB.imode);
+		FreqDispB->value(vfoB.freq);
 
-	if (rig_nbr == TT550) {
-		selrig->selectA();
-		selrig->set_vfoA(vfoA.freq);
-		selrig->set_modeA(vfoA.imode);
-		selrig->set_bwA(vfoA.iBW);
-	} else {
 		selrig->selectA();
 		selrig->set_vfoA(vfoA.freq);
 		selrig->set_modeA(vfoA.imode);
@@ -1888,7 +1885,6 @@ void initRig()
 		selrig->set_bwB(vfoB.iBW);
 		selrig->selectA();
 	}
-*/
 
 	// enable the serial thread
 
