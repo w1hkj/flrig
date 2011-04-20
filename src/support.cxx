@@ -674,6 +674,7 @@ void cb_selectA() {
 	useB = false;
 //	if (queA.empty()) {
 		vfoA.src = UI;
+		vfoA.freq = FreqDispA->value();
 		queA.push(vfoA);
 //	}
 	pthread_mutex_unlock(&mutex_serial);
@@ -700,6 +701,7 @@ void cb_selectB() {
 	useB = true;
 //	if (queB.empty()) {
 		vfoB.src = UI;
+		vfoB.freq = FreqDispB->value();
 		queB.push(vfoB);
 //	}
 	pthread_mutex_unlock(&mutex_serial);
