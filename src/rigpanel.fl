@@ -234,16 +234,20 @@ btnA->value(0);}
     Fl_Group opMODE {
       label Mode
       callback {setMode();} open
-      tooltip {Select transceiver operating mode} xywh {322 84 100 18} box FLAT_BOX labelsize 12 align 16
+      tooltip {Select transceiver operating mode} xywh {318 84 105 18} box FLAT_BOX labelsize 12 align 16
       code0 {\#include "combo.h"}
       class Fl_ComboBox
     } {}
     Fl_Group opBW {
-      label BW
-      callback {setBW();} open
-      tooltip {Select Transceiver Bandwidth} xywh {215 84 100 18} box FLAT_BOX labelsize 12 align 16
+      label Bandwidth
+      callback {setBW();} open selected
+      tooltip {Select Transceiver Bandwidth} xywh {212 84 105 18} box FLAT_BOX labelsize 12 align 16
       class Fl_ComboBox
     } {}
+    Fl_Counter cntK3bw {
+      callback {setBW();}
+      tooltip Bandwidth xywh {212 84 105 18} labelsize 12 align 16 minimum 50 maximum 4000 step 10 value 4000 hide
+    }
     Fl_Light_Button btnAttenuator {
       label Att
       callback {cbAttenuator();}
@@ -397,7 +401,7 @@ Function {DisplayDialog()} {open
       Fl_Group {} {open
         xywh {5 77 210 100} box DOWN_BOX
       } {
-        Fl_Group grpMeterColor {selected
+        Fl_Group grpMeterColor {
           xywh {7 79 206 96} box FLAT_BOX
         } {
           Fl_Box scaleSmeterColor {

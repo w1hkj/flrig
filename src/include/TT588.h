@@ -12,7 +12,6 @@ private:
 	double VfoAdj;
 	int    vfo_corr;
 
-	void showresponse(string s);
 public:
 	RIG_TT588();
 	~RIG_TT588(){}

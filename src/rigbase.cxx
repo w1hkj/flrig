@@ -227,3 +227,21 @@ long rigbase::fm_decimal_be(char *decimal_be, int len)
 	}
 	return fm_decimal(decimal_be, len);
 }
+
+void rigbase::showresp(int level, int how, string s) 
+{
+	string s1 = how == HEX ? str2hex(cmd.c_str(), cmd.length()) : cmd;
+	string s2 = how == HEX ? str2hex(replystr.c_str(), replystr.length()) : replystr;
+
+	switch (level) {
+	case ERR:
+		LOG_ERROR("%s : %s ==> %s", s.c_str(), s1.c_str(), s2.c_str());
+	case WARN:
+		LOG_WARN("%s : %s ==> %s", s.c_str(), s1.c_str(), s2.c_str());
+	case INFO:
+	default:
+		LOG_INFO("%s : %s ==> %s", s.c_str(), s1.c_str(), s2.c_str());
+	}
+}
+
+

@@ -9,7 +9,7 @@ private:
 	double refpwr;
 	double fwdv;
 	double refv;
-	void showresponse();
+
 public:
 	RIG_TT516();
 	~RIG_TT516(){}

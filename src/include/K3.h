@@ -40,11 +40,6 @@ public:
 
 	bool twovfos() {return true;}
 
-	void showresp(string s) {
-		LOG_WARN("%s : %s ==> %s", s.c_str(), cmd.c_str(), replystr.c_str());
-	}
-
-
 private:
 	double  minpwr;
 	double  maxpwr;
