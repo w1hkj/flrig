@@ -139,7 +139,7 @@ int sendCommand (string s, int nread)
 {
 	int numwrite = (int)s.size();
 
-	LOG_DEBUG("cmd:%3d, %s", s.length(), str2hex(s.data(), s.length()));
+	LOG_DEBUG("cmd:%3d, %s", (int)s.length(), str2hex(s.data(), s.length()));
 	if (RigSerial.IsOpen() == false)
 		return 0;
 
