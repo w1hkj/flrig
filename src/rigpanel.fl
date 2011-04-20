@@ -233,7 +233,7 @@ btnA->value(0);}
     }
     Fl_Group opMODE {
       label Mode
-      callback {setMode();} open selected
+      callback {setMode();} open
       tooltip {Select transceiver operating mode} xywh {322 84 100 18} box FLAT_BOX labelsize 12 align 16
       code0 {\#include "combo.h"}
       class Fl_ComboBox
@@ -397,7 +397,7 @@ Function {DisplayDialog()} {open
       Fl_Group {} {open
         xywh {5 77 210 100} box DOWN_BOX
       } {
-        Fl_Group grpMeterColor {open
+        Fl_Group grpMeterColor {selected
           xywh {7 79 206 96} box FLAT_BOX
         } {
           Fl_Box scaleSmeterColor {
@@ -427,30 +427,30 @@ Function {DisplayDialog()} {open
             image {images/P100.xbm} xywh {8 153 205 20} box FLAT_BOX
           }
         }
-        Fl_Button btMeterColor {
-          label Smeter
-          callback {cbSMeterColor();}
-          xywh {221 78 60 22}
-        }
-        Fl_Button btnSWRColor {
-          label SWR
-          callback {cbSWRMeterColor();}
-          xywh {221 103 60 22}
-        }
-        Fl_Button btnPwrColor {
-          label Pwr
-          callback {cbPwrMeterColor();}
-          xywh {221 128 60 22}
-        }
-        Fl_Button btnPeakColor {
-          label Peak
-          callback {cbPeakMeterColor();}
-          xywh {221 154 60 22}
-        }
+      }
+      Fl_Button btMeterColor {
+        label Smeter
+        callback {cbSMeterColor();}
+        xywh {221 78 60 22}
+      }
+      Fl_Button btnSWRColor {
+        label SWR
+        callback {cbSWRMeterColor();}
+        xywh {221 103 60 22}
+      }
+      Fl_Button btnPwrColor {
+        label Pwr
+        callback {cbPwrMeterColor();}
+        xywh {221 128 60 22}
+      }
+      Fl_Button btnPeakColor {
+        label Peak
+        callback {cbPeakMeterColor();}
+        xywh {221 154 60 22}
       }
     }
     Fl_Group {} {
-      label System open
+      label System
       xywh {220 2 202 70} box ENGRAVED_FRAME align 21
     } {
       Fl_Choice mnuScheme {
@@ -484,7 +484,7 @@ Fl::scheme(progStatus.ui_scheme.c_str());} open
         tooltip {Background - selected} xywh {356 21 60 22}
       }
     }
-    Fl_Group {} {open
+    Fl_Group {} {
       xywh {287 122 134 88} box ENGRAVED_FRAME
     } {
       Fl_Value_Slider sldrColors {
@@ -576,7 +576,7 @@ selectFreq();}
 Function {XcvrDialog()} {} {
   Fl_Window {} {
     label {I/O Ports} open
-    xywh {572 674 482 257} type Double visible
+    xywh {572 674 482 257} type Double hide
   } {
     Fl_Tabs {} {open
       xywh {0 8 477 245}

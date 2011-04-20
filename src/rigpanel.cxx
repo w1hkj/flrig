@@ -1023,20 +1023,20 @@ Fl_Double_Window* DisplayDialog() {
           } // Fl_Box* scalePWRcolor
           grpMeterColor->end();
         } // Fl_Group* grpMeterColor
-        { btMeterColor = new Fl_Button(221, 78, 60, 22, _("Smeter"));
-          btMeterColor->callback((Fl_Callback*)cb_btMeterColor);
-        } // Fl_Button* btMeterColor
-        { btnSWRColor = new Fl_Button(221, 103, 60, 22, _("SWR"));
-          btnSWRColor->callback((Fl_Callback*)cb_btnSWRColor);
-        } // Fl_Button* btnSWRColor
-        { btnPwrColor = new Fl_Button(221, 128, 60, 22, _("Pwr"));
-          btnPwrColor->callback((Fl_Callback*)cb_btnPwrColor);
-        } // Fl_Button* btnPwrColor
-        { btnPeakColor = new Fl_Button(221, 154, 60, 22, _("Peak"));
-          btnPeakColor->callback((Fl_Callback*)cb_btnPeakColor);
-        } // Fl_Button* btnPeakColor
         o->end();
       } // Fl_Group* o
+      { btMeterColor = new Fl_Button(221, 78, 60, 22, _("Smeter"));
+        btMeterColor->callback((Fl_Callback*)cb_btMeterColor);
+      } // Fl_Button* btMeterColor
+      { btnSWRColor = new Fl_Button(221, 103, 60, 22, _("SWR"));
+        btnSWRColor->callback((Fl_Callback*)cb_btnSWRColor);
+      } // Fl_Button* btnSWRColor
+      { btnPwrColor = new Fl_Button(221, 128, 60, 22, _("Pwr"));
+        btnPwrColor->callback((Fl_Callback*)cb_btnPwrColor);
+      } // Fl_Button* btnPwrColor
+      { btnPeakColor = new Fl_Button(221, 154, 60, 22, _("Peak"));
+        btnPeakColor->callback((Fl_Callback*)cb_btnPeakColor);
+      } // Fl_Button* btnPeakColor
       o->end();
     } // Fl_Group* o
     { Fl_Group* o = new Fl_Group(220, 2, 202, 70, _("System"));
