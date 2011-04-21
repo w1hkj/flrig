@@ -20,13 +20,11 @@ static const char K3_mode_type[] =
 
 static int def_mode_width[] = { 3000, 3000, 800, 3600, 3600, 3000, 800, 3000 };
 
-const char *K3_widths[] = { NULL };
-
 RIG_K3::RIG_K3() {
 // base class values	
 	name_ = K3name_;
 	modes_ = K3modes_;
-	bandwidths_ = NULL;
+	bandwidths_ = NULL;//szNOBWS;
 	comm_baudrate = BR38400;
 	stopbits = 1;
 	comm_retries = 2;
@@ -86,7 +84,9 @@ void RIG_K3::initialize()
 	MilliSleep(100);
 	showresp(WARN, ASC, "1 Hz fine tune mode");
 
-	cmd = "OM;"; // request options
+	set_split(false); // normal ops
+
+	cmd = "OM;"; // request options to get power level
 	sendCommand(cmd);
 	MilliSleep(50);
 	showresp(WARN, ASC, "options");
@@ -104,6 +104,10 @@ void RIG_K3::initialize()
 	bwA = 19;
 	modeB = 1;
 	bwB = 19;
+}
+
+void RIG_K3::shutdown()
+{
 }
 
 long RIG_K3::get_vfoA ()
@@ -402,5 +406,23 @@ int RIG_K3::get_power_out()
 	int mtr = atoi(&replystr[p + 2]) * 10;
 	if (mtr > 100) mtr = 100;
 	return mtr;
+}
+
+bool RIG_K3::can_split()
+{
+	return true;
+}
+
+void RIG_K3::set_split(bool val)
+{
+	if (val) {
+		cmd = "FT1;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set split ON");
+	} else {
+		cmd = "FR0;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set split OFF");
+	}
 }
 

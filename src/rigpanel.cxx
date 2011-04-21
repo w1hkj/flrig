@@ -6,6 +6,7 @@
 #include "rig.h"
 #include "status.h"
 #include "support.h"
+#include "K3_ui.h"
 
 static void cb_mnuExit(Fl_Menu_*, void*) {
   cbExit();
@@ -176,6 +177,12 @@ static void cb_btnB(Fl_Light_Button*, void*) {
 	cb_selectB();
 btnB->value(1);
 btnA->value(0);
+}
+
+Fl_Button *btn_K3_swapAB=(Fl_Button *)0;
+
+static void cb_btn_K3_swapAB(Fl_Button*, void*) {
+  cb_K3_swapAB();
 }
 
 Fl_Button *btnA2B=(Fl_Button *)0;
@@ -599,6 +606,13 @@ Fl_Double_Window* Rig_window() {
       btnB->callback((Fl_Callback*)cb_btnB);
       o->value(useB);
     } // Fl_Light_Button* btnB
+    { btn_K3_swapAB = new Fl_Button(265, 62, 52, 20, _("A/B"));
+      btn_K3_swapAB->tooltip(_("Copy A to B"));
+      btn_K3_swapAB->down_box(FL_DOWN_BOX);
+      btn_K3_swapAB->labelsize(12);
+      btn_K3_swapAB->callback((Fl_Callback*)cb_btn_K3_swapAB);
+      btn_K3_swapAB->hide();
+    } // Fl_Button* btn_K3_swapAB
     { btnA2B = new Fl_Button(318, 62, 52, 20, _("A -> B"));
       btnA2B->tooltip(_("Copy A to B"));
       btnA2B->down_box(FL_DOWN_BOX);
