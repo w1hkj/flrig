@@ -38,7 +38,11 @@ public:
 	int  adjust_bandwidth(int m);
 	int  def_bandwidth(int m);
 
+	bool can_split();
+	void set_split(bool val);
 	bool twovfos() {return true;}
+
+	void shutdown();
 
 private:
 	double  minpwr;

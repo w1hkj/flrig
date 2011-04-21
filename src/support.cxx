@@ -20,6 +20,7 @@
 #include "xml_io.h"
 
 #include "rigs.h"
+#include "K3_ui.h"
 
 using namespace std;
 
@@ -88,6 +89,7 @@ char *print(FREQMODE data)
 // read any data stream sent by transceiver
 
 // read current vfo frequency
+
 void read_vfo()
 {
 // transceiver changed ?
@@ -329,8 +331,9 @@ end_serviceA:
 
 void serviceB()
 {
-	if ((rig_nbr != TT550) && !useB)
-		return;
+	if (rig_nbr != K3 && rig_nbr != TT550)
+		if (!useB)
+			return;
 
 	if (queB.empty()) 
 		return;
@@ -350,8 +353,8 @@ void serviceB()
 		changed_vfo = false;
 	}
 
-// if TT550 and split or on vfoA just update the B vfo
-	if ((rig_nbr == TT550) && !useB) {
+// if TT550 or K3 and split or on vfoA just update the B vfo
+	if ((rig_nbr == TT550 || rig_nbr == K3) && !useB) {
 		selrig->set_vfoB(vfoB.freq);
 		goto end_serviceB;
 	}
@@ -432,18 +435,21 @@ void * serial_thread_loop(void *d)
 			resetxmt = true;
 
 			if (!loopcount--) {
-				read_smeter();
-				read_vfo();
-				read_mode();
-				read_bandwidth();
-//				read_volume();
-//				read_notch();
-//				read_ifshift();
-//				read_power_control();
-//				read_preamp_att();
-//				read_mic_gain();
-//				read_squelch();
-//				read_rfgain();
+				if (rig_nbr == K3) read_K3();
+				else {
+					read_smeter();
+					read_vfo();
+					read_mode();
+					read_bandwidth();
+//					read_volume();
+//					read_notch();
+//					read_ifshift();
+//					read_power_control();
+//					read_preamp_att();
+//					read_mic_gain();
+//					read_squelch();
+//					read_rfgain();
+				}
 				loopcount = progStatus.serloop_timing / 10;
 			}
 		} else {
@@ -628,6 +634,10 @@ int movFreqB() {
 
 void cbA2B()
 {
+	if (rig_nbr == K3) {
+		K3_A2B();
+		return;
+	}
 	queB.push(vfoA);
 	FreqDispB->value(vfoA.freq);
 	FreqDispB->redraw();
@@ -637,6 +647,10 @@ void cbA2B()
 
 void cb_set_split(int val)
 {
+	if (rig_nbr == K3) {
+		K3_set_split(val);
+		return;
+	}
 	if (val) {
 		if (useB) {
 			btnA->value(1);
@@ -1563,6 +1577,7 @@ void initRig()
 
 	rigbws_.clear();
 	if (rig_nbr != K3) {
+		opBW->show();
 		opBW->clear();
 		if (selrig->has_bandwidth_control) {
 			old_bws = selrig->bandwidths_;
@@ -1907,7 +1922,22 @@ void initRig()
 //	bypass_digi_loop = false;
 	pthread_mutex_unlock(&mutex_xmlrpc);
 
-	cb_selectA();
+	if (rig_nbr != K3)
+		cb_selectA();
+
+	if (rig_nbr == K3) {
+//		FreqDispB->deactivate();
+		btnB->hide();
+		btnA->hide();
+		btn_K3_swapAB->show();
+//		btnA2B->hide();
+	} else {
+//		FreqDispB->activate();
+		btn_K3_swapAB->hide();
+		btnB->show();
+		btnA->show();
+//		btnA2B->show();
+	}
 
 	setFocus();
 }

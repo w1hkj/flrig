@@ -13,6 +13,9 @@ decl {\#include "status.h"} {}
 
 decl {\#include "support.h"} {} 
 
+decl {\#include "K3_ui.h"} {selected
+} 
+
 Function {Rig_window()} {open
 } {
   Fl_Window {} {
@@ -220,6 +223,11 @@ btnA->value(0);}
       tooltip {Rx-A / Tx-B} xywh {265 62 52 20} down_box THIN_DOWN_BOX labelsize 12
       code0 {o->value(useB);}
     }
+    Fl_Button btn_K3_swapAB {
+      label {A/B}
+      callback {cb_K3_swapAB();}
+      tooltip {Copy A to B} xywh {265 62 52 20} down_box DOWN_BOX labelsize 12 hide
+    }
     Fl_Button btnA2B {
       label {A -> B}
       callback {cbA2B();}
@@ -240,7 +248,7 @@ btnA->value(0);}
     } {}
     Fl_Group opBW {
       label Bandwidth
-      callback {setBW();} open selected
+      callback {setBW();} open
       tooltip {Select Transceiver Bandwidth} xywh {212 84 105 18} box FLAT_BOX labelsize 12 align 16
       class Fl_ComboBox
     } {}

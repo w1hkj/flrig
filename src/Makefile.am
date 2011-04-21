@@ -124,6 +124,7 @@ flrig_SOURCES += \
 	font_browser.cxx \
 	FreqControl.cxx \
 	images.cxx \
+	K3_ui.cxx \
 	ptt.cxx \
 	rig.cxx \
 	rig_io.cxx \
@@ -249,6 +250,7 @@ EXTRA_DIST = \
 	include/images.h \
 	include/K2.h \
 	include/K3.h \
+	include/K3_ui.h \
 	include/RAY152.h \
 	include/mingw.h \
 	include/ptt.h \
