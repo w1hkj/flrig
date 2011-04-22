@@ -86,7 +86,7 @@ void debug::start(const char* filename)
 		return;
 	inst = new debug(filename);
 
-	window = new Fl_Double_Window(500, 256, _("Event log"));
+	window = new Fl_Double_Window(600, 256, _("Event log"));
 
 	int pad = 2;
 	Fl_Menu_Button* button = new Fl_Menu_Button(pad, pad, 128, 20, _("Log sources"));
@@ -144,29 +144,35 @@ void debug::log(level_e level, const char* func, const char* srcf, int line, con
 	va_list args;
 	va_start(args, format);
 
-//	intptr_t nw = vfprintf(wfile, fmt, args);
+	vsnprintf(sztemp, sizeof(sztemp), fmt, args);
+	estr.append(sztemp);
+
+	va_end(args);
+
+	fflush(wfile);
+
+    Fl::awake(sync_text, 0);
+}
+
+void debug::slog(level_e level, const char* func, const char* srcf, int line, const char* format, ...)
+{
+	if (!inst)
+		return;
+
+	snprintf(fmt, sizeof(fmt), "%c:%s\n", *prefix[level], format);
+
+    while(debug_in_use) MilliSleep(1);
+    
+	va_list args;
+	va_start(args, format);
 
 	vsnprintf(sztemp, sizeof(sztemp), fmt, args);
 	estr.append(sztemp);
 
 	va_end(args);
-/*
-#ifndef __WIN32__
-	if (tty) {
-		if (level <= DEBUG_LEVEL && level > QUIET_LEVEL) {
-			va_start(args, format);
-			vfprintf(stderr, fmt, args);
-			va_end(args);
-		}
-	}
-#else
-*/
 	fflush(wfile);
-//#endif
 
     Fl::awake(sync_text, 0);
-
-//	Fl::add_timeout(0.0, sync_text, (void*)nw);
 }
 
 void debug::elog(const char* func, const char* srcf, int line, const char* text)
@@ -179,25 +185,8 @@ void debug::show(void)
 	window->show();
 }
 
-//static char buf[BUFSIZ+1];
-
 void debug::sync_text(void* arg)
 {
-/*
-	intptr_t toread = (intptr_t)arg;
-	size_t block = MIN((size_t)toread, sizeof(buf) - 1);
-	ssize_t n;
-    string tempbuf;
-
-	while (toread > 0) {
-		if ((n = read(rfd, buf, block)) <= 0)
-			break;
-		buf[n] = '\0';
-		tempbuf.append(buf);
-		toread -= n;
-	}
-	text->insert(tempbuf.c_str());
-*/
     debug_in_use = true;
     text->insert(estr.c_str());
     estr = "";

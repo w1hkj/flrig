@@ -78,8 +78,7 @@ void RIG_FT100D::selectA()
 	init_cmd();
 	cmd[4] = 0x05;
 	sendCommand(cmd, 0);
-if (RIG_DEBUG)
-	LOG_INFO("%s", str2hex(cmd.c_str(), 5));
+	showresp(WARN, HEX, "select A");
 }
 
 void RIG_FT100D::selectB()
@@ -88,8 +87,7 @@ void RIG_FT100D::selectB()
 	cmd[3] = 0x01;
 	cmd[4] = 0x05;
 	sendCommand(cmd, 0);
-if (RIG_DEBUG)
-	LOG_INFO("%s", str2hex(cmd.c_str(), 5));
+	showresp(WARN, HEX, "select B");
 }
 
 void RIG_FT100D::set_split(bool val)
@@ -99,8 +97,10 @@ void RIG_FT100D::set_split(bool val)
 	cmd[3] = val ? 0x01 : 0x00;
 	cmd[4] = 0x01;
 	sendCommand(cmd, 0);
-if (RIG_DEBUG)
-	LOG_INFO("%s", str2hex(cmd.c_str(), 5));
+	if (val)
+		showresp(WARN, HEX, "set split ON");
+	else
+		showresp(WARN, HEX, "set split OFF");
 }
 
 
@@ -109,8 +109,7 @@ bool RIG_FT100D::get_info()
 	init_cmd();
 	cmd[4] = 0x10;
 	int ret = sendCommand(cmd);
-if (RIG_DEBUG)
-	LOG_INFO("%s", str2hex(replybuff, ret));
+	showresp(WARN, HEX, "info");
 
 	if (ret >= 32) {
 		afreq = 0;
@@ -143,7 +142,7 @@ void RIG_FT100D::set_vfoA (long freq)
 	cmd = to_bcd_be(freq, 8);
 	cmd += 0x0A;
 	sendCommand(cmd, 0);
-LOG_WARN("%s", str2hex(cmd.c_str(), 5));
+	showresp(WARN, HEX, "set freq A");
 }
 
 int RIG_FT100D::get_modeA()
@@ -158,7 +157,7 @@ void RIG_FT100D::set_modeA(int val)
 	cmd[3] = FT100D_mode_val[val];
 	cmd[4] = 0x0C;
 	sendCommand(cmd, 0);
-LOG_WARN("%s", str2hex(cmd.c_str(), 5));
+	showresp(WARN, HEX, "set mode A");
 }
 
 void RIG_FT100D::set_bwA (int val)
@@ -168,7 +167,7 @@ void RIG_FT100D::set_bwA (int val)
 	cmd[3] = FT100D_bw_val[val];
 	cmd[4] = 0x8C;
 	sendCommand(cmd, 0);
-LOG_WARN("%s", str2hex(cmd.c_str(), 5));
+	showresp(WARN, HEX, "set BW A");
 }
 
 int RIG_FT100D::get_bwA()
@@ -193,7 +192,7 @@ void RIG_FT100D::set_vfoB(long freq)
 	cmd = to_bcd_be(freq, 8);
 	cmd += 0x0A;
 	sendCommand(cmd, 0);
-LOG_WARN("%s", str2hex(cmd.c_str(), 5));
+	showresp(WARN, HEX, "set freq B");
 }
 
 void RIG_FT100D::set_modeB(int val)
@@ -203,7 +202,7 @@ void RIG_FT100D::set_modeB(int val)
 	cmd[3] = FT100D_mode_val[val];
 	cmd[4] = 0x0C;
 	sendCommand(cmd, 0);
-LOG_WARN("%s", str2hex(cmd.c_str(), 5));
+	showresp(WARN, HEX, "set mode B");
 }
 
 int  RIG_FT100D::get_modeB()
@@ -218,7 +217,7 @@ void RIG_FT100D::set_bwB(int val)
 	cmd[3] = FT100D_bw_val[val];
 	cmd[4] = 0x8C;
 	sendCommand(cmd, 0);
-LOG_WARN("%s", str2hex(cmd.c_str(), 5));
+	showresp(WARN, HEX, "set bw B");
 }
 
 int  RIG_FT100D::get_bwB()
@@ -238,7 +237,10 @@ void RIG_FT100D::set_PTT_control(int val)
 	if (val) cmd[3] = 1;
 	cmd[4] = 0x0F;
 	sendCommand(cmd, 0);
-LOG_WARN("%s", str2hex(cmd.c_str(), 5));
+	if (val)
+		showresp(WARN, HEX, "set PTT ON");
+	else
+		showresp(WARN, HEX, "set PTT OFF");
 }
 
 int RIG_FT100D::get_smeter()
@@ -246,6 +248,7 @@ int RIG_FT100D::get_smeter()
 	init_cmd();
 	cmd[4] = 0xF7;
 	int ret = sendCommand(cmd, 9);
+	showresp(INFO, HEX, "S-meter");
 	if (ret < 9) return 0;
 	int sval = (200 -  (unsigned char)replybuff[ret - 9 + 3]) / 1.1;
 	if (sval < 0) sval = 0;
@@ -268,6 +271,7 @@ int RIG_FT100D::get_power_out()
 	init_cmd();
 	cmd[4] = 0xF7;
 	int ret = sendCommand(cmd);
+	showresp(INFO, HEX, "P-out");
 	if (ret < 9) return 0;
 	fwdpwr = replybuff[ret - 9 + 1] / 2.56;
 	refpwr = replybuff[ret - 9 + 2] / 2.56;
