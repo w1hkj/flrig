@@ -36,6 +36,9 @@ public:
 	static void stop(void);
 	static void log(level_e level, const char* func, const char* srcf, int line,
 			const char* format, ...) format__(printf, 5, 6);
+	static void slog(level_e level, const char* func, const char* srcf, int line,
+			const char* format, ...) format__(printf, 5, 6);
+
 	static void elog(const char* func, const char* srcf, int line, const char* text);
 	static void show(void);
 	static level_e level;
@@ -60,6 +63,18 @@ private:
 #define LOG_WARN(...) LOG(debug::WARN_LEVEL, log_source_, __VA_ARGS__)
 #define LOG_ERROR(...) LOG(debug::ERROR_LEVEL, log_source_, __VA_ARGS__)
 #define LOG_QUIET(...) LOG(debug::QUIET_LEVEL, log_source_, __VA_ARGS__)
+
+#define SLOG(level__, source__, ...)							\
+	do {										\
+		if (level__ <= debug::level && source__ & debug::mask)			\
+			debug::slog(level__, __func__, __FILE__, __LINE__, __VA_ARGS__); \
+	} while (0)
+
+#define SLOG_DEBUG(...) SLOG(debug::DEBUG_LEVEL, log_source_, __VA_ARGS__)
+#define SLOG_INFO(...) SLOG(debug::INFO_LEVEL, log_source_, __VA_ARGS__)
+#define SLOG_WARN(...) SLOG(debug::WARN_LEVEL, log_source_, __VA_ARGS__)
+#define SLOG_ERROR(...) SLOG(debug::ERROR_LEVEL, log_source_, __VA_ARGS__)
+#define SLOG_QUIET(...) SLOG(debug::QUIET_LEVEL, log_source_, __VA_ARGS__)
 
 #define LOG_PERROR(msg__)								\
 	do {										\

@@ -1543,7 +1543,7 @@ void initRig()
 		transceiverB.freq = selrig->get_vfoB();
 		transceiverB.imode = selrig->get_modeB();
 		transceiverB.iBW = selrig->get_bwB();
-		selrig->selectA();
+//		selrig->selectA();
 	}
 
 	if (selrig->restore_mbw) selrig->last_bw = transceiverA.iBW;
@@ -1922,8 +1922,8 @@ void initRig()
 //	bypass_digi_loop = false;
 	pthread_mutex_unlock(&mutex_xmlrpc);
 
-	if (rig_nbr != K3)
-		cb_selectA();
+//	if (rig_nbr != K3)
+//		cb_selectA();
 
 	if (rig_nbr == K3) {
 //		FreqDispB->deactivate();

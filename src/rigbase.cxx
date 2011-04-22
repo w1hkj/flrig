@@ -3,6 +3,7 @@
 #include "debug.h"
 #include "rig_io.h"
 
+
 const char *szNORIG = "NONE";
 const char *szNOMODES[] = {"LSB", "USB", NULL};
 const char *szNOBWS[] = {"NONE", NULL};
@@ -235,12 +236,14 @@ void rigbase::showresp(int level, int how, string s)
 
 	switch (level) {
 	case ERR:
-		LOG_ERROR("%s : %s ==> %s", s.c_str(), s1.c_str(), s2.c_str());
+		SLOG_ERROR("%10s : cmd %s : ans %s", s.c_str(), s1.c_str(), s2.c_str());
+		break;
 	case WARN:
-		LOG_WARN("%s : %s ==> %s", s.c_str(), s1.c_str(), s2.c_str());
+		SLOG_WARN("%10s : cmd %s : ans %s", s.c_str(), s1.c_str(), s2.c_str());
+		break;
 	case INFO:
 	default:
-		LOG_INFO("%s : %s ==> %s", s.c_str(), s1.c_str(), s2.c_str());
+		SLOG_INFO("%10s : cmd %s : ans %s", s.c_str(), s1.c_str(), s2.c_str());
 	}
 }
 
