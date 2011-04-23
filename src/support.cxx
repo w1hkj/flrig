@@ -1211,17 +1211,18 @@ void cbExit()
 
 	progStatus.rig_nbr = rig_nbr;
 
-	progStatus.freq_A = FreqDispA->value();//vfoA.freq;
+	progStatus.freq_A = vfoA.freq;
 	progStatus.imode_A = vfoA.imode;
 	progStatus.iBW_A = vfoA.iBW;
 
-	progStatus.freq_B = FreqDispB->value();//vfoB.freq;
+	progStatus.freq_B = vfoB.freq;
 	progStatus.imode_B = vfoB.imode;
 	progStatus.iBW_B = vfoB.iBW;
 
 	progStatus.spkr_on = btnVol->value();
 	progStatus.volume = sldrVOLUME->value();
 	progStatus.power_level = sldrPOWER->value();
+	progStatus.rfgain = sldrRFGAIN->value();
 	progStatus.mic_gain = sldrMICGAIN->value();
 	progStatus.notch = btnNotch->value();
 	progStatus.notch_val = sldrNOTCH->value();
@@ -1543,7 +1544,6 @@ void initRig()
 		transceiverB.freq = selrig->get_vfoB();
 		transceiverB.imode = selrig->get_modeB();
 		transceiverB.iBW = selrig->get_bwB();
-//		selrig->selectA();
 	}
 
 	if (selrig->restore_mbw) selrig->last_bw = transceiverA.iBW;
@@ -1682,16 +1682,18 @@ void initRig()
 	}
 
 	if (selrig->has_rf_control) {
-		sldrRFGAIN->value(
-			progStatus.rfgain = selrig->get_rf_gain());
+		progStatus.rfgain = selrig->get_rf_gain();
+		sldrRFGAIN->value(progStatus.rfgain);
+		selrig->set_rf_gain(progStatus.rfgain);
 		sldrRFGAIN->show();
 	} else {
 		sldrRFGAIN->hide();
 	}
 
 	if (selrig->has_sql_control) {
-		sldrSQUELCH->value(
-			progStatus.squelch = selrig->get_squelch());
+		progStatus.squelch = selrig->get_squelch();
+		sldrSQUELCH->value(progStatus.squelch);
+		selrig->set_squelch(progStatus.squelch);
 		sldrSQUELCH->show();
 	} else {
 		sldrSQUELCH->hide();
@@ -1699,9 +1701,13 @@ void initRig()
 
 	if (selrig->has_noise_reduction_control) {
 		btnNR->show();
+		progStatus.noise_reduction = selrig->get_noise_reduction();
+		progStatus.noise_reduction_val = selrig->get_noise_reduction_val();
 		btnNR->value(progStatus.noise_reduction);
 		sldrNR->show();
 		sldrNR->value(progStatus.noise_reduction_val);
+		selrig->set_noise_reduction(progStatus.noise_reduction);
+		selrig->set_noise_reduction_val(progStatus.noise_reduction_val);
 	} else {
 		btnNR->hide();
 		sldrNR->hide();

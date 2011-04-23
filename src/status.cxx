@@ -71,7 +71,7 @@ status progStatus = {
 	0,			// int  notch_val;
 	false,		// bool shift;
 	0,			// int  shift_val;
-	10,			// int  rfgain;
+	100,		// int  rfgain;
 	10,			// int  squelch;
 	
 	0,			// int  line_out;
