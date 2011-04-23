@@ -34,6 +34,17 @@ public:
 	void set_preamp(int val);
 	int  get_preamp();
 
+	void set_volume_control(int val);
+	int  get_volume_control();
+	void get_vol_min_max_step(int &min, int &max, int &step);
+	void set_rf_gain(int val);
+	int  get_rf_gain();
+	void set_squelch(int val);
+	void set_power_control(double val);
+	int  get_power_control();
+
+	int  get_auto_notch();
+
 	void set_auto_notch(int v);
 	void set_split(bool v);
 

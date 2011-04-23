@@ -48,7 +48,9 @@ public:
 	void set_rf_gain(int val);
 	int  get_rf_gain();
 	void set_squelch(int val);
+	int  get_squelch();
 	void set_power_control(double val);
+	int  get_power_control();
 	void set_mic_gain(int val);
 	int  adjust_bandwidth(int m);
 	int  def_bandwidth(int m);
@@ -59,6 +61,9 @@ public:
 	void set_split(bool);
 	bool can_split() { return true; }
 	const char **bwtable(int);
+
+	void tune_rig();
+
 
 protected:
 	int  filter_nbr;
