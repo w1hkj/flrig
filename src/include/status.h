@@ -40,6 +40,22 @@ struct status {
 	int		CIV;
 	bool	USBaudio;
 
+	bool	poll_smeter;
+	bool	poll_frequency;
+	bool	poll_mode;
+	bool	poll_bandwidth;
+	bool	poll_volume;
+	bool	poll_auto_notch;
+	bool	poll_ifshift;
+	bool	poll_power_control;
+	bool	poll_pre_att;
+	bool	poll_micgain;
+	bool	poll_squelch;
+	bool	poll_rfgain;
+	bool	poll_pout;
+	bool	poll_swr;
+	bool	poll_alc;
+
 	int		iBW_A;
 	int		imode_A;
 	int		freq_A;

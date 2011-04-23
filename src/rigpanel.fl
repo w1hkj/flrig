@@ -13,11 +13,9 @@ decl {\#include "status.h"} {}
 
 decl {\#include "support.h"} {} 
 
-decl {\#include "K3_ui.h"} {selected
-} 
+decl {\#include "K3_ui.h"} {} 
 
-Function {Rig_window()} {open
-} {
+Function {Rig_window()} {} {
   Fl_Window {} {
     label Flrig open
     xywh {577 57 424 330} type Double align 80
@@ -370,11 +368,10 @@ Please wait}
   }
 } 
 
-Function {DisplayDialog()} {open
-} {
+Function {DisplayDialog()} {} {
   Fl_Window {} {
     label {Flrig Colors} open
-    xywh {577 415 424 213} type Double visible
+    xywh {577 415 424 213} type Double hide
   } {
     Fl_Group {} {open
       xywh {2 2 218 70} box ENGRAVED_FRAME
@@ -585,16 +582,17 @@ selectFreq();}
   }
 } 
 
-Function {XcvrDialog()} {} {
+Function {XcvrDialog()} {open
+} {
   Fl_Window {} {
     label {I/O Ports} open
-    xywh {572 674 482 257} type Double hide
+    xywh {577 419 482 257} type Double visible
   } {
     Fl_Tabs {} {open
       xywh {0 8 477 245}
     } {
       Fl_Group {} {
-        label Primary open
+        label Primary selected
         xywh {2 30 475 222}
       } {
         Fl_Group {} {open
@@ -838,6 +836,111 @@ btnOkXcvrDialog->redraw();} open
           label {Use only if your setup requires a separate
 Serial Port for a special Control Signals}
           xywh {55 84 395 37}
+        }
+      }
+      Fl_Group {} {
+        label Polling open
+        xywh {2 30 470 220} hide
+      } {
+        Fl_Group {} {
+          label Meters open
+          xywh {6 36 464 79} box ENGRAVED_BOX align 21
+        } {
+          Fl_Check_Button btn_poll_smeter {
+            label {S meter}
+            callback {progStatus.poll_smeter = o->value();}
+            xywh {39 61 104 15} down_box DOWN_BOX value 1
+            code0 {o->value(progStatus.poll_smeter);}
+          }
+          Fl_Check_Button btn_poll_pout {
+            label {Power out}
+            callback {progStatus.poll_pout = o->value();}
+            xywh {172 61 104 15} down_box DOWN_BOX value 1
+            code0 {o->value(progStatus.poll_pout);}
+          }
+          Fl_Check_Button btn_poll_swr {
+            label SWR
+            callback {progStatus.poll_swr = o->value();}
+            xywh {172 88 104 15} down_box DOWN_BOX value 1
+            code0 {o->value(progStatus.poll_swr);}
+          }
+          Fl_Check_Button btn_poll_alc {
+            label ALC
+            callback {progStatus.poll_alc = o->value();}
+            xywh {302 61 104 15} down_box DOWN_BOX value 1
+            code0 {o->value(progStatus.poll_alc);}
+          }
+        }
+        Fl_Group {} {
+          label Controls open
+          xywh {6 116 464 132} box ENGRAVED_BOX align 21
+        } {
+          Fl_Check_Button btn_poll_frequency {
+            label Frequency
+            callback {progStatus.poll_frequency = o->value();}
+            xywh {43 138 104 15} down_box DOWN_BOX value 1
+            code0 {o->value(progStatus.poll_frequency);}
+          }
+          Fl_Check_Button btn_poll_mode {
+            label Mode
+            callback {progStatus.poll_mode = o->value();}
+            xywh {43 166 104 15} down_box DOWN_BOX value 1
+            code0 {o->value(progStatus.poll_mode);}
+          }
+          Fl_Check_Button btn_poll_bandwidth {
+            label Bandwidth
+            callback {progStatus.poll_bandwidth = o->value();}
+            xywh {43 194 104 15} down_box DOWN_BOX value 1
+            code0 {o->value(progStatus.poll_bandwidth);}
+          }
+          Fl_Check_Button btn_poll_volume {
+            label Volume
+            callback {progStatus.poll_volume = o->value();}
+            xywh {172 138 104 15} down_box DOWN_BOX
+            code0 {o->value(progStatus.poll_volume);}
+          }
+          Fl_Check_Button btn_poll_auto_notch {
+            label {Auto Notch}
+            callback {progStatus.poll_auto_notch = o->value();}
+            xywh {172 166 104 15} down_box DOWN_BOX
+            code0 {o->value(progStatus.poll_auto_notch);}
+          }
+          Fl_Check_Button btn_poll_ifshift {
+            label {IF shift}
+            callback {progStatus.poll_ifshift = o->value();}
+            xywh {172 194 104 15} down_box DOWN_BOX
+            code0 {o->value(progStatus.poll_ifshift);}
+          }
+          Fl_Check_Button btn_poll_power_control {
+            label {Power control}
+            callback {progStatus.poll_power_control = o->value();}
+            xywh {172 221 104 15} down_box DOWN_BOX
+            code0 {o->value(progStatus.poll_power_control);}
+          }
+          Fl_Check_Button btn_poll_pre_att {
+            label {Preamp / Attenuator}
+            callback {progStatus.poll_pre_att = o->value();}
+            xywh {302 138 104 15} down_box DOWN_BOX
+            code0 {o->value(progStatus.poll_pre_att);}
+          }
+          Fl_Check_Button btn_poll_micgain {
+            label {Mic gain}
+            callback {progStatus.poll_micgain = o->value();}
+            xywh {302 166 104 15} down_box DOWN_BOX
+            code0 {o->value(progStatus.poll_micgain);}
+          }
+          Fl_Check_Button btn_poll_squelch {
+            label Squelch
+            callback {progStatus.poll_squelch = o->value();}
+            xywh {302 194 104 15} down_box DOWN_BOX
+            code0 {o->value(progStatus.poll_squelch);}
+          }
+          Fl_Check_Button btn_poll_rfgain {
+            label {RF gain}
+            callback {progStatus.poll_rfgain = o->value();}
+            xywh {302 221 104 15} down_box DOWN_BOX
+            code0 {o->value(progStatus.poll_rfgain);}
+          }
         }
       }
     }
