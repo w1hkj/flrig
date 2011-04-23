@@ -67,42 +67,42 @@ RIG_TS480HX::RIG_TS480HX() {
 
 void RIG_TS480HX::initialize()
 {
-	selectA();
 	cmd = "AC000;"; 
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 	MilliSleep(100);
-	readResponse();
-LOG_WARN("%s", replystr.c_str());
+	showresp(WARN, ASC, "rx/tx set");
+
 	cmd = "EX04500001;"; // set bandwidth controls for data modes
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 	MilliSleep(100);
-	readResponse();
-LOG_WARN("%s", replystr.c_str());
+	showresp(WARN, ASC, "data modes");
+
 	cmd = "SH01"; // set center frequency to 1500
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 	MilliSleep(100);
-	readResponse();
-LOG_WARN("%s", replystr.c_str());
+	showresp(WARN, ASC, "cfreq 1500");
+
+	selectA();
 }
 
 void RIG_TS480HX::selectA()
 {
 	cmd = "FR0;";
 	sendCommand(cmd);
-LOG_WARN("%s", replystr.c_str());
+	showresp(WARN, ASC, "Rx A");
 	cmd = "FT0;";
 	sendCommand(cmd);
-LOG_WARN("%s", replystr.c_str());
+	showresp(WARN, ASC, "Tx A");
 }
 
 void RIG_TS480HX::selectB()
 {
 	cmd = "FR1;";
 	sendCommand(cmd);
-LOG_WARN("%s", replystr.c_str());
+	showresp(WARN, ASC, "Rx B");
 	cmd = "FT1;";
 	sendCommand(cmd);
-LOG_WARN("%s", replystr.c_str());
+	showresp(WARN, ASC, "Tx B");
 }
 
 void RIG_TS480HX::set_split(bool val) 
@@ -111,17 +111,17 @@ void RIG_TS480HX::set_split(bool val)
 	if (val) {
 		cmd = "FR0;";
 		sendCommand(cmd);
-LOG_WARN("%s", replystr.c_str());
+		showresp(WARN, ASC, "Rx A");
 		cmd = "FT1;";
 		sendCommand(cmd);
-LOG_WARN("%s", replystr.c_str());
+		showresp(WARN, ASC, "Tx B");
 	} else {
 		cmd = "FR0;";
 		sendCommand(cmd);
-LOG_WARN("%s", replystr.c_str());
+		showresp(WARN, ASC, "Rx A");
 		cmd = "FT0;";
 		sendCommand(cmd);
-LOG_WARN("%s", replystr.c_str());
+		showresp(WARN, ASC, "Tx A");
 	}
 }
 
@@ -129,6 +129,7 @@ long RIG_TS480HX::get_vfoA ()
 {
 	cmd = "FA;";
 	int ret = sendCommand(cmd);
+	showresp(WARN, ASC, "get vfo A");
 	if (ret < 14) return freqA;
 	size_t p = replystr.rfind("FA");
 	if (p == string::npos) return freqA;
@@ -149,13 +150,15 @@ void RIG_TS480HX::set_vfoA (long freq)
 		freq /= 10;
 	}
 	LOG_WARN("%s", cmd.c_str());
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set vfo A");
 }
 
 long RIG_TS480HX::get_vfoB ()
 {
 	cmd = "FB;";
 	int ret = sendCommand(cmd);
+	showresp(WARN, ASC, "get vfo B");
 	if (ret < 14) return B.freq;
 	size_t p = replystr.rfind("FB");
 	if (p == string::npos); return B.freq;
@@ -180,7 +183,8 @@ void RIG_TS480HX::set_vfoB (long freq)
 		freq /= 10;
 	}
 	LOG_WARN("%s", cmd.c_str());
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set vfo B");
 }
 
 // SM cmd 0 ... 100 (rig values 0 ... 15)
@@ -188,6 +192,7 @@ int RIG_TS480HX::get_smeter()
 {
 	cmd = "SM0;";
 	int ret = sendCommand(cmd);
+	showresp(WARN, ASC, "get s-meter");
 	if (ret < 8) return 0;
 
 	size_t p = replystr.rfind("SM");
@@ -206,6 +211,7 @@ int RIG_TS480HX::get_swr()
 	int mtr = 0;
 	cmd = "RM1;"; // select measurement '1' (swr) and read meter
 	int ret = sendCommand(cmd);
+	showresp(WARN, ASC, "get swr");
 	if (ret < 8) return mtr;
 	size_t p = replystr.rfind("RM");
 	if (p == string::npos) return mtr;
@@ -224,7 +230,8 @@ void RIG_TS480HX::set_PTT_control(int val)
 	if (val)	cmd = "TX1;"; // DTS transmission using ANI input
 	else	 	cmd = "RX;";
 	LOG_WARN("%s", cmd.c_str());
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set PTT");
 }
 
 void RIG_TS480HX::set_modeA(int val)
@@ -235,12 +242,14 @@ void RIG_TS480HX::set_modeA(int val)
 	cmd += ';';
 	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd, 0);
+	showresp(WARN, ASC, "set mode A");
 }
 
 int RIG_TS480HX::get_modeA()
 {
 	cmd = "MD;";
 	int ret = sendCommand(cmd);
+	showresp(WARN, ASC, "get mode A");
 	if (ret < 4) return modeA;
 
 	size_t p = replystr.rfind("MD");
@@ -261,12 +270,14 @@ void RIG_TS480HX::set_modeB(int val)
 	cmd += ';';
 	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd, 0);
+	showresp(WARN, ASC, "set mode B");
 }
 
 int RIG_TS480HX::get_modeB()
 {
 	cmd = "MD;";
 	int ret = sendCommand(cmd);
+	showresp(WARN, ASC, "get mode B");
 	if (ret < 4) return modeB;
 
 	size_t p = replystr.rfind("MD");
@@ -291,12 +302,14 @@ void RIG_TS480HX::set_bwA(int val)
 	cmd[3] = '0' + val;
 	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd, 0);
+	showresp(WARN, ASC, "set bw A");
 }
 
 int RIG_TS480HX::get_bwA()
 {
 	cmd = "SL;";
 	int ret = sendCommand(cmd);
+	showresp(WARN, ASC, "get bw A");
 	if (ret < 5) return bwA;
 	size_t p = replystr.rfind("SL");
 	if (p == string::npos) return bwA;
@@ -315,12 +328,14 @@ void RIG_TS480HX::set_bwB(int val)
 	cmd[3] = '0' + val;
 	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd, 0);
+	showresp(WARN, ASC, "set bw B");
 }
 
 int RIG_TS480HX::get_bwB()
 {
 	cmd = "SL;";
 	int ret = sendCommand(cmd);
+	showresp(WARN, ASC, "get bw B");
 	if (ret < 5) return bwB;
 	size_t p = replystr.rfind("SL");
 	if (p == string::npos) return bwB;
@@ -347,6 +362,7 @@ void RIG_TS480HX::set_volume_control(int val)
 	cmd += ';';
 	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd, 0);
+	showresp(WARN, ASC, "set vol");
 }
 
 int RIG_TS480HX::get_volume_control()
@@ -354,6 +370,7 @@ int RIG_TS480HX::get_volume_control()
 	int val = 0;
 	cmd = "AG0";
 	int ret = sendCommand(cmd);
+	showresp(WARN, ASC, "get vol");
 	if (ret < 7) return val;
 	size_t p = replystr.rfind("AG");
 	if (p == string::npos) return val;
@@ -374,7 +391,8 @@ void RIG_TS480HX::set_power_control(double val)
 	cmd += szval;
 	cmd += ';';
 	LOG_WARN("%s", cmd.c_str());
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set power");
 }
 
 int RIG_TS480HX::get_power_control()
@@ -382,6 +400,7 @@ int RIG_TS480HX::get_power_control()
 	int val = 5;
 	cmd = "PC;";
 	int ret = sendCommand(cmd);
+	showresp(WARN, ASC, "get power");
 	if (ret < 6) return val;
 	size_t p = replystr.rfind("PC");
 	if (p == string::npos) return val;
@@ -396,13 +415,15 @@ void RIG_TS480HX::set_attenuator(int val)
 {
 	if (val)	cmd = "RA01";
 	else		cmd = "RA00";
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set att");
 }
 
 int RIG_TS480HX::get_attenuator()
 {
 	cmd = "RA;";
 	int ret = sendCommand(cmd);
+	showresp(WARN, ASC, "get att");
 	if (ret < 7) return 0;
 	size_t p = replystr.rfind("RA");
 	if (p == string::npos) return 0;
@@ -415,6 +436,7 @@ void RIG_TS480HX::tune_rig()
 {
 	cmd = "AC111;";
 	LOG_WARN("%s", cmd.c_str());
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "tune");
 }
 
