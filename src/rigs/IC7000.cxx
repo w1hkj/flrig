@@ -461,6 +461,33 @@ int RIG_IC7000::get_rf_gain()
 	return progStatus.rfgain;
 }
 
+void RIG_IC7000::set_squelch(int val)
+{
+	int ICsql = (int)(val * 255 / 100);
+	cmd = pre_to;
+	cmd.append("\x14\x03");
+	cmd.append(to_bcd(ICsql, 3));
+	cmd.append( post );
+	sendICcommand (cmd, 6);
+	showresp(WARN, HEX, "set Sqlch");
+}
+
+int  RIG_IC7000::get_squelch()
+{
+	string cstr = "\x14\x03";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append(post);
+	sendCommand(cmd);
+	showresp(WARN, HEX, "get squelch");
+	size_t p = replystr.rfind(resp);
+	if (p != string::npos && ((p + 9) < replystr.length()))
+		return ((int)(fm_bcd(&replystr[p+6], 3) * 100 / 255));
+	return progStatus.squelch;
+}
+
 void RIG_IC7000::set_power_control(double val)
 {
 	cmd = pre_to;
@@ -484,5 +511,25 @@ int RIG_IC7000::get_power_control()
 	if (p != string::npos && ((p + 9) < replystr.length()))
 		return ((int)(fm_bcd(&replystr[p + 6],3) * 100 / 255));
 	return progStatus.power_level;
+}
+
+int RIG_IC7000::get_smeter()
+{
+	string cstr = "\x15\x02";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+	sendCommand(cmd);
+	showresp(WARN, HEX, "get smeter");
+	int mtr= -1;
+	size_t p = replystr.rfind(resp);
+	if (p != string::npos && ((p+9) < replystr.length())) {
+		mtr = fm_bcd(&replystr[p+6], 3);
+		mtr = (int)(mtr /2.55);
+		if (mtr > 100) mtr = 100;
+	}
+	return mtr;
 }
 
