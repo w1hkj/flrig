@@ -259,6 +259,163 @@ void read_alc()
 		Fl::awake(updateALC, (void*)sig);
 }
 
+// notch
+void update_auto_notch(void *d)
+{
+	progStatus.auto_notch = (long)d;
+	btnNotch->value(progStatus.auto_notch);
+}
+
+void read_auto_notch()
+{
+	if (!selrig->has_notch_control) return;
+	int sig;
+	pthread_mutex_lock(&mutex_serial);
+		sig = selrig->get_auto_notch();
+	pthread_mutex_unlock(&mutex_serial);
+	Fl::awake(update_auto_notch, (void*)sig);
+}
+
+// preamp - attenuator
+void update_preamp(void *d)
+{
+	progStatus.preamp = (long)d;
+	btnNotch->value(progStatus.preamp);
+}
+
+void update_attenuator(void *d)
+{
+	progStatus.attenuator = (long)d;
+	btnNotch->value(progStatus.attenuator);
+}
+
+void read_preamp_att()
+{
+	int sig;
+	if (selrig->has_preamp_control) {
+		pthread_mutex_lock(&mutex_serial);
+			sig = selrig->get_preamp();
+		pthread_mutex_unlock(&mutex_serial);
+		Fl::awake(update_preamp, (void*)sig);
+	}
+	if (selrig->has_attenuator_control) {
+		pthread_mutex_lock(&mutex_serial);
+			sig = selrig->get_attenuator();
+		pthread_mutex_unlock(&mutex_serial);
+		Fl::awake(update_attenuator, (void*)sig);
+	}
+}
+
+// volume
+void update_volume(void *d)
+{
+	progStatus.volume = (long)d;
+	sldrVOLUME->value(progStatus.volume);
+}
+
+void read_volume()
+{
+	if (!selrig->has_volume_control) return;
+	int sig;
+	pthread_mutex_lock(&mutex_serial);
+		sig = selrig->get_volume_control();
+	pthread_mutex_unlock(&mutex_serial);
+	Fl::awake(update_volume, (void*)sig);
+}
+
+// ifshift
+void update_ifshift(void *d)
+{
+	progStatus.shift = (long)d;
+	btnNotch->value(progStatus.shift);
+}
+
+void update_ifshift_val(void *d)
+{
+	progStatus.shift_val = (long)d;
+	sldrNOTCH->value(progStatus.shift_val);
+}
+
+void read_ifshift()
+{
+	if (!selrig->has_ifshift_control) return;
+	bool on;
+	int  val;
+	pthread_mutex_lock(&mutex_serial);
+		on = selrig->get_if_shift(val);
+	pthread_mutex_unlock(&mutex_serial);
+	Fl::awake(update_ifshift, (void*)on);
+	Fl::awake(update_ifshift_val, (void*)val);
+}
+
+// power_control
+void update_power_control(void *d)
+{
+	progStatus.power_level = (long)d;
+	sldrPOWER->value(progStatus.power_level);
+}
+
+void read_power_control()
+{
+	if (!selrig->has_power_control) return;
+	int sig;
+	pthread_mutex_lock(&mutex_serial);
+		sig = selrig->get_power_control();
+	pthread_mutex_unlock(&mutex_serial);
+	Fl::awake(update_power_control, (void*)sig);
+}
+
+// mic gain
+void update_mic_gain(void *d)
+{
+	progStatus.mic_gain = (long)d;
+	sldrPOWER->value(progStatus.mic_gain);
+}
+
+void read_mic_gain()
+{
+	if (!selrig->has_micgain_control) return;
+	int sig;
+	pthread_mutex_lock(&mutex_serial);
+		sig = selrig->get_mic_gain();
+	pthread_mutex_unlock(&mutex_serial);
+	Fl::awake(update_mic_gain, (void*)sig);
+}
+
+// rf gain
+void update_rfgain(void *d)
+{
+	progStatus.rfgain = (long)d;
+	sldrPOWER->value(progStatus.rfgain);
+}
+
+void read_rfgain()
+{
+	if (!selrig->has_rf_control) return;
+	int sig;
+	pthread_mutex_lock(&mutex_serial);
+		sig = selrig->get_rf_gain();
+	pthread_mutex_unlock(&mutex_serial);
+	Fl::awake(update_rfgain, (void*)sig);
+}
+
+// squelch
+void update_squelch(void *d)
+{
+	progStatus.squelch = (long)d;
+	sldrPOWER->value(progStatus.squelch);
+}
+
+void read_squelch()
+{
+	if (!selrig->has_sql_control) return;
+	int sig;
+	pthread_mutex_lock(&mutex_serial);
+		sig = selrig->get_squelch();
+	pthread_mutex_unlock(&mutex_serial);
+	Fl::awake(update_squelch, (void*)sig);
+}
+
 static bool resetrcv = true;
 static bool resetxmt = true;
 
@@ -437,18 +594,18 @@ void * serial_thread_loop(void *d)
 			if (!loopcount--) {
 				if (rig_nbr == K3) read_K3();
 				else {
-					read_smeter();
-					read_vfo();
-					read_mode();
-					read_bandwidth();
-//					read_volume();
-//					read_notch();
-//					read_ifshift();
-//					read_power_control();
-//					read_preamp_att();
-//					read_mic_gain();
-//					read_squelch();
-//					read_rfgain();
+					if (progStatus.poll_smeter) read_smeter();
+					if (progStatus.poll_frequency) read_vfo();
+					if (progStatus.poll_mode) read_mode();
+					if (progStatus.poll_bandwidth) read_bandwidth();
+					if (progStatus.poll_volume) read_volume();
+					if (progStatus.poll_auto_notch) read_auto_notch();
+					if (progStatus.poll_ifshift) read_ifshift();
+					if (progStatus.poll_power_control) read_power_control();
+					if (progStatus.poll_pre_att) read_preamp_att();
+					if (progStatus.poll_micgain) read_mic_gain();
+					if (progStatus.poll_squelch) read_squelch();
+					if (progStatus.poll_rfgain) read_rfgain();
 				}
 				loopcount = progStatus.serloop_timing / 10;
 			}
@@ -460,9 +617,9 @@ void * serial_thread_loop(void *d)
 			}
 			resetrcv = true;
 			if (!loopcount--) {
-				read_power_out();
-				read_swr();
-				read_alc();
+				if (progStatus.poll_pout) read_power_out();
+				if (progStatus.poll_swr) read_swr();
+				if (progStatus.poll_alc) read_alc();
 				loopcount = progStatus.serloop_timing / 10;
 			}
 

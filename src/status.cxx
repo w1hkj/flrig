@@ -54,6 +54,22 @@ status progStatus = {
 	0,			// int	CIV;
 	false,		// bool	USBaudio;
 
+	true,		// bool	poll_smeter;
+	true,		// bool	poll_frequency;
+	true,		// bool	poll_mode;
+	true,		// bool	poll_bandwidth;
+	false,		// bool	poll_volume;
+	false,		// bool	poll_auto_notch;
+	false,		// bool	poll_ifshift;
+	false,		// bool	poll_power_control;
+	false,		// bool	poll_pre_att;
+	false,		// bool	poll_micgain;
+	false,		// bool	poll_squelch;
+	false,		// bool	poll_rfgain;
+	true,		// bool	poll_pout;
+	true,		// bool	poll_swr;
+	true,		// bool	poll_alc;
+
 	-1,			// int  iBW_A;
 	1,			// int  imode_A;
 	7070000,	// long freq_A;
@@ -248,6 +264,22 @@ void status::saveLastState()
 	spref.set("sep_dtrptt", sep_dtrptt);
 	spref.set("sep_rtsplus", sep_rtsplus);
 	spref.set("set_dtrplus", sep_dtrplus);
+
+	spref.set("poll_smeter", poll_smeter);
+	spref.set("poll_frequency", poll_frequency);
+	spref.set("poll_mode", poll_mode);
+	spref.set("poll_bandwidth", poll_bandwidth);
+	spref.set("poll_volume", poll_volume);
+	spref.set("poll_auto_notch", poll_auto_notch);
+	spref.set("poll_ifshift", poll_ifshift);
+	spref.set("poll_power_control", poll_power_control);
+	spref.set("poll_pre_att", poll_pre_att);
+	spref.set("poll_micgain", poll_micgain);
+	spref.set("poll_squelch", poll_squelch);
+	spref.set("poll_rfgain", poll_rfgain);
+	spref.set("poll_pout", poll_pout);
+	spref.set("poll_swr", poll_swr);
+	spref.set("poll_alc", poll_alc);
 
 	spref.set("bw_A", iBW_A);
 	spref.set("mode_A", imode_A);
@@ -450,6 +482,22 @@ bool status::loadXcvrState(const char *xcvr)
 		if (spref.get("sep_dtrptt", i, i)) sep_dtrptt = i;
 		if (spref.get("sep_rtsplus", i, i)) sep_rtsplus = i;
 		if (spref.get("sep_dtrplus", i, i)) sep_dtrplus = i;
+
+		if (spref.get("poll_smeter", i, i)) poll_smeter = i;
+		if (spref.get("poll_frequency", i, i)) poll_frequency = i;
+		if (spref.get("poll_mode", i, i)) poll_mode = i;
+		if (spref.get("poll_bandwidth", i, i)) poll_bandwidth = i;
+		if (spref.get("poll_volume", i, i)) poll_volume = i;
+		if (spref.get("poll_auto_notch", i, i)) poll_auto_notch = i;
+		if (spref.get("poll_ifshift", i, i)) poll_ifshift = i;
+		if (spref.get("poll_power_control", i, i)) poll_power_control = i;
+		if (spref.get("poll_pre_att", i, i)) poll_pre_att = i;
+		if (spref.get("poll_micgain", i, i)) poll_micgain = i;
+		if (spref.get("poll_squelch", i, i)) poll_squelch = i;
+		if (spref.get("poll_rfgain", i, i)) poll_rfgain = i;
+		if (spref.get("poll_pout", i, i)) poll_pout = i;
+		if (spref.get("poll_swr", i, i)) poll_swr = i;
+		if (spref.get("poll_alc", i, i)) poll_alc = i;
 
 		spref.get("bw_A", iBW_A, iBW_A);
 		spref.get("mode_A", imode_A, imode_A);
