@@ -40,12 +40,13 @@ public:
 	void set_rf_gain(int val);
 	int  get_rf_gain();
 	void set_squelch(int val);
+	int  get_squelch();
 	void set_power_control(double val);
 	int  get_power_control();
-
 	int  get_auto_notch();
-
 	void set_auto_notch(int v);
+	int  get_smeter();
+
 	void set_split(bool v);
 
 };
