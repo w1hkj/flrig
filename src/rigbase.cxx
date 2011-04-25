@@ -233,6 +233,17 @@ void rigbase::showresp(int level, int how, string s)
 {
 	string s1 = how == HEX ? str2hex(cmd.c_str(), cmd.length()) : cmd;
 	string s2 = how == HEX ? str2hex(replystr.c_str(), replystr.length()) : replystr;
+	if (how == ASC) {
+		size_t p;
+		while((p = s1.find('\r')) != string::npos)
+			s1.replace(p, 1, "<cr>");
+		while((p = s1.find('\n')) != string::npos)
+			s1.replace(p, 1, "<lf>");
+		while((p = s2.find('\r')) != string::npos)
+			s2.replace(p, 1, "<cr>");
+		while((p = s2.find('\n')) != string::npos)
+			s2.replace(p, 1, "<lf>");
+	}
 
 	switch (level) {
 	case ERR:
