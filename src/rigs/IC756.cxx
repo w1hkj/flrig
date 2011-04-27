@@ -63,10 +63,7 @@ void RIG_IC756PRO2::set_attenuator(int val)
 	cmd += '\x11';
 	cmd += cmdval;
 	cmd.append( post );
-	sendICcommand(cmd,6);
-	checkresponse();
-	if (RIG_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+	waitFB("set att");
 }
 
 int RIG_IC756PRO2::get_attenuator()
@@ -74,7 +71,7 @@ int RIG_IC756PRO2::get_attenuator()
 	cmd = pre_to;
 	cmd += '\x11';
 	cmd.append( post );
-	if (sendICcommand(cmd,7)) {
+	if (waitFOR(8, "get att")) {
 		if (replystr[5] == 0x06) {
 			atten_level = 1;
 			atten_label("6 dB", true);
@@ -109,10 +106,7 @@ void RIG_IC756PRO2::set_preamp(int val)
 	cmd += '\x02';
 	cmd += (unsigned char) preamp_level;
 	cmd.append( post );
-	sendICcommand (cmd, 6);
-	checkresponse();
-	if (RIG_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+	waitFB("set preamp");
 }
 
 int RIG_IC756PRO2::get_preamp()
@@ -121,7 +115,7 @@ int RIG_IC756PRO2::get_preamp()
 	cmd += '\x16';
 	cmd += '\x02';
 	cmd.append( post );
-	if (sendICcommand (cmd, 8)) {
+	if (waitFOR(8, "get preamp")) {
 		if (replystr[6] == 0x01) {
 			preamp_label("Pre 1", true);
 			preamp_level = 1;
@@ -157,18 +151,12 @@ void RIG_IC756PRO3::set_modeA(int val)
 	cmd += val;
 	cmd += A.iBW;
 	cmd.append( post );
-	sendICcommand (cmd, 6);
-	if (RIG_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-	checkresponse();
+	waitFB("set mode A");
 	if (datamode) { // LSB / USB ==> use DATA mode
 		cmd = pre_to;
 		cmd.append("\x1A\x06\x01");
 		cmd.append(post);
-		sendICcommand(cmd, 6);
-		checkresponse();
-	if (RIG_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+		waitFB("data mode");
 	}
 }
 
@@ -178,14 +166,14 @@ int RIG_IC756PRO3::get_modeA()
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
-	if (sendICcommand (cmd, 8 )) {
+	if (waitFOR(8, "get mode A")) {
 		md = replystr[5];
 		if (md > 6) md--;
 		A.iBW = replystr[6];
 		cmd = pre_to;
 		cmd.append("\x1A\x06");
 		cmd.append(post);
-		if (sendICcommand(cmd, 9)) {
+		if (waitFOR(9, "data mode?")) {
 			if (replystr[6]) {
 				switch (md) {
 					case 0 : md = 8; break;
@@ -221,18 +209,12 @@ void RIG_IC756PRO3::set_modeB(int val)
 	cmd += val;
 	cmd += B.iBW;
 	cmd.append( post );
-	sendICcommand (cmd, 6);
-	if (RIG_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-	checkresponse();
+	waitFB("set mode B");
 	if (datamode) { // LSB / USB ==> use DATA mode
 		cmd = pre_to;
 		cmd.append("\x1A\x06\x01");
 		cmd.append(post);
-		sendICcommand(cmd, 6);
-		checkresponse();
-	if (RIG_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+		waitFB("data mode");
 	}
 }
 
@@ -242,14 +224,14 @@ int RIG_IC756PRO3::get_modeB()
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
-	if (sendICcommand (cmd, 8 )) {
+	if (waitFOR(8, "get mode B")) {
 		md = replystr[5];
 		if (md > 6) md--;
 		B.iBW = replystr[6];
 		cmd = pre_to;
 		cmd.append("\x1A\x06");
 		cmd.append(post);
-		if (sendICcommand(cmd, 9)) {
+		if (waitFOR(9, "data mode?")) {
 			if (replystr[6]) {
 				switch (md) {
 					case 0 : md = 8; break;

@@ -54,8 +54,7 @@ void RIG_IC706MKIIG::selectA()
 	cmd += '\x07';
 	cmd += '\x00';
 	cmd.append(post);
-	sendICcommand(cmd, 6);
-	checkresponse();
+	waitFB("select A");
 }
 
 void RIG_IC706MKIIG::selectB()
@@ -64,8 +63,7 @@ void RIG_IC706MKIIG::selectB()
 	cmd += '\x07';
 	cmd += '\x01';
 	cmd.append(post);
-	sendICcommand(cmd, 6);
-	checkresponse();
+	waitFB("select B");
 }
 
 long RIG_IC706MKIIG::get_vfoA ()
@@ -73,11 +71,13 @@ long RIG_IC706MKIIG::get_vfoA ()
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
-	if (!sendCommand(cmd, 11)) {
-		checkresponse();
-		return freqA;
+	string resp = pre_fm;
+	resp += '\x03';
+	if (waitFOR(11, "get vfo A")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			freqA = fm_bcd_be(&replystr[p+5], 10);
 	}
-	freqA = fm_bcd_be(&replystr[5], 10);
 	return freqA;
 }
 
@@ -88,8 +88,7 @@ void RIG_IC706MKIIG::set_vfoA (long freq)
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append( post );
-	sendICcommand(cmd, 6);
-	checkresponse();
+	waitFB("set vfo A");
 }
 
 long RIG_IC706MKIIG::get_vfoB ()
@@ -97,11 +96,13 @@ long RIG_IC706MKIIG::get_vfoB ()
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
-	if (!sendCommand(cmd, 11)) {
-		checkresponse();
-		return freqB;
+	string resp = pre_fm;
+	resp += '\x03';
+	if (waitFOR(11, "get vfo B")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			freqB = fm_bcd_be(&replystr[p+5], 10);
 	}
-	freqB = fm_bcd_be(&replystr[5], 10);
 	return freqB;
 }
 
@@ -112,8 +113,7 @@ void RIG_IC706MKIIG::set_vfoB (long freq)
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append( post );
-	sendICcommand(cmd, 6);
-	checkresponse();
+	waitFB("set vfo B");
 }
 
 void RIG_IC706MKIIG::set_split(bool b)
@@ -122,8 +122,7 @@ void RIG_IC706MKIIG::set_split(bool b)
 	cmd += '\x0F';
 	cmd += b ? '\x01' : '\x00';
 	cmd.append( post );
-	sendICcommand(cmd, 6);
-	checkresponse();
+	waitFB("set split");
 }
 
 void RIG_IC706MKIIG::set_modeA(int val)
@@ -134,10 +133,7 @@ void RIG_IC706MKIIG::set_modeA(int val)
 	cmd += val > 5 ? val + 2 : val;
 	cmd += bwA;
 	cmd.append( post );
-	sendICcommand (cmd, 6);
-	checkresponse();
-	if (RIG_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+	waitFB("set mode A");
 }
 
 int RIG_IC706MKIIG::get_modeA()
@@ -145,10 +141,15 @@ int RIG_IC706MKIIG::get_modeA()
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
-	if (sendICcommand (cmd, 8 )) {
-		modeA = replystr[5];
-		if (modeA > 6) modeA -= 2;
-		bwA = replystr[6];
+	string resp = pre_fm;
+	resp += '\x04';
+	if (waitFOR(8, "get mode A")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			modeA = replystr[p+5];
+			if (modeA > 6) modeA -= 2;
+			bwA = replystr[p+6];
+		}
 	}
 	return modeA;
 }
@@ -175,8 +176,7 @@ void RIG_IC706MKIIG::set_attenuator(int val)
 	cmd += '\x11';
 	cmd += val ? '\x20' : '\x00';
 	cmd.append( post );
-	sendCommand (cmd, 6);
-	checkresponse();
+	waitFB("set att");
 }
 
 int RIG_IC706MKIIG::get_smeter()
@@ -184,8 +184,12 @@ int RIG_IC706MKIIG::get_smeter()
 	cmd = pre_to;
 	cmd.append("\x15\x02");
 	cmd.append( post );
-	if (sendICcommand (cmd, 9)) {
-		return fm_bcd(&replystr[6], 3) / 2.55;
-	} else
-		return 0;
+	string resp = pre_fm;
+	resp.append("\x15\x02");
+	if (waitFOR(9, "get smeter")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return fm_bcd(&replystr[p+6], 3) / 2.55;
+	}
+	return -1;
 }

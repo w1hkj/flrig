@@ -73,7 +73,7 @@ long RIG_IC718::get_vfoA ()
 	cmd.append( post );
 	string resp = pre_fm;
 	resp += '\x03';
-	if (waitFOR(11, "get vfoA")) {
+	if (waitFOR(11, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			freqA = fm_bcd_be(&replystr[p+5], 10);
@@ -129,7 +129,6 @@ int RIG_IC718::get_smeter()
 	cmd.append( post );
 	string resp = pre_fm;
 	resp.append("\x15\x02");
-
 	int mtr = 0;
 	if (waitFOR(9, "get smeter")) {
 		size_t p = replystr.rfind(resp);
@@ -267,7 +266,7 @@ void RIG_IC718::set_rf_gain(int val)
 	cmd.append("\x14\x02");
 	cmd.append(to_bcd(ICrfg, 3));
 	cmd.append( post );
-	waitFB("set rfg");
+	waitFB("set rf gain");
 }
 
 int RIG_IC718::get_rf_gain()
