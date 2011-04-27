@@ -592,7 +592,7 @@ Function {XcvrDialog()} {open
       xywh {0 8 477 245}
     } {
       Fl_Group {} {
-        label Primary selected
+        label Primary open selected
         xywh {2 30 475 222}
       } {
         Fl_Group {} {open
@@ -839,7 +839,7 @@ Serial Port for a special Control Signals}
         }
       }
       Fl_Group {} {
-        label Polling open
+        label Polling
         xywh {2 30 470 220} hide
       } {
         Fl_Group {} {
@@ -941,6 +941,27 @@ Serial Port for a special Control Signals}
             xywh {302 221 104 15} down_box DOWN_BOX
             code0 {o->value(progStatus.poll_rfgain);}
           }
+        }
+      }
+      Fl_Group {} {
+        label {Send Cmd} open
+        xywh {4 30 470 220} hide
+      } {
+        Fl_Input txt_command {
+          label {Enter text as ASCII string
+Or sequence of hex values, x80 etc separated by spaces}
+          xywh {29 55 431 25} align 6
+          code0 {\#include "flinput2.h"}
+          class Fl_Input2
+        }
+        Fl_Button btn_send_command {
+          label SEND
+          callback {cb_send_command();}
+          xywh {390 166 70 20}
+        }
+        Fl_Output txt_response {
+          label {Response to the SEND button}
+          xywh {29 121 431 25} align 6
         }
       }
     }
@@ -1096,7 +1117,7 @@ cb_bpf_center();}
 Function {make_TT550()} {} {
   Fl_Window {} {
     label {TT550 Setup}
-    xywh {578 56 424 402} type Double align 0 hide
+    xywh {42 421 424 402} type Double align 0 hide
   } {
     Fl_Group {} {
       label CW open

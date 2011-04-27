@@ -120,6 +120,9 @@ flrig_SOURCES += \
 	debug.cxx \
 	dialogs.cxx \
 	Fl_SigBar.cxx \
+	flinput2.cxx \
+	pixmaps.cxx \
+	icons.cxx \
 	flslider2.cxx \
 	font_browser.cxx \
 	FreqControl.cxx \
@@ -218,6 +221,9 @@ EXTRA_DIST = \
 	include/fileselect.h \
 	include/font_browser.h \
 	include/flrigrc.h \
+	include/flinput2.h \
+	include/icons.h \
+	include/pixmaps.h \
 	include/flslider2.h \
 	include/Fl_SigBar.h \
 	include/FreqControl.h \

@@ -49,6 +49,10 @@ public:
 
 	void set_split(bool v);
 
+	int  get_mic_gain();
+	void set_mic_gain(int val);
+	void get_mic_gain_min_max_step(int &min, int &max, int &step);
+
 };
 
 

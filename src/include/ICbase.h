@@ -12,6 +12,7 @@ protected:
 	string post;
 	string ok;
 	string bad;
+	int    waited;
 	const char *_mode_type;
 public:
 	RIG_ICOM() {
@@ -25,7 +26,11 @@ public:
 	virtual ~RIG_ICOM() {}
 	void checkresponse();
 	bool sendICcommand(string str, int nbr);
+	void delayCommand(string cmd, int wait);
+	bool  waitFB(const char *sz);
+	bool  waitFOR(size_t n, const char *sz);
 	void adjustCIV(uchar adr);
+
 };
 
 #endif
