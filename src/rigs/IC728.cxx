@@ -59,11 +59,8 @@ long RIG_IC728::get_vfoA ()
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
-	if (!sendCommand(cmd, 10)) {
-		checkresponse();
-		return freqA;
-	}
-	freqA = fm_bcd_be(&replystr[5], 8);
+	if (waitFOR(10, "get vfo A"))
+		freqA = fm_bcd_be(&replystr[5], 8);
 	return freqA;
 }
 
@@ -74,7 +71,6 @@ void RIG_IC728::set_vfoA (long freq)
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 8 ) );
 	cmd.append( post );
-	sendCommand(cmd, 6);
-	checkresponse();
+	waitFB("set vfo A");
 }
 

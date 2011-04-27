@@ -327,7 +327,7 @@ int RIG_IC7200::get_noise()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
-	if (waitFOR(7, "get noise")) {
+	if (waitFOR(8, "get noise")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			return (replystr[p+6] ? 1 : 0);
@@ -352,7 +352,7 @@ int RIG_IC7200::get_noise_reduction()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
-	if (waitFOR(7, "get NR")) {
+	if (waitFOR(8, "get NR")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			return (replystr[p+6] ? 1 : 0);
@@ -404,7 +404,7 @@ int RIG_IC7200::get_preamp()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(7, "get Pre")) {
+	if (waitFOR(8, "get Pre")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			if (replystr[p+6] == 0x01) {
@@ -507,11 +507,11 @@ void RIG_IC7200::set_mic_gain(int val)
 int RIG_IC7200::get_modeA()
 {
 	int md = A.imode;
+	string resp = pre_fm;
+	resp += '\x04';
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
-	string resp = pre_fm;
-	resp += '\x04';
 	if (waitFOR(8, "get mode A")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {

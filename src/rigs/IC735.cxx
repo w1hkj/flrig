@@ -50,11 +50,8 @@ long RIG_IC735::get_vfoA ()
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
-	if (!sendCommand(cmd, 10)) {
-		checkresponse();
-		return freqA;
-	}
-	freqA = fm_bcd_be(&replystr[5], 8);
+	if (waitFOR(10, "get vfo A"))
+		freqA = fm_bcd_be(&replystr[5], 8);
 	return freqA;
 }
 
@@ -65,8 +62,7 @@ void RIG_IC735::set_vfoA (long freq)
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 8 ) );
 	cmd.append( post );
-	sendCommand(cmd, 6);
-	checkresponse();
+	waitFB("set vfo A");
 }
 
 void RIG_IC735::set_modeA(int val)
@@ -76,8 +72,7 @@ void RIG_IC735::set_modeA(int val)
 	cmd += "\x06";
 	cmd += modeA;		   // set the mode byte
 	cmd.append( post );
-	sendCommand(cmd, 6);
-	checkresponse();
+	waitFB("set mode A");
 }
 
 void RIG_IC735::set_bwA(int val)
@@ -88,8 +83,7 @@ void RIG_IC735::set_bwA(int val)
 	cmd += modeA;
 	cmd += bwA;
 	cmd.append(post);
-	sendCommand(cmd, 6);
-	checkresponse();
+	waitFB("set bw A");
 }
 
 
