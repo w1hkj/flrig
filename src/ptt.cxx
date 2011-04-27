@@ -20,7 +20,6 @@ using namespace std;
 // used for transceivers with a single vfo, called only by rigPTT
 static void fake_split(int on)
 {
-	static  FREQMODE temp;
 	if (on) {
 		selrig->set_vfoA(vfoB.freq);
 		selrig->set_modeA(vfoB.imode);

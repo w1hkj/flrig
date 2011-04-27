@@ -55,3 +55,89 @@ bool RIG_ICOM::sendICcommand(string cmd, int nbr)
 	return true;
 }
 
+void RIG_ICOM::delayCommand(string cmd, int wait)
+{
+	int oldwait = progStatus.comm_wait;
+	progStatus.comm_wait += wait;
+	sendCommand(cmd);
+	progStatus.comm_wait = oldwait;
+}
+
+bool RIG_ICOM::waitFB(const char *sz)
+{
+	char sztemp[50];
+	string returned = "";
+	string tosend = cmd;
+
+	if (!RigSerial.IsOpen()) {
+		replystr = returned;
+		snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
+		showresp(WARN, HEX, sztemp, tosend, returned);
+		return false;
+	}
+	int cnt = 0, repeat = 0;
+	for (repeat = 0; repeat < progStatus.comm_retries; repeat++) {
+		sendCommand(cmd, 0);
+		returned = "";
+		for ( cnt = 0; cnt < 20; cnt++) {
+			readResponse();
+			returned.append(replystr);
+			if (returned.find(ok) != string::npos) {
+				replystr = returned;
+				waited = cnt * 10 * repeat;
+				snprintf(sztemp, sizeof(sztemp), "%s %d ms OK  ", sz, waited);
+				showresp(WARN, HEX, sztemp, tosend, returned);
+				return true;
+			}
+			if (returned.find(bad) != string::npos) {
+				replystr = returned;
+				waited = cnt * 10 * repeat;
+				snprintf(sztemp, sizeof(sztemp), "%s %d ms FAIL", sz, waited);
+				showresp(WARN, HEX, sztemp, tosend, returned);
+				return false;
+			}
+			MilliSleep(10);
+		}
+	}
+	replystr = returned;
+	waited = cnt * 10 * repeat;
+	snprintf(sztemp, sizeof(sztemp), "%s %d ms NIL ", sz, waited);
+	showresp(WARN, HEX, sztemp, tosend, returned);
+	return false;
+}
+
+bool RIG_ICOM::waitFOR(size_t n, const char *sz)
+{
+	char sztemp[50];
+	string returned = "";
+	string tosend = cmd;
+	if (!RigSerial.IsOpen()) {
+		replystr = returned;
+		snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
+		showresp(WARN, HEX, sztemp, tosend, returned);
+		return false;
+	}
+	int cnt = 0, repeat = 0;
+	for (repeat = 0; repeat < progStatus.comm_retries; repeat++) {
+		sendCommand(tosend, 0);
+		returned = "";
+		for ( cnt = 0; cnt < 20; cnt++) {
+			readResponse();
+			returned.append(replystr);
+			if (returned.length() >= n) {
+				replystr = returned;
+				waited = cnt * 10 * repeat;
+				snprintf(sztemp, sizeof(sztemp), "%s %d ms OK  ", sz, waited);
+				showresp(WARN, HEX, sztemp, tosend, returned);
+				return true;
+			}
+			MilliSleep(10);
+		}
+	}
+	replystr = returned;
+	waited = cnt * 10 * repeat;
+	snprintf(sztemp, sizeof(sztemp), "%s %d ms NIL ", sz, waited);
+	showresp(WARN, HEX, sztemp, tosend, returned);
+	return false;
+}
+

@@ -52,10 +52,10 @@ RIG_IC7000::RIG_IC7000() {
 	bandwidths_ = IC7000_SSB_CWwidths;
 	_mode_type = IC7000_mode_type;
 
-	A.freq = 14070000;
+	A.freq = 432399230;
 	A.imode = 1;
 	A.iBW = 28;
-	B.freq = 14070000;
+	B.freq = 432399230;
 	B.imode = 1;
 	B.iBW = 28;
 
@@ -72,10 +72,18 @@ RIG_IC7000::RIG_IC7000() {
 // IC7000 unique commands
 //======================================================================
 
+#include "debug.h"
+
 void RIG_IC7000::initialize()
 {
-	cmd = "";
-	showresp(WARN, HEX, "IC7000 init");
+	cmd = pre_to;
+	cmd += '\x1A';
+	cmd += '\x05';
+	cmd += '\x00';
+	cmd += '\x92';
+	cmd += '\x00';
+	cmd.append(post);
+	waitFB("CI-V");
 }
 
 void RIG_IC7000::selectA()
@@ -84,8 +92,7 @@ void RIG_IC7000::selectA()
 	cmd += '\x07';
 	cmd += '\x00';
 	cmd.append(post);
-	sendCommand(cmd);
-	showresp(WARN, HEX, "select A");
+	waitFB("sel A");
 }
 
 void RIG_IC7000::selectB()
@@ -94,8 +101,7 @@ void RIG_IC7000::selectB()
 	cmd += '\x07';
 	cmd += '\x01';
 	cmd.append(post);
-	sendCommand(cmd);
-	showresp(WARN, HEX, "select B");
+	waitFB("sel B");
 }
 
 long RIG_IC7000::get_vfoA ()
@@ -105,11 +111,11 @@ long RIG_IC7000::get_vfoA ()
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
-	sendCommand(cmd);
-	showresp(WARN, HEX, "get vfoA");
-	size_t p = replystr.rfind(resp);
-	if (p != string::npos && ((p+11) <= replystr.length()))
-		A.freq = fm_bcd_be(&replystr[p+5], 10);
+	if (waitFOR(11, "get vfo A")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			A.freq = fm_bcd_be(&replystr[p+5], 10);
+	}
 	return A.freq;
 }
 
@@ -119,9 +125,7 @@ void RIG_IC7000::set_vfoA (long freq)
 	cmd = pre_to;
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 10 ) );
-	cmd.append( post );
-	sendCommand(cmd);
-	showresp(WARN, HEX, "set vfoA");
+	waitFB("set vfo A");
 }
 
 long RIG_IC7000::get_vfoB ()
@@ -131,11 +135,11 @@ long RIG_IC7000::get_vfoB ()
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
-	sendCommand(cmd);
-	showresp(WARN, HEX, "get vfoB");
-	size_t p = replystr.rfind(resp);
-	if (p != string::npos && ((p+11) <= replystr.length()))
-		B.freq = fm_bcd_be(&replystr[p+5], 10);
+	if (waitFOR(11, "get vfo B")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			B.freq = fm_bcd_be(&replystr[p+5], 10);
+	}
 	return B.freq;
 }
 
@@ -146,8 +150,7 @@ void RIG_IC7000::set_vfoB (long freq)
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append( post );
-	sendCommand(cmd);
-	showresp(WARN, HEX, "set vfoB");
+	waitFB("set vfo B");
 }
 
 void RIG_IC7000::set_modeA(int val)
@@ -162,8 +165,7 @@ void RIG_IC7000::set_modeA(int val)
 	cmd += '\x06';
 	cmd += val;
 	cmd.append( post );
-	sendCommand (cmd);
-	showresp(WARN, HEX, "set mode A");
+	waitFB("set mode A");
 }
 
 int RIG_IC7000::get_modeA()
@@ -174,13 +176,13 @@ int RIG_IC7000::get_modeA()
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
-	sendCommand(cmd);
-	showresp(WARN, HEX, "get mode A");
-	size_t p = replystr.rfind(resp);
-	if (p != string::npos && ((p+8) <= replystr.length())) {
-		md = replystr[p+5];
-		if (md > 6) md--;
-		A.imode = md;
+	if (waitFOR(8, "get mode A")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			md = replystr[p+5];
+			if (md > 6) md--;
+			A.imode = md;
+		}
 	}
 	return A.imode;
 }
@@ -197,8 +199,7 @@ void RIG_IC7000::set_modeB(int val)
 	cmd += '\x06';
 	cmd += val;
 	cmd.append( post );
-	sendCommand (cmd);
-	showresp(WARN, HEX, "set mode B");
+	waitFB("set mode B");
 }
 
 int RIG_IC7000::get_modeB()
@@ -209,13 +210,13 @@ int RIG_IC7000::get_modeB()
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
-	sendCommand(cmd);
-	showresp(WARN, HEX, "get mode B");
-	size_t p = replystr.rfind(resp);
-	if (p != string::npos && ((p+5) <= replystr.length())) {
-		md = replystr[p+5];
-		if (md > 6) md--;
-		B.imode = md;
+	if (waitFOR(8, "get mode B")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			md = replystr[p+5];
+			if (md > 6) md--;
+			B.imode = md;
+		}
 	}
 	return B.imode;
 }
@@ -228,11 +229,11 @@ int  RIG_IC7000::get_bwA()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	sendCommand(cmd);
-	showresp(WARN, HEX, "get bwA");
-	size_t p = replystr.rfind(resp);
-	if (p != string::npos && ((p+8) <= replystr.length()))
-		A.iBW = (fm_bcd(&replystr[p+6],2));
+	if (waitFOR(8, "get bw A")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			A.iBW = (fm_bcd(&replystr[p+6],2));
+	}
 	return A.iBW;
 }
 
@@ -244,11 +245,11 @@ int  RIG_IC7000::get_bwB()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	sendCommand(cmd);
-	showresp(WARN, HEX, "get bwA");
-	size_t p = replystr.rfind(resp);
-	if (p != string::npos && ((p+8) <= replystr.length()))
-		B.iBW = (fm_bcd(&replystr[p+6],2));
+	if (waitFOR(8, "get bw B")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			B.iBW = (fm_bcd(&replystr[p+6],2));
+	}
 	return B.iBW;
 }
 
@@ -259,8 +260,7 @@ void RIG_IC7000::set_bwA(int val)
 	cmd.append("\x1A\x03");
 	cmd.append(to_bcd(val, 2));
 	cmd.append( post );
-	sendCommand(cmd);
-	showresp(WARN, HEX, "set bw A");
+	waitFB("set bw A");
 }
 
 void RIG_IC7000::set_bwB(int val)
@@ -270,8 +270,7 @@ void RIG_IC7000::set_bwB(int val)
 	cmd.append("\x1A\x03");
 	cmd.append(to_bcd(val, 2));
 	cmd.append( post );
-	sendCommand(cmd);
-	showresp(WARN, HEX, "set bw B");
+	waitFB("set bw B");
 }
 
 int RIG_IC7000::adjust_bandwidth(int m)
@@ -310,11 +309,11 @@ int RIG_IC7000::get_attenuator()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	sendCommand(cmd);
-	showresp(WARN, HEX, "get att");
-	size_t p = replystr.rfind(resp);
-	if (p != string::npos && ((p+5) <= replystr.length()))
-		return (replystr[p+5] ? 1 : 0);
+	if (waitFOR(5, "get att")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return (replystr[p+5] ? 1 : 0);
+	}
 	return progStatus.attenuator;
 }
 
@@ -324,8 +323,7 @@ void RIG_IC7000::set_attenuator(int val)
 	cmd += '\x11';
 	cmd += val ? '\x12' : '\x00';
 	cmd.append( post );
-	sendCommand(cmd);
-	showresp(WARN, HEX, "set att");
+	waitFB("set att");
 }
 
 void RIG_IC7000::set_preamp(int val)
@@ -335,11 +333,7 @@ void RIG_IC7000::set_preamp(int val)
 	cmd += '\x02';
 	cmd += val ? 0x01 : 0x00;
 	cmd.append( post );
-	sendCommand (cmd, 6);
-	if (val)
-		showresp(WARN, HEX, "set preON");
-	else
-		showresp(WARN, HEX, "set preOFF");
+	waitFB("set preamp");
 }
 
 int RIG_IC7000::get_preamp()
@@ -350,11 +344,11 @@ int RIG_IC7000::get_preamp()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	sendCommand(cmd);
-	showresp(WARN, HEX, "get pre");
-	size_t p = replystr.rfind(resp);
-	if (p != string::npos && ((p+6) <= replystr.length()))
-		return replystr[6] ? 1 : 0;
+	if (waitFOR(6, "get preamp")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return replystr[p+6] ? 1 : 0;
+	}
 	return progStatus.preamp;
 }
 
@@ -365,8 +359,7 @@ void RIG_IC7000::set_auto_notch(int val)
 	cmd += '\x41';
 	cmd += (unsigned char)val;
 	cmd.append( post );
-	sendCommand (cmd, 6);
-	showresp(WARN, HEX, "set AN");
+	waitFB("set AN");
 }
 
 int RIG_IC7000::get_auto_notch()
@@ -377,16 +370,16 @@ int RIG_IC7000::get_auto_notch()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	sendCommand(cmd);
-	showresp(WARN, HEX, "get AN");
-	size_t p = replystr.rfind(resp);
-	if (p != string::npos && ((p+6) < replystr.length())) {
-		if (replystr[p+6] == 0x01) {
-			auto_notch_label("AN", true);
-			return true;
-		} else {
-			auto_notch_label("AN", false);
-			return false;
+	if (waitFOR(8, "get AN")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			if (replystr[p+6] == 0x01) {
+				auto_notch_label("AN", true);
+				return true;
+			} else {
+				auto_notch_label("AN", false);
+				return false;
+			}
 		}
 	}
 	return progStatus.auto_notch;
@@ -398,8 +391,7 @@ void RIG_IC7000::set_split(bool val)
 	cmd += 0x0F;
 	cmd += val ? 0x10 : 0x00;
 	cmd.append(post);
-	sendCommand(cmd);
-	showresp(WARN, HEX, "set split");
+	waitFB("set split");
 }
 
 // Volume control val 0 ... 100
@@ -410,8 +402,7 @@ void RIG_IC7000::set_volume_control(int val)
 	cmd.append("\x14\x01");
 	cmd.append(to_bcd(ICvol, 3));
 	cmd.append( post );
-	sendICcommand (cmd, 6);
-	showresp(WARN, HEX, "set vol");
+	waitFB("set vol");
 }
 
 int RIG_IC7000::get_volume_control()
@@ -422,11 +413,11 @@ int RIG_IC7000::get_volume_control()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	sendCommand(cmd);
-	showresp(WARN, HEX, "get vol");
-	size_t p = replystr.rfind(resp);
-	if (p != string::npos && ((p + 9) < replystr.length()))
-		return ((int)(fm_bcd(&replystr[p + 2],3) * 100 / 255));
+	if (waitFOR(9, "get vol")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return ((int)(fm_bcd(&replystr[p + 6],3) * 100 / 255));
+	}
 	return progStatus.volume;
 }
 
@@ -442,8 +433,7 @@ void RIG_IC7000::set_rf_gain(int val)
 	cmd.append("\x14\x02");
 	cmd.append(to_bcd(ICrfg, 3));
 	cmd.append( post );
-	sendICcommand (cmd, 6);
-	showresp(WARN, HEX, "set RF");
+	waitFB("set RF");
 }
 
 int RIG_IC7000::get_rf_gain()
@@ -453,11 +443,11 @@ int RIG_IC7000::get_rf_gain()
 	cmd = pre_to;
 	cmd.append(cstr).append(post);
 	resp.append(cstr);
-	sendCommand(cmd);
-	showresp(WARN, HEX, "get RF");
-	size_t p = replystr.rfind(resp);
-	if (p != string::npos && ((p + 9) < replystr.length()))
-		return ((int)(fm_bcd(&replystr[p + 6],3) * 100 / 255));
+	if (waitFOR(9, "get RF")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return ((int)(fm_bcd(&replystr[p + 6],3) * 100 / 255));
+	}
 	return progStatus.rfgain;
 }
 
@@ -468,8 +458,7 @@ void RIG_IC7000::set_squelch(int val)
 	cmd.append("\x14\x03");
 	cmd.append(to_bcd(ICsql, 3));
 	cmd.append( post );
-	sendICcommand (cmd, 6);
-	showresp(WARN, HEX, "set Sqlch");
+	waitFB("set Sqlch");
 }
 
 int  RIG_IC7000::get_squelch()
@@ -480,11 +469,11 @@ int  RIG_IC7000::get_squelch()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
-	sendCommand(cmd);
-	showresp(WARN, HEX, "get squelch");
-	size_t p = replystr.rfind(resp);
-	if (p != string::npos && ((p + 9) < replystr.length()))
-		return ((int)(fm_bcd(&replystr[p+6], 3) * 100 / 255));
+	if (waitFOR(9, "get sql")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return ((int)(fm_bcd(&replystr[p+6], 3) * 100 / 255));
+	}
 	return progStatus.squelch;
 }
 
@@ -494,8 +483,7 @@ void RIG_IC7000::set_power_control(double val)
 	cmd.append("\x14\x0A");
 	cmd.append(to_bcd((int)(val * 255 / 100), 3));
 	cmd.append( post );
-	sendICcommand (cmd, 6);
-	showresp(WARN, HEX, "set power");
+	waitFB("set power");
 }
 
 int RIG_IC7000::get_power_control()
@@ -505,11 +493,11 @@ int RIG_IC7000::get_power_control()
 	cmd = pre_to;
 	cmd.append(cstr).append(post);
 	resp.append(cstr);
-	sendCommand(cmd);
-	showresp(WARN, HEX, "get power");
-	size_t p = replystr.rfind(resp);
-	if (p != string::npos && ((p + 9) < replystr.length()))
-		return ((int)(fm_bcd(&replystr[p + 6],3) * 100 / 255));
+	if (waitFOR(9, "get power")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return ((int)(fm_bcd(&replystr[p + 6],3) * 100 / 255));
+	}
 	return progStatus.power_level;
 }
 
@@ -521,15 +509,47 @@ int RIG_IC7000::get_smeter()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	sendCommand(cmd);
-	showresp(WARN, HEX, "get smeter");
 	int mtr= -1;
-	size_t p = replystr.rfind(resp);
-	if (p != string::npos && ((p+9) < replystr.length())) {
-		mtr = fm_bcd(&replystr[p+6], 3);
-		mtr = (int)(mtr /2.55);
-		if (mtr > 100) mtr = 100;
+	if (waitFOR(9, "get smeter")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			mtr = fm_bcd(&replystr[p+6], 3);
+			mtr = (int)(mtr /2.55);
+			if (mtr > 100) mtr = 100;
+		}
 	}
 	return mtr;
+}
+
+int RIG_IC7000::get_mic_gain()
+{
+	string cstr = "\x14\x0B";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	if (waitFOR(9, "get att")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return ((int)(fm_bcd(&replystr[p+6],3) / 2.55));
+	}
+	return 0;
+}
+
+void RIG_IC7000::set_mic_gain(int val)
+{
+	val = (int)(val * 255 / 100);
+	cmd = pre_to;
+	cmd.append("\x14\x0B");
+	cmd.append(to_bcd(val,3));
+	cmd.append(post);
+	waitFB("set mic");
+}
+
+void RIG_IC7000::get_mic_gain_min_max_step(int &min, int &max, int &step)
+{
+	min = 0;
+	max = 100;
+	step = 1;
 }
 

@@ -1288,3 +1288,29 @@ Fl_Color flrig_def_color(int n)
 	if (n < 0) n = 0;
 	return (Fl_Color)flrig_cmap[n];
 }
+
+
+void cb_send_command()
+{
+	bool usehex = false;
+	string command = txt_command->value();
+	if (command.empty()) return;
+	string cmd = "";
+	if (command.find("x") != string::npos) { // hex strings
+		size_t p = 0;
+		usehex = true;
+		unsigned int val;
+		while (( p = command.find("x", p)) != string::npos) {
+			sscanf(&command[p+1], "%x", &val);
+			cmd += (unsigned char) val;
+			p += 3;
+		}
+	} else
+		cmd = command;
+	sendCommand(cmd, 0);
+	MilliSleep(100);
+	readResponse();
+	txt_response->value(
+		usehex ? str2hex(replystr.c_str(), replystr.length()) :
+		replystr.c_str());
+}

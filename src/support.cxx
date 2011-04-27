@@ -1820,16 +1820,22 @@ void initRig()
 		sldrVOLUME->maximum(max);
 		sldrVOLUME->step(step);
 		sldrVOLUME->redraw();
-		progStatus.volume = selrig->get_volume_control();
-		sldrVOLUME->value(progStatus.volume);
-		if (progStatus.spkr_on == 0) {
-			btnVol->value(0);
-			sldrVOLUME->deactivate();
-			selrig->set_volume_control(0);
-		} else {
+		if (progStatus.use_rig_data) {
+			progStatus.volume = selrig->get_volume_control();
+			sldrVOLUME->value(progStatus.volume);
 			btnVol->value(1);
 			sldrVOLUME->activate();
-			selrig->set_volume_control(progStatus.volume);
+		} else {
+			sldrVOLUME->value(progStatus.volume);
+			if (progStatus.spkr_on == 0) {
+				btnVol->value(0);
+				sldrVOLUME->deactivate();
+				selrig->set_volume_control(0);
+			} else {
+				btnVol->value(1);
+				sldrVOLUME->activate();
+				selrig->set_volume_control(progStatus.volume);
+			}
 		}
 		btnVol->show();
 		sldrVOLUME->show();
@@ -1839,32 +1845,48 @@ void initRig()
 	}
 
 	if (selrig->has_rf_control) {
-		progStatus.rfgain = selrig->get_rf_gain();
-		sldrRFGAIN->value(progStatus.rfgain);
-		selrig->set_rf_gain(progStatus.rfgain);
-		sldrRFGAIN->show();
+		if (progStatus.use_rig_data) {
+			progStatus.rfgain = selrig->get_rf_gain();
+			sldrRFGAIN->value(progStatus.rfgain);
+			sldrRFGAIN->show();
+		} else {
+			sldrRFGAIN->value(progStatus.rfgain);
+			selrig->set_rf_gain(progStatus.rfgain);
+			sldrRFGAIN->show();
+		}
 	} else {
 		sldrRFGAIN->hide();
 	}
 
 	if (selrig->has_sql_control) {
-		progStatus.squelch = selrig->get_squelch();
-		sldrSQUELCH->value(progStatus.squelch);
-		selrig->set_squelch(progStatus.squelch);
-		sldrSQUELCH->show();
+		if (progStatus.use_rig_data) {
+			progStatus.squelch = selrig->get_squelch();
+			sldrSQUELCH->value(progStatus.squelch);
+			sldrSQUELCH->show();
+		} else {
+			sldrSQUELCH->value(progStatus.squelch);
+			selrig->set_squelch(progStatus.squelch);
+			sldrSQUELCH->show();
+		}
 	} else {
 		sldrSQUELCH->hide();
 	}
 
 	if (selrig->has_noise_reduction_control) {
 		btnNR->show();
-		progStatus.noise_reduction = selrig->get_noise_reduction();
-		progStatus.noise_reduction_val = selrig->get_noise_reduction_val();
-		btnNR->value(progStatus.noise_reduction);
-		sldrNR->show();
-		sldrNR->value(progStatus.noise_reduction_val);
-		selrig->set_noise_reduction(progStatus.noise_reduction);
-		selrig->set_noise_reduction_val(progStatus.noise_reduction_val);
+		if (progStatus.use_rig_data) {
+			progStatus.noise_reduction = selrig->get_noise_reduction();
+			progStatus.noise_reduction_val = selrig->get_noise_reduction_val();
+			btnNR->value(progStatus.noise_reduction);
+			sldrNR->show();
+			sldrNR->value(progStatus.noise_reduction_val);
+		} else {
+			btnNR->value(progStatus.noise_reduction);
+			sldrNR->show();
+			sldrNR->value(progStatus.noise_reduction_val);
+			selrig->set_noise_reduction(progStatus.noise_reduction);
+			selrig->set_noise_reduction_val(progStatus.noise_reduction_val);
+		}
 	} else {
 		btnNR->hide();
 		sldrNR->hide();
@@ -1917,9 +1939,11 @@ void initRig()
 		sldrMICGAIN->minimum(min);
 		sldrMICGAIN->maximum(max);
 		sldrMICGAIN->step(step);
-		sldrMICGAIN->redraw();
+		if (progStatus.use_rig_data)
+			progStatus.mic_gain = selrig->get_mic_gain();
+		else 
+			selrig->set_mic_gain(progStatus.mic_gain);
 		sldrMICGAIN->value(progStatus.mic_gain);
-		selrig->set_mic_gain(progStatus.mic_gain);
 		sldrMICGAIN->show();
 	} else {
 		sldrMICGAIN->hide();
@@ -1931,14 +1955,17 @@ void initRig()
 		sldrPOWER->minimum(min);
 		sldrPOWER->maximum(max);
 		sldrPOWER->step(step);
-		sldrPOWER->redraw();
 		if (min > progStatus.power_level)
 			progStatus.power_level = min;
 		if (max < progStatus.power_level)
 			progStatus.power_level = max;
+		if (progStatus.use_rig_data)
+			progStatus.power_level = selrig->get_power_control();
+		else
+			selrig->set_power_control(progStatus.power_level);
 		sldrPOWER->value(progStatus.power_level);
+		sldrPOWER->redraw();
 		sldrPOWER->show();
-		selrig->set_power_control(progStatus.power_level);
 	} else {
 		sldrPOWER->hide();
 	}
@@ -1970,8 +1997,11 @@ void initRig()
 	}
 
 	if (selrig->has_noise_control) {
+		if (progStatus.use_rig_data)
+			progStatus.noise = selrig->get_noise();
+		else
+			selrig->set_noise(progStatus.noise);
 		btnNOISE->value(progStatus.noise);
-		selrig->set_noise(progStatus.noise);
 		btnNOISE->show();
 	}
 	else {
@@ -2054,14 +2084,16 @@ void initRig()
 		FreqDispB->value(vfoB.freq);
 
 		selrig->selectA();
-		selrig->set_vfoA(vfoA.freq);
-		selrig->set_modeA(vfoA.imode);
-		selrig->set_bwA(vfoA.iBW);
-		selrig->selectB();
-		selrig->set_vfoB(vfoB.freq);
-		selrig->set_modeB(vfoB.imode);
-		selrig->set_bwB(vfoB.iBW);
-		selrig->selectA();
+		if (!progStatus.use_rig_data) {
+			selrig->set_vfoA(vfoA.freq);
+			selrig->set_modeA(vfoA.imode);
+			selrig->set_bwA(vfoA.iBW);
+			selrig->selectB();
+			selrig->set_vfoB(vfoB.freq);
+			selrig->set_modeB(vfoB.imode);
+			selrig->set_bwB(vfoB.iBW);
+			selrig->selectA();
+		}
 	}
 
 	// enable the serial thread

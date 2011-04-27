@@ -229,10 +229,16 @@ long rigbase::fm_decimal_be(char *decimal_be, int len)
 	return fm_decimal(decimal_be, len);
 }
 
-void rigbase::showresp(int level, int how, string s) 
+void rigbase::showresp(int level, int how, string s, string tx, string rx) 
 {
-	string s1 = how == HEX ? str2hex(cmd.c_str(), cmd.length()) : cmd;
-	string s2 = how == HEX ? str2hex(replystr.c_str(), replystr.length()) : replystr;
+	time_t now;
+	time(&now);
+	struct tm *local = localtime(&now);
+	char sztm[20];
+	strftime(sztm, sizeof(sztm), "%H:%M:%S", local);
+
+	string s1 = how == HEX ? str2hex(tx.c_str(), tx.length()) : tx;
+	string s2 = how == HEX ? str2hex(rx.c_str(), rx.length()) : rx;
 	if (how == ASC) {
 		size_t p;
 		while((p = s1.find('\r')) != string::npos)
@@ -247,14 +253,14 @@ void rigbase::showresp(int level, int how, string s)
 
 	switch (level) {
 	case ERR:
-		SLOG_ERROR("%10s : cmd %s : ans %s", s.c_str(), s1.c_str(), s2.c_str());
+		SLOG_ERROR("%s: %10s, cmd %s, ans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
 		break;
 	case WARN:
-		SLOG_WARN("%10s : cmd %s : ans %s", s.c_str(), s1.c_str(), s2.c_str());
+		SLOG_WARN("%s: %10s, cmd %s, ans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
 		break;
 	case INFO:
 	default:
-		SLOG_INFO("%10s : cmd %s : ans %s", s.c_str(), s1.c_str(), s2.c_str());
+		SLOG_INFO("%s: %10s, cmd %s, ans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
 	}
 }
 

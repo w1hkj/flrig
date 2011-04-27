@@ -1528,6 +1528,16 @@ static void cb_btn_poll_rfgain(Fl_Check_Button* o, void*) {
   progStatus.poll_rfgain = o->value();
 }
 
+Fl_Input2 *txt_command=(Fl_Input2 *)0;
+
+Fl_Button *btn_send_command=(Fl_Button *)0;
+
+static void cb_btn_send_command(Fl_Button*, void*) {
+  cb_send_command();
+}
+
+Fl_Output *txt_response=(Fl_Output *)0;
+
 Fl_Button *btnCancelCommConfig=(Fl_Button *)0;
 
 static void cb_btnCancelCommConfig(Fl_Button*, void*) {
@@ -1890,6 +1900,28 @@ e"));
           } // Fl_Check_Button* btn_poll_rfgain
           o->end();
         } // Fl_Group* o
+        o->end();
+      } // Fl_Group* o
+      { Fl_Group* o = new Fl_Group(4, 30, 470, 220, _("Send Cmd"));
+        o->hide();
+        { txt_command = new Fl_Input2(29, 55, 431, 25, _("Enter text as ASCII string\nOr sequence of hex values, x80 etc separated by s\
+paces"));
+          txt_command->box(FL_DOWN_BOX);
+          txt_command->color((Fl_Color)FL_BACKGROUND2_COLOR);
+          txt_command->selection_color((Fl_Color)FL_SELECTION_COLOR);
+          txt_command->labeltype(FL_NORMAL_LABEL);
+          txt_command->labelfont(0);
+          txt_command->labelsize(14);
+          txt_command->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
+          txt_command->align(FL_ALIGN_BOTTOM_LEFT);
+          txt_command->when(FL_WHEN_RELEASE);
+        } // Fl_Input2* txt_command
+        { btn_send_command = new Fl_Button(390, 166, 70, 20, _("SEND"));
+          btn_send_command->callback((Fl_Callback*)cb_btn_send_command);
+        } // Fl_Button* btn_send_command
+        { txt_response = new Fl_Output(29, 121, 431, 25, _("Response to the SEND button"));
+          txt_response->align(FL_ALIGN_BOTTOM_LEFT);
+        } // Fl_Output* txt_response
         o->end();
       } // Fl_Group* o
       o->end();
