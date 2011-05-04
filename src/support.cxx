@@ -46,8 +46,6 @@ bool pushedB = false;
 
 const char **old_bws = NULL;
 
-//bool localptt = false;
-
 FREQMODE oplist[LISTSIZE];
 int  numinlist = 0;
 vector<string> rigmodes_;
@@ -2021,9 +2019,9 @@ void initRig()
 	if (selrig->has_ptt_control ||
 		progStatus.comm_dtrptt || progStatus.comm_rtsptt ||
 		progStatus.sep_dtrptt || progStatus.sep_rtsptt) {
-		btnPTT->show();
+		btnPTT->activate();
 	} else {
-		btnPTT->hide();
+		btnPTT->deactivate();
 	}
 
 	if (selrig->has_auto_notch) {
