@@ -125,6 +125,7 @@ void RIG_IC7000::set_vfoA (long freq)
 	cmd = pre_to;
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 10 ) );
+	cmd.append(post);
 	waitFB("set vfo A");
 }
 
@@ -528,7 +529,8 @@ int RIG_IC7000::get_mic_gain()
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
-	if (waitFOR(9, "get att")) {
+	cmd.append(post);
+	if (waitFOR(9, "get mic")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			return ((int)(fm_bcd(&replystr[p+6],3) / 2.55));

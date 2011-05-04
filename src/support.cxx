@@ -436,7 +436,6 @@ void serviceA()
 
 	if (changed_vfo && !useB) {
 		selrig->selectA();
-		changed_vfo = false;
 	}
 
 // if TT550 and on the B vfo
@@ -445,7 +444,7 @@ void serviceA()
 		goto end_serviceA;
 	}
 
-	if (vfoA.freq != vfo.freq) {
+	if (vfoA.freq != vfo.freq || changed_vfo) {
 		selrig->set_vfoA(vfoA.freq);
 		Fl::awake(setFreqDispA, (void *)vfoA.freq);
 		vfo.freq = vfoA.freq;
@@ -455,7 +454,7 @@ void serviceA()
 			} catch (...) {}
 	}
 // adjust for change in bandwidths_
-	if (vfoA.imode != vfo.imode) {
+	if (vfoA.imode != vfo.imode || changed_vfo) {
 		selrig->set_modeA(vfoA.imode);
 		vfo.imode = vfoA.imode;
 		vfo.iBW = vfoA.iBW = selrig->adjust_bandwidth(vfo.imode);
@@ -470,7 +469,7 @@ void serviceA()
 			send_bandwidths();
 			send_new_bandwidth(vfoA.iBW);
 		} catch (...) {}
-	} else if (vfoA.iBW != vfo.iBW) {
+	} else if (vfoA.iBW != vfo.iBW || changed_vfo) {
 		selrig->set_bwA(vfoA.iBW);
 		vfo.iBW = vfoA.iBW;
 		Fl::awake(setBWControl);
@@ -481,6 +480,7 @@ void serviceA()
 	}
 
 end_serviceA:
+	changed_vfo = false;
 	pthread_mutex_unlock(&mutex_xmlrpc);
 
 	pthread_mutex_unlock(&mutex_serial);
@@ -507,7 +507,6 @@ void serviceB()
 
 	if (changed_vfo && useB) {
 		selrig->selectB();
-		changed_vfo = false;
 	}
 
 // if TT550 or K3 and split or on vfoA just update the B vfo
@@ -516,7 +515,7 @@ void serviceB()
 		goto end_serviceB;
 	}
 
-	if (vfoB.freq != vfo.freq || pushedB) {
+	if (vfoB.freq != vfo.freq || pushedB || changed_vfo) {
 		selrig->set_vfoB(vfoB.freq);
 		vfo.freq = vfoB.freq;
 		Fl::awake(setFreqDispB, (void *)vfoB.freq);
@@ -525,7 +524,7 @@ void serviceB()
 				send_new_freq(vfoB.freq);
 			} catch (...) {}
 	}
-	if (vfoB.imode != vfo.imode || pushedB) {
+	if (vfoB.imode != vfo.imode || pushedB || changed_vfo) {
 		selrig->set_modeB(vfoB.imode);
 		vfo.imode = vfoB.imode;
 		vfo.iBW = vfoB.iBW = selrig->adjust_bandwidth(vfo.imode);
@@ -540,7 +539,7 @@ void serviceB()
 			send_bandwidths();
 			send_new_bandwidth(vfoB.iBW);
 		} catch (...) {}
-	} else if (vfoB.iBW != vfo.iBW || pushedB) {
+	} else if (vfoB.iBW != vfo.iBW || pushedB || changed_vfo) {
 		selrig->set_bwB(vfoB.iBW);
 		vfo.iBW = vfoB.iBW;
 		Fl::awake(setBWControl);
@@ -552,6 +551,7 @@ void serviceB()
 	pushedB = false;
 
 end_serviceB:
+	changed_vfo = false;
 	pthread_mutex_unlock(&mutex_xmlrpc);
 	pthread_mutex_unlock(&mutex_serial);
 }
@@ -782,6 +782,8 @@ int movFreqA() {
 }
 
 int movFreqB() {
+	if (progStatus.split && (rig_nbr >= IC703 && rig_nbr <= IC910H))
+		return 0; // disallow for ICOM transceivers
 	FREQMODE vfo = vfoB;
 	vfo.freq = FreqDispB->value();
 	vfo.src = UI;
@@ -814,10 +816,12 @@ void cb_set_split(int val)
 			btnB->value(0);
 			cb_selectA();
 		} else {
-			vfoB.freq = FreqDispB->value();
-			pthread_mutex_lock(&mutex_serial);
-				selrig->set_vfoB(vfoB.freq);
-			pthread_mutex_unlock(&mutex_serial);
+			if (vfoB.freq != FreqDispB->value()) {
+				vfoB.freq = FreqDispB->value();
+				pthread_mutex_lock(&mutex_serial);
+					selrig->set_vfoB(vfoB.freq);
+				pthread_mutex_unlock(&mutex_serial);
+			}
 		}
 	}
 	progStatus.split = val;
