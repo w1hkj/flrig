@@ -1,3 +1,15 @@
+2011-05-04  David Freese  <w1hkj@w1hkj.com>
+
+	dfa146b: FT920
+	980ad5e: IC7000 bug fix
+	4a74378: IC xcvr family
+	7f2ae93: IC7000
+	4406d39: TT599
+
+2011-04-24  David Kjellquist  <dave@kjellquist.com>
+
+	e1748e5: TS570
+
 2011-04-23  David Freese  <w1hkj@w1hkj.com>
 
 	170a5a7: Polling
