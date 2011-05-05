@@ -65,6 +65,24 @@ RIG_IC7000::RIG_IC7000() {
 	restore_mbw = false;
 
 	has_auto_notch = true;
+	has_power_control = true;
+	has_volume_control = true;
+	has_mode_control = true;
+	has_bandwidth_control = true;
+	has_micgain_control = true;
+	has_notch_control = true;
+	has_noise_control = true;
+	has_noise_reduction_control = true;
+	has_noise_reduction = true;
+	has_attenuator_control = true;
+	has_preamp_control = true;
+	has_ifshift_control = true;
+	has_ptt_control = true;
+	has_tune_control = true;
+	has_swr_control = true;
+	has_alc_control = true;
+	has_rf_control = true;
+	has_sql_control = true;
 
 };
 
@@ -310,7 +328,7 @@ int RIG_IC7000::get_attenuator()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(5, "get att")) {
+	if (waitFOR(7, "get att")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			return (replystr[p+5] ? 1 : 0);
@@ -345,7 +363,7 @@ int RIG_IC7000::get_preamp()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(6, "get preamp")) {
+	if (waitFOR(8, "get preamp")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			return replystr[p+6] ? 1 : 0;
@@ -491,9 +509,9 @@ int RIG_IC7000::get_power_control()
 {
 	string cstr = "\x14\x0A";
 	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr).append(post);
-	resp.append(cstr);
 	if (waitFOR(9, "get power")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
