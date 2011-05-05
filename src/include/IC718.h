@@ -8,11 +8,29 @@ public:
 	RIG_IC718();
 	~RIG_IC718(){}
 
-	long get_vfoA ();
-	void set_vfoA (long freq);
+	long get_vfoA(void);
+	void set_vfoA(long f);
+	int  get_bwA();
+	void set_bwA(int);
+	int  get_modeA();
+	void set_modeA(int val);
+
+	int  get_modetype(int n);
+
+	long get_vfoB(void);
+	void set_vfoB(long f);
+	int  get_bwB();
+	void set_bwB(int);
+	void set_modeB(int val);
+	int  get_modeB();
+
+	void selectA();
+	void selectB();
+
 	void set_volume_control(int val);
 	int  get_volume_control();
 	void get_vol_min_max_step(int &min, int &max, int &step);
+
 	void set_attenuator(int val);
 	int  get_smeter();
 	void set_noise(bool val);
@@ -27,12 +45,12 @@ public:
 	int  get_rf_gain();
 	void set_squelch(int val);
 	void set_power_control(double val);
+	int  get_power_control();
+
 	void set_mic_gain(int val);
-	void set_modeA(int val);
-	int  get_modeA();
-	int  get_modetype(int n);
-	void set_bwA(int val);
-	int  get_bwA();
+	int  get_mic_gain();
+	void get_mic_gain_min_max_step(int &min, int &max, int &step);
+
 	void set_compression();
 	void set_auto_notch(int val);
 	int  get_auto_notch();

@@ -66,6 +66,24 @@ int  RIG_IC718::adjust_bandwidth(int m)
 	return 0;
 }
 
+void RIG_IC718::selectA()
+{
+	cmd = pre_to;
+	cmd += '\x07';
+	cmd += '\x00';
+	cmd.append(post);
+	waitFB("sel A");
+}
+
+void RIG_IC718::selectB()
+{
+	cmd = pre_to;
+	cmd += '\x07';
+	cmd += '\x01';
+	cmd.append(post);
+	waitFB("sel B");
+}
+
 long RIG_IC718::get_vfoA ()
 {
 	cmd = pre_to;
@@ -90,6 +108,32 @@ void RIG_IC718::set_vfoA (long freq)
 	cmd.append( post );
 	waitFB("set vfo A");
 }
+
+long RIG_IC718::get_vfoB ()
+{
+	string resp = pre_fm;
+	resp += '\x03';
+	cmd = pre_to;
+	cmd += '\x03';
+	cmd.append( post );
+	if (waitFOR(11, "get vfo B")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			B.freq = fm_bcd_be(&replystr[p+5], 10);
+	}
+	return B.freq;
+}
+
+void RIG_IC718::set_vfoB (long freq)
+{
+	B.freq = freq;
+	cmd = pre_to;
+	cmd += '\x05';
+	cmd.append( to_bcd_be( freq, 10 ) );
+	cmd.append( post );
+	waitFB("set vfo B");
+}
+
 
 // Volume control val 0 ... 100
 void RIG_IC718::set_volume_control(int val)
@@ -302,6 +346,21 @@ void RIG_IC718::set_power_control(double val)
 	waitFB("set power");
 }
 
+int RIG_IC718::get_power_control()
+{
+	string cstr = "\x14\x0A";
+	string resp = pre_fm;
+	cmd = pre_to;
+	cmd.append(cstr).append(post);
+	resp.append(cstr);
+	if (waitFOR(9, "get power")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return ((int)(fm_bcd(&replystr[p + 6],3) * 100 / 255));
+	}
+	return progStatus.power_level;
+}
+
 void RIG_IC718::set_mic_gain(int val)
 {
 	val = (int)(val * 255 / 100);
@@ -312,12 +371,35 @@ void RIG_IC718::set_mic_gain(int val)
 	waitFB("set mic");
 }
 
+int RIG_IC718::get_mic_gain()
+{
+	string cstr = "\x14\x0B";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append(post);
+	if (waitFOR(9, "get mic")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return ((int)(fm_bcd(&replystr[p+6],3) / 2.55));
+	}
+	return 0;
+}
+
+void RIG_IC718::get_mic_gain_min_max_step(int &min, int &max, int &step)
+{
+	min = 0;
+	max = 100;
+	step = 1;
+}
+
 void RIG_IC718::set_modeA(int val)
 {
 	modeA = val;
 	cmd = pre_to;
 	cmd += '\x06';
-	cmd += val > 5 ? val + 2 : val;
+	cmd += val > 4 ? val + 2 : val;
 	cmd += filter_nbr;
 	cmd.append( post );
 	waitFB("set mode A");
@@ -341,6 +423,35 @@ int RIG_IC718::get_modeA()
 	return modeA;
 }
 
+void RIG_IC718::set_modeB(int val)
+{
+	modeB = val;
+	cmd = pre_to;
+	cmd += '\x06';
+	cmd += val > 4 ? val + 2 : val;
+	cmd += filter_nbr;
+	cmd.append( post );
+	waitFB("set mode A");
+}
+
+int RIG_IC718::get_modeB()
+{
+	cmd = pre_to;
+	cmd += '\x04';
+	cmd.append(post);
+	string resp = pre_fm;
+	resp += '\x04';
+	if (waitFOR(8, "get modeB")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			modeB = replystr[p+5];
+			if (modeB > 6) modeB -= 2;
+			filter_nbr = replystr[p+6];
+		}
+	}
+	return modeB;
+}
+
 int RIG_IC718::get_modetype(int n)
 {
 	return _mode_type[n];
@@ -353,6 +464,17 @@ void RIG_IC718::set_bwA(int val)
 }
 
 int RIG_IC718::get_bwA()
+{
+	return filter_nbr - 1;
+}
+
+void RIG_IC718::set_bwB(int val)
+{
+	filter_nbr = val + 1;
+	set_modeB(modeB);
+}
+
+int RIG_IC718::get_bwB()
 {
 	return filter_nbr - 1;
 }
