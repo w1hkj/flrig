@@ -68,22 +68,28 @@ void RIG_IC756PRO2::set_attenuator(int val)
 
 int RIG_IC756PRO2::get_attenuator()
 {
+	string cstr = "\x11";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd += '\x11';
+	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(8, "get att")) {
-		if (replystr[5] == 0x06) {
-			atten_level = 1;
-			atten_label("6 dB", true);
-		} else if (replystr[6] == 0x12) {
-			atten_level = 2;
-			atten_label("12 dB", true);
-		} else if (replystr[6] == 0x18) {
-			atten_level = 3;
-			atten_label("18 dB", true);
-		} else if (replystr[6] == 0x00) {
-			atten_level = 0;
-			atten_label("Att", false);
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			if (replystr[p+6] == 0x06) {
+				atten_level = 1;
+				atten_label("6 dB", true);
+			} else if (replystr[p+6] == 0x12) {
+				atten_level = 2;
+				atten_label("12 dB", true);
+			} else if (replystr[p+6] == 0x18) {
+				atten_level = 3;
+				atten_label("18 dB", true);
+			} else if (replystr[p+6] == 0x00) {
+				atten_level = 0;
+				atten_label("Att", false);
+			}
 		}
 	}
 	return atten_level;
@@ -111,20 +117,25 @@ void RIG_IC756PRO2::set_preamp(int val)
 
 int RIG_IC756PRO2::get_preamp()
 {
+	string cstr = "\x16\x02";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd += '\x16';
-	cmd += '\x02';
+	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(8, "get preamp")) {
-		if (replystr[6] == 0x01) {
-			preamp_label("Pre 1", true);
-			preamp_level = 1;
-		} else if (replystr[6] == 0x02) {
-			preamp_label("Pre 2", true);
-			preamp_level = 2;
-		} else {
-			preamp_label("Pre", false);
-			preamp_level = 0;
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			if (replystr[p+6] == 0x01) {
+				preamp_label("Pre 1", true);
+				preamp_level = 1;
+			} else if (replystr[p+6] == 0x02) {
+				preamp_label("Pre 2", true);
+				preamp_level = 2;
+			} else {
+				preamp_label("Pre", false);
+				preamp_level = 0;
+			}
 		}
 	}
 	return preamp_level;
@@ -162,32 +173,40 @@ void RIG_IC756PRO3::set_modeA(int val)
 
 int RIG_IC756PRO3::get_modeA()
 {
-	int md;
+	int md = 0;
+	string cstr = "\x04";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd += '\x04';
+	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(8, "get mode A")) {
-		md = replystr[5];
-		if (md > 6) md--;
-		A.iBW = replystr[6];
-		cmd = pre_to;
-		cmd.append("\x1A\x06");
-		cmd.append(post);
-		if (waitFOR(9, "data mode?")) {
-			if (replystr[6]) {
-				switch (md) {
-					case 0 : md = 8; break;
-					case 1 : md = 9; break;
-					case 5 : md = 10; break;
-					default : break;
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			md = replystr[p+5];
+			if (md > 6) md--;
+			A.iBW = replystr[p+6];
+			cstr = "\x1A\x06";
+			resp = pre_fm;
+			resp.append(cstr);
+			cmd = pre_to;
+			cmd.append(cstr);
+			cmd.append(post);
+			if (waitFOR(9, "data mode?")) {
+				p = replystr.rfind(resp);
+				if (p != string::npos) {
+					if (replystr[p+6]) {
+						switch (md) {
+							case 0 : md = 8; break;
+							case 1 : md = 9; break;
+							case 5 : md = 10; break;
+							default : break;
+						}
+					}
 				}
 			}
 			A.imode = md;
-		} else {
-			checkresponse();
 		}
-	} else {
-		checkresponse();
 	}
 	return A.imode;
 }
@@ -220,32 +239,40 @@ void RIG_IC756PRO3::set_modeB(int val)
 
 int RIG_IC756PRO3::get_modeB()
 {
-	int md;
+	int md = 0;
+	string cstr = "\x04";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd += '\x04';
+	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(8, "get mode B")) {
-		md = replystr[5];
-		if (md > 6) md--;
-		B.iBW = replystr[6];
-		cmd = pre_to;
-		cmd.append("\x1A\x06");
-		cmd.append(post);
-		if (waitFOR(9, "data mode?")) {
-			if (replystr[6]) {
-				switch (md) {
-					case 0 : md = 8; break;
-					case 1 : md = 9; break;
-					case 5 : md = 10; break;
-					default : break;
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			md = replystr[p+5];
+			if (md > 6) md--;
+			B.iBW = replystr[p+6];
+			cstr = "\x1A\x06";
+			resp = pre_fm;
+			resp.append(cstr);
+			cmd = pre_to;
+			cmd.append(cstr);
+			cmd.append(post);
+			if (waitFOR(9, "data mode?")) {
+				p = replystr.rfind(resp);
+				if (p != string::npos) {
+					if (replystr[p+6]) {
+						switch (md) {
+							case 0 : md = 8; break;
+							case 1 : md = 9; break;
+							case 5 : md = 10; break;
+							default : break;
+						}
+					}
 				}
 			}
 			B.imode = md;
-		} else {
-			checkresponse();
 		}
-	} else {
-		checkresponse();
 	}
 	return B.imode;
 }
