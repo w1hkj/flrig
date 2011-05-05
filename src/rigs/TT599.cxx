@@ -358,7 +358,6 @@ int  RIG_TT599::get_smeter()
 
 int  RIG_TT599::get_swr()
 {
-	return 0; // not implemented by TenTec
 	float swr = (sqrtf(fwdpwr) + sqrtf(refpwr))/(sqrt(fwdpwr) - sqrt(refpwr) + .0001);
 	swr -= 1.0;
 	swr *= 25.0;
@@ -370,7 +369,6 @@ int  RIG_TT599::get_swr()
 
 int  RIG_TT599::get_power_out()
 {
-	return 0; // not implemented by TenTec
 	size_t p;
 	fwdpwr = 0; refpwr = 0;
 	cmd = "?S\r";
