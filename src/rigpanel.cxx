@@ -7,6 +7,7 @@
 #include "status.h"
 #include "support.h"
 #include "K3_ui.h"
+static const int freq_sel_widths[]={110, 70, 70, 0}; 
 
 static void cb_mnuExit(Fl_Menu_*, void*) {
   cbExit();
@@ -1194,42 +1195,48 @@ selectFreq();
 
 Fl_Double_Window* Memory_Dialog() {
   Fl_Double_Window* w;
-  { Fl_Double_Window* o = new Fl_Double_Window(222, 128, _("Flrig Memory"));
+  { Fl_Double_Window* o = new Fl_Double_Window(320, 138, _("Flrig Memory"));
     w = o;
-    { btnAddFreq = new Fl_Button(9, 8, 51, 20, _("Add @-1>"));
-      btnAddFreq->tooltip(_("Add to list"));
-      btnAddFreq->down_box(FL_DOWN_BOX);
-      btnAddFreq->labelsize(12);
-      btnAddFreq->callback((Fl_Callback*)cb_btnAddFreq);
-      btnAddFreq->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
-    } // Fl_Button* btnAddFreq
-    { btnDelFreq = new Fl_Button(10, 38, 50, 20, _("Del @-11+"));
-      btnDelFreq->tooltip(_("Delete from list"));
-      btnDelFreq->down_box(FL_DOWN_BOX);
-      btnDelFreq->labelsize(12);
-      btnDelFreq->callback((Fl_Callback*)cb_btnDelFreq);
-      btnDelFreq->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
-    } // Fl_Button* btnDelFreq
-    { btnClearList = new Fl_Button(10, 68, 52, 20, _("Clr @-2square"));
-      btnClearList->tooltip(_("Clear list"));
-      btnClearList->down_box(FL_DOWN_BOX);
-      btnClearList->labelsize(12);
-      btnClearList->callback((Fl_Callback*)cb_btnClearList);
-      btnClearList->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
-    } // Fl_Button* btnClearList
-    { Fl_Button* o = new Fl_Button(7, 99, 54, 20, _("Close"));
-      o->labelsize(12);
-      o->callback((Fl_Callback*)cb_Close);
-      o->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
-    } // Fl_Button* o
-    { FreqSelect = new Fl_Browser(66, 7, 150, 113);
+    { Fl_Group* o = new Fl_Group(2, 2, 60, 133);
+      o->box(FL_ENGRAVED_FRAME);
+      { btnAddFreq = new Fl_Button(6, 6, 51, 22, _("Add @-1>"));
+        btnAddFreq->tooltip(_("Add to list"));
+        btnAddFreq->down_box(FL_DOWN_BOX);
+        btnAddFreq->labelsize(12);
+        btnAddFreq->callback((Fl_Callback*)cb_btnAddFreq);
+        btnAddFreq->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
+      } // Fl_Button* btnAddFreq
+      { btnDelFreq = new Fl_Button(6, 40, 51, 22, _("Del @-11+"));
+        btnDelFreq->tooltip(_("Delete from list"));
+        btnDelFreq->down_box(FL_DOWN_BOX);
+        btnDelFreq->labelsize(12);
+        btnDelFreq->callback((Fl_Callback*)cb_btnDelFreq);
+        btnDelFreq->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
+      } // Fl_Button* btnDelFreq
+      { btnClearList = new Fl_Button(6, 74, 51, 22, _("Clr @-2square"));
+        btnClearList->tooltip(_("Clear list"));
+        btnClearList->down_box(FL_DOWN_BOX);
+        btnClearList->labelsize(12);
+        btnClearList->callback((Fl_Callback*)cb_btnClearList);
+        btnClearList->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
+      } // Fl_Button* btnClearList
+      { Fl_Button* o = new Fl_Button(6, 109, 51, 22, _("Close"));
+        o->labelsize(12);
+        o->callback((Fl_Callback*)cb_Close);
+        o->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
+      } // Fl_Button* o
+      o->end();
+    } // Fl_Group* o
+    { Fl_Browser* o = FreqSelect = new Fl_Browser(66, 2, 250, 133);
       FreqSelect->tooltip(_("Select operating frequency/mode"));
-      FreqSelect->type(2);
+      FreqSelect->type(1);
       FreqSelect->labelfont(4);
       FreqSelect->labelsize(12);
       FreqSelect->textfont(4);
       FreqSelect->textsize(12);
       FreqSelect->callback((Fl_Callback*)cb_FreqSelect);
+      o->has_scrollbar(Fl_Browser_::VERTICAL_ALWAYS);
+      o->column_widths(freq_sel_widths);
     } // Fl_Browser* FreqSelect
     o->end();
   } // Fl_Double_Window* o

@@ -712,15 +712,16 @@ void clearList() {
 }
 
 void updateSelect() {
-	char szFREQMODE[20];
+	char szline[40];
 	if (!numinlist) return;
 	sortList();
 	FreqSelect->clear();
 	for (int n = 0; n < numinlist; n++) {
-		snprintf(szFREQMODE, sizeof(szFREQMODE),
-			"%13.3f%7s", oplist[n].freq / 1000.0,
-			selrig->get_modename_(oplist[n].imode));
-		FreqSelect->add (szFREQMODE);
+		snprintf(szline, sizeof(szline),
+			"@r%.3f\t@r%s\t@r%s", oplist[n].freq / 1000.0,
+			selrig->get_bwname_(oplist[n].iBW),
+			selrig->get_modename_(oplist[n].imode) );
+		FreqSelect->add (szline);
 	}
 }
 

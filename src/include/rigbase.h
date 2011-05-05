@@ -230,6 +230,7 @@ public:
 	virtual int  get_rf_gain() {return 0;}
 	virtual void get_rf_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 100; step = 1; }
+
 	virtual const char * get_modename_(int n){
 		if (modes_ == NULL) return "";
 		int nmodes = 0;
@@ -237,7 +238,18 @@ public:
 		if (n < nmodes && n > -1)
 			return modes_[n];
 		else
-			return modes_[0];}
+			return modes_[0];
+	}
+
+	virtual const char * get_bwname_(int n){
+		if (bandwidths_ == NULL) return "";
+		int nbw = 0;
+		while (bandwidths_[nbw] != NULL) nbw++;
+		if (n < nbw && n > -1)
+			return bandwidths_[n];
+		else
+			return bandwidths_[0];
+	}
 
 	virtual void setRit(int v) {}
 	virtual int  getRit() {return 0;}
