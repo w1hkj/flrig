@@ -136,12 +136,17 @@ void RIG_IC746::selectB()
 
 long RIG_IC746::get_vfoA ()
 {
+	string cstr = "x03";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd += '\x03';
-	cmd.append( post );
-	if (waitFOR(11, "get vfo A"))
-		return A.freq;
-	A.freq = fm_bcd_be(&replystr[5], 10);
+	cmd.append(cstr);
+	cmd.append(post);
+	if (waitFOR(11, "get vfo A")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			A.freq = fm_bcd_be(&replystr[p+5], 10);
+	}
 	return A.freq;
 }
 
@@ -157,12 +162,17 @@ void RIG_IC746::set_vfoA (long freq)
 
 long RIG_IC746::get_vfoB ()
 {
+	string cstr = "x03";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd += '\x03';
-	cmd.append( post );
-	if (waitFOR(11, "get vfo B"))
-		return B.freq;
-	B.freq = fm_bcd_be(&replystr[5], 10);
+	cmd.append(cstr);
+	cmd.append(post);
+	if (waitFOR(11, "get vfo B")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			B.freq = fm_bcd_be(&replystr[p+5], 10);
+	}
 	return B.freq;
 }
 
@@ -178,13 +188,18 @@ void RIG_IC746::set_vfoB (long freq)
 
 int RIG_IC746::get_smeter()
 {
+	string cstr = "\x15\x02";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd.append("\x15\x02");
-	cmd.append( post );
+	cmd.append(cstr);
+	cmd.append(post);
 	if (waitFOR(9, "get smeter")) {
-		return fm_bcd(&replystr[6], 3) / 2.55;
-	} else
-		return 0;
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return fm_bcd(&replystr[p+6], 3) / 2.55;
+	}
+	return 0;
 }
 
 // Volume control val 0 ... 100
@@ -201,12 +216,18 @@ void RIG_IC746::set_volume_control(int val)
 
 int RIG_IC746::get_volume_control()
 {
+	string cstr = "\x14\x01";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd.append("\x14\x01");
-	cmd.append( post );
-	if (waitFOR(9, "get vol"))
-		return ((int)(fm_bcd(&replystr[6],3)));
-	return ICvol;
+	cmd.append(cstr);
+	cmd.append(post);
+	if (waitFOR(9, "get vol")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return ((int)(fm_bcd(&replystr[p+6],3)));
+	}
+	return 0;
 }
 
 void RIG_IC746::get_vol_min_max_step(int &min, int &max, int &step)
@@ -241,11 +262,17 @@ void RIG_IC746::set_attenuator(int val)
 
 int RIG_IC746::get_attenuator()
 {
+	string cstr = "\x11";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd += '\x11';
-	cmd.append( post );
-	if (waitFOR(7, "get att"))
-		return (replystr[5] ? 1 : 0);
+	cmd.append(cstr);
+	cmd.append(post);
+	if (waitFOR(7, "get att")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return (replystr[p+5] ? 1 : 0);
+	}
 	return 0;
 }
 
@@ -271,20 +298,25 @@ void RIG_IC746::set_preamp(int val)
 
 int RIG_IC746::get_preamp()
 {
+	string cstr = "\x16\x02";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd += '\x16';
-	cmd += '\x02';
-	cmd.append( post );
+	cmd.append(cstr);
+	cmd.append(post);
 	if (waitFOR(8, "get preamp")) {
-		if (replystr[6] == 0x01) {
-			preamp_label("Pre 1", true);
-			preamp_level = 1;
-		} else if (replystr[6] == 0x02) {
-			preamp_label("Pre 2", true);
-			preamp_level = 2;
-		} else {
-			preamp_label("Pre", false);
-			preamp_level = 0;
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			if (replystr[p+6] == 0x01) {
+				preamp_label("Pre 1", true);
+				preamp_level = 1;
+			} else if (replystr[p+6] == 0x02) {
+				preamp_label("Pre 2", true);
+				preamp_level = 2;
+			} else {
+				preamp_label("Pre", false);
+				preamp_level = 0;
+			}
 		}
 	}
 	return preamp_level;
@@ -302,11 +334,17 @@ void RIG_IC746::set_noise(bool val)
 
 int RIG_IC746::get_noise()
 {
+	string cstr = "\x16\x22";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd.append("\x16\x22");
+	cmd.append(cstr);
 	cmd.append(post);
-	if (waitFOR(8, "get noise"))
-		return (replystr[6] ? 1 : 0);
+	if (waitFOR(9, "get noise")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return (replystr[p+6] ? 1 : 0);
+	}
 	return 0;
 }
 
@@ -321,11 +359,17 @@ void RIG_IC746::set_noise_reduction(int val)
 
 int RIG_IC746::get_noise_reduction()
 {
+	string cstr = "\x16\x40";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd.append("\x16\x40");
+	cmd.append(cstr);
 	cmd.append(post);
-	if (waitFOR(8, "get NR"))
-		return (replystr[6] ? 1 : 0);
+	if (waitFOR(9, "get NR")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return (replystr[p+6] ? 1 : 0);
+	}
 	return 0;
 }
 
@@ -341,12 +385,17 @@ void RIG_IC746::set_noise_reduction_val(int val)
 
 int RIG_IC746::get_noise_reduction_val()
 {
+	string cstr = "\x14\x06";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd.append("\x14\x06");
+	cmd.append(cstr);
 	cmd.append(post);
-	if (waitFOR(9, "get NR val"))
-		return ((int)(fm_bcd(&replystr[6],3) / 2.55));
-	checkresponse();
+	if (waitFOR(9, "get NR val")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return ((int)(fm_bcd(&replystr[p+6],3) / 2.55));
+	}
 	return 0;
 }
 
@@ -363,13 +412,19 @@ void RIG_IC746::set_modeA(int val)
 
 int RIG_IC746::get_modeA()
 {
+	string cstr = "\x04";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd += '\x04';
+	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(8, "get mode A")) {
-		A.imode = replystr[5];
-		if (A.imode > 6) A.imode--;
-		A.iBW = replystr[6];
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			A.imode = replystr[p+5];
+			if (A.imode > 6) A.imode--;
+			A.iBW = replystr[p+6];
+		}
 	}
 	return A.imode;
 }
@@ -398,13 +453,19 @@ void RIG_IC746::set_modeB(int val)
 
 int RIG_IC746::get_modeB()
 {
+	string cstr = "\x04";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd += '\x04';
+	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(8, "get mode B")) {
-		B.imode = replystr[5];
-		if (B.imode > 6) B.imode--;
-		B.iBW = replystr[6];
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			B.imode = replystr[p+5];
+			if (B.imode > 6) B.imode--;
+			B.iBW = replystr[p+6];
+		}
 	}
 	return B.imode;
 }
@@ -499,7 +560,6 @@ void RIG_IC746::set_power_control(double val)
 
 void RIG_IC746::set_split(bool val)
 {
-printf("split %d\n", val);
 	cmd = pre_to;
 	cmd += 0x0F;
 	cmd += val ? 0x10 : 0x00;
@@ -540,31 +600,39 @@ void RIG_IC746PRO::set_modeA(int val)
 int RIG_IC746PRO::get_modeA()
 {
 	int md;
+	string cstr = "\x04";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd += '\x04';
+	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(8, "get mode A")) {
-		md = replystr[5];
-		if (md > 6) md--;
-		A.iBW = replystr[6];
-		cmd = pre_to;
-		cmd.append("\x1A\x06");
-		cmd.append(post);
-		if (waitFOR(8, "data ?")) {
-			if (replystr[6]) {
-				switch (md) {
-					case 0 : md = 8; break;
-					case 1 : md = 9; break;
-					case 5 : md = 10; break;
-					default : break;
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			md = replystr[p+5];
+			if (md > 6) md--;
+			A.iBW = replystr[p+6];
+			cstr = "\x1A\x06";
+			resp = pre_fm;
+			resp.append(cstr);
+			cmd = pre_to;
+			cmd.append(cstr);
+			cmd.append(post);
+			if (waitFOR(8, "data ?")) {
+				p = replystr.rfind(resp);
+				if (p != string::npos) {
+					if (replystr[p+6]) {
+						switch (md) {
+							case 0 : md = 8; break;
+							case 1 : md = 9; break;
+							case 5 : md = 10; break;
+							default : break;
+						}
+					}
 				}
 			}
 			A.imode = md;
-		} else {
-			checkresponse();
 		}
-	} else {
-		checkresponse();
 	}
 	return A.imode;
 }
@@ -598,31 +666,39 @@ void RIG_IC746PRO::set_modeB(int val)
 int RIG_IC746PRO::get_modeB()
 {
 	int md;
+	string cstr = "\x04";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd += '\x04';
+	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(8, "get mode B")) {
-		md = replystr[5];
-		if (md > 6) md--;
-		B.iBW = replystr[6];
-		cmd = pre_to;
-		cmd.append("\x1A\x06");
-		cmd.append(post);
-		if (waitFOR(8, "data ?")) {
-			if (replystr[6]) {
-				switch (md) {
-					case 0 : md = 8; break;
-					case 1 : md = 9; break;
-					case 5 : md = 10; break;
-					default : break;
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			md = replystr[p+5];
+			if (md > 6) md--;
+			B.iBW = replystr[p+6];
+			cstr = "\x1A\x06";
+			resp = pre_fm;
+			resp.append(cstr);
+			cmd = pre_to;
+			cmd.append(cstr);
+			cmd.append(post);
+			if (waitFOR(8, "data ?")) {
+				p = replystr.rfind(resp);
+				if (p != string::npos) {
+					if (replystr[p+6]) {
+						switch (md) {
+							case 0 : md = 8; break;
+							case 1 : md = 9; break;
+							case 5 : md = 10; break;
+							default : break;
+						}
+					}
 				}
 			}
 			B.imode = md;
-		} else {
-			checkresponse();
 		}
-	} else {
-		checkresponse();
 	}
 	return B.imode;
 }
@@ -673,33 +749,49 @@ const char **RIG_IC746PRO::bwtable(int m)
 
 int RIG_IC746PRO::get_swr()
 {
+	string cstr = "\x15\x12";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd.append("\x15\x12");
+	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(9, "get swr"))
-		return fm_bcd(&replystr[6],3) / 3.6;
+	if (waitFOR(9, "get swr")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+		return (int)(fm_bcd(&replystr[p + 6],3) / 2.55 );
+	}
 	return -1;
 }
 
 int RIG_IC746PRO::get_alc()
 {
+	string cstr = "\x15\x13";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd.append("\x15\x13");
+	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(9, "get alc"))
-		return fm_bcd(&replystr[6],3);
+	if (waitFOR(9, "get alc")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+		return (int)(fm_bcd(&replystr[p + 6],3) / 2.55 );
+	}
 	return -1;
 }
 
 // Transceiver power level return power in watts
 int RIG_IC746PRO::get_power_out()
 {
+	string cstr = "\x15\x11";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd.append("\x15\x11");
+	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(9, "get power")) {
-		int pwr = (int)(fm_bcd(&replystr[6],3) / 2.55 );
-		return pwr;
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+		return (int)(fm_bcd(&replystr[p + 6],3) / 2.55 );
 	}
 	return -1;
 }
@@ -733,11 +825,17 @@ int  RIG_IC746PRO::get_bwA()
 	if (bandwidths_ == IC746PRO_AMFMwidths) {
 		return A.iBW - 1;
 	}
+	string cstr = "\x1A\x03";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd += "\x1A\x03";
+	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(8, "get bw A"))
-		A.iBW = (fm_bcd(&replystr[6],2));
+	if (waitFOR(9, "get bw A")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			A.iBW = (int)(fm_bcd(&replystr[p + 6],3) / 2.55 );
+	}
 	return A.iBW;
 }
 
@@ -762,21 +860,33 @@ int  RIG_IC746PRO::get_bwB()
 	if (bandwidths_ == IC746PRO_AMFMwidths) {
 		return B.iBW - 1;
 	}
+	string cstr = "\x1A\x03";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd += "\x1A\x03";
+	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(8, "get bw B"))
-		B.iBW = (fm_bcd(&replystr[6],2));
+	if (waitFOR(9, "get bw B")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			B.iBW = (int)(fm_bcd(&replystr[p + 6],3) / 2.55 );
+	}
 	return B.iBW;
 }
 
 int RIG_IC746PRO::get_attenuator()
 {
+	string cstr = "x11";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd += '\x11';
+	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(7, "get att"))
-		return (replystr[5] ? 1 : 0);
+	if (waitFOR(7, "get att")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+		return (int)(fm_bcd(&replystr[p + 5],3) / 2.55 );
+	}
 	return 0;
 }
 
@@ -817,19 +927,28 @@ bool RIG_IC746PRO::get_notch(int &val)
 {
 	bool on = false;
 	val = 0;
+
+	string cstr = "\x16\x48";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd.append("\x16\x48");
-	cmd.append(post);
+	cmd.append(cstr);
+	cmd.append( post );
 	if (waitFOR(8, "get notch")) {
-		on = replystr[6] ? 1 : 0;
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			on = replystr[p + 6] ? 1 : 0;
 		cmd = pre_to;
-		cmd.append("\x14\x0D");
+		resp = pre_fm;
+		cstr = "\x14\x0D";
+		cmd.append(cstr);
+		resp.append(cstr);
 		cmd.append(post);
-		if (waitFOR(9, "get notch val"))
-			val = 20*(fm_bcd(&replystr[6],3) - 128);
-		else
-			checkresponse();
-		return on;
+		if (waitFOR(9, "get notch val")) {
+			size_t p = replystr.rfind(resp);
+			if (p != string::npos)
+				val = 20*(fm_bcd(&replystr[p + 6],3) - 128);
+		}
 	}
 	return on;
 }

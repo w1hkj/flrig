@@ -56,11 +56,17 @@ RIG_IC728::RIG_IC728() {
 
 long RIG_IC728::get_vfoA ()
 {
+	string cstr = "\x03";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd += '\x03';
+	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(10, "get vfo A"))
-		freqA = fm_bcd_be(&replystr[5], 8);
+	if (waitFOR(10, "get vfo A")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			freqA = fm_bcd_be(&replystr[p+5], 8);
+	}
 	return freqA;
 }
 
