@@ -1,2724 +1,360 @@
-commit 31435e2783064e3b30561ab26b50bc963b1ca613
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu May 5 10:07:04 2011 -0500
-
-    Version 1.1.3C10
-    
-      Alpha release
-
-commit 63277a449c8c49053f567c3e4a85b960dfed3991
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu May 5 10:06:35 2011 -0500
-
-    ICOM response
-    
-      Changed base IC746 series to detect query response string
-        - IC728, IC736, IC746(pro), IC756(pro)
-
-commit bb40e213bbc9a00ea7d1ae11581774fcadddd27b
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu May 5 08:43:26 2011 -0500
-
-    TT599 Pwr-Swr
-    
-      Restored get methods for power_out and swr
-
-commit 0323877402e15c4765eaba4152d9e05b1c6a7200
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu May 5 08:33:51 2011 -0500
-
-    Freq List
-    
-      * Changed dialog size
-      * Made vertical scrollbar fixed
-      * Changed string formating
-
-commit 78e776071bbd546c517c4b256b06749bf049b383
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu May 5 07:08:31 2011 -0500
-
-    IC718
-    
-      * Added missing select A, select B and vfo B control methods
-      * Corrected set mode CW-R
-      * Added read power, mic gain
-
-commit 4ccce7e980c959a2fded322b324128e03b097385
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed May 4 09:10:37 2011 -0500
-
-    Version 1.1.3C9
-    
-      Alpha release
-
-commit dfa146b0ba39568e474f92f57db4290a9a090dfb
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed May 4 09:07:42 2011 -0500
-
-    FT920
-    
-      Added FT920 class
-
-commit 980ad5ebbf71c344befd88e4bf372553bce9cca9
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue May 3 19:03:49 2011 -0500
-
-    IC7000 bug fix
-    
-      * Corrected response byte count in waitFB and waitFOR
-      * Added wait delay equal to total byte count in waitFB
-        and waitFOR
-      * Added Fl::awake() call in inner read loop in waitFB
-        and waitFOR
-      * Corrected missing postamble in get mic
-        corrected event log descriptor
-      * Added force of vfo, mode, bw when select vfo A or B
-        pressed
-      * Added missing postamble for set_vfoA
-
-commit 4a74378aae29cb9f05b837290ce2bdf90f0aa6e6
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Apr 26 19:30:43 2011 -0500
-
-    IC xcvr family
-    
-      * Added waitFB, waitFOR processing to set, get methods in
-        - IC703.cxx
-        - IC706MKIIG.cxx
-        - IC718.cxx
-        - IC7200.cxx
-        - IC728.cxx
-        - IC735.cxx
-        - IC756.cxx
-        - IC910.cxx
-
-commit 7f2ae933dc69f77fd6954b460649922486bbfdde
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Apr 26 19:16:28 2011 -0500
-
-    IC7000
-    
-      * Added CI-V transceiver OFF to initialization
-      * Added controlled delay of read response to:
-        - CI-V xcv OFF command
-        - Select vfo command
-      * Corrected Smeter, Pout parser
-      * Added ICbase method to wait for ok/bad response to
-        commands
-
-commit 4406d3966533e9989cecdb2500f6944cea0111d4
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Mon Apr 25 08:16:45 2011 -0500
-
-    TT599
-    
-      Added showresp event logging to TT599 class
-
-commit e1748e535869d4bce8665251489e51a07e4d5e09
-Author: David Kjellquist <dave@kjellquist.com>
-Date:   Sun Apr 24 15:03:43 2011 -0500
-
-    TS570
-    
-      * Added vfo B - freq, mode, bw
-      * Added noise blanker
-      * Added Split
-      * Added showresp event logging
-
-commit 354094040d739c8149187839b8f0f14d61fc8d60
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Apr 23 18:28:41 2011 -0500
-
-    Version 1.1.3C8
-    
-      Alpha release
-
-commit 170a5a7ceea3306485eb513c80952f60e51e4003
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Apr 23 18:25:22 2011 -0500
-
-    Polling
-    
-      Added user configure items for transceiver polling
-
-commit abf4489e9b7b0ed8084df6986ecd00d67433a410
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Apr 23 15:20:00 2011 -0500
-
-    TS480HX
-    
-      Additional debugging statements using showresp
-
-commit d77da927dfaa9ce7886c31d8d4ece14d54cf8b9e
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Apr 23 15:19:53 2011 -0500
-
-    IC7000
-    
-      Modifed methods for new showresp event logging
-
-commit 361e437673163bc5b11f63460cd83c70b64b7d02
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Apr 23 14:05:34 2011 -0500
-
-    IC7200
-    
-      Changed initialization of volume, rfgain etc.
-
-commit 5b2e35edad413a67f4a33efdbeedeb315f4e847b
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Apr 22 18:07:38 2011 -0500
-
-    IC718
-    
-      Added showresp event logging
-
-commit 095d202e92fa74aef38b7129013dedaffe0e9524
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Apr 22 15:34:28 2011 -0500
-
-    Version 1.1.3C7
-    
-      Alpha release
-
-commit 57ace2faf5dcc3d5afa20481af5a8492ea695b8a
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Apr 22 15:33:28 2011 -0500
-
-    IC7000
-    
-      * Added virtual methods to supplant 746pro methods
-      * Added new event log reporting
-      * Removed filter selection from set_mode_... methods
-
-commit 3ddd26deac63187a73cc2be7f14acd30e38096dd
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Apr 22 05:50:50 2011 -0500
-
-    Event Log
-    
-      * Debug statements changed to showresp statements
-        - modified event log line format
-      * Removed erroneous selectA statements in support.cxx
-
-commit bc487a97aaeaf412b18da4862d00203dcd62954b
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Apr 21 15:06:42 2011 -0500
-
-    K3 split
-    
-      Added methods to cooperate with xcvr split operation
-
-commit a2dcfe8b1ff6c603a763e7ff69ba3b45992d947b
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Apr 20 14:54:45 2011 -0500
-
-    IC7200 metering
-    
-      * Added methods to read
-        - Power out
-        - SWR
-        - ALC
-
-commit d061f7f7c0380ae28d7f72299878c508f3ca1305
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Apr 20 12:20:48 2011 -0500
-
-    Version 1.1.3C6
-    
-      Alpha release
-
-commit baf9feacc9d3072c3e7af9d5b8e8bca227052f28
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Apr 20 12:20:03 2011 -0500
-
-    Keep - Restore
-    
-      Correction to keep-restore logic when selections are disabled
-
-commit ad5116afb4198b1c33dd98d3db8c48784b7440cc
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Apr 20 12:20:01 2011 -0500
-
-    K3 bandwidth control
-    
-      * Changed bandwidth control from combo box to counter
-        - Allows bandwidth selection in 10 / 100 Hz increments
-      * Modified showresp method to be non-virtual in rigbase
-        - supports all xcvr classes using common parameter list
-
-commit ab1734463748b7d44bb0bbfd318a52707c1da9fd
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Apr 20 08:42:33 2011 -0500
-
-    Color Dialog
-    
-      * Restore access to disabled buttons
-
-commit 3221cdbd7273827de79a35ed16a1f5c92974522e
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Apr 19 20:45:28 2011 -0500
-
-    A-B Select force display value
-    
-      * On pressing Select A or B force the selected display frequency to be
-        sent to the xcvr.
-
-commit 10e4b230a1ed94a5900e8f2ebb737e0df1c19d0d
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Apr 19 19:11:08 2011 -0500
-
-    Compile Warning
-    
-      Fix for compile warning in rig_io.cxx
-
-commit d6fe486b48f83dc207e8437116d578c1caef30d8
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Apr 19 18:59:13 2011 -0500
-
-    Version 1.1.3C5
-    
-      Alpha release
-
-commit bd5755f18ff17ccc50a024feff1b4999580ab101
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Apr 19 18:57:12 2011 -0500
-
-    K3
-    
-      * Changed BW selector to include finer steps
-      * Added read options to initialization method.
-        - set power control iaw availability of K3/100 module
-        - required a change in get_pc_min_max method - forced
-          change in non K3 rig classes
-      * Added default Mode/BW table
-      * Changed Power out method to use the BG; query
-
-commit 0f22450848314aefb856e1239a239a126a78290a
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Apr 19 15:34:03 2011 -0500
-
-    Select A/B
-    
-      * correction to commit fd99d188bd1657e018a8cc48be19f2cda2260c5f
-
-commit c5dba58bd46f0da43bff9ee8bd0c42e37ede389d
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Apr 19 11:30:49 2011 -0500
-
-    Version 1.1.3C4
-    
-      alpha release
-
-commit fd99d188bd1657e018a8cc48be19f2cda2260c5f
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Apr 19 11:29:00 2011 -0500
-
-    Select A/B
-    
-      * Fixed incorrect method references for A/B selection
-        - FT450
-        - IC706MKIIG
-        - IC7200
-        - All IC746 derivatives
-
-commit b11057ed357ea60a02a9f44a28f1d0ce9fd99e83
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Apr 19 08:53:32 2011 -0500
-
-    RAY152
-    
-      Added Smeter event statment
-
-commit c7dff8d68e740713ad88ba5653554a6187ef761d
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Apr 19 08:53:18 2011 -0500
-
-    TS480HX/SAT
-    
-      * Update to class method set_power_control
-      * Corrected setBW methods - missing ';' in command string
-
-commit 29f68841e3a81d25568e505257f171106932c0af
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Apr 19 08:17:56 2011 -0500
-
-    IC7200
-    
-      Added debugging statements
-
-commit 44566d0fb3144d9d420553894c73efacc3af75b1
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Mon Apr 18 16:20:40 2011 -0500
-
-    K3
-    
-      Overhaul of the K3 backend code
-
-commit 35ec168528b77c9bbc91dd6d251deb557e0756e1
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Mon Apr 18 14:44:30 2011 -0500
-
-    FT857D s-meter
-    
-      Debug lines added to smeter / pout methods
-
-commit 26d8185af4539824000ace13167b000f3f2e9f38
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Mon Apr 18 14:32:44 2011 -0500
-
-    TS480XH power control
-    
-      Correction to power control method
-
-commit 70bd622bae2306044d071a8ea8eb54b5b11f950f
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Mon Apr 18 14:29:06 2011 -0500
-
-    TT588 RF gain
-    
-      Corrected RF gain control inversion.
-
-commit 9df14fb461cd04f14cffeda0e98d988fd370abb7
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Mon Apr 18 10:27:52 2011 -0500
-
-    Serial Stream Parsing
-    
-      * Changed rig_io serial stream read/write functions
-      * Changed xcvr class methods to comply with new serial r/w
-        scheme.
-
-commit 68ac858a989b7eb1f9d2acf24923c11c629ba31c
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Mon Apr 18 10:27:48 2011 -0500
-
-    Colors-Scheme
-    
-      Tweaks to the color/scheme dialog, save, restore
-
-commit 2fbec07c8a0956ab98f56ccaba2c467ec43c6c54
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Apr 16 15:35:19 2011 -0500
-
-    TT599
-    
-      * Enabled debug statements in tt599 class methods
-      * Changed method of parsing returned strings.  599 seems
-        to send unsolicited strings when xcvr vfo/mode/bw are
-        changed by operator
-      * Corrected ?S power response parser
-
-commit 927db3d696e171e817ab28540c61560ec49e941b
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Apr 16 13:33:26 2011 -0500
-
-    TS2000
-    
-      Changed reply parsing to allow for unsolicited xcvr replies
-
-commit 13619050b9a32f651bca078cd566ce89b5829759
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Apr 16 10:38:44 2011 -0500
-
-    TT538 code clean up
-    
-      * removed unused const char[] definitions
-      * removed unused variables
-
-commit 7e55bda325dd10e4d9dbe4c3acd3c2ec666156f7
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Apr 16 10:38:39 2011 -0500
-
-    System colors
-    
-      * Added system color selection
-      * Added system style selection
-
-commit 65dc4b1fb79c47aa92d6cbfb91f94811e4260c2a
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Apr 13 18:25:56 2011 -0500
-
-    Meter colors
-    
-      Added foreground color selection = frequency label color
-
-commit f9204b609152c022335924dc8715eac3acd481dd
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Apr 13 17:51:00 2011 -0500
-
-    TT588
-    
-      * Modified Smeter conversion
-      * Corrected filter table
-
-commit 5ff58ace72f8d6b0ed5ba4c30e531594f34438ee
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Apr 13 17:50:39 2011 -0500
-
-    TT550 Auto Notch
-    
-      * Changed auto-notch / noise-reduction to allow independent
-        enable disable
-
-commit ef7b1ce8ff98d4075ccfa4829388d8931f954a05
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Apr 13 17:49:55 2011 -0500
-
-    TT550 smeter
-    
-      Rescaled smeter for Pegasus
-
-commit e93110a62ebdb88f888f359ff2d771634c86d761
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Apr 10 05:50:47 2011 -0500
-
-    Version 1.1.3
-    
-      Maintenance release
-
-commit 7fad31fe5bc90e5a73fc71ce48ba1df93e99a124
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Apr 10 05:48:56 2011 -0500
-
-    IC7200 Vfo B
-    
-      Modified Get/Set for VFO B
-
-commit adfb09148cf44b0d75a15bd7013b4a24147ee0ce
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Apr 10 05:48:51 2011 -0500
-
-    TT550
-    
-      * Hijacked Preamp button for use as Spot button on front panel
-      * Altered some first use initialization values
-      * Changed Model 302 stream parser ... works now with TT538/550
-      * Changed serial i/o interface to use PurgeComm method on win32
-      * Added F key support to M302 interface
-      * Added new controls to TT550 configuration dialog
-      * Fixed Restart/Version response display
-
-commit 0c7b089ee39ae85bf48921de7e96d18bad913dc4
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Apr 8 20:28:31 2011 -0500
-
-    IC7600 RTTY fault
-    
-      Removed check for digital setting for all but LSB/USB modes
-
-commit 71649a4e025e29e9af4ce7b770748eed73b35c53
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Apr 5 09:05:52 2011 -0500
-
-    Adjust bandwidth
-    
-      Added method to all rig classes for which not defined.
-
-commit ffd29d7420ffdfd7e85a1750412763d5fc82fada
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Mon Apr 4 12:24:21 2011 -0500
-
-    IC7200 7600 TT550
-    
-      * Corrections to mode set/get
-      * xml_rpc loop clean up
-      * TT550 init mods
-      * Select A/B mods
-
-commit c0c382118a7b677d8660b4b7ed92c3f7f701b2ef
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Apr 2 18:32:54 2011 -0500
-
-    FT100D ABA init
-    
-      Fix to 100D ABA race condx on startup
-
-commit c38b844a5bbdc454e0d8017842e8091d2d29a0e9
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Mar 31 06:53:11 2011 -0500
-
-    TS590S s/pwr meter
-    
-      Added support methods for Smeter and Pout queries
-
-commit 5ce6d56a750a83995d8b72e51ddd5019f2153591
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Mar 30 06:07:20 2011 -0500
-
-    Version 1.1.2
-    
-      Maintenance release
-
-commit b54df4aa9a1423c0c8c6652810b796fde4efe6dd
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Mar 30 06:07:17 2011 -0500
-
-    TS480HX/SAT update
-    
-      * Added vfoB and select vfo commands
-      * Added initialization code to allow simple data
-        control of bandwidth and center frequency
-      * Initialize bandwidth center freq to 1500 Hz
-      * Corrected bandwidth selection / read method
-      * Corrected Smeter and SWR methods
-
-commit 3444ca3cb48c595ad66eb5dcbdcce8f8c66834d6
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Mon Mar 28 13:27:25 2011 -0500
-
-    TT550 noise reduction
-    
-      Added NR init
-
-commit 4465b454548373e69cc43802559e7555c6471cae
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Mar 27 14:53:07 2011 -0500
-
-    Meters / Colors
-    
-      * Modified smeter conversion for TT550
-      * Corrected color selection dialog callbacks
-      * Changed meters to peak-hold type
-
-commit 4c5b946792deb03542b0e113092a9c7f1d6fa10d
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Mar 25 18:21:57 2011 -0500
-
-    Serial thread timing
-    
-      * Changed serial thread to allow sending commands at 10 msec
-        intervals, but poll only on Query Invl increments.
-      * Disassociated sending commands from querying for status/data
-      * Change action of serial retries to retry a read after sending
-        a command
-      * Removed serial re-init after changing serial timing values
-
-commit 95ca6ce38088c5c0fbacc1b31e12ea36cb898869
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Mon Mar 21 12:34:07 2011 -0500
-
-    TS590S smeter
-    
-      Test code to attempt to read the sm0; response
-
-commit 60ea6d28c41957dab7e4c3d10d7ab6c0984fc47b
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Mar 20 19:47:33 2011 -0500
-
-    Version 1.1.1
-    
-      Maintenance release
-
-commit 145649f96992fe17bfd6355b50124dc3e5a7db72
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Mar 20 19:46:01 2011 -0500
-
-    TS590S update
-    
-      * Added FR0; FR1; select vfo commands
-      * Added FT0; split command
-      * Changed startup / close sequence
-      * Removed gets for smeter, swr and power out
-        pending resolution of transceiver responsiveness to
-        the sm0; command string
-
-commit 37538146e74c3b7aa07411d78c0caaa3e20713fb
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Mar 18 20:23:49 2011 -0500
-
-    Version 1.1.0
-    
-      Maintenance release
-
-commit 825808612dddd24b1bc8d592dacb67a531c244ca
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Mar 18 08:19:03 2011 -0500
-
-    TT550 update
-    
-      * Modified Model 302 detection/decoding
-      * Added encoder sensitivity/step controls
-      * Added transmit bandwidth controls save/restore
-
-commit 0a5bdc137c856b75b1a06799604c38872ffca30a
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Mar 8 08:43:43 2011 -0600
-
-    TT538 vfob
-    
-      Restored prior operation of vfoB for the Jupiter
-      Jupiter CAT commands do not provide sufficent control
-      over vfo selection to warrant controlling the actual
-      xcvr vfoB.
-
-commit 2c5ade44132bb0c29cc9f37a4330b8294d538447
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Mar 2 20:21:44 2011 -0600
-
-    TS590S vfo read-write
-    
-      Changed algorithm for read and write vfo A/B
-
-commit 2b915d608add99695f27f076c0b47102d7de50a1
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Mar 1 09:52:26 2011 -0600
-
-    TT550 remote
-    
-      Test code for Pegasus Model 302 remote
-
-commit ef29ed7315b61f11546a9a39784767a5094ceac5
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Feb 26 16:22:42 2011 -0600
-
-    A-B startup race
-    
-      Mods to correct A/B/A race condx during xcvr initialization
-
-commit 7e075405636c9581bb3e24e7049cdf53c51dfa36
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Feb 25 09:25:27 2011 -0600
-
-    TT550 keypad
-    
-      * Added keypad entry for Pegasus
-      * Added correct vfo A/B operation including split
-
-commit 95d95bc75fce1c30a0f9f9810a7894e98d459b15
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Feb 23 10:57:32 2011 -0600
-
-    FT847
-    
-      Added back end
-
-commit bcab820ce916f1301efa11f5e2a12e944ef1fccc
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Feb 23 07:12:42 2011 -0600
-
-    TS590 ptt
-    
-      Added modifier to TX; command to specify ACC input signal
-        TX; ==> TX1;
-
-commit 493b6950f0906aebe8020e961bc024293395b358
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Feb 22 08:36:05 2011 -0600
-
-    TS2000 update
-    
-      Vfo-B method additions
-
-commit 277941bdc62572a7593862f4ed69bedc4327f117
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Feb 22 08:36:05 2011 -0600
-
-    FT1000MP Tuner
-    
-      Added method for tuner ON/OFF.  Recycled unused auto-notch
-      front panel control
-
-commit 6abfdd288b83333a6cc35b7d2e386b28530505d5
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Feb 22 08:36:05 2011 -0600
-
-    TS570 compile error
-    
-      Missing end of method return statement barfs on some gcc
-      compilers ... aargh!
-
-commit 25946efbc5f086ebcc312ce16012a74ebf049fd2
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Feb 22 08:36:05 2011 -0600
-
-    IC7000 auto notch
-    
-      Added set_auto_notch method
-
-commit b4708a3779234b8e7881d74a56a0b489bfec6ede
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Feb 22 08:35:59 2011 -0600
-
-    FT100D
-    
-      Added control methods
-      Added get_info
-
-commit d814bc8291d96a820391aec477a2f95ae84b3fe4
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Feb 13 09:01:34 2011 -0600
-
-    FT1000MP def bw
-    
-      Added method def_bandwidth
-
-commit 5f1fbcd22db56149132bbcbae4b92caf8a8d9740
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Feb 13 08:16:16 2011 -0600
-
-    IC series split
-    
-      Added split method to base IC746 series
-
-commit 4d2076291f66527b01fc76c57912e2c6fe3cec39
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Feb 13 06:53:41 2011 -0600
-
-    Default BW
-    
-      Added default bandwidth method to all transceivers which support
-      filter selection as a function of operating mode.
-
-commit c53afceab0a9104722f7b10c0ac0268b0e14a53a
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Feb 12 14:24:57 2011 -0600
-
-    IC7600 A/B mods
-    
-      Changed access method for A/B selection
-      Added bandwidth tables and CAT for set/get bandwidth
-
-commit c541e1ae472d90f76eb0977c5b4721cc8b942495
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Feb 11 17:58:45 2011 -0600
-
-    FT1000MP swr/alc
-    
-      Added query methods for swr and alc
-
-commit 6abdb0c49c4fc1ea2590e25a6c5e8329a33d7451
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Feb 10 16:45:06 2011 -0600
-
-    RAY 152 smeter
-    
-      Created U values to smeter based on measured values.
-      Measurements by Craig, WA8DRZ
-
-commit 21b23109474713e3f886fc98a9925acb069753ae
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Feb 10 09:21:42 2011 -0600
-
-    FT1000MP power scale
-    
-      Changed power scale to square law.  Expands scale below
-      25 watts.
-
-commit bb21b6253b6118c3dff8ba93a68d5daef4388a8d
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Feb 10 08:45:17 2011 -0600
-
-    IC7600 update
-    
-      Added control methods for mode / bandwidth
-
-commit c01be68702c1feb08477634b1749a43dae15045b
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Feb 10 07:31:06 2011 -0600
-
-    FT1000MP Bandwidth
-    
-      Implementation of full 8.2/455 filter selections
-
-commit b1fe8c614ab06f568851d8bcc2b9c598a93a3061
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Feb 10 07:30:58 2011 -0600
-
-    Button A/B
-    
-      Removed A/B button
-      Changed A-B select buttons to lighted button
-
-commit 268f4fb858e31e64eb5017b6cbbefd4416dc467a
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Feb 9 08:12:52 2011 -0600
-
-    ICOM select race
-    
-      * removed two_vfo capability for all IC746 derivatives
-      * added IC7600 CIV codes for vfo select
-      * added set/get BW, Mode for both vfo-A and vfo-B
-
-commit 867f0d01550bd56a4b00d093ebe5d3a437ba39df
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Feb 5 22:03:43 2011 -0600
-
-    RAY152 - vfo
-    
-      Revert to 100 Hz resolution in CAT string
-
-commit b32168f927bf8b0f17a02d89b1402d6d5f9de8a3
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Feb 5 13:23:18 2011 -0600
-
-    Version 1.0.1.1
-    
-      Alpha release
-
-commit 80633b64da6dc2dbd3f17f542ea65c11d6dcf03e
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Feb 5 13:23:18 2011 -0600
-
-    FT1000MP vfo precision
-    
-      Set vfo precision to 10 Hz
-
-commit 78c369747ef7e980783c8d8c8e88b729010f2272
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Feb 5 13:23:18 2011 -0600
-
-    TT516 update
-    
-      * Added frequency readout precision specifier = 10 Hz
-
-commit beaff060f008e05feef74487dc333db2cc24a6ee
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Feb 5 13:22:53 2011 -0600
-
-    Raytheon 152
-    
-      Added Raytheon-152 transceiver
-
-commit de3bebda1a18f51861b8d89eca05b153e2bccd17
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Feb 4 19:10:44 2011 -0600
-
-    TS590S
-    
-      Added back end for Kenwood TS-590S transceiver
-
-commit fbf17df26bd1dde6dcdeb8e109b570be8064fef2
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Feb 4 19:04:31 2011 -0600
-
-    FT1000MP mods
-    
-      Changes to FT1000mp back end
-
-commit 7432862c0fdc002127dfa700a84f544b646eedcf
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Feb 3 12:37:43 2011 -0600
-
-    IC746 family
-    
-      Changed default stop bits to 1
-
-commit 07d4789386790c3b2cdb736b4819310e25b997a1
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Feb 2 07:29:43 2011 -0600
-
-    Version 1.0.1
-    
-      Initial public release
-
-commit f960a7d8fa8545d4c4b7a74bb49bfe24cfa76f5b
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Feb 2 07:29:38 2011 -0600
-
-    TT599 cleanup
-    
-      Commented out debug statements in class TT599
-
-commit b47dbc2c2185fecb2f139a29c29db63db80b48e5
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Mon Jan 31 08:05:37 2011 -0600
-
-    Version 1.0.0bY
-    
-      Alpha release
-
-commit d33ef332951a8f5f9d53a425433390f1dbf59e01
-Author: Terry Embry, KJ4EED <mrtembry@yahoo.com>
-Date:   Mon Jan 31 08:04:55 2011 -0600
-
-    FT950 update
-    
-      * Corrections to FT950 bandwidth filter selection
-      * Support for vfo-A vfo-B
-
-commit d3a2af4f33cb30c3b549bd2405774c49f7aee2da
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Jan 26 11:16:57 2011 -0600
-
-    Que management
-    
-      Changes to que management for mode and bandwidth
-
-commit ae0347bd6ec3471c1d4a91335dbfc2f9c1f6daf7
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Jan 21 16:20:26 2011 -0600
-
-    IC7600 IC746 FT450
-    
-      * Corrected CAT command for set mic level
-      * Code cleanup on IC746 and FT450
-
-commit 9cb6b9d1fa128e174999f303e95ac92f29e66152
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Jan 20 07:06:37 2011 -0600
-
-    Orion-II smeter
-    
-      Added scaling factor to smeter method
-
-commit d2a5697a4a7f348486055b9e1a1de517bcc9dc26
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Jan 19 10:29:26 2011 -0600
-
-    Eagle CWU-smeter
-    
-      * Added missing CW upper sideband mode to mode table
-      * Translated smeter cat response to flrig smeter scale
-
-commit 5ea9cc0bf9f02f7e3a84c070ce5c54c1c87c4019
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Jan 15 10:20:11 2011 -0600
-
-    Version 1.0.0bX
-    
-      Alpha release
-
-commit e78c7fb8e3224f4eadba937bf670b02cde26c55e
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Jan 15 10:20:07 2011 -0600
-
-    Orion-II Smeter
-    
-      Changed smeter method to recognize 12 character response
-      from xcvr "@SRMnnnSnnn\r"
-
-commit 0f1eea495a475d2afb5e68d502bf0da1e7720754
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Jan 15 10:09:04 2011 -0600
-
-    Exception handling
-    
-      Added exception handling code to pass throw error handling
-      back to xml thread main loop.  Allows program to recognize
-      when xml server is shut down and restarted (fldigi).
-
-commit c10115c60c7943ad873909a29298b2455f642d81
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Jan 15 09:34:53 2011 -0600
-
-    TS450S init
-    
-      * removed RM1; string from get_swr method
-      * added initialize method with RM1; command string
-
-commit e0c0bbf94e8c6f4f560f1ba5294432d1d9253e29
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Jan 14 18:12:40 2011 -0600
-
-    Version 1.0.0bW
-    
-      Alpha release
-
-commit 01d6148a8d4b26bac71b04cd801f5818ee284b63
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Jan 14 18:12:36 2011 -0600
-
-    Orion-II
-    
-      Added controls for
-        - RF Gain,
-        - IF Shift,
-        - Audio volume
-
-commit 72b812de2c328fbda81aff685712c63cf25a9ae0
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Jan 14 15:21:56 2011 -0600
-
-    Eagle split
-    
-      Added h/w split support code
-
-commit 55d653bb2bf62054218e5fbbf025e9eb197f3399
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Jan 14 13:01:56 2011 -0600
-
-    Eagle-Orion-II
-    
-      * Added debug statements for testing backends
-      * Removed unnecessary flags previously used to sync
-        serial and xml threads.  Replaced by mutex.
-
-commit ff67b97defbe0105d646075cdcacd9b0d2df0105
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Jan 14 08:18:14 2011 -0600
-
-    Eagle-Orion getBW fix
-    
-      Fix to getBW method for both TT566 and TT599 classes
-
-commit a9ab74c36326bff41d7a9738aa24001e2c167649
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Jan 14 08:17:53 2011 -0600
-
-    Home Dir
-    
-      Add trailing "/" to config-dir name if not included on
-      command line switch --config-dir
-
-commit a6de27e0c6a43675c334b2052ddc741e21db7fc0
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Jan 13 09:05:16 2011 -0600
-
-    Version 1.0.0bV
-    
-      Alpha release
-
-commit 346c3c01024387dc83fb2d394fba53c9979e4892
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Jan 13 14:26:41 2011 -0600
-
-    ft450 tests
-
-commit 04c86fdb84e37cfc5126021c80a3b5d9f4cd896f
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Jan 13 08:25:44 2011 -0600
-
-    Que processing
-    
-      Added source to change request to FREQMODE struc passed via
-      queue.  Allows single function processing of UI changes when
-      data received from transceiver or external program (fldigi)
-
-commit 9549dd4956d83be98d4183ad1958da7599cb49f3
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Jan 12 16:34:53 2011 -0600
-
-    Version 1.0.0bU
-    
-      Alpha release
-
-commit 43e4eadbfa0c9859a00688cc22c8e185224b7ef7
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Jan 12 16:34:51 2011 -0600
-
-    64 bit recast
-    
-      replaced simple recast "(int)val" with "reinterpret_cast<int>(val)"
-
-commit 535ba2f6788d89cab245e5af0700db45e4a3fa22
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Jan 12 16:34:47 2011 -0600
-
-    TT566-TT599 correction
-    
-      Corrected modes table for Orion-II and Eagle
-
-commit 27812acbd28bfc13ee3af970ee41818fca77d624
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Jan 12 10:36:48 2011 -0600
-
-    Version 1.0.0bT
-    
-      Alpha release
-
-commit 61b6ebafb6339eb93ce75d5666350dcfc98bdec5
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Jan 12 10:35:41 2011 -0600
-
-    Orion-II TT566
-    
-      Added TT565/566 class
-
-commit 997229c09cf4e9e318e1772d8040c8cb759d2c85
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Jan 12 10:25:55 2011 -0600
-
-    TT599-Eagle
-    
-      Added TT599 class
-
-commit 0a8342ea1122b392b2857abc507cd68a1d695fe9
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Jan 12 10:25:51 2011 -0600
-
-    Version 1.0.0bS
-    
-      Alpha release
-
-commit e3a31247224936fd54f9bb6ea8c5b8a6bf675072
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Jan 12 10:25:08 2011 -0600
-
-    TT 535 Delta-II
-    
-      Added TT535 class
-
-commit 9ef17a001a6fc769c9b1e271f03735e4fb7a34c4
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Jan 12 09:52:37 2011 -0600
-
-    TT516 dual vfo
-    
-      Added support code for Vfo A/B operation with TT516
-
-commit 397984aaebbedfe0d22ad24f976b93796a4d8f98
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Jan 12 09:52:10 2011 -0600
-
-    A B vfo select
-    
-      * Added A, B vfo select
-      * Change color rendition of A / B to show active vfo
-
-commit c12a4bfc5c0f0ef8b0578716ae5f9dc203f7ec8f
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Nov 20 05:20:07 2010 -0600
-
-    Version 1.0.0bR
-    
-      Alpha release
-
-commit ffebee96070f1ce9c737a9feaef02ec26e4a5bfd
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Nov 20 05:19:40 2010 -0600
-
-    IC706 mode type
-    
-      Added mode type array to IC706 class
-
-commit 8a07b426988dc32867097157b73aa5da6e6c7416
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Nov 20 05:19:38 2010 -0600
-
-    IC7200 digi mode
-    
-      Added digi modes to IC7200
-
-commit 1d9c27fab7c49d997a6de48dffde3b0dcf6e3041
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Nov 20 05:19:21 2010 -0600
-
-    Version 1.0.0bQ
-    
-      Alpha release
-
-commit 4e7d1f3626205bad4bd7d837aeb3606ffd8c3565
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Nov 13 07:05:17 2010 -0600
-
-    H/W PTT control
-    
-      Added code to show PTT control for h/w ptt controls.
-
-commit 4022e579f2d008d302bf6b5d8ce444a64e455f94
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Nov 13 07:05:12 2010 -0600
-
-    ICOM dual vfo
-    
-      Added control of vfoB to select ICOM rigs
-
-commit 4ec4702f774db4271879dc11638febfc67667f1f
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Nov 12 07:38:22 2010 -0600
-
-    Parse Args
-    
-      Corrected parse_args function for compliance with fltk
-
-commit a34205b393b15e0b2e53eb25c89cfe6fe969a6af
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Nov 6 14:33:06 2010 -0500
-
-    Version 1.0.0bQ
-    
-      alpha release
-
-commit 92d90b9be9853e03c1aeed794228a813a820b66d
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Nov 6 14:02:07 2010 -0500
-
-    Dual VFO mod
-    
-      * Added controllable vfo-B using FreqDisp widget
-      * Fixed initialization problems for K3 and TS140
-        transceivers
-
-commit 950b16477e7f0e69d6eb58aefcd476338d820ff2
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Nov 6 13:04:08 2010 -0500
-
-    Version 1.0.0bP
-    
-      alpha release
-
-commit 61ea3d2b496f1001b6e86cbab3a129134fa1c6e2
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Nov 5 13:06:23 2010 -0500
-
-    VFO A-B
-    
-      * Changed all freq_ mode_ bw_ to freqA modeA bwA preparation
-        to introduce separate control of transceiver vfo-A vfo-B.
-      * Changed all existing rig methods of freq, mode, bw to be
-        vfoA specific
-      * Added dual vfo control to Ten Tec 550, Pegasus
-      * Added dual vfo / split control to Yaesu FT450
-
-commit 3d64fc011b3abdd06b8ead69e99bc72eeaf3c225
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Oct 20 20:48:26 2010 -0500
-
-    K2 Update
-    
-      K2 update submitted by Ken Haase, VE4KEH
-
-commit 322a3cc4e976e315c2dd494fb266e23c008ca4f2
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Sep 22 20:04:17 2010 -0500
-
-    Version 1.0.0bO
-    
-      Beta release
-
-commit 68ae4e4fd108a21ff93f9f40877362b3f2e0c69b
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Sep 22 19:56:48 2010 -0500
-
-    Rig Ordering
-    
-      Added missing rigs to enum which defines the rig ordering
-
-commit d28cacc906a58d483677e8733d04e70c5f4308fa
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Aug 5 08:18:00 2010 -0500
-
-    Version 1.0.0bN
-    
-      Beta release
-
-commit 699c42037f352b75ea82913075c99c8c381853d3
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Aug 5 08:15:30 2010 -0500
-
-    IC703
-    
-      * Added PTT cat command
-      * Added LSB-D and USB-D modes
-
-commit 626d3b096b82ee82865f6fbb8985fe63790894b2
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Aug 4 19:21:44 2010 -0500
-
-    Config Dir
-    
-      Added command line switch to enable using a user specified
-      directory for the flrig configuration files, ie:
-        --config-dir <FULLY_QUALIFIED_DIR_NAME>
-      as in
-        --config-dir /home/w1hkj/flrig.tt550
-
-commit f7a1e4898f698d8d4a304746e3edf32cfcb45939
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Aug 1 15:27:10 2010 -0500
-
-    Version 1.0.0bM
-    
-      beta release
-
-commit c1027a81324363625578c0472cae736d9c9cc478
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Aug 1 15:25:46 2010 -0500
-
-    TS480 HX/SAT
-    
-       CAT command changes based on K6SDR tests
-
-commit 9b8479be981b2f7303489bfdedd8e89dafa08a84
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Jul 31 15:35:20 2010 -0500
-
-    Combo Widget
-    
-      Modified sizing of popup browser used in combo box widget.
-
-commit 58e4d8bdc6593c2bf18bd90ad9d497712ffa2cab
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Jul 31 09:40:59 2010 -0500
-
-    Version 1.0.0bL
-    
-      Beta release
-
-commit bc9b4c324b9426c0605bea9d9a6d10203a17e5d6
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Jul 31 14:35:37 2010 -0500
-
-    TS480 HX/SAT
-    
-      Added new rig clases for TS480HX and TS480SAT
-
-commit 054e92adadca382dd7f0f20b481d7b58bda61e06
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Jul 31 14:35:33 2010 -0500
-
-    TS450 update
-    
-      Added class method get_modetype and support string.
-
-commit 9d72cd8f211a59f35ba80ef3347812aaf8eeb7b9
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Jul 30 10:08:36 2010 -0500
-
-    Version 1.0.0bK
-    
-      Beta release
-
-commit f1a4670fd00e8101359caf64c03dc294cd3d1abb
-Author: Frank Tomesh, AB2ZO <fjt@ka1gl.net>
-Date:   Fri Jul 30 10:06:24 2010 -0500
-
-    IC703 seg fault fix
-    
-      Added missing _mode_type initializer to IC703 instantiation
-
-commit 08f48daf2bc640853ac257f2bb0b4564fb1ea43e
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Jul 17 10:06:45 2010 -0500
-
-    Version 1.0.0bJ
-    
-      Alpha release
-
-commit 6e82feff3219c21b78b8e4f07a63fe6073e5aeaa
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Jul 17 05:00:17 2010 -0500
-
-    Echo suppression
-    
-      Correct error introduced by d57238d6
-
-commit db0834c9c9bf5a0fe45aeaf2e7cf56d1fd3ec720
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Jul 16 12:37:54 2010 -0500
-
-    Version 1.0.0bI
-    
-      Alph release
-
-commit d57238d61f4714a5ce9f3f37969799242da4a261
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Jul 16 12:34:01 2010 -0500
-
-    IC703 bug fixes
-    
-      Config dialog not properly initialized for IC703 type
-      Echo suppression algorithm corrected
-
-commit 895a85b55aded51a0dc15395df2911abad70d001
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Jul 14 07:55:22 2010 -0500
-
-    Version 1.0.0bH
-    
-      Alpha release
-
-commit 9a6e9c4e9957fd360f6a822fcc18b3698da97c0b
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Jul 14 07:41:17 2010 -0500
-
-    IC703-CIV
-    
-      Fixed CIV address selector initialization to include IC703
-
-commit ff6799075c9138b60d921e425c7271bb1555ff4f
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Jul 6 12:30:32 2010 -0500
-
-    Version 1.0.0bG
-    
-      Alpha release
-
-commit 1d5dc71a3274bf345047515d61a0232d94cb328e
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Jul 6 12:30:13 2010 -0500
-
-    IC7200 update
-    
-      Complete rewrite of the IC7200 class
-
-commit 7b3adae3cb91b404e1899e4a82d958fc1fcaccb7
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Jul 6 12:29:18 2010 -0500
-
-    IC718 update
-    
-      Corrected mode selection method
-
-commit 7cacc8ad1dc10df7ff7817bec7c3c48b52846b66
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Jul 4 20:18:41 2010 -0500
-
-    TT550 Auto Tuner
-    
-      Added reverse engineered CAT command sequence to enable optional
-      auto tuner.
-
-commit 665418122a2c34e4319756f17d43c8ebb21fb7a4
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Jul 4 15:18:38 2010 -0500
-
-    RTS-DTR ptt
-    
-      Enable both to be used simultaneously
-
-commit 8091162998f2411065c28fc2b9c70a1df084e7c2
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Mon Jun 14 19:44:52 2010 -0500
-
-    TT-538 Po/SWR
-    
-      Added reverse engineered Power out / SWR CAT commands
-      to Ten Tec Jupiter
-
-commit 8a68ac9190719ddc7a7ad0dff5f8dd2a312bd978
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Jun 3 19:55:55 2010 -0500
-
-    Version 1.0.0bF
-
-commit 66f7861d156ce914161ab2ef647a4ae87c1f55e4
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Jun 3 19:53:04 2010 -0500
-
-    Menu update
-    
-      Corrected initialization of toggle menu items
-
-commit 77baab657a5fed2522475c7afaeedf52e5e4b490
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Jun 2 17:21:28 2010 -0500
-
-    Version 1.0.0bE
-    
-      Beta release
-
-commit b567f0f42954fcf076b92855b045ec5b9f399b42
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Jun 2 17:14:01 2010 -0500
-
-    Restore Xcvr
-    
-      Added menu item to allow enable / disable of restoring
-      transceiver to it's value of frequency and mode when flrig is
-      started.
-
-commit a58d4f60c97ba64f51db34e8e01fdbf23f8546e7
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Jun 2 16:37:01 2010 -0500
-
-    FT817 mods
-    
-      Changed FT817 code to replicate the FT857D methods
-
-commit eda4e7ec40391192741aa019e0e76e2797c16198
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Jun 2 12:05:34 2010 -0500
-
-    Fluid source
-    
-      Added rigpanel.fl to the distribution source package
-
-commit 8654ddb14eb751aa1fc6e07e75867b87ec6a102d
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Mon May 17 12:07:16 2010 -0500
-
-    Read Stream
-    
-      Added ability to intercept transceiver serial stream for
-      rigs requiring that service.
-
-commit 2594d0a4428f6aaeec67c1bf40c73268f396017d
-Author: Jason Turning, N6WBL <jturning@sbcglobal.net>
-Date:   Fri Apr 30 04:01:43 2010 -0500
-
-    IC718 Auto Notch
-    
-      Added auto-notch control code
-
-commit b97848d07e040d337ae3553f2ead2c2107e9b002
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Apr 29 00:03:45 2010 -0500
-
-    ICgeneric split
-    
-      * Split ICgeneric into ICbase and specific families of
-        transceivers
-        - IC746
-        - IC756
-        - IC910
-        - IC7000
-        - IC7200
-        - IC7600
-        - IC7700
-
-commit 500628b94f97bcf7b19db8a8df208dc5fa3d3a6a
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Apr 29 00:03:39 2010 -0500
-
-    IC703 Compression
-    
-      Activated Compression On/Off control
-
-commit 739a7b4f63b8c2b62949f6e00d28b34a44f81f8c
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Apr 29 00:03:31 2010 -0500
-
-    IC703 / TS450S
-    
-      Added new rig classes for Icom 703 and Kenwood 450S transceivers
-
-commit 32492ac134a955a44eb9a8601a80a285d6ac40c4
-Author: Jason Turning, N6WBL <jturning@sbcglobal.net>
-Date:   Thu Apr 29 00:03:18 2010 -0500
-
-    IC718 additions
-    
-      Added auto_notch and compression on/off controls
-      Added vox on/off control
-
-commit 3f5e11e3c8556bc87b26117f41deaf8b4ccc85da
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Apr 27 15:10:44 2010 -0500
-
-    IC718 rf gain
-    
-      Added get_rf_gain method to IC718 class.
-
-commit 52f8e178f21100d291adf2a5d2ee6ce44ffa6fdd
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Apr 27 12:52:09 2010 -0500
-
-    Added rigpanel.fl
-    
-      Missing from the distribution tarball
-
-commit 33b77d634e84e8143549c6b395f76c9f06dd6952
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Mon Apr 26 06:43:37 2010 -0500
-
-    Version 1.0.0bD
-    
-      Beta release
-
-commit 04ef71f58032b052a8398b461e671d236db9073f
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Mon Apr 26 06:41:30 2010 -0500
-
-    IC7200 Data mode
-    
-      Corrected get data mode command string
-
-commit cf066d303f711f36df0c9dafcab3fc5e5f9e6d9e
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Mon Apr 26 06:31:46 2010 -0500
-
-    IC718 corrections
-    
-      * Added mode/bandwidth
-      * scaled smeter response
-
-commit c67a7971285e8baf4200875f0245021830fca8da
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Apr 24 09:19:01 2010 -0500
-
-    Version 1.0.0bC
-    
-      Beta release
-
-commit 5df3c55f91482402acffc4308e0fdf3ed75394cc
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Apr 24 09:19:01 2010 -0500
-
-    ICOM update
-    
-      * added CIV address configuration with revert to default
-      * added USB audio selector for IC7200 and IC7600
-      * corrected integer to BCD conversions for all Icoms
-
-commit b0b0afc6fee23a9d1d45d944c9bc14ea64ca3833
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Apr 24 09:18:35 2010 -0500
-
-    Freq Control Widget
-    
-      Added configurable font to class FreqControl
-
-commit 9d9864bc62d12e5127ca4ae6a24fc941cd3b178a
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Apr 22 05:23:35 2010 -0500
-
-    IC7200 changes
-    
-      Restored default CI-V to 0x76
-      Added support for "digital" modes
-
-commit 195fcd9d36ebf7c790219ed0299f2b57fe7d3581
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Apr 21 07:50:40 2010 -0500
-
-    IC718
-    
-      Added Icom 718 transceiver
-
-commit 526150bd99d3a9763e17fc29a85969a45012a6a1
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Apr 21 03:46:24 2010 -0500
-
-    K3 mode
-    
-      get_mode correction for digital mode selection
-
-commit d5a86492cf514cab37f77474baf111f9974d5b98
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Apr 20 16:45:53 2010 -0500
-
-    Version 1.0.0bB
-    
-      Beta release
-
-commit a2a004da24c26335f3c3d0efebfc454129c2e9fb
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Apr 20 16:42:05 2010 -0500
-
-    IC7200
-    
-      Default CI-V address changed to 7F hex
-      Transceiver commands set to match IC756PRO-III
-
-commit 70f138e48b6b5564a87d6d5cc2803176447cffdb
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Apr 20 16:36:26 2010 -0500
-
-    K3 bug fixes
-    
-      Set audio gain
-      Get mode
-
-commit 05cd9742f46a6b4cdb4eddfe227da9a14cc22511
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Mon Apr 19 17:55:05 2010 -0500
-
-    Version 1.0.0bA
-    
-      Beta release
-
-commit 8ff9611a0829d03380b369f6577358ee14d0b161
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Mon Apr 19 17:55:02 2010 -0500
-
-    Build static distribution
-
-commit 90250eea337eeb53d1c6ad7d5ab82e3202c37fa5
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Mon Apr 19 17:54:58 2010 -0500
-
-    K3 mods
-    
-      * Corrected read frequency for K3
-      * Added Bandwidth control and read
-      * Added power output read
-      * Corrected set audio gain
-      * Added read audio gain
-
-commit 3f7ac25277a0ed8cfe8bbd9cdee38e3d9b503546
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Apr 17 07:41:24 2010 -0500
-
-    Exec during config
-    
-      Enabled rig control to continue when configuration dialog is
-      open.  Effects those rigs with keep-alive software timers.
-
-commit 52de9938a97beed25636589ad53751e852218a8e
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Apr 15 20:10:44 2010 -0500
-
-    Version 1.0.0b9
-    
-      Beta release
-
-commit 5c111dedc4cac2a6322e67bacf330f369f21f211
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Apr 15 20:08:56 2010 -0500
-
-    SWR enable
-    
-      Enabled SWR meter for transceivers supporting that query
-
-commit b36ef3c6b3f73c512aa99bb2d51de9f8bf147f84
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Apr 15 13:10:06 2010 -0500
-
-    Power - 7600
-    
-      * restored initialization of power out control
-      * added IC7600 to rig enumeration - fixed loss of rig naming
-        above IC7600 alphabetically
-
-commit 102278bfb9cc4a7e1b726db58933dab73146c1f0
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Apr 13 18:42:40 2010 -0500
-
-    Version 1.0.0b8
-    
-      Beta release
-
-commit 96005f5d209291e4ca5708ff56d00bdccf75dd95
-Author: Andrew Hart, VE3NVK <andylhart@gmail.com>
-Date:   Tue Apr 13 18:39:44 2010 -0500
-
-    IC7600 update
-    
-      Added code to support attenuator
-
-commit 3fbeee1a046f6ce83136123dfaeeba908241a691
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Mon Mar 29 11:11:11 2010 -0500
-
-    FT1000 series
-    
-      * Separated FT1000, FT1000MP and Mark-V FT1000MP classes
-      * Disabled FT1000 pending tests
-      * Disabled Mark-V pending tests
-      * Rewrote FT1000MP support code
-
-commit 1e93a0c709cbe49c3da5acf75d33987357218a34
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Mar 28 06:09:01 2010 -0500
-
-    Version 1.0.0b7
-    
-        Beta release
-
-commit fa215e259d80c742ad2750ded312630de869b74d
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Mar 28 06:08:58 2010 -0500
-
-    OS X serial device
-    
-      Increased field size to accommodate very long serial port
-      designations on OS X
-
-commit e2a1ff09d49fe43335bcd7972212eed56350da21
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Mar 28 06:08:08 2010 -0500
-
-    FT1000 FT1000MV update
-    
-        Modified get_freq command string
-
-commit fe2bc28d9c5d138708a9ef60dff135086ffb751a
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Mar 26 13:54:32 2010 -0500
-
-    TT550 AM mod
-    
-      * Added back end code to support AM mode power level adjust
-        This command string not detailed in the TenTec Programmers
-        Manual ... gleaned by reverse engineering the TT control prog.
-      * Set minimum power level to 5 watts iaw TT550 manual
-
-commit 8079933106034ecec764073a8eb028e845b5bf76
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Mar 24 09:10:53 2010 -0500
-
-    DLL dependency
-    
-        Removed dll's from repository dependency
-        Still required for win32 build
-
-commit 462bc3976ba41911e7c2515eeb58886566040e52
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Mar 24 12:54:37 2010 -0500
-
-    IC7000 mods
-    
-      * Added LOG_INFO statements for Icom debugging
-      * Added separate mode / bandwidth descriptive arrays and
-        support code for 7000
-      * Added new command line switches when log level set to INFO
-          --rig_debug
-          --xml_debug
-          --debug (both)
-
-commit bcf8499441552531f601d0e1dc0e39d5a86623df
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Mar 19 15:08:09 2010 -0500
-
-    Version 1.0.0b6
-    
-        Beta release
-
-commit e087a07d137203997778c421bc46ce760614e58b
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Mar 19 15:05:41 2010 -0500
-
-    TT550 bug fixes
-    
-        Changed gain computation for speaker output, sidetone vol,
-        and RF gain.
-        Inverted sense of "enable keyer"; checked = keyer enabled
-        Added missing values to enumeration of rigs - caused error
-        on reading previous status.
-
-commit 713b0a77a0072c4be6a2030dfe1127a359c94a4a
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Mar 19 07:12:17 2010 -0500
-
-    TT-538 gain table
-    
-        Introduced gain table for conversion to/from panel %
-        and data value for Audio Gain and RF Gain.  Corrects
-        for difference between transceiver and software conversion.
-
-commit c324e27950f5afe69337a6028a6bbc183a06bb3b
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Mar 17 11:10:03 2010 -0500
-
-    IC746 / Pro Disassociation
-    
-        Removed several 746Pro commands from 746 class structure
-        Modified 746 BW strings
-
-commit 204b6d8c30f2262fd59249a5a9c6a0df52db758a
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Mar 16 19:26:08 2010 -0500
-
-    Version 1.0.0b5
-    
-        Beta release
-        Added ChangeLog
-
-commit 37f966019007dbaeb8be5009de63fa6c5522a667
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Mar 16 19:15:58 2010 -0500
-
-    FT1000MV
-    
-        Completed FT1000MV class - untested
-
-commit 018b3446978efe82ed0875ff6bf40f5414708577
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Mar 16 19:14:56 2010 -0500
-
-    FT1000
-    
-        Added FT1000 class, untested
-
-commit 5c232a5c64eed629374921e36a828eb11803ec50
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Mar 16 19:12:02 2010 -0500
-
-    FT450 Volume range
-    
-        Changed volume range to 0..255, same as transceiver CAT
-        command range for volume.  Fixes round off error during
-        initialization.
-
-commit e53f04cd63bc3772f6ff05b22803108e6f2a83c7
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Mar 14 14:40:11 2010 -0500
-
-    FT2000 debug strings
-    
-        Added content to FT2000 debug strings
-
-commit a59c478c6ec9d0d3db8b6042240deb73608fe464
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Mar 14 14:24:11 2010 -0500
-
-    TS2000 Mic Gain
-    
-        Fixed Mic Gain conversion
-
-commit b240047655f3a1fb425f9d6e3b212d29c6307884
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Mar 14 14:24:09 2010 -0500
-
-    IC-746 BW
-    
-        Changed BW strings to Narrow / Wide
-
-commit 20c32530f09186d08f78468eecccac2f6517cca7
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Mar 14 14:23:45 2010 -0500
-
-    Split Operation
-    
-        Added vfo #1 / # 2 split operation
-
-commit 97221f4348eb352f6142cdec4401092ed018bf1c
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Mar 9 17:42:57 2010 -0600
-
-    Version 1.0.0b4
-    
-        Beta release
-
-commit 5b17be26ce367189b76665db9d066acf755d68a6
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Mar 9 16:01:06 2010 -0600
-
-    TT-550 update
-    
-        Added separate xmt bandwidth selector / enable
-        Fixed keyer timings
-        Added missing thread locks to gui control callbacks
-
-commit 7f401314b8a6fe227cf264561f3009d662803430
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Mar 6 08:41:52 2010 -0600
-
-    Version 1.0.0b3
-    
-        Beta release
-
-commit f8b355b916ae29cea170371acdcc24ad18169fc7
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Mar 6 08:40:41 2010 -0600
-
-    K2 serial baud rate
-    
-        Changed default baud rate to 4800
-
-commit 8ee433c83e0c8fcc5c18176a9bf930a4eb405098
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Mar 6 04:47:35 2010 -0600
-
-    Pegasus TT550 mic gain
-    
-        Added mic gain control to TT550 back end.
-
-commit 003bb0cc4955c2115204f540ba046911fc445993
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Mar 5 10:00:04 2010 -0600
-
-    Version 1.0.0b2
-    
-        Beta release
-
-commit 2792b7429ab858e8b2947c3b9b6add775ad6ebef
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Mar 5 07:45:03 2010 -0600
-
-    On Line Help link
-    
-        Added Help/On Line help menu and associated code
-
-commit 9b36545425a76095a558c3a6c3e7a1aae4deca65
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Mar 3 13:48:36 2010 -0600
-
-    Version 1.0.0b1
-    
-        Beta release
-
-commit 03144154216f66f493a1595bc2983c63452b476d
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Feb 25 18:26:51 2010 -0600
-
-    Version 0.9.99R
-    
-        Alpha release
-
-commit 3c372e6b126145706e3cd4c72cb4e16adc5ccd9b
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Feb 25 18:25:26 2010 -0600
-
-    Omni-VII TT588
-    
-        Added new rig backend for TenTec TT538
-
-commit 568ff5908143c7eff3edc3b3f5aa6b3e6a5f4329
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Feb 25 18:23:32 2010 -0600
-
-    Jupiter-TT538 update
-    
-        Range computation for Vol, RF and Power
-
-commit a6820847389ae6cbd971b69faacc8012aab3ec0b
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Feb 20 15:58:00 2010 -0600
-
-    Version 0.9.99Q
-    
-        Alpha release
-
-commit ae6a40a8986265e4b32a7dd99e7aca1a6ea44a5b
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Feb 20 15:56:58 2010 -0600
-
-    TS570 update
-    
-        Added code to intercept transceiver unsolicited data streams
-
-commit ae2ccbdb5cc87ad20f769f46934ed78826e1c915
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Feb 20 15:56:03 2010 -0600
-
-    FT450 update
-    
-        Added Voice command toggle; Special configuration switch
-
-commit 13bf35f18dd5260754ea05d46753bed7fce415ce
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Feb 19 17:29:01 2010 -0600
-
-    Version 0.9.99P
-    
-        Alpha release
-
-commit 5a807eda20d5c2c348965522d16708759dbfa623
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Feb 19 17:28:11 2010 -0600
-
-    Jupiter update
-    
-        Added controls to center xcvr DSP filters at a specific
-        audio frequency.  Automatically adjusts passband tuning
-        to center the selected filter at the designated center
-        frequency
-
-commit 01c4434d9b7ef8aa764440d39aa1d4dc5f737337
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Feb 18 16:56:48 2010 -0600
-
-    Version 0.9.99O
-    
-        Alpha release
-
-commit 800af3a4b61242b225a336f6999ba4d80aca5d48
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Feb 18 16:53:37 2010 -0600
-
-    Jupiter-TT538 update
-    
-        Added CAT push-to-talk command string
-        Added master oscillator adjust - generic
-          Changed TT550 vfo adjust to generic
-        Added 150, 165, 180, 225, 260 Hz wide DSP filters
-        Set Serial port ctrl parameter ICRNL to inhibit CR to
-          LF conversion.
-
-commit 0fdeef54a1cf52059e3b2adb83c95a5653154da7
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Feb 17 04:17:10 2010 -0600
-
-    Version 1.0.0b01
-    
-        Initial beta release
-
-commit 20047a63de5a41ced7a0bf6d6691cb921c9dfc84
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Feb 13 12:46:26 2010 -0600
-
-    Version 0.9.99N
-    
-        Alpha release
-
-commit ecbe0a55cdf82d37b78aaad7518d4eacbd5aae15
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Feb 13 12:45:01 2010 -0600
-
-    TT550 Vfo Adjust
-    
-        * Added ability to correct for master oscillator offset.
-          Correction entered in ppm using counter control
-        * Tested computation using 5, 10 and 15 MHz WWV transmission.
-
-commit 164433ed2534ebfb5b2dbed092d2645f3ec0462e
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Feb 11 10:01:42 2010 -0600
-
-    Version 0.9.99M
-
-commit c018a65e0abd3ab76b583562454b8ca4a6dbaec1
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Feb 11 07:39:07 2010 -0600
-
-    TT550 new mode
-    
-        Added DIGI mode to TT550 Pegasus xcvr
-         . USB transmissions
-         . Rx center frequency at 1500 Hz
-         . BW changes are centered at 1500 Hz
-         . Tx BW full 3000 Hz
-         . IF shift (pass band tuning) moves passband around the
-           1500 Hz center point
-        Changed IF shift to +/- 500 Hz, 50 Hz increments
-
-commit bf8edef2a548570330ed942f0bdfa1f678b37fa8
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Feb 6 21:11:14 2010 -0600
-
-    Version 0.9.99L
-    
-        Alpha release
-
-commit 4d56b12bf89441057bbd0e5a45024035eda683fa
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Feb 6 21:10:03 2010 -0600
-
-    XMLRPC sync delay
-    
-        Added 200 msec delay between initial set modes / bandwidths and
-        set mode / bandwidth.  Needed to prevent premature response to
-        xmlrpc mode/bandwidth query.
-
-commit 85aa859aa0ebd7f26bbd41a452aea5f8cdf9ac28
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Feb 4 18:30:24 2010 -0600
-
-    Version 0.9.99K
-    
-        Alpha release
-
-commit 881c3ed2732d4113da214d03d6fdda4b14296929
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Feb 4 18:29:42 2010 -0600
-
-    OS X missing include
-    
-        Added <glob.h>
-
-commit cfcda3ffeeed8634d9a1969cf95aa810354bcd47
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Feb 4 15:59:32 2010 -0600
-
-    Version 0.9.99J
-    
-        Alpha release
-
-commit f7dbe5dfd15ad3c8b759961bd390e3771fde8488
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Feb 4 15:58:21 2010 -0600
-
-    WIN32 build fix
-
-commit 3a3328766964a3fd62e0f40a0992194aa83322ec
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Feb 4 13:55:44 2010 -0600
-
-    Version 0.9.99I
-    
-        Alpha release
-
-commit 61f1e7142aec4c2a821b3aa2ea5a30a48d680bfc
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Feb 4 13:55:41 2010 -0600
-
-    Status File Change
-    
-        Removed rig_nbr from status file
-        Determine rig_nbr based on noun name of last transceiver
-        used.
-        Status file is backward compatible.
-
-commit 06744614c77e6b981340daf30e01dec719c4b454
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Feb 4 12:47:42 2010 -0600
-
-    Version 0.9.99H
-    
-        Alpha release
-
-commit 13291947e484402be64d4692177840b8ade3c7e3
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Feb 4 12:42:40 2010 -0600
-
-    Serial Port Discovery
-    
-        Changed serial port discovery routine.
-          * if available, use non-polled device lookup in Linux
-          * added code to support OS X, FreeBSD serial ports
-
-commit 33730965244451adcb626eb023aeccc9fb17d39e
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Feb 4 11:33:13 2010 -0600
-
-    TT-570 update
-    
-        Added TT-570 to enum declaration in rigbase.h
-
-commit 8a0f254c4f9f3d84ba8db4c600627066d7a31e4f
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Feb 4 11:32:17 2010 -0600
-
-    TT-538 update
-    
-        Update to volume control read/write
-
-commit 9f0d0bca88d9bf6a0ed3365fb57a03816b28e41e
-Author: André - M0JEK <m0jek@me.com>
-Date:   Thu Feb 4 06:59:47 2010 -0600
-
-    OS X exit on start
-    
-         Fix to OS X version exiting immediately after start
-
-commit c581acc68db7d996c9349f8570372698110ae5ae
-Author: Chris Sylvain <kb3cs@arrl.net>
-Date:   Sun Jan 24 21:06:21 2010 -0500
-
-    TS570 bandwidth control and basic metering
-
-commit ee6911a7bd00eee59c9c5ab65d291c6e1454ef15
-Author: Chris Sylvain <kb3cs@arrl.net>
-Date:   Thu Feb 4 06:54:24 2010 -0600
-
-    TS-570 S-meter scale adjusted
-
-commit 4341cabcbad5c7773d0ecd70dcc7005146d5ca3c
-Author: Chris Sylvain <kb3cs@arrl.net>
-Date:   Thu Feb 4 06:54:21 2010 -0600
-
-    Add initial Kenwood TS-570 support
-    
-    Kenwood TS rigs and Elecraft K2/K3 are all similar and yet different
-
-commit 35e8af57dd4f891ebfb12a369e8406aede17a20e
-Author: Chris Sylvain <kb3cs@arrl.net>
-Date:   Thu Feb 4 06:47:25 2010 -0600
-
-    Use modulo arithmetic on loopcount in serial loop
-
-commit cb73ffe643166bea562f0119a592ab20d236511f
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Jan 17 13:33:29 2010 -0600
-
-    Version 0.9.99G
-    
-        Alpha release
-
-commit 4e275fe1421fba248c6c3b0deab4810a2d560248
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Jan 17 08:02:26 2010 -0600
-
-    Use defaults fix
-    
-        menu item state was not restored on program start.
-
-commit 658c4621d203a6491d7a1f8e02eff445f637a986
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Jan 17 08:01:21 2010 -0600
-
-    TS2000 fix
-    
-        dev_bw set to wrong value in class definition.
-
-commit b9279df9c9b73ebff2fda9e9e3f15646cc54e20d
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Jan 16 18:47:29 2010 -0600
-
-    Version 0.9.99F
-    
-        Alpha release
-
-commit d5170940cbf3c0b00120c079c2a943ed13353397
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Jan 16 18:44:41 2010 -0600
-
-    Use rig data
-    
-        Added menu item to use current transceiver freq, mode, bw
-        when restarting program.
-
-commit 1b13be12ec502d39874697247734338af7591593
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Jan 16 18:27:09 2010 -0600
-
-    TT550 noise blanker addition
-    
-        Added noise blanker code
-        Added code to populate agc and nb level combo widgets
-
-commit f723ca6f64fd40888da9d0efb6825e8c58f3d661
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Jan 16 14:06:47 2010 -0600
-
-    Version 0.9.99E
-    
-        Alpha release
-
-commit 02a60779bf58b81752df0385e5feb3c36858ef25
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Jan 16 14:05:05 2010 -0600
-
-    TT538 / TT550 additional controls
-    
-        Added controls, modified existing, tested i/o stream for
-        consistency with Pegasus Windows GUI application
-
-commit edc73ce15fd3566401c12e4f5c6d4c9af90ffa29
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Jan 15 23:40:24 2010 -0600
-
-    TT538 / TT550
-    
-        Initial work on TenTec Jupiter, Pegasus and Pegasus
-        emulation mode for Jupiter.
-
-commit a6d7eb1e8ab2a82a7f7b5e6896d0bea9e6247ed3
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Jan 6 10:47:32 2010 -0600
-
-    Version 0.9.99D
-    
-        Alpha release
-
-commit 8ecf733ae12593eccb545d47e3419c627cc958d8
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Jan 6 10:46:30 2010 -0600
-
-    FT450 Preamp Read
-    
-        Read logic was inverted.  Fixed.
-
-commit 5ff0ca1aeb1b5c6f4eeebab689582b1a8d434eeb
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Mon Jan 4 16:12:11 2010 -0600
-
-    TT550 work
-
-commit 1728d0b64d597b0827ec762b7e3f5f745a19c3b9
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Jan 1 20:37:03 2010 -0600
-
-    Version 0.9.99C
-    
-        Alpha release
-
-commit c9a92062dae7758354efb22c50293e34807b56ed
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Jan 1 20:37:00 2010 -0600
-
-    Jupiter-Pegasus DTR line
-    
-        Changed default to DTR enabled for TT-538 and TT-550 xcvrs
-
-commit ca14ecdba87a28f0732ce6b6fac4a228bd15af35
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Jan 1 20:36:55 2010 -0600
-
-    FT767 transceiver
-    
-        Added transceiver class FT767
-    
-    XmlRpc error reports
-    
-        Suppressed stderr reports from xmlrpc library
-
-commit f2df2ba7e9d72ac5f7fb84329f1d7d8d41959187
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Dec 30 14:57:40 2009 -0600
-
-    Version 0.9.99B
-    
-        Alpha release
-
-commit 88db85e42f27b3191a1984e355c7d19c9e328a6d
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Dec 30 14:57:40 2009 -0600
-
-    XML_IO Race Condition
-    
-        Corrected race condition during xml_io update to mode/bw
-    
-    TT-516 AM bandwidths
-    
-        Added AM bandwidths table
-
-commit 8b336f518ce14c2ddb4026a072e4bbd2c1205ff3
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Dec 30 08:59:05 2009 -0600
-
-    FT100D fix
-    
-        Fixed bit interpretation for transceiver bandwidth report
-        Submitted by Walter Fey, DL8FCL
-
-commit 98fc2e9d146ebe8d714e257f2bb6506bfa571a01
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Dec 29 08:17:22 2009 -0600
-
-    XMLRPC mod
-    
-        Updated xmlrpc calls to server to comply with changes in
-        server command language.
-
-commit b1a1061ef566ff17105d3161d02bbc817bdccbe1
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Dec 25 12:19:00 2009 -0600
-
-    Version 0.9.99A
-    
-        Alpha release
-
-commit 681d3cae7879e964ce1911ae628b650739123047
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Dec 25 12:17:11 2009 -0600
-
-    Mode-Bandwidth Annunciation
-    
-        Added transceiver mode / bandwidth change annunciation.
-        flrig / fldigi tracks changes made in transceiver to:
-          frequency
-          mode
-          bandwidth
-
-commit bdbc63ab85bd3817ba4d63c79a517e7bd794f267
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Dec 25 12:12:11 2009 -0600
-
-    FT-857D update
-    
-        Modification to read bandwidth / mode.
-
-commit 8b7687c3cc68395b4c37ee674a1ba1199fd1edb3
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Dec 24 09:39:50 2009 -0600
-
-    Version 0.9.98
-    
-        Alpha release
-
-commit 84f04dda1bd94a5d09ea091789461f42b14162c8
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Dec 24 09:38:52 2009 -0600
-
-    FT-857D get_mode correction
-    
-        Get_mode method for this class was completely bogus :>(
-
-commit e1377830e7b103ef330072573a38c0a71e3505a9
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Dec 13 13:42:09 2009 -0600
-
-    Version 0.9.97
-    
-        Alpha release
-
-commit 2a4f12a1b0b02f8018f0a623f9bc7a834cd4ab21
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sun Dec 13 13:40:27 2009 -0600
-
-    Socket not available checks
-    
-        Removed all socket i/o from main and serial threads if socket
-        not already opened and available.  Socket availability checks
-        constrained to socket i/o thread.  Removes adverse impact on
-        gui and serial thread performance due to socket wait state.
-        Particularly noticable on win32 platforms.
-
-commit 8ccc07d2be4f718c23c983e35496a5d7a08f6034
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Dec 12 14:55:41 2009 -0600
-
-    Version 0.9.96
-    
-        Alpha release
-
-commit 8017748c2187664093e394ab53c32fdc621f175b
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Dec 12 14:54:40 2009 -0600
-
-    Improve transceiver response
-    
-        Changed from on demand to polled frequency updates.
-        Prior behavior required that transceiver be sent every step
-        change in the flrig frequency display.  New behavior only
-        sends state at time of poll iff the value changes.  The poll
-        is a part of the serial thread loop.  Original code gave
-        poor response on low baud rate serial ports.
-
-commit 848b980719c8d5e2bad2cf6c43b7937fcddfe847
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Dec 10 09:17:48 2009 -0600
-
-    Exception handler
-    
-        * Added catch (...) statements to correct "death by win32"
-          problem on MS when closing down without the presence of
-          a running fldigi.
-        * Removed unused code from xml_io.cxx
-
-commit 5c49dea6213707ab6652387014bad63a4dd7e36b
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Wed Dec 9 14:15:59 2009 -0600
-
-    Version 0.9.95
-    
-        Alpha release 0.9.95
-
-commit 40c3797411f2562b00b7b4f3d31bb8e81791c5d0
-Author: Stelios Bounanos <vcs@enotty.net>
-Date:   Sat Dec 5 18:07:45 2009 +0000
-
-    Use XML-RPC
-    
-      * Add xmlrpcpp (cvs20091205)
-      * Add support for the nil type
-      * Use XML-RPC calls for fldigi
-      * Use "boxcarring" (system.multicall) to retrieve fldigi status
-
-commit ab5c7e5cb9e2b72084b75e205967e58273b41d54
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Dec 1 19:04:22 2009 -0600
-
-    Thread conflict fix
-    
-        Changed to single socket send/recv function.
-        Added mutex lock / unlock's to prevent thread conflict
-        Changed support functions to be re-entrant.
-
-commit f0acfb4711d8ea5d62c21ba394af7bd2e1af1128
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Dec 1 09:28:06 2009 -0600
-
-    Socket allocation
-    
-        Changed to dynamic allocation of socket instance
-
-commit a5f326a9f6779496e0809597b022544bc760ca44
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Dec 1 05:09:52 2009 -0600
-
-    Mem Leak Fix
-    
-        Fix for memory leak in dialogs.cxx
-
-commit 9e9795d2a3a5be9cecb2b419bfbb986b2f2e628f
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Nov 28 19:36:55 2009 -0600
-
-    Version 0.9.94
-    
-        Alpha release
-
-commit 0b301f0e98e3e42bc8ccd30ce03603a4987fbb4f
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Nov 28 19:36:52 2009 -0600
-
-    FT857D mod
-    
-        * Corrected code for power_out and swr.
-          Patch submitted by Rich, WA4SXZ
-
-commit b5ef8e31febf9ec15d689187dacaf6f8f2f6c2b1
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Sat Nov 28 19:36:40 2009 -0600
-
-    Window Decoration
-    
-        * Added code to support window bar icon
-
-commit 09ec7ef51eee2bceb8f2dccbde5c7f931b5c4488
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Nov 27 19:02:58 2009 -0600
-
-    OSX Build mods
-    
-        * Accommodate OS X file system behavior of case insensitivity
-        * Removed unused bit map images
-        * Fixed no-effect statement in support.cxx
-        * Changed all base class destructors to virtual; suppresses
-          multiple warnings on OS X build
-
-commit 4fd62cf6328dbcf6ed665d057aea480b4421b1cb
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Fri Nov 27 11:34:19 2009 -0600
-
-    Version 0.9.93
-    
-        Baseline for push to berlios repository: flrig/master
-
-commit 0a75d3d1fb43068f608745a496691a235dc1ca47
-Author: Stelios Bounanos <vcs@enotty.net>
-Date:   Fri Nov 27 11:21:29 2009 +0000
-
-    Disable win32 snprintf workaround
-    
-    This is not needed with gcc 4.x.
-    
-    (adapted from commit 78d5e4dfbb4e39d90910d88eae8404287fa2d078)
-
-commit ebd8568a8d239fb0b25905eefeabc3f84dc7fda6
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Nov 26 15:56:32 2009 -0600
-
-    Version 0.9.92
-    
-        Alpha release
-
-commit e126caa4d3d3f130fe7d57e49ed9e1f109a1573d
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Thu Nov 26 15:55:30 2009 -0600
-
-    No Curl Mod
-    
-        Removed libcurl and libxmlrpc dependencies from source.
-        Substituted application specific xmlrpc string generator
-        and parser.
-        Substituted standard client socket calls, socket class
-        derived from fldigi/flarq source tree.
-
-commit be23b2f23cd7290b66bb5fe5c27fd060f7486c33
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Nov 24 13:56:34 2009 -0600
-
-    Version 0.9.91
-
-commit f902afcbd017cf247fe8ebe15bd20c06e39e6038
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Tue Nov 24 13:54:16 2009 -0600
-
-    Dependencies
-    
-        Add dll dependencies, script mods for win32 build
-
-commit bd30e7a699f9f32701f671f0923dcb59fc5063a2
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Mon Nov 23 10:35:38 2009 -0600
-
-    Build fixes
-    
-        * Added correct flrig.icns for OS-X build
-        * Added missing specifiers to mingw32 build scripts
-        * Added builddist.sh script
-
-commit 59a7b99b32b83c6d52e335700477e978689110de
-Author: Stelios Bounanos <vcs@enotty.net>
-Date:   Mon Nov 23 07:02:52 2009 -0600
-
-    Fix OS X compilation
-    
-      * Add OSX conditional for Pixmap code
-      * Always define KNAME and call Fl_Window::xclass()
-
-commit 7cb8e32ef3a359c464e37edfdc3f7f580513ceff
-Author: Stelios Bounanos <vcs@enotty.net>
-Date:   Mon Nov 23 13:01:17 2009 -0600
-
-    Fix resource include
-
-commit 818bb9d6ffd6ce392139cfbeefb337f1380e792c
-Author: Stelios Bounanos <vcs@enotty.net>
-Date:   Mon Nov 23 18:54:13 2009 -0600
-
-    Add pthreads-w32 build flags
-
-commit 90ee9b1e73e3e13ed4936621dd2e63a68caed65e
-Author: David Freese <w1hkj@w1hkj.com>
-Date:   Mon Nov 23 06:52:19 2009 -0600
-
-    Version 0.9.9
-    
-        * Initial gnu autotools build source
+2011-05-05  David Freese  <w1hkj@w1hkj.com>
+
+	1c3053a: TS570 bug fixes
+	00ef8a5: IC7000 bug fixes
+	bdfcca0: Get power control
+	63277a4: ICOM response
+	bb40e21: TT599 Pwr-Swr
+	0323877: Freq List
+	78e7760: IC718
+	dfa146b: FT920
+	980ad5e: IC7000 bug fix
+	4a74378: IC xcvr family
+	7f2ae93: IC7000
+	4406d39: TT599
+
+2011-04-24  David Kjellquist  <dave@kjellquist.com>
+
+	e1748e5: TS570
+
+2011-04-23  David Freese  <w1hkj@w1hkj.com>
+
+	170a5a7: Polling
+	abf4489: TS480HX
+	d77da92: IC7000
+	361e437: IC7200
+	5b2e35e: IC718
+	57ace2f: IC7000
+	3ddd26d: Event Log
+	bc487a9: K3 split
+	a2dcfe8: IC7200 metering
+	baf9fea: Keep - Restore
+	ad5116a: K3 bandwidth control
+	ab17344: Color Dialog
+	3221cdb: A-B Select force display value
+	10e4b23: Compile Warning
+	bd5755f: K3
+	0f22450: Select A/B
+	fd99d18: Select A/B
+	b11057e: RAY152
+	c7dff8d: TS480HX/SAT
+	29f6884: IC7200
+	44566d0: K3
+	35ec168: FT857D s-meter
+	26d8185: TS480XH power control
+	70bd622: TT588 RF gain
+	9df14fb: Serial Stream Parsing
+	68ac858: Colors-Scheme
+	2fbec07: TT599
+	927db3d: TS2000
+	1361905: TT538 code clean up
+	7e55bda: System colors
+	65dc4b1: Meter colors
+	f9204b6: TT588
+	5ff58ac: TT550 Auto Notch
+	ef7b1ce: TT550 smeter
+
+
+=Version 1.1.3=
+
+	7fad31f: IC7200 Vfo B
+	adfb091: TT550
+	0c7b089: IC7600 RTTY fault
+	71649a4: Adjust bandwidth
+	ffd29d7: IC7200 7600 TT550
+	c0c3821: FT100D ABA init
+	c38b844: TS590S s/pwr meter
+
+
+=Version 1.1.2=
+
+	b54df4a: TS480HX/SAT update
+	3444ca3: TT550 noise reduction
+	4465b45: Meters / Colors
+	4c5b946: Serial thread timing
+	95ca6ce: TS590S smeter
+
+
+=Version 1.1.1=
+
+	145649f: TS590S update
+
+
+=Version 1.1.0=
+
+	8258086: TT550 update
+	0a5bdc1: TT538 vfob
+	2c5ade4: TS590S vfo read-write
+	2b915d6: TT550 remote
+	ef29ed7: A-B startup race
+	7e07540: TT550 keypad
+	95d95bc: FT847
+	bcab820: TS590 ptt
+	493b695: TS2000 update
+	277941b: FT1000MP Tuner
+	6abfdd2: TS570 compile error
+	25946ef: IC7000 auto notch
+	b4708a3: FT100D
+	d814bc8: FT1000MP def bw
+	5f1fbcd: IC series split
+	4d20762: Default BW
+	c53afce: IC7600 A/B mods
+	c541e1a: FT1000MP swr/alc
+	6abdb0c: RAY 152 smeter
+	21b2310: FT1000MP power scale
+	bb21b62: IC7600 update
+	c01be68: FT1000MP Bandwidth
+	b1fe8c6: Button A/B
+	268f4fb: ICOM select race
+	867f0d0: RAY152 - vfo
+
+
+=Version 1.0.1.1=
+
+	80633b6: FT1000MP vfo precision
+	78c3697: TT516 update
+	beaff06: Raytheon 152
+	de3bebd: TS590S
+	fbf17df: FT1000MP mods
+	7432862: IC746 family
+
+
+=Version 1.0.1=
+
+	f960a7d: TT599 cleanup
+
+2011-01-31  Terry Embry, KJ4EED  <mrtembry@yahoo.com>
+
+	d33ef33: FT950 update
+
+2011-01-26  David Freese  <w1hkj@w1hkj.com>
+
+	d3a2af4: Que management
+	ae0347b: IC7600 IC746 FT450
+	9cb6b9d: Orion-II smeter
+	d2a5697: Eagle CWU-smeter
+	e78c7fb: Orion-II Smeter
+	0f1eea4: Exception handling
+	c10115c: TS450S init
+	01d6148: Orion-II
+	72b812d: Eagle split
+	55d653b: Eagle-Orion-II
+	ff67b97: Eagle-Orion getBW fix
+	a9ab74c: Home Dir
+	346c3c0: ft450 tests
+	04c86fd: Que processing
+	43e4ead: 64 bit recast
+	535ba2f: TT566-TT599 correction
+	61b6eba: Orion-II TT566
+	997229c: TT599-Eagle
+	e3a3124: TT 535 Delta-II
+	9ef17a0: TT516 dual vfo
+	397984a: A B vfo select
+	ffebee9: IC706 mode type
+	8a07b42: IC7200 digi mode
+	4e7d1f3: H/W PTT control
+	4022e57: ICOM dual vfo
+	4ec4702: Parse Args
+	92d90b9: Dual VFO mod
+	61ea3d2: VFO A-B
+	3d64fc0: K2 Update
+	68ae4e4: Rig Ordering
+	699c420: IC703
+	626d3b0: Config Dir
+	c1027a8: TS480 HX/SAT
+	9b8479b: Combo Widget
+	bc9b4c3: TS480 HX/SAT
+	054e92a: TS450 update
+
+2010-07-30  Frank Tomesh, AB2ZO  <fjt@ka1gl.net>
+
+	f1a4670: IC703 seg fault fix
+
+2010-07-17  David Freese  <w1hkj@w1hkj.com>
+
+	6e82fef: Echo suppression
+	d57238d: IC703 bug fixes
+	9a6e9c4: IC703-CIV
+	1d5dc71: IC7200 update
+	7b3adae: IC718 update
+	7cacc8a: TT550 Auto Tuner
+	6654181: RTS-DTR ptt
+	8091162: TT-538 Po/SWR
+	66f7861: Menu update
+	b567f0f: Restore Xcvr
+	a58d4f6: FT817 mods
+	eda4e7e: Fluid source
+	8654ddb: Read Stream
+
+2010-04-30  Jason Turning, N6WBL  <jturning@sbcglobal.net>
+
+	2594d0a: IC718 Auto Notch
+
+2010-04-29  David Freese  <w1hkj@w1hkj.com>
+
+	b97848d: ICgeneric split
+	500628b: IC703 Compression
+	739a7b4: IC703 / TS450S
+
+2010-04-29  Jason Turning, N6WBL  <jturning@sbcglobal.net>
+
+	32492ac: IC718 additions
+
+2010-04-27  David Freese  <w1hkj@w1hkj.com>
+
+	3f5e11e: IC718 rf gain
+	52f8e17: Added rigpanel.fl
+	04ef71f: IC7200 Data mode
+	cf066d3: IC718 corrections
+	5df3c55: ICOM update
+	b0b0afc: Freq Control Widget
+	9d9864b: IC7200 changes
+	195fcd9: IC718
+	526150b: K3 mode
+	a2a004d: IC7200
+	70f138e: K3 bug fixes
+	8ff9611: Build static distribution
+	90250ee: K3 mods
+	3f7ac25: Exec during config
+	5c111de: SWR enable
+	b36ef3c: Power - 7600
+
+2010-04-13  Andrew Hart, VE3NVK  <andylhart@gmail.com>
+
+	96005f5: IC7600 update
+
+2010-03-29  David Freese  <w1hkj@w1hkj.com>
+
+	3fbeee1: FT1000 series
+	fa215e2: OS X serial device
+	e2a1ff0: FT1000 FT1000MV update
+	fe2bc28: TT550 AM mod
+	8079933: DLL dependency
+	462bc39: IC7000 mods
+	e087a07: TT550 bug fixes
+	713b0a7: TT-538 gain table
+	c324e27: IC746 / Pro Disassociation
+	37f9660: FT1000MV
+	018b344: FT1000
+	5c232a5: FT450 Volume range
+	e53f04c: FT2000 debug strings
+	a59c478: TS2000 Mic Gain
+	b240047: IC-746 BW
+	20c3253: Split Operation
+	5b17be2: TT-550 update
+	f8b355b: K2 serial baud rate
+	8ee433c: Pegasus TT550 mic gain
+	2792b74: On Line Help link
+	3c372e6: Omni-VII TT588
+	568ff59: Jupiter-TT538 update
+	ae6a40a: TS570 update
+	ae2ccbd: FT450 update
+	5a807ed: Jupiter update
+	800af3a: Jupiter-TT538 update
+	ecbe0a5: TT550 Vfo Adjust
+	c018a65: TT550 new mode
+	4d56b12: XMLRPC sync delay
+	881c3ed: OS X missing include
+	f7dbe5d: WIN32 build fix
+	61f1e71: Status File Change
+	1329194: Serial Port Discovery
+	3373096: TT-570 update
+	8a0f254: TT-538 update
+
+2010-02-04  André - M0JEK  <m0jek@me.com>
+
+	9f0d0bc: OS X exit on start
+
+2010-02-04  Chris Sylvain  <kb3cs@arrl.net>
+
+	ee6911a: TS-570 S-meter scale adjusted
+	4341cab: Add initial Kenwood TS-570 support
+	35e8af5: Use modulo arithmetic on loopcount in serial loop
+	c581acc: TS570 bandwidth control and basic metering
+
+2010-01-17  David Freese  <w1hkj@w1hkj.com>
+
+	4e275fe: Use defaults fix
+	658c462: TS2000 fix
+	d517094: Use rig data
+	1b13be1: TT550 noise blanker addition
+	02a6077: TT538 / TT550 additional controls
+	edc73ce: TT538 / TT550
+	8ecf733: FT450 Preamp Read
+	5ff0ca1: TT550 work
+	c9a9206: Jupiter-Pegasus DTR line
+	ca14ecd: FT767 transceiver
+	88db85e: XML_IO Race Condition
+	8b336f5: FT100D fix
+	98fc2e9: XMLRPC mod
+	681d3ca: Mode-Bandwidth Annunciation
+	bdbc63a: FT-857D update
+
+
+=Version 0.9.98=
+
+	84f04dd: FT-857D get_mode correction
+
+
+=Version 0.9.97=
+
+	2a4f12a: Socket not available checks
+
+
+=Version 0.9.96=
+
+	8017748: Improve transceiver response
+	848b980: Exception handler
+
+
+=Version 0.9.95=
+
+
+2009-12-05  Stelios Bounanos  <vcs@enotty.net>
+
+	40c3797: Use XML-RPC
+
+2009-12-01  David Freese  <w1hkj@w1hkj.com>
+
+	ab5c7e5: Thread conflict fix
+	f0acfb4: Socket allocation
+	a5f326a: Mem Leak Fix
+
+
+=Version 0.9.94=
+
+	0b301f0: FT857D mod
+	b5ef8e3: Window Decoration
+	09ec7ef: OSX Build mods
+
+
+=Version 0.9.93=
+
+
+2009-11-27  Stelios Bounanos  <vcs@enotty.net>
+
+	0a75d3d: Disable win32 snprintf workaround
+
+
+=Version 0.9.92=
+
+
+2009-11-26  David Freese  <w1hkj@w1hkj.com>
+
+	e126caa: No Curl Mod
+
+
+=Version 0.9.91=
+
+	f902afc: Dependencies
+	bd30e7a: Build fixes
+
+2009-11-23  Stelios Bounanos  <vcs@enotty.net>
+
+	59a7b99: Fix OS X compilation
+	7cb8e32: Fix resource include
+	818bb9d: Add pthreads-w32 build flags
+
+
+=Version 0.9.9=
+
