@@ -1958,10 +1958,6 @@ void initRig()
 		sldrPOWER->minimum(min);
 		sldrPOWER->maximum(max);
 		sldrPOWER->step(step);
-		if (min > progStatus.power_level)
-			progStatus.power_level = min;
-		if (max < progStatus.power_level)
-			progStatus.power_level = max;
 		if (progStatus.use_rig_data)
 			progStatus.power_level = selrig->get_power_control();
 		else
