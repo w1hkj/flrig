@@ -27,12 +27,14 @@ static const char *TS570_SSBbw[] = {
 
 static const char *TS570_CWwidths[] = {
 "50", "100", "200", "300", "400", "600", "1000", "2000", NULL};
+
 static const char *TS570_CWbw[] = {
 "FW0050;", "FW0100;", "FW0200;", "FW0300;",
 "FW0400;", "FW0600;", "FW1000;", "FW2000;", NULL};
 
 static const char *TS570_FSKwidths[] = {
 "250", "500", "1000", "1500", NULL};
+
 static const char *TS570_FSKbw[] = {
   "FW0250;", "FW0500;", "FW1000;", "FW1500;", NULL};
 
@@ -314,7 +316,7 @@ int RIG_TS570::get_attenuator()
 	cmd = "RA;";
 	int ret = sendCommand(cmd);
 	showresp(WARN, ASC, "get Att", cmd, replystr);
-	if (ret < 7) return att_on;
+	if (ret < 5) return att_on;
 	size_t p = replystr.rfind("RA");
 	if (p == string::npos) return att_on;
 
@@ -340,7 +342,7 @@ int RIG_TS570::get_preamp()
 	cmd = "PA;";
 	int ret = sendCommand(cmd);
 	showresp(WARN, ASC, "get pre", cmd, replystr);
-	if (ret < 5 ) return preamp_on;
+	if (ret < 4 ) return preamp_on;
 	size_t p = replystr.rfind("PA");
 	if (p == string::npos) return preamp_on;
 
@@ -501,18 +503,21 @@ void RIG_TS570::set_bwA(int val)
 	case 1:
 	case 3:
 	case 4:
-	sendCommand(TS570_SSBbw[A.iBW], 0);
-	break;
+		cmd = TS570_SSBbw[A.iBW];
+		sendCommand(cmd, 0);
+		break;
 	case 2:
 	case 6:
-	sendCommand(TS570_CWbw[A.iBW], 0);
-	break;
+		cmd = TS570_CWbw[A.iBW];
+		sendCommand(cmd, 0);
+		break;
 	case 5:
 	case 7:
-	sendCommand(TS570_FSKbw[A.iBW], 0);
-	break;
+		cmd = TS570_FSKbw[A.iBW];
+		sendCommand(cmd, 0);
+		break;
 	default:
-	break;
+		break;
 	}
 	showresp(WARN, ASC, "set bwA", cmd, replystr);
 }
@@ -527,29 +532,30 @@ int RIG_TS570::get_bwA()
 	if (ret < 7) return A.iBW;
 	size_t p = replystr.rfind("FW");
 	if (p == string::npos) return A.iBW;
-	string test = replystr.substr(p+2);
-	
+
+	string test = replystr.substr(p, 7);
+
 	switch (A.imode) {
 	case 0:
 	case 1:
 	case 3:
 	case 4:
 		for (i = 0; TS570_SSBbw[i] != NULL; i++)
-			if (test.find(TS570_SSBbw[i]) == 0)  break;
+			if (test == TS570_SSBbw[i])  break;
 		if (TS570_SSBbw[i] != NULL) A.iBW = i;
 		else A.iBW = 1;
 		break;
 	case 2:
 	case 6:
 		for (i = 0; TS570_CWbw[i] != NULL; i++)
-			if (test.rfind(TS570_CWbw[i]) == 0)  break;
+			if (test == TS570_CWbw[i])  break;
 		if (TS570_CWbw[i] != NULL) A.iBW = i;
 		else A.iBW = 1;
 		break;
 	case 5:
 	case 7:
 		for (i = 0; TS570_FSKbw[i] != NULL; i++)
-			if (test.rfind(TS570_FSKbw[i]) == 0)  break;
+			if (test == TS570_FSKbw[i])  break;
 		if (TS570_FSKbw[i] != NULL) A.iBW = i;
 		else A.iBW = 1;
 		break;
@@ -569,18 +575,21 @@ void RIG_TS570::set_bwB(int val)
 	case 1:
 	case 3:
 	case 4:
-	sendCommand(TS570_SSBbw[B.iBW], 0);
-	break;
+		cmd = TS570_SSBbw[B.iBW];
+		sendCommand(cmd, 0);
+		break;
 	case 2:
 	case 6:
-	sendCommand(TS570_CWbw[B.iBW], 0);
-	break;
+		cmd = TS570_CWbw[B.iBW];
+		sendCommand(cmd, 0);
+		break;
 	case 5:
 	case 7:
-	sendCommand(TS570_FSKbw[B.iBW], 0);
-	break;
+		cmd = TS570_FSKbw[B.iBW];
+		sendCommand(cmd, 0);
+		break;
 	default:
-	break;
+		break;
 	}
 	showresp(WARN, ASC, "set bwB", cmd, replystr);
 }
@@ -595,29 +604,30 @@ int RIG_TS570::get_bwB()
 	if (ret < 7) return B.iBW;
 	size_t p = replystr.rfind("FW");
 	if (p == string::npos) return B.iBW;
-	string test = replystr.substr(p+2);
-	
+
+	string test = replystr.substr(p,7);
+
 	switch (B.imode) {
 	case 0:
 	case 1:
 	case 3:
 	case 4:
 		for (i = 0; TS570_SSBbw[i] != NULL; i++)
-			if (test.find(TS570_SSBbw[i]) == 0)  break;
+			if (test == TS570_SSBbw[i])  break;
 		if (TS570_SSBbw[i] != NULL) B.iBW = i;
 		else B.iBW = 1;
 		break;
 	case 2:
 	case 6:
 		for (i = 0; TS570_CWbw[i] != NULL; i++)
-			if (test.rfind(TS570_CWbw[i]) == 0)  break;
+			if (test == TS570_CWbw[i])  break;
 		if (TS570_CWbw[i] != NULL) B.iBW = i;
 		else B.iBW = 1;
 		break;
 	case 5:
 	case 7:
 		for (i = 0; TS570_FSKbw[i] != NULL; i++)
-			if (test.rfind(TS570_FSKbw[i]) == 0)  break;
+			if (test == TS570_FSKbw[i])  break;
 		if (TS570_FSKbw[i] != NULL) B.iBW = i;
 		else B.iBW = 1;
 		break;
