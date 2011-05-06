@@ -265,11 +265,11 @@ int RIG_TS590S::get_volume_control()
 {
 	cmd = "AG0;";
 	int ret = sendCommand(cmd);
-	if (ret < 8) return 0;
+	if (ret < 7) return 0;
 	size_t p = replystr.rfind("AG");
 	if (p == string::npos) return 0;
 
-	replystr[p + 7] = 0;
+	replystr[p + 6] = 0;
 	int val = atoi(&replystr[p + 3]);
 	return (int)(val / 2.55);
 }
