@@ -15,8 +15,7 @@ decl {\#include "support.h"} {}
 
 decl {\#include "K3_ui.h"} {} 
 
-decl {const int freq_sel_widths[]={110, 70, 70, 0};} {selected
-} 
+decl {const int freq_sel_widths[]={110, 70, 70, 0};} {} 
 
 Function {Rig_window()} {} {
   Fl_Window {} {
@@ -552,8 +551,7 @@ Fl::scheme(progStatus.ui_scheme.c_str());} open
   }
 } 
 
-Function {Memory_Dialog()} {open
-} {
+Function {Memory_Dialog()} {} {
   Fl_Window {} {
     label {Flrig Memory} open
     xywh {573 706 320 138} type Double visible
@@ -592,16 +590,17 @@ selectFreq();}
   }
 } 
 
-Function {XcvrDialog()} {} {
+Function {XcvrDialog()} {open
+} {
   Fl_Window {} {
-    label {I/O Ports}
+    label {I/O Ports} open
     xywh {577 419 482 257} type Double visible
   } {
     Fl_Tabs {} {open
       xywh {0 8 477 245}
     } {
       Fl_Group {} {
-        label Primary open
+        label Primary selected
         xywh {2 30 475 222}
       } {
         Fl_Group {} {open
@@ -782,7 +781,7 @@ cbCIV();}
         }
       }
       Fl_Group {} {
-        label PTT open
+        label PTT
         xywh {2 30 470 218} hide
       } {
         Fl_Box {} {
@@ -831,7 +830,7 @@ btnOkXcvrDialog->redraw();}
         }
       }
       Fl_Group {} {
-        label Aux open
+        label Aux
         xywh {2 30 470 220} hide
       } {
         Fl_Group selectAuxPort {
@@ -848,7 +847,7 @@ Serial Port for a special Control Signals}
         }
       }
       Fl_Group {} {
-        label Polling
+        label Polling open
         xywh {2 30 470 220} hide
       } {
         Fl_Group {} {
@@ -905,8 +904,14 @@ Serial Port for a special Control Signals}
           Fl_Check_Button btn_poll_volume {
             label Volume
             callback {progStatus.poll_volume = o->value();}
-            xywh {172 138 104 15} down_box DOWN_BOX
+            xywh {43 221 104 15} down_box DOWN_BOX
             code0 {o->value(progStatus.poll_volume);}
+          }
+          Fl_Check_Button btn_poll_notch {
+            label {Manual Notch}
+            callback {progStatus.poll_notch = o->value();}
+            xywh {172 138 104 15} down_box DOWN_BOX
+            code0 {o->value(progStatus.poll_notch);}
           }
           Fl_Check_Button btn_poll_auto_notch {
             label {Auto Notch}
@@ -932,17 +937,17 @@ Serial Port for a special Control Signals}
             xywh {302 138 104 15} down_box DOWN_BOX
             code0 {o->value(progStatus.poll_pre_att);}
           }
-          Fl_Check_Button btn_poll_micgain {
-            label {Mic gain}
-            callback {progStatus.poll_micgain = o->value();}
-            xywh {302 166 104 15} down_box DOWN_BOX
-            code0 {o->value(progStatus.poll_micgain);}
-          }
           Fl_Check_Button btn_poll_squelch {
             label Squelch
             callback {progStatus.poll_squelch = o->value();}
-            xywh {302 194 104 15} down_box DOWN_BOX
+            xywh {302 166 104 15} down_box DOWN_BOX
             code0 {o->value(progStatus.poll_squelch);}
+          }
+          Fl_Check_Button btn_poll_micgain {
+            label {Mic gain}
+            callback {progStatus.poll_micgain = o->value();}
+            xywh {302 193 104 15} down_box DOWN_BOX
+            code0 {o->value(progStatus.poll_micgain);}
           }
           Fl_Check_Button btn_poll_rfgain {
             label {RF gain}
@@ -953,7 +958,7 @@ Serial Port for a special Control Signals}
         }
       }
       Fl_Group {} {
-        label {Send Cmd} open
+        label {Send Cmd}
         xywh {4 30 470 220} hide
       } {
         Fl_Input txt_command {

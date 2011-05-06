@@ -1493,6 +1493,12 @@ static void cb_btn_poll_volume(Fl_Check_Button* o, void*) {
   progStatus.poll_volume = o->value();
 }
 
+Fl_Check_Button *btn_poll_notch=(Fl_Check_Button *)0;
+
+static void cb_btn_poll_notch(Fl_Check_Button* o, void*) {
+  progStatus.poll_notch = o->value();
+}
+
 Fl_Check_Button *btn_poll_auto_notch=(Fl_Check_Button *)0;
 
 static void cb_btn_poll_auto_notch(Fl_Check_Button* o, void*) {
@@ -1517,16 +1523,16 @@ static void cb_btn_poll_pre_att(Fl_Check_Button* o, void*) {
   progStatus.poll_pre_att = o->value();
 }
 
-Fl_Check_Button *btn_poll_micgain=(Fl_Check_Button *)0;
-
-static void cb_btn_poll_micgain(Fl_Check_Button* o, void*) {
-  progStatus.poll_micgain = o->value();
-}
-
 Fl_Check_Button *btn_poll_squelch=(Fl_Check_Button *)0;
 
 static void cb_btn_poll_squelch(Fl_Check_Button* o, void*) {
   progStatus.poll_squelch = o->value();
+}
+
+Fl_Check_Button *btn_poll_micgain=(Fl_Check_Button *)0;
+
+static void cb_btn_poll_micgain(Fl_Check_Button* o, void*) {
+  progStatus.poll_micgain = o->value();
 }
 
 Fl_Check_Button *btn_poll_rfgain=(Fl_Check_Button *)0;
@@ -1865,11 +1871,16 @@ e"));
             btn_poll_bandwidth->callback((Fl_Callback*)cb_btn_poll_bandwidth);
             o->value(progStatus.poll_bandwidth);
           } // Fl_Check_Button* btn_poll_bandwidth
-          { Fl_Check_Button* o = btn_poll_volume = new Fl_Check_Button(172, 138, 104, 15, _("Volume"));
+          { Fl_Check_Button* o = btn_poll_volume = new Fl_Check_Button(43, 221, 104, 15, _("Volume"));
             btn_poll_volume->down_box(FL_DOWN_BOX);
             btn_poll_volume->callback((Fl_Callback*)cb_btn_poll_volume);
             o->value(progStatus.poll_volume);
           } // Fl_Check_Button* btn_poll_volume
+          { Fl_Check_Button* o = btn_poll_notch = new Fl_Check_Button(172, 138, 104, 15, _("Manual Notch"));
+            btn_poll_notch->down_box(FL_DOWN_BOX);
+            btn_poll_notch->callback((Fl_Callback*)cb_btn_poll_notch);
+            o->value(progStatus.poll_notch);
+          } // Fl_Check_Button* btn_poll_notch
           { Fl_Check_Button* o = btn_poll_auto_notch = new Fl_Check_Button(172, 166, 104, 15, _("Auto Notch"));
             btn_poll_auto_notch->down_box(FL_DOWN_BOX);
             btn_poll_auto_notch->callback((Fl_Callback*)cb_btn_poll_auto_notch);
@@ -1890,16 +1901,16 @@ e"));
             btn_poll_pre_att->callback((Fl_Callback*)cb_btn_poll_pre_att);
             o->value(progStatus.poll_pre_att);
           } // Fl_Check_Button* btn_poll_pre_att
-          { Fl_Check_Button* o = btn_poll_micgain = new Fl_Check_Button(302, 166, 104, 15, _("Mic gain"));
-            btn_poll_micgain->down_box(FL_DOWN_BOX);
-            btn_poll_micgain->callback((Fl_Callback*)cb_btn_poll_micgain);
-            o->value(progStatus.poll_micgain);
-          } // Fl_Check_Button* btn_poll_micgain
-          { Fl_Check_Button* o = btn_poll_squelch = new Fl_Check_Button(302, 194, 104, 15, _("Squelch"));
+          { Fl_Check_Button* o = btn_poll_squelch = new Fl_Check_Button(302, 166, 104, 15, _("Squelch"));
             btn_poll_squelch->down_box(FL_DOWN_BOX);
             btn_poll_squelch->callback((Fl_Callback*)cb_btn_poll_squelch);
             o->value(progStatus.poll_squelch);
           } // Fl_Check_Button* btn_poll_squelch
+          { Fl_Check_Button* o = btn_poll_micgain = new Fl_Check_Button(302, 193, 104, 15, _("Mic gain"));
+            btn_poll_micgain->down_box(FL_DOWN_BOX);
+            btn_poll_micgain->callback((Fl_Callback*)cb_btn_poll_micgain);
+            o->value(progStatus.poll_micgain);
+          } // Fl_Check_Button* btn_poll_micgain
           { Fl_Check_Button* o = btn_poll_rfgain = new Fl_Check_Button(302, 221, 104, 15, _("RF gain"));
             btn_poll_rfgain->down_box(FL_DOWN_BOX);
             btn_poll_rfgain->callback((Fl_Callback*)cb_btn_poll_rfgain);
