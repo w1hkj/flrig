@@ -581,8 +581,7 @@ void RIG_IC7000::get_mic_gain_min_max_step(int &min, int &max, int &step)
 
 void RIG_IC7000::set_notch(bool on, int val)
 {
-	int notch = (int)(val/10.0 + 128);
-	if (notch > 256) notch = 255;
+	int notch = 64 + (int)((val - 300) * 128.0 / 2400);
 
 	cmd = pre_to;
 	cmd.append("\x16\x48");
@@ -622,7 +621,7 @@ bool RIG_IC7000::get_notch(int &val)
 		if (waitFOR(9, "get notch val")) {
 			size_t p = replystr.rfind(resp);
 			if (p != string::npos)
-				val = 10*(fm_bcd(&replystr[p + 6],3) - 128);
+				val = (int)(2400.0*(fm_bcd(&replystr[p + 6],3) - 64) / 128.0);
 		}
 	}
 	return on;
@@ -630,8 +629,8 @@ bool RIG_IC7000::get_notch(int &val)
 
 void RIG_IC7000::get_notch_min_max_step(int &min, int &max, int &step)
 {
-	min = -1280;
-	max = 1280;
-	step = 10;
+	min = 300;
+	max = 2700;
+	step = 20;
 }
 
