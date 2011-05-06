@@ -811,11 +811,15 @@ void cb_set_split(int val)
 			if (vfoB.freq != FreqDispB->value()) {
 				vfoB.freq = FreqDispB->value();
 				pthread_mutex_lock(&mutex_serial);
+					selrig->selectB();
 					selrig->set_vfoB(vfoB.freq);
+					selrig->selectA();
 				pthread_mutex_unlock(&mutex_serial);
 			}
 		}
-	}
+	} else
+		cb_selectA();
+
 	progStatus.split = val;
 	pthread_mutex_lock(&mutex_serial);
 		selrig->set_split(val);
