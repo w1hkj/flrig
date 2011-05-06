@@ -53,6 +53,10 @@ public:
 	void set_mic_gain(int val);
 	void get_mic_gain_min_max_step(int &min, int &max, int &step);
 
+	void set_notch(bool on, int val);
+	bool get_notch(int &val);
+	void get_notch_min_max_step(int &min, int &max, int &step);
+
 };
 
 
