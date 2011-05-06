@@ -77,6 +77,14 @@ void RIG_TT599::initialize()
 	showresp(WARN, ASC, "normal", cmd, replystr);
 }
 
+void RIG_TT599::shutdown()
+{
+	cmd = "*RMF0\r";
+	sendCommand(cmd, 0);
+	readResponse();
+	showresp(WARN, ASC, "Enable BW control", cmd, replystr);
+}
+
 long RIG_TT599::get_vfoA ()
 {
 	size_t p;
