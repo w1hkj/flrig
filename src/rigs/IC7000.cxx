@@ -64,6 +64,8 @@ RIG_IC7000::RIG_IC7000() {
 
 	restore_mbw = false;
 
+	has_ifshift_control = false;
+
 	has_auto_notch = true;
 	has_power_control = true;
 	has_volume_control = true;
@@ -76,7 +78,6 @@ RIG_IC7000::RIG_IC7000() {
 	has_noise_reduction = true;
 	has_attenuator_control = true;
 	has_preamp_control = true;
-	has_ifshift_control = true;
 	has_ptt_control = true;
 	has_tune_control = true;
 	has_swr_control = true;
@@ -102,6 +103,11 @@ void RIG_IC7000::initialize()
 	cmd += '\x00';
 	cmd.append(post);
 	waitFB("CI-V");
+	cmd = pre_to;
+	cmd.append("\x16\x51");
+	cmd += '\x00';
+	cmd.append(post);
+	waitFB("NF2 OFF");
 }
 
 void RIG_IC7000::selectA()
@@ -571,5 +577,61 @@ void RIG_IC7000::get_mic_gain_min_max_step(int &min, int &max, int &step)
 	min = 0;
 	max = 100;
 	step = 1;
+}
+
+void RIG_IC7000::set_notch(bool on, int val)
+{
+	int notch = (int)(val/10.0 + 128);
+	if (notch > 256) notch = 255;
+
+	cmd = pre_to;
+	cmd.append("\x16\x48");
+	cmd += on ? '\x01' : '\x00';
+	cmd.append(post);
+	waitFB("set notch");
+
+	cmd = pre_to;
+	cmd.append("\x14\x0D");
+	cmd.append(to_bcd(notch,3));
+	cmd.append(post);
+	waitFB("set notch val");
+
+}
+
+bool RIG_IC7000::get_notch(int &val)
+{
+	bool on = false;
+	val = 0;
+
+	string cstr = "\x16\x48";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+	if (waitFOR(8, "get notch")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			on = replystr[p + 6] ? 1 : 0;
+		cmd = pre_to;
+		resp = pre_fm;
+		cstr = "\x14\x0D";
+		cmd.append(cstr);
+		resp.append(cstr);
+		cmd.append(post);
+		if (waitFOR(9, "get notch val")) {
+			size_t p = replystr.rfind(resp);
+			if (p != string::npos)
+				val = 10*(fm_bcd(&replystr[p + 6],3) - 128);
+		}
+	}
+	return on;
+}
+
+void RIG_IC7000::get_notch_min_max_step(int &min, int &max, int &step)
+{
+	min = -1280;
+	max = 1280;
+	step = 10;
 }
 
