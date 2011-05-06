@@ -260,158 +260,150 @@ void read_alc()
 // notch
 void update_auto_notch(void *d)
 {
-	progStatus.auto_notch = (long)d;
 	btnNotch->value(progStatus.auto_notch);
 }
 
 void read_auto_notch()
 {
 	if (!selrig->has_notch_control) return;
-	int sig;
 	pthread_mutex_lock(&mutex_serial);
-		sig = selrig->get_auto_notch();
+		progStatus.auto_notch = selrig->get_auto_notch();
 	pthread_mutex_unlock(&mutex_serial);
-	Fl::awake(update_auto_notch, (void*)sig);
+	Fl::awake(update_auto_notch, (void*)0);
 }
 
 // preamp - attenuator
 void update_preamp(void *d)
 {
-	progStatus.preamp = (long)d;
-	btnNotch->value(progStatus.preamp);
+	btnPreamp->value(progStatus.preamp);
 }
 
 void update_attenuator(void *d)
 {
-	progStatus.attenuator = (long)d;
-	btnNotch->value(progStatus.attenuator);
+	btnAttenuator->value(progStatus.attenuator);
 }
 
 void read_preamp_att()
 {
-	int sig;
 	if (selrig->has_preamp_control) {
 		pthread_mutex_lock(&mutex_serial);
-			sig = selrig->get_preamp();
+			progStatus.preamp = selrig->get_preamp();
 		pthread_mutex_unlock(&mutex_serial);
-		Fl::awake(update_preamp, (void*)sig);
+		Fl::awake(update_preamp, (void*)0);
 	}
 	if (selrig->has_attenuator_control) {
 		pthread_mutex_lock(&mutex_serial);
-			sig = selrig->get_attenuator();
+			progStatus.attenuator = selrig->get_attenuator();
 		pthread_mutex_unlock(&mutex_serial);
-		Fl::awake(update_attenuator, (void*)sig);
+		Fl::awake(update_attenuator, (void*)0);
 	}
 }
 
 // volume
 void update_volume(void *d)
 {
-	progStatus.volume = (long)d;
 	sldrVOLUME->value(progStatus.volume);
 }
 
 void read_volume()
 {
 	if (!selrig->has_volume_control) return;
-	int sig;
 	pthread_mutex_lock(&mutex_serial);
-		sig = selrig->get_volume_control();
+		progStatus.volume = selrig->get_volume_control();
 	pthread_mutex_unlock(&mutex_serial);
-	Fl::awake(update_volume, (void*)sig);
+	Fl::awake(update_volume, (void*)0);
 }
 
 // ifshift
 void update_ifshift(void *d)
 {
-	progStatus.shift = (long)d;
-	btnNotch->value(progStatus.shift);
-}
-
-void update_ifshift_val(void *d)
-{
-	progStatus.shift_val = (long)d;
-	sldrNOTCH->value(progStatus.shift_val);
+	btnIFsh->value(progStatus.shift);
+	sldrIFSHIFT->value(progStatus.shift_val);
 }
 
 void read_ifshift()
 {
 	if (!selrig->has_ifshift_control) return;
-	bool on;
-	int  val;
 	pthread_mutex_lock(&mutex_serial);
-		on = selrig->get_if_shift(val);
+		progStatus.shift = selrig->get_if_shift(progStatus.shift_val);
 	pthread_mutex_unlock(&mutex_serial);
-	Fl::awake(update_ifshift, (void*)on);
-	Fl::awake(update_ifshift_val, (void*)val);
+	Fl::awake(update_ifshift, (void*)0);
+}
+
+// manual notch
+void update_notch(void *d)
+{
+	btnNotch->value(progStatus.notch);
+	sldrNOTCH->value(progStatus.notch_val);
+}
+
+void read_notch()
+{
+	if (!selrig->has_notch_control) return;
+	pthread_mutex_lock(&mutex_serial);
+		progStatus.notch = selrig->get_notch(progStatus.notch_val);
+	pthread_mutex_unlock(&mutex_serial);
+	Fl::awake(update_notch, (void*)0);
 }
 
 // power_control
 void update_power_control(void *d)
 {
-	progStatus.power_level = (long)d;
 	sldrPOWER->value(progStatus.power_level);
 }
 
 void read_power_control()
 {
 	if (!selrig->has_power_control) return;
-	int sig;
 	pthread_mutex_lock(&mutex_serial);
-		sig = selrig->get_power_control();
+		progStatus.power_level = selrig->get_power_control();
 	pthread_mutex_unlock(&mutex_serial);
-	Fl::awake(update_power_control, (void*)sig);
+	Fl::awake(update_power_control, (void*)0);
 }
 
 // mic gain
 void update_mic_gain(void *d)
 {
-	progStatus.mic_gain = (long)d;
-	sldrPOWER->value(progStatus.mic_gain);
+	sldrMICGAIN->value(progStatus.mic_gain);
 }
 
 void read_mic_gain()
 {
 	if (!selrig->has_micgain_control) return;
-	int sig;
 	pthread_mutex_lock(&mutex_serial);
-		sig = selrig->get_mic_gain();
+		progStatus.mic_gain = selrig->get_mic_gain();
 	pthread_mutex_unlock(&mutex_serial);
-	Fl::awake(update_mic_gain, (void*)sig);
+	Fl::awake(update_mic_gain, (void*)0);
 }
 
 // rf gain
 void update_rfgain(void *d)
 {
-	progStatus.rfgain = (long)d;
-	sldrPOWER->value(progStatus.rfgain);
+	sldrRFGAIN->value(progStatus.rfgain);
 }
 
 void read_rfgain()
 {
 	if (!selrig->has_rf_control) return;
-	int sig;
 	pthread_mutex_lock(&mutex_serial);
-		sig = selrig->get_rf_gain();
+		progStatus.rfgain = selrig->get_rf_gain();
 	pthread_mutex_unlock(&mutex_serial);
-	Fl::awake(update_rfgain, (void*)sig);
+	Fl::awake(update_rfgain, (void*)0);
 }
 
 // squelch
 void update_squelch(void *d)
 {
-	progStatus.squelch = (long)d;
-	sldrPOWER->value(progStatus.squelch);
+	sldrSQUELCH->value(progStatus.squelch);
 }
 
 void read_squelch()
 {
 	if (!selrig->has_sql_control) return;
-	int sig;
 	pthread_mutex_lock(&mutex_serial);
-		sig = selrig->get_squelch();
+		progStatus.squelch = selrig->get_squelch();
 	pthread_mutex_unlock(&mutex_serial);
-	Fl::awake(update_squelch, (void*)sig);
+	Fl::awake(update_squelch, (void*)0);
 }
 
 static bool resetrcv = true;
@@ -598,6 +590,7 @@ void * serial_thread_loop(void *d)
 					if (progStatus.poll_bandwidth) read_bandwidth();
 					if (progStatus.poll_volume) read_volume();
 					if (progStatus.poll_auto_notch) read_auto_notch();
+					if (progStatus.poll_notch) read_notch();
 					if (progStatus.poll_ifshift) read_ifshift();
 					if (progStatus.poll_power_control) read_power_control();
 					if (progStatus.poll_pre_att) read_preamp_att();

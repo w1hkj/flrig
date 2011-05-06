@@ -60,6 +60,7 @@ status progStatus = {
 	true,		// bool	poll_bandwidth;
 	false,		// bool	poll_volume;
 	false,		// bool	poll_auto_notch;
+	false,		// bool poll_notch;
 	false,		// bool	poll_ifshift;
 	false,		// bool	poll_power_control;
 	false,		// bool	poll_pre_att;
@@ -271,6 +272,7 @@ void status::saveLastState()
 	spref.set("poll_bandwidth", poll_bandwidth);
 	spref.set("poll_volume", poll_volume);
 	spref.set("poll_auto_notch", poll_auto_notch);
+	spref.set("poll_notch", poll_notch);
 	spref.set("poll_ifshift", poll_ifshift);
 	spref.set("poll_power_control", poll_power_control);
 	spref.set("poll_pre_att", poll_pre_att);
@@ -489,6 +491,7 @@ bool status::loadXcvrState(const char *xcvr)
 		if (spref.get("poll_bandwidth", i, i)) poll_bandwidth = i;
 		if (spref.get("poll_volume", i, i)) poll_volume = i;
 		if (spref.get("poll_auto_notch", i, i)) poll_auto_notch = i;
+		if (spref.get("poll_notch", i, i)) poll_notch = i;
 		if (spref.get("poll_ifshift", i, i)) poll_ifshift = i;
 		if (spref.get("poll_power_control", i, i)) poll_power_control = i;
 		if (spref.get("poll_pre_att", i, i)) poll_pre_att = i;

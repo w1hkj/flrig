@@ -46,6 +46,7 @@ struct status {
 	bool	poll_bandwidth;
 	bool	poll_volume;
 	bool	poll_auto_notch;
+	bool	poll_notch;
 	bool	poll_ifshift;
 	bool	poll_power_control;
 	bool	poll_pre_att;
