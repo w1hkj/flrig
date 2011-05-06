@@ -1,5 +1,8 @@
-2011-05-05  David Freese  <w1hkj@w1hkj.com>
+2011-05-06  David Freese  <w1hkj@w1hkj.com>
 
+	8186404: IC7000 Notch/IF shift
+	cbce8e9: Control polling
+	3fec974: TT599 get power
 	1c3053a: TS570 bug fixes
 	00ef8a5: IC7000 bug fixes
 	bdfcca0: Get power control
