@@ -494,6 +494,29 @@ int RIG_IC7200::get_power_control()
 	return progStatus.power_level;
 }
 
+void RIG_IC7200::get_mic_gain_min_max_step(int &min, int &max, int &step)
+{
+	min = 0;
+	max = 100;
+	step = 1;
+}
+
+int RIG_IC7200::get_mic_gain()
+{
+	string cstr = "\x14\x0B";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append(post);
+	if (waitFOR(9, "get mic")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return ((int)(fm_bcd(&replystr[p+6],3) / 2.55));
+	}
+	return 0;
+}
+
 void RIG_IC7200::set_mic_gain(int val)
 {
 	val = (int)(val * 255 / 100);
