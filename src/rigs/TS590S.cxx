@@ -141,6 +141,8 @@ long RIG_TS590S::get_vfoA ()
 {
 	cmd = "FA;";
 	int ret = sendCommand(cmd);
+	showresp(INFO, ASC, "get vfoA", cmd, replystr);
+
 	if (ret < 14) return A.freq;
 	size_t p = replystr.rfind("FA");
 	if (p == string::npos) return A.freq;
@@ -170,6 +172,8 @@ long RIG_TS590S::get_vfoB ()
 {
 	cmd = "FB;";
 	int ret = sendCommand(cmd);
+	showresp(INFO, ASC, "get vfoB", cmd, replystr);
+
 	if (ret < 14) return B.freq;
 	size_t p = replystr.rfind("FB");
 	if (p == string::npos) return B.freq;
@@ -201,7 +205,7 @@ int RIG_TS590S::get_smeter()
 	int mtr = 0;
 	cmd = "SM0;";
 	int ret = sendCommand(cmd);
-	LOG_INFO("%s => %s", cmd.c_str(), replystr.c_str());
+	showresp(INFO, ASC, "get smeter", cmd, replystr);
 
 	if (ret < 8) return 0;
 	size_t p = replystr.find("SM0");
@@ -220,6 +224,8 @@ int RIG_TS590S::get_power_out()
 	int mtr = 0;
 	cmd = "SM0;";
 	int ret = sendCommand(cmd);
+	showresp(INFO, ASC, "get power", cmd, replystr);
+
 	if (ret < 8) return mtr;
 	size_t p = replystr.rfind("SM");
 	if (p == string::npos) return mtr;
@@ -249,6 +255,8 @@ int RIG_TS590S::get_power_control()
 {
 	cmd = "PC;";
 	int ret = sendCommand(cmd);
+	showresp(INFO, ASC, "get pwr ctrl", cmd, replystr);
+
 	if (ret < 6) return 0;
 	size_t p = replystr.rfind("PC");
 	if (p == string::npos) return 0;
@@ -265,6 +273,8 @@ int RIG_TS590S::get_volume_control()
 {
 	cmd = "AG0;";
 	int ret = sendCommand(cmd);
+	showresp(INFO, ASC, "get vol ctrl", cmd, replystr);
+
 	if (ret < 7) return 0;
 	size_t p = replystr.rfind("AG");
 	if (p == string::npos) return 0;
@@ -311,6 +321,8 @@ int RIG_TS590S::get_attenuator()
 {
 	cmd = "RA;";
 	int ret = sendCommand(cmd);
+	showresp(INFO, ASC, "get att", cmd, replystr);
+
 	if (ret < 7) return 0;
 	size_t p = replystr.rfind("RA");
 	if (p == string::npos) return 0;
@@ -336,6 +348,8 @@ int RIG_TS590S::get_preamp()
 {
 	cmd = "PA;";
 	int ret = sendCommand(cmd);
+	showresp(INFO, ASC, "get preamp", cmd, replystr);
+
 	if (ret < 5) return 0;
 	size_t p = replystr.rfind("PA");
 	if (p == string::npos) return 0;
@@ -375,6 +389,8 @@ int RIG_TS590S::get_modeA()
 	int md = A.imode;
 	cmd = "MD;";
 	int ret = sendCommand(cmd);
+	showresp(INFO, ASC, "get mode A", cmd, replystr);
+
 	if (ret < 4) return md;
 	size_t p = replystr.rfind("MD");
 	if (p == string::npos) return md;
@@ -386,6 +402,8 @@ int RIG_TS590S::get_modeA()
 	if (md == 0 || md == 1) {
 		cmd = "DA;";
 		ret = sendCommand(cmd);
+		showresp(INFO, ASC, "get data A", cmd, replystr);
+
 		if (ret < 4) return A.imode;
 		p = replystr.rfind("DA");
 		if (p == string::npos) return A.imode;
@@ -424,6 +442,8 @@ int RIG_TS590S::get_modeB()
 	int md = B.imode;
 	cmd = "MD;";
 	int ret = sendCommand(cmd);
+	showresp(INFO, ASC, "get mode B", cmd, replystr);
+
 	if (ret < 4) return md;
 	size_t p = replystr.rfind("MD");
 	if (p == string::npos) return md;
@@ -435,6 +455,8 @@ int RIG_TS590S::get_modeB()
 	if (md == 0 || md == 1) {
 		cmd = "DA;";
 		ret = sendCommand(cmd);
+		showresp(INFO, ASC, "get data B", cmd, replystr);
+
 		if (ret < 4) return B.imode;
 		p = replystr.rfind("DA");
 		if (p == string::npos) return B.imode;
@@ -624,6 +646,8 @@ int RIG_TS590S::get_mic_gain()
 	int val = 0;
 	cmd = "MG;";
 	int ret = sendCommand(cmd);
+	showresp(INFO, ASC, "get mic ctrl", cmd, replystr);
+
 	if (ret >= 6) {
 		size_t p = replystr.rfind("MG");
 		if (p == string::npos) return val;
@@ -685,6 +709,8 @@ bool RIG_TS590S::get_if_shift(int &val)
 	size_t p = 0;
 	cmd = "IS;";
 	int ret = sendCommand(cmd);
+	showresp(INFO, ASC, "get IF shift", cmd, replystr);
+
 	if (ret >= 8) {
 		p = replystr.rfind("IS");
 		if (p == string::npos) return false;
