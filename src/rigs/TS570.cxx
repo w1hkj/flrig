@@ -195,7 +195,8 @@ int RIG_TS570::get_smeter()
 
 	replystr[p + 6] = 0;
 	int mtr = atoi(&replystr[p + 2]);
-	mtr = (mtr * 100) / 16;
+	mtr = (mtr * 50) / 18;
+	if (mtr > 100) mtr = 100;
 	return mtr;
 }
 
@@ -206,12 +207,12 @@ int RIG_TS570::get_swr()
 	int ret = sendCommand(cmd);
 	showresp(WARN, ASC, "SWR", cmd, replystr);
 	if (ret < 8) return 0;
-	size_t p = replystr.rfind("RM");
+	size_t p = replystr.rfind("RM1");
 	if (p == string::npos) return 0;
 	
 	replystr[p + 7] = 0;
 	int mtr = atoi(&replystr[p + 3]);
-	mtr = (mtr * 100) / 9;
+	mtr = (mtr * 100) / 16;
 	return mtr;
 }
 
@@ -221,13 +222,15 @@ int RIG_TS570::get_power_out()
 	cmd = "SM;";
 	int ret = sendCommand(cmd);
 	showresp(WARN, ASC, "P out", cmd, replystr);
-	if (ret < 6) return 0;
+	if (ret < 7) return 0;
 	size_t p = replystr.rfind("SM");
 	if (p == string::npos) return 0;
 	
-	replystr[p + 5] = 0;
+	replystr[p + 6] = 0;
 	int mtr = atoi(&replystr[p + 2]);
-	mtr = (mtr * 100) / 16;
+	if (mtr < 19) mtr = mtr * 40 / 18;
+	else mtr = 40 + (mtr - 18)*60 / 12;
+	if (mtr > 100) mtr = 100;
 	return mtr;
 }
 
