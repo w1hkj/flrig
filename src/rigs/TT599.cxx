@@ -290,11 +290,11 @@ int  RIG_TT599::get_power_control(void)
 	showresp(WARN, ASC, "get pc", cmd, replystr);
 
 	if ((p = replystr.rfind("@TP")) != string::npos) {
-		int pwr;
-		sscanf("%d", &replystr[p+3], &pwr);
+		int pwr = 0;
+		sscanf(&replystr[p+3], "%d", &pwr);
 		return pwr;
 	}
-	return 0;
+	return progStatus.power_level;//0;
 }
 
 void RIG_TT599::set_power_control(double val) 
