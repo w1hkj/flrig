@@ -13,6 +13,7 @@ public:
 	~RIG_TT599(){}
 
 	void initialize();
+	void shutdown();
 
 	long get_vfoA();
 	void set_vfoA(long);
