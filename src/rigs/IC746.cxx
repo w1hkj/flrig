@@ -903,7 +903,7 @@ void RIG_IC746PRO::set_attenuator(int val)
 bool IC_notchon = false;
 void RIG_IC746PRO::set_notch(bool on, int val)
 {
-	int notch = (int)(val/10.0 + 128);
+	int notch = (int)(val/20.0 + 128);
 	if (notch > 256) notch = 255;
 	if (on != IC_notchon) {
 		cmd = pre_to;
@@ -947,7 +947,7 @@ bool RIG_IC746PRO::get_notch(int &val)
 		if (waitFOR(9, "get notch val")) {
 			size_t p = replystr.rfind(resp);
 			if (p != string::npos)
-				val = 10*(fm_bcd(&replystr[p + 6],3) - 128);
+				val = 20*(fm_bcd(&replystr[p + 6],3) - 128);
 		}
 	}
 	return on;
@@ -957,6 +957,6 @@ void RIG_IC746PRO::get_notch_min_max_step(int &min, int &max, int &step)
 {
 	min = -1280;
 	max = 1280;
-	step = 10;
+	step = 20;
 }
 
