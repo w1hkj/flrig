@@ -162,6 +162,7 @@ extern Fl_Check_Button *btn_poll_pre_att;
 extern Fl_Check_Button *btn_poll_squelch;
 extern Fl_Check_Button *btn_poll_micgain;
 extern Fl_Check_Button *btn_poll_rfgain;
+extern Fl_Check_Button *btn_poll_split;
 #include "flinput2.h"
 extern Fl_Input2 *txt_command;
 extern Fl_Button *btn_send_command;

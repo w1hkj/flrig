@@ -56,6 +56,7 @@ struct status {
 	bool	poll_pout;
 	bool	poll_swr;
 	bool	poll_alc;
+	bool	poll_split;
 
 	int		iBW_A;
 	int		imode_A;

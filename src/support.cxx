@@ -299,6 +299,22 @@ void read_preamp_att()
 	}
 }
 
+// split
+void update_split(void *d)
+{
+	btnPreamp->value(progStatus.preamp);
+}
+
+void read_split()
+{
+	if (selrig->can_split()) {
+		pthread_mutex_lock(&mutex_serial);
+			progStatus.split = selrig->get_split();
+		pthread_mutex_unlock(&mutex_serial);
+		Fl::awake(update_split, (void*)0);
+	}
+}
+
 // volume
 void update_volume(void *d)
 {
@@ -597,6 +613,7 @@ void * serial_thread_loop(void *d)
 					if (progStatus.poll_micgain) read_mic_gain();
 					if (progStatus.poll_squelch) read_squelch();
 					if (progStatus.poll_rfgain) read_rfgain();
+					if (progStatus.poll_split) read_split();
 				}
 				loopcount = progStatus.serloop_timing / 10;
 			}
