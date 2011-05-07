@@ -26,6 +26,8 @@
 
 #define LISTSIZE 200
 
+extern bool flrig_abort;
+
 extern FREQMODE vfo;
 extern FREQMODE vfoA;
 extern FREQMODE vfoB;

@@ -10,6 +10,7 @@
 #include <fcntl.h>
 #include <pthread.h>
 
+#include "icons.h"
 #include "support.h"
 #include "debug.h"
 #include "gettext.h"
@@ -27,6 +28,9 @@ using namespace std;
 rigbase *selrig = rigs[0];
 
 extern bool test;
+
+bool flrig_abort = false;
+
 int freqval = 0;
 
 FREQMODE vfoA = {14070000, 0, 0, UI};
@@ -1673,6 +1677,8 @@ void initXcvrTab()
 
 void initRig()
 {
+	flrig_abort = false;
+
 //	wait_query = true;
 
 // disable xml loop
@@ -1682,6 +1688,7 @@ void initRig()
 	pthread_mutex_lock(&mutex_serial);
 
 	selrig->initialize();
+	if (flrig_abort) goto failed;
 
 	FreqDispA->set_precision(selrig->precision);
 	FreqDispB->set_precision(selrig->precision);
@@ -1693,9 +1700,13 @@ void initRig()
 		if (vfoA.iBW == -1) vfoA.iBW = selrig->def_bandwidth(vfoA.imode);
 		FreqDispA->value( vfoA.freq );
 		selrig->selectA();
+		if (flrig_abort) goto failed;
 		selrig->set_vfoA(vfoA.freq);
+		if (flrig_abort) goto failed;
 		selrig->set_modeA(vfoA.imode);
+		if (flrig_abort) goto failed;
 		selrig->set_bwA(vfoA.iBW);
+		if (flrig_abort) goto failed;
 
 		vfoB.freq = progStatus.freq_B;
 		vfoB.imode = progStatus.imode_B;
@@ -2148,6 +2159,16 @@ void initRig()
 	}
 
 	setFocus();
+	bypass_serial_thread_loop = false;
+	return;
+
+failed:
+	bypass_serial_thread_loop = true;
+	pthread_mutex_unlock(&mutex_serial);
+	pthread_mutex_unlock(&mutex_xmlrpc);
+	btnInitializing->hide();
+	fl_alert2(_("Transceiver not responding"));
+	return;
 }
 
 void init_title()
@@ -2267,8 +2288,6 @@ void initStatusConfigDialog()
 	}
 
 	initRig();
-
-	bypass_serial_thread_loop = false;
 
 }
 

@@ -102,12 +102,17 @@ void RIG_IC7000::initialize()
 	cmd += '\x92';
 	cmd += '\x00';
 	cmd.append(post);
-	waitFB("CI-V");
+	if (!waitFB("CI-V") && RigSerial.IsOpen()) {
+		flrig_abort = true;
+		return;
+	}
+		flrig_abort = true;
+		return;
 	cmd = pre_to;
 	cmd.append("\x16\x51");
 	cmd += '\x00';
 	cmd.append(post);
-	waitFB("NF2 OFF");
+	if (!waitFB("NF2 OFF") && RigSerial.IsOpen()) flrig_abort = true;
 }
 
 void RIG_IC7000::selectA()
@@ -116,7 +121,7 @@ void RIG_IC7000::selectA()
 	cmd += '\x07';
 	cmd += '\x00';
 	cmd.append(post);
-	waitFB("sel A");
+	if (!waitFB("sel A") && RigSerial.IsOpen()) flrig_abort = true;
 }
 
 void RIG_IC7000::selectB()
@@ -125,7 +130,7 @@ void RIG_IC7000::selectB()
 	cmd += '\x07';
 	cmd += '\x01';
 	cmd.append(post);
-	waitFB("sel B");
+	if (!waitFB("sel B") && RigSerial.IsOpen()) flrig_abort = true;
 }
 
 long RIG_IC7000::get_vfoA ()
@@ -139,7 +144,8 @@ long RIG_IC7000::get_vfoA ()
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			A.freq = fm_bcd_be(&replystr[p+5], 10);
-	}
+	} else if (RigSerial.IsOpen())
+		flrig_abort = true;
 	return A.freq;
 }
 
@@ -164,7 +170,8 @@ long RIG_IC7000::get_vfoB ()
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			B.freq = fm_bcd_be(&replystr[p+5], 10);
-	}
+	} else if (RigSerial.IsOpen())
+		flrig_abort = true;
 	return B.freq;
 }
 
@@ -208,7 +215,8 @@ int RIG_IC7000::get_modeA()
 			if (md > 6) md--;
 			A.imode = md;
 		}
-	}
+	} else if (RigSerial.IsOpen())
+		flrig_abort = true;
 	return A.imode;
 }
 
@@ -242,7 +250,8 @@ int RIG_IC7000::get_modeB()
 			if (md > 6) md--;
 			B.imode = md;
 		}
-	}
+	} else if (RigSerial.IsOpen())
+		flrig_abort = true;
 	return B.imode;
 }
 
@@ -258,7 +267,8 @@ int  RIG_IC7000::get_bwA()
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			A.iBW = (fm_bcd(&replystr[p+6],2));
-	}
+	} else if (RigSerial.IsOpen())
+		flrig_abort = true;
 	return A.iBW;
 }
 
@@ -274,7 +284,8 @@ int  RIG_IC7000::get_bwB()
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			B.iBW = (fm_bcd(&replystr[p+6],2));
-	}
+	} else if (RigSerial.IsOpen())
+		flrig_abort = true;
 	return B.iBW;
 }
 
