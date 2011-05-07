@@ -137,6 +137,18 @@ void RIG_TS590S::set_split(bool val)
 	sendCommand(cmd, 0);
 }
 
+bool RIG_TS590S::get_split()
+{
+	cmd = "IF;";
+	int ret = sendCommand(cmd);
+	showresp(INFO, ASC, "get info", cmd, replystr);
+	if (ret < 38) return split;
+	size_t p = replystr.rfind("IF");
+	if (p == string::npos) return split;
+	split = replystr[p+32] ? true : false;
+	return split;
+}
+
 long RIG_TS590S::get_vfoA ()
 {
 	cmd = "FA;";

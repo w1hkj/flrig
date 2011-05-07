@@ -41,6 +41,7 @@ public:
 
 	bool can_split();
 	void set_split(bool val);
+	bool get_split();
 	bool twovfos() {return true;}
 
 //	int  get_power_out();

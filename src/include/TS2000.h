@@ -33,6 +33,11 @@ public:
 	int  adjust_bandwidth(int val);
 	int  set_widths(int val);
 
+	bool can_split() { return true;}
+	void set_split(bool val);
+	bool get_split();
+	bool twovfos() {return true;}
+
 	int  get_smeter();
 	int  get_swr();
 	int  get_power_out();
