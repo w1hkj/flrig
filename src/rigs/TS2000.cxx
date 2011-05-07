@@ -744,3 +744,25 @@ void RIG_TS2000::get_notch_min_max_step(int &min, int &max, int &step)
 	step = 9;
 }
 
+void RIG_TS2000::set_split(bool val) 
+{
+	split = val;
+	if (val)
+		cmd = "FT1;";
+	else
+		cmd = "FT0;";
+	sendCommand(cmd, 0);
+}
+
+bool RIG_TS2000::get_split()
+{
+	cmd = "IF;";
+	int ret = sendCommand(cmd);
+	showresp(INFO, ASC, "get info", cmd, replystr);
+	if (ret < 38) return split;
+	size_t p = replystr.rfind("IF");
+	if (p == string::npos) return split;
+	split = replystr[p+32] ? true : false;
+	return split;
+}
+
