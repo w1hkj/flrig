@@ -9,6 +9,7 @@ public:
 	~RIG_K3(){}
 
 	void initialize();
+
 	long get_vfoA();
 	void set_vfoA(long);
 	long get_vfoB();

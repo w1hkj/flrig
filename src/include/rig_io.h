@@ -24,6 +24,7 @@ extern bool startSepSerial();
 
 extern int readResponse();
 extern int sendCommand(string s, int nread = -1);
+extern int  waitResponse(int);
 
 extern void clearSerialPort();
 extern int rig_nbr;
