@@ -430,3 +430,15 @@ void RIG_K3::set_split(bool val)
 	}
 }
 
+bool RIG_K3::get_split()
+{
+	cmd = "IF;";
+	int ret = sendCommand(cmd);
+	showresp(INFO, ASC, "get info", cmd, replystr);
+	if (ret < 38) return split;
+	size_t p = replystr.rfind("IF");
+	if (p == string::npos) return split;
+	split = replystr[p+32] ? true : false;
+	return split;
+}
+
