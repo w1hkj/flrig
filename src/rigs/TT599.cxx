@@ -46,7 +46,8 @@ RIG_TT599::RIG_TT599() {
 	comm_dtrptt = false;
 	modeA = 1;
 	bwA = 16;
-	
+	can_change_alt_vfo = true;
+
 	max_power = 100;
 
 	has_swr_control =

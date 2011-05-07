@@ -61,6 +61,7 @@ RIG_TS570::RIG_TS570() {
 	B.freq = 7035000;
 	B.imode = 1;
 	B.iBW = 1;
+	can_change_alt_vfo = true;
 
 	has_notch_control =
 	has_ifshift_control =

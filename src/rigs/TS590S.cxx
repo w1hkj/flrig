@@ -82,6 +82,7 @@ RIG_TS590S::RIG_TS590S() {
 	B.iBW = 8;
 	active_mode = 1;
 	active_bandwidth = 8;
+	can_change_alt_vfo = true;
 
 	nb_level = 2;
 

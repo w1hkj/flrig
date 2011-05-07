@@ -140,6 +140,7 @@ RIG_TT550::RIG_TT550() {
 	defbw_ = 20;
 	deffreq_ = 14070000;
 	max_power = 100;
+	can_change_alt_vfo = true;
 
 	VfoAdj = 0;
 	Bfo = 600;

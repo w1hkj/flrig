@@ -77,6 +77,7 @@ public:
 	int  bwB;
 	long freqB;
 	int  precision;
+	bool can_change_alt_vfo;
 
 	int  def_mode;
 	int  defbw_;

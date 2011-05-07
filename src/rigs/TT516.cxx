@@ -95,6 +95,7 @@ RIG_TT516::RIG_TT516() {
 	deffreq_ = 14070000;
 	max_power = 25;
 	precision = 10;
+	can_change_alt_vfo = true;
 
 	has_power_control =
 	has_volume_control =
