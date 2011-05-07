@@ -72,23 +72,27 @@ void RIG_K3::initialize()
 	cmd = "AI0;"; // disable auto-info
 	sendCommand(cmd, 0);
 	MilliSleep(100);
+	readResponse();
 	showresp(WARN, ASC, "disable auto-info", cmd, replystr);
 
 	cmd = "K31;"; // K3 extended mode
 	sendCommand(cmd, 0);
 	MilliSleep(100);
+	readResponse();
 	showresp(WARN, ASC, "K3 extended mode", cmd, replystr);
 
 	cmd = "SWT49;"; // Fine tuning (1 Hz mode)
 	sendCommand(cmd, 0);
 	MilliSleep(100);
+	readResponse();
 	showresp(WARN, ASC, "1 Hz fine tune mode", cmd, replystr);
 
 	set_split(false); // normal ops
 
 	cmd = "OM;"; // request options to get power level
-	sendCommand(cmd);
-	MilliSleep(50);
+	sendCommand(cmd, 0);
+	MilliSleep(100);
+	readResponse();
 	showresp(WARN, ASC, "options", cmd, replystr);
 	if (replystr.find("P") == string::npos) {
 		minpwr = 0;
