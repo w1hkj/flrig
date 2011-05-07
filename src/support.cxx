@@ -431,7 +431,7 @@ static bool resetxmt = true;
 
 void serviceA()
 {
-	if (( rig_nbr != TT550) && useB) return;
+	if (!selrig->can_change_alt_vfo && useB) return;
 	if (queA.empty()) return;
 
 	while (!queA.empty()) {
@@ -449,7 +449,7 @@ void serviceA()
 	}
 
 // if TT550 and on the B vfo
-	if ((rig_nbr == TT550) && useB) {
+	if (selrig->can_change_alt_vfo && useB) {
 		selrig->set_vfoA(vfoA.freq);
 		goto end_serviceA;
 	}
@@ -467,7 +467,7 @@ void serviceA()
 	if (vfoA.imode != vfo.imode || changed_vfo) {
 		selrig->set_modeA(vfoA.imode);
 		vfo.imode = vfoA.imode;
-		vfo.iBW = vfoA.iBW = selrig->adjust_bandwidth(vfo.imode);
+		vfo.iBW = vfoA.iBW;// = selrig->adjust_bandwidth(vfo.imode);
 		Fl::awake(setModeControl);
 		Fl::awake(updateBandwidthControl);
 		Fl::awake(setBWControl);
@@ -498,9 +498,7 @@ end_serviceA:
 
 void serviceB()
 {
-	if (rig_nbr != K3 && rig_nbr != TT550)
-		if (!useB)
-			return;
+	if (!selrig->can_change_alt_vfo && !useB) return;
 
 	if (queB.empty()) 
 		return;
@@ -520,7 +518,7 @@ void serviceB()
 	}
 
 // if TT550 or K3 and split or on vfoA just update the B vfo
-	if ((rig_nbr == TT550 || rig_nbr == K3) && !useB) {
+	if (selrig->can_change_alt_vfo && !useB) {
 		selrig->set_vfoB(vfoB.freq);
 		goto end_serviceB;
 	}
@@ -537,7 +535,7 @@ void serviceB()
 	if (vfoB.imode != vfo.imode || pushedB || changed_vfo) {
 		selrig->set_modeB(vfoB.imode);
 		vfo.imode = vfoB.imode;
-		vfo.iBW = vfoB.iBW = selrig->adjust_bandwidth(vfo.imode);
+		vfo.iBW = vfoB.iBW;// = selrig->adjust_bandwidth(vfo.imode);
 		Fl::awake(setModeControl);
 		Fl::awake(updateBandwidthControl);
 		Fl::awake(setBWControl);

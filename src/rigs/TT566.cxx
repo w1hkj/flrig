@@ -45,7 +45,8 @@ RIG_TT566::RIG_TT566() {
 	comm_dtrptt = false;
 	modeA = 1;
 	bwA = 19;
-	
+	can_change_alt_vfo = true;
+
 	max_power = 100;
 
 	has_rf_control =

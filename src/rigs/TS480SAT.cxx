@@ -48,6 +48,7 @@ RIG_TS480SAT::RIG_TS480SAT() {
 	def_mode = 1;
 	defbw_ = 1;
 	deffreq_ = 14070000;
+	can_change_alt_vfo = true;
 
 	has_noise_control =
 	has_micgain_control =

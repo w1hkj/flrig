@@ -67,6 +67,7 @@ RIG_TS2000::RIG_TS2000() {
 	B.imode = A.imode = 1;
 	B.iBW = A.iBW = 8;
 	B.freq = A.freq = 14070000;
+	can_change_alt_vfo = true;
 
 	has_micgain_control =
 	has_notch_control =
