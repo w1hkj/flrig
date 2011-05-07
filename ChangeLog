@@ -1,5 +1,11 @@
-2011-05-06  David Freese  <w1hkj@w1hkj.com>
+2011-05-07  David Freese  <w1hkj@w1hkj.com>
 
+	bbd87b7: Xcvr DEAD
+	344433a: Poll split
+	50b8101: K3 get split
+	cb6c3e5: KENWOOD split
+	109c911: K3 initialization
+	3b39099: TS450S vfoB
 	5c75da9: TS590s showresp
 	e97c2a6: IC7000 notch calibration
 	02d1ed5: Icom Notch conversion
