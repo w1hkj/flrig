@@ -41,11 +41,9 @@ RIG_TS450S::RIG_TS450S() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	modeA = 1;
-	bwA = 1;
-	def_mode = 1;
-	defbw_ = 1;
-	deffreq_ = 14070000;
+	modeB = modeA = def_mode = 1;
+	bwB = bwA = defbw_ = 1;
+	freqB = freqA = deffreq_ = 14070000;
 
 	has_noise_control =
 	has_micgain_control =
@@ -96,6 +94,34 @@ void RIG_TS450S::set_vfoA (long freq)
 	sendCommand(cmd, 0);
 }
 
+long RIG_TS450S::get_vfoB ()
+{
+	cmd = "FB;";
+	int ret = sendCommand(cmd);
+	showresp(WARN, ASC, "get vfoB", cmd, replystr);
+	if (ret < 14) return freqB;
+	size_t p = replystr.rfind("FB");
+	if (p == string::npos) return freqB;
+	
+	int f = 0;
+	for (size_t n = 2; n < 13; n++)
+		f = f*10 + replystr[p + n] - '0';
+	freqB = f;
+	return freqB;
+}
+
+void RIG_TS450S::set_vfoB (long freq)
+{
+	freqB = freq;
+	cmd = "FB00000000000;";
+	for (int i = 12; i > 1; i--) {
+		cmd[i] += freq % 10;
+		freq /= 10;
+	}
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set vfoB", cmd, replystr);
+}
+
 // SM cmd 0 ... 100 (rig values 0 ... 15)
 int RIG_TS450S::get_smeter()
 {
@@ -143,13 +169,15 @@ void RIG_TS450S::set_modeA(int val)
 	cmd = "MD";
 	cmd += TS450S_mode_chr[val];
 	cmd += ';';
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set modeA", cmd, replystr);
 }
 
 int RIG_TS450S::get_modeA()
 {
 	cmd = "MD;";
 	int ret = sendCommand(cmd);
+	showresp(WARN, ASC, "get modeB", cmd, replystr);
 	if (ret < 4) return modeA;
 
 	size_t p = replystr.rfind("MD");
@@ -160,6 +188,33 @@ int RIG_TS450S::get_modeA()
 	if (md == 8) md = 7;
 	modeA = md;
 	return modeA;
+}
+
+void RIG_TS450S::set_modeB(int val)
+{
+	modeB = val;
+	cmd = "MD";
+	cmd += TS450S_mode_chr[val];
+	cmd += ';';
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set modeB", cmd, replystr);
+}
+
+int RIG_TS450S::get_modeB()
+{
+	cmd = "MD;";
+	int ret = sendCommand(cmd);
+	showresp(WARN, ASC, "get modeB", cmd, replystr);
+	if (ret < 4) return B.imode;
+
+	size_t p = replystr.rfind("MD");
+	if (p == string::npos) return B.imode;
+
+	int md = replystr[p + 2];
+	md = md - '1';
+	if (md == 8) md = 7;
+	modeB = md;
+	return modeB;
 }
 
 int RIG_TS450S::get_modetype(int n)
@@ -194,3 +249,50 @@ int RIG_TS450S::get_bwA()
 	bwA = 0;
 	return bwA;
 }
+
+void RIG_TS450S::set_bwB(int val)
+{
+	bwB = val;
+	cmd = "FL";
+	cmd.append(TS450S_filters[val]).append(TS450S_filters[val]);
+	cmd += ';';
+	sendCommand(cmd, 0);
+}
+
+int RIG_TS450S::get_bwB()
+{
+	cmd = "FL;";
+	int ret = sendCommand(cmd);
+	if (ret < 9) return bwB;
+	size_t p = replystr.rfind("FL");
+	if (p == string::npos) return bwB;
+	
+	replystr[p + 8] = 0;
+	bwB = 0;
+	while (TS450S_filters[bwB]) {
+		if (strcmp(&replystr[p + 5], TS450S_filters[bwB]) == 0)
+			return bwB;
+		bwB++;
+	}
+	bwB = 0;
+	return bwB;
+}
+
+bool RIG_TS450S::can_split()
+{
+	return true;
+}
+
+void RIG_TS450S::set_split(bool val)
+{
+	if (val) {
+		cmd = "FT1;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set split ON", cmd, replystr);
+	} else {
+		cmd = "FR0;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set split OFF", cmd, replystr);
+	}
+}
+

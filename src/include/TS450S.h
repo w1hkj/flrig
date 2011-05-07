@@ -19,16 +19,29 @@ public:
 
 	long get_vfoA();
 	void set_vfoA(long);
-	int  get_smeter();
-	int  get_swr();
-	void set_PTT_control(int val);
-	void set_modeA(int val);
 	int  get_modeA();
-	int  get_modetype(int n);
+	void set_modeA(int val);
 	void set_bwA(int val);
 	int  get_bwA();
 
+	long get_vfoB();
+	void set_vfoB(long);
+	int  get_modeB();
+	void set_modeB(int val);
+	void set_bwB(int val);
+	int  get_bwB();
+
+	int  get_modetype(int n);
+
+	int  get_smeter();
+	int  get_swr();
+	void set_PTT_control(int val);
+
 	int  adjust_bandwidth(int val) { return 0; }
+
+	bool can_split();
+	void set_split(bool val);
+	bool twovfos() {return true;}
 
 //	int  get_power_out();
 //	int  get_power_control();
