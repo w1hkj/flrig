@@ -155,6 +155,21 @@ int sendCommand (string s, int nread)
 
 }
 
+int waitResponse(int timeout)
+{
+	int n = 0;
+	if (RigSerial.IsOpen() == false)
+		return 0;
+	MilliSleep(10);
+	if (!(n = readResponse()))
+		for (int t = 0; t <= timeout; t += 50) {
+			if ((n = readResponse())) break;
+			MilliSleep(50);
+			Fl::awake();
+		}
+	return n;
+}
+
 void clearSerialPort()
 {
 	if (RigSerial.IsOpen() == false) return;
