@@ -79,7 +79,7 @@ void RIG_FT920::selectA()
 {
 	init_cmd();
 	cmd[4] = 0x05;
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 	showresp(WARN, HEX, "select A", cmd, replystr);
 }
 
@@ -88,7 +88,7 @@ void RIG_FT920::selectB()
 	init_cmd();
 	cmd[3] = 0x01;
 	cmd[4] = 0x05;
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 	showresp(WARN, HEX, "select B", cmd, replystr);
 }
 
@@ -98,7 +98,7 @@ void RIG_FT920::set_split(bool val)
 	init_cmd();
 	cmd[3] = val ? 0x01 : 0x00;
 	cmd[4] = 0x01;
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 	if (val)
 		showresp(INFO, HEX, "set split ON", cmd, replystr);
 	else
@@ -150,7 +150,7 @@ bool RIG_FT920::get_info()
 		}
 		aBW = (md & 0x80) ? 0 : 1;
 
-		md = replybuff[p + 15 + 5];
+		md = replybuff[p + 19];
 		mode = md & 0x07;
 		switch (md) {
 			case 0 : 
@@ -200,7 +200,7 @@ void RIG_FT920::set_vfoA (long freq)
 	freq /=10; // 920 does not support 1 Hz resolution
 	cmd = to_bcd_be(freq, 8);
 	cmd += 0x0A;
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 	showresp(WARN, HEX, "set vfo A", cmd, replystr);
 }
 
@@ -215,7 +215,7 @@ void RIG_FT920::set_modeA(int val)
 	init_cmd();
 	cmd[3] = FT920_mode_val[val];
 	cmd[4] = 0x0C;
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 	showresp(WARN, HEX, "set mode A", cmd, replystr);
 }
 
@@ -225,7 +225,7 @@ void RIG_FT920::set_bwA (int val)
 	init_cmd();
 	cmd[3] = FT920_bw_val[val];
 	cmd[4] = 0x8C;
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 	showresp(WARN, HEX, "set bw A", cmd, replystr);
 }
 
@@ -245,7 +245,7 @@ void RIG_FT920::set_vfoB(long freq)
 	freq /=10; // 920 does not support 1 Hz resolution
 	cmd = to_bcd_be(freq, 8);
 	cmd += 0x8A;
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 	showresp(WARN, HEX, "set vfo B", cmd, replystr);
 }
 
@@ -255,7 +255,7 @@ void RIG_FT920::set_modeB(int val)
 	init_cmd();
 	cmd[3] = FT920_mode_val[val] | 0x80;
 	cmd[4] = 0x0C;
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 	showresp(WARN, HEX, "set mode B", cmd, replystr);
 }
 
@@ -270,7 +270,7 @@ void RIG_FT920::set_bwB(int val)
 	init_cmd();
 	cmd[3] = FT920_bw_val[val] | 0x80;
 	cmd[4] = 0x8C;
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 	showresp(WARN, HEX, "set bw B", cmd, replystr);
 }
 
