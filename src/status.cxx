@@ -70,6 +70,7 @@ status progStatus = {
 	true,		// bool	poll_pout;
 	true,		// bool	poll_swr;
 	true,		// bool	poll_alc;
+	false,		// bool	poll_split;
 
 	-1,			// int  iBW_A;
 	1,			// int  imode_A;
@@ -282,6 +283,7 @@ void status::saveLastState()
 	spref.set("poll_pout", poll_pout);
 	spref.set("poll_swr", poll_swr);
 	spref.set("poll_alc", poll_alc);
+	spref.set("poll_split", poll_split);
 
 	spref.set("bw_A", iBW_A);
 	spref.set("mode_A", imode_A);
@@ -501,6 +503,7 @@ bool status::loadXcvrState(const char *xcvr)
 		if (spref.get("poll_pout", i, i)) poll_pout = i;
 		if (spref.get("poll_swr", i, i)) poll_swr = i;
 		if (spref.get("poll_alc", i, i)) poll_alc = i;
+		if (spref.get("poll_split", i, i)) poll_split = i;
 
 		spref.get("bw_A", iBW_A, iBW_A);
 		spref.get("mode_A", imode_A, imode_A);

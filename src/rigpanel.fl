@@ -886,74 +886,80 @@ Serial Port for a special Control Signals}
           Fl_Check_Button btn_poll_frequency {
             label Frequency
             callback {progStatus.poll_frequency = o->value();}
-            xywh {43 138 104 15} down_box DOWN_BOX value 1
+            xywh {23 138 100 15} down_box DOWN_BOX value 1
             code0 {o->value(progStatus.poll_frequency);}
           }
           Fl_Check_Button btn_poll_mode {
             label Mode
             callback {progStatus.poll_mode = o->value();}
-            xywh {43 166 104 15} down_box DOWN_BOX value 1
+            xywh {23 166 100 15} down_box DOWN_BOX value 1
             code0 {o->value(progStatus.poll_mode);}
           }
           Fl_Check_Button btn_poll_bandwidth {
             label Bandwidth
             callback {progStatus.poll_bandwidth = o->value();}
-            xywh {43 194 104 15} down_box DOWN_BOX value 1
+            xywh {23 194 100 15} down_box DOWN_BOX value 1
             code0 {o->value(progStatus.poll_bandwidth);}
           }
           Fl_Check_Button btn_poll_volume {
             label Volume
             callback {progStatus.poll_volume = o->value();}
-            xywh {43 221 104 15} down_box DOWN_BOX
+            xywh {23 221 100 15} down_box DOWN_BOX
             code0 {o->value(progStatus.poll_volume);}
           }
           Fl_Check_Button btn_poll_notch {
             label {Manual Notch}
             callback {progStatus.poll_notch = o->value();}
-            xywh {172 138 104 15} down_box DOWN_BOX
+            xywh {137 138 100 15} down_box DOWN_BOX
             code0 {o->value(progStatus.poll_notch);}
           }
           Fl_Check_Button btn_poll_auto_notch {
             label {Auto Notch}
             callback {progStatus.poll_auto_notch = o->value();}
-            xywh {172 166 104 15} down_box DOWN_BOX
+            xywh {137 166 100 15} down_box DOWN_BOX
             code0 {o->value(progStatus.poll_auto_notch);}
           }
           Fl_Check_Button btn_poll_ifshift {
             label {IF shift}
             callback {progStatus.poll_ifshift = o->value();}
-            xywh {172 194 104 15} down_box DOWN_BOX
+            xywh {137 194 100 15} down_box DOWN_BOX
             code0 {o->value(progStatus.poll_ifshift);}
           }
           Fl_Check_Button btn_poll_power_control {
             label {Power control}
             callback {progStatus.poll_power_control = o->value();}
-            xywh {172 221 104 15} down_box DOWN_BOX
+            xywh {137 221 100 15} down_box DOWN_BOX
             code0 {o->value(progStatus.poll_power_control);}
           }
           Fl_Check_Button btn_poll_pre_att {
-            label {Preamp / Attenuator}
+            label {Pre/Att}
             callback {progStatus.poll_pre_att = o->value();}
-            xywh {302 138 104 15} down_box DOWN_BOX
+            xywh {269 138 100 15} down_box DOWN_BOX
             code0 {o->value(progStatus.poll_pre_att);}
           }
           Fl_Check_Button btn_poll_squelch {
             label Squelch
             callback {progStatus.poll_squelch = o->value();}
-            xywh {302 166 104 15} down_box DOWN_BOX
+            xywh {269 166 100 15} down_box DOWN_BOX
             code0 {o->value(progStatus.poll_squelch);}
           }
           Fl_Check_Button btn_poll_micgain {
             label {Mic gain}
             callback {progStatus.poll_micgain = o->value();}
-            xywh {302 193 104 15} down_box DOWN_BOX
+            xywh {269 193 100 15} down_box DOWN_BOX
             code0 {o->value(progStatus.poll_micgain);}
           }
           Fl_Check_Button btn_poll_rfgain {
             label {RF gain}
             callback {progStatus.poll_rfgain = o->value();}
-            xywh {302 221 104 15} down_box DOWN_BOX
+            xywh {269 221 100 15} down_box DOWN_BOX
             code0 {o->value(progStatus.poll_rfgain);}
+          }
+          Fl_Check_Button btn_poll_split {
+            label {Split VFO}
+            callback {progStatus.poll_split = o->value();}
+            xywh {363 138 100 15} down_box DOWN_BOX
+            code0 {o->value(progStatus.poll_split);}
           }
         }
       }
