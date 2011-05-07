@@ -365,7 +365,6 @@ void cbOkXcvrDialog()
 	}
 
 	initRig();
-	bypass_serial_thread_loop = false;
 
 	btnOkXcvrDialog->labelcolor(FL_BLACK);
 }
