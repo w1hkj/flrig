@@ -549,11 +549,11 @@ void RIG_TT550::set_bwA(int val)
 	cmd = TT550setRcvBW;
 	cmd[1] = rxbw;
 	sendCommand(cmd, 0);
-LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
+LOG_WARN("%s", str2hex(cmd.c_str(), cmd.length()));
 	cmd = TT550setXmtBW;
 	cmd[1] = txbw;
 	sendCommand(cmd, 0);
-LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
+LOG_WARN("%s", str2hex(cmd.c_str(), cmd.length()));
 	set_vfoA(freqA);
 }
 
@@ -564,7 +564,7 @@ int RIG_TT550::get_bwA()
 
 int RIG_TT550::adjust_bandwidth(int md)
 {
-	return (bwA = def_bandwidth(md));
+	return bwA;
 }
 
 int RIG_TT550::def_bandwidth(int m)

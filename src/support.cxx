@@ -448,7 +448,7 @@ void serviceA()
 		selrig->selectA();
 	}
 
-// if TT550 and on the B vfo
+// if TT550 etal and on the B vfo
 	if (selrig->can_change_alt_vfo && useB) {
 		selrig->set_vfoA(vfoA.freq);
 		goto end_serviceA;
@@ -467,9 +467,9 @@ void serviceA()
 	if (vfoA.imode != vfo.imode || changed_vfo) {
 		selrig->set_modeA(vfoA.imode);
 		vfo.imode = vfoA.imode;
-		vfo.iBW = vfoA.iBW;// = selrig->adjust_bandwidth(vfo.imode);
 		Fl::awake(setModeControl);
 		Fl::awake(updateBandwidthControl);
+		vfo.iBW = vfoA.iBW;
 		Fl::awake(setBWControl);
 		selrig->set_bwA(vfoA.iBW);
 		try {
@@ -479,7 +479,7 @@ void serviceA()
 			send_bandwidths();
 			send_new_bandwidth(vfoA.iBW);
 		} catch (...) {}
-	} else if (vfoA.iBW != vfo.iBW || changed_vfo) {
+	} else if (vfoA.iBW != vfo.iBW) {
 		selrig->set_bwA(vfoA.iBW);
 		vfo.iBW = vfoA.iBW;
 		Fl::awake(setBWControl);
@@ -500,7 +500,7 @@ void serviceB()
 {
 	if (!selrig->can_change_alt_vfo && !useB) return;
 
-	if (queB.empty()) 
+	if (queB.empty())
 		return;
 
 	while (!queB.empty()) {
@@ -535,9 +535,9 @@ void serviceB()
 	if (vfoB.imode != vfo.imode || pushedB || changed_vfo) {
 		selrig->set_modeB(vfoB.imode);
 		vfo.imode = vfoB.imode;
-		vfo.iBW = vfoB.iBW;// = selrig->adjust_bandwidth(vfo.imode);
 		Fl::awake(setModeControl);
 		Fl::awake(updateBandwidthControl);
+		vfo.iBW = vfoB.iBW;
 		Fl::awake(setBWControl);
 		selrig->set_bwB(vfoB.iBW);
 		try {
@@ -547,7 +547,7 @@ void serviceB()
 			send_bandwidths();
 			send_new_bandwidth(vfoB.iBW);
 		} catch (...) {}
-	} else if (vfoB.iBW != vfo.iBW || pushedB || changed_vfo) {
+	} else if (vfoB.iBW != vfo.iBW || pushedB) {
 		selrig->set_bwB(vfoB.iBW);
 		vfo.iBW = vfoB.iBW;
 		Fl::awake(setBWControl);
@@ -875,11 +875,9 @@ void cb_selectA() {
 	pthread_mutex_lock(&mutex_serial);
 	changed_vfo = true;
 	useB = false;
-//	if (queA.empty()) {
-		vfoA.src = UI;
-		vfoA.freq = FreqDispA->value();
-		queA.push(vfoA);
-//	}
+	vfoA.src = UI;
+	vfoA.freq = FreqDispA->value();
+	queA.push(vfoA);
 	pthread_mutex_unlock(&mutex_serial);
 	setFocus();
 }
@@ -902,11 +900,9 @@ void cb_selectB() {
 	pthread_mutex_lock(&mutex_serial);
 	changed_vfo = true;
 	useB = true;
-//	if (queB.empty()) {
-		vfoB.src = UI;
-		vfoB.freq = FreqDispB->value();
-		queB.push(vfoB);
-//	}
+	vfoB.src = UI;
+	vfoB.freq = FreqDispB->value();
+	queB.push(vfoB);
 	pthread_mutex_unlock(&mutex_serial);
 	setFocus();
 }
@@ -1600,6 +1596,15 @@ void adjust_control_positions()
 
 	btnInitializing->hide();
 
+	if (rig_nbr == TT550) {
+		mnuControls->label("Show Controls");
+		tabs550->resize(tabs550->x(), y + 20, tabs550->w(), tabs550->h());
+		tabs550->hide();
+	} else {
+		mnuControls->label("Xcvr setup");
+		tabs550->hide();
+	}
+
 	mainwindow->size( mainwindow->w(), y + 20);
 	mainwindow->redraw();
 
@@ -1616,42 +1621,27 @@ void adjust_control_positions()
 void initXcvrTab()
 {
 	if (rig_nbr == TT550) {
-		cnt_tt550_line_out->activate(); 
-			cnt_tt550_line_out->value(progStatus.tt550_line_out);
-		cbo_tt550_agc_level->activate(); 
-			cbo_tt550_agc_level->index(progStatus.tt550_agc_level);
-		cnt_tt550_cw_wpm->activate(); 
-			cnt_tt550_cw_wpm->value(progStatus.tt550_cw_wpm);
-		cnt_tt550_cw_vol->activate(); 
-			cnt_tt550_cw_vol->value(progStatus.tt550_cw_vol);
-		cnt_tt550_cw_spot->activate(); 
-			cnt_tt550_cw_spot->value(progStatus.tt550_cw_spot);
-		cnt_tt550_cw_weight->activate(); 
-			cnt_tt550_cw_weight->value(progStatus.tt550_cw_weight);
-		cnt_tt550_cw_qsk->activate(); 
-			cnt_tt550_cw_qsk->value(progStatus.tt550_cw_qsk);
-		btn_tt550_enable_keyer->activate(); 
-			btn_tt550_enable_keyer->value(progStatus.tt550_enable_keyer);
-		btn_tt550_vox->activate(); 
-			btn_tt550_vox->value(progStatus.tt550_vox_onoff);
-		cnt_tt550_vox_gain->activate(); 
-			cnt_tt550_vox_gain->value(progStatus.tt550_vox_gain);
-		cnt_tt550_anti_vox->activate(); 
-			cnt_tt550_anti_vox->value(progStatus.tt550_vox_anti);
-		cnt_tt550_vox_hang->activate(); 
-			cnt_tt550_vox_hang->value(progStatus.tt550_vox_hang);
-		btn_tt550_CompON->activate(); 
-			btn_tt550_CompON->value(progStatus.tt550_compON);
-		cnt_tt550_compression->activate(); 
-			cnt_tt550_compression->value(progStatus.tt550_compression);
-		cnt_tt550_mon_vol->activate(); 
-			cnt_tt550_mon_vol->value(progStatus.tt550_mon_vol);
-		btn_tt550_tuner_bypass->activate(); 
-			btn_tt550_tuner_bypass->value(progStatus.tt550_tuner_bypass);
-		sel_tt550_encoder_step->activate(); 
-			sel_tt550_encoder_step->value(progStatus.tt550_encoder_step);
-		cnt_tt550_encoder_sensitivity->activate(); 
-			cnt_tt550_encoder_sensitivity->value(progStatus.tt550_encoder_sensitivity);
+		cnt_tt550_line_out->value(progStatus.tt550_line_out);
+		cbo_tt550_agc_level->index(progStatus.tt550_agc_level);
+		cnt_tt550_cw_wpm->value(progStatus.tt550_cw_wpm);
+		cnt_tt550_cw_vol->value(progStatus.tt550_cw_vol);
+		cnt_tt550_cw_spot->value(progStatus.tt550_cw_spot);
+		cnt_tt550_cw_weight->value(progStatus.tt550_cw_weight);
+		cnt_tt550_cw_qsk->value(progStatus.tt550_cw_qsk);
+		btn_tt550_enable_keyer->value(progStatus.tt550_enable_keyer);
+		btn_tt550_vox->value(progStatus.tt550_vox_onoff);
+		cnt_tt550_vox_gain->value(progStatus.tt550_vox_gain);
+		cnt_tt550_anti_vox->value(progStatus.tt550_vox_anti);
+		cnt_tt550_vox_hang->value(progStatus.tt550_vox_hang);
+		btn_tt550_CompON->value(progStatus.tt550_compON);
+		cnt_tt550_compression->value(progStatus.tt550_compression);
+		cnt_tt550_mon_vol->value(progStatus.tt550_mon_vol);
+		btn_tt550_tuner_bypass->value(progStatus.tt550_tuner_bypass);
+		sel_tt550_encoder_step->value(progStatus.tt550_encoder_step);
+		cnt_tt550_encoder_sensitivity->value(progStatus.tt550_encoder_sensitivity);
+		sel_tt550_F1_func->value(progStatus.tt550_F1_func);
+		sel_tt550_F2_func->value(progStatus.tt550_F2_func);
+		sel_tt550_F3_func->value(progStatus.tt550_F3_func);
 		mnuRestoreData->clear();
 		mnuRestoreData->hide();
 		mnuKeepData->clear();
@@ -1669,7 +1659,7 @@ void initXcvrTab()
 		if (selrig->has_cw_wpm) cnt_cw_wpm->activate(); else cnt_cw_wpm->deactivate();
 		if (selrig->has_cw_vol) cnt_cw_vol->activate(); else cnt_cw_vol->deactivate();
 		if (selrig->has_cw_spot) {
-			cnt_cw_spot->activate(); 
+			cnt_cw_spot->activate();
 			btnSpot->activate();
 		} else {
 			cnt_cw_spot->deactivate();
@@ -1712,28 +1702,47 @@ void initRig()
 	FreqDispB->set_precision(selrig->precision);
 
 	if (rig_nbr == TT550) {
-		vfoA.freq = progStatus.freq_A;
-		vfoA.imode = progStatus.imode_A;
-		vfoA.iBW = progStatus.iBW_A;
-		if (vfoA.iBW == -1) vfoA.iBW = selrig->def_bandwidth(vfoA.imode);
-		FreqDispA->value( vfoA.freq );
-		selrig->selectA();
-		if (flrig_abort) goto failed;
-		selrig->set_vfoA(vfoA.freq);
-		if (flrig_abort) goto failed;
-		selrig->set_modeA(vfoA.imode);
-		if (flrig_abort) goto failed;
-		selrig->set_bwA(vfoA.iBW);
-		if (flrig_abort) goto failed;
-
+		selrig->selectB();
 		vfoB.freq = progStatus.freq_B;
 		vfoB.imode = progStatus.imode_B;
 		vfoB.iBW = progStatus.iBW_B;
-		if (vfoB.iBW == -1) vfoB.iBW = selrig->def_bandwidth(vfoB.imode);
 		FreqDispB->value(vfoB.freq);
+		if (flrig_abort) goto failed;
 		selrig->set_vfoB(vfoB.freq);
 		selrig->set_modeB(vfoB.imode);
+		if (vfoB.iBW == -1) vfoB.iBW = selrig->def_bandwidth(vfoB.imode);
 		selrig->set_bwB(vfoB.iBW);
+
+		selrig->selectA();
+		vfo.freq = vfoA.freq = progStatus.freq_A;
+		vfo.imode = vfoA.imode = progStatus.imode_A;
+		vfo.iBW = vfoA.iBW = progStatus.iBW_A;
+		FreqDispA->value( vfoA.freq );
+		selrig->set_vfoA(vfoA.freq);
+		selrig->set_modeA(vfoA.imode);
+		if (vfoA.iBW == -1) vfoA.iBW = selrig->def_bandwidth(vfoA.imode);
+		selrig->set_bwA(vfoA.iBW);
+
+		rigmodes_.clear();
+		opMODE->clear();
+		for (int i = 0; selrig->modes_[i] != NULL; i++) {
+			rigmodes_.push_back(selrig->modes_[i]);
+			opMODE->add(selrig->modes_[i]);
+		}
+		opMODE->activate();
+		opMODE->index(vfoA.imode);
+
+		rigbws_.clear();
+		opBW->show();
+		opBW->clear();
+		old_bws = selrig->bandwidths_;
+		for (int i = 0; selrig->bandwidths_[i] != NULL; i++) {
+			rigbws_.push_back(selrig->bandwidths_[i]);
+				opBW->add(selrig->bandwidths_[i]);
+			}
+		opBW->activate();
+		opBW->index(vfoA.iBW);
+
 	} else {
 		if (progStatus.CIV > 0)
 			selrig->adjustCIV(progStatus.CIV);
@@ -1762,44 +1771,46 @@ void initRig()
 	} else
 		mnuKeepData->clear();
 
-	rigmodes_.clear();
-	opMODE->clear();
-	if (selrig->has_mode_control) {
-		for (int i = 0; selrig->modes_[i] != NULL; i++) {
-			rigmodes_.push_back(selrig->modes_[i]);
-			opMODE->add(selrig->modes_[i]);
-		}
-		opMODE->activate();
-		opMODE->index(progStatus.imode_A);
-		updateBandwidthControl();
-	} else {
-		opMODE->add(" ");
-		opMODE->index(0);
-		opMODE->deactivate();
-	}
-
-	rigbws_.clear();
-	if (rig_nbr != K3) {
-		opBW->show();
-		opBW->clear();
-		if (selrig->has_bandwidth_control) {
-			old_bws = selrig->bandwidths_;
-			for (int i = 0; selrig->bandwidths_[i] != NULL; i++) {
-				rigbws_.push_back(selrig->bandwidths_[i]);
-					opBW->add(selrig->bandwidths_[i]);
-				}
-			opBW->activate();
-			opBW->index(progStatus.iBW_A);
+	if (rig_nbr != TT550) {
+		rigmodes_.clear();
+		opMODE->clear();
+		if (selrig->has_mode_control) {
+			for (int i = 0; selrig->modes_[i] != NULL; i++) {
+				rigmodes_.push_back(selrig->modes_[i]);
+				opMODE->add(selrig->modes_[i]);
+			}
+			opMODE->activate();
+			opMODE->index(progStatus.imode_A);
+			updateBandwidthControl();
 		} else {
-			opBW->add(" ");
-			opBW->index(0);
-			opBW->deactivate();
+			opMODE->add(" ");
+			opMODE->index(0);
+			opMODE->deactivate();
 		}
-		cntK3bw->hide();
-	} else {
-		opBW->hide();
-		cntK3bw->lstep(50);
-		cntK3bw->show();
+
+		rigbws_.clear();
+		if (rig_nbr != K3) {
+			opBW->show();
+			opBW->clear();
+			if (selrig->has_bandwidth_control) {
+				old_bws = selrig->bandwidths_;
+				for (int i = 0; selrig->bandwidths_[i] != NULL; i++) {
+					rigbws_.push_back(selrig->bandwidths_[i]);
+						opBW->add(selrig->bandwidths_[i]);
+					}
+				opBW->activate();
+				opBW->index(progStatus.iBW_A);
+			} else {
+				opBW->add(" ");
+				opBW->index(0);
+				opBW->deactivate();
+			}
+			cntK3bw->hide();
+		} else {
+			opBW->hide();
+			cntK3bw->lstep(50);
+			cntK3bw->show();
+		}
 	}
 
 	if (selrig->has_special)
@@ -1987,7 +1998,7 @@ void initRig()
 		sldrMICGAIN->step(step);
 		if (progStatus.use_rig_data)
 			progStatus.mic_gain = selrig->get_mic_gain();
-		else 
+		else
 			selrig->set_mic_gain(progStatus.mic_gain);
 		sldrMICGAIN->value(progStatus.mic_gain);
 		sldrMICGAIN->show();
@@ -2154,26 +2165,18 @@ void initRig()
 		send_sideband();
 		send_new_bandwidth(vfoA.iBW);
 	} catch (...) {}
-	
+
 // enable xml loop
-//	bypass_digi_loop = false;
 	pthread_mutex_unlock(&mutex_xmlrpc);
 
-//	if (rig_nbr != K3)
-//		cb_selectA();
-
 	if (rig_nbr == K3) {
-//		FreqDispB->deactivate();
 		btnB->hide();
 		btnA->hide();
 		btn_K3_swapAB->show();
-//		btnA2B->hide();
 	} else {
-//		FreqDispB->activate();
 		btn_K3_swapAB->hide();
 		btnB->show();
 		btnA->show();
-//		btnA2B->show();
 	}
 
 	setFocus();
