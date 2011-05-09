@@ -398,6 +398,18 @@ void configXcvr()
 	dlgXcvrConfig->show();
 }
 
+void open_poll_tab()
+{
+	dlgXcvrConfig->show();
+	tabsConfig->value(tabPolling);
+}
+
+void open_send_command_tab()
+{
+	dlgXcvrConfig->show();
+	tabsConfig->value(tabSndCmd);
+}
+
 void createXcvrDialog()
 {
 	dlgXcvrConfig = XcvrDialog();

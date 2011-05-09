@@ -954,23 +954,43 @@ void delFreq() {
 }
 
 void addFreq() {
-	long freq = FreqDispA->value();
-	if (!freq) return;
-	int mode = opMODE->index();
-	int bw;
-	if (rig_nbr == K3)
-		bw = cntK3bw->value();
-	else
-		bw = opBW->index();
-	for (int n = 0; n < numinlist; n++)
-		if (freq == oplist[n].freq && mode == oplist[n].imode) {
-			oplist[n].iBW = bw;
-			return;
-		}
-	addtoList(freq, mode, bw);
-	updateSelect();
-	FreqDispA->visual_beep();
-	setFocus();
+	if (useB) {
+		long freq = FreqDispB->value();
+		if (!freq) return;
+		int mode = opMODE->index();
+		int bw;
+		if (rig_nbr == K3)
+			bw = cntK3bw->value();
+		else
+			bw = opBW->index();
+		for (int n = 0; n < numinlist; n++)
+			if (freq == oplist[n].freq && mode == oplist[n].imode) {
+				oplist[n].iBW = bw;
+				return;
+			}
+		addtoList(freq, mode, bw);
+		updateSelect();
+		FreqDispB->visual_beep();
+		setFocus();
+	} else {
+		long freq = FreqDispA->value();
+		if (!freq) return;
+		int mode = opMODE->index();
+		int bw;
+		if (rig_nbr == K3)
+			bw = cntK3bw->value();
+		else
+			bw = opBW->index();
+		for (int n = 0; n < numinlist; n++)
+			if (freq == oplist[n].freq && mode == oplist[n].imode) {
+				oplist[n].iBW = bw;
+				return;
+			}
+		addtoList(freq, mode, bw);
+		updateSelect();
+		FreqDispA->visual_beep();
+		setFocus();
+	}
 }
 
 void cbRIT()
