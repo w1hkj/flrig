@@ -20,8 +20,19 @@ public:
 	int  get_modeA();
 	void set_modeB(int val);
 	int  get_modeB();
+
 	void set_power_control(double val);
+	int  get_power_control();
 	void get_pc_min_max_step(double &, double &, double &);
+
+	void set_rf_gain(int val);
+	int  get_rf_gain();
+	void get_rf_min_max_step(int &min, int &max, int &step);
+
+	void set_mic_gain(int val);
+	int  get_mic_gain();
+	void get_mic_min_max_step(int &min, int &max, int &step);
+
 	void set_PTT_control(int val);
 	void set_attenuator(int val);
 	int  get_attenuator();
@@ -29,6 +40,7 @@ public:
 	int  get_preamp();
 	int  get_smeter();
 	void set_noise(bool on);
+	int  get_noise();
 	int  get_modetype(int n);
 	void set_bwA(int val);
 	int  get_bwA();
