@@ -815,7 +815,7 @@ void RIG_IC746PRO::set_bwA(int val)
 	A.iBW = val;
 	cmd = pre_to;
 	cmd.append("\x1A\x03");
-	cmd += A.iBW;
+	cmd.append(to_bcd(A.iBW,2));
 	cmd.append( post );
 	waitFB("set bw A");
 }
@@ -834,7 +834,7 @@ int  RIG_IC746PRO::get_bwA()
 	if (waitFOR(8, "get bw A")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			A.iBW = (int)(replystr[p + 6]);
+			A.iBW = (int)(fm_bcd(&replystr[p + 6], 2));
 	}
 	return A.iBW;
 }
@@ -850,7 +850,7 @@ void RIG_IC746PRO::set_bwB(int val)
 	B.iBW = val;
 	cmd = pre_to;
 	cmd.append("\x1A\x03");
-	cmd += B.iBW;
+	cmd.append(to_bcd(B.iBW,2));
 	cmd.append( post );
 	waitFB("set bw B");
 }
@@ -866,10 +866,10 @@ int  RIG_IC746PRO::get_bwB()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(9, "get bw B")) {
+	if (waitFOR(8, "get bw B")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			B.iBW = (int)(replystr[p + 6]);
+			B.iBW = (int)(fm_bcd(&replystr[p + 6], 2));
 	}
 	return B.iBW;
 }
