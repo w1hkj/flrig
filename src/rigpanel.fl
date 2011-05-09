@@ -21,7 +21,7 @@ Function {Rig_window()} {open
 } {
   Fl_Window {} {
     label Flrig open
-    xywh {577 57 424 330} type Double align 80
+    xywh {577 57 424 401} type Double align 80
     code0 {\#include <stdlib.h>} visible
   } {
     Fl_Menu_Bar {} {open
@@ -384,6 +384,257 @@ cbAuxPort();}
 Please wait}
       xywh {0 23 424 100} color 206 labelfont 1 labelsize 24 hide
     }
+    Fl_Tabs tabs550 {open
+      xywh {1 330 422 70} selection_color 50
+    } {
+      Fl_Group {} {
+        label CW open
+        xywh {2 350 420 50} color 50 selection_color 50
+      } {
+        Fl_Counter cnt_tt550_cw_wpm {
+          label wpm
+          callback {progStatus.tt550_cw_wpm = (int)o->value();
+cb_tt550_cw_wpm();}
+          xywh {7 355 60 22} type Simple minimum 5 maximum 80 step 1 value 24
+          code0 {o->value(progStatus.tt550_cw_wpm);}
+        }
+        Fl_Counter cnt_tt550_cw_weight {
+          label Weight
+          callback {progStatus.tt550_cw_weight = o->value();
+cb_tt550_cw_weight();}
+          xywh {74 355 60 22} type Simple minimum 0.75 maximum 1.5 step 0.05 value 1
+          code0 {o->value(progStatus.tt550_cw_weight);}
+        }
+        Fl_Counter cnt_tt550_cw_qsk {
+          label Delay
+          callback {progStatus.tt550_cw_qsk = (int)o->value();
+cb_tt550_cw_qsk();}
+          tooltip {QSK delay (msec)} xywh {142 355 60 22} type Simple minimum 0 maximum 100 step 1 value 20
+          code0 {o->value(progStatus.tt550_cw_qsk);}
+        }
+        Fl_Counter cnt_tt550_cw_vol {
+          label {S-T vol}
+          callback {progStatus.tt550_cw_vol=(int)o->value();
+cb_tt550_cw_vol();}
+          tooltip {Side tone volume} xywh {209 355 60 22} type Simple minimum 5 maximum 80 step 1 value 24
+          code0 {o->value(progStatus.tt550_cw_vol);}
+        }
+        Fl_Counter cnt_tt550_cw_spot {
+          label {Spot Vol}
+          callback {progStatus.tt550_cw_spot=(int)o->value();
+cb_tt550_cw_spot();}
+          tooltip {Spot volume} xywh {277 355 60 22} type Simple minimum 0 maximum 100 step 1 value 20
+          code0 {o->value(progStatus.tt550_cw_spot);}
+        }
+        Fl_Check_Button btn_tt550_enable_keyer {
+          label Keyer
+          callback {progStatus.tt550_enable_keyer=o->value();
+cb_tt550_enable_keyer();}
+          tooltip {Enable keyer} xywh {346 358 70 15} down_box DOWN_BOX value 1
+          code0 {o->value(progStatus.tt550_enable_keyer);}
+        }
+      }
+      Fl_Group {} {
+        label Vox open
+        xywh {2 350 420 50} hide
+      } {
+        Fl_Counter cnt_tt550_vox_gain {
+          label gain
+          callback {progStatus.tt550_vox_gain=(int)o->value();
+cb_tt550_vox_gain();}
+          xywh {60 355 70 22} type Simple minimum 0 maximum 100 step 1
+          code0 {o->value(progStatus.tt550_vox_gain);}
+        }
+        Fl_Counter cnt_tt550_anti_vox {
+          label anti
+          callback {progStatus.tt550_vox_anti=(int)o->value();
+cb_tt550_vox_anti();}
+          xywh {136 355 70 22} type Simple minimum 0 maximum 100 step 1
+          code0 {o->value(progStatus.tt550_vox_anti);}
+        }
+        Fl_Counter cnt_tt550_vox_hang {
+          label hang
+          callback {progStatus.tt550_vox_hang = (int)o->value();
+cb_tt550_vox_hang();}
+          xywh {212 355 70 22} type Simple minimum 0 maximum 100 step 1
+          code0 {o->value(progStatus.tt550_vox_hang);}
+        }
+        Fl_Light_Button btn_tt550_vox {
+          label VOX
+          callback {progStatus.tt550_vox_onoff=o->value();
+cb_tt550_vox_onoff();}
+          xywh {289 355 70 22}
+          code0 {o->value(progStatus.tt550_vox_onoff);}
+        }
+      }
+      Fl_Group {} {
+        label Spch open
+        xywh {2 350 420 50} hide
+      } {
+        Fl_Light_Button btn_tt550_CompON {
+          label On
+          callback {progStatus.tt550_compON=o->value();
+cb_tt550_compression();}
+          xywh {244 355 70 22}
+          code0 {o->value(progStatus.tt550_compON);}
+        }
+        Fl_Counter cnt_tt550_compression {
+          label Comp
+          callback {progStatus.tt550_compression=(int)o->value();
+cb_tt550_compression();}
+          xywh {167 355 70 22} type Simple minimum 0 maximum 100 step 1
+          code0 {o->value(progStatus.tt550_compression);}
+        }
+        Fl_Counter cnt_tt550_mon_vol {
+          label {Mon vol}
+          callback {progStatus.tt550_mon_vol=(int)o->value();
+cb_tt550_mon_vol();}
+          tooltip {Side tone volume} xywh {91 355 70 22} type Simple minimum 0 maximum 100 step 1 value 25
+          code0 {o->value(progStatus.tt550_mon_vol);}
+        }
+      }
+      Fl_Group {} {
+        label Audio open
+        xywh {2 350 420 50} hide
+      } {
+        Fl_Counter cnt_tt550_line_out {
+          label {line out}
+          callback {progStatus.tt550_line_out = (int)o->value();
+cb_tt550_line_out();}
+          xywh {114 360 69 22} type Simple align 4 minimum 0 maximum 100 step 1 value 20
+          code0 {o->value(progStatus.tt550_line_out);}
+        }
+        Fl_Check_Button btnAccInp {
+          label {Acc Inp.}
+          callback {progStatus.tt550_use_line_in=o->value();
+cb_tt550_use_line_in();}
+          tooltip {Enable to use accessory audio input} xywh {197 363 82 15} down_box DOWN_BOX
+          code0 {o->value(progStatus.tt550_use_line_in);}
+        }
+      }
+      Fl_Group {} {
+        label RX open
+        xywh {2 350 420 50} hide
+      } {
+        Fl_Group cbo_tt550_nb_level {
+          label {NB level}
+          callback {progStatus.tt550_nb_level = o->index();
+cb_tt550_nb_level();} open
+          tooltip {Select Transceiver} xywh {50 355 80 22} box DOWN_BOX align 2
+          code0 {\#include "combo.h"}
+          code1 {o->index(progStatus.tt550_nb_level);}
+          class Fl_ComboBox
+        } {}
+        Fl_Group cbo_tt550_agc_level {
+          label AGC
+          callback {progStatus.tt550_agc_level = o->index();
+cb_tt550_agc_level();} open
+          tooltip {Select Transceiver} xywh {150 355 80 22} box DOWN_BOX align 2
+          code0 {\#include "combo.h"}
+          code1 {o->index(progStatus.tt550_agc_level);}
+          class Fl_ComboBox
+        } {}
+        Fl_Counter cnt_tt550_vfo_adj {
+          label {Vfo Adj(ppm)}
+          callback {progStatus.vfo_adj=o->value();
+cb_vfo_adj();}
+          xywh {245 355 120 22} align 34
+          code0 {o->value(progStatus.vfo_adj);}
+          code1 {o->lstep(1.0);}
+        }
+      }
+      Fl_Group {} {
+        label TX open
+        xywh {2 350 420 50} hide
+      } {
+        Fl_Check_Button btn_tt550_enable_xmtr {
+          label {Tx ON}
+          callback {progStatus.tt550_enable_xmtr=o->value();
+cb_tt550_enable_xmtr();}
+          xywh {10 359 70 15} down_box DOWN_BOX
+          code0 {o->value(progStatus.tt550_enable_xmtr);}
+        }
+        Fl_Check_Button btn_tt550_enable_tloop {
+          label Tloop
+          callback {progStatus.tt550_enable_tloop=o->value();
+cb_tt550_enable_tloop();}
+          xywh {87 359 70 15} down_box DOWN_BOX
+          code0 {o->value(progStatus.tt550_enable_tloop);}
+        }
+        Fl_Check_Button btn_tt550_tuner_bypass {
+          label Tuner
+          callback {progStatus.tt550_tuner_bypass=o->value();
+cb_tt550_tuner_bypass();}
+          tooltip {Check to bypass tuner} xywh {164 359 70 15} down_box DOWN_BOX
+        }
+        Fl_Group op_tt550_XmtBW {
+          label {Xmt BW}
+          callback {progStatus.tt550_xmt_bw = o->index();
+cb_tt550_setXmtBW();} open
+          tooltip {Select Transceiver Bandwidth} xywh {241 355 100 22} box DOWN_BOX labelsize 12 align 2
+          code0 {o->index(progStatus.tt550_xmt_bw);}
+          class Fl_ComboBox
+        } {}
+        Fl_Check_Button btn_tt550_use_xmt_bw {
+          label Enable
+          callback {progStatus.tt550_use_xmt_bw = o->value();
+cb_tt550_setXmtBW();}
+          xywh {349 359 26 15} down_box DOWN_BOX
+          code0 {o->value(progStatus.tt550_use_xmt_bw);}
+        }
+      }
+      Fl_Group {} {
+        label {302-A} open
+        xywh {2 350 420 50} hide
+      } {
+        Fl_Counter cnt_tt550_keypad_time_out {
+          label {Time out}
+          callback {progStatus.tt550_keypad_timeout=(int)(o->value()*1000.0);}
+          tooltip {Clear M302 keypad after \#\# secs} xywh {31 355 120 21} align 34 minimum 0.5 maximum 10 value 2
+          code0 {o->value(progStatus.tt550_keypad_timeout/1000.0);}
+          code1 {o->step(0.1); o->lstep(1.0);}
+        }
+        Fl_Counter cnt_tt550_encoder_sensitivity {
+          label Sensitivity
+          callback {progStatus.tt550_encoder_sensitivity = o->value();}
+          tooltip {1 - most sensitive} xywh {191 355 80 21} type Simple minimum 1 maximum 25 step 1 value 10
+          code0 {o->value(progStatus.tt550_encoder_sensitivity);}
+        }
+        Fl_Choice sel_tt550_encoder_step {
+          label {Step size}
+          callback {progStatus.tt550_encoder_step = o->value();} open
+          xywh {312 355 72 21} down_box BORDER_BOX align 2
+          code0 {o->add("1|10|100|1 K|10 K");}
+          code1 {o->value(progStatus.tt550_encoder_step);}
+        } {}
+      }
+      Fl_Group {} {
+        label {302-B} open selected
+        xywh {2 350 420 50} hide
+      } {
+        Fl_Choice sel_tt550_F1_func {
+          label F1
+          callback {progStatus.tt550_F1_func = o->value();} open
+          tooltip {Assign Func Key} xywh {34 355 99 22} down_box BORDER_BOX
+          code0 {o->add("None|Clear|CW++|CW--|Band++|Band--|Step++|Step--");}
+          code1 {o->value(progStatus.tt550_F1_func);}
+        } {}
+        Fl_Choice sel_tt550_F2_func {
+          label F2
+          callback {progStatus.tt550_F2_func = o->value();} open
+          tooltip {Assign Func Key} xywh {169 355 99 22} down_box BORDER_BOX
+          code0 {o->add("None|Clear|CW++|CW--|Band++|Band--|Step++|Step--");}
+          code1 {o->value(progStatus.tt550_F2_func);}
+        } {}
+        Fl_Choice sel_tt550_F3_func {
+          label F3
+          callback {progStatus.tt550_F3_func = o->value();} open
+          tooltip {Assign Func Key} xywh {300 355 99 22} down_box BORDER_BOX
+          code0 {o->add("None|Clear|CW++|CW--|Band++|Band--|Step++|Step--");}
+          code1 {o->value(progStatus.tt550_F3_func);}
+        } {}
+      }
+    }
   }
 } 
 
@@ -571,7 +822,7 @@ Fl::scheme(progStatus.ui_scheme.c_str());} open
 Function {Memory_Dialog()} {} {
   Fl_Window {} {
     label {Flrig Memory} open
-    xywh {573 706 320 138} type Double visible
+    xywh {573 706 320 138} type Double hide
   } {
     Fl_Group {} {open
       xywh {2 2 60 133} box ENGRAVED_FRAME
@@ -607,17 +858,16 @@ selectFreq();}
   }
 } 
 
-Function {XcvrDialog()} {open
-} {
+Function {XcvrDialog()} {} {
   Fl_Window {} {
-    label {I/O Ports} open
-    xywh {575 417 482 257} type Double visible
+    label {I/O Ports}
+    xywh {575 417 482 257} type Double hide
   } {
     Fl_Tabs tabsConfig {open
       xywh {0 8 477 245}
     } {
       Fl_Group tabPrimary {
-        label Primary selected
+        label Primary
         xywh {2 30 475 222}
       } {
         Fl_Group {} {open
@@ -1147,263 +1397,6 @@ cb_bpf_center();}
         callback {cb_special();}
         xywh {148 205 74 20}
       }
-    }
-  }
-} 
-
-Function {make_TT550()} {} {
-  Fl_Window {} {
-    label {TT550 Setup}
-    xywh {42 421 424 402} type Double align 0 hide
-  } {
-    Fl_Group {} {
-      label CW open
-      xywh {1 2 422 75} box ENGRAVED_FRAME align 21
-    } {
-      Fl_Counter cnt_tt550_cw_wpm {
-        label wpm
-        callback {progStatus.tt550_cw_wpm = (int)o->value();
-cb_tt550_cw_wpm();}
-        xywh {38 22 70 22} type Simple align 1 minimum 5 maximum 80 step 1 value 24
-        code0 {o->value(progStatus.tt550_cw_wpm);}
-      }
-      Fl_Counter cnt_tt550_cw_weight {
-        label Weight
-        callback {progStatus.tt550_cw_weight = o->value();
-cb_tt550_cw_weight();}
-        xywh {114 22 70 22} type Simple align 1 minimum 0.75 maximum 1.5 step 0.05 value 1
-        code0 {o->value(progStatus.tt550_cw_weight);}
-      }
-      Fl_Counter cnt_tt550_cw_qsk {
-        label Delay
-        callback {progStatus.tt550_cw_qsk = (int)o->value();
-cb_tt550_cw_qsk();}
-        tooltip {QSK delay (msec)} xywh {190 22 70 22} type Simple align 1 minimum 0 maximum 100 step 1 value 20
-        code0 {o->value(progStatus.tt550_cw_qsk);}
-      }
-      Fl_Counter cnt_tt550_cw_vol {
-        label {S-T vol}
-        callback {progStatus.tt550_cw_vol=(int)o->value();
-cb_tt550_cw_vol();}
-        tooltip {Side tone volume} xywh {267 22 70 22} type Simple align 1 minimum 5 maximum 80 step 1 value 24
-        code0 {o->value(progStatus.tt550_cw_vol);}
-      }
-      Fl_Counter cnt_tt550_cw_spot {
-        label {Spot Vol}
-        callback {progStatus.tt550_cw_spot=(int)o->value();
-cb_tt550_cw_spot();}
-        tooltip {Spot volume} xywh {343 22 70 22} type Simple align 1 minimum 0 maximum 100 step 1 value 20
-        code0 {o->value(progStatus.tt550_cw_spot);}
-      }
-      Fl_Check_Button btn_tt550_enable_keyer {
-        label {Keyer On}
-        callback {progStatus.tt550_enable_keyer=o->value();
-cb_tt550_enable_keyer();}
-        tooltip {Enable keyer} xywh {37 53 70 15} down_box DOWN_BOX value 1
-        code0 {o->value(progStatus.tt550_enable_keyer);}
-      }
-    }
-    Fl_Group {} {
-      label Vox open
-      xywh {1 78 422 50} box ENGRAVED_FRAME align 21
-    } {
-      Fl_Counter cnt_tt550_vox_gain {
-        label gain
-        callback {progStatus.tt550_vox_gain=(int)o->value();
-cb_tt550_vox_gain();}
-        xywh {38 95 70 22} type Simple align 1 minimum 0 maximum 100 step 1
-        code0 {o->value(progStatus.tt550_vox_gain);}
-      }
-      Fl_Counter cnt_tt550_anti_vox {
-        label anti
-        callback {progStatus.tt550_vox_anti=(int)o->value();
-cb_tt550_vox_anti();}
-        xywh {114 95 70 22} type Simple align 1 minimum 0 maximum 100 step 1
-        code0 {o->value(progStatus.tt550_vox_anti);}
-      }
-      Fl_Counter cnt_tt550_vox_hang {
-        label hang
-        callback {progStatus.tt550_vox_hang = (int)o->value();
-cb_tt550_vox_hang();}
-        xywh {190 95 70 22} type Simple align 1 minimum 0 maximum 100 step 1
-        code0 {o->value(progStatus.tt550_vox_hang);}
-      }
-      Fl_Light_Button btn_tt550_vox {
-        label VOX
-        callback {progStatus.tt550_vox_onoff=o->value();
-cb_tt550_vox_onoff();}
-        xywh {267 95 70 22}
-        code0 {o->value(progStatus.tt550_vox_onoff);}
-      }
-    }
-    Fl_Group {} {
-      label Speech open
-      xywh {1 129 422 50} box ENGRAVED_FRAME align 21
-    } {
-      Fl_Light_Button btn_tt550_CompON {
-        label On
-        callback {progStatus.tt550_compON=o->value();
-cb_tt550_compression();}
-        xywh {267 147 70 22}
-        code0 {o->value(progStatus.tt550_compON);}
-      }
-      Fl_Counter cnt_tt550_compression {
-        label Comp
-        callback {progStatus.tt550_compression=(int)o->value();
-cb_tt550_compression();}
-        xywh {190 147 70 22} type Simple align 1 minimum 0 maximum 100 step 1
-        code0 {o->value(progStatus.tt550_compression);}
-      }
-      Fl_Counter cnt_tt550_mon_vol {
-        label {Mon vol}
-        callback {progStatus.tt550_mon_vol=(int)o->value();
-cb_tt550_mon_vol();}
-        tooltip {Side tone volume} xywh {114 147 70 22} type Simple align 1 minimum 0 maximum 100 step 1 value 25
-        code0 {o->value(progStatus.tt550_mon_vol);}
-      }
-    }
-    Fl_Group {} {open
-      xywh {1 180 422 68} box ENGRAVED_FRAME align 21
-    } {
-      Fl_Counter cnt_tt550_line_out {
-        label {line out}
-        callback {progStatus.tt550_line_out = (int)o->value();
-cb_tt550_line_out();}
-        xywh {37 200 69 22} type Simple align 5 minimum 0 maximum 100 step 1 value 20
-        code0 {o->value(progStatus.tt550_line_out);}
-      }
-      Fl_Group cbo_tt550_nb_level {
-        label {NB level}
-        callback {progStatus.tt550_nb_level = o->index();
-cb_tt550_nb_level();} open
-        tooltip {Select Transceiver} xywh {126 200 80 22} box DOWN_BOX align 5
-        code0 {\#include "combo.h"}
-        code1 {o->index(progStatus.tt550_nb_level);}
-        class Fl_ComboBox
-      } {}
-      Fl_Group cbo_tt550_agc_level {
-        label AGC
-        callback {progStatus.tt550_agc_level = o->index();
-cb_tt550_agc_level();} open
-        tooltip {Select Transceiver} xywh {226 200 80 22} box DOWN_BOX align 5
-        code0 {\#include "combo.h"}
-        code1 {o->index(progStatus.tt550_agc_level);}
-        class Fl_ComboBox
-      } {}
-      Fl_Check_Button btn_tt550_enable_xmtr {
-        label {Xmtr ON}
-        callback {progStatus.tt550_enable_xmtr=o->value();
-cb_tt550_enable_xmtr();}
-        xywh {36 227 70 15} down_box DOWN_BOX
-        code0 {o->value(progStatus.tt550_enable_xmtr);}
-      }
-      Fl_Check_Button btn_tt550_enable_tloop {
-        label {Tloop ON}
-        callback {progStatus.tt550_enable_tloop=o->value();
-cb_tt550_enable_tloop();}
-        xywh {136 227 70 15} down_box DOWN_BOX
-        code0 {o->value(progStatus.tt550_enable_tloop);}
-      }
-      Fl_Check_Button btn_tt550_tuner_bypass {
-        label {Tuner bypass}
-        callback {progStatus.tt550_tuner_bypass=o->value();
-cb_tt550_tuner_bypass();}
-        xywh {237 227 70 15} down_box DOWN_BOX
-      }
-    }
-    Fl_Group {} {open
-      xywh {1 249 138 50} box ENGRAVED_FRAME
-    } {
-      Fl_Counter cnt_tt550_vfo_adj {
-        label {Vfo Adj(ppm)}
-        callback {progStatus.vfo_adj=o->value();
-cb_vfo_adj();}
-        xywh {13 268 120 22} align 33
-        code0 {o->value(progStatus.vfo_adj);}
-        code1 {o->lstep(1.0);}
-      }
-    }
-    Fl_Group {} {open
-      xywh {139 249 183 50} box ENGRAVED_BOX
-    } {
-      Fl_Group op_tt550_XmtBW {
-        label {Xmt BW}
-        callback {progStatus.tt550_xmt_bw = o->index();
-cb_tt550_setXmtBW();} open
-        tooltip {Select Transceiver Bandwidth} xywh {144 268 100 22} box DOWN_BOX labelsize 12 align 5
-        code0 {o->index(progStatus.tt550_xmt_bw);}
-        class Fl_ComboBox
-      } {}
-      Fl_Check_Button btn_tt550_use_xmt_bw {
-        label Enable
-        callback {progStatus.tt550_use_xmt_bw = o->value();
-cb_tt550_setXmtBW();}
-        xywh {250 271 26 15} down_box DOWN_BOX
-        code0 {o->value(progStatus.tt550_use_xmt_bw);}
-      }
-    }
-    Fl_Group {} {
-      label {Audio source} open
-      xywh {322 249 101 50} box ENGRAVED_FRAME align 17
-    } {
-      Fl_Check_Button btnAccInp {
-        label {Acc Inp.}
-        callback {progStatus.tt550_use_line_in=o->value();
-cb_tt550_use_line_in();}
-        tooltip {Enable to use accessory audio input} xywh {331 271 82 15} down_box DOWN_BOX
-        code0 {o->value(progStatus.tt550_use_line_in);}
-      }
-    }
-    Fl_Group {} {
-      label {Model 302} open
-      xywh {1 300 422 100} box ENGRAVED_FRAME align 21
-    } {
-      Fl_Counter cnt_tt550_encoder_sensitivity {
-        label Sensitivity
-        callback {progStatus.tt550_encoder_sensitivity = o->value();}
-        tooltip {1 - most sensitive} xywh {246 321 80 21} type Simple align 1 minimum 1 maximum 25 step 1 value 10
-        code0 {o->value(progStatus.tt550_encoder_sensitivity);}
-      }
-      Fl_Choice sel_tt550_encoder_step {
-        label {Step size}
-        callback {progStatus.tt550_encoder_step = o->value();} open
-        xywh {336 321 72 22} down_box BORDER_BOX align 1
-        code0 {o->add("1|10|100|1 K|10 K");}
-        code1 {o->value(progStatus.tt550_encoder_step);}
-      } {}
-      Fl_Counter cnt_tt550_keypad_time_out {
-        label {Time out}
-        callback {progStatus.tt550_keypad_timeout=(int)(o->value()*1000.0);}
-        tooltip {Clear M302 keypad after \#\# secs} xywh {115 320 120 22} align 33 minimum 0.5 maximum 10 value 2
-        code0 {o->value(progStatus.tt550_keypad_timeout/1000.0);}
-        code1 {o->step(0.1); o->lstep(1.0);}
-      }
-      Fl_Button btn_close_TT550_setup {
-        label Close
-        callback {cb_close_TT550_setup();}
-        xywh {338 364 70 22}
-      }
-      Fl_Choice sel_tt550_F1_func {
-        label F1
-        callback {progStatus.tt550_F1_func = o->value();} open
-        tooltip {Assign Func Key} xywh {17 364 99 22} down_box BORDER_BOX align 1
-        code0 {o->add("None|Clear|CW++|CW--|Band++|Band--|Step++|Step--");}
-        code1 {o->value(progStatus.tt550_F1_func);}
-      } {}
-      Fl_Choice sel_tt550_F2_func {
-        label F2
-        callback {progStatus.tt550_F2_func = o->value();} open
-        tooltip {Assign Func Key} xywh {124 364 99 22} down_box BORDER_BOX align 1
-        code0 {o->add("None|Clear|CW++|CW--|Band++|Band--|Step++|Step--");}
-        code1 {o->value(progStatus.tt550_F2_func);}
-      } {}
-      Fl_Choice sel_tt550_F3_func {
-        label F3
-        callback {progStatus.tt550_F3_func = o->value();} open
-        tooltip {Assign Func Key} xywh {232 364 99 22} down_box BORDER_BOX align 1
-        code0 {o->add("None|Clear|CW++|CW--|Band++|Band--|Step++|Step--");}
-        code1 {o->value(progStatus.tt550_F3_func);}
-      } {}
     }
   }
 } 

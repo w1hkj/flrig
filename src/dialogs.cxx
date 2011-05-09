@@ -414,7 +414,6 @@ void createXcvrDialog()
 {
 	dlgXcvrConfig = XcvrDialog();
 	dlgControls = make_XcvrXtra();
-	tt550_controls = make_TT550();
 
 	init_port_combos();
 
@@ -1021,9 +1020,18 @@ void openMemoryDialog()
 
 void show_controls()
 {
-	if (rig_nbr == TT550)
-		tt550_controls->show();
-	else
+	if (rig_nbr == TT550) {
+		if (tabs550->visible()) {
+			tabs550->hide();
+			mnuControls->label("Show controls");
+			mainwindow->size( mainwindow->w(), mainwindow->h() - 70);
+		} else {
+			tabs550->show();
+			mnuControls->label("Hide controls");
+			mainwindow->size( mainwindow->w(), mainwindow->h() + 70);
+		}
+		mainwindow->redraw();
+	} else
 		dlgControls->show();
 }
 
