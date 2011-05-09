@@ -17,7 +17,8 @@ decl {\#include "K3_ui.h"} {}
 
 decl {const int freq_sel_widths[]={110, 70, 70, 0};} {} 
 
-Function {Rig_window()} {} {
+Function {Rig_window()} {open
+} {
   Fl_Window {} {
     label Flrig open
     xywh {577 57 424 330} type Double align 80
@@ -74,38 +75,54 @@ Fl_Tooltip::enable(progStatus.tooltips);}
           xywh {0 0 34 21}
         }
       }
-      MenuItem mnuStore {
-        label {&Save@-2>}
-        callback {addFreq();}
-        xywh {0 0 36 21}
-      }
-      MenuItem mnuStored {
-        label {S&aved}
-        callback {openMemoryDialog();}
-        xywh {0 0 36 21}
+      Submenu {} {
+        label {Frq &List} open
+        xywh {0 0 70 21}
+      } {
+        MenuItem {} {
+          label {&Save}
+          callback {addFreq();}
+          xywh {0 0 36 21}
+        }
+        MenuItem {} {
+          label {&View}
+          callback {openMemoryDialog();}
+          xywh {0 0 36 21}
+        }
       }
       Submenu {} {
-        label { } open
-        xywh {10 10 100 20} labeltype NO_LABEL deactivate divider
-      } {}
+        label {&Debug} open
+        xywh {0 0 70 21} divider
+      } {
+        MenuItem {} {
+          label {&Events}
+          callback {cbEventLog();}
+          xywh {0 0 34 21} divider
+        }
+        MenuItem {} {
+          label {&Polling}
+          callback {open_poll_tab();}
+          xywh {0 0 36 21}
+        }
+        MenuItem {} {
+          label {&Send command}
+          callback {open_send_command_tab();}
+          xywh {0 0 36 21}
+        }
+      }
       Submenu mnuHelp {
         label {&Help} open
         xywh {10 10 100 20}
       } {
-        MenuItem mnuAbout {
-          label {&About}
-          callback {about();}
-          xywh {10 10 100 20}
-        }
-        MenuItem mnuEventLog {
-          label {Event log}
-          callback {cbEventLog();}
-          xywh {0 0 34 21} divider
-        }
         MenuItem mnuOnLineHelp {
           label {On Line Help}
           callback {visit_URL((void *)("http://www.w1hkj.com/flrig-help/index.html"));}
           xywh {0 0 36 21}
+        }
+        MenuItem mnuAbout {
+          label {&About}
+          callback {about();}
+          xywh {10 10 100 20}
         }
       }
     }
@@ -583,7 +600,7 @@ Function {Memory_Dialog()} {} {
     Fl_Browser FreqSelect {
       callback {if (FreqSelect->value())
 selectFreq();}
-      tooltip {Select operating frequency/mode} xywh {66 2 250 133} type Select labelfont 4 labelsize 12 textfont 4 textsize 12
+      tooltip {Select operating frequency/mode} xywh {66 2 250 133} type Hold labelfont 4 labelsize 12 textfont 4 textsize 12
       code0 {o->has_scrollbar(Fl_Browser_::VERTICAL_ALWAYS);}
       code1 {o->column_widths(freq_sel_widths);}
     }
@@ -594,12 +611,12 @@ Function {XcvrDialog()} {open
 } {
   Fl_Window {} {
     label {I/O Ports} open
-    xywh {577 419 482 257} type Double visible
+    xywh {575 417 482 257} type Double visible
   } {
-    Fl_Tabs {} {open
+    Fl_Tabs tabsConfig {open
       xywh {0 8 477 245}
     } {
-      Fl_Group {} {
+      Fl_Group tabPrimary {
         label Primary selected
         xywh {2 30 475 222}
       } {
@@ -780,7 +797,7 @@ cbCIV();}
           }
         }
       }
-      Fl_Group {} {
+      Fl_Group tabPTT {
         label PTT
         xywh {2 30 470 218} hide
       } {
@@ -829,7 +846,7 @@ btnOkXcvrDialog->redraw();}
           code0 {o->value(progStatus.sep_dtrplus);}
         }
       }
-      Fl_Group {} {
+      Fl_Group tabAux {
         label Aux
         xywh {2 30 470 220} hide
       } {
@@ -846,8 +863,8 @@ Serial Port for a special Control Signals}
           xywh {55 84 395 37}
         }
       }
-      Fl_Group {} {
-        label Polling open
+      Fl_Group tabPolling {
+        label Polling
         xywh {2 30 470 220} hide
       } {
         Fl_Group {} {
@@ -963,7 +980,7 @@ Serial Port for a special Control Signals}
           }
         }
       }
-      Fl_Group {} {
+      Fl_Group tabSndCmd {
         label {Send Cmd}
         xywh {4 30 470 220} hide
       } {

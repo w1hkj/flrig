@@ -72,12 +72,9 @@ extern Fl_Menu_Item menu_[];
 #define mnuColorConfig (menu_+7)
 #define mnuTooltips (menu_+8)
 #define mnuConfigXcvr (menu_+9)
-#define mnuStore (menu_+11)
-#define mnuStored (menu_+12)
-#define mnuHelp (menu_+15)
-#define mnuAbout (menu_+16)
-#define mnuEventLog (menu_+17)
-#define mnuOnLineHelp (menu_+18)
+#define mnuHelp (menu_+20)
+#define mnuOnLineHelp (menu_+21)
+#define mnuAbout (menu_+22)
 extern Fl_Box *lblTest;
 extern Fl_Button *prefFont;
 extern Fl_Button *prefForeground;
@@ -117,6 +114,8 @@ extern Fl_Button *btnClearList;
 extern Fl_Browser *FreqSelect;
 Fl_Double_Window* Memory_Dialog();
 #include <FL/Fl_Tabs.H>
+extern Fl_Tabs *tabsConfig;
+extern Fl_Group *tabPrimary;
 extern Fl_ComboBox *selectRig;
 extern Fl_Counter *cntRigCatRetries;
 extern Fl_Counter *cntRigCatTimeout;
@@ -140,12 +139,15 @@ extern Fl_Check_Button *btndtrplus;
 extern Fl_Input *txtCIV;
 extern Fl_Check_Button *btnUSBaudio;
 extern Fl_Button *btnCIVdefault;
+extern Fl_Group *tabPTT;
 extern Fl_ComboBox *selectSepPTTPort;
 extern Fl_Round_Button *btnSepRTSptt;
 extern Fl_Check_Button *btnSepRTSplus;
 extern Fl_Round_Button *btnSepDTRptt;
 extern Fl_Check_Button *btnSepDTRplus;
+extern Fl_Group *tabAux;
 extern Fl_ComboBox *selectAuxPort;
+extern Fl_Group *tabPolling;
 extern Fl_Check_Button *btn_poll_smeter;
 extern Fl_Check_Button *btn_poll_pout;
 extern Fl_Check_Button *btn_poll_swr;
@@ -163,6 +165,7 @@ extern Fl_Check_Button *btn_poll_squelch;
 extern Fl_Check_Button *btn_poll_micgain;
 extern Fl_Check_Button *btn_poll_rfgain;
 extern Fl_Check_Button *btn_poll_split;
+extern Fl_Group *tabSndCmd;
 #include "flinput2.h"
 extern Fl_Input2 *txt_command;
 extern Fl_Button *btn_send_command;

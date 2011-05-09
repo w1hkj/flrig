@@ -38,24 +38,32 @@ static void cb_mnuConfigXcvr(Fl_Menu_*, void*) {
   configXcvr();
 }
 
-static void cb_mnuStore(Fl_Menu_*, void*) {
+static void cb_Save(Fl_Menu_*, void*) {
   addFreq();
 }
 
-static void cb_mnuStored(Fl_Menu_*, void*) {
+static void cb_View(Fl_Menu_*, void*) {
   openMemoryDialog();
 }
 
-static void cb_mnuAbout(Fl_Menu_*, void*) {
-  about();
+static void cb_Events(Fl_Menu_*, void*) {
+  cbEventLog();
 }
 
-static void cb_mnuEventLog(Fl_Menu_*, void*) {
-  cbEventLog();
+static void cb_Polling(Fl_Menu_*, void*) {
+  open_poll_tab();
+}
+
+static void cb_Send(Fl_Menu_*, void*) {
+  open_send_command_tab();
 }
 
 static void cb_mnuOnLineHelp(Fl_Menu_*, void*) {
   visit_URL((void *)("http://www.w1hkj.com/flrig-help/index.html"));
+}
+
+static void cb_mnuAbout(Fl_Menu_*, void*) {
+  about();
 }
 
 Fl_Menu_Item menu_[] = {
@@ -70,14 +78,18 @@ Fl_Menu_Item menu_[] = {
  {_("Tooltips"), 0,  (Fl_Callback*)cb_mnuTooltips, 0, 130, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Xcvr select"), 0,  (Fl_Callback*)cb_mnuConfigXcvr, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
- {_("&Save@-2>"), 0,  (Fl_Callback*)cb_mnuStore, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
- {_("S&aved"), 0,  (Fl_Callback*)cb_mnuStored, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
- {_(" "), 0,  0, 0, 193, FL_NO_LABEL, 0, 14, 0},
+ {_("Frq &List"), 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("&Save"), 0,  (Fl_Callback*)cb_Save, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("&View"), 0,  (Fl_Callback*)cb_View, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
+ {0,0,0,0,0,0,0,0,0},
+ {_("&Debug"), 0,  0, 0, 192, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("&Events"), 0,  (Fl_Callback*)cb_Events, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("&Polling"), 0,  (Fl_Callback*)cb_Polling, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("&Send command"), 0,  (Fl_Callback*)cb_Send, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
  {_("&Help"), 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
- {_("&About"), 0,  (Fl_Callback*)cb_mnuAbout, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
- {_("Event log"), 0,  (Fl_Callback*)cb_mnuEventLog, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
  {_("On Line Help"), 0,  (Fl_Callback*)cb_mnuOnLineHelp, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("&About"), 0,  (Fl_Callback*)cb_mnuAbout, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
  {0,0,0,0,0,0,0,0,0}
 };
@@ -1229,7 +1241,7 @@ Fl_Double_Window* Memory_Dialog() {
     } // Fl_Group* o
     { Fl_Browser* o = FreqSelect = new Fl_Browser(66, 2, 250, 133);
       FreqSelect->tooltip(_("Select operating frequency/mode"));
-      FreqSelect->type(1);
+      FreqSelect->type(2);
       FreqSelect->labelfont(4);
       FreqSelect->labelsize(12);
       FreqSelect->textfont(4);
@@ -1242,6 +1254,10 @@ Fl_Double_Window* Memory_Dialog() {
   } // Fl_Double_Window* o
   return w;
 }
+
+Fl_Tabs *tabsConfig=(Fl_Tabs *)0;
+
+Fl_Group *tabPrimary=(Fl_Group *)0;
 
 Fl_ComboBox *selectRig=(Fl_ComboBox *)0;
 
@@ -1399,6 +1415,8 @@ static void cb_btnCIVdefault(Fl_Button*, void*) {
   cbCIVdefault();
 }
 
+Fl_Group *tabPTT=(Fl_Group *)0;
+
 Fl_ComboBox *selectSepPTTPort=(Fl_ComboBox *)0;
 
 static void cb_selectSepPTTPort(Fl_ComboBox*, void*) {
@@ -1438,12 +1456,16 @@ static void cb_btnSepDTRplus(Fl_Check_Button*, void*) {
 btnOkXcvrDialog->redraw();
 }
 
+Fl_Group *tabAux=(Fl_Group *)0;
+
 Fl_ComboBox *selectAuxPort=(Fl_ComboBox *)0;
 
 static void cb_selectAuxPort(Fl_ComboBox*, void*) {
   btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();
 }
+
+Fl_Group *tabPolling=(Fl_Group *)0;
 
 Fl_Check_Button *btn_poll_smeter=(Fl_Check_Button *)0;
 
@@ -1547,6 +1569,8 @@ static void cb_btn_poll_split(Fl_Check_Button* o, void*) {
   progStatus.poll_split = o->value();
 }
 
+Fl_Group *tabSndCmd=(Fl_Group *)0;
+
 Fl_Input2 *txt_command=(Fl_Input2 *)0;
 
 Fl_Button *btn_send_command=(Fl_Button *)0;
@@ -1573,8 +1597,8 @@ Fl_Double_Window* XcvrDialog() {
   Fl_Double_Window* w;
   { Fl_Double_Window* o = new Fl_Double_Window(482, 257, _("I/O Ports"));
     w = o;
-    { Fl_Tabs* o = new Fl_Tabs(0, 8, 477, 245);
-      { Fl_Group* o = new Fl_Group(2, 30, 475, 222, _("Primary"));
+    { tabsConfig = new Fl_Tabs(0, 8, 477, 245);
+      { tabPrimary = new Fl_Group(2, 30, 475, 222, _("Primary"));
         { Fl_Group* o = new Fl_Group(5, 34, 195, 140);
           o->box(FL_ENGRAVED_FRAME);
           { selectRig = new Fl_ComboBox(41, 38, 155, 22, _("Rig:"));
@@ -1757,10 +1781,10 @@ Fl_Double_Window* XcvrDialog() {
           } // Fl_Button* btnCIVdefault
           o->end();
         } // Fl_Group* o
-        o->end();
-      } // Fl_Group* o
-      { Fl_Group* o = new Fl_Group(2, 30, 470, 218, _("PTT"));
-        o->hide();
+        tabPrimary->end();
+      } // Fl_Group* tabPrimary
+      { tabPTT = new Fl_Group(2, 30, 470, 218, _("PTT"));
+        tabPTT->hide();
         { new Fl_Box(52, 72, 395, 37, _("Use only if your setup requires a separate\nSerial Port for a PTT control lin\
 e"));
         } // Fl_Box* o
@@ -1802,10 +1826,10 @@ e"));
           btnSepDTRplus->callback((Fl_Callback*)cb_btnSepDTRplus);
           o->value(progStatus.sep_dtrplus);
         } // Fl_Check_Button* btnSepDTRplus
-        o->end();
-      } // Fl_Group* o
-      { Fl_Group* o = new Fl_Group(2, 30, 470, 220, _("Aux"));
-        o->hide();
+        tabPTT->end();
+      } // Fl_Group* tabPTT
+      { tabAux = new Fl_Group(2, 30, 470, 220, _("Aux"));
+        tabAux->hide();
         { selectAuxPort = new Fl_ComboBox(130, 131, 190, 22, _("Aux Port"));
           selectAuxPort->tooltip(_("Aux control port"));
           selectAuxPort->box(FL_DOWN_BOX);
@@ -1823,10 +1847,10 @@ e"));
         { new Fl_Box(55, 84, 395, 37, _("Use only if your setup requires a separate\nSerial Port for a special Control\
  Signals"));
         } // Fl_Box* o
-        o->end();
-      } // Fl_Group* o
-      { Fl_Group* o = new Fl_Group(2, 30, 470, 220, _("Polling"));
-        o->hide();
+        tabAux->end();
+      } // Fl_Group* tabAux
+      { tabPolling = new Fl_Group(2, 30, 470, 220, _("Polling"));
+        tabPolling->hide();
         { Fl_Group* o = new Fl_Group(6, 36, 464, 79, _("Meters"));
           o->box(FL_ENGRAVED_BOX);
           o->align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE);
@@ -1929,10 +1953,10 @@ e"));
           } // Fl_Check_Button* btn_poll_split
           o->end();
         } // Fl_Group* o
-        o->end();
-      } // Fl_Group* o
-      { Fl_Group* o = new Fl_Group(4, 30, 470, 220, _("Send Cmd"));
-        o->hide();
+        tabPolling->end();
+      } // Fl_Group* tabPolling
+      { tabSndCmd = new Fl_Group(4, 30, 470, 220, _("Send Cmd"));
+        tabSndCmd->hide();
         { txt_command = new Fl_Input2(29, 55, 431, 25, _("Enter text as ASCII string\nOr sequence of hex values, x80 etc separated by s\
 paces"));
           txt_command->box(FL_DOWN_BOX);
@@ -1951,10 +1975,10 @@ paces"));
         { txt_response = new Fl_Output(29, 121, 431, 25, _("Response to the SEND button"));
           txt_response->align(FL_ALIGN_BOTTOM_LEFT);
         } // Fl_Output* txt_response
-        o->end();
-      } // Fl_Group* o
-      o->end();
-    } // Fl_Tabs* o
+        tabSndCmd->end();
+      } // Fl_Group* tabSndCmd
+      tabsConfig->end();
+    } // Fl_Tabs* tabsConfig
     { btnCancelCommConfig = new Fl_Button(346, 2, 60, 25, _("Close"));
       btnCancelCommConfig->callback((Fl_Callback*)cb_btnCancelCommConfig);
     } // Fl_Button* btnCancelCommConfig
