@@ -1,5 +1,10 @@
-2011-05-07  David Freese  <w1hkj@w1hkj.com>
+2011-05-09  David Freese  <w1hkj@w1hkj.com>
 
+	ba79896: TT550 control panel
+	a70a812: TS570 IF shift
+	78253b3: IC746PRO
+	807ad16: K3 controls
+	bf04b82: Debugging
 	67240d9: Alt Vfo Adjust
 	8a7e582: K3 delayed response
 	755a91f: FT920
