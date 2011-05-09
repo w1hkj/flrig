@@ -602,21 +602,21 @@ void * serial_thread_loop(void *d)
 			if (!loopcount--) {
 				if (rig_nbr == K3) read_K3();
 				else {
-					if (progStatus.poll_smeter) read_smeter();
 					if (progStatus.poll_frequency) read_vfo();
 					if (progStatus.poll_mode) read_mode();
 					if (progStatus.poll_bandwidth) read_bandwidth();
-					if (progStatus.poll_volume) read_volume();
-					if (progStatus.poll_auto_notch) read_auto_notch();
-					if (progStatus.poll_notch) read_notch();
-					if (progStatus.poll_ifshift) read_ifshift();
-					if (progStatus.poll_power_control) read_power_control();
-					if (progStatus.poll_pre_att) read_preamp_att();
-					if (progStatus.poll_micgain) read_mic_gain();
-					if (progStatus.poll_squelch) read_squelch();
-					if (progStatus.poll_rfgain) read_rfgain();
-					if (progStatus.poll_split) read_split();
 				}
+				if (progStatus.poll_smeter) read_smeter();
+				if (progStatus.poll_volume) read_volume();
+				if (progStatus.poll_auto_notch) read_auto_notch();
+				if (progStatus.poll_notch) read_notch();
+				if (progStatus.poll_ifshift) read_ifshift();
+				if (progStatus.poll_power_control) read_power_control();
+				if (progStatus.poll_pre_att) read_preamp_att();
+				if (progStatus.poll_micgain) read_mic_gain();
+				if (progStatus.poll_squelch) read_squelch();
+				if (progStatus.poll_rfgain) read_rfgain();
+				if (progStatus.poll_split) read_split();
 				loopcount = progStatus.serloop_timing / 10;
 			}
 		} else {
