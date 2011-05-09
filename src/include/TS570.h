@@ -55,9 +55,10 @@ public:
 	void set_preamp(int val);
 	int  get_preamp();
 
-	//	void set_if_shift(int val);
-	//	bool get_if_shift(int &val);
-	//	void get_if_min_max_step(int &min, int &max, int &step);
+	void set_if_shift(int val);
+	bool get_if_shift(int &val);
+	void get_if_min_max_step(int &min, int &max, int &step);
+
 	//	void set_notch(bool on, int val);
 	//	bool get_notch(int &val);
 	//	void get_notch_min_max_step(int &min, int &max, int &step);

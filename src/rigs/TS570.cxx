@@ -63,10 +63,10 @@ RIG_TS570::RIG_TS570() {
 	B.iBW = 1;
 	can_change_alt_vfo = true;
 
-	has_notch_control =
-	has_ifshift_control =
-	has_swr_control = false;
+	has_notch_control = false;
 
+	has_swr_control =
+	has_ifshift_control =
 	has_noise_control =
 	has_micgain_control =
 	has_volume_control =
@@ -714,3 +714,45 @@ int  RIG_TS570::get_noise()
 	return (replystr[p + 2] == '1');
 }
 
+//======================================================================
+// IF shift command
+// step size is 100 Hz
+//======================================================================
+void RIG_TS570::set_if_shift(int val)
+{
+	cmd = "IS+0000;";
+	if (val < 0) cmd[2] = '-';
+	val = abs(val);
+	for (int i = 6; i > 2; i--) {
+		cmd[i] += val % 10;
+		val /= 10;
+	}
+	sendCommand(cmd, 0);
+	showresp(WARN, ASC, "set IF shift", cmd, replystr);
+}
+
+bool RIG_TS570::get_if_shift(int &val)
+{
+	size_t p = 0;
+	cmd = "IS;";
+	int ret = sendCommand(cmd);
+	showresp(WARN, ASC, "get IF shift", cmd, replystr);
+
+	if (ret >= 8) {
+		p = replystr.rfind("IS");
+		if (p == string::npos) return false;
+		replystr[p + 7] = 0;
+		val = atoi(&replystr[p + 3]);
+		if (replystr[p+2] == '-') val = -val;
+		return true;
+	}
+	val = 0;
+	return false;
+}
+
+void RIG_TS570::get_if_min_max_step(int &min, int &max, int &step)
+{
+	min = -1000;
+	max = 1000;
+	step = 100;
+}
