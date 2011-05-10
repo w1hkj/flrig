@@ -56,6 +56,7 @@ public:
 	void initialize();
 	void shutdown();
 
+	void set_vfo(long);
 	long get_vfoA();
 	void set_vfoA(long);
 	long get_vfoB();
@@ -64,16 +65,18 @@ public:
 	void selectA();
 	void selectB();
 
+	void set_mode(int val);
 	void set_modeA(int val);
 	int  get_modeA();
-//	void set_modeB(int val);
-//	int  get_modeB();
+	void set_modeB(int val);
+	int  get_modeB();
 	int  get_modetype(int n);
 
+	void set_bw(int val);
 	void set_bwA(int val);
 	int  get_bwA();
-//	void set_bwB(int val);
-//	int  get_bwB();
+	void set_bwB(int val);
+	int  get_bwB();
 
 	bool twovfos() { return true; }
 	void set_split(bool);
