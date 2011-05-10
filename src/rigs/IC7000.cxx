@@ -106,8 +106,6 @@ void RIG_IC7000::initialize()
 		flrig_abort = true;
 		return;
 	}
-		flrig_abort = true;
-		return;
 	cmd = pre_to;
 	cmd.append("\x16\x51");
 	cmd += '\x00';
