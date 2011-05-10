@@ -133,12 +133,10 @@ RIG_TT550::RIG_TT550() {
 	comm_rtsptt = false;
 	comm_dtrptt = false;
 	serloop_timing = 100;
-	
-	modeA = 1;
-	bwA = 20;
-	def_mode = 1;
-	defbw_ = 20;
-	deffreq_ = 14070000;
+
+	def_mode = modeA = modeB = 1;
+	defbw_ = bwA = bwB = 20;
+	deffreq_ = freqA = freqB = 14070000;
 	max_power = 100;
 	can_change_alt_vfo = true;
 
@@ -303,11 +301,13 @@ void RIG_TT550::set_vfoRX(long freq)
 	int PbtAdj = PbtActive ? pbt : 0;//PbtFreq : 0;	// passband adj (Hz)
 	int	RitAdj = RitActive ? RitFreq : 0;	// RIT adj (Hz)
 
-	int FiltAdj = (TT550_filter_width[bwA])/2;		// filter bw (Hz)
+	int FiltAdj = (TT550_filter_width[defbw_])/2;		// filter bw (Hz)
 
 	long lFreq = freq * (1 + VfoAdj * 1e-6) + RitAdj;
 
-	if(modeA == TT550_DIGI_MODE) {
+LOG_WARN("rx freq = %ld", freq);
+
+	if(def_mode == TT550_DIGI_MODE) {
 		DigiAdj = 1500 - FiltAdj - 200;
 		DigiAdj = DigiAdj < 0 ? 0 : DigiAdj;
 		IBfo = FiltAdj + 200;
@@ -315,19 +315,19 @@ void RIG_TT550::set_vfoRX(long freq)
 		IBfo = IBfo + PbtAdj + DigiAdj;
 	}
 
-	if(modeA == TT550_USB_MODE) {
+	if(def_mode == TT550_USB_MODE) {
 		IBfo = FiltAdj + 200;
 		lFreq += (IBfo + PbtAdj);
 		IBfo = IBfo + PbtAdj;
 	}
 
-	if(modeA == TT550_LSB_MODE) {
+	if(def_mode == TT550_LSB_MODE) {
 		IBfo = FiltAdj + 200;
 		lFreq -= (IBfo + PbtAdj);
 		IBfo = IBfo + PbtAdj;
 	}
 
-	if(modeA == TT550_CW_MODE) {
+	if(def_mode == TT550_CW_MODE) {
 // CW Mode uses LSB Mode
 		if (( FiltAdj + 300) <= Bfo) {
 			IBfo = PbtAdj + Bfo;
@@ -338,7 +338,7 @@ void RIG_TT550::set_vfoRX(long freq)
 		}
 	}
 	
-	if(modeA == TT550_FM_MODE) {
+	if(def_mode == TT550_FM_MODE) {
 		lFreq += Bfo;
 		IBfo = 0;
 	}
@@ -359,7 +359,6 @@ void RIG_TT550::set_vfoRX(long freq)
 	cmd += TBfo & 0xff;
 	cmd += '\r';
 	sendCommand(cmd, 0);
-LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_TT550::set_vfoTX(long freq)
@@ -373,37 +372,39 @@ void RIG_TT550::set_vfoTX(long freq)
 	int XitAdj;
 	long lFreq = freq * (1 + VfoAdj * 1e-6);
 
+LOG_WARN("tx freq = %ld", freq);
+
 	lFreq += XitAdj = XitActive ? XitFreq : 0;
 
 	if (progStatus.tt550_use_xmt_bw)
 		FilterBw = TT550_xmt_filter_width[progStatus.tt550_xmt_bw];
 	else
-		FilterBw = TT550_filter_width[bwA];
+		FilterBw = TT550_filter_width[defbw_];
 	if (FilterBw < 900) FilterBw = 900;
 	if (FilterBw > 3900) FilterBw = 3900;
-//	if (modeA == TT550_DIGI_MODE) FilterBw = 3000;
+//	if (def_mode == TT550_DIGI_MODE) FilterBw = 3000;
 
 	bwBFO = (FilterBw/2) + 200;
 	IBfo = (bwBFO > IBfo) ?  bwBFO : IBfo ;
 
-	if (modeA == TT550_USB_MODE || modeA == TT550_DIGI_MODE) {
+	if (def_mode == TT550_USB_MODE || def_mode == TT550_DIGI_MODE) {
 		lFreq += IBfo;
 		TBfo = (int)(IBfo * 2.73);
 	}
 
-	if (modeA == TT550_LSB_MODE) {
+	if (def_mode == TT550_LSB_MODE) {
 		lFreq -= IBfo;
 		TBfo = (int)(IBfo * 2.73);
 	}
 
 // CW Mode uses LSB Mode
-	if(modeA == TT550_CW_MODE) {
+	if(def_mode == TT550_CW_MODE) {
 		IBfo = 1500; // fixed for CW
 		lFreq += Bfo - IBfo;
 		TBfo = (int)(Bfo * 2.73);
 	}
 
-	if(modeA == TT550_FM_MODE) {
+	if(def_mode == TT550_FM_MODE) {
 		IBfo = 0;
 		lFreq -= IBfo;
 		TBfo = 0;
@@ -422,28 +423,31 @@ void RIG_TT550::set_vfoTX(long freq)
 	cmd += TBfo & 0xff;
 	cmd += '\r';
 	sendCommand(cmd, 0);
-LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_TT550::set_split(bool val)
 {
 	split = val;
+	selectA();
 	if (split)
 		set_vfoTX(freqB);
-	else
-		set_vfoTX(freqA);
+}
+
+void RIG_TT550::set_vfo(long freq)
+{
+//LOG_WARN("set vfo %ld", freq);
+	set_vfoRX(freq);
+	if (!split)
+		set_vfoTX(freq);
+	xcvrstream.clear();
 }
 
 void RIG_TT550::set_vfoA (long freq)
 {
+//LOG_WARN("set vfo A %ld", freq);
 	freqA = freq;
-	if (onA) {
-		set_vfoRX(freq);
-		if (!split)
-			set_vfoTX(freq);
-		xcvrstream.clear();
-	}
-	return ;
+	if (onA)
+		set_vfo(freq);
 }
 
 long RIG_TT550::get_vfoA ()
@@ -453,15 +457,10 @@ long RIG_TT550::get_vfoA ()
 
 void RIG_TT550::set_vfoB (long freq)
 {
+//LOG_WARN("set vfo B %ld", freq);
 	freqB = freq;
-	if (!onA) {
-		set_vfoRX(freqB);
-		set_vfoTX(freqB);
-	} else if (split) {
-		set_vfoRX(freqA);
-		set_vfoTX(freqB);
-	}
-	xcvrstream.clear();
+	if (!onA)
+		set_vfo(freqB);
 }
 
 long RIG_TT550::get_vfoB ()
@@ -478,10 +477,11 @@ void RIG_TT550::set_PTT_control(int val)
 LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 }
 
-void RIG_TT550::set_modeA(int val)
+void RIG_TT550::set_mode(int val)
 {
-	modeA = val;
-	if (modeA == TT550_AM_MODE) {
+LOG_WARN("mode = %d", val);
+	def_mode = val;
+	if (val == TT550_AM_MODE) {
 
 		cmd = TT550setMODE;
 		cmd[1] = cmd[2] = TT550mode_chr[val];
@@ -498,10 +498,37 @@ void RIG_TT550::set_modeA(int val)
 		cmd = TT550setMODE;
 		cmd[1] = cmd[2] = TT550mode_chr[val];
 		sendCommand(cmd, 0);
-LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 		set_power_control(progStatus.power_level);
 	}
-	set_bwA(bwA);
+	set_bw(defbw_);
+}
+
+void RIG_TT550::set_modeA(int val)
+{
+	modeA = val;
+	set_mode(val);
+}
+
+void RIG_TT550::set_modeB(int val)
+{
+	modeB = val;
+	set_mode(val);
+}
+
+int  RIG_TT550::get_modeB()
+{
+	return modeB;
+}
+
+void RIG_TT550::set_bwB(int val)
+{
+	bwB = val;
+	set_bw(val);
+}
+
+int  RIG_TT550::get_bwB()
+{
+	return bwB;
 }
 
 static int ret_mode = TT550_CW_MODE;
@@ -537,10 +564,11 @@ int RIG_TT550::get_modetype(int n)
 	return TT550mode_type[n];
 }
 
-void RIG_TT550::set_bwA(int val)
+void RIG_TT550::set_bw(int val)
 {
-	bwA = val;
-	int rxbw = TT550_filter_nbr[bwA];
+LOG_WARN("bw = %d", val);
+	defbw_ = val;
+	int rxbw = TT550_filter_nbr[val];
 	int txbw = rxbw;
 	if (progStatus.tt550_use_xmt_bw)
 		txbw = TT550_xmt_filter_nbr[progStatus.tt550_xmt_bw];
@@ -549,12 +577,16 @@ void RIG_TT550::set_bwA(int val)
 	cmd = TT550setRcvBW;
 	cmd[1] = rxbw;
 	sendCommand(cmd, 0);
-LOG_WARN("%s", str2hex(cmd.c_str(), cmd.length()));
 	cmd = TT550setXmtBW;
 	cmd[1] = txbw;
 	sendCommand(cmd, 0);
-LOG_WARN("%s", str2hex(cmd.c_str(), cmd.length()));
-	set_vfoA(freqA);
+	set_vfo(onA ? freqA : freqB);
+}
+
+void RIG_TT550::set_bwA(int val)
+{
+	bwA = val;
+	set_bw(bwA);
 }
 
 int RIG_TT550::get_bwA()
@@ -580,7 +612,7 @@ void RIG_TT550::set_if_shift(int val)
 //	if (PbtFreq) PbtActive = true;
 	pbt = val;
 	if (pbt) PbtActive = true;
-	set_vfoRX(freqA);
+	set_vfoRX(onA ? freqA : freqB);
 }
 
 bool RIG_TT550::get_if_shift(int &val)
@@ -635,6 +667,7 @@ static void update_encA(void *d)
 
 void RIG_TT550::selectA()
 {
+//LOG_WARN("%s", "select A");
 	onA = true;
 	Fl::awake(hide_encA, NULL);
 	xcvrstream.clear();
@@ -642,6 +675,7 @@ void RIG_TT550::selectA()
 
 void RIG_TT550::selectB()
 {
+//LOG_WARN("%s", "select B");
 	onA = false;
 	Fl::awake(hide_encA, NULL);
 	xcvrstream.clear();
@@ -719,7 +753,7 @@ void RIG_TT550::fkey_cw_plus()
 
 void RIG_TT550::fkey_cw_minus()
 {
-//	LOG_WARN("%s", tt550_fkey_strings[3]);
+//	LOG_WARN("%s", tt550_fkey_strings[3]);set_bw
 	if (progStatus.tt550_cw_wpm <= 5) return;
 	progStatus.tt550_cw_wpm--;
 	cnt_tt550_cw_wpm->value(progStatus.tt550_cw_wpm);
@@ -1001,10 +1035,7 @@ int RIG_TT550::getBfo()
 void RIG_TT550::setVfoAdj(double v)
 {
 	VfoAdj = v;
-	if (onA)
-		set_vfoRX(freqA);
-	else
-		set_vfoRX(freqB);
+	set_vfoRX(onA ? freqA : freqB);
 }
 
 void RIG_TT550::setRit(int val)
@@ -1262,7 +1293,7 @@ void RIG_TT550::get_mic_min_max_step(int &min, int &max, int &step)
 
 void RIG_TT550::set_power_control(double val)
 {
-	if (modeA == TT550_AM_MODE) {
+	if (def_mode == TT550_AM_MODE) {
 		progStatus.tt550_AM_level = (int)val;
 		cmd = TT550setAMCARRIER;
 		cmd[1] = (unsigned char)(val * .64);

@@ -450,11 +450,13 @@ void serviceA()
 
 // if TT550 etal and on the B vfo
 	if (selrig->can_change_alt_vfo && useB) {
+LOG_WARN("%s","1");
 		selrig->set_vfoA(vfoA.freq);
 		goto end_serviceA;
 	}
 
 	if (vfoA.freq != vfo.freq || changed_vfo) {
+LOG_WARN("%s","2");
 		selrig->set_vfoA(vfoA.freq);
 		Fl::awake(setFreqDispA, (void *)vfoA.freq);
 		vfo.freq = vfoA.freq;
