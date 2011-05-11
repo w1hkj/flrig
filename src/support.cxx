@@ -82,8 +82,8 @@ char *print(FREQMODE data)
 	snprintf(str, sizeof(str), "%3s,%10ld,%4s,%5s",
 		data.src == XML ? "xml" : "ui",
 		data.freq,
-		selrig->modes_[data.imode],
-		selrig->bandwidths_[data.iBW]);
+		selrig->modes_ ? selrig->modes_[data.imode] : "modes n/a",
+		selrig->bandwidths_ ? selrig->bandwidths_[data.iBW] : "bw n/a");
 	return str;
 }
 

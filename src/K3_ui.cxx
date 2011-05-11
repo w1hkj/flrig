@@ -106,6 +106,8 @@ void K3_set_split(int val)
 
 }
 
+extern char *print(FREQMODE data);
+
 void K3_A2B()
 {
 	pthread_mutex_lock(&mutex_serial);
@@ -125,6 +127,7 @@ void cb_K3_swapAB()
 	vfoA = vfoB;
 	vfoB = temp;
 	vfo = vfoA;
+
 	selrig->set_vfoA(vfoA.freq);
 	selrig->set_bwA(vfoA.iBW);
 	selrig->set_modeA(vfoA.imode);
