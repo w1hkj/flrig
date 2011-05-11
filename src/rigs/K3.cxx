@@ -89,6 +89,7 @@ void RIG_K3::initialize()
 	set_split(false); // normal ops
 
 	cmd = "OM;"; // request options to get power level
+	sendCommand(cmd, 0);   // was missing !!
 	waitResponse(500);
 	showresp(WARN, ASC, "options", cmd, replystr);
 	if (replystr.find("P") == string::npos) {
