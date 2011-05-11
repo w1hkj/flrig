@@ -42,6 +42,8 @@ RIG_K3::RIG_K3() {
 	modeB = 1;
 	bwB = 3000;
 
+	can_change_alt_vfo =
+
 	has_micgain_control =
 	has_rf_control =
 	has_bandwidth_control =
