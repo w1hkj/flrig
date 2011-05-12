@@ -43,12 +43,16 @@ RIG_TT566::RIG_TT566() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	modeA = 1;
-	bwA = 19;
+	def_mode = modeB = modeA = 1;
+	def_bw = bwB = bwA = 19;
+	def_freq = freqB = freqA = 14070000;
 	can_change_alt_vfo = true;
 
 	max_power = 100;
 
+	has_smeter =
+	has_power_out =
+	has_swr_control =
 	has_rf_control =
 	has_volume_control =
 	has_ifshift_control =

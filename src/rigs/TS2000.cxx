@@ -74,6 +74,9 @@ RIG_TS2000::RIG_TS2000() {
 	has_ifshift_control =
 	has_swr_control = false;
 
+	has_smeter =
+	has_power_out =
+	has_swr_control =
 	has_noise_control =
 	has_micgain_control =
 	has_volume_control =

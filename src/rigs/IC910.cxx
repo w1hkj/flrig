@@ -26,7 +26,7 @@ RIG_IC910H::RIG_IC910H() {
 	_mode_type = IC910H_mode_type;
 	bandwidths_ = IC910H_widths;
 
-	deffreq_ = 1296070000L;
+	def_freq = 1296070000L;
 	def_mode = 1;
 
 	has_notch_control =
@@ -34,6 +34,7 @@ RIG_IC910H::RIG_IC910H() {
 	has_alc_control =
 	has_bandwidth_control = false;
 
+	has_smeter =
 	has_vox_onoff =
 	has_vox_gain =
 	has_vox_anti =
@@ -147,5 +148,25 @@ void RIG_IC910H::set_vox_hang()
 	cmd.append(to_bcd(progStatus.vox_hang * 255 / 100, 3));
 	cmd.append(post);
 	waitFB("set vox hang");
+}
+
+int RIG_IC910H::get_smeter()
+{
+	string cstr = "\x16\x02";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+	int mtr= -1;
+	if (waitFOR(9, "get smeter")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			mtr = fm_bcd(&replystr[p+6], 3);
+			mtr = (int)(mtr /2.55);
+			if (mtr > 100) mtr = 100;
+		}
+	}
+	return mtr;
 }
 

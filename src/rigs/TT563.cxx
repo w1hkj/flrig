@@ -39,6 +39,10 @@ RIG_TT563::RIG_TT563() {
 	modeA = 1;
 	bwA = 0;
 
+	def_mode = modeB = modeA = 1;
+	def_bw = bwB = bwA = 1;
+	def_freq = freqB = freqA = 14070000;
+
 	has_mode_control = true;
 	has_ptt_control = true;
 

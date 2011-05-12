@@ -328,7 +328,6 @@ static void send_rig_info()
 	XmlRpcValue res;
 	try {
 		execute(rig_take_control, XmlRpcValue(), res);
-//		execute(rig_set_name, selrig->name_, res);
 
 		send_name();
 		send_modes();
@@ -338,22 +337,12 @@ static void send_rig_info()
 		else       xmlvfo = vfoB;
 
 		send_new_mode(xmlvfo.imode);
-//		XmlRpcValue mode(selrig->modes_[xmlvfo.imode]);
-//		execute(rig_set_mode, mode, res);
 
 		send_new_bandwidth(xmlvfo.iBW);
-//		if (selrig->bandwidths_ && xmlvfo.iBW != -1) {
-//			XmlRpcValue bandwidth(selrig->bandwidths_[xmlvfo.iBW]);
-//			execute(rig_set_bandwidth, bandwidth, res);
-//		}
 
 		send_sideband();
-//		XmlRpcValue sideband(selrig->get_modetype(xmlvfo.imode) == 'U' ? "USB" : "LSB");
-//		execute(main_set_wf_sideband, sideband, res);
 
 		send_new_freq(xmlvfo.freq);
-//		XmlRpcValue freq((double)xmlvfo.freq);
-//		execute(rig_set_frequency, freq, res);
 
 if (XML_DEBUG)
 	LOG_WARN("%s", print(xmlvfo));
@@ -407,7 +396,6 @@ void * digi_loop(void *d)
 	for (;;) {
 		MilliSleep(RIG_UPDATE_INTERVAL);
 		if (!run_digi_loop) break;
-//		if (bypass_digi_loop) continue;
 		pthread_mutex_lock(&mutex_xmlrpc);
 		try {
 			if (rig_reset || (!fldigi_online && (--try_count == 0)))

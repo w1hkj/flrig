@@ -99,11 +99,9 @@ RIG_TT588::RIG_TT588() {
 	comm_dtrptt = false;
 	serloop_timing = 200;
 
-	modeA = 1;
-	bwA = 25;
-	def_mode = 3;
-	defbw_ = 25;
-	deffreq_ = 14070000;
+	def_mode = modeB = modeA = 1;
+	def_bw = bwB = bwA = 25;
+	def_freq = freqB = freqA = 14070000;
 	max_power = 100;
 	pbt = 0;
 	VfoAdj = progStatus.vfo_adj;
@@ -120,6 +118,9 @@ RIG_TT588::RIG_TT588() {
 	has_vfo_adj = false;
 
  
+	has_smeter =
+	has_power_out =
+	has_swr_control =
 	has_volume_control =
 	has_rf_control =
 	has_attenuator_control =

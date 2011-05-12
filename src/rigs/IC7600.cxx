@@ -62,6 +62,7 @@ RIG_IC7600::RIG_IC7600() {
 	_mode_type = IC7600_mode_type;
 	adjustCIV(defaultCIV);
 
+	has_micgain_control =
 	has_bandwidth_control = true;
 };
 

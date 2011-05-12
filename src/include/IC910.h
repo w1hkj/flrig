@@ -13,6 +13,8 @@ public:
 	void set_vox_gain();
 	void set_vox_anti();
 	void set_vox_hang();
+	
+	int  get_smeter();
 
 	int  adjust_bandwidth(int m) { return 0; }
 

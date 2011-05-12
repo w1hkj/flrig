@@ -180,9 +180,9 @@ void read_mode()
 
 void setBWControl(void *)
 {
-	if (rig_nbr == K3)
-		cntK3bw->value(vfo.iBW);
-	else
+//	if (rig_nbr == K3)
+//		cntK3bw->value(vfo.iBW);
+//	else
 		opBW->index(vfo.iBW);
 }
 
@@ -219,6 +219,7 @@ void read_bandwidth()
 // read current signal level
 void read_smeter()
 {
+	if (!selrig->has_smeter) return;
 	int  sig;
 	pthread_mutex_lock(&mutex_serial);
 	sig = selrig->get_smeter();
@@ -230,6 +231,7 @@ void read_smeter()
 // read power out
 void read_power_out()
 {
+	if (!selrig->has_power_out) return;
 	int sig;
 	pthread_mutex_lock(&mutex_serial);
 	sig = selrig->get_power_out();
@@ -241,6 +243,7 @@ void read_power_out()
 // read swr
 void read_swr()
 {
+	if (!selrig->has_swr_control) return;
 	int sig;
 	pthread_mutex_lock(&mutex_serial);
 	sig = selrig->get_swr();
@@ -450,13 +453,11 @@ void serviceA()
 
 // if TT550 etal and on the B vfo
 	if (selrig->can_change_alt_vfo && useB) {
-LOG_WARN("%s","1");
 		selrig->set_vfoA(vfoA.freq);
 		goto end_serviceA;
 	}
 
 	if (vfoA.freq != vfo.freq || changed_vfo) {
-LOG_WARN("%s","2");
 		selrig->set_vfoA(vfoA.freq);
 		Fl::awake(setFreqDispA, (void *)vfoA.freq);
 		vfo.freq = vfoA.freq;
@@ -602,23 +603,23 @@ void * serial_thread_loop(void *d)
 			resetxmt = true;
 
 			if (!loopcount--) {
-				if (rig_nbr == K3) read_K3();
+				if (rig_nbr == K3) read_K3_rx();
 				else {
 					if (progStatus.poll_frequency) read_vfo();
 					if (progStatus.poll_mode) read_mode();
 					if (progStatus.poll_bandwidth) read_bandwidth();
+					if (progStatus.poll_smeter) read_smeter();
+					if (progStatus.poll_volume) read_volume();
+					if (progStatus.poll_auto_notch) read_auto_notch();
+					if (progStatus.poll_notch) read_notch();
+					if (progStatus.poll_ifshift) read_ifshift();
+					if (progStatus.poll_power_control) read_power_control();
+					if (progStatus.poll_pre_att) read_preamp_att();
+					if (progStatus.poll_micgain) read_mic_gain();
+					if (progStatus.poll_squelch) read_squelch();
+					if (progStatus.poll_rfgain) read_rfgain();
+					if (progStatus.poll_split) read_split();
 				}
-				if (progStatus.poll_smeter) read_smeter();
-				if (progStatus.poll_volume) read_volume();
-				if (progStatus.poll_auto_notch) read_auto_notch();
-				if (progStatus.poll_notch) read_notch();
-				if (progStatus.poll_ifshift) read_ifshift();
-				if (progStatus.poll_power_control) read_power_control();
-				if (progStatus.poll_pre_att) read_preamp_att();
-				if (progStatus.poll_micgain) read_mic_gain();
-				if (progStatus.poll_squelch) read_squelch();
-				if (progStatus.poll_rfgain) read_rfgain();
-				if (progStatus.poll_split) read_split();
 				loopcount = progStatus.serloop_timing / 10;
 			}
 		} else {
@@ -629,9 +630,12 @@ void * serial_thread_loop(void *d)
 			}
 			resetrcv = true;
 			if (!loopcount--) {
-				if (progStatus.poll_pout) read_power_out();
-				if (progStatus.poll_swr) read_swr();
-				if (progStatus.poll_alc) read_alc();
+				if (rig_nbr == K3) read_K3_tx();
+				else {
+					if (progStatus.poll_pout) read_power_out();
+					if (progStatus.poll_swr) read_swr();
+					if (progStatus.poll_alc) read_alc();
+				}
 				loopcount = progStatus.serloop_timing / 10;
 			}
 
@@ -655,23 +659,13 @@ void setBW()
 {
 	FREQMODE fm = vfo;
 	fm.src = UI;
-	if (rig_nbr == K3)
-		fm.iBW = cntK3bw->value();
-	else
-		fm.iBW = opBW->index();
+	fm.iBW = opBW->index();
 	useB ? queB.push(fm) : queA.push(fm);
 	setFocus();
 }
 
 void updateBandwidthControl(void *d)
 {
-	if (rig_nbr == K3) {
-		vfo.iBW = selrig->adjust_bandwidth(vfo.imode);
-		cntK3bw->value(vfo.iBW);
-		useB ? vfoB.iBW = vfo.iBW : vfoA.iBW = vfo.iBW;
-		return;
-	}
-
 	if (selrig->has_bandwidth_control) {
 		if (selrig->adjust_bandwidth(vfo.imode) != -1) {
 			if (old_bws != selrig->bandwidths_) {
@@ -957,10 +951,7 @@ void addFreq() {
 		if (!freq) return;
 		int mode = opMODE->index();
 		int bw;
-		if (rig_nbr == K3)
-			bw = cntK3bw->value();
-		else
-			bw = opBW->index();
+		bw = opBW->index();
 		for (int n = 0; n < numinlist; n++)
 			if (freq == oplist[n].freq && mode == oplist[n].imode) {
 				oplist[n].iBW = bw;
@@ -975,10 +966,7 @@ void addFreq() {
 		if (!freq) return;
 		int mode = opMODE->index();
 		int bw;
-		if (rig_nbr == K3)
-			bw = cntK3bw->value();
-		else
-			bw = opBW->index();
+		bw = opBW->index();
 		for (int n = 0; n < numinlist; n++)
 			if (freq == oplist[n].freq && mode == oplist[n].imode) {
 				oplist[n].iBW = bw;
@@ -1194,7 +1182,8 @@ void cbbtnMicLine()
 
 void setMicGainControl(void* d)
 {
-	sldrMICGAIN->value((long)d);
+	int val = (long)d;
+	sldrMICGAIN->value(val);
 }
 
 void set_power_controlImage(double pwr)
@@ -1656,6 +1645,25 @@ void initXcvrTab()
 		}
 		op_tt550_XmtBW->activate();
 		op_tt550_XmtBW->index(progStatus.tt550_xmt_bw);
+
+		btn_poll_smeter->activate(); btn_poll_smeter->value(progStatus.poll_smeter);
+		btn_poll_pout->activate(); btn_poll_pout->value(progStatus.poll_pout);
+		btn_poll_swr->activate(); btn_poll_swr->value(progStatus.poll_swr);
+		btn_poll_alc->activate(); btn_poll_alc->value(progStatus.poll_alc);
+		btn_poll_frequency->deactivate(); btn_poll_frequency->value(0);
+		btn_poll_mode->deactivate(); btn_poll_mode->value(0);
+		btn_poll_bandwidth->deactivate(); btn_poll_bandwidth->value(0);
+		btn_poll_volume->deactivate(); btn_poll_volume->value(0);
+		btn_poll_notch->deactivate(); btn_poll_notch->value(0);
+		btn_poll_auto_notch->deactivate(); btn_poll_auto_notch->value(0);
+		btn_poll_ifshift->deactivate(); btn_poll_ifshift->value(0);
+		btn_poll_power_control->deactivate(); btn_poll_power_control->value(0);
+		btn_poll_pre_att->deactivate(); btn_poll_pre_att->value(0);
+		btn_poll_squelch->deactivate(); btn_poll_squelch->value(0);
+		btn_poll_micgain->deactivate(); btn_poll_micgain->value(0);
+		btn_poll_rfgain->deactivate(); btn_poll_rfgain->value(0);
+		btn_poll_split->deactivate(); btn_poll_split->value(0);
+
 	} else {
 		if (selrig->has_agc_level) cbo_agc_level->activate(); else cbo_agc_level->deactivate();
 		if (selrig->has_cw_wpm) cnt_cw_wpm->activate(); else cnt_cw_wpm->deactivate();
@@ -1682,6 +1690,44 @@ void initXcvrTab()
 		cnt_line_out->deactivate();
 		mnuRestoreData->show();
 		mnuKeepData->show();
+
+		btn_poll_frequency->activate(); btn_poll_frequency->value(progStatus.poll_smeter);
+		btn_poll_mode->activate(); btn_poll_mode->value(progStatus.poll_mode);
+		btn_poll_bandwidth->activate(); btn_poll_bandwidth->value(progStatus.poll_bandwidth);
+
+		btn_poll_smeter->activate(); btn_poll_smeter->value(progStatus.poll_smeter);
+		btn_poll_pout->activate(); btn_poll_pout->value(progStatus.poll_pout);
+		btn_poll_swr->activate(); btn_poll_swr->value(progStatus.poll_swr);
+		btn_poll_alc->activate(); btn_poll_alc->value(progStatus.poll_alc);
+		btn_poll_volume->activate(); btn_poll_volume->value(progStatus.poll_volume);
+		btn_poll_notch->activate(); btn_poll_notch->value(progStatus.poll_notch);
+		btn_poll_auto_notch->activate(); btn_poll_auto_notch->value(progStatus.poll_auto_notch);
+		btn_poll_ifshift->activate(); btn_poll_ifshift->value(progStatus.poll_ifshift);
+		btn_poll_power_control->activate(); btn_poll_power_control->value(progStatus.poll_power_control);
+		btn_poll_pre_att->activate(); btn_poll_pre_att->value(progStatus.poll_pre_att);
+		btn_poll_squelch->activate(); btn_poll_squelch->value(progStatus.poll_squelch);
+		btn_poll_micgain->activate(); btn_poll_micgain->value(progStatus.poll_micgain);
+		btn_poll_rfgain->activate(); btn_poll_rfgain->value(progStatus.poll_rfgain);
+		btn_poll_split->activate(); btn_poll_split->value(progStatus.poll_split);
+		btn_poll_noise->activate(); btn_poll_noise->value(progStatus.poll_noise);
+
+		if (!selrig->has_smeter) { btn_poll_smeter->deactivate(); btn_poll_smeter->value(0); }
+		if (!selrig->has_power_out) { btn_poll_pout->deactivate(); btn_poll_pout->value(0); }
+		if (!selrig->has_swr_control) { btn_poll_swr->deactivate(); btn_poll_swr->value(0); }
+		if (!selrig->has_alc_control) { btn_poll_alc->deactivate(); btn_poll_alc->value(0); }
+		if (!selrig->has_volume_control) { btn_poll_volume->deactivate(); btn_poll_volume->value(0); }
+		if (!selrig->has_notch_control) { btn_poll_notch->deactivate(); btn_poll_notch->value(0); }
+		if (!selrig->has_auto_notch) { btn_poll_auto_notch->deactivate(); btn_poll_auto_notch->value(0); }
+		if (!selrig->has_ifshift_control) { btn_poll_ifshift->deactivate(); btn_poll_ifshift->value(0); }
+		if (!selrig->has_power_control) { btn_poll_power_control->deactivate(); btn_poll_power_control->value(0); }
+		if (!selrig->has_preamp_control && !selrig->has_attenuator_control) 
+			{ btn_poll_pre_att->deactivate(); btn_poll_pre_att->value(0); }
+		if (!selrig->has_sql_control) { btn_poll_squelch->deactivate(); btn_poll_squelch->value(0); }
+		if (!selrig->has_micgain_control) { btn_poll_micgain->deactivate(); btn_poll_micgain->value(0); }
+		if (!selrig->has_rf_control) { btn_poll_rfgain->deactivate(); btn_poll_rfgain->value(0); }
+		if (!selrig->has_split) { btn_poll_split->deactivate(); btn_poll_split->value(0); }
+		if (!selrig->has_noise_control) {btn_poll_noise->deactivate(); btn_poll_noise->value(0);}
+
 	}
 }
 
@@ -1791,27 +1837,22 @@ void initRig()
 		}
 
 		rigbws_.clear();
-		if (rig_nbr != K3) {
-			opBW->show();
-			opBW->clear();
-			if (selrig->has_bandwidth_control) {
-				old_bws = selrig->bandwidths_;
-				for (int i = 0; selrig->bandwidths_[i] != NULL; i++) {
-					rigbws_.push_back(selrig->bandwidths_[i]);
-						opBW->add(selrig->bandwidths_[i]);
-					}
-				opBW->activate();
-				opBW->index(progStatus.iBW_A);
-			} else {
-				opBW->add(" ");
-				opBW->index(0);
-				opBW->deactivate();
-			}
-			cntK3bw->hide();
+		opBW->show();
+		opBW->clear();
+		if (selrig->has_bandwidth_control) {
+			old_bws = selrig->bandwidths_;
+			for (int i = 0; selrig->bandwidths_[i] != NULL; i++) {
+				rigbws_.push_back(selrig->bandwidths_[i]);
+					opBW->add(selrig->bandwidths_[i]);
+				}
+			opBW->activate();
+			if (progStatus.iBW_A == -1) progStatus.iBW_A = selrig->def_bandwidth(vfoA.imode);
+			if (progStatus.iBW_B == -1) progStatus.iBW_B = selrig->def_bandwidth(vfoB.imode);
+			opBW->index(progStatus.iBW_A);
 		} else {
-			opBW->hide();
-			cntK3bw->lstep(50);
-			cntK3bw->show();
+			opBW->add(" ");
+			opBW->index(0);
+			opBW->deactivate();
 		}
 	}
 
@@ -1993,7 +2034,7 @@ void initRig()
 	}
 
 	if (selrig->has_micgain_control) {
-		int min, max, step;
+		int min = 0, max = 0, step = 0;
 		selrig->get_mic_min_max_step(min, max, step);
 		sldrMICGAIN->minimum(min);
 		sldrMICGAIN->maximum(max);
@@ -2258,6 +2299,10 @@ void initStatusConfigDialog()
 
 	selectRig->index(rig_nbr);
 	mnuBaudrate->index( progStatus.comm_baudrate );
+
+	progStatus.freq_B = progStatus.freq_A = selrig->def_freq;
+	progStatus.iBW_B = progStatus.iBW_A = selrig->def_bw;
+	progStatus.imode_B = progStatus.imode_A = selrig->def_mode;
 
 	selectCommPort->value( progStatus.xcvr_serial_port.c_str() );
 	selectAuxPort->value( progStatus.aux_serial_port.c_str() );

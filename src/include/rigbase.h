@@ -80,8 +80,8 @@ public:
 	bool can_change_alt_vfo;
 
 	int  def_mode;
-	int  defbw_;
-	long deffreq_;
+	int  def_bw;
+	long def_freq;
 	int  max_power;
 	int  last_bw;
 	int  bpf_center;
@@ -117,6 +117,9 @@ public:
 	bool has_alc_control;
 	bool has_rf_control;
 	bool has_sql_control;
+	bool has_smeter;
+	bool has_power_out;
+	bool has_split;
 
 	bool has_agc_level;
 	bool has_cw_wpm;
@@ -297,6 +300,26 @@ public:
 	virtual void adjustCIV(uchar adr) {}
 
 	virtual void read_stream() {}
+
+	virtual int  parse_vfoA(string){return 0;}
+	virtual int  parse_vfoB(string){return 0;}
+	virtual int  parse_modeA(string){return 0;}
+	virtual int  parse_modeB(string){return 0;}
+	virtual int  parse_bwA(string){return 0;}
+	virtual int  parse_bwB(string){return 0;}
+	virtual int  parse_volume_control(string){return 0;}
+	virtual int  parse_power_control(string){return 0;}
+	virtual int  parse_rf_gain(string){return 0;}
+	virtual int  parse_mic_gain(string){return 0;}
+	virtual int  parse_attenuator(string){return 0;}
+	virtual int  parse_preamp(string){return 0;}
+	virtual int  parse_smeter(string){return 0;}
+	virtual int  parse_(string){return 0;}
+	virtual int  parse_noise(string){return 0;}
+	virtual int  parse_power_out(string){return 0;}
+	virtual int  parse_swr(string){return 0;}
+	virtual int  parse_alc(string){return 0;}
+	virtual int  parse_split(string){return 0;}
 
 enum { ERR, WARN, INFO };
 enum { ASC, HEX };

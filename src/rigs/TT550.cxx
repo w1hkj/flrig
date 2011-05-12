@@ -135,8 +135,8 @@ RIG_TT550::RIG_TT550() {
 	serloop_timing = 100;
 
 	def_mode = modeA = modeB = 1;
-	defbw_ = bwA = bwB = 20;
-	deffreq_ = freqA = freqB = 14070000;
+	def_bw = bwA = bwB = 20;
+	def_freq = freqA = freqB = 14070000;
 	max_power = 100;
 	can_change_alt_vfo = true;
 
@@ -150,6 +150,9 @@ RIG_TT550::RIG_TT550() {
 	has_notch_control =
 	has_preamp_control = false;
 
+	has_smeter =
+	has_power_out =
+	has_split =
 	has_swr_control = 
 	has_micgain_control =
 	has_power_control =
@@ -301,7 +304,7 @@ void RIG_TT550::set_vfoRX(long freq)
 	int PbtAdj = PbtActive ? pbt : 0;//PbtFreq : 0;	// passband adj (Hz)
 	int	RitAdj = RitActive ? RitFreq : 0;	// RIT adj (Hz)
 
-	int FiltAdj = (TT550_filter_width[defbw_])/2;		// filter bw (Hz)
+	int FiltAdj = (TT550_filter_width[def_bw])/2;		// filter bw (Hz)
 
 	long lFreq = freq * (1 + VfoAdj * 1e-6) + RitAdj;
 
@@ -379,7 +382,7 @@ LOG_WARN("tx freq = %ld", freq);
 	if (progStatus.tt550_use_xmt_bw)
 		FilterBw = TT550_xmt_filter_width[progStatus.tt550_xmt_bw];
 	else
-		FilterBw = TT550_filter_width[defbw_];
+		FilterBw = TT550_filter_width[def_bw];
 	if (FilterBw < 900) FilterBw = 900;
 	if (FilterBw > 3900) FilterBw = 3900;
 //	if (def_mode == TT550_DIGI_MODE) FilterBw = 3000;
@@ -500,7 +503,7 @@ LOG_WARN("mode = %d", val);
 		sendCommand(cmd, 0);
 		set_power_control(progStatus.power_level);
 	}
-	set_bw(defbw_);
+	set_bw(def_bw);
 }
 
 void RIG_TT550::set_modeA(int val)
@@ -567,7 +570,7 @@ int RIG_TT550::get_modetype(int n)
 void RIG_TT550::set_bw(int val)
 {
 LOG_WARN("bw = %d", val);
-	defbw_ = val;
+	def_bw = val;
 	int rxbw = TT550_filter_nbr[val];
 	int txbw = rxbw;
 	if (progStatus.tt550_use_xmt_bw)
