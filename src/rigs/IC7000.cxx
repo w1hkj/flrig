@@ -66,23 +66,26 @@ RIG_IC7000::RIG_IC7000() {
 
 	has_ifshift_control = false;
 
-	has_auto_notch = true;
-	has_power_control = true;
-	has_volume_control = true;
-	has_mode_control = true;
-	has_bandwidth_control = true;
-	has_micgain_control = true;
-	has_notch_control = true;
-	has_noise_control = true;
-	has_noise_reduction_control = true;
-	has_noise_reduction = true;
-	has_attenuator_control = true;
-	has_preamp_control = true;
-	has_ptt_control = true;
-	has_tune_control = true;
-	has_swr_control = true;
-	has_alc_control = true;
-	has_rf_control = true;
+	has_smeter =
+	has_power_out =
+	has_alc_control =
+	has_swr_control =
+	has_split =
+	has_auto_notch = 
+	has_power_control = 
+	has_volume_control = 
+	has_mode_control = 
+	has_bandwidth_control = 
+	has_micgain_control = 
+	has_notch_control = 
+	has_noise_control = 
+	has_noise_reduction_control = 
+	has_noise_reduction = 
+	has_attenuator_control = 
+	has_preamp_control = 
+	has_ptt_control = 
+	has_tune_control = 
+	has_rf_control = 
 	has_sql_control = true;
 
 };
@@ -545,6 +548,46 @@ int RIG_IC7000::get_smeter()
 	cmd.append( post );
 	int mtr= -1;
 	if (waitFOR(9, "get smeter")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			mtr = fm_bcd(&replystr[p+6], 3);
+			mtr = (int)(mtr /2.55);
+			if (mtr > 100) mtr = 100;
+		}
+	}
+	return mtr;
+}
+
+int RIG_IC7000::get_power_out()
+{
+	string cstr = "\x15\x11";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+	int mtr= -1;
+	if (waitFOR(9, "get pout")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			mtr = fm_bcd(&replystr[p+6], 3);
+			mtr = (int)(mtr /2.55);
+			if (mtr > 100) mtr = 100;
+		}
+	}
+	return mtr;
+}
+
+int RIG_IC7000::get_alc()
+{
+	string cstr = "\x15\x13";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+	int mtr= -1;
+	if (waitFOR(9, "get alc")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			mtr = fm_bcd(&replystr[p+6], 3);

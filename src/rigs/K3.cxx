@@ -19,13 +19,19 @@ const char modenbr[] =
 static const char K3_mode_type[] =
 	{ 'L', 'U', 'U', 'U', 'U', 'U', 'L', 'L' };
 
-static int def_mode_width[] = { 3000, 3000, 800, 3600, 3600, 3000, 800, 3000 };
+static const char *K3_widths[] = {
+   "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
+  "550",  "600",  "650",  "700",  "750",  "800",  "850",  "900",  "950", "1000",
+ "1100", "1200", "1300", "1400", "1500", "1600", "1700", "1800", "1900", "2000",
+ "2200", "2400", "2600", "2800", "3000", "3200", "3400", "3600", NULL};
+
+static int def_mode_width[] = { 34, 34, 15, 37, 37, 34, 15, 34 };
 
 RIG_K3::RIG_K3() {
 // base class values	
 	name_ = K3name_;
 	modes_ = K3modes_;
-	bandwidths_ = NULL;//szNOBWS;
+	bandwidths_ = K3_widths;//szNOBWS;
 	comm_baudrate = BR38400;
 	stopbits = 1;
 	comm_retries = 2;
@@ -37,10 +43,9 @@ RIG_K3::RIG_K3() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	modeA = 1;
-	bwA = 3000;
-	modeB = 1;
-	bwB = 3000;
+	def_freq = freqA = freqB = 14070000;
+	def_mode = modeA = modeB = 1;
+	def_bw = bwA = bwB = 34;
 
 	can_change_alt_vfo =
 
@@ -53,6 +58,9 @@ RIG_K3::RIG_K3() {
 	has_ptt_control =
 	has_noise_control =
 	has_attenuator_control =
+	has_smeter =
+	has_power_out =
+	has_split =
 	has_preamp_control = true;
 
 	has_notch_control =
@@ -60,6 +68,37 @@ RIG_K3::RIG_K3() {
 	has_tune_control =
 	has_swr_control = false;
 
+}
+
+void RIG_K3::showparse(int level, string s, string rx) 
+{
+	time_t now;
+	time(&now);
+	struct tm *local = localtime(&now);
+	char sztm[20];
+	strftime(sztm, sizeof(sztm), "%H:%M:%S", local);
+
+	size_t p;
+	while((p = rx.find('\r')) != string::npos)
+		rx.replace(p, 1, "<cr>");
+	while((p = rx.find('\n')) != string::npos)
+		rx.replace(p, 1, "<lf>");
+	while((p = rx.find('\r')) != string::npos)
+		rx.replace(p, 1, "<cr>");
+	while((p = rx.find('\n')) != string::npos)
+		rx.replace(p, 1, "<lf>");
+
+	switch (level) {
+	case ERR:
+		SLOG_ERROR("%s: %10s, %s", sztm, s.c_str(), rx.c_str());
+		break;
+	case WARN:
+		SLOG_WARN("%s: %10s, %s", sztm, s.c_str(), rx.c_str());
+		break;
+	case INFO:
+	default:
+		SLOG_INFO("%s: %10s, %s", sztm, s.c_str(), rx.c_str());
+	}
 }
 
 int  RIG_K3::adjust_bandwidth(int m)
@@ -75,30 +114,27 @@ int  RIG_K3::def_bandwidth(int m)
 void RIG_K3::initialize()
 {
 	cmd = "AI0;"; // disable auto-info
-	sendCommand(cmd);
-	showresp(WARN, ASC, "disable auto-info", cmd, replystr);
+	sendCommand(cmd, 0);
 
 	cmd = "K31;"; // K3 extended mode
-	sendCommand(cmd);
-	showresp(WARN, ASC, "K3 extended mode", cmd, replystr);
+	sendCommand(cmd, 0);
 
 	cmd = "SWT49;"; // Fine tuning (1 Hz mode)
-	sendCommand(cmd);
-	showresp(WARN, ASC, "1 Hz fine tune mode", cmd, replystr);
+	sendCommand(cmd, 0);
 
 	set_split(false); // normal ops
 
 	cmd = "OM;"; // request options to get power level
 	sendCommand(cmd, 0);   // was missing !!
-	waitResponse(500);
+	waitResponse(100);
 	showresp(WARN, ASC, "options", cmd, replystr);
 	if (replystr.find("P") == string::npos) {
 		minpwr = 0;
 		maxpwr = 12;
-		steppwr = 0.1;
+		steppwr = 1;
 	} else {
 		minpwr = 0;
-		maxpwr = 120;
+		maxpwr = 106;
 		steppwr = 1;
 	}
 
@@ -116,15 +152,17 @@ long RIG_K3::get_vfoA ()
 {
 	cmd = "FA;";
 	sendCommand(cmd, 0);
-	int ret = waitResponse(500);
-	showresp(WARN, ASC, "get vfo A", cmd, replystr);
-	if (ret < 14) return freqA;
-	size_t p = replystr.rfind("FA");
-	if (p == string::npos) return freqA;
-	
+	return freqA;
+}
+
+// s will be in form "FA00014060000;"
+int RIG_K3::parse_vfoA(string s)
+{
+	showparse(WARN, "xcvr vfo A", s);
+	if (s.length() < 14) return freqA;
 	long f = 0;
 	for (size_t n = 2; n < 13; n++)
-		f = f*10 + replystr[p + n] - '0';
+		f = f*10 + s[n] - '0';
 	freqA = f;
 	return freqA;
 }
@@ -138,23 +176,25 @@ void RIG_K3::set_vfoA (long freq)
 		freq /= 10;
 	}
 	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "set vfo A", cmd, replystr);
+	showparse(WARN, "set vfo A", cmd);
+}
+
+// s will be in form "FB00003580000;"
+int RIG_K3::parse_vfoB(string s)
+{
+	showparse(WARN, "xcvr vfo B", s);
+	if (s.length() < 14) return freqB;
+	long f = 0;
+	for (size_t n = 2; n < 13; n++)
+		f = f*10 + s[n] - '0';
+	freqB = f;
+	return freqB;
 }
 
 long RIG_K3::get_vfoB ()
 {
 	cmd = "FB;";
 	sendCommand(cmd, 0);
-	int ret = waitResponse(500);
-	showresp(WARN, ASC, "get vfo B", cmd, replystr);
-	if (ret < 14) return freqB;
-	size_t p = replystr.rfind("FB");
-	if (p == string::npos) return freqB;
-	
-	long f = 0;
-	for (size_t n = 2; n < 13; n++)
-		f = f*10 + replystr[p + n] - '0';
-	freqB = f;
 	return freqB;
 }
 
@@ -167,7 +207,7 @@ void RIG_K3::set_vfoB (long freq)
 		freq /= 10;
 	}
 	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "set vfo B", cmd, replystr);
+	showparse(WARN, "set vfo B", cmd);
 }
 
 // Volume control
@@ -180,21 +220,24 @@ void RIG_K3::set_volume_control(int val)
 		ivol /= 10;
 	}
 	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "set vol", cmd, replystr);
+	showparse(WARN, "set vol", cmd);
 }
 
 int RIG_K3::get_volume_control()
 {
 	cmd = "AG;";
 	sendCommand(cmd, 0);
-	int ret = waitResponse(500);
-	showresp(WARN, ASC, "get vol", cmd, replystr);
-	if (ret < 6) return progStatus.volume;
-	size_t p = replystr.rfind("AG");
-	if (p == string::npos) return 0;
+	return progStatus.volume;
+}
 
-	replystr[p + 5] = 0;
-	int v = atoi(&replystr[p + 2]);
+// s in format AG000;
+int RIG_K3::parse_volume_control(string s)
+{
+	showparse(WARN, "xcvr vol", s);
+	if (s.length() < 6) return progStatus.volume;
+
+	s[5] = 0;
+	int v = atoi(&s[2]);
 	return (int)(v / 2.55);
 }
 
@@ -204,20 +247,20 @@ void RIG_K3::set_modeA(int val)
 	cmd = "MD0;";
 	cmd[2] = modenbr[val];
 	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "set mode A", cmd, replystr);
+	showparse(WARN, "set mode A", cmd);
 }
 
 int RIG_K3::get_modeA()
 {
 	cmd = "MD;";
 	sendCommand(cmd, 0);
-	int ret = waitResponse(500);
-	showresp(WARN, ASC, "get mode A", cmd, replystr);
-	if (ret < 4) return modeA;
-	size_t p = replystr.rfind("MD");
-	if (p == string::npos) return modeA;
-	
-	int md = replystr[p + 2] - '1';
+	return modeA;
+}
+
+int RIG_K3::parse_modeA(string s)
+{
+	if (s.length() < 4) return modeA;
+	int md = s[2] - '1';
 	if (md == 8) md--;
 	return (modeA = md);
 }
@@ -228,20 +271,21 @@ void RIG_K3::set_modeB(int val)
 	cmd = "MD$0;";
 	cmd[3] = modenbr[val];
 	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "set mode B", cmd, replystr);
+	showparse(WARN, "set mode B", cmd);
 }
 
 int RIG_K3::get_modeB()
 {
 	cmd = "MD$;";
 	sendCommand(cmd, 0);
-	int ret = waitResponse(500);
-	showresp(WARN, ASC, "get mode B", cmd, replystr);
-	if (ret < 4) return modeB;
-	size_t p = replystr.rfind("MD$");
-	if (p == string::npos) return modeB;
-	
-	int md = replystr[p + 3] - '1';
+	return modeB;
+}
+
+int RIG_K3::parse_modeB(string s)
+{
+	showparse(WARN, "xcvr mode B", s);
+	if (s.length() < 5) return modeB;
+	int md = s[3] - '1';
 	if (md == 8) md--;
 	return (modeB = md);
 }
@@ -253,6 +297,7 @@ int RIG_K3::get_modetype(int n)
 
 void RIG_K3::set_preamp(int val)
 {
+	progStatus.preamp = val;
 	if (val) sendCommand("PA1;", 0);
 	else	 sendCommand("PA0;", 0);
 }
@@ -261,12 +306,15 @@ int RIG_K3::get_preamp()
 {
 	cmd = "PA;";
 	sendCommand(cmd, 0);
-	int ret = waitResponse(500);
-	showresp(WARN, ASC, "get preamp", cmd, replystr);
-	if (ret < 4) return progStatus.preamp;
-	size_t p = replystr.rfind("PA");
-	if (p == string::npos) return 0;
-	return (replystr[p + 2] == '1' ? 1 : 0);
+	return progStatus.preamp;
+}
+
+int RIG_K3::parse_preamp(string s)
+{
+	showparse(WARN, "xcvr preamp", s);
+	if (s.length() < 4) return progStatus.preamp;
+	progStatus.preamp = (s[2] == '1' ? 1 : 0);
+	return progStatus.preamp;
 }
 
 //
@@ -280,12 +328,15 @@ int RIG_K3::get_attenuator()
 {
 	cmd = "RA;";
 	sendCommand(cmd, 0);
-	int ret = waitResponse(500);
-	showresp(WARN, ASC, "get att", cmd, replystr);
-	if (ret < 5) return progStatus.attenuator;
-	size_t p = replystr.rfind("RA");
-	if (p == string::npos) return 0;
-	return (replystr[p + 3] == '1' ? 1 : 0);
+	return progStatus.attenuator;
+}
+
+int RIG_K3::parse_attenuator(string s)
+{
+	showparse(WARN, "xcvr att", s);
+	if (s.length() < 5) return progStatus.attenuator;
+	progStatus.attenuator = (s[3] == '1' ? 1 : 0);
+	return progStatus.attenuator;
 }
 
 // Transceiver power level
@@ -298,21 +349,24 @@ void RIG_K3::set_power_control(double val)
 		ival /= 10;
 	}
 	sendCommand(cmd, 0);
+	showparse(WARN, "power level", cmd);
 }
 
 int RIG_K3::get_power_control()
 {
 	cmd = "PC;";
 	sendCommand(cmd, 0);
-	int ret = waitResponse(500);
-	showresp(WARN, ASC, "get power ctrl", cmd, replystr);
-	if (ret < 6) return progStatus.power_level;
-	size_t p = replystr.rfind("AG");
-	if (p == string::npos) return progStatus.power_level;
+	return progStatus.power_level;
+}
 
-	replystr[p + 5] = 0;
-	int v = atoi(&replystr[p + 2]);
-	return (int)(v / 2.55);
+int RIG_K3::parse_power_control(string s)
+{
+	showparse(WARN, "xcvr power ctrl", s);
+	if (s.length() < 6) return progStatus.power_level;
+	s[5] = 0;
+	int v = atoi(&s[2]);
+	progStatus.power_level = (int)(v / 2.55);
+	return progStatus.power_level;
 }
 
 void RIG_K3::get_pc_min_max_step(double &min, double &max, double &step)
@@ -330,27 +384,28 @@ void RIG_K3::set_rf_gain(int val)
 		ival /= 10;
 	}
 	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "set rfgain ctrl", cmd, replystr);
+	showparse(WARN, "set rfgain ctrl", cmd);
 }
 
 int RIG_K3::get_rf_gain()
 {
 	cmd = "RG;";
 	sendCommand(cmd, 0);
-	int ret = waitResponse(500);
-	showresp(WARN, ASC, "get rfgain ctrl", cmd, replystr);
-	if (ret < 6) return progStatus.rfgain;
-	size_t p = replystr.rfind("RG");
-	if (p == string::npos) return progStatus.rfgain;
+	return progStatus.rfgain;
+}
 
-	replystr[p + 5] = 0;
-	int v = atoi(&replystr[p + 2]);
-	return v;
+int RIG_K3::parse_rf_gain(string s)
+{
+	showparse(WARN, "xcvr rfgain ctrl", s);
+	if (s.length() < 6) return progStatus.rfgain;
+	s[5] = 0;
+	progStatus.rfgain = atoi(&s[2]);
+	return progStatus.rfgain;
 }
 
 void RIG_K3::get_rf_min_max_step(int &min, int &max, int &step)
 {
-   min = 0; max = 250; step = 0; 
+   min = 0; max = 250; step = 1; 
 }
 
 // Transceiver mic control
@@ -363,27 +418,28 @@ void RIG_K3::set_mic_gain(int val)
 		ival /= 10;
 	}
 	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "set mic ctrl", cmd, replystr);
+	showparse(WARN, "set mic ctrl", cmd);
 }
 
 int RIG_K3::get_mic_gain()
 {
 	cmd = "MG;";
 	sendCommand(cmd, 0);
-	int ret = waitResponse(500);
-	showresp(WARN, ASC, "get mic ctrl", cmd, replystr);
-	if (ret < 6) return progStatus.mic_gain;
-	size_t p = replystr.rfind("MG");
-	if (p == string::npos) return progStatus.mic_gain;
+	return progStatus.mic_gain;
+}
 
-	replystr[p + 5] = 0;
-	int v = atoi(&replystr[p + 2]);
-	return v;
+int RIG_K3::parse_mic_gain(string s)
+{
+	showparse(WARN, "xcvr mic ctrl", s);
+	if (s.length() < 6) return progStatus.mic_gain;
+	s[5] = 0;
+	progStatus.mic_gain = atoi(&s[2]);
+	return progStatus.mic_gain;
 }
 
 void RIG_K3::get_mic_min_max_step(int &min, int &max, int &step)
 {
-   min = 0; max = 60; step = 0; 
+   min = 0; max = 60; step = 1; 
 }
 
 // Tranceiver PTT on/off
@@ -409,14 +465,15 @@ int RIG_K3::get_smeter()
 {
 	cmd = "SM;";
 	sendCommand(cmd, 0);
-	int ret = waitResponse(500);
-	showresp(WARN, ASC, "get s-meter", cmd, replystr);
-	if (ret < 7) return 0;
-	size_t p = replystr.rfind("SM");
-	if (p == string::npos) return 0;
+	return 0;
+}
 
-	replystr[p + 6] = 0;
-	int mtr = atoi(&replystr[p + 3]);
+int RIG_K3::parse_smeter(string s)
+{
+	showparse(WARN, "xcvr s-meter", s);
+	if (s.length() < 7) return 0;
+	s[6] = 0;
+	int mtr = atoi(&s[3]);
 	if (mtr <= 6) mtr = (int) (50.0 * mtr / 6.0);
 	else mtr = (int)(50 + (mtr - 6.0) * 50.0 / 9.0);
 	return mtr;
@@ -432,12 +489,15 @@ int RIG_K3::get_noise()
 {
 	cmd = "NB;";
 	sendCommand(cmd, 0);
-	int ret = waitResponse(500);
-	showresp(WARN, ASC, "get noise", cmd, replystr);
-	if (ret < 4) return progStatus.noise;
-	size_t p = replystr.rfind("NB");
-	if (p == string::npos) return progStatus.noise;
-	return (replystr[p+2] == '1' ? 1 : 0);
+	return progStatus.noise;
+}
+
+int RIG_K3::parse_noise(string s)
+{
+	showparse(WARN, "xcvr noise", s);
+	if (s.length() < 4) return progStatus.noise;
+	progStatus.noise = (s[2] == '1' ? 1 : 0);
+	return progStatus.noise;
 }
 
 //FW $ (Filter Bandwidth and Number; GET/SET)
@@ -448,27 +508,31 @@ void RIG_K3::set_bwA(int val)
 {
 	cmd = "FW0000;";
 	bwA = val;
+	val = atoi(K3_widths[val]);
 	val /= 10; cmd[5] += val % 10;
 	val /= 10; cmd[4] += val % 10;
 	val /= 10; cmd[3] += val % 10;
 	val /= 10; cmd[2] += val % 10;
 	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "set bw A", cmd, replystr);
+	showparse(WARN, "set bw A", cmd);
 }
 
 int RIG_K3::get_bwA()
 {
 	cmd = "FW;";
 	sendCommand(cmd, 0);
-	int ret = waitResponse(500);
-	showresp(WARN, ASC, "get bw A", cmd, replystr);
-	if (ret < 7) return bwA;
-	size_t p = replystr.rfind("FW");
-	if (p == string::npos) return bwA;
-	p += 2;
-	bwA = 0;
-	for (int i = 0; i < 4; i++) bwA = bwA * 10 + replystr[p++] - '0';
-	bwA *= 10;
+	return bwA;
+}
+
+int RIG_K3::parse_bwA(string s)
+{
+	showparse(WARN, "xcvr bw A", s);
+	if (s.length() < 7) return bwA;
+	int bw = 0;
+	for (int i = 2; i < 6; i++) bw = bw * 10 + s[i] - '0';
+	bw *= 10;
+	for (bwA = 0; bwA < 36; bwA++)
+		if (bw <= atoi(K3_widths[bwA])) break;
 	return bwA;
 }
 
@@ -476,27 +540,31 @@ void RIG_K3::set_bwB(int val)
 {
 	cmd = "FW$0000;";
 	bwB = val;
+	val = atoi(K3_widths[val]);
 	val /= 10; cmd[6] += val % 10;
 	val /= 10; cmd[5] += val % 10;
 	val /= 10; cmd[4] += val % 10;
 	val /= 10; cmd[3] += val % 10;
 	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "set bw B", cmd, replystr);
+	showparse(WARN, "set bw B", cmd);
 }
 
 int RIG_K3::get_bwB()
 {
 	cmd = "FW$;";
 	sendCommand(cmd, 0);
-	int ret = waitResponse(500);
-	showresp(WARN, ASC, "get bw B", cmd, replystr);
-	if (ret < 8) return bwB;
-	size_t p = replystr.rfind("FW$");
-	if (p == string::npos) return bwB;
-	p += 3;
-	bwB = 0;
-	for (int i = 0; i < 4; i++) bwB = bwB * 10 + replystr[p++] - '0';
-	bwB *= 10;
+	return bwB;
+}
+
+int RIG_K3::parse_bwB(string s)
+{
+	showparse(WARN, "xcvr bw B", s);
+	if (s.length() < 8) return bwB;
+	int bw = 0;
+	for (int i = 2; i < 6; i++) bw = bw * 10 + s[i] - '0';
+	bw *= 10;
+	for (bwB = 0; bwB < 36; bwB++)
+		if (bw <= atoi(K3_widths[bwB])) break;
 	return bwB;
 }
 
@@ -504,13 +572,15 @@ int RIG_K3::get_power_out()
 {
 	cmd = "BG;"; // responds BGnn; 0 < nn < 10
 	sendCommand(cmd, 0);
-	int ret = waitResponse(500);
-	showresp(WARN, ASC, "get power out", cmd, replystr);
-	if (ret < 5) return 0;
-	size_t p = replystr.rfind("BG");
-	if (p == string::npos) return 0;
-	replystr[p + 4] = 0;
-	int mtr = atoi(&replystr[p + 2]) * 10;
+	return 0;
+}
+
+int RIG_K3::parse_power_out(string s)
+{
+	showparse(WARN, "xcvr power out", s);
+	if (s.length() < 5) return 0;
+	s[4] = 0;
+	int mtr = atoi(&s[2]) * 10;
 	if (mtr > 100) mtr = 100;
 	return mtr;
 }
@@ -524,12 +594,10 @@ void RIG_K3::set_split(bool val)
 {
 	if (val) {
 		cmd = "FT1;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "set split ON", cmd, replystr);
+		sendCommand(cmd, 0);
 	} else {
 		cmd = "FR0;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "set split OFF", cmd, replystr);
+		sendCommand(cmd, 0);
 	}
 }
 
@@ -537,12 +605,14 @@ bool RIG_K3::get_split()
 {
 	cmd = "IF;";
 	sendCommand(cmd, 0);
-	int ret = waitResponse(500);
-	showresp(WARN, ASC, "get info", cmd, replystr);
-	if (ret < 38) return split;
-	size_t p = replystr.rfind("IF");
-	if (p == string::npos) return split;
-	split = replystr[p+32] ? true : false;
-	return split;
+	return false;
+}
+
+int RIG_K3::parse_split(string s)
+{
+	showparse(WARN, "xcvr info", s);
+	if (s.length() < 38) return false;
+	if (s[32] == '1') return true;
+	return false;
 }
 

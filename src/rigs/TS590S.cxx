@@ -87,14 +87,17 @@ RIG_TS590S::RIG_TS590S() {
 	nb_level = 2;
 
 	def_mode = 1;
-	defbw_ = 8;
-	deffreq_ = 14070000;
+	def_bw = 8;
+	def_freq = 14070000;
 
 	has_micgain_control =
 	has_notch_control =
 	has_ifshift_control =
 	has_swr_control = false;
 
+	has_smeter =
+	has_power_out =
+	has_split =
 	has_noise_control =
 	has_micgain_control =
 	has_volume_control =

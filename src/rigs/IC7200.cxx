@@ -76,6 +76,10 @@ RIG_IC7200::RIG_IC7200() {
 	B.imode = 3;
 	B.iBW = 12;
 
+	has_smeter =
+	has_power_out =
+	has_swr_control =
+	has_alc_control =
 	has_sql_control = true;
 	has_power_control = true;
 	has_volume_control = true;

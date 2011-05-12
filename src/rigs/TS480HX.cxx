@@ -39,15 +39,9 @@ RIG_TS480HX::RIG_TS480HX() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	freqA = 14070000;
-	modeA = 1;
-	bwA = 6;
-	freqB = 7035000;
-	modeB = 1;
-	bwB = 6;
-	def_mode = 1;
-	defbw_ = 1;
-	deffreq_ = 14070000;
+	def_freq = freqB = freqA = 14070000;
+	def_mode = modeB = modeA = 1;
+	def_bw = bwB = bwA = 6;
 
 	has_noise_control =
 	has_micgain_control =
@@ -56,6 +50,8 @@ RIG_TS480HX::RIG_TS480HX() {
 	has_ifshift_control =
 	has_swr_control = false;
 
+	has_smeter =
+	has_swr_control =
 	has_attenuator_control =
 	has_mode_control =
 	has_bandwidth_control =

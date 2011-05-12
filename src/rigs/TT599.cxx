@@ -50,6 +50,9 @@ RIG_TT599::RIG_TT599() {
 
 	max_power = 100;
 
+	has_smeter =
+	has_power_out =
+	has_split =
 	has_swr_control =
 	has_mode_control =
 	has_bandwidth_control =

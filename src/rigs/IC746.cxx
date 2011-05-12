@@ -111,8 +111,8 @@ RIG_IC746PRO::RIG_IC746PRO() {
 	atten_level = 0;
 	preamp_level = 0;
 	def_mode = 9;
-	defbw_ = 32;
-	deffreq_ = 14070000;
+	def_bw = 32;
+	def_freq = 14070000;
 	adjustCIV(defaultCIV);
 };
 

@@ -338,8 +338,8 @@ void cbOkXcvrDialog()
 	progStatus.sep_rtsptt = btnSepRTSptt->value();
 
 	progStatus.imode_B  = progStatus.imode_A  = selrig->def_mode;
-	progStatus.iBW_B    = progStatus.iBW_A    = selrig->defbw_;
-	progStatus.freq_B   = progStatus.freq_A   = selrig->deffreq_;
+	progStatus.iBW_B    = progStatus.iBW_A    = selrig->def_bw;
+	progStatus.freq_B   = progStatus.freq_A   = selrig->def_freq;
 
 	init_title();
 

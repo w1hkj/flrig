@@ -42,8 +42,8 @@ RIG_TS450S::RIG_TS450S() {
 	comm_rtsptt = false;
 	comm_dtrptt = false;
 	modeB = modeA = def_mode = 1;
-	bwB = bwA = defbw_ = 1;
-	freqB = freqA = deffreq_ = 14070000;
+	bwB = bwA = def_bw = 1;
+	freqB = freqA = def_freq = 14070000;
 	can_change_alt_vfo = true;
 
 	has_noise_control =
@@ -57,6 +57,8 @@ RIG_TS450S::RIG_TS450S() {
 	has_ifshift_control =
 	has_swr_control = false;
 
+	has_smeter =
+	has_swr_control =
 	has_mode_control =
 	has_bandwidth_control =
 	has_ptt_control = true;

@@ -39,6 +39,8 @@ RIG_MARK_V::RIG_MARK_V() {
 	modeA = 1;
 	bwA = 0;
 
+	has_smeter =
+	has_power_out =
 	has_mode_control =
 	has_bandwidth_control =
 	has_ptt_control =

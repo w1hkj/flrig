@@ -2047,6 +2047,12 @@ static void cb_btn_poll_split(Fl_Check_Button* o, void*) {
   progStatus.poll_split = o->value();
 }
 
+Fl_Check_Button *btn_poll_noise=(Fl_Check_Button *)0;
+
+static void cb_btn_poll_noise(Fl_Check_Button* o, void*) {
+  progStatus.poll_noise = o->value();
+}
+
 Fl_Group *tabSndCmd=(Fl_Group *)0;
 
 Fl_Input2 *txt_command=(Fl_Input2 *)0;
@@ -2429,6 +2435,11 @@ e"));
             btn_poll_split->callback((Fl_Callback*)cb_btn_poll_split);
             o->value(progStatus.poll_split);
           } // Fl_Check_Button* btn_poll_split
+          { Fl_Check_Button* o = btn_poll_noise = new Fl_Check_Button(363, 166, 100, 15, _("Noise"));
+            btn_poll_noise->down_box(FL_DOWN_BOX);
+            btn_poll_noise->callback((Fl_Callback*)cb_btn_poll_noise);
+            o->value(progStatus.poll_noise);
+          } // Fl_Check_Button* btn_poll_noise
           o->end();
         } // Fl_Group* o
         tabPolling->end();

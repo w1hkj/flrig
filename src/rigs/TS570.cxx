@@ -65,6 +65,10 @@ RIG_TS570::RIG_TS570() {
 
 	has_notch_control = false;
 
+	has_smeter =
+	has_power_out =
+	has_swr_control =
+	has_split =
 	has_swr_control =
 	has_ifshift_control =
 	has_noise_control =
@@ -208,8 +212,7 @@ int RIG_TS570::get_smeter()
 
 	replystr[p + 6] = 0;
 	int mtr = atoi(&replystr[p + 2]);
-	mtr = (mtr * 50) / 18;
-	if (mtr > 100) mtr = 100;
+	mtr = (mtr * 100) / 15;
 	return mtr;
 }
 
@@ -225,7 +228,7 @@ int RIG_TS570::get_swr()
 	
 	replystr[p + 7] = 0;
 	int mtr = atoi(&replystr[p + 3]);
-	mtr = (mtr * 100) / 16;
+	mtr = (mtr * 100) / 15;
 	return mtr;
 }
 
@@ -241,8 +244,8 @@ int RIG_TS570::get_power_out()
 	
 	replystr[p + 6] = 0;
 	int mtr = atoi(&replystr[p + 2]);
-	if (mtr < 19) mtr = mtr * 40 / 18;
-	else mtr = 40 + (mtr - 18)*60 / 12;
+	mtr = (int)(0.34 + (((0.035*mtr - 0.407)*mtr + 5.074)*mtr));
+	if (mtr < 1) mtr = 0;
 	if (mtr > 100) mtr = 100;
 	return mtr;
 }

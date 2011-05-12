@@ -88,11 +88,10 @@ RIG_TT516::RIG_TT516() {
 	comm_dtrptt = false;
 	serloop_timing = 200;
 
-	A.imode = 3;
-	A.iBW = 36;
-	def_mode = 3;
-	defbw_ = 36;
-	deffreq_ = 14070000;
+	def_mode = modeB = modeA = B.imode = A.imode = 1;
+	def_bw = bwB = bwA = B.iBW = A.iBW = 34;
+	def_freq = freqB = freqA = B.freq = A.freq = 14070000;
+
 	max_power = 25;
 	precision = 10;
 	can_change_alt_vfo = true;
@@ -105,6 +104,10 @@ RIG_TT516::RIG_TT516() {
 	has_tune_control =
 	has_swr_control = false;
 
+	has_smeter =
+	has_power_out =
+	has_swr_control =
+	has_split =
 	has_noise_control =
 	has_attenuator_control =
 	has_ifshift_control =

@@ -50,8 +50,8 @@ RIG_FT2000::RIG_FT2000() {
 	modeA = 1;
 	bwA = 2;
 	def_mode = 10;
-	defbw_ = 2;
-	deffreq_ = 14070000;
+	def_bw = 2;
+	def_freq = 14070000;
 
 
 	has_power_control =

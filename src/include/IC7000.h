@@ -46,6 +46,8 @@ public:
 	int  get_auto_notch();
 	void set_auto_notch(int v);
 	int  get_smeter();
+	int  get_power_out();
+	int  get_alc();
 
 	void set_split(bool v);
 

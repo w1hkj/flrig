@@ -56,6 +56,9 @@ rigbase::rigbase()
 	has_compression =
 	has_bpf_center =
 	has_special =  
+	has_smeter =
+	has_power_out =
+	has_split =
 	has_get_info = false;
 
 	A.freq = 14070000L;
@@ -75,9 +78,9 @@ rigbase::rigbase()
 	modeB = 1;
 	bwB = 0;
 
-	deffreq_ = 14070000L;
+	def_freq = 14070000L;
 	def_mode = 1;
-	defbw_ = 0;
+	def_bw = 0;
 	bpf_center = 0;
 	pbt = 0;
 

@@ -609,7 +609,7 @@ cb_tt550_setXmtBW();}
         } {}
       }
       Fl_Group {} {
-        label {302-B} open selected
+        label {302-B} open
         xywh {2 350 420 50} hide
       } {
         Fl_Choice sel_tt550_F1_func {
@@ -858,16 +858,17 @@ selectFreq();}
   }
 } 
 
-Function {XcvrDialog()} {} {
+Function {XcvrDialog()} {open
+} {
   Fl_Window {} {
-    label {I/O Ports}
-    xywh {575 417 482 257} type Double hide
+    label {I/O Ports} open
+    xywh {575 417 482 257} type Double visible
   } {
     Fl_Tabs tabsConfig {open
       xywh {0 8 477 245}
     } {
       Fl_Group tabPrimary {
-        label Primary
+        label Primary selected
         xywh {2 30 475 222}
       } {
         Fl_Group {} {open
@@ -1114,7 +1115,7 @@ Serial Port for a special Control Signals}
         }
       }
       Fl_Group tabPolling {
-        label Polling
+        label Polling open
         xywh {2 30 470 220} hide
       } {
         Fl_Group {} {
@@ -1227,6 +1228,12 @@ Serial Port for a special Control Signals}
             callback {progStatus.poll_split = o->value();}
             xywh {363 138 100 15} down_box DOWN_BOX
             code0 {o->value(progStatus.poll_split);}
+          }
+          Fl_Check_Button btn_poll_noise {
+            label Noise
+            callback {progStatus.poll_noise = o->value();}
+            xywh {363 166 100 15} down_box DOWN_BOX
+            code0 {o->value(progStatus.poll_noise);}
           }
         }
       }
