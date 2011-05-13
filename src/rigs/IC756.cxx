@@ -297,7 +297,7 @@ void RIG_IC756PRO::set_split(bool val)
 {
 	cmd = pre_to;
 	cmd += 0x0F;
-	cmd += val ? 0x10 : 0x00;
+	cmd += val ? 0x01 : 0x00;
 	cmd.append(post);
 	waitFB("set split");
 }

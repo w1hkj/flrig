@@ -54,6 +54,8 @@ RIG_IC756PRO3::RIG_IC756PRO3() {
 	def_mode = modeA = modeB = B.imode = 1;
 	def_bw = bwA = bwB = A.iBW = B.iBW = 32;
 
+	can_change_alt_vfo =
+
 	has_bandwidth_control =
 	has_ifshift_control =
 	has_tune_control =
@@ -80,7 +82,7 @@ void RIG_IC756PRO3::selectA()
 {
 	cmd = pre_to;
 	cmd += '\x07';
-	cmd += '\x00';
+	cmd += '\xD0';
 	cmd.append(post);
 	waitFB("sel A");
 }
@@ -89,7 +91,7 @@ void RIG_IC756PRO3::selectB()
 {
 	cmd = pre_to;
 	cmd += '\x07';
-	cmd += '\x01';
+	cmd += '\xD1';
 	cmd.append(post);
 	waitFB("sel B");
 }
@@ -364,7 +366,7 @@ void RIG_IC756PRO3::set_split(bool val)
 {
 	cmd = pre_to;
 	cmd += 0x0F;
-	cmd += val ? 0x10 : 0x00;
+	cmd += val ? 0x01 : 0x00;
 	cmd.append(post);
 	waitFB("set split");
 }
