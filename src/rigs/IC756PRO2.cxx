@@ -1,89 +1,28 @@
 /*
- * Icom IC-746, 746PRO
- * 
+ * Icom 756PRO-II
+ *
  * a part of flrig
  *
  * Copyright 2009, Dave Freese, W1HKJ
  *
  */
 
-#include "IC746.h"
+#include "IC756PRO2.h"
+#include "debug.h"
+#include "support.h"
+
+const char IC756PRO2name_[] = "IC-756PRO-II";
 
 //=============================================================================
-// IC-746, IC746PRO
-//=============================================================================
-
-const char IC746name_[] = "IC-746";
-
-const char *IC746modes_[] = {
-		"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R", NULL};
-// mode values are 0, 1, 2, 3, 4, 5, 7, 8
-const char IC746_mode_type[] =
-	{ 'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U'};
-
-const char *IC746_widths[] = { "NORM", "NARR", NULL};
-
-RIG_IC746::RIG_IC746() {
-	defaultCIV = 0x56;
-	name_ = IC746name_;
-	modes_ = IC746modes_;
-	bandwidths_ = IC746_widths;
-	_mode_type = IC746_mode_type;
-
-	comm_baudrate = BR9600;
-	stopbits = 1;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_echo = true;
-	comm_rtscts = false;
-	comm_rtsplus = true;
-	comm_dtrplus = true;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
-
-	def_mode = modeB = modeA = B.imode = A.imode = 1;
-	def_bw = bwB = bwA = B.iBW = A.iBW = 0;
-	def_freq = freqB = freqA = B.freq = A.freq = 14070000L;
-
-	ICvol = 0;
-
-	has_smeter =
-	has_power_control =
-	has_volume_control =
-	has_mode_control =
-	has_bandwidth_control =
-	has_micgain_control =
-	has_notch_control =
-	has_attenuator_control =
-	has_preamp_control =
-	has_ifshift_control =
-	has_ptt_control =
-	has_tune_control =
-	has_noise_control =
-	has_noise_reduction =
-	has_noise_reduction_control =
-	has_rf_control =
-	has_sql_control =
-	has_split =
-	restore_mbw = true;
-
-};
-
-//=============================================================================
-// 746PRO
-const char IC746PROname_[] = "IC-746PRO";
-
-const char *IC746PROmodes_[] = {
+const char *IC756PRO2modes_[] = {
 		"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R",
 		"D-LSB", "D-USB", "D-FM", NULL};
 
-const char IC746PRO_mode_type[] =
+const char IC756PRO2_mode_type[] =
 	{ 'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U',
 	  'L', 'U', 'U' };
 
-const char *IC746PRO_SSBwidths[] = {
+const char *IC756PRO2_SSBwidths[] = {
   "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
 "600",   "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
@@ -91,32 +30,53 @@ const char *IC746PRO_SSBwidths[] = {
 "3600",
 NULL};
 
-const char *IC746PRO_RTTYwidths[] = {
+const char *IC756PRO2_RTTYwidths[] = {
   "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
  "600",  "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
 "2600", "2700",
 NULL};
 
-const char *IC746PRO_AMFMwidths[] = { "FILT-1", "FILT-2", "FILT-3", NULL };
+const char *IC756PRO2_AMFMwidths[] = { "FILT-1", "FILT-2", "FILT-3", NULL };
 
-RIG_IC746PRO::RIG_IC746PRO() {
-	defaultCIV = 0x66;
-	name_ = IC746PROname_;
-	modes_ = IC746PROmodes_;
-	bandwidths_ = IC746PRO_SSBwidths;
-	_mode_type = IC746PRO_mode_type;
+RIG_IC756PRO2::RIG_IC756PRO2() {
+	defaultCIV = 0x64;
+	name_ = IC756PRO2name_;
+	modes_ = IC756PRO2modes_;
+	bandwidths_ = IC756PRO2_SSBwidths;
+	_mode_type = IC756PRO2_mode_type;
+
+	def_freq = freqA = freqB = A.freq = 14070000;
+	def_mode = modeA = modeB = B.imode = 1;
+	def_bw = bwA = bwB = A.iBW = B.iBW = 32;
+
 	atten_level = 0;
 	preamp_level = 0;
 
-	has_swr_control =
-	has_alc_control =
-	has_power_out = true;
-
 	adjustCIV(defaultCIV);
+
+	has_bandwidth_control =
+	has_ifshift_control =
+	has_tune_control =
+	has_swr_control =
+	has_alc_control = 
+	has_smeter =
+	has_power_control =
+	has_volume_control =
+	has_mode_control =
+	has_micgain_control =
+	has_auto_notch =
+	has_attenuator_control =
+	has_preamp_control =
+	has_ptt_control =
+	has_noise_reduction =
+	has_noise_reduction_control =
+	has_noise_control =
+	has_rf_control = true;
+
 };
 
-void RIG_IC746::selectA()
+void RIG_IC756PRO2::selectA()
 {
 	cmd = pre_to;
 	cmd += '\x07';
@@ -125,7 +85,7 @@ void RIG_IC746::selectA()
 	waitFB("sel A");
 }
 
-void RIG_IC746::selectB()
+void RIG_IC756PRO2::selectB()
 {
 	cmd = pre_to;
 	cmd += '\x07';
@@ -134,7 +94,7 @@ void RIG_IC746::selectB()
 	waitFB("sel B");
 }
 
-long RIG_IC746::get_vfoA ()
+long RIG_IC756PRO2::get_vfoA ()
 {
 	string cstr = "\x03";
 	string resp = pre_fm;
@@ -150,7 +110,7 @@ long RIG_IC746::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_IC746::set_vfoA (long freq)
+void RIG_IC756PRO2::set_vfoA (long freq)
 {
 	A.freq = freq;
 	cmd = pre_to;
@@ -160,7 +120,7 @@ void RIG_IC746::set_vfoA (long freq)
 	waitFB("set vfo A");
 }
 
-long RIG_IC746::get_vfoB ()
+long RIG_IC756PRO2::get_vfoB ()
 {
 	string cstr = "\x03";
 	string resp = pre_fm;
@@ -176,7 +136,7 @@ long RIG_IC746::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_IC746::set_vfoB (long freq)
+void RIG_IC756PRO2::set_vfoB (long freq)
 {
 	B.freq = freq;
 	cmd = pre_to;
@@ -186,7 +146,7 @@ void RIG_IC746::set_vfoB (long freq)
 	waitFB("set vfo B");
 }
 
-int RIG_IC746::get_smeter()
+int RIG_IC756PRO2::get_smeter()
 {
 	string cstr = "\x15\x02";
 	string resp = pre_fm;
@@ -204,7 +164,7 @@ int RIG_IC746::get_smeter()
 
 // Volume control val 0 ... 100
 
-void RIG_IC746::set_volume_control(int val)
+void RIG_IC756PRO2::set_volume_control(int val)
 {
 	ICvol = (int)(val);
 	cmd = pre_to;
@@ -214,7 +174,7 @@ void RIG_IC746::set_volume_control(int val)
 	waitFB("set vol");
 }
 
-int RIG_IC746::get_volume_control()
+int RIG_IC756PRO2::get_volume_control()
 {
 	string cstr = "\x14\x01";
 	string resp = pre_fm;
@@ -230,13 +190,13 @@ int RIG_IC746::get_volume_control()
 	return 0;
 }
 
-void RIG_IC746::get_vol_min_max_step(int &min, int &max, int &step)
+void RIG_IC756PRO2::get_vol_min_max_step(int &min, int &max, int &step)
 {
 	min = 0; max = 255; step = 1;
 }
 
 // Tranceiver PTT on/off
-void RIG_IC746::set_PTT_control(int val)
+void RIG_IC756PRO2::set_PTT_control(int val)
 {
 	cmd = pre_to;
 	cmd += '\x1c';
@@ -246,84 +206,8 @@ void RIG_IC746::set_PTT_control(int val)
 	waitFB("set PTT");
 }
 
-void RIG_IC746::set_attenuator(int val)
-{
-	cmd = pre_to;
-	cmd += '\x11';
-	cmd += val ? 0x20 : 0x00;
-	cmd.append( post );
-	waitFB("set att");
-	if (!val) {
-		preamp_level--;
-		if (preamp_level < 0) preamp_level = 2;
-		set_preamp(1);
-	}
-}
-
-int RIG_IC746::get_attenuator()
-{
-	string cstr = "\x11";
-	string resp = pre_fm;
-	resp.append(cstr);
-	cmd = pre_to;
-	cmd.append(cstr);
-	cmd.append(post);
-	if (waitFOR(7, "get att")) {
-		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			return (replystr[p+5] ? 1 : 0);
-	}
-	return 0;
-}
-
-void RIG_IC746::set_preamp(int val)
-{
-	if (preamp_level == 0) {
-		preamp_level = 1;
-		preamp_label("Pre 1", true);
-	} else if (preamp_level == 1) {
-		preamp_level = 2;
-		preamp_label("Pre 2", true);
-	} else if (preamp_level == 2) {
-		preamp_level = 0;
-		preamp_label("Pre", false);
-	}
-	cmd = pre_to;
-	cmd += '\x16';
-	cmd += '\x02';
-	cmd += (unsigned char) preamp_level;
-	cmd.append( post );
-	waitFB("set preamp");
-}
-
-int RIG_IC746::get_preamp()
-{
-	string cstr = "\x16\x02";
-	string resp = pre_fm;
-	resp.append(cstr);
-	cmd = pre_to;
-	cmd.append(cstr);
-	cmd.append(post);
-	if (waitFOR(8, "get preamp")) {
-		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
-			if (replystr[p+6] == 0x01) {
-				preamp_label("Pre 1", true);
-				preamp_level = 1;
-			} else if (replystr[p+6] == 0x02) {
-				preamp_label("Pre 2", true);
-				preamp_level = 2;
-			} else {
-				preamp_label("Pre", false);
-				preamp_level = 0;
-			}
-		}
-	}
-	return preamp_level;
-}
-
 // changed noise blanker to noise reduction
-void RIG_IC746::set_noise(bool val)
+void RIG_IC756PRO2::set_noise(bool val)
 {
 	cmd = pre_to;
 	cmd.append("\x16\x22");
@@ -332,7 +216,7 @@ void RIG_IC746::set_noise(bool val)
 	waitFB("set noise");
 }
 
-int RIG_IC746::get_noise()
+int RIG_IC756PRO2::get_noise()
 {
 	string cstr = "\x16\x22";
 	string resp = pre_fm;
@@ -348,7 +232,7 @@ int RIG_IC746::get_noise()
 	return 0;
 }
 
-void RIG_IC746::set_noise_reduction(int val)
+void RIG_IC756PRO2::set_noise_reduction(int val)
 {
 	cmd = pre_to;
 	cmd.append("\x16\x40");
@@ -357,7 +241,7 @@ void RIG_IC746::set_noise_reduction(int val)
 	waitFB("set NR");
 }
 
-int RIG_IC746::get_noise_reduction()
+int RIG_IC756PRO2::get_noise_reduction()
 {
 	string cstr = "\x16\x40";
 	string resp = pre_fm;
@@ -374,7 +258,7 @@ int RIG_IC746::get_noise_reduction()
 }
 
 // 0 < val < 100
-void RIG_IC746::set_noise_reduction_val(int val)
+void RIG_IC756PRO2::set_noise_reduction_val(int val)
 {
 	cmd = pre_to;
 	cmd.append("\x14\x06");
@@ -383,7 +267,7 @@ void RIG_IC746::set_noise_reduction_val(int val)
 	waitFB("set NR val");
 }
 
-int RIG_IC746::get_noise_reduction_val()
+int RIG_IC756PRO2::get_noise_reduction_val()
 {
 	string cstr = "\x14\x06";
 	string resp = pre_fm;
@@ -399,94 +283,13 @@ int RIG_IC746::get_noise_reduction_val()
 	return 0;
 }
 
-void RIG_IC746::set_modeA(int val)
-{
-	A.imode = val;
-	cmd = pre_to;
-	cmd += '\x06';
-	cmd += val > 5 ? val + 1 : val;
-	cmd += A.iBW; // filter #1
-	cmd.append( post );
-	waitFB("set mode A");
-}
 
-int RIG_IC746::get_modeA()
-{
-	string cstr = "\x04";
-	string resp = pre_fm;
-	resp.append(cstr);
-	cmd = pre_to;
-	cmd.append(cstr);
-	cmd.append(post);
-	if (waitFOR(8, "get mode A")) {
-		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
-			A.imode = replystr[p+5];
-			if (A.imode > 6) A.imode--;
-			A.iBW = replystr[p+6];
-		}
-	}
-	return A.imode;
-}
-
-void RIG_IC746::set_bwA(int val)
-{
-	A.iBW = val + 1;
-	set_modeA(A.imode);
-}
-
-int RIG_IC746::get_bwA()
-{
-	return A.iBW - 1;
-}
-
-void RIG_IC746::set_modeB(int val)
-{
-	B.imode = val;
-	cmd = pre_to;
-	cmd += '\x06';
-	cmd += val > 5 ? val + 1 : val;
-	cmd += B.iBW; // filter #1
-	cmd.append( post );
-	waitFB("set mode B");
-}
-
-int RIG_IC746::get_modeB()
-{
-	string cstr = "\x04";
-	string resp = pre_fm;
-	resp.append(cstr);
-	cmd = pre_to;
-	cmd.append(cstr);
-	cmd.append(post);
-	if (waitFOR(8, "get mode B")) {
-		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
-			B.imode = replystr[p+5];
-			if (B.imode > 6) B.imode--;
-			B.iBW = replystr[p+6];
-		}
-	}
-	return B.imode;
-}
-
-void RIG_IC746::set_bwB(int val)
-{
-	B.iBW = val + 1;
-	set_modeB(B.imode);
-}
-
-int RIG_IC746::get_bwB()
-{
-	return B.iBW - 1;
-}
-
-int RIG_IC746::get_modetype(int n)
+int RIG_IC756PRO2::get_modetype(int n)
 {
 	return _mode_type[n];
 }
 
-void RIG_IC746::set_mic_gain(int val)
+void RIG_IC756PRO2::set_mic_gain(int val)
 {
 	val = (int)(val * 255 / 100);
 	cmd = pre_to;
@@ -496,14 +299,14 @@ void RIG_IC746::set_mic_gain(int val)
 	waitFB("set mic");
 }
 
-void RIG_IC746::get_mic_gain_min_max_step(int &min, int &max, int &step)
+void RIG_IC756PRO2::get_mic_gain_min_max_step(int &min, int &max, int &step)
 {
 	min = 0;
 	max = 100;
 	step = 1;
 }
 
-void RIG_IC746::set_if_shift(int val)
+void RIG_IC756PRO2::set_if_shift(int val)
 {
 	int shift = (int)((val + 50) * 2.56 );
 	if (shift == 256) shift = 255;
@@ -520,36 +323,36 @@ void RIG_IC746::set_if_shift(int val)
 	waitFB("set IF val");
 }
 
-void RIG_IC746::get_if_min_max_step(int &min, int &max, int &step)
+void RIG_IC756PRO2::get_if_min_max_step(int &min, int &max, int &step)
 {
 	min = -50;
 	max = +50;
 	step = 2;
 }
 
-int ICsql = 0;
-void RIG_IC746::set_squelch(int val)
+int IC756PRO2sql = 0;
+void RIG_IC756PRO2::set_squelch(int val)
 {
-	ICsql = (int)(val * 255 / 100);
+	IC756PRO2sql = (int)(val * 255 / 100);
 	cmd = pre_to;
 	cmd.append("\x14\x03");
-	cmd.append(to_bcd(ICsql, 3));
+	cmd.append(to_bcd(IC756PRO2sql, 3));
 	cmd.append( post );
 	waitFB("set sql");
 }
 
-int ICrfg = 0;
-void RIG_IC746::set_rf_gain(int val)
+int IC756PRO2rfg = 0;
+void RIG_IC756PRO2::set_rf_gain(int val)
 {
-	ICrfg = (int)(val * 255 / 100);
+	IC756PRO2rfg = (int)(val * 255 / 100);
 	cmd = pre_to;
 	cmd.append("\x14\x02");
-	cmd.append(to_bcd(ICrfg, 3));
+	cmd.append(to_bcd(IC756PRO2rfg, 3));
 	cmd.append( post );
 	waitFB("set rf gain");
 }
 
-void RIG_IC746::set_power_control(double val)
+void RIG_IC756PRO2::set_power_control(double val)
 {
 	cmd = pre_to;
 	cmd.append("\x14\x0A");
@@ -558,7 +361,7 @@ void RIG_IC746::set_power_control(double val)
 	waitFB("set power");
 }
 
-void RIG_IC746::set_split(bool val)
+void RIG_IC756PRO2::set_split(bool val)
 {
 	cmd = pre_to;
 	cmd += 0x0F;
@@ -568,10 +371,10 @@ void RIG_IC746::set_split(bool val)
 }
 
 //======================================================================
-// IC746PRO unique commands
+// IC756PRO2 unique commands
 //======================================================================
 
-void RIG_IC746PRO::set_modeA(int val)
+void RIG_IC756PRO2::set_modeA(int val)
 {
 	A.imode = val;
 	bool datamode = false;
@@ -586,7 +389,6 @@ void RIG_IC746PRO::set_modeA(int val)
 	cmd = pre_to;
 	cmd += '\x06';
 	cmd += val;
-	cmd += A.iBW;
 	cmd.append( post );
 	waitFB("set mode A");
 	if (datamode) { // LSB / USB ==> use DATA mode
@@ -597,7 +399,7 @@ void RIG_IC746PRO::set_modeA(int val)
 	}
 }
 
-int RIG_IC746PRO::get_modeA()
+int RIG_IC756PRO2::get_modeA()
 {
 	int md;
 	string cstr = "\x04";
@@ -637,7 +439,7 @@ int RIG_IC746PRO::get_modeA()
 	return A.imode;
 }
 
-void RIG_IC746PRO::set_modeB(int val)
+void RIG_IC756PRO2::set_modeB(int val)
 {
 	B.imode = val;
 	bool datamode = false;
@@ -652,7 +454,6 @@ void RIG_IC746PRO::set_modeB(int val)
 	cmd = pre_to;
 	cmd += '\x06';
 	cmd += val;
-	cmd += B.iBW;
 	cmd.append( post );
 	waitFB("set mode B");
 	if (datamode) { // LSB / USB ==> use DATA mode
@@ -663,7 +464,7 @@ void RIG_IC746PRO::set_modeB(int val)
 	}
 }
 
-int RIG_IC746PRO::get_modeB()
+int RIG_IC756PRO2::get_modeB()
 {
 	int md;
 	string cstr = "\x04";
@@ -703,25 +504,25 @@ int RIG_IC746PRO::get_modeB()
 	return B.imode;
 }
 
-int RIG_IC746PRO::adjust_bandwidth(int m)
+int RIG_IC756PRO2::adjust_bandwidth(int m)
 {
 	if (m == 0 || m == 1 || m == 8 || m == 9) { //SSB
-		bandwidths_ = IC746PRO_SSBwidths;
+		bandwidths_ = IC756PRO2_SSBwidths;
 		return (32);
 	}
 	if (m == 3 || m == 6) { //CW
-		bandwidths_ = IC746PRO_SSBwidths;
+		bandwidths_ = IC756PRO2_SSBwidths;
 		return (14);
 	}
 	if (m == 4 || m == 7) { //RTTY
-		bandwidths_ = IC746PRO_RTTYwidths;
+		bandwidths_ = IC756PRO2_RTTYwidths;
 		return (28);
 	}
-	bandwidths_ = IC746PRO_AMFMwidths;
+	bandwidths_ = IC756PRO2_AMFMwidths;
 	return (0);
 }
 
-int RIG_IC746PRO::def_bandwidth(int m)
+int RIG_IC756PRO2::def_bandwidth(int m)
 {
 	if (m == 0 || m == 1 || m == 8 || m == 9) { //SSB
 		return (32);
@@ -732,22 +533,22 @@ int RIG_IC746PRO::def_bandwidth(int m)
 	if (m == 4 || m == 7) { //RTTY
 		return (28);
 	}
-	bandwidths_ = IC746PRO_AMFMwidths;
+	bandwidths_ = IC756PRO2_AMFMwidths;
 	return (0);
 }
 
-const char **RIG_IC746PRO::bwtable(int m)
+const char **RIG_IC756PRO2::bwtable(int m)
 {
 	if (m == 0 || m == 1 || m == 8 || m == 9) //SSB
-		return IC746PRO_SSBwidths;
+		return IC756PRO2_SSBwidths;
 	if (m == 3 || m == 6) //CW
-		return IC746PRO_SSBwidths;
+		return IC756PRO2_SSBwidths;
 	if (m == 4 || m == 7) //RTTY
-		return IC746PRO_RTTYwidths;
-	return IC746PRO_AMFMwidths;
+		return IC756PRO2_RTTYwidths;
+	return IC756PRO2_AMFMwidths;
 }
 
-int RIG_IC746PRO::get_swr()
+int RIG_IC756PRO2::get_swr()
 {
 	string cstr = "\x15\x12";
 	string resp = pre_fm;
@@ -763,7 +564,7 @@ int RIG_IC746PRO::get_swr()
 	return -1;
 }
 
-int RIG_IC746PRO::get_alc()
+int RIG_IC756PRO2::get_alc()
 {
 	string cstr = "\x15\x13";
 	string resp = pre_fm;
@@ -780,7 +581,7 @@ int RIG_IC746PRO::get_alc()
 }
 
 // Transceiver power level return power in watts
-int RIG_IC746PRO::get_power_out()
+int RIG_IC756PRO2::get_power_out()
 {
 	string cstr = "\x15\x11";
 	string resp = pre_fm;
@@ -796,7 +597,7 @@ int RIG_IC746PRO::get_power_out()
 	return -1;
 }
 
-void RIG_IC746PRO::tune_rig()
+void RIG_IC756PRO2::tune_rig()
 {
 	cmd = pre_to;
 	cmd.append("\x1c\x01\x02");
@@ -804,9 +605,9 @@ void RIG_IC746PRO::tune_rig()
 	waitFB("tune");
 }
 
-void RIG_IC746PRO::set_bwA(int val)
+void RIG_IC756PRO2::set_bwA(int val)
 {
-	if (bandwidths_ == IC746PRO_AMFMwidths) {
+	if (bandwidths_ == IC756PRO2_AMFMwidths) {
 		A.iBW = val + 1;
 		set_modeA(A.imode);
 		return;
@@ -820,9 +621,9 @@ void RIG_IC746PRO::set_bwA(int val)
 	waitFB("set bw A");
 }
 
-int  RIG_IC746PRO::get_bwA()
+int  RIG_IC756PRO2::get_bwA()
 {
-	if (bandwidths_ == IC746PRO_AMFMwidths) {
+	if (bandwidths_ == IC756PRO2_AMFMwidths) {
 		return A.iBW - 1;
 	}
 	string cstr = "\x1A\x03";
@@ -839,9 +640,9 @@ int  RIG_IC746PRO::get_bwA()
 	return A.iBW;
 }
 
-void RIG_IC746PRO::set_bwB(int val)
+void RIG_IC756PRO2::set_bwB(int val)
 {
-	if (bandwidths_ == IC746PRO_AMFMwidths) {
+	if (bandwidths_ == IC756PRO2_AMFMwidths) {
 		B.iBW = val + 1;
 		set_modeB(B.imode);
 		return;
@@ -855,9 +656,9 @@ void RIG_IC746PRO::set_bwB(int val)
 	waitFB("set bw B");
 }
 
-int  RIG_IC746PRO::get_bwB()
+int  RIG_IC756PRO2::get_bwB()
 {
-	if (bandwidths_ == IC746PRO_AMFMwidths) {
+	if (bandwidths_ == IC756PRO2_AMFMwidths) {
 		return B.iBW - 1;
 	}
 	string cstr = "\x1A\x03";
@@ -874,44 +675,18 @@ int  RIG_IC746PRO::get_bwB()
 	return B.iBW;
 }
 
-int RIG_IC746PRO::get_attenuator()
-{
-	string cstr = "x11";
-	string resp = pre_fm;
-	resp.append(cstr);
-	cmd = pre_to;
-	cmd.append(cstr);
-	cmd.append( post );
-	if (waitFOR(7, "get att")) {
-		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-		return (int)(fm_bcd(&replystr[p + 5],3) / 2.55 );
-	}
-	return 0;
-}
-
-void RIG_IC746PRO::set_attenuator(int val)
-{
-	int cmdval = val ? 0x20 : 0x00;
-	cmd = pre_to;
-	cmd += '\x11';
-	cmd += cmdval;
-	cmd.append( post );
-	waitFB("set att");
-}
-
-bool IC_notchon = false;
-void RIG_IC746PRO::set_notch(bool on, int val)
+bool IC756PRO2_notchon = false;
+void RIG_IC756PRO2::set_notch(bool on, int val)
 {
 	int notch = (int)(val/20.0 + 128);
 	if (notch > 256) notch = 255;
-	if (on != IC_notchon) {
+	if (on != IC756PRO2_notchon) {
 		cmd = pre_to;
 		cmd.append("\x16\x48");
 		cmd += on ? '\x01' : '\x00';
 		cmd.append(post);
 		waitFB("set notch");
-		IC_notchon = on;
+		IC756PRO2_notchon = on;
 	}
 
 	if (on) {
@@ -923,7 +698,7 @@ void RIG_IC746PRO::set_notch(bool on, int val)
 	}
 }
 
-bool RIG_IC746PRO::get_notch(int &val)
+bool RIG_IC756PRO2::get_notch(int &val)
 {
 	bool on = false;
 	val = 0;
@@ -953,10 +728,113 @@ bool RIG_IC746PRO::get_notch(int &val)
 	return on;
 }
 
-void RIG_IC746PRO::get_notch_min_max_step(int &min, int &max, int &step)
+void RIG_IC756PRO2::get_notch_min_max_step(int &min, int &max, int &step)
 {
 	min = -1280;
 	max = 1280;
 	step = 20;
 }
+
+void RIG_IC756PRO2::set_attenuator(int val)
+{
+	int cmdval = 0;
+	if (atten_level == 0) {
+		atten_level = 1;
+		atten_label("6 dB", true);
+		cmdval = 0x06;
+	} else if (atten_level == 1) {
+		atten_level = 2;
+		atten_label("12 dB", true);
+		cmdval = 0x12;
+	} else if (atten_level == 2) {
+		atten_level = 3;
+		atten_label("18 dB", true);
+		cmdval = 0x18;
+	} else if (atten_level == 3) {
+		atten_level = 0;
+		atten_label("Att", false);
+		cmdval = 0x00;
+	}
+	cmd = pre_to;
+	cmd += '\x11';
+	cmd += cmdval;
+	cmd.append( post );
+	waitFB("set att");
+}
+
+int RIG_IC756PRO2::get_attenuator()
+{
+	string cstr = "\x11";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+	if (waitFOR(8, "get att")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			if (replystr[p+6] == 0x06) {
+				atten_level = 1;
+				atten_label("6 dB", true);
+			} else if (replystr[p+6] == 0x12) {
+				atten_level = 2;
+				atten_label("12 dB", true);
+			} else if (replystr[p+6] == 0x18) {
+				atten_level = 3;
+				atten_label("18 dB", true);
+			} else if (replystr[p+6] == 0x00) {
+				atten_level = 0;
+				atten_label("Att", false);
+			}
+		}
+	}
+	return atten_level;
+}
+
+void RIG_IC756PRO2::set_preamp(int val)
+{
+	if (preamp_level == 0) {
+		preamp_level = 1;
+		preamp_label("Pre 1", true);
+	} else if (preamp_level == 1) {
+		preamp_level = 2;
+		preamp_label("Pre 2", true);
+	} else if (preamp_level == 2) {
+		preamp_level = 0;
+		preamp_label("Pre", false);
+	}
+	cmd = pre_to;
+	cmd += '\x16';
+	cmd += '\x02';
+	cmd += (unsigned char) preamp_level;
+	cmd.append( post );
+	waitFB("set preamp");
+}
+
+int RIG_IC756PRO2::get_preamp()
+{
+	string cstr = "\x16\x02";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+	if (waitFOR(8, "get preamp")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			if (replystr[p+6] == 0x01) {
+				preamp_label("Pre 1", true);
+				preamp_level = 1;
+			} else if (replystr[p+6] == 0x02) {
+				preamp_label("Pre 2", true);
+				preamp_level = 2;
+			} else {
+				preamp_label("Pre", false);
+				preamp_level = 0;
+			}
+		}
+	}
+	return preamp_level;
+}
+
 

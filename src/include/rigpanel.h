@@ -196,6 +196,7 @@ extern Fl_Check_Button *btn_poll_micgain;
 extern Fl_Check_Button *btn_poll_rfgain;
 extern Fl_Check_Button *btn_poll_split;
 extern Fl_Check_Button *btn_poll_noise;
+extern Fl_Check_Button *btn_poll_nr;
 extern Fl_Group *tabSndCmd;
 #include "flinput2.h"
 extern Fl_Input2 *txt_command;

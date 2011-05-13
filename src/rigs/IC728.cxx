@@ -38,18 +38,6 @@ RIG_IC728::RIG_IC728() {
 	defaultCIV = 0x38;
 	adjustCIV(defaultCIV);
 
-	has_attenuator_control =
-	has_preamp_control =
-	has_power_control =
-	has_volume_control =
-	has_mode_control =
-	has_bandwidth_control =
-	has_micgain_control =
-	has_notch_control =
-	has_ifshift_control =
-	has_ptt_control =
-	has_tune_control =
-	has_swr_control = false;
 };
 
 //=============================================================================
