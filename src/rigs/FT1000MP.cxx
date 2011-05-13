@@ -88,14 +88,16 @@ RIG_FT1000MP::RIG_FT1000MP() {
 	max_power = 200;
 	tuner_on = false;
 
+	has_smeter =
+	has_power_out =
 	has_swr_control =
 	has_alc_control =
 	has_mode_control =
 	has_bandwidth_control =
 	has_ptt_control =
 	has_tune_control = 
+	has_split =
 	has_get_info = true;
-// auto_notch used for Tuner ON/OFF control
 	has_auto_notch = true;
 
 

@@ -28,6 +28,7 @@ public:
 	bool twovfos() {return true;}
 	bool can_split() {return true;}
 	void set_split(bool);
+	bool get_split();
 
 	int  get_smeter();
 	int  get_swr();

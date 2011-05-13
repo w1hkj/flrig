@@ -42,7 +42,10 @@ RIG_FT450::RIG_FT450() {
 	def_bw = 2;
 	def_freq = 14070000;
 
-
+	has_split =
+	has_smeter =
+	has_swr_control =
+	has_power_out =
 	has_power_control =
 	has_volume_control =
 	has_mode_control =
@@ -55,7 +58,6 @@ RIG_FT450::RIG_FT450() {
 	has_ifshift_control =
 	has_ptt_control =
 	has_tune_control =
-	has_swr_control =
 	has_special = true;
 	
 // derived specific
@@ -138,6 +140,15 @@ void RIG_FT450::set_split(bool on)
 	else cmd = "FT0;";
 	sendCommand(cmd, 0);
 	LOG_INFO("cmd: %s\nreply: %s", cmd.c_str(), replystr.c_str());
+}
+
+bool RIG_FT450::get_split()
+{
+	cmd = "FT;";
+	sendCommand(cmd);
+	size_t p = replystr.rfind("FT");
+	if (p == string::npos) return false;
+	return replystr[p+2] == '1' ? true : false;
 }
 
 int RIG_FT450::get_smeter()

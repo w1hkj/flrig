@@ -139,6 +139,7 @@ flrig_SOURCES += \
 	rigs/FT817.cxx \
 	rigs/FT847.cxx \
 	rigs/FT857D.cxx \
+	rigs/FT890.cxx \
 	rigs/FT920.cxx \
 	rigs/FT950.cxx \
 	rigs/FT1000.cxx \

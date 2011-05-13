@@ -1,15 +1,12 @@
 /*
- * UNFINISHED !!
  *
- * Yaesu FT-890 drivers
+ * Yaesu FT-890 transceiver class
  * 
  * a part of flrig
  * 
  * Copyright 2009, Dave Freese, W1HKJ
  * 
  */
-
-// a work in progress
 
 #include "FT890.h"
 
@@ -18,279 +15,280 @@ const char FT890name_[] = "FT-890";
 const char *FT890modes_[] = {
 		"LSB", "USB", "CW", "CW-N", "AM", "AM-N", "FM", NULL};
 static const int FT890_mode_val[] =  { 0, 1, 2, 3, 4, 5, 6 };
+
 static const char FT890_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'U', 'U' };
 
-RIG RIG_FT890 = {
-	FT890,
-	FT890name_,
-	FT890modes_,
-	NULL, // FT890_widths,
-	BR4800,			// comm_baudrate
-	2,				// stopbits
-	2,				 // comm_retries
-	5,				 // comm_wait
-	50,				// comm_timeout
-	false,			 // comm_rtscts;
-	false,			 // comm_rtsplus;
-	true,			  // comm_dtrplus;
-	true,			  // comm_catptt;
-	false,			 // comm_rtsptt;
-	false,			 // comm_dtrptt;
-	1,
-	0,
-	
-	FT890_init,
-	FT890_get_vfoA, 
-	FT890_set_vfoA, 
-	NULL, // FT890_get_smeter, 
-	NULL, // FT890_get_swr,
-	NULL, // FT890_get_power_out, 
-	NULL, // FT890_get_power_control,
-	NULL, // FT890_set_volume_control,
-	NULL, // FT890_set_power_control,
-	FT890_set_PTT_control,
-	FT890_tune_rig,
-	NULL, // FT890_set_attenuator,
-	NULL, // FT890_get_attenuator,
-	NULL, // FT890_set_preamp,
-	NULL, // FT890_get_preamp,
-	FT890_set_modeA,
-	FT890_get_modeA,
-	NULL, // FT890_get_modetype,
-	NULL, // FT890_set_bwA,
-	NULL, // adjust_bandwidth,
-	NULL, // FT890_get_bwA,
-	NULL, // FT890_set_if_shift,
-	NULL, // FT890_get_if_shift,
-	NULL, // FT890_get_if_min_max_step,
-	NULL, // FT890_set_notch,
-	NULL, // get_notch
-	NULL, // FT890_get_notch_min_max_step,
-	NULL, // FT890_set_mic_gain,
-	NULL, // FT890_get_mic_gain
+static const char *FT890widths_[] =
+{ "wide", "narr", NULL};
 
-	has_power_control =
-	has_tune_control =
-	has_attenuator_control =
-	has_preamp_control = true;
+static const int FT890_bw_val[] =
+{ 0, 1 };
 
-	has_volume_control =
-	has_mode_control =
-	has_bandwidth_control =
-	has_micgain_control =
-	has_notch_control =
-	has_ifshift_control =
+RIG_FT890::RIG_FT890() {
+	name_ = FT890name_;
+	modes_ = FT890modes_;
+	bandwidths_ = FT890widths_;
+	comm_baudrate = BR4800;
+	stopbits = 2;
+	comm_retries = 2;
+	comm_wait = 5;
+	comm_timeout = 50;
+	comm_rtscts = false;
+	comm_rtsplus = false;
+	comm_dtrplus = true;
+	comm_catptt = true;
+	comm_rtsptt = false;
+	comm_dtrptt = false;
+
+	afreq = bfreq = A.freq = B.freq = 14070000;
+	amode = bmode = A.imode = B.imode = 1;
+	aBW = bBW = A.iBW = B.iBW = 0;
+	precision = 10;
+
+	has_smeter =
+	has_power_out =
+	has_get_info =
 	has_ptt_control =
-	has_swr_control = false;
+	has_mode_control = true;
 
-};
+}
 
-// use init_cmd() from the FT817 code structure
+void RIG_FT890::init_cmd()
+{
+	cmd = "00000";
+	for (size_t i = 0; i < 5; i++) cmd[i] = 0;
+}
 
-void FT890_init()
+void RIG_FT890::initialize()
 {
 }
 
-int currmode = 0;
-
-long FT890_get_vfoA ()
+void RIG_FT890::selectA()
 {
 	init_cmd();
-	cmd[3] = 3;
+	cmd[4] = 0x05;
+	sendCommand(cmd);
+	showresp(WARN, HEX, "select A", cmd, replystr);
+}
+
+void RIG_FT890::selectB()
+{
+	init_cmd();
+	cmd[3] = 0x01;
+	cmd[4] = 0x05;
+	sendCommand(cmd);
+	showresp(WARN, HEX, "select B", cmd, replystr);
+}
+
+void RIG_FT890::set_split(bool val)
+{
+	split = val;
+	init_cmd();
+	cmd[3] = val ? 0x01 : 0x00;
+	cmd[4] = 0x01;
+	sendCommand(cmd);
+	if (val)
+		showresp(INFO, HEX, "set split ON", cmd, replystr);
+	else
+		showresp(INFO, HEX, "set split OFF", cmd, replystr);
+}
+
+
+bool RIG_FT890::get_info()
+{
+	init_cmd();
+	cmd[3] = 0x03;
 	cmd[4] = 0x10;
+	int ret = sendCommand(cmd);
+	showresp(WARN, HEX, "get info", cmd, replystr);
 
-	if (sendCommand(cmd, 18)) {
-		long f = 0;
-// vfo value is in bytes 1..3; binary MSB in byte 1
-		for (size_t n = 1; n < 4; n++) {
-			f = f*256 + replybuff[n];
+	if (ret >= 28) {
+		size_t p = ret - 28;
+		afreq = 0;
+		bfreq = 0;
+		for (size_t n = 1; n < 5; n++) {
+			afreq = afreq * 256 + (unsigned char)replybuff[p + n];
+			bfreq = bfreq * 256 + (unsigned char)replybuff[p + 14 + n];
 		}
-		freqA = f * 10; // 890 resolution is 10 Hz
-// interpret mode byte
-		int md = replybuff[6];
-		int flg = replybuff[8] & 0xC0; // bits 6 & 7
+		afreq = afreq * 1.25;
+		bfreq = bfreq * 1.25;
+		int md = replybuff[p+5];
+		int mode = md & 0x07;
 		switch (md) {
-			case 0: modeA = 0; break;
-			case 1: modeA = 1; break;
-			case 2: modeA = 2;
-					if (flg && 0x80 == 0x80) modeA = 3;
-					break;
-			case 3: currmode = 4;
-					if (flg && 0x40 == 0x40) modeA = 5;
-					break;
-			case 4: modeA = 6; break;
+			case 0 : 
+				amode = (md & 0x40) ? 1 : 0;
+				break;
+			case 1 :
+				amode = (md & 0x40) ? 2 : 3;
+				break;
+			case 2 :
+				amode = 4;
+				break;
+			case 3 :
+				amode = (md & 0x80) ? 7 : 6;
+				break;
+			case 4 :
+				amode = (md & 0x40) ? 8 : 10;
+				break;
+			case 6 :
+				amode = 11;
+				break;
+			default :
+				amode = 1;
 		}
+		aBW = (md & 0x80) ? 0 : 1;
+
+		md = replybuff[p + 19];
+		mode = md & 0x07;
+		switch (md) {
+			case 0 : 
+				bmode = (md & 0x40) ? 1 : 0;
+				break;
+			case 1 :
+				bmode = (md & 0x40) ? 2 : 3;
+				break;
+			case 2 :
+				bmode = 4;
+				break;
+			case 3 :
+				bmode = (md & 0x80) ? 7 : 6;
+				break;
+			case 4 :
+				bmode = (md & 0x40) ? 8 : 10;
+				break;
+			case 6 :
+				bmode = 11;
+				break;
+			default :
+				bmode = 1;
+		}
+		bBW = (md & 0x80) ? 0 : 1;
+
+		A.freq = afreq;
+		A.imode = amode;
+		A.iBW = aBW;
+
+		B.freq = bfreq;
+		B.imode = bmode;
+		B.iBW = bBW;
+
+		return true;
 	}
-	return freqA;
+	return false;
 }
 
-void FT890_set_vfoA (long freq)
+long RIG_FT890::get_vfoA ()
 {
-	freqA = freq;
-	init_cmd();
+	return A.freq;
+}
+
+void RIG_FT890::set_vfoA (long freq)
+{
+	A.freq = freq;
 	freq /=10; // 890 does not support 1 Hz resolution
-	for (size_t i = 0; i < 4; i++) {
-		cmd[i] = freq % 10; freq /=10;
-		cmd[i] += (freq % 10) << 4; freq /= 10;
-	}
-	cmd[4] = 0x0A;
-	sendCommand(cmd, 0);
+	cmd = to_bcd_be(freq, 8);
+	cmd += 0x0A;
+	sendCommand(cmd);
+	showresp(WARN, HEX, "set vfo A", cmd, replystr);
 }
 
-int FT890_get_modeA()
+int RIG_FT890::get_modeA()
 {
-// combined with get_vfoA
-// do not need a separate read for mode
-	return modeA;
+	return A.imode;
 }
 
-void FT890_set_modeA(int val)
+void RIG_FT890::set_modeA(int val)
 {
-	modeA = val;
+	A.imode = val;
 	init_cmd();
 	cmd[3] = FT890_mode_val[val];
 	cmd[4] = 0x0C;
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, HEX, "set mode A", cmd, replystr);
+}
+
+long RIG_FT890::get_vfoB()
+{
+	return B.freq;
+}
+
+void RIG_FT890::set_vfoB(long freq)
+{
+	B.freq = freq;
+	freq /=10; // 890 does not support 1 Hz resolution
+	cmd = to_bcd_be(freq, 8);
+	cmd += 0x8A;
+	sendCommand(cmd);
+	showresp(WARN, HEX, "set vfo B", cmd, replystr);
+}
+
+void RIG_FT890::set_modeB(int val)
+{
+	B.imode = val;
+	init_cmd();
+	cmd[3] = FT890_mode_val[val] | 0x80;
+	cmd[4] = 0x0C;
+	sendCommand(cmd);
+	showresp(WARN, HEX, "set mode B", cmd, replystr);
+}
+
+int  RIG_FT890::get_modeB()
+{
+	return B.imode;
 }
 
 // Tranceiver PTT on/off
-void FT890_set_PTT_control(int val)
+void RIG_FT890::set_PTT_control(int val)
 {
 	init_cmd();
 	if (val) cmd[3] = 1;
+	else	 cmd[3] = 0;
 	cmd[4] = 0x0F;
 	sendCommand(cmd, 0);
+LOG_INFO("%s", str2hex(cmd.c_str(), 5));
 }
 
-void FT890_tune_rig()
-{
-	init_cmd();
-	cmd[3] = 1;
-	cmd[4] = 0x81;
-	sendCommand(cmd, 0);
-	cmd[3] = 0;
-	cmd[4]= 0x82;
-	sendCommand(cmd, 0);
-}
-
-int FT890_get_smeter()
+int RIG_FT890::get_smeter()
 {
 	init_cmd();
 	cmd[4] = 0xF7;
-	if (sendCommand(cmd, 5)) {
-		return (replybuff[0] * 100.0 / 256.0 - 128.0);
-	}
-	return 0;
+	int ret = sendCommand(cmd);
+	if (ret < 5) return 0;
+	int sval = (unsigned char)(replybuff[ret - 2]);
+	sval = sval * 100 / 255;
+	return sval;
 }
 
-int FT890_get_power_out()
+int RIG_FT890::get_power_out()
 {
 	init_cmd();
 	cmd[4] = 0xF7;
-	if (sendCommand(cmd, 5)) {
-		return (replybuff[0]);
-	}
-	return 0;
+	int ret = sendCommand(cmd);
+	if (ret < 5) return 0;
+	int sval = (unsigned char)(replybuff[ret - 2]);
+	sval = sval * 100 / 255;
+	return sval;
 }
 
-// following commands not supported by FT890
 /*
-int FT890_get_swr()
+int RIG_FT890::get_swr()
 {
-	return 0;
+	double swr = (fwdpwr + refpwr) / (fwdpwr - refpwr + .0001);
+	swr -= 1.0;
+	swr *= 25.0;
+	if (swr < 0) swr = 0;
+	if (swr > 100) swr = 100;
+	return (int) swr;
 }
 
-int FT890_get_power_control()
+int RIG_FT890::get_power_out()
 {
-	return 0;
-}
-
-// Volume control
-void FT890_set_volume_control(double val) 
-{
-}
-
-// Transceiver power level
-void FT890_set_power_control(double val)
-{
-}
-
-void FT890_set_attenuator(int val)
-{
-}
-
-int FT890_get_attenuator()
-{
-}
-
-void FT890_set_preamp(int val)
-{
-}
-
-int FT890_get_preamp()
-{
-}
-
-
-void FT890_set_bwA(int val)
-{
-}
-
-int FT890_get_bwA()
-{
-	return 0;
-}
-
-int FT890_get_modetype(int n)
-{
-	return 0;
-}
-
-void FT890_set_if_shift(int val)
-{
-}
-
-int FT890_get_if_shift()
-{
-}
-
-void FT890_get_if_min_max_step(int &min, int &max, int &step)
-{
-	min = -1000;
-	max = 1000;
-	step = 100;
-}
-
-static bool notch_on = false;
-
-void FT890_set_notch(bool on, int val)
-{
-}
-
-int  FT890_get_notch()
-{
-}
-
-void FT890_get_notch_min_max_step(int &min, int &max, int &step)
-{
-	min = -1800;
-	max = +1800;
-	step = 10;
-}
-
-void FT890_set_mic_gain(int val)
-{
-}
-
-int FT890_get_mic_gain()
-{
-	return 0;
-}
-
-void FT890_get_mic_min_max_step(int &min, int &max, int &step)
-{
-	min = 0;
-	max = 255;
-	step = 1;
+	init_cmd();
+	cmd[4] = 0xF7;
+	int ret = sendCommand(cmd);
+	if (ret < 9) return 0;
+	fwdpwr = replybuff[ret - 9 + 1] / 2.56;
+	refpwr = replybuff[ret - 9 + 2] / 2.56;
+	return (int) fwdpwr;
 }
 */

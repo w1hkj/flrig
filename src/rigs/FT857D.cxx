@@ -36,6 +36,9 @@ RIG_FT857D::RIG_FT857D() {
 	comm_dtrptt = false;
 	modeA = 1;
 	bwA = 0;
+
+	has_smeter =
+	has_power_out =
 	has_mode_control = true;
 };
 

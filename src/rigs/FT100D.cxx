@@ -49,6 +49,9 @@ RIG_FT100D::RIG_FT100D() {
 	precision = 10;
 
 //	has_get_info =
+	has_smeter =
+	has_power_out =
+	has_swr_control =
 	has_mode_control =
 	has_bandwidth_control =
 	has_ptt_control = true;
