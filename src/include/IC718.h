@@ -58,6 +58,9 @@ public:
 
 	int  adjust_bandwidth(int m);
 
+	bool can_split() { return true;}
+	void set_split(bool val);
+
 protected:
 	int  filter_nbr;
 };

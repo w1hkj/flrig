@@ -353,6 +353,23 @@ void read_ifshift()
 	Fl::awake(update_ifshift, (void*)0);
 }
 
+// noise reduction
+void update_nr(void *d)
+{
+	btnNR->value(progStatus.noise_reduction);
+	sldrNR->value(progStatus.noise_reduction_val);
+}
+
+void read_nr()
+{
+	if (!selrig->has_noise_reduction) return;
+	pthread_mutex_lock(&mutex_serial);
+		progStatus.noise_reduction = selrig->get_noise_reduction();
+		progStatus.noise_reduction_val = selrig->get_noise_reduction_val();
+	pthread_mutex_unlock(&mutex_serial);
+	Fl::awake(update_nr, (void*)0);
+}
+
 // manual notch
 void update_notch(void *d)
 {
@@ -619,6 +636,7 @@ void * serial_thread_loop(void *d)
 					if (progStatus.poll_squelch) read_squelch();
 					if (progStatus.poll_rfgain) read_rfgain();
 					if (progStatus.poll_split) read_split();
+					if (progStatus.poll_nr) read_nr();
 				}
 				loopcount = progStatus.serloop_timing / 10;
 			}

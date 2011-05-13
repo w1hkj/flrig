@@ -41,19 +41,21 @@ RIG_IC718::RIG_IC718() {
 	bwA = 0;
 	filter_nbr = 1;
 
-	has_power_control = true;
-	has_volume_control = true;
-	has_mode_control = true;
-	has_bandwidth_control = true;
-	has_micgain_control = true;
-	has_attenuator_control = true;
-	has_preamp_control = true;
-	has_noise_control = true;
-	has_noise_reduction = true;
-	has_noise_reduction_control = true;
-	has_auto_notch = true;
-	has_rf_control = true;
-	has_compON = true;
+	has_smeter =
+	has_power_control =
+	has_volume_control =
+	has_mode_control =
+	has_bandwidth_control =
+	has_micgain_control =
+	has_attenuator_control =
+	has_preamp_control =
+	has_noise_control =
+	has_noise_reduction =
+	has_noise_reduction_control =
+	has_auto_notch =
+	has_rf_control =
+	has_split =
+	has_compON =
 	has_vox_onoff = true;
 
 	defaultCIV = 0x5E;
@@ -546,6 +548,15 @@ void RIG_IC718::set_vox_onoff()
 		cmd.append(post);
 		waitFB("set voxOFF");
 	}
+}
+
+void RIG_IC718::set_split(bool val)
+{
+	cmd = pre_to;
+	cmd += 0x0F;
+	cmd += val ? 0x10 : 0x00;
+	cmd.append(post);
+	waitFB("set split");
 }
 
 // N6WBL

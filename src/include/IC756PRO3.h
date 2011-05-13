@@ -1,12 +1,12 @@
-#ifndef _IC756_H
-#define _IC756_H
+#ifndef _IC756PRO3_H
+#define _IC756PRO3_H
 
 #include "ICbase.h"
 
-class RIG_IC756PRO : public RIG_ICOM {
+class RIG_IC756PRO3 : public RIG_ICOM {
 public:
-	RIG_IC756PRO();
-	~RIG_IC756PRO(){}
+	RIG_IC756PRO3();
+	~RIG_IC756PRO3(){}
 
 	void selectA();
 	void selectB();
@@ -16,11 +16,15 @@ public:
 	int  get_modetype(int n);
 	void set_modeA(int val);
 	int  get_modeA();
+	void set_bwA(int val);
+	int  get_bwA();
 
 	long get_vfoB(void);
 	void set_vfoB(long f);
 	void set_modeB(int val);
 	int  get_modeB();
+	void set_bwB(int val);
+	int  get_bwB();
 
 	int  get_smeter();
 	void set_volume_control(int val);
@@ -29,6 +33,10 @@ public:
 	void set_PTT_control(int val);
 	void set_noise(bool val);
 	int  get_noise();
+	void set_noise_reduction(int val);
+	int  get_noise_reduction();
+	void set_noise_reduction_val(int val);
+	int  get_noise_reduction_val();
 
 	void set_mic_gain(int val);
 //	int  get_mic_gain();
@@ -52,9 +60,13 @@ public:
 
 	int  adjust_bandwidth(int);
 	int  def_bandwidth(int);
-
-	void set_auto_notch(int v);
-	int  get_auto_notch();
+	int  get_swr();
+	int  get_alc();
+	int  get_power_out();
+	void tune_rig();
+	void set_notch(bool, int);
+	bool get_notch(int&);
+	void get_notch_min_max_step(int&, int&, int&);
 
 	bool twovfos() { return false; }
 

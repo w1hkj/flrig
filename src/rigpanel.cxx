@@ -2053,6 +2053,12 @@ static void cb_btn_poll_noise(Fl_Check_Button* o, void*) {
   progStatus.poll_noise = o->value();
 }
 
+Fl_Check_Button *btn_poll_nr=(Fl_Check_Button *)0;
+
+static void cb_btn_poll_nr(Fl_Check_Button* o, void*) {
+  progStatus.poll_nr = o->value();
+}
+
 Fl_Group *tabSndCmd=(Fl_Group *)0;
 
 Fl_Input2 *txt_command=(Fl_Input2 *)0;
@@ -2368,78 +2374,98 @@ e"));
           o->box(FL_ENGRAVED_BOX);
           o->align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE);
           { Fl_Check_Button* o = btn_poll_frequency = new Fl_Check_Button(23, 138, 100, 15, _("Frequency"));
+            btn_poll_frequency->tooltip(_("Frequency control"));
             btn_poll_frequency->down_box(FL_DOWN_BOX);
             btn_poll_frequency->value(1);
             btn_poll_frequency->callback((Fl_Callback*)cb_btn_poll_frequency);
             o->value(progStatus.poll_frequency);
           } // Fl_Check_Button* btn_poll_frequency
           { Fl_Check_Button* o = btn_poll_mode = new Fl_Check_Button(23, 166, 100, 15, _("Mode"));
+            btn_poll_mode->tooltip(_("Mode selector"));
             btn_poll_mode->down_box(FL_DOWN_BOX);
             btn_poll_mode->value(1);
             btn_poll_mode->callback((Fl_Callback*)cb_btn_poll_mode);
             o->value(progStatus.poll_mode);
           } // Fl_Check_Button* btn_poll_mode
           { Fl_Check_Button* o = btn_poll_bandwidth = new Fl_Check_Button(23, 194, 100, 15, _("Bandwidth"));
+            btn_poll_bandwidth->tooltip(_("Bandwidth selector"));
             btn_poll_bandwidth->down_box(FL_DOWN_BOX);
             btn_poll_bandwidth->value(1);
             btn_poll_bandwidth->callback((Fl_Callback*)cb_btn_poll_bandwidth);
             o->value(progStatus.poll_bandwidth);
           } // Fl_Check_Button* btn_poll_bandwidth
           { Fl_Check_Button* o = btn_poll_volume = new Fl_Check_Button(23, 221, 100, 15, _("Volume"));
+            btn_poll_volume->tooltip(_("Audio volume control"));
             btn_poll_volume->down_box(FL_DOWN_BOX);
             btn_poll_volume->callback((Fl_Callback*)cb_btn_poll_volume);
             o->value(progStatus.poll_volume);
           } // Fl_Check_Button* btn_poll_volume
           { Fl_Check_Button* o = btn_poll_notch = new Fl_Check_Button(137, 138, 100, 15, _("Manual Notch"));
+            btn_poll_notch->tooltip(_("Manual notch control"));
             btn_poll_notch->down_box(FL_DOWN_BOX);
             btn_poll_notch->callback((Fl_Callback*)cb_btn_poll_notch);
             o->value(progStatus.poll_notch);
           } // Fl_Check_Button* btn_poll_notch
           { Fl_Check_Button* o = btn_poll_auto_notch = new Fl_Check_Button(137, 166, 100, 15, _("Auto Notch"));
+            btn_poll_auto_notch->tooltip(_("Auto notch ON/OFF"));
             btn_poll_auto_notch->down_box(FL_DOWN_BOX);
             btn_poll_auto_notch->callback((Fl_Callback*)cb_btn_poll_auto_notch);
             o->value(progStatus.poll_auto_notch);
           } // Fl_Check_Button* btn_poll_auto_notch
           { Fl_Check_Button* o = btn_poll_ifshift = new Fl_Check_Button(137, 194, 100, 15, _("IF shift"));
+            btn_poll_ifshift->tooltip(_("IF shift control"));
             btn_poll_ifshift->down_box(FL_DOWN_BOX);
             btn_poll_ifshift->callback((Fl_Callback*)cb_btn_poll_ifshift);
             o->value(progStatus.poll_ifshift);
           } // Fl_Check_Button* btn_poll_ifshift
           { Fl_Check_Button* o = btn_poll_power_control = new Fl_Check_Button(137, 221, 100, 15, _("Power control"));
+            btn_poll_power_control->tooltip(_("Power level control"));
             btn_poll_power_control->down_box(FL_DOWN_BOX);
             btn_poll_power_control->callback((Fl_Callback*)cb_btn_poll_power_control);
             o->value(progStatus.poll_power_control);
           } // Fl_Check_Button* btn_poll_power_control
           { Fl_Check_Button* o = btn_poll_pre_att = new Fl_Check_Button(269, 138, 100, 15, _("Pre/Att"));
+            btn_poll_pre_att->tooltip(_("Preamp / Attenuator"));
             btn_poll_pre_att->down_box(FL_DOWN_BOX);
             btn_poll_pre_att->callback((Fl_Callback*)cb_btn_poll_pre_att);
             o->value(progStatus.poll_pre_att);
           } // Fl_Check_Button* btn_poll_pre_att
           { Fl_Check_Button* o = btn_poll_squelch = new Fl_Check_Button(269, 166, 100, 15, _("Squelch"));
+            btn_poll_squelch->tooltip(_("Squelch level control"));
             btn_poll_squelch->down_box(FL_DOWN_BOX);
             btn_poll_squelch->callback((Fl_Callback*)cb_btn_poll_squelch);
             o->value(progStatus.poll_squelch);
           } // Fl_Check_Button* btn_poll_squelch
           { Fl_Check_Button* o = btn_poll_micgain = new Fl_Check_Button(269, 193, 100, 15, _("Mic gain"));
+            btn_poll_micgain->tooltip(_("Mic gain control"));
             btn_poll_micgain->down_box(FL_DOWN_BOX);
             btn_poll_micgain->callback((Fl_Callback*)cb_btn_poll_micgain);
             o->value(progStatus.poll_micgain);
           } // Fl_Check_Button* btn_poll_micgain
           { Fl_Check_Button* o = btn_poll_rfgain = new Fl_Check_Button(269, 221, 100, 15, _("RF gain"));
+            btn_poll_rfgain->tooltip(_("RF gain control"));
             btn_poll_rfgain->down_box(FL_DOWN_BOX);
             btn_poll_rfgain->callback((Fl_Callback*)cb_btn_poll_rfgain);
             o->value(progStatus.poll_rfgain);
           } // Fl_Check_Button* btn_poll_rfgain
           { Fl_Check_Button* o = btn_poll_split = new Fl_Check_Button(363, 138, 100, 15, _("Split VFO"));
+            btn_poll_split->tooltip(_("Vfo A/B split ops"));
             btn_poll_split->down_box(FL_DOWN_BOX);
             btn_poll_split->callback((Fl_Callback*)cb_btn_poll_split);
             o->value(progStatus.poll_split);
           } // Fl_Check_Button* btn_poll_split
-          { Fl_Check_Button* o = btn_poll_noise = new Fl_Check_Button(363, 166, 100, 15, _("Noise"));
+          { Fl_Check_Button* o = btn_poll_noise = new Fl_Check_Button(363, 166, 100, 15, _("NB"));
+            btn_poll_noise->tooltip(_("Noise blanker"));
             btn_poll_noise->down_box(FL_DOWN_BOX);
             btn_poll_noise->callback((Fl_Callback*)cb_btn_poll_noise);
             o->value(progStatus.poll_noise);
           } // Fl_Check_Button* btn_poll_noise
+          { Fl_Check_Button* o = btn_poll_nr = new Fl_Check_Button(363, 193, 100, 15, _("Noise Red\'"));
+            btn_poll_nr->tooltip(_("Noise reduction"));
+            btn_poll_nr->down_box(FL_DOWN_BOX);
+            btn_poll_nr->callback((Fl_Callback*)cb_btn_poll_nr);
+            o->value(progStatus.poll_nr);
+          } // Fl_Check_Button* btn_poll_nr
           o->end();
         } // Fl_Group* o
         tabPolling->end();
