@@ -1764,6 +1764,8 @@ void initRig()
 {
 	flrig_abort = false;
 
+	sldrRcvSignal->aging(8);
+
 //	wait_query = true;
 
 // disable xml loop
