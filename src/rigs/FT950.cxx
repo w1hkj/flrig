@@ -74,6 +74,9 @@ RIG_FT950::RIG_FT950() {
 	def_freq = 14070000;
 
 
+	has_smeter =
+	has_swr_control =
+	has_power_out =
 	has_power_control =
 	has_volume_control =
 	has_rf_control =
@@ -158,7 +161,6 @@ bool RIG_FT950::twovfos()
 {
 	return true;
 }
-
 
 int RIG_FT950::get_smeter()
 {

@@ -53,7 +53,8 @@ RIG_FT2000::RIG_FT2000() {
 	def_bw = 2;
 	def_freq = 14070000;
 
-
+	has_smeter =
+	has_power_out =
 	has_power_control =
 	has_volume_control =
 	has_mode_control =

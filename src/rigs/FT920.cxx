@@ -112,7 +112,7 @@ bool RIG_FT920::get_info()
 	cmd[3] = 0x03;
 	cmd[4] = 0x10;
 	int ret = sendCommand(cmd);
-	showresp(INFO, HEX, "get info", cmd, replystr);
+	showresp(WARN, HEX, "get info", cmd, replystr);
 
 	if (ret >= 28) {
 		size_t p = ret - 28;

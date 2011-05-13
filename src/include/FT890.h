@@ -3,22 +3,52 @@
 
 #include "rigbase.h"
 
-// UNFINISHED !!
-
-extern RIG  RIG_FT890;
-
 extern const char FT890name_[];
 extern const char *FT890modes_[];
 extern const char *FT890_widths[];
 
-extern void FT890_init();
-extern long FT890_get_vfoA();
-extern void FT890_set_vfoA(long);
-extern int  FT890_get_smeter();
-extern int  FT890_get_power_out();
-extern void FT890_set_PTT_control(int val);
-extern void FT890_tune_rig();
-extern void FT890_set_modeA(int val);
-extern int  FT890_get_modeA();
+class RIG_FT890 : public rigbase {
+private:
+	double fwdpwr;
+	double refpwr;
+	double fwdv;
+	double refv;
+	int afreq, amode, aBW;
+	int bfreq, bmode, bBW;
+
+public:
+	RIG_FT890();
+	~RIG_FT890(){};
+	
+	void initialize();
+
+	bool get_info();
+
+	bool can_split() { return true;}
+	void set_split(bool val);
+	bool twovfos() {return false;}
+
+	long get_vfoA();
+	void set_vfoA(long);
+	void set_modeA(int val);
+	int  get_modeA();
+
+	long get_vfoB();
+	void set_vfoB(long);
+	void set_modeB(int val);
+	int  get_modeB();
+
+	void selectA();
+	void selectB();
+
+	void set_PTT_control(int val);
+
+	int  get_smeter();
+	int  get_power_out();
+
+private:
+	void init_cmd();
+};
+
 
 #endif

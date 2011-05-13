@@ -1576,7 +1576,14 @@ void adjust_control_positions()
 		btnPTT->redraw();
 	}
 
-	if (rig_nbr == FT100D || rig_nbr == FT847) {
+	if (	rig_nbr == FT100D || 
+			rig_nbr == FT767  ||
+			rig_nbr == FT817  ||
+			rig_nbr == FT847  || 
+			rig_nbr == FT857D ||
+			rig_nbr == FT890  ||
+			rig_nbr == FT897D ||
+			rig_nbr == FT920 ) {
 		y -= 20;
 		btnPTT->position( btnPTT->x(), y);
 		btnPTT->redraw();
@@ -1681,6 +1688,7 @@ void initXcvrTab()
 		btn_poll_micgain->deactivate(); btn_poll_micgain->value(0);
 		btn_poll_rfgain->deactivate(); btn_poll_rfgain->value(0);
 		btn_poll_split->deactivate(); btn_poll_split->value(0);
+		btn_poll_nr->deactivate(); btn_poll_nr->value(0);
 
 	} else {
 		if (selrig->has_agc_level) cbo_agc_level->activate(); else cbo_agc_level->deactivate();
@@ -1728,6 +1736,7 @@ void initXcvrTab()
 		btn_poll_rfgain->activate(); btn_poll_rfgain->value(progStatus.poll_rfgain);
 		btn_poll_split->activate(); btn_poll_split->value(progStatus.poll_split);
 		btn_poll_noise->activate(); btn_poll_noise->value(progStatus.poll_noise);
+		btn_poll_nr->activate(); btn_poll_nr->value(progStatus.poll_nr);
 
 		if (!selrig->has_smeter) { btn_poll_smeter->deactivate(); btn_poll_smeter->value(0); }
 		if (!selrig->has_power_out) { btn_poll_pout->deactivate(); btn_poll_pout->value(0); }
@@ -1735,7 +1744,8 @@ void initXcvrTab()
 		if (!selrig->has_alc_control) { btn_poll_alc->deactivate(); btn_poll_alc->value(0); }
 		if (!selrig->has_volume_control) { btn_poll_volume->deactivate(); btn_poll_volume->value(0); }
 		if (!selrig->has_notch_control) { btn_poll_notch->deactivate(); btn_poll_notch->value(0); }
-		if (!selrig->has_auto_notch) { btn_poll_auto_notch->deactivate(); btn_poll_auto_notch->value(0); }
+		if (!selrig->has_auto_notch || rig_nbr == FT1000MP) 
+			{ btn_poll_auto_notch->deactivate(); btn_poll_auto_notch->value(0); }
 		if (!selrig->has_ifshift_control) { btn_poll_ifshift->deactivate(); btn_poll_ifshift->value(0); }
 		if (!selrig->has_power_control) { btn_poll_power_control->deactivate(); btn_poll_power_control->value(0); }
 		if (!selrig->has_preamp_control && !selrig->has_attenuator_control) 
@@ -1745,6 +1755,7 @@ void initXcvrTab()
 		if (!selrig->has_rf_control) { btn_poll_rfgain->deactivate(); btn_poll_rfgain->value(0); }
 		if (!selrig->has_split) { btn_poll_split->deactivate(); btn_poll_split->value(0); }
 		if (!selrig->has_noise_control) {btn_poll_noise->deactivate(); btn_poll_noise->value(0);}
+		if (!selrig->has_noise_reduction) {btn_poll_nr->deactivate(); btn_poll_nr->value(0);}
 
 	}
 }
