@@ -251,7 +251,7 @@ int RIG_FT100D::get_smeter()
 	init_cmd();
 	cmd[4] = 0xF7;
 	int ret = sendCommand(cmd, 9);
-	showresp(INFO, HEX, "S-meter", cmd, replystr);
+	showresp(WARN, HEX, "S-meter", cmd, replystr);
 	if (ret < 9) return 0;
 	int sval = (200 -  (unsigned char)replybuff[ret - 9 + 3]) / 1.1;
 	if (sval < 0) sval = 0;
@@ -274,7 +274,7 @@ int RIG_FT100D::get_power_out()
 	init_cmd();
 	cmd[4] = 0xF7;
 	int ret = sendCommand(cmd);
-	showresp(INFO, HEX, "P-out", cmd, replystr);
+	showresp(WARN, HEX, "P-out", cmd, replystr);
 	if (ret < 9) return 0;
 	fwdpwr = replybuff[ret - 9 + 1] / 2.56;
 	refpwr = replybuff[ret - 9 + 2] / 2.56;
