@@ -10,6 +10,7 @@ public:
 
 	void selectA();
 	void selectB();
+	void A2B();
 
 	long get_vfoA(void);
 	void set_vfoA(long f);

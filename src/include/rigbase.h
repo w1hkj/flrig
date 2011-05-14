@@ -94,6 +94,7 @@ public:
 	bool XitActive;
 	bool split;
 
+	bool has_a2b;
 	bool has_vfo_adj;
 	bool has_rit;
 	bool has_xit;
@@ -176,6 +177,7 @@ public:
 	virtual int  get_modeB() {return B.imode;}
 	virtual void selectA(){}
 	virtual void selectB(){}
+	virtual void A2B(){}
 
 	virtual void set_bwA(int val) {A.iBW = val;}
 	virtual int  get_bwA() {return A.iBW;}
