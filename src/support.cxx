@@ -620,26 +620,26 @@ void * serial_thread_loop(void *d)
 			resetxmt = true;
 
 			if (!loopcount--) {
-				if (rig_nbr == K3) read_K3_rx();
+				if (rig_nbr == K3) read_K3();
 				else {
 					if (progStatus.poll_frequency) read_vfo();
 					if (progStatus.poll_mode) read_mode();
 					if (progStatus.poll_bandwidth) read_bandwidth();
-					if (progStatus.poll_smeter) read_smeter();
-					if (progStatus.poll_volume) read_volume();
-					if (progStatus.poll_auto_notch) read_auto_notch();
-					if (progStatus.poll_notch) read_notch();
-					if (progStatus.poll_ifshift) read_ifshift();
-					if (progStatus.poll_power_control) read_power_control();
-					if (progStatus.poll_pre_att) read_preamp_att();
-					if (progStatus.poll_micgain) read_mic_gain();
-					if (progStatus.poll_squelch) read_squelch();
-					if (progStatus.poll_rfgain) read_rfgain();
-					if (progStatus.poll_split) read_split();
-					if (progStatus.poll_nr) read_nr();
 				}
-				loopcount = progStatus.serloop_timing / 10;
+				if (progStatus.poll_smeter) read_smeter();
+				if (progStatus.poll_volume) read_volume();
+				if (progStatus.poll_auto_notch) read_auto_notch();
+				if (progStatus.poll_notch) read_notch();
+				if (progStatus.poll_ifshift) read_ifshift();
+				if (progStatus.poll_power_control) read_power_control();
+				if (progStatus.poll_pre_att) read_preamp_att();
+				if (progStatus.poll_micgain) read_mic_gain();
+				if (progStatus.poll_squelch) read_squelch();
+				if (progStatus.poll_rfgain) read_rfgain();
+				if (progStatus.poll_split) read_split();
+				if (progStatus.poll_nr) read_nr();
 			}
+			loopcount = progStatus.serloop_timing / 10;
 		} else {
 			if (resetxmt) {
 				Fl::awake(updateSmeter, (void *)(0));
@@ -648,12 +648,9 @@ void * serial_thread_loop(void *d)
 			}
 			resetrcv = true;
 			if (!loopcount--) {
-				if (rig_nbr == K3) read_K3_tx();
-				else {
-					if (progStatus.poll_pout) read_power_out();
-					if (progStatus.poll_swr) read_swr();
-					if (progStatus.poll_alc) read_alc();
-				}
+				if (progStatus.poll_pout) read_power_out();
+				if (progStatus.poll_swr) read_swr();
+				if (progStatus.poll_alc) read_alc();
 				loopcount = progStatus.serloop_timing / 10;
 			}
 
