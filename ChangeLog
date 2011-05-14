@@ -1,5 +1,8 @@
 2011-05-14  David Freese  <w1hkj@w1hkj.com>
 
+	5fae473: FT100D event levels
+	befcb95: Polling bug
+	e4c0edf: TT550 events
 	bf34ec1: IC756 A2B
 	90a32a6: K3 revert
 	2a68d6f: IC718 split
