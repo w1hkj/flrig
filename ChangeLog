@@ -1,5 +1,15 @@
-2011-05-09  David Freese  <w1hkj@w1hkj.com>
+2011-05-13  David Freese  <w1hkj@w1hkj.com>
 
+	2a68d6f: IC718 split
+	a8fdef6: IC7000 missing controls
+	32f3154: IC756 Series
+	7c52305: Yaeusu series
+	d5a3a0a: IC series
+	9fb9fe8: K3 command query
+	b4f2298: K3 OM fix
+	f003d7d: K3 alt_vfo
+	5958e0c: TT550 A/B
+	a695ac3: IC7000 erroneous code bug
 	ba79896: TT550 control panel
 	a70a812: TS570 IF shift
 	78253b3: IC746PRO
