@@ -8,6 +8,7 @@
  */
 
 #include "IC7000.h"
+#include "debug.h"
 
 //=============================================================================
 // IC-7000
@@ -633,7 +634,7 @@ void RIG_IC7000::get_mic_gain_min_max_step(int &min, int &max, int &step)
 
 void RIG_IC7000::set_notch(bool on, int val)
 {
-	int notch = 64 + (int)((val - 300) * 128.0 / 2400);
+	int notch = (int)(val * 256.0 / 3000.0);
 
 	cmd = pre_to;
 	cmd.append("\x16\x48");
@@ -663,7 +664,7 @@ bool RIG_IC7000::get_notch(int &val)
 	if (waitFOR(8, "get notch")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			on = replystr[p + 6] ? 1 : 0;
+			on = replystr[p + 6];
 		cmd = pre_to;
 		resp = pre_fm;
 		cstr = "\x14\x0D";
@@ -673,7 +674,7 @@ bool RIG_IC7000::get_notch(int &val)
 		if (waitFOR(9, "get notch val")) {
 			size_t p = replystr.rfind(resp);
 			if (p != string::npos)
-				val = (int)(2400.0*(fm_bcd(&replystr[p + 6],3) - 64) / 128.0);
+				val = (int)(3000.0*(fm_bcd(&replystr[p + 6],3)) / 256.0);
 		}
 	}
 	return on;
@@ -681,8 +682,84 @@ bool RIG_IC7000::get_notch(int &val)
 
 void RIG_IC7000::get_notch_min_max_step(int &min, int &max, int &step)
 {
-	min = 300;
-	max = 2700;
+	min = 0;
+	max = 3000;
 	step = 20;
+}
+
+void RIG_IC7000::set_noise(bool val)
+{
+	cmd = pre_to;
+	cmd.append("\x16\x22");
+	cmd += val ? 1 : 0;
+	cmd.append(post);
+	waitFB("set noise");
+}
+
+int RIG_IC7000::get_noise()
+{
+	string cstr = "\x16\x22";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append(post);
+	if (waitFOR(9, "get noise")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return (replystr[p+6] ? 1 : 0);
+	}
+	return 0;
+}
+
+void RIG_IC7000::set_noise_reduction(int val)
+{
+	cmd = pre_to;
+	cmd.append("\x16\x40");
+	cmd += val ? 0x01 : 0x00;
+	cmd.append(post);
+	waitFB("set NR");
+}
+
+int RIG_IC7000::get_noise_reduction()
+{
+	string cstr = "\x16\x40";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append(post);
+	if (waitFOR(9, "get NR")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return (replystr[p+6] ? 1 : 0);
+	}
+	return 0;
+}
+
+// 0 < val < 100
+void RIG_IC7000::set_noise_reduction_val(int val)
+{
+	cmd = pre_to;
+	cmd.append("\x14\x06");
+	cmd.append(to_bcd(val * 255 / 100, 3));
+	cmd.append(post);
+	waitFB("set NR val");
+}
+
+int RIG_IC7000::get_noise_reduction_val()
+{
+	string cstr = "\x14\x06";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append(post);
+	if (waitFOR(9, "get NR val")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return ((int)(fm_bcd(&replystr[p+6],3) / 2.55));
+	}
+	return 0;
 }
 
