@@ -1418,12 +1418,10 @@ void cbExit()
 	progStatus.freq_A = vfoA.freq;
 	progStatus.imode_A = vfoA.imode;
 	progStatus.iBW_A = vfoA.iBW;
-printf("saving A: %s\n", print(vfoA));
 
 	progStatus.freq_B = vfoB.freq;
 	progStatus.imode_B = vfoB.imode;
 	progStatus.iBW_B = vfoB.iBW;
-printf("saving B: %s\n", print(vfoB));
 
 	progStatus.spkr_on = btnVol->value();
 	progStatus.volume = sldrVOLUME->value();

@@ -344,7 +344,7 @@ static void send_rig_info()
 
 		send_new_freq(xmlvfo.freq);
 
-if (XML_DEBUG)
+//if (XML_DEBUG)
 	LOG_WARN("%s", print(xmlvfo));
 
 		fldigi_online = true;
