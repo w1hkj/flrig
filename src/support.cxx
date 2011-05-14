@@ -819,8 +819,14 @@ void cbA2B()
 		K3_A2B();
 		return;
 	}
-	queB.push(vfoA);
-	FreqDispB->value(vfoA.freq);
+	if (selrig->has_a2b) {
+		pthread_mutex_lock(&mutex_serial);
+			selrig->A2B();
+		pthread_mutex_unlock(&mutex_serial);
+	}
+	vfoB = vfoA;
+	queB.push(vfoB);
+	FreqDispB->value(vfoB.freq);
 	FreqDispB->redraw();
 	pushedB = true;
 	setFocus();
@@ -1412,10 +1418,12 @@ void cbExit()
 	progStatus.freq_A = vfoA.freq;
 	progStatus.imode_A = vfoA.imode;
 	progStatus.iBW_A = vfoA.iBW;
+printf("saving A: %s\n", print(vfoA));
 
 	progStatus.freq_B = vfoB.freq;
 	progStatus.imode_B = vfoB.imode;
 	progStatus.iBW_B = vfoB.iBW;
+printf("saving B: %s\n", print(vfoB));
 
 	progStatus.spkr_on = btnVol->value();
 	progStatus.volume = sldrVOLUME->value();
@@ -2198,26 +2206,26 @@ void initRig()
 		vfoA.freq = progStatus.freq_A;
 		vfoA.imode = progStatus.imode_A;
 		vfoA.iBW = progStatus.iBW_A;
+
 		if (vfoA.iBW == -1) vfoA.iBW = selrig->def_bandwidth(vfoA.imode);
 		FreqDispA->value( vfoA.freq );
 
 		vfoB.freq = progStatus.freq_B;
 		vfoB.imode = progStatus.imode_B;
 		vfoB.iBW = progStatus.iBW_B;
+
 		if (vfoB.iBW == -1) vfoB.iBW = selrig->def_bandwidth(vfoB.imode);
 		FreqDispB->value(vfoB.freq);
 
+		selrig->selectB();
+		selrig->set_vfoB(vfoB.freq);
+		selrig->set_modeB(vfoB.imode);
+		selrig->set_bwB(vfoB.iBW);
 		selrig->selectA();
-		if (!progStatus.use_rig_data) {
-			selrig->set_vfoA(vfoA.freq);
-			selrig->set_modeA(vfoA.imode);
-			selrig->set_bwA(vfoA.iBW);
-			selrig->selectB();
-			selrig->set_vfoB(vfoB.freq);
-			selrig->set_modeB(vfoB.imode);
-			selrig->set_bwB(vfoB.iBW);
-			selrig->selectA();
-		}
+		selrig->set_vfoA(vfoA.freq);
+		selrig->set_modeA(vfoA.imode);
+		selrig->set_bwA(vfoA.iBW);
+
 	}
 
 	// enable the serial thread
@@ -2327,10 +2335,6 @@ void initStatusConfigDialog()
 
 	selectRig->index(rig_nbr);
 	mnuBaudrate->index( progStatus.comm_baudrate );
-
-	progStatus.freq_B = progStatus.freq_A = selrig->def_freq;
-	progStatus.iBW_B = progStatus.iBW_A = selrig->def_bw;
-	progStatus.imode_B = progStatus.imode_A = selrig->def_mode;
 
 	selectCommPort->value( progStatus.xcvr_serial_port.c_str() );
 	selectAuxPort->value( progStatus.aux_serial_port.c_str() );

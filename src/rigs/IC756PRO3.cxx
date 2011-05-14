@@ -54,8 +54,7 @@ RIG_IC756PRO3::RIG_IC756PRO3() {
 	def_mode = modeA = modeB = B.imode = 1;
 	def_bw = bwA = bwB = A.iBW = B.iBW = 32;
 
-	can_change_alt_vfo =
-
+	has_a2b =
 	has_bandwidth_control =
 	has_ifshift_control =
 	has_tune_control =
@@ -94,6 +93,15 @@ void RIG_IC756PRO3::selectB()
 	cmd += '\xD1';
 	cmd.append(post);
 	waitFB("sel B");
+}
+
+void RIG_IC756PRO3::A2B()
+{
+	cmd = pre_to;
+	cmd += '\x07';
+	cmd += '\xB1';
+	cmd.append(post);
+	waitFB("A->B");
 }
 
 long RIG_IC756PRO3::get_vfoA ()
