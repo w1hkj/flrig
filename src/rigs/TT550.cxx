@@ -308,7 +308,7 @@ void RIG_TT550::set_vfoRX(long freq)
 
 	long lFreq = freq * (1 + VfoAdj * 1e-6) + RitAdj;
 
-LOG_WARN("rx freq = %ld", freq);
+LOG_INFO("rx freq = %ld", freq);
 
 	if(def_mode == TT550_DIGI_MODE) {
 		DigiAdj = 1500 - FiltAdj - 200;
@@ -375,7 +375,7 @@ void RIG_TT550::set_vfoTX(long freq)
 	int XitAdj;
 	long lFreq = freq * (1 + VfoAdj * 1e-6);
 
-LOG_WARN("tx freq = %ld", freq);
+LOG_INFO("tx freq = %ld", freq);
 
 	lFreq += XitAdj = XitActive ? XitFreq : 0;
 
@@ -447,7 +447,7 @@ void RIG_TT550::set_vfo(long freq)
 
 void RIG_TT550::set_vfoA (long freq)
 {
-//LOG_WARN("set vfo A %ld", freq);
+LOG_WARN("set vfo A %ld", freq);
 	freqA = freq;
 	if (onA)
 		set_vfo(freq);
@@ -460,7 +460,7 @@ long RIG_TT550::get_vfoA ()
 
 void RIG_TT550::set_vfoB (long freq)
 {
-//LOG_WARN("set vfo B %ld", freq);
+LOG_WARN("set vfo B %ld", freq);
 	freqB = freq;
 	if (!onA)
 		set_vfo(freqB);
@@ -477,12 +477,11 @@ void RIG_TT550::set_PTT_control(int val)
 	if (val) cmd = TT550setXMT;
 	else     cmd = TT550setRCV;
 	sendCommand(cmd, 0);
-LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
+LOG_WARN("%s", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_TT550::set_mode(int val)
 {
-LOG_WARN("mode = %d", val);
 	def_mode = val;
 	if (val == TT550_AM_MODE) {
 
@@ -508,12 +507,14 @@ LOG_WARN("mode = %d", val);
 
 void RIG_TT550::set_modeA(int val)
 {
+LOG_WARN("mode A = %d", val);
 	modeA = val;
 	set_mode(val);
 }
 
 void RIG_TT550::set_modeB(int val)
 {
+LOG_WARN("mode B = %d", val);
 	modeB = val;
 	set_mode(val);
 }
@@ -521,17 +522,6 @@ void RIG_TT550::set_modeB(int val)
 int  RIG_TT550::get_modeB()
 {
 	return modeB;
-}
-
-void RIG_TT550::set_bwB(int val)
-{
-	bwB = val;
-	set_bw(val);
-}
-
-int  RIG_TT550::get_bwB()
-{
-	return bwB;
 }
 
 static int ret_mode = TT550_CW_MODE;
@@ -588,6 +578,7 @@ LOG_WARN("bw = %d", val);
 
 void RIG_TT550::set_bwA(int val)
 {
+LOG_WARN("bw A = %d", val);
 	bwA = val;
 	set_bw(bwA);
 }
@@ -595,6 +586,18 @@ void RIG_TT550::set_bwA(int val)
 int RIG_TT550::get_bwA()
 {
 	return bwA;
+}
+
+void RIG_TT550::set_bwB(int val)
+{
+LOG_WARN("bw B = %d", val);
+	bwB = val;
+	set_bw(val);
+}
+
+int  RIG_TT550::get_bwB()
+{
+	return bwB;
 }
 
 int RIG_TT550::adjust_bandwidth(int md)
@@ -638,7 +641,7 @@ void RIG_TT550::set_attenuator(int val)
 	if (val) cmd[1] = '1';
 	else     cmd[1] = '0';
 	sendCommand(cmd, 0);
-LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
+LOG_WARN("%s", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_TT550::set_volume_control(int val)
@@ -646,7 +649,7 @@ void RIG_TT550::set_volume_control(int val)
 	cmd = TT550setVolume;
 	cmd[1] = 0xFF & ((val * 255) / 100);
 	sendCommand(cmd, 0);
-LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
+LOG_WARN("%s", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_TT550::get_volume_control()
@@ -670,7 +673,7 @@ static void update_encA(void *d)
 
 void RIG_TT550::selectA()
 {
-//LOG_WARN("%s", "select A");
+LOG_WARN("%s", "select A");
 	onA = true;
 	Fl::awake(hide_encA, NULL);
 	xcvrstream.clear();
@@ -678,7 +681,7 @@ void RIG_TT550::selectA()
 
 void RIG_TT550::selectB()
 {
-//LOG_WARN("%s", "select B");
+LOG_WARN("%s", "select B");
 	onA = false;
 	Fl::awake(hide_encA, NULL);
 	xcvrstream.clear();
