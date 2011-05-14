@@ -267,12 +267,12 @@ void read_alc()
 // notch
 void update_auto_notch(void *d)
 {
-	btnNotch->value(progStatus.auto_notch);
+	btnAutoNotch->value(progStatus.auto_notch);
 }
 
 void read_auto_notch()
 {
-	if (!selrig->has_notch_control) return;
+	if (!selrig->has_auto_notch) return;
 	pthread_mutex_lock(&mutex_serial);
 		progStatus.auto_notch = selrig->get_auto_notch();
 	pthread_mutex_unlock(&mutex_serial);

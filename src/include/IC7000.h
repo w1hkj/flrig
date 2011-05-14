@@ -59,6 +59,15 @@ public:
 	bool get_notch(int &val);
 	void get_notch_min_max_step(int &min, int &max, int &step);
 
+	void set_noise(bool val);
+	int  get_noise();
+
+	void set_noise_reduction(int val);
+	int  get_noise_reduction();
+
+	void set_noise_reduction_val(int val);
+	int  get_noise_reduction_val();
+
 };
 
 
