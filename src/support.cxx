@@ -638,8 +638,8 @@ void * serial_thread_loop(void *d)
 				if (progStatus.poll_rfgain) read_rfgain();
 				if (progStatus.poll_split) read_split();
 				if (progStatus.poll_nr) read_nr();
+				loopcount = progStatus.serloop_timing / 10;
 			}
-			loopcount = progStatus.serloop_timing / 10;
 		} else {
 			if (resetxmt) {
 				Fl::awake(updateSmeter, (void *)(0));
