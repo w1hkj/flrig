@@ -60,6 +60,7 @@ public:
 
 	bool can_split() { return true;}
 	void set_split(bool val);
+	bool get_split();
 
 protected:
 	int  filter_nbr;

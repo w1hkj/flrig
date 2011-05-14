@@ -554,9 +554,29 @@ void RIG_IC718::set_split(bool val)
 {
 	cmd = pre_to;
 	cmd += 0x0F;
-	cmd += val ? 0x10 : 0x00;
+	cmd += val ? 0x01 : 0x00;
 	cmd.append(post);
 	waitFB("set split");
+}
+
+bool RIG_IC718::get_split()
+{
+	cmd = pre_to;
+	cmd += 0x0F;
+	cmd.append(post);
+	string resp = pre_fm;
+	resp += 0x0F;
+	if (waitFOR(7, "get split")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			if (replystr[5] == 0x01) {
+				return 1;
+			} else {
+				return 0;
+			}
+		}
+	}
+	return 0;
 }
 
 // N6WBL
