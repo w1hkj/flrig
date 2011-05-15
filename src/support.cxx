@@ -2435,52 +2435,72 @@ void cbAuxPort()
 
 void cb_agc_level()
 {
-	selrig->set_agc_level();
+	pthread_mutex_lock(&mutex_serial);
+		selrig->set_agc_level();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_cw_wpm()
 {
-	selrig->set_cw_wpm();
+	pthread_mutex_lock(&mutex_serial);
+		selrig->set_cw_wpm();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_cw_vol()
 {
-	selrig->set_cw_vol();
+	pthread_mutex_lock(&mutex_serial);
+		selrig->set_cw_vol();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_cw_spot()
 {
-	selrig->set_cw_spot();
+	pthread_mutex_lock(&mutex_serial);
+		selrig->set_cw_spot();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_vox_gain()
 {
-	selrig->set_vox_gain();
+	pthread_mutex_lock(&mutex_serial);
+		selrig->set_vox_gain();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_vox_anti()
 {
-	selrig->set_vox_anti();
+	pthread_mutex_lock(&mutex_serial);
+		selrig->set_vox_anti();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_vox_hang()
 {
-	selrig->set_vox_hang();
+	pthread_mutex_lock(&mutex_serial);
+		selrig->set_vox_hang();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_vox_onoff()
 {
-	selrig->set_vox_onoff();
+	pthread_mutex_lock(&mutex_serial);
+		selrig->set_vox_onoff();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_compression()
 {
-	selrig->set_compression();
+	pthread_mutex_lock(&mutex_serial);
+		selrig->set_compression();
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_auto_notch()
 {
-	selrig->set_auto_notch(btnAutoNotch->value());
+	pthread_mutex_lock(&mutex_serial);
+		selrig->set_auto_notch(btnAutoNotch->value());
+	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_vfo_adj()
