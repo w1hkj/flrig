@@ -113,23 +113,24 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 	char sztemp[50];
 	string returned = "";
 	string tosend = cmd;
+	int cnt = 0, repeat = 0, num = n + cmd.length();
+	int delay =  num * 11000.0 / RigSerial.Baud();
 	if (!RigSerial.IsOpen()) {
 		replystr = returned;
 		snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
 		showresp(WARN, HEX, sztemp, tosend, returned);
 		return false;
 	}
-	int cnt = 0, repeat = 0, num = n + cmd.length();
 	for (repeat = 0; repeat < progStatus.comm_retries; repeat++) {
 		sendCommand(tosend, 0);
-		MilliSleep( (int)((num*11000.0/RigSerial.Baud())));
+		MilliSleep(delay);
 		returned = "";
 		for ( cnt = 0; cnt < 20; cnt++) {
 			readResponse();
 			returned.append(replystr);
 			if (returned.length() >= num) {
 				replystr = returned;
-				waited = cnt * 10 * repeat;
+				waited = cnt * 10 * repeat + delay;
 				snprintf(sztemp, sizeof(sztemp), "%s %d ms OK  ", sz, waited);
 				showresp(WARN, HEX, sztemp, tosend, returned);
 				return true;
@@ -139,8 +140,8 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 		}
 	}
 	replystr = returned;
-	waited = cnt * 10 * repeat;
-	snprintf(sztemp, sizeof(sztemp), "%s %d ms NIL ", sz, waited);
+	waited = cnt * 10 * repeat + delay;
+	snprintf(sztemp, sizeof(sztemp), "%s %d ms FAIL", sz, waited);
 	showresp(WARN, HEX, sztemp, tosend, returned);
 	return false;
 }

@@ -395,7 +395,7 @@ void RIG_IC7000::set_auto_notch(int val)
 	cmd = pre_to;
 	cmd += '\x16';
 	cmd += '\x41';
-	cmd += (unsigned char)val;
+	cmd += val ? 0x01 : 0x00;
 	cmd.append( post );
 	waitFB("set AN");
 }
@@ -427,9 +427,24 @@ void RIG_IC7000::set_split(bool val)
 {
 	cmd = pre_to;
 	cmd += 0x0F;
-	cmd += val ? 0x10 : 0x00;
+	cmd += val ? 0x01 : 0x00;
 	cmd.append(post);
 	waitFB("set split");
+}
+
+bool RIG_IC7000::get_split()
+{
+	cmd = pre_to;
+	cmd += 0x0F;
+	cmd.append(post);
+	string resp = pre_fm;
+	resp += 0x0F;
+	if (waitFOR(8, "get split")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return (replystr[p+6] ? 1 : 0);
+	}
+	return 0;
 }
 
 // Volume control val 0 ... 100
@@ -496,7 +511,7 @@ void RIG_IC7000::set_squelch(int val)
 	cmd.append("\x14\x03");
 	cmd.append(to_bcd(ICsql, 3));
 	cmd.append( post );
-	waitFB("set Sqlch");
+	waitFB("set sql");
 }
 
 int  RIG_IC7000::get_squelch()
@@ -671,7 +686,7 @@ bool RIG_IC7000::get_notch(int &val)
 		cmd.append(cstr);
 		resp.append(cstr);
 		cmd.append(post);
-		if (waitFOR(9, "get notch val")) {
+		if (waitFOR(9, "notch val")) {
 			size_t p = replystr.rfind(resp);
 			if (p != string::npos)
 				val = (int)(3000.0*(fm_bcd(&replystr[p + 6],3)) / 256.0);
@@ -704,7 +719,7 @@ int RIG_IC7000::get_noise()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
-	if (waitFOR(9, "get noise")) {
+	if (waitFOR(8, "get noise")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			return (replystr[p+6] ? 1 : 0);
@@ -729,10 +744,10 @@ int RIG_IC7000::get_noise_reduction()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
-	if (waitFOR(9, "get NR")) {
+	if (waitFOR(8, "get NR")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return (replystr[p+6] ? 1 : 0);
+			return (replystr[p+6] == 0x01 ? 1 : 0);
 	}
 	return 0;
 }

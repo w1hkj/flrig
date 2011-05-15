@@ -50,6 +50,7 @@ public:
 	int  get_alc();
 
 	void set_split(bool v);
+	bool get_split();
 
 	int  get_mic_gain();
 	void set_mic_gain(int val);
