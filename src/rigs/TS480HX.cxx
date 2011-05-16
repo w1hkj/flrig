@@ -157,7 +157,6 @@ void RIG_TS480HX::set_vfoA (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set vfo A", cmd, replystr);
 }
@@ -190,7 +189,6 @@ void RIG_TS480HX::set_vfoB (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set vfo B", cmd, replystr);
 }
@@ -237,7 +235,6 @@ void RIG_TS480HX::set_PTT_control(int val)
 {
 	if (val)	cmd = "TX1;"; // DTS transmission using ANI input
 	else	 	cmd = "RX;";
-	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set PTT", cmd, replystr);
 }
@@ -248,7 +245,6 @@ void RIG_TS480HX::set_modeA(int val)
 	cmd = "MD";
 	cmd += TS480HX_mode_chr[val];
 	cmd += ';';
-	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd, 0);
 	showresp(WARN, ASC, "set mode A", cmd, replystr);
 }
@@ -276,7 +272,6 @@ void RIG_TS480HX::set_modeB(int val)
 	cmd = "MD";
 	cmd += TS480HX_mode_chr[val];
 	cmd += ';';
-	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd, 0);
 	showresp(WARN, ASC, "set mode B", cmd, replystr);
 }
@@ -308,7 +303,6 @@ void RIG_TS480HX::set_bwA(int val)
 	bwA = val;
 	cmd = "SL00;";
 	cmd[3] = '0' + val;
-	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd, 0);
 	showresp(WARN, ASC, "set bw A", cmd, replystr);
 }
@@ -334,7 +328,6 @@ void RIG_TS480HX::set_bwB(int val)
 	bwB = val;
 	cmd = "SL00;";
 	cmd[3] = '0' + val;
-	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd, 0);
 	showresp(WARN, ASC, "set bw B", cmd, replystr);
 }
@@ -368,7 +361,6 @@ void RIG_TS480HX::set_volume_control(int val)
 	snprintf(szval, sizeof(szval), "%04d", val * 255 / 100);
 	cmd += szval;
 	cmd += ';';
-	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd, 0);
 	showresp(WARN, ASC, "set vol", cmd, replystr);
 }
@@ -398,7 +390,6 @@ void RIG_TS480HX::set_power_control(double val)
 	snprintf(szval, sizeof(szval), "%03d", (int)val);
 	cmd += szval;
 	cmd += ';';
-	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set power", cmd, replystr);
 }
@@ -443,7 +434,6 @@ int RIG_TS480HX::get_attenuator()
 void RIG_TS480HX::tune_rig()
 {
 	cmd = "AC111;";
-	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd);
 	showresp(WARN, ASC, "tune", cmd, replystr);
 }
