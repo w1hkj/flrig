@@ -1741,6 +1741,7 @@ void initXcvrTab()
 		btn_poll_noise->activate(); btn_poll_noise->value(progStatus.poll_noise);
 		btn_poll_nr->activate(); btn_poll_nr->value(progStatus.poll_nr);
 
+		if (!selrig->has_bandwidth_control) { btn_poll_bandwidth->deactivate(); btn_poll_bandwidth->value(0); }
 		if (!selrig->has_smeter) { btn_poll_smeter->deactivate(); btn_poll_smeter->value(0); }
 		if (!selrig->has_power_out) { btn_poll_pout->deactivate(); btn_poll_pout->value(0); }
 		if (!selrig->has_swr_control) { btn_poll_swr->deactivate(); btn_poll_swr->value(0); }

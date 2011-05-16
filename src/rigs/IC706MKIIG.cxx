@@ -16,15 +16,16 @@ const char IC706MKIIGname_[] = "IC-706MKIIG";
 const char *IC706MKIIGmodes_[] = { "LSB", "USB", "AM", "CW", "RTTY", "FM", "WFM", NULL};
 const char IC706MKIIG_mode_type[] =
 	{ 'L', 'U', 'U', 'L', 'L', 'U', 'U'};
-const char *IC706MKIIG_widths[] = { "WIDE", "NARR", NULL};
+//const char *IC706MKIIG_widths[] = { "WIDE", "NARR", NULL};
+const char *IC706MKIIG_widths[] = { "n/a", NULL};
 
 RIG_IC706MKIIG::RIG_IC706MKIIG() {
 	name_ = IC706MKIIGname_;
 	modes_ = IC706MKIIGmodes_;
 	bandwidths_ = IC706MKIIG_widths;
 	_mode_type = IC706MKIIG_mode_type;
-	comm_baudrate = BR9600;
-	stopbits = 2;
+	comm_baudrate = BR19200;
+	stopbits = 1;
 	comm_retries = 2;
 	comm_wait = 5;
 	comm_timeout = 50;
@@ -32,14 +33,15 @@ RIG_IC706MKIIG::RIG_IC706MKIIG() {
 	comm_rtscts = false;
 	comm_rtsplus = true;
 	comm_dtrplus = true;
-	comm_catptt = true;
+	comm_catptt = false;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	modeA = 1;
-	bwA = 0;
+	def_freq = freqA = freqB = A.freq = B.imode = 14070000;
+	def_mode = modeA = modeB = A.imode = B.imode = 1;
+	def_bw = bwA = bwB = A.iBW = B.iBW = 0;
 
-	has_mode_control = true;
-	has_bandwidth_control = true;
+	has_smeter =
+	has_mode_control =
 	has_attenuator_control = true;
 
 	defaultCIV = 0x58;
@@ -148,7 +150,7 @@ int RIG_IC706MKIIG::get_modeA()
 		if (p != string::npos) {
 			modeA = replystr[p+5];
 			if (modeA > 6) modeA -= 2;
-			bwA = replystr[p+6];
+//			bwA = replystr[p+6];
 		}
 	}
 	return modeA;
@@ -159,6 +161,7 @@ int RIG_IC706MKIIG::get_modetype(int n)
 	return _mode_type[n];
 }
 
+/*
 void RIG_IC706MKIIG::set_bwA(int val)
 {
 	bwA = val;
@@ -169,6 +172,7 @@ int  RIG_IC706MKIIG::get_bwA()
 {
 	return bwA;
 }
+*/
 
 void RIG_IC706MKIIG::set_attenuator(int val)
 {

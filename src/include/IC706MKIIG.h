@@ -20,8 +20,8 @@ public:
 	void set_modeA(int val);
 	int  get_modeA();
 	int  get_modetype(int n);
-	void set_bwA(int val);
-	int  get_bwA();
+//	void set_bwA(int val);
+//	int  get_bwA();
 
 	int  get_smeter();
 //	int  get_swr();
