@@ -1881,16 +1881,22 @@ static void cb_txtCIV(Fl_Input* o, void*) {
 cbCIV();
 }
 
+Fl_Button *btnCIVdefault=(Fl_Button *)0;
+
+static void cb_btnCIVdefault(Fl_Button*, void*) {
+  cbCIVdefault();
+}
+
 Fl_Check_Button *btnUSBaudio=(Fl_Check_Button *)0;
 
 static void cb_btnUSBaudio(Fl_Check_Button*, void*) {
   cbUSBaudio();
 }
 
-Fl_Button *btnCIVdefault=(Fl_Button *)0;
+Fl_Check_Button *btn_key_fldigi=(Fl_Check_Button *)0;
 
-static void cb_btnCIVdefault(Fl_Button*, void*) {
-  cbCIVdefault();
+static void cb_btn_key_fldigi(Fl_Check_Button* o, void*) {
+  progStatus.key_fldigi = o->value();
 }
 
 Fl_Group *tabPTT=(Fl_Group *)0;
@@ -2253,7 +2259,7 @@ Fl_Double_Window* XcvrDialog() {
           } // Fl_Check_Button* btndtrplus
           o->end();
         } // Fl_Group* o
-        { Fl_Group* o = new Fl_Group(247, 175, 225, 73);
+        { Fl_Group* o = new Fl_Group(247, 175, 225, 36);
           o->box(FL_ENGRAVED_FRAME);
           o->align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE);
           { txtCIV = new Fl_Input(261, 183, 58, 22, _("CI-V adr"));
@@ -2262,18 +2268,28 @@ Fl_Double_Window* XcvrDialog() {
             txtCIV->callback((Fl_Callback*)cb_txtCIV);
             txtCIV->align(FL_ALIGN_RIGHT);
           } // Fl_Input* txtCIV
-          { btnUSBaudio = new Fl_Check_Button(261, 215, 104, 15, _("USB audio"));
-            btnUSBaudio->down_box(FL_DOWN_BOX);
-            btnUSBaudio->callback((Fl_Callback*)cb_btnUSBaudio);
-          } // Fl_Check_Button* btnUSBaudio
           { btnCIVdefault = new Fl_Button(387, 183, 69, 22, _("Default"));
             btnCIVdefault->callback((Fl_Callback*)cb_btnCIVdefault);
           } // Fl_Button* btnCIVdefault
           o->end();
         } // Fl_Group* o
+        { Fl_Group* o = new Fl_Group(247, 212, 225, 36);
+          o->box(FL_ENGRAVED_FRAME);
+          { btnUSBaudio = new Fl_Check_Button(261, 222, 104, 15, _("USB audio"));
+            btnUSBaudio->down_box(FL_DOWN_BOX);
+            btnUSBaudio->callback((Fl_Callback*)cb_btnUSBaudio);
+          } // Fl_Check_Button* btnUSBaudio
+          { Fl_Check_Button* o = btn_key_fldigi = new Fl_Check_Button(375, 222, 85, 15, _("key fldigi"));
+            btn_key_fldigi->tooltip(_("PTT keys fldigi modem"));
+            btn_key_fldigi->down_box(FL_DOWN_BOX);
+            btn_key_fldigi->callback((Fl_Callback*)cb_btn_key_fldigi);
+            o->value(progStatus.key_fldigi);
+          } // Fl_Check_Button* btn_key_fldigi
+          o->end();
+        } // Fl_Group* o
         tabPrimary->end();
       } // Fl_Group* tabPrimary
-      { tabPTT = new Fl_Group(2, 30, 470, 218, _("PTT"));
+      { tabPTT = new Fl_Group(2, 30, 470, 218, _("Sep\' PTT"));
         tabPTT->hide();
         { new Fl_Box(52, 72, 395, 37, _("Use only if your setup requires a separate\nSerial Port for a PTT control lin\
 e"));
