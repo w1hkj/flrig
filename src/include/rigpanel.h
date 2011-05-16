@@ -105,9 +105,10 @@ extern Fl_Menu_Item menu_[];
 #define mnuColorConfig (menu_+7)
 #define mnuTooltips (menu_+8)
 #define mnuConfigXcvr (menu_+9)
-#define mnuHelp (menu_+20)
-#define mnuOnLineHelp (menu_+21)
-#define mnuAbout (menu_+22)
+#define save_me (menu_+12)
+#define mnuHelp (menu_+18)
+#define mnuOnLineHelp (menu_+19)
+#define mnuAbout (menu_+20)
 extern Fl_Box *lblTest;
 extern Fl_Button *prefFont;
 extern Fl_Button *prefForeground;
@@ -140,6 +141,7 @@ extern Fl_Light_Button *btn_lighted;
 extern Fl_Button *btn_lighted_default;
 Fl_Double_Window* DisplayDialog();
 extern Fl_Button *btnAddFreq;
+extern Fl_Button *btnPickFreq;
 extern Fl_Button *btnDelFreq;
 extern Fl_Button *btnClearList;
 #include <FL/Fl_Browser.H>

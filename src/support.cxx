@@ -952,6 +952,23 @@ void selectFreq() {
 	setFocus();
 }
 
+void select_and_close()
+{
+	switch (Fl::event_button()) {
+		case FL_LEFT_MOUSE:
+			if (Fl::event_clicks()) { // double click
+				selectFreq();
+				cbCloseMemory();
+			}
+			break;
+		case FL_RIGHT_MOUSE:
+			selectFreq();
+			break;
+		default:
+			break;
+	}
+}
+
 void delFreq() {
 	if (FreqSelect->value()) {
 		long n = FreqSelect->value() - 1;
