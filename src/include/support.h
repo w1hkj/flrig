@@ -195,6 +195,7 @@ extern void setColors();
 extern void setDisplayColors();
 extern void openMemoryDialog();
 extern void cbCloseMemory();
+extern void select_and_close();
 
 extern void cbOkDisplayDialog();
 extern void cbCancelDisplayDialog();

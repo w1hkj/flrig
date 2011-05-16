@@ -38,12 +38,12 @@ static void cb_mnuConfigXcvr(Fl_Menu_*, void*) {
   configXcvr();
 }
 
-static void cb_Save(Fl_Menu_*, void*) {
-  addFreq();
+static void cb_Memory(Fl_Menu_*, void*) {
+  openMemoryDialog();
 }
 
-static void cb_View(Fl_Menu_*, void*) {
-  openMemoryDialog();
+static void cb_save_me(Fl_Menu_*, void*) {
+  addFreq();
 }
 
 static void cb_Events(Fl_Menu_*, void*) {
@@ -78,10 +78,8 @@ Fl_Menu_Item menu_[] = {
  {_("Tooltips"), 0,  (Fl_Callback*)cb_mnuTooltips, 0, 130, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Xcvr select"), 0,  (Fl_Callback*)cb_mnuConfigXcvr, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
- {_("Frq &List"), 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
- {_("&Save"), 0,  (Fl_Callback*)cb_Save, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
- {_("&View"), 0,  (Fl_Callback*)cb_View, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
- {0,0,0,0,0,0,0,0,0},
+ {_("&Memory"), 0,  (Fl_Callback*)cb_Memory, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("@>>"), 0,  (Fl_Callback*)cb_save_me, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("&Debug"), 0,  0, 0, 192, FL_NORMAL_LABEL, 0, 14, 0},
  {_("&Events"), 0,  (Fl_Callback*)cb_Events, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
  {_("&Polling"), 0,  (Fl_Callback*)cb_Polling, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
@@ -591,7 +589,7 @@ Fl_Double_Window* Rig_window() {
       }
       o->menu(menu_);
     } // Fl_Menu_Bar* o
-    { txt_encA = new Fl_Output(334, 0, 90, 22);
+    { txt_encA = new Fl_Output(333, 1, 90, 20);
       txt_encA->box(FL_THIN_DOWN_BOX);
       txt_encA->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
       txt_encA->hide();
@@ -1660,6 +1658,13 @@ static void cb_btnAddFreq(Fl_Button*, void*) {
   addFreq();
 }
 
+Fl_Button *btnPickFreq=(Fl_Button *)0;
+
+static void cb_btnPickFreq(Fl_Button*, void*) {
+  if (FreqSelect->value())
+selectFreq();
+}
+
 Fl_Button *btnDelFreq=(Fl_Button *)0;
 
 static void cb_btnDelFreq(Fl_Button*, void*) {
@@ -1678,9 +1683,22 @@ static void cb_Close(Fl_Button*, void*) {
 
 Fl_Browser *FreqSelect=(Fl_Browser *)0;
 
-static void cb_FreqSelect(Fl_Browser*, void*) {
-  if (FreqSelect->value())
-selectFreq();
+static void cb_FreqSelect(Fl_Browser* o, void*) {
+  select_and_close();
+switch (Fl::event_button()) {
+case FL_LEFT_MOUSE:
+if (Fl::event_clicks()) { // double click
+	if (o->value())
+		selectFreq();		
+	o->parent()->hide();
+}
+break;
+case FL_RIGHT_MOUSE:
+	if (o->value()) selectFreq();
+	break;
+default:
+	break;
+};
 }
 
 Fl_Double_Window* Memory_Dialog() {
@@ -1696,14 +1714,21 @@ Fl_Double_Window* Memory_Dialog() {
         btnAddFreq->callback((Fl_Callback*)cb_btnAddFreq);
         btnAddFreq->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
       } // Fl_Button* btnAddFreq
-      { btnDelFreq = new Fl_Button(6, 40, 51, 22, _("Del @-11+"));
+      { btnPickFreq = new Fl_Button(6, 31, 51, 22, _("Pick @-1<"));
+        btnPickFreq->tooltip(_("Use selected data"));
+        btnPickFreq->down_box(FL_DOWN_BOX);
+        btnPickFreq->labelsize(12);
+        btnPickFreq->callback((Fl_Callback*)cb_btnPickFreq);
+        btnPickFreq->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
+      } // Fl_Button* btnPickFreq
+      { btnDelFreq = new Fl_Button(6, 57, 51, 22, _("Del @-11+"));
         btnDelFreq->tooltip(_("Delete from list"));
         btnDelFreq->down_box(FL_DOWN_BOX);
         btnDelFreq->labelsize(12);
         btnDelFreq->callback((Fl_Callback*)cb_btnDelFreq);
         btnDelFreq->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
       } // Fl_Button* btnDelFreq
-      { btnClearList = new Fl_Button(6, 74, 51, 22, _("Clr @-2square"));
+      { btnClearList = new Fl_Button(6, 83, 51, 22, _("Clr @-2square"));
         btnClearList->tooltip(_("Clear list"));
         btnClearList->down_box(FL_DOWN_BOX);
         btnClearList->labelsize(12);
@@ -1711,6 +1736,7 @@ Fl_Double_Window* Memory_Dialog() {
         btnClearList->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
       } // Fl_Button* btnClearList
       { Fl_Button* o = new Fl_Button(6, 109, 51, 22, _("Close"));
+        o->tooltip(_("Close Memory dialog"));
         o->labelsize(12);
         o->callback((Fl_Callback*)cb_Close);
         o->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
@@ -1718,7 +1744,7 @@ Fl_Double_Window* Memory_Dialog() {
       o->end();
     } // Fl_Group* o
     { Fl_Browser* o = FreqSelect = new Fl_Browser(66, 2, 250, 133);
-      FreqSelect->tooltip(_("Select operating frequency/mode"));
+      FreqSelect->tooltip(_("Right click => pick freq\nDouble-click ==> pick and close"));
       FreqSelect->type(2);
       FreqSelect->labelfont(4);
       FreqSelect->labelsize(12);
