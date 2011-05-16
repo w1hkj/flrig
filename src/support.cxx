@@ -1266,11 +1266,10 @@ void cbTune()
 
 void cbPTT()
 {
-	if (fldigi_online)
+	if (fldigi_online && progStatus.key_fldigi)
 		send_ptt_changed(btnPTT->value());
 	else
 		quePTT.push(btnPTT->value());
-	return;
 	setFocus();
 }
 

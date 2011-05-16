@@ -116,6 +116,8 @@ status progStatus = {
 
 	false,		// bool split;
 
+	true,		// bool key_fldigi;
+
 //tt550 controls
 	80,			// tt550_line_out;
 	1,			// tt550_agc_level;

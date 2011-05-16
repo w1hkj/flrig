@@ -101,6 +101,8 @@ struct status {
 
 	bool	split;
 
+	bool	key_fldigi;
+
 //============= transceiver specific prameters
 //tt550 controls
 	int		tt550_line_out;
