@@ -1126,18 +1126,25 @@ void setNotch()
 void setIFshiftButton(void *d)
 {
 	bool b = (bool)d;
-	if (b && !btnIFsh->value()) btnIFsh->value(1);
-	else if (!b && btnIFsh->value()) btnIFsh->value(0);
+	if (b && !btnIFsh->value()) {
+		btnIFsh->value(1);
+	}
+	else if (!b && btnIFsh->value()) {
+		btnIFsh->value(0);
+	}
 }
 
 void setIFshiftControl(void *d)
 {
 	int val = (long)d;
-	if (sldrIFSHIFT->value() != val) sldrIFSHIFT->value(val);
+	if (sldrIFSHIFT->value() != val)
+		sldrIFSHIFT->value(val);
+	if (val != 0) btnIFsh->value(1);
 }
 
 void setIFshift()
 {
+	if (sldrIFSHIFT->value() != 0) btnIFsh->value(1);
 	pthread_mutex_lock(&mutex_serial);
 		selrig->set_if_shift(sldrIFSHIFT->value());
 	pthread_mutex_unlock(&mutex_serial);
@@ -1145,13 +1152,8 @@ void setIFshift()
 
 void cbIFsh()
 {
-	if (btnIFsh->value() == 1) {
+	if (btnIFsh->value() == 0)
 		sldrIFSHIFT->value(0);
-		sldrIFSHIFT->activate();
-	} else {
-		sldrIFSHIFT->value(0);
-		sldrIFSHIFT->deactivate();
-	}
 	setIFshift();
 	setFocus();
 }
@@ -2040,7 +2042,6 @@ void initRig()
 		} else {
 			btnIFsh->value(0);
 			sldrIFSHIFT->value(0);
-			sldrIFSHIFT->deactivate();
 			selrig->set_if_shift(0);
 		}
 		btnIFsh->show();
@@ -2425,6 +2426,13 @@ void auto_notch_label(const char * l, bool on = false)
 	btnAutoNotch->value(on);
 	btnAutoNotch->label(l);
 	btnAutoNotch->redraw_label();
+}
+
+void noise_blanker_label(const char *l, bool on = false)
+{
+	btnNOISE->value(on);
+	btnNOISE->label(l);
+	btnNOISE->redraw_label();
 }
 
 void cbAuxPort()
