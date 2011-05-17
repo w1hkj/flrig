@@ -279,6 +279,20 @@ void read_auto_notch()
 	Fl::awake(update_auto_notch, (void*)0);
 }
 
+// NOISE blanker
+void update_noise(void *d)
+{
+	btnNOISE->value(progStatus.noise);
+}
+
+void read_noise()
+{
+	pthread_mutex_lock(&mutex_serial);
+		progStatus.noise = selrig->get_noise();
+	pthread_mutex_unlock(&mutex_serial);
+	Fl::awake(update_noise, (void*)0);
+}
+
 // preamp - attenuator
 void update_preamp(void *d)
 {
@@ -638,6 +652,7 @@ void * serial_thread_loop(void *d)
 				if (progStatus.poll_rfgain) read_rfgain();
 				if (progStatus.poll_split) read_split();
 				if (progStatus.poll_nr) read_nr();
+				if (progStatus.poll_noise) read_noise();
 				loopcount = progStatus.serloop_timing / 10;
 			}
 		} else {
@@ -1073,31 +1088,29 @@ void setPreampControl(void *d)
 
 void cbNoise()
 {
+	progStatus.noise = btnNOISE->value();
 	pthread_mutex_lock(&mutex_serial);
-		selrig->set_noise(btnNOISE->value());
+		selrig->set_noise(progStatus.noise);
 	pthread_mutex_unlock(&mutex_serial);
 	setFocus();
 }
 
 void cbNR()
 {
+	progStatus.noise_reduction = btnNR->value();
 	pthread_mutex_lock(&mutex_serial);
-		selrig->set_noise_reduction(btnNR->value());
+		selrig->set_noise_reduction(progStatus.noise_reduction);
 	pthread_mutex_unlock(&mutex_serial);
 	setFocus();
 }
 
 void setNR()
 {
+	progStatus.noise_reduction_val = sldrNR->value();
 	pthread_mutex_lock(&mutex_serial);
-		selrig->set_noise_reduction_val(sldrNR->value());
+		selrig->set_noise_reduction_val(progStatus.noise_reduction_val);
 	pthread_mutex_unlock(&mutex_serial);
 	setFocus();
-}
-
-void setNoiseControl(void *d)
-{
-	btnNOISE->value((long)d);
 }
 
 void cbbtnNotch()
@@ -1114,15 +1127,11 @@ void cbbtnNotch()
 
 void cbAN()
 {
+	progStatus.auto_notch = btnAutoNotch->value();
 	pthread_mutex_lock(&mutex_serial);
-		selrig->set_auto_notch(btnAutoNotch->value());
+		selrig->set_auto_notch(progStatus.auto_notch);
 	pthread_mutex_unlock(&mutex_serial);
 	setFocus();
-}
-
-void setNotchButton(void *d)
-{
-	btnNotch->value((bool)d);
 }
 
 void setNotchControl(void *d)
@@ -2523,8 +2532,9 @@ void cb_compression()
 
 void cb_auto_notch()
 {
+	progStatus.auto_notch = btnAutoNotch->value();
 	pthread_mutex_lock(&mutex_serial);
-		selrig->set_auto_notch(btnAutoNotch->value());
+		selrig->set_auto_notch(progStatus.auto_notch);
 	pthread_mutex_unlock(&mutex_serial);
 }
 

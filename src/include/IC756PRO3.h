@@ -28,46 +28,63 @@ public:
 	int  get_bwB();
 
 	int  get_smeter();
+	int  get_swr(void);
+	int  get_alc(void);
+	int  get_power_out(void);
+
 	void set_volume_control(int val);
 	int  get_volume_control();
 	void get_vol_min_max_step(int &min, int &max, int &step);
+
 	void set_PTT_control(int val);
+
 	void set_noise(bool val);
 	int  get_noise();
+
 	void set_noise_reduction(int val);
 	int  get_noise_reduction();
+
 	void set_noise_reduction_val(int val);
 	int  get_noise_reduction_val();
 
 	void set_mic_gain(int val);
-//	int  get_mic_gain();
+	int  get_mic_gain();
 	void get_mic_gain_min_max_step(int &min, int &max, int &step);
+
 	void set_if_shift(int val);
-//	bool get_if_shift(int val);
+	bool get_if_shift(int &val);
 	void get_if_min_max_step(int &min, int &max, int &step);
+	
 	void set_squelch(int val);
-//	int  get_squelch();
+	int  get_squelch();
+	
 	void set_rf_gain(int val);
-//	int  get_rf_gain();
+	int  get_rf_gain();
+	
 	void set_power_control(double val);
+	int  get_power_control();
 
 	void set_split(bool val);
+	bool get_split();
 	bool can_split() { return true;}
 
 	void set_attenuator(int val);
 	int  get_attenuator();
+
 	void set_preamp(int val);
 	int  get_preamp();
 
 	int  adjust_bandwidth(int);
 	int  def_bandwidth(int);
-	int  get_swr();
-	int  get_alc();
-	int  get_power_out();
+
 	void tune_rig();
+
 	void set_notch(bool, int);
 	bool get_notch(int&);
 	void get_notch_min_max_step(int&, int&, int&);
+
+	void set_auto_notch(int);
+	int  get_auto_notch();
 
 	bool twovfos() { return false; }
 

@@ -55,12 +55,16 @@ RIG_IC756PRO3::RIG_IC756PRO3() {
 	def_bw = bwA = bwB = A.iBW = B.iBW = 32;
 
 	has_a2b =
+	has_split =
 	has_bandwidth_control =
 	has_ifshift_control =
 	has_tune_control =
+
 	has_swr_control =
 	has_alc_control = 
 	has_smeter =
+	has_power_out =
+
 	has_power_control =
 	has_volume_control =
 	has_mode_control =
@@ -172,11 +176,59 @@ int RIG_IC756PRO3::get_smeter()
 	return 0;
 }
 
+int RIG_IC756PRO3::get_power_out()
+{
+	string cstr = "\x15\x11";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append(post);
+	if (waitFOR(9, "get pout")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return fm_bcd(&replystr[p+6], 3) / 2.55;
+	}
+	return 0;
+}
+
+int RIG_IC756PRO3::get_alc()
+{
+	string cstr = "\x15\x13";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append(post);
+	if (waitFOR(9, "get alc")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return fm_bcd(&replystr[p+6], 3) / 2.55;
+	}
+	return 0;
+}
+
+int RIG_IC756PRO3::get_swr()
+{
+	string cstr = "\x15\x12";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append(post);
+	if (waitFOR(9, "get swr")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return fm_bcd(&replystr[p+6], 3) / 2.55;
+	}
+	return 0;
+}
+
 // Volume control val 0 ... 100
 
 void RIG_IC756PRO3::set_volume_control(int val)
 {
-	ICvol = (int)(val);
+	ICvol = (int)(val * 2.55);
 	cmd = pre_to;
 	cmd.append("\x14\x01");
 	cmd.append(to_bcd(ICvol, 3));
@@ -195,14 +247,14 @@ int RIG_IC756PRO3::get_volume_control()
 	if (waitFOR(9, "get vol")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return ((int)(fm_bcd(&replystr[p+6],3)));
+			return ((int)(fm_bcd(&replystr[p+6],3)) / 2.55);
 	}
 	return 0;
 }
 
 void RIG_IC756PRO3::get_vol_min_max_step(int &min, int &max, int &step)
 {
-	min = 0; max = 255; step = 1;
+	min = 0; max = 100; step = 1;
 }
 
 // Tranceiver PTT on/off
@@ -239,7 +291,7 @@ int RIG_IC756PRO3::get_noise()
 		if (p != string::npos)
 			return (replystr[p+6] ? 1 : 0);
 	}
-	return 0;
+	return progStatus.noise;
 }
 
 void RIG_IC756PRO3::set_noise_reduction(int val)
@@ -264,7 +316,7 @@ int RIG_IC756PRO3::get_noise_reduction()
 		if (p != string::npos)
 			return (replystr[p+6] ? 1 : 0);
 	}
-	return 0;
+	return progStatus.noise_reduction;
 }
 
 // 0 < val < 100
@@ -272,7 +324,7 @@ void RIG_IC756PRO3::set_noise_reduction_val(int val)
 {
 	cmd = pre_to;
 	cmd.append("\x14\x06");
-	cmd.append(to_bcd(val * 255 / 100, 3));
+	cmd.append(to_bcd(val * 2.55, 3));
 	cmd.append(post);
 	waitFB("set NR val");
 }
@@ -290,7 +342,7 @@ int RIG_IC756PRO3::get_noise_reduction_val()
 		if (p != string::npos)
 			return ((int)(fm_bcd(&replystr[p+6],3) / 2.55));
 	}
-	return 0;
+	return progStatus.noise_reduction_val;
 }
 
 int RIG_IC756PRO3::get_modetype(int n)
@@ -298,9 +350,25 @@ int RIG_IC756PRO3::get_modetype(int n)
 	return _mode_type[n];
 }
 
+int RIG_IC756PRO3::get_mic_gain()
+{
+	string cstr = "\x14\x0B";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append(post);
+	if (waitFOR(9, "get mic")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return ((int)(fm_bcd(&replystr[p+6],3) / 2.55));
+	}
+	return 0;
+}
+
 void RIG_IC756PRO3::set_mic_gain(int val)
 {
-	val = (int)(val * 255 / 100);
+	val = (int)(val * 2.55);
 	cmd = pre_to;
 	cmd.append("\x14\x0B");
 	cmd.append(to_bcd(val,3));
@@ -317,32 +385,41 @@ void RIG_IC756PRO3::get_mic_gain_min_max_step(int &min, int &max, int &step)
 
 void RIG_IC756PRO3::set_if_shift(int val)
 {
-	int shift = (int)((val + 50) * 2.56 );
-	if (shift == 256) shift = 255;
+	int shift = (int)((val + 50) * 2.55 );
 	cmd = pre_to;
 	cmd.append("\x14\x07");
 	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
-	waitFB("set IF on/off");
+	waitFB("set if-shift");
+}
 
+bool  RIG_IC756PRO3::get_if_shift(int &val)
+{
+	string cstr = "\x14\x07";
+	string resp = pre_fm;
+	resp.append(cstr);
 	cmd = pre_to;
-	cmd.append("\x14\x08");
-	cmd.append(to_bcd(shift, 3));
+	cmd.append(cstr);
 	cmd.append(post);
-	waitFB("set IF val");
+	val = progStatus.shift_val;
+	if (waitFOR(9, "get if-shift")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			val = ((int)(fm_bcd(&replystr[p+6], 3) / 2.55 - 50));
+	}
+	return (progStatus.shift = (val != 0));
 }
 
 void RIG_IC756PRO3::get_if_min_max_step(int &min, int &max, int &step)
 {
 	min = -50;
 	max = +50;
-	step = 2;
+	step = 1;
 }
 
-int IC756PRO3sql = 0;
 void RIG_IC756PRO3::set_squelch(int val)
 {
-	IC756PRO3sql = (int)(val * 255 / 100);
+	int IC756PRO3sql = (int)(val * 2.55);
 	cmd = pre_to;
 	cmd.append("\x14\x03");
 	cmd.append(to_bcd(IC756PRO3sql, 3));
@@ -350,10 +427,25 @@ void RIG_IC756PRO3::set_squelch(int val)
 	waitFB("set sql");
 }
 
-int IC756PRO3rfg = 0;
+int  RIG_IC756PRO3::get_squelch()
+{
+	string cstr = "\x14\x03";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append(post);
+	if (waitFOR(9, "get sql")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return ((int)(fm_bcd(&replystr[p+6], 3) / 2.55));
+	}
+	return progStatus.squelch;
+}
+
 void RIG_IC756PRO3::set_rf_gain(int val)
 {
-	IC756PRO3rfg = (int)(val * 255 / 100);
+	int IC756PRO3rfg = (int)(val * 2.55);
 	cmd = pre_to;
 	cmd.append("\x14\x02");
 	cmd.append(to_bcd(IC756PRO3rfg, 3));
@@ -361,13 +453,43 @@ void RIG_IC756PRO3::set_rf_gain(int val)
 	waitFB("set rf gain");
 }
 
+int RIG_IC756PRO3::get_rf_gain()
+{
+	string cstr = "\x14\x02";
+	string resp = pre_fm;
+	cmd = pre_to;
+	cmd.append(cstr).append(post);
+	resp.append(cstr);
+	if (waitFOR(9, "get rfgain")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return ((int)(fm_bcd(&replystr[p + 6],3) / 2.55));
+	}
+	return progStatus.rfgain;
+}
+
 void RIG_IC756PRO3::set_power_control(double val)
 {
 	cmd = pre_to;
 	cmd.append("\x14\x0A");
-	cmd.append(to_bcd((int)(val * 255 / 100), 3));
+	cmd.append(to_bcd((int)(val * 2.55), 3));
 	cmd.append( post );
 	waitFB("set power");
+}
+
+int RIG_IC756PRO3::get_power_control()
+{
+	string cstr = "\x14\x0A";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr).append(post);
+	if (waitFOR(9, "get power")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return ((int)(fm_bcd(&replystr[p + 6],3) / 2.55));
+	}
+	return progStatus.power_level;
 }
 
 void RIG_IC756PRO3::set_split(bool val)
@@ -377,6 +499,12 @@ void RIG_IC756PRO3::set_split(bool val)
 	cmd += val ? 0x01 : 0x00;
 	cmd.append(post);
 	waitFB("set split");
+}
+
+bool RIG_IC756PRO3::get_split()
+{
+	LOG_WARN("%s", "get split - not implemented");
+	return progStatus.split;
 }
 
 int RIG_IC756PRO3::adjust_bandwidth(int m)
@@ -421,55 +549,6 @@ const char **RIG_IC756PRO3::bwtable(int m)
 	if (m == 4 || m == 7) //RTTY
 		return IC756PRO3_RTTYwidths;
 	return IC756PRO3_AMFMwidths;
-}
-
-int RIG_IC756PRO3::get_swr()
-{
-	string cstr = "\x15\x12";
-	string resp = pre_fm;
-	resp.append(cstr);
-	cmd = pre_to;
-	cmd.append(cstr);
-	cmd.append( post );
-	if (waitFOR(9, "get swr")) {
-		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-		return (int)(fm_bcd(&replystr[p + 6],3) / 2.55 );
-	}
-	return -1;
-}
-
-int RIG_IC756PRO3::get_alc()
-{
-	string cstr = "\x15\x13";
-	string resp = pre_fm;
-	resp.append(cstr);
-	cmd = pre_to;
-	cmd.append(cstr);
-	cmd.append( post );
-	if (waitFOR(9, "get alc")) {
-		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-		return (int)(fm_bcd(&replystr[p + 6],3) / 2.55 );
-	}
-	return -1;
-}
-
-// Transceiver power level return power in watts
-int RIG_IC756PRO3::get_power_out()
-{
-	string cstr = "\x15\x11";
-	string resp = pre_fm;
-	resp.append(cstr);
-	cmd = pre_to;
-	cmd.append(cstr);
-	cmd.append( post );
-	if (waitFOR(9, "get power")) {
-		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-		return (int)(fm_bcd(&replystr[p + 6],3) / 2.55 );
-	}
-	return -1;
 }
 
 void RIG_IC756PRO3::tune_rig()
@@ -841,5 +920,38 @@ int RIG_IC756PRO3::get_modeB()
 		}
 	}
 	return B.imode;
+}
+
+void RIG_IC756PRO3::set_auto_notch(int val)
+{
+	cmd = pre_to;
+	cmd += '\x16';
+	cmd += '\x41';
+	cmd += val ? 0x01 : 0x00;
+	cmd.append( post );
+	waitFB("set AN");
+}
+
+int RIG_IC756PRO3::get_auto_notch()
+{
+	string cstr = "\x16\x41";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+	if (waitFOR(8, "get AN")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			if (replystr[p+6] == 0x01) {
+				auto_notch_label("AN", true);
+				return true;
+			} else {
+				auto_notch_label("AN", false);
+				return false;
+			}
+		}
+	}
+	return progStatus.auto_notch;
 }
 
