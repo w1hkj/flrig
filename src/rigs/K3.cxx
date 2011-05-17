@@ -99,7 +99,7 @@ void RIG_K3::initialize()
 
 	cmd = "OM;"; // request options to get power level
 	sendCommand(cmd, 0);   // was missing !!
-	waitResponse(100);
+	waitResponse(800);
 	showresp(WARN, ASC, "options", cmd, replystr);
 	if (replystr.find("P") == string::npos) {
 		minpwr = 0;
