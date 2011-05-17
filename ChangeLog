@@ -1,9 +1,13 @@
-2011-05-16  David Freese  <w1hkj@w1hkj.com>
+2011-05-17  David Freese  <w1hkj@w1hkj.com>
 
-	051f71d: TT588 additions
-	7264220: PTT for Voice
-	25c002c: TS480HX events
-	e3e92ed: IC706MKIIG set mode/bandwidth
+	e143828: K3 read options
+	a47b892: IC7000
+	aa77fff: IC756PRO3
+	284a765: Memory List
+	27eb3d1: TT588 additions
+	d51a394: PTT for Voice
+	60bad67: TS480HX events
+	00bd636: IC706MKIIG set mode/bandwidth
 	d3c9e8e: IC7000 bug fixes
 	5fae473: FT100D event levels
 	befcb95: Polling bug
