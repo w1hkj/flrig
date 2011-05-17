@@ -59,13 +59,11 @@ extern void updateBandwidthControl(void *d = NULL);
 extern void updateBW(void *);
 extern void setBWControl(void *);
 extern void setNotchControl(void *);
-extern void setNotchButton(void *);
 extern void setIFshiftButton(void *);
 extern void setIFshiftControl(void *);
 extern void setPTT( void *);
 extern void setPreampControl(void *);
 extern void setAttControl(void *);
-extern void setNoiseControl(void *);
 extern void setMicGainControl(void *);
 
 extern void setMode();
