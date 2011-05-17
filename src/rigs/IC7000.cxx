@@ -434,6 +434,9 @@ void RIG_IC7000::set_split(bool val)
 
 bool RIG_IC7000::get_split()
 {
+	LOG_WARN("%s", "get split - not implemented");
+	return progStatus.split;
+/*
 	cmd = pre_to;
 	cmd += 0x0F;
 	cmd.append(post);
@@ -445,6 +448,7 @@ bool RIG_IC7000::get_split()
 			return (replystr[p+6] ? 1 : 0);
 	}
 	return 0;
+*/
 }
 
 // Volume control val 0 ... 100
