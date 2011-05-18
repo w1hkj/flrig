@@ -111,7 +111,7 @@ bool RIG_FT100D::get_info()
 {
 	init_cmd();
 	cmd[4] = 0x10;
-	int ret = sendCommand(cmd);
+	int ret = sendCommand(cmd, 32);
 	showresp(WARN, HEX, "info", cmd, replystr);
 
 	if (ret >= 32) {
