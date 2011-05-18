@@ -1,5 +1,8 @@
-2011-05-17  David Freese  <w1hkj@w1hkj.com>
+2011-05-18  David Freese  <w1hkj@w1hkj.com>
 
+	9ae9a2a: IC756PRO3 split
+	974d78c: FT100D bug fix
+	b1c536e: TT588 if shift range
 	e143828: K3 read options
 	a47b892: IC7000
 	aa77fff: IC756PRO3
