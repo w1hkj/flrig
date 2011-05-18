@@ -311,8 +311,8 @@ bool RIG_TT588::get_if_shift(int &val)
 
 void RIG_TT588::get_if_min_max_step(int &min, int &max, int &step)
 {
-	min = -8000;
-	max = 8000;
+	min = -2500;
+	max = 2500;
 	step = 10;
 }
 
