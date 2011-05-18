@@ -849,10 +849,15 @@ void cbA2B()
 
 void cb_set_split(int val)
 {
-	if (rig_nbr == K3) {
-		K3_set_split(val);
+	progStatus.split = val;
+	if (rig_nbr == K3 || rig_nbr == IC756PRO3) {
+		pthread_mutex_lock(&mutex_serial);
+			selrig->set_split(val);
+		pthread_mutex_unlock(&mutex_serial);
+		setFocus();
 		return;
 	}
+
 	if (val) {
 		if (useB) {
 			btnA->value(1);
@@ -871,7 +876,6 @@ void cb_set_split(int val)
 	} else
 		cb_selectA();
 
-	progStatus.split = val;
 	pthread_mutex_lock(&mutex_serial);
 		selrig->set_split(val);
 	pthread_mutex_unlock(&mutex_serial);

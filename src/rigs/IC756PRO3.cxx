@@ -85,7 +85,7 @@ void RIG_IC756PRO3::selectA()
 {
 	cmd = pre_to;
 	cmd += '\x07';
-	cmd += '\xD0';
+	cmd += '\xB0';
 	cmd.append(post);
 	waitFB("sel A");
 }
@@ -94,7 +94,7 @@ void RIG_IC756PRO3::selectB()
 {
 	cmd = pre_to;
 	cmd += '\x07';
-	cmd += '\xD1';
+	cmd += '\xB1';
 	cmd.append(post);
 	waitFB("sel B");
 }
