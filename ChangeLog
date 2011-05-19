@@ -1,5 +1,9 @@
 2011-05-19  David Freese  <w1hkj@w1hkj.com>
 
+	3fb4cf7: Initialize Notch/IF_shift
+	3c6bfc3: FT950 update
+	654171a: TT588 Orion-II
+	4b9f92f: TT566 update
 	a3a2618: FT100D update
 	a7c16ec: TT588 update
 	9ae9a2a: IC756PRO3 split
