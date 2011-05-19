@@ -127,8 +127,8 @@ RIG_TT588::RIG_TT588() {
 
 	can_change_alt_vfo =
 
-	has_auto_notch =
-	has_notch_control = 
+//	has_auto_notch =
+//	has_notch_control = 
 
 	has_split =
 	has_smeter =
@@ -141,7 +141,6 @@ RIG_TT588::RIG_TT588() {
 	has_sql_control =
 	has_ptt_control =
 	has_bandwidth_control =
-	has_auto_notch = 
 	has_noise_control =
 	has_mode_control = true;
 
@@ -161,7 +160,7 @@ long RIG_TT588::get_vfoA ()
 {
 	cmd = TT588getFREQA;
 	int ret = sendCommand(cmd);
-	showresp(WARN, HEX, "get vfoA", cmd, replystr);
+	showresp(WARN, HEX, "get vfo A", cmd, replystr);
 	if (ret >= 6) {
 		size_t p = replystr.rfind("A");
 		if (p != string::npos) {
@@ -184,8 +183,8 @@ void RIG_TT588::set_vfoA (long freq)
 	cmd[4] = xfreq & 0xff; xfreq = xfreq >> 8;
 	cmd[3] = xfreq & 0xff; xfreq = xfreq >> 8;
 	cmd[2] = xfreq & 0xff;
-	sendCommand(cmd, 0);
-	LOG_WARN ("%s", str2hex(cmd.c_str(), cmd.length()));
+	sendCommand(cmd);
+	showresp(WARN, HEX, "set vfo A", cmd, replystr);
 	return ;
 }
 
@@ -193,9 +192,9 @@ long RIG_TT588::get_vfoB()
 {
 	cmd = TT588getFREQB;
 	int ret = sendCommand(cmd);
-	showresp(WARN, HEX, "get vfoB", cmd, replystr);
+	showresp(WARN, HEX, "get vfo B", cmd, replystr);
 	if (ret >= 6) {
-		size_t p = replystr.rfind("A");
+		size_t p = replystr.rfind("B");
 		if (p != string::npos) {
 			int f = 0;
 			for (size_t n = 1; n < 5; n++)
@@ -216,8 +215,8 @@ void RIG_TT588::set_vfoB (long freq)
 	cmd[4] = xfreq & 0xff; xfreq = xfreq >> 8;
 	cmd[3] = xfreq & 0xff; xfreq = xfreq >> 8;
 	cmd[2] = xfreq & 0xff;
-	sendCommand(cmd, 0);
-	LOG_WARN ("%s", str2hex(cmd.c_str(), cmd.length()));
+	sendCommand(cmd);
+	showresp(WARN, HEX, "set vfo B", cmd, replystr);
 	return ;
 }
 
@@ -231,8 +230,8 @@ void RIG_TT588::set_modeA(int val)
 	modeA = val;
 	cmd = TT588setMODE;
 	cmd[2] = cmd[3] = TT588mode_chr[val];
-	sendCommand(cmd, 0);
-	LOG_WARN ("%s", str2hex(cmd.c_str(), cmd.length()));
+	sendCommand(cmd);
+	showresp(WARN, HEX, "set mode A", cmd, replystr);
 }
 
 int RIG_TT588::get_modeA()
@@ -257,8 +256,8 @@ void RIG_TT588::set_bwA(int val)
 	bwA = val;
 	cmd = TT588setBW;
 	cmd[2] = 37 - val;
-	sendCommand(cmd, 0);
-	LOG_WARN ("%s", str2hex(cmd.c_str(), cmd.length()));
+	sendCommand(cmd);
+	showresp(WARN, HEX, "set bw A", cmd, replystr);
 }
 
 int RIG_TT588::get_bwA()
@@ -289,15 +288,15 @@ void RIG_TT588::set_if_shift(int val)
 	short int si = val;
 	cmd[2] = (si & 0xff00) >> 8;
 	cmd[3] = (si & 0xff);
-	sendCommand(cmd, 0);
-	LOG_WARN ("%s", str2hex(cmd.c_str(), cmd.length()));
+	sendCommand(cmd);
+	showresp(WARN, HEX, "set pbt", cmd, replystr);
 }
 
 bool RIG_TT588::get_if_shift(int &val)
 {
 	cmd = TT588getPBT;
 	int ret = sendCommand(cmd);
-	showresp(WARN, HEX, "get att", cmd, replystr);
+	showresp(WARN, HEX, "get pbt", cmd, replystr);
 	val = pbt;
 	if (ret >= 4) {
 		size_t p = replystr.rfind("P");
@@ -328,8 +327,8 @@ void RIG_TT588::set_attenuator(int val)
 		case 2: atten_label("12 dB", true); break;
 		case 3: atten_label("18 dB", true); break;
 	}
-	sendCommand(cmd, 0);
-	LOG_WARN ("%s", str2hex(cmd.c_str(), cmd.length()));
+	sendCommand(cmd);
+	showresp(WARN, HEX, "set att", cmd, replystr);
 }
 
 
@@ -388,14 +387,16 @@ void RIG_TT588::set_volume_control(int vol)
 {
 	cmd = TT588setVOL;
 	cmd[2] = 0x7F & (int)(vol * 1.27);
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, HEX, "set vol", cmd, replystr);
 }
 
 void RIG_TT588::set_rf_gain(int val)
 {
 	cmd = TT588setRF;
 	cmd[2] = 0x7F & (int)(val * 1.27);
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, HEX, "set rfgain", cmd, replystr);
 }
 
 int  RIG_TT588::get_rf_gain()
@@ -421,7 +422,8 @@ void RIG_TT588::set_PTT_control(int val)
 		cmd[2] = 0;
 		cmd[3] = 0;
 	}
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, HEX, "set PTT", cmd, replystr);
 }
 
 int RIG_TT588::get_power_out()
@@ -444,6 +446,7 @@ void RIG_TT588::set_squelch(int val)
 	cmd = TT588setSQLCH;
 	cmd[2] = (unsigned char)(val * 1.27);
 	sendCommand(cmd);
+	showresp(WARN, HEX, "set sql", cmd, replystr);
 }
 
 int  RIG_TT588::get_squelch()
@@ -469,14 +472,14 @@ void RIG_TT588::set_noise(bool val)
 	cmd[3] = 0;
 	cmd[4] = (unsigned char)an_;
 	sendCommand(cmd);
-	LOG_WARN ("%s", str2hex(cmd.c_str(), cmd.length()));
+	showresp(WARN, HEX, "set NB", cmd, replystr);
 }
 
 int  RIG_TT588::get_noise()
 {
 	cmd = TT588getNB;
 	int ret = sendCommand(cmd);
-	showresp(WARN, HEX, "get sql", cmd, replystr);
+	showresp(WARN, HEX, "get NB", cmd, replystr);
 	if (ret < 5) return nb_;
 	size_t p = replystr.rfind("K");
 	if (p == string::npos) return nb_;
@@ -488,6 +491,7 @@ int  RIG_TT588::get_noise()
 	return nb_;
 }
 
+/*
 void RIG_TT588::set_auto_notch(int val)
 {
 	static char anlabel[] = "AN ";
@@ -518,13 +522,14 @@ int  RIG_TT588::get_auto_notch()
 	auto_notch_label(anlabel, an_ ? true : false);
 	return an_;
 }
+*/
 
 void RIG_TT588::set_split(bool val)
 {
 	cmd = TT588setSPLIT;
 	cmd[2] = val == 0 ? 0 : 1;
 	sendCommand(cmd);
-	LOG_WARN ("%s", str2hex(cmd.c_str(), cmd.length()));
+	showresp(WARN, HEX, "set split", cmd, replystr);
 }
 
 bool RIG_TT588::get_split()
