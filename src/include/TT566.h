@@ -43,10 +43,10 @@ public:
 		min = 0; max = 100; step = 1; }
 	void set_volume_control(int val);
 
-	void set_if_shift(int val);
-	bool get_if_shift(int &val);
-	void get_if_min_max_step(int &min, int &max, int &step) {
-		min = -8000; max = 8000; step = 50; }
+//	void set_if_shift(int val);
+//	bool get_if_shift(int &val);
+//	void get_if_min_max_step(int &min, int &max, int &step) {
+//		min = -8000; max = 8000; step = 50; }
 
 	void set_rf_gain(int val);
 	int  get_rf_gain();
