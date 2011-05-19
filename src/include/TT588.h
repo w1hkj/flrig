@@ -50,8 +50,8 @@ public:
 	void get_squelch_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 100; step = 1; }
 
-	void set_auto_notch(int);
-	int  get_auto_notch();
+//	void set_auto_notch(int);
+//	int  get_auto_notch();
 
 	void set_noise(bool);
 	int  get_noise();
