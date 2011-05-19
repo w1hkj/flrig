@@ -1,5 +1,7 @@
-2011-05-18  David Freese  <w1hkj@w1hkj.com>
+2011-05-19  David Freese  <w1hkj@w1hkj.com>
 
+	a3a2618: FT100D update
+	a7c16ec: TT588 update
 	9ae9a2a: IC756PRO3 split
 	974d78c: FT100D bug fix
 	b1c536e: TT588 if shift range
