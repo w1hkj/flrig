@@ -2065,14 +2065,20 @@ void initRig()
 		sldrIFSHIFT->maximum(max);
 		sldrIFSHIFT->step(step);
 		sldrIFSHIFT->redraw();
-		if (progStatus.shift) {
-			btnIFsh->value(1);
+		if (progStatus.use_rig_data) {
+			progStatus.shift = selrig->get_if_shift(progStatus.shift_val);
+			btnIFsh->value(progStatus.shift);
 			sldrIFSHIFT->value(progStatus.shift_val);
-			selrig->set_if_shift(progStatus.shift_val);
 		} else {
-			btnIFsh->value(0);
-			sldrIFSHIFT->value(0);
-			selrig->set_if_shift(0);
+			if (progStatus.shift) {
+				btnIFsh->value(1);
+				sldrIFSHIFT->value(progStatus.shift_val);
+				selrig->set_if_shift(progStatus.shift_val);
+			} else {
+				btnIFsh->value(0);
+				sldrIFSHIFT->value(0);
+				selrig->set_if_shift(0);
+			}
 		}
 		btnIFsh->show();
 		sldrIFSHIFT->show();
@@ -2088,9 +2094,15 @@ void initRig()
 		sldrNOTCH->maximum(max);
 		sldrNOTCH->step(step);
 		sldrNOTCH->redraw();
-		btnNotch->value(progStatus.notch);
-		sldrNOTCH->value(progStatus.notch_val);
-		selrig->set_notch(progStatus.notch, progStatus.notch_val);
+		if (progStatus.use_rig_data) {
+			progStatus.notch = selrig->get_if_shift(progStatus.notch_val);
+			btnNotch->value(progStatus.notch);
+			sldrNOTCH->value(progStatus.notch_val);
+		} else {
+			btnNotch->value(progStatus.notch);
+			sldrNOTCH->value(progStatus.notch_val);
+			selrig->set_notch(progStatus.notch, progStatus.notch_val);
+		}
 		btnNotch->show();
 		sldrNOTCH->show();
 	} else {
