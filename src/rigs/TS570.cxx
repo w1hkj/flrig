@@ -67,7 +67,6 @@ RIG_TS570::RIG_TS570() {
 
 	has_smeter =
 	has_power_out =
-	has_swr_control =
 	has_split =
 	has_swr_control =
 	has_ifshift_control =
