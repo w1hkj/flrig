@@ -2458,13 +2458,6 @@ void auto_notch_label(const char * l, bool on = false)
 	btnAutoNotch->redraw_label();
 }
 
-void noise_blanker_label(const char *l, bool on = false)
-{
-	btnNOISE->value(on);
-	btnNOISE->label(l);
-	btnNOISE->redraw_label();
-}
-
 void cbAuxPort()
 {
 	AuxSerial.setRTS(progStatus.aux_rts);

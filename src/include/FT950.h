@@ -15,11 +15,23 @@ public:
 	~RIG_FT950(){}
 
 	void initialize();
+
 	long get_vfoA();
 	void set_vfoA(long);
+
 	long get_vfoB();
 	void set_vfoB(long);
+
 	bool twovfos();
+
+	void set_modeA(int val);
+	int  get_modeA();
+	int  get_modetype(int n);
+	void set_bwA(int val);
+	int  get_bwA();
+	int  adjust_bandwidth(int val);
+	int  def_bandwidth(int val);
+
 	int  get_smeter();
 	int  get_swr();
 	int  get_power_out();
@@ -33,20 +45,18 @@ public:
 	int  get_attenuator();
 	void set_preamp(int val);
 	int  get_preamp();
-	void set_modeA(int val);
-	int  get_modeA();
-	int  get_modetype(int n);
-	void set_bwA(int val);
-	int  get_bwA();
-	int  adjust_bandwidth(int val);
-	int  def_bandwidth(int val);
+
 	void set_if_shift(int val);
 	bool get_if_shift(int &val);
 	void get_if_min_max_step(int &min, int &max, int &step);
+
 	void set_notch(bool on, int val);
 	bool get_notch(int &val);
 	void get_notch_min_max_step(int &min, int &max, int &step);
+
 	void set_noise(bool b);
+	int  get_noise();
+
 	void set_mic_gain(int val);
 	int  get_mic_gain();
 	void get_mic_min_max_step(int &min, int &max, int &step);

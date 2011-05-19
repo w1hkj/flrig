@@ -67,12 +67,10 @@ RIG_FT950::RIG_FT950() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	modeA = 1;
-	bwA = 2;
-	def_mode = 10;
-	def_bw = 2;
-	def_freq = 14070000;
 
+	A.imode = B.imode = modeB = modeA = def_mode = 1;
+	A.iBW = B.iBW = bwA = bwB = def_bw = 2;
+	A.freq = B.freq = freqA = freqB = def_freq = 14070000;
 
 	has_smeter =
 	has_swr_control =
@@ -91,7 +89,7 @@ RIG_FT950::RIG_FT950() {
 	has_ptt_control =
 	has_tune_control =
 	has_swr_control = true;
-	
+
 // derived specific
 	notch_on = false;
 	atten_level = 0;
@@ -109,6 +107,7 @@ long RIG_FT950::get_vfoA ()
 {
 	cmd = "FA";
 	sendCommand(cmd.append(";"));
+	showresp(WARN, ASC, "get vfo A", cmd, replystr);
 	size_t p = replystr.rfind(cmd);
 	if (p == string::npos) return freqA;
 	if (p + 9 >= replystr.length()) return freqA;
@@ -127,13 +126,15 @@ void RIG_FT950::set_vfoA (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set vfo A", cmd, replystr);
 }
 
 long RIG_FT950::get_vfoB ()
 {
 	cmd = "FB";
 	sendCommand(cmd.append(";"));
+	showresp(WARN, ASC, "get vfo B", cmd, replystr);
 	size_t p = replystr.rfind(cmd);
 	if (p == string::npos) return freqB;
 	if (p + 9 >= replystr.length()) return freqB;
@@ -153,7 +154,8 @@ void RIG_FT950::set_vfoB (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set vfo B", cmd, replystr);
 }
 
 
@@ -166,6 +168,7 @@ int RIG_FT950::get_smeter()
 {
 	cmd = "SM0";
 	sendCommand(cmd.append(";"));
+	showresp(WARN, ASC, "get smeter", cmd, replystr);
 	size_t p = replystr.rfind(cmd);
 	if (p == string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
@@ -179,6 +182,7 @@ int RIG_FT950::get_swr()
 {
 	cmd = "RM6";
 	sendCommand(cmd.append(";"));
+	showresp(WARN, ASC, "get swr", cmd, replystr);
 	size_t p = replystr.rfind(cmd);
 	if (p == string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
@@ -191,6 +195,7 @@ int RIG_FT950::get_power_out()
 {
 	cmd = "RM5";
 	sendCommand(cmd.append(";"));
+	showresp(WARN, ASC, "get pout", cmd, replystr);
 	size_t p = replystr.rfind(cmd);
 	if (p == string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
@@ -205,9 +210,10 @@ int RIG_FT950::get_power_control()
 {
 	cmd = "PC";
 	sendCommand(cmd.append(";"));
+	showresp(WARN, ASC, "set power", cmd, replystr);
 	size_t p = replystr.rfind(cmd);
-	if (p == string::npos) return 0;
-	if (p + 5 >= replystr.length()) return 0;
+	if (p == string::npos) return progStatus.power_level;
+	if (p + 5 >= replystr.length()) return progStatus.power_level;
 
 	replystr[p+5] = 0;
 	int mtr = atoi(&replystr[p+2]);
@@ -224,7 +230,8 @@ void RIG_FT950::set_power_control(double val)
 		cmd[i] += ival % 10;
 		ival /= 10;
 	}
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "get power", cmd, replystr);
 }
 
 // Volume control return 0 ... 100
@@ -232,35 +239,40 @@ int RIG_FT950::get_volume_control()
 {
 	cmd = "AG0";
 	sendCommand(cmd.append(";"));
+	showresp(WARN, ASC, "get vol", cmd, replystr);
 	size_t p = replystr.rfind(cmd);
-	if (p == string::npos) return 0;
-	if (p + 6 >= replystr.length()) return 0;
+	if (p == string::npos) return progStatus.volume;
+	if (p + 6 >= replystr.length()) return progStatus.volume;
 	cmd[p+6] = 0;
 	int val = atoi(&replystr[p+3]);
-	return (int)(val / 2.55);
+	return (int)(val * 100 / 255);
 }
 
 void RIG_FT950::set_volume_control(int val) 
 {
-	int ivol = (int)(val * 2.55);
+	int ivol = (int)(val * 255 / 100);
 	cmd = "AG0000;";
 	for (int i = 5; i > 2; i--) {
 		cmd[i] += ivol % 10;
 		ivol /= 10;
 	}
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set vol", cmd, replystr);
 }
 
 // Tranceiver PTT on/off
 void RIG_FT950::set_PTT_control(int val)
 {
-	if (val) sendCommand("TX1;", 0);
-	else	 sendCommand("TX0;", 0);
+	cmd = val ? "TX1;" : "TX0;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set PTT", cmd, replystr);
 }
 
 void RIG_FT950::tune_rig()
 {
-	sendCommand("AC002;",0);
+	cmd = "AC002;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "tune rig", cmd, replystr);
 }
 
 void RIG_FT950::set_attenuator(int val)
@@ -268,15 +280,15 @@ void RIG_FT950::set_attenuator(int val)
 	int cmdval = 0;
 	if (atten_level == 0) {
 		atten_level = 1;
-		atten_label("6 dB", false);
+		atten_label("6 dB", true);
 		cmdval = 0x06;
 	} else if (atten_level == 1) {
 		atten_level = 2;
-		atten_label("12 dB", false);
+		atten_label("12 dB", true);
 		cmdval = 0x12;
 	} else if (atten_level == 2) {
 		atten_level = 3;
-		atten_label("18 dB", false);
+		atten_label("18 dB", true);
 		cmdval = 0x18;
 	} else if (atten_level == 3) {
 		atten_level = 0;
@@ -285,23 +297,25 @@ void RIG_FT950::set_attenuator(int val)
 	}
 	cmd = "RA0;";
 	cmd[2] = '0' + atten_level;
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set att", cmd, replystr);
 }
 
 int RIG_FT950::get_attenuator()
 {
 	cmd = "RA0";
 	sendCommand(cmd.append(";"));
+	showresp(WARN, ASC, "get att", cmd, replystr);
 	size_t p = replystr.rfind(cmd);
-	if (p == string::npos) return 0;
-	if (p + 3 >= replystr.length()) return 0;
+	if (p == string::npos) return progStatus.attenuator;
+	if (p + 3 >= replystr.length()) return progStatus.attenuator;
 	atten_level = replystr[p+3] - '0';
 	if (atten_level == 1) {
-		atten_label("6 dB", false);
+		atten_label("6 dB", true);
 	} else if (atten_level == 2) {
-		atten_label("12 dB", false);
+		atten_label("12 dB", true);
 	} else if (atten_level == 3) {
-		atten_label("18 dB", false);
+		atten_label("18 dB", true);
 	} else {
 		atten_level = 0;
 		atten_label("Att", false);
@@ -314,31 +328,33 @@ void RIG_FT950::set_preamp(int val)
 	cmd = "PA00;";
 	if (preamp_level == 0) {
 		preamp_level = 1;
-		preamp_label("Pre 1", false);
+		preamp_label("Pre 1", true);
 	} else if (preamp_level == 1) {
 		preamp_level = 2;
-		preamp_label("Pre 2", false);
+		preamp_label("Pre 2", true);
 	} else if (preamp_level == 2) {
 		preamp_level = 0;
 		preamp_label("Pre", false);
 	}
 	cmd[3] = '0' + preamp_level;
-	sendCommand (cmd, 0);
+	sendCommand (cmd);
+	showresp(WARN, ASC, "set preamp", cmd, replystr);
 }
 
 int RIG_FT950::get_preamp()
 {
 	cmd = "PA0";
 	sendCommand(cmd.append(";"));
+	showresp(WARN, ASC, "get preamp", cmd, replystr);
 	size_t p = replystr.rfind(cmd);
-	if (p == string::npos) return 0;
-	if (p + 3 >= replystr.length()) return 0;
+	if (p == string::npos) return progStatus.preamp;
+	if (p + 3 >= replystr.length()) return progStatus.preamp;
 
 	preamp_level = replystr[p+3] - '0';
 	if (preamp_level == 1) {
-		preamp_label("Pre 1", false);
+		preamp_label("Pre 1", true);
 	} else if (preamp_level == 2) {
-		preamp_label("Pre 2", false);
+		preamp_label("Pre 2", true);
 	} else {
 		preamp_label("Pre", false);
 		preamp_level = 0;
@@ -386,7 +402,8 @@ void RIG_FT950::set_modeA(int val)
 	cmd = "MD0";
 	cmd += FT950_mode_chr[val];
 	cmd += ';';
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set mode A", cmd, replystr);
 	adjust_bandwidth(modeA);
 }
 
@@ -394,9 +411,10 @@ int RIG_FT950::get_modeA()
 {
 	cmd = "MD0";
 	sendCommand(cmd.append(";"));
+	showresp(WARN, ASC, "get mode A", cmd, replystr);
 	size_t p = replystr.rfind(cmd);
-	if (p == string::npos) return 0;
-	if (p + 3 >= replystr.length()) return 0;
+	if (p == string::npos) return modeA;
+	if (p + 3 >= replystr.length()) return modeA;
 
 	int md = replystr[p+3];
 	if (md <= '9') md = md - '1';
@@ -418,7 +436,8 @@ void RIG_FT950::set_bwA(int val)
 	cmd += '0' + bw_indx / 10;
 	cmd += '0' + bw_indx % 10;
 	cmd += ';';
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set bw A", cmd, replystr);
 }
 
 int RIG_FT950::get_bwA()
@@ -430,9 +449,10 @@ int RIG_FT950::get_bwA()
 	} 
 	cmd = "SH0";
 	sendCommand(cmd.append(";"));
+	showresp(WARN, ASC, "get bw A", cmd, replystr);
 	size_t p = replystr.rfind(cmd);
-	if (p == string::npos) return 0;
-	if (p + 5 >= replystr.length()) return 0;
+	if (p == string::npos) return bwA;
+	if (p + 5 >= replystr.length()) return bwA;
 	
 	replystr[p+5] = 0;
 	int bw_indx = atoi(&replystr[p+3]);
@@ -451,32 +471,31 @@ int RIG_FT950::get_modetype(int n)
 void RIG_FT950::set_if_shift(int val)
 {
 	cmd = "IS0+0000;";
+	if (val != 0) progStatus.shift = true;
+	else progStatus.shift = false;
 	if (val < 0) cmd[3] = '-';
 	val = abs(val);
 	for (int i = 4; i > 0; i--) {
 		cmd[3+i] += val % 10;
 		val /= 10;
 	}
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set if shift", cmd, replystr);
 }
 
 bool RIG_FT950::get_if_shift(int &val)
 {
-	static int oldval = 0;
 	cmd = "IS0";
 	sendCommand(cmd.append(";"));
+	showresp(WARN, ASC, "get if shift", cmd, replystr);
 	size_t p = replystr.rfind(cmd);
-	if (p == string::npos) return 0;
-	if (p + 8 >= replystr.length()) return 0;
+	val = progStatus.shift_val;
+	if (p == string::npos) return progStatus.shift;
+	if (p + 8 >= replystr.length()) return progStatus.shift;
 
 	replystr[p+8] = 0;
 	val = atoi(&replystr[p+3]);
-	if (val != 0 || oldval != val) {
-		oldval = val;
-		return true;
-	}
-	oldval = val;
-	return false;
+	return true;
 }
 
 void RIG_FT950::get_if_min_max_step(int &min, int &max, int &step)
@@ -490,7 +509,8 @@ void RIG_FT950::set_notch(bool on, int val)
 {
 	cmd = "BP00000;";
 	if (on == false) {
-		sendCommand(cmd, 0);
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set notch", cmd, replystr);
 		notch_on = false;
 		return;
 	}
@@ -508,7 +528,8 @@ void RIG_FT950::set_notch(bool on, int val)
 		cmd[3 + i] += val % 10;
 		val /=10;
 	}
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set notch", cmd, replystr);
 }
 
 bool  RIG_FT950::get_notch(int &val)
@@ -516,6 +537,7 @@ bool  RIG_FT950::get_notch(int &val)
 	bool ison = false;
 	cmd = "BP00";
 	sendCommand(cmd.append(";"));
+	showresp(WARN, ASC, "get notch", cmd, replystr);
 	size_t p = replystr.rfind(cmd);
 	if (p == string::npos) return ison;
 	if (p + 6 >= replystr.length()) return ison;
@@ -524,6 +546,7 @@ bool  RIG_FT950::get_notch(int &val)
 		ison = true;
 		cmd = "BP01";
 		sendCommand(cmd.append(";"));
+		showresp(WARN, ASC, "get notch val", cmd, replystr);
 		p = replystr.rfind(cmd);
 		if (p == string::npos) return ison;
 		if (p + 7 >= replystr.length()) return ison;
@@ -541,38 +564,72 @@ void RIG_FT950::get_notch_min_max_step(int &min, int &max, int &step)
 	step = 10;
 }
 
+int FT950_blanker_level = 0;
+
 void RIG_FT950::set_noise(bool b)
 {
-	if (b)
-		cmd = "NB01;";
-	else
-		cmd = "NB00;";
-	sendCommand(cmd, 0);
+	cmd = "NB00;";
+	if (FT950_blanker_level == 0) {
+		FT950_blanker_level = 1;
+		nb_label("NB 1", true);
+	} else if (FT950_blanker_level == 1) {
+		FT950_blanker_level = 2;
+		nb_label("NB 2", true);
+	} else if (FT950_blanker_level == 2) {
+		FT950_blanker_level = 0;
+		nb_label("NB", false);
+	}
+	cmd[3] = '0' + FT950_blanker_level;
+	sendCommand (cmd);
+	showresp(WARN, ASC, "set NB", cmd, replystr);
+}
+
+int RIG_FT950::get_noise()
+{
+	cmd = "NB0";
+	sendCommand(cmd.append(";"));
+	showresp(WARN, ASC, "get NB", cmd, replystr);
+	size_t p = replystr.rfind(cmd);
+	if (p == string::npos) return FT950_blanker_level;
+	if (p + 3 >= replystr.length()) return FT950_blanker_level;
+
+	FT950_blanker_level = replystr[p+3] - '0';
+	if (FT950_blanker_level == 1) {
+		nb_label("NB 1", true);
+	} else if (FT950_blanker_level == 2) {
+		nb_label("NB 2", true);
+	} else {
+		nb_label("NB", false);
+		FT950_blanker_level = 0;
+	}
+	return FT950_blanker_level;
 }
 
 // val 0 .. 100
 void RIG_FT950::set_mic_gain(int val)
 {
 	cmd = "MG000;";
-	val = (int)(val * 2.55); // convert to 0 .. 255
+	val = (int)(val * 255 / 100); // convert to 0 .. 255
 	for (int i = 3; i > 0; i--) {
 		cmd[1+i] += val % 10;
 		val /= 10;
 	}
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set mic", cmd, replystr);
 }
 
 int RIG_FT950::get_mic_gain()
 {
 	cmd = "MG";
 	sendCommand(cmd.append(";"));
+	showresp(WARN, ASC, "get mic", cmd, replystr);
 	size_t p = replystr.rfind(cmd);
-	if (p == string::npos) return 0;
+	if (p == string::npos) return progStatus.mic_gain;
 	if (p + 5 >= replystr.length()) return 0;
 	
 	replystr[p+5] = 0;
 	int val = atoi(&replystr[p+2]);
-	return val;
+	return val * 100 / 255;
 }
 
 void RIG_FT950::get_mic_min_max_step(int &min, int &max, int &step)
@@ -585,12 +642,13 @@ void RIG_FT950::get_mic_min_max_step(int &min, int &max, int &step)
 void RIG_FT950::set_rf_gain(int val)
 {
 	cmd = "RG0000;";
-	int rfval = val * 2.55;
+	int rfval = val * 255 / 100;
 	for (int i = 5; i > 2; i--) {
 		cmd[i] = rfval % 10 + '0';
 		rfval /= 10;
 	}
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set rfgain", cmd, replystr);
 }
 
 int  RIG_FT950::get_rf_gain()
@@ -598,14 +656,15 @@ int  RIG_FT950::get_rf_gain()
 	int rfval = 0;
 	cmd = "RG0";
 	sendCommand(cmd.append(";"));
+	showresp(WARN, ASC, "get rfgain", cmd, replystr);
 	size_t p = replystr.rfind(cmd);
-	if (p == string::npos) return 0;
+	if (p == string::npos) return progStatus.rfgain;
 	if (p + 5 >= replystr.length()) return 0;
 	for (int i = 3; i < 6; i++) {
 		rfval *= 10;
 		rfval += replystr[p+i] - '0';
 	}
-	return (int)(rfval / 2.55);
+	return (int)(rfval * 100 / 255);
 }
 
 void RIG_FT950::get_rf_min_max_step(int &min, int &max, int &step)
