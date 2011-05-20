@@ -94,6 +94,11 @@ public:
 	bool XitActive;
 	bool split;
 
+	int  if_shift_min;
+	int  if_shift_max;
+	int  if_shift_step;
+	int  if_shift_mid;
+
 	bool has_a2b;
 	bool has_vfo_adj;
 	bool has_rit;
@@ -214,6 +219,7 @@ public:
 	virtual bool get_if_shift(int &val) {val = 0; return false;}
 	virtual void get_if_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 100; step = 1; }
+	virtual void get_if_mid() {};
 	virtual void set_notch(bool on, int val) {}
 	virtual bool get_notch(int &val) {val = 0; return false;}
 	virtual void get_notch_min_max_step(int &min, int &max, int &step) {

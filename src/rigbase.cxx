@@ -87,6 +87,10 @@ rigbase::rigbase()
 
 	max_power = 100;
 
+	if_shift_min = -1500;
+	if_shift_max = 1500;
+	if_shift_step = 10;
+	if_shift_mid = 0;
 }
 
 string rigbase::to_bcd_be(long freq, int len)

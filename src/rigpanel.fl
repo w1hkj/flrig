@@ -20,7 +20,7 @@ decl {const int freq_sel_widths[]={110, 70, 70, 0};} {}
 Function {Rig_window()} {open
 } {
   Fl_Window {} {
-    label Flrig open
+    label Flrig open selected
     xywh {577 57 424 401} type Double align 80
     code0 {\#include <stdlib.h>} visible
   } {
@@ -38,7 +38,7 @@ Function {Rig_window()} {open
         }
       }
       Submenu mnuConfig {
-        label {&Config} open selected
+        label {&Config} open
         xywh {10 10 100 20}
       } {
         MenuItem mnuControls {
@@ -238,7 +238,7 @@ btnA->value(0);}
     Fl_Button btn_K3_swapAB {
       label {A/B}
       callback {cb_K3_swapAB();}
-      tooltip {Copy A to B} xywh {265 62 52 20} down_box DOWN_BOX labelsize 12 hide
+      tooltip {Swap A/B} xywh {265 62 52 20} down_box DOWN_BOX labelsize 12 hide
     }
     Fl_Button btnA2B {
       label {A -> B}
@@ -264,10 +264,6 @@ btnA->value(0);}
       tooltip {Select Transceiver Bandwidth} xywh {212 84 105 18} box FLAT_BOX labelsize 12 align 16
       class Fl_ComboBox
     } {}
-    Fl_Counter cntK3bw {
-      callback {setBW();}
-      tooltip Bandwidth xywh {212 84 105 18} labelsize 12 align 16 minimum 50 maximum 4000 step 10 value 4000 hide
-    }
     Fl_Light_Button btnAttenuator {
       label Att
       callback {cbAttenuator();}

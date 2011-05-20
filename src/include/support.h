@@ -59,6 +59,7 @@ extern void updateBandwidthControl(void *d = NULL);
 extern void updateBW(void *);
 extern void setBWControl(void *);
 extern void setNotchControl(void *);
+extern void adjust_if_shift_control(void *);
 extern void setIFshiftButton(void *);
 extern void setIFshiftControl(void *);
 extern void setPTT( void *);

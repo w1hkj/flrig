@@ -220,12 +220,6 @@ static void cb_opBW(Fl_ComboBox*, void*) {
   setBW();
 }
 
-Fl_Counter *cntK3bw=(Fl_Counter *)0;
-
-static void cb_cntK3bw(Fl_Counter*, void*) {
-  setBW();
-}
-
 Fl_Light_Button *btnAttenuator=(Fl_Light_Button *)0;
 
 static void cb_btnAttenuator(Fl_Light_Button*, void*) {
@@ -817,7 +811,7 @@ Fl_Double_Window* Rig_window() {
       o->value(useB);
     } // Fl_Light_Button* btnB
     { btn_K3_swapAB = new Fl_Button(265, 62, 52, 20, _("A/B"));
-      btn_K3_swapAB->tooltip(_("Copy A to B"));
+      btn_K3_swapAB->tooltip(_("Swap A/B"));
       btn_K3_swapAB->down_box(FL_DOWN_BOX);
       btn_K3_swapAB->labelsize(12);
       btn_K3_swapAB->callback((Fl_Callback*)cb_btn_K3_swapAB);
@@ -864,17 +858,6 @@ Fl_Double_Window* Rig_window() {
       opBW->when(FL_WHEN_RELEASE);
       opBW->end();
     } // Fl_ComboBox* opBW
-    { cntK3bw = new Fl_Counter(212, 84, 105, 18);
-      cntK3bw->tooltip(_("Bandwidth"));
-      cntK3bw->labelsize(12);
-      cntK3bw->minimum(50);
-      cntK3bw->maximum(4000);
-      cntK3bw->step(10);
-      cntK3bw->value(4000);
-      cntK3bw->callback((Fl_Callback*)cb_cntK3bw);
-      cntK3bw->align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE);
-      cntK3bw->hide();
-    } // Fl_Counter* cntK3bw
     { btnAttenuator = new Fl_Light_Button(2, 286, 60, 18, _("Att"));
       btnAttenuator->tooltip(_("Attenuator On/Off"));
       btnAttenuator->down_box(FL_THIN_DOWN_BOX);
