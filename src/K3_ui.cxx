@@ -128,16 +128,21 @@ void cb_K3_swapAB()
 	vfoB = temp;
 	vfo = vfoA;
 
-	selrig->set_vfoA(vfoA.freq);
-	selrig->set_bwA(vfoA.iBW);
-	selrig->set_modeA(vfoA.imode);
 	selrig->set_vfoB(vfoB.freq);
 	selrig->set_bwB(vfoB.iBW);
 	selrig->set_modeB(vfoB.imode);
-	cntK3bw->value(vfoA.iBW);
+
+	selrig->set_vfoA(vfoA.freq);
+	selrig->set_bwA(vfoA.iBW);
+	selrig->set_modeA(vfoA.imode);
+
+	opBW->index(vfoA.iBW);
 	opMODE->index(vfoA.imode);
 	FreqDispA->value(vfoA.freq);
+
 	FreqDispB->value(vfoB.freq);
+
 	pthread_mutex_unlock(&mutex_serial);
+
 	Fl::focus(FreqDispA);
 }

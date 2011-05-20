@@ -62,12 +62,17 @@ RIG_K3::RIG_K3() {
 	has_smeter =
 	has_power_out =
 	has_split =
+	has_ifshift_control =
 	has_preamp_control = true;
 
 	has_notch_control =
-	has_ifshift_control =
 	has_tune_control =
 	has_swr_control = false;
+
+	if_shift_min = 400;
+	if_shift_max = 2600;
+	if_shift_step = 10;
+	if_shift_mid = 1500;
 
 }
 
@@ -207,6 +212,31 @@ int RIG_K3::get_volume_control()
 	return (int)(v / 2.55);
 }
 
+void RIG_K3::set_pbt_values(int val)
+{
+	switch (val) {
+		case 0 :
+		case 1 :
+		case 3 :
+		case 4 :
+			if_shift_min = 400; if_shift_max = 2600;
+			if_shift_step = 10; if_shift_mid = 1500;
+			break;
+		case 2 :
+		case 6 :
+			if_shift_min = 300; if_shift_max = 1300;
+			if_shift_step = 10; if_shift_mid = 800;
+			break;
+		case 5 :
+		case 7 :
+			if_shift_min = 100; if_shift_max = 2100;
+			if_shift_step = 10; if_shift_mid = 1000;
+			break;
+	}
+	progStatus.shift_val = if_shift_mid;
+	Fl::awake(adjust_if_shift_control, (void *)0);
+}
+
 void RIG_K3::set_modeA(int val)
 {
 	modeA = val;
@@ -214,6 +244,7 @@ void RIG_K3::set_modeA(int val)
 	cmd[2] = modenbr[val];
 	sendCommand(cmd, 0);
 	showresp(WARN, ASC, "set mode A", cmd, replystr);
+	set_pbt_values(val);
 }
 
 int RIG_K3::get_modeA()
@@ -225,9 +256,9 @@ int RIG_K3::get_modeA()
 	if (ret < 4) return modeA;
 	size_t p = replystr.rfind("MD");
 	if (p == string::npos) return modeA;
-	
 	int md = replystr[p + 2] - '1';
 	if (md == 8) md--;
+	if (md != modeA) set_pbt_values(md);
 	return (modeA = md);
 }
 
@@ -238,6 +269,7 @@ void RIG_K3::set_modeB(int val)
 	cmd[3] = modenbr[val];
 	sendCommand(cmd, 0);
 	showresp(WARN, ASC, "set mode B", cmd, replystr);
+	set_pbt_values(val);
 }
 
 int RIG_K3::get_modeB()
@@ -249,9 +281,9 @@ int RIG_K3::get_modeB()
 	if (ret < 4) return modeB;
 	size_t p = replystr.rfind("MD$");
 	if (p == string::npos) return modeB;
-	
 	int md = replystr[p + 3] - '1';
 	if (md == 8) md--;
+	if (md != modeB) set_pbt_values(md);
 	return (modeB = md);
 }
 
@@ -392,7 +424,7 @@ int RIG_K3::get_mic_gain()
 
 void RIG_K3::get_mic_min_max_step(int &min, int &max, int &step)
 {
-   min = 0; max = 60; step = 0; 
+   min = 0; max = 60; step = 1; 
 }
 
 // Tranceiver PTT on/off
@@ -560,3 +592,52 @@ bool RIG_K3::get_split()
 	return split;
 }
 
+void RIG_K3::set_if_shift(int val) 
+{
+	cmd = "IS 0000;";
+	cmd[6] += val % 10; val /= 10;
+	cmd[5] += val % 10; val /= 10;
+	cmd[4] += val % 10; val /= 10;
+	cmd[3] += val % 10;
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set if shift", cmd, replystr);
+}
+
+bool RIG_K3::get_if_shift(int &val)
+{
+	cmd = "IS;";
+	sendCommand(cmd, 0);
+	int ret = waitResponse(500);
+	showresp(WARN, ASC, "get if shift", cmd, replystr);
+	val = progStatus.shift_val;
+	if (ret < 8) return progStatus.shift;
+	size_t p = replystr.rfind("IS ");
+	if (p == string::npos) return progStatus.shift;
+	sscanf(&replystr[p + 3], "%d", &progStatus.shift_val);
+	val = progStatus.shift_val;
+	if (val == if_shift_mid) progStatus.shift = false;
+	else progStatus.shift = true;
+	return progStatus.shift;
+}
+
+void RIG_K3::get_if_min_max_step(int &min, int &max, int &step)
+{
+	min = if_shift_min; max = if_shift_max; step = if_shift_step; 
+}
+
+void  RIG_K3::get_if_mid()
+{
+	cmd = "IS 9999;";
+	sendCommand(cmd, 0);
+	waitResponse(500);
+	showresp(WARN, ASC, "center pbt", cmd, replystr);
+
+	cmd = "IS;";
+	sendCommand(cmd, 0);
+	int ret = waitResponse(500);
+	showresp(WARN, ASC, "get ctr pbt", cmd, replystr);
+	if (ret < 8) return;
+	size_t p = replystr.rfind("IS ");
+	if (p == string::npos) return;
+	sscanf(&replystr[p + 3], "%d", &if_shift_mid);
+}

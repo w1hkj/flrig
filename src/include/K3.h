@@ -33,6 +33,11 @@ public:
 	int  get_mic_gain();
 	void get_mic_min_max_step(int &min, int &max, int &step);
 
+	void set_if_shift(int val);
+	bool get_if_shift(int &val);
+	void get_if_min_max_step(int &min, int &max, int &step);
+	void get_if_mid();
+
 	void set_PTT_control(int val);
 	void set_attenuator(int val);
 	int  get_attenuator();
@@ -58,10 +63,18 @@ public:
 
 	void shutdown();
 
+	void set_pbt_values(int val);
+
 private:
 	double  minpwr;
 	double  maxpwr;
 	double  steppwr;
+
+// if shift value
+	int  if_mid;
+	int  if_min;
+	int  if_max;
+
 /*
 	int  get_swr();
 	void tune_rig();

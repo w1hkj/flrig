@@ -180,10 +180,7 @@ void read_mode()
 
 void setBWControl(void *)
 {
-//	if (rig_nbr == K3)
-//		cntK3bw->value(vfo.iBW);
-//	else
-		opBW->index(vfo.iBW);
+	opBW->index(vfo.iBW);
 }
 
 void read_bandwidth()
@@ -1153,6 +1150,17 @@ void setNotch()
 	}
 }
 
+void adjust_if_shift_control(void *d)
+{
+	sldrIFSHIFT->minimum(selrig->if_shift_min);
+	sldrIFSHIFT->maximum(selrig->if_shift_max);
+	sldrIFSHIFT->step(selrig->if_shift_step);
+	sldrIFSHIFT->value(selrig->if_shift_mid);
+	sldrIFSHIFT->redraw();
+	btnIFsh->value(0);
+	btnIFsh->redraw();
+}
+
 void setIFshiftButton(void *d)
 {
 	bool b = (bool)d;
@@ -1160,7 +1168,7 @@ void setIFshiftButton(void *d)
 		btnIFsh->value(1);
 	}
 	else if (!b && btnIFsh->value()) {
-		btnIFsh->value(0);
+		btnIFsh->value( selrig->if_shift_mid );
 	}
 }
 
@@ -1169,22 +1177,33 @@ void setIFshiftControl(void *d)
 	int val = (long)d;
 	if (sldrIFSHIFT->value() != val)
 		sldrIFSHIFT->value(val);
-	if (val != 0) btnIFsh->value(1);
+	btnIFsh->value( val != selrig->if_shift_mid );
 }
 
 void setIFshift()
 {
-	if (sldrIFSHIFT->value() != 0) btnIFsh->value(1);
+	int val = sldrIFSHIFT->value();
+	btnIFsh->value( val != selrig->if_shift_mid );
+	progStatus.shift_val = sldrIFSHIFT->value();
+	progStatus.shift = btnIFsh->value();
 	pthread_mutex_lock(&mutex_serial);
-		selrig->set_if_shift(sldrIFSHIFT->value());
+		selrig->set_if_shift(val);
 	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cbIFsh()
 {
-	if (btnIFsh->value() == 0)
-		sldrIFSHIFT->value(0);
-	setIFshift();
+	if (sldrIFSHIFT->value() == selrig->if_shift_mid)
+		btnIFsh->value(0);
+	if (!btnIFsh->value()) {
+		if (rig_nbr == K3) selrig->get_if_mid();
+		sldrIFSHIFT->value(selrig->if_shift_mid);
+	}
+	progStatus.shift_val = sldrIFSHIFT->value();
+	progStatus.shift = btnIFsh->value();
+	pthread_mutex_lock(&mutex_serial);
+		selrig->set_if_shift(sldrIFSHIFT->value());
+	pthread_mutex_unlock(&mutex_serial);
 	setFocus();
 }
 
