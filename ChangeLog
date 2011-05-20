@@ -1,5 +1,7 @@
-2011-05-19  David Freese  <w1hkj@w1hkj.com>
+2011-05-20  David Freese  <w1hkj@w1hkj.com>
 
+	c7dd9b4: K3 if-shift / mic gain
+	78fc39d: TS570 duplicate statement
 	3fb4cf7: Initialize Notch/IF_shift
 	3c6bfc3: FT950 update
 	654171a: TT588 Orion-II
