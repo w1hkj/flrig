@@ -48,7 +48,7 @@ RIG_FT100D::RIG_FT100D() {
 	aBW = bBW = A.iBW = B.iBW = 2;
 	precision = 10;
 
-//	has_get_info =
+	has_get_info =
 	has_smeter =
 	has_power_out =
 	has_swr_control =
@@ -78,7 +78,6 @@ void RIG_FT100D::initialize()
 
 void RIG_FT100D::selectA()
 {
-	readResponse(); // clear serial i/o buffers
 	init_cmd();
 	cmd[4] = 0x05;
 	sendCommand(cmd);
@@ -87,7 +86,6 @@ void RIG_FT100D::selectA()
 
 void RIG_FT100D::selectB()
 {
-	readResponse(); // clear serial i/o buffers
 	init_cmd();
 	cmd[3] = 0x01;
 	cmd[4] = 0x05;
@@ -97,7 +95,6 @@ void RIG_FT100D::selectB()
 
 void RIG_FT100D::set_split(bool val)
 {
-	readResponse(); // clear serial i/o buffers
 	split = val;
 	init_cmd();
 	cmd[3] = val ? 0x01 : 0x00;
@@ -112,21 +109,61 @@ void RIG_FT100D::set_split(bool val)
 
 bool RIG_FT100D::get_info()
 {
-	readResponse(); // clear serial i/o buffers
+	bool memmode = false, vfobmode = false;
+	init_cmd();
+	cmd[4] = 0xFA;
+	int ret = sendCommand(cmd, 9);
+	showresp(WARN, HEX, "status", cmd, replystr);
+
+	if (ret >= 9) {
+		size_t p = ret - 9;
+		memmode = ((replystr[p+1] & 0x40) == 0x40);
+		vfobmode = ((replystr[p+1] & 0x24) == 0x24);
+		if (memmode) return false;
+		if (vfobmode && !useB) {
+			useB = true;
+			Fl::awake(highlight_vfo, (void *)0);
+		} else if (!vfobmode && useB) {
+			useB = false;
+			Fl::awake(highlight_vfo, (void *)0);
+		}
+	}
+
 	init_cmd();
 	cmd[4] = 0x10;
-	int ret = sendCommand(cmd, 32);
+	ret = sendCommand(cmd, 32);
 	showresp(WARN, HEX, "info", cmd, replystr);
 
 	if (ret >= 32) {
+		size_t p = ret - 32;
+		// primary
 		afreq = 0;
 		for (size_t n = 1; n < 5; n++)
-			afreq = afreq * 256 + (unsigned char)replybuff[ret - 32 + n];
+			afreq = afreq * 256 + (unsigned char)replybuff[p + n];
 		afreq = afreq * 1.25; // 100D resolution is 1.25 Hz / bit for read
-		amode = replybuff[ret - 32 + 5] & 0x07;
+		amode = replybuff[p + 5] & 0x07;
 		if (amode > 7) amode = 7;
-		aBW = (replybuff[ret - 32 + 5] >> 4) & 0x03;
+		aBW = (replybuff[p + 5] >> 4) & 0x03;
 		aBW = 3 - aBW;
+		// secondary
+		p += 16;
+		bfreq = 0;
+		for (size_t n = 1; n < 5; n++)
+			bfreq = bfreq * 256 + (unsigned char)replybuff[p + n];
+		bfreq = bfreq * 1.25; // 100D resolution is 1.25 Hz / bit for read
+		bmode = replybuff[p + 5] & 0x07;
+		if (bmode > 7) bmode = 7;
+		bBW = (replybuff[p + 5] >> 4) & 0x03;
+		bBW = 3 - bBW;
+LOG_WARN("pri vfo = %d, sec vfo = %d, active vfo = %c", afreq, bfreq, vfobmode ? 'B' : 'A');
+		if (!vfobmode) {
+			A.freq = afreq; A.imode = amode; A.iBW = aBW;
+//			B.freq = bfreq; B.imode = bmode; B.iBW = bBW;
+		} else {
+			B.freq = afreq; B.imode = amode; B.iBW = aBW;
+//			A.freq = bfreq; A.imode = bmode; A.iBW = bBW;
+		}
+
 		return true;
 	}
 	return false;
@@ -134,17 +171,11 @@ bool RIG_FT100D::get_info()
 
 long RIG_FT100D::get_vfoA ()
 {
-	if (get_info()) {
-		A.freq = afreq;
-		A.imode = amode;
-		A.iBW = aBW;
-	}
 	return A.freq;
 }
 
 void RIG_FT100D::set_vfoA (long freq)
 {
-	readResponse(); // clear serial i/o buffers
 	A.freq = freq;
 	freq /=10; // 100D does not support 1 Hz resolution
 	cmd = to_bcd_be(freq, 8);
@@ -160,7 +191,6 @@ int RIG_FT100D::get_modeA()
 
 void RIG_FT100D::set_modeA(int val)
 {
-	readResponse(); // clear serial i/o buffers
 	A.imode = val;
 	init_cmd();
 	cmd[3] = FT100D_mode_val[val];
@@ -171,7 +201,6 @@ void RIG_FT100D::set_modeA(int val)
 
 void RIG_FT100D::set_bwA (int val)
 {
-	readResponse(); // clear serial i/o buffers
 	A.iBW = val;
 	init_cmd();
 	cmd[3] = FT100D_bw_val[val];
@@ -187,17 +216,11 @@ int RIG_FT100D::get_bwA()
 
 long RIG_FT100D::get_vfoB()
 {
-	if (get_info()) {
-		B.freq = afreq;
-		B.imode = amode;
-		B.iBW = aBW;
-	}
 	return B.freq;
 }
 
 void RIG_FT100D::set_vfoB(long freq)
 {
-	readResponse(); // clear serial i/o buffers
 	B.freq = freq;
 	freq /=10; // 100D does not support 1 Hz resolution
 	cmd = to_bcd_be(freq, 8);
@@ -208,7 +231,6 @@ void RIG_FT100D::set_vfoB(long freq)
 
 void RIG_FT100D::set_modeB(int val)
 {
-	readResponse(); // clear serial i/o buffers
 	B.imode = val;
 	init_cmd();
 	cmd[3] = FT100D_mode_val[val];
@@ -224,7 +246,6 @@ int  RIG_FT100D::get_modeB()
 
 void RIG_FT100D::set_bwB(int val)
 {
-	readResponse(); // clear serial i/o buffers
 	B.iBW = val;
 	init_cmd();
 	cmd[3] = FT100D_bw_val[val];
@@ -246,7 +267,6 @@ int  RIG_FT100D::def_bandwidth(int m)
 // Tranceiver PTT on/off
 void RIG_FT100D::set_PTT_control(int val)
 {
-	readResponse(); // clear serial i/o buffers
 	init_cmd();
 	if (val) cmd[3] = 1;
 	cmd[4] = 0x0F;
@@ -259,7 +279,6 @@ void RIG_FT100D::set_PTT_control(int val)
 
 int RIG_FT100D::get_smeter()
 {
-	readResponse(); // clear serial i/o buffers
 	init_cmd();
 	cmd[4] = 0xF7;
 	int ret = sendCommand(cmd, 9);
@@ -283,7 +302,6 @@ int RIG_FT100D::get_swr()
 
 int RIG_FT100D::get_power_out()
 {
-	readResponse(); // clear serial i/o buffers
 	init_cmd();
 	cmd[4] = 0xF7;
 	int ret = sendCommand(cmd);

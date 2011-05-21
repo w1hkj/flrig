@@ -17,10 +17,9 @@ decl {\#include "K3_ui.h"} {}
 
 decl {const int freq_sel_widths[]={110, 70, 70, 0};} {} 
 
-Function {Rig_window()} {open
-} {
+Function {Rig_window()} {} {
   Fl_Window {} {
-    label Flrig open selected
+    label Flrig open
     xywh {577 57 424 401} type Double align 80
     code0 {\#include <stdlib.h>} visible
   } {
@@ -874,7 +873,7 @@ Function {XcvrDialog()} {open
 } {
   Fl_Window {} {
     label {I/O Ports} open
-    xywh {575 417 482 257} type Double hide
+    xywh {575 417 482 257} type Double visible
   } {
     Fl_Tabs tabsConfig {open
       xywh {0 8 477 245}
