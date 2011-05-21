@@ -211,6 +211,7 @@ struct status {
 	string	ui_scheme;
 
 	string server_port;
+	string server_addr;
 
 	void saveLastState();
 	void loadLastState();

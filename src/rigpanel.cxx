@@ -1823,6 +1823,12 @@ static void cb_btnRigCatEcho(Fl_Check_Button*, void*) {
 btnOkXcvrDialog->redraw();
 }
 
+Fl_Input *server_addr=(Fl_Input *)0;
+
+static void cb_server_addr(Fl_Input* o, void*) {
+  progStatus.server_addr = o->value();
+}
+
 Fl_Input *server_port=(Fl_Input *)0;
 
 static void cb_server_port(Fl_Input* o, void*) {
@@ -2156,7 +2162,7 @@ Fl_Double_Window* XcvrDialog() {
           { Fl_Counter* o = query_interval = new Fl_Counter(123, 141, 75, 22, _("qry intvl (ms):"));
             query_interval->tooltip(_("Interval between Xvr queries"));
             query_interval->type(1);
-            query_interval->minimum(50);
+            query_interval->minimum(10);
             query_interval->maximum(5000);
             query_interval->step(10);
             query_interval->value(50);
@@ -2166,10 +2172,10 @@ Fl_Double_Window* XcvrDialog() {
           } // Fl_Counter* query_interval
           o->end();
         } // Fl_Group* o
-        { Fl_Group* o = new Fl_Group(202, 74, 270, 99);
+        { Fl_Group* o = new Fl_Group(202, 94, 270, 80);
           o->tooltip(_("Two stop bits"));
           o->box(FL_ENGRAVED_FRAME);
-          { selectCommPort = new Fl_ComboBox(278, 82, 190, 22, _("Ser. Port"));
+          { selectCommPort = new Fl_ComboBox(278, 99, 190, 22, _("Ser. Port"));
             selectCommPort->tooltip(_("Xcvr serial port"));
             selectCommPort->box(FL_DOWN_BOX);
             selectCommPort->color((Fl_Color)FL_BACKGROUND_COLOR);
@@ -2183,7 +2189,7 @@ Fl_Double_Window* XcvrDialog() {
             selectCommPort->when(FL_WHEN_RELEASE);
             selectCommPort->end();
           } // Fl_ComboBox* selectCommPort
-          { mnuBaudrate = new Fl_ComboBox(278, 111, 190, 22, _("Baud:"));
+          { mnuBaudrate = new Fl_ComboBox(278, 125, 190, 22, _("Baud:"));
             mnuBaudrate->tooltip(_("Xcvr baudrate"));
             mnuBaudrate->box(FL_DOWN_BOX);
             mnuBaudrate->color((Fl_Color)FL_BACKGROUND_COLOR);
@@ -2197,20 +2203,20 @@ Fl_Double_Window* XcvrDialog() {
             mnuBaudrate->when(FL_WHEN_RELEASE);
             mnuBaudrate->end();
           } // Fl_ComboBox* mnuBaudrate
-          { Fl_Check_Button* o = btnTwoStopBit = new Fl_Check_Button(250, 144, 22, 15, _("2 -StopBits"));
+          { Fl_Check_Button* o = btnTwoStopBit = new Fl_Check_Button(250, 152, 22, 15, _("2 -StopBits"));
             btnTwoStopBit->down_box(FL_DOWN_BOX);
             btnTwoStopBit->callback((Fl_Callback*)cb_btnTwoStopBit);
             btnTwoStopBit->align(FL_ALIGN_RIGHT);
             o->value(progStatus.stopbits == 2);
           } // Fl_Check_Button* btnTwoStopBit
-          { Fl_Check_Button* o = btnOneStopBit = new Fl_Check_Button(210, 144, 22, 15, _("1"));
+          { Fl_Check_Button* o = btnOneStopBit = new Fl_Check_Button(210, 152, 22, 15, _("1"));
             btnOneStopBit->tooltip(_("One Stop Bit"));
             btnOneStopBit->down_box(FL_DOWN_BOX);
             btnOneStopBit->callback((Fl_Callback*)cb_btnOneStopBit);
             btnOneStopBit->align(FL_ALIGN_RIGHT);
             o->value(progStatus.stopbits == 1);
           } // Fl_Check_Button* btnOneStopBit
-          { Fl_Check_Button* o = btnRigCatEcho = new Fl_Check_Button(397, 144, 22, 15, _("Echo "));
+          { Fl_Check_Button* o = btnRigCatEcho = new Fl_Check_Button(397, 152, 22, 15, _("Echo "));
             btnRigCatEcho->down_box(FL_DOWN_BOX);
             btnRigCatEcho->callback((Fl_Callback*)cb_btnRigCatEcho);
             btnRigCatEcho->align(FL_ALIGN_RIGHT);
@@ -2218,10 +2224,15 @@ Fl_Double_Window* XcvrDialog() {
           } // Fl_Check_Button* btnRigCatEcho
           o->end();
         } // Fl_Group* o
-        { Fl_Group* o = new Fl_Group(202, 34, 270, 38);
+        { Fl_Group* o = new Fl_Group(202, 34, 270, 64);
           o->box(FL_ENGRAVED_FRAME);
-          { Fl_Input* o = server_port = new Fl_Input(307, 41, 100, 22, _("Fldigi port:"));
-            server_port->tooltip(_("xmlrpc server address (7362)\nchange requires restart"));
+          { Fl_Input* o = server_addr = new Fl_Input(317, 41, 140, 22, _("Fldigi address:"));
+            server_addr->tooltip(_("xmlrpc server address (7362)\nchange requires restart\nAre you sure?"));
+            server_addr->callback((Fl_Callback*)cb_server_addr);
+            o->value(progStatus.server_addr.c_str());
+          } // Fl_Input* server_addr
+          { Fl_Input* o = server_port = new Fl_Input(317, 67, 100, 22, _("Fldigi port:"));
+            server_port->tooltip(_("xmlrpc server address (7362)\nchange requires restart\nAre you sure?"));
             server_port->type(2);
             server_port->callback((Fl_Callback*)cb_server_port);
             o->value(progStatus.server_port.c_str());

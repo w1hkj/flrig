@@ -917,25 +917,25 @@ command before giving up} xywh {123 63 75 22} type Simple align 4 minimum 1 maxi
           Fl_Counter query_interval {
             label {qry intvl (ms):}
             callback {progStatus.serloop_timing = (int)o->value();}
-            tooltip {Interval between Xvr queries} xywh {123 141 75 22} type Simple align 4 minimum 50 maximum 5000 step 10 value 50
+            tooltip {Interval between Xvr queries} xywh {123 141 75 22} type Simple align 4 minimum 10 maximum 5000 step 10 value 50
             code0 {o->value(progStatus.serloop_timing);}
           }
         }
         Fl_Group {} {open
-          tooltip {Two stop bits} xywh {202 74 270 99} box ENGRAVED_FRAME
+          tooltip {Two stop bits} xywh {202 94 270 80} box ENGRAVED_FRAME
         } {
           Fl_Group selectCommPort {
             label {Ser. Port}
             callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();} open
-            tooltip {Xcvr serial port} xywh {278 82 190 22} box DOWN_BOX align 4
+            tooltip {Xcvr serial port} xywh {278 99 190 22} box DOWN_BOX align 4
             class Fl_ComboBox
           } {}
           Fl_Group mnuBaudrate {
             label {Baud:}
             callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();} open
-            tooltip {Xcvr baudrate} xywh {278 111 190 22} box DOWN_BOX align 4
+            tooltip {Xcvr baudrate} xywh {278 125 190 22} box DOWN_BOX align 4
             class Fl_ComboBox
           } {}
           Fl_Check_Button btnTwoStopBit {
@@ -947,7 +947,7 @@ progStatus.stopbits = 2;
 o->value(true);
 btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();}
-            xywh {250 144 22 15} down_box DOWN_BOX align 8
+            xywh {250 152 22 15} down_box DOWN_BOX align 8
             code0 {o->value(progStatus.stopbits == 2);}
           }
           Fl_Check_Button btnOneStopBit {
@@ -959,25 +959,34 @@ progStatus.stopbits = 1;
 o->value(true);
 btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();}
-            tooltip {One Stop Bit} xywh {210 144 22 15} down_box DOWN_BOX align 8
+            tooltip {One Stop Bit} xywh {210 152 22 15} down_box DOWN_BOX align 8
             code0 {o->value(progStatus.stopbits == 1);}
           }
           Fl_Check_Button btnRigCatEcho {
             label {Echo }
             callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();}
-            xywh {397 144 22 15} down_box DOWN_BOX align 8
+            xywh {397 152 22 15} down_box DOWN_BOX align 8
             code0 {o->value(progStatus.comm_echo);}
           }
         }
         Fl_Group {} {open
-          xywh {202 34 270 38} box ENGRAVED_FRAME
+          xywh {202 34 270 64} box ENGRAVED_FRAME
         } {
+          Fl_Input server_addr {
+            label {Fldigi address:}
+            callback {progStatus.server_addr = o->value();} selected
+            tooltip {xmlrpc server address (7362)
+change requires restart
+Are you sure?} xywh {317 41 140 22}
+            code0 {o->value(progStatus.server_addr.c_str());}
+          }
           Fl_Input server_port {
             label {Fldigi port:}
             callback {progStatus.server_port = o->value();}
             tooltip {xmlrpc server address (7362)
-change requires restart} xywh {307 41 100 22} type Int
+change requires restart
+Are you sure?} xywh {317 67 100 22} type Int
             code0 {o->value(progStatus.server_port.c_str());}
           }
         }
