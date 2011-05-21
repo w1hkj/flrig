@@ -220,7 +220,8 @@ status progStatus = {
 
 	"gtk+",		// string ui_scheme
 
-	"7362"		// string server_port
+	"7362",		// string server_port
+	"127.0.0.1"	// string server_address
 
 };
 
@@ -437,6 +438,7 @@ void status::saveLastState()
 	spref.set("ui_scheme", ui_scheme.c_str());
 
 	spref.set("server_port", server_port.c_str());
+	spref.set("server_addr", server_addr.c_str());
 
 }
 
@@ -662,6 +664,9 @@ bool status::loadXcvrState(const char *xcvr)
 
 		spref.get("server_port", defbuffer, "7362", 199);
 		server_port = defbuffer;
+
+		spref.get("server_addr", defbuffer, "127.0.0.1", 199);
+		server_addr = defbuffer;
 
 	}
 

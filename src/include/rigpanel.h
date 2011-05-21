@@ -159,6 +159,7 @@ extern Fl_Check_Button *btnTwoStopBit;
 extern Fl_Check_Button *btnOneStopBit;
 extern Fl_Check_Button *btnRigCatEcho;
 #include <FL/Fl_Input.H>
+extern Fl_Input *server_addr;
 extern Fl_Input *server_port;
 #include <FL/Fl_Round_Button.H>
 extern Fl_Round_Button *btncatptt;

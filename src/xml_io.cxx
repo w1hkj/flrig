@@ -29,8 +29,6 @@ extern queue<FREQMODE> queB;
 extern queue<bool> quePTT;
 
 static const double TIMEOUT = 0.5;
-static const char* tcpip_address = "127.0.0.1";
-static const int tcpip_port      = 7362;
 
 // these are get only
 static const char* main_get_trx_state   = "main.get_trx_state";
@@ -87,7 +85,10 @@ public:
 
 void open_rig_xmlrpc()
 {
-	client = new XmlRpc::XmlRpcClient(tcpip_address, tcpip_port);
+	int server_port = atoi(progStatus.server_port.c_str());
+	client = new XmlRpc::XmlRpcClient(
+				progStatus.server_addr.c_str(),
+				server_port );
 	// XmlRpc::setVerbosity(5);
 
 	// Create a value suitable for the system.multicall method, which
