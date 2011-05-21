@@ -92,11 +92,17 @@ char *print(FREQMODE data)
 
 // read current vfo frequency
 
+void read_info()
+{
+	pthread_mutex_lock(&mutex_serial);
+		selrig->get_info();
+	pthread_mutex_unlock(&mutex_serial);
+}
+
 void read_vfo()
 {
 // transceiver changed ?
 	pthread_mutex_lock(&mutex_serial);
-	if (selrig->has_get_info) selrig->get_info();
 	long  freq;
 	if (!useB) { // vfo-A
 		freq = selrig->get_vfoA();
@@ -633,6 +639,10 @@ void * serial_thread_loop(void *d)
 			if (!loopcount--) {
 				if (rig_nbr == K3) read_K3();
 				else {
+					if (selrig->has_get_info &&
+						(progStatus.poll_frequency ||
+						(progStatus.poll_mode) ||
+						(progStatus.poll_bandwidth))) read_info();
 					if (progStatus.poll_frequency) read_vfo();
 					if (progStatus.poll_mode) read_mode();
 					if (progStatus.poll_bandwidth) read_bandwidth();
@@ -894,17 +904,31 @@ void set_vfo_mode_bw()
 	} catch (...) {}
 }
 
-void cb_selectA() {
-	FreqDispA->SetONOFFCOLOR(
-		fl_rgb_color(progStatus.fg_red, progStatus.fg_green, progStatus.fg_blue),
-		fl_rgb_color(progStatus.bg_red, progStatus.bg_green, progStatus.bg_blue));
-	FreqDispB->SetONOFFCOLOR(
-		fl_rgb_color(progStatus.fg_red, progStatus.fg_green, progStatus.fg_blue),
-		fl_color_average(fl_rgb_color(progStatus.bg_red, progStatus.bg_green, progStatus.bg_blue), FL_BLACK, 0.87));
+void highlight_vfo(void *d)
+{
+	Fl_Color norm_fg = fl_rgb_color(progStatus.fg_red, progStatus.fg_green, progStatus.fg_blue);
+	Fl_Color norm_bg = fl_rgb_color(progStatus.bg_red, progStatus.bg_green, progStatus.bg_blue);
+	Fl_Color dim_bg = fl_color_average( norm_bg, FL_BLACK, 0.87);
+	if (useB) {
+		FreqDispA->SetONOFFCOLOR( norm_fg, dim_bg );
+		FreqDispB->SetONOFFCOLOR( norm_fg, norm_bg );
+		btnA->value(0);
+		btnB->value(1);
+	} else {
+		FreqDispA->SetONOFFCOLOR( norm_fg, norm_bg );
+		FreqDispB->SetONOFFCOLOR( norm_fg, dim_bg);
+		btnA->value(1);
+		btnB->value(0);
+	}
 	FreqDispA->redraw();
 	FreqDispB->redraw();
+	btnA->redraw();
+	btnB->redraw();
 	Fl::flush();
+	setFocus();
+}
 
+void cb_selectA() {
 	pthread_mutex_lock(&mutex_serial);
 	changed_vfo = true;
 	useB = false;
@@ -912,7 +936,7 @@ void cb_selectA() {
 	vfoA.freq = FreqDispA->value();
 	queA.push(vfoA);
 	pthread_mutex_unlock(&mutex_serial);
-	setFocus();
+	highlight_vfo((void *)0);
 }
 
 void cb_selectB() {
@@ -920,16 +944,6 @@ void cb_selectB() {
 		btnSplit->value(0);
 		cb_set_split(0);
 	}
-	FreqDispB->SetONOFFCOLOR(
-		fl_rgb_color(progStatus.fg_red, progStatus.fg_green, progStatus.fg_blue),
-		fl_rgb_color(progStatus.bg_red, progStatus.bg_green, progStatus.bg_blue));
-	FreqDispA->SetONOFFCOLOR(
-		fl_rgb_color(progStatus.fg_red, progStatus.fg_green, progStatus.fg_blue),
-		fl_color_average(fl_rgb_color(progStatus.bg_red, progStatus.bg_green, progStatus.bg_blue), FL_BLACK, 0.87));
-	FreqDispA->redraw();
-	FreqDispB->redraw();
-	Fl::flush();
-
 	pthread_mutex_lock(&mutex_serial);
 	changed_vfo = true;
 	useB = true;
@@ -937,7 +951,7 @@ void cb_selectB() {
 	vfoB.freq = FreqDispB->value();
 	queB.push(vfoB);
 	pthread_mutex_unlock(&mutex_serial);
-	setFocus();
+	highlight_vfo((void *)0);
 }
 
 void setLower()
