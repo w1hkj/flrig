@@ -113,7 +113,8 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 	char sztemp[50];
 	string returned = "";
 	string tosend = cmd;
-	int cnt = 0, repeat = 0, num = n + cmd.length();
+	int cnt = 0, repeat = 0;
+	size_t num = n + cmd.length();
 	int delay =  num * 11000.0 / RigSerial.Baud();
 	if (!RigSerial.IsOpen()) {
 		replystr = returned;
