@@ -96,9 +96,15 @@ void RIG_K3::initialize()
 	sendCommand(cmd);
 	showresp(WARN, ASC, "K3 extended mode", cmd, replystr);
 
-	cmd = "SWT49;"; // Fine tuning (1 Hz mode)
-	sendCommand(cmd);
-	showresp(WARN, ASC, "1 Hz fine tune mode", cmd, replystr);
+	int oldfa = get_vfoA();
+	int newfa = ++oldfa;
+	set_vfoA(newfa);
+	oldfa = get_vfoA();
+	if (newfa != oldfa) {
+		cmd = "SWT49;"; // Fine tuning (1 Hz mode)
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set fine tune", cmd, replystr);
+	}
 
 	set_split(false); // normal ops
 
