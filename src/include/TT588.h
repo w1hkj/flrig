@@ -33,6 +33,8 @@ public:
 	void set_bwA(int val);
 	int  get_bwA();
 
+	bool twovfos() {return true;}
+
 	int  get_smeter();
 
 	void set_volume_control(int val);
