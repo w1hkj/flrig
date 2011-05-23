@@ -2044,6 +2044,12 @@ void initRig()
 	}
 
 	if (selrig->has_rf_control) {
+		int min, max, step;
+		selrig->get_rf_min_max_step(min, max, step);
+		sldrRFGAIN->minimum(min);
+		sldrRFGAIN->maximum(max);
+		sldrRFGAIN->step(step);
+		sldrRFGAIN->redraw();
 		if (progStatus.use_rig_data) {
 			progStatus.rfgain = selrig->get_rf_gain();
 			sldrRFGAIN->value(progStatus.rfgain);
@@ -2058,6 +2064,12 @@ void initRig()
 	}
 
 	if (selrig->has_sql_control) {
+		int min, max, step;
+		selrig->get_squelch_min_max_step(min, max, step);
+		sldrSQUELCH->minimum(min);
+		sldrSQUELCH->maximum(max);
+		sldrSQUELCH->step(step);
+		sldrSQUELCH->redraw();
 		if (progStatus.use_rig_data) {
 			progStatus.squelch = selrig->get_squelch();
 			sldrSQUELCH->value(progStatus.squelch);
@@ -2072,16 +2084,21 @@ void initRig()
 	}
 
 	if (selrig->has_noise_reduction_control) {
+		int min, max, step;
+		selrig->get_nr_min_max_step(min, max, step);
+		sldrNR->minimum(min);
+		sldrNR->maximum(max);
+		sldrNR->step(step);
+		sldrNR->redraw();
 		btnNR->show();
+		sldrNR->show();
 		if (progStatus.use_rig_data) {
 			progStatus.noise_reduction = selrig->get_noise_reduction();
 			progStatus.noise_reduction_val = selrig->get_noise_reduction_val();
 			btnNR->value(progStatus.noise_reduction);
-			sldrNR->show();
 			sldrNR->value(progStatus.noise_reduction_val);
 		} else {
 			btnNR->value(progStatus.noise_reduction);
-			sldrNR->show();
 			sldrNR->value(progStatus.noise_reduction_val);
 			selrig->set_noise_reduction(progStatus.noise_reduction);
 			selrig->set_noise_reduction_val(progStatus.noise_reduction_val);

@@ -228,6 +228,8 @@ public:
 	virtual int  get_noise(){return 0;}
 	virtual void set_noise_reduction_val(int val) {}
 	virtual int  get_noise_reduction_val() {return 0;}
+	virtual void get_nr_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 100; step = 1; }
 	virtual void set_noise_reduction(int val) {}
 	virtual int  get_noise_reduction() {return 0;}
 	virtual void set_mic_gain(int val) {}
