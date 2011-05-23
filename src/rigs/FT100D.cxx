@@ -111,12 +111,11 @@ bool RIG_FT100D::get_info()
 {
 	bool memmode = false, vfobmode = false;
 	init_cmd();
+	cmd[3] = 0x01;
 	cmd[4] = 0xFA;
-	int ret = sendCommand(cmd, 9);
-	showresp(WARN, HEX, "status", cmd, replystr);
-
-	if (ret >= 9) {
-		size_t p = ret - 9;
+	int ret = waitN(8, 100, "status");
+	if (ret >= 8) {
+		size_t p = ret - 8;
 		memmode = ((replystr[p+1] & 0x40) == 0x40);
 		vfobmode = ((replystr[p+1] & 0x24) == 0x24);
 		if (memmode) return false;
@@ -131,8 +130,7 @@ bool RIG_FT100D::get_info()
 
 	init_cmd();
 	cmd[4] = 0x10;
-	ret = sendCommand(cmd, 32);
-	showresp(WARN, HEX, "info", cmd, replystr);
+	ret = waitN(32, 100, "info");
 
 	if (ret >= 32) {
 		size_t p = ret - 32;
@@ -158,10 +156,10 @@ bool RIG_FT100D::get_info()
 LOG_WARN("pri vfo = %d, sec vfo = %d, active vfo = %c", afreq, bfreq, vfobmode ? 'B' : 'A');
 		if (!vfobmode) {
 			A.freq = afreq; A.imode = amode; A.iBW = aBW;
-//			B.freq = bfreq; B.imode = bmode; B.iBW = bBW;
+			B.freq = bfreq; B.imode = bmode; B.iBW = bBW;
 		} else {
 			B.freq = afreq; B.imode = amode; B.iBW = aBW;
-//			A.freq = bfreq; A.imode = bmode; A.iBW = bBW;
+			A.freq = bfreq; A.imode = bmode; A.iBW = bBW;
 		}
 
 		return true;
@@ -281,8 +279,7 @@ int RIG_FT100D::get_smeter()
 {
 	init_cmd();
 	cmd[4] = 0xF7;
-	int ret = sendCommand(cmd, 9);
-	showresp(WARN, HEX, "S-meter", cmd, replystr);
+	int ret = waitN(9, 100, "S-meter");
 	if (ret < 9) return 0;
 	int sval = (200 -  (unsigned char)replybuff[ret - 9 + 3]) / 1.1;
 	if (sval < 0) sval = 0;
@@ -304,8 +301,7 @@ int RIG_FT100D::get_power_out()
 {
 	init_cmd();
 	cmd[4] = 0xF7;
-	int ret = sendCommand(cmd);
-	showresp(WARN, HEX, "P-out", cmd, replystr);
+	int ret = waitN(9, 100, "P-out");
 	if (ret < 9) return 0;
 	fwdpwr = replybuff[ret - 9 + 1] / 2.56;
 	refpwr = replybuff[ret - 9 + 2] / 2.56;
