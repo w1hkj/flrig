@@ -2,6 +2,7 @@
 #include "util.h"
 #include "debug.h"
 #include "rig_io.h"
+#include "support.h"
 
 
 const char *szNORIG = "NONE";
@@ -271,6 +272,46 @@ void rigbase::showresp(int level, int how, string s, string tx, string rx)
 	default:
 		SLOG_INFO("%s: %10s, cmd %s, ans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
 	}
+}
+
+int rigbase::waitN(size_t n, int timeout, const char *sz)
+{
+	char sztemp[50];
+	string returned = "";
+	string tosend = cmd;
+	int cnt = 0, repeat = 0;
+	int waited = 0;
+	size_t num = n + cmd.length();
+	int delay =  num * 11000.0 / RigSerial.Baud();
+	if (!RigSerial.IsOpen()) {
+		replystr = returned;
+		snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
+		showresp(WARN, HEX, sztemp, tosend, returned);
+		return false;
+	}
+
+	sendCommand(tosend, 0);
+	MilliSleep(delay);
+	returned = "";
+	for ( cnt = 0; cnt < timeout / 10; cnt++) {
+		readResponse();
+		returned.append(replystr);
+		if (returned.length() >= n) {
+			replystr = returned;
+			waited = cnt * 10 * repeat + delay;
+			snprintf(sztemp, sizeof(sztemp), "%s OK %d ms, ", sz, waited);
+			showresp(WARN, HEX, sztemp, cmd, returned);
+			return true;
+		}
+		MilliSleep(10);
+		Fl::awake();
+	}
+
+	replystr = returned;
+	waited = cnt * 10 * repeat + delay;
+	snprintf(sztemp, sizeof(sztemp), "%s failed %d ms, ", sz, waited);
+	showresp(WARN, HEX, sztemp, cmd, returned);
+	return false;
 }
 
 

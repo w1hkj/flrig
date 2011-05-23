@@ -333,6 +333,8 @@ enum { ERR, WARN, INFO };
 enum { ASC, HEX };
 	void showresp(int level, int how, string s, string tx, string rx);
 
+	int waitN(size_t n, int timeout, const char *);
+
 };
 
 extern rigbase *rigs[];

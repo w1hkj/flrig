@@ -63,6 +63,8 @@ static char TT588setSPLIT[]		= "*Nn\n";
 static char TT588setPBT[]		= "*Pxx\r";
 static char TT588setVOL[]		= "*Un\r";
 static char TT588setBW[]		= "*Wx\r";
+static char TT588setPOWER[]		= "*C1Xn\r";
+static char TT588setPREAMP[]	= "*C1Zn\r";
 
 static char TT588getFREQA[]		= "?A\r";
 static char TT588getFREQB[]		= "?B\r";
@@ -77,6 +79,8 @@ static char TT588getPBT[]		= "?P\r";
 static char TT588getSMETER[]	= "?S\r";
 static char TT588getVOL[]		= "?U\r";
 static char TT588getBW[]		= "?W\r";
+static char TT588getPOWER[]		= "?C1X\r";
+static char TT588getPREAMP[]	= "?C1Z\r";
 
 static char TT588getFWDPWR[]	= "?F\r";
 
@@ -116,9 +120,7 @@ RIG_TT588::RIG_TT588() {
 	an_ = 0;
 
 	has_bpf_center =
-	has_power_control =
 	has_micgain_control =
-	has_preamp_control =
 	has_tune_control =
 	has_noise_control =
 	has_swr_control = 
@@ -129,6 +131,8 @@ RIG_TT588::RIG_TT588() {
 //	has_auto_notch =
 //	has_notch_control = 
 
+	has_preamp_control =
+	has_power_control =
 	has_split =
 	has_smeter =
 	has_power_out =
@@ -158,8 +162,7 @@ void RIG_TT588::shutdown()
 long RIG_TT588::get_vfoA ()
 {
 	cmd = TT588getFREQA;
-	int ret = sendCommand(cmd);
-	showresp(WARN, HEX, "get vfo A", cmd, replystr);
+	int ret = waitN(6, 100, "get vfo A");
 	if (ret >= 6) {
 		size_t p = replystr.rfind("A");
 		if (p != string::npos) {
@@ -190,8 +193,7 @@ void RIG_TT588::set_vfoA (long freq)
 long RIG_TT588::get_vfoB()
 {
 	cmd = TT588getFREQB;
-	int ret = sendCommand(cmd);
-	showresp(WARN, HEX, "get vfo B", cmd, replystr);
+	int ret = waitN(6, 100, "get vfo B");
 	if (ret >= 6) {
 		size_t p = replystr.rfind("B");
 		if (p != string::npos) {
@@ -236,8 +238,7 @@ void RIG_TT588::set_modeA(int val)
 int RIG_TT588::get_modeA()
 {
 	cmd = TT588getMODE;
-	int ret = sendCommand(cmd);
-	showresp(WARN, HEX, "get mode A", cmd, replystr);
+	int ret = waitN(4, 100, "get mode A");
 	if (ret < 4) return modeA;
 	size_t p = replystr.rfind("M");
 	if (p == string::npos) return modeA;
@@ -262,8 +263,7 @@ void RIG_TT588::set_bwA(int val)
 int RIG_TT588::get_bwA()
 {
 	cmd = TT588getBW;
-	int ret = sendCommand(cmd);
-	showresp(WARN, HEX, "get bw A", cmd, replystr);
+	int ret = waitN(3, 100, "get bw A");
 	if (ret < 3) return bwA;
 	size_t p = replystr.rfind("W");
 	if (p == string::npos) return bwA;
@@ -294,8 +294,7 @@ void RIG_TT588::set_if_shift(int val)
 bool RIG_TT588::get_if_shift(int &val)
 {
 	cmd = TT588getPBT;
-	int ret = sendCommand(cmd);
-	showresp(WARN, HEX, "get pbt", cmd, replystr);
+	int ret = waitN(4, 100, "get pbt");
 	val = pbt;
 	if (ret >= 4) {
 		size_t p = replystr.rfind("P");
@@ -334,8 +333,7 @@ void RIG_TT588::set_attenuator(int val)
 int RIG_TT588::get_attenuator()
 {
 	cmd = TT588getATT;
-	int ret = sendCommand(cmd);
-	showresp(WARN, HEX, "get att", cmd, replystr);
+	int ret = waitN(3, 100, "get att");
 	int val = atten_level;
 	if (ret >= 3) {
 		size_t p = replystr.rfind("J");
@@ -356,8 +354,7 @@ int RIG_TT588::get_smeter()
 	int sval = 0;
 	float fval = 0;
 	cmd = TT588getSMETER;
-	int ret = sendCommand(cmd);
-	showresp(WARN, HEX, "get smeter", cmd, replystr);
+	int ret = waitN(6, 100, "get smeter");
 	if (ret < 6) return sval;
 	size_t p = replystr.rfind("S");
 	if (p == string::npos) return sval;
@@ -373,8 +370,7 @@ int RIG_TT588::get_smeter()
 int RIG_TT588::get_volume_control()
 {
 	cmd = TT588getVOL;
-	int ret = sendCommand(cmd);
-	showresp(WARN, HEX, "get vol", cmd, replystr);
+	int ret = waitN(3, 100, "get vol");
 	if (ret < 3) return 0;
 	size_t p = replystr.rfind("U");
 	if (p == string::npos) return 0;
@@ -401,8 +397,7 @@ void RIG_TT588::set_rf_gain(int val)
 int  RIG_TT588::get_rf_gain()
 {
 	cmd = TT588getRF;
-	int ret = sendCommand(cmd);
-	showresp(WARN, HEX, "get rfgain", cmd, replystr);
+	int ret = waitN(3, 100, "get rfgain");
 	if (ret < 3) return 100;
 	size_t p = replystr.rfind("I");
 	if (p == string::npos) return 100;
@@ -428,8 +423,7 @@ void RIG_TT588::set_PTT_control(int val)
 int RIG_TT588::get_power_out()
 {
 	cmd = TT588getFWDPWR;
-	int ret = sendCommand(cmd);
-	showresp(WARN, HEX, "get pout", cmd, replystr);
+	int ret = waitN(6, 100, "get pout");
 	if (ret <  6) return 0;
 	size_t p = replystr.rfind("F");
 	if (p == string::npos) return 0;
@@ -451,8 +445,7 @@ void RIG_TT588::set_squelch(int val)
 int  RIG_TT588::get_squelch()
 {
 	cmd = TT588getSQLCH;
-	int ret = sendCommand(cmd);
-	showresp(WARN, HEX, "get sql", cmd, replystr);
+	int ret = waitN(3, 100, "get sql");
 	if (ret < 3) return 0;
 	size_t p = replystr.rfind("H");
 	if (p == string::npos) return 0;
@@ -477,8 +470,7 @@ void RIG_TT588::set_noise(bool val)
 int  RIG_TT588::get_noise()
 {
 	cmd = TT588getNB;
-	int ret = sendCommand(cmd);
-	showresp(WARN, HEX, "get NB", cmd, replystr);
+	int ret = waitN(5, 100, "get NB");
 	if (ret < 5) return nb_;
 	size_t p = replystr.rfind("K");
 	if (p == string::npos) return nb_;
@@ -526,7 +518,7 @@ int  RIG_TT588::get_auto_notch()
 void RIG_TT588::set_split(bool val)
 {
 	cmd = TT588setSPLIT;
-	cmd[2] = val == 0 ? 0 : 1;
+	cmd[2] = val == true ? 1 : 0;
 	sendCommand(cmd);
 	showresp(WARN, HEX, "set split", cmd, replystr);
 }
@@ -534,7 +526,45 @@ void RIG_TT588::set_split(bool val)
 bool RIG_TT588::get_split()
 {
 	cmd = TT588getSPLIT;
-	int ret = sendCommand(cmd);
-	showresp(WARN, HEX, "get split", cmd, replystr);
+	int ret = waitN(3, 100, "get split");
+	if (ret == 3)
+		return (replystr[1] == 0x01);
+	return false;
 }
 
+
+int  RIG_TT588::get_power_control(void)
+{
+	cmd = TT588getPOWER;
+	int ret = waitN(7, 100, "get pc");
+	if (ret == 7) {
+		int pc = replystr[3] & 0x7F;
+		return (int)(pc / 1.27);
+	}
+	return 0;
+}
+
+void RIG_TT588::set_power_control(double val)
+{
+	cmd = TT588setPOWER;
+	cmd[4] = ((int)(val * 1.27) & 0x7f);
+	sendCommand(cmd);
+	showresp(WARN, HEX, "set pc", cmd, replystr);
+}
+
+int  RIG_TT588::get_preamp()
+{
+	cmd = TT588getPREAMP;
+	int ret = waitN(5, 100, "get preamp");
+	if (ret == 5) 
+		return replystr[3];
+	return 0;
+}
+
+void RIG_TT588::set_preamp(int val)
+{
+	cmd = TT588setPREAMP;
+	cmd[4] = (val == 0 ? 0 : 1);
+	sendCommand(cmd);
+	showresp(WARN, HEX, "set preamp", cmd, replystr);
+}
