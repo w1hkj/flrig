@@ -338,7 +338,7 @@ int RIG_K3::get_attenuator()
 // Transceiver power level
 void RIG_K3::set_power_control(double val)
 {
-	int ival = (int)val;
+	int ival = val;
 	cmd = "PC000;";
 	for (int i = 4; i > 1; i--) {
 		cmd[i] += ival % 10;
@@ -359,7 +359,7 @@ int RIG_K3::get_power_control()
 
 	replystr[p + 5] = 0;
 	int v = atoi(&replystr[p + 2]);
-	return (int)(v / 2.55);
+	return v;
 }
 
 void RIG_K3::get_pc_min_max_step(double &min, double &max, double &step)
@@ -370,7 +370,7 @@ void RIG_K3::get_pc_min_max_step(double &min, double &max, double &step)
 // Transceiver rf control
 void RIG_K3::set_rf_gain(int val)
 {
-	int ival = (int)val;
+	int ival = val;
 	cmd = "RG000;";
 	for (int i = 4; i > 1; i--) {
 		cmd[i] += ival % 10;
@@ -397,7 +397,7 @@ int RIG_K3::get_rf_gain()
 
 void RIG_K3::get_rf_min_max_step(int &min, int &max, int &step)
 {
-   min = 0; max = 250; step = 0; 
+   min = 0; max = 250; step = 1; 
 }
 
 // Transceiver mic control
