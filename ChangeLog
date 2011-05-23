@@ -1,5 +1,13 @@
-2011-05-20  David Freese  <w1hkj@w1hkj.com>
+2011-05-23  David Freese  <w1hkj@w1hkj.com>
 
+	56daafa: K3 rfgain limits
+	8c30bdb: FT100D
+	1f23cf3: TT588 get data
+	eb1c5d2: K3 Fine tune test
+	ccd8d0d: TT588 two vfos
+	e143e58: FT100D get info
+	15690a5: XMLRPC address/port
+	ccabe29: ICbase WARN
 	c7dd9b4: K3 if-shift / mic gain
 	78fc39d: TS570 duplicate statement
 	3fb4cf7: Initialize Notch/IF_shift
