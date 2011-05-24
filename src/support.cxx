@@ -2460,8 +2460,12 @@ void initStatusConfigDialog()
 			progStatus.xcvr_serial_port = "NONE";
 			selectCommPort->value(progStatus.xcvr_serial_port.c_str());
 		}
+		box_xcvr_connect->color(FL_BACKGROUND2_COLOR);
+		box_xcvr_connect->redraw();
 	} else {
 		selectCommPort->value(progStatus.xcvr_serial_port.c_str());
+		box_xcvr_connect->color(FL_GREEN);
+		box_xcvr_connect->redraw();
 	}
 	if (!startAuxSerial()) {
 		if (progStatus.aux_serial_port.compare("NONE") != 0) {

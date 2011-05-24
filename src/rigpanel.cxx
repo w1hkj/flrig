@@ -2092,6 +2092,10 @@ static void cb_btn_send_command(Fl_Button*, void*) {
 
 Fl_Output *txt_response=(Fl_Output *)0;
 
+Fl_Box *box_xcvr_connect=(Fl_Box *)0;
+
+Fl_Box *box_fldigi_connect=(Fl_Box *)0;
+
 Fl_Button *btnCancelCommConfig=(Fl_Button *)0;
 
 static void cb_btnCancelCommConfig(Fl_Button*, void*) {
@@ -2108,8 +2112,9 @@ Fl_Double_Window* XcvrDialog() {
   Fl_Double_Window* w;
   { Fl_Double_Window* o = new Fl_Double_Window(482, 257, _("I/O Ports"));
     w = o;
-    { tabsConfig = new Fl_Tabs(0, 8, 477, 245);
+    { tabsConfig = new Fl_Tabs(0, 8, 482, 246);
       { tabPrimary = new Fl_Group(2, 30, 475, 222, _("Primary"));
+        tabPrimary->hide();
         { Fl_Group* o = new Fl_Group(5, 34, 195, 140);
           o->box(FL_ENGRAVED_FRAME);
           { selectRig = new Fl_ComboBox(41, 38, 155, 22, _("Rig:"));
@@ -2309,12 +2314,12 @@ Fl_Double_Window* XcvrDialog() {
         } // Fl_Group* o
         tabPrimary->end();
       } // Fl_Group* tabPrimary
-      { tabPTT = new Fl_Group(2, 30, 470, 218, _("Sep\' PTT"));
+      { tabPTT = new Fl_Group(2, 30, 475, 222, _("Sep\' PTT"));
         tabPTT->hide();
-        { new Fl_Box(52, 72, 395, 37, _("Use only if your setup requires a separate\nSerial Port for a PTT control lin\
+        { new Fl_Box(53, 73, 399, 37, _("Use only if your setup requires a separate\nSerial Port for a PTT control lin\
 e"));
         } // Fl_Box* o
-        { selectSepPTTPort = new Fl_ComboBox(127, 119, 190, 22, _("PTT Port"));
+        { selectSepPTTPort = new Fl_ComboBox(128, 121, 192, 22, _("PTT Port"));
           selectSepPTTPort->tooltip(_("Aux control port"));
           selectSepPTTPort->box(FL_DOWN_BOX);
           selectSepPTTPort->color((Fl_Color)FL_BACKGROUND_COLOR);
@@ -2328,25 +2333,25 @@ e"));
           selectSepPTTPort->when(FL_WHEN_RELEASE);
           selectSepPTTPort->end();
         } // Fl_ComboBox* selectSepPTTPort
-        { Fl_Round_Button* o = btnSepRTSptt = new Fl_Round_Button(110, 157, 127, 22, _("PTT via RTS"));
+        { Fl_Round_Button* o = btnSepRTSptt = new Fl_Round_Button(111, 159, 129, 23, _("PTT via RTS"));
           btnSepRTSptt->tooltip(_("RTS is ptt line"));
           btnSepRTSptt->down_box(FL_ROUND_DOWN_BOX);
           btnSepRTSptt->callback((Fl_Callback*)cb_btnSepRTSptt);
           o->value(progStatus.sep_rtsptt);
         } // Fl_Round_Button* btnSepRTSptt
-        { Fl_Check_Button* o = btnSepRTSplus = new Fl_Check_Button(271, 157, 127, 22, _("RTS +12 v"));
+        { Fl_Check_Button* o = btnSepRTSplus = new Fl_Check_Button(274, 159, 128, 23, _("RTS +12 v"));
           btnSepRTSplus->tooltip(_("Initial state of RTS"));
           btnSepRTSplus->down_box(FL_DOWN_BOX);
           btnSepRTSplus->callback((Fl_Callback*)cb_btnSepRTSplus);
           o->value(progStatus.sep_rtsplus);
         } // Fl_Check_Button* btnSepRTSplus
-        { Fl_Round_Button* o = btnSepDTRptt = new Fl_Round_Button(110, 183, 127, 22, _("PTT via DTR"));
+        { Fl_Round_Button* o = btnSepDTRptt = new Fl_Round_Button(111, 186, 129, 22, _("PTT via DTR"));
           btnSepDTRptt->tooltip(_("DTR is ptt line"));
           btnSepDTRptt->down_box(FL_ROUND_DOWN_BOX);
           btnSepDTRptt->callback((Fl_Callback*)cb_btnSepDTRptt);
           o->value(progStatus.sep_dtrptt);
         } // Fl_Round_Button* btnSepDTRptt
-        { Fl_Check_Button* o = btnSepDTRplus = new Fl_Check_Button(271, 183, 127, 22, _("DTR +12 v"));
+        { Fl_Check_Button* o = btnSepDTRplus = new Fl_Check_Button(274, 186, 128, 22, _("DTR +12 v"));
           btnSepDTRplus->tooltip(_("Initial state of DTR"));
           btnSepDTRplus->down_box(FL_DOWN_BOX);
           btnSepDTRplus->callback((Fl_Callback*)cb_btnSepDTRplus);
@@ -2354,9 +2359,9 @@ e"));
         } // Fl_Check_Button* btnSepDTRplus
         tabPTT->end();
       } // Fl_Group* tabPTT
-      { tabAux = new Fl_Group(2, 30, 470, 220, _("Aux"));
+      { tabAux = new Fl_Group(2, 30, 475, 222, _("Aux"));
         tabAux->hide();
-        { selectAuxPort = new Fl_ComboBox(130, 131, 190, 22, _("Aux Port"));
+        { selectAuxPort = new Fl_ComboBox(131, 132, 192, 22, _("Aux Port"));
           selectAuxPort->tooltip(_("Aux control port"));
           selectAuxPort->box(FL_DOWN_BOX);
           selectAuxPort->color((Fl_Color)FL_BACKGROUND_COLOR);
@@ -2370,14 +2375,14 @@ e"));
           selectAuxPort->when(FL_WHEN_RELEASE);
           selectAuxPort->end();
         } // Fl_ComboBox* selectAuxPort
-        { new Fl_Box(55, 84, 395, 37, _("Use only if your setup requires a separate\nSerial Port for a special Control\
+        { new Fl_Box(56, 84, 399, 38, _("Use only if your setup requires a separate\nSerial Port for a special Control\
  Signals"));
         } // Fl_Box* o
         tabAux->end();
       } // Fl_Group* tabAux
-      { tabPolling = new Fl_Group(2, 30, 470, 220, _("Polling"));
+      { tabPolling = new Fl_Group(2, 30, 475, 222, _("Polling"));
         tabPolling->hide();
-        { Fl_Group* o = new Fl_Group(6, 36, 464, 79, _("Meters"));
+        { Fl_Group* o = new Fl_Group(6, 36, 469, 80, _("Meters"));
           o->box(FL_ENGRAVED_BOX);
           o->align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE);
           { Fl_Check_Button* o = btn_poll_smeter = new Fl_Check_Button(39, 61, 104, 15, _("S meter"));
@@ -2406,7 +2411,7 @@ e"));
           } // Fl_Check_Button* btn_poll_alc
           o->end();
         } // Fl_Group* o
-        { Fl_Group* o = new Fl_Group(6, 116, 464, 132, _("Controls"));
+        { Fl_Group* o = new Fl_Group(6, 117, 469, 133, _("Controls"));
           o->box(FL_ENGRAVED_BOX);
           o->align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE);
           { Fl_Check_Button* o = btn_poll_frequency = new Fl_Check_Button(23, 138, 100, 15, _("Frequency"));
@@ -2506,9 +2511,8 @@ e"));
         } // Fl_Group* o
         tabPolling->end();
       } // Fl_Group* tabPolling
-      { tabSndCmd = new Fl_Group(4, 30, 470, 220, _("Send Cmd"));
-        tabSndCmd->hide();
-        { txt_command = new Fl_Input2(29, 55, 431, 25, _("Enter text as ASCII string\nOr sequence of hex values, x80 etc separated by s\
+      { tabSndCmd = new Fl_Group(2, 30, 475, 222, _("Send Cmd"));
+        { txt_command = new Fl_Input2(29, 53, 434, 23, _("Enter text as ASCII string\nOr sequence of hex values, x80 etc separated by s\
 paces"));
           txt_command->box(FL_DOWN_BOX);
           txt_command->color((Fl_Color)FL_BACKGROUND2_COLOR);
@@ -2520,12 +2524,24 @@ paces"));
           txt_command->align(FL_ALIGN_BOTTOM_LEFT);
           txt_command->when(FL_WHEN_RELEASE);
         } // Fl_Input2* txt_command
-        { btn_send_command = new Fl_Button(390, 166, 70, 20, _("SEND"));
+        { btn_send_command = new Fl_Button(392, 156, 71, 19, _("SEND"));
           btn_send_command->callback((Fl_Callback*)cb_btn_send_command);
         } // Fl_Button* btn_send_command
-        { txt_response = new Fl_Output(29, 121, 431, 25, _("Response to the SEND button"));
+        { txt_response = new Fl_Output(29, 115, 434, 23, _("Response to the SEND button"));
           txt_response->align(FL_ALIGN_BOTTOM_LEFT);
         } // Fl_Output* txt_response
+        { box_xcvr_connect = new Fl_Box(29, 180, 18, 18, _("Connected to transceiver"));
+          box_xcvr_connect->tooltip(_("Lit when connected"));
+          box_xcvr_connect->box(FL_DIAMOND_DOWN_BOX);
+          box_xcvr_connect->color((Fl_Color)FL_LIGHT1);
+          box_xcvr_connect->align(FL_ALIGN_RIGHT);
+        } // Fl_Box* box_xcvr_connect
+        { box_fldigi_connect = new Fl_Box(29, 204, 18, 18, _("Connected to fldigi"));
+          box_fldigi_connect->tooltip(_("Lit when connected"));
+          box_fldigi_connect->box(FL_DIAMOND_DOWN_BOX);
+          box_fldigi_connect->color((Fl_Color)FL_LIGHT1);
+          box_fldigi_connect->align(FL_ALIGN_RIGHT);
+        } // Fl_Box* box_fldigi_connect
         tabSndCmd->end();
       } // Fl_Group* tabSndCmd
       tabsConfig->end();

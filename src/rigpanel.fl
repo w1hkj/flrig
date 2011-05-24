@@ -809,11 +809,10 @@ Fl::scheme(progStatus.ui_scheme.c_str());} open
   }
 } 
 
-Function {Memory_Dialog()} {open
-} {
+Function {Memory_Dialog()} {} {
   Fl_Window {} {
     label {Flrig Memory} open
-    xywh {896 492 320 138} type Double visible
+    xywh {576 491 320 138} type Double visible
   } {
     Fl_Group {} {open
       xywh {2 2 60 133} box ENGRAVED_FRAME
@@ -873,14 +872,14 @@ Function {XcvrDialog()} {open
 } {
   Fl_Window {} {
     label {I/O Ports} open
-    xywh {575 417 482 257} type Double visible
+    xywh {580 664 482 257} type Double visible
   } {
     Fl_Tabs tabsConfig {open
-      xywh {0 8 477 245}
+      xywh {0 8 482 246}
     } {
       Fl_Group tabPrimary {
-        label Primary open
-        xywh {2 30 475 222}
+        label Primary
+        xywh {2 30 475 222} hide
       } {
         Fl_Group {} {open
           xywh {5 34 195 140} box ENGRAVED_FRAME
@@ -974,7 +973,7 @@ btnOkXcvrDialog->redraw();}
         } {
           Fl_Input server_addr {
             label {Fldigi address:}
-            callback {progStatus.server_addr = o->value();} selected
+            callback {progStatus.server_addr = o->value();}
             tooltip {xmlrpc server address (7362)
 change requires restart
 Are you sure?} xywh {317 41 140 22}
@@ -1080,18 +1079,18 @@ cbCIV();}
       }
       Fl_Group tabPTT {
         label {Sep' PTT}
-        xywh {2 30 470 218} hide
+        xywh {2 30 475 222} hide
       } {
         Fl_Box {} {
           label {Use only if your setup requires a separate
 Serial Port for a PTT control line}
-          xywh {52 72 395 37}
+          xywh {53 73 399 37}
         }
         Fl_Group selectSepPTTPort {
           label {PTT Port}
           callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();} open
-          tooltip {Aux control port} xywh {127 119 190 22} box DOWN_BOX align 4
+          tooltip {Aux control port} xywh {128 121 192 22} box DOWN_BOX align 4
           class Fl_ComboBox
         } {}
         Fl_Round_Button btnSepRTSptt {
@@ -1100,14 +1099,14 @@ btnOkXcvrDialog->redraw();} open
   btnSepDTRptt->value(0);
 btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();}
-          tooltip {RTS is ptt line} xywh {110 157 127 22} down_box ROUND_DOWN_BOX
+          tooltip {RTS is ptt line} xywh {111 159 129 23} down_box ROUND_DOWN_BOX
           code0 {o->value(progStatus.sep_rtsptt);}
         }
         Fl_Check_Button btnSepRTSplus {
           label {RTS +12 v}
           callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();}
-          tooltip {Initial state of RTS} xywh {271 157 127 22} down_box DOWN_BOX
+          tooltip {Initial state of RTS} xywh {274 159 128 23} down_box DOWN_BOX
           code0 {o->value(progStatus.sep_rtsplus);}
         }
         Fl_Round_Button btnSepDTRptt {
@@ -1116,41 +1115,41 @@ btnOkXcvrDialog->redraw();}
   btnSepRTSptt->value(0);
 btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();}
-          tooltip {DTR is ptt line} xywh {110 183 127 22} down_box ROUND_DOWN_BOX
+          tooltip {DTR is ptt line} xywh {111 186 129 22} down_box ROUND_DOWN_BOX
           code0 {o->value(progStatus.sep_dtrptt);}
         }
         Fl_Check_Button btnSepDTRplus {
           label {DTR +12 v}
           callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();}
-          tooltip {Initial state of DTR} xywh {271 183 127 22} down_box DOWN_BOX
+          tooltip {Initial state of DTR} xywh {274 186 128 22} down_box DOWN_BOX
           code0 {o->value(progStatus.sep_dtrplus);}
         }
       }
       Fl_Group tabAux {
         label Aux
-        xywh {2 30 470 220} hide
+        xywh {2 30 475 222} hide
       } {
         Fl_Group selectAuxPort {
           label {Aux Port}
           callback {btnOkXcvrDialog->labelcolor(FL_RED);
 btnOkXcvrDialog->redraw();} open
-          tooltip {Aux control port} xywh {130 131 190 22} box DOWN_BOX align 4
+          tooltip {Aux control port} xywh {131 132 192 22} box DOWN_BOX align 4
           class Fl_ComboBox
         } {}
         Fl_Box {} {
           label {Use only if your setup requires a separate
 Serial Port for a special Control Signals}
-          xywh {55 84 395 37}
+          xywh {56 84 399 38}
         }
       }
       Fl_Group tabPolling {
-        label Polling open
-        xywh {2 30 470 220} hide
+        label Polling
+        xywh {2 30 475 222} hide
       } {
         Fl_Group {} {
           label Meters open
-          xywh {6 36 464 79} box ENGRAVED_BOX align 21
+          xywh {6 36 469 80} box ENGRAVED_BOX align 21
         } {
           Fl_Check_Button btn_poll_smeter {
             label {S meter}
@@ -1179,7 +1178,7 @@ Serial Port for a special Control Signals}
         }
         Fl_Group {} {
           label Controls open
-          xywh {6 116 464 132} box ENGRAVED_BOX align 21
+          xywh {6 117 469 133} box ENGRAVED_BOX align 21
         } {
           Fl_Check_Button btn_poll_frequency {
             label Frequency
@@ -1275,23 +1274,31 @@ Serial Port for a special Control Signals}
       }
       Fl_Group tabSndCmd {
         label {Send Cmd}
-        xywh {4 30 470 220} hide
+        xywh {2 30 475 222}
       } {
         Fl_Input txt_command {
           label {Enter text as ASCII string
 Or sequence of hex values, x80 etc separated by spaces}
-          xywh {29 55 431 25} align 6
+          xywh {29 53 434 23} align 6
           code0 {\#include "flinput2.h"}
           class Fl_Input2
         }
         Fl_Button btn_send_command {
           label SEND
           callback {cb_send_command();}
-          xywh {390 166 70 20}
+          xywh {392 156 71 19}
         }
         Fl_Output txt_response {
           label {Response to the SEND button}
-          xywh {29 121 431 25} align 6
+          xywh {29 115 434 23} align 6
+        }
+        Fl_Box box_xcvr_connect {
+          label {Connected to transceiver} selected
+          tooltip {Lit when connected} xywh {29 180 18 18} box DIAMOND_DOWN_BOX color 50 align 8
+        }
+        Fl_Box box_fldigi_connect {
+          label {Connected to fldigi}
+          tooltip {Lit when connected} xywh {29 204 18 18} box DIAMOND_DOWN_BOX color 50 align 8
         }
       }
     }
