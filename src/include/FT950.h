@@ -23,6 +23,12 @@ public:
 	void set_vfoB(long);
 
 	bool twovfos();
+	void selectA();
+	void selectB();
+	void A2B();
+	bool can_split();
+	void set_split(bool val);
+	bool get_split();
 
 	void set_modeA(int val);
 	int  get_modeA();
