@@ -147,7 +147,8 @@ public:
 	bool has_get_info;
 
 protected:
-	string cmd;
+	string cmd; // command string
+	string rsp; // expected response string (header etc)
 
 	string to_bcd_be(long freq, int len);
 	string to_bcd(long freq, int len);
@@ -335,7 +336,7 @@ enum { ERR, WARN, INFO };
 enum { ASC, HEX };
 	void showresp(int level, int how, string s, string tx, string rx);
 
-	int waitN(size_t n, int timeout, const char *);
+	int waitN(size_t n, int timeout, const char *, int pr = HEX);
 
 };
 
