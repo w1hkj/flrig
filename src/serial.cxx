@@ -175,8 +175,6 @@ void Cserial::SetPTT(bool ON)
 		return;
 	}
 	if (dtrptt || rtsptt) {
-		LOG_INFO("PTT %d, DTRptt %d, DTR %d, RTSptt %d, RTS %d, RTSCTS %d",
-			  ON, dtrptt, dtr, rtsptt, rts, rtscts);
 		ioctl(fd, TIOCMGET, &status);
 		if (ON) {								  // ptt enabled
 			if (dtrptt && dtr)  status &= ~TIOCM_DTR;	 // toggle low
@@ -193,7 +191,8 @@ void Cserial::SetPTT(bool ON)
 				if (rtsptt && !rts) status &= ~TIOCM_RTS; // toggle low
 			}
 		}
-//	  LOG_INFO("Status %02X, %s", status & 0xFF, uint2bin(status, 8));
+		LOG_INFO("PTT %d, DTRptt %d, DTR %d, RTSptt %d, RTS %d, RTSCTS %d, status %2X",
+			  ON, dtrptt, dtr, rtsptt, rts, rtscts, status);
 		ioctl(fd, TIOCMSET, &status);
 	}
 //	LOG_DEBUG("No ptt specified");
@@ -692,9 +691,6 @@ void Cserial::SetPTT(bool ON)
 	if ( !(dtrptt || rtsptt) )
 		return;
 
-	LOG_INFO("PTT %d, DTRptt %d, DTR %d, RTSptt %d, RTS %d, RTSCTS %d",
-		ON, dtrptt, dtr, rtsptt, rts, rtscts);
-
 	if (ON) {
 		if (dtrptt && dtr)
 			dcb.fDtrControl = DTR_CONTROL_DISABLE;
@@ -718,6 +714,10 @@ void Cserial::SetPTT(bool ON)
 				dcb.fRtsControl = RTS_CONTROL_DISABLE;
 		}
 	}
+
+	LOG_INFO("PTT %d, DTRptt %d, DTR %d, RTSptt %d, RTS %d, RTSCTS %d, %2x %2x",
+		ON, dtrptt, dtr, rtsptt, rts, rtscts, dcb.fDtrControl, dcb.fRtsControl);
+
 	SetCommState(hComm, &dcb);
 }
 
