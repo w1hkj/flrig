@@ -1893,13 +1893,15 @@ void initRig()
 	} else {
 		if (progStatus.CIV > 0)
 			selrig->adjustCIV(progStatus.CIV);
+		selrig->selectA();
 		if (selrig->has_get_info)
 			selrig->get_info();
-		selrig->selectA();
 		transceiverA.freq = selrig->get_vfoA();
 		transceiverA.imode = selrig->get_modeA();
 		transceiverA.iBW = selrig->get_bwA();
 		selrig->selectB();
+		if (selrig->has_get_info)
+			selrig->get_info();
 		transceiverB.freq = selrig->get_vfoB();
 		transceiverB.imode = selrig->get_modeB();
 		transceiverB.iBW = selrig->get_bwB();
