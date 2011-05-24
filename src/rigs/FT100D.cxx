@@ -70,6 +70,7 @@ void RIG_FT100D::init_cmd()
 {
 	cmd = "00000";
 	for (size_t i = 0; i < 5; i++) cmd[i] = 0;
+	replystr.clear();
 }
 
 void RIG_FT100D::initialize()
@@ -106,14 +107,15 @@ void RIG_FT100D::set_split(bool val)
 		showresp(WARN, HEX, "set split OFF", cmd, replystr);
 }
 
-
 bool RIG_FT100D::get_info()
 {
 	bool memmode = false, vfobmode = false;
+	int pfreq, pmode, pbw;
 	init_cmd();
 	cmd[3] = 0x01;
 	cmd[4] = 0xFA;
 	int ret = waitN(8, 100, "status");
+
 	if (ret >= 8) {
 		size_t p = ret - 8;
 		memmode = ((replystr[p+1] & 0x40) == 0x40);
@@ -135,33 +137,20 @@ bool RIG_FT100D::get_info()
 	if (ret >= 32) {
 		size_t p = ret - 32;
 		// primary
-		afreq = 0;
+		pfreq = 0;
 		for (size_t n = 1; n < 5; n++)
-			afreq = afreq * 256 + (unsigned char)replybuff[p + n];
-		afreq = afreq * 1.25; // 100D resolution is 1.25 Hz / bit for read
-		amode = replybuff[p + 5] & 0x07;
-		if (amode > 7) amode = 7;
-		aBW = (replybuff[p + 5] >> 4) & 0x03;
-		aBW = 3 - aBW;
-		// secondary
-		p += 16;
-		bfreq = 0;
-		for (size_t n = 1; n < 5; n++)
-			bfreq = bfreq * 256 + (unsigned char)replybuff[p + n];
-		bfreq = bfreq * 1.25; // 100D resolution is 1.25 Hz / bit for read
-		bmode = replybuff[p + 5] & 0x07;
-		if (bmode > 7) bmode = 7;
-		bBW = (replybuff[p + 5] >> 4) & 0x03;
-		bBW = 3 - bBW;
-LOG_WARN("pri vfo = %d, sec vfo = %d, active vfo = %c", afreq, bfreq, vfobmode ? 'B' : 'A');
-		if (!vfobmode) {
-			A.freq = afreq; A.imode = amode; A.iBW = aBW;
-			B.freq = bfreq; B.imode = bmode; B.iBW = bBW;
+			pfreq = pfreq * 256 + (unsigned char)replystr[p + n];
+		pfreq = pfreq * 1.25; // 100D resolution is 1.25 Hz / bit for read
+		pmode = replystr[p + 5] & 0x07;
+		if (pmode > 7) pmode = 7;
+		pbw = (replystr[p + 5] >> 4) & 0x03;
+		pbw = 3 - pbw;
+LOG_WARN("Vfo %c = %d", vfobmode ? 'B' : 'A', afreq);
+		if (useB) {
+			B.freq = pfreq; B.imode = pmode; B.iBW = pbw;
 		} else {
-			B.freq = afreq; B.imode = amode; B.iBW = aBW;
-			A.freq = bfreq; A.imode = bmode; A.iBW = bBW;
+			A.freq = pfreq; A.imode = pmode; A.iBW = pbw;
 		}
-
 		return true;
 	}
 	return false;
@@ -281,8 +270,7 @@ int RIG_FT100D::get_smeter()
 	cmd[4] = 0xF7;
 	int ret = waitN(9, 100, "S-meter");
 	if (ret < 9) return 0;
-	int sval = (200 -  (unsigned char)replybuff[ret - 9 + 3]) / 1.1;
-	if (sval < 0) sval = 0;
+	int sval = (int)(((unsigned char)replystr[ret - 9 + 3]) / 2.55);
 	if (sval > 100) sval = 100;
 	return sval;
 }
@@ -303,8 +291,8 @@ int RIG_FT100D::get_power_out()
 	cmd[4] = 0xF7;
 	int ret = waitN(9, 100, "P-out");
 	if (ret < 9) return 0;
-	fwdpwr = replybuff[ret - 9 + 1] / 2.56;
-	refpwr = replybuff[ret - 9 + 2] / 2.56;
+	fwdpwr = replystr[ret - 9 + 1] / 2.56;
+	refpwr = replystr[ret - 9 + 2] / 2.56;
 	return (int) fwdpwr;
 }
 
