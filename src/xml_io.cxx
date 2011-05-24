@@ -324,6 +324,13 @@ if (XML_DEBUG)
 		queA.push(xmlvfo);
 }
 
+void set_fldigi_connect (void *d)
+{
+	bool b = (long *)d;
+	box_fldigi_connect->color(b ? FL_RED : FL_BACKGROUND2_COLOR);
+	box_fldigi_connect->redraw();
+}
+
 static void send_rig_info()
 {
 	XmlRpcValue res;
@@ -350,6 +357,7 @@ static void send_rig_info()
 
 		fldigi_online = true;
 		rig_reset = false;
+		Fl::awake(set_fldigi_connect, (void *)1);
 	} catch (...) {
 		throw;
 	}
@@ -409,6 +417,7 @@ void * digi_loop(void *d)
 			fldigi_online = false;
 			rig_reset = false;
 			try_count = CHECK_UPDATE_COUNT;
+			Fl::awake(set_fldigi_connect, (void *)0);
 		}
 		pthread_mutex_unlock(&mutex_xmlrpc);
 	}
