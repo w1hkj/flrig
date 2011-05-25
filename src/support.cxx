@@ -1849,16 +1849,16 @@ void initRig()
 	FreqDispB->set_precision(selrig->precision);
 
 	if (rig_nbr == TT550) {
-		selrig->selectB();
+//		selrig->selectB();  // not necessary for 550 as there are no xcvr memories
 		vfoB.freq = progStatus.freq_B;
 		vfoB.imode = progStatus.imode_B;
 		vfoB.iBW = progStatus.iBW_B;
 		FreqDispB->value(vfoB.freq);
 		if (flrig_abort) goto failed;
-		selrig->set_vfoB(vfoB.freq);
-		selrig->set_modeB(vfoB.imode);
-		if (vfoB.iBW == -1) vfoB.iBW = selrig->def_bandwidth(vfoB.imode);
-		selrig->set_bwB(vfoB.iBW);
+//		selrig->set_vfoB(vfoB.freq);
+//		selrig->set_modeB(vfoB.imode);
+//		if (vfoB.iBW == -1) vfoB.iBW = selrig->def_bandwidth(vfoB.imode);
+//		selrig->set_bwB(vfoB.iBW);
 
 		selrig->selectA();
 		vfo.freq = vfoA.freq = progStatus.freq_A;
