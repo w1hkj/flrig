@@ -43,17 +43,18 @@ RIG_IC746::RIG_IC746() {
 	comm_rtsptt = false;
 	comm_dtrptt = false;
 
+	def_freq = freqB = freqA = B.freq = A.freq = 14070000L;
 	def_mode = modeB = modeA = B.imode = A.imode = 1;
 	def_bw = bwB = bwA = B.iBW = A.iBW = 0;
-	def_freq = freqB = freqA = B.freq = A.freq = 14070000L;
+	filter_nbr = 0;
 
 	ICvol = 0;
 
+	has_bandwidth_control =
 	has_smeter =
 	has_power_control =
 	has_volume_control =
 	has_mode_control =
-	has_bandwidth_control =
 	has_micgain_control =
 	has_notch_control =
 	has_attenuator_control =
@@ -108,6 +109,30 @@ RIG_IC746PRO::RIG_IC746PRO() {
 	_mode_type = IC746PRO_mode_type;
 	atten_level = 0;
 	preamp_level = 0;
+
+	def_mode = modeB = modeA = B.imode = A.imode = 1;
+	def_bw = bwB = bwA = B.iBW = A.iBW = 34;
+	def_freq = freqB = freqA = B.freq = A.freq = 14070000L;
+
+	has_smeter =
+	has_power_control =
+	has_volume_control =
+	has_mode_control =
+	has_bandwidth_control =
+	has_micgain_control =
+	has_notch_control =
+	has_attenuator_control =
+	has_preamp_control =
+	has_ifshift_control =
+	has_ptt_control =
+	has_tune_control =
+	has_noise_control =
+	has_noise_reduction =
+	has_noise_reduction_control =
+	has_rf_control =
+	has_sql_control =
+	has_split =
+	restore_mbw = true;
 
 	has_swr_control =
 	has_alc_control =
@@ -340,7 +365,7 @@ int RIG_IC746::get_noise()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
-	if (waitFOR(9, "get noise")) {
+	if (waitFOR(8, "get noise")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			return (replystr[p+6] ? 1 : 0);
@@ -405,7 +430,7 @@ void RIG_IC746::set_modeA(int val)
 	cmd = pre_to;
 	cmd += '\x06';
 	cmd += val > 5 ? val + 1 : val;
-	cmd += A.iBW; // filter #1
+	cmd += filter_nbr + 1; // filter #
 	cmd.append( post );
 	waitFB("set mode A");
 }
@@ -423,7 +448,7 @@ int RIG_IC746::get_modeA()
 		if (p != string::npos) {
 			A.imode = replystr[p+5];
 			if (A.imode > 6) A.imode--;
-			A.iBW = replystr[p+6];
+			filter_nbr = replystr[p+6] - 1;
 		}
 	}
 	return A.imode;
@@ -431,13 +456,13 @@ int RIG_IC746::get_modeA()
 
 void RIG_IC746::set_bwA(int val)
 {
-	A.iBW = val + 1;
+	filter_nbr = val;
 	set_modeA(A.imode);
 }
 
 int RIG_IC746::get_bwA()
 {
-	return A.iBW - 1;
+	return filter_nbr;
 }
 
 void RIG_IC746::set_modeB(int val)
@@ -446,7 +471,7 @@ void RIG_IC746::set_modeB(int val)
 	cmd = pre_to;
 	cmd += '\x06';
 	cmd += val > 5 ? val + 1 : val;
-	cmd += B.iBW; // filter #1
+	cmd += filter_nbr + 1; // filter
 	cmd.append( post );
 	waitFB("set mode B");
 }
@@ -464,7 +489,7 @@ int RIG_IC746::get_modeB()
 		if (p != string::npos) {
 			B.imode = replystr[p+5];
 			if (B.imode > 6) B.imode--;
-			B.iBW = replystr[p+6];
+			filter_nbr = replystr[p+6] - 1;
 		}
 	}
 	return B.imode;
@@ -472,13 +497,13 @@ int RIG_IC746::get_modeB()
 
 void RIG_IC746::set_bwB(int val)
 {
-	B.iBW = val + 1;
+	filter_nbr = val;
 	set_modeB(B.imode);
 }
 
 int RIG_IC746::get_bwB()
 {
-	return B.iBW - 1;
+	return filter_nbr;
 }
 
 int RIG_IC746::get_modetype(int n)
@@ -586,7 +611,7 @@ void RIG_IC746PRO::set_modeA(int val)
 	cmd = pre_to;
 	cmd += '\x06';
 	cmd += val;
-	cmd += A.iBW;
+	cmd += filter_nbr + 1; // filter 1 ... 3
 	cmd.append( post );
 	waitFB("set mode A");
 	if (datamode) { // LSB / USB ==> use DATA mode
@@ -611,7 +636,7 @@ int RIG_IC746PRO::get_modeA()
 		if (p != string::npos) {
 			md = replystr[p+5];
 			if (md > 6) md--;
-			A.iBW = replystr[p+6];
+			filter_nbr = replystr[p+6] - 1;
 			cstr = "\x1A\x06";
 			resp = pre_fm;
 			resp.append(cstr);
@@ -652,7 +677,7 @@ void RIG_IC746PRO::set_modeB(int val)
 	cmd = pre_to;
 	cmd += '\x06';
 	cmd += val;
-	cmd += B.iBW;
+	cmd += filter_nbr + 1;
 	cmd.append( post );
 	waitFB("set mode B");
 	if (datamode) { // LSB / USB ==> use DATA mode
@@ -677,7 +702,7 @@ int RIG_IC746PRO::get_modeB()
 		if (p != string::npos) {
 			md = replystr[p+5];
 			if (md > 6) md--;
-			B.iBW = replystr[p+6];
+			filter_nbr = replystr[p+6] - 1; // this is the filter #; not the bandwidth
 			cstr = "\x1A\x06";
 			resp = pre_fm;
 			resp.append(cstr);
@@ -806,11 +831,11 @@ void RIG_IC746PRO::tune_rig()
 
 void RIG_IC746PRO::set_bwA(int val)
 {
-	if (bandwidths_ == IC746PRO_AMFMwidths) {
-		A.iBW = val + 1;
-		set_modeA(A.imode);
-		return;
-	}
+//	if (bandwidths_ == IC746PRO_AMFMwidths) {
+//		filter_nbr = val;
+//		set_modeA(A.imode);
+//		return;
+//	}
 
 	A.iBW = val;
 	cmd = pre_to;
@@ -822,9 +847,6 @@ void RIG_IC746PRO::set_bwA(int val)
 
 int  RIG_IC746PRO::get_bwA()
 {
-	if (bandwidths_ == IC746PRO_AMFMwidths) {
-		return A.iBW - 1;
-	}
 	string cstr = "\x1A\x03";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -841,11 +863,11 @@ int  RIG_IC746PRO::get_bwA()
 
 void RIG_IC746PRO::set_bwB(int val)
 {
-	if (bandwidths_ == IC746PRO_AMFMwidths) {
-		B.iBW = val + 1;
-		set_modeB(B.imode);
-		return;
-	}
+//	if (bandwidths_ == IC746PRO_AMFMwidths) {
+//		filter_nbr = val;
+//		set_modeA(A.imode);
+//		return;
+//	}
 
 	B.iBW = val;
 	cmd = pre_to;
@@ -857,9 +879,6 @@ void RIG_IC746PRO::set_bwB(int val)
 
 int  RIG_IC746PRO::get_bwB()
 {
-	if (bandwidths_ == IC746PRO_AMFMwidths) {
-		return B.iBW - 1;
-	}
 	string cstr = "\x1A\x03";
 	string resp = pre_fm;
 	resp.append(cstr);
