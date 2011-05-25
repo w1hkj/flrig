@@ -2319,6 +2319,11 @@ void initRig()
 		selrig->set_modeA(vfoA.imode);
 		selrig->set_bwA(vfoA.iBW);
 
+		btnA->value(1);
+		btnB->value(0);
+		btnA->redraw();
+		btnB->redraw();
+
 	}
 
 	// enable the serial thread
