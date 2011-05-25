@@ -1784,7 +1784,7 @@ void initXcvrTab()
 		mnuRestoreData->show();
 		mnuKeepData->show();
 
-		btn_poll_frequency->activate(); btn_poll_frequency->value(progStatus.poll_smeter);
+		btn_poll_frequency->activate(); btn_poll_frequency->value(progStatus.poll_frequency);
 		btn_poll_mode->activate(); btn_poll_mode->value(progStatus.poll_mode);
 		btn_poll_bandwidth->activate(); btn_poll_bandwidth->value(progStatus.poll_bandwidth);
 
