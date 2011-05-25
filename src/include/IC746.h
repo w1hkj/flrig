@@ -61,6 +61,7 @@ protected:
 	int  preamp_level;
 	int  atten_level;
 	int  ICvol;
+	int  filter_nbr;
 
 };
 
