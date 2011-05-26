@@ -1205,6 +1205,7 @@ Fl_Double_Window* Rig_window() {
         o->hide();
         { Fl_Check_Button* o = btn_tt550_enable_xmtr = new Fl_Check_Button(10, 359, 70, 15, _("Tx ON"));
           btn_tt550_enable_xmtr->down_box(FL_DOWN_BOX);
+          btn_tt550_enable_xmtr->value(1);
           btn_tt550_enable_xmtr->callback((Fl_Callback*)cb_btn_tt550_enable_xmtr);
           o->value(progStatus.tt550_enable_xmtr);
         } // Fl_Check_Button* btn_tt550_enable_xmtr
@@ -2114,7 +2115,6 @@ Fl_Double_Window* XcvrDialog() {
     w = o;
     { tabsConfig = new Fl_Tabs(0, 8, 482, 246);
       { tabPrimary = new Fl_Group(2, 30, 475, 222, _("Primary"));
-        tabPrimary->hide();
         { Fl_Group* o = new Fl_Group(5, 34, 195, 140);
           o->box(FL_ENGRAVED_FRAME);
           { selectRig = new Fl_ComboBox(41, 38, 155, 22, _("Rig:"));
@@ -2512,6 +2512,7 @@ e"));
         tabPolling->end();
       } // Fl_Group* tabPolling
       { tabSndCmd = new Fl_Group(2, 30, 475, 222, _("Send Cmd"));
+        tabSndCmd->hide();
         { txt_command = new Fl_Input2(29, 53, 434, 23, _("Enter text as ASCII string\nOr sequence of hex values, x80 etc separated by s\
 paces"));
           txt_command->box(FL_DOWN_BOX);
