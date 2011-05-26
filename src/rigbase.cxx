@@ -287,7 +287,7 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 		replystr = returned;
 		snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
 		showresp(WARN, HEX, sztemp, tosend, returned);
-		return false;
+		return 0;
 	}
 
 	sendCommand(tosend, 0);
@@ -301,7 +301,7 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 			waited = cnt * 10 * repeat + delay;
 			snprintf(sztemp, sizeof(sztemp), "%s OK %d ms, ", sz, waited);
 			showresp(WARN, pr, sztemp, cmd, returned);
-			return true;
+			return replystr.length();
 		}
 		MilliSleep(10);
 		Fl::awake();
@@ -311,7 +311,7 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 	waited = cnt * 10 * repeat + delay;
 	snprintf(sztemp, sizeof(sztemp), "%s failed %d ms, ", sz, waited);
 	showresp(WARN, pr, sztemp, cmd, returned);
-	return false;
+	return 0;
 }
 
 
