@@ -17,7 +17,8 @@ decl {\#include "K3_ui.h"} {}
 
 decl {const int freq_sel_widths[]={110, 70, 70, 0};} {} 
 
-Function {Rig_window()} {} {
+Function {Rig_window()} {open
+} {
   Fl_Window {} {
     label Flrig open
     xywh {577 57 424 401} type Double align 80
@@ -541,7 +542,7 @@ cb_vfo_adj();}
           label {Tx ON}
           callback {progStatus.tt550_enable_xmtr=o->value();
 cb_tt550_enable_xmtr();}
-          xywh {10 359 70 15} down_box DOWN_BOX
+          xywh {10 359 70 15} down_box DOWN_BOX value 1
           code0 {o->value(progStatus.tt550_enable_xmtr);}
         }
         Fl_Check_Button btn_tt550_enable_tloop {
@@ -868,8 +869,7 @@ Double-click ==> pick and close} xywh {66 2 250 133} type Hold labelfont 4 label
   }
 } 
 
-Function {XcvrDialog()} {open
-} {
+Function {XcvrDialog()} {} {
   Fl_Window {} {
     label {I/O Ports} open
     xywh {580 664 482 257} type Double visible
@@ -878,8 +878,8 @@ Function {XcvrDialog()} {open
       xywh {0 8 482 246}
     } {
       Fl_Group tabPrimary {
-        label Primary
-        xywh {2 30 475 222} hide
+        label Primary selected
+        xywh {2 30 475 222}
       } {
         Fl_Group {} {open
           xywh {5 34 195 140} box ENGRAVED_FRAME
@@ -1274,7 +1274,7 @@ Serial Port for a special Control Signals}
       }
       Fl_Group tabSndCmd {
         label {Send Cmd}
-        xywh {2 30 475 222}
+        xywh {2 30 475 222} hide
       } {
         Fl_Input txt_command {
           label {Enter text as ASCII string
@@ -1293,7 +1293,7 @@ Or sequence of hex values, x80 etc separated by spaces}
           xywh {29 115 434 23} align 6
         }
         Fl_Box box_xcvr_connect {
-          label {Connected to transceiver} selected
+          label {Connected to transceiver}
           tooltip {Lit when connected} xywh {29 180 18 18} box DIAMOND_DOWN_BOX color 50 align 8
         }
         Fl_Box box_fldigi_connect {

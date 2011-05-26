@@ -396,6 +396,7 @@ void configXcvr()
 	}
 
 	dlgXcvrConfig->show();
+	tabsConfig->value(tabPrimary);
 }
 
 void open_poll_tab()
