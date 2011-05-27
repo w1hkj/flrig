@@ -28,6 +28,8 @@ extern queue<FREQMODE> queA;
 extern queue<FREQMODE> queB;
 extern queue<bool> quePTT;
 
+queue<long> qfreq;
+
 static const double TIMEOUT = 0.5;
 
 // these are get only
@@ -205,6 +207,19 @@ void send_new_freq(long freq)
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
 			LOG_WARN("%s", e.getMessage().c_str());
+	}
+}
+
+void send_xml_freq(long freq)
+{
+	qfreq.push(freq);
+}
+
+void send_queue()
+{
+	while (!qfreq.empty()) {
+		send_new_freq(qfreq.front());
+		qfreq.pop();
 	}
 }
 
@@ -409,8 +424,10 @@ void * digi_loop(void *d)
 		try {
 			if (rig_reset || (!fldigi_online && (--try_count == 0)))
 				send_rig_info();
-			else if (fldigi_online)
+			else if (fldigi_online) {
+				send_queue();
 				get_fldigi_status();
+			}
 		} catch (const XmlRpc::XmlRpcException& e) {
 			if (XML_DEBUG)
 				LOG_WARN("%s", e.getMessage().c_str());

@@ -107,14 +107,10 @@ void read_vfo()
 	if (!useB) { // vfo-A
 		freq = selrig->get_vfoA();
 		if (freq != vfoA.freq) {
-			pthread_mutex_lock(&mutex_xmlrpc);
 			vfoA.freq = freq;
 			Fl::awake(setFreqDispA, (void *)vfoA.freq);
 			vfo = vfoA;
-			try {
-				send_new_freq(vfo.freq);
-			} catch (...) {}
-			pthread_mutex_unlock(&mutex_xmlrpc);
+			send_xml_freq(vfo.freq);
 		}
 		if ( selrig->twovfos() ) {
 			freq = selrig->get_vfoB();
@@ -126,14 +122,10 @@ void read_vfo()
 	} else { // vfo-B
 		freq = selrig->get_vfoB();
 		if (freq != vfoB.freq) {
-			pthread_mutex_lock(&mutex_xmlrpc);
 			vfoB.freq = freq;
 			Fl::awake(setFreqDispB, (void *)vfoB.freq);
 			vfo = vfoB;
-			try {
-				send_new_freq(vfo.freq);
-			} catch (...) {}
-			pthread_mutex_unlock(&mutex_xmlrpc);
+			send_xml_freq(vfo.freq);
 		}
 	}
 	pthread_mutex_unlock(&mutex_serial);
@@ -479,8 +471,6 @@ void serviceA()
 		LOG_INFO("%s", print(vfoA));
 	pthread_mutex_lock(&mutex_serial);
 
-	pthread_mutex_lock(&mutex_xmlrpc);
-
 	if (changed_vfo && !useB) {
 		selrig->selectA();
 	}
@@ -495,10 +485,7 @@ void serviceA()
 		selrig->set_vfoA(vfoA.freq);
 		Fl::awake(setFreqDispA, (void *)vfoA.freq);
 		vfo.freq = vfoA.freq;
-		if (vfoA.src != XML)
-			try {
-				send_new_freq(vfoA.freq);
-			} catch (...) {}
+		if (vfoA.src == UI) send_xml_freq(vfoA.freq);
 	}
 // adjust for change in bandwidths_
 	if (vfoA.imode != vfo.imode || changed_vfo) {
@@ -509,6 +496,7 @@ void serviceA()
 		vfo.iBW = vfoA.iBW;
 		Fl::awake(setBWControl);
 		selrig->set_bwA(vfoA.iBW);
+		pthread_mutex_lock(&mutex_xmlrpc);
 		try {
 			if (vfoA.src == UI)
 				send_new_mode(vfoA.imode);
@@ -516,19 +504,22 @@ void serviceA()
 			send_bandwidths();
 			send_new_bandwidth(vfoA.iBW);
 		} catch (...) {}
+		pthread_mutex_unlock(&mutex_xmlrpc);
 	} else if (vfoA.iBW != vfo.iBW) {
 		selrig->set_bwA(vfoA.iBW);
 		vfo.iBW = vfoA.iBW;
 		Fl::awake(setBWControl);
-		if (vfoA.src == UI)
+		if (vfoA.src == UI) {
+		pthread_mutex_lock(&mutex_xmlrpc);
 			try {
 				send_new_bandwidth(vfoA.iBW);
 			} catch (...) {}
+		pthread_mutex_unlock(&mutex_xmlrpc);
+		}
 	}
 
 end_serviceA:
 	changed_vfo = false;
-	pthread_mutex_unlock(&mutex_xmlrpc);
 
 	pthread_mutex_unlock(&mutex_serial);
 }
@@ -548,8 +539,6 @@ void serviceB()
 		LOG_INFO("%s", print(vfoB));
 	pthread_mutex_lock(&mutex_serial);
 
-	pthread_mutex_lock(&mutex_xmlrpc);
-
 	if (changed_vfo && useB) {
 		selrig->selectB();
 	}
@@ -564,10 +553,7 @@ void serviceB()
 		selrig->set_vfoB(vfoB.freq);
 		vfo.freq = vfoB.freq;
 		Fl::awake(setFreqDispB, (void *)vfoB.freq);
-		if (vfoB.src != XML)
-			try {
-				send_new_freq(vfoB.freq);
-			} catch (...) {}
+		if (vfoB.src == UI) send_xml_freq(vfoB.freq);
 	}
 	if (vfoB.imode != vfo.imode || pushedB || changed_vfo) {
 		selrig->set_modeB(vfoB.imode);
@@ -577,6 +563,7 @@ void serviceB()
 		vfo.iBW = vfoB.iBW;
 		Fl::awake(setBWControl);
 		selrig->set_bwB(vfoB.iBW);
+		pthread_mutex_lock(&mutex_xmlrpc);
 		try {
 			if (vfoB.src == UI)
 				send_new_mode(vfoB.imode);
@@ -584,20 +571,23 @@ void serviceB()
 			send_bandwidths();
 			send_new_bandwidth(vfoB.iBW);
 		} catch (...) {}
+		pthread_mutex_unlock(&mutex_xmlrpc);
 	} else if (vfoB.iBW != vfo.iBW || pushedB) {
 		selrig->set_bwB(vfoB.iBW);
 		vfo.iBW = vfoB.iBW;
 		Fl::awake(setBWControl);
-		if (vfoB.src == UI)
+		if (vfoB.src == UI) {
+		pthread_mutex_lock(&mutex_xmlrpc);
 			try {
 				send_new_bandwidth(vfoB.iBW);
 			} catch (...) {}
+		pthread_mutex_unlock(&mutex_xmlrpc);
+		}
 	}
 	pushedB = false;
 
 end_serviceB:
 	changed_vfo = false;
-	pthread_mutex_unlock(&mutex_xmlrpc);
 	pthread_mutex_unlock(&mutex_serial);
 }
 
@@ -613,11 +603,11 @@ void servicePTT()
 
 void * serial_thread_loop(void *d)
 {
-  static int  loopcount = progStatus.serloop_timing / 10;//0;
+  static int  loopcount = progStatus.serloop_timing / 10;
 	for(;;) {
 		if (!run_serial_thread) break;
 
-		MilliSleep(10);//progStatus.serloop_timing);
+		MilliSleep(10);
 
 		if (bypass_serial_thread_loop) goto serial_bypass_loop;
 
@@ -887,21 +877,6 @@ void cb_set_split(int val)
 		selrig->set_split(val);
 	pthread_mutex_unlock(&mutex_serial);
 	setFocus();
-}
-
-void set_vfo_mode_bw()
-{
-
-	opMODE->index(vfo.imode);
-	updateBandwidthControl();
-
-	try {
-		send_new_freq(vfo.freq);
-		send_new_mode(vfo.imode);
-		send_sideband();
-		send_bandwidths();
-		send_new_bandwidth(vfo.iBW);
-	} catch (...) {}
 }
 
 void highlight_vfo(void *d)
