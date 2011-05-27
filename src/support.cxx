@@ -1694,6 +1694,8 @@ void initXcvrTab()
 		btn_tt550_CompON->value(progStatus.tt550_compON);
 		cnt_tt550_compression->value(progStatus.tt550_compression);
 		cnt_tt550_mon_vol->value(progStatus.tt550_mon_vol);
+		btn_tt550_enable_xmtr->value(progStatus.tt550_enable_xmtr);
+		btn_tt550_enable_tloop->value(progStatus.tt550_enable_tloop);
 		btn_tt550_tuner_bypass->value(progStatus.tt550_tuner_bypass);
 		sel_tt550_encoder_step->value(progStatus.tt550_encoder_step);
 		cnt_tt550_encoder_sensitivity->value(progStatus.tt550_encoder_sensitivity);
@@ -1825,23 +1827,23 @@ void initRig()
 
 	if (rig_nbr == TT550) {
 //		selrig->selectB();  // not necessary for 550 as there are no xcvr memories
+		selrig->selectA();
+
 		vfoB.freq = progStatus.freq_B;
 		vfoB.imode = progStatus.imode_B;
 		vfoB.iBW = progStatus.iBW_B;
 		FreqDispB->value(vfoB.freq);
-		if (flrig_abort) goto failed;
-//		selrig->set_vfoB(vfoB.freq);
-//		selrig->set_modeB(vfoB.imode);
-//		if (vfoB.iBW == -1) vfoB.iBW = selrig->def_bandwidth(vfoB.imode);
-//		selrig->set_bwB(vfoB.iBW);
+		selrig->set_vfoB(vfoB.freq);
+		selrig->set_modeB(vfoB.imode);
+		selrig->set_bwB(vfoB.iBW);
 
-		selrig->selectA();
 		vfo.freq = vfoA.freq = progStatus.freq_A;
 		vfo.imode = vfoA.imode = progStatus.imode_A;
 		vfo.iBW = vfoA.iBW = progStatus.iBW_A;
 		FreqDispA->value( vfoA.freq );
 		selrig->set_vfoA(vfoA.freq);
 		selrig->set_modeA(vfoA.imode);
+
 		if (vfoA.iBW == -1) vfoA.iBW = selrig->def_bandwidth(vfoA.imode);
 		selrig->set_bwA(vfoA.iBW);
 

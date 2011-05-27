@@ -516,7 +516,8 @@ void RIG_TT550::set_modeB(int val)
 {
 LOG_WARN("mode B = %d", val);
 	modeB = val;
-	set_mode(val);
+	if (!onA)
+		set_mode(val);
 }
 
 int  RIG_TT550::get_modeB()
@@ -592,7 +593,8 @@ void RIG_TT550::set_bwB(int val)
 {
 LOG_WARN("bw B = %d", val);
 	bwB = val;
-	set_bw(val);
+	if (!onA)
+		set_bw(val);
 }
 
 int  RIG_TT550::get_bwB()
