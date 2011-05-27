@@ -472,6 +472,7 @@ bool status::loadXcvrState(const char *xcvr)
 		spref.get("comm_wait", comm_wait, comm_wait);
 		spref.get("comm_timeout", comm_timeout, comm_timeout);
 		spref.get("serloop_timing", serloop_timing, serloop_timing);
+		if (serloop_timing < 10) serloop_timing = 10; // minimum loop delay of 10 msec
 
 		if (spref.get("comm_echo", i, i)) comm_echo = i;
 		if (spref.get("ptt_via_cat", i, i)) comm_catptt = i;

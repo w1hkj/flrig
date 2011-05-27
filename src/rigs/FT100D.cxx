@@ -3,7 +3,7 @@
  * 
  * a part of flrig
  * 
- * Copyright 2009, Dave Freese, W1HKJ
+ * Copyright 2011, Dave Freese, W1HKJ
  * 
  */
 
@@ -196,6 +196,7 @@ void RIG_FT100D::set_bwA (int val)
 	showresp(WARN, HEX, "set BW A", cmd, replystr);
 }
 
+
 int RIG_FT100D::get_bwA()
 {
 	return A.iBW;
@@ -275,10 +276,6 @@ int RIG_FT100D::get_smeter()
 	if (sval > 200) sval = 200;
 	if (sval < 120) sval = 250 - 5 * sval / 3;
 	else sval = 125 - 5 * sval / 8;
-
-//	int sval = (200 -  (unsigned char)replybuff[ret - 9 + 3]) / 1.1;
-//	if (sval < 0) sval = 0;
-//	if (sval > 100) sval = 100;
 	return sval;
 }
 
