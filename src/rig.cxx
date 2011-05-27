@@ -64,6 +64,10 @@ pthread_t *digi_thread = 0;
 
 pthread_mutex_t mutex_serial = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_xmlrpc = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex_queX = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex_queA = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex_queB = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex_ptt = PTHREAD_MUTEX_INITIALIZER;
 
 bool RIG_DEBUG = false;
 bool XML_DEBUG = false;

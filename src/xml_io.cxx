@@ -333,10 +333,15 @@ static void push2que()
 {
 if (XML_DEBUG)
 	LOG_WARN("%s", print(xmlvfo));
-	if (useB)
+	if (useB) {
+		pthread_mutex_lock(&mutex_queA);
 		queB.push(xmlvfo);
-	else
+		pthread_mutex_unlock(&mutex_queA);
+	} else {
+		pthread_mutex_lock(&mutex_queB);
 		queA.push(xmlvfo);
+		pthread_mutex_unlock(&mutex_queB);
+	}
 }
 
 void set_fldigi_connect (void *d)

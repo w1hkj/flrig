@@ -463,10 +463,13 @@ void serviceA()
 	if (!selrig->can_change_alt_vfo && useB) return;
 	if (queA.empty()) return;
 
+	pthread_mutex_lock(&mutex_queA);
 	while (!queA.empty()) {
 		vfoA = queA.front();
 		queA.pop();
 	}
+	pthread_mutex_unlock(&mutex_queA);
+
 	if (RIG_DEBUG)
 		LOG_INFO("%s", print(vfoA));
 	pthread_mutex_lock(&mutex_serial);
@@ -530,11 +533,14 @@ void serviceB()
 
 	if (queB.empty())
 		return;
-
+		
+	pthread_mutex_lock(&mutex_queB);
 	while (!queB.empty()) {
 		vfoB = queB.front();
 		queB.pop();
 	}
+	pthread_mutex_unlock(&mutex_queB);
+	
 	if (RIG_DEBUG)
 		LOG_INFO("%s", print(vfoB));
 	pthread_mutex_lock(&mutex_serial);
@@ -593,12 +599,14 @@ end_serviceB:
 
 void servicePTT()
 {
+	pthread_mutex_lock(&mutex_ptt);
 	while (!quePTT.empty()) {
 		PTT = quePTT.front();
 		quePTT.pop();
 		rigPTT(PTT);
 		Fl::awake(update_UI_PTT);
 	}
+	pthread_mutex_unlock(&mutex_ptt);
 }
 
 void * serial_thread_loop(void *d)
@@ -687,7 +695,15 @@ void setBW()
 	FREQMODE fm = vfo;
 	fm.src = UI;
 	fm.iBW = opBW->index();
-	useB ? queB.push(fm) : queA.push(fm);
+	if (useB) {
+		pthread_mutex_lock(&mutex_queB);
+		queB.push(fm);
+		pthread_mutex_unlock(&mutex_queB);
+	} else {
+		pthread_mutex_lock(&mutex_queA);
+		queA.push(fm);
+		pthread_mutex_unlock(&mutex_queA);
+	}
 	setFocus();
 }
 
@@ -719,7 +735,15 @@ void setMode()
 	fm.imode = opMODE->index();
 	fm.iBW = selrig->def_bandwidth(fm.imode);
 	fm.src = UI;
-	useB ? queB.push(fm) : queA.push(fm);
+	if (useB) {
+		pthread_mutex_lock(&mutex_queB);
+		queB.push(fm);
+		pthread_mutex_unlock(&mutex_queB);
+	} else {
+		pthread_mutex_lock(&mutex_queA);
+		queA.push(fm);
+		pthread_mutex_unlock(&mutex_queA);
+	}
 	setFocus();
 }
 
@@ -811,7 +835,9 @@ int movFreqA() {
 	FREQMODE vfo = vfoA;
 	vfo.freq = FreqDispA->value();
 	vfo.src = UI;
+	pthread_mutex_lock(&mutex_queA);
 	queA.push(vfo);
+	pthread_mutex_unlock(&mutex_queA);
 	return 1;
 }
 
@@ -821,7 +847,9 @@ int movFreqB() {
 	FREQMODE vfo = vfoB;
 	vfo.freq = FreqDispB->value();
 	vfo.src = UI;
+	pthread_mutex_lock(&mutex_queB);
 	queB.push(vfo);
+	pthread_mutex_unlock(&mutex_queB);
 	return 1;
 }
 
@@ -837,7 +865,9 @@ void cbA2B()
 		pthread_mutex_unlock(&mutex_serial);
 	}
 	vfoB = vfoA;
+	pthread_mutex_lock(&mutex_queB);
 	queB.push(vfoB);
+	pthread_mutex_unlock(&mutex_queB);
 	FreqDispB->value(vfoB.freq);
 	FreqDispB->redraw();
 	pushedB = true;
@@ -909,7 +939,9 @@ void cb_selectA() {
 	useB = false;
 	vfoA.src = UI;
 	vfoA.freq = FreqDispA->value();
+	pthread_mutex_lock(&mutex_queA);
 	queA.push(vfoA);
+	pthread_mutex_unlock(&mutex_queA);
 	pthread_mutex_unlock(&mutex_serial);
 	highlight_vfo((void *)0);
 }
@@ -924,7 +956,9 @@ void cb_selectB() {
 	useB = true;
 	vfoB.src = UI;
 	vfoB.freq = FreqDispB->value();
+	pthread_mutex_lock(&mutex_queB);
 	queB.push(vfoB);
+	pthread_mutex_unlock(&mutex_queB);
 	pthread_mutex_unlock(&mutex_serial);
 	highlight_vfo((void *)0);
 }
@@ -949,10 +983,14 @@ void selectFreq() {
 	fm.src   = UI;
 	if (!useB) {
 		FreqDispA->value(fm.freq);
+		pthread_mutex_lock(&mutex_queA);
 		queA.push(fm);
+		pthread_mutex_unlock(&mutex_queA);
 	} else {
 		FreqDispB->value(fm.freq);
+		pthread_mutex_lock(&mutex_queB);
 		queB.push(fm);
+		pthread_mutex_unlock(&mutex_queB);
 	}
 	setFocus();
 }
@@ -1308,8 +1346,11 @@ void cbPTT()
 {
 	if (fldigi_online && progStatus.key_fldigi)
 		send_ptt_changed(btnPTT->value());
-	else
+	else {
+		pthread_mutex_lock(&mutex_ptt);
 		quePTT.push(btnPTT->value());
+		pthread_mutex_unlock(&mutex_ptt);
+	}
 	setFocus();
 }
 
@@ -1426,7 +1467,9 @@ void saveFreqList()
 void setPTT( void *d)
 {
 	int val = (long)d;
+	pthread_mutex_lock(&mutex_ptt);
 	quePTT.push(val);
+	pthread_mutex_unlock(&mutex_ptt);
 }
 
 
