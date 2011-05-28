@@ -16,17 +16,17 @@ public:
 	virtual long get_vfoB(void);
 	virtual void set_vfoB(long f);
 
-	int  get_smeter();
-	void set_volume_control(int val);
-	int  get_volume_control();
-	void get_vol_min_max_step(int &min, int &max, int &step);
-	void set_PTT_control(int val);
-	void set_noise(bool val);
-	int  get_noise();
-	void set_noise_reduction(int val);
-	int  get_noise_reduction();
-	void set_noise_reduction_val(int val);
-	int  get_noise_reduction_val();
+	virtual int  get_smeter();
+	virtual void set_volume_control(int val);
+	virtual int  get_volume_control();
+	virtual void get_vol_min_max_step(int &min, int &max, int &step);
+	virtual void set_PTT_control(int val);
+	virtual void set_noise(bool val);
+	virtual int  get_noise();
+	virtual void set_noise_reduction(int val);
+	virtual int  get_noise_reduction();
+	virtual void set_noise_reduction_val(int val);
+	virtual int  get_noise_reduction_val();
 	virtual void set_attenuator(int val);
 	virtual int  get_attenuator();
 	virtual void set_preamp(int val);
@@ -43,19 +43,19 @@ public:
 	virtual int  get_bwB();
 
 	virtual void set_mic_gain(int val);
-//	int  get_mic_gain();
-	void get_mic_gain_min_max_step(int &min, int &max, int &step);
-	void set_if_shift(int val);
-//	bool get_if_shift(int val);
-	void get_if_min_max_step(int &min, int &max, int &step);
-	void set_squelch(int val);
+//	virtual int  get_mic_gain();
+	virtual void get_mic_gain_min_max_step(int &min, int &max, int &step);
+	virtual void set_if_shift(int val);
+//	virtual bool get_if_shift(int val);
+	virtual void get_if_min_max_step(int &min, int &max, int &step);
+	virtual void set_squelch(int val);
 //	int  get_squelch();
-	void set_rf_gain(int val);
+	virtual void set_rf_gain(int val);
 //	int  get_rf_gain();
-	void set_power_control(double val);
+	virtual void set_power_control(double val);
 
-	void set_split(bool val);
-	bool can_split() { return true;}
+	virtual void set_split(bool val);
+	virtual bool can_split() { return true;}
 
 protected:
 	int  preamp_level;
@@ -79,17 +79,43 @@ public:
 	virtual void set_bwB(int val);
 	virtual int  get_bwB();
 
-	int  get_swr();
-	int  get_alc();
-	int  get_power_out();
-	virtual void set_attenuator(int val);
-	virtual int  get_attenuator();
-	void tune_rig();
+	virtual int  get_swr();
+	virtual int  get_alc();
+	virtual int  get_power_out();
+	virtual void tune_rig();
 	virtual int  adjust_bandwidth(int m);
 	virtual int  def_bandwidth(int m);
-	void set_notch(bool on, int val);
-	bool get_notch(int &val);
-	void get_notch_min_max_step(int &min, int &max, int &step);
+	
+	virtual void set_attenuator(int val);
+	virtual int  get_attenuator();
+	virtual void set_preamp(int val);
+	virtual int  get_preamp();
+
+	virtual void set_mic_gain(int val);
+	virtual int  get_mic_gain();
+	virtual void get_mic_gain_min_max_step(int &min, int &max, int &step);
+
+	virtual void set_notch(bool on, int val);
+	virtual bool get_notch(int &val);
+	virtual void get_notch_min_max_step(int &min, int &max, int &step);
+
+	virtual void set_rf_gain(int val);
+	virtual int  get_rf_gain();
+
+	virtual void set_squelch(int val);
+	virtual int  get_squelch();
+
+	virtual void set_if_shift(int val);
+	virtual bool get_if_shift(int &val);
+	virtual void get_if_min_max_step(int &min, int &max, int &step);
+
+	virtual void set_power_control(double val);
+	virtual int  get_power_control();
+
+	virtual void set_split(bool val);
+	virtual bool get_split();
+
+	bool can_split() { return true;}
 
 	bool twovfos() { return false; }
 	const char **bwtable(int);

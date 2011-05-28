@@ -76,6 +76,7 @@ RIG_IC756PRO3::RIG_IC756PRO3() {
 	has_noise_reduction =
 	has_noise_reduction_control =
 	has_noise_control =
+	has_sql_control =
 	has_rf_control = true;
 
 	adjustCIV(defaultCIV);
