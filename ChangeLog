@@ -1,5 +1,21 @@
-2011-05-23  David Freese  <w1hkj@w1hkj.com>
+2011-05-28  David Freese  <w1hkj@w1hkj.com>
 
+	92d9814: IC746/756 PRO series
+	a8dddc8: TT550 controls
+	1b82bc3: Queue mutex
+	57e08ce: TT550 initialization
+	95d455c: Xml queue
+	2e02a2f: User interface
+	80e7dda: waitN
+	4c239f4: TT550 start up
+	df5c74f: FT100D
+	6d3cff3: A/B button initialize
+	29340a5: Poll frequency
+	0ac0323: IC746PRO
+	0046e10: FT100D parse info
+	b07e66f: DTR/RTS PTT
+	e44a2d4: FT950 update
+	2925b80: Connect indicators
 	56daafa: K3 rfgain limits
 	8c30bdb: FT100D
 	1f23cf3: TT588 get data
