@@ -685,7 +685,6 @@ serial_bypass_loop: ;
 
 void setFocus()
 {
-//	if (nofocus) return;
 	if (useB) Fl::focus(FreqDispB);
 	else Fl::focus(FreqDispA);
 }
@@ -1640,6 +1639,7 @@ void adjust_control_positions()
 		sldrPOWER->redraw();
 	}
 	y += 20;
+	btn_show_controls->position( btn_show_controls->x(), y );
 	btnAttenuator->position( btnAttenuator->x(), y);
 	btnAttenuator->redraw();
 	btnPreamp->position( btnPreamp->x(), y);
@@ -1701,9 +1701,13 @@ void adjust_control_positions()
 		mnuControls->label("Show Controls");
 		tabs550->resize(tabs550->x(), y + 20, tabs550->w(), tabs550->h());
 		tabs550->hide();
+		btn_show_controls->show();
+		btn_show_controls->label("@-22->");
+		btn_show_controls->redraw_label();
 	} else {
 		mnuControls->label("Xcvr setup");
 		tabs550->hide();
+		btn_show_controls->hide();
 	}
 
 	mainwindow->size( mainwindow->w(), y + 20);
@@ -1740,6 +1744,7 @@ void initXcvrTab()
 		btn_tt550_enable_xmtr->value(progStatus.tt550_enable_xmtr);
 		btn_tt550_enable_tloop->value(progStatus.tt550_enable_tloop);
 		btn_tt550_tuner_bypass->value(progStatus.tt550_tuner_bypass);
+		btn_tt550_use_xmt_bw->value(progStatus.tt550_use_xmt_bw);
 		sel_tt550_encoder_step->value(progStatus.tt550_encoder_step);
 		cnt_tt550_encoder_sensitivity->value(progStatus.tt550_encoder_sensitivity);
 		sel_tt550_F1_func->value(progStatus.tt550_F1_func);

@@ -107,6 +107,8 @@ extern void cb_line_out();
 extern void cb_bpf_center();
 extern void cb_special();
 
+extern void setFocus();
+
 // callbacks for tt550 transceiver
 extern void cb_tt550_line_out();
 extern void cb_tt550_agc_level();

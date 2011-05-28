@@ -1025,15 +1025,20 @@ void show_controls()
 		if (tabs550->visible()) {
 			tabs550->hide();
 			mnuControls->label("Show controls");
+			btn_show_controls->label("@-22->");
+			btn_show_controls->redraw_label();
 			mainwindow->size( mainwindow->w(), mainwindow->h() - 70);
 		} else {
 			tabs550->show();
 			mnuControls->label("Hide controls");
+			btn_show_controls->label("@-28->");
+			btn_show_controls->redraw_label();
 			mainwindow->size( mainwindow->w(), mainwindow->h() + 70);
 		}
 		mainwindow->redraw();
 	} else
 		dlgControls->show();
+	setFocus();
 }
 
 void cb_close_TT550_setup()
