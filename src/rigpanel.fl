@@ -264,30 +264,35 @@ btnA->value(0);}
       tooltip {Select Transceiver Bandwidth} xywh {212 84 105 18} box FLAT_BOX labelsize 12 align 16
       class Fl_ComboBox
     } {}
+    Fl_Button btn_show_controls {
+      label {@-22->}
+      callback {show_controls();}
+      tooltip {Show/Hide controls} xywh {1 286 18 18}
+    }
     Fl_Light_Button btnAttenuator {
       label Att
       callback {cbAttenuator();}
-      tooltip {Attenuator On/Off} xywh {2 286 60 18} down_box THIN_DOWN_BOX labelsize 12
+      tooltip {Attenuator On/Off} xywh {26 286 60 18} down_box THIN_DOWN_BOX labelsize 12
     }
     Fl_Light_Button btnPreamp {
       label Pre
       callback {cbPreamp();}
-      tooltip {Preamp On/Off} xywh {74 286 60 18} down_box THIN_DOWN_BOX labelsize 12
+      tooltip {Preamp On/Off} xywh {93 286 60 18} down_box THIN_DOWN_BOX labelsize 12
     }
     Fl_Light_Button btnNOISE {
       label NB
       callback {cbNoise();}
-      tooltip {Noise Blanker On/Off} xywh {146 286 60 18} down_box THIN_DOWN_BOX labelsize 12
+      tooltip {Noise Blanker On/Off} xywh {160 286 60 18} down_box THIN_DOWN_BOX labelsize 12
     }
     Fl_Light_Button btnAutoNotch {
       label AN
       callback {cbAN();}
-      tooltip {Auto Notch On/Off} xywh {218 286 60 18} down_box THIN_DOWN_BOX labelsize 12
+      tooltip {Auto Notch On/Off} xywh {227 286 60 18} down_box THIN_DOWN_BOX labelsize 12
     }
     Fl_Button btnTune {
       label Tune
       callback {cbTune();}
-      tooltip {Momentary Tune} xywh {290 286 60 18}
+      tooltip {Momentary Tune} xywh {294 286 60 18}
     }
     Fl_Light_Button btnPTT {
       label PTT
@@ -375,11 +380,11 @@ cbAuxPort();}
 Please wait}
       xywh {0 23 424 100} color 206 labelfont 1 labelsize 24 hide
     }
-    Fl_Tabs tabs550 {open
+    Fl_Tabs tabs550 {
       xywh {1 330 422 70} selection_color 50
     } {
       Fl_Group {} {
-        label CW open
+        label CW open selected
         xywh {2 350 420 50} color 50 selection_color 50
       } {
         Fl_Counter cnt_tt550_cw_wpm {
@@ -570,7 +575,7 @@ cb_tt550_setXmtBW();} open
           label Enable
           callback {progStatus.tt550_use_xmt_bw = o->value();
 cb_tt550_setXmtBW();}
-          xywh {349 359 26 15} down_box DOWN_BOX
+          tooltip {Use Xmt BW setting} xywh {345 359 21 15} down_box DOWN_BOX align 8
           code0 {o->value(progStatus.tt550_use_xmt_bw);}
         }
       }
@@ -878,7 +883,7 @@ Function {XcvrDialog()} {} {
       xywh {0 8 482 246}
     } {
       Fl_Group tabPrimary {
-        label Primary selected
+        label Primary
         xywh {2 30 475 222}
       } {
         Fl_Group {} {open

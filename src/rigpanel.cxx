@@ -220,6 +220,12 @@ static void cb_opBW(Fl_ComboBox*, void*) {
   setBW();
 }
 
+Fl_Button *btn_show_controls=(Fl_Button *)0;
+
+static void cb_btn_show_controls(Fl_Button*, void*) {
+  show_controls();
+}
+
 Fl_Light_Button *btnAttenuator=(Fl_Light_Button *)0;
 
 static void cb_btnAttenuator(Fl_Light_Button*, void*) {
@@ -858,31 +864,35 @@ Fl_Double_Window* Rig_window() {
       opBW->when(FL_WHEN_RELEASE);
       opBW->end();
     } // Fl_ComboBox* opBW
-    { btnAttenuator = new Fl_Light_Button(2, 286, 60, 18, _("Att"));
+    { btn_show_controls = new Fl_Button(1, 286, 18, 18, _("@-22->"));
+      btn_show_controls->tooltip(_("Show/Hide controls"));
+      btn_show_controls->callback((Fl_Callback*)cb_btn_show_controls);
+    } // Fl_Button* btn_show_controls
+    { btnAttenuator = new Fl_Light_Button(26, 286, 60, 18, _("Att"));
       btnAttenuator->tooltip(_("Attenuator On/Off"));
       btnAttenuator->down_box(FL_THIN_DOWN_BOX);
       btnAttenuator->labelsize(12);
       btnAttenuator->callback((Fl_Callback*)cb_btnAttenuator);
     } // Fl_Light_Button* btnAttenuator
-    { btnPreamp = new Fl_Light_Button(74, 286, 60, 18, _("Pre"));
+    { btnPreamp = new Fl_Light_Button(93, 286, 60, 18, _("Pre"));
       btnPreamp->tooltip(_("Preamp On/Off"));
       btnPreamp->down_box(FL_THIN_DOWN_BOX);
       btnPreamp->labelsize(12);
       btnPreamp->callback((Fl_Callback*)cb_btnPreamp);
     } // Fl_Light_Button* btnPreamp
-    { btnNOISE = new Fl_Light_Button(146, 286, 60, 18, _("NB"));
+    { btnNOISE = new Fl_Light_Button(160, 286, 60, 18, _("NB"));
       btnNOISE->tooltip(_("Noise Blanker On/Off"));
       btnNOISE->down_box(FL_THIN_DOWN_BOX);
       btnNOISE->labelsize(12);
       btnNOISE->callback((Fl_Callback*)cb_btnNOISE);
     } // Fl_Light_Button* btnNOISE
-    { btnAutoNotch = new Fl_Light_Button(218, 286, 60, 18, _("AN"));
+    { btnAutoNotch = new Fl_Light_Button(227, 286, 60, 18, _("AN"));
       btnAutoNotch->tooltip(_("Auto Notch On/Off"));
       btnAutoNotch->down_box(FL_THIN_DOWN_BOX);
       btnAutoNotch->labelsize(12);
       btnAutoNotch->callback((Fl_Callback*)cb_btnAutoNotch);
     } // Fl_Light_Button* btnAutoNotch
-    { btnTune = new Fl_Button(290, 286, 60, 18, _("Tune"));
+    { btnTune = new Fl_Button(294, 286, 60, 18, _("Tune"));
       btnTune->tooltip(_("Momentary Tune"));
       btnTune->callback((Fl_Callback*)cb_btnTune);
     } // Fl_Button* btnTune
@@ -1234,9 +1244,11 @@ Fl_Double_Window* Rig_window() {
           o->index(progStatus.tt550_xmt_bw);
           op_tt550_XmtBW->end();
         } // Fl_ComboBox* op_tt550_XmtBW
-        { Fl_Check_Button* o = btn_tt550_use_xmt_bw = new Fl_Check_Button(349, 359, 26, 15, _("Enable"));
+        { Fl_Check_Button* o = btn_tt550_use_xmt_bw = new Fl_Check_Button(345, 359, 21, 15, _("Enable"));
+          btn_tt550_use_xmt_bw->tooltip(_("Use Xmt BW setting"));
           btn_tt550_use_xmt_bw->down_box(FL_DOWN_BOX);
           btn_tt550_use_xmt_bw->callback((Fl_Callback*)cb_btn_tt550_use_xmt_bw);
+          btn_tt550_use_xmt_bw->align(FL_ALIGN_RIGHT);
           o->value(progStatus.tt550_use_xmt_bw);
         } // Fl_Check_Button* btn_tt550_use_xmt_bw
         o->end();

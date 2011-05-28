@@ -37,6 +37,7 @@ extern Fl_Light_Button *btnSplit;
 #include "combo.h"
 extern Fl_ComboBox *opMODE;
 extern Fl_ComboBox *opBW;
+extern Fl_Button *btn_show_controls;
 extern Fl_Light_Button *btnAttenuator;
 extern Fl_Light_Button *btnPreamp;
 extern Fl_Light_Button *btnNOISE;
