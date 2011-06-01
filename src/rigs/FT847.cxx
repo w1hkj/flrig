@@ -97,7 +97,7 @@ void RIG_FT847::set_vfoA (long freq)
 {
 	A.freq = freq;
 	freq /=10; // 847 does not support 1 Hz resolution
-	cmd = to_bcd_be(freq, 8);
+	cmd = to_bcd(freq, 8);
 	cmd += 0x01;
 	sendCommand(cmd, 0);
 LOG_WARN("%s", str2hex(cmd.c_str(), 5));
@@ -132,7 +132,7 @@ void RIG_FT847::set_vfoB(long freq)
 {
 	B.freq = freq;
 	freq /=10; // 847 does not support 1 Hz resolution
-	cmd = to_bcd_be(freq, 8);
+	cmd = to_bcd(freq, 8);
 	cmd += 0x01;
 	sendCommand(cmd, 0);
 LOG_WARN("%s", str2hex(cmd.c_str(), 5));
