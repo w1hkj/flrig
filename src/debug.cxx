@@ -41,7 +41,7 @@
 #include <FL/Fl_Text_Buffer.H>
 
 #include "debug.h"
-//#include "icons.h"
+#include "icons.h"
 #include "gettext.h"
 #include "rig.h"
 
@@ -67,19 +67,19 @@ uint32_t debug::mask = ~0u;
 const char* prefix[] = { _("Quiet"), _("Error"), _("Warning"), _("Info"), _("Debug") };
 
 static void slider_cb(Fl_Widget* w, void*);
-static void src_menu_cb(Fl_Widget* w, void*);
+//static void src_menu_cb(Fl_Widget* w, void*);
 static void clear_cb(Fl_Widget *w, void*);
 static void save_cb(Fl_Widget *w, void*);
 
 //static void popup_message(void*);
-
+/*
 Fl_Menu_Item src_menu[] = {
 	{ _("Rig control"), 0, 0, 0, FL_MENU_TOGGLE | FL_MENU_VALUE },
 	{ _("RPC"), 0, 0, 0, FL_MENU_TOGGLE | FL_MENU_VALUE },
 	{ _("Other"), 0, 0, 0, FL_MENU_TOGGLE | FL_MENU_VALUE },
 	{ 0 }
 };
-
+*/
 void debug::start(const char* filename)
 {
 	if (debug::inst)
@@ -89,11 +89,12 @@ void debug::start(const char* filename)
 	window = new Fl_Double_Window(600, 256, _("Event log"));
 
 	int pad = 2;
-	Fl_Menu_Button* button = new Fl_Menu_Button(pad, pad, 128, 20, _("Log sources"));
-	button->menu(src_menu);
-	button->callback(src_menu_cb);
+//	Fl_Menu_Button* button = new Fl_Menu_Button(pad, pad, 128, 20, _("Log sources"));
+//	button->menu(src_menu);
+//	button->callback(src_menu_cb);
 
-	Fl_Slider* slider = new Fl_Slider(button->x() + button->w() + pad, pad, 128, 20, prefix[level]);
+//	Fl_Slider* slider = new Fl_Slider(button->x() + button->w() + pad, pad, 128, 20, prefix[level]);
+	Fl_Slider* slider = new Fl_Slider(pad, pad, 128, 20, prefix[level]);
 	slider->tooltip(_("Change log level"));
 	slider->align(FL_ALIGN_RIGHT);
 	slider->type(FL_HOR_NICE_SLIDER);
@@ -189,6 +190,7 @@ void debug::sync_text(void* arg)
 {
     debug_in_use = true;
     text->insert(estr.c_str());
+    text->show_insert_position();
     estr = "";
     debug_in_use = false;
 }
@@ -225,10 +227,10 @@ static void slider_cb(Fl_Widget* w, void*)
 	w->parent()->redraw();
 }
 
-static void src_menu_cb(Fl_Widget* w, void*)
-{
-	debug::mask ^= 1 << ((Fl_Menu_*)w)->value();
-}
+//static void src_menu_cb(Fl_Widget* w, void*)
+//{
+//	debug::mask ^= 1 << ((Fl_Menu_*)w)->value();
+//}
 
 static void clear_cb(Fl_Widget* w, void*)
 {
@@ -240,4 +242,5 @@ static void save_cb(Fl_Widget* w, void*)
 	string filename = RigHomeDir;
 	filename.append("debug_log.txt");
 	buffer->savefile(filename.c_str());
+	fl_alert2("Saved in %s", filename.c_str());
 }
