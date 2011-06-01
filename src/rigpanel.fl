@@ -17,14 +17,13 @@ decl {\#include "K3_ui.h"} {}
 
 decl {const int freq_sel_widths[]={110, 70, 70, 0};} {} 
 
-Function {Rig_window()} {open
-} {
+Function {Rig_window()} {} {
   Fl_Window {} {
     label Flrig open
     xywh {577 57 424 401} type Double align 80
     code0 {\#include <stdlib.h>} visible
   } {
-    Fl_Menu_Bar {} {open selected
+    Fl_Menu_Bar {} {open
       xywh {0 0 424 22} textsize 12
     } {
       Submenu {} {
@@ -981,7 +980,7 @@ Fl::scheme(progStatus.ui_scheme.c_str());} open
 Function {Memory_Dialog()} {} {
   Fl_Window {} {
     label {Flrig Memory} open
-    xywh {576 491 320 138} type Double visible
+    xywh {576 491 320 138} type Double hide
   } {
     Fl_Group {} {open
       xywh {2 2 60 133} box ENGRAVED_FRAME
@@ -1037,16 +1036,17 @@ Double-click ==> pick and close} xywh {66 2 250 133} type Hold labelfont 4 label
   }
 } 
 
-Function {XcvrDialog()} {} {
+Function {XcvrDialog()} {open
+} {
   Fl_Window {} {
     label {I/O Ports} open
-    xywh {581 663 482 257} type Double hide
+    xywh {575 496 482 257} type Double visible
   } {
     Fl_Tabs tabsConfig {open
       xywh {0 8 482 246}
     } {
       Fl_Group tabPrimary {
-        label Primary
+        label Primary selected
         xywh {2 30 475 222}
       } {
         Fl_Group {} {open
@@ -1312,131 +1312,142 @@ Serial Port for a special Control Signals}
         }
       }
       Fl_Group tabPolling {
-        label Polling
-        xywh {2 30 475 222} hide
+        label Polling open
+        xywh {2 30 476 222} hide
       } {
         Fl_Group {} {
-          label Meters open
-          xywh {6 36 469 80} box ENGRAVED_BOX align 21
+          label {Meters - polled every time} open
+          xywh {4 34 474 54} box ENGRAVED_BOX align 21
         } {
           Fl_Check_Button btn_poll_smeter {
             label {S meter}
             callback {progStatus.poll_smeter = o->value();}
-            xywh {39 61 104 15} down_box DOWN_BOX value 1
+            xywh {13 58 104 15} down_box DOWN_BOX value 1
             code0 {o->value(progStatus.poll_smeter);}
           }
           Fl_Check_Button btn_poll_pout {
             label {Power out}
             callback {progStatus.poll_pout = o->value();}
-            xywh {172 61 104 15} down_box DOWN_BOX value 1
+            xywh {132 58 104 15} down_box DOWN_BOX value 1
             code0 {o->value(progStatus.poll_pout);}
           }
           Fl_Check_Button btn_poll_swr {
             label SWR
             callback {progStatus.poll_swr = o->value();}
-            xywh {172 88 104 15} down_box DOWN_BOX value 1
+            xywh {252 58 104 15} down_box DOWN_BOX value 1
             code0 {o->value(progStatus.poll_swr);}
           }
           Fl_Check_Button btn_poll_alc {
             label ALC
             callback {progStatus.poll_alc = o->value();}
-            xywh {302 61 104 15} down_box DOWN_BOX value 1
+            xywh {372 58 104 15} down_box DOWN_BOX value 1
             code0 {o->value(progStatus.poll_alc);}
           }
         }
         Fl_Group {} {
-          label Controls open
-          xywh {6 117 469 133} box ENGRAVED_BOX align 21
+          label {Op' Controls - polled every time} open
+          xywh {4 88 474 44} box ENGRAVED_BOX align 21
         } {
           Fl_Check_Button btn_poll_frequency {
             label Frequency
             callback {progStatus.poll_frequency = o->value();}
-            tooltip {Frequency control} xywh {23 138 100 15} down_box DOWN_BOX value 1
+            tooltip {Frequency control} xywh {13 111 101 15} down_box DOWN_BOX value 1
             code0 {o->value(progStatus.poll_frequency);}
           }
           Fl_Check_Button btn_poll_mode {
             label Mode
             callback {progStatus.poll_mode = o->value();}
-            tooltip {Mode selector} xywh {23 166 100 15} down_box DOWN_BOX value 1
+            tooltip {Mode selector} xywh {132 111 101 15} down_box DOWN_BOX value 1
             code0 {o->value(progStatus.poll_mode);}
           }
           Fl_Check_Button btn_poll_bandwidth {
             label Bandwidth
             callback {progStatus.poll_bandwidth = o->value();}
-            tooltip {Bandwidth selector} xywh {23 194 100 15} down_box DOWN_BOX value 1
+            tooltip {Bandwidth selector} xywh {252 111 101 15} down_box DOWN_BOX value 1
             code0 {o->value(progStatus.poll_bandwidth);}
           }
+        }
+        Fl_Group {} {
+          label {Additional Controls} open
+          xywh {4 132 474 119} box ENGRAVED_FRAME align 21
+        } {
           Fl_Check_Button btn_poll_volume {
             label Volume
             callback {progStatus.poll_volume = o->value();}
-            tooltip {Audio volume control} xywh {23 221 100 15} down_box DOWN_BOX
+            tooltip {Audio volume control} xywh {13 153 101 15} down_box DOWN_BOX
             code0 {o->value(progStatus.poll_volume);}
-          }
-          Fl_Check_Button btn_poll_notch {
-            label {Manual Notch}
-            callback {progStatus.poll_notch = o->value();}
-            tooltip {Manual notch control} xywh {137 138 100 15} down_box DOWN_BOX
-            code0 {o->value(progStatus.poll_notch);}
-          }
-          Fl_Check_Button btn_poll_auto_notch {
-            label {Auto Notch}
-            callback {progStatus.poll_auto_notch = o->value();}
-            tooltip {Auto notch ON/OFF} xywh {137 166 100 15} down_box DOWN_BOX
-            code0 {o->value(progStatus.poll_auto_notch);}
-          }
-          Fl_Check_Button btn_poll_ifshift {
-            label {IF shift}
-            callback {progStatus.poll_ifshift = o->value();}
-            tooltip {IF shift control} xywh {137 194 100 15} down_box DOWN_BOX
-            code0 {o->value(progStatus.poll_ifshift);}
-          }
-          Fl_Check_Button btn_poll_power_control {
-            label {Power control}
-            callback {progStatus.poll_power_control = o->value();}
-            tooltip {Power level control} xywh {137 221 100 15} down_box DOWN_BOX
-            code0 {o->value(progStatus.poll_power_control);}
-          }
-          Fl_Check_Button btn_poll_pre_att {
-            label {Pre/Att}
-            callback {progStatus.poll_pre_att = o->value();}
-            tooltip {Preamp / Attenuator} xywh {269 138 100 15} down_box DOWN_BOX
-            code0 {o->value(progStatus.poll_pre_att);}
-          }
-          Fl_Check_Button btn_poll_squelch {
-            label Squelch
-            callback {progStatus.poll_squelch = o->value();}
-            tooltip {Squelch level control} xywh {269 166 100 15} down_box DOWN_BOX
-            code0 {o->value(progStatus.poll_squelch);}
           }
           Fl_Check_Button btn_poll_micgain {
             label {Mic gain}
             callback {progStatus.poll_micgain = o->value();}
-            tooltip {Mic gain control} xywh {269 193 100 15} down_box DOWN_BOX
+            tooltip {Mic gain control} xywh {132 153 101 15} down_box DOWN_BOX
             code0 {o->value(progStatus.poll_micgain);}
           }
           Fl_Check_Button btn_poll_rfgain {
             label {RF gain}
             callback {progStatus.poll_rfgain = o->value();}
-            tooltip {RF gain control} xywh {269 221 100 15} down_box DOWN_BOX
+            tooltip {RF gain control} xywh {252 153 101 15} down_box DOWN_BOX
             code0 {o->value(progStatus.poll_rfgain);}
+          }
+          Fl_Check_Button btn_poll_power_control {
+            label {Pwr control}
+            callback {progStatus.poll_power_control = o->value();}
+            tooltip {Power level control} xywh {372 153 101 15} down_box DOWN_BOX
+            code0 {o->value(progStatus.poll_power_control);}
+          }
+          Fl_Check_Button btn_poll_ifshift {
+            label {IF shift}
+            callback {progStatus.poll_ifshift = o->value();}
+            tooltip {IF shift control} xywh {13 177 101 15} down_box DOWN_BOX
+            code0 {o->value(progStatus.poll_ifshift);}
+          }
+          Fl_Check_Button btn_poll_notch {
+            label {Man' Notch}
+            callback {progStatus.poll_notch = o->value();}
+            tooltip {Manual notch control} xywh {132 177 101 15} down_box DOWN_BOX
+            code0 {o->value(progStatus.poll_notch);}
+          }
+          Fl_Check_Button btn_poll_auto_notch {
+            label {Auto Notch}
+            callback {progStatus.poll_auto_notch = o->value();}
+            tooltip {Auto notch ON/OFF} xywh {252 177 101 15} down_box DOWN_BOX
+            code0 {o->value(progStatus.poll_auto_notch);}
+          }
+          Fl_Check_Button btn_poll_pre_att {
+            label {Pre/Att}
+            callback {progStatus.poll_pre_att = o->value();}
+            tooltip {Preamp / Attenuator} xywh {13 201 101 15} down_box DOWN_BOX
+            code0 {o->value(progStatus.poll_pre_att);}
+          }
+          Fl_Check_Button btn_poll_squelch {
+            label Squelch
+            callback {progStatus.poll_squelch = o->value();}
+            tooltip {Squelch level control} xywh {132 201 101 15} down_box DOWN_BOX
+            code0 {o->value(progStatus.poll_squelch);}
           }
           Fl_Check_Button btn_poll_split {
             label {Split VFO}
             callback {progStatus.poll_split = o->value();}
-            tooltip {Vfo A/B split ops} xywh {363 138 100 15} down_box DOWN_BOX
+            tooltip {Vfo A/B split ops} xywh {252 201 101 15} down_box DOWN_BOX
             code0 {o->value(progStatus.poll_split);}
           }
           Fl_Check_Button btn_poll_noise {
-            label NB
+            label {Noise Blnk'}
             callback {progStatus.poll_noise = o->value();}
-            tooltip {Noise blanker} xywh {363 166 100 15} down_box DOWN_BOX
+            tooltip {Noise blanker} xywh {13 226 101 15} down_box DOWN_BOX
             code0 {o->value(progStatus.poll_noise);}
           }
           Fl_Check_Button btn_poll_nr {
             label {Noise Red'}
             callback {progStatus.poll_nr = o->value();}
-            tooltip {Noise reduction} xywh {363 193 100 15} down_box DOWN_BOX
+            tooltip {Noise reduction} xywh {132 226 101 15} down_box DOWN_BOX
             code0 {o->value(progStatus.poll_nr);}
+          }
+          Fl_Value_Slider poll_extras_interval {
+            label {poll every:}
+            callback {progStatus.poll_extras_interval = o->value();}
+            tooltip {Poll these controls once every N meter polls} xywh {332 223 140 21} type Horizontal color 20 align 4 minimum 1 maximum 10 step 1 value 4 textsize 14
+            code0 {o->value(progStatus.poll_extras_interval);}
           }
         }
       }

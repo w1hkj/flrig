@@ -59,6 +59,7 @@ struct status {
 	bool	poll_split;
 	bool	poll_noise;
 	bool	poll_nr;
+	int		poll_extras_interval;
 
 	int		iBW_A;
 	int		imode_A;
