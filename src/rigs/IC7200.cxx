@@ -76,6 +76,7 @@ RIG_IC7200::RIG_IC7200() {
 	B.imode = 3;
 	B.iBW = 12;
 
+	has_extras =
 	has_smeter =
 	has_power_out =
 	has_swr_control =

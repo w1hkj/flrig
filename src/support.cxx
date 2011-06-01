@@ -1697,18 +1697,17 @@ void adjust_control_positions()
 
 	btnInitializing->hide();
 
-	if (rig_nbr == TT550) {
-		mnuControls->label("Show Controls");
+	if (selrig->has_extras) {
 		tabs550->resize(tabs550->x(), y + 20, tabs550->w(), tabs550->h());
+		tabsGeneric->resize(tabsGeneric->x(), y + 20, tabsGeneric->w(), tabsGeneric->h());
 		tabs550->hide();
+		tabsGeneric->hide();
+
 		btn_show_controls->show();
 		btn_show_controls->label("@-22->");
 		btn_show_controls->redraw_label();
-	} else {
-		mnuControls->label("Xcvr setup");
-		tabs550->hide();
+	} else
 		btn_show_controls->hide();
-	}
 
 	mainwindow->size( mainwindow->w(), y + 20);
 	mainwindow->redraw();
@@ -1784,8 +1783,13 @@ void initXcvrTab()
 
 	} else {
 		if (selrig->has_agc_level) cbo_agc_level->activate(); else cbo_agc_level->deactivate();
+		if (selrig->has_nb_level) cbo_nb_level->activate(); else cbo_nb_level->deactivate();
+
 		if (selrig->has_cw_wpm) cnt_cw_wpm->activate(); else cnt_cw_wpm->deactivate();
 		if (selrig->has_cw_vol) cnt_cw_vol->activate(); else cnt_cw_vol->deactivate();
+		if (selrig->has_cw_qsk) cnt_cw_qsk->activate(); else cnt_cw_qsk->deactivate();
+		if (selrig->has_cw_weight) cnt_cw_weight->activate(); else cnt_cw_weight->deactivate();
+		if (selrig->has_cw_keyer) btn_enable_keyer->activate(); else btn_enable_keyer->deactivate();
 		if (selrig->has_cw_spot) {
 			cnt_cw_spot->activate();
 			btnSpot->activate();
@@ -2656,3 +2660,38 @@ void cb_special()
 	pthread_mutex_unlock(&mutex_serial);
 }
 
+void cb_nb_level()
+{
+	pthread_mutex_lock(&mutex_serial);
+	progStatus.nb_level = cbo_nb_level->index();
+	selrig->set_nb_level();
+	pthread_mutex_unlock(&mutex_serial);
+}
+
+void cb_spot()
+{
+	pthread_mutex_lock(&mutex_serial);
+	selrig->set_cw_spot();
+	pthread_mutex_unlock(&mutex_serial);
+}
+
+void cb_enable_keyer()
+{
+	pthread_mutex_lock(&mutex_serial);
+	selrig->enable_keyer();
+	pthread_mutex_unlock(&mutex_serial);
+}
+
+void cb_cw_weight()
+{
+	pthread_mutex_lock(&mutex_serial);
+	selrig->set_cw_weight();
+	pthread_mutex_unlock(&mutex_serial);
+}
+
+void cb_cw_qsk()
+{
+	pthread_mutex_lock(&mutex_serial);
+	selrig->set_cw_qsk();
+	pthread_mutex_unlock(&mutex_serial);
+}

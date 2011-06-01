@@ -127,10 +127,15 @@ public:
 	bool has_power_out;
 	bool has_split;
 
+	bool has_extras;
+	bool has_nb_level;
 	bool has_agc_level;
 	bool has_cw_wpm;
 	bool has_cw_vol;
 	bool has_cw_spot;
+	bool has_cw_qsk;
+	bool has_cw_weight;
+	bool has_cw_keyer;
 	bool has_vox_onoff;
 	bool has_vox_gain;
 	bool has_vox_anti;

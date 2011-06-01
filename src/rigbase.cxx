@@ -45,10 +45,16 @@ rigbase::rigbase()
 	has_rf_control =
 	has_sql_control = 
 	restore_mbw =
+
+	has_extras = 
+	has_nb_level =
 	has_agc_level =
 	has_cw_wpm =
 	has_cw_vol =
 	has_cw_spot =
+	has_cw_qsk =
+	has_cw_weight =
+	has_cw_keyer =
 	has_vox_onoff =
 	has_vox_gain =
 	has_vox_anti =

@@ -56,6 +56,7 @@ RIG_IC718::RIG_IC718() {
 	has_rf_control =
 	has_split =
 	has_compON =
+	has_extras =
 	has_vox_onoff = true;
 
 	defaultCIV = 0x5E;

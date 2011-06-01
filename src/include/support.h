@@ -92,9 +92,14 @@ extern void cbBFO();
 extern void cbAuxPort();
 extern void cb_line_out();
 extern void cb_agc_level();
+
 extern void cb_cw_wpm();
 extern void cb_cw_vol();
 extern void cb_cw_spot();
+extern void cb_cw_qsk();
+extern void cb_cw_weight();
+extern void cb_enable_keyer();
+
 extern void cb_vox_gain();
 extern void cb_vox_anti();
 extern void cb_vox_hang();
@@ -106,6 +111,7 @@ extern void cb_vfo_adj();
 extern void cb_line_out();
 extern void cb_bpf_center();
 extern void cb_special();
+extern void cb_nb_level();
 
 extern void setFocus();
 
