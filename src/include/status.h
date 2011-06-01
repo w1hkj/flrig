@@ -79,11 +79,15 @@ struct status {
 	int		shift_val;
 	int		rfgain;
 	int		squelch;
+
 	int		line_out;
 	int		agc_level;
 	int		cw_wpm;
+	double	cw_weight;
 	int		cw_vol;
 	int		cw_spot;
+	int		cw_qsk;
+	bool	enable_keyer;
 	bool	vox_onoff;
 	int		vox_gain;
 	int		vox_anti;
@@ -93,6 +97,7 @@ struct status {
 
 	bool	noise_reduction;
 	int		noise_reduction_val;
+	int		nb_level;
 
 	bool	noise;
 	int		attenuator;

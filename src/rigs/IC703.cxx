@@ -43,6 +43,7 @@ RIG_IC703::RIG_IC703() {
 	has_mode_control =
 	has_bandwidth_control =
 	has_compON =
+	has_extras =
 	has_vox_onoff =
 	has_preamp_control =
 	has_attenuator_control = true;

@@ -35,6 +35,7 @@ RIG_IC910H::RIG_IC910H() {
 	has_bandwidth_control = false;
 
 	has_smeter =
+	has_extras =
 	has_vox_onoff =
 	has_vox_gain =
 	has_vox_anti =

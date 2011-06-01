@@ -39,7 +39,6 @@ Fl_Double_Window *dlgDisplayConfig = NULL;
 Fl_Double_Window *dlgXcvrConfig = NULL;
 Fl_Double_Window *dlgMemoryDialog = NULL;
 Fl_Double_Window *dlgControls = NULL;
-Fl_Double_Window *tt550_controls = NULL;
 Font_Browser     *fntbrowser = NULL;
 
 Fl_Color flrig_def_color(int);
@@ -414,7 +413,6 @@ void open_send_command_tab()
 void createXcvrDialog()
 {
 	dlgXcvrConfig = XcvrDialog();
-	dlgControls = make_XcvrXtra();
 
 	init_port_combos();
 
@@ -855,7 +853,7 @@ void setColors()
 	if (btnSpot)			btnSpot->selection_color(btn_lt_color);
 	if (btn_vox)			btn_vox->selection_color(btn_lt_color);
 	if (btnCompON)			btnCompON->selection_color(btn_lt_color);
-	if (btnSpecial)			btnSpecial->selection_color(btn_lt_color);
+//	if (btnSpecial)			btnSpecial->selection_color(btn_lt_color);
 	if (btn_tt550_vox)		btn_tt550_vox->selection_color(btn_lt_color);
 	if (btn_tt550_CompON)	btn_tt550_CompON->selection_color(btn_lt_color);
 
@@ -1022,28 +1020,34 @@ void openMemoryDialog()
 void show_controls()
 {
 	if (rig_nbr == TT550) {
+		tabsGeneric->hide();
 		if (tabs550->visible()) {
 			tabs550->hide();
-			mnuControls->label("Show controls");
 			btn_show_controls->label("@-22->");
 			btn_show_controls->redraw_label();
 			mainwindow->size( mainwindow->w(), mainwindow->h() - 70);
 		} else {
 			tabs550->show();
-			mnuControls->label("Hide controls");
 			btn_show_controls->label("@-28->");
 			btn_show_controls->redraw_label();
 			mainwindow->size( mainwindow->w(), mainwindow->h() + 70);
 		}
 		mainwindow->redraw();
-	} else
-		dlgControls->show();
+	} else {
+		tabs550->hide();
+		if (tabsGeneric->visible()) {
+			tabsGeneric->hide();
+			btn_show_controls->label("@-22->");
+			btn_show_controls->redraw_label();
+			mainwindow->size( mainwindow->w(), mainwindow->h() - 70);
+		} else {
+			tabsGeneric->show();
+			btn_show_controls->label("@-28->");
+			btn_show_controls->redraw_label();
+			mainwindow->size( mainwindow->w(), mainwindow->h() + 70);
+		}
+	}
 	setFocus();
-}
-
-void cb_close_TT550_setup()
-{
-	tt550_controls->hide();
 }
 
 // a replica of the default color map used by Fltk

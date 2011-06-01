@@ -93,12 +93,15 @@ status progStatus = {
 	0,			// int  shift_val;
 	100,		// int  rfgain;
 	10,			// int  squelch;
-	
+
 	0,			// int  line_out;
 	1,			// int  agc_level;
 	18,			// int  cw_wpm;
+	1.0,		// double  cw_weight;
 	0,			// int  cw_vol;
 	0,			// int  cw_spot;
+	0,			// int  cw_qsk;
+	false,		// bool enable_keyer;
 	false,		// int  vox_onoff;
 	0,			// int  vox_gain;
 	0,			// int  vox_anti;
@@ -108,6 +111,7 @@ status progStatus = {
 
 	false,		// bool noise_reduction;
 	0,			// int  noise_reduction_val;
+	0,			// int  nb_level;
 
 	false,		// bool noise;
 	0,			// int  attenuator
@@ -359,8 +363,11 @@ void status::saveLastState()
 		spref.set("line_out", line_out);
 		spref.set("agc_level", agc_level);
 		spref.set("cw_wpm", cw_wpm);
+		spref.set("cw_weight", cw_weight);
 		spref.set("cw_vol", cw_vol);
 		spref.set("cw_spot", cw_spot);
+		spref.set("cw_qsk", cw_qsk);
+		spref.set("enable_keyer", enable_keyer);
 		spref.set("vox_onoff", vox_onoff);
 		spref.set("vox_gain", vox_gain);
 		spref.set("vox_anti", vox_anti);
@@ -371,6 +378,7 @@ void status::saveLastState()
 
 	spref.set("noise_reduction", noise_reduction);
 	spref.set("noise_red_val", noise_reduction_val);
+	spref.set("nb_level", nb_level);
 
 	spref.set("bool_noise", noise);
 	spref.set("int_preamp", preamp);
@@ -583,8 +591,12 @@ bool status::loadXcvrState(const char *xcvr)
 			spref.get("line_out", line_out, line_out);
 			spref.get("agc_level", agc_level, agc_level);
 			spref.get("cw_wpm", cw_wpm, cw_wpm);
+			spref.get("cw_weight", cw_weight, cw_weight);
 			spref.get("cw_vol", cw_vol, cw_vol);
 			spref.get("cw_spot", cw_spot, cw_spot);
+			spref.get("cw_qsk", cw_qsk, cw_qsk);
+			if (spref.get("enable_keyer", i, i)) enable_keyer = i;
+
 			if (spref.get("vox_onoff", i, i)) vox_onoff = i;
 			spref.get("vox_gain", vox_gain, vox_gain);
 			spref.get("vox_anti", vox_anti, vox_anti);
@@ -595,7 +607,8 @@ bool status::loadXcvrState(const char *xcvr)
 
 		if (spref.get("noise_reduction", i, i)) noise_reduction = i;
 		spref.get("noise_red_val", noise_reduction_val, noise_reduction_val);
-		
+		spref.get("nb_level", nb_level, nb_level);
+
 		if (spref.get("bool_noise", i, i)) noise = i;
 		spref.get("int_preamp", preamp, preamp);
 		spref.get("int_att", attenuator, attenuator);

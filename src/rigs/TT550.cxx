@@ -146,10 +146,11 @@ RIG_TT550::RIG_TT550() {
 	ATTlevel = 0;
 	RFgain = 100;
 
-	has_bfo = true;
 	has_notch_control =
 	has_preamp_control = false;
 
+	has_extras =
+	has_bfo =
 	has_smeter =
 	has_power_out =
 	has_split =
