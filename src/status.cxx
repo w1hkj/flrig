@@ -73,6 +73,7 @@ status progStatus = {
 	false,		// bool	poll_split;
 	false,		// bool	poll_noise;
 	false,		// bool	poll_nr;
+	5,			// int	poll_extras_interval;
 
 	-1,			// int  iBW_A;
 	1,			// int  imode_A;

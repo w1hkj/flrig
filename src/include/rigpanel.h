@@ -223,17 +223,19 @@ extern Fl_Check_Button *btn_poll_frequency;
 extern Fl_Check_Button *btn_poll_mode;
 extern Fl_Check_Button *btn_poll_bandwidth;
 extern Fl_Check_Button *btn_poll_volume;
-extern Fl_Check_Button *btn_poll_notch;
-extern Fl_Check_Button *btn_poll_auto_notch;
-extern Fl_Check_Button *btn_poll_ifshift;
-extern Fl_Check_Button *btn_poll_power_control;
-extern Fl_Check_Button *btn_poll_pre_att;
-extern Fl_Check_Button *btn_poll_squelch;
 extern Fl_Check_Button *btn_poll_micgain;
 extern Fl_Check_Button *btn_poll_rfgain;
+extern Fl_Check_Button *btn_poll_power_control;
+extern Fl_Check_Button *btn_poll_ifshift;
+extern Fl_Check_Button *btn_poll_notch;
+extern Fl_Check_Button *btn_poll_auto_notch;
+extern Fl_Check_Button *btn_poll_pre_att;
+extern Fl_Check_Button *btn_poll_squelch;
 extern Fl_Check_Button *btn_poll_split;
 extern Fl_Check_Button *btn_poll_noise;
 extern Fl_Check_Button *btn_poll_nr;
+#include <FL/Fl_Value_Slider.H>
+extern Fl_Value_Slider *poll_extras_interval;
 extern Fl_Group *tabSndCmd;
 #include "flinput2.h"
 extern Fl_Input2 *txt_command;
