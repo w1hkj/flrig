@@ -293,6 +293,8 @@ public:
 	virtual void set_agc_level() {}
 	virtual void set_cw_weight() {}
 	virtual void set_cw_wpm() {}
+	virtual void get_cw_wpm_min_max(int &min, int &max) {
+		min = 5; max = 50; }
 	virtual void enable_keyer() {}
 	virtual void set_cw_qsk() {}
 	virtual void set_cw_vol() {}

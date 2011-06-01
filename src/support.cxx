@@ -625,7 +625,9 @@ void * serial_thread_loop(void *d)
 
 		if (!PTT) {
 			serviceA();
+			if (!quePTT.empty()) continue;
 			serviceB();
+			if (!quePTT.empty()) continue;
 
 			if (resetrcv) {
 				Fl::awake(zeroXmtMeters, 0);
@@ -642,21 +644,36 @@ void * serial_thread_loop(void *d)
 						(progStatus.poll_mode) ||
 						(progStatus.poll_bandwidth))) read_info();
 					if (progStatus.poll_frequency) read_vfo();
+					if (!quePTT.empty()) continue;
 					if (progStatus.poll_mode) read_mode();
+					if (!quePTT.empty()) continue;
 					if (progStatus.poll_bandwidth) read_bandwidth();
+					if (!quePTT.empty()) continue;
 				}
 				if (progStatus.poll_smeter) read_smeter();
+				if (!quePTT.empty()) continue;
 				if (progStatus.poll_volume) read_volume();
+				if (!quePTT.empty()) continue;
 				if (progStatus.poll_auto_notch) read_auto_notch();
+				if (!quePTT.empty()) continue;
 				if (progStatus.poll_notch) read_notch();
+				if (!quePTT.empty()) continue;
 				if (progStatus.poll_ifshift) read_ifshift();
+				if (!quePTT.empty()) continue;
 				if (progStatus.poll_power_control) read_power_control();
+				if (!quePTT.empty()) continue;
 				if (progStatus.poll_pre_att) read_preamp_att();
+				if (!quePTT.empty()) continue;
 				if (progStatus.poll_micgain) read_mic_gain();
+				if (!quePTT.empty()) continue;
 				if (progStatus.poll_squelch) read_squelch();
+				if (!quePTT.empty()) continue;
 				if (progStatus.poll_rfgain) read_rfgain();
+				if (!quePTT.empty()) continue;
 				if (progStatus.poll_split) read_split();
+				if (!quePTT.empty()) continue;
 				if (progStatus.poll_nr) read_nr();
+				if (!quePTT.empty()) continue;
 				if (progStatus.poll_noise) read_noise();
 				loopcount = progStatus.serloop_timing / 10;
 			}
@@ -669,7 +686,9 @@ void * serial_thread_loop(void *d)
 			resetrcv = true;
 			if (!loopcount--) {
 				if (progStatus.poll_pout) read_power_out();
+				if (!quePTT.empty()) continue;
 				if (progStatus.poll_swr) read_swr();
+				if (!quePTT.empty()) continue;
 				if (progStatus.poll_alc) read_alc();
 				loopcount = progStatus.serloop_timing / 10;
 			}
@@ -1792,30 +1811,75 @@ void initXcvrTab()
 		if (selrig->has_agc_level) cbo_agc_level->activate(); else cbo_agc_level->deactivate();
 		if (selrig->has_nb_level) cbo_nb_level->activate(); else cbo_nb_level->deactivate();
 
-		if (selrig->has_cw_wpm) cnt_cw_wpm->activate(); else cnt_cw_wpm->deactivate();
-		if (selrig->has_cw_vol) cnt_cw_vol->activate(); else cnt_cw_vol->deactivate();
-		if (selrig->has_cw_qsk) cnt_cw_qsk->activate(); else cnt_cw_qsk->deactivate();
-		if (selrig->has_cw_weight) cnt_cw_weight->activate(); else cnt_cw_weight->deactivate();
-		if (selrig->has_cw_keyer) btn_enable_keyer->activate(); else btn_enable_keyer->deactivate();
+		if (selrig->has_cw_wpm) {
+			int min, max;
+			selrig->get_cw_wpm_min_max(min, max);
+			cnt_cw_wpm->minimum(min);
+			cnt_cw_wpm->maximum(max);
+			cnt_cw_wpm->activate();
+			cnt_cw_wpm->value(progStatus.cw_wpm);
+			selrig->set_cw_wpm();
+		} else cnt_cw_wpm->deactivate();
+		if (selrig->has_cw_vol) {
+			cnt_cw_vol->activate();
+			cnt_cw_vol->value(progStatus.cw_vol);
+			selrig->set_cw_vol();
+		} else cnt_cw_vol->deactivate();
+		if (selrig->has_cw_qsk) {
+			cnt_cw_qsk->activate();
+			cnt_cw_qsk->value(progStatus.cw_qsk);
+			selrig->set_cw_qsk();
+		} else cnt_cw_qsk->deactivate();
+		if (selrig->has_cw_weight) {
+			cnt_cw_weight->activate();
+			cnt_cw_weight->value(progStatus.cw_weight);
+			selrig->set_cw_weight();
+		} else cnt_cw_weight->deactivate();
+		if (selrig->has_cw_keyer) {
+			btn_enable_keyer->activate();
+			btn_enable_keyer->value(progStatus.enable_keyer);
+			selrig->enable_keyer();
+		} else btn_enable_keyer->deactivate();
 		if (selrig->has_cw_spot) {
 			cnt_cw_spot->activate();
+			cnt_cw_spot->value(progStatus.cw_spot);
 			btnSpot->activate();
 		} else {
 			cnt_cw_spot->deactivate();
 			btnSpot->deactivate();
 		}
-		if (selrig->has_vox_onoff) btn_vox->activate(); else btn_vox->deactivate();
-		if (selrig->has_vox_gain) cnt_vox_gain->activate(); else cnt_vox_gain->deactivate();
-		if (selrig->has_vox_anti) cnt_anti_vox->activate(); else cnt_anti_vox->deactivate();
-		if (selrig->has_vox_hang) cnt_vox_hang->activate(); else cnt_vox_hang->deactivate();
-		if (selrig->has_compression)
-			cnt_compression->activate();
-		else
-			cnt_compression->deactivate();
-		if (selrig->has_compON)
+		if (selrig->has_vox_onoff) {
+			btn_vox->activate();
+			btn_vox->value(progStatus.vox_onoff);
+			selrig->set_vox_onoff();
+		} else btn_vox->deactivate();
+		if (selrig->has_vox_gain) {
+			cnt_vox_gain->activate(); 
+			cnt_vox_gain->value(progStatus.vox_gain);
+			selrig->set_vox_gain();
+		} else cnt_vox_gain->deactivate();
+		if (selrig->has_vox_anti) {
+			cnt_anti_vox->activate();
+			cnt_anti_vox->value(progStatus.vox_anti);
+			selrig->set_vox_anti();
+		} else cnt_anti_vox->deactivate();
+		if (selrig->has_vox_hang) {
+			cnt_vox_hang->activate();
+			cnt_vox_hang->value(progStatus.vox_hang);
+			selrig->set_vox_hang();
+		} else cnt_vox_hang->deactivate();
+		if (selrig->has_compON) {
 			btnCompON->activate();
-		else
+			btnCompON->value(progStatus.compON);
+		} else
 			btnCompON->deactivate();
+		if (selrig->has_compression) {
+			cnt_compression->activate();
+			cnt_compression->value(progStatus.compression);
+			selrig->set_compression();
+		} else
+			cnt_compression->deactivate();
+
 		cnt_line_out->deactivate();
 		mnuRestoreData->show();
 		mnuKeepData->show();
