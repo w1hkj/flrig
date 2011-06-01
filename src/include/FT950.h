@@ -33,8 +33,16 @@ public:
 	void set_modeA(int val);
 	int  get_modeA();
 	int  get_modetype(int n);
+
+	void set_modeB(int val);
+	int  get_modeB();
+
 	void set_bwA(int val);
 	int  get_bwA();
+
+	void set_bwB(int val);
+	int  get_bwB();
+
 	int  adjust_bandwidth(int val);
 	int  def_bandwidth(int val);
 
@@ -71,6 +79,22 @@ public:
 	int  get_rf_gain();
 	void get_rf_min_max_step(int &min, int &max, int &step);
 	const char **bwtable(int);
+
+	void set_vox_onoff();
+	void set_vox_gain();
+	void set_vox_anti();
+	void set_vox_hang();
+
+	void get_cw_wpm_min_max(int &min, int &max) {
+		min = 4; max = 60; }
+
+//	void set_cw_weight();
+	void set_cw_wpm();
+	void enable_keyer();
+//	void set_cw_qsk();
+//	void set_cw_vol();
+//	void set_cw_spot();
+//	void set_spot_onoff();
 
 };
 
