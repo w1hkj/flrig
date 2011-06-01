@@ -10,6 +10,7 @@
 #include <stdlib.h>
 
 #include "FT857D.h"
+#include "support.h"
 
 static const char FT857Dname_[] = "FT-857D";
 static const char FT897Dname_[] = "FT-897D";
@@ -44,6 +45,7 @@ RIG_FT857D::RIG_FT857D() {
 
 RIG_FT897D::RIG_FT897D() {
 	name_ = FT897Dname_;
+	onB = false;
 };
 
 void RIG_FT857D::init_cmd()
@@ -56,7 +58,7 @@ long RIG_FT857D::get_vfoA ()
 {
 	init_cmd();
 	cmd[4] = 0x03;
-	int ret = sendCommand(cmd);
+	int ret = waitN(5, 100, "get vfo A", HEX);
 	if (ret == 5) {
 		freqA = fm_bcd(replybuff, 8) * 10;
 		int mode = replybuff[4];
@@ -75,7 +77,37 @@ void RIG_FT857D::set_vfoA (long freq)
 	freq /=10; // 857D does not support 1 Hz resolution
 	cmd = to_bcd(freq, 8);
 	cmd += 0x01;
+	replystr.clear();
 	sendCommand(cmd, 0);
+	showresp(WARN, HEX, "set vfo A", cmd, replystr);
+}
+
+long RIG_FT857D::get_vfoB ()
+{
+	init_cmd();
+	cmd[4] = 0x03;
+	int ret = waitN(5, 100, "get vfo B", HEX);
+	if (ret == 5) {
+		freqB = fm_bcd(replybuff, 8) * 10;
+		int mode = replybuff[4];
+		for (int i = 0; i < 8; i++)
+			if (FT857D_mode_val[i] == mode) {
+				modeB = i;
+				break;
+			}
+	}
+	return freqB;
+}
+
+void RIG_FT857D::set_vfoB (long freq)
+{
+	freqB = freq;
+	freq /=10; // 857D does not support 1 Hz resolution
+	cmd = to_bcd(freq, 8);
+	cmd += 0x01;
+	replystr.clear();
+	sendCommand(cmd, 0);
+	showresp(WARN, HEX, "set vfo B", cmd, replystr);
 }
 
 int RIG_FT857D::get_modeA()
@@ -84,11 +116,16 @@ int RIG_FT857D::get_modeA()
 	return modeA;
 }
 
+int RIG_FT857D::get_modeB()
+{
+// read by get_vfoB
+	return modeB;
+}
+
 int RIG_FT857D::get_modetype(int n)
 {
 	return FT857D_mode_type[n];
 }
-
 
 void RIG_FT857D::set_modeA(int val)
 {
@@ -96,7 +133,20 @@ void RIG_FT857D::set_modeA(int val)
 	init_cmd();
 	cmd[0] = FT857D_mode_val[val];
 	cmd[4] = 0x07;
+	replystr.clear();
 	sendCommand(cmd, 0);
+	showresp(WARN, HEX, "set mode A", cmd, replystr);
+}
+
+void RIG_FT857D::set_modeB(int val)
+{
+	modeB = val;
+	init_cmd();
+	cmd[0] = FT857D_mode_val[val];
+	cmd[4] = 0x07;
+	replystr.clear();
+	sendCommand(cmd, 0);
+	showresp(WARN, HEX, "set mode B", cmd, replystr);
 }
 
 // Tranceiver PTT on/off
@@ -105,7 +155,9 @@ void RIG_FT857D::set_PTT_control(int val)
 	init_cmd();
 	if (val) cmd[4] = 0x08;
 	else	 cmd[4] = 0x88;
+	replystr.clear();
 	sendCommand(cmd, 0);
+	showresp(WARN, HEX, "set PTT", cmd, replystr);
 }
 
 // mod submitted by Rich, WA4SXZ, for power_out and smeter
@@ -114,26 +166,67 @@ int  RIG_FT857D::get_power_out(void)
 {
    init_cmd();
    cmd[4] = 0xF7;
-   int ret = sendCommand(cmd);
-LOG_INFO("%d %x", ret, replybuff[0]);
-//   if (ret == 1) {
+   int ret = waitN(1, 100, "get pout", HEX);
+   if (ret == 1) {
        int fwdpwr = replybuff[0];
        fwdpwr = fwdpwr * 100 / 15;
        return fwdpwr;
-//   }
-//   return 0;
+   }
+   return 0;
 }
 
 int  RIG_FT857D::get_smeter(void)
 {
    init_cmd();
    cmd[4] = 0xE7;
-   int ret = sendCommand(cmd);
-LOG_INFO("%d %x", ret, replybuff[0]);
-//   if (ret == 1) {
+   int ret = waitN(1, 100, "get smeter", HEX);
+   if (ret == 1) {
        int sval = replybuff[0];
        sval = (sval-1) * 100 / 15;
        return sval;
-//   }
-//   return 0;
+   }
+   return 0;
+}
+
+void RIG_FT857D::selectA()
+{
+	if (!onB) return;
+	onB = false;
+	init_cmd();
+	cmd[4] = 0x81; // this is a toggle ... no way of knowing which is A or B
+	replystr.clear();
+	sendCommand(cmd, 0);
+	showresp(WARN, HEX, "select A", cmd, replystr);
+}
+
+void RIG_FT857D::selectB()
+{
+	if (onB) return;
+	onB = true;
+	init_cmd();
+	cmd[4] = 0x81; // this is a toggle ... no way of knowing which is A or B
+	replystr.clear();
+	sendCommand(cmd, 0);
+	showresp(WARN, HEX, "select B", cmd, replystr);
+}
+
+bool RIG_FT857D::can_split()
+{ 
+	return true;
+}
+
+void RIG_FT857D::set_split(bool val)
+{
+	split = val;
+	replystr.clear();
+	init_cmd();
+	if (val) {
+		cmd[4] = 0x02;
+		sendCommand(cmd, 0);
+		showresp(WARN, HEX, "set split ON", cmd, replystr);
+	} else {
+		cmd[4] = 0x82;
+		sendCommand(cmd, 0);
+		showresp(WARN, HEX, "set split OFF", cmd, replystr);
+	}
 }

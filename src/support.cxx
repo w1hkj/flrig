@@ -884,6 +884,13 @@ void cb_set_split(int val)
 		return;
 	}
 
+	if (rig_nbr == FT857D || rig_nbr == FT897D) {
+		pthread_mutex_lock(&mutex_serial);
+			selrig->set_split(val);
+		pthread_mutex_unlock(&mutex_serial);
+		return;
+	}
+
 	if (val) {
 		if (useB) {
 			btnA->value(1);
