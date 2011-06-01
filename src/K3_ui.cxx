@@ -30,6 +30,10 @@
 #include "rigs.h"
 #include "K3_ui.h"
 
+extern queue<FREQMODE> queA;
+extern queue<FREQMODE> queB;
+extern queue<bool> quePTT;
+
 void read_K3()
 {
 	pthread_mutex_lock(&mutex_serial);
@@ -43,7 +47,7 @@ void read_K3()
 			Fl::awake(setFreqDispA, (void *)vfoA.freq);
 			vfo = vfoA;
 			try {
-				send_new_freq(vfo.freq);
+				send_xml_freq(vfo.freq);
 			} catch (...) {}
 			pthread_mutex_unlock(&mutex_xmlrpc);
 		}
@@ -53,6 +57,7 @@ void read_K3()
 			Fl::awake(setFreqDispB, (void *)vfoB.freq);
 		}
 	}
+	if (!quePTT.empty()) goto exit_read;
 
 	if (progStatus.poll_mode) {
 		int nu_mode;
@@ -76,6 +81,7 @@ void read_K3()
 			vfoB.imode = nu_mode;
 		}
 	}
+	if (!quePTT.empty()) goto exit_read;
 
 	if (progStatus.poll_bandwidth) {
 		int nu_BW;
@@ -95,6 +101,7 @@ void read_K3()
 		}
 	}
 
+exit_read:
 	pthread_mutex_unlock(&mutex_serial);
 }
 
