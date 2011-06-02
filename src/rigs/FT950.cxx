@@ -320,13 +320,14 @@ int RIG_FT950::get_volume_control()
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.volume;
 	if (p + 6 >= replystr.length()) return progStatus.volume;
-	int val = atoi(&replystr[p+3]);
-	return (int)(val * 100 / 255);
+	int val = atoi(&replystr[p+3]) * 100 / 250;
+	if (val > 100) val = 100;
+	return val;
 }
 
 void RIG_FT950::set_volume_control(int val) 
 {
-	int ivol = (int)(val * 255 / 100);
+	int ivol = (int)(val * 250 / 100);
 	cmd = "AG0000;";
 	for (int i = 5; i > 2; i--) {
 		cmd[i] += ivol % 10;
@@ -799,7 +800,7 @@ void RIG_FT950::get_mic_min_max_step(int &min, int &max, int &step)
 void RIG_FT950::set_rf_gain(int val)
 {
 	cmd = "RG0000;";
-	int rfval = val * 255 / 100;
+	int rfval = val * 250 / 100;
 	for (int i = 5; i > 2; i--) {
 		cmd[i] = rfval % 10 + '0';
 		rfval /= 10;
@@ -821,7 +822,9 @@ int  RIG_FT950::get_rf_gain()
 		rfval *= 10;
 		rfval += replystr[p+i] - '0';
 	}
-	return (int)(rfval * 100 / 255);
+	rfval = rfval * 100 / 250;
+	if (rfval > 100) rfval = 100;
+	return rfval;
 }
 
 void RIG_FT950::get_rf_min_max_step(int &min, int &max, int &step)
