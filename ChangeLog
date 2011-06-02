@@ -1,6 +1,13 @@
-2011-05-28  David Freese  <w1hkj@w1hkj.com>
+2011-06-01  David Freese  <w1hkj@w1hkj.com>
 
-	92d9814: IC746/756 PRO series
+	ee2ec21: Variable polling
+	e4f8155: FT847
+	6e98ae0: K3 PTT
+	2426653: FT950 update
+	cc0d347: Debug mods
+	8c0e996: FT857/897
+	6a9f177: Xcvr Extras
+	33ed8c3: IC746/756 PRO series
 	a8dddc8: TT550 controls
 	1b82bc3: Queue mutex
 	57e08ce: TT550 initialization
