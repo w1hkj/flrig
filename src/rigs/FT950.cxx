@@ -208,16 +208,34 @@ void RIG_FT950::A2B()
 
 bool RIG_FT950::can_split()
 {
-	return false;
+	return true;
 }
 
 void RIG_FT950::set_split(bool val)
 {
+	split = val;
+	if (val) {
+		useB = false;
+		cmd = "VS0;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "Rx on A", cmd, replystr);
+		cmd = "FT3;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "Tx on B", cmd, replystr);
+	} else {
+		cmd = "VS0;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "Rx on A", cmd, replystr);
+		cmd = "FT2;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "Tx on A", cmd, replystr);
+	}
+	Fl::awake(highlight_vfo, (void *)0);
 }
 
 bool RIG_FT950::get_split()
 {
-	return false;
+	return split;
 }
 
 
