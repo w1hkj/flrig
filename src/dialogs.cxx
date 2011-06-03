@@ -94,7 +94,7 @@ void init_port_combos()
 		if (!open_serial(ttyname))
 			continue;
 		snprintf(ttyname, sizeof(ttyname), "COM%u", j);
-		LOG_INFO("Found serial port %s", ttyname);
+		LOG_WARN("Found serial port %s", ttyname);
 		add_combos(ttyname);
 	}
 }
@@ -114,7 +114,6 @@ void init_port_combos()
 {
 	int retval;
 
-
 	struct stat st;
 	char ttyname[PATH_MAX + 1];
 	bool ret = false;
@@ -124,12 +123,15 @@ void init_port_combos()
 
 	clear_combos();
 
-	if (getcwd(cwd, sizeof(cwd)) == NULL || chdir("/sys/class/tty") == -1 ||
-	    (sys = opendir(".")) == NULL)
-		goto out;
+	if (getcwd(cwd, sizeof(cwd)) == NULL) goto out;
+	if (chdir("/sys/class/tty") == -1) goto out;
+	if ((sys = opendir(".")) == NULL) goto out;
 
 	ssize_t len;
 	struct dirent* dp;
+
+	LOG_WARN("%s", "Searching /sys/class/tty/");
+
 	while ((dp = readdir(sys))) {
 #  ifdef _DIRENT_HAVE_D_TYPE
 		if (dp->d_type != DT_LNK)
@@ -142,11 +144,11 @@ void init_port_combos()
 			snprintf(ttyname, sizeof(ttyname), "/dev/%s", dp->d_name);
 			if (stat(ttyname, &st) == -1 || !S_ISCHR(st.st_mode))
 				continue;
-			LOG_INFO("Found serial port %s", ttyname);
+			LOG_WARN("Found serial port %s", ttyname);
 			add_combos(ttyname);
+			ret = true;
 		}
 	}
-	ret = true;
 
 out:
 	if (sys)
@@ -160,14 +162,14 @@ out:
 		"/dev/ttyUSB%u",
 		"/dev/usb/ttyUSB%u"
 	};
-
+	LOG_WARN("%s", "Serial port discovery via 'stat'");
 	for (size_t i = 0; i < sizeof(tty_fmt)/sizeof(*tty_fmt); i++) {
 		for (unsigned j = 0; j < TTY_MAX; j++) {
 			snprintf(ttyname, sizeof(ttyname), tty_fmt[i], j);
 			if ( !(stat(ttyname, &st) == 0 && S_ISCHR(st.st_mode)) )
 				continue;
 
-			LOG_INFO("Found serial port %s", ttyname);
+			LOG_WARN("Found serial port %s", ttyname);
 			add_combos(ttyname);
 		}
 	}
@@ -203,7 +205,7 @@ void init_port_combos()
 			if ( !(stat(gbuf.gl_pathv[j], &st) == 0 && S_ISCHR(st.st_mode)) ||
 			     strstr(gbuf.gl_pathv[j], "modem") )
 				continue;
-			LOG_INFO("Found serial port %s", gbuf.gl_pathv[j]);
+			LOG_WARN("Found serial port %s", gbuf.gl_pathv[j]);
 			add_combos(gbuf.gl_pathv[j]);
 		}
 		globfree(&gbuf);
@@ -237,7 +239,7 @@ void init_port_combos()
 			snprintf(ttyname, sizeof(ttyname), tty_fmt[i], j);
 			if ( !(stat(ttyname, &st) == 0 && S_ISCHR(st.st_mode)) )
 				continue;
-			LOG_INFO("Found serial port %s", ttyname);
+			LOG_WARN("Found serial port %s", ttyname);
 			add_combos(ttyname);
 		}
 	}
