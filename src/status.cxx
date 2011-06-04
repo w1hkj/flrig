@@ -98,15 +98,18 @@ status progStatus = {
 	0,			// int  line_out;
 	1,			// int  agc_level;
 	18,			// int  cw_wpm;
-	1.0,		// double  cw_weight;
+	3.0,		// double  cw_weight;
 	0,			// int  cw_vol;
 	0,			// int  cw_spot;
-	0,			// int  cw_qsk;
+	false,		// bool spot_onoff;
+	700,		// int  cw_spot_tone;
+	20,			// int  cw_qsk;
 	false,		// bool enable_keyer;
 	false,		// int  vox_onoff;
-	0,			// int  vox_gain;
-	0,			// int  vox_anti;
-	0,			// int  vox_hang;
+	10,			// int  vox_gain;
+	10,			// int  vox_anti;
+	100,		// int  vox_hang; FT950 default
+	true,		// bool vox_on_dataport;
 	0,			// int  compression;
 	false,		// bool compON;
 

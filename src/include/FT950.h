@@ -68,6 +68,9 @@ public:
 	bool get_notch(int &val);
 	void get_notch_min_max_step(int &min, int &max, int &step);
 
+	void set_auto_notch(int v);
+	int  get_auto_notch();
+
 	void set_noise(bool b);
 	int  get_noise();
 
@@ -84,17 +87,18 @@ public:
 	void set_vox_gain();
 	void set_vox_anti();
 	void set_vox_hang();
+	void set_vox_on_dataport();
 
 	void get_cw_wpm_min_max(int &min, int &max) {
 		min = 4; max = 60; }
 
-//	void set_cw_weight();
+	void set_cw_weight();
 	void set_cw_wpm();
 	void enable_keyer();
-//	void set_cw_qsk();
+	void set_cw_qsk();
 //	void set_cw_vol();
-//	void set_cw_spot();
-//	void set_spot_onoff();
+	void set_cw_spot();
+	void set_cw_spot_tone();
 
 };
 

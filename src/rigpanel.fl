@@ -17,7 +17,8 @@ decl {\#include "K3_ui.h"} {}
 
 decl {const int freq_sel_widths[]={110, 70, 70, 0};} {} 
 
-Function {Rig_window()} {} {
+Function {Rig_window()} {open
+} {
   Fl_Window {} {
     label Flrig open
     xywh {577 57 424 401} type Double align 80
@@ -625,53 +626,53 @@ cb_tt550_setXmtBW();}
         } {}
       }
     }
-    Fl_Tabs tabsGeneric {
+    Fl_Tabs tabsGeneric {open
       xywh {1 330 422 70} selection_color 50
     } {
       Fl_Group genericCW {
-        label CW
+        label CW open selected
         xywh {2 349 420 49} color 50 selection_color 50
       } {
-        Fl_Counter cnt_cw_vol {
-          label {S-T vol}
-          callback {progStatus.cw_vol=o->value();
-cb_cw_vol();}
-          tooltip {Side tone volume} xywh {7 358 60 22} type Simple minimum 5 maximum 80 step 1 value 24
-          code0 {o->value(progStatus.cw_vol);}
-        }
-        Fl_Counter cnt_cw_spot {
-          label {Spot Vol}
-          callback {progStatus.cw_spot=(int)o->value();
+        Fl_Light_Button btnSpot {
+          label Spot
+          callback {progStatus.cw_spot=o->value();
 cb_cw_spot();}
-          tooltip {Spot volume} xywh {74 358 60 22} type Simple minimum 0 maximum 100 step 1 value 20
+          tooltip {Spot tone on/off} xywh {5 358 54 22}
+          code0 {o->value(progStatus.cw_spot);}
+        }
+        Fl_Counter cnt_cw_spot_tone {
+          label {Spot tone}
+          callback {progStatus.cw_spot_tone=(int)o->value();
+cb_cw_spot_tone();}
+          tooltip {Spot volume} xywh {62 358 70 22} type Simple minimum 300 maximum 1050 step 50 value 1050
           code0 {o->value(progStatus.cw_spot);}
         }
         Fl_Counter cnt_cw_qsk {
           label {QSK dly}
           callback {progStatus.cw_qsk = (int)o->value();
 cb_cw_qsk();}
-          tooltip {QSK delay (msec)} xywh {142 358 60 22} type Simple minimum 0 maximum 100 step 1 value 20
+          tooltip {QSK delay (msec)} xywh {136 358 70 22} type Simple minimum 0 maximum 100 step 1 value 20
           code0 {o->value(progStatus.tt550_cw_qsk);}
         }
         Fl_Counter cnt_cw_weight {
           label Weight
           callback {progStatus.cw_weight = o->value();
 cb_cw_weight();}
-          xywh {210 358 60 22} type Simple minimum 0.75 maximum 1.5 step 0.05 value 1
+          xywh {209 358 70 22} type Simple minimum 2.5 maximum 4.5 value 3
           code0 {o->value(progStatus.cw_weight);}
         }
         Fl_Counter cnt_cw_wpm {
           label wpm
           callback {progStatus.cw_wpm = o->value();
 cb_cw_wpm();}
-          xywh {278 358 60 22} type Simple minimum 5 maximum 80 step 1 value 24
+          xywh {283 358 70 22} type Simple minimum 5 maximum 80 step 1 value 24
           code0 {o->value(progStatus.cw_wpm);}
         }
         Fl_Check_Button btn_enable_keyer {
           label Keyer
           callback {progStatus.enable_keyer=o->value();
 cb_enable_keyer();}
-          tooltip {Enable keyer} xywh {346 361 70 15} down_box DOWN_BOX
+          tooltip {Enable internal keyer} xywh {357 361 60 15} down_box DOWN_BOX
           code0 {o->value(progStatus.enable_keyer);}
         }
       }
@@ -683,29 +684,36 @@ cb_enable_keyer();}
           label gain
           callback {progStatus.vox_gain=(int)o->value();
 cb_vox_gain();}
-          xywh {73 357 70 22} type Simple minimum 0 maximum 100 step 1
+          xywh {9 357 70 22} type Simple minimum 0 maximum 100 step 1
           code0 {o->value(progStatus.vox_gain);}
         }
         Fl_Counter cnt_anti_vox {
           label anti
           callback {progStatus.vox_anti=(int)o->value();
 cb_vox_anti();}
-          xywh {149 357 70 22} type Simple minimum 0 maximum 100 step 1
+          xywh {85 357 70 22} type Simple minimum 0 maximum 100 step 1
           code0 {o->value(progStatus.vox_anti);}
         }
         Fl_Counter cnt_vox_hang {
           label hang
           callback {progStatus.vox_hang = (int)o->value();
 cb_vox_hang();}
-          xywh {225 357 70 22} type Simple minimum 0 maximum 100 step 1
+          xywh {161 357 70 22} type Simple minimum 0 maximum 100 step 1
           code0 {o->value(progStatus.vox_hang);}
         }
         Fl_Light_Button btn_vox {
           label VOX
           callback {progStatus.vox_onoff=o->value();
 cb_vox_onoff();}
-          xywh {302 357 70 22}
+          xywh {238 357 70 22}
           code0 {o->value(progStatus.vox_onoff);}
+        }
+        Fl_Check_Button btn_vox_on_dataport {
+          label {Data port}
+          callback {progStatus.vox_on_dataport=o->value();
+cb_vox_on_dataport();}
+          tooltip {Data port signal triggers VOX} xywh {322 360 70 15} down_box DOWN_BOX
+          code0 {o->value(progStatus.vox_on_dataport);}
         }
       }
       Fl_Group genericSpeech {
@@ -785,11 +793,6 @@ cb_line_out();}
           label Special
           callback {cb_special();}
           xywh {242 357 74 20}
-        }
-        Fl_Light_Button btnSpot {
-          label Spot
-          callback {cb_cw_spot();}
-          xywh {342 357 74 20}
         }
       }
     }
@@ -1040,13 +1043,13 @@ Function {XcvrDialog()} {open
 } {
   Fl_Window {} {
     label {I/O Ports} open
-    xywh {575 496 482 257} type Double visible
+    xywh {575 496 482 257} type Double hide
   } {
     Fl_Tabs tabsConfig {open
       xywh {0 8 482 246}
     } {
       Fl_Group tabPrimary {
-        label Primary selected
+        label Primary
         xywh {2 30 475 222}
       } {
         Fl_Group {} {open

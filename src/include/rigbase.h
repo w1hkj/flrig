@@ -133,6 +133,7 @@ public:
 	bool has_cw_wpm;
 	bool has_cw_vol;
 	bool has_cw_spot;
+	bool has_cw_spot_tone;
 	bool has_cw_qsk;
 	bool has_cw_weight;
 	bool has_cw_keyer;
@@ -140,6 +141,7 @@ public:
 	bool has_vox_gain;
 	bool has_vox_anti;
 	bool has_vox_hang;
+	bool has_vox_on_dataport;
 	bool has_compression;
 	bool has_compON;
 	bool has_auto_notch;
@@ -292,18 +294,32 @@ public:
 	virtual void set_line_out() {}
 	virtual void set_agc_level() {}
 	virtual void set_cw_weight() {}
+	virtual void get_cw_weight_min_max_step(double &min, double &max, double &step) {
+		min = 2.5; max = 4.5; step = 0.1; } // default for FT950
 	virtual void set_cw_wpm() {}
 	virtual void get_cw_wpm_min_max(int &min, int &max) {
-		min = 5; max = 50; }
+		min = 5; max = 50; } // default for FT950
 	virtual void enable_keyer() {}
 	virtual void set_cw_qsk() {}
+	virtual void get_cw_qsk_min_max_step(int &min, int &max, int &step) {
+		min = 15; max = 30; step = 5; } // default for FT950
 	virtual void set_cw_vol() {}
 	virtual void set_cw_spot() {}
+	virtual void set_cw_spot_tone() {}
+	virtual void get_cw_spot_tone_min_max_step(int &min, int &max, int &step) {
+		min = 300; max = 1050; step = 50; } // default for FT950
 	virtual void set_spot_onoff() {}
 	virtual void set_vox_onoff() {}
 	virtual void set_vox_gain() {}
+	virtual void get_vox_gain_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 100; step = 1; } // default for FT950
 	virtual void set_vox_anti() {}
+	virtual void get_vox_anti_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 100; step = 1; } // default for FT950
 	virtual void set_vox_hang() {}
+	virtual void get_vox_hang_min_max_step(int &min, int &max, int &step) {
+		min = 30; max = 3000; step = 10; } // default for FT950
+	virtual void set_vox_on_dataport() {}
 	virtual void set_mon_vol() {}
 	virtual void set_squelch_level() {}
 	virtual void set_compression() {}
