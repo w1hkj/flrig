@@ -61,21 +61,22 @@ void RIG_FT847::initialize()
 	init_cmd();
 	sendCommand(cmd, 0); // CAT on
 	cmd[4] = 0x8E; // satellite mode off
-	sendCommand(cmd, 0);
+	replystr.clear();
+	sendCommand(cmd);
+	showresp(WARN, HEX, "init", cmd, replystr);
 }
 
 bool RIG_FT847::get_info()
 {
 	int ret = 0, i = 0;
-	
+
 	init_cmd();
 	cmd[4] = 0x03;
-	ret = sendCommand(cmd);
-unsigned char *p = (unsigned char *)replybuff;
-	if (ret == 5) {
-		afreq = ((((((p[0]<<8) + p[1])<<8) + p[2])<<8) + p[3])*10/16;
-		amode = p[4];
-		for (i = 0; i < 10; i++) if (FT847_mode_val[i] == p[4]) break;
+	ret = waitN(5, 100, "get info", HEX);
+	if (ret >= 5) {
+		afreq = fm_bcd(&replystr[ret - 5], 8)*10;
+		amode = replystr[ret - 1];
+		for (i = 0; i < 10; i++) if (FT847_mode_val[i] == amode) break;
 		if (i == 10) i = 1;
 		amode = i;
 		return true;
@@ -99,8 +100,9 @@ void RIG_FT847::set_vfoA (long freq)
 	freq /=10; // 847 does not support 1 Hz resolution
 	cmd = to_bcd(freq, 8);
 	cmd += 0x01;
-	sendCommand(cmd, 0);
-LOG_WARN("%s", str2hex(cmd.c_str(), 5));
+	replystr.clear();
+	sendCommand(cmd);
+	showresp(WARN, HEX, "set vfo A", cmd, replystr);
 }
 
 int RIG_FT847::get_modeA()
@@ -112,10 +114,11 @@ void RIG_FT847::set_modeA(int val)
 {
 	A.imode = val;
 	init_cmd();
-	cmd[3] = FT847_mode_val[val];
+	cmd[0] = FT847_mode_val[val];
 	cmd[4] = 0x07;
-	sendCommand(cmd, 0);
-LOG_WARN("%s", str2hex(cmd.c_str(), 5));
+	replystr.clear();
+	sendCommand(cmd);
+	showresp(WARN, HEX, "set mode A", cmd, replystr);
 }
 
 long RIG_FT847::get_vfoB()
@@ -134,18 +137,20 @@ void RIG_FT847::set_vfoB(long freq)
 	freq /=10; // 847 does not support 1 Hz resolution
 	cmd = to_bcd(freq, 8);
 	cmd += 0x01;
-	sendCommand(cmd, 0);
-LOG_WARN("%s", str2hex(cmd.c_str(), 5));
+	replystr.clear();
+	sendCommand(cmd);
+	showresp(WARN, HEX, "set vfo B", cmd, replystr);
 }
 
 void RIG_FT847::set_modeB(int val)
 {
 	B.imode = val;
 	init_cmd();
-	cmd[3] = FT847_mode_val[val];
+	cmd[0] = FT847_mode_val[val];
 	cmd[4] = 0x07;
-	sendCommand(cmd, 0);
-LOG_WARN("%s", str2hex(cmd.c_str(), 5));
+	replystr.clear();
+	sendCommand(cmd);
+	showresp(WARN, HEX, "set mode B", cmd, replystr);
 }
 
 int  RIG_FT847::get_modeB()
@@ -159,8 +164,9 @@ void RIG_FT847::set_PTT_control(int val)
 	init_cmd();
 	if (val) cmd[4] = 0x08;
 	else cmd[4] = 0x88;
-	sendCommand(cmd, 0);
-LOG_WARN("%s", str2hex(cmd.c_str(), 5));
+	replystr.clear();
+	sendCommand(cmd);
+	showresp(WARN, HEX, "set PTT", cmd, replystr);
 }
 
 int RIG_FT847::get_smeter()
@@ -168,9 +174,9 @@ int RIG_FT847::get_smeter()
 	init_cmd();
 	cmd[4] = 0xE7;
 	int sval = 0;
-	int ret = sendCommand(cmd);
-	if (ret == 1)
-		sval = (replybuff[0] & 0x1F) / 32.0;
+	int ret = waitN(1, 100, "get smeter", HEX);
+	if (ret >= 1)
+		sval = (replystr[ret - 1] & 0x1F) / 32.0;
 	return sval;
 }
 
@@ -179,9 +185,9 @@ int RIG_FT847::get_power_out()
 	init_cmd();
 	cmd[4] = 0xF7;
 	fwdpwr = 0;
-	int ret = sendCommand(cmd);
-	if (ret == 1)
-		fwdpwr = (replybuff[0] & 0x1F) / 32.0;
+	int ret = waitN(1, 100, "get power", HEX);
+	if (ret >= 1)
+		fwdpwr = (replystr[ret - 1] & 0x1F) / 32.0;
 	return fwdpwr;
 }
 
