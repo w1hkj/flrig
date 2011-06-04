@@ -84,15 +84,18 @@ struct status {
 	int		line_out;
 	int		agc_level;
 	int		cw_wpm;
-	double	cw_weight;
+	float	cw_weight;
 	int		cw_vol;
 	int		cw_spot;
+	bool	spot_onoff;
+	int		cw_spot_tone;
 	int		cw_qsk;
 	bool	enable_keyer;
 	bool	vox_onoff;
 	int		vox_gain;
 	int		vox_anti;
 	int		vox_hang;
+	bool	vox_on_dataport;
 	int		compression;
 	bool	compON;
 

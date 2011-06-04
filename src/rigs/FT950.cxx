@@ -75,16 +75,17 @@ RIG_FT950::RIG_FT950() {
 	has_extras =
 	has_vox_onoff =
 	has_vox_gain =
-//	has_vox_anti =
+	has_vox_anti =
 	has_vox_hang =
+	has_vox_on_dataport =
 
 	has_cw_wpm =
 	has_cw_keyer =
 //	has_cw_vol =
-//	has_cw_spot =
-//	has_cw_qsk =
-//	has_cw_weight 
-//	has_cw_keyer =
+	has_cw_spot =
+	has_cw_spot_tone =
+	has_cw_qsk =
+	has_cw_weight =
 
 	can_change_alt_vfo =
 	has_smeter =
@@ -98,6 +99,7 @@ RIG_FT950::RIG_FT950() {
 	has_noise_control =
 	has_bandwidth_control =
 	has_notch_control =
+	has_auto_notch =
 	has_attenuator_control =
 	has_preamp_control =
 	has_ifshift_control =
@@ -149,7 +151,7 @@ long RIG_FT950::get_vfoB ()
 {
 	cmd = rsp = "FB";
 	cmd += ';';
-	waitN(11, 100, "get vfo A", ASC);
+	waitN(11, 100, "get vfo B", ASC);
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqB;
@@ -181,22 +183,22 @@ bool RIG_FT950::twovfos()
 
 void RIG_FT950::selectA()
 {
-	cmd = "VS0;";
+	cmd = "VS0;FT2;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select A", cmd, replystr);
-	cmd = "FT2;";
-	sendCommand(cmd);
-	showresp(WARN, ASC,"xmt on A", cmd, replystr);
+//	cmd = "FT2;";
+//	sendCommand(cmd);
+//	showresp(WARN, ASC,"xmt on A", cmd, replystr);
 }
 
 void RIG_FT950::selectB()
 {
-	cmd = "VS1;";
+	cmd = "VS1;FT3;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select B", cmd, replystr);
-	cmd = "FT3;";
-	sendCommand(cmd);
-	showresp(WARN, ASC,"xmt on B", cmd, replystr);
+//	cmd = "FT3;";
+//	sendCommand(cmd);
+//	showresp(WARN, ASC,"xmt on B", cmd, replystr);
 }
 
 void RIG_FT950::A2B()
@@ -603,6 +605,9 @@ void RIG_FT950::set_bwB(int val)
 
 int RIG_FT950::get_bwB()
 {
+LOG_WARN("%s","get bw B bypassed");
+	return bwB;
+
 	int i = 0;
 	if (modeB == 3 || modeB == 4 || modeB == 10 || modeB == 12) {
 		bwB = 0;
@@ -722,6 +727,24 @@ void RIG_FT950::get_notch_min_max_step(int &min, int &max, int &step)
 	min = 0;
 	max = 3000;
 	step = 10;
+}
+
+void RIG_FT950::set_auto_notch(int v)
+{
+	cmd = "BC00;";
+	if (v) cmd[3] = '1';
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET auto notch", cmd, replystr);
+}
+
+int  RIG_FT950::get_auto_notch()
+{
+	cmd = "BC0;";
+	waitN(5, 100, "get auto notch", ASC);
+	size_t p = replystr.rfind("BC0");
+	if (p == string::npos) return 0;
+	if (replystr[p+3] == '1') return 1;
+	return 0;
 }
 
 int FT950_blanker_level = 0;
@@ -852,14 +875,26 @@ void RIG_FT950::set_vox_gain()
 
 void RIG_FT950::set_vox_anti()
 {
+	cmd = "EX117";
+	cmd.append(to_decimal(progStatus.vox_anti, 3)).append(";");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET anti-vox", cmd, replystr);
 }
 
 void RIG_FT950::set_vox_hang()
 {
 	cmd = "VD";
-	cmd.append(to_decimal(progStatus.vox_hang, 3)).append(";");
+	cmd.append(to_decimal(progStatus.vox_hang, 4)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET vox delay", cmd, replystr);
+}
+
+void RIG_FT950::set_vox_on_dataport()
+{
+	cmd = "EX1140;";
+	if (progStatus.vox_on_dataport) cmd[5] = '1';
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET vox on data port", cmd, replystr);
 }
 
 void RIG_FT950::set_cw_wpm()
@@ -876,29 +911,46 @@ void RIG_FT950::set_cw_wpm()
 void RIG_FT950::enable_keyer()
 {
 	cmd = "KR0;";
-	if (progStatus.enable_keyer) cmd[3] = '1';
+	if (progStatus.enable_keyer) cmd[2] = '1';
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET keyer on/off", cmd, replystr);
 }
 
-/*
+void RIG_FT950::set_cw_spot()
+{
+	cmd = "CS0;";
+	if (progStatus.spot_onoff) cmd[2] = '1';
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET spot on/off", cmd, replystr);
+}
+
 void RIG_FT950::set_cw_weight()
 {
+	cmd = "EX046";
+	cmd.append(to_decimal(progStatus.cw_weight * 10, 2)).append(";");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET cw weight", cmd, replystr);
 }
 
 void RIG_FT950::set_cw_qsk()
 {
+	cmd = "EX044";
+	cmd.append(to_decimal(progStatus.cw_qsk, 4)).append(";");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET cw qsk", cmd, replystr);
 }
 
+void RIG_FT950::set_cw_spot_tone()
+{
+	int n = (progStatus.cw_spot_tone - 300) / 50;
+	cmd = "EX045";
+	cmd.append(to_decimal(n, 2)).append(";");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET cw tone", cmd, replystr);
+}
+
+/*
 void RIG_FT950::set_cw_vol()
-{
-}
-
-void RIG_FT950::set_cw_spot()
-{
-}
-
-void RIG_FT950::set_spot_onoff()
 {
 }
 */

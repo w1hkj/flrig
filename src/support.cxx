@@ -1830,18 +1830,28 @@ void initXcvrTab()
 			cnt_cw_wpm->value(progStatus.cw_wpm);
 			selrig->set_cw_wpm();
 		} else cnt_cw_wpm->deactivate();
-		if (selrig->has_cw_vol) {
-			cnt_cw_vol->activate();
-			cnt_cw_vol->value(progStatus.cw_vol);
-			selrig->set_cw_vol();
-		} else cnt_cw_vol->deactivate();
+//		if (selrig->has_cw_vol) {
+//			cnt_cw_vol->activate();
+//			cnt_cw_vol->value(progStatus.cw_vol);
+//			selrig->set_cw_vol();
+//		} else cnt_cw_vol->deactivate();
 		if (selrig->has_cw_qsk) {
 			cnt_cw_qsk->activate();
+			int min, max, step;
+			selrig->get_cw_qsk_min_max_step(min, max, step);
+			cnt_cw_qsk->minimum(min);
+			cnt_cw_qsk->maximum(max);
+			cnt_cw_qsk->step(step);
 			cnt_cw_qsk->value(progStatus.cw_qsk);
 			selrig->set_cw_qsk();
 		} else cnt_cw_qsk->deactivate();
 		if (selrig->has_cw_weight) {
 			cnt_cw_weight->activate();
+			double min, max, step;
+			selrig->get_cw_weight_min_max_step( min, max, step );
+			cnt_cw_weight->minimum(min);
+			cnt_cw_weight->maximum(max);
+			cnt_cw_weight->step(step);
 			cnt_cw_weight->value(progStatus.cw_weight);
 			selrig->set_cw_weight();
 		} else cnt_cw_weight->deactivate();
@@ -1851,13 +1861,20 @@ void initXcvrTab()
 			selrig->enable_keyer();
 		} else btn_enable_keyer->deactivate();
 		if (selrig->has_cw_spot) {
-			cnt_cw_spot->activate();
-			cnt_cw_spot->value(progStatus.cw_spot);
+			btnSpot->value(progStatus.cw_spot);
+			selrig->set_cw_spot();
 			btnSpot->activate();
-		} else {
-			cnt_cw_spot->deactivate();
-			btnSpot->deactivate();
-		}
+		} else btnSpot->deactivate();
+		if (selrig->has_cw_spot_tone) {
+			cnt_cw_spot_tone->activate();
+			int min, max, step;
+			selrig->get_cw_spot_tone_min_max_step(min, max, step);
+			cnt_cw_spot_tone->minimum(min);
+			cnt_cw_spot_tone->maximum(max);
+			cnt_cw_spot_tone->step(step);
+			cnt_cw_spot_tone->value(progStatus.cw_spot_tone);
+			selrig->set_cw_spot_tone();
+		} else cnt_cw_spot_tone->deactivate();
 		if (selrig->has_vox_onoff) {
 			btn_vox->activate();
 			btn_vox->value(progStatus.vox_onoff);
@@ -1865,19 +1882,39 @@ void initXcvrTab()
 		} else btn_vox->deactivate();
 		if (selrig->has_vox_gain) {
 			cnt_vox_gain->activate(); 
+			int min, max, step;
+			selrig->get_vox_gain_min_max_step(min, max, step);
+			cnt_vox_gain->minimum(min);
+			cnt_vox_gain->maximum(max);
+			cnt_vox_gain->step(step);
 			cnt_vox_gain->value(progStatus.vox_gain);
 			selrig->set_vox_gain();
 		} else cnt_vox_gain->deactivate();
 		if (selrig->has_vox_anti) {
 			cnt_anti_vox->activate();
+			int min, max, step;
+			selrig->get_vox_anti_min_max_step(min, max, step);
+			cnt_anti_vox->minimum(min);
+			cnt_anti_vox->maximum(max);
+			cnt_anti_vox->step(step);
 			cnt_anti_vox->value(progStatus.vox_anti);
 			selrig->set_vox_anti();
 		} else cnt_anti_vox->deactivate();
 		if (selrig->has_vox_hang) {
 			cnt_vox_hang->activate();
+			int min, max, step;
+			selrig->get_vox_hang_min_max_step(min, max, step);
+			cnt_vox_hang->minimum(min);
+			cnt_vox_hang->maximum(max);
+			cnt_vox_hang->step(step);
 			cnt_vox_hang->value(progStatus.vox_hang);
 			selrig->set_vox_hang();
 		} else cnt_vox_hang->deactivate();
+		if (selrig->has_vox_on_dataport) {
+			btn_vox_on_dataport->activate();
+			btn_vox_on_dataport->value(progStatus.vox_on_dataport);
+			selrig->set_vox_on_dataport();
+		} else btn_vox_on_dataport->deactivate();
 		if (selrig->has_compON) {
 			btnCompON->activate();
 			btnCompON->value(progStatus.compON);
@@ -2661,9 +2698,9 @@ void cb_cw_wpm()
 
 void cb_cw_vol()
 {
-	pthread_mutex_lock(&mutex_serial);
-		selrig->set_cw_vol();
-	pthread_mutex_unlock(&mutex_serial);
+//	pthread_mutex_lock(&mutex_serial);
+//		selrig->set_cw_vol();
+//	pthread_mutex_unlock(&mutex_serial);
 }
 
 void cb_cw_spot()
@@ -2672,6 +2709,14 @@ void cb_cw_spot()
 		selrig->set_cw_spot();
 	pthread_mutex_unlock(&mutex_serial);
 }
+
+void cb_cw_spot_tone()
+{
+	pthread_mutex_lock(&mutex_serial);
+		selrig->set_cw_spot_tone();
+	pthread_mutex_unlock(&mutex_serial);
+}
+
 
 void cb_vox_gain()
 {
@@ -2698,6 +2743,13 @@ void cb_vox_onoff()
 {
 	pthread_mutex_lock(&mutex_serial);
 		selrig->set_vox_onoff();
+	pthread_mutex_unlock(&mutex_serial);
+}
+
+void cb_vox_on_dataport()
+{
+	pthread_mutex_lock(&mutex_serial);
+		selrig->set_vox_on_dataport();
 	pthread_mutex_unlock(&mutex_serial);
 }
 

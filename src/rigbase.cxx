@@ -59,6 +59,7 @@ rigbase::rigbase()
 	has_vox_gain =
 	has_vox_anti =
 	has_vox_hang =
+	has_vox_on_dataport =
 	has_auto_notch = 
 	has_compression =
 	has_bpf_center =
