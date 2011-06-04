@@ -1,5 +1,12 @@
-2011-06-01  David Freese  <w1hkj@w1hkj.com>
+2011-06-03  David Freese  <w1hkj@w1hkj.com>
 
+	46c3fd1: FT450 extras
+	9d550ba: FT847 read freq/mode
+	41b1251: FT950 extra controls
+	b09df7f: Serial Port Discovery
+	7365f30: FT950 AF/RF
+	dff9047: FT950 split
+	869dedb: rig_io DEBUG
 	ee2ec21: Variable polling
 	e4f8155: FT847
 	6e98ae0: K3 PTT
