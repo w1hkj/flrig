@@ -42,6 +42,19 @@ RIG_FT450::RIG_FT450() {
 	def_bw = 2;
 	def_freq = 14070000;
 
+	has_extras =
+	has_vox_onoff =
+	has_vox_gain =
+	has_vox_hang =
+
+	has_cw_wpm =
+	has_cw_keyer =
+//	has_cw_vol =
+	has_cw_spot =
+	has_cw_spot_tone =
+	has_cw_qsk =
+	has_cw_weight =
+
 	has_split =
 	has_smeter =
 	has_swr_control =
@@ -469,5 +482,82 @@ void RIG_FT450::set_special(int v)
 {
 	if (v) cmd = "VR1;";
 	else   cmd = "VR0;";
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "Set special", cmd, replystr);
+}
+
+void RIG_FT450::set_vox_onoff()
+{
+	cmd = "VX0;";
+	if (progStatus.vox_onoff) cmd[2] = '1';
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET vox on/off", cmd, replystr);
+}
+
+void RIG_FT450::set_vox_gain()
+{
+	cmd = "VG";
+	cmd.append(to_decimal(progStatus.vox_gain, 3)).append(";");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET vox gain", cmd, replystr);
+}
+
+void RIG_FT450::set_vox_hang()
+{
+	cmd = "VD";
+	cmd.append(to_decimal(progStatus.vox_hang, 4)).append(";");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET vox delay", cmd, replystr);
+}
+
+void RIG_FT450::set_cw_wpm()
+{
+	cmd = "KS";
+	if (progStatus.cw_wpm > 60) progStatus.cw_wpm = 60;
+	if (progStatus.cw_wpm < 4) progStatus.cw_wpm = 4;
+	cmd.append(to_decimal(progStatus.cw_wpm, 3)).append(";");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET cw wpm", cmd, replystr);
+}
+
+
+void RIG_FT450::enable_keyer()
+{
+	cmd = "KR0;";
+	if (progStatus.enable_keyer) cmd[2] = '1';
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET keyer on/off", cmd, replystr);
+}
+
+void RIG_FT450::set_cw_spot()
+{
+	cmd = "CS0;";
+	if (progStatus.spot_onoff) cmd[2] = '1';
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET spot on/off", cmd, replystr);
+}
+
+void RIG_FT450::set_cw_weight()
+{
+	cmd = "EX024";
+	cmd.append(to_decimal(progStatus.cw_weight * 10, 2)).append(";");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET cw weight", cmd, replystr);
+}
+
+void RIG_FT450::set_cw_qsk()
+{
+	cmd = "EX018";
+	cmd.append(to_decimal(progStatus.cw_qsk, 4)).append(";");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET cw qsk", cmd, replystr);
+}
+
+void RIG_FT450::set_cw_spot_tone()
+{
+	int n = (progStatus.cw_spot_tone - 400) / 50 + 1;
+	cmd = "EX020";
+	cmd.append(to_decimal(n, 2)).append(";");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET cw tone", cmd, replystr);
 }

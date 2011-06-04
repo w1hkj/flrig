@@ -58,6 +58,28 @@ public:
 	void set_special(int v);
 
 	int  adjust_bandwidth(int m);
+
+	void set_vox_onoff();
+	void set_vox_gain();
+	void get_vox_gain_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 255; step = 1; }
+	void set_vox_hang();
+	void get_vox_hang_min_max_step(int &min, int &max, int &step) {
+		min = 100; max = 3000; step = 100; }
+
+	void get_cw_wpm_min_max(int &min, int &max) {
+		min = 4; max = 60; }
+
+	void set_cw_weight();
+	void set_cw_wpm();
+	void enable_keyer();
+	void set_cw_qsk();
+	void set_cw_spot();
+	void set_cw_spot_tone();
+	void get_cw_spot_tone_min_max_step(int &min, int &max, int &step) {
+		min = 400; max = 800; step = 100; }
+
+
 };
 
 
