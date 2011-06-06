@@ -227,7 +227,7 @@ int RIG_IC703::get_smeter()
 	if (waitFOR(9, "get smeter")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return fm_bcd(&replystr[p+6], 3) * 100 / 255;
+			return (int)ceil(fm_bcd(&replystr[p+6], 3) * 100 / 255);
 	}
 	return -1;
 }
@@ -241,7 +241,7 @@ int RIG_IC703::get_power_out()
 	if (waitFOR(9, "get power")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return fm_bcd(&replystr[p+6], 3) * 100 / 255;
+			return (int)ceil(fm_bcd(&replystr[p+6], 3) * 100 / 255);
 	}
 	return 0;
 }
@@ -255,7 +255,7 @@ int RIG_IC703::get_swr()
 	if (waitFOR(9, "get swr")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return fm_bcd(&replystr[p+6], 3) * 100 / 255;
+			return (int)ceil(fm_bcd(&replystr[p+6], 3) * 100 / 255);
 	}
 	return -1;
 }
