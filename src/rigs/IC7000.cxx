@@ -473,7 +473,7 @@ int RIG_IC7000::get_volume_control()
 	if (waitFOR(9, "get vol")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return ((int)(fm_bcd(&replystr[p + 6],3) * 100 / 255));
+			return (int)ceil(fm_bcd(&replystr[p + 6],3) * 100 / 255);
 	}
 	return progStatus.volume;
 }
@@ -503,7 +503,7 @@ int RIG_IC7000::get_rf_gain()
 	if (waitFOR(9, "get RF")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return ((int)(fm_bcd(&replystr[p + 6],3) * 100 / 255));
+			return (int)ceil(fm_bcd(&replystr[p + 6],3) * 100 / 255);
 	}
 	return progStatus.rfgain;
 }
@@ -529,7 +529,7 @@ int  RIG_IC7000::get_squelch()
 	if (waitFOR(9, "get sql")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return ((int)(fm_bcd(&replystr[p+6], 3) * 100 / 255));
+			return (int)ceil(fm_bcd(&replystr[p+6], 3) * 100 / 255);
 	}
 	return progStatus.squelch;
 }
@@ -553,7 +553,7 @@ int RIG_IC7000::get_power_control()
 	if (waitFOR(9, "get power")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return ((int)(fm_bcd(&replystr[p + 6],3) * 100 / 255));
+			return (int)ceil(fm_bcd(&replystr[p + 6],3) * 100 / 255);
 	}
 	return progStatus.power_level;
 }
@@ -571,7 +571,7 @@ int RIG_IC7000::get_smeter()
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			mtr = fm_bcd(&replystr[p+6], 3);
-			mtr = (int)(mtr /2.55);
+			mtr = (int)ceil(mtr /2.55);
 			if (mtr > 100) mtr = 100;
 		}
 	}
@@ -591,7 +591,7 @@ int RIG_IC7000::get_power_out()
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			mtr = fm_bcd(&replystr[p+6], 3);
-			mtr = (int)(mtr /2.55);
+			mtr = (int)ceil(mtr /2.55);
 			if (mtr > 100) mtr = 100;
 		}
 	}
@@ -611,7 +611,7 @@ int RIG_IC7000::get_alc()
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			mtr = fm_bcd(&replystr[p+6], 3);
-			mtr = (int)(mtr /2.55);
+			mtr = (int)ceil(mtr /2.55);
 			if (mtr > 100) mtr = 100;
 		}
 	}
@@ -629,7 +629,7 @@ int RIG_IC7000::get_mic_gain()
 	if (waitFOR(9, "get mic")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return ((int)(fm_bcd(&replystr[p+6],3) / 2.55));
+			return (int)ceil(fm_bcd(&replystr[p+6],3) / 2.55);
 	}
 	return 0;
 }
@@ -693,7 +693,7 @@ bool RIG_IC7000::get_notch(int &val)
 		if (waitFOR(9, "notch val")) {
 			size_t p = replystr.rfind(resp);
 			if (p != string::npos)
-				val = (int)(3000.0*(fm_bcd(&replystr[p + 6],3)) / 256.0);
+				val = (int)(3000.0*ceil(fm_bcd(&replystr[p + 6],3) / 255.0));
 		}
 	}
 	return on;
@@ -777,7 +777,7 @@ int RIG_IC7000::get_noise_reduction_val()
 	if (waitFOR(9, "get NR val")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return ((int)(fm_bcd(&replystr[p+6],3) / 2.55));
+			return (int)ceil(fm_bcd(&replystr[p+6],3) / 2.55);
 	}
 	return 0;
 }

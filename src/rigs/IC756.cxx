@@ -141,7 +141,7 @@ int RIG_IC756PRO::get_smeter()
 	if (waitFOR(9, "get smeter")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return fm_bcd(&replystr[p+6], 3) / 2.55;
+			return (int)ceil(fm_bcd(&replystr[p+6], 3) / 2.55);
 	}
 	return 0;
 }

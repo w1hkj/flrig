@@ -167,7 +167,7 @@ int RIG_IC756PRO2::get_smeter()
 	if (waitFOR(9, "get smeter")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return fm_bcd(&replystr[p+6], 3) / 2.55;
+			return (int)ceil(fm_bcd(&replystr[p+6], 3) / 2.55);
 	}
 	return 0;
 }
@@ -288,7 +288,7 @@ int RIG_IC756PRO2::get_noise_reduction_val()
 	if (waitFOR(9, "get NR val")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return ((int)(fm_bcd(&replystr[p+6],3) / 2.55));
+			return (int)ceil(fm_bcd(&replystr[p+6],3) / 2.55);
 	}
 	return 0;
 }
@@ -569,7 +569,7 @@ int RIG_IC756PRO2::get_swr()
 	if (waitFOR(9, "get swr")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-		return (int)(fm_bcd(&replystr[p + 6],3) / 2.55 );
+		return (int)ceil(fm_bcd(&replystr[p + 6],3) / 2.55 );
 	}
 	return -1;
 }
@@ -585,7 +585,7 @@ int RIG_IC756PRO2::get_alc()
 	if (waitFOR(9, "get alc")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-		return (int)(fm_bcd(&replystr[p + 6],3) / 2.55 );
+		return (int)ceil(fm_bcd(&replystr[p + 6],3) / 2.55 );
 	}
 	return -1;
 }
@@ -602,7 +602,7 @@ int RIG_IC756PRO2::get_power_out()
 	if (waitFOR(9, "get power")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-		return (int)(fm_bcd(&replystr[p + 6],3) / 2.55 );
+		return (int)ceil(fm_bcd(&replystr[p + 6],3) / 2.55 );
 	}
 	return -1;
 }
@@ -732,7 +732,7 @@ bool RIG_IC756PRO2::get_notch(int &val)
 		if (waitFOR(9, "get notch val")) {
 			size_t p = replystr.rfind(resp);
 			if (p != string::npos)
-				val = 20*(fm_bcd(&replystr[p + 6],3) - 128);
+				val = 20*ceil(fm_bcd(&replystr[p + 6],3) - 128);
 		}
 	}
 	return on;
