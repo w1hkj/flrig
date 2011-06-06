@@ -2046,7 +2046,8 @@ void initRig()
 		transceiverA.freq = selrig->get_vfoA();
 		transceiverA.imode = selrig->get_modeA();
 		transceiverA.iBW = selrig->get_bwA();
-		selrig->selectB();
+		if (!selrig->can_change_alt_vfo)
+			selrig->selectB();
 		if (selrig->has_get_info)
 			selrig->get_info();
 		transceiverB.freq = selrig->get_vfoB();

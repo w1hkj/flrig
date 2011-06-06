@@ -13,7 +13,7 @@
 #include "debug.h"
 #include "support.h"
 
-#define WVALS_LIMIT 100
+#define WVALS_LIMIT -1
 
 static const char FT950name_[] = "FT-950";
 
@@ -183,22 +183,16 @@ bool RIG_FT950::twovfos()
 
 void RIG_FT950::selectA()
 {
-	cmd = "VS0;FT2;";
+	cmd = "FR0;FT2;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select A", cmd, replystr);
-//	cmd = "FT2;";
-//	sendCommand(cmd);
-//	showresp(WARN, ASC,"xmt on A", cmd, replystr);
 }
 
 void RIG_FT950::selectB()
 {
-	cmd = "VS1;FT3;";
+	cmd = "FR4;FT3;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select B", cmd, replystr);
-//	cmd = "FT3;";
-//	sendCommand(cmd);
-//	showresp(WARN, ASC,"xmt on B", cmd, replystr);
 }
 
 void RIG_FT950::A2B()
@@ -218,14 +212,14 @@ void RIG_FT950::set_split(bool val)
 	split = val;
 	if (val) {
 		useB = false;
-		cmd = "VS0;";
+		cmd = "FR0;";
 		sendCommand(cmd);
 		showresp(WARN, ASC, "Rx on A", cmd, replystr);
 		cmd = "FT3;";
 		sendCommand(cmd);
 		showresp(WARN, ASC, "Tx on B", cmd, replystr);
 	} else {
-		cmd = "VS0;";
+		cmd = "FR0;";
 		sendCommand(cmd);
 		showresp(WARN, ASC, "Rx on A", cmd, replystr);
 		cmd = "FT2;";
@@ -490,8 +484,8 @@ int RIG_FT950::get_modeA()
 {
 	cmd = rsp = "MD0";
 	cmd += ';';
-	waitN(5, 100, "get mode A", ASC);
-
+//	waitN(5, 100, "get mode A", ASC);
+replystr = "MD03";
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return modeA;
 	if (p + 3 >= replystr.length()) return modeA;
@@ -539,6 +533,8 @@ void RIG_FT950::set_bwA(int val)
 {
 	int bw_indx = bw_vals_[val];
 	bwA = val;
+	return;
+
 	if (modeA == 3 || modeA == 4 || modeA == 10 || modeA == 12) {
 		return;
 	}
@@ -559,7 +555,6 @@ void RIG_FT950::set_bwA(int val)
 
 int RIG_FT950::get_bwA()
 {
-	int i = 0;
 	if (modeA == 3 || modeA == 4 || modeA == 10 || modeA == 12) {
 		bwA = 0;
 		return bwA;	
@@ -571,13 +566,18 @@ int RIG_FT950::get_bwA()
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return bwA;
 	if (p + 5 >= replystr.length()) return bwA;
-	
-	replystr[p+5] = 0;
-	int bw_indx = atoi(&replystr[p+3]);
-	for (i = 0; bw_vals_[i] < WVALS_LIMIT; i++)
-		if (bw_vals_[i] == bw_indx) break;
 
-	if (bw_vals_[i]  < WVALS_LIMIT) bwA = i;
+	replystr[p+5] = 0;
+	int bw_idx = fm_decimal(&replystr[p+3],2);
+	const int *idx = bw_vals_;
+	int i = 0;
+	while (*idx != WVALS_LIMIT) {
+		if (*idx == bw_idx) break;
+		idx++;
+		i++;
+	}
+	if (*idx == WVALS_LIMIT) i--;
+	bwA = i;
 	return bwA;
 }
 
@@ -585,6 +585,8 @@ void RIG_FT950::set_bwB(int val)
 {
 	int bw_indx = bw_vals_[val];
 	bwB = val;
+	return;
+
 	if (modeB == 3 || modeB == 4 || modeB == 10 || modeB == 12) {
 		return;
 	}
@@ -605,10 +607,6 @@ void RIG_FT950::set_bwB(int val)
 
 int RIG_FT950::get_bwB()
 {
-LOG_WARN("%s","get bw B bypassed");
-	return bwB;
-
-	int i = 0;
 	if (modeB == 3 || modeB == 4 || modeB == 10 || modeB == 12) {
 		bwB = 0;
 		return bwB;
@@ -622,11 +620,16 @@ LOG_WARN("%s","get bw B bypassed");
 	if (p + 5 >= replystr.length()) return bwB;
 	
 	replystr[p+5] = 0;
-	int bw_indx = atoi(&replystr[p+3]);
-	for (i = 0; bw_vals_[i] < WVALS_LIMIT; i++)
-		if (bw_vals_[i] == bw_indx) break;
-
-	if (bw_vals_[i]  < WVALS_LIMIT) bwB = i;
+	int bw_idx = fm_decimal(&replystr[p+3],2);
+	const int *idx = bw_vals_;
+	int i = 0;
+	while (*idx != WVALS_LIMIT) {
+		if (*idx == bw_idx) break;
+		idx++;
+		i++;
+	}
+	if (*idx == WVALS_LIMIT) i--;
+	bwB = i;
 	return bwB;
 }
 
