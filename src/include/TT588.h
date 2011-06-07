@@ -33,6 +33,11 @@ public:
 	void set_bwA(int val);
 	int  get_bwA();
 
+	void set_modeB(int val);
+	int  get_modeB();
+	void set_bwB(int val);
+	int  get_bwB();
+
 	bool twovfos() {return true;}
 
 	int  get_smeter();
@@ -64,16 +69,16 @@ public:
 //	int  get_swr();
 	int  get_power_out();
 
-	int  get_power_control(void);
-	void set_power_control(double val);
-	void get_pc_min_max_step(double &min, double &max, double &step) {
-		min = 0; max = 100; step = 1; }
+//	int  get_power_control(void);
+//	void set_power_control(double val);
+//	void get_pc_min_max_step(double &min, double &max, double &step) {
+//		min = 0; max = 100; step = 1; }
 
 	void set_PTT_control(int val);
 
 //	void tune_rig();
-	void set_preamp(int val);
-	int  get_preamp();
+//	void set_preamp(int val);
+//	int  get_preamp();
 //	void set_notch(bool on, int val);
 //	bool get_notch(int &val);
 //	void get_notch_min_max_step(int &min, int &max, int &step);
@@ -84,6 +89,7 @@ public:
 	void shutdown();
 
 	int  adjust_bandwidth(int m);
+	int  def_bandwidth(int m);
 
 };
 
