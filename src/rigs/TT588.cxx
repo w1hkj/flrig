@@ -34,22 +34,10 @@ static const char TT588mode_type[] = { 'U', 'U', 'L', 'U', 'U', 'L', 'L' };
 
 // filter # is 37 - index
 static const char *TT588_widths[] = {
-"200",   "250",  "300",  "350",  "400",  "450",  "500", "600",  "700",  "800", "900",  "1000", 
-"1200", "1400", "1600", "1800", "2000", 
-"2200", "2400", "2500", "2600", "2800", "3000", 
-"3200", "3400", "3600", "3800", "4000", 
-"4500", "5000", "5500", "6000", "6500", "7000", "7500", "8000", 
-"9000", "12000", NULL};
-
-static const int TT588_numeric_widths[] = {
-200,   250,  300,  350,  400,  450,  500,
-600,  700,  800,  900,  1000, 
-1200, 1400, 1600, 1800, 2000, 2200, 2400, 
-2500, 2600, 
-2800, 3000, 3200, 3400, 3600, 3800, 4000,
-4500, 5000, 5500, 6000, 6500, 7000, 7500, 8000,
-9000, 12000, NULL};
-
+"14000", "9000", "8000", "7500", "7000", "6500", "6000", "5500", "5000", "4500",
+"4000", "3800", "2600", "3400", "3200", "3000", "2800", "2600", "2500", "2400",
+"2200", "2000", "1800", "1600", "1400", "1200", "1000", "900", "800", "700",
+"600", "500", "450", "400", "350", "300", "250", "200", NULL};
 
 static char TT588setFREQA[]		= "*Annnn\r";
 static char TT588setFREQB[]		= "*Bnnnn\r";
@@ -63,8 +51,8 @@ static char TT588setSPLIT[]		= "*Nn\n";
 static char TT588setPBT[]		= "*Pxx\r";
 static char TT588setVOL[]		= "*Un\r";
 static char TT588setBW[]		= "*Wx\r";
-static char TT588setPOWER[]		= "*C1Xn\r";
-static char TT588setPREAMP[]	= "*C1Zn\r";
+//static char TT588setPOWER[]		= "*C1Xn\r";
+//static char TT588setPREAMP[]	= "*C1Zn\r";
 
 static char TT588getFREQA[]		= "?A\r";
 static char TT588getFREQB[]		= "?B\r";
@@ -79,10 +67,10 @@ static char TT588getPBT[]		= "?P\r";
 static char TT588getSMETER[]	= "?S\r";
 static char TT588getVOL[]		= "?U\r";
 static char TT588getBW[]		= "?W\r";
-static char TT588getPOWER[]		= "?C1X\r";
-static char TT588getPREAMP[]	= "?C1Z\r";
+//static char TT588getPOWER[]		= "?C1X\r";
+//static char TT588getPREAMP[]	= "?C1Z\r";
 
-static char TT588getFWDPWR[]	= "?F\r";
+//static char TT588getFWDPWR[]	= "?F\r";
 
 //static char TT588getREFPWR[]	= "?R\r";
 
@@ -108,7 +96,7 @@ RIG_TT588::RIG_TT588() {
 	serloop_timing = 200;
 
 	def_mode = modeB = modeA = A.imode = B.iBW = 1;
-	def_bw = bwB = bwA = A.iBW = B.iBW = 25;
+	def_bw = bwB = bwA = A.iBW = B.iBW = 15;
 	def_freq = freqB = freqA = A.freq = B.freq = 14070000;
 	max_power = 100;
 	pbt = 0;
@@ -119,8 +107,10 @@ RIG_TT588::RIG_TT588() {
 	nb_ = 0;
 	an_ = 0;
 
+	has_preamp_control =
 	has_bpf_center =
-	has_micgain_control =
+	has_power_control = // must be in REMOTE mode
+	has_micgain_control = // must be in REMOTE mode
 	has_tune_control =
 	has_noise_control =
 	has_swr_control = 
@@ -131,8 +121,6 @@ RIG_TT588::RIG_TT588() {
 //	has_auto_notch =
 //	has_notch_control = 
 
-	has_preamp_control =
-	has_power_control =
 	has_split =
 	has_smeter =
 	has_power_out =
@@ -230,9 +218,20 @@ void RIG_TT588::set_modeA(int val)
 {
 	modeA = val;
 	cmd = TT588setMODE;
-	cmd[2] = cmd[3] = TT588mode_chr[val];
+	cmd[2] = TT588mode_chr[modeA];
+	cmd[3] = TT588mode_chr[modeB];
 	sendCommand(cmd);
 	showresp(WARN, HEX, "set mode A", cmd, replystr);
+}
+
+void RIG_TT588::set_modeB(int val)
+{
+	modeB = val;
+	cmd = TT588setMODE;
+	cmd[2] = TT588mode_chr[modeA];
+	cmd[3] = TT588mode_chr[modeB];
+	sendCommand(cmd);
+	showresp(WARN, HEX, "set mode B", cmd, replystr);
 }
 
 int RIG_TT588::get_modeA()
@@ -246,6 +245,17 @@ int RIG_TT588::get_modeA()
 	return modeA;
 }
 
+int RIG_TT588::get_modeB()
+{
+	cmd = TT588getMODE;
+	int ret = waitN(4, 100, "get mode A");
+	if (ret < 4) return modeB;
+	size_t p = replystr.rfind("M");
+	if (p == string::npos) return modeB;
+	modeB = replystr[p + 1] - '0';
+	return modeB;
+}
+
 int RIG_TT588::get_modetype(int n)
 {
 	return TT588mode_type[n];
@@ -255,29 +265,54 @@ void RIG_TT588::set_bwA(int val)
 {
 	bwA = val;
 	cmd = TT588setBW;
-	cmd[2] = 37 - val;
+	cmd[2] = val;
 	sendCommand(cmd);
-	showresp(WARN, HEX, "set bw A", cmd, replystr);
+	showresp(WARN, HEX, "set BW A", cmd, replystr);
+}
+
+void RIG_TT588::set_bwB(int val)
+{
+	bwB = val;
+	cmd = TT588setBW;
+	cmd[2] = val;
+	sendCommand(cmd);
+	showresp(WARN, HEX, "set BW B", cmd, replystr);
 }
 
 int RIG_TT588::get_bwA()
 {
 	cmd = TT588getBW;
-	int ret = waitN(3, 100, "get bw A");
+	int ret = waitN(3, 100, "get BW A");
 	if (ret < 3) return bwA;
 	size_t p = replystr.rfind("W");
 	if (p == string::npos) return bwA;
-	bwA = 37 - (unsigned char)replystr[p + 1];
+	bwA = (int)(replystr[p + 1] & 0x7F);
 	return bwA;
+}
+
+int RIG_TT588::get_bwB()
+{
+	cmd = TT588getBW;
+	int ret = waitN(3, 100, "get BW B");
+	if (ret < 3) return bwB;
+	size_t p = replystr.rfind("W");
+	if (p == string::npos) return bwB;
+	bwB = (int)(replystr[p + 1] & 0x7F);
+	return bwB;
 }
 
 int  RIG_TT588::adjust_bandwidth(int m)
 {
-	if (m == 0) return 31;
-	if (m == 1 || m == 2) return 22;
-	if (m == 3 || m == 5) return 7;
-	if (m == 4 || m == 6) return 22;
-	return 22;
+	if (m == 0) return 6;
+	if (m == 1 || m == 2) return 15;
+	if (m == 3 || m == 5 || m == 6) return 30;
+	if (m == 4) return 6;
+	return 15;
+}
+
+int  RIG_TT588::def_bandwidth(int m)
+{
+	return adjust_bandwidth(m);
 }
 
 void RIG_TT588::set_if_shift(int val)
@@ -422,13 +457,13 @@ void RIG_TT588::set_PTT_control(int val)
 
 int RIG_TT588::get_power_out()
 {
-	cmd = TT588getFWDPWR;
-	int ret = waitN(6, 100, "get pout");
-	if (ret <  6) return 0;
-	size_t p = replystr.rfind("F");
+	cmd = "?C1X\r";//TT588getFWDPWR;
+	int ret = waitN(7, 100, "get pout");
+	if (ret <  7) return 0;
+	size_t p = replystr.rfind("C1X");
 	if (p == string::npos) return 0;
-	fwdpwr = replystr[p + 1] & 0x7F;
-	refpwr = replystr[p + 2];
+	fwdpwr = replystr[p + 4] & 0x7F;
+	refpwr = replystr[p + 5] & 0x7F;
 	fwdv = sqrtf(fwdpwr);
 	refv = sqrtf(refpwr);
 	return fwdpwr;
@@ -532,14 +567,14 @@ bool RIG_TT588::get_split()
 	return false;
 }
 
-
+/*
 int  RIG_TT588::get_power_control(void)
 {
 	cmd = TT588getPOWER;
 	int ret = waitN(7, 100, "get pc");
 	if (ret == 7) {
 		int pc = replystr[3] & 0x7F;
-		return (int)(pc / 1.27);
+		return (int)ceil(pc / 1.27);
 	}
 	return 0;
 }
@@ -568,3 +603,4 @@ void RIG_TT588::set_preamp(int val)
 	sendCommand(cmd);
 	showresp(WARN, HEX, "set preamp", cmd, replystr);
 }
+*/
