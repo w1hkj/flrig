@@ -595,7 +595,7 @@ Fl_Group *genericCW=(Fl_Group *)0;
 Fl_Light_Button *btnSpot=(Fl_Light_Button *)0;
 
 static void cb_btnSpot(Fl_Light_Button* o, void*) {
-  progStatus.cw_spot=o->value();
+  progStatus.spot_onoff=o->value();
 cb_cw_spot();
 }
 

@@ -304,7 +304,7 @@ public:
 	virtual void get_cw_qsk_min_max_step(int &min, int &max, int &step) {
 		min = 15; max = 30; step = 5; } // default for FT950
 	virtual void set_cw_vol() {}
-	virtual void set_cw_spot() {}
+	virtual bool set_cw_spot() {return false;}
 	virtual void set_cw_spot_tone() {}
 	virtual void get_cw_spot_tone_min_max_step(int &min, int &max, int &step) {
 		min = 300; max = 1050; step = 50; } // default for FT950

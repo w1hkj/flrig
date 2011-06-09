@@ -1154,7 +1154,7 @@ void RIG_TT550::set_cw_vol()
 	sendCommand(cmd, 0);
 }
 
-void RIG_TT550::set_cw_spot()
+bool RIG_TT550::set_cw_spot()
 {
 	int val = progStatus.tt550_cw_spot;
 	cmd = TT550setCWSPOTLVL;
@@ -1162,6 +1162,7 @@ void RIG_TT550::set_cw_spot()
 	if (!progStatus.tt550_spot_onoff) cmd[1] = 0;
 	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
 	sendCommand(cmd, 0);
+	return true;
 }
 
 void RIG_TT550::set_spot_onoff()
