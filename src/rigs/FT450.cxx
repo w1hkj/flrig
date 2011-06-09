@@ -101,9 +101,11 @@ void RIG_FT450::initialize()
 
 long RIG_FT450::get_vfoA ()
 {
-	cmd = "FA;";
-	sendCommand(cmd);
-	size_t p = replystr.rfind("FA");
+	cmd = rsp = "FA";
+	cmd += ';';
+	waitN(11, 100, "get vfo A", ASC);
+
+	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqA;
 	int f = 0;
 	for (size_t n = 2; n < 10; n++)
@@ -120,14 +122,17 @@ void RIG_FT450::set_vfoA (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET vfo A", cmd, replystr);
 }
 
 long RIG_FT450::get_vfoB ()
 {
-	cmd = "FB;";
-	sendCommand(cmd);
-	size_t p = replystr.rfind("FB");
+	cmd = rsp = "FB";
+	cmd += ';';
+	waitN(11, 100, "get vfo B", ASC);
+
+	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqB;
 	int f = 0;
 	for (size_t n = 2; n < 10; n++)
@@ -144,31 +149,36 @@ void RIG_FT450::set_vfoB (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET vfo B", cmd, replystr);
 }
 
 void RIG_FT450::set_split(bool on)
 {
 	if (on) cmd = "FT1;";
 	else cmd = "FT0;";
-	sendCommand(cmd, 0);
-	LOG_INFO("cmd: %s\nreply: %s", cmd.c_str(), replystr.c_str());
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET split", cmd, replystr);
 }
 
 bool RIG_FT450::get_split()
 {
-	cmd = "FT;";
-	sendCommand(cmd);
-	size_t p = replystr.rfind("FT");
+	cmd = rsp = "FT";
+	cmd += ';';
+	waitN(4, 100, "get split", ASC);
+
+	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return false;
 	return replystr[p+2] == '1' ? true : false;
 }
 
 int RIG_FT450::get_smeter()
 {
-	cmd = "SM0;";
-	sendCommand(cmd);
-	size_t p = replystr.rfind("SM");
+	cmd = rsp = "SM0";
+	cmd += ';';
+	waitN(7, 100, "get smeter", ASC);
+
+	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	replystr[p+6] = 0;
 	int mtr = atoi(&replystr[p+3]);
@@ -187,9 +197,11 @@ int RIG_FT450::get_smeter()
 
 int RIG_FT450::get_swr()
 {
-	cmd = "RM6;";
-	sendCommand(cmd);
-	size_t p = replystr.rfind("RM");
+	cmd = rsp = "RM6";
+	cmd += ';';
+	waitN(7, 100, "get swr", ASC);
+
+	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	replystr[p+6] = 0;
 	int mtr = atoi(&replystr[p+3]);
@@ -199,9 +211,11 @@ int RIG_FT450::get_swr()
 
 int RIG_FT450::get_power_out()
 {
-	cmd = "RM5;";
-	sendCommand(cmd);
-	size_t p = replystr.rfind("RM");
+	cmd = rsp = "RM5";
+	sendCommand(cmd.append(";"));
+	waitN(7, 100, "get pout", ASC);
+
+	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	replystr[p+6] = 0;
 	double mtr = (double)(atoi(&replystr[p+3]));
@@ -211,43 +225,17 @@ int RIG_FT450::get_power_out()
 
 int RIG_FT450::get_power_control()
 {
-	cmd = "PC;";
-	sendCommand(cmd);
-	size_t p = replystr.rfind("PC");
+	cmd = rsp = "PC";
+	cmd += ';';
+	waitN(6, 100, "get power", ASC);
+
+	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	replystr[p+5] = 0;
 	int mtr = atoi(&replystr[p+2]);
 	return mtr;
 }
 
-// Volume control return 0 ... 100
-int RIG_FT450::get_volume_control()
-{
-	cmd = "AG0;";
-	sendCommand(cmd);
-	size_t p = replystr.rfind("AG");
-	if (p == string::npos) return 0;
-	cmd[p+6] = 0;
-	return atoi(&replystr[p+3]);
-}
-
-void RIG_FT450::set_volume_control(int val) 
-{
-	int ivol = val;
-	cmd = "AG0000;";
-	for (int i = 5; i > 2; i--) {
-		cmd[i] += ivol % 10;
-		ivol /= 10;
-	}
-	sendCommand(cmd, 0);
-}
-
-void RIG_FT450::get_vol_min_max_step(int &min, int &max, int &step)
-{
-	min = 0; max = 255; step = 1;
-}
-
-// Transceiver power level
 void RIG_FT450::set_power_control(double val)
 {
 	int ival = (int)val;
@@ -256,49 +244,94 @@ void RIG_FT450::set_power_control(double val)
 		cmd[i] += ival % 10;
 		ival /= 10;
 	}
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET power", cmd, replystr);
+}
+
+// Volume control return 0 ... 100
+int RIG_FT450::get_volume_control()
+{
+	cmd = rsp = "AG0";
+	cmd += ';';
+	waitN(7, 100, "get vol", ASC);
+
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return progStatus.volume;
+	if (p + 6 >= replystr.length()) return progStatus.volume;
+	int val = atoi(&replystr[p+3]) * 100 / 250;
+	if (val > 100) val = 100;
+	return val;
+}
+
+void RIG_FT450::set_volume_control(int val) 
+{
+	int ivol = (int)(val * 250 / 100);
+	cmd = "AG0000;";
+	for (int i = 5; i > 2; i--) {
+		cmd[i] += ivol % 10;
+		ivol /= 10;
+	}
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET vol", cmd, replystr);
+}
+
+void RIG_FT450::get_vol_min_max_step(int &min, int &max, int &step)
+{
+	min = 0; max = 255; step = 1;
 }
 
 // Tranceiver PTT on/off
 void RIG_FT450::set_PTT_control(int val)
 {
-	if (val) sendCommand("TX1;", 0);
-	else	 sendCommand("TX0;", 0);
+	cmd = val ? "TX1;" : "TX0;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET PTT", cmd, replystr);
 }
 
 void RIG_FT450::tune_rig()
 {
-	sendCommand("AC002;", 0);
+	cmd = "AC002;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "tune rig", cmd, replystr);
 }
 
 void RIG_FT450::set_attenuator(int val)
 {
-	if (val) sendCommand("RA01;", 0);
-	else	 sendCommand("RA00;", 0);
+	if (val) cmd = "RA01;";
+	else	 cmd = "RA00;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "get att", cmd, replystr);
 }
 
 int RIG_FT450::get_attenuator()
 {
-	sendCommand("RA0;");
-	size_t p = replystr.rfind("RA");
+	cmd = rsp = "RA0";
+	cmd += ';';
+	waitN(5, 100, "get att", ASC);
+
+	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	return (replystr[p+3] == '1' ? 1 : 0);
 }
 
 void RIG_FT450::set_preamp(int val)
 {
-	if (val) sendCommand("PA00;", 0);
-	else	 sendCommand("PA01;", 0);
+	if (val) cmd = "PA00;";
+	else	 cmd = "PA01;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set preamp", cmd, replystr);
 }
 
 int RIG_FT450::get_preamp()
 {
-	sendCommand("PA0;");
-	size_t p = replystr.rfind("PA");
+	cmd = rsp = "PA0";
+	cmd += ';';
+	waitN(5, 100, "get pre", ASC);
+
+	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	return (replystr[p+3] == '1' ? 0 : 1);
 }
-
 
 void RIG_FT450::set_modeA(int val)
 {
@@ -306,15 +339,27 @@ void RIG_FT450::set_modeA(int val)
 	cmd = "MD0";
 	cmd += mode_chr[val];
 	cmd += ';';
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET mode A", cmd, replystr);
+	if (val == 2 || val == 6) return;
+	if (progStatus.spot_onoff) {
+		progStatus.spot_onoff = false;
+		set_spot_onoff();
+		cmd = "CS0;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "SET spot off", cmd, replystr);
+		btnSpot->value(0);
+	}
 }
 
 int RIG_FT450::get_modeA()
 {
-	sendCommand("MD0;");
-	size_t p = replystr.rfind("MD");
+	cmd = rsp = "MD0";
+	cmd += ';';
+	waitN(5, 100, "get mode A", ASC);
+
+	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return modeA;
-	
 	int md = replystr[p+3];
 	if (md <= '9') md = md - '1';
 	else md = 9 + md - 'B';
@@ -331,19 +376,85 @@ void RIG_FT450::set_bwA(int val)
 		case 2 : cmd = "SH031;"; break;
 		default: cmd = "SH031;";
 	}
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET bwA", cmd, replystr);
 }
 
 int RIG_FT450::get_bwA()
 {
-	sendCommand("SH0;");
-	size_t p = replystr.rfind("SH");
+	cmd = rsp = "SH0";
+	cmd += ';';
+	waitN(6, 100, "get bw A", ASC);
+
+	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return bwA;
 	string bws = replystr.substr(p+3,2);
 	if (bws == "00") bwA = 0;
 	else if (bws == "16") bwA = 1;
 	else if (bws == "31") bwA = 2;
 	return bwA;
+}
+
+void RIG_FT450::set_modeB(int val)
+{
+	modeB = val;
+	cmd = "MD0";
+	cmd += mode_chr[val];
+	cmd += ';';
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET mode B", cmd, replystr);
+	if (val == 2 || val == 6) return;
+	if (progStatus.spot_onoff) {
+		progStatus.spot_onoff = false;
+		set_spot_onoff();
+		cmd = "CS0;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "SET spot off", cmd, replystr);
+		btnSpot->value(0);
+	}
+}
+
+int RIG_FT450::get_modeB()
+{
+	cmd = rsp = "MD0";
+	cmd += ';';
+	waitN(5, 100, "get mode B", ASC);
+
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return modeB;
+	int md = replystr[p+3];
+	if (md <= '9') md = md - '1';
+	else md = 9 + md - 'B';
+	modeB = md;
+	return modeB;
+}
+
+void RIG_FT450::set_bwB(int val)
+{
+	bwB = val;
+	switch (val) {
+		case 0 : cmd = "SH000;"; break;
+		case 1 : cmd = "SH016;"; break;
+		case 2 : cmd = "SH031;"; break;
+		default: cmd = "SH031;";
+	}
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET bwB", cmd, replystr);
+}
+
+int RIG_FT450::get_bwB()
+{
+	cmd = rsp = "SH0";
+	cmd += ';';
+	waitN(6, 100, "get bw B", ASC);
+
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return bwB;
+	string bws = replystr.substr(p+3,2);
+	if (bws == "00") bwB = 0;
+	else if (bws == "16") bwB = 1;
+	else if (bws == "31") bwB = 2;
+	return bwB;
 }
 
 int RIG_FT450::get_modetype(int n)
@@ -360,23 +471,22 @@ void RIG_FT450::set_if_shift(int val)
 		cmd[3+i] += val % 10;
 		val /= 10;
 	}
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET ifshift", cmd, replystr);
 }
 
 bool RIG_FT450::get_if_shift(int &val)
 {
-	static int oldval = 0;
-	sendCommand("IS0;");
-	size_t p = replystr.rfind("IS");
-	if (p == string::npos) return false;
-	replystr[p+8] = 0;
-	val = atoi(&replystr[p+3]);
-	if (val != 0 || oldval != val) {
-		oldval = val;
-		return true;
-	}
-	oldval = val;
-	return false;
+	cmd = rsp = "IS0";
+	cmd += ';';
+	waitN(9, 100, "get if shift", ASC);
+
+	size_t p = replystr.rfind(rsp);
+	val = progStatus.shift_val;
+	if (p == string::npos) return progStatus.shift;
+	val = atoi(&replystr[p+4]);
+	if (replystr[p+3] == '-') val = -val;
+	return (val != 0);
 }
 
 void RIG_FT450::get_if_min_max_step(int &min, int &max, int &step)
@@ -390,46 +500,44 @@ void RIG_FT450::set_notch(bool on, int val)
 {
 	cmd = "BP00000;";
 	if (on == false) {
-		sendCommand(cmd, 0);
+		sendCommand(cmd);
+		showresp(WARN, ASC, "SET notch", cmd, replystr);
 		notch_on = false;
 		return;
 	}
-	if (!notch_on) {
-		cmd[6] = '1'; // notch ON
-		sendCommand(cmd, 0);
-		cmd[6] = '0';
-		notch_on = true;
-	}
+	notch_on = true;
 	cmd[3] = '1'; // manual NOTCH position
-// set notch value offset by 200, ie: 001 -> 400
-	val = (-val / 9) + 200;
+	val /= 10;
 	if (val < 1) val = 1;
-	if (val > 400) val = 400;
+	if (val > 300) val = 300;
 	for (int i = 3; i > 0; i--) {
 		cmd[3 + i] += val % 10;
 		val /=10;
 	}
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET notch", cmd, replystr);
 }
 
 bool  RIG_FT450::get_notch(int &val)
 {
 	bool ison = false;
-	cmd = "BP00;";
-	sendCommand(cmd);
-	size_t p = replystr.rfind("BP");
+	cmd = rsp = "BP00";
+	cmd += ';';
+	waitN(8, 100, "get notch", ASC);
+
+	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return ison;
-	if (replystr[p+6] == '1') {
+
+	if (replystr[p+6] == '1') { // manual notch enabled
 		ison = true;
-		cmd = "BP01;";
-		sendCommand(cmd);
-		p = replystr.rfind("BP");
-		if (p != string::npos) {
-			replystr[p+7] = 0;
-			val = atoi(&replystr[p+4]);
-			val -= 200;
-			val *= -9;
-		}
+		val = progStatus.notch_val;
+		cmd = rsp = "BP01";
+		cmd += ';';
+		waitN(8, 100, "get notch val", ASC);
+		p = replystr.rfind(rsp);
+		if (p == string::npos) return ison;
+		val = atoi(&replystr[p+4]);
+		val *= 10;
 	}
 	return ison;
 }
@@ -447,7 +555,8 @@ void RIG_FT450::set_noise(bool b)
 		cmd = "NB01;";
 	else
 		cmd = "NB00;";
-	sendCommand(cmd, 0);
+	sendCommand (cmd);
+	showresp(WARN, ASC, "SET NB", cmd, replystr);
 }
 
 // val 0 .. 100
@@ -459,13 +568,17 @@ void RIG_FT450::set_mic_gain(int val)
 		cmd[1+i] += val % 10;
 		val /= 10;
 	}
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET mic", cmd, replystr);
 }
 
 int RIG_FT450::get_mic_gain()
 {
-	sendCommand("MG;");
-	size_t p = replystr.rfind("MG");
+	cmd = rsp = "MG";
+	cmd += ';';
+	waitN(6, 100, "get mic", ASC);
+
+	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	replystr[p+5] = 0;
 	return atoi(&replystr[p+2]);;
@@ -529,12 +642,16 @@ void RIG_FT450::enable_keyer()
 	showresp(WARN, ASC, "SET keyer on/off", cmd, replystr);
 }
 
-void RIG_FT450::set_cw_spot()
+bool RIG_FT450::set_cw_spot()
 {
-	cmd = "CS0;";
-	if (progStatus.spot_onoff) cmd[2] = '1';
-	sendCommand(cmd);
-	showresp(WARN, ASC, "SET spot on/off", cmd, replystr);
+	if (vfo.imode == 2 || vfo.imode == 6) {
+		cmd = "CS0;";
+		if (progStatus.spot_onoff) cmd[2] = '1';
+		sendCommand(cmd);
+		showresp(WARN, ASC, "SET spot on/off", cmd, replystr);
+		return true;
+	} else
+		return false;
 }
 
 void RIG_FT450::set_cw_weight()

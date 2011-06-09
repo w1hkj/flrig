@@ -25,6 +25,11 @@ public:
 	void set_bwA(int val);
 	int  get_bwA();
 
+	void set_modeB(int val);
+	int  get_modeB();
+	void set_bwB(int val);
+	int  get_bwB();
+
 	bool twovfos() {return true;}
 	bool can_split() {return true;}
 	void set_split(bool);
@@ -34,6 +39,8 @@ public:
 	int  get_swr();
 	int  get_power_out();
 	int  get_power_control();
+	void get_pc_min_max_step(double &min, double &max, double &step) {
+		min = 5; max = 100; step = 1; }
 	void set_volume_control(int val);
 	int  get_volume_control();
 	void get_vol_min_max_step(int &min, int &max, int &step);
@@ -74,7 +81,7 @@ public:
 	void set_cw_wpm();
 	void enable_keyer();
 	void set_cw_qsk();
-	void set_cw_spot();
+	bool set_cw_spot();
 	void set_cw_spot_tone();
 	void get_cw_spot_tone_min_max_step(int &min, int &max, int &step) {
 		min = 400; max = 800; step = 100; }

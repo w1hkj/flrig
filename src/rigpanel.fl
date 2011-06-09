@@ -635,7 +635,7 @@ cb_tt550_setXmtBW();}
       } {
         Fl_Light_Button btnSpot {
           label Spot
-          callback {progStatus.cw_spot=o->value();
+          callback {progStatus.spot_onoff=o->value();
 cb_cw_spot();}
           tooltip {Spot tone on/off} xywh {5 358 54 22}
           code0 {o->value(progStatus.cw_spot);}

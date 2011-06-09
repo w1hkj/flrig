@@ -115,8 +115,6 @@ RIG_FT950::RIG_FT950() {
 
 void RIG_FT950::initialize()
 {
-	get_preamp();
-	get_attenuator();
 }
 
 
@@ -296,14 +294,12 @@ void RIG_FT950::set_power_control(double val)
 {
 	int ival = (int)val;
 	cmd = "PC000;";
-	if (val < 5) val = 5;
-	if (val > 100) val = 100;
 	for (int i = 4; i > 1; i--) {
 		cmd[i] += ival % 10;
 		ival /= 10;
 	}
 	sendCommand(cmd);
-	showresp(WARN, ASC, "get power", cmd, replystr);
+	showresp(WARN, ASC, "SET power", cmd, replystr);
 }
 
 // Volume control return 0 ... 100
@@ -437,24 +433,24 @@ int RIG_FT950::get_preamp()
 
 int RIG_FT950::adjust_bandwidth(int val)
 {
+	int bw = 0;
 	if (val == 2 || val == 5 || val == 6 || val == 8) {
 		bandwidths_ = FT950_widths_CW;
 		bw_vals_ = FT950_wvals_CW;
-		bwA = get_bwA();
+		bw = FT950_def_bw[val];
 	} else if (val == 3 || val == 4 || val == 10 || val == 12) {
 		if (val == 3) bandwidths_ = FT950_widths_FMwide;
 		else if (val ==  4) bandwidths_ = FT950_widths_AMwide;
 		else if (val == 10) bandwidths_ = FT950_widths_FMnar;
 		else if (val == 12) bandwidths_ = FT950_widths_AMnar;
 		bw_vals_ = FT950_wvals_AMFM;
-		bwA = 0;
+		bw = FT950_def_bw[val];
 	} else {
 		bandwidths_ = FT950_widths_SSB;
 		bw_vals_ = FT950_wvals_SSB;
-		bwA = get_bwA();
+		bw = FT950_def_bw[val];
 	}
-	bwB = bwA;
-	return bwA;
+	return bw;
 }
 
 int RIG_FT950::def_bandwidth(int val)
@@ -478,23 +474,32 @@ void RIG_FT950::set_modeA(int val)
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET mode A", cmd, replystr);
 	adjust_bandwidth(modeA);
+	if (val == 2 || val == 6) return;
+	if (progStatus.spot_onoff) {
+		progStatus.spot_onoff = false;
+		set_spot_onoff();
+		cmd = "CS0;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "SET spot off", cmd, replystr);
+		btnSpot->value(0);
+	}
 }
 
 int RIG_FT950::get_modeA()
 {
 	cmd = rsp = "MD0";
 	cmd += ';';
-//	waitN(5, 100, "get mode A", ASC);
-replystr = "MD03";
+	waitN(5, 100, "get mode A", ASC);
+
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return modeA;
-	if (p + 3 >= replystr.length()) return modeA;
-
-	int md = replystr[p+3];
-	if (md <= '9') md = md - '1';
-	else md = 9 + md - 'A';
-	modeA = md;
-
+	if (p != string::npos) {
+		if (p + 3 < replystr.length()) {
+			int md = replystr[p+3];
+			if (md <= '9') md = md - '1';
+			else md = 9 + md - 'A';
+			modeA = md;
+		}
+	}
 	adjust_bandwidth(modeA);
 	return modeA;
 }
@@ -508,6 +513,15 @@ void RIG_FT950::set_modeB(int val)
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET mode B", cmd, replystr);
 	adjust_bandwidth(modeA);
+	if (val == 2 || val == 6) return;
+	if (progStatus.spot_onoff) {
+		progStatus.spot_onoff = false;
+		set_spot_onoff();
+		cmd = "CS0;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "SET spot off", cmd, replystr);
+		btnSpot->value(0);
+	}
 }
 
 int RIG_FT950::get_modeB()
@@ -517,14 +531,14 @@ int RIG_FT950::get_modeB()
 	waitN(5, 100, "get mode B", ASC);
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return modeB;
-	if (p + 3 >= replystr.length()) return modeB;
-
-	int md = replystr[p+3];
-	if (md <= '9') md = md - '1';
-	else md = 9 + md - 'A';
-	modeB = md;
-
+	if (p != string::npos) {
+		if (p + 3 < replystr.length()) {
+			int md = replystr[p+3];
+			if (md <= '9') md = md - '1';
+			else md = 9 + md - 'A';
+			modeB = md;
+		}
+	}
 	adjust_bandwidth(modeB);
 	return modeB;
 }
@@ -533,7 +547,6 @@ void RIG_FT950::set_bwA(int val)
 {
 	int bw_indx = bw_vals_[val];
 	bwA = val;
-	return;
 
 	if (modeA == 3 || modeA == 4 || modeA == 10 || modeA == 12) {
 		return;
@@ -542,10 +555,8 @@ void RIG_FT950::set_bwA(int val)
 		((modeA == 2 || modeA == 5 || modeA == 6 || modeA == 7 || modeA == 8 || modeA == 11) &&
 		val < 4) ) cmd = "NA01;";
 	else cmd = "NA00;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "SET NA", cmd, replystr);
 
-	cmd = "SH0";
+	cmd.append("SH0");
 	cmd += '0' + bw_indx / 10;
 	cmd += '0' + bw_indx % 10;
 	cmd += ';';
@@ -585,7 +596,6 @@ void RIG_FT950::set_bwB(int val)
 {
 	int bw_indx = bw_vals_[val];
 	bwB = val;
-	return;
 
 	if (modeB == 3 || modeB == 4 || modeB == 10 || modeB == 12) {
 		return;
@@ -594,10 +604,8 @@ void RIG_FT950::set_bwB(int val)
 		((modeB == 2 || modeB == 5 || modeB == 6 || modeB == 7 || modeB == 8 || modeB == 11) &&
 		val < 4) ) cmd = "NA1;";
 	else cmd = "NA0;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "SET NA", cmd, replystr);
 
-	cmd = "SH0";
+	cmd.append("SH0");
 	cmd += '0' + bw_indx / 10;
 	cmd += '0' + bw_indx % 10;
 	cmd += ';';
@@ -683,12 +691,7 @@ void RIG_FT950::set_notch(bool on, int val)
 		notch_on = false;
 		return;
 	}
-	if (!notch_on) {
-		cmd[6] = '1'; // notch ON
-		sendCommand(cmd, 0);
-		cmd[6] = '0';
-		notch_on = true;
-	}
+	notch_on = true;
 	cmd[3] = '1'; // manual NOTCH position
 	val /= 10;
 	if (val < 1) val = 1;
@@ -865,7 +868,7 @@ void RIG_FT950::set_vox_onoff()
 	cmd = "VX0;";
 	if (progStatus.vox_onoff) cmd[2] = '1';
 	sendCommand(cmd);
-	showresp(WARN, ASC, "SET vox on/off", cmd, replystr);
+	showresp(WARN, ASC, "SET vox", cmd, replystr);
 }
 
 void RIG_FT950::set_vox_gain()
@@ -919,12 +922,16 @@ void RIG_FT950::enable_keyer()
 	showresp(WARN, ASC, "SET keyer on/off", cmd, replystr);
 }
 
-void RIG_FT950::set_cw_spot()
+bool RIG_FT950::set_cw_spot()
 {
-	cmd = "CS0;";
-	if (progStatus.spot_onoff) cmd[2] = '1';
-	sendCommand(cmd);
-	showresp(WARN, ASC, "SET spot on/off", cmd, replystr);
+	if (vfo.imode == 2 || vfo.imode == 6) {
+		cmd = "CS0;";
+		if (progStatus.spot_onoff) cmd[2] = '1';
+		sendCommand(cmd);
+		showresp(WARN, ASC, "SET spot on/off", cmd, replystr);
+		return true;
+	} else
+		return false;
 }
 
 void RIG_FT950::set_cw_weight()

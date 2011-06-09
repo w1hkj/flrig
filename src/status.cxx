@@ -370,6 +370,8 @@ void status::saveLastState()
 		spref.set("cw_weight", cw_weight);
 		spref.set("cw_vol", cw_vol);
 		spref.set("cw_spot", cw_spot);
+		spref.set("spot_onoff", cw_spot);
+		spref.set("cw_spot_tone", cw_spot);
 		spref.set("cw_qsk", cw_qsk);
 		spref.set("enable_keyer", enable_keyer);
 		spref.set("vox_onoff", vox_onoff);
@@ -598,9 +600,10 @@ bool status::loadXcvrState(const char *xcvr)
 			spref.get("cw_weight", cw_weight, cw_weight);
 			spref.get("cw_vol", cw_vol, cw_vol);
 			spref.get("cw_spot", cw_spot, cw_spot);
+			if (spref.get("spot_onoff", i, i)) spot_onoff = i;
+			spref.get("cw_spot_tone", cw_spot_tone, cw_spot_tone);
 			spref.get("cw_qsk", cw_qsk, cw_qsk);
 			if (spref.get("enable_keyer", i, i)) enable_keyer = i;
-
 			if (spref.get("vox_onoff", i, i)) vox_onoff = i;
 			spref.get("vox_gain", vox_gain, vox_gain);
 			spref.get("vox_anti", vox_anti, vox_anti);

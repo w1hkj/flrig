@@ -142,7 +142,7 @@ public:
 	void enable_keyer();
 	void set_cw_qsk();
 	void set_cw_vol();
-	void set_cw_spot();
+	bool set_cw_spot();
 	void set_spot_onoff();
 	void set_vox_onoff();
 	void set_vox_gain();

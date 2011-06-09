@@ -2037,38 +2037,33 @@ void initRig()
 		opBW->activate();
 		opBW->index(vfoA.iBW);
 
-	} else {
+	} else { // !TT550
 		if (progStatus.CIV > 0)
 			selrig->adjustCIV(progStatus.CIV);
-		selrig->selectA();
-		if (selrig->has_get_info)
-			selrig->get_info();
-		transceiverA.freq = selrig->get_vfoA();
-		transceiverA.imode = selrig->get_modeA();
-		transceiverA.iBW = selrig->get_bwA();
-		if (!selrig->can_change_alt_vfo)
+		if (progStatus.use_rig_data) {
+			selrig->selectA();
+			if (selrig->has_get_info)
+				selrig->get_info();
+			transceiverA.freq = selrig->get_vfoA();
+			transceiverA.imode = selrig->get_modeA();
+			transceiverA.iBW = selrig->get_bwA();
 			selrig->selectB();
-		if (selrig->has_get_info)
-			selrig->get_info();
-		transceiverB.freq = selrig->get_vfoB();
-		transceiverB.imode = selrig->get_modeB();
-		transceiverB.iBW = selrig->get_bwB();
-	}
+			if (selrig->has_get_info)
+				selrig->get_info();
+			transceiverB.freq = selrig->get_vfoB();
+			transceiverB.imode = selrig->get_modeB();
+			transceiverB.iBW = selrig->get_bwB();
+			progStatus.freq_A = transceiverA.freq;
+			progStatus.imode_A = transceiverA.imode;
+			progStatus.iBW_A = transceiverA.iBW;
+			progStatus.freq_B = transceiverB.freq;
+			progStatus.imode_B = transceiverB.imode;
+			progStatus.iBW_B = transceiverB.iBW;
+			mnuKeepData->set();
+			if (selrig->restore_mbw) selrig->last_bw = transceiverA.iBW;
+		} else
+			mnuKeepData->clear();
 
-	if (selrig->restore_mbw) selrig->last_bw = transceiverA.iBW;
-
-	if (progStatus.use_rig_data) {
-		progStatus.freq_A = transceiverA.freq;
-		progStatus.imode_A = transceiverA.imode;
-		progStatus.iBW_A = transceiverA.iBW;
-		progStatus.freq_B = transceiverB.freq;
-		progStatus.imode_B = transceiverB.imode;
-		progStatus.iBW_B = transceiverB.iBW;
-		mnuKeepData->set();
-	} else
-		mnuKeepData->clear();
-
-	if (rig_nbr != TT550) {
 		rigmodes_.clear();
 		opMODE->clear();
 		if (selrig->has_mode_control) {
@@ -2103,7 +2098,7 @@ void initRig()
 			opBW->index(0);
 			opBW->deactivate();
 		}
-	}
+	} // !TT550
 
 	if (selrig->has_special)
 		btnSpecial->show();
@@ -2345,9 +2340,10 @@ void initRig()
 	set_power_controlImage(selrig->max_power);
 
 	if (selrig->has_attenuator_control) {
-		btnAttenuator->label("Att");
-		progStatus.attenuator = selrig->get_attenuator();
-		btnAttenuator->value(progStatus.attenuator);
+		if (progStatus.use_rig_data)
+			progStatus.attenuator = selrig->get_attenuator();
+		else
+			selrig->set_attenuator(progStatus.attenuator);
 		btnAttenuator->show();
 	} else {
 		btnAttenuator->hide();
@@ -2360,9 +2356,10 @@ void initRig()
 		btnPreamp->show();
 	} else {
 		if (selrig->has_preamp_control) {
-			btnPreamp->label("Pre");
-			progStatus.preamp = selrig->get_preamp();
-			btnPreamp->value(progStatus.preamp);
+			if (progStatus.use_rig_data)
+				progStatus.preamp = selrig->get_preamp();
+			else
+				selrig->set_preamp(progStatus.preamp);
 			btnPreamp->show();
 		} else {
 			btnPreamp->hide();
@@ -2402,7 +2399,10 @@ void initRig()
 			btnAutoNotch->label("Tuner");
 		else
 			btnAutoNotch->label("AN");
-		progStatus.auto_notch = selrig->get_auto_notch();
+		if (progStatus.use_rig_data)
+			progStatus.auto_notch = selrig->get_auto_notch();
+		else
+			selrig->set_auto_notch(progStatus.auto_notch);
 		btnAutoNotch->value(progStatus.auto_notch);
 		btnAutoNotch->show();
 	} else {
@@ -2706,9 +2706,11 @@ void cb_cw_vol()
 
 void cb_cw_spot()
 {
+	int ret;
 	pthread_mutex_lock(&mutex_serial);
-		selrig->set_cw_spot();
+		ret = selrig->set_cw_spot();
 	pthread_mutex_unlock(&mutex_serial);
+	if (!ret) btnSpot->value(0);
 }
 
 void cb_cw_spot_tone()

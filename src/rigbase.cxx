@@ -293,7 +293,7 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 	if (!RigSerial.IsOpen()) {
 		replystr = returned;
 		snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
-		showresp(WARN, HEX, sztemp, tosend, returned);
+		showresp(WARN, pr, sztemp, tosend, returned);
 		return 0;
 	}
 
@@ -306,7 +306,7 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 		if (returned.length() >= n) {
 			replystr = returned;
 			waited = cnt * 10 * repeat + delay;
-			snprintf(sztemp, sizeof(sztemp), "%s OK %d ms, ", sz, waited);
+			snprintf(sztemp, sizeof(sztemp), "%s OK %d ms", sz, waited);
 			showresp(WARN, pr, sztemp, cmd, returned);
 			return replystr.length();
 		}
@@ -316,7 +316,7 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 
 	replystr = returned;
 	waited = cnt * 10 * repeat + delay;
-	snprintf(sztemp, sizeof(sztemp), "%s failed %d ms, ", sz, waited);
+	snprintf(sztemp, sizeof(sztemp), "%s failed %d ms", sz, waited);
 	showresp(WARN, pr, sztemp, cmd, returned);
 	return 0;
 }
