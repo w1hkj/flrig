@@ -36,11 +36,12 @@ RIG_K2::RIG_K2() {
 	comm_rtscts = false;
 	comm_rtsplus = false;
 	comm_dtrplus = false;
-	comm_catptt = false;
+	comm_catptt = true;
 	comm_rtsptt = false;
-	comm_dtrptt = true;
-	modeA = 1;
-	bwA = 0;
+	comm_dtrptt = false;
+	modeB = modeA = 1;
+	bwB = bwA = 0;
+	freqB = freqA = 14070000;
 
 	has_attenuator_control = true;
 	has_preamp_control = true;
@@ -54,6 +55,8 @@ RIG_K2::RIG_K2() {
 	has_ptt_control = true;
 	has_tune_control = true;
 	has_swr_control = false;
+
+	hipower = false;
 }
 
 int  RIG_K2::adjust_bandwidth(int m)
@@ -66,17 +69,49 @@ void RIG_K2::initialize()
 //enable extended command mode	
 	sendCommand("K22;", 0);
 //ensure K2 is in VFO A
-	sendCommand("FR0;",0);
-// get power output setting
     get_power_control();
 }
 
+void RIG_K2::selectA()
+{
+	cmd = "FR0;FT0";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "select A", cmd, replystr);
+}
+
+void RIG_K2::selectB()
+{
+	cmd = "FR1;FT1";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "select B", cmd, replystr);
+}
+
+bool RIG_K2::can_split()
+{
+	return true;
+}
+
+void RIG_K2::set_split(bool val)
+{
+	if (val) {
+		cmd = "FR0;FT1;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set split ON", cmd, replystr);
+	} else {
+		cmd = "FR0;FT0;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set split OFF", cmd, replystr);
+	}
+}
+
+
 long RIG_K2::get_vfoA ()
 {
-	cmd = "FA;";
-	int ret = sendCommand(cmd);
+	rsp = cmd = "FA";
+	cmd += ';';
+	int ret = waitN(14, 100, "get vfo A", ASC);
 	if (ret < 14) return freqA;
-	size_t p = replystr.rfind("FA");
+	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqA;
 	long f = 0;
 	for (size_t n = 2; n < 13; n++)
@@ -93,58 +128,79 @@ void RIG_K2::set_vfoA (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET vfo A", cmd, replystr);
 }
 
-void RIG_K2::set_attenuator(int val)
+long RIG_K2::get_vfoB()
 {
-	if (val) sendCommand("RA01;", 0);
-	else	 sendCommand("RA00;", 0);
+	rsp = cmd = "FB";
+	cmd += ';';
+	int ret = waitN(14, 100, "get vfo B", ASC);
+	if (ret < 14) return freqB;
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return freqB;
+	long f = 0;
+	for (size_t n = 2; n < 13; n++)
+		f = f*10 + replystr[p + n] - '0';
+	freqB = f;
+	return freqB;
 }
 
-int RIG_K2::get_attenuator()
+void RIG_K2::set_vfoB(long freq)
 {
-	cmd = "RA;";
-	int ret = sendCommand(cmd);
-	if (ret < 5) return 0;
-	size_t p = replystr.rfind("RA");
-	if (p == string::npos) return 0;
-	return (replystr[p + 3] == '1' ? 1 : 0);
-}
-
-void RIG_K2::set_preamp(int val)
-{
-	if (val) sendCommand("PA1;", 0);
-	else	 sendCommand("PA0;", 0);
-}
-
-int RIG_K2::get_preamp()
-{
-	cmd = "PA;";
-	int ret = sendCommand(cmd);
-	if (ret < 4) return 0;
-	size_t p = replystr.rfind("PA");
-	if (p == string::npos) return 0;
-	return (replystr[p + 2] == '1' ? 1 : 0);
+	freqB = freq;
+	cmd = "FB00000000000;";
+	for (int i = 12; i > 1; i--) {
+		cmd[i] += freq % 10;
+		freq /= 10;
+	}
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET vfo B", cmd, replystr);
 }
 
 void RIG_K2::set_modeA(int val)
 {
+	modeA = val;
 	val++;
 	cmd = "MD0;";
 	cmd[2] += val;
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET mode A", cmd, replystr);
 }
 
 int RIG_K2::get_modeA()
 {
-	int ret = sendCommand("MD;");
+	rsp = cmd = "MD";
+	cmd += ';';
+	int ret = waitN(4, 100, "get mode A", ASC);
 	if (ret < 4) return 0;
-	size_t p = replystr.rfind("MD");
+	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
-	int md = replystr[p + 2] - '0';
-	md--;
-	return md;
+	modeA = replystr[p + 2] - '1';
+	return modeA;
+}
+
+void RIG_K2::set_modeB(int val)
+{
+	modeB = val;
+	val++;
+	cmd = "MD0;";
+	cmd[2] += val;
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET mode B", cmd, replystr);
+}
+
+int  RIG_K2::get_modeB()
+{
+	rsp = cmd = "MD";
+	cmd += ';';
+	int ret = waitN(4, 100, "get mode B", ASC);
+	if (ret < 4) return 0;
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return 0;
+	modeB = replystr[p + 2] - '1';
+	return modeB;
 }
 
 int RIG_K2::get_modetype(int n)
@@ -154,37 +210,70 @@ int RIG_K2::get_modetype(int n)
 
 void RIG_K2::set_bwA(int val)
 {
+	bwA = val;
 	switch (val) {
-		case 0 : sendCommand("FW00001;",0); break;
-		case 1 : sendCommand("FW00002;",0); break;
-		case 2 : sendCommand("FW00003;",0); break;
-		case 3 : sendCommand("FW00004;",0); break;
-		default: sendCommand("FW00001;",0);
+		case 0 : cmd = "FW00001;"; break;
+		case 1 : cmd = "FW00002;"; break;
+		case 2 : cmd = "FW00003;"; break;
+		case 3 : cmd = "FW00004;"; break;
+		default: cmd = "FW00001;";
 	}
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set bwA", cmd, replystr);
 }
 
 int RIG_K2::get_bwA()
 {
-	int ret = sendCommand("FW;");
+	rsp = cmd = "FW";
+	cmd += ';';
+	int ret = waitN(9, 100, "get bw A", ASC);
 	if (ret < 9) return 0;
-	size_t p = replystr.rfind("FW");
+	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
-	int bw = replystr[p + 6] - '0';
-	bw --;
-	return bw;
+	bwA = replystr[p + 6] - '1';
+	return bwA;
+}
+
+void RIG_K2::set_bwB(int val)
+{
+	bwB = val;
+	switch (val) {
+		case 0 : cmd = "FW00001;"; break;
+		case 1 : cmd = "FW00002;"; break;
+		case 2 : cmd = "FW00003;"; break;
+		case 3 : cmd = "FW00004;"; break;
+		default: cmd = "FW00001;";
+	}
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set bwA", cmd, replystr);
+}
+
+int  RIG_K2::get_bwB()
+{
+	rsp = cmd = "FW";
+	cmd += ';';
+	int ret = waitN(9, 100, "get bw B", ASC);
+	if (ret < 9) return 0;
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return 0;
+	bwB = replystr[p + 6] - '1';
+	return bwB;
 }
 
 void RIG_K2::tune_rig()
 {
-	sendCommand("SW20;",0);
+	cmd = "SW20;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "tune", cmd, replystr);
 }
 
 int RIG_K2::get_smeter()
 {
-	cmd = "BG;";
-	int ret = sendCommand(cmd);
+	rsp = cmd = "BG";
+	cmd += ';';
+	int ret = waitN(5, 100, "get smeter", ASC);
 	if (ret < 5) return 0;
-	size_t p = replystr.rfind("BG");
+	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	int mtr = 10 * (replystr[p + 2] - '0') 
 			+ replystr[p + 3] - '0';   //assemble two chars into 2 digit int
@@ -197,10 +286,11 @@ int RIG_K2::get_smeter()
 
 int RIG_K2::get_power_out()
 {
-	cmd = "BG;";
-	int ret = sendCommand(cmd);
+	rsp = cmd = "BG";
+	cmd += ';';
+	int ret = waitN(5, 100, "get power", ASC);
 	if (ret < 5) return 0;
-	size_t p = replystr.rfind("BG");
+	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	int mtr = 10 * (replystr[p + 2] - '0') 
 			+ replystr[p + 3] - '0';   //assemble two chars into 2 digit int
@@ -213,11 +303,13 @@ int RIG_K2::get_power_out()
 
 int RIG_K2::get_power_control()
 {
-	cmd = "PC;";                        //init the get string
-	int ret = sendCommand(cmd);
+	rsp = cmd = "PC";                        //init the get string
+	cmd += ';';
+	int ret = waitN(7, 100, "get pwr cont", ASC);
 	if (ret < 7) return 0;
-	size_t p = replystr.rfind("PC");
+	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
+	hipower = (replystr[p+5] == 1);
     int mtr = (replystr[p + 4] - '0'   //pwr is the least sig digit
 		+ 10 * (replystr[p + 3] - '0')     //plus ten times the next sig digit
 	    + 100 * (replystr[p + 2] - '0'));   //plus one hundred times the most sig digit
@@ -227,18 +319,68 @@ int RIG_K2::get_power_control()
 void RIG_K2::set_power_control(double val)
 {
     int ival = (int)val;
-	cmd = "PC0001;";                    //init the cmd string, hi pwr range
+	cmd = "PC0000;";                    //init the cmd string
+	if (hipower) cmd[5] = '1';
 	for (int i = 4; i > 1; i--) {       //select the char in the cmd string, least sig digit first
 		cmd[i] += ival % 10;            //parse the digit, add it to ascii '0', assign to char
 		ival /= 10;                     //shift the pwr over
 	}
-	sendCommand(cmd,0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET pwr", cmd, replystr);
+}
+
+void RIG_K2::get_pc_min_max_step(double &min, double &max, double &step)
+{
+	if (hipower) {
+		min = 5; max = 150; step = 1;
+	} else {
+		min = 0; max = 15; step = 1;
+	}
 }
 
 void RIG_K2::set_PTT_control(int val)
 {
-	if (val) sendCommand("TX;",0);
-	else	 sendCommand("RX;",0);
+	if (val) cmd = "TX;";
+	else	 cmd = "RX;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET ptt", cmd, replystr);
 }
 
+void RIG_K2::set_attenuator(int val)
+{
+	if (val) cmd = "RA01;";
+	else	 cmd = "RA00;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET att", cmd, replystr);
+}
+
+int RIG_K2::get_attenuator()
+{
+	rsp = cmd = "RA";
+	cmd += ';';
+	int ret = waitN(5, 100, "get att", ASC);
+	if (ret < 5) return 0;
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return 0;
+	return (replystr[p + 3] == '1' ? 1 : 0);
+}
+
+void RIG_K2::set_preamp(int val)
+{
+	if (val) cmd = "PA1;";
+	else	 cmd = "PA0;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET pre", cmd, replystr);
+}
+
+int RIG_K2::get_preamp()
+{
+	rsp = cmd = "PA";
+	cmd += ';';
+	int ret = waitN(4, 100, "get pre", ASC);
+	if (ret < 4) return 0;
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return 0;
+	return (replystr[p + 2] == '1' ? 1 : 0);
+}
 
