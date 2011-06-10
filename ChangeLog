@@ -1,6 +1,55 @@
-commit f7f8790e2f190101c4fc320f4ac4e4504f5f4f8a
+commit 8e54b1fe73d5187c0e5557524b3efe77c6d3a23c
 Author: David Freese <w1hkj@w1hkj.com>
-Date:   Mon Jun 6 10:24:18 2011 -0500
+Date:   Fri Jun 10 16:07:00 2011 -0500
+
+    Version 1.1.3CY
+    
+      Alpha release
+
+commit 51310a972d98cb04255acce70691ba092e776f39
+Author: David Freese <w1hkj@w1hkj.com>
+Date:   Fri Jun 10 14:34:44 2011 -0500
+
+    K2 A/B
+    
+      * Added vfo A/B select
+      * Added split
+      * Changed all methods to use new event logging
+
+commit 9551b86c93b3e2fdca30aae20a38544289e53144
+Author: Rich Newsom <wa4sxz@cox.net>
+Date:   Fri Jun 10 12:55:58 2011 -0500
+
+    FT857D meters
+    
+      * Added lower 4 bit mask to smeter and power meter queries
+
+commit 7253b0b1b0433cbc0ea683c84793ee72216505a4
+Author: David Freese <w1hkj@w1hkj.com>
+Date:   Thu Jun 9 08:55:51 2011 -0500
+
+    FT450/950
+    
+      * Removed extraneous test statements from various FT950 methods
+      * Reordered startup processing in support.cxx
+      * Corrected CW-SPOT method
+        - added mode dependency for enabling CW-SPOT
+      * Added vfo B methods to FT450
+      * Modified all FT450 methods to use new event logging
+
+commit 0ada8a5b1347fbb30798e520068912835b2bbc75
+Author: David Freese <w1hkj@w1hkj.com>
+Date:   Tue Jun 7 10:50:21 2011 -0500
+
+    TT588 RADIO/REMOTE
+    
+      * Changed bandwidth table to match programmers guide
+      * Removed all CAT commands that required xcvr to be in
+        REMOTE mode.
+
+commit 647f8d1885b349c34d66d66ebc857dd72ebfbf23
+Author: David Freese <w1hkj@w1hkj.com>
+Date:   Mon Jun 6 10:26:31 2011 -0500
 
     Version 1.1.3CX
     
