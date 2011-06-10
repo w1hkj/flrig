@@ -164,28 +164,28 @@ void RIG_FT857D::set_PTT_control(int val)
 
 int  RIG_FT857D::get_power_out(void)
 {
-   init_cmd();
-   cmd[4] = 0xF7;
-   int ret = waitN(1, 100, "get pout", HEX);
-   if (ret == 1) {
-       int fwdpwr = replybuff[0];
-       fwdpwr = fwdpwr * 100 / 15;
-       return fwdpwr;
-   }
-   return 0;
+	init_cmd();
+	cmd[4] = 0xF7;
+	int ret = waitN(1, 100, "get pout", HEX);
+	if (ret == 1) {
+		int fwdpwr = replybuff[0] & 0x0F;
+		fwdpwr = fwdpwr * 100 / 15;
+		return fwdpwr;
+	}
+	return 0;
 }
 
 int  RIG_FT857D::get_smeter(void)
 {
-   init_cmd();
-   cmd[4] = 0xE7;
-   int ret = waitN(1, 100, "get smeter", HEX);
-   if (ret == 1) {
-       int sval = replybuff[0];
-       sval = (sval-1) * 100 / 15;
-       return sval;
-   }
-   return 0;
+	init_cmd();
+	cmd[4] = 0xE7;
+	int ret = waitN(1, 100, "get smeter", HEX);
+	if (ret == 1) {
+		int sval = replybuff[0] & 0x0F;
+		sval = (sval-1) * 100 / 15;
+		return sval;
+	}
+	return 0;
 }
 
 void RIG_FT857D::selectA()
