@@ -309,7 +309,7 @@ int RIG_K2::get_power_control()
 	if (ret < 7) return 0;
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
-	hipower = (replystr[p+5] == 1);
+	hipower = (replystr[p+5] == '1');
     int mtr = (replystr[p + 4] - '0'   //pwr is the least sig digit
 		+ 10 * (replystr[p + 3] - '0')     //plus ten times the next sig digit
 	    + 100 * (replystr[p + 2] - '0'));   //plus one hundred times the most sig digit
