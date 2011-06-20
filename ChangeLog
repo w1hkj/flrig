@@ -1,5 +1,8 @@
-2011-06-19  David Freese  <w1hkj@w1hkj.com>
+2011-06-20  David Freese  <w1hkj@w1hkj.com>
 
+	bc50322: FT450 Notch
+	42db85e: FT950 Manual Notch
+	dc28189: TS480 HX/SAT
 	e77ff21: K3 power control query
 	aaedcf8: Copyright
 	51310a9: K2 A/B
