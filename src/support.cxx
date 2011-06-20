@@ -1177,7 +1177,7 @@ void cbbtnNotch()
 	if (btnNotch->value() == 0) {
 		selrig->set_notch(false, 0);
 	} else {
-		selrig->set_notch(true, sldrNOTCH->value());
+		selrig->set_notch(true, (int)floor(sldrNOTCH->value()));
 	}
 	pthread_mutex_unlock(&mutex_serial);
 	setFocus();
