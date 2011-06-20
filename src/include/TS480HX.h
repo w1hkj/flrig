@@ -54,6 +54,8 @@ public:
 	int  get_attenuator();
 
 	int  adjust_bandwidth(int m);
+	int  def_bandwidth(int m) { return adjust_bandwidth(m);}
+
 	void tune_rig();
 
 };
