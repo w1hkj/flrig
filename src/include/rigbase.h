@@ -48,6 +48,8 @@ public:
 	const char * name_;
 	const char ** modes_;
 	const char ** bandwidths_;
+	const char ** dsp_lo;
+	const char ** dsp_hi;
 	const int  * bw_vals_;
 	int  comm_baudrate;
 	int  stopbits;
@@ -108,6 +110,7 @@ public:
 	bool has_volume_control;
 	bool has_mode_control;
 	bool has_bandwidth_control;
+	bool has_dsp_controls;
 	bool has_micgain_control;
 	bool has_mic_line_control;
 	bool has_notch_control;

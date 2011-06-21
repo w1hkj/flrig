@@ -35,8 +35,11 @@ extern Fl_Button *btn_K3_swapAB;
 extern Fl_Button *btnA2B;
 extern Fl_Light_Button *btnSplit;
 #include "combo.h"
-extern Fl_ComboBox *opMODE;
 extern Fl_ComboBox *opBW;
+extern Fl_Button *btnDSP;
+extern Fl_ComboBox *opDSP_lo;
+extern Fl_ComboBox *opDSP_hi;
+extern Fl_ComboBox *opMODE;
 extern Fl_Button *btn_show_controls;
 extern Fl_Light_Button *btnAttenuator;
 extern Fl_Light_Button *btnPreamp;

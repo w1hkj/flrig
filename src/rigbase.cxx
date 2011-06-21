@@ -8,12 +8,16 @@
 const char *szNORIG = "NONE";
 const char *szNOMODES[] = {"LSB", "USB", NULL};
 const char *szNOBWS[] = {"NONE", NULL};
+const char *szDSPLO[] = {"NONE", NULL};
+const char *szDSPHI[] = {"NONE", NULL};
 
 rigbase::rigbase()
 {
 	name_ = szNORIG;
 	modes_ = szNOMODES;
 	bandwidths_ = szNOBWS;
+	dsp_lo = szDSPLO;
+	dsp_hi = szDSPHI;
 
 	serloop_timing = 200; // msec, 5x / second
 
@@ -31,6 +35,7 @@ rigbase::rigbase()
 	has_volume_control =
 	has_mode_control =
 	has_bandwidth_control =
+	has_dsp_controls =
 	has_micgain_control =
 	has_mic_line_control =
 	has_notch_control =

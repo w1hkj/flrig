@@ -152,12 +152,12 @@ void send_modes() {
 void send_bandwidths()
 {
 //	if (!fldigi_online) return;
-	if (!selrig->bandwidths_) return;
+	if (!selrig->bandwidths_ || selrig->has_dsp_controls) return;
 	XmlRpcValue bandwidths, res;
 	int i = 0;
 	for (const char** bw = selrig->bandwidths_; *bw; bw++, i++) {
 		bandwidths[0][i] = *bw;
-}
+	}
 
 	try {
 		execute(rig_set_bandwidths, bandwidths, res);
@@ -241,7 +241,8 @@ void send_new_mode(int md)
 void send_new_bandwidth(int bw)
 {
 //	if (!fldigi_online || !selrig->bandwidths_) return;
-	if (!selrig->bandwidths_) return;
+	if (!selrig->bandwidths_ || selrig->has_dsp_controls) return;
+
 	try {
 		xmlvfo.iBW = bw;
 		XmlRpcValue bandwidth(selrig->bandwidths_[bw]), res;
@@ -314,7 +315,7 @@ static void check_for_mode_change(const XmlRpcValue& new_mode)
 
 static void check_for_bandwidth_change(const XmlRpcValue& new_bw)
 {
-	if (!selrig->bandwidths_ || vfo.iBW == -1)
+	if (!selrig->bandwidths_ || vfo.iBW == -1 || selrig->has_dsp_controls)
 		return;
 
 	string sbw = new_bw;

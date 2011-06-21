@@ -246,17 +246,35 @@ btnA->value(0);}
       tooltip {Rx-A / Tx-B} xywh {371 62 52 20} down_box THIN_DOWN_BOX labelsize 12
       code0 {o->value(progStatus.split);}
     }
+    Fl_Group opBW {
+      label Bandwidth
+      callback {setBW();} open selected
+      tooltip {Select Transceiver Bandwidth} xywh {212 84 105 18} box FLAT_BOX labelsize 12 align 16
+      code0 {\#include "combo.h"}
+      class Fl_ComboBox
+    } {}
+    Fl_Button btnDSP {
+      label L
+      callback {selectDSP();}
+      xywh {212 84 18 18} hide
+    }
+    Fl_Group opDSP_lo {
+      label {Lo Cut}
+      callback {setDSP();} open
+      tooltip {Lo Cut Freq} xywh {231 84 86 18} box DOWN_BOX color 7 labelsize 12 align 16 hide
+      class Fl_ComboBox
+    } {}
+    Fl_Group opDSP_hi {
+      label {Hi Cut}
+      callback {setDSP();} open
+      tooltip {Hi Cut Freq} xywh {231 84 86 18} box DOWN_BOX color 7 labelsize 12 align 16 hide
+      class Fl_ComboBox
+    } {}
     Fl_Group opMODE {
       label Mode
       callback {setMode();} open
       tooltip {Select transceiver operating mode} xywh {318 84 105 18} box FLAT_BOX labelsize 12 align 16
       code0 {\#include "combo.h"}
-      class Fl_ComboBox
-    } {}
-    Fl_Group opBW {
-      label Bandwidth
-      callback {setBW();} open
-      tooltip {Select Transceiver Bandwidth} xywh {212 84 105 18} box FLAT_BOX labelsize 12 align 16
       class Fl_ComboBox
     } {}
     Fl_Button btn_show_controls {
@@ -294,7 +312,7 @@ btnA->value(0);}
       callback {cbPTT();}
       tooltip {Xmt On/Off} xywh {362 286 60 18} down_box THIN_DOWN_BOX labelsize 12
     }
-    Fl_Group {} {open
+    Fl_Group {} {
       xywh {1 62 210 60} box DOWN_BOX
     } {
       Fl_Group grpMeters {open
@@ -626,11 +644,11 @@ cb_tt550_setXmtBW();}
         } {}
       }
     }
-    Fl_Tabs tabsGeneric {open
+    Fl_Tabs tabsGeneric {
       xywh {1 330 422 70} selection_color 50
     } {
       Fl_Group genericCW {
-        label CW open selected
+        label CW open
         xywh {2 349 420 49} color 50 selection_color 50
       } {
         Fl_Light_Button btnSpot {
