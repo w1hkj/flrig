@@ -79,11 +79,15 @@ int  powerlevel = 0;
 char *print(FREQMODE data)
 {
 	static char str[100];
-	snprintf(str, sizeof(str), "%3s,%10ld,%4s,%5s",
+	snprintf(str, sizeof(str), "%3s,%10ld,%4s,%5s %5s",
 		data.src == XML ? "xml" : "ui",
 		data.freq,
 		selrig->modes_ ? selrig->modes_[data.imode] : "modes n/a",
-		selrig->bandwidths_ ? selrig->bandwidths_[data.iBW] : "bw n/a");
+		(data.iBW > 256 && selrig->has_dsp_controls) ?
+			selrig->dsp_lo[data.iBW && 0x7F] : selrig->bandwidths_ ? selrig->bandwidths_[data.iBW] : "bw n/a",
+		(data.iBW > 256 && selrig->has_dsp_controls) ?
+			selrig->dsp_hi[(data.iBW >> 8) && 0x7F] : "" 
+		);
 	return str;
 }
 
@@ -178,7 +182,33 @@ void read_mode()
 
 void setBWControl(void *)
 {
-	opBW->index(vfo.iBW);
+	if (selrig->has_dsp_controls) {
+		if (vfo.iBW < 256) {
+			opBW->index(vfo.iBW);
+			opDSP_lo->hide();
+			opDSP_hi->hide();
+			btnDSP->hide();
+			opDSP_lo->index(0);
+			opDSP_hi->index(0);
+			opBW->show();
+		} else {
+			opDSP_lo->index(vfo.iBW & 0xFF);
+			opDSP_hi->index((vfo.iBW >> 8) & 0x7F);
+			opBW->index(0);
+			opBW->hide();
+			opDSP_lo->show();
+			opDSP_hi->hide();
+			btnDSP->label("L");
+			btnDSP->redraw_label();
+			btnDSP->show();
+		}
+	} else {
+		opBW->index(vfo.iBW);
+		opDSP_lo->hide();
+		opDSP_hi->hide();
+		btnDSP->hide();
+		opBW->show();
+	}
 }
 
 void read_bandwidth()
@@ -730,25 +760,92 @@ void setBW()
 	setFocus();
 }
 
+void setDSP()
+{
+	FREQMODE fm = vfo;
+	fm.src = UI;
+	fm.iBW = ((opDSP_hi->index() << 8) | 0x8000) | (opDSP_lo->index() & 0xFF) ;
+	if (useB) {
+		pthread_mutex_lock(&mutex_queB);
+		queB.push(fm);
+		pthread_mutex_unlock(&mutex_queB);
+	} else {
+		pthread_mutex_lock(&mutex_queA);
+		queA.push(fm);
+		pthread_mutex_unlock(&mutex_queA);
+	}
+	setFocus();
+}
+
+void selectDSP()
+{
+	if (btnDSP->label()[0] == 'L') {
+		btnDSP->label("U");
+		btnDSP->redraw_label();
+		opDSP_hi->show();
+		opDSP_lo->hide();
+	} else {
+		btnDSP->label("L");
+		btnDSP->redraw_label();
+		opDSP_lo->show();
+		opDSP_hi->hide();
+	}
+}
+
 void updateBandwidthControl(void *d)
 {
 	if (selrig->has_bandwidth_control) {
 		if (selrig->adjust_bandwidth(vfo.imode) != -1) {
-			if (old_bws != selrig->bandwidths_) {
-				old_bws = selrig->bandwidths_;
-				opBW->clear();
-				rigbws_.clear();
-				int i = 0;
-				for (i = 0; selrig->bandwidths_[i] != NULL; i++) {
-					rigbws_.push_back(selrig->bandwidths_[i]);
-					opBW->add(selrig->bandwidths_[i]);
+			opBW->clear();
+			rigbws_.clear();
+			int i = 0;
+			for (i = 0; selrig->bandwidths_[i] != NULL; i++) {
+				rigbws_.push_back(selrig->bandwidths_[i]);
+				opBW->add(selrig->bandwidths_[i]);
+			}
+			i--;
+			if (vfo.iBW > i && vfo.iBW < 256)
+				vfo.iBW = selrig->adjust_bandwidth(vfo.imode);
+
+			if (selrig->has_dsp_controls) {
+				opDSP_lo->clear();
+				opDSP_hi->clear();
+				for (int i = 0; selrig->dsp_lo[i] != NULL; i++)
+					opDSP_lo->add(selrig->dsp_lo[i]);
+				for (int i = 0; selrig->dsp_hi[i] != NULL; i++)
+					opDSP_hi->add(selrig->dsp_hi[i]);
+				if (vfo.iBW > 256) {
+					opDSP_lo->index(vfo.iBW & 0xFF);
+					opDSP_hi->index((vfo.iBW >> 8) & 0x7F);
+					opBW->index(0);
+					opBW->hide();
+					btnDSP->label("L");
+					btnDSP->redraw_label();
+					btnDSP->show();
+					opDSP_lo->show();
+					opDSP_hi->hide();
+				} else {
+					opDSP_lo->index(0);
+					opDSP_hi->index(0);
+					btnDSP->hide();
+					opDSP_lo->hide();
+					opDSP_hi->hide();
+					opBW->show();
 				}
-				i--;
-				if (vfo.iBW > i) vfo.iBW = selrig->adjust_bandwidth(vfo.imode);
 			}
 		}
 	}
-	opBW->index(vfo.iBW);
+	if (vfo.iBW < 256) {
+		opBW->index(vfo.iBW);
+		opBW->show();
+		if (selrig->has_dsp_controls) {
+			opDSP_lo->index(0);
+			opDSP_hi->index(0);
+			btnDSP->hide();
+			opDSP_lo->hide();
+			opDSP_hi->hide();
+		}
+	}
 	useB ? vfoB.iBW = vfo.iBW : vfoA.iBW = vfo.iBW;
 }
 
@@ -2073,7 +2170,8 @@ void initRig()
 			}
 			opMODE->activate();
 			opMODE->index(progStatus.imode_A);
-			updateBandwidthControl();
+//			vfo.imode = progStatus.imode_A;
+//			updateBandwidthControl();
 		} else {
 			opMODE->add(" ");
 			opMODE->index(0);
@@ -2155,6 +2253,38 @@ void initRig()
 		cntBFO->show();
 	} else {
 		cntBFO->hide();
+	}
+
+	if (selrig->has_dsp_controls) {
+		opDSP_lo->clear();
+		opDSP_hi->clear();
+		btnDSP->label("L");
+		btnDSP->redraw_label();
+		for (int i = 0; selrig->dsp_lo[i] != NULL; i++)
+			opDSP_lo->add(selrig->dsp_lo[i]);
+		for (int i = 0; selrig->dsp_hi[i] != NULL; i++)
+			opDSP_hi->add(selrig->dsp_hi[i]);
+		if (vfo.iBW > 256) {
+			opDSP_lo->index(vfo.iBW & 0xFF);
+			opDSP_hi->index((vfo.iBW >> 8) & 0x7F);
+			btnDSP->show();
+			opDSP_lo->show();
+			opDSP_hi->hide();
+			opBW->hide();
+			opBW->index(0);
+		} else {
+			opDSP_lo->index(0);
+			opDSP_hi->index(0);
+			btnDSP->hide();
+			opDSP_lo->hide();
+			opDSP_hi->hide();
+			opBW->show();
+		}
+	} else {
+		btnDSP->hide();
+		opDSP_lo->hide();
+		opDSP_hi->hide();
+		opBW->show();
 	}
 
 	if (selrig->has_volume_control) {
@@ -2466,6 +2596,10 @@ void initRig()
 		selrig->set_vfoA(vfoA.freq);
 		selrig->set_modeA(vfoA.imode);
 		selrig->set_bwA(vfoA.iBW);
+		vfo.imode = progStatus.imode_A;
+		vfo.iBW = vfoA.iBW;
+		vfo.freq = vfoA.freq;
+		updateBandwidthControl();
 
 		useB = false;
 		highlight_vfo((void *)0);

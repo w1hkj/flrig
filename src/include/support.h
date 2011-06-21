@@ -69,6 +69,8 @@ extern void setMicGainControl(void *);
 
 extern void setMode();
 extern void setBW();
+extern void setDSP();
+extern void selectDSP();
 
 extern void addFreq();
 extern void delFreq();

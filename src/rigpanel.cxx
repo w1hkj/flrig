@@ -203,16 +203,34 @@ static void cb_btnSplit(Fl_Light_Button* o, void*) {
   cb_set_split(o->value());
 }
 
-Fl_ComboBox *opMODE=(Fl_ComboBox *)0;
-
-static void cb_opMODE(Fl_ComboBox*, void*) {
-  setMode();
-}
-
 Fl_ComboBox *opBW=(Fl_ComboBox *)0;
 
 static void cb_opBW(Fl_ComboBox*, void*) {
   setBW();
+}
+
+Fl_Button *btnDSP=(Fl_Button *)0;
+
+static void cb_btnDSP(Fl_Button*, void*) {
+  selectDSP();
+}
+
+Fl_ComboBox *opDSP_lo=(Fl_ComboBox *)0;
+
+static void cb_opDSP_lo(Fl_ComboBox*, void*) {
+  setDSP();
+}
+
+Fl_ComboBox *opDSP_hi=(Fl_ComboBox *)0;
+
+static void cb_opDSP_hi(Fl_ComboBox*, void*) {
+  setDSP();
+}
+
+Fl_ComboBox *opMODE=(Fl_ComboBox *)0;
+
+static void cb_opMODE(Fl_ComboBox*, void*) {
+  setMode();
 }
 
 Fl_Button *btn_show_controls=(Fl_Button *)0;
@@ -998,20 +1016,6 @@ Fl_Double_Window* Rig_window() {
       btnSplit->callback((Fl_Callback*)cb_btnSplit);
       o->value(progStatus.split);
     } // Fl_Light_Button* btnSplit
-    { opMODE = new Fl_ComboBox(318, 84, 105, 18, _("Mode"));
-      opMODE->tooltip(_("Select transceiver operating mode"));
-      opMODE->box(FL_FLAT_BOX);
-      opMODE->color((Fl_Color)FL_BACKGROUND_COLOR);
-      opMODE->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
-      opMODE->labeltype(FL_NORMAL_LABEL);
-      opMODE->labelfont(0);
-      opMODE->labelsize(12);
-      opMODE->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
-      opMODE->callback((Fl_Callback*)cb_opMODE);
-      opMODE->align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE);
-      opMODE->when(FL_WHEN_RELEASE);
-      opMODE->end();
-    } // Fl_ComboBox* opMODE
     { opBW = new Fl_ComboBox(212, 84, 105, 18, _("Bandwidth"));
       opBW->tooltip(_("Select Transceiver Bandwidth"));
       opBW->box(FL_FLAT_BOX);
@@ -1026,6 +1030,54 @@ Fl_Double_Window* Rig_window() {
       opBW->when(FL_WHEN_RELEASE);
       opBW->end();
     } // Fl_ComboBox* opBW
+    { btnDSP = new Fl_Button(212, 84, 18, 18, _("L"));
+      btnDSP->callback((Fl_Callback*)cb_btnDSP);
+      btnDSP->hide();
+    } // Fl_Button* btnDSP
+    { opDSP_lo = new Fl_ComboBox(231, 84, 86, 18, _("Lo Cut"));
+      opDSP_lo->tooltip(_("Lo Cut Freq"));
+      opDSP_lo->box(FL_DOWN_BOX);
+      opDSP_lo->color((Fl_Color)FL_BACKGROUND2_COLOR);
+      opDSP_lo->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
+      opDSP_lo->labeltype(FL_NORMAL_LABEL);
+      opDSP_lo->labelfont(0);
+      opDSP_lo->labelsize(12);
+      opDSP_lo->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
+      opDSP_lo->callback((Fl_Callback*)cb_opDSP_lo);
+      opDSP_lo->align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE);
+      opDSP_lo->when(FL_WHEN_RELEASE);
+      opDSP_lo->hide();
+      opDSP_lo->end();
+    } // Fl_ComboBox* opDSP_lo
+    { opDSP_hi = new Fl_ComboBox(231, 84, 86, 18, _("Hi Cut"));
+      opDSP_hi->tooltip(_("Hi Cut Freq"));
+      opDSP_hi->box(FL_DOWN_BOX);
+      opDSP_hi->color((Fl_Color)FL_BACKGROUND2_COLOR);
+      opDSP_hi->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
+      opDSP_hi->labeltype(FL_NORMAL_LABEL);
+      opDSP_hi->labelfont(0);
+      opDSP_hi->labelsize(12);
+      opDSP_hi->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
+      opDSP_hi->callback((Fl_Callback*)cb_opDSP_hi);
+      opDSP_hi->align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE);
+      opDSP_hi->when(FL_WHEN_RELEASE);
+      opDSP_hi->hide();
+      opDSP_hi->end();
+    } // Fl_ComboBox* opDSP_hi
+    { opMODE = new Fl_ComboBox(318, 84, 105, 18, _("Mode"));
+      opMODE->tooltip(_("Select transceiver operating mode"));
+      opMODE->box(FL_FLAT_BOX);
+      opMODE->color((Fl_Color)FL_BACKGROUND_COLOR);
+      opMODE->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
+      opMODE->labeltype(FL_NORMAL_LABEL);
+      opMODE->labelfont(0);
+      opMODE->labelsize(12);
+      opMODE->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
+      opMODE->callback((Fl_Callback*)cb_opMODE);
+      opMODE->align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE);
+      opMODE->when(FL_WHEN_RELEASE);
+      opMODE->end();
+    } // Fl_ComboBox* opMODE
     { btn_show_controls = new Fl_Button(1, 286, 18, 18, _("@-22->"));
       btn_show_controls->tooltip(_("Show/Hide controls"));
       btn_show_controls->callback((Fl_Callback*)cb_btn_show_controls);
