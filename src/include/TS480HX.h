@@ -31,6 +31,7 @@ public:
 	int  get_smeter();
 	int  get_swr();
 	void set_PTT_control(int val);
+	void tune_rig();
 
 	void set_bwA(int val);
 	int  get_bwA();
@@ -54,9 +55,10 @@ public:
 	int  get_attenuator();
 
 	int  adjust_bandwidth(int m);
-	int  def_bandwidth(int m) { return adjust_bandwidth(m);}
+	int  def_bandwidth(int m);
+	int  set_widths(int val);
 
-	void tune_rig();
+	const char **bwtable(int);
 
 };
 
