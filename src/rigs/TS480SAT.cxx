@@ -1,6 +1,6 @@
 /*
  * Kenwood TS480SAT driver
- * originally based on Kenwood TS2000 driver
+ * originally based on Kenwood TS480SAT driver
  *
  * a part of flrig
  *
@@ -19,15 +19,51 @@ static const char *TS480SATmodes_[] = {
 static const char TS480SAT_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '9' };
 static const char TS480SAT_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'U' };
 
-static const char *TS480SAT_widths[] = {
-"50", "100", "250", "500", "1000", "1500", "2400", NULL};
+static const char *TS480SAT_empty[] = { "N/A", NULL };
+
+static const char *TS480SAT_lo[] = {
+ "10",   "50", "100", "200", "300", 
+"400",  "500", "600", "700", "800", 
+"900", "1000",
+NULL };
+
+static const char *TS480SAT_hi[] = {
+"1400", "1600", "1800", "2000", "2200", 
+"2400", "2600", "2800", "3000", "3400", 
+"4000", "5000",
+NULL };
+
+static const char *TS480SAT_AM_lo[] = {
+"10", "100", "200", "500",
+NULL };
+
+static const char *TS480SAT_AM_hi[] = {
+"2500", "3000", "4000", "5000",
+NULL };
+
+static const char *TS480SAT_CWwidths[] = {
+"50", "80", "100", "150", "200", 
+"300", "400", "500", "600", "1000", 
+"2000", NULL};
+
+static const char *TS480SAT_CWbw[] = {
+"FW0050;", "FW0080;", "FW0100;", "FW0150;", "FW0200;", 
+"FW0300;", "FW0400;", "FW0500;", "FW0600;", "FW1000;", 
+"FW2000;" };
+
+static const char *TS480SAT_FSKwidths[] = {
+"250", "500", "1000", "1500", NULL};
+static const char *TS480SAT_FSKbw[] = {
+"FW0250;", "FW0500;", "FW1000;", "FW1500;" };
 
 RIG_TS480SAT::RIG_TS480SAT() {
 // base class values
 	name_ = TS480SATname_;
 	modes_ = TS480SATmodes_;
 	_mode_type = TS480SAT_mode_type;
-	bandwidths_ = TS480SAT_widths;
+	bandwidths_ = TS480SAT_empty;
+	dsp_lo = TS480SAT_lo;
+	dsp_hi = TS480SAT_hi;
 	comm_baudrate = BR4800;
 	stopbits = 2;
 	comm_retries = 2;
@@ -39,11 +75,13 @@ RIG_TS480SAT::RIG_TS480SAT() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	def_freq = freqB = freqA = 14070000;
-	def_mode = modeB = modeA = 1;
-	def_bw = bwB = bwA = 6;
+	B.imode = A.imode = 1;
+	B.iBW = A.iBW = 0x8803;
+	B.freq = A.freq = 14070000;
+
 	can_change_alt_vfo = true;
 
+	has_dsp_controls =
 	has_noise_control =
 	has_micgain_control =
 	has_tune_control =
@@ -65,22 +103,11 @@ RIG_TS480SAT::RIG_TS480SAT() {
 
 void RIG_TS480SAT::initialize()
 {
-	selectA();
-	cmd = "AC000;"; 
-	sendCommand(cmd, 0);
-	MilliSleep(100);
-	readResponse();
-LOG_WARN("%s", replystr.c_str());
-	cmd = "EX04500001;"; // set bandwidth controls for data modes
-	sendCommand(cmd, 0);
-	MilliSleep(100);
-	readResponse();
-LOG_WARN("%s", replystr.c_str());
-	cmd = "SH01"; // set center frequency to 1500
-	sendCommand(cmd, 0);
-	MilliSleep(100);
-	readResponse();
-LOG_WARN("%s", replystr.c_str());
+	cmd = "FR0;"; sendCommand(cmd, 0);
+	cmd = "FT0;"; sendCommand(cmd, 0);
+	cmd = "AC001;"; sendCommand(cmd, 0);
+	get_preamp();
+	get_attenuator();
 }
 
 void RIG_TS480SAT::selectA()
@@ -138,46 +165,42 @@ bool RIG_TS480SAT::get_split()
 long RIG_TS480SAT::get_vfoA ()
 {
 	cmd = "FA;";
-	int ret = sendCommand(cmd);
-	if (ret < 14) return freqA;
+	sendCommand(cmd);
+	showresp(WARN, ASC, "get vfo A", cmd, replystr);
 	size_t p = replystr.rfind("FA");
-	if (p == string::npos) return freqA;
-
-	int f = 0;
-	for (size_t n = 2; n < 13; n++)
-		f = f*10 + replystr[p - n] - '0';
-	freqA = f;
-	return freqA;
+	if (p != string::npos && (p + 12 < replystr.length())) {
+		int f = 0;
+		for (size_t n = 2; n < 13; n++)
+			f = f*10 + replystr[p+n] - '0';
+		A.freq = f;
+	}
+	return A.freq;
 }
 
 void RIG_TS480SAT::set_vfoA (long freq)
 {
-	freqA = freq;
+	A.freq = freq;
 	cmd = "FA00000000000;";
 	for (int i = 12; i > 1; i--) {
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	LOG_WARN("%s", cmd.c_str());
-	sendCommand(cmd, 0);
+	sendCommand(cmd,0);
+	showresp(WARN, ASC, "set vfo A", cmd, replystr);
 }
 
 long RIG_TS480SAT::get_vfoB ()
 {
 	cmd = "FB;";
-	int ret = sendCommand(cmd);
-	if (ret < 14) return B.freq;
+	sendCommand(cmd);
+	showresp(WARN, ASC, "get vfo B", cmd, replystr);
 	size_t p = replystr.rfind("FB");
-	if (p == string::npos) return B.freq;
-
-	long f = 0L;
-	long mul = 1L;
-	for (size_t n = 12; n > 1; n--) {
-		f += (replystr[p - n] - '0') * mul;
-		mul *= 10;
+	if (p != string::npos && (p + 12 < replystr.length())) {
+		int f = 0;
+		for (size_t n = 2; n < 13; n++)
+			f = f*10 + replystr[p+n] - '0';
+		B.freq = f;
 	}
-	B.freq = f;
-
 	return B.freq;
 }
 
@@ -189,8 +212,8 @@ void RIG_TS480SAT::set_vfoB (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	LOG_WARN("%s", cmd.c_str());
-	sendCommand(cmd, 0);
+	sendCommand(cmd,0);
+	showresp(WARN, ASC, "set vfo B", cmd, replystr);
 }
 
 // SM cmd 0 ... 100 (rig values 0 ... 15)
@@ -237,56 +260,97 @@ void RIG_TS480SAT::set_PTT_control(int val)
 	sendCommand(cmd, 0);
 }
 
+int RIG_TS480SAT::set_widths(int val)
+{
+	int bw;
+	if (val == 0 || val == 1 || val == 3) {
+		bandwidths_ = TS480SAT_empty;
+		dsp_lo = TS480SAT_lo;
+		dsp_hi = TS480SAT_hi;
+		bw = 0x8803; // 200 ... 3000 Hz
+	} else if (val == 2 || val == 6) {
+		bandwidths_ = TS480SAT_CWwidths;
+		dsp_lo = TS480SAT_empty;
+		dsp_hi = TS480SAT_empty;
+		bw = 7;
+	} else if (val == 5 || val == 7) {
+		bandwidths_ = TS480SAT_FSKwidths;
+		dsp_lo = TS480SAT_empty;
+		dsp_hi = TS480SAT_empty;
+		bw = 1;
+	} else { // val == 4 ==> AM
+		bandwidths_ = TS480SAT_empty;
+		dsp_lo = TS480SAT_AM_lo;
+		dsp_hi = TS480SAT_AM_hi;
+		bw = 0x8201;
+	}
+	return bw;
+}
+
+const char **RIG_TS480SAT::bwtable(int m)
+{
+	if (m == 0 || m == 1 || m == 3)
+		return TS480SAT_empty;
+	else if (m == 2 || m == 6)
+		return TS480SAT_CWwidths;
+	else if (m == 5 || m == 7)
+		return TS480SAT_FSKwidths;
+//else AM m == 4
+	return TS480SAT_empty;
+}
+
 void RIG_TS480SAT::set_modeA(int val)
 {
-	modeA = val;
+	A.imode = val;
 	cmd = "MD";
 	cmd += TS480SAT_mode_chr[val];
 	cmd += ';';
-	LOG_WARN("%s", cmd.c_str());
-	sendCommand(cmd, 0);
+	sendCommand(cmd,0);
+	showresp(WARN, ASC, "set mode", cmd, replystr);
+	A.iBW = set_widths(val);
 }
 
 int RIG_TS480SAT::get_modeA()
 {
 	cmd = "MD;";
-	int ret = sendCommand(cmd);
-	if (ret < 4) return modeA;
-
+	sendCommand(cmd);
+	showresp(WARN, ASC, "get mode A", cmd, replystr);
 	size_t p = replystr.rfind("MD");
-	if (p == string::npos) return modeA;
-
-	int md = replystr[p - 2];
-	md = md - '1';
-	if (md == 8) md = 7;
-	modeA = md;
-	return modeA;
+	if (p != string::npos && (p + 2 < replystr.length())) {
+		int md = replystr[p+2];
+		md = md - '1';
+		if (md == 8) md = 7;
+		A.imode = md;
+		A.iBW = set_widths(A.imode);
+	}
+	return A.imode;
 }
 
 void RIG_TS480SAT::set_modeB(int val)
 {
-	modeB = val;
+	B.imode = val;
 	cmd = "MD";
 	cmd += TS480SAT_mode_chr[val];
 	cmd += ';';
-	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd, 0);
+	showresp(WARN, ASC, "set mode B", cmd, replystr);
+	B.iBW = set_widths(val);
 }
 
 int RIG_TS480SAT::get_modeB()
 {
 	cmd = "MD;";
-	int ret = sendCommand(cmd);
-	if (ret < 4) return modeB;
-
+	sendCommand(cmd);
+	showresp(WARN, ASC, "get mode B", cmd, replystr);
 	size_t p = replystr.rfind("MD");
-	if (p == string::npos) return modeB;
-
-	int md = replystr[p - 2];
-	md = md - '1';
-	if (md == 8) md = 7;
-	modeA = md;
-	return modeB;
+	if (p != string::npos && (p + 2 < replystr.length())) {
+		int md = replystr[p+2];
+		md = md - '1';
+		if (md == 8) md = 7;
+		B.imode = md;
+		B.iBW = set_widths(B.imode);
+	}
+	return B.imode;
 }
 
 int RIG_TS480SAT::get_modetype(int n)
@@ -296,56 +360,172 @@ int RIG_TS480SAT::get_modetype(int n)
 
 void RIG_TS480SAT::set_bwA(int val)
 {
-	bwA = val;
-	cmd = "SL00;";
-	cmd[3] = '0' + val;
-	LOG_WARN("%s", cmd.c_str());
-	sendCommand(cmd, 0);
+	if (A.imode == 0 || A.imode == 1 || A.imode == 3 || A.imode == 4) {
+		if (val < 256) return;
+		A.iBW = val;
+		cmd = "FW0001;"; // wide filter 
+		showresp(WARN, ASC, "wide filter", cmd, replystr);
+		cmd = "SL";
+		cmd.append(to_decimal(A.iBW & 0xFF, 2)).append(";");
+		sendCommand(cmd,0);
+		showresp(WARN, ASC, "set lower", cmd, replystr);
+		cmd = "SH";
+		cmd.append(to_decimal(((A.iBW >> 8) & 0x7F), 2)).append(";");
+		sendCommand(cmd,0);
+		showresp(WARN, ASC, "set upper", cmd, replystr);
+	}
+	if (val > 256) return;
+	else if (A.imode == 2 || A.imode == 6) {
+		A.iBW = val;
+		cmd = TS480SAT_CWbw[A.iBW];
+		sendCommand(cmd,0);
+		showresp(WARN, ASC, "set CW bw", cmd, replystr);
+	}else if (A.imode == 5 || A.imode == 7) {
+		A.iBW = val;
+		cmd = TS480SAT_FSKbw[A.iBW];
+		sendCommand(cmd,0);
+		showresp(WARN, ASC, "set FSK bw", cmd, replystr);
+	}
 }
 
 int RIG_TS480SAT::get_bwA()
 {
-	cmd = "SL;";
-	int ret = sendCommand(cmd);
-	if (ret < 5) return bwA;
-	size_t p = replystr.rfind("SL");
-	if (p == string::npos) return bwA;
-
-	bwA = replystr[p + 3] - '0';
-	if (bwA < 0) bwA = 0;
-	if (bwA > 6) bwA = 6;
-
-	return bwA;
+	int i = 0;
+	size_t p;
+	if (A.imode == 0 || A.imode == 1 || A.imode == 3 || A.imode == 4) {
+		int lo = A.iBW & 0xFF, hi = (A.iBW >> 8) & 0x7F;
+		cmd = "SL;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "get SL", cmd, replystr);
+		p = replystr.rfind("SL");
+		if (p != string::npos)
+			lo = fm_decimal(&replystr[2], 2);
+		cmd = "SH;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "get SH", cmd, replystr);
+		p = replystr.rfind("SH");
+		if (p != string::npos)
+			hi = fm_decimal(&replystr[2], 2);
+		A.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
+	} else if (A.imode == 2 || A.imode == 6) {
+		cmd = "FW;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "get FW", cmd, replystr);
+		p = replystr.rfind("FW");
+		if (p != string::npos) {
+			for (i = 0; i < 11; i++)
+				if (replystr.find(TS480SAT_CWbw[i]) == p+2)
+					break;
+			if (i == 11) i = 10;
+			A.iBW = i;
+		}
+	} else if (A.imode == 5 || A.imode == 7) {
+		cmd = "FW;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "get FW", cmd, replystr);
+		p = replystr.rfind("FW");
+		if (p != string::npos) {
+			for (i = 0; i < 4; i++)
+				if (replystr.find(TS480SAT_FSKbw[i]) == p+2)
+					break;
+			if (i == 4) i = 3;
+			A.iBW = i;
+		}
+	}
+	return A.iBW;
 }
 
 void RIG_TS480SAT::set_bwB(int val)
 {
-	bwB = val;
-	cmd = "SL00;";
-	cmd[3] = '0' + val;
-	LOG_WARN("%s", cmd.c_str());
-	sendCommand(cmd, 0);
+	if (B.imode == 0 || B.imode == 1 || B.imode == 3 || B.imode == 4) {
+		if (val < 256) return;
+		B.iBW = val;
+		cmd = "SL";
+		cmd.append(to_decimal(B.iBW & 0xFF, 2)).append(";");
+		sendCommand(cmd,0);
+		showresp(WARN, ASC, "set lower", cmd, replystr);
+		cmd = "SH";
+		cmd.append(to_decimal(((B.iBW >> 8) & 0x7F), 2)).append(";");
+		sendCommand(cmd,0);
+		showresp(WARN, ASC, "set upper", cmd, replystr);
+	}
+	if (val > 256) return;
+	else if (B.imode == 2 || B.imode == 6) { // CW
+		B.iBW = val;
+		cmd = TS480SAT_CWbw[B.iBW];
+		sendCommand(cmd,0);
+		showresp(WARN, ASC, "set CW bw", cmd, replystr);
+	}else if (B.imode == 5 || B.imode == 7) {
+		B.iBW = val;
+		cmd = TS480SAT_FSKbw[B.iBW];
+		sendCommand(cmd,0);
+		showresp(WARN, ASC, "set FSK bw", cmd, replystr);
+	}
 }
 
 int RIG_TS480SAT::get_bwB()
 {
-	cmd = "SL;";
-	int ret = sendCommand(cmd);
-	if (ret < 5) return bwB;
-	size_t p = replystr.rfind("SL");
-	if (p == string::npos) return bwB;
-
-	bwA = replystr[p + 3] - '0';
-	if (bwB < 0) bwB = 0;
-	if (bwB > 6) bwB = 6;
-
-	return bwB;
+	int i = 0;
+	size_t p;
+	if (B.imode == 0 || B.imode == 1 || B.imode == 3 || B.imode == 4) {
+		int lo = B.iBW & 0xFF, hi = (B.iBW >> 8) & 0x7F;
+		cmd = "SL;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "get SL", cmd, replystr);
+		p = replystr.rfind("SL");
+		if (p != string::npos)
+			lo = fm_decimal(&replystr[2], 2);
+		cmd = "SH;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "get SH", cmd, replystr);
+		p = replystr.rfind("SH");
+		if (p != string::npos)
+			hi = fm_decimal(&replystr[2], 2);
+		B.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
+	} else if (B.imode == 2 || B.imode == 6) {
+		cmd = "FW;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "get FW", cmd, replystr);
+		p = replystr.rfind("FW");
+		if (p != string::npos) {
+			for (i = 0; i < 11; i++)
+				if (replystr.find(TS480SAT_CWbw[i]) == p+2)
+					break;
+			if (i == 11) i = 10;
+			B.iBW = i;
+		}
+	} else if (B.imode == 5 || B.imode == 7) {
+		cmd = "FW;";
+		showresp(WARN, ASC, "get FW", cmd, replystr);
+		p = replystr.rfind("FW");
+		if (p != string::npos) {
+			for (i = 0; i < 4; i++)
+				if (replystr.find(TS480SAT_FSKbw[i]) == p+2)
+					break;
+			if (i == 4) i = 3;
+			B.iBW = i;
+		}
+	}
+	return B.iBW;
 }
 
-int  RIG_TS480SAT::adjust_bandwidth(int m)
+int RIG_TS480SAT::adjust_bandwidth(int val)
 {
-	if (m == 2 || m == 6) return 3;
-	return 6;
+	int bw = 0;
+	if (val == 0 || val == 1 || val == 3)
+		bw = 0x8803;
+	else if (val == 4)
+		bw = 0x8201;
+	else if (val == 2 || val == 6)
+		bw = 7;
+	else if (val == 5 || val == 7)
+		bw = 1;
+	return bw;
+}
+
+int RIG_TS480SAT::def_bandwidth(int val)
+{
+	return adjust_bandwidth(val);
 }
 
 void RIG_TS480SAT::set_volume_control(int val)
