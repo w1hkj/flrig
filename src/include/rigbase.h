@@ -267,12 +267,12 @@ public:
 			return modes_[0];
 	}
 
-	virtual const char * get_bwname_(int n){
+	virtual const char * get_bwname_(int bw, int md) {
 		if (bandwidths_ == NULL) return "";
 		int nbw = 0;
 		while (bandwidths_[nbw] != NULL) nbw++;
-		if (n < nbw && n > -1)
-			return bandwidths_[n];
+		if (bw < nbw && bw > -1)
+			return bandwidths_[bw];
 		else
 			return bandwidths_[0];
 	}
