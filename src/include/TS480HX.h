@@ -60,6 +60,7 @@ public:
 
 	const char **bwtable(int);
 
+	const char * get_bwname_(int bw, int md);
 };
 
 

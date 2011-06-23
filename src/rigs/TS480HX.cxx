@@ -28,9 +28,9 @@ static const char *TS480HX_lo[] = {
 NULL };
 
 static const char *TS480HX_hi[] = {
-"1400", "1600", "1800", "2000", "2200", 
-"2400", "2600", "2800", "3000", "3400", 
-"4000", "5000",
+"1000", "1200", "1400", "1600", "1800", 
+"2000", "2200", "2400", "2600", "2800", 
+"3000", "3400", "4000", "5000",
 NULL };
 
 static const char *TS480HX_AM_lo[] = {
@@ -76,7 +76,7 @@ RIG_TS480HX::RIG_TS480HX() {
 	comm_rtsptt = false;
 	comm_dtrptt = false;
 	B.imode = A.imode = 1;
-	B.iBW = A.iBW = 0x8803;
+	B.iBW = A.iBW = 0x8A03;
 	B.freq = A.freq = 14070000;
 
 	has_noise_control =
@@ -96,6 +96,22 @@ RIG_TS480HX::RIG_TS480HX() {
 	has_power_control =
 	has_tune_control = 
 	has_ptt_control = true;
+}
+
+const char * RIG_TS480HX::get_bwname_(int n, int md) 
+{
+	static char bwname[20];
+	if (n > 256) {
+		int hi = (n >> 8) & 0x7F;
+		int lo = n & 0xFF;
+		snprintf(bwname, sizeof(bwname), "%s/%s",
+			(md == 0 || md == 1 || md == 3) ? TS480HX_lo[lo] : TS480HX_AM_lo[lo],
+			(md == 0 || md == 1 || md == 3) ? TS480HX_hi[hi] : TS480HX_AM_hi[hi] );
+	} else {
+		snprintf(bwname, sizeof(bwname), "%s",
+			(md == 2 || md == 6) ? TS480HX_CWwidths[n] : TS480HX_FSKwidths[n]);
+	}
+	return bwname;
 }
 
 void RIG_TS480HX::initialize()
@@ -233,7 +249,6 @@ int RIG_TS480HX::get_smeter()
 // RM cmd 0 ... 100 (rig values 0 ... 8)
 int RIG_TS480HX::get_swr()
 {
-	return -1; // disable to see if beeps go away
 	int mtr = 0;
 	cmd = "RM1;"; // select measurement '1' (swr) and read meter
 	int ret = sendCommand(cmd);
@@ -266,7 +281,7 @@ int RIG_TS480HX::set_widths(int val)
 		bandwidths_ = TS480HX_empty;
 		dsp_lo = TS480HX_lo;
 		dsp_hi = TS480HX_hi;
-		bw = 0x8803; // 200 ... 3000 Hz
+		bw = 0x8A03; // 200 ... 3000 Hz
 	} else if (val == 2 || val == 6) {
 		bandwidths_ = TS480HX_CWwidths;
 		dsp_lo = TS480HX_empty;
@@ -412,7 +427,7 @@ int RIG_TS480HX::get_bwA()
 		p = replystr.rfind("FW");
 		if (p != string::npos) {
 			for (i = 0; i < 11; i++)
-				if (replystr.find(TS480HX_CWbw[i]) == p+2)
+				if (replystr.find(TS480HX_CWbw[i]) == p)
 					break;
 			if (i == 11) i = 10;
 			A.iBW = i;
@@ -424,7 +439,7 @@ int RIG_TS480HX::get_bwA()
 		p = replystr.rfind("FW");
 		if (p != string::npos) {
 			for (i = 0; i < 4; i++)
-				if (replystr.find(TS480HX_FSKbw[i]) == p+2)
+				if (replystr.find(TS480HX_FSKbw[i]) == p)
 					break;
 			if (i == 4) i = 3;
 			A.iBW = i;
@@ -487,7 +502,7 @@ int RIG_TS480HX::get_bwB()
 		p = replystr.rfind("FW");
 		if (p != string::npos) {
 			for (i = 0; i < 11; i++)
-				if (replystr.find(TS480HX_CWbw[i]) == p+2)
+				if (replystr.find(TS480HX_CWbw[i]) == p)
 					break;
 			if (i == 11) i = 10;
 			B.iBW = i;
@@ -498,7 +513,7 @@ int RIG_TS480HX::get_bwB()
 		p = replystr.rfind("FW");
 		if (p != string::npos) {
 			for (i = 0; i < 4; i++)
-				if (replystr.find(TS480HX_FSKbw[i]) == p+2)
+				if (replystr.find(TS480HX_FSKbw[i]) == p)
 					break;
 			if (i == 4) i = 3;
 			B.iBW = i;
@@ -511,7 +526,7 @@ int RIG_TS480HX::adjust_bandwidth(int val)
 {
 	int bw = 0;
 	if (val == 0 || val == 1 || val == 3)
-		bw = 0x8803;
+		bw = 0x8A03;
 	else if (val == 4)
 		bw = 0x8201;
 	else if (val == 2 || val == 6)
