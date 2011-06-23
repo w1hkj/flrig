@@ -31,7 +31,7 @@ public:
 
 	int  adjust_bandwidth(int val);
 	int  def_bandwidth(int val);
-	void set_widths();
+	int  set_widths(int val);
 	void set_active_bandwidth();
 	int  get_active_bandwidth();
 	void set_bwA(int val);
@@ -74,6 +74,8 @@ public:
 
 	bool sendTScommand(string, int, bool);
 	const char **bwtable(int);
+
+	const char * get_bwname_(int bw, int md);
 
 };
 
