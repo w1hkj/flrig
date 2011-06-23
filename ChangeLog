@@ -1,7 +1,10 @@
-2011-06-20  David Freese  <w1hkj@w1hkj.com>
+2011-06-22  David Freese  <w1hkj@w1hkj.com>
 
-	bc50322: FT450 Notch
-	42db85e: FT950 Manual Notch
+	455e650: TS480 series
+	8913e9e: TS2000
+	93d08c6: DSP lo/hi cut controls
+	66b3b13: FT450 Notch
+	7a6b96d: FT950 Manual Notch
 	dc28189: TS480 HX/SAT
 	e77ff21: K3 power control query
 	aaedcf8: Copyright
