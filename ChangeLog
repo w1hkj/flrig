@@ -1,5 +1,10 @@
-2011-06-22  David Freese  <w1hkj@w1hkj.com>
+2011-06-24  David Freese  <w1hkj@w1hkj.com>
 
+	a971b72: K3 power control
+	27bf270: FT950 manual notch
+	f098dc3: TS2000 fixes
+	e21d24f: TS480 series
+	ff95d7f: TS590S
 	455e650: TS480 series
 	8913e9e: TS2000
 	93d08c6: DSP lo/hi cut controls
