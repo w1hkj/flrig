@@ -21,7 +21,7 @@ static const char TS2000_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'U' 
 static const char *TS2000_empty[] = { "N/A", NULL };
 
 static const char *TS2000_lo[] = {
- "10",   "50", "100", "200", "300", 
+  "0",   "50", "100", "200", "300", 
 "400",  "500", "600", "700", "800", 
 "900", "1000",
 NULL };
@@ -77,12 +77,14 @@ RIG_TS2000::RIG_TS2000() {
 	B.freq = A.freq = 14070000;
 	can_change_alt_vfo = true;
 
-	has_micgain_control =
-	has_notch_control =
-	has_ifshift_control =
 	has_swr_control = false;
 
 	has_dsp_controls =
+	has_rf_control =
+	has_micgain_control =
+	has_notch_control =
+	has_auto_notch =
+	has_ifshift_control =
 	has_smeter =
 	has_power_out =
 	has_swr_control =
@@ -96,6 +98,22 @@ RIG_TS2000::RIG_TS2000() {
 	has_mode_control =
 	has_bandwidth_control =
 	has_ptt_control = true;
+}
+
+const char * RIG_TS2000::get_bwname_(int n, int md) 
+{
+	static char bwname[20];
+	if (n > 256) {
+		int hi = (n >> 8) & 0x7F;
+		int lo = n & 0xFF;
+		snprintf(bwname, sizeof(bwname), "%s/%s",
+			(md == 0 || md == 1 || md == 3) ? TS2000_lo[lo] : TS2000_AM_lo[lo],
+			(md == 0 || md == 1 || md == 3) ? TS2000_hi[hi] : TS2000_AM_hi[hi] );
+	} else {
+		snprintf(bwname, sizeof(bwname), "%s",
+			(md == 2 || md == 6) ? TS2000_CWwidths[n] : TS2000_FSKwidths[n]);
+	}
+	return bwname;
 }
 
 void RIG_TS2000::initialize()
@@ -482,8 +500,6 @@ void RIG_TS2000::set_bwA(int val)
 	if (A.imode == 0 || A.imode == 1 || A.imode == 3 || A.imode == 4) {
 		if (val < 256) return;
 		A.iBW = val;
-		cmd = "FW0001;"; // wide filter 
-		showresp(WARN, ASC, "wide filter", cmd, replystr);
 		cmd = "SL";
 		cmd.append(to_decimal(A.iBW & 0xFF, 2)).append(";");
 		sendCommand(cmd,0);
@@ -526,14 +542,14 @@ int RIG_TS2000::get_bwA()
 		if (p != string::npos)
 			hi = fm_decimal(&replystr[2], 2);
 		A.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
-	} else if (A.imode == 2 || A.imode == 6) {
+	} else if (A.imode == 2 || A.imode == 6) { // CW
 		cmd = "FW;";
 		sendCommand(cmd);
 		showresp(WARN, ASC, "get FW", cmd, replystr);
 		p = replystr.rfind("FW");
 		if (p != string::npos) {
 			for (i = 0; i < 11; i++)
-				if (replystr.find(TS2000_CWbw[i]) == p+2)
+				if (replystr.find(TS2000_CWbw[i]) == p)
 					break;
 			if (i == 11) i = 10;
 			A.iBW = i;
@@ -545,7 +561,7 @@ int RIG_TS2000::get_bwA()
 		p = replystr.rfind("FW");
 		if (p != string::npos) {
 			for (i = 0; i < 4; i++)
-				if (replystr.find(TS2000_FSKbw[i]) == p+2)
+				if (replystr.find(TS2000_FSKbw[i]) == p)
 					break;
 			if (i == 4) i = 3;
 			A.iBW = i;
@@ -608,7 +624,7 @@ int RIG_TS2000::get_bwB()
 		p = replystr.rfind("FW");
 		if (p != string::npos) {
 			for (i = 0; i < 11; i++)
-				if (replystr.find(TS2000_CWbw[i]) == p+2)
+				if (replystr.find(TS2000_CWbw[i]) == p)
 					break;
 			if (i == 11) i = 10;
 			B.iBW = i;
@@ -619,7 +635,7 @@ int RIG_TS2000::get_bwB()
 		p = replystr.rfind("FW");
 		if (p != string::npos) {
 			for (i = 0; i < 4; i++)
-				if (replystr.find(TS2000_FSKbw[i]) == p+2)
+				if (replystr.find(TS2000_FSKbw[i]) == p)
 					break;
 			if (i == 4) i = 3;
 			B.iBW = i;
@@ -636,11 +652,8 @@ int RIG_TS2000::get_modetype(int n)
 // val 0 .. 100
 void RIG_TS2000::set_mic_gain(int val)
 {
-	cmd = "MG000;";
-	for (int i = 3; i > 0; i--) {
-		cmd[1+i] += val % 10;
-		val /= 10;
-	}
+	cmd = "MG";
+	cmd.append(to_decimal(val,3)).append(";");
 	sendCommand(cmd, 0);
 	showresp(WARN, ASC, "set mic", cmd, replystr);
 }
@@ -651,11 +664,8 @@ int RIG_TS2000::get_mic_gain()
 	sendCommand(cmd);
 	showresp(WARN, ASC, "get mic", cmd, replystr);
 	size_t p = replystr.rfind("MG");
-	if (p != string::npos && (p + 5 < replystr.length())) {
-		replystr[p+5] = 0;
-		int val = atoi(&replystr[p+2]);
-		return val;
-	}
+	if (p != string::npos)
+		return fm_decimal(&replystr[p+2], 3);
 	return 0;
 }
 
@@ -676,76 +686,52 @@ void RIG_TS2000::set_noise(bool b)
 	showresp(WARN, ASC, "set NB", cmd, replystr);
 }
 
-///////////////////
+//======================================================================
 // IF shift only available if the transceiver is in the CW mode
 // step size is 50 Hz
-// not implemented for flrig since it cannot be used in USB the
-// normal setting for digital modes
-//
+//======================================================================
+
 void RIG_TS2000::set_if_shift(int val)
 {
-	cmd = "IS 0000;";
-	if (val < 0) cmd[3] = '-';
-	val = abs(val);
-	for (int i = 4; i > 0; i--) {
-		cmd[3+i] += val % 10;
-		val /= 10;
+	bool cw = (useB && (B.imode == 2 || B.imode == 6)) ||
+	          (!useB && (A.imode == 2 || A.imode == 6));
+	if (!cw) {
+		setIFshiftButton((void*)0);
+		return;
 	}
+
+	cmd = "IS ";
+	cmd.append(to_decimal(val,4)).append(";");
 	sendCommand(cmd,0);
 	showresp(WARN, ASC, "set IF shift", cmd, replystr);
 }
 
 bool RIG_TS2000::get_if_shift(int &val)
 {
-	static int oldval = 0;
 	cmd = "IS;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "get IF shift", cmd, replystr);
-	size_t p = replystr.rfind("IS");
-	if (p != string::npos && (p + 8 < replystr.length())) {
-		replystr[p+8] = 0;
-		val = atoi(&replystr[p+3]);
-		if (val != 0 || oldval != val) {
-			oldval = val;
-			return true;
-		}
+	size_t p = replystr.rfind("IS ");
+	if (p != string::npos) {
+		val = fm_decimal(&replystr[p+3], 4);
+		return true;
 	}
-	oldval = val;
+	val = if_shift_mid;
 	return false;
 }
 
 void RIG_TS2000::get_if_min_max_step(int &min, int &max, int &step)
 {
-	min = -1000;
-	max = 1000;
-	step = 100;
+	if_shift_min = min = 400;
+	if_shift_max = max = 1000;
+	if_shift_step = step = 50;
+	if_shift_mid = 700;
 }
 
 void RIG_TS2000::set_notch(bool on, int val)
 {
-	cmd = "BP00000;";
-	if (on == false) {
-		sendCommand(cmd,0);
-		showresp(WARN, ASC, "set Notch off", cmd, replystr);
-		notch_on = false;
-		return;
-	}
-	if (!notch_on) {
-		cmd[6] = '1'; // notch ON
-		sendCommand(cmd,0);
-		showresp(WARN, ASC, "set Notch on", cmd, replystr);
-		cmd[6] = '0';
-		notch_on = true;
-	}
-	cmd[3] = '1'; // manual NOTCH position
-// set notch value offset by 200, ie: 001 -> 400
-	val = (-val / 9) + 200;
-	if (val < 1) val = 1;
-	if (val > 400) val = 400;
-	for (int i = 3; i > 0; i--) {
-		cmd[3 + i] += val % 10;
-		val /=10;
-	}
+	cmd = "BP";
+	cmd.append(to_decimal(val, 3)).append(";");
 	sendCommand(cmd,0);
 	showresp(WARN, ASC, "set Notch val", cmd, replystr);
 }
@@ -753,32 +739,58 @@ void RIG_TS2000::set_notch(bool on, int val)
 bool  RIG_TS2000::get_notch(int &val)
 {
 	bool ison = false;
-	cmd = "BP00;";
+	cmd = "BP;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "get Notch", cmd, replystr);
 	size_t p = replystr.rfind("BP");
-	if (p != string::npos && (p + 6 < replystr.length())) {
-		if (replystr[p+6] == '1') {
-			ison = true;
-			cmd = "BP01;";
-			sendCommand(cmd);
-			showresp(WARN, ASC, "get Notch val", cmd, replystr);
-			p = replystr.rfind("BP");
-			if (p != string::npos && (p + 7 < replystr.length())) {
-				replystr[p+7] = 0;
-				val = atoi(&replystr[p+4]);
-				val -= 200;
-				val *= -9;
-			}
-		}
+	if (p != string::npos) {
+		val = fm_decimal(&replystr[p+2],3);
+		ison = true;
 	}
 	return ison;
 }
 
 void RIG_TS2000::get_notch_min_max_step(int &min, int &max, int &step)
 {
-	min = -1143;
-	max = +1143;
-	step = 9;
+	min = 0;
+	max = 63;
+	step = 1;
+}
+
+void RIG_TS2000::set_auto_notch(int v)
+{
+	cmd = v ? "NT1;" : "NT0;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set auto notch", cmd, replystr);
+}
+
+int  RIG_TS2000::get_auto_notch()
+{
+	cmd = "NT;";
+	sendCommand(cmd, 0);
+	showresp(WARN, ASC, "get auto notch", cmd, replystr);
+	size_t p = replystr.rfind("NT");
+	if (p != string::npos)
+		return (replystr[p+2] == '1');
+	return 0;
+}
+
+void RIG_TS2000::set_rf_gain(int val)
+{
+	cmd = "RG";
+	cmd.append(to_decimal(val * 255 / 100, 3)).append(";");
+	sendCommand(cmd, 0);
+	showresp(WARN, ASC, "set rf gain", cmd, replystr);
+}
+
+int  RIG_TS2000::get_rf_gain()
+{
+	cmd = "RG;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "get rf gain", cmd, replystr);
+	size_t p = replystr.rfind("RG");
+	if (p != string::npos)
+		return fm_decimal(&replystr[p+2] ,3) * 100 / 255;
+	return 100;
 }
 
