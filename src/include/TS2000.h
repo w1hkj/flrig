@@ -59,13 +59,21 @@ public:
 	void set_notch(bool on, int val);
 	bool get_notch(int &val);
 	void get_notch_min_max_step(int &min, int &max, int &step);
+	void set_auto_notch(int v);
+	int  get_auto_notch();
 	void set_noise(bool b);
 	void set_mic_gain(int val);
 	int  get_mic_gain();
 	void get_mic_min_max_step(int &min, int &max, int &step);
+	void set_rf_gain(int val);
+	int  get_rf_gain();
+	void get_rf_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 100; step = 1; }
+
 
 	bool sendTScommand(string, int, bool);
 	const char **bwtable(int);
+	const char * get_bwname_(int bw, int md);
 
 };
 

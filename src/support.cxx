@@ -1349,7 +1349,8 @@ void setIFshiftButton(void *d)
 		btnIFsh->value(1);
 	}
 	else if (!b && btnIFsh->value()) {
-		btnIFsh->value( selrig->if_shift_mid );
+		btnIFsh->value(0);
+		sldrIFSHIFT->value( selrig->if_shift_mid );
 	}
 }
 
@@ -2431,8 +2432,8 @@ void initRig()
 				selrig->set_if_shift(progStatus.shift_val);
 			} else {
 				btnIFsh->value(0);
-				sldrIFSHIFT->value(0);
-				selrig->set_if_shift(0);
+				sldrIFSHIFT->value(selrig->if_shift_mid);
+				selrig->set_if_shift(selrig->if_shift_mid);
 			}
 		}
 		btnIFsh->show();
