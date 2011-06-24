@@ -4,6 +4,9 @@
 #include "rigbase.h"
 
 class RIG_TS590S : public rigbase {
+
+enum TS590MODES { LSB, USB, CW, FM, AM, FSK, CWR, FSKR, LSBD, USBD, FMD };
+
 private:
 	bool notch_on;
 	int  preamp_level;
