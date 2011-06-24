@@ -99,6 +99,7 @@ RIG_FT950::RIG_FT950() {
 	has_noise_control =
 	has_bandwidth_control =
 	has_notch_control =
+	allow_notch_changes =
 	has_auto_notch =
 	has_attenuator_control =
 	has_preamp_control =
@@ -108,7 +109,6 @@ RIG_FT950::RIG_FT950() {
 	has_swr_control = true;
 
 // derived specific
-	notch_on = false;
 	atten_level = 0;
 	preamp_level = 0;
 }
@@ -677,24 +677,23 @@ bool RIG_FT950::get_if_shift(int &val)
 
 void RIG_FT950::get_if_min_max_step(int &min, int &max, int &step)
 {
-	min = -1000;
-	max = 1000;
-	step = 50;
+	if_shift_min = min = -1000;
+	if_shift_max = max = 1000;
+	if_shift_step = step = 50;
+	if_shift_mid = 0;
 }
 
 void RIG_FT950::set_notch(bool on, int val)
 {
 	cmd = "BP00000;";
-	if (on == false) {
+	if (on) {
+		cmd[6] = '1';
+		sendCommand(cmd);
+		showresp(WARN, ASC, "SET notch on", cmd, replystr);
+	} else {
 		sendCommand(cmd);
 		showresp(WARN, ASC, "SET notch off", cmd, replystr);
-		notch_on = false;
-		return;
 	}
-	cmd[6] = '1';
-	sendCommand(cmd);
-	showresp(WARN, ASC, "SET notch on", cmd, replystr);
-	notch_on = true;
 
 	cmd[3] = '1'; // manual NOTCH position
 	cmd[6] = '0';
@@ -724,9 +723,10 @@ bool  RIG_FT950::get_notch(int &val)
 		cmd += ';';
 		waitN(8, 100, "get notch val", ASC);
 		p = replystr.rfind(rsp);
-		if (p == string::npos) return ison;
-		val = atoi(&replystr[p+4]);
-		val *= 10;
+		if (p == string::npos)
+			val = 10;
+		else
+			val = fm_decimal(&replystr[p+4],3) * 10;
 	}
 	return ison;
 }

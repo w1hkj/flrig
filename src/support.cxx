@@ -1324,9 +1324,9 @@ void setNotchControl(void *d)
 
 void setNotch()
 {
-	if (btnNotch->value()) {
+	if (btnNotch->value() || selrig->allow_notch_changes) {
 		pthread_mutex_lock(&mutex_serial);
-			selrig->set_notch(true, sldrNOTCH->value());
+			selrig->set_notch(btnNotch->value(), sldrNOTCH->value());
 		pthread_mutex_unlock(&mutex_serial);
 	}
 }

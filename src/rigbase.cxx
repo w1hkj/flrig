@@ -39,6 +39,7 @@ rigbase::rigbase()
 	has_micgain_control =
 	has_mic_line_control =
 	has_notch_control =
+	allow_notch_changes =
 	has_noise_control =
 	has_attenuator_control =
 	has_preamp_control =

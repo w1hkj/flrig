@@ -114,6 +114,7 @@ public:
 	bool has_micgain_control;
 	bool has_mic_line_control;
 	bool has_notch_control;
+	bool allow_notch_changes;
 	bool has_noise_control;
 	bool has_noise_reduction_control;
 	bool has_noise_reduction;
