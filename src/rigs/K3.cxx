@@ -354,12 +354,9 @@ int RIG_K3::get_power_control()
 	int ret = waitResponse(500);
 	showresp(WARN, ASC, "get power ctrl", cmd, replystr);
 	if (ret < 6) return progStatus.power_level;
-	size_t p = replystr.rfind("AG");
+	size_t p = replystr.rfind("PC");
 	if (p == string::npos) return progStatus.power_level;
-
-	replystr[p + 5] = 0;
-	int v = atoi(&replystr[p + 2]);
-	return v;
+	return fm_decimal(&replystr[p+2], 3);
 }
 
 void RIG_K3::get_pc_min_max_step(double &min, double &max, double &step)
