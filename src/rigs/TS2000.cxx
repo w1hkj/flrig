@@ -730,10 +730,19 @@ void RIG_TS2000::get_if_min_max_step(int &min, int &max, int &step)
 
 void RIG_TS2000::set_notch(bool on, int val)
 {
-	cmd = "BP";
-	cmd.append(to_decimal(val, 3)).append(";");
-	sendCommand(cmd,0);
-	showresp(WARN, ASC, "set Notch val", cmd, replystr);
+	if (on) {
+		cmd = "BC2"; // set manual notch
+		sendCommand(cmd,0);
+		showresp(WARN, ASC, "set manual notch on", cmd, replystr);
+		cmd = "BP";
+		cmd.append(to_decimal(val, 3)).append(";");
+		sendCommand(cmd,0);
+		showresp(WARN, ASC, "set Notch val", cmd, replystr);
+	} else {
+		cmd = "BC0"; // no notch action
+		sendCommand(cmd,0);
+		showresp(WARN, ASC, "set manual notch off", cmd, replystr);
+	}
 }
 
 bool  RIG_TS2000::get_notch(int &val)
