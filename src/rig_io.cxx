@@ -140,14 +140,18 @@ int sendCommand (string s, int nread)
 	int numwrite = (int)s.size();
 
 //	LOG_DEBUG("cmd:%3d, %s", (int)s.length(), str2hex(s.data(), s.length()));
-	if (RigSerial.IsOpen() == false)
+	if (RigSerial.IsOpen() == false) {
+		replystr.clear();
 		return 0;
+	}
 
 	RigSerial.WriteBuffer(s.c_str(), numwrite);
 	MilliSleep( progStatus.comm_wait );
 
-	if (nread == 0)
+	if (nread == 0) {
+		replystr.clear();
 		return 0;
+	}
 	if (nread > 0)
 		MilliSleep( (int)((nread + progStatus.comm_echo ? numwrite : 0)*11000.0/RigSerial.Baud()));
 
