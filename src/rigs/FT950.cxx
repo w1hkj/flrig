@@ -72,6 +72,8 @@ RIG_FT950::RIG_FT950() {
 	A.iBW = B.iBW = bwA = bwB = def_bw = 2;
 	A.freq = B.freq = freqA = freqB = def_freq = 14070000;
 
+	notch_on = false;
+
 	has_extras =
 	has_vox_onoff =
 	has_vox_gain =
@@ -685,23 +687,22 @@ void RIG_FT950::get_if_min_max_step(int &min, int &max, int &step)
 
 void RIG_FT950::set_notch(bool on, int val)
 {
-	cmd = "BP00000;";
-	if (on) {
-		cmd[6] = '1';
+	if (on && !notch_on) {
+		notch_on = true;
+		cmd = "BP00001;";
 		sendCommand(cmd);
 		showresp(WARN, ASC, "SET notch on", cmd, replystr);
-	} else {
+	} else if (!on && notch_on) {
+		notch_on = false;
+		cmd = "BP00000;";
 		sendCommand(cmd);
 		showresp(WARN, ASC, "SET notch off", cmd, replystr);
+		return;
 	}
 
-	cmd[3] = '1'; // manual NOTCH position
-	cmd[6] = '0';
+	cmd = "BP01";
 	val /= 10;
-	for (int i = 3; i > 0; i--) {
-		cmd[3 + i] += val % 10;
-		val /=10;
-	}
+	cmd.append(to_decimal(val,3)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET notch val", cmd, replystr);
 }
@@ -728,7 +729,7 @@ bool  RIG_FT950::get_notch(int &val)
 		else
 			val = fm_decimal(&replystr[p+4],3) * 10;
 	}
-	return ison;
+	return (notch_on = ison);
 }
 
 void RIG_FT950::get_notch_min_max_step(int &min, int &max, int &step)
