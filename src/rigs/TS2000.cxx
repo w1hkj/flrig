@@ -118,11 +118,7 @@ const char * RIG_TS2000::get_bwname_(int n, int md)
 
 void RIG_TS2000::initialize()
 {
-	cmd = "FR0;"; sendCommand(cmd, 0);
-	cmd = "FT0;"; sendCommand(cmd, 0);
-	cmd = "AC001;"; sendCommand(cmd, 0);
-	get_preamp();
-	get_attenuator();
+	return;
 }
 
 void RIG_TS2000::selectA()
@@ -731,7 +727,7 @@ void RIG_TS2000::get_if_min_max_step(int &min, int &max, int &step)
 void RIG_TS2000::set_notch(bool on, int val)
 {
 	if (on) {
-		cmd = "BC2"; // set manual notch
+		cmd = "BC2;"; // set manual notch
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set manual notch on", cmd, replystr);
 		cmd = "BP";
@@ -739,7 +735,7 @@ void RIG_TS2000::set_notch(bool on, int val)
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set Notch val", cmd, replystr);
 	} else {
-		cmd = "BC0"; // no notch action
+		cmd = "BC0;"; // no notch action
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set manual notch off", cmd, replystr);
 	}

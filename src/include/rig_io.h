@@ -23,7 +23,7 @@ extern bool startAuxSerial();
 extern bool startSepSerial();
 
 extern int readResponse();
-extern int sendCommand(string s, int nread = -1);
+extern int sendCommand(string s, int nread = 0);
 extern int waitResponse(int);
 
 extern void clearSerialPort();
