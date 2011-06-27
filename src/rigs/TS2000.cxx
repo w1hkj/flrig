@@ -14,7 +14,8 @@
 static const char TS2000name_[] = "TS-2000";
 
 static const char *TS2000modes_[] = {
-		"LSB", "USB", "CW", "FM", "AM", "FSK", "CW-R", "FSK-R", NULL};
+	"LSB", "USB", "CW", "FM", "AM", "FSK", "CW-R", "FSK-R", NULL};
+
 static const char TS2000_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '9' };
 static const char TS2000_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'U' };
 
@@ -373,22 +374,23 @@ int RIG_TS2000::get_preamp()
 int RIG_TS2000::set_widths(int val)
 {
 	int bw;
-	if (val == 0 || val == 1 || val == 3) {
+	if (val == LSB || val == USB || val == FM) {
 		bandwidths_ = TS2000_empty;
 		dsp_lo = TS2000_lo;
 		dsp_hi = TS2000_hi;
-		bw = 0x8803; // 200 ... 3000 Hz
-	} else if (val == 2 || val == 6) {
+		if (val == FM) bw = 0x8A03; // 200 ... 4000 Hz
+		else bw = 0x8803; // 200 ... 3000 Hz
+	} else if (val == CW || val == CWR) {
 		bandwidths_ = TS2000_CWwidths;
 		dsp_lo = TS2000_empty;
 		dsp_hi = TS2000_empty;
 		bw = 7;
-	} else if (val == 5 || val == 7) {
+	} else if (val == FSK || val == FSKR) {
 		bandwidths_ = TS2000_FSKwidths;
 		dsp_lo = TS2000_empty;
 		dsp_hi = TS2000_empty;
 		bw = 1;
-	} else { // val == 4 ==> AM
+	} else { // val == AM
 		bandwidths_ = TS2000_empty;
 		dsp_lo = TS2000_AM_lo;
 		dsp_hi = TS2000_AM_hi;
@@ -464,13 +466,15 @@ int RIG_TS2000::get_modeB()
 int RIG_TS2000::adjust_bandwidth(int val)
 {
 	int bw = 0;
-	if (val == 0 || val == 1 || val == 3)
+	if (val == LSB || val == USB)
 		bw = 0x8803;
-	else if (val == 4)
-		bw = 0x8201;
-	else if (val == 2 || val == 6)
+	else if (val == FM)
+		bw = 0x8A03;
+	else if (val == AM)
+		bw = 0x8301;
+	else if (val == CW || val == CWR)
 		bw = 7;
-	else if (val == 5 || val == 7)
+	else if (val == FSK || val == FSKR)
 		bw = 1;
 	return bw;
 }
@@ -482,7 +486,7 @@ int RIG_TS2000::def_bandwidth(int val)
 
 void RIG_TS2000::set_bwA(int val)
 {
-	if (A.imode == 0 || A.imode == 1 || A.imode == 3 || A.imode == 4) {
+	if (A.imode == LSB || A.imode == USB || A.imode == FM || A.imode == AM) {
 		if (val < 256) return;
 		A.iBW = val;
 		cmd = "SL";
@@ -495,12 +499,12 @@ void RIG_TS2000::set_bwA(int val)
 		showresp(WARN, ASC, "set upper", cmd, replystr);
 	}
 	if (val > 256) return;
-	else if (A.imode == 2 || A.imode == 6) {
+	else if (A.imode == CW || A.imode == CWR) {
 		A.iBW = val;
 		cmd = TS2000_CWbw[A.iBW];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set CW bw", cmd, replystr);
-	}else if (A.imode == 5 || A.imode == 7) {
+	}else if (A.imode == FSK || A.imode == FSKR) {
 		A.iBW = val;
 		cmd = TS2000_FSKbw[A.iBW];
 		sendCommand(cmd,0);
@@ -512,7 +516,7 @@ int RIG_TS2000::get_bwA()
 {
 	int i = 0;
 	size_t p;
-	if (A.imode == 0 || A.imode == 1 || A.imode == 3 || A.imode == 4) {
+	if (A.imode == LSB || A.imode == USB || A.imode == FM || A.imode == AM) {
 		int lo = A.iBW & 0xFF, hi = (A.iBW >> 8) & 0x7F;
 		cmd = "SL;";
 		waitN(5, 100, "get SL", ASC);
@@ -525,7 +529,7 @@ int RIG_TS2000::get_bwA()
 		if (p != string::npos)
 			hi = fm_decimal(&replystr[2], 2);
 		A.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
-	} else if (A.imode == 2 || A.imode == 6) { // CW
+	} else if (A.imode == CW || A.imode == CWR) { // CW
 		cmd = "FW;";
 		waitN(7, 100, "get FW", ASC);
 		p = replystr.rfind("FW");
@@ -536,7 +540,7 @@ int RIG_TS2000::get_bwA()
 			if (i == 11) i = 10;
 			A.iBW = i;
 		}
-	} else if (A.imode == 5 || A.imode == 7) {
+	} else if (A.imode == FSK || A.imode == FSKR) {
 		cmd = "FW;";
 		waitN(7, 100, "get FW", ASC);
 		p = replystr.rfind("FW");
@@ -553,7 +557,7 @@ int RIG_TS2000::get_bwA()
 
 void RIG_TS2000::set_bwB(int val)
 {
-	if (B.imode == 0 || B.imode == 1 || B.imode == 3 || B.imode == 4) {
+	if (B.imode == LSB || B.imode == USB || B.imode == FM || B.imode == AM) {
 		if (val < 256) return;
 		B.iBW = val;
 		cmd = "SL";
@@ -566,12 +570,12 @@ void RIG_TS2000::set_bwB(int val)
 		showresp(WARN, ASC, "set upper", cmd, replystr);
 	}
 	if (val > 256) return;
-	else if (B.imode == 2 || B.imode == 6) { // CW
+	else if (B.imode == CW || B.imode == CWR) { // CW
 		B.iBW = val;
 		cmd = TS2000_CWbw[B.iBW];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set CW bw", cmd, replystr);
-	}else if (B.imode == 5 || B.imode == 7) {
+	}else if (B.imode == FSK || B.imode == FSKR) {
 		B.iBW = val;
 		cmd = TS2000_FSKbw[B.iBW];
 		sendCommand(cmd,0);
@@ -583,7 +587,7 @@ int RIG_TS2000::get_bwB()
 {
 	int i = 0;
 	size_t p;
-	if (B.imode == 0 || B.imode == 1 || B.imode == 3 || B.imode == 4) {
+	if (B.imode == LSB || B.imode == USB || B.imode == FM || B.imode == AM) {
 		int lo = B.iBW & 0xFF, hi = (B.iBW >> 8) & 0x7F;
 		cmd = "SL;";
 		waitN(5, 100, "get SL", ASC);
@@ -596,7 +600,7 @@ int RIG_TS2000::get_bwB()
 		if (p != string::npos)
 			hi = fm_decimal(&replystr[2], 2);
 		B.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
-	} else if (B.imode == 2 || B.imode == 6) {
+	} else if (B.imode == CW || B.imode == CWR) {
 		cmd = "FW;";
 		waitN(7, 100, "get FW", ASC);
 		p = replystr.rfind("FW");
@@ -607,7 +611,7 @@ int RIG_TS2000::get_bwB()
 			if (i == 11) i = 10;
 			B.iBW = i;
 		}
-	} else if (B.imode == 5 || B.imode == 7) {
+	} else if (B.imode == FSK || B.imode == FSKR) {
 		cmd = "FW;";
 		waitN(7, 100, "get FW", ASC);
 		p = replystr.rfind("FW");

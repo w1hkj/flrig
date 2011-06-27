@@ -4,6 +4,9 @@
 #include "rigbase.h"
 
 class RIG_TS2000 : public rigbase {
+
+enum TS2000MODES { LSB, USB, CW, FM, AM, FSK, CWR, FSKR };
+
 private:
 	bool notch_on;
 	int  preamp_level;
@@ -47,6 +50,8 @@ public:
 	void set_volume_control(int val);
 	int  get_volume_control();
 	void set_power_control(double val);
+	void get_pc_min_max_step(double &min, double &max, double &step) {
+		min = 5; max = 100; step = 1; }
 	void set_PTT_control(int val);
 	void tune_rig();
 	void set_attenuator(int val);
