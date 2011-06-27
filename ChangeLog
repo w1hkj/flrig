@@ -1,6 +1,7 @@
-2011-06-26  David Freese  <w1hkj@w1hkj.com>
+2011-06-27  David Freese  <w1hkj@w1hkj.com>
 
-	83f0daf: FT950 Manual Notch
+	f082550: Deprecate d3572dc
+	654f07f: FT950 Manual Notch
 	d3572dc: TS2000 BC string
 	2270d84: T2000 MBC
 	ccbe938: TS590S SL/SH/FW corrections
