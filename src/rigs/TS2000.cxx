@@ -124,20 +124,20 @@ void RIG_TS2000::initialize()
 void RIG_TS2000::selectA()
 {
 	cmd = "FR0;";
-	sendCommand(cmd);
+	sendCommand(cmd, 0);
 	showresp(WARN, ASC, "Rx A", cmd, replystr);
 	cmd = "FT0;";
-	sendCommand(cmd);
+	sendCommand(cmd, 0);
 	showresp(WARN, ASC, "Tx A", cmd, replystr);
 }
 
 void RIG_TS2000::selectB()
 {
 	cmd = "FR1;";
-	sendCommand(cmd);
+	sendCommand(cmd, 0);
 	showresp(WARN, ASC, "Rx B", cmd, replystr);
 	cmd = "FT1;";
-	sendCommand(cmd);
+	sendCommand(cmd, 0);
 	showresp(WARN, ASC, "Tx B", cmd, replystr);
 }
 
@@ -146,17 +146,17 @@ void RIG_TS2000::set_split(bool val)
 	split = val;
 	if (val) {
 		cmd = "FR0;";
-		sendCommand(cmd);
+		sendCommand(cmd, 0);
 		showresp(WARN, ASC, "Rx A", cmd, replystr);
 		cmd = "FT1;";
-		sendCommand(cmd);
+		sendCommand(cmd, 0);
 		showresp(WARN, ASC, "Tx B", cmd, replystr);
 	} else {
 		cmd = "FR0;";
-		sendCommand(cmd);
+		sendCommand(cmd, 0);
 		showresp(WARN, ASC, "Rx A", cmd, replystr);
 		cmd = "FT0;";
-		sendCommand(cmd);
+		sendCommand(cmd, 0);
 		showresp(WARN, ASC, "Tx A", cmd, replystr);
 	}
 }
@@ -164,8 +164,7 @@ void RIG_TS2000::set_split(bool val)
 bool RIG_TS2000::get_split()
 {
 	cmd = "IF;";
-	int ret = sendCommand(cmd);
-	showresp(INFO, ASC, "get info", cmd, replystr);
+	int ret = waitN(38, 100, "get info", ASC);
 	if (ret < 38) return split;
 	size_t p = replystr.rfind("IF");
 	if (p == string::npos) return split;
@@ -176,8 +175,7 @@ bool RIG_TS2000::get_split()
 long RIG_TS2000::get_vfoA ()
 {
 	cmd = "FA;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "get vfo A", cmd, replystr);
+	waitN(14, 100, "get vfo A", ASC);
 	size_t p = replystr.rfind("FA");
 	if (p != string::npos && (p + 12 < replystr.length())) {
 		int f = 0;
@@ -203,8 +201,7 @@ void RIG_TS2000::set_vfoA (long freq)
 long RIG_TS2000::get_vfoB ()
 {
 	cmd = "FB;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "get vfo B", cmd, replystr);
+	waitN(14, 100, "get vfo B", ASC);
 	size_t p = replystr.rfind("FB");
 	if (p != string::npos && (p + 12 < replystr.length())) {
 		int f = 0;
@@ -230,8 +227,7 @@ void RIG_TS2000::set_vfoB (long freq)
 int RIG_TS2000::get_smeter()
 {
 	cmd = "SM0;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "get smeter", cmd, replystr);
+	waitN(8, 100, "get smeter", ASC);
 	size_t p = replystr.rfind("SM");
 	if (p != string::npos && (p + 7 < replystr.length())) {
 		replystr[p+7] = 0;
@@ -245,8 +241,7 @@ int RIG_TS2000::get_smeter()
 int RIG_TS2000::get_swr()
 {
 	cmd = "RM1;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "get swr", cmd, replystr);
+	waitN(8, 100, "get swr", ASC);
 	size_t p = replystr.rfind("RM");
 	if (p != string::npos && (p + 7 < replystr.length())) {
 		replystr[p+7] = 0;
@@ -265,7 +260,7 @@ void RIG_TS2000::set_power_control(double val)
 		cmd[i] += ival % 10;
 		ival /= 10;
 	}
-	sendCommand(cmd);
+	sendCommand(cmd, 0);
 	showresp(WARN, ASC, "set pwr ctrl", cmd, replystr);
 }
 
@@ -277,8 +272,7 @@ int RIG_TS2000::get_power_out()
 int RIG_TS2000::get_power_control()
 {
 	cmd = "PC;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "get pout", cmd, replystr);
+	waitN(6, 100, "get pout", ASC);
 	size_t p = replystr.rfind("PC");
 	if (p != string::npos && (p + 5 < replystr.length())) {
 		replystr[p+5] = 0;
@@ -292,8 +286,7 @@ int RIG_TS2000::get_power_control()
 int RIG_TS2000::get_volume_control()
 {
 	cmd = "AG0;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "get vol", cmd, replystr);
+	waitN(7, 100, "get vol", ASC);
 	size_t p = replystr.rfind("AG");
 	if (p != string::npos && (p + 7 < replystr.length())) {
 		cmd[p+7] = 0;
@@ -343,8 +336,7 @@ void RIG_TS2000::set_attenuator(int val)
 int RIG_TS2000::get_attenuator()
 {
 	cmd = "RA;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "get ATT", cmd, replystr);
+	waitN(7, 100, "get ATT", ASC);
 	size_t p = replystr.rfind("RA");
 	if (p != string::npos && (p+3 < replystr.length())) {
 		if (replystr[p+2] == '0' && replystr[p+3] == '0')
@@ -367,8 +359,7 @@ void RIG_TS2000::set_preamp(int val)
 int RIG_TS2000::get_preamp()
 {
 	cmd = "PA;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "get PRE", cmd, replystr);
+	waitN(5, 100, "get PRE", ASC);
 	size_t p = replystr.rfind("PA");
 	if (p != string::npos && (p+2 < replystr.length())) {
 		if (replystr[p+2] == '1') 
@@ -432,8 +423,7 @@ void RIG_TS2000::set_modeA(int val)
 int RIG_TS2000::get_modeA()
 {
 	cmd = "MD;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "get mode A", cmd, replystr);
+	waitN(4, 100, "get mode A", ASC);
 	size_t p = replystr.rfind("MD");
 	if (p != string::npos && (p + 2 < replystr.length())) {
 		int md = replystr[p+2];
@@ -459,8 +449,7 @@ void RIG_TS2000::set_modeB(int val)
 int RIG_TS2000::get_modeB()
 {
 	cmd = "MD;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "get mode B", cmd, replystr);
+	waitN(4, 100, "get mode B", ASC);
 	size_t p = replystr.rfind("MD");
 	if (p != string::npos && (p + 2 < replystr.length())) {
 		int md = replystr[p+2];
@@ -526,22 +515,19 @@ int RIG_TS2000::get_bwA()
 	if (A.imode == 0 || A.imode == 1 || A.imode == 3 || A.imode == 4) {
 		int lo = A.iBW & 0xFF, hi = (A.iBW >> 8) & 0x7F;
 		cmd = "SL;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "get SL", cmd, replystr);
+		waitN(5, 100, "get SL", ASC);
 		p = replystr.rfind("SL");
 		if (p != string::npos)
 			lo = fm_decimal(&replystr[2], 2);
 		cmd = "SH;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "get SH", cmd, replystr);
+		waitN(5, 100, "get SH", ASC);
 		p = replystr.rfind("SH");
 		if (p != string::npos)
 			hi = fm_decimal(&replystr[2], 2);
 		A.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
 	} else if (A.imode == 2 || A.imode == 6) { // CW
 		cmd = "FW;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "get FW", cmd, replystr);
+		waitN(7, 100, "get FW", ASC);
 		p = replystr.rfind("FW");
 		if (p != string::npos) {
 			for (i = 0; i < 11; i++)
@@ -552,8 +538,7 @@ int RIG_TS2000::get_bwA()
 		}
 	} else if (A.imode == 5 || A.imode == 7) {
 		cmd = "FW;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "get FW", cmd, replystr);
+		waitN(7, 100, "get FW", ASC);
 		p = replystr.rfind("FW");
 		if (p != string::npos) {
 			for (i = 0; i < 4; i++)
@@ -601,22 +586,19 @@ int RIG_TS2000::get_bwB()
 	if (B.imode == 0 || B.imode == 1 || B.imode == 3 || B.imode == 4) {
 		int lo = B.iBW & 0xFF, hi = (B.iBW >> 8) & 0x7F;
 		cmd = "SL;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "get SL", cmd, replystr);
+		waitN(5, 100, "get SL", ASC);
 		p = replystr.rfind("SL");
 		if (p != string::npos)
 			lo = fm_decimal(&replystr[2], 2);
 		cmd = "SH;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "get SH", cmd, replystr);
+		waitN(5, 100, "get SH", ASC);
 		p = replystr.rfind("SH");
 		if (p != string::npos)
 			hi = fm_decimal(&replystr[2], 2);
 		B.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
 	} else if (B.imode == 2 || B.imode == 6) {
 		cmd = "FW;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "get FW", cmd, replystr);
+		waitN(7, 100, "get FW", ASC);
 		p = replystr.rfind("FW");
 		if (p != string::npos) {
 			for (i = 0; i < 11; i++)
@@ -627,7 +609,7 @@ int RIG_TS2000::get_bwB()
 		}
 	} else if (B.imode == 5 || B.imode == 7) {
 		cmd = "FW;";
-		showresp(WARN, ASC, "get FW", cmd, replystr);
+		waitN(7, 100, "get FW", ASC);
 		p = replystr.rfind("FW");
 		if (p != string::npos) {
 			for (i = 0; i < 4; i++)
@@ -657,8 +639,7 @@ void RIG_TS2000::set_mic_gain(int val)
 int RIG_TS2000::get_mic_gain()
 {
 	cmd = "MG;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "get mic", cmd, replystr);
+	waitN(6, 100, "get mic", ASC);
 	size_t p = replystr.rfind("MG");
 	if (p != string::npos)
 		return fm_decimal(&replystr[p+2], 3);
@@ -705,8 +686,7 @@ void RIG_TS2000::set_if_shift(int val)
 bool RIG_TS2000::get_if_shift(int &val)
 {
 	cmd = "IS;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "get IF shift", cmd, replystr);
+	waitN(8, 100, "get IF shift", ASC);
 	size_t p = replystr.rfind("IS ");
 	if (p != string::npos) {
 		val = fm_decimal(&replystr[p+3], 4);
@@ -745,8 +725,7 @@ bool  RIG_TS2000::get_notch(int &val)
 {
 	bool ison = false;
 	cmd = "BP;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "get Notch", cmd, replystr);
+	waitN(6, 100, "get Notch", ASC);
 	size_t p = replystr.rfind("BP");
 	if (p != string::npos) {
 		val = fm_decimal(&replystr[p+2],3);
@@ -765,15 +744,14 @@ void RIG_TS2000::get_notch_min_max_step(int &min, int &max, int &step)
 void RIG_TS2000::set_auto_notch(int v)
 {
 	cmd = v ? "NT1;" : "NT0;";
-	sendCommand(cmd);
+	sendCommand(cmd, 0);
 	showresp(WARN, ASC, "set auto notch", cmd, replystr);
 }
 
 int  RIG_TS2000::get_auto_notch()
 {
 	cmd = "NT;";
-	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "get auto notch", cmd, replystr);
+	waitN(4, 100, "get auto notch", ASC);
 	size_t p = replystr.rfind("NT");
 	if (p != string::npos)
 		return (replystr[p+2] == '1');
@@ -791,8 +769,7 @@ void RIG_TS2000::set_rf_gain(int val)
 int  RIG_TS2000::get_rf_gain()
 {
 	cmd = "RG;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "get rf gain", cmd, replystr);
+	waitN(6, 100, "get rf gain", ASC);
 	size_t p = replystr.rfind("RG");
 	if (p != string::npos)
 		return fm_decimal(&replystr[p+2] ,3) * 100 / 255;
