@@ -34,7 +34,7 @@ static const char *TS2000_hi[] = {
 NULL };
 
 static const char *TS2000_AM_lo[] = {
-"10", "100", "200", "500",
+"0", "100", "200", "500",
 NULL };
 
 static const char *TS2000_AM_hi[] = {
@@ -178,7 +178,7 @@ long RIG_TS2000::get_vfoA ()
 	cmd = "FA;";
 	waitN(14, 100, "get vfo A", ASC);
 	size_t p = replystr.rfind("FA");
-	if (p != string::npos && (p + 12 < replystr.length())) {
+	if (p != string::npos) {
 		int f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replystr[p+n] - '0';
@@ -204,7 +204,7 @@ long RIG_TS2000::get_vfoB ()
 	cmd = "FB;";
 	waitN(14, 100, "get vfo B", ASC);
 	size_t p = replystr.rfind("FB");
-	if (p != string::npos && (p + 12 < replystr.length())) {
+	if (p != string::npos) {
 		int f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replystr[p+n] - '0';
@@ -230,9 +230,8 @@ int RIG_TS2000::get_smeter()
 	cmd = "SM0;";
 	waitN(8, 100, "get smeter", ASC);
 	size_t p = replystr.rfind("SM");
-	if (p != string::npos && (p + 7 < replystr.length())) {
-		replystr[p+7] = 0;
-		int mtr = atoi(&replystr[p+5]);
+	if (p != string::npos) {
+		int mtr = fm_decimal(&replystr[p+3],4);
 		mtr = (mtr * 100) / 30;
 		return mtr;
 	}
@@ -244,9 +243,8 @@ int RIG_TS2000::get_swr()
 	cmd = "RM1;";
 	waitN(8, 100, "get swr", ASC);
 	size_t p = replystr.rfind("RM");
-	if (p != string::npos && (p + 7 < replystr.length())) {
-		replystr[p+7] = 0;
-		int mtr = atoi(&replystr[p+5]);
+	if (p != string::npos) {
+		int mtr = fm_decimal(&replystr[p+3], 4);
 		mtr = (mtr * 100) / 30;
 	}
 	return 0;
@@ -256,11 +254,8 @@ int RIG_TS2000::get_swr()
 void RIG_TS2000::set_power_control(double val)
 {
 	int ival = (int)val;
-	cmd = "PC000;";
-	for (int i = 4; i > 1; i--) {
-		cmd[i] += ival % 10;
-		ival /= 10;
-	}
+	cmd = "PC";
+	cmd.append(to_decimal(ival, 3)).append(";");
 	sendCommand(cmd, 0);
 	showresp(WARN, ASC, "set pwr ctrl", cmd, replystr);
 }
@@ -275,9 +270,8 @@ int RIG_TS2000::get_power_control()
 	cmd = "PC;";
 	waitN(6, 100, "get pout", ASC);
 	size_t p = replystr.rfind("PC");
-	if (p != string::npos && (p + 5 < replystr.length())) {
-		replystr[p+5] = 0;
-		int mtr = atoi(&replystr[p+2]);
+	if (p != string::npos) {
+		int mtr = fm_decimal(&replystr[p+2], 3);
 		return mtr;
 	}
 	return 0;
@@ -289,9 +283,8 @@ int RIG_TS2000::get_volume_control()
 	cmd = "AG0;";
 	waitN(7, 100, "get vol", ASC);
 	size_t p = replystr.rfind("AG");
-	if (p != string::npos && (p + 7 < replystr.length())) {
-		cmd[p+7] = 0;
-		int val = atoi(&replystr[p+3]);
+	if (p != string::npos) {
+		int val = fm_decimal(&replystr[p+3],3);
 		return (int)(val / 2.55);
 	}
 	return 0;
@@ -300,11 +293,8 @@ int RIG_TS2000::get_volume_control()
 void RIG_TS2000::set_volume_control(int val) 
 {
 	int ivol = (int)(val * 2.55);
-	cmd = "AG0000;";
-	for (int i = 5; i > 2; i--) {
-		cmd[i] += ivol % 10;
-		ivol /= 10;
-	}
+	cmd = "AG";
+	cmd.append(to_decimal(ivol, 3)).append(";");
 	sendCommand(cmd,0);
 	showresp(WARN, ASC, "set vol", cmd, replystr);
 }
@@ -427,7 +417,7 @@ int RIG_TS2000::get_modeA()
 	cmd = "MD;";
 	waitN(4, 100, "get mode A", ASC);
 	size_t p = replystr.rfind("MD");
-	if (p != string::npos && (p + 2 < replystr.length())) {
+	if (p != string::npos) {
 		int md = replystr[p+2];
 		md = md - '1';
 		if (md == 8) md = 7;
@@ -453,7 +443,7 @@ int RIG_TS2000::get_modeB()
 	cmd = "MD;";
 	waitN(4, 100, "get mode B", ASC);
 	size_t p = replystr.rfind("MD");
-	if (p != string::npos && (p + 2 < replystr.length())) {
+	if (p != string::npos) {
 		int md = replystr[p+2];
 		md = md - '1';
 		if (md == 8) md = 7;
@@ -713,27 +703,33 @@ void RIG_TS2000::set_notch(bool on, int val)
 	if (on) {
 		cmd = "BC2;"; // set manual notch
 		sendCommand(cmd,0);
-		showresp(WARN, ASC, "set manual notch on", cmd, replystr);
+		showresp(WARN, ASC, "set notch on", cmd, replystr);
 		cmd = "BP";
 		cmd.append(to_decimal(val, 3)).append(";");
 		sendCommand(cmd,0);
-		showresp(WARN, ASC, "set Notch val", cmd, replystr);
+		showresp(WARN, ASC, "set notch val", cmd, replystr);
 	} else {
 		cmd = "BC0;"; // no notch action
 		sendCommand(cmd,0);
-		showresp(WARN, ASC, "set manual notch off", cmd, replystr);
+		showresp(WARN, ASC, "set notch off", cmd, replystr);
 	}
 }
 
 bool  RIG_TS2000::get_notch(int &val)
 {
 	bool ison = false;
-	cmd = "BP;";
-	waitN(6, 100, "get Notch", ASC);
-	size_t p = replystr.rfind("BP");
+	cmd = "BC;";
+	waitN(4, 100, "get notch on/off", ASC);
+	size_t p = replystr.rfind("BC");
 	if (p != string::npos) {
-		val = fm_decimal(&replystr[p+2],3);
-		ison = true;
+		if (replystr[p+2] == '2') {
+			ison = true;
+			cmd = "BP;";
+			waitN(6, 100, "get notch val", ASC);
+			p = replystr.rfind("BP");
+			if (p != string::npos)
+				val = fm_decimal(&replystr[p+2],3);
+		}
 	}
 	return ison;
 }
