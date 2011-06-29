@@ -293,7 +293,7 @@ int RIG_TS2000::get_volume_control()
 void RIG_TS2000::set_volume_control(int val) 
 {
 	int ivol = (int)(val * 2.55);
-	cmd = "AG";
+	cmd = "AG0";
 	cmd.append(to_decimal(ivol, 3)).append(";");
 	sendCommand(cmd,0);
 	showresp(WARN, ASC, "set vol", cmd, replystr);
