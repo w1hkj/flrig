@@ -1,5 +1,6 @@
 2011-06-29  David Freese  <w1hkj@w1hkj.com>
 
+	5367c5d: TS2000 set volume
 	66cbe4b: TS2000 queries, AM
 	431ca8f: TS2000 defaults
 	f082550: Deprecate d3572dc
