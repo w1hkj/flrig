@@ -713,22 +713,22 @@ bool  RIG_FT950::get_notch(int &val)
 	cmd = rsp = "BP00";
 	cmd += ';';
 	waitN(8, 100, "get notch on/off", ASC);
-
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return ison;
 
-	if (replystr[p+6] == '1') { // manual notch enabled
+	if (replystr[p+6] == '1') // manual notch enabled
 		ison = true;
-		val = progStatus.notch_val;
-		cmd = rsp = "BP01";
-		cmd += ';';
-		waitN(8, 100, "get notch val", ASC);
-		p = replystr.rfind(rsp);
-		if (p == string::npos)
-			val = 10;
-		else
-			val = fm_decimal(&replystr[p+4],3) * 10;
-	}
+
+	val = progStatus.notch_val;
+	cmd = rsp = "BP01";
+	cmd += ';';
+	waitN(8, 100, "get notch val", ASC);
+	p = replystr.rfind(rsp);
+	if (p == string::npos)
+		val = 10;
+	else
+		val = fm_decimal(&replystr[p+4],3) * 10;
+
 	return (notch_on = ison);
 }
 
