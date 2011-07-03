@@ -1,5 +1,8 @@
-2011-06-29  David Freese  <w1hkj@w1hkj.com>
+2011-07-03  David Freese  <w1hkj@w1hkj.com>
 
+	12942c5: K2 low/high power
+	9114a67: TS2000 swr/po
+	d7d549c: FT950 manual notch
 	5367c5d: TS2000 set volume
 	66cbe4b: TS2000 queries, AM
 	431ca8f: TS2000 defaults
