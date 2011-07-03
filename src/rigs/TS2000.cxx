@@ -78,6 +78,7 @@ RIG_TS2000::RIG_TS2000() {
 	B.freq = A.freq = 14070000;
 	can_change_alt_vfo = true;
 
+	has_power_out =
 	has_swr_control = false;
 
 	has_dsp_controls =
@@ -87,8 +88,6 @@ RIG_TS2000::RIG_TS2000() {
 	has_auto_notch =
 	has_ifshift_control =
 	has_smeter =
-	has_power_out =
-	has_swr_control =
 	has_noise_control =
 	has_micgain_control =
 	has_volume_control =
@@ -240,13 +239,18 @@ int RIG_TS2000::get_smeter()
 
 int RIG_TS2000::get_swr()
 {
+/*
 	cmd = "RM1;";
+	sendCommand(cmd,0);
+	showresp(WARN, ASC, "set swr meter", cmd, replystr);
+	cmd = "RM;";
 	waitN(8, 100, "get swr", ASC);
 	size_t p = replystr.rfind("RM");
 	if (p != string::npos) {
 		int mtr = fm_decimal(&replystr[p+3], 4);
 		mtr = (mtr * 100) / 30;
 	}
+*/
 	return 0;
 }
 
