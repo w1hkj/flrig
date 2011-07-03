@@ -432,6 +432,15 @@ void read_notch()
 void update_power_control(void *d)
 {
 	sldrPOWER->value(progStatus.power_level);
+	if (rig_nbr == K2) {
+		double min, max, step;
+		selrig->get_pc_min_max_step(min, max, step);
+		sldrPOWER->minimum(min);
+		sldrPOWER->maximum(max);
+		sldrPOWER->step(step);
+		sldrPOWER->redraw();
+	}
+	set_power_controlImage(selrig->max_power);
 }
 
 void read_power_control()
@@ -1480,13 +1489,17 @@ void setPower()
 		progStatus.power_level = pwr;
 		selrig->set_power_control(pwr);
 	pthread_mutex_unlock(&mutex_serial);
+	if (rig_nbr == K2) {
+		double min, max, step;
+		selrig->get_pc_min_max_step(min, max, step);
+		sldrPOWER->minimum(min);
+		sldrPOWER->maximum(max);
+		sldrPOWER->step(step);
+		sldrPOWER->value(progStatus.power_level);
+		sldrPOWER->redraw();
+	}
+	set_power_controlImage(selrig->max_power);
 	setFocus();
-}
-
-void reset_power_controlImage( void *d )
-{
-	int val = (long)d;
-	sldrPOWER->value(val);
 }
 
 void cbTune()
@@ -2484,14 +2497,14 @@ void initRig()
 
 	if (selrig->has_power_control) {
 		double min, max, step;
-		selrig->get_pc_min_max_step(min, max, step);
-		sldrPOWER->minimum(min);
-		sldrPOWER->maximum(max);
-		sldrPOWER->step(step);
 		if (progStatus.use_rig_data)
 			progStatus.power_level = selrig->get_power_control();
 		else
 			selrig->set_power_control(progStatus.power_level);
+		selrig->get_pc_min_max_step(min, max, step);
+		sldrPOWER->minimum(min);
+		sldrPOWER->maximum(max);
+		sldrPOWER->step(step);
 		sldrPOWER->value(progStatus.power_level);
 		sldrPOWER->redraw();
 		sldrPOWER->show();

@@ -313,7 +313,7 @@ void status::saveLastState()
 
 	spref.set("bool_spkr_on", spkr_on);
 	spref.set("int_volume", volume);
-	spref.set("int_power", power_level);
+	spref.set("dbl_power", power_level);
 	spref.set("int_mic", mic_gain);
 	spref.set("bool_notch", notch);
 	spref.set("int_notch", notch_val);
@@ -543,7 +543,7 @@ bool status::loadXcvrState(const char *xcvr)
 
 		if (spref.get("bool_spkr_on", i, i)) spkr_on = i;
 		spref.get("int_volume", volume, volume);
-		spref.get("int_power", power_level, power_level);
+		spref.get("dbl_power", power_level, power_level);
 		spref.get("int_mic", mic_gain, mic_gain);
 		if (spref.get("bool_notch", i, i)) notch = i;
 		spref.get("int_notch", notch_val, notch_val);
