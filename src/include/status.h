@@ -72,7 +72,7 @@ struct status {
 
 	bool	spkr_on;
 	int		volume;
-	int		power_level;
+	double	power_level;
 	int		mic_gain;
 	bool	notch;
 	int		notch_val;

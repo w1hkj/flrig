@@ -9,9 +9,10 @@
  * Ref Elecraft KIO2 Programmer's Reference (Rev E, 3 Feb, 2004)
  * K2 MCU firmware rev 2.04
  * 
- */
+*/
  
- #include "K2.h"
+#include "K2.h"
+#include "status.h"
 
 const char K2name_[] = "K2";
 
@@ -303,27 +304,29 @@ int RIG_K2::get_power_out()
 
 int RIG_K2::get_power_control()
 {
-	rsp = cmd = "PC";                        //init the get string
+	rsp = cmd = "PC;";  // extended mode for get power
 	cmd += ';';
 	int ret = waitN(7, 100, "get pwr cont", ASC);
-	if (ret < 7) return 0;
+	if (ret < 7) return progStatus.power_level;
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	hipower = (replystr[p+5] == '1');
-    int mtr = (replystr[p + 4] - '0'   //pwr is the least sig digit
-		+ 10 * (replystr[p + 3] - '0')     //plus ten times the next sig digit
-	    + 100 * (replystr[p + 2] - '0'));   //plus one hundred times the most sig digit
+	int mtr = fm_decimal(&replystr[p+4], 3);
+	if (!hipower) mtr /= 10;
 	return mtr;
 }
 
 void RIG_K2::set_power_control(double val)
 {
     int ival = (int)val;
-	cmd = "PC0000;";                    //init the cmd string
-	if (hipower) cmd[5] = '1';
-	for (int i = 4; i > 1; i--) {       //select the char in the cmd string, least sig digit first
-		cmd[i] += ival % 10;            //parse the digit, add it to ascii '0', assign to char
-		ival /= 10;                     //shift the pwr over
+	cmd = "PC";                    //init the cmd string
+	if (val > 15) {
+		hipower = true;
+		cmd[5] = '1';
+		cmd.append(to_decimal(ival,3)).append("1;");
+	} else {
+		hipower = false;
+		cmd.append(to_decimal((int)(val*10),3)).append("0;");
 	}
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET pwr", cmd, replystr);
@@ -332,9 +335,9 @@ void RIG_K2::set_power_control(double val)
 void RIG_K2::get_pc_min_max_step(double &min, double &max, double &step)
 {
 	if (hipower) {
-		min = 5; max = 150; step = 1;
+		min = 1.0; max_power = max = 110.0; step = 1.0;
 	} else {
-		min = 0; max = 15; step = 1;
+		min = 0.1; max_power = max = 20; step = 0.1;
 	}
 }
 
