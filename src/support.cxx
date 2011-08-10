@@ -682,18 +682,18 @@ void * serial_thread_loop(void *d)
 
 			if (!loopcount--) {
 				if (rig_nbr == K3) read_K3();
-				else {
-					if (selrig->has_get_info &&
-						(progStatus.poll_frequency ||
-						(progStatus.poll_mode) ||
-						(progStatus.poll_bandwidth))) read_info();
-					if (progStatus.poll_frequency) read_vfo();
-					if (!quePTT.empty()) continue;
-					if (progStatus.poll_mode) read_mode();
-					if (!quePTT.empty()) continue;
-					if (progStatus.poll_bandwidth) read_bandwidth();
-					if (!quePTT.empty()) continue;
-				}
+				else if ((rig_nbr == K2) ||
+						 (selrig->has_get_info &&
+						 (progStatus.poll_frequency ||
+						 (progStatus.poll_mode) ||
+						 (progStatus.poll_bandwidth)))) read_info();
+				if (progStatus.poll_frequency) read_vfo();
+				if (!quePTT.empty()) continue;
+				if (progStatus.poll_mode) read_mode();
+				if (!quePTT.empty()) continue;
+				if (progStatus.poll_bandwidth) read_bandwidth();
+				if (!quePTT.empty()) continue;
+
 				if (progStatus.poll_smeter) read_smeter();
 				if (!quePTT.empty()) continue;
 				if (poll_extras++ >= progStatus.poll_extras_interval) {
@@ -1007,6 +1007,15 @@ void cbA2B()
 {
 	if (rig_nbr == K3) {
 		K3_A2B();
+		return;
+	}
+	if (rig_nbr == K2) {
+		pthread_mutex_lock(&mutex_serial);
+		vfoB = vfoA;
+		selrig->set_vfoB(vfoB.freq);
+		FreqDispB->value(vfoB.freq);
+		pthread_mutex_unlock(&mutex_serial);
+		setFocus();
 		return;
 	}
 	if (selrig->has_a2b) {
