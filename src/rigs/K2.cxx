@@ -12,6 +12,7 @@
 */
  
 #include "K2.h"
+#include "support.h"
 #include "status.h"
 
 const char K2name_[] = "K2";
@@ -44,17 +45,19 @@ RIG_K2::RIG_K2() {
 	bwB = bwA = 0;
 	freqB = freqA = 14070000;
 
-	has_attenuator_control = true;
-	has_preamp_control = true;
-	has_power_control = true;
-	has_volume_control = false;
-	has_mode_control = true;
-	has_bandwidth_control = true;
-	has_micgain_control = false;
-	has_notch_control = false;
-	has_ifshift_control = false;
-	has_ptt_control = true;
+	has_get_info =
+	has_attenuator_control =
+	has_preamp_control =
+	has_power_control =
+	has_mode_control =
+	has_bandwidth_control =
+	has_ptt_control =
 	has_tune_control = true;
+
+	has_micgain_control =
+	has_notch_control =
+	has_ifshift_control =
+	has_volume_control =
 	has_swr_control = false;
 
 	hipower = false;
@@ -67,10 +70,67 @@ int  RIG_K2::adjust_bandwidth(int m)
 
 void RIG_K2::initialize()
 {
-//enable extended command mode	
+//enable extended command mode
 	sendCommand("K22;", 0);
+//disable auto reporting of info
+	sendCommand("AI0;", 0);
 //ensure K2 is in VFO A
     get_power_control();
+}
+
+/*
+ * IF (Transceiver Information; GET only)
+ * 
+ * RSP format: IF[f]*****+yyyyrx*00tmvspb01*; where the fields are defined as follows:
+ * 
+ * 0         1         2         3
+ * 0123456789012345678901234567890123456789
+ * IFfffffffffff*****+yyyyrx*00tmvspb01*;
+ *   0..1   IF 
+ *   2..12  [f] operating frequency, excluding any RIT/XIT offset (11 digits; see FA command)
+ *   13..17 * represents a space (BLANK, or ASCII 0x20)
+ *   18     + either "+" or "-" (sign of RIT/XIT offset)
+ *   19..22 yyyy RIT/XIT offset in Hz (range is -9990 to +9990 Hz when computer-controlled)
+ *   23     r 1 if RIT is on, 0 if off
+ *   24     x 1 if XIT is on, 0 if off
+ *   25..27 fill
+ *   28     t 1 if the K2 is in transmit mode, 0 if receive
+ *   29     m operating mode (see MD command)
+ *   30     v receive-mode VFO selection, 0 for VFO A, 1 for VFO B
+ *   31     s 1 if scan is in progress, 0 otherwise
+ *   32     p 1 if the transeiver is in split mode, 0 otherwise
+ *   33     b basic RSP format: always 0
+ *            extended RSP format: 
+ *                1 if the present IF response is due to a K2 band change and 
+ *                0 otherwise
+ *   34..35 fill
+ *   37     ; terminator
+ * The fixed-value fields (space, 0, and 1) are provided for syntactic compatibility with existing software.
+*/
+//const char *teststr = "IFfffffffffff*****+yyyyrx*001m0spb01*;";
+
+static void do_selectA(void *)
+{
+	cb_selectA();
+}
+
+static void do_selectB(void *)
+{
+	cb_selectB();
+}
+
+bool RIG_K2::get_info()
+{
+	rsp = cmd = "IF";
+	cmd += ';';
+	int ret = waitN(38, 100, "get info", ASC);
+	if (ret < 38) return false;
+	size_t p = replystr.find(rsp);
+	if (PTT && (replystr[p+28]=='0')) Fl::awake(setPTT, (void*)0);
+	if (!PTT && (replystr[p+28]=='1')) Fl::awake(setPTT, (void*)1);
+	if (useB && (replystr[p+30]=='0')) Fl::awake(do_selectA, (void*)0);
+	else if(!useB && (replystr[p+30]=='1')) Fl::awake(do_selectB, (void*)0);
+	return true;
 }
 
 void RIG_K2::selectA()
@@ -104,7 +164,6 @@ void RIG_K2::set_split(bool val)
 		showresp(WARN, ASC, "set split OFF", cmd, replystr);
 	}
 }
-
 
 long RIG_K2::get_vfoA ()
 {

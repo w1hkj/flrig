@@ -12,6 +12,7 @@ public:
 
 	void initialize();
 
+	bool get_info();
 	bool twovfos() {return true;}
 
 	long get_vfoA();
