@@ -351,16 +351,25 @@ void read_preamp_att()
 // split
 void update_split(void *d)
 {
-	btnPreamp->value(progStatus.preamp);
+	btnSplit->value(progStatus.split);
+	if (rig_nbr == K2 && progStatus.split) {
+		btnA->value(1);
+		btnB->value(0);
+		cb_selectA();
+	}
 }
 
 void read_split()
 {
+	int val;
 	if (selrig->can_split()) {
 		pthread_mutex_lock(&mutex_serial);
-			progStatus.split = selrig->get_split();
+			val = selrig->get_split();
 		pthread_mutex_unlock(&mutex_serial);
-		Fl::awake(update_split, (void*)0);
+		if (val != progStatus.split) {
+			progStatus.split = val;
+			Fl::awake(update_split, (void*)0);
+		}
 	}
 }
 
@@ -1040,6 +1049,16 @@ void cb_set_split(int val)
 		pthread_mutex_lock(&mutex_serial);
 			selrig->set_split(val);
 		pthread_mutex_unlock(&mutex_serial);
+		setFocus();
+		return;
+	}
+	if (rig_nbr == K2) {
+		pthread_mutex_lock(&mutex_serial);
+			selrig->set_split(val);
+		pthread_mutex_unlock(&mutex_serial);
+		btnA->value(1);
+		btnB->value(0);
+		cb_selectA();
 		setFocus();
 		return;
 	}
