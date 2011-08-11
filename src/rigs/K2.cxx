@@ -52,8 +52,10 @@ RIG_K2::RIG_K2() {
 	has_mode_control =
 	has_bandwidth_control =
 	has_ptt_control =
+	has_split =
 	has_tune_control = true;
 
+	K2split =
 	has_micgain_control =
 	has_notch_control =
 	has_ifshift_control =
@@ -107,7 +109,8 @@ void RIG_K2::initialize()
  *   37     ; terminator
  * The fixed-value fields (space, 0, and 1) are provided for syntactic compatibility with existing software.
 */
-//const char *teststr = "IFfffffffffff*****+yyyyrx*001m0spb01*;";
+// set replystr to teststr to test for various control bytes
+//const char *teststr = "IFfffffffffff*****+yyyyrx*000m0s1b01*;";
 
 static void do_selectA(void *)
 {
@@ -130,6 +133,7 @@ bool RIG_K2::get_info()
 	if (!PTT && (replystr[p+28]=='1')) Fl::awake(setPTT, (void*)1);
 	if (useB && (replystr[p+30]=='0')) Fl::awake(do_selectA, (void*)0);
 	else if(!useB && (replystr[p+30]=='1')) Fl::awake(do_selectB, (void*)0);
+	K2split = replystr[p+32]-'0';
 	return true;
 }
 
@@ -163,6 +167,11 @@ void RIG_K2::set_split(bool val)
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set split OFF", cmd, replystr);
 	}
+}
+
+bool RIG_K2::get_split()
+{
+	return K2split;
 }
 
 long RIG_K2::get_vfoA ()

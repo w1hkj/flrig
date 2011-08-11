@@ -6,6 +6,7 @@
 class RIG_K2 : public rigbase {
 protected:
 	bool hipower;
+	bool K2split;
 public:
 	RIG_K2();
 	~RIG_K2(){}
@@ -50,6 +51,7 @@ public:
 
 	bool can_split();
 	void set_split(bool val);
+	bool get_split();
 
 	int  adjust_bandwidth(int m);
 
