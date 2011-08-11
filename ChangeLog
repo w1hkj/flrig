@@ -1,6 +1,7 @@
-2011-08-10  David Freese  <w1hkj@w1hkj.com>
+2011-08-11  David Freese  <w1hkj@w1hkj.com>
 
-	bb41f99: K2 ptt/vfo-select
+	9d02acf: K2 get split
+	29953d7: K2 ptt/vfo-select
 	12942c5: K2 low/high power
 	9114a67: TS2000 swr/po
 	d7d549c: FT950 manual notch
