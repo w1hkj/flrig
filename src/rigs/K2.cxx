@@ -141,6 +141,7 @@ void RIG_K2::selectA()
 {
 	cmd = "FR0;FT0";
 	sendCommand(cmd);
+	K2split = false;
 	showresp(WARN, ASC, "select A", cmd, replystr);
 }
 
@@ -148,6 +149,7 @@ void RIG_K2::selectB()
 {
 	cmd = "FR1;FT1";
 	sendCommand(cmd);
+	K2split = false;
 	showresp(WARN, ASC, "select B", cmd, replystr);
 }
 
@@ -159,11 +161,17 @@ bool RIG_K2::can_split()
 void RIG_K2::set_split(bool val)
 {
 	if (val) {
-		cmd = "FR0;FT1;";
+		if (useB)
+			cmd = "FR1;FT0;";
+		else
+			cmd = "FR0;FT1;";
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set split ON", cmd, replystr);
 	} else {
-		cmd = "FR0;FT0;";
+		if (useB)
+			cmd = "FR1;FT1;";
+		else
+			cmd = "FR0;FT0;";
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set split OFF", cmd, replystr);
 	}

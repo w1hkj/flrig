@@ -352,11 +352,6 @@ void read_preamp_att()
 void update_split(void *d)
 {
 	btnSplit->value(progStatus.split);
-	if (rig_nbr == K2 && progStatus.split) {
-		btnA->value(1);
-		btnB->value(0);
-		cb_selectA();
-	}
 }
 
 void read_split()
@@ -1056,9 +1051,6 @@ void cb_set_split(int val)
 		pthread_mutex_lock(&mutex_serial);
 			selrig->set_split(val);
 		pthread_mutex_unlock(&mutex_serial);
-		btnA->value(1);
-		btnB->value(0);
-		cb_selectA();
 		setFocus();
 		return;
 	}
@@ -1119,9 +1111,13 @@ void highlight_vfo(void *d)
 }
 
 void cb_selectA() {
+	useB = false;
+	if (progStatus.split) {
+		btnSplit->value(0);
+		cb_set_split(0);
+	}
 	pthread_mutex_lock(&mutex_serial);
 	changed_vfo = true;
-	useB = false;
 	vfoA.src = UI;
 	vfoA.freq = FreqDispA->value();
 	pthread_mutex_lock(&mutex_queA);
@@ -1132,13 +1128,13 @@ void cb_selectA() {
 }
 
 void cb_selectB() {
+	useB = true;
 	if (progStatus.split) {
 		btnSplit->value(0);
 		cb_set_split(0);
 	}
 	pthread_mutex_lock(&mutex_serial);
 	changed_vfo = true;
-	useB = true;
 	vfoB.src = UI;
 	vfoB.freq = FreqDispB->value();
 	pthread_mutex_lock(&mutex_queB);
