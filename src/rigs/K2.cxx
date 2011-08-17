@@ -53,6 +53,8 @@ RIG_K2::RIG_K2() {
 	has_bandwidth_control =
 	has_ptt_control =
 	has_split =
+	has_smeter =
+	has_power_out =
 	has_tune_control = true;
 
 	K2split =
