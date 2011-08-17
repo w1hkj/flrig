@@ -1,8 +1,10 @@
+2011-08-17  David Freese  <w1hkj@w1hkj.com>
+
+	4fccae4: K2 smeter/pout
+	aab7579: K2 split
 
 
 =Version 1.2.0=
-
-2011-08-11  David Freese  <w1hkj@w1hkj.com>
 
 	9d02acf: K2 get split
 	29953d7: K2 ptt/vfo-select
