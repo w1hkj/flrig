@@ -1,5 +1,7 @@
-2011-08-17  David Freese  <w1hkj@w1hkj.com>
+2011-08-18  David Freese  <w1hkj@w1hkj.com>
 
+	627beb6: Volume restore
+	45696b3: IC7000 read notch
 	4fccae4: K2 smeter/pout
 	aab7579: K2 split
 
