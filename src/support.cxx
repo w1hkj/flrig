@@ -377,6 +377,7 @@ void update_volume(void *d)
 void read_volume()
 {
 	if (!selrig->has_volume_control) return;
+	if (btnVol->value() == 0) return; // muted
 	pthread_mutex_lock(&mutex_serial);
 		progStatus.volume = selrig->get_volume_control();
 	pthread_mutex_unlock(&mutex_serial);
