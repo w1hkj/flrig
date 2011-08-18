@@ -693,7 +693,7 @@ bool RIG_IC7000::get_notch(int &val)
 		if (waitFOR(9, "notch val")) {
 			size_t p = replystr.rfind(resp);
 			if (p != string::npos)
-				val = (int)(3000.0*ceil(fm_bcd(&replystr[p + 6],3) / 255.0));
+				val = (int)ceil(fm_bcd(&replystr[p+6],3) * 3000.0 / 255.0);
 		}
 	}
 	return on;
