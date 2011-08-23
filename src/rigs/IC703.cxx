@@ -39,6 +39,9 @@ RIG_IC703::RIG_IC703() {
 	modeA = 1;
 	bwA = 0;
 
+	has_swr_control =
+	has_smeter =
+	has_power_out =
 	has_ptt_control =
 	has_mode_control =
 	has_bandwidth_control =
