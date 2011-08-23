@@ -30,6 +30,7 @@ public:
 
 	int  get_smeter();
 	int  get_swr();
+	int  get_power_out();
 	void set_PTT_control(int val);
 	void tune_rig();
 

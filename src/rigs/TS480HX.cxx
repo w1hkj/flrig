@@ -83,9 +83,9 @@ RIG_TS480HX::RIG_TS480HX() {
 	has_micgain_control =
 	has_preamp_control =
 	has_notch_control =
-	has_ifshift_control =
-	has_swr_control = false;
+	has_ifshift_control = false;
 
+	has_power_out =
 	has_dsp_controls =
 	has_smeter =
 	has_swr_control =
@@ -232,38 +232,46 @@ void RIG_TS480HX::set_vfoB (long freq)
 // SM cmd 0 ... 100 (rig values 0 ... 15)
 int RIG_TS480HX::get_smeter()
 {
+	int mtr = 0;
 	cmd = "SM0;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get s-meter", cmd, replystr);
+	int ret = waitN(8, 100, "get Smeter", ASC);
 	if (ret < 8) return 0;
 
 	size_t p = replystr.rfind("SM");
-	if (p == string::npos) return 0;
+	if (p != string::npos)
+		mtr = 5 * atoi(&replystr[p + 3]);
+	return mtr;
+}
 
-	replystr[p + 7] = 0;
-	int mtr = atoi(&replystr[p + 3]);
-	mtr = (mtr * 100) / 20;
+int RIG_TS480HX::get_power_out()
+{
+	int mtr = 0;
+	cmd = "SM0;";
+	int ret = waitN(8, 100, "get power", ASC);
+	if (ret < 8) return mtr;
+	size_t p = replystr.rfind("SM");
+	if (p != string::npos) {
+		mtr = 5 * atoi(&replystr[p + 3]);
+		if (mtr > 100) mtr = 100;
+	}
 	return mtr;
 }
 
 // RM cmd 0 ... 100 (rig values 0 ... 8)
+// User report of RM; command using Send Cmd tab
+// RM10000;RM20000;RM30000;
+
 int RIG_TS480HX::get_swr()
 {
-	int mtr = 0;
-	cmd = "RM1;"; // select measurement '1' (swr) and read meter
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get swr", cmd, replystr);
-	if (ret < 8) return mtr;
-	size_t p = replystr.rfind("RM");
-	if (p == string::npos) return mtr;
-
-	replystr[p + 7] = 0;
-	mtr = atoi(&replystr[p + 4]);
-	mtr *= 10;
-
-	return mtr;
+	double mtr = 0;
+	cmd = "RM;";
+	int ret = waitN(8, 100, "get SWR", ASC);
+	if (ret < 8) return (int)mtr;
+	size_t p = replystr.rfind("RM1");
+	if (p != string::npos)
+		mtr = 6.6 * atoi(&replystr[p + 3]);
+	return (int)mtr;
 }
-
 
 // Tranceiver PTT on/off
 void RIG_TS480HX::set_PTT_control(int val)

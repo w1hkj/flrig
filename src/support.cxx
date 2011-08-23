@@ -1576,6 +1576,10 @@ void updateSWR(void * d)
 {
 	if (meter_image != SWR_IMAGE) return;
 	double data = (long)d;
+	if (selrig->has_swr_control) {
+		sldrRcvSignal->hide();
+		sldrALC_SWR->show();
+	}
 	sldrALC_SWR->value(data);
 	sldrALC_SWR->redraw();
 }
@@ -1585,10 +1589,6 @@ void updateFwdPwr(void *d)
 	double power = (long)d;
 	if (!sldrFwdPwr->visible()) {
 		sldrFwdPwr->show();
-		if (selrig->has_swr_control) {
-			sldrRcvSignal->hide();
-			sldrALC_SWR->show();
-		}
 	}
 	sldrFwdPwr->value(power);
 	sldrFwdPwr->redraw();
