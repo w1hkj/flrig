@@ -9,6 +9,7 @@ private:
 	bool preamp_on;
 	bool att_on;
 	const char *_mode_type;
+	bool menu_45;
 public:
 	RIG_TS480HX();
 	~RIG_TS480HX(){}
@@ -16,6 +17,9 @@ public:
 	bool sendTScommand(string, int);
 
 	void initialize();
+	void shutdown();
+
+	void check_menu_45();
 
 	long get_vfoA();
 	void set_vfoA(long);
