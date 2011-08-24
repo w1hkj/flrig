@@ -10,6 +10,8 @@ const char *szNOMODES[] = {"LSB", "USB", NULL};
 const char *szNOBWS[] = {"NONE", NULL};
 const char *szDSPLO[] = {"NONE", NULL};
 const char *szDSPHI[] = {"NONE", NULL};
+const char *szdsptooltip = "dsp tooltip";
+const char *szbtnlabel = " ";
 
 rigbase::rigbase()
 {
@@ -17,7 +19,11 @@ rigbase::rigbase()
 	modes_ = szNOMODES;
 	bandwidths_ = szNOBWS;
 	dsp_lo = szDSPLO;
+	lo_tooltip = szdsptooltip;
+	lo_label = szbtnlabel;
 	dsp_hi = szDSPHI;
+	hi_tooltip = szdsptooltip;
+	hi_label = szbtnlabel;
 
 	serloop_timing = 200; // msec, 5x / second
 

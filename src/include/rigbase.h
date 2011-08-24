@@ -49,7 +49,11 @@ public:
 	const char ** modes_;
 	const char ** bandwidths_;
 	const char ** dsp_lo;
+	const char *  lo_tooltip;
+	const char *  lo_label;
 	const char ** dsp_hi;
+	const char *  hi_tooltip;
+	const char *  hi_label;
 	const int  * bw_vals_;
 	int  comm_baudrate;
 	int  stopbits;

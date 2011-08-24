@@ -192,18 +192,30 @@ void setBWControl(void *)
 			opDSP_hi->index(0);
 			opBW->show();
 		} else {
-			opDSP_lo->index(vfo.iBW & 0xFF);
-			opDSP_hi->index((vfo.iBW >> 8) & 0x7F);
-			opBW->index(0);
-			opBW->hide();
-			opDSP_lo->show();
-			opDSP_hi->hide();
-			if (rig_nbr == TS590S && vfo.imode > 7)
-				btnDSP->label("S");
-			else
-				btnDSP->label("L");
-			btnDSP->redraw_label();
-			btnDSP->show();
+			if (rig_nbr == TS590S) {
+				opDSP_lo->index(vfo.iBW & 0xFF);
+				opDSP_hi->index((vfo.iBW >> 8) & 0x7F);
+				opBW->index(0);
+				opBW->hide();
+				opDSP_lo->show();
+				opDSP_hi->hide();
+				if (vfo.imode > 7)
+					btnDSP->label("S");
+				else
+					btnDSP->label("L");
+				btnDSP->redraw_label();
+				btnDSP->show();
+			} else {
+				opDSP_lo->index(vfo.iBW & 0xFF);
+				opDSP_hi->index((vfo.iBW >> 8) & 0x7F);
+				opBW->index(0);
+				opBW->hide();
+				opDSP_lo->show();
+				opDSP_hi->hide();
+				btnDSP->label(selrig->lo_label);
+				btnDSP->redraw_label();
+				btnDSP->show();
+			}
 		}
 	} else {
 		opBW->index(vfo.iBW);
@@ -796,26 +808,28 @@ void setDSP()
 
 void selectDSP()
 {
-	if (rig_nbr == TS590S && vfo.imode > 7) {
-		if (btnDSP->label()[0] == 'S') {
-			btnDSP->label("W");
-			btnDSP->redraw_label();
-			opDSP_hi->show();
-			opDSP_lo->hide();
-		} else {
-			btnDSP->label("S");
-			btnDSP->redraw_label();
-			opDSP_lo->show();
-			opDSP_hi->hide();
+	if (rig_nbr == TS590S) {
+		if (vfo.imode > 7) {
+			if (btnDSP->label()[0] == 'S') {
+				btnDSP->label("W");
+				btnDSP->redraw_label();
+				opDSP_hi->show();
+				opDSP_lo->hide();
+			} else {
+				btnDSP->label("S");
+				btnDSP->redraw_label();
+				opDSP_lo->show();
+				opDSP_hi->hide();
+			}
 		}
 	} else {
-		if (btnDSP->label()[0] == 'L') {
-			btnDSP->label("U");
+		if (btnDSP->label()[0] == selrig->lo_label[0]) {
+			btnDSP->label(selrig->hi_label);
 			btnDSP->redraw_label();
 			opDSP_hi->show();
 			opDSP_lo->hide();
 		} else {
-			btnDSP->label("L");
+			btnDSP->label(selrig->lo_label);
 			btnDSP->redraw_label();
 			opDSP_lo->show();
 			opDSP_hi->hide();
@@ -850,21 +864,23 @@ void updateBandwidthControl(void *d)
 					opDSP_hi->index((vfo.iBW >> 8) & 0x7F);
 					opBW->index(0);
 					opBW->hide();
-					if (rig_nbr == TS590S && vfo.imode > 7)
-						btnDSP->label("S");
-					else
-						btnDSP->label("L");
-					btnDSP->redraw_label();
-					btnDSP->show();
-					opDSP_lo->show();
-					opDSP_hi->hide();
-				} else {
-					opDSP_lo->index(0);
-					opDSP_hi->index(0);
-					btnDSP->hide();
-					opDSP_lo->hide();
-					opDSP_hi->hide();
-					opBW->show();
+					if (rig_nbr == TS590S) {
+						if (vfo.imode > 7)
+							btnDSP->label("S");
+						else
+							btnDSP->label("L");	
+						btnDSP->redraw_label();
+						btnDSP->show();
+						opDSP_lo->show();
+						opDSP_hi->hide();
+					} else {
+						opDSP_lo->index(0);
+						opDSP_hi->index(0);
+						btnDSP->hide();
+						opDSP_lo->hide();
+						opDSP_hi->hide();
+						opBW->show();
+					}
 				}
 			}
 		}
@@ -2324,15 +2340,21 @@ void initRig()
 	if (selrig->has_dsp_controls) {
 		opDSP_lo->clear();
 		opDSP_hi->clear();
-		if (rig_nbr == TS590S && vfo.imode > 7)
-			btnDSP->label("S");
-		else
-			btnDSP->label("L");
+		if (rig_nbr == TS590S ) {
+			if (vfo.imode > 7)
+				btnDSP->label("S");
+			else 
+				btnDSP->label("L");
+		} else {
+			btnDSP->label(selrig->lo_label);
+		}
 		btnDSP->redraw_label();
 		for (int i = 0; selrig->dsp_lo[i] != NULL; i++)
 			opDSP_lo->add(selrig->dsp_lo[i]);
+		opDSP_lo->tooltip(selrig->lo_tooltip);
 		for (int i = 0; selrig->dsp_hi[i] != NULL; i++)
 			opDSP_hi->add(selrig->dsp_hi[i]);
+		opDSP_hi->tooltip(selrig->hi_tooltip);
 		if (vfo.iBW > 256) {
 			opDSP_lo->index(vfo.iBW & 0xFF);
 			opDSP_hi->index((vfo.iBW >> 8) & 0x7F);

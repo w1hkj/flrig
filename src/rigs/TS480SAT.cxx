@@ -21,17 +21,33 @@ static const char TS480SAT_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'U
 
 static const char *TS480SAT_empty[] = { "N/A", NULL };
 
+// SL command is lo cutoff when menu 045 OFF
 static const char *TS480SAT_lo[] = {
  "10",   "50", "100", "200", "300", 
 "400",  "500", "600", "700", "800", 
-"900", "1000",
-NULL };
+"900", "1000", NULL };
+static const char *TS480SAT_lo_tooltip = "lo cutoff";
+static const char *TS480SAT_btn_lo_label = "L";
 
+// SH command is hi cutoff when menu 045 OFF
 static const char *TS480SAT_hi[] = {
 "1000", "1200", "1400", "1600", "1800", 
 "2000", "2200", "2400", "2600", "2800", 
-"3000", "3400", "4000", "5000",
-NULL };
+"3000", "3400", "4000", "5000", NULL };
+static const char *TS480SAT_hi_tooltip = "hi cutoff";
+static const char *TS480SAT_btn_hi_label = "H";
+
+// SL command is width when menu 045 ON
+static const char *TS480SAT_dataW[] = {
+"50", "100", "250", "500", "1000", "1500", "2400", NULL };
+static const char *TS480SAT_dataW_tooltip = "filter width";
+static const char *TS480SAT_dataW_label = "W";
+
+// SH command is center frequency when menu 045 ON
+static const char *TS480SAT_dataC[] = {
+"1000", "1500", "2210", NULL };
+static const char *TS480SAT_dataC_tooltip = "center frequency";
+static const char *TS480SAT_dataC_label = "C";
 
 static const char *TS480SAT_AM_lo[] = {
 "10", "100", "200", "500",
@@ -62,8 +78,15 @@ RIG_TS480SAT::RIG_TS480SAT() {
 	modes_ = TS480SATmodes_;
 	_mode_type = TS480SAT_mode_type;
 	bandwidths_ = TS480SAT_empty;
-	dsp_lo = TS480SAT_lo;
-	dsp_hi = TS480SAT_hi;
+
+	dsp_lo     = TS480SAT_lo;
+	lo_tooltip = TS480SAT_lo_tooltip;
+	lo_label   = TS480SAT_btn_lo_label;
+
+	dsp_hi     = TS480SAT_hi;
+	hi_tooltip = TS480SAT_hi_tooltip;
+	hi_label   = TS480SAT_btn_hi_label;
+
 	comm_baudrate = BR4800;
 	stopbits = 2;
 	comm_retries = 2;
@@ -118,13 +141,46 @@ const char * RIG_TS480SAT::get_bwname_(int n, int md)
 	return bwname;
 }
 
+void RIG_TS480SAT::check_menu_45()
+{
+// read current switch 45 setting
+	cmd = "EX0450000;"; sendCommand(cmd);
+	showresp(WARN, ASC, "Check menu item 45", cmd, replystr);
+	size_t p = replystr.rfind("EX045");
+	if (p != string::npos)
+		menu_45 = (replystr[p+9] == '1');
+	else
+		menu_45 = false;
+	if (menu_45) {
+		dsp_lo     = TS480SAT_dataC;
+		lo_tooltip = TS480SAT_dataC_tooltip;
+		lo_label   = TS480SAT_dataC_label;
+		dsp_hi     = TS480SAT_dataW;
+		hi_tooltip = TS480SAT_dataW_tooltip;
+		hi_label   = TS480SAT_dataW_label;
+		B.iBW = A.iBW = 0x8301;
+	} else {
+		dsp_lo     = TS480SAT_lo;
+		lo_tooltip = TS480SAT_lo_tooltip;
+		lo_label   = TS480SAT_btn_lo_label;
+		dsp_hi     = TS480SAT_hi;
+		hi_tooltip = TS480SAT_hi_tooltip;
+		hi_label   = TS480SAT_btn_hi_label;
+		B.iBW = A.iBW = 0x8A03;
+	}
+}
+
 void RIG_TS480SAT::initialize()
 {
-	cmd = "FR0;"; sendCommand(cmd, 0);
-	cmd = "FT0;"; sendCommand(cmd, 0);
-	cmd = "AC001;"; sendCommand(cmd, 0);
+	cmd = "AC001;"; sendCommand(cmd);
+	showresp(WARN, ASC, "Auto tune ON", cmd, replystr);
+	check_menu_45();
 	get_preamp();
 	get_attenuator();
+}
+
+void RIG_TS480SAT::shutdown()
+{
 }
 
 void RIG_TS480SAT::selectA()
@@ -292,9 +348,23 @@ int RIG_TS480SAT::set_widths(int val)
 	int bw;
 	if (val == 0 || val == 1 || val == 3) {
 		bandwidths_ = TS480SAT_empty;
-		dsp_lo = TS480SAT_lo;
-		dsp_hi = TS480SAT_hi;
-		bw = 0x8A03; // 200 ... 3000 Hz
+		if (menu_45) {
+			bw = 0x8601; // 1500 Hz 2400 wide
+			dsp_lo     = TS480SAT_dataC;
+			lo_tooltip = TS480SAT_dataC_tooltip;
+			lo_label   = TS480SAT_dataC_label;
+			dsp_hi     = TS480SAT_dataW;
+			hi_tooltip = TS480SAT_dataW_tooltip;
+			hi_label   = TS480SAT_dataW_label;
+		} else {
+			bw = 0x8A03; // 200 ... 3000 Hz
+			dsp_lo     = TS480SAT_lo;
+			lo_tooltip = TS480SAT_lo_tooltip;
+			lo_label   = TS480SAT_btn_lo_label;
+			dsp_hi     = TS480SAT_hi;
+			hi_tooltip = TS480SAT_hi_tooltip;
+			hi_label   = TS480SAT_btn_hi_label;
+		}
 	} else if (val == 2 || val == 6) {
 		bandwidths_ = TS480SAT_CWwidths;
 		dsp_lo = TS480SAT_empty;
@@ -390,16 +460,18 @@ void RIG_TS480SAT::set_bwA(int val)
 	if (A.imode == 0 || A.imode == 1 || A.imode == 3 || A.imode == 4) {
 		if (val < 256) return;
 		A.iBW = val;
-		cmd = "FW0001;"; // wide filter 
-		showresp(WARN, ASC, "wide filter", cmd, replystr);
+//		if (!menu_45) {
+//			cmd = "FW0001;"; // wide filter 
+//			showresp(WARN, ASC, "wide filter", cmd, replystr);
+//		}
 		cmd = "SL";
 		cmd.append(to_decimal(A.iBW & 0xFF, 2)).append(";");
 		sendCommand(cmd,0);
-		showresp(WARN, ASC, "set lower", cmd, replystr);
+		showresp(WARN, ASC, lo_tooltip, cmd, replystr);
 		cmd = "SH";
 		cmd.append(to_decimal(((A.iBW >> 8) & 0x7F), 2)).append(";");
 		sendCommand(cmd,0);
-		showresp(WARN, ASC, "set upper", cmd, replystr);
+		showresp(WARN, ASC, hi_tooltip, cmd, replystr);
 	}
 	if (val > 256) return;
 	else if (A.imode == 2 || A.imode == 6) {
@@ -419,6 +491,13 @@ int RIG_TS480SAT::get_bwA()
 {
 	int i = 0;
 	size_t p;
+
+	bool menu45 = menu_45;
+
+	check_menu_45();
+	if (menu45 != menu_45)
+		Fl::awake(updateBandwidthControl);
+
 	if (A.imode == 0 || A.imode == 1 || A.imode == 3 || A.imode == 4) {
 		int lo = A.iBW & 0xFF, hi = (A.iBW >> 8) & 0x7F;
 		cmd = "SL;";
@@ -470,11 +549,11 @@ void RIG_TS480SAT::set_bwB(int val)
 		cmd = "SL";
 		cmd.append(to_decimal(B.iBW & 0xFF, 2)).append(";");
 		sendCommand(cmd,0);
-		showresp(WARN, ASC, "set lower", cmd, replystr);
+		showresp(WARN, ASC, lo_tooltip, cmd, replystr);
 		cmd = "SH";
 		cmd.append(to_decimal(((B.iBW >> 8) & 0x7F), 2)).append(";");
 		sendCommand(cmd,0);
-		showresp(WARN, ASC, "set upper", cmd, replystr);
+		showresp(WARN, ASC, hi_tooltip, cmd, replystr);
 	}
 	if (val > 256) return;
 	else if (B.imode == 2 || B.imode == 6) { // CW
@@ -494,6 +573,12 @@ int RIG_TS480SAT::get_bwB()
 {
 	int i = 0;
 	size_t p;
+	bool menu45 = menu_45;
+
+	check_menu_45();
+	if (menu45 != menu_45)
+		Fl::awake(updateBandwidthControl);
+
 	if (B.imode == 0 || B.imode == 1 || B.imode == 3 || B.imode == 4) {
 		int lo = B.iBW & 0xFF, hi = (B.iBW >> 8) & 0x7F;
 		cmd = "SL;";
@@ -586,7 +671,7 @@ void RIG_TS480SAT::set_power_control(double val)
 {
 	cmd = "PC";
 	char szval[4];
-	if (modeA == 4 && val > 50) val = 50; // AM mode limitation
+	if (modeA == 4 && val > 25) val = 25; // AM mode limitation
 	snprintf(szval, sizeof(szval), "%03d", (int)val);
 	cmd += szval;
 	cmd += ';';
@@ -596,14 +681,13 @@ void RIG_TS480SAT::set_power_control(double val)
 
 int RIG_TS480SAT::get_power_control()
 {
-	int val = 5;
+	int val = progStatus.power_level;
 	cmd = "PC;";
-	int ret = sendCommand(cmd);
+	int ret = waitN(6, 100, "get Power control", ASC);
 	if (ret < 6) return val;
 	size_t p = replystr.rfind("PC");
 	if (p == string::npos) return val;
 
-	replystr[p + 5] = 0;
 	val = atoi(&replystr[p + 2]);
 
 	return val;
