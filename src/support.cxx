@@ -1482,6 +1482,7 @@ void cbMute()
 void setMicGain()
 {
 	pthread_mutex_lock(&mutex_serial);
+		progStatus.mic_gain = sldrMICGAIN->value();
 		selrig->set_mic_gain(sldrMICGAIN->value());
 	pthread_mutex_unlock(&mutex_serial);
 }
