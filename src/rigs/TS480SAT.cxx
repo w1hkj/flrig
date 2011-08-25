@@ -107,16 +107,17 @@ RIG_TS480SAT::RIG_TS480SAT() {
 	has_noise_control =
 	has_micgain_control =
 	has_tune_control =
-	has_preamp_control =
 	has_notch_control =
-	has_ifshift_control =
-	has_swr_control = false;
+	has_ifshift_control = false;
 
+	has_swr_control =
+	has_alc_control =
 	has_power_out =
 	has_dsp_controls =
 	has_smeter =
 	has_swr_control =
 	has_attenuator_control =
+	has_preamp_control =
 	has_mode_control =
 	has_bandwidth_control =
 	has_volume_control =
@@ -145,6 +146,7 @@ void RIG_TS480SAT::check_menu_45()
 {
 // read current switch 45 setting
 	cmd = "EX0450000;"; sendCommand(cmd);
+replystr = "abcdef EX04500001;";
 	showresp(WARN, ASC, "Check menu item 45", cmd, replystr);
 	size_t p = replystr.rfind("EX045");
 	if (p != string::npos)
@@ -158,7 +160,7 @@ void RIG_TS480SAT::check_menu_45()
 		dsp_hi     = TS480SAT_dataW;
 		hi_tooltip = TS480SAT_dataW_tooltip;
 		hi_label   = TS480SAT_dataW_label;
-		B.iBW = A.iBW = 0x8301;
+		B.iBW = A.iBW = 0x8601;
 	} else {
 		dsp_lo     = TS480SAT_lo;
 		lo_tooltip = TS480SAT_lo_tooltip;
@@ -168,6 +170,7 @@ void RIG_TS480SAT::check_menu_45()
 		hi_label   = TS480SAT_btn_hi_label;
 		B.iBW = A.iBW = 0x8A03;
 	}
+replystr.clear();
 }
 
 void RIG_TS480SAT::initialize()
@@ -175,8 +178,6 @@ void RIG_TS480SAT::initialize()
 	cmd = "AC001;"; sendCommand(cmd);
 	showresp(WARN, ASC, "Auto tune ON", cmd, replystr);
 	check_menu_45();
-	get_preamp();
-	get_attenuator();
 }
 
 void RIG_TS480SAT::shutdown()
@@ -320,19 +321,34 @@ int RIG_TS480SAT::get_power_out()
 // RM cmd 0 ... 100 (rig values 0 ... 8)
 // User report of RM; command using Send Cmd tab
 // RM10000;RM20000;RM30000;
+// RM1nnnn; => SWR
+// RM2nnnn; => COMP
+// RM3nnnn; => ALC
 
 int RIG_TS480SAT::get_swr()
 {
-	double mtr = 0;
+	int mtr = 0;
 	cmd = "RM;";
-	int ret = waitN(8, 100, "get SWR", ASC);
+	int ret = waitN(8, 100, "get SWR/ALC", ASC);
 	if (ret < 8) return (int)mtr;
 	size_t p = replystr.rfind("RM1");
 	if (p != string::npos)
-		mtr = 6.6 * atoi(&replystr[p + 3]);
-	return (int)mtr;
+		mtr = 66 * atoi(&replystr[p + 3]) / 10;
+	p = replystr.rfind("RM3");
+	if (p != string::npos)
+		alc = 66 * atoi(&replystr[p+3]) / 10;
+	else
+		alc = 0;
+	swralc_polled = true;
+	return mtr;
 }
 
+int  RIG_TS480SAT::get_alc(void) 
+{
+	if (!swralc_polled) get_swr();
+	swralc_polled = false;
+	return alc;
+}
 
 // Tranceiver PTT on/off
 void RIG_TS480SAT::set_PTT_control(int val)
@@ -653,14 +669,13 @@ void RIG_TS480SAT::set_volume_control(int val)
 
 int RIG_TS480SAT::get_volume_control()
 {
-	int val = 0;
-	cmd = "AG0";
-	int ret = sendCommand(cmd);
+	int val = progStatus.volume;
+	cmd = "AG0;";
+	int ret = waitN(7, 100, "get vol control", ASC);
 	if (ret < 7) return val;
 	size_t p = replystr.rfind("AG");
 	if (p == string::npos) return val;
 
-	replystr[p + 6] = 0;
 	val = atoi(&replystr[p + 3]);
 	val = val * 100 / 255;
 
@@ -695,20 +710,40 @@ int RIG_TS480SAT::get_power_control()
 
 void RIG_TS480SAT::set_attenuator(int val)
 {
-	if (val)	cmd = "RA01";
-	else		cmd = "RA00";
+	if (val)	cmd = "RA01;";
+	else		cmd = "RA00;";
+	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd, 0);
 }
 
 int RIG_TS480SAT::get_attenuator()
 {
 	cmd = "RA;";
-	int ret = sendCommand(cmd);
-	if (ret < 7) return 0;
+	int ret = waitN(7, 100, "get attenuator", ASC);
+	if (ret < 7) return progStatus.attenuator;
 	size_t p = replystr.rfind("RA");
-	if (p == string::npos) return 0;
-	
-	return replystr[p + 3] - '0';
+	if (p == string::npos) return progStatus.attenuator;
+	if (replystr[p+3] == '1') return 1;
+	return 0;
+}
+
+void RIG_TS480SAT::set_preamp(int val)
+{
+	if (val)	cmd = "PA01;";
+	else		cmd = "PA00;";
+	LOG_WARN("%s", cmd.c_str());
+	sendCommand(cmd, 0);
+}
+
+int RIG_TS480SAT::get_preamp()
+{
+	cmd = "PA;";
+	int ret = waitN(5, 100, "get preamp", ASC);
+	if (ret < 5) return progStatus.preamp;
+	size_t p = replystr.rfind("PA");
+	if (p == string::npos) return progStatus.preamp;
+	if (replystr[p+2] == '1') return 1;
+	return 0;
 }
 
 void RIG_TS480SAT::tune_rig()
