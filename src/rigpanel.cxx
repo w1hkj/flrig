@@ -153,6 +153,12 @@ static void cb_sldrNOTCH(Fl_Wheel_Value_Slider*, void*) {
   setNotch();
 }
 
+Fl_Light_Button *btnDataPort=(Fl_Light_Button *)0;
+
+static void cb_btnDataPort(Fl_Light_Button* o, void*) {
+  progStatus.data_port = o->value();
+}
+
 Fl_Wheel_Value_Slider *sldrMICGAIN=(Fl_Wheel_Value_Slider *)0;
 
 static void cb_sldrMICGAIN(Fl_Wheel_Value_Slider*, void*) {
@@ -937,6 +943,14 @@ Fl_Double_Window* Rig_window() {
       sldrNOTCH->when(FL_WHEN_CHANGED);
       o->reverse(true);
     } // Fl_Wheel_Value_Slider* sldrNOTCH
+    { Fl_Light_Button* o = btnDataPort = new Fl_Light_Button(2, 246, 60, 18, _("Data"));
+      btnDataPort->tooltip(_("Input on Data Port"));
+      btnDataPort->down_box(FL_THIN_DOWN_BOX);
+      btnDataPort->labelsize(12);
+      btnDataPort->callback((Fl_Callback*)cb_btnDataPort);
+      btnDataPort->hide();
+      o->value(progStatus.data_port);
+    } // Fl_Light_Button* btnDataPort
     { Fl_Wheel_Value_Slider* o = sldrMICGAIN = new Fl_Wheel_Value_Slider(66, 246, 355, 18, _("MIC"));
       sldrMICGAIN->tooltip(_("Adjust Mic Gain"));
       sldrMICGAIN->type(5);

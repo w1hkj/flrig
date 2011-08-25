@@ -56,6 +56,7 @@ rigbase::rigbase()
 	has_alc_control =
 	has_rf_control =
 	has_sql_control = 
+	has_data_port =
 	restore_mbw =
 
 	has_extras = 

@@ -1851,6 +1851,12 @@ void adjust_control_positions()
 	}
 	if (selrig->has_micgain_control) {
 		y += 20;
+		if (selrig->has_data_port) {
+			sldrMICGAIN->label("");
+			sldrMICGAIN->redraw_label();
+			btnDataPort->position( btnDataPort->x(), y);
+			btnDataPort->redraw();
+		}
 		sldrMICGAIN->position( sldrMICGAIN->x(), y);
 		sldrMICGAIN->redraw();
 	}
@@ -2549,6 +2555,10 @@ void initRig()
 			selrig->set_mic_gain(progStatus.mic_gain);
 		sldrMICGAIN->value(progStatus.mic_gain);
 		sldrMICGAIN->show();
+		if (selrig->has_data_port) { 
+			btnDataPort->show();
+			btnDataPort->value(progStatus.data_port);
+		} else btnDataPort->hide();
 	} else {
 		sldrMICGAIN->hide();
 	}

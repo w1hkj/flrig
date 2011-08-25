@@ -96,6 +96,7 @@ status progStatus = {
 	10,			// int  squelch;
 
 	0,			// int  line_out;
+	false,		// bool data_port;
 	1,			// int  agc_level;
 	18,			// int  cw_wpm;
 	3.0,		// double  cw_weight;
@@ -365,6 +366,7 @@ void status::saveLastState()
 
 	} else {
 		spref.set("line_out", line_out);
+		spref.set("data_port", data_port);
 		spref.set("agc_level", agc_level);
 		spref.set("cw_wpm", cw_wpm);
 		spref.set("cw_weight", cw_weight);
@@ -595,6 +597,7 @@ bool status::loadXcvrState(const char *xcvr)
 		} 
 		else {
 			spref.get("line_out", line_out, line_out);
+			spref.get("data_port", i, data_port); data_port = i;
 			spref.get("agc_level", agc_level, agc_level);
 			spref.get("cw_wpm", cw_wpm, cw_wpm);
 			spref.get("cw_weight", cw_weight, cw_weight);

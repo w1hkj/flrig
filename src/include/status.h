@@ -82,6 +82,7 @@ struct status {
 	int		squelch;
 
 	int		line_out;
+	bool	data_port;
 	int		agc_level;
 	int		cw_wpm;
 	float	cw_weight;

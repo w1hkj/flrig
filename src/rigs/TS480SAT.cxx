@@ -108,6 +108,7 @@ RIG_TS480SAT::RIG_TS480SAT() {
 	has_tune_control =
 	has_notch_control = false;
 
+	has_data_port =
 	has_micgain_control =
 	has_ifshift_control =
 	has_rf_control =
@@ -147,7 +148,6 @@ void RIG_TS480SAT::check_menu_45()
 {
 // read current switch 45 setting
 	cmd = "EX0450000;"; sendCommand(cmd);
-replystr = "abcdef EX04500001;";
 	showresp(WARN, ASC, "Check menu item 45", cmd, replystr);
 	size_t p = replystr.rfind("EX045");
 	if (p != string::npos)
@@ -171,7 +171,6 @@ replystr = "abcdef EX04500001;";
 		hi_label   = TS480SAT_btn_hi_label;
 		B.iBW = A.iBW = 0x8A03;
 	}
-replystr.clear();
 }
 
 void RIG_TS480SAT::initialize()
@@ -354,8 +353,10 @@ int  RIG_TS480SAT::get_alc(void)
 // Tranceiver PTT on/off
 void RIG_TS480SAT::set_PTT_control(int val)
 {
-	if (val)	cmd = "TX1;";
-	else	 	cmd = "RX;";
+	if (val) {
+		if (progStatus.data_port) cmd = "TX1;"; // DTS transmission using ANI input
+		else cmd = "TX0;"; // mic input
+	} else cmd = "RX;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set PTT", cmd, replystr);
 }
