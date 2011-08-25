@@ -24,6 +24,7 @@ extern Fl_Light_Button *btnIFsh;
 extern Fl_Wheel_Value_Slider *sldrIFSHIFT;
 extern Fl_Light_Button *btnNotch;
 extern Fl_Wheel_Value_Slider *sldrNOTCH;
+extern Fl_Light_Button *btnDataPort;
 extern Fl_Wheel_Value_Slider *sldrMICGAIN;
 extern Fl_Wheel_Value_Slider *sldrPOWER;
 #include <FL/Fl_Box.H>

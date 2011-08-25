@@ -194,6 +194,12 @@ Fl_Tooltip::enable(progStatus.tooltips);}
       code0 {o->reverse(true);}
       class Fl_Wheel_Value_Slider
     }
+    Fl_Light_Button btnDataPort {
+      label Data
+      callback {progStatus.data_port = o->value();} selected
+      tooltip {Input on Data Port} xywh {2 246 60 18} down_box THIN_DOWN_BOX labelsize 12 hide
+      code0 {o->value(progStatus.data_port);}
+    }
     Fl_Value_Slider sldrMICGAIN {
       label MIC
       callback {setMicGain();}
@@ -248,7 +254,7 @@ btnA->value(0);}
     }
     Fl_Group opBW {
       label Bandwidth
-      callback {setBW();} open selected
+      callback {setBW();} open
       tooltip {Select Transceiver Bandwidth} xywh {212 84 105 18} box FLAT_BOX labelsize 12 align 16
       code0 {\#include "combo.h"}
       class Fl_ComboBox

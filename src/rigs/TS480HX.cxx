@@ -106,6 +106,7 @@ RIG_TS480HX::RIG_TS480HX() {
 	has_noise_control =
 	has_notch_control = false;
 
+	has_data_port =
 	has_micgain_control =
 	has_ifshift_control =
 	has_rf_control =
@@ -348,8 +349,10 @@ int  RIG_TS480HX::get_alc(void)
 // Tranceiver PTT on/off
 void RIG_TS480HX::set_PTT_control(int val)
 {
-	if (val)	cmd = "TX1;"; // DTS transmission using ANI input
-	else	 	cmd = "RX;";
+	if (val) {
+		if (progStatus.data_port) cmd = "TX1;"; // DTS transmission using ANI input
+		else cmd = "TX0;"; // mic input
+	} else cmd = "RX;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set PTT", cmd, replystr);
 }
