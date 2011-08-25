@@ -105,11 +105,12 @@ RIG_TS480SAT::RIG_TS480SAT() {
 	can_change_alt_vfo = true;
 
 	has_noise_control =
-	has_micgain_control =
 	has_tune_control =
-	has_notch_control =
-	has_ifshift_control = false;
+	has_notch_control = false;
 
+	has_micgain_control =
+	has_ifshift_control =
+	has_rf_control =
 	has_swr_control =
 	has_alc_control =
 	has_power_out =
@@ -751,5 +752,88 @@ void RIG_TS480SAT::tune_rig()
 	cmd = "AC111;";
 	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd, 0);
+}
+
+void RIG_TS480SAT::set_if_shift(int val)
+{
+	cmd = "IS+";
+	if (val < 0) cmd[2] = '-';
+	cmd.append(to_decimal(abs(val),4)).append(";");
+	sendCommand(cmd,0);
+	showresp(WARN, ASC, "set IF shift", cmd, replystr);
+}
+
+bool RIG_TS480SAT::get_if_shift(int &val)
+{
+	cmd = "IS;";
+	waitN(8, 100, "get IF shift", ASC);
+	size_t p = replystr.rfind("IS");
+	if (p != string::npos) {
+		val = fm_decimal(&replystr[p+3], 4);
+		if (replystr[p+2] == '-') val *= -1;
+		return true;
+	}
+	val = progStatus.shift_val;
+	return progStatus.shift;
+}
+
+void RIG_TS480SAT::get_if_min_max_step(int &min, int &max, int &step)
+{
+	if_shift_min = min = -1100;
+	if_shift_max = max = 1100;
+	if_shift_step = step = 10;
+	if_shift_mid = 0;
+}
+
+void RIG_TS480SAT::set_mic_gain(int val)
+{
+	cmd = "MG";
+	cmd.append(to_decimal(val,3)).append(";");
+	sendCommand(cmd,0);
+	showresp(WARN, ASC, "set mic gain", cmd, replystr);
+}
+
+int  RIG_TS480SAT::get_mic_gain()
+{
+	int val;
+	cmd = "MG;";
+	waitN(6, 100, "get mic gain", ASC);
+	size_t p = replystr.rfind("MG");
+	if (p != string::npos) {
+		val = fm_decimal(&replystr[p+2], 3);
+	} else
+		val = progStatus.mic_gain;
+	return val;
+}
+
+void RIG_TS480SAT::get_mic_min_max_step(int &min, int &max, int &step)
+{
+	min = 0; max = 100; step = 1;
+}
+
+void RIG_TS480SAT::set_rf_gain(int val)	
+{
+	cmd = "RG";
+	cmd.append(to_decimal(val,3)).append(";");
+	sendCommand(cmd,0);
+	showresp(WARN, ASC, "set rf gain", cmd, replystr);
+}
+
+int  RIG_TS480SAT::get_rf_gain()
+{
+	int val;
+	cmd = "RG;";
+	waitN(6, 100, "get rf gain", ASC);
+	size_t p = replystr.rfind("RG");
+	if (p != string::npos) {
+		val = fm_decimal(&replystr[p+2], 3);
+	} else
+		val = progStatus.rfgain;
+	return val;
+}
+
+void RIG_TS480SAT::get_rf_min_max_step(int &min, int &max, int &step)
+{
+	min = 0; max = 100; step = 1;
 }
 

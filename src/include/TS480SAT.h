@@ -59,6 +59,19 @@ public:
 	int  get_power_control();
 	void get_pc_min_max_step(double &min, double &max, double &step) {
 		min = 5; max = 100; step = 1; }
+
+	void set_if_shift(int val);
+	bool get_if_shift(int &val);
+	void get_if_min_max_step(int &min, int &max, int &step);
+
+	void set_mic_gain(int val);
+	int  get_mic_gain();
+	void get_mic_min_max_step(int &min, int &max, int &step);
+
+	void set_rf_gain(int val);
+	int  get_rf_gain();
+	void get_rf_min_max_step(int &min, int &max, int &step);
+
 	void set_attenuator(int val);
 	int  get_attenuator();
 	void set_preamp(int val);
