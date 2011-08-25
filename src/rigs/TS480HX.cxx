@@ -104,7 +104,6 @@ RIG_TS480HX::RIG_TS480HX() {
 
 	has_noise_control =
 	has_micgain_control =
-	has_preamp_control =
 	has_notch_control =
 	has_ifshift_control = false;
 
@@ -112,7 +111,9 @@ RIG_TS480HX::RIG_TS480HX() {
 	has_dsp_controls =
 	has_smeter =
 	has_swr_control =
+	has_alc_control =
 	has_attenuator_control =
+	has_preamp_control =
 	has_mode_control =
 	has_bandwidth_control =
 	has_volume_control =
@@ -153,7 +154,7 @@ void RIG_TS480HX::check_menu_45()
 		dsp_hi     = TS480HX_dataW;
 		hi_tooltip = TS480HX_dataW_tooltip;
 		hi_label   = TS480HX_dataW_label;
-		B.iBW = A.iBW = 0x8301;
+		B.iBW = A.iBW = 0x8601;
 	} else {
 		dsp_lo     = TS480HX_lo;
 		lo_tooltip = TS480HX_lo_tooltip;
@@ -170,8 +171,6 @@ void RIG_TS480HX::initialize()
 	cmd = "AC001;"; sendCommand(cmd);
 	showresp(WARN, ASC, "Auto tune ON", cmd, replystr);
 	check_menu_45();
-	get_preamp();
-	get_attenuator();
 }
 
 void RIG_TS480HX::shutdown()
@@ -315,17 +314,33 @@ int RIG_TS480HX::get_power_out()
 // RM cmd 0 ... 100 (rig values 0 ... 8)
 // User report of RM; command using Send Cmd tab
 // RM10000;RM20000;RM30000;
+// RM1nnnn; => SWR
+// RM2nnnn; => COMP
+// RM3nnnn; => ALC
 
 int RIG_TS480HX::get_swr()
 {
-	double mtr = 0;
+	int mtr = 0;
 	cmd = "RM;";
-	int ret = waitN(8, 100, "get SWR", ASC);
+	int ret = waitN(8, 100, "get SWR/ALC", ASC);
 	if (ret < 8) return (int)mtr;
 	size_t p = replystr.rfind("RM1");
 	if (p != string::npos)
-		mtr = 6.6 * atoi(&replystr[p + 3]);
-	return (int)mtr;
+		mtr = 66 * atoi(&replystr[p + 3]) / 10;
+	p = replystr.rfind("RM3");
+	if (p != string::npos)
+		alc = 66 * atoi(&replystr[p+3]) / 10;
+	else
+		alc = 0;
+	swralc_polled = true;
+	return mtr;
+}
+
+int  RIG_TS480HX::get_alc(void) 
+{
+	if (!swralc_polled) get_swr();
+	swralc_polled = false;
+	return alc;
 }
 
 // Tranceiver PTT on/off
@@ -641,8 +656,8 @@ void RIG_TS480HX::set_volume_control(int val)
 
 int RIG_TS480HX::get_volume_control()
 {
-	int val = 0;
-	cmd = "AG0";
+	int val = progStatus.volume;
+	cmd = "AG0;";
 	int ret = sendCommand(cmd);
 	showresp(WARN, ASC, "get vol", cmd, replystr);
 	if (ret < 7) return val;
@@ -685,23 +700,40 @@ int RIG_TS480HX::get_power_control()
 
 void RIG_TS480HX::set_attenuator(int val)
 {
-	if (val)	cmd = "RA01";
-	else		cmd = "RA00";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "set att", cmd, replystr);
+	if (val)	cmd = "RA01;";
+	else		cmd = "RA00;";
+	LOG_WARN("%s", cmd.c_str());
+	sendCommand(cmd, 0);
 }
 
 int RIG_TS480HX::get_attenuator()
 {
 	cmd = "RA;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get att", cmd, replystr);
-	if (ret < 7) return 0;
+	int ret = waitN(7, 100, "get attenuator", ASC);
+	if (ret < 7) return progStatus.attenuator;
 	size_t p = replystr.rfind("RA");
-	if (p == string::npos) return 0;
-	
-	return replystr[p + 3] - '0';
+	if (p == string::npos) return progStatus.attenuator;
+	if (replystr[p+3] == '1') return 1;
+	return 0;
+}
 
+void RIG_TS480HX::set_preamp(int val)
+{
+	if (val)	cmd = "PA01;";
+	else		cmd = "PA00;";
+	LOG_WARN("%s", cmd.c_str());
+	sendCommand(cmd, 0);
+}
+
+int RIG_TS480HX::get_preamp()
+{
+	cmd = "PA;";
+	int ret = waitN(5, 100, "get preamp", ASC);
+	if (ret < 5) return progStatus.preamp;
+	size_t p = replystr.rfind("PA");
+	if (p == string::npos) return progStatus.preamp;
+	if (replystr[p+2] == '1') return 1;
+	return 0;
 }
 
 void RIG_TS480HX::tune_rig()

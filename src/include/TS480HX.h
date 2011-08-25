@@ -10,6 +10,8 @@ private:
 	bool att_on;
 	const char *_mode_type;
 	bool menu_45;
+	int  alc;
+	bool swralc_polled;
 public:
 	RIG_TS480HX();
 	~RIG_TS480HX(){}
@@ -34,6 +36,7 @@ public:
 
 	int  get_smeter();
 	int  get_swr();
+	int  get_alc();
 	int  get_power_out();
 	void set_PTT_control(int val);
 	void tune_rig();
@@ -58,6 +61,8 @@ public:
 		min = 5; max = 200; step = 1; }
 	void set_attenuator(int val);
 	int  get_attenuator();
+	void set_preamp(int val);
+	int  get_preamp();
 
 	int  adjust_bandwidth(int m);
 	int  def_bandwidth(int m);
