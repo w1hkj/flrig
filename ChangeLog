@@ -1,6 +1,7 @@
-2011-08-25  David Freese  <w1hkj@w1hkj.com>
+2011-08-26  David Freese  <w1hkj@w1hkj.com>
 
-	95929d3: TS480 DataPort select
+	5c173d5: TS480 fixes
+	d0b764e: TS480 DataPort select
 	a5bada1: TS480 Mic/RF/Shift
 	78434b3: TS590/480 series
 	06766bf: TS480 menu_045
