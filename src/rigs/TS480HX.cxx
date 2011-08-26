@@ -23,7 +23,7 @@ static const char *TS480HX_empty[] = { "N/A", NULL };
 
 // SL command is lo cutoff when menu 045 OFF
 static const char *TS480HX_lo[] = {
- "10",   "50", "100", "200", "300", 
+  "0",   "50", "100", "200", "300", 
 "400",  "500", "600", "700", "800", 
 "900", "1000", NULL };
 static const char *TS480HX_lo_tooltip = "lo cutoff";
@@ -132,8 +132,8 @@ const char * RIG_TS480HX::get_bwname_(int n, int md)
 		int hi = (n >> 8) & 0x7F;
 		int lo = n & 0xFF;
 		snprintf(bwname, sizeof(bwname), "%s/%s",
-			(md == 0 || md == 1 || md == 3) ? TS480HX_lo[lo] : TS480HX_AM_lo[lo],
-			(md == 0 || md == 1 || md == 3) ? TS480HX_hi[hi] : TS480HX_AM_hi[hi] );
+			(md == 0 || md == 1 || md == 3) ? dsp_lo[lo] : TS480HX_AM_lo[lo],
+			(md == 0 || md == 1 || md == 3) ? dsp_hi[hi] : TS480HX_AM_hi[hi] );
 	} else {
 		snprintf(bwname, sizeof(bwname), "%s",
 			(md == 2 || md == 6) ? TS480HX_CWwidths[n] : TS480HX_FSKwidths[n]);
@@ -724,8 +724,8 @@ int RIG_TS480HX::get_attenuator()
 
 void RIG_TS480HX::set_preamp(int val)
 {
-	if (val)	cmd = "PA01;";
-	else		cmd = "PA00;";
+	if (val)	cmd = "PA1;";
+	else		cmd = "PA0;";
 	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd, 0);
 }
@@ -765,7 +765,7 @@ bool RIG_TS480HX::get_if_shift(int &val)
 	if (p != string::npos) {
 		val = fm_decimal(&replystr[p+3], 4);
 		if (replystr[p+2] == '-') val *= -1;
-		return true;
+		return (val != 0);
 	}
 	val = progStatus.shift_val;
 	return progStatus.shift;

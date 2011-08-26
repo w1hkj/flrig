@@ -23,7 +23,7 @@ static const char *TS480SAT_empty[] = { "N/A", NULL };
 
 // SL command is lo cutoff when menu 045 OFF
 static const char *TS480SAT_lo[] = {
- "10",   "50", "100", "200", "300", 
+  "0",   "50", "100", "200", "300", 
 "400",  "500", "600", "700", "800", 
 "900", "1000", NULL };
 static const char *TS480SAT_lo_tooltip = "lo cutoff";
@@ -135,8 +135,8 @@ const char * RIG_TS480SAT::get_bwname_(int n, int md)
 		int hi = (n >> 8) & 0x7F;
 		int lo = n & 0xFF;
 		snprintf(bwname, sizeof(bwname), "%s/%s",
-			(md == 0 || md == 1 || md == 3) ? TS480SAT_lo[lo] : TS480SAT_AM_lo[lo],
-			(md == 0 || md == 1 || md == 3) ? TS480SAT_hi[hi] : TS480SAT_AM_hi[hi] );
+			(md == 0 || md == 1 || md == 3) ? dsp_lo[lo] : TS480SAT_AM_lo[lo],
+			(md == 0 || md == 1 || md == 3) ? dsp_hi[hi] : TS480SAT_AM_hi[hi] );
 	} else {
 		snprintf(bwname, sizeof(bwname), "%s",
 			(md == 2 || md == 6) ? TS480SAT_CWwidths[n] : TS480SAT_FSKwidths[n]);
@@ -478,10 +478,6 @@ void RIG_TS480SAT::set_bwA(int val)
 	if (A.imode == 0 || A.imode == 1 || A.imode == 3 || A.imode == 4) {
 		if (val < 256) return;
 		A.iBW = val;
-//		if (!menu_45) {
-//			cmd = "FW0001;"; // wide filter 
-//			showresp(WARN, ASC, "wide filter", cmd, replystr);
-//		}
 		cmd = "SL";
 		cmd.append(to_decimal(A.iBW & 0xFF, 2)).append(";");
 		sendCommand(cmd,0);
@@ -731,8 +727,8 @@ int RIG_TS480SAT::get_attenuator()
 
 void RIG_TS480SAT::set_preamp(int val)
 {
-	if (val)	cmd = "PA01;";
-	else		cmd = "PA00;";
+	if (val)	cmd = "PA1;";
+	else		cmd = "PA0;";
 	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd, 0);
 }
@@ -772,7 +768,7 @@ bool RIG_TS480SAT::get_if_shift(int &val)
 	if (p != string::npos) {
 		val = fm_decimal(&replystr[p+3], 4);
 		if (replystr[p+2] == '-') val *= -1;
-		return true;
+		return (val != 0);
 	}
 	val = progStatus.shift_val;
 	return progStatus.shift;
