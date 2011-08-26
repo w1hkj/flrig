@@ -148,20 +148,21 @@ void RIG_TS480SAT::check_menu_45()
 {
 // read current switch 45 setting
 	cmd = "EX0450000;"; sendCommand(cmd);
-	showresp(WARN, ASC, "Check menu item 45", cmd, replystr);
+	int ret = waitN(11, 100, "Check menu item 45", ASC);
+	if (ret < 11) return;
 	size_t p = replystr.rfind("EX045");
 	if (p != string::npos)
 		menu_45 = (replystr[p+9] == '1');
 	else
 		menu_45 = false;
 	if (menu_45) {
-		dsp_lo     = TS480SAT_dataC;
-		lo_tooltip = TS480SAT_dataC_tooltip;
-		lo_label   = TS480SAT_dataC_label;
-		dsp_hi     = TS480SAT_dataW;
-		hi_tooltip = TS480SAT_dataW_tooltip;
-		hi_label   = TS480SAT_dataW_label;
-		B.iBW = A.iBW = 0x8601;
+		dsp_lo     = TS480SAT_dataW;
+		lo_tooltip = TS480SAT_dataW_tooltip;
+		lo_label   = TS480SAT_dataW_label;
+		dsp_hi     = TS480SAT_dataC;
+		hi_tooltip = TS480SAT_dataC_tooltip;
+		hi_label   = TS480SAT_dataC_label;
+		B.iBW = A.iBW = 0x8106;
 	} else {
 		dsp_lo     = TS480SAT_lo;
 		lo_tooltip = TS480SAT_lo_tooltip;
@@ -175,8 +176,6 @@ void RIG_TS480SAT::check_menu_45()
 
 void RIG_TS480SAT::initialize()
 {
-	cmd = "AC001;"; sendCommand(cmd);
-	showresp(WARN, ASC, "Auto tune ON", cmd, replystr);
 	check_menu_45();
 }
 
@@ -239,8 +238,8 @@ bool RIG_TS480SAT::get_split()
 long RIG_TS480SAT::get_vfoA ()
 {
 	cmd = "FA;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "get vfo A", cmd, replystr);
+	int ret = waitN(14, 100, "get vfo A", ASC);
+	if (ret < 14) return A.freq;
 	size_t p = replystr.rfind("FA");
 	if (p != string::npos && (p + 12 < replystr.length())) {
 		int f = 0;
@@ -266,8 +265,8 @@ void RIG_TS480SAT::set_vfoA (long freq)
 long RIG_TS480SAT::get_vfoB ()
 {
 	cmd = "FB;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "get vfo B", cmd, replystr);
+	int ret = waitN(14, 100, "get vfo B", ASC);
+	if (ret < 14) return B.freq;
 	size_t p = replystr.rfind("FB");
 	if (p != string::npos && (p + 12 < replystr.length())) {
 		int f = 0;
@@ -367,13 +366,13 @@ int RIG_TS480SAT::set_widths(int val)
 	if (val == 0 || val == 1 || val == 3) {
 		bandwidths_ = TS480SAT_empty;
 		if (menu_45) {
-			bw = 0x8601; // 1500 Hz 2400 wide
-			dsp_lo     = TS480SAT_dataC;
-			lo_tooltip = TS480SAT_dataC_tooltip;
-			lo_label   = TS480SAT_dataC_label;
-			dsp_hi     = TS480SAT_dataW;
-			hi_tooltip = TS480SAT_dataW_tooltip;
-			hi_label   = TS480SAT_dataW_label;
+			bw = 0x8106; // 1500 Hz 2400 wide
+			dsp_lo     = TS480SAT_dataW;
+			lo_tooltip = TS480SAT_dataW_tooltip;
+			lo_label   = TS480SAT_dataW_label;
+			dsp_hi     = TS480SAT_dataC;
+			hi_tooltip = TS480SAT_dataC_tooltip;
+			hi_label   = TS480SAT_dataC_label;
 		} else {
 			bw = 0x8A03; // 200 ... 3000 Hz
 			dsp_lo     = TS480SAT_lo;

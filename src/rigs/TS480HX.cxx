@@ -145,19 +145,21 @@ void RIG_TS480HX::check_menu_45()
 {
 // read current switch 45 setting
 	cmd = "EX0450000;"; sendCommand(cmd);
+	int ret = waitN(11, 100, "Check menu item 45", ASC);
+	if (ret < 11) return;
 	size_t p = replystr.rfind("EX045");
 	if (p != string::npos)
 		menu_45 = (replystr[p+9] == '1');
 	else
 		menu_45 = false;
 	if (menu_45) {
-		dsp_lo     = TS480HX_dataC;
-		lo_tooltip = TS480HX_dataC_tooltip;
-		lo_label   = TS480HX_dataC_label;
-		dsp_hi     = TS480HX_dataW;
-		hi_tooltip = TS480HX_dataW_tooltip;
-		hi_label   = TS480HX_dataW_label;
-		B.iBW = A.iBW = 0x8601;
+		dsp_lo     = TS480HX_dataW;
+		lo_tooltip = TS480HX_dataW_tooltip;
+		lo_label   = TS480HX_dataW_label;
+		dsp_hi     = TS480HX_dataC;
+		hi_tooltip = TS480HX_dataC_tooltip;
+		hi_label   = TS480HX_dataC_label;
+		B.iBW = A.iBW = 0x8106;
 	} else {
 		dsp_lo     = TS480HX_lo;
 		lo_tooltip = TS480HX_lo_tooltip;
@@ -171,8 +173,6 @@ void RIG_TS480HX::check_menu_45()
 
 void RIG_TS480HX::initialize()
 {
-	cmd = "AC001;"; sendCommand(cmd);
-	showresp(WARN, ASC, "Auto tune ON", cmd, replystr);
 	check_menu_45();
 }
 
@@ -235,8 +235,8 @@ bool RIG_TS480HX::get_split()
 long RIG_TS480HX::get_vfoA ()
 {
 	cmd = "FA;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "get vfo A", cmd, replystr);
+	int ret = waitN(14, 100, "get vfo A", ASC);
+	if (ret < 14) return A.freq;
 	size_t p = replystr.rfind("FA");
 	if (p != string::npos && (p + 12 < replystr.length())) {
 		int f = 0;
@@ -262,8 +262,8 @@ void RIG_TS480HX::set_vfoA (long freq)
 long RIG_TS480HX::get_vfoB ()
 {
 	cmd = "FB;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "get vfo B", cmd, replystr);
+	int ret = waitN(14, 100, "get vfo B", ASC);
+	if (ret < 14) return B.freq;
 	size_t p = replystr.rfind("FB");
 	if (p != string::npos && (p + 12 < replystr.length())) {
 		int f = 0;
@@ -363,13 +363,13 @@ int RIG_TS480HX::set_widths(int val)
 	if (val == 0 || val == 1 || val == 3) {
 		bandwidths_ = TS480HX_empty;
 		if (menu_45) {
-			bw = 0x8601; // 1500 Hz 2400 wide
-			dsp_lo     = TS480HX_dataC;
-			lo_tooltip = TS480HX_dataC_tooltip;
-			lo_label   = TS480HX_dataC_label;
-			dsp_hi     = TS480HX_dataW;
-			hi_tooltip = TS480HX_dataW_tooltip;
-			hi_label   = TS480HX_dataW_label;
+			bw = 0x8106; // 1500 Hz 2400 wide
+			dsp_lo     = TS480HX_dataW;
+			lo_tooltip = TS480HX_dataW_tooltip;
+			lo_label   = TS480HX_dataW_label;
+			dsp_hi     = TS480HX_dataC;
+			hi_tooltip = TS480HX_dataC_tooltip;
+			hi_label   = TS480HX_dataC_label;
 		} else {
 			bw = 0x8A03; // 200 ... 3000 Hz
 			dsp_lo     = TS480HX_lo;
@@ -463,6 +463,7 @@ int RIG_TS480HX::get_modeB()
 	}
 	return B.imode;
 }
+
 int RIG_TS480HX::get_modetype(int n)
 {
 	return _mode_type[n];
@@ -500,6 +501,7 @@ int RIG_TS480HX::get_bwA()
 {
 	int i = 0;
 	size_t p;
+
 	bool menu45 = menu_45;
 
 	check_menu_45();
