@@ -461,7 +461,7 @@ void update_power_control(void *d)
 		sldrPOWER->step(step);
 		sldrPOWER->redraw();
 	}
-	set_power_controlImage(selrig->max_power);
+	set_power_controlImage(progStatus.power_level);
 }
 
 void read_power_control()
@@ -1550,7 +1550,7 @@ void setPower()
 		sldrPOWER->value(progStatus.power_level);
 		sldrPOWER->redraw();
 	}
-	set_power_controlImage(selrig->max_power);
+	set_power_controlImage(pwr);
 	setFocus();
 }
 
@@ -2579,7 +2579,7 @@ void initRig()
 	} else {
 		sldrPOWER->hide();
 	}
-	set_power_controlImage(selrig->max_power);
+	set_power_controlImage(progStatus.power_level);
 
 	if (selrig->has_attenuator_control) {
 		if (progStatus.use_rig_data)
