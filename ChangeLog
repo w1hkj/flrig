@@ -1,6 +1,7 @@
-2011-08-31  David Freese  <w1hkj@w1hkj.com>
+2011-09-19  David Freese  <w1hkj@w1hkj.com>
 
-	00b62a8: FT5000
+	1d06f83: key fldigi
+	65f3fbd: FT5000
 	364c5f8: TS480 center/width
 	5c173d5: TS480 fixes
 	d0b764e: TS480 DataPort select
