@@ -281,6 +281,8 @@ void status::saveLastState()
 	spref.set("sep_rtsplus", sep_rtsplus);
 	spref.set("set_dtrplus", sep_dtrplus);
 
+	spref.set("key_fldigi", key_fldigi);
+
 	spref.set("poll_smeter", poll_smeter);
 	spref.set("poll_frequency", poll_frequency);
 	spref.set("poll_mode", poll_mode);
@@ -511,6 +513,8 @@ bool status::loadXcvrState(const char *xcvr)
 		if (spref.get("sep_dtrptt", i, i)) sep_dtrptt = i;
 		if (spref.get("sep_rtsplus", i, i)) sep_rtsplus = i;
 		if (spref.get("sep_dtrplus", i, i)) sep_dtrplus = i;
+
+		if (spref.get("key_fldigi", i, key_fldigi)) key_fldigi = i;
 
 		if (spref.get("poll_smeter", i, i)) poll_smeter = i;
 		if (spref.get("poll_frequency", i, i)) poll_frequency = i;
