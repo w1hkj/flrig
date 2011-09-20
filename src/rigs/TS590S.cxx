@@ -34,6 +34,8 @@ static const char *TS590S_CAT_ssb_lo[] = {
 "SL00", "SL01", "SL02", "SL03", "SL04", 
 "SL05", "SL06", "SL07", "SL08", "SL09",
 "SL10", "SL11", NULL };
+static const char *TS590S_SSB_lo_tooltip = "lo cutoff";
+static const char *TS590S_SSB_btn_lo_label = "L";
 
 static const char *TS590S_SSB_hi[] = {
 "1000", "1200", "1400", "1600", "1800", 
@@ -44,6 +46,8 @@ static const char *TS590S_CAT_ssb_hi[] = {
 "SH00", "SH01", "SH02", "SH03", "SH04", 
 "SH05", "SH06", "SH07", "SH08", "SH09",
 "SH10", "SH11", "SH12", "SH13", NULL };
+static const char *TS590S_SSB_hi_tooltip = "hi cutoff";
+static const char *TS590S_SSB_btn_hi_label = "H";
 
 //----------------------------------------------------------------------
 static const char *TS590S_DATA_width[] = {
@@ -55,6 +59,8 @@ static const char *TS590S_CAT_data_width[] = {
 "SH00", "SH01", "SH02", "SH03", "SH04", 
 "SH05", "SH06", "SH07", "SH08", "SH09",
 "SH10", "SH11", "SH12", "SH13", NULL };
+static const char *TS590S_DATA_W_tooltip = "filter width";
+static const char *TS590S_DATA_W_btn_label = "W";
 
 static const char *TS590S_DATA_shift[] = {
 "1000", "1100", "1200", "1300", "1400", 
@@ -65,6 +71,8 @@ static const char *TS590S_CAT_data_shift[] = {
 "SL00", "SL01", "SL02", "SL03", "SL04", 
 "SL05", "SL06", "SL07", "SL08", "SL09",
 "SL10", "SL11", "SL12", NULL };
+static const char *TS590S_DATA_S_tooltip = "shift frequency";
+static const char *TS590S_DATA_S_btn_label = "S";
 
 //----------------------------------------------------------------------
 static const char *TS590S_AM_lo[] = {
@@ -72,12 +80,16 @@ static const char *TS590S_AM_lo[] = {
 
 static const char *TS590S_CAT_am_lo[] = {
 "SL00", "SL01", "SL02", "SL03", NULL}; 
+static const char *TS590S_AM_lo_tooltip = "lo cutoff";
+static const char *TS590S_AM_btn_lo_label = "L";
 
 static const char *TS590S_AM_hi[] = {
 "2500", "3000", "4000", "5000", NULL };
 
 static const char *TS590S_CAT_am_hi[] = {
 "SH00", "SH01", "SH02", "SH03", NULL}; 
+static const char *TS590S_AM_hi_tooltip = "hi cutoff";
+static const char *TS590S_AM_btn_hi_label = "H";
 
 //----------------------------------------------------------------------
 static const char *TS590S_CWwidths[] = {
@@ -104,8 +116,15 @@ RIG_TS590S::RIG_TS590S() {
 	name_ = TS590Sname_;
 	modes_ = TS590Smodes_;
 	bandwidths_ = TS590S_empty;
-	dsp_lo = TS590S_SSB_lo;
-	dsp_hi = TS590S_SSB_hi;
+
+	dsp_lo     = TS590S_SSB_lo;
+	lo_tooltip = TS590S_SSB_lo_tooltip;
+	lo_label   = TS590S_SSB_btn_lo_label;
+
+	dsp_hi     = TS590S_SSB_hi;
+	hi_tooltip = TS590S_SSB_hi_tooltip;
+	hi_label   = TS590S_SSB_btn_hi_label;
+
 	comm_baudrate = BR4800;
 	stopbits = 2;
 	comm_retries = 2;
@@ -567,6 +586,10 @@ int RIG_TS590S::set_widths(int val)
 		bandwidths_ = TS590S_empty;
 		dsp_lo = TS590S_SSB_lo;
 		dsp_hi = TS590S_SSB_hi;
+		lo_tooltip = TS590S_SSB_lo_tooltip;
+		lo_label   = TS590S_SSB_btn_lo_label;
+		hi_tooltip = TS590S_SSB_hi_tooltip;
+		hi_label   = TS590S_SSB_btn_hi_label;
 		bw = 0x8A03; // 200 ... 3000 Hz
 	} else if (val == CW || val == CWR) {
 		bandwidths_ = TS590S_CWwidths;
@@ -582,11 +605,19 @@ int RIG_TS590S::set_widths(int val)
 		bandwidths_ = TS590S_empty;
 		dsp_lo = TS590S_AM_lo;
 		dsp_hi = TS590S_AM_hi;
+		lo_tooltip = TS590S_AM_lo_tooltip;
+		lo_label   = TS590S_AM_btn_lo_label;
+		hi_tooltip = TS590S_AM_hi_tooltip;
+		hi_label   = TS590S_AM_btn_hi_label;
 		bw = 0x8201;
 	} else if (val == LSBD || val == USBD) {
 		bandwidths_ = TS590S_empty;
 		dsp_lo = TS590S_DATA_shift;
 		dsp_hi = TS590S_DATA_width;
+		lo_tooltip = TS590S_DATA_S_tooltip;
+		lo_label   = TS590S_DATA_S_btn_label;
+		hi_tooltip = TS590S_DATA_W_tooltip;
+		hi_label   = TS590S_DATA_W_btn_label;
 		bw = 0x8D05;
 	}
 	return bw;
