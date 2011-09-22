@@ -29,6 +29,7 @@
 #include "xml_io.h"
 
 extern Fl_Double_Window *mainwindow;
+extern string HomeDir;
 extern string RigHomeDir;
 extern string TempDir;
 extern string rigfile;
