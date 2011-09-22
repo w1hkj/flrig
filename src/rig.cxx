@@ -54,6 +54,7 @@
 int parse_args(int argc, char **argv, int& idx);
 
 Fl_Double_Window *mainwindow;
+string HomeDir;
 string RigHomeDir;
 string TempDir;
 string defFileName;
@@ -228,6 +229,7 @@ int main (int argc, char *argv[])
 	std::terminate_handler(flrig_terminate);
 
 	int arg_idx;
+	HomeDir.clear();
 	RigHomeDir.clear();
 
 	Fl::args(argc, argv, arg_idx, parse_args);
@@ -242,8 +244,12 @@ int main (int argc, char *argv[])
 
 	char dirbuf[FL_PATH_MAX + 1];
 #ifdef __WIN32__
+	fl_filename_expand(dirbuf, sizeof(dirbuf) -1, "$USERPROFILE");
+	HomeDir = dirbuf;
 	fl_filename_expand(dirbuf, sizeof(dirbuf) - 1, "$USERPROFILE/flrig.files/");
 #else
+	fl_filename_expand(dirbuf, sizeof(dirbuf) - 1, "$HOME");
+	HomeDir = dirbuf;
 	fl_filename_expand(dirbuf, sizeof(dirbuf) - 1, "$HOME/.flrig/");
 #endif
 	if (RigHomeDir.empty())

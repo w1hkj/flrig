@@ -303,6 +303,9 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 	int waited = 0;
 	size_t num = n + cmd.length();
 	int delay =  num * 11000.0 / RigSerial.Baud();
+
+	replystr.clear();
+
 	if (!RigSerial.IsOpen()) {
 		snprintf(sztemp, sizeof(sztemp), "TEST %s", sz);
 		showresp(WARN, pr, sztemp, tosend, replystr);
