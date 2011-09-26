@@ -1,5 +1,11 @@
-2011-09-19  David Freese  <w1hkj@w1hkj.com>
 
+
+=Version 1.3.0=
+
+2011-09-22  David Freese  <w1hkj@w1hkj.com>
+
+	b5052b5: TS590 manual error
+	efad166: TS590S sh/sl
 	1d06f83: key fldigi
 	65f3fbd: FT5000
 	364c5f8: TS480 center/width
