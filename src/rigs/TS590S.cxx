@@ -675,10 +675,10 @@ void RIG_TS590S::set_bwA(int val)
 	if (A.imode == tsLSB || A.imode == tsUSB || A.imode == tsFM || A.imode == tsFMD) {
 		if (val < 256) return;
 		A.iBW = val;
-		cmd = TS590S_CAT_ssb_lo[(A.iBW >> 8) & 0x7F];
+		cmd = TS590S_CAT_ssb_lo[A.iBW  & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set lower", cmd, replystr);
-		cmd = TS590S_CAT_ssb_hi[A.iBW & 0x7F];
+		cmd = TS590S_CAT_ssb_hi[(A.iBW >> 8) & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set upper", cmd, replystr);
 		return;
@@ -731,10 +731,10 @@ void RIG_TS590S::set_bwB(int val)
 	if (B.imode == tsLSB || B.imode == tsUSB || B.imode == tsFM || B.imode == tsFMD) {
 		if (val < 256) return;
 		B.iBW = val;
-		cmd = TS590S_CAT_ssb_lo[(B.iBW >> 8) & 0x7F];
+		cmd = TS590S_CAT_ssb_lo[B.iBW & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set lower", cmd, replystr);
-		cmd = TS590S_CAT_ssb_hi[B.iBW & 0x7F];
+		cmd = TS590S_CAT_ssb_hi[(B.iBW >> 8) & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set upper", cmd, replystr);
 		return;
