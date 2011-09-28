@@ -123,6 +123,7 @@ RIG_TS480HX::RIG_TS480HX() {
 	has_power_control =
 	has_tune_control = 
 	has_ptt_control = true;
+
 }
 
 const char * RIG_TS480HX::get_bwname_(int n, int md) 
@@ -144,14 +145,15 @@ const char * RIG_TS480HX::get_bwname_(int n, int md)
 void RIG_TS480HX::check_menu_45()
 {
 // read current switch 45 setting
+	menu_45 = false;
 	cmd = "EX0450000;"; sendCommand(cmd);
 	int ret = waitN(11, 100, "Check menu item 45", ASC);
-	if (ret < 11) return;
-	size_t p = replystr.rfind("EX045");
-	if (p != string::npos)
-		menu_45 = (replystr[p+9] == '1');
-	else
-		menu_45 = false;
+	if (ret >= 11) {
+		size_t p = replystr.rfind("EX045");
+		if (p != string::npos)
+			menu_45 = (replystr[p+9] == '1');
+	}
+
 	if (menu_45) {
 		dsp_lo     = TS480HX_dataW;
 		lo_tooltip = TS480HX_dataW_tooltip;
@@ -173,6 +175,10 @@ void RIG_TS480HX::check_menu_45()
 
 void RIG_TS480HX::initialize()
 {
+	progStatus.rfgain = 100;
+	progStatus.volume = 25;
+	progStatus.power_level = 20;
+	progStatus.mic_gain = 25;
 	check_menu_45();
 }
 
@@ -665,16 +671,13 @@ int RIG_TS480HX::get_volume_control()
 {
 	int val = progStatus.volume;
 	cmd = "AG0;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get vol", cmd, replystr);
+	int ret = waitN(7, 100, "get vol", ASC);
 	if (ret < 7) return val;
 	size_t p = replystr.rfind("AG");
 	if (p == string::npos) return val;
-
 	replystr[p + 6] = 0;
 	val = atoi(&replystr[p + 3]);
 	val = val * 100 / 255;
-
 	return val;
 }
 
@@ -791,14 +794,13 @@ void RIG_TS480HX::set_mic_gain(int val)
 
 int  RIG_TS480HX::get_mic_gain()
 {
-	int val;
+	int val = progStatus.mic_gain;
 	cmd = "MG;";
-	waitN(6, 100, "get mic gain", ASC);
+	int ret = waitN(6, 100, "get mic gain", ASC);
+	if (ret < 6) return val;
 	size_t p = replystr.rfind("MG");
-	if (p != string::npos) {
+	if (p != string::npos)
 		val = fm_decimal(&replystr[p+2], 3);
-	} else
-		val = progStatus.mic_gain;
 	return val;
 }
 
@@ -817,14 +819,13 @@ void RIG_TS480HX::set_rf_gain(int val)
 
 int  RIG_TS480HX::get_rf_gain()
 {
-	int val;
+	int val = progStatus.rfgain;
 	cmd = "RG;";
-	waitN(6, 100, "get rf gain", ASC);
+	int ret = waitN(6, 100, "get rf gain", ASC);
+	if (ret < 6) return val;
 	size_t p = replystr.rfind("RG");
-	if (p != string::npos) {
+	if (p != string::npos)
 		val = fm_decimal(&replystr[p+2], 3);
-	} else
-		val = progStatus.rfgain;
 	return val;
 }
 
