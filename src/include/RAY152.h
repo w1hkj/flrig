@@ -2,6 +2,7 @@
 #define _RAY152_H
 
 #include "rigbase.h"
+#include "rigpanel.h"
 
 class RIG_RAY152 : public rigbase {
 public:

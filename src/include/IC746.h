@@ -7,6 +7,7 @@ class RIG_IC746 : public RIG_ICOM {
 public:
 	RIG_IC746();
 	virtual ~RIG_IC746(){}
+	virtual void initialize();
 
 	virtual void selectA();
 	virtual void selectB();

@@ -8,6 +8,8 @@ public:
 	RIG_IC756PRO2();
 	~RIG_IC756PRO2(){}
 
+	void initialize();
+
 	void selectA();
 	void selectB();
 	void A2B();

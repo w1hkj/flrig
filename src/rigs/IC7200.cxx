@@ -45,6 +45,17 @@ const char *IC7200_AMwidths[] = {
  "6200", "6400", "6600", "6800", "6000", "6200", "6400", "6600", "6800", "6000",
 NULL};
 
+static GUI rig_widgets[]= {
+	{ (Fl_Widget *)btnVol, 2, 125,  50 },
+	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },
+	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },
+	{ (Fl_Widget *)sldrMICGAIN, 54, 165, 156 },
+	{ (Fl_Widget *)sldrSQUELCH, 266, 125, 156 },
+	{ (Fl_Widget *)btnNR, 214, 145,  50 },
+	{ (Fl_Widget *)sldrNR, 266, 145, 156 },
+	{ (Fl_Widget *)sldrPOWER, 266, 165, 156 },
+	{ (Fl_Widget *)NULL, 0, 0, 0 }
+};
 
 //======================================================================
 // IC7200 unique commands
@@ -55,6 +66,7 @@ RIG_IC7200::RIG_IC7200() {
 	modes_ = IC7200modes_;
 	_mode_type = IC7200_mode_type;
 	bandwidths_ = IC7200_SSBwidths;
+	widgets = rig_widgets;
 
 	comm_baudrate = BR9600;
 	stopbits = 1;
@@ -102,6 +114,18 @@ RIG_IC7200::RIG_IC7200() {
 	defaultCIV = 0x76;
 	adjustCIV(defaultCIV);
 };
+
+void RIG_IC7200::initialize()
+{
+	rig_widgets[0].W = btnVol;
+	rig_widgets[1].W = sldrVOLUME;
+	rig_widgets[2].W = sldrRFGAIN;
+	rig_widgets[3].W = sldrMICGAIN;
+	rig_widgets[4].W = sldrSQUELCH;
+	rig_widgets[5].W = btnNR;
+	rig_widgets[6].W = sldrNR;
+	rig_widgets[7].W = sldrPOWER;
+}
 
 //=============================================================================
 void RIG_IC7200::selectA()

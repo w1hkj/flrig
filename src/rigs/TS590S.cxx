@@ -112,6 +112,33 @@ static const char *TS590S_FSKbw[] = {
 
 //----------------------------------------------------------------------
 
+static GUI rig_widgets[]= {
+	{ (Fl_Widget *)btnVol,        2, 125,  50 },
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
+	{ (Fl_Widget *)btnIFsh,     214, 105,  50 },
+	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
+	{ (Fl_Widget *)sldrMICGAIN, 266, 125, 156 },
+	{ (Fl_Widget *)sldrPOWER,    54, 145, 368 },
+	{ (Fl_Widget *)NULL,          0,   0,   0 }
+};
+
+void RIG_TS590S::initialize()
+{
+	rig_widgets[0].W = btnVol;
+	rig_widgets[1].W = sldrVOLUME;
+	rig_widgets[2].W = btnIFsh;
+	rig_widgets[3].W = sldrIFSHIFT;
+	rig_widgets[4].W = sldrMICGAIN;
+	rig_widgets[5].W = sldrPOWER;
+
+	selectA();
+	cmd = "AC000;"; sendCommand(cmd);
+	get_preamp();
+	get_attenuator();
+	RIG_DEBUG = true;
+}
+
+
 RIG_TS590S::RIG_TS590S() {
 
 	name_ = TS590Sname_;
@@ -125,6 +152,8 @@ RIG_TS590S::RIG_TS590S() {
 	dsp_hi     = TS590S_SSB_hi;
 	hi_tooltip = TS590S_SSB_hi_tooltip;
 	hi_label   = TS590S_SSB_btn_hi_label;
+
+	widgets = rig_widgets;
 
 	comm_baudrate = BR115200;
 	stopbits = 1;
@@ -185,15 +214,6 @@ const char * RIG_TS590S::get_bwname_(int n, int md)
 			(md == 2 || md == 6) ? TS590S_CWwidths[n] : TS590S_FSKwidths[n]);
 	}
 	return bwname;
-}
-
-void RIG_TS590S::initialize()
-{
-	selectA();
-	cmd = "AC000;"; sendCommand(cmd);
-	get_preamp();
-	get_attenuator();
-	RIG_DEBUG = true;
 }
 
 void RIG_TS590S::selectA()

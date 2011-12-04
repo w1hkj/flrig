@@ -13,6 +13,8 @@ public:
 	RIG_FT2000();
 	~RIG_FT2000(){}
 
+	void initialize();
+
 	long get_vfoA();
 	void set_vfoA(long);
 	int  get_smeter();

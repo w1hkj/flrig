@@ -55,6 +55,32 @@ static const char *TS2000_FSKwidths[] = {
 static const char *TS2000_FSKbw[] = {
 "FW0250;", "FW0500;", "FW1000;", "FW1500;" };
 
+static GUI rig_widgets[]= {
+	{ (Fl_Widget *)btnVol,        2, 125,  50 },
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },
+	{ (Fl_Widget *)btnIFsh,     214, 105,  50 },
+	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
+	{ (Fl_Widget *)btnNotch,    214, 125,  50 },
+	{ (Fl_Widget *)sldrNOTCH,   266, 125, 156 },
+	{ (Fl_Widget *)sldrMICGAIN, 266, 145, 156 },
+	{ (Fl_Widget *)sldrPOWER,    54, 165, 368 },
+	{ (Fl_Widget *)NULL,          0,   0,   0 }
+};
+
+void RIG_TS2000::initialize()
+{
+	rig_widgets[0].W = btnVol;
+	rig_widgets[1].W = sldrVOLUME;
+	rig_widgets[2].W = sldrRFGAIN;
+	rig_widgets[3].W = btnIFsh;
+	rig_widgets[4].W = sldrIFSHIFT;
+	rig_widgets[5].W = btnNotch;
+	rig_widgets[6].W = sldrNOTCH;
+	rig_widgets[7].W = sldrMICGAIN;
+	rig_widgets[8].W = sldrPOWER;
+}
+
 RIG_TS2000::RIG_TS2000() {
 // base class values	
 	name_ = TS2000name_;
@@ -62,6 +88,9 @@ RIG_TS2000::RIG_TS2000() {
 	bandwidths_ = TS2000_empty;
 	dsp_lo = TS2000_lo;
 	dsp_hi = TS2000_hi;
+
+	widgets = rig_widgets;
+
 	comm_baudrate = BR4800;
 	stopbits = 2;
 	comm_retries = 2;
@@ -114,11 +143,6 @@ const char * RIG_TS2000::get_bwname_(int n, int md)
 			(md == 2 || md == 6) ? TS2000_CWwidths[n] : TS2000_FSKwidths[n]);
 	}
 	return bwname;
-}
-
-void RIG_TS2000::initialize()
-{
-	return;
 }
 
 void RIG_TS2000::selectA()

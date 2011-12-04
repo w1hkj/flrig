@@ -25,6 +25,14 @@ const char IC756PRO_mode_type[] =
 
 const char *IC756PRO_widths[] = { "FIXED", NULL};
 
+static GUI ic756pro_widgets[]= {
+	{ (Fl_Widget *)btnVol, 2, 125,  50 },
+	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },
+	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },
+	{ (Fl_Widget *)sldrMICGAIN, 266, 125, 156 },
+	{ (Fl_Widget *)sldrPOWER, 266, 145, 156 },
+	{ (Fl_Widget *)NULL, 0, 0, 0 }
+};
 
 RIG_IC756PRO::RIG_IC756PRO() {
 	defaultCIV = 0x5C;
@@ -32,6 +40,8 @@ RIG_IC756PRO::RIG_IC756PRO() {
 	modes_ = IC756PROmodes_;
 	bandwidths_ = IC756PRO_widths;
 	_mode_type = IC756PRO_mode_type;
+
+	widgets = ic756pro_widgets;
 
 	def_freq = freqA = freqB = A.freq = 14070000;
 	def_mode = modeA = modeB = B.imode = 1;
@@ -59,6 +69,15 @@ RIG_IC756PRO::RIG_IC756PRO() {
 	has_noise_control =
 	has_rf_control = true;
 };
+
+void RIG_IC756PRO::initialize()
+{
+	ic756pro_widgets[0].W = btnVol;
+	ic756pro_widgets[1].W = sldrVOLUME;
+	ic756pro_widgets[2].W = sldrRFGAIN;
+	ic756pro_widgets[3].W = sldrMICGAIN;
+	ic756pro_widgets[4].W = sldrPOWER;
+}
 
 void RIG_IC756PRO::selectA()
 {

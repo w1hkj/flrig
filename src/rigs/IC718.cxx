@@ -19,11 +19,23 @@ const char *IC718modes_[] = { "LSB", "USB", "AM", "CW", "RTTY", "CW-R", "RTTY-R"
 const char IC718_mode_type[] = { 'L', 'U', 'U', 'L', 'L', 'U', 'U'};
 const char *IC718_widths[] = { "Wide", "Med", "Narr", NULL};
 
+static GUI rig_widgets[]= {
+	{ (Fl_Widget *)btnVol,       2, 125,  50 },
+	{ (Fl_Widget *)sldrVOLUME,  54, 125, 156 },
+	{ (Fl_Widget *)sldrRFGAIN,  54, 145, 156 },
+	{ (Fl_Widget *)btnNR,      214, 105,  50 },
+	{ (Fl_Widget *)sldrNR,     266, 105, 156 },
+	{ (Fl_Widget *)sldrMICGAIN,266, 125, 156 },
+	{ (Fl_Widget *)sldrPOWER,  266, 145, 156 },
+	{ (Fl_Widget *)NULL, 0, 0, 0 }
+};
+
 RIG_IC718::RIG_IC718() {
 	name_ = IC718name_;
 	modes_ = IC718modes_;
 	_mode_type = IC718_mode_type;
 	bandwidths_ = IC718_widths;
+	widgets = rig_widgets;
 
 	comm_baudrate = BR9600;
 	stopbits = 1;
@@ -64,6 +76,18 @@ RIG_IC718::RIG_IC718() {
 };
 
 //=============================================================================
+
+void RIG_IC718::initialize()
+{
+	rig_widgets[0].W = btnVol;
+	rig_widgets[1].W = sldrVOLUME;
+	rig_widgets[2].W = sldrRFGAIN;
+	rig_widgets[3].W = btnNR;
+	rig_widgets[4].W = sldrNR;
+	rig_widgets[5].W = sldrMICGAIN;
+	rig_widgets[6].W = sldrPOWER;
+}
+
 int  RIG_IC718::adjust_bandwidth(int m)
 {
 	return 0;

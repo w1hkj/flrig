@@ -46,12 +46,27 @@ NULL};
 
 const char *IC7000_FMwidths[] = { "FIXED", NULL };
 
+static GUI rig_widgets[]= {
+	{ (Fl_Widget *)btnVol,        2, 125,  50 },
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
+	{ (Fl_Widget *)sldrRFGAIN,  266, 125, 156 },
+	{ (Fl_Widget *)sldrMICGAIN, 266, 145, 156 },
+	{ (Fl_Widget *)sldrSQUELCH, 266, 105, 156 },
+	{ (Fl_Widget *)btnNR,         2, 145,  50 },
+	{ (Fl_Widget *)sldrNR,       54, 145, 156 },
+	{ (Fl_Widget *)btnNotch,      2, 165,  50 },
+	{ (Fl_Widget *)sldrNOTCH,    54, 165, 156 },
+	{ (Fl_Widget *)sldrPOWER,   266, 165, 156 },
+	{ (Fl_Widget *)NULL, 0, 0, 0 }
+};
+
 RIG_IC7000::RIG_IC7000() {
 	defaultCIV = 0x70;
 	name_ = IC7000name_;
 	modes_ = IC7000modes_;
 	bandwidths_ = IC7000_SSB_CWwidths;
 	_mode_type = IC7000_mode_type;
+	widgets = rig_widgets;
 
 	A.freq = 432399230;
 	A.imode = 1;
@@ -61,7 +76,6 @@ RIG_IC7000::RIG_IC7000() {
 	B.iBW = 28;
 
 	adjustCIV(defaultCIV);
-
 
 	restore_mbw = false;
 
@@ -99,6 +113,17 @@ RIG_IC7000::RIG_IC7000() {
 
 void RIG_IC7000::initialize()
 {
+	rig_widgets[0].W = btnVol;
+	rig_widgets[1].W = sldrVOLUME;
+	rig_widgets[2].W = sldrRFGAIN;
+	rig_widgets[3].W = sldrMICGAIN;
+	rig_widgets[4].W = sldrSQUELCH;
+	rig_widgets[5].W = btnNR;
+	rig_widgets[6].W = sldrNR;
+	rig_widgets[7].W = btnNotch;
+	rig_widgets[8].W = sldrNOTCH;
+	rig_widgets[9].W = sldrPOWER;
+
 	cmd = pre_to;
 	cmd += '\x1A';
 	cmd += '\x05';

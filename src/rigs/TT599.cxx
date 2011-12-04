@@ -27,11 +27,18 @@ const char *RIG_TT599widths[] = {
 "3200", "3400", "3600", "3800", "4000",
 NULL};
 
+static GUI rig_widgets[]= {
+	{ (Fl_Widget *)sldrPOWER,   266, 105, 156 },
+	{ (Fl_Widget *)NULL,          0,   0,   0 }
+};
 
 RIG_TT599::RIG_TT599() {
 	name_ = RIG_TT599name_;
 	modes_ = RIG_TT599modes_;
 	bandwidths_ = RIG_TT599widths;
+
+	widgets = rig_widgets;
+
 	comm_baudrate = BR57600;
 	stopbits = 1;
 	comm_retries = 2;
@@ -67,6 +74,8 @@ RIG_TT599::RIG_TT599() {
 
 void RIG_TT599::initialize()
 {
+	rig_widgets[0].W = sldrPOWER;
+
 	cmd = "X\r";
 	sendCommand(cmd, 0);
 	MilliSleep(200);

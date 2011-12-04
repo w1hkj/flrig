@@ -20,11 +20,26 @@ static const char mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L', 'U', '
 
 static const char *FT450_widths[] = {"NARR", "NORM", "WIDE", NULL};
 
+static GUI rig_widgets[]= {
+	{ (Fl_Widget *)btnVol,        2, 125,  50 },
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
+	{ (Fl_Widget *)btnIFsh,     214, 105,  50 },
+	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
+	{ (Fl_Widget *)btnNotch,    214, 125,  50 },
+	{ (Fl_Widget *)sldrNOTCH,   266, 125, 156 },
+	{ (Fl_Widget *)sldrMICGAIN,  54, 145, 156 },
+	{ (Fl_Widget *)sldrPOWER,   266, 145, 156 },
+	{ (Fl_Widget *)NULL,          0,   0,   0 }
+};
+
 RIG_FT450::RIG_FT450() {
 // base class values	
 	name_ = FT450name_;
 	modes_ = FT450modes_;
 	bandwidths_ = FT450_widths;
+
+	widgets = rig_widgets;
+
 	comm_baudrate = BR38400;
 	stopbits = 1;
 	comm_retries = 2;
@@ -77,6 +92,21 @@ RIG_FT450::RIG_FT450() {
 	notch_on = false;
 }
 
+void RIG_FT450::initialize()
+{
+	rig_widgets[0].W = btnVol;
+	rig_widgets[1].W = sldrVOLUME;
+	rig_widgets[2].W = btnIFsh;
+	rig_widgets[3].W = sldrIFSHIFT;
+	rig_widgets[4].W = btnNotch;
+	rig_widgets[5].W = sldrNOTCH;
+	rig_widgets[6].W = sldrMICGAIN;
+	rig_widgets[7].W = sldrPOWER;
+
+	selectA();
+}
+
+
 int  RIG_FT450::adjust_bandwidth(int m)
 {
 	return 1;
@@ -92,11 +122,6 @@ void RIG_FT450::selectB()
 {
 	cmd = "SV1;";
 	sendCommand(cmd, 0);
-}
-
-void RIG_FT450::initialize()
-{
-	selectA();
 }
 
 long RIG_FT450::get_vfoA ()

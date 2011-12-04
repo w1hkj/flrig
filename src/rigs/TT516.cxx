@@ -70,11 +70,20 @@ static char TT516getSMETER[]	= "?S\r";
 static char TT516getBW[]		= "?W\r";
 static char TT516setVfo[]		= "*EVx\r";
 
+static GUI rig_widgets[]= {
+	{ (Fl_Widget *)btnIFsh,     214, 105,  50 },
+	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
+	{ (Fl_Widget *)NULL,          0,   0,   0 }
+};
+
 RIG_TT516::RIG_TT516() {
 // base class values	
 	name_ = TT516name_;
 	modes_ = TT516modes_;
 	bandwidths_ = TT516_widths;
+
+	widgets = rig_widgets;
+
 	comm_baudrate = BR1200;
 	stopbits = 1;
 	comm_retries = 2;
@@ -115,6 +124,12 @@ RIG_TT516::RIG_TT516() {
 	has_bandwidth_control =
 	has_mode_control = true;
 
+}
+
+void RIG_TT516::initialize()
+{
+	rig_widgets[0].W = btnIFsh;
+	rig_widgets[1].W = sldrIFSHIFT;
 }
 
 long RIG_TT516::get_vfoA ()

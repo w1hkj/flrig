@@ -14,6 +14,8 @@ public:
 	RIG_TT516();
 	~RIG_TT516(){}
 
+	void initialize();
+
 	long get_vfoA();
 	void set_vfoA(long);
 	long get_vfoB();
