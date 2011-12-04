@@ -13,6 +13,8 @@ public:
 	RIG_TT566();
 	~RIG_TT566(){}
 
+	void initialize();
+
 	long get_vfoA();
 	void set_vfoA(long);
 	long get_vfoB();

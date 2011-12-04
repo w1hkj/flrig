@@ -25,11 +25,19 @@ static const char K2_mode_type[] =
 
 const char *K2_widths[] = {"FL1", "FL2", "FL3", "FL4", NULL};
 
+static GUI k2_widgets[]= {
+	{ (Fl_Widget *)sldrPOWER, 266, 105, 156 },
+	{ (Fl_Widget *)NULL, 0, 0, 0 }
+};
+
 RIG_K2::RIG_K2() {
 // base class values	
 	name_ = K2name_;
 	modes_ = K2modes_;
 	bandwidths_ = K2_widths;
+
+	widgets = k2_widgets;
+
 	comm_baudrate = BR4800;
 	stopbits = 2;
 	comm_retries = 3;
@@ -74,6 +82,8 @@ int  RIG_K2::adjust_bandwidth(int m)
 
 void RIG_K2::initialize()
 {
+	k2_widgets[0].W = sldrPOWER;
+
 //enable extended command mode
 	sendCommand("K22;", 0);
 //disable auto reporting of info

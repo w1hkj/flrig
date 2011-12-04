@@ -49,6 +49,18 @@ static const char *FT950_widths_AMwide[] = {  "9000", NULL };
 static const char *FT950_widths_FMnar[]  = { "12500", NULL };
 static const char *FT950_widths_FMwide[] = { "25000", NULL };
 
+static GUI rig_widgets[]= {
+	{ (Fl_Widget *)btnVol,        2, 125,  50 },
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },
+	{ (Fl_Widget *)btnIFsh,     214, 105,  50 },
+	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
+	{ (Fl_Widget *)btnNotch,    214, 125,  50 },
+	{ (Fl_Widget *)sldrNOTCH,   266, 125, 156 },
+	{ (Fl_Widget *)sldrMICGAIN, 266, 145, 156 },
+	{ (Fl_Widget *)sldrPOWER,    54, 165, 368 },
+	{ (Fl_Widget *)NULL,          0,   0,   0 }
+};
 
 RIG_FT950::RIG_FT950() {
 // base class values	
@@ -56,6 +68,9 @@ RIG_FT950::RIG_FT950() {
 	modes_ = FT950modes_;
 	bandwidths_ = FT950_widths_SSB;
 	bw_vals_ = FT950_wvals_SSB;
+
+	widgets = rig_widgets;
+
 	comm_baudrate = BR38400;
 	stopbits = 1;
 	comm_retries = 2;
@@ -117,6 +132,15 @@ RIG_FT950::RIG_FT950() {
 
 void RIG_FT950::initialize()
 {
+	rig_widgets[0].W = btnVol;
+	rig_widgets[1].W = sldrVOLUME;
+	rig_widgets[2].W = sldrRFGAIN;
+	rig_widgets[3].W = btnIFsh;
+	rig_widgets[4].W = sldrIFSHIFT;
+	rig_widgets[5].W = btnNotch;
+	rig_widgets[6].W = sldrNOTCH;
+	rig_widgets[7].W = sldrMICGAIN;
+	rig_widgets[8].W = sldrPOWER;
 }
 
 

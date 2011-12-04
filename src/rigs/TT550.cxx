@@ -116,11 +116,25 @@ static char TT550setAMCARRIER[]	= "R \r";	// enables AM mode transmit
 
 static string xcvrstream = "";
 
+static GUI rig_widgets[]= {
+	{ (Fl_Widget *)btnVol,        2, 125,  50 },
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },
+	{ (Fl_Widget *)btnIFsh,     214, 125,  50 },
+	{ (Fl_Widget *)sldrIFSHIFT, 266, 125, 156 },
+	{ (Fl_Widget *)sldrMICGAIN, 266, 145, 156 },
+	{ (Fl_Widget *)sldrPOWER,    54, 165, 368 },
+	{ (Fl_Widget *)NULL,          0,   0,   0 }
+};
+
 RIG_TT550::RIG_TT550() {
 // base class values	
 	name_ = TT550name_;
 	modes_ = TT550modes_;
 	bandwidths_ = TT550_widths;
+
+	widgets = rig_widgets;
+
 	comm_baudrate = BR57600;
 	stopbits = 1;
 	comm_retries = 2;
@@ -194,7 +208,13 @@ void RIG_TT550::showASCII(string s1, string s)
 
 void RIG_TT550::initialize()
 {
-//	clearSerialPort();
+	rig_widgets[0].W = btnVol;
+	rig_widgets[1].W = sldrVOLUME;
+	rig_widgets[2].W = sldrRFGAIN;
+	rig_widgets[3].W = btnIFsh;
+	rig_widgets[4].W = sldrIFSHIFT;
+	rig_widgets[5].W = sldrMICGAIN;
+	rig_widgets[6].W = sldrPOWER;
 
 	sendCommand(TT550restart);
 

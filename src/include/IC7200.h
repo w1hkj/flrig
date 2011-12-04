@@ -8,6 +8,8 @@ public:
 	RIG_IC7200();
 	~RIG_IC7200(){}
 
+	void initialize();
+
 	void selectA();
 	void selectB();
 

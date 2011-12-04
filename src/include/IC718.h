@@ -7,6 +7,7 @@ class RIG_IC718 : public RIG_ICOM {
 public:
 	RIG_IC718();
 	~RIG_IC718(){}
+	void initialize();
 
 	long get_vfoA(void);
 	void set_vfoA(long f);

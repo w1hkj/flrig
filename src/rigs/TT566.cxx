@@ -156,10 +156,22 @@ static char TT566getPREAMP[]	= "?RME\r";
 
 static char TT566setPTT[]		= "*T";
 
+static GUI rig_widgets[]= {
+	{ (Fl_Widget *)btnVol,        2, 125,  50 },
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },
+	{ (Fl_Widget *)sldrMICGAIN, 266, 125, 156 },
+	{ (Fl_Widget *)sldrPOWER,   266, 145, 156 },
+	{ (Fl_Widget *)NULL,          0,   0,   0 }
+};
+
 RIG_TT566::RIG_TT566() {
 	name_ = RIG_TT566name_;
 	modes_ = RIG_TT566modes_;
 	bandwidths_ = RIG_TT566widths;
+
+	widgets = rig_widgets;
+
 	comm_baudrate = BR57600;
 	stopbits = 1;
 	comm_retries = 2;
@@ -201,6 +213,15 @@ RIG_TT566::RIG_TT566() {
 	has_power_control = true;
 
 };
+
+void RIG_TT566::initialize()
+{
+	rig_widgets[0].W = btnVol;
+	rig_widgets[1].W = sldrVOLUME;
+	rig_widgets[2].W = sldrRFGAIN;
+	rig_widgets[3].W = sldrMICGAIN;
+	rig_widgets[4].W = sldrPOWER;
+}
 
 int  RIG_TT566::adjust_bandwidth(int m)
 {

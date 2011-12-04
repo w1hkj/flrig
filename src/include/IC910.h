@@ -7,6 +7,9 @@ class RIG_IC910H : public RIG_IC746 {
 public:
 	RIG_IC910H();
 	~RIG_IC910H(){};
+
+	void initialize();
+
 	void set_vfoA(long);
 	void set_compression();
 	void set_vox_onoff();

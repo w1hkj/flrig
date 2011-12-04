@@ -19,6 +19,13 @@ struct FREQMODE {
 	int  src;
 };
 
+struct GUI {
+	Fl_Widget*	W;
+	int			x;
+	int			y;
+	int			w;
+};
+
 enum {onA, onB};
 enum {UI, XML};
 
@@ -55,6 +62,9 @@ public:
 	const char *  hi_tooltip;
 	const char *  hi_label;
 	const int  * bw_vals_;
+
+	GUI *widgets;
+
 	int  comm_baudrate;
 	int  stopbits;
 	int  comm_retries;

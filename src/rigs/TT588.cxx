@@ -76,11 +76,23 @@ static char TT588getBW[]		= "?W\r";
 
 static char TT588setXMT[]		= "*Tnn\r";
 
+static GUI tt588_widgets[]= {
+	{ (Fl_Widget *)btnVol,        2, 125,  50 },
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },
+	{ (Fl_Widget *)sldrMICGAIN, 266, 125, 156 },
+	{ (Fl_Widget *)sldrSQUELCH, 266, 145, 156 },
+	{ (Fl_Widget *)NULL,          0,   0,   0 }
+};
+
 RIG_TT588::RIG_TT588() {
 // base class values
 	name_ = TT588name_;
 	modes_ = TT588modes_;
 	bandwidths_ = TT588_widths;
+
+	widgets = tt588_widgets;
+
 	comm_baudrate = BR57600;
 	stopbits = 1;
 	comm_retries = 2;
@@ -139,6 +151,12 @@ RIG_TT588::RIG_TT588() {
 
 void RIG_TT588::initialize()
 {
+	tt588_widgets[0].W = btnVol;
+	tt588_widgets[1].W = sldrVOLUME;
+	tt588_widgets[2].W = sldrRFGAIN;
+	tt588_widgets[3].W = sldrMICGAIN;
+	tt588_widgets[4].W = sldrSQUELCH;
+
 	VfoAdj = progStatus.vfo_adj;
 }
 

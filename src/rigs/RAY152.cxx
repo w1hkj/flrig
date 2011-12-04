@@ -21,9 +21,20 @@ const char RIG_RAY152name_[] = "RAY 152";
 const char *RIG_RAY152modes_[] = { "USB", "LSB", "H3E", "A1A", "F1B", NULL};
 static const char RIG_RAY152_mode_type[] = {'U', 'L', 'U', 'L', 'U'};
 
+static GUI rig_widgets[]= {
+	{ (Fl_Widget *)btnVol, 2, 145,  50 },
+	{ (Fl_Widget *)sldrVOLUME, 54, 145, 368 },
+	{ (Fl_Widget *)sldrRFGAIN, 54, 125, 156 },
+	{ (Fl_Widget *)sldrSQUELCH, 266, 125, 156 },
+	{ (Fl_Widget *)NULL, 0, 0, 0 }
+};
+
 RIG_RAY152::RIG_RAY152() {
 	name_ = RIG_RAY152name_;
 	modes_ = RIG_RAY152modes_;
+
+	widgets = rig_widgets;
+
 	comm_baudrate = BR1200;
 	stopbits = 1;
 	comm_retries = 2;
@@ -148,6 +159,11 @@ void RIG_RAY152::get_data()
 
 void RIG_RAY152::initialize()
 {
+	rig_widgets[0].W = btnVol;
+	rig_widgets[1].W = sldrVOLUME;
+	rig_widgets[2].W = sldrRFGAIN;
+	rig_widgets[3].W = sldrSQUELCH;
+
 	sendCommand("E1\r", 0);
 	sendCommand("Z1\r", 0);
 	dumpdata = true;

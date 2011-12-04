@@ -27,12 +27,26 @@ static const char *K3_widths[] = {
 
 static int def_mode_width[] = { 34, 34, 15, 37, 37, 34, 15, 34 };
 
+static GUI k3_widgets[]= {
+	{ (Fl_Widget *)btnVol, 2, 125,  50 },
+	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },
+	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },
+	{ (Fl_Widget *)btnIFsh, 214, 105,  50 },
+	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
+	{ (Fl_Widget *)sldrMICGAIN, 266, 125, 156 },
+	{ (Fl_Widget *)sldrPOWER, 266, 145, 156 },
+	{ (Fl_Widget *)NULL, 0, 0, 0 }
+};
+
 RIG_K3::RIG_K3() {
 // base class values	
 	name_ = K3name_;
 	modes_ = K3modes_;
 	bandwidths_ = K3_widths;
 	comm_baudrate = BR38400;
+
+	widgets = k3_widgets;
+
 	stopbits = 1;
 	comm_retries = 2;
 	comm_wait = 5;
@@ -88,6 +102,14 @@ int  RIG_K3::def_bandwidth(int m)
 
 void RIG_K3::initialize()
 {
+	k3_widgets[0].W = btnVol;
+	k3_widgets[1].W = sldrVOLUME;
+	k3_widgets[2].W = sldrRFGAIN;
+	k3_widgets[3].W = btnIFsh;
+	k3_widgets[4].W = sldrIFSHIFT;
+	k3_widgets[5].W = sldrMICGAIN;
+	k3_widgets[6].W = sldrPOWER;
+
 	cmd = "AI0;"; // disable auto-info
 	sendCommand(cmd);
 	showresp(WARN, ASC, "disable auto-info", cmd, replystr);

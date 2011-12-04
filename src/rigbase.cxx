@@ -13,6 +13,8 @@ const char *szDSPHI[] = {"NONE", NULL};
 const char *szdsptooltip = "dsp tooltip";
 const char *szbtnlabel = " ";
 
+static GUI basewidgets[] = { {NULL, 0, 0} };
+
 rigbase::rigbase()
 {
 	name_ = szNORIG;
@@ -24,6 +26,8 @@ rigbase::rigbase()
 	dsp_hi = szDSPHI;
 	hi_tooltip = szdsptooltip;
 	hi_label = szbtnlabel;
+
+	widgets = basewidgets;
 
 	serloop_timing = 200; // msec, 5x / second
 

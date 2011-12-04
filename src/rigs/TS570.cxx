@@ -38,11 +38,42 @@ static const char *TS570_FSKwidths[] = {
 static const char *TS570_FSKbw[] = {
   "FW0250;", "FW0500;", "FW1000;", "FW1500;", NULL};
 
+static GUI rig_widgets[]= {
+	{ (Fl_Widget *)btnVol,        2, 125,  50 },
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
+	{ (Fl_Widget *)btnIFsh,     214, 105,  50 },
+	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
+	{ (Fl_Widget *)sldrMICGAIN, 266, 125, 156 },
+	{ (Fl_Widget *)sldrPOWER,    54, 145, 368 },
+	{ (Fl_Widget *)NULL,          0,   0,   0 }
+};
+
+void RIG_TS570::initialize()
+{
+	rig_widgets[0].W = btnVol;
+	rig_widgets[1].W = sldrVOLUME;
+	rig_widgets[2].W = btnIFsh;
+	rig_widgets[3].W = sldrIFSHIFT;
+	rig_widgets[4].W = sldrMICGAIN;
+	rig_widgets[5].W = sldrPOWER;
+
+	cmd = "FR0;"; sendCommand(cmd);
+	showresp(WARN, ASC, "Rx on A", cmd, replystr);
+	cmd = "AC001;"; sendCommand(cmd);
+	showresp(WARN, ASC, "Thru - tune ON", cmd, replystr);
+	get_preamp();
+	get_attenuator();
+	is_TS570S = get_ts570id();
+}
+
 RIG_TS570::RIG_TS570() {
 // base class values
 	name_ = TS570name_;
 	modes_ = TS570modes_;
 	bandwidths_ = TS570_SSBwidths;
+
+	widgets = rig_widgets;
+
 	comm_baudrate = BR4800;
 	stopbits = 2;
 	comm_retries = 2;
@@ -80,17 +111,6 @@ RIG_TS570::RIG_TS570() {
 	has_mode_control =
 	has_bandwidth_control =
 	has_ptt_control = true;
-}
-
-void RIG_TS570::initialize()
-{
-	cmd = "FR0;"; sendCommand(cmd);
-	showresp(WARN, ASC, "Rx on A", cmd, replystr);
-	cmd = "AC001;"; sendCommand(cmd);
-	showresp(WARN, ASC, "Thru - tune ON", cmd, replystr);
-	get_preamp();
-	get_attenuator();
-	is_TS570S = get_ts570id();
 }
 
 bool RIG_TS570::get_ts570id()

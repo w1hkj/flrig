@@ -72,6 +72,36 @@ static const char *TS480HX_FSKwidths[] = {
 static const char *TS480HX_FSKbw[] = {
 "FW0250;", "FW0500;", "FW1000;", "FW1500;" };
 
+static GUI rig_widgets[]= {
+	{ (Fl_Widget *)btnVol,        2, 125,  50 },
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },
+	{ (Fl_Widget *)btnIFsh,     214, 105,  50 },
+	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
+	{ (Fl_Widget *)btnDataPort, 214, 125,  50 },
+	{ (Fl_Widget *)sldrMICGAIN, 266, 125, 156 },
+	{ (Fl_Widget *)sldrPOWER,   266, 145, 156 },
+	{ (Fl_Widget *)NULL,          0,   0,   0 }
+};
+
+void RIG_TS480HX::initialize()
+{
+	rig_widgets[0].W = btnVol;
+	rig_widgets[1].W = sldrVOLUME;
+	rig_widgets[2].W = sldrRFGAIN;
+	rig_widgets[3].W = btnIFsh;
+	rig_widgets[4].W = sldrIFSHIFT;
+	rig_widgets[5].W = btnDataPort;
+	rig_widgets[6].W = sldrMICGAIN;
+	rig_widgets[7].W = sldrPOWER;
+
+	progStatus.rfgain = 100;
+	progStatus.volume = 25;
+	progStatus.power_level = 20;
+	progStatus.mic_gain = 25;
+	check_menu_45();
+};
+
 RIG_TS480HX::RIG_TS480HX() {
 // base class values
 	name_ = TS480HXname_;
@@ -86,6 +116,8 @@ RIG_TS480HX::RIG_TS480HX() {
 	dsp_hi     = TS480HX_hi;
 	hi_tooltip = TS480HX_lo_tooltip;
 	hi_label   = TS480HX_btn_hi_label;
+
+	widgets = rig_widgets;
 
 	comm_baudrate = BR4800;
 	stopbits = 2;
@@ -171,15 +203,6 @@ void RIG_TS480HX::check_menu_45()
 		hi_label   = TS480HX_btn_hi_label;
 		B.iBW = A.iBW = 0x8A03;
 	}
-}
-
-void RIG_TS480HX::initialize()
-{
-	progStatus.rfgain = 100;
-	progStatus.volume = 25;
-	progStatus.power_level = 20;
-	progStatus.mic_gain = 25;
-	check_menu_45();
 }
 
 void RIG_TS480HX::shutdown()

@@ -86,11 +86,23 @@ static char TT538getBW[]		= "?W\r";
 static char TT538setXMT[]		= "Q1\r";
 static char TT538setRCV[]		= "Q0\r";
 
+static GUI rig_widgets[]= {
+	{ (Fl_Widget *)btnVol,        2, 125,  50 },
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
+	{ (Fl_Widget *)sldrRFGAIN,  266, 125, 156 },
+	{ (Fl_Widget *)btnIFsh,     214, 105,  50 },
+	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
+	{ (Fl_Widget *)NULL,          0,   0,   0 }
+};
+
 RIG_TT538::RIG_TT538() {
 // base class values
 	name_ = TT538name_;
 	modes_ = TT538modes_;
 	bandwidths_ = TT538_widths;
+
+	widgets = rig_widgets;
+
 	comm_baudrate = BR57600;
 	stopbits = 1;
 	comm_retries = 2;
@@ -147,6 +159,12 @@ void RIG_TT538::checkresponse(string s)
 
 void RIG_TT538::initialize()
 {
+	rig_widgets[0].W = btnVol;
+	rig_widgets[1].W = sldrVOLUME;
+	rig_widgets[2].W = sldrRFGAIN;
+	rig_widgets[3].W = btnIFsh;
+	rig_widgets[4].W = sldrIFSHIFT;
+
 	VfoAdj = progStatus.vfo_adj;
 	fwdpwr = refpwr = 0.0;
 }

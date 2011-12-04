@@ -39,12 +39,27 @@ NULL};
 
 const char *IC756PRO2_AMFMwidths[] = { "FILT-1", "FILT-2", "FILT-3", NULL };
 
+static GUI ic756pro2_widgets[]= {
+	{ (Fl_Widget *)btnVol, 2, 125,  50 },
+	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },
+	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },
+	{ (Fl_Widget *)btnNR, 2, 165,  50 },
+	{ (Fl_Widget *)sldrNR, 54, 165, 156 },
+	{ (Fl_Widget *)btnIFsh, 214, 125,  50 },
+	{ (Fl_Widget *)sldrIFSHIFT, 266, 125, 156 },
+	{ (Fl_Widget *)sldrMICGAIN, 266, 145, 156 },
+	{ (Fl_Widget *)sldrPOWER, 266, 165, 156 },
+	{ (Fl_Widget *)NULL, 0, 0, 0 }
+};
+
 RIG_IC756PRO2::RIG_IC756PRO2() {
 	defaultCIV = 0x64;
 	name_ = IC756PRO2name_;
 	modes_ = IC756PRO2modes_;
 	bandwidths_ = IC756PRO2_SSBwidths;
 	_mode_type = IC756PRO2_mode_type;
+
+	widgets = ic756pro2_widgets;
 
 	def_freq = freqA = freqB = A.freq = 14070000;
 	def_mode = modeA = modeB = B.imode = 1;
@@ -76,6 +91,19 @@ RIG_IC756PRO2::RIG_IC756PRO2() {
 	has_rf_control = true;
 
 };
+
+void RIG_IC756PRO2::initialize()
+{
+	ic756pro2_widgets[0].W = btnVol;
+	ic756pro2_widgets[1].W = sldrVOLUME;
+	ic756pro2_widgets[2].W = sldrRFGAIN;
+	ic756pro2_widgets[3].W = btnNR;
+	ic756pro2_widgets[4].W = sldrNR;
+	ic756pro2_widgets[5].W = btnIFsh;
+	ic756pro2_widgets[6].W = sldrIFSHIFT;
+	ic756pro2_widgets[7].W = sldrMICGAIN;
+	ic756pro2_widgets[8].W = sldrPOWER;
+}
 
 void RIG_IC756PRO2::selectA()
 {
