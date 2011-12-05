@@ -1459,6 +1459,7 @@ void setMicGainControl(void* d)
 
 void set_power_controlImage(double pwr)
 {
+	if (!pwr) return;
 	if (pwr < 26.0) {
 		scalePower->image(image_p25);
 		sldrFwdPwr->maximum(25.0);
@@ -1475,15 +1476,9 @@ void set_power_controlImage(double pwr)
 		sldrFwdPwr->minimum(0.0);
 	}
 	else {
-		if (rig_nbr == FT1000MP) {
-			scalePower->image(image_p200log);
-			sldrFwdPwr->maximum(200.0);
-			sldrFwdPwr->minimum(0.0);
-		} else {
-			scalePower->image(image_p200);
-			sldrFwdPwr->maximum(200.0);
-			sldrFwdPwr->minimum(0.0);
-		}
+		scalePower->image(image_p200);
+		sldrFwdPwr->maximum(200.0);
+		sldrFwdPwr->minimum(0.0);
 	}
 	scalePower->redraw();
 	return;
@@ -1573,6 +1568,8 @@ void updateFwdPwr(void *d)
 	if (!sldrFwdPwr->visible()) {
 		sldrFwdPwr->show();
 	}
+	if (!selrig->has_power_control)
+		set_power_controlImage(power);
 	sldrFwdPwr->value(power);
 	sldrFwdPwr->redraw();
 }
