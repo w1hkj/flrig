@@ -369,6 +369,7 @@ void status::saveLastState()
 	} else {
 		spref.set("line_out", line_out);
 		spref.set("data_port", data_port);
+		spref.set("vox_on_dataport", vox_on_dataport);
 		spref.set("agc_level", agc_level);
 		spref.set("cw_wpm", cw_wpm);
 		spref.set("cw_weight", cw_weight);
@@ -602,6 +603,7 @@ bool status::loadXcvrState(const char *xcvr)
 		else {
 			spref.get("line_out", line_out, line_out);
 			spref.get("data_port", i, data_port); data_port = i;
+			spref.get("vox_on_dataport", i, vox_on_dataport); vox_on_dataport = i;
 			spref.get("agc_level", agc_level, agc_level);
 			spref.get("cw_wpm", cw_wpm, cw_wpm);
 			spref.get("cw_weight", cw_weight, cw_weight);
