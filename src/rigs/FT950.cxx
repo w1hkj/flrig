@@ -13,6 +13,7 @@
 #include "debug.h"
 #include "support.h"
 
+#define MAX_60METERS 5
 #define WVALS_LIMIT -1
 
 static const char FT950name_[] = "FT-950";
@@ -22,15 +23,15 @@ static const char *FT950modes_[] = {
 "CW-R", "PKT-L", "RTTY-U", "PKT-FM",
 "FM-N", "PKT-U", "AM-N", NULL};
 
-static const int FT950_def_bw[] = { 19, 19, 5, 0, 0, 5, 5, 19, 5, 0, 0, 19, 0 };
-
 static const char FT950_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D' };
 static const char FT950_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L', 'U', 'U', 'U', 'U', 'U' };
 
+// 20110707 - SSB "2450", 14 discontinued in latest North American firmware 
+static const int FT950_def_bw[] = { 18, 18, 5, 0, 0, 5, 5, 18, 5, 0, 0, 18, 0 };
 static const char *FT950_widths_SSB[] = {
-"200", "400", "600", "850", "1100", "1350", "1500", "1650", "1800", // NA = 1 widths
-"1950", "2100", "2250", "2400", "2450", "2500", "2600", "2700", "2800", "2900", "3000", // NA = 0 widths
-NULL };
+"200", "400", "600", "850", "1100", "1350", "1500", "1650", "1800",
+"1950", "2100", "2250", "2400", "2500", "2600", "2700",
+"2800", "2900", "3000", NULL };
 
 static int FT950_wvals_SSB[] = {
 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20, WVALS_LIMIT};
@@ -40,7 +41,7 @@ static const char *FT950_widths_CW[] = {
 "800", "1200", "1400", "1700", "2000", "2400", NULL };
 
 static int FT950_wvals_CW[] = {
-3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, WVALS_LIMIT };
+1,2,3,4,5,6,7,8,9,10,11,12,13,15,16,17,18,19,20, WVALS_LIMIT};
 
 static const int FT950_wvals_AMFM[] = { 0, WVALS_LIMIT };
 
@@ -87,8 +88,8 @@ RIG_FT950::RIG_FT950() {
 	A.iBW = B.iBW = bwA = bwB = def_bw = 2;
 	A.freq = B.freq = freqA = freqB = def_freq = 14070000;
 
-	notch_on = false;
-
+	has_noise_reduction =
+	has_noise_reduction_control =
 	has_extras =
 	has_vox_onoff =
 	has_vox_gain =
@@ -128,6 +129,14 @@ RIG_FT950::RIG_FT950() {
 // derived specific
 	atten_level = 0;
 	preamp_level = 0;
+// set defaults
+	progStatus.use_rig_data = true;
+	if (!progStatus.use_rig_data) {
+		progStatus.notch = false;
+		progStatus.notch_val = 1500;
+		progStatus.noise_reduction = false;
+		progStatus.noise_reduction_val = 1;
+	}
 }
 
 void RIG_FT950::initialize()
@@ -296,8 +305,10 @@ int RIG_FT950::get_power_out()
 	if (p == string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
 	double mtr = (double)(atoi(&replystr[p+3]));
-//	mtr = -6.6263535 + .11813178 * mtr + .0013607405 * mtr * mtr;
-	mtr = 0.116 * mtr + 0.0011 * mtr * mtr;
+
+// following conversion iaw data measured by Terry, KJ4EED
+	mtr = (.06 * mtr) + (.002 * mtr * mtr);
+
 	return (int)mtr;
 }
 
@@ -486,7 +497,11 @@ int RIG_FT950::def_bandwidth(int val)
 
 const char ** RIG_FT950::bwtable(int n)
 {
-	if (n == 2 || n == 5 || n == 6 || n == 8)
+	if (n == 3) return FT950_widths_FMwide;
+	else if (n == 4) return FT950_widths_AMwide;
+	else if (n == 10) return FT950_widths_FMnar;
+	else if (n == 12) return FT950_widths_AMnar;
+	else if (n == 2 || n == 5 || n == 6 || n == 8)
 		return FT950_widths_CW;
 	return FT950_widths_SSB;
 }
@@ -538,7 +553,7 @@ void RIG_FT950::set_modeB(int val)
 	cmd += ';';
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET mode B", cmd, replystr);
-	adjust_bandwidth(modeA);
+	adjust_bandwidth(modeB);
 	if (val == 2 || val == 6) return;
 	if (progStatus.spot_onoff) {
 		progStatus.spot_onoff = false;
@@ -705,28 +720,29 @@ void RIG_FT950::get_if_min_max_step(int &min, int &max, int &step)
 {
 	if_shift_min = min = -1000;
 	if_shift_max = max = 1000;
-	if_shift_step = step = 50;
+	if_shift_step = step = 20;
 	if_shift_mid = 0;
 }
 
 void RIG_FT950::set_notch(bool on, int val)
 {
-	if (on && !notch_on) {
-		notch_on = true;
-		cmd = "BP00001;";
+	cmd = "BP00000;";
+	if (on) {
+		cmd[6] = '1';
 		sendCommand(cmd);
 		showresp(WARN, ASC, "SET notch on", cmd, replystr);
-	} else if (!on && notch_on) {
-		notch_on = false;
-		cmd = "BP00000;";
+	} else {
 		sendCommand(cmd);
 		showresp(WARN, ASC, "SET notch off", cmd, replystr);
-		return;
 	}
 
-	cmd = "BP01";
+	cmd[3] = '1'; // manual NOTCH position
+	cmd[6] = '0';
 	val /= 10;
-	cmd.append(to_decimal(val,3)).append(";");
+	for (int i = 3; i > 0; i--) {
+		cmd[3 + i] += val % 10;
+		val /=10;
+	}
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET notch val", cmd, replystr);
 }
@@ -737,23 +753,24 @@ bool  RIG_FT950::get_notch(int &val)
 	cmd = rsp = "BP00";
 	cmd += ';';
 	waitN(8, 100, "get notch on/off", ASC);
+
 	size_t p = replystr.rfind(rsp);
+	val = progStatus.notch_val = 1500;		// fix default slider position if disabled
 	if (p == string::npos) return ison;
 
-	if (replystr[p+6] == '1') // manual notch enabled
+	if (replystr[p+6] == '1') { // manual notch enabled
 		ison = true;
-
-	val = progStatus.notch_val;
-	cmd = rsp = "BP01";
-	cmd += ';';
-	waitN(8, 100, "get notch val", ASC);
-	p = replystr.rfind(rsp);
-	if (p == string::npos)
-		val = 10;
-	else
-		val = fm_decimal(&replystr[p+4],3) * 10;
-
-	return (notch_on = ison);
+		val = progStatus.notch_val;
+		cmd = rsp = "BP01";
+		cmd += ';';
+		waitN(8, 100, "get notch val", ASC);
+		p = replystr.rfind(rsp);
+		if (p == string::npos)
+			val = 10;
+		else
+			val = fm_decimal(&replystr[p+4],3) * 10;
+	}
+	return ison;
 }
 
 void RIG_FT950::get_notch_min_max_step(int &min, int &max, int &step)
@@ -763,21 +780,26 @@ void RIG_FT950::get_notch_min_max_step(int &min, int &max, int &step)
 	step = 10;
 }
 
+// Terry, KJ4EED
+// auto notch replaced with audio peak filter
+// DNF causes chirping/pinging problems in CW just like
+// Noise Blanker will cause distortion on strong SSB signals.
+// I have never seen DNF make a difference, replace it with something usefull
 void RIG_FT950::set_auto_notch(int v)
 {
-	cmd = "BC00;";
-	if (v) cmd[3] = '1';
+	cmd.assign("CO000").append(v ? "2" : "0" ).append(";");
 	sendCommand(cmd);
-	showresp(WARN, ASC, "SET auto notch", cmd, replystr);
+	showresp(WARN, ASC, "SET Auto Peak Filter", cmd, replystr);
 }
 
 int  RIG_FT950::get_auto_notch()
 {
-	cmd = "BC0;";
-	waitN(5, 100, "get auto notch", ASC);
-	size_t p = replystr.rfind("BC0");
+	// Audio Peak Filter
+	cmd = "CO00;";
+	waitN(5, 100, "get Audio Peak Filter", ASC);
+	size_t p = replystr.rfind("CO0");
 	if (p == string::npos) return 0;
-	if (replystr[p+3] == '1') return 1;
+	if (replystr[p+5] == '2') return 1;
 	return 0;
 }
 
@@ -964,16 +986,16 @@ bool RIG_FT950::set_cw_spot()
 
 void RIG_FT950::set_cw_weight()
 {
-	cmd = "EX046";
-	cmd.append(to_decimal(progStatus.cw_weight * 10, 2)).append(";");
+	int n = round(progStatus.cw_weight * 10);
+	cmd.assign("EX046").append(to_decimal(n, 2)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET cw weight", cmd, replystr);
 }
 
 void RIG_FT950::set_cw_qsk()
 {
-	cmd = "EX044";
-	cmd.append(to_decimal(progStatus.cw_qsk, 4)).append(";");
+	int n = progStatus.cw_qsk / 5 - 3;
+	cmd.assign("EX049").append(to_decimal(n, 1)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET cw qsk", cmd, replystr);
 }
@@ -981,8 +1003,7 @@ void RIG_FT950::set_cw_qsk()
 void RIG_FT950::set_cw_spot_tone()
 {
 	int n = (progStatus.cw_spot_tone - 300) / 50;
-	cmd = "EX045";
-	cmd.append(to_decimal(n, 2)).append(";");
+	cmd.assign("EX045").append(to_decimal(n, 2)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET cw tone", cmd, replystr);
 }
@@ -992,3 +1013,46 @@ void RIG_FT950::set_cw_vol()
 {
 }
 */
+
+// DNR
+void RIG_FT950::set_noise_reduction_val(int val)
+{
+	cmd.assign("RL0").append(to_decimal(val, 2)).append(";");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET_noise_reduction_val", cmd, replystr);
+
+}
+
+int  RIG_FT950::get_noise_reduction_val()
+{
+	int val = 1;
+	cmd = "RL0;";
+	waitN(6, 100, "GET noise reduction val", ASC);
+	size_t p = replystr.rfind("RL0");
+	if (p == string::npos) return val;
+	val = atoi(&replystr[p+3]);
+	return val;
+}
+
+// DNR
+void RIG_FT950::set_noise_reduction(int val)
+{
+	if (val > 0)
+		cmd = "NR01;";
+	else
+		cmd = "NR00;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET noise reduction", cmd, replystr);
+}
+
+
+int  RIG_FT950::get_noise_reduction()
+{
+	int val;
+	cmd = "NR0;";
+	waitN(5, 100, "GET noise reduction", ASC);
+	size_t p = replystr.rfind("NR0");
+	if (p == string::npos) return 0;
+	val = replystr[p+3] - '0';
+	return val;
+}
