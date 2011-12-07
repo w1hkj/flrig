@@ -2685,12 +2685,16 @@ void initRig()
 	}
 
 	if (selrig->has_auto_notch) {
-		if (rig_nbr == RAY152)
+		if (rig_nbr == RAY152) {
 			btnAutoNotch->label("AGC");
-		else if (rig_nbr == FT1000MP)
+			btnAutoNotch->tooltip("AGC on/off");
+		} else if (rig_nbr == FT1000MP) {
 			btnAutoNotch->label("Tuner");
-		else
+			btnAutoNotch->tooltip("Tuner on/off");
+		} else {
 			btnAutoNotch->label("AN");
+			btnAutoNotch->tooltip("Auto notch on/off");
+		}
 		if (progStatus.use_rig_data)
 			progStatus.auto_notch = selrig->get_auto_notch();
 		else
