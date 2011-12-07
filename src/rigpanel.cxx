@@ -614,6 +614,80 @@ static void cb_sel_tt550_F3_func(Fl_Choice* o, void*) {
 
 Fl_Tabs *tabsGeneric=(Fl_Tabs *)0;
 
+Fl_Group *genericBands=(Fl_Group *)0;
+
+Fl_Button *btnBandSelect_1=(Fl_Button *)0;
+
+static void cb_btnBandSelect_1(Fl_Button*, void*) {
+  cbBandSelect(1);
+}
+
+Fl_Button *btnBandSelect_2=(Fl_Button *)0;
+
+static void cb_btnBandSelect_2(Fl_Button*, void*) {
+  cbBandSelect(2);
+}
+
+Fl_Button *btnBandSelect_3=(Fl_Button *)0;
+
+static void cb_btnBandSelect_3(Fl_Button*, void*) {
+  cbBandSelect(3);
+}
+
+Fl_Button *btnBandSelect_4=(Fl_Button *)0;
+
+static void cb_btnBandSelect_4(Fl_Button*, void*) {
+  cbBandSelect(4);
+}
+
+Fl_Button *btnBandSelect_5=(Fl_Button *)0;
+
+static void cb_btnBandSelect_5(Fl_Button*, void*) {
+  cbBandSelect(5);
+}
+
+Fl_Button *btnBandSelect_6=(Fl_Button *)0;
+
+static void cb_btnBandSelect_6(Fl_Button*, void*) {
+  cbBandSelect(6);
+}
+
+Fl_Button *btnBandSelect_7=(Fl_Button *)0;
+
+static void cb_btnBandSelect_7(Fl_Button*, void*) {
+  cbBandSelect(7);
+}
+
+Fl_Button *btnBandSelect_8=(Fl_Button *)0;
+
+static void cb_btnBandSelect_8(Fl_Button*, void*) {
+  cbBandSelect(8);
+}
+
+Fl_Button *btnBandSelect_9=(Fl_Button *)0;
+
+static void cb_btnBandSelect_9(Fl_Button*, void*) {
+  cbBandSelect(9);
+}
+
+Fl_Button *btnBandSelect_10=(Fl_Button *)0;
+
+static void cb_btnBandSelect_10(Fl_Button*, void*) {
+  cbBandSelect(10);
+}
+
+Fl_Button *btnBandSelect_11=(Fl_Button *)0;
+
+static void cb_btnBandSelect_11(Fl_Button*, void*) {
+  cbBandSelect(11);
+}
+
+Fl_Button *btnBandSelect_12=(Fl_Button *)0;
+
+static void cb_btnBandSelect_12(Fl_Button*, void*) {
+  cbBandSelect(12);
+}
+
 Fl_Group *genericCW=(Fl_Group *)0;
 
 Fl_Light_Button *btnSpot=(Fl_Light_Button *)0;
@@ -1540,15 +1614,80 @@ Fl_Double_Window* Rig_window() {
     } // Fl_Tabs* tabs550
     { tabsGeneric = new Fl_Tabs(1, 252, 422, 70);
       tabsGeneric->selection_color((Fl_Color)FL_LIGHT1);
-      { genericCW = new Fl_Group(2, 272, 420, 49, _("CW"));
+      { genericBands = new Fl_Group(2, 271, 420, 49, _("Bands"));
+        { btnBandSelect_1 = new Fl_Button(4, 276, 60, 18, _("1.8"));
+          btnBandSelect_1->tooltip(_("160m Band"));
+          btnBandSelect_1->color((Fl_Color)246);
+          btnBandSelect_1->callback((Fl_Callback*)cb_btnBandSelect_1);
+        } // Fl_Button* btnBandSelect_1
+        { btnBandSelect_2 = new Fl_Button(74, 276, 60, 18, _("3.5"));
+          btnBandSelect_2->tooltip(_("80m band"));
+          btnBandSelect_2->color((Fl_Color)246);
+          btnBandSelect_2->callback((Fl_Callback*)cb_btnBandSelect_2);
+        } // Fl_Button* btnBandSelect_2
+        { btnBandSelect_3 = new Fl_Button(145, 276, 60, 18, _("7"));
+          btnBandSelect_3->tooltip(_("40m band"));
+          btnBandSelect_3->color((Fl_Color)246);
+          btnBandSelect_3->callback((Fl_Callback*)cb_btnBandSelect_3);
+          btnBandSelect_3->align(FL_ALIGN_CLIP);
+        } // Fl_Button* btnBandSelect_3
+        { btnBandSelect_4 = new Fl_Button(216, 276, 60, 18, _("10"));
+          btnBandSelect_4->tooltip(_("30m band"));
+          btnBandSelect_4->color((Fl_Color)246);
+          btnBandSelect_4->callback((Fl_Callback*)cb_btnBandSelect_4);
+        } // Fl_Button* btnBandSelect_4
+        { btnBandSelect_5 = new Fl_Button(287, 276, 60, 18, _("14"));
+          btnBandSelect_5->tooltip(_("20m band"));
+          btnBandSelect_5->color((Fl_Color)246);
+          btnBandSelect_5->callback((Fl_Callback*)cb_btnBandSelect_5);
+        } // Fl_Button* btnBandSelect_5
+        { btnBandSelect_6 = new Fl_Button(358, 276, 60, 18, _("18"));
+          btnBandSelect_6->tooltip(_("17m band"));
+          btnBandSelect_6->color((Fl_Color)246);
+          btnBandSelect_6->callback((Fl_Callback*)cb_btnBandSelect_6);
+        } // Fl_Button* btnBandSelect_6
+        { btnBandSelect_7 = new Fl_Button(4, 299, 60, 18, _("21"));
+          btnBandSelect_7->tooltip(_("15m band"));
+          btnBandSelect_7->color((Fl_Color)246);
+          btnBandSelect_7->callback((Fl_Callback*)cb_btnBandSelect_7);
+        } // Fl_Button* btnBandSelect_7
+        { btnBandSelect_8 = new Fl_Button(74, 299, 60, 18, _("24"));
+          btnBandSelect_8->tooltip(_("12m band"));
+          btnBandSelect_8->color((Fl_Color)246);
+          btnBandSelect_8->callback((Fl_Callback*)cb_btnBandSelect_8);
+        } // Fl_Button* btnBandSelect_8
+        { btnBandSelect_9 = new Fl_Button(145, 299, 60, 18, _("28"));
+          btnBandSelect_9->tooltip(_("10m band"));
+          btnBandSelect_9->color((Fl_Color)246);
+          btnBandSelect_9->callback((Fl_Callback*)cb_btnBandSelect_9);
+        } // Fl_Button* btnBandSelect_9
+        { btnBandSelect_10 = new Fl_Button(216, 299, 60, 18, _("50"));
+          btnBandSelect_10->tooltip(_("6m band"));
+          btnBandSelect_10->color((Fl_Color)246);
+          btnBandSelect_10->callback((Fl_Callback*)cb_btnBandSelect_10);
+        } // Fl_Button* btnBandSelect_10
+        { btnBandSelect_11 = new Fl_Button(287, 299, 60, 18, _("GEN"));
+          btnBandSelect_11->tooltip(_("General RX"));
+          btnBandSelect_11->color((Fl_Color)246);
+          btnBandSelect_11->callback((Fl_Callback*)cb_btnBandSelect_11);
+        } // Fl_Button* btnBandSelect_11
+        { btnBandSelect_12 = new Fl_Button(358, 299, 60, 18, _("5"));
+          btnBandSelect_12->tooltip(_("60m band"));
+          btnBandSelect_12->color((Fl_Color)246);
+          btnBandSelect_12->callback((Fl_Callback*)cb_btnBandSelect_12);
+        } // Fl_Button* btnBandSelect_12
+        genericBands->end();
+      } // Fl_Group* genericBands
+      { genericCW = new Fl_Group(2, 271, 420, 49, _("CW"));
         genericCW->color((Fl_Color)FL_LIGHT1);
         genericCW->selection_color((Fl_Color)FL_LIGHT1);
-        { Fl_Light_Button* o = btnSpot = new Fl_Light_Button(5, 281, 54, 22, _("Spot"));
+        genericCW->hide();
+        { Fl_Light_Button* o = btnSpot = new Fl_Light_Button(5, 280, 54, 22, _("Spot"));
           btnSpot->tooltip(_("Spot tone on/off"));
           btnSpot->callback((Fl_Callback*)cb_btnSpot);
           o->value(progStatus.cw_spot);
         } // Fl_Light_Button* btnSpot
-        { Fl_Counter* o = cnt_cw_spot_tone = new Fl_Counter(62, 281, 70, 22, _("Spot tone"));
+        { Fl_Counter* o = cnt_cw_spot_tone = new Fl_Counter(62, 280, 70, 22, _("Spot tone"));
           cnt_cw_spot_tone->tooltip(_("Spot volume"));
           cnt_cw_spot_tone->type(1);
           cnt_cw_spot_tone->minimum(300);
@@ -1558,7 +1697,7 @@ Fl_Double_Window* Rig_window() {
           cnt_cw_spot_tone->callback((Fl_Callback*)cb_cnt_cw_spot_tone);
           o->value(progStatus.cw_spot);
         } // Fl_Counter* cnt_cw_spot_tone
-        { Fl_Counter* o = cnt_cw_qsk = new Fl_Counter(136, 281, 70, 22, _("QSK dly"));
+        { Fl_Counter* o = cnt_cw_qsk = new Fl_Counter(136, 280, 70, 22, _("QSK dly"));
           cnt_cw_qsk->tooltip(_("QSK delay (msec)"));
           cnt_cw_qsk->type(1);
           cnt_cw_qsk->minimum(0);
@@ -1568,7 +1707,7 @@ Fl_Double_Window* Rig_window() {
           cnt_cw_qsk->callback((Fl_Callback*)cb_cnt_cw_qsk);
           o->value(progStatus.tt550_cw_qsk);
         } // Fl_Counter* cnt_cw_qsk
-        { Fl_Counter* o = cnt_cw_weight = new Fl_Counter(209, 281, 70, 22, _("Weight"));
+        { Fl_Counter* o = cnt_cw_weight = new Fl_Counter(209, 280, 70, 22, _("Weight"));
           cnt_cw_weight->type(1);
           cnt_cw_weight->minimum(2.5);
           cnt_cw_weight->maximum(4.5);
@@ -1576,7 +1715,7 @@ Fl_Double_Window* Rig_window() {
           cnt_cw_weight->callback((Fl_Callback*)cb_cnt_cw_weight);
           o->value(progStatus.cw_weight);
         } // Fl_Counter* cnt_cw_weight
-        { Fl_Counter* o = cnt_cw_wpm = new Fl_Counter(283, 281, 70, 22, _("wpm"));
+        { Fl_Counter* o = cnt_cw_wpm = new Fl_Counter(283, 280, 70, 22, _("wpm"));
           cnt_cw_wpm->type(1);
           cnt_cw_wpm->minimum(5);
           cnt_cw_wpm->maximum(80);
@@ -1585,7 +1724,7 @@ Fl_Double_Window* Rig_window() {
           cnt_cw_wpm->callback((Fl_Callback*)cb_cnt_cw_wpm);
           o->value(progStatus.cw_wpm);
         } // Fl_Counter* cnt_cw_wpm
-        { Fl_Check_Button* o = btn_enable_keyer = new Fl_Check_Button(357, 284, 60, 15, _("Keyer"));
+        { Fl_Check_Button* o = btn_enable_keyer = new Fl_Check_Button(357, 283, 60, 15, _("Keyer"));
           btn_enable_keyer->tooltip(_("Enable internal keyer"));
           btn_enable_keyer->down_box(FL_DOWN_BOX);
           btn_enable_keyer->callback((Fl_Callback*)cb_btn_enable_keyer);

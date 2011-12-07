@@ -174,6 +174,7 @@ extern void cbALC_SWR();
 //extern void cbPWR();
 extern void cbMute();
 extern void cbEventLog();
+extern void cbBandSelect(int band);
 
 extern void loadConfig();
 extern void saveConfig();

@@ -85,6 +85,7 @@ rigbase::rigbase()
 	has_power_out =
 	has_split =
 	has_a2b =
+	has_band_selection =
 	has_get_info = false;
 
 	A.freq = 14070000L;
