@@ -1764,12 +1764,27 @@ void update_UI_PTT(void *d)
 void adjust_control_positions()
 {
 	int y = 0;
+
+	btnVol->hide();
+	sldrVOLUME->hide();
+	sldrRFGAIN->hide();
+	btnIFsh->hide();
+	sldrIFSHIFT->hide();
+	btnNotch->hide();
+	sldrNOTCH->hide();
+	sldrMICGAIN->hide();
+	sldrPOWER->hide();
+	sldrSQUELCH->hide();
+	btnNR->hide();
+	sldrNR->hide();
+
 	if (selrig->widgets[0].W != NULL) {
 		int i = 0;
 		while (selrig->widgets[i].W != NULL) {
 			selrig->widgets[i].W->resize(
 				selrig->widgets[i].x, selrig->widgets[i].y,
 				selrig->widgets[i].w, selrig->widgets[i].W->h() );
+			selrig->widgets[i].W->show();
 			selrig->widgets[i].W->redraw();
 			if (selrig->widgets[i].y > y) y = selrig->widgets[i].y;
 			i++;
@@ -1784,32 +1799,40 @@ void adjust_control_positions()
 			y += 20;
 			sldrVOLUME->position( sldrVOLUME->x(), y );
 			btnVol->position( btnVol->x(), y);
-			sldrVOLUME->redraw();
+			btnVol->show();
 			btnVol->redraw();
+			sldrVOLUME->redraw();
+			sldrVOLUME->redraw();
 		}
 		if (selrig->has_rf_control) {
 			y += 20;
 			sldrRFGAIN->position( sldrRFGAIN->x(), y );
+			sldrRFGAIN->show();
 			sldrRFGAIN->redraw();
 		}
 		if (selrig->has_sql_control) {
 			y += 20;
 			sldrSQUELCH->position( sldrSQUELCH->x(), y);
+			sldrSQUELCH->show();
 			sldrSQUELCH->redraw();
 		}
 		if (selrig->has_noise_reduction_control) {
 			y += 20;
 			sldrNR->position( sldrNR->x(), y);
 			btnNR->position( btnNR->x(), y);
-			sldrNR->redraw();
 			btnNR->show();
+			btnNR->redraw();
+			sldrNR->show();
+			sldrNR->redraw();
 		}
 		if (selrig->has_ifshift_control) {
 			y += 20;
 			sldrIFSHIFT->position( sldrIFSHIFT->x(), y);
 			btnIFsh->position( btnIFsh->x(), y);
-			sldrIFSHIFT->redraw();
 			btnIFsh->show();
+			btnIFsh->redraw();
+			sldrIFSHIFT->show();
+			sldrIFSHIFT->redraw();
 		}
 		if (selrig->has_notch_control) {
 			y += 20;
@@ -1824,14 +1847,17 @@ void adjust_control_positions()
 				sldrMICGAIN->label("");
 				sldrMICGAIN->redraw_label();
 				btnDataPort->position( btnDataPort->x(), y);
+				btnDataPort->show();
 				btnDataPort->redraw();
 			}
 			sldrMICGAIN->position( sldrMICGAIN->x(), y);
+			sldrMICGAIN->show();
 			sldrMICGAIN->redraw();
 		}
 		if (selrig->has_power_control) {
 			y += 20;
 			sldrPOWER->position( sldrPOWER->x(), y);
+			sldrPOWER->show();
 			sldrPOWER->redraw();
 		}
 	}
