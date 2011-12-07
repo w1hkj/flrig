@@ -1981,119 +1981,196 @@ void initXcvrTab()
 		poll_extras_interval->deactivate();
 
 	} else {
+
+		tabsGeneric->remove(*genericBands);
+		tabsGeneric->remove(*genericCW);
+		tabsGeneric->remove(*genericVOX);
+		tabsGeneric->remove(*genericSpeech);
+		tabsGeneric->remove(*genericRx);
+		tabsGeneric->remove(*genericMisc);
+
+		if (selrig->has_band_selection) {
+			genericBands->resize(
+				tabsGeneric->x() + 2,
+				tabsGeneric->y() + 19,
+				tabsGeneric->w() - 4,
+				tabsGeneric->h() - 21);
+			tabsGeneric->insert(*genericBands, 0);
+		}
+
 		poll_extras_interval->activate();
 		poll_extras_interval->value(progStatus.poll_extras_interval);
 
-		if (selrig->has_agc_level) cbo_agc_level->activate(); else cbo_agc_level->deactivate();
-		if (selrig->has_nb_level) cbo_nb_level->activate(); else cbo_nb_level->deactivate();
-
-		if (selrig->has_cw_wpm) {
-			int min, max;
-			selrig->get_cw_wpm_min_max(min, max);
-			cnt_cw_wpm->minimum(min);
-			cnt_cw_wpm->maximum(max);
-			cnt_cw_wpm->activate();
-			cnt_cw_wpm->value(progStatus.cw_wpm);
-			selrig->set_cw_wpm();
-		} else cnt_cw_wpm->deactivate();
+		if (selrig->has_cw_wpm || selrig->has_cw_qsk || selrig->has_cw_weight ||
+			selrig->has_cw_keyer || selrig->has_cw_spot || selrig->has_cw_spot_tone) {
+			genericCW->resize(
+				tabsGeneric->x() + 2,
+				tabsGeneric->y() + 19,
+				tabsGeneric->w() - 4,
+				tabsGeneric->h() - 21);
+			tabsGeneric->insert(*genericCW, 6);
+			if (selrig->has_cw_wpm) {
+				int min, max;
+				selrig->get_cw_wpm_min_max(min, max);
+				cnt_cw_wpm->minimum(min);
+				cnt_cw_wpm->maximum(max);
+				cnt_cw_wpm->activate();
+				cnt_cw_wpm->value(progStatus.cw_wpm);
+				selrig->set_cw_wpm();
+			} else cnt_cw_wpm->deactivate();
 //		if (selrig->has_cw_vol) {
 //			cnt_cw_vol->activate();
 //			cnt_cw_vol->value(progStatus.cw_vol);
 //			selrig->set_cw_vol();
 //		} else cnt_cw_vol->deactivate();
-		if (selrig->has_cw_qsk) {
-			cnt_cw_qsk->activate();
-			int min, max, step;
-			selrig->get_cw_qsk_min_max_step(min, max, step);
-			cnt_cw_qsk->minimum(min);
-			cnt_cw_qsk->maximum(max);
-			cnt_cw_qsk->step(step);
-			cnt_cw_qsk->value(progStatus.cw_qsk);
-			selrig->set_cw_qsk();
-		} else cnt_cw_qsk->deactivate();
-		if (selrig->has_cw_weight) {
-			cnt_cw_weight->activate();
-			double min, max, step;
-			selrig->get_cw_weight_min_max_step( min, max, step );
-			cnt_cw_weight->minimum(min);
-			cnt_cw_weight->maximum(max);
-			cnt_cw_weight->step(step);
-			cnt_cw_weight->value(progStatus.cw_weight);
-			selrig->set_cw_weight();
-		} else cnt_cw_weight->deactivate();
-		if (selrig->has_cw_keyer) {
-			btn_enable_keyer->activate();
-			btn_enable_keyer->value(progStatus.enable_keyer);
-			selrig->enable_keyer();
-		} else btn_enable_keyer->deactivate();
-		if (selrig->has_cw_spot) {
-			btnSpot->value(progStatus.cw_spot);
-			selrig->set_cw_spot();
-			btnSpot->activate();
-		} else btnSpot->deactivate();
-		if (selrig->has_cw_spot_tone) {
-			cnt_cw_spot_tone->activate();
-			int min, max, step;
-			selrig->get_cw_spot_tone_min_max_step(min, max, step);
-			cnt_cw_spot_tone->minimum(min);
-			cnt_cw_spot_tone->maximum(max);
-			cnt_cw_spot_tone->step(step);
-			cnt_cw_spot_tone->value(progStatus.cw_spot_tone);
-			selrig->set_cw_spot_tone();
-		} else cnt_cw_spot_tone->deactivate();
-		if (selrig->has_vox_onoff) {
-			btn_vox->activate();
-			btn_vox->value(progStatus.vox_onoff);
-			selrig->set_vox_onoff();
-		} else btn_vox->deactivate();
-		if (selrig->has_vox_gain) {
-			cnt_vox_gain->activate(); 
-			int min, max, step;
-			selrig->get_vox_gain_min_max_step(min, max, step);
-			cnt_vox_gain->minimum(min);
-			cnt_vox_gain->maximum(max);
-			cnt_vox_gain->step(step);
-			cnt_vox_gain->value(progStatus.vox_gain);
-			selrig->set_vox_gain();
-		} else cnt_vox_gain->deactivate();
-		if (selrig->has_vox_anti) {
-			cnt_anti_vox->activate();
-			int min, max, step;
-			selrig->get_vox_anti_min_max_step(min, max, step);
-			cnt_anti_vox->minimum(min);
-			cnt_anti_vox->maximum(max);
-			cnt_anti_vox->step(step);
-			cnt_anti_vox->value(progStatus.vox_anti);
-			selrig->set_vox_anti();
-		} else cnt_anti_vox->deactivate();
-		if (selrig->has_vox_hang) {
-			cnt_vox_hang->activate();
-			int min, max, step;
-			selrig->get_vox_hang_min_max_step(min, max, step);
-			cnt_vox_hang->minimum(min);
-			cnt_vox_hang->maximum(max);
-			cnt_vox_hang->step(step);
-			cnt_vox_hang->value(progStatus.vox_hang);
-			selrig->set_vox_hang();
-		} else cnt_vox_hang->deactivate();
-		if (selrig->has_vox_on_dataport) {
-			btn_vox_on_dataport->activate();
-			btn_vox_on_dataport->value(progStatus.vox_on_dataport);
-			selrig->set_vox_on_dataport();
-		} else btn_vox_on_dataport->deactivate();
-		if (selrig->has_compON) {
-			btnCompON->activate();
-			btnCompON->value(progStatus.compON);
-		} else
-			btnCompON->deactivate();
-		if (selrig->has_compression) {
-			cnt_compression->activate();
-			cnt_compression->value(progStatus.compression);
-			selrig->set_compression();
-		} else
-			cnt_compression->deactivate();
+			if (selrig->has_cw_qsk) {
+				cnt_cw_qsk->activate();
+				int min, max, step;
+				selrig->get_cw_qsk_min_max_step(min, max, step);
+				cnt_cw_qsk->minimum(min);
+				cnt_cw_qsk->maximum(max);
+				cnt_cw_qsk->step(step);
+				cnt_cw_qsk->value(progStatus.cw_qsk);
+				selrig->set_cw_qsk();
+			} else cnt_cw_qsk->deactivate();
+			if (selrig->has_cw_weight) {
+				cnt_cw_weight->activate();
+				double min, max, step;
+				selrig->get_cw_weight_min_max_step( min, max, step );
+				cnt_cw_weight->minimum(min);
+				cnt_cw_weight->maximum(max);
+				cnt_cw_weight->step(step);
+				cnt_cw_weight->value(progStatus.cw_weight);
+				selrig->set_cw_weight();
+			} else cnt_cw_weight->deactivate();
+			if (selrig->has_cw_keyer) {
+				btn_enable_keyer->activate();
+				btn_enable_keyer->value(progStatus.enable_keyer);
+				selrig->enable_keyer();
+			} else btn_enable_keyer->deactivate();
+			if (selrig->has_cw_spot) {
+				btnSpot->value(progStatus.cw_spot);
+				selrig->set_cw_spot();
+				btnSpot->activate();
+			} else btnSpot->deactivate();
+			if (selrig->has_cw_spot_tone) {
+				cnt_cw_spot_tone->activate();
+				int min, max, step;
+				selrig->get_cw_spot_tone_min_max_step(min, max, step);
+				cnt_cw_spot_tone->minimum(min);
+				cnt_cw_spot_tone->maximum(max);
+				cnt_cw_spot_tone->step(step);
+				cnt_cw_spot_tone->value(progStatus.cw_spot_tone);
+				selrig->set_cw_spot_tone();
+			} else cnt_cw_spot_tone->deactivate();
+		}
 
-		cnt_line_out->deactivate();
+		if (selrig->has_vox_onoff || selrig->has_vox_gain || selrig->has_vox_anti ||
+			selrig->has_vox_hang || selrig->has_vox_on_dataport || selrig->has_cw_spot_tone) {
+			genericVOX->resize(
+				tabsGeneric->x() + 2,
+				tabsGeneric->y() + 19,
+				tabsGeneric->w() - 4,
+				tabsGeneric->h() - 21);
+			tabsGeneric->insert(*genericVOX, 6);
+			if (selrig->has_vox_onoff) {
+				btn_vox->activate();
+				btn_vox->value(progStatus.vox_onoff);
+				selrig->set_vox_onoff();
+			} else btn_vox->deactivate();
+			if (selrig->has_vox_gain) {
+				cnt_vox_gain->activate(); 
+				int min, max, step;
+				selrig->get_vox_gain_min_max_step(min, max, step);
+				cnt_vox_gain->minimum(min);
+				cnt_vox_gain->maximum(max);
+				cnt_vox_gain->step(step);
+				cnt_vox_gain->value(progStatus.vox_gain);
+				selrig->set_vox_gain();
+			} else cnt_vox_gain->deactivate();
+			if (selrig->has_vox_anti) {
+				cnt_anti_vox->activate();
+				int min, max, step;
+				selrig->get_vox_anti_min_max_step(min, max, step);
+				cnt_anti_vox->minimum(min);
+				cnt_anti_vox->maximum(max);
+				cnt_anti_vox->step(step);
+				cnt_anti_vox->value(progStatus.vox_anti);
+				selrig->set_vox_anti();
+			} else cnt_anti_vox->deactivate();
+			if (selrig->has_vox_hang) {
+				cnt_vox_hang->activate();
+				int min, max, step;
+				selrig->get_vox_hang_min_max_step(min, max, step);
+				cnt_vox_hang->minimum(min);
+				cnt_vox_hang->maximum(max);
+				cnt_vox_hang->step(step);
+				cnt_vox_hang->value(progStatus.vox_hang);
+				selrig->set_vox_hang();
+			} else cnt_vox_hang->deactivate();
+			if (selrig->has_vox_on_dataport) {
+				btn_vox_on_dataport->activate();
+				btn_vox_on_dataport->value(progStatus.vox_on_dataport);
+				selrig->set_vox_on_dataport();
+			} else btn_vox_on_dataport->deactivate();
+		}
+
+		if (selrig->has_compON || selrig->has_compression) {
+			genericSpeech->resize(
+				tabsGeneric->x() + 2,
+				tabsGeneric->y() + 19,
+				tabsGeneric->w() - 4,
+				tabsGeneric->h() - 21);
+			tabsGeneric->insert(*genericSpeech, 6);
+			if (selrig->has_compON) {
+				btnCompON->activate();
+				btnCompON->value(progStatus.compON);
+			} else
+				btnCompON->deactivate();
+			if (selrig->has_compression) {
+				cnt_compression->activate();
+				cnt_compression->value(progStatus.compression);
+				selrig->set_compression();
+			} else
+				cnt_compression->deactivate();
+		}
+		if (selrig->has_agc_level || selrig->has_nb_level || selrig->has_bpf_center) {
+			genericRx->resize(
+				tabsGeneric->x() + 2,
+				tabsGeneric->y() + 19,
+				tabsGeneric->w() - 4,
+				tabsGeneric->h() - 21);
+			tabsGeneric->insert(*genericRx, 6);
+			if (selrig->has_agc_level) cbo_agc_level->activate(); else cbo_agc_level->deactivate();
+			if (selrig->has_nb_level) cbo_nb_level->activate(); else cbo_nb_level->deactivate();
+			if (selrig->has_bpf_center) {
+				cnt_bpf_center->value(progStatus.bpf_center);
+				cnt_bpf_center->activate();
+				btn_use_bpf_center->activate();
+			} else {
+				cnt_bpf_center->deactivate();
+				btn_use_bpf_center->deactivate();
+			}
+		}
+
+		if (selrig->has_vfo_adj) {
+			genericMisc->resize(
+				tabsGeneric->x() + 2,
+				tabsGeneric->y() + 19,
+				tabsGeneric->w() - 4,
+				tabsGeneric->h() - 21);
+			tabsGeneric->insert(*genericMisc, 6);
+			if (selrig->has_vfo_adj) {
+				cnt_vfo_adj->value(progStatus.vfo_adj);
+				selrig->setVfoAdj(progStatus.vfo_adj);
+				cnt_vfo_adj->activate();
+			} else
+				cnt_vfo_adj->deactivate();
+			cnt_line_out->hide(); // enable if a lineout control is used by any transceiver
+		}
+
+		tabsGeneric->redraw();
+
 		mnuRestoreData->show();
 		mnuKeepData->show();
 
@@ -2271,22 +2348,6 @@ void initRig()
 		btnSpecial->show();
 	else
 		btnSpecial->hide();
-
-	if (selrig->has_bpf_center) {
-		cnt_bpf_center->value(progStatus.bpf_center);
-		cnt_bpf_center->activate();
-		btn_use_bpf_center->activate();
-	} else {
-		cnt_bpf_center->deactivate();
-		btn_use_bpf_center->deactivate();
-	}
-
-	if (selrig->has_vfo_adj) {
-		cnt_vfo_adj->value(progStatus.vfo_adj);
-		selrig->setVfoAdj(progStatus.vfo_adj);
-		cnt_vfo_adj->activate();
-	} else
-		cnt_vfo_adj->deactivate();
 
 	if (selrig->has_rit) {
 		int min, max, step;
@@ -3038,5 +3099,91 @@ void cb_cw_qsk()
 {
 	pthread_mutex_lock(&mutex_serial);
 	selrig->set_cw_qsk();
+	pthread_mutex_unlock(&mutex_serial);
+}
+
+void cbBandSelect(int band)
+{
+// Works.
+// All reads are needed with no unlocking inbetween
+
+// lock loops untill done, no calls with mutex's
+	pthread_mutex_lock(&mutex_serial);
+	pthread_mutex_lock(&mutex_xmlrpc);
+
+	selrig->set_band_selection(band);
+// let settle, some rigs may need this the FT-950 does not
+	MilliSleep(50);
+
+// read vfo WHILE LOCKED *****************************
+	long  freq;
+	if (!useB) { // vfo-A
+		freq = selrig->get_vfoA();
+		if (freq != vfoA.freq) {
+			vfoA.freq = freq;
+			Fl::awake(setFreqDispA, (void *)vfoA.freq);
+			vfo = vfoA;
+			send_xml_freq(vfo.freq);
+		}
+		if ( selrig->twovfos() ) {
+			freq = selrig->get_vfoB();
+			if (freq != vfoB.freq) {
+				vfoB.freq = freq;
+				Fl::awake(setFreqDispB, (void *)vfoB.freq);
+			}
+		}
+	} else { // vfo-B
+		freq = selrig->get_vfoB();
+		if (freq != vfoB.freq) {
+			vfoB.freq = freq;
+			Fl::awake(setFreqDispB, (void *)vfoB.freq);
+			vfo = vfoB;
+			send_xml_freq(vfo.freq);
+		}
+	}
+// read mode WHILE LOCKED, Not-The-Same-As read_mode() **********
+	int nu_mode;
+	if (selrig->has_band_selection) {
+		if (!useB) {
+			nu_mode = selrig->get_modeA();
+			if (nu_mode != vfoA.imode) {
+				vfoA.imode = vfo.imode = nu_mode;
+				try {
+					send_new_mode(nu_mode);
+					send_sideband();
+				} catch (...) {}
+				Fl::awake(setModeControl);
+			}
+		} else {
+			nu_mode = selrig->get_modeB();
+			if (nu_mode != vfoB.imode) {
+				vfoB.imode = vfo.imode = nu_mode;
+				try {
+					send_new_mode(nu_mode);
+					send_sideband();
+				} catch (...) {}
+				Fl::awake(setModeControl);
+			}
+		}
+	}
+// read bandwidth WHILE LOCKED, Not-The-Same-As read_bandwidth() **
+// the mode could change and the BW index could be the same so force update
+	if (selrig->has_bandwidth_control) {
+		selrig->adjust_bandwidth(vfo.imode);
+		if (!useB)
+			vfoA.iBW = vfo.iBW = selrig->get_bwA();
+		else
+			vfoB.iBW = vfo.iBW = selrig->get_bwB();
+		try {
+			send_bandwidths();
+			send_new_bandwidth(vfo.iBW);
+		} catch (...) {}
+		Fl::awake(updateBandwidthControl);	// async GUI cloud
+	}
+// Update Other.. WHILE LOCKED Other-Things-To Update *************************
+
+// should only call unlock after all async GUI cloud calls are done
+	MilliSleep(100);
+	pthread_mutex_unlock(&mutex_xmlrpc);
 	pthread_mutex_unlock(&mutex_serial);
 }

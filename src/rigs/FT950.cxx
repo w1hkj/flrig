@@ -50,6 +50,8 @@ static const char *FT950_widths_AMwide[] = {  "9000", NULL };
 static const char *FT950_widths_FMnar[]  = { "12500", NULL };
 static const char *FT950_widths_FMwide[] = { "25000", NULL };
 
+static const char *FT950_60m[] = {"125", "126", "127", "128", "130", NULL};
+
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
 	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
@@ -88,6 +90,7 @@ RIG_FT950::RIG_FT950() {
 	A.iBW = B.iBW = bwA = bwB = def_bw = 2;
 	A.freq = B.freq = freqA = freqB = def_freq = 14070000;
 
+	has_band_selection =
 	has_noise_reduction =
 	has_noise_reduction_control =
 	has_extras =
@@ -1013,6 +1016,37 @@ void RIG_FT950::set_cw_vol()
 {
 }
 */
+
+void RIG_FT950::set_band_selection(int v)
+{
+	int inc_60m = false;
+	cmd = "IF;";
+	waitN(27, 100, "get vfo mode in set_band_selection", ASC);
+	size_t p = replystr.rfind("IF");
+	if (p == string::npos) return;
+	if (replystr[p+21] != '0') {	// vfo 60M memory mode
+		inc_60m = true;
+	}
+
+	if (v == 12) {	// 5MHz 60m presets
+		if (inc_60m) {
+			if (++m_60m_indx >= MAX_60METERS)
+				m_60m_indx = 0;
+		}
+		cmd.assign("MC").append(FT950_60m[m_60m_indx]).append(";");
+	} else {		// v == 1..11 band selection OR return to vfo mode == 0
+		if (inc_60m)
+			cmd = "VM;";
+		else {
+			if (v < 3)
+				v = v - 1;
+			cmd.assign("BS").append(to_decimal(v, 2)).append(";");
+		}
+	}
+
+	sendCommand(cmd);
+	showresp(WARN, ASC, "Select Band Stacks", cmd, replystr);
+}
 
 // DNR
 void RIG_FT950::set_noise_reduction_val(int val)

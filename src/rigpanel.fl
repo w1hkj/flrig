@@ -653,50 +653,115 @@ cb_tt550_setXmtBW();}
     Fl_Tabs tabsGeneric {open
       xywh {1 252 422 70} selection_color 50
     } {
+      Fl_Group genericBands {
+        label Bands open selected
+        xywh {2 271 420 49}
+      } {
+        Fl_Button btnBandSelect_1 {
+          label {1.8}
+          callback {cbBandSelect(1);}
+          tooltip {160m Band} xywh {4 276 60 18} color 246
+        }
+        Fl_Button btnBandSelect_2 {
+          label {3.5}
+          callback {cbBandSelect(2);}
+          tooltip {80m band} xywh {74 276 60 18} color 246
+        }
+        Fl_Button btnBandSelect_3 {
+          label 7
+          callback {cbBandSelect(3);}
+          tooltip {40m band} xywh {145 276 60 18} color 246 align 64
+        }
+        Fl_Button btnBandSelect_4 {
+          label 10
+          callback {cbBandSelect(4);}
+          tooltip {30m band} xywh {216 276 60 18} color 246
+        }
+        Fl_Button btnBandSelect_5 {
+          label 14
+          callback {cbBandSelect(5);}
+          tooltip {20m band} xywh {287 276 60 18} color 246
+        }
+        Fl_Button btnBandSelect_6 {
+          label 18
+          callback {cbBandSelect(6);}
+          tooltip {17m band} xywh {358 276 60 18} color 246
+        }
+        Fl_Button btnBandSelect_7 {
+          label 21
+          callback {cbBandSelect(7);}
+          tooltip {15m band} xywh {4 299 60 18} color 246
+        }
+        Fl_Button btnBandSelect_8 {
+          label 24
+          callback {cbBandSelect(8);}
+          tooltip {12m band} xywh {74 299 60 18} color 246
+        }
+        Fl_Button btnBandSelect_9 {
+          label 28
+          callback {cbBandSelect(9);}
+          tooltip {10m band} xywh {145 299 60 18} color 246
+        }
+        Fl_Button btnBandSelect_10 {
+          label 50
+          callback {cbBandSelect(10);}
+          tooltip {6m band} xywh {216 299 60 18} color 246
+        }
+        Fl_Button btnBandSelect_11 {
+          label GEN
+          callback {cbBandSelect(11);}
+          tooltip {General RX} xywh {287 299 60 18} color 246
+        }
+        Fl_Button btnBandSelect_12 {
+          label 5
+          callback {cbBandSelect(12);}
+          tooltip {60m band} xywh {358 299 60 18} color 246
+        }
+      }
       Fl_Group genericCW {
-        label CW open selected
-        xywh {2 272 420 49} color 50 selection_color 50
+        label CW open
+        xywh {2 271 420 49} color 50 selection_color 50 hide
       } {
         Fl_Light_Button btnSpot {
           label Spot
           callback {progStatus.spot_onoff=o->value();
 cb_cw_spot();}
-          tooltip {Spot tone on/off} xywh {5 281 54 22}
+          tooltip {Spot tone on/off} xywh {5 280 54 22}
           code0 {o->value(progStatus.cw_spot);}
         }
         Fl_Counter cnt_cw_spot_tone {
           label {Spot tone}
           callback {progStatus.cw_spot_tone=(int)o->value();
 cb_cw_spot_tone();}
-          tooltip {Spot volume} xywh {62 281 70 22} type Simple minimum 300 maximum 1050 step 50 value 1050
+          tooltip {Spot volume} xywh {62 280 70 22} type Simple minimum 300 maximum 1050 step 50 value 1050
           code0 {o->value(progStatus.cw_spot);}
         }
         Fl_Counter cnt_cw_qsk {
           label {QSK dly}
           callback {progStatus.cw_qsk = (int)o->value();
 cb_cw_qsk();}
-          tooltip {QSK delay (msec)} xywh {136 281 70 22} type Simple minimum 0 maximum 100 step 1 value 20
+          tooltip {QSK delay (msec)} xywh {136 280 70 22} type Simple minimum 0 maximum 100 step 1 value 20
           code0 {o->value(progStatus.tt550_cw_qsk);}
         }
         Fl_Counter cnt_cw_weight {
           label Weight
           callback {progStatus.cw_weight = o->value();
 cb_cw_weight();}
-          xywh {209 281 70 22} type Simple minimum 2.5 maximum 4.5 value 3
+          xywh {209 280 70 22} type Simple minimum 2.5 maximum 4.5 value 3
           code0 {o->value(progStatus.cw_weight);}
         }
         Fl_Counter cnt_cw_wpm {
           label wpm
           callback {progStatus.cw_wpm = o->value();
 cb_cw_wpm();}
-          xywh {283 281 70 22} type Simple minimum 5 maximum 80 step 1 value 24
+          xywh {283 280 70 22} type Simple minimum 5 maximum 80 step 1 value 24
           code0 {o->value(progStatus.cw_wpm);}
         }
         Fl_Check_Button btn_enable_keyer {
           label Keyer
           callback {progStatus.enable_keyer=o->value();
 cb_enable_keyer();}
-          tooltip {Enable internal keyer} xywh {357 284 60 15} down_box DOWN_BOX
+          tooltip {Enable internal keyer} xywh {357 283 60 15} down_box DOWN_BOX
           code0 {o->value(progStatus.enable_keyer);}
         }
       }

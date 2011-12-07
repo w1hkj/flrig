@@ -167,6 +167,7 @@ public:
 	bool use_line_in;
 	bool has_bpf_center;
 	bool has_special;
+	bool has_band_selection;
 
 	bool restore_mbw;
 
@@ -349,6 +350,7 @@ public:
 	virtual void enable_tloop() {}
 	virtual void set_nb_level() {}
 	virtual void set_special(int v) {}
+	virtual void set_band_selection(int v) {}
 
 	virtual void adjustCIV(uchar adr) {}
 
