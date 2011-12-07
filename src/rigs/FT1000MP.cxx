@@ -452,70 +452,64 @@ int RIG_FT1000MP::get_auto_notch()
 
 int  RIG_FT1000MP::get_power_out(void)
 {
-// power table measured by AF2M
-//static int ptable[][] = { {39, 10}, {80, 25}, {122, 50}, {144, 75}, {255, 200} };
-	float m, b, pout;
-	int pwr;
-	unsigned char val = 0;
+	float pwr;
 	init_cmd();
 	cmd[0] = 0x80;
 	cmd[4] = 0xF7;
 
 	int ret = sendCommand(cmd);
 	if (ret < 5) return 0;
-	
-	val = (unsigned char)(replybuff[ret - 5]);
-	if (val < 39) {
-		m = 10.0 / 39.0; b = 0;
-	} else if (val < 80) {
-		m = (25.0 - 15.0)/(80.0 - 39.0);
-		b = 25.0 - m * 80.0;
-	} else if (val < 122) {
-		m = (50.0 - 25.0)/(122.0 - 80.0);
-		b = 50.0 - m * 122.0;
-	} else if (val < 144) {
-		m = (75.0 - 50.0)/(144.0 - 122.0);
-		b = 75.0 - m * 144.0;
-	} else {
-		m = (200.0 - 75.0)/(255.0 - 144.0);
-		b = 200.0 - m * 255.0;
-	}
-	pout = m*val + b;
-	pwr = (int)pout;
-	if (pwr > 200) pwr = 200;
-	if (pwr < 0) pwr = 0;
-	LOG_INFO("%s => %d",str2hex(replybuff,1), pwr);
 
-	return (int)(200 * sqrt(pwr/200.0) + 0.5);
+	pwr = (unsigned char)(replybuff[ret - 5]);
+
+	if (pwr <=53) {pwr /= 53; pwr = 10 * pwr * pwr; }
+	else if (pwr <= 77) {pwr /= 77; pwr = 20 * pwr * pwr; }
+	else if (pwr <= 98) {pwr /= 98; pwr = 30 * pwr * pwr; }
+	else if (pwr <= 114) {pwr /= 114; pwr = 40 * pwr * pwr; }
+	else if (pwr <= 130) {pwr /= 130; pwr = 50 * pwr * pwr; }
+	else {pwr /= 177; pwr = 100 * pwr * pwr; }
+
+	LOG_INFO("%s => %d",str2hex(replybuff,1), (int)pwr);
+	return (int)pwr;
 }
 
 int  RIG_FT1000MP::get_smeter(void)
 {
-	unsigned char val = 0;
+	float val = 0;
 	init_cmd();
+	cmd[0] = 0x00;
 	cmd[4] = 0xF7;
 	int ret = sendCommand(cmd);
 	if (ret < 5) return 0;
 
-	val = (unsigned char)(replybuff[ret - 5]);
-	LOG_INFO("%s => %d",str2hex(replybuff,1), val);
+	val = (unsigned char)(replybuff[ret-5]);
+	if (val <= 15) val = 5;
+	else if (val <=154) val = 5 + 45 * (val - 15) / (154 - 15);
+	else val = 50 + 50 * (val - 154.0) / (255.0 - 154.0);
 
-	return val * 100 / 255;
+	LOG_INFO("%s => %d",str2hex(replybuff,1), (int)val);
+
+	return (int)val;
 }
 
 int  RIG_FT1000MP::get_swr(void)
 {
-	unsigned char val = 0;
+	float val = 0;
 	init_cmd();
 	cmd[0] = 0x85;
 	cmd[4] = 0xF7;
 	int ret = sendCommand(cmd);
 	if (ret < 5) return 0;
 
-	val = (unsigned char)(replybuff[ret-5]);
-	LOG_INFO("%s => %d",str2hex(replybuff,1), val);
+	val = (unsigned char)(replybuff[ret-5]) - 10;
+	val *=  (50.0 / 122.0);
 
-	return val * 100 / 255;
+	if (val < 0) val = 0;
+	if (val > 100) val = 100;
+
+	LOG_INFO("%s => %d",str2hex(replybuff,1), (int)val);
+
+	return (int)val;
 }
 
 int  RIG_FT1000MP::get_alc(void)
