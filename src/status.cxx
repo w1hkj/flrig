@@ -375,8 +375,8 @@ void status::saveLastState()
 		spref.set("cw_weight", cw_weight);
 		spref.set("cw_vol", cw_vol);
 		spref.set("cw_spot", cw_spot);
-		spref.set("spot_onoff", cw_spot);
-		spref.set("cw_spot_tone", cw_spot);
+		spref.set("spot_onoff", spot_onoff);
+		spref.set("cw_spot_tone", cw_spot_tone);
 		spref.set("cw_qsk", cw_qsk);
 		spref.set("enable_keyer", enable_keyer);
 		spref.set("vox_onoff", vox_onoff);

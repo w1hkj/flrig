@@ -6,7 +6,6 @@
 class RIG_FT950 : public rigbase {
 private:
 	bool notch_on;
-	// void update_bandwidths();
 protected:
 	int  preamp_level;
 	int  atten_level;
@@ -99,9 +98,15 @@ public:
 	void set_cw_wpm();
 	void enable_keyer();
 	void set_cw_qsk();
-//	void set_cw_vol();
 	bool set_cw_spot();
 	void set_cw_spot_tone();
+
+	void get_nr_min_max_step(int &min, int &max, int &step) {
+		min = 1; max = 15; step = 1; }	
+	void set_noise_reduction_val(int val);
+	int  get_noise_reduction_val();
+	void set_noise_reduction(int val);
+	int  get_noise_reduction();
 
 };
 
