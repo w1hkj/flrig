@@ -144,12 +144,15 @@ void read_mode()
 {
 	pthread_mutex_lock(&mutex_serial);
 	int nu_mode;
+	int nu_BW;
 	if (!useB) {
 		nu_mode = selrig->get_modeA();
 		if (nu_mode != vfoA.imode) {
 			pthread_mutex_lock(&mutex_xmlrpc);
 			vfoA.imode = vfo.imode = nu_mode;
-			selrig->set_bwA(vfo.iBW = selrig->adjust_bandwidth(nu_mode));
+			// selrig->set_bwA(vfo.iBW = selrig->adjust_bandwidth(nu_mode));
+			nu_BW = selrig->get_bwA();
+			vfoA.iBW = vfo.iBW = nu_BW;
 			try {
 				send_bandwidths();
 				send_new_mode(nu_mode);
@@ -165,7 +168,9 @@ void read_mode()
 		if (nu_mode != vfoB.imode) {
 			pthread_mutex_lock(&mutex_xmlrpc);
 			vfoB.imode = vfo.imode = nu_mode;
-			selrig->set_bwB(vfo.iBW = selrig->adjust_bandwidth(nu_mode));
+			// selrig->set_bwB(vfo.iBW = selrig->adjust_bandwidth(nu_mode));
+			nu_BW = selrig->get_bwB();
+			vfoB.iBW = vfo.iBW = nu_BW;
 			try {
 				send_bandwidths();
 				send_new_mode(nu_mode);
@@ -847,18 +852,22 @@ void updateBandwidthControl(void *d)
 					opDSP_hi->hide();
 					btnDSP->hide();
 				}
+			} else {  // no DSP control so update BW control, hide DSP
+				opBW->index(vfo.iBW);
+				opBW->show();
+				opDSP_lo->hide();
+				opDSP_hi->hide();
+				btnDSP->hide();
 			}
 		}
-	} else if (vfo.iBW < 256) {
-		opBW->index(vfo.iBW);
-		opBW->show();
-		if (selrig->has_dsp_controls) {
-			opDSP_lo->index(0);
-			opDSP_hi->index(0);
-			btnDSP->hide();
-			opDSP_lo->hide();
-			opDSP_hi->hide();
-		}
+	} else { // no BW, no DSP controls
+		opBW->index(0);
+		opBW->hide();
+		opDSP_lo->index(0);
+		opDSP_hi->index(0);
+		btnDSP->hide();
+		opDSP_lo->hide();
+		opDSP_hi->hide();
 	}
 	useB ? vfoB.iBW = vfo.iBW : vfoA.iBW = vfo.iBW;
 }

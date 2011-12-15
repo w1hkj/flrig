@@ -34,14 +34,14 @@ static const char *FT950_widths_SSB[] = {
 "2800", "2900", "3000", NULL };
 
 static int FT950_wvals_SSB[] = {
-1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20, WVALS_LIMIT};
+1,2,3,4,5,6,7,8,9,10,11,12,13,15,16,17,18,19,20, WVALS_LIMIT};
 
 static const char *FT950_widths_CW[] = {
 "100", "200", "300", "400", "500",
 "800", "1200", "1400", "1700", "2000", "2400", NULL };
 
 static int FT950_wvals_CW[] = {
-1,2,3,4,5,6,7,8,9,10,11,12,13,15,16,17,18,19,20, WVALS_LIMIT};
+3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, WVALS_LIMIT };
 
 static const int FT950_wvals_AMFM[] = { 0, WVALS_LIMIT };
 
@@ -784,25 +784,38 @@ void RIG_FT950::get_notch_min_max_step(int &min, int &max, int &step)
 }
 
 // Terry, KJ4EED
-// auto notch replaced with audio peak filter
-// DNF causes chirping/pinging problems in CW just like
-// Noise Blanker will cause distortion on strong SSB signals.
-// I have never seen DNF make a difference, replace it with something usefull
+// auto notch NOT replaced with audio peak filter
+//
+// Lets move APF to CW menu at a later date
+// CW menus are only sets?
+//
 void RIG_FT950::set_auto_notch(int v)
 {
-	cmd.assign("CO000").append(v ? "2" : "0" ).append(";");
+// Please save this for now
+//	cmd.assign("CO000").append(v ? "2" : "0" ).append(";");
+//	sendCommand(cmd);
+//	showresp(WARN, ASC, "SET Auto Peak Filter", cmd, replystr);
+
+	cmd.assign("BC0").append(v ? "1" : "0" ).append(";");
 	sendCommand(cmd);
-	showresp(WARN, ASC, "SET Auto Peak Filter", cmd, replystr);
+	showresp(WARN, ASC, "SET DNF Auto Notch Filter", cmd, replystr);
 }
 
 int  RIG_FT950::get_auto_notch()
 {
-	// Audio Peak Filter
-	cmd = "CO00;";
-	waitN(5, 100, "get Audio Peak Filter", ASC);
-	size_t p = replystr.rfind("CO0");
+//	// Audio Peak Filter
+//	cmd = "CO00;";
+//	waitN(5, 100, "get Audio Peak Filter", ASC);
+//	size_t p = replystr.rfind("CO0");
+//	if (p == string::npos) return 0;
+//	if (replystr[p+5] == '2') return 1;
+//	return 0;
+
+	cmd = "BC0;";
+	waitN(5, 100, "get auto notch", ASC);
+	size_t p = replystr.rfind("BC0");
 	if (p == string::npos) return 0;
-	if (replystr[p+5] == '2') return 1;
+	if (replystr[p+3] == '1') return 1;
 	return 0;
 }
 
