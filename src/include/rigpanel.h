@@ -54,7 +54,8 @@ extern Fl_Box *scaleSmeter;
 extern Fl_Button *btnALC_SWR;
 #include "Fl_SigBar.h"
 extern Fl_SigBar *sldrRcvSignal;
-extern Fl_SigBar *sldrALC_SWR;
+extern Fl_SigBar *sldrALC;
+extern Fl_SigBar *sldrSWR;
 extern Fl_SigBar *sldrFwdPwr;
 extern Fl_Box *scalePower;
 extern Fl_Box *boxControl;
@@ -154,11 +155,12 @@ extern Fl_Menu_Item menu_[];
 #define mnuKeepData (menu_+5)
 #define mnuColorConfig (menu_+6)
 #define mnuTooltips (menu_+7)
-#define mnuConfigXcvr (menu_+8)
-#define save_me (menu_+11)
-#define mnuHelp (menu_+17)
-#define mnuOnLineHelp (menu_+18)
-#define mnuAbout (menu_+19)
+#define mnu_meter_filtering (menu_+8)
+#define mnuConfigXcvr (menu_+9)
+#define save_me (menu_+12)
+#define mnuHelp (menu_+18)
+#define mnuOnLineHelp (menu_+19)
+#define mnuAbout (menu_+20)
 extern Fl_Box *lblTest;
 extern Fl_Button *prefFont;
 extern Fl_Button *prefForeground;
@@ -263,4 +265,9 @@ extern Fl_Box *box_fldigi_connect;
 extern Fl_Button *btnCancelCommConfig;
 extern Fl_Return_Button *btnOkXcvrDialog;
 Fl_Double_Window* XcvrDialog();
+extern Fl_Wheel_Value_Slider *sldr_smeter_avg;
+extern Fl_Wheel_Value_Slider *sldr_smeter_peak;
+extern Fl_Wheel_Value_Slider *sldr_pout_avg;
+extern Fl_Wheel_Value_Slider *sldr_pout_peak;
+Fl_Double_Window* MetersDialog();
 #endif

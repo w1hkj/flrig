@@ -33,12 +33,9 @@
 
 class Fl_SigBar : public Fl_Widget
 {
-	float	value_,
-		peakv_,
-		minimum_,
-		maximum_,
-		peak_[11];
-	int aging_;
+	float value_, peakv_, minimum_, maximum_,
+		peak_[10], vals_[10];
+	int aging_, avg_;
 	bool horiz;
 	Fl_Color pkcolor;
 
@@ -56,15 +53,29 @@ public:
 	void	minimum(float v) { minimum_ = v; redraw(); }
 	float	minimum() const { return (minimum_); }
 
-	void	value(float v) { value_ = v; peak(v); redraw(); Fl::flush(); };
+	void	value(float v);
 	float	value() const { return (value_); }
   
 	void aging (int n) { 
-		if (n <= 10 && n > 0) aging_ = n - 1;
-		else aging_ = 10;
+		if (n <= 10 && n > 0) aging_ = n;
+		else aging_ = 5;
+		for (int i = 0; i < aging_; i++) peak_[i] = peakv_;
 	}
+
+	void avg (int n) {
+		if (n <= 10 && n > 0) avg_ = n;
+		else avg_ = 5;
+		for (int i = 0; i < avg_; i++) vals_[i] = value_ / avg_;
+	}
+
+	void clear () {
+		for (int i = 0; i < 10; i++) vals_[i] = peak_[i] = 0;
+		peakv_ = value_ = 0;
+	}
+
 	void peak(float);
 	float peak() { return peakv_;};
+
 	void PeakColor(Fl_Color c) { pkcolor = c; };
 	Fl_Color PeakColor() { return pkcolor; }
 	void horizontal(bool yes) { horiz = yes; };

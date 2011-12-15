@@ -127,6 +127,11 @@ status progStatus = {
 
 	true,		// bool key_fldigi;
 
+	5,			// int rx_avg;
+	5,			// int rx_peak;
+	5,			// int pwr_avg;
+	5,			// int pwr_peak;
+
 //tt550 controls
 	80,			// tt550_line_out;
 	1,			// tt550_agc_level;
@@ -324,6 +329,11 @@ void status::saveLastState()
 	spref.set("int_shift", shift_val);
 	spref.set("rfgain", rfgain);
 	spref.set("squelch", squelch);
+
+	spref.set("rx_avg", rx_avg);
+	spref.set("rx_peak", rx_peak);
+	spref.set("pwr_avg", pwr_avg);
+	spref.set("pwr_peak", pwr_peak);
 
 	if (rig_nbr == TT550) {
 		spref.set("tt550_line_out", tt550_line_out);
@@ -559,6 +569,11 @@ bool status::loadXcvrState(const char *xcvr)
 		spref.get("rfgain", rfgain, rfgain);
 		spref.get("squelch", squelch, squelch);
 
+		spref.get("rx_avg", rx_avg, rx_avg);
+		spref.get("rx_peak", rx_peak, rx_peak);
+		spref.get("pwr_avg", pwr_avg, pwr_avg);
+		spref.get("pwr_peak", pwr_peak, pwr_peak);
+
 		if (rig_nbr == TT550) {
 			spref.get("tt550_line_out", tt550_line_out, tt550_line_out);
 			spref.get("tt550_agc_level", tt550_agc_level, tt550_agc_level);
@@ -725,8 +740,11 @@ bool status::loadXcvrState(const char *xcvr)
 	sldrRcvSignal->color(fl_rgb_color (smeterRed, smeterGreen, smeterBlue), bgclr);
 	sldrRcvSignal->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
 
-	sldrALC_SWR->color(fl_rgb_color (swrRed, swrGreen, swrBlue), bgclr);
-	sldrALC_SWR->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
+	sldrALC->color(fl_rgb_color (swrRed, swrGreen, swrBlue), bgclr);
+	sldrALC->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
+
+	sldrSWR->color(fl_rgb_color (swrRed, swrGreen, swrBlue), bgclr);
+	sldrSWR->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
 
 	grpMeters->color(bgclr);
 	grpMeters->labelcolor(fgclr);

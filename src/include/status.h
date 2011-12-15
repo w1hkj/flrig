@@ -113,6 +113,11 @@ struct status {
 
 	bool	key_fldigi;
 
+	int		rx_avg;
+	int		rx_peak;
+	int		pwr_avg;
+	int		pwr_peak;
+
 //============= transceiver specific prameters
 //tt550 controls
 	int		tt550_line_out;

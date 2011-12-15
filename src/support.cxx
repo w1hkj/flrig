@@ -1546,8 +1546,10 @@ void updateALC(void * d)
 {
 	if (meter_image != ALC_IMAGE) return;
 	double data = (long)d;
-	sldrALC_SWR->value(data);
-	sldrALC_SWR->redraw();
+	sldrRcvSignal->hide();
+	sldrSWR->hide();
+	sldrALC->value(data);
+	sldrALC->redraw();
 }
 
 void updateSWR(void * d)
@@ -1556,10 +1558,11 @@ void updateSWR(void * d)
 	double data = (long)d;
 	if (selrig->has_swr_control) {
 		sldrRcvSignal->hide();
-		sldrALC_SWR->show();
+		sldrALC->hide();
+		sldrSWR->show();
 	}
-	sldrALC_SWR->value(data);
-	sldrALC_SWR->redraw();
+	sldrSWR->value(data);
+	sldrSWR->redraw();
 }
 
 void updateFwdPwr(void *d)
@@ -1588,11 +1591,12 @@ void updateRFgain(void *d)
 
 void zeroXmtMeters(void *d)
 {
-	sldrFwdPwr->aging(1);
+	sldrFwdPwr->clear();
+	sldrALC->clear();
+	sldrSWR->clear();
 	updateFwdPwr(0);
 	updateALC(0);
 	updateSWR(0);
-	sldrFwdPwr->aging(5);
 }
 
 void setFreqDispA(void *d)
@@ -1611,13 +1615,14 @@ void setFreqDispB(void *d)
 
 void updateSmeter(void *d) // 0 to 100;
 {
-	double swr = (long)d;
+	double smeter = (long)d;
 	if (!sldrRcvSignal->visible()) {
-		sldrFwdPwr->hide();
 		sldrRcvSignal->show();
-		sldrALC_SWR->hide();
+		sldrFwdPwr->hide();
+		sldrALC->hide();
+		sldrSWR->hide();
 	}
-	sldrRcvSignal->value(swr);
+	sldrRcvSignal->value(smeter);
 	sldrRcvSignal->redraw();
 }
 
@@ -1741,9 +1746,11 @@ void cbALC_SWR()
 	if (meter_image == SWR_IMAGE) {
 		btnALC_SWR->image(image_alc);
 		meter_image = ALC_IMAGE;
+		sldrALC->show();
 	} else {
 		btnALC_SWR->image(image_swr);
 		meter_image = SWR_IMAGE;
+		sldrSWR->show();
 	}
 	btnALC_SWR->redraw();
 	setFocus();
@@ -1755,9 +1762,13 @@ void update_UI_PTT(void *d)
 	if (!PTT) {
 		btnALC_SWR->hide();
 		scaleSmeter->show();
+		sldrRcvSignal->clear();
 	} else {
 		btnALC_SWR->show();
 		scaleSmeter->hide();
+		sldrFwdPwr->clear();
+		sldrALC->clear();
+		sldrSWR->clear();
 	}
 }
 
@@ -2248,7 +2259,10 @@ void initRig()
 {
 	flrig_abort = false;
 
-	sldrRcvSignal->aging(8);
+	sldrRcvSignal->aging(progStatus.rx_peak);
+	sldrRcvSignal->avg(progStatus.rx_avg);
+	sldrFwdPwr->aging(progStatus.pwr_peak);
+	sldrFwdPwr->avg(progStatus.pwr_avg);
 
 //	wait_query = true;
 
