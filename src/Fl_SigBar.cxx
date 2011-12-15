@@ -124,20 +124,32 @@ Fl_SigBar::Fl_SigBar(int X, int Y, int W, int H, const char* l)
 	value_ = 0.0f;
 	horiz = true;
 	pkcolor = FL_RED;
-	for (int i = 0; i < 11; i++) peak_[i] = 0.0f;
+	clear();
+	avg_ = aging_ = 5;
 }
 
 void Fl_SigBar::peak( float v)
 {
 	peakv_ = v;
-	if (aging_ > 1) {
-		for (int i = 1; i <= aging_; i++)
-			if (peakv_ < (peak_[i-1] = peak_[i])) 
-				peakv_ = peak_[i-1];
-		peak_[aging_] = v;
-		if (peakv_ < v) peakv_ = v;
-	}
+
+	for (int i = 1; i < aging_; i++)
+		if (peakv_ < (peak_[i-1] = peak_[i])) 
+			peakv_ = peak_[i];
+
+	peak_[aging_ - 1] = v;
+
 }
+
+void Fl_SigBar::value(float v)
+{
+	value_ -= vals_[0];
+
+	for (int i = 1; i < avg_; i++) vals_[i-1] = vals_[i];
+
+	value_ += (vals_[avg_- 1] = v / avg_); 
+
+	peak(value_);
+};
 
 //
 // End of "$Id: Fl_SigBar.cxx 4288 2005-04-16 00:13:17Z mike $".

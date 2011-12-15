@@ -17,6 +17,8 @@ decl {\#include "K3_ui.h"} {}
 
 decl {const int freq_sel_widths[]={110, 70, 70, 0};} {} 
 
+decl {Fl_Double_Window *meter_filters = (Fl_Double_Window *)0;} {} 
+
 Function {Rig_window()} {open
 } {
   Fl_Window {} {
@@ -63,6 +65,12 @@ Fl_Tooltip::enable(progStatus.tooltips);}
           xywh {0 0 36 21} type Toggle divider
           code0 {\#include <FL/Fl_Tooltip.H>}
           code1 {progStatus.tooltips ? o->set() :o->clear();}
+        }
+        MenuItem mnu_meter_filtering {
+          label {Meter filtering}
+          callback {if (!meter_filters) meter_filters = MetersDialog();
+meter_filters->show();}
+          xywh {0 0 36 21} divider
         }
         MenuItem mnuConfigXcvr {
           label {Xcvr select}
@@ -318,7 +326,7 @@ btnA->value(0);}
       callback {cbPTT();}
       tooltip {Xmt On/Off} xywh {362 206 60 18} down_box THIN_DOWN_BOX labelsize 12
     }
-    Fl_Group {} {
+    Fl_Group {} {open
       xywh {1 62 210 60} box DOWN_BOX
     } {
       Fl_Group grpMeters {open
@@ -332,20 +340,26 @@ btnA->value(0);}
           tooltip {Press SWR / ALC} image {images/SWR.xbm} xywh {3 63 206 20} box FLAT_BOX down_box FLAT_BOX hide
         }
         Fl_Box sldrRcvSignal {
-          xywh {5 85 181 6} box FLAT_BOX hide
+          xywh {5 85 200 6} box FLAT_BOX hide
           code0 {\#include "Fl_SigBar.h"}
           code1 {o->minimum(0);}
           code2 {o->maximum(100);}
           class Fl_SigBar
         }
-        Fl_Box sldrALC_SWR {
-          xywh {5 85 201 6} box FLAT_BOX hide
+        Fl_Box sldrALC {
+          xywh {5 85 200 6} box FLAT_BOX hide
+          code0 {o->minimum(0);}
+          code1 {o->maximum(100);}
+          class Fl_SigBar
+        }
+        Fl_Box sldrSWR {selected
+          xywh {5 85 200 6} box FLAT_BOX hide
           code0 {o->minimum(0);}
           code1 {o->maximum(100);}
           class Fl_SigBar
         }
         Fl_Box sldrFwdPwr {
-          xywh {5 92 201 6} box FLAT_BOX hide
+          xywh {5 92 200 6} box FLAT_BOX hide
           code0 {o->minimum(0);}
           code1 {o->maximum(100);}
           class Fl_SigBar
@@ -399,7 +413,7 @@ cbAuxPort();}
 Please wait}
       xywh {0 23 424 100} color 206 labelfont 1 labelsize 24 hide
     }
-    Fl_Tabs tabs550 {open
+    Fl_Tabs tabs550 {
       xywh {1 252 422 70} selection_color 50 hide
     } {
       Fl_Group tt550_CW {
@@ -654,7 +668,7 @@ cb_tt550_setXmtBW();}
       xywh {1 252 422 70} selection_color 50
     } {
       Fl_Group genericBands {
-        label Bands open selected
+        label Bands open
         xywh {2 271 420 49}
       } {
         Fl_Button btnBandSelect_1 {
@@ -1128,8 +1142,7 @@ Double-click ==> pick and close} xywh {66 2 250 133} type Hold labelfont 4 label
   }
 } 
 
-Function {XcvrDialog()} {open
-} {
+Function {XcvrDialog()} {} {
   Fl_Window {} {
     label {I/O Ports} open
     xywh {575 496 482 257} type Double hide
@@ -1582,6 +1595,51 @@ Or sequence of hex values, x80 etc separated by spaces}
       label Init
       callback {cbOkXcvrDialog();}
       xywh {416 2 60 25}
+    }
+  }
+} 
+
+Function {MetersDialog()} {open
+} {
+  Fl_Window {} {
+    label {Meter Filters} open
+    xywh {824 738 410 192} type Double hide
+  } {
+    Fl_Value_Slider sldr_smeter_avg {
+      label {S meter averging}
+      callback {progStatus.rx_avg=o->value();
+sldrRcvSignal->avg(o->value());}
+      tooltip {Adjust RF gain} xywh {16 31 375 18} type {Horz Knob} box THIN_DOWN_BOX align 5 minimum 1 maximum 10 step 1 value 5 textsize 12
+      code0 {o->reverse(true);}
+      code1 {o->value(progStatus.rx_avg);}
+      class Fl_Wheel_Value_Slider
+    }
+    Fl_Value_Slider sldr_smeter_peak {
+      label {S meter peak }
+      callback {progStatus.rx_peak=o->value();
+sldrRcvSignal->aging(o->value());}
+      tooltip {Adjust RF gain} xywh {16 70 375 18} type {Horz Knob} box THIN_DOWN_BOX align 5 minimum 1 maximum 10 step 1 value 5 textsize 12
+      code0 {o->reverse(true);}
+      code1 {o->value(progStatus.rx_peak);}
+      class Fl_Wheel_Value_Slider
+    }
+    Fl_Value_Slider sldr_pout_avg {
+      label {Pwr out averging}
+      callback {progStatus.pwr_avg=o->value();
+sldrFwdPwr->value(o->value());}
+      tooltip {Adjust RF gain} xywh {16 109 375 18} type {Horz Knob} box THIN_DOWN_BOX align 5 minimum 1 maximum 10 step 1 value 5 textsize 12
+      code0 {o->reverse(true);}
+      code1 {o->value(progStatus.pwr_avg);}
+      class Fl_Wheel_Value_Slider
+    }
+    Fl_Value_Slider sldr_pout_peak {
+      label {Pwr out peak}
+      callback {progStatus.pwr_peak=o->value();
+sldrFwdPwr->aging(o->value());}
+      tooltip {Adjust RF gain} xywh {16 149 375 18} type {Horz Knob} box THIN_DOWN_BOX align 5 minimum 1 maximum 10 step 1 value 5 textsize 12
+      code0 {o->reverse(true);}
+      code1 {o->value(progStatus.pwr_peak);}
+      class Fl_Wheel_Value_Slider
     }
   }
 } 

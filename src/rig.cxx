@@ -293,9 +293,10 @@ int main (int argc, char *argv[])
 	createXcvrDialog();
 
 	btnALC_SWR->image(image_swr);
-	sldrRcvSignal->value(0);
-	sldrFwdPwr->value(0);
-	sldrALC_SWR->value(0);
+	sldrRcvSignal->clear();
+	sldrFwdPwr->clear();
+	sldrALC->clear();
+	sldrSWR->clear();
 
 	mainwindow->resize( progStatus.mainX, progStatus.mainY, mainwindow->w(), btnInitializing->h() + 24 );
 	btnInitializing->show();

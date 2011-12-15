@@ -825,8 +825,11 @@ void setColors()
 	sldrRcvSignal->color(fl_rgb_color (smeterRed, smeterGreen, smeterBlue), bgclr);
 	sldrRcvSignal->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
 
-	sldrALC_SWR->color(fl_rgb_color (swrRed, swrGreen, swrBlue), bgclr);
-	sldrALC_SWR->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
+	sldrALC->color(fl_rgb_color (swrRed, swrGreen, swrBlue), bgclr);
+	sldrALC->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
+
+	sldrSWR->color(fl_rgb_color (swrRed, swrGreen, swrBlue), bgclr);
+	sldrSWR->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
 
 	grpMeters->redraw();
 

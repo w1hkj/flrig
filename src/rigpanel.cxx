@@ -8,6 +8,7 @@
 #include "support.h"
 #include "K3_ui.h"
 static const int freq_sel_widths[]={110, 70, 70, 0}; 
+static Fl_Double_Window *meter_filters = (Fl_Double_Window *)0; 
 
 static void cb_mnuExit(Fl_Menu_*, void*) {
   cbExit();
@@ -28,6 +29,11 @@ static void cb_mnuColorConfig(Fl_Menu_*, void*) {
 static void cb_mnuTooltips(Fl_Menu_*, void*) {
   progStatus.tooltips=mnuTooltips->value();
 Fl_Tooltip::enable(progStatus.tooltips);
+}
+
+static void cb_mnu_meter_filtering(Fl_Menu_*, void*) {
+  if (!meter_filters) meter_filters = MetersDialog();
+meter_filters->show();
 }
 
 static void cb_mnuConfigXcvr(Fl_Menu_*, void*) {
@@ -71,6 +77,7 @@ Fl_Menu_Item menu_[] = {
  {_("Keep Freq/Mode"), 0,  (Fl_Callback*)cb_mnuKeepData, 0, 134, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Colors"), 0,  (Fl_Callback*)cb_mnuColorConfig, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Tooltips"), 0,  (Fl_Callback*)cb_mnuTooltips, 0, 130, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("Meter filtering"), 0,  (Fl_Callback*)cb_mnu_meter_filtering, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Xcvr select"), 0,  (Fl_Callback*)cb_mnuConfigXcvr, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
  {_("&Memory"), 0,  (Fl_Callback*)cb_Memory, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
@@ -287,21 +294,21 @@ Fl_Box *scaleSmeter=(Fl_Box *)0;
 
 #include <FL/Fl_Bitmap.H>
 static unsigned char idata_S60[] =
-{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,56,28,0,0,14,7,0,
-128,195,1,0,224,112,0,0,64,28,0,128,227,0,0,0,0,0,0,68,34,0,0,145,8,0,64,36,2,0,
-16,137,0,0,96,34,0,64,20,1,0,0,0,0,0,4,32,0,0,129,0,0,64,32,2,0,0,137,0,0,96,
-34,0,64,16,1,0,0,0,0,0,4,32,0,0,129,0,0,64,32,2,0,2,137,0,128,80,34,128,64,16,
-1,0,0,0,0,0,56,24,0,0,142,7,0,128,195,3,0,130,136,0,128,80,34,128,192,19,1,0,
-0,0,0,0,64,32,0,0,144,8,0,0,4,2,128,79,136,0,224,75,34,224,71,20,1,0,0,0,0,0,
-64,32,0,0,144,8,0,0,4,2,0,34,136,0,128,248,34,128,64,20,1,0,0,0,0,0,68,34,0,0,
-145,8,0,64,36,2,0,18,136,0,128,64,34,128,64,20,1,0,0,0,0,0,56,28,0,0,14,7,0,128,
-195,1,0,240,113,0,0,64,28,0,128,227,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,4,0,0,0,1,0,0,64,0,0,0,16,0,0,0,4,0,0,0,1,0,0,16,0,0,0,4,0,0,0,
-1,0,0,64,0,0,0,16,0,0,0,4,0,0,0,1,0,0,16,0,0,0,4,0,0,0,1,0,0,64,0,0,0,16,0,0,
-0,4,0,0,0,1,0,0,16,0,0,0,4,16,64,0,1,4,16,64,0,1,4,16,64,0,1,4,16,64,0,1,4,16,
-16,0,0,0,4,16,64,0,1,4,16,64,0,1,4,16,64,0,1,4,16,64,0,1,4,16,16,0,0,0,4,16,64,
-0,1,4,16,64,0,1,4,16,64,0,1,4,16,64,0,1,4,16,16,0,0,0,252,255,255,255,255,255,
-255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,31,0,0,0};
+{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,128,195,1,0,0,28,
+14,0,0,14,7,0,0,28,14,0,0,0,113,0,0,28,7,0,0,0,64,36,2,0,0,34,17,0,0,145,8,0,0,
+34,17,0,0,128,137,0,0,162,8,0,0,0,64,0,2,0,0,2,1,0,0,129,8,0,0,32,17,0,0,128,
+137,0,32,130,8,0,0,0,64,0,2,0,0,2,1,0,0,129,8,0,64,32,17,0,0,66,137,0,32,130,8,
+0,0,0,128,131,1,0,0,28,15,0,0,14,15,0,64,16,17,0,0,66,137,0,248,158,8,0,0,0,0,
+4,2,0,0,32,17,0,0,16,8,0,240,9,17,0,128,47,137,0,32,162,8,0,0,0,0,4,2,0,0,32,
+17,0,0,16,8,0,64,4,17,0,0,226,139,0,32,162,8,0,0,0,64,36,2,0,0,34,17,0,0,145,8,
+0,64,2,17,0,0,2,137,0,0,162,8,0,0,0,128,195,1,0,0,28,14,0,0,14,7,0,0,62,14,0,
+0,0,113,0,0,28,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,
+16,0,0,0,128,0,0,0,64,0,0,0,128,0,0,0,0,4,0,0,0,4,4,0,0,0,16,0,0,0,128,0,0,0,
+64,0,0,0,128,0,0,0,0,4,0,0,0,4,4,32,0,2,16,0,1,8,128,0,2,8,64,0,64,0,128,0,0,1,
+0,4,0,8,0,4,4,32,0,2,16,0,1,8,128,0,2,8,64,0,64,0,128,0,0,1,0,4,0,8,0,4,4,32,
+0,2,16,0,1,8,128,0,2,8,64,0,64,0,128,0,0,1,0,4,0,8,0,4,4,32,0,2,16,0,1,8,128,
+0,2,8,64,0,64,0,128,0,0,1,0,4,0,8,0,4,252,255,255,255,255,255,255,255,255,255,
+255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,7};
 static Fl_Bitmap image_S60(idata_S60, 205, 18);
 
 Fl_Button *btnALC_SWR=(Fl_Button *)0;
@@ -330,7 +337,9 @@ static Fl_Bitmap image_SWR(idata_SWR, 205, 18);
 
 Fl_SigBar *sldrRcvSignal=(Fl_SigBar *)0;
 
-Fl_SigBar *sldrALC_SWR=(Fl_SigBar *)0;
+Fl_SigBar *sldrALC=(Fl_SigBar *)0;
+
+Fl_SigBar *sldrSWR=(Fl_SigBar *)0;
 
 Fl_SigBar *sldrFwdPwr=(Fl_SigBar *)0;
 
@@ -1220,7 +1229,7 @@ Fl_Double_Window* Rig_window() {
           btnALC_SWR->callback((Fl_Callback*)cb_btnALC_SWR);
           btnALC_SWR->hide();
         } // Fl_Button* btnALC_SWR
-        { Fl_SigBar* o = sldrRcvSignal = new Fl_SigBar(5, 85, 181, 6);
+        { Fl_SigBar* o = sldrRcvSignal = new Fl_SigBar(5, 85, 200, 6);
           sldrRcvSignal->box(FL_FLAT_BOX);
           sldrRcvSignal->color((Fl_Color)FL_BACKGROUND_COLOR);
           sldrRcvSignal->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
@@ -1234,21 +1243,35 @@ Fl_Double_Window* Rig_window() {
           o->minimum(0);
           o->maximum(100);
         } // Fl_SigBar* sldrRcvSignal
-        { Fl_SigBar* o = sldrALC_SWR = new Fl_SigBar(5, 85, 201, 6);
-          sldrALC_SWR->box(FL_FLAT_BOX);
-          sldrALC_SWR->color((Fl_Color)FL_BACKGROUND_COLOR);
-          sldrALC_SWR->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
-          sldrALC_SWR->labeltype(FL_NORMAL_LABEL);
-          sldrALC_SWR->labelfont(0);
-          sldrALC_SWR->labelsize(14);
-          sldrALC_SWR->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
-          sldrALC_SWR->align(FL_ALIGN_CENTER);
-          sldrALC_SWR->when(FL_WHEN_RELEASE);
-          sldrALC_SWR->hide();
+        { Fl_SigBar* o = sldrALC = new Fl_SigBar(5, 85, 200, 6);
+          sldrALC->box(FL_FLAT_BOX);
+          sldrALC->color((Fl_Color)FL_BACKGROUND_COLOR);
+          sldrALC->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
+          sldrALC->labeltype(FL_NORMAL_LABEL);
+          sldrALC->labelfont(0);
+          sldrALC->labelsize(14);
+          sldrALC->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
+          sldrALC->align(FL_ALIGN_CENTER);
+          sldrALC->when(FL_WHEN_RELEASE);
+          sldrALC->hide();
           o->minimum(0);
           o->maximum(100);
-        } // Fl_SigBar* sldrALC_SWR
-        { Fl_SigBar* o = sldrFwdPwr = new Fl_SigBar(5, 92, 201, 6);
+        } // Fl_SigBar* sldrALC
+        { Fl_SigBar* o = sldrSWR = new Fl_SigBar(5, 85, 200, 6);
+          sldrSWR->box(FL_FLAT_BOX);
+          sldrSWR->color((Fl_Color)FL_BACKGROUND_COLOR);
+          sldrSWR->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
+          sldrSWR->labeltype(FL_NORMAL_LABEL);
+          sldrSWR->labelfont(0);
+          sldrSWR->labelsize(14);
+          sldrSWR->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
+          sldrSWR->align(FL_ALIGN_CENTER);
+          sldrSWR->when(FL_WHEN_RELEASE);
+          sldrSWR->hide();
+          o->minimum(0);
+          o->maximum(100);
+        } // Fl_SigBar* sldrSWR
+        { Fl_SigBar* o = sldrFwdPwr = new Fl_SigBar(5, 92, 200, 6);
           sldrFwdPwr->box(FL_FLAT_BOX);
           sldrFwdPwr->color((Fl_Color)FL_BACKGROUND_COLOR);
           sldrFwdPwr->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
@@ -3138,6 +3161,127 @@ paces"));
     { btnOkXcvrDialog = new Fl_Return_Button(416, 2, 60, 25, _("Init"));
       btnOkXcvrDialog->callback((Fl_Callback*)cb_btnOkXcvrDialog);
     } // Fl_Return_Button* btnOkXcvrDialog
+    o->end();
+  } // Fl_Double_Window* o
+  return w;
+}
+
+Fl_Wheel_Value_Slider *sldr_smeter_avg=(Fl_Wheel_Value_Slider *)0;
+
+static void cb_sldr_smeter_avg(Fl_Wheel_Value_Slider* o, void*) {
+  progStatus.rx_avg=o->value();
+sldrRcvSignal->avg(o->value());
+}
+
+Fl_Wheel_Value_Slider *sldr_smeter_peak=(Fl_Wheel_Value_Slider *)0;
+
+static void cb_sldr_smeter_peak(Fl_Wheel_Value_Slider* o, void*) {
+  progStatus.rx_peak=o->value();
+sldrRcvSignal->aging(o->value());
+}
+
+Fl_Wheel_Value_Slider *sldr_pout_avg=(Fl_Wheel_Value_Slider *)0;
+
+static void cb_sldr_pout_avg(Fl_Wheel_Value_Slider* o, void*) {
+  progStatus.pwr_avg=o->value();
+sldrFwdPwr->value(o->value());
+}
+
+Fl_Wheel_Value_Slider *sldr_pout_peak=(Fl_Wheel_Value_Slider *)0;
+
+static void cb_sldr_pout_peak(Fl_Wheel_Value_Slider* o, void*) {
+  progStatus.pwr_peak=o->value();
+sldrFwdPwr->aging(o->value());
+}
+
+Fl_Double_Window* MetersDialog() {
+  Fl_Double_Window* w;
+  { Fl_Double_Window* o = new Fl_Double_Window(410, 192, _("Meter Filters"));
+    w = o;
+    { Fl_Wheel_Value_Slider* o = sldr_smeter_avg = new Fl_Wheel_Value_Slider(16, 31, 375, 18, _("S meter averging"));
+      sldr_smeter_avg->tooltip(_("Adjust RF gain"));
+      sldr_smeter_avg->type(5);
+      sldr_smeter_avg->box(FL_THIN_DOWN_BOX);
+      sldr_smeter_avg->color((Fl_Color)FL_BACKGROUND_COLOR);
+      sldr_smeter_avg->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
+      sldr_smeter_avg->labeltype(FL_NORMAL_LABEL);
+      sldr_smeter_avg->labelfont(0);
+      sldr_smeter_avg->labelsize(14);
+      sldr_smeter_avg->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
+      sldr_smeter_avg->minimum(1);
+      sldr_smeter_avg->maximum(10);
+      sldr_smeter_avg->step(1);
+      sldr_smeter_avg->value(5);
+      sldr_smeter_avg->textsize(12);
+      sldr_smeter_avg->callback((Fl_Callback*)cb_sldr_smeter_avg);
+      sldr_smeter_avg->align(FL_ALIGN_TOP_LEFT);
+      sldr_smeter_avg->when(FL_WHEN_CHANGED);
+      o->reverse(true);
+      o->value(progStatus.rx_avg);
+    } // Fl_Wheel_Value_Slider* sldr_smeter_avg
+    { Fl_Wheel_Value_Slider* o = sldr_smeter_peak = new Fl_Wheel_Value_Slider(16, 70, 375, 18, _("S meter peak "));
+      sldr_smeter_peak->tooltip(_("Adjust RF gain"));
+      sldr_smeter_peak->type(5);
+      sldr_smeter_peak->box(FL_THIN_DOWN_BOX);
+      sldr_smeter_peak->color((Fl_Color)FL_BACKGROUND_COLOR);
+      sldr_smeter_peak->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
+      sldr_smeter_peak->labeltype(FL_NORMAL_LABEL);
+      sldr_smeter_peak->labelfont(0);
+      sldr_smeter_peak->labelsize(14);
+      sldr_smeter_peak->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
+      sldr_smeter_peak->minimum(1);
+      sldr_smeter_peak->maximum(10);
+      sldr_smeter_peak->step(1);
+      sldr_smeter_peak->value(5);
+      sldr_smeter_peak->textsize(12);
+      sldr_smeter_peak->callback((Fl_Callback*)cb_sldr_smeter_peak);
+      sldr_smeter_peak->align(FL_ALIGN_TOP_LEFT);
+      sldr_smeter_peak->when(FL_WHEN_CHANGED);
+      o->reverse(true);
+      o->value(progStatus.rx_peak);
+    } // Fl_Wheel_Value_Slider* sldr_smeter_peak
+    { Fl_Wheel_Value_Slider* o = sldr_pout_avg = new Fl_Wheel_Value_Slider(16, 109, 375, 18, _("Pwr out averging"));
+      sldr_pout_avg->tooltip(_("Adjust RF gain"));
+      sldr_pout_avg->type(5);
+      sldr_pout_avg->box(FL_THIN_DOWN_BOX);
+      sldr_pout_avg->color((Fl_Color)FL_BACKGROUND_COLOR);
+      sldr_pout_avg->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
+      sldr_pout_avg->labeltype(FL_NORMAL_LABEL);
+      sldr_pout_avg->labelfont(0);
+      sldr_pout_avg->labelsize(14);
+      sldr_pout_avg->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
+      sldr_pout_avg->minimum(1);
+      sldr_pout_avg->maximum(10);
+      sldr_pout_avg->step(1);
+      sldr_pout_avg->value(5);
+      sldr_pout_avg->textsize(12);
+      sldr_pout_avg->callback((Fl_Callback*)cb_sldr_pout_avg);
+      sldr_pout_avg->align(FL_ALIGN_TOP_LEFT);
+      sldr_pout_avg->when(FL_WHEN_CHANGED);
+      o->reverse(true);
+      o->value(progStatus.pwr_avg);
+    } // Fl_Wheel_Value_Slider* sldr_pout_avg
+    { Fl_Wheel_Value_Slider* o = sldr_pout_peak = new Fl_Wheel_Value_Slider(16, 149, 375, 18, _("Pwr out peak"));
+      sldr_pout_peak->tooltip(_("Adjust RF gain"));
+      sldr_pout_peak->type(5);
+      sldr_pout_peak->box(FL_THIN_DOWN_BOX);
+      sldr_pout_peak->color((Fl_Color)FL_BACKGROUND_COLOR);
+      sldr_pout_peak->selection_color((Fl_Color)FL_BACKGROUND_COLOR);
+      sldr_pout_peak->labeltype(FL_NORMAL_LABEL);
+      sldr_pout_peak->labelfont(0);
+      sldr_pout_peak->labelsize(14);
+      sldr_pout_peak->labelcolor((Fl_Color)FL_FOREGROUND_COLOR);
+      sldr_pout_peak->minimum(1);
+      sldr_pout_peak->maximum(10);
+      sldr_pout_peak->step(1);
+      sldr_pout_peak->value(5);
+      sldr_pout_peak->textsize(12);
+      sldr_pout_peak->callback((Fl_Callback*)cb_sldr_pout_peak);
+      sldr_pout_peak->align(FL_ALIGN_TOP_LEFT);
+      sldr_pout_peak->when(FL_WHEN_CHANGED);
+      o->reverse(true);
+      o->value(progStatus.pwr_peak);
+    } // Fl_Wheel_Value_Slider* sldr_pout_peak
     o->end();
   } // Fl_Double_Window* o
   return w;
