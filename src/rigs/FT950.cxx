@@ -13,7 +13,6 @@
 #include "debug.h"
 #include "support.h"
 
-#define MAX_60METERS 5
 #define WVALS_LIMIT -1
 
 static const char FT950name_[] = "FT-950";
@@ -50,18 +49,24 @@ static const char *FT950_widths_AMwide[] = {  "9000", NULL };
 static const char *FT950_widths_FMnar[]  = { "12500", NULL };
 static const char *FT950_widths_FMwide[] = { "25000", NULL };
 
-static const char *FT950_60m[] = {"125", "126", "127", "128", "130", NULL};
+static const char *FT950_US_60m[] = {"125", "126", "127", "128", "130", NULL};
+// UK has 7 60M presets. Using dummy numbers for all.  If you want support,
+// Maybe someone can do a cat command MC; on all 7 presets and add returned numbers below.
+// To send cat commands in flrig goto menu Config->Xcvr select->Send Cmd.
+// static const char *FT950_UK_60m[] = {"125", "126", "127", "128", "130", "131", "132", NULL};
+
+static const char **Channels_60m = FT950_US_60m;
 
 static GUI rig_widgets[]= {
-	{ (Fl_Widget *)btnVol,        2, 125,  50 },
-	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
-	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },
+//	{ (Fl_Widget *)btnVol,        2, 125,  50 },
+//	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
+//	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },
 	{ (Fl_Widget *)btnIFsh,     214, 105,  50 },
 	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
 	{ (Fl_Widget *)btnNotch,    214, 125,  50 },
 	{ (Fl_Widget *)sldrNOTCH,   266, 125, 156 },
-	{ (Fl_Widget *)sldrMICGAIN, 266, 145, 156 },
-	{ (Fl_Widget *)sldrPOWER,    54, 165, 368 },
+//	{ (Fl_Widget *)sldrMICGAIN, 266, 145, 156 },
+	{ (Fl_Widget *)sldrPOWER,    54, 125, 368 },
 	{ (Fl_Widget *)NULL,          0,   0,   0 }
 };
 
@@ -1043,10 +1048,10 @@ void RIG_FT950::set_band_selection(int v)
 
 	if (v == 12) {	// 5MHz 60m presets
 		if (inc_60m) {
-			if (++m_60m_indx >= MAX_60METERS)
+			if (Channels_60m[++m_60m_indx] == NULL)
 				m_60m_indx = 0;
 		}
-		cmd.assign("MC").append(FT950_60m[m_60m_indx]).append(";");
+		cmd.assign("MC").append(Channels_60m[m_60m_indx]).append(";");
 	} else {		// v == 1..11 band selection OR return to vfo mode == 0
 		if (inc_60m)
 			cmd = "VM;";
