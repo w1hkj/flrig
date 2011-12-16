@@ -265,4 +265,6 @@ extern void update_UI_PTT(void *d = NULL);
 
 extern void cb_send_command();
 
+extern void adjust_control_positions();
+
 #endif
