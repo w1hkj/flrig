@@ -19,8 +19,7 @@ decl {const int freq_sel_widths[]={110, 70, 70, 0};} {}
 
 decl {Fl_Double_Window *meter_filters = (Fl_Double_Window *)0;} {} 
 
-Function {Rig_window()} {open
-} {
+Function {Rig_window()} {} {
   Fl_Window {} {
     label Flrig open
     xywh {577 57 424 324} type Double align 80
@@ -352,7 +351,7 @@ btnA->value(0);}
           code1 {o->maximum(100);}
           class Fl_SigBar
         }
-        Fl_Box sldrSWR {selected
+        Fl_Box sldrSWR {
           xywh {5 85 200 6} box FLAT_BOX hide
           code0 {o->minimum(0);}
           code1 {o->maximum(100);}
@@ -1599,7 +1598,7 @@ Or sequence of hex values, x80 etc separated by spaces}
   }
 } 
 
-Function {MetersDialog()} {open
+Function {MetersDialog()} {open selected
 } {
   Fl_Window {} {
     label {Meter Filters} open
@@ -1609,7 +1608,7 @@ Function {MetersDialog()} {open
       label {S meter averging}
       callback {progStatus.rx_avg=o->value();
 sldrRcvSignal->avg(o->value());}
-      tooltip {Adjust RF gain} xywh {16 31 375 18} type {Horz Knob} box THIN_DOWN_BOX align 5 minimum 1 maximum 10 step 1 value 5 textsize 12
+      tooltip {Meter averaged over \# samples} xywh {16 31 375 18} type {Horz Knob} box THIN_DOWN_BOX align 5 minimum 1 maximum 10 step 1 value 5 textsize 12
       code0 {o->reverse(true);}
       code1 {o->value(progStatus.rx_avg);}
       class Fl_Wheel_Value_Slider
@@ -1618,7 +1617,7 @@ sldrRcvSignal->avg(o->value());}
       label {S meter peak }
       callback {progStatus.rx_peak=o->value();
 sldrRcvSignal->aging(o->value());}
-      tooltip {Adjust RF gain} xywh {16 70 375 18} type {Horz Knob} box THIN_DOWN_BOX align 5 minimum 1 maximum 10 step 1 value 5 textsize 12
+      tooltip {Max peak reading over last \# averaged samples} xywh {16 70 375 18} type {Horz Knob} box THIN_DOWN_BOX align 5 minimum 1 maximum 10 step 1 value 5 textsize 12
       code0 {o->reverse(true);}
       code1 {o->value(progStatus.rx_peak);}
       class Fl_Wheel_Value_Slider
@@ -1626,8 +1625,8 @@ sldrRcvSignal->aging(o->value());}
     Fl_Value_Slider sldr_pout_avg {
       label {Pwr out averging}
       callback {progStatus.pwr_avg=o->value();
-sldrFwdPwr->value(o->value());}
-      tooltip {Adjust RF gain} xywh {16 109 375 18} type {Horz Knob} box THIN_DOWN_BOX align 5 minimum 1 maximum 10 step 1 value 5 textsize 12
+sldrFwdPwr->avg(o->value());}
+      tooltip {Meter averaged over \# samples} xywh {16 109 375 18} type {Horz Knob} box THIN_DOWN_BOX align 5 minimum 1 maximum 10 step 1 value 5 textsize 12
       code0 {o->reverse(true);}
       code1 {o->value(progStatus.pwr_avg);}
       class Fl_Wheel_Value_Slider
@@ -1636,7 +1635,7 @@ sldrFwdPwr->value(o->value());}
       label {Pwr out peak}
       callback {progStatus.pwr_peak=o->value();
 sldrFwdPwr->aging(o->value());}
-      tooltip {Adjust RF gain} xywh {16 149 375 18} type {Horz Knob} box THIN_DOWN_BOX align 5 minimum 1 maximum 10 step 1 value 5 textsize 12
+      tooltip {Max peak reading over last \# averaged samples} xywh {16 149 375 18} type {Horz Knob} box THIN_DOWN_BOX align 5 minimum 1 maximum 10 step 1 value 5 textsize 12
       code0 {o->reverse(true);}
       code1 {o->value(progStatus.pwr_peak);}
       class Fl_Wheel_Value_Slider
