@@ -45,36 +45,45 @@ Function {Rig_window()} {} {
         MenuItem mnuRestoreData {
           label {Restore Freq/Mode}
           callback {progStatus.restore_rig_data = !progStatus.restore_rig_data;}
-          tooltip {Restore on exit} xywh {10 10 36 21} type Toggle value 1
+          tooltip {Restore transceiver settings on exit} xywh {10 10 36 21} type Toggle value 1
         }
         MenuItem mnuKeepData {
           label {Keep Freq/Mode}
           callback {progStatus.use_rig_data= !progStatus.use_rig_data;}
           tooltip {Use xcvr freq/mode on startup} xywh {0 0 36 21} type Toggle value 1 divider
         }
-        MenuItem mnuColorConfig {
-          label Colors
-          callback {setDisplayColors();}
-          xywh {0 0 34 21}
-        }
         MenuItem mnuTooltips {
           label Tooltips
           callback {progStatus.tooltips=mnuTooltips->value();
 Fl_Tooltip::enable(progStatus.tooltips);}
-          xywh {0 0 36 21} type Toggle divider
+          tooltip {Turn tooltips on/off} xywh {0 0 36 21} type Toggle
           code0 {\#include <FL/Fl_Tooltip.H>}
           code1 {progStatus.tooltips ? o->set() :o->clear();}
+        }
+        MenuItem mnuSchema {
+          label {Small sliders}
+          callback {progStatus.schema = !progStatus.schema;
+if (progStatus.schema) mnuSchema->set(); 
+else mnuSchema->clear();
+adjust_control_positions();}
+          tooltip {Reduce size of main dialog} xywh {0 0 36 21} type Toggle divider
+          code0 {if (progStatus.schema) o->set(); else o->clear();}
+        }
+        MenuItem mnuColorConfig {
+          label Colors
+          callback {setDisplayColors();}
+          tooltip {Configure control colors} xywh {0 0 34 21}
         }
         MenuItem mnu_meter_filtering {
           label {Meter filtering}
           callback {if (!meter_filters) meter_filters = MetersDialog();
 meter_filters->show();}
-          xywh {0 0 36 21} divider
+          tooltip {Set averaging and peak hold filters} xywh {0 0 36 21} divider
         }
         MenuItem mnuConfigXcvr {
           label {Xcvr select}
           callback {configXcvr();}
-          xywh {0 0 34 21}
+          tooltip {Select and configure transceiver} xywh {0 0 34 21}
         }
       }
       MenuItem {} {
@@ -1598,17 +1607,17 @@ Or sequence of hex values, x80 etc separated by spaces}
   }
 } 
 
-Function {MetersDialog()} {open selected
+Function {MetersDialog()} {open
 } {
   Fl_Window {} {
     label {Meter Filters} open
-    xywh {824 738 410 192} type Double hide
+    xywh {680 476 410 192} type Double visible
   } {
     Fl_Value_Slider sldr_smeter_avg {
       label {S meter averging}
       callback {progStatus.rx_avg=o->value();
 sldrRcvSignal->avg(o->value());}
-      tooltip {Meter averaged over \# samples} xywh {16 31 375 18} type {Horz Knob} box THIN_DOWN_BOX align 5 minimum 1 maximum 10 step 1 value 5 textsize 12
+      tooltip {Meter averaged over \# samples} xywh {17 31 375 18} type {Horz Knob} box THIN_DOWN_BOX color 54 selection_color 4 align 5 minimum 1 maximum 10 step 1 value 5 textsize 12
       code0 {o->reverse(true);}
       code1 {o->value(progStatus.rx_avg);}
       class Fl_Wheel_Value_Slider
@@ -1617,7 +1626,7 @@ sldrRcvSignal->avg(o->value());}
       label {S meter peak }
       callback {progStatus.rx_peak=o->value();
 sldrRcvSignal->aging(o->value());}
-      tooltip {Max peak reading over last \# averaged samples} xywh {16 70 375 18} type {Horz Knob} box THIN_DOWN_BOX align 5 minimum 1 maximum 10 step 1 value 5 textsize 12
+      tooltip {Max peak reading over last \# averaged samples} xywh {17 70 375 18} type {Horz Knob} box THIN_DOWN_BOX color 54 selection_color 4 align 5 minimum 1 maximum 10 step 1 value 5 textsize 12
       code0 {o->reverse(true);}
       code1 {o->value(progStatus.rx_peak);}
       class Fl_Wheel_Value_Slider
@@ -1626,7 +1635,7 @@ sldrRcvSignal->aging(o->value());}
       label {Pwr out averging}
       callback {progStatus.pwr_avg=o->value();
 sldrFwdPwr->avg(o->value());}
-      tooltip {Meter averaged over \# samples} xywh {16 109 375 18} type {Horz Knob} box THIN_DOWN_BOX align 5 minimum 1 maximum 10 step 1 value 5 textsize 12
+      tooltip {Meter averaged over \# samples} xywh {17 109 375 18} type {Horz Knob} box THIN_DOWN_BOX color 54 selection_color 4 align 5 minimum 1 maximum 10 step 1 value 5 textsize 12
       code0 {o->reverse(true);}
       code1 {o->value(progStatus.pwr_avg);}
       class Fl_Wheel_Value_Slider
@@ -1635,7 +1644,7 @@ sldrFwdPwr->avg(o->value());}
       label {Pwr out peak}
       callback {progStatus.pwr_peak=o->value();
 sldrFwdPwr->aging(o->value());}
-      tooltip {Max peak reading over last \# averaged samples} xywh {16 149 375 18} type {Horz Knob} box THIN_DOWN_BOX align 5 minimum 1 maximum 10 step 1 value 5 textsize 12
+      tooltip {Max peak reading over last \# averaged samples} xywh {17 149 375 18} type {Horz Knob} box THIN_DOWN_BOX color 54 selection_color 4 align 5 minimum 1 maximum 10 step 1 value 5 textsize 12
       code0 {o->reverse(true);}
       code1 {o->value(progStatus.pwr_peak);}
       class Fl_Wheel_Value_Slider

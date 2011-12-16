@@ -1798,7 +1798,7 @@ void adjust_control_positions()
 	btnNR->hide();
 	sldrNR->hide();
 
-	if (selrig->widgets[0].W != NULL) {
+	if (progStatus.schema == 1 && selrig->widgets[0].W != NULL) {
 		int i = 0;
 		while (selrig->widgets[i].W != NULL) {
 			selrig->widgets[i].W->resize(
@@ -1817,66 +1817,68 @@ void adjust_control_positions()
 		y = cntRIT->y() + 2;
 		if (selrig->has_volume_control) {
 			y += 20;
-			sldrVOLUME->position( sldrVOLUME->x(), y );
-			btnVol->position( btnVol->x(), y);
+			btnVol->position( 2, y);
 			btnVol->show();
 			btnVol->redraw();
-			sldrVOLUME->redraw();
+			sldrVOLUME->resize( 54, y, 368, 18 );
+			sldrVOLUME->show();
 			sldrVOLUME->redraw();
 		}
 		if (selrig->has_rf_control) {
 			y += 20;
-			sldrRFGAIN->position( sldrRFGAIN->x(), y );
+			sldrRFGAIN->resize( 54, y, 368, 18 );
 			sldrRFGAIN->show();
 			sldrRFGAIN->redraw();
 		}
 		if (selrig->has_sql_control) {
 			y += 20;
-			sldrSQUELCH->position( sldrSQUELCH->x(), y);
+			sldrSQUELCH->resize( 54, y, 368, 18 );
 			sldrSQUELCH->show();
 			sldrSQUELCH->redraw();
 		}
 		if (selrig->has_noise_reduction_control) {
 			y += 20;
-			sldrNR->position( sldrNR->x(), y);
-			btnNR->position( btnNR->x(), y);
+			btnNR->position( 2, y);
 			btnNR->show();
 			btnNR->redraw();
+			sldrNR->resize( 54, y, 368, 18 );
 			sldrNR->show();
 			sldrNR->redraw();
 		}
 		if (selrig->has_ifshift_control) {
 			y += 20;
-			sldrIFSHIFT->position( sldrIFSHIFT->x(), y);
-			btnIFsh->position( btnIFsh->x(), y);
+			btnIFsh->position( 2, y);
 			btnIFsh->show();
 			btnIFsh->redraw();
+			sldrIFSHIFT->resize( 54, y, 368, 18 );
 			sldrIFSHIFT->show();
 			sldrIFSHIFT->redraw();
 		}
 		if (selrig->has_notch_control) {
 			y += 20;
-			sldrNOTCH->position( sldrNOTCH->x(), y);
-			btnNotch->position( btnNotch->x(), y);
-			sldrNOTCH->redraw();
+			btnNotch->position( 2, y);
 			btnNotch->show();
+			btnNotch->redraw();
+			sldrNOTCH->resize( 54, y, 368, 18 );
+			sldrNOTCH->show();
+			sldrNOTCH->redraw();
 		}
 		if (selrig->has_micgain_control) {
 			y += 20;
 			if (selrig->has_data_port) {
 				sldrMICGAIN->label("");
 				sldrMICGAIN->redraw_label();
-				btnDataPort->position( btnDataPort->x(), y);
+				btnDataPort->position( 2, y);
 				btnDataPort->show();
 				btnDataPort->redraw();
 			}
-			sldrMICGAIN->position( sldrMICGAIN->x(), y);
+			sldrMICGAIN->resize( 54, y, 368, 18 );
 			sldrMICGAIN->show();
 			sldrMICGAIN->redraw();
 		}
 		if (selrig->has_power_control) {
 			y += 20;
-			sldrPOWER->position( sldrPOWER->x(), y);
+			sldrPOWER->resize( 54, y, 368, 18 );
 			sldrPOWER->show();
 			sldrPOWER->redraw();
 		}
@@ -1962,6 +1964,10 @@ void adjust_control_positions()
 		mnuTooltips->clear();
 		Fl_Tooltip::enable(0);
 	}
+	if (progStatus.schema)
+		mnuSchema->set(); 
+	else
+		mnuSchema->clear();
 
 }
 

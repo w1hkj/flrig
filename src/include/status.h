@@ -81,6 +81,8 @@ struct status {
 	int		rfgain;
 	int		squelch;
 
+	int		schema;
+
 	int		line_out;
 	bool	data_port;
 	int		agc_level;

@@ -58,15 +58,15 @@ static const char *FT950_US_60m[] = {"125", "126", "127", "128", "130", NULL};
 static const char **Channels_60m = FT950_US_60m;
 
 static GUI rig_widgets[]= {
-//	{ (Fl_Widget *)btnVol,        2, 125,  50 },
-//	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
-//	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },
+	{ (Fl_Widget *)btnVol,        2, 125,  50 },
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },
 	{ (Fl_Widget *)btnIFsh,     214, 105,  50 },
 	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
 	{ (Fl_Widget *)btnNotch,    214, 125,  50 },
 	{ (Fl_Widget *)sldrNOTCH,   266, 125, 156 },
-//	{ (Fl_Widget *)sldrMICGAIN, 266, 145, 156 },
-	{ (Fl_Widget *)sldrPOWER,    54, 125, 368 },
+	{ (Fl_Widget *)sldrMICGAIN, 266, 145, 156 },
+	{ (Fl_Widget *)sldrPOWER,    54, 165, 368 },
 	{ (Fl_Widget *)NULL,          0,   0,   0 }
 };
 
