@@ -3184,7 +3184,7 @@ Fl_Wheel_Value_Slider *sldr_pout_avg=(Fl_Wheel_Value_Slider *)0;
 
 static void cb_sldr_pout_avg(Fl_Wheel_Value_Slider* o, void*) {
   progStatus.pwr_avg=o->value();
-sldrFwdPwr->value(o->value());
+sldrFwdPwr->avg(o->value());
 }
 
 Fl_Wheel_Value_Slider *sldr_pout_peak=(Fl_Wheel_Value_Slider *)0;
@@ -3199,7 +3199,7 @@ Fl_Double_Window* MetersDialog() {
   { Fl_Double_Window* o = new Fl_Double_Window(410, 192, _("Meter Filters"));
     w = o;
     { Fl_Wheel_Value_Slider* o = sldr_smeter_avg = new Fl_Wheel_Value_Slider(16, 31, 375, 18, _("S meter averging"));
-      sldr_smeter_avg->tooltip(_("Adjust RF gain"));
+      sldr_smeter_avg->tooltip(_("Meter averaged over # samples"));
       sldr_smeter_avg->type(5);
       sldr_smeter_avg->box(FL_THIN_DOWN_BOX);
       sldr_smeter_avg->color((Fl_Color)FL_BACKGROUND_COLOR);
@@ -3220,7 +3220,7 @@ Fl_Double_Window* MetersDialog() {
       o->value(progStatus.rx_avg);
     } // Fl_Wheel_Value_Slider* sldr_smeter_avg
     { Fl_Wheel_Value_Slider* o = sldr_smeter_peak = new Fl_Wheel_Value_Slider(16, 70, 375, 18, _("S meter peak "));
-      sldr_smeter_peak->tooltip(_("Adjust RF gain"));
+      sldr_smeter_peak->tooltip(_("Max peak reading over last # averaged samples"));
       sldr_smeter_peak->type(5);
       sldr_smeter_peak->box(FL_THIN_DOWN_BOX);
       sldr_smeter_peak->color((Fl_Color)FL_BACKGROUND_COLOR);
@@ -3241,7 +3241,7 @@ Fl_Double_Window* MetersDialog() {
       o->value(progStatus.rx_peak);
     } // Fl_Wheel_Value_Slider* sldr_smeter_peak
     { Fl_Wheel_Value_Slider* o = sldr_pout_avg = new Fl_Wheel_Value_Slider(16, 109, 375, 18, _("Pwr out averging"));
-      sldr_pout_avg->tooltip(_("Adjust RF gain"));
+      sldr_pout_avg->tooltip(_("Meter averaged over # samples"));
       sldr_pout_avg->type(5);
       sldr_pout_avg->box(FL_THIN_DOWN_BOX);
       sldr_pout_avg->color((Fl_Color)FL_BACKGROUND_COLOR);
@@ -3262,7 +3262,7 @@ Fl_Double_Window* MetersDialog() {
       o->value(progStatus.pwr_avg);
     } // Fl_Wheel_Value_Slider* sldr_pout_avg
     { Fl_Wheel_Value_Slider* o = sldr_pout_peak = new Fl_Wheel_Value_Slider(16, 149, 375, 18, _("Pwr out peak"));
-      sldr_pout_peak->tooltip(_("Adjust RF gain"));
+      sldr_pout_peak->tooltip(_("Max peak reading over last # averaged samples"));
       sldr_pout_peak->type(5);
       sldr_pout_peak->box(FL_THIN_DOWN_BOX);
       sldr_pout_peak->color((Fl_Color)FL_BACKGROUND_COLOR);
