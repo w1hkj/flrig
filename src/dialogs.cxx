@@ -1341,10 +1341,17 @@ void cb_send_command()
 		}
 	} else
 		cmd = command;
+// lock out polling loops until done
+	pthread_mutex_lock(&mutex_serial);
+	pthread_mutex_lock(&mutex_xmlrpc);
+
 	sendCommand(cmd, 0);
 	MilliSleep(100);
 	readResponse();
 	txt_response->value(
 		usehex ? str2hex(replystr.c_str(), replystr.length()) :
 		replystr.c_str());
+
+	pthread_mutex_unlock(&mutex_xmlrpc);
+	pthread_mutex_unlock(&mutex_serial);
 }
