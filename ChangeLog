@@ -1,8 +1,36 @@
 
 
-=Version 1.2.3=
+=Version 1.2.4=
 
-2011-12-03  David Freese  <w1hkj@w1hkj.com>
+2011-12-16  David Freese  <w1hkj@w1hkj.com>
+
+	792fe6c: Slider size
+	2d46c8b: FT950
+
+2011-12-16  Terry Embry (KJ4EED)  <mrtembry@yahoo.com>
+
+	1533a56: Send Command exclusive
+
+2011-12-16  David Freese  <w1hkj@w1hkj.com>
+
+	d970cf3: Meter filters
+	a897030: FT950 BW
+	9ebc94b: Meter mods
+	54f6b16: FT1000MP meter scales
+	20f66e2: Hide controls
+	ddf83b1: BAND selector
+
+2011-12-06  Terry Embry  <ftembry@users.berlios.de>
+
+	af88aa1: FT950 corrections
+
+2011-12-06  David Freese  <w1hkj@w1hkj.com>
+
+	45997d9: Vox On Dataport
+	8bddd77: Pwr Metering
+
+
+=Version 1.2.3=
 
 	9b03699: UI minimize
 	8538d05: TS480
