@@ -869,7 +869,7 @@ int RIG_FT950::get_noise()
 void RIG_FT950::set_mic_gain(int val)
 {
 	cmd = "MG000;";
-	val = (int)(val * 255 / 100); // convert to 0 .. 255
+	val = (int)(val * 248 / 100); // magic num tracks radio display value, convert to 0 .. 255
 	for (int i = 3; i > 0; i--) {
 		cmd[1+i] += val % 10;
 		val /= 10;
@@ -887,7 +887,9 @@ int RIG_FT950::get_mic_gain()
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.mic_gain;
 	int val = atoi(&replystr[p+2]);
-	return val * 100 / 255;
+	val = val * 100 / 248;	// magic num tracks radio display value
+	if (val > 100) val = 100;
+	return val;
 }
 
 void RIG_FT950::get_mic_min_max_step(int &min, int &max, int &step)
