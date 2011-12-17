@@ -685,16 +685,16 @@ bool RIG_FT450::set_cw_spot()
 
 void RIG_FT450::set_cw_weight()
 {
-	cmd = "EX024";
-	cmd.append(to_decimal(progStatus.cw_weight * 10, 2)).append(";");
+	int n = round(progStatus.cw_weight * 10);
+	cmd.assign("EX024").append(to_decimal(n, 2)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET cw weight", cmd, replystr);
 }
 
 void RIG_FT450::set_cw_qsk()
 {
-	cmd = "EX018";
-	cmd.append(to_decimal(progStatus.cw_qsk, 4)).append(";");
+	int n = progStatus.cw_qsk / 5 - 3;
+	cmd.assign("EX018").append(to_decimal(n, 1)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET cw qsk", cmd, replystr);
 }
