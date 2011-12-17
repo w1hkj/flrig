@@ -33,13 +33,12 @@ static const char FT5000_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L',
 static const char *FT5000_widths_SSB[] = {
 "200", "400", "600", "850", "1100", "1350", "1500", // NA = 1 widths
 "1650", "1800", "1950", "2100", "2250", "2400", 
-"2450",                                             // #14 not defined in prog manual
 "2500", "2600", "2700", "2800", "2900", "3000",
 "3200", "3400", "3600", "4000",                     // NA = 0 widths
 NULL };
 
 static int FT5000_wvals_SSB[] = {
-1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24, WVALS_LIMIT};
+1,2,3,4,5,6,7,8,9,10,11,12,13,15,16,17,18,19,20,21,22,23,24, WVALS_LIMIT};
 
 static const char *FT5000_widths_CW[] = {
 "50",   "100",  "150",  "200",  "250", "300",  "350", "400",  "450", "500", // NA1
@@ -139,7 +138,7 @@ RIG_FT5000::RIG_FT5000() {
 	has_cw_keyer =
 //	has_cw_vol =
 	has_cw_spot =
-	has_cw_spot_tone =
+//	has_cw_spot_tone = // does not exist???
 	has_cw_qsk =
 	has_cw_weight =
 
@@ -951,7 +950,7 @@ void RIG_FT5000::set_vox_gain()
 
 void RIG_FT5000::set_vox_anti()
 {
-	cmd = "EX117";
+	cmd = "EX175";
 	cmd.append(to_decimal(progStatus.vox_anti, 3)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET anti-vox", cmd, replystr);
@@ -1006,16 +1005,16 @@ bool RIG_FT5000::set_cw_spot()
 
 void RIG_FT5000::set_cw_weight()
 {
-	cmd = "EX046";
-	cmd.append(to_decimal(progStatus.cw_weight * 10, 2)).append(";");
+	int n = round(progStatus.cw_weight * 10);
+	cmd.assign("EX065").append(to_decimal(n, 2)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET cw weight", cmd, replystr);
 }
 
 void RIG_FT5000::set_cw_qsk()
 {
-	cmd = "EX044";
-	cmd.append(to_decimal(progStatus.cw_qsk, 4)).append(";");
+	int n = progStatus.cw_qsk / 5 - 3;
+	cmd.assign("EX068").append(to_decimal(n, 1)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET cw qsk", cmd, replystr);
 }
