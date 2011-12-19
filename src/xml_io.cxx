@@ -317,6 +317,10 @@ static void check_for_bandwidth_change(const XmlRpcValue& new_bw)
 {
 	if (!selrig->bandwidths_ || vfo.iBW == -1 || selrig->has_dsp_controls)
 		return;
+// out-of-bounds check for instance where bandwidths_ has changed
+	int t = 0;
+	while (selrig->bandwidths_[t] != NULL)  t++;
+	if (vfo.iBW >= t) return;
 
 	string sbw = new_bw;
 	if (sbw != selrig->bandwidths_[vfo.iBW]) {
