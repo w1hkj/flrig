@@ -31,6 +31,14 @@ static const char *FT2000_PKT_RTTYwidths[] = {
 static const char *FT2000_AMFMwidths[] = {
 "NORM", "NARR", NULL};
 
+static const char *FT2000_US_60m[] = {NULL, "126", "127", "128", "130", NULL};
+// US has 5 60M presets. Using dummy numbers for all.
+// First NULL means skip 60m sets in set_band_selection().
+// Maybe someone can do a cat command MC; on all 5 presets and add returned numbers above.
+// To send cat commands in flrig goto menu Config->Xcvr select->Send Cmd.
+
+static const char **Channels_60m = FT2000_US_60m;
+
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
 	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
@@ -80,6 +88,8 @@ RIG_FT2000::RIG_FT2000() {
 	def_bw = 2;
 	def_freq = 14070000;
 
+	has_band_selection =
+	has_extras =
 	has_smeter =
 	has_power_out =
 	has_power_control =
@@ -98,6 +108,42 @@ RIG_FT2000::RIG_FT2000() {
 	
 // derived specific
 	notch_on = false;
+
+	atten_level = 0;
+	preamp_level = 0;
+	m_60m_indx = 0;
+}
+
+void RIG_FT2000::set_band_selection(int v)
+{
+	int inc_60m = false;
+	cmd = "IF;";
+	waitN(27, 100, "get vfo mode in set_band_selection", ASC);
+	size_t p = replystr.rfind("IF");
+	if (p == string::npos) return;
+	if (replystr[p+21] != '0') {	// vfo 60M memory mode
+		inc_60m = true;
+	}
+
+	if (v == 12) {	// 5MHz 60m presets
+		if (Channels_60m[0] == NULL) return;	// no 60m Channels so skip
+		if (inc_60m) {
+			if (Channels_60m[++m_60m_indx] == NULL)
+				m_60m_indx = 0;
+		}
+		cmd.assign("MC").append(Channels_60m[m_60m_indx]).append(";");
+	} else {		// v == 1..11 band selection OR return to vfo mode == 0
+		if (inc_60m)
+			cmd = "VM;";
+		else {
+			if (v < 3)
+				v = v - 1;
+			cmd.assign("BS").append(to_decimal(v, 2)).append(";");
+		}
+	}
+
+	sendCommand(cmd);
+	showresp(WARN, ASC, "Select Band Stacks", cmd, replystr);
 }
 
 long RIG_FT2000::get_vfoA ()

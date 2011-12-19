@@ -6,6 +6,7 @@
 class RIG_FT450 : public rigbase {
 private:
 	bool notch_on;
+	int  m_60m_indx;
 public:
 	RIG_FT450();
 	~RIG_FT450(){}
@@ -86,6 +87,7 @@ public:
 	void get_cw_spot_tone_min_max_step(int &min, int &max, int &step) {
 		min = 400; max = 800; step = 100; }
 
+	void set_band_selection(int v);
 
 };
 

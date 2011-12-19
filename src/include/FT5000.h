@@ -6,6 +6,7 @@
 class RIG_FT5000 : public rigbase {
 private:
 	bool notch_on;
+	int  m_60m_indx;
 	// void update_bandwidths();
 protected:
 	int  preamp_level;
@@ -103,6 +104,7 @@ public:
 	bool set_cw_spot();
 	void set_cw_spot_tone();
 
+	void set_band_selection(int v);
 };
 
 

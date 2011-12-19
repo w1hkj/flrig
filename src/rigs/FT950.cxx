@@ -95,6 +95,7 @@ RIG_FT950::RIG_FT950() {
 	A.iBW = B.iBW = bwA = bwB = def_bw = 2;
 	A.freq = B.freq = freqA = freqB = def_freq = 14070000;
 
+	has_split =
 	has_band_selection =
 	has_noise_reduction =
 	has_noise_reduction_control =
@@ -137,6 +138,9 @@ RIG_FT950::RIG_FT950() {
 // derived specific
 	atten_level = 0;
 	preamp_level = 0;
+	notch_on = false;
+	m_60m_indx = 0;
+
 // set defaults
 	progStatus.use_rig_data = true;
 	if (!progStatus.use_rig_data) {
@@ -253,26 +257,26 @@ void RIG_FT950::set_split(bool val)
 	split = val;
 	if (val) {
 		useB = false;
-		cmd = "FR0;";
+		cmd = "FR0;FT3;";
 		sendCommand(cmd);
-		showresp(WARN, ASC, "Rx on A", cmd, replystr);
-		cmd = "FT3;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "Tx on B", cmd, replystr);
+		showresp(WARN, ASC, "Rx on A, Tx on B", cmd, replystr);
 	} else {
-		cmd = "FR0;";
+		cmd = "FR0;FT2;";
 		sendCommand(cmd);
-		showresp(WARN, ASC, "Rx on A", cmd, replystr);
-		cmd = "FT2;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "Tx on A", cmd, replystr);
+		showresp(WARN, ASC, "Rx on A, Tx on A", cmd, replystr);
 	}
 	Fl::awake(highlight_vfo, (void *)0);
 }
 
 bool RIG_FT950::get_split()
 {
-	return split;
+	cmd = rsp = "FT";
+	cmd += ';';
+	waitN(4, 100, "get split", ASC);
+
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return false;
+	return replystr[p+2] == '1' ? true : false;
 }
 
 
@@ -357,7 +361,7 @@ int RIG_FT950::get_volume_control()
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.volume;
 	if (p + 6 >= replystr.length()) return progStatus.volume;
-	int val = atoi(&replystr[p+3]) * 100 / 250;
+	int val = round(atoi(&replystr[p+3]) * 100 / 250);
 	if (val > 100) val = 100;
 	return val;
 }
