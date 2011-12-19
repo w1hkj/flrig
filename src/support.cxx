@@ -2067,47 +2067,42 @@ void initXcvrTab()
 				selrig->get_cw_wpm_min_max(min, max);
 				cnt_cw_wpm->minimum(min);
 				cnt_cw_wpm->maximum(max);
-				cnt_cw_wpm->activate();
 				cnt_cw_wpm->value(progStatus.cw_wpm);
+				cnt_cw_wpm->show();
 				selrig->set_cw_wpm();
-			} else cnt_cw_wpm->deactivate();
-//		if (selrig->has_cw_vol) {
-//			cnt_cw_vol->activate();
-//			cnt_cw_vol->value(progStatus.cw_vol);
-//			selrig->set_cw_vol();
-//		} else cnt_cw_vol->deactivate();
+			} else cnt_cw_wpm->hide();
 			if (selrig->has_cw_qsk) {
-				cnt_cw_qsk->activate();
 				int min, max, step;
 				selrig->get_cw_qsk_min_max_step(min, max, step);
 				cnt_cw_qsk->minimum(min);
 				cnt_cw_qsk->maximum(max);
 				cnt_cw_qsk->step(step);
 				cnt_cw_qsk->value(progStatus.cw_qsk);
+				cnt_cw_qsk->show();
 				selrig->set_cw_qsk();
-			} else cnt_cw_qsk->deactivate();
+			} else cnt_cw_qsk->hide();
 			if (selrig->has_cw_weight) {
-				cnt_cw_weight->activate();
 				double min, max, step;
 				selrig->get_cw_weight_min_max_step( min, max, step );
 				cnt_cw_weight->minimum(min);
 				cnt_cw_weight->maximum(max);
 				cnt_cw_weight->step(step);
 				cnt_cw_weight->value(progStatus.cw_weight);
+				cnt_cw_weight->show();
 				selrig->set_cw_weight();
-			} else cnt_cw_weight->deactivate();
+			} else cnt_cw_weight->hide();
 			if (selrig->has_cw_keyer) {
-				btn_enable_keyer->activate();
+				btn_enable_keyer->show();
 				btn_enable_keyer->value(progStatus.enable_keyer);
 				selrig->enable_keyer();
-			} else btn_enable_keyer->deactivate();
+			} else btn_enable_keyer->hide();
 			if (selrig->has_cw_spot) {
 				btnSpot->value(progStatus.cw_spot);
 				selrig->set_cw_spot();
-				btnSpot->activate();
-			} else btnSpot->deactivate();
+				btnSpot->show();
+			} else btnSpot->hide();
 			if (selrig->has_cw_spot_tone) {
-				cnt_cw_spot_tone->activate();
+				cnt_cw_spot_tone->show();
 				int min, max, step;
 				selrig->get_cw_spot_tone_min_max_step(min, max, step);
 				cnt_cw_spot_tone->minimum(min);
@@ -2115,7 +2110,7 @@ void initXcvrTab()
 				cnt_cw_spot_tone->step(step);
 				cnt_cw_spot_tone->value(progStatus.cw_spot_tone);
 				selrig->set_cw_spot_tone();
-			} else cnt_cw_spot_tone->deactivate();
+			} else cnt_cw_spot_tone->hide();
 		}
 
 		if (selrig->has_vox_onoff || selrig->has_vox_gain || selrig->has_vox_anti ||
@@ -2127,12 +2122,12 @@ void initXcvrTab()
 				tabsGeneric->h() - 21);
 			tabsGeneric->insert(*genericVOX, 6);
 			if (selrig->has_vox_onoff) {
-				btn_vox->activate();
+				btn_vox->show();
 				btn_vox->value(progStatus.vox_onoff);
 				selrig->set_vox_onoff();
-			} else btn_vox->deactivate();
+			} else btn_vox->hide();
 			if (selrig->has_vox_gain) {
-				cnt_vox_gain->activate(); 
+				cnt_vox_gain->show(); 
 				int min, max, step;
 				selrig->get_vox_gain_min_max_step(min, max, step);
 				cnt_vox_gain->minimum(min);
@@ -2140,9 +2135,9 @@ void initXcvrTab()
 				cnt_vox_gain->step(step);
 				cnt_vox_gain->value(progStatus.vox_gain);
 				selrig->set_vox_gain();
-			} else cnt_vox_gain->deactivate();
+			} else cnt_vox_gain->hide();
 			if (selrig->has_vox_anti) {
-				cnt_anti_vox->activate();
+				cnt_anti_vox->show();
 				int min, max, step;
 				selrig->get_vox_anti_min_max_step(min, max, step);
 				cnt_anti_vox->minimum(min);
@@ -2150,9 +2145,9 @@ void initXcvrTab()
 				cnt_anti_vox->step(step);
 				cnt_anti_vox->value(progStatus.vox_anti);
 				selrig->set_vox_anti();
-			} else cnt_anti_vox->deactivate();
+			} else cnt_anti_vox->hide();
 			if (selrig->has_vox_hang) {
-				cnt_vox_hang->activate();
+				cnt_vox_hang->show();
 				int min, max, step;
 				selrig->get_vox_hang_min_max_step(min, max, step);
 				cnt_vox_hang->minimum(min);
@@ -2160,12 +2155,12 @@ void initXcvrTab()
 				cnt_vox_hang->step(step);
 				cnt_vox_hang->value(progStatus.vox_hang);
 				selrig->set_vox_hang();
-			} else cnt_vox_hang->deactivate();
+			} else cnt_vox_hang->hide();
 			if (selrig->has_vox_on_dataport) {
-				btn_vox_on_dataport->activate();
+				btn_vox_on_dataport->show();
 				btn_vox_on_dataport->value(progStatus.vox_on_dataport);
 				selrig->set_vox_on_dataport();
-			} else btn_vox_on_dataport->deactivate();
+			} else btn_vox_on_dataport->hide();
 		}
 
 		if (selrig->has_compON || selrig->has_compression) {
@@ -2176,16 +2171,16 @@ void initXcvrTab()
 				tabsGeneric->h() - 21);
 			tabsGeneric->insert(*genericSpeech, 6);
 			if (selrig->has_compON) {
-				btnCompON->activate();
+				btnCompON->show();
 				btnCompON->value(progStatus.compON);
 			} else
-				btnCompON->deactivate();
+				btnCompON->hide();
 			if (selrig->has_compression) {
-				cnt_compression->activate();
+				cnt_compression->show();
 				cnt_compression->value(progStatus.compression);
 				selrig->set_compression();
 			} else
-				cnt_compression->deactivate();
+				cnt_compression->hide();
 		}
 		if (selrig->has_agc_level || selrig->has_nb_level || selrig->has_bpf_center) {
 			genericRx->resize(
@@ -2198,11 +2193,11 @@ void initXcvrTab()
 			if (selrig->has_nb_level) cbo_nb_level->activate(); else cbo_nb_level->deactivate();
 			if (selrig->has_bpf_center) {
 				cnt_bpf_center->value(progStatus.bpf_center);
-				cnt_bpf_center->activate();
-				btn_use_bpf_center->activate();
+				cnt_bpf_center->show();
+				btn_use_bpf_center->show();
 			} else {
-				cnt_bpf_center->deactivate();
-				btn_use_bpf_center->deactivate();
+				cnt_bpf_center->hide();
+				btn_use_bpf_center->hide();
 			}
 		}
 
@@ -2216,9 +2211,9 @@ void initXcvrTab()
 			if (selrig->has_vfo_adj) {
 				cnt_vfo_adj->value(progStatus.vfo_adj);
 				selrig->setVfoAdj(progStatus.vfo_adj);
-				cnt_vfo_adj->activate();
+				cnt_vfo_adj->show();
 			} else
-				cnt_vfo_adj->deactivate();
+				cnt_vfo_adj->hide();
 			cnt_line_out->hide(); // enable if a lineout control is used by any transceiver
 		}
 
