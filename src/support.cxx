@@ -382,6 +382,7 @@ void read_volume()
 {
 	if (!selrig->has_volume_control) return;
 	if (btnVol->value() == 0) return; // muted
+	if (!sldrVOLUME->active()) return; // cbMute() not done still un-muting
 	pthread_mutex_lock(&mutex_serial);
 		progStatus.volume = selrig->get_volume_control();
 	pthread_mutex_unlock(&mutex_serial);
@@ -1437,8 +1438,8 @@ void cbMute()
 		pthread_mutex_unlock(&mutex_serial);
 	} else {
 		pthread_mutex_lock(&mutex_serial);
-			sldrVOLUME->activate();
 			selrig->set_volume_control(progStatus.volume);
+			sldrVOLUME->activate();
 		pthread_mutex_unlock(&mutex_serial);
 	}
 	setFocus();
