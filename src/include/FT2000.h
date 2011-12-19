@@ -8,6 +8,7 @@ private:
 	bool notch_on;
 	int  atten_level;
 	int  preamp_level;
+	int  m_60m_indx;
 
 public:
 	RIG_FT2000();
@@ -50,6 +51,8 @@ public:
 
 	bool sendFTcommand(string, int, bool);
 	const char **bwtable(int);
+
+	void set_band_selection(int v);
 
 };
 

@@ -70,6 +70,18 @@ static const char *FT5000_widths_AMwide[] = { "AM-bw", NULL };
 static const char *FT5000_widths_FMnar[]  = { "FM-nar", NULL };
 static const char *FT5000_widths_FMwide[] = { "FM-wid", NULL };
 
+static const char *FT5000_US_60m[] = {NULL, "126", "127", "128", "130", NULL};
+// US has 5 60M presets. Using dummy numbers for all.
+// First NULL means skip 60m sets in set_band_selection().
+// Maybe someone can do a cat command MC; on all 5 presets and add returned numbers above.
+// To send cat commands in flrig goto menu Config->Xcvr select->Send Cmd.
+//
+// UK has 7 60M presets. Using dummy numbers for all.  If you want support,
+// Maybe someone can do a cat command MC; on all 7 presets and add returned numbers below.
+// static const char *FT5000_UK_60m[] = {NULL, "126", "127", "128", "130", "131", "132", NULL};
+
+static const char **Channels_60m = FT5000_US_60m;
+
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
 	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
@@ -127,6 +139,7 @@ RIG_FT5000::RIG_FT5000() {
 
 	notch_on = false;
 
+	has_band_selection =
 	has_extras =
 	has_vox_onoff =
 	has_vox_gain =
@@ -166,6 +179,41 @@ RIG_FT5000::RIG_FT5000() {
 // derived specific
 	atten_level = 0;
 	preamp_level = 0;
+	notch_on = false;
+	m_60m_indx = 0;
+
+}
+
+void RIG_FT5000::set_band_selection(int v)
+{
+	int inc_60m = false;
+	cmd = "IF;";
+	waitN(27, 100, "get vfo mode in set_band_selection", ASC);
+	size_t p = replystr.rfind("IF");
+	if (p == string::npos) return;
+	if (replystr[p+21] != '0') {	// vfo 60M memory mode
+		inc_60m = true;
+	}
+
+	if (v == 12) {	// 5MHz 60m presets
+		if (Channels_60m[0] == NULL) return;	// no 60m Channels so skip
+		if (inc_60m) {
+			if (Channels_60m[++m_60m_indx] == NULL)
+				m_60m_indx = 0;
+		}
+		cmd.assign("MC").append(Channels_60m[m_60m_indx]).append(";");
+	} else {		// v == 1..11 band selection OR return to vfo mode == 0
+		if (inc_60m)
+			cmd = "VM;";
+		else {
+			if (v < 3)
+				v = v - 1;
+			cmd.assign("BS").append(to_decimal(v, 2)).append(";");
+		}
+	}
+
+	sendCommand(cmd);
+	showresp(WARN, ASC, "Select Band Stacks", cmd, replystr);
 }
 
 long RIG_FT5000::get_vfoA ()
