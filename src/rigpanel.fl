@@ -1611,10 +1611,10 @@ Function {MetersDialog()} {open
 } {
   Fl_Window {} {
     label {Meter Filters} open
-    xywh {680 476 410 192} type Double visible
+    xywh {680 476 410 192} type Double hide
   } {
     Fl_Value_Slider sldr_smeter_avg {
-      label {S meter averging}
+      label {S meter averaging}
       callback {progStatus.rx_avg=o->value();
 sldrRcvSignal->avg(o->value());}
       tooltip {Meter averaged over \# samples} xywh {17 31 375 18} type {Horz Knob} box THIN_DOWN_BOX color 54 selection_color 4 align 5 minimum 1 maximum 10 step 1 value 5 textsize 12
@@ -1632,9 +1632,9 @@ sldrRcvSignal->aging(o->value());}
       class Fl_Wheel_Value_Slider
     }
     Fl_Value_Slider sldr_pout_avg {
-      label {Pwr out averging}
+      label {Pwr out averaging}
       callback {progStatus.pwr_avg=o->value();
-sldrFwdPwr->avg(o->value());}
+sldrFwdPwr->avg(o->value());} selected
       tooltip {Meter averaged over \# samples} xywh {17 109 375 18} type {Horz Knob} box THIN_DOWN_BOX color 54 selection_color 4 align 5 minimum 1 maximum 10 step 1 value 5 textsize 12
       code0 {o->reverse(true);}
       code1 {o->value(progStatus.pwr_avg);}

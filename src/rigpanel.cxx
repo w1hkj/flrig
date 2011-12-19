@@ -3209,7 +3209,7 @@ Fl_Double_Window* MetersDialog() {
   Fl_Double_Window* w;
   { Fl_Double_Window* o = new Fl_Double_Window(410, 192, _("Meter Filters"));
     w = o;
-    { Fl_Wheel_Value_Slider* o = sldr_smeter_avg = new Fl_Wheel_Value_Slider(17, 31, 375, 18, _("S meter averging"));
+    { Fl_Wheel_Value_Slider* o = sldr_smeter_avg = new Fl_Wheel_Value_Slider(17, 31, 375, 18, _("S meter averaging"));
       sldr_smeter_avg->tooltip(_("Meter averaged over # samples"));
       sldr_smeter_avg->type(5);
       sldr_smeter_avg->box(FL_THIN_DOWN_BOX);
@@ -3251,7 +3251,7 @@ Fl_Double_Window* MetersDialog() {
       o->reverse(true);
       o->value(progStatus.rx_peak);
     } // Fl_Wheel_Value_Slider* sldr_smeter_peak
-    { Fl_Wheel_Value_Slider* o = sldr_pout_avg = new Fl_Wheel_Value_Slider(17, 109, 375, 18, _("Pwr out averging"));
+    { Fl_Wheel_Value_Slider* o = sldr_pout_avg = new Fl_Wheel_Value_Slider(17, 109, 375, 18, _("Pwr out averaging"));
       sldr_pout_avg->tooltip(_("Meter averaged over # samples"));
       sldr_pout_avg->type(5);
       sldr_pout_avg->box(FL_THIN_DOWN_BOX);
