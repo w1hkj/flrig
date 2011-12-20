@@ -66,7 +66,9 @@ static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnNotch,    214, 125,  50 },
 	{ (Fl_Widget *)sldrNOTCH,   266, 125, 156 },
 	{ (Fl_Widget *)sldrMICGAIN, 266, 145, 156 },
-	{ (Fl_Widget *)sldrPOWER,    54, 165, 368 },
+	{ (Fl_Widget *)sldrPOWER,   266, 165, 156 },
+	{ (Fl_Widget *)btnNR,         2, 165,  50 },
+	{ (Fl_Widget *)sldrNR,       54, 165, 156 },
 	{ (Fl_Widget *)NULL,          0,   0,   0 }
 };
 
@@ -162,6 +164,8 @@ void RIG_FT950::initialize()
 	rig_widgets[6].W = sldrNOTCH;
 	rig_widgets[7].W = sldrMICGAIN;
 	rig_widgets[8].W = sldrPOWER;
+	rig_widgets[9].W = btnNR;
+	rig_widgets[10].W = sldrNR;
 }
 
 
@@ -1078,15 +1082,15 @@ void RIG_FT950::set_noise_reduction_val(int val)
 	cmd.assign("RL0").append(to_decimal(val, 2)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET_noise_reduction_val", cmd, replystr);
-
 }
 
 int  RIG_FT950::get_noise_reduction_val()
 {
 	int val = 1;
-	cmd = "RL0;";
+	cmd = rsp = "RL0";
+	cmd.append(";");
 	waitN(6, 100, "GET noise reduction val", ASC);
-	size_t p = replystr.rfind("RL0");
+	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return val;
 	val = atoi(&replystr[p+3]);
 	return val;
@@ -1095,21 +1099,18 @@ int  RIG_FT950::get_noise_reduction_val()
 // DNR
 void RIG_FT950::set_noise_reduction(int val)
 {
-	if (val > 0)
-		cmd = "NR01;";
-	else
-		cmd = "NR00;";
+	cmd.assign("NR0").append(val ? "1" : "0" ).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET noise reduction", cmd, replystr);
 }
 
-
 int  RIG_FT950::get_noise_reduction()
 {
 	int val;
-	cmd = "NR0;";
+	cmd = rsp = "NR0";
+	cmd.append(";");
 	waitN(5, 100, "GET noise reduction", ASC);
-	size_t p = replystr.rfind("NR0");
+	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	val = replystr[p+3] - '0';
 	return val;
