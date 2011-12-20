@@ -89,6 +89,14 @@ public:
 
 	void set_band_selection(int v);
 
+	void get_nr_min_max_step(int &min, int &max, int &step) {
+		min = 1; max = 11; step = 1; }
+
+	void set_noise_reduction_val(int val);
+	int  get_noise_reduction_val();
+	void set_noise_reduction(int val);
+	int  get_noise_reduction();
+
 };
 
 
