@@ -1150,16 +1150,17 @@ Double-click ==> pick and close} xywh {66 2 250 133} type Hold labelfont 4 label
   }
 } 
 
-Function {XcvrDialog()} {} {
+Function {XcvrDialog()} {open
+} {
   Fl_Window {} {
     label {I/O Ports} open
-    xywh {575 496 482 257} type Double hide
+    xywh {579 407 482 257} type Double visible
   } {
     Fl_Tabs tabsConfig {open
       xywh {0 8 482 246}
     } {
       Fl_Group tabPrimary {
-        label Primary
+        label Primary open selected
         xywh {2 30 475 222}
       } {
         Fl_Group {} {open
@@ -1178,25 +1179,25 @@ initConfigDialog();} open
             label Retries
             callback {progStatus.comm_retries = (int)o->value();}
             tooltip {Number of  times to resend
-command before giving up} xywh {123 63 75 22} type Simple align 4 minimum 1 maximum 10 step 1 value 5
+command before giving up} xywh {96 63 100 22} align 4 minimum 1 maximum 10 step 1 value 5
             code0 {o->value(progStatus.comm_retries);}
           }
           Fl_Counter cntRigCatTimeout {
-            label {Retry intvl (ms)}
+            label {Retry intvl}
             callback {progStatus.comm_timeout = (int)o->value();}
-            tooltip {Time between retries is msec} xywh {123 89 75 22} type Simple align 4 minimum 2 maximum 200 step 1 value 10
+            tooltip {Time between retries is msec} xywh {96 89 100 22} align 4 minimum 2 maximum 200 step 1 value 10
             code0 {o->value(progStatus.comm_timeout);}
           }
           Fl_Counter cntRigCatWait {
-            label {Cmd Intvl (ms)}
+            label Cmds
             callback {progStatus.comm_wait = (int)o->value();}
-            tooltip {Millseconds between sequential commands} xywh {123 115 75 22} type Simple align 4 minimum 0 maximum 100 step 1 value 5
+            tooltip {Wait millseconds between sequential commands} xywh {96 115 100 22} align 4 minimum 0 maximum 100 step 1 value 5
             code0 {o->value(progStatus.comm_wait);}
           }
           Fl_Counter query_interval {
-            label {qry intvl (ms):}
+            label {Poll intvl}
             callback {progStatus.serloop_timing = (int)o->value();}
-            tooltip {Interval between Xvr queries} xywh {123 141 75 22} type Simple align 4 minimum 10 maximum 5000 step 10 value 50
+            tooltip {Polling interval in msec} xywh {96 141 100 22} align 4 minimum 10 maximum 5000 step 1 value 50
             code0 {o->value(progStatus.serloop_timing);}
           }
         }
@@ -1429,138 +1430,193 @@ Serial Port for a special Control Signals}
         xywh {2 30 476 222} hide
       } {
         Fl_Group {} {
-          label {Meters - polled every time} open
-          xywh {4 34 474 54} box ENGRAVED_BOX align 21
+          label Meters open
+          xywh {4 34 474 48} box ENGRAVED_BOX align 21
         } {
-          Fl_Check_Button btn_poll_smeter {
-            label {S meter}
+          Fl_Value_Input poll_smeter {
+            label {S-meter}
             callback {progStatus.poll_smeter = o->value();}
-            xywh {13 58 104 15} down_box DOWN_BOX value 1
+            tooltip {Poll every Nth interval} xywh {13 55 30 20} align 8 maximum 10 step 1 value 1
             code0 {o->value(progStatus.poll_smeter);}
           }
-          Fl_Check_Button btn_poll_pout {
+          Fl_Value_Input poll_pout {
             label {Power out}
             callback {progStatus.poll_pout = o->value();}
-            xywh {132 58 104 15} down_box DOWN_BOX value 1
+            tooltip {Poll every Nth interval} xywh {132 55 30 20} align 8 maximum 10 step 1 value 1
             code0 {o->value(progStatus.poll_pout);}
           }
-          Fl_Check_Button btn_poll_swr {
+          Fl_Value_Input poll_swr {
             label SWR
             callback {progStatus.poll_swr = o->value();}
-            xywh {252 58 104 15} down_box DOWN_BOX value 1
+            tooltip {Poll every Nth interval} xywh {252 55 30 20} align 8 maximum 10 step 1 value 1
             code0 {o->value(progStatus.poll_swr);}
           }
-          Fl_Check_Button btn_poll_alc {
+          Fl_Value_Input poll_alc {
             label ALC
             callback {progStatus.poll_alc = o->value();}
-            xywh {372 58 104 15} down_box DOWN_BOX value 1
+            tooltip {Poll every Nth interval} xywh {372 55 30 20} align 8 maximum 10 step 1 value 1
             code0 {o->value(progStatus.poll_alc);}
           }
         }
         Fl_Group {} {
-          label {Op' Controls - polled every time} open
-          xywh {4 88 474 44} box ENGRAVED_BOX align 21
+          label {Operating Controls} open
+          xywh {4 82 474 48} box ENGRAVED_BOX align 21
         } {
-          Fl_Check_Button btn_poll_frequency {
+          Fl_Value_Input poll_frequency {
             label Frequency
             callback {progStatus.poll_frequency = o->value();}
-            tooltip {Frequency control} xywh {13 111 101 15} down_box DOWN_BOX value 1
+            tooltip {Poll every Nth interval} xywh {13 103 30 20} align 8 maximum 10 step 1 value 1
             code0 {o->value(progStatus.poll_frequency);}
           }
-          Fl_Check_Button btn_poll_mode {
+          Fl_Value_Input poll_mode {
             label Mode
             callback {progStatus.poll_mode = o->value();}
-            tooltip {Mode selector} xywh {132 111 101 15} down_box DOWN_BOX value 1
+            tooltip {Poll every Nth interval} xywh {132 103 30 20} align 8 maximum 10 step 1 value 1
             code0 {o->value(progStatus.poll_mode);}
           }
-          Fl_Check_Button btn_poll_bandwidth {
+          Fl_Value_Input poll_bandwidth {
             label Bandwidth
             callback {progStatus.poll_bandwidth = o->value();}
-            tooltip {Bandwidth selector} xywh {252 111 101 15} down_box DOWN_BOX value 1
+            tooltip {Poll every Nth interval} xywh {252 103 30 20} align 8 maximum 10 step 1 value 1
             code0 {o->value(progStatus.poll_bandwidth);}
           }
         }
         Fl_Group {} {
           label {Additional Controls} open
-          xywh {4 132 474 119} box ENGRAVED_FRAME align 21
+          xywh {4 130 474 122} box ENGRAVED_FRAME align 21
         } {
-          Fl_Check_Button btn_poll_volume {
+          Fl_Value_Input poll_volume {
             label Volume
             callback {progStatus.poll_volume = o->value();}
-            tooltip {Audio volume control} xywh {13 153 101 15} down_box DOWN_BOX
+            tooltip {Poll every Nth interval} xywh {12 150 30 20} align 8 maximum 10 step 1
             code0 {o->value(progStatus.poll_volume);}
           }
-          Fl_Check_Button btn_poll_micgain {
+          Fl_Value_Input poll_micgain {
             label {Mic gain}
             callback {progStatus.poll_micgain = o->value();}
-            tooltip {Mic gain control} xywh {132 153 101 15} down_box DOWN_BOX
+            tooltip {Poll every Nth interval} xywh {131 150 30 20} align 8 maximum 10 step 1
             code0 {o->value(progStatus.poll_micgain);}
           }
-          Fl_Check_Button btn_poll_rfgain {
+          Fl_Value_Input poll_rfgain {
             label {RF gain}
             callback {progStatus.poll_rfgain = o->value();}
-            tooltip {RF gain control} xywh {252 153 101 15} down_box DOWN_BOX
+            tooltip {Poll every Nth interval} xywh {251 150 30 20} align 8 maximum 10 step 1
             code0 {o->value(progStatus.poll_rfgain);}
           }
-          Fl_Check_Button btn_poll_power_control {
-            label {Pwr control}
+          Fl_Value_Input poll_power_control {
+            label Power
             callback {progStatus.poll_power_control = o->value();}
-            tooltip {Power level control} xywh {372 153 101 15} down_box DOWN_BOX
+            tooltip {Poll every Nth interval} xywh {371 150 30 20} align 8 maximum 10 step 1
             code0 {o->value(progStatus.poll_power_control);}
           }
-          Fl_Check_Button btn_poll_ifshift {
+          Fl_Value_Input poll_ifshift {
             label {IF shift}
             callback {progStatus.poll_ifshift = o->value();}
-            tooltip {IF shift control} xywh {13 177 101 15} down_box DOWN_BOX
+            tooltip {Poll every Nth interval} xywh {12 175 30 20} align 8 maximum 10 step 1
             code0 {o->value(progStatus.poll_ifshift);}
           }
-          Fl_Check_Button btn_poll_notch {
+          Fl_Value_Input poll_notch {
             label {Man' Notch}
             callback {progStatus.poll_notch = o->value();}
-            tooltip {Manual notch control} xywh {132 177 101 15} down_box DOWN_BOX
+            tooltip {Poll every Nth interval} xywh {131 175 30 20} align 8 maximum 10 step 1
             code0 {o->value(progStatus.poll_notch);}
           }
-          Fl_Check_Button btn_poll_auto_notch {
-            label {Auto Notch}
+          Fl_Value_Input poll_auto_notch {
+            label {Auto notch}
             callback {progStatus.poll_auto_notch = o->value();}
-            tooltip {Auto notch ON/OFF} xywh {252 177 101 15} down_box DOWN_BOX
+            tooltip {Poll every Nth interval} xywh {251 175 30 20} align 8 maximum 10 step 1
             code0 {o->value(progStatus.poll_auto_notch);}
           }
-          Fl_Check_Button btn_poll_pre_att {
+          Fl_Value_Input poll_pre_att {
             label {Pre/Att}
             callback {progStatus.poll_pre_att = o->value();}
-            tooltip {Preamp / Attenuator} xywh {13 201 101 15} down_box DOWN_BOX
+            tooltip {Poll every Nth interval} xywh {12 200 30 20} align 8 maximum 10 step 1
             code0 {o->value(progStatus.poll_pre_att);}
           }
-          Fl_Check_Button btn_poll_squelch {
+          Fl_Value_Input poll_squelch {
             label Squelch
             callback {progStatus.poll_squelch = o->value();}
-            tooltip {Squelch level control} xywh {132 201 101 15} down_box DOWN_BOX
+            tooltip {Poll every Nth interval} xywh {131 200 30 20} align 8 maximum 10 step 1
             code0 {o->value(progStatus.poll_squelch);}
           }
-          Fl_Check_Button btn_poll_split {
-            label {Split VFO}
+          Fl_Value_Input poll_split {
+            label Split
             callback {progStatus.poll_split = o->value();}
-            tooltip {Vfo A/B split ops} xywh {252 201 101 15} down_box DOWN_BOX
+            tooltip {Poll every Nth interval} xywh {251 200 30 20} align 8 maximum 10 step 1
             code0 {o->value(progStatus.poll_split);}
           }
-          Fl_Check_Button btn_poll_noise {
-            label {Noise Blnk'}
+          Fl_Value_Input poll_noise {
+            label Noise
             callback {progStatus.poll_noise = o->value();}
-            tooltip {Noise blanker} xywh {13 226 101 15} down_box DOWN_BOX
+            tooltip {Poll every Nth interval} xywh {13 225 30 20} align 8 maximum 10 step 1
             code0 {o->value(progStatus.poll_noise);}
           }
-          Fl_Check_Button btn_poll_nr {
-            label {Noise Red'}
-            callback {progStatus.poll_nr = o->value();}
-            tooltip {Noise reduction} xywh {132 226 101 15} down_box DOWN_BOX
-            code0 {o->value(progStatus.poll_nr);}
+          Fl_Value_Input poll_nr {
+            label {Noise red'}
+            callback {progStatus.poll_noise = o->value();}
+            tooltip {Poll every Nth interval} xywh {132 225 30 20} align 8 maximum 10 step 1
+            code0 {o->value(progStatus.poll_noise);}
           }
-          Fl_Value_Slider poll_extras_interval {
-            label {poll every:}
-            callback {progStatus.poll_extras_interval = o->value();}
-            tooltip {Poll these controls once every N meter polls} xywh {332 223 140 21} type Horizontal color 20 align 4 minimum 1 maximum 10 step 1 value 4 textsize 14
-            code0 {o->value(progStatus.poll_extras_interval);}
+          Fl_Button btnClearAddControls {
+            label {Clear all}
+            callback {poll_volume->value(0);
+poll_micgain->value(0);
+poll_rfgain->value(0);
+poll_power_control->value(0);
+poll_ifshift->value(0);
+poll_notch->value(0);
+poll_auto_notch->value(0);
+poll_pre_att->value(0);
+poll_squelch->value(0);
+poll_split->value(0);
+poll_noise->value(0);
+poll_nr->value(0);
+progStatus.poll_volume = 0;
+progStatus.poll_micgain = 0;
+progStatus.poll_rfgain = 0;
+progStatus.poll_power_control = 0;
+progStatus.poll_ifshift = 0;
+progStatus.poll_notch = 0;
+progStatus.poll_auto_notch = 0;
+progStatus.poll_pre_att = 0;
+progStatus.poll_squelch = 0;
+progStatus.poll_split = 0;
+progStatus.poll_noise = 0;
+progStatus.poll_nr = 0;}
+            xywh {330 200 70 20}
+          }
+          Fl_Value_Input poll_all {
+            callback {progStatus.poll_all = o->value();}
+            tooltip {Poll every Nth interval} xywh {408 225 30 20} align 20 maximum 10 step 1 value 4
+            code0 {o->value(progStatus.poll_all);}
+          }
+          Fl_Button btnSetAllAdd {
+            label {Set all to}
+            callback {poll_volume->value(progStatus.poll_all);
+poll_micgain->value(progStatus.poll_all);
+poll_rfgain->value(progStatus.poll_all);
+poll_power_control->value(progStatus.poll_all);
+poll_ifshift->value(progStatus.poll_all);
+poll_notch->value(progStatus.poll_all);
+poll_auto_notch->value(progStatus.poll_all);
+poll_pre_att->value(progStatus.poll_all);
+poll_squelch->value(progStatus.poll_all);
+poll_split->value(progStatus.poll_all);
+poll_noise->value(progStatus.poll_all);
+poll_nr->value(progStatus.poll_all);
+progStatus.poll_volume = progStatus.poll_all;
+progStatus.poll_micgain = progStatus.poll_all;
+progStatus.poll_rfgain = progStatus.poll_all;
+progStatus.poll_power_control = progStatus.poll_all;
+progStatus.poll_ifshift = progStatus.poll_all;
+progStatus.poll_notch = progStatus.poll_all;
+progStatus.poll_auto_notch = progStatus.poll_all;
+progStatus.poll_pre_att = progStatus.poll_all;
+progStatus.poll_squelch = progStatus.poll_all;
+progStatus.poll_split = progStatus.poll_all;
+progStatus.poll_noise = progStatus.poll_all;
+progStatus.poll_nr = progStatus.poll_all;}
+            xywh {331 225 70 20}
           }
         }
       }
@@ -1607,8 +1663,7 @@ Or sequence of hex values, x80 etc separated by spaces}
   }
 } 
 
-Function {MetersDialog()} {open
-} {
+Function {MetersDialog()} {} {
   Fl_Window {} {
     label {Meter Filters} open
     xywh {680 476 410 192} type Double hide
@@ -1634,7 +1689,7 @@ sldrRcvSignal->aging(o->value());}
     Fl_Value_Slider sldr_pout_avg {
       label {Pwr out averaging}
       callback {progStatus.pwr_avg=o->value();
-sldrFwdPwr->avg(o->value());} selected
+sldrFwdPwr->avg(o->value());}
       tooltip {Meter averaged over \# samples} xywh {17 109 375 18} type {Horz Knob} box THIN_DOWN_BOX color 54 selection_color 4 align 5 minimum 1 maximum 10 step 1 value 5 textsize 12
       code0 {o->reverse(true);}
       code1 {o->value(progStatus.pwr_avg);}
