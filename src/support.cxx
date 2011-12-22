@@ -664,7 +664,7 @@ void servicePTT()
 void * serial_thread_loop(void *d)
 {
   static int  loopcount = progStatus.serloop_timing / 10;
-  static int  poll_extras = 0;
+  static int  poll_nbr = 0;
 
 	for(;;) {
 		if (!run_serial_thread) break;
@@ -687,51 +687,69 @@ void * serial_thread_loop(void *d)
 				Fl::awake(zeroXmtMeters, 0);
 				resetrcv = false;
 				loopcount = progStatus.serloop_timing / 10;
+				poll_nbr = 0;
 			}
 			resetxmt = true;
 
 			if (!loopcount--) {
+				poll_nbr++;
+
 				if (rig_nbr == K3) read_K3();
 				else if ((rig_nbr == K2) ||
 						 (selrig->has_get_info &&
-						 (progStatus.poll_frequency ||
-						 (progStatus.poll_mode) ||
-						 (progStatus.poll_bandwidth)))) read_info();
-				if (progStatus.poll_frequency) read_vfo();
+						 (progStatus.poll_frequency || progStatus.poll_mode || progStatus.poll_bandwidth)))
+					read_info();
+
+				if (progStatus.poll_frequency)
+					if (poll_nbr % progStatus.poll_frequency) read_vfo();
 				if (!quePTT.empty()) continue;
-				if (progStatus.poll_mode) read_mode();
+				if (progStatus.poll_mode)
+					if (!(poll_nbr % progStatus.poll_mode)) read_mode();
 				if (!quePTT.empty()) continue;
-				if (progStatus.poll_bandwidth) read_bandwidth();
+				if (progStatus.poll_bandwidth)
+					if (!(poll_nbr % progStatus.poll_bandwidth)) read_bandwidth();
 				if (!quePTT.empty()) continue;
 
-				if (progStatus.poll_smeter) read_smeter();
+				if (progStatus.poll_smeter)
+					if (!(poll_nbr % progStatus.poll_smeter)) read_smeter();
 				if (!quePTT.empty()) continue;
-				if (poll_extras++ >= progStatus.poll_extras_interval) {
-					poll_extras = 0;
-					if (progStatus.poll_volume) read_volume();
-					if (!quePTT.empty()) continue;
-					if (progStatus.poll_auto_notch) read_auto_notch();
-					if (!quePTT.empty()) continue;
-					if (progStatus.poll_notch) read_notch();
-					if (!quePTT.empty()) continue;
-					if (progStatus.poll_ifshift) read_ifshift();
-					if (!quePTT.empty()) continue;
-					if (progStatus.poll_power_control) read_power_control();
-					if (!quePTT.empty()) continue;
-					if (progStatus.poll_pre_att) read_preamp_att();
-					if (!quePTT.empty()) continue;
-					if (progStatus.poll_micgain) read_mic_gain();
-					if (!quePTT.empty()) continue;
-					if (progStatus.poll_squelch) read_squelch();
-					if (!quePTT.empty()) continue;
-					if (progStatus.poll_rfgain) read_rfgain();
-					if (!quePTT.empty()) continue;
-					if (progStatus.poll_split) read_split();
-					if (!quePTT.empty()) continue;
-					if (progStatus.poll_nr) read_nr();
-					if (!quePTT.empty()) continue;
-					if (progStatus.poll_noise) read_noise();
-				}
+
+				if (progStatus.poll_volume)
+					if (!(poll_nbr % progStatus.poll_volume)) read_volume();
+				if (!quePTT.empty()) continue;
+				if (progStatus.poll_auto_notch)
+					if (!(poll_nbr % progStatus.poll_auto_notch)) read_auto_notch();
+				if (!quePTT.empty()) continue;
+				if (progStatus.poll_notch)
+					if (!(poll_nbr % progStatus.poll_notch)) read_notch();
+				if (!quePTT.empty()) continue;
+				if (progStatus.poll_ifshift)
+					if (!(poll_nbr % progStatus.poll_ifshift)) read_ifshift();
+				if (!quePTT.empty()) continue;
+				if (progStatus.poll_power_control)
+					if (!(poll_nbr % progStatus.poll_power_control)) read_power_control();
+				if (!quePTT.empty()) continue;
+				if (progStatus.poll_pre_att)
+					if (!(poll_nbr % progStatus.poll_pre_att)) read_preamp_att();
+				if (!quePTT.empty()) continue;
+				if (progStatus.poll_micgain)
+					if (!(poll_nbr % progStatus.poll_micgain)) read_mic_gain();
+				if (!quePTT.empty()) continue;
+				if (progStatus.poll_squelch)
+					if (!(poll_nbr % progStatus.poll_squelch)) read_squelch();
+				if (!quePTT.empty()) continue;
+				if (progStatus.poll_rfgain)
+					if (!(poll_nbr % progStatus.poll_rfgain)) read_rfgain();
+				if (!quePTT.empty()) continue;
+				if (progStatus.poll_split)
+					if (!(poll_nbr % progStatus.poll_split)) read_split();
+				if (!quePTT.empty()) continue;
+				if (progStatus.poll_nr)
+					if (!(poll_nbr % progStatus.poll_nr)) read_nr();
+				if (!quePTT.empty()) continue;
+				if (progStatus.poll_noise)
+					if (!(poll_nbr % progStatus.poll_noise)) read_noise();
+
 				loopcount = progStatus.serloop_timing / 10;
 			}
 		} else {
@@ -739,14 +757,19 @@ void * serial_thread_loop(void *d)
 				Fl::awake(updateSmeter, (void *)(0));
 				resetxmt = false;
 				loopcount = progStatus.serloop_timing / 10;
+				poll_nbr = 0;
 			}
 			resetrcv = true;
 			if (!loopcount--) {
-				if (progStatus.poll_pout) read_power_out();
+				poll_nbr++;
+				if (progStatus.poll_pout)
+					if (!(poll_nbr % progStatus.poll_pout)) read_power_out();
 				if (!quePTT.empty()) continue;
-				if (progStatus.poll_swr) read_swr();
+				if (progStatus.poll_swr)
+					if (!(poll_nbr % progStatus.poll_swr)) read_swr();
 				if (!quePTT.empty()) continue;
-				if (progStatus.poll_alc) read_alc();
+				if (progStatus.poll_alc)
+					if (!(poll_nbr % progStatus.poll_alc)) read_alc();
 				loopcount = progStatus.serloop_timing / 10;
 			}
 
@@ -2012,26 +2035,26 @@ void initXcvrTab()
 		op_tt550_XmtBW->activate();
 		op_tt550_XmtBW->index(progStatus.tt550_xmt_bw);
 
-		btn_poll_smeter->activate(); btn_poll_smeter->value(progStatus.poll_smeter);
-		btn_poll_pout->activate(); btn_poll_pout->value(progStatus.poll_pout);
-		btn_poll_swr->activate(); btn_poll_swr->value(progStatus.poll_swr);
-		btn_poll_alc->activate(); btn_poll_alc->value(progStatus.poll_alc);
-		btn_poll_frequency->deactivate(); btn_poll_frequency->value(0);
-		btn_poll_mode->deactivate(); btn_poll_mode->value(0);
-		btn_poll_bandwidth->deactivate(); btn_poll_bandwidth->value(0);
-		btn_poll_volume->deactivate(); btn_poll_volume->value(0);
-		btn_poll_notch->deactivate(); btn_poll_notch->value(0);
-		btn_poll_auto_notch->deactivate(); btn_poll_auto_notch->value(0);
-		btn_poll_ifshift->deactivate(); btn_poll_ifshift->value(0);
-		btn_poll_power_control->deactivate(); btn_poll_power_control->value(0);
-		btn_poll_pre_att->deactivate(); btn_poll_pre_att->value(0);
-		btn_poll_squelch->deactivate(); btn_poll_squelch->value(0);
-		btn_poll_micgain->deactivate(); btn_poll_micgain->value(0);
-		btn_poll_rfgain->deactivate(); btn_poll_rfgain->value(0);
-		btn_poll_split->deactivate(); btn_poll_split->value(0);
-		btn_poll_nr->deactivate(); btn_poll_nr->value(0);
-		btn_poll_noise->deactivate(); btn_poll_noise->value(0);
-		poll_extras_interval->deactivate();
+		poll_smeter->activate(); poll_smeter->value(progStatus.poll_smeter);
+		poll_pout->activate(); poll_pout->value(progStatus.poll_pout);
+		poll_swr->activate(); poll_swr->value(progStatus.poll_swr);
+		poll_alc->activate(); poll_alc->value(progStatus.poll_alc);
+		poll_frequency->deactivate(); poll_frequency->value(0);
+		poll_mode->deactivate(); poll_mode->value(0);
+		poll_bandwidth->deactivate(); poll_bandwidth->value(0);
+		poll_volume->deactivate(); poll_volume->value(0);
+		poll_notch->deactivate(); poll_notch->value(0);
+		poll_auto_notch->deactivate(); poll_auto_notch->value(0);
+		poll_ifshift->deactivate(); poll_ifshift->value(0);
+		poll_power_control->deactivate(); poll_power_control->value(0);
+		poll_pre_att->deactivate(); poll_pre_att->value(0);
+		poll_squelch->deactivate(); poll_squelch->value(0);
+		poll_micgain->deactivate(); poll_micgain->value(0);
+		poll_rfgain->deactivate(); poll_rfgain->value(0);
+		poll_split->deactivate(); poll_split->value(0);
+		poll_nr->deactivate(); poll_nr->value(0);
+		poll_noise->deactivate(); poll_noise->value(0);
+		poll_all->deactivate(); poll_all->value(0);
 
 	} else {
 
@@ -2051,8 +2074,8 @@ void initXcvrTab()
 			tabsGeneric->insert(*genericBands, 0);
 		}
 
-		poll_extras_interval->activate();
-		poll_extras_interval->value(progStatus.poll_extras_interval);
+		poll_all->activate();
+		poll_all->value(progStatus.poll_all);
 
 		if (selrig->has_cw_wpm || selrig->has_cw_qsk || selrig->has_cw_weight ||
 			selrig->has_cw_keyer || selrig->has_cw_spot || selrig->has_cw_spot_tone) {
@@ -2222,46 +2245,46 @@ void initXcvrTab()
 		mnuRestoreData->show();
 		mnuKeepData->show();
 
-		btn_poll_frequency->activate(); btn_poll_frequency->value(progStatus.poll_frequency);
-		btn_poll_mode->activate(); btn_poll_mode->value(progStatus.poll_mode);
-		btn_poll_bandwidth->activate(); btn_poll_bandwidth->value(progStatus.poll_bandwidth);
+		poll_frequency->activate(); poll_frequency->value(progStatus.poll_frequency);
+		poll_mode->activate(); poll_mode->value(progStatus.poll_mode);
+		poll_bandwidth->activate(); poll_bandwidth->value(progStatus.poll_bandwidth);
 
-		btn_poll_smeter->activate(); btn_poll_smeter->value(progStatus.poll_smeter);
-		btn_poll_pout->activate(); btn_poll_pout->value(progStatus.poll_pout);
-		btn_poll_swr->activate(); btn_poll_swr->value(progStatus.poll_swr);
-		btn_poll_alc->activate(); btn_poll_alc->value(progStatus.poll_alc);
-		btn_poll_volume->activate(); btn_poll_volume->value(progStatus.poll_volume);
-		btn_poll_notch->activate(); btn_poll_notch->value(progStatus.poll_notch);
-		btn_poll_auto_notch->activate(); btn_poll_auto_notch->value(progStatus.poll_auto_notch);
-		btn_poll_ifshift->activate(); btn_poll_ifshift->value(progStatus.poll_ifshift);
-		btn_poll_power_control->activate(); btn_poll_power_control->value(progStatus.poll_power_control);
-		btn_poll_pre_att->activate(); btn_poll_pre_att->value(progStatus.poll_pre_att);
-		btn_poll_squelch->activate(); btn_poll_squelch->value(progStatus.poll_squelch);
-		btn_poll_micgain->activate(); btn_poll_micgain->value(progStatus.poll_micgain);
-		btn_poll_rfgain->activate(); btn_poll_rfgain->value(progStatus.poll_rfgain);
-		btn_poll_split->activate(); btn_poll_split->value(progStatus.poll_split);
-		btn_poll_noise->activate(); btn_poll_noise->value(progStatus.poll_noise);
-		btn_poll_nr->activate(); btn_poll_nr->value(progStatus.poll_nr);
+		poll_smeter->activate(); poll_smeter->value(progStatus.poll_smeter);
+		poll_pout->activate(); poll_pout->value(progStatus.poll_pout);
+		poll_swr->activate(); poll_swr->value(progStatus.poll_swr);
+		poll_alc->activate(); poll_alc->value(progStatus.poll_alc);
+		poll_volume->activate(); poll_volume->value(progStatus.poll_volume);
+		poll_notch->activate(); poll_notch->value(progStatus.poll_notch);
+		poll_auto_notch->activate(); poll_auto_notch->value(progStatus.poll_auto_notch);
+		poll_ifshift->activate(); poll_ifshift->value(progStatus.poll_ifshift);
+		poll_power_control->activate(); poll_power_control->value(progStatus.poll_power_control);
+		poll_pre_att->activate(); poll_pre_att->value(progStatus.poll_pre_att);
+		poll_squelch->activate(); poll_squelch->value(progStatus.poll_squelch);
+		poll_micgain->activate(); poll_micgain->value(progStatus.poll_micgain);
+		poll_rfgain->activate(); poll_rfgain->value(progStatus.poll_rfgain);
+		poll_split->activate(); poll_split->value(progStatus.poll_split);
+		poll_noise->activate(); poll_noise->value(progStatus.poll_noise);
+		poll_nr->activate(); poll_nr->value(progStatus.poll_nr);
 
-		if (!selrig->has_bandwidth_control) { btn_poll_bandwidth->deactivate(); btn_poll_bandwidth->value(0); }
-		if (!selrig->has_smeter) { btn_poll_smeter->deactivate(); btn_poll_smeter->value(0); }
-		if (!selrig->has_power_out) { btn_poll_pout->deactivate(); btn_poll_pout->value(0); }
-		if (!selrig->has_swr_control) { btn_poll_swr->deactivate(); btn_poll_swr->value(0); }
-		if (!selrig->has_alc_control) { btn_poll_alc->deactivate(); btn_poll_alc->value(0); }
-		if (!selrig->has_volume_control) { btn_poll_volume->deactivate(); btn_poll_volume->value(0); }
-		if (!selrig->has_notch_control) { btn_poll_notch->deactivate(); btn_poll_notch->value(0); }
+		if (!selrig->has_bandwidth_control) { poll_bandwidth->deactivate(); poll_bandwidth->value(0); }
+		if (!selrig->has_smeter) { poll_smeter->deactivate(); poll_smeter->value(0); }
+		if (!selrig->has_power_out) { poll_pout->deactivate(); poll_pout->value(0); }
+		if (!selrig->has_swr_control) { poll_swr->deactivate(); poll_swr->value(0); }
+		if (!selrig->has_alc_control) { poll_alc->deactivate(); poll_alc->value(0); }
+		if (!selrig->has_volume_control) { poll_volume->deactivate(); poll_volume->value(0); }
+		if (!selrig->has_notch_control) { poll_notch->deactivate(); poll_notch->value(0); }
 		if (!selrig->has_auto_notch || rig_nbr == FT1000MP) 
-			{ btn_poll_auto_notch->deactivate(); btn_poll_auto_notch->value(0); }
-		if (!selrig->has_ifshift_control) { btn_poll_ifshift->deactivate(); btn_poll_ifshift->value(0); }
-		if (!selrig->has_power_control) { btn_poll_power_control->deactivate(); btn_poll_power_control->value(0); }
+			{ poll_auto_notch->deactivate(); poll_auto_notch->value(0); }
+		if (!selrig->has_ifshift_control) { poll_ifshift->deactivate(); poll_ifshift->value(0); }
+		if (!selrig->has_power_control) { poll_power_control->deactivate(); poll_power_control->value(0); }
 		if (!selrig->has_preamp_control && !selrig->has_attenuator_control) 
-			{ btn_poll_pre_att->deactivate(); btn_poll_pre_att->value(0); }
-		if (!selrig->has_sql_control) { btn_poll_squelch->deactivate(); btn_poll_squelch->value(0); }
-		if (!selrig->has_micgain_control) { btn_poll_micgain->deactivate(); btn_poll_micgain->value(0); }
-		if (!selrig->has_rf_control) { btn_poll_rfgain->deactivate(); btn_poll_rfgain->value(0); }
-		if (!selrig->has_split) { btn_poll_split->deactivate(); btn_poll_split->value(0); }
-		if (!selrig->has_noise_control) {btn_poll_noise->deactivate(); btn_poll_noise->value(0);}
-		if (!selrig->has_noise_reduction) {btn_poll_nr->deactivate(); btn_poll_nr->value(0);}
+			{ poll_pre_att->deactivate(); poll_pre_att->value(0); }
+		if (!selrig->has_sql_control) { poll_squelch->deactivate(); poll_squelch->value(0); }
+		if (!selrig->has_micgain_control) { poll_micgain->deactivate(); poll_micgain->value(0); }
+		if (!selrig->has_rf_control) { poll_rfgain->deactivate(); poll_rfgain->value(0); }
+		if (!selrig->has_split) { poll_split->deactivate(); poll_split->value(0); }
+		if (!selrig->has_noise_control) {poll_noise->deactivate(); poll_noise->value(0);}
+		if (!selrig->has_noise_reduction) {poll_nr->deactivate(); poll_nr->value(0);}
 
 	}
 }

@@ -2562,124 +2562,182 @@ btnOkXcvrDialog->redraw();
 
 Fl_Group *tabPolling=(Fl_Group *)0;
 
-Fl_Check_Button *btn_poll_smeter=(Fl_Check_Button *)0;
+Fl_Value_Input *poll_smeter=(Fl_Value_Input *)0;
 
-static void cb_btn_poll_smeter(Fl_Check_Button* o, void*) {
+static void cb_poll_smeter(Fl_Value_Input* o, void*) {
   progStatus.poll_smeter = o->value();
 }
 
-Fl_Check_Button *btn_poll_pout=(Fl_Check_Button *)0;
+Fl_Value_Input *poll_pout=(Fl_Value_Input *)0;
 
-static void cb_btn_poll_pout(Fl_Check_Button* o, void*) {
+static void cb_poll_pout(Fl_Value_Input* o, void*) {
   progStatus.poll_pout = o->value();
 }
 
-Fl_Check_Button *btn_poll_swr=(Fl_Check_Button *)0;
+Fl_Value_Input *poll_swr=(Fl_Value_Input *)0;
 
-static void cb_btn_poll_swr(Fl_Check_Button* o, void*) {
+static void cb_poll_swr(Fl_Value_Input* o, void*) {
   progStatus.poll_swr = o->value();
 }
 
-Fl_Check_Button *btn_poll_alc=(Fl_Check_Button *)0;
+Fl_Value_Input *poll_alc=(Fl_Value_Input *)0;
 
-static void cb_btn_poll_alc(Fl_Check_Button* o, void*) {
+static void cb_poll_alc(Fl_Value_Input* o, void*) {
   progStatus.poll_alc = o->value();
 }
 
-Fl_Check_Button *btn_poll_frequency=(Fl_Check_Button *)0;
+Fl_Value_Input *poll_frequency=(Fl_Value_Input *)0;
 
-static void cb_btn_poll_frequency(Fl_Check_Button* o, void*) {
+static void cb_poll_frequency(Fl_Value_Input* o, void*) {
   progStatus.poll_frequency = o->value();
 }
 
-Fl_Check_Button *btn_poll_mode=(Fl_Check_Button *)0;
+Fl_Value_Input *poll_mode=(Fl_Value_Input *)0;
 
-static void cb_btn_poll_mode(Fl_Check_Button* o, void*) {
+static void cb_poll_mode(Fl_Value_Input* o, void*) {
   progStatus.poll_mode = o->value();
 }
 
-Fl_Check_Button *btn_poll_bandwidth=(Fl_Check_Button *)0;
+Fl_Value_Input *poll_bandwidth=(Fl_Value_Input *)0;
 
-static void cb_btn_poll_bandwidth(Fl_Check_Button* o, void*) {
+static void cb_poll_bandwidth(Fl_Value_Input* o, void*) {
   progStatus.poll_bandwidth = o->value();
 }
 
-Fl_Check_Button *btn_poll_volume=(Fl_Check_Button *)0;
+Fl_Value_Input *poll_volume=(Fl_Value_Input *)0;
 
-static void cb_btn_poll_volume(Fl_Check_Button* o, void*) {
+static void cb_poll_volume(Fl_Value_Input* o, void*) {
   progStatus.poll_volume = o->value();
 }
 
-Fl_Check_Button *btn_poll_micgain=(Fl_Check_Button *)0;
+Fl_Value_Input *poll_micgain=(Fl_Value_Input *)0;
 
-static void cb_btn_poll_micgain(Fl_Check_Button* o, void*) {
+static void cb_poll_micgain(Fl_Value_Input* o, void*) {
   progStatus.poll_micgain = o->value();
 }
 
-Fl_Check_Button *btn_poll_rfgain=(Fl_Check_Button *)0;
+Fl_Value_Input *poll_rfgain=(Fl_Value_Input *)0;
 
-static void cb_btn_poll_rfgain(Fl_Check_Button* o, void*) {
+static void cb_poll_rfgain(Fl_Value_Input* o, void*) {
   progStatus.poll_rfgain = o->value();
 }
 
-Fl_Check_Button *btn_poll_power_control=(Fl_Check_Button *)0;
+Fl_Value_Input *poll_power_control=(Fl_Value_Input *)0;
 
-static void cb_btn_poll_power_control(Fl_Check_Button* o, void*) {
+static void cb_poll_power_control(Fl_Value_Input* o, void*) {
   progStatus.poll_power_control = o->value();
 }
 
-Fl_Check_Button *btn_poll_ifshift=(Fl_Check_Button *)0;
+Fl_Value_Input *poll_ifshift=(Fl_Value_Input *)0;
 
-static void cb_btn_poll_ifshift(Fl_Check_Button* o, void*) {
+static void cb_poll_ifshift(Fl_Value_Input* o, void*) {
   progStatus.poll_ifshift = o->value();
 }
 
-Fl_Check_Button *btn_poll_notch=(Fl_Check_Button *)0;
+Fl_Value_Input *poll_notch=(Fl_Value_Input *)0;
 
-static void cb_btn_poll_notch(Fl_Check_Button* o, void*) {
+static void cb_poll_notch(Fl_Value_Input* o, void*) {
   progStatus.poll_notch = o->value();
 }
 
-Fl_Check_Button *btn_poll_auto_notch=(Fl_Check_Button *)0;
+Fl_Value_Input *poll_auto_notch=(Fl_Value_Input *)0;
 
-static void cb_btn_poll_auto_notch(Fl_Check_Button* o, void*) {
+static void cb_poll_auto_notch(Fl_Value_Input* o, void*) {
   progStatus.poll_auto_notch = o->value();
 }
 
-Fl_Check_Button *btn_poll_pre_att=(Fl_Check_Button *)0;
+Fl_Value_Input *poll_pre_att=(Fl_Value_Input *)0;
 
-static void cb_btn_poll_pre_att(Fl_Check_Button* o, void*) {
+static void cb_poll_pre_att(Fl_Value_Input* o, void*) {
   progStatus.poll_pre_att = o->value();
 }
 
-Fl_Check_Button *btn_poll_squelch=(Fl_Check_Button *)0;
+Fl_Value_Input *poll_squelch=(Fl_Value_Input *)0;
 
-static void cb_btn_poll_squelch(Fl_Check_Button* o, void*) {
+static void cb_poll_squelch(Fl_Value_Input* o, void*) {
   progStatus.poll_squelch = o->value();
 }
 
-Fl_Check_Button *btn_poll_split=(Fl_Check_Button *)0;
+Fl_Value_Input *poll_split=(Fl_Value_Input *)0;
 
-static void cb_btn_poll_split(Fl_Check_Button* o, void*) {
+static void cb_poll_split(Fl_Value_Input* o, void*) {
   progStatus.poll_split = o->value();
 }
 
-Fl_Check_Button *btn_poll_noise=(Fl_Check_Button *)0;
+Fl_Value_Input *poll_noise=(Fl_Value_Input *)0;
 
-static void cb_btn_poll_noise(Fl_Check_Button* o, void*) {
+static void cb_poll_noise(Fl_Value_Input* o, void*) {
   progStatus.poll_noise = o->value();
 }
 
-Fl_Check_Button *btn_poll_nr=(Fl_Check_Button *)0;
+Fl_Value_Input *poll_nr=(Fl_Value_Input *)0;
 
-static void cb_btn_poll_nr(Fl_Check_Button* o, void*) {
-  progStatus.poll_nr = o->value();
+static void cb_poll_nr(Fl_Value_Input* o, void*) {
+  progStatus.poll_noise = o->value();
 }
 
-Fl_Value_Slider *poll_extras_interval=(Fl_Value_Slider *)0;
+Fl_Button *btnClearAddControls=(Fl_Button *)0;
 
-static void cb_poll_extras_interval(Fl_Value_Slider* o, void*) {
-  progStatus.poll_extras_interval = o->value();
+static void cb_btnClearAddControls(Fl_Button*, void*) {
+  poll_volume->value(0);
+poll_micgain->value(0);
+poll_rfgain->value(0);
+poll_power_control->value(0);
+poll_ifshift->value(0);
+poll_notch->value(0);
+poll_auto_notch->value(0);
+poll_pre_att->value(0);
+poll_squelch->value(0);
+poll_split->value(0);
+poll_noise->value(0);
+poll_nr->value(0);
+progStatus.poll_volume = 0;
+progStatus.poll_micgain = 0;
+progStatus.poll_rfgain = 0;
+progStatus.poll_power_control = 0;
+progStatus.poll_ifshift = 0;
+progStatus.poll_notch = 0;
+progStatus.poll_auto_notch = 0;
+progStatus.poll_pre_att = 0;
+progStatus.poll_squelch = 0;
+progStatus.poll_split = 0;
+progStatus.poll_noise = 0;
+progStatus.poll_nr = 0;
+}
+
+Fl_Value_Input *poll_all=(Fl_Value_Input *)0;
+
+static void cb_poll_all(Fl_Value_Input* o, void*) {
+  progStatus.poll_all = o->value();
+}
+
+Fl_Button *btnSetAllAdd=(Fl_Button *)0;
+
+static void cb_btnSetAllAdd(Fl_Button*, void*) {
+  poll_volume->value(progStatus.poll_all);
+poll_micgain->value(progStatus.poll_all);
+poll_rfgain->value(progStatus.poll_all);
+poll_power_control->value(progStatus.poll_all);
+poll_ifshift->value(progStatus.poll_all);
+poll_notch->value(progStatus.poll_all);
+poll_auto_notch->value(progStatus.poll_all);
+poll_pre_att->value(progStatus.poll_all);
+poll_squelch->value(progStatus.poll_all);
+poll_split->value(progStatus.poll_all);
+poll_noise->value(progStatus.poll_all);
+poll_nr->value(progStatus.poll_all);
+progStatus.poll_volume = progStatus.poll_all;
+progStatus.poll_micgain = progStatus.poll_all;
+progStatus.poll_rfgain = progStatus.poll_all;
+progStatus.poll_power_control = progStatus.poll_all;
+progStatus.poll_ifshift = progStatus.poll_all;
+progStatus.poll_notch = progStatus.poll_all;
+progStatus.poll_auto_notch = progStatus.poll_all;
+progStatus.poll_pre_att = progStatus.poll_all;
+progStatus.poll_squelch = progStatus.poll_all;
+progStatus.poll_split = progStatus.poll_all;
+progStatus.poll_noise = progStatus.poll_all;
+progStatus.poll_nr = progStatus.poll_all;
 }
 
 Fl_Group *tabSndCmd=(Fl_Group *)0;
@@ -2732,9 +2790,8 @@ Fl_Double_Window* XcvrDialog() {
             selectRig->when(FL_WHEN_RELEASE);
             selectRig->end();
           } // Fl_ComboBox* selectRig
-          { Fl_Counter* o = cntRigCatRetries = new Fl_Counter(123, 63, 75, 22, _("Retries"));
+          { Fl_Counter* o = cntRigCatRetries = new Fl_Counter(96, 63, 100, 22, _("Retries"));
             cntRigCatRetries->tooltip(_("Number of  times to resend\ncommand before giving up"));
-            cntRigCatRetries->type(1);
             cntRigCatRetries->minimum(1);
             cntRigCatRetries->maximum(10);
             cntRigCatRetries->step(1);
@@ -2743,9 +2800,8 @@ Fl_Double_Window* XcvrDialog() {
             cntRigCatRetries->align(FL_ALIGN_LEFT);
             o->value(progStatus.comm_retries);
           } // Fl_Counter* cntRigCatRetries
-          { Fl_Counter* o = cntRigCatTimeout = new Fl_Counter(123, 89, 75, 22, _("Retry intvl (ms)"));
+          { Fl_Counter* o = cntRigCatTimeout = new Fl_Counter(96, 89, 100, 22, _("Retry intvl"));
             cntRigCatTimeout->tooltip(_("Time between retries is msec"));
-            cntRigCatTimeout->type(1);
             cntRigCatTimeout->minimum(2);
             cntRigCatTimeout->maximum(200);
             cntRigCatTimeout->step(1);
@@ -2754,9 +2810,8 @@ Fl_Double_Window* XcvrDialog() {
             cntRigCatTimeout->align(FL_ALIGN_LEFT);
             o->value(progStatus.comm_timeout);
           } // Fl_Counter* cntRigCatTimeout
-          { Fl_Counter* o = cntRigCatWait = new Fl_Counter(123, 115, 75, 22, _("Cmd Intvl (ms)"));
-            cntRigCatWait->tooltip(_("Millseconds between sequential commands"));
-            cntRigCatWait->type(1);
+          { Fl_Counter* o = cntRigCatWait = new Fl_Counter(96, 115, 100, 22, _("Cmds"));
+            cntRigCatWait->tooltip(_("Wait millseconds between sequential commands"));
             cntRigCatWait->minimum(0);
             cntRigCatWait->maximum(100);
             cntRigCatWait->step(1);
@@ -2765,12 +2820,11 @@ Fl_Double_Window* XcvrDialog() {
             cntRigCatWait->align(FL_ALIGN_LEFT);
             o->value(progStatus.comm_wait);
           } // Fl_Counter* cntRigCatWait
-          { Fl_Counter* o = query_interval = new Fl_Counter(123, 141, 75, 22, _("qry intvl (ms):"));
-            query_interval->tooltip(_("Interval between Xvr queries"));
-            query_interval->type(1);
+          { Fl_Counter* o = query_interval = new Fl_Counter(96, 141, 100, 22, _("Poll intvl"));
+            query_interval->tooltip(_("Polling interval in msec"));
             query_interval->minimum(10);
             query_interval->maximum(5000);
-            query_interval->step(10);
+            query_interval->step(1);
             query_interval->value(50);
             query_interval->callback((Fl_Callback*)cb_query_interval);
             query_interval->align(FL_ALIGN_LEFT);
@@ -2983,149 +3037,193 @@ e"));
       } // Fl_Group* tabAux
       { tabPolling = new Fl_Group(2, 30, 476, 222, _("Polling"));
         tabPolling->hide();
-        { Fl_Group* o = new Fl_Group(4, 34, 474, 54, _("Meters - polled every time"));
+        { Fl_Group* o = new Fl_Group(4, 34, 474, 48, _("Meters"));
           o->box(FL_ENGRAVED_BOX);
           o->align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE);
-          { Fl_Check_Button* o = btn_poll_smeter = new Fl_Check_Button(13, 58, 104, 15, _("S meter"));
-            btn_poll_smeter->down_box(FL_DOWN_BOX);
-            btn_poll_smeter->value(1);
-            btn_poll_smeter->callback((Fl_Callback*)cb_btn_poll_smeter);
+          { Fl_Value_Input* o = poll_smeter = new Fl_Value_Input(13, 55, 30, 20, _("S-meter"));
+            poll_smeter->tooltip(_("Poll every Nth interval"));
+            poll_smeter->maximum(10);
+            poll_smeter->step(1);
+            poll_smeter->value(1);
+            poll_smeter->callback((Fl_Callback*)cb_poll_smeter);
+            poll_smeter->align(FL_ALIGN_RIGHT);
             o->value(progStatus.poll_smeter);
-          } // Fl_Check_Button* btn_poll_smeter
-          { Fl_Check_Button* o = btn_poll_pout = new Fl_Check_Button(132, 58, 104, 15, _("Power out"));
-            btn_poll_pout->down_box(FL_DOWN_BOX);
-            btn_poll_pout->value(1);
-            btn_poll_pout->callback((Fl_Callback*)cb_btn_poll_pout);
+          } // Fl_Value_Input* poll_smeter
+          { Fl_Value_Input* o = poll_pout = new Fl_Value_Input(132, 55, 30, 20, _("Power out"));
+            poll_pout->tooltip(_("Poll every Nth interval"));
+            poll_pout->maximum(10);
+            poll_pout->step(1);
+            poll_pout->value(1);
+            poll_pout->callback((Fl_Callback*)cb_poll_pout);
+            poll_pout->align(FL_ALIGN_RIGHT);
             o->value(progStatus.poll_pout);
-          } // Fl_Check_Button* btn_poll_pout
-          { Fl_Check_Button* o = btn_poll_swr = new Fl_Check_Button(252, 58, 104, 15, _("SWR"));
-            btn_poll_swr->down_box(FL_DOWN_BOX);
-            btn_poll_swr->value(1);
-            btn_poll_swr->callback((Fl_Callback*)cb_btn_poll_swr);
+          } // Fl_Value_Input* poll_pout
+          { Fl_Value_Input* o = poll_swr = new Fl_Value_Input(252, 55, 30, 20, _("SWR"));
+            poll_swr->tooltip(_("Poll every Nth interval"));
+            poll_swr->maximum(10);
+            poll_swr->step(1);
+            poll_swr->value(1);
+            poll_swr->callback((Fl_Callback*)cb_poll_swr);
+            poll_swr->align(FL_ALIGN_RIGHT);
             o->value(progStatus.poll_swr);
-          } // Fl_Check_Button* btn_poll_swr
-          { Fl_Check_Button* o = btn_poll_alc = new Fl_Check_Button(372, 58, 104, 15, _("ALC"));
-            btn_poll_alc->down_box(FL_DOWN_BOX);
-            btn_poll_alc->value(1);
-            btn_poll_alc->callback((Fl_Callback*)cb_btn_poll_alc);
+          } // Fl_Value_Input* poll_swr
+          { Fl_Value_Input* o = poll_alc = new Fl_Value_Input(372, 55, 30, 20, _("ALC"));
+            poll_alc->tooltip(_("Poll every Nth interval"));
+            poll_alc->maximum(10);
+            poll_alc->step(1);
+            poll_alc->value(1);
+            poll_alc->callback((Fl_Callback*)cb_poll_alc);
+            poll_alc->align(FL_ALIGN_RIGHT);
             o->value(progStatus.poll_alc);
-          } // Fl_Check_Button* btn_poll_alc
+          } // Fl_Value_Input* poll_alc
           o->end();
         } // Fl_Group* o
-        { Fl_Group* o = new Fl_Group(4, 88, 474, 44, _("Op\' Controls - polled every time"));
+        { Fl_Group* o = new Fl_Group(4, 82, 474, 48, _("Operating Controls"));
           o->box(FL_ENGRAVED_BOX);
           o->align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE);
-          { Fl_Check_Button* o = btn_poll_frequency = new Fl_Check_Button(13, 111, 101, 15, _("Frequency"));
-            btn_poll_frequency->tooltip(_("Frequency control"));
-            btn_poll_frequency->down_box(FL_DOWN_BOX);
-            btn_poll_frequency->value(1);
-            btn_poll_frequency->callback((Fl_Callback*)cb_btn_poll_frequency);
+          { Fl_Value_Input* o = poll_frequency = new Fl_Value_Input(13, 103, 30, 20, _("Frequency"));
+            poll_frequency->tooltip(_("Poll every Nth interval"));
+            poll_frequency->maximum(10);
+            poll_frequency->step(1);
+            poll_frequency->value(1);
+            poll_frequency->callback((Fl_Callback*)cb_poll_frequency);
+            poll_frequency->align(FL_ALIGN_RIGHT);
             o->value(progStatus.poll_frequency);
-          } // Fl_Check_Button* btn_poll_frequency
-          { Fl_Check_Button* o = btn_poll_mode = new Fl_Check_Button(132, 111, 101, 15, _("Mode"));
-            btn_poll_mode->tooltip(_("Mode selector"));
-            btn_poll_mode->down_box(FL_DOWN_BOX);
-            btn_poll_mode->value(1);
-            btn_poll_mode->callback((Fl_Callback*)cb_btn_poll_mode);
+          } // Fl_Value_Input* poll_frequency
+          { Fl_Value_Input* o = poll_mode = new Fl_Value_Input(132, 103, 30, 20, _("Mode"));
+            poll_mode->tooltip(_("Poll every Nth interval"));
+            poll_mode->maximum(10);
+            poll_mode->step(1);
+            poll_mode->value(1);
+            poll_mode->callback((Fl_Callback*)cb_poll_mode);
+            poll_mode->align(FL_ALIGN_RIGHT);
             o->value(progStatus.poll_mode);
-          } // Fl_Check_Button* btn_poll_mode
-          { Fl_Check_Button* o = btn_poll_bandwidth = new Fl_Check_Button(252, 111, 101, 15, _("Bandwidth"));
-            btn_poll_bandwidth->tooltip(_("Bandwidth selector"));
-            btn_poll_bandwidth->down_box(FL_DOWN_BOX);
-            btn_poll_bandwidth->value(1);
-            btn_poll_bandwidth->callback((Fl_Callback*)cb_btn_poll_bandwidth);
+          } // Fl_Value_Input* poll_mode
+          { Fl_Value_Input* o = poll_bandwidth = new Fl_Value_Input(252, 103, 30, 20, _("Bandwidth"));
+            poll_bandwidth->tooltip(_("Poll every Nth interval"));
+            poll_bandwidth->maximum(10);
+            poll_bandwidth->step(1);
+            poll_bandwidth->value(1);
+            poll_bandwidth->callback((Fl_Callback*)cb_poll_bandwidth);
+            poll_bandwidth->align(FL_ALIGN_RIGHT);
             o->value(progStatus.poll_bandwidth);
-          } // Fl_Check_Button* btn_poll_bandwidth
+          } // Fl_Value_Input* poll_bandwidth
           o->end();
         } // Fl_Group* o
-        { Fl_Group* o = new Fl_Group(4, 132, 474, 119, _("Additional Controls"));
+        { Fl_Group* o = new Fl_Group(4, 130, 474, 122, _("Additional Controls"));
           o->box(FL_ENGRAVED_FRAME);
           o->align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE);
-          { Fl_Check_Button* o = btn_poll_volume = new Fl_Check_Button(13, 153, 101, 15, _("Volume"));
-            btn_poll_volume->tooltip(_("Audio volume control"));
-            btn_poll_volume->down_box(FL_DOWN_BOX);
-            btn_poll_volume->callback((Fl_Callback*)cb_btn_poll_volume);
+          { Fl_Value_Input* o = poll_volume = new Fl_Value_Input(12, 150, 30, 20, _("Volume"));
+            poll_volume->tooltip(_("Poll every Nth interval"));
+            poll_volume->maximum(10);
+            poll_volume->step(1);
+            poll_volume->callback((Fl_Callback*)cb_poll_volume);
+            poll_volume->align(FL_ALIGN_RIGHT);
             o->value(progStatus.poll_volume);
-          } // Fl_Check_Button* btn_poll_volume
-          { Fl_Check_Button* o = btn_poll_micgain = new Fl_Check_Button(132, 153, 101, 15, _("Mic gain"));
-            btn_poll_micgain->tooltip(_("Mic gain control"));
-            btn_poll_micgain->down_box(FL_DOWN_BOX);
-            btn_poll_micgain->callback((Fl_Callback*)cb_btn_poll_micgain);
+          } // Fl_Value_Input* poll_volume
+          { Fl_Value_Input* o = poll_micgain = new Fl_Value_Input(131, 150, 30, 20, _("Mic gain"));
+            poll_micgain->tooltip(_("Poll every Nth interval"));
+            poll_micgain->maximum(10);
+            poll_micgain->step(1);
+            poll_micgain->callback((Fl_Callback*)cb_poll_micgain);
+            poll_micgain->align(FL_ALIGN_RIGHT);
             o->value(progStatus.poll_micgain);
-          } // Fl_Check_Button* btn_poll_micgain
-          { Fl_Check_Button* o = btn_poll_rfgain = new Fl_Check_Button(252, 153, 101, 15, _("RF gain"));
-            btn_poll_rfgain->tooltip(_("RF gain control"));
-            btn_poll_rfgain->down_box(FL_DOWN_BOX);
-            btn_poll_rfgain->callback((Fl_Callback*)cb_btn_poll_rfgain);
+          } // Fl_Value_Input* poll_micgain
+          { Fl_Value_Input* o = poll_rfgain = new Fl_Value_Input(251, 150, 30, 20, _("RF gain"));
+            poll_rfgain->tooltip(_("Poll every Nth interval"));
+            poll_rfgain->maximum(10);
+            poll_rfgain->step(1);
+            poll_rfgain->callback((Fl_Callback*)cb_poll_rfgain);
+            poll_rfgain->align(FL_ALIGN_RIGHT);
             o->value(progStatus.poll_rfgain);
-          } // Fl_Check_Button* btn_poll_rfgain
-          { Fl_Check_Button* o = btn_poll_power_control = new Fl_Check_Button(372, 153, 101, 15, _("Pwr control"));
-            btn_poll_power_control->tooltip(_("Power level control"));
-            btn_poll_power_control->down_box(FL_DOWN_BOX);
-            btn_poll_power_control->callback((Fl_Callback*)cb_btn_poll_power_control);
+          } // Fl_Value_Input* poll_rfgain
+          { Fl_Value_Input* o = poll_power_control = new Fl_Value_Input(371, 150, 30, 20, _("Power"));
+            poll_power_control->tooltip(_("Poll every Nth interval"));
+            poll_power_control->maximum(10);
+            poll_power_control->step(1);
+            poll_power_control->callback((Fl_Callback*)cb_poll_power_control);
+            poll_power_control->align(FL_ALIGN_RIGHT);
             o->value(progStatus.poll_power_control);
-          } // Fl_Check_Button* btn_poll_power_control
-          { Fl_Check_Button* o = btn_poll_ifshift = new Fl_Check_Button(13, 177, 101, 15, _("IF shift"));
-            btn_poll_ifshift->tooltip(_("IF shift control"));
-            btn_poll_ifshift->down_box(FL_DOWN_BOX);
-            btn_poll_ifshift->callback((Fl_Callback*)cb_btn_poll_ifshift);
+          } // Fl_Value_Input* poll_power_control
+          { Fl_Value_Input* o = poll_ifshift = new Fl_Value_Input(12, 175, 30, 20, _("IF shift"));
+            poll_ifshift->tooltip(_("Poll every Nth interval"));
+            poll_ifshift->maximum(10);
+            poll_ifshift->step(1);
+            poll_ifshift->callback((Fl_Callback*)cb_poll_ifshift);
+            poll_ifshift->align(FL_ALIGN_RIGHT);
             o->value(progStatus.poll_ifshift);
-          } // Fl_Check_Button* btn_poll_ifshift
-          { Fl_Check_Button* o = btn_poll_notch = new Fl_Check_Button(132, 177, 101, 15, _("Man\' Notch"));
-            btn_poll_notch->tooltip(_("Manual notch control"));
-            btn_poll_notch->down_box(FL_DOWN_BOX);
-            btn_poll_notch->callback((Fl_Callback*)cb_btn_poll_notch);
+          } // Fl_Value_Input* poll_ifshift
+          { Fl_Value_Input* o = poll_notch = new Fl_Value_Input(131, 175, 30, 20, _("Man\' Notch"));
+            poll_notch->tooltip(_("Poll every Nth interval"));
+            poll_notch->maximum(10);
+            poll_notch->step(1);
+            poll_notch->callback((Fl_Callback*)cb_poll_notch);
+            poll_notch->align(FL_ALIGN_RIGHT);
             o->value(progStatus.poll_notch);
-          } // Fl_Check_Button* btn_poll_notch
-          { Fl_Check_Button* o = btn_poll_auto_notch = new Fl_Check_Button(252, 177, 101, 15, _("Auto Notch"));
-            btn_poll_auto_notch->tooltip(_("Auto notch ON/OFF"));
-            btn_poll_auto_notch->down_box(FL_DOWN_BOX);
-            btn_poll_auto_notch->callback((Fl_Callback*)cb_btn_poll_auto_notch);
+          } // Fl_Value_Input* poll_notch
+          { Fl_Value_Input* o = poll_auto_notch = new Fl_Value_Input(251, 175, 30, 20, _("Auto notch"));
+            poll_auto_notch->tooltip(_("Poll every Nth interval"));
+            poll_auto_notch->maximum(10);
+            poll_auto_notch->step(1);
+            poll_auto_notch->callback((Fl_Callback*)cb_poll_auto_notch);
+            poll_auto_notch->align(FL_ALIGN_RIGHT);
             o->value(progStatus.poll_auto_notch);
-          } // Fl_Check_Button* btn_poll_auto_notch
-          { Fl_Check_Button* o = btn_poll_pre_att = new Fl_Check_Button(13, 201, 101, 15, _("Pre/Att"));
-            btn_poll_pre_att->tooltip(_("Preamp / Attenuator"));
-            btn_poll_pre_att->down_box(FL_DOWN_BOX);
-            btn_poll_pre_att->callback((Fl_Callback*)cb_btn_poll_pre_att);
+          } // Fl_Value_Input* poll_auto_notch
+          { Fl_Value_Input* o = poll_pre_att = new Fl_Value_Input(12, 200, 30, 20, _("Pre/Att"));
+            poll_pre_att->tooltip(_("Poll every Nth interval"));
+            poll_pre_att->maximum(10);
+            poll_pre_att->step(1);
+            poll_pre_att->callback((Fl_Callback*)cb_poll_pre_att);
+            poll_pre_att->align(FL_ALIGN_RIGHT);
             o->value(progStatus.poll_pre_att);
-          } // Fl_Check_Button* btn_poll_pre_att
-          { Fl_Check_Button* o = btn_poll_squelch = new Fl_Check_Button(132, 201, 101, 15, _("Squelch"));
-            btn_poll_squelch->tooltip(_("Squelch level control"));
-            btn_poll_squelch->down_box(FL_DOWN_BOX);
-            btn_poll_squelch->callback((Fl_Callback*)cb_btn_poll_squelch);
+          } // Fl_Value_Input* poll_pre_att
+          { Fl_Value_Input* o = poll_squelch = new Fl_Value_Input(131, 200, 30, 20, _("Squelch"));
+            poll_squelch->tooltip(_("Poll every Nth interval"));
+            poll_squelch->maximum(10);
+            poll_squelch->step(1);
+            poll_squelch->callback((Fl_Callback*)cb_poll_squelch);
+            poll_squelch->align(FL_ALIGN_RIGHT);
             o->value(progStatus.poll_squelch);
-          } // Fl_Check_Button* btn_poll_squelch
-          { Fl_Check_Button* o = btn_poll_split = new Fl_Check_Button(252, 201, 101, 15, _("Split VFO"));
-            btn_poll_split->tooltip(_("Vfo A/B split ops"));
-            btn_poll_split->down_box(FL_DOWN_BOX);
-            btn_poll_split->callback((Fl_Callback*)cb_btn_poll_split);
+          } // Fl_Value_Input* poll_squelch
+          { Fl_Value_Input* o = poll_split = new Fl_Value_Input(251, 200, 30, 20, _("Split"));
+            poll_split->tooltip(_("Poll every Nth interval"));
+            poll_split->maximum(10);
+            poll_split->step(1);
+            poll_split->callback((Fl_Callback*)cb_poll_split);
+            poll_split->align(FL_ALIGN_RIGHT);
             o->value(progStatus.poll_split);
-          } // Fl_Check_Button* btn_poll_split
-          { Fl_Check_Button* o = btn_poll_noise = new Fl_Check_Button(13, 226, 101, 15, _("Noise Blnk\'"));
-            btn_poll_noise->tooltip(_("Noise blanker"));
-            btn_poll_noise->down_box(FL_DOWN_BOX);
-            btn_poll_noise->callback((Fl_Callback*)cb_btn_poll_noise);
+          } // Fl_Value_Input* poll_split
+          { Fl_Value_Input* o = poll_noise = new Fl_Value_Input(13, 225, 30, 20, _("Noise"));
+            poll_noise->tooltip(_("Poll every Nth interval"));
+            poll_noise->maximum(10);
+            poll_noise->step(1);
+            poll_noise->callback((Fl_Callback*)cb_poll_noise);
+            poll_noise->align(FL_ALIGN_RIGHT);
             o->value(progStatus.poll_noise);
-          } // Fl_Check_Button* btn_poll_noise
-          { Fl_Check_Button* o = btn_poll_nr = new Fl_Check_Button(132, 226, 101, 15, _("Noise Red\'"));
-            btn_poll_nr->tooltip(_("Noise reduction"));
-            btn_poll_nr->down_box(FL_DOWN_BOX);
-            btn_poll_nr->callback((Fl_Callback*)cb_btn_poll_nr);
-            o->value(progStatus.poll_nr);
-          } // Fl_Check_Button* btn_poll_nr
-          { Fl_Value_Slider* o = poll_extras_interval = new Fl_Value_Slider(332, 223, 140, 21, _("poll every:"));
-            poll_extras_interval->tooltip(_("Poll these controls once every N meter polls"));
-            poll_extras_interval->type(1);
-            poll_extras_interval->color((Fl_Color)20);
-            poll_extras_interval->minimum(1);
-            poll_extras_interval->maximum(10);
-            poll_extras_interval->step(1);
-            poll_extras_interval->value(4);
-            poll_extras_interval->textsize(14);
-            poll_extras_interval->callback((Fl_Callback*)cb_poll_extras_interval);
-            poll_extras_interval->align(FL_ALIGN_LEFT);
-            o->value(progStatus.poll_extras_interval);
-          } // Fl_Value_Slider* poll_extras_interval
+          } // Fl_Value_Input* poll_noise
+          { Fl_Value_Input* o = poll_nr = new Fl_Value_Input(132, 225, 30, 20, _("Noise red\'"));
+            poll_nr->tooltip(_("Poll every Nth interval"));
+            poll_nr->maximum(10);
+            poll_nr->step(1);
+            poll_nr->callback((Fl_Callback*)cb_poll_nr);
+            poll_nr->align(FL_ALIGN_RIGHT);
+            o->value(progStatus.poll_noise);
+          } // Fl_Value_Input* poll_nr
+          { btnClearAddControls = new Fl_Button(330, 200, 70, 20, _("Clear all"));
+            btnClearAddControls->callback((Fl_Callback*)cb_btnClearAddControls);
+          } // Fl_Button* btnClearAddControls
+          { Fl_Value_Input* o = poll_all = new Fl_Value_Input(408, 225, 30, 20);
+            poll_all->tooltip(_("Poll every Nth interval"));
+            poll_all->maximum(10);
+            poll_all->step(1);
+            poll_all->value(4);
+            poll_all->callback((Fl_Callback*)cb_poll_all);
+            poll_all->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
+            o->value(progStatus.poll_all);
+          } // Fl_Value_Input* poll_all
+          { btnSetAllAdd = new Fl_Button(331, 225, 70, 20, _("Set all to"));
+            btnSetAllAdd->callback((Fl_Callback*)cb_btnSetAllAdd);
+          } // Fl_Button* btnSetAllAdd
           o->end();
         } // Fl_Group* o
         tabPolling->end();
