@@ -1,11 +1,41 @@
 
 
+=Version 1.2.5=
+
+2011-12-22  David Freese  <w1hkj@w1hkj.com>
+
+	e8402b8: Polling intervals
+
+2011-12-20  Terry Embry  <ftembry@users.berlios.de>
+
+	6d40a12: FT950 Noise reduction
+	e4b8c48: FT450 Noise Reduction
+
+2011-12-19  David Freese  <w1hkj@w1hkj.com>
+
+	ef680de: Extras Tabs
+	1f91ddd: Meter dialog
+
+2011-12-19  Terry Embry  <ftembry@users.berlios.de>
+
+	36d5fb5: FT450/950/2000/5000
+	a04ea4d: Volume mute
+	d35a878: Bandchange race fix
+
+
 =Version 1.2.4=
+
+	2843ca7: FT950 Mic Gain
+	25a229c: FT5000 mods
+	48a2dfb: FT-450 CW controls
 
 2011-12-16  David Freese  <w1hkj@w1hkj.com>
 
-	792fe6c: Slider size
-	2d46c8b: FT950
+	13b7e4f: Slider size
+
+2011-12-16  Terry Embry  <ftembry@users.berlios.de>
+
+	df51d9c: FT950
 
 2011-12-16  Terry Embry (KJ4EED)  <mrtembry@yahoo.com>
 
