@@ -17,9 +17,25 @@ decl {\#include "K3_ui.h"} {}
 
 decl {const int freq_sel_widths[]={110, 70, 70, 0};} {} 
 
+decl {Fl_Double_Window *meter_scale_dialog = (Fl_Double_Window *)0;} {} 
+
 decl {Fl_Double_Window *meter_filters = (Fl_Double_Window *)0;} {} 
 
-Function {Rig_window()} {} {
+decl {const char *mtr_scales[] = {
+"25 watt",
+"50 watt",
+"100 watt",
+"200 watt",
+"Auto scaled"};} {} 
+
+Function {select_power_meter_scales()} {open return_type void
+} {
+  code {if (!meter_scale_dialog) meter_scale_dialog = power_meter_scale_select();
+meter_scale_dialog->show();} {}
+} 
+
+Function {Rig_window()} {open
+} {
   Fl_Window {} {
     label Flrig open
     xywh {577 57 424 324} type Double align 80
@@ -372,8 +388,10 @@ btnA->value(0);}
           code1 {o->maximum(100);}
           class Fl_SigBar
         }
-        Fl_Box scalePower {
-          image {images/P100.xbm} xywh {3 99 206 20} box FLAT_BOX
+        Fl_Button scalePower {
+          callback {if (Fl::event_button() == FL_RIGHT_MOUSE)
+  select_power_meter_scales();}
+          tooltip {right-click to select power scale} image {images/P100.xbm} xywh {3 99 206 20} box FLAT_BOX down_box FLAT_BOX
         }
       }
     }
@@ -913,7 +931,7 @@ cb_line_out();}
 Function {DisplayDialog()} {} {
   Fl_Window {} {
     label {Flrig Colors} open
-    xywh {577 415 424 213} type Double hide
+    xywh {150 694 424 213} type Double hide
   } {
     Fl_Group {} {open
       xywh {2 2 218 70} box ENGRAVED_FRAME
@@ -1150,8 +1168,7 @@ Double-click ==> pick and close} xywh {66 2 250 133} type Hold labelfont 4 label
   }
 } 
 
-Function {XcvrDialog()} {open
-} {
+Function {XcvrDialog()} {} {
   Fl_Window {} {
     label {I/O Ports} open
     xywh {579 407 482 257} type Double visible
@@ -1160,7 +1177,7 @@ Function {XcvrDialog()} {open
       xywh {0 8 482 246}
     } {
       Fl_Group tabPrimary {
-        label Primary open selected
+        label Primary open
         xywh {2 30 475 222}
       } {
         Fl_Group {} {open
@@ -1703,6 +1720,58 @@ sldrFwdPwr->aging(o->value());}
       code0 {o->reverse(true);}
       code1 {o->value(progStatus.pwr_peak);}
       class Fl_Wheel_Value_Slider
+    }
+  }
+} 
+
+Function {power_meter_scale_select()} {open
+} {
+  Fl_Window {} {
+    label {Select Power Meter Scale} open
+    xywh {58 686 458 149} type Double visible
+  } {
+    Fl_Button sel_25 {
+      label {25 watt}
+      callback {progStatus.pwr_scale = 0;
+pwr_scale_description->value(mtr_scales[progStatus.pwr_scale]);
+set_power_controlImage(0);}
+      tooltip {Press to select} image {images/P25.xbm} xywh {8 7 218 40} color 215 labelsize 12 align 16
+    }
+    Fl_Button sel_100 {
+      label {100 watt}
+      callback {progStatus.pwr_scale = 2;
+pwr_scale_description->value(mtr_scales[progStatus.pwr_scale]);
+set_power_controlImage(0);}
+      tooltip {Press to select} image {images/P100.xbm} xywh {8 53 218 40} color 215 labelsize 12 align 16
+    }
+    Fl_Button sel_auto {
+      label {Auto scaled}
+      callback {progStatus.pwr_scale = 4;
+pwr_scale_description->value(mtr_scales[progStatus.pwr_scale]);
+if (selrig->has_power_control)
+  set_power_controlImage(sldrPOWER->value());
+else
+  set_power_controlImage(sldrFwdPwr->peak());} selected
+      tooltip {Press to select} xywh {8 100 218 40} color 215 labelsize 12 align 16
+    }
+    Fl_Button sel_50 {
+      label {50 watt}
+      callback {progStatus.pwr_scale = 1;
+pwr_scale_description->value(mtr_scales[progStatus.pwr_scale]);
+set_power_controlImage(0);}
+      tooltip {Press to select} image {images/P50.xbm} xywh {234 7 218 40} color 215 labelsize 12 align 16
+    }
+    Fl_Button sel_200 {
+      label {200 watt}
+      callback {progStatus.pwr_scale = 3;
+pwr_scale_description->value(mtr_scales[progStatus.pwr_scale]);
+set_power_controlImage(0);}
+      tooltip {Press to select} image {images/P200.xbm} xywh {234 53 218 40} color 215 labelsize 12 align 16
+    }
+    Fl_Output pwr_scale_description {
+      label {Meter face selected:}
+      xywh {234 115 218 25} align 5
+      code0 {o->value(mtr_scales[progStatus.pwr_scale]);}
     }
   }
 } 

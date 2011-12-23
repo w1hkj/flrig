@@ -8,7 +8,19 @@
 #include "support.h"
 #include "K3_ui.h"
 static const int freq_sel_widths[]={110, 70, 70, 0}; 
+static Fl_Double_Window *meter_scale_dialog = (Fl_Double_Window *)0; 
 static Fl_Double_Window *meter_filters = (Fl_Double_Window *)0; 
+static const char *mtr_scales[] = {
+"25 watt",
+"50 watt",
+"100 watt",
+"200 watt",
+"Auto scaled"}; 
+
+void select_power_meter_scales() {
+  if (!meter_scale_dialog) meter_scale_dialog = power_meter_scale_select();
+meter_scale_dialog->show();
+}
 
 static void cb_mnuExit(Fl_Menu_*, void*) {
   cbExit();
@@ -351,7 +363,12 @@ Fl_SigBar *sldrSWR=(Fl_SigBar *)0;
 
 Fl_SigBar *sldrFwdPwr=(Fl_SigBar *)0;
 
-Fl_Box *scalePower=(Fl_Box *)0;
+Fl_Button *scalePower=(Fl_Button *)0;
+
+static void cb_scalePower(Fl_Button*, void*) {
+  if (Fl::event_button() == FL_RIGHT_MOUSE)
+  select_power_meter_scales();
+}
 
 static unsigned char idata_P100[] =
 {252,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
@@ -1296,10 +1313,13 @@ Fl_Double_Window* Rig_window() {
           o->minimum(0);
           o->maximum(100);
         } // Fl_SigBar* sldrFwdPwr
-        { scalePower = new Fl_Box(3, 99, 206, 20);
+        { scalePower = new Fl_Button(3, 99, 206, 20);
+          scalePower->tooltip(_("right-click to select power scale"));
           scalePower->box(FL_FLAT_BOX);
+          scalePower->down_box(FL_FLAT_BOX);
           scalePower->image(image_P100);
-        } // Fl_Box* scalePower
+          scalePower->callback((Fl_Callback*)cb_scalePower);
+        } // Fl_Button* scalePower
         grpMeters->end();
       } // Fl_Group* grpMeters
       o->end();
@@ -3391,6 +3411,159 @@ Fl_Double_Window* MetersDialog() {
       o->reverse(true);
       o->value(progStatus.pwr_peak);
     } // Fl_Wheel_Value_Slider* sldr_pout_peak
+    o->end();
+  } // Fl_Double_Window* o
+  return w;
+}
+
+Fl_Button *sel_25=(Fl_Button *)0;
+
+static void cb_sel_25(Fl_Button*, void*) {
+  progStatus.pwr_scale = 0;
+pwr_scale_description->value(mtr_scales[progStatus.pwr_scale]);
+set_power_controlImage(0);
+}
+
+static unsigned char idata_P25[] =
+{252,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+255,255,255,255,255,255,255,7,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,
+68,68,68,68,68,68,68,68,68,4,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,
+68,68,68,68,68,68,68,68,68,4,4,0,64,0,0,4,0,64,0,0,4,0,64,0,0,4,0,64,0,0,4,0,
+64,0,0,4,4,0,64,0,0,4,0,64,0,0,4,0,64,0,0,4,0,64,0,0,4,0,64,0,0,4,4,0,0,0,0,4,
+0,0,0,0,4,0,0,0,0,4,0,0,0,0,4,0,0,0,0,4,4,0,0,0,0,4,0,0,0,0,4,0,0,0,0,4,0,0,0,
+0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+31,0,0,0,128,113,0,0,0,0,249,0,0,0,192,113,0,0,0,0,0,240,0,0,0,0,1,0,0,0,192,
+137,0,0,0,192,9,0,0,0,32,138,0,0,0,0,0,16,1,0,0,0,1,0,0,0,0,137,0,0,0,0,9,0,0,0,
+0,138,0,0,0,0,0,16,1,0,0,0,15,0,0,0,0,137,0,0,0,0,121,0,0,0,0,138,0,0,0,0,0,
+16,1,0,0,0,16,0,0,0,0,137,0,0,0,0,129,0,0,0,0,137,0,0,0,0,0,240,12,0,0,0,16,0,
+0,0,0,137,0,0,0,0,129,0,0,0,128,136,0,0,0,0,0,16,18,0,0,0,16,0,0,0,0,137,0,0,
+0,0,129,0,0,0,64,136,0,0,0,0,0,16,18,0,0,0,17,0,0,0,0,137,0,0,0,0,137,0,0,0,
+32,136,0,0,0,0,0,16,12,0,0,0,14,0,0,0,0,113,0,0,0,0,113,0,0,0,224,115,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+static Fl_Bitmap image_P25(idata_P25, 205, 18);
+
+Fl_Button *sel_100=(Fl_Button *)0;
+
+static void cb_sel_100(Fl_Button*, void*) {
+  progStatus.pwr_scale = 2;
+pwr_scale_description->value(mtr_scales[progStatus.pwr_scale]);
+set_power_controlImage(0);
+}
+
+Fl_Button *sel_auto=(Fl_Button *)0;
+
+static void cb_sel_auto(Fl_Button*, void*) {
+  progStatus.pwr_scale = 4;
+pwr_scale_description->value(mtr_scales[progStatus.pwr_scale]);
+if (selrig->has_power_control)
+  set_power_controlImage(sldrPOWER->value());
+else
+  set_power_controlImage(sldrFwdPwr->peak());
+}
+
+Fl_Button *sel_50=(Fl_Button *)0;
+
+static void cb_sel_50(Fl_Button*, void*) {
+  progStatus.pwr_scale = 1;
+pwr_scale_description->value(mtr_scales[progStatus.pwr_scale]);
+set_power_controlImage(0);
+}
+
+static unsigned char idata_P50[] =
+{252,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+255,255,255,255,255,255,255,7,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,
+68,68,68,68,68,68,68,68,68,4,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,68,
+68,68,68,68,68,68,68,68,68,4,4,0,64,0,0,4,0,64,0,0,4,0,64,0,0,4,0,64,0,0,4,0,
+64,0,0,4,4,0,64,0,0,4,0,64,0,0,4,0,64,0,0,4,0,64,0,0,4,0,64,0,0,4,4,0,64,0,0,4,
+0,64,0,0,4,0,64,0,0,4,0,64,0,0,4,0,64,0,0,4,4,0,0,0,0,4,0,0,0,0,4,0,0,0,0,4,0,
+0,0,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,113,0,0,0,192,113,0,0,0,192,113,0,0,0,0,113,0,0,0,0,0,240,0,0,0,192,137,0,0,
+0,32,138,0,0,0,32,138,0,0,0,128,137,0,0,0,0,0,16,1,0,0,0,137,0,0,0,0,138,0,0,
+0,0,138,0,0,0,64,137,0,0,0,0,0,16,1,0,0,0,137,0,0,0,0,138,0,0,0,0,138,0,0,0,
+64,137,0,0,0,0,0,16,1,0,0,0,137,0,0,0,0,137,0,0,0,128,137,0,0,0,32,137,0,0,0,0,
+0,240,12,0,0,0,137,0,0,0,128,136,0,0,0,0,138,0,0,0,224,139,0,0,0,0,0,16,18,0,
+0,0,137,0,0,0,64,136,0,0,0,0,138,0,0,0,0,137,0,0,0,0,0,16,18,0,0,0,137,0,0,0,
+32,136,0,0,0,32,138,0,0,0,0,137,0,0,0,0,0,16,12,0,0,0,113,0,0,0,224,115,0,0,0,
+192,113,0,0,0,0,113,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0};
+static Fl_Bitmap image_P50(idata_P50, 205, 18);
+
+Fl_Button *sel_200=(Fl_Button *)0;
+
+static void cb_sel_200(Fl_Button*, void*) {
+  progStatus.pwr_scale = 3;
+pwr_scale_description->value(mtr_scales[progStatus.pwr_scale]);
+set_power_controlImage(0);
+}
+
+static unsigned char idata_P200[] =
+{252,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+255,255,255,255,255,255,255,7,84,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,
+85,85,85,85,85,85,85,85,85,5,84,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,
+85,85,85,85,85,85,85,85,85,5,4,16,64,0,1,4,16,64,0,1,4,16,64,0,1,4,16,64,0,1,4,
+16,64,0,1,4,4,16,64,0,1,4,16,64,0,1,4,16,64,0,1,4,16,64,0,1,4,16,64,0,1,4,4,0,
+0,0,0,4,0,0,0,0,4,0,64,0,0,4,0,0,0,0,4,0,0,0,0,4,4,0,0,0,0,4,0,0,0,0,4,0,64,0,
+0,4,0,0,0,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,113,0,0,0,192,113,0,0,0,32,142,3,0,0,32,142,3,0,0,0,0,240,0,0,0,128,
+137,0,0,0,32,138,0,0,0,56,81,4,0,0,56,81,4,0,0,0,0,16,1,0,0,128,137,0,0,0,32,
+138,0,0,0,32,80,4,0,0,32,65,4,0,0,0,0,16,1,0,0,64,137,0,0,0,32,138,0,0,0,32,80,
+4,0,0,32,65,4,0,0,0,0,16,1,0,0,64,137,0,0,0,192,137,0,0,0,32,72,4,0,0,32,79,4,
+0,0,0,0,240,12,0,0,32,137,0,0,0,32,138,0,0,0,32,68,4,0,0,32,81,4,0,0,0,0,16,
+18,0,0,224,139,0,0,0,32,138,0,0,0,32,66,4,0,0,32,81,4,0,0,0,0,16,18,0,0,0,137,
+0,0,0,32,138,0,0,0,32,65,4,0,0,32,81,4,0,0,0,0,16,12,0,0,0,113,0,0,0,192,113,
+0,0,0,32,159,3,0,0,32,142,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0};
+static Fl_Bitmap image_P200(idata_P200, 205, 18);
+
+Fl_Output *pwr_scale_description=(Fl_Output *)0;
+
+Fl_Double_Window* power_meter_scale_select() {
+  Fl_Double_Window* w;
+  { Fl_Double_Window* o = new Fl_Double_Window(458, 149, _("Select Power Meter Scale"));
+    w = o;
+    { sel_25 = new Fl_Button(8, 7, 218, 40, _("25 watt"));
+      sel_25->tooltip(_("Press to select"));
+      sel_25->color((Fl_Color)215);
+      sel_25->image(image_P25);
+      sel_25->labelsize(12);
+      sel_25->callback((Fl_Callback*)cb_sel_25);
+      sel_25->align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE);
+    } // Fl_Button* sel_25
+    { sel_100 = new Fl_Button(8, 53, 218, 40, _("100 watt"));
+      sel_100->tooltip(_("Press to select"));
+      sel_100->color((Fl_Color)215);
+      sel_100->image(image_P100);
+      sel_100->labelsize(12);
+      sel_100->callback((Fl_Callback*)cb_sel_100);
+      sel_100->align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE);
+    } // Fl_Button* sel_100
+    { sel_auto = new Fl_Button(8, 100, 218, 40, _("Auto scaled"));
+      sel_auto->tooltip(_("Press to select"));
+      sel_auto->color((Fl_Color)215);
+      sel_auto->labelsize(12);
+      sel_auto->callback((Fl_Callback*)cb_sel_auto);
+      sel_auto->align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE);
+    } // Fl_Button* sel_auto
+    { sel_50 = new Fl_Button(234, 7, 218, 40, _("50 watt"));
+      sel_50->tooltip(_("Press to select"));
+      sel_50->color((Fl_Color)215);
+      sel_50->image(image_P50);
+      sel_50->labelsize(12);
+      sel_50->callback((Fl_Callback*)cb_sel_50);
+      sel_50->align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE);
+    } // Fl_Button* sel_50
+    { sel_200 = new Fl_Button(234, 53, 218, 40, _("200 watt"));
+      sel_200->tooltip(_("Press to select"));
+      sel_200->color((Fl_Color)215);
+      sel_200->image(image_P200);
+      sel_200->labelsize(12);
+      sel_200->callback((Fl_Callback*)cb_sel_200);
+      sel_200->align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE);
+    } // Fl_Button* sel_200
+    { Fl_Output* o = pwr_scale_description = new Fl_Output(234, 115, 218, 25, _("Meter face selected:"));
+      pwr_scale_description->align(FL_ALIGN_TOP_LEFT);
+      o->value(mtr_scales[progStatus.pwr_scale]);
+    } // Fl_Output* pwr_scale_description
     o->end();
   } // Fl_Double_Window* o
   return w;

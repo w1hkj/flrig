@@ -1492,23 +1492,22 @@ void setMicGainControl(void* d)
 
 void set_power_controlImage(double pwr)
 {
-	if (!pwr) return;
-	if (pwr < 26.0) {
+	if (progStatus.pwr_scale == 0 || (progStatus.pwr_scale == 4 && pwr < 26.0)) {
 		scalePower->image(image_p25);
 		sldrFwdPwr->maximum(25.0);
 		sldrFwdPwr->minimum(0.0);
 	}
-	else if (pwr < 51.0) {
+	else if (progStatus.pwr_scale == 1 || (progStatus.pwr_scale == 4 && pwr < 51.0)) {
 		scalePower->image(image_p50);
 		sldrFwdPwr->maximum(50.0);
 		sldrFwdPwr->minimum(0.0);
 	}
-	else if (pwr < 101.0) {
+	else if (progStatus.pwr_scale == 2 || (progStatus.pwr_scale == 4 && pwr < 101.0)) {
 		scalePower->image(image_p100);
 		sldrFwdPwr->maximum(100.0);
 		sldrFwdPwr->minimum(0.0);
 	}
-	else {
+	else if (progStatus.pwr_scale >= 3) {
 		scalePower->image(image_p200);
 		sldrFwdPwr->maximum(200.0);
 		sldrFwdPwr->minimum(0.0);
@@ -1604,10 +1603,10 @@ void updateFwdPwr(void *d)
 	if (!sldrFwdPwr->visible()) {
 		sldrFwdPwr->show();
 	}
-	if (!selrig->has_power_control)
-		set_power_controlImage(power);
 	sldrFwdPwr->value(power);
 	sldrFwdPwr->redraw();
+	if (!selrig->has_power_control)
+		set_power_controlImage(sldrFwdPwr->peak());
 }
 
 void updateSquelch(void *d)

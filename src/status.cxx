@@ -133,6 +133,7 @@ status progStatus = {
 	5,			// int rx_peak;
 	5,			// int pwr_avg;
 	5,			// int pwr_peak;
+	4,			// int pwr_scale ==> Autoselect
 
 //tt550 controls
 	80,			// tt550_line_out;
@@ -339,6 +340,7 @@ void status::saveLastState()
 	spref.set("rx_peak", rx_peak);
 	spref.set("pwr_avg", pwr_avg);
 	spref.set("pwr_peak", pwr_peak);
+	spref.set("pwr_scale", pwr_scale);
 
 	if (rig_nbr == TT550) {
 		spref.set("tt550_line_out", tt550_line_out);
@@ -581,6 +583,7 @@ bool status::loadXcvrState(const char *xcvr)
 		spref.get("rx_peak", rx_peak, rx_peak);
 		spref.get("pwr_avg", pwr_avg, pwr_avg);
 		spref.get("pwr_peak", pwr_peak, pwr_peak);
+		spref.get("pwr_scale", pwr_scale, pwr_scale);
 
 		if (rig_nbr == TT550) {
 			spref.get("tt550_line_out", tt550_line_out, tt550_line_out);

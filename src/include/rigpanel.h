@@ -3,6 +3,7 @@
 #ifndef rigpanel_h
 #define rigpanel_h
 #include <FL/Fl.H>
+void select_power_meter_scales();
 #include <FL/Fl_Double_Window.H>
 #include <stdlib.h>
 #include <FL/Fl_Menu_Bar.H>
@@ -57,7 +58,7 @@ extern Fl_SigBar *sldrRcvSignal;
 extern Fl_SigBar *sldrALC;
 extern Fl_SigBar *sldrSWR;
 extern Fl_SigBar *sldrFwdPwr;
-extern Fl_Box *scalePower;
+extern Fl_Button *scalePower;
 extern Fl_Box *boxControl;
 extern Fl_Light_Button *btnAuxRTS;
 extern Fl_Light_Button *btnAuxDTR;
@@ -273,4 +274,11 @@ extern Fl_Wheel_Value_Slider *sldr_smeter_peak;
 extern Fl_Wheel_Value_Slider *sldr_pout_avg;
 extern Fl_Wheel_Value_Slider *sldr_pout_peak;
 Fl_Double_Window* MetersDialog();
+extern Fl_Button *sel_25;
+extern Fl_Button *sel_100;
+extern Fl_Button *sel_auto;
+extern Fl_Button *sel_50;
+extern Fl_Button *sel_200;
+extern Fl_Output *pwr_scale_description;
+Fl_Double_Window* power_meter_scale_select();
 #endif
