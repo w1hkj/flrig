@@ -741,7 +741,7 @@ cb_cw_spot_tone();
 Fl_Counter *cnt_cw_qsk=(Fl_Counter *)0;
 
 static void cb_cnt_cw_qsk(Fl_Counter* o, void*) {
-  progStatus.cw_qsk = (int)o->value();
+  progStatus.cw_qsk = o->value();
 cb_cw_qsk();
 }
 
@@ -1759,7 +1759,7 @@ Fl_Double_Window* Rig_window() {
           cnt_cw_qsk->step(1);
           cnt_cw_qsk->value(20);
           cnt_cw_qsk->callback((Fl_Callback*)cb_cnt_cw_qsk);
-          o->value(progStatus.tt550_cw_qsk);
+          o->value(progStatus.cw_qsk);
         } // Fl_Counter* cnt_cw_qsk
         { Fl_Counter* o = cnt_cw_weight = new Fl_Counter(209, 280, 70, 22, _("Weight"));
           cnt_cw_weight->type(1);

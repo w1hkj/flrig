@@ -321,7 +321,7 @@ public:
 		min = 5; max = 50; } // default for FT950
 	virtual void enable_keyer() {}
 	virtual void set_cw_qsk() {}
-	virtual void get_cw_qsk_min_max_step(int &min, int &max, int &step) {
+	virtual void get_cw_qsk_min_max_step(double &min, double &max, double &step) {
 		min = 15; max = 30; step = 5; } // default for FT950
 	virtual void set_cw_vol() {}
 	virtual bool set_cw_spot() {return false;}
@@ -343,6 +343,8 @@ public:
 	virtual void set_mon_vol() {}
 	virtual void set_squelch_level() {}
 	virtual void set_compression() {}
+	virtual void get_comp_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 100; step = 1; }
 	virtual void set_auto_notch(int v) {}
 	virtual int  get_auto_notch() {return 0;}
 	virtual void tuner_bypass() {}
