@@ -106,7 +106,7 @@ status progStatus = {
 	0,			// int  cw_spot;
 	false,		// bool spot_onoff;
 	700,		// int  cw_spot_tone;
-	20,			// int  cw_qsk;
+	2.0,		// int  cw_qsk;
 	false,		// bool enable_keyer;
 	false,		// int  vox_onoff;
 	10,			// int  vox_gain;

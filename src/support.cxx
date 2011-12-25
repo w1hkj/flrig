@@ -2094,7 +2094,7 @@ void initXcvrTab()
 				selrig->set_cw_wpm();
 			} else cnt_cw_wpm->hide();
 			if (selrig->has_cw_qsk) {
-				int min, max, step;
+				double min, max, step;
 				selrig->get_cw_qsk_min_max_step(min, max, step);
 				cnt_cw_qsk->minimum(min);
 				cnt_cw_qsk->maximum(max);
@@ -2198,6 +2198,11 @@ void initXcvrTab()
 			} else
 				btnCompON->hide();
 			if (selrig->has_compression) {
+				int min, max, step;
+				selrig->get_comp_min_max_step(min, max, step);
+				cnt_compression->minimum(min);
+				cnt_compression->maximum(max);
+				cnt_compression->step(step);
 				cnt_compression->show();
 				cnt_compression->value(progStatus.compression);
 				selrig->set_compression();

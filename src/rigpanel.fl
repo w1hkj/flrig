@@ -694,7 +694,7 @@ cb_tt550_setXmtBW();}
       xywh {1 252 422 70} selection_color 50
     } {
       Fl_Group genericBands {
-        label Bands open
+        label Bands open selected
         xywh {2 271 420 49}
       } {
         Fl_Button btnBandSelect_1 {
@@ -778,10 +778,10 @@ cb_cw_spot_tone();}
         }
         Fl_Counter cnt_cw_qsk {
           label {QSK dly}
-          callback {progStatus.cw_qsk = (int)o->value();
+          callback {progStatus.cw_qsk = o->value();
 cb_cw_qsk();}
           tooltip {QSK delay (msec)} xywh {136 280 70 22} type Simple minimum 0 maximum 100 step 1 value 20
-          code0 {o->value(progStatus.tt550_cw_qsk);}
+          code0 {o->value(progStatus.cw_qsk);}
         }
         Fl_Counter cnt_cw_weight {
           label Weight
@@ -1728,7 +1728,7 @@ Function {power_meter_scale_select()} {open
 } {
   Fl_Window {} {
     label {Select Power Meter Scale} open
-    xywh {58 686 458 149} type Double visible
+    xywh {651 754 458 149} type Double visible
   } {
     Fl_Button sel_25 {
       label {25 watt}
@@ -1751,7 +1751,7 @@ pwr_scale_description->value(mtr_scales[progStatus.pwr_scale]);
 if (selrig->has_power_control)
   set_power_controlImage(sldrPOWER->value());
 else
-  set_power_controlImage(sldrFwdPwr->peak());} selected
+  set_power_controlImage(sldrFwdPwr->peak());}
       tooltip {Press to select} xywh {8 100 218 40} color 215 labelsize 12 align 16
     }
     Fl_Button sel_50 {

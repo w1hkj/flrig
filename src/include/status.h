@@ -92,7 +92,7 @@ struct status {
 	int		cw_spot;
 	bool	spot_onoff;
 	int		cw_spot_tone;
-	int		cw_qsk;
+	double	cw_qsk;
 	bool	enable_keyer;
 	bool	vox_onoff;
 	int		vox_gain;
