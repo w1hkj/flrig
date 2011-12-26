@@ -54,6 +54,22 @@ const char *IC7600_am_bws[] = {
 const char *IC7600_fm_bws[] = {
 "FIXED", NULL };
 
+static GUI IC7600_widgets[]= {
+	{ (Fl_Widget *)btnVol, 2, 125,  50 },
+	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },
+	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },
+	{ (Fl_Widget *)sldrSQUELCH, 54, 165, 156 },
+	{ (Fl_Widget *)btnNR, 2, 185,  50 },
+	{ (Fl_Widget *)sldrNR, 54, 185, 156 },
+	{ (Fl_Widget *)btnIFsh, 214, 125,  50 },
+	{ (Fl_Widget *)sldrIFSHIFT, 266, 125, 156 },
+	{ (Fl_Widget *)btnNotch, 214, 145,  50 },
+	{ (Fl_Widget *)sldrNOTCH, 266, 145, 156 },
+	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },
+	{ (Fl_Widget *)sldrPOWER, 266, 185, 156 },
+	{ (Fl_Widget *)NULL, 0, 0, 0 }
+};
+
 RIG_IC7600::RIG_IC7600() {
 	defaultCIV = 0x7A;
 	name_ = IC7600name_;
@@ -62,6 +78,22 @@ RIG_IC7600::RIG_IC7600() {
 	_mode_type = IC7600_mode_type;
 	adjustCIV(defaultCIV);
 
+	widgets = IC7600_widgets;
+
+	has_extras =
+
+	has_cw_wpm =
+	has_cw_spot_tone =
+	has_cw_qsk =
+
+	has_vox_onoff =
+	has_vox_gain =
+	has_vox_anti =
+	has_vox_hang =
+
+	has_compON =
+	has_compression =
+
 	has_micgain_control =
 	has_bandwidth_control = true;
 };
@@ -69,6 +101,22 @@ RIG_IC7600::RIG_IC7600() {
 //======================================================================
 // IC7600 unique commands
 //======================================================================
+
+void RIG_IC7600::initialize()
+{
+	IC7600_widgets[0].W = btnVol;
+	IC7600_widgets[1].W = sldrVOLUME;
+	IC7600_widgets[2].W = sldrRFGAIN;
+	IC7600_widgets[3].W = sldrSQUELCH;
+	IC7600_widgets[4].W = btnNR;
+	IC7600_widgets[5].W = sldrNR;
+	IC7600_widgets[6].W = btnIFsh;
+	IC7600_widgets[7].W = sldrIFSHIFT;
+	IC7600_widgets[8].W = btnNotch;
+	IC7600_widgets[9].W = sldrNOTCH;
+	IC7600_widgets[10].W = sldrMICGAIN;
+	IC7600_widgets[11].W = sldrPOWER;
+}
 
 void RIG_IC7600::selectA()
 {
@@ -390,4 +438,98 @@ int RIG_IC7600::get_attenuator()
 		}
 	}
 	return atten_level;
+}
+
+void RIG_IC7600::set_compression()
+{
+	if (progStatus.compON) {
+		cmd.assign(pre_to).append("\x14\x0E");
+		cmd.append(to_bcd(progStatus.compression * 255 / 100, 3));
+		cmd.append( post );
+		waitFB("set comp");
+
+		cmd = pre_to;
+		cmd.append("\x16\x44");
+		cmd += '\x01';
+		cmd.append(post);
+		waitFB("set Comp ON");
+
+	} else{
+		cmd.assign(pre_to).append("\x16\x44");
+		cmd += '\x00';
+		cmd.append(post);
+		waitFB("set Comp OFF");
+	}
+}
+
+void RIG_IC7600::set_vox_onoff()
+{
+	if (progStatus.vox_onoff) {
+		cmd.assign(pre_to).append("\x16\x46\x01").append(post);
+		waitFB("set vox ON");
+	} else {
+		cmd.assign(pre_to).append("\x16\x46\x00").append(post);
+		waitFB("set vox OFF");
+	}
+}
+
+void RIG_IC7600::set_vox_gain()
+{
+	cmd.assign(pre_to).append("\x1A\x03\x09");
+	cmd.append(to_bcd((int)(progStatus.vox_gain * 2.55), 3));
+	cmd.append( post );
+	waitFB("SET vox gain");
+}
+
+void RIG_IC7600::set_vox_anti()
+{
+	cmd.assign(pre_to).append("\x1A\x03\x10");
+	cmd.append(to_bcd((int)(progStatus.vox_anti * 2.55), 3));
+	cmd.append( post );
+	waitFB("SET anti-vox");
+}
+
+void RIG_IC7600::set_vox_hang()
+{
+	cmd.assign(pre_to).append("\x1A\x03\x11");
+	cmd.append(to_bcd((int)(progStatus.vox_hang * 2.55), 3));
+	cmd.append( post );
+	waitFB("SET vox hang");
+}
+
+// CW controls
+
+void RIG_IC7600::set_cw_wpm()
+{
+	cmd.assign(pre_to).append("\x14\x0C");
+	cmd.append(to_bcd(round((progStatus.cw_wpm - 6) * 255 / (60 - 6)), 3));
+	cmd.append( post );
+	waitFB("SET cw wpm");
+}
+
+void RIG_IC7600::set_cw_qsk()
+{
+	int n = round(progStatus.cw_qsk * 10);
+	cmd.assign(pre_to).append("\x14\x0F");
+	cmd.append(to_bcd(n, 3));
+	cmd.append(post);
+	waitFB("Set cw qsk delay");
+}
+
+void RIG_IC7600::set_cw_spot_tone()
+{
+	cmd.assign(pre_to).append("\x14\x09 ");
+	int n = round((progStatus.cw_spot_tone - 300) * 255.0 / 600.0);
+	if (n > 255) n = 255;
+	if (n < 0) n = 0;
+	cmd.append(to_bcd(n, 3)).append(post);
+	waitFB("SET cw spot tone");
+}
+
+void RIG_IC7600::set_cw_vol()
+{
+	cmd.assign(pre_to).append("\x1A\x03\0x06");
+	cmd.append(to_bcd((int)(progStatus.cw_vol * 2.55), 3));
+	cmd.append( post );
+	waitFB("SET cw sidetone volume");
 }
