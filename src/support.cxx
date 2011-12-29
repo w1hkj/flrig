@@ -701,7 +701,7 @@ void * serial_thread_loop(void *d)
 					read_info();
 
 				if (progStatus.poll_frequency)
-					if (poll_nbr % progStatus.poll_frequency) read_vfo();
+					if (!(poll_nbr % progStatus.poll_frequency)) read_vfo();
 				if (!quePTT.empty()) continue;
 				if (progStatus.poll_mode)
 					if (!(poll_nbr % progStatus.poll_mode)) read_mode();
