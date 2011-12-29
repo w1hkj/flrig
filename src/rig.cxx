@@ -28,12 +28,15 @@
 #endif
 
 #include <FL/filename.H>
-#ifdef __MINGW32__
-#  undef dirent
-#endif
 
-//#include "fileselect.h"
-#include <dirent.h>
+#ifdef __MINGW32__
+#	if FLRIG_FLTK_API_MAJOR == 1 && FLRIG_FLTK_API_MINOR < 3
+#		undef dirent
+#		include <dirent.h>
+#	endif
+#else
+#	include <dirent.h>
+#endif
 
 #include <FL/x.H>
 #include <FL/Fl_Pixmap.H>
