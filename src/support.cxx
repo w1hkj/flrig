@@ -1753,6 +1753,10 @@ void cbExit()
 
 	selrig->shutdown();
 
+	// xcvr auto off
+	if (selrig->has_xcvr_auto_on_off)
+		selrig->set_xcvr_auto_off();
+
 	// close down the serial port
 	RigSerial.ClosePort();
 
@@ -2228,7 +2232,7 @@ void initXcvrTab()
 			}
 		}
 
-		if (selrig->has_vfo_adj) {
+		if (selrig->has_vfo_adj || selrig->has_xcvr_auto_on_off) {
 			genericMisc->resize(
 				tabsGeneric->x() + 2,
 				tabsGeneric->y() + 19,
@@ -2242,6 +2246,17 @@ void initXcvrTab()
 			} else
 				cnt_vfo_adj->hide();
 			cnt_line_out->hide(); // enable if a lineout control is used by any transceiver
+
+			if (selrig->has_xcvr_auto_on_off) {
+				btn_xcvr_auto_on->value(progStatus.xcvr_auto_on);
+				btn_xcvr_auto_off->value(progStatus.xcvr_auto_off);
+				btn_xcvr_auto_on->show();
+				btn_xcvr_auto_off->show();
+			} else {
+				btn_xcvr_auto_on->hide();
+				btn_xcvr_auto_off->hide();
+			}
+
 		}
 
 		tabsGeneric->redraw();
@@ -2309,6 +2324,10 @@ void initRig()
 
 // disable the serial thread
 	pthread_mutex_lock(&mutex_serial);
+
+// Xcvr Auto Power on as soon as possible
+	if (selrig->has_xcvr_auto_on_off)
+		selrig->set_xcvr_auto_on();
 
 	selrig->initialize();
 	if (flrig_abort) goto failed;

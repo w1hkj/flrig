@@ -37,6 +37,7 @@ rigbase::rigbase()
 	defaultCIV = 0;
 	USBaudio = false;
 
+	has_xcvr_auto_on_off =
 	comm_echo =
 	has_rit =
 	has_xit =

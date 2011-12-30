@@ -923,6 +923,18 @@ cb_line_out();}
           callback {cb_special();}
           xywh {242 279 74 20}
         }
+        Fl_Check_Button btn_xcvr_auto_on {
+          label {Rig autOn}
+          callback {progStatus.xcvr_auto_on = o->value();}
+          tooltip {Auto Turn Rig On with Flrig startup} xywh {325 280 95 15} down_box DOWN_BOX
+          code0 {o->value(progStatus.xcvr_auto_on);}
+        }
+        Fl_Check_Button btn_xcvr_auto_off {
+          label {Rig autOff}
+          callback {progStatus.xcvr_auto_off = o->value();}
+          tooltip {Auto Turn Rig Off with Flrig exit} xywh {325 300 95 15} down_box DOWN_BOX
+          code0 {o->value(progStatus.xcvr_auto_off);}
+        }
       }
     }
   }

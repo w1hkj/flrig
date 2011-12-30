@@ -109,6 +109,8 @@ public:
 	void set_noise_reduction(int val);
 	int  get_noise_reduction();
 
+	void set_xcvr_auto_on();
+	void set_xcvr_auto_off();
 };
 
 
