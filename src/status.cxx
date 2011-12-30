@@ -238,7 +238,10 @@ status progStatus = {
 	"gtk+",		// string ui_scheme
 
 	"7362",		// string server_port
-	"127.0.0.1"	// string server_address
+	"127.0.0.1",// string server_address
+
+	false,		// bool xcvr auto on
+	false		// bool xcvr auto off
 
 };
 
@@ -475,6 +478,9 @@ void status::saveLastState()
 
 	spref.set("server_port", server_port.c_str());
 	spref.set("server_addr", server_addr.c_str());
+
+	spref.set("xcvr_auto_on", xcvr_auto_on);
+	spref.set("xcvr_auto_off", xcvr_auto_off);
 
 }
 
@@ -724,6 +730,8 @@ bool status::loadXcvrState(const char *xcvr)
 		spref.get("server_addr", defbuffer, "127.0.0.1", 199);
 		server_addr = defbuffer;
 
+		if (spref.get("xcvr_auto_on", i, i)) xcvr_auto_on = i;
+		if (spref.get("xcvr_auto_off", i, i)) xcvr_auto_off = i;
 	}
 
 	Fl_Color bgclr = fl_rgb_color(bg_red, bg_green, bg_blue);

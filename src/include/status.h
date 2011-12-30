@@ -231,6 +231,9 @@ struct status {
 	string server_port;
 	string server_addr;
 
+	bool	xcvr_auto_on;
+	bool	xcvr_auto_off;
+
 	void saveLastState();
 	void loadLastState();
 	bool loadXcvrState(const char *);

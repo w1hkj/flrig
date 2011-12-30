@@ -871,6 +871,18 @@ static void cb_btnSpecial(Fl_Light_Button*, void*) {
   cb_special();
 }
 
+Fl_Check_Button *btn_xcvr_auto_on=(Fl_Check_Button *)0;
+
+static void cb_btn_xcvr_auto_on(Fl_Check_Button* o, void*) {
+  progStatus.xcvr_auto_on = o->value();
+}
+
+Fl_Check_Button *btn_xcvr_auto_off=(Fl_Check_Button *)0;
+
+static void cb_btn_xcvr_auto_off(Fl_Check_Button* o, void*) {
+  progStatus.xcvr_auto_off = o->value();
+}
+
 Fl_Double_Window* Rig_window() {
   Fl_Double_Window* w;
   { Fl_Double_Window* o = new Fl_Double_Window(424, 324, _("Flrig"));
@@ -1911,6 +1923,18 @@ Fl_Double_Window* Rig_window() {
         { btnSpecial = new Fl_Light_Button(242, 279, 74, 20, _("Special"));
           btnSpecial->callback((Fl_Callback*)cb_btnSpecial);
         } // Fl_Light_Button* btnSpecial
+        { Fl_Check_Button* o = btn_xcvr_auto_on = new Fl_Check_Button(325, 280, 95, 15, _("Rig autOn"));
+          btn_xcvr_auto_on->tooltip(_("Auto Turn Rig On with Flrig startup"));
+          btn_xcvr_auto_on->down_box(FL_DOWN_BOX);
+          btn_xcvr_auto_on->callback((Fl_Callback*)cb_btn_xcvr_auto_on);
+          o->value(progStatus.xcvr_auto_on);
+        } // Fl_Check_Button* btn_xcvr_auto_on
+        { Fl_Check_Button* o = btn_xcvr_auto_off = new Fl_Check_Button(325, 300, 95, 15, _("Rig autOff"));
+          btn_xcvr_auto_off->tooltip(_("Auto Turn Rig Off with Flrig exit"));
+          btn_xcvr_auto_off->down_box(FL_DOWN_BOX);
+          btn_xcvr_auto_off->callback((Fl_Callback*)cb_btn_xcvr_auto_off);
+          o->value(progStatus.xcvr_auto_off);
+        } // Fl_Check_Button* btn_xcvr_auto_off
         genericMisc->end();
       } // Fl_Group* genericMisc
       tabsGeneric->end();

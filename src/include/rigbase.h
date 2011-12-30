@@ -115,6 +115,7 @@ public:
 	int  if_shift_step;
 	int  if_shift_mid;
 
+	bool has_xcvr_auto_on_off;
 	bool has_a2b;
 	bool has_vfo_adj;
 	bool has_rit;
@@ -353,6 +354,8 @@ public:
 	virtual void set_nb_level() {}
 	virtual void set_special(int v) {}
 	virtual void set_band_selection(int v) {}
+	virtual void set_xcvr_auto_on() {}
+	virtual void set_xcvr_auto_off() {}
 
 	virtual void adjustCIV(uchar adr) {}
 

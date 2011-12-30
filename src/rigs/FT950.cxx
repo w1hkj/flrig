@@ -97,6 +97,7 @@ RIG_FT950::RIG_FT950() {
 	A.iBW = B.iBW = bwA = bwB = def_bw = 2;
 	A.freq = B.freq = freqA = freqB = def_freq = 14070000;
 
+	has_xcvr_auto_on_off =
 	has_split =
 	has_band_selection =
 	has_noise_reduction =
@@ -1114,4 +1115,29 @@ int  RIG_FT950::get_noise_reduction()
 	if (p == string::npos) return 0;
 	val = replystr[p+3] - '0';
 	return val;
+}
+
+void RIG_FT950::set_xcvr_auto_on()
+{
+	if (!progStatus.xcvr_auto_on) return;
+
+	cmd = rsp = "PS";
+	cmd.append(";");
+	waitN(5, 100, "Test: Is Rig ON", ASC);
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) {	// rig is off, power on
+		cmd = "PS1;";
+		sendCommand(cmd);
+		MilliSleep(1500);	// 1.0 < T < 2.0 seconds
+		sendCommand(cmd);
+		MilliSleep(3000);	// Wait for rig startup?  Maybe not needed.
+	}
+}
+
+void RIG_FT950::set_xcvr_auto_off()
+{
+	if (!progStatus.xcvr_auto_off) return;
+
+	cmd = "PS0;";
+	sendCommand(cmd);
 }

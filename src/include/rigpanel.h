@@ -148,6 +148,8 @@ extern Fl_Group *genericMisc;
 extern Fl_Counter *cnt_vfo_adj;
 extern Fl_Counter *cnt_line_out;
 extern Fl_Light_Button *btnSpecial;
+extern Fl_Check_Button *btn_xcvr_auto_on;
+extern Fl_Check_Button *btn_xcvr_auto_off;
 Fl_Double_Window* Rig_window();
 extern Fl_Menu_Item menu_[];
 #define mnuExit (menu_+1)
