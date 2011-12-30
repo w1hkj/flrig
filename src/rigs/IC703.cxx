@@ -341,12 +341,44 @@ int RIG_IC703::get_alc()
 // Tranceiver PTT on/off
 void RIG_IC703::set_PTT_control(int val)
 {
-	cmd = pre_to;
+	cmd.assign(pre_to);
 	cmd += '\x1c';
 	cmd += '\x00';
-	cmd += (unsigned char) val;
+	cmd += (val ? '\x01' : '\x00');
 	cmd.append( post );
 	waitFB("set PTT");
+}
+
+// Volume control val 0 ... 100
+void RIG_IC703::set_volume_control(int val)
+{
+	int ICvol = val * 255 / 100;
+	cmd = pre_to;
+	cmd.append("\x14\x01");
+	cmd.append(to_bcd(ICvol, 3));
+	cmd.append( post );
+	waitFB("set vol");
+}
+
+int RIG_IC703::get_volume_control()
+{
+	string cstr = "\x14\x01";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+	if (waitFOR(9, "get vol")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return (int)ceil(fm_bcd(&replystr[p + 6],3) * 100 / 255);
+	}
+	return progStatus.volume;
+}
+
+void RIG_IC703::get_vol_min_max_step(int &min, int &max, int &step)
+{
+	min = 0; max = 100; step = 1;
 }
 
 // changed noise blanker to noise reduction

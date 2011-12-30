@@ -57,20 +57,31 @@ public:
 	int  get_noise_reduction();
 	void set_noise_reduction_val(int val);
 	int  get_noise_reduction_val();
+
+	void set_volume_control(int val);
+	int  get_volume_control();
+	void get_vol_min_max_step(int &min, int &max, int &step);
+
 	int  get_mic_gain();
 	void set_mic_gain(int val);
 	void get_mic_gain_min_max_step(int &min, int &max, int &step);
+
 	void set_if_shift(int val);
 	bool get_if_shift(int &val);
 	void get_if_min_max_step(int &min, int &max, int &step);
+
 	void set_squelch(int val);
 	int  get_squelch();
+
 	void set_rf_gain(int val);
 	int  get_rf_gain();
+
 	void set_power_control(double val);
 	int  get_power_control();
+
 	void set_split(bool val);
 	bool get_split();
+
 	void tune_rig();
 
 protected:
