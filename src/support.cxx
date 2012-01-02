@@ -2649,7 +2649,7 @@ void initRig()
 		sldrNOTCH->step(step);
 		sldrNOTCH->redraw();
 		if (progStatus.use_rig_data) {
-			progStatus.notch = selrig->get_if_shift(progStatus.notch_val);
+			progStatus.notch = selrig->get_notch(progStatus.notch_val);
 			btnNotch->value(progStatus.notch);
 			sldrNOTCH->value(progStatus.notch_val);
 		} else {
