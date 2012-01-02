@@ -1,8 +1,30 @@
 
 
-=Version 1.2.5=
+=Version 1.2.6=
 
-2011-12-22  David Freese  <w1hkj@w1hkj.com>
+2012-01-02  Terry Embry  <ftembry@users.berlios.de>
+
+	2d92636: FT950 fixes
+	c75cebf: Init notch from xcvr
+	21bc472: Xcvr auto-on-off
+
+2011-12-29  David Freese  <w1hkj@w1hkj.com>
+
+	53a18ac: FLTK-1.3 mods
+
+2011-12-29  Terry Embry  <ftembry@users.berlios.de>
+
+	eb7262a: Poll frequency
+
+2011-12-29  David Freese  <w1hkj@w1hkj.com>
+
+	17c0ed7: IC703 - corrections
+	706b6c0: IC7600 additions
+	55a4f58: IC703 controls
+	eee8a62: Power meter scales
+
+
+=Version 1.2.5=
 
 	e8402b8: Polling intervals
 
