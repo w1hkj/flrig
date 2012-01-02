@@ -139,23 +139,22 @@ RIG_FT950::RIG_FT950() {
 	has_swr_control = true;
 
 // derived specific
-	atten_level = 0;
-	preamp_level = 0;
+	atten_level = 3;
+	preamp_level = 2;
 	notch_on = false;
 	m_60m_indx = 0;
 
-// set defaults
-	progStatus.use_rig_data = true;
-	if (!progStatus.use_rig_data) {
-		progStatus.notch = false;
-		progStatus.notch_val = 1500;
-		progStatus.noise_reduction = false;
-		progStatus.noise_reduction_val = 1;
-	}
 }
 
 void RIG_FT950::initialize()
 {
+// set progStatus defaults
+	if (!progStatus.use_rig_data) {
+		if (progStatus.notch_val < 10) progStatus.notch_val = 1500;
+		if (progStatus.noise_reduction_val < 1) progStatus.noise_reduction_val = 1;
+		if (progStatus.power_level < 5) progStatus.power_level = 5;
+	}
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = sldrRFGAIN;
@@ -275,13 +274,30 @@ void RIG_FT950::set_split(bool val)
 
 bool RIG_FT950::get_split()
 {
+	size_t p;
+	bool split = false;
+	char rx, tx;
+// tx vfo
 	cmd = rsp = "FT";
-	cmd += ';';
-	waitN(4, 100, "get split", ASC);
-
-	size_t p = replystr.rfind(rsp);
+	cmd.append(";");
+	waitN(4, 100, "get split tx vfo", ASC);
+	p = replystr.rfind(rsp);
 	if (p == string::npos) return false;
-	return replystr[p+2] == '1' ? true : false;
+	tx = replystr[p+2];
+
+// rx vfo
+	cmd = rsp = "FR";
+	cmd.append(";");
+	waitN(4, 100, "get split rx vfo", ASC);
+
+	p = replystr.rfind(rsp);
+	if (p == string::npos) return false;
+	rx = replystr[p+2];
+// split test
+	if ((tx == '1' && rx == '0') || (tx == '0' && rx == '4'))
+		split = true;
+
+	return split;
 }
 
 
@@ -797,19 +813,8 @@ void RIG_FT950::get_notch_min_max_step(int &min, int &max, int &step)
 	step = 10;
 }
 
-// Terry, KJ4EED
-// auto notch NOT replaced with audio peak filter
-//
-// Lets move APF to CW menu at a later date
-// CW menus are only sets?
-//
 void RIG_FT950::set_auto_notch(int v)
 {
-// Please save this for now
-//	cmd.assign("CO000").append(v ? "2" : "0" ).append(";");
-//	sendCommand(cmd);
-//	showresp(WARN, ASC, "SET Auto Peak Filter", cmd, replystr);
-
 	cmd.assign("BC0").append(v ? "1" : "0" ).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET DNF Auto Notch Filter", cmd, replystr);
@@ -817,14 +822,6 @@ void RIG_FT950::set_auto_notch(int v)
 
 int  RIG_FT950::get_auto_notch()
 {
-//	// Audio Peak Filter
-//	cmd = "CO00;";
-//	waitN(5, 100, "get Audio Peak Filter", ASC);
-//	size_t p = replystr.rfind("CO0");
-//	if (p == string::npos) return 0;
-//	if (replystr[p+5] == '2') return 1;
-//	return 0;
-
 	cmd = "BC0;";
 	waitN(5, 100, "get auto notch", ASC);
 	size_t p = replystr.rfind("BC0");
@@ -833,7 +830,7 @@ int  RIG_FT950::get_auto_notch()
 	return 0;
 }
 
-int FT950_blanker_level = 0;
+int FT950_blanker_level = 2;
 
 void RIG_FT950::set_noise(bool b)
 {
@@ -1141,3 +1138,18 @@ void RIG_FT950::set_xcvr_auto_off()
 	cmd = "PS0;";
 	sendCommand(cmd);
 }
+
+/*
+// Audio Peak Filter, like set_cw_spot
+bool RIG_FT950::set_cw_APF()
+{
+	if (vfo.imode == 2 || vfo.imode == 6) {
+		cmd = "CO0000;";
+		if (progStatus.apf_onoff) cmd[5] = '2';
+		sendCommand(cmd);
+		showresp(WARN, ASC, "SET APF on/off", cmd, replystr);
+		return true;
+	} else
+		return false;
+}
+*/
