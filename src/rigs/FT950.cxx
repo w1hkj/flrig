@@ -94,7 +94,7 @@ RIG_FT950::RIG_FT950() {
 	comm_dtrptt = false;
 
 	A.imode = B.imode = modeB = modeA = def_mode = 1;
-	A.iBW = B.iBW = bwA = bwB = def_bw = 2;
+	A.iBW = B.iBW = bwA = bwB = def_bw = 12;
 	A.freq = B.freq = freqA = freqB = def_freq = 14070000;
 
 	has_xcvr_auto_on_off =
@@ -149,10 +149,19 @@ RIG_FT950::RIG_FT950() {
 void RIG_FT950::initialize()
 {
 // set progStatus defaults
-	if (!progStatus.use_rig_data) {
-		if (progStatus.notch_val < 10) progStatus.notch_val = 1500;
-		if (progStatus.noise_reduction_val < 1) progStatus.noise_reduction_val = 1;
-		if (progStatus.power_level < 5) progStatus.power_level = 5;
+	if (progStatus.notch_val < 10) progStatus.notch_val = 1500;
+	if (progStatus.noise_reduction_val < 1) progStatus.noise_reduction_val = 1;
+	if (progStatus.power_level < 5) progStatus.power_level = 5;
+// first-time-thru, or reset
+	if (progStatus.cw_qsk < 15) {
+		progStatus.cw_qsk = 15;
+		progStatus.cw_spot_tone = 700;
+		progStatus.cw_weight = 3.0;
+		progStatus.cw_wpm = 18;
+		progStatus.vox_on_dataport = false;
+		progStatus.vox_gain = 50;
+		progStatus.vox_anti = 50;
+		progStatus.vox_hang = 500;
 	}
 
 	rig_widgets[0].W = btnVol;
