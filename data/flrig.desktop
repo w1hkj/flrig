@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Flrig
-GenericName=Amateur Radio Data Encapsulation
+GenericName=Amateur Radio Rig Control
 Comment=Amateur Radio Communications
 Exec=flrig
 Icon=flrig
