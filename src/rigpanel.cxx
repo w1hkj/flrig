@@ -2843,6 +2843,7 @@ Fl_Double_Window* XcvrDialog() {
             cntRigCatRetries->callback((Fl_Callback*)cb_cntRigCatRetries);
             cntRigCatRetries->align(FL_ALIGN_LEFT);
             o->value(progStatus.comm_retries);
+            o->lstep(10);
           } // Fl_Counter* cntRigCatRetries
           { Fl_Counter* o = cntRigCatTimeout = new Fl_Counter(96, 89, 100, 22, _("Retry intvl"));
             cntRigCatTimeout->tooltip(_("Time between retries is msec"));
@@ -2853,6 +2854,7 @@ Fl_Double_Window* XcvrDialog() {
             cntRigCatTimeout->callback((Fl_Callback*)cb_cntRigCatTimeout);
             cntRigCatTimeout->align(FL_ALIGN_LEFT);
             o->value(progStatus.comm_timeout);
+            o->lstep(10);
           } // Fl_Counter* cntRigCatTimeout
           { Fl_Counter* o = cntRigCatWait = new Fl_Counter(96, 115, 100, 22, _("Cmds"));
             cntRigCatWait->tooltip(_("Wait millseconds between sequential commands"));
@@ -2863,6 +2865,7 @@ Fl_Double_Window* XcvrDialog() {
             cntRigCatWait->callback((Fl_Callback*)cb_cntRigCatWait);
             cntRigCatWait->align(FL_ALIGN_LEFT);
             o->value(progStatus.comm_wait);
+            o->lstep(10);
           } // Fl_Counter* cntRigCatWait
           { Fl_Counter* o = query_interval = new Fl_Counter(96, 141, 100, 22, _("Poll intvl"));
             query_interval->tooltip(_("Polling interval in msec"));
@@ -2873,6 +2876,7 @@ Fl_Double_Window* XcvrDialog() {
             query_interval->callback((Fl_Callback*)cb_query_interval);
             query_interval->align(FL_ALIGN_LEFT);
             o->value(progStatus.serloop_timing);
+            o->lstep(10);
           } // Fl_Counter* query_interval
           o->end();
         } // Fl_Group* o
