@@ -24,6 +24,7 @@
 #include <cstring>
 #include <cstdarg>
 #include <string>
+#include <iostream>
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -37,8 +38,7 @@
 #include <FL/Fl_Menu_Item.H>
 #include <FL/Fl_Menu_Button.H>
 
-#include <FL/Fl_Text_Display.H>
-#include <FL/Fl_Text_Buffer.H>
+#include <FL/Fl_Browser.H>
 
 #include "debug.h"
 #include "icons.h"
@@ -51,14 +51,12 @@ using namespace std;
 
 static FILE* wfile;
 static FILE* rfile;
-//static size_t nlines = 0;
 static int rfd;
 static bool tty;
-//static bool want_popup = false;
 
-static Fl_Double_Window* window;
-static Fl_Text_Display* text;
-static Fl_Text_Buffer* buffer;
+static Fl_Double_Window*	window;
+static Fl_Browser*			btext;
+static string buffer;
 
 debug* debug::inst = 0;
 debug::level_e debug::level = debug::WARN_LEVEL;
@@ -67,19 +65,9 @@ uint32_t debug::mask = ~0u;
 const char* prefix[] = { _("Quiet"), _("Error"), _("Warning"), _("Info"), _("Debug") };
 
 static void slider_cb(Fl_Widget* w, void*);
-//static void src_menu_cb(Fl_Widget* w, void*);
 static void clear_cb(Fl_Widget *w, void*);
 static void save_cb(Fl_Widget *w, void*);
 
-//static void popup_message(void*);
-/*
-Fl_Menu_Item src_menu[] = {
-	{ _("Rig control"), 0, 0, 0, FL_MENU_TOGGLE | FL_MENU_VALUE },
-	{ _("RPC"), 0, 0, 0, FL_MENU_TOGGLE | FL_MENU_VALUE },
-	{ _("Other"), 0, 0, 0, FL_MENU_TOGGLE | FL_MENU_VALUE },
-	{ 0 }
-};
-*/
 void debug::start(const char* filename)
 {
 	if (debug::inst)
@@ -89,11 +77,7 @@ void debug::start(const char* filename)
 	window = new Fl_Double_Window(600, 256, _("Event log"));
 
 	int pad = 2;
-//	Fl_Menu_Button* button = new Fl_Menu_Button(pad, pad, 128, 20, _("Log sources"));
-//	button->menu(src_menu);
-//	button->callback(src_menu_cb);
 
-//	Fl_Slider* slider = new Fl_Slider(button->x() + button->w() + pad, pad, 128, 20, prefix[level]);
 	Fl_Slider* slider = new Fl_Slider(pad, pad, 128, 20, prefix[level]);
 	slider->tooltip(_("Change log level"));
 	slider->align(FL_ALIGN_RIGHT);
@@ -102,22 +86,18 @@ void debug::start(const char* filename)
 	slider->step(1.0);
 	slider->value(level);
 	slider->callback(slider_cb);
-	
+
 	Fl_Button* savebtn  = new Fl_Button(window->w() - 124, pad, 60, 20, "save");
 	savebtn->callback(save_cb);
-	
+
 	Fl_Button* clearbtn = new Fl_Button(window->w() - 60, pad, 60, 20, "clear");
 	clearbtn->callback(clear_cb);
 
-	text = new Fl_Text_Display(pad, slider->h()+pad, window->w()-2*pad, window->h()-slider->h()-2*pad, 0);
-	text->textfont(FL_COURIER);
-	text->textsize(FL_NORMAL_SIZE);
-    text->wrap_mode(true, 160);
-	window->resizable(text);
-	
-	buffer = new Fl_Text_Buffer();
-	text->buffer(buffer);
-	
+	btext = new Fl_Browser(pad,  slider->h()+pad, window->w()-2*pad, window->h()-slider->h()-2*pad, 0);
+	window->resizable(btext);
+
+	buffer.clear();
+
 	window->end();
 }
 
@@ -189,8 +169,13 @@ void debug::show(void)
 void debug::sync_text(void* arg)
 {
     debug_in_use = true;
-    text->insert(estr.c_str());
-    text->show_insert_position();
+	size_t p0 = 0, p1 = estr.find('\n');
+	while (p1 != string::npos) {
+		btext->insert(1, estr.substr(p0,p1-p0).c_str());
+		buffer.append(estr.substr(p0, p1 - p0)).append("\n");
+		p0 = p1 + 1;
+		p1 = estr.find('\n', p0);
+	}
     estr = "";
     debug_in_use = false;
 }
@@ -227,20 +212,20 @@ static void slider_cb(Fl_Widget* w, void*)
 	w->parent()->redraw();
 }
 
-//static void src_menu_cb(Fl_Widget* w, void*)
-//{
-//	debug::mask ^= 1 << ((Fl_Menu_*)w)->value();
-//}
-
 static void clear_cb(Fl_Widget* w, void*)
 {
-	buffer->text("");
+	btext->clear();
+	buffer.clear();
 }
 
 static void save_cb(Fl_Widget* w, void*)
 {
+	if (!btext->size()) return;
 	string filename = RigHomeDir;
 	filename.append("debug_log.txt");
-	buffer->savefile(filename.c_str());
+	ofstream out;
+	out.open(filename.c_str(), ios::app);
+	out << buffer;
+	out.close();
 	fl_alert2("Saved in %s", filename.c_str());
 }
