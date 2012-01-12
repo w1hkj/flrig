@@ -66,7 +66,7 @@ public:
 	void set_split(bool val);
 	bool get_split();
 
-//	int  get_swr();
+	int  get_swr();
 	int  get_power_out();
 
 //	int  get_power_control(void);

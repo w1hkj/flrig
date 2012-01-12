@@ -4,6 +4,7 @@
  * a part of flrig
  *
  * Copyright 2009, Dave Freese, W1HKJ
+ *           2012. Fernando M. Maresca, 
  *
  */
 
@@ -21,6 +22,9 @@
 #include "math.h"
 
 #include "debug.h"
+// fer, debugging purpose
+#include <iostream>
+#include <typeinfo>
 
 static const char TT588name_[] = "Omni-VII";
 
@@ -34,10 +38,17 @@ static const char TT588mode_type[] = { 'U', 'U', 'L', 'U', 'U', 'L', 'L' };
 
 // filter # is 37 - index
 static const char *TT588_widths[] = {
-"14000", "9000", "8000", "7500", "7000", "6500", "6000", "5500", "5000", "4500",
-"4000", "3800", "2600", "3400", "3200", "3000", "2800", "2600", "2500", "2400",
-"2200", "2000", "1800", "1600", "1400", "1200", "1000", "900", "800", "700",
-"600", "500", "450", "400", "350", "300", "250", "200", NULL};
+"200",   "250",  "300",  "350",  "400",  "450",  "500",  "600",  "700",  "800",
+"900",  "1000", "1200", "1400", "1600", "1800", "2000", "2200", "2400", "2500",
+"2600", "2800", "3000", "3200", "3400", "3600", "3800", "4000", "4500", "5000",
+"5500", "6000", "6500", "7000", "7500", "8000", "9000", "12000", NULL};
+
+static const int TT588_numeric_widths[] = {
+200,   250,  300,  350,  400,  450,  500,  600,  700,  800,
+900,  1000, 1200, 1400, 1600, 1800, 2000, 2200, 2400, 2500,
+2600, 2800, 3000, 3200, 3400, 3600, 3800, 4000, 4500, 5000,
+5500, 6000, 6500, 7000, 7500, 8000, 9000, 12000, NULL};
+
 
 static char TT588setFREQA[]		= "*Annnn\r";
 static char TT588setFREQB[]		= "*Bnnnn\r";
@@ -51,8 +62,17 @@ static char TT588setSPLIT[]		= "*Nn\n";
 static char TT588setPBT[]		= "*Pxx\r";
 static char TT588setVOL[]		= "*Un\r";
 static char TT588setBW[]		= "*Wx\r";
-//static char TT588setPOWER[]		= "*C1Xn\r";
+
+// these C1* and C2* commands are for ethernet only
+//static char TT588setPOWER[]	= "*C1Xn\r";
 //static char TT588setPREAMP[]	= "*C1Zn\r";
+//static char TT588getPOWER[]		= "?C1X\r";
+//static char TT588getPREAMP[]	= "?C1Z\r";
+// set pout is not available under serial interface
+//static char TT588setPOWER[]	= "*C1Xn\r";
+// F command gets fwd and ref power  
+//static char TT588getFWDPWR[]	= "?F\r";
+static char TT588getPOWER[]		= "?F\r";
 
 static char TT588getFREQA[]		= "?A\r";
 static char TT588getFREQB[]		= "?B\r";
@@ -67,11 +87,8 @@ static char TT588getPBT[]		= "?P\r";
 static char TT588getSMETER[]	= "?S\r";
 static char TT588getVOL[]		= "?U\r";
 static char TT588getBW[]		= "?W\r";
-//static char TT588getPOWER[]		= "?C1X\r";
-//static char TT588getPREAMP[]	= "?C1Z\r";
 
 //static char TT588getFWDPWR[]	= "?F\r";
-
 //static char TT588getREFPWR[]	= "?R\r";
 
 static char TT588setXMT[]		= "*Tnn\r";
@@ -124,8 +141,6 @@ RIG_TT588::RIG_TT588() {
 	has_power_control = // must be in REMOTE mode
 	has_micgain_control = // must be in REMOTE mode
 	has_tune_control =
-	has_noise_control =
-	has_swr_control = 
 	has_vfo_adj = false;
 
 	can_change_alt_vfo =
@@ -170,11 +185,16 @@ long RIG_TT588::get_vfoA ()
 	cmd = TT588getFREQA;
 	int ret = waitN(6, 100, "get vfo A");
 	if (ret >= 6) {
+        /*
+         whenever 41 is in the freq. value answered, we don't want to use that index
+         for an offset. (reproduce: freq. set around 21 MHz, then drag 
+         the wf to change freq. up and down.)
+        */
 		size_t p = replystr.rfind("A");
 		if (p != string::npos) {
 			int f = 0;
 			for (size_t n = 1; n < 5; n++)
-				f = f*256 + (unsigned char)replystr[p + n];
+				f = f*256 + (unsigned char)replystr[n];
 			freqA = f;
 		}
 	}
@@ -205,7 +225,7 @@ long RIG_TT588::get_vfoB()
 		if (p != string::npos) {
 			int f = 0;
 			for (size_t n = 1; n < 5; n++)
-				f = f*256 + (unsigned char)replystr[p + n];
+				f = f*256 + (unsigned char)replystr[n];
 			freqA = f;
 		}
 	}
@@ -283,9 +303,10 @@ void RIG_TT588::set_bwA(int val)
 {
 	bwA = val;
 	cmd = TT588setBW;
-	cmd[2] = val;
+	cmd[2] = 37 - val;
 	sendCommand(cmd);
 	showresp(WARN, HEX, "set BW A", cmd, replystr);
+    set_if_shift(pbt);
 }
 
 void RIG_TT588::set_bwB(int val)
@@ -295,28 +316,29 @@ void RIG_TT588::set_bwB(int val)
 	cmd[2] = val;
 	sendCommand(cmd);
 	showresp(WARN, HEX, "set BW B", cmd, replystr);
+    set_if_shift(pbt);
 }
 
 int RIG_TT588::get_bwA()
 {
 	cmd = TT588getBW;
 	int ret = waitN(3, 100, "get BW A");
-	if (ret < 3) return bwA;
+	if (ret < 3) return 37 - bwA;
 	size_t p = replystr.rfind("W");
-	if (p == string::npos) return bwA;
+	if (p == string::npos) return 37 - bwA;
 	bwA = (int)(replystr[p + 1] & 0x7F);
-	return bwA;
+	return 37 - bwA;
 }
 
 int RIG_TT588::get_bwB()
 {
 	cmd = TT588getBW;
 	int ret = waitN(3, 100, "get BW B");
-	if (ret < 3) return bwB;
+	if (ret < 3) return 37 - bwB;
 	size_t p = replystr.rfind("W");
-	if (p == string::npos) return bwB;
+	if (p == string::npos) return 37 - bwB;
 	bwB = (int)(replystr[p + 1] & 0x7F);
-	return bwB;
+	return 37 - bwB;
 }
 
 int  RIG_TT588::adjust_bandwidth(int m)
@@ -338,6 +360,9 @@ void RIG_TT588::set_if_shift(int val)
 	pbt = val;
 	cmd = TT588setPBT;
 	short int si = val;
+	int bpval = progStatus.bpf_center - 200 - TT588_numeric_widths[bwA]/2;
+	if ((modeA == 1 || modeA == 2) && progStatus.use_bpf_center)
+		si += (bpval > 0 ? bpval : 0);
 	cmd[2] = (si & 0xff00) >> 8;
 	cmd[3] = (si & 0xff);
 	sendCommand(cmd);
@@ -416,7 +441,6 @@ int RIG_TT588::get_smeter()
 	fval = sval/256.0;
 	sval = (int)(fval * 100.0 / 18.0);
 	if (sval > 100) sval = 100;
-
 	return sval;
 }
 
@@ -475,18 +499,28 @@ void RIG_TT588::set_PTT_control(int val)
 
 int RIG_TT588::get_power_out()
 {
-	cmd = "?C1X\r";//TT588getFWDPWR;
-	int ret = waitN(7, 100, "get pout");
-	if (ret <  7) return 0;
-	size_t p = replystr.rfind("C1X");
+	cmd = TT588getPOWER;
+	int ret = waitN(4, 100, "get pout");
+	if (ret < 4) return 0;
+	size_t p = replystr.rfind("F");
 	if (p == string::npos) return 0;
-	fwdpwr = replystr[p + 4] & 0x7F;
-	refpwr = replystr[p + 5] & 0x7F;
+	fwdpwr = replystr[p + 1] & 0x7F;
+	refpwr = replystr[p + 2] & 0x7F;
+    // it looks like it never returns reflected power < 1
+    refpwr -= 1;
 	fwdv = sqrtf(fwdpwr);
 	refv = sqrtf(refpwr);
 	return fwdpwr;
 }
-
+int RIG_TT588::get_swr()
+{
+    float swr = (fwdv + refv)/(fwdv - refv) ;
+    swr -= 1; 
+	swr *= 25.0;
+	if (swr < 0) swr = 0;
+	if (swr > 100) swr = 100;
+	return (int)swr;
+}
 void RIG_TT588::set_squelch(int val)
 {
 	cmd = TT588setSQLCH;
