@@ -4,7 +4,7 @@
  * a part of flrig
  * 
  * Copyright 2009, Dave Freese, W1HKJ
- * Copyright 2011, Terry Embry, KJ4EED
+ * Copyright 2011-2012, Terry Embry, KJ4EED
  * 
  */
 
@@ -50,10 +50,8 @@ static const char *FT950_widths_FMnar[]  = { "12500", NULL };
 static const char *FT950_widths_FMwide[] = { "25000", NULL };
 
 static const char *FT950_US_60m[] = {"125", "126", "127", "128", "130", NULL};
-// UK has 7 60M presets. Using dummy numbers for all.  If you want support,
-// Maybe someone can do a cat command MC; on all 7 presets and add returned numbers below.
-// To send cat commands in flrig goto menu Config->Xcvr select->Send Cmd.
-// static const char *FT950_UK_60m[] = {"125", "126", "127", "128", "130", "131", "132", NULL};
+// UK 60m channel numbers by Brian, G8SEZ
+static const char *FT950_UK_60m[] = {"118", "120", "121", "127", "128", "129", "130", NULL};
 
 static const char **Channels_60m = FT950_US_60m;
 
@@ -148,6 +146,18 @@ RIG_FT950::RIG_FT950() {
 
 void RIG_FT950::initialize()
 {
+	rig_widgets[0].W = btnVol;
+	rig_widgets[1].W = sldrVOLUME;
+	rig_widgets[2].W = sldrRFGAIN;
+	rig_widgets[3].W = btnIFsh;
+	rig_widgets[4].W = sldrIFSHIFT;
+	rig_widgets[5].W = btnNotch;
+	rig_widgets[6].W = sldrNOTCH;
+	rig_widgets[7].W = sldrMICGAIN;
+	rig_widgets[8].W = sldrPOWER;
+	rig_widgets[9].W = btnNR;
+	rig_widgets[10].W = sldrNR;
+
 // set progStatus defaults
 	if (progStatus.notch_val < 10) progStatus.notch_val = 1500;
 	if (progStatus.noise_reduction_val < 1) progStatus.noise_reduction_val = 1;
@@ -163,18 +173,12 @@ void RIG_FT950::initialize()
 		progStatus.vox_anti = 50;
 		progStatus.vox_hang = 500;
 	}
-
-	rig_widgets[0].W = btnVol;
-	rig_widgets[1].W = sldrVOLUME;
-	rig_widgets[2].W = sldrRFGAIN;
-	rig_widgets[3].W = btnIFsh;
-	rig_widgets[4].W = sldrIFSHIFT;
-	rig_widgets[5].W = btnNotch;
-	rig_widgets[6].W = sldrNOTCH;
-	rig_widgets[7].W = sldrMICGAIN;
-	rig_widgets[8].W = sldrPOWER;
-	rig_widgets[9].W = btnNR;
-	rig_widgets[10].W = sldrNR;
+// "MRnnn;" if valid, returns last channel used, "mrlll...;", along with channel nnn info.
+	cmd = "MR118;";
+	waitN(27, 100, "Read UK 60m Channel Mem", ASC);
+	size_t p = replystr.rfind("MR");
+	if (p == string::npos) Channels_60m = FT950_US_60m;
+	else Channels_60m = FT950_UK_60m;
 }
 
 
