@@ -4,6 +4,7 @@
  * a part of flrig
  * 
  * Copyright 2009, Dave Freese, W1HKJ
+ * Copyright 2011-2012, Terry Embry, KJ4EED
  * 
  */
 
@@ -118,6 +119,18 @@ void RIG_FT450::initialize()
 	rig_widgets[7].W = sldrPOWER;
 	rig_widgets[8].W = btnNR;
 	rig_widgets[9].W = sldrNR;
+
+// set progStatus defaults
+	if (progStatus.noise_reduction_val < 1) progStatus.noise_reduction_val = 1;
+// first-time-thru, or reset
+	if (progStatus.cw_qsk < 15) {
+		progStatus.cw_qsk = 15;
+		progStatus.cw_spot_tone = 700;
+		progStatus.cw_weight = 3.0;
+		progStatus.cw_wpm = 18;
+		progStatus.vox_gain = 50;
+		progStatus.vox_hang = 500;
+	}
 
 	selectA();
 }
@@ -235,13 +248,30 @@ void RIG_FT450::set_split(bool on)
 
 bool RIG_FT450::get_split()
 {
+	size_t p;
+	bool split = false;
+	char rx, tx;
+// tx vfo
 	cmd = rsp = "FT";
-	cmd += ';';
-	waitN(4, 100, "get split", ASC);
-
-	size_t p = replystr.rfind(rsp);
+	cmd.append(";");
+	waitN(4, 100, "get split tx vfo", ASC);
+ 
+	p = replystr.rfind(rsp);
 	if (p == string::npos) return false;
-	return replystr[p+2] == '1' ? true : false;
+	tx = replystr[p+2];
+// rx vfo
+	cmd = rsp = "VS";
+	cmd.append(";");
+	waitN(4, 100, "get split rx vfo", ASC);
+
+	p = replystr.rfind(rsp);
+	if (p == string::npos) return false;
+	rx = replystr[p+2];
+// split test
+	if ((tx == '1' && rx == '0') || (tx == '0' && rx == '1'))
+		split = true;
+
+	return split;
 }
 
 int RIG_FT450::get_smeter()
