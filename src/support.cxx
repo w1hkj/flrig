@@ -441,6 +441,7 @@ void read_notch()
 // power_control
 void update_power_control(void *d)
 {
+	set_power_controlImage(progStatus.power_level);
 	sldrPOWER->value(progStatus.power_level);
 	if (rig_nbr == K2) {
 		double min, max, step;
@@ -450,7 +451,6 @@ void update_power_control(void *d)
 		sldrPOWER->step(step);
 		sldrPOWER->redraw();
 	}
-	set_power_controlImage(progStatus.power_level);
 }
 
 void read_power_control()
@@ -1490,29 +1490,46 @@ void setMicGainControl(void* d)
 	sldrMICGAIN->value(val);
 }
 
+static int img = -1;
+
 void set_power_controlImage(double pwr)
 {
 	if (progStatus.pwr_scale == 0 || (progStatus.pwr_scale == 4 && pwr < 26.0)) {
-		scalePower->image(image_p25);
-		sldrFwdPwr->maximum(25.0);
-		sldrFwdPwr->minimum(0.0);
+		if (img != 1) {
+			img = 1;
+			scalePower->image(image_p25);
+			sldrFwdPwr->maximum(25.0);
+			sldrFwdPwr->minimum(0.0);
+			scalePower->redraw();
+		}
 	}
 	else if (progStatus.pwr_scale == 1 || (progStatus.pwr_scale == 4 && pwr < 51.0)) {
-		scalePower->image(image_p50);
-		sldrFwdPwr->maximum(50.0);
-		sldrFwdPwr->minimum(0.0);
+		if (img != 2) {
+			img = 2;
+			scalePower->image(image_p50);
+			sldrFwdPwr->maximum(50.0);
+			sldrFwdPwr->minimum(0.0);
+			scalePower->redraw();
+		}
 	}
 	else if (progStatus.pwr_scale == 2 || (progStatus.pwr_scale == 4 && pwr < 101.0)) {
-		scalePower->image(image_p100);
-		sldrFwdPwr->maximum(100.0);
-		sldrFwdPwr->minimum(0.0);
+		if (img != 3) {
+			img = 3;
+			scalePower->image(image_p100);
+			sldrFwdPwr->maximum(100.0);
+			sldrFwdPwr->minimum(0.0);
+			scalePower->redraw();
+		}
 	}
 	else if (progStatus.pwr_scale >= 3) {
-		scalePower->image(image_p200);
-		sldrFwdPwr->maximum(200.0);
-		sldrFwdPwr->minimum(0.0);
+		if (img != 4) {
+			img = 4;
+			scalePower->image(image_p200);
+			sldrFwdPwr->maximum(200.0);
+			sldrFwdPwr->minimum(0.0);
+			scalePower->redraw();
+		}
 	}
-	scalePower->redraw();
 	return;
 }
 
