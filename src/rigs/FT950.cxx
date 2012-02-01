@@ -342,7 +342,7 @@ int RIG_FT950::get_swr()
 	if (p == string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
 	int mtr = atoi(&replystr[p+3]);
-	return mtr / 2.56;
+	return (int)ceil(mtr / 2.56);
 }
 
 int RIG_FT950::get_power_out()
@@ -359,7 +359,7 @@ int RIG_FT950::get_power_out()
 // following conversion iaw data measured by Terry, KJ4EED
 	mtr = (.06 * mtr) + (.002 * mtr * mtr);
 
-	return (int)mtr;
+	return (int)ceil(mtr);
 }
 
 // Transceiver power level
@@ -399,14 +399,14 @@ int RIG_FT950::get_volume_control()
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.volume;
 	if (p + 6 >= replystr.length()) return progStatus.volume;
-	int val = round(atoi(&replystr[p+3]) * 100 / 250);
+	int val = round(atoi(&replystr[p+3]) / 2.55);
 	if (val > 100) val = 100;
-	return val;
+	return ceil(val);
 }
 
 void RIG_FT950::set_volume_control(int val) 
 {
-	int ivol = (int)(val * 250 / 100);
+	int ivol = (int)(val * 2.55);
 	cmd = "AG0000;";
 	for (int i = 5; i > 2; i--) {
 		cmd[i] += ivol % 10;
@@ -892,7 +892,7 @@ int RIG_FT950::get_noise()
 void RIG_FT950::set_mic_gain(int val)
 {
 	cmd = "MG000;";
-	val = (int)(val * 248 / 100); // magic num tracks radio display value, convert to 0 .. 255
+	val = (int)(val * 2.50);
 	for (int i = 3; i > 0; i--) {
 		cmd[1+i] += val % 10;
 		val /= 10;
@@ -910,9 +910,9 @@ int RIG_FT950::get_mic_gain()
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.mic_gain;
 	int val = atoi(&replystr[p+2]);
-	val = val * 100 / 248;	// magic num tracks radio display value
+	val = (int)(val / 2.50);
 	if (val > 100) val = 100;
-	return val;
+	return ceil(val);
 }
 
 void RIG_FT950::get_mic_min_max_step(int &min, int &max, int &step)
@@ -925,7 +925,7 @@ void RIG_FT950::get_mic_min_max_step(int &min, int &max, int &step)
 void RIG_FT950::set_rf_gain(int val)
 {
 	cmd = "RG0000;";
-	int rfval = val * 250 / 100;
+	int rfval = (int)(val * 2.50);
 	for (int i = 5; i > 2; i--) {
 		cmd[i] = rfval % 10 + '0';
 		rfval /= 10;
@@ -947,9 +947,9 @@ int  RIG_FT950::get_rf_gain()
 		rfval *= 10;
 		rfval += replystr[p+i] - '0';
 	}
-	rfval = rfval * 100 / 250;
+	rfval = (int)(rfval / 2.50);
 	if (rfval > 100) rfval = 100;
-	return rfval;
+	return ceil(rfval);
 }
 
 void RIG_FT950::get_rf_min_max_step(int &min, int &max, int &step)

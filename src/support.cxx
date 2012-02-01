@@ -375,18 +375,40 @@ void read_split()
 // volume
 void update_volume(void *d)
 {
+	long *nr = (long *)d;
 	sldrVOLUME->value(progStatus.volume);
+	sldrVOLUME->activate();
+	if (*nr) btnVol->value(1);
+	else     btnVol->value(0);
 }
+
+long nlzero = 0L;
+long nlone = 1L;
 
 void read_volume()
 {
 	if (!selrig->has_volume_control) return;
-	if (btnVol->value() == 0) return; // muted
-	if (!sldrVOLUME->active()) return; // cbMute() not done still un-muting
-	pthread_mutex_lock(&mutex_serial);
-		progStatus.volume = selrig->get_volume_control();
-	pthread_mutex_unlock(&mutex_serial);
-	Fl::awake(update_volume, (void*)0);
+	if (rig_nbr == FT950) {
+		int vol;
+		pthread_mutex_lock(&mutex_serial);
+			vol = selrig->get_volume_control();
+		pthread_mutex_unlock(&mutex_serial);
+		if (vol != progStatus.volume) {
+			if (vol <= 1 && !btnVol->value()) return;
+			progStatus.volume = vol;
+			if (vol <= 1 && btnVol->value())
+				Fl::awake(update_volume, (void*)&nlzero);
+			else
+				Fl::awake(update_volume, (void*)&nlone);
+		}
+	} else {
+		if (btnVol->value() == 0) return; // muted
+		if (!sldrVOLUME->active()) return; // cbMute() not done still un-muting
+		pthread_mutex_lock(&mutex_serial);
+			progStatus.volume = selrig->get_volume_control();
+		pthread_mutex_unlock(&mutex_serial);
+		Fl::awake(update_volume, (void*)&nlzero);
+	}
 }
 
 // ifshift
@@ -1457,7 +1479,7 @@ void cbMute()
 	if (btnVol->value() == 0) {
 		pthread_mutex_lock(&mutex_serial);
 			sldrVOLUME->deactivate();
-			selrig->set_volume_control(0.0);
+			selrig->set_volume_control(0);
 		pthread_mutex_unlock(&mutex_serial);
 	} else {
 		pthread_mutex_lock(&mutex_serial);
