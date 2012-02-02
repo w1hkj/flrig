@@ -3261,7 +3261,7 @@ void cbBandSelect(int band)
 	}
 // read mode WHILE LOCKED, Not-The-Same-As read_mode() **********
 	int nu_mode;
-	if (selrig->has_band_selection) {
+	if (selrig->has_mode_control) {
 		if (!useB) {
 			nu_mode = selrig->get_modeA();
 			if (nu_mode != vfoA.imode) {
