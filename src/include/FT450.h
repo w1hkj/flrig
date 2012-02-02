@@ -20,6 +20,7 @@ public:
 
 	void selectA();
 	void selectB();
+	void A2B();
 	void set_modeA(int val);
 	int  get_modeA();
 	int  get_modetype(int n);
@@ -96,6 +97,9 @@ public:
 	int  get_noise_reduction_val();
 	void set_noise_reduction(int val);
 	int  get_noise_reduction();
+
+	void set_xcvr_auto_on();
+	void set_xcvr_auto_off();
 
 };
 
