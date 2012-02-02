@@ -68,6 +68,9 @@ RIG_FT450::RIG_FT450() {
 	def_bw = 2;
 	def_freq = 14070000;
 
+	has_a2b =
+	can_change_alt_vfo =
+	has_xcvr_auto_on_off =
 	has_noise_reduction =
 	has_noise_reduction_control =
 	has_band_selection =
@@ -99,9 +102,8 @@ RIG_FT450::RIG_FT450() {
 	has_preamp_control =
 	has_ifshift_control =
 	has_ptt_control =
-	has_tune_control =
-	has_special = true;
-	
+	has_tune_control = true;
+
 // derived specific
 	notch_on = false;
 	m_60m_indx = 0;
@@ -131,6 +133,9 @@ void RIG_FT450::initialize()
 		progStatus.vox_gain = 50;
 		progStatus.vox_hang = 500;
 	}
+
+// turn off auto information mode
+	sendCommand("AI0;");
 
 	selectA();
 }
@@ -174,14 +179,21 @@ int  RIG_FT450::adjust_bandwidth(int m)
 
 void RIG_FT450::selectA()
 {
-	cmd = "SV0;";
+	cmd = "VS0;";
 	sendCommand(cmd, 0);
 }
 
 void RIG_FT450::selectB()
 {
-	cmd = "SV1;";
+	cmd = "VS1;";
 	sendCommand(cmd, 0);
+}
+
+void RIG_FT450::A2B()
+{
+	cmd = "VV;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "vfo A --> B", cmd, replystr);
 }
 
 long RIG_FT450::get_vfoA ()
@@ -614,7 +626,7 @@ void RIG_FT450::set_notch(bool on, int val)
 
 	cmd[3] = '1'; // manual NOTCH position
 	cmd[6] = '0';
-	val += 200;
+	val = val / 10 + 200;
 	for (int i = 3; i > 0; i--) {
 		cmd[3 + i] += val % 10;
 		val /=10;
@@ -631,6 +643,7 @@ bool  RIG_FT450::get_notch(int &val)
 	waitN(8, 100, "get notch on/off", ASC);
 
 	size_t p = replystr.rfind(rsp);
+	val = progStatus.notch_val = 0; // disabled default slider position
 	if (p == string::npos) return ison;
 
 	if (replystr[p+6] == '1') { // manual notch enabled
@@ -642,17 +655,16 @@ bool  RIG_FT450::get_notch(int &val)
 		p = replystr.rfind(rsp);
 		if (p == string::npos) return ison;
 		val = atoi(&replystr[p+4]);
-		val *= 10;
-		val -= 200;
+		val = (val - 200) * 10;
 	}
 	return ison;
 }
 
 void RIG_FT450::get_notch_min_max_step(int &min, int &max, int &step)
 {
-	min = -190;
-	max = +190;
-	step = 10;
+	min = -1990;
+	max = +2000;
+	step = 100;
 }
 
 void RIG_FT450::set_noise(bool b)
@@ -663,6 +675,31 @@ void RIG_FT450::set_noise(bool b)
 		cmd = "NB00;";
 	sendCommand (cmd);
 	showresp(WARN, ASC, "SET NB", cmd, replystr);
+}
+
+void RIG_FT450::set_xcvr_auto_on()
+{
+	if (!progStatus.xcvr_auto_on) return;
+
+	cmd = rsp = "PS";
+	cmd.append(";");
+	waitN(4, 100, "Test: Is Rig ON", ASC);
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) {	// rig is off, power on
+		cmd = "PS1;";
+		sendCommand(cmd);
+		MilliSleep(1500);	// 1.0 < T < 2.0 seconds
+		sendCommand(cmd);
+		MilliSleep(3000);	// Wait for rig startup?  Maybe not needed.
+	}
+}
+
+void RIG_FT450::set_xcvr_auto_off()
+{
+	if (!progStatus.xcvr_auto_off) return;
+
+	cmd = "PS0;";
+	sendCommand(cmd);
 }
 
 // val 0 .. 100
