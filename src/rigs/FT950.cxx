@@ -95,6 +95,7 @@ RIG_FT950::RIG_FT950() {
 	A.iBW = B.iBW = bwA = bwB = def_bw = 12;
 	A.freq = B.freq = freqA = freqB = def_freq = 14070000;
 
+	has_a2b =
 	has_xcvr_auto_on_off =
 	has_split =
 	has_band_selection =
@@ -173,6 +174,9 @@ void RIG_FT950::initialize()
 		progStatus.vox_anti = 50;
 		progStatus.vox_hang = 500;
 	}
+// Disable Auto Information mode
+	sendCommand("AI0;");
+
 // "MRnnn;" if valid, returns last channel used, "mrlll...;", along with channel nnn info.
 	cmd = "MR118;";
 	waitN(27, 100, "Read UK 60m Channel Mem", ASC);
@@ -1133,7 +1137,7 @@ void RIG_FT950::set_xcvr_auto_on()
 
 	cmd = rsp = "PS";
 	cmd.append(";");
-	waitN(5, 100, "Test: Is Rig ON", ASC);
+	waitN(4, 100, "Test: Is Rig ON", ASC);
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) {	// rig is off, power on
 		cmd = "PS1;";
