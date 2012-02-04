@@ -196,6 +196,7 @@ public:
 	virtual ~rigbase(){}
 
 	virtual void initialize() {}
+	virtual void post_initialize() {}
 	virtual void shutdown() {}
 
 	virtual bool get_info(void) {return false;}

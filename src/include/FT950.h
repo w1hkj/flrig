@@ -15,6 +15,7 @@ public:
 	~RIG_FT950(){}
 
 	void initialize();
+	void post_initialize();
 
 	long get_vfoA();
 	void set_vfoA(long);

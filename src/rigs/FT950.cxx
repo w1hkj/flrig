@@ -185,6 +185,10 @@ void RIG_FT950::initialize()
 	else Channels_60m = FT950_UK_60m;
 }
 
+void RIG_FT950::post_initialize()
+{
+	enable_bandselect_btn(12);
+}
 
 long RIG_FT950::get_vfoA ()
 {
