@@ -1,6 +1,36 @@
 
 
+=Version 1.2.7=
+
+2012-02-04  Terry Embry  <ftembry@users.berlios.de>
+
+	db19ce7: FT2000 mic input
+	fbd12d2: FT950 60m
+	10d4a62: FT950 mods
+	db3f77b: FT450 mods
+	5e4f4a5: Band select
+
+2012-02-01  David Freese  <w1hkj@w1hkj.com>
+
+	4359fb0: FT950 controls
+	5498d45: Redraw fault
+	bc94a32: FLTK version
+	1013a74: FT950 / FT450 mods
+	d26af58: TT588 update
+	3169bfe: Debug revision
+
+2012-01-03  Terry Embry  <ftembry@users.berlios.de>
+
+	9664223: FT950 defaults
+
+2012-01-03  David Freese  <w1hkj@w1hkj.com>
+
+	4209922: Desktop generic name
+
+
 =Version 1.2.6=
+
+	8e2982b: Lstep for timing controls
 
 2012-01-02  Terry Embry  <ftembry@users.berlios.de>
 
@@ -10,7 +40,7 @@
 
 2011-12-29  David Freese  <w1hkj@w1hkj.com>
 
-	53a18ac: FLTK-1.3 mods
+	3aff859: FLTK-1.3 mods
 
 2011-12-29  Terry Embry  <ftembry@users.berlios.de>
 
