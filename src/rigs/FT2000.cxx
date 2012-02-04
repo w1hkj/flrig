@@ -615,24 +615,27 @@ void RIG_FT2000::set_noise(bool b)
 void RIG_FT2000::set_mic_gain(int val)
 {
 	cmd = "MG000;";
-	val = (int)(val * 2.55); // convert to 0 .. 255
+	val = (int)(val * 2.50);
 	for (int i = 3; i > 0; i--) {
 		cmd[1+i] += val % 10;
 		val /= 10;
 	}
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET mic", cmd, replystr);
 }
 
 int RIG_FT2000::get_mic_gain()
 {
-	cmd = "MG;";
-	int ret = sendCommand(cmd);
-	if (ret < 6) return 0;
-	size_t p = replystr.rfind("MG");
-	if (p == string::npos) return 0;
-	replystr[p + 5] = 0;
-	int val = atoi(&replystr[p + 2]);
-	return val;
+	cmd = rsp = "MG";
+	cmd += ';';
+	waitN(6, 100, "get mic", ASC);
+
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return progStatus.mic_gain;
+	int val = atoi(&replystr[p+2]);
+	val = (int)(val / 2.50);
+	if (val > 100) val = 100;
+	return ceil(val);
 }
 
 void RIG_FT2000::get_mic_min_max_step(int &min, int &max, int &step)
