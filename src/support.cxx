@@ -2114,6 +2114,7 @@ void initXcvrTab()
 				tabsGeneric->w() - 4,
 				tabsGeneric->h() - 21);
 			tabsGeneric->insert(*genericBands, 0);
+			btnBandSelect_12->hide();
 		}
 
 		poll_all->activate();
@@ -2882,6 +2883,9 @@ void initRig()
 
 	}
 
+// enable buttons, change labels
+	selrig->post_initialize();
+
 	// enable the serial thread
 
 	pthread_mutex_unlock(&mutex_serial);
@@ -3326,4 +3330,27 @@ void cbBandSelect(int band)
 	MilliSleep(100);
 	pthread_mutex_unlock(&mutex_xmlrpc);
 	pthread_mutex_unlock(&mutex_serial);
+}
+
+void enable_bandselect_btn(int btn_num, bool enable)
+{
+	switch (btn_num) {
+		case 1:
+		case 9:
+			break;
+		case 10:	// 6m
+			if (enable) btnBandSelect_10->show();
+			else btnBandSelect_10->hide();
+			break;
+		case 11:	// GEN
+			if (enable) btnBandSelect_11->show();
+			else btnBandSelect_11->hide();
+			break;
+		case 12:	// 60m
+			if (enable) btnBandSelect_12->show();
+			else btnBandSelect_12->hide();
+			break;
+		default:
+			break;
+	}
 }

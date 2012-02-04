@@ -195,6 +195,7 @@ extern void nb_label(const char *, bool on);
 extern void preamp_label(const char *, bool on);
 extern void atten_label(const char *, bool on);
 extern void auto_notch_label(const char *,bool on);
+extern void enable_bandselect_btn(int btn_num, bool enable = true);
 
 // Display Dialog
 extern void cbUSBaudio();
