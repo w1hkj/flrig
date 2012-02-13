@@ -287,13 +287,16 @@ public:
 	}
 
 	virtual const char * get_bwname_(int bw, int md) {
-		if (bandwidths_ == NULL) return "";
+// read bw based on mode
+		const char ** pbwt;
+		pbwt = bwtable(md);
+		if (pbwt == NULL) return "";
 		int nbw = 0;
-		while (bandwidths_[nbw] != NULL) nbw++;
+		while (pbwt[nbw] != NULL) nbw++;
 		if (bw < nbw && bw > -1)
-			return bandwidths_[bw];
+			return pbwt[bw];
 		else
-			return bandwidths_[0];
+			return pbwt[0];
 	}
 
 	virtual void setRit(int v) {}
