@@ -1256,6 +1256,7 @@ void addFreq() {
 		for (int n = 0; n < numinlist; n++)
 			if (freq == oplist[n].freq && mode == oplist[n].imode) {
 				oplist[n].iBW = bw;
+				updateSelect();	// update list
 				return;
 			}
 		addtoList(freq, mode, bw);
@@ -1274,6 +1275,7 @@ void addFreq() {
 		for (int n = 0; n < numinlist; n++)
 			if (freq == oplist[n].freq && mode == oplist[n].imode) {
 				oplist[n].iBW = bw;
+				updateSelect();	// update list
 				return;
 			}
 		addtoList(freq, mode, bw);
@@ -3271,7 +3273,8 @@ void cbBandSelect(int band)
 			vfoA.freq = freq;
 			Fl::awake(setFreqDispA, (void *)vfoA.freq);
 			vfo = vfoA;
-			send_xml_freq(vfo.freq);
+// big speed up in windows with no fldigi
+			if (fldigi_online) send_xml_freq(vfo.freq);
 		}
 		if ( selrig->twovfos() ) {
 			freq = selrig->get_vfoB();
@@ -3286,7 +3289,7 @@ void cbBandSelect(int band)
 			vfoB.freq = freq;
 			Fl::awake(setFreqDispB, (void *)vfoB.freq);
 			vfo = vfoB;
-			send_xml_freq(vfo.freq);
+			if (fldigi_online) send_xml_freq(vfo.freq);
 		}
 	}
 // read mode WHILE LOCKED, Not-The-Same-As read_mode() **********
@@ -3296,20 +3299,24 @@ void cbBandSelect(int band)
 			nu_mode = selrig->get_modeA();
 			if (nu_mode != vfoA.imode) {
 				vfoA.imode = vfo.imode = nu_mode;
-				try {
-					send_new_mode(nu_mode);
-					send_sideband();
-				} catch (...) {}
+				if (fldigi_online) {
+					try {
+						send_new_mode(nu_mode);
+						send_sideband();
+					} catch (...) {}
+				}
 				Fl::awake(setModeControl);
 			}
 		} else {
 			nu_mode = selrig->get_modeB();
 			if (nu_mode != vfoB.imode) {
 				vfoB.imode = vfo.imode = nu_mode;
-				try {
-					send_new_mode(nu_mode);
-					send_sideband();
-				} catch (...) {}
+				if (fldigi_online) {
+					try {
+						send_new_mode(nu_mode);
+						send_sideband();
+					} catch (...) {}
+				}
 				Fl::awake(setModeControl);
 			}
 		}
@@ -3322,10 +3329,12 @@ void cbBandSelect(int band)
 			vfoA.iBW = vfo.iBW = selrig->get_bwA();
 		else
 			vfoB.iBW = vfo.iBW = selrig->get_bwB();
-		try {
-			send_bandwidths();
-			send_new_bandwidth(vfo.iBW);
-		} catch (...) {}
+		if (fldigi_online) {
+			try {
+				send_bandwidths();
+				send_new_bandwidth(vfo.iBW);
+			} catch (...) {}
+		}
 		Fl::awake(updateBandwidthControl);	// async GUI cloud
 	}
 // Update Other.. WHILE LOCKED Other-Things-To Update *************************
