@@ -12,6 +12,7 @@ const char *szDSPLO[] = {"NONE", NULL};
 const char *szDSPHI[] = {"NONE", NULL};
 const char *szdsptooltip = "dsp tooltip";
 const char *szbtnlabel = " ";
+const int  ibw_val = -1;
 
 static GUI basewidgets[] = { {NULL, 0, 0} };
 
@@ -26,6 +27,7 @@ rigbase::rigbase()
 	dsp_hi = szDSPHI;
 	hi_tooltip = szdsptooltip;
 	hi_label = szbtnlabel;
+	bw_vals_ = &ibw_val;
 
 	widgets = basewidgets;
 
@@ -39,6 +41,7 @@ rigbase::rigbase()
 
 	has_xcvr_auto_on_off =
 	comm_echo =
+	has_vfo_adj =
 	has_rit =
 	has_xit =
 	has_bfo =
@@ -52,6 +55,8 @@ rigbase::rigbase()
 	has_notch_control =
 	allow_notch_changes =
 	has_noise_control =
+	has_noise_reduction_control =
+	has_noise_reduction =
 	has_attenuator_control =
 	has_preamp_control =
 	has_ifshift_control =
@@ -70,6 +75,7 @@ rigbase::rigbase()
 	has_cw_wpm =
 	has_cw_vol =
 	has_cw_spot =
+	has_cw_spot_tone =
 	has_cw_qsk =
 	has_cw_weight =
 	has_cw_keyer =
@@ -80,6 +86,8 @@ rigbase::rigbase()
 	has_vox_on_dataport =
 	has_auto_notch = 
 	has_compression =
+	has_compON =
+	use_line_in =
 	has_bpf_center =
 	has_special =  
 	has_smeter =
