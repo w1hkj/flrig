@@ -22,16 +22,28 @@ static const char TS2000_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'U' 
 static const char *TS2000_empty[] = { "N/A", NULL };
 
 static const char *TS2000_lo[] = {
-  "0",   "50", "100", "200", "300", 
+ "10",   "50", "100", "200", "300", 
 "400",  "500", "600", "700", "800", 
-"900", "1000",
-NULL };
+"900", "1000", NULL };
+
+static const char *TS2000_CAT_lo[] = {
+"SL00;", "SL01;", "SL02;", "SL03;", "SL04;", 
+"SL05;", "SL06;", "SL07;", "SL08;", "SL09;",
+"SL10;", "SL11;", NULL };
+static const char *TS2000_lo_tooltip = "lo cutoff";
+static const char *TS2000_SSB_btn_lo_label = "L";
 
 static const char *TS2000_hi[] = {
-"1400", "1600", "1800", "2000", "2200", 
-"2400", "2600", "2800", "3000", "3400", 
-"4000", "5000",
-NULL };
+"1400", "1600", "1800", "2000", "2200",
+"2400", "2600", "2800", "3000", "3400",
+"4000", "5000", NULL };
+
+static const char *TS2000_CAT_hi[] = {
+"SH00;", "SH01;", "SH02;", "SH03;", "SH04;", 
+"SH05;", "SH06;", "SH07;", "SH08;", "SH09;",
+"SH10;", "SH11;", NULL };
+static const char *TS2000_hi_tooltip = "hi cutoff";
+static const char *TS2000_SSB_btn_hi_label = "H";
 
 static const char *TS2000_AM_lo[] = {
 "0", "100", "200", "500",
@@ -86,8 +98,14 @@ RIG_TS2000::RIG_TS2000() {
 	name_ = TS2000name_;
 	modes_ = TS2000modes_;
 	bandwidths_ = TS2000_empty;
-	dsp_lo = TS2000_lo;
-	dsp_hi = TS2000_hi;
+
+	dsp_lo     = TS2000_lo;
+	lo_tooltip = TS2000_lo_tooltip;
+	lo_label   = TS2000_SSB_btn_lo_label;
+
+	dsp_hi     = TS2000_hi;
+	hi_tooltip = TS2000_hi_tooltip;
+	hi_label   = TS2000_SSB_btn_hi_label;
 
 	widgets = rig_widgets;
 
@@ -396,6 +414,10 @@ int RIG_TS2000::set_widths(int val)
 		bandwidths_ = TS2000_empty;
 		dsp_lo = TS2000_lo;
 		dsp_hi = TS2000_hi;
+		lo_tooltip = TS2000_lo_tooltip;
+		lo_label   = TS2000_SSB_btn_lo_label;
+		hi_tooltip = TS2000_hi_tooltip;
+		hi_label   = TS2000_SSB_btn_hi_label;
 		if (val == FM) bw = 0x8A03; // 200 ... 4000 Hz
 		else bw = 0x8803; // 200 ... 3000 Hz
 	} else if (val == CW || val == CWR) {
@@ -508,11 +530,11 @@ void RIG_TS2000::set_bwA(int val)
 		if (val < 256) return;
 		A.iBW = val;
 		cmd = "SL";
-		cmd.append(to_decimal(A.iBW & 0xFF, 2)).append(";");
+		cmd = TS2000_CAT_lo[A.iBW & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set lower", cmd, replystr);
 		cmd = "SH";
-		cmd.append(to_decimal(((A.iBW >> 8) & 0x7F), 2)).append(";");
+		cmd = TS2000_CAT_hi[(A.iBW >> 8) & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set upper", cmd, replystr);
 	}
@@ -579,11 +601,11 @@ void RIG_TS2000::set_bwB(int val)
 		if (val < 256) return;
 		B.iBW = val;
 		cmd = "SL";
-		cmd.append(to_decimal(B.iBW & 0xFF, 2)).append(";");
+		cmd = TS2000_CAT_lo[B.iBW & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set lower", cmd, replystr);
 		cmd = "SH";
-		cmd.append(to_decimal(((B.iBW >> 8) & 0x7F), 2)).append(";");
+		cmd = TS2000_CAT_hi[(B.iBW >> 8) & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set upper", cmd, replystr);
 	}
