@@ -1,8 +1,23 @@
 
 
-=Version 1.2.7=
+=Version 1.2.8=
 
-2012-02-04  Terry Embry  <ftembry@users.berlios.de>
+2012-02-17  Terry Embry  <ftembry@users.berlios.de>
+
+	d6c88cc: Service A/B
+	2721d1d: On line test
+
+2012-02-16  David Freese  <w1hkj@w1hkj.com>
+
+	3fb4a06: Disabled control bug
+	af5641a: Debug Level
+
+2012-02-13  Terry Embry  <ftembry@users.berlios.de>
+
+	80712bc: Saved BW
+
+
+=Version 1.2.7=
 
 	db19ce7: FT2000 mic input
 	fbd12d2: FT950 60m
