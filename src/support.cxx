@@ -569,8 +569,8 @@ void serviceA()
 		selrig->set_modeA(vfoA.imode);
 		vfo.imode = vfoA.imode;
 		Fl::awake(setModeControl);
-		Fl::awake(updateBandwidthControl);
 		vfo.iBW = vfoA.iBW;
+		Fl::awake(updateBandwidthControl);
 		Fl::awake(setBWControl);
 		selrig->set_bwA(vfoA.iBW);
 		pthread_mutex_lock(&mutex_xmlrpc);
@@ -639,8 +639,8 @@ void serviceB()
 		selrig->set_modeB(vfoB.imode);
 		vfo.imode = vfoB.imode;
 		Fl::awake(setModeControl);
-		Fl::awake(updateBandwidthControl);
 		vfo.iBW = vfoB.iBW;
+		Fl::awake(updateBandwidthControl);
 		Fl::awake(setBWControl);
 		selrig->set_bwB(vfoB.iBW);
 		pthread_mutex_lock(&mutex_xmlrpc);
