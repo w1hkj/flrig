@@ -2008,19 +2008,24 @@ void adjust_control_positions()
 
 	btnInitializing->hide();
 
-	if (selrig->has_extras) {
-		tabs550->resize(tabs550->x(), y + 20, tabs550->w(), tabs550->h());
-		tabsGeneric->resize(tabsGeneric->x(), y + 20, tabsGeneric->w(), tabsGeneric->h());
-		tabs550->hide();
-		tabsGeneric->hide();
+	tabs550->resize(tabs550->x(), y + 20, tabs550->w(), tabs550->h());
+	tabs550->hide();
 
+	tabsGeneric->resize(tabsGeneric->x(), y + 20, tabsGeneric->w(), tabsGeneric->h());
+	tabsGeneric->hide();
+
+	btn_show_controls->label("@-22->");
+	btn_show_controls->redraw_label();
+
+	if (selrig->has_extras)
 		btn_show_controls->show();
-		btn_show_controls->label("@-22->");
-		btn_show_controls->redraw_label();
-	} else
+	else
 		btn_show_controls->hide();
 
-	mainwindow->size( mainwindow->w(), y + 20);
+	y += 20;
+
+	mainwindow->size( mainwindow->w(), y);
+	mainwindow->init_sizes();
 	mainwindow->redraw();
 
 	if (progStatus.tooltips) {
@@ -2824,7 +2829,6 @@ void initRig()
 
 	if (selrig->has_compON || selrig->has_compression)
 		selrig->set_compression();
-
 
 	adjust_control_positions();
 	initXcvrTab();
