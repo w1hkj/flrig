@@ -707,6 +707,16 @@ void RIG_TS2000::set_noise(bool b)
 	showresp(WARN, ASC, "set NB", cmd, replystr);
 }
 
+int RIG_TS2000::get_noise()
+{
+	cmd = "NB;";
+	waitN(4, 100, "get Noise Blanker", ASC);
+	size_t p = replystr.rfind("NB");
+	if (p == string::npos) return 0;
+	if (replystr[p+2] == '0') return 0;
+	return 1;
+}
+
 //======================================================================
 // IF shift only available if the transceiver is in the CW mode
 // step size is 50 Hz
