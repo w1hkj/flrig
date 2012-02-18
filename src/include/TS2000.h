@@ -67,6 +67,7 @@ public:
 	void set_auto_notch(int v);
 	int  get_auto_notch();
 	void set_noise(bool b);
+	int  get_noise();
 	void set_mic_gain(int val);
 	int  get_mic_gain();
 	void get_mic_min_max_step(int &min, int &max, int &step);
