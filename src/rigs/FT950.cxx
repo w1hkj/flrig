@@ -15,6 +15,12 @@
 
 #define WVALS_LIMIT -1
 
+enum mFT950 {
+  mLSB, mUSB, mCW, mFM, mAM, mRTTY_L, mCW_R, mPKT_L, mRTTY_U, mPKT_FM, mFM_N, mPKT_U, mAM_N };
+// mLSB, mUSB, mCW, mFM, mAM, mRTTY_L, mCW_R, mPKT_L, mRTTY_U, mPKT_FM, mFM_N, mPKT_U, mAM_N
+//  0,    1,    2,   3,   4,   5,       6,     7,      8,       9,       10,    11,     12	// mode index
+// 18,   18,    5,   0,   0,   5,       5,     5,      5,       0,        0,     5,      0	// FT950_def_bw
+
 static const char FT950name_[] = "FT-950";
 
 static const char *FT950modes_[] = {
@@ -26,7 +32,8 @@ static const char FT950_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '8', 
 static const char FT950_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L', 'U', 'U', 'U', 'U', 'U' };
 
 // 20110707 - SSB "2450", 14 discontinued in latest North American firmware 
-static const int FT950_def_bw[] = { 18, 18, 5, 0, 0, 5, 5, 18, 5, 0, 0, 18, 0 };
+static const int FT950_def_bw[] = { 18, 18, 5, 0, 0, 5, 5, 5, 5, 0, 0, 5, 0 };
+
 static const char *FT950_widths_SSB[] = {
 "200", "400", "600", "850", "1100", "1350", "1500", "1650", "1800",
 "1950", "2100", "2250", "2400", "2500", "2600", "2700",
@@ -42,12 +49,18 @@ static const char *FT950_widths_CW[] = {
 static int FT950_wvals_CW[] = {
 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, WVALS_LIMIT };
 
+// Single bandwidth modes
+static const char *FT950_widths_AMnar[]  = { "NARR", NULL };
+static const char *FT950_widths_AMwide[] = { "NORM", NULL };
+static const char *FT950_widths_FMnar[]  = { "NARR", NULL };
+static const char *FT950_widths_FMwide[] = { "NORM", NULL };
+
 static const int FT950_wvals_AMFM[] = { 0, WVALS_LIMIT };
 
-static const char *FT950_widths_AMnar[]  = {  "6000", NULL };
-static const char *FT950_widths_AMwide[] = {  "9000", NULL };
-static const char *FT950_widths_FMnar[]  = { "12500", NULL };
-static const char *FT950_widths_FMwide[] = { "25000", NULL };
+// mPKT_FM Multi bandwidth mode
+static const char *FT950_widths_NN[] = {"NORM", "NARR", NULL };
+
+static const int FT950_wvals_NN[] = {0, 1, WVALS_LIMIT};
 
 static const char *FT950_US_60m[] = {"125", "126", "127", "128", "130", NULL};
 // UK 60m channel numbers by Brian, G8SEZ
@@ -525,22 +538,26 @@ int RIG_FT950::get_preamp()
 int RIG_FT950::adjust_bandwidth(int val)
 {
 	int bw = 0;
-	if (val == 2 || val == 5 || val == 6 || val == 8) {
+	if (val == mCW || val == mCW_R ||
+	    val == mRTTY_L || val == mRTTY_U ||
+	    val == mPKT_L || val == mPKT_U) {
 		bandwidths_ = FT950_widths_CW;
 		bw_vals_ = FT950_wvals_CW;
-		bw = FT950_def_bw[val];
-	} else if (val == 3 || val == 4 || val == 10 || val == 12) {
-		if (val == 3) bandwidths_ = FT950_widths_FMwide;
-		else if (val ==  4) bandwidths_ = FT950_widths_AMwide;
-		else if (val == 10) bandwidths_ = FT950_widths_FMnar;
-		else if (val == 12) bandwidths_ = FT950_widths_AMnar;
+	} else if (val == mFM || val == mAM || val == mPKT_FM || val == mFM_N || val == mAM_N) {
+		if (val == mPKT_FM) {
+			bandwidths_ = FT950_widths_NN;
+			bw_vals_ = FT950_wvals_NN;
+		}
+		else if (val == mFM) bandwidths_ = FT950_widths_FMwide;
+		else if (val ==  mAM) bandwidths_ = FT950_widths_AMwide;
+		else if (val == mFM_N) bandwidths_ = FT950_widths_FMnar;
+		else if (val == mAM_N) bandwidths_ = FT950_widths_AMnar;
 		bw_vals_ = FT950_wvals_AMFM;
-		bw = FT950_def_bw[val];
 	} else {
 		bandwidths_ = FT950_widths_SSB;
 		bw_vals_ = FT950_wvals_SSB;
-		bw = FT950_def_bw[val];
 	}
+	bw = FT950_def_bw[val];
 	return bw;
 }
 
@@ -551,11 +568,14 @@ int RIG_FT950::def_bandwidth(int val)
 
 const char ** RIG_FT950::bwtable(int n)
 {
-	if (n == 3) return FT950_widths_FMwide;
-	else if (n == 4) return FT950_widths_AMwide;
-	else if (n == 10) return FT950_widths_FMnar;
-	else if (n == 12) return FT950_widths_AMnar;
-	else if (n == 2 || n == 5 || n == 6 || n == 8)
+	if (n == mPKT_FM) return FT950_widths_NN;
+	else if (n == mFM) return FT950_widths_FMwide;
+	else if (n == mAM) return FT950_widths_AMwide;
+	else if (n == mFM_N) return FT950_widths_FMnar;
+	else if (n == mAM_N) return FT950_widths_AMnar;
+	else if (n == mCW || n == mCW_R ||
+			 n == mRTTY_L || n == mRTTY_U ||
+			 n == mPKT_L || n == mPKT_U)
 		return FT950_widths_CW;
 	return FT950_widths_SSB;
 }
@@ -569,7 +589,7 @@ void RIG_FT950::set_modeA(int val)
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET mode A", cmd, replystr);
 	adjust_bandwidth(modeA);
-	if (val == 2 || val == 6) return;
+	if (val == mCW || val == mCW_R) return;
 	if (progStatus.spot_onoff) {
 		progStatus.spot_onoff = false;
 		set_spot_onoff();
@@ -608,7 +628,7 @@ void RIG_FT950::set_modeB(int val)
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET mode B", cmd, replystr);
 	adjust_bandwidth(modeB);
-	if (val == 2 || val == 6) return;
+	if (val == mCW || val == mCW_R) return;
 	if (progStatus.spot_onoff) {
 		progStatus.spot_onoff = false;
 		set_spot_onoff();
@@ -643,12 +663,18 @@ void RIG_FT950::set_bwA(int val)
 	int bw_indx = bw_vals_[val];
 	bwA = val;
 
-	if (modeA == 3 || modeA == 4 || modeA == 10 || modeA == 12) {
+	if (modeA == mFM || modeA == mAM || modeA == mFM_N || modeA == mAM_N) return;
+	if (modeA == mPKT_FM) {
+		if (val == 1) cmd = "NA01;";
+		else cmd = "NA00;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "SET bw A", cmd, replystr);
 		return;
 	}
-	if ((((modeA == 0 || modeA == 1) && val < 8)) ||
-		((modeA == 2 || modeA == 5 || modeA == 6 || modeA == 7 || modeA == 8 || modeA == 11) &&
-		val < 4) ) cmd = "NA01;";
+	if ((((modeA == mLSB || modeA == mUSB) && val < 8)) ||
+		((modeA == mCW || modeA == mCW_R ||
+		  modeA == mRTTY_L || modeA == mRTTY_U ||
+		  modeA == mPKT_L || modeA == mPKT_U) && val < 4) ) cmd = "NA01;";
 	else cmd = "NA00;";
 
 	cmd.append("SH0");
@@ -661,15 +687,27 @@ void RIG_FT950::set_bwA(int val)
 
 int RIG_FT950::get_bwA()
 {
-	if (modeA == 3 || modeA == 4 || modeA == 10 || modeA == 12) {
+	size_t p;
+	if (modeA == mFM || modeA == mAM || modeA == mFM_N || modeA == mAM_N) {
 		bwA = 0;
 		return bwA;	
-	} 
+	}
+	if (modeA == mPKT_FM) {
+		cmd = rsp = "NA0";
+		cmd += ';';
+		waitN(5, 100, "get bw A narrow", ASC);
+		p = replystr.rfind(rsp);
+		if (p == string::npos) { bwA = 0; return bwA; }
+		if (p + 4 >= replystr.length()) { bwA = 0; return bwA; }
+		if (replystr[p+3] == '1') bwA = 1;	// narrow on
+		else bwA = 0;
+		return bwA;
+	}
 	cmd = rsp = "SH0";
 	cmd += ';';
 	waitN(6, 100, "get bw A", ASC);
 
-	size_t p = replystr.rfind(rsp);
+	p = replystr.rfind(rsp);
 	if (p == string::npos) return bwA;
 	if (p + 5 >= replystr.length()) return bwA;
 
@@ -692,12 +730,18 @@ void RIG_FT950::set_bwB(int val)
 	int bw_indx = bw_vals_[val];
 	bwB = val;
 
-	if (modeB == 3 || modeB == 4 || modeB == 10 || modeB == 12) {
+	if (modeB == mFM || modeB == mAM || modeB == mFM_N || modeB == mAM_N) return;
+	if (modeA == mPKT_FM) {
+		if (val == 1) cmd = "NA01;";
+		else cmd = "NA00;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "SET bw B", cmd, replystr);
 		return;
 	}
-	if ((((modeB == 0 || modeB == 1) && val < 8)) ||
-		((modeB == 2 || modeB == 5 || modeB == 6 || modeB == 7 || modeB == 8 || modeB == 11) &&
-		val < 4) ) cmd = "NA1;";
+	if ((((modeB == mLSB || modeB == mUSB) && val < 8)) ||
+		((modeB == mCW || modeB == mCW_R ||
+		  modeB == mRTTY_L || modeB == mRTTY_U ||
+		  modeB == mPKT_L || modeB == mPKT_U) && val < 4) ) cmd = "NA01;";
 	else cmd = "NA0;";
 
 	cmd.append("SH0");
@@ -710,18 +754,30 @@ void RIG_FT950::set_bwB(int val)
 
 int RIG_FT950::get_bwB()
 {
-	if (modeB == 3 || modeB == 4 || modeB == 10 || modeB == 12) {
+	size_t p;
+	if (modeB == mFM || modeB == mAM || modeB == mFM_N || modeB == mAM_N) {
 		bwB = 0;
 		return bwB;
-	} 
+	}
+	if (modeB == mPKT_FM) {
+		cmd = rsp = "NA0";
+		cmd += ';';
+		waitN(5, 100, "get bw B narrow", ASC);
+		p = replystr.rfind(rsp);
+		if (p == string::npos) { bwB = 0; return bwB; }
+		if (p + 4 >= replystr.length()) { bwB = 0; return bwB; }
+		if (replystr[p+3] == '1') bwB = 1;	// narrow on
+		else bwB = 0;
+		return bwB;
+	}
 	cmd = rsp = "SH0";
 	cmd += ';';
 	waitN(6, 100, "get bw B", ASC);
 
-	size_t p = replystr.rfind(rsp);
+	p = replystr.rfind(rsp);
 	if (p == string::npos) return bwB;
 	if (p + 5 >= replystr.length()) return bwB;
-	
+
 	replystr[p+5] = 0;
 	int bw_idx = fm_decimal(&replystr[p+3],2);
 	const int *idx = bw_vals_;
@@ -1024,7 +1080,7 @@ void RIG_FT950::enable_keyer()
 
 bool RIG_FT950::set_cw_spot()
 {
-	if (vfo.imode == 2 || vfo.imode == 6) {
+	if (vfo.imode == mCW || vfo.imode == mCW_R) {
 		cmd = "CS0;";
 		if (progStatus.spot_onoff) cmd[2] = '1';
 		sendCommand(cmd);
@@ -1164,7 +1220,7 @@ void RIG_FT950::set_xcvr_auto_off()
 // Audio Peak Filter, like set_cw_spot
 bool RIG_FT950::set_cw_APF()
 {
-	if (vfo.imode == 2 || vfo.imode == 6) {
+	if (vfo.imode == mCW || vfo.imode == mCW_R) {
 		cmd = "CO0000;";
 		if (progStatus.apf_onoff) cmd[5] = '2';
 		sendCommand(cmd);
