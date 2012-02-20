@@ -38,7 +38,7 @@ Function {Rig_window()} {open
 } {
   Fl_Window {} {
     label Flrig open
-    xywh {577 57 424 324} type Double align 80
+    xywh {597 68 425 320} type Double align 80
     code0 {\#include <stdlib.h>} visible
   } {
     Fl_Menu_Bar {} {open
@@ -1121,10 +1121,11 @@ Fl::scheme(progStatus.ui_scheme.c_str());} open
   }
 } 
 
-Function {Memory_Dialog()} {} {
+Function {Memory_Dialog()} {open
+} {
   Fl_Window {} {
     label {Flrig Memory} open
-    xywh {576 491 320 138} type Double hide
+    xywh {203 660 505 175} type Double visible
   } {
     Fl_Group {} {open
       xywh {2 2 60 133} box ENGRAVED_FRAME
@@ -1173,9 +1174,18 @@ default:
 	break;
 }}
       tooltip {Right click => pick freq
-Double-click ==> pick and close} xywh {66 2 250 133} type Hold labelfont 4 labelsize 12 textfont 4 textsize 12
+Double-click ==> pick and close
+Left click => edit Alpha Tag} xywh {66 2 434 133} type Hold labelfont 4 labelsize 12 textfont 4 textsize 12
       code0 {o->has_scrollbar(Fl_Browser_::VERTICAL_ALWAYS);}
       code1 {o->column_widths(freq_sel_widths);}
+    }
+    Fl_Input inAlphaTag {
+      label {Alpha Tag:}
+      callback {editAlphaTag();} selected
+      tooltip {Select Tag from browser window
+Left click => in Tag field to edit
+[Enter] => when done to update} xywh {290 140 190 25}
+      code0 {inAlphaTag->when(FL_WHEN_ENTER_KEY_ALWAYS);}
     }
   }
 } 
@@ -1184,7 +1194,7 @@ Function {XcvrDialog()} {open
 } {
   Fl_Window {} {
     label {I/O Ports} open
-    xywh {579 407 482 257} type Double visible
+    xywh {580 428 480 255} type Double visible
   } {
     Fl_Tabs tabsConfig {open
       xywh {0 8 482 246}
@@ -1207,7 +1217,7 @@ initConfigDialog();} open
           } {}
           Fl_Counter cntRigCatRetries {
             label Retries
-            callback {progStatus.comm_retries = (int)o->value();} selected
+            callback {progStatus.comm_retries = (int)o->value();}
             tooltip {Number of  times to resend
 command before giving up} xywh {96 63 100 22} align 4 minimum 1 maximum 10 step 1 value 5
             code0 {o->value(progStatus.comm_retries);}
@@ -1745,7 +1755,7 @@ Function {power_meter_scale_select()} {open
 } {
   Fl_Window {} {
     label {Select Power Meter Scale} open
-    xywh {651 754 458 149} type Double visible
+    xywh {647 726 455 145} type Double visible
   } {
     Fl_Button sel_25 {
       label {25 watt}
