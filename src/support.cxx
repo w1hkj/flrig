@@ -50,7 +50,16 @@ bool pushedB = false;
 
 const char **old_bws = NULL;
 
-FREQMODE oplist[LISTSIZE];
+// Add alpha-tag to FREQMODE;
+struct ATAG_FREQMODE {
+	long freq;
+	int  imode;
+	int  iBW;
+	int  src;
+	char alpha_tag[ATAGSIZE];
+};
+ATAG_FREQMODE oplist[LISTSIZE];
+
 int  numinlist = 0;
 vector<string> rigmodes_;
 vector<string> rigbws_;
@@ -938,7 +947,7 @@ void setMode()
 
 void sortList() {
 	if (!numinlist) return;
-	FREQMODE temp;
+	ATAG_FREQMODE temp;
 	for (int i = 0; i < numinlist - 1; i++)
 		for (int j = i + 1; j < numinlist; j++)
 			if (oplist[i].freq > oplist[j].freq) {
@@ -954,31 +963,55 @@ void clearList() {
 		oplist[i].freq = 0;
 		oplist[i].imode = USB;
 		oplist[i].iBW = 0;
+		memset(oplist[i].alpha_tag, 0, ATAGSIZE);
 	}
 	FreqSelect->clear();
 	numinlist = 0;
+	inAlphaTag->value("");
 }
 
 void updateSelect() {
-	char szline[40];
+	char szline[80 + ATAGSIZE];
+	char szatag[ATAGSIZE];
+	int i;
 	if (!numinlist) return;
 	sortList();
 	FreqSelect->clear();
+// stripe lines
+	int bg1, bg2, bg_clr;
+	// bg1 = FL_WHITE; bg2 = FL_LIGHT3;
+	bg1 = FL_WHITE; bg2 = FL_LIGHT2;
+
 	for (int n = 0; n < numinlist; n++) {
+		memset(szline, 0, sizeof(szline));
+		memset(szatag, 0, sizeof(szatag));
+		for (i = 0; i < ATAGSIZE - 1; i++) {
+			szatag[i] = oplist[n].alpha_tag[i];
+			if (szatag[i] == 0) szatag[i] = ' ';
+		}
+		bg_clr = (n % 2) ? bg1 : bg2;
 		snprintf(szline, sizeof(szline),
-			"@r%.3f\t@r%s\t@r%s",
-			oplist[n].freq / 1000.0,
-			selrig->get_bwname_(oplist[n].iBW, oplist[n].imode),
-			selrig->get_modename_(oplist[n].imode) );
+			// "@r%.3f\t@r%s\t@r%s\t@r%s",
+			// oplist[n].freq / 1000.0,
+			// selrig->get_bwname_(oplist[n].iBW, oplist[n].imode),
+			// selrig->get_modename_(oplist[n].imode),
+			"@B%d@r%.3f\t@B%d@r%s\t@B%d@r%s\t@B%d@r%s", bg_clr,
+			oplist[n].freq / 1000.0, bg_clr,
+			selrig->get_bwname_(oplist[n].iBW, oplist[n].imode), bg_clr,
+			selrig->get_modename_(oplist[n].imode), bg_clr,
+			szatag );
 		FreqSelect->add (szline);
 	}
+	inAlphaTag->value("");
 }
 
 void addtoList(int val, int imode, int iBW) {
 	if (numinlist < LISTSIZE) {
 		oplist[numinlist].imode = imode;
 		oplist[numinlist].freq = val;
-		oplist[numinlist++].iBW = iBW;
+		oplist[numinlist].iBW = iBW;
+		memset(oplist[numinlist].alpha_tag, 0, ATAGSIZE);
+		numinlist++;
 	}
 }
 
@@ -998,6 +1031,40 @@ void readFile() {
 			oplist[i].freq = freq;
 			oplist[i].imode = mode;
 			oplist[i].iBW = (bw == -1 ? 0 : bw);
+			memset(oplist[i].alpha_tag, 0, ATAGSIZE);
+			i++;
+		}
+	}
+	iList.close();
+	numinlist = i;
+	updateSelect();
+}
+
+void readTagFile() {
+	ifstream iList(defFileName.c_str());
+	if (!iList) {
+		fl_message ("Could not open %s", defFileName.c_str());
+		return;
+	}
+	clearList();
+	int i = 0, mode, bw;
+	long freq;
+	string atag;
+	char ca[ATAGSIZE + 60];
+	while (!iList.eof()) {
+		freq = 0L; mode = -1;
+		atag.clear();
+		memset(ca, 0, sizeof(ca));
+		iList >> freq >> mode >> bw;
+		iList.getline(ca, sizeof(ca) - 1);
+		atag = ca;
+		if (freq && (mode > -1)) {
+			oplist[i].freq = freq;
+			oplist[i].imode = mode;
+			oplist[i].iBW = (bw == -1 ? 0 : bw);
+// trim leading, trailing spaces and double quotes
+			atag = lt_trim(atag);
+			snprintf(oplist[i].alpha_tag, ATAGSIZE, "%s", atag.c_str());
 			i++;
 		}
 	}
@@ -1007,13 +1074,28 @@ void readFile() {
 }
 
 void buildlist() {
+	string tmpFN, orgFN;
+// check for new Memory-Alpha-Tag file
 	defFileName = RigHomeDir;
 	defFileName.append(selrig->name_);
-	defFileName.append(".arv");
+	defFileName.append(".mat");
 	FILE *fh = fopen(defFileName.c_str(), "r");
 	if (fh != NULL) {
 		fclose (fh);
+		readTagFile();
+		return;
+	}
+// else only read original file to make new MAT file
+	orgFN = RigHomeDir;
+	orgFN.append(selrig->name_);
+	orgFN.append(".arv");
+	fh = fopen(orgFN.c_str(), "r");
+	if (fh != NULL) {
+		fclose (fh);
+		tmpFN = defFileName;
+		defFileName = orgFN;
 		readFile();
+		defFileName = tmpFN;
 		return;
 	}
 	clearList();
@@ -1216,13 +1298,28 @@ void select_and_close()
 {
 	switch (Fl::event_button()) {
 		case FL_LEFT_MOUSE:
+			if (FreqSelect->value() > 0)
+				inAlphaTag->value(oplist[FreqSelect->value() - 1].alpha_tag);
 			if (Fl::event_clicks()) { // double click
 				selectFreq();
 				cbCloseMemory();
 			}
 			break;
 		case FL_RIGHT_MOUSE:
+			if (FreqSelect->value() > 0)
+				inAlphaTag->value(oplist[FreqSelect->value() - 1].alpha_tag);
 			selectFreq();
+			break;
+		default:
+			break;
+	}
+
+// update Alpha Tag field when keyboard scrolling
+	switch (Fl::event_key()) {
+		case FL_Up:
+		case FL_Down:
+			if (FreqSelect->value() > 0)
+				inAlphaTag->value(oplist[FreqSelect->value() - 1].alpha_tag);
 			break;
 		default:
 			break;
@@ -1237,6 +1334,7 @@ void delFreq() {
 		oplist[numinlist - 1].imode = USB;
 		oplist[numinlist - 1].freq = 0;
 		oplist[numinlist - 1].iBW = 0;
+		memset(oplist[numinlist - 1].alpha_tag, 0, ATAGSIZE);
 		numinlist--;
 		updateSelect();
 	}
@@ -1701,6 +1799,7 @@ void updateSmeter(void *d) // 0 to 100;
 
 void saveFreqList()
 {
+	string atag;
 	if (!numinlist) {
 		remove(defFileName.c_str());
 		return;
@@ -1710,8 +1809,11 @@ void saveFreqList()
 		fl_message ("Could not write to %s", defFileName.c_str());
 		return;
 	}
-	for (int i = 0; i < numinlist; i++)
-		oList << oplist[i].freq << " " << oplist[i].imode << " " << oplist[i].iBW << endl;
+	for (int i = 0; i < numinlist; i++) {
+		atag = oplist[i].alpha_tag;
+		oList << oplist[i].freq << " " << oplist[i].imode << " " << oplist[i].iBW << " \"" << atag.c_str() << "\"" << endl;
+
+	}
 	oList.close();
 }
 
@@ -3366,4 +3468,36 @@ void enable_bandselect_btn(int btn_num, bool enable)
 		default:
 			break;
 	}
+}
+
+// trim leading and trailing whitspace and double quote
+const string lt_trim(const string& pString, const string& pWhitespace)
+{
+    size_t beginStr, endStr, range;
+	beginStr = pString.find_first_not_of(pWhitespace);
+    if (beginStr == string::npos) return "";	// no content
+    endStr = pString.find_last_not_of(pWhitespace);
+    range = endStr - beginStr + 1;
+
+    return pString.substr(beginStr, range);
+}
+
+void editAlphaTag()
+{
+	int indx;
+	string atag;
+	if (FreqSelect->value() < 1) {
+		inAlphaTag->value("");
+		return;	// no memory selected
+	}
+	indx = FreqSelect->value() - 1;
+	atag = inAlphaTag->value();
+// delete leading, trailing spaces
+	atag = lt_trim(atag);
+	memset(oplist[indx].alpha_tag, 0, ATAGSIZE);
+	snprintf(oplist[indx].alpha_tag, ATAGSIZE, "%s", atag.c_str());
+// update browser list
+	updateSelect();
+	FreqSelect->value(indx + 1);
+	inAlphaTag->value(oplist[indx].alpha_tag);
 }
