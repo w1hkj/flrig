@@ -1,8 +1,26 @@
 
 
-=Version 1.2.8=
+=Version 1.2.9=
+
+2012-02-20  David Freese  <w1hkj@w1hkj.com>
+
+	0b5bbba: Freq list alpha tag
+	808e864: TS2000 Noise Blanker
+
+2012-02-18  Terry Embry  <ftembry@users.berlios.de>
+
+	758be7a: FT950 PKT/FM Bandwidths
+
+2012-02-17  David Freese  <w1hkj@w1hkj.com>
+
+	6c3259a: TS2000 SL/SH
 
 2012-02-17  Terry Embry  <ftembry@users.berlios.de>
+
+	ad07190: Rigbase value initialization
+
+
+=Version 1.2.8=
 
 	d6c88cc: Service A/B
 	2721d1d: On line test
