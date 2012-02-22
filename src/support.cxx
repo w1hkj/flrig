@@ -581,14 +581,14 @@ void serviceA()
 		vfo.iBW = vfoA.iBW;
 		Fl::awake(updateBandwidthControl);
 		Fl::awake(setBWControl);
-		selrig->set_bwA(vfoA.iBW);
+		selrig->set_bwA(vfo.iBW);
 		pthread_mutex_lock(&mutex_xmlrpc);
 		try {
 			if (vfoA.src == UI)
 				send_new_mode(vfoA.imode);
 			send_sideband();
 			send_bandwidths();
-			send_new_bandwidth(vfoA.iBW);
+			send_new_bandwidth(vfo.iBW);
 		} catch (...) {}
 		pthread_mutex_unlock(&mutex_xmlrpc);
 	} else if (vfoA.iBW != vfo.iBW) {
@@ -651,14 +651,14 @@ void serviceB()
 		vfo.iBW = vfoB.iBW;
 		Fl::awake(updateBandwidthControl);
 		Fl::awake(setBWControl);
-		selrig->set_bwB(vfoB.iBW);
+		selrig->set_bwB(vfo.iBW);
 		pthread_mutex_lock(&mutex_xmlrpc);
 		try {
 			if (vfoB.src == UI)
 				send_new_mode(vfoB.imode);
 			send_sideband();
 			send_bandwidths();
-			send_new_bandwidth(vfoB.iBW);
+			send_new_bandwidth(vfo.iBW);
 		} catch (...) {}
 		pthread_mutex_unlock(&mutex_xmlrpc);
 	} else if (vfoB.iBW != vfo.iBW || pushedB) {
