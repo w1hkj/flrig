@@ -128,6 +128,8 @@ RIG_TS2000::RIG_TS2000() {
 	has_power_out =
 	has_swr_control = false;
 
+	has_split =
+	has_split_AB =
 	has_dsp_controls =
 	has_rf_control =
 	has_micgain_control =
@@ -145,6 +147,8 @@ RIG_TS2000::RIG_TS2000() {
 	has_mode_control =
 	has_bandwidth_control =
 	has_ptt_control = true;
+
+	rxtxa = true;
 }
 
 const char * RIG_TS2000::get_bwname_(int n, int md) 
@@ -171,6 +175,7 @@ void RIG_TS2000::selectA()
 	cmd = "FT0;";
 	sendCommand(cmd, 0);
 	showresp(WARN, ASC, "Tx A", cmd, replystr);
+	rxtxa = true;
 }
 
 void RIG_TS2000::selectB()
@@ -181,25 +186,38 @@ void RIG_TS2000::selectB()
 	cmd = "FT1;";
 	sendCommand(cmd, 0);
 	showresp(WARN, ASC, "Tx B", cmd, replystr);
+	rxtxa = false;
 }
 
 void RIG_TS2000::set_split(bool val) 
 {
 	split = val;
-	if (val) {
+	if (rxtxa) {
 		cmd = "FR0;";
 		sendCommand(cmd, 0);
 		showresp(WARN, ASC, "Rx A", cmd, replystr);
-		cmd = "FT1;";
-		sendCommand(cmd, 0);
-		showresp(WARN, ASC, "Tx B", cmd, replystr);
+		if (val) {
+			cmd = "FT1;";
+			sendCommand(cmd, 0);
+			showresp(WARN, ASC, "Tx B", cmd, replystr);
+		} else {
+			cmd = "FT0;";
+			sendCommand(cmd, 0);
+			showresp(WARN, ASC, "Tx A", cmd, replystr);
+		}
 	} else {
-		cmd = "FR0;";
+		cmd = "FR1;";
 		sendCommand(cmd, 0);
-		showresp(WARN, ASC, "Rx A", cmd, replystr);
-		cmd = "FT0;";
-		sendCommand(cmd, 0);
-		showresp(WARN, ASC, "Tx A", cmd, replystr);
+		showresp(WARN, ASC, "Rx B", cmd, replystr);
+		if (val) {
+			cmd = "FT0;";
+			sendCommand(cmd, 0);
+			showresp(WARN, ASC, "Tx A", cmd, replystr);
+		} else {
+			cmd = "FT1;";
+			sendCommand(cmd, 0);
+			showresp(WARN, ASC, "Tx B", cmd, replystr);
+		}
 	}
 }
 

@@ -93,6 +93,7 @@ rigbase::rigbase()
 	has_smeter =
 	has_power_out =
 	has_split =
+	has_split_AB =
 	has_a2b =
 	has_band_selection =
 	has_get_info = false;

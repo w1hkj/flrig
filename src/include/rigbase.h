@@ -145,6 +145,7 @@ public:
 	bool has_smeter;
 	bool has_power_out;
 	bool has_split;
+	bool has_split_AB;
 	bool has_data_port;
 
 	bool has_extras;

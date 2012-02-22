@@ -1180,23 +1180,24 @@ void cb_set_split(int val)
 		return;
 	}
 
-	if (val) {
-		if (useB) {
-			btnA->value(1);
-			btnB->value(0);
-			cb_selectA();
-		} else {
-			if (vfoB.freq != FreqDispB->value()) {
-				vfoB.freq = FreqDispB->value();
-				pthread_mutex_lock(&mutex_serial);
-					selrig->selectB();
-					selrig->set_vfoB(vfoB.freq);
-					selrig->selectA();
-				pthread_mutex_unlock(&mutex_serial);
+	if (!selrig->has_split_AB) {
+		if (val) {
+			if (useB) {
+				btnA->value(1);
+				btnB->value(0);
+				cb_selectA();
+				if (vfoB.freq != FreqDispB->value()) {
+					vfoB.freq = FreqDispB->value();
+					pthread_mutex_lock(&mutex_serial);
+						selrig->selectB();
+						selrig->set_vfoB(vfoB.freq);
+						selrig->selectA();
+					pthread_mutex_unlock(&mutex_serial);
+				}
 			}
-		}
-	} else
-		cb_selectA();
+		} else
+			cb_selectA();
+	}
 
 	pthread_mutex_lock(&mutex_serial);
 		selrig->set_split(val);
@@ -1232,7 +1233,8 @@ void cb_selectA() {
 	useB = false;
 	if (progStatus.split) {
 		btnSplit->value(0);
-		cb_set_split(0);
+		if (!selrig->has_split_AB)
+			cb_set_split(0);
 	}
 	pthread_mutex_lock(&mutex_serial);
 	changed_vfo = true;
@@ -1249,7 +1251,8 @@ void cb_selectB() {
 	useB = true;
 	if (progStatus.split) {
 		btnSplit->value(0);
-		cb_set_split(0);
+		if (!selrig->has_split_AB)
+			cb_set_split(0);
 	}
 	pthread_mutex_lock(&mutex_serial);
 	changed_vfo = true;

@@ -11,6 +11,7 @@ private:
 	bool notch_on;
 	int  preamp_level;
 	int  att_level;
+	bool rxtxa;
 public:
 	RIG_TS2000();
 	~RIG_TS2000(){}
