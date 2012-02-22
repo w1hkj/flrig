@@ -50,10 +50,8 @@ static int FT950_wvals_CW[] = {
 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, WVALS_LIMIT };
 
 // Single bandwidth modes
-static const char *FT950_widths_AMnar[]  = { "NARR", NULL };
-static const char *FT950_widths_AMwide[] = { "NORM", NULL };
-static const char *FT950_widths_FMnar[]  = { "NARR", NULL };
-static const char *FT950_widths_FMwide[] = { "NORM", NULL };
+static const char *FT950_widths_AMFMnar[]  = { "NARR", NULL };
+static const char *FT950_widths_AMFMnorm[] = { "NORM", NULL };
 
 static const int FT950_wvals_AMFM[] = { 0, WVALS_LIMIT };
 
@@ -111,6 +109,7 @@ RIG_FT950::RIG_FT950() {
 	has_a2b =
 	has_xcvr_auto_on_off =
 	has_split =
+	has_split_AB =
 	has_band_selection =
 	has_noise_reduction =
 	has_noise_reduction_control =
@@ -293,15 +292,26 @@ bool RIG_FT950::can_split()
 void RIG_FT950::set_split(bool val)
 {
 	split = val;
-	if (val) {
-		useB = false;
-		cmd = "FR0;FT3;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "Rx on A, Tx on B", cmd, replystr);
+	if (useB) {
+		if (val) {
+			cmd = "FR4;FT2;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on B, Tx on A", cmd, replystr);
+		} else {
+			cmd = "FR4;FT3;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on B, Tx on B", cmd, replystr);
+		}
 	} else {
-		cmd = "FR0;FT2;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "Rx on A, Tx on A", cmd, replystr);
+		if (val) {
+			cmd = "FR0;FT3;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on A, Tx on B", cmd, replystr);
+		} else {
+			cmd = "FR0;FT2;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on A, Tx on A", cmd, replystr);
+		}
 	}
 	Fl::awake(highlight_vfo, (void *)0);
 }
@@ -548,10 +558,8 @@ int RIG_FT950::adjust_bandwidth(int val)
 			bandwidths_ = FT950_widths_NN;
 			bw_vals_ = FT950_wvals_NN;
 		}
-		else if (val == mFM) bandwidths_ = FT950_widths_FMwide;
-		else if (val ==  mAM) bandwidths_ = FT950_widths_AMwide;
-		else if (val == mFM_N) bandwidths_ = FT950_widths_FMnar;
-		else if (val == mAM_N) bandwidths_ = FT950_widths_AMnar;
+		else if (val == mFM || val == mAM) bandwidths_ = FT950_widths_AMFMnorm;
+		else if (val == mFM_N || val == mAM_N) bandwidths_ = FT950_widths_AMFMnar;
 		bw_vals_ = FT950_wvals_AMFM;
 	} else {
 		bandwidths_ = FT950_widths_SSB;
@@ -568,15 +576,20 @@ int RIG_FT950::def_bandwidth(int val)
 
 const char ** RIG_FT950::bwtable(int n)
 {
-	if (n == mPKT_FM) return FT950_widths_NN;
-	else if (n == mFM) return FT950_widths_FMwide;
-	else if (n == mAM) return FT950_widths_AMwide;
-	else if (n == mFM_N) return FT950_widths_FMnar;
-	else if (n == mAM_N) return FT950_widths_AMnar;
-	else if (n == mCW || n == mCW_R ||
-			 n == mRTTY_L || n == mRTTY_U ||
-			 n == mPKT_L || n == mPKT_U)
-		return FT950_widths_CW;
+	switch (n) {
+		case mPKT_FM : return FT950_widths_NN;
+		case mFM     :
+		case mAM     : return FT950_widths_AMFMnorm;
+		case mFM_N   :
+		case mAM_N   : return FT950_widths_AMFMnar;
+		case mCW     :
+		case mCW_R   :
+		case mRTTY_L :
+		case mRTTY_U :
+		case mPKT_L  :
+		case mPKT_U  : return FT950_widths_CW;
+		default      : break;
+	}
 	return FT950_widths_SSB;
 }
 

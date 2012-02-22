@@ -584,6 +584,12 @@ void serviceA()
 		selrig->set_bwA(vfo.iBW);
 		pthread_mutex_lock(&mutex_xmlrpc);
 		try {
+/*
+printf("vfoA %ld, %s (%d), %s (%d)\n", 
+xmlvfo.freq, 
+selrig->modes_[vfo.imode], vfo.imode, 
+selrig->bandwidths_[vfo.iBW], vfo.iBW);
+*/
 			if (vfoA.src == UI)
 				send_new_mode(vfoA.imode);
 			send_sideband();
@@ -598,7 +604,7 @@ void serviceA()
 		if (vfoA.src == UI) {
 		pthread_mutex_lock(&mutex_xmlrpc);
 			try {
-				send_new_bandwidth(vfoA.iBW);
+				send_new_bandwidth(vfo.iBW);
 			} catch (...) {}
 		pthread_mutex_unlock(&mutex_xmlrpc);
 		}
@@ -668,7 +674,7 @@ void serviceB()
 		if (vfoB.src == UI) {
 		pthread_mutex_lock(&mutex_xmlrpc);
 			try {
-				send_new_bandwidth(vfoB.iBW);
+				send_new_bandwidth(vfo.iBW);
 			} catch (...) {}
 		pthread_mutex_unlock(&mutex_xmlrpc);
 		}
