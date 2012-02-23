@@ -15,6 +15,7 @@ private:
 	bool data_mode;
 	int  active_mode;
 	int  active_bandwidth;
+	bool rxtxa;
 public:
 	RIG_TS590S();
 	~RIG_TS590S(){}
