@@ -223,6 +223,7 @@ void RIG_TS2000::set_split(bool val)
 
 bool RIG_TS2000::get_split()
 {
+#if 0 // read using Info CAT command
 	cmd = "IF;";
 	int ret = waitN(38, 100, "get info", ASC);
 	if (ret < 38) return split;
@@ -230,6 +231,32 @@ bool RIG_TS2000::get_split()
 	if (p == string::npos) return split;
 	split = replystr[p+32] ? true : false;
 	return split;
+#else // read using separate FT / FR queries
+	size_t p;
+	bool split = false;
+	char rx, tx;
+// tx vfo
+	cmd = rsp = "FT";
+	cmd.append(";");
+	waitN(4, 100, "get split tx vfo", ASC);
+	p = replystr.rfind(rsp);
+	if (p == string::npos) return split;
+	tx = replystr[p+2];
+
+// rx vfo
+	cmd = rsp = "FR";
+	cmd.append(";");
+	waitN(4, 100, "get split rx vfo", ASC);
+
+	p = replystr.rfind(rsp);
+	if (p == string::npos) return split;
+	rx = replystr[p+2];
+// split test
+	if ((tx == '1' && rx == '0') || (tx == '0' && rx == '1'))
+		split = true;
+
+	return split;
+#endif
 }
 
 long RIG_TS2000::get_vfoA ()
