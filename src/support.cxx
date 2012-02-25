@@ -578,9 +578,12 @@ void serviceA()
 		selrig->set_modeA(vfoA.imode);
 		vfo.imode = vfoA.imode;
 		Fl::awake(setModeControl);
+// Set default mode bandwidth from fldigi and send it back
+		if (vfoA.src == XML)
+			vfoA.iBW = selrig->def_bandwidth(vfo.imode);
 		vfo.iBW = vfoA.iBW;
-		Fl::awake(updateBandwidthControl); // vfo.iBW set inbounds if needed
-		vfoA.iBW = vfo.iBW;                // make sure they match or strange things can happen	
+		Fl::awake(updateBandwidthControl);	// set vfo.iBW inbounds if out
+		vfoA.iBW = vfo.iBW;					// needed sync up after inbounds adjustment
 		Fl::awake(setBWControl);
 		selrig->set_bwA(vfo.iBW);
 		pthread_mutex_lock(&mutex_xmlrpc);
@@ -655,9 +658,12 @@ void serviceB()
 		selrig->set_modeB(vfoB.imode);
 		vfo.imode = vfoB.imode;
 		Fl::awake(setModeControl);
+// Set default mode bandwidth from fldigi and send it back
+		if (vfoB.src == XML)
+			vfoB.iBW = selrig->def_bandwidth(vfo.imode);
 		vfo.iBW = vfoB.iBW;
-		Fl::awake(updateBandwidthControl); // vfo.iBW set inbounds if needed
-		vfoB.iBW = vfo.iBW;                // make sure they match or strange things can happen 
+		Fl::awake(updateBandwidthControl);	// set vfo.iBW inbounds if out
+		vfoB.iBW = vfo.iBW;					// needed sync up after inbounds adjustment
 		Fl::awake(setBWControl);
 		selrig->set_bwB(vfo.iBW);
 		pthread_mutex_lock(&mutex_xmlrpc);

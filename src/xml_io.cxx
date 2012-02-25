@@ -305,7 +305,7 @@ static void check_for_mode_change(const XmlRpcValue& new_mode)
 		return;
 	string smode = new_mode;
 	xmlmode_changed = false;
-	if (smode != selrig->modes_[vfo.imode]) {
+	if (smode != selrig->modes_[xmlvfo.imode]) {
 		int imode = 0;
 		while (selrig->modes_[imode] != NULL && smode != selrig->modes_[imode])
 			imode++;
@@ -329,13 +329,13 @@ static void check_for_bandwidth_change(const XmlRpcValue& new_bw)
 		return;
 // out-of-bounds check for instance where bandwidths_ has changed
 	int t = 0;
-	while (selrig->bandwidths_[t] != NULL)  t++;
-	if (vfo.iBW >= t) return;
+	while (selrig->bwtable(xmlvfo.imode)[t] != NULL)  t++;
+	if (xmlvfo.iBW >= t) return;	// serivceAB will set inbounds if needed
 
 	string sbw = new_bw;
-	if (sbw != selrig->bandwidths_[vfo.iBW]) {
+	if (sbw != selrig->bwtable(xmlvfo.imode)[xmlvfo.iBW]) {
 		int ibw = 0;
-		const char **bwt = &selrig->bandwidths_[0];
+		const char **bwt = &selrig->bwtable(xmlvfo.imode)[0];
 		while ((bwt[ibw] != NULL) && (sbw != bwt[ibw])) ibw++;
 		if (bwt[ibw] != NULL && ibw != xmlvfo.iBW) {
 			xmlvfo.iBW = ibw;
