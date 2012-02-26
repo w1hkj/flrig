@@ -273,7 +273,7 @@ void RIG_TS590S::set_split(bool val)
 	}
 }
 
-bool RIG_TS590S::get_split()
+int RIG_TS590S::get_split()
 {
 	cmd = "IF;";
 	int ret = waitN(38, 100, "get info", ASC);

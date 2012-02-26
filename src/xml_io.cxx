@@ -68,19 +68,6 @@ bool ptt_on = false;
 
 bool ignore = false;
 
-// not used
-/*
-class auto_mutex
-{
-	pthread_mutex_t& mutex;
-	auto_mutex(const auto_mutex& m);
-	auto_mutex& operator=(const auto_mutex& m);
-public:
-	auto_mutex(pthread_mutex_t& m) : mutex(m) { pthread_mutex_lock(&mutex); }
-	~auto_mutex(void) { pthread_mutex_unlock(&mutex); }
-};
-*/
-
 //=====================================================================
 // socket ops
 //=====================================================================
@@ -130,7 +117,6 @@ static inline void execute(const char* name, const XmlRpcValue& param, XmlRpcVal
 // --------------------------------------------------------------------
 
 void send_modes() { 
-//	if (!fldigi_online) return;
 	if (!selrig->modes_) return;
 
 	XmlRpcValue modes, res;
@@ -151,7 +137,6 @@ void send_modes() {
 
 void send_bandwidths()
 {
-//	if (!fldigi_online) return;
 	if (!selrig->bandwidths_ || selrig->has_dsp_controls) return;
 	XmlRpcValue bandwidths, res;
 	int i = 0;
@@ -171,7 +156,6 @@ void send_bandwidths()
 
 void send_name()
 {
-//	if (!fldigi_online) return;
 	try {
 		XmlRpcValue res;
 		execute(rig_set_name, XmlRpcValue(selrig->name_), res);
@@ -185,7 +169,6 @@ void send_name()
 
 void send_ptt_changed(bool PTT)
 {
-//	if (!fldigi_online) return;
 	try {
 		XmlRpcValue res;
 		execute((PTT ? main_set_tx : main_set_rx), XmlRpcValue(), res);
@@ -198,7 +181,6 @@ void send_ptt_changed(bool PTT)
 
 void send_new_freq(long freq)
 {
-//	if (!fldigi_online) return;
 	try {
 		xmlvfo.freq = freq;
 		XmlRpcValue f((double)freq), res;
@@ -225,7 +207,6 @@ void send_queue()
 
 void send_new_mode(int md)
 {
-//	if (!fldigi_online || !selrig->modes_) return;
 	if (!selrig->modes_) return;
 	try {
 		xmlvfo.imode = md;
@@ -240,9 +221,7 @@ void send_new_mode(int md)
 
 void send_new_bandwidth(int bw)
 {
-//	if (!fldigi_online || !selrig->bandwidths_) return;
 	if (!selrig->bandwidths_ || selrig->has_dsp_controls) return;
-//printf("new bw %s (%d)\n", selrig->bandwidths_[bw], bw);
 	try {
 		xmlvfo.iBW = bw;
 		XmlRpcValue bandwidth(selrig->bandwidths_[bw]), res;
@@ -256,7 +235,6 @@ void send_new_bandwidth(int bw)
 
 void send_sideband()
 {
-//	if (!fldigi_online) return;
 	try {
 		XmlRpcValue sideband(selrig->get_modetype(vfo.imode) == 'U' ? "USB" : "LSB"), res;
 		execute(main_set_wf_sideband, sideband, res);
@@ -320,8 +298,7 @@ static void check_for_mode_change(const XmlRpcValue& new_mode)
 static void check_for_bandwidth_change(const XmlRpcValue& new_bw)
 {
 	if (xmlmode_changed) {
-//		xmlvfo.iBW = selrig->def_bandwidth(xmlvfo.imode);
-		xmlvfo.iBW = selrig->adjust_bandwidth(xmlvfo.imode);
+		xmlvfo.iBW = selrig->def_bandwidth(xmlvfo.imode);
 		return;
 	}
 
@@ -350,23 +327,11 @@ if (XML_DEBUG)
 	LOG_WARN("%s", print(xmlvfo));
 	if (useB) {
 		if (!queB.empty()) return;
-/*
-printf("queB xmlvfo %ld, %s (%d), %s (%d)\n", 
-xmlvfo.freq, 
-selrig->modes_[xmlvfo.imode], xmlvfo.imode, 
-selrig->bandwidths_[xmlvfo.iBW], xmlvfo.iBW);
-*/
 		pthread_mutex_lock(&mutex_queA);
 		queB.push(xmlvfo);
 		pthread_mutex_unlock(&mutex_queA);
 	} else {
 		if (!queA.empty()) return;
-/*
-printf("queA xmlvfo %ld, %s (%d), %s (%d)\n", 
-xmlvfo.freq, 
-selrig->modes_[xmlvfo.imode], xmlvfo.imode, 
-selrig->bandwidths_[xmlvfo.iBW], xmlvfo.iBW);
-*/
 		pthread_mutex_lock(&mutex_queB);
 		queA.push(xmlvfo);
 		pthread_mutex_unlock(&mutex_queB);
@@ -400,9 +365,6 @@ static void send_rig_info()
 		send_sideband();
 
 		send_new_freq(xmlvfo.freq);
-
-//if (XML_DEBUG)
-	LOG_WARN("%s", print(xmlvfo));
 
 		fldigi_online = true;
 		rig_reset = false;

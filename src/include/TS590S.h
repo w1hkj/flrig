@@ -48,7 +48,7 @@ public:
 
 	bool can_split() { return true;}
 	void set_split(bool val);
-	bool get_split();
+	int  get_split();
 	bool twovfos() {return true;}
 
 	int  get_smeter();

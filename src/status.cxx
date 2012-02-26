@@ -125,7 +125,7 @@ status progStatus = {
 	0,			// int  preamp;
 	0,			// int  auto_notch;
 
-	false,		// bool split;
+	0,			// int  split;
 
 	true,		// bool key_fldigi;
 

@@ -584,7 +584,7 @@ void RIG_IC718::set_split(bool val)
 	waitFB("set split");
 }
 
-bool RIG_IC718::get_split()
+int RIG_IC718::get_split()
 {
 	cmd = pre_to;
 	cmd += 0x0F;

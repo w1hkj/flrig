@@ -20,7 +20,7 @@ public:
 	void selectA();
 	void selectB();
 	void set_split(bool val);
-	bool get_split();
+	int  get_split();
 
 	long get_vfoA();
 	void set_vfoA(long);

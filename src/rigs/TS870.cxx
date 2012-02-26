@@ -168,7 +168,7 @@ void RIG_TS870::set_split(bool val)
 
 //	IF00014070000.....+000000.203000004.;   (. = unused character)
 //	                               ^		  1=Split 0=NoSplit
-bool RIG_TS870::get_split() {
+int RIG_TS870::get_split() {
 	cmd = "IF;";
 	int ret = sendCommand(cmd);
 	showresp(INFO, ASC, "get info", cmd, replystr);

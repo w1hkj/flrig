@@ -51,7 +51,7 @@ public:
 
 	bool can_split();
 	void set_split(bool val);
-	bool get_split();
+	int  get_split();
 
 	int  adjust_bandwidth(int m);
 

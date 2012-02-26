@@ -64,6 +64,7 @@ RIG_K3::RIG_K3() {
 
 	can_change_alt_vfo =
 
+	has_split_AB =
 	has_micgain_control =
 	has_rf_control =
 	has_bandwidth_control =
@@ -604,7 +605,7 @@ void RIG_K3::set_split(bool val)
 	}
 }
 
-bool RIG_K3::get_split()
+int RIG_K3::get_split()
 {
 	cmd = "IF;";
 	sendCommand(cmd, 0);
