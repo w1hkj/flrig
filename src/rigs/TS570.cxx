@@ -151,7 +151,7 @@ void RIG_TS570::set_split(bool val)
 	showresp(WARN, ASC, "split", cmd, replystr);
 }
 
-bool RIG_TS570::get_split()
+int RIG_TS570::get_split()
 {
 	cmd = "IF;";
 	int ret = sendCommand(cmd);

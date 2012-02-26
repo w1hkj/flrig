@@ -316,10 +316,10 @@ void RIG_FT950::set_split(bool val)
 	Fl::awake(highlight_vfo, (void *)0);
 }
 
-bool RIG_FT950::get_split()
+int RIG_FT950::get_split()
 {
 	size_t p;
-	bool split = false;
+	int split = 0;
 	char rx, tx;
 // tx vfo
 	cmd = rsp = "FT";
@@ -327,7 +327,7 @@ bool RIG_FT950::get_split()
 	waitN(4, 100, "get split tx vfo", ASC);
 	p = replystr.rfind(rsp);
 	if (p == string::npos) return false;
-	tx = replystr[p+2];
+	tx = replystr[p+2] - '0';
 
 // rx vfo
 	cmd = rsp = "FR";
@@ -336,10 +336,9 @@ bool RIG_FT950::get_split()
 
 	p = replystr.rfind(rsp);
 	if (p == string::npos) return false;
-	rx = replystr[p+2];
-// split test
-	if ((tx == '1' && rx == '0') || (tx == '0' && rx == '4'))
-		split = true;
+	rx = replystr[p+2] - '0';
+
+	split = (tx == 1 ? 2 : 0) + (rx >= 4 ? 1 : 0);
 
 	return split;
 }
@@ -601,7 +600,7 @@ void RIG_FT950::set_modeA(int val)
 	cmd += ';';
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET mode A", cmd, replystr);
-	adjust_bandwidth(modeA);
+//	adjust_bandwidth(modeA);
 	if (val == mCW || val == mCW_R) return;
 	if (progStatus.spot_onoff) {
 		progStatus.spot_onoff = false;
@@ -628,7 +627,7 @@ int RIG_FT950::get_modeA()
 			modeA = md;
 		}
 	}
-	adjust_bandwidth(modeA);
+//	adjust_bandwidth(modeA);
 	return modeA;
 }
 
@@ -640,7 +639,7 @@ void RIG_FT950::set_modeB(int val)
 	cmd += ';';
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET mode B", cmd, replystr);
-	adjust_bandwidth(modeB);
+//	adjust_bandwidth(modeB);
 	if (val == mCW || val == mCW_R) return;
 	if (progStatus.spot_onoff) {
 		progStatus.spot_onoff = false;
@@ -667,7 +666,7 @@ int RIG_FT950::get_modeB()
 			modeB = md;
 		}
 	}
-	adjust_bandwidth(modeB);
+//	adjust_bandwidth(modeB);
 	return modeB;
 }
 
@@ -755,7 +754,7 @@ void RIG_FT950::set_bwB(int val)
 		((modeB == mCW || modeB == mCW_R ||
 		  modeB == mRTTY_L || modeB == mRTTY_U ||
 		  modeB == mPKT_L || modeB == mPKT_U) && val < 4) ) cmd = "NA01;";
-	else cmd = "NA0;";
+	else cmd = "NA00;";
 
 	cmd.append("SH0");
 	cmd += '0' + bw_indx / 10;

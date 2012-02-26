@@ -221,17 +221,8 @@ void RIG_TS2000::set_split(bool val)
 	}
 }
 
-bool RIG_TS2000::get_split()
+int RIG_TS2000::get_split()
 {
-#if 0 // read using Info CAT command
-	cmd = "IF;";
-	int ret = waitN(38, 100, "get info", ASC);
-	if (ret < 38) return split;
-	size_t p = replystr.rfind("IF");
-	if (p == string::npos) return split;
-	split = replystr[p+32] ? true : false;
-	return split;
-#else // read using separate FT / FR queries
 	size_t p;
 	bool split = false;
 	char rx, tx;
@@ -252,11 +243,9 @@ bool RIG_TS2000::get_split()
 	if (p == string::npos) return split;
 	rx = replystr[p+2];
 // split test
-	if ((tx == '1' && rx == '0') || (tx == '0' && rx == '1'))
-		split = true;
+	split = (tx == '1' ? 2 : 0) + (rx == '1' ? 1 : 0);
 
 	return split;
-#endif
 }
 
 long RIG_TS2000::get_vfoA ()

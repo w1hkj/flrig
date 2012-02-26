@@ -325,7 +325,7 @@ void RIG_FT5000::set_split(bool val)
 	Fl::awake(highlight_vfo, (void *)0);
 }
 
-bool RIG_FT5000::get_split()
+int RIG_FT5000::get_split()
 {
 	return split;
 }

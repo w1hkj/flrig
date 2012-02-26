@@ -114,7 +114,7 @@ public:
 	virtual int  get_power_control();
 
 	virtual void set_split(bool val);
-	virtual bool get_split();
+	virtual int  get_split();
 
 	bool can_split() { return true;}
 

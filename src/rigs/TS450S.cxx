@@ -340,7 +340,7 @@ void RIG_TS450S::set_split(bool val)
 	}
 }
 
-bool RIG_TS450S::get_split()
+int RIG_TS450S::get_split()
 {
 	cmd = "IF;";
 	int ret = sendCommand(cmd);

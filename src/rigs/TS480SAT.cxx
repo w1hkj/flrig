@@ -252,7 +252,7 @@ void RIG_TS480SAT::set_split(bool val)
 	}
 }
 
-bool RIG_TS480SAT::get_split()
+int RIG_TS480SAT::get_split()
 {
 	cmd = "IF;";
 	int ret = sendCommand(cmd);

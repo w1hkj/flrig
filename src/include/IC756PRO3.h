@@ -67,7 +67,7 @@ public:
 	int  get_power_control();
 
 	void set_split(bool val);
-	bool get_split();
+	int  get_split();
 	bool can_split() { return true;}
 
 	void set_attenuator(int val);

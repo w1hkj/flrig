@@ -29,7 +29,7 @@ public:
 	void A2B();
 	bool can_split();
 	void set_split(bool val);
-	bool get_split();
+	int  get_split();
 
 	void set_modeA(int val);
 	int  get_modeA();
