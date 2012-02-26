@@ -39,7 +39,7 @@ public:
 
 	bool can_split() { return true;}
 	void set_split(bool val);
-	bool get_split();
+	int  get_split();
 	void selectA();
 	void selectB();
 	bool twovfos() {return true;}

@@ -56,6 +56,7 @@ extern void cbExit();
 
 extern void setVolumeControl(void *);
 extern void setModeControl(void *);
+extern void set_bandwidth_control();
 extern void updateBandwidthControl(void *d = NULL);
 extern void updateBW(void *);
 extern void setBWControl(void *);

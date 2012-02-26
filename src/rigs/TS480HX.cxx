@@ -249,7 +249,7 @@ void RIG_TS480HX::set_split(bool val)
 	}
 }
 
-bool RIG_TS480HX::get_split()
+int RIG_TS480HX::get_split()
 {
 	cmd = "IF;";
 	int ret = sendCommand(cmd);

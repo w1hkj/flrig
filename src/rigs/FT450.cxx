@@ -258,30 +258,29 @@ void RIG_FT450::set_split(bool on)
 	showresp(WARN, ASC, "SET split", cmd, replystr);
 }
 
-bool RIG_FT450::get_split()
+int RIG_FT450::get_split()
 {
 	size_t p;
-	bool split = false;
+	int split = 0;
 	char rx, tx;
 // tx vfo
 	cmd = rsp = "FT";
 	cmd.append(";");
 	waitN(4, 100, "get split tx vfo", ASC);
- 
 	p = replystr.rfind(rsp);
 	if (p == string::npos) return false;
-	tx = replystr[p+2];
+	tx = replystr[p+2] - '0';
+
 // rx vfo
-	cmd = rsp = "VS";
+	cmd = rsp = "FR";
 	cmd.append(";");
 	waitN(4, 100, "get split rx vfo", ASC);
 
 	p = replystr.rfind(rsp);
 	if (p == string::npos) return false;
-	rx = replystr[p+2];
-// split test
-	if ((tx == '1' && rx == '0') || (tx == '0' && rx == '1'))
-		split = true;
+	rx = replystr[p+2] - '0';
+
+	split = (tx == 1 ? 2 : 0) + (rx >= 4 ? 1 : 0);
 
 	return split;
 }

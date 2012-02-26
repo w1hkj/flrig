@@ -610,7 +610,7 @@ void RIG_TT588::set_split(bool val)
 	showresp(WARN, HEX, "set split", cmd, replystr);
 }
 
-bool RIG_TT588::get_split()
+int RIG_TT588::get_split()
 {
 	cmd = TT588getSPLIT;
 	int ret = waitN(3, 100, "get split");

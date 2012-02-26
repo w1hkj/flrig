@@ -72,6 +72,7 @@ RIG_IC756PRO3::RIG_IC756PRO3() {
 
 	has_a2b =
 	has_split =
+	has_split_AB =
 	has_bandwidth_control =
 	has_ifshift_control =
 	has_tune_control =
@@ -532,7 +533,7 @@ void RIG_IC756PRO3::set_split(bool val)
 	waitFB("set split");
 }
 
-bool RIG_IC756PRO3::get_split()
+int RIG_IC756PRO3::get_split()
 {
 	LOG_WARN("%s", "get split - not implemented");
 	return progStatus.split;

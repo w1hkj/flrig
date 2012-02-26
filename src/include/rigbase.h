@@ -104,11 +104,11 @@ public:
 	int  pbt;
 
 	bool PbtActive;
-	int RitFreq;
+	int  RitFreq;
 	bool RitActive;
-	int XitFreq;
+	int  XitFreq;
 	bool XitActive;
-	bool split;
+	int  split;
 
 	int  if_shift_min;
 	int  if_shift_max;
@@ -225,7 +225,7 @@ public:
 
 	virtual bool can_split() { return false;}
 	virtual void set_split(bool val) {split = val;}
-	virtual bool get_split() {return split;}
+	virtual int  get_split() {return split;}
 	virtual bool twovfos() {return false;}
 
 	virtual int  get_smeter(void) {return -1;}

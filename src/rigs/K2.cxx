@@ -53,6 +53,7 @@ RIG_K2::RIG_K2() {
 	bwB = bwA = 0;
 	freqB = freqA = 14070000;
 
+	has_split_AB =
 	has_get_info =
 	has_attenuator_control =
 	has_preamp_control =
@@ -189,7 +190,7 @@ void RIG_K2::set_split(bool val)
 	}
 }
 
-bool RIG_K2::get_split()
+int RIG_K2::get_split()
 {
 	return K2split;
 }

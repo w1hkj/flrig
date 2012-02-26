@@ -111,7 +111,7 @@ struct status {
 	int		preamp;
 	int		auto_notch;
 
-	bool	split;
+	int		split;
 
 	bool	key_fldigi;
 

@@ -606,7 +606,7 @@ void RIG_IC703::set_split(bool val)
 	waitFB("set split");
 }
 
-bool RIG_IC703::get_split()
+int RIG_IC703::get_split()
 {
 	LOG_WARN("%s", "get split - not implemented");
 	return progStatus.split;

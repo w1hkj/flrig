@@ -80,7 +80,7 @@ public:
 	int  get_power_control();
 
 	void set_split(bool val);
-	bool get_split();
+	int  get_split();
 
 	void tune_rig();
 

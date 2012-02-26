@@ -38,6 +38,7 @@ RIG_FT857D::RIG_FT857D() {
 	modeA = 1;
 	bwA = 0;
 
+	has_split_AB =
 	has_smeter =
 	has_power_out =
 	has_mode_control = true;
