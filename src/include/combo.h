@@ -60,7 +60,7 @@ class Fl_PopBrowser : public Fl_Window {
   public: 
 	Fl_PopBrowser (int x, int y, int w, int h, retvals R);
 	~Fl_PopBrowser ();
-	void popshow (int, int);
+	void popshow (int, int, int);
 	void pophide ();
 	void popbrwsr_cb_i (Fl_Widget *, long);
 

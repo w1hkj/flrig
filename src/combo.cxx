@@ -51,10 +51,18 @@ void Fl_PopBrowser::sort()
 	return;
 }
 
-void Fl_PopBrowser::popshow (int x, int y)
+void Fl_PopBrowser::popshow (int x, int y, int maxH)
 {
 	int nRows = popbrwsr->size();
-	int height = (nRows > 12 ? 12 : nRows)  * fl_height() + 4;
+	int rh = fl_height();
+	int height = (nRows > 12 ? 12 : nRows)  * rh + 4;
+	int sx, sy, sw, sh; // screen bounding box
+	Fl::screen_xywh(sx, sy, sw, sh);
+#ifdef __WIN32__
+	sh -= 32; // allowance for windows bottom bar
+#endif
+	while ( height > maxH) height -= rh;
+	while (y + height > sh) y -= rh;
 
 	if (nRows == 0) return;
 	popbrwsr->resize (0, 0, wRow, height);
@@ -118,10 +126,12 @@ void Fl_ComboBox::fl_popbrwsr(Fl_Widget *p)
 // x() and y() are locations relative to the current window
 // also need to know where the root window for the application
 // to compute the screen x,y position of the popup
+	int maxh = (who->parent())->h();
 	int xpos = who->x(), ypos = who->h() + who->y();
 	parent = who;
 	while (parent) {
 		who = parent;
+		if (who) maxh = who->h();
 		parent = parent->parent();
 		if (parent == 0) {
 			xpos += who->x();
@@ -135,7 +145,7 @@ void Fl_ComboBox::fl_popbrwsr(Fl_Widget *p)
 // correct callback function can be called when the user selects an item
 // from the browser list
 	Brwsr->parent = (Fl_ComboBox *) p;
-	Brwsr->popshow(xpos, ypos);
+	Brwsr->popshow(xpos, ypos, maxh);
 	return;
 }
 
