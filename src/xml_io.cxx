@@ -100,16 +100,21 @@ void open_rig_xmlrpc()
 
 void close_rig_xmlrpc()
 {
+	pthread_mutex_lock(&mutex_xmlrpc);
+
 	delete client;
 	client = NULL;
 	delete status_query;
 	status_query = NULL;
+
+	pthread_mutex_unlock(&mutex_xmlrpc);
 }
 
 static inline void execute(const char* name, const XmlRpcValue& param, XmlRpcValue& result)
 {
-	if (!client->execute(name, param, result, TIMEOUT))
-		throw XmlRpc::XmlRpcException(name);
+	if (client)
+		if (!client->execute(name, param, result, TIMEOUT))
+			throw XmlRpc::XmlRpcException(name);
 }
 
 // --------------------------------------------------------------------

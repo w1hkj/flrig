@@ -8,6 +8,7 @@ extern bool bypass_digi_loop;
 extern bool rig_reset;
 
 extern void open_rig_xmlrpc();
+extern void close_rig_xmlrpc();
 extern void send_new_freq(long);
 extern void send_modes();
 extern void send_bandwidths();

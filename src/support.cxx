@@ -397,7 +397,6 @@ void read_preamp_att()
 void update_split(void *d)
 {
 	if (rig_nbr == FT450 || rig_nbr == FT950) {
-printf("split = %x\n", progStatus.split);
 		switch (progStatus.split) {
 			case 0: btnSplit->value(0);
 					useB = false;
@@ -1886,6 +1885,8 @@ void closeRig()
 void cbExit()
 {
 	// shutdown xmlrpc thread
+	close_rig_xmlrpc();
+
 	pthread_mutex_lock(&mutex_xmlrpc);
 	run_digi_loop = false;
 	pthread_mutex_unlock(&mutex_xmlrpc);
