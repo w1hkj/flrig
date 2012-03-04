@@ -282,6 +282,7 @@ void cbOkXcvrDialog()
 {
 	// close the current rig control
 	closeRig();
+	close_rig_xmlrpc();
 
 	pthread_mutex_lock(&mutex_serial);
 		RigSerial.ClosePort();
@@ -364,6 +365,8 @@ void cbOkXcvrDialog()
 			selectSepPTTPort->value(progStatus.sep_serial_port.c_str());
 		}
 	}
+
+	open_rig_xmlrpc();
 
 	initRig();
 
