@@ -62,7 +62,7 @@ extern RIG_FT890		rig_FT890;		// 7
 extern RIG_FT897D		rig_FT897D;		// 8
 extern RIG_FT920		rig_FT920;		// 9
 extern RIG_FT950		rig_FT950;		// 10
-extern RIG_FT1000MP	rig_FT1000MP;		// 11
+extern RIG_FT1000MP		rig_FT1000MP;	// 11
 extern RIG_FT2000		rig_FT2000;		// 12
 extern RIG_FT5000		rig_FT5000;		// 13
 extern RIG_IC703		rig_IC703;		// 14
