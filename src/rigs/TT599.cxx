@@ -60,6 +60,7 @@ RIG_TT599::RIG_TT599() {
 	has_smeter =
 	has_power_out =
 	has_split =
+	has_split_AB =
 	has_swr_control =
 	has_mode_control =
 	has_bandwidth_control =
@@ -414,4 +415,16 @@ void  RIG_TT599:: set_split(bool val)
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set split", cmd, replystr);
 }
+
+int RIG_TT599::get_split()
+{
+	cmd = "?KV\r";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "get split", cmd, replystr);
+	size_t p = replystr.find("@KVAA");
+	if ((p != string::npos) && (replystr[p+5] == 'B')) split = 1;
+	else split = 0;
+	return split;
+}
+
 

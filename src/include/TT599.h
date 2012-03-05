@@ -30,6 +30,7 @@ public:
 
 	bool can_split() { return true;}
 	void set_split(bool val);
+	int  get_split();
 	bool twovfos() { return false;}//true;}
 
 	void set_PTT_control(int val);
