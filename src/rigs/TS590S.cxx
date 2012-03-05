@@ -244,43 +244,54 @@ void RIG_TS590S::selectB()
 void RIG_TS590S::set_split(bool val) 
 {
 	split = val;
-	if (rxtxa) {
-		cmd = "FR0;";
-		sendCommand(cmd, 0);
-		showresp(WARN, ASC, "Rx A", cmd, replystr);
+	if (useB) {
 		if (val) {
-			cmd = "FT1;";
-			sendCommand(cmd, 0);
-			showresp(WARN, ASC, "Tx B", cmd, replystr);
+			cmd = "FR1;FT0;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on B, Tx on A", cmd, replystr);
 		} else {
-			cmd = "FT0;";
-			sendCommand(cmd, 0);
-			showresp(WARN, ASC, "Tx A", cmd, replystr);
+			cmd = "FR1;FT1;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on B, Tx on B", cmd, replystr);
 		}
 	} else {
-		cmd = "FR1;";
-		sendCommand(cmd, 0);
-		showresp(WARN, ASC, "Rx B", cmd, replystr);
 		if (val) {
-			cmd = "FT0;";
-			sendCommand(cmd, 0);
-			showresp(WARN, ASC, "Tx A", cmd, replystr);
+			cmd = "FR0;FT1;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on A, Tx on B", cmd, replystr);
 		} else {
-			cmd = "FT1;";
-			sendCommand(cmd, 0);
-			showresp(WARN, ASC, "Tx B", cmd, replystr);
+			cmd = "FR0;FT0;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on A, Tx on A", cmd, replystr);
 		}
 	}
+	Fl::awake(highlight_vfo, (void *)0);
 }
 
 int RIG_TS590S::get_split()
 {
-	cmd = "IF;";
-	int ret = waitN(38, 100, "get info", ASC);
-	if (ret < 38) return split;
-	size_t p = replystr.rfind("IF");
+	size_t p;
+	bool split = false;
+	char rx, tx;
+// tx vfo
+	cmd = rsp = "FT";
+	cmd.append(";");
+	waitN(4, 100, "get split tx vfo", ASC);
+	p = replystr.rfind(rsp);
 	if (p == string::npos) return split;
-	split = replystr[p+32] ? true : false;
+	tx = replystr[p+2];
+
+// rx vfo
+	cmd = rsp = "FR";
+	cmd.append(";");
+	waitN(4, 100, "get split rx vfo", ASC);
+
+	p = replystr.rfind(rsp);
+	if (p == string::npos) return split;
+	rx = replystr[p+2];
+// split test
+	split = (tx == '1' ? 2 : 0) + (rx == '1' ? 1 : 0);
+
 	return split;
 }
 
