@@ -140,6 +140,8 @@ RIG_TS480SAT::RIG_TS480SAT() {
 	has_tune_control =
 	has_notch_control = false;
 
+	has_split =
+	has_split_AB =
 	has_data_port =
 	has_micgain_control =
 	has_ifshift_control =
@@ -214,53 +216,75 @@ void RIG_TS480SAT::shutdown()
 
 void RIG_TS480SAT::selectA()
 {
-	cmd = "FR0;";
+	cmd = "FR0;FT0;";
 	sendCommand(cmd);
-	showresp(WARN, ASC, "Rx A", cmd, replystr);
-	cmd = "FT0;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "Tx A", cmd, replystr);
+	showresp(WARN, ASC, "Rx on A, Tx on A", cmd, replystr);
 }
 
 void RIG_TS480SAT::selectB()
 {
-	cmd = "FR1;";
+	cmd = "FR1;FT1;";
 	sendCommand(cmd);
-	showresp(WARN, ASC, "Rx B", cmd, replystr);
-	cmd = "FT1;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "Tx B", cmd, replystr);
+	showresp(WARN, ASC, "Rx on B, Tx on B", cmd, replystr);
 }
 
 void RIG_TS480SAT::set_split(bool val) 
 {
 	split = val;
-	if (val) {
-		cmd = "FR0;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "Rx A", cmd, replystr);
-		cmd = "FT1;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "Tx B", cmd, replystr);
+	split = val;
+	if (useB) {
+		if (val) {
+			cmd = "FR1;FT0;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on B, Tx on A", cmd, replystr);
+		} else {
+			cmd = "FR1;FT1;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on B, Tx on B", cmd, replystr);
+		}
 	} else {
-		cmd = "FR0;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "Rx A", cmd, replystr);
-		cmd = "FT0;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "Tx A", cmd, replystr);
+		if (val) {
+			cmd = "FR0;FT1;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on A, Tx on B", cmd, replystr);
+		} else {
+			cmd = "FR0;FT0;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on A, Tx on A", cmd, replystr);
+		}
 	}
+	Fl::awake(highlight_vfo, (void *)0);
+}
+
+bool RIG_TS480SAT::can_split()
+{
+	return true;
 }
 
 int RIG_TS480SAT::get_split()
 {
-	cmd = "IF;";
-	int ret = sendCommand(cmd);
-	showresp(INFO, ASC, "get info", cmd, replystr);
-	if (ret < 38) return split;
-	size_t p = replystr.rfind("IF");
+	size_t p;
+	bool split = false;
+	char rx, tx;
+// tx vfo
+	cmd = rsp = "FT";
+	cmd.append(";");
+	waitN(4, 100, "get split tx vfo", ASC);
+	p = replystr.rfind(rsp);
 	if (p == string::npos) return split;
-	split = replystr[p+32] ? true : false;
+	tx = replystr[p+2];
+
+// rx vfo
+	cmd = rsp = "FR";
+	cmd.append(";");
+	waitN(4, 100, "get split rx vfo", ASC);
+
+	p = replystr.rfind(rsp);
+	if (p == string::npos) return split;
+	rx = replystr[p+2];
+// split test
+	split = (tx == '1' ? 2 : 0) + (rx == '1' ? 1 : 0);
+
 	return split;
 }
 
