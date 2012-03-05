@@ -48,6 +48,7 @@ RIG_FT100D::RIG_FT100D() {
 	aBW = bBW = A.iBW = B.iBW = 2;
 	precision = 10;
 
+	has_split = has_split_AB =
 	has_get_info =
 	has_smeter =
 	has_power_out =
