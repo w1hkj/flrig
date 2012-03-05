@@ -169,56 +169,43 @@ const char * RIG_TS2000::get_bwname_(int n, int md)
 
 void RIG_TS2000::selectA()
 {
-	cmd = "FR0;";
-	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "Rx A", cmd, replystr);
-	cmd = "FT0;";
-	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "Tx A", cmd, replystr);
-	rxtxa = true;
+	cmd = "FR0;FT0;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "Rx on A, Tx on A", cmd, replystr);
 }
 
 void RIG_TS2000::selectB()
 {
-	cmd = "FR1;";
-	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "Rx B", cmd, replystr);
-	cmd = "FT1;";
-	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "Tx B", cmd, replystr);
-	rxtxa = false;
+	cmd = "FR1;FT1;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "Rx on B, Tx on B", cmd, replystr);
 }
 
 void RIG_TS2000::set_split(bool val) 
 {
 	split = val;
-	if (rxtxa) {
-		cmd = "FR0;";
-		sendCommand(cmd, 0);
-		showresp(WARN, ASC, "Rx A", cmd, replystr);
+	if (useB) {
 		if (val) {
-			cmd = "FT1;";
-			sendCommand(cmd, 0);
-			showresp(WARN, ASC, "Tx B", cmd, replystr);
+			cmd = "FR1;FT0;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on B, Tx on A", cmd, replystr);
 		} else {
-			cmd = "FT0;";
-			sendCommand(cmd, 0);
-			showresp(WARN, ASC, "Tx A", cmd, replystr);
+			cmd = "FR1;FT1;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on B, Tx on B", cmd, replystr);
 		}
 	} else {
-		cmd = "FR1;";
-		sendCommand(cmd, 0);
-		showresp(WARN, ASC, "Rx B", cmd, replystr);
 		if (val) {
-			cmd = "FT0;";
-			sendCommand(cmd, 0);
-			showresp(WARN, ASC, "Tx A", cmd, replystr);
+			cmd = "FR0;FT1;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on A, Tx on B", cmd, replystr);
 		} else {
-			cmd = "FT1;";
-			sendCommand(cmd, 0);
-			showresp(WARN, ASC, "Tx B", cmd, replystr);
+			cmd = "FR0;FT0;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on A, Tx on A", cmd, replystr);
 		}
 	}
+	Fl::awake(highlight_vfo, (void *)0);
 }
 
 int RIG_TS2000::get_split()
