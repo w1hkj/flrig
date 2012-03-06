@@ -1128,14 +1128,14 @@ Fl_Double_Window* Rig_window() {
       txtInactive->hide();
     } // Fl_Box* txtInactive
     { Fl_Light_Button* o = btnA = new Fl_Light_Button(212, 62, 52, 20, _("vfoA"));
-      btnA->tooltip(_("Rx-A / Tx-B"));
+      btnA->tooltip(_("Rx-A / Tx-A"));
       btnA->down_box(FL_THIN_DOWN_BOX);
       btnA->labelsize(12);
       btnA->callback((Fl_Callback*)cb_btnA);
       o->value(!useB);
     } // Fl_Light_Button* btnA
     { Fl_Light_Button* o = btnB = new Fl_Light_Button(265, 62, 52, 20, _("vfoB"));
-      btnB->tooltip(_("Rx-A / Tx-B"));
+      btnB->tooltip(_("Rx-B / Tx-B"));
       btnB->down_box(FL_THIN_DOWN_BOX);
       btnB->labelsize(12);
       btnB->callback((Fl_Callback*)cb_btnB);
