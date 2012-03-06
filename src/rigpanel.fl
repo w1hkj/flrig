@@ -256,7 +256,7 @@ meter_filters->show();}
 	cb_selectA();
 btnA->value(1);
 btnB->value(0);}
-      tooltip {Rx-A / Tx-B} xywh {212 62 52 20} down_box THIN_DOWN_BOX labelsize 12
+      tooltip {Rx-A / Tx-A} xywh {212 62 52 20} down_box THIN_DOWN_BOX labelsize 12
       code0 {o->value(!useB);}
     }
     Fl_Light_Button btnB {
@@ -265,7 +265,7 @@ btnB->value(0);}
 	cb_selectB();
 btnB->value(1);
 btnA->value(0);}
-      tooltip {Rx-A / Tx-B} xywh {265 62 52 20} down_box THIN_DOWN_BOX labelsize 12
+      tooltip {Rx-B / Tx-B} xywh {265 62 52 20} down_box THIN_DOWN_BOX labelsize 12
       code0 {o->value(useB);}
     }
     Fl_Button btn_K3_swapAB {

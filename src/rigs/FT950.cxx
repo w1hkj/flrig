@@ -600,7 +600,7 @@ void RIG_FT950::set_modeA(int val)
 	cmd += ';';
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET mode A", cmd, replystr);
-//	adjust_bandwidth(modeA);
+	adjust_bandwidth(modeA);
 	if (val == mCW || val == mCW_R) return;
 	if (progStatus.spot_onoff) {
 		progStatus.spot_onoff = false;
@@ -627,7 +627,7 @@ int RIG_FT950::get_modeA()
 			modeA = md;
 		}
 	}
-//	adjust_bandwidth(modeA);
+	adjust_bandwidth(modeA);
 	return modeA;
 }
 
@@ -639,7 +639,7 @@ void RIG_FT950::set_modeB(int val)
 	cmd += ';';
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET mode B", cmd, replystr);
-//	adjust_bandwidth(modeB);
+	adjust_bandwidth(modeB);
 	if (val == mCW || val == mCW_R) return;
 	if (progStatus.spot_onoff) {
 		progStatus.spot_onoff = false;
@@ -666,7 +666,7 @@ int RIG_FT950::get_modeB()
 			modeB = md;
 		}
 	}
-//	adjust_bandwidth(modeB);
+	adjust_bandwidth(modeB);
 	return modeB;
 }
 
@@ -743,7 +743,7 @@ void RIG_FT950::set_bwB(int val)
 	bwB = val;
 
 	if (modeB == mFM || modeB == mAM || modeB == mFM_N || modeB == mAM_N) return;
-	if (modeA == mPKT_FM) {
+	if (modeB == mPKT_FM) {
 		if (val == 1) cmd = "NA01;";
 		else cmd = "NA00;";
 		sendCommand(cmd);
