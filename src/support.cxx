@@ -449,7 +449,7 @@ long nlone = 1L;
 void read_volume()
 {
 	if (!selrig->has_volume_control) return;
-	if (rig_nbr == FT950) {
+//	if (rig_nbr == FT950) {
 		int vol;
 		pthread_mutex_lock(&mutex_serial);
 			vol = selrig->get_volume_control();
@@ -462,14 +462,14 @@ void read_volume()
 			else
 				Fl::awake(update_volume, (void*)&nlone);
 		}
-	} else {
-		if (btnVol->value() == 0) return; // muted
-		if (!sldrVOLUME->active()) return; // cbMute() not done still un-muting
-		pthread_mutex_lock(&mutex_serial);
-			progStatus.volume = selrig->get_volume_control();
-		pthread_mutex_unlock(&mutex_serial);
-		Fl::awake(update_volume, (void*)&nlzero);
-	}
+//	} else {
+//		if (btnVol->value() == 0) return; // muted
+//		if (!sldrVOLUME->active()) return; // cbMute() not done still un-muting
+//		pthread_mutex_lock(&mutex_serial);
+//			progStatus.volume = selrig->get_volume_control();
+//		pthread_mutex_unlock(&mutex_serial);
+//		Fl::awake(update_volume, (void*)&nlzero);
+//	}
 }
 
 // ifshift
