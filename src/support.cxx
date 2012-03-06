@@ -209,7 +209,7 @@ void read_mode()
 			Fl::awake(setModeControl);
 			set_bandwidth_control();
 		} else {	// mode and bwtable are in sync so read vfoB bw
-			nu_BW = selrig->get_bwA();
+			nu_BW = selrig->get_bwB();
 			if (nu_BW != vfoB.iBW) {
 				pthread_mutex_lock(&mutex_xmlrpc);
 				vfoB.iBW = vfo.iBW = nu_BW;
@@ -3400,93 +3400,54 @@ void cb_cw_qsk()
 
 void cbBandSelect(int band)
 {
-// Works.
-// All reads are needed with no unlocking inbetween
-
-// lock loops untill done, no calls with mutex's
 	pthread_mutex_lock(&mutex_serial);
 	pthread_mutex_lock(&mutex_xmlrpc);
-
 	selrig->set_band_selection(band);
-// let settle, some rigs may need this the FT-950 does not
-	MilliSleep(50);
-
-// read vfo WHILE LOCKED *****************************
-	long  freq;
-	if (!useB) { // vfo-A
-		freq = selrig->get_vfoA();
-		if (freq != vfoA.freq) {
-			vfoA.freq = freq;
-			Fl::awake(setFreqDispA, (void *)vfoA.freq);
-			vfo = vfoA;
-// big speed up in windows with no fldigi
-			if (fldigi_online) send_xml_freq(vfo.freq);
+// get freqmdbw
+	if (!useB) {
+		vfoA.freq = selrig->get_vfoA();
+		if (selrig->has_mode_control)
+			vfoA.imode = selrig->get_modeA();
+		if (selrig->has_bandwidth_control) {
+			selrig->adjust_bandwidth(vfoA.imode);
+			vfoA.iBW = selrig->get_bwA();
 		}
-		if ( selrig->twovfos() ) {
-			freq = selrig->get_vfoB();
-			if (freq != vfoB.freq) {
-				vfoB.freq = freq;
-				Fl::awake(setFreqDispB, (void *)vfoB.freq);
-			}
+		vfo = vfoA;
+	} else {
+		vfoB.freq = selrig->get_vfoB();
+		if (selrig->has_mode_control)
+			vfoB.imode = selrig->get_modeB();
+		if (selrig->has_bandwidth_control) {
+			selrig->adjust_bandwidth(vfoB.imode);
+			vfoB.iBW = selrig->get_bwB();
 		}
-	} else { // vfo-B
-		freq = selrig->get_vfoB();
-		if (freq != vfoB.freq) {
-			vfoB.freq = freq;
-			Fl::awake(setFreqDispB, (void *)vfoB.freq);
-			vfo = vfoB;
-			if (fldigi_online) send_xml_freq(vfo.freq);
-		}
+		vfo = vfoB;
 	}
-// read mode WHILE LOCKED, Not-The-Same-As read_mode() **********
-	int nu_mode;
-	if (selrig->has_mode_control) {
-		if (!useB) {
-			nu_mode = selrig->get_modeA();
-			if (nu_mode != vfoA.imode) {
-				vfoA.imode = vfo.imode = nu_mode;
-				if (fldigi_online) {
-					try {
-						send_new_mode(nu_mode);
-						send_sideband();
-					} catch (...) {}
-				}
-				Fl::awake(setModeControl);
-			}
-		} else {
-			nu_mode = selrig->get_modeB();
-			if (nu_mode != vfoB.imode) {
-				vfoB.imode = vfo.imode = nu_mode;
-				if (fldigi_online) {
-					try {
-						send_new_mode(nu_mode);
-						send_sideband();
-					} catch (...) {}
-				}
-				Fl::awake(setModeControl);
-			}
-		}
-	}
-// read bandwidth WHILE LOCKED, Not-The-Same-As read_bandwidth() **
-// the mode could change and the BW index could be the same so force update
+// local display freqmdbw
+	if (selrig->has_mode_control)
+		Fl::awake(setModeControl);
 	if (selrig->has_bandwidth_control) {
-		selrig->adjust_bandwidth(vfo.imode);
-		if (!useB)
-			vfoA.iBW = vfo.iBW = selrig->get_bwA();
-		else
-			vfoB.iBW = vfo.iBW = selrig->get_bwB();
-		if (fldigi_online) {
+		set_bandwidth_control();
+		Fl::awake(setBWControl);
+	}
+	if (!useB) Fl::awake(setFreqDispA, (void *)vfo.freq);
+	else Fl::awake(setFreqDispB, (void *)vfo.freq);
+// remote send freqmdbw
+	if (fldigi_online) {
+		send_xml_freq(vfo.freq);
+		if (selrig->has_mode_control) {
+			try {
+				send_new_mode(vfo.imode);
+				send_sideband();
+			} catch (...) {}
+		}
+		if (selrig->has_bandwidth_control) {
 			try {
 				send_bandwidths();
 				send_new_bandwidth(vfo.iBW);
 			} catch (...) {}
 		}
-		set_bandwidth_control();
 	}
-// Update Other.. WHILE LOCKED Other-Things-To Update *************************
-
-// should only call unlock after all async GUI cloud calls are done
-	MilliSleep(100);
 	pthread_mutex_unlock(&mutex_xmlrpc);
 	pthread_mutex_unlock(&mutex_serial);
 }
