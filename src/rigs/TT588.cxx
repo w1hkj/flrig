@@ -149,6 +149,7 @@ RIG_TT588::RIG_TT588() {
 //	has_notch_control = 
 
 	has_split =
+	has_split_AB =
 	has_smeter =
 	has_power_out =
 	has_swr_control =
@@ -313,7 +314,7 @@ void RIG_TT588::set_bwB(int val)
 {
 	bwB = val;
 	cmd = TT588setBW;
-	cmd[2] = val;
+	cmd[2] = 37 - val;
 	sendCommand(cmd);
 	showresp(WARN, HEX, "set BW B", cmd, replystr);
     set_if_shift(pbt);
@@ -343,11 +344,12 @@ int RIG_TT588::get_bwB()
 
 int  RIG_TT588::adjust_bandwidth(int m)
 {
-	if (m == 0) return 6;
-	if (m == 1 || m == 2) return 15;
-	if (m == 3 || m == 5 || m == 6) return 30;
-	if (m == 4) return 6;
-	return 15;
+	if (m == 0) return 35; // AM
+	if (m == 1 || m == 2) return 22; // LSB-USB
+	if (m == 3 || m == 5) return 9;
+	if (m == 6) return 0;
+	if (m == 4) return 25;
+	return 22;
 }
 
 int  RIG_TT588::def_bandwidth(int m)
@@ -448,9 +450,9 @@ int RIG_TT588::get_volume_control()
 {
 	cmd = TT588getVOL;
 	int ret = waitN(3, 100, "get vol");
-	if (ret < 3) return 0;
+	if (ret < 3) return progStatus.volume;
 	size_t p = replystr.rfind("U");
-	if (p == string::npos) return 0;
+	if (p == string::npos) return progStatus.volume;
 
 	return (int)((replystr[p + 1] & 0x7F) / 1.27);
 }
