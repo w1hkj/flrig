@@ -19,7 +19,7 @@ enum mFT950 {
   mLSB, mUSB, mCW, mFM, mAM, mRTTY_L, mCW_R, mPKT_L, mRTTY_U, mPKT_FM, mFM_N, mPKT_U, mAM_N };
 // mLSB, mUSB, mCW, mFM, mAM, mRTTY_L, mCW_R, mPKT_L, mRTTY_U, mPKT_FM, mFM_N, mPKT_U, mAM_N
 //  0,    1,    2,   3,   4,   5,       6,     7,      8,       9,       10,    11,     12	// mode index
-// 18,   18,    5,   0,   0,   5,       5,     5,      5,       0,        0,     5,      0	// FT950_def_bw
+// 18,   18,    5,   0,   0,   5,       5,    10,      5,       0,        0,    10,      0	// FT950_def_bw
 
 static const char FT950name_[] = "FT-950";
 
@@ -32,7 +32,7 @@ static const char FT950_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '8', 
 static const char FT950_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L', 'U', 'U', 'U', 'U', 'U' };
 
 // 20110707 - SSB "2450", 14 discontinued in latest North American firmware 
-static const int FT950_def_bw[] = { 18, 18, 5, 0, 0, 5, 5, 5, 5, 0, 0, 5, 0 };
+static const int FT950_def_bw[] = { 18, 18, 5, 0, 0, 5, 5, 10, 5, 0, 0, 10, 0 };
 
 static const char *FT950_widths_SSB[] = {
 "200", "400", "600", "850", "1100", "1350", "1500", "1650", "1800",
