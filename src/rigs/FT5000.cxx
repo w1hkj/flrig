@@ -14,6 +14,12 @@
 #include "support.h"
 
 #define WVALS_LIMIT -1
+enum mFTdx5000 {
+  mLSB, mUSB, mCW, mFM, mAM, mRTTY_L, mCW_R, mPKT_L, mRTTY_U, mPKT_FM, mFM_N, mPKT_U };
+// mLSB, mUSB, mCW, mFM, mAM, mRTTY_L, mCW_R, mPKT_L, mRTTY_U, mPKT_FM, mFM_N, mPKT_U
+//  0,    1,    2,   3,   4,   5,       6,     7,      8,       9,       10,    11	// mode index
+// 19,   19,    9,   0,   0,  10,       9,    15,     10,       0,        0,    15	// FTdx5000_def_bw
+
 
 static const char FT5000name_[] = "FTdx5000";
 
@@ -24,21 +30,21 @@ static const char *FT5000modes_[] = {
 
 static const int FT5000_def_bw[] = {
 19, 19, 9, 0, 0, 
-9, 5, 10, 10, 0, 
-0, 10 };
+10, 9, 15, 10, 0,
+0, 15 };
 
 static const char FT5000_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C' };
 static const char FT5000_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L', 'U', 'U', 'U', 'U' };
 
 static const char *FT5000_widths_SSB[] = {
 "200", "400", "600", "850", "1100", "1350", "1500", // NA = 1 widths
-"1650", "1800", "1950", "2100", "2250", "2400", 
+"1650", "1800", "1950", "2100", "2250", "2400",
 "2500", "2600", "2700", "2800", "2900", "3000",
-"3200", "3400", "3600", "4000",                     // NA = 0 widths
+"3200", "3400", "3600", "3800", "4000",             // NA = 0 widths
 NULL };
 
 static int FT5000_wvals_SSB[] = {
-1,2,3,4,5,6,7,8,9,10,11,12,13,15,16,17,18,19,20,21,22,23,24, WVALS_LIMIT};
+1,2,3,4,5,6,7,  8,9,10,11,12,13,  15,16,17,18,19,20,  21,22,23,24,25, WVALS_LIMIT};
 
 static const char *FT5000_widths_CW[] = {
 "50",   "100",  "150",  "200",  "250", "300",  "350", "400",  "450", "500", // NA1
@@ -69,6 +75,7 @@ static const int FT5000_wvals_AMFM[] = { 0, WVALS_LIMIT };
 static const char *FT5000_widths_AMwide[] = { "AM-bw", NULL };
 static const char *FT5000_widths_FMnar[]  = { "FM-nar", NULL };
 static const char *FT5000_widths_FMwide[] = { "FM-wid", NULL };
+static const char *FT5000_widths_FMpkt[]  = { "FM-pkt", NULL };
 
 static const char *FT5000_US_60m[] = {NULL, "126", "127", "128", "130", NULL};
 // US has 5 60M presets. Using dummy numbers for all.
@@ -537,18 +544,19 @@ int RIG_FT5000::get_preamp()
 int RIG_FT5000::adjust_bandwidth(int val)
 {
 	int bw = 0;
-	if (val == 2 || val == 6) {
+	if (val == mCW || val == mCW_R) {
 		bandwidths_ = FT5000_widths_CW;
 		bw_vals_ = FT5000_wvals_CW;
-	} else if (val == 3 || val == 4 || val == 10) {
-		if (val == 3) bandwidths_ = FT5000_widths_FMwide;
-		else if (val ==  4) bandwidths_ = FT5000_widths_AMwide;
-		else if (val == 10) bandwidths_ = FT5000_widths_FMnar;
+	} else if (val == mFM || val == mAM || val == mFM_N || val == mPKT_FM) {
+		if (val == mFM) bandwidths_ = FT5000_widths_FMwide;
+		else if (val ==  mAM) bandwidths_ = FT5000_widths_AMwide;
+		else if (val == mFM_N) bandwidths_ = FT5000_widths_FMnar;
+		else if (val == mPKT_FM) bandwidths_ = FT5000_widths_FMpkt;
 		bw_vals_ = FT5000_wvals_AMFM;
-	} else if (val == 5 || val == 8) { // RTTY
+	} else if (val == mRTTY_L || val == mRTTY_U) { // RTTY
 		bandwidths_ = FT5000_widths_RTTY;
 		bw_vals_ = FT5000_wvals_RTTY;
-	} else if (val == 7 || val == 11) { // PSK
+	} else if (val == mPKT_L || val == mPKT_U) { // PSK
 		bandwidths_ = FT5000_widths_PSK;
 		bw_vals_ = FT5000_wvals_PSK;
 	} else {
@@ -567,12 +575,13 @@ int RIG_FT5000::def_bandwidth(int val)
 const char ** RIG_FT5000::bwtable(int n)
 {
 	switch (n) {
-		case 2: case 6: return FT5000_widths_CW;
-		case 3: return FT5000_widths_FMwide;
-		case 4: return FT5000_widths_AMwide;
-		case 5: case 8: return FT5000_widths_RTTY;
-		case 7: case 11: return FT5000_widths_PSK;
-		case 10: return FT5000_widths_FMnar;
+		case mCW: case mCW_R: return FT5000_widths_CW;
+		case mFM: return FT5000_widths_FMwide;
+		case mAM: return FT5000_widths_AMwide;
+		case mRTTY_L: case mRTTY_U: return FT5000_widths_RTTY;
+		case mPKT_L: case mPKT_U: return FT5000_widths_PSK;
+		case mFM_N: return FT5000_widths_FMnar;
+		case mPKT_FM: return FT5000_widths_FMpkt;
 		default: ;
 	}
 	return FT5000_widths_SSB;
@@ -587,7 +596,7 @@ void RIG_FT5000::set_modeA(int val)
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET mode A", cmd, replystr);
 	adjust_bandwidth(modeA);
-	if (val == 2 || val == 6) return;
+	if (val == mCW || val == mCW_R) return;
 	if (progStatus.spot_onoff) {
 		progStatus.spot_onoff = false;
 		set_spot_onoff();
@@ -626,7 +635,7 @@ void RIG_FT5000::set_modeB(int val)
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET mode B", cmd, replystr);
 	adjust_bandwidth(modeA);
-	if (val == 2 || val == 6) return;
+	if (val == mCW || val == mCW_R) return;
 	if (progStatus.spot_onoff) {
 		progStatus.spot_onoff = false;
 		set_spot_onoff();
@@ -661,13 +670,13 @@ void RIG_FT5000::set_bwA(int val)
 	int bw_indx = bw_vals_[val];
 	bwA = val;
 
-	if (modeA == 3 || modeA == 4 || modeA == 10) {
+	if (modeA == mFM || modeA == mAM || modeA == mFM_N || modeA == mPKT_FM ) {
 		return;
 	}
-	if ((((modeA == 0 || modeA == 1) && val < 8)) ||
-		 ((modeA == 2 || modeA == 6) && val < 11) || 
-		 ((modeA == 5 || modeA == 8) && val < 11) || 
-		 ((modeA == 7 || modeA == 11) && val < 11))  cmd = "NA01;";
+	if ((((modeA == mLSB || modeA == mUSB)  && val < 8)) ||
+		 ((modeA == mCW  || modeA == mCW_R) && val < 11) ||
+		 ((modeA == mRTTY_L || modeA == mRTTY_U) && val < 11) ||
+		 ((modeA == mPKT_L  || modeA == mPKT_U)  && val < 11))  cmd = "NA01;";
 	else cmd = "NA00;";
 
 	cmd.append("SH0");
@@ -680,7 +689,7 @@ void RIG_FT5000::set_bwA(int val)
 
 int RIG_FT5000::get_bwA()
 {
-	if (modeA == 3 || modeA == 4 || modeA == 10) {
+	if (modeA == mFM || modeA == mAM || modeA == mFM_N || modeA == mPKT_FM) {
 		bwA = 0;
 		return bwA;	
 	} 
@@ -711,13 +720,13 @@ void RIG_FT5000::set_bwB(int val)
 	int bw_indx = bw_vals_[val];
 	bwB = val;
 
-	if (modeA == 3 || modeA == 4 || modeA == 10) {
+	if (modeB == mFM || modeB == mAM || modeB == mFM_N || modeB == mPKT_FM) {
 		return;
 	}
-	if ((((modeA == 0 || modeA == 1) && val < 8)) ||
-		 ((modeA == 2 || modeA == 6) && val < 11) || 
-		 ((modeA == 5 || modeA == 8) && val < 11) || 
-		 ((modeA == 7 || modeA == 11) && val < 11))  cmd = "NA01;";
+	if ((((modeB == mLSB || modeB == mUSB)  && val < 8)) ||
+		 ((modeB == mCW  || modeB == mCW_R) && val < 11) ||
+		 ((modeB == mRTTY_L || modeB == mRTTY_U) && val < 11) ||
+		 ((modeB == mPKT_L  || modeB == mPKT_U)  && val < 11))  cmd = "NA01;";
 	else cmd = "NA00;";
 
 	cmd.append("SH0");
@@ -730,7 +739,7 @@ void RIG_FT5000::set_bwB(int val)
 
 int RIG_FT5000::get_bwB()
 {
-	if (modeB == 3 || modeB == 4 || modeB == 10) {
+	if (modeB == mFM || modeB == mAM || modeB == mFM_N || modeB == mPKT_FM) {
 		bwB = 0;
 		return bwB;
 	} 

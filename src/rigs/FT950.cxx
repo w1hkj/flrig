@@ -546,26 +546,35 @@ int RIG_FT950::get_preamp()
 
 int RIG_FT950::adjust_bandwidth(int val)
 {
-	int bw = 0;
-	if (val == mCW || val == mCW_R ||
-	    val == mRTTY_L || val == mRTTY_U ||
-	    val == mPKT_L || val == mPKT_U) {
-		bandwidths_ = FT950_widths_CW;
-		bw_vals_ = FT950_wvals_CW;
-	} else if (val == mFM || val == mAM || val == mPKT_FM || val == mFM_N || val == mAM_N) {
-		if (val == mPKT_FM) {
+	switch (val) {
+		case mCW     :
+		case mCW_R   :
+		case mRTTY_L :
+		case mRTTY_U :
+		case mPKT_L  :
+		case mPKT_U  :
+			bandwidths_ = FT950_widths_CW;
+			bw_vals_ = FT950_wvals_CW;
+			break;
+		case mFM     :
+		case mAM     :
+			bandwidths_ = FT950_widths_AMFMnorm;
+			bw_vals_    = FT950_wvals_AMFM;
+			break;
+		case mFM_N   :
+		case mAM_N   :
+			bandwidths_ = FT950_widths_AMFMnar;
+			bw_vals_    = FT950_wvals_AMFM;
+			break;
+		case mPKT_FM :
 			bandwidths_ = FT950_widths_NN;
 			bw_vals_ = FT950_wvals_NN;
-		}
-		else if (val == mFM || val == mAM) bandwidths_ = FT950_widths_AMFMnorm;
-		else if (val == mFM_N || val == mAM_N) bandwidths_ = FT950_widths_AMFMnar;
-		bw_vals_ = FT950_wvals_AMFM;
-	} else {
-		bandwidths_ = FT950_widths_SSB;
-		bw_vals_ = FT950_wvals_SSB;
+			break;
+		default:
+			bandwidths_ = FT950_widths_SSB;
+			bw_vals_ = FT950_wvals_SSB;
 	}
-	bw = FT950_def_bw[val];
-	return bw;
+	return FT950_def_bw[val];
 }
 
 int RIG_FT950::def_bandwidth(int val)
