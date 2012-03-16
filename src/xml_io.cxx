@@ -52,7 +52,8 @@ static const char* rig_set_mode         = "rig.set_mode";
 static const char* rig_get_mode         = "rig.get_mode";
 static const char* rig_set_bandwidth    = "rig.set_bandwidth";
 static const char* rig_get_bandwidth    = "rig.get_bandwidth";
-
+static const char* rig_set_notch        = "rig.set_notch";
+static const char* rig_get_notch        = "rig.get_notch";
 
 static XmlRpc::XmlRpcClient* client;
 static XmlRpcValue* status_query;
@@ -90,7 +91,7 @@ void open_rig_xmlrpc()
 	status_query = new XmlRpcValue;
 	const char* status_methods[] = {
 		main_get_trx_state, main_get_frequency,
-		rig_get_mode, rig_get_bandwidth
+		rig_get_mode, rig_get_bandwidth, rig_get_notch
 	};
 	for (size_t i = 0; i < sizeof(status_methods)/sizeof(*status_methods); i++) {
 		(*status_query)[0][i]["methodName"] = status_methods[i];
@@ -190,6 +191,18 @@ void send_new_freq(long freq)
 		xmlvfo.freq = freq;
 		XmlRpcValue f((double)freq), res;
 		execute(rig_set_frequency, f, res);
+		ignore = true;
+	} catch (const XmlRpc::XmlRpcException& e) {
+		if (XML_DEBUG)
+			LOG_WARN("%s", e.getMessage().c_str());
+	}
+}
+
+void send_new_notch(int freq)
+{
+	try {
+		XmlRpcValue i(freq), res;
+		execute(rig_set_notch, i, res);
 		ignore = true;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
@@ -326,6 +339,15 @@ static void check_for_bandwidth_change(const XmlRpcValue& new_bw)
 	}
 }
 
+static void check_for_notch_change(const XmlRpcValue& new_notch)
+{
+	if (!selrig->has_notch_control) return;
+	int ntch = new_notch;
+	int ntch_step = sldrNOTCH->step();
+	if ((!ntch && progStatus.notch) || (ntch && (ntch / ntch_step != progStatus.notch_val / ntch_step)))
+		Fl::awake(setNotchControl, (void*)ntch);
+}
+
 static void push2que()
 {
 if (XML_DEBUG)
@@ -401,6 +423,7 @@ static void get_fldigi_status()
 			return;
 		}
 		check_for_ptt_change(status[0][0]);
+		check_for_notch_change(status[4][0]);
 		if (!ptt_on) {
 			xmlvfo.src = XML;
 			xmlvfo_changed = false;

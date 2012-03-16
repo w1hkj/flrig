@@ -869,6 +869,7 @@ void RIG_FT950::set_notch(bool on, int val)
 
 	cmd[3] = '1'; // manual NOTCH position
 	cmd[6] = '0';
+	if (val % 10 >= 5) val += 10;
 	val /= 10;
 	for (int i = 3; i > 0; i--) {
 		cmd[3 + i] += val % 10;
