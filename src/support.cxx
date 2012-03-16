@@ -510,6 +510,7 @@ void update_notch(void *d)
 {
 	btnNotch->value(progStatus.notch);
 	sldrNOTCH->value(progStatus.notch_val);
+	send_new_notch(progStatus.notch ? progStatus.notch_val : 0);
 }
 
 void read_notch()
@@ -1517,6 +1518,9 @@ void cbbtnNotch()
 		selrig->set_notch(true, (int)floor(sldrNOTCH->value()));
 	}
 	pthread_mutex_unlock(&mutex_serial);
+	try {
+		send_new_notch(progStatus.notch ? progStatus.notch_val : 0);
+	} catch (...) {}
 	setFocus();
 }
 
@@ -1532,15 +1536,31 @@ void cbAN()
 void setNotchControl(void *d)
 {
 	int val = (long)d;
-	if (sldrNOTCH->value() != val) sldrNOTCH->value(val);
+	if (val) {
+		progStatus.notch_val = val;
+		progStatus.notch = true;
+	} else
+		progStatus.notch = false;
+
+	pthread_mutex_lock(&mutex_serial);
+		selrig->set_notch(progStatus.notch, progStatus.notch_val);
+	pthread_mutex_unlock(&mutex_serial);
+
+	sldrNOTCH->value(progStatus.notch_val);
+	btnNotch->value(progStatus.notch);
 }
 
 void setNotch()
 {
 	if (btnNotch->value() || selrig->allow_notch_changes) {
+		progStatus.notch = btnNotch->value();
+		progStatus.notch_val = sldrNOTCH->value();
 		pthread_mutex_lock(&mutex_serial);
-			selrig->set_notch(btnNotch->value(), sldrNOTCH->value());
+			selrig->set_notch(progStatus.notch, progStatus.notch_val);
 		pthread_mutex_unlock(&mutex_serial);
+		try {
+			send_new_notch(progStatus.notch ? progStatus.notch_val : 0);
+		} catch (...) {}
 	}
 }
 
