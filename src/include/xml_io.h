@@ -20,6 +20,7 @@ extern void send_new_bandwidth(int);
 extern void send_sideband();
 extern void send_no_rig();
 extern void send_xml_freq(long);
+extern void send_new_notch(int);
 
 extern void * digi_loop(void *d);
 
