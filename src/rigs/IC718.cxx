@@ -46,7 +46,7 @@ RIG_IC718::RIG_IC718() {
 	comm_rtscts = false;
 	comm_rtsplus = true;
 	comm_dtrplus = true;
-	comm_catptt = true;
+	comm_catptt = false;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
 	modeA = 1;
