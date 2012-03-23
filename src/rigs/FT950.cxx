@@ -60,7 +60,8 @@ static const char *FT950_widths_NN[] = {"NORM", "NARR", NULL };
 
 static const int FT950_wvals_NN[] = {0, 1, WVALS_LIMIT};
 
-static const char *FT950_US_60m[] = {"125", "126", "127", "128", "130", NULL};
+// US 60M 5-USB, 5-CW
+static const char *FT950_US_60m[] = {"125", "126", "127", "128", "130", "141", "142", "143", "144", "146" , NULL};
 // UK 60m channel numbers by Brian, G8SEZ
 static const char *FT950_UK_60m[] = {"118", "120", "121", "127", "128", "129", "130", NULL};
 
