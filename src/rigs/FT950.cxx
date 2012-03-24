@@ -131,6 +131,7 @@ RIG_FT950::RIG_FT950() {
 
 	can_change_alt_vfo =
 	has_smeter =
+	has_alc_control =
 	has_swr_control =
 	has_power_out =
 	has_power_control =
@@ -147,8 +148,7 @@ RIG_FT950::RIG_FT950() {
 	has_preamp_control =
 	has_ifshift_control =
 	has_ptt_control =
-	has_tune_control =
-	has_swr_control = true;
+	has_tune_control = true;
 
 // derived specific
 	atten_level = 3;
@@ -364,6 +364,19 @@ int RIG_FT950::get_swr()
 	cmd = rsp = "RM6";
 	cmd += ';';
 	waitN(7, 100, "get swr", ASC);
+
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return 0;
+	if (p + 6 >= replystr.length()) return 0;
+	int mtr = atoi(&replystr[p+3]);
+	return (int)ceil(mtr / 2.56);
+}
+
+int RIG_FT950::get_alc()
+{
+	cmd = rsp = "RM4";
+	cmd += ';';
+	waitN(7, 100, "get alc", ASC);
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
