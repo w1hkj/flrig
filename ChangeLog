@@ -1,6 +1,77 @@
 
 
+=Version 1.2.10=
+
+2012-03-24  David Freese  <w1hkj@w1hkj.com>
+
+	cf13afb: FT950 ALC
+
+2012-03-23  Terry Embry  <ftembry@users.berlios.de>
+
+	35713d2: FT950
+
+2012-03-21  David Freese  <w1hkj@w1hkj.com>
+
+	a035893: IC718
+	d47f366: XML notch
+
+2012-03-14  Terry Embry  <ftembry@users.berlios.de>
+
+	44c0ca5: FT950/5000
+
+2012-03-07  David Freese  <w1hkj@w1hkj.com>
+
+	687a9d4: FT950 PKT bandwidth
+	bd0293a: TT588 mods
+
+2012-03-06  Terry Embry  <ftembry@users.berlios.de>
+
+	3ea797d: Code cleanup
+
+2012-03-05  David Freese  <w1hkj@w1hkj.com>
+
+	6a56970: TT599 split
+	ec756cd: FT100 split
+	9d8611c: TS 480/590S/2000 Split Vfo
+	2ebaf56: Xmlrpc reset
+	e9b7c1b: Win32 bottom bar
+	6ee0919: TS-870 fix to rig numbering
+	bde19f4: BW control update
+
+2012-02-25  Terry Embry  <ftembry@users.berlios.de>
+
+	4294fad: Read Mode
+
+2012-02-24  David Freese  <w1hkj@w1hkj.com>
+
+	96ea3db: TS2000 split query
+
+2012-02-23  Terry Embry  <ftembry@users.berlios.de>
+
+	f698ae1: serviceAB2
+
+2012-02-23  David Freese  <w1hkj@w1hkj.com>
+
+	f3d72e1: TS870
+	5034889: TS590S split
+	21e4a64: FT950 bandwidths
+	61c79aa: FT950 dual split
+
+2012-02-22  Terry Embry  <ftembry@users.berlios.de>
+
+	610803e: Service A/B
+
+2012-02-22  David Freese  <w1hkj@w1hkj.com>
+
+	87c3f70: TS2000 split
+
+2012-02-20  Terry Embry  <ftembry@users.berlios.de>
+
+	6599ae2: Freq List Alpha Tag - About Change
+
+
 =Version 1.2.9=
+
 
 2012-02-20  David Freese  <w1hkj@w1hkj.com>
 
