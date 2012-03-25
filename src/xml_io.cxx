@@ -30,7 +30,7 @@ extern queue<bool> quePTT;
 
 queue<long> qfreq;
 
-static const double TIMEOUT = 0.5;
+static const double TIMEOUT = 1.0;
 
 // these are get only
 static const char* main_get_trx_state   = "main.get_trx_state";
@@ -91,7 +91,7 @@ void open_rig_xmlrpc()
 	status_query = new XmlRpcValue;
 	const char* status_methods[] = {
 		main_get_trx_state, main_get_frequency,
-		rig_get_mode, rig_get_bandwidth, rig_get_notch
+		rig_get_mode, rig_get_bandwidth
 	};
 	for (size_t i = 0; i < sizeof(status_methods)/sizeof(*status_methods); i++) {
 		(*status_query)[0][i]["methodName"] = status_methods[i];
@@ -416,14 +416,15 @@ void send_no_rig()
 static void get_fldigi_status()
 {
 	XmlRpcValue status;
+	string xmlcall;
 	try {
-		execute("system.multicall", *status_query, status);
+		xmlcall = "system.multicall";
+		execute(xmlcall.c_str(), *status_query, status);
 		if (ignore) {
 			ignore = false;
 			return;
 		}
 		check_for_ptt_change(status[0][0]);
-		check_for_notch_change(status[4][0]);
 		if (!ptt_on) {
 			xmlvfo.src = XML;
 			xmlvfo_changed = false;
@@ -434,7 +435,15 @@ static void get_fldigi_status()
 				push2que();
 		}
 	} catch (...) {
+		LOG_ERROR("%s", xmlcall.c_str());
 		throw;
+	}
+	try {
+		xmlcall = rig_get_notch;
+		execute(xmlcall.c_str(), NULL, status);
+		check_for_notch_change(status);
+	} catch (...) {
+//		throw;
 	}
 }
 
