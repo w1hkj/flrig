@@ -11,9 +11,7 @@
 #include "FT890.h"
 #include "FT920.h"
 #include "FT950.h"
-//#include "FT1000.h"
 #include "FT1000MP.h"
-//#include "Mark-V.h"
 #include "FT2000.h"
 #include "FT5000.h"
 #include "ICbase.h"
@@ -40,7 +38,7 @@
 #include "TS480SAT.h"
 #include "TS570.h"
 #include "TS590S.h"
-#include "TS870.h"
+#include "TS870S.h"		// wbx
 #include "TS2000.h"
 #include "TT516.h"
 #include "DELTA-II.h"
@@ -89,7 +87,7 @@ extern RIG_TS480HX		rig_TS480HX;	// 34
 extern RIG_TS480SAT		rig_TS480SAT;	// 35
 extern RIG_TS570		rig_TS570;		// 36
 extern RIG_TS590S		rig_TS590S;		// 37
-extern RIG_TS870		rig_TS870;		// 38
+extern RIG_TS870S		rig_TS780S;		// 38 wbx
 extern RIG_TS2000		rig_TS2000;		// 39
 extern RIG_TT516		rig_TT516;		// 40
 extern RIG_TT535		rig_TT535;		// 41

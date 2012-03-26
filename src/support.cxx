@@ -154,6 +154,18 @@ void read_vfo()
 void setModeControl(void *)
 {
 	opMODE->index(vfo.imode);
+
+// enables/disables the IF shift control, depending on the mode.
+// the IF Shift function, is ONLY valid in CW modes, with the 870S.
+	if (rig_nbr == TS870S) {
+		if (vfo.imode == RIG_TS870S::tsCW || vfo.imode == RIG_TS870S::tsCWR) {
+			btnIFsh->activate();
+			sldrIFSHIFT->activate();
+		} else {
+			btnIFsh->deactivate();
+			sldrIFSHIFT->deactivate();
+		}
+	}
 }
 
 // mode and bandwidth
@@ -437,10 +449,10 @@ void read_split()
 void update_volume(void *d)
 {
 	long *nr = (long *)d;
-	sldrVOLUME->value(progStatus.volume);
-	sldrVOLUME->activate();
-	if (*nr) btnVol->value(1);
-	else     btnVol->value(0);
+	sldrVOLUME->value(progStatus.volume); // Set slider to last known value
+	sldrVOLUME->activate();				  // activate it
+	if (*nr) btnVol->value(1);			  // Button Lit
+	else     btnVol->value(0);			  // Button Dark.
 }
 
 long nlzero = 0L;
@@ -449,27 +461,18 @@ long nlone = 1L;
 void read_volume()
 {
 	if (!selrig->has_volume_control) return;
-//	if (rig_nbr == FT950) {
-		int vol;
-		pthread_mutex_lock(&mutex_serial);
-			vol = selrig->get_volume_control();
-		pthread_mutex_unlock(&mutex_serial);
-		if (vol != progStatus.volume) {
-			if (vol <= 1 && !btnVol->value()) return;
-			progStatus.volume = vol;
-			if (vol <= 1 && btnVol->value())
-				Fl::awake(update_volume, (void*)&nlzero);
-			else
-				Fl::awake(update_volume, (void*)&nlone);
-		}
-//	} else {
-//		if (btnVol->value() == 0) return; // muted
-//		if (!sldrVOLUME->active()) return; // cbMute() not done still un-muting
-//		pthread_mutex_lock(&mutex_serial);
-//			progStatus.volume = selrig->get_volume_control();
-//		pthread_mutex_unlock(&mutex_serial);
-//		Fl::awake(update_volume, (void*)&nlzero);
-//	}
+	int vol;
+	pthread_mutex_lock(&mutex_serial);
+		vol = selrig->get_volume_control();
+	pthread_mutex_unlock(&mutex_serial);
+	if (vol != progStatus.volume) {
+		if (vol <= 1 && !btnVol->value()) return;
+		progStatus.volume = vol;
+		if (vol <= 1 && btnVol->value())
+			Fl::awake(update_volume, (void*)&nlzero);
+		else
+			Fl::awake(update_volume, (void*)&nlone);
+	}
 }
 
 // ifshift
@@ -2852,6 +2855,16 @@ void initRig()
 	} else {
 		btnIFsh->hide();
 		sldrIFSHIFT->hide();
+	}
+	if (rig_nbr == TS870S) {
+		if (progStatus.imode_A == RIG_TS870S::tsCW || 
+			progStatus.imode_A == RIG_TS870S::tsCWR) {
+			btnIFsh->activate();
+			sldrIFSHIFT->activate();
+		} else {
+			btnIFsh->deactivate();
+			sldrIFSHIFT->deactivate();
+		}
 	}
 
 	if (selrig->has_notch_control) {

@@ -123,6 +123,8 @@ rigbase::rigbase()
 
 	max_power = 100;
 
+	active_mode = 0; // wbx
+
 	if_shift_min = -1500;
 	if_shift_max = 1500;
 	if_shift_step = 10;
