@@ -416,6 +416,7 @@ void send_no_rig()
 static void get_fldigi_status()
 {
 	XmlRpcValue status;
+	XmlRpcValue param((int)0);
 	string xmlcall;
 	try {
 		xmlcall = "system.multicall";
@@ -440,10 +441,9 @@ static void get_fldigi_status()
 	}
 	try {
 		xmlcall = rig_get_notch;
-		execute(xmlcall.c_str(), NULL, status);
+		execute(xmlcall.c_str(), param, status);
 		check_for_notch_change(status);
 	} catch (...) {
-//		throw;
 	}
 }
 
