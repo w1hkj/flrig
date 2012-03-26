@@ -170,7 +170,7 @@ flrig_SOURCES += \
 	rigs/TS480SAT.cxx \
 	rigs/TS570.cxx \
 	rigs/TS590S.cxx \
-	rigs/TS870.cxx \
+	rigs/TS870S.cxx \
 	rigs/TS2000.cxx \
 	rigs/TT516.cxx \
 	rigs/DELTA-II.cxx \
@@ -286,7 +286,7 @@ EXTRA_DIST = \
 	include/TS480SAT.h \
 	include/TS570.h \
 	include/TS590S.h \
-	include/TS870.h \
+	include/TS870S.h \
 	include/TS2000.h \
 	include/TT516.h \
 	include/DELTA-II.h \

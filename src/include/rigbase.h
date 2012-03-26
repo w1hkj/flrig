@@ -43,7 +43,7 @@ enum {
 
 	RAY152,
 
-	TS140, TS450S, TS480HX, TS480SAT, TS570, TS590S, TS870, TS2000,
+	TS140, TS450S, TS480HX, TS480SAT, TS570, TS590S, TS870S, TS2000,
 
 	TT516, TT535, TT538, TT550, TT563, TT566, TT588, TT599, // 47
 
@@ -94,6 +94,7 @@ public:
 	long freqB;
 	int  precision;
 	bool can_change_alt_vfo;
+	int  active_mode;		// wbx
 
 	int  def_mode;
 	int  def_bw;
