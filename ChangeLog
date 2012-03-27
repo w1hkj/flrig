@@ -1,8 +1,17 @@
 
 
-=Version 1.2.11=
+=Version 1.2.12=
+
+2012-03-26  Dave (G8KBV)  <dave@g8kbv.demon.co.uk>
+
+	592e08d: TS870S
 
 2012-03-25  David Freese  <w1hkj@w1hkj.com>
+
+	e772a4d: xml_io 64 bit compiler
+
+
+=Version 1.2.11=
 
 	3c715ec: Fix fldigi compatibility
 
