@@ -465,17 +465,22 @@ void RIG_IC7600::set_compression()
 void RIG_IC7600::set_vox_onoff()
 {
 	if (progStatus.vox_onoff) {
-		cmd.assign(pre_to).append("\x16\x46\x01").append(post);
+		cmd.assign(pre_to).append("\x16\x46\x01");
+		cmd.append( post );
 		waitFB("set vox ON");
 	} else {
-		cmd.assign(pre_to).append("\x16\x46\x00").append(post);
+		cmd.assign(pre_to).append("\x16\x46");
+		cmd += '\x00';		// ALH
+		cmd.append( post );
 		waitFB("set vox OFF");
 	}
 }
 
 void RIG_IC7600::set_vox_gain()
 {
-	cmd.assign(pre_to).append("\x1A\x03\x09");
+	cmd.assign(pre_to).append("\x1A\x05"); // ALH values 0-255
+	cmd +='\x01';
+	cmd +='\x65';
 	cmd.append(to_bcd((int)(progStatus.vox_gain * 2.55), 3));
 	cmd.append( post );
 	waitFB("SET vox gain");
@@ -483,7 +488,9 @@ void RIG_IC7600::set_vox_gain()
 
 void RIG_IC7600::set_vox_anti()
 {
-	cmd.assign(pre_to).append("\x1A\x03\x10");
+	cmd.assign(pre_to).append("\x1A\x05");	//ALH values 0-255
+	cmd +='\x01';
+	cmd +='\x66';
 	cmd.append(to_bcd((int)(progStatus.vox_anti * 2.55), 3));
 	cmd.append( post );
 	waitFB("SET anti-vox");
@@ -491,8 +498,10 @@ void RIG_IC7600::set_vox_anti()
 
 void RIG_IC7600::set_vox_hang()
 {
-	cmd.assign(pre_to).append("\x1A\x03\x11");
-	cmd.append(to_bcd((int)(progStatus.vox_hang * 2.55), 3));
+	cmd.assign(pre_to).append("\x1A\x05");	//ALH values 00-20 = 0.0 - 2.0 sec
+	cmd +='\x01';	// ALH
+	cmd +='\x67';	// ALH
+	cmd.append(to_bcd((int)(progStatus.vox_hang / 10 ), 2));
 	cmd.append( post );
 	waitFB("SET vox hang");
 }
@@ -501,7 +510,7 @@ void RIG_IC7600::set_vox_hang()
 
 void RIG_IC7600::set_cw_wpm()
 {
-	cmd.assign(pre_to).append("\x14\x0C");
+	cmd.assign(pre_to).append("\x14\x0C"); // values 0-255
 	cmd.append(to_bcd(round((progStatus.cw_wpm - 6) * 255 / (60 - 6)), 3));
 	cmd.append( post );
 	waitFB("SET cw wpm");
@@ -509,7 +518,7 @@ void RIG_IC7600::set_cw_wpm()
 
 void RIG_IC7600::set_cw_qsk()
 {
-	int n = round(progStatus.cw_qsk * 10);
+	int n = round(progStatus.cw_qsk * 10); // values 0-255
 	cmd.assign(pre_to).append("\x14\x0F");
 	cmd.append(to_bcd(n, 3));
 	cmd.append(post);
@@ -518,17 +527,21 @@ void RIG_IC7600::set_cw_qsk()
 
 void RIG_IC7600::set_cw_spot_tone()
 {
-	cmd.assign(pre_to).append("\x14\x09 ");
+	cmd.assign(pre_to).append("\x14\x09"); // values 0=300Hz 255=900Hz
 	int n = round((progStatus.cw_spot_tone - 300) * 255.0 / 600.0);
 	if (n > 255) n = 255;
 	if (n < 0) n = 0;
-	cmd.append(to_bcd(n, 3)).append(post);
+	cmd.append(to_bcd(n, 3));
+	cmd.append( post );
 	waitFB("SET cw spot tone");
 }
 
 void RIG_IC7600::set_cw_vol()
 {
-	cmd.assign(pre_to).append("\x1A\x03\0x06");
+	cmd.assign(pre_to);
+	cmd.append("\x1A\x05");
+	cmd += '\x00';
+	cmd += '\x24';	// ALH / DF
 	cmd.append(to_bcd((int)(progStatus.cw_vol * 2.55), 3));
 	cmd.append( post );
 	waitFB("SET cw sidetone volume");
