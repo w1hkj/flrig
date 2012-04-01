@@ -1,32 +1,41 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110 
+version 1.0300 
 i18n_type 1 
 i18n_include "gettext.h" 
 i18n_function _ 
 header_name {.h} 
 code_name {.cxx}
-decl {\#include "images.h"} {} 
+decl {\#include "images.h"} {private local
+} 
 
-decl {\#include "rig.h"} {} 
+decl {\#include "rig.h"} {private local
+} 
 
-decl {\#include "status.h"} {} 
+decl {\#include "status.h"} {private local
+} 
 
-decl {\#include "support.h"} {} 
+decl {\#include "support.h"} {private local
+} 
 
-decl {\#include "K3_ui.h"} {} 
+decl {\#include "K3_ui.h"} {private local
+} 
 
-decl {const int freq_sel_widths[]={110, 70, 70, 0};} {} 
+decl {const int freq_sel_widths[]={110, 70, 70, 0};} {private local
+} 
 
-decl {Fl_Double_Window *meter_scale_dialog = (Fl_Double_Window *)0;} {} 
+decl {Fl_Double_Window *meter_scale_dialog = (Fl_Double_Window *)0;} {private local
+} 
 
-decl {Fl_Double_Window *meter_filters = (Fl_Double_Window *)0;} {} 
+decl {Fl_Double_Window *meter_filters = (Fl_Double_Window *)0;} {private local
+} 
 
 decl {const char *mtr_scales[] = {
 "25 watt",
 "50 watt",
 "100 watt",
 "200 watt",
-"Auto scaled"};} {} 
+"Auto scaled"};} {private local
+} 
 
 Function {select_power_meter_scales()} {open return_type void
 } {
@@ -755,8 +764,18 @@ cb_tt550_setXmtBW();}
         Fl_Button btnBandSelect_12 {
           label 5
           callback {cbBandSelect(12);}
-          tooltip {60m band} xywh {358 299 60 18} color 246
+          tooltip {60m band} xywh {358 299 60 18} color 246 hide
         }
+        Fl_Choice mnuSelect60 {
+          callback {cbBandSelect(13);} open
+          xywh {358 299 60 18} down_box BORDER_BOX color 246 hide
+          code0 {o->add("U51|U52|U53|U54|U55");}
+        } {}
+        Fl_Group opSelect60 {
+          callback {cbBandSelect(13);} open selected
+          tooltip {Select 60 meter frequency} xywh {358 299 60 18} box FLAT_BOX labelsize 12 align 16
+          class Fl_ComboBox
+        } {}
       }
       Fl_Group genericCW {
         label CW open
@@ -1125,7 +1144,7 @@ Function {Memory_Dialog()} {open
 } {
   Fl_Window {} {
     label {Flrig Memory} open
-    xywh {203 660 505 175} type Double visible
+    xywh {203 660 505 175} type Double hide
   } {
     Fl_Group {} {open
       xywh {2 2 60 133} box ENGRAVED_FRAME
@@ -1181,7 +1200,7 @@ Left click => edit Alpha Tag} xywh {66 2 434 133} type Hold labelfont 4 labelsiz
     }
     Fl_Input inAlphaTag {
       label {Alpha Tag:}
-      callback {editAlphaTag();} selected
+      callback {editAlphaTag();}
       tooltip {Select Tag from browser window
 Left click => in Tag field to edit
 [Enter] => when done to update} xywh {290 140 190 25}
@@ -1194,7 +1213,7 @@ Function {XcvrDialog()} {open
 } {
   Fl_Window {} {
     label {I/O Ports} open
-    xywh {580 428 480 255} type Double visible
+    xywh {580 428 480 255} type Double hide
   } {
     Fl_Tabs tabsConfig {open
       xywh {0 8 482 246}
@@ -1755,7 +1774,7 @@ Function {power_meter_scale_select()} {open
 } {
   Fl_Window {} {
     label {Select Power Meter Scale} open
-    xywh {647 726 455 145} type Double visible
+    xywh {647 726 455 145} type Double hide
   } {
     Fl_Button sel_25 {
       label {25 watt}

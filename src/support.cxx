@@ -3503,6 +3503,10 @@ void enable_bandselect_btn(int btn_num, bool enable)
 			if (enable) btnBandSelect_12->show();
 			else btnBandSelect_12->hide();
 			break;
+		case 13:
+			if (enable) opSelect60->show();
+			else opSelect60->hide();
+			break;
 		default:
 			break;
 	}
