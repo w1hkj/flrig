@@ -39,6 +39,8 @@ public:
 	void set_vox_gain();
 	void set_vox_anti();
 	void set_vox_hang();
+	void get_vox_hang_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 200; step = 10; } //alh
 
 	void get_cw_wpm_min_max(int &min, int &max) {
 		min = 6; max = 60; }
