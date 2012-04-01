@@ -723,6 +723,18 @@ static void cb_btnBandSelect_12(Fl_Button*, void*) {
   cbBandSelect(12);
 }
 
+Fl_Choice *mnuSelect60=(Fl_Choice *)0;
+
+static void cb_mnuSelect60(Fl_Choice*, void*) {
+  cbBandSelect(13);
+}
+
+Fl_ComboBox *opSelect60=(Fl_ComboBox *)0;
+
+static void cb_opSelect60(Fl_ComboBox*, void*) {
+  cbBandSelect(13);
+}
+
 Fl_Group *genericCW=(Fl_Group *)0;
 
 Fl_Light_Button *btnSpot=(Fl_Light_Button *)0;
@@ -1749,7 +1761,29 @@ Fl_Double_Window* Rig_window() {
           btnBandSelect_12->tooltip(_("60m band"));
           btnBandSelect_12->color((Fl_Color)246);
           btnBandSelect_12->callback((Fl_Callback*)cb_btnBandSelect_12);
+          btnBandSelect_12->hide();
         } // Fl_Button* btnBandSelect_12
+        { Fl_Choice* o = mnuSelect60 = new Fl_Choice(358, 299, 60, 18);
+          mnuSelect60->down_box(FL_BORDER_BOX);
+          mnuSelect60->color((Fl_Color)246);
+          mnuSelect60->callback((Fl_Callback*)cb_mnuSelect60);
+          mnuSelect60->hide();
+          o->add("U51|U52|U53|U54|U55");
+        } // Fl_Choice* mnuSelect60
+        { opSelect60 = new Fl_ComboBox(358, 299, 60, 18);
+          opSelect60->tooltip(_("Select 60 meter frequency"));
+          opSelect60->box(FL_FLAT_BOX);
+          opSelect60->color(FL_BACKGROUND_COLOR);
+          opSelect60->selection_color(FL_BACKGROUND_COLOR);
+          opSelect60->labeltype(FL_NORMAL_LABEL);
+          opSelect60->labelfont(0);
+          opSelect60->labelsize(12);
+          opSelect60->labelcolor(FL_FOREGROUND_COLOR);
+          opSelect60->callback((Fl_Callback*)cb_opSelect60);
+          opSelect60->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
+          opSelect60->when(FL_WHEN_RELEASE);
+          opSelect60->end();
+        } // Fl_ComboBox* opSelect60
         genericBands->end();
       } // Fl_Group* genericBands
       { genericCW = new Fl_Group(2, 271, 420, 49, _("CW"));
