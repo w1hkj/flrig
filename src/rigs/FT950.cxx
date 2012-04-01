@@ -61,11 +61,16 @@ static const char *FT950_widths_NN[] = {"NORM", "NARR", NULL };
 static const int FT950_wvals_NN[] = {0, 1, WVALS_LIMIT};
 
 // US 60M 5-USB, 5-CW
-static const char *FT950_US_60m[] = {"125", "126", "127", "128", "130", "141", "142", "143", "144", "146" , NULL};
+static const char *US_60m_chan[]  = {"125", "126", "127", "128", "130", "141", "142", "143", "144", "146", NULL};
+static const char *US_60m_label[] = {"U51", "U52", "U53", "U54", "U55", "U56", "U57", "U58", "U59", "U50", NULL};
 // UK 60m channel numbers by Brian, G8SEZ
-static const char *FT950_UK_60m[] = {"118", "120", "121", "127", "128", "129", "130", NULL};
+static const char *UK_60m_chan[]  = {"118", "120", "121", "127", "128", "129", "130", NULL};
+static const char *UK_60m_label[] = {"U51", "U52", "U53", "U54", "U55", "U56", "U57", NULL};
+// default label
+static const char *dflt_label_60m = "5";
 
-static const char **Channels_60m = FT950_US_60m;
+static const char **Channels_60m = US_60m_chan;
+static const char **label_60m    = US_60m_label;
 
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
@@ -194,8 +199,14 @@ void RIG_FT950::initialize()
 	cmd = "MR118;";
 	waitN(27, 100, "Read UK 60m Channel Mem", ASC);
 	size_t p = replystr.rfind("MR");
-	if (p == string::npos) Channels_60m = FT950_US_60m;
-	else Channels_60m = FT950_UK_60m;
+	if (p == string::npos) {
+		Channels_60m = US_60m_chan;
+		label_60m    = US_60m_label;
+	}
+	else {
+		Channels_60m = UK_60m_chan;
+		label_60m    = UK_60m_label;
+	}
 }
 
 void RIG_FT950::post_initialize()
@@ -1173,10 +1184,12 @@ void RIG_FT950::set_band_selection(int v)
 				m_60m_indx = 0;
 		}
 		cmd.assign("MC").append(Channels_60m[m_60m_indx]).append(";");
+		bandsel_label(label_60m[m_60m_indx]);
 	} else {		// v == 1..11 band selection OR return to vfo mode == 0
-		if (inc_60m)
+		if (inc_60m) {
 			cmd = "VM;";
-		else {
+			bandsel_label(dflt_label_60m);
+		} else {
 			if (v < 3)
 				v = v - 1;
 			cmd.assign("BS").append(to_decimal(v, 2)).append(";");

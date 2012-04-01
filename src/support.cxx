@@ -3539,3 +3539,14 @@ void editAlphaTag()
 	FreqSelect->value(indx + 1);
 	inAlphaTag->value(oplist[indx].alpha_tag);
 }
+
+void bandsel_label(const char * l, int btn)
+{
+	switch (btn) {
+		case 12:
+			btnBandSelect_12->label(l);
+			btnBandSelect_12->redraw_label();
+			break;
+		default: break;
+	}
+}
