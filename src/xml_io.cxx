@@ -212,6 +212,8 @@ void send_new_notch(int freq)
 
 void send_xml_freq(long freq)
 {
+	if (rig_nbr == FT950 && freq > 5300000 && freq < 5500000)
+		freq -= 1500;
 	qfreq.push(freq);
 }
 
