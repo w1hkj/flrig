@@ -61,12 +61,12 @@ static const char *FT950_widths_NN[] = {"NORM", "NARR", NULL };
 static const int FT950_wvals_NN[] = {0, 1, WVALS_LIMIT};
 
 // US 60M 5-USB, 5-CW
-static const char *US_60m_chan[]  = {"125", "126", "127", "128", "130", "141", "142", "143", "144", "146", NULL};
-static const char *US_60m_label[] = {"U51", "U52", "U53", "U54", "U55", "U56", "U57", "U58", "U59", "U50", NULL};
+static const char *US_60m_chan[]  = {"000", "125", "126", "127", "128", "130", "141", "142", "143", "144", "146", NULL};
+static const char *US_60m_label[] = {"VFO", "U51", "U52", "U53", "U54", "U55", "U56", "U57", "U58", "U59", "U50", NULL};
 
 // UK 60m channel numbers by Brian, G8SEZ
-static const char *UK_60m_chan[]  = {"118", "120", "121", "127", "128", "129", "130", NULL};
-static const char *UK_60m_label[] = {"U51", "U52", "U53", "U54", "U55", "U56", "U57", NULL};
+static const char *UK_60m_chan[]  = {"000", "118", "120", "121", "127", "128", "129", "130", NULL};
+static const char *UK_60m_label[] = {"VFO", "U51", "U52", "U53", "U54", "U55", "U56", "U57", NULL};
 
 // default label
 static const char *dflt_label_60m = "5";
@@ -215,6 +215,7 @@ void RIG_FT950::initialize()
 		char **p = (char **)UK_60m_label;
 		while (*p) opSelect60->add(*p++);
 	}
+	opSelect60->index(m_60m_indx);
 }
 
 void RIG_FT950::post_initialize()
@@ -1196,11 +1197,15 @@ void RIG_FT950::set_band_selection(int v)
 		bandsel_label(label_60m[m_60m_indx]);
 	} else if (v == 13) {
 		m_60m_indx = opSelect60->index();
-		cmd.assign("MC").append(Channels_60m[m_60m_indx]).append(";");
+		if (m_60m_indx)
+			cmd.assign("MC").append(Channels_60m[m_60m_indx]).append(";");
+		else if (inc_60m)
+			cmd = "VM;";
 	} else {		// v == 1..11 band selection OR return to vfo mode == 0
 		if (inc_60m) {
 			cmd = "VM;";
 			bandsel_label(dflt_label_60m);
+			opSelect60->index(m_60m_indx = 0);
 		} else {
 			if (v < 3)
 				v = v - 1;
