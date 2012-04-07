@@ -138,15 +138,14 @@ cFreqControl::cFreqControl(int x, int y, int w, int h, const char *lbl):
 	cbFunc = NULL;
 	end();
 
-	finp = new Fl_Float_Input(0, 0, 1, 1);
+	finp = new Fl_Float_Input(0, 0, 24,24);//1, 1);
 	finp->callback(freq_input_cb, this);
 	finp->when(FL_WHEN_CHANGED);
-	finp->hide();
+//	finp->hide();
 	parent()->remove(finp);
 
 	precision = 1;
 
-//	tooltip(_("Enter frequency or change with\nLeft/Right/Up/Down/Pg_Up/Pg_Down"));
 }
 
 cFreqControl::~cFreqControl()
@@ -263,34 +262,35 @@ int cFreqControl::handle(int event)
 		case FL_Left:
 			DecFreq(0);
 			return 1;
-//			d = -1;
 			break;
 		case FL_Down:
 			DecFreq(1);
 			return 1;
-//			d = -10;
 			break;
 		case FL_Right:
 			IncFreq(0);
 			return 1;
-//			d = 1;
 			break;
 		case FL_Up:
 			IncFreq(1);
 			return 1;
-//			d = 10;
 			break;
 		case FL_Page_Up:
 			IncFreq(2);
 			return 1;
-//			d = 100;
 			break;
 		case FL_Page_Down:
 			DecFreq(2);
 			return 1;
-//			d = -100;
 			break;
 		default:
+			if (Fl::event_ctrl()) {
+				if (Fl::event_key() == 'v') {
+					finp->handle(event);
+					Fl::remove_timeout((Fl_Timeout_Handler)blink_point, decbx);
+					return 1;
+				}
+			}
 			if (Fl::has_timeout((Fl_Timeout_Handler)blink_point, decbx)) {
 				if (d == FL_Escape) {
 					Fl::remove_timeout((Fl_Timeout_Handler)blink_point, decbx);
@@ -304,10 +304,6 @@ int cFreqControl::handle(int event)
 				}
 			}
 			else {
-//			  if (d == FL_Escape && window() != Fl::first_window()) {
-//				  window()->do_callback();
-//				  return 1;
-//			  }
 				Fl::add_timeout(0.0, (Fl_Timeout_Handler)blink_point, decbx);
 				finp->static_value("");
 				oldval = val;
@@ -330,7 +326,8 @@ int cFreqControl::handle(int event)
 		}
 		break;
 	case FL_PUSH:
-		return Fl_Group::handle(event);
+		return Fl_Group::handle(event); // in turn calls the digit[] callback
+
 	}
 
 	return 1;
