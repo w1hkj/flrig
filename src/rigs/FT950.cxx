@@ -61,15 +61,12 @@ static const char *FT950_widths_NN[] = {"NORM", "NARR", NULL };
 static const int FT950_wvals_NN[] = {0, 1, WVALS_LIMIT};
 
 // US 60M 5-USB, 5-CW
-static const char *US_60m_chan[]  = {"000", "125", "126", "127", "128", "130", "141", "142", "143", "144", "146", NULL};
-static const char *US_60m_label[] = {"VFO", "U51", "U52", "U53", "U54", "U55", "U56", "U57", "U58", "U59", "U50", NULL};
+static const char *US_60m_chan[]  = {"000","125","126","127","128","130","141","142","143","144","146",NULL};
+static const char *US_60m_label[] = {"VFO","U51","U52","U53","U54","U55","U56","U57","U58","U59","U50",NULL};
 
 // UK 60m channel numbers by Brian, G8SEZ
-static const char *UK_60m_chan[]  = {"000", "118", "120", "121", "127", "128", "129", "130", NULL};
-static const char *UK_60m_label[] = {"VFO", "U51", "U52", "U53", "U54", "U55", "U56", "U57", NULL};
-
-// default label
-static const char *dflt_label_60m = "5";
+static const char *UK_60m_chan[]  = {"000","118","120","121","127","128","129","130",NULL};
+static const char *UK_60m_label[] = {"VFO","U51","U52","U53","U54","U55","U56","U57",NULL};
 
 static const char **Channels_60m = US_60m_chan;
 static const char **label_60m    = US_60m_label;
@@ -1179,32 +1176,25 @@ void RIG_FT950::set_cw_vol()
 
 void RIG_FT950::set_band_selection(int v)
 {
-	int inc_60m = false;
+	int chan_mem_on = false;
 	cmd = "IF;";
 	waitN(27, 100, "get vfo mode in set_band_selection", ASC);
 	size_t p = replystr.rfind("IF");
 	if (p == string::npos) return;
+	if ((p + 26) >= replystr.length()) return;
 	if (replystr[p+21] != '0') {	// vfo 60M memory mode
-		inc_60m = true;
+		chan_mem_on = true;
 	}
 
-	if (v == 12) {	// 5MHz 60m presets
-		if (inc_60m) {
-			if (Channels_60m[++m_60m_indx] == NULL)
-				m_60m_indx = 0;
-		}
-		cmd.assign("MC").append(Channels_60m[m_60m_indx]).append(";");
-		bandsel_label(label_60m[m_60m_indx]);
-	} else if (v == 13) {
+	if (v == 13) {
 		m_60m_indx = opSelect60->index();
 		if (m_60m_indx)
 			cmd.assign("MC").append(Channels_60m[m_60m_indx]).append(";");
-		else if (inc_60m)
+		else if (chan_mem_on)
 			cmd = "VM;";
 	} else {		// v == 1..11 band selection OR return to vfo mode == 0
-		if (inc_60m) {
+		if (chan_mem_on) {
 			cmd = "VM;";
-			bandsel_label(dflt_label_60m);
 			opSelect60->index(m_60m_indx = 0);
 		} else {
 			if (v < 3)

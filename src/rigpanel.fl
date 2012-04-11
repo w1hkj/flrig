@@ -709,32 +709,32 @@ cb_tt550_setXmtBW();}
         Fl_Button btnBandSelect_1 {
           label {1.8}
           callback {cbBandSelect(1);}
-          tooltip {160m Band} xywh {4 276 60 18} color 246
+          tooltip {160m Band} xywh {4 278 60 18} color 246
         }
         Fl_Button btnBandSelect_2 {
           label {3.5}
           callback {cbBandSelect(2);}
-          tooltip {80m band} xywh {74 276 60 18} color 246
+          tooltip {80m band} xywh {74 278 60 18} color 246
         }
         Fl_Button btnBandSelect_3 {
           label 7
           callback {cbBandSelect(3);}
-          tooltip {40m band} xywh {145 276 60 18} color 246 align 64
+          tooltip {40m band} xywh {145 278 60 18} color 246 align 64
         }
         Fl_Button btnBandSelect_4 {
           label 10
           callback {cbBandSelect(4);}
-          tooltip {30m band} xywh {216 276 60 18} color 246
+          tooltip {30m band} xywh {216 278 60 18} color 246
         }
         Fl_Button btnBandSelect_5 {
           label 14
           callback {cbBandSelect(5);}
-          tooltip {20m band} xywh {287 276 60 18} color 246
+          tooltip {20m band} xywh {287 278 60 18} color 246
         }
         Fl_Button btnBandSelect_6 {
           label 18
           callback {cbBandSelect(6);}
-          tooltip {17m band} xywh {358 276 60 18} color 246
+          tooltip {17m band} xywh {358 278 60 18} color 246
         }
         Fl_Button btnBandSelect_7 {
           label 21
@@ -766,14 +766,10 @@ cb_tt550_setXmtBW();}
           callback {cbBandSelect(12);}
           tooltip {60m band} xywh {358 299 60 18} color 246 hide
         }
-        Fl_Choice mnuSelect60 {
-          callback {cbBandSelect(13);} open
-          xywh {358 299 60 18} down_box BORDER_BOX color 246 hide
-          code0 {o->add("U51|U52|U53|U54|U55");}
-        } {}
         Fl_Group opSelect60 {
+          label combo
           callback {cbBandSelect(13);} open selected
-          tooltip {Select 60 meter frequency} xywh {358 299 60 18} box FLAT_BOX labelsize 12 align 16
+          tooltip {vfo / 60 meter channel} xywh {358 299 60 18} box BORDER_BOX color 246 labelsize 12 align 16
           class Fl_ComboBox
         } {}
       }

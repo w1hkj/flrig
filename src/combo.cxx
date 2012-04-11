@@ -189,6 +189,11 @@ Fl_ComboBox::~Fl_ComboBox()
 	delete [] datalist;
 }
 
+void Fl_ComboBox::color(Fl_Color clr)
+{
+	Output->color(clr);
+}
+
 void Fl_ComboBox::type (int t)
 {
 	listtype = t;
