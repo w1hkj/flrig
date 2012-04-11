@@ -123,7 +123,6 @@ extern Fl_Button *btnBandSelect_9;
 extern Fl_Button *btnBandSelect_10;
 extern Fl_Button *btnBandSelect_11;
 extern Fl_Button *btnBandSelect_12;
-extern Fl_Choice *mnuSelect60;
 extern Fl_ComboBox *opSelect60;
 extern Fl_Group *genericCW;
 extern Fl_Light_Button *btnSpot;

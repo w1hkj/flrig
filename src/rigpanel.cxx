@@ -723,12 +723,6 @@ static void cb_btnBandSelect_12(Fl_Button*, void*) {
   cbBandSelect(12);
 }
 
-Fl_Choice *mnuSelect60=(Fl_Choice *)0;
-
-static void cb_mnuSelect60(Fl_Choice*, void*) {
-  cbBandSelect(13);
-}
-
 Fl_ComboBox *opSelect60=(Fl_ComboBox *)0;
 
 static void cb_opSelect60(Fl_ComboBox*, void*) {
@@ -1701,33 +1695,33 @@ Fl_Double_Window* Rig_window() {
     { tabsGeneric = new Fl_Tabs(1, 252, 422, 70);
       tabsGeneric->selection_color(FL_LIGHT1);
       { genericBands = new Fl_Group(2, 271, 420, 49, _("Bands"));
-        { btnBandSelect_1 = new Fl_Button(4, 276, 60, 18, _("1.8"));
+        { btnBandSelect_1 = new Fl_Button(4, 278, 60, 18, _("1.8"));
           btnBandSelect_1->tooltip(_("160m Band"));
           btnBandSelect_1->color((Fl_Color)246);
           btnBandSelect_1->callback((Fl_Callback*)cb_btnBandSelect_1);
         } // Fl_Button* btnBandSelect_1
-        { btnBandSelect_2 = new Fl_Button(74, 276, 60, 18, _("3.5"));
+        { btnBandSelect_2 = new Fl_Button(74, 278, 60, 18, _("3.5"));
           btnBandSelect_2->tooltip(_("80m band"));
           btnBandSelect_2->color((Fl_Color)246);
           btnBandSelect_2->callback((Fl_Callback*)cb_btnBandSelect_2);
         } // Fl_Button* btnBandSelect_2
-        { btnBandSelect_3 = new Fl_Button(145, 276, 60, 18, _("7"));
+        { btnBandSelect_3 = new Fl_Button(145, 278, 60, 18, _("7"));
           btnBandSelect_3->tooltip(_("40m band"));
           btnBandSelect_3->color((Fl_Color)246);
           btnBandSelect_3->callback((Fl_Callback*)cb_btnBandSelect_3);
           btnBandSelect_3->align(Fl_Align(FL_ALIGN_CLIP));
         } // Fl_Button* btnBandSelect_3
-        { btnBandSelect_4 = new Fl_Button(216, 276, 60, 18, _("10"));
+        { btnBandSelect_4 = new Fl_Button(216, 278, 60, 18, _("10"));
           btnBandSelect_4->tooltip(_("30m band"));
           btnBandSelect_4->color((Fl_Color)246);
           btnBandSelect_4->callback((Fl_Callback*)cb_btnBandSelect_4);
         } // Fl_Button* btnBandSelect_4
-        { btnBandSelect_5 = new Fl_Button(287, 276, 60, 18, _("14"));
+        { btnBandSelect_5 = new Fl_Button(287, 278, 60, 18, _("14"));
           btnBandSelect_5->tooltip(_("20m band"));
           btnBandSelect_5->color((Fl_Color)246);
           btnBandSelect_5->callback((Fl_Callback*)cb_btnBandSelect_5);
         } // Fl_Button* btnBandSelect_5
-        { btnBandSelect_6 = new Fl_Button(358, 276, 60, 18, _("18"));
+        { btnBandSelect_6 = new Fl_Button(358, 278, 60, 18, _("18"));
           btnBandSelect_6->tooltip(_("17m band"));
           btnBandSelect_6->color((Fl_Color)246);
           btnBandSelect_6->callback((Fl_Callback*)cb_btnBandSelect_6);
@@ -1763,17 +1757,10 @@ Fl_Double_Window* Rig_window() {
           btnBandSelect_12->callback((Fl_Callback*)cb_btnBandSelect_12);
           btnBandSelect_12->hide();
         } // Fl_Button* btnBandSelect_12
-        { Fl_Choice* o = mnuSelect60 = new Fl_Choice(358, 299, 60, 18);
-          mnuSelect60->down_box(FL_BORDER_BOX);
-          mnuSelect60->color((Fl_Color)246);
-          mnuSelect60->callback((Fl_Callback*)cb_mnuSelect60);
-          mnuSelect60->hide();
-          o->add("U51|U52|U53|U54|U55");
-        } // Fl_Choice* mnuSelect60
-        { opSelect60 = new Fl_ComboBox(358, 299, 60, 18);
-          opSelect60->tooltip(_("Select 60 meter frequency"));
-          opSelect60->box(FL_FLAT_BOX);
-          opSelect60->color(FL_BACKGROUND_COLOR);
+        { opSelect60 = new Fl_ComboBox(358, 299, 60, 18, _("combo"));
+          opSelect60->tooltip(_("vfo / 60 meter channel"));
+          opSelect60->box(FL_BORDER_BOX);
+          opSelect60->color((Fl_Color)246);
           opSelect60->selection_color(FL_BACKGROUND_COLOR);
           opSelect60->labeltype(FL_NORMAL_LABEL);
           opSelect60->labelfont(0);
