@@ -135,17 +135,15 @@ void RIG_TT516::initialize()
 long RIG_TT516::get_vfoA ()
 {
 	cmd = TT516getFREQA;
-	int ret = sendCommand(cmd);
-	if (ret < 8) return A.freq;
-	size_t p = replystr.rfind("A");
-	if (p == string::npos) return A.freq;
-
+	int ret = waitN(8, 150, "get vfo A", HEX);
+	if (ret != 8) return A.freq;
+	if (replystr[0] != 'A') return A.freq;
+	if (replystr[6] != 'G') return A.freq;
 	int f = 0;
 	for (size_t n = 1; n < 5; n++) {
-		f = f*256 + (unsigned char)replystr[p+n];
+		f = f*256 + ((unsigned char)replystr[n] & 0xFF) ;
 		A.freq = f;
 	}
-
 	return A.freq;
 }
 
@@ -157,6 +155,8 @@ void RIG_TT516::set_vfoA (long freq)
 	cmd[4] = freq & 0xff; freq = freq >> 8;
 	cmd[3] = freq & 0xff; freq = freq >> 8;
 	cmd[2] = freq & 0xff;
+	LOG_INFO(" %c%c %02X %02X %02X %02X %02X", cmd[0], cmd[1],
+		cmd[2] & 0xFF, cmd[3] & 0xFF, cmd[4] & 0xFF, cmd[5] & 0xFF, cmd[6]);
 	sendCommand(cmd);
 	return;
 }
@@ -164,14 +164,14 @@ void RIG_TT516::set_vfoA (long freq)
 long RIG_TT516::get_vfoB ()
 {
 	cmd = TT516getFREQB;
-	int ret = sendCommand(cmd);
-	if (ret < 8) return B.freq;
-	size_t p = replystr.rfind("B");
-	if (p == string::npos) return B.freq;
+	int ret = waitN(8, 150, "get vfo B", HEX);
+	if (ret != 8) return B.freq;
+	if (replystr[0] != 'B') return B.freq;
+	if (replystr[6] != 'G') return B.freq;
 
 	int f = 0;
 	for (size_t n = 1; n < 5; n++) {
-		f = f*256 + (unsigned char)replystr[p+n];
+		f = f*256 + ((unsigned char)replystr[n] & 0xFF) ;
 		B.freq = f;
 	}
 
@@ -186,6 +186,8 @@ void RIG_TT516::set_vfoB (long freq)
 	cmd[4] = freq & 0xff; freq = freq >> 8;
 	cmd[3] = freq & 0xff; freq = freq >> 8;
 	cmd[2] = freq & 0xff;
+	LOG_INFO(" %c%c %02X %02X %02X %02X %02X", cmd[0], cmd[1],
+		cmd[2] & 0xFF, cmd[3] & 0xFF, cmd[4] & 0xFF, cmd[5] & 0xFF, cmd[6]);
 	sendCommand(cmd);
 	return;
 }
@@ -259,8 +261,9 @@ void RIG_TT516::set_modeA(int val)
 int RIG_TT516::get_modeA()
 {
 	cmd = TT516getMODE;
-	int ret = sendCommand(cmd);
+	int ret = waitN(6, 150, "get mode A", HEX);
 	if (ret < 6) return A.imode;
+	if (replystr[ret - 2] != 'G') return A.imode;
 	size_t p = replystr.rfind("M");
 	if (p == string::npos) return A.imode;
 
@@ -281,8 +284,9 @@ void RIG_TT516::set_modeB(int val)
 int RIG_TT516::get_modeB()
 {
 	cmd = TT516getMODE;
-	int ret = sendCommand(cmd);
+	int ret = waitN(6, 150, "get mode B", HEX);
 	if (ret < 6) return B.imode;
+	if (replystr[ret - 2] != 'G') return B.imode;
 	size_t p = replystr.rfind("M");
 	if (p == string::npos) return B.imode;
 
@@ -295,8 +299,9 @@ int RIG_TT516::get_bwA()
 {
 	if (inuse == onA) {
 		cmd = TT516getBW;
-		int ret = sendCommand(cmd);
+		int ret = waitN(5, 150, "get bw A", HEX);
 		if (ret < 5) return A.iBW;
+		if (replystr[ret - 2] != 'G') return A.iBW;
 		size_t p = replystr.rfind("W");
 		if (p == string::npos) return A.iBW;
 		A.iBW = (unsigned char)replystr[p+1];
@@ -318,8 +323,9 @@ int RIG_TT516::get_bwB()
 {
 	if (inuse == onB) {
 		cmd = TT516getBW;
-		int ret = sendCommand(cmd);
+		int ret = waitN(5, 150, "get bw B", HEX);
 		if (ret < 5) return B.iBW;
+		if (replystr[ret - 2] != 'G') return B.iBW;
 		size_t p = replystr.rfind("W");
 		if (p == string::npos) return B.iBW;
 		B.iBW = (unsigned char)replystr[p+1];
