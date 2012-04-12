@@ -1,6 +1,39 @@
 
 
+=Version 1.1.13=
+
+2012-04-11  David Freese  <w1hkj@w1hkj.com>
+
+	20fa614: TT516
+
+2012-04-11  Terry Embry  <ftembry@users.berlios.de>
+
+	1069bf5: FT950
+
+2012-04-06  David Freese  <w1hkj@w1hkj.com>
+
+	7169864: VFO paste
+
+2012-04-06  Terry Embry  <ftembry@users.berlios.de>
+
+	3b465e5: FT950 VFO switch
+
+2012-04-01  David Freese  <w1hkj@w1hkj.com>
+
+	feecd1b: FT950 60m offset
+	c0d355e: FT960 60m selector
+
+2012-04-01  Terry Embry  <ftembry@users.berlios.de>
+
+	15f2c60: FT950 60 meter
+
+2012-04-01  Andy Hart  <andylhart@gmail.com>
+
+	ad0e023: IC7600
+
+
 =Version 1.2.12=
+
 
 2012-03-26  Dave (G8KBV)  <dave@g8kbv.demon.co.uk>
 
