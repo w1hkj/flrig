@@ -39,6 +39,7 @@ Fl_Double_Window *dlgDisplayConfig = NULL;
 Fl_Double_Window *dlgXcvrConfig = NULL;
 Fl_Double_Window *dlgMemoryDialog = NULL;
 Fl_Double_Window *dlgControls = NULL;
+
 Font_Browser     *fntbrowser = NULL;
 
 Fl_Color flrig_def_color(int);
@@ -280,6 +281,15 @@ void cbCancelXcvrDialog()
 
 void cbOkXcvrDialog()
 {
+	if (progStatus.UIsize != small_ui) {
+		btn_show_controls->label("@-22->");
+		btn_show_controls->redraw_label();
+		grpTABS->hide();
+		mainwindow->resizable(grpTABS);
+		mainwindow->size(mainwindow->w(), 150);
+		mainwindow->size_range(735, 150, 0, 150);
+	}
+
 	// close the current rig control
 	closeRig();
 	close_rig_xmlrpc();
@@ -369,6 +379,8 @@ void cbOkXcvrDialog()
 	open_rig_xmlrpc();
 
 	initRig();
+
+	mainwindow->redraw();
 
 	btnOkXcvrDialog->labelcolor(FL_BLACK);
 }
@@ -806,11 +818,10 @@ void setColors()
 			fl_color_average(bgclr, FL_BLACK, 0.87));
 	}
 
-	txtInactive->color(lblTest->color());
-	txtInactive->labelcolor(lblTest->labelcolor());
-	txtInactive->redraw();
-
 	grpMeters->color(bgclr);
+
+	if (progStatus.UIsize != small_ui)
+		meter_fill_box->color(bgclr);
 
 	scaleSmeter->color(bgclr);
 	scaleSmeter->labelcolor(fgclr);
@@ -836,12 +847,6 @@ void setColors()
 
 	grpMeters->redraw();
 
-//	scaleSmeter->redraw();
-//	scalePower->redraw();
-//	sldrFwdPwr->redraw();
-//	sldrRcvSignal->redraw();
-//	sldrALC_SWR->redraw();
-
 	if (btnVol)				btnVol->selection_color(btn_lt_color);
 	if (btnNR)				btnNR->selection_color(btn_lt_color);
 	if (btnIFsh)			btnIFsh->selection_color(btn_lt_color);
@@ -857,7 +862,6 @@ void setColors()
 	if (btnPTT)				btnPTT->selection_color(btn_lt_color);
 	if (btnAuxRTS)			btnAuxRTS->selection_color(btn_lt_color);
 	if (btnAuxDTR)			btnAuxDTR->selection_color(btn_lt_color);
-	if (btnMicLine)			btnMicLine->selection_color(btn_lt_color);
 	if (btnSpot)			btnSpot->selection_color(btn_lt_color);
 	if (btn_vox)			btn_vox->selection_color(btn_lt_color);
 	if (btnCompON)			btnCompON->selection_color(btn_lt_color);
@@ -1027,32 +1031,52 @@ void openMemoryDialog()
 
 void show_controls()
 {
-	if (rig_nbr == TT550) {
-		tabsGeneric->hide();
-		if (tabs550->visible()) {
-			tabs550->hide();
+	if (!(selrig->has_extras || rig_nbr == TT550) && progStatus.aux_serial_port == "NONE")
+		return;
+	if (progStatus.UIsize != small_ui) {
+		if (progStatus.UIsize != small_ui && mainwindow->h() > 150) {
 			btn_show_controls->label("@-22->");
 			btn_show_controls->redraw_label();
-			mainwindow->size( mainwindow->w(), mainwindow->h() - 70);
+			grpTABS->hide();
+			mainwindow->resizable(grpTABS);
+			mainwindow->size(mainwindow->w(), 150);
+			mainwindow->size_range(735, 150, 0, 150);
 		} else {
-			tabs550->show();
 			btn_show_controls->label("@-28->");
 			btn_show_controls->redraw_label();
-			mainwindow->size( mainwindow->w(), mainwindow->h() + 70);
+			mainwindow->resizable(grpTABS);
+			mainwindow->size_range(735, 218, 0, 218);
+			mainwindow->size(mainwindow->w(), 218);
+			grpTABS->show();
 		}
-		mainwindow->redraw();
 	} else {
-		tabs550->hide();
-		if (tabsGeneric->visible()) {
+		if (rig_nbr == TT550) {
 			tabsGeneric->hide();
-			btn_show_controls->label("@-22->");
-			btn_show_controls->redraw_label();
-			mainwindow->size( mainwindow->w(), mainwindow->h() - 70);
+			if (tabs550->visible()) {
+				tabs550->hide();
+				btn_show_controls->label("@-22->");
+				btn_show_controls->redraw_label();
+				mainwindow->size( mainwindow->w(), mainwindow->h() - 70);
+			} else {
+				tabs550->show();
+				btn_show_controls->label("@-28->");
+				btn_show_controls->redraw_label();
+				mainwindow->size( mainwindow->w(), mainwindow->h() + 70);
+			}
+			mainwindow->redraw();
 		} else {
-			tabsGeneric->show();
-			btn_show_controls->label("@-28->");
-			btn_show_controls->redraw_label();
-			mainwindow->size( mainwindow->w(), mainwindow->h() + 70);
+			tabs550->hide();
+			if (tabsGeneric->visible()) {
+				tabsGeneric->hide();
+				btn_show_controls->label("@-22->");
+				btn_show_controls->redraw_label();
+				mainwindow->size( mainwindow->w(), mainwindow->h() - 70);
+			} else {
+				tabsGeneric->show();
+				btn_show_controls->label("@-28->");
+				btn_show_controls->redraw_label();
+				mainwindow->size( mainwindow->w(), mainwindow->h() + 70);
+			}
 		}
 	}
 	setFocus();

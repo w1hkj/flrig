@@ -57,6 +57,7 @@
 int parse_args(int argc, char **argv, int& idx);
 
 Fl_Double_Window *mainwindow;
+
 string HomeDir;
 string RigHomeDir;
 string TempDir;
@@ -82,11 +83,8 @@ void about()
 	string msg = "\
 %s\n\
 Version %s\n\
-copyright W1HKJ, KJ4EED 2009-12\n\
-w1hkj@@w1hkj.com\n\
-Developers:\n\
-   Dave,  W1HKJ\n\
-   Terry, KJ4EED";
+copyright W1HKJ  <w1hkj@@w1hkj.com>\n\
+Developer:  Dave,  W1HKJ";
 	fl_message(msg.c_str(), PACKAGE_TARNAME, PACKAGE_VERSION);
 }
 
@@ -222,12 +220,24 @@ void exit_main(Fl_Widget *w)
 extern void open_rig_socket();
 extern bool run_digi_loop;
 
+void close_controls(void*)
+{
+//	show_controls();
+	if (progStatus.UIsize != small_ui) {
+		btn_show_controls->label("@-22->");
+		btn_show_controls->redraw_label();
+		grpTABS->hide();
+		mainwindow->resizable(grpTABS);
+		mainwindow->size(progStatus.mainW, 150);
+		mainwindow->size_range(735, 150, 0, 150);
+	}
+}
+
 void startup(void*)
 {
-//	btnInitializing->show();
-	mainwindow->redraw();
 	initStatusConfigDialog();
 
+	Fl::add_timeout(0.0, close_controls);
 }
 
 int main (int argc, char *argv[])
@@ -239,14 +249,6 @@ int main (int argc, char *argv[])
 	RigHomeDir.clear();
 
 	Fl::args(argc, argv, arg_idx, parse_args);
-
-	mainwindow = Rig_window();
-	mainwindow->callback(exit_main);
-
-	fntbrowser = new Font_Browser;
-	dlgMemoryDialog = Memory_Dialog();
-	dlgDisplayConfig = DisplayDialog();
-
 
 	char dirbuf[FL_PATH_MAX + 1];
 #ifdef __WIN32__
@@ -261,6 +263,21 @@ int main (int argc, char *argv[])
 	if (RigHomeDir.empty())
 		RigHomeDir = dirbuf;
 	checkdirectories();
+
+	progStatus.loadLastState();
+
+	if (progStatus.UIsize == small_ui)
+		mainwindow = Small_rig_window();
+	else
+		mainwindow = Wide_rig_window();
+
+	mainwindow->callback(exit_main);
+
+	progStatus.UI_laststate();
+
+	fntbrowser = new Font_Browser;
+	dlgMemoryDialog = Memory_Dialog();
+	dlgDisplayConfig = DisplayDialog();
 
 	try {
 		debug::start(string(RigHomeDir).append("status_log.txt").c_str());
@@ -286,7 +303,7 @@ int main (int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	progStatus.loadLastState();
+//	progStatus.loadLastState();
 
 	open_rig_xmlrpc();
 
@@ -304,7 +321,11 @@ int main (int argc, char *argv[])
 	sldrALC->clear();
 	sldrSWR->clear();
 
-	mainwindow->resize( progStatus.mainX, progStatus.mainY, mainwindow->w(), btnInitializing->h() + 24 );
+	if (progStatus.UIsize == small_ui)
+		mainwindow->resize( progStatus.mainX, progStatus.mainY, mainwindow->w(), btnInitializing->h() + 24 );
+	else
+		mainwindow->resize( progStatus.mainX, progStatus.mainY, progStatus.mainW, mainwindow->h());
+
 	btnInitializing->show();
 
 	mainwindow->xclass(KNAME);
@@ -323,7 +344,12 @@ int main (int argc, char *argv[])
 	mainwindow->show(argc, argv);
 #endif
 
-	Fl::add_timeout(0.250, startup);
+	btn_show_controls->label("@-28->");
+	btn_show_controls->redraw_label();
+
+//	show_controls();
+
+	Fl::add_timeout(0.50, startup);
 
 	return Fl::run();
 

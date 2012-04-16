@@ -12,6 +12,10 @@ using namespace std;
 struct status {
 	int		mainX;
 	int		mainY;
+	int		mainW;
+	int		mainH;
+	int		UIsize;
+	bool	UIchanged;
 	int		rig_nbr;
 	string	xcvr_serial_port;
 	int		comm_baudrate;
@@ -237,6 +241,7 @@ struct status {
 	void saveLastState();
 	void loadLastState();
 	bool loadXcvrState(const char *);
+	void UI_laststate();
 };
 
 extern status progStatus;

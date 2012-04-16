@@ -43,14 +43,14 @@ Function {select_power_meter_scales()} {open return_type void
 meter_scale_dialog->show();} {}
 } 
 
-Function {Rig_window()} {open
+Function {Small_rig_window()} {open
 } {
   Fl_Window {} {
     label Flrig open
     xywh {617 95 425 320} type Double align 80
     code0 {\#include <stdlib.h>} visible
   } {
-    Fl_Menu_Bar {} {open
+    Fl_Menu_Bar small_menu {open selected
       xywh {0 0 424 22} textsize 12
     } {
       Submenu {} {
@@ -284,7 +284,7 @@ btnA->value(0);}
     }
     Fl_Button btnAswapB {
       label {A<->B}
-      callback {cbAswapB();} selected
+      callback {cbAswapB();}
       tooltip {Left click:Swap A/B
 Right click:Copy A to B} xywh {318 62 52 20} down_box DOWN_BOX labelsize 12
     }
@@ -367,11 +367,11 @@ Right click:Copy A to B} xywh {318 62 52 20} down_box DOWN_BOX labelsize 12
         xywh {3 63 206 57} box FLAT_BOX
       } {
         Fl_Box scaleSmeter {
-          image {images/S60.xbm} xywh {3 63 206 20} box FLAT_BOX
+          image {../images/S60.xbm} xywh {3 63 206 20} box FLAT_BOX
         }
         Fl_Button btnALC_SWR {
           callback {cbALC_SWR();}
-          tooltip {Press SWR / ALC} image {images/SWR.xbm} xywh {3 63 206 20} box FLAT_BOX down_box FLAT_BOX hide
+          tooltip {Press SWR / ALC} image {../images/SWR.xbm} xywh {3 63 206 20} box FLAT_BOX down_box FLAT_BOX hide
         }
         Fl_Box sldrRcvSignal {
           xywh {5 85 200 6} box FLAT_BOX hide
@@ -401,7 +401,7 @@ Right click:Copy A to B} xywh {318 62 52 20} down_box DOWN_BOX labelsize 12
         Fl_Button scalePower {
           callback {if (Fl::event_button() == FL_RIGHT_MOUSE)
   select_power_meter_scales();}
-          tooltip {right-click to select power scale} image {images/P100.xbm} xywh {3 99 206 20} box FLAT_BOX down_box FLAT_BOX
+          tooltip {right-click to select power scale} image {../images/P100.xbm} xywh {3 99 206 20} box FLAT_BOX down_box FLAT_BOX
         }
       }
     }
@@ -998,7 +998,7 @@ Function {DisplayDialog()} {} {
           xywh {7 79 206 96} box FLAT_BOX
         } {
           Fl_Box scaleSmeterColor {
-            image {images/S60.xbm} xywh {8 79 205 20} box FLAT_BOX
+            image {../images/S60.xbm} xywh {8 79 205 20} box FLAT_BOX
             code0 {o->color(scaleSmeter->color());}
           }
           Fl_Box sldrRcvSignalColor {
@@ -1012,7 +1012,7 @@ Function {DisplayDialog()} {} {
             class Fl_SigBar
           }
           Fl_Box scaleSWRcolor {
-            image {images/SWR.xbm} xywh {8 110 205 20} box FLAT_BOX
+            image {../images/SWR.xbm} xywh {8 110 205 20} box FLAT_BOX
           }
           Fl_Box sldrPWRcolor {
             xywh {8 147 200 6} box FLAT_BOX
@@ -1021,7 +1021,7 @@ Function {DisplayDialog()} {} {
             class Fl_SigBar
           }
           Fl_Box scalePWRcolor {
-            image {images/P100.xbm} xywh {8 153 205 20} box FLAT_BOX
+            image {../images/P100.xbm} xywh {8 153 205 20} box FLAT_BOX
           }
         }
       }
@@ -1778,14 +1778,14 @@ Function {power_meter_scale_select()} {open
       callback {progStatus.pwr_scale = 0;
 pwr_scale_description->value(mtr_scales[progStatus.pwr_scale]);
 set_power_controlImage(0);}
-      tooltip {Press to select} image {images/P25.xbm} xywh {8 7 218 40} color 215 labelsize 12 align 16
+      tooltip {Press to select} image {../images/P25.xbm} xywh {8 7 218 40} color 215 labelsize 12 align 16
     }
     Fl_Button sel_100 {
       label {100 watt}
       callback {progStatus.pwr_scale = 2;
 pwr_scale_description->value(mtr_scales[progStatus.pwr_scale]);
 set_power_controlImage(0);}
-      tooltip {Press to select} image {images/P100.xbm} xywh {8 53 218 40} color 215 labelsize 12 align 16
+      tooltip {Press to select} image {../images/P100.xbm} xywh {8 53 218 40} color 215 labelsize 12 align 16
     }
     Fl_Button sel_auto {
       label {Auto scaled}
@@ -1802,14 +1802,14 @@ else
       callback {progStatus.pwr_scale = 1;
 pwr_scale_description->value(mtr_scales[progStatus.pwr_scale]);
 set_power_controlImage(0);}
-      tooltip {Press to select} image {images/P50.xbm} xywh {234 7 218 40} color 215 labelsize 12 align 16
+      tooltip {Press to select} image {../images/P50.xbm} xywh {234 7 218 40} color 215 labelsize 12 align 16
     }
     Fl_Button sel_200 {
       label {200 watt}
       callback {progStatus.pwr_scale = 3;
 pwr_scale_description->value(mtr_scales[progStatus.pwr_scale]);
 set_power_controlImage(0);}
-      tooltip {Press to select} image {images/P200.xbm} xywh {234 53 218 40} color 215 labelsize 12 align 16
+      tooltip {Press to select} image {../images/P200.xbm} xywh {234 53 218 40} color 215 labelsize 12 align 16
     }
     Fl_Output pwr_scale_description {
       label {Meter face selected:}

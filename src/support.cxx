@@ -1341,7 +1341,7 @@ void highlight_vfo(void *d)
 {
 	Fl_Color norm_fg = fl_rgb_color(progStatus.fg_red, progStatus.fg_green, progStatus.fg_blue);
 	Fl_Color norm_bg = fl_rgb_color(progStatus.bg_red, progStatus.bg_green, progStatus.bg_blue);
-	Fl_Color dim_bg = fl_color_average( norm_bg, FL_BLACK, 0.87);
+	Fl_Color dim_bg = fl_color_average( norm_bg, FL_BLACK, 0.75);
 	if (useB) {
 		FreqDispA->SetONOFFCOLOR( norm_fg, dim_bg );
 		FreqDispB->SetONOFFCOLOR( norm_fg, norm_bg );
@@ -1752,14 +1752,6 @@ void setMicGain()
 	pthread_mutex_unlock(&mutex_serial);
 }
 
-void cbbtnMicLine()
-{
-	pthread_mutex_lock(&mutex_serial);
-		selrig->set_mic_line(btnMicLine->value());
-	pthread_mutex_unlock(&mutex_serial);
-	setFocus();
-}
-
 void setMicGainControl(void* d)
 {
 	int val = (long)d;
@@ -2109,6 +2101,9 @@ void update_UI_PTT(void *d)
 
 void adjust_control_positions()
 {
+// small_ui (ORIGINAL) USER INTERFACE
+if (progStatus.UIsize == small_ui) 
+{
 	int y = 0;
 
 	btnVol->hide();
@@ -2300,6 +2295,65 @@ void adjust_control_positions()
 	else
 		mnuSchema->clear();
 
+} else {
+// wide_ui USER INTERFACE
+	mainwindow->resize( mainwindow->x(), mainwindow->y(), mainwindow->w(), 218);
+
+	btnVol->show();
+	sldrVOLUME->show();
+	sldrRFGAIN->show();
+	btnIFsh->show();
+	sldrIFSHIFT->show();
+	btnNotch->show();
+	sldrNOTCH->show();
+	sldrMICGAIN->show();
+	sldrPOWER->show();
+	sldrSQUELCH->show();
+	btnNR->show();
+	sldrNR->show();
+
+
+	if (rig_nbr == TT550) {
+		tabs550->show();
+		tabsGeneric->hide();
+	} else {
+		tabs550->hide();
+		tabsGeneric->remove(genericAux);
+		if (progStatus.aux_serial_port != "NONE" || selrig->has_data_port) {
+			if (progStatus.aux_serial_port != "NONE") {
+				btnAuxRTS->activate();
+				btnAuxDTR->activate();
+			} else {
+				btnAuxRTS->deactivate();
+				btnAuxDTR->deactivate();
+			}
+			if (selrig->has_data_port)
+				btnDataPort->activate();
+			else
+				btnDataPort->deactivate();
+			tabsGeneric->add(genericAux);
+		}
+		tabsGeneric->remove(genericRXB);
+		if (selrig->has_rit || selrig->has_xit || selrig->has_bfo)
+			tabsGeneric->add(genericRXB);
+		tabsGeneric->show();
+	}
+
+	btnInitializing->hide();
+
+	mainwindow->init_sizes();
+
+	mainwindow->redraw();
+
+	if (progStatus.tooltips) {
+		Fl_Tooltip::enable(1);
+		mnuTooltips->set();
+	} else {
+		mnuTooltips->clear();
+		Fl_Tooltip::enable(0);
+	}
+}
+
 }
 
 void initXcvrTab()
@@ -2379,7 +2433,6 @@ void initXcvrTab()
 				tabsGeneric->w() - 4,
 				tabsGeneric->h() - 21);
 			tabsGeneric->insert(*genericBands, 0);
-			btnBandSelect_12->hide();
 		}
 
 		poll_all->activate();
@@ -2611,6 +2664,7 @@ void initXcvrTab()
 		if (!selrig->has_noise_reduction) {poll_nr->deactivate(); poll_nr->value(0);}
 
 	}
+
 }
 
 void initRig()
@@ -2643,7 +2697,6 @@ void initRig()
 	FreqDispB->set_ndigits(selrig->ndigits);
 
 	if (rig_nbr == TT550) {
-//		selrig->selectB();  // not necessary for 550 as there are no xcvr memories
 		selrig->selectA();
 
 		vfoB.freq = progStatus.freq_B;
@@ -2750,8 +2803,10 @@ void initRig()
 
 	if (selrig->has_special)
 		btnSpecial->show();
+//		btnSpecial->activate();
 	else
 		btnSpecial->hide();
+//		btnSpecial->deactivate();
 
 	if (selrig->has_rit) {
 		int min, max, step;
@@ -2759,10 +2814,16 @@ void initRig()
 		cntRIT->minimum(min);
 		cntRIT->maximum(max);
 		cntRIT->step(step);
-		cntRIT->show();
+		if (progStatus.UIsize == small_ui)
+			cntRIT->show();
+		else
+			cntRIT->activate();
 		cntRIT->value(progStatus.rit_freq);
 	} else {
-		cntRIT->hide();
+		if (progStatus.UIsize == small_ui)
+			cntRIT->hide();
+		else
+			cntRIT->deactivate();
 	}
 
 	if (selrig->has_xit) {
@@ -2772,9 +2833,15 @@ void initRig()
 		cntXIT->maximum(max);
 		cntXIT->step(step);
 		cntXIT->value(progStatus.xit_freq);
-		cntXIT->show();
+		if (progStatus.UIsize == small_ui)
+			cntXIT->show();
+		else
+			cntXIT->activate();
 	} else {
-		cntXIT->hide();
+		if (progStatus.UIsize == small_ui)
+			cntXIT->hide();
+		else
+			cntXIT->deactivate();
 	}
 
 	if (selrig->has_bfo) {
@@ -2784,9 +2851,15 @@ void initRig()
 		cntBFO->maximum(max);
 		cntBFO->step(step);
 		cntBFO->value(progStatus.bfo_freq);
-		cntBFO->show();
+		if (progStatus.UIsize == small_ui)
+			cntBFO->show();
+		else
+			cntBFO->activate();
 	} else {
-		cntBFO->hide();
+		if (progStatus.UIsize == small_ui)
+			cntBFO->hide();
+		else
+			cntBFO->deactivate();
 	}
 
 	if (selrig->has_dsp_controls) {
@@ -2847,11 +2920,21 @@ void initRig()
 				selrig->set_volume_control(progStatus.volume);
 			}
 		}
-		btnVol->show();
-		sldrVOLUME->show();
+		if (progStatus.UIsize == small_ui) {
+			btnVol->show();
+			sldrVOLUME->show();
+		} else {
+			btnVol->activate();
+			sldrVOLUME->activate();
+		}
 	} else {
-		btnVol->hide();
-		sldrVOLUME->hide();
+		if (progStatus.UIsize == small_ui) {
+			btnVol->hide();
+			sldrVOLUME->hide();
+		} else {
+			btnVol->deactivate();
+			sldrVOLUME->deactivate();
+		}
 	}
 
 	if (selrig->has_rf_control) {
@@ -2864,14 +2947,23 @@ void initRig()
 		if (progStatus.use_rig_data) {
 			progStatus.rfgain = selrig->get_rf_gain();
 			sldrRFGAIN->value(progStatus.rfgain);
-			sldrRFGAIN->show();
+			if (progStatus.UIsize == small_ui)
+				sldrRFGAIN->show();
+			else
+				sldrRFGAIN->activate();
 		} else {
 			sldrRFGAIN->value(progStatus.rfgain);
 			selrig->set_rf_gain(progStatus.rfgain);
-			sldrRFGAIN->show();
+			if (progStatus.UIsize == small_ui)
+				sldrRFGAIN->show();
+			else
+				sldrRFGAIN->activate();
 		}
 	} else {
-		sldrRFGAIN->hide();
+		if (progStatus.UIsize == small_ui)
+			sldrRFGAIN->hide();
+		else
+			sldrRFGAIN->deactivate();
 	}
 
 	if (selrig->has_sql_control) {
@@ -2884,14 +2976,23 @@ void initRig()
 		if (progStatus.use_rig_data) {
 			progStatus.squelch = selrig->get_squelch();
 			sldrSQUELCH->value(progStatus.squelch);
-			sldrSQUELCH->show();
+			if (progStatus.UIsize == small_ui)
+				sldrSQUELCH->show();
+			else
+				sldrSQUELCH->activate();
 		} else {
 			sldrSQUELCH->value(progStatus.squelch);
 			selrig->set_squelch(progStatus.squelch);
-			sldrSQUELCH->show();
+			if (progStatus.UIsize == small_ui)
+				sldrSQUELCH->show();
+			else
+				sldrSQUELCH->activate();
 		}
 	} else {
-		sldrSQUELCH->hide();
+		if (progStatus.UIsize == small_ui)
+			sldrSQUELCH->hide();
+		else
+			sldrSQUELCH->deactivate();
 	}
 
 	if (selrig->has_noise_reduction_control) {
@@ -2901,8 +3002,13 @@ void initRig()
 		sldrNR->maximum(max);
 		sldrNR->step(step);
 		sldrNR->redraw();
-		btnNR->show();
-		sldrNR->show();
+		if (progStatus.UIsize == small_ui) {
+			btnNR->show();
+			sldrNR->show();
+		} else {
+			btnNR->activate();
+			sldrNR->activate();
+		}
 		if (progStatus.use_rig_data) {
 			progStatus.noise_reduction = selrig->get_noise_reduction();
 			progStatus.noise_reduction_val = selrig->get_noise_reduction_val();
@@ -2915,8 +3021,13 @@ void initRig()
 			selrig->set_noise_reduction_val(progStatus.noise_reduction_val);
 		}
 	} else {
-		btnNR->hide();
-		sldrNR->hide();
+		if (progStatus.UIsize == small_ui) {
+			btnNR->hide();
+			sldrNR->hide();
+		} else {
+			btnNR->deactivate();
+			sldrNR->deactivate();
+		}
 	}
 
 	if (selrig->has_ifshift_control) {
@@ -2941,11 +3052,21 @@ void initRig()
 				selrig->set_if_shift(selrig->if_shift_mid);
 			}
 		}
-		btnIFsh->show();
-		sldrIFSHIFT->show();
+		if (progStatus.UIsize == small_ui) {
+			btnIFsh->show();
+			sldrIFSHIFT->show();
+		} else {
+			btnIFsh->activate();
+			sldrIFSHIFT->activate();
+		}
 	} else {
-		btnIFsh->hide();
-		sldrIFSHIFT->hide();
+		if (progStatus.UIsize == small_ui) {
+			btnIFsh->hide();
+			sldrIFSHIFT->hide();
+		} else {
+			btnIFsh->deactivate();
+			sldrIFSHIFT->deactivate();
+		}
 	}
 	if (rig_nbr == TS870S) {
 		if (progStatus.imode_A == RIG_TS870S::tsCW || 
@@ -2974,11 +3095,21 @@ void initRig()
 			sldrNOTCH->value(progStatus.notch_val);
 			selrig->set_notch(progStatus.notch, progStatus.notch_val);
 		}
-		btnNotch->show();
-		sldrNOTCH->show();
+		if (progStatus.UIsize == small_ui) {
+			btnNotch->show();
+			sldrNOTCH->show();
+		} else {
+			btnNotch->activate();
+			sldrNOTCH->activate();
+		}
 	} else {
-		btnNotch->hide();
-		sldrNOTCH->hide();
+		if (progStatus.UIsize == small_ui) {
+			btnNotch->hide();
+			sldrNOTCH->hide();
+		} else {
+			btnNotch->deactivate();
+			sldrNOTCH->deactivate();
+		}
 	}
 
 	if (selrig->has_micgain_control) {
@@ -2992,13 +3123,19 @@ void initRig()
 		else
 			selrig->set_mic_gain(progStatus.mic_gain);
 		sldrMICGAIN->value(progStatus.mic_gain);
-		sldrMICGAIN->show();
+		if (progStatus.UIsize == small_ui)
+			sldrMICGAIN->show();
+		else
+			sldrMICGAIN->activate();
 		if (selrig->has_data_port) { 
 			btnDataPort->show();
 			btnDataPort->value(progStatus.data_port);
 		} else btnDataPort->hide();
 	} else {
-		sldrMICGAIN->hide();
+		if (progStatus.UIsize == small_ui)
+			sldrMICGAIN->hide();
+		else
+			sldrMICGAIN->deactivate();
 	}
 
 	if (selrig->has_power_control) {
@@ -3013,9 +3150,15 @@ void initRig()
 		sldrPOWER->step(step);
 		sldrPOWER->value(progStatus.power_level);
 		sldrPOWER->redraw();
-		sldrPOWER->show();
+		if (progStatus.UIsize == small_ui)
+			sldrPOWER->show();
+		else
+			sldrPOWER->activate();
 	} else {
-		sldrPOWER->hide();
+		if (progStatus.UIsize == small_ui)
+			sldrPOWER->hide();
+		else
+			sldrPOWER->deactivate();
 	}
 	set_power_controlImage(progStatus.power_level);
 
@@ -3024,25 +3167,40 @@ void initRig()
 			progStatus.attenuator = selrig->get_attenuator();
 		else
 			selrig->set_attenuator(progStatus.attenuator);
-		btnAttenuator->show();
+		if (progStatus.UIsize == small_ui)
+			btnAttenuator->show();
+		else
+			btnAttenuator->activate();
 	} else {
-		btnAttenuator->hide();
+		if (progStatus.UIsize == small_ui)
+			btnAttenuator->hide();
+		else
+			btnAttenuator->deactivate();
 	}
 
 // hijack the preamp control for a SPOT button on the TT550 Pegasus
 	if (rig_nbr == TT550) {
 		btnPreamp->label("Spot");
 		btnPreamp->value(progStatus.tt550_spot_onoff);
-		btnPreamp->show();
+		if (progStatus.UIsize == small_ui)
+			btnPreamp->show();
+		else
+			btnPreamp->activate();
 	} else {
 		if (selrig->has_preamp_control) {
 			if (progStatus.use_rig_data)
 				progStatus.preamp = selrig->get_preamp();
 			else
 				selrig->set_preamp(progStatus.preamp);
-			btnPreamp->show();
+			if (progStatus.UIsize == small_ui)
+				btnPreamp->show();
+			else
+			btnPreamp->activate();
 		} else {
-			btnPreamp->hide();
+			if (progStatus.UIsize == small_ui)
+				btnPreamp->hide();
+			else
+				btnPreamp->deactivate();
 		}
 	}
 
@@ -3052,16 +3210,28 @@ void initRig()
 		else
 			selrig->set_noise(progStatus.noise);
 		btnNOISE->value(progStatus.noise);
-		btnNOISE->show();
+		if (progStatus.UIsize == small_ui)
+			btnNOISE->show();
+		else
+			btnNOISE->activate();
 	}
 	else {
-		btnNOISE->hide();
+		if (progStatus.UIsize == small_ui)
+			btnNOISE->hide();
+		else
+			btnNOISE->deactivate();
 	}
 
 	if (selrig->has_tune_control) {
-		btnTune->show();
+		if (progStatus.UIsize == small_ui)
+			btnTune->show();
+		else
+			btnTune->activate();
 	} else {
-		btnTune->hide();
+		if (progStatus.UIsize == small_ui)
+			btnTune->hide();
+		else
+			btnTune->deactivate();
 	}
 
 	if (selrig->has_ptt_control ||
@@ -3088,9 +3258,15 @@ void initRig()
 		else
 			selrig->set_auto_notch(progStatus.auto_notch);
 		btnAutoNotch->value(progStatus.auto_notch);
-		btnAutoNotch->show();
+		if (progStatus.UIsize == small_ui)
+			btnAutoNotch->show();
+		else
+			btnAutoNotch->activate();
 	} else {
-		btnAutoNotch->hide();
+		if (progStatus.UIsize == small_ui)
+			btnAutoNotch->hide();
+		else
+			btnAutoNotch->deactivate();
 	}
 
 	if (selrig->has_swr_control)
@@ -3162,7 +3338,7 @@ void initRig()
 // enable buttons, change labels
 	selrig->post_initialize();
 
-	// enable the serial thread
+// enable the serial thread
 
 	pthread_mutex_unlock(&mutex_serial);
 
@@ -3592,10 +3768,6 @@ void enable_bandselect_btn(int btn_num, bool enable)
 			if (enable) btnBandSelect_11->show();
 			else btnBandSelect_11->hide();
 			break;
-		case 12:	// 60m
-			if (enable) btnBandSelect_12->show();
-			else btnBandSelect_12->hide();
-			break;
 		case 13:
 			if (enable) opSelect60->show();
 			else opSelect60->hide();
@@ -3637,13 +3809,3 @@ void editAlphaTag()
 	inAlphaTag->value(oplist[indx].alpha_tag);
 }
 
-void bandsel_label(const char * l, int btn)
-{
-	switch (btn) {
-		case 12:
-			btnBandSelect_12->label(l);
-			btnBandSelect_12->redraw_label();
-			break;
-		default: break;
-	}
-}

@@ -270,7 +270,6 @@ extern void update_UI_PTT(void *d = NULL);
 extern void cb_send_command();
 extern const string lt_trim(const string& pString, const string& pWhitespace = " \"\t");
 extern void editAlphaTag();
-extern void bandsel_label(const char * l, int btn = 12);
 
 extern void adjust_control_positions();
 
