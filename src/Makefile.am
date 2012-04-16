@@ -66,20 +66,6 @@ uninstall-local:
 	rm -f $(DESTDIR)/$(datadir)/pixmaps/flrig.xpm
 	rm -f $(DESTDIR)/$(datadir)/applications/flrig.desktop
 
-FLRIG_FL_SRC = rigpanel.fl
-
-if HAVE_FLUID
-flgen: $(FLRIG_FL_SRC)
-	(cd $(srcdir)/include; \
-	for f in $(FLRIG_FL_SRC); do \
-	    c=$${f%.fl}.cxx; \
-		h=$${f%.fl}.h; \
-		h=$${h##*/}; \
-	    $(FLUID) -c -o ../$$c -h $$h ../$$f; \
-	done)
-endif
-
-
 INSTALLER_FILE = flrig-$(FLRIG_VERSION)_setup.exe
 APPBUNDLE=flrig-$(FLRIG_VERSION)
 APPBUNDLE_NOLIBS=$(APPBUNDLE)-nolibs
@@ -95,21 +81,6 @@ appbundle: $(bin_PROGRAMS)
 	sh $(srcdir)/../scripts/mkappbundle.sh "$(srcdir)/../data" .
     CLEAN_LOCAL += $(APPBUNDLE_NOLIBS) $(APPBUNDLE) $(APPBUNDLE)*.dmg
 endif
-
-#if HAVE_ASCIIDOC
-#$(builddir)/../doc/guide.html: $(builddir)/../doc/guide.txt
-#	$(MAKE) -C $(builddir)/../doc $(AM_MAKEFLAGS) guide.html
-
-#$(builddir)/dialogs/guide.cxx: $(builddir)/../doc/guide.html
-#	mkdir -p $(builddir)/dialogs
-#	sed 's/"/\\"/g; s/$$/\\n\\/g; 1 s/.*/const char* szBeginner = "&/; $$ s/.*/&n";/' $< > $@
-#dialogs/htmlstrings.cxx: $(builddir)/dialogs/guide.cxx
-
-#distclean-local:
-#	@if test "$(builddir)" != "$(srcdir)"; then \
-#	    rm -f $(builddir)/dialogs/guide.cxx; \
-#        fi
-#endif
 
 clean-local:
 	-rm -rf $(CLEAN_LOCAL)
@@ -131,7 +102,6 @@ flrig_SOURCES += \
 	ptt.cxx \
 	rig.cxx \
 	rig_io.cxx \
-	rigpanel.cxx \
 	rigbase.cxx \
 	rigs/FT100D.cxx \
 	rigs/FT450.cxx \
@@ -184,6 +154,7 @@ flrig_SOURCES += \
 	serial.cxx \
 	status.cxx \
 	support.cxx \
+	UI/rigpanel.cxx \
 	util.cxx \
 	ValueSlider.cxx \
 	xml_io.cxx \
@@ -220,7 +191,16 @@ flrig_SOURCES += \
 EXTRA_DIST = \
 	config.h \
 	flrig_icon.cxx \
-	rigpanel.fl \
+	UI/ui_bitmaps.cxx \
+	UI/ui_wide.cxx \
+	UI/ui_small.cxx \
+	UI/ui_setup.cxx \
+	UI/ui_memory.cxx \
+	UI/xcvr_setup.cxx \
+	UI/meters_setup.cxx \
+	UI/power_meter_setup.cxx \
+	UI/fluid-designs/orig-panel.fl \
+	UI/fluid-designs/wide-panel.fl \
 	include/combo.h \
 	include/debug.h \
 	include/dialogs.h \

@@ -26,6 +26,10 @@ string last_xcvr_used = "none";
 status progStatus = {
 	50,			// int mainX;
 	50,			// int mainY;
+	735,		// int mainW;
+	150,		// int mainH;
+	wide_ui,		// UISIZE, UIsize;
+	false,		// UIchanged;
 	0,			// int rig_nbr;
 	"NONE",		// string xcvr_serial_port;
 	0,			// int comm_baudrate;
@@ -42,7 +46,7 @@ status progStatus = {
 	false,		// bool comm_dtrplus;
 	200,		// int  serloop_timing;
 
-	"NONE",		// string control_port;
+	"NONE",		// string aux_serial_port;
 	false,		// bool aux_rts;
 	false,		// bool aux_dtr;
 
@@ -253,16 +257,29 @@ void status::saveLastState()
 
 	int mX = mainwindow->x();
 	int mY = mainwindow->y();
+	int mW = mainwindow->w();
+	int mH = mainwindow->h();
+
 	if (mX >= 0 && mX >= 0) {
 		mainX = mX;
 		mainY = mY;
+		if (UIsize != small_ui) {
+			mainW = mW;
+			mainH = mH;
+		}
 	}
 
 	Fl_Preferences spref(RigHomeDir.c_str(), "w1hkj.com", last_xcvr_used.c_str());
 
 	spref.set("version", PACKAGE_VERSION);
-	spref.set("mainx", mX);
-	spref.set("mainy", mY);
+
+	spref.set("mainx", mainX);
+	spref.set("mainy", mainY);
+	spref.set("mainw", mainW);
+	spref.set("mainh", mainH);
+
+	if (UIchanged) UIsize = btn_wide_ui->value();
+	spref.set("uisize", UIsize);
 
 	spref.set("xcvr_serial_port", xcvr_serial_port.c_str());
 	spref.set("comm_baudrate", comm_baudrate);
@@ -495,6 +512,9 @@ bool status::loadXcvrState(const char *xcvr)
 
 		spref.get("mainx", mainX, mainX);
 		spref.get("mainy", mainY, mainY);
+		spref.get("mainw", mainW, mainW);
+		spref.get("mainh", mainH, mainH);
+		spref.get("uisize", UIsize, UIsize);
 
 		spref.get("xcvr_serial_port", defbuffer, "NONE", 199);
 		xcvr_serial_port = defbuffer;
@@ -734,6 +754,22 @@ bool status::loadXcvrState(const char *xcvr)
 		if (spref.get("xcvr_auto_off", i, i)) xcvr_auto_off = i;
 	}
 
+	return true;
+}
+
+void status::loadLastState()
+{
+	Fl_Preferences xcvrpref(RigHomeDir.c_str(), "w1hkj.com", PACKAGE_TARNAME);
+	if (xcvrpref.entryExists("last_xcvr_used")) {
+		char defbuffer[200];
+		xcvrpref.get("last_xcvr_used", defbuffer, "none", 199);
+		last_xcvr_used = defbuffer;
+	}
+	loadXcvrState(last_xcvr_used.c_str());
+}
+
+void status::UI_laststate()
+{
 	Fl_Color bgclr = fl_rgb_color(bg_red, bg_green, bg_blue);
 	Fl_Color fgclr = fl_rgb_color(fg_red, fg_green, fg_blue);
 
@@ -765,6 +801,9 @@ bool status::loadXcvrState(const char *xcvr)
 	sldrSWR->color(fl_rgb_color (swrRed, swrGreen, swrBlue), bgclr);
 	sldrSWR->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
 
+	if (UIsize != small_ui)
+		meter_fill_box->color(bgclr);
+
 	grpMeters->color(bgclr);
 	grpMeters->labelcolor(fgclr);
 
@@ -784,7 +823,6 @@ bool status::loadXcvrState(const char *xcvr)
 	if (btnPTT)				btnPTT->selection_color(btn_lt_color);
 	if (btnAuxRTS)			btnAuxRTS->selection_color(btn_lt_color);
 	if (btnAuxDTR)			btnAuxDTR->selection_color(btn_lt_color);
-	if (btnMicLine)			btnMicLine->selection_color(btn_lt_color);
 	if (btnSpot)			btnSpot->selection_color(btn_lt_color);
 	if (btn_vox)			btn_vox->selection_color(btn_lt_color);
 	if (btnCompON)			btnCompON->selection_color(btn_lt_color);
@@ -818,18 +856,4 @@ bool status::loadXcvrState(const char *xcvr)
 	else mnuRestoreData->clear();
 
 	Fl::scheme(ui_scheme.c_str());
-
-	return true;
 }
-
-void status::loadLastState()
-{
-	Fl_Preferences xcvrpref(RigHomeDir.c_str(), "w1hkj.com", PACKAGE_TARNAME);
-	if (xcvrpref.entryExists("last_xcvr_used")) {
-		char defbuffer[200];
-		xcvrpref.get("last_xcvr_used", defbuffer, "none", 199);
-		last_xcvr_used = defbuffer;
-	}
-	loadXcvrState(last_xcvr_used.c_str());
-}
-
