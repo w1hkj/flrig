@@ -1169,8 +1169,8 @@ Fl_Double_Window* Rig_window() {
     } // Fl_Light_Button* btnSplit
     { opBW = new Fl_ComboBox(212, 84, 105, 18, _("Bandwidth"));
       opBW->tooltip(_("Select Transceiver Bandwidth"));
-      opBW->box(FL_FLAT_BOX);
-      opBW->color(FL_BACKGROUND_COLOR);
+      opBW->box(FL_BORDER_BOX);
+      opBW->color(FL_BACKGROUND2_COLOR);
       opBW->selection_color(FL_BACKGROUND_COLOR);
       opBW->labeltype(FL_NORMAL_LABEL);
       opBW->labelfont(0);
@@ -1187,7 +1187,7 @@ Fl_Double_Window* Rig_window() {
     } // Fl_Button* btnDSP
     { opDSP_lo = new Fl_ComboBox(231, 84, 86, 18, _("Lo Cut"));
       opDSP_lo->tooltip(_("Lo Cut Freq"));
-      opDSP_lo->box(FL_DOWN_BOX);
+      opDSP_lo->box(FL_FLAT_BOX);
       opDSP_lo->color(FL_BACKGROUND2_COLOR);
       opDSP_lo->selection_color(FL_BACKGROUND_COLOR);
       opDSP_lo->labeltype(FL_NORMAL_LABEL);
@@ -1202,7 +1202,7 @@ Fl_Double_Window* Rig_window() {
     } // Fl_ComboBox* opDSP_lo
     { opDSP_hi = new Fl_ComboBox(231, 84, 86, 18, _("Hi Cut"));
       opDSP_hi->tooltip(_("Hi Cut Freq"));
-      opDSP_hi->box(FL_DOWN_BOX);
+      opDSP_hi->box(FL_FLAT_BOX);
       opDSP_hi->color(FL_BACKGROUND2_COLOR);
       opDSP_hi->selection_color(FL_BACKGROUND_COLOR);
       opDSP_hi->labeltype(FL_NORMAL_LABEL);
@@ -1217,8 +1217,8 @@ Fl_Double_Window* Rig_window() {
     } // Fl_ComboBox* opDSP_hi
     { opMODE = new Fl_ComboBox(318, 84, 105, 18, _("Mode"));
       opMODE->tooltip(_("Select transceiver operating mode"));
-      opMODE->box(FL_FLAT_BOX);
-      opMODE->color(FL_BACKGROUND_COLOR);
+      opMODE->box(FL_BORDER_BOX);
+      opMODE->color(FL_BACKGROUND2_COLOR);
       opMODE->selection_color(FL_BACKGROUND_COLOR);
       opMODE->labeltype(FL_NORMAL_LABEL);
       opMODE->labelfont(0);
