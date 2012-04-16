@@ -47,7 +47,7 @@ Function {Rig_window()} {open
 } {
   Fl_Window {} {
     label Flrig open
-    xywh {597 68 425 320} type Double align 80
+    xywh {617 95 425 320} type Double align 80
     code0 {\#include <stdlib.h>} visible
   } {
     Fl_Menu_Bar {} {open
@@ -295,8 +295,8 @@ btnA->value(0);}
     }
     Fl_Group opBW {
       label Bandwidth
-      callback {setBW();} open
-      tooltip {Select Transceiver Bandwidth} xywh {212 84 105 18} box FLAT_BOX labelsize 12 align 16
+      callback {setBW();} open selected
+      tooltip {Select Transceiver Bandwidth} xywh {212 84 105 18} box BORDER_BOX color 7 labelsize 12 align 16
       code0 {\#include "combo.h"}
       class Fl_ComboBox
     } {}
@@ -308,19 +308,19 @@ btnA->value(0);}
     Fl_Group opDSP_lo {
       label {Lo Cut}
       callback {setDSP();} open
-      tooltip {Lo Cut Freq} xywh {231 84 86 18} box DOWN_BOX color 7 labelsize 12 align 16 hide
+      tooltip {Lo Cut Freq} xywh {231 84 86 18} box FLAT_BOX color 7 labelsize 12 align 16 hide
       class Fl_ComboBox
     } {}
     Fl_Group opDSP_hi {
       label {Hi Cut}
       callback {setDSP();} open
-      tooltip {Hi Cut Freq} xywh {231 84 86 18} box DOWN_BOX color 7 labelsize 12 align 16 hide
+      tooltip {Hi Cut Freq} xywh {231 84 86 18} box FLAT_BOX color 7 labelsize 12 align 16 hide
       class Fl_ComboBox
     } {}
     Fl_Group opMODE {
       label Mode
       callback {setMode();} open
-      tooltip {Select transceiver operating mode} xywh {318 84 105 18} box FLAT_BOX labelsize 12 align 16
+      tooltip {Select transceiver operating mode} xywh {318 84 105 18} box BORDER_BOX color 7 labelsize 12 align 16
       code0 {\#include "combo.h"}
       class Fl_ComboBox
     } {}
@@ -768,7 +768,7 @@ cb_tt550_setXmtBW();}
         }
         Fl_Group opSelect60 {
           label combo
-          callback {cbBandSelect(13);} open selected
+          callback {cbBandSelect(13);} open
           tooltip {vfo / 60 meter channel} xywh {358 299 60 18} box BORDER_BOX color 246 labelsize 12 align 16
           class Fl_ComboBox
         } {}
