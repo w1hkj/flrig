@@ -482,11 +482,60 @@ void RIG_FT950::set_PTT_control(int val)
 	showresp(WARN, ASC, "SET PTT", cmd, replystr);
 }
 
+// internal or external tune mode
 void RIG_FT950::tune_rig()
 {
-	cmd = "AC002;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "tune rig", cmd, replystr);
+	static bool extun_on = false;
+	static int rmd = modeA;
+	static int rbw = bwA;
+	static int rpwr = 100;
+	static long rfreq = freqA;	// fix for menu 047 OFSt default
+	int use_int_tuner = true;
+
+//  On-The-Fly bandstack by bandstack int/ext tuner
+//  if rig "Tuner" light is on internal else external
+	cmd = rsp = "AC";
+	cmd.append(";");
+	waitN(6, 100, "is Int. Tuner Enabled", ASC);
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return;
+	if ((p + 5) >= replystr.length()) return;
+	if (replystr[p+4] == '0') {
+		use_int_tuner = false;
+	}
+
+	if (use_int_tuner) {
+		cmd = "AC002;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "tune rig", cmd, replystr);
+	} else {
+		if (extun_on == false) {
+			if (btnPTT->value() == true) return;
+			useB ? rmd = modeB : rmd = modeA;
+			useB ? rbw = bwB : rbw = bwA;
+			useB ? rfreq = freqB : rfreq = freqA;
+			useB ? set_modeB(mAM_N) : set_modeA(mAM_N);
+//			useB ? set_modeB(mFM_N) : set_modeA(mFM_N);
+			useB ? set_vfoB(rfreq) : set_vfoA(rfreq);
+			rpwr = get_power_control();
+			set_power_control(10);
+			sendCommand("EX0360000;");	// AM mic off
+//			sendCommand("EX0560000;");	// FM mic off
+			extun_on = true;
+			btnPTT->value(true);
+			sendCommand("MX1;");
+		} else {
+			extun_on = false;
+			btnPTT->value(false);
+			sendCommand("MX0;");
+			sendCommand("EX0361000;");	// AM mic default
+//			sendCommand("EX0560050;");	// FM mic default
+			set_power_control(rpwr);
+			useB ? set_modeB(rmd) : set_modeA(rmd);
+			useB ? set_bwB(rbw) : set_bwA(rbw);
+			useB ? set_vfoB(rfreq) : set_vfoA(rfreq);
+		}
+	}
 }
 
 void RIG_FT950::set_attenuator(int val)
