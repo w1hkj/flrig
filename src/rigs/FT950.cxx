@@ -111,6 +111,8 @@ RIG_FT950::RIG_FT950() {
 	A.iBW = B.iBW = bwA = bwB = def_bw = 12;
 	A.freq = B.freq = freqA = freqB = def_freq = 14070000;
 
+	has_compON =
+	has_compression =
 	has_a2b =
 	has_xcvr_auto_on_off =
 	has_split =
@@ -159,6 +161,8 @@ RIG_FT950::RIG_FT950() {
 	preamp_level = 2;
 	notch_on = false;
 	m_60m_indx = 0;
+
+	precision = 1;
 
 }
 
@@ -1319,6 +1323,25 @@ void RIG_FT950::set_xcvr_auto_off()
 
 	cmd = "PS0;";
 	sendCommand(cmd);
+}
+
+void RIG_FT950::set_compression()
+{
+	if (progStatus.compON) {
+		if (progStatus.compression == 0) {
+			cmd.assign("PR2;");	// mic eq on
+			sendCommand(cmd);
+			showresp(WARN, ASC, "set Comp EQ on", cmd, replystr);
+		} else {
+			cmd.assign("PR1;PL").append(to_decimal(progStatus.compression, 3)).append(";");
+			sendCommand(cmd);
+			showresp(WARN, ASC, "set Comp on", cmd, replystr);
+		}
+	} else{
+		cmd.assign("PR0;");
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set Comp off", cmd, replystr);
+	}
 }
 
 /*
