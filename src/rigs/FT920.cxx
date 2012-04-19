@@ -53,6 +53,9 @@ RIG_FT920::RIG_FT920() {
 	has_mode_control =
 	has_bandwidth_control = true;
 
+	precision = 1;
+	ndigits = 8;
+
 }
 
 int  RIG_FT920::adjust_bandwidth(int m)

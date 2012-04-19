@@ -46,6 +46,10 @@ RIG_IC706MKIIG::RIG_IC706MKIIG() {
 
 	defaultCIV = 0x58;
 	adjustCIV(defaultCIV);
+
+	precision = 1;
+	ndigits = 9;
+
 };
 
 //=============================================================================

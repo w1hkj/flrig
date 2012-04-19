@@ -195,6 +195,9 @@ RIG_TT550::RIG_TT550() {
 
 	auto_notch = noise_reduction = false;
 
+	precision = 1;
+	ndigits = 8;
+
 }
 
 void RIG_TT550::showASCII(string s1, string s)

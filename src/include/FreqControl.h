@@ -77,10 +77,20 @@ public:
 	int  handle(int event);
 	void visual_beep();
 
+	void resize (int X, int Y, int W, int H);
+
 	void set_precision(int val) {
-		if (val % 10) val = 1;
-		precision = (val < 1) ? 1 : (val > 1000) ? 1000 : val;
+		switch (val) {
+			case 100:
+				dpoint = 1; precision = 100; break;
+			case 10:
+				dpoint = 2; precision = 10; break;
+			default:
+				dpoint = 3; precision = 1; break;
+		}
 	}
+
+	void set_ndigits(int val);
 
 private:
 	Fl_Repeat_Button	  	*Digit[MAX_DIGITS];
@@ -88,6 +98,8 @@ private:
 	static const char	 	*Label[];
 	int					mult[MAX_DIGITS];
 	Fl_Box				*decbx;
+	Fl_Box				*hfill1;
+	Fl_Box				*hfill2;
 	Fl_Font  font_number;
 	Fl_Color OFFCOLOR;
 	Fl_Color ONCOLOR;
@@ -97,6 +109,15 @@ private:
 	int active;
 	long maxVal;
 	long minVal;
+
+	int pw; // decimal width
+	int wfill;
+	int bdr;
+	int fcWidth;
+	int fcTop;
+	int fcHeight;
+	int W;
+
 	void DecFreq(int n);
 	void IncFreq(int n);
 	int (*cbFunc)();
@@ -104,6 +125,7 @@ private:
 protected:
 	long val, oldval;
 	int  precision;
+	int  dpoint;
 };
 
 #endif 

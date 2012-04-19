@@ -100,6 +100,8 @@ RIG_FT1000MP::RIG_FT1000MP() {
 	has_get_info = true;
 	has_auto_notch = true;
 
+	precision = 10;
+	ndigits = 7;
 
 };
 

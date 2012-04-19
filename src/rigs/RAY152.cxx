@@ -57,6 +57,7 @@ RIG_RAY152::RIG_RAY152() {
 	B.iBW = 0;
 
 	precision = 100;
+	ndigits = 6;
 
 	has_mode_control = true;
 	has_ptt_control = true;

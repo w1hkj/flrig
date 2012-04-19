@@ -94,6 +94,10 @@ RIG_IC703::RIG_IC703() {
 
 	defaultCIV = 0x68;
 	adjustCIV(defaultCIV);
+
+	precision = 1;
+	ndigits = 8;
+
 };
 
 //=============================================================================

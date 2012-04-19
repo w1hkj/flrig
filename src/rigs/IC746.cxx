@@ -88,6 +88,9 @@ RIG_IC746::RIG_IC746() {
 	has_split =
 	restore_mbw = true;
 
+	precision = 1;
+	ndigits = 9;
+
 };
 
 void RIG_IC746::initialize()

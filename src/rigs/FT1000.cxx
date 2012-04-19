@@ -51,6 +51,9 @@ RIG_FT1000::RIG_FT1000() {
 	has_ptt_control =
 	has_tune_control = true;
 
+	precision = 10;
+	ndigits = 7;
+
 };
 
 // from hamlib

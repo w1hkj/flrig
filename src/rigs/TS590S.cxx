@@ -197,6 +197,10 @@ RIG_TS590S::RIG_TS590S() {
 	has_ptt_control = true;
 
 	rxtxa = true;
+
+	precision = 1;
+	ndigits = 8;
+
 }
 
 const char * RIG_TS590S::get_bwname_(int n, int md) 

@@ -2549,7 +2549,9 @@ void initRig()
 	if (flrig_abort) goto failed;
 
 	FreqDispA->set_precision(selrig->precision);
+	FreqDispA->set_ndigits(selrig->ndigits);
 	FreqDispB->set_precision(selrig->precision);
+	FreqDispB->set_ndigits(selrig->ndigits);
 
 	if (rig_nbr == TT550) {
 //		selrig->selectB();  // not necessary for 550 as there are no xcvr memories

@@ -161,6 +161,9 @@ RIG_TS480SAT::RIG_TS480SAT() {
 	has_tune_control =
 	has_ptt_control = true;
 
+	precision = 0;
+	ndigits = 7;
+
 }
 
 const char * RIG_TS480SAT::get_bwname_(int n, int md) 

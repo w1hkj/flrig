@@ -73,6 +73,10 @@ RIG_IC718::RIG_IC718() {
 
 	defaultCIV = 0x5E;
 	adjustCIV(defaultCIV);
+
+	precision = 1;
+	ndigits = 8;
+
 };
 
 //=============================================================================

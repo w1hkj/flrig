@@ -97,6 +97,10 @@ RIG_IC756PRO3::RIG_IC756PRO3() {
 	has_rf_control = true;
 
 	adjustCIV(defaultCIV);
+
+	precision = 1;
+	ndigits = 9;
+
 };
 
 void RIG_IC756PRO3::initialize()

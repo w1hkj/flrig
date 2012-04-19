@@ -158,6 +158,9 @@ RIG_TS480HX::RIG_TS480HX() {
 	has_tune_control = 
 	has_ptt_control = true;
 
+	precision = 10;
+	ndigits = 7;
+
 }
 
 const char * RIG_TS480HX::get_bwname_(int n, int md) 

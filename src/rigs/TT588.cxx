@@ -163,6 +163,9 @@ RIG_TT588::RIG_TT588() {
 	has_noise_control =
 	has_mode_control = true;
 
+	precision = 1;
+	ndigits = 8;
+
 }
 
 void RIG_TT588::initialize()

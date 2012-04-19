@@ -41,7 +41,10 @@ RIG_FT847::RIG_FT847() {
 	comm_dtrptt = false;
 	afreq = A.freq = B.freq = 14070000;
 	amode = A.imode = B.imode = 1;
+
 	precision = 10;
+	ndigits = 8;
+
 
 //	has_get_info =
 //	has_bandwidth_control =

@@ -62,6 +62,10 @@ RIG_TS450S::RIG_TS450S() {
 	has_mode_control =
 	has_bandwidth_control =
 	has_ptt_control = true;
+
+	precision = 10;
+	ndigits = 7;
+
 }
 
 void RIG_TS450S::initialize()
