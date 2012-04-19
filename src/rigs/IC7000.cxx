@@ -81,6 +81,9 @@ RIG_IC7000::RIG_IC7000() {
 
 	has_ifshift_control = false;
 
+	has_extras =
+	has_compON =
+	has_compression =
 	has_smeter =
 	has_power_out =
 	has_alc_control =
@@ -102,6 +105,9 @@ RIG_IC7000::RIG_IC7000() {
 	has_tune_control = 
 	has_rf_control = 
 	has_sql_control = true;
+
+	precision = 1;
+	ndigits = 9;
 
 };
 
@@ -805,5 +811,27 @@ int RIG_IC7000::get_noise_reduction_val()
 			return (int)ceil(fm_bcd(&replystr[p+6],3) / 2.55);
 	}
 	return 0;
+}
+
+void RIG_IC7000::set_compression()
+{
+	if (progStatus.compON) {
+		cmd = pre_to;
+		cmd.append("\x16\x44");
+		cmd += '\x01';
+		cmd.append(post);
+		waitFB("set Comp ON");
+
+		cmd.assign(pre_to).append("\x14\x0E");
+		cmd.append(to_bcd(progStatus.compression * 255 / 10, 3));	// 0 - 10
+		cmd.append( post );
+		waitFB("set comp level");
+
+	} else{
+		cmd.assign(pre_to).append("\x16\x44");
+		cmd += '\x00';
+		cmd.append(post);
+		waitFB("set Comp OFF");
+	}
 }
 
