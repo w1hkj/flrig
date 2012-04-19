@@ -90,6 +90,9 @@ RIG_IC756PRO2::RIG_IC756PRO2() {
 	has_noise_control =
 	has_rf_control = true;
 
+	precision = 1;
+	ndigits = 9;
+
 };
 
 void RIG_IC756PRO2::initialize()

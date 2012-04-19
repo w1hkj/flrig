@@ -35,7 +35,10 @@ RIG_FT817::RIG_FT817() {
 
 	has_ptt_control =
 	has_mode_control = true;
-	
+
+	precision = 10;
+	ndigits = 8;
+
 }
 
 void RIG_FT817::init_cmd()

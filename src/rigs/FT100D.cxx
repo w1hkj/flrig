@@ -46,7 +46,10 @@ RIG_FT100D::RIG_FT100D() {
 	afreq = bfreq = A.freq = B.freq = 14070000;
 	amode = bmode = A.imode = B.imode = 1;
 	aBW = bBW = A.iBW = B.iBW = 2;
+
 	precision = 10;
+	ndigits = 9;
+
 
 	has_split = has_split_AB =
 	has_get_info =

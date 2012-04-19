@@ -106,6 +106,7 @@ rigbase::rigbase()
 	B.iBW = 0;
 	inuse = onA;
 	precision = 1;
+	ndigits = 9;
 	can_change_alt_vfo = false;
 
 	freqA = 14070000L;

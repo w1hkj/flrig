@@ -6,7 +6,7 @@
  * Copyright 2009, Dave Freese, W1HKJ
  * Changes for the TS-870S March 2012, Dave Baxter, G0WBX
  */
- 
+
  /* Todo:
  * Look at:-												(Example)
  * Autonotch control:- 	(SSB Only on the 870S)				(TS-2000)
@@ -154,7 +154,7 @@ RIG_TS870S::RIG_TS870S() {
 
 //	Defaults.
 	B.imode = A.imode = 1;		// USB
-	B.iBW = A.iBW = 0x8704; 	// hi=2800Hz .. lo=300Hz 
+	B.iBW = A.iBW = 0x8704; 	// hi=2800Hz .. lo=300Hz
 	B.freq = A.freq = 14070000;
 	can_change_alt_vfo = true;
 
@@ -173,32 +173,36 @@ RIG_TS870S::RIG_TS870S() {
 	has_micgain_control =
 	has_volume_control =	// see 'read_volume()' in support.cxx
 	has_power_control = true;
-	
+
 	has_tune_control = false; // disabled for now
-	
+
 	has_attenuator_control = true;
-	
+
 	has_preamp_control = false;
-	
+
 	has_mode_control =
-	has_bandwidth_control = 
-	
+	has_bandwidth_control =
+
 	has_ifshift_control =    // See 'update_ifshift' in support.cxx
-	
+
 	has_ptt_control = true;
+
+	precision = 10;
+	ndigits = 7;
+
 }
 
 //----------------------------------------------------------------------
 const char * RIG_TS870S::get_bwname_(int n, int md)
 { // md is an index value, NOT a "mode" designator itself.
   //  n also is an index value, used to reference the name in the array.
-  
+
   // This uses "ternary" methods, in the form of...
   // (boolean test) ? (do if true) : (do if false);
   // http://www.teach-me-c.com/blog/c-ternary-operator
-  
+
 	static char bwname[20];
-	
+
 	if (n > 256) { // hi/lo cutt off bw setting mode.
 		int hi = (n >> 8) & 0x7F; // hi byte (not MSB)
 		int lo = n & 0xFF;        // lo byte
@@ -207,7 +211,7 @@ const char * RIG_TS870S::get_bwname_(int n, int md)
 			(md == 4) ? TS870S_AM_lo[lo] : "N/A",		//  AM lo
 			(md == 0 || md == 1) ? TS870S_SSB_hi[hi] :	// SSB hi
 			(md == 4) ? TS870S_AM_hi[hi] : "N/A" );		//  AM hi
-			
+
 	} else { // plain vanilla single bandwidth mode.
 		snprintf(bwname, sizeof(bwname), "%s",
 			(md == 2 || md == 6) ? TS870S_CWwidths[n] :	//  CW or CW-R
@@ -254,10 +258,10 @@ int RIG_TS870S::get_split()
 	cmd = "IF;";
 	int ret = waitN(38, 100, "get info", ASC);
 	if (ret < 38) return split;
-	
+
 	size_t p = replystr.rfind("IF");
 	if (p == string::npos) return split;
-	
+
 	split = replystr[p+32] ? true : false;
 	return split;
 }
@@ -418,7 +422,7 @@ int RIG_TS870S::get_volume_control()
 
 	int ret = sendCommand(cmd);
 	showresp(WARN, ASC, "get vol ctrl", cmd, replystr);
-	
+
 //	int ret = waitN(7, 100, "get vol ctrl", ASC);
 
 	if (ret < 6) return 0;
@@ -454,7 +458,7 @@ void RIG_TS870S::set_volume_control(int val) // 0 .. 100
  * To do that, in the Config/Xcvr Select menu, use one of the Hardware PTT options.
  * Just so it has been said...
  */
- 
+
 void RIG_TS870S::set_PTT_control(int val)
 {
 	if (val) cmd = "TX;";
@@ -468,7 +472,7 @@ void RIG_TS870S::tune_rig()
 {
 //	cmd = "AC111;";
 //	sendCommand(cmd, 0);
-	
+
 	// this might take a while!
 }
 
@@ -481,25 +485,25 @@ void RIG_TS870S::set_attenuator(int val) {
 		att_level = 1;				// then turn it on, at 6dB
 		cmd = "RA01;";				// this is the command...
 		atten_label("Att 6", true);	// show it in the button...
-	} 
+	}
 	else if (att_level == 1) {		// If attenuator level = 1 (6dB)
 		att_level = 2;				// then make it 12dB
 		cmd = "RA02;";
 		atten_label("Att 12", true);
-	} 
+	}
 	else if (att_level == 2) {		// if it's 12dB
 		att_level = 3;				// go to 18dB
 		cmd = "RA03;";
 		atten_label("Att 18", true);
-	} 
+	}
 	else if (att_level == 3) {		// If it's 18dB
 		att_level = 0;				// Loop back to none.
 		cmd = "RA00;";
 		atten_label("Att", false);
 	}
-	
+
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set Att", cmd, replystr);	
+	showresp(WARN, ASC, "set Att", cmd, replystr);
 }
 
 //----------------------------------------------------------------------
@@ -525,14 +529,14 @@ int RIG_TS870S::get_attenuator() {
 	else if (replystr[p + 2] == '0' && replystr[p + 3] == '2') {
 		att_on = 1;						// .. still ON, 12dB
 		att_level = 2;					// remember this level
-		atten_label("Att 12", true);	// show it.	
+		atten_label("Att 12", true);	// show it.
 	}
 	else if (replystr[p + 2] == '0' && replystr[p + 3] == '3') {
 		att_on = 1;						// .. still ON 18dB
 		att_level = 3;					// remember...
-		atten_label("Att 18", true);	// show this too..	
+		atten_label("Att 18", true);	// show this too..
 	}
-		
+
 	return att_on;			// let the rest of th world know.
 }
 
@@ -544,7 +548,7 @@ bool RIG_TS870S::get_TS870Sid() {
 	if (ret < 6) return false;
 	size_t p = replystr.rfind("ID");			// String "ID015;"
 	if (p == string::npos) return false;		// Bytes   012345
-	if (replystr[p + 3] == '1' && 
+	if (replystr[p + 3] == '1' &&
 		replystr[p + 4] == '5')  return true;	//wbx
 	return false;
 }

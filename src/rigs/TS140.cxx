@@ -49,6 +49,9 @@ RIG_TS140::RIG_TS140() {
 	has_tune_control =
 	has_swr_control = false;
 
+	precision = 10;
+	ndigits = 7;
+
 }
 
 /*

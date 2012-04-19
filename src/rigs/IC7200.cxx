@@ -113,6 +113,10 @@ RIG_IC7200::RIG_IC7200() {
 
 	defaultCIV = 0x76;
 	adjustCIV(defaultCIV);
+
+	precision = 1;
+	ndigits = 8;
+
 };
 
 void RIG_IC7200::initialize()

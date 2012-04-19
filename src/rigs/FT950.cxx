@@ -163,6 +163,7 @@ RIG_FT950::RIG_FT950() {
 	m_60m_indx = 0;
 
 	precision = 1;
+	ndigits = 8;
 
 }
 

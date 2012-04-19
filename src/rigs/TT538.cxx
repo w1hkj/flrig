@@ -144,6 +144,9 @@ RIG_TT538::RIG_TT538() {
 	has_mode_control = 
 	has_vfo_adj = true;
 
+	precision = 1;
+	ndigits = 8;
+
 }
 
 //static int corrA = 0, corrB = 0;

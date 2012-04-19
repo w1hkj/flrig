@@ -89,6 +89,9 @@ RIG_K3::RIG_K3() {
 	if_shift_step = 10;
 	if_shift_mid = 1500;
 
+	precision = 1;
+	ndigits = 8;
+
 }
 
 int  RIG_K3::adjust_bandwidth(int m)

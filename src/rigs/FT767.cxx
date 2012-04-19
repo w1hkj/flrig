@@ -35,6 +35,10 @@ RIG_FT767::RIG_FT767() {
 	modeA = 1;
 	bwA = 0;
 	has_mode_control = true;
+
+	precision = 10;
+	ndigits = 8;
+
 };
 
 void RIG_FT767::init_cmd()

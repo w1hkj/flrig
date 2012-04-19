@@ -149,6 +149,10 @@ RIG_TS2000::RIG_TS2000() {
 	has_ptt_control = true;
 
 	rxtxa = true;
+
+	precision = 1;
+	ndigits = 8;
+
 }
 
 const char * RIG_TS2000::get_bwname_(int n, int md) 

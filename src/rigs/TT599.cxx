@@ -71,6 +71,9 @@ RIG_TT599::RIG_TT599() {
 	has_power_control = true;
 //	has_agc_level = true;
 
+	precision = 1;
+	ndigits = 8;
+
 };
 
 void RIG_TT599::initialize()

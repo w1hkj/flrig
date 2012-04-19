@@ -38,6 +38,9 @@ RIG_IC728::RIG_IC728() {
 	defaultCIV = 0x38;
 	adjustCIV(defaultCIV);
 
+	precision = 10;
+	ndigits = 7;
+
 };
 
 //=============================================================================

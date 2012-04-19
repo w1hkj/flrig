@@ -42,6 +42,10 @@ RIG_FT857D::RIG_FT857D() {
 	has_smeter =
 	has_power_out =
 	has_mode_control = true;
+
+	precision = 10;
+	ndigits = 8;
+
 };
 
 RIG_FT897D::RIG_FT897D() {

@@ -212,6 +212,9 @@ RIG_TT566::RIG_TT566() {
 	has_attenuator_control =
 	has_power_control = true;
 
+	precision = 1;
+	ndigits = 8;
+
 };
 
 void RIG_TT566::initialize()

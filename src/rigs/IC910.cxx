@@ -75,6 +75,10 @@ RIG_IC910H::RIG_IC910H() {
 
 	comp_is_on = !progStatus.compON;
 	adjustCIV(defaultCIV);
+
+	precision = 10;
+	ndigits = 9;
+
 };
 
 void RIG_IC910H::initialize()
@@ -112,6 +116,7 @@ void RIG_IC910H::set_vfoA (long freq)
 		vfoA.freq = freqA;
 		setFreqDispA((void*)0);
 	}
+	A.freq = freqA;
 	cmd = pre_to;
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freqA, 10 ) );

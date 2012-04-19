@@ -48,6 +48,9 @@ RIG_TT563::RIG_TT563() {
 
 	pre_to[2] = ok[3] = bad[3] = pre_fm[3] = 0x04;
 
+	precision = 10;
+	ndigits = 7;
+
 };
 
 long RIG_TT563::get_vfoA ()

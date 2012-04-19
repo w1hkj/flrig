@@ -74,6 +74,10 @@ RIG_K2::RIG_K2() {
 	has_swr_control = false;
 
 	hipower = false;
+
+	precision = 10;
+	ndigits = 7;
+
 }
 
 int  RIG_K2::adjust_bandwidth(int m)

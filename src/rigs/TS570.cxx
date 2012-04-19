@@ -111,6 +111,10 @@ RIG_TS570::RIG_TS570() {
 	has_mode_control =
 	has_bandwidth_control =
 	has_ptt_control = true;
+
+	precision = 10;
+	ndigits = 7;
+
 }
 
 bool RIG_TS570::get_ts570id()

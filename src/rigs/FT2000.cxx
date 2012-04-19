@@ -84,7 +84,7 @@ RIG_FT2000::RIG_FT2000() {
 	comm_dtrptt = false;
 	modeA = 1;
 	bwA = 2;
-	def_mode = 10;
+	def_mode = 1;
 	def_bw = 2;
 	def_freq = 14070000;
 
@@ -112,6 +112,10 @@ RIG_FT2000::RIG_FT2000() {
 	atten_level = 0;
 	preamp_level = 0;
 	m_60m_indx = 0;
+
+	precision = 10;
+	ndigits = 7;
+
 }
 
 void RIG_FT2000::set_band_selection(int v)

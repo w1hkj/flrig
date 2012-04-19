@@ -68,6 +68,9 @@ RIG_FT450::RIG_FT450() {
 	def_bw = 2;
 	def_freq = 14070000;
 
+	precision = 10;
+	ndigits = 8;
+
 	has_a2b =
 	can_change_alt_vfo =
 	has_xcvr_auto_on_off =

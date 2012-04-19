@@ -102,7 +102,6 @@ RIG_TT516::RIG_TT516() {
 	def_freq = freqB = freqA = B.freq = A.freq = 14070000;
 
 	max_power = 25;
-	precision = 10;
 	can_change_alt_vfo = true;
 
 	has_power_control =
@@ -123,6 +122,9 @@ RIG_TT516::RIG_TT516() {
 	has_ptt_control =
 	has_bandwidth_control =
 	has_mode_control = true;
+
+	precision = 10;
+	ndigits = 7;
 
 }
 

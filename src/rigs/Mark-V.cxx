@@ -46,6 +46,9 @@ RIG_MARK_V::RIG_MARK_V() {
 	has_ptt_control =
 	has_tune_control = true;
 
+	precision = 1;
+	ndigits = 8;
+
 };
 
 void RIG_MARK_V::init_cmd()

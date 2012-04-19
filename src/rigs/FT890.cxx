@@ -51,6 +51,9 @@ RIG_FT890::RIG_FT890() {
 	has_ptt_control =
 	has_mode_control = true;
 
+	precision = 10;
+	ndigits = 7;
+
 }
 
 void RIG_FT890::init_cmd()

@@ -96,6 +96,10 @@ RIG_IC7600::RIG_IC7600() {
 
 	has_micgain_control =
 	has_bandwidth_control = true;
+
+	precision = 1;
+	ndigits = 8;
+
 };
 
 //======================================================================

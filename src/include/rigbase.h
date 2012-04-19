@@ -93,6 +93,7 @@ public:
 	int  bwB;
 	long freqB;
 	int  precision;
+	int  ndigits;
 	bool can_change_alt_vfo;
 	int  active_mode;		// wbx
 
