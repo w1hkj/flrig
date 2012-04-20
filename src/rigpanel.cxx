@@ -225,10 +225,10 @@ static void cb_btn_K3_swapAB(Fl_Button*, void*) {
   cb_K3_swapAB();
 }
 
-Fl_Button *btnA2B=(Fl_Button *)0;
+Fl_Button *btnAswapB=(Fl_Button *)0;
 
-static void cb_btnA2B(Fl_Button*, void*) {
-  cbA2B();
+static void cb_btnAswapB(Fl_Button*, void*) {
+  cbAswapB();
 }
 
 Fl_Light_Button *btnSplit=(Fl_Light_Button *)0;
@@ -1154,12 +1154,12 @@ Fl_Double_Window* Rig_window() {
       btn_K3_swapAB->callback((Fl_Callback*)cb_btn_K3_swapAB);
       btn_K3_swapAB->hide();
     } // Fl_Button* btn_K3_swapAB
-    { btnA2B = new Fl_Button(318, 62, 52, 20, _("A -> B"));
-      btnA2B->tooltip(_("Copy A to B"));
-      btnA2B->down_box(FL_DOWN_BOX);
-      btnA2B->labelsize(12);
-      btnA2B->callback((Fl_Callback*)cb_btnA2B);
-    } // Fl_Button* btnA2B
+    { btnAswapB = new Fl_Button(318, 62, 52, 20, _("A<->B"));
+      btnAswapB->tooltip(_("Left click:Swap A/B\nRight click:Copy A to B"));
+      btnAswapB->down_box(FL_DOWN_BOX);
+      btnAswapB->labelsize(12);
+      btnAswapB->callback((Fl_Callback*)cb_btnAswapB);
+    } // Fl_Button* btnAswapB
     { Fl_Light_Button* o = btnSplit = new Fl_Light_Button(371, 62, 52, 20, _("Split"));
       btnSplit->tooltip(_("Rx-A / Tx-B"));
       btnSplit->down_box(FL_THIN_DOWN_BOX);
@@ -1169,7 +1169,7 @@ Fl_Double_Window* Rig_window() {
     } // Fl_Light_Button* btnSplit
     { opBW = new Fl_ComboBox(212, 84, 105, 18, _("Bandwidth"));
       opBW->tooltip(_("Select Transceiver Bandwidth"));
-      opBW->box(FL_BORDER_BOX);
+      opBW->box(FL_NO_BOX);
       opBW->color(FL_BACKGROUND2_COLOR);
       opBW->selection_color(FL_BACKGROUND_COLOR);
       opBW->labeltype(FL_NORMAL_LABEL);
@@ -1217,7 +1217,7 @@ Fl_Double_Window* Rig_window() {
     } // Fl_ComboBox* opDSP_hi
     { opMODE = new Fl_ComboBox(318, 84, 105, 18, _("Mode"));
       opMODE->tooltip(_("Select transceiver operating mode"));
-      opMODE->box(FL_BORDER_BOX);
+      opMODE->box(FL_NO_BOX);
       opMODE->color(FL_BACKGROUND2_COLOR);
       opMODE->selection_color(FL_BACKGROUND_COLOR);
       opMODE->labeltype(FL_NORMAL_LABEL);
@@ -1759,7 +1759,7 @@ Fl_Double_Window* Rig_window() {
         } // Fl_Button* btnBandSelect_12
         { opSelect60 = new Fl_ComboBox(358, 299, 60, 18, _("combo"));
           opSelect60->tooltip(_("vfo / 60 meter channel"));
-          opSelect60->box(FL_BORDER_BOX);
+          opSelect60->box(FL_NO_BOX);
           opSelect60->color((Fl_Color)246);
           opSelect60->selection_color(FL_BACKGROUND_COLOR);
           opSelect60->labeltype(FL_NORMAL_LABEL);

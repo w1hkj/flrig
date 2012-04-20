@@ -282,10 +282,11 @@ btnA->value(0);}
       callback {cb_K3_swapAB();}
       tooltip {Swap A/B} xywh {265 62 52 20} down_box DOWN_BOX labelsize 12 hide
     }
-    Fl_Button btnA2B {
-      label {A -> B}
-      callback {cbA2B();}
-      tooltip {Copy A to B} xywh {318 62 52 20} down_box DOWN_BOX labelsize 12
+    Fl_Button btnAswapB {
+      label {A<->B}
+      callback {cbAswapB();} selected
+      tooltip {Left click:Swap A/B
+Right click:Copy A to B} xywh {318 62 52 20} down_box DOWN_BOX labelsize 12
     }
     Fl_Light_Button btnSplit {
       label Split
@@ -295,8 +296,8 @@ btnA->value(0);}
     }
     Fl_Group opBW {
       label Bandwidth
-      callback {setBW();} open selected
-      tooltip {Select Transceiver Bandwidth} xywh {212 84 105 18} box BORDER_BOX color 7 labelsize 12 align 16
+      callback {setBW();} open
+      tooltip {Select Transceiver Bandwidth} xywh {212 84 105 18} color 7 labelsize 12 align 16
       code0 {\#include "combo.h"}
       class Fl_ComboBox
     } {}
@@ -320,7 +321,7 @@ btnA->value(0);}
     Fl_Group opMODE {
       label Mode
       callback {setMode();} open
-      tooltip {Select transceiver operating mode} xywh {318 84 105 18} box BORDER_BOX color 7 labelsize 12 align 16
+      tooltip {Select transceiver operating mode} xywh {318 84 105 18} color 7 labelsize 12 align 16
       code0 {\#include "combo.h"}
       class Fl_ComboBox
     } {}
@@ -769,7 +770,7 @@ cb_tt550_setXmtBW();}
         Fl_Group opSelect60 {
           label combo
           callback {cbBandSelect(13);} open
-          tooltip {vfo / 60 meter channel} xywh {358 299 60 18} box BORDER_BOX color 246 labelsize 12 align 16
+          tooltip {vfo / 60 meter channel} xywh {358 299 60 18} color 246 labelsize 12 align 16
           class Fl_ComboBox
         } {}
       }

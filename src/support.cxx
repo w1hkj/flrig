@@ -1179,7 +1179,7 @@ int movFreqA() {
 }
 
 int movFreqB() {
-	if (progStatus.split && (rig_nbr >= IC703 && rig_nbr <= IC910H))
+	if (progStatus.split && (!selrig->twovfos()))
 		return 0; // disallow for ICOM transceivers
 	FREQMODE vfo = vfoB;
 	vfo.freq = FreqDispB->value();
@@ -1188,6 +1188,44 @@ int movFreqB() {
 	queB.push(vfo);
 	pthread_mutex_unlock(&mutex_queB);
 	return 1;
+}
+
+void cbAswapB()
+{
+	if (Fl::event_button() == FL_RIGHT_MOUSE) {
+		return cbA2B();
+	}
+	if (!selrig->twovfos()) {
+		vfoB.freq = FreqDispB->value();
+		FREQMODE temp = vfoB;
+		vfoB = vfoA;
+		vfoA = temp;
+		FreqDispB->value(vfoB.freq);
+		FreqDispB->redraw();
+
+		pthread_mutex_lock(&mutex_queA);
+			while (!queA.empty()) queA.pop();
+			queA.push(vfoA);
+		pthread_mutex_unlock(&mutex_queA);
+	} else {
+		vfoB.freq = FreqDispB->value();
+		FREQMODE temp = vfoB;
+		vfoB = vfoA;
+		vfoA = temp;
+
+		pthread_mutex_lock(&mutex_queA);
+			while (!queA.empty()) queA.pop();
+			queA.push(vfoA);
+		pthread_mutex_unlock(&mutex_queA);
+		pthread_mutex_lock(&mutex_queB);
+			while (!queB.empty()) queB.pop();
+			queB.push(vfoB);
+		pthread_mutex_unlock(&mutex_queB);
+		FreqDispB->value(vfoB.freq);
+		FreqDispB->redraw();
+		pushedB = true;
+	}
+	setFocus();
 }
 
 void cbA2B()
@@ -3102,6 +3140,8 @@ void initRig()
 		btnB->show();
 		btnA->show();
 	}
+
+	btnAswapB->show();
 
 	setFocus();
 	bypass_serial_thread_loop = false;
