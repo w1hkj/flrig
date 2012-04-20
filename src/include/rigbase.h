@@ -217,6 +217,8 @@ public:
 	virtual void selectB(){}
 	virtual void A2B(){}
 
+	virtual void swapAB(){}
+
 	virtual void set_bwA(int val) {A.iBW = val;}
 	virtual int  get_bwA() {return A.iBW;}
 	virtual void set_bwB(int val) {B.iBW = val; set_bwA(val);}
