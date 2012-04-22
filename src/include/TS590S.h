@@ -52,7 +52,8 @@ public:
 	bool twovfos() {return true;}
 
 	int  get_smeter();
-//	int  get_swr();
+	int  get_swr();
+	int  get_alc();
 	int  get_power_out();
 	int  get_power_control();
 	void set_volume_control(int val);
@@ -68,13 +69,33 @@ public:
 	void set_if_shift(int val);
 	bool get_if_shift(int &val);
 	void get_if_min_max_step(int &min, int &max, int &step);
-	void set_notch(bool on, int val);
-	bool get_notch(int &val);
-	void get_notch_min_max_step(int &min, int &max, int &step);
+
 	void set_noise(bool b);
 	void set_mic_gain(int val);
 	int  get_mic_gain();
 	void get_mic_min_max_step(int &min, int &max, int &step);
+
+	void set_squelch(int val);
+	int  get_squelch();
+	void get_squelch_min_max_step(int &min, int &max, int &step);
+
+	void set_rf_gain(int val);
+	int  get_rf_gain();
+	void get_rf_min_max_step(int &min, int &max, int &step);
+
+	void set_noise_reduction_val(int val);
+	int  get_noise_reduction_val();
+	void set_noise_reduction(int val);
+	int  get_noise_reduction();
+	void get_nr_min_max_step(int &min, int &max, int &step) {
+		min = 1; max = 10; step = 1; }	
+
+	void set_notch(bool on, int val);
+	bool get_notch(int &val);
+	void get_notch_min_max_step(int &min, int &max, int &step);
+
+	void set_auto_notch(int v);
+	int  get_auto_notch();
 
 	bool sendTScommand(string, int, bool);
 	const char **bwtable(int);
