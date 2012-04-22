@@ -115,10 +115,15 @@ static const char *TS590S_FSKbw[] = {
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
 	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },
 	{ (Fl_Widget *)btnIFsh,     214, 105,  50 },
 	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
-	{ (Fl_Widget *)sldrMICGAIN, 266, 125, 156 },
-	{ (Fl_Widget *)sldrPOWER,    54, 145, 368 },
+	{ (Fl_Widget *)btnNotch,    214, 125,  50 },
+	{ (Fl_Widget *)sldrNOTCH,   266, 125, 156 },
+	{ (Fl_Widget *)sldrMICGAIN, 266, 145, 156 },
+	{ (Fl_Widget *)sldrPOWER,   266, 165, 156 },
+	{ (Fl_Widget *)btnNR,         2, 165,  50 },
+	{ (Fl_Widget *)sldrNR,       54, 165, 156 },
 	{ (Fl_Widget *)NULL,          0,   0,   0 }
 };
 
@@ -126,10 +131,15 @@ void RIG_TS590S::initialize()
 {
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
-	rig_widgets[2].W = btnIFsh;
-	rig_widgets[3].W = sldrIFSHIFT;
-	rig_widgets[4].W = sldrMICGAIN;
-	rig_widgets[5].W = sldrPOWER;
+	rig_widgets[2].W = sldrRFGAIN;
+	rig_widgets[3].W = btnIFsh;
+	rig_widgets[4].W = sldrIFSHIFT;
+	rig_widgets[5].W = btnNotch;
+	rig_widgets[6].W = sldrNOTCH;
+	rig_widgets[7].W = sldrMICGAIN;
+	rig_widgets[8].W = sldrPOWER;
+	rig_widgets[9].W = btnNR;
+	rig_widgets[10].W = sldrNR;
 
 	selectA();
 	cmd = "AC000;"; sendCommand(cmd);
@@ -175,10 +185,15 @@ RIG_TS590S::RIG_TS590S() {
 	nb_level = 2;
 
 	has_micgain_control =
-	has_notch_control =
-	has_ifshift_control =
-	has_swr_control = false;
+	has_ifshift_control = false;
 
+	has_auto_notch =
+	has_notch_control =
+	has_sql_control =
+	has_swr_control =
+	has_noise_reduction =
+	has_noise_reduction_control =
+	has_alc_control =
 	has_dsp_controls =
 	has_smeter =
 	has_power_out =
@@ -186,6 +201,7 @@ RIG_TS590S::RIG_TS590S() {
 	has_split_AB =
 	has_noise_control =
 	has_micgain_control =
+	has_rf_control =
 	has_volume_control =
 	has_power_control =
 	has_tune_control =
@@ -366,8 +382,7 @@ int RIG_TS590S::get_smeter()
 {
 	int mtr = 0;
 	cmd = "SM0;";
-	int ret = waitN(8, 100, "get smeter", ASC);
-
+	int ret = waitN(8, 100, "get", ASC);
 	if (ret < 8) return 0;
 	size_t p = replystr.find("SM0");
 	if (p == string::npos) return 0;
@@ -387,7 +402,7 @@ int RIG_TS590S::get_power_out()
 	int ret = waitN(8, 100, "get power", ASC);
 
 	if (ret < 8) return mtr;
-	size_t p = replystr.rfind("SM");
+	size_t p = replystr.rfind("SM0");
 	if (p == string::npos) return mtr;
 
 	mtr = atoi(&replystr[p + 3]);
@@ -398,6 +413,61 @@ int RIG_TS590S::get_power_out()
 	return mtr;
 }
 
+static bool read_alc = false;
+static int alc_val = 0;
+
+int RIG_TS590S::get_swr(void)
+{
+	int mtr = 0;
+
+	read_alc = false;
+
+	cmd = "RM;";
+	int ret = waitN(8, 100, "get swr/alc", ASC);
+	if (ret < 24) return 0;
+
+	size_t p = replystr.find("RM3");
+	if (p != string::npos) {
+		replystr[p + 7] = 0;
+		alc_val = atoi(&replystr[p + 3]);
+		alc_val *= 100;
+		alc_val /= 15;
+		if (alc_val > 100) alc_val = 100;
+		read_alc = true;
+	}
+
+	p = replystr.find("RM1");
+	if (p == string::npos) return 0;
+
+	replystr[p + 7] = 0;
+	mtr = atoi(&replystr[p + 3]);
+	mtr *= 50;
+	mtr /= 15;
+	if (mtr > 100) mtr = 100;
+
+	return mtr;
+}
+
+int RIG_TS590S::get_alc(void)
+{
+	if (read_alc) {
+		read_alc = false;
+		return alc_val;
+	}
+	cmd = "RM;";
+	int ret = waitN(8, 100, "get alc", ASC);
+	if (ret < 24) return 0;
+
+	size_t p = replystr.find("RM3");
+	if (p == string::npos) return 0;
+
+	replystr[p + 7] = 0;
+	alc_val = atoi(&replystr[p + 3]);
+	alc_val *= 100;
+	alc_val /= 15;
+	if (alc_val > 100) alc_val = 100;
+	return alc_val;
+}
 
 // Transceiver power level
 void RIG_TS590S::set_power_control(double val)
@@ -1053,47 +1123,170 @@ void RIG_TS590S::get_if_min_max_step(int &min, int &max, int &step)
 	if_shift_mid = 800;
 }
 
-void RIG_TS590S::set_notch(bool on, int val)
+void RIG_TS590S::set_squelch(int val)
 {
-	cmd = "BP00000;";
-	if (on == false) {
-		sendCommand(cmd, 0);
-		notch_on = false;
-		return;
-	}
-	if (!notch_on) {
-		cmd[6] = '1'; // notch ON
-		sendCommand(cmd, 0);
-		cmd[6] = '0';
-		notch_on = true;
-	}
-	cmd[3] = '1'; // manual NOTCH position
-// set notch value offset by 200, ie: 001 -> 400
-	val = (-val / 9) + 200;
-	if (val < 1) val = 1;
-	if (val > 400) val = 400;
-	for (int i = 3; i > 0; i--) {
-		cmd[3 + i] += val % 10;
-		val /=10;
-	}
-	sendCommand(cmd, 0);
+	cmd = "SQ0";
+	cmd.append(to_decimal(abs(val),3)).append(";");
+	sendCommand(cmd,0);
+	showresp(WARN, ASC, "set squelch", cmd, replystr);
 }
 
-//tbd
+int  RIG_TS590S::get_squelch()
+{
+	int val = 0;
+	cmd = "SQ0;";
+	int ret = waitN(7, 100, "get squelch", ASC);
+
+	if (ret >= 7) {
+		size_t p = replystr.rfind("SQ0");
+		if (p == string::npos) return val;
+		replystr[p + 6] = 0;
+		val = atoi(&replystr[p + 3]);
+	}
+	return val;
+}
+
+void RIG_TS590S::get_squelch_min_max_step(int &min, int &max, int &step)
+{
+	min = 0; max = 255; step = 1;
+}
+
+void RIG_TS590S::set_rf_gain(int val)
+{
+	cmd = "RG000;";
+	int rfval = 255 - val;
+	for (int i = 4; i > 1; i--) {
+		cmd[i] = rfval % 10 + '0';
+		rfval /= 10;
+	}
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET rfgain", cmd, replystr);
+}
+
+int  RIG_TS590S::get_rf_gain()
+{
+	int rfval = 0;
+	cmd = rsp = "RG";
+	cmd += ';';
+	waitN(6, 100, "get rfgain", ASC);
+
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return progStatus.rfgain;
+	for (int i = 2; i < 5; i++) {
+		rfval *= 10;
+		rfval += replystr[p+i] - '0';
+	}
+	return 255 - rfval;
+}
+
+void RIG_TS590S::get_rf_min_max_step(int &min, int &max, int &step)
+{
+	min = 0;
+	max = 255;
+	step = 1;
+}
+
+static bool nr_on = false;
+
+void RIG_TS590S::set_noise_reduction(int val)
+{
+	cmd.assign("NR").append(val ? "1" : "0" ).append(";");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET noise reduction", cmd, replystr);
+	if (val) nr_on = true;
+	else nr_on = false;
+}
+
+int  RIG_TS590S::get_noise_reduction()
+{
+	int val;
+	cmd = rsp = "NR";
+	cmd.append(";");
+	waitN(4, 100, "GET noise reduction", ASC);
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return 0;
+	val = replystr[p+2] - '0';
+	if (val == 2) nr_on = true;
+	else nr_on = false;
+	return val;
+}
+
+void RIG_TS590S::set_noise_reduction_val(int val)
+{
+	cmd.assign("RL").append(to_decimal(val, 2)).append(";");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET_noise_reduction_val", cmd, replystr);
+}
+
+int  RIG_TS590S::get_noise_reduction_val()
+{
+	if (!nr_on) return 0;
+	int val = 1;
+	cmd = rsp = "RL";
+	cmd.append(";");
+	waitN(5, 100, "GET noise reduction val", ASC);
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return val;
+	val = atoi(&replystr[p+2]);
+	return val;
+}
+
+void RIG_TS590S::set_auto_notch(int v)
+{
+	cmd.assign("NT").append(v ? "1" : "0" ).append("0;");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET Auto Notch", cmd, replystr);
+}
+
+int  RIG_TS590S::get_auto_notch()
+{
+	cmd = "NT;";
+	waitN(5, 100, "get auto notch", ASC);
+	size_t p = replystr.rfind("NT");
+	if (p == string::npos) return 0;
+	if (replystr[p+2] == '1') return 1;
+	return 0;
+}
+
+void RIG_TS590S::set_notch(bool on, int val)
+{
+	if (on) {
+		cmd.assign("NT20;");
+		sendCommand(cmd);
+		showresp(WARN, ASC, "Set notch ON", cmd, replystr);
+		int bp = (int)((val - 300.0) * 128.0 / 2700.0);
+		cmd.assign("BP").append(to_decimal(bp, 3)).append(";");
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set notch freq", cmd, replystr);
+	} else {
+		cmd.assign("NT00;");
+		sendCommand(cmd);
+		showresp(WARN, ASC, "Set notch OFF", cmd, replystr);
+	}
+}
 
 bool  RIG_TS590S::get_notch(int &val)
 {
-	return false;
-//	bool ison = false;
-//	cmd = "BP;";
-//	int ret = sendCommand(cmd);
-//	return ison;
+	val = 300;
+	cmd = "NT;";
+	waitN(5, 100, "get notch state", ASC);
+	size_t p = replystr.rfind("NT");
+	if (p == string::npos)
+		return 0;
+	if (replystr[p+2] == '2') {
+		cmd.assign("BP;");
+		waitN(6, 100, "get notch freq", ASC);
+		size_t p = replystr.rfind("BP");
+		if (p != string::npos)
+			val = (int)((atoi(&replystr[p+2]) * 2700.0 / 128.0) + 300.0);
+		return 1;
+	}
+	return 0;
 }
 
 void RIG_TS590S::get_notch_min_max_step(int &min, int &max, int &step)
 {
-	min = -1143;
-	max = +1143;
-	step = 9;
+	min = 300;
+	max = 3000;
+	step = 20;
 }
-
