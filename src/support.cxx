@@ -785,55 +785,100 @@ void * serial_thread_loop(void *d)
 
 				if (progStatus.poll_frequency)
 					if (!(poll_nbr % progStatus.poll_frequency)) read_vfo();
+
+				if (bypass_serial_thread_loop) goto serial_bypass_loop;
 				if (!quePTT.empty()) continue;
+
 				if (progStatus.poll_mode)
 					if (!(poll_nbr % progStatus.poll_mode)) read_mode();
+
+				if (bypass_serial_thread_loop) goto serial_bypass_loop;
 				if (!quePTT.empty()) continue;
+
 				if (progStatus.poll_bandwidth)
 					if (!(poll_nbr % progStatus.poll_bandwidth)) read_bandwidth();
+
+				if (bypass_serial_thread_loop) goto serial_bypass_loop;
 				if (!quePTT.empty()) continue;
 
 				if (progStatus.poll_smeter)
 					if (!(poll_nbr % progStatus.poll_smeter)) read_smeter();
+
+				if (bypass_serial_thread_loop) goto serial_bypass_loop;
 				if (!quePTT.empty()) continue;
 
 				if (progStatus.poll_volume)
 					if (!(poll_nbr % progStatus.poll_volume)) read_volume();
+
+				if (bypass_serial_thread_loop) goto serial_bypass_loop;
 				if (!quePTT.empty()) continue;
+
 				if (progStatus.poll_auto_notch)
 					if (!(poll_nbr % progStatus.poll_auto_notch)) read_auto_notch();
+
+				if (bypass_serial_thread_loop) goto serial_bypass_loop;
 				if (!quePTT.empty()) continue;
+
 				if (progStatus.poll_notch)
 					if (!(poll_nbr % progStatus.poll_notch)) read_notch();
+
+				if (bypass_serial_thread_loop) goto serial_bypass_loop;
 				if (!quePTT.empty()) continue;
+
 				if (progStatus.poll_ifshift)
 					if (!(poll_nbr % progStatus.poll_ifshift)) read_ifshift();
+
+				if (bypass_serial_thread_loop) goto serial_bypass_loop;
 				if (!quePTT.empty()) continue;
+
 				if (progStatus.poll_power_control)
 					if (!(poll_nbr % progStatus.poll_power_control)) read_power_control();
+
+				if (bypass_serial_thread_loop) goto serial_bypass_loop;
 				if (!quePTT.empty()) continue;
+
 				if (progStatus.poll_pre_att)
 					if (!(poll_nbr % progStatus.poll_pre_att)) read_preamp_att();
+
+				if (bypass_serial_thread_loop) goto serial_bypass_loop;
 				if (!quePTT.empty()) continue;
+
 				if (progStatus.poll_micgain)
 					if (!(poll_nbr % progStatus.poll_micgain)) read_mic_gain();
+
+				if (bypass_serial_thread_loop) goto serial_bypass_loop;
 				if (!quePTT.empty()) continue;
+
 				if (progStatus.poll_squelch)
 					if (!(poll_nbr % progStatus.poll_squelch)) read_squelch();
+
+				if (bypass_serial_thread_loop) goto serial_bypass_loop;
 				if (!quePTT.empty()) continue;
+
 				if (progStatus.poll_rfgain)
 					if (!(poll_nbr % progStatus.poll_rfgain)) read_rfgain();
+
+				if (bypass_serial_thread_loop) goto serial_bypass_loop;
 				if (!quePTT.empty()) continue;
+
 				if (progStatus.poll_split)
 					if (!(poll_nbr % progStatus.poll_split)) read_split();
+
+				if (bypass_serial_thread_loop) goto serial_bypass_loop;
 				if (!quePTT.empty()) continue;
+
 				if (progStatus.poll_nr)
 					if (!(poll_nbr % progStatus.poll_nr)) read_nr();
+
+				if (bypass_serial_thread_loop) goto serial_bypass_loop;
 				if (!quePTT.empty()) continue;
+
 				if (progStatus.poll_noise)
 					if (!(poll_nbr % progStatus.poll_noise)) read_noise();
-
 				loopcount = progStatus.serloop_timing / 10;
+
+				if (bypass_serial_thread_loop) goto serial_bypass_loop;
+
 			}
 		} else {
 			if (resetxmt) {
@@ -855,10 +900,8 @@ void * serial_thread_loop(void *d)
 					if (!(poll_nbr % progStatus.poll_alc)) read_alc();
 				loopcount = progStatus.serloop_timing / 10;
 			}
-
 		}
 serial_bypass_loop: ;
-
 	}
 	return NULL;
 }
@@ -1208,6 +1251,10 @@ void cbAswapB()
 			queA.push(vfoA);
 		pthread_mutex_unlock(&mutex_queA);
 	} else {
+		pthread_mutex_lock(&mutex_serial);
+			bypass_serial_thread_loop = true;
+		pthread_mutex_unlock(&mutex_serial);
+
 		vfoB.freq = FreqDispB->value();
 		FREQMODE temp = vfoB;
 		vfoB = vfoA;
@@ -1224,6 +1271,10 @@ void cbAswapB()
 		FreqDispB->value(vfoB.freq);
 		FreqDispB->redraw();
 		pushedB = true;
+
+		pthread_mutex_lock(&mutex_serial);
+			bypass_serial_thread_loop = false;
+		pthread_mutex_unlock(&mutex_serial);
 	}
 	setFocus();
 }
