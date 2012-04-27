@@ -88,12 +88,13 @@ int  powerlevel = 0;
 char *print(FREQMODE data)
 {
 	static char str[100];
+	const char **bwt = selrig->bwtable(data.imode);
 	snprintf(str, sizeof(str), "%3s,%10ld, %4s, %5s %5s",
 		data.src == XML ? "xml" : "ui",
 		data.freq,
 		selrig->modes_ ? selrig->modes_[data.imode] : "modes n/a",
 		(data.iBW > 256 && selrig->has_dsp_controls) ?
-			selrig->dsp_lo[data.iBW & 0x7F] : selrig->bandwidths_ ? selrig->bandwidths_[data.iBW] : "bw n/a",
+			selrig->dsp_lo[data.iBW & 0x7F] : bwt ? bwt[data.iBW] : "bw n/a",
 		(data.iBW > 256 && selrig->has_dsp_controls) ?
 			selrig->dsp_hi[(data.iBW >> 8) & 0x7F] : "" 
 		);

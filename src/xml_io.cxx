@@ -136,7 +136,7 @@ void send_modes() {
 		ignore = true;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
-			LOG_WARN("%s", e.getMessage().c_str());
+			LOG_ERROR("%s", e.getMessage().c_str());
 		throw;
 	}
 }
@@ -155,7 +155,7 @@ void send_bandwidths()
 		ignore = true;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
-			LOG_WARN("%s", e.getMessage().c_str());
+			LOG_ERROR("%s", e.getMessage().c_str());
 		throw;
 	}
 }
@@ -168,7 +168,7 @@ void send_name()
 		ignore = true;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
-			LOG_WARN("%s", e.getMessage().c_str());
+			LOG_ERROR("%s", e.getMessage().c_str());
 		throw;
 	}
 }
@@ -181,7 +181,7 @@ void send_ptt_changed(bool PTT)
 		ignore = true;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
-			LOG_WARN("%s", e.getMessage().c_str());
+			LOG_ERROR("%s", e.getMessage().c_str());
 	}
 }
 
@@ -194,7 +194,7 @@ void send_new_freq(long freq)
 		ignore = true;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
-			LOG_WARN("%s", e.getMessage().c_str());
+			LOG_ERROR("%s", e.getMessage().c_str());
 	}
 }
 
@@ -206,7 +206,7 @@ void send_new_notch(int freq)
 		ignore = true;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
-			LOG_WARN("%s", e.getMessage().c_str());
+			LOG_ERROR("%s", e.getMessage().c_str());
 	}
 }
 
@@ -235,7 +235,7 @@ void send_new_mode(int md)
 		ignore = true;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
-			LOG_WARN("%s", e.getMessage().c_str());
+			LOG_ERROR("%s", e.getMessage().c_str());
 	}
 }
 
@@ -249,7 +249,7 @@ void send_new_bandwidth(int bw)
 		ignore = true;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
-			LOG_WARN("%s", e.getMessage().c_str());
+			LOG_ERROR("%s", e.getMessage().c_str());
 	}
 }
 
@@ -261,7 +261,7 @@ void send_sideband()
 		ignore = true;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
-			LOG_WARN("%s", e.getMessage().c_str());
+			LOG_ERROR("%s", e.getMessage().c_str());
 		throw;
 	}
 }
@@ -278,7 +278,7 @@ static void check_for_ptt_change(const XmlRpcValue& trx_state)
 	if (nuptt != ptt_on) {
 		if (XML_DEBUG) {
 			string txstate = trx_state;
-			LOG_WARN("%s", txstate.c_str());
+			LOG_ERROR("%s", txstate.c_str());
 		}
 		ptt_on = nuptt;
 		Fl::awake(setPTT, (void*)ptt_on);
@@ -319,6 +319,8 @@ static void check_for_bandwidth_change(const XmlRpcValue& new_bw)
 {
 	if (xmlmode_changed) {
 		xmlvfo.iBW = selrig->def_bandwidth(xmlvfo.imode);
+		if (XML_DEBUG)
+			LOG_ERROR("default BW %d: %s", xmlvfo.iBW, print(xmlvfo));
 		return;
 	}
 
@@ -352,18 +354,28 @@ static void check_for_notch_change(const XmlRpcValue& new_notch)
 
 static void push2que()
 {
-if (XML_DEBUG)
-	LOG_WARN("%s", print(xmlvfo));
 	if (useB) {
-		if (!queB.empty()) return;
-		pthread_mutex_lock(&mutex_queA);
-		queB.push(xmlvfo);
-		pthread_mutex_unlock(&mutex_queA);
-	} else {
-		if (!queA.empty()) return;
+		if (!queB.empty()) {
+			if (XML_DEBUG)
+				LOG_ERROR("B not empty %s", print(xmlvfo));
+			return;
+		}
+		if (XML_DEBUG)
+			LOG_ERROR("pushed to B %s", print(xmlvfo));
 		pthread_mutex_lock(&mutex_queB);
-		queA.push(xmlvfo);
+		queB.push(xmlvfo);
 		pthread_mutex_unlock(&mutex_queB);
+	} else {
+		if (!queA.empty()) {
+			if (XML_DEBUG)
+				LOG_ERROR("A not empty %s", print(xmlvfo));
+			return;
+		}
+		if (XML_DEBUG)
+			LOG_ERROR("pushed to A %s", print(xmlvfo));
+		pthread_mutex_lock(&mutex_queA);
+		queA.push(xmlvfo);
+		pthread_mutex_unlock(&mutex_queA);
 	}
 }
 
@@ -467,7 +479,7 @@ void * digi_loop(void *d)
 			}
 		} catch (const XmlRpc::XmlRpcException& e) {
 			if (XML_DEBUG)
-				LOG_WARN("%s", e.getMessage().c_str());
+				LOG_ERROR("%s", e.getMessage().c_str());
 			fldigi_online = false;
 			rig_reset = false;
 			try_count = CHECK_UPDATE_COUNT;
