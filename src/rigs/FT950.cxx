@@ -32,7 +32,7 @@ static const char FT950_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '8', 
 static const char FT950_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L', 'U', 'U', 'U', 'U', 'U' };
 
 // 20110707 - SSB "2450", 14 discontinued in latest North American firmware 
-static const int FT950_def_bw[] = { 18, 18, 5, 0, 0, 5, 5, 10, 5, 0, 0, 10, 0 };
+static const int FT950_def_bw[] = { 18, 18, 5, 0, 0, 5, 5, 12, 5, 0, 0, 12, 0 };
 
 static const char *FT950_widths_SSB[] = {
 "200", "400", "600", "850", "1100", "1350", "1500", "1650", "1800",
@@ -637,8 +637,6 @@ int RIG_FT950::adjust_bandwidth(int val)
 		case mCW_R   :
 		case mRTTY_L :
 		case mRTTY_U :
-		case mPKT_L  :
-		case mPKT_U  :
 			bandwidths_ = FT950_widths_CW;
 			bw_vals_ = FT950_wvals_CW;
 			break;
@@ -679,9 +677,9 @@ const char ** RIG_FT950::bwtable(int n)
 		case mCW     :
 		case mCW_R   :
 		case mRTTY_L :
-		case mRTTY_U :
+		case mRTTY_U : return FT950_widths_CW;
 		case mPKT_L  :
-		case mPKT_U  : return FT950_widths_CW;
+		case mPKT_U  : // use SSB widths
 		default      : break;
 	}
 	return FT950_widths_SSB;
