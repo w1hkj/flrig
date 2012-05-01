@@ -464,16 +464,38 @@ int RIG_TS2000::set_widths(int val)
 	return bw;
 }
 
-const char **RIG_TS2000::bwtable(int m)
+const char **RIG_TS2000::bwtable(int val)
 {
-	if (m == 0 || m == 1 || m == 3)
-		return TS2000_empty;
-	else if (m == 2 || m == 6)
+	if (val == LSB || val == USB || val == FM)
+		return NULL;
+	else if (val == CW || val == CWR)
 		return TS2000_CWwidths;
-	else if (m == 5 || m == 7)
+	else if (val == FSK || val == FSKR)
 		return TS2000_FSKwidths;
 //else AM m == 4
-	return TS2000_empty;
+	return NULL;
+}
+
+const char **RIG_TS2000::lotable(int val)
+{
+	if (val == LSB || val == USB || val == FM)
+		return TS2000_lo;
+	else if (val == CW || val == CWR)
+		return NULL;
+	else if (val == FSK || val == FSKR)
+		return NULL;
+	return TS2000_AM_lo;
+}
+
+const char **RIG_TS2000::hitable(int val)
+{
+	if (val == LSB || val == USB || val == FM)
+		return TS2000_hi;
+	else if (val == CW || val == CWR)
+		return NULL;
+	else if (val == FSK || val == FSKR)
+		return NULL;
+	return TS2000_AM_hi;
 }
 
 void RIG_TS2000::set_modeA(int val)

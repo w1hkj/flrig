@@ -79,7 +79,11 @@ public:
 
 
 	bool sendTScommand(string, int, bool);
+
 	const char **bwtable(int);
+	const char **lotable(int);
+	const char **hitable(int);
+
 	const char * get_bwname_(int bw, int md);
 
 };

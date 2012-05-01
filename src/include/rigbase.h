@@ -226,6 +226,8 @@ public:
 	virtual int  adjust_bandwidth(int m) {return 0;}
 	virtual int  def_bandwidth(int m) {return 0;}
 	virtual const char **bwtable(int m) {return bandwidths_;}
+	virtual const char **lotable(int m) {return dsp_lo;}
+	virtual const char **hitable(int m) {return dsp_hi;}
 
 	virtual bool can_split() { return false;}
 	virtual void set_split(bool val) {split = val;}

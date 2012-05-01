@@ -89,14 +89,17 @@ char *print(FREQMODE data)
 {
 	static char str[100];
 	const char **bwt = selrig->bwtable(data.imode);
-	snprintf(str, sizeof(str), "%3s,%10ld, %4s, %5s %5s",
+	const char **dsplo = selrig->lotable(data.imode);
+	const char **dsphi = selrig->hitable(data.imode);
+	snprintf(str, sizeof(str), "%3s,%10ld, %4s, %x => %5s %5s",
 		data.src == XML ? "xml" : "ui",
 		data.freq,
 		selrig->modes_ ? selrig->modes_[data.imode] : "modes n/a",
+		data.iBW,
 		(data.iBW > 256 && selrig->has_dsp_controls) ?
-			selrig->dsp_lo[data.iBW & 0x7F] : bwt ? bwt[data.iBW] : "bw n/a",
+			(dsplo ? dsplo[data.iBW & 0x7F] : "??") : (bwt ? bwt[data.iBW] : "lo n/a"),
 		(data.iBW > 256 && selrig->has_dsp_controls) ?
-			selrig->dsp_hi[(data.iBW >> 8) & 0x7F] : "" 
+			(dsphi ? dsphi[(data.iBW >> 8) & 0x7F] : "??") : "hi n/a" 
 		);
 	return str;
 }
@@ -1046,6 +1049,7 @@ void setMode()
 	fm.imode = opMODE->index();
 	fm.iBW = selrig->def_bandwidth(fm.imode);
 	fm.src = UI;
+
 	if (useB) {
 		pthread_mutex_lock(&mutex_queB);
 		queB.push(fm);

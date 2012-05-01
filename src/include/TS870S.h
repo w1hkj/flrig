@@ -85,7 +85,10 @@ public:
 	void get_mic_min_max_step(int &min, int &max, int &step);
 
 	bool sendTScommand(string, int, bool);
+
 	const char **bwtable(int);
+	const char **lotable(int);
+	const char **hitable(int);
 
 	const char * get_bwname_(int bw, int md);
 	

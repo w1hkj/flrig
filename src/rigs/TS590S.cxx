@@ -526,8 +526,13 @@ void RIG_TS590S::set_volume_control(int val)
 // Tranceiver PTT on/off
 void RIG_TS590S::set_PTT_control(int val)
 {
-	if (val) cmd = "TX1;";
-	else	 cmd = "RX;";
+	if (val) {
+		if (data_mode)
+			cmd = "TX1;"; 
+		else 
+			cmd = "TX0;";
+	} else
+		cmd = "RX;";
 	sendCommand(cmd, 0);
 }
 
@@ -598,7 +603,7 @@ void RIG_TS590S::set_modeA(int val)
 	cmd += TS590S_mode_chr[val];
 	cmd += ';';
 	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "set mode A", cmd, replystr);
+	showresp(ERR, ASC, "set mode A", cmd, replystr);
 	if (val > tsFSKR) {
 		data_mode = true;
 		cmd = "DA1;";
@@ -621,6 +626,7 @@ int RIG_TS590S::get_modeA()
 	int ret = waitN(4, 100, "get mode A", ASC);
 
 	if (ret < 4) return A.imode;
+
 	size_t p = replystr.rfind("MD");
 	if (p == string::npos) return A.imode;
 
@@ -628,8 +634,8 @@ int RIG_TS590S::get_modeA()
 		case '1' : md = tsLSB; break;
 		case '2' : md = tsUSB; break;
 		case '3' : md = tsCW; break;
-		case '4' : md = tsAM; break;
-		case '5' : md = tsFM; break;
+		case '4' : md = tsFM; break;
+		case '5' : md = tsAM; break;
 		case '6' : md = tsFSK; break;
 		case '7' : md = tsCWR; break;
 		case '9' : md = tsFSKR; break;
@@ -693,8 +699,8 @@ int RIG_TS590S::get_modeB()
 		case '1' : md = tsLSB; break;
 		case '2' : md = tsUSB; break;
 		case '3' : md = tsCW; break;
-		case '4' : md = tsAM; break;
-		case '5' : md = tsFM; break;
+		case '4' : md = tsFM; break;
+		case '5' : md = tsAM; break;
 		case '6' : md = tsFSK; break;
 		case '7' : md = tsCWR; break;
 		case '9' : md = tsFSKR; break;
@@ -773,15 +779,43 @@ int RIG_TS590S::set_widths(int val)
 const char **RIG_TS590S::bwtable(int m)
 {
 	if (m == tsLSB || m == tsUSB || m == tsFM || m == tsFMD)
-		return TS590S_empty;
+		return NULL;//TS590S_empty;
 	else if (m == tsCW || m == tsCWR)
 		return TS590S_CWwidths;
 	else if (m == tsFSK || m == tsFSKR)
 		return TS590S_FSKwidths;
 	else if (m == tsAM)
-		return TS590S_empty;
+		return NULL;//TS590S_empty;
 	else
-		return TS590S_empty;
+		return NULL;//TS590S_empty;
+}
+
+const char **RIG_TS590S::lotable(int m)
+{
+	if (m == tsLSB || m == tsUSB || m == tsFM || m == tsFMD)
+		return TS590S_SSB_lo;
+	else if (m == tsCW || m == tsCWR)
+		return NULL;
+	else if (m == tsFSK || m == tsFSKR)
+		return NULL;
+	else if (m == tsAM)
+		return TS590S_AM_lo;
+	else
+		return TS590S_DATA_shift;
+}
+
+const char **RIG_TS590S::hitable(int m)
+{
+	if (m == tsLSB || m == tsUSB || m == tsFM || m == tsFMD)
+		return TS590S_SSB_hi;
+	else if (m == tsCW || m == tsCWR)
+		return NULL;
+	else if (m == tsFSK || m == tsFSKR)
+		return NULL;
+	else if (m == tsAM)
+		return TS590S_AM_hi;
+	else
+		return TS590S_DATA_width;
 }
 
 int RIG_TS590S::adjust_bandwidth(int val)

@@ -469,6 +469,28 @@ const char **RIG_TS480SAT::bwtable(int m)
 	return TS480SAT_empty;
 }
 
+const char **RIG_TS480SAT::lotable(int m)
+{
+	if (m == 0 || m == 1 || m == 3)
+		return TS480SAT_lo;
+	else if (m == 2 || m == 6)
+		return NULL;
+	else if (m == 5 || m == 7)
+		return NULL;
+	return TS480SAT_AM_lo;
+}
+
+const char **RIG_TS480SAT::hitable(int m)
+{
+	if (m == 0 || m == 1 || m == 3)
+		return TS480SAT_hi;
+	else if (m == 2 || m == 6)
+		return NULL;
+	else if (m == 5 || m == 7)
+		return NULL;
+	return TS480SAT_AM_hi;
+}
+
 void RIG_TS480SAT::set_modeA(int val)
 {
 	A.imode = val;
