@@ -1,6 +1,6 @@
 /*
  * Kenwood TS870S driver
- * Based on the TS590S driver by Dave Freese.
+ * Based on the TS870S driver by Dave Freese.
  * a part of flrig.
  *
  * Copyright 2009, Dave Freese, W1HKJ
@@ -701,7 +701,7 @@ int RIG_TS870S::set_widths(int val) // val is from the mode list index, as selec
 const char **RIG_TS870S::bwtable(int m)
 {
 	if (m == tsLSB || m == tsUSB || m == tsAM)
-		return TS870S_empty;  // these modes have lo and hi settings.
+		return NULL;  // these modes have lo and hi settings.
 
 	else if (m == tsCW || m == tsCWR)
 		return TS870S_CWwidths;
@@ -713,7 +713,43 @@ const char **RIG_TS870S::bwtable(int m)
 		return TS870S_FMwidths;
 
 	else
-		return TS870S_empty;
+		return NULL;
+}
+
+const char **RIG_TS870S::lotable(int m)
+{
+	if (m == tsLSB || m == tsUSB || m == tsAM)
+		return TS870S_SSB_lo;  // these modes have lo and hi settings.
+
+	else if (m == tsCW || m == tsCWR)
+		return NULL;
+
+	else if (m == tsFSK || m == tsFSKR)
+		return NULL;
+
+	else if (m == tsFM)
+		return NULL;
+
+	else
+		return TS870S_AM_lo;
+}
+
+const char **RIG_TS870S::hitable(int m)
+{
+	if (m == tsLSB || m == tsUSB || m == tsAM)
+		return TS870S_SSB_hi;  // these modes have lo and hi settings.
+
+	else if (m == tsCW || m == tsCWR)
+		return NULL;
+
+	else if (m == tsFSK || m == tsFSKR)
+		return NULL;
+
+	else if (m == tsFM)
+		return NULL;
+
+	else
+		return TS870S_AM_hi;
 }
 
 //----------------------------------------------------------------------
