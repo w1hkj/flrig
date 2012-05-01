@@ -39,8 +39,15 @@ static const char *FT950_widths_SSB[] = {
 "1950", "2100", "2250", "2400", "2500", "2600", "2700",
 "2800", "2900", "3000", NULL };
 
+static const char *FT950_widths_SSBD[] = {
+"200", "400", "600", "850", "1100", "1350", "1500", "1650", "1800",
+"1950", "2100", "2250", "2400", NULL };
+
 static int FT950_wvals_SSB[] = {
 1,2,3,4,5,6,7,8,9,10,11,12,13,15,16,17,18,19,20, WVALS_LIMIT};
+
+static int FT950_wvals_SSBD[] = {
+1,2,3,4,5,6,7,8,9,10,11,12,13, WVALS_LIMIT};
 
 static const char *FT950_widths_CW[] = {
 "100", "200", "300", "400", "500",
@@ -654,6 +661,11 @@ int RIG_FT950::adjust_bandwidth(int val)
 			bandwidths_ = FT950_widths_NN;
 			bw_vals_ = FT950_wvals_NN;
 			break;
+		case mPKT_L :
+		case mPKT_U :
+			bandwidths_ = FT950_widths_SSBD;
+			bw_vals_ = FT950_wvals_SSBD;
+			break;
 		default:
 			bandwidths_ = FT950_widths_SSB;
 			bw_vals_ = FT950_wvals_SSB;
@@ -679,7 +691,7 @@ const char ** RIG_FT950::bwtable(int n)
 		case mRTTY_L :
 		case mRTTY_U : return FT950_widths_CW;
 		case mPKT_L  :
-		case mPKT_U  : // use SSB widths
+		case mPKT_U  : return FT950_widths_SSBD;
 		default      : break;
 	}
 	return FT950_widths_SSB;
