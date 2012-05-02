@@ -31,7 +31,7 @@ static const char FT950_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L', 
 
 // 20110707 - SSB "2450", 14 discontinued in latest North American firmware 
 static const int FT950_def_bw[] = {
-    18,   18,   5,   0,   0,   5,       5,     12,     5,       0,       0,     12,     0 };
+    18,   18,   5,   0,   0,   5,       5,     10,     5,       0,       0,     10,     0 };
 // mLSB, mUSB, mCW, mFM, mAM, mRTTY_L, mCW_R, mPKT_L, mRTTY_U, mPKT_FM, mFM_N, mPKT_U, mAM_N
 
 static const char *FT950_widths_SSB[] = {
@@ -39,19 +39,17 @@ static const char *FT950_widths_SSB[] = {
 "1950", "2100", "2250", "2400", "2500", "2600", "2700",
 "2800", "2900", "3000", NULL };
 
-static const char *FT950_widths_SSBD[] = {
-"200", "400", "600", "850", "1100", "1350", "1500", "1650", "1800",
-"1950", "2100", "2250", "2400", NULL };
-
 static int FT950_wvals_SSB[] = {
 1,2,3,4,5,6,7,8,9,10,11,12,13,15,16,17,18,19,20, WVALS_LIMIT};
 
+static const char *FT950_widths_SSBD[] = {
+"100", "200", "300", "400", "500", "800", "1200", "1400", "1700", "2000", "2400", NULL };
+
 static int FT950_wvals_SSBD[] = {
-1,2,3,4,5,6,7,8,9,10,11,12,13, WVALS_LIMIT};
+3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, WVALS_LIMIT};
 
 static const char *FT950_widths_CW[] = {
-"100", "200", "300", "400", "500",
-"800", "1200", "1400", "1700", "2000", "2400", NULL };
+"100", "200", "300", "400", "500", "800", "1200", "1400", "1700", "2000", "2400", NULL };
 
 static int FT950_wvals_CW[] = {
 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, WVALS_LIMIT };
