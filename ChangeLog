@@ -1,8 +1,46 @@
 
 
-=Version 1.1.13=
+=Version 1.2.01=
 
-2012-04-11  David Freese  <w1hkj@w1hkj.com>
+2012-05-03  David Freese  <w1hkj@w1hkj.com>
+
+	8aae5bc: Xcvr setup
+	d9a461b: FT950 pkt bandwidth
+
+2012-05-02  Terry Embry  <ftembry@users.berlios.de>
+
+	9bd9f5e: FT950/xml_io
+
+2012-05-01  David Freese  <w1hkj@w1hkj.com>
+
+	5df2691: FT950 PKT_U/PKT_L
+	e22066c: Kenwood DSP Hi/Lo
+	e654106: XMLRPC post to Que
+	e6ce673: FT950 defaults
+	d474e82: A/B bypass serial loop
+	54ce87c: TS590S
+	d72e2b9: SWAP A/B
+
+2012-04-19  Terry Embry  <ftembry@users.berlios.de>
+
+	d408b05: IC7000 compression
+
+2012-04-19  David Freese  <w1hkj@w1hkj.com>
+
+	b1c794e: FreqControl
+
+2012-04-19  Terry Embry  <ftembry@users.berlios.de>
+
+	704aa65: FT950 compression
+	c58ba5d: FT950 external tuner
+
+2012-04-16  David Freese  <w1hkj@w1hkj.com>
+
+	e8363f2: New User Interface
+	2f894b8: BW control color
+
+
+=Version 1.1.13=
 
 	20fa614: TT516
 
