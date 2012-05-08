@@ -80,6 +80,9 @@ static GUI rig_widgets[]= {
 	{ (Fl_Widget *)NULL,          0,   0,   0 }
 };
 
+// mid range on loudness
+static string menu012 = "EX01200004";
+
 void RIG_TS2000::initialize()
 {
 	rig_widgets[0].W = btnVol;
@@ -91,7 +94,31 @@ void RIG_TS2000::initialize()
 	rig_widgets[6].W = sldrNOTCH;
 	rig_widgets[7].W = sldrMICGAIN;
 	rig_widgets[8].W = sldrPOWER;
+
+	menu012.clear();
+	cmd = "EX0120000;"; // read menu 012 state
+//might return something like EX01200004;
+
+	if (waitN(11, 100, "read ex 012", ASC) == 11)
+		menu012 = replystr;
+
+// disable beeps before resetting front panel display to SWR
+	cmd = "EX01200000;";
+	sendCommand(cmd);
+	select_swr();
+
+// restore state of xcvr beeps
+	cmd = menu012;
+	sendCommand(cmd);
 }
+
+void RIG_TS2000::shutdown()
+{
+// restore state of xcvr beeps
+//	cmd = menu012;
+//	sendCommand(cmd);
+}
+
 
 RIG_TS2000::RIG_TS2000() {
 // base class values	
@@ -126,8 +153,8 @@ RIG_TS2000::RIG_TS2000() {
 	can_change_alt_vfo = true;
 
 	has_power_out =
-	has_swr_control = false;
-
+	has_swr_control =
+	has_alc_control =
 	has_split =
 	has_split_AB =
 	has_dsp_controls =
@@ -151,7 +178,7 @@ RIG_TS2000::RIG_TS2000() {
 	rxtxa = true;
 
 	precision = 1;
-	ndigits = 8;
+	ndigits = 9;
 
 }
 
@@ -173,16 +200,22 @@ const char * RIG_TS2000::get_bwname_(int n, int md)
 
 void RIG_TS2000::selectA()
 {
-	cmd = "FR0;FT0;";
+	cmd = "FR0;";
 	sendCommand(cmd);
-	showresp(WARN, ASC, "Rx on A, Tx on A", cmd, replystr);
+	showresp(WARN, ASC, "Rx on A", cmd, replystr);
+	cmd = "FT0;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "Tx on A", cmd, replystr);
 }
 
 void RIG_TS2000::selectB()
 {
-	cmd = "FR1;FT1;";
+	cmd = "FR1;";
 	sendCommand(cmd);
-	showresp(WARN, ASC, "Rx on B, Tx on B", cmd, replystr);
+	showresp(WARN, ASC, "Rx on B", cmd, replystr);
+	cmd = "FT1;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "Tx on B", cmd, replystr);
 }
 
 void RIG_TS2000::set_split(bool val) 
@@ -190,23 +223,35 @@ void RIG_TS2000::set_split(bool val)
 	split = val;
 	if (useB) {
 		if (val) {
-			cmd = "FR1;FT0;";
+			cmd = "FR1;";
 			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on B, Tx on A", cmd, replystr);
+			showresp(WARN, ASC, "Rx on B", cmd, replystr);
+			cmd = "FT0;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Tx on A", cmd, replystr);
 		} else {
-			cmd = "FR1;FT1;";
+			cmd = "FR1;";
 			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on B, Tx on B", cmd, replystr);
+			showresp(WARN, ASC, "Rx on B", cmd, replystr);
+			cmd = "FT1;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Tx on B", cmd, replystr);
 		}
 	} else {
 		if (val) {
-			cmd = "FR0;FT1;";
+			cmd = "FR0;";
 			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on A, Tx on B", cmd, replystr);
+			showresp(WARN, ASC, "Rx on A", cmd, replystr);
+			cmd = "FT1;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Tx on B", cmd, replystr);
 		} else {
-			cmd = "FR0;FT0;";
+			cmd = "FR0;";
 			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on A, Tx on A", cmd, replystr);
+			showresp(WARN, ASC, "Rx on A", cmd, replystr);
+			cmd = "FT0;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Tx on A", cmd, replystr);
 		}
 	}
 	Fl::awake(highlight_vfo, (void *)0);
@@ -215,26 +260,24 @@ void RIG_TS2000::set_split(bool val)
 int RIG_TS2000::get_split()
 {
 	size_t p;
-	bool split = false;
-	char rx, tx;
+	int split = 0;
+	int rx, tx;
 // tx vfo
-	cmd = rsp = "FT";
-	cmd.append(";");
+	cmd = "FT;";
 	waitN(4, 100, "get split tx vfo", ASC);
-	p = replystr.rfind(rsp);
+	p = replystr.rfind("FT");
 	if (p == string::npos) return split;
-	tx = replystr[p+2];
+	tx = replystr[p+2] - '0';
 
 // rx vfo
-	cmd = rsp = "FR";
-	cmd.append(";");
+	cmd = "FR;";
 	waitN(4, 100, "get split rx vfo", ASC);
 
-	p = replystr.rfind(rsp);
+	p = replystr.rfind("FR");
 	if (p == string::npos) return split;
-	rx = replystr[p+2];
+	rx = replystr[p+2] - '0';
 // split test
-	split = (tx == '1' ? 2 : 0) + (rx == '1' ? 1 : 0);
+	split = tx * 2 + rx;
 
 	return split;
 }
@@ -306,19 +349,40 @@ int RIG_TS2000::get_smeter()
 
 int RIG_TS2000::get_swr()
 {
-/*
-	cmd = "RM1;";
-	sendCommand(cmd,0);
-	showresp(WARN, ASC, "set swr meter", cmd, replystr);
 	cmd = "RM;";
 	waitN(8, 100, "get swr", ASC);
-	size_t p = replystr.rfind("RM");
+	size_t p = replystr.rfind("RM1");
 	if (p != string::npos) {
 		int mtr = fm_decimal(&replystr[p+3], 4);
-		mtr = (mtr * 100) / 30;
+		mtr = (mtr * 10) / 3;
+		return mtr;
 	}
-*/
 	return 0;
+}
+
+int  RIG_TS2000::get_alc(void) 
+{
+	cmd = "RM;";
+	waitN(8, 100, "get alc", ASC);
+	size_t p = replystr.rfind("RM3");
+	if (p != string::npos) {
+		int mtr = fm_decimal(&replystr[p+3], 4);
+		mtr = (mtr * 10) / 3;
+		return mtr;
+	}
+	return 0;
+}
+
+void  RIG_TS2000::select_swr()
+{
+	cmd = "RM1;";
+	sendCommand(cmd);
+}
+
+void  RIG_TS2000::select_alc()
+{
+	cmd = "RM3;";
+	sendCommand(cmd);
 }
 
 // Transceiver power level
@@ -327,12 +391,24 @@ void RIG_TS2000::set_power_control(double val)
 	int ival = (int)val;
 	cmd = "PC";
 	cmd.append(to_decimal(ival, 3)).append(";");
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "set pwr ctrl", cmd, replystr);
 }
 
 int RIG_TS2000::get_power_out()
 {
+	cmd = "SM0;";
+	waitN(8, 100, "get power out", ASC);
+	size_t p = replystr.rfind("SM0");
+	if (p != string::npos) {
+		int mtr = fm_decimal(&replystr[p+3],4);
+		if (mtr <= 6) mtr = mtr * 2;
+		else if (mtr <= 11) mtr = 11 + (mtr - 6)*(26 - 11)/(11 - 6);
+		else if (mtr <= 18) mtr = 26 + (mtr - 11)*(50 - 26)/(18 - 11);
+		else mtr = 50 + (mtr - 18)*(100 - 50)/(27 - 18);
+		if (mtr > 100) mtr = 100;
+		return mtr;
+	}
 	return 0;
 }
 
@@ -530,7 +606,7 @@ void RIG_TS2000::set_modeB(int val)
 	cmd = "MD";
 	cmd += TS2000_mode_chr[val];
 	cmd += ';';
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "set mode B", cmd, replystr);
 	B.iBW = set_widths(val);
 }
@@ -723,7 +799,7 @@ void RIG_TS2000::set_mic_gain(int val)
 {
 	cmd = "MG";
 	cmd.append(to_decimal(val,3)).append(";");
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "set mic", cmd, replystr);
 }
 
@@ -851,7 +927,7 @@ void RIG_TS2000::get_notch_min_max_step(int &min, int &max, int &step)
 void RIG_TS2000::set_auto_notch(int v)
 {
 	cmd = v ? "NT1;" : "NT0;";
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "set auto notch", cmd, replystr);
 }
 
@@ -869,7 +945,7 @@ void RIG_TS2000::set_rf_gain(int val)
 {
 	cmd = "RG";
 	cmd.append(to_decimal(val * 255 / 100, 3)).append(";");
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "set rf gain", cmd, replystr);
 }
 

@@ -291,7 +291,7 @@ void RIG_TS590S::set_split(bool val)
 int RIG_TS590S::get_split()
 {
 	size_t p;
-	bool split = false;
+	int split = 0;
 	char rx, tx;
 // tx vfo
 	cmd = rsp = "FT";

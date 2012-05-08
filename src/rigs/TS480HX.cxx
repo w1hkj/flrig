@@ -158,8 +158,8 @@ RIG_TS480HX::RIG_TS480HX() {
 	has_tune_control = 
 	has_ptt_control = true;
 
-	precision = 10;
-	ndigits = 7;
+	precision = 1;
+	ndigits = 8;
 
 }
 
@@ -263,7 +263,7 @@ bool RIG_TS480HX::can_split()
 int RIG_TS480HX::get_split()
 {
 	size_t p;
-	bool split = false;
+	int split = 0;
 	char rx, tx;
 // tx vfo
 	cmd = rsp = "FT";
