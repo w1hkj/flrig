@@ -17,6 +17,7 @@ public:
 	~RIG_TS2000(){}
 	
 	void initialize();
+	virtual void shutdown();
 
 	long get_vfoA();
 	void set_vfoA(long);
@@ -46,6 +47,9 @@ public:
 
 	int  get_smeter();
 	int  get_swr();
+	int  get_alc();
+	void select_swr();
+	void select_alc();
 	int  get_power_out();
 	int  get_power_control();
 	void set_volume_control(int val);

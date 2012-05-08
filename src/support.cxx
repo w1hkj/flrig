@@ -332,7 +332,8 @@ void read_power_out()
 // read swr
 void read_swr()
 {
-	if (!selrig->has_swr_control) return;
+	if ((meter_image != SWR_IMAGE) ||
+		!selrig->has_swr_control) return;
 	int sig;
 	pthread_mutex_lock(&mutex_serial);
 	sig = selrig->get_swr();
@@ -344,7 +345,8 @@ void read_swr()
 // alc
 void read_alc()
 {
-	if (!selrig->has_alc_control) return;
+	if ((meter_image != ALC_IMAGE) ||
+		!selrig->has_alc_control) return;
 	int sig;
 	pthread_mutex_lock(&mutex_serial);
 		sig = selrig->get_alc();
@@ -412,7 +414,9 @@ void read_preamp_att()
 // split
 void update_split(void *d)
 {
-	if (rig_nbr == FT450 || rig_nbr == FT950) {
+	if (rig_nbr == FT450 || rig_nbr == FT950 ||
+		rig_nbr == TS480SAT || rig_nbr == TS480HX ||
+		rig_nbr == TS590S || rig_nbr == TS2000) {
 		switch (progStatus.split) {
 			case 0: btnSplit->value(0);
 					useB = false;
@@ -2079,10 +2083,16 @@ void cbALC_SWR()
 		btnALC_SWR->image(image_alc);
 		meter_image = ALC_IMAGE;
 		sldrALC->show();
+		pthread_mutex_lock(&mutex_serial);
+			selrig->select_alc();
+		pthread_mutex_unlock(&mutex_serial);
 	} else {
 		btnALC_SWR->image(image_swr);
 		meter_image = SWR_IMAGE;
 		sldrSWR->show();
+		pthread_mutex_lock(&mutex_serial);
+			selrig->select_swr();
+		pthread_mutex_unlock(&mutex_serial);
 	}
 	btnALC_SWR->redraw();
 	setFocus();

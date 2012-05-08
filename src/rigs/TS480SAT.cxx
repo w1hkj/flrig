@@ -161,8 +161,8 @@ RIG_TS480SAT::RIG_TS480SAT() {
 	has_tune_control =
 	has_ptt_control = true;
 
-	precision = 0;
-	ndigits = 7;
+	precision = 1;
+	ndigits = 8;
 
 }
 
@@ -267,7 +267,7 @@ bool RIG_TS480SAT::can_split()
 int RIG_TS480SAT::get_split()
 {
 	size_t p;
-	bool split = false;
+	int split = 0;
 	char rx, tx;
 // tx vfo
 	cmd = rsp = "FT";
