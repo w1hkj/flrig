@@ -3720,6 +3720,7 @@ void cbBandSelect(int band)
 	pthread_mutex_lock(&mutex_serial);
 	pthread_mutex_lock(&mutex_xmlrpc);
 	selrig->set_band_selection(band);
+	MilliSleep(100);	// rig sync-up
 // get freqmdbw
 	if (!useB) {
 		vfoA.freq = selrig->get_vfoA();
@@ -3749,6 +3750,8 @@ void cbBandSelect(int band)
 	}
 	if (!useB) Fl::awake(setFreqDispA, (void *)vfo.freq);
 	else Fl::awake(setFreqDispB, (void *)vfo.freq);
+
+	MilliSleep(100);	// local sync-up
 // remote send freqmdbw
 	if (fldigi_online) {
 		send_xml_freq(vfo.freq);
@@ -3765,6 +3768,8 @@ void cbBandSelect(int band)
 			} catch (...) {}
 		}
 	}
+	MilliSleep(100);	// remote sync-up
+
 	pthread_mutex_unlock(&mutex_xmlrpc);
 	pthread_mutex_unlock(&mutex_serial);
 }
