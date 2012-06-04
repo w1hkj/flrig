@@ -249,6 +249,7 @@ int main (int argc, char *argv[])
 	RigHomeDir.clear();
 
 	Fl::args(argc, argv, arg_idx, parse_args);
+	Fl::set_fonts(0);
 
 	char dirbuf[FL_PATH_MAX + 1];
 #ifdef __WIN32__
