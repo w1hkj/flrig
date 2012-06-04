@@ -76,6 +76,7 @@ pthread_mutex_t mutex_ptt = PTHREAD_MUTEX_INITIALIZER;
 
 bool RIG_DEBUG = false;
 bool XML_DEBUG = false;
+bool EXPAND_CONTROLS = false;
 
 //----------------------------------------------------------------------
 void about()
@@ -220,16 +221,25 @@ void exit_main(Fl_Widget *w)
 extern void open_rig_socket();
 extern bool run_digi_loop;
 
+void expand_controls(void*)
+{
+	show_controls();
+}
+
 void close_controls(void*)
 {
 //	show_controls();
-	if (progStatus.UIsize != small_ui) {
+	if (progStatus.UIsize == wide_ui) {
+		if (EXPAND_CONTROLS && selrig->has_extras) return;
 		btn_show_controls->label("@-22->");
 		btn_show_controls->redraw_label();
 		grpTABS->hide();
 		mainwindow->resizable(grpTABS);
 		mainwindow->size(progStatus.mainW, 150);
 		mainwindow->size_range(735, 150, 0, 150);
+	} else if (progStatus.UIsize == small_ui) {
+		if (EXPAND_CONTROLS && selrig->has_extras)
+			Fl::add_timeout(1.0, expand_controls);
 	}
 }
 
@@ -365,7 +375,8 @@ int parse_args(int argc, char **argv, int& idx)
   --config-dir <DIR>\n\
   --debug (both rig and xml)\n\
   --rig_debug\n\
-  --xml_debug\n\n");
+  --xml_debug\n\
+  --exp (expand menu tab controls)\n\n");
 		exit(0);
 	} 
 	if (strcasecmp("--version", argv[idx]) == 0) {
@@ -393,6 +404,11 @@ int parse_args(int argc, char **argv, int& idx)
 		if (RigHomeDir[RigHomeDir.length()-1] != '/')
 			RigHomeDir += '/';
 		idx += 2;
+		return 1;
+	}
+	if (strcasecmp("--exp", argv[idx]) == 0) {
+		EXPAND_CONTROLS = true;
+		idx++;
 		return 1;
 	}
 	return 0;
