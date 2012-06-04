@@ -2,6 +2,18 @@
 
 =Version 1.3.02=
 
+2012-06-04  Terry Embry  <ftembry@users.berlios.de>
+
+	0f2a4c2: Polling loop fixes
+
+2012-06-04  David Freese  <w1hkj@w1hkj.com>
+
+	cc5733a: Font Initialization
+
+
+=Version 1.3.02=
+
+
 2012-05-31  Brian Miezejewski K5HFI  <fmcane@gmail.com>
 
 	11ad48f: PCR1000
