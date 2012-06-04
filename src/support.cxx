@@ -783,6 +783,7 @@ void * serial_thread_loop(void *d)
 			resetxmt = true;
 
 			if (!loopcount--) {
+				loopcount = progStatus.serloop_timing / 10;
 				poll_nbr++;
 
 				if (rig_nbr == K3) read_K3();
@@ -883,7 +884,6 @@ void * serial_thread_loop(void *d)
 
 				if (progStatus.poll_noise)
 					if (!(poll_nbr % progStatus.poll_noise)) read_noise();
-				loopcount = progStatus.serloop_timing / 10;
 
 				if (bypass_serial_thread_loop) goto serial_bypass_loop;
 
@@ -897,6 +897,7 @@ void * serial_thread_loop(void *d)
 			}
 			resetrcv = true;
 			if (!loopcount--) {
+				loopcount = progStatus.serloop_timing / 10;
 				poll_nbr++;
 				if (progStatus.poll_pout)
 					if (!(poll_nbr % progStatus.poll_pout)) read_power_out();
@@ -906,7 +907,6 @@ void * serial_thread_loop(void *d)
 				if (!quePTT.empty()) continue;
 				if (progStatus.poll_alc)
 					if (!(poll_nbr % progStatus.poll_alc)) read_alc();
-				loopcount = progStatus.serloop_timing / 10;
 			}
 		}
 serial_bypass_loop: ;
@@ -3717,6 +3717,11 @@ void cb_cw_qsk()
 
 void cbBandSelect(int band)
 {
+// bypass local
+	pthread_mutex_lock(&mutex_serial);
+		bypass_serial_thread_loop = true;
+	pthread_mutex_unlock(&mutex_serial);
+
 	pthread_mutex_lock(&mutex_serial);
 	pthread_mutex_lock(&mutex_xmlrpc);
 	selrig->set_band_selection(band);
@@ -3767,10 +3772,15 @@ void cbBandSelect(int band)
 				send_new_bandwidth(vfo.iBW);
 			} catch (...) {}
 		}
+		MilliSleep(100);	// remote sync-up
 	}
-	MilliSleep(100);	// remote sync-up
 
 	pthread_mutex_unlock(&mutex_xmlrpc);
+	pthread_mutex_unlock(&mutex_serial);
+
+// enable local
+	pthread_mutex_lock(&mutex_serial);
+		bypass_serial_thread_loop = false;
 	pthread_mutex_unlock(&mutex_serial);
 }
 
