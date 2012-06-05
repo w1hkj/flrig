@@ -39,12 +39,14 @@ static const char *TS570_FSKbw[] = {
   "FW0250;", "FW0500;", "FW1000;", "FW1500;", NULL};
 
 static GUI rig_widgets[]= {
-	{ (Fl_Widget *)btnVol,        2, 125,  50 },
-	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
-	{ (Fl_Widget *)btnIFsh,     214, 105,  50 },
+	{ (Fl_Widget *)btnVol, 2, 125,  50 },
+	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },
+	{ (Fl_Widget *)sldrRFGAIN, 266, 145, 156 },
+	{ (Fl_Widget *)sldrPOWER, 54, 165, 368 },
+	{ (Fl_Widget *)btnIFsh, 214, 105,  50 },
 	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
-	{ (Fl_Widget *)sldrMICGAIN, 266, 125, 156 },
-	{ (Fl_Widget *)sldrPOWER,    54, 145, 368 },
+	{ (Fl_Widget *)sldrSQUELCH, 266, 125, 156 },
+	{ (Fl_Widget *)sldrMICGAIN, 54, 145, 156 },
 	{ (Fl_Widget *)NULL,          0,   0,   0 }
 };
 
@@ -52,10 +54,12 @@ void RIG_TS570::initialize()
 {
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
-	rig_widgets[2].W = btnIFsh;
-	rig_widgets[3].W = sldrIFSHIFT;
-	rig_widgets[4].W = sldrMICGAIN;
-	rig_widgets[5].W = sldrPOWER;
+	rig_widgets[2].W = sldrRFGAIN;
+	rig_widgets[3].W = sldrPOWER;
+	rig_widgets[4].W = btnIFsh;
+	rig_widgets[5].W = sldrIFSHIFT;
+	rig_widgets[6].W = sldrSQUELCH;
+	rig_widgets[7].W = sldrMICGAIN;
 
 	cmd = "FR0;"; sendCommand(cmd);
 	showresp(WARN, ASC, "Rx on A", cmd, replystr);
@@ -98,7 +102,7 @@ RIG_TS570::RIG_TS570() {
 
 	has_smeter =
 	has_power_out =
-	has_split =
+	has_split = has_split_AB =
 	has_swr_control =
 	has_ifshift_control =
 	has_noise_control =
@@ -110,6 +114,8 @@ RIG_TS570::RIG_TS570() {
 	has_preamp_control =
 	has_mode_control =
 	has_bandwidth_control =
+	has_rf_control = 
+	has_sql_control =
 	has_ptt_control = true;
 
 	precision = 10;
@@ -147,12 +153,28 @@ void RIG_TS570::selectB()
 void RIG_TS570::set_split(bool val) 
 {
 	split = val;
-	if (val)
-		cmd = "FT1;";
-	else
-		cmd = "FR0;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "split", cmd, replystr);
+	if (useB) {
+		if (val) {
+			cmd = "FR1;FT0;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on B, Tx on A", cmd, replystr);
+		} else {
+			cmd = "FR1;FT1;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on B, Tx on B", cmd, replystr);
+		}
+	} else {
+		if (val) {
+			cmd = "FR0;FT1;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on A, Tx on B", cmd, replystr);
+		} else {
+			cmd = "FR0;FT0;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on A, Tx on A", cmd, replystr);
+		}
+	}
+	Fl::awake(highlight_vfo, (void *)0);
 }
 
 int RIG_TS570::get_split()
@@ -782,3 +804,56 @@ void RIG_TS570::get_if_min_max_step(int &min, int &max, int &step)
 	max = 1000;
 	step = 100;
 }
+
+void RIG_TS570::set_rf_gain(int val)	
+{
+	cmd = "RG";
+	cmd.append(to_decimal(val,3)).append(";");
+	sendCommand(cmd,0);
+	showresp(WARN, ASC, "set rf gain", cmd, replystr);
+}
+
+int  RIG_TS570::get_rf_gain()
+{
+	int val = progStatus.rfgain;
+	cmd = "RG;";
+	int ret = waitN(6, 100, "get rf gain", ASC);
+	if (ret < 6) return val;
+	size_t p = replystr.rfind("RG");
+	if (p != string::npos)
+		val = fm_decimal(&replystr[p+2], 3);
+	return val;
+}
+
+void RIG_TS570::get_rf_min_max_step(int &min, int &max, int &step)
+{
+	min = 0; max = 255; step = 1;
+}
+
+void RIG_TS570::set_squelch(int val)
+{
+	cmd = "SQ";
+	cmd.append(to_decimal(abs(val),3)).append(";");
+	sendCommand(cmd,0);
+	showresp(WARN, ASC, "set squelch", cmd, replystr);
+}
+
+int  RIG_TS570::get_squelch()
+{
+	cmd = "SQ;";
+	if (waitN(6, 100, "get squelch", ASC) < 6) return 0;
+
+	size_t p = replystr.rfind("SQ");
+
+	if (p == string::npos) return 0;
+
+	replystr[p + 5] = 0;
+	return atoi(&replystr[p + 2]);
+}
+
+void RIG_TS570::get_squelch_min_max_step(int &min, int &max, int &step)
+{
+	min = 0; max = 255; step = 1;
+}
+
+

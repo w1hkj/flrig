@@ -41,6 +41,8 @@ public:
 	int  def_bandwidth(int val);
 	void set_widths();
 
+	const char **bwtable(int);
+
 	int  get_smeter();
 	int  get_swr();
 	int  get_power_out();
@@ -59,10 +61,6 @@ public:
 	bool get_if_shift(int &val);
 	void get_if_min_max_step(int &min, int &max, int &step);
 
-	//	void set_notch(bool on, int val);
-	//	bool get_notch(int &val);
-	//	void get_notch_min_max_step(int &min, int &max, int &step);
-
 	void set_noise(bool b);
 	int  get_noise();
 
@@ -70,10 +68,14 @@ public:
 	int  get_mic_gain();
 	void get_mic_min_max_step(int &min, int &max, int &step);
 
-	bool sendTScommand(string, int, bool);
-	const char **bwtable(int);
+	void set_rf_gain(int val);
+	int  get_rf_gain();
+	void get_rf_min_max_step(int &min, int &max, int &step);
+
+	void set_squelch(int val);
+	int  get_squelch();
+	void get_squelch_min_max_step(int &min, int &max, int &step);
 
 };
-
 
 #endif
