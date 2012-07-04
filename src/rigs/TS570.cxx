@@ -118,8 +118,8 @@ RIG_TS570::RIG_TS570() {
 	has_sql_control =
 	has_ptt_control = true;
 
-	precision = 10;
-	ndigits = 7;
+	precision = 1;
+	ndigits = 8;
 
 }
 

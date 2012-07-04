@@ -110,6 +110,9 @@ RIG_FT450::RIG_FT450() {
 // derived specific
 	notch_on = false;
 	m_60m_indx = 0;
+
+	precision = 1;
+	ndigits = 8;
 }
 
 void RIG_FT450::initialize()
