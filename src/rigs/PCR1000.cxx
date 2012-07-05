@@ -164,8 +164,8 @@ RIG_PCR1000::RIG_PCR1000() : current_vfo(A) {
 	has_attenuator_control =
 	has_ifshift_control = true;
 
-	precision = 2 ;
-	ndigits = 10 ;
+	precision = 10 ;
+	ndigits = 9 ;
 
 }
 
