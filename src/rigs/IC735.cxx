@@ -14,12 +14,10 @@
 //
 const char IC735name_[] = "IC-735";
 const char *IC735modes_[] = { "LSB", "USB", "AM", "CW", "RTTY", "FM", NULL};
-const char *IC735_widths[] = { "NARR", "WIDE", NULL};
 
 RIG_IC735::RIG_IC735() {
 	name_ = IC735name_;
 	modes_ = IC735modes_;
-	bandwidths_ = IC735_widths;
 	comm_baudrate = BR1200;
 	stopbits = 2;
 	comm_retries = 2;
@@ -47,6 +45,23 @@ RIG_IC735::RIG_IC735() {
 };
 
 //=============================================================================
+void RIG_IC735::selectA()
+{
+	cmd = pre_to;
+	cmd += '\x07';
+	cmd += '\x00';
+	cmd.append(post);
+	waitFB("select A");
+}
+
+void RIG_IC735::selectB()
+{
+	cmd = pre_to;
+	cmd += '\x07';
+	cmd += '\x01';
+	cmd.append(post);
+	waitFB("select B");
+}
 
 long RIG_IC735::get_vfoA ()
 {
@@ -74,6 +89,32 @@ void RIG_IC735::set_vfoA (long freq)
 	waitFB("set vfo A");
 }
 
+long RIG_IC735::get_vfoB ()
+{
+	string cstr = "\x03";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+	if (waitFOR(10, "get vfo B")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			freqB = fm_bcd_be(&replystr[p+5], 8);
+	}
+	return freqB;
+}
+
+void RIG_IC735::set_vfoB (long freq)
+{
+	freqA = freq;
+	cmd = pre_to;
+	cmd += '\x05';
+	cmd.append( to_bcd_be( freq, 8 ) );
+	cmd.append( post );
+	waitFB("set vfo B");
+}
+
 void RIG_IC735::set_modeA(int val)
 {
 	modeA = val;
@@ -81,18 +122,21 @@ void RIG_IC735::set_modeA(int val)
 	cmd += "\x06";
 	cmd += modeA;		   // set the mode byte
 	cmd.append( post );
-	waitFB("set mode A");
+	waitFB("set mode");
 }
 
-void RIG_IC735::set_bwA(int val)
+int RIG_IC735::get_modeA()
 {
-	bwA = val;
 	cmd = pre_to;
-	cmd += "\0x06";
-	cmd += modeA;
-	cmd += bwA;
+	cmd += '\x04';
 	cmd.append(post);
-	waitFB("set bw A");
+	string resp = pre_fm;
+	resp += '\x04';
+	if (waitFOR(7, "get mode")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			modeA = replystr[p+5];
+		}
+	}
+	return modeA;
 }
-
-

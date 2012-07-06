@@ -8,12 +8,17 @@ public:
 	RIG_IC735();
 	~RIG_IC735(){}
 
+	void selectA();
+	void selectB();
+
 	long get_vfoA();
 	void set_vfoA(long);
-	void set_modeA(int val);
-	void set_bwA(int val);
 
-	int  adjust_bandwidth(int m) { return 1; }
+	long get_vfoB(void);
+	void set_vfoB(long f);
+
+	void set_modeA(int val);
+	int  get_modeA();
 
 };
 
