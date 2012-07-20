@@ -130,6 +130,7 @@ flrig_SOURCES += \
 	rigs/IC7000.cxx \
 	rigs/IC7200.cxx \
 	rigs/IC7600.cxx \
+	rigs/IC9100.cxx \
 	rigs/IC7700.cxx \
 	rigs/K2.cxx \
 	rigs/K3.cxx \
@@ -244,6 +245,7 @@ EXTRA_DIST = \
 	include/IC7200.h \
 	include/IC7600.h \
 	include/IC7700.h \
+	include/IC9100.h \
 	include/images.h \
 	include/K2.h \
 	include/K3.h \
