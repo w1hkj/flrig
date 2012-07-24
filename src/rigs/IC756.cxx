@@ -46,8 +46,8 @@ RIG_IC756PRO::RIG_IC756PRO() {
 	def_freq = freqA = freqB = A.freq = 14070000;
 	def_mode = modeA = modeB = B.imode = 1;
 	def_bw = bwA = bwB = A.iBW = B.iBW = 0;
-	atten_level = 0;
-	preamp_level = 0;
+	atten_level = 3;
+	preamp_level = 2;
 	adjustCIV(defaultCIV);
 
 //	has_bandwidth_control =
@@ -464,19 +464,19 @@ int RIG_IC756PRO::get_attenuator()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(8, "get att")) {
+	if (waitFOR(7, "get att")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			if (replystr[p+6] == 0x06) {
+			if (replystr[p+5] == 0x06) {
 				atten_level = 1;
 				atten_label("6 dB", true);
-			} else if (replystr[p+6] == 0x12) {
+			} else if (replystr[p+5] == 0x12) {
 				atten_level = 2;
 				atten_label("12 dB", true);
-			} else if (replystr[p+6] == 0x18) {
+			} else if (replystr[p+5] == 0x18) {
 				atten_level = 3;
 				atten_label("18 dB", true);
-			} else if (replystr[p+6] == 0x00) {
+			} else if (replystr[p+5] == 0x00) {
 				atten_level = 0;
 				atten_label("Att", false);
 			}

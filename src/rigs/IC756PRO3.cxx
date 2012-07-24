@@ -1,5 +1,5 @@
 /*
- * Icom 756PRO-II
+ * Icom 756PRO-III
  *
  * a part of flrig
  *
@@ -61,8 +61,8 @@ RIG_IC756PRO3::RIG_IC756PRO3() {
 	modes_ = IC756PRO3modes_;
 	bandwidths_ = IC756PRO3_SSBwidths;
 	_mode_type = IC756PRO3_mode_type;
-	atten_level = 0;
-	preamp_level = 0;
+	atten_level = 3; // will force initializing to 0 dB
+	preamp_level = 2; // will force initializaing to 0 dB
 
 	widgets = ic756pro3_widgets;
 
@@ -322,7 +322,7 @@ int RIG_IC756PRO3::get_noise()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
-	if (waitFOR(9, "get noise")) {
+	if (waitFOR(8, "get noise")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			return (replystr[p+6] ? 1 : 0);
@@ -347,7 +347,7 @@ int RIG_IC756PRO3::get_noise_reduction()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
-	if (waitFOR(9, "get NR")) {
+	if (waitFOR(8, "get NR")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			return (replystr[p+6] ? 1 : 0);
@@ -421,7 +421,7 @@ void RIG_IC756PRO3::get_mic_gain_min_max_step(int &min, int &max, int &step)
 
 void RIG_IC756PRO3::set_if_shift(int val)
 {
-	int shift = (int)((val + 50) * 2.55 );
+	int shift = (int)(val * 128.0 / 825.0 + 128);
 	cmd = pre_to;
 	cmd.append("\x14\x07");
 	cmd.append(to_bcd(shift, 3));
@@ -441,16 +441,16 @@ bool  RIG_IC756PRO3::get_if_shift(int &val)
 	if (waitFOR(9, "get if-shift")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			val = (int)ceil(fm_bcd(&replystr[p+6], 3) / 2.55 - 50);
+			val = (int)((fm_bcd(&replystr[p+6], 3) - 128) * 825.0 / 128.0);
 	}
 	return (progStatus.shift = (val != 0));
 }
 
 void RIG_IC756PRO3::get_if_min_max_step(int &min, int &max, int &step)
 {
-	min = -50;
-	max = +50;
-	step = 1;
+	min = -825;
+	max = +825;
+	step = 25;
 }
 
 void RIG_IC756PRO3::set_squelch(int val)
@@ -760,19 +760,19 @@ int RIG_IC756PRO3::get_attenuator()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(8, "get att")) {
+	if (waitFOR(7, "get att")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			if (replystr[p+6] == 0x06) {
+			if (replystr[p+5] == 0x06) {
 				atten_level = 1;
 				atten_label("6 dB", true);
-			} else if (replystr[p+6] == 0x12) {
+			} else if (replystr[p+5] == 0x12) {
 				atten_level = 2;
 				atten_label("12 dB", true);
-			} else if (replystr[p+6] == 0x18) {
+			} else if (replystr[p+5] == 0x18) {
 				atten_level = 3;
 				atten_label("18 dB", true);
-			} else if (replystr[p+6] == 0x00) {
+			} else if (replystr[p+5] == 0x00) {
 				atten_level = 0;
 				atten_label("Att", false);
 			}
