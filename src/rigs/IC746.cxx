@@ -595,8 +595,8 @@ RIG_IC746PRO::RIG_IC746PRO() {
 	modes_ = IC746PROmodes_;
 	bandwidths_ = IC746PRO_SSBwidths;
 	_mode_type = IC746PRO_mode_type;
-	atten_level = 0;
-	preamp_level = 0;
+	atten_level = 1;
+	preamp_level = 2;
 
 	def_mode = modeB = modeA = B.imode = A.imode = 1;
 	def_bw = bwB = bwA = B.iBW = A.iBW = 34;
