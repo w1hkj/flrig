@@ -1,8 +1,15 @@
 
 
-=Version 1.3.06=
+=Version 1.3.07=
 
-2012-07-05  David Freese  <w1hkj@w1hkj.com>
+2012-07-24  David Freese  <w1hkj@w1hkj.com>
+
+	426c50d: IC746/756 family
+	46b114d: IC9100
+	50351e5: IC735 update
+
+
+=Version 1.3.06=
 
 	1305004: PCR1000
 
