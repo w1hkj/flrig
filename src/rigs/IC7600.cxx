@@ -331,9 +331,9 @@ int RIG_IC7600::adjust_bandwidth(int m)
 			bw = 34;
 			break;
 		case 0: case 1: // SSB
-		default:
 		case 10: case 11 : case 12 :
 		case 13: case 14 : case 15 :
+		default:
 			bandwidths_ = IC7600_ssb_bws;
 			bw = 34;
 	}
