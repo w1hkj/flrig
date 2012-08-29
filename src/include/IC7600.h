@@ -56,6 +56,8 @@ public:
 	void set_cw_spot_tone();
 	void set_cw_vol();
 
+	const char **bwtable(int m) {return bandwidths_;}
+
 
 };
 
