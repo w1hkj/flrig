@@ -1,8 +1,13 @@
 
 
-=Version 1.3.07=
+=Version 1.3.08=
 
-2012-07-24  David Freese  <w1hkj@w1hkj.com>
+2012-08-29  David Freese  <w1hkj@w1hkj.com>
+
+	d7a3b46: IC7600 bw tables
+
+
+=Version 1.3.07=
 
 	426c50d: IC746/756 family
 	46b114d: IC9100
