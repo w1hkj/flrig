@@ -4,7 +4,6 @@
 #include <FL/fl_draw.H>
 
 #include "combo.h"
-#include "debug.h"
 
 void popbrwsr_cb (Fl_Widget *v, long d);
 
@@ -51,22 +50,15 @@ void Fl_PopBrowser::sort()
 	return;
 }
 
-void Fl_PopBrowser::popshow (int x, int y, int maxH)
+void Fl_PopBrowser::popshow (int x, int y)
 {
-	int nRows = popbrwsr->size();
-	int rh = fl_height();
-	int height = (nRows > 12 ? 12 : nRows)  * rh + 4;
-	int sx, sy, sw, sh; // screen bounding box
-	Fl::screen_xywh(sx, sy, sw, sh);
-#ifdef __WIN32__
-	sh -= 32; // allowance for windows bottom bar
-#endif
-	while ( height > maxH) height -= rh;
-	while (y + height > sh) y -= rh;
+	int nRows = parent->numrows();
+	int fh = fl_height();
+	int height = nRows * fh + 4;
 
-	if (nRows == 0) return;
-	popbrwsr->resize (0, 0, wRow, height);
-	resize (x, y, wRow, height);
+	if (popbrwsr->size() == 0) return;
+	if (nRows > parent->lsize()) nRows = parent->lsize();
+
 // locate first occurance of Output string value in the list
 // and display that if found
 	int i = parent->index();
@@ -78,8 +70,40 @@ void Fl_PopBrowser::popshow (int x, int y, int maxH)
 			i = 0;
 	}
 
-	show ();
+// resize and reposition the popup to insure that it is within the bounds
+// of the uppermost parent widget
+// preferred position is just below and at the same x position as the
+// parent widget
+
+	Fl_Widget *gparent = parent;
+	int	xp = gparent->x(),
+		yp = gparent->y(),
+		hp = gparent->h();
+	while ((gparent = gparent->parent())) {
+		xp = gparent->x();
+		yp = gparent->y();
+		hp = gparent->h();
+	}
+
+	int nu = nRows, nl = nRows;
+	int hu = nu * fh + 4, hl = nl * fh + 4;
+	int yu = parent->y() - hu;
+	int yl = y;
+
+	while (nl > 1 && (yl + hl > hp)) { nl--; hl -= fh; }
+	while (nu > 1 && yu < 0) { nu--; yu += fh; hu -= fh; }
+
+	if (nl >= nu) { y = yl; height = hl; }
+	else { y = yu; height = hu; }
+
+	x += xp;
+	y += yp;
+
+	popbrwsr->size (wRow, height);
+	resize (x, y, wRow, height);
+
 	popbrwsr->topline (i);
+	show();
 
 	Fl::grab(this);
 }
@@ -121,23 +145,7 @@ void popbrwsr_cb (Fl_Widget *v, long d)
 
 void Fl_ComboBox::fl_popbrwsr(Fl_Widget *p)
 {
-	Fl_Widget *who = this, *parent;
-// compute the x,y position for the pop-up browser window
-// x() and y() are locations relative to the current window
-// also need to know where the root window for the application
-// to compute the screen x,y position of the popup
-	int maxh = (who->parent())->h();
-	int xpos = who->x(), ypos = who->h() + who->y();
-	parent = who;
-	while (parent) {
-		who = parent;
-		if (who) maxh = who->h();
-		parent = parent->parent();
-		if (parent == 0) {
-			xpos += who->x();
-			ypos += who->y();
-		}
-	}
+	int xpos = p->x(), ypos = p->h() + p->y();
 	if (Brwsr == 0) {
 		Brwsr = new Fl_PopBrowser(xpos, ypos, width, height, R);
 	}
@@ -145,7 +153,7 @@ void Fl_ComboBox::fl_popbrwsr(Fl_Widget *p)
 // correct callback function can be called when the user selects an item
 // from the browser list
 	Brwsr->parent = (Fl_ComboBox *) p;
-	Brwsr->popshow(xpos, ypos, maxh);
+	Brwsr->popshow(xpos, ypos);
 	return;
 }
 
@@ -175,6 +183,7 @@ Fl_ComboBox::Fl_ComboBox (int X,int Y,int W,int H, const char *L)
 	R.Inp = Output;
 	R.retval = retdata;
 	R.idx = &idx;
+	numrows_ = 8;
 }
 
 Fl_ComboBox::~Fl_ComboBox()
@@ -187,11 +196,6 @@ Fl_ComboBox::~Fl_ComboBox()
 		}
 	}
 	delete [] datalist;
-}
-
-void Fl_ComboBox::color(Fl_Color clr)
-{
-	Output->color(clr);
 }
 
 void Fl_ComboBox::type (int t)
@@ -333,6 +337,18 @@ void Fl_ComboBox::textfont (int fnt)
 void Fl_ComboBox::textsize (uchar n)
 {
 	Output->textsize (n);
+}
+
+void Fl_ComboBox::textcolor( Fl_Color c)
+{
+	Output->textcolor (c);
+}
+
+void Fl_ComboBox::color(Fl_Color c)
+{
+	_color = c;
+	Output->color(c);
+	if (Brwsr) Brwsr->color(c);
 }
 
 

@@ -2,7 +2,7 @@
 
    "$Id: Fl_Combobox.H,v 1.4 2000/02/13 04:43:56 dhfreese Exp $"
    
-   Copyright 1999-2000 by the Dave Freese.
+   Copyright 1999-2010 by the Dave Freese.
    
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -60,7 +60,7 @@ class Fl_PopBrowser : public Fl_Window {
   public: 
 	Fl_PopBrowser (int x, int y, int w, int h, retvals R);
 	~Fl_PopBrowser ();
-	void popshow (int, int, int);
+	void popshow (int, int);
 	void pophide ();
 	void popbrwsr_cb_i (Fl_Widget *, long);
 
@@ -78,20 +78,22 @@ class Fl_ComboBox : public Fl_Group  {
   friend class Fl_PopBrowser;
   
   protected:
-	Fl_Button	 *Btn;
-	Fl_Input	  *Output;
-	Fl_PopBrowser *Brwsr;
-	datambr	   **datalist;
-	int		   listsize;
-	int		   maxsize;
-	int		   listtype;
+	Fl_Button		*Btn;
+	Fl_Input		*Output;
+	Fl_PopBrowser	*Brwsr;
+	datambr			**datalist;
+	int				listsize;
+	int				maxsize;
+	int				listtype;
+	int				numrows_;
 
   private:
-	int width;
-	int height;
-	void *retdata;
-	int  idx;
-	retvals R;
+	int				width;
+	int				height;
+	void			*retdata;
+	int				idx;
+	retvals			R;
+	Fl_Color _color;
 
   public:
 
@@ -112,9 +114,12 @@ class Fl_ComboBox : public Fl_Group  {
 	void *data ();
 	void textfont (int);
 	void textsize (uchar);
+	void textcolor (Fl_Color c);
+	void color (Fl_Color c);
 	void readonly();
-
-	void color(Fl_Color clr);
+	int  numrows() { return numrows_; }
+	void numrows(int n) { numrows_ = n; }
+	int  lsize() { return listsize; }
 
 };
 
