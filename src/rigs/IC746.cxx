@@ -358,7 +358,7 @@ int RIG_IC746::get_noise_reduction()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
-	if (waitFOR(9, "get NR")) {
+	if (waitFOR(8, "get NR")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			return (replystr[p+6] ? 1 : 0);
@@ -1211,7 +1211,15 @@ void RIG_IC746PRO::set_split(bool val)
 
 int  RIG_IC746PRO::get_split()
 {
-	LOG_WARN("%s", "get split - not implemented");
-	return progStatus.split;
+	string cstr = "\x0F";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd.assign(pre_to).append(cstr).append(post);
+	if (waitFOR(7, "get split")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return (replystr[p+5] ? 1 : 0);
+	}
+	return 0;
 }
 
