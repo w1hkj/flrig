@@ -263,9 +263,20 @@ int main (int argc, char *argv[])
 
 	char dirbuf[FL_PATH_MAX + 1];
 #ifdef __WIN32__
-	fl_filename_expand(dirbuf, sizeof(dirbuf) -1, "$USERPROFILE");
-	HomeDir = dirbuf;
-	fl_filename_expand(dirbuf, sizeof(dirbuf) - 1, "$USERPROFILE/flrig.files/");
+	string appname = argv[0];
+	size_t p = appname.find(":\\NBEMSapps\\");
+	if (p == 1) {
+		HomeDir.assign(appname.substr(0,13));
+		strcpy(dirbuf, HomeDir.c_str());
+		strcat(dirbuf, "NBEMS.files\\");
+	} else {
+		fl_filename_expand(dirbuf, sizeof(dirbuf) -1, "$USERPROFILE");
+		HomeDir = dirbuf;
+		fl_filename_expand(dirbuf, sizeof(dirbuf) - 1, "$USERPROFILE/flrig.files/");
+	}
+//	fl_filename_expand(dirbuf, sizeof(dirbuf) -1, "$USERPROFILE");
+//	HomeDir = dirbuf;
+//	fl_filename_expand(dirbuf, sizeof(dirbuf) - 1, "$USERPROFILE/flrig.files/");
 #else
 	fl_filename_expand(dirbuf, sizeof(dirbuf) - 1, "$HOME");
 	HomeDir = dirbuf;
