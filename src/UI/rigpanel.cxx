@@ -594,6 +594,9 @@ static void cb_btnAuxDTR(Fl_Light_Button* o, void*) {
 
 static void cb_btnDataPort(Fl_Light_Button* o, void*) {
 	progStatus.data_port = o->value();
+	if (o->value()) btnDataPort->label("Data");
+	else btnDataPort->label("Mic");
+	btnDataPort->redraw_label();
 }
 
 static void cb_cnt_tt550_cw_wpm(Fl_Counter* o, void*) {

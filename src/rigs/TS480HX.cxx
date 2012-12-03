@@ -95,6 +95,7 @@ void RIG_TS480HX::initialize()
 	rig_widgets[6].W = sldrMICGAIN;
 	rig_widgets[7].W = sldrPOWER;
 
+	if (progStatus.UIsize == small_ui) has_extras = false;
 	progStatus.rfgain = 100;
 	progStatus.volume = 25;
 	progStatus.power_level = 20;
@@ -134,28 +135,29 @@ RIG_TS480HX::RIG_TS480HX() {
 	B.iBW = A.iBW = 0x8A03;
 	B.freq = A.freq = 14070000;
 
-	has_tune_control =
-	has_noise_control =
+	has_tune_control = false;
+	has_noise_control = false;
 	has_notch_control = false;
 
-	has_split =
-	has_split_AB =
-	has_data_port =
-	has_micgain_control =
-	has_ifshift_control =
-	has_rf_control =
-	has_power_out =
-	has_dsp_controls =
-	has_smeter =
-	has_swr_control =
-	has_alc_control =
-	has_attenuator_control =
-	has_preamp_control =
-	has_mode_control =
-	has_bandwidth_control =
-	has_volume_control =
-	has_power_control =
-	has_tune_control = 
+	has_extras = true;
+	has_split = true;
+	has_split_AB = true;
+	has_data_port = true;
+	has_micgain_control = true;
+	has_ifshift_control = true;
+	has_rf_control = true;
+	has_power_out = true;
+	has_dsp_controls = true;
+	has_smeter = true;
+	has_swr_control = true;
+	has_alc_control = true;
+	has_attenuator_control = true;
+	has_preamp_control = true;
+	has_mode_control = true;
+	has_bandwidth_control = true;
+	has_volume_control = true;
+	has_power_control = true;
+	has_tune_control =  true;
 	has_ptt_control = true;
 
 	precision = 1;

@@ -3145,6 +3145,8 @@ void initRig()
 		if (selrig->has_data_port) { 
 			btnDataPort->show();
 			btnDataPort->value(progStatus.data_port);
+			btnDataPort->label(progStatus.data_port ? "Data" : "Mic");
+			btnDataPort->redraw_label();
 		} else btnDataPort->hide();
 	} else {
 		if (progStatus.UIsize == small_ui)
