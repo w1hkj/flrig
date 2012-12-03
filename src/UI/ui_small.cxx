@@ -238,7 +238,7 @@ Fl_Double_Window* Small_rig_window() {
 	sldrNR->when(FL_WHEN_CHANGED);
 	sldrNR->reverse(true);
 
-	btnDataPort = new Fl_Light_Button(2, 246, 60, 18, _("Data"));
+	btnDataPort = new Fl_Light_Button(2, 246, 50, 18, _("Data"));
 	btnDataPort->tooltip(_("Input on Data Port"));
 	btnDataPort->down_box(FL_THIN_DOWN_BOX);
 	btnDataPort->labelsize(12);
