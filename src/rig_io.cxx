@@ -145,7 +145,14 @@ int sendCommand (string s, int nread)
 		return 0;
 	}
 
-	RigSerial.WriteBuffer(s.c_str(), numwrite);
+	if (progStatus.byte_interval == 0)
+		RigSerial.WriteBuffer(s.c_str(), numwrite);
+	else
+		for (size_t i = 0; i < s.length(); i++) {
+			RigSerial.WriteByte(s[i]);
+			MilliSleep(progStatus.byte_interval);
+		}
+
 	MilliSleep( progStatus.comm_wait );
 
 	if (nread == 0) {

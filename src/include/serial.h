@@ -60,6 +60,7 @@ public:
 
 	int  ReadBuffer (char *b, int nbr);
 	int  WriteBuffer(const char *str, int nbr);
+	bool WriteByte(char bybyte);
 	void FlushBuffer();
 
 
