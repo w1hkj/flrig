@@ -300,6 +300,20 @@ int Cserial::WriteBuffer(const char *buff, int n)
 }
 
 ///////////////////////////////////////////////////////
+// Function name	: Cserial::WriteByte
+// Description	  : Writes a Byte to the selected port
+// Return type	  : bool
+// Argument		 : BYTE by
+///////////////////////////////////////////////////////
+bool Cserial::WriteByte(char by)
+{
+	if (fd < 0) return false;
+	static char buff[2];
+	buff[0] = by; buff[1] = 0;
+	return (write(fd, buff, 1) == 1);
+}
+
+///////////////////////////////////////////////////////
 // Function name : Cserial::FlushBuffer
 // Description   : flushes the pending rx chars
 // Return type   : void

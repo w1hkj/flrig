@@ -32,7 +32,7 @@ enum {UI, XML};
 enum {
 	NONE,
 
-	FT100D, FT450, FT767, FT817, FT847, FT857D,
+	FT100D, FT450, FT747, FT767, FT817, FT847, FT857D,
 	FT890, FT897D, FT920, FT950, FT1000MP, FT2000, FT5000,
 
 	IC703, IC706MKIIG, IC718, IC728, IC735, IC746,
@@ -396,7 +396,7 @@ public:
 	virtual int  parse_alc(string){return 0;}
 	virtual int  parse_split(string){return 0;}
 
-enum { ERR, WARN, INFO };
+enum { ERR, WARN, INFO, DEBUG };
 enum { ASC, HEX };
 	void showresp(int level, int how, string s, string tx, string rx);
 

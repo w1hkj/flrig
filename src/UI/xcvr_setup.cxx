@@ -26,6 +26,7 @@ Fl_Counter *cntRigCatRetries=(Fl_Counter *)0;
 Fl_Counter *cntRigCatTimeout=(Fl_Counter *)0;
 Fl_Counter *cntRigCatWait=(Fl_Counter *)0;
 Fl_Counter *query_interval=(Fl_Counter *)0;
+Fl_Counter *byte_interval=(Fl_Counter *)0;
 Fl_ComboBox *selectCommPort=(Fl_ComboBox *)0;
 Fl_ComboBox *mnuBaudrate=(Fl_ComboBox *)0;
 Fl_Check_Button *btnTwoStopBit=(Fl_Check_Button *)0;
@@ -103,6 +104,10 @@ static void cb_cntRigCatWait(Fl_Counter* o, void*) {
 
 static void cb_query_interval(Fl_Counter* o, void*) {
 	progStatus.serloop_timing = (int)o->value();
+}
+
+static void cb_byte_interval(Fl_Counter* o, void*) {
+	progStatus.byte_interval = (int)o->value();
 }
 
 static void cb_selectCommPort(Fl_ComboBox*, void*) {
@@ -396,7 +401,7 @@ tabsConfig = new Fl_Tabs(0, 8, 482, 246);
 		Fl_Group* xcr_grp1 = new Fl_Group(5, 34, 195, 140);
 			xcr_grp1->box(FL_ENGRAVED_FRAME);
 
-			selectRig = new Fl_ComboBox(41, 38, 155, 22, _("Rig:"));
+			selectRig = new Fl_ComboBox(41, 36, 155, 20, _("Rig:"));
 			selectRig->tooltip(_("Select Transceiver"));
 			selectRig->box(FL_DOWN_BOX);
 			selectRig->color(FL_BACKGROUND2_COLOR);
@@ -410,7 +415,7 @@ tabsConfig = new Fl_Tabs(0, 8, 482, 246);
 			selectRig->when(FL_WHEN_RELEASE);
 			selectRig->end();
 
-			cntRigCatRetries = new Fl_Counter(96, 63, 100, 22, _("Retries"));
+			cntRigCatRetries = new Fl_Counter(96, 58, 100, 20, _("Retries"));
 			cntRigCatRetries->tooltip(_("Number of  times to resend\ncommand before giving up"));
 			cntRigCatRetries->minimum(1);
 			cntRigCatRetries->maximum(10);
@@ -421,7 +426,7 @@ tabsConfig = new Fl_Tabs(0, 8, 482, 246);
 			cntRigCatRetries->value(progStatus.comm_retries);
 			cntRigCatRetries->lstep(10);
 
-			cntRigCatTimeout = new Fl_Counter(96, 89, 100, 22, _("Retry intvl"));
+			cntRigCatTimeout = new Fl_Counter(96, 80, 100, 20, _("Retry intvl"));
 			cntRigCatTimeout->tooltip(_("Time between retries is msec"));
 			cntRigCatTimeout->minimum(2);
 			cntRigCatTimeout->maximum(200);
@@ -432,7 +437,7 @@ tabsConfig = new Fl_Tabs(0, 8, 482, 246);
 			cntRigCatTimeout->value(progStatus.comm_timeout);
 			cntRigCatTimeout->lstep(10);
 
-			cntRigCatWait = new Fl_Counter(96, 115, 100, 22, _("Cmds"));
+			cntRigCatWait = new Fl_Counter(96, 102, 100, 20, _("Cmds"));
 			cntRigCatWait->tooltip(_("Wait millseconds between sequential commands"));
 			cntRigCatWait->minimum(0);
 			cntRigCatWait->maximum(100);
@@ -443,7 +448,7 @@ tabsConfig = new Fl_Tabs(0, 8, 482, 246);
 			cntRigCatWait->value(progStatus.comm_wait);
 			cntRigCatWait->lstep(10);
 
-			query_interval = new Fl_Counter(96, 141, 100, 22, _("Poll intvl"));
+			query_interval = new Fl_Counter(96, 124, 100, 22, _("Poll intvl"));
 			query_interval->tooltip(_("Polling interval in msec"));
 			query_interval->minimum(10);
 			query_interval->maximum(5000);
@@ -453,6 +458,17 @@ tabsConfig = new Fl_Tabs(0, 8, 482, 246);
 			query_interval->align(Fl_Align(FL_ALIGN_LEFT));
 			query_interval->value(progStatus.serloop_timing);
 			query_interval->lstep(10);
+
+			byte_interval = new Fl_Counter(96, 148, 100, 22, _("Byte intvl"));
+			byte_interval->tooltip(_("Inter-byte interval (msec)"));
+			byte_interval->minimum(0);
+			byte_interval->maximum(200);
+			byte_interval->step(1);
+			byte_interval->value(0);
+			byte_interval->callback((Fl_Callback*)cb_byte_interval);
+			byte_interval->align(Fl_Align(FL_ALIGN_LEFT));
+			byte_interval->value(progStatus.byte_interval);
+			byte_interval->lstep(10);
 
 		xcr_grp1->end();
 

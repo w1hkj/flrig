@@ -31,6 +31,7 @@ struct status {
 	bool	comm_rtsplus;
 	bool	comm_dtrplus;
 	int		serloop_timing;
+	int		byte_interval;
 
 	string	aux_serial_port;
 	bool	aux_rts;

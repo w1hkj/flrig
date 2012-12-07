@@ -45,6 +45,7 @@ status progStatus = {
 	false,		// bool comm_rtsplus;
 	false,		// bool comm_dtrplus;
 	200,		// int  serloop_timing;
+	0,			// int  byte_interval;
 
 	"NONE",		// string aux_serial_port;
 	false,		// bool aux_rts;
@@ -288,6 +289,7 @@ void status::saveLastState()
 	spref.set("comm_wait", comm_wait);
 	spref.set("comm_timeout", comm_timeout);
 	spref.set("serloop_timing", serloop_timing);
+	spref.set("byte_interval", byte_interval);
 
 	spref.set("comm_echo", comm_echo);
 	spref.set("ptt_via_cat", comm_catptt);
@@ -535,6 +537,7 @@ bool status::loadXcvrState(const char *xcvr)
 		spref.get("comm_timeout", comm_timeout, comm_timeout);
 		spref.get("serloop_timing", serloop_timing, serloop_timing);
 		if (serloop_timing < 10) serloop_timing = 10; // minimum loop delay of 10 msec
+		spref.get("byte_interval", byte_interval, byte_interval);
 
 		if (spref.get("comm_echo", i, i)) comm_echo = i;
 		if (spref.get("ptt_via_cat", i, i)) comm_catptt = i;
