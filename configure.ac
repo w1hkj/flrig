@@ -83,6 +83,14 @@ AC_FUNC_STRFTIME
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([getaddrinfo gethostbyname hstrerror gmtime_r localtime_r memmove memset mkdir select setenv snprintf socket socketpair strcasecmp strcasestr strchr strdup strerror strlcpy strncasecmp strrchr strstr strtol uname unsetenv vsnprintf])
 
+### X11
+# Set ac_cv_x to yes/no
+# Define USE_X in config.h
+# Substitute X_CFLAGS and X_LIBS in Makefile
+if test "x$target_darwin" = "xno" && test "x$target_win32" = "xno"; then
+    AC_FLRIG_PKG_CHECK([x], [x11], [no], [yes])
+fi
+
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
 AC_TYPE_SIZE_T

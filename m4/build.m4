@@ -28,6 +28,11 @@ $PTW32_CFLAGS"
   fi
   if test "x$target_mingw32" = "xyes"; then
       FLRIG_BUILD_LDFLAGS="-mthreads $FLRIG_BUILD_LDFLAGS"
+  else if test "x$target_darwin" = "xyes"; then
+      FLRIG_BUILD_LDFLAGS="$FLRIG_BUILD_LDFLAGS"
+    else
+        FLRIG_BUILD_LDFLAGS="$FLRIG_BUILD_LDFLAGS -lm -lX11"
+    fi
   fi
 
   AC_SUBST([FLRIG_BUILD_CPPFLAGS])
