@@ -36,6 +36,15 @@ AC_DEFUN([AC_CHECK_FLTK], [
       FLTK_CFLAGS=`$FLTK_CONFIG --cxxflags`
       if test "x$ac_cv_static" != "xyes"; then
           FLTK_LIBS=`$FLTK_CONFIG --ldflags --use-images`
+          if test "x$target_mingw32" != "xyes"; then
+              if test "x$target_darwin" != "xyes"; then
+                  if grep -q "lX11" <<< "$FLTK_LIBS"; then
+                      FLTK_LIBS="$FLTK_LIBS";
+                  else
+                      FLTK_LIBS="$FLTK_LIBS -lm -lX11";
+                  fi
+              fi
+          fi
       else
           FLTK_LIBS=`$FLTK_CONFIG --ldstaticflags --use-images`
       fi
