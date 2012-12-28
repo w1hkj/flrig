@@ -1,6 +1,24 @@
 
 
+=Version 1.3.11=
+
+2012-12-27  David Freese  <w1hkj@w1hkj.com>
+
+	6aae7e6: fltk m4 script
+
+
+=Version 1.3.10=
+
+	5d5e739: X11 Package check
+	a6d99d4: FT747GX
+
+2012-12-07  Michael Corbin  <kc9lwk@sbcglobal.net>
+
+	42a12bb: PCR1000
+
+
 =Version 1.3.09=
+
 
 2012-12-03  Dave Freese (none)  <dave@compaq>
 
