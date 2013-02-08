@@ -17,13 +17,14 @@ private:
 	int  active_mode;
 
 	bool att_on;
-	bool is_TS870S;	
-	
+	bool is_TS870S;
+
 public:
 	RIG_TS870S();
 	~RIG_TS870S(){}
-	
+
 	void initialize();
+	virtual void shutdown();
 
 	bool get_TS870Sid();
 
@@ -31,6 +32,8 @@ public:
 	void set_vfoA(long);
 	long get_vfoB();
 	void set_vfoB(long);
+
+	int  vfo;  // 0, 1 or 2.  = A, B or Memory                 wbx2
 
 	int  get_modetype(int n);
 	void set_modeA(int val);
@@ -52,8 +55,8 @@ public:
 	void selectB();
 
 	bool can_split() { return true;}
-	void set_split(bool val);
-	int  get_split();
+	void set_split(bool val);    // boolean value only
+	int  get_split();			 // integer value
 	bool twovfos() {return true;}
 
 	int  get_smeter();
@@ -76,7 +79,7 @@ public:
 	void set_notch(bool on, int val);
 	bool get_notch(int &val);
 	void get_notch_min_max_step(int &min, int &max, int &step);
-	
+
 	void set_noise(bool val);
 	int  get_noise();
 
@@ -91,7 +94,7 @@ public:
 	const char **hitable(int);
 
 	const char * get_bwname_(int bw, int md);
-	
+
 
 };
 
