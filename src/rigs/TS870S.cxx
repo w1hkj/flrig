@@ -117,10 +117,17 @@ void RIG_TS870S::initialize()
 	rig_widgets[5].W = sldrPOWER;
 
 	selectA();
-	cmd = "AC000;"; sendCommand(cmd);
+//	cmd = "AC 00;";       sendCommand(cmd);  // ATU Off.
+	cmd = "EX0270000;";   sendCommand(cmd);  // TX Enable.		wbx2
+
 	get_preamp();
 	get_attenuator();
 	RIG_DEBUG = true;
+}
+
+// add code here for shutting down the transceiver ...
+void RIG_TS870S::shutdown()
+{
 }
 
 //----------------------------------------------------------------------
@@ -148,13 +155,13 @@ RIG_TS870S::RIG_TS870S() {
 	comm_rtscts = true;
 	comm_rtsplus = false;
 	comm_dtrplus = false;
-	comm_catptt = false;  	// default to safe
-	comm_rtsptt = false;	//	ditto (used for hardware handshake)
-	comm_dtrptt = false;	//	ditto
+	comm_catptt = false;    // default to safe
+	comm_rtsptt = false;    // ditto (used for hardware handshake)
+	comm_dtrptt = false;    // ditto
 
 //	Defaults.
-	B.imode = A.imode = 1;		// USB
-	B.iBW = A.iBW = 0x8704; 	// hi=2800Hz .. lo=300Hz
+	B.imode = A.imode = 1;      // USB
+	B.iBW = A.iBW = 0x8704;     // hi=2800Hz .. lo=300Hz
 	B.freq = A.freq = 14070000;
 	can_change_alt_vfo = true;
 
@@ -169,9 +176,10 @@ RIG_TS870S::RIG_TS870S() {
 	has_smeter =
 	has_power_out =
 	has_split =
+	has_split_AB =
 	has_noise_control =
 	has_micgain_control =
-	has_volume_control =	// see 'read_volume()' in support.cxx
+	has_volume_control =      // see 'read_volume()' in support.cxx
 	has_power_control = true;
 
 	has_tune_control = false; // disabled for now
@@ -183,7 +191,7 @@ RIG_TS870S::RIG_TS870S() {
 	has_mode_control =
 	has_bandwidth_control =
 
-	has_ifshift_control =    // See 'update_ifshift' in support.cxx
+	has_ifshift_control =     // See 'update_ifshift' in support.cxx
 
 	has_ptt_control = true;
 
@@ -227,6 +235,7 @@ void RIG_TS870S::selectA()
 	cmd = "FR0;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "Rx/Tx A", cmd, replystr);
+	vfo = 0;
 }
 
 //----------------------------------------------------------------------
@@ -235,34 +244,87 @@ void RIG_TS870S::selectB()
 	cmd = "FR1;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "Rx/Tx B", cmd, replystr);
+	vfo = 1;
 }
 
+//----------------------------------------------------------------------
+// revision is similar to TS950S code
 //----------------------------------------------------------------------
 void RIG_TS870S::set_split(bool val)
 {
-	split = val;
-	if (val) {
-		cmd = "FT1;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "Rx-A Tx-B", cmd, replystr);
-	} else {
-		cmd = "FR0;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "Rx/Tx A", cmd, replystr);
+// find out which VFO (or if Memory) is in use for RX.
+
+	cmd = "FR;";   sendCommand(cmd);
+	showresp(WARN, ASC, "RX-VFO?", cmd, replystr);
+	int ret = waitN(4, 100, "get VFO for split", ASC);
+// if incomplete data, change nothing.
+	if (ret < 4) return;
+
+	size_t p = replystr.rfind("FR");
+// if bad data, change nothing.
+	if (p == string::npos) return;
+
+// '0' = VFO-A, '1' = VFO-B, '2' = Memory.
+	switch (replystr[p+2]) {
+		case '0' : useB = false; break;
+		case '1' : useB = true; break;
+		case '2' :
+		default  : return;  // do nothing the xcvr is in memory mode
 	}
+
+	split = val;
+	if (useB) {
+		if (val) {
+			cmd = "FR1;FT0;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on B, Tx on A", cmd, replystr);
+		} else {
+			cmd = "FR1;FT1;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on B, Tx on B", cmd, replystr);
+		}
+	} else {
+		if (val) {
+			cmd = "FR0;FT1;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on A, Tx on B", cmd, replystr);
+		} else {
+			cmd = "FR0;FT0;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on A, Tx on A", cmd, replystr);
+		}
+	}
+	Fl::awake(highlight_vfo, (void *)0);
 }
 
 //----------------------------------------------------------------------
+// This works for the 950S ... you can can revert to use your
+//  IF byte 32 test if this does not work on the 870S
+//----------------------------------------------------------------------
 int RIG_TS870S::get_split()
 {
-	cmd = "IF;";
-	int ret = waitN(38, 100, "get info", ASC);
-	if (ret < 38) return split;
-
-	size_t p = replystr.rfind("IF");
+	size_t p;
+	int split = 0;
+	char rx, tx;
+// tx vfo
+	cmd = rsp = "FT";
+	cmd.append(";");
+	waitN(4, 100, "get split tx vfo", ASC);
+	p = replystr.rfind(rsp);
 	if (p == string::npos) return split;
+	tx = replystr[p+2];
 
-	split = replystr[p+32] ? true : false;
+// rx vfo
+	cmd = rsp = "FR";
+	cmd.append(";");
+	waitN(4, 100, "get split rx vfo", ASC);
+
+	p = replystr.rfind(rsp);
+	if (p == string::npos) return split;
+	rx = replystr[p+2];
+// split test
+	split = (tx == '1' ? 2 : 0) + (rx == '1' ? 1 : 0);
+
 	return split;
 }
 
@@ -382,6 +444,9 @@ int RIG_TS870S::get_power_out()
 	mtr = (mtr * 100) / 30;										//wbx
 	if (mtr > 100) mtr = 100; // but with a power limit!
 	return mtr;
+
+	// The power meter scale is not the same as Flrig's default.
+	// a change is needed, one day.   wbx2
 }
 
 //----------------------------------------------------------------------
@@ -537,7 +602,7 @@ int RIG_TS870S::get_attenuator() {
 		atten_label("Att 18", true);	// show this too..
 	}
 
-	return att_on;			// let the rest of th world know.
+	return att_on;			// let the rest of the world know.
 }
 
 //----------------------------------------------------------------------
@@ -548,8 +613,9 @@ bool RIG_TS870S::get_TS870Sid() {
 	if (ret < 6) return false;
 	size_t p = replystr.rfind("ID");			// String "ID015;"
 	if (p == string::npos) return false;		// Bytes   012345
-	if (replystr[p + 3] == '1' &&
-		replystr[p + 4] == '5')  return true;	//wbx
+	if 	(replystr[p + 2] == '0' &&				// wbx2
+		 replystr[p + 3] == '1' &&
+		 replystr[p + 4] == '5')  return true;	// wbx
 	return false;
 }
 
@@ -863,11 +929,11 @@ void RIG_TS870S::set_bwB(int val)
 		if (val < 256) return;
 		B.iBW = val;
 
-		cmd = TS870S_AM_lo[B.iBW & 0x7F];
+		cmd = TS870S_CAT_am_lo[B.iBW & 0x7F];  			// corrected wbx2
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set lower", cmd, replystr);
 
-		cmd = TS870S_AM_hi[(B.iBW >> 8) & 0x7F];
+		cmd = TS870S_CAT_am_hi[(B.iBW >> 8) & 0x7F];	// corrected wbx2
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set upper", cmd, replystr);
 
