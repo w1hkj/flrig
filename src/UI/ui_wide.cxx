@@ -884,7 +884,7 @@ Fl_Double_Window* Wide_rig_window() {
 			genericMisc = new Fl_Group(2, 179, 730, 32, _("Misc"));
 				genericMisc->hide();
 
-				cnt_vfo_adj = new Fl_Counter(104, 187, 96, 20, _("Vfo Adj(ppm)"));
+				cnt_vfo_adj = new Fl_Counter(104, 187, 96, 20, _("Vfo Adj"));
 				cnt_vfo_adj->type(1);
 				cnt_vfo_adj->callback((Fl_Callback*)cb_cnt_vfo_adj);
 				cnt_vfo_adj->align(Fl_Align(36));

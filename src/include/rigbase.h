@@ -326,6 +326,9 @@ public:
 		min = -100; max = 100; step = 1; }
 
 	virtual void setVfoAdj(double v) {}
+	virtual double getVfoAdj() {return 0;}
+	virtual void get_vfoadj_min_max_step(int &min, int &max, int &step) {
+		min = -100; max = 100; step = 1; }
 
 	virtual void set_line_out() {}
 	virtual void set_agc_level() {}

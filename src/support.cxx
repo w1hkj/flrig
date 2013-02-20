@@ -2041,7 +2041,6 @@ void cbExit()
 	pthread_mutex_unlock(&mutex_serial);
 	pthread_join(*serial_thread, NULL);
 
-	selrig->setVfoAdj(0);
 	if (progStatus.restore_rig_data){
 		selrig->set_vfoA(transceiverA.freq);
 		selrig->set_modeA(transceiverA.imode);
@@ -2613,8 +2612,13 @@ void initXcvrTab()
 				tabsGeneric->h() - 21);
 			tabsGeneric->insert(*genericMisc, 6);
 			if (selrig->has_vfo_adj) {
+				int min, max, step;
+				selrig->get_vfoadj_min_max_step(min, max, step);
+				cnt_vfo_adj->minimum(min);
+				cnt_vfo_adj->maximum(max);
+				cnt_vfo_adj->step(step);
+				progStatus.vfo_adj = selrig->getVfoAdj();
 				cnt_vfo_adj->value(progStatus.vfo_adj);
-				selrig->setVfoAdj(progStatus.vfo_adj);
 				cnt_vfo_adj->show();
 			} else
 				cnt_vfo_adj->hide();

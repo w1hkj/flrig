@@ -132,6 +132,8 @@ RIG_FT950::RIG_FT950() {
 	has_vox_hang =
 	has_vox_on_dataport =
 
+	has_vfo_adj =
+
 	has_cw_wpm =
 	has_cw_keyer =
 //	has_cw_vol =
@@ -223,6 +225,11 @@ void RIG_FT950::initialize()
 		while (*p) opSelect60->add(*p++);
 	}
 	opSelect60->index(m_60m_indx);
+
+//	cmd = "EX035;";
+//	waitN(11,100,"Read Vfo Adjust", ASC);
+//	size_t p = replystr.rfind("EX035");
+
 }
 
 void RIG_FT950::post_initialize()
@@ -286,6 +293,31 @@ void RIG_FT950::set_vfoB (long freq)
 	showresp(WARN, ASC, "SET vfo B", cmd, replystr);
 }
 
+void RIG_FT950::setVfoAdj(double v)
+{
+	char cmdstr[20];
+	snprintf(cmdstr, sizeof(cmdstr), "EX035%+03d;", (int)v);
+	cmd = cmdstr;
+	sendCommand(cmd);
+}
+
+double RIG_FT950::getVfoAdj() 
+{
+	cmd = rsp = "EX035";
+	sendCommand(cmd.append(";"));
+	waitN(9, 100, "get Vfo Adjust", ASC);
+
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return 0;
+	return (double)(atoi(&replystr[p+5]));
+}
+
+void RIG_FT950::get_vfoadj_min_max_step(int &min, int &max, int &step)
+{
+	min = -25;
+	max = 25;
+	step = 1;
+}
 
 bool RIG_FT950::twovfos()
 {
