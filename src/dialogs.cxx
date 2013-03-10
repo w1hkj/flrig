@@ -27,10 +27,7 @@ using namespace std;
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <termios.h>
-#endif
-
-#ifdef __APPLE__
-#  include <glob.h>
+#include <glob.h>
 #endif
 
 #include "rig.h"
@@ -123,6 +120,17 @@ void init_port_combos()
 	char cwd[PATH_MAX] = { '.', '\0' };
 
 	clear_combos();
+
+	glob_t gbuf;
+	glob("/dev/serial/by-id/*", 0, NULL, &gbuf);
+	for (size_t j = 0; j < gbuf.gl_pathc; j++) {
+		if ( !(stat(gbuf.gl_pathv[j], &st) == 0 && S_ISCHR(st.st_mode)) ||
+		     strstr(gbuf.gl_pathv[j], "modem") )
+			continue;
+		LOG_INFO("Found serial port %s", gbuf.gl_pathv[j]);
+			add_combos(gbuf.gl_pathv[j]);
+	}
+	globfree(&gbuf);
 
 	if (getcwd(cwd, sizeof(cwd)) == NULL) goto out;
 	if (chdir("/sys/class/tty") == -1) goto out;
