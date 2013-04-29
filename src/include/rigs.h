@@ -12,6 +12,7 @@
 #include "FT890.h"
 #include "FT920.h"
 #include "FT950.h"
+#include "FT990.h"
 #include "FT1000MP.h"
 #include "FT2000.h"
 #include "FT5000.h"
