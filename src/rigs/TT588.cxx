@@ -230,7 +230,7 @@ long RIG_TT588::get_vfoB()
 			int f = 0;
 			for (size_t n = 1; n < 5; n++)
 				f = f*256 + (unsigned char)replystr[n];
-			freqA = f;
+			freqB = f;
 		}
 	}
 	return (long)(freqB - vfo_corr);
