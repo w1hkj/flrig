@@ -162,6 +162,7 @@ RIG_FT5000::RIG_FT5000() {
 	has_cw_qsk =
 	has_cw_weight =
 
+	has_split_AB =
 	can_change_alt_vfo =
 	has_smeter =
 	has_swr_control =
@@ -180,8 +181,7 @@ RIG_FT5000::RIG_FT5000() {
 	has_preamp_control =
 	has_ifshift_control =
 	has_ptt_control =
-	has_tune_control =
-	has_swr_control = true;
+	has_tune_control = true;
 
 // derived specific
 	atten_level = 0;
