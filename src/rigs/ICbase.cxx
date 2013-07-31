@@ -43,13 +43,13 @@ bool RIG_ICOM::sendICcommand(string cmd, int nbr)
 
 // look for preamble at beginning
 	if (replystr.rfind(pre_fm) == string::npos)  {
-		LOG_ERROR("preamble");
+		LOG_ERROR("preamble: %s not in %s", pre_fm.c_str(), cmd.c_str());
 		return false;
 	}
 
 // look for postamble
 	if (replystr.rfind(post) == string::npos) {
-		LOG_ERROR("postample 0x%X", (unsigned char)post[0]);
+		LOG_ERROR("postample: %s not at end of %s", post.c_str(), cmd.c_str());
 		return false;
 	}
 	return true;
