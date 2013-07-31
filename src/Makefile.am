@@ -131,6 +131,7 @@ flrig_SOURCES += \
 	rigs/IC756PRO3.cxx \
 	rigs/IC910.cxx \
 	rigs/IC7000.cxx \
+	rigs/IC7100.cxx \
 	rigs/IC7200.cxx \
 	rigs/IC7600.cxx \
 	rigs/IC9100.cxx \
@@ -248,6 +249,7 @@ EXTRA_DIST = \
 	include/IC756PRO3.h \
 	include/IC910.h \
 	include/IC7000.h \
+	include/IC7100.h \
 	include/IC7200.h \
 	include/IC7600.h \
 	include/IC7700.h \
