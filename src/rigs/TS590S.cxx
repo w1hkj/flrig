@@ -141,11 +141,11 @@ void RIG_TS590S::initialize()
 	rig_widgets[9].W = btnNR;
 	rig_widgets[10].W = sldrNR;
 
-	selectA();
+	RIG_DEBUG = true;
 	cmd = "AC000;"; sendCommand(cmd);
+	selectA();
 	get_preamp();
 	get_attenuator();
-	RIG_DEBUG = true;
 }
 
 
