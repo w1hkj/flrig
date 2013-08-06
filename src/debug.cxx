@@ -66,7 +66,6 @@ const char* prefix[] = { _("Quiet"), _("Error"), _("Warning"), _("Info"), _("Deb
 
 static void slider_cb(Fl_Widget* w, void*);
 static void clear_cb(Fl_Widget *w, void*);
-static void save_cb(Fl_Widget *w, void*);
 
 void debug::start(const char* filename)
 {
@@ -87,8 +86,8 @@ void debug::start(const char* filename)
 	slider->value(level);
 	slider->callback(slider_cb);
 
-	Fl_Button* savebtn  = new Fl_Button(window->w() - 124, pad, 60, 20, "save");
-	savebtn->callback(save_cb);
+//	Fl_Button* savebtn  = new Fl_Button(window->w() - 124, pad, 60, 20, "save");
+//	savebtn->callback(save_cb);
 
 	Fl_Button* clearbtn = new Fl_Button(window->w() - 60, pad, 60, 20, "clear");
 	clearbtn->callback(clear_cb);
@@ -127,6 +126,7 @@ void debug::log(level_e level, const char* func, const char* srcf, int line, con
 
 	vsnprintf(sztemp, sizeof(sztemp), fmt, args);
 	estr.append(sztemp);
+	vfprintf(wfile, fmt, args);
 
 	va_end(args);
 
@@ -149,9 +149,18 @@ void debug::slog(level_e level, const char* func, const char* srcf, int line, co
 
 	vsnprintf(sztemp, sizeof(sztemp), fmt, args);
 	estr.append(sztemp);
-
+	vfprintf(wfile, fmt, args);
 	va_end(args);
+
 	fflush(wfile);
+
+	if (tty) {
+		if (level <= DEBUG_LEVEL && level >= QUIET_LEVEL) {
+			va_start(args, format);
+			vfprintf(stderr, fmt, args);
+			va_end(args);
+		}
+	}
 
     Fl::awake(sync_text, 0);
 }
@@ -185,10 +194,12 @@ debug::debug(const char* filename)
 	if ((wfile = fopen(filename, "w")) == NULL)
 		throw strerror(errno);
 	setvbuf(wfile, (char*)NULL, _IOLBF, 0);
+	set_cloexec(fileno(wfile), 1);
 
 	if ((rfile = fopen(filename, "r")) == NULL)
 		throw strerror(errno);
 	rfd = fileno(rfile);
+	set_cloexec(rfd, 1);
 #ifndef __WIN32__
 	int f;
 	if ((f = fcntl(rfd, F_GETFL)) == -1)
@@ -218,14 +229,3 @@ static void clear_cb(Fl_Widget* w, void*)
 	buffer.clear();
 }
 
-static void save_cb(Fl_Widget* w, void*)
-{
-	if (!btext->size()) return;
-	string filename = RigHomeDir;
-	filename.append("debug_log.txt");
-	ofstream out;
-	out.open(filename.c_str(), ios::app);
-	out << buffer;
-	out.close();
-	fl_alert2("Saved in %s", filename.c_str());
-}
