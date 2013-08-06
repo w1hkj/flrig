@@ -302,9 +302,9 @@ int main (int argc, char *argv[])
 	dlgDisplayConfig = DisplayDialog();
 
 	try {
-		debug::start(string(RigHomeDir).append("status_log.txt").c_str());
+		debug::start(string(RigHomeDir).append("debug_log.txt").c_str());
 		time_t t = time(NULL);
-		LOG(debug::WARN_LEVEL, debug::LOG_OTHER, _("%s log started on %s"), PACKAGE_STRING, ctime(&t));
+		LOG(debug::INFO_LEVEL, debug::LOG_OTHER, _("%s log started on %s"), PACKAGE_STRING, ctime(&t));
 	}
 	catch (const char* error) {
 		cerr << error << '\n';
@@ -384,7 +384,7 @@ int parse_args(int argc, char **argv, int& idx)
   --help this help text\n\
   --version\n\
   --config-dir <DIR>\n\
-  --debug (both rig and xml)\n\
+  --debug-level N (0..4)\n\
   --rig_debug\n\
   --xml_debug\n\
   --exp (expand menu tab controls)\n\n");
@@ -404,10 +404,17 @@ int parse_args(int argc, char **argv, int& idx)
 		idx++;
 		return 1;
 	}
-	if (strcasecmp("--debug", argv[idx]) == 0) {
-		RIG_DEBUG = true;
-		XML_DEBUG = true;
-		idx++;
+	if (strcasecmp("--debug-level", argv[idx]) == 0) {
+		string level = argv[idx + 1];
+		switch (level[0]) {
+			case '0': debug::level = debug::QUIET_LEVEL; break;
+			case '1': debug::level = debug::ERROR_LEVEL; break;
+			case '2': debug::level = debug::WARN_LEVEL; break;
+			case '3': debug::level = debug::INFO_LEVEL; break;
+			case '4': debug::level = debug::DEBUG_LEVEL; break;
+			default : debug::level = debug::WARN_LEVEL;
+		}
+		idx += 2;
 		return 1;
 	}
 	if (strcasecmp("--config-dir", argv[idx]) == 0) {
