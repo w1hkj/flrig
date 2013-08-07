@@ -128,7 +128,6 @@ bool RIG_FT920::get_info()
 		afreq = afreq * 1.25;
 		bfreq = bfreq * 1.25;
 		int md = replybuff[p+5];
-		int mode = md & 0x07;
 		switch (md) {
 			case 0 : 
 				amode = (md & 0x40) ? 1 : 0;
@@ -154,7 +153,6 @@ bool RIG_FT920::get_info()
 		aBW = (md & 0x80) ? 0 : 1;
 
 		md = replybuff[p + 19];
-		mode = md & 0x07;
 		switch (md) {
 			case 0 : 
 				bmode = (md & 0x40) ? 1 : 0;

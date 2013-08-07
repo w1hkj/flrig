@@ -81,7 +81,6 @@ static bool open_serial(const char* dev)
 #  define TTY_MAX 255
 void init_port_combos()
 {
-	int retval;
 	clear_combos();
 
 	char ttyname[21];

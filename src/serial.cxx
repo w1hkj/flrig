@@ -730,7 +730,9 @@ void Cserial::SetPTT(bool ON)
 	}
 
 	LOG_INFO("PTT %d, DTRptt %d, DTR %d, RTSptt %d, RTS %d, RTSCTS %d, %2x %2x",
-		ON, dtrptt, dtr, rtsptt, rts, rtscts, dcb.fDtrControl, dcb.fRtsControl);
+		ON, dtrptt, dtr, rtsptt, rts, rtscts, 
+		static_cast<unsigned int>(dcb.fDtrControl), 
+		static_cast<unsigned int>(dcb.fRtsControl) );
 
 	SetCommState(hComm, &dcb);
 }

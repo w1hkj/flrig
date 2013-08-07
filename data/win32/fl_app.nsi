@@ -104,7 +104,6 @@ Section "FLRIG"
 	SectionIn RO
 	SetOutPath $INSTDIR
 	File "${FLRIG_BINARY}"
-	File /nonfatal "${MINGWM_DLL}" "${PTW32_DLL}"
 SectionEnd
 
 # Start Menu path

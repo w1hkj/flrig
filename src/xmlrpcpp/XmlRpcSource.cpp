@@ -187,7 +187,9 @@ namespace XmlRpc {
       _ssl = 0;
     }
 #endif
+#if !defined( __WIN32__ )
     if (_fd != -1)
+#endif
     {
       XmlRpcUtil::log(2,"XmlRpcSource::close: closing socket %d.", _fd);
       XmlRpcSocket::close(_fd);
