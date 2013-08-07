@@ -304,6 +304,10 @@ int main (int argc, char *argv[])
 	try {
 		debug::start(string(RigHomeDir).append("debug_log.txt").c_str());
 		time_t t = time(NULL);
+// for testing purposes only
+		debug::level = debug::DEBUG_LEVEL;
+		RIG_DEBUG = true;
+//
 		LOG(debug::INFO_LEVEL, debug::LOG_OTHER, _("%s log started on %s"), PACKAGE_STRING, ctime(&t));
 	}
 	catch (const char* error) {
