@@ -198,7 +198,6 @@ RIG_TT566::RIG_TT566() {
 	can_change_alt_vfo =
 	has_smeter =
 	has_power_out =
-	has_swr_control =
 	has_rf_control =
 	has_volume_control =
 	has_micgain_control =

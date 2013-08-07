@@ -159,7 +159,6 @@ RIG_TS2000::RIG_TS2000() {
 	has_split_AB =
 	has_dsp_controls =
 	has_rf_control =
-	has_micgain_control =
 	has_notch_control =
 	has_auto_notch =
 	has_ifshift_control =

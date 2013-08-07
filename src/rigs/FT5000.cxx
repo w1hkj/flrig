@@ -454,23 +454,18 @@ void RIG_FT5000::tune_rig()
 
 void RIG_FT5000::set_attenuator(int val)
 {
-	int cmdval = 0;
 	if (atten_level == 0) {
 		atten_level = 1;
 		atten_label("6 dB", true);
-		cmdval = 0x06;
 	} else if (atten_level == 1) {
 		atten_level = 2;
 		atten_label("12 dB", true);
-		cmdval = 0x12;
 	} else if (atten_level == 2) {
 		atten_level = 3;
 		atten_label("18 dB", true);
-		cmdval = 0x18;
 	} else if (atten_level == 3) {
 		atten_level = 0;
 		atten_label("Att", false);
-		cmdval = 0x00;
 	}
 	cmd = "RA00;";
 	cmd[3] += atten_level;
