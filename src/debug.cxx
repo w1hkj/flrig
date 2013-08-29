@@ -125,8 +125,9 @@ void debug::log(level_e level, const char* func, const char* srcf, int line, con
 	va_start(args, format);
 
 	vsnprintf(sztemp, sizeof(sztemp), fmt, args);
+
 	estr.append(sztemp);
-	vfprintf(wfile, fmt, args);
+	fprintf(wfile, "%s", sztemp);
 
 	va_end(args);
 
@@ -149,7 +150,7 @@ void debug::slog(level_e level, const char* func, const char* srcf, int line, co
 
 	vsnprintf(sztemp, sizeof(sztemp), fmt, args);
 	estr.append(sztemp);
-	vfprintf(wfile, fmt, args);
+	fprintf(wfile, "%s", sztemp);
 	va_end(args);
 
 	fflush(wfile);
@@ -157,7 +158,8 @@ void debug::slog(level_e level, const char* func, const char* srcf, int line, co
 	if (tty) {
 		if (level <= DEBUG_LEVEL && level >= QUIET_LEVEL) {
 			va_start(args, format);
-			vfprintf(stderr, fmt, args);
+			vsnprintf(sztemp, sizeof(sztemp), fmt, args);
+			fprintf(wfile, "%s", sztemp);
 			va_end(args);
 		}
 	}

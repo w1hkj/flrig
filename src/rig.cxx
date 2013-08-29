@@ -286,21 +286,6 @@ int main (int argc, char *argv[])
 		RigHomeDir = dirbuf;
 	checkdirectories();
 
-	progStatus.loadLastState();
-
-	if (progStatus.UIsize == small_ui)
-		mainwindow = Small_rig_window();
-	else
-		mainwindow = Wide_rig_window();
-
-	mainwindow->callback(exit_main);
-
-	progStatus.UI_laststate();
-
-	fntbrowser = new Font_Browser;
-	dlgMemoryDialog = Memory_Dialog();
-	dlgDisplayConfig = DisplayDialog();
-
 	try {
 		debug::start(string(RigHomeDir).append("debug_log.txt").c_str());
 		time_t t = time(NULL);
@@ -315,6 +300,21 @@ int main (int argc, char *argv[])
 		debug::stop();
 		exit(1);
 	}
+
+	progStatus.loadLastState();
+
+	if (progStatus.UIsize == small_ui)
+		mainwindow = Small_rig_window();
+	else
+		mainwindow = Wide_rig_window();
+
+	mainwindow->callback(exit_main);
+
+	progStatus.UI_laststate();
+
+	fntbrowser = new Font_Browser;
+	dlgMemoryDialog = Memory_Dialog();
+	dlgDisplayConfig = DisplayDialog();
 
 	Fl::lock();
 

@@ -138,7 +138,7 @@ void init_port_combos()
 	ssize_t len;
 	struct dirent* dp;
 
-	LOG_WARN("%s", "Searching /sys/class/tty/");
+	LOG_INFO("%s", "Searching /sys/class/tty/");
 
 	while ((dp = readdir(sys))) {
 #  ifdef _DIRENT_HAVE_D_TYPE
@@ -152,7 +152,7 @@ void init_port_combos()
 			snprintf(ttyname, sizeof(ttyname), "/dev/%s", dp->d_name);
 			if (stat(ttyname, &st) == -1 || !S_ISCHR(st.st_mode))
 				continue;
-			LOG_WARN("Found serial port %s", ttyname);
+			LOG_INFO("Found serial port %s", ttyname);
 			add_combos(ttyname);
 			ret = true;
 		}
