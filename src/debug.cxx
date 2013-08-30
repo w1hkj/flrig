@@ -86,9 +86,6 @@ void debug::start(const char* filename)
 	slider->value(level);
 	slider->callback(slider_cb);
 
-//	Fl_Button* savebtn  = new Fl_Button(window->w() - 124, pad, 60, 20, "save");
-//	savebtn->callback(save_cb);
-
 	Fl_Button* clearbtn = new Fl_Button(window->w() - 60, pad, 60, 20, "clear");
 	clearbtn->callback(clear_cb);
 
