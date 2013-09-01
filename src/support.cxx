@@ -195,17 +195,6 @@ void read_mode()
 			pthread_mutex_unlock(&mutex_xmlrpc);
 			Fl::awake(setModeControl);
 			set_bandwidth_control();
-		} else {	// mode and bwtable are in sync so read vfoA bw
-			nu_BW = selrig->get_bwA();
-			if (nu_BW != vfoA.iBW) {
-				pthread_mutex_lock(&mutex_xmlrpc);
-				vfoA.iBW = vfo.iBW = nu_BW;
-				Fl::awake(setBWControl);
-				try {
-					send_new_bandwidth(vfo.iBW);
-				} catch (...) {}
-				pthread_mutex_unlock(&mutex_xmlrpc);
-			}
 		}
 	} else {
 		nu_mode = selrig->get_modeB();
@@ -224,18 +213,7 @@ void read_mode()
 			pthread_mutex_unlock(&mutex_xmlrpc);
 			Fl::awake(setModeControl);
 			set_bandwidth_control();
-		} else {	// mode and bwtable are in sync so read vfoB bw
-			nu_BW = selrig->get_bwB();
-			if (nu_BW != vfoB.iBW) {
-				pthread_mutex_lock(&mutex_xmlrpc);
-				vfoB.iBW = vfo.iBW = nu_BW;
-				Fl::awake(setBWControl);
-				try {
-					send_new_bandwidth(vfo.iBW);
-				} catch (...) {}
-				pthread_mutex_unlock(&mutex_xmlrpc);
-			}
-		}
+		} 
 	}
 	pthread_mutex_unlock(&mutex_serial);
 }
@@ -275,8 +253,6 @@ void setBWControl(void *)
 
 void read_bandwidth()
 {
-	return;
-	
 	pthread_mutex_lock(&mutex_serial);
 	int nu_BW;
 	if (!useB) {
