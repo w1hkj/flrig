@@ -59,7 +59,7 @@ static Fl_Browser*			btext;
 static string buffer;
 
 debug* debug::inst = 0;
-debug::level_e debug::level = debug::ERROR_LEVEL;
+debug::level_e debug::level = debug::INFO_LEVEL;
 uint32_t debug::mask = ~0u;
 
 const char* prefix[] = { _("Quiet"), _("Error"), _("Warning"), _("Info"), _("Debug") };
@@ -111,8 +111,8 @@ bool   debug_in_use = false;
 
 void debug::log(level_e level, const char* func, const char* srcf, int line, const char* format, ...)
 {
-	if (!inst)
-		return;
+	if (!inst) return;
+	if (level > debug::level) return;
 
 	snprintf(fmt, sizeof(fmt), "%c: %s: %s\n", *prefix[level], func, format);
 
@@ -135,8 +135,8 @@ void debug::log(level_e level, const char* func, const char* srcf, int line, con
 
 void debug::slog(level_e level, const char* func, const char* srcf, int line, const char* format, ...)
 {
-	if (!inst)
-		return;
+	if (!inst) return;
+	if (level > debug::level) return;
 
 	snprintf(fmt, sizeof(fmt), "%c:%s\n", *prefix[level], format);
 
@@ -152,20 +152,12 @@ void debug::slog(level_e level, const char* func, const char* srcf, int line, co
 
 	fflush(wfile);
 
-	if (tty) {
-		if (level <= DEBUG_LEVEL && level >= QUIET_LEVEL) {
-			va_start(args, format);
-			vsnprintf(sztemp, sizeof(sztemp), fmt, args);
-			fprintf(wfile, "%s", sztemp);
-			va_end(args);
-		}
-	}
-
     Fl::awake(sync_text, 0);
 }
 
 void debug::elog(const char* func, const char* srcf, int line, const char* text)
 {
+	if (level > debug::level) return;
 	log(ERROR_LEVEL, func, srcf, line, "%s: %s", text, strerror(errno));
 }
 

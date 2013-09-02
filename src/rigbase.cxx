@@ -301,15 +301,15 @@ void rigbase::showresp(int level, int how, string s, string tx, string rx)
 
 	switch (level) {
 	case ERR:
-		SLOG_ERROR("%s: %10s, cmd %s, ans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
+		SLOG_ERROR("%s: %10s\ncmd %s\nans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
 		break;
 	case WARN:
-		SLOG_WARN("%s: %10s, cmd %s, ans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
+		SLOG_WARN("%s: %10s\ncmd %s\nans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
 		break;
 	case INFO:
-		SLOG_INFO("%s: %10s, cmd %s, ans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
+		SLOG_INFO("%s: %10s\ncmd %s\nans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
 	default:
-		SLOG_DEBUG("%s: %10s, cmd %s, ans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
+		SLOG_DEBUG("%s: %10s\ncmd %s\nans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
 	}
 }
 
