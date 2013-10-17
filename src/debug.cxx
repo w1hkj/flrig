@@ -59,7 +59,7 @@ static Fl_Browser*			btext;
 static string buffer;
 
 debug* debug::inst = 0;
-debug::level_e debug::level = debug::INFO_LEVEL;
+debug::level_e debug::level = debug::ERROR_LEVEL;
 uint32_t debug::mask = ~0u;
 
 const char* prefix[] = { _("Quiet"), _("Error"), _("Warning"), _("Info"), _("Debug") };
