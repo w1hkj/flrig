@@ -308,6 +308,7 @@ void rigbase::showresp(int level, int how, string s, string tx, string rx)
 		break;
 	case INFO:
 		SLOG_INFO("%s: %10s\ncmd %s\nans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
+		break;
 	default:
 		SLOG_DEBUG("%s: %10s\ncmd %s\nans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
 	}

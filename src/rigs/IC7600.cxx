@@ -94,6 +94,9 @@ RIG_IC7600::RIG_IC7600() {
 	has_compON =
 	has_compression =
 
+	has_split =
+	has_split_AB =
+
 	has_micgain_control =
 	has_bandwidth_control = true;
 
@@ -139,6 +142,51 @@ void RIG_IC7600::selectB()
 	cmd += '\xD1';
 	cmd.append(post);
 	sendICcommand(cmd, 6);
+	checkresponse();
+}
+
+bool RIG_IC7600::can_split()
+{
+	return true;
+}
+
+void RIG_IC7600::set_split(bool val)
+{
+	split = val;
+	if (val) {
+		cmd.assign(pre_to);
+		cmd.append("\x0F");
+		cmd += '\x01';
+		cmd.append( post );
+		waitFB("Split ON");
+	} else {
+		cmd.assign(pre_to);
+		cmd.append("\x0F");
+		cmd += '\x00';
+		cmd.append( post );
+		waitFB("Split OFF");
+	}
+}
+
+int RIG_IC7600::get_split()
+{
+	int split = 0;
+	cmd.assign(pre_to);
+	cmd.append("\x0F");
+	cmd.append( post );
+	if (sendICcommand (cmd, 7))
+		split = replystr[5];
+	return split;
+}
+
+void RIG_IC7600::swapvfos()
+{
+	cmd = pre_to;
+	cmd += 0x07; cmd += 0xB0;
+	cmd.append(post);
+	if (IC7600_DEBUG)
+		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
+	sendICcommand (cmd, 6);
 	checkresponse();
 }
 
@@ -550,3 +598,4 @@ void RIG_IC7600::set_cw_vol()
 	cmd.append( post );
 	waitFB("SET cw sidetone volume");
 }
+

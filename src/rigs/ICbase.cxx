@@ -37,6 +37,9 @@ bool RIG_ICOM::sendICcommand(string cmd, int nbr)
 {
 	int ret = sendCommand(cmd);
 
+	if (RigSerial.IsOpen() == false)
+		return false;
+
 	if (ret < nbr) {
 		LOG_ERROR("Expected %d received %d", nbr, ret);
 		return false;

@@ -19,6 +19,13 @@ public:
 	void set_modeB(int val);
 	int  get_modeB();
 
+	bool can_split();
+	void set_split(bool);
+	int  get_split();
+
+	void swapvfos();
+	bool  canswap() { return true;}
+
 	void set_bwA(int val);
 	int  get_bwA();
 

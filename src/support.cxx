@@ -1220,6 +1220,10 @@ int movFreqB() {
 
 void cbAswapB()
 {
+	if (selrig->canswap()) {
+		selrig->swapvfos();
+		return;
+	}
 	if (Fl::event_button() == FL_RIGHT_MOUSE) {
 		return cbA2B();
 	}

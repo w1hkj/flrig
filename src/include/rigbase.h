@@ -238,6 +238,8 @@ public:
 	virtual void set_split(bool val) {split = val;}
 	virtual int  get_split() {return split;}
 	virtual bool twovfos() {return false;}
+	virtual void swapvfos() {}
+	virtual bool  canswap() { return false;}
 
 	virtual int  get_smeter(void) {return -1;}
 	virtual int  get_swr(void) {return -1;}
