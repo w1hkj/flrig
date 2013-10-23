@@ -989,6 +989,8 @@ void RIG_FT950::set_notch(bool on, int val)
 		showresp(WARN, ASC, "SET notch off", cmd, replystr);
 	}
 
+	if (!on) return;
+
 	cmd[3] = '1'; // manual NOTCH position
 	cmd[6] = '0';
 	if (val % 10 >= 5) val += 10;
@@ -1009,7 +1011,6 @@ bool  RIG_FT950::get_notch(int &val)
 	waitN(8, 100, "get notch on/off", ASC);
 
 	size_t p = replystr.rfind(rsp);
-	val = progStatus.notch_val = 1500;		// fix default slider position if disabled
 	if (p == string::npos) return ison;
 
 	if (replystr[p+6] == '1') { // manual notch enabled

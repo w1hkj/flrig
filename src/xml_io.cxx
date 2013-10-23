@@ -67,7 +67,12 @@ bool fldigi_online = false;
 bool rig_reset = false;
 bool ptt_on = false;
 
-bool ignore = false;
+int ignore = 0; // skip next "ignore" read loops
+
+int try_count = CHECK_UPDATE_COUNT;
+
+int xml_notch_val = 0;
+bool xml_notch_on = false;
 
 //=====================================================================
 // socket ops
@@ -133,7 +138,7 @@ void send_modes() {
 
 	try {
 		execute(rig_set_modes, modes, res);
-		ignore = true;
+		ignore = 1;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
 			LOG_ERROR("%s", e.getMessage().c_str());
@@ -152,7 +157,7 @@ void send_bandwidths()
 
 	try {
 		execute(rig_set_bandwidths, bandwidths, res);
-		ignore = true;
+		ignore = 1;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
 			LOG_ERROR("%s", e.getMessage().c_str());
@@ -165,7 +170,7 @@ void send_name()
 	try {
 		XmlRpcValue res;
 		execute(rig_set_name, XmlRpcValue(selrig->name_), res);
-		ignore = true;
+		ignore = 1;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
 			LOG_ERROR("%s", e.getMessage().c_str());
@@ -178,7 +183,7 @@ void send_ptt_changed(bool PTT)
 	try {
 		XmlRpcValue res;
 		execute((PTT ? main_set_tx : main_set_rx), XmlRpcValue(), res);
-		ignore = true;
+		ignore = 1;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
 			LOG_ERROR("%s", e.getMessage().c_str());
@@ -191,7 +196,7 @@ void send_new_freq(long freq)
 		xmlvfo.freq = freq;
 		XmlRpcValue f((double)freq), res;
 		execute(rig_set_frequency, f, res);
-		ignore = true;
+		ignore = 1;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
 			LOG_ERROR("%s", e.getMessage().c_str());
@@ -203,7 +208,13 @@ void send_new_notch(int freq)
 	try {
 		XmlRpcValue i(freq), res;
 		execute(rig_set_notch, i, res);
-		ignore = true;
+		ignore = 1;
+		if (freq == 0)
+			xml_notch_on = false;
+		else {
+			xml_notch_on = true;
+			xml_notch_val = freq;
+		}
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
 			LOG_ERROR("%s", e.getMessage().c_str());
@@ -232,7 +243,7 @@ void send_new_mode(int md)
 		xmlvfo.imode = md;
 		XmlRpcValue mode(selrig->modes_[md]), res;
 		execute(rig_set_mode, mode, res);
-		ignore = true;
+		ignore = 1;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
 			LOG_ERROR("%s", e.getMessage().c_str());
@@ -246,7 +257,7 @@ void send_new_bandwidth(int bw)
 		xmlvfo.iBW = bw;
 		XmlRpcValue bandwidth(selrig->bandwidths_[bw]), res;
 		execute(rig_set_bandwidth, bandwidth, res);
-		ignore = true;
+		ignore = 1;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
 			LOG_ERROR("%s", e.getMessage().c_str());
@@ -258,7 +269,7 @@ void send_sideband()
 	try {
 		XmlRpcValue sideband(selrig->get_modetype(vfo.imode) == 'U' ? "USB" : "LSB"), res;
 		execute(main_set_wf_sideband, sideband, res);
-		ignore = true;
+		ignore = 1;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
 			LOG_ERROR("%s", e.getMessage().c_str());
@@ -341,11 +352,15 @@ static void check_for_bandwidth_change(const XmlRpcValue& new_bw)
 
 static void check_for_notch_change(const XmlRpcValue& new_notch)
 {
-	if (!selrig->has_notch_control) return;
 	int ntch = new_notch;
-	int ntch_step = sldrNOTCH->step();
-	if ((!ntch && progStatus.notch) || (ntch && (ntch / ntch_step != progStatus.notch_val / ntch_step)))
-		Fl::awake(setNotchControl, (void*)ntch);
+	if (ntch == 0 && xml_notch_on)
+		xml_notch_on = false;
+	else
+	if (ntch != xml_notch_val ) {
+		xml_notch_on = true;
+		xml_notch_val = ntch;
+		Fl::awake(setNotchControl, (void *)ntch);
+	}
 }
 
 static void push2que()
@@ -428,13 +443,13 @@ static void get_fldigi_status()
 	XmlRpcValue status;
 	XmlRpcValue param((int)0);
 	string xmlcall;
+	if (ignore) {
+		--ignore;
+		return;
+	}
 	try {
 		xmlcall = "system.multicall";
 		execute(xmlcall.c_str(), *status_query, status);
-		if (ignore) {
-			ignore = false;
-			return;
-		}
 		check_for_ptt_change(status[0][0]);
 		if (!ptt_on) {
 			xmlvfo.src = XML;
@@ -450,16 +465,17 @@ static void get_fldigi_status()
 		throw;
 	}
 	try {
-		xmlcall = rig_get_notch;
-		execute(xmlcall.c_str(), param, status);
-		check_for_notch_change(status);
+		if (selrig->has_notch_control) {
+			xmlcall = rig_get_notch;
+			execute(xmlcall.c_str(), param, status);
+			check_for_notch_change(status);
+		}
 	} catch (...) {
 	}
 }
 
 void * digi_loop(void *d)
 {
-	int try_count = CHECK_UPDATE_COUNT;
 	for (;;) {
 		MilliSleep(RIG_UPDATE_INTERVAL);
 		if (!run_digi_loop) break;

@@ -493,10 +493,12 @@ void read_nr()
 }
 
 // manual notch
+bool rig_notch;
+int  rig_notch_val;
 void update_notch(void *d)
 {
-	btnNotch->value(progStatus.notch);
-	sldrNOTCH->value(progStatus.notch_val);
+	btnNotch->value(progStatus.notch = rig_notch);
+	sldrNOTCH->value(progStatus.notch_val = rig_notch_val);
 	send_new_notch(progStatus.notch ? progStatus.notch_val : 0);
 }
 
@@ -504,9 +506,10 @@ void read_notch()
 {
 	if (!selrig->has_notch_control) return;
 	pthread_mutex_lock(&mutex_serial);
-		progStatus.notch = selrig->get_notch(progStatus.notch_val);
+		rig_notch = selrig->get_notch(rig_notch_val);
 	pthread_mutex_unlock(&mutex_serial);
-	Fl::awake(update_notch, (void*)0);
+	if (rig_notch != progStatus.notch || rig_notch_val != progStatus.notch_val)
+		Fl::awake(update_notch, (void*)0);
 }
 
 // power_control
@@ -1592,16 +1595,21 @@ void setNR()
 
 void cbbtnNotch()
 {
-	pthread_mutex_lock(&mutex_serial);
-	if (btnNotch->value() == 0) {
-		selrig->set_notch(false, 0);
-	} else {
-		selrig->set_notch(true, (int)floor(sldrNOTCH->value()));
-	}
-	pthread_mutex_unlock(&mutex_serial);
+	progStatus.notch = btnNotch->value();
+	progStatus.notch_val = sldrNOTCH->value();
 	try {
 		send_new_notch(progStatus.notch ? progStatus.notch_val : 0);
 	} catch (...) {}
+
+	pthread_mutex_lock(&mutex_serial);
+
+	if (btnNotch->value() == 0)
+		selrig->set_notch(false, 0);
+	else
+		selrig->set_notch(true, (int)floor(sldrNOTCH->value()));
+
+	pthread_mutex_unlock(&mutex_serial);
+
 	setFocus();
 }
 
@@ -1614,6 +1622,7 @@ void cbAN()
 	setFocus();
 }
 
+// called from xml_io thread
 void setNotchControl(void *d)
 {
 	int val = (long)d;
@@ -1633,15 +1642,14 @@ void setNotchControl(void *d)
 
 void setNotch()
 {
-	if (btnNotch->value() || selrig->allow_notch_changes) {
-		progStatus.notch = btnNotch->value();
+	if (progStatus.notch && selrig->allow_notch_changes) {
 		progStatus.notch_val = sldrNOTCH->value();
+		try {
+			send_new_notch(progStatus.notch_val);
+		} catch (...) {}
 		pthread_mutex_lock(&mutex_serial);
 			selrig->set_notch(progStatus.notch, progStatus.notch_val);
 		pthread_mutex_unlock(&mutex_serial);
-		try {
-			send_new_notch(progStatus.notch ? progStatus.notch_val : 0);
-		} catch (...) {}
 	}
 }
 
