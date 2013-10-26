@@ -40,6 +40,17 @@ FREQMODE transceiverA;
 FREQMODE transceiverB;
 FREQMODE xmlvfo = vfoA;
 
+enum {VOL, MIC, PWR, SQL, IFSH, NOTCH, RFGAIN, NR };
+
+struct SLIDER { 
+	int  which;
+	float value;
+	bool button;
+	SLIDER(int a, float f, bool b = false) {which = a; value = f; button = b;}
+};
+
+queue<SLIDER> sliders;
+
 queue<FREQMODE> queA;
 queue<FREQMODE> queB;
 queue<bool> quePTT;
@@ -47,6 +58,15 @@ queue<bool> quePTT;
 bool useB = false;
 bool changed_vfo = false;
 bool pushedB = false;
+
+bool volume_changed = false;
+bool mic_changed = false;
+bool power_changed = false;
+bool squelch_changed = false;
+bool if_shift_changed = false;
+bool notch_changed = false;
+bool rfgain_changed = false;
+bool noise_reduction_changed = false;
 
 const char **old_bws = NULL;
 
@@ -99,7 +119,7 @@ char *print(FREQMODE data)
 		(data.iBW > 256 && selrig->has_dsp_controls) ?
 			(dsplo ? dsplo[data.iBW & 0x7F] : "??") : (bwt ? bwt[data.iBW] : "lo n/a"),
 		(data.iBW > 256 && selrig->has_dsp_controls) ?
-			(dsphi ? dsphi[(data.iBW >> 8) & 0x7F] : "??") : "hi n/a" 
+			(dsphi ? dsphi[(data.iBW >> 8) & 0x7F] : "??") : "hi n/a"
 		);
 	return str;
 }
@@ -157,10 +177,15 @@ void read_vfo()
 
 void setModeControl(void *)
 {
+
+
+
 	opMODE->index(vfo.imode);
 
 // enables/disables the IF shift control, depending on the mode.
 // the IF Shift function, is ONLY valid in CW modes, with the 870S.
+
+
 	if (rig_nbr == TS870S) {
 		if (vfo.imode == RIG_TS870S::tsCW || vfo.imode == RIG_TS870S::tsCWR) {
 			btnIFsh->activate();
@@ -170,6 +195,8 @@ void setModeControl(void *)
 			sldrIFSHIFT->deactivate();
 		}
 	}
+
+
 }
 
 // mode and bandwidth
@@ -213,7 +240,7 @@ void read_mode()
 			pthread_mutex_unlock(&mutex_xmlrpc);
 			Fl::awake(setModeControl);
 			set_bandwidth_control();
-		} 
+		}
 	}
 	pthread_mutex_unlock(&mutex_serial);
 }
@@ -339,7 +366,7 @@ void update_auto_notch(void *d)
 
 void read_auto_notch()
 {
-	if (!selrig->has_auto_notch) return;
+	if (!selrig->has_auto_notch || notch_changed) return;
 	pthread_mutex_lock(&mutex_serial);
 		progStatus.auto_notch = selrig->get_auto_notch();
 	pthread_mutex_unlock(&mutex_serial);
@@ -444,7 +471,7 @@ long nlone = 1L;
 
 void read_volume()
 {
-	if (!selrig->has_volume_control) return;
+	if (!selrig->has_volume_control || volume_changed) return;
 	int vol;
 	pthread_mutex_lock(&mutex_serial);
 		vol = selrig->get_volume_control();
@@ -463,12 +490,13 @@ void read_volume()
 void update_ifshift(void *d)
 {
 	btnIFsh->value(progStatus.shift);
-	sldrIFSHIFT->value(progStatus.shift_val);
+//	if (progStatus.shift)
+		sldrIFSHIFT->value(progStatus.shift_val);
 }
 
 void read_ifshift()
 {
-	if (!selrig->has_ifshift_control) return;
+	if (!selrig->has_ifshift_control || if_shift_changed) return;
 	pthread_mutex_lock(&mutex_serial);
 		progStatus.shift = selrig->get_if_shift(progStatus.shift_val);
 	pthread_mutex_unlock(&mutex_serial);
@@ -484,7 +512,7 @@ void update_nr(void *d)
 
 void read_nr()
 {
-	if (!selrig->has_noise_reduction) return;
+	if (!selrig->has_noise_reduction || noise_reduction_changed) return;
 	pthread_mutex_lock(&mutex_serial);
 		progStatus.noise_reduction = selrig->get_noise_reduction();
 		progStatus.noise_reduction_val = selrig->get_noise_reduction_val();
@@ -504,7 +532,7 @@ void update_notch(void *d)
 
 void read_notch()
 {
-	if (!selrig->has_notch_control) return;
+	if (!selrig->has_notch_control || notch_changed) return;
 	pthread_mutex_lock(&mutex_serial);
 		rig_notch = selrig->get_notch(rig_notch_val);
 	pthread_mutex_unlock(&mutex_serial);
@@ -529,7 +557,7 @@ void update_power_control(void *d)
 
 void read_power_control()
 {
-	if (!selrig->has_power_control) return;
+	if (!selrig->has_power_control || power_changed) return;
 	pthread_mutex_lock(&mutex_serial);
 		progStatus.power_level = selrig->get_power_control();
 	pthread_mutex_unlock(&mutex_serial);
@@ -544,7 +572,7 @@ void update_mic_gain(void *d)
 
 void read_mic_gain()
 {
-	if (!selrig->has_micgain_control) return;
+	if (!selrig->has_micgain_control || mic_changed) return;
 	pthread_mutex_lock(&mutex_serial);
 		progStatus.mic_gain = selrig->get_mic_gain();
 	pthread_mutex_unlock(&mutex_serial);
@@ -559,7 +587,7 @@ void update_rfgain(void *d)
 
 void read_rfgain()
 {
-	if (!selrig->has_rf_control) return;
+	if (!selrig->has_rf_control || rfgain_changed) return;
 	pthread_mutex_lock(&mutex_serial);
 		progStatus.rfgain = selrig->get_rf_gain();
 	pthread_mutex_unlock(&mutex_serial);
@@ -574,7 +602,7 @@ void update_squelch(void *d)
 
 void read_squelch()
 {
-	if (!selrig->has_sql_control) return;
+	if (!selrig->has_sql_control || squelch_changed) return;
 	pthread_mutex_lock(&mutex_serial);
 		progStatus.squelch = selrig->get_squelch();
 	pthread_mutex_unlock(&mutex_serial);
@@ -731,6 +759,67 @@ void servicePTT()
 	pthread_mutex_unlock(&mutex_ptt);
 }
 
+void serviceSliders()
+{
+	SLIDER working(0,0);
+	pthread_mutex_lock(&mutex_serial);
+	while(!sliders.empty()) {
+		working = sliders.front();
+		sliders.pop();
+		switch (working.which) {
+			case VOL:
+				selrig->set_volume_control(working.value);
+				progStatus.volume = working.value;
+				volume_changed = false;
+				break;
+			case MIC:
+				progStatus.mic_gain = working.value;
+				selrig->set_mic_gain(working.value);
+				mic_changed = false;
+				break;
+			case PWR:
+				selrig->set_power_control(working.value);
+				power_changed = false;
+				break;
+			case SQL:
+				progStatus.squelch = working.value;
+				selrig->set_squelch(working.value);
+				squelch_changed = false;
+				break;
+			case IFSH:
+				progStatus.shift = working.button;
+				progStatus.shift_val = working.value;
+				selrig->set_if_shift(working.value);
+				if_shift_changed = false;
+				break;
+			case NOTCH:
+				progStatus.notch = working.button;
+				progStatus.notch_val = working.value;
+				selrig->set_notch(working.button, working.value);
+				try {
+					send_new_notch(working.button ? working.value : 0);
+				} catch (...) {}
+				notch_changed = false;
+				break;
+			case RFGAIN:
+				progStatus.rfgain = working.value;
+				selrig->set_rf_gain(working.value);
+				rfgain_changed = false;
+				break;
+			case NR:
+				progStatus.noise_reduction = working.button;
+				progStatus.noise_reduction_val = working.value;
+				selrig->set_noise_reduction(working.button);
+				selrig->set_noise_reduction_val(working.value);
+				noise_reduction_changed = false;
+				break;
+			default :
+				break;
+		}
+	}
+	pthread_mutex_unlock(&mutex_serial);
+}
+
 void * serial_thread_loop(void *d)
 {
   static int  loopcount = progStatus.serloop_timing / 10;
@@ -740,12 +829,14 @@ void * serial_thread_loop(void *d)
 		if (!run_serial_thread) break;
 
 		MilliSleep(10);
+		serviceSliders();
+		servicePTT();
 
 		if (bypass_serial_thread_loop) goto serial_bypass_loop;
 
 //send any freq/mode/bw changes in the queu
 
-		servicePTT();
+//		servicePTT();
 
 		if (!PTT) {
 			serviceA();
@@ -895,12 +986,6 @@ serial_bypass_loop: ;
 
 //=============================================================================
 
-void setFocus()
-{
-	if (useB) Fl::focus(FreqDispB);
-	else Fl::focus(FreqDispA);
-}
-
 void setBW()
 {
 	FREQMODE fm = vfo;
@@ -915,7 +1000,6 @@ void setBW()
 		queA.push(fm);
 		pthread_mutex_unlock(&mutex_queA);
 	}
-	setFocus();
 }
 
 void setDSP()
@@ -932,7 +1016,6 @@ void setDSP()
 		queA.push(fm);
 		pthread_mutex_unlock(&mutex_queA);
 	}
-	setFocus();
 }
 
 void selectDSP()
@@ -1042,7 +1125,6 @@ void setMode()
 		queA.push(fm);
 		pthread_mutex_unlock(&mutex_queA);
 	}
-	setFocus();
 }
 
 void sortList() {
@@ -1268,7 +1350,6 @@ void cbAswapB()
 			bypass_serial_thread_loop = false;
 		pthread_mutex_unlock(&mutex_serial);
 	}
-	setFocus();
 }
 
 void cbA2B()
@@ -1283,8 +1364,7 @@ void cbA2B()
 		selrig->set_vfoB(vfoB.freq);
 		FreqDispB->value(vfoB.freq);
 		pthread_mutex_unlock(&mutex_serial);
-		setFocus();
-		return;
+			return;
 	}
 	if (selrig->has_a2b) {
 		pthread_mutex_lock(&mutex_serial);
@@ -1298,7 +1378,6 @@ void cbA2B()
 	FreqDispB->value(vfoB.freq);
 	FreqDispB->redraw();
 	pushedB = true;
-	setFocus();
 }
 
 void cb_set_split(int val)
@@ -1326,7 +1405,6 @@ void cb_set_split(int val)
 	} else
 		cb_selectA();
 
-	setFocus();
 }
 
 void highlight_vfo(void *d)
@@ -1350,7 +1428,6 @@ void highlight_vfo(void *d)
 	btnA->redraw();
 	btnB->redraw();
 	Fl::flush();
-	setFocus();
 }
 
 void cb_selectA() {
@@ -1418,7 +1495,6 @@ void selectFreq() {
 		queB.push(fm);
 		pthread_mutex_unlock(&mutex_queB);
 	}
-	setFocus();
 }
 
 void select_and_close()
@@ -1465,7 +1541,6 @@ void delFreq() {
 		numinlist--;
 		updateSelect();
 	}
-	setFocus();
 }
 
 void addFreq() {
@@ -1487,8 +1562,7 @@ void addFreq() {
 		addtoList(freq, mode, bw);
 		updateSelect();
 		FreqDispB->visual_beep();
-		setFocus();
-	} else {
+		} else {
 		long freq = FreqDispA->value();
 		if (!freq) return;
 		int mode = opMODE->index();
@@ -1506,8 +1580,7 @@ void addFreq() {
 		addtoList(freq, mode, bw);
 		updateSelect();
 		FreqDispA->visual_beep();
-		setFocus();
-	}
+		}
 }
 
 void cbRIT()
@@ -1516,7 +1589,6 @@ void cbRIT()
 	if (selrig->has_rit)
 		selrig->setRit((int)cntRIT->value());
 	pthread_mutex_unlock(&mutex_serial);
-	setFocus();
 }
 
 void cbXIT()
@@ -1524,7 +1596,6 @@ void cbXIT()
 	pthread_mutex_lock(&mutex_serial);
 	selrig->setXit((int)cntXIT->value());
 	pthread_mutex_unlock(&mutex_serial);
-	setFocus();
 }
 
 void cbBFO()
@@ -1533,7 +1604,6 @@ void cbBFO()
 	pthread_mutex_lock(&mutex_serial);
 		selrig->setBfo((int)cntBFO->value());
 	pthread_mutex_unlock(&mutex_serial);
-	setFocus();
 }
 
 void cbAttenuator()
@@ -1542,7 +1612,6 @@ void cbAttenuator()
 		progStatus.attenuator = btnAttenuator->value();
 		selrig->set_attenuator(progStatus.attenuator);
 	pthread_mutex_unlock(&mutex_serial);
-	setFocus();
 }
 
 void setAttControl(void *d)
@@ -1557,7 +1626,6 @@ void cbPreamp()
 		progStatus.preamp = btnPreamp->value();
 		selrig->set_preamp(progStatus.preamp);
 	pthread_mutex_unlock(&mutex_serial);
-	setFocus();
 }
 
 void setPreampControl(void *d)
@@ -1572,45 +1640,21 @@ void cbNoise()
 	pthread_mutex_lock(&mutex_serial);
 		selrig->set_noise(progStatus.noise);
 	pthread_mutex_unlock(&mutex_serial);
-	setFocus();
 }
 
 void cbNR()
 {
-	progStatus.noise_reduction = btnNR->value();
-	pthread_mutex_lock(&mutex_serial);
-		selrig->set_noise_reduction(progStatus.noise_reduction);
-	pthread_mutex_unlock(&mutex_serial);
-	setFocus();
+	if (!selrig->has_noise_reduction_control) return;
+	noise_reduction_changed = true;
+	sliders.push(SLIDER(NR, sldrNR->value(), btnNR->value() ) );
+
 }
 
 void setNR()
 {
-	progStatus.noise_reduction_val = sldrNR->value();
-	pthread_mutex_lock(&mutex_serial);
-		selrig->set_noise_reduction_val(progStatus.noise_reduction_val);
-	pthread_mutex_unlock(&mutex_serial);
-	setFocus();
-}
-
-void cbbtnNotch()
-{
-	progStatus.notch = btnNotch->value();
-	progStatus.notch_val = sldrNOTCH->value();
-	try {
-		send_new_notch(progStatus.notch ? progStatus.notch_val : 0);
-	} catch (...) {}
-
-	pthread_mutex_lock(&mutex_serial);
-
-	if (btnNotch->value() == 0)
-		selrig->set_notch(false, 0);
-	else
-		selrig->set_notch(true, (int)floor(sldrNOTCH->value()));
-
-	pthread_mutex_unlock(&mutex_serial);
-
-	setFocus();
+	if (!selrig->has_noise_reduction_control) return;
+	noise_reduction_changed = true;
+	sliders.push(SLIDER(NR, sldrNR->value(), btnNR->value() ) );
 }
 
 void cbAN()
@@ -1619,7 +1663,20 @@ void cbAN()
 	pthread_mutex_lock(&mutex_serial);
 		selrig->set_auto_notch(progStatus.auto_notch);
 	pthread_mutex_unlock(&mutex_serial);
-	setFocus();
+}
+
+void cbbtnNotch()
+{
+	if (!selrig->has_notch_control) return;
+	notch_changed = true;
+	sliders.push(SLIDER(NOTCH, sldrNOTCH->value(), btnNotch->value() ));
+}
+
+void setNotch()
+{
+	if (!selrig->has_notch_control) return;
+	notch_changed = true;
+	sliders.push(SLIDER(NOTCH, sldrNOTCH->value(), btnNotch->value() ));
 }
 
 // called from xml_io thread
@@ -1638,19 +1695,6 @@ void setNotchControl(void *d)
 
 	sldrNOTCH->value(progStatus.notch_val);
 	btnNotch->value(progStatus.notch);
-}
-
-void setNotch()
-{
-	if (progStatus.notch && selrig->allow_notch_changes) {
-		progStatus.notch_val = sldrNOTCH->value();
-		try {
-			send_new_notch(progStatus.notch_val);
-		} catch (...) {}
-		pthread_mutex_lock(&mutex_serial);
-			selrig->set_notch(progStatus.notch, progStatus.notch_val);
-		pthread_mutex_unlock(&mutex_serial);
-	}
 }
 
 void adjust_if_shift_control(void *d)
@@ -1686,67 +1730,43 @@ void setIFshiftControl(void *d)
 
 void setIFshift()
 {
-	int val = sldrIFSHIFT->value();
-	btnIFsh->value( val != selrig->if_shift_mid );
-	progStatus.shift_val = sldrIFSHIFT->value();
-	progStatus.shift = btnIFsh->value();
-	pthread_mutex_lock(&mutex_serial);
-		selrig->set_if_shift(val);
-	pthread_mutex_unlock(&mutex_serial);
+	if_shift_changed = true;
+	sliders.push(SLIDER(IFSH, sldrIFSHIFT->value(), btnIFsh->value()));
 }
 
 void cbIFsh()
 {
-	if (sldrIFSHIFT->value() == selrig->if_shift_mid)
-		btnIFsh->value(0);
-	if (!btnIFsh->value()) {
-		if (rig_nbr == K3) selrig->get_if_mid();
-		sldrIFSHIFT->value(selrig->if_shift_mid);
-	}
-	progStatus.shift_val = sldrIFSHIFT->value();
-	progStatus.shift = btnIFsh->value();
-	pthread_mutex_lock(&mutex_serial);
-		selrig->set_if_shift(sldrIFSHIFT->value());
-	pthread_mutex_unlock(&mutex_serial);
-	setFocus();
+	if_shift_changed = true;
+	sliders.push(SLIDER(IFSH, sldrIFSHIFT->value(), btnIFsh->value()));
 }
 
 void cbEventLog()
 {
 	debug::show();
-	setFocus();
 }
 
 void setVolume()
 {
-	pthread_mutex_lock(&mutex_serial);
-		selrig->set_volume_control(sldrVOLUME->value());
-		progStatus.volume = sldrVOLUME->value();
-	pthread_mutex_unlock(&mutex_serial);
+	volume_changed = true;
+	sliders.push(SLIDER(VOL, sldrVOLUME->value()));
 }
 
 void cbMute()
 {
+	volume_changed = true;
 	if (btnVol->value() == 0) {
-		pthread_mutex_lock(&mutex_serial);
-			sldrVOLUME->deactivate();
-			selrig->set_volume_control(0);
-		pthread_mutex_unlock(&mutex_serial);
+		sldrVOLUME->deactivate();
+		sliders.push(SLIDER(VOL, 0));
 	} else {
-		pthread_mutex_lock(&mutex_serial);
-			selrig->set_volume_control(progStatus.volume);
-			sldrVOLUME->activate();
-		pthread_mutex_unlock(&mutex_serial);
+		sldrVOLUME->activate();
+		sliders.push(SLIDER(VOL, sldrVOLUME->value()));
 	}
-	setFocus();
 }
 
 void setMicGain()
 {
-	pthread_mutex_lock(&mutex_serial);
-		progStatus.mic_gain = sldrMICGAIN->value();
-		selrig->set_mic_gain(sldrMICGAIN->value());
-	pthread_mutex_unlock(&mutex_serial);
+	mic_changed = true;
+	sliders.push(SLIDER(MIC, sldrMICGAIN->value()));
 }
 
 void setMicGainControl(void* d)
@@ -1800,12 +1820,10 @@ void set_power_controlImage(double pwr)
 
 void setPower()
 {
-	double pwr = sldrPOWER->value();
-	pthread_mutex_lock(&mutex_serial);
-		powerlevel = (int)pwr;
-		progStatus.power_level = pwr;
-		selrig->set_power_control(pwr);
-	pthread_mutex_unlock(&mutex_serial);
+	float pwr = progStatus.power_level = sldrPOWER->value();
+	power_changed = true;
+	sliders.push(SLIDER(PWR, progStatus.power_level));
+
 	if (rig_nbr == K2) {
 		double min, max, step;
 		selrig->get_pc_min_max_step(min, max, step);
@@ -1816,7 +1834,6 @@ void setPower()
 		sldrPOWER->redraw();
 	}
 	set_power_controlImage(pwr);
-	setFocus();
 }
 
 void cbTune()
@@ -1824,7 +1841,6 @@ void cbTune()
 	pthread_mutex_lock(&mutex_serial);
 		selrig->tune_rig();
 	pthread_mutex_unlock(&mutex_serial);
-	setFocus();
 }
 
 void cbPTT()
@@ -1836,23 +1852,18 @@ void cbPTT()
 		quePTT.push(btnPTT->value());
 		pthread_mutex_unlock(&mutex_ptt);
 	}
-	setFocus();
 }
 
 void setSQUELCH()
 {
-	pthread_mutex_lock(&mutex_serial);
-		selrig->set_squelch((int)sldrSQUELCH->value());
-	pthread_mutex_unlock(&mutex_serial);
-	setFocus();
+	squelch_changed = true;
+	sliders.push(SLIDER(SQL, sldrSQUELCH->value() ));
 }
 
 void setRFGAIN()
 {
-	pthread_mutex_lock(&mutex_serial);
-		selrig->set_rf_gain((int)sldrRFGAIN->value());
-	pthread_mutex_unlock(&mutex_serial);
-	setFocus();
+	rfgain_changed = true;
+	sliders.push(SLIDER(RFGAIN, sldrRFGAIN->value() ));
 }
 
 
@@ -2082,7 +2093,6 @@ void cbALC_SWR()
 		pthread_mutex_unlock(&mutex_serial);
 	}
 	btnALC_SWR->redraw();
-	setFocus();
 }
 
 void update_UI_PTT(void *d)
@@ -2104,7 +2114,7 @@ void update_UI_PTT(void *d)
 void adjust_control_positions()
 {
 // small_ui (ORIGINAL) USER INTERFACE
-if (progStatus.UIsize == small_ui) 
+if (progStatus.UIsize == small_ui)
 {
 	int y = 0;
 
@@ -2229,10 +2239,10 @@ if (progStatus.UIsize == small_ui)
 		btnPTT->redraw();
 	}
 
-	if (	rig_nbr == FT100D || 
+	if (	rig_nbr == FT100D ||
 			rig_nbr == FT767  ||
 			rig_nbr == FT817  ||
-			rig_nbr == FT847  || 
+			rig_nbr == FT847  ||
 			rig_nbr == FT857D ||
 			rig_nbr == FT890  ||
 			rig_nbr == FT897D ||
@@ -2293,7 +2303,7 @@ if (progStatus.UIsize == small_ui)
 		Fl_Tooltip::enable(0);
 	}
 	if (progStatus.schema)
-		mnuSchema->set(); 
+		mnuSchema->set();
 	else
 		mnuSchema->clear();
 
@@ -2513,7 +2523,7 @@ void initXcvrTab()
 				selrig->set_vox_onoff();
 			} else btn_vox->hide();
 			if (selrig->has_vox_gain) {
-				cnt_vox_gain->show(); 
+				cnt_vox_gain->show();
 				int min, max, step;
 				selrig->get_vox_gain_min_max_step(min, max, step);
 				cnt_vox_gain->minimum(min);
@@ -2657,11 +2667,11 @@ void initXcvrTab()
 		if (!selrig->has_alc_control) { poll_alc->deactivate(); poll_alc->value(0); }
 		if (!selrig->has_volume_control) { poll_volume->deactivate(); poll_volume->value(0); }
 		if (!selrig->has_notch_control) { poll_notch->deactivate(); poll_notch->value(0); }
-		if (!selrig->has_auto_notch || rig_nbr == FT1000MP) 
+		if (!selrig->has_auto_notch || rig_nbr == FT1000MP)
 			{ poll_auto_notch->deactivate(); poll_auto_notch->value(0); }
 		if (!selrig->has_ifshift_control) { poll_ifshift->deactivate(); poll_ifshift->value(0); }
 		if (!selrig->has_power_control) { poll_power_control->deactivate(); poll_power_control->value(0); }
-		if (!selrig->has_preamp_control && !selrig->has_attenuator_control) 
+		if (!selrig->has_preamp_control && !selrig->has_attenuator_control)
 			{ poll_pre_att->deactivate(); poll_pre_att->value(0); }
 		if (!selrig->has_sql_control) { poll_squelch->deactivate(); poll_squelch->value(0); }
 		if (!selrig->has_micgain_control) { poll_micgain->deactivate(); poll_micgain->value(0); }
@@ -3038,6 +3048,9 @@ void initRig()
 	}
 
 	if (selrig->has_ifshift_control) {
+
+
+
 		int min, max, step;
 		selrig->get_if_min_max_step(min, max, step);
 		sldrIFSHIFT->minimum(min);
@@ -3076,7 +3089,7 @@ void initRig()
 		}
 	}
 	if (rig_nbr == TS870S) {
-		if (progStatus.imode_A == RIG_TS870S::tsCW || 
+		if (progStatus.imode_A == RIG_TS870S::tsCW ||
 			progStatus.imode_A == RIG_TS870S::tsCWR) {
 			btnIFsh->activate();
 			sldrIFSHIFT->activate();
@@ -3084,6 +3097,8 @@ void initRig()
 			btnIFsh->deactivate();
 			sldrIFSHIFT->deactivate();
 		}
+
+
 	}
 
 	if (selrig->has_notch_control) {
@@ -3134,7 +3149,7 @@ void initRig()
 			sldrMICGAIN->show();
 		else
 			sldrMICGAIN->activate();
-		if (selrig->has_data_port) { 
+		if (selrig->has_data_port) {
 			btnDataPort->show();
 			btnDataPort->value(progStatus.data_port);
 			btnDataPort->label(progStatus.data_port ? "Data" : "Mic");
@@ -3214,6 +3229,10 @@ void initRig()
 	}
 
 	if (selrig->has_noise_control) {
+		if (rig_nbr == TS990) {
+			btnNOISE->label("AGC M"); //Set TS990 AGC Label
+			btnNR->label("NR1"); //Set TS990 NR Button
+		}
 		if (progStatus.use_rig_data)
 			progStatus.noise = selrig->get_noise();
 		else
@@ -3252,6 +3271,7 @@ void initRig()
 	}
 
 	if (selrig->has_auto_notch) {
+
 		if (rig_nbr == RAY152) {
 			btnAutoNotch->label("AGC");
 			btnAutoNotch->tooltip("AGC on/off");
@@ -3345,6 +3365,10 @@ void initRig()
 	}
 
 // enable buttons, change labels
+
+	if (rig_nbr == TS990) { // Setup TS990 Mon Button
+		btnIFsh->label("MON");
+	}
 	selrig->post_initialize();
 
 // enable the serial thread
@@ -3379,7 +3403,6 @@ void initRig()
 
 	btnAswapB->show();
 
-	setFocus();
 	bypass_serial_thread_loop = false;
 	return;
 

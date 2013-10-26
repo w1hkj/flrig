@@ -179,7 +179,6 @@ RIG_FTdx3000::RIG_FTdx3000() {
 	has_noise_control =
 	has_bandwidth_control =
 	has_notch_control =
-	allow_notch_changes =
 	has_auto_notch =
 	has_attenuator_control =
 	has_preamp_control =

@@ -136,7 +136,7 @@ public:
 	bool has_micgain_control;
 	bool has_mic_line_control;
 	bool has_notch_control;
-	bool allow_notch_changes;
+	bool has_auto_notch;
 	bool has_noise_control;
 	bool has_noise_reduction_control;
 	bool has_noise_reduction;
@@ -172,7 +172,6 @@ public:
 	bool has_vox_on_dataport;
 	bool has_compression;
 	bool has_compON;
-	bool has_auto_notch;
 	bool use_line_in;
 	bool has_bpf_center;
 	bool has_special;

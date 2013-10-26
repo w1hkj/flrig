@@ -52,8 +52,8 @@ rigbase::rigbase()
 	has_dsp_controls =
 	has_micgain_control =
 	has_mic_line_control =
+	has_auto_notch = 
 	has_notch_control =
-	allow_notch_changes =
 	has_noise_control =
 	has_noise_reduction_control =
 	has_noise_reduction =
@@ -84,7 +84,6 @@ rigbase::rigbase()
 	has_vox_anti =
 	has_vox_hang =
 	has_vox_on_dataport =
-	has_auto_notch = 
 	has_compression =
 	has_compON =
 	use_line_in =

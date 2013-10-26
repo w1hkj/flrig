@@ -1086,7 +1086,6 @@ void show_controls()
 			}
 		}
 	}
-	setFocus();
 }
 
 // a replica of the default color map used by Fltk

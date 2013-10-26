@@ -155,7 +155,6 @@ RIG_FT950::RIG_FT950() {
 	has_noise_control =
 	has_bandwidth_control =
 	has_notch_control =
-	allow_notch_changes =
 	has_auto_notch =
 	has_attenuator_control =
 	has_preamp_control =
@@ -943,8 +942,6 @@ int RIG_FT950::get_modetype(int n)
 void RIG_FT950::set_if_shift(int val)
 {
 	cmd = "IS0+0000;";
-	if (val != 0) progStatus.shift = true;
-	else progStatus.shift = false;
 	if (val < 0) cmd[3] = '-';
 	val = abs(val);
 	for (int i = 4; i > 0; i--) {
@@ -979,28 +976,27 @@ void RIG_FT950::get_if_min_max_step(int &min, int &max, int &step)
 
 void RIG_FT950::set_notch(bool on, int val)
 {
-	cmd = "BP00000;";
+// set notch frequency
 	if (on) {
-		cmd[6] = '1';
+		cmd = "BP00001;";
 		sendCommand(cmd);
 		showresp(WARN, ASC, "SET notch on", cmd, replystr);
-	} else {
+		cmd = "BP01000;";
+		if (val % 10 >= 5) val += 10;
+		val /= 10;
+		for (int i = 3; i > 0; i--) {
+			cmd[3 + i] += val % 10;
+			val /=10;
+		}
 		sendCommand(cmd);
-		showresp(WARN, ASC, "SET notch off", cmd, replystr);
+		showresp(WARN, ASC, "SET notch val", cmd, replystr);
+		return;
 	}
 
-	if (!on) return;
-
-	cmd[3] = '1'; // manual NOTCH position
-	cmd[6] = '0';
-	if (val % 10 >= 5) val += 10;
-	val /= 10;
-	for (int i = 3; i > 0; i--) {
-		cmd[3 + i] += val % 10;
-		val /=10;
-	}
+// set notch off
+	cmd = "BP00000;";
 	sendCommand(cmd);
-	showresp(WARN, ASC, "SET notch val", cmd, replystr);
+	showresp(WARN, ASC, "SET notch off", cmd, replystr);
 }
 
 bool  RIG_FT950::get_notch(int &val)
