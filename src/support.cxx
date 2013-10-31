@@ -419,7 +419,7 @@ void update_split(void *d)
 {
 	if (rig_nbr == FT450 || rig_nbr == FT950 ||
 		rig_nbr == TS480SAT || rig_nbr == TS480HX ||
-		rig_nbr == TS590S || rig_nbr == TS2000) {
+		rig_nbr == TS590S || rig_nbr == TS2000 || rig_nbr == TS990) {
 		switch (progStatus.split) {
 			case 0: btnSplit->value(0);
 					useB = false;
@@ -489,6 +489,8 @@ void read_volume()
 // ifshift
 void update_ifshift(void *d)
 {
+
+
 	btnIFsh->value(progStatus.shift);
 //	if (progStatus.shift)
 		sldrIFSHIFT->value(progStatus.shift_val);
@@ -650,10 +652,13 @@ void serviceA()
 		selrig->set_modeA(vfoA.imode);
 		vfo.imode = vfoA.imode;
 		Fl::awake(setModeControl);
-		vfo.iBW = vfoA.iBW;
-		set_bandwidth_control();
-		Fl::awake(setBWControl);
-		selrig->set_bwA(vfo.iBW);
+		if (!((vfoA.src == XML) && 
+			(rig_nbr == TS2000 || rig_nbr == TS590S || rig_nbr == TS990) ) ) {
+			vfo.iBW = vfoA.iBW;
+			set_bandwidth_control();
+			Fl::awake(setBWControl);
+			selrig->set_bwA(vfo.iBW);
+		}
 		try {
 			if (vfoA.src == UI)
 				send_new_mode(vfoA.imode);
@@ -662,9 +667,12 @@ void serviceA()
 			send_new_bandwidth(vfo.iBW);
 		} catch (...) {}
 	} else if (vfoA.iBW != vfo.iBW) {
-		selrig->set_bwA(vfoA.iBW);
-		vfo.iBW = vfoA.iBW;
-		Fl::awake(setBWControl);
+		if (!((vfoA.src == XML) && 
+			(rig_nbr == TS2000 || rig_nbr == TS590S || rig_nbr == TS990) ) ) {
+			selrig->set_bwA(vfoA.iBW);
+			vfo.iBW = vfoA.iBW;
+			Fl::awake(setBWControl);
+		}
 		if (vfoA.src == UI) {
 			try {
 				send_new_bandwidth(vfo.iBW);
@@ -718,10 +726,13 @@ void serviceB()
 		selrig->set_modeB(vfoB.imode);
 		vfo.imode = vfoB.imode;
 		Fl::awake(setModeControl);
-		vfo.iBW = vfoB.iBW;
-		set_bandwidth_control();
-		Fl::awake(setBWControl);
-		selrig->set_bwB(vfo.iBW);
+		if (!((vfoB.src == XML) && 
+			(rig_nbr == TS2000 && rig_nbr == TS590S || rig_nbr == TS990) ) ) {
+			vfo.iBW = vfoB.iBW;
+			set_bandwidth_control();
+			Fl::awake(setBWControl);
+			selrig->set_bwB(vfo.iBW);
+		}
 		try {
 			if (vfoB.src == UI)
 				send_new_mode(vfoB.imode);
@@ -730,9 +741,12 @@ void serviceB()
 			send_new_bandwidth(vfo.iBW);
 		} catch (...) {}
 	} else if (vfoB.iBW != vfo.iBW || pushedB) {
-		selrig->set_bwB(vfoB.iBW);
-		vfo.iBW = vfoB.iBW;
-		Fl::awake(setBWControl);
+		if (!((vfoB.src == XML) && 
+			(rig_nbr == TS2000 && rig_nbr == TS590S || rig_nbr == TS990) ) ) {
+			selrig->set_bwB(vfoB.iBW);
+			vfo.iBW = vfoB.iBW;
+			Fl::awake(setBWControl);
+		}
 		if (vfoB.src == UI) {
 			try {
 				send_new_bandwidth(vfo.iBW);
@@ -1654,7 +1668,10 @@ void setNR()
 {
 	if (!selrig->has_noise_reduction_control) return;
 	noise_reduction_changed = true;
-	sliders.push(SLIDER(NR, sldrNR->value(), btnNR->value() ) );
+	if (rig_nbr == TS2000 || rig_nbr == TS590S || rig_nbr == TS990)
+		sliders.push(SLIDER(NR, sldrNR->value(), -1 ) );
+	else
+		sliders.push(SLIDER(NR, sldrNR->value(), btnNR->value() ) );
 }
 
 void cbAN()
@@ -3230,7 +3247,7 @@ void initRig()
 
 	if (selrig->has_noise_control) {
 		if (rig_nbr == TS990) {
-			btnNOISE->label("AGC M"); //Set TS990 AGC Label
+			btnNOISE->label("AGC"); //Set TS990 AGC Label
 			btnNR->label("NR1"); //Set TS990 NR Button
 		}
 		if (progStatus.use_rig_data)
