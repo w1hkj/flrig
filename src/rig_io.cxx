@@ -130,7 +130,7 @@ int readResponse()
 	replystr.clear();
 	memset(replybuff, 0, RXBUFFSIZE + 1);
 	numread = RigSerial.ReadBuffer(replybuff, RXBUFFSIZE);
-//	LOG_DEBUG("rsp:%3d, %s", numread, str2hex(replybuff, numread));
+	LOG_DEBUG("rsp:%3d, %s", numread, str2hex(replybuff, numread));
 	for (int i = 0; i < numread; replystr += replybuff[i++]);
 	return numread;
 }
@@ -139,7 +139,7 @@ int sendCommand (string s, int nread)
 {
 	int numwrite = (int)s.size();
 
-//	LOG_DEBUG("cmd:%3d, %s", (int)s.length(), str2hex(s.data(), s.length()));
+	LOG_DEBUG("cmd:%3d, %s", (int)s.length(), str2hex(s.data(), s.length()));
 	if (RigSerial.IsOpen() == false) {
 		replystr.clear();
 		return 0;
