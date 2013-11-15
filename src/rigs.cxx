@@ -22,6 +22,7 @@ RIG_FT950		rig_FT950;
 RIG_FT990		rig_FT990;
 RIG_FT1000MP	rig_FT1000MP;
 RIG_FT2000		rig_FT2000;
+RIG_FTdx1200	rig_FTdx1200;
 RIG_FTdx3000	rig_FTdx3000;
 RIG_FT5000		rig_FT5000;
 
@@ -84,46 +85,47 @@ rigbase *rigs[] = {
 	&rig_FT990,		// 12
 	&rig_FT1000MP,	// 13
 	&rig_FT2000,	// 14
-	&rig_FTdx3000,	// 15
-	&rig_FT5000,	// 16
-	&rig_IC703,		// 17
-	&rig_IC706MKIIG,// 18
-	&rig_IC718,		// 19
-	&rig_IC728,		// 20
-	&rig_IC735,		// 21
-	&rig_IC746,		// 22
-	&rig_IC746PRO,	// 23
-	&rig_IC756PRO,	// 24
-	&rig_IC756PRO2,	// 25
-	&rig_IC756PRO3,	// 26
-	&rig_IC7000,	// 27
-	&rig_IC7100,	// 28
-	&rig_IC7200,	// 29
-	&rig_IC7600,	// 30
-	&rig_IC7700,	// 31
-	&rig_IC9100,	// 32
-	&rig_IC910H,	// 33
-	&rig_K2,		// 34
-	&rig_K3,		// 35
-	&rig_PCR1000,	// 36
-	&rig_RAY152,	// 37
-	&rig_TS140,		// 38
-	&rig_TS450S,	// 39
-	&rig_TS480HX,	// 40
-	&rig_TS480SAT,	// 41
-	&rig_TS570,		// 42
-	&rig_TS590S,	// 43
-	&rig_TS870S,	// 44 wbx
-	&rig_TS990,		// 45
-	&rig_TS2000,	// 46
-	&rig_TT516,		// 47
-	&rig_TT535,		// 48
-	&rig_TT538,		// 49
-	&rig_TT550,		// 50
-	&rig_TT563,		// 51
-	&rig_TT566,		// 52
-	&rig_TT588,		// 53
-	&rig_TT599,		// 54
+	&rig_FTdx1200,	// 15
+	&rig_FTdx3000,	// 16
+	&rig_FT5000,	// 17
+	&rig_IC703,		// 18
+	&rig_IC706MKIIG,// 19
+	&rig_IC718,		// 20
+	&rig_IC728,		// 21
+	&rig_IC735,		// 22
+	&rig_IC746,		// 23
+	&rig_IC746PRO,	// 24
+	&rig_IC756PRO,	// 25
+	&rig_IC756PRO2,	// 26
+	&rig_IC756PRO3,	// 27
+	&rig_IC7000,	// 28
+	&rig_IC7100,	// 29
+	&rig_IC7200,	// 30
+	&rig_IC7600,	// 31
+	&rig_IC7700,	// 32
+	&rig_IC9100,	// 33
+	&rig_IC910H,	// 34
+	&rig_K2,		// 35
+	&rig_K3,		// 36
+	&rig_PCR1000,	// 37
+	&rig_RAY152,	// 38
+	&rig_TS140,		// 39
+	&rig_TS450S,	// 40
+	&rig_TS480HX,	// 41
+	&rig_TS480SAT,	// 42
+	&rig_TS570,		// 43
+	&rig_TS590S,	// 44
+	&rig_TS870S,	// 45 wbx
+	&rig_TS990,		// 46
+	&rig_TS2000,	// 47
+	&rig_TT516,		// 48
+	&rig_TT535,		// 49
+	&rig_TT538,		// 50
+	&rig_TT550,		// 51
+	&rig_TT563,		// 52
+	&rig_TT566,		// 53
+	&rig_TT588,		// 54
+	&rig_TT599,		// 55
 	NULL
 };
 

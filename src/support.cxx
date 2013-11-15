@@ -409,7 +409,7 @@ void read_preamp_att()
 // split
 void update_split(void *d)
 {
-	if (rig_nbr == FT450 || rig_nbr == FT950 ||
+	if (rig_nbr == FT450 || rig_nbr == FT950 || rig_nbr == FTdx1200 ||
 		rig_nbr == TS480SAT || rig_nbr == TS480HX ||
 		rig_nbr == TS590S || rig_nbr == TS2000 || rig_nbr == TS990) {
 		switch (progStatus.split) {
