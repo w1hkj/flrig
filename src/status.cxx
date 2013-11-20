@@ -121,7 +121,7 @@ status progStatus = {
 	0,			// int  compression;
 	false,		// bool compON;
 
-	false,		// bool noise_reduction;
+	0,			// bool noise_reduction;
 	0,			// int  noise_reduction_val;
 	0,			// int  nb_level;
 

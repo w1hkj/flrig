@@ -5,16 +5,20 @@
 
 class RIG_TS990 : public rigbase {
 
+private:
 enum TS990MODES {
-tsLSB,   tsUSB,   tsCW,   tsFM,   tsAM,
-tsFSK,   tsPSK,   tsCWR,  tsFSKR, tsPSKR,
-tsLSBD1, tsUSBD1, tsFMD1, tsAMD1,
-tsLSBD2, tsUSBD2, tsFMD2, tsAMD2,
-tsLSBD3, tsUSBD3, tsFMD3, tsAMD3 };
+LSB,   USB,   CW,   FM,   AM,
+FSK,   PSK,   CWR,  FSKR, PSKR,
+LSBD1, USBD1, FMD1, AMD1,
+LSBD2, USBD2, FMD2, AMD2,
+LSBD3, USBD3, FMD3, AMD3 };
 
 private:
 	bool menu_0607;
 	bool menu_0608;
+	bool save_menu_0607;
+	bool save_menu_0608;
+
 	bool notch_on;
 	int  preamp_level;
 	int  att_level;
@@ -26,11 +30,47 @@ private:
 
 	bool att_on;
 
+// default mode values
+	int A_default_SH_WI;
+	int A_default_SH_WI_D1;
+	int A_default_SH_WI_D2;
+	int A_default_SH_WI_D3;
+	int A_default_HI_LO;
+	int A_default_FM;
+	int A_default_FM_D1;
+	int A_default_FM_D2;
+	int A_default_FM_D3;
+	int A_default_CW;
+	int A_default_AM;
+	int A_default_AM_D1;
+	int A_default_AM_D2;
+	int A_default_AM_D3;
+	int A_default_FSK;
+	int A_default_PSK;
+
+	int B_default_SH_WI;
+	int B_default_SH_WI_D1;
+	int B_default_SH_WI_D2;
+	int B_default_SH_WI_D3;
+	int B_default_HI_LO;
+	int B_default_FM;
+	int B_default_FM_D1;
+	int B_default_FM_D2;
+	int B_default_FM_D3;
+	int B_default_CW;
+	int B_default_AM;
+	int B_default_AM_D1;
+	int B_default_AM_D2;
+	int B_default_AM_D3;
+	int B_default_FSK;
+	int B_default_PSK;
+
 public:
 	RIG_TS990();
 	~RIG_TS990(){}
 
 	void initialize();
+	void shutdown();
 
 
 	long get_vfoA();
@@ -44,8 +84,10 @@ public:
 	void set_modeB(int val);
 	int  get_modeB();
 
-	void check_menu_0607();
-	void check_menu_0608();
+	void read_menu_0607();
+	void read_menu_0608();
+	void set_menu_0607(int);
+	void set_menu_0608(int);
 
 	int  adjust_bandwidth(int val);
 	int  def_bandwidth(int val);
@@ -128,6 +170,5 @@ public:
 	const char * get_bwname_(int bw, int md);
 
 };
-
 
 #endif

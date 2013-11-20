@@ -12,20 +12,24 @@
 #include "TS590S.h"
 #include "support.h"
 
-enum TS590MODES { tsLSB, tsUSB, tsCW, tsFM, tsAM, tsFSK, tsCWR, tsFSKR, tsLSBD, tsUSBD, tsFMD };
-
 static const char TS590Sname_[] = "TS-590S";
 
 static const char *TS590Smodes_[] = {
-		"LSB", "USB", "CW", "FM", "AM", "FSK", "CW-R", "FSK-R", "LSB-D", "USB-D", "FM-D", NULL};
+"LSB", "USB",  "CW", "FM", "AM", "FSK", "CW-R", "FSK-R", 
+"LSB-D", "USB-D", "FM-D", NULL};
 
-static const char TS590S_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '9', '1', '2', '4' };
-static const char TS590S_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'U', 'L', 'U', 'U' };
+static const char TS590S_mode_chr[] =  { 
+'1', '2', '3', '4', '5', '6', '7', '9',
+'1', '2', '4' };
+static const char TS590S_mode_type[] = { 
+'L', 'U', 'U', 'U', 'U', 'L', 'L', 'U', 
+'L', 'U', 'U' };
 
 //----------------------------------------------------------------------
 static const char *TS590S_empty[] = { "N/A", NULL };
 
 //----------------------------------------------------------------------
+static int DEF_lo_hi = 0x8A03;
 static const char *TS590S_SSB_lo[] = {
   "0",   "50", "100", "200", "300", 
 "400",  "500", "600", "700", "800", 
@@ -51,6 +55,7 @@ static const char *TS590S_SSB_hi_tooltip = "hi cutoff";
 static const char *TS590S_SSB_btn_hi_label = "H";
 
 //----------------------------------------------------------------------
+static int DEF_width_shift = 0x8D05;
 static const char *TS590S_DATA_width[] = {
   "50",   "80",  "100",  "150", "200", 
  "250",  "300",  "400",  "500", "600", 
@@ -76,6 +81,7 @@ static const char *TS590S_DATA_S_tooltip = "shift frequency";
 static const char *TS590S_DATA_S_btn_label = "S";
 
 //----------------------------------------------------------------------
+static int DEF_am = 0x8201;
 static const char *TS590S_AM_lo[] = {
 "10", "100", "200", "500", NULL };
 
@@ -93,6 +99,7 @@ static const char *TS590S_AM_hi_tooltip = "hi cutoff";
 static const char *TS590S_AM_btn_hi_label = "H";
 
 //----------------------------------------------------------------------
+static int  DEF_cw = 7;
 static const char *TS590S_CWwidths[] = {
   "50",   "80",  "100",  "150", "200", 
  "250",  "300",  "400",  "500", "600", 
@@ -104,6 +111,7 @@ static const char *TS590S_CWbw[] = {
 "FW1000;", "FW1500;", "FW2000;", "FW2500;", NULL};
 
 //----------------------------------------------------------------------
+static int  DEF_fsk = 1;
 static const char *TS590S_FSKwidths[] = {
 "250", "500", "1000", "1500", NULL};
 
@@ -127,6 +135,8 @@ static GUI rig_widgets[]= {
 	{ (Fl_Widget *)NULL,          0,   0,   0 }
 };
 
+static string menu003;
+
 void RIG_TS590S::initialize()
 {
 	rig_widgets[0].W = btnVol;
@@ -141,6 +151,12 @@ void RIG_TS590S::initialize()
 	rig_widgets[9].W = btnNR;
 	rig_widgets[10].W = sldrNR;
 
+	cmd = "EX0030000;";
+	if (waitN(11, 100, "read ex 003", ASC) == 11)
+		menu003 = replystr;
+	cmd = "EX003000000;";
+	sendCommand(cmd);
+
 	RIG_DEBUG = true;
 	cmd = "AC000;"; sendCommand(cmd);
 	selectA();
@@ -148,12 +164,19 @@ void RIG_TS590S::initialize()
 	get_attenuator();
 }
 
+void RIG_TS590S::shutdown()
+{
+// restore state of xcvr beeps
+	cmd = menu003;
+	sendCommand(cmd);
+}
+
 
 RIG_TS590S::RIG_TS590S() {
 
 	name_ = TS590Sname_;
 	modes_ = TS590Smodes_;
-	bandwidths_ = TS590S_empty;
+	bandwidths_ = TS590S_SSB_hi;
 
 	dsp_lo     = TS590S_SSB_lo;
 	lo_tooltip = TS590S_SSB_lo_tooltip;
@@ -177,8 +200,8 @@ RIG_TS590S::RIG_TS590S() {
 	comm_rtsptt = false;
 	comm_dtrptt = false;
 
-	B.imode = A.imode = 1;
-	B.iBW = A.iBW = 0x8A03;
+	B.imode = A.imode = USB;
+	B.iBW = A.iBW = DEF_lo_hi;
 	B.freq = A.freq = 14070000;
 	can_change_alt_vfo = true;
 
@@ -217,6 +240,9 @@ RIG_TS590S::RIG_TS590S() {
 	precision = 1;
 	ndigits = 8;
 
+	att_level = 0;
+	preamp_level = 0;
+	noise_reduction_level = 0;
 }
 
 const char * RIG_TS590S::get_bwname_(int n, int md) 
@@ -226,15 +252,15 @@ const char * RIG_TS590S::get_bwname_(int n, int md)
 		int hi = (n >> 8) & 0x7F;
 		int lo = n & 0xFF;
 		snprintf(bwname, sizeof(bwname), "%s/%s",
-			(md == 0 || md == 1 || md == 3) ? TS590S_SSB_lo[lo] :
-			(md == 4) ? TS590S_AM_lo[lo] :
-			TS590S_DATA_shift[lo],
-			(md == 0 || md == 1 || md == 3) ? TS590S_SSB_hi[hi] :
-			(md == 4) ? TS590S_AM_hi[hi] :
-			TS590S_DATA_width[hi] );
+			(md == LSB || md == USB || md == FM) ? TS590S_SSB_lo[lo] :
+			(md == AM) ? TS590S_AM_lo[lo] :
+			TS590S_DATA_width[lo],
+			(md == LSB || md == USB || md == FM) ? TS590S_SSB_hi[hi] :
+			(md == AM) ? TS590S_AM_hi[hi] :
+			TS590S_DATA_shift[hi] );
 	} else {
 		snprintf(bwname, sizeof(bwname), "%s",
-			(md == 2 || md == 6) ? TS590S_CWwidths[n] : TS590S_FSKwidths[n]);
+			(md == CW || md == CWR) ? TS590S_CWwidths[n] : TS590S_FSKwidths[n]);
 	}
 	return bwname;
 }
@@ -604,18 +630,17 @@ void RIG_TS590S::set_modeA(int val)
 	cmd += ';';
 	sendCommand(cmd, 0);
 	showresp(ERR, ASC, "set mode A", cmd, replystr);
-	if (val > tsFSKR) {
+	if ( val == LSBD || val == USBD || val == FMD) {
 		data_mode = true;
 		cmd = "DA1;";
 		sendCommand(cmd, 0);
 		showresp(WARN, ASC, "set data A", cmd, replystr);
-	} else {
+	} else if (val == LSB || val == USB || val == FM) {
 		data_mode = false;
 		cmd = "DA0;";
 		sendCommand(cmd, 0);
 		showresp(WARN, ASC, "set data A", cmd, replystr);
 	}
-
 	set_widths(val);
 }
 
@@ -631,18 +656,18 @@ int RIG_TS590S::get_modeA()
 	if (p == string::npos) return A.imode;
 
 	switch (replystr[p + 2]) {
-		case '1' : md = tsLSB; break;
-		case '2' : md = tsUSB; break;
-		case '3' : md = tsCW; break;
-		case '4' : md = tsFM; break;
-		case '5' : md = tsAM; break;
-		case '6' : md = tsFSK; break;
-		case '7' : md = tsCWR; break;
-		case '9' : md = tsFSKR; break;
+		case '1' : md = LSB; break;
+		case '2' : md = USB; break;
+		case '3' : md = CW; break;
+		case '4' : md = FM; break;
+		case '5' : md = AM; break;
+		case '6' : md = FSK; break;
+		case '7' : md = CWR; break;
+		case '9' : md = FSKR; break;
 		default : md = A.imode;
 	}
 
-	if (md == tsLSB || md == tsUSB || md == tsFM) {
+	if (md == LSB || md == USB || md == FM) {
 		cmd = "DA;";
 		ret = waitN(4, 100, "get data A", ASC);
 
@@ -651,9 +676,9 @@ int RIG_TS590S::get_modeA()
 		if (p == string::npos) return A.imode;
 		if (replystr[p + 2] == '1') {
 			data_mode = true;
-			if (md == tsLSB) md = tsLSBD;
-			else if (md == tsUSB) md = tsUSBD;
-			else if (md == tsFM) md = tsFMD;
+			if (md == LSB) md = LSBD;
+			else if (md == USB) md = USBD;
+			else if (md == FM) md = FMD;
 		}
 	}
 	if (md != A.imode) {
@@ -671,17 +696,16 @@ void RIG_TS590S::set_modeB(int val)
 	cmd += ';';
 	sendCommand(cmd, 0);
 	showresp(WARN, ASC, "set mode B", cmd, replystr);
-	if (val > tsFSKR) {
+	if ( val == LSBD || val == USBD || val == FMD) {
 		data_mode = true;
 		cmd = "DA1;";
 		sendCommand(cmd, 0);
 		showresp(WARN, ASC, "set data B", cmd, replystr);
-	} else if (val != tsAM && val != tsFSK && val != tsFSKR) {
+	} else if (val == LSB || val == USB || val == FM) {
 		cmd = "DA0;";
 		sendCommand(cmd, 0);
 		showresp(WARN, ASC, "set data B", cmd, replystr);
 	}
-
 	set_widths(val);
 }
 
@@ -696,18 +720,18 @@ int RIG_TS590S::get_modeB()
 	if (p == string::npos) return B.imode;
 
 	switch (replystr[p + 2]) {
-		case '1' : md = tsLSB; break;
-		case '2' : md = tsUSB; break;
-		case '3' : md = tsCW; break;
-		case '4' : md = tsFM; break;
-		case '5' : md = tsAM; break;
-		case '6' : md = tsFSK; break;
-		case '7' : md = tsCWR; break;
-		case '9' : md = tsFSKR; break;
+		case '1' : md = LSB; break;
+		case '2' : md = USB; break;
+		case '3' : md = CW; break;
+		case '4' : md = FM; break;
+		case '5' : md = AM; break;
+		case '6' : md = FSK; break;
+		case '7' : md = CWR; break;
+		case '9' : md = FSKR; break;
 		default : md = B.imode;
 	}
 
-	if (md == tsLSB || md == tsUSB || md == tsFM) {
+	if (md == LSB || md == USB || md == FM) {
 		cmd = "DA;";
 		ret = waitN(4, 100, "get dat B", ASC);
 
@@ -716,9 +740,9 @@ int RIG_TS590S::get_modeB()
 		if (p == string::npos) return B.imode;
 		if (replystr[p + 2] == '1') {
 			data_mode = true;
-			if (md == tsLSB) md = tsLSBD;
-			else if (md == tsUSB) md = tsUSBD;
-			else if (md == tsFM) md = tsFMD;
+			if (md == LSB) md = LSBD;
+			else if (md == USB) md = USBD;
+			else if (md == FM) md = FMD;
 		}
 	}
 	if (md != B.imode) {
@@ -735,101 +759,99 @@ int RIG_TS590S::get_modeB()
 int RIG_TS590S::set_widths(int val)
 {
 	int bw = 0;
-	if (val == tsLSB || val == tsUSB || val == tsFM || val == tsFMD) {
-		bandwidths_ = TS590S_empty;
+	if (val == LSB || val == USB || val == FM || val == FMD) {
+		bandwidths_ = TS590S_SSB_hi;
 		dsp_lo = TS590S_SSB_lo;
 		dsp_hi = TS590S_SSB_hi;
 		lo_tooltip = TS590S_SSB_lo_tooltip;
 		lo_label   = TS590S_SSB_btn_lo_label;
 		hi_tooltip = TS590S_SSB_hi_tooltip;
 		hi_label   = TS590S_SSB_btn_hi_label;
-		bw = 0x8A03; // 200 ... 3000 Hz
-	} else if (val == tsCW || val == tsCWR) {
+		bw = DEF_lo_hi; // 200 lower, 3000 upper
+	} else if (val == CW || val == CWR) {
 		bandwidths_ = TS590S_CWwidths;
 		dsp_lo = TS590S_empty;
 		dsp_hi = TS590S_empty;
-		bw = 7;
-	} else if (val == tsFSK || val == tsFSKR) {
+		bw = DEF_cw;
+	} else if (val == FSK || val == FSKR) {
 		bandwidths_ = TS590S_FSKwidths;
 		dsp_lo = TS590S_empty;
 		dsp_hi = TS590S_empty;
 		bw = 1;
-	} else if (val == tsAM) { // val == 4 ==> AM
-		bandwidths_ = TS590S_empty;
+	} else if (val == AM) { // val == 4 ==> AM
+		bandwidths_ = TS590S_AM_hi;
 		dsp_lo = TS590S_AM_lo;
 		dsp_hi = TS590S_AM_hi;
 		lo_tooltip = TS590S_AM_lo_tooltip;
 		lo_label   = TS590S_AM_btn_lo_label;
 		hi_tooltip = TS590S_AM_hi_tooltip;
 		hi_label   = TS590S_AM_btn_hi_label;
-		bw = 0x8201;
-	} else if (val == tsLSBD || val == tsUSBD) {
-		bandwidths_ = TS590S_empty;
+		bw = DEF_am;
+	} else if (val == LSBD || val == USBD) {
+		bandwidths_ = TS590S_DATA_width;
+
 		dsp_lo = TS590S_DATA_shift;
-		dsp_hi = TS590S_DATA_width;
 		lo_tooltip = TS590S_DATA_S_tooltip;
 		lo_label   = TS590S_DATA_S_btn_label;
+
+		dsp_hi = TS590S_DATA_width;
 		hi_tooltip = TS590S_DATA_W_tooltip;
 		hi_label   = TS590S_DATA_W_btn_label;
-		bw = 0x8D05;
+		bw = DEF_width_shift;
 	}
 	return bw;
 }
 
 const char **RIG_TS590S::bwtable(int m)
 {
-	if (m == tsLSB || m == tsUSB || m == tsFM || m == tsFMD)
-		return NULL;//TS590S_empty;
-	else if (m == tsCW || m == tsCWR)
-		return TS590S_CWwidths;
-	else if (m == tsFSK || m == tsFSKR)
-		return TS590S_FSKwidths;
-	else if (m == tsAM)
-		return NULL;//TS590S_empty;
-	else
-		return NULL;//TS590S_empty;
-}
-
-const char **RIG_TS590S::lotable(int m)
-{
-	if (m == tsLSB || m == tsUSB || m == tsFM || m == tsFMD)
-		return TS590S_SSB_lo;
-	else if (m == tsCW || m == tsCWR)
-		return NULL;
-	else if (m == tsFSK || m == tsFSKR)
-		return NULL;
-	else if (m == tsAM)
-		return TS590S_AM_lo;
-	else
-		return TS590S_DATA_shift;
-}
-
-const char **RIG_TS590S::hitable(int m)
-{
-	if (m == tsLSB || m == tsUSB || m == tsFM || m == tsFMD)
+	if (m == LSB || m == USB || m == FM || m == FMD)
 		return TS590S_SSB_hi;
-	else if (m == tsCW || m == tsCWR)
-		return NULL;
-	else if (m == tsFSK || m == tsFSKR)
-		return NULL;
-	else if (m == tsAM)
+	else if (m == CW || m == CWR)
+		return TS590S_CWwidths;
+	else if (m == FSK || m == FSKR)
+		return TS590S_FSKwidths;
+	else if (m == AM)
 		return TS590S_AM_hi;
 	else
 		return TS590S_DATA_width;
 }
 
+const char **RIG_TS590S::lotable(int m)
+{
+	if (m == LSB || m == USB || m == FM || m == FMD)
+		return TS590S_SSB_lo;
+	else if (m == AM)
+		return TS590S_AM_lo;
+	else if (m == LSBD || m == USBD)
+		return TS590S_DATA_shift;
+// CW CWR FSK FSKR
+	return NULL;
+}
+
+const char **RIG_TS590S::hitable(int m)
+{
+	if (m == LSB || m == USB || m == FM || m == FMD)
+		return TS590S_SSB_hi;
+	else if (m == AM)
+		return TS590S_AM_hi;
+	else if (m == LSBD || m == USBD)
+		return TS590S_DATA_width;
+// CW CWR FSK FSKR
+	return NULL;
+}
+
 int RIG_TS590S::adjust_bandwidth(int val)
 {
-	if (val == tsLSB || val == tsUSB || val == tsFM || val == tsFMD)
-		return 0x8A03;
-	else if (val == tsLSBD || val == tsUSBD)
-		return 0x8D05;
-	else if (val == tsCW || val == tsCWR)
-		return 7;
-	else if (val == tsFSK || val == tsFSKR)
-		return 1;
+	if (val == LSB || val == USB || val == FM || val == FMD)
+		return DEF_lo_hi;
+	else if (val == LSBD || val == USBD)
+		return DEF_width_shift;
+	else if (val == CW || val == CWR)
+		return DEF_cw;
+	else if (val == FSK || val == FSKR)
+		return DEF_fsk;
 //	else if (val == AM)
-		return 0x8201;
+	return DEF_am;
 }
 
 int RIG_TS590S::def_bandwidth(int val)
@@ -840,10 +862,10 @@ int RIG_TS590S::def_bandwidth(int val)
 void RIG_TS590S::set_bwA(int val)
 {
 // LSB, USB, FM, FM-D
-	if (A.imode == tsLSB || A.imode == tsUSB || A.imode == tsFM || A.imode == tsFMD) {
+	if (A.imode == LSB || A.imode == USB || A.imode == FM || A.imode == FMD) {
 		if (val < 256) return;
 		A.iBW = val;
-		cmd = TS590S_CAT_ssb_lo[A.iBW  & 0x7F];
+		cmd = TS590S_CAT_ssb_lo[A.iBW & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set lower", cmd, replystr);
 		cmd = TS590S_CAT_ssb_hi[(A.iBW >> 8) & 0x7F];
@@ -852,7 +874,7 @@ void RIG_TS590S::set_bwA(int val)
 		return;
 	}
 // LSB-D, USB-D
-	if (A.imode == tsLSBD || A.imode == tsUSBD) {
+	if (A.imode == LSBD || A.imode == USBD) {
 		if (val < 256) return;
 		A.iBW = val;
 		cmd = TS590S_CAT_data_shift[A.iBW & 0x7F];
@@ -864,20 +886,20 @@ void RIG_TS590S::set_bwA(int val)
 		return;
 	}
 // AM
-	if (A.imode == tsAM) {
+	if (A.imode == AM) {
 		if (val < 256) return;
 		A.iBW = val;
-		cmd = TS590S_CAT_am_lo[(A.iBW >> 8) & 0x7F];
+		cmd = TS590S_CAT_am_lo[A.iBW & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set lower", cmd, replystr);
-		cmd = TS590S_CAT_am_hi[A.iBW & 0x7F];
+		cmd = TS590S_CAT_am_hi[(A.iBW >> 8) & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set upper", cmd, replystr);
 		return;
 	}
 	if (val > 256) return;
 // CW
-	if (A.imode == tsCW || A.imode == tsCWR) {
+	if (A.imode == CW || A.imode == CWR) {
 		A.iBW = val;
 		cmd = TS590S_CWbw[A.iBW];
 		sendCommand(cmd,0);
@@ -885,7 +907,7 @@ void RIG_TS590S::set_bwA(int val)
 		return;
 	}
 // FSK
-	if (A.imode == tsFSK || A.imode == tsFSKR) {
+	if (A.imode == FSK || A.imode == FSKR) {
 		A.iBW = val;
 		cmd = TS590S_FSKbw[A.iBW];
 		sendCommand(cmd,0);
@@ -896,7 +918,7 @@ void RIG_TS590S::set_bwA(int val)
 
 void RIG_TS590S::set_bwB(int val)
 {
-	if (B.imode == tsLSB || B.imode == tsUSB || B.imode == tsFM || B.imode == tsFMD) {
+	if (B.imode == LSB || B.imode == USB || B.imode == FM || B.imode == FMD) {
 		if (val < 256) return;
 		B.iBW = val;
 		cmd = TS590S_CAT_ssb_lo[B.iBW & 0x7F];
@@ -907,10 +929,10 @@ void RIG_TS590S::set_bwB(int val)
 		showresp(WARN, ASC, "set upper", cmd, replystr);
 		return;
 	}
-	if (B.imode == tsLSBD || B.imode == tsUSBD) { // SSB data mode
+	if (B.imode == LSBD || B.imode == USBD) { // SSB data mode
 		if (val < 256) return;
 		B.iBW = val;
-		cmd = TS590S_CAT_data_shift[B.iBW & 0x7F];
+		cmd = TS590S_CAT_data_shift[B.iBW  & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set shift", cmd, replystr);
 		cmd = TS590S_CAT_data_width[(B.iBW >> 8) & 0x7F];
@@ -918,20 +940,20 @@ void RIG_TS590S::set_bwB(int val)
 		showresp(WARN, ASC, "set width", cmd, replystr);
 		return;
 	}
-	if (B.imode == tsAM) {
+	if (B.imode == AM) {
 		if (val < 256) return;
 		B.iBW = val;
-		cmd = TS590S_AM_lo[(B.iBW >> 8) & 0x7F];
+		cmd = TS590S_AM_lo[B.iBW & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set lower", cmd, replystr);
-		cmd = TS590S_AM_hi[B.iBW & 0x7F];
+		cmd = TS590S_AM_hi[(B.iBW >> 8) & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set upper", cmd, replystr);
 		return;
 	}
 
 	if (val > 256) return;
-	if (B.imode == tsCW || B.imode == tsCWR) {
+	if (B.imode == CW || B.imode == CWR) {
 		B.iBW = val;
 		cmd = TS590S_CWbw[B.iBW];
 		sendCommand(cmd,0);
@@ -939,7 +961,7 @@ void RIG_TS590S::set_bwB(int val)
 		return;
 	}
 
-	if (B.imode == tsFSK || B.imode == tsFSKR) {
+	if (B.imode == FSK || B.imode == FSKR) {
 		B.iBW = val;
 		cmd = TS590S_FSKbw[B.iBW];
 		sendCommand(cmd,0);
@@ -950,9 +972,11 @@ void RIG_TS590S::set_bwB(int val)
 
 int RIG_TS590S::get_bwA()
 {
-	int i = 0;
+	int i = 0, lo = 0, hi = 0;
 	size_t p;
-	if (A.imode == tsCW || A.imode == tsCWR) {
+	switch (A.imode) {
+	case CW: case CWR:
+		A.iBW = DEF_cw;
 		cmd = "FW;";
 		waitN(7, 100, "get CW width", ASC);
 		p = replystr.rfind("FW");
@@ -963,7 +987,9 @@ int RIG_TS590S::get_bwA()
 			if (i == 14) i = 13;
 			A.iBW = i;
 		}
-	} else if (A.imode == tsFSK || A.imode == tsFSKR) {
+		break;
+	case FSK: case FSKR:
+		A.iBW = DEF_fsk;
 		cmd = "FW;";
 		waitN(7, 100, "get FSK width", ASC);
 		p = replystr.rfind("FW");
@@ -974,42 +1000,50 @@ int RIG_TS590S::get_bwA()
 			if (i == 4) i = 3;
 			A.iBW = i;
 		}
-	}
-	else if (A.imode == tsLSB || A.imode == tsUSB || A.imode == tsFM || A.imode == tsFMD) {
-		int lo = A.iBW & 0x7F, hi = (A.iBW >> 8) & 0x7F;
+		break;
+	case LSB: case USB: case FM:
+		A.iBW = DEF_lo_hi;
+		lo = A.iBW & 0x7F;
+		hi = (A.iBW >> 8) & 0x7F;
 		cmd = "SL;";
 		waitN(5, 100, "get lower", ASC);
 		p = replystr.rfind("SL");
-		if (p != string::npos)
-			lo = fm_decimal(&replystr[2], 2);
+		if (p == string::npos) break;
+		lo = fm_decimal(&replystr[2], 2);
 		cmd = "SH;";
 		waitN(5, 100, "get upper", ASC);
 		p = replystr.rfind("SH");
-		if (p != string::npos)
-			hi = fm_decimal(&replystr[2], 2);
+		if (p == string::npos) break;
+		hi = fm_decimal(&replystr[2], 2);
 		A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
-	} else if (A.imode == tsLSBD || A.imode == tsUSBD) {
-		int lo = A.iBW & 0x7F, hi = (A.iBW >> 8) & 0x7F;
+		break;
+	case LSBD: case USBD: case FMD:
+		A.iBW = DEF_width_shift;
+		lo = A.iBW & 0x7F;
+		hi = (A.iBW >> 8) & 0x7F;
 		cmd = "SL;";
 		waitN(5, 100, "get width", ASC);
 		p = replystr.rfind("SL");
-		if (p != string::npos)
-			hi = fm_decimal(&replystr[2], 2);
+		if (p == string::npos) break;
+		hi = fm_decimal(&replystr[2], 2);
 		cmd = "SH;";
 		waitN(5, 100, "get shift", ASC);
 		p = replystr.rfind("SH");
-		if (p != string::npos)
-			lo = fm_decimal(&replystr[2], 2);
+		if (p == string::npos) break;
+		lo = fm_decimal(&replystr[2], 2);
 		A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+		break;
 	}
 	return A.iBW;
 }
 
 int RIG_TS590S::get_bwB()
 {
-	int i = 0;
+	int i = 0, lo = 0, hi = 0;
 	size_t p;
-	if (B.imode == tsCW || B.imode == tsCWR) {
+	switch (B.imode) {
+	case CW: case CWR:
+		B.iBW = DEF_cw;
 		cmd = "FW;";
 		waitN(7, 100, "get CW width", ASC);
 		p = replystr.rfind("FW");
@@ -1020,7 +1054,9 @@ int RIG_TS590S::get_bwB()
 			if (i == 14) i = 13;
 			B.iBW = i;
 		}
-	} else if (B.imode == tsFSK || B.imode == tsFSKR) {
+		break;
+	case FSK: case FSKR:
+		B.iBW = DEF_fsk;
 		cmd = "FW;";
 		waitN(7, 100, "get FSK width", ASC);
 		p = replystr.rfind("FW");
@@ -1031,33 +1067,39 @@ int RIG_TS590S::get_bwB()
 			if (i == 4) i = 3;
 			B.iBW = i;
 		}
-	}
-	else if (B.imode == tsLSB || B.imode == tsUSB || B.imode == tsFM || B.imode == tsFMD) {
-		int lo = B.iBW & 0xFF, hi = (B.iBW >> 8) & 0x7F;
+		break;
+	case LSB: case USB: case FM:
+		B.iBW = DEF_lo_hi;
+		lo = B.iBW & 0xFF;
+		hi = (B.iBW >> 8) & 0x7F;
 		cmd = "SL;";
 		waitN(5, 100, "get lower", ASC);
 		p = replystr.rfind("SL");
-		if (p != string::npos)
-			lo = fm_decimal(&replystr[2], 2);
+		if (p == string::npos) break;
+		lo = fm_decimal(&replystr[2], 2);
 		cmd = "SH;";
 		waitN(5, 100, "get upper", ASC);
 		p = replystr.rfind("SH");
-		if (p != string::npos)
-			hi = fm_decimal(&replystr[2], 2);
+		if (p == string::npos) break;
+		hi = fm_decimal(&replystr[2], 2);
 		B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
-	} else if (B.imode == tsLSBD || B.imode == tsUSBD) {
-		int lo = B.iBW & 0x7F, hi = (B.iBW >> 8) & 0x7F;
+		break;
+	case LSBD: case USBD: case FMD:
+		B.iBW = DEF_width_shift;
+		lo = B.iBW & 0x7F;
+		hi = (B.iBW >> 8) & 0x7F;
 		cmd = "SL;";
 		waitN(5, 100, "get width", ASC);
 		p = replystr.rfind("SL");
-		if (p != string::npos)
-			hi = fm_decimal(&replystr[2], 2);
+		if (p == string::npos) break;
+		hi = fm_decimal(&replystr[2], 2);
 		cmd = "SH;";
 		waitN(5, 100, "get shift", ASC);
 		p = replystr.rfind("SH");
-		if (p != string::npos)
-			lo = fm_decimal(&replystr[2], 2);
+		if (p == string::npos) break;
+		lo = fm_decimal(&replystr[2], 2);
 		B.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
+		break;
 	}
 	return B.iBW;
 }
@@ -1124,7 +1166,7 @@ void RIG_TS590S::set_noise(bool val)
 //======================================================================
 void RIG_TS590S::set_if_shift(int val)
 {
-	if (active_mode == tsCW || active_mode == tsCWR) { // cw modes
+	if (active_mode == CW || active_mode == CWR) { // cw modes
 		progStatus.shift_val = val;
 		cmd = "IS ";
 		cmd.append(to_decimal(abs(val),4)).append(";");
@@ -1135,7 +1177,7 @@ void RIG_TS590S::set_if_shift(int val)
 
 bool RIG_TS590S::get_if_shift(int &val)
 {
-	if (active_mode == tsCW || active_mode == tsCWR) { // cw modes
+	if (active_mode == CW || active_mode == CWR) { // cw modes
 		cmd = "IS;";
 		waitN(8, 100, "get IF shift", ASC);
 		size_t p = replystr.rfind("IS");
@@ -1220,29 +1262,50 @@ void RIG_TS590S::get_rf_min_max_step(int &min, int &max, int &step)
 	step = 1;
 }
 
-static bool nr_on = false;
-
 void RIG_TS590S::set_noise_reduction(int val)
 {
-	cmd.assign("NR").append(val ? "1" : "0" ).append(";");
-	sendCommand(cmd);
+	if (val == -1) {
+		if (noise_reduction_level == 1) {
+			nr_label("NR1", true);
+		} else if (noise_reduction_level == 2) {
+			nr_label("NR2", true);
+		}
+		return;
+	}
+	if (noise_reduction_level == 0) {
+		noise_reduction_level = 1;
+		nr_label("NR1", true);
+	} else if (noise_reduction_level == 1) {
+		noise_reduction_level = 2;
+		nr_label("NR2", true);
+	} else if (noise_reduction_level == 2) {
+		noise_reduction_level = 0;
+		nr_label("NR", false);
+	}
+	cmd.assign("NR");
+	cmd += '0' + noise_reduction_level;
+	sendCommand (cmd);
 	showresp(WARN, ASC, "SET noise reduction", cmd, replystr);
-	if (val) nr_on = true;
-	else nr_on = false;
 }
 
 int  RIG_TS590S::get_noise_reduction()
 {
-	int val;
 	cmd = rsp = "NR";
 	cmd.append(";");
 	waitN(4, 100, "GET noise reduction", ASC);
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
-	val = replystr[p+2] - '0';
-	if (val == 2) nr_on = true;
-	else nr_on = false;
-	return val;
+	if (p == string::npos) return noise_reduction_level;
+	noise_reduction_level = replystr[p+2] - '0';
+
+	if (noise_reduction_level == 1) {
+		nr_label("NR1", true);
+	} else if (noise_reduction_level == 2) {
+		nr_label("NR2", true);
+	} else {
+		nr_label("NR", false);
+	}
+
+	return noise_reduction_level;
 }
 
 void RIG_TS590S::set_noise_reduction_val(int val)
@@ -1254,13 +1317,13 @@ void RIG_TS590S::set_noise_reduction_val(int val)
 
 int  RIG_TS590S::get_noise_reduction_val()
 {
-	if (!nr_on) return 0;
+	if (noise_reduction_level == 0) return 0;
 	int val = 1;
 	cmd = rsp = "RL";
 	cmd.append(";");
 	waitN(5, 100, "GET noise reduction val", ASC);
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return val;
+	if (p == string::npos) return progStatus.noise_reduction_val;
 	val = atoi(&replystr[p+2]);
 	return val;
 }

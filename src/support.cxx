@@ -45,8 +45,8 @@ enum {VOL, MIC, PWR, SQL, IFSH, NOTCH, RFGAIN, NR };
 struct SLIDER { 
 	int  which;
 	float value;
-	bool button;
-	SLIDER(int a, float f, bool b = false) {which = a; value = f; button = b;}
+	int  button;
+	SLIDER(int a, float f, int b = 0) {which = a; value = f; button = b;}
 };
 
 queue<SLIDER> sliders;
@@ -177,14 +177,10 @@ void read_vfo()
 
 void setModeControl(void *)
 {
-
-
-
 	opMODE->index(vfo.imode);
 
 // enables/disables the IF shift control, depending on the mode.
 // the IF Shift function, is ONLY valid in CW modes, with the 870S.
-
 
 	if (rig_nbr == TS870S) {
 		if (vfo.imode == RIG_TS870S::tsCW || vfo.imode == RIG_TS870S::tsCWR) {
@@ -195,8 +191,6 @@ void setModeControl(void *)
 			sldrIFSHIFT->deactivate();
 		}
 	}
-
-
 }
 
 // mode and bandwidth
@@ -249,31 +243,29 @@ void setBWControl(void *)
 {
 	if (selrig->has_dsp_controls) {
 		if (vfo.iBW < 256) {
-			opBW->index(vfo.iBW);
+			opDSP_lo->index(0);
+			opDSP_hi->index(0);
 			opDSP_lo->hide();
 			opDSP_hi->hide();
 			btnDSP->hide();
-			opDSP_lo->index(0);
-			opDSP_hi->index(0);
+			opBW->index(vfo.iBW);
 			opBW->show();
 		} else {
+			opBW->index(0);
+			opBW->hide();
 			opDSP_lo->index(vfo.iBW & 0xFF);
+			opDSP_lo->hide();
 			opDSP_hi->index((vfo.iBW >> 8) & 0x7F);
-			if (!btnDSP->visible()) {
-				opBW->index(0);
-				opBW->hide();
-				opDSP_hi->show();
-				opDSP_lo->hide();
-				btnDSP->label(selrig->hi_label);
-				btnDSP->redraw_label();
-				btnDSP->show();
-			}
+			opDSP_hi->show();
+			btnDSP->label(selrig->hi_label);
+			btnDSP->redraw_label();
+			btnDSP->show();
 		}
 	} else {
-		opBW->index(vfo.iBW);
 		opDSP_lo->hide();
 		opDSP_hi->hide();
 		btnDSP->hide();
+		opBW->index(vfo.iBW);
 		opBW->show();
 	}
 }
@@ -628,6 +620,9 @@ void serviceA()
 	}
 	pthread_mutex_unlock(&mutex_queA);
 
+//printf("vfo is %s\n", print(vfo));
+//printf("A   is %s\n", print(vfoA));
+
 	if (RIG_DEBUG)
 		LOG_INFO("%s", print(vfoA));
 
@@ -652,13 +647,13 @@ void serviceA()
 		selrig->set_modeA(vfoA.imode);
 		vfo.imode = vfoA.imode;
 		Fl::awake(setModeControl);
-		if (!((vfoA.src == XML) && 
-			(rig_nbr == TS2000 || rig_nbr == TS590S || rig_nbr == TS990) ) ) {
+//		if (!((vfoA.src == XML) && 
+//			(rig_nbr == TS2000 || rig_nbr == TS590S || rig_nbr == TS990) ) ) {
 			vfo.iBW = vfoA.iBW;
 			set_bandwidth_control();
 			Fl::awake(setBWControl);
 			selrig->set_bwA(vfo.iBW);
-		}
+//		}
 		try {
 			if (vfoA.src == UI)
 				send_new_mode(vfoA.imode);
@@ -667,12 +662,12 @@ void serviceA()
 			send_new_bandwidth(vfo.iBW);
 		} catch (...) {}
 	} else if (vfoA.iBW != vfo.iBW) {
-		if (!((vfoA.src == XML) && 
-			(rig_nbr == TS2000 || rig_nbr == TS590S || rig_nbr == TS990) ) ) {
+//		if ((vfoA.src == XML) && 
+//			(rig_nbr == TS2000 || rig_nbr == TS590S || rig_nbr == TS990) ) {
 			selrig->set_bwA(vfoA.iBW);
 			vfo.iBW = vfoA.iBW;
 			Fl::awake(setBWControl);
-		}
+//		}
 		if (vfoA.src == UI) {
 			try {
 				send_new_bandwidth(vfo.iBW);
@@ -703,6 +698,9 @@ void serviceB()
 	}
 	pthread_mutex_unlock(&mutex_queB);
 
+//printf("vfo is %s\n", print(vfo));
+//printf("B   is %s\n", print(vfoB));
+
 	if (RIG_DEBUG)
 		LOG_INFO("%s", print(vfoB));
 
@@ -726,13 +724,13 @@ void serviceB()
 		selrig->set_modeB(vfoB.imode);
 		vfo.imode = vfoB.imode;
 		Fl::awake(setModeControl);
-		if (!((vfoB.src == XML) && 
-			(rig_nbr == TS2000 && rig_nbr == TS590S || rig_nbr == TS990) ) ) {
+//		if (!((vfoB.src == XML) && 
+//			(rig_nbr == TS2000 || rig_nbr == TS590S || rig_nbr == TS990) ) ) {
 			vfo.iBW = vfoB.iBW;
 			set_bandwidth_control();
 			Fl::awake(setBWControl);
 			selrig->set_bwB(vfo.iBW);
-		}
+//		}
 		try {
 			if (vfoB.src == UI)
 				send_new_mode(vfoB.imode);
@@ -741,12 +739,12 @@ void serviceB()
 			send_new_bandwidth(vfo.iBW);
 		} catch (...) {}
 	} else if (vfoB.iBW != vfo.iBW || pushedB) {
-		if (!((vfoB.src == XML) && 
-			(rig_nbr == TS2000 && rig_nbr == TS590S || rig_nbr == TS990) ) ) {
+//		if (!((vfoB.src == XML) && 
+//			(rig_nbr == TS2000 || rig_nbr == TS590S || rig_nbr == TS990) ) ) {
 			selrig->set_bwB(vfoB.iBW);
 			vfo.iBW = vfoB.iBW;
 			Fl::awake(setBWControl);
-		}
+//		}
 		if (vfoB.src == UI) {
 			try {
 				send_new_bandwidth(vfo.iBW);
@@ -821,10 +819,36 @@ void serviceSliders()
 				rfgain_changed = false;
 				break;
 			case NR:
-				progStatus.noise_reduction = working.button;
-				progStatus.noise_reduction_val = working.value;
-				selrig->set_noise_reduction(working.button);
-				selrig->set_noise_reduction_val(working.value);
+				if (rig_nbr == TS2000) {
+					if (working.button != -1) { // pia
+						if (selrig->noise_reduction_level() == 0) {
+							selrig->set_noise_reduction(1);
+							selrig->set_noise_reduction_val(selrig->nrval1());
+							progStatus.noise_reduction = 1;
+							progStatus.noise_reduction_val = selrig->nrval1();
+							Fl::awake(update_nr, (void*)0);
+						} else if (selrig->currmode() != RIG_TS2000::FM &&
+								  selrig->noise_reduction_level() == 1) {
+							selrig->set_noise_reduction(2);
+							selrig->set_noise_reduction_val(selrig->nrval2());
+							progStatus.noise_reduction = 2;
+							progStatus.noise_reduction_val = selrig->nrval2();
+							Fl::awake(update_nr, (void*)0);
+						} else
+							selrig->set_noise_reduction(0);
+					} else {
+						progStatus.noise_reduction_val = working.value;
+						selrig->set_noise_reduction_val(working.value);
+						Fl::awake(update_nr, (void*)0);
+					}
+				} else { // not TS2000
+					if (working.button != -1) {
+						progStatus.noise_reduction = working.button;
+						selrig->set_noise_reduction(working.button);
+					}
+					progStatus.noise_reduction_val = working.value;
+					selrig->set_noise_reduction_val(working.value);
+				}
 				noise_reduction_changed = false;
 				break;
 			default :
@@ -1007,10 +1031,12 @@ void setBW()
 	fm.iBW = opBW->index();
 	if (useB) {
 		pthread_mutex_lock(&mutex_queB);
+//printf("pushed to B: %s\n", print(fm));
 		queB.push(fm);
 		pthread_mutex_unlock(&mutex_queB);
 	} else {
 		pthread_mutex_lock(&mutex_queA);
+//printf("pushed to A: %s\n", print(fm));
 		queA.push(fm);
 		pthread_mutex_unlock(&mutex_queA);
 	}
@@ -1088,28 +1114,28 @@ void updateBandwidthControl(void *d)
 				for (int i = 0; selrig->dsp_hi[i] != NULL; i++)
 					opDSP_hi->add(selrig->dsp_hi[i]);
 				if (vfo.iBW > 256) {
-					opDSP_lo->index(vfo.iBW & 0xFF);
-					opDSP_hi->index((vfo.iBW >> 8) & 0x7F);
 					opBW->index(0);
 					opBW->hide();
-					btnDSP->label(selrig->hi_label);
-					btnDSP->show();
-					opDSP_hi->show();
-					opDSP_lo->hide();
 					opBW->hide();
+					opDSP_lo->index(vfo.iBW & 0xFF);
+					opDSP_lo->hide();
+					opDSP_hi->index((vfo.iBW >> 8) & 0x7F);
+					btnDSP->label(selrig->lo_label);
+					opDSP_lo->show();
+					btnDSP->show();
 				} else {
-					opBW->index(vfo.iBW);
-					opBW->show();
 					opDSP_lo->hide();
 					opDSP_hi->hide();
 					btnDSP->hide();
+					opBW->index(vfo.iBW);
+					opBW->show();
 				}
 			} else {  // no DSP control so update BW control, hide DSP
-				opBW->index(vfo.iBW);
-				opBW->show();
 				opDSP_lo->hide();
 				opDSP_hi->hide();
 				btnDSP->hide();
+				opBW->index(vfo.iBW);
+				opBW->show();
 			}
 		}
 	} else { // no BW, no DSP controls
@@ -3402,7 +3428,7 @@ void initRig()
 		send_new_freq(vfoA.freq);
 		send_new_mode(vfoA.imode);
 		send_sideband();
-		send_new_bandwidth(vfoA.iBW);
+		send_new_bandwidth(vfoA.iBW & 0x7F);
 	} catch (...) {}
 
 // enable xml loop
@@ -3566,30 +3592,37 @@ void initRigCombo()
 	selectRig->index(rig_nbr = 0);
 }
 
+void nr_label(const char *l, bool on = false)
+{
+	btnNR->value(on ? 1 : 0);
+	btnNR->label(l);
+	btnNR->redraw_label();
+}
+
 void nb_label(const char * l, bool on = false)
 {
-	btnNOISE->value(on);
+	btnNOISE->value(on ? 1 : 0);
 	btnNOISE->label(l);
 	btnNOISE->redraw_label();
 }
 
 void preamp_label(const char * l, bool on = false)
 {
-	btnPreamp->value(on);
+	btnPreamp->value(on ? 1 : 0);
 	btnPreamp->label(l);
 	btnPreamp->redraw_label();
 }
 
 void atten_label(const char * l, bool on = false)
 {
-	btnAttenuator->value(on);
+	btnAttenuator->value(on ? 1 : 0);
 	btnAttenuator->label(l);
 	btnAttenuator->redraw_label();
 }
 
 void auto_notch_label(const char * l, bool on = false)
 {
-	btnAutoNotch->value(on);
+	btnAutoNotch->value(on ? 1 : 0);
 	btnAutoNotch->label(l);
 	btnAutoNotch->redraw_label();
 }
@@ -3803,7 +3836,7 @@ void cbBandSelect(int band)
 		if (selrig->has_bandwidth_control) {
 			try {
 				send_bandwidths();
-				send_new_bandwidth(vfo.iBW);
+				send_new_bandwidth(vfo.iBW & 0x7F);
 			} catch (...) {}
 		}
 		MilliSleep(100);	// remote sync-up

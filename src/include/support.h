@@ -194,6 +194,7 @@ extern void open_send_command_tab();
 extern void show_controls();
 extern void cb_close_TT550_setup();
 extern void cbUseRepeatButtons(bool on);
+extern void nr_label(const char *, bool on);
 extern void nb_label(const char *, bool on);
 extern void preamp_label(const char *, bool on);
 extern void atten_label(const char *, bool on);

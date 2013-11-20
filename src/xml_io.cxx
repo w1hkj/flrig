@@ -148,7 +148,7 @@ void send_modes() {
 
 void send_bandwidths()
 {
-	if (!selrig->bandwidths_ || selrig->has_dsp_controls) return;
+	if (!selrig->bandwidths_ ) return;
 	XmlRpcValue bandwidths, res;
 	int i = 0;
 	for (const char** bw = selrig->bandwidths_; *bw; bw++, i++) {
@@ -252,10 +252,12 @@ void send_new_mode(int md)
 
 void send_new_bandwidth(int bw)
 {
-	if (!selrig->bandwidths_ || selrig->has_dsp_controls) return;
+	if (!selrig->bandwidths_ ) return;
 	try {
 		xmlvfo.iBW = bw;
-		XmlRpcValue bandwidth(selrig->bandwidths_[bw]), res;
+		int selbw = (bw > 0x80) ? (bw >> 8 & 0x7F) : bw;
+//printf("bw %X, bw# %d, bw %s\n", bw, selbw, selrig->bandwidths_[selbw]);
+		XmlRpcValue bandwidth(selrig->bandwidths_[selbw]), res;
 		execute(rig_set_bandwidth, bandwidth, res);
 		ignore = 1;
 	} catch (const XmlRpc::XmlRpcException& e) {
@@ -335,17 +337,37 @@ static void check_for_bandwidth_change(const XmlRpcValue& new_bw)
 		return;
 	}
 
-	if (!selrig->bandwidths_ || vfo.iBW == -1 || selrig->has_dsp_controls)
+	if (!selrig->bandwidths_ || vfo.iBW == -1 )
 		return;
 
 	string sbw = new_bw;
-	if (sbw != selrig->bwtable(xmlvfo.imode)[xmlvfo.iBW]) {
-		int ibw = 0;
-		const char **bwt = &selrig->bwtable(xmlvfo.imode)[0];
-		while ((bwt[ibw] != NULL) && (sbw != bwt[ibw])) ibw++;
-		if (bwt[ibw] != NULL && ibw != xmlvfo.iBW) {
-			xmlvfo.iBW = ibw;
-			xmlvfo_changed = true;
+	if (selrig->has_dsp_controls) {
+		int currlo = xmlvfo.iBW & 0x7F;
+		int currhi = (xmlvfo.iBW >> 8) & 0x7F;
+//printf("mode %d, lo %d, hi %d\n", xmlvfo.imode, currlo, currhi);
+//printf("&bwtable(xmlvfo.imode) %p\n", selrig->bwtable(xmlvfo.imode));
+		string currbw = selrig->bwtable(xmlvfo.imode)[currhi];
+		if (sbw != currbw) {
+			int ibw = 0;
+			const char **bwt = selrig->bwtable(xmlvfo.imode);
+			while ((bwt[ibw] != NULL) && (sbw != bwt[ibw])) ibw++;
+//printf("index %d ", ibw);
+			if (bwt[ibw] != NULL) { // && ibw != (xmlvfo.iBW & 0x7F)) {
+				xmlvfo.iBW = (ibw << 8) | 0x8000 | currlo;
+//printf("bandwidth %s, new xmlvfo.iBW %X", bwt[ibw], xmlvfo.iBW);
+				xmlvfo_changed = true;
+			}
+//printf("\n");
+		}
+	} else {
+		if (sbw != selrig->bwtable(xmlvfo.imode)[xmlvfo.iBW]) {
+			int ibw = 0;
+			const char **bwt = &selrig->bwtable(xmlvfo.imode)[0];
+			while ((bwt[ibw] != NULL) && (sbw != bwt[ibw])) ibw++;
+			if (bwt[ibw] != NULL && ibw != xmlvfo.iBW) {
+				xmlvfo.iBW = ibw;
+				xmlvfo_changed = true;
+			}
 		}
 	}
 }
@@ -373,6 +395,7 @@ static void push2que()
 		}
 		if (XML_DEBUG)
 			LOG_ERROR("pushed to B %s", print(xmlvfo));
+//printf("pushed to B %s\n", print(xmlvfo));
 		pthread_mutex_lock(&mutex_queB);
 		queB.push(xmlvfo);
 		pthread_mutex_unlock(&mutex_queB);
@@ -384,6 +407,7 @@ static void push2que()
 		}
 		if (XML_DEBUG)
 			LOG_ERROR("pushed to A %s", print(xmlvfo));
+//printf("pushed to A %s\n", print(xmlvfo));
 		pthread_mutex_lock(&mutex_queA);
 		queA.push(xmlvfo);
 		pthread_mutex_unlock(&mutex_queA);
@@ -402,22 +426,24 @@ static void send_rig_info()
 	XmlRpcValue res;
 	try {
 		execute(rig_take_control, XmlRpcValue(), res);
-
 		send_name();
+//printf("send name\n");
 		send_modes();
+//printf("send_modes\n");
 		send_bandwidths();
+//printf("send_bandwidths\n");
 
 		if (!useB) xmlvfo = vfoA;
 		else       xmlvfo = vfoB;
 
 		send_new_mode(xmlvfo.imode);
-
+//printf("send_new_mode\n");
 		send_new_bandwidth(xmlvfo.iBW);
-
+//printf("send_new_bandwidth\n");
 		send_sideband();
-
+//printf("send sideband\n");
 		send_new_freq(xmlvfo.freq);
-
+//printf("send new frequency\n");
 		fldigi_online = true;
 		rig_reset = false;
 		Fl::awake(set_fldigi_connect, (void *)1);

@@ -14,45 +14,42 @@
 static const char TS2000name_[] = "TS-2000";
 
 static const char *TS2000modes_[] = {
-	"LSB", "USB", "CW", "FM", "AM", "FSK", "CW-R", "FSK-R", NULL};
+	"LSB", "USB", "CW", "FM", "AM", "FSK", "CW-R", "FSK-R", "DIGI-L", "DIGI-U", NULL};
 
 static const char TS2000_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '9' };
 static const char TS2000_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'U' };
 
 static const char *TS2000_empty[] = { "N/A", NULL };
-
+//------------------------------------------------------------------------------
 static const char *TS2000_lo[] = {
  "10",   "50", "100", "200", "300", 
 "400",  "500", "600", "700", "800", 
 "900", "1000", NULL };
-
 static const char *TS2000_CAT_lo[] = {
 "SL00;", "SL01;", "SL02;", "SL03;", "SL04;", 
 "SL05;", "SL06;", "SL07;", "SL08;", "SL09;",
 "SL10;", "SL11;", NULL };
 static const char *TS2000_lo_tooltip = "lo cutoff";
 static const char *TS2000_SSB_btn_lo_label = "L";
-
+//------------------------------------------------------------------------------
 static const char *TS2000_hi[] = {
 "1400", "1600", "1800", "2000", "2200",
 "2400", "2600", "2800", "3000", "3400",
 "4000", "5000", NULL };
-
 static const char *TS2000_CAT_hi[] = {
 "SH00;", "SH01;", "SH02;", "SH03;", "SH04;", 
 "SH05;", "SH06;", "SH07;", "SH08;", "SH09;",
 "SH10;", "SH11;", NULL };
 static const char *TS2000_hi_tooltip = "hi cutoff";
 static const char *TS2000_SSB_btn_hi_label = "H";
-
+//------------------------------------------------------------------------------
 static const char *TS2000_AM_lo[] = {
 "0", "100", "200", "500",
 NULL };
-
 static const char *TS2000_AM_hi[] = {
 "2500", "3000", "4000", "5000",
 NULL };
-
+//------------------------------------------------------------------------------
 static const char *TS2000_CWwidths[] = {
 "50", "80", "100", "150", "200", 
 "300", "400", "500", "600", "1000", 
@@ -61,11 +58,12 @@ static const char *TS2000_CWbw[] = {
 "FW0050;", "FW0080;", "FW0100;", "FW0150;", "FW0200;", 
 "FW0300;", "FW0400;", "FW0500;", "FW0600;", "FW1000;", 
 "FW1500;" };
-
+//------------------------------------------------------------------------------
 static const char *TS2000_FSKwidths[] = {
 "250", "500", "1000", "1500", NULL};
 static const char *TS2000_FSKbw[] = {
 "FW0250;", "FW0500;", "FW1000;", "FW1500;" };
+//------------------------------------------------------------------------------
 
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
@@ -108,15 +106,38 @@ void RIG_TS2000::initialize()
 	select_swr();
 
 // restore state of xcvr beeps
-	cmd = menu012;
+//	cmd = menu012;
+//	sendCommand(cmd);
+
+// get current noise reduction values for NR1 and NR2
+	string current_nr;
+	cmd = "NR;";
+	if (waitN(4, 100, "read current NR", ASC) == 4)
+		current_nr = replystr;
+	cmd = "NR1;";
+	sendCommand(cmd);
+	cmd = "RL;";
+	waitN(5, 100, "GET noise reduction val", ASC);
+	size_t p = replystr.rfind("RL");
+	if (p != string::npos)
+		_nrval1 = atoi(&replystr[p+2]);
+	cmd = "NR2;";
+	sendCommand(cmd);
+	cmd = "RL;";
+	waitN(5, 100, "GET noise reduction val", ASC);
+	p = replystr.rfind("RL");
+	if (p != string::npos)
+		_nrval2 = atoi(&replystr[p+2]);
+// restore xcvr setting for NR
+	cmd = current_nr;
 	sendCommand(cmd);
 }
 
 void RIG_TS2000::shutdown()
 {
 // restore state of xcvr beeps
-//	cmd = menu012;
-//	sendCommand(cmd);
+	cmd = menu012;
+	sendCommand(cmd);
 }
 
 
@@ -163,6 +184,8 @@ RIG_TS2000::RIG_TS2000() {
 	has_auto_notch =
 	has_ifshift_control =
 	has_smeter =
+	has_noise_reduction =
+	has_noise_reduction_control =
 	has_noise_control =
 	has_micgain_control =
 	has_volume_control =
@@ -174,11 +197,16 @@ RIG_TS2000::RIG_TS2000() {
 	has_bandwidth_control =
 	has_ptt_control = true;
 
-	rxtxa = true;
+	rxona = true;
 
 	precision = 1;
 	ndigits = 9;
 
+	att_level = 0;
+	preamp_level = 0;
+	_noise_reduction_level = 0;
+	_nrval1 = 2;
+	_nrval2 = 4;
 }
 
 const char * RIG_TS2000::get_bwname_(int n, int md) 
@@ -188,11 +216,11 @@ const char * RIG_TS2000::get_bwname_(int n, int md)
 		int hi = (n >> 8) & 0x7F;
 		int lo = n & 0xFF;
 		snprintf(bwname, sizeof(bwname), "%s/%s",
-			(md == 0 || md == 1 || md == 3) ? TS2000_lo[lo] : TS2000_AM_lo[lo],
-			(md == 0 || md == 1 || md == 3) ? TS2000_hi[hi] : TS2000_AM_hi[hi] );
+			(md == LSB || md == USB || md == FM) ? TS2000_lo[lo] : TS2000_AM_lo[lo],
+			(md == LSB || md == USB || md == FM) ? TS2000_hi[hi] : TS2000_AM_hi[hi] );
 	} else {
 		snprintf(bwname, sizeof(bwname), "%s",
-			(md == 2 || md == 6) ? TS2000_CWwidths[n] : TS2000_FSKwidths[n]);
+			(md == CW || md == CWR) ? TS2000_CWwidths[n] : TS2000_FSKwidths[n]);
 	}
 	return bwname;
 }
@@ -205,6 +233,7 @@ void RIG_TS2000::selectA()
 	cmd = "FT0;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "Tx on A", cmd, replystr);
+	rxona = true;
 }
 
 void RIG_TS2000::selectB()
@@ -215,6 +244,7 @@ void RIG_TS2000::selectB()
 	cmd = "FT1;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "Tx on B", cmd, replystr);
+	rxona = false;
 }
 
 void RIG_TS2000::set_split(bool val) 
@@ -236,6 +266,7 @@ void RIG_TS2000::set_split(bool val)
 			sendCommand(cmd);
 			showresp(WARN, ASC, "Tx on B", cmd, replystr);
 		}
+		rxona = false;
 	} else {
 		if (val) {
 			cmd = "FR0;";
@@ -252,6 +283,7 @@ void RIG_TS2000::set_split(bool val)
 			sendCommand(cmd);
 			showresp(WARN, ASC, "Tx on A", cmd, replystr);
 		}
+		rxona = true;
 	}
 	Fl::awake(highlight_vfo, (void *)0);
 }
@@ -335,12 +367,18 @@ void RIG_TS2000::set_vfoB (long freq)
 
 int RIG_TS2000::get_smeter()
 {
-	cmd = "SM0;";
+	if (rxona)
+		cmd = "SM0;";
+	else
+		cmd = "SM1;";
 	waitN(8, 100, "get smeter", ASC);
 	size_t p = replystr.rfind("SM");
 	if (p != string::npos) {
 		int mtr = fm_decimal(&replystr[p+3],4);
-		mtr = (mtr * 100) / 30;
+		if (rxona)
+			mtr = (mtr * 100) / 30;
+		else
+			mtr = (mtr * 100) / 15;
 		return mtr;
 	}
 	return 0;
@@ -510,31 +548,36 @@ int RIG_TS2000::get_preamp()
 int RIG_TS2000::set_widths(int val)
 {
 	int bw;
-	if (val == LSB || val == USB || val == FM) {
-		bandwidths_ = TS2000_empty;
+	switch (val) {
+	case LSB: case USB: case FM:
+		bandwidths_ = TS2000_hi;
 		dsp_lo = TS2000_lo;
-		dsp_hi = TS2000_hi;
 		lo_tooltip = TS2000_lo_tooltip;
 		lo_label   = TS2000_SSB_btn_lo_label;
+		dsp_hi = TS2000_hi;
 		hi_tooltip = TS2000_hi_tooltip;
 		hi_label   = TS2000_SSB_btn_hi_label;
 		if (val == FM) bw = 0x8A03; // 200 ... 4000 Hz
 		else bw = 0x8803; // 200 ... 3000 Hz
-	} else if (val == CW || val == CWR) {
+		break;
+	case CW: case CWR:
 		bandwidths_ = TS2000_CWwidths;
 		dsp_lo = TS2000_empty;
 		dsp_hi = TS2000_empty;
 		bw = 7;
-	} else if (val == FSK || val == FSKR) {
+		break;
+	case FSK: case FSKR:
 		bandwidths_ = TS2000_FSKwidths;
 		dsp_lo = TS2000_empty;
 		dsp_hi = TS2000_empty;
 		bw = 1;
-	} else { // val == AM
-		bandwidths_ = TS2000_empty;
+		break;
+	case AM: default:
+		bandwidths_ = TS2000_AM_hi;
 		dsp_lo = TS2000_AM_lo;
 		dsp_hi = TS2000_AM_hi;
 		bw = 0x8201;
+		break;
 	}
 	return bw;
 }
@@ -542,13 +585,13 @@ int RIG_TS2000::set_widths(int val)
 const char **RIG_TS2000::bwtable(int val)
 {
 	if (val == LSB || val == USB || val == FM)
-		return NULL;
+		return TS2000_hi;
 	else if (val == CW || val == CWR)
 		return TS2000_CWwidths;
 	else if (val == FSK || val == FSKR)
 		return TS2000_FSKwidths;
 //else AM m == 4
-	return NULL;
+	return TS2000_AM_hi;
 }
 
 const char **RIG_TS2000::lotable(int val)
@@ -575,7 +618,7 @@ const char **RIG_TS2000::hitable(int val)
 
 void RIG_TS2000::set_modeA(int val)
 {
-	A.imode = val;
+	_currmode = A.imode = val;
 	cmd = "MD";
 	cmd += TS2000_mode_chr[val];
 	cmd += ';';
@@ -596,12 +639,13 @@ int RIG_TS2000::get_modeA()
 		A.imode = md;
 		A.iBW = set_widths(A.imode);
 	}
+	_currmode = A.imode;
 	return A.imode;
 }
 
 void RIG_TS2000::set_modeB(int val)
 {
-	B.imode = val;
+	_currmode = B.imode = val;
 	cmd = "MD";
 	cmd += TS2000_mode_chr[val];
 	cmd += ';';
@@ -622,6 +666,7 @@ int RIG_TS2000::get_modeB()
 		B.imode = md;
 		B.iBW = set_widths(B.imode);
 	}
+	_currmode = B.imode;
 	return B.imode;
 }
 
@@ -887,6 +932,7 @@ void RIG_TS2000::set_notch(bool on, int val)
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set notch on", cmd, replystr);
 		cmd = "BP";
+		val = round((val - 300) * 64.0 / 2700.0);
 		cmd.append(to_decimal(val, 3)).append(";");
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set notch val", cmd, replystr);
@@ -910,7 +956,7 @@ bool  RIG_TS2000::get_notch(int &val)
 			waitN(6, 100, "get notch val", ASC);
 			p = replystr.rfind("BP");
 			if (p != string::npos)
-				val = fm_decimal(&replystr[p+2],3);
+				val = 300 + (2700.0 / 64.0) * fm_decimal(&replystr[p+2],3);
 		}
 	}
 	return ison;
@@ -918,9 +964,9 @@ bool  RIG_TS2000::get_notch(int &val)
 
 void RIG_TS2000::get_notch_min_max_step(int &min, int &max, int &step)
 {
-	min = 0;
-	max = 63;
-	step = 1;
+	min = 300;
+	max = 3000;
+	step = 50;
 }
 
 void RIG_TS2000::set_auto_notch(int v)
@@ -956,5 +1002,80 @@ int  RIG_TS2000::get_rf_gain()
 	if (p != string::npos)
 		return fm_decimal(&replystr[p+2] ,3) * 100 / 255;
 	return 100;
+}
+
+void RIG_TS2000::set_noise_reduction(int val)
+{
+	if (val == -1) {
+//		if (_noise_reduction_level == 1) {
+//			nr_label("NR1", true);
+//		} else if (_noise_reduction_level == 2) {
+//			nr_label("NR2", true);
+//		}
+		return;
+	}
+	_noise_reduction_level = val;
+	if (_noise_reduction_level == 0) {
+		nr_label("NR", false);
+	} else if (_noise_reduction_level == 1) {
+		nr_label("NR1", true);
+	} else if (_noise_reduction_level == 2) {
+		nr_label("NR2", true);
+	}
+	cmd.assign("NR");
+	cmd += '0' + _noise_reduction_level;
+	cmd += ';';
+	sendCommand (cmd);
+	showresp(WARN, ASC, "SET noise reduction", cmd, replystr);
+}
+
+int  RIG_TS2000::get_noise_reduction()
+{
+	cmd = rsp = "NR";
+	cmd.append(";");
+	waitN(4, 100, "GET noise reduction", ASC);
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return _noise_reduction_level;
+	_noise_reduction_level = replystr[p+2] - '0';
+
+	if (_noise_reduction_level == 1) {
+		nr_label("NR1", true);
+	} else if (_noise_reduction_level == 2) {
+		nr_label("NR2", true);
+	} else {
+		nr_label("NR", false);
+	}
+
+	return _noise_reduction_level;
+}
+
+void RIG_TS2000::set_noise_reduction_val(int val)
+{
+	if (_noise_reduction_level == 0) return;
+	if (_noise_reduction_level == 1) _nrval1 = val;
+	else _nrval2 = val;
+
+	cmd.assign("RL").append(to_decimal(val, 2)).append(";");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET_noise_reduction_val", cmd, replystr);
+}
+
+int  RIG_TS2000::get_noise_reduction_val()
+{
+	if (_noise_reduction_level == 0) return 0;
+	int val = progStatus.noise_reduction_val;
+	cmd = rsp = "RL";
+	cmd.append(";");
+	waitN(5, 100, "GET noise reduction val", ASC);
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos)
+		return (_noise_reduction_level == 1 ? _nrval1 : _nrval2);
+
+	val = atoi(&replystr[p+2]);
+
+	if (_noise_reduction_level == 1) _nrval1 = val;
+	else _nrval2 = val;
+
+	return val;
 }
 

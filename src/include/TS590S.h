@@ -4,23 +4,23 @@
 #include "rigbase.h"
 
 class RIG_TS590S : public rigbase {
-
-enum TS590MODES { LSB, USB, CW, FM, AM, FSK, CWR, FSKR, LSBD, USBD, FMD };
-
 private:
 	bool notch_on;
 	int  preamp_level;
 	int  att_level;
 	int  nb_level;
+	int  noise_reduction_level;
 	bool data_mode;
 	int  active_mode;
 	int  active_bandwidth;
 	bool rxtxa;
 public:
+enum TS590MODES { LSB, USB, CW, FM, AM, FSK, CWR, FSKR, LSBD, USBD, FMD };
 	RIG_TS590S();
 	~RIG_TS590S(){}
 	
 	void initialize();
+	void shutdown();
 
 	long get_vfoA();
 	void set_vfoA(long);

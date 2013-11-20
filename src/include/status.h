@@ -107,7 +107,7 @@ struct status {
 	int		compression;
 	bool	compON;
 
-	bool	noise_reduction;
+	int		noise_reduction;
 	int		noise_reduction_val;
 	int		nb_level;
 

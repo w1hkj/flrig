@@ -4,15 +4,13 @@
 #include "rigbase.h"
 
 class RIG_TS2000 : public rigbase {
-
-enum TS2000MODES { LSB, USB, CW, FM, AM, FSK, CWR, FSKR };
-
 private:
 	bool notch_on;
 	int  preamp_level;
 	int  att_level;
-	bool rxtxa;
+	bool rxona;
 public:
+enum TS2000MODES { LSB, USB, CW, FM, AM, FSK, CWR, FSKR, DIGI };
 	RIG_TS2000();
 	~RIG_TS2000(){}
 	
@@ -71,8 +69,17 @@ public:
 	void get_notch_min_max_step(int &min, int &max, int &step);
 	void set_auto_notch(int v);
 	int  get_auto_notch();
+
+	void set_noise_reduction_val(int val);
+	int  get_noise_reduction_val();
+	void set_noise_reduction(int val);
+	int  get_noise_reduction();
+	void get_nr_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 9; step = 1; }
+
 	void set_noise(bool b);
 	int  get_noise();
+
 	void set_mic_gain(int val);
 	int  get_mic_gain();
 	void get_mic_min_max_step(int &min, int &max, int &step);

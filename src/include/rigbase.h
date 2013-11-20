@@ -181,6 +181,12 @@ public:
 
 	bool has_get_info;
 
+// for pia TS2000 without a front panel
+	int  _noise_reduction_level;
+	int  _nrval1;
+	int  _nrval2;
+	int  _currmode;
+
 protected:
 	string cmd; // command string
 	string rsp; // expected response string (header etc)
@@ -408,6 +414,12 @@ enum { ASC, HEX };
 	void showresp(int level, int how, string s, string tx, string rx);
 
 	int waitN(size_t n, int timeout, const char *, int pr = HEX);
+
+// more pia TS2000 without front panel!
+	int currmode() { return _currmode; }
+	int nrval1() { return _nrval1; }
+	int nrval2() { return _nrval2; }
+	int noise_reduction_level() { return _noise_reduction_level; }
 
 };
 
