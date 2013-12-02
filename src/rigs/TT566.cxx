@@ -30,11 +30,11 @@ NULL};
 
 static char TT566setFREQa[]		= "*AF"; // binary data
 static char TT566getFREQa[]		= "?AF\r";
-static char TT566rspFREQa[]		= "@A";
+static char TT566rspFREQa[]		= "@AF";
 
 static char TT566setFREQb[]		= "*BF";
 static char TT566getFREQb[]		= "?BF\r";
-static char TT566rspFREQb[]		= "@B";
+static char TT566rspFREQb[]		= "@BF";
 
 static char TT566setMODEa[]		= "*RMM";
 static char TT566getMODEa[]		= "?RMM\r";
