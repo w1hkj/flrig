@@ -109,8 +109,6 @@ void init_port_combos()
 
 void init_port_combos()
 {
-	int retval;
-
 	struct stat st;
 	char ttyname[PATH_MAX + 1];
 	bool ret = false;
@@ -132,8 +130,9 @@ void init_port_combos()
 	globfree(&gbuf);
 
 	if (getcwd(cwd, sizeof(cwd)) == NULL) goto out;
-	if (chdir("/sys/class/tty") == -1) goto out;
-	if ((sys = opendir(".")) == NULL) goto out;
+
+	if (chdir("/sys/class/tty") == -1) goto check_cuse;
+	if ((sys = opendir(".")) == NULL) goto check_cuse;
 
 	ssize_t len;
 	struct dirent* dp;
@@ -158,10 +157,44 @@ void init_port_combos()
 		}
 	}
 
-out:
-	if (sys)
+check_cuse:
+	if (sys) {
 		closedir(sys);
-	retval = chdir(cwd);
+		sys = NULL;
+	}
+	if (chdir("/sys/class/cuse") == -1) goto out;
+	if ((sys = opendir(".")) == NULL) goto out;
+
+	LOG_INFO("%s", "Searching /sys/class/cuse/");
+
+	while ((dp = readdir(sys))) {
+#  ifdef _DIRENT_HAVE_D_TYPE
+		if (dp->d_type != DT_LNK)
+			continue;
+#  endif
+		if ((len = readlink(dp->d_name, ttyname, sizeof(ttyname)-1)) == -1)
+			continue;
+		ttyname[len] = '\0';
+		if (strstr(ttyname, "/devices/virtual/") && !strncmp(dp->d_name, "mhuxd", 5)) {
+			char *name = strdup(dp->d_name);
+			if(!name)
+				continue;
+			char *p = strchr(name, '!');
+			if(p)
+				*p = '/';
+			snprintf(ttyname, sizeof(ttyname), "/dev/%s", name);
+			free(name);
+			if (stat(ttyname, &st) == -1 || !S_ISCHR(st.st_mode))
+				continue;
+			LOG_INFO("Found serial port %s", ttyname);
+			add_combos(ttyname);
+			ret = true;
+		}
+	}
+
+out:
+	if (sys) closedir(sys);
+	if (chdir(cwd) == -1) return;
 	if (ret) // do we need to fall back to the probe code below?
 		return;
 
