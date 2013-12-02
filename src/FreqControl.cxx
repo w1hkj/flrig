@@ -148,7 +148,7 @@ cFreqControl::cFreqControl(int x, int y, int w, int h, const char *lbl):
 		Digit[n]->labelcolor(ONCOLOR);
 		Digit[n]->color(OFFCOLOR, SELCOLOR);
 		Digit[n]->labelsize(fh);
-		Digit[n]->callback(cbSelectDigit, (void *) n);
+		Digit[n]->callback(cbSelectDigit, reinterpret_cast<void*>(n));
 		if (n == 0) mult[n] = 1;
 		else mult[n] = 10 * mult[n-1];
 	}
@@ -174,7 +174,7 @@ cFreqControl::cFreqControl(int x, int y, int w, int h, const char *lbl):
 		Digit[n]->labelcolor(ONCOLOR);
 		Digit[n]->color(OFFCOLOR, SELCOLOR);
 		Digit[n]->labelsize(fh);
-		Digit[n]->callback(cbSelectDigit, (void *) n);
+		Digit[n]->callback(cbSelectDigit, reinterpret_cast<void*>(n));
 		if (n == 0) mult[n] = 1;
 		else mult[n] = 10 * mult[n-1];
 	}
@@ -502,7 +502,7 @@ void cFreqControl::set_ndigits(int nbr)
 		Digit[n]->labelcolor(ONCOLOR);
 		Digit[n]->color(OFFCOLOR, SELCOLOR);
 		Digit[n]->labelsize(fh);
-		Digit[n]->callback(cbSelectDigit, (void *) n);
+		Digit[n]->callback(cbSelectDigit, reinterpret_cast<void*>(n));
 		if (n == 0) mult[n] = 1;
 		else mult[n] = 10 * mult[n-1];
 		this->add(Digit[n]);
@@ -530,7 +530,7 @@ void cFreqControl::set_ndigits(int nbr)
 		Digit[n]->labelcolor(ONCOLOR);
 		Digit[n]->color(OFFCOLOR, SELCOLOR);
 		Digit[n]->labelsize(fh);
-		Digit[n]->callback(cbSelectDigit, (void *) n);
+		Digit[n]->callback(cbSelectDigit, reinterpret_cast<void*>(n));
 		if (n == 0) mult[n] = 1;
 		else mult[n] = 10 * mult[n-1];
 		this->add(Digit[n]);

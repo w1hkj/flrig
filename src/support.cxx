@@ -309,7 +309,7 @@ void read_smeter()
 	sig = selrig->get_smeter();
 	pthread_mutex_unlock(&mutex_serial);
 	if (sig == -1) return;
-	Fl::awake(updateSmeter, (void*)sig);
+	Fl::awake(updateSmeter, reinterpret_cast<void*>(sig));
 }
 
 // read power out
@@ -321,7 +321,7 @@ void read_power_out()
 	sig = selrig->get_power_out();
 	pthread_mutex_unlock(&mutex_serial);
 	if (sig > -1)
-		Fl::awake(updateFwdPwr, (void*)sig);
+		Fl::awake(updateFwdPwr, reinterpret_cast<void*>(sig));
 }
 
 // read swr
@@ -334,7 +334,7 @@ void read_swr()
 	sig = selrig->get_swr();
 	pthread_mutex_unlock(&mutex_serial);
 	if (sig > -1)
-		Fl::awake(updateSWR, (void*)sig);
+		Fl::awake(updateSWR, reinterpret_cast<void*>(sig));
 }
 
 // alc
@@ -347,7 +347,7 @@ void read_alc()
 		sig = selrig->get_alc();
 	pthread_mutex_unlock(&mutex_serial);
 	if (sig > -1)
-		Fl::awake(updateALC, (void*)sig);
+		Fl::awake(updateALC, reinterpret_cast<void*>(sig));
 }
 
 // notch
