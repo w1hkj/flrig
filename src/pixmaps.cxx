@@ -1,14 +1,23 @@
-#include <config.h>
-
+// ----------------------------------------------------------------------------
+// Copyright (C) 2014
+//              David Freese, W1HKJ
+//
+// This file is part of flrig.
+//
+// flrig is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// ----------------------------------------------------------------------------
 // This file contains pixmap versions of icons from the Tango base icon
 // theme:  http://tango.freedesktop.org/Tango_Desktop_Project
 //
 // Licensed under the Creative Commons Attribution Share-Alike license:
 // http://creativecommons.org/licenses/by-sa/2.5/
-
 // ---------------------------------------------------------------------
 // Tango icons
 // ---------------------------------------------------------------------
+
+#include <config.h>
 
 /* XPM */
 const char *address_book_icon[] = {

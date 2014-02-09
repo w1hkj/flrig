@@ -1,15 +1,24 @@
-/*
- * K2 drivers
- * 
- * a part of flrig
- * 
- * Copyright 2009, Dave Freese, W1HKJ
- *
- * Additions by Kent Haase, VE4KEH
- * Ref Elecraft KIO2 Programmer's Reference (Rev E, 3 Feb, 2004)
- * K2 MCU firmware rev 2.04
- * 
-*/
+// ----------------------------------------------------------------------------
+// Copyright (C) 2014
+//              David Freese, W1HKJ
+//
+// This file is part of flrig.
+//
+// flrig is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// flrig is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// ----------------------------------------------------------------------------
+// Additions by Kent Haase, VE4KEH
+//-----------------------------------------------------------------------------
  
 #include "K2.h"
 #include "support.h"

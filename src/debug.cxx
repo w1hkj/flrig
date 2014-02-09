@@ -1,8 +1,9 @@
 // ----------------------------------------------------------------------------
 //      debug.cxx
 //
-// Copyright (C) 2008
+// Copyright (C) 2014
 //              Stelios Bounanos, M0GLD
+//              David Freese, W1HKJ
 //
 // This file is part of fldigi.
 //
