@@ -18,12 +18,115 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
-#include "IC756.h"
 #include "debug.h"
 #include "support.h"
 
 //=============================================================================
+// 756
+//=============================================================================
+#include "IC756.h"
+
+const char IC756name_[] = "IC-756";
+
+const char *IC756modes_[] = {
+		"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R", NULL};
+// mode values are 0, 1, 2, 3, 4, 5, 7, 8
+const char IC756_mode_type[] =
+	{ 'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U'};
+
+const char *IC756_widths[] = { "NORM", "NARR", NULL};
+
+static GUI ic756_widgets[]= {
+	{ (Fl_Widget *)btnVol, 2, 125,  50 },
+	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },
+	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },
+	{ (Fl_Widget *)sldrSQUELCH, 54, 165, 156 },
+	{ (Fl_Widget *)btnNR, 2, 185,  50 },
+	{ (Fl_Widget *)sldrNR, 54, 185, 156 },
+	{ (Fl_Widget *)btnIFsh, 214, 125,  50 },
+	{ (Fl_Widget *)sldrIFSHIFT, 266, 125, 156 },
+	{ (Fl_Widget *)btnNotch, 214, 145,  50 },
+	{ (Fl_Widget *)sldrNOTCH, 266, 145, 156 },
+	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },
+	{ (Fl_Widget *)sldrPOWER, 266, 185, 156 },
+	{ (Fl_Widget *)NULL, 0, 0, 0 }
+};
+
+RIG_IC756::RIG_IC756() {
+	defaultCIV = 0x50;
+	name_ = IC756name_;
+	modes_ = IC756modes_;
+	bandwidths_ = IC756_widths;
+	_mode_type = IC756_mode_type;
+
+	widgets = ic756_widgets;
+
+	comm_baudrate = BR19200;
+	stopbits = 1;
+	comm_retries = 2;
+	comm_wait = 5;
+	comm_timeout = 50;
+	comm_echo = true;
+	comm_rtscts = false;
+	comm_rtsplus = false;
+	comm_dtrplus = true;
+	comm_catptt = false;
+	comm_rtsptt = true;
+	comm_dtrptt = false;
+
+	def_freq = freqB = freqA = B.freq = A.freq = 14070000L;
+	def_mode = modeB = modeA = B.imode = A.imode = 1;
+	def_bw = bwB = bwA = B.iBW = A.iBW = 0;
+	filter_nbr = 0;
+
+	ICvol = 0;
+
+	has_bandwidth_control =
+	has_smeter =
+	has_power_control =
+	has_volume_control =
+	has_mode_control =
+	has_micgain_control =
+	has_notch_control =
+	has_attenuator_control =
+	has_preamp_control =
+	has_ifshift_control =
+	has_ptt_control =
+	has_tune_control =
+	has_noise_control =
+	has_noise_reduction =
+	has_noise_reduction_control =
+	has_rf_control =
+	has_sql_control =
+	has_split =
+	restore_mbw = true;
+
+	precision = 1;
+	ndigits = 9;
+
+	adjustCIV(defaultCIV);
+};
+
+void RIG_IC756::initialize()
+{
+	ic756_widgets[0].W = btnVol;
+	ic756_widgets[1].W = sldrVOLUME;
+	ic756_widgets[2].W = sldrRFGAIN;
+	ic756_widgets[3].W = sldrSQUELCH;
+	ic756_widgets[4].W = btnNR;
+	ic756_widgets[5].W = sldrNR;
+	ic756_widgets[6].W = btnIFsh;
+	ic756_widgets[7].W = sldrIFSHIFT;
+	ic756_widgets[8].W = btnNotch;
+	ic756_widgets[9].W = sldrNOTCH;
+	ic756_widgets[10].W = sldrMICGAIN;
+	ic756_widgets[11].W = sldrPOWER;
+}
+
+//=============================================================================
 // 756PRO
+//=============================================================================
+#include "IC756.h"
 
 const char IC756PROname_[] = "IC-756PRO";
 
@@ -61,13 +164,6 @@ RIG_IC756PRO::RIG_IC756PRO() {
 	preamp_level = 2;
 	adjustCIV(defaultCIV);
 
-//	has_bandwidth_control =
-//	has_ifshift_control =
-//	has_tune_control =
-//	has_swr_control =
-//	has_noise_reduction =
-//	has_noise_reduction_control =
-//	has_alc_control = 
 	has_smeter =
 	has_power_control =
 	has_volume_control =

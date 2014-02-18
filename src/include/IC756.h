@@ -21,7 +21,15 @@
 #ifndef _IC756_H
 #define _IC756_H
 
-#include "ICbase.h"
+#include "IC746.h"
+//#include "ICbase.h"
+
+class RIG_IC756 : public RIG_IC746 {
+public:
+	RIG_IC756();
+	~RIG_IC756(){}
+	void initialize();
+};
 
 class RIG_IC756PRO : public RIG_ICOM {
 public:
@@ -53,15 +61,11 @@ public:
 	int  get_noise();
 
 	void set_mic_gain(int val);
-//	int  get_mic_gain();
 	void get_mic_gain_min_max_step(int &min, int &max, int &step);
 	void set_if_shift(int val);
-//	bool get_if_shift(int val);
 	void get_if_min_max_step(int &min, int &max, int &step);
 	void set_squelch(int val);
-//	int  get_squelch();
 	void set_rf_gain(int val);
-//	int  get_rf_gain();
 	void set_power_control(double val);
 
 	void set_split(bool val);
