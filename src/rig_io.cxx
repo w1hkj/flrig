@@ -150,16 +150,35 @@ int readResponse()
 	replystr.clear();
 	memset(replybuff, 0, RXBUFFSIZE + 1);
 	numread = RigSerial.ReadBuffer(replybuff, RXBUFFSIZE);
-	LOG_DEBUG("rsp:%3d, %s", numread, str2hex(replybuff, numread));
+//	LOG_DEBUG("rsp:%3d, %s", numread, str2hex(replybuff, numread));
+	LOG_WARN("rsp:%3d, %s", numread, str2hex(replybuff, numread));
 	for (int i = 0; i < numread; replystr += replybuff[i++]);
 	return numread;
 }
 
 int sendCommand (string s, int nread)
 {
-	int numwrite = (int)s.size();
+	if (RigSerial.IsOpen() == false) return 0;
 
+	int numwrite = (int)s.size();
+	replystr.clear();
+	clearSerialPort();
+
+	LOG_WARN("cmd:%3d, %s", (int)s.length(), str2hex(s.data(), s.length()));
+	RigSerial.WriteBuffer(s.c_str(), numwrite);
+	if (nread == 0) return 0;
+
+	int timeout = progStatus.comm_wait + 
+		(int)((nread + progStatus.comm_echo ? numwrite : 0)*11000.0/RigSerial.Baud());
+	for (int i = 0; i < timeout; i++) {
+		MilliSleep(1);
+		Fl::awake();
+	}
+	return readResponse();
+
+/*
 	LOG_DEBUG("cmd:%3d, %s", (int)s.length(), str2hex(s.data(), s.length()));
+
 	if (RigSerial.IsOpen() == false) {
 		replystr.clear();
 		return 0;
@@ -179,11 +198,12 @@ int sendCommand (string s, int nread)
 		replystr.clear();
 		return 0;
 	}
+
 	if (nread > 0)
 		MilliSleep( (int)((nread + progStatus.comm_echo ? numwrite : 0)*11000.0/RigSerial.Baud()));
 
 	return readResponse();
-
+*/
 }
 
 int waitResponse(int timeout)
