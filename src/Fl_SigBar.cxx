@@ -118,13 +118,13 @@ Fl_SigBar::Fl_SigBar(int X, int Y, int W, int H, const char* l)
 : Fl_Widget(X, Y, W, H, l)
 {
 	align(FL_ALIGN_INSIDE);
-	aging_ = 4;
 	peakv_ = 0.0f;
 	value_ = 0.0f;
 	horiz = true;
 	pkcolor = FL_RED;
 	clear();
-	avg_ = aging_ = 5;
+	avg_ = 5;
+	aging_ = 5;
 }
 
 void Fl_SigBar::peak( float v)
@@ -141,13 +141,11 @@ void Fl_SigBar::peak( float v)
 
 void Fl_SigBar::value(float v)
 {
-	value_ -= vals_[0];
-
-	for (int i = 1; i < avg_; i++) vals_[i-1] = vals_[i];
-
-	value_ += (vals_[avg_- 1] = v / avg_); 
-
-	peak(value_);
+//	value_ -= vals_[0];
+//	for (int i = 1; i < avg_; i++) vals_[i-1] = vals_[i];
+//	value_ += (vals_[avg_- 1] = v / avg_); 
+//	peak(value_);
+	peak(value_ = v);
 };
 
 //
