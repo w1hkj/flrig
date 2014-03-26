@@ -74,54 +74,54 @@ static const int TT550_xmt_filter_width[] = {
 
 static const int TT550_steps[] = { 1, 10, 100, 1000, 10000 };
 
-static char TT550restart[]		= "XX\r";
+static char TT550restart[]			= "XX\r";
 static char TT550init[]			= "P1\r";
-//static char TT550isRADIO[]	= " RADIO START";
-//static char TT550isDSP[]		= " DSP START";
+//static char TT550isRADIO[]		= " RADIO START";
+//static char TT550isDSP[]			= " DSP START";
 
 //static char TT550setFREQ[]		= "N123456\r";
 
-static char TT550setMODE[]		= "Mnn\r";
+static char TT550setMODE[]			= "Mnn\r";
 static char TT550setRcvBW[]		= "Wx\r";
 static char TT550setXmtBW[]		= "Cx\r";
-static char TT550setVolume[]	= "Vn\r";
-static char TT550setAGC[]		= "Gc\r";
-static char TT550setRFGAIN[]	= "An\r";
-static char TT550setATT[]		= "Bc\r";
+static char TT550setVolume[]		= "Vn\r";
+static char TT550setAGC[]			= "Gc\r";
+static char TT550setRFGAIN[]		= "An\r";
+static char TT550setATT[]			= "Bc\r";
 static char TT550setCWWPM[]		= "Eabcdef\r";
-static char TT550setMONVOL[]	= "Hn\r";
-static char TT550setCWMONVOL[]	= "Jn\r";
-static char TT550setNRNOTCH[]	= "Kna\r";
-static char TT550setLINEOUT[]	= "Ln\r"; // 63 - min, 0 - max
-static char TT550setMICLINE[]	= "O1cn\r"; // *******************************************
+static char TT550setMONVOL[]		= "Hn\r";
+static char TT550setCWMONVOL[]		= "Jn\r";
+static char TT550setNRNOTCH[]		= "Kna\r";
+static char TT550setLINEOUT[]		= "Ln\r"; // 63 - min, 0 - max
+static char TT550setMICLINE[]		= "O1cn\r"; // *******************************************
 static char TT550setPOWER[]		= "Pn\r"; // ****************************************
-static char TT550setXMT[]		= "Q1\r";
-static char TT550setRCV[]		= "Q0\r";
-static char TT550setSQUELCH[]	= "Sn\r";	// 0..19; 6db / unit
-static char TT550setVOX[]		= "Uc\r";	// '0' = off; '1' = on
-static char TT550setVOXGAIN[]	= "UGn\r";	// 0 <= n <= 255
-static char TT550setANTIVOX[]	= "UAn\r";	// 0..255
-static char TT550setVOXHANG[]	= "UHn\r";	// 0..255; n= delay*0.0214 sec
+static char TT550setXMT[]			= "Q1\r";
+static char TT550setRCV[]			= "Q0\r";
+static char TT550setSQUELCH[]		= "Sn\r";	// 0..19; 6db / unit
+static char TT550setVOX[]			= "Uc\r";	// '0' = off; '1' = on
+static char TT550setVOXGAIN[]		= "UGn\r";	// 0 <= n <= 255
+static char TT550setANTIVOX[]		= "UAn\r";	// 0..255
+static char TT550setVOXHANG[]		= "UHn\r";	// 0..255; n= delay*0.0214 sec
 static char TT550setCWSPOTLVL[]	= "Fn\r";	// 0..255; 0 = off
 static char TT550setCWQSK[]		= "UQn\r";	// 0..255; 0 = none
-static char TT550setAUXHANG[]	= "UTn\r";	// 0..255; 0 = none
-static char TT550setBLANKER[]	= "Dn\r";	// 0..7; 0 = off
-static char TT550setSPEECH[]	= "Yn\r";	// 0..127; 0 = off
+static char TT550setAUXHANG[]		= "UTn\r";	// 0..255; 0 = none
+static char TT550setBLANKER[]		= "Dn\r";	// 0..7; 0 = off
+static char TT550setSPEECH[]		= "Yn\r";	// 0..127; 0 = off
 
-static char TT550setDISABLE[]	= "#0\r";	// disable transmitter
-static char TT550setENABLE[]	= "#1\r";	// enable transmitter
+static char TT550setDISABLE[]		= "#0\r";	// disable transmitter
+static char TT550setENABLE[]		= "#1\r";	// enable transmitter
 static char TT550setTLOOP_OFF[]	= "#2\r";	// disable T loop
-static char TT550setTLOOP_ON[]	= "#3\r";	// enable T loop
+static char TT550setTLOOP_ON[]		= "#3\r";	// enable T loop
 static char TT550setKEYER_OFF[]	= "#6\r";	// enable keyer
-static char TT550setKEYER_ON[]	= "#7\r";	// disable keyer
+static char TT550setKEYER_ON[]		= "#7\r";	// disable keyer
 static char TT550setALIVE_OFF[]	= "#8\r";	// disable keep alive
 //static char TT550setALIVE_ON[]	= "#9\r";	// enable keep alive
 
-//static char TT550getAGC[]		= "?Y\r";	// 0..255
-//static char TT550getFWDPWR[]	= "?F\r";	// F<0..255>
-//static char TT550getREFPWR[]	= "?R\r";	// R<0..255>
+//static char TT550getAGC[]			= "?Y\r";	// 0..255
+//static char TT550getFWDPWR[]		= "?F\r";	// F<0..255>
+//static char TT550getREFPWR[]		= "?R\r";	// R<0..255>
 static char TT550getSIG_LEVEL[]	= "?S\r";	// S<0..255><0..255>
-static char TT550getFWDREF[]	= "?S\r";	// T<0..255><0..255>
+static char TT550getFWDREF[]		= "?S\r";	// T<0..255><0..255>
 
 static char TT550setAMCARRIER[]	= "R \r";	// enables AM mode transmit
 
@@ -179,6 +179,7 @@ RIG_TT550::RIG_TT550() {
 	has_smeter =
 	has_power_out =
 	has_split =
+	has_split_AB =
 	has_swr_control = 
 	has_micgain_control =
 	has_power_control =
@@ -465,10 +466,20 @@ LOG_INFO("tx freq = %ld", freq);
 
 void RIG_TT550::set_split(bool val)
 {
+printf("set split %s\n", val ? "ON" : "OFF");
 	split = val;
-	selectA();
-	if (split)
-		set_vfoTX(freqB);
+//	selectA();
+	if (split) {
+		if (onA)
+			set_vfoTX(freqB);
+		else
+			set_vfoTX(freqA);
+	} else {
+		if (onA)
+			set_vfoTX(freqA);
+		else
+			set_vfoTX(freqB);
+	}
 }
 
 void RIG_TT550::set_vfo(long freq)
