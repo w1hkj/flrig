@@ -35,6 +35,14 @@ static const char FT847_mode_type[] =
 //static const char *FT847widths_[] = { "300", "500", "2400", "6000", NULL};
 //static const int FT847_bw_val[] = { 0, 1, 2, 3 };
 
+static const int sm[] = {0,2,4,6,8,11,14,16,19,22,25,28,31,34,37,40,
+43,45,47,50,54,58,62,66,70,74,78,82,86,90,95,100};
+
+static const int po[] = {0,2,3,4,5,6,7,8,9,10,11,12,14,16,18,20,
+23,26,30,34,39,44,50,56,62,69,76,84,92,100,109,120};
+
+
+
 RIG_FT847::RIG_FT847() {
 	name_ = FT847name_;
 	modes_ = FT847modes_;
@@ -56,8 +64,9 @@ RIG_FT847::RIG_FT847() {
 	precision = 10;
 	ndigits = 8;
 
-
-//	has_get_info =
+	has_smeter =
+	has_power_out =
+	has_get_info =
 //	has_bandwidth_control =
 	has_mode_control =
 	has_ptt_control = true;
@@ -190,7 +199,7 @@ int RIG_FT847::get_smeter()
 	int sval = 0;
 	int ret = waitN(1, 100, "get smeter", HEX);
 	if (ret >= 1)
-		sval = (replystr[ret - 1] & 0x1F) / 32.0;
+		sval = sm[(replystr[ret - 1] & 0x1F)];
 	return sval;
 }
 
@@ -201,7 +210,7 @@ int RIG_FT847::get_power_out()
 	fwdpwr = 0;
 	int ret = waitN(1, 100, "get power", HEX);
 	if (ret >= 1)
-		fwdpwr = (replystr[ret - 1] & 0x1F) / 32.0;
+		fwdpwr = po[(replystr[ret - 1] & 0x1F)];
 	return fwdpwr;
 }
 
