@@ -429,10 +429,6 @@ public:
 	virtual int  parse_alc(string){return 0;}
 	virtual int  parse_split(string){return 0;}
 
-enum { ERR, WARN, INFO, DEBUG };
-enum { ASC, HEX };
-	void showresp(int level, int how, string s, string tx, string rx);
-
 	int waitN(size_t n, int timeout, const char *, int pr = HEX);
 
 // more pia TS2000 without front panel!

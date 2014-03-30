@@ -28,6 +28,7 @@
 #include "util.h"
 #include "debug.h"
 #include "status.h"
+#include "rigbase.h"
 #include "rig_io.h"
 
 using namespace std;
@@ -150,21 +151,22 @@ int readResponse()
 	replystr.clear();
 	memset(replybuff, 0, RXBUFFSIZE + 1);
 	numread = RigSerial.ReadBuffer(replybuff, RXBUFFSIZE);
-//	LOG_DEBUG("rsp:%3d, %s", numread, str2hex(replybuff, numread));
-	LOG_WARN("rsp:%3d, %s", numread, str2hex(replybuff, numread));
+	LOG_DEBUG("rsp:%3d, %s", numread, str2hex(replybuff, numread));
 	for (int i = 0; i < numread; replystr += replybuff[i++]);
 	return numread;
 }
 
 int sendCommand (string s, int nread)
 {
-	if (RigSerial.IsOpen() == false) return 0;
+	if (RigSerial.IsOpen() == false) {
+		return 0;
+	}
 
 	int numwrite = (int)s.size();
 	replystr.clear();
 	clearSerialPort();
 
-	LOG_WARN("cmd:%3d, %s", (int)s.length(), str2hex(s.data(), s.length()));
+	LOG_DEBUG("cmd:%3d, %s", (int)s.length(), str2hex(s.data(), s.length()));
 	RigSerial.WriteBuffer(s.c_str(), numwrite);
 	if (nread == 0) return 0;
 
@@ -175,35 +177,60 @@ int sendCommand (string s, int nread)
 		Fl::awake();
 	}
 	return readResponse();
+}
 
-/*
-	LOG_DEBUG("cmd:%3d, %s", (int)s.length(), str2hex(s.data(), s.length()));
-
+bool waitCommand(
+				string command,
+				int nread,
+				string info,
+				int msec,
+				char term,
+				int how,
+				int level )
+{
 	if (RigSerial.IsOpen() == false) {
-		replystr.clear();
+		LOG_DEBUG("cmd: %s", how == ASC ? command.c_str() : str2hex(command.data(), command.length()));
 		return 0;
 	}
 
-	if (progStatus.byte_interval == 0)
-		RigSerial.WriteBuffer(s.c_str(), numwrite);
-	else
-		for (size_t i = 0; i < s.length(); i++) {
-			RigSerial.WriteByte(s[i]);
-			MilliSleep(progStatus.byte_interval);
+	int numwrite = (int)command.length();
+	replystr.clear();
+	clearSerialPort();
+
+	if (nread == 0)
+		LOG_DEBUG("cmd:%3d, %s", numwrite, how == ASC ? command.c_str() : str2hex(command.data(), numwrite));
+
+	RigSerial.WriteBuffer(command.c_str(), numwrite);
+	if (nread == 0) return 0;
+
+// minimimum time to wait for a response
+	int timeout = (int)((nread + progStatus.comm_echo ? numwrite : 0)*11000.0/RigSerial.Baud());
+	for (int i = 0; i < timeout; i++) {
+		MilliSleep(1);
+		Fl::awake();
+	}
+// additional wait for xcvr processing
+	string returned = "";
+	static char sztemp[100];
+	int waited = 0;
+	while (waited < msec) {
+		if (readResponse())
+			returned.append(replystr);
+		if (	((int)returned.length() >= nread) || 
+				(returned.find(term) != string::npos) ) {
+			replystr = returned;
+			snprintf(sztemp, sizeof(sztemp), "%s rcvd in %d msec", info.c_str(), waited + timeout);
+			showresp(level, how, sztemp, command, returned);
+			return true;
 		}
-
-	MilliSleep( progStatus.comm_wait );
-
-	if (nread == 0) {
-		replystr.clear();
-		return 0;
+		waited += 10;
+		MilliSleep(10);
+		Fl::awake();
 	}
-
-	if (nread > 0)
-		MilliSleep( (int)((nread + progStatus.comm_echo ? numwrite : 0)*11000.0/RigSerial.Baud()));
-
-	return readResponse();
-*/
+	replystr = returned;
+	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %d ms",  info.c_str(), waited + timeout);
+	showresp(ERR, how, sztemp, command, returned);
+	return false;
 }
 
 int waitResponse(int timeout)
@@ -225,4 +252,41 @@ void clearSerialPort()
 {
 	if (RigSerial.IsOpen() == false) return;
 	RigSerial.FlushBuffer();
+}
+
+void showresp(int level, int how, string s, string tx, string rx) 
+{
+	time_t now;
+	time(&now);
+	struct tm *local = localtime(&now);
+	char sztm[20];
+	strftime(sztm, sizeof(sztm), "%H:%M:%S", local);
+
+	string s1 = how == HEX ? str2hex(tx.c_str(), tx.length()) : tx;
+	string s2 = how == HEX ? str2hex(rx.c_str(), rx.length()) : rx;
+	if (how == ASC) {
+		size_t p;
+		while((p = s1.find('\r')) != string::npos)
+			s1.replace(p, 1, "<cr>");
+		while((p = s1.find('\n')) != string::npos)
+			s1.replace(p, 1, "<lf>");
+		while((p = s2.find('\r')) != string::npos)
+			s2.replace(p, 1, "<cr>");
+		while((p = s2.find('\n')) != string::npos)
+			s2.replace(p, 1, "<lf>");
+	}
+
+	switch (level) {
+	case ERR:
+		SLOG_ERROR("%s: %10s\ncmd %s\nans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
+		break;
+	case WARN:
+		SLOG_WARN("%s: %10s\ncmd %s\nans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
+		break;
+	case INFO:
+		SLOG_INFO("%s: %10s\ncmd %s\nans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
+		break;
+	default:
+		SLOG_DEBUG("%s: %10s\ncmd %s\nans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
+	}
 }

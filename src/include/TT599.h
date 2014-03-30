@@ -70,6 +70,12 @@ public:
 	int  adjust_bandwidth(int);
 	int  def_bandwidth(int);
 
+	void get_nr_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 9; step = 1; }
+	int  get_noise_reduction_val();
+	void set_noise_reduction_val(int val);
+
+
 //	void set_agc_level();
 };
 

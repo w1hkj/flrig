@@ -296,43 +296,6 @@ long rigbase::fm_decimal_be(char *decimal_be, int len)
 	return fm_decimal(decimal_be, len);
 }
 
-void rigbase::showresp(int level, int how, string s, string tx, string rx) 
-{
-	time_t now;
-	time(&now);
-	struct tm *local = localtime(&now);
-	char sztm[20];
-	strftime(sztm, sizeof(sztm), "%H:%M:%S", local);
-
-	string s1 = how == HEX ? str2hex(tx.c_str(), tx.length()) : tx;
-	string s2 = how == HEX ? str2hex(rx.c_str(), rx.length()) : rx;
-	if (how == ASC) {
-		size_t p;
-		while((p = s1.find('\r')) != string::npos)
-			s1.replace(p, 1, "<cr>");
-		while((p = s1.find('\n')) != string::npos)
-			s1.replace(p, 1, "<lf>");
-		while((p = s2.find('\r')) != string::npos)
-			s2.replace(p, 1, "<cr>");
-		while((p = s2.find('\n')) != string::npos)
-			s2.replace(p, 1, "<lf>");
-	}
-
-	switch (level) {
-	case ERR:
-		SLOG_ERROR("%s: %10s\ncmd %s\nans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
-		break;
-	case WARN:
-		SLOG_WARN("%s: %10s\ncmd %s\nans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
-		break;
-	case INFO:
-		SLOG_INFO("%s: %10s\ncmd %s\nans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
-		break;
-	default:
-		SLOG_DEBUG("%s: %10s\ncmd %s\nans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
-	}
-}
-
 int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 {
 	char sztemp[50];

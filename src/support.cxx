@@ -2240,6 +2240,7 @@ if (progStatus.UIsize == small_ui)
 			sldrNR->resize( 54, y, 368, 18 );
 			sldrNR->show();
 			sldrNR->redraw();
+			if (rig_nbr == TT599) btnNR->deactivate();
 		}
 		if (selrig->has_ifshift_control) {
 			y += 20;
