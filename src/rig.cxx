@@ -282,28 +282,44 @@ int main (int argc, char *argv[])
 	Fl::set_fonts(0);
 
 	char dirbuf[FL_PATH_MAX + 1];
+	string appdir = argv[0];
+	size_t p;
 #ifdef __WIN32__
-	string appname = argv[0];
-	size_t p = appname.find(":\\NBEMSapps\\");
-	if (p == 1) {
-		HomeDir.assign(appname.substr(0,13));
-		strcpy(dirbuf, HomeDir.c_str());
-		strcat(dirbuf, "NBEMS.files\\");
+	p = appdir.rfind("flrig.exe");
+	if (p != string::npos) appdir.erase(p);
+	p = appdir.find("FL_APPS\\");
+	if (p != string::npos) {
+		HomeDir.assign(appdir.substr(0, p + 8));
+		RigHomeDir.assign(HomeDir).append("flrig.files\\");
 	} else {
-		fl_filename_expand(dirbuf, sizeof(dirbuf) -1, "$USERPROFILE");
+		fl_filename_expand(dirbuf, sizeof(dirbuf) -1, "$USERPROFILE/");
 		HomeDir = dirbuf;
-		fl_filename_expand(dirbuf, sizeof(dirbuf) - 1, "$USERPROFILE/flrig.files/");
+		RigHomeDir.assign(HomeDir).append("flrig.files\\");
 	}
-//	fl_filename_expand(dirbuf, sizeof(dirbuf) -1, "$USERPROFILE");
-//	HomeDir = dirbuf;
-//	fl_filename_expand(dirbuf, sizeof(dirbuf) - 1, "$USERPROFILE/flrig.files/");
 #else
-	fl_filename_expand(dirbuf, sizeof(dirbuf) - 1, "$HOME");
-	HomeDir = dirbuf;
-	fl_filename_expand(dirbuf, sizeof(dirbuf) - 1, "$HOME/.flrig/");
+		p = appdir.rfind("flrig");
+		if (p != std::string::npos)
+			appdir.erase(p);
+		p = appdir.find("FL_APPS/");
+		if (p != string::npos)
+			HomeDir = appdir.substr(0, p + 8);
+		if (HomeDir.empty()) {
+			fl_filename_expand(dirbuf, FL_PATH_MAX, "$HOME/");
+			HomeDir = dirbuf;
+		}
+
+		DIR *isdir = 0;
+		string test_dir;
+		test_dir.assign(HomeDir).append("flrig.files/");
+		isdir = opendir(test_dir.c_str());
+		if (isdir) {
+			RigHomeDir = test_dir;
+			closedir(isdir);
+		} else {
+			RigHomeDir.assign(HomeDir).append(".flrig/");
+		}
+
 #endif
-	if (RigHomeDir.empty())
-		RigHomeDir = dirbuf;
 	checkdirectories();
 
 	try {
