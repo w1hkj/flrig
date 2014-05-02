@@ -11,7 +11,7 @@ flrig_LDADD = @FLRIG_BUILD_LDADD@
 MINGW32_SRC = \
 	flrig-rc.rc \
 	include/flrigrc.h \
-	mingw.c \
+	support/mingw.c \
 	include/compat.h \
 	include/compat-mingw.h
 
@@ -87,22 +87,12 @@ clean-local:
 
 # Sources that we build. It is OK to have headers here.
 flrig_SOURCES += \
-	combo.cxx \
-	debug.cxx \
-	dialogs.cxx \
-	Fl_SigBar.cxx \
-	flinput2.cxx \
-	pixmaps.cxx \
-	icons.cxx \
-	flslider2.cxx \
-	font_browser.cxx \
-	FreqControl.cxx \
-	images.cxx \
-	K3_ui.cxx \
-	ptt.cxx \
-	rig.cxx \
-	rig_io.cxx \
-	rigbase.cxx \
+	graphics/pixmaps.cxx \
+	graphics/icons.cxx \
+	graphics/images.cxx \
+	main.cxx \
+	rigs/rigbase.cxx \
+	rigs/rigs.cxx \
 	rigs/FT100D.cxx \
 	rigs/FT450.cxx \
 	rigs/FT747.cxx \
@@ -158,14 +148,25 @@ flrig_SOURCES += \
 	rigs/TT566.cxx \
 	rigs/TT588.cxx \
 	rigs/TT599.cxx \
-	rigs.cxx \
-	serial.cxx \
-	status.cxx \
-	support.cxx \
+	support/debug.cxx \
+	support/dialogs.cxx \
+	support/ptt.cxx \
+	support/rig_io.cxx \
+	support/serial.cxx \
+	support/status.cxx \
+	support/support.cxx \
+	support/util.cxx \
+	support/xml_io.cxx \
+	UI/K3_ui.cxx \
 	UI/rigpanel.cxx \
-	util.cxx \
-	ValueSlider.cxx \
-	xml_io.cxx \
+	widgets/combo.cxx \
+	widgets/Fl_SigBar.cxx \
+	widgets/flinput2.cxx \
+	widgets/flslider2.cxx \
+	widgets/font_browser.cxx \
+	widgets/FreqControl.cxx \
+	widgets/ValueSlider.cxx \
+	server/xml_server.cxx \
 	xmlrpcpp/XmlRpc.h \
 	xmlrpcpp/XmlRpcClient.cpp \
 	xmlrpcpp/XmlRpcClient.h \
@@ -294,6 +295,7 @@ EXTRA_DIST = \
 	include/TT599.h \
 	include/util.h \
 	include/ValueSlider.h \
+	include/xml_server.h \
 	images/alc.xbm \
 	images/P25.xbm \
 	images/P50.xbm \

@@ -39,7 +39,7 @@ AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([-Wall foreign std-options 1.9.6])
 
 #change the next config item for the specific application src's
-AC_CONFIG_SRCDIR([src/rigs.cxx])
+AC_CONFIG_SRCDIR([src/main.cxx])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
