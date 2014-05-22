@@ -291,7 +291,7 @@ int main (int argc, char *argv[])
 	if (p != string::npos) {
 		HomeDir.assign(appdir.substr(0, p + 8));
 		RigHomeDir.assign(HomeDir).append("flrig.files\\");
-	} else {
+	} else if (RigHomeDir.empty()) {
 		fl_filename_expand(dirbuf, sizeof(dirbuf) -1, "$USERPROFILE/");
 		HomeDir = dirbuf;
 		RigHomeDir.assign(HomeDir).append("flrig.files\\");
@@ -302,8 +302,8 @@ int main (int argc, char *argv[])
 			appdir.erase(p);
 		p = appdir.find("FL_APPS/");
 		if (p != string::npos)
-			HomeDir = appdir.substr(0, p + 8);
-		if (HomeDir.empty()) {
+			RigHomeDir = appdir.substr(0, p + 8);
+		if (RigHomeDir.empty()) {
 			fl_filename_expand(dirbuf, FL_PATH_MAX, "$HOME/");
 			HomeDir = dirbuf;
 		}
@@ -315,7 +315,7 @@ int main (int argc, char *argv[])
 		if (isdir) {
 			RigHomeDir = test_dir;
 			closedir(isdir);
-		} else {
+		} else if (RigHomeDir.empty()) {
 			RigHomeDir.assign(HomeDir).append(".flrig/");
 		}
 
