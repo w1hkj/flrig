@@ -21,6 +21,7 @@
 #include <FL/Fl.H>
 #include <FL/x.H>
 #include <FL/fl_draw.H>
+#include <string>
 
 #include "dialogs.h"
 #include "util.h"
@@ -138,13 +139,15 @@ void init_port_combos()
 
 	clear_combos();
 
+	LOG_QUIET("%s","Search for serial ports");
+
 	glob_t gbuf;
 	glob("/dev/serial/by-id/*", 0, NULL, &gbuf);
 	for (size_t j = 0; j < gbuf.gl_pathc; j++) {
 		if ( !(stat(gbuf.gl_pathv[j], &st) == 0 && S_ISCHR(st.st_mode)) ||
 		     strstr(gbuf.gl_pathv[j], "modem") )
 			continue;
-		LOG_INFO("Found serial port %s", gbuf.gl_pathv[j]);
+		LOG_QUIET("Found serial port %s", gbuf.gl_pathv[j]);
 			add_combos(gbuf.gl_pathv[j]);
 	}
 	globfree(&gbuf);
@@ -157,7 +160,7 @@ void init_port_combos()
 	ssize_t len;
 	struct dirent* dp;
 
-	LOG_INFO("%s", "Searching /sys/class/tty/");
+	LOG_QUIET("%s", "Searching /sys/class/tty/");
 
 	while ((dp = readdir(sys))) {
 #  ifdef _DIRENT_HAVE_D_TYPE
@@ -171,7 +174,7 @@ void init_port_combos()
 			snprintf(ttyname, sizeof(ttyname), "/dev/%s", dp->d_name);
 			if (stat(ttyname, &st) == -1 || !S_ISCHR(st.st_mode))
 				continue;
-			LOG_INFO("Found serial port %s", ttyname);
+			LOG_QUIET("Found serial port %s", ttyname);
 			add_combos(ttyname);
 			ret = true;
 		}
@@ -185,7 +188,7 @@ check_cuse:
 	if (chdir("/sys/class/cuse") == -1) goto out;
 	if ((sys = opendir(".")) == NULL) goto out;
 
-	LOG_INFO("%s", "Searching /sys/class/cuse/");
+	LOG_QUIET("%s", "Searching /sys/class/cuse/");
 
 	while ((dp = readdir(sys))) {
 #  ifdef _DIRENT_HAVE_D_TYPE
@@ -206,13 +209,27 @@ check_cuse:
 			free(name);
 			if (stat(ttyname, &st) == -1 || !S_ISCHR(st.st_mode))
 				continue;
-			LOG_INFO("Found serial port %s", ttyname);
+			LOG_QUIET("Found serial port %s", ttyname);
 			add_combos(ttyname);
 			ret = true;
 		}
 	}
 
 out:
+	std::string tty_virtual = HomeDir;
+	tty_virtual.append("vdev");
+
+	LOG_QUIET("Searching %s", tty_virtual.c_str());
+
+	tty_virtual.append("/ttyS%u");
+	for (unsigned j = 0; j < TTY_MAX; j++) {
+		snprintf(ttyname, sizeof(ttyname), tty_virtual.c_str(), j);
+		if ( !(stat(ttyname, &st) == 0 && S_ISCHR(st.st_mode)) )
+			continue;
+		LOG_QUIET("Found serial port %s", ttyname);
+		add_combos(ttyname);
+	}
+
 	if (sys) closedir(sys);
 	if (chdir(cwd) == -1) return;
 	if (ret) // do we need to fall back to the probe code below?
@@ -223,7 +240,7 @@ out:
 		"/dev/ttyUSB%u",
 		"/dev/usb/ttyUSB%u"
 	};
-	LOG_WARN("%s", "Serial port discovery via 'stat'");
+	LOG_QUIET("%s", "Serial port discovery via 'stat'");
 	for (size_t i = 0; i < sizeof(tty_fmt)/sizeof(*tty_fmt); i++) {
 		for (unsigned j = 0; j < TTY_MAX; j++) {
 			snprintf(ttyname, sizeof(ttyname), tty_fmt[i], j);
