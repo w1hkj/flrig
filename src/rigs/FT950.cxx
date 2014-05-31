@@ -25,6 +25,8 @@
 
 #define WVALS_LIMIT -1
 
+#define FL950_WAIT_TIME 200
+
 enum mFT950 {
   mLSB, mUSB, mCW, mFM, mAM, mRTTY_L, mCW_R, mPKT_L, mRTTY_U, mPKT_FM, mFM_N, mPKT_U, mAM_N };
 //  0,    1,    2,   3,   4,   5,       6,     7,      8,       9,       10,    11,     12	// mode index
@@ -217,7 +219,7 @@ void RIG_FT950::initialize()
 
 // "MRnnn;" if valid, returns last channel used, "mrlll...;", along with channel nnn info.
 	cmd = "MR118;";
-	waitN(27, 100, "Read UK 60m Channel Mem", ASC);
+	wait_char(';', 27, FL950_WAIT_TIME, "Read UK 60m Channel Mem", ASC);
 	size_t p = replystr.rfind("MR");
 	if (p == string::npos) {
 		Channels_60m = US_60m_chan;
@@ -235,10 +237,6 @@ void RIG_FT950::initialize()
 	}
 	opSelect60->index(m_60m_indx);
 
-//	cmd = "EX035;";
-//	waitN(11,100,"Read Vfo Adjust", ASC);
-//	size_t p = replystr.rfind("EX035");
-
 }
 
 void RIG_FT950::post_initialize()
@@ -251,7 +249,7 @@ long RIG_FT950::get_vfoA ()
 {
 	cmd = rsp = "FA";
 	cmd += ';';
-	waitN(11, 100, "get vfo A", ASC);
+	wait_char(';',11, FL950_WAIT_TIME, "get vfo A", ASC);
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqA;
@@ -278,7 +276,7 @@ long RIG_FT950::get_vfoB ()
 {
 	cmd = rsp = "FB";
 	cmd += ';';
-	waitN(11, 100, "get vfo B", ASC);
+	wait_char(';',11, FL950_WAIT_TIME, "get vfo B", ASC);
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqB;
@@ -314,7 +312,7 @@ double RIG_FT950::getVfoAdj()
 {
 	cmd = rsp = "EX035";
 	sendCommand(cmd.append(";"));
-	waitN(9, 100, "get Vfo Adjust", ASC);
+	wait_char(';',9, FL950_WAIT_TIME, "get Vfo Adjust", ASC);
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -394,7 +392,7 @@ int RIG_FT950::get_split()
 // tx vfo
 	cmd = rsp = "FT";
 	cmd.append(";");
-	waitN(4, 100, "get split tx vfo", ASC);
+	wait_char(';',4, FL950_WAIT_TIME, "get split tx vfo", ASC);
 	p = replystr.rfind(rsp);
 	if (p == string::npos) return false;
 	tx = replystr[p+2] - '0';
@@ -402,7 +400,7 @@ int RIG_FT950::get_split()
 // rx vfo
 	cmd = rsp = "FR";
 	cmd.append(";");
-	waitN(4, 100, "get split rx vfo", ASC);
+	wait_char(';',4, FL950_WAIT_TIME, "get split rx vfo", ASC);
 
 	p = replystr.rfind(rsp);
 	if (p == string::npos) return false;
@@ -418,7 +416,7 @@ int RIG_FT950::get_smeter()
 {
 	cmd = rsp = "SM0";
 	cmd += ';';
-	waitN(7, 100, "get smeter", ASC);
+	wait_char(';',7, FL950_WAIT_TIME, "get smeter", ASC);
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -432,7 +430,7 @@ int RIG_FT950::get_swr()
 {
 	cmd = rsp = "RM6";
 	cmd += ';';
-	waitN(7, 100, "get swr", ASC);
+	wait_char(';',7, FL950_WAIT_TIME, "get swr", ASC);
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -445,7 +443,7 @@ int RIG_FT950::get_alc()
 {
 	cmd = rsp = "RM4";
 	cmd += ';';
-	waitN(7, 100, "get alc", ASC);
+	wait_char(';',7, FL950_WAIT_TIME, "get alc", ASC);
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -458,7 +456,7 @@ int RIG_FT950::get_power_out()
 {
 	cmd = rsp = "RM5";
 	sendCommand(cmd.append(";"));
-	waitN(7, 100, "get pout", ASC);
+	wait_char(';',7, FL950_WAIT_TIME, "get pout", ASC);
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -476,7 +474,7 @@ int RIG_FT950::get_power_control()
 {
 	cmd = rsp = "PC";
 	cmd += ';';
-	waitN(6, 100, "get power", ASC);
+	wait_char(';',6, FL950_WAIT_TIME, "get power", ASC);
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.power_level;
@@ -503,7 +501,7 @@ int RIG_FT950::get_volume_control()
 {
 	cmd = rsp = "AG0";
 	cmd += ';';
-	waitN(7, 100, "get vol", ASC);
+	wait_char(';',7, FL950_WAIT_TIME, "get vol", ASC);
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.volume;
@@ -547,7 +545,7 @@ void RIG_FT950::tune_rig()
 //  if rig "Tuner" light is on internal else external
 	cmd = rsp = "AC";
 	cmd.append(";");
-	waitN(6, 100, "is Int. Tuner Enabled", ASC);
+	wait_char(';',6, FL950_WAIT_TIME, "is Int. Tuner Enabled", ASC);
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return;
 	if ((p + 5) >= replystr.length()) return;
@@ -615,7 +613,7 @@ int RIG_FT950::get_attenuator()
 {
 	cmd = rsp = "RA0";
 	cmd += ';';
-	waitN(5, 100, "get att", ASC);
+	wait_char(';',5, FL950_WAIT_TIME, "get att", ASC);
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.attenuator;
@@ -656,7 +654,7 @@ int RIG_FT950::get_preamp()
 {
 	cmd = rsp = "PA0";
 	cmd += ';';
-	waitN(5, 100, "get pre", ASC);
+	wait_char(';',5, FL950_WAIT_TIME, "get pre", ASC);
 
 	size_t p = replystr.rfind(rsp);
 	if (p != string::npos)
@@ -756,7 +754,7 @@ int RIG_FT950::get_modeA()
 {
 	cmd = rsp = "MD0";
 	cmd += ';';
-	waitN(5, 100, "get mode A", ASC);
+	wait_char(';',5, FL950_WAIT_TIME, "get mode A", ASC);
 
 	size_t p = replystr.rfind(rsp);
 	if (p != string::npos) {
@@ -795,7 +793,7 @@ int RIG_FT950::get_modeB()
 {
 	cmd = rsp = "MD0";
 	cmd += ';';
-	waitN(5, 100, "get mode B", ASC);
+	wait_char(';',5, FL950_WAIT_TIME, "get mode B", ASC);
 
 	size_t p = replystr.rfind(rsp);
 	if (p != string::npos) {
@@ -847,7 +845,7 @@ int RIG_FT950::get_bwA()
 	if (modeA == mPKT_FM) {
 		cmd = rsp = "NA0";
 		cmd += ';';
-		waitN(5, 100, "get bw A narrow", ASC);
+		wait_char(';',5, FL950_WAIT_TIME, "get bw A narrow", ASC);
 		p = replystr.rfind(rsp);
 		if (p == string::npos) { bwA = 0; return bwA; }
 		if (p + 4 >= replystr.length()) { bwA = 0; return bwA; }
@@ -857,7 +855,7 @@ int RIG_FT950::get_bwA()
 	}
 	cmd = rsp = "SH0";
 	cmd += ';';
-	waitN(6, 100, "get bw A", ASC);
+	wait_char(';',6, FL950_WAIT_TIME, "get bw A", ASC);
 
 	p = replystr.rfind(rsp);
 	if (p == string::npos) return bwA;
@@ -914,7 +912,7 @@ int RIG_FT950::get_bwB()
 	if (modeB == mPKT_FM) {
 		cmd = rsp = "NA0";
 		cmd += ';';
-		waitN(5, 100, "get bw B narrow", ASC);
+		wait_char(';',5, FL950_WAIT_TIME, "get bw B narrow", ASC);
 		p = replystr.rfind(rsp);
 		if (p == string::npos) { bwB = 0; return bwB; }
 		if (p + 4 >= replystr.length()) { bwB = 0; return bwB; }
@@ -924,7 +922,7 @@ int RIG_FT950::get_bwB()
 	}
 	cmd = rsp = "SH0";
 	cmd += ';';
-	waitN(6, 100, "get bw B", ASC);
+	wait_char(';',6, FL950_WAIT_TIME, "get bw B", ASC);
 
 	p = replystr.rfind(rsp);
 	if (p == string::npos) return bwB;
@@ -966,7 +964,7 @@ bool RIG_FT950::get_if_shift(int &val)
 {
 	cmd = rsp = "IS0";
 	cmd += ';';
-	waitN(9, 100, "get if shift", ASC);
+	wait_char(';',9, FL950_WAIT_TIME, "get if shift", ASC);
 
 	size_t p = replystr.rfind(rsp);
 	val = progStatus.shift_val;
@@ -1014,7 +1012,7 @@ bool  RIG_FT950::get_notch(int &val)
 	bool ison = false;
 	cmd = rsp = "BP00";
 	cmd += ';';
-	waitN(8, 100, "get notch on/off", ASC);
+	wait_char(';',8, FL950_WAIT_TIME, "get notch on/off", ASC);
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return ison;
@@ -1024,7 +1022,7 @@ bool  RIG_FT950::get_notch(int &val)
 		val = progStatus.notch_val;
 		cmd = rsp = "BP01";
 		cmd += ';';
-		waitN(8, 100, "get notch val", ASC);
+		wait_char(';',8, FL950_WAIT_TIME, "get notch val", ASC);
 		p = replystr.rfind(rsp);
 		if (p == string::npos)
 			val = 10;
@@ -1051,7 +1049,7 @@ void RIG_FT950::set_auto_notch(int v)
 int  RIG_FT950::get_auto_notch()
 {
 	cmd = "BC0;";
-	waitN(5, 100, "get auto notch", ASC);
+	wait_char(';',5, FL950_WAIT_TIME, "get auto notch", ASC);
 	size_t p = replystr.rfind("BC0");
 	if (p == string::npos) return 0;
 	if (replystr[p+3] == '1') return 1;
@@ -1082,7 +1080,7 @@ int RIG_FT950::get_noise()
 {
 	cmd = rsp = "NB0";
 	cmd += ';';
-	waitN(5, 100, "get NB", ASC);
+	wait_char(';',5, FL950_WAIT_TIME, "get NB", ASC);
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return FT950_blanker_level;
@@ -1116,7 +1114,7 @@ int RIG_FT950::get_mic_gain()
 {
 	cmd = rsp = "MG";
 	cmd += ';';
-	waitN(6, 100, "get mic", ASC);
+	wait_char(';',6, FL950_WAIT_TIME, "get mic", ASC);
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.mic_gain;
@@ -1150,7 +1148,7 @@ int  RIG_FT950::get_rf_gain()
 	int rfval = 0;
 	cmd = rsp = "RG0";
 	cmd += ';';
-	waitN(7, 100, "get rfgain", ASC);
+	wait_char(';',7, FL950_WAIT_TIME, "get rfgain", ASC);
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.rfgain;
@@ -1275,7 +1273,7 @@ void RIG_FT950::set_band_selection(int v)
 {
 	int chan_mem_on = false;
 	cmd = "IF;";
-	waitN(27, 100, "get vfo mode in set_band_selection", ASC);
+	wait_char(';',27, FL950_WAIT_TIME, "get vfo mode in set_band_selection", ASC);
 	size_t p = replystr.rfind("IF");
 	if (p == string::npos) return;
 	if ((p + 26) >= replystr.length()) return;
@@ -1317,7 +1315,7 @@ int  RIG_FT950::get_noise_reduction_val()
 	int val = 1;
 	cmd = rsp = "RL0";
 	cmd.append(";");
-	waitN(6, 100, "GET noise reduction val", ASC);
+	wait_char(';',6, FL950_WAIT_TIME, "GET noise reduction val", ASC);
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return val;
 	val = atoi(&replystr[p+3]);
@@ -1337,7 +1335,7 @@ int  RIG_FT950::get_noise_reduction()
 	int val;
 	cmd = rsp = "NR0";
 	cmd.append(";");
-	waitN(5, 100, "GET noise reduction", ASC);
+	wait_char(';',5, FL950_WAIT_TIME, "GET noise reduction", ASC);
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	val = replystr[p+3] - '0';
@@ -1350,7 +1348,7 @@ void RIG_FT950::set_xcvr_auto_on()
 
 	cmd = rsp = "PS";
 	cmd.append(";");
-	waitN(4, 100, "Test: Is Rig ON", ASC);
+	wait_char(';',4, FL950_WAIT_TIME, "Test: Is Rig ON", ASC);
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) {	// rig is off, power on
 		cmd = "PS1;";

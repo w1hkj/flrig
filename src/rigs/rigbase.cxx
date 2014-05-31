@@ -301,14 +301,14 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 	char sztemp[50];
 	string returned = "";
 	string tosend = cmd;
-	int cnt = 0, repeat = 0;
+	int cnt = 0;
 	int waited = 0;
 	size_t num = n + cmd.length();
 	int delay =  num * 11000.0 / RigSerial.Baud();
 
 	replystr.clear();
 
-	if (!RigSerial.IsOpen()) {
+	if(!RigSerial.IsOpen()) {
 		snprintf(sztemp, sizeof(sztemp), "TEST %s", sz);
 		showresp(WARN, pr, sztemp, tosend, replystr);
 		return 0;
@@ -316,13 +316,14 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 
 	sendCommand(tosend, 0);
 	MilliSleep(delay);
+
 	returned = "";
 	for ( cnt = 0; cnt < timeout / 10; cnt++) {
 		readResponse();
 		returned.append(replystr);
 		if (returned.length() >= n) {
 			replystr = returned;
-			waited = cnt * 10 * repeat + delay;
+			waited = cnt * 10 + delay;
 			snprintf(sztemp, sizeof(sztemp), "%s OK %d ms", sz, waited);
 			showresp(WARN, pr, sztemp, cmd, returned);
 			return replystr.length();
@@ -332,9 +333,52 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 	}
 
 	replystr = returned;
-	waited = cnt * 10 * repeat + delay;
+	waited = timeout + delay;
 	snprintf(sztemp, sizeof(sztemp), "%s failed %d ms", sz, waited);
-	showresp(WARN, pr, sztemp, cmd, returned);
+	showresp(ERR, pr, sztemp, cmd, returned);
+	return 0;
+}
+
+int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
+{
+	char sztemp[50];
+	string returned = "";
+	string tosend = cmd;
+	int cnt = 0;
+	int waited = 0;
+	size_t num = n + cmd.length();
+	int delay =  num * 11000.0 / RigSerial.Baud();
+
+	replystr.clear();
+
+	if(!RigSerial.IsOpen()) {
+		snprintf(sztemp, sizeof(sztemp), "TEST %s", sz);
+		showresp(WARN, pr, sztemp, tosend, replystr);
+		return 0;
+	}
+
+	sendCommand(tosend, 0);
+	MilliSleep(delay);
+
+	returned = "";
+	for ( cnt = 0; cnt < timeout / 10; cnt++) {
+		readResponse();
+		returned.append(replystr);
+		if (returned.find(ch) != string::npos) {
+			replystr = returned;
+			waited = cnt * 10 + delay;
+			snprintf(sztemp, sizeof(sztemp), "%s OK %d ms", sz, waited);
+			showresp(WARN, pr, sztemp, cmd, returned);
+			return replystr.length();
+		}
+		MilliSleep(10);
+		Fl::awake();
+	}
+
+	replystr = returned;
+	waited = timeout + delay;
+	snprintf(sztemp, sizeof(sztemp), "%s failed %d ms", sz, waited);
+	showresp(ERR, pr, sztemp, cmd, returned);
 	return 0;
 }
 

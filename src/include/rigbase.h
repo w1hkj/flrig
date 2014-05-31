@@ -430,6 +430,7 @@ public:
 	virtual int  parse_split(string){return 0;}
 
 	int waitN(size_t n, int timeout, const char *, int pr = HEX);
+	int wait_char(int ch, size_t n, int timeout, const char *, int pr = HEX);
 
 // more pia TS2000 without front panel!
 	int currmode() { return _currmode; }
