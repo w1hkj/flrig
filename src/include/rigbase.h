@@ -49,6 +49,8 @@ struct GUI {
 enum {onA, onB};
 enum {UI, XML};
 
+enum {BINARY, STRING};
+
 enum {
 	NONE,
 
@@ -200,6 +202,8 @@ public:
 	bool restore_mbw;
 
 	bool has_get_info;
+
+	int  data_type;
 
 // for pia TS2000 without a front panel
 	int  _noise_reduction_level;

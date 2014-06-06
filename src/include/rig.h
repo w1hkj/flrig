@@ -23,7 +23,6 @@
 
 #include <string>
 #include <sys/types.h>
-#include <pthread.h>
 
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
@@ -40,6 +39,8 @@
 #include <FL/fl_draw.H>
 
 #include "config.h"
+
+#include "threads.h"
 
 #include "FreqControl.h"
 #include "rigpanel.h"
@@ -62,7 +63,6 @@ extern pthread_t *serial_thread;
 extern pthread_t *digi_thread;
 extern pthread_mutex_t mutex_serial;
 extern pthread_mutex_t mutex_xmlrpc;
-extern pthread_mutex_t mutex_queX;
 extern pthread_mutex_t mutex_queA;
 extern pthread_mutex_t mutex_queB;
 extern pthread_mutex_t mutex_ptt;

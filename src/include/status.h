@@ -253,8 +253,15 @@ struct status {
 	
 	string	ui_scheme;
 
-	string server_port;
-	string server_addr;
+	string	server_port;
+	string	server_addr;
+
+	string	tcpip_port;
+	string	tcpip_addr;
+	int		tcpip_ping_delay;
+	int		tcpip_reconnect_after;
+	int		tcpip_drops_allowed;
+	bool	use_tcpip;
 
 	bool	xcvr_auto_on;
 	bool	xcvr_auto_off;

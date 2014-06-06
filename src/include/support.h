@@ -212,6 +212,11 @@ extern void createXcvrDialog();
 extern void open_poll_tab();
 extern void open_send_command_tab();
 extern void show_controls();
+
+extern void open_tcpip_tab();
+extern void open_ptt_tab();
+extern void open_aux_tab();
+
 extern void cb_close_TT550_setup();
 extern void cbUseRepeatButtons(bool on);
 extern void nr_label(const char *, bool on);

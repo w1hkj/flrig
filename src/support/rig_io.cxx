@@ -31,6 +31,8 @@
 #include "rigbase.h"
 #include "rig_io.h"
 
+#include "socket_io.h"
+
 using namespace std;
 
 extern bool test;
@@ -55,7 +57,10 @@ bool startXcvrSerial()
 {
 	bypass_serial_thread_loop = true;
 // setup commands for serial port
-	if (progStatus.xcvr_serial_port == "NONE") return false;
+	if (progStatus.xcvr_serial_port == "NONE") {
+		bypass_serial_thread_loop = false;
+		return false;
+	}
 
 	RigSerial.Device(progStatus.xcvr_serial_port);
 	RigSerial.Baud(BaudRate(progStatus.comm_baudrate));
@@ -150,30 +155,53 @@ int readResponse()
 	int numread = 0;
 	replystr.clear();
 	memset(replybuff, 0, RXBUFFSIZE + 1);
-	numread = RigSerial.ReadBuffer(replybuff, RXBUFFSIZE);
-	LOG_DEBUG("rsp:%3d, %s", numread, str2hex(replybuff, numread));
-	for (int i = 0; i < numread; replystr += replybuff[i++]);
+	if (progStatus.use_tcpip)
+		numread = read_from_remote(replystr);
+	else {
+		numread = RigSerial.ReadBuffer(replybuff, RXBUFFSIZE);
+		for (int i = 0; i < numread; replystr += replybuff[i++]);
+	}
+	if (numread)
+		LOG_DEBUG("rsp:%3d, %s", numread, str2hex(replystr.c_str(), replystr.length()));
 	return numread;
 }
 
 int sendCommand (string s, int nread)
 {
-	if (RigSerial.IsOpen() == false) {
-		return 0;
+	int numwrite = (int)s.size();
+
+	if (progStatus.use_tcpip) {
+		readResponse();
+		send_to_remote(s, progStatus.byte_interval);
+		int timeout = 
+			progStatus.comm_wait + progStatus.tcpip_ping_delay +
+			(int)((nread + progStatus.comm_echo ? numwrite : 0)*11000.0/RigSerial.Baud() );
+		while (timeout > 0) {
+			if (timeout > 10) MilliSleep(10);
+			else MilliSleep(timeout);
+			timeout -= 10;
+			Fl::awake();
+		}
+		if (nread == 0) return 0;
+		return readResponse();
 	}
 
-	int numwrite = (int)s.size();
-	replystr.clear();
-	clearSerialPort();
+	if (RigSerial.IsOpen() == false)
+		return 0;
 
 	LOG_DEBUG("cmd:%3d, %s", (int)s.length(), str2hex(s.data(), s.length()));
-	RigSerial.WriteBuffer(s.c_str(), numwrite);
-	if (nread == 0) return 0;
 
+	clearSerialPort();
+	RigSerial.WriteBuffer(s.c_str(), numwrite);
+
+	if (nread == 0) return 0;
 	int timeout = progStatus.comm_wait + 
-		(int)((nread + progStatus.comm_echo ? numwrite : 0)*11000.0/RigSerial.Baud());
-	for (int i = 0; i < timeout; i++) {
-		MilliSleep(1);
+		(int)((nread + progStatus.comm_echo ? numwrite : 0)*11000.0/RigSerial.Baud()
+		+ progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0);
+	while (timeout > 0) {
+		if (timeout > 10) MilliSleep(10);
+		else MilliSleep(timeout);
+		timeout -= 10;
 		Fl::awake();
 	}
 	return readResponse();
@@ -188,25 +216,31 @@ bool waitCommand(
 				int how,
 				int level )
 {
-	if (RigSerial.IsOpen() == false) {
-		LOG_DEBUG("cmd: %s", how == ASC ? command.c_str() : str2hex(command.data(), command.length()));
-		return 0;
-	}
-
 	int numwrite = (int)command.length();
-	replystr.clear();
-	clearSerialPort();
-
 	if (nread == 0)
 		LOG_DEBUG("cmd:%3d, %s", numwrite, how == ASC ? command.c_str() : str2hex(command.data(), numwrite));
 
-	RigSerial.WriteBuffer(command.c_str(), numwrite);
-	if (nread == 0) return 0;
+	if (progStatus.use_tcpip) {
+		send_to_remote(command, progStatus.byte_interval);
+		if (nread == 0) return 0;
+	} else {
+		if (RigSerial.IsOpen() == false) {
+			LOG_DEBUG("cmd: %s", how == ASC ? command.c_str() : str2hex(command.data(), command.length()));
+			return 0;
+		}
+		replystr.clear();
+		clearSerialPort();
+		RigSerial.WriteBuffer(command.c_str(), numwrite);
+		if (nread == 0) return 0;
+	}
 
 // minimimum time to wait for a response
-	int timeout = (int)((nread + progStatus.comm_echo ? numwrite : 0)*11000.0/RigSerial.Baud());
-	for (int i = 0; i < timeout; i++) {
-		MilliSleep(1);
+	int timeout = (int)((nread + progStatus.comm_echo ? numwrite : 0)*11000.0/RigSerial.Baud()
+		+ progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0);
+	while (timeout > 0) {
+		if (timeout > 10) MilliSleep(10);
+		else MilliSleep(timeout);
+		timeout -= 10;
 		Fl::awake();
 	}
 // additional wait for xcvr processing
@@ -236,13 +270,15 @@ bool waitCommand(
 int waitResponse(int timeout)
 {
 	int n = 0;
-	if (RigSerial.IsOpen() == false)
+	if (!progStatus.use_tcpip && RigSerial.IsOpen() == false)
 		return 0;
+
 	MilliSleep(10);
 	if (!(n = readResponse()))
-		for (int t = 0; t <= timeout; t += 50) {
-			if ((n = readResponse())) break;
-			MilliSleep(50);
+		while (timeout > 0) {
+			if (timeout > 10) MilliSleep(10);
+			else MilliSleep(timeout);
+			timeout -= 10;
 			Fl::awake();
 		}
 	return n;
@@ -277,6 +313,9 @@ void showresp(int level, int how, string s, string tx, string rx)
 	}
 
 	switch (level) {
+	case QUIET:
+		SLOG_QUIET("%s: %10s\ncmd %s\nans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
+		break;
 	case ERR:
 		SLOG_ERROR("%s: %10s\ncmd %s\nans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
 		break;

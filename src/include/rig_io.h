@@ -26,7 +26,7 @@
 
 #include <FL/Fl.H>
 
-enum { ERR, WARN, INFO, DEBUG };
+enum { QUIET, ERR, WARN, INFO, DEBUG };
 enum { ASC, HEX };
 
 using namespace std;
@@ -46,7 +46,7 @@ extern bool startAuxSerial();
 extern bool startSepSerial();
 
 extern int readResponse();
-extern int sendCommand(string s, int nread = -1);
+extern int sendCommand(string s, int nread = 0);
 extern int waitResponse(int);
 extern bool waitCommand(
 				string command,

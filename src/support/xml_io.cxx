@@ -27,9 +27,9 @@
 #include "support.h"
 #include "debug.h"
 #include "rig.h"
-
 #include "rigbase.h"
 
+#include "threads.h"
 #include "XmlRpc.h"
 
 using namespace std;
@@ -72,10 +72,9 @@ static XmlRpc::XmlRpcClient* client;
 static XmlRpcValue* status_query;
 
 #define RIG_UPDATE_INTERVAL  100 // milliseconds
-#define CHECK_UPDATE_COUNT   (500 / RIG_UPDATE_INTERVAL)
+#define CHECK_UPDATE_COUNT   (2000 / RIG_UPDATE_INTERVAL)
 
 bool run_digi_loop = true;
-//bool bypass_digi_loop = true;
 bool fldigi_online = false;
 bool rig_reset = false;
 bool ptt_on = false;
@@ -119,14 +118,13 @@ void open_rig_xmlrpc()
 
 void close_rig_xmlrpc()
 {
-	pthread_mutex_lock(&mutex_xmlrpc);
+	guard_lock gl_xmlclose(&mutex_xmlrpc, 100);
 
 	delete client;
 	client = NULL;
 	delete status_query;
 	status_query = NULL;
 
-	pthread_mutex_unlock(&mutex_xmlrpc);
 }
 
 static inline void execute(const char* name, const XmlRpcValue& param, XmlRpcValue& result)
@@ -155,7 +153,6 @@ void send_modes() {
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
 			LOG_ERROR("%s", e.getMessage().c_str());
-		throw;
 	}
 }
 
@@ -174,7 +171,6 @@ void send_bandwidths()
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
 			LOG_ERROR("%s", e.getMessage().c_str());
-		throw;
 	}
 }
 
@@ -187,7 +183,6 @@ void send_name()
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
 			LOG_ERROR("%s", e.getMessage().c_str());
-		throw;
 	}
 }
 
@@ -269,7 +264,6 @@ void send_new_bandwidth(int bw)
 	try {
 		xmlvfo.iBW = bw;
 		int selbw = (bw > 0x80) ? (bw >> 8 & 0x7F) : bw;
-//printf("bw %X, bw# %d, bw %s\n", bw, selbw, selrig->bandwidths_[selbw]);
 		XmlRpcValue bandwidth(selrig->bandwidths_[selbw]), res;
 		execute(rig_set_bandwidth, bandwidth, res);
 		ignore = 1;
@@ -288,7 +282,6 @@ void send_sideband()
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
 			LOG_ERROR("%s", e.getMessage().c_str());
-		throw;
 	}
 }
 
@@ -357,20 +350,15 @@ static void check_for_bandwidth_change(const XmlRpcValue& new_bw)
 	if (selrig->has_dsp_controls) {
 		int currlo = xmlvfo.iBW & 0x7F;
 		int currhi = (xmlvfo.iBW >> 8) & 0x7F;
-//printf("mode %d, lo %d, hi %d\n", xmlvfo.imode, currlo, currhi);
-//printf("&bwtable(xmlvfo.imode) %p\n", selrig->bwtable(xmlvfo.imode));
 		string currbw = selrig->bwtable(xmlvfo.imode)[currhi];
 		if (sbw != currbw) {
 			int ibw = 0;
 			const char **bwt = selrig->bwtable(xmlvfo.imode);
 			while ((bwt[ibw] != NULL) && (sbw != bwt[ibw])) ibw++;
-//printf("index %d ", ibw);
 			if (bwt[ibw] != NULL) { // && ibw != (xmlvfo.iBW & 0x7F)) {
 				xmlvfo.iBW = (ibw << 8) | 0x8000 | currlo;
-//printf("bandwidth %s, new xmlvfo.iBW %X", bwt[ibw], xmlvfo.iBW);
 				xmlvfo_changed = true;
 			}
-//printf("\n");
 		}
 	} else {
 		if (sbw != selrig->bwtable(xmlvfo.imode)[xmlvfo.iBW]) {
@@ -409,9 +397,8 @@ static void push2que()
 		if (XML_DEBUG)
 			LOG_ERROR("pushed to B %s", print(xmlvfo));
 //printf("pushed to B %s\n", print(xmlvfo));
-		pthread_mutex_lock(&mutex_queB);
+		guard_lock gl_xmlqueB(&mutex_queB, 101);
 		queB.push(xmlvfo);
-		pthread_mutex_unlock(&mutex_queB);
 	} else {
 		if (!queA.empty()) {
 			if (XML_DEBUG)
@@ -421,9 +408,8 @@ static void push2que()
 		if (XML_DEBUG)
 			LOG_ERROR("pushed to A %s", print(xmlvfo));
 //printf("pushed to A %s\n", print(xmlvfo));
-		pthread_mutex_lock(&mutex_queA);
+		guard_lock gl_xmlqueA(&mutex_queA, 102);
 		queA.push(xmlvfo);
-		pthread_mutex_unlock(&mutex_queA);
 	}
 }
 
@@ -440,28 +426,25 @@ static void send_rig_info()
 	try {
 		execute(rig_take_control, XmlRpcValue(), res);
 		send_name();
-//printf("send name\n");
 		send_modes();
-//printf("send_modes\n");
 		send_bandwidths();
-//printf("send_bandwidths\n");
 
 		if (!useB) xmlvfo = vfoA;
 		else       xmlvfo = vfoB;
 
 		send_new_mode(xmlvfo.imode);
-//printf("send_new_mode\n");
 		send_new_bandwidth(xmlvfo.iBW);
-//printf("send_new_bandwidth\n");
 		send_sideband();
-//printf("send sideband\n");
 		send_new_freq(xmlvfo.freq);
-//printf("send new frequency\n");
 		fldigi_online = true;
 		rig_reset = false;
 		Fl::awake(set_fldigi_connect, (void *)1);
-	} catch (...) {
-		throw;
+	} catch (const XmlRpc::XmlRpcException& e) {
+		if (XML_DEBUG)
+			LOG_ERROR("%s", e.getMessage().c_str());
+		else
+			LOG_WARN("%s", e.getMessage().c_str());
+		throw e;
 	}
 }
 
@@ -479,13 +462,13 @@ void send_no_rig()
 
 static void get_fldigi_status()
 {
-	XmlRpcValue status;
-	XmlRpcValue param((int)0);
-	string xmlcall;
 	if (ignore) {
 		--ignore;
 		return;
 	}
+	XmlRpcValue status;
+	XmlRpcValue param((int)0);
+	string xmlcall;
 	try {
 		xmlcall = "system.multicall";
 		execute(xmlcall.c_str(), *status_query, status);
@@ -499,9 +482,12 @@ static void get_fldigi_status()
 			if (xmlvfo_changed)
 				push2que();
 		}
-	} catch (...) {
-		LOG_ERROR("%s", xmlcall.c_str());
-		throw;
+	} catch (const XmlRpc::XmlRpcException& e) {
+		if (XML_DEBUG)
+			LOG_ERROR("%s", e.getMessage().c_str());
+		else
+			LOG_WARN("%s", e.getMessage().c_str());
+		throw e;
 	}
 	try {
 		if (selrig->has_notch_control) {
@@ -509,7 +495,12 @@ static void get_fldigi_status()
 			execute(xmlcall.c_str(), param, status);
 			check_for_notch_change(status);
 		}
-	} catch (...) {
+	} catch (const XmlRpc::XmlRpcException& e) {
+		if (XML_DEBUG)
+			LOG_ERROR("%s", e.getMessage().c_str());
+		else
+			LOG_WARN("%s", e.getMessage().c_str());
+		throw e;
 	}
 }
 
@@ -518,25 +509,29 @@ void * digi_loop(void *d)
 	for (;;) {
 		MilliSleep(RIG_UPDATE_INTERVAL);
 		if (!run_digi_loop) break;
-		pthread_mutex_lock(&mutex_xmlrpc);
 		try {
-			if (rig_reset || (!fldigi_online && (--try_count == 0)))
+			if (rig_reset || (!fldigi_online && (--try_count == 0))) {
+				guard_lock gl_xmloop(&mutex_xmlrpc, 103);
 				send_rig_info();
-			else if (fldigi_online) {
-				if (qfreq.empty())
+			} else if (fldigi_online) {
+				if (qfreq.empty()) {
+					guard_lock gl_xmloop(&mutex_xmlrpc, 104);
 					get_fldigi_status();
-				else
+				} else {
+					guard_lock gl_xmloop(&mutex_xmlrpc, 105);
 					send_queue();
+				}
 			}
 		} catch (const XmlRpc::XmlRpcException& e) {
 			if (XML_DEBUG)
 				LOG_ERROR("%s", e.getMessage().c_str());
+			else
+				LOG_WARN("%s", e.getMessage().c_str());
 			fldigi_online = false;
 			rig_reset = false;
 			try_count = CHECK_UPDATE_COUNT;
 			Fl::awake(set_fldigi_connect, (void *)0);
 		}
-		pthread_mutex_unlock(&mutex_xmlrpc);
 	}
 	return NULL;
 }

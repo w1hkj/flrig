@@ -43,6 +43,15 @@ Fl_Int_Input *txtCIV=(Fl_Int_Input *)0;
 Fl_Button *btnCIVdefault=(Fl_Button *)0;
 Fl_Check_Button *btnUSBaudio=(Fl_Check_Button *)0;
 Fl_Check_Button *btn_key_fldigi=(Fl_Check_Button *)0;
+Fl_Group *tabTCPIP = (Fl_Group *)0;
+Fl_Input2 *inp_tcpip_addr = (Fl_Input2 *)0;
+Fl_Input2 *inp_tcpip_port = (Fl_Input2 *)0;
+Fl_Check_Button *chk_use_tcpip=(Fl_Check_Button *)0;
+Fl_Counter *inp_tcpip_ping_delay=(Fl_Counter *)0;
+Fl_Box *box_tcpip_connect=(Fl_Box *)0;
+Fl_Counter *cntRetryAfter=(Fl_Counter *)0;
+Fl_Counter *cntDropsAllowed=(Fl_Counter *)0;
+
 Fl_Group *tabPTT=(Fl_Group *)0;
 Fl_ComboBox *selectSepPTTPort=(Fl_ComboBox *)0;
 Fl_Round_Button *btnSepRTSptt=(Fl_Round_Button *)0;
@@ -150,6 +159,41 @@ static void cb_server_addr(Fl_Input* o, void*) {
 
 static void cb_server_port(Fl_Int_Input* o, void*) {
 	progStatus.server_port = o->value();
+}
+
+static void cb_tcpip_addr(Fl_Input2* o, void*) {
+	progStatus.tcpip_addr = o->value();
+}
+
+static void cb_tcpip_port(Fl_Input2* o, void*) {
+	progStatus.tcpip_port = o->value();
+}
+
+static void cb_tcpip_ping_delay(Fl_Counter* o, void*) {
+	progStatus.tcpip_ping_delay = o->value();
+}
+
+static void cb_use_tcpip(Fl_Check_Button* o, void*) {
+	progStatus.use_tcpip = o->value();
+	if (!progStatus.use_tcpip)
+		disconnect_from_remote();
+	else
+		try {
+			connect_to_remote();
+			initRig();
+		} catch (...) {
+			progStatus.use_tcpip = 0;
+			o->value(0);
+			return;
+		}
+}
+
+static void cb_cntRetryAfter(Fl_Counter* o, void *) {
+	progStatus.tcpip_reconnect_after = o->value();
+}
+
+static void cb_cntDropsAllowed(Fl_Counter* o, void *) {
+	progStatus.tcpip_drops_allowed = o->value();
 }
 
 static void cb_btncatptt(Fl_Round_Button* o, void*) {
@@ -614,7 +658,66 @@ tabsConfig = new Fl_Tabs(0, 8, 482, 246);
 
 	tabPrimary->end();
 
-	tabPTT = new Fl_Group(2, 30, 475, 222, _("Sep\' PTT"));
+	tabTCPIP = new Fl_Group(2, 30, 475, 222, _("TCPIP"));
+		tabTCPIP->hide();
+        
+		inp_tcpip_addr = new Fl_Input2(120, 50, 300, 22, _("TCPIP address:"));
+		inp_tcpip_addr->tooltip(_("remote tcpip server address"));
+		inp_tcpip_addr->callback((Fl_Callback*)cb_tcpip_addr);
+		inp_tcpip_addr->value(progStatus.tcpip_addr.c_str());
+
+		inp_tcpip_port = new Fl_Input2(120, 74, 100, 22, _("TCPIP port:"));
+		inp_tcpip_port->tooltip(_("remote tcpip server port"));
+		inp_tcpip_port->type(2);
+		inp_tcpip_port->callback((Fl_Callback*)cb_tcpip_port);
+		inp_tcpip_port->value(progStatus.tcpip_port.c_str());
+
+		inp_tcpip_ping_delay = new Fl_Counter(120, 100, 100, 22, _("Ping delay"));
+		inp_tcpip_ping_delay->tooltip(_("enter round trip ping delay"));
+		inp_tcpip_ping_delay->callback((Fl_Callback*)cb_tcpip_ping_delay);
+		inp_tcpip_ping_delay->minimum(0);
+		inp_tcpip_ping_delay->maximum(500);
+		inp_tcpip_ping_delay->step(5);
+		inp_tcpip_ping_delay->lstep(20);
+		inp_tcpip_ping_delay->value(progStatus.tcpip_ping_delay);
+		inp_tcpip_ping_delay->align(Fl_Align(FL_ALIGN_LEFT));
+
+		chk_use_tcpip = new Fl_Check_Button(120, 128, 18, 18, _("Use tcpip"));
+		chk_use_tcpip->tooltip(_("Rig control via tcpip"));
+		chk_use_tcpip->down_box(FL_DOWN_BOX);
+		chk_use_tcpip->callback((Fl_Callback*)cb_use_tcpip);
+		chk_use_tcpip->value(progStatus.use_tcpip);
+		chk_use_tcpip->align(Fl_Align(FL_ALIGN_LEFT));
+
+		box_tcpip_connect = new Fl_Box(120, 150, 18, 18, _("Connected"));
+		box_tcpip_connect->tooltip(_("Lit when connected to remote tcpip"));
+		box_tcpip_connect->box(FL_DIAMOND_DOWN_BOX);
+		box_tcpip_connect->color(FL_LIGHT1);
+		box_tcpip_connect->align(Fl_Align(FL_ALIGN_RIGHT));
+
+		cntRetryAfter = new Fl_Counter(120, 172, 100, 20, _("Retry (secs)"));
+		cntRetryAfter->tooltip(_("Retry connection if lost"));
+		cntRetryAfter->minimum(1);
+		cntRetryAfter->maximum(120);
+		cntRetryAfter->step(1);
+		cntRetryAfter->lstep(10);
+		cntRetryAfter->callback((Fl_Callback*)cb_cntRetryAfter);
+		cntRetryAfter->align(Fl_Align(FL_ALIGN_LEFT));
+		cntRetryAfter->value(progStatus.tcpip_reconnect_after);
+
+		cntDropsAllowed = new Fl_Counter(120, 196, 100, 20, _("Allowed drops"));
+		cntDropsAllowed->tooltip(_("# tcpip drop-outs before connection declared down"));
+		cntDropsAllowed->minimum(1);
+		cntDropsAllowed->maximum(25);
+		cntDropsAllowed->step(1);
+		cntDropsAllowed->lstep(5);
+		cntDropsAllowed->callback((Fl_Callback*)cb_cntDropsAllowed);
+		cntDropsAllowed->align(Fl_Align(FL_ALIGN_LEFT));
+		cntDropsAllowed->value(progStatus.tcpip_drops_allowed);
+
+	tabTCPIP->end();
+
+	tabPTT = new Fl_Group(2, 30, 475, 222, _("PTT"));
 		tabPTT->hide();
 
 		Fl_Box *bxptt = new Fl_Box(53, 73, 399, 37, 
@@ -665,7 +768,7 @@ _("Use only if your setup requires a separate\nSerial Port for a PTT control lin
 	tabAux = new Fl_Group(2, 30, 475, 222, _("Aux"));
 		tabAux->hide();
         
-		selectAuxPort = new Fl_ComboBox(131, 132, 192, 22, _("Aux Port"));
+		selectAuxPort = new Fl_ComboBox(131, 132, 192, 22, _("Aux"));
 		selectAuxPort->tooltip(_("Aux control port"));
 		selectAuxPort->box(FL_DOWN_BOX);
 		selectAuxPort->color(FL_BACKGROUND2_COLOR);
@@ -686,7 +789,7 @@ _("Use only if your setup requires a separate\nSerial Port for a special Control
 	tabAux->end();
 
 
-	tabPolling = new Fl_Group(2, 30, 476, 222, _("Polling"));
+	tabPolling = new Fl_Group(2, 30, 476, 222, _("Poll"));
 		tabPolling->hide();
 
 		Fl_Group* xcr_grp7 = new Fl_Group(4, 34, 474, 48, _("Meters"));
@@ -884,7 +987,7 @@ _("Use only if your setup requires a separate\nSerial Port for a special Control
 
 	tabPolling->end();
 
-	tabSndCmd = new Fl_Group(2, 30, 475, 222, _("Send Cmd"));
+	tabSndCmd = new Fl_Group(2, 30, 475, 222, _("Cmds"));
 		tabSndCmd->hide();
 
 		txt_command = new Fl_Input2(29, 53, 434, 23, 

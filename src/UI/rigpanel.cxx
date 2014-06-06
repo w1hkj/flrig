@@ -25,10 +25,11 @@
 #include "status.h"
 #include "support.h"
 #include "K3_ui.h"
+#include "socket_io.h"
 
-static const int freq_sel_widths[]={110, 70, 70, 0}; 
-static Fl_Double_Window *meter_scale_dialog = (Fl_Double_Window *)0; 
-static Fl_Double_Window *meter_filters = (Fl_Double_Window *)0; 
+static const int freq_sel_widths[]={110, 70, 70, 0};
+static Fl_Double_Window *meter_scale_dialog = (Fl_Double_Window *)0;
+static Fl_Double_Window *meter_filters = (Fl_Double_Window *)0;
 
 
 Fl_Menu_Bar *small_menu=(Fl_Menu_Bar *)0;
@@ -47,8 +48,8 @@ Fl_Menu_Item *save_me = (Fl_Menu_Item *)0;
 Fl_Menu_Item *mnuHelp = (Fl_Menu_Item *)0;
 Fl_Menu_Item *mnuOnLineHelp = (Fl_Menu_Item *)0;
 Fl_Menu_Item *mnuAbout = (Fl_Menu_Item *)0;
-
-Fl_Button *btnInitializing=(Fl_Button *)0;
+Fl_Box *tcpip_menu_box = (Fl_Box *)0;
+Fl_Group *tcpip_box = (Fl_Group *)0;
 
 Fl_Output *txt_encA=(Fl_Output *)0;
 
@@ -204,6 +205,9 @@ Fl_Choice *sel_tt550_F1_func=(Fl_Choice *)0;
 Fl_Choice *sel_tt550_F2_func=(Fl_Choice *)0;
 Fl_Choice *sel_tt550_F3_func=(Fl_Choice *)0;
 
+Fl_Group *main_group = (Fl_Group *)0;
+Fl_Button *btnInitializing=(Fl_Button *)0;
+
 #include "ui_bitmaps.cxx"
 
 static const char *mtr_scales[] = {
@@ -211,7 +215,7 @@ static const char *mtr_scales[] = {
 "50 watt",
 "100 watt",
 "200 watt",
-"Auto scaled"}; 
+"Auto scaled"};
 
 void select_power_meter_scales() {
 	if (!meter_scale_dialog)
@@ -274,6 +278,18 @@ static void cb_Send(Fl_Menu_*, void*) {
 	open_send_command_tab();
 }
 
+static void cb_mnuTCPIP(Fl_Menu_*, void*) {
+	open_tcpip_tab();
+}
+
+static void cb_mnuPTT(Fl_Menu_*, void*) {
+	open_ptt_tab();
+}
+
+static void cb_mnuAUX(Fl_Menu_*, void *) {
+	open_aux_tab();
+}
+
 static void cb_mnuOnLineHelp(Fl_Menu_*, void*) {
 	visit_URL((void *)("http://www.w1hkj.com/flrig-help/index.html"));
 }
@@ -291,11 +307,24 @@ static void cb_scalePower(Fl_Button*, void*) {
 		select_power_meter_scales();
 }
 
+static bool on_A = true;
+
 static void cb_btnA(Fl_Light_Button*, void*) {
-	if (btnA->value()==1)
+	if (Fl::event_button() == FL_RIGHT_MOUSE) {
+		if (on_A) {
+			addFreq();
+			btnA->value(1);
+			btnB->value(0);
+		} else {
+			btnA->value(0);
+			btnB->value(1);
+		}
+	} else {
 		cb_selectA();
-	btnA->value(1);
-	btnB->value(0);
+		on_A = true;
+		btnA->value(1);
+		btnB->value(0);
+	}
 }
 
 static void cb_btn_K3_swapAB(Fl_Button*, void*) {
@@ -304,10 +333,21 @@ static void cb_btn_K3_swapAB(Fl_Button*, void*) {
 
 
 static void cb_btnB(Fl_Light_Button*, void*) {
-	if (btnB->value()==1)
+	if (Fl::event_button() == FL_RIGHT_MOUSE) {
+		if (!on_A) {
+			addFreq();
+			btnB->value(1);
+			btnA->value(0);
+		} else {
+			btnB->value(0);
+			btnA->value(1);
+		}
+	} else {
 		cb_selectB();
-	btnB->value(1);
-	btnA->value(0);
+		on_A = false;
+		btnB->value(1);
+		btnA->value(0);
+	}
 }
 
 static void cb_btnTune(Fl_Button*, void*) {

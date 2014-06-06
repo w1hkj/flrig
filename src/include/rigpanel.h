@@ -191,7 +191,10 @@ extern Fl_Group *tt550_302B;
 extern Fl_Choice *sel_tt550_F1_func;
 extern Fl_Choice *sel_tt550_F2_func;
 extern Fl_Choice *sel_tt550_F3_func;
+
+extern Fl_Group  *main_group;
 extern Fl_Button *btnInitializing;
+
 Fl_Double_Window* Wide_rig_window();
 Fl_Double_Window* Small_rig_window();
 
@@ -208,6 +211,9 @@ extern Fl_Menu_Item *save_me;
 extern Fl_Menu_Item *mnuHelp;
 extern Fl_Menu_Item *mnuOnLineHelp;
 extern Fl_Menu_Item *mnuAbout;
+extern Fl_Box *tcpip_menu_box;
+extern Fl_Group *tcpip_box;
+extern Fl_Check_Button *chk_use_tcpip;
 
 extern Fl_Check_Button *btn_wide_ui;
 extern Fl_Box *lblTest;
@@ -285,6 +291,7 @@ extern Fl_Check_Button *btnSepDTRplus;
 extern Fl_Group *tabAux;
 extern Fl_ComboBox *selectAuxPort;
 extern Fl_Group *tabPolling;
+extern Fl_Group *tabTCPIP;
 #include <FL/Fl_Value_Input.H>
 extern Fl_Value_Input *poll_smeter;
 extern Fl_Value_Input *poll_pout;
@@ -315,6 +322,7 @@ extern Fl_Button *btn_send_command;
 extern Fl_Output *txt_response;
 extern Fl_Box *box_xcvr_connect;
 extern Fl_Box *box_fldigi_connect;
+extern Fl_Box *box_tcpip_connect;
 extern Fl_Button *btnCancelCommConfig;
 extern Fl_Return_Button *btnOkXcvrDialog;
 Fl_Double_Window* XcvrDialog();

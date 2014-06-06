@@ -89,7 +89,6 @@ pthread_t *digi_thread = 0;
 
 pthread_mutex_t mutex_serial = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_xmlrpc = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t mutex_queX = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_queA = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_queB = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_ptt = PTHREAD_MUTEX_INITIALIZER;
@@ -238,9 +237,6 @@ void exit_main(Fl_Widget *w)
 	cbExit();
 }
 
-extern void open_rig_socket();
-extern bool run_digi_loop;
-
 void expand_controls(void*)
 {
 	show_controls();
@@ -265,9 +261,23 @@ void close_controls(void*)
 
 void startup(void*)
 {
+//	btnInitializing->show();
 	initStatusConfigDialog();
 
-	Fl::add_timeout(0.0, close_controls);
+	if (progStatus.UIsize == wide_ui) {
+		if (EXPAND_CONTROLS && selrig->has_extras) return;
+		btn_show_controls->label("@-22->");
+		btn_show_controls->redraw_label();
+		grpTABS->hide();
+		mainwindow->resizable(grpTABS);
+		mainwindow->size(progStatus.mainW, 150);
+		mainwindow->size_range(735, 150, 0, 150);
+	} else if (progStatus.UIsize == small_ui) {
+		if (EXPAND_CONTROLS && selrig->has_extras)
+			show_controls();
+//			Fl::add_timeout(1.0, expand_controls);
+	}
+//	Fl::add_timeout(0.0, close_controls);
 }
 
 int main (int argc, char *argv[])
@@ -365,8 +375,6 @@ int main (int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-//	progStatus.loadLastState();
-
 	open_rig_xmlrpc();
 
 	digi_thread = new pthread_t;      
@@ -384,11 +392,11 @@ int main (int argc, char *argv[])
 	sldrSWR->clear();
 
 	if (progStatus.UIsize == small_ui)
-		mainwindow->resize( progStatus.mainX, progStatus.mainY, mainwindow->w(), btnInitializing->h() + 24 );
+		mainwindow->resize( progStatus.mainX, progStatus.mainY, 
+							mainwindow->w(), btnPTT->y() + btnPTT->h() + 2);
 	else
-		mainwindow->resize( progStatus.mainX, progStatus.mainY, progStatus.mainW, mainwindow->h());
-
-	btnInitializing->show();
+		mainwindow->resize( progStatus.mainX, progStatus.mainY, 
+							progStatus.mainW, btnVol->y() + btnVol->h() + 2);//progStatus.mainH);
 
 	mainwindow->xclass(KNAME);
 
@@ -409,8 +417,7 @@ int main (int argc, char *argv[])
 	btn_show_controls->label("@-28->");
 	btn_show_controls->redraw_label();
 
-//	show_controls();
-
+//	Fl::awake(startup);
 	Fl::add_timeout(0.50, startup);
 
 	return Fl::run();

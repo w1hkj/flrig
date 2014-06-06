@@ -110,6 +110,17 @@ bool thread_in_list(int id, const int* list);
 #  define CANCEL_THREAD(t__) pthread_cancel(t__);
 #endif
 
-#include "fl_lock.h"
+/// This ensures that a mutex is always unlocked when leaving a function or block.
+
+class guard_lock
+{
+public:
+	guard_lock(pthread_mutex_t* m, int h = 0);
+	~guard_lock(void);
+	const char *name(pthread_mutex_t *m);
+private:
+	pthread_mutex_t* mutex;
+	int how;
+};
 
 #endif // !THREADS_H_

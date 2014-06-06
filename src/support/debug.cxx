@@ -125,6 +125,8 @@ void debug::log(level_e level, const char* func, const char* srcf, int line, con
 	vsnprintf(sztemp, sizeof(sztemp), fmt, args);
 
 	estr.append(sztemp);
+printf("%s", sztemp);
+
 	fprintf(wfile, "%s", sztemp);
 
 	va_end(args);
@@ -148,6 +150,8 @@ void debug::slog(level_e level, const char* func, const char* srcf, int line, co
 
 	vsnprintf(sztemp, sizeof(sztemp), fmt, args);
 	estr.append(sztemp);
+printf("%s\n", sztemp);
+
 	fprintf(wfile, "%s", sztemp);
 	va_end(args);
 

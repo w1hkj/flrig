@@ -18,61 +18,48 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
+Fl_Group *gsmall = (Fl_Group *)0;
+
 Fl_Menu_Item menu_small_menu[] = {
  {_("&Files"), 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
  {_("E&xit"), 0,  (Fl_Callback*)cb_mnuExit, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
  {_("&Config"), 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("Setup"), 0, 0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("Transceiver"), 0,  (Fl_Callback*)cb_mnuConfigXcvr, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("tcpip"), 0, (Fl_Callback*)cb_mnuTCPIP, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("PTT"), 0, (Fl_Callback*)cb_mnuPTT, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("AUX"), 0, (Fl_Callback*)cb_mnuAUX, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("Polling"), 0, (Fl_Callback*)cb_Polling, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
+ {0,0,0,0,0,0,0,0,0},
+ {_("Start/Stop"), 0, 0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Restore Freq/Mode"), 0,  (Fl_Callback*)cb_mnuRestoreData, 0, 6, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Keep Freq/Mode"), 0,  (Fl_Callback*)cb_mnuKeepData, 0, 134, FL_NORMAL_LABEL, 0, 14, 0},
- {_("Tooltips"), 0,  (Fl_Callback*)cb_mnuTooltips, 0, 2, FL_NORMAL_LABEL, 0, 14, 0},
- {_("Small sliders"), 0,  (Fl_Callback*)cb_mnuSchema, 0, 130, FL_NORMAL_LABEL, 0, 14, 0},
- {_("User Interface"), 0,  (Fl_Callback*)cb_mnuColorConfig, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
- {_("Meter filtering"), 0,  (Fl_Callback*)cb_mnu_meter_filtering, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
- {_("Xcvr select"), 0,  (Fl_Callback*)cb_mnuConfigXcvr, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
- {_("&Memory"), 0,  (Fl_Callback*)cb_Memory, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
- {_("@>>"), 0,  (Fl_Callback*)cb_save_me, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
- {_("&Debug"), 0,  0, 0, 192, FL_NORMAL_LABEL, 0, 14, 0},
- {_("&Events"), 0,  (Fl_Callback*)cb_Events, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
- {_("&Polling"), 0,  (Fl_Callback*)cb_Polling, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
- {_("&Send command"), 0,  (Fl_Callback*)cb_Send, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("UI"), 0, 0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("Meter filtering"), 0,  (Fl_Callback*)cb_mnu_meter_filtering, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("Small sliders"), 0,  (Fl_Callback*)cb_mnuSchema, 0, 130, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("Tooltips"), 0,  (Fl_Callback*)cb_mnuTooltips, 0, 130, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("User Interface"), 0,  (Fl_Callback*)cb_mnuColorConfig, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
+ {0,0,0,0,0,0,0,0,0},
+ {0,0,0,0,0,0,0,0,0},
+ {_("&Memory"), 0, 0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("Save"), 0,  (Fl_Callback*)cb_save_me, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("Manage"), 0,  (Fl_Callback*)cb_Memory, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
  {_("&Help"), 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
  {_("On Line Help"), 0,  (Fl_Callback*)cb_mnuOnLineHelp, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
- {_("&About"), 0,  (Fl_Callback*)cb_mnuAbout, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("&About"), 0,  (Fl_Callback*)cb_mnuAbout, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("Send command"), 0, (Fl_Callback*)cb_Send, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("&Events"), 0,  (Fl_Callback*)cb_Events, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
  {0,0,0,0,0,0,0,0,0}
 };
 
-Fl_Double_Window* Small_rig_window() {
-	Fl_Double_Window* w = new Fl_Double_Window(425, 320, _("Flrig"));
-	w->align(Fl_Align(FL_ALIGN_CLIP|FL_ALIGN_INSIDE));
-
-	small_menu = new Fl_Menu_Bar(0, 0, 424, 22);
-	small_menu->textsize(12);
-	progStatus.tooltips ? (&menu_small_menu[6])->set() : (&menu_small_menu[6])->clear();
-	progStatus.schema ? (&menu_small_menu[7])->set() : (&menu_small_menu[7])->clear();
-	small_menu->menu(menu_small_menu);
-
-	mnuExit = (menu_small_menu+1);
-	mnuConfig = (menu_small_menu+3);
-	mnuRestoreData = (menu_small_menu+4);
-	mnuKeepData = (menu_small_menu+5);
-	mnuTooltips = (menu_small_menu+6);
-	mnuSchema = (menu_small_menu+7);
-	mnuColorConfig = (menu_small_menu+8);
-	mnu_meter_filtering = (menu_small_menu+9);
-	mnuConfigXcvr = (menu_small_menu+10);
-	save_me = (menu_small_menu+13);
-	mnuHelp = (menu_small_menu+19);
-	mnuOnLineHelp =  (menu_small_menu+20);
-	mnuAbout = (menu_small_menu+21);
-
-	txt_encA = new Fl_Output( 425 - 90, 1, 90, 20, "");
-	txt_encA->box(FL_THIN_DOWN_BOX);
-	txt_encA->align(20);
-	txt_encA->hide();
+Fl_Group *small_main_group(int X, int Y, int W, int H)
+{
+	Fl_Group *g = new Fl_Group(X,Y,W,H);
+	g->box(FL_FLAT_BOX);
 
 	FreqDispA = new cFreqControl(1, 24, 210, 35, _("10"));
 	FreqDispA->box(FL_DOWN_BOX);
@@ -550,12 +537,6 @@ Fl_Double_Window* Small_rig_window() {
 	cntBFO->callback((Fl_Callback*)cb_cntBFO);
 	cntBFO->align(Fl_Align(FL_ALIGN_RIGHT));
 
-	btnInitializing = new Fl_Button(0, 23, 424, 100, _("Initializing\n\nPlease wait"));
-	btnInitializing->color((Fl_Color)206);
-	btnInitializing->labelfont(1);
-	btnInitializing->labelsize(24);
-	btnInitializing->hide();
-
 	tabs550 = new Fl_Tabs(1, 252, 422, 70);
 		tabs550->selection_color(FL_LIGHT1);
 		tabs550->hide();
@@ -796,7 +777,7 @@ Fl_Double_Window* Small_rig_window() {
 			cnt_tt550_keypad_time_out->callback((Fl_Callback*)cb_cnt_tt550_keypad_time_out);
 			cnt_tt550_keypad_time_out->align(Fl_Align(34));
 			cnt_tt550_keypad_time_out->value(progStatus.tt550_keypad_timeout/1000.0);
-			cnt_tt550_keypad_time_out->step(0.1); 
+			cnt_tt550_keypad_time_out->step(0.1);
 			cnt_tt550_keypad_time_out->lstep(1.0);
 
 			cnt_tt550_encoder_sensitivity = new Fl_Counter(191, 277, 80, 21, _("Sensitivity"));
@@ -1123,7 +1104,60 @@ Fl_Double_Window* Small_rig_window() {
 
 	tabsGeneric->end();
 
+	g->end();
+	return g;
+}
+
+Fl_Double_Window* Small_rig_window() {
+	Fl_Double_Window* w = new Fl_Double_Window(425, 320, _("Flrig"));
+	w->align(Fl_Align(FL_ALIGN_CLIP|FL_ALIGN_INSIDE));
+
+	Fl_Group* grp_small_menu = new Fl_Group(0,0,424,22);
+
+		small_menu = new Fl_Menu_Bar(0, 0, 424 - 64, 22);
+		small_menu->textsize(12);
+		progStatus.tooltips ? (&menu_small_menu[6])->set() : (&menu_small_menu[6])->clear();
+		progStatus.schema ? (&menu_small_menu[7])->set() : (&menu_small_menu[7])->clear();
+		small_menu->menu(menu_small_menu);
+
+		Fl_Group *mnu_box = new Fl_Group(424-64, 0, 64, 22);
+		mnu_box->box(FL_UP_BOX);
+
+			tcpip_box = new Fl_Group(424-62, 2, 60, 18);
+			tcpip_box->box(FL_FLAT_BOX);
+
+				tcpip_menu_box = new Fl_Box(424 - 62, 3, 16, 16);
+				tcpip_menu_box->box(FL_DIAMOND_BOX);
+				tcpip_menu_box->color(FL_GREEN);
+				Fl_Box *tcpip_menu_label = new Fl_Box(424 - 62 + 18, 3, 64 - 22, 16, _("tcpip"));
+				tcpip_menu_label->box(FL_FLAT_BOX);
+				tcpip_menu_label->align(FL_ALIGN_CENTER);
+				tcpip_menu_label->tooltip(_("lit when connected to remote tcpip"));
+
+			tcpip_box->end();
+			tcpip_box->hide();
+
+		mnu_box->end();
+		grp_small_menu->resizable(small_menu);
+
+	grp_small_menu->end();
+
+	mnuRestoreData = (menu_small_menu+12);
+	mnuKeepData = (menu_small_menu+13);
+	mnuTooltips = (menu_small_menu+18);
+	mnuSchema = (menu_small_menu+17);
+
+	txt_encA = new Fl_Output( 425 - 90, 1, 90, 20, "");
+	txt_encA->box(FL_THIN_DOWN_BOX);
+	txt_encA->align(20);
+	txt_encA->hide();
+
+	btnInitializing = new Fl_Button(0,0,425, 320, "Initializing");
+	btnInitializing->hide();
+
+	main_group = small_main_group(0, 22, 425, 320-22);
+	main_group->show();
+
 	w->end();
 	return w;
 }
-

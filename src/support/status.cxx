@@ -256,6 +256,14 @@ status progStatus = {
 	"7362",		// string server_port
 	"127.0.0.1",// string server_address
 
+	"4001",		// string tcpip_port
+	"127.0.0.1",// string tcpip_address
+	50,			// int tcpip_ping_delay
+	10,			// int tcpip_reconnect_after in seconds
+	10,			// int tcpip_drops_allowed;
+
+	false,		// bool use_tcpip
+
 	false,		// bool xcvr auto on
 	false		// bool xcvr auto off
 
@@ -509,6 +517,13 @@ void status::saveLastState()
 	spref.set("server_port", server_port.c_str());
 	spref.set("server_addr", server_addr.c_str());
 
+	spref.set("tcpip_port", tcpip_port.c_str());
+	spref.set("tcpip_addr", tcpip_addr.c_str());
+	spref.set("tcpip_ping_delay", tcpip_ping_delay);
+	spref.set("tcpip_tcpip_reconnect_after", tcpip_reconnect_after);
+	spref.set("tcpip_drops_allowed", tcpip_drops_allowed);
+	spref.set("use_tcpip", use_tcpip);
+
 	spref.set("xcvr_auto_on", xcvr_auto_on);
 	spref.set("xcvr_auto_off", xcvr_auto_off);
 
@@ -760,9 +775,17 @@ bool status::loadXcvrState(const char *xcvr)
 
 		spref.get("server_port", defbuffer, "7362", 199);
 		server_port = defbuffer;
-
 		spref.get("server_addr", defbuffer, "127.0.0.1", 199);
 		server_addr = defbuffer;
+
+		spref.get("tcpip_port", defbuffer, "4001", 199);
+		tcpip_port = defbuffer;
+		spref.get("tcpip_addr", defbuffer, "127.0.0.1", 199);
+		tcpip_addr = defbuffer;
+		spref.get("tcpip_ping_delay", tcpip_ping_delay, tcpip_ping_delay);
+		spref.get("tcpip_tcpip_reconnect_after", tcpip_reconnect_after, tcpip_reconnect_after);
+		spref.get("tcpip_drops_allowed", tcpip_drops_allowed, tcpip_drops_allowed);
+		if (spref.get("use_tcpip", i, i)) use_tcpip = i;
 
 		if (spref.get("xcvr_auto_on", i, i)) xcvr_auto_on = i;
 		if (spref.get("xcvr_auto_off", i, i)) xcvr_auto_off = i;

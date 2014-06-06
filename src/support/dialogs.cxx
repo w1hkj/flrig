@@ -52,6 +52,7 @@ using namespace std;
 #endif
 
 #include "rig.h"
+#include "socket_io.h"
 
 Fl_Double_Window *dlgDisplayConfig = NULL;
 Fl_Double_Window *dlgXcvrConfig = NULL;
@@ -368,16 +369,16 @@ void cbOkXcvrDialog()
 	}
 
 	// close the current rig control
-	closeRig();
-	close_rig_xmlrpc();
+	closeRig();               // local serial comm connection
+	close_rig_xmlrpc();       // fldigi connection
+//	disconnect_from_remote(); // remote tcpip connection
 
-	pthread_mutex_lock(&mutex_serial);
+	{ guard_lock gl_serial(&mutex_serial, 200);
 		RigSerial.ClosePort();
 		AuxSerial.ClosePort();
 		SepSerial.ClosePort();
 		bypass_serial_thread_loop = true;
-	pthread_mutex_unlock(&mutex_serial);
-
+	}
 
 	string p1 = selectCommPort->value();
 	string p2 = selectAuxPort->value();
@@ -502,6 +503,24 @@ void open_send_command_tab()
 {
 	dlgXcvrConfig->show();
 	tabsConfig->value(tabSndCmd);
+}
+
+void open_tcpip_tab()
+{
+	dlgXcvrConfig->show();
+	tabsConfig->value(tabTCPIP);
+}
+
+void open_ptt_tab()
+{
+	dlgXcvrConfig->show();
+	tabsConfig->value(tabPTT);
+}
+
+void open_aux_tab()
+{
+	dlgXcvrConfig->show();
+	tabsConfig->value(tabAux);
 }
 
 void createXcvrDialog()
@@ -1445,16 +1464,21 @@ void cb_send_command()
 	} else
 		cmd = command;
 // lock out polling loops until done
-	pthread_mutex_lock(&mutex_serial);
-	pthread_mutex_lock(&mutex_xmlrpc);
+	guard_lock gl_serial(&mutex_serial, 201);
+	guard_lock gl_xml(&mutex_xmlrpc, 202);
 
 	sendCommand(cmd, 0);
-	MilliSleep(100);
+
+	int timeout = 1000;
+	while (timeout > 0) {
+		if (timeout > 10) MilliSleep(10);
+		else MilliSleep(timeout);
+		timeout -= 10;
+		Fl::awake();
+	}
+
 	readResponse();
 	txt_response->value(
 		usehex ? str2hex(replystr.c_str(), replystr.length()) :
 		replystr.c_str());
-
-	pthread_mutex_unlock(&mutex_xmlrpc);
-	pthread_mutex_unlock(&mutex_serial);
 }

@@ -27,8 +27,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
-#include <pthread.h>
 
+#include "threads.h"
 #include "ptt.h"
 #include "debug.h"
 #include "rig_io.h"
@@ -56,7 +56,8 @@ static void fake_split(int on)
 void rigPTT(bool on)
 {
 //	wait_query = true;
-	pthread_mutex_lock(&mutex_serial);
+
+	guard_lock gl_serial(&mutex_serial, 300);
 
 	if (on && progStatus.split && !selrig->can_split())
 		fake_split(on);
@@ -73,6 +74,5 @@ void rigPTT(bool on)
 	if (!on && progStatus.split && !selrig->can_split())
 		fake_split(on);
 
-	pthread_mutex_unlock(&mutex_serial);
 //	wait_query = false;
 }
