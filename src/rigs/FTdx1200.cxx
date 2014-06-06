@@ -757,8 +757,8 @@ int RIG_FTdx1200::get_modeA()
 	if (p != string::npos) {
 		if (p + 3 < replystr.length()) {
 			int md = replystr[p+3];
-			if (md <= '9') md = md - '1';
-			else md = 9 + md - 'A';
+			if (md <= '9') md -= '1';
+			else md = md - 'B' + 9;
 			modeA = md;
 		}
 	}
@@ -796,8 +796,8 @@ int RIG_FTdx1200::get_modeB()
 	if (p != string::npos) {
 		if (p + 3 < replystr.length()) {
 			int md = replystr[p+3];
-			if (md <= '9') md = md - '1';
-			else md = 9 + md - 'A';
+			if (md <= '9') md -= '1';
+			else md = md - 'B' + 9;
 			modeB = md;
 		}
 	}
