@@ -1,8 +1,40 @@
 
 
-=Version 1.3.15=
+=Version 1.3.16=
 
-2013-12-02  David Freese  <w1hkj@w1hkj.com>
+2014-06-06  David Freese  <w1hkj@w1hkj.com>
+
+	0e8e450: FTdx1200 mode
+
+2014-06-04  Kamal Mostafa  <kamal@whence.com>
+
+	67286b3: RTS/DTR restore
+
+2014-05-31  David Freese  <w1hkj@w1hkj.com>
+
+	cce02f3: wait_char
+	e93a4fb: virtual-tty-port
+	41a0e82: update build scripts
+	a244acf: rig home dir
+	4e751e2: Dir reorg
+	fabad10: FL_APPS folder
+	f3a91fc: TT599
+
+2014-03-28  Arvo Järve  <arvo@dino2.dyndns.org>
+
+	b37ce11: FT847
+
+2014-03-26  David Freese  <w1hkj@w1hkj.com>
+
+	f7e0959: TT550 split
+	1791191: Disable meter averaging
+	ac55457: ic7000 again
+	e9d7a8e: ComboBox/ListBox
+	cfa02f2: IC756
+	45efe8a: License Declaration
+
+
+=Version 1.3.15=
 
 	3422195: 64 bit void pointer
 	fa317c3: tty search
