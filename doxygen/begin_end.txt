@@ -1,0 +1,18 @@
+/**
+\page advanced_qsy_page  Advanced QSY operations
+
+\tableofcontents
+
+\section id_tag  Descriptiom
+
+<br>
+
+
+
+
+<br>
+
+\ref main_page "Return to Main Page"
+
+*/
+

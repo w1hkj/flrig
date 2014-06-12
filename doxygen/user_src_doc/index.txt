@@ -1,0 +1,374 @@
+/******************************************************************************
+ * Copyright (C) 2014 Robert Stiles, KK5VD.
+ *
+ * Permission to use, copy, modify, and distribute this software and its
+ * documentation under the terms of the GNU General Public License is hereby
+ * granted. No representations are made about the suitability of this software
+ * for any purpose. It is provided "as is" without express or implied warranty.
+ * See the GNU General Public License for more details.
+ *
+ * Documents produced by Doxygen are derivative works derived from the
+ * input used in their production; they are not affected by this license.
+ *
+ * Requires Doxygen for HTML output
+ * plus LiveTeX (LaTeX) for PDF output
+ *
+ */
+
+
+/*!
+
+\mainpage FLRIG Users Manual - Version 1.3
+
+\tableofcontents
+
+<center>
+\image latex flriglogo.eps "" width=0.5in
+\image html flriglogo.png ""
+</center>
+
+<!--FLRIG User Manual-->
+\section sFlrigDesc Transceiver Control
+
+FLRIG is a transceiver control program designed to be used either stand
+alone or as an adjunct to FLDIGI.  The supported transceivers all have some
+degree of CAT.  The FLRIG user interface changes to accommodate the degree
+of CAT support available for the transceiver in use.
+
+Three different main dialog aspect ratios can be selected to suit the
+computer screen dimensions and operator preferences.  The wide aspect
+ratio can be resized horizontally.  The narrow aspect ratios are fixed
+in width and height.
+
+\anchor ft950_rig_anchor
+
+<center>
+\image latex FT-950.eps "" width=7.5in
+\image html FT-950.png ""
+</center>
+<br>
+
+<center>
+\image latex FT-950-2.eps "" width=4.3in
+\image html FT-950-2.png ""
+</center>
+<br>
+
+<center>
+\image latex FT-950-4.eps "" width=4.3in
+\image html FT-950-4.png ""
+</center>
+<br>
+
+The back end control code for each transceiver is unique to FLRIG. No
+additional libraries or definition files are required.
+
+\section sSupportedTRX Supported Transceivers
+
+\ref yaesu_rigs
+<center>
+
+| Elecraft         |Icom                                  |Kenwood                       |Ten-Tec                  | Yaesu                          | Other                      |
+|:----------------:|:------------------------------------:|:----------------------------:|:-----------------------:|:------------------------------:|:--------------------------:|
+|\ref ek_k2_a "K2" |\ref icom_703_a "IC-703"              |\ref kwd_ts140_a "TS 140"     |\ref tt_516_a   "TT 516" |\ref yaesu_100d_a "FT 100D"     |\ref o_pcr1000_a "PCR 1000" |
+|\ref ek_k3_a "K3" |\ref icom_706mk2g_a "IC 706 MK IIG"   |\ref kwd_ts450s_a "TS 450"    |\ref tt_535_a   "TT 535" |\ref yaesu_450_a "FT-450"       |\ref o_ray152_a  "RAY 152"  |
+|<br>              |\ref icom_718_a "IC-718"              |\ref kwd_ts480hx_a "TS 480HX" |\ref tt_538_a   "TT 538" |\ref yaesu_747gx_a "FT 747GX"   |<br>                        |
+|<br>              |\ref icom_728_a "IC 728"              |\ref kwd_ts570_a   "TS 570"   |\ref tt_550_a   "TT 550" |\ref yaesu_767_a  "FT 767"      |<br>                        |
+|<br>              |\ref icom_735_a "IC 735"              |\ref kwd_ts590s_a  "TS 590S"  |\ref tt_omni6_a "TT 563" |\ref yaesu_817_a "FT 817"       |<br>                        |
+|<br>              |\ref icom_746_a "IC 746"              |\ref kwd_ts990_a   "TS 990"   |\ref tt_566_a   "TT 566" |\ref yaesu_847_a "FT 847"       |<br>                        |
+|<br>              |\ref icom_746pro_a "IC 746 Pro"       |\ref kwd_ts2000_a  "TS 2000"  |\ref tt_omni7_a "TT 588" |\ref yaesu_857d_a "FT 857D"     |<br>                        |
+|<br>              |\ref icom_756pro2_a "IC 756 Pro II"   |<br>                          |\ref tt_599_a   "TT 599" |\ref yaesu_897d_a "FT 897D"     |<br>                        |
+|<br>              |\ref icom_756pro3_a "IC 756 Pro III"  |<br>                          |<br>                     |\ref yaesu_950_a "FT-950"       |<br>                        |
+|<br>              |\ref icom_910h_a "IC 910H"            |<br>                          |<br>                     |\ref yaesu_1000mp_a "FT-1000MP" |<br>                        |
+|<br>              |\ref icom_7000_a "IC 7000"            |<br>                          |<br>                     |\ref yaesu_2000_a "FT 2000"     |<br>                        |
+|<br>              |\ref icom_7100_a "IC 7100"            |<br>                          |<br>                     |\ref yaesu_1200dx_a "FTdx1200"  |<br>                        |
+|<br>              |\ref icom_7200_a "IC 7200"            |<br>                          |<br>                     |\ref yaesu_3000dx_a "FTdx3000"  |<br>                        |
+|<br>              |\ref icom_7600_a "IC 7600"            |<br>                          |<br>                     |\ref yaesu_5000dx_a "FTdx5000"  |<br>                        |
+|<br>              |\ref icom_7700_a "IC 7700"            |<br>                          |<br>                     |<br>                            |<br>                        |
+
+</center>
+
+\section sSetUp Setup
+
+Select the transceiver with the "Config / Xcvr select" menu item.
+
+<center>
+\image latex config-menu.eps "" width=1.6in
+\image html config-menu.png ""
+</center>
+<br>
+
+Check:
+
+<ul>
+	<li><b>Restore Freq/Mode</b> and FLRIG will read the current frequency /
+	    mode from the transceiver at start. It will then restore those at
+	    exit.</li>
+	<li><b>Keep Freq/Mode</b> and FLRIG use the transceiver frequency and
+	    mode for it's initial startup values.</li>
+	<li><b>Tooltips</b> and a small popup information box will appear above
+	    most controls when the mouse is allowed to hover over the control.</li>
+	<li><b>Small sliders</b> to compress the user interface as above in the
+	    right hand panel.</li>
+</ul>
+<br>
+
+\subsection ssXcvrSelect Xcvr Select
+
+<center>
+\image latex primary.eps "I/O Ports - Primary" width=4.9in
+\image html primary.png "I/O Ports - Primary"
+</center>
+<br>
+
+Select the rig in use from the "Rig" combo box.
+
+The default values associated with that transceiver will be preset for you.
+These have been verified by the test team but might require some tweaking for
+your particular h/w.
+
+You may prefer to use h/w PTT signaling instead of CAT PTT.  Not all
+transceivers support the CAT PTT function, but it will be preset to on
+if the selected transceiver supports that command.  The h/w PTT may be
+shared with the CAT serial port.
+
+If your serial connection is a CI-V device you might need to check "Echo"
+and also set either RTS or DTR to +12 if CI-V power is derived from the
+serial port.
+
+
+<center>
+\image latex ptt.eps "I/O Ports - PTT" width=4.9in
+\image html ptt.png "I/O Ports - PTT"
+</center>
+<br>
+
+Your PTT h/w control may also make use of a second serial port.
+
+
+<center>
+\image latex aux.eps "I/O Ports - Aux" width=4.9in
+\image html aux.png "I/O Ports - Aux"
+</center>
+<br>
+
+<center>
+\image latex aux-controls.eps "Aux Controls" width=3.45in
+\image html aux-controls.png "Aux Controls"
+</center>
+<br>
+
+You might also need access to special h/w functions.  FLRIG provides this
+via the DTR and RTS signal lines of an independent serial port.  Additional
+main dialog controls are enabled and shown if you select anything other than
+NONE (the default) on this tab.
+
+<center>
+\image latex polling.eps "I/O Ports - Polling" width=4.9in
+\image html polling.png "I/O Ports - Polling"
+</center>
+<br>
+
+Providing you transceiver supports the various meters and controls, you
+can elect to poll these every time the poll cycle occurs.  Polling a value
+causes FLRIG to follow and well as control a particular transceiver function
+or control.  The polling cycle will slow down as you elect to poll more and
+more values.
+
+<center>
+\image latex send-cmd.eps "I/O Ports - Polling" width=4.9in
+\image html send-cmd.png "I/O Ports - Polling"
+</center>
+<br>
+
+Testing your transceiver commands.  FLRIG might not support a particular CAT
+command for your transceiver.  You can test the support for a particular
+command using the "Send Cmd" tab.  The command string must comply with the
+transceiver requirements.  If ASCII text is used, as with transceivers based
+on the Kenwood command set you enter the string without spaces, i.e.
+
+\verbatim
+FA;
+\endverbatim
+to read the A vfo .
+
+For binary strings, used in older Yaesu transceivers, and all Icom CI-V type
+transceivers you need to enter the string as space delineated hex values,
+i.e.
+
+\verbatim
+Yaesu:  x00 x00 x00 x01 x05
+
+Icom: xFE xFE x70 xE0 x1A x05 x00 x92 x00 xFD
+\endverbatim
+
+Press the SEND button to transfer the command to the transceiver.  The
+response will appear in the lower text control.
+
+<center>
+\image latex FT-950-3.eps "FLRIG - FT950" width=4.25in
+\image html FT-950-3.png "FLRIG - FT950"
+</center>
+<br>
+
+<center>
+\image latex FT950-CW.eps "FT950 CW" width=4.25in
+\image html FT950-CW.png "FT950 CW"
+\image latex FT950-VOX.eps "FT950 Vox" width=4.25in
+\image html FT950-VOX.png "FT950 Vox"
+\image latex FT950-SPCH.eps "FT950 SPCH" width=4.25in
+\image html FT950-SPCH.png "FT950 SPCH"
+\image latex FT950-MISC.eps "FT950 MISC" width=4.25in
+\image html FT950-MISC.png "FT950 MISC"
+</center>
+<br>
+
+Additional control settings may be available depending on the transceiver
+being controlled.  These are in a drop-down area toggled by the arrow button
+to the left of the attenuator button on the small aspect ratio dialog view.
+These are the controls for the Yeasu FT950.
+
+
+<center>
+\image latex ft950-small.eps "FT950 Minimal" width=4.32in
+\image html ft950-small.png "FT950 Minimal"
+</center>
+<br>
+
+Select the toggle button "Small sliders" on the Config menu for 1/2 size
+sliders and a dialog layout that uses less vertical space.
+
+\subsection ssUserInterface User Interface
+
+\ref config_fonts_colors
+<br>
+
+<center>
+\image latex power-scale-select.eps "Meter Scale" width=4.6in
+\image html power-scale-select.png "Meter Scale"
+</center>
+<br>
+
+Right click on the main dialog power meter scale to open up this selection
+dialog.  Each of the 4 scales and the "Auto scaled" box are buttons.  Press
+the one you want to use.  Auto-scaling adjusts the meter scale to the
+smallest scale consistent with the current measured peak power.  If that
+power is fluctuating near the transistion point between two scales you
+might want to fix the scale to either the larger or smaller.
+<br>
+
+\section sOpControls Operating Controls
+
+
+<center>
+\image latex frequency-control.eps "Frequency Control" width=4.6in
+\image html frequency-control.png "Frequency Control"
+</center>
+<br>
+
+The frequency display is also a control.  Each numeric is sensitive to mouse
+left/right buttons for up/down and to the mouse scroll wheel for rapidly
+changing value.  Put the mouse over any of the numeric segments and you
+can enter a new frequency using the keyboard numeric keypad.  If you make an
+error simply enter a non-numeric key.  Set the newly entered frequency by
+pressing the Enter key.
+
+To paste a frequency from the clipboard (kHz only), press control-V followed
+by the Enter key
+
+Vfo-A and Vfo-B are separate control, A on the left, B on the right.
+
+Left click on the A->B button to swap vfos.  Right click on the A->B button
+to transfer vfoA to vfoB.
+
+When the mouse pointer is over the frequency display you can also change
+frequency values using the arrow and page key buttons:
+
+<ul>
+	<li>left / right arrow - increase / decrease 1 Hz</li>
+	<li>up / down arrow - increase / decrease 10 Hz</li>
+	<li>Page Up / Page Down - increase / decrease 100 Hz</li>
+</ul>
+<br>
+
+<center>
+\image latex buttons-sliders.eps "Control Sliders" width=2.24in
+\image html buttons-sliders.png "Control Sliders"
+</center>
+<br>
+
+The buttons that have a light box are toggles - activated when the lighted
+box is colored.  Some of these are linked to a slider.  If the button state
+is inactive then that associated slider will be greyed out.  In the example
+the volume control is active and the NR control is inactive.
+<br>
+
+<center>
+\image latex flrig-fldigi.eps "FLRIG/FLDIGI" width=4.37in
+\image html flrig-fldigi.png "FLRIG/FLDIGI"
+</center>
+<br>
+
+Operating FLRIG with FLDIGI requires a simple setup in FLDIGI.  Deselect all
+but the "xmlrpc" rig control.  Xmlrpc is used via a local socket device for
+the two programs to communicate.  FLDIGI acts as the server and FLRIG the
+client.  There is no requirement for start / stop ordering of the programs.
+
+FLRIG sends rig configuration data to FLDIGI when the two programs initially
+recognize each other.  This data is used to populate the rig name, the
+available modes and the available bandwidths.
+
+After this initial communications the operator can set the paired controls
+from either FLDIGI or FLRIG.  The two programs will remain synchronized.  The
+data from the computer to the transceiver is always from FLRIG.
+
+PTT can be activated at FLRIG or using the T/R button on FLDIGI.  FLDIGI
+also engages the PTT via the macro <TX> <RX> tags.  When operating digital
+modes with FLDIGI you should use the PTT from FLDIGI.
+
+\subsection ssMeterFiltering Meter Filtering
+
+<center>
+\image latex meter-filters.eps "Meter Filter Controls" width=4.18in
+\image html meter-filters.png "Meter Filter Controls"
+</center>
+<br>
+
+You can control the behavior of both the average and peak values of the
+S-meter and Power out meters.  Setting the controls to 1 for both average
+and peak will simply display the latest value available from the
+transceiver.  The average setting results in the display showing the
+average of the last N readings.  The peak value will display the average
+peak value over the last M readings.
+
+
+<center>
+\image latex flrig-event-log.eps "Event Log" width=7.5in
+\image html flrig-event-log.png "Event Log"
+</center>
+<br>
+
+The event log is opened from the "Debug" menu.  It allows you to view the
+serial and xmlrpc data exchanges between FLRIG, FLDIGI, and the
+transceiver.
+
+
+\subsection ssMultipleConfigDir Multiple Configuration Directories
+
+<center>
+\image latex mulitple_configs.eps "" width=2.48in
+\image html mulitple_configs.png ""
+</center>
+<br>
+
+\section sTT550 TT 550
+
+The TenTec Pegasus, TT-550 is a computer only transceiver.  FLRIG controls
+all aspects of this transceiver: \ref tt550_ops_page
+
+\section sIC7600 IC 7600
+
+Andy's (VE3NVK / G8VTV) \ref ic7600_how_to_page
+
+\ref sFlrigDesc "Top of Page"
+*/

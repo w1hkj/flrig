@@ -1,0 +1,48 @@
+/**
+\page yaesu_rigs  Supported Yaesu Transceivers
+\anchor yaesu_100d_a
+\image latex FT100D.eps "FT-100D" width=3.75in
+\image html FT100D.png "FT-100D"
+\anchor yaesu_450_a
+\image latex FT450.eps "FT-450" width=3.75in
+\image html FT450.png "FT-450"
+\anchor yaesu_747gx_a
+\image latex FT747GX.eps "FT-747GX" width=3.75in
+\image html FT747GX.png "FT-747GS"
+\anchor yaesu_767_a
+\image latex FT767.eps "FT-767" width=3.75in
+\image html FT767.png "FT-767"
+\anchor yaesu_817_a
+\image latex FT817.eps "FT-817" width=3.75in
+\image html FT817.png "FT-817"
+\anchor yaesu_847_a
+\image latex FT847.eps "FT-847" width=3.75in
+\image html FT847.png "FT-847"
+\anchor yaesu_857d_a
+\image latex FT857D.eps "FT-857D" width=3.75in
+\image html FT857D.png "FT-857D"
+\anchor yaesu_897d_a
+\image latex FT897D.eps "FT-897D" width=3.75in
+\image html FT897D.png "FT-897D"
+\anchor yaesu_950_a
+\image latex FT-950.eps "FT-950" width=6in
+\image html FT-950.png "FT-950"
+\anchor yaesu_1000mp_a
+\image latex FT1000MP.eps "FT-1000mp" width=3.75in
+\image html FT1000MP.png "FT-1000mp"
+\anchor yaesu_2000_a
+\image latex FT2000.eps "FT-2000" width=6in
+\image html FT2000.png "FT-2000"
+\anchor yaesu_1200dx_a
+\image latex FTdx1200.eps "FT-dx1200" width=6in
+\image html FTdx1200.png "FT-dx1200"
+\anchor yaesu_3000dx_a
+\image latex FTdx3000.eps "FT-dx3000" width=6in
+\image html FTdx3000.png "FT-dx3000"
+\anchor yaesu_5000dx_a
+\image latex FTdx5000.eps "FT-dx5000" width=3.75in
+\image html FTdx5000.png "FT-dx5000"
+\ref yaesu_rigs "Page Top"
+\ref sFlrigDesc "Return to Main Page"
+*/
+

@@ -1,0 +1,275 @@
+------------------------ At top of page
+/**
+\page <id_tag>_page  Description
+
+\tableofcontents
+
+\section id_tag  Descriptiom
+<br>
+------------------------
+
+------------------------- for Images
+\image html filename.png "Description"
+\image latex filename.eps "Description" width=5.0in
+-------------------------
+
+------------------------- Links
+\ref id_tag
+-------------------------
+
+------------------------- At bottom of page
+<br>
+\ref main_page "Return to Main Page"
+
+*/
+------------------------
+
+------------------------ Images in tables
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+    \includegraphics[width=\textwidth]{gull}
+    \caption{A gull}
+    \label{fig:gull}
+	\end{subfigure}%
+~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+  %(or a blank line to force the subfigure onto a new line)
+    \begin{subfigure}[b]{0.3\textwidth}
+   		\includegraphics[width=\textwidth]{tiger}
+    	\caption{A tiger}
+        \label{fig:tiger}
+	\end{subfigure}
+~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+  %(or a blank line to force the subfigure onto a new line)
+    \begin{subfigure}[b]{0.3\textwidth}
+    	\includegraphics[width=\textwidth]{mouse}
+        \caption{A mouse}
+        \label{fig:mouse}
+    \end{subfigure}
+    \caption{Pictures of animals}
+    \label{fig:animals}
+\end{figure}
+
+\htmlonly
+<table>
+<tr><th>PSK</th><th>MFSK</th></tr>
+<tr>
+<td>
+<img src="ModemHeader.jpg" alt="some_text">
+</td>
+<td>
+<img src="ModemHeader.jpg" alt="some_text">
+</td>
+</tr>
+</table>
+\endhtmlonly
+
+\latexonly
+\begin{table}[ht]
+\caption{A table arranging  images}
+\centering
+\begin{tabular}{cc}
+\includegraphics[scale=1]{ModemHeader.eps}&\includegraphics[scale=1]{ModemHeader.eps}\\
+\includegraphics[scale=1]{ModemHeader.eps}&\includegraphics[scale=1]{ModemHeader.eps}\\
+\end{tabular}
+\label{tab:gt}
+\end{table}
+\endlatexonly
+------------------------
+
+LaTeX command	Sample	Description
+\`{o}	ò	grave accent
+\'{o}	ó	acute accent
+\^{o}	ô	circumflex
+\"{o}	ö	umlaut, trema or dieresis
+\H{o}	ő	long Hungarian umlaut (double acute)
+\~{o}	õ	tilde
+\c{c}	ç	cedilla
+\k{a}	ą	ogonek
+\l	ł	barred l (l with stroke)
+\={o}	ō	macron accent (a bar over the letter)
+\b{o}	o	bar under the letter
+\.{o}	ȯ	dot over the letter
+\d{u}	ụ	dot under the letter
+\r{a}	å	ring over the letter (for å there is also the special command \aa)
+\u{o}	ŏ	breve over the letter
+\v{s}	š	caron/hacek ("v") over the letter
+\t{oo}	o͡o	"tie" (inverted u) over the two letters
+\o	ø	slashed o (o with stroke)
+
+Here is a list of all HTML commands that may be used inside the documentation. Note that although these HTML tags are translated to the proper commands for output formats other than HTML, all attributes of a HTML tag are passed on to the HTML output only (the HREF and NAME attributes for the A tag are the only exception).
+
+<A HREF="..."> Starts a hyperlink (if supported by the output format).
+<A NAME="..."> Starts an named anchor (if supported by the output format).
+</A> Ends a link or anchor
+<B> Starts a piece of text displayed in a bold font.
+</B> Ends a <B> section.
+<BLOCKQUOTE> Starts a quotation block.
+</BLOCKQUOTE> Ends the quotation block.
+<BODY> Does not generate any output.
+</BODY> Does not generate any output.
+<BR> Forces a line break.
+<CENTER> starts a section of centered text.
+</CENTER> ends a section of centered text.
+<CAPTION> Starts a caption. Use within a table only.
+</CAPTION> Ends a caption. Use within a table only.
+<CODE> Starts a piece of text displayed in a typewriter font. Note that only for C# code, this command is equivalent to \code.
+</CODE> Ends a <CODE> section. Note that only for C# code, this command is equivalent to \endcode.
+<DD> Starts an item description.
+</DD> Ends an item description.
+<DFN> Starts a piece of text displayed in a typewriter font.
+</DFN> Ends a <DFN> section.
+<DIV> Starts a section with a specific style (HTML only)
+</DIV> Ends a section with a specific style (HTML only)
+<DL> Starts a description list.
+</DL> Ends a description list.
+<DT> Starts an item title.
+</DT> Ends an item title.
+<EM> Starts a piece of text displayed in an italic font.
+</EM> Ends a <EM> section.
+<FORM> Does not generate any output.
+</FORM> Does not generate any output.
+<HR> Writes a horizontal ruler.
+<H1> Starts an unnumbered section.
+</H1> Ends an unnumbered section.
+<H2> Starts an unnumbered subsection.
+</H2> Ends an unnumbered subsection.
+<H3> Starts an unnumbered subsubsection.
+</H3> Ends an unnumbered subsubsection.
+<I> Starts a piece of text displayed in an italic font.
+<INPUT> Does not generate any output.
+</I> Ends a <I> section.
+<IMG> This command is written with attributes to the HTML output only.
+<LI> Starts a new list item.
+</LI> Ends a list item.
+<META> Does not generate any output.
+<MULTICOL> ignored by doxygen.
+</MUTLICOL> ignored by doxygen.
+<OL> Starts a numbered item list.
+</OL> Ends a numbered item list.
+<P> Starts a new paragraph.
+</P> Ends a paragraph.
+<PRE> Starts a preformatted fragment.
+</PRE> Ends a preformatted fragment.
+<SMALL> Starts a section of text displayed in a smaller font.
+</SMALL> Ends a <SMALL> section.
+<SPAN> Starts an inline text fragment with a specific style (HTML only)
+</SPAN> Ends an inline text fragment with a specific style (HTML only)
+<STRONG> Starts a section of bold text.
+</STRONG> Ends a section of bold text.
+<SUB> Starts a piece of text displayed in subscript.
+</SUB> Ends a <SUB> section.
+<SUP> Starts a piece of text displayed in superscript.
+</SUP> Ends a <SUP> section.
+<TABLE> starts a table.
+</TABLE> ends a table.
+<TD> Starts a new table data element.
+</TD> Ends a table data element.
+<TH> Starts a new table header.
+</TH> Ends a table header.
+<TR> Starts a new table row.
+</TR> Ends a table row.
+<TT> Starts a piece of text displayed in a typewriter font.
+</TT> Ends a <TT> section.
+<KBD> Starts a piece of text displayed in a typewriter font.
+</KBD> Ends a <KBD> section.
+<UL> Starts an unnumbered item list.
+</UL> Ends an unnumbered item list.
+<VAR> Starts a piece of text displayed in an italic font.
+</VAR> Ends a <VAR> section.
+The special HTML character entities that are recognized by Doxygen:
+
+&copy; the copyright symbol
+&trade; the trade mark symbol
+&reg; the registered trade mark symbol
+&lt; less-than symbol
+&gt; greater-than symbol
+&amp; ampersand
+&apos; single quotation mark (straight)
+&quot; double quotation mark (straight)
+&lsquo; left single quotation mark
+&rsquo; right single quotation mark
+&ldquo; left double quotation mark
+&rdquo; right double quotation mark
+&ndash; n-dash (for numeric ranges, e.g. 2–8)
+&mdash; m-dash (for parenthetical punctuation — like this)
+&?uml; where ? is one of {A,E,I,O,U,Y,a,e,i,o,u,y}, writes a character with a diaeresis accent (like ä).
+&?acute; where ? is one of {A,E,I,O,U,Y,a,e,i,o,u,y}, writes a character with a acute accent (like á).
+&?grave; where ? is one of {A,E,I,O,U,a,e,i,o,u,y}, writes a character with a grave accent (like à).
+&?circ; where ? is one of {A,E,I,O,U,a,e,i,o,u,y}, writes a character with a circumflex accent (like â).
+&?tilde; where ? is one of {A,N,O,a,n,o}, writes a character with a tilde accent (like ã).
+&szlig; write a sharp s (i.e. ß) to the output.
+&?cedil; where ? is one of {c,C}, writes a c-cedille (like ç).
+&?ring; where ? is one of {a,A}, writes an a with a ring (like å).
+&nbsp; a non breakable space.
+&Gamma; Greek letter Gamma Γ.
+&Delta; Greek letter Delta Δ.
+&Theta; Greek letter Theta Θ.
+&Lambda; Greek letter Lambda Λ.
+&Xi; Greek letter Xi Ξ.
+&Pi; Greek letter Pi Π.
+&Sigma; Greek letter Sigma Σ.
+&Upsilon; Greek letter Upsilon Υ.
+&Phi; Greek letter Phi Φ.
+&Psi; Greek letter Psi Ψ.
+&Omega; Greek letter Omega Ω.
+&alpha; Greek letter alpha α.
+&beta; Greek letter beta β.
+&gamma; Greek letter gamma γ.
+&delta; Greek letter delta δ.
+&epsilon; Greek letter epsilon ε.
+&zeta; Greek letter zeta ζ.
+&eta; Greek letter eta η.
+&theta; Greek letter theta θ.
+&iota; Greek letter iota ι.
+&kappa; Greek letter kappa κ.
+&lambda; Greek letter lambda λ.
+&mu; Greek letter mu μ.
+&nu; Greek letter nu ν.
+&xi; Greek letter xi ξ.
+&pi; Greek letter pi π.
+&rho; Greek letter rho ρ.
+&sigma; Greek letter sigma σ.
+&tau; Greek letter tau τ.
+&upsilon; Greek letter upsilon υ.
+&phi; Greek letter phi φ.
+&chi; Greek letter chi χ.
+&psi; Greek letter psi ψ.
+&omega; Greek letter omega ω.
+&sigmaf; Greek final sigma ς.
+&sect; section sign §.
+&deg; degree °.
+&prime; prime ′.
+&Prime; double prime ″.
+&infin; infinity ∞.
+&empty; empty set ∅.
+&plusmn; plus or minus ±.
+&times; multiplication sign ×.
+&minus; minus sign −.
+&sdot; centered dot ⋅.
+&part; partial derivative ∂.
+&nabla; nabla symbol ∇.
+&radic; square root √.
+&perp; perpendicular symbol ⊥.
+&sum; sum ∑.
+&int; integral ∫.
+&prod; product ∏.
+&sim; similar to ∼.
+&asymp; approximately equal to ≈.
+&ne; not equal to ≠.
+&equiv; equivalent to ≡.
+&prop; proportional to ∝.
+&le; less than or equal to ≤.
+&ge; greater than or equal to ≥.
+&larr; left arrow ←.
+&rarr; right arrow →.
+&isin; in the set ∈.
+&notin; not in the set ∉.
+&lceil; left ceiling sign ⌈.
+&rceil; right ceiling sign ⌉.
+&lfloor; left floor sign ⌊.
+&rfloor; right floor sign ⌋.
+Finally, to put invisible comments inside comment blocks, HTML style comments can be used:
+
+/*! <!-- This is a comment with a comment block --> Visible text */

@@ -1,0 +1,81 @@
+/**
+\page icom_rigs  Supported Icom Transceivers
+\anchor icom_703_a
+<center>
+\image latex IC703.eps "IC 703" width=3.75in
+\image html  IC703.png "IC 703"
+</center>
+\anchor icom_706mk2g_a
+<center>
+\image latex IC706MKIIG.eps "IC 706 MKIIG" width=3.75in
+\image html  IC706MKIIG.png "IC 706 MKIIG"
+</center>
+\anchor icom_718_a
+<center>
+\image latex IC718.eps "IC 718" width=3.75in
+\image html  IC718.png "IC 718"
+</center>
+\anchor icom_728_a
+<center>
+\image latex IC728.eps "IC 728" width=3.75in
+\image html  IC728.png "IC 728"
+</center>
+\anchor icom_735_a
+<center>
+\image latex IC735.eps "IC 735" width=3.75in
+\image html  IC735.png "IC 735"
+</center>
+\anchor icom_746_a
+<center>
+\image latex IC746.eps "IC 746" width=3.75in
+\image html  IC746.png "IC 746"
+</center>
+\anchor icom_746pro_a
+<center>
+\image latex IC746PRO.eps "IC 746" width=3.75in
+\image html  IC746PRO.png "IC 746"
+</center>
+\anchor icom_756pro2_a
+<center>
+\image latex IC756PROII.eps "IC 756 pro2" width=3.75in
+\image html  IC756PROII.png "IC 756 pro2"
+</center>
+\anchor icom_756pro3_a
+<center>
+\image latex IC756PROIII.eps "IC 756 pro3" width=3.75in
+\image html  IC756PROIII.png "IC 756 pro3"
+</center>
+\anchor icom_910h_a
+<center>
+\image latex IC910H.eps "IC 910 H" width=3.75in
+\image html  IC910H.png "IC 910 H"
+</center>
+\anchor icom_7000_a
+<center>
+\image latex IC7000.eps "IC 7000" width=3.75in
+\image html  IC7000.png "IC 7000"
+</center>
+\anchor icom_7100_a
+<center>
+\image latex IC7100.eps "IC 7100" width=3.75in
+\image html  IC7100.png "IC 7100"
+</center>
+\anchor icom_7200_a
+<center>
+\image latex IC7200.eps "IC 7200" width=3.75in
+\image html  IC7200.png "IC 7200"
+</center>
+\anchor icom_7600_a
+<center>
+\image latex IC7600.eps "IC 7600" width=3.75in
+\image html  IC7600.png "IC 7600"
+</center>
+\anchor icom_7700_a
+<center>
+\image latex IC7700.eps "IC 7700" width=3.75in
+\image html  IC7700.png "IC 7700"
+</center>
+\ref elecraft_rigs "Page Top"
+\ref sFlrigDesc "Return to Main Page"
+*/
+
