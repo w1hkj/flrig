@@ -1,0 +1,90 @@
+/**
+\page config_fonts_colors  Configuring Fonts and Colors
+
+\tableofcontents
+
+
+<center>
+\image latex colors-dialog.png "" width=4.25in
+\image html colors-dialog.png ""
+</center>
+<br>
+
+You can change many of the colors and fonts used in FLDIGI to suit your
+operating style.  Those shown at the left are the defaults.
+
+You can use the color dialog to set the colors, or if you understand the RGB
+color system you may directly edit the prefs file associated with the
+transceiver you are using.  The prefs file is located in the FLRIG folder.
+
+On linux and OS X this folder is
+\verbatim
+$HOME/.FLDIGI
+\endverbatim
+
+
+On XP,
+\verbatim
+C:\Documents and Settings\<usr>\FLRIG.files
+\endverbatim
+
+On Vista / Win7,
+\verbatim
+C:\Users\<usr>\FLRIG.files
+\endverbatim
+
+The prefs file for the TT-550 Pegasus would be TT-550.prefs.
+
+<center>
+\image latex yellow-on-black.png "" width=5.5in
+\image html yellow-on-black.png ""
+</center>
+<br>
+
+This bold look is achieved with the following settings found in the prefs
+file:
+
+\verbatim
+smeter_red:0
+smeter_green:180
+smeter_blue:0
+peak_red:255
+peak_green:0
+peak_blue:0
+fg_sys_red:255
+fg_sys_green:210
+fg_sys_blue:50
+bg_sys_red:0
+bg_sys_green:0
+bg_sys_blue:0
+bg2_sys_red:122
+bg2_sys_green:141
+bg2_sys_blue:147
+slider_red:96
+slider_green:100
+slider_blue:115
+slider_btn_red:209
+slider_btn_green:177
+slider_btn_blue:75
+lighted_btn_red:72
+lighted_btn_green:255
+lighted_btn_blue:96
+ui_scheme:gtk+
+\endverbatim
+<br>
+<br>
+
+<center>
+\image latex FT950-bold-plastic.png "" width=5.5in
+\image html FT950-bold-plastic.png ""
+</center>
+<br>
+
+A similar color scheme but using the FLTK "Plastic" look for the controls.
+
+
+\ref config_fonts_colors "Page Top"
+
+\ref sFlrigDesc "Return to Main Page"
+
+*/

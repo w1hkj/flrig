@@ -1,0 +1,185 @@
+/**
+\page tt550_ops_page  TT550 - Pegasus Operating instructions
+
+\tableofcontents
+
+<center>
+\image latex TT550.png "FLRIG - TT550" width=4.32in
+\image html TT550.png "FLRIG - TT550"
+</center>
+<br>
+
+FLRIG provides a full implementation of all TT550 control functions including
+the operation of the Model 302 remote keypad.  The TT550 selection can also
+be used with the TT538, Jupiter.  The Jupiter emulates all of the Pegasus
+commands.
+
+All of the FLRIG "front panel" controls operate the same as for any other
+transceiver with a few exceptions.  The Pegasus does not have any preamp
+control.  So that button is converted for use as a spot control when the
+rig is in CW mode.
+
+Select CW mode and then press the spot button.  You should hear the sidetone
+(if not you may need to increase the Spot Vol ... see below).  You can then
+adjust the B (BFO) control for the desired sidetone frequency.
+
+The DIGI mode is unique to FLRIG and the TT550.  The control commands
+available on the Pegasus allow the program to control the center
+frequency and the bandwidth for all of the DSP filters.  The DIGI
+mode is designed to always place the center frequency of the filter
+at 1500 Hz.  When FLRIG is used with FLDIGI this provides a very
+convenient and easy way to QSY to a received signal and then narrow
+down the filter.  The Pegasus DSP filters are very well suited to digital
+mode operations.
+
+
+<center>
+\image latex TT550-init.png "I/O Ports - Primary" width=4.9in
+\image html TT550-init.png "I/O Ports - Primary"
+</center>
+<br>
+
+Selecting the TT550 from the rig selection combo box should preset all of the
+interface controls.  You should only need to select from the serial port
+combo.  FLRIG will find all unused serial ports so be sure that the TT550
+is not being accessed by another software when you start FLRIG.
+
+It is necessary to press the Init button when you first set the program for
+use with a transceiver.  Subsequent use should not require any action on
+the part of the operator.
+
+
+The TT550 has it's own set up dialog for accessing those controls that are
+not routinely used.  This dialog is opened by the "Config / Xcvr setup"
+menu.
+
+\section sAdditionalControls  Additional Control
+
+Access to the additional controls is obtained by the down arrow button to
+the left of the Att control.
+
+<center>
+\image latex TT550-CW.png "TT550 - CW" width=4.34in
+\image html TT550-CW.png "TT550 - CW"
+</center>
+<br>
+
+\subsection ssCW CW
+
+The internal keyer can be enabled and both the words/min and the weight of
+the keyer can be adjusted.  The Pegasus is a QSK rig and you can adjust the
+QSK hold in milliseconds.  You can adjust the keyer sidetone volume relative
+to the received audio.  Set the control to zero if you do want to hear the
+sidetone.  The Spot Vol control is associated with the Spot button on the
+front panel.  This volume is also relative to the receiver volume control.
+
+\subsection ssVOX VOX
+
+<center>
+\image latex TT550-VOX.png "TT550 - VOX" width=4.26in
+\image html TT550-VOX.png "TT550 - VOX"
+</center>
+<br>
+
+You can operate the Pegasus with manual SSB PTT or with Vox.  The three
+Vox controls are controlled IAW the 550 manual.
+
+\subsection ssSpeech Speech
+
+<center>
+\image latex TT550-SPCH.png "TT550 - Speech" width=4.24in
+\image html TT550-SPCH.png "TT550 - Speech"
+</center>
+<br>
+
+You can monitor the SSB speech level (recommended only with headphones).
+The compression level is also adjustable and speech compression can be
+enabled or disabled as suited.
+
+The Accessory socket line out level can be set to prevent overdriving of
+a terminal node controller or computer sound card interface.  The front
+panel NB, noise blanker, control can be set for any level from NONE to
+7.  AGC can be set for slow, medium or fast.  The transmitter can be
+disabled.  Very useful if you do not want idle hands pressing the PTT
+switch.  The Tloop (for amplifier) can be enabled and finally if your
+Pegasus has the built-in tuner it can be bypassed.
+
+
+\subsection ssAudio Audio
+
+<center>
+\image latex TT550-AUDIO.png "TT550 - Audio" width=4.27in
+\image html TT550-AUDIO.png "TT550 - Audio"
+</center>
+<br>
+
+Audio can be either from the Mic connector or from the Accessory input
+(digital mode ops).  The level of the line out on the remote connector can
+be controlled independent of the speaker.
+
+\subsection ssRX RX
+
+<center>
+\image latex TT550-RX.png "TT550 - Receive" width=4.23in
+\image html TT550-RX.png "TT550 - Receive"
+</center>
+<br>
+
+The signal frequencies internal to the Pegasus are all derived from a single
+oscillator.  That oscillator can be corrected for frequency error using the
+VFO adjustment control.
+
+\subsection ssTX TX
+
+<center>
+\image latex TT550-TX.png "TT550 - Transmit" width=4.25in
+\image html TT550-TX.png "TT550 - Transmit"
+</center>
+<br>
+
+The signal frequencies internal to the Pegasus are all derived from a single
+oscillator.  That oscillator can be corrected for frequency error using the
+VFO adjustment control.
+
+\subsection ss302A 302A
+
+<center>
+\image latex TT550-302A.png "TT550 - 302A" width=4.25in
+\image html TT550-302A.png "TT550 - 302A"
+</center>
+<br>
+
+302 Keypad Accessory  If you have the 302 keypad you can set various
+parameters to adjust it's performance.  The function keys can be assigned
+on of several response functions:
+
+<center>
+\image latex fkey-choices.png "" width=0.96in
+\image html fkey-choices.png ""
+</center>
+<br>
+
+Both the Pegasus and the Jupiter can be controlled with the Model 302 key
+pad / encoder.
+
+As you enter keypad values from the keypad they will appear in an entry
+box at the upper right of the main dialog.  These are used for entering
+a frequency in kHz (i.e. 14.070 MHz is entered as 14070.000).
+
+<center>
+\image latex fkey-entry.png "" width=1.66in
+\image html fkey-entry.png ""
+</center>
+<br>
+
+
+Here the numbers 1 and 4 have been pressed in sequence.  You can abort the
+input by pressing the decimal value twice in succession.  You can also set
+a time out in seconds.  Failure to continue an entry within the time out
+period will also abort the input.
+
+\ref tt550_ops_page "Page Top"
+
+\ref sFlrigDesc "Return to Main Page"
+
+*/

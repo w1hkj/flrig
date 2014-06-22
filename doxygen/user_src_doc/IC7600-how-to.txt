@@ -1,0 +1,167 @@
+/**
+\page ic7600_how_to_page IC-7600 How-to
+
+\tableofcontents
+
+<b>Submitted by Andy - VE3NVK / G8VTV</b>
+
+<center>
+\image latex ic7600-config.png "" width=5.5in
+\image html ic7600-config.png ""
+</center>
+
+How to use the USB audio connection of the IC-7600 to a computer with
+FLDIGI and FLRIG.
+
+
+\section sIC7600Settings IC-7600 SETTINGS
+
+Setting the IC7600 menu items
+
+<ol>
+	<li>Go into setup on the 7600 (Exit/set) then goto "set" and finally
+	   "Levels"</li>
+	<li>Scroll to the item "Data 1 mod" and change the setting to USB
+	    (by turning the tuning dial).<br>
+		If you do not change this setting then the rig will not get the
+		transmit audio - it still sends the received audio signal out
+		though.<br>
+		You can use any of Data 1 to Data 3 settings if you have reason to
+		but it is simplest to use the first.</li>
+	<li>Scroll up to the setting for "USB MOD Level" make sure it has some
+	    level set (mine is at 40%).</li>
+	<li>Scroll up to "USB Audio SQL" and make sure it is off(open) - We want
+	    the software to do any squelching on digital modes.</li>
+	<li>You will probably also want to leave the setting for DATA OFF MOD
+	    at the default of "Mic,Acc", if you still intend to use a microphone
+	    for SSB! <br>
+	    You can just turn it to Mic alone to avoid any confusing
+	    complications. <br>
+	    If you have another audio interface plugged into the auxiliary port,
+	    such as a TNC you will probably want to leave it alone.</li>
+</ol>
+
+That should be it for the radio settings.
+
+
+\section sSoftwareSettings SOFTWARE SETTINGS
+
+Now, on the computer, make sure that the sound card on the output side has
+some initial level set; try from 20 to 60% for starters.
+
+If using FLRIG, (the companion software) to FLDIGI, both of which I strongly
+recommend, set a level for microphone and power level (start at say 50%). I
+find that I ended up with the mic level very low at about 5%.  If you are not
+using FLRIG in association with FLDIGI then you do have some other interface
+options, explained in the main FLDIGI on-line help.
+
+Start both FLDIGI and FLRIG, make sure that FLDIGI is set to use XML-RPC for
+rig control, and not anything else.  If you try to use rig control from both
+FLDIGI with FLRIG running then there will be conflicts, and who knows which
+programme will be in charge.  FLDIGI sends frequency, mode and bandwidth
+changes to the transceiver via FLRIG when XML-RPC is selected.  FLRIG in
+turn annunciates changes back to FLDIGI.  The radio, FLRIG and FLDIGI should
+stay in synch no matter where the change occurs.
+
+\subsection ssFldigi FLDIGI
+
+<ol>
+	<li>On FLDIGI's "Configure" tab and rig control tab make sure that you
+	    only select XML-RPC.</li>
+	<li>On the "Audio" tab make sure (on Linux) that you have selected
+	    the correct audio device. I use PortAudio so I have selected both
+	    Capture and Playback show up as "USB Audio CODEC: USB Audio ..." (after
+	    that is will show the hardware port as something like (HW:0,0) - this
+	    last part will change depending on how your computer is set up to
+	    identify the audio ports.</li>
+	<li>In the OS sound mixer application, the 7600 USB audio will probably
+	    be identified as "PCM2901 Audio Codec."</li>
+	<li>If you are using Pulse audio the mixer function is performed in
+	    the Pulse-audio mixer application.&nbsp; Pulse audio will remember both
+	    the record and playback levels required for each application that it
+	    serves.</li>
+</ol>
+
+\subsection ssFlrig FLRIG
+
+<ol>
+	<li>Open the Config/Transceiver select tab and perform the following in
+	    the dialog window that opens</li>
+	<li>Make sure to select the rig ic-7600 that the serial port is
+	    selected - it will be something like (again in Linux) /dev/ttyUSB0, the
+	    number at the end may be different, and if you have more than one USB
+	    serial device connected, make sure you have the correct one. (Hint: use
+	    the command, in a terminal screen, 'lsmod')</li>
+	<li>Make sure the CI-V address is correct, the default for the 7600 is
+	    0x7A</li>
+	<li>Check off the "USB Audio" box.</li>
+	<li>Select the button for PTT via CAT.</li>
+	<li>Ensure that the baud rate is compatible with what you have set on the
+	    7600 I use 19200.</li>
+	<li>Select 1 stop bit</li>
+	<li>Enable the checkbox for Echo.</li>
+	<li>Now for retries, retry interval, cmd interval and query interval,
+	    I use 2, 50, 5, 100, but other values will certainly work for you. If
+	    you want faster response to the frequency when changed using the tune
+	    dial on the rig you may want to try reducing the value of QRY
+	    interval.</li>
+</ol>
+
+Make sure to press the INIT button before closing the window so that the
+settings you have changed TAKE.
+
+When using digital modes make sure that (even for CW) that you have selected
+"USB-D1" for the audio connection. If you use anything else, you will NOT
+be able to transmit, just receive. (Unless you decided to set up for USB-D2
+or D3). This shows in both FLRIG and FLDIGI.
+
+The rig should then also show that it is set to USB-D1 with a blue
+background just above the frequency display and between the VFO and filter
+setting indicators.
+
+If, as has happened to me with some of the iterations of FLRIG, the 7600
+stops showing USB-D1, change it back by either pressing the USB button
+repeatedly on the 7600 until it shows, or in FLRIG if you can.
+
+
+\subsection ssSettingLevelTuning SETTING LEVELS AND TUNING
+
+Finally using the TUNE button on FLDIGI, set up the power and modulation
+levels for almost no ALC action. You will have to play with both the MIC
+setting in FLRIG, and the output level setting for your sound mixer to
+get this right. You can work digital modes such as PSK31 very well with
+power levels of less than 25 watts output. Doing so does not stress your
+output finals too much and still gives you an effective signal out (unless
+your antenna system is awful.) At 25 watts output my rig shows about 13
+amps for Ip.
+
+When making these level selections make sure you press in and hold the rig's
+meter button for 1+ sec so that all the readings show at the same time.
+
+Please note that the TUNE button on FLRIG does not work the same as the same
+as the tune button in FLDIGI. The tune button on FLRIG tells the 7600 to
+use its internal tuner to match to the antenna at the frequency selected.
+If you are already tuned then if will go on and off again very quickly with
+no time to adjust modulation level settings. The TUNE button on FLDIGI
+sends a continuous two tone signal at the maximum level, and is intended
+for setting the modulation levels - that is the one to use.
+
+As I only use Linux on my rigs computer I have not been able to provide
+instructions for Windows users but they are essentially the same except
+as to how the serial port and audio ports are identified.
+
+<b>CAUTION</b>
+
+Last of all, always turn the 7600 on before starting FLRIG and FLDIGI, and
+always close the two programmes before turning off the 7600. If you do not
+do it in this fashion you may have to reset settings on starting up the
+programmes, and they will almost always hang on shutting down - at times
+necessitating a reboot in Windows.
+
+
+\ref ic7600_how_to_page "Page Top"
+
+\ref sFlrigDesc "Return to Main Page"
+
+*/
+

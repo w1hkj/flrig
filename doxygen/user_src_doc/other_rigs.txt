@@ -1,0 +1,16 @@
+/**
+\page other_rigs  Other Supported Transceivers
+\anchor o_pcr1000_a
+<center>
+\image latex PCR1000.png "PCR 1000" width=3.75in
+\image html  PCR1000.png "PCR 1000"
+</center>
+\anchor o_ray152_a
+<center>
+\image latex RAY152.png "RAY 152" width=3.75in
+\image html  RAY152.png "RAY 152"
+</center>
+\ref other_rigs "Page Top"
+\ref sFlrigDesc "Return to Main Page"
+*/
+
