@@ -51,6 +51,7 @@
 #include "IC910.h"
 #include "IC7000.h"
 #include "IC7100.h"
+#include "IC7410.h"
 #include "IC7200.h"
 #include "IC7600.h"
 #include "IC7700.h"
@@ -109,30 +110,31 @@ extern RIG_IC756PRO3	rig_IC756PRO3;	// 28
 extern RIG_IC7000		rig_IC7000;		// 29
 extern RIG_IC7100		rig_IC7100;		// 30
 extern RIG_IC7200		rig_IC7200;		// 31
-extern RIG_IC7600		rig_IC7600;		// 32
-extern RIG_IC7700		rig_IC7700;		// 33
-extern RIG_IC9100		rig_IC9100;		// 34
-extern RIG_IC910H		rig_IC910H;		// 35
-extern RIG_K2			rig_K2;			// 36
-extern RIG_K3			rig_K3;			// 37
-extern RIG_PCR1000		rig_PCR1000;	// 38
-extern RIG_RAY152		rig_RAY152;		// 39
-extern RIG_TS140		rig_TS140;		// 40
-extern RIG_TS450S		rig_TS450S;		// 41
-extern RIG_TS480HX		rig_TS480HX;	// 42
-extern RIG_TS480SAT	rig_TS480SAT;	// 43
-extern RIG_TS570		rig_TS570;		// 44
-extern RIG_TS590S		rig_TS590S;		// 45
-extern RIG_TS870S		rig_TS780S;		// 46 wbx
-extern RIG_TS990		rig_TS990;		// 47 G0HIX
-extern RIG_TS2000		rig_TS2000;		// 48
-extern RIG_TT516		rig_TT516;		// 49
-extern RIG_TT535		rig_TT535;		// 50
-extern RIG_TT538		rig_TT538;		// 51
-extern RIG_TT550		rig_TT550;		// 52
-extern RIG_TT563		rig_TT563;		// 53
-extern RIG_TT566		rig_TT566;		// 54
-extern RIG_TT588		rig_TT588;		// 55
-extern RIG_TT599		rig_TT599;		// 56
+extern RIG_IC7410		rig_IC7410;		// 32
+extern RIG_IC7600		rig_IC7600;		// 33
+extern RIG_IC7700		rig_IC7700;		// 34
+extern RIG_IC9100		rig_IC9100;		// 35
+extern RIG_IC910H		rig_IC910H;		// 36
+extern RIG_K2			rig_K2;			// 37
+extern RIG_K3			rig_K3;			// 38
+extern RIG_PCR1000		rig_PCR1000;	// 39
+extern RIG_RAY152		rig_RAY152;		// 40
+extern RIG_TS140		rig_TS140;		// 41
+extern RIG_TS450S		rig_TS450S;		// 42
+extern RIG_TS480HX		rig_TS480HX;	// 43
+extern RIG_TS480SAT	rig_TS480SAT;	// 44
+extern RIG_TS570		rig_TS570;		// 45
+extern RIG_TS590S		rig_TS590S;		// 46
+extern RIG_TS870S		rig_TS780S;		// 47 wbx
+extern RIG_TS990		rig_TS990;		// 48 G0HIX
+extern RIG_TS2000		rig_TS2000;		// 49
+extern RIG_TT516		rig_TT516;		// 50
+extern RIG_TT535		rig_TT535;		// 51
+extern RIG_TT538		rig_TT538;		// 52
+extern RIG_TT550		rig_TT550;		// 53
+extern RIG_TT563		rig_TT563;		// 54
+extern RIG_TT566		rig_TT566;		// 55
+extern RIG_TT588		rig_TT588;		// 56
+extern RIG_TT599		rig_TT599;		// 57
 
 #endif
