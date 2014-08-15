@@ -126,8 +126,11 @@ status progStatus = {
 	0,			// int  cw_spot;
 	false,		// bool spot_onoff;
 	700,		// int  cw_spot_tone;
-	2.0,		// int  cw_qsk;
 	false,		// bool enable_keyer;
+	false,		// bool	break_in;
+	15,			// double	cw_qsk;
+	200,		// double	cw_delay;
+
 	false,		// int  vox_onoff;
 	10,			// int  vox_gain;
 	10,			// int  vox_anti;
@@ -393,7 +396,9 @@ void status::saveLastState()
 		spref.set("tt550_cw_spot", tt550_cw_spot);
 		spref.set("tt550_spot_onoff", tt550_spot_onoff);
 		spref.set("tt550_cw_qsk", tt550_cw_qsk);
-		spref.set("tt550_enable_keyer", tt550_enable_keyer);
+		spref.set("enable_keyer", enable_keyer);
+		spref.set("break_in", break_in);
+		spref.set("cw_delay", cw_delay);
 
 		spref.set("tt550_vox_onoff", tt550_vox_onoff);
 		spref.set("tt550_vox_gain", tt550_vox_gain);
@@ -662,6 +667,8 @@ bool status::loadXcvrState(const char *xcvr)
 			if (spref.get("tt550_spot_onoff", i, i)) tt550_spot_onoff = i;
 			spref.get("tt550_cw_qsk", tt550_cw_qsk, tt550_cw_qsk);
 			if (spref.get("tt550_enable_keyer", i, i)) tt550_enable_keyer = i;
+			if (spref.get("break_in", i, i)) break_in = i;
+			if (spref.get("vox_onoff", i, i)) vox_onoff = i;
 
 			if (spref.get("tt550_vox_onoff", i, i)) tt550_vox_onoff = i;
 			spref.get("tt550_vox_gain", tt550_vox_gain, tt550_vox_gain);

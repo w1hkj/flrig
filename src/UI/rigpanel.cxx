@@ -121,6 +121,12 @@ Hspinner *spnr_cw_qsk=(Hspinner *)0;
 Hspinner *spnr_cw_weight=(Hspinner *)0;
 Hspinner *spnr_cw_wpm=(Hspinner *)0;
 Fl_Check_Button *btn_enable_keyer=(Fl_Check_Button *)0;
+
+Fl_Group *genericQSK=(Fl_Group *)0;
+Fl_Light_Button *btnBreakIn=(Fl_Light_Button *)0;
+Hspinner *spnr_cw_delay=(Hspinner *)0;
+Hspinner *cnt_cw_qsk=(Hspinner *)0;
+
 Fl_Group *genericVOX=(Fl_Group *)0;
 Hspinner *spnr_vox_gain=(Hspinner *)0;
 Hspinner *spnr_anti_vox=(Hspinner *)0;
@@ -568,9 +574,19 @@ static void cb_spnr_cw_wpm(Fl_Counter* o, void*) {
 	cb_cw_wpm();
 }
 
+static void cb_spnr_cw_delay(Fl_Counter* o, void*) {
+	progStatus.cw_delay = o->value();
+	cb_cw_delay();
+}
+
 static void cb_btn_enable_keyer(Fl_Check_Button* o, void*) {
 	progStatus.enable_keyer=o->value();
 	cb_enable_keyer();
+}
+
+static void cb_btnBreakIn(Fl_Check_Button* o, void*) {
+	progStatus.break_in=o->value();
+	cb_enable_break_in();
 }
 
 static void cb_spnr_vox_gain(Fl_Counter* o, void*) {

@@ -794,18 +794,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_cw_spot_tone->align(Fl_Align(FL_ALIGN_LEFT));
 				spnr_cw_spot_tone->value(progStatus.cw_spot);
 
-				spnr_cw_qsk = new Hspinner(299, 187, 70, 20, _("QSK dly"));
-				spnr_cw_qsk->tooltip(_("QSK delay (msec)"));
-				spnr_cw_qsk->type(FL_INT_INPUT);
-				spnr_cw_qsk->minimum(0);
-				spnr_cw_qsk->maximum(100);
-				spnr_cw_qsk->step(1);
-				spnr_cw_qsk->value(20);
-				spnr_cw_qsk->callback((Fl_Callback*)cb_spnr_cw_qsk);
-				spnr_cw_qsk->align(Fl_Align(FL_ALIGN_LEFT));
-				spnr_cw_qsk->value(progStatus.cw_qsk);
-
-				spnr_cw_weight = new Hspinner(435, 187, 70, 20, _("Weight"));
+				spnr_cw_weight = new Hspinner(299, 187, 70, 20, _("Weight"));
 				spnr_cw_weight->type(FL_INT_INPUT);
 				spnr_cw_weight->minimum(2.5);
 				spnr_cw_weight->maximum(4.5);
@@ -814,7 +803,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_cw_weight->align(Fl_Align(FL_ALIGN_LEFT));
 				spnr_cw_weight->value(progStatus.cw_weight);
 
-				spnr_cw_wpm = new Hspinner(571, 187, 70, 20, _("wpm"));
+				spnr_cw_wpm = new Hspinner(435, 187, 70, 20, _("wpm"));
 				spnr_cw_wpm->type(FL_INT_INPUT);
 				spnr_cw_wpm->minimum(5);
 				spnr_cw_wpm->maximum(80);
@@ -830,6 +819,39 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				btn_enable_keyer->value(progStatus.enable_keyer);
 }
 			genericCW->end();
+
+			genericQSK = new Fl_Group(xpos, ypos, W, tabs2_h, _("QSK"));
+				genericQSK->color(FL_LIGHT1);
+				genericQSK->selection_color(FL_LIGHT1);
+				genericQSK->hide();
+
+				btnBreakIn = new Fl_Light_Button(13, 187, 54, 20, _("QSK"));
+				btnBreakIn->tooltip(_("Full break in on/off"));
+				btnBreakIn->callback((Fl_Callback*)cb_btnBreakIn);
+				btnBreakIn->value(progStatus.break_in);
+
+				spnr_cw_qsk = new Hspinner(170, 187, 70, 20, _("Bk-in Dly"));
+				spnr_cw_qsk->tooltip(_("msec"));
+				spnr_cw_qsk->type(FL_INT_INPUT);
+				spnr_cw_qsk->minimum(0);
+				spnr_cw_qsk->maximum(100);
+				spnr_cw_qsk->step(1);
+				spnr_cw_qsk->value(20);
+				spnr_cw_qsk->callback((Fl_Callback*)cb_spnr_cw_qsk);
+				spnr_cw_qsk->align(Fl_Align(FL_ALIGN_LEFT));
+				spnr_cw_qsk->value(progStatus.cw_qsk);
+
+				spnr_cw_delay = new Hspinner(330, 187, 100, 20, _("QSK delay"));
+				spnr_cw_delay->tooltip(_("QSK delay (msec)"));
+				spnr_cw_delay->type(0);
+				spnr_cw_delay->minimum(30);
+				spnr_cw_delay->maximum(3000);
+				spnr_cw_delay->step(10);
+				spnr_cw_delay->callback((Fl_Callback*)cb_spnr_cw_delay);
+				spnr_cw_delay->value(progStatus.cw_delay);
+				spnr_cw_delay->align(Fl_Align(FL_ALIGN_LEFT));
+
+			genericQSK->end();
 
 			genericVOX = new Fl_Group(xpos, ypos, W, tabs2_h, _("Vox"));
 {
@@ -853,7 +875,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_anti_vox->align(Fl_Align(FL_ALIGN_LEFT));
 				spnr_anti_vox->value(progStatus.vox_anti);
 
-				spnr_vox_hang = new Hspinner(396, 187, 70, 20, _("hang"));
+				spnr_vox_hang = new Hspinner(396, 187, 100, 20, _("hang"));
 				spnr_vox_hang->type(FL_INT_INPUT);
 				spnr_vox_hang->minimum(0);
 				spnr_vox_hang->maximum(100);

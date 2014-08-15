@@ -773,21 +773,8 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				spnr_cw_spot_tone->value(progStatus.cw_spot);
 				spnr_cw_spot_tone->align(FL_ALIGN_CENTER | FL_ALIGN_BOTTOM);
 
-				spnr_cw_qsk = new Hspinner(
-					spnr_cw_spot_tone->x() + spnr_cw_spot_tone->w() + 75, by,
-					5*bh, bh, _("QSK dly"));
-				spnr_cw_qsk->tooltip(_("QSK delay (msec)"));
-				spnr_cw_qsk->type(FL_INT_INPUT);
-				spnr_cw_qsk->minimum(0);
-				spnr_cw_qsk->maximum(100);
-				spnr_cw_qsk->step(1);
-				spnr_cw_qsk->value(20);
-				spnr_cw_qsk->callback((Fl_Callback*)cb_spnr_cw_qsk);
-				spnr_cw_qsk->value(progStatus.cw_qsk);
-				spnr_cw_qsk->align(FL_ALIGN_CENTER | FL_ALIGN_BOTTOM);
-
 				spnr_cw_weight = new Hspinner(
-					spnr_cw_qsk->x() + spnr_cw_qsk->w() + 75, by,
+					spnr_cw_spot_tone->x() + spnr_cw_spot_tone->w() + 75, by,
 					5*bh, bh, _("Weight"));
 				spnr_cw_weight->type(FL_INT_INPUT);
 				spnr_cw_weight->minimum(2.5);
@@ -817,6 +804,42 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				btn_enable_keyer->value(progStatus.enable_keyer);
 
 			genericCW->end();
+
+			genericQSK = new Fl_Group(xpos, ypos+tabh, W, tabb, _("QSK"));
+				genericQSK->color(FL_LIGHT1);
+				genericQSK->selection_color(FL_LIGHT1);
+				genericQSK->hide();
+
+				btnBreakIn = new Fl_Light_Button(xpos + 13, by, 54, bh, _("QSK"));
+				btnBreakIn->tooltip(_("Full break in on/off"));
+				btnBreakIn->callback((Fl_Callback*)cb_btnBreakIn);
+				btnBreakIn->value(progStatus.break_in);
+
+				spnr_cw_qsk = new Hspinner(
+					btnBreakIn->x() + btnBreakIn->w() + 75, by,
+					5*bh, bh, _("Bk-in Dly"));
+				spnr_cw_qsk->tooltip(_("msec"));
+				spnr_cw_qsk->type(FL_INT_INPUT);
+				spnr_cw_qsk->minimum(0);
+				spnr_cw_qsk->maximum(100);
+				spnr_cw_qsk->step(1);
+				spnr_cw_qsk->value(20);
+				spnr_cw_qsk->callback((Fl_Callback*)cb_spnr_cw_qsk);
+				spnr_cw_qsk->value(progStatus.cw_qsk);
+				spnr_cw_qsk->align(FL_ALIGN_CENTER | FL_ALIGN_BOTTOM);
+
+				spnr_cw_delay = new Hspinner(
+					spnr_cw_qsk->x() + spnr_cw_qsk->w() + 75, by, 120, bh, _("QSK delay"));
+				spnr_cw_delay->tooltip(_("msec"));
+				spnr_cw_delay->type(0);
+				spnr_cw_delay->minimum(30);
+				spnr_cw_delay->maximum(3000);
+				spnr_cw_delay->step(10);
+				spnr_cw_delay->callback((Fl_Callback*)cb_spnr_cw_delay);
+				spnr_cw_delay->value(progStatus.cw_delay);
+				spnr_cw_delay->align(FL_ALIGN_CENTER | FL_ALIGN_BOTTOM);
+
+			genericQSK->end();
 
 			genericVOX = new Fl_Group(xpos, ypos+tabh, W, tabb, _("Vox"));
 				genericVOX->hide();

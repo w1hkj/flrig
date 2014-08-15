@@ -54,7 +54,7 @@ enum {BINARY, STRING};
 enum {
 	NONE,
 
-	FT100D, FT450,  FT747,    FT767,  FT817,
+	FT100D, FT450,  FT450D, FT747,    FT767,  FT817,
 	FT847,  FT857D, FT890,    FT897D, FT920,
 	FT950,  FT990,  FT1000MP, FT2000, FTdx1200, FTdx3000,
 	FT5000,
@@ -185,6 +185,8 @@ public:
 	bool has_cw_spot;
 	bool has_cw_spot_tone;
 	bool has_cw_qsk;
+	bool has_cw_break_in;
+	bool has_cw_delay;
 	bool has_cw_weight;
 	bool has_cw_keyer;
 	bool has_vox_onoff;
@@ -368,30 +370,37 @@ public:
 	virtual void set_agc_level() {}
 	virtual void set_cw_weight() {}
 	virtual void get_cw_weight_min_max_step(double &min, double &max, double &step) {
-		min = 2.5; max = 4.5; step = 0.1; } // default for FT950
+		min = 2.5; max = 4.5; step = 0.1; } // default for FT950/FT450D
 	virtual void set_cw_wpm() {}
 	virtual void get_cw_wpm_min_max(int &min, int &max) {
-		min = 5; max = 50; } // default for FT950
+		min = 5; max = 50; } // default for FT950/FT450D
 	virtual void enable_keyer() {}
+	virtual void enable_break_in() {}
+
 	virtual void set_cw_qsk() {}
 	virtual void get_cw_qsk_min_max_step(double &min, double &max, double &step) {
-		min = 15; max = 30; step = 5; } // default for FT950
+		min = 15; max = 30; step = 5; } // default for FT950/FT450D
+
+	virtual void set_cw_delay() {}
+	virtual void get_cw_delay_min_max_step(double &min, double &max, double &step) {
+		min = 30; max = 3000; step = 10; } // default for FT950/FT450D
+
 	virtual void set_cw_vol() {}
 	virtual bool set_cw_spot() {return false;}
 	virtual void set_cw_spot_tone() {}
 	virtual void get_cw_spot_tone_min_max_step(int &min, int &max, int &step) {
-		min = 300; max = 1050; step = 50; } // default for FT950
+		min = 300; max = 1050; step = 50; } // default for FT950/FT450D
 	virtual void set_spot_onoff() {}
 	virtual void set_vox_onoff() {}
 	virtual void set_vox_gain() {}
 	virtual void get_vox_gain_min_max_step(int &min, int &max, int &step) {
-		min = 0; max = 100; step = 1; } // default for FT950
+		min = 0; max = 100; step = 1; } // default for FT950/FT450D
 	virtual void set_vox_anti() {}
 	virtual void get_vox_anti_min_max_step(int &min, int &max, int &step) {
-		min = 0; max = 100; step = 1; } // default for FT950
+		min = 0; max = 100; step = 1; } // default for FT950/FT450D
 	virtual void set_vox_hang() {}
 	virtual void get_vox_hang_min_max_step(int &min, int &max, int &step) {
-		min = 30; max = 3000; step = 10; } // default for FT950
+		min = 30; max = 3000; step = 10; } // default for FT950/FT450D
 	virtual void set_vox_on_dataport() {}
 	virtual void set_mon_vol() {}
 	virtual void set_squelch_level() {}

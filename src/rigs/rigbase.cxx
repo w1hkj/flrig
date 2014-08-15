@@ -97,6 +97,8 @@ rigbase::rigbase()
 	has_cw_spot =
 	has_cw_spot_tone =
 	has_cw_qsk =
+	has_cw_break_in =
+	has_cw_delay =
 	has_cw_weight =
 	has_cw_keyer =
 	has_vox_onoff =

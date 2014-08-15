@@ -439,7 +439,8 @@ void read_preamp_att()
 // split
 void update_split(void *d)
 {
-	if (rig_nbr == FT450 || rig_nbr == FT950 || rig_nbr == FTdx1200 ||
+	if (rig_nbr == FT450 || rig_nbr == FT450D || 
+		rig_nbr == FT950 || rig_nbr == FTdx1200 ||
 		rig_nbr == TS480SAT || rig_nbr == TS480HX ||
 		rig_nbr == TS590S || rig_nbr == TS2000 || rig_nbr == TS990) {
 		switch (progStatus.split) {
@@ -2728,6 +2729,35 @@ void initXcvrTab()
 			} else spnr_cw_spot_tone->hide();
 		}
 
+		if (selrig->has_cw_break_in || selrig->has_cw_qsk || selrig->has_cw_delay) {
+			genericQSK->resize(
+				tabsGeneric->x() + 2,
+				tabsGeneric->y() + 19,
+				tabsGeneric->w() - 4,
+				tabsGeneric->h() - 21);
+			tabsGeneric->insert(*genericQSK, 6);
+			if (selrig->has_cw_qsk) {
+				double min, max, step;
+				selrig->get_cw_qsk_min_max_step(min, max, step);
+				spnr_cw_qsk->minimum(min);
+				spnr_cw_qsk->maximum(max);
+				spnr_cw_qsk->step(step);
+				spnr_cw_qsk->value(progStatus.cw_qsk);
+				spnr_cw_qsk->show();
+				selrig->set_cw_qsk();
+			} else spnr_cw_qsk->hide();
+			if (selrig->has_cw_delay) {
+				double min, max, step;
+				selrig->get_cw_delay_min_max_step( min, max, step );
+				spnr_cw_delay->minimum(min);
+				spnr_cw_delay->maximum(max);
+				spnr_cw_delay->step(step);
+				spnr_cw_delay->value(progStatus.cw_delay);
+				spnr_cw_delay->show();
+				selrig->set_cw_delay();
+			} else spnr_cw_delay->hide();
+		}
+
 		if (selrig->has_vox_onoff || selrig->has_vox_gain || selrig->has_vox_anti ||
 			selrig->has_vox_hang || selrig->has_vox_on_dataport || selrig->has_cw_spot_tone) {
 			if (progStatus.UIsize == wide_ui)
@@ -4135,6 +4165,12 @@ void cb_enable_keyer()
 	selrig->enable_keyer();
 }
 
+void cb_enable_break_in()
+{
+	guard_lock serial_lock(&mutex_serial, 89);
+	selrig->enable_break_in();
+}
+
 void cb_cw_weight()
 {
 	guard_lock serial_lock(&mutex_serial, 89);
@@ -4145,6 +4181,12 @@ void cb_cw_qsk()
 {
 	guard_lock serial_lock(&mutex_serial, 90);
 	selrig->set_cw_qsk();
+}
+
+void cb_cw_delay()
+{
+	guard_lock serial_lock(&mutex_serial, 90);
+	selrig->set_cw_delay();
 }
 
 void cbBandSelect(int band)

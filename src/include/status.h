@@ -118,8 +118,10 @@ struct status {
 	int		cw_spot;
 	bool	spot_onoff;
 	int		cw_spot_tone;
-	double	cw_qsk;
 	bool	enable_keyer;
+	bool	break_in;
+	double	cw_qsk;
+	double	cw_delay;
 	bool	vox_onoff;
 	int		vox_gain;
 	int		vox_anti;
