@@ -76,6 +76,11 @@ public:
 	void do_callback() { if (cbFunc) cbFunc(); }
 	int  handle(int event);
 	void visual_beep();
+	void set_hrd(bool b) {hrd_buttons = b;}
+
+	void reverse_colors();
+	void restore_colors();
+	bool  is_reversed_colors() { return colors_reversed; }
 
 	void resize (int X, int Y, int W, int H);
 
@@ -105,6 +110,8 @@ private:
 	Fl_Color ONCOLOR;
 	Fl_Color SELCOLOR;
 	Fl_Color ILLUMCOLOR;
+	Fl_Color REVONCOLOR;
+	Fl_Color REVOFFCOLOR;
 	int nD;
 	int active;
 	long maxVal;
@@ -126,6 +133,8 @@ protected:
 	long val, oldval;
 	int  precision;
 	int  dpoint;
+	bool hrd_buttons;
+	bool colors_reversed;
 };
 
 #endif 

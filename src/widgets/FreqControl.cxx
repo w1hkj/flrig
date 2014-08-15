@@ -59,12 +59,21 @@ void cbSelectDigit (Fl_Widget *btn, void * nbr)
 
 	Fl_Button *b = (Fl_Button *)btn;
 	int Nbr = (int)(reinterpret_cast<long> (nbr));
-	
+
 	cFreqControl *fc = (cFreqControl *)b->parent();
-	if (Fl::event_button1())
-		fc->IncFreq(Nbr);
-	else if (Fl::event_button3())
-		fc->DecFreq(Nbr);
+	if (fc->hrd_buttons) {
+		int yclick = Fl::event_y();
+		int fc_yc = fc->y() + fc->h()/2;
+		if (yclick <= fc_yc)
+			fc->IncFreq(Nbr);
+		else
+			fc->DecFreq(Nbr);
+	} else {
+		if (Fl::event_button1())
+			fc->IncFreq(Nbr);
+		else if (Fl::event_button3())
+			fc->DecFreq(Nbr);
+	}
 	fc->redraw();
 }
 
@@ -192,6 +201,8 @@ cFreqControl::cFreqControl(int x, int y, int w, int h, const char *lbl):
 	parent()->remove(finp);
 
 	precision = 1;
+	hrd_buttons = true;
+	colors_reversed = false;
 
 }
 
@@ -233,8 +244,8 @@ void cFreqControl::font(Fl_Font fnt)
 
 void cFreqControl::SetONOFFCOLOR( Fl_Color ONcolor, Fl_Color OFFcolor)
 {
-	OFFCOLOR = OFFcolor;
-	ONCOLOR = ONcolor;
+	OFFCOLOR = REVONCOLOR = OFFcolor;
+	ONCOLOR = REVOFFCOLOR = ONcolor;
 
 	for (int n = 0; n < nD; n++) {
 		Digit[n]->labelcolor(ONCOLOR);
@@ -261,6 +272,7 @@ void cFreqControl::SetONOFFCOLOR( Fl_Color ONcolor, Fl_Color OFFcolor)
 void cFreqControl::SetONCOLOR (uchar r, uchar g, uchar b) 
 {
 	ONCOLOR = fl_rgb_color (r, g, b);
+	REVOFFCOLOR = ONCOLOR;
 	for (int n = 0; n < nD; n++) {
 		Digit[n]->labelcolor(ONCOLOR);
 		Digit[n]->color(OFFCOLOR);
@@ -286,6 +298,8 @@ void cFreqControl::SetONCOLOR (uchar r, uchar g, uchar b)
 void cFreqControl::SetOFFCOLOR (uchar r, uchar g, uchar b) 
 {
 	OFFCOLOR = fl_rgb_color (r, g, b);
+	REVONCOLOR = OFFCOLOR;
+
 	for (int n = 0; n < nD; n++) {
 		Digit[n]->labelcolor(ONCOLOR);
 		Digit[n]->color(OFFCOLOR);
@@ -319,37 +333,90 @@ void cFreqControl::value(long lv)
 	updatevalue();
 }
 
+void cFreqControl::restore_colors()
+{
+	colors_reversed = false;
+	for (int n = 0; n < nD; n++) {
+		Digit[n]->labelcolor(ONCOLOR);
+		Digit[n]->color(OFFCOLOR);
+		Digit[n]->redraw();
+		Digit[n]->redraw_label();
+	}
+	decbx->labelcolor(ONCOLOR);
+	decbx->color(OFFCOLOR);
+	decbx->redraw();
+	decbx->redraw_label();
+	hfill1->labelcolor(ONCOLOR);
+	hfill1->color(OFFCOLOR);
+	hfill1->redraw();
+	hfill1->redraw_label();
+	hfill2->labelcolor(ONCOLOR);
+	hfill2->color(OFFCOLOR);
+	hfill2->redraw();
+	hfill2->redraw_label();
+	color(OFFCOLOR);
+	redraw();
+}
+
+void cFreqControl::reverse_colors()
+{
+	colors_reversed = true;
+	for (int n = 0; n < nD; n++) {
+		Digit[n]->labelcolor(REVONCOLOR);
+		Digit[n]->color(REVOFFCOLOR);
+		Digit[n]->redraw();
+		Digit[n]->redraw_label();
+	}
+	decbx->labelcolor(REVONCOLOR);
+	decbx->color(REVOFFCOLOR);
+	decbx->redraw();
+	decbx->redraw_label();
+	hfill1->labelcolor(REVONCOLOR);
+	hfill1->color(REVOFFCOLOR);
+	hfill1->redraw();
+	hfill1->redraw_label();
+	hfill2->labelcolor(REVONCOLOR);
+	hfill2->color(REVOFFCOLOR);
+	hfill2->redraw();
+	hfill2->redraw_label();
+	color(REVOFFCOLOR);
+	redraw();
+}
+
 int cFreqControl::handle(int event)
 {
-	if (!Fl::event_inside(this))
-		return Fl_Group::handle(event);
-
 	int d;
 	switch (event) {
 	case FL_KEYBOARD:
 		switch (d = Fl::event_key()) {
-		case FL_Left:
-			DecFreq(0);
-			return 1;
-			break;
-		case FL_Down:
-			DecFreq(1);
-			return 1;
-			break;
-		case FL_Right:
-			IncFreq(0);
-			return 1;
-			break;
-		case FL_Up:
-			IncFreq(1);
-			return 1;
-			break;
 		case FL_Page_Up:
-			IncFreq(2);
+			if (Fl::event_shift()) IncFreq(1);
+			else IncFreq(0);
 			return 1;
 			break;
 		case FL_Page_Down:
-			DecFreq(2);
+			if (Fl::event_shift()) DecFreq(1);
+			else DecFreq(0);
+			return 1;
+			break;
+		case FL_Right:
+			if (Fl::event_shift()) IncFreq(4);
+			else IncFreq(2);
+			return 1;
+			break;
+		case FL_Left:
+			if (Fl::event_shift()) DecFreq(4);
+			else DecFreq(2);
+			return 1;
+			break;
+		case FL_Up:
+			if (Fl::event_shift()) IncFreq(5);
+			else IncFreq(3);
+			return 1;
+			break;
+		case FL_Down:
+			if (Fl::event_shift()) DecFreq(5);
+			else DecFreq(3);
 			return 1;
 			break;
 		default:
@@ -373,6 +440,8 @@ int cFreqControl::handle(int event)
 				}
 			}
 			else {
+				int ch = Fl::event_text()[0];
+				if (ch < '0' || ch > '9') return Fl_Group::handle(event);
 				Fl::add_timeout(0.0, (Fl_Timeout_Handler)blink_point, decbx);
 				finp->static_value("");
 				oldval = val;
@@ -398,8 +467,7 @@ int cFreqControl::handle(int event)
 		return Fl_Group::handle(event); // in turn calls the digit[] callback
 
 	}
-
-	return 1;
+	return Fl_Group::handle(event);
 }
 
 void cFreqControl::freq_input_cb(Fl_Widget*, void* arg)
@@ -420,20 +488,16 @@ void cFreqControl::freq_input_cb(Fl_Widget*, void* arg)
 	}
 }
 
-Fl_Color onclr;
-Fl_Color offclr;
-
-static void restore_colors(void* w)
+static void restore_color(void* w)
 {
 	cFreqControl *fc = (cFreqControl *)w;
-	fc->SetONOFFCOLOR(onclr, offclr);
+	fc->restore_colors();
 }
 
 void cFreqControl::visual_beep()
 {
-	onclr = ONCOLOR; offclr = OFFCOLOR;
-	SetONOFFCOLOR(offclr, onclr);
-	Fl::add_timeout(0.1, restore_colors, this);
+	reverse_colors();
+	Fl::add_timeout(0.1, restore_color, this);
 }
 
 void cFreqControl::set_ndigits(int nbr)
