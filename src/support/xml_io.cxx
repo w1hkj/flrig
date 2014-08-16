@@ -139,7 +139,7 @@ static inline void execute(const char* name, const XmlRpcValue& param, XmlRpcVal
 // --------------------------------------------------------------------
 
 void send_modes() { 
-	if (!selrig->modes_) return;
+	if (!selrig->modes_ || !fldigi_online) return;
 
 	XmlRpcValue modes, res;
 	int i = 0;
@@ -158,7 +158,7 @@ void send_modes() {
 
 void send_bandwidths()
 {
-	if (!selrig->bandwidths_ ) return;
+	if (!selrig->bandwidths_ || !fldigi_online) return;
 	XmlRpcValue bandwidths, res;
 	int i = 0;
 	for (const char** bw = selrig->bandwidths_; *bw; bw++, i++) {
@@ -176,6 +176,7 @@ void send_bandwidths()
 
 void send_name()
 {
+	if (!fldigi_online) return;
 	try {
 		XmlRpcValue res;
 		execute(rig_set_name, XmlRpcValue(selrig->name_), res);
@@ -188,6 +189,7 @@ void send_name()
 
 void send_ptt_changed(bool PTT)
 {
+	if (!fldigi_online) return;
 	try {
 		XmlRpcValue res;
 		execute((PTT ? main_set_tx : main_set_rx), XmlRpcValue(), res);
@@ -200,6 +202,7 @@ void send_ptt_changed(bool PTT)
 
 void send_new_freq(long freq)
 {
+	if (!fldigi_online) return;
 	try {
 		xmlvfo.freq = freq;
 		XmlRpcValue f((double)freq), res;
@@ -213,6 +216,7 @@ void send_new_freq(long freq)
 
 void send_new_notch(int freq)
 {
+	if (!fldigi_online) return;
 	try {
 		XmlRpcValue i(freq), res;
 		execute(rig_set_notch, i, res);
@@ -231,6 +235,7 @@ void send_new_notch(int freq)
 
 void send_xml_freq(long freq)
 {
+	if (!fldigi_online) return;
 	if (rig_nbr == FT950 && freq > 5300000 && freq < 5500000)
 		freq -= 1500;
 	qfreq.push(freq);
@@ -238,6 +243,7 @@ void send_xml_freq(long freq)
 
 void send_queue()
 {
+	if (!fldigi_online) return;
 	while (!qfreq.empty()) {
 		send_new_freq(qfreq.front());
 		qfreq.pop();
@@ -246,7 +252,7 @@ void send_queue()
 
 void send_new_mode(int md)
 {
-	if (!selrig->modes_) return;
+	if (!selrig->modes_ || !fldigi_online) return;
 	try {
 		xmlvfo.imode = md;
 		XmlRpcValue mode(selrig->modes_[md]), res;
@@ -260,7 +266,7 @@ void send_new_mode(int md)
 
 void send_new_bandwidth(int bw)
 {
-	if (!selrig->bandwidths_ ) return;
+	if (!selrig->bandwidths_ || !fldigi_online) return;
 	try {
 		xmlvfo.iBW = bw;
 		int selbw = (bw > 0x80) ? (bw >> 8 & 0x7F) : bw;
@@ -275,6 +281,7 @@ void send_new_bandwidth(int bw)
 
 void send_sideband()
 {
+	if (!fldigi_online) return;
 	try {
 		XmlRpcValue sideband(selrig->get_modetype(vfo.imode) == 'U' ? "USB" : "LSB"), res;
 		execute(main_set_wf_sideband, sideband, res);
@@ -425,6 +432,7 @@ static void send_rig_info()
 	XmlRpcValue res;
 	try {
 		execute(rig_take_control, XmlRpcValue(), res);
+		fldigi_online = true;
 		send_name();
 		send_modes();
 		send_bandwidths();
@@ -436,7 +444,6 @@ static void send_rig_info()
 		send_new_bandwidth(xmlvfo.iBW);
 		send_sideband();
 		send_new_freq(xmlvfo.freq);
-		fldigi_online = true;
 		rig_reset = false;
 		Fl::awake(set_fldigi_connect, (void *)1);
 	} catch (const XmlRpc::XmlRpcException& e) {
@@ -450,6 +457,7 @@ static void send_rig_info()
 
 void send_no_rig()
 {
+	if (!fldigi_online) return;
 	XmlRpcValue res;
 	execute(rig_set_name, szNORIG, res);
 	send_bandwidths();
