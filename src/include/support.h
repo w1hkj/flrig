@@ -264,6 +264,7 @@ extern void cb_slider_defaults();
 
 extern void cb_lighted_button();
 extern void cb_lighted_default();
+extern void cb_change_hrd_button();
 
 extern Fl_Color flrig_def_color(int);
 

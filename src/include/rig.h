@@ -71,6 +71,6 @@ extern bool RIG_DEBUG;
 extern bool XML_DEBUG;
 extern bool EXPAND_CONTROLS;
 
-enum UISIZE {small_ui, wide_ui};
+enum UISIZE {small_ui, wide_ui, touch_ui};
 
 #endif

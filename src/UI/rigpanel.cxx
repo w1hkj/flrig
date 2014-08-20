@@ -26,6 +26,18 @@
 #include "support.h"
 #include "K3_ui.h"
 #include "socket_io.h"
+#include "hspinner.h"
+#include "ui.h"
+
+// controls for touch screen interface
+Hspinner *spnrPOWER = (Hspinner *)0;
+Hspinner *spnrVOLUME = (Hspinner *)0;
+Hspinner *spnrRFGAIN = (Hspinner *)0;
+Hspinner *spnrSQUELCH = (Hspinner *)0;
+Hspinner *spnrNR = (Hspinner *)0;
+Hspinner *spnrIFSHIFT = (Hspinner *)0;
+Hspinner *spnrNOTCH = (Hspinner *)0;
+Hspinner *spnrMICGAIN = (Hspinner *)0;
 
 static const int freq_sel_widths[]={110, 70, 70, 0};
 static Fl_Double_Window *meter_scale_dialog = (Fl_Double_Window *)0;
@@ -104,24 +116,24 @@ Fl_ComboBox *opSelect60=(Fl_ComboBox *)0;
 Fl_Group *genericCW=(Fl_Group *)0;
 Fl_Light_Button *btnSpot=(Fl_Light_Button *)0;
 
-Fl_Counter *cnt_cw_spot_tone=(Fl_Counter *)0;
-Fl_Counter *cnt_cw_qsk=(Fl_Counter *)0;
-Fl_Counter *cnt_cw_weight=(Fl_Counter *)0;
-Fl_Counter *cnt_cw_wpm=(Fl_Counter *)0;
+Hspinner *spnr_cw_spot_tone=(Hspinner *)0;
+Hspinner *spnr_cw_qsk=(Hspinner *)0;
+Hspinner *spnr_cw_weight=(Hspinner *)0;
+Hspinner *spnr_cw_wpm=(Hspinner *)0;
 Fl_Check_Button *btn_enable_keyer=(Fl_Check_Button *)0;
 Fl_Group *genericVOX=(Fl_Group *)0;
-Fl_Counter *cnt_vox_gain=(Fl_Counter *)0;
-Fl_Counter *cnt_anti_vox=(Fl_Counter *)0;
-Fl_Counter *cnt_vox_hang=(Fl_Counter *)0;
+Hspinner *spnr_vox_gain=(Hspinner *)0;
+Hspinner *spnr_anti_vox=(Hspinner *)0;
+Hspinner *spnr_vox_hang=(Hspinner *)0;
 Fl_Light_Button *btn_vox=(Fl_Light_Button *)0;
 Fl_Check_Button *btn_vox_on_dataport=(Fl_Check_Button *)0;
 Fl_Group *genericSpeech=(Fl_Group *)0;
 Fl_Light_Button *btnCompON=(Fl_Light_Button *)0;
-Fl_Counter *cnt_compression=(Fl_Counter *)0;
+Hspinner *spnr_compression=(Hspinner *)0;
 Fl_Group *genericRx=(Fl_Group *)0;
 Fl_ComboBox *cbo_nb_level=(Fl_ComboBox *)0;
 Fl_ComboBox *cbo_agc_level=(Fl_ComboBox *)0;
-Fl_Counter *cnt_bpf_center=(Fl_Counter *)0;
+Hspinner *spnr_bpf_center=(Hspinner *)0;
 
 Fl_Button *btnALC_SWR=(Fl_Button *)0;
 Fl_SigBar *sldrRcvSignal=(Fl_SigBar *)0;
@@ -150,15 +162,15 @@ Fl_Light_Button *btnAttenuator=(Fl_Light_Button *)0;
 
 Fl_Check_Button *btn_use_bpf_center=(Fl_Check_Button *)0;
 Fl_Group *genericMisc=(Fl_Group *)0;
-Fl_Counter *cnt_vfo_adj=(Fl_Counter *)0;
-Fl_Counter *cnt_line_out=(Fl_Counter *)0;
+Hspinner *spnr_vfo_adj=(Hspinner *)0;
+Hspinner *spnr_line_out=(Hspinner *)0;
 Fl_Light_Button *btnSpecial=(Fl_Light_Button *)0;
 Fl_Check_Button *btn_xcvr_auto_on=(Fl_Check_Button *)0;
 Fl_Check_Button *btn_xcvr_auto_off=(Fl_Check_Button *)0;
 Fl_Group *genericRXB=(Fl_Group *)0;
-Fl_Counter *cntRIT=(Fl_Counter *)0;
-Fl_Counter *cntXIT=(Fl_Counter *)0;
-Fl_Counter *cntBFO=(Fl_Counter *)0;
+Hspinner *cntRIT=(Hspinner *)0;
+Hspinner *cntXIT=(Hspinner *)0;
+Hspinner *cntBFO=(Hspinner *)0;
 Fl_Group *genericAux=(Fl_Group *)0;
 Fl_Box *boxControl=(Fl_Box *)0;
 Fl_Light_Button *btnAuxRTS=(Fl_Light_Button *)0;
@@ -168,28 +180,28 @@ Fl_Light_Button *btnDataPort=(Fl_Light_Button *)0;
 
 Fl_Tabs *tabs550=(Fl_Tabs *)0;
 Fl_Group *tt550_CW=(Fl_Group *)0;
-Fl_Counter *cnt_tt550_cw_wpm=(Fl_Counter *)0;
-Fl_Counter *cnt_tt550_cw_weight=(Fl_Counter *)0;
-Fl_Counter *cnt_tt550_cw_qsk=(Fl_Counter *)0;
-Fl_Counter *cnt_tt550_cw_vol=(Fl_Counter *)0;
-Fl_Counter *cnt_tt550_cw_spot=(Fl_Counter *)0;
+Hspinner *spnr_tt550_cw_wpm=(Hspinner *)0;
+Hspinner *spnr_tt550_cw_weight=(Hspinner *)0;
+Hspinner *spnr_tt550_cw_qsk=(Hspinner *)0;
+Hspinner *spnr_tt550_cw_vol=(Hspinner *)0;
+Hspinner *spnr_tt550_cw_spot=(Hspinner *)0;
 Fl_Check_Button *btn_tt550_enable_keyer=(Fl_Check_Button *)0;
 Fl_Group *tt550_VOX=(Fl_Group *)0;
-Fl_Counter *cnt_tt550_vox_gain=(Fl_Counter *)0;
-Fl_Counter *cnt_tt550_anti_vox=(Fl_Counter *)0;
-Fl_Counter *cnt_tt550_vox_hang=(Fl_Counter *)0;
+Hspinner *spnr_tt550_vox_gain=(Hspinner *)0;
+Hspinner *spnr_tt550_anti_vox=(Hspinner *)0;
+Hspinner *spnr_tt550_vox_hang=(Hspinner *)0;
 Fl_Light_Button *btn_tt550_vox=(Fl_Light_Button *)0;
 Fl_Group *tt550_Speech=(Fl_Group *)0;
 Fl_Light_Button *btn_tt550_CompON=(Fl_Light_Button *)0;
-Fl_Counter *cnt_tt550_compression=(Fl_Counter *)0;
-Fl_Counter *cnt_tt550_mon_vol=(Fl_Counter *)0;
+Hspinner *spnr_tt550_compression=(Hspinner *)0;
+Hspinner *spnr_tt550_mon_vol=(Hspinner *)0;
 Fl_Group *tt550_Audio=(Fl_Group *)0;
-Fl_Counter *cnt_tt550_line_out=(Fl_Counter *)0;
+Hspinner *spnr_tt550_line_out=(Hspinner *)0;
 Fl_Check_Button *btnAccInp=(Fl_Check_Button *)0;
 Fl_Group *tt550_Rx=(Fl_Group *)0;
 Fl_ComboBox *cbo_tt550_nb_level=(Fl_ComboBox *)0;
 Fl_ComboBox *cbo_tt550_agc_level=(Fl_ComboBox *)0;
-Fl_Counter *cnt_tt550_vfo_adj=(Fl_Counter *)0;
+Hspinner *spnr_tt550_vfo_adj=(Hspinner *)0;
 Fl_Group *tt550_Tx=(Fl_Group *)0;
 Fl_Check_Button *btn_tt550_enable_xmtr=(Fl_Check_Button *)0;
 Fl_Check_Button *btn_tt550_enable_tloop=(Fl_Check_Button *)0;
@@ -197,8 +209,8 @@ Fl_Check_Button *btn_tt550_tuner_bypass=(Fl_Check_Button *)0;
 Fl_ComboBox *op_tt550_XmtBW=(Fl_ComboBox *)0;
 Fl_Check_Button *btn_tt550_use_xmt_bw=(Fl_Check_Button *)0;
 Fl_Group *tt550_302A=(Fl_Group *)0;
-Fl_Counter *cnt_tt550_keypad_time_out=(Fl_Counter *)0;
-Fl_Counter *cnt_tt550_encoder_sensitivity=(Fl_Counter *)0;
+Hspinner *spnr_tt550_keypad_time_out=(Hspinner *)0;
+Hspinner *spnr_tt550_encoder_sensitivity=(Hspinner *)0;
 Fl_Choice *sel_tt550_encoder_step=(Fl_Choice *)0;
 Fl_Group *tt550_302B=(Fl_Group *)0;
 Fl_Choice *sel_tt550_F1_func=(Fl_Choice *)0;
@@ -320,10 +332,25 @@ static void cb_btnA(Fl_Light_Button*, void*) {
 			btnB->value(1);
 		}
 	} else {
-		cb_selectA();
+		if (!on_A) {
+			cb_selectA();
+		} else {
+			if (FreqDispA->is_reversed_colors()) {
+				FreqDispA->restore_colors();
+				Fl::focus(btnA);
+			} else {
+				FreqDispA->reverse_colors();
+				Fl::focus(FreqDispA);
+			}
+		}
+
 		on_A = true;
 		btnA->value(1);
 		btnB->value(0);
+		if (progStatus.UIsize == touch_ui) {
+			FreqDispB->hide();
+			FreqDispA->show();
+		}
 	}
 }
 
@@ -343,10 +370,24 @@ static void cb_btnB(Fl_Light_Button*, void*) {
 			btnA->value(1);
 		}
 	} else {
-		cb_selectB();
+		if (on_A) {
+			cb_selectB();
+		} else { 
+			if (FreqDispB->is_reversed_colors()) {
+				FreqDispB->restore_colors();
+				Fl::focus(btnB);
+			} else {
+				FreqDispB->reverse_colors();
+				Fl::focus(FreqDispB);
+			}
+		}
 		on_A = false;
 		btnB->value(1);
 		btnA->value(0);
+		if (progStatus.UIsize == touch_ui) {
+			FreqDispA->hide();
+			FreqDispB->show();
+		}
 	}
 }
 
@@ -507,22 +548,22 @@ static void cb_btnSpot(Fl_Light_Button* o, void*) {
 	cb_cw_spot();
 }
 
-static void cb_cnt_cw_spot_tone(Fl_Counter* o, void*) {
+static void cb_spnr_cw_spot_tone(Fl_Counter* o, void*) {
 	progStatus.cw_spot_tone=(int)o->value();
 	cb_cw_spot_tone();
 }
 
-static void cb_cnt_cw_qsk(Fl_Counter* o, void*) {
+static void cb_spnr_cw_qsk(Fl_Counter* o, void*) {
 	progStatus.cw_qsk = o->value();
 	cb_cw_qsk();
 }
 
-static void cb_cnt_cw_weight(Fl_Counter* o, void*) {
+static void cb_spnr_cw_weight(Fl_Counter* o, void*) {
 	progStatus.cw_weight = o->value();
 	cb_cw_weight();
 }
 
-static void cb_cnt_cw_wpm(Fl_Counter* o, void*) {
+static void cb_spnr_cw_wpm(Fl_Counter* o, void*) {
 	progStatus.cw_wpm = o->value();
 	cb_cw_wpm();
 }
@@ -532,17 +573,17 @@ static void cb_btn_enable_keyer(Fl_Check_Button* o, void*) {
 	cb_enable_keyer();
 }
 
-static void cb_cnt_vox_gain(Fl_Counter* o, void*) {
+static void cb_spnr_vox_gain(Fl_Counter* o, void*) {
 	progStatus.vox_gain=(int)o->value();
 	cb_vox_gain();
 }
 
-static void cb_cnt_anti_vox(Fl_Counter* o, void*) {
+static void cb_spnr_anti_vox(Fl_Counter* o, void*) {
 	progStatus.vox_anti=(int)o->value();
 	cb_vox_anti();
 }
 
-static void cb_cnt_vox_hang(Fl_Counter* o, void*) {
+static void cb_spnr_vox_hang(Fl_Counter* o, void*) {
 	progStatus.vox_hang = (int)o->value();
 	cb_vox_hang();
 }
@@ -562,7 +603,7 @@ static void cb_btnCompON(Fl_Light_Button* o, void*) {
 	cb_compression();
 }
 
-static void cb_cnt_compression(Fl_Counter* o, void*) {
+static void cb_spnr_compression(Fl_Counter* o, void*) {
 	progStatus.compression=(int)o->value();
 	cb_compression();
 }
@@ -577,7 +618,7 @@ static void cb_cbo_agc_level(Fl_ComboBox* o, void*) {
 	cb_agc_level();
 }
 
-static void cb_cnt_bpf_center(Fl_Counter* o, void*) {
+static void cb_spnr_bpf_center(Fl_Counter* o, void*) {
 	progStatus.bpf_center=o->value();
 	cb_bpf_center();
 }
@@ -587,12 +628,12 @@ static void cb_btn_use_bpf_center(Fl_Check_Button* o, void*) {
 	cb_bpf_center();
 }
 
-static void cb_cnt_vfo_adj(Fl_Counter* o, void*) {
+static void cb_spnr_vfo_adj(Fl_Counter* o, void*) {
 	progStatus.vfo_adj=o->value();
 	cb_vfo_adj();
 }
 
-static void cb_cnt_line_out(Fl_Counter* o, void*) {
+static void cb_spnr_line_out(Fl_Counter* o, void*) {
 	progStatus.line_out = o->value();
 	cb_line_out();
 }
@@ -638,27 +679,27 @@ static void cb_btnDataPort(Fl_Light_Button* o, void*) {
 	btnDataPort->redraw_label();
 }
 
-static void cb_cnt_tt550_cw_wpm(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_cw_wpm(Fl_Counter* o, void*) {
 	progStatus.tt550_cw_wpm = (int)o->value();
 	cb_tt550_cw_wpm();
 }
 
-static void cb_cnt_tt550_cw_weight(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_cw_weight(Fl_Counter* o, void*) {
 	progStatus.tt550_cw_weight = o->value();
 	cb_tt550_cw_weight();
 }
 
-static void cb_cnt_tt550_cw_qsk(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_cw_qsk(Fl_Counter* o, void*) {
 	progStatus.tt550_cw_qsk = (int)o->value();
 	cb_tt550_cw_qsk();
 }
 
-static void cb_cnt_tt550_cw_vol(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_cw_vol(Fl_Counter* o, void*) {
 	progStatus.tt550_cw_vol=(int)o->value();
 	cb_tt550_cw_vol();
 }
 
-static void cb_cnt_tt550_cw_spot(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_cw_spot(Fl_Counter* o, void*) {
 	progStatus.tt550_cw_spot=(int)o->value();
 	cb_tt550_cw_spot();
 }
@@ -668,17 +709,17 @@ static void cb_btn_tt550_enable_keyer(Fl_Check_Button* o, void*) {
 	cb_tt550_enable_keyer();
 }
 
-static void cb_cnt_tt550_vox_gain(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_vox_gain(Fl_Counter* o, void*) {
 	progStatus.tt550_vox_gain=(int)o->value();
 	cb_tt550_vox_gain();
 }
 
-static void cb_cnt_tt550_anti_vox(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_anti_vox(Fl_Counter* o, void*) {
 	progStatus.tt550_vox_anti=(int)o->value();
 	cb_tt550_vox_anti();
 }
 
-static void cb_cnt_tt550_vox_hang(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_vox_hang(Fl_Counter* o, void*) {
 	progStatus.tt550_vox_hang = (int)o->value();
 	cb_tt550_vox_hang();
 }
@@ -693,17 +734,17 @@ static void cb_btn_tt550_CompON(Fl_Light_Button* o, void*) {
 	cb_tt550_compression();
 }
 
-static void cb_cnt_tt550_compression(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_compression(Fl_Counter* o, void*) {
 	progStatus.tt550_compression=(int)o->value();
 	cb_tt550_compression();
 }
 
-static void cb_cnt_tt550_mon_vol(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_mon_vol(Fl_Counter* o, void*) {
 	progStatus.tt550_mon_vol=(int)o->value();
 	cb_tt550_mon_vol();
 }
 
-static void cb_cnt_tt550_line_out(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_line_out(Fl_Counter* o, void*) {
 	progStatus.tt550_line_out = (int)o->value();
 	cb_tt550_line_out();
 }
@@ -723,7 +764,7 @@ static void cb_cbo_tt550_agc_level(Fl_ComboBox* o, void*) {
 	cb_tt550_agc_level();
 }
 
-static void cb_cnt_tt550_vfo_adj(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_vfo_adj(Fl_Counter* o, void*) {
 	progStatus.vfo_adj=o->value();
 	cb_vfo_adj();
 }
@@ -753,11 +794,11 @@ static void cb_btn_tt550_use_xmt_bw(Fl_Check_Button* o, void*) {
 	cb_tt550_setXmtBW();
 }
 
-static void cb_cnt_tt550_keypad_time_out(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_keypad_time_out(Fl_Counter* o, void*) {
 	progStatus.tt550_keypad_timeout=(int)(o->value()*1000.0);
 }
 
-static void cb_cnt_tt550_encoder_sensitivity(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_encoder_sensitivity(Fl_Counter* o, void*) {
 	progStatus.tt550_encoder_sensitivity = o->value();
 }
 
@@ -780,6 +821,8 @@ static void cb_sel_tt550_F3_func(Fl_Choice* o, void*) {
 #include "ui_small.cxx"
 
 #include "ui_wide.cxx"
+
+#include "ui_touch.cxx"
 
 #include "ui_setup.cxx"
 

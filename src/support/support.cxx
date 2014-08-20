@@ -39,6 +39,7 @@
 #include "ptt.h"
 #include "xml_io.h"
 #include "socket_io.h"
+#include "ui.h"
 
 #include "rig.h"
 #include "rigs.h"
@@ -206,10 +207,12 @@ void setModeControl(void *)
 	if (rig_nbr == TS870S) {
 		if (vfo.imode == RIG_TS870S::tsCW || vfo.imode == RIG_TS870S::tsCWR) {
 			btnIFsh->activate();
-			sldrIFSHIFT->activate();
+			if (sldrIFSHIFT) sldrIFSHIFT->activate();
+			if (spnrIFSHIFT) spnrIFSHIFT->activate();
 		} else {
 			btnIFsh->deactivate();
-			sldrIFSHIFT->deactivate();
+			if (sldrIFSHIFT) sldrIFSHIFT->deactivate();
+			if (spnrIFSHIFT) spnrIFSHIFT->deactivate();
 		}
 	}
 }
@@ -480,8 +483,11 @@ void read_split()
 void update_volume(void *d)
 {
 	long *nr = (long *)d;
+	if (spnrVOLUME) spnrVOLUME->value(progStatus.volume);
+	if (spnrVOLUME) spnrVOLUME->activate();
 	sldrVOLUME->value(progStatus.volume); // Set slider to last known value
 	sldrVOLUME->activate();				  // activate it
+
 	if (*nr) btnVol->value(1);			  // Button Lit
 	else     btnVol->value(0);			  // Button Dark.
 }
@@ -512,7 +518,8 @@ void update_ifshift(void *d)
 {
 	btnIFsh->value(progStatus.shift);
 //	if (progStatus.shift)
-		sldrIFSHIFT->value(progStatus.shift_val);
+	if (sldrIFSHIFT) sldrIFSHIFT->value(progStatus.shift_val);
+	if (spnrIFSHIFT) spnrIFSHIFT->value(progStatus.shift_val);
 }
 
 void read_ifshift()
@@ -529,7 +536,8 @@ void read_ifshift()
 void update_nr(void *d)
 {
 	btnNR->value(progStatus.noise_reduction);
-	sldrNR->value(progStatus.noise_reduction_val);
+	if (sldrNR) sldrNR->value(progStatus.noise_reduction_val);
+	if (spnrNR) spnrNR->value(progStatus.noise_reduction_val);
 }
 
 void read_nr()
@@ -549,7 +557,8 @@ int  rig_notch_val;
 void update_notch(void *d)
 {
 	btnNotch->value(progStatus.notch = rig_notch);
-	sldrNOTCH->value(progStatus.notch_val = rig_notch_val);
+	if (sldrNOTCH) sldrNOTCH->value(progStatus.notch_val = rig_notch_val);
+	if (spnrNOTCH) spnrNOTCH->value(progStatus.notch_val = rig_notch_val);
 	send_new_notch(progStatus.notch ? progStatus.notch_val : 0);
 }
 
@@ -568,14 +577,19 @@ void read_notch()
 void update_power_control(void *d)
 {
 	set_power_controlImage(progStatus.power_level);
-	sldrPOWER->value(progStatus.power_level);
+	if (sldrPOWER) sldrPOWER->value(progStatus.power_level);
+	if (spnrPOWER) spnrPOWER->value(progStatus.power_level);
 	if (rig_nbr == K2) {
 		double min, max, step;
 		selrig->get_pc_min_max_step(min, max, step);
-		sldrPOWER->minimum(min);
-		sldrPOWER->maximum(max);
-		sldrPOWER->step(step);
-		sldrPOWER->redraw();
+		if (sldrPOWER) sldrPOWER->minimum(min);
+		if (sldrPOWER) sldrPOWER->maximum(max);
+		if (sldrPOWER) sldrPOWER->step(step);
+		if (sldrPOWER) sldrPOWER->redraw();
+		if (spnrPOWER) spnrPOWER->minimum(min);
+		if (spnrPOWER) spnrPOWER->maximum(max);
+		if (spnrPOWER) spnrPOWER->step(step);
+		if (spnrPOWER) spnrPOWER->redraw();
 	}
 }
 
@@ -592,7 +606,8 @@ void read_power_control()
 // mic gain
 void update_mic_gain(void *d)
 {
-	sldrMICGAIN->value(progStatus.mic_gain);
+	if (sldrMICGAIN) sldrMICGAIN->value(progStatus.mic_gain);
+	if (spnrMICGAIN) spnrMICGAIN->value(progStatus.mic_gain);
 }
 
 void read_mic_gain()
@@ -608,7 +623,8 @@ void read_mic_gain()
 // rf gain
 void update_rfgain(void *d)
 {
-	sldrRFGAIN->value(progStatus.rfgain);
+	if (sldrRFGAIN) sldrRFGAIN->value(progStatus.rfgain);
+	if (spnrRFGAIN) spnrRFGAIN->value(progStatus.rfgain);
 }
 
 void read_rfgain()
@@ -624,7 +640,8 @@ void read_rfgain()
 // squelch
 void update_squelch(void *d)
 {
-	sldrSQUELCH->value(progStatus.squelch);
+	if (sldrSQUELCH) sldrSQUELCH->value(progStatus.squelch);
+	if (spnrSQUELCH) spnrSQUELCH->value(progStatus.squelch);
 }
 
 void read_squelch()
@@ -1710,18 +1727,21 @@ void cbNR()
 {
 	if (!selrig->has_noise_reduction_control) return;
 	noise_reduction_changed = true;
-	sliders.push(SLIDER(NR, sldrNR->value(), btnNR->value() ) );
-
+	if (sldrNR) sliders.push(SLIDER(NR, sldrNR->value(), btnNR->value() ) );
+	if (spnrNR) sliders.push(SLIDER(NR, spnrNR->value(), btnNR->value() ) );
 }
 
 void setNR()
 {
 	if (!selrig->has_noise_reduction_control) return;
 	noise_reduction_changed = true;
-	if (rig_nbr == TS2000 || rig_nbr == TS590S || rig_nbr == TS990)
-		sliders.push(SLIDER(NR, sldrNR->value(), -1 ) );
-	else
-		sliders.push(SLIDER(NR, sldrNR->value(), btnNR->value() ) );
+	if (rig_nbr == TS2000 || rig_nbr == TS590S || rig_nbr == TS990) {
+		if (sldrNR) sliders.push(SLIDER(NR, sldrNR->value(), -1 ) );
+		if (spnrNR) sliders.push(SLIDER(NR, spnrNR->value(), -1 ) );
+	} else {
+		if (sldrNR) sliders.push(SLIDER(NR, sldrNR->value(), btnNR->value() ) );
+		if (spnrNR) sliders.push(SLIDER(NR, spnrNR->value(), btnNR->value() ) );
+	}
 }
 
 void cbAN()
@@ -1735,14 +1755,16 @@ void cbbtnNotch()
 {
 	if (!selrig->has_notch_control) return;
 	notch_changed = true;
-	sliders.push(SLIDER(NOTCH, sldrNOTCH->value(), btnNotch->value() ));
+	if (sldrNOTCH) sliders.push(SLIDER(NOTCH, sldrNOTCH->value(), btnNotch->value() ));
+	if (spnrNOTCH) sliders.push(SLIDER(NOTCH, spnrNOTCH->value(), btnNotch->value() ));
 }
 
 void setNotch()
 {
 	if (!selrig->has_notch_control) return;
 	notch_changed = true;
-	sliders.push(SLIDER(NOTCH, sldrNOTCH->value(), btnNotch->value() ));
+	if (sldrNOTCH) sliders.push(SLIDER(NOTCH, sldrNOTCH->value(), btnNotch->value() ));
+	if (spnrNOTCH) sliders.push(SLIDER(NOTCH, spnrNOTCH->value(), btnNotch->value() ));
 }
 
 // called from xml_io thread
@@ -1758,17 +1780,23 @@ void setNotchControl(void *d)
 	guard_lock serial_lock(&mutex_serial, 61);
 	selrig->set_notch(progStatus.notch, progStatus.notch_val);
 
-	sldrNOTCH->value(progStatus.notch_val);
+	if (sldrNOTCH) sldrNOTCH->value(progStatus.notch_val);
+	if (spnrNOTCH) spnrNOTCH->value(progStatus.notch_val);
 	btnNotch->value(progStatus.notch);
 }
 
 void adjust_if_shift_control(void *d)
 {
-	sldrIFSHIFT->minimum(selrig->if_shift_min);
-	sldrIFSHIFT->maximum(selrig->if_shift_max);
-	sldrIFSHIFT->step(selrig->if_shift_step);
-	sldrIFSHIFT->value(selrig->if_shift_mid);
-	sldrIFSHIFT->redraw();
+	if (sldrIFSHIFT) sldrIFSHIFT->minimum(selrig->if_shift_min);
+	if (sldrIFSHIFT) sldrIFSHIFT->maximum(selrig->if_shift_max);
+	if (sldrIFSHIFT) sldrIFSHIFT->step(selrig->if_shift_step);
+	if (sldrIFSHIFT) sldrIFSHIFT->value(selrig->if_shift_mid);
+	if (sldrIFSHIFT) sldrIFSHIFT->redraw();
+	if (spnrIFSHIFT) spnrIFSHIFT->minimum(selrig->if_shift_min);
+	if (spnrIFSHIFT) spnrIFSHIFT->maximum(selrig->if_shift_max);
+	if (spnrIFSHIFT) spnrIFSHIFT->step(selrig->if_shift_step);
+	if (spnrIFSHIFT) spnrIFSHIFT->value(selrig->if_shift_mid);
+	if (spnrIFSHIFT) spnrIFSHIFT->redraw();
 	btnIFsh->value(0);
 	btnIFsh->redraw();
 }
@@ -1781,28 +1809,37 @@ void setIFshiftButton(void *d)
 	}
 	else if (!b && btnIFsh->value()) {
 		btnIFsh->value(0);
-		sldrIFSHIFT->value( selrig->if_shift_mid );
+		if (sldrIFSHIFT) sldrIFSHIFT->value( selrig->if_shift_mid );
+		if (spnrIFSHIFT) spnrIFSHIFT->value( selrig->if_shift_mid );
 	}
 }
 
 void setIFshiftControl(void *d)
 {
 	int val = (long)d;
-	if (sldrIFSHIFT->value() != val)
-		sldrIFSHIFT->value(val);
+	if (sldrIFSHIFT) {
+		if (sldrIFSHIFT->value() != val)
+			sldrIFSHIFT->value(val);
+	}
+	if (spnrIFSHIFT) {
+		if (spnrIFSHIFT->value() != val)
+			spnrIFSHIFT->value(val);
+	}
 	btnIFsh->value( val != selrig->if_shift_mid );
 }
 
 void setIFshift()
 {
 	if_shift_changed = true;
-	sliders.push(SLIDER(IFSH, sldrIFSHIFT->value(), btnIFsh->value()));
+	if (sldrIFSHIFT) sliders.push(SLIDER(IFSH, sldrIFSHIFT->value(), btnIFsh->value()));
+	if (spnrIFSHIFT) sliders.push(SLIDER(IFSH, spnrIFSHIFT->value(), btnIFsh->value()));
 }
 
 void cbIFsh()
 {
 	if_shift_changed = true;
-	sliders.push(SLIDER(IFSH, sldrIFSHIFT->value(), btnIFsh->value()));
+	if (sldrIFSHIFT) sliders.push(SLIDER(IFSH, sldrIFSHIFT->value(), btnIFsh->value()));
+	if (spnrIFSHIFT) sliders.push(SLIDER(IFSH, spnrIFSHIFT->value(), btnIFsh->value()));
 }
 
 void cbEventLog()
@@ -1813,31 +1850,41 @@ void cbEventLog()
 void setVolume()
 {
 	volume_changed = true;
-	sliders.push(SLIDER(VOL, sldrVOLUME->value()));
+	if (spnrVOLUME) sliders.push(SLIDER(VOL, spnrVOLUME->value()));
+	if (sldrVOLUME) sliders.push(SLIDER(VOL, sldrVOLUME->value()));
 }
 
 void cbMute()
 {
 	volume_changed = true;
 	if (btnVol->value() == 0) {
-		sldrVOLUME->deactivate();
+		if (spnrVOLUME) spnrVOLUME->deactivate();
+		if (sldrVOLUME) sldrVOLUME->deactivate();
 		sliders.push(SLIDER(VOL, 0));
 	} else {
-		sldrVOLUME->activate();
-		sliders.push(SLIDER(VOL, sldrVOLUME->value()));
+		if (spnrVOLUME) {
+			spnrVOLUME->activate();
+			sliders.push(SLIDER(VOL, spnrVOLUME->value()));
+		}
+		if (sldrVOLUME) {
+			sldrVOLUME->activate();
+			sliders.push(SLIDER(VOL, sldrVOLUME->value()));
+		}
 	}
 }
 
 void setMicGain()
 {
 	mic_changed = true;
-	sliders.push(SLIDER(MIC, sldrMICGAIN->value()));
+	if (sldrMICGAIN) sliders.push(SLIDER(MIC, sldrMICGAIN->value()));
+	if (spnrMICGAIN) sliders.push(SLIDER(MIC, spnrMICGAIN->value()));
 }
 
 void setMicGainControl(void* d)
 {
 	int val = (long)d;
-	sldrMICGAIN->value(val);
+	if (sldrMICGAIN) sldrMICGAIN->value(val);
+	if (spnrMICGAIN) spnrMICGAIN->value(val);
 }
 
 static int img = -1;
@@ -1885,19 +1932,25 @@ void set_power_controlImage(double pwr)
 
 void setPower()
 {
-	float pwr = progStatus.power_level = sldrPOWER->value();
-	power_changed = true;
-	sliders.push(SLIDER(PWR, progStatus.power_level));
-
+	float pwr = 0;
+	if (spnrPOWER) pwr = progStatus.power_level = spnrPOWER->value();
+	if (sldrPOWER) pwr = progStatus.power_level = sldrPOWER->value();
 	if (rig_nbr == K2) {
 		double min, max, step;
 		selrig->get_pc_min_max_step(min, max, step);
-		sldrPOWER->minimum(min);
-		sldrPOWER->maximum(max);
-		sldrPOWER->step(step);
-		sldrPOWER->value(progStatus.power_level);
-		sldrPOWER->redraw();
+		if (spnrPOWER) spnrPOWER->minimum(min);
+		if (spnrPOWER) spnrPOWER->maximum(max);
+		if (spnrPOWER) spnrPOWER->step(step);
+		if (spnrPOWER) spnrPOWER->value(progStatus.power_level);
+		if (spnrPOWER) spnrPOWER->redraw();
+		if (sldrPOWER) sldrPOWER->minimum(min);
+		if (sldrPOWER) sldrPOWER->maximum(max);
+		if (sldrPOWER) sldrPOWER->step(step);
+		if (sldrPOWER) sldrPOWER->value(progStatus.power_level);
+		if (sldrPOWER) sldrPOWER->redraw();
 	}
+	power_changed = true;
+	sliders.push(SLIDER(PWR, progStatus.power_level));
 	set_power_controlImage(pwr);
 }
 
@@ -1920,13 +1973,15 @@ void cbPTT()
 void setSQUELCH()
 {
 	squelch_changed = true;
-	sliders.push(SLIDER(SQL, sldrSQUELCH->value() ));
+	if (sldrSQUELCH) sliders.push(SLIDER(SQL, sldrSQUELCH->value() ));
+	if (spnrSQUELCH) sliders.push(SLIDER(SQL, spnrSQUELCH->value() ));
 }
 
 void setRFGAIN()
 {
 	rfgain_changed = true;
-	sliders.push(SLIDER(RFGAIN, sldrRFGAIN->value() ));
+	if (spnrRFGAIN) sliders.push(SLIDER(RFGAIN, spnrRFGAIN->value()));
+	if (sldrRFGAIN) sliders.push(SLIDER(RFGAIN, sldrRFGAIN->value()));
 }
 
 
@@ -1967,14 +2022,22 @@ void updateFwdPwr(void *d)
 
 void updateSquelch(void *d)
 {
-	sldrSQUELCH->value((long)d);
-	sldrSQUELCH->redraw();
+	if (sldrSQUELCH) sldrSQUELCH->value((long)d);
+	if (sldrSQUELCH) sldrSQUELCH->redraw();
+	if (spnrSQUELCH) spnrSQUELCH->value((long)d);
+	if (spnrSQUELCH) spnrSQUELCH->redraw();
 }
 
 void updateRFgain(void *d)
 {
-	sldrRFGAIN->value((long)d);
-	sldrRFGAIN->redraw();
+	if (spnrRFGAIN) {
+		spnrRFGAIN->value((long)d);
+		spnrRFGAIN->redraw();
+	} 
+	if (sldrRFGAIN) {
+		sldrRFGAIN->value((long)d);
+		sldrRFGAIN->redraw();
+	}
 }
 
 void zeroXmtMeters(void *d)
@@ -2077,16 +2140,26 @@ void cbExit()
 	progStatus.iBW_B = vfoB.iBW;
 
 	progStatus.spkr_on = btnVol->value();
-	progStatus.volume = sldrVOLUME->value();
-	progStatus.power_level = sldrPOWER->value();
-	progStatus.rfgain = sldrRFGAIN->value();
-	progStatus.mic_gain = sldrMICGAIN->value();
+
+	if (spnrPOWER) progStatus.power_level = spnrPOWER->value();
+	if (spnrVOLUME) progStatus.volume = spnrVOLUME->value();
+	if (spnrRFGAIN) progStatus.rfgain = spnrRFGAIN->value();
+	if (spnrMICGAIN) progStatus.mic_gain = spnrMICGAIN->value();
+	if (spnrNOTCH) progStatus.notch_val = spnrNOTCH->value();
+	if (spnrIFSHIFT) progStatus.shift_val = spnrIFSHIFT->value();
+	if (spnrNR) progStatus.noise_reduction_val = spnrNR->value();
+
+	if (sldrPOWER) progStatus.power_level = sldrPOWER->value();
+	if (sldrVOLUME) progStatus.volume = sldrVOLUME->value();
+	if (sldrRFGAIN) progStatus.rfgain = sldrRFGAIN->value();
+	if (sldrMICGAIN) progStatus.mic_gain = sldrMICGAIN->value();
+	if (sldrNOTCH) progStatus.notch_val = sldrNOTCH->value();
+	if (sldrIFSHIFT) progStatus.shift_val = sldrIFSHIFT->value();
+	if (sldrNR) progStatus.noise_reduction_val = sldrNR->value();
+
 	progStatus.notch = btnNotch->value();
-	progStatus.notch_val = sldrNOTCH->value();
 	progStatus.shift = btnIFsh->value();
-	progStatus.shift_val = sldrIFSHIFT->value();
 	progStatus.noise_reduction = btnNR->value();
-	progStatus.noise_reduction_val = sldrNR->value();
 	progStatus.noise = btnNOISE->value();
 	progStatus.attenuator = btnAttenuator->value();
 	progStatus.preamp = btnPreamp->value();
@@ -2176,13 +2249,9 @@ void update_UI_PTT(void *d)
 	}
 }
 
-void adjust_control_positions()
-{
-// small_ui (ORIGINAL) USER INTERFACE
-if (progStatus.UIsize == small_ui)
+void adjust_small_ui()
 {
 	int y = 0;
-
 	btnVol->hide();
 	sldrVOLUME->hide();
 	sldrRFGAIN->hide();
@@ -2370,10 +2439,11 @@ if (progStatus.UIsize == small_ui)
 	mainwindow->size( mainwindow->w(), y);
 	mainwindow->init_sizes();
 	mainwindow->redraw();
+}
 
-} else {
-// wide_ui USER INTERFACE
-	mainwindow->resize( mainwindow->x(), mainwindow->y(), mainwindow->w(), 218);
+void adjust_wide_ui()
+{
+	mainwindow->resize( mainwindow->x(), mainwindow->y(), mainwindow->w(), 130);
 	mainwindow->redraw();
 
 	btnVol->show();
@@ -2427,32 +2497,118 @@ if (progStatus.UIsize == small_ui)
 	mainwindow->redraw();
 }
 
+void adjust_touch_ui()
+{
+	mainwindow->resize( mainwindow->x(), mainwindow->y(), mainwindow->w(), TOUCH_MAINH);
+	mainwindow->redraw();
+
+	if (spnrPOWER) spnrPOWER->show();
+	if (sldrPOWER) sldrPOWER->show();
+	btnVol->show();
+	if (spnrVOLUME) spnrVOLUME->show();
+	if (sldrVOLUME) sldrVOLUME->show();
+
+	if (spnrRFGAIN) spnrRFGAIN->show();
+	if (sldrRFGAIN) sldrRFGAIN->show();
+
+	btnIFsh->show();
+	if (spnrIFSHIFT) spnrIFSHIFT->show();
+	if (sldrIFSHIFT) sldrIFSHIFT->show();
+
+	btnNotch->show();
+	if (spnrNOTCH) spnrNOTCH->show();
+	if (sldrNOTCH) sldrNOTCH->show();
+
+	if (spnrMICGAIN) spnrMICGAIN->show();
+	if (sldrMICGAIN) sldrMICGAIN->show();
+
+	if (spnrSQUELCH) spnrSQUELCH->show();
+	if (sldrSQUELCH) sldrSQUELCH->show();
+
+	btnNR->show();
+	if (spnrNR) spnrNR->show();
+	if (sldrNR) sldrNR->show();
+
+	if (rig_nbr == TT550) {
+		tabs550->show();
+		tabsGeneric->hide();
+	} else {
+		tabs550->hide();
+		tabsGeneric->remove(genericAux);
+		if (progStatus.aux_serial_port != "NONE" || selrig->has_data_port) {
+			if (progStatus.aux_serial_port != "NONE") {
+				btnAuxRTS->activate();
+				btnAuxDTR->activate();
+			} else {
+				btnAuxRTS->deactivate();
+				btnAuxDTR->deactivate();
+			}
+			if (selrig->has_data_port)
+				btnDataPort->activate();
+			else
+				btnDataPort->deactivate();
+			tabsGeneric->add(genericAux);
+		}
+		tabsGeneric->remove(genericRXB);
+		if (selrig->has_rit || selrig->has_xit || selrig->has_bfo)
+			tabsGeneric->add(genericRXB);
+		tabsGeneric->show();
+	}
+
+	if (progStatus.tooltips) {
+		Fl_Tooltip::enable(1);
+		mnuTooltips->set();
+	} else {
+		mnuTooltips->clear();
+		Fl_Tooltip::enable(0);
+	}
+
+	mainwindow->init_sizes();
+	mainwindow->redraw();
+}
+
+void adjust_control_positions()
+{
+	switch (progStatus.UIsize) {
+		case small_ui :
+			adjust_small_ui();
+			break;
+		case wide_ui :
+			adjust_wide_ui();
+			break;
+		case touch_ui :
+		default :
+			adjust_touch_ui();
+			break;
+	}
+	FreqDispA->set_hrd(progStatus.hrd_buttons);
+	FreqDispB->set_hrd(progStatus.hrd_buttons);
 }
 
 void initXcvrTab()
 {
 	if (rig_nbr == TT550) {
-		cnt_tt550_line_out->value(progStatus.tt550_line_out);
+		spnr_tt550_line_out->value(progStatus.tt550_line_out);
 		cbo_tt550_agc_level->index(progStatus.tt550_agc_level);
-		cnt_tt550_cw_wpm->value(progStatus.tt550_cw_wpm);
-		cnt_tt550_cw_vol->value(progStatus.tt550_cw_vol);
-		cnt_tt550_cw_spot->value(progStatus.tt550_cw_spot);
-		cnt_tt550_cw_weight->value(progStatus.tt550_cw_weight);
-		cnt_tt550_cw_qsk->value(progStatus.tt550_cw_qsk);
+		spnr_tt550_cw_wpm->value(progStatus.tt550_cw_wpm);
+		spnr_tt550_cw_vol->value(progStatus.tt550_cw_vol);
+		spnr_tt550_cw_spot->value(progStatus.tt550_cw_spot);
+		spnr_tt550_cw_weight->value(progStatus.tt550_cw_weight);
+		spnr_tt550_cw_qsk->value(progStatus.tt550_cw_qsk);
 		btn_tt550_enable_keyer->value(progStatus.tt550_enable_keyer);
 		btn_tt550_vox->value(progStatus.tt550_vox_onoff);
-		cnt_tt550_vox_gain->value(progStatus.tt550_vox_gain);
-		cnt_tt550_anti_vox->value(progStatus.tt550_vox_anti);
-		cnt_tt550_vox_hang->value(progStatus.tt550_vox_hang);
+		spnr_tt550_vox_gain->value(progStatus.tt550_vox_gain);
+		spnr_tt550_anti_vox->value(progStatus.tt550_vox_anti);
+		spnr_tt550_vox_hang->value(progStatus.tt550_vox_hang);
 		btn_tt550_CompON->value(progStatus.tt550_compON);
-		cnt_tt550_compression->value(progStatus.tt550_compression);
-		cnt_tt550_mon_vol->value(progStatus.tt550_mon_vol);
+		spnr_tt550_compression->value(progStatus.tt550_compression);
+		spnr_tt550_mon_vol->value(progStatus.tt550_mon_vol);
 		btn_tt550_enable_xmtr->value(progStatus.tt550_enable_xmtr);
 		btn_tt550_enable_tloop->value(progStatus.tt550_enable_tloop);
 		btn_tt550_tuner_bypass->value(progStatus.tt550_tuner_bypass);
 		btn_tt550_use_xmt_bw->value(progStatus.tt550_use_xmt_bw);
 		sel_tt550_encoder_step->value(progStatus.tt550_encoder_step);
-		cnt_tt550_encoder_sensitivity->value(progStatus.tt550_encoder_sensitivity);
+		spnr_tt550_encoder_sensitivity->value(progStatus.tt550_encoder_sensitivity);
 		sel_tt550_F1_func->value(progStatus.tt550_F1_func);
 		sel_tt550_F2_func->value(progStatus.tt550_F2_func);
 		sel_tt550_F3_func->value(progStatus.tt550_F3_func);
@@ -2500,6 +2656,7 @@ void initXcvrTab()
 		tabsGeneric->remove(*genericMisc);
 
 		if (selrig->has_band_selection) {
+			if (progStatus.UIsize != touch_ui)
 			genericBands->resize(
 				tabsGeneric->x() + 2,
 				tabsGeneric->y() + 19,
@@ -2513,6 +2670,7 @@ void initXcvrTab()
 
 		if (selrig->has_cw_wpm || selrig->has_cw_qsk || selrig->has_cw_weight ||
 			selrig->has_cw_keyer || selrig->has_cw_spot || selrig->has_cw_spot_tone) {
+			if (progStatus.UIsize == wide_ui)
 			genericCW->resize(
 				tabsGeneric->x() + 2,
 				tabsGeneric->y() + 19,
@@ -2522,32 +2680,32 @@ void initXcvrTab()
 			if (selrig->has_cw_wpm) {
 				int min, max;
 				selrig->get_cw_wpm_min_max(min, max);
-				cnt_cw_wpm->minimum(min);
-				cnt_cw_wpm->maximum(max);
-				cnt_cw_wpm->value(progStatus.cw_wpm);
-				cnt_cw_wpm->show();
+				spnr_cw_wpm->minimum(min);
+				spnr_cw_wpm->maximum(max);
+				spnr_cw_wpm->value(progStatus.cw_wpm);
+				spnr_cw_wpm->show();
 				selrig->set_cw_wpm();
-			} else cnt_cw_wpm->hide();
+			} else spnr_cw_wpm->hide();
 			if (selrig->has_cw_qsk) {
 				double min, max, step;
 				selrig->get_cw_qsk_min_max_step(min, max, step);
-				cnt_cw_qsk->minimum(min);
-				cnt_cw_qsk->maximum(max);
-				cnt_cw_qsk->step(step);
-				cnt_cw_qsk->value(progStatus.cw_qsk);
-				cnt_cw_qsk->show();
+				spnr_cw_qsk->minimum(min);
+				spnr_cw_qsk->maximum(max);
+				spnr_cw_qsk->step(step);
+				spnr_cw_qsk->value(progStatus.cw_qsk);
+				spnr_cw_qsk->show();
 				selrig->set_cw_qsk();
-			} else cnt_cw_qsk->hide();
+			} else spnr_cw_qsk->hide();
 			if (selrig->has_cw_weight) {
 				double min, max, step;
 				selrig->get_cw_weight_min_max_step( min, max, step );
-				cnt_cw_weight->minimum(min);
-				cnt_cw_weight->maximum(max);
-				cnt_cw_weight->step(step);
-				cnt_cw_weight->value(progStatus.cw_weight);
-				cnt_cw_weight->show();
+				spnr_cw_weight->minimum(min);
+				spnr_cw_weight->maximum(max);
+				spnr_cw_weight->step(step);
+				spnr_cw_weight->value(progStatus.cw_weight);
+				spnr_cw_weight->show();
 				selrig->set_cw_weight();
-			} else cnt_cw_weight->hide();
+			} else spnr_cw_weight->hide();
 			if (selrig->has_cw_keyer) {
 				btn_enable_keyer->show();
 				btn_enable_keyer->value(progStatus.enable_keyer);
@@ -2559,19 +2717,20 @@ void initXcvrTab()
 				btnSpot->show();
 			} else btnSpot->hide();
 			if (selrig->has_cw_spot_tone) {
-				cnt_cw_spot_tone->show();
+				spnr_cw_spot_tone->show();
 				int min, max, step;
 				selrig->get_cw_spot_tone_min_max_step(min, max, step);
-				cnt_cw_spot_tone->minimum(min);
-				cnt_cw_spot_tone->maximum(max);
-				cnt_cw_spot_tone->step(step);
-				cnt_cw_spot_tone->value(progStatus.cw_spot_tone);
+				spnr_cw_spot_tone->minimum(min);
+				spnr_cw_spot_tone->maximum(max);
+				spnr_cw_spot_tone->step(step);
+				spnr_cw_spot_tone->value(progStatus.cw_spot_tone);
 				selrig->set_cw_spot_tone();
-			} else cnt_cw_spot_tone->hide();
+			} else spnr_cw_spot_tone->hide();
 		}
 
 		if (selrig->has_vox_onoff || selrig->has_vox_gain || selrig->has_vox_anti ||
 			selrig->has_vox_hang || selrig->has_vox_on_dataport || selrig->has_cw_spot_tone) {
+			if (progStatus.UIsize == wide_ui)
 			genericVOX->resize(
 				tabsGeneric->x() + 2,
 				tabsGeneric->y() + 19,
@@ -2584,35 +2743,35 @@ void initXcvrTab()
 				selrig->set_vox_onoff();
 			} else btn_vox->hide();
 			if (selrig->has_vox_gain) {
-				cnt_vox_gain->show();
+				spnr_vox_gain->show();
 				int min, max, step;
 				selrig->get_vox_gain_min_max_step(min, max, step);
-				cnt_vox_gain->minimum(min);
-				cnt_vox_gain->maximum(max);
-				cnt_vox_gain->step(step);
-				cnt_vox_gain->value(progStatus.vox_gain);
+				spnr_vox_gain->minimum(min);
+				spnr_vox_gain->maximum(max);
+				spnr_vox_gain->step(step);
+				spnr_vox_gain->value(progStatus.vox_gain);
 				selrig->set_vox_gain();
-			} else cnt_vox_gain->hide();
+			} else spnr_vox_gain->hide();
 			if (selrig->has_vox_anti) {
-				cnt_anti_vox->show();
+				spnr_anti_vox->show();
 				int min, max, step;
 				selrig->get_vox_anti_min_max_step(min, max, step);
-				cnt_anti_vox->minimum(min);
-				cnt_anti_vox->maximum(max);
-				cnt_anti_vox->step(step);
-				cnt_anti_vox->value(progStatus.vox_anti);
+				spnr_anti_vox->minimum(min);
+				spnr_anti_vox->maximum(max);
+				spnr_anti_vox->step(step);
+				spnr_anti_vox->value(progStatus.vox_anti);
 				selrig->set_vox_anti();
-			} else cnt_anti_vox->hide();
+			} else spnr_anti_vox->hide();
 			if (selrig->has_vox_hang) {
-				cnt_vox_hang->show();
+				spnr_vox_hang->show();
 				int min, max, step;
 				selrig->get_vox_hang_min_max_step(min, max, step);
-				cnt_vox_hang->minimum(min);
-				cnt_vox_hang->maximum(max);
-				cnt_vox_hang->step(step);
-				cnt_vox_hang->value(progStatus.vox_hang);
+				spnr_vox_hang->minimum(min);
+				spnr_vox_hang->maximum(max);
+				spnr_vox_hang->step(step);
+				spnr_vox_hang->value(progStatus.vox_hang);
 				selrig->set_vox_hang();
-			} else cnt_vox_hang->hide();
+			} else spnr_vox_hang->hide();
 			if (selrig->has_vox_on_dataport) {
 				btn_vox_on_dataport->show();
 				btn_vox_on_dataport->value(progStatus.vox_on_dataport);
@@ -2621,6 +2780,7 @@ void initXcvrTab()
 		}
 
 		if (selrig->has_compON || selrig->has_compression) {
+			if (progStatus.UIsize == wide_ui)
 			genericSpeech->resize(
 				tabsGeneric->x() + 2,
 				tabsGeneric->y() + 19,
@@ -2635,16 +2795,17 @@ void initXcvrTab()
 			if (selrig->has_compression) {
 				int min, max, step;
 				selrig->get_comp_min_max_step(min, max, step);
-				cnt_compression->minimum(min);
-				cnt_compression->maximum(max);
-				cnt_compression->step(step);
-				cnt_compression->show();
-				cnt_compression->value(progStatus.compression);
+				spnr_compression->minimum(min);
+				spnr_compression->maximum(max);
+				spnr_compression->step(step);
+				spnr_compression->show();
+				spnr_compression->value(progStatus.compression);
 				selrig->set_compression();
 			} else
-				cnt_compression->hide();
+				spnr_compression->hide();
 		}
 		if (selrig->has_agc_level || selrig->has_nb_level || selrig->has_bpf_center) {
+			if (progStatus.UIsize == wide_ui)
 			genericRx->resize(
 				tabsGeneric->x() + 2,
 				tabsGeneric->y() + 19,
@@ -2654,16 +2815,17 @@ void initXcvrTab()
 			if (selrig->has_agc_level) cbo_agc_level->activate(); else cbo_agc_level->deactivate();
 			if (selrig->has_nb_level) cbo_nb_level->activate(); else cbo_nb_level->deactivate();
 			if (selrig->has_bpf_center) {
-				cnt_bpf_center->value(progStatus.bpf_center);
-				cnt_bpf_center->show();
+				spnr_bpf_center->value(progStatus.bpf_center);
+				spnr_bpf_center->show();
 				btn_use_bpf_center->show();
 			} else {
-				cnt_bpf_center->hide();
+				spnr_bpf_center->hide();
 				btn_use_bpf_center->hide();
 			}
 		}
 
 		if (selrig->has_vfo_adj || selrig->has_xcvr_auto_on_off) {
+			if (progStatus.UIsize == wide_ui)
 			genericMisc->resize(
 				tabsGeneric->x() + 2,
 				tabsGeneric->y() + 19,
@@ -2673,15 +2835,15 @@ void initXcvrTab()
 			if (selrig->has_vfo_adj) {
 				int min, max, step;
 				selrig->get_vfoadj_min_max_step(min, max, step);
-				cnt_vfo_adj->minimum(min);
-				cnt_vfo_adj->maximum(max);
-				cnt_vfo_adj->step(step);
+				spnr_vfo_adj->minimum(min);
+				spnr_vfo_adj->maximum(max);
+				spnr_vfo_adj->step(step);
 				progStatus.vfo_adj = selrig->getVfoAdj();
-				cnt_vfo_adj->value(progStatus.vfo_adj);
-				cnt_vfo_adj->show();
+				spnr_vfo_adj->value(progStatus.vfo_adj);
+				spnr_vfo_adj->show();
 			} else
-				cnt_vfo_adj->hide();
-			cnt_line_out->hide(); // enable if a lineout control is used by any transceiver
+				spnr_vfo_adj->hide();
+			spnr_line_out->hide(); // enable if a lineout control is used by any transceiver
 
 			if (selrig->has_xcvr_auto_on_off) {
 				btn_xcvr_auto_on->value(progStatus.xcvr_auto_on);
@@ -2749,8 +2911,6 @@ void initRig()
 {
 	btnInitializing->show();
 	mainwindow->redraw();
-
-printf("initRig\n");
 
 	flrig_abort = false;
 
@@ -2915,16 +3075,22 @@ printf("initRig\n");
 		cntRIT->minimum(min);
 		cntRIT->maximum(max);
 		cntRIT->step(step);
-		if (progStatus.UIsize == small_ui)
-			cntRIT->show();
-		else
-			cntRIT->activate();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				cntRIT->show();
+				break;
+			case wide_ui : case touch_ui : default :
+				cntRIT->activate();
+		}
 		cntRIT->value(progStatus.rit_freq);
 	} else {
-		if (progStatus.UIsize == small_ui)
-			cntRIT->hide();
-		else
-			cntRIT->deactivate();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				cntRIT->hide();
+				break;
+			case wide_ui: case touch_ui : default :
+				cntRIT->deactivate();
+		}
 	}
 
 	if (selrig->has_xit) {
@@ -2934,15 +3100,20 @@ printf("initRig\n");
 		cntXIT->maximum(max);
 		cntXIT->step(step);
 		cntXIT->value(progStatus.xit_freq);
-		if (progStatus.UIsize == small_ui)
-			cntXIT->show();
-		else
-			cntXIT->activate();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				cntXIT->show();
+				break;
+			case wide_ui : case touch_ui : default :
+				cntXIT->activate();
+			}
 	} else {
-		if (progStatus.UIsize == small_ui)
-			cntXIT->hide();
-		else
-			cntXIT->deactivate();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				cntXIT->hide();
+			case wide_ui : case touch_ui : default :
+				cntXIT->deactivate();
+		}
 	}
 
 	if (selrig->has_bfo) {
@@ -2952,15 +3123,21 @@ printf("initRig\n");
 		cntBFO->maximum(max);
 		cntBFO->step(step);
 		cntBFO->value(progStatus.bfo_freq);
-		if (progStatus.UIsize == small_ui)
-			cntBFO->show();
-		else
-			cntBFO->activate();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				cntBFO->show();
+				break;
+			case wide_ui : case touch_ui : default :
+				cntBFO->activate();
+		}
 	} else {
-		if (progStatus.UIsize == small_ui)
-			cntBFO->hide();
-		else
-			cntBFO->deactivate();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				cntBFO->hide();
+				break;
+			case wide_ui : case touch_ui : default :
+				cntBFO->deactivate();
+		}
 	}
 
 	if (selrig->has_dsp_controls) {
@@ -3000,134 +3177,214 @@ printf("initRig\n");
 	if (selrig->has_volume_control) {
 		int min, max, step;
 		selrig->get_vol_min_max_step(min, max, step);
-		sldrVOLUME->minimum(min);
-		sldrVOLUME->maximum(max);
-		sldrVOLUME->step(step);
-		sldrVOLUME->redraw();
+		if (spnrVOLUME) {
+			spnrVOLUME->minimum(min);
+			spnrVOLUME->maximum(max);
+			spnrVOLUME->step(step);
+			spnrVOLUME->redraw();
+		}
+		if (sldrVOLUME) {
+			sldrVOLUME->minimum(min);
+			sldrVOLUME->maximum(max);
+			sldrVOLUME->step(step);
+			sldrVOLUME->redraw();
+		}
 		if (progStatus.use_rig_data) {
 			progStatus.volume = selrig->get_volume_control();
-			sldrVOLUME->value(progStatus.volume);
+			if (sldrVOLUME) sldrVOLUME->value(progStatus.volume);
+			if (sldrVOLUME) sldrVOLUME->activate();
 			btnVol->value(1);
+			if (spnrVOLUME) spnrVOLUME->value(progStatus.volume);
+			if (spnrVOLUME) spnrVOLUME->activate();
 			sldrVOLUME->activate();
 		} else {
-			sldrVOLUME->value(progStatus.volume);
+			if (sldrVOLUME) sldrVOLUME->value(progStatus.volume);
+			if (spnrVOLUME) spnrVOLUME->value(progStatus.volume);
 			if (progStatus.spkr_on == 0) {
 				btnVol->value(0);
-				sldrVOLUME->deactivate();
+				if (sldrVOLUME) sldrVOLUME->deactivate();
+				if (spnrVOLUME) spnrVOLUME->deactivate();
 				selrig->set_volume_control(0);
 			} else {
 				btnVol->value(1);
-				sldrVOLUME->activate();
+				if (sldrVOLUME) sldrVOLUME->activate();
+				if (spnrVOLUME) spnrVOLUME->activate();
 				selrig->set_volume_control(progStatus.volume);
 			}
 		}
-		if (progStatus.UIsize == small_ui) {
-			btnVol->show();
-			sldrVOLUME->show();
-		} else {
-			btnVol->activate();
-			sldrVOLUME->activate();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				btnVol->show();
+				if (sldrVOLUME) sldrVOLUME->show();
+				if (spnrVOLUME) spnrVOLUME->show();
+				break;
+			case wide_ui : case touch_ui : default :
+				btnVol->activate();
+				if (sldrVOLUME) sldrVOLUME->activate();
+				if (spnrVOLUME) spnrVOLUME->activate();
 		}
 	} else {
-		if (progStatus.UIsize == small_ui) {
-			btnVol->hide();
-			sldrVOLUME->hide();
-		} else {
-			btnVol->deactivate();
-			sldrVOLUME->deactivate();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				btnVol->hide();
+				if (sldrVOLUME) sldrVOLUME->hide();
+				if (spnrVOLUME) spnrVOLUME->hide();
+				break;
+			case wide_ui : case touch_ui : default :
+				btnVol->deactivate();
+				if (sldrVOLUME) sldrVOLUME->deactivate();
+				if (spnrVOLUME) spnrVOLUME->deactivate();
 		}
 	}
 
 	if (selrig->has_rf_control) {
 		int min, max, step;
 		selrig->get_rf_min_max_step(min, max, step);
-		sldrRFGAIN->minimum(min);
-		sldrRFGAIN->maximum(max);
-		sldrRFGAIN->step(step);
-		sldrRFGAIN->redraw();
+		if (sldrRFGAIN) sldrRFGAIN->minimum(min);
+		if (sldrRFGAIN) sldrRFGAIN->maximum(max);
+		if (sldrRFGAIN) sldrRFGAIN->step(step);
+		if (sldrRFGAIN) sldrRFGAIN->redraw();
+		if (spnrRFGAIN) spnrRFGAIN->minimum(min);
+		if (spnrRFGAIN) spnrRFGAIN->maximum(max);
+		if (spnrRFGAIN) spnrRFGAIN->step(step);
+		if (spnrRFGAIN) spnrRFGAIN->redraw();
 		if (progStatus.use_rig_data) {
 			progStatus.rfgain = selrig->get_rf_gain();
-			sldrRFGAIN->value(progStatus.rfgain);
-			if (progStatus.UIsize == small_ui)
-				sldrRFGAIN->show();
-			else
-				sldrRFGAIN->activate();
+			if (sldrRFGAIN) sldrRFGAIN->value(progStatus.rfgain);
+			if (spnrRFGAIN) spnrRFGAIN->value(progStatus.rfgain);
+			switch (progStatus.UIsize) {
+				case small_ui :
+					if (sldrRFGAIN) sldrRFGAIN->show();
+					if (spnrRFGAIN) spnrRFGAIN->show();
+					break;
+				case wide_ui : case touch_ui : default :
+					if (sldrRFGAIN) sldrRFGAIN->activate();
+					if (spnrRFGAIN) spnrRFGAIN->activate();
+			}
 		} else {
-			sldrRFGAIN->value(progStatus.rfgain);
+			if (sldrRFGAIN) sldrRFGAIN->value(progStatus.rfgain);
+			if (spnrRFGAIN) spnrRFGAIN->value(progStatus.rfgain);
 			selrig->set_rf_gain(progStatus.rfgain);
-			if (progStatus.UIsize == small_ui)
-				sldrRFGAIN->show();
-			else
-				sldrRFGAIN->activate();
+			switch (progStatus.UIsize) {
+				case small_ui :
+					if (sldrRFGAIN) sldrRFGAIN->show();
+					if (spnrRFGAIN) spnrRFGAIN->show();
+					break;
+				case wide_ui : case touch_ui : default :
+					if (sldrRFGAIN) sldrRFGAIN->activate();
+					if (spnrRFGAIN) spnrRFGAIN->activate();
+			}
 		}
 	} else {
-		if (progStatus.UIsize == small_ui)
-			sldrRFGAIN->hide();
-		else
-			sldrRFGAIN->deactivate();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				if (sldrRFGAIN) sldrRFGAIN->hide();
+				if (spnrRFGAIN) spnrRFGAIN->hide();
+				break;
+			case wide_ui : case touch_ui : default :
+				if (sldrRFGAIN) sldrRFGAIN->deactivate();
+				if (spnrRFGAIN) spnrRFGAIN->deactivate();
+		}
 	}
 
 	if (selrig->has_sql_control) {
 		int min, max, step;
 		selrig->get_squelch_min_max_step(min, max, step);
-		sldrSQUELCH->minimum(min);
-		sldrSQUELCH->maximum(max);
-		sldrSQUELCH->step(step);
-		sldrSQUELCH->redraw();
+		if (sldrSQUELCH) sldrSQUELCH->minimum(min);
+		if (sldrSQUELCH) sldrSQUELCH->maximum(max);
+		if (sldrSQUELCH) sldrSQUELCH->step(step);
+		if (sldrSQUELCH) sldrSQUELCH->redraw();
+		if (spnrSQUELCH) spnrSQUELCH->minimum(min);
+		if (spnrSQUELCH) spnrSQUELCH->maximum(max);
+		if (spnrSQUELCH) spnrSQUELCH->step(step);
+		if (spnrSQUELCH) spnrSQUELCH->redraw();
 		if (progStatus.use_rig_data) {
 			progStatus.squelch = selrig->get_squelch();
-			sldrSQUELCH->value(progStatus.squelch);
-			if (progStatus.UIsize == small_ui)
-				sldrSQUELCH->show();
-			else
-				sldrSQUELCH->activate();
+			if (sldrSQUELCH) sldrSQUELCH->value(progStatus.squelch);
+			if (spnrSQUELCH) spnrSQUELCH->value(progStatus.squelch);
+			switch (progStatus.UIsize) {
+				case small_ui :
+					if (sldrSQUELCH) sldrSQUELCH->show();
+					if (spnrSQUELCH) spnrSQUELCH->show();
+					break;
+				case wide_ui : case touch_ui : default:
+					if (sldrSQUELCH) sldrSQUELCH->activate();
+					if (spnrSQUELCH) spnrSQUELCH->activate();
+			}
 		} else {
-			sldrSQUELCH->value(progStatus.squelch);
+			if (sldrSQUELCH) sldrSQUELCH->value(progStatus.squelch);
+			if (spnrSQUELCH) spnrSQUELCH->value(progStatus.squelch);
 			selrig->set_squelch(progStatus.squelch);
-			if (progStatus.UIsize == small_ui)
-				sldrSQUELCH->show();
-			else
-				sldrSQUELCH->activate();
+			switch (progStatus.UIsize) {
+				case small_ui :
+					if (sldrSQUELCH) sldrSQUELCH->show();
+					if (spnrSQUELCH) spnrSQUELCH->show();
+					break;
+				case wide_ui : case touch_ui : default :
+					if (sldrSQUELCH) sldrSQUELCH->activate();
+					if (spnrSQUELCH) spnrSQUELCH->activate();
+			}
 		}
 	} else {
-		if (progStatus.UIsize == small_ui)
-			sldrSQUELCH->hide();
-		else
-			sldrSQUELCH->deactivate();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				if (sldrSQUELCH) sldrSQUELCH->hide();
+				if (spnrSQUELCH) spnrSQUELCH->hide();
+				break;
+			case wide_ui : case touch_ui : default :
+				if (sldrSQUELCH) sldrSQUELCH->deactivate();
+				if (spnrSQUELCH) spnrSQUELCH->deactivate();
+		}
 	}
 
 	if (selrig->has_noise_reduction_control) {
 		int min, max, step;
 		selrig->get_nr_min_max_step(min, max, step);
-		sldrNR->minimum(min);
-		sldrNR->maximum(max);
-		sldrNR->step(step);
-		sldrNR->redraw();
-		if (progStatus.UIsize == small_ui) {
-			btnNR->show();
-			sldrNR->show();
-		} else {
-			btnNR->activate();
-			sldrNR->activate();
+		if (sldrNR) sldrNR->minimum(min);
+		if (sldrNR) sldrNR->maximum(max);
+		if (sldrNR) sldrNR->step(step);
+		if (sldrNR) sldrNR->redraw();
+		if (spnrNR) spnrNR->minimum(min);
+		if (spnrNR) spnrNR->maximum(max);
+		if (spnrNR) spnrNR->step(step);
+		if (spnrNR) spnrNR->redraw();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				btnNR->show();
+				if (sldrNR) sldrNR->show();
+				if (spnrNR) spnrNR->show();
+				break;
+			case wide_ui : case touch_ui : default:
+				btnNR->activate();
+				if (sldrNR) sldrNR->activate();
+				if (spnrNR) spnrNR->activate();
+				break;
 		}
 		if (progStatus.use_rig_data) {
 			progStatus.noise_reduction = selrig->get_noise_reduction();
 			progStatus.noise_reduction_val = selrig->get_noise_reduction_val();
 			btnNR->value(progStatus.noise_reduction);
-			sldrNR->value(progStatus.noise_reduction_val);
+			if (sldrNR) sldrNR->value(progStatus.noise_reduction_val);
+			if (spnrNR) spnrNR->value(progStatus.noise_reduction_val);
 		} else {
 			btnNR->value(progStatus.noise_reduction);
-			sldrNR->value(progStatus.noise_reduction_val);
+			if (sldrNR) sldrNR->value(progStatus.noise_reduction_val);
+			if (spnrNR) spnrNR->value(progStatus.noise_reduction_val);
 			selrig->set_noise_reduction(progStatus.noise_reduction);
 			selrig->set_noise_reduction_val(progStatus.noise_reduction_val);
 		}
 	} else {
-		if (progStatus.UIsize == small_ui) {
-			btnNR->hide();
-			sldrNR->hide();
-		} else {
-			btnNR->deactivate();
-			sldrNR->deactivate();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				btnNR->hide();
+				if (sldrNR) sldrNR->hide();
+				if (spnrNR) sldrNR->hide();
+				break;
+			case wide_ui : case touch_ui : default :
+				btnNR->deactivate();
+				if (sldrNR) sldrNR->deactivate();
+				if (spnrNR) spnrNR->deactivate();
+				break;
 		}
 	}
 
@@ -3135,39 +3392,56 @@ printf("initRig\n");
 
 		int min, max, step;
 		selrig->get_if_min_max_step(min, max, step);
-		sldrIFSHIFT->minimum(min);
-		sldrIFSHIFT->maximum(max);
-		sldrIFSHIFT->step(step);
-		sldrIFSHIFT->redraw();
+		if (sldrIFSHIFT) sldrIFSHIFT->minimum(min);
+		if (sldrIFSHIFT) sldrIFSHIFT->maximum(max);
+		if (sldrIFSHIFT) sldrIFSHIFT->step(step);
+		if (sldrIFSHIFT) sldrIFSHIFT->redraw();
+		if (spnrIFSHIFT) spnrIFSHIFT->minimum(min);
+		if (spnrIFSHIFT) spnrIFSHIFT->maximum(max);
+		if (spnrIFSHIFT) spnrIFSHIFT->step(step);
+		if (spnrIFSHIFT) spnrIFSHIFT->redraw();
 		if (progStatus.use_rig_data) {
 			progStatus.shift = selrig->get_if_shift(progStatus.shift_val);
 			btnIFsh->value(progStatus.shift);
-			sldrIFSHIFT->value(progStatus.shift_val);
+			if (sldrIFSHIFT) sldrIFSHIFT->value(progStatus.shift_val);
+			if (spnrIFSHIFT) spnrIFSHIFT->value(progStatus.shift_val);
 		} else {
 			if (progStatus.shift) {
 				btnIFsh->value(1);
-				sldrIFSHIFT->value(progStatus.shift_val);
+				if (sldrIFSHIFT) sldrIFSHIFT->value(progStatus.shift_val);
+				if (spnrIFSHIFT) spnrIFSHIFT->value(progStatus.shift_val);
 				selrig->set_if_shift(progStatus.shift_val);
 			} else {
 				btnIFsh->value(0);
-				sldrIFSHIFT->value(selrig->if_shift_mid);
+				if (sldrIFSHIFT) sldrIFSHIFT->value(selrig->if_shift_mid);
+				if (spnrIFSHIFT) spnrIFSHIFT->value(selrig->if_shift_mid);
 				selrig->set_if_shift(selrig->if_shift_mid);
 			}
 		}
-		if (progStatus.UIsize == small_ui) {
-			btnIFsh->show();
-			sldrIFSHIFT->show();
-		} else {
-			btnIFsh->activate();
-			sldrIFSHIFT->activate();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				btnIFsh->show();
+				if (sldrIFSHIFT) sldrIFSHIFT->show();
+				if (spnrIFSHIFT) spnrIFSHIFT->show();
+				break;
+			case wide_ui : case touch_ui : default :
+				btnIFsh->activate();
+				if (sldrIFSHIFT) sldrIFSHIFT->activate();
+				if (spnrIFSHIFT) spnrIFSHIFT->activate();
+				break;
 		}
 	} else {
-		if (progStatus.UIsize == small_ui) {
-			btnIFsh->hide();
-			sldrIFSHIFT->hide();
-		} else {
-			btnIFsh->deactivate();
-			sldrIFSHIFT->deactivate();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				btnIFsh->hide();
+				if (sldrIFSHIFT) sldrIFSHIFT->hide();
+				if (spnrIFSHIFT) spnrIFSHIFT->hide();
+				break;
+			case wide_ui : case touch_ui : default :
+				btnIFsh->deactivate();
+				if (sldrIFSHIFT) sldrIFSHIFT->deactivate();
+				if (spnrIFSHIFT) spnrIFSHIFT->deactivate();
+				break;
 		}
 	}
 
@@ -3175,61 +3449,89 @@ printf("initRig\n");
 		if (progStatus.imode_A == RIG_TS870S::tsCW ||
 			progStatus.imode_A == RIG_TS870S::tsCWR) {
 			btnIFsh->activate();
-			sldrIFSHIFT->activate();
+			if (sldrIFSHIFT) sldrIFSHIFT->activate();
+			if (spnrIFSHIFT) spnrIFSHIFT->activate();
 		} else {
 			btnIFsh->deactivate();
-			sldrIFSHIFT->deactivate();
+			if (sldrIFSHIFT) sldrIFSHIFT->deactivate();
+			if (spnrIFSHIFT) spnrIFSHIFT->deactivate();
 		}
 	}
 
 	if (selrig->has_notch_control) {
 		int min, max, step;
 		selrig->get_notch_min_max_step(min, max, step);
-		sldrNOTCH->minimum(min);
-		sldrNOTCH->maximum(max);
-		sldrNOTCH->step(step);
-		sldrNOTCH->redraw();
+		if (sldrNOTCH) sldrNOTCH->minimum(min);
+		if (sldrNOTCH) sldrNOTCH->maximum(max);
+		if (sldrNOTCH) sldrNOTCH->step(step);
+		if (sldrNOTCH) sldrNOTCH->redraw();
+		if (spnrNOTCH) spnrNOTCH->minimum(min);
+		if (spnrNOTCH) spnrNOTCH->maximum(max);
+		if (spnrNOTCH) spnrNOTCH->step(step);
+		if (spnrNOTCH) spnrNOTCH->redraw();
 		if (progStatus.use_rig_data) {
 			progStatus.notch = selrig->get_notch(progStatus.notch_val);
 			btnNotch->value(progStatus.notch);
-			sldrNOTCH->value(progStatus.notch_val);
+			if (sldrNOTCH) sldrNOTCH->value(progStatus.notch_val);
+			if (spnrNOTCH) spnrNOTCH->value(progStatus.notch_val);
 		} else {
 			btnNotch->value(progStatus.notch);
-			sldrNOTCH->value(progStatus.notch_val);
+			if (sldrNOTCH) sldrNOTCH->value(progStatus.notch_val);
+			if (spnrNOTCH) spnrNOTCH->value(progStatus.notch_val);
 			selrig->set_notch(progStatus.notch, progStatus.notch_val);
 		}
-		if (progStatus.UIsize == small_ui) {
-			btnNotch->show();
-			sldrNOTCH->show();
-		} else {
-			btnNotch->activate();
-			sldrNOTCH->activate();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				btnNotch->show();
+				if (sldrNOTCH) sldrNOTCH->show();
+				if (spnrNOTCH) spnrNOTCH->show();
+				break;
+			case wide_ui : case touch_ui : default :
+				btnNotch->activate();
+				if (sldrNOTCH) sldrNOTCH->activate();
+				if (spnrNOTCH) spnrNOTCH->activate();
+				break;
 		}
 	} else {
-		if (progStatus.UIsize == small_ui) {
-			btnNotch->hide();
-			sldrNOTCH->hide();
-		} else {
-			btnNotch->deactivate();
-			sldrNOTCH->deactivate();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				btnNotch->hide();
+				if (sldrNOTCH) sldrNOTCH->hide();
+				if (spnrNOTCH) spnrNOTCH->hide();
+				break;
+			case wide_ui : case touch_ui : default :
+				btnNotch->deactivate();
+				if (sldrNOTCH) sldrNOTCH->deactivate();
+				if (spnrNOTCH) spnrNOTCH->deactivate();
+				break;
 		}
 	}
 
 	if (selrig->has_micgain_control) {
 		int min = 0, max = 0, step = 0;
 		selrig->get_mic_min_max_step(min, max, step);
-		sldrMICGAIN->minimum(min);
-		sldrMICGAIN->maximum(max);
-		sldrMICGAIN->step(step);
+		if (sldrMICGAIN) sldrMICGAIN->minimum(min);
+		if (sldrMICGAIN) sldrMICGAIN->maximum(max);
+		if (sldrMICGAIN) sldrMICGAIN->step(step);
+		if (spnrMICGAIN) spnrMICGAIN->minimum(min);
+		if (spnrMICGAIN) spnrMICGAIN->maximum(max);
+		if (spnrMICGAIN) spnrMICGAIN->step(step);
 		if (progStatus.use_rig_data)
 			progStatus.mic_gain = selrig->get_mic_gain();
 		else
 			selrig->set_mic_gain(progStatus.mic_gain);
-		sldrMICGAIN->value(progStatus.mic_gain);
-		if (progStatus.UIsize == small_ui)
-			sldrMICGAIN->show();
-		else
-			sldrMICGAIN->activate();
+		if (sldrMICGAIN) sldrMICGAIN->value(progStatus.mic_gain);
+		if (spnrMICGAIN) spnrMICGAIN->value(progStatus.mic_gain);
+		switch (progStatus.UIsize) {
+			case small_ui :
+				if (sldrMICGAIN) sldrMICGAIN->show();
+				if (spnrMICGAIN) spnrMICGAIN->show();
+				break;
+			case wide_ui : case touch_ui : default :
+				if (sldrMICGAIN) sldrMICGAIN->activate();
+				if (spnrMICGAIN) spnrMICGAIN->activate();
+				break;
+		}
 		if (selrig->has_data_port) {
 			btnDataPort->show();
 			btnDataPort->value(progStatus.data_port);
@@ -3237,33 +3539,37 @@ printf("initRig\n");
 			btnDataPort->redraw_label();
 		} else btnDataPort->hide();
 	} else {
-		if (progStatus.UIsize == small_ui)
-			sldrMICGAIN->hide();
-		else
-			sldrMICGAIN->deactivate();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				if (sldrMICGAIN) sldrMICGAIN->hide();
+				if (spnrMICGAIN) spnrMICGAIN->hide();
+				break;
+			case wide_ui : case touch_ui : default :
+				if (sldrMICGAIN) sldrMICGAIN->deactivate();
+				if (spnrMICGAIN) spnrMICGAIN->deactivate();
+		}
 	}
 
+	double min, max, step;
 	if (selrig->has_power_control) {
-		double min, max, step;
 		if (progStatus.use_rig_data)
 			progStatus.power_level = selrig->get_power_control();
 		else
 			selrig->set_power_control(progStatus.power_level);
 		selrig->get_pc_min_max_step(min, max, step);
-		sldrPOWER->minimum(min);
-		sldrPOWER->maximum(max);
-		sldrPOWER->step(step);
-		sldrPOWER->value(progStatus.power_level);
-		sldrPOWER->redraw();
-		if (progStatus.UIsize == small_ui)
-			sldrPOWER->show();
-		else
-			sldrPOWER->activate();
-	} else {
-		if (progStatus.UIsize == small_ui)
-			sldrPOWER->hide();
-		else
-			sldrPOWER->deactivate();
+		if (sldrPOWER) sldrPOWER->minimum(min);
+		if (sldrPOWER) sldrPOWER->maximum(max);
+		if (sldrPOWER) sldrPOWER->step(step);
+		if (sldrPOWER) sldrPOWER->value(progStatus.power_level);
+		if (sldrPOWER) sldrPOWER->show();
+		if (sldrPOWER) sldrPOWER->redraw();
+
+		if (spnrPOWER) spnrPOWER->minimum(min);
+		if (spnrPOWER) spnrPOWER->maximum(max);
+		if (spnrPOWER) spnrPOWER->step(step);
+		if (spnrPOWER) spnrPOWER->value(progStatus.power_level);
+		if (spnrPOWER) spnrPOWER->show();
+		if (spnrPOWER) spnrPOWER->redraw();
 	}
 	set_power_controlImage(progStatus.power_level);
 
@@ -3272,40 +3578,55 @@ printf("initRig\n");
 			progStatus.attenuator = selrig->get_attenuator();
 		else
 			selrig->set_attenuator(progStatus.attenuator);
-		if (progStatus.UIsize == small_ui)
-			btnAttenuator->show();
-		else
-			btnAttenuator->activate();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				btnAttenuator->show();
+				break;
+			case wide_ui : case touch_ui : default :
+				btnAttenuator->activate();
+		}
 	} else {
-		if (progStatus.UIsize == small_ui)
-			btnAttenuator->hide();
-		else
-			btnAttenuator->deactivate();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				btnAttenuator->hide();
+				break;
+			case wide_ui : case touch_ui : default :
+				btnAttenuator->deactivate();
+		}
 	}
 
 // hijack the preamp control for a SPOT button on the TT550 Pegasus
 	if (rig_nbr == TT550) {
 		btnPreamp->label("Spot");
 		btnPreamp->value(progStatus.tt550_spot_onoff);
-		if (progStatus.UIsize == small_ui)
-			btnPreamp->show();
-		else
-			btnPreamp->activate();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				btnPreamp->show();
+				break;
+			case wide_ui : case touch_ui : default :
+				btnPreamp->activate();
+		}
 	} else {
 		if (selrig->has_preamp_control) {
 			if (progStatus.use_rig_data)
 				progStatus.preamp = selrig->get_preamp();
 			else
 				selrig->set_preamp(progStatus.preamp);
-			if (progStatus.UIsize == small_ui)
-				btnPreamp->show();
-			else
-			btnPreamp->activate();
+			switch (progStatus.UIsize) {
+				case small_ui :
+					btnPreamp->show();
+					break;
+				case wide_ui : case touch_ui : default :
+				btnPreamp->activate();
+			}
 		} else {
-			if (progStatus.UIsize == small_ui)
-				btnPreamp->hide();
-			else
-				btnPreamp->deactivate();
+			switch (progStatus.UIsize) {
+				case small_ui :
+					btnPreamp->hide();
+					break;
+				case wide_ui : case touch_ui : default :
+					btnPreamp->deactivate();
+			}
 		}
 	}
 
@@ -3319,28 +3640,40 @@ printf("initRig\n");
 		else
 			selrig->set_noise(progStatus.noise);
 		btnNOISE->value(progStatus.noise);
-		if (progStatus.UIsize == small_ui)
-			btnNOISE->show();
-		else
-			btnNOISE->activate();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				btnNOISE->show();
+				break;
+			case wide_ui : case touch_ui : default :
+				btnNOISE->activate();
+		}
 	}
 	else {
-		if (progStatus.UIsize == small_ui)
-			btnNOISE->hide();
-		else
-			btnNOISE->deactivate();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				btnNOISE->hide();
+				break;
+			case wide_ui : case touch_ui : default :
+				btnNOISE->deactivate();
+		}
 	}
 
 	if (selrig->has_tune_control) {
-		if (progStatus.UIsize == small_ui)
-			btnTune->show();
-		else
-			btnTune->activate();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				btnTune->show();
+				break;
+			case wide_ui : case touch_ui : default :
+				btnTune->activate();
+		}
 	} else {
-		if (progStatus.UIsize == small_ui)
-			btnTune->hide();
-		else
-			btnTune->deactivate();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				btnTune->hide();
+				break;
+			case wide_ui : case touch_ui : default :
+				btnTune->deactivate();
+		}
 	}
 
 	if (selrig->has_ptt_control ||
@@ -3368,15 +3701,21 @@ printf("initRig\n");
 		else
 			selrig->set_auto_notch(progStatus.auto_notch);
 		btnAutoNotch->value(progStatus.auto_notch);
-		if (progStatus.UIsize == small_ui)
-			btnAutoNotch->show();
-		else
-			btnAutoNotch->activate();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				btnAutoNotch->show();
+				break;
+			case wide_ui : case touch_ui : default :
+				btnAutoNotch->activate();
+		}
 	} else {
-		if (progStatus.UIsize == small_ui)
-			btnAutoNotch->hide();
-		else
-			btnAutoNotch->deactivate();
+		switch (progStatus.UIsize) {
+			case small_ui :
+				btnAutoNotch->hide();
+				break;
+			case wide_ui : case touch_ui : default :
+				btnAutoNotch->deactivate();
+		}
 	}
 
 	if (selrig->has_swr_control)

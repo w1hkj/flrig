@@ -71,6 +71,7 @@
 #include "util.h"
 #include "gettext.h"
 #include "xml_io.h"
+#include "ui.h"
 
 #include "flrig_icon.cxx"
 
@@ -244,40 +245,50 @@ void expand_controls(void*)
 
 void close_controls(void*)
 {
-//	show_controls();
-	if (progStatus.UIsize == wide_ui) {
-		if (EXPAND_CONTROLS && selrig->has_extras) return;
-		btn_show_controls->label("@-22->");
-		btn_show_controls->redraw_label();
-		grpTABS->hide();
-		mainwindow->resizable(grpTABS);
-		mainwindow->size(progStatus.mainW, 150);
-		mainwindow->size_range(735, 150, 0, 150);
-	} else if (progStatus.UIsize == small_ui) {
-		if (EXPAND_CONTROLS && selrig->has_extras)
-			Fl::add_timeout(1.0, expand_controls);
+	switch (progStatus.UIsize) {
+		case wide_ui :
+			if (EXPAND_CONTROLS && selrig->has_extras) return;
+			btn_show_controls->label("@-22->");
+			btn_show_controls->redraw_label();
+			grpTABS->hide();
+			mainwindow->resizable(grpTABS);
+			mainwindow->size(progStatus.mainW, 150);
+			mainwindow->size_range(735, 150, 0, 150);
+			break;
+		case small_ui :
+			if (EXPAND_CONTROLS && selrig->has_extras)
+				Fl::add_timeout(1.0, expand_controls);
+			break;
+		case touch_ui :
+		default :
+			break;
 	}
 }
 
 void startup(void*)
 {
-//	btnInitializing->show();
 	initStatusConfigDialog();
 
-	if (progStatus.UIsize == wide_ui) {
-		if (EXPAND_CONTROLS && selrig->has_extras) return;
-		btn_show_controls->label("@-22->");
-		btn_show_controls->redraw_label();
-		grpTABS->hide();
-		mainwindow->resizable(grpTABS);
-		mainwindow->size(progStatus.mainW, 150);
-		mainwindow->size_range(735, 150, 0, 150);
-	} else if (progStatus.UIsize == small_ui) {
-		if (EXPAND_CONTROLS && selrig->has_extras)
-			show_controls();
-//			Fl::add_timeout(1.0, expand_controls);
+	switch (progStatus.UIsize) {
+		case touch_ui :
+			mainwindow->size(progStatus.mainW, TOUCH_MAINH);
+			mainwindow->size_range(TOUCH_MAINW, TOUCH_MAINH, 0, TOUCH_MAINH);
+			mainwindow->redraw();
+			break;
+		case wide_ui :
+			if (EXPAND_CONTROLS && selrig->has_extras) return;
+			btn_show_controls->label("@-22->");
+			btn_show_controls->redraw_label();
+			grpTABS->hide();
+			mainwindow->resizable(grpTABS);
+			mainwindow->size(progStatus.mainW, 148);
+			mainwindow->size_range(735, 148, 0, 148);
+			mainwindow->redraw();
+		case small_ui :
+		default :
+			if (EXPAND_CONTROLS && selrig->has_extras)
+				show_controls();
 	}
-//	Fl::add_timeout(0.0, close_controls);
 }
 
 int main (int argc, char *argv[])
@@ -349,11 +360,17 @@ int main (int argc, char *argv[])
 
 	progStatus.loadLastState();
 
-	if (progStatus.UIsize == small_ui)
-		mainwindow = Small_rig_window();
-	else
-		mainwindow = Wide_rig_window();
-
+	switch (progStatus.UIsize) {
+		case touch_ui :
+			mainwindow = touch_rig_window();
+			break;
+		case small_ui :
+			mainwindow = Small_rig_window();
+			break;
+		case wide_ui :
+		default :
+			mainwindow = Wide_rig_window();
+	}
 	mainwindow->callback(exit_main);
 
 	progStatus.UI_laststate();
@@ -391,13 +408,24 @@ int main (int argc, char *argv[])
 	sldrALC->clear();
 	sldrSWR->clear();
 
-	if (progStatus.UIsize == small_ui)
-		mainwindow->resize( progStatus.mainX, progStatus.mainY, 
-							mainwindow->w(), btnPTT->y() + btnPTT->h() + 2);
-	else
-		mainwindow->resize( progStatus.mainX, progStatus.mainY, 
-							progStatus.mainW, btnVol->y() + btnVol->h() + 2);//progStatus.mainH);
-
+	switch (progStatus.UIsize) {
+		case small_ui :
+			mainwindow->resize(
+				progStatus.mainX, progStatus.mainY, 
+				mainwindow->w(), btnPTT->y() + btnPTT->h() + 2);
+			break;
+		case wide_ui :
+			mainwindow->resize(
+				progStatus.mainX, progStatus.mainY, 
+				progStatus.mainW, btnVol->y() + btnVol->h() + 2);
+			break;
+		case touch_ui :
+			mainwindow->resize(
+				progStatus.mainX, progStatus.mainY, 
+				progStatus.mainW, TOUCH_MAINH);
+		default :
+			break;
+	}
 	mainwindow->xclass(KNAME);
 
 #if defined(__WOE32__)
@@ -414,11 +442,12 @@ int main (int argc, char *argv[])
 	mainwindow->show(argc, argv);
 #endif
 
-	btn_show_controls->label("@-28->");
-	btn_show_controls->redraw_label();
+	if (progStatus.UIsize != touch_ui) {
+		btn_show_controls->label("@-28->");
+		btn_show_controls->redraw_label();
+	}
 
-//	Fl::awake(startup);
-	Fl::add_timeout(0.50, startup);
+	Fl::add_timeout(0, startup);//0.50, startup);
 
 	return Fl::run();
 

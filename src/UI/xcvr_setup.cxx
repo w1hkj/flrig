@@ -47,8 +47,8 @@ Fl_Group *tabTCPIP = (Fl_Group *)0;
 Fl_Input2 *inp_tcpip_addr = (Fl_Input2 *)0;
 Fl_Input2 *inp_tcpip_port = (Fl_Input2 *)0;
 Fl_Check_Button *chk_use_tcpip=(Fl_Check_Button *)0;
-Fl_Counter *inp_tcpip_ping_delay=(Fl_Counter *)0;
 Fl_Box *box_tcpip_connect=(Fl_Box *)0;
+Fl_Counter *inp_tcpip_ping_delay=(Fl_Counter *)0;
 Fl_Counter *cntRetryAfter=(Fl_Counter *)0;
 Fl_Counter *cntDropsAllowed=(Fl_Counter *)0;
 

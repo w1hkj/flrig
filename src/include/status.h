@@ -107,6 +107,7 @@ struct status {
 	int		squelch;
 
 	int		schema;
+	bool	hrd_buttons;
 
 	int		line_out;
 	bool	data_port;

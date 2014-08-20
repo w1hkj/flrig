@@ -31,15 +31,18 @@
 #include "support.h"
 #include "config.h"
 #include "rigpanel.h"
+#include "ui.h"
 
 string last_xcvr_used = "none";
+
+int current_ui_size = -1;
 
 status progStatus = {
 	50,			// int mainX;
 	50,			// int mainY;
 	735,		// int mainW;
 	150,		// int mainH;
-	wide_ui,		// UISIZE, UIsize;
+	small_ui,	// UISIZE, UIsize;
 	false,		// UIchanged;
 	0,			// int rig_nbr;
 	"NONE",		// string xcvr_serial_port;
@@ -97,8 +100,8 @@ status progStatus = {
 	-1,			// int  iBW_B;
 	1,			// int  imode_B;
 	7070000,	// long freq_B;
-	true,		// bool use_rig_data;
-	true,		// bool restore_rig_data;
+	false,		// bool use_rig_data;
+	false,		// bool restore_rig_data;
 
 	false,		// bool spkr_on;
 	20,			// int  volume;
@@ -112,6 +115,7 @@ status progStatus = {
 	10,			// int  squelch;
 
 	0,			// int  schema;
+	true,		// bool hrd_buttons
 
 	0,			// int  line_out;
 	false,		// bool data_port;
@@ -283,10 +287,7 @@ void status::saveLastState()
 	if (mX >= 0 && mX >= 0) {
 		mainX = mX;
 		mainY = mY;
-		if (UIsize != small_ui) {
-			mainW = mW;
-			mainH = mH;
-		}
+		if (UIsize != small_ui) { mainW = mW; mainH = mH; }
 	}
 
 	Fl_Preferences spref(RigHomeDir.c_str(), "w1hkj.com", last_xcvr_used.c_str());
@@ -298,7 +299,6 @@ void status::saveLastState()
 	spref.set("mainw", mainW);
 	spref.set("mainh", mainH);
 
-	if (UIchanged) UIsize = btn_wide_ui->value();
 	spref.set("uisize", UIsize);
 
 	spref.set("xcvr_serial_port", xcvr_serial_port.c_str());
@@ -527,6 +527,7 @@ void status::saveLastState()
 	spref.set("xcvr_auto_on", xcvr_auto_on);
 	spref.set("xcvr_auto_off", xcvr_auto_off);
 
+	spref.set("hrd_buttons", hrd_buttons);
 }
 
 bool status::loadXcvrState(const char *xcvr)
@@ -543,6 +544,16 @@ bool status::loadXcvrState(const char *xcvr)
 		spref.get("mainw", mainW, mainW);
 		spref.get("mainh", mainH, mainH);
 		spref.get("uisize", UIsize, UIsize);
+		if (current_ui_size != -1) {
+			UIsize = current_ui_size;
+		}
+		current_ui_size = UIsize;
+		if (UIsize == wide_ui) {
+			if (mainW < WIDE_MAINW) mainW = WIDE_MAINW;
+		}
+		if (UIsize == touch_ui) {
+			if (mainW < TOUCH_MAINW) mainW = TOUCH_MAINW;
+		}
 
 		spref.get("xcvr_serial_port", defbuffer, "NONE", 199);
 		xcvr_serial_port = defbuffer;
@@ -789,6 +800,8 @@ bool status::loadXcvrState(const char *xcvr)
 
 		if (spref.get("xcvr_auto_on", i, i)) xcvr_auto_on = i;
 		if (spref.get("xcvr_auto_off", i, i)) xcvr_auto_off = i;
+
+		if (spref.get("hrd_buttons", i, i)) hrd_buttons = i;
 	}
 
 	return true;
@@ -885,6 +898,30 @@ void status::UI_laststate()
 	if (sldrMICGAIN)		sldrMICGAIN->selection_color(btn_slider);
 	if (sldrPOWER)			sldrPOWER->color(bg_slider);
 	if (sldrPOWER)			sldrPOWER->selection_color(btn_slider);
+
+	if (spnrPOWER)			spnrPOWER->color(bg_slider);
+	if (spnrPOWER)			spnrPOWER->selection_color(btn_slider);
+
+	if (spnrVOLUME)			spnrVOLUME->color(bg_slider);
+	if (spnrVOLUME)			spnrVOLUME->selection_color(btn_slider);
+
+	if (spnrRFGAIN)			spnrRFGAIN->color(bg_slider);
+	if (spnrRFGAIN)			spnrRFGAIN->selection_color(btn_slider);
+
+	if (spnrSQUELCH)		spnrSQUELCH->color(bg_slider);
+	if (spnrSQUELCH)		spnrSQUELCH->selection_color(btn_slider);
+
+	if (spnrNR)				spnrNR->color(bg_slider);
+	if (spnrNR)				spnrNR->selection_color(btn_slider);
+
+	if (spnrIFSHIFT)		spnrIFSHIFT->color(bg_slider);
+	if (spnrIFSHIFT)		spnrIFSHIFT->selection_color(btn_slider);
+
+	if (spnrNOTCH)			spnrNOTCH->color(bg_slider);
+	if (spnrNOTCH)			spnrNOTCH->selection_color(btn_slider);
+
+	if (spnrMICGAIN)		spnrMICGAIN->color(bg_slider);
+	if (spnrMICGAIN)		spnrMICGAIN->selection_color(btn_slider);
 
 	if (use_rig_data) mnuKeepData->set();
 	else mnuKeepData->clear();

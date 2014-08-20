@@ -169,6 +169,7 @@ flrig_SOURCES += \
 	widgets/flslider2.cxx \
 	widgets/font_browser.cxx \
 	widgets/FreqControl.cxx \
+	widgets/hspinner.cxx \
 	widgets/ValueSlider.cxx \
 	server/xml_server.cxx \
 	xmlrpcpp/XmlRpc.h \
@@ -207,13 +208,12 @@ EXTRA_DIST = \
 	UI/ui_bitmaps.cxx \
 	UI/ui_wide.cxx \
 	UI/ui_small.cxx \
+	UI/ui_touch.cxx \
 	UI/ui_setup.cxx \
 	UI/ui_memory.cxx \
 	UI/xcvr_setup.cxx \
 	UI/meters_setup.cxx \
 	UI/power_meter_setup.cxx \
-	UI/fluid-designs/orig-panel.fl \
-	UI/fluid-designs/wide-panel.fl \
 	include/combo.h \
 	include/debug.h \
 	include/dialogs.h \
@@ -226,6 +226,7 @@ EXTRA_DIST = \
 	include/flslider2.h \
 	include/Fl_SigBar.h \
 	include/FreqControl.h \
+	include/hspinner.h \
 	include/FT100D.h \
 	include/FT450.h \
 	include/FT747.h \
@@ -300,6 +301,7 @@ EXTRA_DIST = \
 	include/TT566.h \
 	include/TT588.h \
 	include/TT599.h \
+	include/ui.h \
 	include/util.h \
 	include/ValueSlider.h \
 	include/xml_server.h \

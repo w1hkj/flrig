@@ -800,8 +800,8 @@ void RIG_TT550::fkey_cw_plus()
 //	LOG_WARN("%s", tt550_fkey_strings[2]);
 	if (progStatus.tt550_cw_wpm >= 80) return;
 	progStatus.tt550_cw_wpm++;
-	cnt_tt550_cw_wpm->value(progStatus.tt550_cw_wpm);
-	cnt_tt550_cw_wpm->redraw();
+	spnr_tt550_cw_wpm->value(progStatus.tt550_cw_wpm);
+	spnr_tt550_cw_wpm->redraw();
 	selrig->set_cw_wpm();
 }
 
@@ -810,8 +810,8 @@ void RIG_TT550::fkey_cw_minus()
 //	LOG_WARN("%s", tt550_fkey_strings[3]);set_bw
 	if (progStatus.tt550_cw_wpm <= 5) return;
 	progStatus.tt550_cw_wpm--;
-	cnt_tt550_cw_wpm->value(progStatus.tt550_cw_wpm);
-	cnt_tt550_cw_wpm->redraw();
+	spnr_tt550_cw_wpm->value(progStatus.tt550_cw_wpm);
+	spnr_tt550_cw_wpm->redraw();
 	selrig->set_cw_wpm();
 }
 

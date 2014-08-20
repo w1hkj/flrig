@@ -359,7 +359,7 @@ void cbCancelXcvrDialog()
 
 void cbOkXcvrDialog()
 {
-	if (progStatus.UIsize != small_ui) {
+	if (progStatus.UIsize == wide_ui) {
 		btn_show_controls->label("@-22->");
 		btn_show_controls->redraw_label();
 		grpTABS->hide();
@@ -625,6 +625,13 @@ void cb_lighted_default()
 	btn_lighted->selection_color(btn_lt_color);
 	btn_lighted->value(1);
 	btn_lighted->redraw();
+}
+
+void cb_change_hrd_button()
+{
+	progStatus.hrd_buttons = !progStatus.hrd_buttons;
+	FreqDispA->set_hrd(progStatus.hrd_buttons);
+	FreqDispB->set_hrd(progStatus.hrd_buttons);
 }
 
 void cb_slider_defaults()
@@ -916,8 +923,7 @@ void setColors()
 
 	grpMeters->color(bgclr);
 
-	if (progStatus.UIsize != small_ui)
-		meter_fill_box->color(bgclr);
+	meter_fill_box->color(bgclr);
 
 	scaleSmeter->color(bgclr);
 	scaleSmeter->labelcolor(fgclr);
@@ -981,6 +987,10 @@ void setColors()
 	if (sldrMICGAIN)		sldrMICGAIN->selection_color(btn_slider);
 	if (sldrPOWER)			sldrPOWER->color(bg_slider);
 	if (sldrPOWER)			sldrPOWER->selection_color(btn_slider);
+
+	if (spnrPOWER)			spnrPOWER->color(bg_slider);
+	if (spnrVOLUME)			spnrVOLUME->color(bg_slider);
+//	if (spnrPOWER)			spnrPOWER->selection_color(btn_slider);
 
 	mainwindow->redraw();
 }
@@ -1129,51 +1139,70 @@ void show_controls()
 {
 	if (!(selrig->has_extras || rig_nbr == TT550) && progStatus.aux_serial_port == "NONE")
 		return;
-	if (progStatus.UIsize != small_ui) {
-		if (progStatus.UIsize != small_ui && mainwindow->h() > 150) {
-			btn_show_controls->label("@-22->");
-			btn_show_controls->redraw_label();
-			grpTABS->hide();
-			mainwindow->resizable(grpTABS);
-			mainwindow->size(mainwindow->w(), 150);
-			mainwindow->size_range(735, 150, 0, 150);
-		} else {
-			btn_show_controls->label("@-28->");
-			btn_show_controls->redraw_label();
-			mainwindow->resizable(grpTABS);
-			mainwindow->size_range(735, 218, 0, 218);
-			mainwindow->size(mainwindow->w(), 218);
-			grpTABS->show();
-		}
-	} else {
-		if (rig_nbr == TT550) {
-			tabsGeneric->hide();
-			if (tabs550->visible()) {
-				tabs550->hide();
+	switch (progStatus.UIsize) {
+		case wide_ui :
+			if (mainwindow->h() > 150) {
 				btn_show_controls->label("@-22->");
 				btn_show_controls->redraw_label();
-				mainwindow->size( mainwindow->w(), mainwindow->h() - 70);
+				grpTABS->hide();
+				mainwindow->resizable(grpTABS);
+				mainwindow->size(mainwindow->w(), 150);
+				mainwindow->size_range(735, 150, 0, 150);
 			} else {
-				tabs550->show();
 				btn_show_controls->label("@-28->");
 				btn_show_controls->redraw_label();
-				mainwindow->size( mainwindow->w(), mainwindow->h() + 70);
+				mainwindow->resizable(grpTABS);
+				mainwindow->size(mainwindow->w(), 218);
+				mainwindow->size_range(735, 218, 0, 218);
+				grpTABS->show();
 			}
 			mainwindow->redraw();
-		} else {
-			tabs550->hide();
-			if (tabsGeneric->visible()) {
+			break;
+		case touch_ui : 
+			if (rig_nbr == TT550) {
+				tabs550->show();
 				tabsGeneric->hide();
-				btn_show_controls->label("@-22->");
-				btn_show_controls->redraw_label();
-				mainwindow->size( mainwindow->w(), mainwindow->h() - 70);
 			} else {
+				tabs550->hide();
 				tabsGeneric->show();
-				btn_show_controls->label("@-28->");
-				btn_show_controls->redraw_label();
-				mainwindow->size( mainwindow->w(), mainwindow->h() + 70);
 			}
-		}
+			tabs550->redraw();
+			tabsGeneric->redraw();
+			mainwindow->redraw();
+			return;
+		case small_ui :
+			if (rig_nbr == TT550) {
+				tabsGeneric->hide();
+				if (tabs550->visible()) {
+					tabs550->hide();
+					btn_show_controls->label("@-22->");
+					btn_show_controls->redraw_label();
+					mainwindow->size( mainwindow->w(), mainwindow->h() - 70);
+				} else {
+					tabs550->show();
+					btn_show_controls->label("@-28->");
+					btn_show_controls->redraw_label();
+					mainwindow->size( mainwindow->w(), mainwindow->h() + 70);
+				}
+				mainwindow->redraw();
+			} else {
+				tabs550->hide();
+				if (tabsGeneric->visible()) {
+					tabsGeneric->hide();
+					btn_show_controls->label("@-22->");
+					btn_show_controls->redraw_label();
+					mainwindow->size( mainwindow->w(), mainwindow->h() - 70);
+				} else {
+					tabsGeneric->show();
+					btn_show_controls->label("@-28->");
+					btn_show_controls->redraw_label();
+					mainwindow->size( mainwindow->w(), mainwindow->h() + 70);
+				}
+				mainwindow->redraw();
+			}
+			break;
+		default :
+			break;
 	}
 }
 
