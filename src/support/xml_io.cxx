@@ -61,6 +61,7 @@ static const char* rig_release_control  = "rig.release_control";
 static const char* main_get_frequency   = "main.get_frequency";
 static const char* main_set_wf_sideband = "main.set_wf_sideband";
 static const char* rig_set_frequency    = "rig.set_frequency";
+static const char *rig_set_smeter       = "rig.set_smeter";
 static const char* rig_set_mode         = "rig.set_mode";
 static const char* rig_get_mode         = "rig.get_mode";
 static const char* rig_set_bandwidth    = "rig.set_bandwidth";
@@ -207,6 +208,19 @@ void send_new_freq(long freq)
 		xmlvfo.freq = freq;
 		XmlRpcValue f((double)freq), res;
 		execute(rig_set_frequency, f, res);
+		ignore = 1;
+	} catch (const XmlRpc::XmlRpcException& e) {
+		if (XML_DEBUG)
+			LOG_ERROR("%s", e.getMessage().c_str());
+	}
+}
+
+void send_smeter_val(int val)
+{
+	if (!fldigi_online) return;
+	try {
+		XmlRpcValue mval((int)val), res;
+		execute(rig_set_smeter, mval, res);
 		ignore = 1;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)

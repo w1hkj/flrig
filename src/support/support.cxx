@@ -323,6 +323,7 @@ void read_bandwidth()
 }
 
 // read current signal level
+int mval = 0;
 void read_smeter()
 {
 	if (!selrig->has_smeter) return;
@@ -2076,6 +2077,7 @@ void updateSmeter(void *d) // 0 to 100;
 	}
 	sldrRcvSignal->value(smeter);
 	sldrRcvSignal->redraw();
+	send_smeter_val((int)smeter);
 }
 
 void saveFreqList()
