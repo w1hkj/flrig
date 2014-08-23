@@ -2020,6 +2020,7 @@ void updateFwdPwr(void *d)
 	sldrFwdPwr->redraw();
 	if (!selrig->has_power_control)
 		set_power_controlImage(sldrFwdPwr->peak());
+	send_pwrmeter_val((int)power);
 }
 
 void updateSquelch(void *d)

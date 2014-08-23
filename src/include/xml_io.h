@@ -31,6 +31,7 @@ extern void open_rig_xmlrpc();
 extern void close_rig_xmlrpc();
 extern void send_new_freq(long);
 extern void send_smeter_val(int);
+extern void send_pwrmeter_val(int);
 extern void send_modes();
 extern void send_bandwidths();
 extern void send_name();
