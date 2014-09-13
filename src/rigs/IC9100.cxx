@@ -141,6 +141,12 @@ void RIG_IC9100::initialize()
 	IC9100_widgets[9].W = sldrNOTCH;
 	IC9100_widgets[10].W = sldrMICGAIN;
 	IC9100_widgets[11].W = sldrPOWER;
+	cmd = pre_to;
+	cmd += '\x1A'; cmd += '\x05';
+	cmd += '\x00'; cmd += '\x58'; cmd += '\x00';
+	cmd.append(post);
+	sendICcommand(cmd,6);
+	checkresponse();
 }
 
 void RIG_IC9100::selectA()
@@ -149,8 +155,7 @@ void RIG_IC9100::selectA()
 	cmd += '\x07';
 	cmd += '\xD0';
 	cmd.append(post);
-	sendICcommand(cmd, 6);
-	checkresponse();
+	waitFB("select A");
 }
 
 void RIG_IC9100::selectB()
@@ -159,8 +164,7 @@ void RIG_IC9100::selectB()
 	cmd += '\x07';
 	cmd += '\xD1';
 	cmd.append(post);
-	sendICcommand(cmd, 6);
-	checkresponse();
+	waitFB("select B");
 }
 
 void RIG_IC9100::set_modeA(int val)
@@ -172,24 +176,22 @@ void RIG_IC9100::set_modeA(int val)
 	cmd.append( post );
 	if (IC9100_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-	sendICcommand (cmd, 6);
-	checkresponse();
+	waitFB("set mode A");
 // digital set / clear
 	if (A.imode >= 10) {
 		cmd = pre_to;
 		cmd += '\x1A'; cmd += '\x06';
 		switch (A.imode) {
-			case 10 : case 13 : cmd += '\x01'; cmd += '\x01';break;
-			case 11 : case 14 : cmd += '\x02'; cmd += '\x01';break;
-			case 12 : case 15 : cmd += '\x03'; cmd += '\x01';break;
+			case 10 : case 13 : cmd += '\x01'; cmd += '\x01'; break;
+			case 11 : case 14 : cmd += '\x01'; cmd += '\x02'; break;
+			case 12 : case 15 : cmd += '\x01'; cmd += '\x03'; break;
 			default :
 				cmd += '\x00'; cmd += '\x00';
 		}
 		cmd.append( post);
 		if (IC9100_DEBUG)
 			LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-		sendICcommand (cmd, 6);
-		checkresponse();
+		waitFB("set digital");
 	}
 }
 
@@ -199,23 +201,28 @@ int RIG_IC9100::get_modeA()
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
-	if (sendICcommand (cmd, 8 )) {
+	string resp = pre_fm;
+	resp += '\x04';
+	if (waitFOR(8, "get mode A")) {
 		for (md = 0; md < 10; md++) if (replystr[5] == IC9100_mode_nbr[md]) break;
-		if (md == 10) md = 0;
-		A.imode = md;
-	} else
+		if (md >= 10) md = 0;
+	} else {
 		checkresponse();
+		return A.imode;
+	}
 	if (md == 0 || md == 1) {
 		cmd = pre_to;
-		cmd += '\x1A'; cmd += '\x06';
+		cmd.append("\x1a\x06");
 		cmd.append(post);
-		if (sendICcommand(cmd, 9)) {
-			if (replystr[6] > 0 && A.imode < 2) {
-				if (replystr[6] < 4)
-					A.imode = 9 + A.imode * 3 + replystr[6];
+		resp = pre_fm;
+		resp.append("\x1a\x06");
+		if (waitFOR(9, "get digital setting")) {
+			if (replystr[6] == 1 && replystr[7] > 0)
+				md = (md ? 13 : 10) + replystr[7];
 			}
-		}
 	}
+	if (md > 15) md = 0;
+	A.imode = md;
 	return A.imode;
 }
 
@@ -228,24 +235,22 @@ void RIG_IC9100::set_modeB(int val)
 	cmd.append( post );
 	if (IC9100_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-	sendICcommand (cmd, 6);
-	checkresponse();
+	waitFB("set mode B");
 // digital set / clear
 	if (B.imode >= 10) {
 		cmd = pre_to;
 		cmd += '\x1A'; cmd += '\x06';
 		switch (B.imode) {
-			case 10 : case 13 : cmd += '\x01'; cmd += '\x01';break;
-			case 11 : case 14 : cmd += '\x02'; cmd += '\x01';break;
-			case 12 : case 15 : cmd += '\x03'; cmd += '\x01';break;
+			case 10 : case 13 : cmd += '\x01'; cmd += '\x01'; break;
+			case 11 : case 14 : cmd += '\x01'; cmd += '\x02'; break;
+			case 12 : case 15 : cmd += '\x01'; cmd += '\x03'; break;
 			default :
 				cmd += '\x00'; cmd += '\x00';
 		}
 		cmd.append( post);
 		if (IC9100_DEBUG)
 			LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-		sendICcommand (cmd, 6);
-		checkresponse();
+		waitFB("set digital");
 	}
 }
 
@@ -255,34 +260,43 @@ int RIG_IC9100::get_modeB()
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
-	if (sendICcommand (cmd, 8 )) {
+	string resp = pre_fm;
+	resp += '\x04';
+	if (waitFOR(8, "get mode A")) {
 		for (md = 0; md < 10; md++) if (replystr[5] == IC9100_mode_nbr[md]) break;
-		if (md == 10) md = 0;
-		B.imode = md;
-	} else
+		if (md >= 10) md = 0;
+	} else {
 		checkresponse();
+		return B.imode;
+	}
 	if (md == 0 || md == 1) {
 		cmd = pre_to;
-		cmd += '\x1A'; cmd += '\x06';
+		cmd.append("\x1a\x06");
 		cmd.append(post);
-		if (sendICcommand(cmd, 9)) {
-			if (replystr[6] > 0 && B.imode < 2) {
-				if (replystr[6] < 4)
-					B.imode = 9 + B.imode * 3 + replystr[6];
+		resp = pre_fm;
+		resp.append("\x1a\x06");
+		if (waitFOR(9, "get digital setting")) {
+			if (replystr[6] == 1 && replystr[7] > 0)
+				md = (md ? 13 : 10) + replystr[7];
 			}
-		}
 	}
+	if (md > 15) md = 0;
+	B.imode = md;
 	return B.imode;
 }
 
 int RIG_IC9100::get_bwA()
 {
 	if (A.imode == 5) return 0;
+
 	cmd = pre_to;
 	cmd.append("\x1a\x03");
 	cmd.append(post);
-	if (sendICcommand (cmd, 8)) {
-		A.iBW = fm_bcd(&replystr[6], 2);
+	string resp = pre_fm;
+	resp.append("\x1a\x03");
+	if (waitFOR(8, "get bw A")) {
+		size_t p = replystr.rfind(resp);
+		A.iBW = fm_bcd(&replystr[p+6], 2);
 	}
 	return A.iBW;
 }
@@ -297,18 +311,21 @@ void RIG_IC9100::set_bwA(int val)
 	cmd.append(post);
 	if (IC9100_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-	sendICcommand (cmd, 6);
-	checkresponse();
+	waitFB("set bw A");
 }
 
 int RIG_IC9100::get_bwB()
 {
 	if (B.imode == 5) return 0;
+
 	cmd = pre_to;
 	cmd.append("\x1a\x03");
 	cmd.append(post);
-	if (sendICcommand (cmd, 8)) {
-		B.iBW = fm_bcd(&replystr[6], 2);
+	string resp = pre_fm;
+	resp.append("\x1a\x03");
+	if (waitFOR(8, "get bw A")) {
+		size_t p = replystr.rfind(resp);
+		B.iBW = fm_bcd(&replystr[p+6], 2);
 	}
 	return B.iBW;
 }
@@ -323,8 +340,7 @@ void RIG_IC9100::set_bwB(int val)
 	cmd.append(post);
 	if (IC9100_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-	sendICcommand (cmd, 6);
-	checkresponse();
+	waitFB("set bw B");
 }
 
 int RIG_IC9100::adjust_bandwidth(int m)
@@ -352,9 +368,9 @@ int RIG_IC9100::adjust_bandwidth(int m)
 			bw = 34;
 			break;
 		case 0: case 1: // SSB
-		default:
 		case 10: case 11 : case 12 :
 		case 13: case 14 : case 15 :
+		default:
 			bandwidths_ = IC9100_ssb_bws;
 			bw = 34;
 	}
@@ -404,8 +420,7 @@ void RIG_IC9100::set_mic_gain(int v)
 		cmd.append(to_bcd(ICvol, 3));
 		cmd.append( post );
 	}
-	sendICcommand (cmd, 6);
-	checkresponse();
+	waitFB("set mic gain");
 	if (IC9100_DEBUG)
 		LOG_WARN("%s", str2hex(cmd.data(), cmd.length()));
 }
@@ -426,8 +441,7 @@ void RIG_IC9100::set_attenuator(int val)
 	cmd += '\x11';
 	cmd += cmdval;
 	cmd.append( post );
-	sendICcommand(cmd,6);
-	checkresponse();
+	waitFB("set attenuator");
 	if (IC9100_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
@@ -437,7 +451,9 @@ int RIG_IC9100::get_attenuator()
 	cmd = pre_to;
 	cmd += '\x11';
 	cmd.append( post );
-	if (sendICcommand(cmd,6)) {
+	string resp = pre_fm;
+	resp += '\x11';
+	if (waitFOR(7, "get attenuator")) {
 		if (replystr[5] == 0x20) {
 			atten_level = 1;
 			atten_label("20 dB", true);

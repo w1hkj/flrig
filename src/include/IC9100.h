@@ -95,6 +95,8 @@ public:
 	bool get_notch(int &val);
 	void get_notch_min_max_step(int &min, int &max, int &step);
 
+	const char **bwtable(int m) {return bandwidths_;}
+
 };
 
 #endif
