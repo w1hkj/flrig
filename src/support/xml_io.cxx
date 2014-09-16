@@ -431,7 +431,6 @@ static void push2que()
 		}
 		if (XML_DEBUG)
 			LOG_ERROR("pushed to B %s", print(xmlvfo));
-//printf("pushed to B %s\n", print(xmlvfo));
 		guard_lock gl_xmlqueB(&mutex_queB, 101);
 		queB.push(xmlvfo);
 	} else {
@@ -442,7 +441,6 @@ static void push2que()
 		}
 		if (XML_DEBUG)
 			LOG_ERROR("pushed to A %s", print(xmlvfo));
-//printf("pushed to A %s\n", print(xmlvfo));
 		guard_lock gl_xmlqueA(&mutex_queA, 102);
 		queA.push(xmlvfo);
 	}
@@ -477,8 +475,6 @@ static void send_rig_info()
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
 			LOG_ERROR("%s", e.getMessage().c_str());
-		else
-			LOG_WARN("%s", e.getMessage().c_str());
 		throw e;
 	}
 }
@@ -521,8 +517,6 @@ static void get_fldigi_status()
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
 			LOG_ERROR("%s", e.getMessage().c_str());
-		else
-			LOG_WARN("%s", e.getMessage().c_str());
 		throw e;
 	}
 	try {
@@ -534,8 +528,6 @@ static void get_fldigi_status()
 	} catch (const XmlRpc::XmlRpcException& e) {
 		if (XML_DEBUG)
 			LOG_ERROR("%s", e.getMessage().c_str());
-		else
-			LOG_WARN("%s", e.getMessage().c_str());
 		throw e;
 	}
 }
@@ -561,8 +553,6 @@ void * digi_loop(void *d)
 		} catch (const XmlRpc::XmlRpcException& e) {
 			if (XML_DEBUG)
 				LOG_ERROR("%s", e.getMessage().c_str());
-			else
-				LOG_WARN("%s", e.getMessage().c_str());
 			fldigi_online = false;
 			rig_reset = false;
 			try_count = CHECK_UPDATE_COUNT;

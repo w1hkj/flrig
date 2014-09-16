@@ -722,22 +722,26 @@ void RIG_FT450D::get_if_min_max_step(int &min, int &max, int &step)
 void RIG_FT450D::set_notch(bool on, int val)
 {
 	cmd = "BP00000;";
-	if (on == false) {
-		sendCommand(cmd);
-		showresp(WARN, ASC, "SET notch off", cmd, replystr);
-		notch_on = false;
+	if (!on) {
+		if (notch_on) {
+			sendCommand(cmd);
+			showresp(WARN, ASC, "SET notch off", cmd, replystr);
+			notch_on = false;
+		}
 		return;
 	}
-	cmd[6] = '1';
-	sendCommand(cmd);
-	showresp(WARN, ASC, "SET notch on", cmd, replystr);
-	notch_on = true;
 
-	cmd[3] = '1'; // manual NOTCH position
-	cmd[6] = '0';
-	val = val / 10 + 200;
+	cmd = "BP00001;";
+	if (!notch_on) {
+		sendCommand(cmd);
+		showresp(WARN, ASC, "SET notch on", cmd, replystr);
+		notch_on = true;
+	}
+
+	cmd = "BP01nnn;";
+	val = val / 10;
 	for (int i = 3; i > 0; i--) {
-		cmd[3 + i] += val % 10;
+		cmd[3 + i] = val % 10 + '0';
 		val /=10;
 	}
 	sendCommand(cmd);
@@ -762,18 +766,19 @@ bool  RIG_FT450D::get_notch(int &val)
 		cmd += ';';
 		waitN(8, 100, "get notch val", ASC);
 		p = replystr.rfind(rsp);
-		if (p == string::npos) return ison;
+		if (p == string::npos || rsp.length() < 8) return ison;
 		val = atoi(&replystr[p+4]);
-		val = (val - 200) * 10;
+		val = val * 10;
 	}
+	notch_on = ison;
 	return ison;
 }
 
 void RIG_FT450D::get_notch_min_max_step(int &min, int &max, int &step)
 {
-	min = -1990;
-	max = +2000;
-	step = 100;
+	min = 10;
+	max = 4000;
+	step = 10;
 }
 
 void RIG_FT450D::set_noise(bool b)
