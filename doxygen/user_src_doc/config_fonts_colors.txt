@@ -5,7 +5,7 @@
 
 
 <center>
-\image latex colors-dialog.eps "" width=4.25in
+\image latex colors-dialog.png "" width=4.25in
 \image html colors-dialog.png ""
 </center>
 <br>
@@ -36,7 +36,7 @@ C:\Users\<usr>\FLRIG.files
 The prefs file for the TT-550 Pegasus would be TT-550.prefs.
 
 <center>
-\image latex yellow-on-black.eps "" width=5.5in
+\image latex yellow-on-black.png "" width=5.5in
 \image html yellow-on-black.png ""
 </center>
 <br>
@@ -75,7 +75,7 @@ ui_scheme:gtk+
 <br>
 
 <center>
-\image latex FT950-bold-plastic.eps "" width=5.5in
+\image latex FT950-bold-plastic.png "" width=5.5in
 \image html FT950-bold-plastic.png ""
 </center>
 <br>

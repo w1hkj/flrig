@@ -4,7 +4,7 @@
 \tableofcontents
 
 <center>
-\image latex TT550.eps "FLRIG - TT550" width=4.32in
+\image latex TT550.png "FLRIG - TT550" width=4.32in
 \image html TT550.png "FLRIG - TT550"
 </center>
 <br>
@@ -34,7 +34,7 @@ mode operations.
 
 
 <center>
-\image latex TT550-init.eps "I/O Ports - Primary" width=4.9in
+\image latex TT550-init.png "I/O Ports - Primary" width=4.9in
 \image html TT550-init.png "I/O Ports - Primary"
 </center>
 <br>
@@ -59,7 +59,7 @@ Access to the additional controls is obtained by the down arrow button to
 the left of the Att control.
 
 <center>
-\image latex TT550-CW.eps "TT550 - CW" width=4.34in
+\image latex TT550-CW.png "TT550 - CW" width=4.34in
 \image html TT550-CW.png "TT550 - CW"
 </center>
 <br>
@@ -76,7 +76,7 @@ front panel.  This volume is also relative to the receiver volume control.
 \subsection ssVOX VOX
 
 <center>
-\image latex TT550-VOX.eps "TT550 - VOX" width=4.26in
+\image latex TT550-VOX.png "TT550 - VOX" width=4.26in
 \image html TT550-VOX.png "TT550 - VOX"
 </center>
 <br>
@@ -87,7 +87,7 @@ Vox controls are controlled IAW the 550 manual.
 \subsection ssSpeech Speech
 
 <center>
-\image latex TT550-SPCH.eps "TT550 - Speech" width=4.24in
+\image latex TT550-SPCH.png "TT550 - Speech" width=4.24in
 \image html TT550-SPCH.png "TT550 - Speech"
 </center>
 <br>
@@ -108,7 +108,7 @@ Pegasus has the built-in tuner it can be bypassed.
 \subsection ssAudio Audio
 
 <center>
-\image latex TT550-AUDIO.eps "TT550 - Audio" width=4.27in
+\image latex TT550-AUDIO.png "TT550 - Audio" width=4.27in
 \image html TT550-AUDIO.png "TT550 - Audio"
 </center>
 <br>
@@ -120,7 +120,7 @@ be controlled independent of the speaker.
 \subsection ssRX RX
 
 <center>
-\image latex TT550-RX.eps "TT550 - Receive" width=4.23in
+\image latex TT550-RX.png "TT550 - Receive" width=4.23in
 \image html TT550-RX.png "TT550 - Receive"
 </center>
 <br>
@@ -132,7 +132,7 @@ VFO adjustment control.
 \subsection ssTX TX
 
 <center>
-\image latex TT550-TX.eps "TT550 - Transmit" width=4.25in
+\image latex TT550-TX.png "TT550 - Transmit" width=4.25in
 \image html TT550-TX.png "TT550 - Transmit"
 </center>
 <br>
@@ -144,7 +144,7 @@ VFO adjustment control.
 \subsection ss302A 302A
 
 <center>
-\image latex TT550-302A.eps "TT550 - 302A" width=4.25in
+\image latex TT550-302A.png "TT550 - 302A" width=4.25in
 \image html TT550-302A.png "TT550 - 302A"
 </center>
 <br>
@@ -154,7 +154,7 @@ parameters to adjust it's performance.  The function keys can be assigned
 on of several response functions:
 
 <center>
-\image latex fkey-choices.eps "" width=0.96in
+\image latex fkey-choices.png "" width=0.96in
 \image html fkey-choices.png ""
 </center>
 <br>
@@ -167,7 +167,7 @@ box at the upper right of the main dialog.  These are used for entering
 a frequency in kHz (i.e. 14.070 MHz is entered as 14070.000).
 
 <center>
-\image latex fkey-entry.eps "" width=1.66in
+\image latex fkey-entry.png "" width=1.66in
 \image html fkey-entry.png ""
 </center>
 <br>

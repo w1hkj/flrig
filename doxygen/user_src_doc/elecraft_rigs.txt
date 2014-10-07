@@ -2,12 +2,12 @@
 \page elecraft_rigs  Supported Elecraft Transceivers
 \anchor ek_k2_a
 <center>
-\image latex K2.eps "K2" width=3.75in
+\image latex K2.png "K2" width=3.75in
 \image html  K2.png "K2"
 </center>
 \anchor ek_k3_a
 <center>
-\image latex K3.eps "K3" width=3.75in
+\image latex K3.png "K3" width=3.75in
 \image html  K3.png "K3"
 </center>
 \ref elecraft_rigs "Page Top"

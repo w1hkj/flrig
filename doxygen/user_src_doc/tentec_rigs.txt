@@ -2,42 +2,42 @@
 \page tentec_rigs  Supported TenTec Transceivers
 \anchor tt_516_a
 <center>
-\image latex TT516.eps "TT 516" width=3.75in
+\image latex TT516.png "TT 516" width=3.75in
 \image html  TT516.png "TT 516"
 </center>
 \anchor tt_535_a
 <center>
-\image latex TT535.eps "TT 535" width=3.75in
+\image latex TT535.png "TT 535" width=3.75in
 \image html  TT535.png "TT 535"
 </center>
 \anchor tt_538_a
 <center>
-\image latex TT538.eps "TT 538" width=3.75in
+\image latex TT538.png "TT 538" width=3.75in
 \image html  TT538.png "TT 538"
 </center>
 \anchor tt_550_a
 <center>
-\image latex TT550.eps "TT 550" width=3.75in
+\image latex TT550.png "TT 550" width=3.75in
 \image html  TT550.png "TT 550"
 </center>
 \anchor tt_omni6_a
 <center>
-\image latex OmniVI.eps "Omni VI" width=3.75in
+\image latex OmniVI.png "Omni VI" width=3.75in
 \image html  OmniVI.png "Omni VI"
 </center>
 \anchor tt_566_a
 <center>
-\image latex TT566.eps "TT 566" width=3.75in
+\image latex TT566.png "TT 566" width=3.75in
 \image html  TT566.png "TT 566"
 </center>
 \anchor tt_omni7_a
 <center>
-\image latex OmniVII.eps "Omni VII" width=3.75in
+\image latex OmniVII.png "Omni VII" width=3.75in
 \image html  OmniVII.png "Omni VII"
 </center>
 \anchor tt_599_a
 <center>
-\image latex TT599.eps "TT 599" width=3.75in
+\image latex TT599.png "TT 599" width=3.75in
 \image html  TT599.png "TT 599"
 </center>
 \ref tentec_rigs "Page Top"

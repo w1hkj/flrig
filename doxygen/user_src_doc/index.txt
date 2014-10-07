@@ -23,7 +23,7 @@
 \tableofcontents
 
 <center>
-\image latex flriglogo.eps "" width=0.5in
+\image latex flriglogo.png "" width=0.5in
 \image html flriglogo.png ""
 </center>
 
@@ -43,20 +43,29 @@ in width and height.
 \anchor ft950_rig_anchor
 
 <center>
-\image latex FT-950.eps "" width=7.5in
+\image latex FT-950.png "" width=6in
 \image html FT-950.png ""
 </center>
 <br>
 
 <center>
-\image latex FT-950-2.eps "" width=4.3in
+\image latex FT-950-2.png "" width=4.3in
 \image html FT-950-2.png ""
 </center>
 <br>
 
 <center>
-\image latex FT-950-4.eps "" width=4.3in
+\image latex FT-950-4.png "" width=4.3in
 \image html FT-950-4.png ""
+</center>
+<br>
+
+A fourth interface is available for all transceivers.  It is suitable for use on
+a touch screen
+
+<center>
+\image latex FT-950-touch.png "Shown at 75% of full size" width=6in
+\image html FT-950-touch.png "Shown at 75% of full size"
 </center>
 <br>
 
@@ -72,17 +81,18 @@ additional libraries or definition files are required.
 |:----------------:|:------------------------------------:|:----------------------------:|:-----------------------:|:------------------------------:|:--------------------------:|
 |\ref ek_k2_a "K2" |\ref icom_703_a "IC-703"              |\ref kwd_ts140_a "TS 140"     |\ref tt_516_a   "TT 516" |\ref yaesu_100d_a "FT 100D"     |\ref o_pcr1000_a "PCR 1000" |
 |\ref ek_k3_a "K3" |\ref icom_706mk2g_a "IC 706 MK IIG"   |\ref kwd_ts450s_a "TS 450"    |\ref tt_535_a   "TT 535" |\ref yaesu_450_a "FT-450"       |\ref o_ray152_a  "RAY 152"  |
-|<br>              |\ref icom_718_a "IC-718"              |\ref kwd_ts480hx_a "TS 480HX" |\ref tt_538_a   "TT 538" |\ref yaesu_747gx_a "FT 747GX"   |<br>                        |
-|<br>              |\ref icom_728_a "IC 728"              |\ref kwd_ts570_a   "TS 570"   |\ref tt_550_a   "TT 550" |\ref yaesu_767_a  "FT 767"      |<br>                        |
-|<br>              |\ref icom_735_a "IC 735"              |\ref kwd_ts590s_a  "TS 590S"  |\ref tt_omni6_a "TT 563" |\ref yaesu_817_a "FT 817"       |<br>                        |
-|<br>              |\ref icom_746_a "IC 746"              |\ref kwd_ts990_a   "TS 990"   |\ref tt_566_a   "TT 566" |\ref yaesu_847_a "FT 847"       |<br>                        |
-|<br>              |\ref icom_746pro_a "IC 746 Pro"       |\ref kwd_ts2000_a  "TS 2000"  |\ref tt_omni7_a "TT 588" |\ref yaesu_857d_a "FT 857D"     |<br>                        |
-|<br>              |\ref icom_756pro2_a "IC 756 Pro II"   |<br>                          |\ref tt_599_a   "TT 599" |\ref yaesu_897d_a "FT 897D"     |<br>                        |
-|<br>              |\ref icom_756pro3_a "IC 756 Pro III"  |<br>                          |<br>                     |\ref yaesu_950_a "FT-950"       |<br>                        |
-|<br>              |\ref icom_910h_a "IC 910H"            |<br>                          |<br>                     |\ref yaesu_1000mp_a "FT-1000MP" |<br>                        |
-|<br>              |\ref icom_7000_a "IC 7000"            |<br>                          |<br>                     |\ref yaesu_2000_a "FT 2000"     |<br>                        |
-|<br>              |\ref icom_7100_a "IC 7100"            |<br>                          |<br>                     |\ref yaesu_1200dx_a "FTdx1200"  |<br>                        |
-|<br>              |\ref icom_7200_a "IC 7200"            |<br>                          |<br>                     |\ref yaesu_3000dx_a "FTdx3000"  |<br>                        |
+|<br>              |\ref icom_718_a "IC-718"              |\ref kwd_ts480hx_a "TS 480HX" |\ref tt_538_a   "TT 538" |\ref yaesu_450d_a "FT-450D"     |<br>                        |
+|<br>              |\ref icom_728_a "IC 728"              |\ref kwd_ts570_a   "TS 570"   |\ref tt_550_a   "TT 550" |\ref yaesu_747gx_a "FT 747GX"   |<br>                        |
+|<br>              |\ref icom_735_a "IC 735"              |\ref kwd_ts590s_a  "TS 590S"  |\ref tt_omni6_a "TT 563" |\ref yaesu_767_a  "FT 767"      |<br>                        |
+|<br>              |\ref icom_746_a "IC 746"              |\ref kwd_ts990_a   "TS 990"   |\ref tt_566_a   "TT 566" |\ref yaesu_817_a "FT 817"       |<br>                        |
+|<br>              |\ref icom_746pro_a "IC 746 Pro"       |\ref kwd_ts2000_a  "TS 2000"  |\ref tt_omni7_a "TT 588" |\ref yaesu_847_a "FT 847"       |<br>                        |
+|<br>              |\ref icom_756pro2_a "IC 756 Pro II"   |<br>                          |\ref tt_599_a   "TT 599" |\ref yaesu_857d_a "FT 857D"     |<br>                        |
+|<br>              |\ref icom_756pro3_a "IC 756 Pro III"  |<br>                          |<br>                     |\ref yaesu_897d_a "FT 897D"     |<br>                        |
+|<br>              |\ref icom_910h_a "IC 910H"            |<br>                          |<br>                     |\ref yaesu_950_a "FT-950"       |<br>                        |
+|<br>              |\ref icom_7000_a "IC 7000"            |<br>                          |<br>                     |\ref yaesu_1000mp_a "FT-1000MP" |<br>                        |
+|<br>              |\ref icom_7100_a "IC 7100"            |<br>                          |<br>                     |\ref yaesu_2000_a "FT 2000"     |<br>                        |
+|<br>              |\ref icom_7200_a "IC 7100"            |<br>                          |<br>                     |\ref yaesu_1200dx_a "FTdx1200"  |<br>                        |
+|<br>              |\ref icom_7410_a "IC 7410"            |<br>                          |<br>                     |\ref yaesu_3000dx_a "FTdx3000"  |<br>                        |
 |<br>              |\ref icom_7600_a "IC 7600"            |<br>                          |<br>                     |\ref yaesu_5000dx_a "FTdx5000"  |<br>                        |
 |<br>              |\ref icom_7700_a "IC 7700"            |<br>                          |<br>                     |<br>                            |<br>                        |
 
@@ -93,7 +103,7 @@ additional libraries or definition files are required.
 Select the transceiver with the "Config / Xcvr select" menu item.
 
 <center>
-\image latex config-menu.eps "" width=1.6in
+\image latex config-menu.png "" width=1.6in
 \image html config-menu.png ""
 </center>
 <br>
@@ -116,7 +126,7 @@ Check:
 \subsection ssXcvrSelect Xcvr Select
 
 <center>
-\image latex primary.eps "I/O Ports - Primary" width=4.9in
+\image latex primary.png "I/O Ports - Primary" width=4.9in
 \image html primary.png "I/O Ports - Primary"
 </center>
 <br>
@@ -138,7 +148,7 @@ serial port.
 
 
 <center>
-\image latex ptt.eps "I/O Ports - PTT" width=4.9in
+\image latex ptt.png "I/O Ports - PTT" width=4.9in
 \image html ptt.png "I/O Ports - PTT"
 </center>
 <br>
@@ -147,13 +157,13 @@ Your PTT h/w control may also make use of a second serial port.
 
 
 <center>
-\image latex aux.eps "I/O Ports - Aux" width=4.9in
+\image latex aux.png "I/O Ports - Aux" width=4.9in
 \image html aux.png "I/O Ports - Aux"
 </center>
 <br>
 
 <center>
-\image latex aux-controls.eps "Aux Controls" width=3.45in
+\image latex aux-controls.png "Aux Controls" width=3.45in
 \image html aux-controls.png "Aux Controls"
 </center>
 <br>
@@ -164,7 +174,7 @@ main dialog controls are enabled and shown if you select anything other than
 NONE (the default) on this tab.
 
 <center>
-\image latex polling.eps "I/O Ports - Polling" width=4.9in
+\image latex polling.png "I/O Ports - Polling" width=4.9in
 \image html polling.png "I/O Ports - Polling"
 </center>
 <br>
@@ -176,7 +186,7 @@ or control.  The polling cycle will slow down as you elect to poll more and
 more values.
 
 <center>
-\image latex send-cmd.eps "I/O Ports - Polling" width=4.9in
+\image latex send-cmd.png "I/O Ports - Polling" width=4.9in
 \image html send-cmd.png "I/O Ports - Polling"
 </center>
 <br>
@@ -205,38 +215,54 @@ Icom: xFE xFE x70 xE0 x1A x05 x00 x92 x00 xFD
 Press the SEND button to transfer the command to the transceiver.  The
 response will appear in the lower text control.
 
-<center>
-\image latex FT-950-3.eps "FLRIG - FT950" width=4.25in
-\image html FT-950-3.png "FLRIG - FT950"
-</center>
-<br>
+Select the toggle button "Small sliders" on the Config menu for 1/2 size
+sliders and a dialog layout that uses less vertical space.
 
 <center>
-\image latex FT950-CW.eps "FT950 CW" width=4.25in
-\image html FT950-CW.png "FT950 CW"
-\image latex FT950-VOX.eps "FT950 Vox" width=4.25in
-\image html FT950-VOX.png "FT950 Vox"
-\image latex FT950-SPCH.eps "FT950 SPCH" width=4.25in
-\image html FT950-SPCH.png "FT950 SPCH"
-\image latex FT950-MISC.eps "FT950 MISC" width=4.25in
-\image html FT950-MISC.png "FT950 MISC"
+\image latex ft950-small.png "FT950 Minimal" width=4.32in
+\image html ft950-small.png "FT950 Minimal"
 </center>
-<br>
 
 Additional control settings may be available depending on the transceiver
 being controlled.  These are in a drop-down area toggled by the arrow button
 to the left of the attenuator button on the small aspect ratio dialog view.
 These are the controls for the Yeasu FT950.
 
-
 <center>
-\image latex ft950-small.eps "FT950 Minimal" width=4.32in
-\image html ft950-small.png "FT950 Minimal"
+\image latex FT-950-3.png "FLRIG - FT950" width=4.25in
+\image html FT-950-3.png "FLRIG - FT950"
 </center>
 <br>
+<center>
+\image latex FT950-CW.png "FT950 CW" width=4.25in
+\image html FT950-CW.png "FT950 CW"
+\image latex FT950-VOX.png "FT950 Vox" width=4.25in
+\image html FT950-VOX.png "FT950 Vox"
+\image latex FT950-SPCH.png "FT950 SPCH" width=4.25in
+\image html FT950-SPCH.png "FT950 SPCH"
+\image latex FT950-MISC.png "FT950 MISC" width=4.25in
+\image html FT950-MISC.png "FT950 MISC"
+</center>
 
-Select the toggle button "Small sliders" on the Config menu for 1/2 size
-sliders and a dialog layout that uses less vertical space.
+For the FT-450D, these control when accessed from the "touch" user interface 
+scheme appear as:
+
+\image latex touch-main.png "FT-450D main panel" width = 6in
+\image html  touch-main.png "FT-450D main panel"
+\image latex touch-buttons.png "FT-450D button panel" width = 6in
+\image html  touch-buttons.png "FT-450D button panel"
+\image latex touch-sliders.png "FT-450D sliders panel" width = 6in
+\image html  touch-sliders.png "FT-450D sliders panel"
+\image latex touch-other-bands.png "FT-450D 'Bands' panel" width = 6in
+\image html  touch-other-bands.png "FT-450D 'Bands' panel"
+\image latex touch-other-cw.png "FT-450D CW panel" width = 6in
+\image html  touch-other-cw.png "FT-450D CW panel"
+\image latex touch-other-qsk.png "FT-450D QSK panel" width = 6in
+\image html  touch-other-qsk.png "FT-450D QSK panel"
+\image latex touch-other-vox.png "FT-450D VOX panel" width = 6in
+\image html  touch-other-vox.png "FT-450D VOX panel"
+\image latex touch-other-misc.png "FT-450D MISC panel" width = 6in
+\image html  touch-other-misc.png "FT-450D MISC panel"
 
 \subsection ssUserInterface User Interface
 
@@ -244,7 +270,7 @@ sliders and a dialog layout that uses less vertical space.
 <br>
 
 <center>
-\image latex power-scale-select.eps "Meter Scale" width=4.6in
+\image latex power-scale-select.png "Meter Scale" width=4.6in
 \image html power-scale-select.png "Meter Scale"
 </center>
 <br>
@@ -261,7 +287,7 @@ might want to fix the scale to either the larger or smaller.
 
 
 <center>
-\image latex frequency-control.eps "Frequency Control" width=4.6in
+\image latex frequency-control.png "Frequency Control" width=4.6in
 \image html frequency-control.png "Frequency Control"
 </center>
 <br>
@@ -292,7 +318,7 @@ frequency values using the arrow and page key buttons:
 <br>
 
 <center>
-\image latex buttons-sliders.eps "Control Sliders" width=2.24in
+\image latex buttons-sliders.png "Control Sliders" width=2.24in
 \image html buttons-sliders.png "Control Sliders"
 </center>
 <br>
@@ -304,7 +330,7 @@ the volume control is active and the NR control is inactive.
 <br>
 
 <center>
-\image latex flrig-fldigi.eps "FLRIG/FLDIGI" width=4.37in
+\image latex flrig-fldigi.png "FLRIG/FLDIGI" width=4.37in
 \image html flrig-fldigi.png "FLRIG/FLDIGI"
 </center>
 <br>
@@ -323,13 +349,13 @@ from either FLDIGI or FLRIG.  The two programs will remain synchronized.  The
 data from the computer to the transceiver is always from FLRIG.
 
 PTT can be activated at FLRIG or using the T/R button on FLDIGI.  FLDIGI
-also engages the PTT via the macro <TX> <RX> tags.  When operating digital
+also engages the PTT via the macro \<TX\> \<RX\> tags.  When operating digital
 modes with FLDIGI you should use the PTT from FLDIGI.
 
 \subsection ssMeterFiltering Meter Filtering
 
 <center>
-\image latex meter-filters.eps "Meter Filter Controls" width=4.18in
+\image latex meter-filters.png "Meter Filter Controls" width=4.18in
 \image html meter-filters.png "Meter Filter Controls"
 </center>
 <br>
@@ -343,7 +369,7 @@ peak value over the last M readings.
 
 
 <center>
-\image latex flrig-event-log.eps "Event Log" width=7.5in
+\image latex flrig-event-log.png "Event Log" width=7.5in
 \image html flrig-event-log.png "Event Log"
 </center>
 <br>
@@ -356,7 +382,7 @@ transceiver.
 \subsection ssMultipleConfigDir Multiple Configuration Directories
 
 <center>
-\image latex mulitple_configs.eps "" width=2.48in
+\image latex mulitple_configs.png "" width=2.48in
 \image html mulitple_configs.png ""
 </center>
 <br>

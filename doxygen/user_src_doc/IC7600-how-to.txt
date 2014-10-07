@@ -6,7 +6,7 @@
 <b>Submitted by Andy - VE3NVK / G8VTV</b>
 
 <center>
-\image latex ic7600-config.eps "" width=5.5in
+\image latex ic7600-config.png "" width=5.5in
 \image html ic7600-config.png ""
 </center>
 

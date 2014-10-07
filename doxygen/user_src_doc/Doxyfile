@@ -19,10 +19,12 @@ ALLEXTERNALS         = NO
 CASE_SENSE_NAMES     = NO
 DISABLE_INDEX        = NO
 DOXYFILE_ENCODING    = UTF-8
+INPUT_ENCODING       = UTF-8
 ENABLE_PREPROCESSING = NO
 ENABLED_SECTIONS     = logo_on
 EXTRACT_ALL          = NO
 EXTRACT_PRIVATE      = NO
+EXTRA_PACKAGES       = graphicx caption subcaption float
 FILE_PATTERNS        = *.cpp *.h *.doc *.txt
 GENERATE_HTML        = YES
 GENERATE_HTMLHELP    = NO
@@ -45,6 +47,8 @@ INPUT                = index.txt \
                        tentec_rigs.txt \
                        yaesu_rigs.txt \
                        other_rigs.txt
+INCLUDE_PATH         = .
+EXAMPLE_PATH         = .
 OUTPUT_DIRECTORY     = ../../doc/user_docs
 OUTPUT_LANGUAGE      = English
 PDF_HYPERLINKS       = YES

@@ -7,6 +7,7 @@ PRG_NAME="FLRig"
 LATEX="0"
 DOXY="0"
 BUILD_PROG_DOCS="0"
+BUILD_USER_DOCS="0"
 
 if [ -z $1 ]; then
 	BUILD_USER_DOCS="1"
