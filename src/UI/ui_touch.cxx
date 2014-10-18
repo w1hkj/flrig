@@ -24,7 +24,7 @@ void cbBUTTONS(Fl_Widget *, void *);
 void cbOTHER(Fl_Widget *, void *);
 
 Fl_Menu_Item touch_menu[] = {
- {_("&Files"), 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("&File"), 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
  {_("E&xit"), 0,  (Fl_Callback*)cb_mnuExit, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
  {_("&Config"), 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
