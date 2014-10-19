@@ -25,7 +25,7 @@ static const char FT100Dname_[] = "FT-100D";
 static const char *FT100Dmodes_[] = 
 { "LSB", "USB", "CW", "CW-R", "AM", "DIG", "FM", "W-FM", NULL};
 
-static const int FT100D_def_bw[] = { 2, 2, 1, 1, 3, 2, 2, 3 };
+static const int FT100D_def_bw[] = { 2, 2, 1, 1, 3, 1, 2, 3 };
 
 static const int FT100D_mode_val[] =
 { 0, 1, 2, 3, 4, 5, 6, 7 };
