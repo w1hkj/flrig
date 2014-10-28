@@ -36,7 +36,7 @@ AC_CANONICAL_HOST
 # define target, target_cpu, target_vendor, target_os
 AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE([-Wall foreign std-options 1.9.6])
+AM_INIT_AUTOMAKE([-Wall foreign std-options subdir-objects 1.9.6])
 
 #change the next config item for the specific application src's
 AC_CONFIG_SRCDIR([src/main.cxx])
