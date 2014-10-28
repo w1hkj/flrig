@@ -303,8 +303,13 @@ void RIG_FT950::set_vfoB (long freq)
 void RIG_FT950::setVfoAdj(double v)
 {
 	char cmdstr[20];
-	snprintf(cmdstr, sizeof(cmdstr), "EX035%+03d;", (int)v);
-	cmd = cmdstr;
+	int iv = fabs(v);
+	snprintf(cmdstr, sizeof(cmdstr), "%02d", iv);
+	cmd = "EX035";
+	if (v < 0) cmd += '-';
+	else cmd += '+';
+	cmd.append(cmdstr);
+	cmd.append(";");
 	sendCommand(cmd);
 }
 

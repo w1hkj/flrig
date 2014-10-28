@@ -4129,6 +4129,7 @@ void cb_auto_notch()
 
 void cb_vfo_adj()
 {
+	progStatus.vfo_adj = spnr_vfo_adj->value();
 	guard_lock serial_lock(&mutex_serial, 83);
 	selrig->setVfoAdj(progStatus.vfo_adj);
 }
