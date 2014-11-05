@@ -292,12 +292,13 @@ might want to fix the scale to either the larger or smaller.
 </center>
 <br>
 
-The frequency display is also a control.  Each numeric is sensitive to mouse
+The frequency display is also a control.  Each numeric is sensitive to the mouse
 left/right buttons for up/down and to the mouse scroll wheel for rapidly
-changing value.  Put the mouse over any of the numeric segments and you
-can enter a new frequency using the keyboard numeric keypad.  If you make an
-error simply enter a non-numeric key.  Set the newly entered frequency by
-pressing the Enter key.
+changing value.  Click on upper half of the digit to increase frequency, and
+the lower half of the digit to decrease the frequency. Put the mouse over any of 
+the numeric segments and you can enter a new frequency using the keyboard 
+numeric keypad.  If you make an error simply enter a non-numeric key.  Set the 
+newly entered frequency by pressing the Enter key.
 
 To paste a frequency from the clipboard (kHz only), press control-V followed
 by the Enter key
