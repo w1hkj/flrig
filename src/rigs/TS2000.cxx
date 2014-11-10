@@ -24,7 +24,7 @@
 static const char TS2000name_[] = "TS-2000";
 
 static const char *TS2000modes_[] = {
-	"LSB", "USB", "CW", "FM", "AM", "FSK", "CW-R", "FSK-R", "DIGI-L", "DIGI-U", NULL};
+	"LSB", "USB", "CW", "FM", "AM", "FSK", "CW-R", "FSK-R", NULL};
 
 static const char TS2000_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '9' };
 static const char TS2000_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'U' };
