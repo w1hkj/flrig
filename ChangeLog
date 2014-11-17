@@ -1,18 +1,30 @@
 
 
+=Version 1.3.18=
+
+2014-11-14  David Freese  <iam_w1hkj@w1hkj.com>
+
+	cb03871: fltk 1.3.3
+	d488690: TS2000
+	83691fc: Docs
+	b85fbff: subdir objects
+	696b824: FT950 Osc adjust
+	ed5a6ea: FT100D
+	bc3fd65: File versus Files
+
+
 =Version 1.3.17=
 
-2014-09-16  David Freese  <w1hkj@w1hkj.com>
-
-	b19f0a0: FT450D Notch
-	4dd618f: IC-9100 update
-	908cb18: Power meter remote
-	da1795a: Smeter remote
-	bf0449a: touch panel
+	b5721aa: Documentation update
+	506125a: FT450D Notch
+	1d38b34: IC-9100 update
+	c634a85: Power meter remote
+	c678b79: Smeter remote
+	9f8aeca: touch panel
 	da7068a: xml-fix
-	5348f87: FT450D
-	93f9377: Freq Control
-	5838a12: IC 7410
+	f25bd7c: FT450D
+	1cf4388: Freq Control
+	e94924e: IC 7410
 
 2014-06-12  Robert Stiles  <kk5vd@yahoo.com>
 
