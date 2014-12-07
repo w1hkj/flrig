@@ -17,18 +17,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
-/*
- * Changes for the TS-870S March 2012, Dave Baxter, G0WBX
-/
-
- /* Todo:
- * Look at:-												(Example)
- * Autonotch control:- 	(SSB Only on the 870S)				(TS-2000)
- * Noise Reduction control:- 								(IC-7700)
- * Extra controls for speach compressor etc:- 				(IC-9100 (and others))
- * Misc controls auto rig on/off with flrig startup/quit:-	(FT-450/950) (PS0; PS1;)
- * Check Autotune action, and any 'busy' status.
- */
+//
+// Changes for the TS-870S March 2012, Dave Baxter, G0WBX
+//
+// Todo:
+// Look at:-												(Example)
+// Autonotch control:- 	(SSB Only on the 870S)				(TS-2000)
+// Noise Reduction control:- 								(IC-7700)
+// Extra controls for speach compressor etc:- 				(IC-9100 (and others))
+// Misc controls auto rig on/off with flrig startup/quit:-	(FT-450/950) (PS0; PS1;)
+// Check Autotune action, and any 'busy' status.
 
 #include "config.h"
 #include "TS870S.h"
@@ -45,6 +43,7 @@ static const char TS870S_mode_type[] = { 'L',   'U',   'U',  'U',  'U',  'L',   
 static const char *TS870S_empty[] = { "N/A", NULL };
 
 //----------------------------------------------------------------------
+static int DEF_lo_hi = 0x8704;
 static const char *TS870S_SSB_lo[] = { 			// MD1; and MD2;
   "0",   "50", "100", "200", "300", 			// Available settings (Hz)
 "400",  "500", "600", "800", "1000", NULL };
@@ -149,7 +148,7 @@ RIG_TS870S::RIG_TS870S() {
 
 	name_ = TS870Sname_;
 	modes_ = TS870Smodes_;
-	bandwidths_ = TS870S_empty;
+	bandwidths_ = TS870S_SSB_hi;
 
 	dsp_lo     = TS870S_SSB_lo;
 	lo_tooltip = TS870S_SSB_lo_tooltip;
@@ -174,8 +173,8 @@ RIG_TS870S::RIG_TS870S() {
 	comm_dtrptt = false;    // ditto
 
 //	Defaults.
-	B.imode = A.imode = 1;      // USB
-	B.iBW = A.iBW = 0x8704;     // hi=2800Hz .. lo=300Hz
+	B.imode = A.imode = USB;
+	B.iBW = A.iBW = DEF_lo_hi;
 	B.freq = A.freq = 14070000;
 	can_change_alt_vfo = true;
 
@@ -410,29 +409,11 @@ void RIG_TS870S::set_vfoB (long freq)
 }
 
 //----------------------------------------------------------------------
-/* int RIG_TS870S::get_smeter() {
-	int mtr = 0;
+int RIG_TS870S::get_smeter() {
 	cmd = "SM;";
-	int ret = waitN(8, 100, "get smeter", ASC);
-
+	int ret = waitN(7, 100, "get smeter", ASC);
 	if (ret < 7) return 0;
-	size_t p = replystr.find("SM");
-	if (p == string::npos) return 0;
 
-	replystr[p + 6] = 0;
-	mtr = atoi(&replystr[p + 2]);
-	mtr *= 50;
-	mtr /= 15;
-	if (mtr > 100) mtr = 100;
-	return mtr;
-} */
-
-//----------------------------------------------------------------------
-int RIG_TS870S::get_smeter() {	 // scales correctly now 2012-02-24
-	cmd = "SM;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "S meter", cmd, replystr);
-	if (ret < 7) return 0;
 	size_t p = replystr.rfind("SM");
 	if (p == string::npos) return -1;
 
@@ -447,9 +428,9 @@ int RIG_TS870S::get_power_out()
 { // Shares same command as the 'S' meter reading.
 	int mtr = 0;
 	cmd = "SM;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "Output Power", cmd, replystr);
+	int ret = waitN(7, 100, "get output power", ASC);
 	if (ret < 7) return mtr;
+
 	size_t p = replystr.rfind("SM");
 	if (p == string::npos) return mtr;
 
@@ -461,6 +442,8 @@ int RIG_TS870S::get_power_out()
 
 	// The power meter scale is not the same as Flrig's default.
 	// a change is needed, one day.   wbx2
+	// Note that the power meter scale is an image and would have to be
+	// redrawn and then set specifically for the xcvr in support.cxx
 }
 
 //----------------------------------------------------------------------
@@ -481,8 +464,8 @@ int RIG_TS870S::get_power_control()
 {
 	cmd = "PC;";
 	int ret = waitN(6, 100, "get pwr ctrl", ASC);
-
 	if (ret < 6) return 0;
+
 	size_t p = replystr.rfind("PC");
 	if (p == string::npos) return 0;
 	int mtr = 0;
@@ -499,12 +482,9 @@ int RIG_TS870S::get_volume_control()
 {
 	cmd = "AG;";  // reply data is 'AGnnn;' nnn = 000 .. 255  wbx
 
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get vol ctrl", cmd, replystr);
-
-//	int ret = waitN(7, 100, "get vol ctrl", ASC);
-
+	int ret = waitN(6, 100, "get vol ctrl", ASC);
 	if (ret < 6) return 0;
+
 	size_t p = replystr.rfind("AG");
 	if (p == string::npos) return 0;
 
@@ -536,6 +516,8 @@ void RIG_TS870S::set_volume_control(int val) // 0 .. 100
  * there, and blank the mic.
  * To do that, in the Config/Xcvr Select menu, use one of the Hardware PTT options.
  * Just so it has been said...
+ * 
+ * BUMMER - HKJ
  */
 
 void RIG_TS870S::set_PTT_control(int val)
@@ -589,9 +571,9 @@ void RIG_TS870S::set_attenuator(int val) {
 //	Modified to read and show the actual radio setting, in the button.
 int RIG_TS870S::get_attenuator() {
 	cmd = "RA;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get Att", cmd, replystr);
+	int ret = waitN(5, 100, "get att", ASC);
 	if (ret < 5) return att_on;
+
 	size_t p = replystr.rfind("RA");
 	if (p == string::npos) return att_on;
 
@@ -622,9 +604,9 @@ int RIG_TS870S::get_attenuator() {
 //----------------------------------------------------------------------
 bool RIG_TS870S::get_TS870Sid() {
 	cmd = "ID;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "Id", cmd, replystr);
+	int ret = waitN(6, 100, "get ID", ASC);
 	if (ret < 6) return false;
+
 	size_t p = replystr.rfind("ID");			// String "ID015;"
 	if (p == string::npos) return false;		// Bytes   012345
 	if 	(replystr[p + 2] == '0' &&				// wbx2
@@ -654,8 +636,8 @@ int RIG_TS870S::get_modeA()
 	int md = A.imode;
 	cmd = "MD;";
 	int ret = waitN(4, 100, "get mode A", ASC);
-
 	if (ret < 4) return A.imode;
+
 	size_t p = replystr.rfind("MD");
 	if (p == string::npos) return A.imode;
 
@@ -697,8 +679,8 @@ int RIG_TS870S::get_modeB()
 	int md = B.imode;
 	cmd = "MD;";
 	int ret = waitN(4, 100, "get mode B", ASC);
-
 	if (ret < 4) return B.imode;
+
 	size_t p = replystr.rfind("MD");
 	if (p == string::npos) return B.imode;
 
@@ -731,14 +713,14 @@ int RIG_TS870S::set_widths(int val) // val is from the mode list index, as selec
 	int bw = 0;
 
 	if (val == tsLSB || val == tsUSB ) {  // SSB modes
-		bandwidths_ = TS870S_empty;
+		bandwidths_ = TS870S_SSB_hi;
 		dsp_lo = TS870S_SSB_lo;
 		dsp_hi = TS870S_SSB_hi;
 		lo_tooltip = TS870S_SSB_lo_tooltip;
 		lo_label   = TS870S_SSB_btn_lo_label;
 		hi_tooltip = TS870S_SSB_hi_tooltip;
 		hi_label   = TS870S_SSB_btn_hi_label;
-		bw = 0x8704; // 300 ... 2800 Hz
+		bw = DEF_lo_hi; // 300 ... 2800 Hz
 	}
 
 	else if (val == tsCW || val == tsCWR) {  // CW modes
@@ -781,7 +763,9 @@ int RIG_TS870S::set_widths(int val) // val is from the mode list index, as selec
 const char **RIG_TS870S::bwtable(int m)
 {
 	if (m == tsLSB || m == tsUSB || m == tsAM)
-		return NULL;  // these modes have lo and hi settings.
+// these modes have lo and hi settings. BUT MUST RETURN A VALID pointer
+// NOT EMPTY!
+		return TS870S_SSB_hi;  
 
 	else if (m == tsCW || m == tsCWR)
 		return TS870S_CWwidths;
@@ -793,7 +777,7 @@ const char **RIG_TS870S::bwtable(int m)
 		return TS870S_FMwidths;
 
 	else
-		return NULL;
+		return TS870S_SSB_hi;
 }
 
 const char **RIG_TS870S::lotable(int m)
@@ -802,13 +786,13 @@ const char **RIG_TS870S::lotable(int m)
 		return TS870S_SSB_lo;  // these modes have lo and hi settings.
 
 	else if (m == tsCW || m == tsCWR)
-		return NULL;
+		return TS870S_empty;
 
 	else if (m == tsFSK || m == tsFSKR)
-		return NULL;
+		return TS870S_empty;
 
 	else if (m == tsFM)
-		return NULL;
+		return TS870S_empty;
 
 	else
 		return TS870S_AM_lo;
@@ -820,13 +804,13 @@ const char **RIG_TS870S::hitable(int m)
 		return TS870S_SSB_hi;  // these modes have lo and hi settings.
 
 	else if (m == tsCW || m == tsCWR)
-		return NULL;
+		return TS870S_empty;
 
 	else if (m == tsFSK || m == tsFSKR)
-		return NULL;
+		return TS870S_empty;
 
 	else if (m == tsFM)
-		return NULL;
+		return TS870S_empty;
 
 	else
 		return TS870S_AM_hi;
@@ -836,7 +820,7 @@ const char **RIG_TS870S::hitable(int m)
 int RIG_TS870S::adjust_bandwidth(int val)
 {
 	if (val == tsLSB || val == tsUSB )
-		return 0x8704; // 2800Hz .. 300Hz
+		return DEF_lo_hi; // 2800Hz .. 300Hz
 
 	else if (val == tsCW || val == tsCWR)
 		return 2; // 200Hz
@@ -986,13 +970,15 @@ void RIG_TS870S::set_bwB(int val)
 int RIG_TS870S::get_bwA() {
 
 	int i = 0;
+	int ret = 0;
 	size_t p;
 
 	if (A.imode == tsFM) { // FM mode.
 		cmd = "FW;"; // 'Filter Width' query
-		waitN(7, 100, "get CW width", ASC);
-		p = replystr.rfind("FW");
+		ret = waitN(7, 100, "get CW width", ASC);
+		if (ret < 7) return A.iBW;
 
+		p = replystr.rfind("FW");
 		if (p != string::npos) { // If 'FW' found then scan the known responces to find out what we got.
 			for (i = 0; TS870S_FMbw[i] != NULL; i++) // bump array index counter, till string match or end.
 				if (replystr.find(TS870S_FMbw[i]) == p) break; 	// Found returned data, in string array.
@@ -1004,9 +990,10 @@ int RIG_TS870S::get_bwA() {
 
 	else if (A.imode == tsCW || A.imode == tsCWR) { // CW modes.
 		cmd = "FW;"; // 'Filter Width' query
-		waitN(7, 100, "get CW width", ASC);
-		p = replystr.rfind("FW");
+		ret = waitN(7, 100, "get CW width", ASC);
+		if (ret < 7) return A.iBW;
 
+		p = replystr.rfind("FW");
 		if (p != string::npos) { // If 'FW' found then scan the known responces to find out what we got.
 			for (i = 0; TS870S_CWbw[i] != NULL; i++) // bump array index counter, till string match or end.
 				if (replystr.find(TS870S_CWbw[i]) == p) break; 	// Found returned data, in string array.
@@ -1018,9 +1005,10 @@ int RIG_TS870S::get_bwA() {
 
 	else if (A.imode == tsFSK || A.imode == tsFSKR ) { // FSK modes.
 		cmd = "FW;";
-		waitN(7, 100, "get FSK width", ASC);
-		p = replystr.rfind("FW");
+		ret = waitN(7, 100, "get FSK width", ASC);
+		if (ret < 7) return A.iBW;
 
+		p = replystr.rfind("FW");
 		if (p != string::npos) { // If 'FW' found then scan the known responces to find out what we got.
 			for (i = 0; TS870S_FSKbw[i] != NULL; i++) // bump array index counter, till string match or end.
 				if (replystr.find(TS870S_FSKbw[i]) == p) break; 	// Found returned data, in string array.
@@ -1037,9 +1025,10 @@ int RIG_TS870S::get_bwA() {
 		// High byte is hi cutoff index (not MSB though.) Low byte is lo cuttoff index.
 
 		cmd = "FW;"; // Read Low cuttoff. Returns a two digit code as 'FLxxxx;' in 10Hz increments.
-		waitN(5, 100, "get lower", ASC);
-		p = replystr.rfind("FW");
+		ret = waitN(5, 100, "get lower", ASC);
+		if (ret < 5) return A.iBW;
 
+		p = replystr.rfind("FW");
 		if (p != string::npos) { // If 'FW' found then scan the known responces to find out what we got.
 			for (i = 0; TS870S_CAT_am_lo[i] != NULL; i++) // bump array index counter, till string match or end.
 				if (replystr.find(TS870S_CAT_am_lo[i]) == p) break; 	// Found returned data, in string array.
@@ -1069,9 +1058,10 @@ int RIG_TS870S::get_bwA() {
 		int lo = A.iBW & 0x7F, hi = (A.iBW >> 8) & 0x7F; // Same trick as above...
 
 		cmd = "FW;"; // Read Low cuttoff. Returns a two digit code as 'FLxxxx;' in 10Hz increments.
-		waitN(5, 100, "get lower", ASC);
-		p = replystr.rfind("FW");
+		ret = waitN(5, 100, "get lower", ASC);
+		if (ret < 5) return A.iBW;
 
+		p = replystr.rfind("FW");
 		if (p != string::npos) { // If 'FW' found then scan the known responces to find out what we got.
 			for (i = 0; TS870S_CAT_ssb_lo[i] != NULL; i++) // bump array index counter, till string match or end.
 				if (replystr.find(TS870S_CAT_ssb_lo[i]) == p) break; 	// Found returned data, in string array.
@@ -1081,7 +1071,9 @@ int RIG_TS870S::get_bwA() {
 		}
 
 		cmd = "IS;";
-		waitN(5, 100, "get upper", ASC);
+		ret = waitN(5, 100, "get upper", ASC);
+		if (ret < 5) return A.iBW;
+
 		p = replystr.rfind("IS ");
 
 		if (p != string::npos) {
@@ -1100,13 +1092,15 @@ int RIG_TS870S::get_bwA() {
 int RIG_TS870S::get_bwB()
 {
 	int i = 0;
+	int ret = 0;
 	size_t p;
 
 	if (B.imode == tsFM) {
 		cmd = "FW;"; // 'Filter Width' query
-		waitN(7, 100, "get CW width", ASC);
-		p = replystr.rfind("FW");
+		ret = waitN(7, 100, "get CW width", ASC);
+		if (ret < 7) return B.iBW;
 
+		p = replystr.rfind("FW");
 		if (p != string::npos) { // If 'FW' found then scan the known responces to find out what we got.
 			for (i = 0; TS870S_FMbw[i] != NULL; i++) // bump array index counter, till string match or end.
 				if (replystr.find(TS870S_FMbw[i]) == p) break; 	// Found returned data, in string array.
@@ -1118,9 +1112,10 @@ int RIG_TS870S::get_bwB()
 
 	else if (B.imode == tsCW || B.imode == tsCWR) { // CW modes.
 		cmd = "FW;"; // 'Filter Width' query
-		waitN(7, 100, "get CW width", ASC);
-		p = replystr.rfind("FW");
+		ret = waitN(7, 100, "get CW width", ASC);
+		if (ret < 7) return B.iBW;
 
+		p = replystr.rfind("FW");
 		if (p != string::npos) { // If 'FW' found then scan the known responces to find out what we got.
 			for (i = 0; TS870S_CWbw[i] != NULL; i++) // bump array index counter, till string match or end.
 				if (replystr.find(TS870S_CWbw[i]) == p) break; 	// Found returned data, in string array.
@@ -1132,9 +1127,10 @@ int RIG_TS870S::get_bwB()
 
 	else if (B.imode == tsFSK || B.imode == tsFSKR) { // FSK modes.
 		cmd = "FW;";
-		waitN(7, 100, "get FSK width", ASC);
-		p = replystr.rfind("FW");
+		ret = waitN(7, 100, "get FSK width", ASC);
+		if (ret < 7) return B.iBW;
 
+		p = replystr.rfind("FW");
 		if (p != string::npos) { // If 'FW' found then scan the known responces to find out what we got.
 			for (i = 0; TS870S_FSKbw[i] != NULL; i++) // bumb array index counter, till string match or end.
 				if (replystr.find(TS870S_FSKbw[i]) == p) break; 	// Found returned data, in string array.
@@ -1149,9 +1145,10 @@ int RIG_TS870S::get_bwB()
 		int lo = B.iBW & 0x7F, hi = (B.iBW >> 8) & 0x7F;
 
 		cmd = "FW;"; // Read Low cuttoff. Returns a two digit code as 'FLxxxx;' in 10Hz increments.
-		waitN(5, 100, "get lower", ASC);
-		p = replystr.rfind("FW");
+		ret = waitN(5, 100, "get lower", ASC);
+		if (ret < 5) return B.iBW;
 
+		p = replystr.rfind("FW");
 		if (p != string::npos) { // If 'FW' found then scan the known responces to find out what we got.
 			for (i = 0; TS870S_CAT_am_lo[i] != NULL; i++) // bump array index counter, till string match or end.
 				if (replystr.find(TS870S_CAT_am_lo[i]) == p) break; 	// Found returned data, in string array.
@@ -1161,9 +1158,10 @@ int RIG_TS870S::get_bwB()
 		}
 
 		cmd = "IS;";
-		waitN(5, 100, "get upper", ASC);
-		p = replystr.rfind("IS ");
+		ret = waitN(5, 100, "get upper", ASC);
+		if (ret < 5) return B.iBW;
 
+		p = replystr.rfind("IS ");
 		if (p != string::npos) {
 			for (i = 0; TS870S_CAT_am_hi[i] != NULL; i++) // bump array index counter, till string match or end.
 				if (replystr.find(TS870S_CAT_am_hi[i]) == p) break; 	// Found returned data, in string array.
@@ -1180,9 +1178,10 @@ int RIG_TS870S::get_bwB()
 		int lo = B.iBW & 0x7F, hi = (B.iBW >> 8) & 0x7F;
 
 		cmd = "FW;"; // Read Low cuttoff. Returns a two digit code as 'FLxxxx;' in 10Hz increments.
-		waitN(5, 100, "get lower", ASC);
-		p = replystr.rfind("FW");
+		ret = waitN(5, 100, "get lower", ASC);
+		if (ret < 5) return  B.iBW;
 
+		p = replystr.rfind("FW");
 		if (p != string::npos) { // If 'FW' found then scan the known responces to find out what we got.
 			for (i = 0; TS870S_CAT_ssb_lo[i] != NULL; i++) // bump array index counter, till string match or end.
 				if (replystr.find(TS870S_CAT_ssb_lo[i]) == p) break; 	// Found returned data, in string array.
@@ -1192,9 +1191,10 @@ int RIG_TS870S::get_bwB()
 		}
 
 		cmd = "IS;";
-		waitN(5, 100, "get upper", ASC);
-		p = replystr.rfind("IS ");
+		ret = waitN(5, 100, "get upper", ASC);
+		if (ret < 5) return B.iBW;
 
+		p = replystr.rfind("IS ");
 		if (p != string::npos) {
 			for (i = 0; TS870S_CAT_ssb_hi[i] != NULL; i++) // bump array index counter, till string match or end.
 				if (replystr.find(TS870S_CAT_ssb_hi[i]) == p) break; 	// Found returned data, in string array.
@@ -1264,9 +1264,9 @@ void RIG_TS870S::set_noise(bool val)
 int  RIG_TS870S::get_noise()
 {
 	cmd = "NB;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get NB", cmd, replystr);
+	int ret = waitN(4, 100, "get NB", ASC);
 	if (ret < 4) return 0;
+
 	size_t p = replystr.rfind("NB");
 	if (p == string::npos) return 0;
 
@@ -1296,7 +1296,11 @@ bool RIG_TS870S::get_if_shift(int &val)
 {
 	if (active_mode == tsCW || active_mode == tsCWR) { // cw modes
 		cmd = "IS;";
-		waitN(8, 100, "get IF shift", ASC);
+		int ret = waitN(8, 100, "get IF shift", ASC);
+		if (ret < 8) {
+			val = progStatus.shift_val;
+			return false;
+		}
 		size_t p = replystr.rfind("IS");
 		if (p != string::npos) {
 			val = fm_decimal(&replystr[p+3], 4);
@@ -1318,6 +1322,9 @@ void RIG_TS870S::get_if_min_max_step(int &min, int &max, int &step)
 }
 
 //----------------------------------------------------------------------
+// Dave, G0WBX, does this work?
+// I do not see a BP in the 870 command table
+//
 void RIG_TS870S::set_notch(bool on, int val)
 {
 	cmd = "BP00000;";
