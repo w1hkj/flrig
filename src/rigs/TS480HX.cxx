@@ -512,8 +512,7 @@ void RIG_TS480HX::set_modeA(int val)
 int RIG_TS480HX::get_modeA()
 {
 	cmd = "MD;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "get mode A", cmd, replystr);
+	if (waitN(14, 100, "get vfo A", ASC) < 14) return A.imode;
 	size_t p = replystr.rfind("MD");
 	if (p != string::npos && (p + 2 < replystr.length())) {
 		int md = replystr[p+2];
@@ -539,8 +538,7 @@ void RIG_TS480HX::set_modeB(int val)
 int RIG_TS480HX::get_modeB()
 {
 	cmd = "MD;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "get mode B", cmd, replystr);
+	if (waitN(14, 100, "get vfo B", ASC) < 14) return B.imode;
 	size_t p = replystr.rfind("MD");
 	if (p != string::npos && (p + 2 < replystr.length())) {
 		int md = replystr[p+2];
@@ -599,22 +597,19 @@ int RIG_TS480HX::get_bwA()
 	if (A.imode == 0 || A.imode == 1 || A.imode == 3 || A.imode == 4) {
 		int lo = A.iBW & 0xFF, hi = (A.iBW >> 8) & 0x7F;
 		cmd = "SL;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "get SL", cmd, replystr);
+		waitN(5, 100, "get SL", ASC);
 		p = replystr.rfind("SL");
 		if (p != string::npos)
 			lo = fm_decimal(&replystr[2], 2);
 		cmd = "SH;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "get SH", cmd, replystr);
+		waitN(5, 100, "get SH", ASC);
 		p = replystr.rfind("SH");
 		if (p != string::npos)
 			hi = fm_decimal(&replystr[2], 2);
 		A.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
 	} else if (A.imode == 2 || A.imode == 6) {
 		cmd = "FW;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "get FW", cmd, replystr);
+		waitN(7, 100, "get FW", ASC);
 		p = replystr.rfind("FW");
 		if (p != string::npos) {
 			for (i = 0; i < 11; i++)
@@ -625,8 +620,7 @@ int RIG_TS480HX::get_bwA()
 		}
 	} else if (A.imode == 5 || A.imode == 7) {
 		cmd = "FW;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "get FW", cmd, replystr);
+		waitN(7, 100, "get FW", ASC);
 		p = replystr.rfind("FW");
 		if (p != string::npos) {
 			for (i = 0; i < 4; i++)
@@ -680,20 +674,19 @@ int RIG_TS480HX::get_bwB()
 	if (B.imode == 0 || B.imode == 1 || B.imode == 3 || B.imode == 4) {
 		int lo = B.iBW & 0xFF, hi = (B.iBW >> 8) & 0x7F;
 		cmd = "SL;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "get SL", cmd, replystr);
+		waitN(5, 100, "get SL", ASC);
 		p = replystr.rfind("SL");
 		if (p != string::npos)
 			lo = fm_decimal(&replystr[2], 2);
 		cmd = "SH;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "get SH", cmd, replystr);
+		waitN(5, 100, "get SH", ASC);
 		p = replystr.rfind("SH");
 		if (p != string::npos)
 			hi = fm_decimal(&replystr[2], 2);
 		B.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
 	} else if (B.imode == 2 || B.imode == 6) {
 		cmd = "FW;";
+		waitN(7, 100, "get FW", ASC);
 		sendCommand(cmd);
 		showresp(WARN, ASC, "get FW", cmd, replystr);
 		p = replystr.rfind("FW");
@@ -706,7 +699,7 @@ int RIG_TS480HX::get_bwB()
 		}
 	} else if (B.imode == 5 || B.imode == 7) {
 		cmd = "FW;";
-		showresp(WARN, ASC, "get FW", cmd, replystr);
+		waitN(7, 100, "get FW", ASC);
 		p = replystr.rfind("FW");
 		if (p != string::npos) {
 			for (i = 0; i < 4; i++)
@@ -779,8 +772,7 @@ int RIG_TS480HX::get_power_control()
 {
 	int val = progStatus.power_level;
 	cmd = "PC;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get power", cmd, replystr);
+	int ret = waitN(6, 100, "get power", ASC);
 	if (ret < 6) return val;
 	size_t p = replystr.rfind("PC");
 	if (p == string::npos) return val;

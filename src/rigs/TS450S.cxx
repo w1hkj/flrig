@@ -86,8 +86,7 @@ void RIG_TS450S::initialize()
 long RIG_TS450S::get_vfoA ()
 {
 	cmd = "FA;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get vfo A", cmd, replystr);
+	int ret = waitN(14, 100, "get vfoA", ASC);
 	if (ret < 14) return freqA;
 
 	size_t p = replystr.rfind("FA");
@@ -115,8 +114,7 @@ void RIG_TS450S::set_vfoA (long freq)
 long RIG_TS450S::get_vfoB ()
 {
 	cmd = "FB;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get vfo B", cmd, replystr);
+	int ret = waitN(14, 100, "get vfoB", ASC);
 	if (ret < 14) return freqB;
 	size_t p = replystr.rfind("FB");
 	if (p == string::npos) return freqB;
@@ -144,8 +142,7 @@ void RIG_TS450S::set_vfoB (long freq)
 int RIG_TS450S::get_smeter()
 {
 	cmd = "SM;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get smeter", cmd, replystr);
+	int ret = waitN(7, 100, "get smeter", ASC);
 	if (ret < 7) return 0;
 
 	size_t p = replystr.rfind("SM");
@@ -161,8 +158,7 @@ int RIG_TS450S::get_smeter()
 int RIG_TS450S::get_swr()
 {
 	cmd = "RM;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get swr", cmd, replystr);
+	int ret = waitN(8, 100, "get swr", ASC);
 	if (ret < 8) return 0;
 
 	size_t p = replystr.rfind("RM");
@@ -196,8 +192,7 @@ void RIG_TS450S::set_modeA(int val)
 int RIG_TS450S::get_modeA()
 {
 	cmd = "IF;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "info mode A", cmd, replystr);
+	int ret = waitN(38, 100, "get modeA", ASC);
 	if (ret < 38) return split;
 	size_t p = replystr.rfind("IF");
 	if (p == string::npos) return modeA;
@@ -219,8 +214,7 @@ void RIG_TS450S::set_modeB(int val)
 int RIG_TS450S::get_modeB()
 {
 	cmd = "IF;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "info mode B", cmd, replystr);
+	int ret = waitN(38, 100, "get modeB", ASC);
 	if (ret < 38) return split;
 	size_t p = replystr.rfind("IF");
 	if (p == string::npos) return modeA;
@@ -247,8 +241,7 @@ void RIG_TS450S::set_bwA(int val)
 int RIG_TS450S::get_bwA()
 {
 	cmd = "FL;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get bw A", cmd, replystr);
+	int ret = waitN(9, 100, "get bwA", ASC);
 	if (ret < 9) return bwA;
 	size_t p = replystr.rfind("FL");
 	if (p == string::npos) return bwA;
@@ -276,8 +269,7 @@ void RIG_TS450S::set_bwB(int val)
 int RIG_TS450S::get_bwB()
 {
 	cmd = "FL;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get bw B", cmd, replystr);
+	int ret = waitN(9, 100, "get bwB", ASC);
 	if (ret < 9) return bwB;
 	size_t p = replystr.rfind("FL");
 	if (p == string::npos) return bwB;
@@ -356,8 +348,7 @@ void RIG_TS450S::set_split(bool val)
 int RIG_TS450S::get_split()
 {
 	cmd = "IF;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "info split", cmd, replystr);
+	int ret = waitN(38, 100, "get split", ASC);
 	if (ret < 38) return split;
 	size_t p = replystr.rfind("IF");
 	if (p == string::npos) return split;

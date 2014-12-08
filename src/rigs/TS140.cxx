@@ -105,7 +105,7 @@ RIG_TS140::RIG_TS140() {
 long RIG_TS140::get_vfoA ()
 {
 	cmd = "IF;";
-	int ret = sendCommand(cmd);
+	int ret = waitN(38, 100, "get VFO", ASC);
 	if (ret < 38) return freqA;
 
 	long f = 0;
@@ -150,7 +150,7 @@ int RIG_TS140::get_modeA()
 {
 	modeA = 0;
 	cmd = "IF;";
-	int ret = sendCommand(cmd);
+	int ret = waitN(38, 100, "get mode", ASC);
 	if (ret < 38) return modeA;
 
 	int md = replybuff[ret - 38 + 29] - '1';

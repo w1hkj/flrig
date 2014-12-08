@@ -472,8 +472,7 @@ int RIG_TS990::get_attenuator() {
 
 	if (useB) {
 		cmd = "RA1;";
-		int ret = sendCommand(cmd);
-		showresp(INFO, ASC, "get Att B", cmd, replystr);
+		int ret = waitN(5, 100, "get Att B", ASC);
 		if (ret < 5) return att_on;
 		size_t p = replystr.rfind("RA");
 		if (p == string::npos) return att_on;
@@ -497,8 +496,7 @@ int RIG_TS990::get_attenuator() {
 		}
 	} else {
 		cmd = "RA0;";
-		int ret = sendCommand(cmd);
-		showresp(INFO, ASC, "get Att A", cmd, replystr);
+		int ret = waitN(5, 100, "get Att B", ASC);
 		if (ret < 5) return att_on;
 		size_t p = replystr.rfind("RA");
 		if (p == string::npos) return att_on;
@@ -2451,8 +2449,7 @@ int  RIG_TS990::get_agc()
 	int val = 0;
 	if (useB) {
 		cmd = "GC1;";
-		int ret = sendCommand(cmd);
-		showresp(INFO, ASC, "get AGC", cmd, replystr);
+		int ret = waitN(5, 100, "get AGC", ASC);
 		if (ret < 5) return val;
 		size_t p = replystr.rfind("GC");
 		if (p == string::npos) return val;
@@ -2465,7 +2462,7 @@ int  RIG_TS990::get_agc()
 		}
 	} else {
 		cmd = "GC0;";
-		int ret = sendCommand(cmd);
+		int ret = waitN(5, 100, "get AGC", ASC);
 		showresp(INFO, ASC, "get AGC", cmd, replystr);
 		if (ret < 5) return val;
 		size_t p = replystr.rfind("GC");

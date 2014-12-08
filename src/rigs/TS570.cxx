@@ -135,8 +135,7 @@ RIG_TS570::RIG_TS570() {
 bool RIG_TS570::get_ts570id()
 {
 	cmd = "ID;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "Id", cmd, replystr);
+	int ret = waitN(6, 100, "get ID", ASC);
 	if (ret < 6) return false;
 	size_t p = replystr.rfind("ID");
 	if (p == string::npos) return false;
@@ -189,8 +188,7 @@ void RIG_TS570::set_split(bool val)
 int RIG_TS570::get_split()
 {
 	cmd = "IF;";
-	int ret = sendCommand(cmd);
-	showresp(INFO, ASC, "get info", cmd, replystr);
+	int ret = waitN(38, 100, "get IF", ASC);
 	if (ret < 38) return split;
 	size_t p = replystr.rfind("IF");
 	if (p == string::npos) return split;
@@ -201,8 +199,7 @@ int RIG_TS570::get_split()
 long RIG_TS570::get_vfoA ()
 {
 	cmd = "FA;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get vfoA", cmd, replystr);
+	int ret = waitN(14, 100, "get vfoA", ASC);
 	if (ret < 14) return A.freq;
 	size_t p = replystr.rfind("FA");
 	if (p == string::npos) return A.freq;
@@ -229,8 +226,7 @@ void RIG_TS570::set_vfoA (long freq)
 long RIG_TS570::get_vfoB ()
 {
 	cmd = "FB;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get vfoB", cmd, replystr);
+	int ret = waitN(14, 100, "get vfoB", ASC);
 	if (ret < 14) return freqB;
 	size_t p = replystr.rfind("FB");
 	if (p == string::npos) return freqB;
@@ -258,8 +254,7 @@ void RIG_TS570::set_vfoB (long freq)
 int RIG_TS570::get_smeter()
 {
 	cmd = "SM;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "S meter", cmd, replystr);
+	int ret = waitN(7, 100, "get smeter", ASC);
 	if (ret < 7) return 0;
 	size_t p = replystr.rfind("SM");
 	if (p == string::npos) return -1;
@@ -273,9 +268,9 @@ int RIG_TS570::get_smeter()
 // RM cmd 0 ... 100 (rig values 0 ... 8)
 int RIG_TS570::get_swr()
 {
-	cmd = "RM1;RM;"; // select measurement '1' (swr) and read meter
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "SWR", cmd, replystr);
+	sendCommand("RM1;"); // select measurement #1
+	cmd = "RM;"; // select measurement '1' (swr) and read meter
+	int ret = waitN(8, 100, "get swr", ASC);
 	if (ret < 8) return 0;
 	size_t p = replystr.rfind("RM1");
 	if (p == string::npos) return 0;
@@ -290,8 +285,7 @@ int RIG_TS570::get_swr()
 int RIG_TS570::get_power_out()
 {
 	cmd = "SM;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "P out", cmd, replystr);
+	int ret = waitN(7, 100, "get pwr out", ASC);
 	if (ret < 7) return 0;
 	size_t p = replystr.rfind("SM");
 	if (p == string::npos) return 0;
@@ -320,8 +314,7 @@ void RIG_TS570::set_power_control(double val)
 int RIG_TS570::get_power_control()
 {
 	cmd = "PC;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get pwr", cmd, replystr);
+	int ret = waitN(6, 100, "get pwr ctl", ASC);
 	if (ret < 6) return 0;
 	size_t p = replystr.rfind("PC");
 	if (p == string::npos) return 0;
@@ -335,8 +328,7 @@ int RIG_TS570::get_power_control()
 int RIG_TS570::get_volume_control()
 {
 	cmd = "AG;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get vol", cmd, replystr);
+	int ret = waitN(6, 100, "get vol", ASC);
 
 	if (ret < 6) return 0;
 	size_t p = replystr.rfind("AG");
@@ -387,8 +379,7 @@ void RIG_TS570::set_attenuator(int val)
 int RIG_TS570::get_attenuator()
 {
 	cmd = "RA;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get Att", cmd, replystr);
+	int ret = waitN(5, 100, "get att", ASC);
 	if (ret < 5) return att_on;
 	size_t p = replystr.rfind("RA");
 	if (p == string::npos) return att_on;
@@ -413,8 +404,7 @@ void RIG_TS570::set_preamp(int val)
 int RIG_TS570::get_preamp()
 {
 	cmd = "PA;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get pre", cmd, replystr);
+	int ret = waitN(4, 100, "get pre", ASC);
 	if (ret < 4 ) return preamp_on;
 	size_t p = replystr.rfind("PA");
 	if (p == string::npos) return preamp_on;
@@ -486,8 +476,7 @@ void RIG_TS570::set_modeA(int val)
 int RIG_TS570::get_modeA()
 {
 	cmd = "MD;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get modeA", cmd, replystr);
+	int ret = waitN(4, 100, "get modeA", ASC);
 	if (ret < 4) return A.imode;
 	size_t p = replystr.rfind("MD");
 	if (p == string::npos) return A.imode;
@@ -514,7 +503,7 @@ void RIG_TS570::set_modeB(int val)
 int RIG_TS570::get_modeB()
 {
 	cmd = "MD;";
-	int ret = sendCommand(cmd);
+	int ret = waitN(4, 100, "get modeB", ASC);
 	showresp(WARN, ASC, "get modeB", cmd, replystr);
 	if (ret < 4) return B.imode;
 	size_t p = replystr.rfind("MD");
@@ -600,8 +589,7 @@ int RIG_TS570::get_bwA()
 	int i;
 
 	cmd = "FW;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get bwA", cmd, replystr);
+	int ret = waitN(7, 100, "get bwA", ASC);
 	if (ret < 7) return A.iBW;
 	size_t p = replystr.rfind("FW");
 	if (p == string::npos) return A.iBW;
@@ -672,8 +660,7 @@ int RIG_TS570::get_bwB()
 	int i;
 
 	cmd = "FW;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get bwB", cmd, replystr);
+	int ret = waitN(7, 100, "get bwB", ASC);
 	if (ret < 7) return B.iBW;
 	size_t p = replystr.rfind("FW");
 	if (p == string::npos) return B.iBW;
@@ -731,8 +718,7 @@ void RIG_TS570::set_mic_gain(int val)
 int RIG_TS570::get_mic_gain()
 {
 	cmd = "MG;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get mic", cmd, replystr);
+	int ret = waitN(6, 100, "get mic", ASC);
 	if (ret < 6) return 0;
 	size_t p = replystr.rfind("MG");
 	if (p == string::npos) return 0;
@@ -762,8 +748,7 @@ void RIG_TS570::set_noise(bool b)
 int  RIG_TS570::get_noise()
 {
 	cmd = "NB;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get NB", cmd, replystr);
+	int ret = waitN(4, 100, "get NB", ASC);
 	if (ret < 4) return 0;
 	size_t p = replystr.rfind("NB");
 	if (p == string::npos) return 0;
@@ -792,8 +777,7 @@ bool RIG_TS570::get_if_shift(int &val)
 {
 	size_t p = 0;
 	cmd = "IS;";
-	int ret = sendCommand(cmd);
-	showresp(WARN, ASC, "get IF shift", cmd, replystr);
+	int ret = waitN(8, 100, "get IFsh", ASC);
 
 	if (ret >= 8) {
 		p = replystr.rfind("IS");
