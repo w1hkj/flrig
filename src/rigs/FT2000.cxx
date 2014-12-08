@@ -163,7 +163,7 @@ void RIG_FT2000::set_band_selection(int v)
 long RIG_FT2000::get_vfoA ()
 {
 	cmd = "FA;";
-	int ret = sendCommand(cmd);
+	int ret = waitN(11, 100, "get vfoA", ASC);
 	if (ret < 11) return freqA;
 	size_t p = replystr.rfind("FA");
 	if (p == string::npos) return freqA;
@@ -189,7 +189,7 @@ void RIG_FT2000::set_vfoA (long freq)
 int RIG_FT2000::get_smeter()
 {
 	cmd = "SM0;";
-	int ret = sendCommand(cmd);
+	int ret = waitN(7, 100, "get smeter", ASC);
 	if (ret < 7) return 0;
 	size_t p = replystr.rfind("SM");
 	if (p == string::npos) return 0;
@@ -202,7 +202,7 @@ int RIG_FT2000::get_smeter()
 int RIG_FT2000::get_swr()
 {
 	cmd = "RM6;";
-	int ret = sendCommand(cmd);
+	int ret = waitN(7, 100, "get swr", ASC);
 	if (ret < 7) return 0;
 	size_t p = replystr.rfind("RM");
 	if (p == string::npos) return 0;
@@ -214,7 +214,7 @@ int RIG_FT2000::get_swr()
 int RIG_FT2000::get_power_out()
 {
 	cmd = "RM5;";
-	int ret = sendCommand(cmd);
+	int ret = waitN(7, 100, "get pwr out", ASC);
 	if (ret < 7) return 0;
 	size_t p = replystr.rfind("RM");
 	if (p == string::npos) return 0;
@@ -227,7 +227,7 @@ int RIG_FT2000::get_power_out()
 int RIG_FT2000::get_power_control()
 {
 	cmd = "PC;";
-	int ret = sendCommand(cmd);
+	int ret = waitN(6, 100, "get pwr ctl", ASC);
 	if (ret < 6) return 0;
 	size_t p = replystr.rfind("PC");
 	if (p == string::npos) return 0;
@@ -240,7 +240,7 @@ int RIG_FT2000::get_power_control()
 int RIG_FT2000::get_volume_control()
 {
 	cmd = "AG0;";
-	int ret = sendCommand(cmd);
+	int ret = waitN(7, 100, "get vol", ASC);
 	if (ret < 7) return 0;
 	size_t p = replystr.rfind("AG");
 	if (p == string::npos) return 0;
@@ -314,7 +314,7 @@ void RIG_FT2000::set_attenuator(int val)
 int RIG_FT2000::get_attenuator()
 {
 	cmd = "RA0;";
-	int ret = sendCommand(cmd);
+	int ret = waitN(5, 100, "get att", ASC);
 	if (ret < 5) {
 		atten_label("Att", false);
 		return 0;
@@ -371,7 +371,7 @@ void RIG_FT2000::set_preamp(int val)
 int RIG_FT2000::get_preamp()
 {
 	cmd = "PA0;";
-	int ret = sendCommand(cmd);
+	int ret = waitN(5, 100, "get pre", ASC);
 	if (ret < 5) {
 		preamp_label("Pre", false);
 		return 0;
@@ -412,7 +412,7 @@ void RIG_FT2000::set_modeA(int val)
 int RIG_FT2000::get_modeA()
 {
 	cmd = "MD0;";
-	int ret = sendCommand(cmd);
+	int ret = waitN(5, 100, "get modeA", ASC);
 	if (ret < 5) return modeA;
 	size_t p = replystr.rfind("MD");
 	if (p == string::npos) return modeA;
@@ -537,7 +537,8 @@ void RIG_FT2000::set_if_shift(int val)
 bool RIG_FT2000::get_if_shift(int &val)
 {
 	static int oldval = 0;
-	int ret = sendCommand("IS0;");
+	cmd = "IS0;";
+	int ret = waitN(9, 100, "get if shift", ASC);
 	if (ret < 9) return false;
 	size_t p = replystr.rfind("IS");
 	if (p == string::npos) return false;
@@ -589,7 +590,7 @@ bool  RIG_FT2000::get_notch(int &val)
 {
 	bool ison = false;
 	cmd = "BP00;";
-	int ret = sendCommand(cmd);
+	int ret = waitN(8, 100, "get notch", ASC);
 	if (ret < 8) return ison;
 	size_t p = replystr.rfind("BP");
 	if (p == string::npos) return ison;
@@ -597,7 +598,7 @@ bool  RIG_FT2000::get_notch(int &val)
 	if (replystr[p + 6] == '1') {
 		ison = true;
 		cmd = "BP01;";
-		ret = sendCommand(cmd);
+		ret = waitN(8, 100, "get notch freq", ASC);
 		if (ret < 8) return ison;
 		p = replystr.rfind("BP");
 		if (p == string::npos) return ison;

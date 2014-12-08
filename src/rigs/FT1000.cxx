@@ -147,7 +147,7 @@ long RIG_FT1000::get_vfoA ()
 {
 	init_cmd();
 	cmd[3] = 2; cmd[4] = 0x10;
-	int ret = sendCommand(cmd);
+	int ret = waitN(17, 100, "get vfoA", HEX);
 	if (ret < 17) return freqA;
 	replybuff[9] = 0;
 	freqA = fm_bcd(&replybuff[6], 8) * 10;
@@ -168,7 +168,7 @@ int RIG_FT1000::get_modeA()
 {
 	init_cmd();
 	cmd[4] = 0x0C;
-	int ret = sendCommand(cmd);
+	int ret = waitN(5, 100, "get modeA", HEX);
 	if (ret < 5) return modeA;
 	modeA = cmd[4];
 	return modeA;
@@ -223,7 +223,7 @@ int  RIG_FT1000::get_power_out(void)
 {
 	init_cmd();
 	cmd[4] = 0xF7;
-	int ret = sendCommand(cmd);
+	int ret = waitN(5, 100, "get pwr out", HEX);
 	if (ret < 5) return 0;
 	return replybuff[0] && 0x0F;
 }
@@ -232,7 +232,7 @@ int  RIG_FT1000::get_smeter(void)
 {
 	init_cmd();
 	cmd[4] = 0xF7;
-	int ret = sendCommand(cmd);
+	int ret = waitN(5, 100, "get smeter", HEX);
 	if (ret < 5) return 0;
 	return replybuff[0] && 0x0F;
 }

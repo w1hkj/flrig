@@ -64,7 +64,7 @@ long RIG_FT767::get_vfoA ()
 	init_cmd();
 	cmd[4] = 0x01; // CHECK command
 
-	int ret = sendCommand(cmd);
+	int ret = waitN(20, 100, "get vfoA", HEX);
 	if (ret < 20) return freqA;
 	freqA = fm_bcd(replybuff, 14) * 10; // VFO-A in positions 14-17
 	modeA = replybuff[19];

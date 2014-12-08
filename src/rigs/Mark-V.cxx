@@ -73,18 +73,14 @@ long RIG_MARK_V::get_vfoA ()
 	init_cmd();
 	cmd[3] = 2; 
 	cmd[4] = 0x10;
-//	if (sendCommand(cmd, 32)) {
-replybuff[1] = 0x01;
-replybuff[2] = 0x08;
-replybuff[3] = 0x53;
-replybuff[4] = 0x00;
+	if (waitN(32, 200, "get vfoA", HEX) >= 32) {
 		freqA = 0;
 		for (int i = 4; i > 0; i--) {
 			freqA = freqA * 10 + (replybuff[i] & 0x0F);
 			freqA = freqA * 10 + ((replybuff[i] & 0xF0) >> 4);
 		}
 		freqA *= 10;
-//	}
+	}
 	return freqA;
 }
 
@@ -102,7 +98,7 @@ int RIG_MARK_V::get_modeA()
 {
 	init_cmd();
 	cmd[4] = 0x0C;
-	if (sendCommand(cmd, 5))
+	if (waitN(5, 100, "get modeA", HEX) >= 5)
 		modeA = cmd[4];
 	return modeA;
 }
@@ -135,11 +131,11 @@ int  RIG_MARK_V::get_power_out(void)
 {
 	int val = 0;
 	init_cmd();
+	cmd[00] = cmd[01] = cmd[02] = cmd[03] = 0x80H;
 	cmd[4] = 0xF7;
-	if (sendCommand(cmd,1)) {
-LOG_INFO("%s => %d",str2hex(replybuff,1), (val = replybuff[0] && 0x0F));
-	}
-	return 0;
+	if (waitN(1, 100, "get pwr out", HEX) >= 1)
+		val = replybuff[0] && 0x0F;
+	return val;
 }
 
 int  RIG_MARK_V::get_smeter(void)
@@ -147,9 +143,8 @@ int  RIG_MARK_V::get_smeter(void)
 	int val = 0;
 	init_cmd();
 	cmd[4] = 0xF7;
-	if (sendCommand(cmd,5)) {
-LOG_INFO("%s => %d",str2hex(replybuff,1), (val = replybuff[0] && 0x0F));
-	}
-	return 0;
+	if (waitN(1, 100, "get vfoA", HEX) >= 1)
+		val = replybuff[0] && 0x0F;
+	return val;
 }
 

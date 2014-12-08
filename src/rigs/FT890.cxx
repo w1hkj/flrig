@@ -112,8 +112,7 @@ bool RIG_FT890::get_info()
 	init_cmd();
 	cmd[3] = 0x03;
 	cmd[4] = 0x10;
-	int ret = sendCommand(cmd);
-	showresp(WARN, HEX, "get info", cmd, replystr);
+	int ret = waitN(28, 100, "get info", HEX);
 
 	if (ret >= 28) {
 		size_t p = ret - 28;
@@ -263,7 +262,7 @@ int RIG_FT890::get_smeter()
 {
 	init_cmd();
 	cmd[4] = 0xF7;
-	int ret = sendCommand(cmd);
+	int ret = waitN(5, 100, "get smeter", HEX);
 	if (ret < 5) return 0;
 	int sval = (unsigned char)(replybuff[ret - 2]);
 	sval = sval * 100 / 255;
@@ -274,32 +273,9 @@ int RIG_FT890::get_power_out()
 {
 	init_cmd();
 	cmd[4] = 0xF7;
-	int ret = sendCommand(cmd);
+	int ret = waitN(5, 100, "get pwr out", HEX);
 	if (ret < 5) return 0;
 	int sval = (unsigned char)(replybuff[ret - 2]);
 	sval = sval * 100 / 255;
 	return sval;
 }
-
-/*
-int RIG_FT890::get_swr()
-{
-	double swr = (fwdpwr + refpwr) / (fwdpwr - refpwr + .0001);
-	swr -= 1.0;
-	swr *= 25.0;
-	if (swr < 0) swr = 0;
-	if (swr > 100) swr = 100;
-	return (int) swr;
-}
-
-int RIG_FT890::get_power_out()
-{
-	init_cmd();
-	cmd[4] = 0xF7;
-	int ret = sendCommand(cmd);
-	if (ret < 9) return 0;
-	fwdpwr = replybuff[ret - 9 + 1] / 2.56;
-	refpwr = replybuff[ret - 9 + 2] / 2.56;
-	return (int) fwdpwr;
-}
-*/

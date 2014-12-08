@@ -62,7 +62,7 @@ long RIG_FT817::get_vfoA ()
 {
 	init_cmd();
 	cmd[4] = 0x03;
-	int ret = sendCommand(cmd);
+	int ret = waitN(5, 100, "get vfoA", HEX);
 	if (ret < 5) return freqA;
 
 	freqA = fm_bcd(replybuff, 8) * 10;
@@ -118,7 +118,7 @@ int  RIG_FT817::get_power_out(void)
 {
 	init_cmd();
 	cmd[4] = 0xF7;
-	int ret = sendCommand(cmd);
+	int ret = waitN(1, 100, "get pwr out", HEX);
 	if (!ret) return 0;
 	int fwdpwr = replybuff[0];
 	fwdpwr = fwdpwr * 100 / 15;
@@ -129,7 +129,7 @@ int  RIG_FT817::get_smeter(void)
 {
 	init_cmd();
 	cmd[4] = 0xE7;
-	int ret = sendCommand(cmd);
+	int ret = waitN(1, 100, "get smeter", HEX);
 	if (!ret) return 0;
 	int sval = replybuff[0];
 	sval = (sval-1) * 100 / 15;

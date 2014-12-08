@@ -103,7 +103,7 @@ bool RIG_FT747::get_info()
 	int amode = A.imode;
 	init_cmd();
 	cmd[4] = 0x10;
-	int ret = sendCommand(cmd);
+	int ret = waitN(28, 100, "get info", HEX);
 	showresp(DEBUG, HEX, "get info", cmd, replystr);
 
 	if (ret >= 28) {

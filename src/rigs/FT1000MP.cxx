@@ -226,7 +226,7 @@ bool RIG_FT1000MP::get_info(void)
 	init_cmd();
 	cmd[3] = 0x03;  // read both vfo's
 	cmd[4] = 0x10;
-	ret = sendCommand(cmd);
+	ret = waitN(32, 100, "get info", ASC);
 	p = (unsigned char *)replybuff;
 	if (ret >= 32) {
 		if (ret > 32) p += (ret - 32);
@@ -492,7 +492,7 @@ int  RIG_FT1000MP::get_smeter(void)
 	init_cmd();
 	cmd[0] = 0x00;
 	cmd[4] = 0xF7;
-	int ret = sendCommand(cmd);
+	int ret = waitN(5, 100, "get smeter", HEX);
 	if (ret < 5) return 0;
 
 	val = (unsigned char)(replybuff[ret-5]);
@@ -511,7 +511,7 @@ int  RIG_FT1000MP::get_swr(void)
 	init_cmd();
 	cmd[0] = 0x85;
 	cmd[4] = 0xF7;
-	int ret = sendCommand(cmd);
+	int ret = waitN(5, 100, "get swr", HEX);
 	if (ret < 5) return 0;
 
 	val = (unsigned char)(replybuff[ret-5]) - 10;
@@ -531,7 +531,7 @@ int  RIG_FT1000MP::get_alc(void)
 	init_cmd();
 	cmd[0] = 0x81;
 	cmd[4] = 0xF7;
-	int ret = sendCommand(cmd);
+	int ret = waitN(5, 100, "get alc", HEX);
 	if (ret < 5) return 0;
 
 	val = (unsigned char)(replybuff[ret-5]);
