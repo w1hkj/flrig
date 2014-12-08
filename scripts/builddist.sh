@@ -1,13 +1,6 @@
 # build file to generate the distribution binary tarball
 autoreconf
 
-# build linux binary
-./configure --prefix=/tmp/flrig-build --enable-static
-make install-strip
-tar czf flrig-$1.bin.tgz -C /tmp/flrig-build .
-
-make clean
-
 # build windows installation file
 ./configure \
   $PKGCFG \
