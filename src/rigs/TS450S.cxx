@@ -80,13 +80,14 @@ RIG_TS450S::RIG_TS450S() {
 void RIG_TS450S::initialize()
 {
 	cmd = "RM1;"; // select measurement '1' (swr)
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 }
 
 long RIG_TS450S::get_vfoA ()
 {
 	cmd = "FA;";
-	int ret = waitN(14, 100, "get vfoA", ASC);
+
+	int ret = wait_char(';', 14, 100, "get vfo A", ASC);
 	if (ret < 14) return freqA;
 
 	size_t p = replystr.rfind("FA");
@@ -107,15 +108,16 @@ void RIG_TS450S::set_vfoA (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "set vfo A", cmd, replystr);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set vfo A", cmd, "");
 }
 
 long RIG_TS450S::get_vfoB ()
 {
 	cmd = "FB;";
-	int ret = waitN(14, 100, "get vfoB", ASC);
+	int ret = wait_char(';', 14, 100, "get vfo B", ASC);
 	if (ret < 14) return freqB;
+
 	size_t p = replystr.rfind("FB");
 	if (p == string::npos) return freqB;
 	
@@ -135,14 +137,14 @@ void RIG_TS450S::set_vfoB (long freq)
 		freq /= 10;
 	}
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set vfoB", cmd, replystr);
+	showresp(WARN, ASC, "set vfo B", cmd, "");
 }
 
 // SM cmd 0 ... 100 (rig values 0 ... 15)
 int RIG_TS450S::get_smeter()
 {
 	cmd = "SM;";
-	int ret = waitN(7, 100, "get smeter", ASC);
+	int ret = wait_char(';', 7, 100, "get smeter", ASC);
 	if (ret < 7) return 0;
 
 	size_t p = replystr.rfind("SM");
@@ -158,7 +160,7 @@ int RIG_TS450S::get_smeter()
 int RIG_TS450S::get_swr()
 {
 	cmd = "RM;";
-	int ret = waitN(8, 100, "get swr", ASC);
+	int ret = wait_char(';', 8, 100, "get swr", ASC);
 	if (ret < 8) return 0;
 
 	size_t p = replystr.rfind("RM");
@@ -174,25 +176,26 @@ int RIG_TS450S::get_swr()
 // Tranceiver PTT on/off
 void RIG_TS450S::set_PTT_control(int val)
 {
+	showresp(WARN, ASC, "PTT", val ? "on" : "off", "");
 	if (val) cmd = "TX;";
 	else	 cmd = "RX;";
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 }
 
 void RIG_TS450S::set_modeA(int val)
 {
+	showresp(WARN, ASC, "set mode A", "", "");
 	modeA = val;
 	cmd = "MD";
 	cmd += TS450S_mode_chr[val];
 	cmd += ';';
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set mode A", cmd, replystr);
 }
 
 int RIG_TS450S::get_modeA()
 {
 	cmd = "IF;";
-	int ret = waitN(38, 100, "get modeA", ASC);
+	int ret = wait_char(';', 38, 100, "get modeA", ASC);
 	if (ret < 38) return split;
 	size_t p = replystr.rfind("IF");
 	if (p == string::npos) return modeA;
@@ -203,18 +206,18 @@ int RIG_TS450S::get_modeA()
 
 void RIG_TS450S::set_modeB(int val)
 {
+	showresp(WARN, ASC, "set mode B", "", "");
 	modeB = val;
 	cmd = "MD";
 	cmd += TS450S_mode_chr[val];
 	cmd += ';';
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set mode B", cmd, replystr);
 }
 
 int RIG_TS450S::get_modeB()
 {
 	cmd = "IF;";
-	int ret = waitN(38, 100, "get modeB", ASC);
+	int ret = wait_char(';', 38, 100, "get mode B", ASC);
 	if (ret < 38) return split;
 	size_t p = replystr.rfind("IF");
 	if (p == string::npos) return modeA;
@@ -228,21 +231,24 @@ int RIG_TS450S::get_modetype(int n)
 	return _mode_type[n];
 }
 
+static string bw_str = "FL001001;";
+
 void RIG_TS450S::set_bwA(int val)
 {
+	get_bwA();
+	showresp(WARN, ASC, "set bw A", "", "");
 	bwA = val;
-	cmd = "FL";
-	cmd.append(TS450S_filters[val]).append(TS450S_filters[val]);
-	cmd += ';';
-	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "set bw A", cmd, replystr);
+	cmd = bw_str.substr(0, 5);
+	cmd.append(TS450S_filters[val]).append(";");
+	sendCommand(cmd);
 }
 
 int RIG_TS450S::get_bwA()
 {
 	cmd = "FL;";
-	int ret = waitN(9, 100, "get bwA", ASC);
+	int ret = wait_char(';', 9, 100, "get bwA", ASC);
 	if (ret < 9) return bwA;
+	bw_str = replystr;
 	size_t p = replystr.rfind("FL");
 	if (p == string::npos) return bwA;
 	
@@ -258,19 +264,20 @@ int RIG_TS450S::get_bwA()
 
 void RIG_TS450S::set_bwB(int val)
 {
+	get_bwB();
+	showresp(WARN, ASC, "set bw B", "", "");
 	bwB = val;
-	cmd = "FL";
-	cmd.append(TS450S_filters[val]).append(TS450S_filters[val]);
-	cmd += ';';
-	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "set bw b", cmd, replystr);
+	cmd = bw_str.substr(0, 5);
+	cmd.append(TS450S_filters[val]).append(";");
+	sendCommand(cmd);
 }
 
 int RIG_TS450S::get_bwB()
 {
 	cmd = "FL;";
-	int ret = waitN(9, 100, "get bwB", ASC);
+	int ret = wait_char(';', 9, 100, "get bwB", ASC);
 	if (ret < 9) return bwB;
+	bw_str = replystr;
 	size_t p = replystr.rfind("FL");
 	if (p == string::npos) return bwB;
 	
@@ -304,10 +311,8 @@ void RIG_TS450S::selectA()
 	showresp(WARN, ASC, "select A", "", "");
 	cmd = "FR0;";
 	sendCommand(cmd);
-	showresp(WARN, ASC, "rx on A", cmd, replystr);
 	cmd = "FT0;";
 	sendCommand(cmd);
-	showresp(WARN, ASC, "tx on A", cmd, replystr);
 }
 
 void RIG_TS450S::selectB()
@@ -315,10 +320,8 @@ void RIG_TS450S::selectB()
 	showresp(WARN, ASC, "select B", "", "");
 	cmd = "FR1;";
 	sendCommand(cmd);
-	showresp(WARN, ASC, "rx on B", cmd, replystr);
 	cmd = "FT1;";
 	sendCommand(cmd);
-	showresp(WARN, ASC, "tx on B", cmd, replystr);
 }
 
 bool RIG_TS450S::can_split()
@@ -331,24 +334,20 @@ void RIG_TS450S::set_split(bool val)
 	if (val) {
 		cmd = "FR0;";
 		sendCommand(cmd);
-		showresp(WARN, ASC, "rx on A", cmd, replystr);
 		cmd = "FT1;";
 		sendCommand(cmd);
-		showresp(WARN, ASC, "tx on B", cmd, replystr);
 	} else {
 		cmd = "FR0;";
 		sendCommand(cmd);
-		showresp(WARN, ASC, "rx on A", cmd, replystr);
 		cmd = "FT0;";
 		sendCommand(cmd);
-		showresp(WARN, ASC, "tx on A", cmd, replystr);
 	}
 }
 
 int RIG_TS450S::get_split()
 {
 	cmd = "IF;";
-	int ret = waitN(38, 100, "get split", ASC);
+	int ret = wait_char(';', 38, 100, "get split", ASC);
 	if (ret < 38) return split;
 	size_t p = replystr.rfind("IF");
 	if (p == string::npos) return split;
