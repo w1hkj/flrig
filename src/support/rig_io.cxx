@@ -194,16 +194,15 @@ int sendCommand (string s, int nread)
 	clearSerialPort();
 	RigSerial.WriteBuffer(s.c_str(), numwrite);
 
-	if (nread == 0) return 0;
 	int timeout = progStatus.comm_wait + 
-		(int)((nread + progStatus.comm_echo ? numwrite : 0)*11000.0/RigSerial.Baud()
-		+ progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0);
+		(int)((nread + progStatus.comm_echo ? numwrite : 0)*11000.0/RigSerial.Baud());
 	while (timeout > 0) {
 		if (timeout > 10) MilliSleep(10);
 		else MilliSleep(timeout);
 		timeout -= 10;
 		Fl::awake();
 	}
+	if (nread == 0) return 0;
 	return readResponse();
 }
 
