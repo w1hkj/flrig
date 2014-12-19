@@ -107,7 +107,7 @@ void RIG_TS2000::initialize()
 	cmd = "EX0120000;"; // read menu 012 state
 //might return something like EX01200004;
 
-	if (waitN(11, 100, "read ex 012", ASC) == 11)
+	if (wait_char(';', 11, 100, "read ex 012", ASC) == 11)
 		menu012 = replystr;
 
 // disable beeps before resetting front panel display to SWR
@@ -122,22 +122,24 @@ void RIG_TS2000::initialize()
 // get current noise reduction values for NR1 and NR2
 	string current_nr;
 	cmd = "NR;";
-	if (waitN(4, 100, "read current NR", ASC) == 4)
+	if (wait_char(';', 4, 100, "read current NR", ASC) == 4)
 		current_nr = replystr;
 	cmd = "NR1;";
 	sendCommand(cmd);
 	cmd = "RL;";
-	waitN(5, 100, "GET noise reduction val", ASC);
-	size_t p = replystr.rfind("RL");
-	if (p != string::npos)
-		_nrval1 = atoi(&replystr[p+2]);
+	if (wait_char(';', 5, 100, "GET noise reduction val", ASC) == 5) {
+		size_t p = replystr.rfind("RL");
+		if (p != string::npos)
+			_nrval1 = atoi(&replystr[p+2]);
+	}
 	cmd = "NR2;";
 	sendCommand(cmd);
 	cmd = "RL;";
-	waitN(5, 100, "GET noise reduction val", ASC);
-	p = replystr.rfind("RL");
-	if (p != string::npos)
-		_nrval2 = atoi(&replystr[p+2]);
+	if (wait_char(';', 5, 100, "GET noise reduction val", ASC) == 5) {
+		size_t p = replystr.rfind("RL");
+		if (p != string::npos)
+			_nrval2 = atoi(&replystr[p+2]);
+	}
 // restore xcvr setting for NR
 	cmd = current_nr;
 	sendCommand(cmd);
@@ -239,10 +241,10 @@ void RIG_TS2000::selectA()
 {
 	cmd = "FR0;";
 	sendCommand(cmd);
-	showresp(WARN, ASC, "Rx on A", cmd, replystr);
+	showresp(WARN, ASC, "Rx on A", cmd, "");
 	cmd = "FT0;";
 	sendCommand(cmd);
-	showresp(WARN, ASC, "Tx on A", cmd, replystr);
+	showresp(WARN, ASC, "Tx on A", cmd, "");
 	rxona = true;
 }
 
@@ -250,10 +252,10 @@ void RIG_TS2000::selectB()
 {
 	cmd = "FR1;";
 	sendCommand(cmd);
-	showresp(WARN, ASC, "Rx on B", cmd, replystr);
+	showresp(WARN, ASC, "Rx on B", cmd, "");
 	cmd = "FT1;";
 	sendCommand(cmd);
-	showresp(WARN, ASC, "Tx on B", cmd, replystr);
+	showresp(WARN, ASC, "Tx on B", cmd, "");
 	rxona = false;
 }
 
@@ -264,34 +266,34 @@ void RIG_TS2000::set_split(bool val)
 		if (val) {
 			cmd = "FR1;";
 			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on B", cmd, replystr);
+			showresp(WARN, ASC, "Rx on B", cmd, "");
 			cmd = "FT0;";
 			sendCommand(cmd);
-			showresp(WARN, ASC, "Tx on A", cmd, replystr);
+			showresp(WARN, ASC, "Tx on A", cmd, "");
 		} else {
 			cmd = "FR1;";
 			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on B", cmd, replystr);
+			showresp(WARN, ASC, "Rx on B", cmd, "");
 			cmd = "FT1;";
 			sendCommand(cmd);
-			showresp(WARN, ASC, "Tx on B", cmd, replystr);
+			showresp(WARN, ASC, "Tx on B", cmd, "");
 		}
 		rxona = false;
 	} else {
 		if (val) {
 			cmd = "FR0;";
 			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on A", cmd, replystr);
+			showresp(WARN, ASC, "Rx on A", cmd, "");
 			cmd = "FT1;";
 			sendCommand(cmd);
-			showresp(WARN, ASC, "Tx on B", cmd, replystr);
+			showresp(WARN, ASC, "Tx on B", cmd, "");
 		} else {
 			cmd = "FR0;";
 			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on A", cmd, replystr);
+			showresp(WARN, ASC, "Rx on A", cmd, "");
 			cmd = "FT0;";
 			sendCommand(cmd);
-			showresp(WARN, ASC, "Tx on A", cmd, replystr);
+			showresp(WARN, ASC, "Tx on A", cmd, "");
 		}
 		rxona = true;
 	}
@@ -302,21 +304,22 @@ int RIG_TS2000::get_split()
 {
 	size_t p;
 	int split = 0;
-	int rx, tx;
+	int rx = 0, tx = 0;
 // tx vfo
 	cmd = "FT;";
-	waitN(4, 100, "get split tx vfo", ASC);
-	p = replystr.rfind("FT");
-	if (p == string::npos) return split;
-	tx = replystr[p+2] - '0';
+	if (wait_char(';', 4, 100, "get split tx vfo", ASC) == 4) {
+		p = replystr.rfind("FT");
+		if (p == string::npos) return split;
+		tx = replystr[p+2] - '0';
+	}
 
 // rx vfo
 	cmd = "FR;";
-	waitN(4, 100, "get split rx vfo", ASC);
-
-	p = replystr.rfind("FR");
-	if (p == string::npos) return split;
-	rx = replystr[p+2] - '0';
+	if (wait_char(';', 4, 100, "get split rx vfo", ASC) == 4) {
+		p = replystr.rfind("FR");
+		if (p == string::npos) return split;
+		rx = replystr[p+2] - '0';
+	}
 // split test
 	split = tx * 2 + rx;
 
@@ -326,13 +329,14 @@ int RIG_TS2000::get_split()
 long RIG_TS2000::get_vfoA ()
 {
 	cmd = "FA;";
-	waitN(14, 100, "get vfo A", ASC);
-	size_t p = replystr.rfind("FA");
-	if (p != string::npos) {
-		int f = 0;
-		for (size_t n = 2; n < 13; n++)
-			f = f*10 + replystr[p+n] - '0';
-		A.freq = f;
+	if (wait_char(';', 14, 100, "get vfo A", ASC) == 14) {
+		size_t p = replystr.rfind("FA");
+		if (p != string::npos) {
+			int f = 0;
+			for (size_t n = 2; n < 13; n++)
+				f = f*10 + replystr[p+n] - '0';
+			A.freq = f;
+		}
 	}
 	return A.freq;
 }
@@ -345,20 +349,21 @@ void RIG_TS2000::set_vfoA (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendCommand(cmd,0);
-	showresp(WARN, ASC, "set vfo A", cmd, replystr);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set vfo A", cmd, "");
 }
 
 long RIG_TS2000::get_vfoB ()
 {
 	cmd = "FB;";
-	waitN(14, 100, "get vfo B", ASC);
-	size_t p = replystr.rfind("FB");
-	if (p != string::npos) {
-		int f = 0;
-		for (size_t n = 2; n < 13; n++)
-			f = f*10 + replystr[p+n] - '0';
-		B.freq = f;
+	if (wait_char(';', 14, 100, "get vfo B", ASC) == 14) {
+		size_t p = replystr.rfind("FB");
+		if (p != string::npos) {
+			int f = 0;
+			for (size_t n = 2; n < 13; n++)
+				f = f*10 + replystr[p+n] - '0';
+			B.freq = f;
+		}
 	}
 	return B.freq;
 }
@@ -371,8 +376,8 @@ void RIG_TS2000::set_vfoB (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendCommand(cmd,0);
-	showresp(WARN, ASC, "set vfo B", cmd, replystr);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set vfo B", cmd, "");
 }
 
 int RIG_TS2000::get_smeter()
@@ -381,15 +386,16 @@ int RIG_TS2000::get_smeter()
 		cmd = "SM0;";
 	else
 		cmd = "SM1;";
-	waitN(8, 100, "get smeter", ASC);
-	size_t p = replystr.rfind("SM");
-	if (p != string::npos) {
-		int mtr = fm_decimal(&replystr[p+3],4);
-		if (rxona)
-			mtr = (mtr * 100) / 30;
-		else
-			mtr = (mtr * 100) / 15;
-		return mtr;
+	if (wait_char(';', 8, 100, "get smeter", ASC) == 8) {
+		size_t p = replystr.rfind("SM");
+		if (p != string::npos) {
+			int mtr = fm_decimal(&replystr[p+3],4);
+			if (rxona)
+				mtr = (mtr * 100) / 30;
+			else
+				mtr = (mtr * 100) / 15;
+			return mtr;
+		}
 	}
 	return 0;
 }
@@ -397,12 +403,13 @@ int RIG_TS2000::get_smeter()
 int RIG_TS2000::get_swr()
 {
 	cmd = "RM;";
-	waitN(8, 100, "get swr", ASC);
-	size_t p = replystr.rfind("RM1");
-	if (p != string::npos) {
-		int mtr = fm_decimal(&replystr[p+3], 4);
-		mtr = (mtr * 10) / 3;
-		return mtr;
+	if (wait_char(';', 8, 100, "get swr", ASC) == 8) {
+		size_t p = replystr.rfind("RM1");
+		if (p != string::npos) {
+			int mtr = fm_decimal(&replystr[p+3], 4);
+			mtr = (mtr * 10) / 3;
+			return mtr;
+		}
 	}
 	return 0;
 }
@@ -410,12 +417,13 @@ int RIG_TS2000::get_swr()
 int  RIG_TS2000::get_alc(void) 
 {
 	cmd = "RM;";
-	waitN(8, 100, "get alc", ASC);
-	size_t p = replystr.rfind("RM3");
-	if (p != string::npos) {
-		int mtr = fm_decimal(&replystr[p+3], 4);
-		mtr = (mtr * 10) / 3;
-		return mtr;
+	if (wait_char(';', 8, 100, "get alc", ASC) == 8) {
+		size_t p = replystr.rfind("RM3");
+		if (p != string::npos) {
+			int mtr = fm_decimal(&replystr[p+3], 4);
+			mtr = (mtr * 10) / 3;
+			return mtr;
+		}
 	}
 	return 0;
 }
@@ -439,22 +447,23 @@ void RIG_TS2000::set_power_control(double val)
 	cmd = "PC";
 	cmd.append(to_decimal(ival, 3)).append(";");
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set pwr ctrl", cmd, replystr);
+	showresp(WARN, ASC, "set pwr ctrl", cmd, "");
 }
 
 int RIG_TS2000::get_power_out()
 {
 	cmd = "SM0;";
-	waitN(8, 100, "get power out", ASC);
-	size_t p = replystr.rfind("SM0");
-	if (p != string::npos) {
-		int mtr = fm_decimal(&replystr[p+3],4);
-		if (mtr <= 6) mtr = mtr * 2;
-		else if (mtr <= 11) mtr = 11 + (mtr - 6)*(26 - 11)/(11 - 6);
-		else if (mtr <= 18) mtr = 26 + (mtr - 11)*(50 - 26)/(18 - 11);
-		else mtr = 50 + (mtr - 18)*(100 - 50)/(27 - 18);
-		if (mtr > 100) mtr = 100;
-		return mtr;
+	if (wait_char(';', 8, 100, "get power out", ASC) == 8) {
+		size_t p = replystr.rfind("SM0");
+		if (p != string::npos) {
+			int mtr = fm_decimal(&replystr[p+3],4);
+			if (mtr <= 6) mtr = mtr * 2;
+			else if (mtr <= 11) mtr = 11 + (mtr - 6)*(26 - 11)/(11 - 6);
+			else if (mtr <= 18) mtr = 26 + (mtr - 11)*(50 - 26)/(18 - 11);
+			else mtr = 50 + (mtr - 18)*(100 - 50)/(27 - 18);
+			if (mtr > 100) mtr = 100;
+			return mtr;
+		}
 	}
 	return 0;
 }
@@ -462,11 +471,12 @@ int RIG_TS2000::get_power_out()
 int RIG_TS2000::get_power_control()
 {
 	cmd = "PC;";
-	waitN(6, 100, "get pout", ASC);
-	size_t p = replystr.rfind("PC");
-	if (p != string::npos) {
-		int mtr = fm_decimal(&replystr[p+2], 3);
-		return mtr;
+	if (wait_char(';', 6, 100, "get pout", ASC) == 6) {
+		size_t p = replystr.rfind("PC");
+		if (p != string::npos) {
+			int mtr = fm_decimal(&replystr[p+2], 3);
+			return mtr;
+		}
 	}
 	return 0;
 }
@@ -475,11 +485,12 @@ int RIG_TS2000::get_power_control()
 int RIG_TS2000::get_volume_control()
 {
 	cmd = "AG0;";
-	waitN(7, 100, "get vol", ASC);
-	size_t p = replystr.rfind("AG");
-	if (p != string::npos) {
-		int val = fm_decimal(&replystr[p+3],3);
-		return (int)(val / 2.55);
+	if (wait_char(';', 7, 100, "get vol", ASC) == 7) {
+		size_t p = replystr.rfind("AG");
+		if (p != string::npos) {
+			int val = fm_decimal(&replystr[p+3],3);
+			return (int)(val / 2.55);
+		}
 	}
 	return 0;
 }
@@ -489,8 +500,8 @@ void RIG_TS2000::set_volume_control(int val)
 	int ivol = (int)(val * 2.55);
 	cmd = "AG0";
 	cmd.append(to_decimal(ivol, 3)).append(";");
-	sendCommand(cmd,0);
-	showresp(WARN, ASC, "set vol", cmd, replystr);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set vol", cmd, "");
 }
 
 // Tranceiver PTT on/off
@@ -498,15 +509,15 @@ void RIG_TS2000::set_PTT_control(int val)
 {
 	if (val) cmd = "TX;";
 	else	 cmd = "RX;";
-	sendCommand(cmd,0);
-	showresp(WARN, ASC, "set PTT", cmd, replystr);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set PTT", cmd, "");
 }
 
 void RIG_TS2000::tune_rig()
 {
 	cmd = "AC111;";
-	sendCommand(cmd,0);
-	showresp(WARN, ASC, "tune", cmd, replystr);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "tune", cmd, "");
 }
 
 void RIG_TS2000::set_attenuator(int val)
@@ -514,20 +525,21 @@ void RIG_TS2000::set_attenuator(int val)
 	att_level = val;
 	if (val) cmd = "RA01;";
 	else     cmd = "RA00;";
-	sendCommand(cmd,0);
-	showresp(WARN, ASC, "set ATT", cmd, replystr);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set ATT", cmd, "");
 }
 
 int RIG_TS2000::get_attenuator()
 {
 	cmd = "RA;";
-	waitN(7, 100, "get ATT", ASC);
-	size_t p = replystr.rfind("RA");
-	if (p != string::npos && (p+3 < replystr.length())) {
-		if (replystr[p+2] == '0' && replystr[p+3] == '0')
-			att_level = 0;
-		else
-			att_level = 1;
+	if (wait_char(';', 7, 100, "get ATT", ASC) == 7) {
+		size_t p = replystr.rfind("RA");
+		if (p != string::npos && (p+3 < replystr.length())) {
+			if (replystr[p+2] == '0' && replystr[p+3] == '0')
+				att_level = 0;
+			else
+				att_level = 1;
+		}
 	}
 	return att_level;
 }
@@ -537,20 +549,21 @@ void RIG_TS2000::set_preamp(int val)
 	preamp_level = val;
 	if (val) cmd = "PA1;";
 	else     cmd = "PA0;";
-	sendCommand(cmd,0);
-	showresp(WARN, ASC, "set PRE", cmd, replystr);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set PRE", cmd, "");
 }
 
 int RIG_TS2000::get_preamp()
 {
 	cmd = "PA;";
-	waitN(5, 100, "get PRE", ASC);
-	size_t p = replystr.rfind("PA");
-	if (p != string::npos && (p+2 < replystr.length())) {
-		if (replystr[p+2] == '1') 
-			preamp_level = 1;
-		else
-			preamp_level = 0;
+	if (wait_char(';', 5, 100, "get PRE", ASC) == 5) {
+		size_t p = replystr.rfind("PA");
+		if (p != string::npos && (p+2 < replystr.length())) {
+			if (replystr[p+2] == '1') 
+				preamp_level = 1;
+			else
+				preamp_level = 0;
+		}
 	}
 	return preamp_level;
 }
@@ -632,22 +645,23 @@ void RIG_TS2000::set_modeA(int val)
 	cmd = "MD";
 	cmd += TS2000_mode_chr[val];
 	cmd += ';';
-	sendCommand(cmd,0);
-	showresp(WARN, ASC, "set mode", cmd, replystr);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set mode", cmd, "");
 	A.iBW = set_widths(val);
 }
 
 int RIG_TS2000::get_modeA()
 {
 	cmd = "MD;";
-	waitN(4, 100, "get mode A", ASC);
-	size_t p = replystr.rfind("MD");
-	if (p != string::npos) {
-		int md = replystr[p+2];
-		md = md - '1';
-		if (md == 8) md = 7;
-		A.imode = md;
-		A.iBW = set_widths(A.imode);
+	if (wait_char(';', 4, 100, "get mode A", ASC) == 4) {
+		size_t p = replystr.rfind("MD");
+		if (p != string::npos) {
+			int md = replystr[p+2];
+			md = md - '1';
+			if (md == 8) md = 7;
+			A.imode = md;
+			A.iBW = set_widths(A.imode);
+		}
 	}
 	_currmode = A.imode;
 	return A.imode;
@@ -660,21 +674,22 @@ void RIG_TS2000::set_modeB(int val)
 	cmd += TS2000_mode_chr[val];
 	cmd += ';';
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set mode B", cmd, replystr);
+	showresp(WARN, ASC, "set mode B", cmd, "");
 	B.iBW = set_widths(val);
 }
 
 int RIG_TS2000::get_modeB()
 {
 	cmd = "MD;";
-	waitN(4, 100, "get mode B", ASC);
-	size_t p = replystr.rfind("MD");
-	if (p != string::npos) {
-		int md = replystr[p+2];
-		md = md - '1';
-		if (md == 8) md = 7;
-		B.imode = md;
-		B.iBW = set_widths(B.imode);
+	if (wait_char(';', 4, 100, "get mode B", ASC) == 4) {
+		size_t p = replystr.rfind("MD");
+		if (p != string::npos) {
+			int md = replystr[p+2];
+			md = md - '1';
+			if (md == 8) md = 7;
+			B.imode = md;
+			B.iBW = set_widths(B.imode);
+		}
 	}
 	_currmode = B.imode;
 	return B.imode;
@@ -708,24 +723,24 @@ void RIG_TS2000::set_bwA(int val)
 		A.iBW = val;
 		cmd = "SL";
 		cmd = TS2000_CAT_lo[A.iBW & 0x7F];
-		sendCommand(cmd,0);
-		showresp(WARN, ASC, "set lower", cmd, replystr);
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set lower", cmd, "");
 		cmd = "SH";
 		cmd = TS2000_CAT_hi[(A.iBW >> 8) & 0x7F];
-		sendCommand(cmd,0);
-		showresp(WARN, ASC, "set upper", cmd, replystr);
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set upper", cmd, "");
 	}
 	if (val > 256) return;
 	else if (A.imode == CW || A.imode == CWR) {
 		A.iBW = val;
 		cmd = TS2000_CWbw[A.iBW];
-		sendCommand(cmd,0);
-		showresp(WARN, ASC, "set CW bw", cmd, replystr);
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set CW bw", cmd, "");
 	}else if (A.imode == FSK || A.imode == FSKR) {
 		A.iBW = val;
 		cmd = TS2000_FSKbw[A.iBW];
-		sendCommand(cmd,0);
-		showresp(WARN, ASC, "set FSK bw", cmd, replystr);
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set FSK bw", cmd, "");
 	}
 }
 
@@ -736,37 +751,41 @@ int RIG_TS2000::get_bwA()
 	if (A.imode == LSB || A.imode == USB || A.imode == FM || A.imode == AM) {
 		int lo = A.iBW & 0xFF, hi = (A.iBW >> 8) & 0x7F;
 		cmd = "SL;";
-		waitN(5, 100, "get SL", ASC);
-		p = replystr.rfind("SL");
-		if (p != string::npos)
-			lo = fm_decimal(&replystr[2], 2);
+		if (wait_char(';', 5, 100, "get SL", ASC) == 5) {
+			p = replystr.rfind("SL");
+			if (p != string::npos)
+				lo = fm_decimal(&replystr[2], 2);
+		}
 		cmd = "SH;";
-		waitN(5, 100, "get SH", ASC);
-		p = replystr.rfind("SH");
-		if (p != string::npos)
-			hi = fm_decimal(&replystr[2], 2);
-		A.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
+		if (wait_char(';', 5, 100, "get SH", ASC) == 5) {
+			p = replystr.rfind("SH");
+			if (p != string::npos)
+				hi = fm_decimal(&replystr[2], 2);
+			A.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
+		}
 	} else if (A.imode == CW || A.imode == CWR) { // CW
 		cmd = "FW;";
-		waitN(7, 100, "get FW", ASC);
-		p = replystr.rfind("FW");
-		if (p != string::npos) {
-			for (i = 0; i < 11; i++)
-				if (replystr.find(TS2000_CWbw[i]) == p)
-					break;
-			if (i == 11) i = 10;
-			A.iBW = i;
+		if (wait_char(';', 7, 100, "get FW", ASC) == 7) {
+			p = replystr.rfind("FW");
+			if (p != string::npos) {
+				for (i = 0; i < 11; i++)
+					if (replystr.find(TS2000_CWbw[i]) == p)
+						break;
+				if (i == 11) i = 10;
+				A.iBW = i;
+			}
 		}
 	} else if (A.imode == FSK || A.imode == FSKR) {
 		cmd = "FW;";
-		waitN(7, 100, "get FW", ASC);
-		p = replystr.rfind("FW");
-		if (p != string::npos) {
-			for (i = 0; i < 4; i++)
-				if (replystr.find(TS2000_FSKbw[i]) == p)
-					break;
-			if (i == 4) i = 3;
-			A.iBW = i;
+		if (wait_char(';', 7, 100, "get FW", ASC) == 7) {
+			p = replystr.rfind("FW");
+			if (p != string::npos) {
+				for (i = 0; i < 4; i++)
+					if (replystr.find(TS2000_FSKbw[i]) == p)
+						break;
+				if (i == 4) i = 3;
+				A.iBW = i;
+			}
 		}
 	}
 	return A.iBW;
@@ -779,24 +798,24 @@ void RIG_TS2000::set_bwB(int val)
 		B.iBW = val;
 		cmd = "SL";
 		cmd = TS2000_CAT_lo[B.iBW & 0x7F];
-		sendCommand(cmd,0);
-		showresp(WARN, ASC, "set lower", cmd, replystr);
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set lower", cmd, "");
 		cmd = "SH";
 		cmd = TS2000_CAT_hi[(B.iBW >> 8) & 0x7F];
-		sendCommand(cmd,0);
-		showresp(WARN, ASC, "set upper", cmd, replystr);
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set upper", cmd, "");
 	}
 	if (val > 256) return;
 	else if (B.imode == CW || B.imode == CWR) { // CW
 		B.iBW = val;
 		cmd = TS2000_CWbw[B.iBW];
-		sendCommand(cmd,0);
-		showresp(WARN, ASC, "set CW bw", cmd, replystr);
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set CW bw", cmd, "");
 	}else if (B.imode == FSK || B.imode == FSKR) {
 		B.iBW = val;
 		cmd = TS2000_FSKbw[B.iBW];
-		sendCommand(cmd,0);
-		showresp(WARN, ASC, "set FSK bw", cmd, replystr);
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set FSK bw", cmd, "");
 	}
 }
 
@@ -807,37 +826,41 @@ int RIG_TS2000::get_bwB()
 	if (B.imode == LSB || B.imode == USB || B.imode == FM || B.imode == AM) {
 		int lo = B.iBW & 0xFF, hi = (B.iBW >> 8) & 0x7F;
 		cmd = "SL;";
-		waitN(5, 100, "get SL", ASC);
-		p = replystr.rfind("SL");
-		if (p != string::npos)
-			lo = fm_decimal(&replystr[2], 2);
+		if (wait_char(';', 5, 100, "get SL", ASC) == 5) {
+			p = replystr.rfind("SL");
+			if (p != string::npos)
+				lo = fm_decimal(&replystr[2], 2);
+		}
 		cmd = "SH;";
-		waitN(5, 100, "get SH", ASC);
-		p = replystr.rfind("SH");
-		if (p != string::npos)
-			hi = fm_decimal(&replystr[2], 2);
-		B.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
+		if (wait_char(';', 5, 100, "get SH", ASC) == 5) {
+			p = replystr.rfind("SH");
+			if (p != string::npos)
+				hi = fm_decimal(&replystr[2], 2);
+			B.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
+		}
 	} else if (B.imode == CW || B.imode == CWR) {
 		cmd = "FW;";
-		waitN(7, 100, "get FW", ASC);
-		p = replystr.rfind("FW");
-		if (p != string::npos) {
-			for (i = 0; i < 11; i++)
-				if (replystr.find(TS2000_CWbw[i]) == p)
-					break;
-			if (i == 11) i = 10;
-			B.iBW = i;
+		if (wait_char(';', 7, 100, "get FW", ASC) == 7) {
+			p = replystr.rfind("FW");
+			if (p != string::npos) {
+				for (i = 0; i < 11; i++)
+					if (replystr.find(TS2000_CWbw[i]) == p)
+						break;
+				if (i == 11) i = 10;
+				B.iBW = i;
+			}
 		}
 	} else if (B.imode == FSK || B.imode == FSKR) {
 		cmd = "FW;";
-		waitN(7, 100, "get FW", ASC);
-		p = replystr.rfind("FW");
-		if (p != string::npos) {
-			for (i = 0; i < 4; i++)
-				if (replystr.find(TS2000_FSKbw[i]) == p)
-					break;
-			if (i == 4) i = 3;
-			B.iBW = i;
+		if (wait_char(';', 7, 100, "get FW", ASC) == 7) {
+			p = replystr.rfind("FW");
+			if (p != string::npos) {
+				for (i = 0; i < 4; i++)
+					if (replystr.find(TS2000_FSKbw[i]) == p)
+						break;
+				if (i == 4) i = 3;
+				B.iBW = i;
+			}
 		}
 	}
 	return B.iBW;
@@ -854,16 +877,17 @@ void RIG_TS2000::set_mic_gain(int val)
 	cmd = "MG";
 	cmd.append(to_decimal(val,3)).append(";");
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set mic", cmd, replystr);
+	showresp(WARN, ASC, "set mic", cmd, "");
 }
 
 int RIG_TS2000::get_mic_gain()
 {
 	cmd = "MG;";
-	waitN(6, 100, "get mic", ASC);
-	size_t p = replystr.rfind("MG");
-	if (p != string::npos)
-		return fm_decimal(&replystr[p+2], 3);
+	if (wait_char(';', 6, 100, "get mic", ASC) == 6) {
+		size_t p = replystr.rfind("MG");
+		if (p != string::npos)
+			return fm_decimal(&replystr[p+2], 3);
+	}
 	return 0;
 }
 
@@ -880,17 +904,18 @@ void RIG_TS2000::set_noise(bool b)
 		cmd = "NB1;";
 	else
 		cmd = "NB0;";
-	sendCommand(cmd,0);
-	showresp(WARN, ASC, "set NB", cmd, replystr);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set NB", cmd, "");
 }
 
 int RIG_TS2000::get_noise()
 {
 	cmd = "NB;";
-	waitN(4, 100, "get Noise Blanker", ASC);
-	size_t p = replystr.rfind("NB");
-	if (p == string::npos) return 0;
-	if (replystr[p+2] == '0') return 0;
+	if (wait_char(';', 4, 100, "get Noise Blanker", ASC) == 4) {
+		size_t p = replystr.rfind("NB");
+		if (p == string::npos) return 0;
+		if (replystr[p+2] == '0') return 0;
+	}
 	return 1;
 }
 
@@ -910,18 +935,19 @@ void RIG_TS2000::set_if_shift(int val)
 
 	cmd = "IS ";
 	cmd.append(to_decimal(val,4)).append(";");
-	sendCommand(cmd,0);
-	showresp(WARN, ASC, "set IF shift", cmd, replystr);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set IF shift", cmd, "");
 }
 
 bool RIG_TS2000::get_if_shift(int &val)
 {
 	cmd = "IS;";
-	waitN(8, 100, "get IF shift", ASC);
-	size_t p = replystr.rfind("IS ");
-	if (p != string::npos) {
-		val = fm_decimal(&replystr[p+3], 4);
-		return true;
+	if (wait_char(';', 8, 100, "get IF shift", ASC) == 8) {
+		size_t p = replystr.rfind("IS ");
+		if (p != string::npos) {
+			val = fm_decimal(&replystr[p+3], 4);
+			return true;
+		}
 	}
 	val = if_shift_mid;
 	return false;
@@ -939,17 +965,17 @@ void RIG_TS2000::set_notch(bool on, int val)
 {
 	if (on) {
 		cmd = "BC2;"; // set manual notch
-		sendCommand(cmd,0);
-		showresp(WARN, ASC, "set notch on", cmd, replystr);
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set notch on", cmd, "");
 		cmd = "BP";
 		val = round((val - 300) * 64.0 / 2700.0);
 		cmd.append(to_decimal(val, 3)).append(";");
-		sendCommand(cmd,0);
-		showresp(WARN, ASC, "set notch val", cmd, replystr);
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set notch val", cmd, "");
 	} else {
 		cmd = "BC0;"; // no notch action
-		sendCommand(cmd,0);
-		showresp(WARN, ASC, "set notch off", cmd, replystr);
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set notch off", cmd, "");
 	}
 }
 
@@ -957,16 +983,18 @@ bool  RIG_TS2000::get_notch(int &val)
 {
 	bool ison = false;
 	cmd = "BC;";
-	waitN(4, 100, "get notch on/off", ASC);
-	size_t p = replystr.rfind("BC");
-	if (p != string::npos) {
-		if (replystr[p+2] == '2') {
-			ison = true;
-			cmd = "BP;";
-			waitN(6, 100, "get notch val", ASC);
-			p = replystr.rfind("BP");
-			if (p != string::npos)
-				val = 300 + (2700.0 / 64.0) * fm_decimal(&replystr[p+2],3);
+	if (wait_char(';', 4, 100, "get notch on/off", ASC) == 4) {
+		size_t p = replystr.rfind("BC");
+		if (p != string::npos) {
+			if (replystr[p+2] == '2') {
+				ison = true;
+				cmd = "BP;";
+				if (wait_char(';', 6, 100, "get notch val", ASC) == 6) {
+					p = replystr.rfind("BP");
+					if (p != string::npos)
+						val = 300 + (2700.0 / 64.0) * fm_decimal(&replystr[p+2],3);
+				}
+			}
 		}
 	}
 	return ison;
@@ -983,16 +1011,17 @@ void RIG_TS2000::set_auto_notch(int v)
 {
 	cmd = v ? "NT1;" : "NT0;";
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set auto notch", cmd, replystr);
+	showresp(WARN, ASC, "set auto notch", cmd, "");
 }
 
 int  RIG_TS2000::get_auto_notch()
 {
 	cmd = "NT;";
-	waitN(4, 100, "get auto notch", ASC);
-	size_t p = replystr.rfind("NT");
-	if (p != string::npos)
-		return (replystr[p+2] == '1');
+	if (wait_char(';', 4, 100, "get auto notch", ASC) == 4) {
+		size_t p = replystr.rfind("NT");
+		if (p != string::npos)
+			return (replystr[p+2] == '1');
+	}
 	return 0;
 }
 
@@ -1001,27 +1030,23 @@ void RIG_TS2000::set_rf_gain(int val)
 	cmd = "RG";
 	cmd.append(to_decimal(val * 255 / 100, 3)).append(";");
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set rf gain", cmd, replystr);
+	showresp(WARN, ASC, "set rf gain", cmd, "");
 }
 
 int  RIG_TS2000::get_rf_gain()
 {
 	cmd = "RG;";
-	waitN(6, 100, "get rf gain", ASC);
-	size_t p = replystr.rfind("RG");
-	if (p != string::npos)
-		return fm_decimal(&replystr[p+2] ,3) * 100 / 255;
+	if (wait_char(';', 6, 100, "get rf gain", ASC) == 6) {
+		size_t p = replystr.rfind("RG");
+		if (p != string::npos)
+			return fm_decimal(&replystr[p+2] ,3) * 100 / 255;
+	}
 	return 100;
 }
 
 void RIG_TS2000::set_noise_reduction(int val)
 {
 	if (val == -1) {
-//		if (_noise_reduction_level == 1) {
-//			nr_label("NR1", true);
-//		} else if (_noise_reduction_level == 2) {
-//			nr_label("NR2", true);
-//		}
 		return;
 	}
 	_noise_reduction_level = val;
@@ -1036,17 +1061,18 @@ void RIG_TS2000::set_noise_reduction(int val)
 	cmd += '0' + _noise_reduction_level;
 	cmd += ';';
 	sendCommand (cmd);
-	showresp(WARN, ASC, "SET noise reduction", cmd, replystr);
+	showresp(WARN, ASC, "SET noise reduction", cmd, "");
 }
 
 int  RIG_TS2000::get_noise_reduction()
 {
 	cmd = rsp = "NR";
 	cmd.append(";");
-	waitN(4, 100, "GET noise reduction", ASC);
-	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return _noise_reduction_level;
-	_noise_reduction_level = replystr[p+2] - '0';
+	if (wait_char(';', 4, 100, "GET noise reduction", ASC) == 4) {
+		size_t p = replystr.rfind(rsp);
+		if (p == string::npos) return _noise_reduction_level;
+		_noise_reduction_level = replystr[p+2] - '0';
+	}
 
 	if (_noise_reduction_level == 1) {
 		nr_label("NR1", true);
@@ -1067,7 +1093,7 @@ void RIG_TS2000::set_noise_reduction_val(int val)
 
 	cmd.assign("RL").append(to_decimal(val, 2)).append(";");
 	sendCommand(cmd);
-	showresp(WARN, ASC, "SET_noise_reduction_val", cmd, replystr);
+	showresp(WARN, ASC, "SET_noise_reduction_val", cmd, "");
 }
 
 int  RIG_TS2000::get_noise_reduction_val()
@@ -1076,12 +1102,12 @@ int  RIG_TS2000::get_noise_reduction_val()
 	int val = progStatus.noise_reduction_val;
 	cmd = rsp = "RL";
 	cmd.append(";");
-	waitN(5, 100, "GET noise reduction val", ASC);
-	size_t p = replystr.rfind(rsp);
-	if (p == string::npos)
-		return (_noise_reduction_level == 1 ? _nrval1 : _nrval2);
-
-	val = atoi(&replystr[p+2]);
+	if (wait_char(';', 5, 100, "GET noise reduction val", ASC) == 5) {
+		size_t p = replystr.rfind(rsp);
+		if (p == string::npos)
+			return (_noise_reduction_level == 1 ? _nrval1 : _nrval2);
+		val = atoi(&replystr[p+2]);
+	}
 
 	if (_noise_reduction_level == 1) _nrval1 = val;
 	else _nrval2 = val;

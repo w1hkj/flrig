@@ -243,7 +243,7 @@ void RIG_TS990::initialize()
 	sendCommand(cmd);
 
 	cmd = "EX00100;";
-	if (waitN(11, 100, "read ex 00100", ASC) == 11)
+	if (wait_char(';', 11, 100, "read ex 00100", ASC) == 11)
 		menu_0001 = replystr;
 	cmd = "EX00100 00"; // turn off beeps
 	sendCommand(cmd);
@@ -380,8 +380,8 @@ RIG_TS990::RIG_TS990() {
 void RIG_TS990::selectA()
 {
 	cmd = "CB0;";
-	sendCommand(cmd, 0);
-	showresp(INFO, ASC, "Rx A, Tx A", cmd, replystr);
+	sendCommand(cmd);
+	showresp(INFO, ASC, "Rx A, Tx A", cmd, "");
 	rxtxa = true;
 	get_attenuator();
 	get_preamp();
@@ -397,8 +397,8 @@ void RIG_TS990::selectA()
 void RIG_TS990::selectB()
 {
 	cmd = "CB1;";
-	sendCommand(cmd, 0);
-	showresp(INFO, ASC, "Rx B, Tx B", cmd, replystr);
+	sendCommand(cmd);
+	showresp(INFO, ASC, "Rx B, Tx B", cmd, "");
 	rxtxa = false;
 	get_attenuator();
 	get_preamp();
@@ -439,7 +439,7 @@ void RIG_TS990::set_attenuator(int val) {
 			atten_label("Att", false);
 		}
 		sendCommand(cmd);
-		showresp(INFO, ASC, "set Att B", cmd, replystr);
+		showresp(INFO, ASC, "set Att B", cmd, "");
 
 	} else {
 		if (att_level == 0) {
@@ -461,7 +461,7 @@ void RIG_TS990::set_attenuator(int val) {
 			atten_label("Att", false);
 		}
 		sendCommand(cmd);
-		showresp(INFO, ASC, "set Att A", cmd, replystr);
+		showresp(INFO, ASC, "set Att A", cmd, "");
 	}
 }
 
@@ -472,8 +472,8 @@ int RIG_TS990::get_attenuator() {
 
 	if (useB) {
 		cmd = "RA1;";
-		int ret = waitN(5, 100, "get Att B", ASC);
-		if (ret < 5) return att_on;
+		if (wait_char(';', 5, 100, "get Att B", ASC) < 5) return att_on;
+
 		size_t p = replystr.rfind("RA");
 		if (p == string::npos) return att_on;
 
@@ -496,8 +496,8 @@ int RIG_TS990::get_attenuator() {
 		}
 	} else {
 		cmd = "RA0;";
-		int ret = waitN(5, 100, "get Att B", ASC);
-		if (ret < 5) return att_on;
+		if (wait_char(';', 5, 100, "get Att B", ASC) < 5) return att_on;
+
 		size_t p = replystr.rfind("RA");
 		if (p == string::npos) return att_on;
 
@@ -534,22 +534,22 @@ void RIG_TS990::set_preamp(int val)
 		preamp_level = val;
 		if (val) cmd = "PA11;";
 		else     cmd = "PA10;";
-		sendCommand(cmd, 0);
+		sendCommand(cmd);
 	} else {
 		preamp_level = val;
 		if (val) cmd = "PA01;";
 		else     cmd = "PA00;";
-		sendCommand(cmd, 0);
+		sendCommand(cmd);
 	}
-	showresp(INFO, ASC, "set preamp", cmd, replystr);
+	showresp(INFO, ASC, "set preamp", cmd, "");
 }
 
 int RIG_TS990::get_preamp()
 {
 	if (useB) {
 		cmd = "PA1;";
-		int ret = waitN(5, 20, "get preamp", ASC);
-		if (ret < 5) return 0;
+		if (wait_char(';', 5, 20, "get preamp", ASC) < 5) return 0;
+
 		size_t p = replystr.rfind("PA");
 		if (p == string::npos) return 0;
 
@@ -560,8 +560,8 @@ int RIG_TS990::get_preamp()
 
 	} else {
 		cmd = "PA0;";
-		int ret = waitN(5, 20, "get preamp", ASC);
-		if (ret < 5) return 0;
+		if (wait_char(';', 5, 20, "get preamp", ASC) < 5) return 0;
+
 		size_t p = replystr.rfind("PA");
 		if (p == string::npos) return 0;
 
@@ -583,21 +583,21 @@ void RIG_TS990::set_split(bool val)
 		if (val) {
 			cmd = "MV10;TB0;";
 			sendCommand(cmd);
-			showresp(INFO, ASC, "Rx on B, Tx on A", cmd, replystr);
+			showresp(INFO, ASC, "Rx on B, Tx on A", cmd, "");
 		} else {
 			cmd = "MV10;TB1;";
 			sendCommand(cmd);
-			showresp(INFO, ASC, "Rx on B, Tx on B", cmd, replystr);
+			showresp(INFO, ASC, "Rx on B, Tx on B", cmd, "");
 		}
 	} else {
 		if (val) {
 			cmd = "MV00;TB1;";
 			sendCommand(cmd);
-			showresp(INFO, ASC, "Rx on A, Tx on B", cmd, replystr);
+			showresp(INFO, ASC, "Rx on A, Tx on B", cmd, "");
 		} else {
 			cmd = "MV00;TB0;";
 			sendCommand(cmd);
-			showresp(INFO, ASC, "Rx on A, Tx on A", cmd, replystr);
+			showresp(INFO, ASC, "Rx on A, Tx on A", cmd, "");
 		}
 	}
 	Fl::awake(highlight_vfo, (void *)0);
@@ -608,26 +608,25 @@ int RIG_TS990::get_split()
 {
 	size_t p;
 	int split = 0;
-	char rx, tx;
+	char rx = 0, tx = 0;
 // tx vfo
 	cmd = rsp = "TB";
 	cmd.append(";");
-	waitN(4, 20, "get split tx vfo", ASC);
-	p = replystr.rfind(rsp);
-	if (p == string::npos) return split;
-	tx = replystr[p+2];
-
+	if (wait_char(';', 4, 20, "get split tx vfo", ASC) == 4) {
+		p = replystr.rfind(rsp);
+		if (p == string::npos) return split;
+		tx = replystr[p+2];
+	}
 // rx vfo
 	cmd = rsp = "CB";
 	cmd.append(";");
-	waitN(4, 20, "get split rx vfo", ASC);
-
-	p = replystr.rfind(rsp);
-	if (p == string::npos) return split;
-	rx = replystr[p+2];
+	if (wait_char(';', 4, 20, "get split rx vfo", ASC) == 4) {
+		p = replystr.rfind(rsp);
+		if (p == string::npos) return split;
+		rx = replystr[p+2];
  //split test
-	split = (tx == '1' ? 2 : 0) + (rx == '1' ? 1 : 0);
-
+		split = (tx == '1' ? 2 : 0) + (rx == '1' ? 1 : 0);
+	}
 	return split;
 }
 
@@ -662,9 +661,8 @@ const char * RIG_TS990::get_bwname_(int n, int md)
 long RIG_TS990::get_vfoA ()
 {
 	cmd = "FA;";
-	int ret = waitN(14, 20, "get vfoA", ASC);
+	if (wait_char(';', 14, 20, "get vfoA", ASC) < 14) return A.freq;
 
-	if (ret < 14) return A.freq;
 	size_t p = replystr.rfind("FA");
 	if (p == string::npos) return A.freq;
 
@@ -686,16 +684,15 @@ void RIG_TS990::set_vfoA (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendCommand(cmd, 0);
-	showresp(INFO, ASC, "set vfo A", cmd, replystr);
+	sendCommand(cmd);
+	showresp(INFO, ASC, "set vfo A", cmd, "");
 }
 
 long RIG_TS990::get_vfoB ()
 {
 	cmd = "FB;";
-	int ret = waitN(14, 20, "get vfoB", ASC);
+	if (wait_char(';', 14, 20, "get vfoB", ASC) < 14) return B.freq;
 
-	if (ret < 14) return B.freq;
 	size_t p = replystr.rfind("FB");
 	if (p == string::npos) return B.freq;
 
@@ -718,8 +715,8 @@ void RIG_TS990::set_vfoB (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendCommand(cmd, 0);
-	showresp(INFO, ASC, "set vfo B", cmd, replystr);
+	sendCommand(cmd);
+	showresp(INFO, ASC, "set vfo B", cmd, "");
 }
 
 //==============================================================================
@@ -731,8 +728,8 @@ int RIG_TS990::get_smeter()
 	if (useB) {
 		int mtr = 0;
 		cmd = "SM1;";
-		int ret = waitN(8, 20, "get", ASC);
-		if (ret < 8) return 0;
+		if (wait_char(';', 8, 20, "get", ASC) < 8) return 0;
+
 		size_t p = replystr.find("SM1");
 		if (p == string::npos) return 0;
 		replystr[p + 7] = 0;
@@ -744,8 +741,8 @@ int RIG_TS990::get_smeter()
 	} else {
 		int mtr = 0;
 		cmd = "SM0;";
-		int ret = waitN(8, 20, "get", ASC);
-		if (ret < 8) return 0;
+		if (wait_char(';', 8, 20, "get", ASC) < 8) return 0;
+
 		size_t p = replystr.find("SM0");
 		if (p == string::npos) return 0;
 		replystr[p + 7] = 0;
@@ -766,8 +763,8 @@ int RIG_TS990::get_power_out()
 	if (useB) {
 		int mtr = 0;
 		cmd = "SM1;";
-		int ret = waitN(8, 20, "get power", ASC);
-		if (ret < 8) return mtr;
+		if (wait_char(';', 8, 20, "get power", ASC) < 8) return mtr;
+
 		size_t p = replystr.rfind("SM1");
 		if (p == string::npos) return mtr;
 
@@ -779,8 +776,8 @@ int RIG_TS990::get_power_out()
 	} else {
 		int mtr = 0;
 		cmd = "SM0;";
-		int ret = waitN(8, 20, "get power", ASC);
-		if (ret < 8) return mtr;
+		if (wait_char(';', 8, 20, "get power", ASC) < 8) return mtr;
+
 		size_t p = replystr.rfind("SM0");
 		if (p == string::npos) return mtr;
 		mtr = atoi(&replystr[p + 3]);
@@ -806,8 +803,7 @@ int RIG_TS990::get_swr(void)
 	read_alc = false;
 
 	cmd = "RM;";
-	int ret = waitN(16, 20, "get swr/alc", ASC);
-	if (ret < 16) return 0;
+	if (wait_char(';', 16, 20, "get swr/alc", ASC) < 16) return 0;
 
 	size_t p = replystr.find("RM1");
 	if (p != string::npos) {
@@ -838,8 +834,7 @@ int RIG_TS990::get_alc(void)
 		return alc_val;
 	}
 	cmd = "RM;";
-	int ret = waitN(8, 20, "get alc", ASC);
-	if (ret < 8) return 0;
+	if (wait_char(';', 8, 20, "get alc", ASC) < 8) return 0;
 
 	size_t p = replystr.find("RM1");
 	if (p == string::npos) return 0;
@@ -864,23 +859,19 @@ void RIG_TS990::set_power_control(double val)
 		cmd[i] += ival % 10;
 		ival /= 10;
 	}
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 }
 
 int RIG_TS990::get_power_control()
 {
 	cmd = "PC;";
-	int ret = waitN(6, 20, "get pwr ctrl", ASC);
+	if (wait_char(';', 6, 20, "get pwr ctrl", ASC) < 6) return 0;
 
-	if (ret < 6) return 0;
 	size_t p = replystr.rfind("PC");
 	if (p == string::npos) return 0;
 	int mtr = 0;
-	if (ret >= 6) {
-		replystr[p + 5] = 0;
-			mtr = atoi(&replystr[p + 2]);
-
-	}
+	replystr[p + 5] = 0;
+	mtr = atoi(&replystr[p + 2]);
 	return mtr;
 }
 
@@ -893,9 +884,8 @@ int RIG_TS990::get_volume_control()
 	if (useB) {
 
 	cmd = "AG1;";
-	int ret = waitN(7, 20, "get vol ctrl", ASC);
+	if (wait_char(';', 7, 20, "get vol ctrl", ASC) < 7) return 0;
 
-	if (ret < 7) return 0;
 	size_t p = replystr.rfind("AG");
 	if (p == string::npos) return 0;
 
@@ -906,9 +896,8 @@ int RIG_TS990::get_volume_control()
 	} else {
 
 	cmd = "AG0;";
-	int ret = waitN(7, 20, "get vol ctrl", ASC);
+	if (wait_char(';', 7, 20, "get vol ctrl", ASC) < 7) return 0;
 
-	if (ret < 7) return 0;
 	size_t p = replystr.rfind("AG");
 	if (p == string::npos) return 0;
 
@@ -929,7 +918,7 @@ void RIG_TS990::set_volume_control(int val)
 		cmd[i] += ivol % 10;
 		ivol /= 10;
 	}
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 
 	} else {
 
@@ -939,7 +928,7 @@ void RIG_TS990::set_volume_control(int val)
 		cmd[i] += ivol % 10;
 		ivol /= 10;
 	}
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 	}
 }
 
@@ -956,7 +945,7 @@ void RIG_TS990::set_PTT_control(int val)
 			cmd = "TX0;";
 	} else
 		cmd = "RX;";
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 }
 
 //==============================================================================
@@ -966,7 +955,7 @@ void RIG_TS990::set_PTT_control(int val)
 void RIG_TS990::tune_rig()
 {
 	cmd = "AC111;";
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 }
 
 //==============================================================================
@@ -979,8 +968,8 @@ void RIG_TS990::set_modeA(int val)
 	cmd = "OM0";
 	cmd += TS990_mode_chr[val];
 	cmd += ';';
-	sendCommand(cmd, 0);
-	showresp(INFO, ASC, "set mode main band", cmd, replystr);
+	sendCommand(cmd);
+	showresp(INFO, ASC, "set mode main band", cmd, "");
 	set_widths(val);
 	get_bwA();
 }
@@ -989,8 +978,8 @@ int RIG_TS990::get_modeA()
 {
 	int md = A.imode;
 	cmd = "OM0;";
-	int ret = waitN(5, 20, "get mode main band", ASC);
-	if (ret < 5) return A.imode;
+	if (wait_char(';', 5, 20, "get mode main band", ASC) < 5) return A.imode;
+
 	size_t p = replystr.rfind("OM");
 	if (p == string::npos) return A.imode;
 
@@ -1038,8 +1027,8 @@ void RIG_TS990::set_modeB(int val)
 	cmd = "OM1";
 	cmd += TS990_mode_chr[val];
 	cmd += ';';
-	sendCommand(cmd, 0);
-	showresp(INFO, ASC, "set mode sub band", cmd, replystr);
+	sendCommand(cmd);
+	showresp(INFO, ASC, "set mode sub band", cmd, "");
 	set_widths(val);
 	get_bwB();
 }
@@ -1049,9 +1038,8 @@ int RIG_TS990::get_modeB()
 
 	int md = B.imode;
 	cmd = "OM1;";
-	int ret = waitN(5, 20, "get mode sub band", ASC);
+	if (wait_char(';', 5, 20, "get mode sub band", ASC) < 5) return B.imode;
 
-	if (ret < 5) return B.imode;
 	size_t p = replystr.rfind("OM");
 	if (p == string::npos) return B.imode;
 
@@ -1104,16 +1092,14 @@ void RIG_TS990::set_mic_gain(int val)
 		cmd[1+i] += val % 10;
 		val /= 10;
 	}
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 }
 
 int RIG_TS990::get_mic_gain()
 {
 	int val = 0;
 	cmd = "MG;";
-	int ret = waitN(6, 20, "get mic ctrl", ASC);
-
-	if (ret >= 6) {
+	if (wait_char(';', 6, 20, "get mic ctrl", ASC)  >= 6) {
 		size_t p = replystr.rfind("MG");
 		if (p == string::npos) return val;
 		replystr[p + 5] = 0;
@@ -1137,8 +1123,7 @@ void RIG_TS990::read_menu_0607()
 {
 	save_menu_0607 = false;
 	cmd = "EX00607;"; sendCommand(cmd);
-	int ret = waitN(12, 20, "Read menu 0607", ASC);
-	if (ret >= 12) {
+	if (wait_char(';', 12, 20, "Read menu 0607", ASC) >= 12) {
 		size_t p = replystr.rfind("EX00607");
 		if (p != string::npos)
 			save_menu_0607 = (replystr[p+10] == '1');
@@ -1149,8 +1134,7 @@ void RIG_TS990::read_menu_0608()
 {
 	save_menu_0608 = false;
 	cmd = "EX00608;"; sendCommand(cmd);
-	int ret = waitN(12, 20, "Read menu 0608", ASC);
-	if (ret >= 12) {
+	if (wait_char(';', 12, 20, "Read menu 0608", ASC) >= 12) {
 		size_t p = replystr.rfind("EX00608");
 		if (p != string::npos)
 			save_menu_0608 = (replystr[p+10] == '1');
@@ -1163,7 +1147,7 @@ void RIG_TS990::set_menu_0607(int val)
 	cmd = "EX00607 00";
 	cmd += menu_0607 ? "1" : "0";
 	cmd += ";";
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 }
 
 void RIG_TS990::set_menu_0608(int val)
@@ -1172,7 +1156,7 @@ void RIG_TS990::set_menu_0608(int val)
 	cmd = "EX00608 00";
 	cmd += menu_0608 ? "1" : "0";
 	cmd += ";";
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 }
 
 //==============================================================================
@@ -1384,48 +1368,48 @@ int RIG_TS990::adjust_bandwidth(int val)
 			else
 				retval = menu_0607 ? A_default_SH_WI : A_default_HI_LO;
 			break;
-		case LSBD1: case USBD1: 
+		case LSBD1: case USBD1:
 			if (useB)
 				retval = menu_0608 ? B_default_SH_WI_D1 : B_default_HI_LO;
 			else
 				retval = menu_0608 ? A_default_SH_WI_D1 : A_default_HI_LO;
 			break;
-		case LSBD2: case USBD2: 
+		case LSBD2: case USBD2:
 			if (useB)
 				retval = menu_0608 ? B_default_SH_WI_D2 : B_default_HI_LO;
 			else
 				retval = menu_0608 ? A_default_SH_WI_D2 : A_default_HI_LO;
 			break;
-		case LSBD3: case USBD3: 
+		case LSBD3: case USBD3:
 			if (useB)
 				retval = menu_0608 ? B_default_SH_WI_D3 : B_default_HI_LO;
 			else
 				retval = menu_0608 ? A_default_SH_WI_D3 : A_default_HI_LO;
-			break;	
-		case FM: 
+			break;
+		case FM:
 			retval = useB ? B_default_FM : A_default_FM;
 			break;
-		case FMD1: 
+		case FMD1:
 			retval = useB ? B_default_FM_D1 : A_default_FM_D1;
-			break;	
-		case FMD2: 
+			break;
+		case FMD2:
 			retval = useB ? B_default_FM_D2 : A_default_FM_D2;
 			break;
-		case FMD3: 
+		case FMD3:
 			retval = useB ? B_default_FM_D3 : A_default_FM_D3;
-			break;				
-		case AM: 
+			break;
+		case AM:
 			retval = useB ? B_default_AM : A_default_AM;
 			break;
-		case AMD1: 
+		case AMD1:
 			retval = useB ? B_default_AM_D1 : A_default_AM_D1;
 			break;
-		case AMD2: 
+		case AMD2:
 			retval = useB ? B_default_AM_D2 : A_default_AM_D2;
 			break;
-		case AMD3: 
+		case AMD3:
 			retval = useB ? B_default_AM_D3 : A_default_AM_D3;
-			break;			
+			break;
 		case CW: case CWR:
 			retval = useB ? B_default_CW : A_default_CW;
 			break;
@@ -1455,17 +1439,17 @@ void RIG_TS990::set_bwA(int val)
 			hi = (val >> 8) & 0x7F;
 			if (hi >= sizeof(TS990_CAT_filt_width)/sizeof(*TS990_CAT_filt_width) ||
 				 lo >= sizeof(TS990_CAT_filt_shift)/sizeof(*TS990_CAT_filt_shift) )
-				A.iBW = A_default_SH_WI;		
+				A.iBW = A_default_SH_WI;
 			else
 				A.iBW = val;
 			cmd = "SL0";
 			cmd += TS990_CAT_filt_width[(A.iBW >> 8) & 0x7F];
-			sendCommand(cmd,0);
-			showresp(INFO, ASC, "set filter width", cmd, replystr);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set filter width", cmd, "");
 			cmd = "SH0";
 			cmd += TS990_CAT_filt_shift[A.iBW & 0x7F];
-			sendCommand(cmd,0);
-			showresp(INFO, ASC, "set filter shift", cmd, replystr);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set filter shift", cmd, "");
 		} else {
 			lo = val & 0x7F;
 			hi = (val >> 8) & 0x7F;
@@ -1476,12 +1460,12 @@ void RIG_TS990::set_bwA(int val)
 				A.iBW = val;
 			cmd = "SL0";
 			cmd += TS990_CAT_filt_lo[A.iBW  & 0x7F];
-			sendCommand(cmd,0);
-			showresp(INFO, ASC, "set filter lower cutoff", cmd, replystr);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set filter lower cutoff", cmd, "");
 			cmd = "SH0";
 			cmd += TS990_CAT_filt_hi[(A.iBW >> 8) & 0x7F];
-			sendCommand(cmd,0);
-			showresp(INFO, ASC, "set filter upper cutoff", cmd, replystr);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set filter upper cutoff", cmd, "");
 		}
 		break;
 
@@ -1493,17 +1477,17 @@ void RIG_TS990::set_bwA(int val)
 			hi = (val >> 8) & 0x7F;
 			if (hi >= sizeof(TS990_CAT_filt_width)/sizeof(*TS990_CAT_filt_width) ||
 				 lo >= sizeof(TS990_CAT_filt_shift)/sizeof(*TS990_CAT_filt_shift) )
-				A.iBW = A_default_SH_WI;		
+				A.iBW = A_default_SH_WI;
 			else
 				A.iBW = val;
 			cmd = "SL0";
 			cmd += TS990_CAT_filt_width[(A.iBW >> 8) & 0x7F];
-			sendCommand(cmd,0);
-			showresp(INFO, ASC, "set data width", cmd, replystr);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set data width", cmd, "");
 			cmd = "SH0";
 			cmd += TS990_CAT_filt_shift[A.iBW & 0x7F];
-			sendCommand(cmd,0);
-			showresp(INFO, ASC, "set data shift", cmd, replystr);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set data shift", cmd, "");
 		} else {
 			lo = val & 0x7F;
 			hi = (val >> 8) & 0x7F;
@@ -1514,12 +1498,12 @@ void RIG_TS990::set_bwA(int val)
 				A.iBW = val;
 			cmd = "SL0";
 			cmd += TS990_CAT_filt_lo[A.iBW & 0x7F];
-			sendCommand(cmd,0);
-			showresp(INFO, ASC, "set data lower cutoff", cmd, replystr);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set data lower cutoff", cmd, "");
 			cmd = "SH0";
 			cmd += TS990_CAT_filt_hi[(A.iBW >> 8) & 0x7F];
-			sendCommand(cmd,0);
-			showresp(INFO, ASC, "set data upper cutoff", cmd, replystr);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set data upper cutoff", cmd, "");
 		}
 		break;
 
@@ -1534,12 +1518,12 @@ void RIG_TS990::set_bwA(int val)
 			A.iBW = val;
 		cmd = "SL0";
 		cmd += TS990_CAT_AM_lo[A.iBW & 0x7F];
-		sendCommand(cmd,0);
-		showresp(INFO, ASC, "set AM lower", cmd, replystr);
+		sendCommand(cmd);
+		showresp(INFO, ASC, "set AM lower", cmd, "");
 		cmd = "SH0";
 		cmd += TS990_CAT_AM_hi[(A.iBW >> 8) & 0x7F];
-		sendCommand(cmd,0);
-		showresp(INFO, ASC, "set AM upper", cmd, replystr);
+		sendCommand(cmd);
+		showresp(INFO, ASC, "set AM upper", cmd, "");
 		break;
 
 	case FM: case FMD1: case FMD2: case FMD3:
@@ -1553,12 +1537,12 @@ void RIG_TS990::set_bwA(int val)
 			A.iBW = val;
 		cmd = "SL0";
 		cmd += TS990_CAT_filt_lo[A.iBW & 0x7F];
-		sendCommand(cmd,0);
-		showresp(INFO, ASC, "set FM lower", cmd, replystr);
+		sendCommand(cmd);
+		showresp(INFO, ASC, "set FM lower", cmd, "");
 		cmd = "SH0";
 		cmd += TS990_CAT_filt_hi[(A.iBW >> 8) & 0x7F];
-		sendCommand(cmd,0);
-		showresp(INFO, ASC, "set FM upper", cmd, replystr);
+		sendCommand(cmd);
+		showresp(INFO, ASC, "set FM upper", cmd, "");
 		break;
 
 	case CW: case CWR:
@@ -1572,12 +1556,12 @@ void RIG_TS990::set_bwA(int val)
 			A.iBW = val;
 		cmd = "SL0";
 		cmd += TS990_CAT_CW_width[(A.iBW >> 8) & 0x7F];
-		sendCommand(cmd,0);
-		showresp(INFO, ASC, "set cw width", cmd, replystr);
+		sendCommand(cmd);
+		showresp(INFO, ASC, "set cw width", cmd, "");
 		cmd = "SH0";
 		cmd += TS990_CAT_CW_shift[A.iBW & 0x7F];
-		sendCommand(cmd,0);
-		showresp(INFO, ASC, "set cw shift", cmd, replystr);
+		sendCommand(cmd);
+		showresp(INFO, ASC, "set cw shift", cmd, "");
 		break;
 
 	case FSK: case FSKR:
@@ -1589,8 +1573,8 @@ void RIG_TS990::set_bwA(int val)
 			A.iBW = val;
 		cmd = "SL0";
 		cmd += TS990_CAT_FSK_filt[A.iBW];
-		sendCommand(cmd,0);
-		showresp(INFO, ASC, "set FSK bw", cmd, replystr);
+		sendCommand(cmd);
+		showresp(INFO, ASC, "set FSK bw", cmd, "");
 		break;
 
 	case PSK: case PSKR:
@@ -1602,8 +1586,8 @@ void RIG_TS990::set_bwA(int val)
 			A.iBW = val;
 		cmd = "SL0";
 		cmd += TS990_CAT_PSK_filt[A.iBW];
-		sendCommand(cmd,0);
-		showresp(INFO, ASC, "set PSK bw", cmd, replystr);
+		sendCommand(cmd);
+		showresp(INFO, ASC, "set PSK bw", cmd, "");
 		break;
 	}
 }
@@ -1624,12 +1608,12 @@ void RIG_TS990::set_bwB(int val)
 				B.iBW = val;
 			cmd = "SL1";
 			cmd += TS990_CAT_filt_width[(B.iBW >> 8) & 0x7F];
-			sendCommand(cmd,0);
-			showresp(INFO, ASC, "set filter width", cmd, replystr);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set filter width", cmd, "");
 			cmd = "SH1";
 			cmd += TS990_CAT_filt_shift[B.iBW & 0x7F];
-			sendCommand(cmd,0);
-			showresp(INFO, ASC, "set filter shift", cmd, replystr);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set filter shift", cmd, "");
 		} else {
 			lo = val & 0x7F;
 			hi = (val >> 8) & 0x7F;
@@ -1640,12 +1624,12 @@ void RIG_TS990::set_bwB(int val)
 				B.iBW = val;
 			cmd = "SL1";
 			cmd += TS990_CAT_filt_lo[B.iBW  & 0x7F];
-			sendCommand(cmd,0);
-			showresp(INFO, ASC, "set filter lower cutoff", cmd, replystr);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set filter lower cutoff", cmd, "");
 			cmd = "SH1";
 			cmd += TS990_CAT_filt_hi[(B.iBW >> 8) & 0x7F];
-			sendCommand(cmd,0);
-			showresp(INFO, ASC, "set filter upper cutoff", cmd, replystr);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set filter upper cutoff", cmd, "");
 		}
 		break;
 
@@ -1662,12 +1646,12 @@ void RIG_TS990::set_bwB(int val)
 				B.iBW = val;
 			cmd = "SL1";
 			cmd += TS990_CAT_filt_width[(B.iBW >> 8) & 0x7F];
-			sendCommand(cmd,0);
-			showresp(INFO, ASC, "set data width", cmd, replystr);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set data width", cmd, "");
 			cmd = "SH1";
 			cmd += TS990_CAT_filt_shift[B.iBW & 0x7F];
-			sendCommand(cmd,0);
-			showresp(INFO, ASC, "set data shift", cmd, replystr);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set data shift", cmd, "");
 		} else {
 			lo = val & 0x7F;
 			hi = (val >> 8) & 0x7F;
@@ -1678,12 +1662,12 @@ void RIG_TS990::set_bwB(int val)
 				B.iBW = val;
 			cmd = "SL1";
 			cmd += TS990_CAT_filt_lo[B.iBW & 0x7F];
-			sendCommand(cmd,0);
-			showresp(INFO, ASC, "set data lower cutoff", cmd, replystr);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set data lower cutoff", cmd, "");
 			cmd = "SH1";
 			cmd += TS990_CAT_filt_hi[(B.iBW >> 8) & 0x7F];
-			sendCommand(cmd,0);
-			showresp(INFO, ASC, "set data upper cutoff", cmd, replystr);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set data upper cutoff", cmd, "");
 		}
 		break;
 
@@ -1698,12 +1682,12 @@ void RIG_TS990::set_bwB(int val)
 			B.iBW = val;
 		cmd = "SL1";
 		cmd += TS990_CAT_AM_lo[B.iBW & 0x7F];
-		sendCommand(cmd,0);
-		showresp(INFO, ASC, "set AM lower", cmd, replystr);
+		sendCommand(cmd);
+		showresp(INFO, ASC, "set AM lower", cmd, "");
 		cmd = "SH1";
 		cmd += TS990_CAT_AM_hi[(B.iBW >> 8) & 0x7F];
-		sendCommand(cmd,0);
-		showresp(INFO, ASC, "set AM upper", cmd, replystr);
+		sendCommand(cmd);
+		showresp(INFO, ASC, "set AM upper", cmd, "");
 		break;
 
 	case FM: case FMD1: case FMD2: case FMD3:
@@ -1717,12 +1701,12 @@ void RIG_TS990::set_bwB(int val)
 			B.iBW = val;
 		cmd = "SL1";
 		cmd += TS990_CAT_filt_lo[B.iBW & 0x7F];
-		sendCommand(cmd,0);
-		showresp(INFO, ASC, "set FM lower", cmd, replystr);
+		sendCommand(cmd);
+		showresp(INFO, ASC, "set FM lower", cmd, "");
 		cmd = "SH1";
 		cmd += TS990_CAT_filt_hi[(B.iBW >> 8) & 0x7F];
-		sendCommand(cmd,0);
-		showresp(INFO, ASC, "set FM upper", cmd, replystr);
+		sendCommand(cmd);
+		showresp(INFO, ASC, "set FM upper", cmd, "");
 		break;
 
 	case CW: case CWR:
@@ -1736,12 +1720,12 @@ void RIG_TS990::set_bwB(int val)
 			B.iBW = val;
 		cmd = "SL1";
 		cmd += TS990_CAT_CW_width[(B.iBW >> 8) & 0x7F];
-		sendCommand(cmd,0);
-		showresp(INFO, ASC, "set cw width", cmd, replystr);
+		sendCommand(cmd);
+		showresp(INFO, ASC, "set cw width", cmd, "");
 		cmd = "SH1";
 		cmd += TS990_CAT_CW_shift[B.iBW & 0x7F];
-		sendCommand(cmd,0);
-		showresp(INFO, ASC, "set cw shift", cmd, replystr);
+		sendCommand(cmd);
+		showresp(INFO, ASC, "set cw shift", cmd, "");
 		break;
 
 	case FSK: case FSKR:
@@ -1753,8 +1737,8 @@ void RIG_TS990::set_bwB(int val)
 			B.iBW = val;
 		cmd = "SL1";
 		cmd += TS990_CAT_FSK_filt[B.iBW];
-		sendCommand(cmd,0);
-		showresp(INFO, ASC, "set FSK bw", cmd, replystr);
+		sendCommand(cmd);
+		showresp(INFO, ASC, "set FSK bw", cmd, "");
 		break;
 
 	case PSK: case PSKR:
@@ -1766,8 +1750,8 @@ void RIG_TS990::set_bwB(int val)
 			B.iBW = val;
 		cmd = "SL1";
 		cmd += TS990_CAT_PSK_filt[B.iBW];
-		sendCommand(cmd,0);
-		showresp(INFO, ASC, "set PSK bw", cmd, replystr);
+		sendCommand(cmd);
+		showresp(INFO, ASC, "set PSK bw", cmd, "");
 		break;
 	}
 }
@@ -1783,38 +1767,42 @@ int RIG_TS990::get_bwA()
 		lo = A.iBW & 0x7F;
 		hi = (A.iBW >> 8) & 0x7F;
 		cmd = "SL0;";
-		waitN(6, 20, "get CW width", ASC);
-		p = replystr.rfind("SL");
-		if (p == string::npos) break;
-		hi = fm_decimal(&replystr[3], 2); //2 2
-		cmd = "SH0;";
-		waitN(6, 20, "get CW shift", ASC);
-		p = replystr.rfind("SH");
-		if (p == string::npos) break;
-		lo = fm_decimal(&replystr[3], 2); //2 2
-		A_default_CW = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+		if (wait_char(';', 6, 20, "get CW width", ASC) == 6) {
+			p = replystr.rfind("SL");
+			if (p == string::npos) break;
+			hi = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH0;";
+			if (wait_char(';', 6, 20, "get CW shift", ASC) == 6) {
+				p = replystr.rfind("SH");
+				if (p == string::npos) break;
+				lo = fm_decimal(&replystr[3], 2); //2 2
+				A_default_CW = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+			}
+		}
 		break;
 
 	case FSK: case FSKR:
 		A.iBW = A_default_FSK;
 		lo = A.iBW & 0x7F;
 		cmd = "SL0;";
-		waitN(6, 20, "get FSK Width", ASC);
-		p = replystr.rfind("SL");
-		if (p == string::npos) break;
-		lo = fm_decimal(&replystr[3], 2); //2 2
-		A_default_FSK = A.iBW = (lo & 0x7F);
+		if (wait_char(';', 6, 20, "get FSK Width", ASC) == 6) {
+			p = replystr.rfind("SL");
+			if (p == string::npos) break;
+			lo = fm_decimal(&replystr[3], 2); //2 2
+			A_default_FSK = A.iBW = (lo & 0x7F);
+		}
 		break;
 
 	case PSK: case PSKR:
 		A.iBW = A_default_PSK;
 		lo = A.iBW & 0x7F;
 		cmd = "SL0;";
-		waitN(6, 20, "get PSK Width", ASC);
-		p = replystr.rfind("SL");
-		if (p == string::npos) break;
-		lo = fm_decimal(&replystr[3], 2); //2 2
-		A_default_PSK = A.iBW = (lo & 0x7F);
+		if (wait_char(';', 6, 20, "get PSK Width", ASC) == 6) {
+			p = replystr.rfind("SL");
+			if (p == string::npos) break;
+			lo = fm_decimal(&replystr[3], 2); //2 2
+			A_default_PSK = A.iBW = (lo & 0x7F);
+		}
 		break;
 
 	case LSB: case USB:
@@ -1823,128 +1811,143 @@ int RIG_TS990::get_bwA()
 		if (menu_0607) {
 			A.iBW = A_default_SH_WI;
 			cmd = "SL0;";
-			waitN(6, 20, "get filter width", ASC);
-			p = replystr.rfind("SL");
-			if (p == string::npos) break;
-			hi = fm_decimal(&replystr[3], 2); //2 2
-			cmd = "SH0;";
-			waitN(6, 20, "get filter shift", ASC);
-			p = replystr.rfind("SH");
-			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			A_default_SH_WI = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+			if (wait_char(';', 6, 20, "get filter width", ASC) == 6) {
+				p = replystr.rfind("SL");
+				if (p == string::npos) break;
+				hi = fm_decimal(&replystr[3], 2); //2 2
+				cmd = "SH0;";
+				if (wait_char(';', 6, 20, "get filter shift", ASC) == 6) {
+					p = replystr.rfind("SH");
+					if (p == string::npos) break;
+					lo = fm_decimal(&replystr[3], 2); //2 2
+					A_default_SH_WI = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+				}
+			}
 		} else {
 			A.iBW = A_default_HI_LO;
 			cmd = "SL0;";
-			waitN(6, 20, "get filter lower cutoff", ASC);
-			p = replystr.rfind("SL");
-			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			cmd = "SH0;";
-			waitN(6, 20, "get filter upper cutoff", ASC);
-			p = replystr.rfind("SH");
-			if (p == string::npos) break;
-			hi = fm_decimal(&replystr[3], 2); //2 2
-			A_default_HI_LO = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+			if (wait_char(';', 6, 20, "get filter lower cutoff", ASC) == 6) {
+				p = replystr.rfind("SL");
+				if (p == string::npos) break;
+				lo = fm_decimal(&replystr[3], 2); //2 2
+				cmd = "SH0;";
+				if (wait_char(';', 6, 20, "get filter upper cutoff", ASC) == 6) {
+					p = replystr.rfind("SH");
+					if (p == string::npos) break;
+					hi = fm_decimal(&replystr[3], 2); //2 2
+					A_default_HI_LO = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+				}
+			}
 		}
 		break;
 
-	case LSBD1: case USBD1: 
+	case LSBD1: case USBD1:
 			lo = A.iBW & 0x7F;
 			hi = (A.iBW >> 8) & 0x7F;
 		if (menu_0608) {
 			A.iBW = A_default_SH_WI_D1;
 			cmd = "SL0;";
-			waitN(6, 20, "get filter width", ASC);
-			p = replystr.rfind("SL");
-			if (p == string::npos) break;
-			hi = fm_decimal(&replystr[3], 2); //2 2
-			cmd = "SH0;";
-			waitN(6, 20, "get filter shift", ASC);
-			p = replystr.rfind("SH");
-			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 
-			A_default_SH_WI_D1 = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+			if (wait_char(';', 6, 20, "get filter width", ASC) == 6) {
+				p = replystr.rfind("SL");
+				if (p == string::npos) break;
+				hi = fm_decimal(&replystr[3], 2); //2 2
+				cmd = "SH0;";
+				if (wait_char(';', 6, 20, "get filter shift", ASC) == 6) {
+					p = replystr.rfind("SH");
+					if (p == string::npos) break;
+						lo = fm_decimal(&replystr[3], 2); //2
+					A_default_SH_WI_D1 = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+				}
+			}
 		} else {
-			
+
 			A.iBW = A_default_HI_LO;
 			cmd = "SL0;";
-			waitN(6, 20, "get filter lower cutoff", ASC);
-			p = replystr.rfind("SL");
-			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			cmd = "SH0;";
-			waitN(6, 20, "get filter upper cutoff", ASC);
-			p = replystr.rfind("SH");
-			if (p == string::npos) break;
-			hi = fm_decimal(&replystr[3], 2); //2 2
-			A_default_HI_LO = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+			if (wait_char(';', 6, 20, "get filter lower cutoff", ASC) == 6) {
+				p = replystr.rfind("SL");
+				if (p == string::npos) break;
+				lo = fm_decimal(&replystr[3], 2); //2 2
+				cmd = "SH0;";
+				if (wait_char(';', 6, 20, "get filter upper cutoff", ASC) == 6) {
+					p = replystr.rfind("SH");
+					if (p == string::npos) break;
+					hi = fm_decimal(&replystr[3], 2); //2 2
+					A_default_HI_LO = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+				}
+			}
 		}
 		break;
-		
+
 	case LSBD2: case USBD2:
 			lo = A.iBW & 0x7F;
 			hi = (A.iBW >> 8) & 0x7F;
 		if (menu_0608) {
 			A.iBW = A_default_SH_WI_D2;
 			cmd = "SL0;";
-			waitN(6, 20, "get filter width", ASC);
-			p = replystr.rfind("SL");
-			if (p == string::npos) break;
-			hi = fm_decimal(&replystr[3], 2); //2 2
-			cmd = "SH0;";
-			waitN(6, 20, "get filter shift", ASC);
-			p = replystr.rfind("SH");
-			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 
-			A_default_SH_WI_D2 = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+			if (wait_char(';', 6, 20, "get filter width", ASC) == 6) {
+				p = replystr.rfind("SL");
+				if (p == string::npos) break;
+				hi = fm_decimal(&replystr[3], 2); //2 2
+				cmd = "SH0;";
+				if (wait_char(';', 6, 20, "get filter shift", ASC) == 6) {
+					p = replystr.rfind("SH");
+					if (p == string::npos) break;
+					lo = fm_decimal(&replystr[3], 2); //2
+					A_default_SH_WI_D2 = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+				}
+			}
 		} else {
-			
+
 			A.iBW = A_default_HI_LO;
 			cmd = "SL0;";
-			waitN(6, 20, "get filter lower cutoff", ASC);
-			p = replystr.rfind("SL");
-			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			cmd = "SH0;";
-			waitN(6, 20, "get filter upper cutoff", ASC);
-			p = replystr.rfind("SH");
-			if (p == string::npos) break;
-			hi = fm_decimal(&replystr[3], 2); //2 2
-			A_default_HI_LO = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+			if (wait_char(';', 6, 20, "get filter lower cutoff", ASC) == 6) {
+				p = replystr.rfind("SL");
+				if (p == string::npos) break;
+				lo = fm_decimal(&replystr[3], 2); //2 2
+				cmd = "SH0;";
+				if (wait_char(';', 6, 20, "get filter upper cutoff", ASC) == 6) {
+					p = replystr.rfind("SH");
+					if (p == string::npos) break;
+					hi = fm_decimal(&replystr[3], 2); //2 2
+					A_default_HI_LO = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+				}
+			}
 		}
 		break;
-		
+
 	case LSBD3: case USBD3:
 			lo = A.iBW & 0x7F;
 			hi = (A.iBW >> 8) & 0x7F;
 		if (menu_0608) {
 			A.iBW = A_default_SH_WI_D3;
 			cmd = "SL0;";
-			waitN(6, 20, "get filter width", ASC);
-			p = replystr.rfind("SL");
-			if (p == string::npos) break;
-			hi = fm_decimal(&replystr[3], 2); //2 2
-			cmd = "SH0;";
-			waitN(6, 20, "get filter shift", ASC);
-			p = replystr.rfind("SH");
-			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 
-			A_default_SH_WI_D3 = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+			if (wait_char(';', 6, 20, "get filter width", ASC) == 6) {
+				p = replystr.rfind("SL");
+				if (p == string::npos) break;
+				hi = fm_decimal(&replystr[3], 2); //2 2
+				cmd = "SH0;";
+				if (wait_char(';', 6, 20, "get filter shift", ASC) == 6) {
+					p = replystr.rfind("SH");
+					if (p == string::npos) break;
+					lo = fm_decimal(&replystr[3], 2); //2
+					A_default_SH_WI_D3 = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+				}
+			}
 		} else {
-			
 			A.iBW = A_default_HI_LO;
 			cmd = "SL0;";
-			waitN(6, 20, "get filter lower cutoff", ASC);
-			p = replystr.rfind("SL");
-			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			cmd = "SH0;";
-			waitN(6, 20, "get filter upper cutoff", ASC);
-			p = replystr.rfind("SH");
-			if (p == string::npos) break;
-			hi = fm_decimal(&replystr[3], 2); //2 2
-			A_default_HI_LO = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+			if (wait_char(';', 6, 20, "get filter lower cutoff", ASC) == 6) {
+				p = replystr.rfind("SL");
+				if (p == string::npos) break;
+				lo = fm_decimal(&replystr[3], 2); //2 2
+				cmd = "SH0;";
+				if (wait_char(';', 6, 20, "get filter upper cutoff", ASC) == 6) {
+					p = replystr.rfind("SH");
+					if (p == string::npos) break;
+					hi = fm_decimal(&replystr[3], 2); //2 2
+					A_default_HI_LO = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+				}
+			}
 		}
 		break;
 
@@ -1953,67 +1956,75 @@ int RIG_TS990::get_bwA()
 		lo = A.iBW & 0x7F;
 		hi = (A.iBW >> 8) & 0x7F;
 		cmd = "SL0;";
-		waitN(6, 20, "get AM lo", ASC);
-		p = replystr.rfind("SL");
-		if (p == string::npos) break;
-		lo = fm_decimal(&replystr[3], 2); //2 2
-		cmd = "SH0;";
-		waitN(6, 20, "get AM hi", ASC);
-		p = replystr.rfind("SH");
-		if (p == string::npos) break;
-		hi = fm_decimal(&replystr[3], 2); //2 2
-		A_default_AM = A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+		if (wait_char(';', 6, 20, "get AM lo", ASC) == 6) {
+			p = replystr.rfind("SL");
+			if (p == string::npos) break;
+			lo = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH0;";
+			if (wait_char(';', 6, 20, "get AM hi", ASC) == 6) {
+				p = replystr.rfind("SH");
+				if (p == string::npos) break;
+				hi = fm_decimal(&replystr[3], 2); //2 2
+				A_default_AM = A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+			}
+		}
 		break;
-		
+
 	case AMD1:
 		A.iBW = A_default_AM_D1;
 		lo = A.iBW & 0x7F;
 		hi = (A.iBW >> 8) & 0x7F;
 		cmd = "SL0;";
-		waitN(6, 20, "get AM lo", ASC);
-		p = replystr.rfind("SL");
-		if (p == string::npos) break;
-		lo = fm_decimal(&replystr[3], 2); //2 2
-		cmd = "SH0;";
-		waitN(6, 20, "get AM hi", ASC);
-		p = replystr.rfind("SH");
-		if (p == string::npos) break;
-		hi = fm_decimal(&replystr[3], 2); //2 2
-		A_default_AM_D1 = A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+		if (wait_char(';', 6, 20, "get AM lo", ASC) == 6) {
+			p = replystr.rfind("SL");
+			if (p == string::npos) break;
+			lo = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH0;";
+			if (wait_char(';', 6, 20, "get AM hi", ASC) == 6) {
+				p = replystr.rfind("SH");
+				if (p == string::npos) break;
+				hi = fm_decimal(&replystr[3], 2); //2 2
+				A_default_AM_D1 = A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+			}
+		}
 		break;
-		
+
 	case AMD2:
 		A.iBW = A_default_AM_D2;
 		lo = A.iBW & 0x7F;
 		hi = (A.iBW >> 8) & 0x7F;
 		cmd = "SL0;";
-		waitN(6, 20, "get AM lo", ASC);
-		p = replystr.rfind("SL");
-		if (p == string::npos) break;
-		lo = fm_decimal(&replystr[3], 2); //2 2
-		cmd = "SH0;";
-		waitN(6, 20, "get AM hi", ASC);
-		p = replystr.rfind("SH");
-		if (p == string::npos) break;
-		hi = fm_decimal(&replystr[3], 2); //2 2
-		A_default_AM_D2 = A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+		if (wait_char(';', 6, 20, "get AM lo", ASC) == 6) {
+			p = replystr.rfind("SL");
+			if (p == string::npos) break;
+			lo = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH0;";
+			if (wait_char(';', 6, 20, "get AM hi", ASC) == 6) {
+				p = replystr.rfind("SH");
+				if (p == string::npos) break;
+				hi = fm_decimal(&replystr[3], 2); //2 2
+				A_default_AM_D2 = A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+			}
+		}
 		break;
-	
+
 	case AMD3:
 		A.iBW = A_default_AM_D3;
 		lo = A.iBW & 0x7F;
 		hi = (A.iBW >> 8) & 0x7F;
 		cmd = "SL0;";
-		waitN(6, 20, "get AM lo", ASC);
-		p = replystr.rfind("SL");
-		if (p == string::npos) break;
-		lo = fm_decimal(&replystr[3], 2); //2 2
-		cmd = "SH0;";
-		waitN(6, 20, "get AM hi", ASC);
-		p = replystr.rfind("SH");
-		if (p == string::npos) break;
-		hi = fm_decimal(&replystr[3], 2); //2 2
-		A_default_AM_D3 = A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+		if (wait_char(';', 6, 20, "get AM lo", ASC) == 6) {
+			p = replystr.rfind("SL");
+			if (p == string::npos) break;
+			lo = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH0;";
+			if (wait_char(';', 6, 20, "get AM hi", ASC) == 6) {
+				p = replystr.rfind("SH");
+				if (p == string::npos) break;
+				hi = fm_decimal(&replystr[3], 2); //2 2
+				A_default_AM_D3 = A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+			}
+		}
 		break;
 
 	case FM:
@@ -2021,68 +2032,76 @@ int RIG_TS990::get_bwA()
 		lo = A.iBW & 0x7F;
 		hi = (A.iBW >> 8) & 0x7F;
 		cmd = "SL0;";
-		waitN(6, 20, "get FM lo", ASC);
-		p = replystr.rfind("SL");
-		if (p == string::npos) break;
-		lo = fm_decimal(&replystr[3], 2); //2 2
-		cmd = "SH0;";
-		waitN(6, 20, "get FM hi", ASC);
-		p = replystr.rfind("SH");
-		if (p == string::npos) break;
-		hi = fm_decimal(&replystr[3], 2); //2 2
-		A_default_FM = A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+		if (wait_char(';', 6, 20, "get FM lo", ASC) == 6) {
+			p = replystr.rfind("SL");
+			if (p == string::npos) break;
+			lo = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH0;";
+			if (wait_char(';', 6, 20, "get FM hi", ASC) == 6) {
+				p = replystr.rfind("SH");
+				if (p == string::npos) break;
+				hi = fm_decimal(&replystr[3], 2); //2 2
+				A_default_FM = A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+			}
+		}
 		break;
-		
+
 	case FMD1:
 		A.iBW = A_default_FM_D1;
 		lo = A.iBW & 0x7F;
 		hi = (A.iBW >> 8) & 0x7F;
 		cmd = "SL0;";
-		waitN(6, 20, "get FM lo", ASC);
-		p = replystr.rfind("SL");
-		if (p == string::npos) break;
-		lo = fm_decimal(&replystr[3], 2); //2 2
-		cmd = "SH0;";
-		waitN(6, 20, "get FM hi", ASC);
-		p = replystr.rfind("SH");
-		if (p == string::npos) break;
-		hi = fm_decimal(&replystr[3], 2); //2 2
-		A_default_FM_D1 = A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+		if (wait_char(';', 6, 20, "get FM lo", ASC) == 6) {
+			p = replystr.rfind("SL");
+			if (p == string::npos) break;
+			lo = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH0;";
+			if (wait_char(';', 6, 20, "get FM hi", ASC) == 6) {
+				p = replystr.rfind("SH");
+				if (p == string::npos) break;
+				hi = fm_decimal(&replystr[3], 2); //2 2
+				A_default_FM_D1 = A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+			}
+		}
 		break;
-		
+
 	case FMD2 :
 		A.iBW = A_default_FM_D2;
 		lo = A.iBW & 0x7F;
 		hi = (A.iBW >> 8) & 0x7F;
 		cmd = "SL0;";
-		waitN(6, 20, "get FM lo", ASC);
-		p = replystr.rfind("SL");
-		if (p == string::npos) break;
-		lo = fm_decimal(&replystr[3], 2); //2 2
-		cmd = "SH0;";
-		waitN(6, 20, "get FM hi", ASC);
-		p = replystr.rfind("SH");
-		if (p == string::npos) break;
-		hi = fm_decimal(&replystr[3], 2); //2 2
-		A_default_FM_D2 = A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+		if (wait_char(';', 6, 20, "get FM lo", ASC) == 6) {
+			p = replystr.rfind("SL");
+			if (p == string::npos) break;
+			lo = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH0;";
+			if (wait_char(';', 6, 20, "get FM hi", ASC) == 6) {
+				p = replystr.rfind("SH");
+				if (p == string::npos) break;
+				hi = fm_decimal(&replystr[3], 2); //2 2
+				A_default_FM_D2 = A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+			}
+		}
 		break;
-		
+
 	case FMD3:
 		A.iBW = A_default_FM_D3;
 		lo = A.iBW & 0x7F;
 		hi = (A.iBW >> 8) & 0x7F;
 		cmd = "SL0;";
-		waitN(6, 20, "get FM lo", ASC);
-		p = replystr.rfind("SL");
-		if (p == string::npos) break;
-		lo = fm_decimal(&replystr[3], 2); //2 2
-		cmd = "SH0;";
-		waitN(6, 20, "get FM hi", ASC);
-		p = replystr.rfind("SH");
-		if (p == string::npos) break;
-		hi = fm_decimal(&replystr[3], 2); //2 2
-		A_default_FM_D3 = A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
-		return A.iBW;			
+		if (wait_char(';', 6, 20, "get FM lo", ASC) == 6) {
+			p = replystr.rfind("SL");
+			if (p == string::npos) break;
+			lo = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH0;";
+			if (wait_char(';', 6, 20, "get FM hi", ASC) == 6) {
+				p = replystr.rfind("SH");
+				if (p == string::npos) break;
+				hi = fm_decimal(&replystr[3], 2); //2 2
+				A_default_FM_D3 = A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+			}
+		}
+		return A.iBW;
 	}
 	return A.iBW;
 }
@@ -2098,38 +2117,42 @@ int RIG_TS990::get_bwB()
 		lo = B.iBW & 0x7F;
 		hi = (B.iBW >> 8) & 0x7F;
 		cmd = "SL1;";
-		waitN(6, 20, "get CW lower", ASC);
-		p = replystr.rfind("SL");
-		if (p == string::npos) break;
-		lo = fm_decimal(&replystr[3], 2); //2 2
-		cmd = "SH1;";
-		waitN(6, 20, "get CW upper", ASC);
-		p = replystr.rfind("SH");
-		if (p == string::npos) break;
-		hi = fm_decimal(&replystr[3], 2); //2 2
-		B_default_CW = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+		if (wait_char(';', 6, 20, "get CW lower", ASC) == 6) {
+			p = replystr.rfind("SL");
+			if (p == string::npos) break;
+			lo = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH1;";
+			if (wait_char(';', 6, 20, "get CW upper", ASC) == 6) {
+				p = replystr.rfind("SH");
+				if (p == string::npos) break;
+				hi = fm_decimal(&replystr[3], 2); //2 2
+				B_default_CW = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+			}
+		}
 		break;
 
 	case FSK: case FSKR:
 		B.iBW = B_default_FSK;
 		lo = B.iBW & 0x7F;
 		cmd = "SL1;";
-		waitN(6, 20, "get FSK Width", ASC);
-		p = replystr.rfind("SL");
-		if (p == string::npos) break;
-		lo = fm_decimal(&replystr[3], 2); //2 2
-		B_default_FSK = B.iBW = (lo & 0x7F);
+		if (wait_char(';', 6, 20, "get FSK Width", ASC) == 6) {
+			p = replystr.rfind("SL");
+			if (p == string::npos) break;
+			lo = fm_decimal(&replystr[3], 2); //2 2
+			B_default_FSK = B.iBW = (lo & 0x7F);
+		}
 		break;
 
 	case PSK: case PSKR:
 		B.iBW = B_default_PSK;
 		lo = B.iBW & 0x7F;
 		cmd = "SL1;";
-		waitN(6, 20, "get PSK Width", ASC);
-		p = replystr.rfind("SL");
-		if (p == string::npos) break;
-		lo = fm_decimal(&replystr[3], 2); //2 2
-		B_default_PSK = B.iBW = (lo & 0x7F);
+		if (wait_char(';', 6, 20, "get PSK Width", ASC) == 6) {
+			p = replystr.rfind("SL");
+			if (p == string::npos) break;
+			lo = fm_decimal(&replystr[3], 2); //2 2
+			B_default_PSK = B.iBW = (lo & 0x7F);
+		}
 		break;
 
 	case LSB: case USB:
@@ -2138,29 +2161,33 @@ int RIG_TS990::get_bwB()
 		if (menu_0607) {
 			B.iBW = B_default_SH_WI;
 			cmd = "SL1;";
-			waitN(6, 20, "get filter width", ASC);
-			p = replystr.rfind("SL");
-			if (p == string::npos) break;
-			hi = fm_decimal(&replystr[3], 2); //2 2
-			cmd = "SH1;";
-			waitN(6, 20, "get filter shift", ASC);
-			p = replystr.rfind("SH");
-			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			B_default_SH_WI = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+			if (wait_char(';', 6, 20, "get filter width", ASC) == 6) {
+				p = replystr.rfind("SL");
+				if (p == string::npos) break;
+				hi = fm_decimal(&replystr[3], 2); //2 2
+				cmd = "SH1;";
+				if (wait_char(';', 6, 20, "get filter shift", ASC) == 6) {
+					p = replystr.rfind("SH");
+					if (p == string::npos) break;
+					lo = fm_decimal(&replystr[3], 2); //2 2
+					B_default_SH_WI = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+				}
+			}
 		} else {
 			B.iBW = B_default_HI_LO;
 			cmd = "SL1;";
-			waitN(6, 20, "get filter lower cutoff", ASC);
-			p = replystr.rfind("SL");
-			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			cmd = "SH1;";
-			waitN(6, 20, "get filter upper cutoff", ASC);
-			p = replystr.rfind("SH");
-			if (p == string::npos) break;
-			hi = fm_decimal(&replystr[3], 2); //2 2
-			B_default_HI_LO = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+			if (wait_char(';', 6, 20, "get filter lower cutoff", ASC) == 6) {
+				p = replystr.rfind("SL");
+				if (p == string::npos) break;
+				lo = fm_decimal(&replystr[3], 2); //2 2
+				cmd = "SH1;";
+				if (wait_char(';', 6, 20, "get filter upper cutoff", ASC) == 6) {
+					p = replystr.rfind("SH");
+					if (p == string::npos) break;
+					hi = fm_decimal(&replystr[3], 2); //2 2
+					B_default_HI_LO = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+				}
+			}
 		}
 		break;
 
@@ -2170,231 +2197,259 @@ int RIG_TS990::get_bwB()
 		if (menu_0608) {
 			B.iBW = B_default_SH_WI_D1;
 			cmd = "SL1;";
-			waitN(6, 20, "get filter width", ASC);
-			p = replystr.rfind("SL");
-			if (p == string::npos) break;
-			hi = fm_decimal(&replystr[3], 2); //2 2
-			cmd = "SH1;";
-			waitN(6, 20, "get filter shift", ASC);
-			p = replystr.rfind("SH");
-			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			B_default_SH_WI_D1 = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+			if (wait_char(';', 6, 20, "get filter width", ASC) == 6) {
+				p = replystr.rfind("SL");
+				if (p == string::npos) break;
+				hi = fm_decimal(&replystr[3], 2); //2 2
+				cmd = "SH1;";
+				if (wait_char(';', 6, 20, "get filter shift", ASC) == 6) {
+					p = replystr.rfind("SH");
+					if (p == string::npos) break;
+					lo = fm_decimal(&replystr[3], 2); //2 2
+					B_default_SH_WI_D1 = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+				}
+			}
 		} else {
 			B.iBW = B_default_HI_LO;
 			cmd = "SL1;";
-			waitN(6, 20, "get filter lower cutoff", ASC);
-			p = replystr.rfind("SL");
-			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			cmd = "SH1;";
-			waitN(6, 20, "get fiter upper cutoff", ASC);
-			p = replystr.rfind("SH");
-			if (p == string::npos) break;
-			hi = fm_decimal(&replystr[3], 2); //2 2
-			B_default_HI_LO = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+			if (wait_char(';', 6, 20, "get filter lower cutoff", ASC) == 6) {
+				p = replystr.rfind("SL");
+				if (p == string::npos) break;
+				lo = fm_decimal(&replystr[3], 2); //2 2
+				cmd = "SH1;";
+				if (wait_char(';', 6, 20, "get fiter upper cutoff", ASC) == 6) {
+					p = replystr.rfind("SH");
+					if (p == string::npos) break;
+					hi = fm_decimal(&replystr[3], 2); //2 2
+					B_default_HI_LO = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+				}
+			}
 		}
 		break;
-		
+
 	case LSBD2: case USBD2:
 		lo = B.iBW & 0x7F;
 		hi = (B.iBW >> 8) & 0x7F;
 		if (menu_0608) {
 			B.iBW = B_default_SH_WI_D2;
 			cmd = "SL1;";
-			waitN(6, 20, "get filter width", ASC);
-			p = replystr.rfind("SL");
-			if (p == string::npos) break;
-			hi = fm_decimal(&replystr[3], 2); //2 2
-			cmd = "SH1;";
-			waitN(6, 20, "get filter shift", ASC);
-			p = replystr.rfind("SH");
-			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			B_default_SH_WI_D2 = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+			if (wait_char(';', 6, 20, "get filter width", ASC) == 6) {
+				p = replystr.rfind("SL");
+				if (p == string::npos) break;
+				hi = fm_decimal(&replystr[3], 2); //2 2
+				cmd = "SH1;";
+				if (wait_char(';', 6, 20, "get filter shift", ASC) == 6) {
+					p = replystr.rfind("SH");
+					if (p == string::npos) break;
+					lo = fm_decimal(&replystr[3], 2); //2 2
+					B_default_SH_WI_D2 = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+				}
+			}
 		} else {
 			B.iBW = B_default_HI_LO;
 			cmd = "SL1;";
-			waitN(6, 20, "get filter lower cutoff", ASC);
-			p = replystr.rfind("SL");
-			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			cmd = "SH1;";
-			waitN(6, 20, "get fiter upper cutoff", ASC);
-			p = replystr.rfind("SH");
-			if (p == string::npos) break;
-			hi = fm_decimal(&replystr[3], 2); //2 2
-			B_default_HI_LO = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+			if (wait_char(';', 6, 20, "get filter lower cutoff", ASC) == 6) {
+				p = replystr.rfind("SL");
+				if (p == string::npos) break;
+				lo = fm_decimal(&replystr[3], 2); //2 2
+				cmd = "SH1;";
+				if (wait_char(';', 6, 20, "get fiter upper cutoff", ASC) == 6) {
+					p = replystr.rfind("SH");
+					if (p == string::npos) break;
+					hi = fm_decimal(&replystr[3], 2); //2 2
+					B_default_HI_LO = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+				}
+			}
 		}
 		break;
-		
+
 	case LSBD3: case USBD3:
 		lo = B.iBW & 0x7F;
 		hi = (B.iBW >> 8) & 0x7F;
 		if (menu_0608) {
 			B.iBW = B_default_SH_WI_D3;
 			cmd = "SL1;";
-			waitN(6, 20, "get filter width", ASC);
-			p = replystr.rfind("SL");
-			if (p == string::npos) break;
-			hi = fm_decimal(&replystr[3], 2); //2 2
-			cmd = "SH1;";
-			waitN(6, 20, "get filter shift", ASC);
-			p = replystr.rfind("SH");
-			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			B_default_SH_WI_D3 = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+			if (wait_char(';', 6, 20, "get filter width", ASC) == 6) {
+				p = replystr.rfind("SL");
+				if (p == string::npos) break;
+				hi = fm_decimal(&replystr[3], 2); //2 2
+				cmd = "SH1;";
+				if (wait_char(';', 6, 20, "get filter shift", ASC) == 6) {
+					p = replystr.rfind("SH");
+					if (p == string::npos) break;
+					lo = fm_decimal(&replystr[3], 2); //2 2
+					B_default_SH_WI_D3 = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+				}
+			}
 		} else {
 			B.iBW = B_default_HI_LO;
 			cmd = "SL1;";
-			waitN(6, 20, "get filter lower cutoff", ASC);
-			p = replystr.rfind("SL");
-			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			cmd = "SH1;";
-			waitN(6, 20, "get fiter upper cutoff", ASC);
-			p = replystr.rfind("SH");
-			if (p == string::npos) break;
-			hi = fm_decimal(&replystr[3], 2); //2 2
-			B_default_HI_LO = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+			if (wait_char(';', 6, 20, "get filter lower cutoff", ASC) == 6) {
+				p = replystr.rfind("SL");
+				if (p == string::npos) break;
+				lo = fm_decimal(&replystr[3], 2); //2 2
+				cmd = "SH1;";
+				if (wait_char(';', 6, 20, "get fiter upper cutoff", ASC) == 6) {
+					p = replystr.rfind("SH");
+					if (p == string::npos) break;
+					hi = fm_decimal(&replystr[3], 2); //2 2
+					B_default_HI_LO = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+				}
+			}
 		}
-		break;		
+		break;
 
 	case AM:
 		B.iBW = B_default_AM;
 		lo = B.iBW & 0x7F;
 		hi = (B.iBW >> 8) & 0x7F;
 		cmd = "SL1;";
-		waitN(6, 20, "get AM lo", ASC);
-		p = replystr.rfind("SL");
-		if (p == string::npos) break;
-		lo = fm_decimal(&replystr[3], 2); //2 2
-		cmd = "SH1;";
-		waitN(6, 20, "get AM hi", ASC);
-		p = replystr.rfind("SH");
-		if (p == string::npos) break;
-		hi = fm_decimal(&replystr[3], 2); //2 2
-		B_default_AM = B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+		if (wait_char(';', 6, 20, "get AM lo", ASC) == 6) {
+			p = replystr.rfind("SL");
+			if (p == string::npos) break;
+			lo = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH1;";
+			if (wait_char(';', 6, 20, "get AM hi", ASC) == 6) {
+				p = replystr.rfind("SH");
+				if (p == string::npos) break;
+				hi = fm_decimal(&replystr[3], 2); //2 2
+				B_default_AM = B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+			}
+		}
 		break;
-		
+
 	case AMD1:
 		B.iBW = B_default_AM_D1;
 		lo = B.iBW & 0x7F;
 		hi = (B.iBW >> 8) & 0x7F;
 		cmd = "SL1;";
-		waitN(6, 20, "get AM lo", ASC);
-		p = replystr.rfind("SL");
-		if (p == string::npos) break;
-		lo = fm_decimal(&replystr[3], 2); //2 2
-		cmd = "SH1;";
-		waitN(6, 20, "get AM hi", ASC);
-		p = replystr.rfind("SH");
-		if (p == string::npos) break;
-		hi = fm_decimal(&replystr[3], 2); //2 2
-		B_default_AM_D1 = B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+		if (wait_char(';', 6, 20, "get AM lo", ASC) == 6) {
+			p = replystr.rfind("SL");
+			if (p == string::npos) break;
+			lo = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH1;";
+			if (wait_char(';', 6, 20, "get AM hi", ASC) == 6) {
+				p = replystr.rfind("SH");
+				if (p == string::npos) break;
+				hi = fm_decimal(&replystr[3], 2); //2 2
+				B_default_AM_D1 = B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+			}
+		}
 		break;
-		
+
 	case AMD2:
 		B.iBW = B_default_AM_D2;
 		lo = B.iBW & 0x7F;
 		hi = (B.iBW >> 8) & 0x7F;
 		cmd = "SL1;";
-		waitN(6, 20, "get AM lo", ASC);
-		p = replystr.rfind("SL");
-		if (p == string::npos) break;
-		lo = fm_decimal(&replystr[3], 2); //2 2
-		cmd = "SH1;";
-		waitN(6, 20, "get AM hi", ASC);
-		p = replystr.rfind("SH");
-		if (p == string::npos) break;
-		hi = fm_decimal(&replystr[3], 2); //2 2
-		B_default_AM_D2 = B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+		if (wait_char(';', 6, 20, "get AM lo", ASC) == 6) {
+			p = replystr.rfind("SL");
+			if (p == string::npos) break;
+			lo = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH1;";
+			if (wait_char(';', 6, 20, "get AM hi", ASC) == 6) {
+				p = replystr.rfind("SH");
+				if (p == string::npos) break;
+				hi = fm_decimal(&replystr[3], 2); //2 2
+				B_default_AM_D2 = B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+			}
+		}
 		break;
-		
+
 	case AMD3:
 		B.iBW = B_default_AM_D3;
 		lo = B.iBW & 0x7F;
 		hi = (B.iBW >> 8) & 0x7F;
 		cmd = "SL1;";
-		waitN(6, 20, "get AM lo", ASC);
-		p = replystr.rfind("SL");
-		if (p == string::npos) break;
-		lo = fm_decimal(&replystr[3], 2); //2 2
-		cmd = "SH1;";
-		waitN(6, 20, "get AM hi", ASC);
-		p = replystr.rfind("SH");
-		if (p == string::npos) break;
-		hi = fm_decimal(&replystr[3], 2); //2 2
-		B_default_AM_D3 = B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
-		break;			
+		if (wait_char(';', 6, 20, "get AM lo", ASC) == 6) {
+			p = replystr.rfind("SL");
+			if (p == string::npos) break;
+			lo = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH1;";
+			if (wait_char(';', 6, 20, "get AM hi", ASC) == 6) {
+				p = replystr.rfind("SH");
+				if (p == string::npos) break;
+				hi = fm_decimal(&replystr[3], 2); //2 2
+				B_default_AM_D3 = B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+			}
+		}
+		break;
 
 	case FM:
 		B.iBW = B_default_FM;
 		lo = B.iBW & 0x7F;
 		hi = (B.iBW >> 8) & 0x7F;
 		cmd = "SL1;";
-		waitN(6, 20, "get FM lo", ASC);
-		p = replystr.rfind("SL");
-		if (p == string::npos) break;
-		lo = fm_decimal(&replystr[3], 2); //2 2
-		cmd = "SH1;";
-		waitN(6, 20, "get FM hi", ASC);
-		p = replystr.rfind("SH");
-		if (p == string::npos) break;
-		hi = fm_decimal(&replystr[3], 2); //2 2
-		B_default_FM = B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+		if (wait_char(';', 6, 20, "get FM lo", ASC) == 6) {
+			p = replystr.rfind("SL");
+			if (p == string::npos) break;
+			lo = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH1;";
+			if (wait_char(';', 6, 20, "get FM hi", ASC) == 6) {
+				p = replystr.rfind("SH");
+				if (p == string::npos) break;
+				hi = fm_decimal(&replystr[3], 2); //2 2
+				B_default_FM = B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+			}
+		}
 		break;
-		
+
 	case FMD1:
 		B.iBW = B_default_FM_D1;
 		lo = B.iBW & 0x7F;
 		hi = (B.iBW >> 8) & 0x7F;
 		cmd = "SL1;";
-		waitN(6, 20, "get FM lo", ASC);
-		p = replystr.rfind("SL");
-		if (p == string::npos) break;
-		lo = fm_decimal(&replystr[3], 2); //2 2
-		cmd = "SH1;";
-		waitN(6, 20, "get FM hi", ASC);
-		p = replystr.rfind("SH");
-		if (p == string::npos) break;
-		hi = fm_decimal(&replystr[3], 2); //2 2
-		B_default_FM_D1 = B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+		if (wait_char(';', 6, 20, "get FM lo", ASC) == 6) {
+			p = replystr.rfind("SL");
+			if (p == string::npos) break;
+			lo = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH1;";
+			if (wait_char(';', 6, 20, "get FM hi", ASC) == 6) {
+				p = replystr.rfind("SH");
+				if (p == string::npos) break;
+				hi = fm_decimal(&replystr[3], 2); //2 2
+				B_default_FM_D1 = B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+			}
+		}
 		break;
-		
+
 	case FMD2:
 		B.iBW = B_default_FM_D2;
 		lo = B.iBW & 0x7F;
 		hi = (B.iBW >> 8) & 0x7F;
 		cmd = "SL1;";
-		waitN(6, 20, "get FM lo", ASC);
-		p = replystr.rfind("SL");
-		if (p == string::npos) break;
-		lo = fm_decimal(&replystr[3], 2); //2 2
-		cmd = "SH1;";
-		waitN(6, 20, "get FM hi", ASC);
-		p = replystr.rfind("SH");
-		if (p == string::npos) break;
-		hi = fm_decimal(&replystr[3], 2); //2 2
-		B_default_FM_D2 = B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+		if (wait_char(';', 6, 20, "get FM lo", ASC) == 6) {
+			p = replystr.rfind("SL");
+			if (p == string::npos) break;
+			lo = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH1;";
+			if (wait_char(';', 6, 20, "get FM hi", ASC) == 6) {
+				p = replystr.rfind("SH");
+				if (p == string::npos) break;
+				hi = fm_decimal(&replystr[3], 2); //2 2
+				B_default_FM_D2 = B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+			}
+		}
 		break;
-		
+
 	case FMD3:
 		B.iBW = B_default_FM_D3;
 		lo = B.iBW & 0x7F;
 		hi = (B.iBW >> 8) & 0x7F;
 		cmd = "SL1;";
-		waitN(6, 20, "get FM lo", ASC);
-		p = replystr.rfind("SL");
-		if (p == string::npos) break;
-		lo = fm_decimal(&replystr[3], 2); //2 2
-		cmd = "SH1;";
-		waitN(6, 20, "get FM hi", ASC);
-		p = replystr.rfind("SH");
-		if (p == string::npos) break;
-		hi = fm_decimal(&replystr[3], 2); //2 2
-		B_default_FM_D3 = B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
-		return B.iBW;			
+		if (wait_char(';', 6, 20, "get FM lo", ASC) == 6) {
+			p = replystr.rfind("SL");
+			if (p == string::npos) break;
+			lo = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH1;";
+			if (wait_char(';', 6, 20, "get FM hi", ASC) == 6) {
+				p = replystr.rfind("SH");
+				if (p == string::npos) break;
+				hi = fm_decimal(&replystr[3], 2); //2 2
+				B_default_FM_D3 = B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+			}
+		}
+		return B.iBW;
 	}
 	return B.iBW;
 }
@@ -2411,34 +2466,34 @@ void RIG_TS990::set_noise(bool val) //Now Setting AGC
 			nb_level = 3;
 			nb_label("AGC F", false);
 			cmd = "GC13;";
-			sendCommand(cmd, 0);
+			sendCommand(cmd);
 		} else if (nb_level == 3) {
 			nb_level = 1;
 			nb_label("AGC S", false);
 			cmd = "GC11;";
-			sendCommand(cmd, 0);
+			sendCommand(cmd);
 		} else if (nb_level == 1) {
 			nb_level = 2;
 			nb_label("AGC M", false);
 			cmd = "GC12;";
-			sendCommand(cmd, 0);
+			sendCommand(cmd);
 		}
 	} else {
 		if (nb_level == 2) {
 			nb_level = 3;
 			nb_label("AGC F", false);
 			cmd = "GC03;";
-			sendCommand(cmd, 0);
+			sendCommand(cmd);
 		} else if (nb_level == 3) {
 			nb_level = 1;
 			nb_label("AGC S", false);
 			cmd = "GC01;";
-			sendCommand(cmd, 0);
+			sendCommand(cmd);
 		} else if (nb_level == 1) {
 			nb_level = 2;
 			nb_label("AGC M", false);
 			cmd = "GC02;";
-			sendCommand(cmd, 0);
+			sendCommand(cmd);
 		}
 	}
 }
@@ -2449,8 +2504,8 @@ int  RIG_TS990::get_agc()
 	int val = 0;
 	if (useB) {
 		cmd = "GC1;";
-		int ret = waitN(5, 100, "get AGC", ASC);
-		if (ret < 5) return val;
+		if (wait_char(';', 5, 100, "get AGC", ASC) < 5) return val;
+
 		size_t p = replystr.rfind("GC");
 		if (p == string::npos) return val;
 		if (replystr[p + 3] == '1' ) {
@@ -2462,9 +2517,8 @@ int  RIG_TS990::get_agc()
 		}
 	} else {
 		cmd = "GC0;";
-		int ret = waitN(5, 100, "get AGC", ASC);
-		showresp(INFO, ASC, "get AGC", cmd, replystr);
-		if (ret < 5) return val;
+		if (wait_char(';', 5, 100, "get AGC", ASC) < 5) return val;
+
 		size_t p = replystr.rfind("GC");
 		if (p == string::npos) return val;
 		if (replystr[p + 3] == '1' ) {
@@ -2485,13 +2539,13 @@ void RIG_TS990::set_squelch(int val)
 	if (useB) {
 		cmd = "SQ1";
 		cmd.append(to_decimal(abs(val),3)).append(";");
-		sendCommand(cmd,0);
-		showresp(INFO, ASC, "set squelch", cmd, replystr);
+		sendCommand(cmd);
+		showresp(INFO, ASC, "set squelch", cmd, "");
 	} else {
 		cmd = "SQ0";
 		cmd.append(to_decimal(abs(val),3)).append(";");
-		sendCommand(cmd,0);
-		showresp(INFO, ASC, "set squelch", cmd, replystr);
+		sendCommand(cmd);
+		showresp(INFO, ASC, "set squelch", cmd, "");
 	}
 }
 
@@ -2500,8 +2554,7 @@ int  RIG_TS990::get_squelch()
 	int val = 0;
 	if (useB) {
 		cmd = "SQ1;";
-		int ret = waitN(7, 20, "get squelch", ASC);
-		if (ret >= 7) {
+		if (wait_char(';', 7, 20, "get squelch", ASC) >= 7) {
 			size_t p = replystr.rfind("SQ1");
 			if (p == string::npos) return val;
 			replystr[p + 6] = 0;
@@ -2509,8 +2562,7 @@ int  RIG_TS990::get_squelch()
 		}
 	} else {
 		cmd = "SQ0;";
-		int ret = waitN(7, 20, "get squelch", ASC);
-		if (ret >= 7) {
+		if (wait_char(';', 7, 20, "get squelch", ASC) >= 7) {
 			size_t p = replystr.rfind("SQ0");
 			if (p == string::npos) return val;
 			replystr[p + 6] = 0;
@@ -2530,13 +2582,13 @@ void RIG_TS990::set_rf_gain(int val)
 	if (useB) {
 		cmd = "RG1";
 		cmd.append(to_decimal(val,3)).append(";");
-		sendCommand(cmd,0);
-		showresp(INFO, ASC, "set rf gain", cmd, replystr);
+		sendCommand(cmd);
+		showresp(INFO, ASC, "set rf gain", cmd, "");
 	} else {
 		cmd = "RG0";
 		cmd.append(to_decimal(val,3)).append(";");
-		sendCommand(cmd,0);
-		showresp(INFO, ASC, "set rf gain", cmd, replystr);
+		sendCommand(cmd);
+		showresp(INFO, ASC, "set rf gain", cmd, "");
 	}
 }
 
@@ -2545,15 +2597,15 @@ int  RIG_TS990::get_rf_gain()
 	int val = progStatus.rfgain;
 	if (useB) {
 		cmd = "RG1;";
-		int ret = waitN(7, 20, "get rf gain", ASC);
-		if (ret < 7) return val;
+		if (wait_char(';', 7, 20, "get rf gain", ASC) < 7) return val;
+
 		size_t p = replystr.rfind("RG");
 		if (p != string::npos)
 			val = fm_decimal(&replystr[p+3], 3);
 	} else {
 		cmd = "RG0;";
-		int ret = waitN(7, 20, "get rf gain", ASC);
-		if (ret < 7) return val;
+		if (wait_char(';', 7, 20, "get rf gain", ASC) < 7) return val;
+
 		size_t p = replystr.rfind("RG");
 		if (p != string::npos)
 			val = fm_decimal(&replystr[p+3], 3);
@@ -2575,13 +2627,13 @@ void RIG_TS990::set_noise_reduction(int val)
 	if (useB) {
 		cmd.assign("NR1").append(val ? "1" : "0" ).append(";");
 		sendCommand(cmd);
-		showresp(INFO, ASC, "SET noise reduction", cmd, replystr);
+		showresp(INFO, ASC, "SET noise reduction", cmd, "");
 		if (val) nr_on = true;
 		else nr_on = false;
 	} else {
 		cmd.assign("NR0").append(val ? "1" : "0" ).append(";");
 		sendCommand(cmd);
-		showresp(INFO, ASC, "SET noise reduction", cmd, replystr);
+		showresp(INFO, ASC, "SET noise reduction", cmd, "");
 		if (val) nr_on = true;
 		else nr_on = false;
 	}
@@ -2593,7 +2645,8 @@ int  RIG_TS990::get_noise_reduction()
 	if (useB) {
 		cmd = rsp = "NR1";
 		cmd.append(";");
-		waitN(5, 20, "GET noise reduction", ASC);
+		if (wait_char(';', 5, 20, "GET noise reduction", ASC) < 5) return val;
+
 		size_t p = replystr.rfind(rsp);
 		if (p == string::npos) return val;
 		val = replystr[p+3] - '0';
@@ -2603,7 +2656,8 @@ int  RIG_TS990::get_noise_reduction()
 	} else {
 		cmd = rsp = "NR0";
 		cmd.append(";");
-		waitN(5, 20, "GET noise reduction", ASC);
+		if (wait_char(';', 5, 20, "GET noise reduction", ASC) < 5) return val;
+
 		size_t p = replystr.rfind(rsp);
 		if (p == string::npos) return val;
 		val = replystr[p+3] - '0';
@@ -2618,11 +2672,11 @@ void RIG_TS990::set_noise_reduction_val(int val)
 	if (useB) {
 		cmd.assign("RL11").append(to_decimal(val, 2)).append(";");
 		sendCommand(cmd);
-		showresp(INFO, ASC, "SET_noise_reduction_val", cmd, replystr);
+		showresp(INFO, ASC, "SET_noise_reduction_val", cmd, "");
 	} else {
 		cmd.assign("RL10").append(to_decimal(val, 2)).append(";");
 		sendCommand(cmd);
-		showresp(INFO, ASC, "SET_noise_reduction_val", cmd, replystr);
+		showresp(INFO, ASC, "SET_noise_reduction_val", cmd, "");
 	}
 }
 
@@ -2633,7 +2687,7 @@ int  RIG_TS990::get_noise_reduction_val()
 		if (!nr_on) return val;
 		cmd = rsp = "RL11";
 		cmd.append(";");
-		waitN(7, 20, "GET noise reduction val", ASC);
+		if (wait_char(';', 7, 20, "GET noise reduction val", ASC) < 7) return val;
 		size_t p = replystr.rfind(rsp);
 		if (p == string::npos) return val;
 		val = fm_decimal(&replystr[p+4], 2);
@@ -2641,7 +2695,7 @@ int  RIG_TS990::get_noise_reduction_val()
 		if (!nr_on) return val;
 		cmd = rsp = "RL10";
 		cmd.append(";");
-		waitN(7, 20, "GET noise reduction val", ASC);
+		if (wait_char(';', 7, 20, "GET noise reduction val", ASC) < 7) return val;
 		size_t p = replystr.rfind(rsp);
 		if (p == string::npos) return val;
 		val = fm_decimal(&replystr[p+4], 2);
@@ -2654,11 +2708,11 @@ void RIG_TS990::set_auto_notch(int v)
 	if (useB) {
 		cmd.assign("NT1").append(v ? "1" : "0" ).append(";");
 		sendCommand(cmd);
-		showresp(INFO, ASC, "SET Auto Notch", cmd, replystr);
+		showresp(INFO, ASC, "SET Auto Notch", cmd, "");
 	} else {
 		cmd.assign("NT0").append(v ? "1" : "0" ).append(";");
 		sendCommand(cmd);
-		showresp(INFO, ASC, "SET Auto Notch", cmd, replystr);
+		showresp(INFO, ASC, "SET Auto Notch", cmd, "");
 	}
 }
 
@@ -2667,13 +2721,13 @@ int  RIG_TS990::get_auto_notch()
 	int val = 0;
 	if (useB) {
 		cmd = "NT1;";
-		waitN(5, 20, "get auto notch", ASC);
+		if (wait_char(';', 5, 20, "get auto notch", ASC) < 5) return val;
 		size_t p = replystr.rfind("NT");
 		if (p == string::npos) return val;
 		if (replystr[p+3] == '1') val = 1;
 	} else {
 		cmd = "NT0;";
-		waitN(5, 20, "get auto notch", ASC);
+		if (wait_char(';', 5, 20, "get auto notch", ASC) < 5) return val;
 		size_t p = replystr.rfind("NT");
 		if (p == string::npos) return val;
 		if (replystr[p+3] == '1') val = 1;
@@ -2687,31 +2741,31 @@ void RIG_TS990::set_notch(bool on, int val)
 		if (on) {
 			cmd.assign("NT12;");
 			sendCommand(cmd);
-			showresp(INFO, ASC, "Set notch ON", cmd, replystr);
+			showresp(INFO, ASC, "Set notch ON", cmd, "");
 			int bp = (int)(val * 127.0 / 3000);
 			if (bp == 0) bp = 1;
 			cmd.assign("BP1").append(to_decimal(bp, 3)).append(";");
 			sendCommand(cmd);
-			showresp(INFO, ASC, "set notch freq", cmd, replystr);
+			showresp(INFO, ASC, "set notch freq", cmd, "");
 		} else {
 			cmd.assign("NT10;");
 			sendCommand(cmd);
-			showresp(INFO, ASC, "Set notch OFF", cmd, replystr);
+			showresp(INFO, ASC, "Set notch OFF", cmd, "");
 		}
 	} else {
 		if (on) {
 			cmd.assign("NT02;");
 			sendCommand(cmd);
-			showresp(INFO, ASC, "Set notch ON", cmd, replystr);
+			showresp(INFO, ASC, "Set notch ON", cmd, "");
 			int bp = (int)(val * 127.0 / 3000);
 			if (bp == 0) bp = 1;
 			cmd.assign("BP0").append(to_decimal(bp, 3)).append(";");
 			sendCommand(cmd);
-			showresp(INFO, ASC, "set notch freq", cmd, replystr);
+			showresp(INFO, ASC, "set notch freq", cmd, "");
 		} else {
 			cmd.assign("NT00;");
 			sendCommand(cmd);
-			showresp(INFO, ASC, "Set notch OFF", cmd, replystr);
+			showresp(INFO, ASC, "Set notch OFF", cmd, "");
 		}
 	}
 }
@@ -2721,13 +2775,13 @@ bool  RIG_TS990::get_notch(int &val)
 	if (useB) {
 		val = 1500;
 		cmd = "NT1;";
-		waitN(5, 20, "get notch state", ASC);
+		if (wait_char(';', 5, 20, "get notch state", ASC) < 5) return 0;
 		size_t p = replystr.rfind("NT");
 		if (p == string::npos)
 			return 0;
 		if (replystr[p+3] == '2') {
 			cmd.assign("BP1;");
-			waitN(7, 20, "get notch freq", ASC);
+			if (wait_char(';', 7, 20, "get notch freq", ASC) < 7) return 0;
 			size_t p = replystr.rfind("BP1");
 			if (p != string::npos)
 				val = (int)(atoi(&replystr[p+3]) * 3000 / 127.0);
@@ -2737,13 +2791,13 @@ bool  RIG_TS990::get_notch(int &val)
 	} else {
 		val = 1500;
 		cmd = "NT0;";
-		waitN(5, 20, "get notch state", ASC);
+		if (wait_char(';', 5, 20, "get notch state", ASC) < 5) return 0;
 		size_t p = replystr.rfind("NT");
 		if (p == string::npos)
 			return 0;
 		if (replystr[p+3] == '2') {
 			cmd.assign("BP0;");
-			waitN(7, 20, "get notch freq", ASC);
+			if (wait_char(';', 7, 20, "get notch freq", ASC) < 7) return 0;
 			size_t p = replystr.rfind("BP0");
 			if (p != string::npos)
 				val = (int)(atoi(&replystr[p+3]) * 3000.0 / 127.0);
@@ -2769,18 +2823,19 @@ void RIG_TS990::set_if_shift(int val)  //Now doing Monitor
 	progStatus.shift_val = val;
 	cmd = "ML";
 	cmd.append(to_decimal(val,3)).append(";");
-	sendCommand(cmd,0);
-	showresp(INFO, ASC, "set Mon Level", cmd, replystr);
+	sendCommand(cmd);
+	showresp(INFO, ASC, "set Mon Level", cmd, "");
 }
 
 bool RIG_TS990::get_if_shift(int &val)
 {
 	cmd = "ML;";
-	waitN(6, 20, "get Mon Level", ASC);
-	size_t p = replystr.rfind("ML");
-	if (p != string::npos) {
-		val = fm_decimal(&replystr[p+2], 3);
-		return true;
+	if (wait_char(';', 6, 20, "get Mon Level", ASC) == 6) {
+		size_t p = replystr.rfind("ML");
+		if (p != string::npos) {
+			val = fm_decimal(&replystr[p+2], 3);
+			return true;
+		}
 	}
 	val = progStatus.shift_val;
 	return false;

@@ -197,9 +197,8 @@ void RIG_TS480SAT::check_menu_45()
 {
 // read current switch 45 setting
 	menu_45 = false;
-	cmd = "EX0450000;"; sendCommand(cmd);
-	int ret = waitN(11, 100, "Check menu item 45", ASC);
-	if (ret >= 11) {
+	cmd = "EX0450000;";
+	if (wait_char(';', 11, 100, "Check menu item 45", ASC) >= 11) {
 		size_t p = replystr.rfind("EX045");
 		if (p != string::npos)
 			menu_45 = (replystr[p+9] == '1');
@@ -232,14 +231,14 @@ void RIG_TS480SAT::selectA()
 {
 	cmd = "FR0;FT0;";
 	sendCommand(cmd);
-	showresp(WARN, ASC, "Rx on A, Tx on A", cmd, replystr);
+	showresp(WARN, ASC, "Rx on A, Tx on A", cmd, "");
 }
 
 void RIG_TS480SAT::selectB()
 {
 	cmd = "FR1;FT1;";
 	sendCommand(cmd);
-	showresp(WARN, ASC, "Rx on B, Tx on B", cmd, replystr);
+	showresp(WARN, ASC, "Rx on B, Tx on B", cmd, "");
 }
 
 void RIG_TS480SAT::set_split(bool val) 
@@ -250,21 +249,21 @@ void RIG_TS480SAT::set_split(bool val)
 		if (val) {
 			cmd = "FR1;FT0;";
 			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on B, Tx on A", cmd, replystr);
+			showresp(WARN, ASC, "Rx on B, Tx on A", cmd, "");
 		} else {
 			cmd = "FR1;FT1;";
 			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on B, Tx on B", cmd, replystr);
+			showresp(WARN, ASC, "Rx on B, Tx on B", cmd, "");
 		}
 	} else {
 		if (val) {
 			cmd = "FR0;FT1;";
 			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on A, Tx on B", cmd, replystr);
+			showresp(WARN, ASC, "Rx on A, Tx on B", cmd, "");
 		} else {
 			cmd = "FR0;FT0;";
 			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on A, Tx on A", cmd, replystr);
+			showresp(WARN, ASC, "Rx on A, Tx on A", cmd, "");
 		}
 	}
 	Fl::awake(highlight_vfo, (void *)0);
@@ -279,25 +278,25 @@ int RIG_TS480SAT::get_split()
 {
 	size_t p;
 	int split = 0;
-	char rx, tx;
+	char rx = 0, tx = 0;
 // tx vfo
 	cmd = rsp = "FT";
 	cmd.append(";");
-	waitN(4, 100, "get split tx vfo", ASC);
-	p = replystr.rfind(rsp);
-	if (p == string::npos) return split;
-	tx = replystr[p+2];
-
+	if (wait_char(';', 4, 100, "get split tx vfo", ASC) == 4) {
+		p = replystr.rfind(rsp);
+		if (p == string::npos) return split;
+		tx = replystr[p+2];
+	}
 // rx vfo
 	cmd = rsp = "FR";
 	cmd.append(";");
-	waitN(4, 100, "get split rx vfo", ASC);
-
-	p = replystr.rfind(rsp);
-	if (p == string::npos) return split;
-	rx = replystr[p+2];
+	if (wait_char(';', 4, 100, "get split rx vfo", ASC) == 4) {
+		p = replystr.rfind(rsp);
+		if (p == string::npos) return split;
+		rx = replystr[p+2];
 // split test
-	split = (tx == '1' ? 2 : 0) + (rx == '1' ? 1 : 0);
+		split = (tx == '1' ? 2 : 0) + (rx == '1' ? 1 : 0);
+	}
 
 	return split;
 }
@@ -305,8 +304,8 @@ int RIG_TS480SAT::get_split()
 long RIG_TS480SAT::get_vfoA ()
 {
 	cmd = "FA;";
-	int ret = waitN(14, 100, "get vfo A", ASC);
-	if (ret < 14) return A.freq;
+	if (wait_char(';', 14, 100, "get vfo A", ASC) < 14) return A.freq;
+
 	size_t p = replystr.rfind("FA");
 	if (p != string::npos && (p + 12 < replystr.length())) {
 		int f = 0;
@@ -325,15 +324,15 @@ void RIG_TS480SAT::set_vfoA (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendCommand(cmd,0);
-	showresp(WARN, ASC, "set vfo A", cmd, replystr);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set vfo A", cmd, "");
 }
 
 long RIG_TS480SAT::get_vfoB ()
 {
 	cmd = "FB;";
-	int ret = waitN(14, 100, "get vfo B", ASC);
-	if (ret < 14) return B.freq;
+	if (wait_char(';', 14, 100, "get vfo B", ASC) < 14) return B.freq;
+
 	size_t p = replystr.rfind("FB");
 	if (p != string::npos && (p + 12 < replystr.length())) {
 		int f = 0;
@@ -352,8 +351,8 @@ void RIG_TS480SAT::set_vfoB (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendCommand(cmd,0);
-	showresp(WARN, ASC, "set vfo B", cmd, replystr);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set vfo B", cmd, "");
 }
 
 // SM cmd 0 ... 100 (rig values 0 ... 15)
@@ -361,8 +360,7 @@ int RIG_TS480SAT::get_smeter()
 {
 	int mtr = 0;
 	cmd = "SM0;";
-	int ret = waitN(8, 100, "get Smeter", ASC);
-	if (ret < 8) return 0;
+	if (wait_char(';', 8, 100, "get Smeter", ASC) < 8) return 0;
 
 	size_t p = replystr.rfind("SM");
 	if (p != string::npos)
@@ -374,8 +372,8 @@ int RIG_TS480SAT::get_power_out()
 {
 	int mtr = 0;
 	cmd = "SM0;";
-	int ret = waitN(8, 100, "get power", ASC);
-	if (ret < 8) return mtr;
+	if (wait_char(';', 8, 100, "get power", ASC) < 8) return mtr;
+
 	size_t p = replystr.rfind("SM");
 	if (p != string::npos) {
 		mtr = 5 * atoi(&replystr[p + 3]);
@@ -395,8 +393,8 @@ int RIG_TS480SAT::get_swr()
 {
 	int mtr = 0;
 	cmd = "RM;";
-	int ret = waitN(8, 100, "get SWR/ALC", ASC);
-	if (ret < 8) return (int)mtr;
+	if (wait_char(';', 8, 100, "get SWR/ALC", ASC) < 8) return (int)mtr;
+
 	size_t p = replystr.rfind("RM1");
 	if (p != string::npos)
 		mtr = 66 * atoi(&replystr[p + 3]) / 10;
@@ -424,7 +422,7 @@ void RIG_TS480SAT::set_PTT_control(int val)
 		else cmd = "TX0;"; // mic input
 	} else cmd = "RX;";
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set PTT", cmd, replystr);
+	showresp(WARN, ASC, "set PTT", cmd, "");
 }
 
 int RIG_TS480SAT::set_widths(int val)
@@ -508,15 +506,16 @@ void RIG_TS480SAT::set_modeA(int val)
 	cmd = "MD";
 	cmd += TS480SAT_mode_chr[val];
 	cmd += ';';
-	sendCommand(cmd,0);
-	showresp(WARN, ASC, "set mode", cmd, replystr);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set mode", cmd, "");
 	A.iBW = set_widths(val);
 }
 
 int RIG_TS480SAT::get_modeA()
 {
 	cmd = "MD;";
-	waitN(4, 100, "get modeA", ASC);
+	if (wait_char(';', 4, 100, "get modeA", ASC) < 4) return A.imode;
+
 	size_t p = replystr.rfind("MD");
 	if (p != string::npos && (p + 2 < replystr.length())) {
 		int md = replystr[p+2];
@@ -534,15 +533,16 @@ void RIG_TS480SAT::set_modeB(int val)
 	cmd = "MD";
 	cmd += TS480SAT_mode_chr[val];
 	cmd += ';';
-	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "set mode B", cmd, replystr);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set mode B", cmd, "");
 	B.iBW = set_widths(val);
 }
 
 int RIG_TS480SAT::get_modeB()
 {
 	cmd = "MD;";
-	waitN(4, 100, "get modeB", ASC);
+	if (wait_char(';', 4, 100, "get modeB", ASC) < 4) return B.imode;
+
 	size_t p = replystr.rfind("MD");
 	if (p != string::npos && (p + 2 < replystr.length())) {
 		int md = replystr[p+2];
@@ -566,24 +566,24 @@ void RIG_TS480SAT::set_bwA(int val)
 		A.iBW = val;
 		cmd = "SL";
 		cmd.append(to_decimal(A.iBW & 0xFF, 2)).append(";");
-		sendCommand(cmd,0);
-		showresp(WARN, ASC, lo_tooltip, cmd, replystr);
+		sendCommand(cmd);
+		showresp(WARN, ASC, lo_tooltip, cmd, "");
 		cmd = "SH";
 		cmd.append(to_decimal(((A.iBW >> 8) & 0x7F), 2)).append(";");
-		sendCommand(cmd,0);
-		showresp(WARN, ASC, hi_tooltip, cmd, replystr);
+		sendCommand(cmd);
+		showresp(WARN, ASC, hi_tooltip, cmd, "");
 	}
 	if (val > 256) return;
 	else if (A.imode == 2 || A.imode == 6) {
 		A.iBW = val;
 		cmd = TS480SAT_CWbw[A.iBW];
-		sendCommand(cmd,0);
-		showresp(WARN, ASC, "set CW bw", cmd, replystr);
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set CW bw", cmd, "");
 	}else if (A.imode == 5 || A.imode == 7) {
 		A.iBW = val;
 		cmd = TS480SAT_FSKbw[A.iBW];
-		sendCommand(cmd,0);
-		showresp(WARN, ASC, "set FSK bw", cmd, replystr);
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set FSK bw", cmd, "");
 	}
 }
 
@@ -601,37 +601,41 @@ int RIG_TS480SAT::get_bwA()
 	if (A.imode == 0 || A.imode == 1 || A.imode == 3 || A.imode == 4) {
 		int lo = A.iBW & 0xFF, hi = (A.iBW >> 8) & 0x7F;
 		cmd = "SL;";
-		waitN(5, 100, "get SL", ASC);
-		p = replystr.rfind("SL");
-		if (p != string::npos)
-			lo = fm_decimal(&replystr[2], 2);
+		if (wait_char(';', 5, 100, "get SL", ASC) == 5) {
+			p = replystr.rfind("SL");
+			if (p != string::npos)
+				lo = fm_decimal(&replystr[2], 2);
+		}
 		cmd = "SH;";
-		waitN(5, 100, "get SH", ASC);
-		p = replystr.rfind("SH");
-		if (p != string::npos)
-			hi = fm_decimal(&replystr[2], 2);
-		A.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
+		if (wait_char(';', 5, 100, "get SH", ASC) == 5) {
+			p = replystr.rfind("SH");
+			if (p != string::npos)
+				hi = fm_decimal(&replystr[2], 2);
+			A.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
+		}
 	} else if (A.imode == 2 || A.imode == 6) {
 		cmd = "FW;";
-		waitN(7, 100, "get FW", ASC);
-		p = replystr.rfind("FW");
-		if (p != string::npos) {
-			for (i = 0; i < 11; i++)
-				if (replystr.find(TS480SAT_CWbw[i]) == p)
-					break;
-			if (i == 11) i = 10;
-			A.iBW = i;
+		if (wait_char(';', 7, 100, "get FW", ASC) == 7) {
+			p = replystr.rfind("FW");
+			if (p != string::npos) {
+				for (i = 0; i < 11; i++)
+					if (replystr.find(TS480SAT_CWbw[i]) == p)
+						break;
+				if (i == 11) i = 10;
+				A.iBW = i;
+			}
 		}
 	} else if (A.imode == 5 || A.imode == 7) {
 		cmd = "FW;";
-		waitN(7, 100, "get FW", ASC);
-		p = replystr.rfind("FW");
-		if (p != string::npos) {
-			for (i = 0; i < 4; i++)
-				if (replystr.find(TS480SAT_FSKbw[i]) == p)
-					break;
-			if (i == 4) i = 3;
-			A.iBW = i;
+		if (wait_char(';', 7, 100, "get FW", ASC) == 7) {
+			p = replystr.rfind("FW");
+			if (p != string::npos) {
+				for (i = 0; i < 4; i++)
+					if (replystr.find(TS480SAT_FSKbw[i]) == p)
+						break;
+				if (i == 4) i = 3;
+				A.iBW = i;
+			}
 		}
 	}
 	return A.iBW;
@@ -644,24 +648,24 @@ void RIG_TS480SAT::set_bwB(int val)
 		B.iBW = val;
 		cmd = "SL";
 		cmd.append(to_decimal(B.iBW & 0xFF, 2)).append(";");
-		sendCommand(cmd,0);
-		showresp(WARN, ASC, lo_tooltip, cmd, replystr);
+		sendCommand(cmd);
+		showresp(WARN, ASC, lo_tooltip, cmd, "");
 		cmd = "SH";
 		cmd.append(to_decimal(((B.iBW >> 8) & 0x7F), 2)).append(";");
-		sendCommand(cmd,0);
-		showresp(WARN, ASC, hi_tooltip, cmd, replystr);
+		sendCommand(cmd);
+		showresp(WARN, ASC, hi_tooltip, cmd, "");
 	}
 	if (val > 256) return;
 	else if (B.imode == 2 || B.imode == 6) { // CW
 		B.iBW = val;
 		cmd = TS480SAT_CWbw[B.iBW];
-		sendCommand(cmd,0);
-		showresp(WARN, ASC, "set CW bw", cmd, replystr);
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set CW bw", cmd, "");
 	}else if (B.imode == 5 || B.imode == 7) {
 		B.iBW = val;
 		cmd = TS480SAT_FSKbw[B.iBW];
-		sendCommand(cmd,0);
-		showresp(WARN, ASC, "set FSK bw", cmd, replystr);
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set FSK bw", cmd, "");
 	}
 }
 
@@ -678,36 +682,41 @@ int RIG_TS480SAT::get_bwB()
 	if (B.imode == 0 || B.imode == 1 || B.imode == 3 || B.imode == 4) {
 		int lo = B.iBW & 0xFF, hi = (B.iBW >> 8) & 0x7F;
 		cmd = "SL;";
-		waitN(5, 100, "get SL", ASC);
-		p = replystr.rfind("SL");
-		if (p != string::npos)
-			lo = fm_decimal(&replystr[2], 2);
+		if (wait_char(';', 5, 100, "get SL", ASC) == 5) {
+			p = replystr.rfind("SL");
+			if (p != string::npos)
+				lo = fm_decimal(&replystr[2], 2);
+		}
 		cmd = "SH;";
-		waitN(5, 100, "get SH", ASC);
-		p = replystr.rfind("SH");
-		if (p != string::npos)
-			hi = fm_decimal(&replystr[2], 2);
-		B.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
+		if (wait_char(';', 5, 100, "get SH", ASC) == 5) {
+			p = replystr.rfind("SH");
+			if (p != string::npos)
+				hi = fm_decimal(&replystr[2], 2);
+			B.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
+		}
 	} else if (B.imode == 2 || B.imode == 6) {
 		cmd = "FW;";
-		waitN(7, 100, "get FW", ASC);
-		p = replystr.rfind("FW");
-		if (p != string::npos) {
-			for (i = 0; i < 11; i++)
-				if (replystr.find(TS480SAT_CWbw[i]) == p)
-					break;
-			if (i == 11) i = 10;
-			B.iBW = i;
+		if (wait_char(';', 7, 100, "get FW", ASC) == 7) {
+			p = replystr.rfind("FW");
+			if (p != string::npos) {
+				for (i = 0; i < 11; i++)
+					if (replystr.find(TS480SAT_CWbw[i]) == p)
+						break;
+				if (i == 11) i = 10;
+				B.iBW = i;
+			}
 		}
 	} else if (B.imode == 5 || B.imode == 7) {
 		cmd = "FW;";
-		waitN(7, 100, "get FW", ASC);
-		if (p != string::npos) {
-			for (i = 0; i < 4; i++)
-				if (replystr.find(TS480SAT_FSKbw[i]) == p)
-					break;
-			if (i == 4) i = 3;
-			B.iBW = i;
+		if (wait_char(';', 7, 100, "get FW", ASC) == 7) {
+			p = replystr.rfind("FW");
+			if (p != string::npos) {
+				for (i = 0; i < 4; i++)
+					if (replystr.find(TS480SAT_FSKbw[i]) == p)
+						break;
+				if (i == 4) i = 3;
+				B.iBW = i;
+			}
 		}
 	}
 	return B.iBW;
@@ -740,15 +749,15 @@ void RIG_TS480SAT::set_volume_control(int val)
 	cmd += szval;
 	cmd += ';';
 	LOG_WARN("%s", cmd.c_str());
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 }
 
 int RIG_TS480SAT::get_volume_control()
 {
 	int val = progStatus.volume;
 	cmd = "AG0;";
-	int ret = waitN(7, 100, "get vol", ASC);
-	if (ret < 7) return val;
+	if (wait_char(';', 7, 100, "get vol", ASC) < 7) return val;
+
 	size_t p = replystr.rfind("AG");
 	if (p == string::npos) return val;
 	replystr[p + 6] = 0;
@@ -766,15 +775,15 @@ void RIG_TS480SAT::set_power_control(double val)
 	cmd += szval;
 	cmd += ';';
 	LOG_WARN("%s", cmd.c_str());
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 }
 
 int RIG_TS480SAT::get_power_control()
 {
 	int val = progStatus.power_level;
 	cmd = "PC;";
-	int ret = waitN(6, 100, "get Power control", ASC);
-	if (ret < 6) return val;
+	if (wait_char(';', 6, 100, "get Power control", ASC) < 6) return val;
+
 	size_t p = replystr.rfind("PC");
 	if (p == string::npos) return val;
 
@@ -788,14 +797,14 @@ void RIG_TS480SAT::set_attenuator(int val)
 	if (val)	cmd = "RA01;";
 	else		cmd = "RA00;";
 	LOG_WARN("%s", cmd.c_str());
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 }
 
 int RIG_TS480SAT::get_attenuator()
 {
 	cmd = "RA;";
-	int ret = waitN(7, 100, "get attenuator", ASC);
-	if (ret < 7) return progStatus.attenuator;
+	if (wait_char(';', 7, 100, "get attenuator", ASC) < 7) return progStatus.attenuator;
+
 	size_t p = replystr.rfind("RA");
 	if (p == string::npos) return progStatus.attenuator;
 	if (replystr[p+3] == '1') return 1;
@@ -807,14 +816,14 @@ void RIG_TS480SAT::set_preamp(int val)
 	if (val)	cmd = "PA1;";
 	else		cmd = "PA0;";
 	LOG_WARN("%s", cmd.c_str());
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 }
 
 int RIG_TS480SAT::get_preamp()
 {
 	cmd = "PA;";
-	int ret = waitN(5, 100, "get preamp", ASC);
-	if (ret < 5) return progStatus.preamp;
+	if (wait_char(';', 5, 100, "get preamp", ASC) < 5) return progStatus.preamp;
+
 	size_t p = replystr.rfind("PA");
 	if (p == string::npos) return progStatus.preamp;
 	if (replystr[p+2] == '1') return 1;
@@ -825,7 +834,7 @@ void RIG_TS480SAT::tune_rig()
 {
 	cmd = "AC111;";
 	LOG_WARN("%s", cmd.c_str());
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 }
 
 void RIG_TS480SAT::set_if_shift(int val)
@@ -833,19 +842,20 @@ void RIG_TS480SAT::set_if_shift(int val)
 	cmd = "IS+";
 	if (val < 0) cmd[2] = '-';
 	cmd.append(to_decimal(abs(val),4)).append(";");
-	sendCommand(cmd,0);
-	showresp(WARN, ASC, "set IF shift", cmd, replystr);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set IF shift", cmd, "");
 }
 
 bool RIG_TS480SAT::get_if_shift(int &val)
 {
 	cmd = "IS;";
-	waitN(8, 100, "get IF shift", ASC);
-	size_t p = replystr.rfind("IS");
-	if (p != string::npos) {
-		val = fm_decimal(&replystr[p+3], 4);
-		if (replystr[p+2] == '-') val *= -1;
-		return (val != 0);
+	if (wait_char(';', 8, 100, "get IF shift", ASC) == 8) {
+		size_t p = replystr.rfind("IS");
+		if (p != string::npos) {
+			val = fm_decimal(&replystr[p+3], 4);
+			if (replystr[p+2] == '-') val *= -1;
+			return (val != 0);
+		}
 	}
 	val = progStatus.shift_val;
 	return progStatus.shift;
@@ -863,16 +873,16 @@ void RIG_TS480SAT::set_mic_gain(int val)
 {
 	cmd = "MG";
 	cmd.append(to_decimal(val,3)).append(";");
-	sendCommand(cmd,0);
-	showresp(WARN, ASC, "set mic gain", cmd, replystr);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set mic gain", cmd, "");
 }
 
 int  RIG_TS480SAT::get_mic_gain()
 {
 	int val = progStatus.mic_gain;
 	cmd = "MG;";
-	int ret = waitN(6, 100, "get mic gain", ASC);
-	if (ret < 6) return val;
+	if (wait_char(';', 6, 100, "get mic gain", ASC) < 6) return val;
+
 	size_t p = replystr.rfind("MG");
 	if (p != string::npos)
 		val = fm_decimal(&replystr[p+2], 3);
@@ -888,16 +898,16 @@ void RIG_TS480SAT::set_rf_gain(int val)
 {
 	cmd = "RG";
 	cmd.append(to_decimal(val,3)).append(";");
-	sendCommand(cmd,0);
-	showresp(WARN, ASC, "set rf gain", cmd, replystr);
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set rf gain", cmd, "");
 }
 
 int  RIG_TS480SAT::get_rf_gain()
 {
 	int val = progStatus.rfgain;
 	cmd = "RG;";
-	int ret = waitN(6, 100, "get rf gain", ASC);
-	if (ret < 6) return val;
+	if (wait_char(';', 6, 100, "get rf gain", ASC) < 6) return val;
+
 	size_t p = replystr.rfind("RG");
 	if (p != string::npos)
 		val = fm_decimal(&replystr[p+2], 3);

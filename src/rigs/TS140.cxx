@@ -105,7 +105,7 @@ RIG_TS140::RIG_TS140() {
 long RIG_TS140::get_vfoA ()
 {
 	cmd = "IF;";
-	int ret = waitN(38, 100, "get VFO", ASC);
+	int ret = wait_char(';', 38, 100, "get VFO", ASC);
 	if (ret < 38) return freqA;
 
 	long f = 0;
@@ -123,14 +123,14 @@ void RIG_TS140::set_vfoA (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 }
 
 // Tranceiver PTT on/off
 void RIG_TS140::set_PTT_control(int val)
 {
-	if (val) sendCommand("TX;", 0);
-	else	 sendCommand("RX;", 0);
+	if (val) sendCommand("TX;");
+	else	 sendCommand("RX;");
 }
 
 int RIG_TS140::get_modetype(int n)
@@ -143,14 +143,14 @@ void RIG_TS140::set_modeA(int val)
 	if (val == 5) val++;
 	cmd = "MD0;";
 	cmd[2] = '1' + (val % 10);
-	sendCommand(cmd, 0);
+	sendCommand(cmd);
 }
 
 int RIG_TS140::get_modeA()
 {
 	modeA = 0;
 	cmd = "IF;";
-	int ret = waitN(38, 100, "get mode", ASC);
+	int ret = wait_char(';', 38, 100, "get mode", ASC);
 	if (ret < 38) return modeA;
 
 	int md = replybuff[ret - 38 + 29] - '1';
