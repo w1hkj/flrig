@@ -3826,7 +3826,7 @@ void initRig()
 
 // enable the serial thread
 }
-
+LOG_ERROR("online = false, reset = true");
 	fldigi_online = false;
 	rig_reset = true;
 

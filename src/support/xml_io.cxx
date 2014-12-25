@@ -78,7 +78,10 @@ static XmlRpcValue* status_query;
 
 bool run_digi_loop = true;
 bool fldigi_online = false;
+
 bool rig_reset = false;
+int  err_count = 5;
+
 bool ptt_on = false;
 
 int ignore = 0; // skip next "ignore" read loops
@@ -151,10 +154,11 @@ void send_modes() {
 
 	try {
 		execute(rig_set_modes, modes, res);
-		ignore = 1;
+		ignore = 2;
+		err_count = 5;
 	} catch (const XmlRpc::XmlRpcException& e) {
-		if (XML_DEBUG)
-			LOG_ERROR("%s", e.getMessage().c_str());
+		err_count--;
+//		LOG_ERROR("err count %d: %s", err_count, e.getMessage().c_str());
 	}
 }
 
@@ -169,10 +173,11 @@ void send_bandwidths()
 
 	try {
 		execute(rig_set_bandwidths, bandwidths, res);
-		ignore = 1;
+		ignore = 2;
+		err_count = 5;
 	} catch (const XmlRpc::XmlRpcException& e) {
-		if (XML_DEBUG)
-			LOG_ERROR("%s", e.getMessage().c_str());
+		err_count--;
+//		LOG_ERROR("err count %d: %s", err_count, e.getMessage().c_str());
 	}
 }
 
@@ -182,10 +187,11 @@ void send_name()
 	try {
 		XmlRpcValue res;
 		execute(rig_set_name, XmlRpcValue(selrig->name_), res);
-		ignore = 1;
+		ignore = 2;
+		err_count = 5;
 	} catch (const XmlRpc::XmlRpcException& e) {
-		if (XML_DEBUG)
-			LOG_ERROR("%s", e.getMessage().c_str());
+		err_count--;
+//		LOG_ERROR("err count %d: %s", err_count, e.getMessage().c_str());
 	}
 }
 
@@ -195,10 +201,11 @@ void send_ptt_changed(bool PTT)
 	try {
 		XmlRpcValue res;
 		execute((PTT ? main_set_tx : main_set_rx), XmlRpcValue(), res);
-		ignore = 1;
+		ignore = 2;
+		err_count = 5;
 	} catch (const XmlRpc::XmlRpcException& e) {
-		if (XML_DEBUG)
-			LOG_ERROR("%s", e.getMessage().c_str());
+		err_count--;
+//		LOG_ERROR("err count %d: %s", err_count, e.getMessage().c_str());
 	}
 }
 
@@ -209,10 +216,11 @@ void send_new_freq(long freq)
 		xmlvfo.freq = freq;
 		XmlRpcValue f((double)freq), res;
 		execute(rig_set_frequency, f, res);
-		ignore = 1;
+		ignore = 2;
+		err_count = 5;
 	} catch (const XmlRpc::XmlRpcException& e) {
-		if (XML_DEBUG)
-			LOG_ERROR("%s", e.getMessage().c_str());
+		err_count--;
+//		LOG_ERROR("err count %d: %s", err_count, e.getMessage().c_str());
 	}
 }
 
@@ -222,10 +230,11 @@ void send_smeter_val(int val)
 	try {
 		XmlRpcValue mval((int)val), res;
 		execute(rig_set_smeter, mval, res);
-		ignore = 1;
+		ignore = 2;
+		err_count = 5;
 	} catch (const XmlRpc::XmlRpcException& e) {
-		if (XML_DEBUG)
-			LOG_ERROR("%s", e.getMessage().c_str());
+		err_count--;
+//		LOG_ERROR("err count %d: %s", err_count, e.getMessage().c_str());
 	}
 }
 
@@ -235,10 +244,11 @@ void send_pwrmeter_val(int val)
 	try {
 		XmlRpcValue mval((int)val), res;
 		execute(rig_set_pwrmeter, mval, res);
-		ignore = 1;
+		ignore = 2;
+		err_count = 5;
 	} catch (const XmlRpc::XmlRpcException& e) {
-		if (XML_DEBUG)
-			LOG_ERROR("%s", e.getMessage().c_str());
+		err_count--;
+//		LOG_ERROR("err count %d: %s", err_count, e.getMessage().c_str());
 	}
 }
 
@@ -248,7 +258,8 @@ void send_new_notch(int freq)
 	try {
 		XmlRpcValue i(freq), res;
 		execute(rig_set_notch, i, res);
-		ignore = 1;
+		ignore = 2;
+		err_count = 5;
 		if (freq == 0)
 			xml_notch_on = false;
 		else {
@@ -256,8 +267,8 @@ void send_new_notch(int freq)
 			xml_notch_val = freq;
 		}
 	} catch (const XmlRpc::XmlRpcException& e) {
-		if (XML_DEBUG)
-			LOG_ERROR("%s", e.getMessage().c_str());
+		err_count--;
+//		LOG_ERROR("err count %d: %s", err_count, e.getMessage().c_str());
 	}
 }
 
@@ -285,10 +296,11 @@ void send_new_mode(int md)
 		xmlvfo.imode = md;
 		XmlRpcValue mode(selrig->modes_[md]), res;
 		execute(rig_set_mode, mode, res);
-		ignore = 1;
+		ignore = 2;
+		err_count = 5;
 	} catch (const XmlRpc::XmlRpcException& e) {
-		if (XML_DEBUG)
-			LOG_ERROR("%s", e.getMessage().c_str());
+		err_count--;
+//		LOG_ERROR("err count %d: %s", err_count, e.getMessage().c_str());
 	}
 }
 
@@ -300,10 +312,11 @@ void send_new_bandwidth(int bw)
 		int selbw = (bw > 0x80) ? (bw >> 8 & 0x7F) : bw;
 		XmlRpcValue bandwidth(selrig->bandwidths_[selbw]), res;
 		execute(rig_set_bandwidth, bandwidth, res);
-		ignore = 1;
+		ignore = 2;
+		err_count = 5;
 	} catch (const XmlRpc::XmlRpcException& e) {
-		if (XML_DEBUG)
-			LOG_ERROR("%s", e.getMessage().c_str());
+		err_count--;
+//		LOG_ERROR("err count %d: %s", err_count, e.getMessage().c_str());
 	}
 }
 
@@ -313,10 +326,11 @@ void send_sideband()
 	try {
 		XmlRpcValue sideband(selrig->get_modetype(vfo.imode) == 'U' ? "USB" : "LSB"), res;
 		execute(main_set_wf_sideband, sideband, res);
-		ignore = 1;
+		ignore = 2;
+		err_count = 5;
 	} catch (const XmlRpc::XmlRpcException& e) {
-		if (XML_DEBUG)
-			LOG_ERROR("%s", e.getMessage().c_str());
+		err_count--;
+//		LOG_ERROR("err count %d: %s", err_count, e.getMessage().c_str());
 	}
 }
 
@@ -472,10 +486,11 @@ static void send_rig_info()
 		send_new_freq(xmlvfo.freq);
 		rig_reset = false;
 		Fl::awake(set_fldigi_connect, (void *)1);
+		err_count = 5;
 	} catch (const XmlRpc::XmlRpcException& e) {
-		if (XML_DEBUG)
-			LOG_ERROR("%s", e.getMessage().c_str());
-		throw e;
+		LOG_ERROR("%s", e.getMessage().c_str());
+		if (!err_count)
+			throw e;
 	}
 }
 
@@ -514,21 +529,25 @@ static void get_fldigi_status()
 			if (xmlvfo_changed)
 				push2que();
 		}
+		err_count = 5;
 	} catch (const XmlRpc::XmlRpcException& e) {
-		if (XML_DEBUG)
-			LOG_ERROR("%s", e.getMessage().c_str());
-		throw e;
+		err_count--;
+//		LOG_ERROR("err count %d: %s", err_count, e.getMessage().c_str());
+		if (err_count <= 0)
+			throw e;
 	}
-	try {
-		if (selrig->has_notch_control) {
+	if (selrig->has_notch_control) {
+		try {
 			xmlcall = rig_get_notch;
 			execute(xmlcall.c_str(), param, status);
 			check_for_notch_change(status);
+			err_count = 5;
+		} catch (const XmlRpc::XmlRpcException& e) {
+			err_count--;
+//			LOG_ERROR("err count %d: %s", err_count, e.getMessage().c_str());
+			if (err_count <= 0)
+				throw e;
 		}
-	} catch (const XmlRpc::XmlRpcException& e) {
-		if (XML_DEBUG)
-			LOG_ERROR("%s", e.getMessage().c_str());
-		throw e;
 	}
 }
 
@@ -551,10 +570,10 @@ void * digi_loop(void *d)
 				}
 			}
 		} catch (const XmlRpc::XmlRpcException& e) {
-			if (XML_DEBUG)
-				LOG_ERROR("%s", e.getMessage().c_str());
+			LOG_ERROR("%s", e.getMessage().c_str());
 			fldigi_online = false;
 			rig_reset = false;
+			err_count = 5;
 			try_count = CHECK_UPDATE_COUNT;
 			Fl::awake(set_fldigi_connect, (void *)0);
 		}
