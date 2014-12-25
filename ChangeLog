@@ -1,8 +1,15 @@
+2014-12-19  David Freese  <iam_w1hkj@w1hkj.com>
+
+	4aad930: Kenwood transceivers
+	f8f01c8: TS450S
+	d759736: Transceiver timeout
+	b21600f: Scripts
+	998fe5d: Yaesu
+	ef3ee28: Kenwood
+	967734b: TS870S
 
 
 =Version 1.3.18=
-
-2014-11-14  David Freese  <iam_w1hkj@w1hkj.com>
 
 	cb03871: fltk 1.3.3
 	d488690: TS2000
