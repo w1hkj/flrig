@@ -111,6 +111,7 @@ rigbase::rigbase()
 	use_line_in =
 	has_bpf_center =
 	has_special =  
+	has_ext_tuner =
 	has_smeter =
 	has_power_out =
 	has_split =

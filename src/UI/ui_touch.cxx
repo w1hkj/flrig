@@ -995,10 +995,21 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 					by, 74, bh, _("Special"));
 				btnSpecial->callback((Fl_Callback*)cb_btnSpecial);
 
-				btn_xcvr_auto_on = new Fl_Check_Button(
+				btn_ext_tuner = new Fl_Check_Button(
 					btnSpecial->x() +
 					btnSpecial->w() + 8,
-					by, 95, bh, _("Rig autOn"));
+					by, 95, bh, 
+					_("Ext tuner"));
+				btn_ext_tuner->tooltip(_("use external auto tuner"));
+				btn_ext_tuner->down_box(FL_DOWN_BOX);
+				btn_ext_tuner->callback((Fl_Callback*)cb_btn_ext_tuner);
+				btn_ext_tuner->value(progStatus.external_tuner);
+
+				btn_xcvr_auto_on = new Fl_Check_Button(
+					btn_ext_tuner->x() +
+					btn_ext_tuner->w() + 8,
+					by, 95, bh, 
+					_("Rig autOn"));
 				btn_xcvr_auto_on->tooltip(_("Auto Turn Rig On with Flrig startup"));
 				btn_xcvr_auto_on->down_box(FL_DOWN_BOX);
 				btn_xcvr_auto_on->callback((Fl_Callback*)cb_btn_xcvr_auto_on);

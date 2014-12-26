@@ -189,6 +189,7 @@ extern Fl_Group *genericMisc;
 extern Hspinner *spnr_vfo_adj;
 extern Hspinner *spnr_line_out;
 extern Fl_Light_Button *btnSpecial;
+extern Fl_Check_Button *btn_ext_tuner;
 extern Fl_Check_Button *btn_xcvr_auto_on;
 extern Fl_Check_Button *btn_xcvr_auto_off;
 extern Fl_Group *genericRXB;

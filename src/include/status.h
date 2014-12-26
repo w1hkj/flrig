@@ -269,6 +269,8 @@ struct status {
 	bool	xcvr_auto_on;
 	bool	xcvr_auto_off;
 
+	bool	external_tuner;
+
 	void saveLastState();
 	void loadLastState();
 	bool loadXcvrState(const char *);

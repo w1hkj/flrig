@@ -3097,6 +3097,11 @@ void initRig()
 		btnSpecial->hide();
 //		btnSpecial->deactivate();
 
+	if (selrig->has_ext_tuner)
+		btn_ext_tuner->show();
+	else
+		btn_ext_tuner->hide();
+
 	if (selrig->has_rit) {
 		int min, max, step;
 		selrig->get_RIT_min_max_step(min, max, step);

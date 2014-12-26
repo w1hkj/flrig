@@ -1217,6 +1217,12 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			btnSpecial = new Fl_Light_Button(242, 279, 74, 20, _("Special"));
 			btnSpecial->callback((Fl_Callback*)cb_btnSpecial);
 
+			btn_ext_tuner = new Fl_Check_Button(242, 300, 74, 15, _("Ext tuner"));
+			btn_ext_tuner->tooltip(_("use external auto tuner"));
+			btn_ext_tuner->down_box(FL_DOWN_BOX);
+			btn_ext_tuner->callback((Fl_Callback*)cb_btn_ext_tuner);
+			btn_ext_tuner->value(progStatus.external_tuner);
+
 			btn_xcvr_auto_on = new Fl_Check_Button(325, 280, 95, 15, _("Rig autOn"));
 			btn_xcvr_auto_on->tooltip(_("Auto Turn Rig On with Flrig startup"));
 			btn_xcvr_auto_on->down_box(FL_DOWN_BOX);

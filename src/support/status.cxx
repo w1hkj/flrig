@@ -272,8 +272,9 @@ status progStatus = {
 	false,		// bool use_tcpip
 
 	false,		// bool xcvr auto on
-	false		// bool xcvr auto off
+	false,		// bool xcvr auto off
 
+	false		// bool external_tuner
 };
 
 void status::saveLastState()
@@ -531,6 +532,8 @@ void status::saveLastState()
 
 	spref.set("xcvr_auto_on", xcvr_auto_on);
 	spref.set("xcvr_auto_off", xcvr_auto_off);
+
+	spref.set("external_tuner", external_tuner);
 
 	spref.set("hrd_buttons", hrd_buttons);
 }
@@ -807,6 +810,8 @@ bool status::loadXcvrState(const char *xcvr)
 
 		if (spref.get("xcvr_auto_on", i, i)) xcvr_auto_on = i;
 		if (spref.get("xcvr_auto_off", i, i)) xcvr_auto_off = i;
+
+		if (spref.get("external_tuner", i,i)) external_tuner = i;
 
 		if (spref.get("hrd_buttons", i, i)) hrd_buttons = i;
 	}

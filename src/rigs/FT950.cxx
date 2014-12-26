@@ -131,6 +131,7 @@ RIG_FT950::RIG_FT950() {
 	has_compON =
 	has_compression =
 	has_a2b =
+	has_ext_tuner =
 	has_xcvr_auto_on_off =
 	has_split =
 	has_split_AB =
@@ -539,6 +540,12 @@ void RIG_FT950::set_PTT_control(int val)
 // internal or external tune mode
 void RIG_FT950::tune_rig()
 {
+	if (!progStatus.external_tuner) {
+		cmd = "AC002;";
+		sendCommand(cmd);
+		return;
+	}
+
 	static bool extun_on = false;
 	static int rmd = modeA;
 	static int rbw = bwA;

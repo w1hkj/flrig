@@ -171,8 +171,10 @@ Fl_Group *genericMisc=(Fl_Group *)0;
 Hspinner *spnr_vfo_adj=(Hspinner *)0;
 Hspinner *spnr_line_out=(Hspinner *)0;
 Fl_Light_Button *btnSpecial=(Fl_Light_Button *)0;
+Fl_Check_Button *btn_ext_tuner=(Fl_Check_Button *)0;
 Fl_Check_Button *btn_xcvr_auto_on=(Fl_Check_Button *)0;
 Fl_Check_Button *btn_xcvr_auto_off=(Fl_Check_Button *)0;
+
 Fl_Group *genericRXB=(Fl_Group *)0;
 Hspinner *cntRIT=(Hspinner *)0;
 Hspinner *cntXIT=(Hspinner *)0;
@@ -656,6 +658,10 @@ static void cb_spnr_line_out(Fl_Counter* o, void*) {
 
 static void cb_btnSpecial(Fl_Light_Button*, void*) {
 	cb_special();
+}
+
+static void cb_btn_ext_tuner(Fl_Check_Button* o, void*) {
+	progStatus.external_tuner = o->value();
 }
 
 static void cb_btn_xcvr_auto_on(Fl_Check_Button* o, void*) {

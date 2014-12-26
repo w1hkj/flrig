@@ -199,6 +199,7 @@ public:
 	bool use_line_in;
 	bool has_bpf_center;
 	bool has_special;
+	bool has_ext_tuner;
 	bool has_band_selection;
 
 	bool restore_mbw;

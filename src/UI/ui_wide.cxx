@@ -972,13 +972,13 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 {
 				genericMisc->hide();
 
-				spnr_vfo_adj = new Hspinner(104, 187, 96, 20, _("Vfo Adj"));
+				spnr_vfo_adj = new Hspinner(60, 187, 96, 20, _("Vfo Adj"));
 				spnr_vfo_adj->type(FL_INT_INPUT);
 				spnr_vfo_adj->callback((Fl_Callback*)cb_spnr_vfo_adj);
 				spnr_vfo_adj->align(Fl_Align(36));
 				spnr_vfo_adj->value(progStatus.vfo_adj);
 
-				spnr_line_out = new Hspinner(273, 187, 70, 20, _("line out"));
+				spnr_line_out = new Hspinner(225, 187, 70, 20, _("line out"));
 				spnr_line_out->type(FL_INT_INPUT);
 				spnr_line_out->minimum(0);
 				spnr_line_out->maximum(100);
@@ -988,8 +988,14 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_line_out->align(Fl_Align(FL_ALIGN_LEFT));
 				spnr_line_out->value(progStatus.line_out);
 
-				btnSpecial = new Fl_Light_Button(364, 187, 74, 20, _("Special"));
+				btnSpecial = new Fl_Light_Button(300, 187, 74, 20, _("Special"));
 				btnSpecial->callback((Fl_Callback*)cb_btnSpecial);
+
+				btn_ext_tuner = new Fl_Check_Button(380, 189, 80, 15, _("Ext tuner"));
+				btn_ext_tuner->tooltip(_("use external auto tuner"));
+				btn_ext_tuner->down_box(FL_DOWN_BOX);
+				btn_ext_tuner->callback((Fl_Callback*)cb_btn_ext_tuner);
+				btn_ext_tuner->value(progStatus.external_tuner);
 
 				btn_xcvr_auto_on = new Fl_Check_Button(470, 189, 95, 15, _("Rig autOn"));
 				btn_xcvr_auto_on->tooltip(_("Auto Turn Rig On with Flrig startup"));
