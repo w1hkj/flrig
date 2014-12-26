@@ -152,6 +152,8 @@ void RIG_TS2000::shutdown()
 	sendCommand(cmd);
 }
 
+static bool is_tuning = false;
+static int  skip_get = 2;
 
 RIG_TS2000::RIG_TS2000() {
 // base class values	
@@ -219,7 +221,24 @@ RIG_TS2000::RIG_TS2000() {
 	_noise_reduction_level = 0;
 	_nrval1 = 2;
 	_nrval2 = 4;
+
+	is_tuning = false;
 }
+
+// return true iff transceiver is still in tune mode
+
+bool RIG_TS2000::tuning()
+{
+	if (!is_tuning) return false;
+	cmd = "AC;";
+	if (wait_char(';', 6, 100, "tuning?", ASC) == 6) {
+		if (replystr[4] == '1') return true;
+	}
+	is_tuning = false;
+	skip_get = 2;
+	return is_tuning;
+}
+
 
 const char * RIG_TS2000::get_bwname_(int n, int md) 
 {
@@ -387,14 +406,15 @@ int RIG_TS2000::get_smeter()
 	else
 		cmd = "SM1;";
 	if (wait_char(';', 8, 100, "get smeter", ASC) == 8) {
+		int smtr = 0;
 		size_t p = replystr.rfind("SM");
 		if (p != string::npos) {
-			int mtr = fm_decimal(&replystr[p+3],4);
+			smtr = fm_decimal(&replystr[p+3],4);
 			if (rxona)
-				mtr = (mtr * 100) / 30;
+				smtr = (smtr * 100) / 30;
 			else
-				mtr = (mtr * 100) / 15;
-			return mtr;
+				smtr = (smtr * 100) / 15;
+			return smtr;
 		}
 	}
 	return 0;
@@ -404,11 +424,12 @@ int RIG_TS2000::get_swr()
 {
 	cmd = "RM;";
 	if (wait_char(';', 8, 100, "get swr", ASC) == 8) {
+		int swrmtr = 0;
 		size_t p = replystr.rfind("RM1");
 		if (p != string::npos) {
-			int mtr = fm_decimal(&replystr[p+3], 4);
-			mtr = (mtr * 10) / 3;
-			return mtr;
+			swrmtr = fm_decimal(&replystr[p+3], 4);
+			swrmtr = (swrmtr * 10) / 3;
+			return swrmtr;
 		}
 	}
 	return 0;
@@ -418,11 +439,12 @@ int  RIG_TS2000::get_alc(void)
 {
 	cmd = "RM;";
 	if (wait_char(';', 8, 100, "get alc", ASC) == 8) {
+		int alcmtr = 0;
 		size_t p = replystr.rfind("RM3");
 		if (p != string::npos) {
-			int mtr = fm_decimal(&replystr[p+3], 4);
-			mtr = (mtr * 10) / 3;
-			return mtr;
+			alcmtr = fm_decimal(&replystr[p+3], 4);
+			alcmtr = (alcmtr * 10) / 3;
+			return alcmtr;
 		}
 	}
 	return 0;
@@ -432,12 +454,14 @@ void  RIG_TS2000::select_swr()
 {
 	cmd = "RM1;";
 	sendCommand(cmd);
+	showresp(WARN, ASC, "select SWR", cmd, "");
 }
 
 void  RIG_TS2000::select_alc()
 {
 	cmd = "RM3;";
 	sendCommand(cmd);
+	showresp(WARN, ASC, "select ALC", cmd, "");
 }
 
 // Transceiver power level
@@ -456,13 +480,14 @@ int RIG_TS2000::get_power_out()
 	if (wait_char(';', 8, 100, "get power out", ASC) == 8) {
 		size_t p = replystr.rfind("SM0");
 		if (p != string::npos) {
-			int mtr = fm_decimal(&replystr[p+3],4);
-			if (mtr <= 6) mtr = mtr * 2;
-			else if (mtr <= 11) mtr = 11 + (mtr - 6)*(26 - 11)/(11 - 6);
-			else if (mtr <= 18) mtr = 26 + (mtr - 11)*(50 - 26)/(18 - 11);
-			else mtr = 50 + (mtr - 18)*(100 - 50)/(27 - 18);
-			if (mtr > 100) mtr = 100;
-			return mtr;
+			int poutmtr = 0;
+			poutmtr = fm_decimal(&replystr[p+3],4);
+			if (poutmtr <= 6) poutmtr = poutmtr * 2;
+			else if (poutmtr <= 11) poutmtr = 11 + (poutmtr - 6)*(26 - 11)/(11 - 6);
+			else if (poutmtr <= 18) poutmtr = 26 + (poutmtr - 11)*(50 - 26)/(18 - 11);
+			else poutmtr = 50 + (poutmtr - 18)*(100 - 50)/(27 - 18);
+			if (poutmtr > 100) poutmtr = 100;
+			return poutmtr;
 		}
 	}
 	return 0;
@@ -472,10 +497,11 @@ int RIG_TS2000::get_power_control()
 {
 	cmd = "PC;";
 	if (wait_char(';', 6, 100, "get pout", ASC) == 6) {
+		int pctrl = 0;
 		size_t p = replystr.rfind("PC");
 		if (p != string::npos) {
-			int mtr = fm_decimal(&replystr[p+2], 3);
-			return mtr;
+			pctrl = fm_decimal(&replystr[p+2], 3);
+			return pctrl;
 		}
 	}
 	return 0;
@@ -486,10 +512,11 @@ int RIG_TS2000::get_volume_control()
 {
 	cmd = "AG0;";
 	if (wait_char(';', 7, 100, "get vol", ASC) == 7) {
+		int volctrl = 0;
 		size_t p = replystr.rfind("AG");
 		if (p != string::npos) {
-			int val = fm_decimal(&replystr[p+3],3);
-			return (int)(val / 2.55);
+			volctrl = fm_decimal(&replystr[p+3],3);
+			return (int)(volctrl / 2.55);
 		}
 	}
 	return 0;
@@ -515,9 +542,16 @@ void RIG_TS2000::set_PTT_control(int val)
 
 void RIG_TS2000::tune_rig()
 {
+//	cmd = "AC111;";
+//	       | |||______ start tuner = 1
+//	       | ||_______ set TX hold = 1
+//	       | |________ set RX hold = 1
+//	       |__________ tune transceiver command prefix
+	if (tuning()) return;
 	cmd = "AC111;";
 	sendCommand(cmd);
-	showresp(WARN, ASC, "tune", cmd, "");
+	showresp(WARN, ASC, "send tune command", cmd, "");
+	is_tuning = true;
 }
 
 void RIG_TS2000::set_attenuator(int val)
@@ -652,6 +686,11 @@ void RIG_TS2000::set_modeA(int val)
 
 int RIG_TS2000::get_modeA()
 {
+	if (tuning()) return A.imode;
+	if (skip_get) {
+		skip_get--;
+		return A.imode;
+	}
 	cmd = "MD;";
 	if (wait_char(';', 4, 100, "get mode A", ASC) == 4) {
 		size_t p = replystr.rfind("MD");
@@ -680,6 +719,8 @@ void RIG_TS2000::set_modeB(int val)
 
 int RIG_TS2000::get_modeB()
 {
+	if (tuning()) return B.imode;
+	if (skip_get) return B.imode;
 	cmd = "MD;";
 	if (wait_char(';', 4, 100, "get mode B", ASC) == 4) {
 		size_t p = replystr.rfind("MD");
@@ -746,6 +787,8 @@ void RIG_TS2000::set_bwA(int val)
 
 int RIG_TS2000::get_bwA()
 {
+	if (tuning()) return A.iBW;
+	if (skip_get) return A.iBW;
 	int i = 0;
 	size_t p;
 	if (A.imode == LSB || A.imode == USB || A.imode == FM || A.imode == AM) {
@@ -821,6 +864,8 @@ void RIG_TS2000::set_bwB(int val)
 
 int RIG_TS2000::get_bwB()
 {
+	if (tuning()) return B.iBW;
+	if (skip_get) return B.iBW;
 	int i = 0;
 	size_t p;
 	if (B.imode == LSB || B.imode == USB || B.imode == FM || B.imode == AM) {
@@ -884,9 +929,12 @@ int RIG_TS2000::get_mic_gain()
 {
 	cmd = "MG;";
 	if (wait_char(';', 6, 100, "get mic", ASC) == 6) {
+		int mgain = 0;
 		size_t p = replystr.rfind("MG");
-		if (p != string::npos)
-			return fm_decimal(&replystr[p+2], 3);
+		if (p != string::npos) {
+			mgain = fm_decimal(&replystr[p+2], 3);
+			return mgain;
+		}
 	}
 	return 0;
 }
@@ -997,7 +1045,7 @@ bool  RIG_TS2000::get_notch(int &val)
 			}
 		}
 	}
-	return ison;
+	return (ison);
 }
 
 void RIG_TS2000::get_notch_min_max_step(int &min, int &max, int &step)
@@ -1018,9 +1066,12 @@ int  RIG_TS2000::get_auto_notch()
 {
 	cmd = "NT;";
 	if (wait_char(';', 4, 100, "get auto notch", ASC) == 4) {
+		int anotch = 0;
 		size_t p = replystr.rfind("NT");
-		if (p != string::npos)
-			return (replystr[p+2] == '1');
+		if (p != string::npos) {
+			anotch = (replystr[p+2] == '1');
+			return anotch;
+		}
 	}
 	return 0;
 }
@@ -1036,12 +1087,13 @@ void RIG_TS2000::set_rf_gain(int val)
 int  RIG_TS2000::get_rf_gain()
 {
 	cmd = "RG;";
+	int rfg = 100;
 	if (wait_char(';', 6, 100, "get rf gain", ASC) == 6) {
 		size_t p = replystr.rfind("RG");
 		if (p != string::npos)
-			return fm_decimal(&replystr[p+2] ,3) * 100 / 255;
+			rfg = fm_decimal(&replystr[p+2] ,3) * 100 / 255;
 	}
-	return 100;
+	return rfg;
 }
 
 void RIG_TS2000::set_noise_reduction(int val)
@@ -1098,14 +1150,17 @@ void RIG_TS2000::set_noise_reduction_val(int val)
 
 int  RIG_TS2000::get_noise_reduction_val()
 {
+	int nrval = 0;
 	if (_noise_reduction_level == 0) return 0;
 	int val = progStatus.noise_reduction_val;
 	cmd = rsp = "RL";
 	cmd.append(";");
 	if (wait_char(';', 5, 100, "GET noise reduction val", ASC) == 5) {
 		size_t p = replystr.rfind(rsp);
-		if (p == string::npos)
-			return (_noise_reduction_level == 1 ? _nrval1 : _nrval2);
+		if (p == string::npos) {
+			nrval = (_noise_reduction_level == 1 ? _nrval1 : _nrval2);
+			return nrval;
+		}
 		val = atoi(&replystr[p+2]);
 	}
 

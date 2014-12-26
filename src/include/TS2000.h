@@ -108,6 +108,7 @@ enum TS2000MODES { LSB, USB, CW, FM, AM, FSK, CWR, FSKR, DIGI };
 	void get_rf_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 100; step = 1; }
 
+	bool tuning();
 
 	bool sendTScommand(string, int, bool);
 

@@ -1143,7 +1143,7 @@ void set_bandwidth_control()
 {
 	if (!selrig->has_bandwidth_control) return;
 
-	selrig->adjust_bandwidth(vfo.imode);
+	vfo.iBW = selrig->adjust_bandwidth(vfo.imode);
 
 	if (vfo.iBW < 256) {
 		int i = 0;
