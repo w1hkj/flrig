@@ -2124,15 +2124,6 @@ void closeRig()
 
 void cbExit()
 {
-	// shutdown xmlrpc thread
-	close_rig_xmlrpc();
-
-	{
-		guard_lock xmlrpc_lock(&mutex_xmlrpc, 66);
-		run_digi_loop = false;
-	}
-	pthread_join(*digi_thread, NULL);
-
 	progStatus.rig_nbr = rig_nbr;
 
 	progStatus.freq_A = vfoA.freq;
@@ -2198,10 +2189,14 @@ void cbExit()
 	// close down the serial port
 	RigSerial.ClosePort();
 
-	// restore fldigi to its no-rig state
-	try {
-		send_no_rig();
-	} catch (...) { }
+	// shutdown xmlrpc thread
+	{
+		guard_lock xmlrpc_lock(&mutex_xmlrpc, 66);
+		selrig = rigs[0];
+		run_digi_loop = false;
+	}
+	pthread_join(*digi_thread, NULL);
+	close_rig_xmlrpc();
 
 	if (dlgDisplayConfig && dlgDisplayConfig->visible())
 		dlgDisplayConfig->hide();
@@ -3826,11 +3821,12 @@ void initRig()
 
 // enable the serial thread
 }
-LOG_ERROR("online = false, reset = true");
+
 	fldigi_online = false;
 	rig_reset = true;
 
 // initialize fldigi
+/*
 	try {
 		send_modes();
 		send_bandwidths();
@@ -3838,8 +3834,10 @@ LOG_ERROR("online = false, reset = true");
 		send_new_mode(vfoA.imode);
 		send_sideband();
 		send_new_bandwidth(vfoA.iBW & 0x7F);
-	} catch (...) {}
-
+	} catch (...) {
+		LOG_ERROR("initialize fldigi failed");
+	}
+*/
 // enable xml loop
 }
 

@@ -164,7 +164,9 @@ void send_modes() {
 
 void send_bandwidths()
 {
-	if (!selrig->bandwidths_ || !fldigi_online) return;
+	if (!selrig->bandwidths_ || !fldigi_online) {
+		return;
+	}
 	XmlRpcValue bandwidths, res;
 	int i = 0;
 	for (const char** bw = selrig->bandwidths_; *bw; bw++, i++) {
@@ -472,39 +474,53 @@ static void send_rig_info()
 	XmlRpcValue res;
 	try {
 		execute(rig_take_control, XmlRpcValue(), res);
+	} catch (const XmlRpc::XmlRpcException& e) {
+		throw e;
+	}
+	try {
 		fldigi_online = true;
-		send_name();
-		send_modes();
-		send_bandwidths();
 
 		if (!useB) xmlvfo = vfoA;
 		else       xmlvfo = vfoB;
 
+		send_name();
+		send_modes();
 		send_new_mode(xmlvfo.imode);
-		send_new_bandwidth(xmlvfo.iBW);
 		send_sideband();
+
+MilliSleep(500);
+
+		send_bandwidths();
+
+		send_new_bandwidth(xmlvfo.iBW);
+
 		send_new_freq(xmlvfo.freq);
+
 		rig_reset = false;
+		LOG_ERROR("Connected");
 		Fl::awake(set_fldigi_connect, (void *)1);
 		err_count = 5;
+		ignore = 2;
 	} catch (const XmlRpc::XmlRpcException& e) {
-		LOG_ERROR("%s", e.getMessage().c_str());
-		if (!err_count)
-			throw e;
+		throw e;
 	}
 }
 
 void send_no_rig()
 {
 	if (!fldigi_online) return;
-	XmlRpcValue res;
-	execute(rig_set_name, szNORIG, res);
-	send_bandwidths();
-	send_modes();
-	execute(rig_set_mode, "USB", res);
-	XmlRpcValue sideband("USB");
-	execute(main_set_wf_sideband, sideband, res);
-	execute(rig_release_control, XmlRpcValue(), res);
+	try {
+		XmlRpcValue res;
+		execute(rig_set_name, szNORIG, res);
+		send_bandwidths();
+		send_modes();
+		execute(rig_set_mode, "USB", res);
+		XmlRpcValue sideband("USB");
+		execute(main_set_wf_sideband, sideband, res);
+		execute(rig_release_control, XmlRpcValue(), res);
+	} catch (const XmlRpc::XmlRpcException& e) {
+		throw e;
+	}
 }
 
 static void get_fldigi_status()
@@ -555,12 +571,30 @@ void * digi_loop(void *d)
 {
 	for (;;) {
 		MilliSleep(RIG_UPDATE_INTERVAL);
-		if (!run_digi_loop) break;
-		try {
-			if (rig_reset || (!fldigi_online && (--try_count == 0))) {
+		if (!run_digi_loop) {
+			LOG_ERROR("Exiting digi loop");
+			try {
+				send_no_rig();
+			} catch (const XmlRpc::XmlRpcException& e) {
+				break;
+			}
+			break;
+		}
+
+		if (rig_reset || (!fldigi_online && (--try_count == 0))) {
+			try {
 				guard_lock gl_xmloop(&mutex_xmlrpc, 103);
 				send_rig_info();
-			} else if (fldigi_online) {
+			} catch (const XmlRpc::XmlRpcException& e) {
+				fldigi_online = false;
+				rig_reset = false;
+				err_count = 5;
+				try_count = CHECK_UPDATE_COUNT;
+				Fl::awake(set_fldigi_connect, (void *)0);
+			}
+		}
+		if (fldigi_online) {
+			try {
 				if (qfreq.empty()) {
 					guard_lock gl_xmloop(&mutex_xmlrpc, 104);
 					get_fldigi_status();
@@ -568,14 +602,14 @@ void * digi_loop(void *d)
 					guard_lock gl_xmloop(&mutex_xmlrpc, 105);
 					send_queue();
 				}
+			} catch (const XmlRpc::XmlRpcException& e) {
+				LOG_ERROR("%s", e.getMessage().c_str());
+				fldigi_online = false;
+				rig_reset = false;
+				err_count = 5;
+				try_count = CHECK_UPDATE_COUNT;
+				Fl::awake(set_fldigi_connect, (void *)0);
 			}
-		} catch (const XmlRpc::XmlRpcException& e) {
-			LOG_ERROR("%s", e.getMessage().c_str());
-			fldigi_online = false;
-			rig_reset = false;
-			err_count = 5;
-			try_count = CHECK_UPDATE_COUNT;
-			Fl::awake(set_fldigi_connect, (void *)0);
 		}
 	}
 	return NULL;
