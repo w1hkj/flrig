@@ -21,8 +21,6 @@
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
-#include <vector>
-#include <queue>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdlib.h>
@@ -37,7 +35,6 @@
 #include "dialogs.h"
 #include "rigbase.h"
 #include "ptt.h"
-#include "xml_io.h"
 #include "socket_io.h"
 #include "ui.h"
 
@@ -136,7 +133,7 @@ char *print(FREQMODE data)
 	const char **dsplo = selrig->lotable(data.imode);
 	const char **dsphi = selrig->hitable(data.imode);
 	snprintf(str, sizeof(str), "%3s,%10ld, %4s, %x => %5s %5s",
-		data.src == XML ? "xml" : "ui",
+		data.src == XML ? "xml" : data.src == UI ? "ui" : "srvr",
 		data.freq,
 		selrig->modes_ ? selrig->modes_[data.imode] : "modes n/a",
 		data.iBW,
@@ -170,7 +167,6 @@ void read_vfo()
 			vfoA.freq = freq;
 			Fl::awake(setFreqDispA, (void *)vfoA.freq);
 			vfo = vfoA;
-			send_xml_freq(vfo.freq);
 		}
 		if ( selrig->twovfos() ) {
 			freq = selrig->get_vfoB();
@@ -185,7 +181,6 @@ void read_vfo()
 			vfoB.freq = freq;
 			Fl::awake(setFreqDispB, (void *)vfoB.freq);
 			vfo = vfoB;
-			send_xml_freq(vfo.freq);
 		}
 		if ( selrig->twovfos() ) {
 			freq = selrig->get_vfoA();
@@ -231,13 +226,6 @@ void read_mode()
 				selrig->adjust_bandwidth(vfo.imode);
 				nu_BW = selrig->get_bwA();
 				vfoA.iBW = vfo.iBW = nu_BW;
-				try {
-					guard_lock xmlrpc_lock(&mutex_xmlrpc, 3);
-					send_bandwidths();
-					send_new_mode(nu_mode);
-					send_sideband();
-					send_new_bandwidth(vfo.iBW);
-				} catch (...) {}
 			}
 			Fl::awake(setModeControl);
 			set_bandwidth_control();
@@ -250,13 +238,6 @@ void read_mode()
 				selrig->adjust_bandwidth(vfo.imode);
 				nu_BW = selrig->get_bwB();
 				vfoB.iBW = vfo.iBW = nu_BW;
-				try {
-					guard_lock xmlrpc_lock(&mutex_xmlrpc, 4);
-					send_bandwidths();
-					send_new_mode(nu_mode);
-					send_sideband();
-					send_new_bandwidth(vfo.iBW);
-				} catch (...) {}
 			}
 			Fl::awake(setModeControl);
 			set_bandwidth_control();
@@ -302,22 +283,16 @@ void read_bandwidth()
 	if (!useB) {
 		nu_BW = selrig->get_bwA();
 		if (nu_BW != vfoA.iBW) {
-			guard_lock xmlrpc_lock(&mutex_xmlrpc, 5);
+//			guard_lock xmlrpc_lock(&mutex_xmlrpc, 5);
 			vfoA.iBW = vfo.iBW = nu_BW;
 			Fl::awake(setBWControl);
-			try {
-				send_new_bandwidth(vfo.iBW);
-			} catch (...) {}
 		}
 	} else {
 		nu_BW = selrig->get_bwB();
 		if (nu_BW != vfoB.iBW) {
 			vfoB.iBW = vfo.iBW = nu_BW;
-			guard_lock xmlrpc_lock(&mutex_xmlrpc, 6);
+//			guard_lock xmlrpc_lock(&mutex_xmlrpc, 6);
 			Fl::awake(setBWControl);
-			try {
-				send_new_bandwidth(vfo.iBW);
-			} catch (...) {}
 		}
 	}
 }
@@ -333,6 +308,7 @@ void read_smeter()
 		sig = selrig->get_smeter();
 	}
 	if (sig == -1) return;
+	mval = sig;
 	Fl::awake(updateSmeter, reinterpret_cast<void*>(sig));
 }
 
@@ -345,8 +321,9 @@ void read_power_out()
 		guard_lock serial_lock(&mutex_serial, 8);
 		sig = selrig->get_power_out();
 	}
-	if (sig > -1)
-		Fl::awake(updateFwdPwr, reinterpret_cast<void*>(sig));
+	if (sig == -1) return;
+	mval = sig;
+	Fl::awake(updateFwdPwr, reinterpret_cast<void*>(sig));
 }
 
 // read swr
@@ -561,7 +538,6 @@ void update_notch(void *d)
 	btnNotch->value(progStatus.notch = rig_notch);
 	if (sldrNOTCH) sldrNOTCH->value(progStatus.notch_val = rig_notch_val);
 	if (spnrNOTCH) spnrNOTCH->value(progStatus.notch_val = rig_notch_val);
-	send_new_notch(progStatus.notch ? progStatus.notch_val : 0);
 }
 
 void read_notch()
@@ -664,7 +640,7 @@ void serviceA()
 	if (!selrig->can_change_alt_vfo && useB) return;
 	if (queA.empty()) return;
 	guard_lock serial_lock(&mutex_serial, 24);
-	guard_lock xmlrpc_lock(&mutex_xmlrpc, 24);
+//	guard_lock xmlrpc_lock(&mutex_xmlrpc, 24);
 	{
 		guard_lock queA_lock(&mutex_queA, 25);
 		while (!queA.empty()) {
@@ -673,7 +649,7 @@ void serviceA()
 		}
 	}
 
-	if (RIG_DEBUG)
+//	if (RIG_DEBUG)
 		LOG_INFO("%s", print(vfoA));
 
 	if (changed_vfo && !useB) {
@@ -690,7 +666,6 @@ void serviceA()
 		selrig->set_vfoA(vfoA.freq);
 		Fl::awake(setFreqDispA, (void *)vfoA.freq);
 		vfo.freq = vfoA.freq;
-		if (vfoA.src == UI) send_xml_freq(vfoA.freq);
 	}
 // adjust for change in bandwidths_
 	if (vfoA.imode != vfo.imode || changed_vfo) {
@@ -701,22 +676,10 @@ void serviceA()
 		set_bandwidth_control();
 		Fl::awake(setBWControl);
 		selrig->set_bwA(vfo.iBW);
-		try {
-			if (vfoA.src == UI)
-				send_new_mode(vfoA.imode);
-			send_sideband();
-			send_bandwidths();
-			send_new_bandwidth(vfo.iBW);
-		} catch (...) {}
 	} else if (vfoA.iBW != vfo.iBW) {
 		selrig->set_bwA(vfoA.iBW);
 		vfo.iBW = vfoA.iBW;
 		Fl::awake(setBWControl);
-		if (vfoA.src == UI) {
-			try {
-				send_new_bandwidth(vfo.iBW);
-			} catch (...) {}
-		}
 	}
 
 end_serviceA:
@@ -730,7 +693,7 @@ void serviceB()
 	if (queB.empty())
 		return;
 	guard_lock serial_lock(&mutex_serial, 26);
-	guard_lock xmlrpc_lock(&mutex_xmlrpc, 26);
+//	guard_lock xmlrpc_lock(&mutex_xmlrpc, 26);
 	{
 		guard_lock queB_lock(&mutex_queB, 27);
 		while (!queB.empty()) {
@@ -739,7 +702,7 @@ void serviceB()
 		}
 	}
 
-	if (RIG_DEBUG)
+//	if (RIG_DEBUG)
 		LOG_INFO("%s", print(vfoB));
 
 	if (changed_vfo && useB) {
@@ -756,7 +719,6 @@ void serviceB()
 		selrig->set_vfoB(vfoB.freq);
 		vfo.freq = vfoB.freq;
 		Fl::awake(setFreqDispB, (void *)vfoB.freq);
-		if (vfoB.src == UI) send_xml_freq(vfoB.freq);
 	}
 	if (vfoB.imode != vfo.imode || pushedB || changed_vfo) {
 		selrig->set_modeB(vfoB.imode);
@@ -766,22 +728,10 @@ void serviceB()
 		set_bandwidth_control();
 		Fl::awake(setBWControl);
 		selrig->set_bwB(vfo.iBW);
-		try {
-			if (vfoB.src == UI)
-				send_new_mode(vfoB.imode);
-			send_sideband();
-			send_bandwidths();
-			send_new_bandwidth(vfo.iBW);
-		} catch (...) {}
 	} else if (vfoB.iBW != vfo.iBW || pushedB) {
 		selrig->set_bwB(vfoB.iBW);
 		vfo.iBW = vfoB.iBW;
 		Fl::awake(setBWControl);
-		if (vfoB.src == UI) {
-			try {
-				send_new_bandwidth(vfo.iBW);
-			} catch (...) {}
-		}
 	}
 	pushedB = false;
 
@@ -791,8 +741,7 @@ end_serviceB:
 
 void servicePTT()
 {
-	if (!tcpip && !RigSerial.IsOpen()) return;
-
+//	if (!tcpip && !RigSerial.IsOpen()) return;
 	guard_lock ptt_lock(&mutex_ptt, 28);
 	while (!quePTT.empty()) {
 		PTT = quePTT.front();
@@ -841,9 +790,6 @@ void serviceSliders()
 				progStatus.notch = working.button;
 				progStatus.notch_val = working.value;
 				selrig->set_notch(working.button, working.value);
-				try {
-					send_new_notch(working.button ? working.value : 0);
-				} catch (...) {}
 				notch_changed = false;
 				break;
 			case RFGAIN:
@@ -890,6 +836,14 @@ void serviceSliders()
 	}
 }
 
+inline bool que_pending()
+{
+	if (!quePTT.empty()) return true;
+	if (!queA.empty()) return true;
+	if (!queB.empty()) return true;
+	return false;
+}
+
 void * serial_thread_loop(void *d)
 {
   static int  loopcount = progStatus.serloop_timing / 10;
@@ -911,9 +865,9 @@ void * serial_thread_loop(void *d)
 
 		if (!PTT) {
 			serviceA();
-			if (!quePTT.empty()) continue;
+			if (que_pending()) continue;
 			serviceB();
-			if (!quePTT.empty()) continue;
+			if (que_pending()) continue;
 
 			if (resetrcv) {
 				Fl::awake(zeroXmtMeters, 0);
@@ -927,10 +881,14 @@ void * serial_thread_loop(void *d)
 				loopcount = progStatus.serloop_timing / 10;
 				poll_nbr++;
 
-				if (rig_nbr == K3) read_K3();
+				if (rig_nbr == K3) {
+					if (que_pending()) continue;
+					read_K3();
+				}
 				else if ((rig_nbr == K2) ||
 						 (selrig->has_get_info &&
 						 (progStatus.poll_frequency || progStatus.poll_mode || progStatus.poll_bandwidth))) {
+					if (que_pending()) continue;
 					read_info();
 				}
 
@@ -940,7 +898,7 @@ void * serial_thread_loop(void *d)
 					}
 
 				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (!quePTT.empty()) continue;
+				if (que_pending()) continue;
 
 				if (progStatus.poll_mode)
 					if (!(poll_nbr % progStatus.poll_mode)) {
@@ -948,7 +906,7 @@ void * serial_thread_loop(void *d)
 					}
 
 				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (!quePTT.empty()) continue;
+				if (que_pending()) continue;
 
 				if (progStatus.poll_bandwidth)
 					if (!(poll_nbr % progStatus.poll_bandwidth)) {
@@ -956,7 +914,7 @@ void * serial_thread_loop(void *d)
 					}
 
 				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (!quePTT.empty()) continue;
+				if (que_pending()) continue;
 
 				if (progStatus.poll_smeter)
 					if (!(poll_nbr % progStatus.poll_smeter)) {
@@ -964,7 +922,7 @@ void * serial_thread_loop(void *d)
 					}
 
 				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (!quePTT.empty()) continue;
+				if (que_pending()) continue;
 
 				if (progStatus.poll_volume)
 					if (!(poll_nbr % progStatus.poll_volume)) {
@@ -972,7 +930,7 @@ void * serial_thread_loop(void *d)
 					}
 
 				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (!quePTT.empty()) continue;
+				if (que_pending()) continue;
 
 				if (progStatus.poll_auto_notch)
 					if (!(poll_nbr % progStatus.poll_auto_notch)) {
@@ -980,7 +938,7 @@ void * serial_thread_loop(void *d)
 					}
 
 				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (!quePTT.empty()) continue;
+				if (que_pending()) continue;
 
 				if (progStatus.poll_notch)
 					if (!(poll_nbr % progStatus.poll_notch)) {
@@ -988,7 +946,7 @@ void * serial_thread_loop(void *d)
 					}
 
 				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (!quePTT.empty()) continue;
+				if (que_pending()) continue;
 
 				if (progStatus.poll_ifshift)
 					if (!(poll_nbr % progStatus.poll_ifshift)) {
@@ -996,7 +954,7 @@ void * serial_thread_loop(void *d)
 					}
 
 				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (!quePTT.empty()) continue;
+				if (que_pending()) continue;
 
 				if (progStatus.poll_power_control)
 					if (!(poll_nbr % progStatus.poll_power_control)) {
@@ -1004,7 +962,7 @@ void * serial_thread_loop(void *d)
 					}
 
 				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (!quePTT.empty()) continue;
+				if (que_pending()) continue;
 
 				if (progStatus.poll_pre_att)
 					if (!(poll_nbr % progStatus.poll_pre_att)) {
@@ -1012,7 +970,7 @@ void * serial_thread_loop(void *d)
 					}
 
 				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (!quePTT.empty()) continue;
+				if (que_pending()) continue;
 
 				if (progStatus.poll_micgain)
 					if (!(poll_nbr % progStatus.poll_micgain)) {
@@ -1020,7 +978,7 @@ void * serial_thread_loop(void *d)
 					}
 
 				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (!quePTT.empty()) continue;
+				if (que_pending()) continue;
 
 				if (progStatus.poll_squelch)
 					if (!(poll_nbr % progStatus.poll_squelch)) {
@@ -1028,7 +986,7 @@ void * serial_thread_loop(void *d)
 					}
 
 				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (!quePTT.empty()) continue;
+				if (que_pending()) continue;
 
 				if (progStatus.poll_rfgain)
 					if (!(poll_nbr % progStatus.poll_rfgain)) {
@@ -1036,7 +994,7 @@ void * serial_thread_loop(void *d)
 					}
 
 				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (!quePTT.empty()) continue;
+				if (que_pending()) continue;
 
 				if (progStatus.poll_split)
 					if (!(poll_nbr % progStatus.poll_split)) {
@@ -1044,7 +1002,7 @@ void * serial_thread_loop(void *d)
 					}
 
 				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (!quePTT.empty()) continue;
+				if (que_pending()) continue;
 
 				if (progStatus.poll_nr)
 					if (!(poll_nbr % progStatus.poll_nr)) {
@@ -1052,7 +1010,7 @@ void * serial_thread_loop(void *d)
 					}
 
 				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (!quePTT.empty()) continue;
+				if (que_pending()) continue;
 
 				if (progStatus.poll_noise)
 					if (!(poll_nbr % progStatus.poll_noise)) {
@@ -1772,15 +1730,8 @@ void setNotch()
 // called from xml_io thread
 void setNotchControl(void *d)
 {
-	int val = (long)d;
-	if (val) {
-		progStatus.notch_val = val;
-		progStatus.notch = true;
-	} else
-		progStatus.notch = false;
-
-	guard_lock serial_lock(&mutex_serial, 61);
-	selrig->set_notch(progStatus.notch, progStatus.notch_val);
+//	guard_lock serial_lock(&mutex_serial, 61);
+//	selrig->set_notch(progStatus.notch, progStatus.notch_val);
 
 	if (sldrNOTCH) sldrNOTCH->value(progStatus.notch_val);
 	if (spnrNOTCH) spnrNOTCH->value(progStatus.notch_val);
@@ -1964,12 +1915,8 @@ void cbTune()
 
 void cbPTT()
 {
-	if (fldigi_online && progStatus.key_fldigi)
-		send_ptt_changed(btnPTT->value());
-	else {
-		guard_lock ptt_lock(&mutex_ptt, 63);
-		quePTT.push(btnPTT->value());
-	}
+	guard_lock ptt_lock(&mutex_ptt, 63);
+	quePTT.push(btnPTT->value());
 }
 
 void setSQUELCH()
@@ -2020,7 +1967,6 @@ void updateFwdPwr(void *d)
 	sldrFwdPwr->redraw();
 	if (!selrig->has_power_control)
 		set_power_controlImage(sldrFwdPwr->peak());
-	send_pwrmeter_val((int)power);
 }
 
 void updateSquelch(void *d)
@@ -2078,7 +2024,6 @@ void updateSmeter(void *d) // 0 to 100;
 	}
 	sldrRcvSignal->value(smeter);
 	sldrRcvSignal->redraw();
-	send_smeter_val((int)smeter);
 }
 
 void saveFreqList()
@@ -2188,15 +2133,6 @@ void cbExit()
 
 	// close down the serial port
 	RigSerial.ClosePort();
-
-	// shutdown xmlrpc thread
-	{
-		guard_lock xmlrpc_lock(&mutex_xmlrpc, 66);
-		selrig = rigs[0];
-		run_digi_loop = false;
-	}
-	pthread_join(*digi_thread, NULL);
-	close_rig_xmlrpc();
 
 	if (dlgDisplayConfig && dlgDisplayConfig->visible())
 		dlgDisplayConfig->hide();
@@ -2956,10 +2892,6 @@ void initRig()
 			return;
 		}
 	}
-
-// disable xml loop
-{
-	guard_lock gl_xmlrpc(&mutex_xmlrpc, 70);
 
 // disable the serial thread
 {
@@ -3825,26 +3757,7 @@ void initRig()
 	selrig->post_initialize();
 
 // enable the serial thread
-}
-
-	fldigi_online = false;
-	rig_reset = true;
-
-// initialize fldigi
-/*
-	try {
-		send_modes();
-		send_bandwidths();
-		send_new_freq(vfoA.freq);
-		send_new_mode(vfoA.imode);
-		send_sideband();
-		send_new_bandwidth(vfoA.iBW & 0x7F);
-	} catch (...) {
-		LOG_ERROR("initialize fldigi failed");
 	}
-*/
-// enable xml loop
-}
 
 	if (rig_nbr == K3) {
 		btnB->hide();
@@ -4204,7 +4117,7 @@ void cbBandSelect(int band)
 	}
 	{
 		guard_lock gl_serial(&mutex_serial, 92);
-		guard_lock gl_xmlrpc(&mutex_xmlrpc, 93);
+//		guard_lock gl_xmlrpc(&mutex_xmlrpc, 93);
 
 	selrig->set_band_selection(band);
 	MilliSleep(100);	// rig sync-up
@@ -4239,28 +4152,11 @@ void cbBandSelect(int band)
 	else Fl::awake(setFreqDispB, (void *)vfo.freq);
 
 	MilliSleep(100);	// local sync-up
-// remote send freqmdbw
-	if (fldigi_online) {
-		send_xml_freq(vfo.freq);
-		if (selrig->has_mode_control) {
-			try {
-				send_new_mode(vfo.imode);
-				send_sideband();
-			} catch (...) {}
-		}
-		if (selrig->has_bandwidth_control) {
-			try {
-				send_bandwidths();
-				send_new_bandwidth(vfo.iBW & 0x7F);
-			} catch (...) {}
-		}
-		MilliSleep(100);	// remote sync-up
-	}
 	}
 
 // enable local
 	guard_lock gl_serial(&mutex_serial, 94);
-		bypass_serial_thread_loop = false;
+	bypass_serial_thread_loop = false;
 }
 
 void enable_bandselect_btn(int btn_num, bool enable)

@@ -44,3 +44,5 @@
 
 extern void start_server(int port = 12345);
 extern void exit_server();
+
+#endif

@@ -52,7 +52,7 @@ static const char *TS870S_CAT_ssb_lo[] = {		// Corresponding commands.
 "FW0000;", "FW0005;", "FW0010;", "FW0020;", "FW0030;",
 "FW0040;", "FW0050;", "FW0060;", "FW0080;", "FW0100;", NULL };
 
-static const char *TS870S_SSB_lo_tooltip = "lo cutoff";
+static const char *TS870S_SSB_lo_tooltip = "lo cut";
 static const char *TS870S_SSB_btn_lo_label = "L";
 
 
@@ -64,7 +64,7 @@ static const char *TS870S_CAT_ssb_hi[] = {		// Corresponding commands.
 "IS 1400;", "IS 1600;", "IS 1800;", "IS 2000;", "IS 2200;", "IS 2400;",
 "IS 2600;", "IS 2800;", "IS 3000;", "IS 3400;", "IS 4600;", "IS 6000;", NULL };
 
-static const char *TS870S_SSB_hi_tooltip = "hi cutoff";
+static const char *TS870S_SSB_hi_tooltip = "hi cut";
 static const char *TS870S_SSB_btn_hi_label = "H";
 
 //----------------------------------------------------------------------
@@ -74,7 +74,7 @@ static const char *TS870S_AM_lo[] = { // Available values...
 static const char *TS870S_CAT_am_lo[] = { // ... Corresponding commands.
 "FW0000;", "FW0010;", "FW0020;", "FW0050;", NULL};
 
-static const char *TS870S_AM_lo_tooltip = "lo cutoff";
+static const char *TS870S_AM_lo_tooltip = "lo cut";
 static const char *TS870S_AM_btn_lo_label = "L";
 
 static const char *TS870S_AM_hi[] = {
@@ -83,7 +83,7 @@ static const char *TS870S_AM_hi[] = {
 static const char *TS870S_CAT_am_hi[] = {
 "IS 2500;", "IS 3000;", "IS 4000;", "IS 5000;", "IS 6000;", "IS 7000;", NULL};
 
-static const char *TS870S_AM_hi_tooltip = "hi cutoff";
+static const char *TS870S_AM_hi_tooltip = "hi cut";
 static const char *TS870S_AM_btn_hi_label = "H";
 
 //----------------------------------------------------------------------
@@ -958,7 +958,7 @@ int RIG_TS870S::get_bwA() {
 	size_t p;
 
 	if (A.imode == tsFM) { // FM mode.
-		cmd = "FW;"; // 'Filter Width' query
+		cmd = "FW;"; // 'width' query
 		if (wait_char(';', 7, 100, "get CW width", ASC) < 7) return A.iBW;
 
 		p = replystr.rfind("FW");
@@ -972,7 +972,7 @@ int RIG_TS870S::get_bwA() {
 	}
 
 	else if (A.imode == tsCW || A.imode == tsCWR) { // CW modes.
-		cmd = "FW;"; // 'Filter Width' query
+		cmd = "FW;"; // 'width' query
 		if (wait_char(';', 7, 100, "get CW width", ASC) < 7) return A.iBW;
 
 		p = replystr.rfind("FW");
@@ -1003,7 +1003,7 @@ int RIG_TS870S::get_bwA() {
 	else if (A.imode == tsAM) { // AM mode only
 
 		int lo = A.iBW & 0x7F, hi = (A.iBW >> 8) & 0x7F;
-		// High byte is hi cutoff index (not MSB though.) Low byte is lo cuttoff index.
+		// High byte is hi cut index (not MSB though.) Low byte is lo cuttoff index.
 
 		cmd = "FW;"; // Read Low cuttoff. Returns a two digit code as 'FLxxxx;' in 10Hz increments.
 		if (wait_char(';', 5, 100, "get lower", ASC) < 5) return A.iBW;
@@ -1073,7 +1073,7 @@ int RIG_TS870S::get_bwB()
 	size_t p;
 
 	if (B.imode == tsFM) {
-		cmd = "FW;"; // 'Filter Width' query
+		cmd = "FW;"; // 'width' query
 		if (wait_char(';', 7, 100, "get CW width", ASC) < 7) return B.iBW;
 
 		p = replystr.rfind("FW");
@@ -1087,7 +1087,7 @@ int RIG_TS870S::get_bwB()
 	}
 
 	else if (B.imode == tsCW || B.imode == tsCWR) { // CW modes.
-		cmd = "FW;"; // 'Filter Width' query
+		cmd = "FW;"; // 'width' query
 		if (wait_char(';', 7, 100, "get CW width", ASC) < 7) return B.iBW;
 
 		p = replystr.rfind("FW");

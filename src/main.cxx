@@ -71,6 +71,8 @@
 #include "util.h"
 #include "gettext.h"
 #include "xml_io.h"
+#include "xml_server.h"
+
 #include "ui.h"
 
 #include "flrig_icon.cxx"
@@ -399,6 +401,8 @@ int main (int argc, char *argv[])
 		perror("pthread_create");
 		exit(EXIT_FAILURE);
 	}
+
+	start_server();
 
 	createXcvrDialog();
 

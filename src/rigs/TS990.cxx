@@ -72,7 +72,7 @@ static const char *TS990_CAT_filt_width[] = {
 "10;", "11;", "12;", "13;", "14;",
 "15;", "16;", "17;", NULL };
 
-static const char *TS990_filt_width_tooltip = "filter width";
+static const char *TS990_filt_width_tooltip = "width";
 static const char *TS990_filt_width_label = "W";
 
 static const char *TS990_filt_shift[] = {
@@ -85,11 +85,11 @@ static const char *TS990_CAT_filt_shift[] = {
 "05;", "06;", "07;", "08;", "09;",
 "10;", "11;", "12;", NULL };
 
-static const char *TS990_filt_shift_tooltip = "shift frequency";
+static const char *TS990_filt_shift_tooltip = "shift";
 static const char *TS990_filt_shift_label = "S";
 
 //==============================================================================
-// SSB, FM, Other lo/hi cutoff filters
+// SSB, FM, Other lo/hi cut filters
 //
 // BW indicates 0x8000 & (hi << 8) & lo
 // Maximum assignable BW value 0x8D0B
@@ -107,7 +107,7 @@ static const char *TS990_CAT_filt_hi[] = {
 "05;", "06;", "07;", "08;", "09;",
 "10;", "11;", "12;", "13;", NULL };
 
-static const char *TS990_filt_hi_tooltip = "hi cutoff";
+static const char *TS990_filt_hi_tooltip = "hi cut";
 static const char *TS990_filt_hi_label = "H";
 
 static const char *TS990_filt_lo[] = {
@@ -120,7 +120,7 @@ static const char *TS990_CAT_filt_lo[] = {
 "05;", "06;", "07;", "08;", "09;",
 "10;", "11;", NULL };
 
-static const char *TS990_filt_lo_tooltip = "lo cutoff";
+static const char *TS990_filt_lo_tooltip = "lo cut";
 static const char *TS990_filt_lo_label = "L";
 
 //==============================================================================
@@ -141,7 +141,7 @@ static const char *TS990_CAT_CW_width[] = {
 "05;", "06;", "07;", "08;", "09;",
 "10;", "11;", "12;", "13;", NULL };
 
-static const char *TS990_CW_W_tooltip = "filter width";
+static const char *TS990_CW_W_tooltip = "width";
 static const char *TS990_CW_W_btn_label = "W";
 
 static const char *TS990_CW_shift[] = {
@@ -162,7 +162,7 @@ static const char *TS990_CAT_CW_shift[] = {
 "25;", "26;", "27;", "28;", "29;",
 "30;", "31;", "32;", NULL };
 
-static const char *TS990_CW_S_tooltip = "shift frequency";
+static const char *TS990_CW_S_tooltip = "shift";
 static const char *TS990_CW_S_btn_label = "S";
 
 //==============================================================================
@@ -173,7 +173,7 @@ static const char *TS990_AM_lo[] = {
 static const char *TS990_CAT_AM_lo[] = {
 "00;", "01;", "02;", "03;", NULL};
 
-static const char *TS990_AM_lo_tooltip = "lo cutoff";
+static const char *TS990_AM_lo_tooltip = "lo cut";
 static const char *TS990_AM_btn_lo_label = "L";
 
 static const char *TS990_AM_hi[] = {
@@ -182,7 +182,7 @@ static const char *TS990_AM_hi[] = {
 static const char *TS990_CAT_AM_hi[] = {
 "00;", "01;", "02;", "03;", NULL};
 
-static const char *TS990_AM_hi_tooltip = "hi cutoff";
+static const char *TS990_AM_hi_tooltip = "hi cut";
 static const char *TS990_AM_btn_hi_label = "H";
 
 //==============================================================================
@@ -1445,7 +1445,7 @@ void RIG_TS990::set_bwA(int val)
 			cmd = "SL0";
 			cmd += TS990_CAT_filt_width[(A.iBW >> 8) & 0x7F];
 			sendCommand(cmd);
-			showresp(INFO, ASC, "set filter width", cmd, "");
+			showresp(INFO, ASC, "set width", cmd, "");
 			cmd = "SH0";
 			cmd += TS990_CAT_filt_shift[A.iBW & 0x7F];
 			sendCommand(cmd);
@@ -1609,7 +1609,7 @@ void RIG_TS990::set_bwB(int val)
 			cmd = "SL1";
 			cmd += TS990_CAT_filt_width[(B.iBW >> 8) & 0x7F];
 			sendCommand(cmd);
-			showresp(INFO, ASC, "set filter width", cmd, "");
+			showresp(INFO, ASC, "set width", cmd, "");
 			cmd = "SH1";
 			cmd += TS990_CAT_filt_shift[B.iBW & 0x7F];
 			sendCommand(cmd);
@@ -1811,7 +1811,7 @@ int RIG_TS990::get_bwA()
 		if (menu_0607) {
 			A.iBW = A_default_SH_WI;
 			cmd = "SL0;";
-			if (wait_char(';', 6, 20, "get filter width", ASC) == 6) {
+			if (wait_char(';', 6, 20, "get width", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
 				hi = fm_decimal(&replystr[3], 2); //2 2
@@ -1847,7 +1847,7 @@ int RIG_TS990::get_bwA()
 		if (menu_0608) {
 			A.iBW = A_default_SH_WI_D1;
 			cmd = "SL0;";
-			if (wait_char(';', 6, 20, "get filter width", ASC) == 6) {
+			if (wait_char(';', 6, 20, "get width", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
 				hi = fm_decimal(&replystr[3], 2); //2 2
@@ -1884,7 +1884,7 @@ int RIG_TS990::get_bwA()
 		if (menu_0608) {
 			A.iBW = A_default_SH_WI_D2;
 			cmd = "SL0;";
-			if (wait_char(';', 6, 20, "get filter width", ASC) == 6) {
+			if (wait_char(';', 6, 20, "get width", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
 				hi = fm_decimal(&replystr[3], 2); //2 2
@@ -1921,7 +1921,7 @@ int RIG_TS990::get_bwA()
 		if (menu_0608) {
 			A.iBW = A_default_SH_WI_D3;
 			cmd = "SL0;";
-			if (wait_char(';', 6, 20, "get filter width", ASC) == 6) {
+			if (wait_char(';', 6, 20, "get width", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
 				hi = fm_decimal(&replystr[3], 2); //2 2
@@ -2161,7 +2161,7 @@ int RIG_TS990::get_bwB()
 		if (menu_0607) {
 			B.iBW = B_default_SH_WI;
 			cmd = "SL1;";
-			if (wait_char(';', 6, 20, "get filter width", ASC) == 6) {
+			if (wait_char(';', 6, 20, "get width", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
 				hi = fm_decimal(&replystr[3], 2); //2 2
@@ -2197,7 +2197,7 @@ int RIG_TS990::get_bwB()
 		if (menu_0608) {
 			B.iBW = B_default_SH_WI_D1;
 			cmd = "SL1;";
-			if (wait_char(';', 6, 20, "get filter width", ASC) == 6) {
+			if (wait_char(';', 6, 20, "get width", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
 				hi = fm_decimal(&replystr[3], 2); //2 2
@@ -2233,7 +2233,7 @@ int RIG_TS990::get_bwB()
 		if (menu_0608) {
 			B.iBW = B_default_SH_WI_D2;
 			cmd = "SL1;";
-			if (wait_char(';', 6, 20, "get filter width", ASC) == 6) {
+			if (wait_char(';', 6, 20, "get width", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
 				hi = fm_decimal(&replystr[3], 2); //2 2
@@ -2269,7 +2269,7 @@ int RIG_TS990::get_bwB()
 		if (menu_0608) {
 			B.iBW = B_default_SH_WI_D3;
 			cmd = "SL1;";
-			if (wait_char(';', 6, 20, "get filter width", ASC) == 6) {
+			if (wait_char(';', 6, 20, "get width", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
 				hi = fm_decimal(&replystr[3], 2); //2 2

@@ -39,7 +39,7 @@ static const char *TS2000_CAT_lo[] = {
 "SL00;", "SL01;", "SL02;", "SL03;", "SL04;", 
 "SL05;", "SL06;", "SL07;", "SL08;", "SL09;",
 "SL10;", "SL11;", NULL };
-static const char *TS2000_lo_tooltip = "lo cutoff";
+static const char *TS2000_lo_tooltip = "lo cut";
 static const char *TS2000_SSB_btn_lo_label = "L";
 //------------------------------------------------------------------------------
 static const char *TS2000_hi[] = {
@@ -50,7 +50,7 @@ static const char *TS2000_CAT_hi[] = {
 "SH00;", "SH01;", "SH02;", "SH03;", "SH04;", 
 "SH05;", "SH06;", "SH07;", "SH08;", "SH09;",
 "SH10;", "SH11;", NULL };
-static const char *TS2000_hi_tooltip = "hi cutoff";
+static const char *TS2000_hi_tooltip = "hi cut";
 static const char *TS2000_SSB_btn_hi_label = "H";
 //------------------------------------------------------------------------------
 static const char *TS2000_AM_lo[] = {

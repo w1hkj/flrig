@@ -50,7 +50,7 @@ static const char *TS590S_CAT_ssb_lo[] = {
 "SL00;", "SL01;", "SL02;", "SL03;", "SL04;", 
 "SL05;", "SL06;", "SL07;", "SL08;", "SL09;",
 "SL10;", "SL11;", NULL };
-static const char *TS590S_SSB_lo_tooltip = "lo cutoff";
+static const char *TS590S_SSB_lo_tooltip = "lo cut";
 static const char *TS590S_SSB_btn_lo_label = "L";
 
 static const char *TS590S_SSB_hi[] = {
@@ -62,7 +62,7 @@ static const char *TS590S_CAT_ssb_hi[] = {
 "SH00;", "SH01;", "SH02;", "SH03;", "SH04;", 
 "SH05;", "SH06;", "SH07;", "SH08;", "SH09;",
 "SH10;", "SH11;", "SH12;", "SH13;", NULL };
-static const char *TS590S_SSB_hi_tooltip = "hi cutoff";
+static const char *TS590S_SSB_hi_tooltip = "hi cut";
 static const char *TS590S_SSB_btn_hi_label = "H";
 
 //----------------------------------------------------------------------
@@ -76,7 +76,7 @@ static const char *TS590S_CAT_data_width[] = {
 "SL00;", "SL01;", "SL02;", "SL03;", "SL04;", 
 "SL05;", "SL06;", "SL07;", "SL08;", "SL09;",
 "SL10;", "SL11;", "SL12;", "SL13;", NULL };
-static const char *TS590S_DATA_W_tooltip = "filter width";
+static const char *TS590S_DATA_W_tooltip = "width";
 static const char *TS590S_DATA_W_btn_label = "W";
 
 static const char *TS590S_DATA_shift[] = {
@@ -88,7 +88,7 @@ static const char *TS590S_CAT_data_shift[] = {
 "SH00;", "SH01;", "SH02;", "SH03;", "SH04;", 
 "SH05;", "SH06;", "SH07;", "SH08;", "SH09;",
 "SH10;", "SH11;", "SH12;", NULL };
-static const char *TS590S_DATA_S_tooltip = "shift frequency";
+static const char *TS590S_DATA_S_tooltip = "shift";
 static const char *TS590S_DATA_S_btn_label = "S";
 
 //----------------------------------------------------------------------
@@ -98,7 +98,7 @@ static const char *TS590S_AM_lo[] = {
 
 static const char *TS590S_CAT_am_lo[] = {
 "SL00;", "SL01;", "SL02;", "SL03;", NULL}; 
-static const char *TS590S_AM_lo_tooltip = "lo cutoff";
+static const char *TS590S_AM_lo_tooltip = "lo cut";
 static const char *TS590S_AM_btn_lo_label = "L";
 
 static const char *TS590S_AM_hi[] = {
@@ -106,7 +106,7 @@ static const char *TS590S_AM_hi[] = {
 
 static const char *TS590S_CAT_am_hi[] = {
 "SH00;", "SH01;", "SH02;", "SH03;", NULL}; 
-static const char *TS590S_AM_hi_tooltip = "hi cutoff";
+static const char *TS590S_AM_hi_tooltip = "hi cut";
 static const char *TS590S_AM_btn_hi_label = "H";
 
 //----------------------------------------------------------------------

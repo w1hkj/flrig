@@ -30,32 +30,32 @@ static const char TS480SAT_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'U
 
 static const char *TS480SAT_empty[] = { "N/A", NULL };
 
-// SL command is lo cutoff when menu 045 OFF
+// SL command is lo cut when menu 045 OFF
 static const char *TS480SAT_lo[] = {
   "0",   "50", "100", "200", "300", 
 "400",  "500", "600", "700", "800", 
 "900", "1000", NULL };
-static const char *TS480SAT_lo_tooltip = "lo cutoff";
+static const char *TS480SAT_lo_tooltip = "lo cut";
 static const char *TS480SAT_btn_lo_label = "L";
 
-// SH command is hi cutoff when menu 045 OFF
+// SH command is hi cut when menu 045 OFF
 static const char *TS480SAT_hi[] = {
 "1000", "1200", "1400", "1600", "1800", 
 "2000", "2200", "2400", "2600", "2800", 
 "3000", "3400", "4000", "5000", NULL };
-static const char *TS480SAT_hi_tooltip = "hi cutoff";
+static const char *TS480SAT_hi_tooltip = "hi cut";
 static const char *TS480SAT_btn_hi_label = "H";
 
 // SL command is width when menu 045 ON
 static const char *TS480SAT_dataW[] = {
 "50", "100", "250", "500", "1000", "1500", "2400", NULL };
-static const char *TS480SAT_dataW_tooltip = "filter width";
+static const char *TS480SAT_dataW_tooltip = "width";
 static const char *TS480SAT_dataW_label = "W";
 
-// SH command is center frequency when menu 045 ON
+// SH command is center when menu 045 ON
 static const char *TS480SAT_dataC[] = {
 "1000", "1500", "2210", NULL };
-static const char *TS480SAT_dataC_tooltip = "center frequency";
+static const char *TS480SAT_dataC_tooltip = "center";
 static const char *TS480SAT_dataC_label = "C";
 
 static const char *TS480SAT_AM_lo[] = {

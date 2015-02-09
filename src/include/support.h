@@ -23,6 +23,7 @@
 
 #include <fstream>
 #include <vector>
+#include <queue>
 #include <string>
 
 #include <math.h>
@@ -301,5 +302,15 @@ extern const string lt_trim(const string& pString, const string& pWhitespace = "
 extern void editAlphaTag();
 
 extern void adjust_control_positions();
+
+extern bool rig_notch;
+extern int rig_notch_val;
+extern void update_notch(void *d);
+
+extern int mval;
+
+extern queue<FREQMODE> queA;
+extern queue<FREQMODE> queB;
+extern queue<bool> quePTT;
 
 #endif
