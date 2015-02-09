@@ -55,6 +55,5 @@ const char * guard_lock::name(pthread_mutex_t *m) {
 		if (m == &mutex_queB) return "QueB";
 		if (m == &mutex_rcv_socket) return "Rcv Socket";
 		if (m == &mutex_serial) return "Serial";
-		if (m == &mutex_xmlrpc) return "XmlRpc";
 		return "Unknown";
 	}

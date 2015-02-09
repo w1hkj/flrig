@@ -283,7 +283,6 @@ void read_bandwidth()
 	if (!useB) {
 		nu_BW = selrig->get_bwA();
 		if (nu_BW != vfoA.iBW) {
-//			guard_lock xmlrpc_lock(&mutex_xmlrpc, 5);
 			vfoA.iBW = vfo.iBW = nu_BW;
 			Fl::awake(setBWControl);
 		}
@@ -291,7 +290,6 @@ void read_bandwidth()
 		nu_BW = selrig->get_bwB();
 		if (nu_BW != vfoB.iBW) {
 			vfoB.iBW = vfo.iBW = nu_BW;
-//			guard_lock xmlrpc_lock(&mutex_xmlrpc, 6);
 			Fl::awake(setBWControl);
 		}
 	}
@@ -640,7 +638,6 @@ void serviceA()
 	if (!selrig->can_change_alt_vfo && useB) return;
 	if (queA.empty()) return;
 	guard_lock serial_lock(&mutex_serial, 24);
-//	guard_lock xmlrpc_lock(&mutex_xmlrpc, 24);
 	{
 		guard_lock queA_lock(&mutex_queA, 25);
 		while (!queA.empty()) {
@@ -693,7 +690,6 @@ void serviceB()
 	if (queB.empty())
 		return;
 	guard_lock serial_lock(&mutex_serial, 26);
-//	guard_lock xmlrpc_lock(&mutex_xmlrpc, 26);
 	{
 		guard_lock queB_lock(&mutex_queB, 27);
 		while (!queB.empty()) {
@@ -865,7 +861,7 @@ void * serial_thread_loop(void *d)
 
 		if (!PTT) {
 			serviceA();
-			if (que_pending()) continue;
+			if (!quePTT.empty()) continue;
 			serviceB();
 			if (que_pending()) continue;
 
@@ -4117,7 +4113,6 @@ void cbBandSelect(int band)
 	}
 	{
 		guard_lock gl_serial(&mutex_serial, 92);
-//		guard_lock gl_xmlrpc(&mutex_xmlrpc, 93);
 
 	selrig->set_band_selection(band);
 	MilliSleep(100);	// rig sync-up

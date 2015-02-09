@@ -38,7 +38,6 @@
 #include "dialogs.h"
 #include "rigbase.h"
 #include "ptt.h"
-#include "xml_io.h"
 
 #include "rigs.h"
 #include "K3_ui.h"
@@ -55,14 +54,9 @@ void read_K3()
 		long  freq;
 		freq = selrig->get_vfoA();
 		if (freq != vfoA.freq) {
-			pthread_mutex_lock(&mutex_xmlrpc);
 			vfoA.freq = freq;
 			Fl::awake(setFreqDispA, (void *)vfoA.freq);
 			vfo = vfoA;
-			try {
-				send_xml_freq(vfo.freq);
-			} catch (...) {}
-			pthread_mutex_unlock(&mutex_xmlrpc);
 		}
 		freq = selrig->get_vfoB();
 		if (freq != vfoB.freq) {
@@ -76,16 +70,8 @@ void read_K3()
 		int nu_mode;
 		nu_mode = selrig->get_modeA();
 		if (nu_mode != vfoA.imode) {
-			pthread_mutex_lock(&mutex_xmlrpc);
 			vfoA.imode = vfo.imode = nu_mode;
 			selrig->set_bwA(vfo.iBW = selrig->adjust_bandwidth(nu_mode));
-			try {
-				send_bandwidths();
-				send_new_mode(nu_mode);
-				send_sideband();
-				send_new_bandwidth(vfo.iBW);
-			} catch (...) {}
-			pthread_mutex_unlock(&mutex_xmlrpc);
 			Fl::awake(setModeControl);
 			Fl::awake(updateBandwidthControl);
 		}
@@ -100,13 +86,8 @@ void read_K3()
 		int nu_BW;
 		nu_BW = selrig->get_bwA();
 		if (nu_BW != vfoA.iBW) {
-			pthread_mutex_lock(&mutex_xmlrpc);
 			vfoA.iBW = vfo.iBW = nu_BW;
 			Fl::awake(setBWControl);
-			try {
-				send_new_bandwidth(vfo.iBW);
-			} catch (...) {}
-			pthread_mutex_unlock(&mutex_xmlrpc);
 		}
 		nu_BW = selrig->get_bwB();
 		if (nu_BW != vfoB.iBW) {

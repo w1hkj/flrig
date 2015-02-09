@@ -29,7 +29,6 @@
 #include "serial.h"
 #include "support.h"
 #include "rigpanel.h"
-#include "xml_io.h"
 #include "rigbase.h"
 #include "font_browser.h"
 
@@ -370,7 +369,6 @@ void cbOkXcvrDialog()
 
 	// close the current rig control
 	closeRig();               // local serial comm connection
-	close_rig_xmlrpc();       // fldigi connection
 //	disconnect_from_remote(); // remote tcpip connection
 
 	{ guard_lock gl_serial(&mutex_serial, 200);
@@ -454,11 +452,7 @@ void cbOkXcvrDialog()
 		}
 	}
 
-	open_rig_xmlrpc();
-
 	initRig();
-
-	mainwindow->redraw();
 
 	btnOkXcvrDialog->labelcolor(FL_BLACK);
 }
@@ -1494,7 +1488,6 @@ void cb_send_command()
 		cmd = command;
 // lock out polling loops until done
 	guard_lock gl_serial(&mutex_serial, 201);
-	guard_lock gl_xml(&mutex_xmlrpc, 202);
 
 	sendCommand(cmd, 0);
 
