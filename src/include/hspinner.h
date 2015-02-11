@@ -41,56 +41,8 @@ protected:
 	int sW2;
 
 private:
-static void sb_cb(Fl_Widget *w, Hspinner *sb)
-{
-	double v;		// New value
-
-	if (w == &(sb->input_)) {
-// Something changed in the input field...
-		v = atof(sb->input_.value());
-		if (v < sb->minimum_) {
-			sb->value_ = sb->minimum_;
-			sb->update();
-		} else if (v > sb->maximum_) {
-			sb->value_ = sb->maximum_;
-			sb->update();
-		} else sb->value_ = v;
-	} else if (w == &(sb->up_button_)) {
-// Up button pressed...
-		v = sb->value_ + sb->step_;
-		if (v > sb->maximum_) sb->value_ = sb->maximum_;
-		else sb->value_ = v;
-		sb->update();
-	} else if (w == &(sb->down_button_)) {
-// Down button pressed...
-		v = sb->value_ - sb->step_;
-		if (v < sb->minimum_) sb->value_ = sb->minimum_;
-		else sb->value_ = v;
-		sb->update();
-	}
-	sb->do_callback();
-}
-
-void update() {
-	char s[255]; // Value string
-
-/// this code block is a simplified version of
-/// Fl_Valuator::format() and works well (but looks ugly)
-// precision argument
-	if (format_[0]=='%'&&format_[1]=='.'&&format_[2]=='*') {
-		int c = 0;
-		char temp[64], *sp = temp;
-		sprintf(temp, "%.12f", step_);
-		while (*sp) sp++;
-		sp--;
-		while (sp>temp && *sp=='0') sp--;
-		while (sp>temp && (*sp>='0' && *sp<='9')) { sp--; c++; }
-		sprintf(s, format_, c, value_);
-	} else {
-		sprintf(s, format_, value_);
-	}
-	input_.value(s);
-}
+	static void sb_cb(Fl_Widget *w, Hspinner *sb);
+	void update();
 
 public:
 /// Creates a new Fl_Spinner widget using the given position, size,
@@ -164,8 +116,8 @@ Hspinner(int X, int Y, int W, int H, const char *L = 0, int W2 = 0);
 /// Gets/Sets the current value of the widget.
 /// Before setting value to a non-integer value, the spinner
 /// type() should be changed to floating point.
-	double		value() const { return (value_); }
-	void		value(double v) { value_ = v; update(); }
+	double		value();
+	void		value(double v);
 
 /// Get/Set the background color of the spinner widget's input field.
 	void		color(Fl_Color v) { input_.color(v); }

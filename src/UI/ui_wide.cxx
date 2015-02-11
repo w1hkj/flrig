@@ -1093,7 +1093,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				tt550_CW->color(FL_LIGHT1);
 				tt550_CW->selection_color(FL_LIGHT1);
 
-				spnr_tt550_cw_wpm = new Hspinner(55, 187, 67, 20, _("wpm"));
+				spnr_tt550_cw_wpm = new Hspinner(55, 187, 67, 20, _("wpm"), 15);
 				spnr_tt550_cw_wpm->type(FL_INT_INPUT);
 				spnr_tt550_cw_wpm->minimum(5);
 				spnr_tt550_cw_wpm->maximum(80);
@@ -1103,7 +1103,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_tt550_cw_wpm->align(Fl_Align(FL_ALIGN_LEFT));
 				spnr_tt550_cw_wpm->value(progStatus.tt550_cw_wpm);
 
-				spnr_tt550_cw_weight = new Hspinner(187, 187, 67, 20, _("Weight"));
+				spnr_tt550_cw_weight = new Hspinner(187, 187, 67, 20, _("Weight"), 15);
 				spnr_tt550_cw_weight->type(FL_INT_INPUT);
 				spnr_tt550_cw_weight->minimum(0.75);
 				spnr_tt550_cw_weight->maximum(1.5);
@@ -1113,7 +1113,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_tt550_cw_weight->align(Fl_Align(FL_ALIGN_LEFT));
 				spnr_tt550_cw_weight->value(progStatus.tt550_cw_weight);
 
-				spnr_tt550_cw_qsk = new Hspinner(311, 187, 67, 20, _("Delay"));
+				spnr_tt550_cw_qsk = new Hspinner(311, 187, 67, 20, _("Delay"), 15);
 				spnr_tt550_cw_qsk->tooltip(_("QSK delay (msec)"));
 				spnr_tt550_cw_qsk->type(FL_INT_INPUT);
 				spnr_tt550_cw_qsk->minimum(0);
@@ -1124,7 +1124,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_tt550_cw_qsk->align(Fl_Align(FL_ALIGN_LEFT));
 				spnr_tt550_cw_qsk->value(progStatus.tt550_cw_qsk);
 
-				spnr_tt550_cw_vol = new Hspinner(447, 187, 67, 20, _("S-T vol"));
+				spnr_tt550_cw_vol = new Hspinner(447, 187, 67, 20, _("S-T vol"), 15);
 				spnr_tt550_cw_vol->tooltip(_("Side tone volume"));
 				spnr_tt550_cw_vol->type(FL_INT_INPUT);
 				spnr_tt550_cw_vol->minimum(5);
@@ -1135,7 +1135,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_tt550_cw_vol->align(Fl_Align(FL_ALIGN_LEFT));
 				spnr_tt550_cw_vol->value(progStatus.tt550_cw_vol);
 
-				spnr_tt550_cw_spot = new Hspinner(590, 187, 67, 20, _("Spot Vol"));
+				spnr_tt550_cw_spot = new Hspinner(590, 187, 67, 20, _("Spot Vol"), 15);
 				spnr_tt550_cw_spot->tooltip(_("Spot volume"));
 				spnr_tt550_cw_spot->type(FL_INT_INPUT);
 				spnr_tt550_cw_spot->minimum(0);
@@ -1159,7 +1159,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 {
 				tt550_VOX->hide();
 
-				spnr_tt550_vox_gain = new Hspinner(101, 187, 79, 20, _("gain"));
+				spnr_tt550_vox_gain = new Hspinner(101, 187, 79, 20, _("gain"), 15);
 				spnr_tt550_vox_gain->type(FL_INT_INPUT);
 				spnr_tt550_vox_gain->minimum(0);
 				spnr_tt550_vox_gain->maximum(100);
@@ -1168,7 +1168,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_tt550_vox_gain->align(Fl_Align(FL_ALIGN_LEFT));
 				spnr_tt550_vox_gain->value(progStatus.tt550_vox_gain);
 
-				spnr_tt550_anti_vox = new Hspinner(299, 187, 78, 20, _("anti"));
+				spnr_tt550_anti_vox = new Hspinner(299, 187, 78, 20, _("anti"), 15);
 				spnr_tt550_anti_vox->type(FL_INT_INPUT);
 				spnr_tt550_anti_vox->minimum(0);
 				spnr_tt550_anti_vox->maximum(100);
@@ -1177,7 +1177,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_tt550_anti_vox->align(Fl_Align(FL_ALIGN_LEFT));
 				spnr_tt550_anti_vox->value(progStatus.tt550_vox_anti);
 
-				spnr_tt550_vox_hang = new Hspinner(497, 187, 78, 20, _("hang"));
+				spnr_tt550_vox_hang = new Hspinner(497, 187, 78, 20, _("hang"), 15);
 				spnr_tt550_vox_hang->type(FL_INT_INPUT);
 				spnr_tt550_vox_hang->minimum(0);
 				spnr_tt550_vox_hang->maximum(100);
@@ -1226,7 +1226,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 {
 				tt550_Audio->hide();
 
-				spnr_tt550_line_out = new Hspinner(296, 187, 77, 20, _("line out"));
+				spnr_tt550_line_out = new Hspinner(296, 187, 77, 20, _("line out"), 15);
 				spnr_tt550_line_out->type(FL_INT_INPUT);
 				spnr_tt550_line_out->minimum(0);
 				spnr_tt550_line_out->maximum(100);
@@ -1249,9 +1249,9 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				tt550_Rx->hide();
 
 				cbo_tt550_nb_level = new Fl_ComboBox(179, 187, 89, 20, _("NB level"));
-				cbo_tt550_nb_level->tooltip(_("Select Transceiver"));
+				cbo_tt550_nb_level->tooltip(_("Select Noise Blanker level"));
 				cbo_tt550_nb_level->box(FL_DOWN_BOX);
-				cbo_tt550_nb_level->color(FL_BACKGROUND_COLOR);
+				cbo_tt550_nb_level->color(FL_WHITE);
 				cbo_tt550_nb_level->selection_color(FL_BACKGROUND_COLOR);
 				cbo_tt550_nb_level->labeltype(FL_NORMAL_LABEL);
 				cbo_tt550_nb_level->labelfont(0);
@@ -1264,9 +1264,9 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				cbo_tt550_nb_level->end();
 
 				cbo_tt550_agc_level = new Fl_ComboBox(340, 187, 90, 20, _("AGC"));
-				cbo_tt550_agc_level->tooltip(_("Select Transceiver"));
+				cbo_tt550_agc_level->tooltip(_("Select AGC"));
 				cbo_tt550_agc_level->box(FL_DOWN_BOX);
-				cbo_tt550_agc_level->color(FL_BACKGROUND_COLOR);
+				cbo_tt550_agc_level->color(FL_WHITE);
 				cbo_tt550_agc_level->selection_color(FL_BACKGROUND_COLOR);
 				cbo_tt550_agc_level->labeltype(FL_NORMAL_LABEL);
 				cbo_tt550_agc_level->labelfont(0);
@@ -1280,9 +1280,13 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 
 				spnr_tt550_vfo_adj = new Hspinner(556, 187, 134, 20, _("Vfo Adj(ppm)"));
 				spnr_tt550_vfo_adj->callback((Fl_Callback*)cb_spnr_tt550_vfo_adj);
-				spnr_tt550_vfo_adj->align(Fl_Align(36));
+				spnr_tt550_vfo_adj->align(FL_ALIGN_LEFT);
+				spnr_tt550_vfo_adj->minimum(-100);
+				spnr_tt550_vfo_adj->maximum(100);
+				spnr_tt550_vfo_adj->type(FL_FLOAT_INPUT);
+				spnr_tt550_vfo_adj->step(0.1);
 				spnr_tt550_vfo_adj->value(progStatus.vfo_adj);
-				spnr_tt550_vfo_adj->step(1.0);
+
 }
 			tt550_Rx->end();
 
@@ -1309,7 +1313,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				op_tt550_XmtBW = new Fl_ComboBox(462, 187, 112, 20, _("Xmt BW"));
 				op_tt550_XmtBW->tooltip(_("Select Transceiver Bandwidth"));
 				op_tt550_XmtBW->box(FL_DOWN_BOX);
-				op_tt550_XmtBW->color(FL_BACKGROUND_COLOR);
+				op_tt550_XmtBW->color(FL_WHITE);
 				op_tt550_XmtBW->selection_color(FL_BACKGROUND_COLOR);
 				op_tt550_XmtBW->labeltype(FL_NORMAL_LABEL);
 				op_tt550_XmtBW->labelfont(0);

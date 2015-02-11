@@ -556,27 +556,27 @@ static void cb_btnSpot(Fl_Light_Button* o, void*) {
 	cb_cw_spot();
 }
 
-static void cb_spnr_cw_spot_tone(Fl_Counter* o, void*) {
+static void cb_spnr_cw_spot_tone(Hspinner* o, void*) {
 	progStatus.cw_spot_tone=(int)o->value();
 	cb_cw_spot_tone();
 }
 
-static void cb_spnr_cw_qsk(Fl_Counter* o, void*) {
+static void cb_spnr_cw_qsk(Hspinner* o, void*) {
 	progStatus.cw_qsk = o->value();
 	cb_cw_qsk();
 }
 
-static void cb_spnr_cw_weight(Fl_Counter* o, void*) {
+static void cb_spnr_cw_weight(Hspinner* o, void*) {
 	progStatus.cw_weight = o->value();
 	cb_cw_weight();
 }
 
-static void cb_spnr_cw_wpm(Fl_Counter* o, void*) {
+static void cb_spnr_cw_wpm(Hspinner* o, void*) {
 	progStatus.cw_wpm = o->value();
 	cb_cw_wpm();
 }
 
-static void cb_spnr_cw_delay(Fl_Counter* o, void*) {
+static void cb_spnr_cw_delay(Hspinner* o, void*) {
 	progStatus.cw_delay = o->value();
 	cb_cw_delay();
 }
@@ -591,17 +591,17 @@ static void cb_btnBreakIn(Fl_Check_Button* o, void*) {
 	cb_enable_break_in();
 }
 
-static void cb_spnr_vox_gain(Fl_Counter* o, void*) {
+static void cb_spnr_vox_gain(Hspinner* o, void*) {
 	progStatus.vox_gain=(int)o->value();
 	cb_vox_gain();
 }
 
-static void cb_spnr_anti_vox(Fl_Counter* o, void*) {
+static void cb_spnr_anti_vox(Hspinner* o, void*) {
 	progStatus.vox_anti=(int)o->value();
 	cb_vox_anti();
 }
 
-static void cb_spnr_vox_hang(Fl_Counter* o, void*) {
+static void cb_spnr_vox_hang(Hspinner* o, void*) {
 	progStatus.vox_hang = (int)o->value();
 	cb_vox_hang();
 }
@@ -621,7 +621,7 @@ static void cb_btnCompON(Fl_Light_Button* o, void*) {
 	cb_compression();
 }
 
-static void cb_spnr_compression(Fl_Counter* o, void*) {
+static void cb_spnr_compression(Hspinner* o, void*) {
 	progStatus.compression=(int)o->value();
 	cb_compression();
 }
@@ -636,7 +636,7 @@ static void cb_cbo_agc_level(Fl_ComboBox* o, void*) {
 	cb_agc_level();
 }
 
-static void cb_spnr_bpf_center(Fl_Counter* o, void*) {
+static void cb_spnr_bpf_center(Hspinner* o, void*) {
 	progStatus.bpf_center=o->value();
 	cb_bpf_center();
 }
@@ -646,12 +646,12 @@ static void cb_btn_use_bpf_center(Fl_Check_Button* o, void*) {
 	cb_bpf_center();
 }
 
-static void cb_spnr_vfo_adj(Fl_Counter* o, void*) {
+static void cb_spnr_vfo_adj(Hspinner* o, void*) {
 	progStatus.vfo_adj=o->value();
 	cb_vfo_adj();
 }
 
-static void cb_spnr_line_out(Fl_Counter* o, void*) {
+static void cb_spnr_line_out(Hspinner* o, void*) {
 	progStatus.line_out = o->value();
 	cb_line_out();
 }
@@ -672,15 +672,15 @@ static void cb_btn_xcvr_auto_off(Fl_Check_Button* o, void*) {
 	progStatus.xcvr_auto_off = o->value();
 }
 
-static void cb_cntRIT(Fl_Counter*, void*) {
+static void cb_cntRIT(Hspinner*, void*) {
 	cbRIT();
 }
 
-static void cb_cntXIT(Fl_Counter*, void*) {
+static void cb_cntXIT(Hspinner*, void*) {
 	cbXIT();
 }
 
-static void cb_cntBFO(Fl_Counter*, void*) {
+static void cb_cntBFO(Hspinner*, void*) {
 	cbBFO();
 }
 
@@ -701,27 +701,27 @@ static void cb_btnDataPort(Fl_Light_Button* o, void*) {
 	btnDataPort->redraw_label();
 }
 
-static void cb_spnr_tt550_cw_wpm(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_cw_wpm(Hspinner* o, void*) {
 	progStatus.tt550_cw_wpm = (int)o->value();
 	cb_tt550_cw_wpm();
 }
 
-static void cb_spnr_tt550_cw_weight(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_cw_weight(Hspinner* o, void*) {
 	progStatus.tt550_cw_weight = o->value();
 	cb_tt550_cw_weight();
 }
 
-static void cb_spnr_tt550_cw_qsk(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_cw_qsk(Hspinner* o, void*) {
 	progStatus.tt550_cw_qsk = (int)o->value();
 	cb_tt550_cw_qsk();
 }
 
-static void cb_spnr_tt550_cw_vol(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_cw_vol(Hspinner* o, void*) {
 	progStatus.tt550_cw_vol=(int)o->value();
 	cb_tt550_cw_vol();
 }
 
-static void cb_spnr_tt550_cw_spot(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_cw_spot(Hspinner* o, void*) {
 	progStatus.tt550_cw_spot=(int)o->value();
 	cb_tt550_cw_spot();
 }
@@ -731,17 +731,17 @@ static void cb_btn_tt550_enable_keyer(Fl_Check_Button* o, void*) {
 	cb_tt550_enable_keyer();
 }
 
-static void cb_spnr_tt550_vox_gain(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_vox_gain(Hspinner* o, void*) {
 	progStatus.tt550_vox_gain=(int)o->value();
 	cb_tt550_vox_gain();
 }
 
-static void cb_spnr_tt550_anti_vox(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_anti_vox(Hspinner* o, void*) {
 	progStatus.tt550_vox_anti=(int)o->value();
 	cb_tt550_vox_anti();
 }
 
-static void cb_spnr_tt550_vox_hang(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_vox_hang(Hspinner* o, void*) {
 	progStatus.tt550_vox_hang = (int)o->value();
 	cb_tt550_vox_hang();
 }
@@ -756,17 +756,17 @@ static void cb_btn_tt550_CompON(Fl_Light_Button* o, void*) {
 	cb_tt550_compression();
 }
 
-static void cb_spnr_tt550_compression(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_compression(Hspinner* o, void*) {
 	progStatus.tt550_compression=(int)o->value();
 	cb_tt550_compression();
 }
 
-static void cb_spnr_tt550_mon_vol(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_mon_vol(Hspinner* o, void*) {
 	progStatus.tt550_mon_vol=(int)o->value();
 	cb_tt550_mon_vol();
 }
 
-static void cb_spnr_tt550_line_out(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_line_out(Hspinner* o, void*) {
 	progStatus.tt550_line_out = (int)o->value();
 	cb_tt550_line_out();
 }
@@ -786,7 +786,7 @@ static void cb_cbo_tt550_agc_level(Fl_ComboBox* o, void*) {
 	cb_tt550_agc_level();
 }
 
-static void cb_spnr_tt550_vfo_adj(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_vfo_adj(Hspinner* o, void*) {
 	progStatus.vfo_adj=o->value();
 	cb_vfo_adj();
 }
@@ -816,11 +816,11 @@ static void cb_btn_tt550_use_xmt_bw(Fl_Check_Button* o, void*) {
 	cb_tt550_setXmtBW();
 }
 
-static void cb_spnr_tt550_keypad_time_out(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_keypad_time_out(Hspinner* o, void*) {
 	progStatus.tt550_keypad_timeout=(int)(o->value()*1000.0);
 }
 
-static void cb_spnr_tt550_encoder_sensitivity(Fl_Counter* o, void*) {
+static void cb_spnr_tt550_encoder_sensitivity(Hspinner* o, void*) {
 	progStatus.tt550_encoder_sensitivity = o->value();
 }
 

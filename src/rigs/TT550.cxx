@@ -20,6 +20,10 @@
 
 // TenTec Pegasus computer controlled transceiver
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <iostream>
+
 #include <math.h>
 #include <vector>
 #include <queue>
@@ -29,9 +33,11 @@
 #include "util.h"
 #include "debug.h"
 
+#include "rig.h"
+
 static const char TT550name_[] = "TT-550";
 
-enum TT550_MODES { 
+enum TT550_MODES {
 TT550_AM_MODE, TT550_USB_MODE, TT550_LSB_MODE, TT550_CW_MODE, TT550_DIGI_MODE, TT550_FM_MODE };
 
 static const char *TT550modes_[] = {
@@ -43,9 +49,9 @@ static const char TT550mode_chr[] =  { '0', '1', '2', '3', '1', '4' };
 static const char TT550mode_type[] = { 'U', 'U', 'L', 'L', 'U', 'U' };
 
 static const char *TT550_widths[] = {
-"300",  "330",  "375",  "450",  "525",   "600",  "675",  "750",  "900", "1050", 
-"1200", "1350", "1500", "1650", "1800", "1950", "2100", "2250", "2400", "2550", 
-"2700", "2850", "3000", "3300", "3600", "3900", "4200", "4500", "4800", "5100", 
+"300",  "330",  "375",  "450",  "525",   "600",  "675",  "750",  "900", "1050",
+"1200", "1350", "1500", "1650", "1800", "1950", "2100", "2250", "2400", "2550",
+"2700", "2850", "3000", "3300", "3600", "3900", "4200", "4500", "4800", "5100",
 "5400", "5700", "6000", "8000", NULL};
 
 static const int TT550_filter_nbr[] = {
@@ -53,11 +59,11 @@ static const int TT550_filter_nbr[] = {
 22, 21, 20, 19, 18, 17, 16, 15, 14, 13,
 12, 11, 10,  9,  8,  7,  6,  5,  4,  3,
  2,  1,  0, 33 };
- 
+
 static const int TT550_filter_width[] = {
- 300,  330,  375,  450,  525,  600,  675,  750,  900, 1050, 
-1200, 1350, 1500, 1650, 1800, 1950, 2100, 2250, 2400, 2550, 
-2700, 2850, 3000, 3300, 3600, 3900, 4200, 4500, 4800, 5100, 
+ 300,  330,  375,  450,  525,  600,  675,  750,  900, 1050,
+1200, 1350, 1500, 1650, 1800, 1950, 2100, 2250, 2400, 2550,
+2700, 2850, 3000, 3300, 3600, 3900, 4200, 4500, 4800, 5100,
 5400, 5700, 6000, 8000 };
 
 const char *TT550_xmt_widths[] = {
@@ -67,7 +73,7 @@ const char *TT550_xmt_widths[] = {
 static const int TT550_xmt_filter_nbr[] = {
 24, 23, 22, 21, 20, 19, 18, 17, 16,
 15, 14, 13, 12, 11, 10,  9,  8,  7};
- 
+
 static const int TT550_xmt_filter_width[] = {
  900, 1050, 1200, 1350, 1500, 1650, 1800, 1950, 2100,
 2250, 2400, 2550, 2700, 2850, 3000, 3300, 3600, 3900 };
@@ -120,10 +126,10 @@ static char TT550setALIVE_OFF[]	= "#8\r";	// disable keep alive
 //static char TT550getAGC[]			= "?Y\r";	// 0..255
 //static char TT550getFWDPWR[]		= "?F\r";	// F<0..255>
 //static char TT550getREFPWR[]		= "?R\r";	// R<0..255>
-static char TT550getSIG_LEVEL[]	= "?S\r";	// S<0..255><0..255>
+static char TT550query[]			= "?S\r";	// S<0..255><0..255>
 static char TT550getFWDREF[]		= "?S\r";	// T<0..255><0..255>
 
-static char TT550setAMCARRIER[]	= "R \r";	// enables AM mode transmit
+static char TT550setAMCARRIER[]		= "R \r";	// enables AM mode transmit
 
 static string xcvrstream = "";
 
@@ -139,7 +145,7 @@ static GUI rig_widgets[]= {
 };
 
 RIG_TT550::RIG_TT550() {
-// base class values	
+// base class values
 	name_ = TT550name_;
 	modes_ = TT550modes_;
 	bandwidths_ = TT550_widths;
@@ -180,7 +186,7 @@ RIG_TT550::RIG_TT550() {
 	has_power_out =
 	has_split =
 	has_split_AB =
-	has_swr_control = 
+	has_swr_control =
 	has_micgain_control =
 	has_power_control =
 	has_agc_level =
@@ -200,7 +206,7 @@ RIG_TT550::RIG_TT550() {
 	has_ifshift_control =
 	has_ptt_control =
 	has_bandwidth_control =
-	has_auto_notch = 
+	has_auto_notch =
 	has_tune_control =
 	has_noise_control =
 	has_mode_control = true;
@@ -231,7 +237,7 @@ void RIG_TT550::initialize()
 	rig_widgets[5].W = sldrMICGAIN;
 	rig_widgets[6].W = sldrPOWER;
 
-	sendCommand(TT550restart);
+	sendCommand(TT550restart, 14);
 
 	if (replystr.find("RADIO") == string::npos) {
 		showASCII("Power up", "DSP START");
@@ -239,10 +245,10 @@ void RIG_TT550::initialize()
 	}
 	showASCII("Init", replystr);
 
-	sendCommand("?V\r");
+	sendCommand("?V\r", 13);
 	showASCII("Version", replystr);
 
-	sendCommand(TT550setALIVE_OFF);
+	sendCommand(TT550setALIVE_OFF, 0);
 
 	set_volume_control(0);
 
@@ -266,7 +272,7 @@ void RIG_TT550::initialize()
 	set_mic_gain(progStatus.mic_gain);
 	set_mic_line(0);
 	set_rf_gain(RFgain);
-	
+
 	XitFreq = progStatus.xit_freq;
 	RitFreq = progStatus.rit_freq;
 	Bfo = progStatus.bfo_freq;
@@ -288,7 +294,7 @@ void RIG_TT550::initialize()
 
 	cmd = TT550setAMCARRIER;
 	cmd[1] = 0x0F;
-	sendCommand(cmd, 0); 
+	sendCommand(cmd, 0);
 
 	enable_tloop();
 	enable_xmtr();
@@ -376,7 +382,7 @@ LOG_INFO("rx freq = %ld", freq);
 			IBfo = IBfo + PbtAdj;
 		}
 	}
-	
+
 	if(def_mode == TT550_FM_MODE) {
 		lFreq += Bfo;
 		IBfo = 0;
@@ -499,8 +505,17 @@ LOG_WARN("set vfo A %ld", freq);
 		set_vfo(freq);
 }
 
+int enc_change = 0;
+void RIG_TT550::process_encoder(int val)
+{
+}
+
 long RIG_TT550::get_vfoA ()
 {
+	if (onA) {
+		freqA += enc_change;
+		enc_change = 0;
+	}
 	return freqA;
 }
 
@@ -514,6 +529,10 @@ LOG_WARN("set vfo B %ld", freq);
 
 long RIG_TT550::get_vfoB ()
 {
+	if (!onA) {
+		freqB += enc_change;
+		enc_change = 0;
+	}
 	return freqB;
 }
 
@@ -523,7 +542,7 @@ void RIG_TT550::set_PTT_control(int val)
 	if (val) cmd = TT550setXMT;
 	else     cmd = TT550setRCV;
 	sendCommand(cmd, 0);
-LOG_WARN("%s", str2hex(cmd.c_str(), cmd.length()));
+//LOG_WARN("%s", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_TT550::set_mode(int val)
@@ -773,12 +792,8 @@ void RIG_TT550::process_freq_entry(char c)
 		Fl::awake(hide_encA, NULL);
 		if (onA) {
 			freqA = freq;
-			set_vfoA(freqA);
-			Fl::awake(setFreqDispA, (void *)freqA);
 		} else {
 			freqB = freq;
-			set_vfoB(freqB);
-			Fl::awake(setFreqDispB, (void *)freqB);
 		}
 		xcvrstream.clear();
 		have_decimal = false;
@@ -807,7 +822,6 @@ void RIG_TT550::fkey_cw_plus()
 
 void RIG_TT550::fkey_cw_minus()
 {
-//	LOG_WARN("%s", tt550_fkey_strings[3]);set_bw
 	if (progStatus.tt550_cw_wpm <= 5) return;
 	progStatus.tt550_cw_wpm--;
 	spnr_tt550_cw_wpm->value(progStatus.tt550_cw_wpm);
@@ -831,10 +845,6 @@ static BANDS ibands[] = {
 { 29700000, 0, 1807000 }
 };
 
-extern queue<FREQMODE> queA;
-extern queue<FREQMODE> queB;
-extern bool useB;
-
 void RIG_TT550::fkey_band_plus()
 {
 	FREQMODE vfoplus = vfo;
@@ -845,10 +855,13 @@ void RIG_TT550::fkey_band_plus()
 		}
 	}
 	vfo.src = UI;
-	if (!useB)
+	if (!useB) {
+		guard_lock queA_lock(&mutex_queA, 500);
 		queA.push(vfoplus);
-	else
+	} else {
+		guard_lock queB_lock(&mutex_queB, 500);
 		queB.push(vfoplus);
+	}
 }
 
 void RIG_TT550::fkey_band_minus()
@@ -861,10 +874,13 @@ void RIG_TT550::fkey_band_minus()
 		}
 	}
 	vfo.src = UI;
-	if (!useB)
+	if (!useB) {
+		guard_lock queA_lock(&mutex_queA, 500);
 		queA.push(vfoplus);
-	else
+	} else {
+		guard_lock queB_lock(&mutex_queB, 500);
 		queB.push(vfoplus);
+	}
 }
 
 void RIG_TT550::fkey_step_plus()
@@ -885,7 +901,8 @@ void RIG_TT550::fkey_step_minus()
 
 void RIG_TT550::process_fkey(char c)
 {
-	if (c == 0x11) 
+std::cout << "fkey " << (int)c << "\n";
+	if (c == 0x11)
 		switch (progStatus.tt550_F1_func) {
 			case 1 : fkey_clear(); break;
 			case 2 : fkey_cw_plus(); break;
@@ -929,77 +946,8 @@ void RIG_TT550::process_keypad(char c)
 		process_freq_entry(c);
 }
 
-void RIG_TT550::process_encoder(string s)
+void RIG_TT550::get_302()
 {
-	size_t p = 0;
-	int encval = 0, encoder = 0;
-	size_t len = s.length();
-	while (p < len) {
-		encval = ((unsigned char)s[p+1] << 8) | (unsigned char)s[p+2];
-		if (encval > 16383) encval -= 65536;
-		encoder += encval;
-		p += 5;
-	}
-
-	encoder_count += encoder;
-	encoder = 0;
-
-	encoder = encoder_count / progStatus.tt550_encoder_sensitivity;
-	encoder_count -= encoder * progStatus.tt550_encoder_sensitivity;
-
-	if (encoder != 0) {
-		FREQMODE vfoplus = vfo;
-		vfoplus.src = UI;
-		vfoplus.freq += encoder*TT550_steps[progStatus.tt550_encoder_step];
-		if (!useB)
-			queA.push(vfoplus);
-		else
-			queB.push(vfoplus);
-	}
-}
-
-int RIG_TT550::get_smeter()
-{
-	int sval = 0;
-	float fval;
-
-	cmd = TT550getSIG_LEVEL;
-	sendCommand(cmd);
-
-	string meter = "";
-	string keys = "";
-	string encoder = "";
-
-	size_t p = 0;
-	size_t len = replystr.length();
-	char c;
-	while (p < len) {
-		c = replystr[p];
-		if (c == 'S' || c == 'U' || c == '!') break;
-		p++;
-	}
-	while (p < len) {
-		if (replystr[p] == 'S') {
-			meter += replystr[p++];
-			if (p < len) meter += replystr[p++];
-			if (p < len) meter += replystr[p++];
-			if (p < len) meter += replystr[p++];
-			if (p < len) meter += replystr[p++];
-			if (p < len) meter += replystr[p++];
-		} else if (replystr[p] == 'U') {
-			keys += replystr[p++];
-			if (p < len) keys += replystr[p++];
-			if (p < len) keys += replystr[p++];
-		} else if (replystr[p] == '!') {
-			encoder += replystr[p++];
-			if (p < len) encoder += replystr[p++];
-			if (p < len) encoder += replystr[p++];
-			if (p < len) encoder += replystr[p++];
-			if (p < len) encoder += replystr[p++];
-		} else
-			break;
-	}
-
 	if (keypad_timeout) {
 		keypad_timeout--;
 		if (keypad_timeout == 0) {
@@ -1007,33 +955,80 @@ int RIG_TT550::get_smeter()
 			Fl::awake(hide_encA, NULL);
 		}
 	}
-// process all smeter returns, retain last
-	p = 0;
-	len = meter.length();
-	if (len) {
-		while (p < len) {
-			sscanf(&replystr[p+1], "%4x", &sval);
-			fval = sval/256.0;
-			sval = (int)(fval * 100.0 / 18.0);
-			if (sval > 100) sval = 100;
-//printf("%s %6.2f %d\n", str2hex(&replystr[p+1],4), fval, sval);
-			p += 6;
+// reading any pending encoder / keyboard strings
+	size_t p = 0;
+	int encval = 0;
+	int encode = 0;
+	size_t len;
+
+	if (!readResponse()) return;
+
+	pending.append(replystr);
+	len = replystr.length();
+
+	while (p < len) {
+		switch (replystr[p]) {
+			case 'U' :
+				if (len - p < 3) {
+					pending.erase(0,p);
+					break;
+				}
+				process_keypad(replystr[p+1]);
+				p += 3;
+				break;
+			case '!' :
+				if (len - p < 5) {
+					pending.erase(0,p);
+					break;
+				}
+				encval = ((unsigned char)replystr[p+1] << 8) | (unsigned char)replystr[p+2];
+				if (encval > 16383) encval -= 65536;
+				encode += encval;
+				p += 5;
+				break;
+			default :
+				p++;
+				break;
 		}
 	}
+	if (encode)
+		enc_change = encode * TT550_steps[progStatus.tt550_encoder_step];
+}
 
-// process all keypad entries
+int RIG_TT550::get_smeter()
+{
+	int sval = 0;
+	float fval;
+	int fp;
+	size_t p;
+	size_t len;
+
+	get_302();
+
 	p = 0;
-	len = keys.length();
-	if (len) {
-		while (p < len) {
-			process_keypad(keys[p+1]);
-			p += 3;
-		}
+	sendCommand( TT550query, 0);
+	len = readResponse();
+
+	while ((p < len) && (replystr[p] != 'S') && (replystr[p] != 'T'))
+		p++;
+	if (p) {
+		pending.append(replystr.substr(0,p));
+		replystr.erase(0,p);
 	}
 
-// process all encoder changes
-	if (!encoder.empty()) {
-		process_encoder(encoder);
+	len = replystr.length();
+
+	if (replystr[0] == 'S' && len > 5) {
+		sscanf(&replystr[1], "%4x", &sval);
+		fval = sval/256.0;
+		sval = (int)(fval * 100.0 / 18.0);
+		if (sval > 100) sval = 0;
+		Fl::awake(updateFwdPwr, (void*)0);
+	}
+
+	else if (replystr[0] == 'T' && len > 3) {
+		fp = (unsigned char)replystr[1];
+		Fl::awake(updateFwdPwr, reinterpret_cast<void*>(fp));
 	}
 
 	return sval;
@@ -1055,14 +1050,17 @@ int RIG_TT550::get_swr()
 int RIG_TT550::get_power_out()
 {
 	cmd = TT550getFWDREF;
-	int ret = sendCommand(cmd);
+	int ret = sendCommand(cmd, 4);
+
 	if (ret < 4) return fwdpwr;
 	size_t p = replystr.rfind("T");
 	if (p == string::npos) return fwdpwr;
 
-	fwdpwr = 0.8*fwdpwr + 0.2*(unsigned char)replystr[p+1];
-	refpwr = 0.8*refpwr + 0.2*(unsigned char)replystr[p+2];
-//LOG_INFO("%s // %4.1f : %4.1f", str2hex(replystr.c_str(), replystr.length()), fwdpwr, refpwr);
+std::cout << (int)replystr[p+1] << " : " << (int)replystr[p+2] << "\n";
+
+	fwdpwr = (unsigned char)replystr[p+1];
+	refpwr = (unsigned char)replystr[p+2];
+
 	return fwdpwr;
 }
 
@@ -1311,7 +1309,7 @@ void RIG_TT550::set_noise_reduction(int b)
 	noise_reduction = b;
 	cmd = TT550setNRNOTCH;
 	if (b)
-		cmd[1] = '1'; 
+		cmd[1] = '1';
 	else
 		cmd[1] = '0';
 	cmd[2] = auto_notch ? '1' : '0';
@@ -1346,6 +1344,9 @@ void RIG_TT550::get_mic_min_max_step(int &min, int &max, int &step)
 	step = 1;
 }
 
+float pwr_set[] =
+{ 0, 3, 6, 10, 13, 17, 20, 24, 28, 34, 40, 46, 52, 59, 67, 75, 82, 90, 98, 104, 109 };
+
 void RIG_TT550::set_power_control(double val)
 {
 	if (def_mode == TT550_AM_MODE) {
@@ -1355,7 +1356,13 @@ void RIG_TT550::set_power_control(double val)
 	} else {
 		progStatus.power_level = (int) val;
 		cmd =  TT550setPOWER;
-		cmd[1] = (unsigned char)(val * 2.55);
+		size_t sel = 0;
+		for (sel = 0; sel < sizeof(pwr_set); sel++)
+			if (pwr_set[sel] >= val) break;
+		sel--;
+		float v = 5.0 * (sel + 1.0 * (val - pwr_set[sel])/(pwr_set[sel+1]-pwr_set[sel]));
+		cmd[1] = (unsigned char)(v * 2.55);
+//		cmd[1] = (unsigned char)(val * 2.55);
 	}
 	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
 	sendCommand(cmd, 0);
@@ -1517,7 +1524,7 @@ void cb_tt550_enable_tloop()
 void cb_tt550_nb_level()
 {
 	pthread_mutex_lock(&mutex_serial);
-	progStatus.tt550_nb_level = cbo_tt550_nb_level->index();
+//	progStatus.tt550_nb_level = cbo_tt550_nb_level->index();
 	selrig->set_nb_level();
 	pthread_mutex_unlock(&mutex_serial);
 }
@@ -1555,24 +1562,24 @@ void cb_tt550_cw_qsk()
        ==========================================================
 
 ========================= start program ======================================
-WRITE Length 3: 
+WRITE Length 3:
 58 58 0D                                  "XX"
 
-READ  Length 2: 
-0D 0D 
+READ  Length 2:
+0D 0D
 READ  Length 14:
 20 20 52 41 44 49 4F 20 53 54 41 52 54 0D "  RADIO START"
 
-WRITE Length 3: 
+WRITE Length 3:
 3F 56 0D                                  "?V"  version?
 READ  Length 13:
 56 45 52 20 31 32 39 31 2D 35 33 38 0D    "VER 1291.538"
 
-WRITE Length 7: 
+WRITE Length 7:
 4D 31 31 0D                               "M11" mode - USB / USB
 50 2B 0D                                  "P+"  power = 16.8 watts
 
-WRITE Length 28: 
+WRITE Length 28:
 47 31 0D                                  "G1" agc - slow
 4E 51 5C 0A A9 67 70 0D                   "N...." Receive tuning factor
 54 51 5C 0A A9 12 20 0D                   "T...." Transmit tuning factor
@@ -1580,10 +1587,10 @@ WRITE Length 28:
 56 3E 0D                                  "V." Volume 24
 4C 00 0D                                  "L0" Line out - 0, full output
 
-WRITE Length 3: 
+WRITE Length 3:
 50 2B 0D                                  "P+" power = 16.8 watts
 
-WRITE Length 3: 
+WRITE Length 3:
 4A 29 0D                                  "J." sidetone volume = 16
 
 WRITE Length 13:
@@ -1591,38 +1598,38 @@ WRITE Length 13:
 55 47 0F 0D                               "UG." Vox gain = 15
 55 48 0F 0D                               "UH." Vox hang = 15
 
-WRITE Length 16: 
+WRITE Length 16:
 55 41 5D 0D                               "UA." Antivox = 36
 55 30 0D                                  "U0" Vox OFF
 48 00 0D                                  "H." Audio monitor volume = 0
 23 32 0D                                  "#2" Disable 'T' loop
 23 31 0D                                  "#1" Enable transmitter
 
-WRITE Length 26: 
+WRITE Length 26:
 43 0A 0D                                  "C." Transmit filter width = 3000
 23 36 0D                                  "#6" Enable keyer
 53 00 0D                                  "S." Squelch = 0, OFF
 52 0F 0D                                  "R." UNKNOWN
-45 01 1F 03 5D 01 1F 0D                   "E...." Keyer timing 
+45 01 1F 03 5D 01 1F 0D                   "E...." Keyer timing
 44 00 0D                                  "D." Noise blanker = 0, OFF
 59 00 0D                                  "Y." Speech processor = 0, OFF
 
-WRITE Length 8: 
+WRITE Length 8:
 55 51 00 0D                               "UQ." set CW QSK = 0..255
 55 54 00 0D                               "UT." set AUX TX HANG = 0..255 (aux T/R delay)
 
 ============================ smeter query ======================================
-WRITE Length 3: 
+WRITE Length 3:
 3F 53 0D                                  "?S" read smeter
-READ	Length 6: 
+READ	Length 6:
 53 30 39 31 42 0D                         "S...." smeter value
 
 ============================== close program ====================================
 
-WRITE Length 3: 
+WRITE Length 3:
 56 00 0D                                  "V0" volume = ZERO
 
-WRITE Length 3: 
+WRITE Length 3:
 4C 3F 0D                                  "L." Line out = 63, MINIMUM
 
 

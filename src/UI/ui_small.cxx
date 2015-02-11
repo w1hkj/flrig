@@ -552,8 +552,8 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			spnr_tt550_cw_wpm = new Hspinner(
 				2, 280, 
 				70, 22, _("wpm"));
-			spnr_tt550_cw_wpm->type(1);
-			spnr_tt550_cw_wpm->minimum(5);
+			spnr_tt550_cw_wpm->type(FL_INT_INPUT);
+			spnr_tt550_cw_wpm->minimum(1);
 			spnr_tt550_cw_wpm->maximum(80);
 			spnr_tt550_cw_wpm->step(1);
 			spnr_tt550_cw_wpm->value(24);
@@ -743,7 +743,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			cbo_tt550_nb_level = new Fl_ComboBox(
 				4, 280, 
 				80, 22, _("NB level"));
-			cbo_tt550_nb_level->tooltip(_("Select Transceiver"));
+				cbo_tt550_nb_level->tooltip(_("Select Noise Blanker level"));
 			cbo_tt550_nb_level->box(FL_DOWN_BOX);
 			cbo_tt550_nb_level->color(FL_WHITE);
 			cbo_tt550_nb_level->selection_color(FL_BACKGROUND_COLOR);
@@ -762,7 +762,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 				cbo_tt550_nb_level->x() +
 				cbo_tt550_nb_level->w() + 5, 280,
 				80, 22, _("AGC"));
-			cbo_tt550_agc_level->tooltip(_("Select Transceiver"));
+			cbo_tt550_agc_level->tooltip(_("Select AGC"));
 			cbo_tt550_agc_level->box(FL_DOWN_BOX);
 			cbo_tt550_agc_level->color(FL_WHITE);
 			cbo_tt550_agc_level->selection_color(FL_BACKGROUND_COLOR);
@@ -780,12 +780,14 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			spnr_tt550_vfo_adj = new Hspinner(
 				cbo_tt550_agc_level->x() +
 				cbo_tt550_agc_level->w() + 5, 280, 
-				90, 22, _("Vfo Adj(ppm)"));
+				90, 22, _("Vfo Adj(ppm)"), 16);
 			spnr_tt550_vfo_adj->callback((Fl_Callback*)cb_spnr_tt550_vfo_adj);
-			spnr_tt550_vfo_adj->align(Fl_Align(34));
-			spnr_tt550_vfo_adj->value(progStatus.vfo_adj);
-			spnr_tt550_vfo_adj->step(0.1);
 			spnr_tt550_vfo_adj->align(FL_ALIGN_BOTTOM | FL_ALIGN_CENTER);
+			spnr_tt550_vfo_adj->minimum(-100);
+			spnr_tt550_vfo_adj->maximum(100);
+			spnr_tt550_vfo_adj->type(FL_FLOAT_INPUT);
+			spnr_tt550_vfo_adj->step(0.1);
+			spnr_tt550_vfo_adj->value(progStatus.vfo_adj);
 
 		tt550_Rx->end();
 
@@ -835,7 +837,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 		tt550_302A = new Fl_Group(2, 272, 420, 50, _("302-A"));
 			tt550_302A->hide();
 
-			spnr_tt550_keypad_time_out = new Hspinner(30, 280, 120, 22, _("Time out"));
+			spnr_tt550_keypad_time_out = new Hspinner(30, 280, 120, 22, _("Time out"), 16);
 			spnr_tt550_keypad_time_out->tooltip(_("Clear M302 keypad after ## secs"));
 			spnr_tt550_keypad_time_out->minimum(0.5);
 			spnr_tt550_keypad_time_out->maximum(10);
@@ -849,7 +851,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 
 			spnr_tt550_encoder_sensitivity = new Hspinner(
 				spnr_tt550_keypad_time_out->x() +
-				spnr_tt550_keypad_time_out->w() + 10, 280, 80, 22, _("Sensitivity"));
+				spnr_tt550_keypad_time_out->w() + 10, 280, 80, 22, _("Sensitivity"), 16);
 			spnr_tt550_encoder_sensitivity->tooltip(_("1 - most sensitive"));
 			spnr_tt550_encoder_sensitivity->type(1);
 			spnr_tt550_encoder_sensitivity->minimum(1);
@@ -983,7 +985,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 
 			spnr_cw_wpm = new Hspinner(
 				4, 280,
-				85, 22, _("wpm"));
+				85, 22, _("wpm"), 16);
 			spnr_cw_wpm->type(1);
 			spnr_cw_wpm->minimum(5);
 			spnr_cw_wpm->maximum(80);
@@ -995,7 +997,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 
 			spnr_cw_weight = new Hspinner(
 				spnr_cw_wpm->x() + spnr_cw_wpm->w() + 4, 280,
-				85, 22, _("Weight"));
+				85, 22, _("Weight"), 16);
 			spnr_cw_weight->type(1);
 			spnr_cw_weight->minimum(2.5);
 			spnr_cw_weight->maximum(4.5);
@@ -1008,7 +1010,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 
 			spnr_cw_spot_tone= new Hspinner(
 				spnr_cw_weight->w() + spnr_cw_weight->x() + 4, 280,
-				85, 22, _("Spot tone"));
+				85, 22, _("Spot tone"), 16);
 			spnr_cw_spot_tone->tooltip(_("Spot volume"));
 			spnr_cw_spot_tone->type(1);
 			spnr_cw_spot_tone->minimum(300);
@@ -1049,7 +1051,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 
 			spnr_cw_qsk = new Hspinner(
 				btnBreakIn->x() + btnBreakIn->w() + 4, 280,
-				85, 22, _("Bk-in Dly"));
+				85, 22, _("Bk-in Dly"), 16);
 			spnr_cw_qsk->tooltip(_("msec"));
 			spnr_cw_qsk->type(1);
 			spnr_cw_qsk->minimum(0);
@@ -1062,7 +1064,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 
 			spnr_cw_delay = new Hspinner(
 				spnr_cw_qsk->x() + spnr_cw_qsk->w() + 4, 280, 
-				120, 22, _("QSK delay"));
+				120, 22, _("QSK delay"), 16);
 			spnr_cw_delay->tooltip(_("msec"));
 			spnr_cw_delay->type(0);
 			spnr_cw_delay->minimum(30);
@@ -1079,7 +1081,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 
 			spnr_vox_gain = new Hspinner(
 				4, 280, 
-				80, 22, _("gain"));
+				80, 22, _("gain"), 16);
 			spnr_vox_gain->type(1);
 			spnr_vox_gain->minimum(0);
 			spnr_vox_gain->maximum(100);
@@ -1090,7 +1092,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 
 			spnr_anti_vox = new Hspinner(
 				spnr_vox_gain->x() + spnr_vox_gain->w() + 10, 280,
-				80, 22, _("anti"));
+				80, 22, _("anti"), 16);
 			spnr_anti_vox->type(1);
 			spnr_anti_vox->minimum(0);
 			spnr_anti_vox->maximum(100);
@@ -1101,7 +1103,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 
 			spnr_vox_hang = new Hspinner(
 				spnr_anti_vox->x() + spnr_anti_vox->w() + 10, 280, 
-				80, 22, _("hang"));
+				80, 22, _("hang"), 16);
 			spnr_vox_hang->type(1);
 			spnr_vox_hang->minimum(0);
 			spnr_vox_hang->maximum(100);

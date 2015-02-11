@@ -1285,7 +1285,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				tt550_Rx->hide();
 
 				cbo_tt550_nb_level = new Fl_ComboBox(xpos+80, by, 89, bh, _("NB level"));
-				cbo_tt550_nb_level->tooltip(_("Select Transceiver"));
+				cbo_tt550_nb_level->tooltip(_("Select Noise Blanker level"));
 				cbo_tt550_nb_level->box(FL_DOWN_BOX);
 				cbo_tt550_nb_level->color(FL_BACKGROUND_COLOR);
 				cbo_tt550_nb_level->selection_color(FL_BACKGROUND_COLOR);
@@ -1303,7 +1303,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 					cbo_tt550_nb_level->x() +
 					cbo_tt550_nb_level->w() + 60, by,
 					90, bh, _("AGC"));
-				cbo_tt550_agc_level->tooltip(_("Select Transceiver"));
+				cbo_tt550_agc_level->tooltip(_("Select AGC"));
 				cbo_tt550_agc_level->box(FL_DOWN_BOX);
 				cbo_tt550_agc_level->color(FL_BACKGROUND_COLOR);
 				cbo_tt550_agc_level->selection_color(FL_BACKGROUND_COLOR);
@@ -1322,9 +1322,12 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 					cbo_tt550_agc_level->w() + 120, by,
 					5*bh, bh, _("Vfo Adj(ppm)"));
 				spnr_tt550_vfo_adj->callback((Fl_Callback*)cb_spnr_tt550_vfo_adj);
-				spnr_tt550_vfo_adj->align(Fl_Align(36));
+				spnr_tt550_vfo_adj->align(FL_ALIGN_BOTTOM | FL_ALIGN_CENTER);
+				spnr_tt550_vfo_adj->minimum(-100);
+				spnr_tt550_vfo_adj->maximum(100);
+				spnr_tt550_vfo_adj->type(FL_FLOAT_INPUT);
+				spnr_tt550_vfo_adj->step(0.1);
 				spnr_tt550_vfo_adj->value(progStatus.vfo_adj);
-				spnr_tt550_vfo_adj->step(1.0);
 
 			tt550_Rx->end();
 
@@ -1350,7 +1353,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				op_tt550_XmtBW = new Fl_ComboBox(xpos+462, by, 112, bh, _("Xmt BW"));
 				op_tt550_XmtBW->tooltip(_("Select Transceiver Bandwidth"));
 				op_tt550_XmtBW->box(FL_DOWN_BOX);
-				op_tt550_XmtBW->color(FL_BACKGROUND_COLOR);
+				op_tt550_XmtBW->color(FL_WHITE);
 				op_tt550_XmtBW->selection_color(FL_BACKGROUND_COLOR);
 				op_tt550_XmtBW->labeltype(FL_NORMAL_LABEL);
 				op_tt550_XmtBW->labelfont(0);

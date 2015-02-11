@@ -22,6 +22,7 @@
 #define _TT550_H
 // TenTec Pegasus computer controlled transceiver
 
+#include <string>
 #include "rigbase.h"
 
 class RIG_TT550 : public rigbase {
@@ -52,12 +53,16 @@ private:
 	bool auto_notch;
 	bool noise_reduction;
 
+	std::string pending;
+
 	void showASCII(string, string);
 
 	void set_vfoRX(long freq);
 	void set_vfoTX(long freq);
 
-	void process_encoder( string s );
+	void get_302();
+
+	void process_encoder( int v );
 	void process_keypad(char c);
 	void process_freq_entry(char c);
 	void process_fkey(char c);

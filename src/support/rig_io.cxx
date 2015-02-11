@@ -163,6 +163,7 @@ int readResponse()
 	}
 	if (numread)
 		LOG_DEBUG("rsp:%3d, %s", numread, str2hex(replystr.c_str(), replystr.length()));
+//LOG_WARN("rsp:%3d, %s", numread, str2hex(replystr.c_str(), replystr.length()));
 	return numread;
 }
 
