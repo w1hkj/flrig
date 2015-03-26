@@ -55,6 +55,9 @@ int BaudRate(int n)
 
 bool startXcvrSerial()
 {
+	debug::level_e level = debug::level;
+	debug::level = debug::DEBUG_LEVEL;
+
 	bypass_serial_thread_loop = true;
 // setup commands for serial port
 	if (progStatus.xcvr_serial_port == "NONE") {
@@ -76,12 +79,12 @@ bool startXcvrSerial()
 	if (!RigSerial.OpenPort()) {
 		LOG_ERROR("Cannot access %s", progStatus.xcvr_serial_port.c_str());
 		return false;
-	} else if (debug::level == debug::DEBUG_LEVEL) {
+	} else {
 		LOG_DEBUG("\n\
 Serial port:\n\
     Port     : %s\n\
     Baud     : %d\n\
-	Stopbits : %d\n\
+    Stopbits : %d\n\
     Retries  : %d\n\
     Timeout  : %d\n\
     Loop     : %d\n\
@@ -106,7 +109,9 @@ Serial port:\n\
 	}
 
 	RigSerial.FlushBuffer();
-//	bypass_serial_thread_loop = false;
+
+	debug::level = level;
+
 	return true;
 }
 
@@ -187,8 +192,10 @@ int sendCommand (string s, int nread)
 		return readResponse();
 	}
 
-	if (RigSerial.IsOpen() == false)
+	if (RigSerial.IsOpen() == false) {
+		replystr.clear();
 		return 0;
+	}
 
 	LOG_DEBUG("cmd:%3d, %s", (int)s.length(), str2hex(s.data(), s.length()));
 
@@ -288,6 +295,7 @@ void clearSerialPort()
 {
 	if (RigSerial.IsOpen() == false) return;
 	RigSerial.FlushBuffer();
+	replystr.clear();
 }
 
 void showresp(int level, int how, string s, string tx, string rx) 

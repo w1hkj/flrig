@@ -95,6 +95,7 @@ private:
 	int  if_min;
 	int  if_max;
 
+	bool  split_on;
 /*
 	int  get_swr();
 	void tune_rig();

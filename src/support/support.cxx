@@ -706,7 +706,7 @@ void serviceB()
 	}
 
 // if TT550 or K3 and split or on vfoA just update the B vfo
-	if (selrig->can_change_alt_vfo && !useB) {
+	if ((rig_nbr == K3) || (selrig->can_change_alt_vfo && !useB)) {
 		selrig->set_vfoB(vfoB.freq);
 		goto end_serviceB;
 	}

@@ -345,6 +345,8 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 	return 0;
 }
 
+int report_level = INFO;
+
 int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 {
 	char sztemp[50];
@@ -361,7 +363,7 @@ int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 
 	if(!progStatus.use_tcpip && !RigSerial.IsOpen()) {
 		snprintf(sztemp, sizeof(sztemp), "TEST %s", sz);
-		showresp(WARN, pr, sztemp, tosend, replystr);
+		showresp(report_level, pr, sztemp, tosend, replystr);
 		return 0;
 	}
 
@@ -376,7 +378,7 @@ int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 			replystr = returned;
 			waited = cnt * 10 + delay;
 			snprintf(sztemp, sizeof(sztemp), "%s OK %d ms", sz, waited);
-			showresp(WARN, pr, sztemp, cmd, returned);
+			showresp(report_level, pr, sztemp, cmd, returned);
 			return replystr.length();
 		}
 		MilliSleep(10);
