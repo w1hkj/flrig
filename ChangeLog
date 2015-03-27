@@ -1,8 +1,15 @@
 
 
-=Version 1.3.20=
+=Version 1.3.21=
 
-2015-02-11  David Freese  <iam_w1hkj@w1hkj.com>
+2015-03-27  David Freese  <iam_w1hkj@w1hkj.com>
+
+	d4f4f36: KX3
+	45dc545: K3 update
+	1f086c2: FSF address
+
+
+=Version 1.3.20=
 
 	399b37b: TT550 update
 	6739d81: fix ab
