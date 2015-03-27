@@ -215,6 +215,14 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				btn_K3_swapAB->callback((Fl_Callback*)cb_btn_K3_swapAB);
 				btn_K3_swapAB->hide();
 
+				btn_KX3_swapAB = new Fl_Button(
+					btnA->x(), btnA->y() + btnA->h() + 2, 69, 20, _("A/B"));
+				btn_KX3_swapAB->tooltip(_("Swap A/B"));
+				btn_KX3_swapAB->down_box(FL_DOWN_BOX);
+				btn_KX3_swapAB->labelsize(12);
+				btn_KX3_swapAB->callback((Fl_Callback*)cb_btn_KX3_swapAB);
+				btn_KX3_swapAB->hide();
+
 				btnB = new Fl_Light_Button(
 					btnA->x() + btnA->w() + 2, btnA->y(), 69, 20, _("vfoB"));
 				btnB->tooltip(_("Rx-B / Tx-B"));

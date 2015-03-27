@@ -25,6 +25,7 @@
 #include "status.h"
 #include "support.h"
 #include "K3_ui.h"
+#include "KX3_ui.h"
 #include "socket_io.h"
 #include "hspinner.h"
 #include "ui.h"
@@ -74,6 +75,7 @@ Fl_Light_Button *btnAutoNotch=(Fl_Light_Button *)0;
 Fl_Group *grp_row1b2=(Fl_Group *)0;
 Fl_Button *btnAswapB=(Fl_Button *)0;
 Fl_Button *btn_K3_swapAB=(Fl_Button *)0;
+Fl_Button *btn_KX3_swapAB=(Fl_Button *)0;
 Fl_Light_Button *btnB=(Fl_Light_Button *)0;
 Fl_Light_Button *btnSplit=(Fl_Light_Button *)0;
 Fl_Light_Button *btnPTT=(Fl_Light_Button *)0;
@@ -366,6 +368,9 @@ static void cb_btn_K3_swapAB(Fl_Button*, void*) {
 	cb_K3_swapAB();
 }
 
+static void cb_btn_KX3_swapAB(Fl_Button*, void*) {
+	cb_KX3_swapAB();
+}
 
 static void cb_btnB(Fl_Light_Button*, void*) {
 	if (Fl::event_button() == FL_RIGHT_MOUSE) {

@@ -41,6 +41,7 @@
 #include "rig.h"
 #include "rigs.h"
 #include "K3_ui.h"
+#include "KX3_ui.h"
 
 #include "rigpanel.h"
 
@@ -881,6 +882,10 @@ void * serial_thread_loop(void *d)
 					if (que_pending()) continue;
 					read_K3();
 				}
+				else if (rig_nbr == KX3) {
+					if (que_pending()) continue;
+					read_KX3();
+				}
 				else if ((rig_nbr == K2) ||
 						 (selrig->has_get_info &&
 						 (progStatus.poll_frequency || progStatus.poll_mode || progStatus.poll_bandwidth))) {
@@ -1408,6 +1413,10 @@ void cbA2B()
 {
 	if (rig_nbr == K3) {
 		K3_A2B();
+		return;
+	}
+	if (rig_nbr == KX3) {
+		KX3_A2B();
 		return;
 	}
 	if (rig_nbr == K2) {
@@ -3758,9 +3767,16 @@ void initRig()
 	if (rig_nbr == K3) {
 		btnB->hide();
 		btnA->hide();
+		btn_KX3_swapAB->hide();
 		btn_K3_swapAB->show();
+	} else if (rig_nbr == KX3) {
+		btnB->hide();
+		btnA->hide();
+		btn_K3_swapAB->hide();
+		btn_KX3_swapAB->show();
 	} else {
 		btn_K3_swapAB->hide();
+		btn_KX3_swapAB->hide();
 		btnB->show();
 		btnA->show();
 	}

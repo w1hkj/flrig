@@ -86,6 +86,7 @@ extern Fl_Group *grp_row0a;
 
 extern Fl_Light_Button *btnA;
 extern Fl_Button *btn_K3_swapAB;
+extern Fl_Button *btn_KX3_swapAB;
 extern Fl_Light_Button *btnB;
 extern Fl_Button *btnTune;
 extern Fl_Box *bx_row0_expander;

@@ -7,8 +7,8 @@
 </center>
 \anchor ek_k3_a
 <center>
-\image latex K3.png "K3" width=3.75in
-\image html  K3.png "K3"
+\image latex K3.png "K3/KX3" width=3.75in
+\image html  K3.png "K3/KX3"
 </center>
 \ref elecraft_rigs "Page Top"
 \ref sFlrigDesc "Return to Main Page"

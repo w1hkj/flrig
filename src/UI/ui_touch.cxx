@@ -644,6 +644,13 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		btn_K3_swapAB->callback((Fl_Callback*)cb_btn_K3_swapAB);
 		btn_K3_swapAB->hide();
 
+		btn_KX3_swapAB = new Fl_Button(xpos, ypos, bw, bh, _("A/B"));
+		btn_KX3_swapAB->tooltip(_("Swap A/B"));
+		btn_KX3_swapAB->down_box(FL_DOWN_BOX);
+		btn_KX3_swapAB->labelsize(16);
+		btn_KX3_swapAB->callback((Fl_Callback*)cb_btn_KX3_swapAB);
+		btn_KX3_swapAB->hide();
+
 		xpos += btn_K3_swapAB->w() + 2;
 		btnSplit = new Fl_Light_Button(xpos, ypos, bw, bh, _("Split"));
 		btnSplit->tooltip(_("Rx-A / Tx-B"));

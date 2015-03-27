@@ -131,6 +131,7 @@ flrig_SOURCES += \
 	rigs/IC7700.cxx \
 	rigs/K2.cxx \
 	rigs/K3.cxx \
+	rigs/KX3.cxx \
 	rigs/PCR1000.cxx \
 	rigs/RAY152.cxx \
 	rigs/TS140.cxx \
@@ -162,6 +163,7 @@ flrig_SOURCES += \
 	support/threads.cxx \
 	support/util.cxx \
 	UI/K3_ui.cxx \
+	UI/KX3_ui.cxx \
 	UI/rigpanel.cxx \
 	widgets/combo.cxx \
 	widgets/Fl_SigBar.cxx \
@@ -269,6 +271,8 @@ EXTRA_DIST = \
 	include/K2.h \
 	include/K3.h \
 	include/K3_ui.h \
+	include/KX3.h \
+	include/KX3_ui.h \
 	include/PCR1000.h \
 	include/RAY152.h \
 	include/mingw.h \

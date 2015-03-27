@@ -59,6 +59,7 @@
 #include "IC9100.h"
 #include "K2.h"
 #include "K3.h"
+#include "KX3.h"
 #include "PCR1000.h"
 #include "RAY152.h"
 #include "TS140.h"
@@ -119,24 +120,25 @@ extern RIG_IC9100		rig_IC9100;		// 36
 extern RIG_IC910H		rig_IC910H;		// 37
 extern RIG_K2			rig_K2;			// 38
 extern RIG_K3			rig_K3;			// 39
-extern RIG_PCR1000		rig_PCR1000;	// 40
-extern RIG_RAY152		rig_RAY152;		// 41
-extern RIG_TS140		rig_TS140;		// 42
-extern RIG_TS450S		rig_TS450S;		// 43
-extern RIG_TS480HX		rig_TS480HX;	// 44
-extern RIG_TS480SAT	rig_TS480SAT;	// 45
-extern RIG_TS570		rig_TS570;		// 46
-extern RIG_TS590S		rig_TS590S;		// 47
-extern RIG_TS870S		rig_TS780S;		// 48 wbx
-extern RIG_TS990		rig_TS990;		// 49 G0HIX
-extern RIG_TS2000		rig_TS2000;		// 50
-extern RIG_TT516		rig_TT516;		// 51
-extern RIG_TT535		rig_TT535;		// 52
-extern RIG_TT538		rig_TT538;		// 53
-extern RIG_TT550		rig_TT550;		// 54
-extern RIG_TT563		rig_TT563;		// 55
-extern RIG_TT566		rig_TT566;		// 56
-extern RIG_TT588		rig_TT588;		// 57
-extern RIG_TT599		rig_TT599;		// 58
+extern RIG_KX3			rig_KX3;		// 40
+extern RIG_PCR1000		rig_PCR1000;	// 41
+extern RIG_RAY152		rig_RAY152;		// 42
+extern RIG_TS140		rig_TS140;		// 43
+extern RIG_TS450S		rig_TS450S;		// 44
+extern RIG_TS480HX		rig_TS480HX;	// 45
+extern RIG_TS480SAT	rig_TS480SAT;	// 46
+extern RIG_TS570		rig_TS570;		// 47
+extern RIG_TS590S		rig_TS590S;		// 48
+extern RIG_TS870S		rig_TS780S;		// 49 wbx
+extern RIG_TS990		rig_TS990;		// 50 G0HIX
+extern RIG_TS2000		rig_TS2000;		// 51
+extern RIG_TT516		rig_TT516;		// 52
+extern RIG_TT535		rig_TT535;		// 53
+extern RIG_TT538		rig_TT538;		// 54
+extern RIG_TT550		rig_TT550;		// 55
+extern RIG_TT563		rig_TT563;		// 56
+extern RIG_TT566		rig_TT566;		// 57
+extern RIG_TT588		rig_TT588;		// 58
+extern RIG_TT599		rig_TT599;		// 59
 
 #endif

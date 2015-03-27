@@ -290,6 +290,13 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	btn_K3_swapAB->callback((Fl_Callback*)cb_btn_K3_swapAB);
 	btn_K3_swapAB->hide();
 
+	btn_KX3_swapAB = new Fl_Button(265, 62, 52, 20, _("A/B"));
+	btn_KX3_swapAB->tooltip(_("Swap A/B"));
+	btn_KX3_swapAB->down_box(FL_DOWN_BOX);
+	btn_KX3_swapAB->labelsize(12);
+	btn_KX3_swapAB->callback((Fl_Callback*)cb_btn_KX3_swapAB);
+	btn_KX3_swapAB->hide();
+
 	btnAswapB = new Fl_Button(318, 62, 52, 20, _("A<->B"));
 	btnAswapB->tooltip(_("Left click:Swap A/B\nRight click:Copy A to B"));
 	btnAswapB->down_box(FL_DOWN_BOX);
