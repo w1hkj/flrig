@@ -512,9 +512,10 @@ int RIG_K3::get_noise()
 	return (replystr[p+2] == '1' ? 1 : 0);
 }
 
-//FW $ (Filter Bandwidth and Number; GET/SET)
-//K3 Extended SET/RSP format (K31): FWxxxx; where xxxx is 0-9999, the bandwidth in 10-Hz units. May be
-//quantized and/or range limited based on the present operating mode.
+// FW $ (Filter Bandwidth and Number; GET/SET)
+// K3 Extended SET/RSP format (K31): FWxxxx; where xxxx is 0-9999, the bandwidth
+// in 10-Hz units. May be quantized and/or range limited based on the present 
+// operating mode.
 
 void RIG_K3::set_bwA(int val)
 {
@@ -554,10 +555,10 @@ void RIG_K3::set_bwB(int val)
 	cmd = "FW$0000;";
 	bwA = val;
 	val = atoi(K3_widths[val]);
+	val /= 10; cmd[6] += val % 10;
 	val /= 10; cmd[5] += val % 10;
 	val /= 10; cmd[4] += val % 10;
 	val /= 10; cmd[3] += val % 10;
-	val /= 10; cmd[2] += val % 10;
 	sendCommand(cmd);
 	showresp(INFO, ASC, "set bw B", cmd, replystr);
 }

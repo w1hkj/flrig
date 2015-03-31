@@ -506,13 +506,13 @@ int RIG_KX3::get_noise()
 	return (replystr[p+2] == '1' ? 1 : 0);
 }
 
-//FW $ (Filter Bandwidth and Number; GET/SET)
-//KX3 Extended SET/RSP format (KX31): FWxxxx; where xxxx is 0-9999, the bandwidth in 10-Hz units. May be
-//quantized and/or range limited based on the present operating mode.
+// BW $ (Filter Bandwidth and Number; GET/SET)
+// KX3 Extended SET/RSP format (K31): BWxxxx; where xxxx is 0-9999, the bandwidth in 10-Hz units. May be
+// quantized and/or range limited based on the present operating mode.
 
 void RIG_KX3::set_bwA(int val)
 {
-	cmd = "FW0000;";
+	cmd = "BW0000;";
 	bwA = val;
 	val = atoi(KX3_widths[val]);
 	val /= 10; cmd[5] += val % 10;
@@ -525,7 +525,7 @@ void RIG_KX3::set_bwA(int val)
 
 int RIG_KX3::get_bwA()
 {
-	cmd = "FW;";
+	cmd = "BW;";
 	int ret = wait_char(';', 7, KX3_WAIT_TIME, "get bandwidth A", ASC);
 	if (ret < 7) return bwA;
 	size_t p = replystr.rfind("FW");
@@ -545,20 +545,20 @@ void RIG_KX3::set_bwB(int val)
 		LOG_INFO("split on");
 		return;
 	}
-	cmd = "FW$0000;";
+	cmd = "BW$0000;";
 	bwA = val;
 	val = atoi(KX3_widths[val]);
+	val /= 10; cmd[6] += val % 10;
 	val /= 10; cmd[5] += val % 10;
 	val /= 10; cmd[4] += val % 10;
 	val /= 10; cmd[3] += val % 10;
-	val /= 10; cmd[2] += val % 10;
 	sendCommand(cmd);
 	showresp(INFO, ASC, "set bw B", cmd, replystr);
 }
 
 int RIG_KX3::get_bwB()
 {
-	cmd = "FW$;";
+	cmd = "BW$;";
 	int ret = wait_char(';', 8, KX3_WAIT_TIME, "get bandwidth B", ASC);
 	if (ret < 8) return bwB;
 	size_t p = replystr.rfind("FW$");
