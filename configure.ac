@@ -36,7 +36,7 @@ AC_CANONICAL_HOST
 # define target, target_cpu, target_vendor, target_os
 AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE([-Wall foreign std-options subdir-objects 1.9.6])
+AM_INIT_AUTOMAKE([-Wall -Wno-portability foreign std-options subdir-objects 1.9.6])
 
 #change the next config item for the specific application src's
 AC_CONFIG_SRCDIR([src/main.cxx])
@@ -48,55 +48,17 @@ AC_PROG_CXX
 AC_PROG_CC
 AC_USE_SYSTEM_EXTENSIONS
 
+# Checks for libraries.
+
 # Checks for header files.
-AC_HEADER_STDC
-AC_HEADER_DIRENT
-AC_CHECK_HEADERS([arpa/inet.h execinfo.h fcntl.h limits.h memory.h netdb.h netinet/in.h regex.h stdint.h stdlib.h string.h strings.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h sys/utsname.h termios.h unistd.h values.h linux/ppdev.h dev/ppbus/ppi.h])
+AC_CHECK_HEADERS([stdlib.h string.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
-AC_C_CONST
-AC_C_INLINE
-AC_TYPE_INT16_T
-AC_TYPE_INT32_T
-AC_TYPE_INT64_T
-AC_TYPE_INT8_T
-AC_C_RESTRICT
 AC_TYPE_SIZE_T
-AC_HEADER_TIME
-AC_STRUCT_TM
-AC_TYPE_UINT16_T
-AC_TYPE_UINT32_T
-AC_TYPE_UINT64_T
-AC_TYPE_UINT8_T
-AC_C_VOLATILE
 
 # Checks for library functions.
-AC_FUNC_CLOSEDIR_VOID
-AC_FUNC_ERROR_AT_LINE
-AC_PROG_GCC_TRADITIONAL
-dnl AC_FUNC_MALLOC
-dnl AC_FUNC_REALLOC
-AC_FUNC_SELECT_ARGTYPES
-AC_TYPE_SIGNAL
-AC_FUNC_STRFTIME
-AC_FUNC_STRTOD
 AC_CHECK_FUNCS([getaddrinfo gethostbyname hstrerror gmtime_r localtime_r memmove memset mkdir select setenv snprintf socket socketpair strcasecmp strcasestr strchr strdup strerror strlcpy strncasecmp strrchr strstr strtol uname unsetenv vsnprintf])
-
-### X11
-# Set ac_cv_x to yes/no
-# Define USE_X in config.h
-# Substitute X_CFLAGS and X_LIBS in Makefile
-if test "x$target_darwin" = "xno" && test "x$target_win32" = "xno"; then
-    AC_FLRIG_PKG_CHECK([x], [x11], [no], [yes])
-fi
-
-# Checks for typedefs, structures, and compiler characteristics.
-AC_HEADER_STDBOOL
-AC_TYPE_SIZE_T
-
-# Checks for library functions.
-AC_CHECK_FUNCS([strstr])
 
 ### static flag
 # Set ac_cv_static to yes/no
@@ -121,11 +83,16 @@ AC_FL_DEBUG
 # Set DARWIN Makefile conditional
 # Substitute MAC_UNIVERSAL_CFLAGS and MAC_UNIVERSAL_LDFLAGS in Makefile
 AC_FL_MACOSX
+
 ### win32
 # Set WIN32 Makefile conditional
 # Set HAVE_WINDRES Makefile conditional
 # Substitute WINDRES in Makefile
 AC_FL_WIN32
+
+### Non-POSIX compatibility (i.e. mingw32)
+# Sets various Makefile conditionals; see m4/np-compat.m4
+AC_FLRIG_NP_COMPAT
 
 ### FLTK
 # Substitute FLTK_CFLAGS and FLTK_LIBS in Makefile
@@ -133,16 +100,22 @@ AC_FL_WIN32
 # Set HAVE_FLUID Makefile conditional
 AC_CHECK_FLTK
 
-### XML-RPC library
-# Set ac_cv_xmlrpc to yes/no
-# Substitute XMLRPC_CFLAGS and XMLRPC_LIBS in Makefile
-# Define USE_XMLRPC in config.h
-# Set ENABLE_XMLRPC Makefile conditional
-#AC_FLRIG_XMLRPC
+### X11
+# Set ac_cv_x to yes/no
+# Define USE_X in config.h
+# Substitute X_CFLAGS and X_LIBS in Makefile
+if test "x$target_darwin" = "xno" && test "x$target_win32" = "xno"; then
+    AC_FLRIG_PKG_CHECK([x], [x11], [no], [yes])
+fi
 
-### Non-POSIX compatibility (i.e. mingw32)
-# Sets various Makefile conditionals; see m4/np-compat.m4
-AC_FL_NP_COMPAT
+### libflxmlrpc
+# Set ac_cv_flxmlrpc to yes/no
+# Define USE_FLXMLRPC in config.h
+# Substitute FLXMLRPC_CFLAGS and FLXMLRPC_LIBS in Makefile
+
+AC_FLRIG_PKG_CHECK([flxmlrpc], [flxmlrpc >= 0.1.0], 
+  [yes], [yes], [use external flxmlrpc library @<:@autodetect@:>@],
+  [ENABLE_FLXMLRPC])
 
 ### build info
 # Define various build variables in config.h
@@ -159,6 +132,8 @@ Configuration summary:
   Version ..................... $VERSION
   
   Target OS ................... $target_os
+
+  Have flxmlrpc library ....... $ac_cv_flxmlrpc
 
   Static linking .............. $ac_cv_static
   CPU optimizations ........... $ac_cv_opt

@@ -1,5 +1,5 @@
 # args: function, search-libs, other-libraries
-AC_DEFUN([AC_FL_SEARCH_LIBS], [
+AC_DEFUN([AC_FLRIG_SEARCH_LIBS], [
 
 m4_define([FUNC_NAME_UC], m4_translit([$1], [a-z], [A-Z]))
 

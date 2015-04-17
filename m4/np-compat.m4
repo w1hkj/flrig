@@ -1,4 +1,4 @@
-AC_DEFUN([AC_FL_NP_COMPAT], [
+AC_DEFUN([AC_FLRIG_NP_COMPAT], [
   AC_REQUIRE([AC_FL_MACOSX])
   AC_REQUIRE([AC_FL_WIN32])
 
@@ -20,10 +20,10 @@ AC_DEFUN([AC_FL_NP_COMPAT], [
       other_libs=-lws2_32
   fi
 
-  AC_FL_SEARCH_LIBS([dlopen], [dl], [$other_libs])
-  AC_FL_SEARCH_LIBS([clock_gettime], [rt], [$other_libs])
-  AC_FL_SEARCH_LIBS([sem_unlink], [$sem_libs], [$other_libs])
-  AC_FL_SEARCH_LIBS([sem_timedwait], [$sem_libs], [$other_libs])
+  AC_FLRIG_SEARCH_LIBS([dlopen], [dl], [$other_libs])
+  AC_FLRIG_SEARCH_LIBS([clock_gettime], [rt], [$other_libs])
+  AC_FLRIG_SEARCH_LIBS([sem_unlink], [$sem_libs], [$other_libs])
+  AC_FLRIG_SEARCH_LIBS([sem_timedwait], [$sem_libs], [$other_libs])
 
   if test "x$ac_cv_want_ptw32" = "xyes"; then
       CFLAGS="$CFLAGS_saved"

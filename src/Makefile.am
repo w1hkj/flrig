@@ -2,12 +2,6 @@
 
 bin_PROGRAMS = flrig
 
-flrig_CPPFLAGS = @FLRIG_BUILD_CPPFLAGS@
-flrig_CXXFLAGS = @FLRIG_BUILD_CXXFLAGS@
-flrig_CFLAGS = $(flrig_CXXFLAGS)
-flrig_LDFLAGS = @FLRIG_BUILD_LDFLAGS@
-flrig_LDADD = @FLRIG_BUILD_LDADD@
-
 MINGW32_SRC = \
 	flrig-rc.rc \
 	include/flrigrc.h \
@@ -15,11 +9,51 @@ MINGW32_SRC = \
 	include/compat.h \
 	include/compat-mingw.h
 
+# Build the xmlrpcpp source if libflxmlrpc is not found
+XMLRPCPP_SRC = \
+	xmlrpcpp/XmlRpcBase64.h \
+	xmlrpcpp/XmlRpcClient.cpp \
+	xmlrpcpp/XmlRpcClient.h \
+	xmlrpcpp/XmlRpcDispatch.cpp \
+	xmlrpcpp/XmlRpcDispatch.h \
+	xmlrpcpp/XmlRpcException.h \
+	xmlrpcpp/XmlRpc.h \
+	xmlrpcpp/XmlRpcMutex.cpp \
+	xmlrpcpp/XmlRpcMutex.h \
+	xmlrpcpp/XmlRpcServerConnection.cpp \
+	xmlrpcpp/XmlRpcServerConnection.h \
+	xmlrpcpp/XmlRpcServer.cpp \
+	xmlrpcpp/XmlRpcServer.h \
+	xmlrpcpp/XmlRpcServerMethod.cpp \
+	xmlrpcpp/XmlRpcServerMethod.h \
+	xmlrpcpp/XmlRpcSocket.cpp \
+	xmlrpcpp/XmlRpcSocket.h \
+	xmlrpcpp/XmlRpcSource.cpp \
+	xmlrpcpp/XmlRpcSource.h \
+	xmlrpcpp/XmlRpcUtil.cpp \
+	xmlrpcpp/XmlRpcUtil.h \
+	xmlrpcpp/XmlRpcValue.cpp \
+	xmlrpcpp/XmlRpcValue.h
 
 # We distribute these but do not always compile them
-EXTRA_flrig_SOURCES = $(FLRIG_WIN32_RES_SRC) $(MINGW32_SRC)
+EXTRA_flrig_SOURCES = $(FLRIG_WIN32_RES_SRC) $(MINGW32_SRC) $(XMLRPCPP_SRC)
 
 flrig_SOURCES =
+
+if !ENABLE_FLXMLRPC
+  flrig_SOURCES += $(XMLRPCPP_SRC)
+  flrig_CPPFLAGS = @FLRIG_BUILD_CPPFLAGS@
+  flrig_CXXFLAGS = @FLRIG_BUILD_CXXFLAGS@
+  flrig_CFLAGS = $(flrig_CXXFLAGS)
+  flrig_LDFLAGS = @FLRIG_BUILD_LDFLAGS@
+  flrig_LDADD = @FLRIG_BUILD_LDADD@
+else
+  flrig_CPPFLAGS = @FLRIG_BUILD_CPPFLAGS@ @FLXMLRPC_CFLAGS@
+  flrig_CXXFLAGS = @FLRIG_BUILD_CXXFLAGS@ @FLXMLRPC_CFLAGS@
+  flrig_CFLAGS = $(flrig_CXXFLAGS)
+  flrig_LDFLAGS = @FLRIG_BUILD_LDFLAGS@ @FLXMLRPC_LIBS@
+  flrig_LDADD = @FLRIG_BUILD_LDADD@
+endif
 
 if MINGW32
 if HAVE_WINDRES
@@ -173,35 +207,7 @@ flrig_SOURCES += \
 	widgets/FreqControl.cxx \
 	widgets/hspinner.cxx \
 	widgets/ValueSlider.cxx \
-	server/xml_server.cxx \
-	xmlrpcpp/XmlRpc.h \
-	xmlrpcpp/XmlRpcClient.cpp \
-	xmlrpcpp/XmlRpcClient.h \
-	xmlrpcpp/XmlRpcDispatch.cpp \
-	xmlrpcpp/XmlRpcDispatch.h \
-	xmlrpcpp/XmlRpcException.h \
-	xmlrpcpp/XmlRpcMutex.cpp \
-	xmlrpcpp/XmlRpcMutex.h \
-	xmlrpcpp/XmlRpcServer.cpp \
-	xmlrpcpp/XmlRpcServer.h \
-	xmlrpcpp/XmlRpcServerConnection.cpp \
-	xmlrpcpp/XmlRpcServerConnection.h \
-	xmlrpcpp/XmlRpcServerMethod.cpp \
-	xmlrpcpp/XmlRpcServerMethod.h \
-	xmlrpcpp/XmlRpcSocket.cpp \
-	xmlrpcpp/XmlRpcSocket.h \
-	xmlrpcpp/XmlRpcSource.cpp \
-	xmlrpcpp/XmlRpcSource.h \
-	xmlrpcpp/XmlRpcThread.cpp \
-	xmlrpcpp/XmlRpcThread.h \
-	xmlrpcpp/XmlRpcThreadedServer.cpp \
-	xmlrpcpp/XmlRpcThreadedServer.h \
-	xmlrpcpp/XmlRpcUtil.cpp \
-	xmlrpcpp/XmlRpcUtil.h \
-	xmlrpcpp/XmlRpcValue.cpp \
-	xmlrpcpp/XmlRpcValue.h \
-	xmlrpcpp/base64.h
-
+	server/xml_server.cxx 
 
 # Additional source files that are distributed
 EXTRA_DIST = \

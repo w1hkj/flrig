@@ -1,10 +1,13 @@
+2015-04-17  David Freese  <iam_w1hkj@w1hkj.com>
+
+	09bdd0e: xmlrpcpp
+	48a04fb: xml server
+	e6b132d: K3/KX3 bandwidth
 
 
 =Version 1.3.21=
 
-2015-03-27  David Freese  <iam_w1hkj@w1hkj.com>
-
-	d4f4f36: KX3
+	b02f095: KX3
 	45dc545: K3 update
 	1f086c2: FSF address
 
