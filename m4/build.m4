@@ -53,13 +53,19 @@ $X_CFLAGS -pipe -Wall -fexceptions $OPT_CFLAGS $DEBUG_CFLAGS $PTW32_CFLAGS"
   AC_FLRIG_SH_DQ([echo $ac_configure_args])
   AC_DEFINE_UNQUOTED([BUILD_CONFIGURE_ARGS], [$ac_sh_dq], [Configure arguments])
 
-  AC_FLRIG_SH_DQ([date])
+# Allow BUILD_DATE, BUILD_USER, BUILD_HOST to be externally overridden by
+# environment variables.
+
+  ac_sh_dq="\"$BUILD_DATE\""
+  test "x$BUILD_DATE" = "x" && AC_FLRIG_SH_DQ([date])
   AC_DEFINE_UNQUOTED([BUILD_DATE], [$ac_sh_dq], [Build date])
 
-  AC_FLRIG_SH_DQ([whoami])
+  ac_sh_dq="\"$BUILD_USER\""
+  test "x$BUILD_USER" = "x" && AC_FLRIG_SH_DQ([whoami])
   AC_DEFINE_UNQUOTED([BUILD_USER], [$ac_sh_dq], [Build user])
 
-  AC_FLRIG_SH_DQ([hostname])
+  ac_sh_dq="\"$BUILD_HOST\""
+  test "x$BUILD_HOST" = "x" && AC_FLRIG_SH_DQ([hostname])
   AC_DEFINE_UNQUOTED([BUILD_HOST], [$ac_sh_dq], [Build host])
 
   AC_FLRIG_SH_DQ([$CXX -v 2>&1 | tail -1])
