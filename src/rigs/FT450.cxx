@@ -29,6 +29,7 @@ static const char mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '8', '9', '
 static const char mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L', 'U', 'U', 'U' };
 
 static const char *FT450_widths[] = {"NARR", "NORM", "WIDE", NULL};
+static int FT450_wvals_widths[] = {1, 2, 3, WVALS_LIMIT};
 
 static const char *FT450_US_60m[] = {NULL, "126", "127", "128", "130", NULL};
 // US has 5 60M presets. Using dummy numbers for all.
@@ -57,6 +58,7 @@ RIG_FT450::RIG_FT450() {
 	name_ = FT450name_;
 	modes_ = FT450modes_;
 	bandwidths_ = FT450_widths;
+	bw_vals_ = FT450_wvals_widths;
 
 	widgets = rig_widgets;
 

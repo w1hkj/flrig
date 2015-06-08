@@ -35,10 +35,19 @@ static const char mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '8', '9', '
 static const char mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L', 'U', 'U', 'U' };
 
 static const char *FT450D_ssb_widths[]  = {"1800", "2400", "3000", NULL};
+static int FT450D_wvals_ssb_widths[] = {1, 2, 3, WVALS_LIMIT};
+
 static const char *FT450D_cw_widths[]   = {"300", "500", "2400", NULL};
+static int FT450D_wvals_cw_widths[] = {1, 2, 3, WVALS_LIMIT};
+
 static const char *FT450D_data_widths[] = {"300", "2400", "3000", NULL};
+static int FT450D_wvals_data_widths[] = {1, 2, 3, WVALS_LIMIT};
+
 static const char *FT450D_am_widths[]   = {"3000", "6000", "9000", NULL};
+static int FT450D_wvals_am_widths[] = {1, 2, 3, WVALS_LIMIT};
+
 static const char *FT450D_fm_widths[]   = {"2500", "5000", NULL};
+static int FT450D_wvals_fm_widths[] = {1, 2, WVALS_LIMIT};
 
 static const int FT450D_def_bw[] = {
   2, 2, 0, 1, 1, 0, 0, 1, 0, 1, 1 };
@@ -72,6 +81,7 @@ RIG_FT450D::RIG_FT450D() {
 	name_ = FT450Dname_;
 	modes_ = FT450Dmodes_;
 	bandwidths_ = FT450D_ssb_widths;
+	bw_vals_ = FT450D_wvals_ssb_widths;
 
 	widgets = rig_widgets;
 
@@ -506,22 +516,27 @@ int RIG_FT450D::adjust_bandwidth(int val)
 		case mCW     :
 		case mCW_R   :
 			bandwidths_ = FT450D_cw_widths;
+			bw_vals_ = FT450D_wvals_cw_widths;
 			break;
 		case mFM     :
 		case mFM_N   :
 			bandwidths_ = FT450D_fm_widths;
+			bw_vals_ = FT450D_wvals_fm_widths;
 			break;
 		case mAM :
 			bandwidths_ = FT450D_am_widths;
+			bw_vals_ = FT450D_wvals_am_widths;
 			break;
 		case mRTTY_L :
 		case mRTTY_U :
 		case mDATA_L :
 		case mDATA_U :
 			bandwidths_ = FT450D_data_widths;
+			bw_vals_ = FT450D_wvals_data_widths;
 			break;
 		default:
 			bandwidths_ = FT450D_ssb_widths;
+			bw_vals_ = FT450D_wvals_ssb_widths;
 			break;
 	}
 	return FT450D_def_bw[val];

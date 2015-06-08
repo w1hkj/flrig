@@ -35,6 +35,9 @@ static const char FT1000_mode_type[] = {
 static const char *FT1000_widths[] = {
 "2400", "2000", "500", "250", "6000", NULL };
 
+static int FT1000_bw_vals[] = {
+1,2,3,4,5, WVALS_LIMIT};
+
 
 // FT1000 class
 RIG_FT1000::RIG_FT1000() {

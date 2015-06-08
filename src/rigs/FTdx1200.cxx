@@ -22,8 +22,6 @@
 #include "debug.h"
 #include "support.h"
 
-#define WVALS_LIMIT -1
-
 enum mFTdx1200 {
   mLSB, mUSB, mCW, mFM, mAM, mRTTY_L, mCW_R, mDATA_L, mRTTY_U, mFM_N, mDATA_U };
 //  0,    1,    2,   3,   4,   5,       6,     7,      8,       9,       10   	// mode index
@@ -58,7 +56,7 @@ static const char *FTdx1200_widths_SSBD[] = {
 "2000", "2400", NULL }; // def_bw = 16 for DATA, 6 for RTTY
 
 static int FTdx1200_wvals_SSBD[] = {
-1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, WVALS_LIMIT};
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, WVALS_LIMIT};
 
 static const char *FTdx1200_widths_CW[] = {
   "50",  "150",  "100",  "150",  "200",
@@ -67,7 +65,7 @@ static const char *FTdx1200_widths_CW[] = {
 "2000", "2400", NULL }; // def_bw = 10
 
 static int FTdx1200_wvals_CW[] = {
-1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, WVALS_LIMIT};
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, WVALS_LIMIT};
 
 // Single bandwidth modes
 static const char *FTdx1200_widths_FMnar[] = { "NARR", NULL };

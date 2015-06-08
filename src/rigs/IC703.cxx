@@ -29,6 +29,7 @@ const char *IC703modes_[] = { "LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "R
 const char IC703_mode_type[] = {'L', 'U', 'U', 'L', 'L', 'U', 'U', 'U', 'L', 'U' };
 
 const char *IC703_widths[] = { "NARR", "MED", "WIDE", NULL};
+static int IC703_bw_vals[] = {1,2,3, WVALS_LIMIT};
 
 static GUI IC703_widgets[]= {
 	{ (Fl_Widget *)btnVol, 2, 125,  50 },
@@ -49,6 +50,7 @@ RIG_IC703::RIG_IC703() {
 	modes_ = IC703modes_;
  	_mode_type = IC703_mode_type;
 	bandwidths_ = IC703_widths;
+	bw_vals_ = IC703_bw_vals;
 	comm_baudrate = BR9600;
 	stopbits = 2;
 	comm_retries = 2;

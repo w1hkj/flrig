@@ -29,11 +29,13 @@ const char IC706MKIIG_mode_type[] =
 	{ 'L', 'U', 'U', 'L', 'L', 'U', 'U'};
 //const char *IC706MKIIG_widths[] = { "WIDE", "NARR", NULL};
 const char *IC706MKIIG_widths[] = { "n/a", NULL};
+static int IC706MKIIG_bw_vals[] = { 1, WVALS_LIMIT};
 
 RIG_IC706MKIIG::RIG_IC706MKIIG() {
 	name_ = IC706MKIIGname_;
 	modes_ = IC706MKIIGmodes_;
 	bandwidths_ = IC706MKIIG_widths;
+	bw_vals_ = IC706MKIIG_bw_vals;
 	_mode_type = IC706MKIIG_mode_type;
 	comm_baudrate = BR19200;
 	stopbits = 1;

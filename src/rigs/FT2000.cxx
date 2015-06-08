@@ -34,12 +34,24 @@ static const char FT2000_mode_type[] = {
 
 static const char *FT2000_SSBwidths[] = {
 "NORM", "200", "400", "600", "850", "1100", "1350", "1500", "1650", "1800", "1950", "2100", "2250", NULL};
+static int FT2000_wvals_SSBwidths[] = {
+1,2,3,4,5,6,7,8,9,10,11,12,13, WVALS_LIMIT};
+
 static const char *FT2000_CWwidths[] = {
 "NORM", "50", "100", "200", "300", "400", "500", "800", "1200", "1400", "1700", "2000", NULL};
+static int FT2000_wvals_CWwidths[] = {
+1,2,3,4,5,6,7,8,9,10,11,12, WVALS_LIMIT};
+
 static const char *FT2000_PKT_RTTYwidths[] = {
 "NORM", "25", "50", "100", "200", "300", "400", NULL};
+static int FT2000_wvals_PKT_RTTYwidths[] = {
+1,2,3,4,5,6,7, WVALS_LIMIT};
+
 static const char *FT2000_AMFMwidths[] = {
 "NORM", "NARR", NULL};
+static int FT2000_wvals_AMFMwidths[] = {
+1,2, WVALS_LIMIT};
+
 
 static const char *FT2000_US_60m[] = {NULL, "126", "127", "128", "130", NULL};
 // US has 5 60M presets. Using dummy numbers for all.
@@ -78,6 +90,7 @@ RIG_FT2000::RIG_FT2000() {
 	name_ = FT2000name_;
 	modes_ = FT2000modes_;
 	bandwidths_ = FT2000_SSBwidths;
+	bw_vals_ = FT2000_wvals_SSBwidths;
 
 	widgets = rig_widgets;
 
@@ -425,18 +438,22 @@ int RIG_FT2000::adjust_bandwidth(int m)
 	switch (m) {
 		case 0 : case 1 :
 			bandwidths_ = FT2000_SSBwidths;
+			bw_vals_ = FT2000_wvals_SSBwidths;
 			bwA = 0;
 			break;
 		case 2 : case 6 :
 			bandwidths_ = FT2000_CWwidths;
+			bw_vals_ = FT2000_wvals_CWwidths;
 			bwA = 0;
 			break;
 		case 5 : case 7 : case 8 : case 11 :
 			bandwidths_ = FT2000_PKT_RTTYwidths;
+			bw_vals_ = FT2000_wvals_PKT_RTTYwidths;
 			bwA = 0;
 			break;
 		case 3 : case 4 : case 9 : case 10 :
 			bandwidths_ = FT2000_AMFMwidths;
+			bw_vals_ = FT2000_wvals_AMFMwidths;
 			bwA = 0;
 			break;
 	}

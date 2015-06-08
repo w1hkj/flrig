@@ -44,6 +44,8 @@ RIG_FT920::RIG_FT920() {
 	name_ = FT920name_;
 	modes_ = FT920modes_;
 	bandwidths_ = FT920widths_;
+	bw_vals_ = FT920_bw_val;
+
 	comm_baudrate = BR4800;
 	stopbits = 2;
 	comm_retries = 2;

@@ -43,6 +43,8 @@ RIG_FT100D::RIG_FT100D() {
 	name_ = FT100Dname_;
 	modes_ = FT100Dmodes_;
 	bandwidths_ = FT100Dwidths_;
+	bw_vals_ = FT100D_bw_val;
+
 	comm_baudrate = BR4800;
 	stopbits = 2;
 	comm_retries = 2;

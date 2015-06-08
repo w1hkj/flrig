@@ -45,6 +45,9 @@ static const char FT990_mode_type[] = {
 static const char *FT990widths_[] =
 { "2400", "2000", "500", "250", "6000", NULL};
 
+static int FT990_bw_vals[] = {
+1,2,3,4,5,WVALS_LIMIT};
+
 static const int FT990_bw_val[] =
 { 0, 1, 2, 3, 4 };
 
@@ -52,6 +55,8 @@ RIG_FT990::RIG_FT990() {
 	name_ = FT990name_;
 	modes_ = FT990modes_;
 	bandwidths_ = FT990widths_;
+	bw_vals_ = FT990_bw_vals;
+
 	comm_baudrate = BR4800;
 	stopbits = 2;
 	comm_retries = 2;

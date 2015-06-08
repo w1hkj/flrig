@@ -41,6 +41,12 @@ const char *IC7200_SSBwidths[] = {
 "2600", "2700", "2800", "2900", "3000", "3100", "3200", "3300", "3400", "3500",
 "3600",
 NULL};
+static int IC7200_bw_vals_SSB[] = {
+ 1, 2, 3, 4, 5, 6, 7, 8, 9,10,
+11,12,13,14,15,16,17,18,19,20,
+21,22,23,24,25,26,27,28,29,30,
+31,32,33,34,35,36,37,38,39,40,
+41, WVALS_LIMIT};
 
 const char *IC7200_RTTYwidths[] = {
   "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
@@ -48,6 +54,11 @@ const char *IC7200_RTTYwidths[] = {
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
 "2600", "2700",
 NULL};
+static int IC7200_bw_vals_RTTY[] = {
+ 1, 2, 3, 4, 5, 6, 7, 8, 9,10,
+11,12,13,14,15,16,17,18,19,20,
+21,22,23,24,25,26,27,28,29,30,
+31,32, WVALS_LIMIT};
 
 const char *IC7200_AMwidths[] = {
   "200",  "400",  "600",  "800", "1000", "1200", "1400", "1600", "1800", "2000",
@@ -55,6 +66,12 @@ const char *IC7200_AMwidths[] = {
  "4200", "4400", "4600", "4800", "5000", "5200", "5400", "5600", "5800", "5000",
  "6200", "6400", "6600", "6800", "6000", "6200", "6400", "6600", "6800", "6000",
 NULL};
+static int IC7200_bw_vals_AM[] = {
+ 1, 2, 3, 4, 5, 6, 7, 8, 9,10,
+11,12,13,14,15,16,17,18,19,20,
+21,22,23,24,25,26,27,28,29,30,
+31,32,33,34,35,36,37,38,39,40,
+WVALS_LIMIT};
 
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol, 2, 125,  50 },
@@ -77,6 +94,7 @@ RIG_IC7200::RIG_IC7200() {
 	modes_ = IC7200modes_;
 	_mode_type = IC7200_mode_type;
 	bandwidths_ = IC7200_SSBwidths;
+	bw_vals_ = IC7200_bw_vals_SSB;
 	widgets = rig_widgets;
 
 	comm_baudrate = BR9600;
@@ -683,16 +701,19 @@ int RIG_IC7200::adjust_bandwidth(int m)
 	switch (m) {
 		case 2: // AM
 			bandwidths_ = IC7200_AMwidths;
+			bw_vals_ = IC7200_bw_vals_AM;
 			bwA = 30;
 			break;
 		case 3:
 		case 5: // CW
 			bandwidths_ = IC7200_SSBwidths;
+			bw_vals_ = IC7200_bw_vals_SSB;
 			bwA = 14;
 			break;
 		case 4:
 		case 6: // RTTY
 			bandwidths_ = IC7200_RTTYwidths;
+			bw_vals_ = IC7200_bw_vals_RTTY;
 			bwA = 28;
 			break;
 		case 0:
@@ -701,6 +722,7 @@ int RIG_IC7200::adjust_bandwidth(int m)
 		case 8: 
 		default: // SSB
 			bandwidths_ = IC7200_SSBwidths;
+			bw_vals_ = IC7200_bw_vals_SSB;
 			bwA = 32;
 	}
 	return bwA;

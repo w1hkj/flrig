@@ -30,12 +30,14 @@ static const char TS570_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'U' }
 
 static const char *TS570_SSBwidths[] = { // same for AM and FM
 "NARR", "WIDE", NULL};
+static int TS570_SSB_bw_vals[] = { 1,2, WVALS_LIMIT};
 
 static const char *TS570_SSBbw[] = {
 "FW0000;", "FW0001;", NULL};
 
 static const char *TS570_CWwidths[] = {
 "50", "100", "200", "300", "400", "600", "1000", "2000", NULL};
+static int TS570_CW_bw_vals[] = { 1,2,3,4,5,6,7,8, WVALS_LIMIT};
 
 static const char *TS570_CWbw[] = {
 "FW0050;", "FW0100;", "FW0200;", "FW0300;",
@@ -43,6 +45,7 @@ static const char *TS570_CWbw[] = {
 
 static const char *TS570_FSKwidths[] = {
 "250", "500", "1000", "1500", NULL};
+static int TS570_FSK_bw_vals[] = { 1,2,3,4, WVALS_LIMIT};
 
 static const char *TS570_FSKbw[] = {
   "FW0250;", "FW0500;", "FW1000;", "FW1500;", NULL};
@@ -84,6 +87,7 @@ RIG_TS570::RIG_TS570() {
 	name_ = TS570name_;
 	modes_ = TS570modes_;
 	bandwidths_ = TS570_SSBwidths;
+	bw_vals_ = TS570_SSB_bw_vals;
 
 	widgets = rig_widgets;
 
@@ -423,16 +427,19 @@ void RIG_TS570::set_widths()
 	case 3:
 	case 4:
 	bandwidths_ = TS570_SSBwidths;
+	bw_vals_ = TS570_SSB_bw_vals;
 	A.iBW = 1;
 	break;
 	case 2:
 	case 6:
 	bandwidths_ = TS570_CWwidths;
+	bw_vals_ = TS570_CW_bw_vals;
 	A.iBW = 5;
 	break;
 	case 5:
 	case 7:
 	bandwidths_ = TS570_FSKwidths;
+	bw_vals_ = TS570_FSK_bw_vals;
 	A.iBW = 2;
 	break;
 	default:
@@ -523,14 +530,17 @@ int RIG_TS570::adjust_bandwidth(int val)
 	case 3:
 	case 4:
 		bandwidths_ = TS570_SSBwidths;
+		bw_vals_ = TS570_SSB_bw_vals;
 		return 1;
 	case 2:
 	case 6:
 		bandwidths_ = TS570_CWwidths;
+		bw_vals_ = TS570_CW_bw_vals;
 		return 5;
 	case 5:
 	case 7:
 		bandwidths_ = TS570_FSKwidths;
+		bw_vals_ = TS570_FSK_bw_vals;
 		return 2;
 	}
 	return 1;

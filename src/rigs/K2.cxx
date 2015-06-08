@@ -33,6 +33,7 @@ static const char K2_mode_type[] =
 	{'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L', 'U', 'U'};
 
 const char *K2_widths[] = {"FL1", "FL2", "FL3", "FL4", NULL};
+static int K2_bw_vals[] = { 1, 2, 3, 4, WVALS_LIMIT};
 
 static GUI k2_widgets[]= {
 	{ (Fl_Widget *)sldrPOWER, 266, 105, 156 },
@@ -44,6 +45,7 @@ RIG_K2::RIG_K2() {
 	name_ = K2name_;
 	modes_ = K2modes_;
 	bandwidths_ = K2_widths;
+	bw_vals_ = K2_bw_vals;
 
 	widgets = k2_widgets;
 

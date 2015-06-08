@@ -23,8 +23,6 @@
 #include "debug.h"
 #include "support.h"
 
-#define WVALS_LIMIT -1
-
 #define FL950_WAIT_TIME 200
 
 enum mFT950 {

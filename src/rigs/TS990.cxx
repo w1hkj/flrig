@@ -65,6 +65,7 @@ static const char *TS990_filt_width[] = {
  "250",  "300",  "400",  "500",  "600",
 "1000", "1500", "2000", "2200", "2400",
 "2600", "2800", "3000", NULL };
+static int TS990_WIDTH_bw_vals[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,WVALS_LIMIT};
 
 static const char *TS990_CAT_filt_width[] = {
 "00;", "01;", "02;", "03;", "04;",
@@ -101,6 +102,7 @@ static const char *TS990_filt_hi[] = {
 "1000", "1200", "1400", "1600", "1800",
 "2000", "2200", "2400", "2600", "2800",
 "3000", "3400", "4000", "5000", NULL };
+static int TS990_HI_bw_vals[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,WVALS_LIMIT};
 
 static const char *TS990_CAT_filt_hi[] = {
 "00;", "01;", "02;", "03;", "04;",
@@ -135,6 +137,7 @@ static const char *TS990_CW_width[] = {
   "50",   "80",  "100",  "150", "200",
  "250",  "300",  "400",  "500", "600",
 "1000", "1500", "2000", "2500",  NULL };
+static int TS990_CW_bw_vals[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,WVALS_LIMIT};
 
 static const char *TS990_CAT_CW_width[] = {
 "00;", "01;", "02;", "03;", "04;",
@@ -178,6 +181,7 @@ static const char *TS990_AM_btn_lo_label = "L";
 
 static const char *TS990_AM_hi[] = {
 "2500", "3000", "4000", "5000", NULL };
+static int TS990_AM_HI_bw_vals[] = { 1,2,3,4,WVALS_LIMIT};
 
 static const char *TS990_CAT_AM_hi[] = {
 "00;", "01;", "02;", "03;", NULL};
@@ -189,6 +193,7 @@ static const char *TS990_AM_btn_hi_label = "H";
 
 static const char *TS990_FSK_filt[] = {
 "250", "300", "400", "500", "1000", "1500", NULL};
+static int TS990_FSK_bw_vals[] = {1,2,3,4,5,6,WVALS_LIMIT};
 
 static const char *TS990_CAT_FSK_filt[] = {
 "00;", "01;", "02;", "03;", "04;", "05;", NULL };
@@ -198,6 +203,7 @@ static const char *TS990_CAT_FSK_filt[] = {
 static const char *TS990_PSK_filt[] = {
 "50",   "80",  "100",  "150", "200", "250",  "300",  "400",  "500", "600",
 "1000", "1500", NULL};
+static int TS990_PSK_bw_vals[] = {1,2,3,4,5,6,7,8,9,10,11,12,WVALS_LIMIT};
 
 static const char *TS990_CAT_PSK_filt[] = {
 "00;", "01;", "02;", "03;", "04;",
@@ -317,6 +323,7 @@ RIG_TS990::RIG_TS990() {
 	B.iBW = B_default_HI_LO;
 
 	bandwidths_ = TS990_filt_hi;
+	bw_vals_ = TS990_HI_bw_vals;
 
 	dsp_lo     = TS990_filt_lo;
 	lo_tooltip = TS990_filt_lo_tooltip;
@@ -1172,6 +1179,7 @@ int RIG_TS990::set_widths(int val)
 	case LSB: case USB:
 		if (menu_0607) {
 			bandwidths_ = TS990_filt_width;
+			bw_vals_ = TS990_WIDTH_bw_vals;
 			dsp_hi     = TS990_filt_width;
 			hi_tooltip = TS990_filt_width_tooltip;
 			hi_label   = TS990_filt_width_label;
@@ -1180,6 +1188,7 @@ int RIG_TS990::set_widths(int val)
 			lo_label   = TS990_filt_shift_label;
 		} else {
 			bandwidths_ = TS990_filt_hi;
+			bw_vals_ = TS990_HI_bw_vals;
 			dsp_lo = TS990_filt_lo;
 			lo_tooltip = TS990_filt_lo_tooltip;
 			lo_label   = TS990_filt_lo_label;
@@ -1192,6 +1201,7 @@ int RIG_TS990::set_widths(int val)
 	case USBD1: case USBD2: case USBD3:
 		if (menu_0608) {
 			bandwidths_ = TS990_filt_width;
+			bw_vals_ = TS990_WIDTH_bw_vals;
 			dsp_hi     = TS990_filt_width;
 			hi_tooltip = TS990_filt_width_tooltip;
 			hi_label   = TS990_filt_width_label;
@@ -1200,6 +1210,7 @@ int RIG_TS990::set_widths(int val)
 			lo_label   = TS990_filt_shift_label;
 		} else {
 			bandwidths_ = TS990_filt_hi;
+			bw_vals_ = TS990_HI_bw_vals;
 			dsp_lo = TS990_filt_lo;
 			lo_tooltip = TS990_filt_lo_tooltip;
 			lo_label   = TS990_filt_lo_label;
@@ -1210,6 +1221,7 @@ int RIG_TS990::set_widths(int val)
 		break;
 	case CW: case CWR:
 		bandwidths_ = TS990_CW_width;
+		bw_vals_ = TS990_CW_bw_vals;
 		dsp_hi = TS990_CW_width;
 		hi_tooltip = TS990_CW_W_tooltip;
 		hi_label   = TS990_CW_W_btn_label;
@@ -1219,16 +1231,19 @@ int RIG_TS990::set_widths(int val)
 		break;
 	case FSK: case FSKR:
 		bandwidths_ = TS990_FSK_filt;
+		bw_vals_ = TS990_FSK_bw_vals;
 		dsp_lo = TS990_empty;
 		dsp_hi = TS990_empty;
 		break;
 	case PSK: case PSKR:
 		bandwidths_ = TS990_PSK_filt;
+		bw_vals_ = TS990_PSK_bw_vals;
 		dsp_lo = TS990_empty;
 		dsp_hi = TS990_empty;
 		break;
 	case AM: case AMD1: case AMD2: case AMD3:
 		bandwidths_ = TS990_AM_hi;
+		bw_vals_ = TS990_AM_HI_bw_vals;
 		dsp_lo = TS990_AM_lo;
 		dsp_hi = TS990_AM_hi;
 		lo_tooltip = TS990_AM_lo_tooltip;
@@ -1238,6 +1253,7 @@ int RIG_TS990::set_widths(int val)
 		break;
 	case FM: case FMD1: case FMD2: case FMD3:
 		bandwidths_ = TS990_filt_hi;
+		bw_vals_ = TS990_HI_bw_vals;
 		dsp_lo = TS990_filt_lo;
 		dsp_hi = TS990_filt_hi;
 		lo_tooltip = TS990_filt_lo_tooltip;

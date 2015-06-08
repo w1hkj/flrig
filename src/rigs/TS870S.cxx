@@ -59,6 +59,7 @@ static const char *TS870S_SSB_btn_lo_label = "L";
 static const char *TS870S_SSB_hi[] = { 			// MD1; and MD2;
 "1400", "1600", "1800", "2000", "2200", "2400", // Available settings (Hz)
 "2600", "2800", "3000", "3400", "4600", "6000", NULL };
+static int TS870S_SSB_HI_bw_vals[] = {1,2,3,4,5,6,7,8,9,10,11,12,WVALS_LIMIT};
 
 static const char *TS870S_CAT_ssb_hi[] = {		// Corresponding commands.
 "IS 1400;", "IS 1600;", "IS 1800;", "IS 2000;", "IS 2200;", "IS 2400;",
@@ -79,6 +80,7 @@ static const char *TS870S_AM_btn_lo_label = "L";
 
 static const char *TS870S_AM_hi[] = {
 "2500", "3000", "4000", "5000", "6000", "7000", NULL };
+static int TS870S_AM_HI_bw_vals[] = {1,2,3,4,5,6,WVALS_LIMIT};
 
 static const char *TS870S_CAT_am_hi[] = {
 "IS 2500;", "IS 3000;", "IS 4000;", "IS 5000;", "IS 6000;", "IS 7000;", NULL};
@@ -89,6 +91,7 @@ static const char *TS870S_AM_btn_hi_label = "H";
 //----------------------------------------------------------------------
 static const char *TS870S_CWwidths[] = { // Available CW bandwidths
 "50", "100", "200", "400", "600", "1000", NULL};
+static int TS870S_CW_bw_vals[] = { 1,2,3,4,5,6,WVALS_LIMIT};
 
 static const char *TS870S_CWbw[] = { // Corresponding commands.
 "FW0005;", "FW0010;", "FW0020;", "FW0040;", "FW0060;", "FW0100;", NULL};
@@ -96,6 +99,7 @@ static const char *TS870S_CWbw[] = { // Corresponding commands.
 //----------------------------------------------------------------------
 static const char *TS870S_FSKwidths[] = { // Available FSK bandwidths
 "250", "500", "1000", "1500", NULL};
+static int TS870S_FSK_bw_vals[] = {1,2,3,4,WVALS_LIMIT};
 
 static const char *TS870S_FSKbw[] = { // Corresponding commands.
 "FW0025;", "FW0050;", "FW0100;", "FW0150;", NULL };
@@ -103,6 +107,7 @@ static const char *TS870S_FSKbw[] = { // Corresponding commands.
 //----------------------------------------------------------------------
 static const char *TS870S_FMwidths[] = { // Available FM bandwidths
 "5000", "6000", "8000", "10000", "12000", "14000", NULL};
+static int TS870S_FM_bw_vals[] = {1,2,3,4,5,6,WVALS_LIMIT};
 
 static const char *TS870S_FMbw[] = { // Corresponding commands.
 "FW0500;", "FW0600;", "FW0800;", "FW1000;", "FW1200;", "FW1400;", NULL };
@@ -149,6 +154,7 @@ RIG_TS870S::RIG_TS870S() {
 	name_ = TS870Sname_;
 	modes_ = TS870Smodes_;
 	bandwidths_ = TS870S_SSB_hi;
+	bw_vals_ = TS870S_SSB_HI_bw_vals;
 
 	dsp_lo     = TS870S_SSB_lo;
 	lo_tooltip = TS870S_SSB_lo_tooltip;
@@ -699,6 +705,7 @@ int RIG_TS870S::set_widths(int val) // val is from the mode list index, as selec
 
 	if (val == tsLSB || val == tsUSB ) {  // SSB modes
 		bandwidths_ = TS870S_SSB_hi;
+		bw_vals_ = TS870S_SSB_HI_bw_vals;
 		dsp_lo = TS870S_SSB_lo;
 		dsp_hi = TS870S_SSB_hi;
 		lo_tooltip = TS870S_SSB_lo_tooltip;
@@ -710,6 +717,7 @@ int RIG_TS870S::set_widths(int val) // val is from the mode list index, as selec
 
 	else if (val == tsCW || val == tsCWR) {  // CW modes
 		bandwidths_ = TS870S_CWwidths;
+		bw_vals_ = TS870S_CW_bw_vals;
 		dsp_lo = TS870S_empty;
 		dsp_hi = TS870S_empty;
 		bw = 2; // 200Hz
@@ -717,6 +725,7 @@ int RIG_TS870S::set_widths(int val) // val is from the mode list index, as selec
 
 	else if (val == tsFSK || val == tsFSKR) {  // FSK modes
 		bandwidths_ = TS870S_FSKwidths;
+		bw_vals_ = TS870S_FSK_bw_vals;
 		dsp_lo = TS870S_empty;
 		dsp_hi = TS870S_empty;
 		bw = 1; // 500Hz
@@ -724,6 +733,7 @@ int RIG_TS870S::set_widths(int val) // val is from the mode list index, as selec
 
 	else if (val == tsAM) { // val == 5 ==> AM mode
 		bandwidths_ = TS870S_empty;
+		bw_vals_ = TS870S_AM_HI_bw_vals;
 		dsp_lo = TS870S_AM_lo;
 		dsp_hi = TS870S_AM_hi;
 		lo_tooltip = TS870S_AM_lo_tooltip;
@@ -736,6 +746,7 @@ int RIG_TS870S::set_widths(int val) // val is from the mode list index, as selec
 // FM mode BW selection.
 	else if (val == tsFM) {  // FM mode
 		bandwidths_ = TS870S_FMwidths;  // load the dropdown with our list
+		bw_vals_ = TS870S_FM_bw_vals;
 		dsp_lo = TS870S_empty;
 		dsp_hi = TS870S_empty;
 		bw = 4; // 10000Hz

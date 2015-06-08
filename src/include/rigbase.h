@@ -78,6 +78,7 @@ enum {
 };
 
 class rigbase {
+#define WVALS_LIMIT -1
 public:
 	const char * name_;
 	const char ** modes_;

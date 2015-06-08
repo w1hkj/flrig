@@ -30,6 +30,8 @@ static const char TS450S_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'U' 
 
 static const char *TS450S_widths[] = {
 "NONE", "FM-W", "FM-N", "AM", "SSB", "CW", NULL};
+static int TS450S_bw_vals[] = { 1,2,3,4,5,6, WVALS_LIMIT};
+
 static const char *TS450S_filters[] = {
 "000", "002", "003", "005", "007", "009", NULL};
 
@@ -39,6 +41,7 @@ RIG_TS450S::RIG_TS450S() {
 	modes_ = TS450Smodes_;
 	_mode_type = TS450S_mode_type;
 	bandwidths_ = TS450S_widths;
+	bw_vals_ = TS450S_bw_vals;
 	comm_baudrate = BR4800;
 	stopbits = 2;
 	comm_retries = 2;

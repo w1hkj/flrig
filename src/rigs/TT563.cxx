@@ -29,11 +29,13 @@ const char *RIG_TT563modes_[] = {
 		"LSB", "USB", "AM", "CW", "RTTY", "FM", NULL};
 static const char RIG_TT563_mode_type[] = {'L', 'U', 'U', 'U', 'L', 'U'};
 const char *RIG_TT563widths[] = { "NARR", "WIDE", NULL};
+static int TT563_bw_vals[] = {1, 2, WVALS_LIMIT};
 
 RIG_TT563::RIG_TT563() {
 	name_ = RIG_TT563name_;
 	modes_ = RIG_TT563modes_;
 	bandwidths_ = RIG_TT563widths;
+	bw_vals_ = TT563_bw_vals;
 	comm_baudrate = BR9600;
 	stopbits = 1;
 	comm_retries = 2;

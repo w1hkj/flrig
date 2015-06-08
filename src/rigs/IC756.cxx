@@ -35,6 +35,7 @@ const char IC756_mode_type[] =
 	{ 'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U'};
 
 const char *IC756_widths[] = { "NORM", "NARR", NULL};
+static int IC756_bw_vals[] = {1, 2, WVALS_LIMIT};
 
 static GUI ic756_widgets[]= {
 	{ (Fl_Widget *)btnVol, 2, 125,  50 },
@@ -57,6 +58,7 @@ RIG_IC756::RIG_IC756() {
 	name_ = IC756name_;
 	modes_ = IC756modes_;
 	bandwidths_ = IC756_widths;
+	bw_vals_ = IC756_bw_vals;
 	_mode_type = IC756_mode_type;
 
 	widgets = ic756_widgets;
@@ -138,6 +140,7 @@ const char IC756PRO_mode_type[] =
 	{ 'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U' };
 
 const char *IC756PRO_widths[] = { "FIXED", NULL};
+static int IC756PRO_bw_vals[] = { 1, WVALS_LIMIT};
 
 static GUI ic756pro_widgets[]= {
 	{ (Fl_Widget *)btnVol, 2, 125,  50 },
@@ -153,6 +156,7 @@ RIG_IC756PRO::RIG_IC756PRO() {
 	name_ = IC756PROname_;
 	modes_ = IC756PROmodes_;
 	bandwidths_ = IC756PRO_widths;
+	bw_vals_ = IC756PRO_bw_vals;
 	_mode_type = IC756PRO_mode_type;
 
 	widgets = ic756pro_widgets;

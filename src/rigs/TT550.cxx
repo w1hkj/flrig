@@ -53,6 +53,12 @@ static const char *TT550_widths[] = {
 "1200", "1350", "1500", "1650", "1800", "1950", "2100", "2250", "2400", "2550",
 "2700", "2850", "3000", "3300", "3600", "3900", "4200", "4500", "4800", "5100",
 "5400", "5700", "6000", "8000", NULL};
+static int TT550_bw_vals[] = {
+ 1, 2, 3, 4, 5, 6, 7, 8, 9,10,
+11,12,13,14,15,16,17,18,19,20,
+21,22,23,24,25,26,27,28,29,30,
+31,32,33,34,
+WVALS_LIMIT};
 
 static const int TT550_filter_nbr[] = {
 32, 31, 30, 29, 28, 27, 26, 25, 24, 23,
@@ -149,6 +155,7 @@ RIG_TT550::RIG_TT550() {
 	name_ = TT550name_;
 	modes_ = TT550modes_;
 	bandwidths_ = TT550_widths;
+	bw_vals_ = TT550_bw_vals;
 
 	widgets = rig_widgets;
 
@@ -901,7 +908,6 @@ void RIG_TT550::fkey_step_minus()
 
 void RIG_TT550::process_fkey(char c)
 {
-std::cout << "fkey " << (int)c << "\n";
 	if (c == 0x11)
 		switch (progStatus.tt550_F1_func) {
 			case 1 : fkey_clear(); break;
@@ -1055,8 +1061,6 @@ int RIG_TT550::get_power_out()
 	if (ret < 4) return fwdpwr;
 	size_t p = replystr.rfind("T");
 	if (p == string::npos) return fwdpwr;
-
-std::cout << (int)replystr[p+1] << " : " << (int)replystr[p+2] << "\n";
 
 	fwdpwr = (unsigned char)replystr[p+1];
 	refpwr = (unsigned char)replystr[p+2];

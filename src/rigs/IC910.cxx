@@ -28,6 +28,7 @@ const char IC910H_mode_type[] =
 	{ 'L', 'U', 'U', 'U', 'L', 'U'};
 
 const char *IC910H_widths[] = {"none", NULL};
+static int IC910H_bw_val[] = {1, WVALS_LIMIT};
 
 static GUI ic910h_widgets[]= {
 	{ (Fl_Widget *)btnVol, 2, 125,  50 },
@@ -49,6 +50,7 @@ RIG_IC910H::RIG_IC910H() {
 	modes_ = IC910Hmodes_;
 	_mode_type = IC910H_mode_type;
 	bandwidths_ = IC910H_widths;
+	bw_vals_ = IC910H_bw_val;
 
 	widgets = ic910h_widgets;
 

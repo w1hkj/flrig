@@ -42,6 +42,12 @@ const char *IC756PRO3_SSBwidths[] = {
 "2600", "2700", "2800", "2900", "3000", "3100", "3200", "3300", "3400", "3500",
 "3600",
 NULL};
+static int IC756PRO3_bw_vals_SSB[] = {
+ 1, 2, 3, 4, 5, 6, 7, 8, 9,10,
+11,12,13,14,15,16,17,18,19,20,
+21,22,23,24,25,26,27,28,29,30,
+31,32,33,34,35,36,37,38,39,40,
+41, WVALS_LIMIT};
 
 const char *IC756PRO3_RTTYwidths[] = {
   "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
@@ -49,8 +55,14 @@ const char *IC756PRO3_RTTYwidths[] = {
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
 "2600", "2700",
 NULL};
+static int IC756PRO3_bw_vals_RTTY[] = {
+ 1, 2, 3, 4, 5, 6, 7, 8, 9,10,
+11,12,13,14,15,16,17,18,19,20,
+21,22,23,24,25,26,27,28,29,30,
+31,32, WVALS_LIMIT};
 
 const char *IC756PRO3_AMFMwidths[] = { "FILT-1", "FILT-2", "FILT-3", NULL };
+static int IC756PRO3_bw_vals_AMFM[] = { 1,2,3, WVALS_LIMIT};
 
 static GUI ic756pro3_widgets[]= {
 	{ (Fl_Widget *)btnVol, 2, 125,  50 },
@@ -71,6 +83,8 @@ RIG_IC756PRO3::RIG_IC756PRO3() {
 	name_ = IC756PRO3name_;
 	modes_ = IC756PRO3modes_;
 	bandwidths_ = IC756PRO3_SSBwidths;
+	bw_vals_ = IC756PRO3_bw_vals_SSB;
+
 	_mode_type = IC756PRO3_mode_type;
 	atten_level = 3; // will force initializing to 0 dB
 	preamp_level = 2; // will force initializaing to 0 dB
@@ -558,17 +572,21 @@ int RIG_IC756PRO3::adjust_bandwidth(int m)
 {
 	if (m == 0 || m == 1 || m == 8 || m == 9) { //SSB
 		bandwidths_ = IC756PRO3_SSBwidths;
+		bw_vals_ = IC756PRO3_bw_vals_SSB;
 		return (32);
 	}
 	if (m == 3 || m == 6) { //CW
 		bandwidths_ = IC756PRO3_SSBwidths;
+		bw_vals_ = IC756PRO3_bw_vals_SSB;
 		return (14);
 	}
 	if (m == 4 || m == 7) { //RTTY
 		bandwidths_ = IC756PRO3_RTTYwidths;
+		bw_vals_ = IC756PRO3_bw_vals_RTTY;
 		return (28);
 	}
 	bandwidths_ = IC756PRO3_AMFMwidths;
+	bw_vals_ = IC756PRO3_bw_vals_AMFM;
 	return (0);
 }
 

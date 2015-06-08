@@ -59,6 +59,7 @@ const char RIG_PCR1000::mode_type[] = { 'L',   'U',   'U',  'U',  'U',   'U' };
 
 //	   band width array Index Values :-    0      1    2     3     4
 const char *RIG_PCR1000::band_widths[] = { "2.8k","6k","15k","50k","230k",NULL};
+static int PCR1000_bw_vals[] = {1,2,3,4,5,WVALS_LIMIT};
 
 //----------------------------------------------------------------------
 
@@ -101,6 +102,9 @@ void RIG_PCR1000::initialize()
 {
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
+	modes_ = modes;
+	bandwidths_ = band_widths;
+	bw_vals_ = PCR1000_bw_vals;
 
 	selectA();
 

@@ -365,14 +365,14 @@ FREQMODE srvr_vfo;
 static void push_xml()
 {
 	srvr_vfo.src = SRVR;
-//	char pr[200];
-//	snprintf(pr, sizeof(pr), "srvr: %ld, %i, %i | %i",
-//		srvr_vfo.freq,
-//		srvr_vfo.imode,
-//		(srvr_vfo.iBW / 256),
-//		(srvr_vfo.iBW & 0xFF));
+	char pr[200];
+	snprintf(pr, sizeof(pr), "srvr: %ld, mode: %i, bw-HI: %i | bw-LO %i",
+		srvr_vfo.freq,
+		srvr_vfo.imode,
+		(srvr_vfo.iBW / 256),
+		(srvr_vfo.iBW & 0xFF));
 //std::cout << pr << "\n";
-//	LOG_INFO("%s", pr);
+	LOG_DEBUG("%s", pr);
 	if (useB) {
 		guard_lock gl_xmlqueB(&mutex_queB, 101);
 		queB.push(srvr_vfo);
@@ -494,10 +494,11 @@ public:
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 		int bw = int(params[0]);
-		
 		int i = 0;
 		while (selrig->bw_vals_[i] != -1) i++;
-		if (bw < 0 || bw >= i) return;
+		if (bw < 0 || bw >= i) {
+			return;
+		}
 
 		if (useB) {
 			guard_lock queB_lock(&mutex_queB);

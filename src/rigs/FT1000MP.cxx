@@ -71,12 +71,17 @@ static const char *FT1000MP_widths[] = {
 "500/6.0", "500/2.4", "500/2.0", "500/500", "500/250",
 "250/6.0", "250/2.4", "250/2.0", "250/500", "250/250", NULL };
 
+static int FT1000MP_bw_vals[] = {
+1,2,3,4,5,6,7,8,9,0,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25, WVALS_LIMIT};
+
 
 RIG_FT1000MP::RIG_FT1000MP() {
 // base class values
 	name_ = FT1000MPname_;
 	modes_ = FT1000MP_modes;
 	bandwidths_ = FT1000MP_widths;
+	bw_vals_ = FT1000MP_bw_vals;
+
 	comm_baudrate = BR4800;
 	stopbits = 2;
 	comm_retries = 2;

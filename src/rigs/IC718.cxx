@@ -29,6 +29,7 @@ const char IC718name_[] = "IC-718";
 const char *IC718modes_[] = { "LSB", "USB", "AM", "CW", "RTTY", "CW-R", "RTTY-R", NULL};
 const char IC718_mode_type[] = { 'L', 'U', 'U', 'L', 'L', 'U', 'U'};
 const char *IC718_widths[] = { "Wide", "Med", "Narr", NULL};
+static int IC718_bw_vals[] = {1,2,3,WVALS_LIMIT};
 
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,       2, 125,  50 },
@@ -46,6 +47,7 @@ RIG_IC718::RIG_IC718() {
 	modes_ = IC718modes_;
 	_mode_type = IC718_mode_type;
 	bandwidths_ = IC718_widths;
+	bw_vals_ = IC718_bw_vals;
 	widgets = rig_widgets;
 
 	comm_baudrate = BR9600;

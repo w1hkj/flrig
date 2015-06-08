@@ -53,12 +53,22 @@ static const char *TT516_widths[] = {
 "700", "750", "800", "850", "900", "950", "1000", "1100", "1200", "1300",
 "1400", "1500", "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300",
 "2400", "2500", "2600", "2700", "2800", "2900", "3000", NULL};
+static int TT516_WIDTH_bw_vals[] = {
+ 1, 2, 3, 4, 5, 6, 7, 8, 9,10,
+11,12,13,14,15,16,17,18,19,20,
+21,22,23,24,25,26,27,28,29,30,
+31,32,33,34,35,36,37, WVALS_LIMIT};
 
 static const char *TT516_AM_widths[] = {
 "400", "500", "600", "700", "800", "900", "1000", "1100", "1200", "1350",
 "1400", "1500", "1600", "1700", "1800", "1900", "2000", "2200", "2400", "2600",
 "2800", "3000", "3200", "3400", "3600", "3800", "4000", "4200", "4400", "4600",
 "4800", "5000", "5200", "5400", "5600", "5800", "6000", NULL};
+static int TT516_AM_bw_vals[] = {
+ 1, 2, 3, 4, 5, 6, 7, 8, 9,10,
+11,12,13,14,15,16,17,18,19,20,
+21,22,23,24,25,26,27,28,29,30,
+31,32,33,34,35,36,37, WVALS_LIMIT};
 
 static char TT516setBW[]		= "*Wx\r";
 static char TT516setPBT[]		= "*Pxx\r";
@@ -92,6 +102,7 @@ RIG_TT516::RIG_TT516() {
 	name_ = TT516name_;
 	modes_ = TT516modes_;
 	bandwidths_ = TT516_widths;
+	bw_vals_ = TT516_WIDTH_bw_vals;
 
 	widgets = rig_widgets;
 
@@ -247,7 +258,13 @@ int RIG_TT516::get_modetype(int n)
 
 const char **RIG_TT516::bwtable(int m)
 {
-	if (m == 0) return TT516_AM_widths;
+	if (m == 0) {
+		bandwidths_ = TT516_AM_widths;
+		bw_vals_ = TT516_AM_bw_vals;
+		return TT516_AM_widths;
+	}
+	bandwidths_ = TT516_widths;
+	bw_vals_ = TT516_WIDTH_bw_vals;
 	return TT516_widths;
 }
 

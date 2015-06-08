@@ -26,11 +26,13 @@
 const char IC728name_[] = "IC-728";
 const char *IC728modes_[] = { "LSB", "USB", "AM", "CW", "RTTY", "FM", NULL};
 const char *IC728_widths[] = { "NARR", "WIDE", NULL};
+static int IC728_bw_vals[] = {1,2, WVALS_LIMIT};
 
 RIG_IC728::RIG_IC728() {
 	name_ = IC728name_;
 	modes_ = IC728modes_;
 	bandwidths_ = IC728_widths;
+	bw_vals_ = IC728_bw_vals;
 	comm_baudrate = BR1200;
 	stopbits = 2;
 	comm_retries = 2;

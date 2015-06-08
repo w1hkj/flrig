@@ -38,6 +38,8 @@ RIG_FT890::RIG_FT890() {
 	name_ = FT890name_;
 	modes_ = FT890modes_;
 	bandwidths_ = FT890widths_;
+	bw_vals_ = FT890_bw_val;
+
 	comm_baudrate = BR4800;
 	stopbits = 2;
 	comm_retries = 2;

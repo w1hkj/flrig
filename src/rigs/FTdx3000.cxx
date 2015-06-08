@@ -22,7 +22,6 @@
 #include "debug.h"
 #include "support.h"
 
-#define WVALS_LIMIT -1
 enum mFTdx3000 {
   mLSB, mUSB, mCW, mFM, mAM, mRTTY_L, mCW_R, mPKT_L, mRTTY_U, mPKT_FM, mFM_N, mPKT_U, mAM_N };
 // mLSB, mUSB, mCW, mFM, mAM, mRTTY_L, mCW_R, mPKT_L, mRTTY_U, mPKT_FM, mFM_N, mPKT_U, mAM_N
