@@ -3708,7 +3708,8 @@ void initRig()
 		txtCIV->value(hexstr);
 		txtCIV->activate();
 		btnCIVdefault->activate();
-		if (strstr(selrig->name_, "IC-7200") || strstr(selrig->name_, "IC-7600")) {
+		if (strstr(selrig->name_, "IC-7200") || strstr(selrig->name_, "IC-7600")
+			|| strstr(selrig->name_, "IC-7800")) {
 			btnUSBaudio->value(progStatus.USBaudio = true);
 			btnUSBaudio->activate();
 		} else
@@ -3839,7 +3840,7 @@ void initConfigDialog()
 		txtCIV->value(hexstr);
 		txtCIV->activate();
 		btnCIVdefault->activate();
-		if (picked == IC7200 || picked == IC7600) {
+		if (picked == IC7200 || picked == IC7600 || picked == IC7800) {
 			btnUSBaudio->value(progStatus.USBaudio = true);
 			btnUSBaudio->activate();
 		} else
