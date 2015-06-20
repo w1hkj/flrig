@@ -40,30 +40,30 @@ static const char TS590S_mode_type[] = {
 static const char *TS590S_empty[] = { "N/A", NULL };
 
 //----------------------------------------------------------------------
-static int DEF_lo_hi = 0x8A03;
-static const char *TS590S_SSB_lo[] = {
+static int DEF_SL_SH = 0x8A03;
+static const char *TS590S_SSB_SL[] = {
   "0",   "50", "100", "200", "300", 
 "400",  "500", "600", "700", "800", 
 "900", "1000", NULL };
 
-static const char *TS590S_CAT_ssb_lo[] = {
+static const char *TS590S_CAT_ssb_SL[] = {
 "SL00;", "SL01;", "SL02;", "SL03;", "SL04;", 
 "SL05;", "SL06;", "SL07;", "SL08;", "SL09;",
 "SL10;", "SL11;", NULL };
-static const char *TS590S_SSB_lo_tooltip = "lo cut";
-static const char *TS590S_SSB_btn_lo_label = "L";
+static const char *TS590S_SSB_SL_tooltip = "lo cut";
+static const char *TS590S_SSB_btn_SL_label = "L";
 
-static const char *TS590S_SSB_hi[] = {
+static const char *TS590S_SSB_SH[] = {
 "1000", "1200", "1400", "1600", "1800", 
 "2000", "2200", "2400", "2600", "2800", 
 "3000", "3400", "4000", "5000", NULL };
 
-static const char *TS590S_CAT_ssb_hi[] = {
+static const char *TS590S_CAT_ssb_SH[] = {
 "SH00;", "SH01;", "SH02;", "SH03;", "SH04;", 
 "SH05;", "SH06;", "SH07;", "SH08;", "SH09;",
 "SH10;", "SH11;", "SH12;", "SH13;", NULL };
-static const char *TS590S_SSB_hi_tooltip = "hi cut";
-static const char *TS590S_SSB_btn_hi_label = "H";
+static const char *TS590S_SSB_SH_tooltip = "hi cut";
+static const char *TS590S_SSB_btn_SH_label = "H";
 
 //----------------------------------------------------------------------
 static int DEF_width_shift = 0x8D05;
@@ -93,21 +93,21 @@ static const char *TS590S_DATA_S_btn_label = "S";
 
 //----------------------------------------------------------------------
 static int DEF_am = 0x8201;
-static const char *TS590S_AM_lo[] = {
+static const char *TS590S_AM_SL[] = {
 "10", "100", "200", "500", NULL };
 
-static const char *TS590S_CAT_am_lo[] = {
+static const char *TS590S_CAT_am_SL[] = {
 "SL00;", "SL01;", "SL02;", "SL03;", NULL}; 
-static const char *TS590S_AM_lo_tooltip = "lo cut";
-static const char *TS590S_AM_btn_lo_label = "L";
+static const char *TS590S_AM_SL_tooltip = "lo cut";
+static const char *TS590S_AM_btn_SL_label = "L";
 
-static const char *TS590S_AM_hi[] = {
+static const char *TS590S_AM_SH[] = {
 "2500", "3000", "4000", "5000", NULL };
 
-static const char *TS590S_CAT_am_hi[] = {
+static const char *TS590S_CAT_am_SH[] = {
 "SH00;", "SH01;", "SH02;", "SH03;", NULL}; 
-static const char *TS590S_AM_hi_tooltip = "hi cut";
-static const char *TS590S_AM_btn_hi_label = "H";
+static const char *TS590S_AM_SH_tooltip = "hi cut";
+static const char *TS590S_AM_btn_SH_label = "H";
 
 //----------------------------------------------------------------------
 static int  DEF_cw = 7;
@@ -187,15 +187,15 @@ RIG_TS590S::RIG_TS590S() {
 
 	name_ = TS590Sname_;
 	modes_ = TS590Smodes_;
-	bandwidths_ = TS590S_SSB_hi;
+	bandwidths_ = TS590S_SSB_SH;
 
-	dsp_lo     = TS590S_SSB_lo;
-	lo_tooltip = TS590S_SSB_lo_tooltip;
-	lo_label   = TS590S_SSB_btn_lo_label;
+	dsp_SL     = TS590S_SSB_SL;
+	SL_tooltip = TS590S_SSB_SL_tooltip;
+	SL_label   = TS590S_SSB_btn_SL_label;
 
-	dsp_hi     = TS590S_SSB_hi;
-	hi_tooltip = TS590S_SSB_hi_tooltip;
-	hi_label   = TS590S_SSB_btn_hi_label;
+	dsp_SH     = TS590S_SSB_SH;
+	SH_tooltip = TS590S_SSB_SH_tooltip;
+	SH_label   = TS590S_SSB_btn_SH_label;
 
 	widgets = rig_widgets;
 
@@ -212,7 +212,7 @@ RIG_TS590S::RIG_TS590S() {
 	comm_dtrptt = false;
 
 	B.imode = A.imode = USB;
-	B.iBW = A.iBW = DEF_lo_hi;
+	B.iBW = A.iBW = DEF_SL_SH;
 	B.freq = A.freq = 14070000;
 	can_change_alt_vfo = true;
 
@@ -263,11 +263,11 @@ const char * RIG_TS590S::get_bwname_(int n, int md)
 		int hi = (n >> 8) & 0x7F;
 		int lo = n & 0xFF;
 		snprintf(bwname, sizeof(bwname), "%s/%s",
-			(md == LSB || md == USB || md == FM) ? TS590S_SSB_lo[lo] :
-			(md == AM) ? TS590S_AM_lo[lo] :
+			(md == LSB || md == USB || md == FM) ? TS590S_SSB_SL[lo] :
+			(md == AM) ? TS590S_AM_SL[lo] :
 			TS590S_DATA_width[lo],
-			(md == LSB || md == USB || md == FM) ? TS590S_SSB_hi[hi] :
-			(md == AM) ? TS590S_AM_hi[hi] :
+			(md == LSB || md == USB || md == FM) ? TS590S_SSB_SH[hi] :
+			(md == AM) ? TS590S_AM_SH[hi] :
 			TS590S_DATA_shift[hi] );
 	} else {
 		snprintf(bwname, sizeof(bwname), "%s",
@@ -755,43 +755,43 @@ int RIG_TS590S::set_widths(int val)
 {
 	int bw = 0;
 	if (val == LSB || val == USB || val == FM || val == FMD) {
-		bandwidths_ = TS590S_SSB_hi;
-		dsp_lo = TS590S_SSB_lo;
-		dsp_hi = TS590S_SSB_hi;
-		lo_tooltip = TS590S_SSB_lo_tooltip;
-		lo_label   = TS590S_SSB_btn_lo_label;
-		hi_tooltip = TS590S_SSB_hi_tooltip;
-		hi_label   = TS590S_SSB_btn_hi_label;
-		bw = DEF_lo_hi; // 200 lower, 3000 upper
+		bandwidths_ = TS590S_SSB_SH;
+		dsp_SL = TS590S_SSB_SL;
+		dsp_SH = TS590S_SSB_SH;
+		SL_tooltip = TS590S_SSB_SL_tooltip;
+		SL_label   = TS590S_SSB_btn_SL_label;
+		SH_tooltip = TS590S_SSB_SH_tooltip;
+		SH_label   = TS590S_SSB_btn_SH_label;
+		bw = DEF_SL_SH; // 200 lower, 3000 upper
 	} else if (val == CW || val == CWR) {
 		bandwidths_ = TS590S_CWwidths;
-		dsp_lo = TS590S_empty;
-		dsp_hi = TS590S_empty;
+		dsp_SL = TS590S_empty;
+		dsp_SH = TS590S_empty;
 		bw = DEF_cw;
 	} else if (val == FSK || val == FSKR) {
 		bandwidths_ = TS590S_FSKwidths;
-		dsp_lo = TS590S_empty;
-		dsp_hi = TS590S_empty;
+		dsp_SL = TS590S_empty;
+		dsp_SH = TS590S_empty;
 		bw = 1;
 	} else if (val == AM) { // val == 4 ==> AM
-		bandwidths_ = TS590S_AM_hi;
-		dsp_lo = TS590S_AM_lo;
-		dsp_hi = TS590S_AM_hi;
-		lo_tooltip = TS590S_AM_lo_tooltip;
-		lo_label   = TS590S_AM_btn_lo_label;
-		hi_tooltip = TS590S_AM_hi_tooltip;
-		hi_label   = TS590S_AM_btn_hi_label;
+		bandwidths_ = TS590S_AM_SH;
+		dsp_SL = TS590S_AM_SL;
+		dsp_SH = TS590S_AM_SH;
+		SL_tooltip = TS590S_AM_SL_tooltip;
+		SL_label   = TS590S_AM_btn_SL_label;
+		SH_tooltip = TS590S_AM_SH_tooltip;
+		SH_label   = TS590S_AM_btn_SH_label;
 		bw = DEF_am;
 	} else if (val == LSBD || val == USBD) {
 		bandwidths_ = TS590S_DATA_width;
 
-		dsp_lo = TS590S_DATA_shift;
-		lo_tooltip = TS590S_DATA_S_tooltip;
-		lo_label   = TS590S_DATA_S_btn_label;
+		dsp_SL = TS590S_DATA_shift;
+		SL_tooltip = TS590S_DATA_S_tooltip;
+		SL_label   = TS590S_DATA_S_btn_label;
 
-		dsp_hi = TS590S_DATA_width;
-		hi_tooltip = TS590S_DATA_W_tooltip;
-		hi_label   = TS590S_DATA_W_btn_label;
+		dsp_SH = TS590S_DATA_width;
+		SH_tooltip = TS590S_DATA_W_tooltip;
+		SH_label   = TS590S_DATA_W_btn_label;
 		bw = DEF_width_shift;
 	}
 	return bw;
@@ -800,13 +800,13 @@ int RIG_TS590S::set_widths(int val)
 const char **RIG_TS590S::bwtable(int m)
 {
 	if (m == LSB || m == USB || m == FM || m == FMD)
-		return TS590S_SSB_hi;
+		return TS590S_SSB_SH;
 	else if (m == CW || m == CWR)
 		return TS590S_CWwidths;
 	else if (m == FSK || m == FSKR)
 		return TS590S_FSKwidths;
 	else if (m == AM)
-		return TS590S_AM_hi;
+		return TS590S_AM_SH;
 	else
 		return TS590S_DATA_width;
 }
@@ -814,9 +814,9 @@ const char **RIG_TS590S::bwtable(int m)
 const char **RIG_TS590S::lotable(int m)
 {
 	if (m == LSB || m == USB || m == FM || m == FMD)
-		return TS590S_SSB_lo;
+		return TS590S_SSB_SL;
 	else if (m == AM)
-		return TS590S_AM_lo;
+		return TS590S_AM_SL;
 	else if (m == LSBD || m == USBD)
 		return TS590S_DATA_shift;
 // CW CWR FSK FSKR
@@ -826,9 +826,9 @@ const char **RIG_TS590S::lotable(int m)
 const char **RIG_TS590S::hitable(int m)
 {
 	if (m == LSB || m == USB || m == FM || m == FMD)
-		return TS590S_SSB_hi;
+		return TS590S_SSB_SH;
 	else if (m == AM)
-		return TS590S_AM_hi;
+		return TS590S_AM_SH;
 	else if (m == LSBD || m == USBD)
 		return TS590S_DATA_width;
 // CW CWR FSK FSKR
@@ -838,7 +838,7 @@ const char **RIG_TS590S::hitable(int m)
 int RIG_TS590S::adjust_bandwidth(int val)
 {
 	if (val == LSB || val == USB || val == FM || val == FMD)
-		return DEF_lo_hi;
+		return DEF_SL_SH;
 	else if (val == LSBD || val == USBD)
 		return DEF_width_shift;
 	else if (val == CW || val == CWR)
@@ -860,10 +860,10 @@ void RIG_TS590S::set_bwA(int val)
 	if (A.imode == LSB || A.imode == USB || A.imode == FM || A.imode == FMD) {
 		if (val < 256) return;
 		A.iBW = val;
-		cmd = TS590S_CAT_ssb_lo[A.iBW & 0x7F];
+		cmd = TS590S_CAT_ssb_SL[A.iBW & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set lower", cmd, "");
-		cmd = TS590S_CAT_ssb_hi[(A.iBW >> 8) & 0x7F];
+		cmd = TS590S_CAT_ssb_SH[(A.iBW >> 8) & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set upper", cmd, "");
 		return;
@@ -884,10 +884,10 @@ void RIG_TS590S::set_bwA(int val)
 	if (A.imode == AM) {
 		if (val < 256) return;
 		A.iBW = val;
-		cmd = TS590S_CAT_am_lo[A.iBW & 0x7F];
+		cmd = TS590S_CAT_am_SL[A.iBW & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set lower", cmd, "");
-		cmd = TS590S_CAT_am_hi[(A.iBW >> 8) & 0x7F];
+		cmd = TS590S_CAT_am_SH[(A.iBW >> 8) & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set upper", cmd, "");
 		return;
@@ -916,10 +916,10 @@ void RIG_TS590S::set_bwB(int val)
 	if (B.imode == LSB || B.imode == USB || B.imode == FM || B.imode == FMD) {
 		if (val < 256) return;
 		B.iBW = val;
-		cmd = TS590S_CAT_ssb_lo[B.iBW & 0x7F];
+		cmd = TS590S_CAT_ssb_SL[B.iBW & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set lower", cmd, "");
-		cmd = TS590S_CAT_ssb_hi[(B.iBW >> 8) & 0x7F];
+		cmd = TS590S_CAT_ssb_SH[(B.iBW >> 8) & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set upper", cmd, "");
 		return;
@@ -938,10 +938,10 @@ void RIG_TS590S::set_bwB(int val)
 	if (B.imode == AM) {
 		if (val < 256) return;
 		B.iBW = val;
-		cmd = TS590S_AM_lo[B.iBW & 0x7F];
+		cmd = TS590S_AM_SL[B.iBW & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set lower", cmd, "");
-		cmd = TS590S_AM_hi[(B.iBW >> 8) & 0x7F];
+		cmd = TS590S_AM_SH[(B.iBW >> 8) & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set upper", cmd, "");
 		return;
@@ -999,7 +999,7 @@ int RIG_TS590S::get_bwA()
 		}
 		break;
 	case LSB: case USB: case FM:
-		A.iBW = DEF_lo_hi;
+		A.iBW = DEF_SL_SH;
 		lo = A.iBW & 0x7F;
 		hi = (A.iBW >> 8) & 0x7F;
 		cmd = "SL;";
@@ -1072,7 +1072,7 @@ int RIG_TS590S::get_bwB()
 		}
 		break;
 	case LSB: case USB: case FM:
-		B.iBW = DEF_lo_hi;
+		B.iBW = DEF_SL_SH;
 		lo = B.iBW & 0xFF;
 		hi = (B.iBW >> 8) & 0x7F;
 		cmd = "SL;";

@@ -43,50 +43,50 @@ static const char TS870S_mode_type[] = { 'L',   'U',   'U',  'U',  'U',  'L',   
 static const char *TS870S_empty[] = { "N/A", NULL };
 
 //----------------------------------------------------------------------
-static int DEF_lo_hi = 0x8704;
-static const char *TS870S_SSB_lo[] = { 			// MD1; and MD2;
+static int DEF_SL_SH = 0x8704;
+static const char *TS870S_SSB_SL[] = { 			// MD1; and MD2;
   "0",   "50", "100", "200", "300", 			// Available settings (Hz)
 "400",  "500", "600", "800", "1000", NULL };
 
-static const char *TS870S_CAT_ssb_lo[] = {		// Corresponding commands.
+static const char *TS870S_CAT_ssb_SL[] = {		// Corresponding commands.
 "FW0000;", "FW0005;", "FW0010;", "FW0020;", "FW0030;",
 "FW0040;", "FW0050;", "FW0060;", "FW0080;", "FW0100;", NULL };
 
-static const char *TS870S_SSB_lo_tooltip = "lo cut";
-static const char *TS870S_SSB_btn_lo_label = "L";
+static const char *TS870S_SSB_SL_tooltip = "lo cut";
+static const char *TS870S_SSB_btn_SL_label = "L";
 
 
-static const char *TS870S_SSB_hi[] = { 			// MD1; and MD2;
+static const char *TS870S_SSB_SH[] = { 			// MD1; and MD2;
 "1400", "1600", "1800", "2000", "2200", "2400", // Available settings (Hz)
 "2600", "2800", "3000", "3400", "4600", "6000", NULL };
 static int TS870S_SSB_HI_bw_vals[] = {1,2,3,4,5,6,7,8,9,10,11,12,WVALS_LIMIT};
 
-static const char *TS870S_CAT_ssb_hi[] = {		// Corresponding commands.
+static const char *TS870S_CAT_ssb_SH[] = {		// Corresponding commands.
 "IS 1400;", "IS 1600;", "IS 1800;", "IS 2000;", "IS 2200;", "IS 2400;",
 "IS 2600;", "IS 2800;", "IS 3000;", "IS 3400;", "IS 4600;", "IS 6000;", NULL };
 
-static const char *TS870S_SSB_hi_tooltip = "hi cut";
-static const char *TS870S_SSB_btn_hi_label = "H";
+static const char *TS870S_SSB_SH_tooltip = "hi cut";
+static const char *TS870S_SSB_btn_SH_label = "H";
 
 //----------------------------------------------------------------------
-static const char *TS870S_AM_lo[] = { // Available values...
+static const char *TS870S_AM_SL[] = { // Available values...
 "0", "100", "200", "500", NULL };
 
-static const char *TS870S_CAT_am_lo[] = { // ... Corresponding commands.
+static const char *TS870S_CAT_am_SL[] = { // ... Corresponding commands.
 "FW0000;", "FW0010;", "FW0020;", "FW0050;", NULL};
 
-static const char *TS870S_AM_lo_tooltip = "lo cut";
-static const char *TS870S_AM_btn_lo_label = "L";
+static const char *TS870S_AM_SL_tooltip = "lo cut";
+static const char *TS870S_AM_btn_SL_label = "L";
 
-static const char *TS870S_AM_hi[] = {
+static const char *TS870S_AM_SH[] = {
 "2500", "3000", "4000", "5000", "6000", "7000", NULL };
 static int TS870S_AM_HI_bw_vals[] = {1,2,3,4,5,6,WVALS_LIMIT};
 
-static const char *TS870S_CAT_am_hi[] = {
+static const char *TS870S_CAT_am_SH[] = {
 "IS 2500;", "IS 3000;", "IS 4000;", "IS 5000;", "IS 6000;", "IS 7000;", NULL};
 
-static const char *TS870S_AM_hi_tooltip = "hi cut";
-static const char *TS870S_AM_btn_hi_label = "H";
+static const char *TS870S_AM_SH_tooltip = "hi cut";
+static const char *TS870S_AM_btn_SH_label = "H";
 
 //----------------------------------------------------------------------
 static const char *TS870S_CWwidths[] = { // Available CW bandwidths
@@ -153,16 +153,16 @@ RIG_TS870S::RIG_TS870S() {
 
 	name_ = TS870Sname_;
 	modes_ = TS870Smodes_;
-	bandwidths_ = TS870S_SSB_hi;
+	bandwidths_ = TS870S_SSB_SH;
 	bw_vals_ = TS870S_SSB_HI_bw_vals;
 
-	dsp_lo     = TS870S_SSB_lo;
-	lo_tooltip = TS870S_SSB_lo_tooltip;
-	lo_label   = TS870S_SSB_btn_lo_label;
+	dsp_SL     = TS870S_SSB_SL;
+	SL_tooltip = TS870S_SSB_SL_tooltip;
+	SL_label   = TS870S_SSB_btn_SL_label;
 
-	dsp_hi     = TS870S_SSB_hi;
-	hi_tooltip = TS870S_SSB_hi_tooltip;
-	hi_label   = TS870S_SSB_btn_hi_label;
+	dsp_SH     = TS870S_SSB_SH;
+	SH_tooltip = TS870S_SSB_SH_tooltip;
+	SH_label   = TS870S_SSB_btn_SH_label;
 
 	widgets = rig_widgets;
 
@@ -180,7 +180,7 @@ RIG_TS870S::RIG_TS870S() {
 
 //	Defaults.
 	B.imode = A.imode = USB;
-	B.iBW = A.iBW = DEF_lo_hi;
+	B.iBW = A.iBW = DEF_SL_SH;
 	B.freq = A.freq = 14070000;
 	can_change_alt_vfo = true;
 
@@ -234,10 +234,10 @@ const char * RIG_TS870S::get_bwname_(int n, int md)
 		int hi = (n >> 8) & 0x7F; // hi byte (not MSB)
 		int lo = n & 0xFF;        // lo byte
 		snprintf(bwname, sizeof(bwname), "%s/%s",
-			(md == 0 || md == 1) ? TS870S_SSB_lo[lo] :	// SSB lo
-			(md == 4) ? TS870S_AM_lo[lo] : "N/A",		//  AM lo
-			(md == 0 || md == 1) ? TS870S_SSB_hi[hi] :	// SSB hi
-			(md == 4) ? TS870S_AM_hi[hi] : "N/A" );		//  AM hi
+			(md == 0 || md == 1) ? TS870S_SSB_SL[lo] :	// SSB lo
+			(md == 4) ? TS870S_AM_SL[lo] : "N/A",		//  AM lo
+			(md == 0 || md == 1) ? TS870S_SSB_SH[hi] :	// SSB hi
+			(md == 4) ? TS870S_AM_SH[hi] : "N/A" );		//  AM hi
 
 	} else { // plain vanilla single bandwidth mode.
 		snprintf(bwname, sizeof(bwname), "%s",
@@ -704,42 +704,42 @@ int RIG_TS870S::set_widths(int val) // val is from the mode list index, as selec
 	int bw = 0;
 
 	if (val == tsLSB || val == tsUSB ) {  // SSB modes
-		bandwidths_ = TS870S_SSB_hi;
+		bandwidths_ = TS870S_SSB_SH;
 		bw_vals_ = TS870S_SSB_HI_bw_vals;
-		dsp_lo = TS870S_SSB_lo;
-		dsp_hi = TS870S_SSB_hi;
-		lo_tooltip = TS870S_SSB_lo_tooltip;
-		lo_label   = TS870S_SSB_btn_lo_label;
-		hi_tooltip = TS870S_SSB_hi_tooltip;
-		hi_label   = TS870S_SSB_btn_hi_label;
-		bw = DEF_lo_hi; // 300 ... 2800 Hz
+		dsp_SL = TS870S_SSB_SL;
+		dsp_SH = TS870S_SSB_SH;
+		SL_tooltip = TS870S_SSB_SL_tooltip;
+		SL_label   = TS870S_SSB_btn_SL_label;
+		SH_tooltip = TS870S_SSB_SH_tooltip;
+		SH_label   = TS870S_SSB_btn_SH_label;
+		bw = DEF_SL_SH; // 300 ... 2800 Hz
 	}
 
 	else if (val == tsCW || val == tsCWR) {  // CW modes
 		bandwidths_ = TS870S_CWwidths;
 		bw_vals_ = TS870S_CW_bw_vals;
-		dsp_lo = TS870S_empty;
-		dsp_hi = TS870S_empty;
+		dsp_SL = TS870S_empty;
+		dsp_SH = TS870S_empty;
 		bw = 2; // 200Hz
 	}
 
 	else if (val == tsFSK || val == tsFSKR) {  // FSK modes
 		bandwidths_ = TS870S_FSKwidths;
 		bw_vals_ = TS870S_FSK_bw_vals;
-		dsp_lo = TS870S_empty;
-		dsp_hi = TS870S_empty;
+		dsp_SL = TS870S_empty;
+		dsp_SH = TS870S_empty;
 		bw = 1; // 500Hz
 	}
 
 	else if (val == tsAM) { // val == 5 ==> AM mode
 		bandwidths_ = TS870S_empty;
 		bw_vals_ = TS870S_AM_HI_bw_vals;
-		dsp_lo = TS870S_AM_lo;
-		dsp_hi = TS870S_AM_hi;
-		lo_tooltip = TS870S_AM_lo_tooltip;
-		lo_label   = TS870S_AM_btn_lo_label;
-		hi_tooltip = TS870S_AM_hi_tooltip;
-		hi_label   = TS870S_AM_btn_hi_label;
+		dsp_SL = TS870S_AM_SL;
+		dsp_SH = TS870S_AM_SH;
+		SL_tooltip = TS870S_AM_SL_tooltip;
+		SL_label   = TS870S_AM_btn_SL_label;
+		SH_tooltip = TS870S_AM_SH_tooltip;
+		SH_label   = TS870S_AM_btn_SH_label;
 		bw = 0x8401; // 100Hz .. 6000Hz
 	}
 
@@ -747,8 +747,8 @@ int RIG_TS870S::set_widths(int val) // val is from the mode list index, as selec
 	else if (val == tsFM) {  // FM mode
 		bandwidths_ = TS870S_FMwidths;  // load the dropdown with our list
 		bw_vals_ = TS870S_FM_bw_vals;
-		dsp_lo = TS870S_empty;
-		dsp_hi = TS870S_empty;
+		dsp_SL = TS870S_empty;
+		dsp_SH = TS870S_empty;
 		bw = 4; // 10000Hz
 	}
 
@@ -761,7 +761,7 @@ const char **RIG_TS870S::bwtable(int m)
 	if (m == tsLSB || m == tsUSB || m == tsAM)
 // these modes have lo and hi settings. BUT MUST RETURN A VALID pointer
 // NOT EMPTY!
-		return TS870S_SSB_hi;  
+		return TS870S_SSB_SH;  
 
 	else if (m == tsCW || m == tsCWR)
 		return TS870S_CWwidths;
@@ -773,50 +773,36 @@ const char **RIG_TS870S::bwtable(int m)
 		return TS870S_FMwidths;
 
 	else
-		return TS870S_SSB_hi;
+		return TS870S_SSB_SH;
 }
 
 const char **RIG_TS870S::lotable(int m)
 {
 	if (m == tsLSB || m == tsUSB || m == tsAM)
-		return TS870S_SSB_lo;  // these modes have lo and hi settings.
+		return TS870S_SSB_SL;  // these modes have lo and hi settings.
 
-	else if (m == tsCW || m == tsCWR)
-		return TS870S_empty;
+	if (m == tsAM)
+		return TS870S_AM_SL;
 
-	else if (m == tsFSK || m == tsFSKR)
-		return TS870S_empty;
-
-	else if (m == tsFM)
-		return TS870S_empty;
-
-	else
-		return TS870S_AM_lo;
+	return NULL;//TS870S_empty;
 }
 
 const char **RIG_TS870S::hitable(int m)
 {
 	if (m == tsLSB || m == tsUSB || m == tsAM)
-		return TS870S_SSB_hi;  // these modes have lo and hi settings.
+		return TS870S_SSB_SH;  // these modes have lo and hi settings.
 
-	else if (m == tsCW || m == tsCWR)
-		return TS870S_empty;
+	if (m == tsAM)
+		return TS870S_AM_SH;
 
-	else if (m == tsFSK || m == tsFSKR)
-		return TS870S_empty;
-
-	else if (m == tsFM)
-		return TS870S_empty;
-
-	else
-		return TS870S_AM_hi;
+	return NULL;
 }
 
 //----------------------------------------------------------------------
 int RIG_TS870S::adjust_bandwidth(int val)
 {
 	if (val == tsLSB || val == tsUSB )
-		return DEF_lo_hi; // 2800Hz .. 300Hz
+		return DEF_SL_SH; // 2800Hz .. 300Hz
 
 	else if (val == tsCW || val == tsCWR)
 		return 2; // 200Hz
@@ -845,11 +831,11 @@ void RIG_TS870S::set_bwA(int val)
 		if (val < 256) return;  // not hi/lo setting
 		A.iBW = val;
 
-		cmd = TS870S_CAT_ssb_lo[A.iBW & 0x7F];
+		cmd = TS870S_CAT_ssb_SL[A.iBW & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set lower", cmd, "");
 
-		cmd = TS870S_CAT_ssb_hi[(A.iBW >> 8) & 0x7F];
+		cmd = TS870S_CAT_ssb_SH[(A.iBW >> 8) & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set upper", cmd, "");
 
@@ -861,11 +847,11 @@ void RIG_TS870S::set_bwA(int val)
 		if (val < 256) return; // not hi/lo setting
 		A.iBW = val;
 
-		cmd = TS870S_CAT_am_lo[A.iBW & 0x7F];
+		cmd = TS870S_CAT_am_SL[A.iBW & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set lower", cmd, "");
 
-		cmd = TS870S_CAT_am_hi[(A.iBW >> 8) & 0x7F];
+		cmd = TS870S_CAT_am_SH[(A.iBW >> 8) & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set upper", cmd, "");
 
@@ -908,11 +894,11 @@ void RIG_TS870S::set_bwB(int val)
 		if (val < 256) return;
 		B.iBW = val;
 
-		cmd = TS870S_CAT_ssb_lo[B.iBW & 0x7F];
+		cmd = TS870S_CAT_ssb_SL[B.iBW & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set lower", cmd, "");
 
-		cmd = TS870S_CAT_ssb_hi[(B.iBW >> 8) & 0x7F];
+		cmd = TS870S_CAT_ssb_SH[(B.iBW >> 8) & 0x7F];
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set upper", cmd, "");
 
@@ -923,11 +909,11 @@ void RIG_TS870S::set_bwB(int val)
 		if (val < 256) return;
 		B.iBW = val;
 
-		cmd = TS870S_CAT_am_lo[B.iBW & 0x7F];  			// corrected wbx2
+		cmd = TS870S_CAT_am_SL[B.iBW & 0x7F];  			// corrected wbx2
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set lower", cmd, "");
 
-		cmd = TS870S_CAT_am_hi[(B.iBW >> 8) & 0x7F];	// corrected wbx2
+		cmd = TS870S_CAT_am_SH[(B.iBW >> 8) & 0x7F];	// corrected wbx2
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set upper", cmd, "");
 
@@ -1021,10 +1007,10 @@ int RIG_TS870S::get_bwA() {
 
 		p = replystr.rfind("FW");
 		if (p != string::npos) { // If 'FW' found then scan the known responces to find out what we got.
-			for (i = 0; TS870S_CAT_am_lo[i] != NULL; i++) // bump array index counter, till string match or end.
-				if (replystr.find(TS870S_CAT_am_lo[i]) == p) break; 	// Found returned data, in string array.
+			for (i = 0; TS870S_CAT_am_SL[i] != NULL; i++) // bump array index counter, till string match or end.
+				if (replystr.find(TS870S_CAT_am_SL[i]) == p) break; 	// Found returned data, in string array.
 
-			if (TS870S_CAT_am_lo[i] != NULL) lo = i; // if we didn't hit the end, return the array index value.
+			if (TS870S_CAT_am_SL[i] != NULL) lo = i; // if we didn't hit the end, return the array index value.
 			else lo = 1; // Default.
 		}
 
@@ -1032,10 +1018,10 @@ int RIG_TS870S::get_bwA() {
 		if (wait_char(';', 5, 100, "get upper", ASC) == 5) {
 			p = replystr.rfind("IS ");
 			if (p != string::npos) {
-				for (i = 0; TS870S_CAT_am_hi[i] != NULL; i++) // bump array index counter, till string match or end.
-					if (replystr.find(TS870S_CAT_am_hi[i]) == p) break; 	// Found returned data, in string array.
+				for (i = 0; TS870S_CAT_am_SH[i] != NULL; i++) // bump array index counter, till string match or end.
+					if (replystr.find(TS870S_CAT_am_SH[i]) == p) break; 	// Found returned data, in string array.
 
-				if (TS870S_CAT_am_hi[i] != NULL) hi = i; // if we didn't hit the end, return the array index value.
+				if (TS870S_CAT_am_SH[i] != NULL) hi = i; // if we didn't hit the end, return the array index value.
 				else hi = 1; // Default.
 			}
 			A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
@@ -1053,10 +1039,10 @@ int RIG_TS870S::get_bwA() {
 
 		p = replystr.rfind("FW");
 		if (p != string::npos) { // If 'FW' found then scan the known responces to find out what we got.
-			for (i = 0; TS870S_CAT_ssb_lo[i] != NULL; i++) // bump array index counter, till string match or end.
-				if (replystr.find(TS870S_CAT_ssb_lo[i]) == p) break; 	// Found returned data, in string array.
+			for (i = 0; TS870S_CAT_ssb_SL[i] != NULL; i++) // bump array index counter, till string match or end.
+				if (replystr.find(TS870S_CAT_ssb_SL[i]) == p) break; 	// Found returned data, in string array.
 
-			if (TS870S_CAT_ssb_lo[i] != NULL) lo = i; // if we didn't hit the end, return the array index value.
+			if (TS870S_CAT_ssb_SL[i] != NULL) lo = i; // if we didn't hit the end, return the array index value.
 			else lo = 1; // Default.
 		}
 
@@ -1066,10 +1052,10 @@ int RIG_TS870S::get_bwA() {
 		p = replystr.rfind("IS ");
 
 		if (p != string::npos) {
-			for (i = 0; TS870S_CAT_ssb_hi[i] != NULL; i++) // bump array index counter, till string match or end.
-				if (replystr.find(TS870S_CAT_ssb_hi[i]) == p) break; 	// Found returned data, in string array.
+			for (i = 0; TS870S_CAT_ssb_SH[i] != NULL; i++) // bump array index counter, till string match or end.
+				if (replystr.find(TS870S_CAT_ssb_SH[i]) == p) break; 	// Found returned data, in string array.
 
-			if (TS870S_CAT_ssb_hi[i] != NULL) hi = i; // if we didn't hit the end, return the array index value.
+			if (TS870S_CAT_ssb_SH[i] != NULL) hi = i; // if we didn't hit the end, return the array index value.
 			else hi = 1; // Default.
 		}
 		A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
@@ -1134,10 +1120,10 @@ int RIG_TS870S::get_bwB()
 
 		p = replystr.rfind("FW");
 		if (p != string::npos) { // If 'FW' found then scan the known responces to find out what we got.
-			for (i = 0; TS870S_CAT_am_lo[i] != NULL; i++) // bump array index counter, till string match or end.
-				if (replystr.find(TS870S_CAT_am_lo[i]) == p) break; 	// Found returned data, in string array.
+			for (i = 0; TS870S_CAT_am_SL[i] != NULL; i++) // bump array index counter, till string match or end.
+				if (replystr.find(TS870S_CAT_am_SL[i]) == p) break; 	// Found returned data, in string array.
 
-			if (TS870S_CAT_am_lo[i] != NULL) lo = i; // if we didn't hit the end, return the array index value.
+			if (TS870S_CAT_am_SL[i] != NULL) lo = i; // if we didn't hit the end, return the array index value.
 			else lo = 1; // Default.
 		}
 
@@ -1146,10 +1132,10 @@ int RIG_TS870S::get_bwB()
 
 		p = replystr.rfind("IS ");
 		if (p != string::npos) {
-			for (i = 0; TS870S_CAT_am_hi[i] != NULL; i++) // bump array index counter, till string match or end.
-				if (replystr.find(TS870S_CAT_am_hi[i]) == p) break; 	// Found returned data, in string array.
+			for (i = 0; TS870S_CAT_am_SH[i] != NULL; i++) // bump array index counter, till string match or end.
+				if (replystr.find(TS870S_CAT_am_SH[i]) == p) break; 	// Found returned data, in string array.
 
-			if (TS870S_CAT_am_hi[i] != NULL) hi = i; // if we didn't hit the end, return the array index value.
+			if (TS870S_CAT_am_SH[i] != NULL) hi = i; // if we didn't hit the end, return the array index value.
 			else hi = 1; // Default.
 		}
 		B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
@@ -1165,10 +1151,10 @@ int RIG_TS870S::get_bwB()
 
 		p = replystr.rfind("FW");
 		if (p != string::npos) { // If 'FW' found then scan the known responces to find out what we got.
-			for (i = 0; TS870S_CAT_ssb_lo[i] != NULL; i++) // bump array index counter, till string match or end.
-				if (replystr.find(TS870S_CAT_ssb_lo[i]) == p) break; 	// Found returned data, in string array.
+			for (i = 0; TS870S_CAT_ssb_SL[i] != NULL; i++) // bump array index counter, till string match or end.
+				if (replystr.find(TS870S_CAT_ssb_SL[i]) == p) break; 	// Found returned data, in string array.
 
-			if (TS870S_CAT_ssb_lo[i] != NULL) lo = i; // if we didn't hit the end, return the array index value.
+			if (TS870S_CAT_ssb_SL[i] != NULL) lo = i; // if we didn't hit the end, return the array index value.
 			else lo = 1; // Default.
 		}
 
@@ -1177,10 +1163,10 @@ int RIG_TS870S::get_bwB()
 
 		p = replystr.rfind("IS ");
 		if (p != string::npos) {
-			for (i = 0; TS870S_CAT_ssb_hi[i] != NULL; i++) // bump array index counter, till string match or end.
-				if (replystr.find(TS870S_CAT_ssb_hi[i]) == p) break; 	// Found returned data, in string array.
+			for (i = 0; TS870S_CAT_ssb_SH[i] != NULL; i++) // bump array index counter, till string match or end.
+				if (replystr.find(TS870S_CAT_ssb_SH[i]) == p) break; 	// Found returned data, in string array.
 
-			if (TS870S_CAT_ssb_hi[i] != NULL) hi = i; // if we didn't hit the end, return the array index value.
+			if (TS870S_CAT_ssb_SH[i] != NULL) hi = i; // if we didn't hit the end, return the array index value.
 			else hi = 1; // Default.
 		}
 		B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;

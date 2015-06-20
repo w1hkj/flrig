@@ -83,12 +83,12 @@ public:
 	const char * name_;
 	const char ** modes_;
 	const char ** bandwidths_;
-	const char ** dsp_lo;
-	const char *  lo_tooltip;
-	const char *  lo_label;
-	const char ** dsp_hi;
-	const char *  hi_tooltip;
-	const char *  hi_label;
+	const char ** dsp_SL;
+	const char *  SL_tooltip;
+	const char *  SL_label;
+	const char ** dsp_SH;
+	const char *  SH_tooltip;
+	const char *  SH_label;
 	const int  * bw_vals_;
 
 	GUI *widgets;
@@ -264,8 +264,8 @@ public:
 	virtual int  adjust_bandwidth(int m) {return 0;}
 	virtual int  def_bandwidth(int m) {return 0;}
 	virtual const char **bwtable(int m) {return bandwidths_;}
-	virtual const char **lotable(int m) {return dsp_lo;}
-	virtual const char **hitable(int m) {return dsp_hi;}
+	virtual const char **lotable(int m) {return NULL;}
+	virtual const char **hitable(int m) {return NULL;}
 
 	virtual bool can_split() { return false;}
 	virtual void set_split(bool val) {split = val;}

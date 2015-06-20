@@ -249,7 +249,17 @@ void read_mode()
 void setBWControl(void *)
 {
 	if (selrig->has_dsp_controls) {
-		if (vfo.iBW < 256) {
+		if (vfo.iBW > 256) {
+			opBW->index(0);
+			opBW->hide();
+			opDSP_hi->index((vfo.iBW >> 8) & 0x7F);
+			opDSP_hi->hide();
+			opDSP_lo->index(vfo.iBW & 0xFF);
+			opDSP_lo->show();
+			btnDSP->label(selrig->SL_label);
+			btnDSP->redraw_label();
+			btnDSP->show();
+		} else {
 			opDSP_lo->index(0);
 			opDSP_hi->index(0);
 			opDSP_lo->hide();
@@ -257,16 +267,6 @@ void setBWControl(void *)
 			btnDSP->hide();
 			opBW->index(vfo.iBW);
 			opBW->show();
-		} else {
-			opBW->index(0);
-			opBW->hide();
-			opDSP_lo->index(vfo.iBW & 0xFF);
-			opDSP_lo->hide();
-			opDSP_hi->index((vfo.iBW >> 8) & 0x7F);
-			opDSP_hi->show();
-			btnDSP->label(selrig->hi_label);
-			btnDSP->redraw_label();
-			btnDSP->show();
 		}
 	} else {
 		opDSP_lo->hide();
@@ -1079,13 +1079,13 @@ void setDSP()
 
 void selectDSP()
 {
-	if (btnDSP->label()[0] == selrig->lo_label[0]) {
-		btnDSP->label(selrig->hi_label);
+	if (btnDSP->label()[0] == selrig->SL_label[0]) {
+		btnDSP->label(selrig->SH_label);
 		btnDSP->redraw_label();
 		opDSP_hi->show();
 		opDSP_lo->hide();
 	} else {
-		btnDSP->label(selrig->lo_label);
+		btnDSP->label(selrig->SL_label);
 		btnDSP->redraw_label();
 		opDSP_lo->show();
 		opDSP_hi->hide();
@@ -1128,10 +1128,10 @@ void updateBandwidthControl(void *d)
 			if (selrig->has_dsp_controls) {
 				opDSP_lo->clear();
 				opDSP_hi->clear();
-				for (int i = 0; selrig->dsp_lo[i] != NULL; i++)
-					opDSP_lo->add(selrig->dsp_lo[i]);
-				for (int i = 0; selrig->dsp_hi[i] != NULL; i++)
-					opDSP_hi->add(selrig->dsp_hi[i]);
+				for (int i = 0; selrig->dsp_SL[i] != NULL; i++)
+					opDSP_lo->add(selrig->dsp_SL[i]);
+				for (int i = 0; selrig->dsp_SH[i] != NULL; i++)
+					opDSP_hi->add(selrig->dsp_SH[i]);
 				if (vfo.iBW > 256) {
 					opBW->index(0);
 					opBW->hide();
@@ -1139,7 +1139,7 @@ void updateBandwidthControl(void *d)
 					opDSP_lo->index(vfo.iBW & 0xFF);
 					opDSP_lo->hide();
 					opDSP_hi->index((vfo.iBW >> 8) & 0x7F);
-					btnDSP->label(selrig->lo_label);
+					btnDSP->label(selrig->SL_label);
 					opDSP_lo->show();
 					btnDSP->show();
 				} else {
@@ -3113,14 +3113,14 @@ void initRig()
 	if (selrig->has_dsp_controls) {
 		opDSP_lo->clear();
 		opDSP_hi->clear();
-		btnDSP->label(selrig->lo_label);
+		btnDSP->label(selrig->SL_label);
 		btnDSP->redraw_label();
-		for (int i = 0; selrig->dsp_lo[i] != NULL; i++)
-			opDSP_lo->add(selrig->dsp_lo[i]);
-		opDSP_lo->tooltip(selrig->lo_tooltip);
-		for (int i = 0; selrig->dsp_hi[i] != NULL; i++)
-			opDSP_hi->add(selrig->dsp_hi[i]);
-		opDSP_hi->tooltip(selrig->hi_tooltip);
+		for (int i = 0; selrig->dsp_SL[i] != NULL; i++)
+			opDSP_lo->add(selrig->dsp_SL[i]);
+		opDSP_lo->tooltip(selrig->SL_tooltip);
+		for (int i = 0; selrig->dsp_SH[i] != NULL; i++)
+			opDSP_hi->add(selrig->dsp_SH[i]);
+		opDSP_hi->tooltip(selrig->SH_tooltip);
 		if (vfo.iBW > 256) {
 			opDSP_lo->index(vfo.iBW & 0xFF);
 			opDSP_hi->index((vfo.iBW >> 8) & 0x7F);

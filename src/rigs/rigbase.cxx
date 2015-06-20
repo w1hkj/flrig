@@ -41,12 +41,12 @@ rigbase::rigbase()
 	name_ = szNORIG;
 	modes_ = szNOMODES;
 	bandwidths_ = szNOBWS;
-	dsp_lo = szDSPLO;
-	lo_tooltip = szdsptooltip;
-	lo_label = szbtnlabel;
-	dsp_hi = szDSPHI;
-	hi_tooltip = szdsptooltip;
-	hi_label = szbtnlabel;
+	dsp_SL = szDSPLO;
+	SL_tooltip = szdsptooltip;
+	SL_label = szbtnlabel;
+	dsp_SH = szDSPHI;
+	SH_tooltip = szdsptooltip;
+	SH_label = szbtnlabel;
 	bw_vals_ = &ibw_val;
 
 	widgets = basewidgets;

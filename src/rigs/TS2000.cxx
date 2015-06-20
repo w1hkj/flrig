@@ -31,34 +31,32 @@ static const char TS2000_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'U' 
 
 static const char *TS2000_empty[] = { "N/A", NULL };
 //------------------------------------------------------------------------------
-static const char *TS2000_lo[] = {
+static const char *TS2000_SL[] = {
  "10",   "50", "100", "200", "300", 
 "400",  "500", "600", "700", "800", 
 "900", "1000", NULL };
-static const char *TS2000_CAT_lo[] = {
+static const char *TS2000_CAT_SL[] = {
 "SL00;", "SL01;", "SL02;", "SL03;", "SL04;", 
 "SL05;", "SL06;", "SL07;", "SL08;", "SL09;",
-"SL10;", "SL11;", NULL };
-static const char *TS2000_lo_tooltip = "lo cut";
-static const char *TS2000_SSB_btn_lo_label = "L";
+"SL10;", "SL11;" };
+static const char *TS2000_SL_tooltip = "lo cut";
+static const char *TS2000_SSB_btn_SL_label = "L";
 //------------------------------------------------------------------------------
-static const char *TS2000_hi[] = {
+static const char *TS2000_SH[] = {
 "1400", "1600", "1800", "2000", "2200",
 "2400", "2600", "2800", "3000", "3400",
-"4000", "5000", NULL };
-static const char *TS2000_CAT_hi[] = {
+"4000", "5000" };
+static const char *TS2000_CAT_SH[] = {
 "SH00;", "SH01;", "SH02;", "SH03;", "SH04;", 
 "SH05;", "SH06;", "SH07;", "SH08;", "SH09;",
-"SH10;", "SH11;", NULL };
-static const char *TS2000_hi_tooltip = "hi cut";
-static const char *TS2000_SSB_btn_hi_label = "H";
+"SH10;", "SH11;" };
+static const char *TS2000_SH_tooltip = "hi cut";
+static const char *TS2000_SSB_btn_SH_label = "H";
 //------------------------------------------------------------------------------
-static const char *TS2000_AM_lo[] = {
-"0", "100", "200", "500",
-NULL };
-static const char *TS2000_AM_hi[] = {
-"2500", "3000", "4000", "5000",
-NULL };
+static const char *TS2000_AM_SL[] = {
+"0", "100", "200", "500" };
+static const char *TS2000_AM_SH[] = {
+"2500", "3000", "4000", "5000" };
 //------------------------------------------------------------------------------
 static const char *TS2000_CWwidths[] = {
 "50", "80", "100", "150", "200", 
@@ -161,13 +159,13 @@ RIG_TS2000::RIG_TS2000() {
 	modes_ = TS2000modes_;
 	bandwidths_ = TS2000_empty;
 
-	dsp_lo     = TS2000_lo;
-	lo_tooltip = TS2000_lo_tooltip;
-	lo_label   = TS2000_SSB_btn_lo_label;
+	dsp_SL     = TS2000_SL;
+	SL_tooltip = TS2000_SL_tooltip;
+	SL_label   = TS2000_SSB_btn_SL_label;
 
-	dsp_hi     = TS2000_hi;
-	hi_tooltip = TS2000_hi_tooltip;
-	hi_label   = TS2000_SSB_btn_hi_label;
+	dsp_SH     = TS2000_SH;
+	SH_tooltip = TS2000_SH_tooltip;
+	SH_label   = TS2000_SSB_btn_SH_label;
 
 	widgets = rig_widgets;
 
@@ -247,8 +245,8 @@ const char * RIG_TS2000::get_bwname_(int n, int md)
 		int hi = (n >> 8) & 0x7F;
 		int lo = n & 0xFF;
 		snprintf(bwname, sizeof(bwname), "%s/%s",
-			(md == LSB || md == USB || md == FM) ? TS2000_lo[lo] : TS2000_AM_lo[lo],
-			(md == LSB || md == USB || md == FM) ? TS2000_hi[hi] : TS2000_AM_hi[hi] );
+			(md == LSB || md == USB || md == FM) ? TS2000_SL[lo] : TS2000_AM_SL[lo],
+			(md == LSB || md == USB || md == FM) ? TS2000_SH[hi] : TS2000_AM_SH[hi] );
 	} else {
 		snprintf(bwname, sizeof(bwname), "%s",
 			(md == CW || md == CWR) ? TS2000_CWwidths[n] : TS2000_FSKwidths[n]);
@@ -607,32 +605,32 @@ int RIG_TS2000::set_widths(int val)
 	int bw;
 	switch (val) {
 	case LSB: case USB: case FM:
-		bandwidths_ = TS2000_hi;
-		dsp_lo = TS2000_lo;
-		lo_tooltip = TS2000_lo_tooltip;
-		lo_label   = TS2000_SSB_btn_lo_label;
-		dsp_hi = TS2000_hi;
-		hi_tooltip = TS2000_hi_tooltip;
-		hi_label   = TS2000_SSB_btn_hi_label;
+		bandwidths_ = TS2000_SH;
+		dsp_SL = TS2000_SL;
+		SL_tooltip = TS2000_SL_tooltip;
+		SL_label   = TS2000_SSB_btn_SL_label;
+		dsp_SH = TS2000_SH;
+		SH_tooltip = TS2000_SH_tooltip;
+		SH_label   = TS2000_SSB_btn_SH_label;
 		if (val == FM) bw = 0x8A03; // 200 ... 4000 Hz
 		else bw = 0x8803; // 200 ... 3000 Hz
 		break;
 	case CW: case CWR:
 		bandwidths_ = TS2000_CWwidths;
-		dsp_lo = TS2000_empty;
-		dsp_hi = TS2000_empty;
+		dsp_SL = TS2000_empty;
+		dsp_SH = TS2000_empty;
 		bw = 7;
 		break;
 	case FSK: case FSKR:
 		bandwidths_ = TS2000_FSKwidths;
-		dsp_lo = TS2000_empty;
-		dsp_hi = TS2000_empty;
+		dsp_SL = TS2000_empty;
+		dsp_SH = TS2000_empty;
 		bw = 1;
 		break;
 	case AM: default:
-		bandwidths_ = TS2000_AM_hi;
-		dsp_lo = TS2000_AM_lo;
-		dsp_hi = TS2000_AM_hi;
+		bandwidths_ = TS2000_AM_SH;
+		dsp_SL = TS2000_AM_SL;
+		dsp_SH = TS2000_AM_SH;
 		bw = 0x8201;
 		break;
 	}
@@ -642,39 +640,36 @@ int RIG_TS2000::set_widths(int val)
 const char **RIG_TS2000::bwtable(int val)
 {
 	if (val == LSB || val == USB || val == FM)
-		return TS2000_hi;
+		return TS2000_SH;
 	else if (val == CW || val == CWR)
 		return TS2000_CWwidths;
 	else if (val == FSK || val == FSKR)
 		return TS2000_FSKwidths;
 //else AM m == 4
-	return TS2000_AM_hi;
+	return TS2000_AM_SH;
 }
 
 const char **RIG_TS2000::lotable(int val)
 {
 	if (val == LSB || val == USB || val == FM)
-		return TS2000_lo;
-	else if (val == CW || val == CWR)
-		return NULL;
-	else if (val == FSK || val == FSKR)
-		return NULL;
-	return TS2000_AM_lo;
+		return TS2000_SL;
+	if (val == AM)
+		return TS2000_AM_SL;
+	return NULL;
 }
 
 const char **RIG_TS2000::hitable(int val)
 {
 	if (val == LSB || val == USB || val == FM)
-		return TS2000_hi;
-	else if (val == CW || val == CWR)
-		return NULL;
-	else if (val == FSK || val == FSKR)
-		return NULL;
-	return TS2000_AM_hi;
+		return TS2000_SH;
+	if (val == AM)
+		return TS2000_AM_SH;
+	return NULL;
 }
 
 void RIG_TS2000::set_modeA(int val)
 {
+	if (val >= sizeof(TS2000_mode_chr)) return;
 	_currmode = A.imode = val;
 	cmd = "MD";
 	cmd += TS2000_mode_chr[val];
@@ -708,6 +703,7 @@ int RIG_TS2000::get_modeA()
 
 void RIG_TS2000::set_modeB(int val)
 {
+	if (val >= sizeof(TS2000_mode_chr)) return;
 	_currmode = B.imode = val;
 	cmd = "MD";
 	cmd += TS2000_mode_chr[val];
@@ -763,23 +759,30 @@ void RIG_TS2000::set_bwA(int val)
 		if (val < 256) return;
 		A.iBW = val;
 		cmd = "SL";
-		cmd = TS2000_CAT_lo[A.iBW & 0x7F];
+		int index = A.iBW & 0x7F;
+		if (index >= sizeof(TS2000_CAT_SL)) return;
+		cmd = TS2000_CAT_SL[index];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set lower", cmd, "");
 		cmd = "SH";
-		cmd = TS2000_CAT_hi[(A.iBW >> 8) & 0x7F];
+		if (index >= sizeof(TS2000_CAT_SH)) return;
+		cmd = TS2000_CAT_SH[index];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set upper", cmd, "");
 	}
 	if (val > 256) return;
 	else if (A.imode == CW || A.imode == CWR) {
 		A.iBW = val;
-		cmd = TS2000_CWbw[A.iBW];
+		int index = A.iBW & 0x7F;
+		if (index >= sizeof(TS2000_CWbw)) return;
+		cmd = TS2000_CWbw[index];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set CW bw", cmd, "");
 	}else if (A.imode == FSK || A.imode == FSKR) {
 		A.iBW = val;
-		cmd = TS2000_FSKbw[A.iBW];
+		int index = A.iBW & 0x7F;
+		if (index >= sizeof(TS2000_FSKbw)) return;
+		cmd = TS2000_FSKbw[index];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set FSK bw", cmd, "");
 	}
@@ -811,10 +814,9 @@ int RIG_TS2000::get_bwA()
 		if (wait_char(';', 7, 100, "get FW", ASC) == 7) {
 			p = replystr.rfind("FW");
 			if (p != string::npos) {
-				for (i = 0; i < 11; i++)
+				for (i = 0; i < sizeof(TS2000_CWbw); i++)
 					if (replystr.find(TS2000_CWbw[i]) == p)
 						break;
-				if (i == 11) i = 10;
 				A.iBW = i;
 			}
 		}
@@ -823,10 +825,9 @@ int RIG_TS2000::get_bwA()
 		if (wait_char(';', 7, 100, "get FW", ASC) == 7) {
 			p = replystr.rfind("FW");
 			if (p != string::npos) {
-				for (i = 0; i < 4; i++)
+				for (i = 0; i < sizeof(TS2000_FSKbw); i++)
 					if (replystr.find(TS2000_FSKbw[i]) == p)
 						break;
-				if (i == 4) i = 3;
 				A.iBW = i;
 			}
 		}
@@ -840,23 +841,30 @@ void RIG_TS2000::set_bwB(int val)
 		if (val < 256) return;
 		B.iBW = val;
 		cmd = "SL";
-		cmd = TS2000_CAT_lo[B.iBW & 0x7F];
+		int index = B.iBW & 0x7F;
+		if (index >= sizeof(TS2000_CAT_SL)) return;
+		cmd = TS2000_CAT_SL[index];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set lower", cmd, "");
 		cmd = "SH";
-		cmd = TS2000_CAT_hi[(B.iBW >> 8) & 0x7F];
+		if (index >= sizeof(TS2000_CAT_SH)) return;
+		cmd = TS2000_CAT_SH[index];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set upper", cmd, "");
 	}
 	if (val > 256) return;
-	else if (B.imode == CW || B.imode == CWR) { // CW
+	else if (B.imode == CW || B.imode == CWR) {
 		B.iBW = val;
-		cmd = TS2000_CWbw[B.iBW];
+		int index = B.iBW & 0x7F;
+		if (index >= sizeof(TS2000_CWbw)) return;
+		cmd = TS2000_CWbw[index];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set CW bw", cmd, "");
 	}else if (B.imode == FSK || B.imode == FSKR) {
 		B.iBW = val;
-		cmd = TS2000_FSKbw[B.iBW];
+		int index = B.iBW & 0x7F;
+		if (index >= sizeof(TS2000_FSKbw)) return;
+		cmd = TS2000_FSKbw[index];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set FSK bw", cmd, "");
 	}
@@ -888,10 +896,9 @@ int RIG_TS2000::get_bwB()
 		if (wait_char(';', 7, 100, "get FW", ASC) == 7) {
 			p = replystr.rfind("FW");
 			if (p != string::npos) {
-				for (i = 0; i < 11; i++)
+				for (i = 0; i < sizeof(TS2000_CWbw); i++)
 					if (replystr.find(TS2000_CWbw[i]) == p)
 						break;
-				if (i == 11) i = 10;
 				B.iBW = i;
 			}
 		}
@@ -900,10 +907,9 @@ int RIG_TS2000::get_bwB()
 		if (wait_char(';', 7, 100, "get FW", ASC) == 7) {
 			p = replystr.rfind("FW");
 			if (p != string::npos) {
-				for (i = 0; i < 4; i++)
+				for (i = 0; i < sizeof(TS2000_FSKbw); i++)
 					if (replystr.find(TS2000_FSKbw[i]) == p)
 						break;
-				if (i == 4) i = 3;
 				B.iBW = i;
 			}
 		}
@@ -913,6 +919,7 @@ int RIG_TS2000::get_bwB()
 
 int RIG_TS2000::get_modetype(int n)
 {
+	if (n >= sizeof(TS2000_mode_type)) return 0;
 	return TS2000_mode_type[n];
 }
 

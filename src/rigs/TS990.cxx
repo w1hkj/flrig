@@ -55,7 +55,7 @@ static const char *TS990_empty[] = { "N/A", NULL };
 //==============================================================================
 // SSB - Width / Shift  filters
 //
-// BW indicates 0x8000 & (width << 8) & shift
+// BW indicates 0x8000 & (shift << 8) & width
 // Maximum assignable BW value 0x910C
 // Default BW value 0x9005
 //==============================================================================
@@ -89,41 +89,49 @@ static const char *TS990_CAT_filt_shift[] = {
 static const char *TS990_filt_shift_tooltip = "shift";
 static const char *TS990_filt_shift_label = "S";
 
+#define DEFAULT_SH_WI     0x8510  // SHIFT 1500, WIDTH 2800
+#define DEFAULT_SH_WI_D1  0x850E  // SHIFT 1500, WIDTH 2400
+#define DEFAULT_SH_WI_D2  0x850A  // SHIFT 1500, WIDTH 1000
+#define DEFAULT_SH_WI_D3  0x8508  // SHIFT 1500, WIDTH 500
+
 //==============================================================================
-// SSB, FM, Other lo/hi cut filters
+// SSB, FM, Other SL/SH cut filters
 //
-// BW indicates 0x8000 & (hi << 8) & lo
-// Maximum assignable BW value 0x8D0B
-// Default BW value 0x8A02 for SSB 3000 / 100
-// Default BW value 0x8201 for FM  4000 / 200
+// BW indicates 0x8000 & (SH << 8) & SL
 //==============================================================================
 
-static const char *TS990_filt_hi[] = {
+static const char *TS990_filt_SH[] = {
 "1000", "1200", "1400", "1600", "1800",
 "2000", "2200", "2400", "2600", "2800",
 "3000", "3400", "4000", "5000", NULL };
 static int TS990_HI_bw_vals[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,WVALS_LIMIT};
 
-static const char *TS990_CAT_filt_hi[] = {
+static const char *TS990_CAT_filt_SH[] = {
 "00;", "01;", "02;", "03;", "04;",
 "05;", "06;", "07;", "08;", "09;",
 "10;", "11;", "12;", "13;", NULL };
 
-static const char *TS990_filt_hi_tooltip = "hi cut";
-static const char *TS990_filt_hi_label = "H";
+static const char *TS990_filt_SH_tooltip = "hi cut";
+static const char *TS990_filt_SH_label = "H";
 
-static const char *TS990_filt_lo[] = {
+static const char *TS990_filt_SL[] = {
 "0", "50", "100", "200", "300",
 "400", "500", "600", "700", "800",
 "900", "1000", NULL };
 
-static const char *TS990_CAT_filt_lo[] = {
+static const char *TS990_CAT_filt_SL[] = {
 "00;", "01;", "02;", "03;", "04;",
 "05;", "06;", "07;", "08;", "09;",
 "10;", "11;", NULL };
 
-static const char *TS990_filt_lo_tooltip = "lo cut";
-static const char *TS990_filt_lo_label = "L";
+static const char *TS990_filt_SL_tooltip = "lo cut";
+static const char *TS990_filt_SL_label = "L";
+
+#define DEFAULT_HI_LO     0x8A03 // LO 200, HI 3000
+#define DEFAULT_FM        0x8C05 // LO 400, HI 4000
+#define DEFAULT_FM_D1     0x8903 // LO 200, HI 2800
+#define DEFAULT_FM_D2     0x8707 // LO 600, HI 2400
+#define DEFAULT_FM_D3     0x850B // LO 1000, HI 2000
 
 //==============================================================================
 // CW filters
@@ -168,27 +176,33 @@ static const char *TS990_CAT_CW_shift[] = {
 static const char *TS990_CW_S_tooltip = "shift";
 static const char *TS990_CW_S_btn_label = "S";
 
+#define DEFAULT_CW        0x9008 // SHIFT 0, WIDTH 500
+
 //==============================================================================
 
-static const char *TS990_AM_lo[] = {
+static const char *TS990_AM_SL[] = {
 "0", "100", "200", "300", NULL };
 
-static const char *TS990_CAT_AM_lo[] = {
+static const char *TS990_CAT_AM_SL[] = {
 "00;", "01;", "02;", "03;", NULL};
 
-static const char *TS990_AM_lo_tooltip = "lo cut";
-static const char *TS990_AM_btn_lo_label = "L";
+static const char *TS990_AM_SL_tooltip = "lo cut";
+static const char *TS990_AM_btn_SL_label = "L";
 
-static const char *TS990_AM_hi[] = {
+static const char *TS990_AM_SH[] = {
 "2500", "3000", "4000", "5000", NULL };
 static int TS990_AM_HI_bw_vals[] = { 1,2,3,4,WVALS_LIMIT};
 
-static const char *TS990_CAT_AM_hi[] = {
+static const char *TS990_CAT_AM_SH[] = {
 "00;", "01;", "02;", "03;", NULL};
 
-static const char *TS990_AM_hi_tooltip = "hi cut";
-static const char *TS990_AM_btn_hi_label = "H";
+static const char *TS990_AM_SH_tooltip = "hi cut";
+static const char *TS990_AM_btn_SH_label = "H";
 
+#define DEFAULT_AM        0x8102 // LO 100, HI 4000
+#define DEFAULT_AM_D1     0x8202 // LO 200, HI 4000 
+#define DEFAULT_AM_D2     0x8201 // LO 200, HI 3000
+#define DEFAULT_AM_D3     0x8200 // LO 200, HI 2500
 //==============================================================================
 
 static const char *TS990_FSK_filt[] = {
@@ -198,10 +212,13 @@ static int TS990_FSK_bw_vals[] = {1,2,3,4,5,6,WVALS_LIMIT};
 static const char *TS990_CAT_FSK_filt[] = {
 "00;", "01;", "02;", "03;", "04;", "05;", NULL };
 
+#define DEFAULT_FSK       0x03 // WIDTH 300
+
 //==============================================================================
 
 static const char *TS990_PSK_filt[] = {
-"50",   "80",  "100",  "150", "200", "250",  "300",  "400",  "500", "600",
+"50",   "80",  "100",  "150", "200", 
+"250",  "300",  "400",  "500", "600",
 "1000", "1500", NULL};
 static int TS990_PSK_bw_vals[] = {1,2,3,4,5,6,7,8,9,10,11,12,WVALS_LIMIT};
 
@@ -209,6 +226,8 @@ static const char *TS990_CAT_PSK_filt[] = {
 "00;", "01;", "02;", "03;", "04;",
 "05;", "06;", "07;", "08;", "09;",
 "10;", "11;", NULL };
+
+#define DEFAULT_PSK       0x06 // WIDTH 300
 
 //==============================================================================
 
@@ -260,44 +279,42 @@ void RIG_TS990::initialize()
 
 	read_menu_0607();
 	read_menu_0608();
-	menu_0607 = false;
-	menu_0608 = true;
 	set_menu_0607(false); // SSB uses lower/upper cutoff frequencies
 	set_menu_0608(true);  // SSB data uses shift/width frequencies
 
-	A_default_SH_WI = 0x9005;
-	A_default_SH_WI_D1 = 0x8E05;
-	A_default_SH_WI_D2 = 0x8A05;
-	A_default_SH_WI_D3 = 0x8805;
-	A_default_HI_LO = 0x8A03;
-	A_default_FM = 0x8C05;
-	A_default_FM_D1 = 0x8903;
-	A_default_FM_D2 = 0x8707;
-	A_default_FM_D3 = 0x850B;
-	A_default_CW = 0x8810;
-	A_default_AM = 0x8201;
-	A_default_AM_D1 = 0x8202;
-	A_default_AM_D2 = 0x8102;
-	A_default_AM_D3 = 0x8002;
-	A_default_FSK = 0x0001;
-	A_default_PSK = 0x0006;
+	A_default_SH_WI    = DEFAULT_SH_WI;
+	A_default_SH_WI_D1 = DEFAULT_SH_WI_D1;
+	A_default_SH_WI_D2 = DEFAULT_SH_WI_D2;
+	A_default_SH_WI_D3 = DEFAULT_SH_WI_D3;
+	A_default_HI_LO    = DEFAULT_HI_LO;
+	A_default_FM       = DEFAULT_FM;
+	A_default_FM_D1    = DEFAULT_FM_D1;
+	A_default_FM_D2    = DEFAULT_FM_D2;
+	A_default_FM_D3    = DEFAULT_FM_D3;
+	A_default_CW       = DEFAULT_CW;
+	A_default_AM       = DEFAULT_AM;
+	A_default_AM_D1    = DEFAULT_AM_D1;
+	A_default_AM_D2    = DEFAULT_AM_D2;
+	A_default_AM_D3    = DEFAULT_AM_D3;
+	A_default_FSK      = DEFAULT_FSK;
+	A_default_PSK      = DEFAULT_PSK;
 
-	B_default_SH_WI = 0x9005;
-	B_default_SH_WI_D1 = 0x8E05;
-	B_default_SH_WI_D2 = 0x8A05;
-	B_default_SH_WI_D3 = 0x8805;
-	B_default_HI_LO = 0x8A03;
-	B_default_FM = 0x8C05;
-	B_default_FM_D1 = 0x8903;
-	B_default_FM_D2 = 0x8707;
-	B_default_FM_D3 = 0x850B;
-	B_default_CW = 0x8810;
-	B_default_AM = 0x8201;
-	B_default_AM_D1 = 0x8202;
-	B_default_AM_D2 = 0x8102;
-	B_default_AM_D3 = 0x8002;
-	B_default_FSK = 0x0001;
-	B_default_PSK = 0x0006;
+	B_default_SH_WI    = DEFAULT_SH_WI;
+	B_default_SH_WI_D1 = DEFAULT_SH_WI_D1;
+	B_default_SH_WI_D2 = DEFAULT_SH_WI_D2;
+	B_default_SH_WI_D3 = DEFAULT_SH_WI_D3;
+	B_default_HI_LO    = DEFAULT_HI_LO;
+	B_default_FM       = DEFAULT_FM;
+	B_default_FM_D1    = DEFAULT_FM_D1;
+	B_default_FM_D2    = DEFAULT_FM_D2;
+	B_default_FM_D3    = DEFAULT_FM_D3;
+	B_default_CW       = DEFAULT_CW;
+	B_default_AM       = DEFAULT_AM;
+	B_default_AM_D1    = DEFAULT_AM_D1;
+	B_default_AM_D2    = DEFAULT_AM_D2;
+	B_default_AM_D3    = DEFAULT_AM_D3;
+	B_default_FSK      = DEFAULT_FSK;
+	B_default_PSK      = DEFAULT_PSK;
 }
 
 void RIG_TS990::shutdown()
@@ -322,16 +339,16 @@ RIG_TS990::RIG_TS990() {
 	B.imode = USB;
 	B.iBW = B_default_HI_LO;
 
-	bandwidths_ = TS990_filt_hi;
-	bw_vals_ = TS990_HI_bw_vals;
+	bandwidths_ = TS990_filt_SH;
+	bw_vals_    = TS990_HI_bw_vals;
 
-	dsp_lo     = TS990_filt_lo;
-	lo_tooltip = TS990_filt_lo_tooltip;
-	lo_label   = TS990_filt_lo_label;
+	dsp_SL      = TS990_filt_SL;
+	SL_tooltip  = TS990_filt_SL_tooltip;
+	SL_label    = TS990_filt_SL_label;
 
-	dsp_hi     = TS990_filt_hi;
-	hi_tooltip = TS990_filt_hi_label;
-	hi_label   = TS990_filt_hi_label;
+	dsp_SH      = TS990_filt_SH;
+	SH_tooltip  = TS990_filt_SH_label;
+	SH_label    = TS990_filt_SH_label;
 
 	widgets = rig_widgets;
 
@@ -642,21 +659,21 @@ const char * RIG_TS990::get_bwname_(int n, int md)
 {
 	static char bwname[20];
 	if (n > 256) {
-		int hi = (n >> 8) & 0x7F;
-		int lo = n & 0x7F;
+		int SH = (n >> 8) & 0x7F;
+		int SL = n & 0x7F;
 		snprintf(bwname, sizeof(bwname), "%s/%s",
-			(md == LSB || md == USB || md == FM) ? TS990_filt_lo[lo] :
-			(md == AM || md == AMD1 || md == AMD2 || md == AMD3) ? TS990_AM_lo[lo] :
-			(md == CW ||md == CWR) ? TS990_CAT_CW_width [lo]:
-			(md == FSK ||md == FSKR) ? TS990_FSK_filt [lo]:
-			(md == PSK ||md == PSKR) ? TS990_PSK_filt [lo]:
-			TS990_filt_shift[lo],
-			(md == LSB || md == USB || md == FM) ? TS990_filt_hi[hi] :
-			(md == AM || md == AMD1 || md == AMD2 || md == AMD3) ? TS990_AM_hi[hi] :
-			(md == CW ||md == CWR) ? TS990_CAT_CW_shift [hi]:
-			(md == FSK ||md == FSKR) ? TS990_FSK_filt [hi]:
-			(md == PSK ||md == PSKR) ? TS990_PSK_filt [hi]:
-			TS990_filt_width[hi] );
+			(md == LSB || md == USB || md == FM) ? TS990_filt_SL[SL] :
+			(md == AM || md == AMD1 || md == AMD2 || md == AMD3) ? TS990_AM_SL[SL] :
+			(md == CW ||md == CWR) ? TS990_CAT_CW_width [SL]:
+			(md == FSK ||md == FSKR) ? TS990_FSK_filt [SL]:
+			(md == PSK ||md == PSKR) ? TS990_PSK_filt [SL]:
+			TS990_filt_shift[SL],
+			(md == LSB || md == USB || md == FM) ? TS990_filt_SH[SH] :
+			(md == AM || md == AMD1 || md == AMD2 || md == AMD3) ? TS990_AM_SH[SH] :
+			(md == CW ||md == CWR) ? TS990_CAT_CW_shift [SH]:
+			(md == FSK ||md == FSKR) ? TS990_FSK_filt [SH]:
+			(md == PSK ||md == PSKR) ? TS990_PSK_filt [SH]:
+			TS990_filt_width[SH] );
 	}
 	return bwname;
 }
@@ -732,33 +749,20 @@ void RIG_TS990::set_vfoB (long freq)
 
 int RIG_TS990::get_smeter()
 {
-	if (useB) {
-		int mtr = 0;
-		cmd = "SM1;";
-		if (wait_char(';', 8, 20, "get", ASC) < 8) return 0;
+	if (useB) cmd = "SM1;";
+	else      cmd = "SM0;";
 
-		size_t p = replystr.find("SM1");
-		if (p == string::npos) return 0;
-		replystr[p + 7] = 0;
-		mtr = atoi(&replystr[p + 3]);
-		mtr *= 50;
-		mtr /= 15;
-		if (mtr > 100) mtr = 100;
-		return mtr;
-	} else {
-		int mtr = 0;
-		cmd = "SM0;";
-		if (wait_char(';', 8, 20, "get", ASC) < 8) return 0;
+	int mtr = 0;
+	if (wait_char(';', 8, 20, "get", ASC) < 8)
+		return 0;
+	size_t p = replystr.find("SM");
+	if (p == string::npos)
+		return 0;
+	mtr = atoi(&replystr[p + 3]);
+	mtr *= 10;
+	mtr /= 7;
 
-		size_t p = replystr.find("SM0");
-		if (p == string::npos) return 0;
-		replystr[p + 7] = 0;
-		mtr = atoi(&replystr[p + 3]);
-		mtr *= 50;
-		mtr /= 15;
-		if (mtr > 100) mtr = 100;
-		return mtr;
-	}
+	return mtr;
 }
 
 //==============================================================================
@@ -767,32 +771,26 @@ int RIG_TS990::get_smeter()
 
 int RIG_TS990::get_power_out()
 {
-	if (useB) {
-		int mtr = 0;
-		cmd = "SM1;";
-		if (wait_char(';', 8, 20, "get power", ASC) < 8) return mtr;
+	static int meter[] = 
+	{  0,  7, 15, 23, 29,  34,  40,  46,  51,  58 };
+	static float val[] =
+	{  0, 10, 25, 50, 75, 100, 125, 150, 175, 200 };
+	if (useB) cmd = "SM1;";
+	else      cmd = "SM0;";
 
-		size_t p = replystr.rfind("SM1");
-		if (p == string::npos) return mtr;
+	int mtr = 0;
+	if (wait_char(';', 8, 20, "get", ASC) < 8)
+		return 0;
+	size_t p = replystr.find("SM");
+	if (p == string::npos)
+		return 0;
+	mtr = atoi(&replystr[p + 3]);
 
-		mtr = atoi(&replystr[p + 3]);
-		mtr *= 50;
-		mtr /= 18;
-		if (mtr > 200) mtr = 200;
-		return mtr;
-	} else {
-		int mtr = 0;
-		cmd = "SM0;";
-		if (wait_char(';', 8, 20, "get power", ASC) < 8) return mtr;
+	int i = 0;
+	while (i < 9 && (mtr > meter[i])) i++;
+	float value = val[i] + (val[i+1] - val[i]) * (mtr - meter[i]) / (meter[i+1] - meter[i]);
 
-		size_t p = replystr.rfind("SM0");
-		if (p == string::npos) return mtr;
-		mtr = atoi(&replystr[p + 3]);
-		mtr *= 50;
-		mtr /= 18;
-		if (mtr > 200) mtr = 200;
-		return mtr;
-	}
+	return (int)value;
 }
 
 //==============================================================================
@@ -809,26 +807,15 @@ int RIG_TS990::get_swr(void)
 
 	read_alc = false;
 
-	cmd = "RM;";
-	if (wait_char(';', 16, 20, "get swr/alc", ASC) < 16) return 0;
+	cmd = "RM21;";
+	if (wait_char(';', 8, 20, "get swr", ASC) < 16) return 0;
 
-	size_t p = replystr.find("RM1");
-	if (p != string::npos) {
-		replystr[p + 7] = 0;
-		alc_val = atoi(&replystr[p + 3]);
-		alc_val *= 100;
-		alc_val /= 15;
-		if (alc_val > 100) alc_val = 100;
-		read_alc = true;
-	}
-
-	p = replystr.find("RM2");
+	size_t p = replystr.find("RM21");
 	if (p == string::npos) return 0;
 
-	replystr[p + 7] = 0;
-	mtr = atoi(&replystr[p + 3]);
-	mtr *= 50;
-	mtr /= 15;
+	mtr = atoi(&replystr[p + 4]);
+	mtr *= 10;
+	mtr /= 7;
 	if (mtr > 100) mtr = 100;
 
 	return mtr;
@@ -840,16 +827,15 @@ int RIG_TS990::get_alc(void)
 		read_alc = false;
 		return alc_val;
 	}
-	cmd = "RM;";
+	cmd = "RM11;";
 	if (wait_char(';', 8, 20, "get alc", ASC) < 8) return 0;
 
-	size_t p = replystr.find("RM1");
+	size_t p = replystr.find("RM11");
 	if (p == string::npos) return 0;
 
-	replystr[p + 7] = 0;
-	alc_val = atoi(&replystr[p + 3]);
-	alc_val *= 100;
-	alc_val /= 15;
+	alc_val = atoi(&replystr[p + 4]);
+	alc_val *= 10;
+	alc_val /= 7;
 	if (alc_val > 100) alc_val = 100;
 	return alc_val;
 }
@@ -1150,7 +1136,7 @@ void RIG_TS990::read_menu_0608()
 
 void RIG_TS990::set_menu_0607(int val)
 {
-	menu_0607 = (val != 0);
+	menu_0607 = val;
 	cmd = "EX00607 00";
 	cmd += menu_0607 ? "1" : "0";
 	cmd += ";";
@@ -1159,7 +1145,7 @@ void RIG_TS990::set_menu_0607(int val)
 
 void RIG_TS990::set_menu_0608(int val)
 {
-	menu_0608 = (val != 0);
+	menu_0608 = val;
 	cmd = "EX00608 00";
 	cmd += menu_0608 ? "1" : "0";
 	cmd += ";";
@@ -1179,22 +1165,22 @@ int RIG_TS990::set_widths(int val)
 	case LSB: case USB:
 		if (menu_0607) {
 			bandwidths_ = TS990_filt_width;
-			bw_vals_ = TS990_WIDTH_bw_vals;
-			dsp_hi     = TS990_filt_width;
-			hi_tooltip = TS990_filt_width_tooltip;
-			hi_label   = TS990_filt_width_label;
-			dsp_lo     = TS990_filt_shift;
-			lo_tooltip = TS990_filt_shift_tooltip;
-			lo_label   = TS990_filt_shift_label;
+			bw_vals_    = TS990_WIDTH_bw_vals;
+			dsp_SL      = TS990_filt_width;
+			SL_tooltip  = TS990_filt_width_tooltip;
+			SL_label    = TS990_filt_width_label;
+			dsp_SH      = TS990_filt_shift;
+			SH_tooltip  = TS990_filt_shift_tooltip;
+			SH_label    = TS990_filt_shift_label;
 		} else {
-			bandwidths_ = TS990_filt_hi;
-			bw_vals_ = TS990_HI_bw_vals;
-			dsp_lo = TS990_filt_lo;
-			lo_tooltip = TS990_filt_lo_tooltip;
-			lo_label   = TS990_filt_lo_label;
-			dsp_hi = TS990_filt_hi;
-			hi_tooltip = TS990_filt_hi_tooltip;
-			hi_label   = TS990_filt_hi_label;
+			bandwidths_ = TS990_filt_SH;
+			bw_vals_    = TS990_HI_bw_vals;
+			dsp_SL      = TS990_filt_SL;
+			SL_tooltip  = TS990_filt_SL_tooltip;
+			SL_label    = TS990_filt_SL_label;
+			dsp_SH      = TS990_filt_SH;
+			SH_tooltip  = TS990_filt_SH_tooltip;
+			SH_label    = TS990_filt_SH_label;
 		}
 		break;
 	case LSBD1: case LSBD2: case LSBD3:
@@ -1202,64 +1188,64 @@ int RIG_TS990::set_widths(int val)
 		if (menu_0608) {
 			bandwidths_ = TS990_filt_width;
 			bw_vals_ = TS990_WIDTH_bw_vals;
-			dsp_hi     = TS990_filt_width;
-			hi_tooltip = TS990_filt_width_tooltip;
-			hi_label   = TS990_filt_width_label;
-			dsp_lo     = TS990_filt_shift;
-			lo_tooltip = TS990_filt_shift_tooltip;
-			lo_label   = TS990_filt_shift_label;
+			dsp_SL     = TS990_filt_width;
+			SL_tooltip = TS990_filt_width_tooltip;
+			SL_label   = TS990_filt_width_label;
+			dsp_SH     = TS990_filt_shift;
+			SH_tooltip = TS990_filt_shift_tooltip;
+			SH_label   = TS990_filt_shift_label;
 		} else {
-			bandwidths_ = TS990_filt_hi;
+			bandwidths_ = TS990_filt_SH;
 			bw_vals_ = TS990_HI_bw_vals;
-			dsp_lo = TS990_filt_lo;
-			lo_tooltip = TS990_filt_lo_tooltip;
-			lo_label   = TS990_filt_lo_label;
-			dsp_hi = TS990_filt_hi;
-			hi_tooltip = TS990_filt_hi_tooltip;
-			hi_label   = TS990_filt_hi_label;
+			dsp_SL = TS990_filt_SL;
+			SL_tooltip = TS990_filt_SL_tooltip;
+			SL_label   = TS990_filt_SL_label;
+			dsp_SH = TS990_filt_SH;
+			SH_tooltip = TS990_filt_SH_tooltip;
+			SH_label   = TS990_filt_SH_label;
 		}
 		break;
 	case CW: case CWR:
 		bandwidths_ = TS990_CW_width;
 		bw_vals_ = TS990_CW_bw_vals;
-		dsp_hi = TS990_CW_width;
-		hi_tooltip = TS990_CW_W_tooltip;
-		hi_label   = TS990_CW_W_btn_label;
-		dsp_lo = TS990_CW_shift;
-		lo_tooltip = TS990_CW_S_tooltip;
-		lo_label   = TS990_CW_S_btn_label;
+		dsp_SL = TS990_CW_width;
+		SL_tooltip = TS990_CW_W_tooltip;
+		SL_label   = TS990_CW_W_btn_label;
+		dsp_SH = TS990_CW_shift;
+		SH_tooltip = TS990_CW_S_tooltip;
+		SH_label   = TS990_CW_S_btn_label;
 		break;
 	case FSK: case FSKR:
 		bandwidths_ = TS990_FSK_filt;
 		bw_vals_ = TS990_FSK_bw_vals;
-		dsp_lo = TS990_empty;
-		dsp_hi = TS990_empty;
+		dsp_SL = TS990_empty;
+		dsp_SH = TS990_empty;
 		break;
 	case PSK: case PSKR:
 		bandwidths_ = TS990_PSK_filt;
 		bw_vals_ = TS990_PSK_bw_vals;
-		dsp_lo = TS990_empty;
-		dsp_hi = TS990_empty;
+		dsp_SL = TS990_empty;
+		dsp_SH = TS990_empty;
 		break;
 	case AM: case AMD1: case AMD2: case AMD3:
-		bandwidths_ = TS990_AM_hi;
+		bandwidths_ = TS990_AM_SH;
 		bw_vals_ = TS990_AM_HI_bw_vals;
-		dsp_lo = TS990_AM_lo;
-		dsp_hi = TS990_AM_hi;
-		lo_tooltip = TS990_AM_lo_tooltip;
-		lo_label   = TS990_AM_btn_lo_label;
-		hi_tooltip = TS990_AM_hi_tooltip;
-		hi_label   = TS990_AM_btn_hi_label;
+		dsp_SL = TS990_AM_SL;
+		dsp_SH = TS990_AM_SH;
+		SL_tooltip = TS990_AM_SL_tooltip;
+		SL_label   = TS990_AM_btn_SL_label;
+		SH_tooltip = TS990_AM_SH_tooltip;
+		SH_label   = TS990_AM_btn_SH_label;
 		break;
 	case FM: case FMD1: case FMD2: case FMD3:
-		bandwidths_ = TS990_filt_hi;
+		bandwidths_ = TS990_filt_SH;
 		bw_vals_ = TS990_HI_bw_vals;
-		dsp_lo = TS990_filt_lo;
-		dsp_hi = TS990_filt_hi;
-		lo_tooltip = TS990_filt_lo_tooltip;
-		lo_label   = TS990_filt_lo_label;
-		hi_tooltip = TS990_filt_hi_tooltip;
-		hi_label   = TS990_filt_hi_label;
+		dsp_SL = TS990_filt_SL;
+		dsp_SH = TS990_filt_SH;
+		SL_tooltip = TS990_filt_SL_tooltip;
+		SL_label   = TS990_filt_SL_label;
+		SH_tooltip = TS990_filt_SH_tooltip;
+		SH_label   = TS990_filt_SH_label;
 		break;
 	}
 	return bw;
@@ -1268,26 +1254,26 @@ int RIG_TS990::set_widths(int val)
 
 const char **RIG_TS990::bwtable(int m)
 {
-	const char **filter = TS990_filt_hi;
+	const char **filter = TS990_filt_SH;
 	switch (m) {
 		case LSB: case USB:
 			if (menu_0607)
 				filter = TS990_filt_width;
 			else
-				filter = TS990_filt_hi;
+				filter = TS990_filt_SH;
 			break;
 		 case FM: case FMD1: case FMD2: case FMD3:
-			filter = TS990_filt_hi;
+			filter = TS990_filt_SH;
 			break;
 		case LSBD1: case LSBD2: case LSBD3:
 		case USBD1: case USBD2: case USBD3:
 			if (menu_0608)
 				filter = TS990_filt_width;
 			else
-				filter = TS990_filt_hi;
+				filter = TS990_filt_SH;
 			break;
 		case AM: case AMD1: case AMD2: case AMD3:
-			filter = TS990_AM_hi;
+			filter = TS990_AM_SH;
 			break;
 		case CW: case CWR:
 			filter = TS990_CW_width;
@@ -1304,35 +1290,35 @@ const char **RIG_TS990::bwtable(int m)
 
 const char **RIG_TS990::lotable(int m)
 {
-	const char **filter = TS990_filt_lo;
+	const char **filter = TS990_filt_SL;
 	switch (m) {
 		case LSB: case USB:
 			if (menu_0607)
-				filter = TS990_filt_shift;
+				filter = TS990_filt_width;
 			else
-				filter = TS990_filt_lo;
+				filter = TS990_filt_SL;
 			break;
 		case FM: case FMD1: case FMD2: case FMD3:
-			filter = TS990_filt_lo;
+			filter = TS990_filt_SL;
 			break;
 		case LSBD1: case LSBD2: case LSBD3:
 		case USBD1: case USBD2: case USBD3:
 			if (menu_0608)
-				filter = TS990_filt_shift;
+				filter = TS990_filt_width;
 			else
-				filter = TS990_filt_lo;
+				filter = TS990_filt_SL;
 			break;
 		case CW: case CWR:
-			filter = TS990_CW_shift;
+			filter = TS990_CW_width;
 			break;
 		case FSK: case FSKR:
-			filter = TS990_FSK_filt;
+			filter = NULL;//TS990_FSK_filt;
 			break;
 		case PSK: case PSKR:
-			filter = TS990_PSK_filt;
+			filter = NULL;//TS990_PSK_filt;
 			break;
 		case AM: case AMD1: case AMD2: case AMD3:
-			filter = TS990_AM_lo;
+			filter = TS990_AM_SL;
 			break;
 	}
 	return filter;
@@ -1340,26 +1326,26 @@ const char **RIG_TS990::lotable(int m)
 
 const char **RIG_TS990::hitable(int m)
 {
-	const char **filter = TS990_filt_hi;
+	const char **filter = TS990_filt_SH;
 	switch (m) {
-		case LSB: case USB: case FM:
+		case LSB: case USB:
 			if (menu_0607)
-				filter = TS990_filt_width;
+				filter = TS990_filt_shift;
 			else
-				filter = TS990_filt_hi;
+				filter = TS990_filt_SH;
 			break;
 		case LSBD1: case LSBD2: case LSBD3:
 		case USBD1: case USBD2: case USBD3:
 			if (menu_0608)
-				filter = TS990_filt_width;
+				filter = TS990_filt_shift;
 			else
-				filter = TS990_filt_hi;
+				filter = TS990_filt_SH;
 			break;
 		case CW: case CWR:
-			filter = TS990_CW_width;
+			filter = TS990_CW_shift;
 			break;
-		case FMD1: case FMD2: case FMD3:
-			filter = TS990_filt_hi;
+		case FM: case FMD1: case FMD2: case FMD3:
+			filter = TS990_filt_SH;
 			break;
 		case FSK: case FSKR:
 			filter = NULL;
@@ -1368,7 +1354,7 @@ const char **RIG_TS990::hitable(int m)
 			filter = NULL;
 			break;
 		case AM: case AMD1: case AMD2: case AMD3:
-			filter = TS990_AM_hi;
+			filter = TS990_AM_SH;
 			break;
 	}
 	return filter;
@@ -1403,37 +1389,37 @@ int RIG_TS990::adjust_bandwidth(int val)
 				retval = menu_0608 ? A_default_SH_WI_D3 : A_default_HI_LO;
 			break;
 		case FM:
-			retval = useB ? B_default_FM : A_default_FM;
+			retval = (useB ? B_default_FM : A_default_FM);
 			break;
 		case FMD1:
-			retval = useB ? B_default_FM_D1 : A_default_FM_D1;
+			retval = (useB ? B_default_FM_D1 : A_default_FM_D1);
 			break;
 		case FMD2:
-			retval = useB ? B_default_FM_D2 : A_default_FM_D2;
+			retval = (useB ? B_default_FM_D2 : A_default_FM_D2);;
 			break;
 		case FMD3:
-			retval = useB ? B_default_FM_D3 : A_default_FM_D3;
+			retval = (useB ? B_default_FM_D3 : A_default_FM_D3);
 			break;
 		case AM:
-			retval = useB ? B_default_AM : A_default_AM;
+			retval = (useB ? B_default_AM : A_default_AM);
 			break;
 		case AMD1:
-			retval = useB ? B_default_AM_D1 : A_default_AM_D1;
+			retval = (useB ? B_default_AM_D1 : A_default_AM_D1);
 			break;
 		case AMD2:
-			retval = useB ? B_default_AM_D2 : A_default_AM_D2;
+			retval = (useB ? B_default_AM_D2 : A_default_AM_D2);
 			break;
 		case AMD3:
-			retval = useB ? B_default_AM_D3 : A_default_AM_D3;
+			retval = (useB ? B_default_AM_D3 : A_default_AM_D3);
 			break;
 		case CW: case CWR:
-			retval = useB ? B_default_CW : A_default_CW;
+			retval = (useB ? B_default_CW : A_default_CW);
 			break;
 		case FSK: case FSKR:
-			retval = useB ? B_default_FSK : A_default_CW;
+			retval = (useB ? B_default_FSK : A_default_FSK);
 			break;
 		case PSK: case PSKR:
-			retval = useB ? B_default_PSK : A_default_PSK;
+			retval = (useB ? B_default_PSK : A_default_PSK);
 			break;
 		}
 	return retval;
@@ -1446,40 +1432,39 @@ int RIG_TS990::def_bandwidth(int val)
 
 void RIG_TS990::set_bwA(int val)
 {
-	size_t lo = 0, hi = 0;
+	size_t SL = 0, SH = 0;
+	SL = val & 0x7F;
+	SH = (val >> 8) & 0x7F;
+
 	switch (A.imode) {
 	case LSB: case USB:
 		if (val < 256) break;
 		if (menu_0607) {
-			lo = val & 0x7F;
-			hi = (val >> 8) & 0x7F;
-			if (hi >= sizeof(TS990_CAT_filt_width)/sizeof(*TS990_CAT_filt_width) ||
-				 lo >= sizeof(TS990_CAT_filt_shift)/sizeof(*TS990_CAT_filt_shift) )
+			if (SL >= sizeof(TS990_CAT_filt_width)/sizeof(*TS990_CAT_filt_width) ||
+				 SH >= sizeof(TS990_CAT_filt_shift)/sizeof(*TS990_CAT_filt_shift) )
 				A.iBW = A_default_SH_WI;
 			else
 				A.iBW = val;
 			cmd = "SL0";
-			cmd += TS990_CAT_filt_width[(A.iBW >> 8) & 0x7F];
+			cmd += TS990_CAT_filt_width[A.iBW & 0x7F];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set width", cmd, "");
 			cmd = "SH0";
-			cmd += TS990_CAT_filt_shift[A.iBW & 0x7F];
+			cmd += TS990_CAT_filt_shift[(A.iBW >> 8) & 0x7F];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set filter shift", cmd, "");
 		} else {
-			lo = val & 0x7F;
-			hi = (val >> 8) & 0x7F;
-			if (hi >= sizeof(TS990_CAT_filt_hi)/sizeof(*TS990_CAT_filt_lo) ||
-				 lo >= sizeof(TS990_CAT_filt_lo)/sizeof(*TS990_CAT_filt_lo) )
+			if (SH >= sizeof(TS990_CAT_filt_SH)/sizeof(*TS990_CAT_filt_SH) ||
+				 SL >= sizeof(TS990_CAT_filt_SL)/sizeof(*TS990_CAT_filt_SL) )
 				A.iBW = A_default_HI_LO;
 			else
 				A.iBW = val;
 			cmd = "SL0";
-			cmd += TS990_CAT_filt_lo[A.iBW  & 0x7F];
+			cmd += TS990_CAT_filt_SL[A.iBW & 0x7F];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set filter lower cutoff", cmd, "");
 			cmd = "SH0";
-			cmd += TS990_CAT_filt_hi[(A.iBW >> 8) & 0x7F];
+			cmd += TS990_CAT_filt_SH[(A.iBW >> 8) & 0x7F];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set filter upper cutoff", cmd, "");
 		}
@@ -1489,35 +1474,31 @@ void RIG_TS990::set_bwA(int val)
 	case USBD1: case USBD2: case USBD3:
 		if (val < 256) break;
 		if (menu_0608) {
-			lo = val & 0x7F;
-			hi = (val >> 8) & 0x7F;
-			if (hi >= sizeof(TS990_CAT_filt_width)/sizeof(*TS990_CAT_filt_width) ||
-				 lo >= sizeof(TS990_CAT_filt_shift)/sizeof(*TS990_CAT_filt_shift) )
+			if (SL >= sizeof(TS990_CAT_filt_width)/sizeof(*TS990_CAT_filt_width) ||
+				 SH >= sizeof(TS990_CAT_filt_shift)/sizeof(*TS990_CAT_filt_shift) )
 				A.iBW = A_default_SH_WI;
 			else
 				A.iBW = val;
 			cmd = "SL0";
-			cmd += TS990_CAT_filt_width[(A.iBW >> 8) & 0x7F];
+			cmd += TS990_CAT_filt_width[A.iBW & 0x7F];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set data width", cmd, "");
 			cmd = "SH0";
-			cmd += TS990_CAT_filt_shift[A.iBW & 0x7F];
+			cmd += TS990_CAT_filt_shift[(A.iBW >> 8) & 0x7F];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set data shift", cmd, "");
 		} else {
-			lo = val & 0x7F;
-			hi = (val >> 8) & 0x7F;
-			if (hi >= sizeof(TS990_CAT_filt_hi)/sizeof(*TS990_CAT_filt_lo) ||
-				 lo >= sizeof(TS990_CAT_filt_lo)/sizeof(*TS990_CAT_filt_lo) )
+			if (SH >= sizeof(TS990_CAT_filt_SH)/sizeof(*TS990_CAT_filt_SH) ||
+				 SL >= sizeof(TS990_CAT_filt_SL)/sizeof(*TS990_CAT_filt_SL) )
 				A.iBW = A_default_HI_LO;
 			else
 				A.iBW = val;
 			cmd = "SL0";
-			cmd += TS990_CAT_filt_lo[A.iBW & 0x7F];
+			cmd += TS990_CAT_filt_SL[A.iBW & 0x7F];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set data lower cutoff", cmd, "");
 			cmd = "SH0";
-			cmd += TS990_CAT_filt_hi[(A.iBW >> 8) & 0x7F];
+			cmd += TS990_CAT_filt_SH[(A.iBW >> 8) & 0x7F];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set data upper cutoff", cmd, "");
 		}
@@ -1525,83 +1506,75 @@ void RIG_TS990::set_bwA(int val)
 
 	case AM: case AMD1: case AMD2: case AMD3:
 		if (val < 256) break;
-		lo = val & 0x7F;
-		hi = (val >> 8) & 0x7F;
-		if (hi >= sizeof(TS990_CAT_AM_hi) / sizeof(*TS990_CAT_AM_hi) ||
-			lo >= sizeof(TS990_CAT_AM_lo) / sizeof(*TS990_CAT_AM_lo) )
+		if (SH >= sizeof(TS990_CAT_AM_SH) / sizeof(*TS990_CAT_AM_SH) ||
+			SL >= sizeof(TS990_CAT_AM_SL) / sizeof(*TS990_CAT_AM_SL) )
 			A.iBW = A_default_AM;
 		else
 			A.iBW = val;
 		cmd = "SL0";
-		cmd += TS990_CAT_AM_lo[A.iBW & 0x7F];
+		cmd += TS990_CAT_AM_SL[A.iBW & 0x7F];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set AM lower", cmd, "");
 		cmd = "SH0";
-		cmd += TS990_CAT_AM_hi[(A.iBW >> 8) & 0x7F];
+		cmd += TS990_CAT_AM_SH[(A.iBW >> 8) & 0x7F];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set AM upper", cmd, "");
 		break;
 
 	case FM: case FMD1: case FMD2: case FMD3:
 		if (val < 256) break;
-		lo = val & 0x7F;
-		hi = (val >> 8) & 0x7F;
-		if (hi >= sizeof(TS990_CAT_filt_hi) / sizeof(*TS990_CAT_filt_hi) ||
-			lo >= sizeof(TS990_CAT_filt_lo) / sizeof(*TS990_CAT_filt_lo) )
+		if (SH >= sizeof(TS990_CAT_filt_SH) / sizeof(*TS990_CAT_filt_SH) ||
+			SL >= sizeof(TS990_CAT_filt_SL) / sizeof(*TS990_CAT_filt_SL) )
 			A.iBW = A_default_FM;
 		else
 			A.iBW = val;
 		cmd = "SL0";
-		cmd += TS990_CAT_filt_lo[A.iBW & 0x7F];
+		cmd += TS990_CAT_filt_SL[A.iBW & 0x7F];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set FM lower", cmd, "");
 		cmd = "SH0";
-		cmd += TS990_CAT_filt_hi[(A.iBW >> 8) & 0x7F];
+		cmd += TS990_CAT_filt_SH[(A.iBW >> 8) & 0x7F];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set FM upper", cmd, "");
 		break;
 
 	case CW: case CWR:
 		if (val < 256) break;
-		lo = val & 0x7F;
-		hi = (val >> 8) & 0x7F;
-		if (hi >= sizeof(TS990_CAT_CW_width) / sizeof(*TS990_CAT_CW_width) ||
-			lo >= sizeof(TS990_CAT_CW_shift) / sizeof(*TS990_CAT_CW_shift) )
+		if (SL >= sizeof(TS990_CAT_CW_width) / sizeof(*TS990_CAT_CW_width) ||
+			SH >= sizeof(TS990_CAT_CW_shift) / sizeof(*TS990_CAT_CW_shift) )
 			A.iBW = A_default_CW;
 		else
 			A.iBW = val;
 		cmd = "SL0";
-		cmd += TS990_CAT_CW_width[(A.iBW >> 8) & 0x7F];
+		cmd += TS990_CAT_CW_width[A.iBW & 0x7F];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set cw width", cmd, "");
 		cmd = "SH0";
-		cmd += TS990_CAT_CW_shift[A.iBW & 0x7F];
+		cmd += TS990_CAT_CW_shift[(A.iBW >> 8) & 0x7F];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set cw shift", cmd, "");
 		break;
 
 	case FSK: case FSKR:
 		if (val > 256) break;
-		lo = val;
-		if (lo >= sizeof(TS990_CAT_FSK_filt) / sizeof(*TS990_CAT_FSK_filt))
+		if (SL >= sizeof(TS990_CAT_FSK_filt) / sizeof(*TS990_CAT_FSK_filt))
 			A.iBW = A_default_FSK;
 		else
 			A.iBW = val;
 		cmd = "SL0";
-		cmd += TS990_CAT_FSK_filt[A.iBW];
+		cmd += TS990_CAT_FSK_filt[A.iBW & 0x7F];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set FSK bw", cmd, "");
 		break;
 
 	case PSK: case PSKR:
 		if (val > 256) break;
-		lo = val;
-		if (lo >= sizeof(TS990_CAT_PSK_filt) / sizeof(*TS990_CAT_PSK_filt))
+		if (SL >= sizeof(TS990_CAT_PSK_filt) / sizeof(*TS990_CAT_PSK_filt))
 			A.iBW = A_default_PSK;
 		else
 			A.iBW = val;
 		cmd = "SL0";
-		cmd += TS990_CAT_PSK_filt[A.iBW];
+		cmd += TS990_CAT_PSK_filt[A.iBW & 0x7F];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set PSK bw", cmd, "");
 		break;
@@ -1610,40 +1583,39 @@ void RIG_TS990::set_bwA(int val)
 
 void RIG_TS990::set_bwB(int val)
 {
-	size_t lo = 0, hi = 0;
+	size_t SL = 0, SH = 0;
+	SL = val & 0x7F;
+	SH = (val >> 8) & 0x7F;
+
 	switch (B.imode) {
 	case LSB: case USB:
 		if (val < 256) break;
 		if (menu_0607) {
-			lo = val & 0x7F;
-			hi = (val >> 8) & 0x7F;
-			if (hi >= sizeof(TS990_CAT_filt_width)/sizeof(*TS990_CAT_filt_width) ||
-				 lo >= sizeof(TS990_CAT_filt_shift)/sizeof(*TS990_CAT_filt_shift) )
+			if (SL >= sizeof(TS990_CAT_filt_width)/sizeof(*TS990_CAT_filt_width) ||
+				 SH >= sizeof(TS990_CAT_filt_shift)/sizeof(*TS990_CAT_filt_shift) )
 				B.iBW = B_default_SH_WI;
 			else
 				B.iBW = val;
-			cmd = "SL1";
-			cmd += TS990_CAT_filt_width[(B.iBW >> 8) & 0x7F];
+			cmd = "SL0";
+			cmd += TS990_CAT_filt_width[A.iBW & 0x7F];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set width", cmd, "");
-			cmd = "SH1";
-			cmd += TS990_CAT_filt_shift[B.iBW & 0x7F];
+			cmd = "SH0";
+			cmd += TS990_CAT_filt_shift[(A.iBW >> 8) & 0x7F];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set filter shift", cmd, "");
 		} else {
-			lo = val & 0x7F;
-			hi = (val >> 8) & 0x7F;
-			if (hi >= sizeof(TS990_CAT_filt_hi)/sizeof(*TS990_CAT_filt_lo) ||
-				 lo >= sizeof(TS990_CAT_filt_lo)/sizeof(*TS990_CAT_filt_lo) )
+			if (SH >= sizeof(TS990_CAT_filt_SH)/sizeof(*TS990_CAT_filt_SH) ||
+				SL >= sizeof(TS990_CAT_filt_SL)/sizeof(*TS990_CAT_filt_SL) )
 				B.iBW = B_default_HI_LO;
 			else
 				B.iBW = val;
-			cmd = "SL1";
-			cmd += TS990_CAT_filt_lo[B.iBW  & 0x7F];
+			cmd = "SL0";
+			cmd += TS990_CAT_filt_SL[A.iBW & 0x7F];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set filter lower cutoff", cmd, "");
-			cmd = "SH1";
-			cmd += TS990_CAT_filt_hi[(B.iBW >> 8) & 0x7F];
+			cmd = "SH0";
+			cmd += TS990_CAT_filt_SH[(A.iBW >> 8) & 0x7F];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set filter upper cutoff", cmd, "");
 		}
@@ -1653,35 +1625,31 @@ void RIG_TS990::set_bwB(int val)
 	case USBD1: case USBD2: case USBD3:
 		if (val < 256) break;
 		if (menu_0608) {
-			lo = val & 0x7F;
-			hi = (val >> 8) & 0x7F;
-			if (hi >= sizeof(TS990_CAT_filt_width)/sizeof(*TS990_CAT_filt_width) ||
-				 lo >= sizeof(TS990_CAT_filt_shift)/sizeof(*TS990_CAT_filt_shift) )
+			if (SL >= sizeof(TS990_CAT_filt_width)/sizeof(*TS990_CAT_filt_width) ||
+				SH >= sizeof(TS990_CAT_filt_shift)/sizeof(*TS990_CAT_filt_shift) )
 				B.iBW = B_default_SH_WI;
 			else
 				B.iBW = val;
-			cmd = "SL1";
-			cmd += TS990_CAT_filt_width[(B.iBW >> 8) & 0x7F];
+			cmd = "SL0";
+			cmd += TS990_CAT_filt_width[A.iBW & 0x7F];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set data width", cmd, "");
-			cmd = "SH1";
-			cmd += TS990_CAT_filt_shift[B.iBW & 0x7F];
+			cmd = "SH0";
+			cmd += TS990_CAT_filt_shift[(A.iBW >> 8) & 0x7F];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set data shift", cmd, "");
 		} else {
-			lo = val & 0x7F;
-			hi = (val >> 8) & 0x7F;
-			if (hi >= sizeof(TS990_CAT_filt_hi)/sizeof(*TS990_CAT_filt_lo) ||
-				 lo >= sizeof(TS990_CAT_filt_lo)/sizeof(*TS990_CAT_filt_lo) )
+			if (SH >= sizeof(TS990_CAT_filt_SH)/sizeof(*TS990_CAT_filt_SH) ||
+				 SL >= sizeof(TS990_CAT_filt_SL)/sizeof(*TS990_CAT_filt_SL) )
 				B.iBW = B_default_HI_LO;
 			else
 				B.iBW = val;
-			cmd = "SL1";
-			cmd += TS990_CAT_filt_lo[B.iBW & 0x7F];
+			cmd = "SL0";
+			cmd += TS990_CAT_filt_SL[A.iBW & 0x7F];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set data lower cutoff", cmd, "");
-			cmd = "SH1";
-			cmd += TS990_CAT_filt_hi[(B.iBW >> 8) & 0x7F];
+			cmd = "SH0";
+			cmd += TS990_CAT_filt_SH[(A.iBW >> 8) & 0x7F];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set data upper cutoff", cmd, "");
 		}
@@ -1689,83 +1657,75 @@ void RIG_TS990::set_bwB(int val)
 
 	case AM: case AMD1: case AMD2: case AMD3:
 		if (val < 256) break;
-		lo = val & 0x7F;
-		hi = (val >> 8) & 0x7F;
-		if (hi >= sizeof(TS990_CAT_AM_hi) / sizeof(*TS990_CAT_AM_hi) ||
-			lo >= sizeof(TS990_CAT_AM_lo) / sizeof(*TS990_CAT_AM_lo) )
+		if (SH >= sizeof(TS990_CAT_AM_SH) / sizeof(*TS990_CAT_AM_SH) ||
+			SL >= sizeof(TS990_CAT_AM_SL) / sizeof(*TS990_CAT_AM_SL) )
 			B.iBW = B_default_AM;
 		else
 			B.iBW = val;
-		cmd = "SL1";
-		cmd += TS990_CAT_AM_lo[B.iBW & 0x7F];
+		cmd = "SL0";
+		cmd += TS990_CAT_AM_SL[A.iBW & 0x7F];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set AM lower", cmd, "");
-		cmd = "SH1";
-		cmd += TS990_CAT_AM_hi[(B.iBW >> 8) & 0x7F];
+		cmd = "SH0";
+		cmd += TS990_CAT_AM_SH[(A.iBW >> 8) & 0x7F];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set AM upper", cmd, "");
 		break;
 
 	case FM: case FMD1: case FMD2: case FMD3:
 		if (val < 256) break;
-		lo = val & 0x7F;
-		hi = (val >> 8) & 0x7F;
-		if (hi >= sizeof(TS990_CAT_filt_hi) / sizeof(*TS990_CAT_filt_hi) ||
-			lo >= sizeof(TS990_CAT_filt_lo) / sizeof(*TS990_CAT_filt_lo) )
+		if (SH >= sizeof(TS990_CAT_filt_SH) / sizeof(*TS990_CAT_filt_SH) ||
+			SL >= sizeof(TS990_CAT_filt_SL) / sizeof(*TS990_CAT_filt_SL) )
 			B.iBW = B_default_FM;
 		else
 			B.iBW = val;
-		cmd = "SL1";
-		cmd += TS990_CAT_filt_lo[B.iBW & 0x7F];
+		cmd = "SL0";
+		cmd += TS990_CAT_filt_SL[A.iBW & 0x7F];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set FM lower", cmd, "");
-		cmd = "SH1";
-		cmd += TS990_CAT_filt_hi[(B.iBW >> 8) & 0x7F];
+		cmd = "SH0";
+		cmd += TS990_CAT_filt_SH[(A.iBW >> 8) & 0x7F];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set FM upper", cmd, "");
 		break;
 
 	case CW: case CWR:
 		if (val < 256) break;
-		lo = val & 0x7F;
-		hi = (val >> 8) & 0x7F;
-		if (hi >= sizeof(TS990_CAT_CW_width) / sizeof(*TS990_CAT_CW_width) ||
-			lo >= sizeof(TS990_CAT_CW_shift) / sizeof(*TS990_CAT_CW_shift) )
+		if (SL >= sizeof(TS990_CAT_CW_width) / sizeof(*TS990_CAT_CW_width) ||
+			SH >= sizeof(TS990_CAT_CW_shift) / sizeof(*TS990_CAT_CW_shift) )
 			B.iBW = B_default_CW;
 		else
 			B.iBW = val;
-		cmd = "SL1";
-		cmd += TS990_CAT_CW_width[(B.iBW >> 8) & 0x7F];
+		cmd = "SL0";
+		cmd += TS990_CAT_CW_width[A.iBW & 0x7F];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set cw width", cmd, "");
-		cmd = "SH1";
-		cmd += TS990_CAT_CW_shift[B.iBW & 0x7F];
+		cmd = "SH0";
+		cmd += TS990_CAT_CW_shift[(A.iBW >> 8) & 0x7F];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set cw shift", cmd, "");
 		break;
 
 	case FSK: case FSKR:
 		if (val > 256) break;
-		lo = val;
-		if (lo >= sizeof(TS990_CAT_FSK_filt) / sizeof(*TS990_CAT_FSK_filt))
+		if (SL >= sizeof(TS990_CAT_FSK_filt) / sizeof(*TS990_CAT_FSK_filt))
 			B.iBW = B_default_FSK;
 		else
 			B.iBW = val;
-		cmd = "SL1";
-		cmd += TS990_CAT_FSK_filt[B.iBW];
+		cmd = "SL0";
+		cmd += TS990_CAT_FSK_filt[A.iBW & 0x7F];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set FSK bw", cmd, "");
 		break;
 
 	case PSK: case PSKR:
 		if (val > 256) break;
-		lo = val;
-		if (lo >= sizeof(TS990_CAT_PSK_filt) / sizeof(*TS990_CAT_PSK_filt))
+		if (SL >= sizeof(TS990_CAT_PSK_filt) / sizeof(*TS990_CAT_PSK_filt))
 			B.iBW = B_default_PSK;
 		else
 			B.iBW = val;
-		cmd = "SL1";
-		cmd += TS990_CAT_PSK_filt[B.iBW];
+		cmd = "SL0";
+		cmd += TS990_CAT_PSK_filt[A.iBW & 0x7F];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set PSK bw", cmd, "");
 		break;
@@ -1775,68 +1735,68 @@ void RIG_TS990::set_bwB(int val)
 int RIG_TS990::get_bwA()
 {
 	size_t p;
-	int lo, hi;
+	int SL = 0, SH = 0;
 
 	switch (A.imode) {
 	case CW: case CWR:
 		A.iBW = A_default_CW;
-		lo = A.iBW & 0x7F;
-		hi = (A.iBW >> 8) & 0x7F;
+		SL = A.iBW & 0x7F;
+		SH = (A.iBW >> 8) & 0x7F;
 		cmd = "SL0;";
 		if (wait_char(';', 6, 20, "get CW width", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			hi = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(&replystr[3], 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get CW shift", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				lo = fm_decimal(&replystr[3], 2); //2 2
-				A_default_CW = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+				SH = fm_decimal(&replystr[3], 2); //2 2
+				A_default_CW = A.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 			}
 		}
 		break;
 
 	case FSK: case FSKR:
 		A.iBW = A_default_FSK;
-		lo = A.iBW & 0x7F;
+		SL = A.iBW & 0x7F;
 		cmd = "SL0;";
 		if (wait_char(';', 6, 20, "get FSK Width", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			A_default_FSK = A.iBW = (lo & 0x7F);
+			SL = fm_decimal(&replystr[3], 2); //2 2
+			A_default_FSK = A.iBW = (SL & 0x7F);
 		}
 		break;
 
 	case PSK: case PSKR:
 		A.iBW = A_default_PSK;
-		lo = A.iBW & 0x7F;
+		SL = A.iBW & 0x7F;
 		cmd = "SL0;";
 		if (wait_char(';', 6, 20, "get PSK Width", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			A_default_PSK = A.iBW = (lo & 0x7F);
+			SL = fm_decimal(&replystr[3], 2); //2 2
+			A_default_PSK = A.iBW = (SL & 0x7F);
 		}
 		break;
 
 	case LSB: case USB:
-		lo = A.iBW & 0x7F;
-		hi = (A.iBW >> 8) & 0x7F;
+		SL = A.iBW & 0x7F;
+		SH = (A.iBW >> 8) & 0x7F;
 		if (menu_0607) {
 			A.iBW = A_default_SH_WI;
 			cmd = "SL0;";
 			if (wait_char(';', 6, 20, "get width", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[3], 2); //2 2
+				SL = fm_decimal(&replystr[3], 2); //2 2
 				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter shift", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					lo = fm_decimal(&replystr[3], 2); //2 2
-					A_default_SH_WI = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+					SH = fm_decimal(&replystr[3], 2); //2 2
+					A_default_SH_WI = A.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
 		} else {
@@ -1845,34 +1805,34 @@ int RIG_TS990::get_bwA()
 			if (wait_char(';', 6, 20, "get filter lower cutoff", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				lo = fm_decimal(&replystr[3], 2); //2 2
+				SL = fm_decimal(&replystr[3], 2); //2 2
 				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter upper cutoff", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					hi = fm_decimal(&replystr[3], 2); //2 2
-					A_default_HI_LO = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+					SH = fm_decimal(&replystr[3], 2); //2 2
+					A_default_HI_LO = A.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
 		}
 		break;
 
 	case LSBD1: case USBD1:
-			lo = A.iBW & 0x7F;
-			hi = (A.iBW >> 8) & 0x7F;
+			SL = A.iBW & 0x7F;
+			SH = (A.iBW >> 8) & 0x7F;
 		if (menu_0608) {
 			A.iBW = A_default_SH_WI_D1;
 			cmd = "SL0;";
 			if (wait_char(';', 6, 20, "get width", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[3], 2); //2 2
+				SL = fm_decimal(&replystr[3], 2); //2 2
 				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter shift", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-						lo = fm_decimal(&replystr[3], 2); //2
-					A_default_SH_WI_D1 = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+						SH = fm_decimal(&replystr[3], 2); //2
+					A_default_SH_WI_D1 = A.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
 		} else {
@@ -1882,34 +1842,34 @@ int RIG_TS990::get_bwA()
 			if (wait_char(';', 6, 20, "get filter lower cutoff", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				lo = fm_decimal(&replystr[3], 2); //2 2
+				SL = fm_decimal(&replystr[3], 2); //2 2
 				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter upper cutoff", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					hi = fm_decimal(&replystr[3], 2); //2 2
-					A_default_HI_LO = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+					SH = fm_decimal(&replystr[3], 2); //2 2
+					A_default_HI_LO = A.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
 		}
 		break;
 
 	case LSBD2: case USBD2:
-			lo = A.iBW & 0x7F;
-			hi = (A.iBW >> 8) & 0x7F;
+			SL = A.iBW & 0x7F;
+			SH = (A.iBW >> 8) & 0x7F;
 		if (menu_0608) {
 			A.iBW = A_default_SH_WI_D2;
 			cmd = "SL0;";
 			if (wait_char(';', 6, 20, "get width", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[3], 2); //2 2
+				SL = fm_decimal(&replystr[3], 2); //2 2
 				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter shift", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					lo = fm_decimal(&replystr[3], 2); //2
-					A_default_SH_WI_D2 = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+					SH = fm_decimal(&replystr[3], 2); //2
+					A_default_SH_WI_D2 = A.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
 		} else {
@@ -1919,34 +1879,34 @@ int RIG_TS990::get_bwA()
 			if (wait_char(';', 6, 20, "get filter lower cutoff", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				lo = fm_decimal(&replystr[3], 2); //2 2
+				SL = fm_decimal(&replystr[3], 2); //2 2
 				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter upper cutoff", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					hi = fm_decimal(&replystr[3], 2); //2 2
-					A_default_HI_LO = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+					SH = fm_decimal(&replystr[3], 2); //2 2
+					A_default_HI_LO = A.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
 		}
 		break;
 
 	case LSBD3: case USBD3:
-			lo = A.iBW & 0x7F;
-			hi = (A.iBW >> 8) & 0x7F;
+			SL = A.iBW & 0x7F;
+			SH = (A.iBW >> 8) & 0x7F;
 		if (menu_0608) {
 			A.iBW = A_default_SH_WI_D3;
 			cmd = "SL0;";
 			if (wait_char(';', 6, 20, "get width", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[3], 2); //2 2
+				SL = fm_decimal(&replystr[3], 2); //2 2
 				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter shift", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					lo = fm_decimal(&replystr[3], 2); //2
-					A_default_SH_WI_D3 = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+					SH = fm_decimal(&replystr[3], 2); //2
+					A_default_SH_WI_D3 = A.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
 		} else {
@@ -1955,13 +1915,13 @@ int RIG_TS990::get_bwA()
 			if (wait_char(';', 6, 20, "get filter lower cutoff", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				lo = fm_decimal(&replystr[3], 2); //2 2
+				SL = fm_decimal(&replystr[3], 2); //2 2
 				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter upper cutoff", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					hi = fm_decimal(&replystr[3], 2); //2 2
-					A_default_HI_LO = A.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+					SH = fm_decimal(&replystr[3], 2); //2 2
+					A_default_HI_LO = A.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
 		}
@@ -1969,152 +1929,152 @@ int RIG_TS990::get_bwA()
 
 	case AM:
 		A.iBW = A_default_AM;
-		lo = A.iBW & 0x7F;
-		hi = (A.iBW >> 8) & 0x7F;
+		SL = A.iBW & 0x7F;
+		SH = (A.iBW >> 8) & 0x7F;
 		cmd = "SL0;";
 		if (wait_char(';', 6, 20, "get AM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(&replystr[3], 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get AM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[3], 2); //2 2
-				A_default_AM = A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+				SH = fm_decimal(&replystr[3], 2); //2 2
+				A_default_AM = A.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
 		break;
 
 	case AMD1:
 		A.iBW = A_default_AM_D1;
-		lo = A.iBW & 0x7F;
-		hi = (A.iBW >> 8) & 0x7F;
+		SL = A.iBW & 0x7F;
+		SH = (A.iBW >> 8) & 0x7F;
 		cmd = "SL0;";
 		if (wait_char(';', 6, 20, "get AM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(&replystr[3], 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get AM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[3], 2); //2 2
-				A_default_AM_D1 = A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+				SH = fm_decimal(&replystr[3], 2); //2 2
+				A_default_AM_D1 = A.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
 		break;
 
 	case AMD2:
 		A.iBW = A_default_AM_D2;
-		lo = A.iBW & 0x7F;
-		hi = (A.iBW >> 8) & 0x7F;
+		SL = A.iBW & 0x7F;
+		SH = (A.iBW >> 8) & 0x7F;
 		cmd = "SL0;";
 		if (wait_char(';', 6, 20, "get AM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(&replystr[3], 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get AM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[3], 2); //2 2
-				A_default_AM_D2 = A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+				SH = fm_decimal(&replystr[3], 2); //2 2
+				A_default_AM_D2 = A.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
 		break;
 
 	case AMD3:
 		A.iBW = A_default_AM_D3;
-		lo = A.iBW & 0x7F;
-		hi = (A.iBW >> 8) & 0x7F;
+		SL = A.iBW & 0x7F;
+		SH = (A.iBW >> 8) & 0x7F;
 		cmd = "SL0;";
 		if (wait_char(';', 6, 20, "get AM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(&replystr[3], 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get AM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[3], 2); //2 2
-				A_default_AM_D3 = A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+				SH = fm_decimal(&replystr[3], 2); //2 2
+				A_default_AM_D3 = A.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
 		break;
 
 	case FM:
 		A.iBW = A_default_FM;
-		lo = A.iBW & 0x7F;
-		hi = (A.iBW >> 8) & 0x7F;
+		SL = A.iBW & 0x7F;
+		SH = (A.iBW >> 8) & 0x7F;
 		cmd = "SL0;";
 		if (wait_char(';', 6, 20, "get FM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(&replystr[3], 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get FM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[3], 2); //2 2
-				A_default_FM = A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+				SH = fm_decimal(&replystr[3], 2); //2 2
+				A_default_FM = A.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
 		break;
 
 	case FMD1:
 		A.iBW = A_default_FM_D1;
-		lo = A.iBW & 0x7F;
-		hi = (A.iBW >> 8) & 0x7F;
+		SL = A.iBW & 0x7F;
+		SH = (A.iBW >> 8) & 0x7F;
 		cmd = "SL0;";
 		if (wait_char(';', 6, 20, "get FM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(&replystr[3], 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get FM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[3], 2); //2 2
-				A_default_FM_D1 = A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+				SH = fm_decimal(&replystr[3], 2); //2 2
+				A_default_FM_D1 = A.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
 		break;
 
 	case FMD2 :
 		A.iBW = A_default_FM_D2;
-		lo = A.iBW & 0x7F;
-		hi = (A.iBW >> 8) & 0x7F;
+		SL = A.iBW & 0x7F;
+		SH = (A.iBW >> 8) & 0x7F;
 		cmd = "SL0;";
 		if (wait_char(';', 6, 20, "get FM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(&replystr[3], 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get FM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[3], 2); //2 2
-				A_default_FM_D2 = A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+				SH = fm_decimal(&replystr[3], 2); //2 2
+				A_default_FM_D2 = A.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
 		break;
 
 	case FMD3:
 		A.iBW = A_default_FM_D3;
-		lo = A.iBW & 0x7F;
-		hi = (A.iBW >> 8) & 0x7F;
+		SL = A.iBW & 0x7F;
+		SH = (A.iBW >> 8) & 0x7F;
 		cmd = "SL0;";
 		if (wait_char(';', 6, 20, "get FM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(&replystr[3], 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get FM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[3], 2); //2 2
-				A_default_FM_D3 = A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+				SH = fm_decimal(&replystr[3], 2); //2 2
+				A_default_FM_D3 = A.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
 		return A.iBW;
@@ -2125,191 +2085,193 @@ int RIG_TS990::get_bwA()
 int RIG_TS990::get_bwB()
 {
 	size_t p;
-	int hi, lo;
+	int SL = 0, SH = 0;
 
 	switch (B.imode) {
 	case CW: case CWR:
 		B.iBW = B_default_CW;
-		lo = B.iBW & 0x7F;
-		hi = (B.iBW >> 8) & 0x7F;
-		cmd = "SL1;";
-		if (wait_char(';', 6, 20, "get CW lower", ASC) == 6) {
+		SL = B.iBW & 0x7F;
+		SH = (B.iBW >> 8) & 0x7F;
+		cmd = "SL0;";
+		if (wait_char(';', 6, 20, "get CW width", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			cmd = "SH1;";
-			if (wait_char(';', 6, 20, "get CW upper", ASC) == 6) {
+			SL = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH0;";
+			if (wait_char(';', 6, 20, "get CW shift", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[3], 2); //2 2
-				B_default_CW = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+				SH = fm_decimal(&replystr[3], 2); //2 2
+				B_default_CW = B.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 			}
 		}
 		break;
 
 	case FSK: case FSKR:
 		B.iBW = B_default_FSK;
-		lo = B.iBW & 0x7F;
-		cmd = "SL1;";
+		SL = B.iBW & 0x7F;
+		cmd = "SL0;";
 		if (wait_char(';', 6, 20, "get FSK Width", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			B_default_FSK = B.iBW = (lo & 0x7F);
+			SL = fm_decimal(&replystr[3], 2); //2 2
+			B_default_FSK = B.iBW = (SL & 0x7F);
 		}
 		break;
 
 	case PSK: case PSKR:
 		B.iBW = B_default_PSK;
-		lo = B.iBW & 0x7F;
-		cmd = "SL1;";
+		SL = B.iBW & 0x7F;
+		cmd = "SL0;";
 		if (wait_char(';', 6, 20, "get PSK Width", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			B_default_PSK = B.iBW = (lo & 0x7F);
+			SL = fm_decimal(&replystr[3], 2); //2 2
+			B_default_PSK = B.iBW = (SL & 0x7F);
 		}
 		break;
 
 	case LSB: case USB:
-		lo = B.iBW & 0x7F;
-		hi = (B.iBW >> 8) & 0x7F;
+		SL = B.iBW & 0x7F;
+		SH = (B.iBW >> 8) & 0x7F;
 		if (menu_0607) {
 			B.iBW = B_default_SH_WI;
-			cmd = "SL1;";
+			cmd = "SL0;";
 			if (wait_char(';', 6, 20, "get width", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[3], 2); //2 2
-				cmd = "SH1;";
+				SL = fm_decimal(&replystr[3], 2); //2 2
+				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter shift", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					lo = fm_decimal(&replystr[3], 2); //2 2
-					B_default_SH_WI = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+					SH = fm_decimal(&replystr[3], 2); //2 2
+					B_default_SH_WI = B.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
 		} else {
 			B.iBW = B_default_HI_LO;
-			cmd = "SL1;";
+			cmd = "SL0;";
 			if (wait_char(';', 6, 20, "get filter lower cutoff", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				lo = fm_decimal(&replystr[3], 2); //2 2
-				cmd = "SH1;";
+				SL = fm_decimal(&replystr[3], 2); //2 2
+				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter upper cutoff", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					hi = fm_decimal(&replystr[3], 2); //2 2
-					B_default_HI_LO = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+					SH = fm_decimal(&replystr[3], 2); //2 2
+					B_default_HI_LO = B.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
 		}
 		break;
 
 	case LSBD1: case USBD1:
-		lo = B.iBW & 0x7F;
-		hi = (B.iBW >> 8) & 0x7F;
+			SL = B.iBW & 0x7F;
+			SH = (B.iBW >> 8) & 0x7F;
 		if (menu_0608) {
 			B.iBW = B_default_SH_WI_D1;
-			cmd = "SL1;";
+			cmd = "SL0;";
 			if (wait_char(';', 6, 20, "get width", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[3], 2); //2 2
-				cmd = "SH1;";
+				SL = fm_decimal(&replystr[3], 2); //2 2
+				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter shift", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					lo = fm_decimal(&replystr[3], 2); //2 2
-					B_default_SH_WI_D1 = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+						SH = fm_decimal(&replystr[3], 2); //2
+					B_default_SH_WI_D1 = B.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
 		} else {
+
 			B.iBW = B_default_HI_LO;
-			cmd = "SL1;";
+			cmd = "SL0;";
 			if (wait_char(';', 6, 20, "get filter lower cutoff", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				lo = fm_decimal(&replystr[3], 2); //2 2
-				cmd = "SH1;";
-				if (wait_char(';', 6, 20, "get fiter upper cutoff", ASC) == 6) {
+				SL = fm_decimal(&replystr[3], 2); //2 2
+				cmd = "SH0;";
+				if (wait_char(';', 6, 20, "get filter upper cutoff", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					hi = fm_decimal(&replystr[3], 2); //2 2
-					B_default_HI_LO = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+					SH = fm_decimal(&replystr[3], 2); //2 2
+					B_default_HI_LO = B.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
 		}
 		break;
 
 	case LSBD2: case USBD2:
-		lo = B.iBW & 0x7F;
-		hi = (B.iBW >> 8) & 0x7F;
+			SL = B.iBW & 0x7F;
+			SH = (B.iBW >> 8) & 0x7F;
 		if (menu_0608) {
 			B.iBW = B_default_SH_WI_D2;
-			cmd = "SL1;";
+			cmd = "SL0;";
 			if (wait_char(';', 6, 20, "get width", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[3], 2); //2 2
-				cmd = "SH1;";
+				SL = fm_decimal(&replystr[3], 2); //2 2
+				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter shift", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					lo = fm_decimal(&replystr[3], 2); //2 2
-					B_default_SH_WI_D2 = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+					SH = fm_decimal(&replystr[3], 2); //2
+					B_default_SH_WI_D2 = B.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
 		} else {
+
 			B.iBW = B_default_HI_LO;
-			cmd = "SL1;";
+			cmd = "SL0;";
 			if (wait_char(';', 6, 20, "get filter lower cutoff", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				lo = fm_decimal(&replystr[3], 2); //2 2
-				cmd = "SH1;";
-				if (wait_char(';', 6, 20, "get fiter upper cutoff", ASC) == 6) {
+				SL = fm_decimal(&replystr[3], 2); //2 2
+				cmd = "SH0;";
+				if (wait_char(';', 6, 20, "get filter upper cutoff", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					hi = fm_decimal(&replystr[3], 2); //2 2
-					B_default_HI_LO = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+					SH = fm_decimal(&replystr[3], 2); //2 2
+					B_default_HI_LO = B.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
 		}
 		break;
 
 	case LSBD3: case USBD3:
-		lo = B.iBW & 0x7F;
-		hi = (B.iBW >> 8) & 0x7F;
+			SL = B.iBW & 0x7F;
+			SH = (B.iBW >> 8) & 0x7F;
 		if (menu_0608) {
 			B.iBW = B_default_SH_WI_D3;
-			cmd = "SL1;";
+			cmd = "SL0;";
 			if (wait_char(';', 6, 20, "get width", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[3], 2); //2 2
-				cmd = "SH1;";
+				SL = fm_decimal(&replystr[3], 2); //2 2
+				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter shift", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					lo = fm_decimal(&replystr[3], 2); //2 2
-					B_default_SH_WI_D3 = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+					SH = fm_decimal(&replystr[3], 2); //2
+					B_default_SH_WI_D3 = B.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
 		} else {
 			B.iBW = B_default_HI_LO;
-			cmd = "SL1;";
+			cmd = "SL0;";
 			if (wait_char(';', 6, 20, "get filter lower cutoff", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				lo = fm_decimal(&replystr[3], 2); //2 2
-				cmd = "SH1;";
-				if (wait_char(';', 6, 20, "get fiter upper cutoff", ASC) == 6) {
+				SL = fm_decimal(&replystr[3], 2); //2 2
+				cmd = "SH0;";
+				if (wait_char(';', 6, 20, "get filter upper cutoff", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					hi = fm_decimal(&replystr[3], 2); //2 2
-					B_default_HI_LO = B.iBW = ((hi << 8) | (lo & 0x7F )) | 0x8000;
+					SH = fm_decimal(&replystr[3], 2); //2 2
+					B_default_HI_LO = B.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
 		}
@@ -2317,152 +2279,152 @@ int RIG_TS990::get_bwB()
 
 	case AM:
 		B.iBW = B_default_AM;
-		lo = B.iBW & 0x7F;
-		hi = (B.iBW >> 8) & 0x7F;
-		cmd = "SL1;";
+		SL = B.iBW & 0x7F;
+		SH = (B.iBW >> 8) & 0x7F;
+		cmd = "SL0;";
 		if (wait_char(';', 6, 20, "get AM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			cmd = "SH1;";
+			SL = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get AM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[3], 2); //2 2
-				B_default_AM = B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+				SH = fm_decimal(&replystr[3], 2); //2 2
+				B_default_AM = B.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
 		break;
 
 	case AMD1:
 		B.iBW = B_default_AM_D1;
-		lo = B.iBW & 0x7F;
-		hi = (B.iBW >> 8) & 0x7F;
-		cmd = "SL1;";
+		SL = B.iBW & 0x7F;
+		SH = (B.iBW >> 8) & 0x7F;
+		cmd = "SL0;";
 		if (wait_char(';', 6, 20, "get AM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			cmd = "SH1;";
+			SL = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get AM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[3], 2); //2 2
-				B_default_AM_D1 = B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+				SH = fm_decimal(&replystr[3], 2); //2 2
+				B_default_AM_D1 = B.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
 		break;
 
 	case AMD2:
 		B.iBW = B_default_AM_D2;
-		lo = B.iBW & 0x7F;
-		hi = (B.iBW >> 8) & 0x7F;
-		cmd = "SL1;";
+		SL = B.iBW & 0x7F;
+		SH = (B.iBW >> 8) & 0x7F;
+		cmd = "SL0;";
 		if (wait_char(';', 6, 20, "get AM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			cmd = "SH1;";
+			SL = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get AM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[3], 2); //2 2
-				B_default_AM_D2 = B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+				SH = fm_decimal(&replystr[3], 2); //2 2
+				B_default_AM_D2 = B.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
 		break;
 
 	case AMD3:
 		B.iBW = B_default_AM_D3;
-		lo = B.iBW & 0x7F;
-		hi = (B.iBW >> 8) & 0x7F;
-		cmd = "SL1;";
+		SL = B.iBW & 0x7F;
+		SH = (B.iBW >> 8) & 0x7F;
+		cmd = "SL0;";
 		if (wait_char(';', 6, 20, "get AM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			cmd = "SH1;";
+			SL = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get AM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[3], 2); //2 2
-				B_default_AM_D3 = B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+				SH = fm_decimal(&replystr[3], 2); //2 2
+				B_default_AM_D3 = B.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
 		break;
 
 	case FM:
 		B.iBW = B_default_FM;
-		lo = B.iBW & 0x7F;
-		hi = (B.iBW >> 8) & 0x7F;
-		cmd = "SL1;";
+		SL = B.iBW & 0x7F;
+		SH = (B.iBW >> 8) & 0x7F;
+		cmd = "SL0;";
 		if (wait_char(';', 6, 20, "get FM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			cmd = "SH1;";
+			SL = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get FM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[3], 2); //2 2
-				B_default_FM = B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+				SH = fm_decimal(&replystr[3], 2); //2 2
+				B_default_FM = B.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
 		break;
 
 	case FMD1:
 		B.iBW = B_default_FM_D1;
-		lo = B.iBW & 0x7F;
-		hi = (B.iBW >> 8) & 0x7F;
-		cmd = "SL1;";
+		SL = B.iBW & 0x7F;
+		SH = (B.iBW >> 8) & 0x7F;
+		cmd = "SL0;";
 		if (wait_char(';', 6, 20, "get FM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			cmd = "SH1;";
+			SL = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get FM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[3], 2); //2 2
-				B_default_FM_D1 = B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+				SH = fm_decimal(&replystr[3], 2); //2 2
+				B_default_FM_D1 = B.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
 		break;
 
-	case FMD2:
+	case FMD2 :
 		B.iBW = B_default_FM_D2;
-		lo = B.iBW & 0x7F;
-		hi = (B.iBW >> 8) & 0x7F;
-		cmd = "SL1;";
+		SL = B.iBW & 0x7F;
+		SH = (B.iBW >> 8) & 0x7F;
+		cmd = "SL0;";
 		if (wait_char(';', 6, 20, "get FM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			cmd = "SH1;";
+			SL = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get FM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[3], 2); //2 2
-				B_default_FM_D2 = B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+				SH = fm_decimal(&replystr[3], 2); //2 2
+				B_default_FM_D2 = B.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
 		break;
 
 	case FMD3:
 		B.iBW = B_default_FM_D3;
-		lo = B.iBW & 0x7F;
-		hi = (B.iBW >> 8) & 0x7F;
-		cmd = "SL1;";
+		SL = B.iBW & 0x7F;
+		SH = (B.iBW >> 8) & 0x7F;
+		cmd = "SL0;";
 		if (wait_char(';', 6, 20, "get FM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[3], 2); //2 2
-			cmd = "SH1;";
+			SL = fm_decimal(&replystr[3], 2); //2 2
+			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get FM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[3], 2); //2 2
-				B_default_FM_D3 = B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
+				SH = fm_decimal(&replystr[3], 2); //2 2
+				B_default_FM_D3 = B.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
 		return B.iBW;

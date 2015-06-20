@@ -220,7 +220,7 @@ public:
 		result = result_string;
 	}
 
-	std::string help() { return std::string("rig.get_mode"); }
+	std::string help() { return std::string("returns current xcvr mode"); }
 
 } rig_get_mode(&rig_server);
 
@@ -259,16 +259,16 @@ public :
 		if (selrig->has_dsp_controls && dsplo && dsphi) {
 			int i = 0;
 			int n = 1;
-			std::string control_label = selrig->lo_label;
-			control_label.append("|").append(selrig->lo_tooltip);
+			std::string control_label = selrig->SL_label;
+			control_label.append("|").append(selrig->SL_tooltip);
 			bws[0][0] = control_label.c_str();
 			while (dsplo[i]) {
 				bws[0][n] = dsplo[i];
 				n++; i++;
 			}
 			i = 0;
-			control_label.assign(selrig->hi_label);
-			control_label.append("|").append(selrig->hi_tooltip);
+			control_label.assign(selrig->SH_label);
+			control_label.append("|").append(selrig->SH_tooltip);
 			bws[1][0] = control_label.c_str();
 			n = 1;
 			while (dsphi[i]) {
@@ -307,6 +307,7 @@ public:
 		const char **bwt = selrig->bwtable(mode);
 		const char **dsplo = selrig->lotable(mode);
 		const char **dsphi = selrig->hitable(mode);
+//std::cout << "BW " << std::hex << BW << std::dec << "\n";
 		result[0] = (BW > 256 && selrig->has_dsp_controls) ?
 					(dsplo ? dsplo[BW & 0x7F] : "") : 
 					(bwt ? bwt[BW] : "");
@@ -315,7 +316,7 @@ public:
 					"";
 	}
 
-	std::string help() { return std::string("rig.get_bw"); }
+	std::string help() { return std::string("returns current bw L/U value"); }
 
 } rig_get_bw(&rig_server);
 
@@ -422,7 +423,7 @@ public:
 		if (ans == "B" && !useB) Fl::awake(selectB);
 	}
 
-	std::string help() { return std::string("returns vfo in use A or B"); }
+	std::string help() { return std::string("sets vfo in use A or B"); }
 
 } rig_set_AB(&rig_server);
 
@@ -479,7 +480,7 @@ public:
 			i++;
 		}
 	}
-	std::string help() { return std::string("rig.set_mode MODE_NAME"); }
+	std::string help() { return std::string("set_mode MODE_NAME"); }
 
 } rig_set_mode(&rig_server);
 
@@ -494,12 +495,6 @@ public:
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 		int bw = int(params[0]);
-		int i = 0;
-		while (selrig->bw_vals_[i] != -1) i++;
-		if (bw < 0 || bw >= i) {
-			return;
-		}
-
 		if (useB) {
 			guard_lock queB_lock(&mutex_queB);
 			if (!queB.empty()) srvr_vfo = queB.back();
@@ -512,7 +507,7 @@ public:
 		srvr_vfo.iBW = bw;
 		push_xml();
 	}
-	std::string help() { return std::string("rig.set_bw"); }
+	std::string help() { return std::string("set_bw to VAL"); }
 
 } rig_set_bw(&rig_server);
 

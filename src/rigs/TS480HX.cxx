@@ -32,22 +32,22 @@ static const char *TS480HX_empty[] = { "N/A", NULL };
 static int TS480HX_bw_vals[] = {1, WVALS_LIMIT};
 
 // SL command is lo cut when menu 045 OFF
-static const char *TS480HX_lo[] = {
+static const char *TS480HX_SL[] = {
   "0",   "50", "100", "200", "300", 
 "400",  "500", "600", "700", "800", 
 "900", "1000", NULL };
-static const char *TS480HX_lo_tooltip = "lo cut";
-static const char *TS480HX_btn_lo_label = "L";
+static const char *TS480HX_SL_tooltip = "lo cut";
+static const char *TS480HX_btn_SL_label = "L";
 
 // SH command is hi cut when menu 045 OFF
-static const char *TS480HX_hi[] = {
+static const char *TS480HX_SH[] = {
 "1000", "1200", "1400", "1600", "1800", 
 "2000", "2200", "2400", "2600", "2800", 
 "3000", "3400", "4000", "5000", NULL };
 static int TS480HX_HI_bw_vals[] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,WVALS_LIMIT};
 
-static const char *TS480HX_hi_tooltip = "hi cut";
-static const char *TS480HX_btn_hi_label = "H";
+static const char *TS480HX_SH_tooltip = "hi cut";
+static const char *TS480HX_btn_SH_label = "H";
 
 // SL command is width when menu 045 ON
 static const char *TS480HX_dataW[] = {
@@ -63,11 +63,11 @@ static const char *TS480HX_dataC[] = {
 static const char *TS480HX_dataC_tooltip = "center";
 static const char *TS480HX_dataC_label = "C";
 
-static const char *TS480HX_AM_lo[] = {
+static const char *TS480HX_AM_SL[] = {
 "10", "100", "200", "500",
 NULL };
 
-static const char *TS480HX_AM_hi[] = {
+static const char *TS480HX_AM_SH[] = {
 "2500", "3000", "4000", "5000",
 NULL };
 //static int TS480HX_AM_bw_vals[] = {1,2,3,4,WVALS_LIMIT};
@@ -127,16 +127,16 @@ RIG_TS480HX::RIG_TS480HX() {
 	name_ = TS480HXname_;
 	modes_ = TS480HXmodes_;
 	_mode_type  = TS480HX_mode_type;
-	bandwidths_ = TS480HX_hi;
+	bandwidths_ = TS480HX_SH;
 	bw_vals_ = TS480HX_HI_bw_vals;
 
-	dsp_lo     = TS480HX_lo;
-	lo_tooltip = TS480HX_lo_tooltip;
-	lo_label   = TS480HX_btn_lo_label;
+	dsp_SL     = TS480HX_SL;
+	SL_tooltip = TS480HX_SL_tooltip;
+	SL_label   = TS480HX_btn_SL_label;
 
-	dsp_hi     = TS480HX_hi;
-	hi_tooltip = TS480HX_lo_tooltip;
-	hi_label   = TS480HX_btn_hi_label;
+	dsp_SH     = TS480HX_SH;
+	SH_tooltip = TS480HX_SL_tooltip;
+	SH_label   = TS480HX_btn_SH_label;
 
 	widgets = rig_widgets;
 
@@ -192,8 +192,8 @@ const char * RIG_TS480HX::get_bwname_(int n, int md)
 		int hi = (n >> 8) & 0x7F;
 		int lo = n & 0xFF;
 		snprintf(bwname, sizeof(bwname), "%s/%s",
-			(md == 0 || md == 1 || md == 3) ? dsp_lo[lo] : TS480HX_AM_lo[lo],
-			(md == 0 || md == 1 || md == 3) ? dsp_hi[hi] : TS480HX_AM_hi[hi] );
+			(md == 0 || md == 1 || md == 3) ? dsp_SL[lo] : TS480HX_AM_SL[lo],
+			(md == 0 || md == 1 || md == 3) ? dsp_SH[hi] : TS480HX_AM_SH[hi] );
 	} else {
 		snprintf(bwname, sizeof(bwname), "%s",
 			(md == 2 || md == 6) ? TS480HX_CWwidths[n] : TS480HX_FSKwidths[n]);
@@ -214,20 +214,20 @@ void RIG_TS480HX::check_menu_45()
 	}
 
 	if (menu_45) {
-		dsp_lo     = TS480HX_dataW;
-		lo_tooltip = TS480HX_dataW_tooltip;
-		lo_label   = TS480HX_dataW_label;
-		dsp_hi     = TS480HX_dataC;
-		hi_tooltip = TS480HX_dataC_tooltip;
-		hi_label   = TS480HX_dataC_label;
+		dsp_SL     = TS480HX_dataW;
+		SL_tooltip = TS480HX_dataW_tooltip;
+		SL_label   = TS480HX_dataW_label;
+		dsp_SH     = TS480HX_dataC;
+		SH_tooltip = TS480HX_dataC_tooltip;
+		SH_label   = TS480HX_dataC_label;
 		B.iBW = A.iBW = 0x8106;
 	} else {
-		dsp_lo     = TS480HX_lo;
-		lo_tooltip = TS480HX_lo_tooltip;
-		lo_label   = TS480HX_btn_lo_label;
-		dsp_hi     = TS480HX_hi;
-		hi_tooltip = TS480HX_hi_tooltip;
-		hi_label   = TS480HX_btn_hi_label;
+		dsp_SL     = TS480HX_SL;
+		SL_tooltip = TS480HX_SL_tooltip;
+		SL_label   = TS480HX_btn_SL_label;
+		dsp_SH     = TS480HX_SH;
+		SH_tooltip = TS480HX_SH_tooltip;
+		SH_label   = TS480HX_btn_SH_label;
 		B.iBW = A.iBW = 0x8A03;
 	}
 }
@@ -440,42 +440,42 @@ int RIG_TS480HX::set_widths(int val)
 	if (val == 0 || val == 1 || val == 3) {
 		if (menu_45) {
 			bw = 0x8106; // 1500 Hz 2400 wide
-			dsp_lo     = TS480HX_dataW;
-			lo_tooltip = TS480HX_dataW_tooltip;
-			lo_label   = TS480HX_dataW_label;
-			dsp_hi     = TS480HX_dataC;
-			hi_tooltip = TS480HX_dataC_tooltip;
-			hi_label   = TS480HX_dataC_label;
+			dsp_SL     = TS480HX_dataW;
+			SL_tooltip = TS480HX_dataW_tooltip;
+			SL_label   = TS480HX_dataW_label;
+			dsp_SH     = TS480HX_dataC;
+			SH_tooltip = TS480HX_dataC_tooltip;
+			SH_label   = TS480HX_dataC_label;
 			bandwidths_ = TS480HX_dataW;
 			bw_vals_ = TS480HX_data_bw_vals;
 		} else {
 			bw = 0x8A03; // 200 ... 3000 Hz
-			dsp_lo     = TS480HX_lo;
-			lo_tooltip = TS480HX_lo_tooltip;
-			lo_label   = TS480HX_btn_lo_label;
-			dsp_hi     = TS480HX_hi;
-			hi_tooltip = TS480HX_hi_tooltip;
-			hi_label   = TS480HX_btn_hi_label;
-			bandwidths_ = TS480HX_hi;
+			dsp_SL     = TS480HX_SL;
+			SL_tooltip = TS480HX_SL_tooltip;
+			SL_label   = TS480HX_btn_SL_label;
+			dsp_SH     = TS480HX_SH;
+			SH_tooltip = TS480HX_SH_tooltip;
+			SH_label   = TS480HX_btn_SH_label;
+			bandwidths_ = TS480HX_SH;
 			bw_vals_ = TS480HX_HI_bw_vals;
 		}
 	} else if (val == 2 || val == 6) {
 		bandwidths_ = TS480HX_CWwidths;
 		bw_vals_ = TS480HX_CW_bw_vals;
-		dsp_lo = TS480HX_empty;
-		dsp_hi = TS480HX_empty;
+		dsp_SL = TS480HX_empty;
+		dsp_SH = TS480HX_empty;
 		bw = 7;
 	} else if (val == 5 || val == 7) {
 		bandwidths_ = TS480HX_FSKwidths;
 		bw_vals_ = TS480HX_FSK_bw_vals;
-		dsp_lo = TS480HX_empty;
-		dsp_hi = TS480HX_empty;
+		dsp_SL = TS480HX_empty;
+		dsp_SH = TS480HX_empty;
 		bw = 1;
 	} else { // val == 4 ==> AM
 		bandwidths_ = TS480HX_empty;
 		bw_vals_ = TS480HX_bw_vals;
-		dsp_lo = TS480HX_AM_lo;
-		dsp_hi = TS480HX_AM_hi;
+		dsp_SL = TS480HX_AM_SL;
+		dsp_SH = TS480HX_AM_SH;
 		bw = 0x8201;
 	}
 	return bw;
@@ -496,23 +496,23 @@ const char **RIG_TS480HX::bwtable(int m)
 const char **RIG_TS480HX::lotable(int m)
 {
 	if (m == 0 || m == 1 || m == 3)
-		return TS480HX_lo;
+		return TS480HX_SL;
 	else if (m == 2 || m == 6)
 		return NULL;
 	else if (m == 5 || m == 7)
 		return NULL;
-	return TS480HX_AM_lo;
+	return TS480HX_AM_SL;
 }
 
 const char **RIG_TS480HX::hitable(int m)
 {
 	if (m == 0 || m == 1 || m == 3)
-		return TS480HX_hi;
+		return TS480HX_SH;
 	else if (m == 2 || m == 6)
 		return NULL;
 	else if (m == 5 || m == 7)
 		return NULL;
-	return TS480HX_AM_hi;
+	return TS480HX_AM_SH;
 }
 
 void RIG_TS480HX::set_modeA(int val)
@@ -582,11 +582,11 @@ void RIG_TS480HX::set_bwA(int val)
 		cmd = "SL";
 		cmd.append(to_decimal(A.iBW & 0xFF, 2)).append(";");
 		sendCommand(cmd);
-		showresp(WARN, ASC, lo_tooltip, cmd, "");
+		showresp(WARN, ASC, SL_tooltip, cmd, "");
 		cmd = "SH";
 		cmd.append(to_decimal(((A.iBW >> 8) & 0x7F), 2)).append(";");
 		sendCommand(cmd);
-		showresp(WARN, ASC, hi_tooltip, cmd, "");
+		showresp(WARN, ASC, SH_tooltip, cmd, "");
 	}
 	if (val > 256) return;
 	else if (A.imode == 2 || A.imode == 6) {
@@ -664,11 +664,11 @@ void RIG_TS480HX::set_bwB(int val)
 		cmd = "SL";
 		cmd.append(to_decimal(B.iBW & 0xFF, 2)).append(";");
 		sendCommand(cmd);
-		showresp(WARN, ASC, lo_tooltip, cmd, "");
+		showresp(WARN, ASC, SL_tooltip, cmd, "");
 		cmd = "SH";
 		cmd.append(to_decimal(((B.iBW >> 8) & 0x7F), 2)).append(";");
 		sendCommand(cmd);
-		showresp(WARN, ASC, hi_tooltip, cmd, "");
+		showresp(WARN, ASC, SH_tooltip, cmd, "");
 	}
 	if (val > 256) return;
 	else if (B.imode == 2 || B.imode == 6) { // CW
