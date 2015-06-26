@@ -31,8 +31,6 @@ Fl_ComboBox *mnuBaudrate=(Fl_ComboBox *)0;
 Fl_Check_Button *btnTwoStopBit=(Fl_Check_Button *)0;
 Fl_Check_Button *btnOneStopBit=(Fl_Check_Button *)0;
 Fl_Check_Button *btnRigCatEcho=(Fl_Check_Button *)0;
-Fl_Input *server_addr=(Fl_Input *)0;
-Fl_Int_Input *server_port=(Fl_Int_Input *)0;
 Fl_Round_Button *btncatptt=(Fl_Round_Button *)0;
 Fl_Round_Button *btnrtsptt=(Fl_Round_Button *)0;
 Fl_Round_Button *btndtrptt=(Fl_Round_Button *)0;
@@ -60,6 +58,7 @@ Fl_Round_Button *btnSepDTRptt=(Fl_Round_Button *)0;
 Fl_Check_Button *btnSepDTRplus=(Fl_Check_Button *)0;
 Fl_Group *tabAux=(Fl_Group *)0;
 Fl_ComboBox *selectAuxPort=(Fl_ComboBox *)0;
+
 Fl_Group *tabPolling=(Fl_Group *)0;
 Fl_Value_Input *poll_smeter=(Fl_Value_Input *)0;
 Fl_Value_Input *poll_pout=(Fl_Value_Input *)0;
@@ -91,6 +90,16 @@ Fl_Box *box_xcvr_connect=(Fl_Box *)0;
 Fl_Box *box_fldigi_connect=(Fl_Box *)0;
 Fl_Button *btnCancelCommConfig=(Fl_Button *)0;
 Fl_Return_Button *btnOkXcvrDialog=(Fl_Return_Button *)0;
+
+Fl_Group *tabXMLRPC=(Fl_Group *)0;
+Fl_Input *server_addr=(Fl_Input *)0;
+Fl_Int_Input *server_port=(Fl_Int_Input *)0;
+Fl_Check_Button *btn_xmlrpc_server=(Fl_Check_Button *)0;
+
+static void cb_xmlrpc_server(Fl_Check_Button *w, void *)
+{
+	progStatus.fldigi_is_server = btn_xmlrpc_server->value();
+}
 
 static void cb_selectRig(Fl_ComboBox*, void*) {
 	btnOkXcvrDialog->labelcolor(FL_RED);
@@ -441,10 +450,10 @@ tabsConfig = new Fl_Tabs(0, 8, 482, 246);
 
 	tabPrimary = new Fl_Group(2, 30, 475, 222, _("Primary"));
 
-		Fl_Group* xcr_grp1 = new Fl_Group(5, 34, 195, 140);
+		Fl_Group* xcr_grp1 = new Fl_Group(5, 34, 465, 140);
 			xcr_grp1->box(FL_ENGRAVED_FRAME);
 
-			selectRig = new Fl_ComboBox(41, 36, 155, 20, _("Rig:"));
+			selectRig = new Fl_ComboBox(80, 40, 190, 22, _("Rig:"));
 			selectRig->tooltip(_("Select Transceiver"));
 			selectRig->box(FL_DOWN_BOX);
 			selectRig->color(FL_BACKGROUND2_COLOR);
@@ -458,68 +467,7 @@ tabsConfig = new Fl_Tabs(0, 8, 482, 246);
 			selectRig->when(FL_WHEN_RELEASE);
 			selectRig->end();
 
-			cntRigCatRetries = new Fl_Counter(96, 58, 100, 20, _("Retries"));
-			cntRigCatRetries->tooltip(_("Number of  times to resend\ncommand before giving up"));
-			cntRigCatRetries->minimum(1);
-			cntRigCatRetries->maximum(10);
-			cntRigCatRetries->step(1);
-			cntRigCatRetries->value(5);
-			cntRigCatRetries->callback((Fl_Callback*)cb_cntRigCatRetries);
-			cntRigCatRetries->align(Fl_Align(FL_ALIGN_LEFT));
-			cntRigCatRetries->value(progStatus.comm_retries);
-			cntRigCatRetries->lstep(10);
-
-			cntRigCatTimeout = new Fl_Counter(96, 80, 100, 20, _("Retry intvl"));
-			cntRigCatTimeout->tooltip(_("Time between retries is msec"));
-			cntRigCatTimeout->minimum(2);
-			cntRigCatTimeout->maximum(200);
-			cntRigCatTimeout->step(1);
-			cntRigCatTimeout->value(10);
-			cntRigCatTimeout->callback((Fl_Callback*)cb_cntRigCatTimeout);
-			cntRigCatTimeout->align(Fl_Align(FL_ALIGN_LEFT));
-			cntRigCatTimeout->value(progStatus.comm_timeout);
-			cntRigCatTimeout->lstep(10);
-
-			cntRigCatWait = new Fl_Counter(96, 102, 100, 20, _("Cmds"));
-			cntRigCatWait->tooltip(_("Wait millseconds between sequential commands"));
-			cntRigCatWait->minimum(0);
-			cntRigCatWait->maximum(100);
-			cntRigCatWait->step(1);
-			cntRigCatWait->value(5);
-			cntRigCatWait->callback((Fl_Callback*)cb_cntRigCatWait);
-			cntRigCatWait->align(Fl_Align(FL_ALIGN_LEFT));
-			cntRigCatWait->value(progStatus.comm_wait);
-			cntRigCatWait->lstep(10);
-
-			query_interval = new Fl_Counter(96, 124, 100, 22, _("Poll intvl"));
-			query_interval->tooltip(_("Polling interval in msec"));
-			query_interval->minimum(10);
-			query_interval->maximum(5000);
-			query_interval->step(1);
-			query_interval->value(50);
-			query_interval->callback((Fl_Callback*)cb_query_interval);
-			query_interval->align(Fl_Align(FL_ALIGN_LEFT));
-			query_interval->value(progStatus.serloop_timing);
-			query_interval->lstep(10);
-
-			byte_interval = new Fl_Counter(96, 148, 100, 22, _("Byte intvl"));
-			byte_interval->tooltip(_("Inter-byte interval (msec)"));
-			byte_interval->minimum(0);
-			byte_interval->maximum(200);
-			byte_interval->step(1);
-			byte_interval->value(0);
-			byte_interval->callback((Fl_Callback*)cb_byte_interval);
-			byte_interval->align(Fl_Align(FL_ALIGN_LEFT));
-			byte_interval->value(progStatus.byte_interval);
-			byte_interval->lstep(10);
-
-		xcr_grp1->end();
-
-		Fl_Group* xcr_grp2 = new Fl_Group(202, 94, 270, 80);
-			xcr_grp2->tooltip(_("Two stop bits"));
-			xcr_grp2->box(FL_ENGRAVED_FRAME);
-
-			selectCommPort = new Fl_ComboBox(278, 99, 190, 22, _("Ser. Port"));
+			selectCommPort = new Fl_ComboBox(80, 65, 190, 22, _("Ser. Port"));
 			selectCommPort->tooltip(_("Xcvr serial port"));
 			selectCommPort->box(FL_DOWN_BOX);
 			selectCommPort->color(FL_BACKGROUND2_COLOR);
@@ -533,7 +481,7 @@ tabsConfig = new Fl_Tabs(0, 8, 482, 246);
 			selectCommPort->when(FL_WHEN_RELEASE);
 			selectCommPort->end();
 
-			mnuBaudrate = new Fl_ComboBox(278, 125, 190, 22, _("Baud:"));
+			mnuBaudrate = new Fl_ComboBox(80, 90, 190, 22, _("Baud:"));
 			mnuBaudrate->tooltip(_("Xcvr baudrate"));
 			mnuBaudrate->box(FL_DOWN_BOX);
 			mnuBaudrate->color(FL_BACKGROUND2_COLOR);
@@ -547,44 +495,82 @@ tabsConfig = new Fl_Tabs(0, 8, 482, 246);
 			mnuBaudrate->when(FL_WHEN_RELEASE);
 			mnuBaudrate->end();
 
-			btnTwoStopBit = new Fl_Check_Button(250, 152, 22, 15, _("2 -StopBits"));
-			btnTwoStopBit->down_box(FL_DOWN_BOX);
-			btnTwoStopBit->callback((Fl_Callback*)cb_btnTwoStopBit);
-			btnTwoStopBit->align(Fl_Align(FL_ALIGN_RIGHT));
-			btnTwoStopBit->value(progStatus.stopbits == 2);
-
-			btnOneStopBit = new Fl_Check_Button(210, 152, 22, 15, _("1"));
+			btnOneStopBit = new Fl_Check_Button(80, 120, 22, 15, _("1"));
 			btnOneStopBit->tooltip(_("One Stop Bit"));
 			btnOneStopBit->down_box(FL_DOWN_BOX);
 			btnOneStopBit->callback((Fl_Callback*)cb_btnOneStopBit);
 			btnOneStopBit->align(Fl_Align(FL_ALIGN_RIGHT));
 			btnOneStopBit->value(progStatus.stopbits == 1);
 
-			btnRigCatEcho = new Fl_Check_Button(397, 152, 22, 15, _("Echo "));
+			btnTwoStopBit = new Fl_Check_Button(120, 120, 22, 15, _("2 -StopBits"));
+			btnTwoStopBit->down_box(FL_DOWN_BOX);
+			btnTwoStopBit->callback((Fl_Callback*)cb_btnTwoStopBit);
+			btnTwoStopBit->align(Fl_Align(FL_ALIGN_RIGHT));
+			btnTwoStopBit->value(progStatus.stopbits == 2);
+
+			btnRigCatEcho = new Fl_Check_Button(80, 145, 22, 15, _("Echo "));
 			btnRigCatEcho->down_box(FL_DOWN_BOX);
 			btnRigCatEcho->callback((Fl_Callback*)cb_btnRigCatEcho);
 			btnRigCatEcho->align(Fl_Align(FL_ALIGN_RIGHT));
 			btnRigCatEcho->value(progStatus.comm_echo);
 
-		xcr_grp2->end();
-        
-		Fl_Group* xcr_grp3 = new Fl_Group(202, 34, 270, 64);
-			xcr_grp3->box(FL_ENGRAVED_FRAME);
+			cntRigCatRetries = new Fl_Counter(350, 40, 100, 20, _("Retries"));
+			cntRigCatRetries->tooltip(_("Number of  times to resend\ncommand before giving up"));
+			cntRigCatRetries->minimum(1);
+			cntRigCatRetries->maximum(10);
+			cntRigCatRetries->step(1);
+			cntRigCatRetries->value(5);
+			cntRigCatRetries->callback((Fl_Callback*)cb_cntRigCatRetries);
+			cntRigCatRetries->align(Fl_Align(FL_ALIGN_LEFT));
+			cntRigCatRetries->value(progStatus.comm_retries);
+			cntRigCatRetries->lstep(10);
 
-			server_addr = new Fl_Input(317, 41, 140, 22, _("Fldigi address:"));
-			server_addr->tooltip(_("xmlrpc server address (7362)\nchange requires restart\nAre you sure?"));
-			server_addr->callback((Fl_Callback*)cb_server_addr);
-			server_addr->value(progStatus.server_addr.c_str());
+			cntRigCatTimeout = new Fl_Counter(350, 65, 100, 20, _("Retry intvl"));
+			cntRigCatTimeout->tooltip(_("Time between retries is msec"));
+			cntRigCatTimeout->minimum(2);
+			cntRigCatTimeout->maximum(200);
+			cntRigCatTimeout->step(1);
+			cntRigCatTimeout->value(10);
+			cntRigCatTimeout->callback((Fl_Callback*)cb_cntRigCatTimeout);
+			cntRigCatTimeout->align(Fl_Align(FL_ALIGN_LEFT));
+			cntRigCatTimeout->value(progStatus.comm_timeout);
+			cntRigCatTimeout->lstep(10);
 
-			server_port = new Fl_Int_Input(317, 67, 100, 22, _("Fldigi port:"));
-			server_port->tooltip(_("xmlrpc server address (7362)\nchange requires restart\nAre you sure?"));
-			server_port->type(2);
-			server_port->callback((Fl_Callback*)cb_server_port);
-			server_port->value(progStatus.server_port.c_str());
+			cntRigCatWait = new Fl_Counter(350, 90, 100, 20, _("Cmds"));
+			cntRigCatWait->tooltip(_("Wait millseconds between sequential commands"));
+			cntRigCatWait->minimum(0);
+			cntRigCatWait->maximum(100);
+			cntRigCatWait->step(1);
+			cntRigCatWait->value(5);
+			cntRigCatWait->callback((Fl_Callback*)cb_cntRigCatWait);
+			cntRigCatWait->align(Fl_Align(FL_ALIGN_LEFT));
+			cntRigCatWait->value(progStatus.comm_wait);
+			cntRigCatWait->lstep(10);
 
-		xcr_grp3->end();
-        
-        
+			query_interval = new Fl_Counter(350, 115, 100, 22, _("Poll intvl"));
+			query_interval->tooltip(_("Polling interval in msec"));
+			query_interval->minimum(10);
+			query_interval->maximum(5000);
+			query_interval->step(1);
+			query_interval->value(50);
+			query_interval->callback((Fl_Callback*)cb_query_interval);
+			query_interval->align(Fl_Align(FL_ALIGN_LEFT));
+			query_interval->value(progStatus.serloop_timing);
+			query_interval->lstep(10);
+
+			byte_interval = new Fl_Counter(350, 140, 100, 22, _("Byte intvl"));
+			byte_interval->tooltip(_("Inter-byte interval (msec)"));
+			byte_interval->minimum(0);
+			byte_interval->maximum(200);
+			byte_interval->step(1);
+			byte_interval->value(0);
+			byte_interval->callback((Fl_Callback*)cb_byte_interval);
+			byte_interval->align(Fl_Align(FL_ALIGN_LEFT));
+			byte_interval->value(progStatus.byte_interval);
+			byte_interval->lstep(10);
+
+		xcr_grp1->end();
+
 		Fl_Group* xcr_grp4 = new Fl_Group(4, 175, 243, 73);
 			xcr_grp4->box(FL_ENGRAVED_FRAME);
 
@@ -625,7 +611,7 @@ tabsConfig = new Fl_Tabs(0, 8, 482, 246);
 			btndtrplus->value(progStatus.comm_dtrplus);
 
 		xcr_grp4->end();
-        
+
 		Fl_Group* xcr_grp5 = new Fl_Group(247, 175, 225, 36);
 			xcr_grp5->box(FL_ENGRAVED_FRAME);
 			xcr_grp5->align(Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE));
@@ -640,7 +626,7 @@ tabsConfig = new Fl_Tabs(0, 8, 482, 246);
 			btnCIVdefault->callback((Fl_Callback*)cb_btnCIVdefault);
 
 		xcr_grp5->end();
-       
+
 		Fl_Group* xcr_grp6 = new Fl_Group(247, 212, 225, 36);
 			xcr_grp6->box(FL_ENGRAVED_FRAME);
 
@@ -658,9 +644,42 @@ tabsConfig = new Fl_Tabs(0, 8, 482, 246);
 
 	tabPrimary->end();
 
+	tabXMLRPC = new Fl_Group(2, 30, 475, 222, _("XML"));
+		tabXMLRPC->hide();
+
+		Fl_Group* grp_fldigi_server = new Fl_Group(80, 40, 300, 80);
+		grp_fldigi_server->box(FL_ENGRAVED_FRAME);
+
+		btn_xmlrpc_server = new Fl_Check_Button(200, 44, 80, 20, _("Use fldigi server"));
+		btn_xmlrpc_server->tooltip(_("Change requires restart!\nAre you sure?"));
+		btn_xmlrpc_server->value(progStatus.fldigi_is_server);
+		btn_xmlrpc_server->callback((Fl_Callback*)cb_xmlrpc_server);
+
+		server_addr = new Fl_Input(200, 68, 140, 22, _("Fldigi address:"));
+		server_addr->tooltip(_("xmlrpc server address (7362)\nchange requires restart!\nAre you sure?"));
+		server_addr->callback((Fl_Callback*)cb_server_addr);
+		server_addr->value(progStatus.server_addr.c_str());
+
+		server_port = new Fl_Int_Input(200, 92, 100, 22, _("Fldigi port:"));
+		server_port->tooltip(_("xmlrpc server address (7362)\nchange requires restart!\nAre you sure?"));
+		server_port->type(2);
+		server_port->callback((Fl_Callback*)cb_server_port);
+		server_port->value(progStatus.server_port.c_str());
+
+		grp_fldigi_server->end();
+
+		Fl_Box *bx_xml_info = new Fl_Box(20, 140, 450, 100,
+_("\
+Changes to any of these values requires an flrig restart\n\n\
+before they are effective.\
+"));
+		bx_xml_info->box(FL_ENGRAVED_FRAME);
+
+	tabXMLRPC->end();
+
 	tabTCPIP = new Fl_Group(2, 30, 475, 222, _("TCPIP"));
 		tabTCPIP->hide();
-        
+
 		inp_tcpip_addr = new Fl_Input2(120, 50, 300, 22, _("TCPIP address:"));
 		inp_tcpip_addr->tooltip(_("remote tcpip server address"));
 		inp_tcpip_addr->callback((Fl_Callback*)cb_tcpip_addr);
@@ -720,7 +739,7 @@ tabsConfig = new Fl_Tabs(0, 8, 482, 246);
 	tabPTT = new Fl_Group(2, 30, 475, 222, _("PTT"));
 		tabPTT->hide();
 
-		Fl_Box *bxptt = new Fl_Box(53, 73, 399, 37, 
+		Fl_Box *bxptt = new Fl_Box(53, 73, 399, 37,
 _("Use only if your setup requires a separate\nSerial Port for a PTT control line"));
 		bxptt->box(FL_FLAT_BOX);
 
@@ -767,7 +786,7 @@ _("Use only if your setup requires a separate\nSerial Port for a PTT control lin
 
 	tabAux = new Fl_Group(2, 30, 475, 222, _("Aux"));
 		tabAux->hide();
-        
+
 		selectAuxPort = new Fl_ComboBox(131, 132, 192, 22, _("Aux"));
 		selectAuxPort->tooltip(_("Aux control port"));
 		selectAuxPort->box(FL_DOWN_BOX);
@@ -782,7 +801,7 @@ _("Use only if your setup requires a separate\nSerial Port for a PTT control lin
 		selectAuxPort->when(FL_WHEN_RELEASE);
 		selectAuxPort->end();
 
-		Fl_Box *bxsep = new Fl_Box(56, 84, 399, 38, 
+		Fl_Box *bxsep = new Fl_Box(56, 84, 399, 38,
 _("Use only if your setup requires a separate\nSerial Port for a special Control Signals"));
 		bxsep->box(FL_FLAT_BOX);
 
@@ -990,7 +1009,7 @@ _("Use only if your setup requires a separate\nSerial Port for a special Control
 	tabSndCmd = new Fl_Group(2, 30, 475, 222, _("Cmds"));
 		tabSndCmd->hide();
 
-		txt_command = new Fl_Input2(29, 53, 434, 23, 
+		txt_command = new Fl_Input2(29, 53, 434, 23,
 _("Enter text as ASCII string\nOr sequence of hex values, x80 etc separated by spaces"));
 		txt_command->box(FL_DOWN_BOX);
 		txt_command->color(FL_BACKGROUND2_COLOR);
@@ -1023,11 +1042,11 @@ _("Enter text as ASCII string\nOr sequence of hex values, x80 etc separated by s
 	tabSndCmd->end();
 
 tabsConfig->end();
-  
-btnCancelCommConfig = new Fl_Button(346, 2, 60, 25, _("Close"));
+
+btnCancelCommConfig = new Fl_Button(358, 2, 50, 25, _("Close"));
 btnCancelCommConfig->callback((Fl_Callback*)cb_btnCancelCommConfig);
 
-btnOkXcvrDialog = new Fl_Return_Button(416, 2, 60, 25, _("Init"));
+btnOkXcvrDialog = new Fl_Return_Button(420, 2, 55, 25, _("Init"));
 btnOkXcvrDialog->callback((Fl_Callback*)cb_btnOkXcvrDialog);
 
 w->end();

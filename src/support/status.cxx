@@ -189,7 +189,7 @@ status progStatus = {
 
 	14,			// tt550_xmt_bw;
 	false,		// tt550_use_xmt_bw;
-	
+
 	25,			// tt550_AM_level;
 	0,			// tt550_encoder_step;
 	1,			// tt550_encoder_sensitivity;
@@ -274,7 +274,9 @@ status progStatus = {
 	false,		// bool xcvr auto on
 	false,		// bool xcvr auto off
 
-	false		// bool external_tuner
+	false,		// bool external_tuner
+
+	false		// bool fldigi_is_server
 };
 
 void status::saveLastState()
@@ -535,6 +537,8 @@ void status::saveLastState()
 
 	spref.set("external_tuner", external_tuner);
 
+	spref.set("fldigi_is_server", fldigi_is_server);
+
 	spref.set("hrd_buttons", hrd_buttons);
 }
 
@@ -565,7 +569,7 @@ bool status::loadXcvrState(const char *xcvr)
 
 		spref.get("xcvr_serial_port", defbuffer, "NONE", 199);
 		xcvr_serial_port = defbuffer;
-		if (xcvr_serial_port.find("tty") == 0) 
+		if (xcvr_serial_port.find("tty") == 0)
 			xcvr_serial_port.insert(0, "/dev/");
 
 		rig_nbr = NONE;
@@ -636,7 +640,7 @@ bool status::loadXcvrState(const char *xcvr)
 		spref.get("bw_B", iBW_B, iBW_B);
 		spref.get("mode_B", imode_B, imode_B);
 		spref.get("freq_B", freq_B, freq_B);
-	
+
 		if (spref.get("use_rig_data", i, i)) use_rig_data = i;
 		if (spref.get("restore_rig_data", i, i)) restore_rig_data = i;
 
@@ -701,7 +705,7 @@ bool status::loadXcvrState(const char *xcvr)
 			spref.get("tt550_F2_func", tt550_F2_func, tt550_F2_func);
 			spref.get("tt550_F3_func", tt550_F3_func, tt550_F3_func);
 
-		} 
+		}
 		else {
 			spref.get("line_out", line_out, line_out);
 			spref.get("data_port", i, data_port); data_port = i;
@@ -812,6 +816,8 @@ bool status::loadXcvrState(const char *xcvr)
 		if (spref.get("xcvr_auto_off", i, i)) xcvr_auto_off = i;
 
 		if (spref.get("external_tuner", i,i)) external_tuner = i;
+
+		if (spref.get("fldigi_is_server", i,i)) fldigi_is_server = i;
 
 		if (spref.get("hrd_buttons", i, i)) hrd_buttons = i;
 	}

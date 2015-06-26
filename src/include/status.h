@@ -253,7 +253,7 @@ struct status {
 	Fl_Font	fontnbr;
 
 	bool	tooltips;
-	
+
 	string	ui_scheme;
 
 	string	server_port;
@@ -270,6 +270,8 @@ struct status {
 	bool	xcvr_auto_off;
 
 	bool	external_tuner;
+
+	bool	fldigi_is_server;
 
 	void saveLastState();
 	void loadLastState();

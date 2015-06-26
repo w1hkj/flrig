@@ -216,6 +216,7 @@ extern void open_poll_tab();
 extern void open_send_command_tab();
 extern void show_controls();
 
+extern void open_xmlrpc_tab();
 extern void open_tcpip_tab();
 extern void open_ptt_tab();
 extern void open_aux_tab();

@@ -71,6 +71,7 @@
 #include "util.h"
 #include "gettext.h"
 #include "xml_server.h"
+#include "xml_io.h"
 
 #include "ui.h"
 
@@ -87,6 +88,7 @@ string defFileName;
 string title;
 
 pthread_t *serial_thread = 0;
+pthread_t *digi_thread = 0;
 
 pthread_mutex_t mutex_serial = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_xmlrpc = PTHREAD_MUTEX_INITIALIZER;
@@ -392,7 +394,15 @@ int main (int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	start_server();
+	if (progStatus.fldigi_is_server) {
+		open_rig_xmlrpc();
+		digi_thread = new pthread_t;      
+		if (pthread_create(digi_thread, NULL, digi_loop, NULL)) {
+			perror("pthread_create");
+			exit(EXIT_FAILURE);
+		}
+	} else
+		start_server();
 
 	createXcvrDialog();
 

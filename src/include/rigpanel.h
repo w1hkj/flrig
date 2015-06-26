@@ -344,6 +344,7 @@ extern Fl_Group *tabAux;
 extern Fl_ComboBox *selectAuxPort;
 extern Fl_Group *tabPolling;
 extern Fl_Group *tabTCPIP;
+extern Fl_Group *tabXMLRPC;
 
 extern Fl_Value_Input *poll_smeter;
 extern Fl_Value_Input *poll_pout;

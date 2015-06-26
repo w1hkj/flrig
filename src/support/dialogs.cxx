@@ -505,6 +505,12 @@ void open_tcpip_tab()
 	tabsConfig->value(tabTCPIP);
 }
 
+void open_xmlrpc_tab()
+{
+	dlgXcvrConfig->show();
+	tabsConfig->value(tabXMLRPC);
+}
+
 void open_ptt_tab()
 {
 	dlgXcvrConfig->show();

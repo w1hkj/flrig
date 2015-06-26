@@ -304,6 +304,10 @@ static void cb_mnuTCPIP(Fl_Menu_*, void*) {
 	open_tcpip_tab();
 }
 
+static void cb_mnuXMLRPC(Fl_Menu_*, void*) {
+	open_xmlrpc_tab();
+}
+
 static void cb_mnuPTT(Fl_Menu_*, void*) {
 	open_ptt_tab();
 }
