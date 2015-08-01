@@ -228,8 +228,9 @@ void read_mode()
 				nu_BW = selrig->get_bwA();
 				vfoA.iBW = vfo.iBW = nu_BW;
 			}
-			Fl::awake(setModeControl);
+//			Fl::awake(setModeControl);
 			set_bandwidth_control();
+			Fl::awake(setModeControl);
 		}
 	} else {
 		nu_mode = selrig->get_modeB();
@@ -240,8 +241,9 @@ void read_mode()
 				nu_BW = selrig->get_bwB();
 				vfoB.iBW = vfo.iBW = nu_BW;
 			}
-			Fl::awake(setModeControl);
+//			Fl::awake(setModeControl);
 			set_bandwidth_control();
+			Fl::awake(setModeControl);
 		}
 	}
 }
