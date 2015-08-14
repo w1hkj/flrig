@@ -338,7 +338,8 @@ EXTRA_DIST += \
 	$(srcdir)/../data/win32/fl_app.nsi \
 	$(srcdir)/../data/win32/flrig.ico \
 	$(srcdir)/../scripts/mknsisinst.sh \
-	$(srcdir)/../scripts/build4mingw.sh \
+	$(srcdir)/../scripts/buildmxe.sh \
+	$(srcdir)/../scripts/builddist.sh \
 	$(srcdir)/../data/mac/Info.plist.in \
 	$(srcdir)/../data/mac/flrig.icns \
 	$(srcdir)/../scripts/mkappbundle.sh \
