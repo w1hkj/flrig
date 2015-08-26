@@ -421,7 +421,8 @@ void update_split(void *d)
 	if (rig_nbr == FT450 || rig_nbr == FT450D || 
 		rig_nbr == FT950 || rig_nbr == FTdx1200 ||
 		rig_nbr == TS480SAT || rig_nbr == TS480HX ||
-		rig_nbr == TS590S || rig_nbr == TS2000 || rig_nbr == TS990) {
+		rig_nbr == TS590S || rig_nbr == TS590SG ||
+		rig_nbr == TS2000 || rig_nbr == TS990) {
 		switch (progStatus.split) {
 			case 0: btnSplit->value(0);
 					useB = false;
@@ -1702,7 +1703,9 @@ void setNR()
 {
 	if (!selrig->has_noise_reduction_control) return;
 	noise_reduction_changed = true;
-	if (rig_nbr == TS2000 || rig_nbr == TS590S || rig_nbr == TS990) {
+	if (rig_nbr == TS2000 || 
+		rig_nbr == TS590S || rig_nbr == TS590SG ||
+		rig_nbr == TS990) {
 		if (sldrNR) sliders.push(SLIDER(NR, sldrNR->value(), -1 ) );
 		if (spnrNR) sliders.push(SLIDER(NR, spnrNR->value(), -1 ) );
 	} else {
