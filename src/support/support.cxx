@@ -639,7 +639,6 @@ static bool resetxmt = true;
 
 void serviceA()
 {
-	if (!selrig->can_change_alt_vfo && useB) return;
 	if (queA.empty()) return;
 	guard_lock serial_lock(&mutex_serial, 24);
 	{
@@ -653,6 +652,8 @@ void serviceA()
 //	if (RIG_DEBUG)
 		LOG_INFO("%s", print(vfoA));
 
+	if (!selrig->can_change_alt_vfo && useB) return;
+		
 	if (changed_vfo && !useB) {
 		selrig->selectA();
 	}
@@ -689,8 +690,6 @@ end_serviceA:
 
 void serviceB()
 {
-	if (!selrig->can_change_alt_vfo && !useB) return;
-
 	if (queB.empty())
 		return;
 	guard_lock serial_lock(&mutex_serial, 26);
@@ -704,6 +703,8 @@ void serviceB()
 
 //	if (RIG_DEBUG)
 		LOG_INFO("%s", print(vfoB));
+
+	if (!selrig->can_change_alt_vfo && !useB) return;
 
 	if (changed_vfo && useB) {
 		selrig->selectB();
@@ -1386,25 +1387,32 @@ void cbAswapB()
 			guard_lock serial_lock(&mutex_serial, 39);
 			bypass_serial_thread_loop = true;
 		}
-
-		vfoB.freq = FreqDispB->value();
-		FREQMODE temp = vfoB;
-		vfoB = vfoA;
-		vfoA = temp;
-
+		if (!useB) {      // vfoA is used, swap vfos and update display B
+			vfoB.freq = FreqDispB->value();
+			FREQMODE temp = vfoB;
+			vfoB = vfoA;
+			vfoA = temp;
+			FreqDispB->value(vfoB.freq);
+			FreqDispB->redraw();
+		} else {          // vfoB is used, swap vfos and update display A
+			vfoA.freq = FreqDispA->value();
+			FREQMODE temp = vfoA;
+			vfoA = vfoB;
+			vfoB = temp;
+			FreqDispA->value(vfoA.freq);
+			FreqDispA->redraw();
+		}
 		{
 			guard_lock queA_lock(&mutex_queA, 40);
 			while (!queA.empty()) queA.pop();
 			queA.push(vfoA);
 		}
-		{	guard_lock queB_lock(&mutex_queB, 41);
+		{	
+			guard_lock queB_lock(&mutex_queB, 41);
 			while (!queB.empty()) queB.pop();
 			queB.push(vfoB);
 		}
-		FreqDispB->value(vfoB.freq);
-		FreqDispB->redraw();
 		pushedB = true;
-
 		{
 			guard_lock serial_lock(&mutex_serial, 42);
 			bypass_serial_thread_loop = false;
@@ -1443,6 +1451,29 @@ void cbA2B()
 	pushedB = true;
 }
 
+void highlight_vfo(void *d)
+{
+	Fl_Color norm_fg = fl_rgb_color(progStatus.fg_red, progStatus.fg_green, progStatus.fg_blue);
+	Fl_Color norm_bg = fl_rgb_color(progStatus.bg_red, progStatus.bg_green, progStatus.bg_blue);
+	Fl_Color dim_bg = fl_color_average( norm_bg, FL_BLACK, 0.75);
+	if (useB) {
+		FreqDispA->SetONOFFCOLOR( norm_fg, dim_bg );
+		FreqDispB->SetONOFFCOLOR( norm_fg, norm_bg );
+		btnA->value(0);
+		btnB->value(1);
+	} else {
+		FreqDispA->SetONOFFCOLOR( norm_fg, norm_bg );
+		FreqDispB->SetONOFFCOLOR( norm_fg, dim_bg);
+		btnA->value(1);
+		btnB->value(0);
+	}
+	FreqDispA->redraw();
+	FreqDispB->redraw();
+	btnA->redraw();
+	btnB->redraw();
+	Fl::flush();
+}
+
 void cb_set_split(int val)
 {
 	progStatus.split = val;
@@ -1467,34 +1498,10 @@ void cb_set_split(int val)
 		cb_selectA();
 }
 
-void highlight_vfo(void *d)
-{
-	Fl_Color norm_fg = fl_rgb_color(progStatus.fg_red, progStatus.fg_green, progStatus.fg_blue);
-	Fl_Color norm_bg = fl_rgb_color(progStatus.bg_red, progStatus.bg_green, progStatus.bg_blue);
-	Fl_Color dim_bg = fl_color_average( norm_bg, FL_BLACK, 0.75);
-	if (useB) {
-		FreqDispA->SetONOFFCOLOR( norm_fg, dim_bg );
-		FreqDispB->SetONOFFCOLOR( norm_fg, norm_bg );
-		btnA->value(0);
-		btnB->value(1);
-	} else {
-		FreqDispA->SetONOFFCOLOR( norm_fg, norm_bg );
-		FreqDispB->SetONOFFCOLOR( norm_fg, dim_bg);
-		btnA->value(1);
-		btnB->value(0);
-	}
-	FreqDispA->redraw();
-	FreqDispB->redraw();
-	btnA->redraw();
-	btnB->redraw();
-	Fl::flush();
-}
-
 void cb_selectA() {
 	if (progStatus.split) {
 		btnSplit->value(0);
-		if (!selrig->has_split_AB)
-			cb_set_split(0);
+		cb_set_split(0);
 	}
 	guard_lock serial_lock(&mutex_serial, 48);
 	changed_vfo = true;
@@ -1509,8 +1516,7 @@ void cb_selectA() {
 void cb_selectB() {
 	if (progStatus.split) {
 		btnSplit->value(0);
-		if (!selrig->has_split_AB)
-			cb_set_split(0);
+		cb_set_split(0);
 	}
 	guard_lock serial_lock(&mutex_serial, 50);
 	changed_vfo = true;
