@@ -59,12 +59,157 @@ public:
 	rig_get_xcvr(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_xcvr", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		result = selrig->name_;;
+		result = selrig->name_;
 	}
 
 	std::string help() { return std::string("returns noun name of transceiver"); }
 
 } rig_get_xcvr(&rig_server);
+
+//------------------------------------------------------------------------------
+// Request for info
+//------------------------------------------------------------------------------
+string uname;
+string ufreq;
+string umode;
+string unotch;
+string ubw;
+string utx;
+
+static string sname()
+{
+	string temp;
+	temp.assign("R:").append(selrig->name_).append("\n");
+	return temp;
+}
+
+static string stx()
+{
+	string temp;
+	temp.assign("T:").append(btnPTT->value() ? "X" : "R").append("\n");
+	return temp;
+}
+
+static string tempfreq;
+static string tempmode;
+static string tempbw;
+
+static void freq_mode_bw()
+{
+	string temp;
+	int freq;
+	int mode;
+	int BW;
+	static char szval[20];
+	if (useB) {
+		guard_lock queB_lock(&mutex_queB);
+		if (!queB.empty()) {
+			freq = queB.back().freq;
+			mode = queB.back().imode;
+		} else {
+			freq = vfoB.freq;
+			mode = vfoB.imode;
+		}
+	} else {
+		guard_lock queA_lock(&mutex_queA);
+		if (!queA.empty()) {
+			freq = queA.back().freq;
+			mode = queA.back().imode;
+		} else {
+			freq = vfoA.freq;
+			mode = vfoB.imode;
+		}
+	}
+
+	snprintf(szval, sizeof(szval), "%d", freq);
+	tempfreq.assign("F").append(useB ? "B:" : "A:").append(szval).append("\n");
+
+	BW = useB ? vfoB.iBW : vfoA.iBW;
+	mode = useB ? vfoB.imode : vfoA.imode;
+	const char **bwt = selrig->bwtable(mode);
+	const char **dsplo = selrig->lotable(mode);
+	const char **dsphi = selrig->hitable(mode);
+
+	tempmode.assign("M:").append(selrig->modes_ ? selrig->modes_[mode] : "none").append("\n");
+
+	tempbw.assign("L:").append((BW > 256 && selrig->has_dsp_controls) ?
+						(dsplo ? dsplo[BW & 0x7F] : "") : 
+						(bwt ? bwt[BW] : "")).append("\n");
+	tempbw.append("U:").append((BW > 256 && selrig->has_dsp_controls) ?
+						(dsphi ? dsphi[(BW >> 8) & 0x7F] : "") : 
+						"").append("\n");
+}
+
+static string snotch()
+{
+	string temp;
+	static char szval[20];
+	snprintf(szval, sizeof(szval), "%d", (int)(progStatus.notch_val));
+	temp.assign("N:").append(szval).append("\n");
+	return temp;
+}
+
+class rig_get_info : public XmlRpcServerMethod {
+public:
+	rig_get_info(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_info", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		string info;
+
+		uname = sname();   info.assign(uname);
+		utx = stx();       info.append(utx);
+		freq_mode_bw();
+		ufreq = tempfreq;  info.append(ufreq);
+		umode = tempmode;  info.append(umode);
+		ubw = tempbw;      info.append(ubw);
+		unotch = snotch(); info.append(unotch);
+
+		result = info;
+
+	}
+
+	std::string help() { return std::string("returns all info in single string"); }
+
+} rig_get_info(&rig_server);
+
+class rig_get_update : public XmlRpcServerMethod {
+public:
+	rig_get_update(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_update", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		string info;  info.clear();
+		string temp;  temp.clear();
+
+		if (selrig->has_smeter && !btnPTT->value()) {
+			static char szval[10];
+			snprintf(szval, sizeof(szval), "S:%d\n", (int)mval);
+			info.append(szval);
+		}
+		if (selrig->has_power_out && btnPTT->value()) {
+			static char szval[10];
+			snprintf(szval, sizeof(szval), "P:%d\n", (int)mval);
+			info.append(szval);
+		}
+
+		if ((temp = sname()) != uname) { uname = temp;     info.append(uname); }
+		if ((temp = stx()) != utx)     { utx = temp;       info.append(utx);}
+
+		freq_mode_bw();
+		if (tempfreq != ufreq) { ufreq = tempfreq; info.append(ufreq); }
+		if (tempmode != umode) { umode = tempmode; info.append(umode); }
+		if (tempbw != ubw)     { ubw = tempbw;     info.append(ubw); }
+		if ((temp = snotch()) != unotch) { unotch = temp; info.append(unotch); }
+
+		if (info.empty()) info.assign("NIL");
+
+		result = info;
+
+	}
+
+	std::string help() { return std::string("returns all updates in single string"); }
+
+} rig_get_update(&rig_server);
+
 
 //------------------------------------------------------------------------------
 // Request for PTT state
@@ -119,7 +264,8 @@ public:
 	rig_get_AB(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_AB", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		result[0] = useB ? "B" : "A";
+//		result[0] = useB ? "B" : "A";
+		result = useB ? "B" : "A";
 	}
 
 	std::string help() { return std::string("returns vfo in use A or B"); }
@@ -511,6 +657,76 @@ public:
 
 } rig_set_bw(&rig_server);
 
+class rig_set_BW : public XmlRpcServerMethod {
+public:
+	rig_set_BW(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_BW", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		string bwstr = params;
+		std::cout << bwstr << "\n";
+/*
+		int bw = int(params[0]);
+		if (useB) {
+			guard_lock queB_lock(&mutex_queB);
+			if (!queB.empty()) srvr_vfo = queB.back();
+			else srvr_vfo = vfoB;
+		} else {
+			guard_lock queA_lock(&mutex_queA);
+			if (!queA.empty()) srvr_vfo = queA.back();
+			else srvr_vfo = vfoA;
+		}
+		srvr_vfo.iBW = bw;
+		push_xml();
+*/
+	}
+	std::string help() { return std::string("set_bw to VAL"); }
+
+} rig_set_BW(&rig_server);
+
+struct MLIST {
+	string name; string signature; string help;
+} mlist[] = {
+	{ "rig.get_AB",       "s:n", "returns vfo in use A or B" },
+	{ "rig.get_bw",       "s:n", "return BW of current VFO" },
+	{ "rig.get_bws",      "s:n", "return table of BW values" },
+	{ "rig.get_info",     "s:n", "return an info string" },
+	{ "rig.get_mode",     "s:n", "return MODE of current VFO" },
+	{ "rig.get_modes",    "s:n", "return table of MODE values" },
+	{ "rig.get_notch",    "s:n", "return notch value" },
+	{ "rig.get_ptt",      "s:n", "return PTT state" },
+	{ "rig.get_pwrmeter", "s:n", "return PWR out" },
+	{ "rig.get_smeter",   "s:n", "return Smeter" },
+	{ "rig.get_update",   "s:n", "return update to info" },
+	{ "rig.get_vfo",      "s:n", "return current VFO in Hz" },
+	{ "rig.get_xcvr",     "s:n", "returns name of transceiver" },
+	{ "rig.set_AB",       "s:s", "set VFO A/B" },
+	{ "rig.set_bw",       "i:i", "set BW iaw BW table" },
+	{ "rig.set_BW",       "i:i", "set L/U pair" },
+	{ "rig.set_mode",     "i:i", "set MODE iaw MODE table" },
+	{ "rig.set_notch",    "d:d", "set NOTCH value in Hz" },
+	{ "rig.set_ptt",      "i:i", "set PTT 1/0 (on/off)" },
+	{ "rig.set_vfo",      "d:d", "set current VFO in Hz" }
+};
+
+class rig_list_methods : public XmlRpcServerMethod {
+public:
+	rig_list_methods(XmlRpcServer *s) : XmlRpcServerMethod("rig.list_methods", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+
+		vector<XmlRpcValue> methods;
+		for (size_t n = 0; n < sizeof(mlist) / sizeof(*mlist); ++n) {
+			XmlRpcValue::ValueStruct item;
+			item["name"]      = mlist[n].name;
+			item["signature"] = mlist[n].signature;
+			item["help"]      = mlist[n].help;
+			methods.push_back(item);
+		}
+
+		result = methods;
+	}
+	std::string help() { return std::string("get flrig methods"); }
+} rig_list_methods(&rig_server);
 
 //------------------------------------------------------------------------------
 // support thread xmlrpc clients
