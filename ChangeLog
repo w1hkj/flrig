@@ -1,6 +1,28 @@
 
 
+=Version 1.3.23=
+
+2015-11-28  David Freese  <iam_w1hkj@w1hkj.com>
+
+	424c33b: FT817 FT857D FT897D
+	86cc66f: xmlrpc server
+	b4bd89b: FT900
+	b6303c1: TS590SG
+	76d12b0: MXE update
+	47d053c: FT990a
+	cd39b31: Set Mode/BW controls
+	f5da410: restore xml client
+	9d994e6: KENWOOD mods
+	7d4054f: IC7800
+	7c41ac6: fldigi BW interface
+
+2015-06-08  Kamal Mostafa  <kamal@whence.com>
+
+	74450a4: BUILD_{DATE,USER,HOST}
+
+
 =Version 1.3.22=
+
 
 2015-04-17  David Freese  <iam_w1hkj@w1hkj.com>
 
