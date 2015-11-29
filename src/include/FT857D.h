@@ -56,6 +56,8 @@ public:
 
 private:
 	void init_cmd();
+	void set_getACK();
+
 protected:
 	bool onB;
 };

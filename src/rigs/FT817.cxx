@@ -75,13 +75,23 @@ long RIG_FT817::get_vfoA ()
 	return freqA;
 }
 
+void RIG_FT817::set_getACK() {
+	for (int i = 0; i < 5; i++) {
+		sendCommand(cmd, 0);
+		for (int j = 0; j < 10; j++) {
+			if (readResponse() == 1) return;
+			MilliSleep(50);
+		}
+	}
+}
+
 void RIG_FT817::set_vfoA (long freq)
 {
 	freqA = freq;
 	freq /=10; // 817 does not support 1 Hz resolution
 	cmd = to_bcd(freq, 8);
 	cmd += 0x01;
-	sendCommand(cmd, 0);
+	set_getACK();
 }
 
 int RIG_FT817::get_modeA()
@@ -102,7 +112,7 @@ void RIG_FT817::set_modeA(int val)
 	init_cmd();
 	cmd[0] = FT817_mode_val[val];
 	cmd[4] = 0x07;
-	sendCommand(cmd, 0);
+	set_getACK();
 }
 
 // Tranceiver PTT on/off
@@ -111,7 +121,7 @@ void RIG_FT817::set_PTT_control(int val)
 	init_cmd();
 	if (val) cmd[4] = 0x08;
 	else	 cmd[4] = 0x88;
-	sendCommand(cmd, 0);
+	set_getACK();
 }
 
 int  RIG_FT817::get_power_out(void)

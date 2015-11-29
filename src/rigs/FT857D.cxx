@@ -65,6 +65,16 @@ RIG_FT897D::RIG_FT897D() {
 	onB = false;
 };
 
+void RIG_FT857D::set_getACK() {
+	for (int i = 0; i < 5; i++) {
+		sendCommand(cmd, 0);
+		for (int j = 0; j < 10; j++) {
+			if (readResponse() == 1) return;
+			MilliSleep(50);
+		}
+	}
+}
+
 void RIG_FT857D::init_cmd()
 {
 	cmd = "00000";
@@ -95,7 +105,7 @@ void RIG_FT857D::set_vfoA (long freq)
 	cmd = to_bcd(freq, 8);
 	cmd += 0x01;
 	replystr.clear();
-	sendCommand(cmd, 0);
+	set_getACK();
 	showresp(WARN, HEX, "set vfo A", cmd, replystr);
 }
 
@@ -123,7 +133,7 @@ void RIG_FT857D::set_vfoB (long freq)
 	cmd = to_bcd(freq, 8);
 	cmd += 0x01;
 	replystr.clear();
-	sendCommand(cmd, 0);
+	set_getACK();
 	showresp(WARN, HEX, "set vfo B", cmd, replystr);
 }
 
@@ -151,7 +161,7 @@ void RIG_FT857D::set_modeA(int val)
 	cmd[0] = FT857D_mode_val[val];
 	cmd[4] = 0x07;
 	replystr.clear();
-	sendCommand(cmd, 0);
+	set_getACK();
 	showresp(WARN, HEX, "set mode A", cmd, replystr);
 }
 
@@ -162,7 +172,7 @@ void RIG_FT857D::set_modeB(int val)
 	cmd[0] = FT857D_mode_val[val];
 	cmd[4] = 0x07;
 	replystr.clear();
-	sendCommand(cmd, 0);
+	set_getACK();
 	showresp(WARN, HEX, "set mode B", cmd, replystr);
 }
 
@@ -173,7 +183,7 @@ void RIG_FT857D::set_PTT_control(int val)
 	if (val) cmd[4] = 0x08;
 	else	 cmd[4] = 0x88;
 	replystr.clear();
-	sendCommand(cmd, 0);
+	set_getACK();
 	showresp(WARN, HEX, "set PTT", cmd, replystr);
 }
 
@@ -212,7 +222,7 @@ void RIG_FT857D::selectA()
 	init_cmd();
 	cmd[4] = 0x81; // this is a toggle ... no way of knowing which is A or B
 	replystr.clear();
-	sendCommand(cmd, 0);
+	set_getACK();
 	showresp(WARN, HEX, "select A", cmd, replystr);
 }
 
@@ -223,7 +233,7 @@ void RIG_FT857D::selectB()
 	init_cmd();
 	cmd[4] = 0x81; // this is a toggle ... no way of knowing which is A or B
 	replystr.clear();
-	sendCommand(cmd, 0);
+	set_getACK();
 	showresp(WARN, HEX, "select B", cmd, replystr);
 }
 
@@ -239,11 +249,11 @@ void RIG_FT857D::set_split(bool val)
 	init_cmd();
 	if (val) {
 		cmd[4] = 0x02;
-		sendCommand(cmd, 0);
+		set_getACK();
 		showresp(WARN, HEX, "set split ON", cmd, replystr);
 	} else {
 		cmd[4] = 0x82;
-		sendCommand(cmd, 0);
+		set_getACK();
 		showresp(WARN, HEX, "set split OFF", cmd, replystr);
 	}
 }
