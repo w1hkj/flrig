@@ -246,7 +246,8 @@ int RIG_IC7100::get_modeA()
 			resp.append("\x1a\x06");
 			if (waitFOR(9, "get digital setting")) {
 				size_t p = replystr.rfind(resp);
-				if (replystr[p+6] == 0x01) {
+				if ((replystr[p+6] & 0x04) == 0x04) {
+//					if (replystr[p+6] == 0x01) {
 					if (md == USB7100) md = USBD7100;
 					else if (md == AM7100) md = AMD7100;
 					else if (md == FM7100) md = FMD7100;
@@ -295,7 +296,7 @@ int RIG_IC7100::get_modeB()
 			resp.append("\x1a\x06");
 			if (waitFOR(9, "get digital")) {
 				size_t p = replystr.rfind(resp);
-				if (replystr[p+6] == 0x01) {
+				if ((replystr[p+6] & 0x04) == 0x04) {
 					if (md == USB7100) md = USBD7100;
 					else if (md == AM7100) md = AMD7100;
 					else if (md == FM7100) md = FMD7100;
