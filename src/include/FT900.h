@@ -38,11 +38,13 @@ private:
 	double refv;
 	int afreq, amode, aBW;
 	int bfreq, bmode, bBW;
+	int vfoAorB;
+	int splitison;
 
 public:
 	RIG_FT900();
 	~RIG_FT900(){};
-
+	
 	void initialize();
 
 	bool get_info();
@@ -50,8 +52,11 @@ public:
 	bool can_split() { return true;}
 	void set_split(bool val);
 	int  get_split();
-
+	
 	bool twovfos() {return true;}
+
+	bool canswap() {return true;}
+	void swapvfos();
 
 	long get_vfoA();
 	void set_vfoA(long);
@@ -62,6 +67,8 @@ public:
 	void set_vfoB(long);
 	void set_modeB(int val);
 	int  get_modeB();
+
+	int  get_vfoAorB();
 
 	void selectA();
 	void selectB();

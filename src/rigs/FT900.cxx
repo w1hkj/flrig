@@ -2,11 +2,10 @@
 // Copyright (C) 2014
 //              David Freese, W1HKJ
 //
-// 2015-10-04
-// adapted from FT890.cxx by Ernst F. Schroeder DJ7HS
-// 2015-10-09   DJ7HS
-// added rig capability   has_split = has_split_AB = true
-// set_vfoB must be same as set_vfoA  (cmd = 0x0A)
+// 2015-10-04 adapted from FT890.cxx by Ernst F. Schroeder DJ7HS
+// the FT-900 has two vfos and can work split
+// but it cannot change the (hidden) alternate vfo
+// 2015-12-03 1st stable version  DJ7HS
 //
 // This file is part of flrig.
 //
@@ -25,6 +24,7 @@
 // ----------------------------------------------------------------------------
 
 #include "FT900.h"
+#include "status.h"
 
 const char FT900name_[] = "FT-900";
 
@@ -51,7 +51,7 @@ RIG_FT900::RIG_FT900() {
 	comm_timeout = 50;
 	comm_rtscts = false;
 	comm_rtsplus = false;
-	comm_dtrplus = true;
+	comm_dtrplus = false;
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
@@ -65,12 +65,20 @@ RIG_FT900::RIG_FT900() {
 	has_power_out =
 	has_get_info =
 	has_ptt_control =
-	has_split = has_split_AB =
+	has_split = 
+	has_split_AB =
+	has_getvfoAorB =
 	has_mode_control = true;
 
 	precision = 10;
 	ndigits = 7;
 
+}
+
+void RIG_FT900::initialize()
+{
+	progStatus.poll_split = 1;     // allow pollimg for split info
+	progStatus.poll_vfoAorB = 1;   // allow pollimg for vfo info
 }
 
 void RIG_FT900::init_cmd()
@@ -79,16 +87,12 @@ void RIG_FT900::init_cmd()
 	for (size_t i = 0; i < 5; i++) cmd[i] = 0;
 }
 
-void RIG_FT900::initialize()
-{
-}
-
 void RIG_FT900::selectA()
 {
 	init_cmd();
 	cmd[4] = 0x05;
 	sendCommand(cmd);
-	showresp(WARN, HEX, "select A", cmd, replystr);
+	showresp(WARN, HEX, "select vfo A", cmd, replystr);
 }
 
 void RIG_FT900::selectB()
@@ -97,54 +101,103 @@ void RIG_FT900::selectB()
 	cmd[3] = 0x01;
 	cmd[4] = 0x05;
 	sendCommand(cmd);
-	showresp(WARN, HEX, "select B", cmd, replystr);
+	showresp(WARN, HEX, "select vfo B", cmd, replystr);
 }
 
 void RIG_FT900::set_split(bool val)
 {
-	split = val;
 	init_cmd();
 	cmd[3] = val ? 0x01 : 0x00;
 	cmd[4] = 0x01;
 	sendCommand(cmd);
 	if (val)
-		showresp(INFO, HEX, "set split ON", cmd, replystr);
+		showresp(WARN, HEX, "set split ON", cmd, replystr);
 	else
-		showresp(INFO, HEX, "set split OFF", cmd, replystr);
+		showresp(WARN, HEX, "set split OFF", cmd, replystr);
+	progStatus.split = val;
 }
 
 int RIG_FT900::get_split()
 {
-	return split;
+	return splitison;
+}
+
+int  RIG_FT900::get_vfoAorB()
+{
+	return vfoAorB;       
+}
+
+void RIG_FT900::swapvfos()  // works, but only with a few tricks
+{
+	progStatus.poll_frequency = 0;  // stop polling read_info
+	progStatus.poll_mode = 0;
+	progStatus.poll_bandwidth = 0;
+	
+	MilliSleep(400);
+
+	FREQMODE tempA = vfoA;	
+	FREQMODE tempB = vfoB;	
+
+	init_cmd();
+	cmd[4] = 0x85;			// copy active vfo to background vfo
+	sendCommand(cmd);
+	showresp(WARN, HEX, "copy active vfo to background vfo", cmd, replystr);
+
+	if (!useB) {	
+		{	
+		guard_lock queA_lock(&mutex_queA, 120);
+		while (!queA.empty()) queA.pop();
+		queA.push(tempB);
+		}
+
+		FreqDispB->value(tempA.freq);
+		FreqDispB->redraw();
+		vfoB = tempA;
+	} else {
+		{	
+		guard_lock queB_lock(&mutex_queB, 121);
+		while (!queB.empty()) queB.pop();
+		queB.push(tempA);
+		}
+
+		FreqDispA->value(tempB.freq);
+		FreqDispA->redraw();
+		vfoA = tempB;
+	}
+
+	progStatus.poll_frequency = 1;  // restart polling read_info
+	progStatus.poll_mode = 1;
+	progStatus.poll_bandwidth = 1;
 }
 
 bool RIG_FT900::get_info()
 {
+//  first get the vfo, mode and bandwidth information
 	init_cmd();
-	cmd[3] = 0x02;
+	cmd[3] = 0x03;
 	cmd[4] = 0x10;
-//  after this command the FT-900 replies with 1 + 2 x 9 bytes of data
-//  bytes 2..4 and 11..13 contain binary VFO data with 10 Hz resolution
-//  byte 0 contains the split flag
-//  bytes 7 and 16 contain the mode and bytes 9 and 18 contain the bandwidth
-	int ret = waitN(19, 100, "get info", HEX);
+//  after this command the FT-900 replies with 2 x 9 bytes of data
+//  bytes 1..3 contain binary data for vfoA with 10 Hz resolution
+//  bytes 10..12 contain binary data for vfoB with 10 Hz resolution
+//  bytes 6 and 15 contain the mode and bytes 8 and 17 contain the bandwidth
 
-	if (ret >= 19) {
-		size_t p = ret - 19;
+	int ret = waitN(18, 100, "get info", HEX);
+
+	if (ret >= 18) {
+		size_t p = ret - 18;
 		afreq = 0;
 		bfreq = 0;
-		for (size_t n = 2; n < 5; n++) {
+		for (size_t n = 1; n < 4; n++) {
 			afreq = afreq * 256 + (unsigned char)replybuff[p + n];
 			bfreq = bfreq * 256 + (unsigned char)replybuff[p + 9 + n];
 		}
 		afreq = afreq * 10.0;
 		bfreq = bfreq * 10.0;
 		aBW = 0;   // normal BW
-//		mode data is in bytes 7 and 16
-//      bandwidth data is in bytes 9 and 18
-		int sp = replybuff[p];
-		int md = replybuff[p + 7];
-		int bw = replybuff[p + 9];
+//		mode data for vfoA is in byte 6
+//      	bandwidth data is in byte 8
+		int md = replybuff[p + 6];
+		int bw = replybuff[p + 8];
 		switch (md) {
 			case 0 :   // LSB
 				amode = 0;
@@ -168,8 +221,10 @@ bool RIG_FT900::get_info()
 		}
 
 		bBW = 0;
-		md = replybuff[p + 16];
-		bw = replybuff[p + 18];
+//		mode data for vfoB is in byte 15
+//      	bandwidth data is in byte 17
+		md = replybuff[p + 15];
+		bw = replybuff[p + 17];
 		switch (md) {
 			case 0 :   // LSB
 				bmode = 0;
@@ -199,9 +254,18 @@ bool RIG_FT900::get_info()
 		B.freq = bfreq;
 		B.imode = bmode;
 		B.iBW = bBW;
+	}
 
-		split = (sp & 0x40) ? 1 : 0;
-
+//  now get some flags
+	init_cmd();
+	cmd[4] = 0xFA;
+	ret = waitN(5, 100, "get flags info", HEX);
+//  after this command the FT-900 replies with 3 bytes of flags and 2 bytes of dummy data
+	if (ret >= 5) {
+		size_t p = ret - 5;
+		int sp = replybuff[p];
+		splitison = (sp & 0x04) ? 1 : 0;     // 1 if split is set
+		vfoAorB = (sp & 0x40) ? 1 : 0;       // 1 if vfoB is in use
 		return true;
 	}
 	return false;
@@ -256,7 +320,7 @@ void RIG_FT900::set_modeB(int val)
 {
 	B.imode = val;
 	init_cmd();
-	cmd[3] = FT900_mode_val[val];
+	cmd[3] = FT900_mode_val[val]; 
 	cmd[4] = 0x0C;
 	sendCommand(cmd);
 	showresp(WARN, HEX, "set mode B", cmd, replystr);

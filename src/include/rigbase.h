@@ -178,6 +178,7 @@ public:
 	bool has_split;
 	bool has_split_AB;
 	bool has_data_port;
+	bool has_getvfoAorB;
 
 	bool has_extras;
 	bool has_nb_level;
@@ -255,6 +256,7 @@ public:
 	virtual void selectA(){}
 	virtual void selectB(){}
 	virtual void A2B(){}
+	virtual int  get_vfoAorB(){return 0;}
 
 	virtual void swapAB(){}
 

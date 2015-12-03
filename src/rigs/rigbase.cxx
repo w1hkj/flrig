@@ -118,7 +118,8 @@ rigbase::rigbase()
 	has_split_AB =
 	has_a2b =
 	has_band_selection =
-	has_get_info = false;
+	has_get_info = 
+	has_getvfoAorB = false;
 
 	data_type = BINARY;
 

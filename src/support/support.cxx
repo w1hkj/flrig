@@ -149,13 +149,13 @@ char *print(FREQMODE data)
 // the following functions are ONLY CALLED by the serial loop
 // read any data stream sent by transceiver
 
-// read current vfo frequency
-
 void read_info()
 {
 	guard_lock serial_lock(&mutex_serial, 1);
 	selrig->get_info();
 }
+
+// read current vfo frequency
 
 void read_vfo()
 {
@@ -189,6 +189,46 @@ void read_vfo()
 				vfoA.freq = freq;
 				Fl::awake(setFreqDispA, (void *)vfoA.freq);
 			}
+		}
+	}
+}
+
+void update_vfoAorB(void *d)
+{
+	long val = (long)d;
+	if (val) {
+//	could use cb_selectB() here, but that switches off split mode
+		guard_lock serial_lock(&mutex_serial, 95);
+		changed_vfo = true;
+		vfoB.src = UI;
+		vfoB.freq = FreqDispB->value();
+		guard_lock queB_lock(&mutex_queB, 96);
+		queB.push(vfoB);
+		useB = true;
+		highlight_vfo((void *)0);
+	} else {
+//	could use cb_selectA() here, but that switches off split mode
+		guard_lock serial_lock(&mutex_serial, 97);
+		changed_vfo = true;
+		vfoA.src = UI;
+		vfoA.freq = FreqDispA->value();
+		guard_lock queA_lock(&mutex_queA, 98);
+		queA.push(vfoA);
+		useB = false;
+		highlight_vfo((void *)0);
+	}
+}
+
+void read_vfoAorB()
+{
+	int val;
+	if (selrig->has_getvfoAorB) {
+		{
+			guard_lock serial_lock(&mutex_serial, 99);
+			val = selrig->get_vfoAorB();
+		}
+		if (val != useB) {
+			Fl::awake(update_vfoAorB, reinterpret_cast<void*>(val));		
 		}
 	}
 }
@@ -1006,6 +1046,13 @@ void * serial_thread_loop(void *d)
 						read_split();
 					}
 
+				if (bypass_serial_thread_loop) goto serial_bypass_loop;
+				if (que_pending()) continue;
+
+				if (progStatus.poll_vfoAorB)
+					if (!(poll_nbr % progStatus.poll_vfoAorB)) {
+						read_vfoAorB();
+					}
 				if (bypass_serial_thread_loop) goto serial_bypass_loop;
 				if (que_pending()) continue;
 
