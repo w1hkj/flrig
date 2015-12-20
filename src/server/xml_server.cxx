@@ -651,6 +651,7 @@ public:
 			else srvr_vfo = vfoA;
 		}
 		srvr_vfo.iBW = bw;
+printf("srvr_vfo.iBW: %X\n", bw);
 		push_xml();
 	}
 	std::string help() { return std::string("set_bw to VAL"); }

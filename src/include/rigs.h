@@ -137,7 +137,7 @@ extern RIG_TS480SAT	    rig_TS480SAT;	// 49
 extern RIG_TS570		rig_TS570;		// 50
 extern RIG_TS590S		rig_TS590S;		// 51
 extern RIG_TS590SG      rig_TS590SG;    // 52
-extern RIG_TS870S		rig_TS780S;		// 53 wbx
+extern RIG_TS870S		rig_TS870S;		// 53 wbx
 extern RIG_TS990		rig_TS990;		// 54 G0HIX
 extern RIG_TS2000		rig_TS2000;		// 55
 extern RIG_TT516		rig_TT516;		// 56

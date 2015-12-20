@@ -32,7 +32,7 @@ static const char TS2000_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'U' 
 static const char *TS2000_empty[] = { "N/A", NULL };
 //------------------------------------------------------------------------------
 static const char *TS2000_SL[] = {
- "10",   "50", "100", "200", "300", 
+ "0",   "50", "100", "200", "300", 
 "400",  "500", "600", "700", "800", 
 "900", "1000", NULL };
 static const char *TS2000_CAT_SL[] = {
@@ -45,7 +45,7 @@ static const char *TS2000_SSB_btn_SL_label = "L";
 static const char *TS2000_SH[] = {
 "1400", "1600", "1800", "2000", "2200",
 "2400", "2600", "2800", "3000", "3400",
-"4000", "5000" };
+"4000", "5000", NULL };
 static const char *TS2000_CAT_SH[] = {
 "SH00;", "SH01;", "SH02;", "SH03;", "SH04;", 
 "SH05;", "SH06;", "SH07;", "SH08;", "SH09;",
@@ -54,18 +54,18 @@ static const char *TS2000_SH_tooltip = "hi cut";
 static const char *TS2000_SSB_btn_SH_label = "H";
 //------------------------------------------------------------------------------
 static const char *TS2000_AM_SL[] = {
-"0", "100", "200", "500" };
+"0", "100", "200", "500", NULL };
 static const char *TS2000_AM_SH[] = {
 "2500", "3000", "4000", "5000" };
 //------------------------------------------------------------------------------
 static const char *TS2000_CWwidths[] = {
 "50", "80", "100", "150", "200", 
 "300", "400", "500", "600", "1000", 
-"1500", NULL};
+"2000", NULL};
 static const char *TS2000_CWbw[] = {
 "FW0050;", "FW0080;", "FW0100;", "FW0150;", "FW0200;", 
 "FW0300;", "FW0400;", "FW0500;", "FW0600;", "FW1000;", 
-"FW1500;" };
+"FW2000;" };
 //------------------------------------------------------------------------------
 static const char *TS2000_FSKwidths[] = {
 "250", "500", "1000", "1500", NULL};
@@ -146,6 +146,7 @@ void RIG_TS2000::initialize()
 void RIG_TS2000::shutdown()
 {
 // restore state of xcvr beeps
+	if (menu012.empty()) return;
 	cmd = menu012;
 	sendCommand(cmd);
 }
@@ -669,7 +670,7 @@ const char **RIG_TS2000::hitable(int val)
 
 void RIG_TS2000::set_modeA(int val)
 {
-	if (val >= sizeof(TS2000_mode_chr)) return;
+	if (val >= (int)sizeof(TS2000_mode_chr)) return;
 	_currmode = A.imode = val;
 	cmd = "MD";
 	cmd += TS2000_mode_chr[val];
@@ -703,7 +704,7 @@ int RIG_TS2000::get_modeA()
 
 void RIG_TS2000::set_modeB(int val)
 {
-	if (val >= sizeof(TS2000_mode_chr)) return;
+	if (val >= (int)sizeof(TS2000_mode_chr)) return;
 	_currmode = B.imode = val;
 	cmd = "MD";
 	cmd += TS2000_mode_chr[val];
@@ -760,12 +761,13 @@ void RIG_TS2000::set_bwA(int val)
 		A.iBW = val;
 		cmd = "SL";
 		int index = A.iBW & 0x7F;
-		if (index >= sizeof(TS2000_CAT_SL)) return;
+		if (index >= (int)sizeof(TS2000_CAT_SL)) return;
 		cmd = TS2000_CAT_SL[index];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set lower", cmd, "");
 		cmd = "SH";
-		if (index >= sizeof(TS2000_CAT_SH)) return;
+		index = (A.iBW >> 8) & 0x7F;
+		if (index >= (int)sizeof(TS2000_CAT_SH)) return;
 		cmd = TS2000_CAT_SH[index];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set upper", cmd, "");
@@ -774,14 +776,14 @@ void RIG_TS2000::set_bwA(int val)
 	else if (A.imode == CW || A.imode == CWR) {
 		A.iBW = val;
 		int index = A.iBW & 0x7F;
-		if (index >= sizeof(TS2000_CWbw)) return;
+		if (index >= (int)sizeof(TS2000_CWbw)) return;
 		cmd = TS2000_CWbw[index];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set CW bw", cmd, "");
 	}else if (A.imode == FSK || A.imode == FSKR) {
 		A.iBW = val;
 		int index = A.iBW & 0x7F;
-		if (index >= sizeof(TS2000_FSKbw)) return;
+		if (index >= (int)sizeof(TS2000_FSKbw)) return;
 		cmd = TS2000_FSKbw[index];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set FSK bw", cmd, "");
@@ -792,7 +794,7 @@ int RIG_TS2000::get_bwA()
 {
 	if (tuning()) return A.iBW;
 	if (skip_get) return A.iBW;
-	int i = 0;
+	size_t i = 0;
 	size_t p;
 	if (A.imode == LSB || A.imode == USB || A.imode == FM || A.imode == AM) {
 		int lo = A.iBW & 0xFF, hi = (A.iBW >> 8) & 0x7F;
@@ -842,12 +844,13 @@ void RIG_TS2000::set_bwB(int val)
 		B.iBW = val;
 		cmd = "SL";
 		int index = B.iBW & 0x7F;
-		if (index >= sizeof(TS2000_CAT_SL)) return;
+		if (index >= (int)sizeof(TS2000_CAT_SL)) return;
 		cmd = TS2000_CAT_SL[index];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set lower", cmd, "");
 		cmd = "SH";
-		if (index >= sizeof(TS2000_CAT_SH)) return;
+		index = (B.iBW >> 8) & 0x7F;
+		if (index >= (int)sizeof(TS2000_CAT_SH)) return;
 		cmd = TS2000_CAT_SH[index];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set upper", cmd, "");
@@ -856,14 +859,14 @@ void RIG_TS2000::set_bwB(int val)
 	else if (B.imode == CW || B.imode == CWR) {
 		B.iBW = val;
 		int index = B.iBW & 0x7F;
-		if (index >= sizeof(TS2000_CWbw)) return;
+		if (index >= (int)sizeof(TS2000_CWbw)) return;
 		cmd = TS2000_CWbw[index];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set CW bw", cmd, "");
 	}else if (B.imode == FSK || B.imode == FSKR) {
 		B.iBW = val;
 		int index = B.iBW & 0x7F;
-		if (index >= sizeof(TS2000_FSKbw)) return;
+		if (index >= (int)sizeof(TS2000_FSKbw)) return;
 		cmd = TS2000_FSKbw[index];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set FSK bw", cmd, "");
@@ -874,7 +877,7 @@ int RIG_TS2000::get_bwB()
 {
 	if (tuning()) return B.iBW;
 	if (skip_get) return B.iBW;
-	int i = 0;
+	size_t i = 0;
 	size_t p;
 	if (B.imode == LSB || B.imode == USB || B.imode == FM || B.imode == AM) {
 		int lo = B.iBW & 0xFF, hi = (B.iBW >> 8) & 0x7F;
@@ -919,7 +922,7 @@ int RIG_TS2000::get_bwB()
 
 int RIG_TS2000::get_modetype(int n)
 {
-	if (n >= sizeof(TS2000_mode_type)) return 0;
+	if (n >= (int)sizeof(TS2000_mode_type)) return 0;
 	return TS2000_mode_type[n];
 }
 
@@ -1023,7 +1026,8 @@ void RIG_TS2000::set_notch(bool on, int val)
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set notch on", cmd, "");
 		cmd = "BP";
-		val = round((val - 300) * 64.0 / 2700.0);
+//		val = round((val - 220) / 50);
+		val = round((val - 200) / 50);
 		cmd.append(to_decimal(val, 3)).append(";");
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set notch val", cmd, "");
@@ -1047,7 +1051,7 @@ bool  RIG_TS2000::get_notch(int &val)
 				if (wait_char(';', 6, 100, "get notch val", ASC) == 6) {
 					p = replystr.rfind("BP");
 					if (p != string::npos)
-						val = 300 + (2700.0 / 64.0) * fm_decimal(&replystr[p+2],3);
+						val = 200 + 50 * fm_decimal(&replystr[p+2],3);
 				}
 			}
 		}
@@ -1057,8 +1061,8 @@ bool  RIG_TS2000::get_notch(int &val)
 
 void RIG_TS2000::get_notch_min_max_step(int &min, int &max, int &step)
 {
-	min = 300;
-	max = 3000;
+	min = 200;
+	max = 3350;
 	step = 50;
 }
 

@@ -461,7 +461,7 @@ void read_preamp_att()
 void update_split(void *d)
 {
 	if (rig_nbr == FT450 || rig_nbr == FT450D || 
-		rig_nbr == FT950 || rig_nbr == FTdx1200 ||
+    	rig_nbr == FT950 || rig_nbr == FTdx1200 ||
 		rig_nbr == TS480SAT || rig_nbr == TS480HX ||
 		rig_nbr == TS590S || rig_nbr == TS590SG ||
 		rig_nbr == TS2000 || rig_nbr == TS990) {
@@ -489,7 +489,7 @@ void update_split(void *d)
 
 void read_split()
 {
-	int val;
+	int val = progStatus.split;
 	if (selrig->can_split()) {
 		{
 			guard_lock serial_lock(&mutex_serial, 15);
