@@ -43,6 +43,7 @@ RIG_FT920		rig_FT920;
 RIG_FT950		rig_FT950;
 RIG_FT990		rig_FT990;
 RIG_FT990A		rig_FT990A;
+RIG_FT991		rig_FT991;
 RIG_FT1000MP	rig_FT1000MP;
 RIG_FT2000		rig_FT2000;
 RIG_FTdx1200	rig_FTdx1200;
@@ -114,54 +115,55 @@ rigbase *rigs[] = {
 	&rig_FT950,		// 13
 	&rig_FT990,		// 14
 	&rig_FT990A,	// 15
-	&rig_FT1000MP,	// 16
-	&rig_FT2000,	// 17
-	&rig_FTdx1200,	// 18
-	&rig_FTdx3000,	// 19
-	&rig_FT5000,	// 20
-	&rig_IC703,		// 21
-	&rig_IC706MKIIG,// 22
-	&rig_IC718,		// 23
-	&rig_IC728,		// 24
-	&rig_IC735,		// 25
-	&rig_IC746,		// 26
-	&rig_IC746PRO,	// 27
-	&rig_IC756,		// 28
-	&rig_IC756PRO,	// 29
-	&rig_IC756PRO2,	// 30
-	&rig_IC756PRO3,	// 31
-	&rig_IC7000,	// 32
-	&rig_IC7100,	// 33
-	&rig_IC7200,	// 34
-	&rig_IC7410,	// 35
-	&rig_IC7600,	// 36
-	&rig_IC7700,	// 37
-	&rig_IC7800,	// 38
-	&rig_IC9100,	// 39
-	&rig_IC910H,	// 40
-	&rig_K2,		// 41
-	&rig_K3,		// 42
-	&rig_KX3,		// 43
-	&rig_PCR1000,	// 44
-	&rig_RAY152,	// 45
-	&rig_TS140,		// 46
-	&rig_TS450S,	// 47
-	&rig_TS480HX,	// 48
-	&rig_TS480SAT,	// 49
-	&rig_TS570,		// 50
-	&rig_TS590S,	// 51
-	&rig_TS590SG,   // 52
-	&rig_TS870S,	// 53 wbx
-	&rig_TS990,		// 54
-	&rig_TS2000,	// 55
-	&rig_TT516,		// 56
-	&rig_TT535,		// 57
-	&rig_TT538,		// 58
-	&rig_TT550,		// 59
-	&rig_TT563,		// 60
-	&rig_TT566,		// 61
-	&rig_TT588,		// 62
-	&rig_TT599,		// 63
+	&rig_FT991,		// 16
+	&rig_FT1000MP,	// 17
+	&rig_FT2000,	// 18
+	&rig_FTdx1200,	// 19
+	&rig_FTdx3000,	// 20
+	&rig_FT5000,	// 21
+	&rig_IC703,		// 22
+	&rig_IC706MKIIG,// 23
+	&rig_IC718,		// 24
+	&rig_IC728,		// 25
+	&rig_IC735,		// 26
+	&rig_IC746,		// 27
+	&rig_IC746PRO,	// 28
+	&rig_IC756,		// 29
+	&rig_IC756PRO,	// 40
+	&rig_IC756PRO2,	// 31
+	&rig_IC756PRO3,	// 32
+	&rig_IC7000,	// 33
+	&rig_IC7100,	// 34
+	&rig_IC7200,	// 35
+	&rig_IC7410,	// 36
+	&rig_IC7600,	// 37
+	&rig_IC7700,	// 38
+	&rig_IC7800,	// 39
+	&rig_IC9100,	// 40
+	&rig_IC910H,	// 41
+	&rig_K2,		// 42
+	&rig_K3,		// 43
+	&rig_KX3,		// 44
+	&rig_PCR1000,	// 45
+	&rig_RAY152,	// 46
+	&rig_TS140,		// 47
+	&rig_TS450S,	// 48
+	&rig_TS480HX,	// 49
+	&rig_TS480SAT,	// 50
+	&rig_TS570,		// 51
+	&rig_TS590S,	// 52
+	&rig_TS590SG,   // 53
+	&rig_TS870S,	// 54 wbx
+	&rig_TS990,		// 55
+	&rig_TS2000,	// 56
+	&rig_TT516,		// 57
+	&rig_TT535,		// 58
+	&rig_TT538,		// 59
+	&rig_TT550,		// 60
+	&rig_TT563,		// 61
+	&rig_TT566,		// 62
+	&rig_TT588,		// 63
+	&rig_TT599,		// 64
 	NULL
 };
 

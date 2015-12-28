@@ -121,6 +121,7 @@ public:
 
 	bool has_xcvr_auto_on_off;
 	bool has_a2b;
+	bool has_b2a;
 	bool has_vfo_adj;
 	bool has_rit;
 	bool has_xit;
@@ -229,6 +230,7 @@ public:
 	virtual void selectA(){}
 	virtual void selectB(){}
 	virtual void A2B(){}
+	virtual void B2A(){}
 	virtual int  get_vfoAorB(){return 0;}
 
 	virtual void swapAB(){}

@@ -141,6 +141,7 @@ flrig_SOURCES += \
 	rigs/FT950.cxx \
 	rigs/FT990.cxx \
 	rigs/FT990a.cxx \
+	rigs/FT991.cxx \
 	rigs/FT1000.cxx \
 	rigs/FT1000MP.cxx \
 	rigs/FT2000.cxx \
@@ -254,6 +255,7 @@ EXTRA_DIST = \
 	include/FT950.h \
 	include/FT990.h \
 	include/FT990a.h \
+	include/FT991.h \
 	include/FT1000.h \
 	include/FT1000MP.h \
 	include/FT2000.h \
