@@ -36,7 +36,6 @@ struct status {
 	int		mainH;
 	int		UIsize;
 	bool	UIchanged;
-	int		rig_nbr;
 	string	xcvr_serial_port;
 	int		comm_baudrate;
 	int		stopbits;
@@ -276,10 +275,11 @@ struct status {
 
 	void saveLastState();
 	void loadLastState();
-	bool loadXcvrState(const char *);
+	bool loadXcvrState(string);
 	void UI_laststate();
 };
 
 extern status progStatus;
+extern string xcvr_name;
 
 #endif

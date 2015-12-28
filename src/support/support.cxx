@@ -242,7 +242,7 @@ void setModeControl(void *)
 // enables/disables the IF shift control, depending on the mode.
 // the IF Shift function, is ONLY valid in CW modes, with the 870S.
 
-	if (rig_nbr == TS870S) {
+	if (xcvr_name == rig_TS870S.name_) {
 		if (vfo.imode == RIG_TS870S::tsCW || vfo.imode == RIG_TS870S::tsCWR) {
 			btnIFsh->activate();
 			if (sldrIFSHIFT) sldrIFSHIFT->activate();
@@ -460,11 +460,11 @@ void read_preamp_att()
 // split
 void update_split(void *d)
 {
-	if (rig_nbr == FT450 || rig_nbr == FT450D || 
-    	rig_nbr == FT950 || rig_nbr == FTdx1200 ||
-		rig_nbr == TS480SAT || rig_nbr == TS480HX ||
-		rig_nbr == TS590S || rig_nbr == TS590SG ||
-		rig_nbr == TS2000 || rig_nbr == TS990) {
+	if (xcvr_name == rig_FT450.name_ || xcvr_name == rig_FT450D.name_ || 
+    	xcvr_name == rig_FT950.name_ || xcvr_name == rig_FTdx1200.name_ ||
+		xcvr_name == rig_TS480SAT.name_ || xcvr_name == rig_TS480HX.name_ ||
+		xcvr_name == rig_TS590S.name_ || xcvr_name == rig_TS590SG.name_ ||
+		xcvr_name == rig_TS2000.name_ || xcvr_name == rig_TS990.name_) {
 		switch (progStatus.split) {
 			case 0: btnSplit->value(0);
 					useB = false;
@@ -601,7 +601,7 @@ void update_power_control(void *d)
 	set_power_controlImage(progStatus.power_level);
 	if (sldrPOWER) sldrPOWER->value(progStatus.power_level);
 	if (spnrPOWER) spnrPOWER->value(progStatus.power_level);
-	if (rig_nbr == K2) {
+	if (xcvr_name == rig_K2.name_) {
 		double min, max, step;
 		selrig->get_pc_min_max_step(min, max, step);
 		if (sldrPOWER) sldrPOWER->minimum(min);
@@ -753,7 +753,7 @@ void serviceB()
 	}
 
 // if TT550 or K3 and split or on vfoA just update the B vfo
-	if ((rig_nbr == K3) || (selrig->can_change_alt_vfo && !useB)) {
+	if ((xcvr_name == rig_K3.name_) || (selrig->can_change_alt_vfo && !useB)) {
 		selrig->set_vfoB(vfoB.freq);
 		goto end_serviceB;
 	}
@@ -841,7 +841,7 @@ void serviceSliders()
 				rfgain_changed = false;
 				break;
 			case NR:
-				if (rig_nbr == TS2000) {
+				if (xcvr_name == rig_TS2000.name_) {
 					if (working.button != -1) { // pia
 						if (selrig->noise_reduction_level() == 0) {
 							selrig->set_noise_reduction(1);
@@ -924,15 +924,15 @@ void * serial_thread_loop(void *d)
 				loopcount = progStatus.serloop_timing / 10;
 				poll_nbr++;
 
-				if (rig_nbr == K3) {
+				if (xcvr_name == rig_K3.name_) {
 					if (que_pending()) continue;
 					read_K3();
 				}
-				else if (rig_nbr == KX3) {
+				else if (xcvr_name == rig_KX3.name_) {
 					if (que_pending()) continue;
 					read_KX3();
 				}
-				else if ((rig_nbr == K2) ||
+				else if ((xcvr_name == rig_K2.name_) ||
 						 (selrig->has_get_info &&
 						 (progStatus.poll_frequency || progStatus.poll_mode || progStatus.poll_bandwidth))) {
 					if (que_pending()) continue;
@@ -1472,15 +1472,15 @@ void cbAswapB()
 
 void cbA2B()
 {
-	if (rig_nbr == K3) {
+	if (xcvr_name == rig_K3.name_) {
 		K3_A2B();
 		return;
 	}
-	if (rig_nbr == KX3) {
+	if (xcvr_name == rig_KX3.name_) {
 		KX3_A2B();
 		return;
 	}
-	if (rig_nbr == K2) {
+	if (xcvr_name == rig_K2.name_) {
 		guard_lock serial_lock(&mutex_serial, 43);
 		vfoB = vfoA;
 		selrig->set_vfoB(vfoB.freq);
@@ -1759,9 +1759,10 @@ void setNR()
 {
 	if (!selrig->has_noise_reduction_control) return;
 	noise_reduction_changed = true;
-	if (rig_nbr == TS2000 || 
-		rig_nbr == TS590S || rig_nbr == TS590SG ||
-		rig_nbr == TS990) {
+	if (xcvr_name == rig_TS2000.name_ || 
+		xcvr_name == rig_TS590S.name_ ||
+		xcvr_name == rig_TS590SG.name_ ||
+		xcvr_name == rig_TS990.name_) {
 		if (sldrNR) sliders.push(SLIDER(NR, sldrNR->value(), -1 ) );
 		if (spnrNR) sliders.push(SLIDER(NR, spnrNR->value(), -1 ) );
 	} else {
@@ -1954,7 +1955,7 @@ void setPower()
 	float pwr = 0;
 	if (spnrPOWER) pwr = progStatus.power_level = spnrPOWER->value();
 	if (sldrPOWER) pwr = progStatus.power_level = sldrPOWER->value();
-	if (rig_nbr == K2) {
+	if (xcvr_name == rig_K2.name_) {
 		double min, max, step;
 		selrig->get_pc_min_max_step(min, max, step);
 		if (spnrPOWER) spnrPOWER->minimum(min);
@@ -2135,8 +2136,6 @@ void closeRig()
 
 void cbExit()
 {
-	progStatus.rig_nbr = rig_nbr;
-
 	progStatus.freq_A = vfoA.freq;
 	progStatus.imode_A = vfoA.imode;
 	progStatus.iBW_A = vfoA.iBW;
@@ -2312,7 +2311,7 @@ void adjust_small_ui()
 			sldrNR->resize( 54, y, 368, 18 );
 			sldrNR->show();
 			sldrNR->redraw();
-			if (rig_nbr == TT599) btnNR->deactivate();
+			if (xcvr_name == rig_TT599.name_) btnNR->deactivate();
 		}
 		if (selrig->has_ifshift_control) {
 			y += 20;
@@ -2365,7 +2364,7 @@ void adjust_small_ui()
 	btnTune->position( btnTune->x(), y);
 	btnTune->redraw();
 
-	if (rig_nbr == FT1000MP) {
+	if (xcvr_name == rig_FT1000MP.name_) {
 		y -= 20;
 		btnTune->position( btnTune->x(), y);
 		btnTune->redraw();
@@ -2375,14 +2374,14 @@ void adjust_small_ui()
 		btnPTT->redraw();
 	}
 
-	if (	rig_nbr == FT100D ||
-			rig_nbr == FT767  ||
-			rig_nbr == FT817  ||
-			rig_nbr == FT847  ||
-			rig_nbr == FT857D ||
-			rig_nbr == FT890  ||
-			rig_nbr == FT897D ||
-			rig_nbr == FT920 ) {
+	if (xcvr_name == rig_FT100D.name_ ||
+		xcvr_name == rig_FT767.name_  ||
+		xcvr_name == rig_FT817.name_  ||
+		xcvr_name == rig_FT847.name_  ||
+		xcvr_name == rig_FT857D.name_ ||
+		xcvr_name == rig_FT890.name_  ||
+		xcvr_name == rig_FT897D.name_ ||
+		xcvr_name == rig_FT920.name_ ) {
 		y -= 20;
 		btnPTT->position( btnPTT->x(), y);
 		btnPTT->redraw();
@@ -2460,7 +2459,7 @@ void adjust_wide_ui()
 	btnNR->show();
 	sldrNR->show();
 
-	if (rig_nbr == TT550) {
+	if (xcvr_name == rig_TT550.name_) {
 		tabs550->show();
 		tabsGeneric->hide();
 	} else {
@@ -2530,7 +2529,7 @@ void adjust_touch_ui()
 	if (spnrNR) spnrNR->show();
 	if (sldrNR) sldrNR->show();
 
-	if (rig_nbr == TT550) {
+	if (xcvr_name == rig_TT550.name_) {
 		tabs550->show();
 		tabsGeneric->hide();
 	} else {
@@ -2588,7 +2587,7 @@ void adjust_control_positions()
 
 void initXcvrTab()
 {
-	if (rig_nbr == TT550) {
+	if (xcvr_name == rig_TT550.name_) {
 		spnr_tt550_line_out->value(progStatus.tt550_line_out);
 		cbo_tt550_agc_level->index(progStatus.tt550_agc_level);
 		spnr_tt550_cw_wpm->value(progStatus.tt550_cw_wpm);
@@ -2920,7 +2919,8 @@ void initXcvrTab()
 		if (!selrig->has_alc_control) { poll_alc->deactivate(); poll_alc->value(0); }
 		if (!selrig->has_volume_control) { poll_volume->deactivate(); poll_volume->value(0); }
 		if (!selrig->has_notch_control) { poll_notch->deactivate(); poll_notch->value(0); }
-		if (!selrig->has_auto_notch || rig_nbr == FT1000MP)
+		if (!selrig->has_auto_notch ||
+			xcvr_name == rig_FT1000MP.name_ )
 			{ poll_auto_notch->deactivate(); poll_auto_notch->value(0); }
 		if (!selrig->has_ifshift_control) { poll_ifshift->deactivate(); poll_ifshift->value(0); }
 		if (!selrig->has_power_control) { poll_power_control->deactivate(); poll_power_control->value(0); }
@@ -2975,7 +2975,7 @@ void initRig()
 	FreqDispB->set_precision(selrig->precision);
 	FreqDispB->set_ndigits(selrig->ndigits);
 
-	if (rig_nbr == TT550) {
+	if (xcvr_name == rig_TT550.name_) {
 		selrig->selectA();
 
 		vfoB.freq = progStatus.freq_B;
@@ -3476,7 +3476,7 @@ void initRig()
 		}
 	}
 
-	if (rig_nbr == TS870S) {
+	if (xcvr_name == rig_TS870S.name_) {
 		if (progStatus.imode_A == RIG_TS870S::tsCW ||
 			progStatus.imode_A == RIG_TS870S::tsCWR) {
 			btnIFsh->activate();
@@ -3627,7 +3627,7 @@ void initRig()
 	}
 
 // hijack the preamp control for a SPOT button on the TT550 Pegasus
-	if (rig_nbr == TT550) {
+	if (xcvr_name == rig_TT550.name_) {
 		btnPreamp->label("Spot");
 		btnPreamp->value(progStatus.tt550_spot_onoff);
 		switch (progStatus.UIsize) {
@@ -3662,7 +3662,7 @@ void initRig()
 	}
 
 	if (selrig->has_noise_control) {
-		if (rig_nbr == TS990) {
+		if (xcvr_name == rig_TS990.name_) {
 			btnNOISE->label("AGC"); //Set TS990 AGC Label
 			btnNR->label("NR1"); //Set TS990 NR Button
 		}
@@ -3717,10 +3717,10 @@ void initRig()
 
 	if (selrig->has_auto_notch) {
 
-		if (rig_nbr == RAY152) {
+		if (xcvr_name == rig_RAY152.name_) {
 			btnAutoNotch->label("AGC");
 			btnAutoNotch->tooltip("AGC on/off");
-		} else if (rig_nbr == FT1000MP) {
+		} else if (xcvr_name == rig_FT1000MP.name_) {
 			btnAutoNotch->label("Tuner");
 			btnAutoNotch->tooltip("Tuner on/off");
 		} else {
@@ -3769,8 +3769,11 @@ void initRig()
 		txtCIV->value(hexstr);
 		txtCIV->activate();
 		btnCIVdefault->activate();
-		if (strstr(selrig->name_, "IC-7200") || strstr(selrig->name_, "IC-7600")
-			|| strstr(selrig->name_, "IC-7800")) {
+		if (selrig->name_ == rig_IC7200.name_ ||
+			selrig->name_ == rig_IC7600.name_ ||
+			selrig->name_ == rig_IC7800.name_ ) {
+//		if (strstr(selrig->name_, "IC-7200") || strstr(selrig->name_, "IC-7600")
+//			|| strstr(selrig->name_, "IC-7800")) {
 			btnUSBaudio->value(progStatus.USBaudio = true);
 			btnUSBaudio->activate();
 		} else
@@ -3783,7 +3786,7 @@ void initRig()
 		btnUSBaudio->deactivate();
 	}
 
-	if (rig_nbr != TT550) {
+	if (selrig->name_ != rig_TT550.name_) {
 		vfoA.freq = progStatus.freq_A;
 		vfoA.imode = progStatus.imode_A;
 		vfoA.iBW = progStatus.iBW_A;
@@ -3818,7 +3821,7 @@ void initRig()
 
 // enable buttons, change labels
 
-	if (rig_nbr == TS990) { // Setup TS990 Mon Button
+	if (xcvr_name == rig_TS990.name_) { // Setup TS990 Mon Button
 		btnIFsh->label("MON");
 	}
 	selrig->post_initialize();
@@ -3826,12 +3829,12 @@ void initRig()
 // enable the serial thread
 	}
 
-	if (rig_nbr == K3) {
+	if (xcvr_name == rig_K3.name_) {
 		btnB->hide();
 		btnA->hide();
 		btn_KX3_swapAB->hide();
 		btn_K3_swapAB->show();
-	} else if (rig_nbr == KX3) {
+	} else if (xcvr_name == rig_KX3.name_) {
 		btnB->hide();
 		btnA->hide();
 		btn_K3_swapAB->hide();
@@ -3873,9 +3876,8 @@ void initConfigDialog()
 {
 	int picked = selectRig->index();
 	rigbase *srig = rigs[picked];
+	string xcvr_name = srig->name_;
 	selectCommPort->index(0);
-
-	progStatus.loadXcvrState(selrig->name_);
 
 	selectCommPort->value(progStatus.xcvr_serial_port.c_str());
 	btnOneStopBit->value( progStatus.stopbits == 1 );
@@ -3895,13 +3897,15 @@ void initConfigDialog()
 	btnrtsplus->value( srig->comm_rtsplus );
 	btndtrplus->value( srig->comm_dtrplus );
 
-	if (picked >= IC703 && picked <= IC910H) {
+	if (xcvr_name.find("IC") == 0) {
 		char hexstr[8];
 		snprintf(hexstr, sizeof(hexstr), "0x%2X", srig->CIV);
 		txtCIV->value(hexstr);
 		txtCIV->activate();
 		btnCIVdefault->activate();
-		if (picked == IC7200 || picked == IC7600 || picked == IC7800) {
+		if (xcvr_name == rig_IC7200.name_ ||
+			xcvr_name == rig_IC7600.name_ ||
+			xcvr_name == rig_IC7800.name_) {
 			btnUSBaudio->value(progStatus.USBaudio = true);
 			btnUSBaudio->activate();
 		} else
@@ -3917,13 +3921,10 @@ void initConfigDialog()
 
 void initStatusConfigDialog()
 {
-	rig_nbr = progStatus.rig_nbr;
-	selrig = rigs[rig_nbr];
+	if (progStatus.CIV) selrig->adjustCIV(progStatus.CIV);
 
-	if (rig_nbr >= IC703 && rig_nbr <= IC910H)
-		if (progStatus.CIV) selrig->adjustCIV(progStatus.CIV);
+	selectRig->value(xcvr_name.c_str());
 
-	selectRig->index(rig_nbr);
 	mnuBaudrate->index( progStatus.comm_baudrate );
 
 	selectCommPort->value( progStatus.xcvr_serial_port.c_str() );
@@ -3995,9 +3996,9 @@ void initRigCombo()
 	selectRig->clear();
 	int i = 0;
 	while (rigs[i] != NULL)
-		selectRig->add(rigs[i++]->name_);
+		selectRig->add(rigs[i++]->name_.c_str());
 
-	selectRig->index(rig_nbr = 0);
+	selectRig->index(0);
 }
 
 void nr_label(const char *l, bool on = false)

@@ -37,8 +37,6 @@ using namespace std;
 
 extern bool test;
 
-int rig_nbr = 0;
-
 const char *nuline = "\n";
 
 static int iBaudRates[] = { 300, 600, 1200, 2400, 4800, 9600,

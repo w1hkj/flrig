@@ -28,12 +28,13 @@
 #include "status.h"
 #include "util.h"
 #include "rig.h"
+#include "rigs.h"
 #include "support.h"
 #include "config.h"
 #include "rigpanel.h"
 #include "ui.h"
 
-string last_xcvr_used = "none";
+string xcvr_name = "NONE";
 
 int current_ui_size = -1;
 
@@ -44,7 +45,6 @@ status progStatus = {
 	150,		// int mainH;
 	small_ui,	// UISIZE, UIsize;
 	false,		// UIchanged;
-	0,			// int rig_nbr;
 	"NONE",		// string xcvr_serial_port;
 	0,			// int comm_baudrate;
 	2,			// int stopbits;
@@ -282,9 +282,9 @@ status progStatus = {
 
 void status::saveLastState()
 {
-	last_xcvr_used = selrig->name_;
+	xcvr_name = selrig->name_;
 	Fl_Preferences xcvrpref(RigHomeDir.c_str(), "w1hkj.com", PACKAGE_TARNAME);
-	xcvrpref.set("last_xcvr_used", last_xcvr_used.c_str());
+	xcvrpref.set("xcvr_name", xcvr_name.c_str());
 
 	int mX = mainwindow->x();
 	int mY = mainwindow->y();
@@ -297,7 +297,7 @@ void status::saveLastState()
 		if (UIsize != small_ui) { mainW = mW; mainH = mH; }
 	}
 
-	Fl_Preferences spref(RigHomeDir.c_str(), "w1hkj.com", last_xcvr_used.c_str());
+	Fl_Preferences spref(RigHomeDir.c_str(), "w1hkj.com", xcvr_name.c_str());
 
 	spref.set("version", PACKAGE_VERSION);
 
@@ -390,7 +390,7 @@ void status::saveLastState()
 	spref.set("pwr_peak", pwr_peak);
 	spref.set("pwr_scale", pwr_scale);
 
-	if (rig_nbr == TT550) {
+	if (selrig->name_ == rig_TT550.name_) {
 		spref.set("tt550_line_out", tt550_line_out);
 		spref.set("tt550_agc_level", tt550_agc_level);
 
@@ -543,9 +543,9 @@ void status::saveLastState()
 	spref.set("hrd_buttons", hrd_buttons);
 }
 
-bool status::loadXcvrState(const char *xcvr)
+bool status::loadXcvrState(string xcvr)
 {
-	Fl_Preferences spref(RigHomeDir.c_str(), "w1hkj.com", xcvr);
+	Fl_Preferences spref(RigHomeDir.c_str(), "w1hkj.com", xcvr.c_str());
 
 	if (spref.entryExists("version")) {
 
@@ -573,12 +573,15 @@ bool status::loadXcvrState(const char *xcvr)
 		if (xcvr_serial_port.find("tty") == 0)
 			xcvr_serial_port.insert(0, "/dev/");
 
-		rig_nbr = NONE;
-		for (int i = NONE; i < LAST_RIG; i++)
-			if (strcmp(rigs[i]->name_, xcvr) == 0) {
-				rig_nbr = i;
+		i = 0;
+		selrig = rigs[i];
+		while (rigs[i] != NULL) {
+			if (xcvr == rigs[i]->name_) {
+				selrig = rigs[i];
 				break;
 			}
+			i++;
+		}
 
 		spref.get("comm_baudrate", comm_baudrate, comm_baudrate);
 		spref.get("comm_stopbits", stopbits, stopbits);
@@ -664,7 +667,7 @@ bool status::loadXcvrState(const char *xcvr)
 		spref.get("pwr_peak", pwr_peak, pwr_peak);
 		spref.get("pwr_scale", pwr_scale, pwr_scale);
 
-		if (rig_nbr == TT550) {
+		if (selrig->name_ == rig_TT550.name_) {
 			spref.get("tt550_line_out", tt550_line_out, tt550_line_out);
 			spref.get("tt550_agc_level", tt550_agc_level, tt550_agc_level);
 
@@ -829,12 +832,17 @@ bool status::loadXcvrState(const char *xcvr)
 void status::loadLastState()
 {
 	Fl_Preferences xcvrpref(RigHomeDir.c_str(), "w1hkj.com", PACKAGE_TARNAME);
-	if (xcvrpref.entryExists("last_xcvr_used")) {
+	if (xcvrpref.entryExists("xcvr_name")) {
 		char defbuffer[200];
-		xcvrpref.get("last_xcvr_used", defbuffer, "none", 199);
-		last_xcvr_used = defbuffer;
+		xcvrpref.get("xcvr_name", defbuffer, "NONE", 199);
+		xcvr_name = defbuffer;
+// for backward compatability
+	} else if (xcvrpref.entryExists("last_xcvr_used")) {
+		char defbuffer[200];
+		xcvrpref.get("last_xcvr_used", defbuffer, "NONE", 199);
+		xcvr_name = defbuffer;
 	}
-	loadXcvrState(last_xcvr_used.c_str());
+	loadXcvrState(xcvr_name.c_str());
 }
 
 void status::UI_laststate()

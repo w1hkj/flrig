@@ -58,7 +58,6 @@ extern bool waitCommand(
 				int level = INFO );
 
 extern void clearSerialPort();
-extern int rig_nbr;
 extern char replybuff[];
 extern string replystr;
 

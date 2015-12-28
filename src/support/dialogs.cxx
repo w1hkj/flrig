@@ -24,6 +24,7 @@
 #include <string>
 
 #include "dialogs.h"
+#include "rigs.h"
 #include "util.h"
 #include "debug.h"
 #include "serial.h"
@@ -394,14 +395,12 @@ void cbOkXcvrDialog()
 			return;
 		}
 
-	if (rig_nbr != selectRig->index()) {
+	if (xcvr_name != rigs[selectRig->index()]->name_) {
 		clearList();
 		saveFreqList();
-		rig_nbr = selectRig->index();
-		selrig = rigs[rig_nbr];
+		selrig = rigs[selectRig->index()];
+		xcvr_name = selrig->name_;
 	}
-
-	progStatus.rig_nbr = rig_nbr;
 
 	progStatus.xcvr_serial_port = selectCommPort->value();
 	progStatus.aux_serial_port = selectAuxPort->value();
@@ -464,13 +463,13 @@ void configXcvr()
 	selectAuxPort->value(progStatus.aux_serial_port.c_str());
 	selectSepPTTPort->value(progStatus.sep_serial_port.c_str());
 
-	if (rig_nbr >= IC703 && rig_nbr <= IC910H) {
+	if (xcvr_name.find("IC") == 0) {
 		char hexstr[8];
 		snprintf(hexstr, sizeof(hexstr), "0x%2X", selrig->CIV);
 		txtCIV->value(hexstr);
 		txtCIV->activate();
 		btnCIVdefault->activate();
-		if (rig_nbr == IC7200 || rig_nbr == IC7600) {
+		if (xcvr_name == rig_IC7200.name_ || xcvr_name == rig_IC7600.name_ ) {
 			btnUSBaudio->value(progStatus.USBaudio);
 			btnUSBaudio->activate();
 		} else
@@ -1137,7 +1136,8 @@ void openMemoryDialog()
 
 void show_controls()
 {
-	if (!(selrig->has_extras || rig_nbr == TT550) && progStatus.aux_serial_port == "NONE")
+	if (!(selrig->has_extras || selrig->name_ == rig_TT550.name_) && 
+		progStatus.aux_serial_port == "NONE")
 		return;
 	switch (progStatus.UIsize) {
 		case wide_ui :
@@ -1159,7 +1159,7 @@ void show_controls()
 			mainwindow->redraw();
 			break;
 		case touch_ui : 
-			if (rig_nbr == TT550) {
+			if (selrig->name_ == rig_TT550.name_) {
 				tabs550->show();
 				tabsGeneric->hide();
 			} else {
@@ -1171,7 +1171,7 @@ void show_controls()
 			mainwindow->redraw();
 			return;
 		case small_ui :
-			if (rig_nbr == TT550) {
+			if (selrig->name_ == rig_TT550.name_) {
 				tabsGeneric->hide();
 				if (tabs550->visible()) {
 					tabs550->hide();
