@@ -1081,6 +1081,7 @@ void RIG_FT5000::set_cw_qsk()
 	showresp(WARN, ASC, "SET cw qsk", cmd, replystr);
 }
 
+/*
 void RIG_FT5000::set_cw_spot_tone()
 {
 	int n = (progStatus.cw_spot_tone - 300) / 50;
@@ -1090,7 +1091,6 @@ void RIG_FT5000::set_cw_spot_tone()
 	showresp(WARN, ASC, "SET cw tone", cmd, replystr);
 }
 
-/*
 void RIG_FT5000::set_cw_vol()
 {
 }
