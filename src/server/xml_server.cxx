@@ -344,6 +344,34 @@ public :
 } rig_get_modes(&rig_server);
 
 //------------------------------------------------------------------------------
+// Request for active vfo sideband
+//------------------------------------------------------------------------------
+
+class rig_get_sideband : public XmlRpcServerMethod {
+public:
+	rig_get_sideband(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_sideband", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		int mode;
+		if (useB) {
+			guard_lock queB_lock(&mutex_queB);
+			if (!queB.empty()) mode = queB.back().imode;
+			else mode = vfoB.imode;
+		} else {
+			guard_lock queA_lock(&mutex_queA);
+			if (!queA.empty()) mode = queA.back().imode;
+			else mode = vfoA.imode;
+		}
+		std::string result_string = "";
+		result_string += selrig->get_modetype(mode);
+		result = result_string;
+	}
+
+	std::string help() { return std::string("returns current xcvr sideband (U/L)"); }
+
+} rig_get_sideband(&rig_server);
+
+//------------------------------------------------------------------------------
 // Request for active vfo mode
 //------------------------------------------------------------------------------
 
@@ -362,7 +390,8 @@ public:
 			if (!queA.empty()) mode = queA.back().imode;
 			else mode = vfoA.imode;
 		}
-		std::string result_string = selrig->modes_ ? selrig->modes_[mode] : "none";
+		std::string result_string = "none";
+		if (selrig->modes_) result_string = selrig->modes_[mode];
 		result = result_string;
 	}
 
@@ -693,6 +722,7 @@ struct MLIST {
 	{ "rig.get_info",     "s:n", "return an info string" },
 	{ "rig.get_mode",     "s:n", "return MODE of current VFO" },
 	{ "rig.get_modes",    "s:n", "return table of MODE values" },
+	{ "rig.get_sideband", "s:n", "return sideband (U/L)" },
 	{ "rig.get_notch",    "s:n", "return notch value" },
 	{ "rig.get_ptt",      "s:n", "return PTT state" },
 	{ "rig.get_pwrmeter", "s:n", "return PWR out" },
