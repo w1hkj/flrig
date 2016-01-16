@@ -28,13 +28,13 @@ const char *KX3modes_[] =
 const char modenbr[] = 
 	{ '1', '2', '3', '4', '5', '6', '7', '9' };
 static const char KX3_mode_type[] =
-	{ 'L', 'U', 'U', 'U', 'U', 'U', 'L', 'L' };
+	{ 'L', 'U', 'L', 'U', 'U', 'U', 'U', 'L' };
 
 static const char *KX3_widths[] = {
    "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
   "550",  "600",  "650",  "700",  "750",  "800",  "850",  "900",  "950", "1000",
  "1100", "1200", "1300", "1400", "1500", "1600", "1700", "1800", "1900", "2000",
- "2200", "2400", "2600", "2800", "3000", "3200", "3400", "3600", NULL};
+ "2200", "2400", "2600", "2800", "3000", "3200", "3400", "3600", "4000", NULL};
 static int KX3_bw_vals[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
@@ -284,6 +284,92 @@ void RIG_KX3::set_pbt_values(int val)
 	Fl::awake(adjust_if_shift_control, (void *)0);
 }
 
+/*
+ * MD $ (Operating Mode; GET/SET)
+ * SET/RSP format: MDn; or MD$n; 
+ *   where n is 
+ *     1 (LSB), 
+ *     2 (USB), 
+ *     3 (CW), 
+ *     4 (FM), 
+ *     5 (AM), 
+ *     6 (DATA), 
+ *     7 (CW-REV),
+ *     9 (DATA-REV).
+ * Notes: 
+ *   (1) K3 only: In Diversity Mode (accessed by holding SUB), sending MDn;
+ *       sets both main and sub mode to n.
+ *   (2) DATA and DATA-REV select the data sub-mode that was last in effect 
+ *       on the present band. (To read/set data sub-mode, use DT.) 
+ *       The norm/rev conditions for the K3’s data sub-modes are
+ *       handled in two pairs at present: 
+ *         DATA A/PSK D, and 
+ *         AFSK A/FSK D. 
+ *       E.g., if the radio is set up for DATA A mode, alternating between 
+ *             MD6 and MD9 will cause both DATA A and PSK D to be set to the 
+ *             same normal/reverse condition. 
+ *       In K2 command modes 1 and 3 (K21 and K23), the RSP message converts 
+ *       modes 6 and 7 (DATA and DATA-REV) to modes 1 and 2 (LSB and USB). 
+ *       This may be useful with existing software applications that don't 
+ * handle DATA modes correctly.
+*/
+/* The DT command needs to be included for get/set mode
+ * 
+ * DT (DATA Sub-Mode; GET/SET)
+ *   SET/RSP format: DTn; where n is the data sub-mode last used with VFO A, 
+ *   whether or not DATA mode is in effect: 
+ *     0 (DATA A), 
+ *     1 (AFSK A), 
+ *     2 (FSK D), 
+ *     3 (PSK D). See MD for data normal/reverse considerations. 
+ *   In Diversity Mode (K3 only, accessed by sending DV1 or via a long hold 
+ *   of SUB), sending DTn matches the sub receiver’s mode to the main receiver’s. 
+ *   Notes: 
+ *     (1) Use DT only when the transceiver is in DATA mode; otherwise,
+ *         the returned value may not be valid. 
+ *     (2) In AI2/3 modes, changing the data sub-mode results in both FW 
+ *         and IS responses.
+ *     (3) The present data sub-mode is also reported as part of the IF command, 
+ *         although this requires that K31 be in effect. Refer to the IF command 
+ *         for details.
+*/
+/* and last but not least, the IF command
+ * 
+ * IF (Transceiver Information; GET only)
+ *   RSP format: IF[f]*****+yyyyrx*00tmvspbd1*; 
+ *   where the fields are defined as follows:
+ *     [f]    Operating frequency, excluding any RIT/XIT offset 
+ *            (11 digits; see FA command format)
+ *      *     represents a space (BLANK, or ASCII 0x20)
+ *      +     either "+" or "-" (sign of RIT/XIT offset)
+ *      yyyy  RIT/XIT offset in Hz (range is -9999 to +9999 Hz when 
+ *            computer-controlled)
+ *      r     1 if RIT is on, 0 if off
+ *      x     1 if XIT is on, 0 if off
+ *      t     1 if the K3 is in transmit mode, 0 if receive
+ *      m     operating mode (see MD command)
+ *      v     receive-mode VFO selection, 0 for VFO A, 1 for VFO B
+ *      s     1 if scan is in progress, 0 otherwise
+ *      p     1 if the transceiver is in split mode, 0 otherwise
+ *      b     Basic RSP format: always 0; 
+ *            K2 Extended RSP format (K22): 
+ *            1 if present IF response is due to a band change; 0 otherwise
+ *      d     Basic RSP format: always 0; 
+ *            K3 Extended RSP format (K31): 
+ *      1     DATA sub-mode, if applicable 
+ *              (0=DATA A, 1=AFSK A, 2= FSK D, 3=PSK D)
+ * The fixed-value fields (space, 0, and 1) are provided for syntactic 
+ * compatibility with existing software.
+ * 
+ * 01234567890123456789012345678901234567
+ * 0         1         2         3      7
+ * IF00014070000*****+yyyyrx*00tmvspbd1*;
+ *   |---------|                   |
+ *     vfo a/b                     split on = '1', off = '0'
+ * IF00014070000     -000000 0002000011 ;  OFF
+ * IF00014070000     -000000 0002001011 ;  ON
+*/
+ 
 void RIG_KX3::set_modeA(int val)
 {
 	modeA = val;

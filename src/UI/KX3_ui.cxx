@@ -48,7 +48,7 @@ extern queue<bool> quePTT;
 
 void read_KX3()
 {
-	pthread_mutex_lock(&mutex_serial);
+	guard_lock serial_lock(&mutex_serial);
 
 	if (progStatus.poll_frequency) {
 		long  freq;
@@ -64,7 +64,8 @@ void read_KX3()
 			Fl::awake(setFreqDispB, (void *)vfoB.freq);
 		}
 	}
-	if (!quePTT.empty()) goto exit_read;
+	if (!quePTT.empty())
+		return;
 
 	if (progStatus.poll_mode) {
 		int nu_mode;
@@ -80,7 +81,8 @@ void read_KX3()
 			vfoB.imode = nu_mode;
 		}
 	}
-	if (!quePTT.empty()) goto exit_read;
+	if (!quePTT.empty())
+		return;
 
 	if (progStatus.poll_bandwidth) {
 		int nu_BW;
@@ -95,36 +97,32 @@ void read_KX3()
 		}
 	}
 
-exit_read:
-	pthread_mutex_unlock(&mutex_serial);
 }
 
 void KX3_set_split(int val)
 {
-	pthread_mutex_lock(&mutex_serial);
-		selrig->set_split(val);
-	pthread_mutex_unlock(&mutex_serial);
-
+	guard_lock serial_lock(&mutex_serial);
+	selrig->set_split(val);
 }
 
 extern char *print(FREQMODE data);
 
 void KX3_A2B()
 {
-	pthread_mutex_lock(&mutex_serial);
+	guard_lock serial_lock(&mutex_serial);
 	vfoB = vfoA;
 	selrig->set_vfoB(vfoB.freq);
 	selrig->set_bwB(vfoB.iBW);
 	selrig->set_modeB(vfoB.imode);
 	FreqDispB->value(vfoB.freq);
-	pthread_mutex_unlock(&mutex_serial);
 	Fl::focus(FreqDispA);
 }
 
 void cb_KX3_swapAB()
 {
+	guard_lock serial_lock(&mutex_serial);
+
 	FREQMODE temp = vfoA;
-	pthread_mutex_lock(&mutex_serial);
 	vfoA = vfoB;
 	vfoB = temp;
 	vfo = vfoA;
@@ -142,8 +140,6 @@ void cb_KX3_swapAB()
 	FreqDispA->value(vfoA.freq);
 
 	FreqDispB->value(vfoB.freq);
-
-	pthread_mutex_unlock(&mutex_serial);
 
 	Fl::focus(FreqDispA);
 }

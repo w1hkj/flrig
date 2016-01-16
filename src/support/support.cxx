@@ -148,6 +148,8 @@ char *print(FREQMODE data)
 
 // the following functions are ONLY CALLED by the serial loop
 // read any data stream sent by transceiver
+// support for the K3 and KX3 read of VFO, MODE and BW are
+// in the K3_ui and KX3_ui source files
 
 void read_info()
 {
@@ -693,7 +695,7 @@ void serviceA()
 		LOG_INFO("%s", print(vfoA));
 
 	if (!selrig->can_change_alt_vfo && useB) return;
-		
+
 	if (changed_vfo && !useB) {
 		selrig->selectA();
 	}
@@ -936,30 +938,31 @@ void * serial_thread_loop(void *d)
 					if (que_pending()) continue;
 					read_info();
 				}
+				else {
+					if (progStatus.poll_frequency)
+						if (!(poll_nbr % progStatus.poll_frequency)) {
+							read_vfo();
+						}
 
-				if (progStatus.poll_frequency)
-					if (!(poll_nbr % progStatus.poll_frequency)) {
-						read_vfo();
-					}
+					if (bypass_serial_thread_loop) goto serial_bypass_loop;
+					if (que_pending()) continue;
 
-				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (que_pending()) continue;
+					if (progStatus.poll_mode)
+						if (!(poll_nbr % progStatus.poll_mode)) {
+							read_mode();
+						}
 
-				if (progStatus.poll_mode)
-					if (!(poll_nbr % progStatus.poll_mode)) {
-						read_mode();
-					}
+					if (bypass_serial_thread_loop) goto serial_bypass_loop;
+					if (que_pending()) continue;
 
-				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (que_pending()) continue;
+					if (progStatus.poll_bandwidth)
+						if (!(poll_nbr % progStatus.poll_bandwidth)) {
+							read_bandwidth();
+						}
 
-				if (progStatus.poll_bandwidth)
-					if (!(poll_nbr % progStatus.poll_bandwidth)) {
-						read_bandwidth();
-					}
-
-				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (que_pending()) continue;
+					if (bypass_serial_thread_loop) goto serial_bypass_loop;
+					if (que_pending()) continue;
+				}
 
 				if (progStatus.poll_smeter)
 					if (!(poll_nbr % progStatus.poll_smeter)) {

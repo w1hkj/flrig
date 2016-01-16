@@ -28,7 +28,7 @@ const char *K3modes_[] =
 const char modenbr[] = 
 	{ '1', '2', '3', '4', '5', '6', '7', '9' };
 static const char K3_mode_type[] =
-	{ 'L', 'U', 'U', 'U', 'U', 'U', 'L', 'L' };
+	{ 'L', 'U', 'L', 'U', 'U', 'U', 'U', 'L' };
 
 static const char *K3_widths[] = {
    "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
