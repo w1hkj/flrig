@@ -1,8 +1,22 @@
 
 
-=Version 1.3.23=
+=Version 1.3.24=
 
-2015-11-28  David Freese  <iam_w1hkj@w1hkj.com>
+2016-01-16  David Freese  <iam_w1hkj@w1hkj.com>
+
+	29f82e6: K3 KX3 mods
+	c1645f0: xmlserver update
+	69ae54a: FTdx9000
+	295ed35: FT5000 update
+	754ba24: FTdx3000 update
+	e5429b9: RIG ENUMERATION
+	976d2df: FT991
+	1d29d8a: TS2000
+	7cb8293: FT900
+	f511fd9: IC7100 data mode detect
+
+
+=Version 1.3.23=
 
 	424c33b: FT817 FT857D FT897D
 	86cc66f: xmlrpc server
