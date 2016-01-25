@@ -1,0 +1,60 @@
+
+2016-January-13th
+G0WBX(G8KBV) Dave.
+
+Changes to KX3.cxx (and others) to improve the functionality with the Elecraft KX3 radio.
+
+KX3.cxx & .h
+
+Support.cxx (comments only)
+
+KX3ui.cxx & .h
+
+Mic, RF(gain) Power and Volume sliders now work correctly.
+The RF Gain control especially, see the Elecraft K3&KX3 programmers reference, "E18" page 21
+for details.
+
+Todo:
+Sort out the split,swap A/B, and A B selection anomalies
+
+Fix the wayward default IF shift values
+
+Commented the (unused for now) shutdown function.
+
+>><<
+2016-01-14
+
+IFsh seems to just send whatever value the slider is set to, for turning on, or off.
+
+Changing from vfoB to A also turns off IFshift, snd sets the slider to 1500.
+Going from B to A, doesnt.
+
+A/B, just seems to set VFOA frequency, mode and BW.
+
+>><<
+2016-01-17
+
+Added comments in:-
+support.cxx
+KX3_ui.cxx
+KX3_ui.h
+rigpanel.cxx
+rigpanel.h
+All relating to the odd behaviour of the Swap A/B button.
+It appears (trapping things in the debugger) that the A/B button used in the panel when
+the KX3 is used, is the general button, NOT the KX3 specific one.
+
+For now, the VFO Swap A/B functionality is unusable.
+as one or other VFO setting is wiped out, as a result of the software polling scheme!
+
+Also struggling to decypher the logic of the IFshift function.
+Need some hints as to program flow, when a user clicks on or alters something in the UI.
+
+Found and corrected the default IF center value for Data modes.
+
+Added event monitoring calls to several on/off button controls.
+
+>><<
+2016-01-25
+
+Changed to version 1.3.24, new branch etc.   Now to re-make the above changes in this version.

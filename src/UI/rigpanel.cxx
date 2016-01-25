@@ -372,6 +372,7 @@ static void cb_btn_K3_swapAB(Fl_Button*, void*) {
 	cb_K3_swapAB();
 }
 
+// as far as I can tell, this is never called!   wbx
 static void cb_btn_KX3_swapAB(Fl_Button*, void*) {
 	cb_KX3_swapAB();
 }

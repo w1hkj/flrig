@@ -85,8 +85,8 @@ extern cFreqControl *FreqDispB;
 extern Fl_Group *grp_row0a;
 
 extern Fl_Light_Button *btnA;
-extern Fl_Button *btn_K3_swapAB;
-extern Fl_Button *btn_KX3_swapAB;
+extern Fl_Button *btn_K3_swapAB;		// specific to the K3 ?						wbx
+extern Fl_Button *btn_KX3_swapAB;		// ditto    to the KX3? (Never called)		wbx
 extern Fl_Light_Button *btnB;
 extern Fl_Button *btnTune;
 extern Fl_Box *bx_row0_expander;
@@ -106,7 +106,7 @@ extern Fl_Light_Button *btnPreamp;
 extern Fl_Light_Button *btnNOISE;
 extern Fl_Light_Button *btnAutoNotch;
 extern Fl_Group *grp_row1b2;
-extern Fl_Button *btnAswapB;
+extern Fl_Button *btnAswapB;			// the regular (common) A/B button IS USED	wbx
 extern Fl_Light_Button *btnSplit;
 extern Fl_Light_Button *btnPTT;
 extern Fl_Box *bx_row1_expander2;

@@ -118,7 +118,7 @@ void KX3_A2B()
 	Fl::focus(FreqDispA);
 }
 
-void cb_KX3_swapAB()
+void cb_KX3_swapAB()	// NOT called from anywhere, yet! wbx
 {
 	guard_lock serial_lock(&mutex_serial);
 
@@ -134,6 +134,8 @@ void cb_KX3_swapAB()
 	selrig->set_vfoA(vfoA.freq);
 	selrig->set_bwA(vfoA.iBW);
 	selrig->set_modeA(vfoA.imode);
+
+//	selrig->swapAB();  //wbx
 
 	opBW->index(vfoA.iBW);
 	opMODE->index(vfoA.imode);

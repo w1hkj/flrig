@@ -37,8 +37,12 @@ public:
 	void set_vfoA(long);
 	long get_vfoB();
 	void set_vfoB(long);
+	void swapAB();	// wbx
+	
 	void set_volume_control(int val);
 	int  get_volume_control();
+	void get_vol_min_max_step(int &min, int &max, int &step); // wbx
+	
 	void set_modeA(int val);
 	int  get_modeA();
 	void set_modeB(int val);

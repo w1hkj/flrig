@@ -79,7 +79,6 @@ RIG_KX3::RIG_KX3() {
 	def_mode = modeA = modeB = 1;
 	def_bw = bwA = bwB = 34;
 
-	can_change_alt_vfo =
 
 	has_split_AB =
 	has_micgain_control =
@@ -97,14 +96,15 @@ RIG_KX3::RIG_KX3() {
 	has_ifshift_control =
 	has_preamp_control = true;
 
-	has_notch_control =
+	can_change_alt_vfo =	// wbx
+	has_notch_control =		// for some CW modes, yet it has.
 	has_tune_control =
 	has_swr_control = false;
 
 	if_shift_min = 400;
 	if_shift_max = 2600;
 	if_shift_step = 10;
-	if_shift_mid = 1500;
+	if_shift_mid = 1500;  	// this varies by mode!
 
 	precision = 1;
 	ndigits = 8;
@@ -137,24 +137,34 @@ void RIG_KX3::initialize()
 	k3_widgets[6].W = sldrPOWER;
 
 	report_level = INFO;
+	
 	cmd = "AI0;"; // disable auto-info
 	sendCommand(cmd);
 	showresp(INFO, ASC, "disable auto-info", cmd, replystr);
 
-	cmd = "K31;"; // KX3 extended mode
+	cmd = "DT0;"; // Set DATA mode type to DATA-A mode.
 	sendCommand(cmd);
-	showresp(INFO, ASC, "KX3 extended mode", cmd, replystr);
+	showresp(INFO, ASC, "KX3 DATA-A mode", cmd, replystr);
+
+	cmd = "K31;"; // K3 command mode 1.
+	sendCommand(cmd);
+	showresp(INFO, ASC, "KX3 K3 command mode 1", cmd, replystr);
 
 	cmd = "OM;"; // request options to get power level
+	             //	returns a string in the form of "OM A-F----B--02;"
 	int ret = wait_char(';', 16, KX3_WAIT_TIME, "Options", ASC);
 	if (ret) {
+//		if (replystr.find("-02;") == string::npos) {
+			// NOT a KX3!  But what to do about it?
+//		}
+
 		if (replystr.find("P") == string::npos) {
 			minpwr = 0;
-			maxpwr = 12;
-			steppwr = 1;
+			maxpwr = 10; // 10W max for bare KX3 (WBX May 2015)
+			steppwr = 0.1;
 		} else {
 			minpwr = 0;
-			maxpwr = 106;
+			maxpwr = 100; // 100W with external KXPA
 			steppwr = 1;
 		}
 	}
@@ -169,11 +179,22 @@ void RIG_KX3::initialize()
 
 	set_split(false); // normal ops
 
+	get_if_mid(); // sets/gets the IF shift midpoint. wbx
+
 }
 
 void RIG_KX3::shutdown()
 {
+//	cmd = "PS0;";		// Send 'PS0;' to power down the KX3 wbx
+//	sendCommand(cmd);
+// The KX3 can do this, but there is no corresponding remote power up command.
+// see the description of the PSn; command, P21 of document "K3&KX3 Pgmrs Ref, E18.doc"
+// One would need to inject power into the Mic PTT line to power up a dormant KX3,
+// momentary +8 to +12V DC for 100+mS on the Mic jack PTT line.
+// This might be possible using one of the serial port handshake lines, and some passive parts.  
+// (ACC2 PTT does not have this feature.)  See P28 of the KX3 owners manual rev B4.
 }
+
 
 long RIG_KX3::get_vfoA ()
 {
@@ -233,10 +254,18 @@ void RIG_KX3::set_vfoB (long freq)
 	showresp(INFO, ASC, "set vfo B", cmd, replystr);
 }
 
-// Volume control
+void RIG_KX3::swapAB() // invoked from KX3_ui.cxx (or not at the moment.)
+{	// Let the radio swap them over. wbx
+	cmd = "SWT24;";	// 'Tap' switch 24
+	sendCommand(cmd);
+	showresp(INFO, ASC, "swap A/B", cmd, replystr);	
+}
+
+//-----------------------------------------------------------------------------
+// Volume control: The KX3's AF Gain setting values ranges from 0 to 60 (wbx)
 void RIG_KX3::set_volume_control(int val) 
-{
-	int ivol = (int)(val * 2.55);
+{	// input range of 'val' is set by 'get_vol_min_max_step'
+	int ivol = (int)val;
 	cmd = "AG000;";
 	for (int i = 4; i > 1; i--) {
 		cmd[i] += ivol % 10;
@@ -256,28 +285,34 @@ int RIG_KX3::get_volume_control()
 
 	replystr[p + 5] = 0;
 	int v = atoi(&replystr[p + 2]);
-	return (int)(v / 2.55);
+	return (int)v;
 }
 
-void RIG_KX3::set_pbt_values(int val)
+void RIG_KX3::get_vol_min_max_step(int &min, int &max, int &step)
+{
+   min = 0; max = 60; step = 1;  // sets UI control slider limits.  (wbx)
+}
+
+//-----------------------------------------------------------------------------
+void RIG_KX3::set_pbt_values(int val)  // Rig defaults, per mode.
 {
 	switch (val) {
-		case 0 :
-		case 1 :
-		case 3 :
-		case 4 :
+		case 0 : // LSB
+		case 1 : // USB
+		case 3 : // FM
+		case 4 : // AM
 			if_shift_min = 400; if_shift_max = 2600;
 			if_shift_step = 10; if_shift_mid = 1500;
 			break;
-		case 2 :
-		case 6 :
+		case 2 : // CW
+		case 6 : // CW-R
 			if_shift_min = 300; if_shift_max = 1300;
 			if_shift_step = 10; if_shift_mid = 800;
 			break;
-		case 5 :
-		case 7 :
+		case 5 : // DATA
+		case 7 : // DATA-R
 			if_shift_min = 100; if_shift_max = 2100;
-			if_shift_step = 10; if_shift_mid = 1000;
+			if_shift_step = 10; if_shift_mid = 1500;	// corrected mid to 1500 wbx
 			break;
 	}
 	progStatus.shift_val = if_shift_mid;
@@ -422,13 +457,17 @@ int RIG_KX3::get_modeB()
 
 int RIG_KX3::get_modetype(int n)
 {
-	return KX3_mode_type[n];
+	return KX3_mode_type[n];	// Upper/Lower sideband...
 }
 
+//-----------------------------------------------------------------------------
+// Tranceiver RX Preamp On/Off
 void RIG_KX3::set_preamp(int val)
 {
-	if (val) sendCommand("PA1;", 0);
-	else	 sendCommand("PA0;", 0);
+	if (val) cmd = "PA1;";		// if caling value non zero, send this (turn it on)
+	else     cmd = "PA0;";		// else send this (turn it off.)
+	sendCommand(cmd);
+	showresp(INFO, ASC, "set preamp on/off", cmd, replystr); // wbx
 }
 
 int RIG_KX3::get_preamp()
@@ -441,23 +480,28 @@ int RIG_KX3::get_preamp()
 	return (replystr[p + 2] == '1' ? 1 : 0);
 }
 
-//
+//-----------------------------------------------------------------------------
+// Transceiver RX Attenuator On/Off
 void RIG_KX3::set_attenuator(int val)
 {
-	if (val) sendCommand("RA01;", 0);
-	else	 sendCommand("RA00;", 0);
+	if (val) cmd = "RA01;";		// if caling value non zero, send this (turn it on)
+	else     cmd = "RA00;";		// else send this (turn it off.)
+	sendCommand(cmd);
+	showresp(INFO, ASC, "set ATT on/off", cmd, replystr); // wbx
 }
 
 int RIG_KX3::get_attenuator()
 {
-	cmd = "RA;";
-	int ret = wait_char(';', 5, KX3_WAIT_TIME, "set ATT", ASC);
+	cmd = "RA;";	// query the rig for it's setting
+	int ret = wait_char(';', 5, KX3_WAIT_TIME, "get ATT", ASC); // wbx (was "set ATT")
 	if (ret < 5) return progStatus.attenuator;
 	size_t p = replystr.rfind("RA");
 	if (p == string::npos) return 0;
 	return (replystr[p + 3] == '1' ? 1 : 0);
+	// the returned string from the rig is in the form of "RAnn;" where 'nn' is 00 or 01.
 }
 
+//-----------------------------------------------------------------------------
 // Transceiver power level
 void RIG_KX3::set_power_control(double val)
 {
@@ -483,13 +527,14 @@ int RIG_KX3::get_power_control()
 
 void RIG_KX3::get_pc_min_max_step(double &min, double &max, double &step)
 {
-   min = minpwr; max = maxpwr; step = steppwr; 
+   min = minpwr; max = maxpwr; step = steppwr;  // set by 'RIG_KX3::initialise' (wbx) 
 }
 
-// Transceiver rf control
+//-----------------------------------------------------------------------------
+// Transceiver rf gain control  Input values -60..0 (as per the rig itself.  wbx)
 void RIG_KX3::set_rf_gain(int val)
 {
-	int ival = val;
+	int ival = (int)(val + 250);  // 190..250 are the values on the wire.
 	cmd = "RG000;";
 	for (int i = 4; i > 1; i--) {
 		cmd[i] += ival % 10;
@@ -508,16 +553,17 @@ int RIG_KX3::get_rf_gain()
 	if (p == string::npos) return progStatus.rfgain;
 
 	replystr[p + 5] = 0;
-	int v = atoi(&replystr[p + 2]);
+	int v = (atoi(&replystr[p + 2]) - 250);  // 190..250 min..max gain
 	return v;
 }
 
 void RIG_KX3::get_rf_min_max_step(int &min, int &max, int &step)
 {
-   min = 0; max = 250; step = 1; 
+   min = -60; max = 0; step = 1;  // sets UI control slider limits.  (wbx)
 }
 
-// Transceiver mic control
+//-----------------------------------------------------------------------------
+// Transceiver mic control  Input values 0..80
 void RIG_KX3::set_mic_gain(int val)
 {
 	int ival = (int)val;
@@ -545,12 +591,14 @@ int RIG_KX3::get_mic_gain()
 
 void RIG_KX3::get_mic_min_max_step(int &min, int &max, int &step)
 {
-   min = 0; max = 60; step = 1; 
+   min = 0; max = 80; step = 1;  // sets UI control slider limits. (wbx)
 }
 
+//-----------------------------------------------------------------------------
 // Tranceiver PTT on/off
 void RIG_KX3::set_PTT_control(int val)
 {
+//	could check if working split, and change the freq display higlight ?  wbx
 	if (val) sendCommand("TX;", 0);
 	else	 sendCommand("RX;", 0);
 }
@@ -582,10 +630,13 @@ int RIG_KX3::get_smeter()
 	return mtr;
 }
 
+//-----------------------------------------------------------------------------
 void RIG_KX3::set_noise(bool on)
 {
-	if (on) sendCommand("NB1;", 0);
-	else	sendCommand("NB0;", 0);
+	if (on)  cmd = "NB1;";		// if on = true, send this (turn it on)
+	else     cmd = "NB0;";		// else send this (turn it off.)
+	sendCommand(cmd);
+	showresp(INFO, ASC, "set Noise Blanker on/off", cmd, replystr); // wbx
 }
 
 int RIG_KX3::get_noise()
@@ -598,6 +649,7 @@ int RIG_KX3::get_noise()
 	return (replystr[p+2] == '1' ? 1 : 0);
 }
 
+//-----------------------------------------------------------------------------
 // BW $ (Filter Bandwidth and Number; GET/SET)
 // KX3 Extended SET/RSP format (K31): BWxxxx; where xxxx is 0-9999, the bandwidth in 10-Hz units. May be
 // quantized and/or range limited based on the present operating mode.
@@ -618,7 +670,7 @@ void RIG_KX3::set_bwA(int val)
 int RIG_KX3::get_bwA()
 {
 	cmd = "BW;";
-	int ret = wait_char(';', 7, KX3_WAIT_TIME, "get bandwidth A", ASC);
+	int ret = wait_char(';', 7, KX3_WAIT_TIME, "get bandwidth A", ASC);  //wait_char is in rigbase.cxx    wbx
 	if (ret < 7) return bwA;
 	size_t p = replystr.rfind("FW");
 	if (p == string::npos) return bwA;
@@ -665,21 +717,26 @@ int RIG_KX3::get_bwB()
 
 int RIG_KX3::get_power_out()
 {
-	cmd = "BG;"; // responds BGnn; 0 < nn < 10
+	cmd = "BG;"; // responds BGnn; 00 < nn < 10   (lowest practical reading is 01 when in TX!)
 	int ret = wait_char(';', 5, KX3_WAIT_TIME, "get power out", ASC);
 	if (ret < 5) return 0;
 	size_t p = replystr.rfind("BG");
 	if (p == string::npos) return 0;
 	replystr[p + 4] = 0;
-	int mtr = atoi(&replystr[p + 2]) * 10;
-	if (mtr > 100) mtr = 100;
+	int mtr = atoi(&replystr[p + 2]); // 10W full scale for base KX3 (WBX, May 2015)
+	if (mtr > 10) mtr = 10;
 	return mtr;
 }
 
+//-----------------------------------------------------------------------------
+// Tranceive SPLIT functioality.
 bool RIG_KX3::can_split()
 {
 	return true;
 }
+
+	// todo get mode, and decide if split is available (it is mode dependant)
+	// may be better to do this in RIG_KX3::can_split() above?  wbx
 
 void RIG_KX3::set_split(bool val)
 {
@@ -714,8 +771,10 @@ int RIG_KX3::get_split()
 	return split_on;
 }
 
+//-----------------------------------------------------------------------------
+// Tranceiver RX IF Shift functions.  (Buggy at present, Jan 2016)  wbx
 void RIG_KX3::set_if_shift(int val) 
-{
+{	// this works fine, it's the button that's the problem. wbx
 	cmd = "IS 0000;";
 	cmd[6] += val % 10; val /= 10;
 	cmd[5] += val % 10; val /= 10;
@@ -726,7 +785,7 @@ void RIG_KX3::set_if_shift(int val)
 }
 
 bool RIG_KX3::get_if_shift(int &val)
-{
+{	// this works fine, it's the button that's the problem. wbx
 	cmd = "IS;";
 	int ret = wait_char(';', 8, KX3_WAIT_TIME, "get IF shift", ASC);
 	val = progStatus.shift_val;
@@ -741,12 +800,12 @@ bool RIG_KX3::get_if_shift(int &val)
 }
 
 void RIG_KX3::get_if_min_max_step(int &min, int &max, int &step)
-{
+{	// these vary with mode!  wbx
 	min = if_shift_min; max = if_shift_max; step = if_shift_step; 
 }
 
 void  RIG_KX3::get_if_mid()
-{
+{	// this should work. wbx
 	cmd = "IS 9999;";
 	sendCommand(cmd);
 	waitResponse(500);
