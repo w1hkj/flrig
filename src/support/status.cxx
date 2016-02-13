@@ -151,8 +151,6 @@ status progStatus = {
 
 	0,			// int  split;
 
-	true,		// bool key_fldigi;
-
 	5,			// int rx_avg;
 	5,			// int rx_peak;
 	5,			// int pwr_avg;
@@ -336,8 +334,6 @@ void status::saveLastState()
 	spref.set("sep_dtrptt", sep_dtrptt);
 	spref.set("sep_rtsplus", sep_rtsplus);
 	spref.set("set_dtrplus", sep_dtrplus);
-
-	spref.set("key_fldigi", key_fldigi);
 
 	spref.set("poll_smeter", poll_smeter);
 	spref.set("poll_frequency", poll_frequency);
@@ -613,8 +609,6 @@ bool status::loadXcvrState(string xcvr)
 		if (spref.get("sep_dtrptt", i, i)) sep_dtrptt = i;
 		if (spref.get("sep_rtsplus", i, i)) sep_rtsplus = i;
 		if (spref.get("sep_dtrplus", i, i)) sep_dtrplus = i;
-
-		if (spref.get("key_fldigi", i, key_fldigi)) key_fldigi = i;
 
 		spref.get("poll_smeter", poll_smeter, poll_smeter);
 		spref.get("poll_frequency", poll_frequency, poll_frequency);

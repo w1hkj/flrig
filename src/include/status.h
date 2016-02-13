@@ -141,8 +141,6 @@ struct status {
 
 	int		split;
 
-	bool	key_fldigi;
-
 	int		rx_avg;
 	int		rx_peak;
 	int		pwr_avg;

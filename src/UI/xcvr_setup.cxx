@@ -40,7 +40,6 @@ Fl_Check_Button *btndtrplus=(Fl_Check_Button *)0;
 Fl_Int_Input *txtCIV=(Fl_Int_Input *)0;
 Fl_Button *btnCIVdefault=(Fl_Button *)0;
 Fl_Check_Button *btnUSBaudio=(Fl_Check_Button *)0;
-Fl_Check_Button *btn_key_fldigi=(Fl_Check_Button *)0;
 Fl_Group *tabTCPIP = (Fl_Group *)0;
 Fl_Input2 *inp_tcpip_addr = (Fl_Input2 *)0;
 Fl_Input2 *inp_tcpip_port = (Fl_Input2 *)0;
@@ -254,10 +253,6 @@ static void cb_btnCIVdefault(Fl_Button*, void*) {
 
 static void cb_btnUSBaudio(Fl_Check_Button*, void*) {
 	cbUSBaudio();
-}
-
-static void cb_btn_key_fldigi(Fl_Check_Button* o, void*) {
-	progStatus.key_fldigi = o->value();
 }
 
 static void cb_selectSepPTTPort(Fl_ComboBox*, void*) {
@@ -633,12 +628,6 @@ tabsConfig = new Fl_Tabs(0, 8, 482, 246);
 			btnUSBaudio = new Fl_Check_Button(261, 222, 104, 15, _("USB audio"));
 			btnUSBaudio->down_box(FL_DOWN_BOX);
 			btnUSBaudio->callback((Fl_Callback*)cb_btnUSBaudio);
-
-			btn_key_fldigi = new Fl_Check_Button(375, 222, 85, 15, _("key fldigi"));
-			btn_key_fldigi->tooltip(_("PTT keys fldigi modem"));
-			btn_key_fldigi->down_box(FL_DOWN_BOX);
-			btn_key_fldigi->callback((Fl_Callback*)cb_btn_key_fldigi);
-			btn_key_fldigi->value(progStatus.key_fldigi);
 
 		xcr_grp6->end();
 
