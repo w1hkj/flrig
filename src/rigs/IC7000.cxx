@@ -251,6 +251,15 @@ void RIG_IC7000::set_vfoB (long freq)
 	waitFB("set vfo B");
 }
 
+void RIG_IC7000::swapvfos()
+{
+	cmd = pre_to;
+	cmd += '\x07';
+	cmd += '\xB0';
+	cmd.append( post );
+	waitFB("swap VFO A/B");
+}
+
 void RIG_IC7000::set_modeA(int val)
 {
 	A.imode = val;

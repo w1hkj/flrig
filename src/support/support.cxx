@@ -1433,10 +1433,10 @@ void cbAswapB()
 			queA.push(vfoA);
 		}
 	} else {
-		{
+//		{
 			guard_lock serial_lock(&mutex_serial, 39);
-			bypass_serial_thread_loop = true;
-		}
+//			bypass_serial_thread_loop = true;
+//		}
 		if (!useB) {      // vfoA is used, swap vfos and update display B
 			vfoB.freq = FreqDispB->value();
 			FREQMODE temp = vfoB;
@@ -1452,21 +1452,21 @@ void cbAswapB()
 			FreqDispA->value(vfoA.freq);
 			FreqDispA->redraw();
 		}
-		{
+//		{
 			guard_lock queA_lock(&mutex_queA, 40);
 			while (!queA.empty()) queA.pop();
 			queA.push(vfoA);
-		}
-		{	
+//		}
+//		{	
 			guard_lock queB_lock(&mutex_queB, 41);
 			while (!queB.empty()) queB.pop();
 			queB.push(vfoB);
-		}
+//		}
 		pushedB = true;
-		{
-			guard_lock serial_lock(&mutex_serial, 42);
-			bypass_serial_thread_loop = false;
-		}
+//		{
+//			guard_lock serial_lock(&mutex_serial, 42);
+//			bypass_serial_thread_loop = false;
+//		}
 	}
 }
 

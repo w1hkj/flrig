@@ -207,7 +207,7 @@ int RIG_IC706MKIIG::get_smeter()
 	cmd.append( post );
 	string resp = pre_fm;
 	resp.append("\x15\x02");
-	if (waitFOR(9, "get smeter")) {
+	if (waitFOR(9, "get smeter")) { // SHOULD BE 10 bytes
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			return (int)ceil(fm_bcd(&replystr[p+6], 3) / 2.55);
