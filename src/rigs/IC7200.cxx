@@ -81,7 +81,9 @@ static GUI rig_widgets[]= {
 	{ (Fl_Widget *)sldrSQUELCH, 266, 125, 156 },
 	{ (Fl_Widget *)btnNR, 214, 145,  50 },
 	{ (Fl_Widget *)sldrNR, 266, 145, 156 },
-	{ (Fl_Widget *)sldrPOWER, 266, 165, 156 },
+	{ (Fl_Widget *)btnNotch, 214, 165,  50 },
+	{ (Fl_Widget *)sldrNOTCH, 266, 165, 156 },
+	{ (Fl_Widget *)sldrPOWER, 54, 185, 156 },
 	{ (Fl_Widget *)NULL, 0, 0, 0 }
 };
 
@@ -134,6 +136,7 @@ RIG_IC7200::RIG_IC7200() {
 	has_noise_reduction = true;
 	has_noise_reduction_control = true;
 	has_auto_notch = true;
+	has_notch_control = true;
 	has_rf_control = true;
 	has_compON = true;
 	has_vox_onoff = true;
@@ -157,7 +160,9 @@ void RIG_IC7200::initialize()
 	rig_widgets[4].W = sldrSQUELCH;
 	rig_widgets[5].W = btnNR;
 	rig_widgets[6].W = sldrNR;
-	rig_widgets[7].W = sldrPOWER;
+	rig_widgets[7].W = btnNotch;
+	rig_widgets[8].W = sldrNOTCH;
+	rig_widgets[9].W = sldrPOWER;
 }
 
 //=============================================================================
@@ -221,7 +226,6 @@ long RIG_IC7200::get_vfoB ()
 
 void RIG_IC7200::set_vfoB (long freq)
 {
-	selectB();
 	B.freq = freq;
 	cmd = pre_to;
 	cmd += '\x05';
@@ -606,10 +610,10 @@ int RIG_IC7200::get_modeA()
 		}
 	}
 	cmd = pre_to;
-	cmd += "\x1A\04";
+	cmd += "\x1A\x04";
 	cmd.append(post);
 	resp = pre_fm;
-	resp += "\x1A\04";
+	resp += "\x1A\x04";
 	if (waitFOR(9, "data mode?")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
@@ -657,10 +661,10 @@ int RIG_IC7200::get_modeB()
 		}
 	}
 	cmd = pre_to;
-	cmd += "x1A\04";
+	cmd += "\x1A\x04";
 	cmd.append(post);
 	resp = pre_fm;
-	resp += "x1A\04";
+	resp += "\x1A\x04";
 	if (waitFOR(9, "get data B")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
@@ -882,3 +886,67 @@ void RIG_IC7200::tune_rig()
 	waitFB("tune rig");
 }
 
+static bool IC7200_notchon = false;
+
+void RIG_IC7200::set_notch(bool on, int val)
+{
+	int notch = val / 20 + 53;
+	if (notch > 255) notch = 255;
+	if (on != IC7200_notchon) {
+		cmd = pre_to;
+		cmd.append("\x16\x48");
+		cmd += on ? '\x01' : '\x00';
+		cmd.append(post);
+		waitFB("set notch");
+		IC7200_notchon = on;
+	}
+
+	if (on) {
+		cmd = pre_to;
+		cmd.append("\x14\x0D");
+		cmd.append(to_bcd(notch,3));
+		cmd.append(post);
+		waitFB("set notch val");
+	}
+}
+
+bool RIG_IC7200::get_notch(int &val)
+{
+	bool on = false;
+	val = 0;
+
+	string cstr = "\x16\x48";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+	if (waitFOR(8, "get notch")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			on = replystr[p + 6] ? 1 : 0;
+		cmd = pre_to;
+		resp = pre_fm;
+		cstr = "\x14\x0D";
+		cmd.append(cstr);
+		resp.append(cstr);
+		cmd.append(post);
+		if (waitFOR(9, "get notch val")) {
+			size_t p = replystr.rfind(resp);
+			if (p != string::npos) {
+				val = fm_bcd(&replystr[p+6],3);
+				val = (val - 53) * 20;
+				if (val < 0) val = 0;
+				if (val > 4040) val = 4040;
+			}
+		}
+	}
+	return on;
+}
+
+void RIG_IC7200::get_notch_min_max_step(int &min, int &max, int &step)
+{
+	min = 0;
+	max = 4040;
+	step = 20;
+}

@@ -71,11 +71,18 @@ public:
 	int  get_rf_gain();
 	void set_squelch(int val);
 	int  get_squelch();
+
 	void set_power_control(double val);
 	int  get_power_control();
+
 	void set_mic_gain(int val);
 	int  get_mic_gain();
 	void get_mic_gain_min_max_step(int &min, int &max, int &step);
+
+	void set_notch(bool on, int val);
+	bool get_notch(int &val);
+	void get_notch_min_max_step(int &min, int &max, int &step);
+
 	int  adjust_bandwidth(int m);
 	int  def_bandwidth(int m);
 	void set_compression();
