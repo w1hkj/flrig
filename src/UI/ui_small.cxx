@@ -1289,8 +1289,8 @@ Fl_Double_Window* Small_rig_window() {
 
 	mnuRestoreData = (menu_small_menu+12);
 	mnuKeepData = (menu_small_menu+13);
-	mnuTooltips = (menu_small_menu+18);
-	mnuSchema = (menu_small_menu+17);
+	mnuSchema = (menu_small_menu+18);
+	mnuTooltips = (menu_small_menu+19);
 
 	txt_encA = new Fl_Output( 425 - 90, 1, 90, 20, "");
 	txt_encA->box(FL_THIN_DOWN_BOX);
