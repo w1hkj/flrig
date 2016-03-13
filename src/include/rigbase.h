@@ -65,6 +65,8 @@ public:
 	const char *  SH_label;
 	const int  * bw_vals_;
 
+	int  bw_size_;
+
 	GUI *widgets;
 
 	int  comm_baudrate;

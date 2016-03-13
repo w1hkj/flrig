@@ -60,7 +60,9 @@ static Fl_Browser*			btext;
 static string buffer;
 
 debug* debug::inst = 0;
-debug::level_e debug::level = debug::ERROR_LEVEL;
+//debug::level_e debug::level = debug::ERROR_LEVEL;
+debug::level_e debug::level = debug::INFO_LEVEL;
+
 uint32_t debug::mask = ~0u;
 
 const char* prefix[] = { _("Quiet"), _("Error"), _("Warning"), _("Info"), _("Debug") };
@@ -106,7 +108,7 @@ void debug::stop(void)
 }
 
 static char fmt[1024];
-static char sztemp[1024];
+static char sztemp[8096];
 static string estr = "";
 bool   debug_in_use = false;
 

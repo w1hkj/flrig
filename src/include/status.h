@@ -275,6 +275,8 @@ struct status {
 	void loadLastState();
 	bool loadXcvrState(string);
 	void UI_laststate();
+
+	string info();
 };
 
 extern status progStatus;

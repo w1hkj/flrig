@@ -55,12 +55,12 @@ bool flrig_abort = false;
 
 int freqval = 0;
 
-FREQMODE vfoA = {14070000, 0, 0, UI};
-FREQMODE vfoB = {7070000, 0, 0, UI};
-FREQMODE vfo = {0, 0, 0, UI};
-FREQMODE transceiverA;
-FREQMODE transceiverB;
-FREQMODE xmlvfo = vfoA;
+FREQMODE vfoA         = {14070000, 0, 0, UI};
+FREQMODE vfoB         = {7070000, 0, 0, UI};
+FREQMODE vfo          = {0, 0, 0, UI};
+FREQMODE transceiverA = {14070000, 0, 0, UI};
+FREQMODE transceiverB = {7070000, 0, 0, UI};
+FREQMODE xmlvfo       = {14070000, 0, 0, UI};
 
 enum {VOL, MIC, PWR, SQL, IFSH, NOTCH, RFGAIN, NR };
 
@@ -129,11 +129,13 @@ int  powerlevel = 0;
 
 char *print(FREQMODE data)
 {
-	static char str[100];
+	static char str[256];
 	const char **bwt = selrig->bwtable(data.imode);
 	const char **dsplo = selrig->lotable(data.imode);
 	const char **dsphi = selrig->hitable(data.imode);
-	snprintf(str, sizeof(str), "%3s,%10ld, %4s, %x => %5s %5s",
+	snprintf(str, 
+		sizeof(str), 
+		"---------------------------------\n%3s,%10ld, %4s, %02d => %5s %5s",
 		data.src == XML ? "xml" : data.src == UI ? "ui" : "srvr",
 		data.freq,
 		selrig->modes_ ? selrig->modes_[data.imode] : "modes n/a",
@@ -692,7 +694,7 @@ void serviceA()
 	}
 
 //	if (RIG_DEBUG)
-		LOG_INFO("%s", print(vfoA));
+	LOG_INFO("%s", print(vfoA));
 
 	if (!selrig->can_change_alt_vfo && useB) return;
 
@@ -744,7 +746,7 @@ void serviceB()
 	}
 
 //	if (RIG_DEBUG)
-		LOG_INFO("%s", print(vfoB));
+	LOG_INFO("%s", print(vfoB));
 
 	if (!selrig->can_change_alt_vfo && !useB) return;
 
@@ -923,6 +925,7 @@ void * serial_thread_loop(void *d)
 			if (!loopcount--) {
 				loopcount = progStatus.serloop_timing / 10;
 				poll_nbr++;
+//LOG_INFO("============ query xcvr ============");
 
 				if (xcvr_name == rig_K3.name_) {
 					if (que_pending()) continue;
@@ -1074,6 +1077,7 @@ void * serial_thread_loop(void *d)
 
 				if (bypass_serial_thread_loop) goto serial_bypass_loop;
 
+//LOG_INFO("--");
 			}
 		} else {
 			if (resetxmt) {
@@ -2124,13 +2128,17 @@ void setPTT( void *d)
 void closeRig()
 {
 	// restore initial rig settings
+	if (!progStatus.restore_rig_data) return;
+
 	guard_lock serial_lock(&mutex_serial, 65);
-	selrig->set_vfoA(transceiverA.freq);
-	selrig->set_modeA(transceiverA.imode);
-	selrig->set_bwA(transceiverA.iBW);
+	selrig->selectB();
 	selrig->set_vfoB(transceiverB.freq);
 	selrig->set_modeB(transceiverB.imode);
 	selrig->set_bwB(transceiverB.iBW);
+	selrig->selectA();
+	selrig->set_vfoA(transceiverA.freq);
+	selrig->set_modeA(transceiverA.imode);
+	selrig->set_bwA(transceiverA.iBW);
 }
 
 
@@ -2182,12 +2190,15 @@ void cbExit()
 	pthread_join(*serial_thread, NULL);
 
 	if (progStatus.restore_rig_data){
-		selrig->set_vfoA(transceiverA.freq);
-		selrig->set_modeA(transceiverA.imode);
-		selrig->set_bwA(transceiverA.iBW);
+LOG_INFO("Restore Xcvr Data");
+		selrig->selectB();
 		selrig->set_vfoB(transceiverB.freq);
 		selrig->set_modeB(transceiverB.imode);
 		selrig->set_bwB(transceiverB.iBW);
+		selrig->selectA();
+		selrig->set_vfoA(transceiverA.freq);
+		selrig->set_modeA(transceiverA.imode);
+		selrig->set_bwA(transceiverA.iBW);
 	}
 
 	selrig->shutdown();
@@ -3020,37 +3031,40 @@ void initRig()
 		if (progStatus.CIV > 0)
 			selrig->adjustCIV(progStatus.CIV);
 
-		if (progStatus.use_rig_data) {
+		if (progStatus.restore_rig_data) { //if (progStatus.use_rig_data) {
+LOG_INFO("Use rig data\n");
+
 			selrig->selectA();
+
 			if (selrig->has_get_info)
 				selrig->get_info();
+
 			transceiverA.freq = selrig->get_vfoA();
 			transceiverA.imode = selrig->get_modeA();
-
 			selrig->adjust_bandwidth(transceiverA.imode);
 			transceiverA.iBW = selrig->get_bwA();
+
 			selrig->selectB();
+
 			if (selrig->has_get_info)
 				selrig->get_info();
 
 			transceiverB.freq = selrig->get_vfoB();
 			transceiverB.imode = selrig->get_modeB();
-
 			selrig->adjust_bandwidth(transceiverB.imode);
 			transceiverB.iBW = selrig->get_bwB();
+
 			progStatus.freq_A = transceiverA.freq;
 			progStatus.imode_A = transceiverA.imode;
-
 			progStatus.iBW_A = transceiverA.iBW;
+
 			progStatus.freq_B = transceiverB.freq;
 			progStatus.imode_B = transceiverB.imode;
 			progStatus.iBW_B = transceiverB.iBW;
 
-			mnuKeepData->set();
 			if (selrig->restore_mbw) selrig->last_bw = transceiverA.iBW;
 
-		} else
-			mnuKeepData->clear();
+		}
 
 		rigmodes_.clear();
 		opMODE->clear();

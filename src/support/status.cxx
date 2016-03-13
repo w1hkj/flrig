@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
 
 #include <FL/Fl_Preferences.H>
@@ -33,6 +34,7 @@
 #include "config.h"
 #include "rigpanel.h"
 #include "ui.h"
+#include "debug.h"
 
 string xcvr_name = "NONE";
 
@@ -820,6 +822,8 @@ bool status::loadXcvrState(string xcvr)
 		if (spref.get("hrd_buttons", i, i)) hrd_buttons = i;
 	}
 
+	LOG_INFO("%s", info().c_str());
+
 	return true;
 }
 
@@ -944,11 +948,97 @@ void status::UI_laststate()
 	if (spnrMICGAIN)		spnrMICGAIN->color(bg_slider);
 	if (spnrMICGAIN)		spnrMICGAIN->selection_color(btn_slider);
 
-	if (use_rig_data) mnuKeepData->set();
-	else mnuKeepData->clear();
-
 	if (restore_rig_data) mnuRestoreData->set();
 	else mnuRestoreData->clear();
 
 	Fl::scheme(ui_scheme.c_str());
 }
+
+string status::info()
+{
+	stringstream info;
+
+	info << "\n ============= Prefs File Contents =============\n\n";
+	info << "xcvr_serial_port   : " << xcvr_serial_port << "\n";
+	info << "comm_baudrate      : " << comm_baudrate << "\n";
+	info << "comm_stopbits      : " << stopbits << "\n";
+	info << "comm_retries       : " << comm_retries << "\n";
+	info << "comm_wait          : " << comm_wait << "\n";
+	info << "comm_timeout       : " << comm_timeout << "\n";
+	info << "serloop_timing     : " << serloop_timing << "\n";
+	info << "byte_interval      : " << byte_interval << "\n";
+	info << "\n";
+	info << "comm_echo          : " << comm_echo << "\n";
+	info << "ptt_via_cat        : " << comm_catptt << "\n";
+	info << "ptt_via_rts        : " << comm_rtsptt << "\n";
+	info << "ptt_via_dtr        : " << comm_dtrptt << "\n";
+	info << "rts_cts_flow       : " << comm_rtscts << "\n";
+	info << "rts_plus           : " << comm_rtsplus << "\n";
+	info << "dtr_plus           : " << comm_dtrplus << "\n";
+	info << "civadr             : " << CIV << "\n";
+	info << "usbaudio           : " << USBaudio << "\n";
+	info << "\n";
+	info << "aux_serial_port    : " << aux_serial_port.c_str() << "\n";
+	info << "aux_rts            : " << aux_rts << "\n";
+	info << "aux_dtr            : " << aux_dtr << "\n";
+	info << "\n";
+	info << "sep_serial_port    : " << sep_serial_port.c_str() << "\n";
+	info << "sep_rtsptt         : " << sep_rtsptt << "\n";
+	info << "sep_dtrptt         : " << sep_dtrptt << "\n";
+	info << "sep_rtsplus        : " << sep_rtsplus << "\n";
+	info << "set_dtrplus        : " << sep_dtrplus << "\n";
+	info << "\n";
+	info << "poll_smeter        : " << poll_smeter << "\n";
+	info << "poll_frequency     : " << poll_frequency << "\n";
+	info << "poll_mode          : " << poll_mode << "\n";
+	info << "poll_bandwidth     : " << poll_bandwidth << "\n";
+	info << "poll_volume        : " << poll_volume << "\n";
+	info << "poll_auto_notch    : " << poll_auto_notch << "\n";
+	info << "poll_notch         : " << poll_notch << "\n";
+	info << "poll_ifshift       : " << poll_ifshift << "\n";
+	info << "poll_power_control : " << poll_power_control << "\n";
+	info << "poll_pre_att       : " << poll_pre_att << "\n";
+	info << "poll_micgain       : " << poll_micgain << "\n";
+	info << "poll_squelch       : " << poll_squelch << "\n";
+	info << "poll_rfgain        : " << poll_rfgain << "\n";
+	info << "poll_pout          : " << poll_pout << "\n";
+	info << "poll_swr           : " << poll_swr << "\n";
+	info << "poll_alc           : " << poll_alc << "\n";
+	info << "poll_split         : " << poll_split << "\n";
+	info << "poll_noise         : " << poll_noise << "\n";
+	info << "poll_nr            : " << poll_nr << "\n";
+	info << "poll_all           : " << poll_all << "\n";
+	info << "\n";
+	info << "freq_A             : " << freq_A << "\n";
+	info << "mode_A             : " << imode_A << "\n";
+	info << "bw_A               : " << iBW_A << "\n";
+	info << "\n";
+	info << "freq_B             : " << freq_B << "\n";
+	info << "mode_B             : " << imode_B << "\n";
+	info << "bw_B               : " << iBW_B << "\n";
+	info << "\n";
+	info << "use_rig_data       : " << use_rig_data << "\n";
+	info << "restore_rig_data   : " << restore_rig_data << "\n";
+	info << "\n";
+	info << "bool_spkr_on       : " << spkr_on << "\n";
+	info << "int_volume         : " << volume << "\n";
+	info << "dbl_power          : " << power_level << "\n";
+	info << "int_mic            : " << mic_gain << "\n";
+	info << "bool_notch         : " << notch << "\n";
+	info << "int_notch          : " << notch_val << "\n";
+	info << "bool_shift         : " << shift << "\n";
+	info << "int_shift          : " << shift_val << "\n";
+	info << "rfgain             : " << rfgain << "\n";
+	info << "squelch            : " << squelch << "\n";
+	info << "\n";
+	info << "schema             : " << schema << "\n";
+	info << "\n";
+	info << "rx_avg             : " << rx_avg << "\n";
+	info << "rx_peak            : " << rx_peak << "\n";
+	info << "pwr_avg            : " << pwr_avg << "\n";
+	info << "pwr_peak           : " << pwr_peak << "\n";
+	info << "pwr_scale          : " << pwr_scale << "\n";
+
+	return info.str();
+}
+
