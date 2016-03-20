@@ -159,6 +159,8 @@ status progStatus = {
 	5,			// int pwr_peak;
 	4,			// int pwr_scale ==> Autoselect
 
+//ft950 reversed RF gain values
+    false,      // bool ft950_rg_reverse
 //tt550 controls
 	80,			// tt550_line_out;
 	1,			// tt550_agc_level;
@@ -387,6 +389,8 @@ void status::saveLastState()
 	spref.set("pwr_avg", pwr_avg);
 	spref.set("pwr_peak", pwr_peak);
 	spref.set("pwr_scale", pwr_scale);
+
+	spref.set("ft950_rg_reverse", ft950_rg_reverse);
 
 	if (selrig->name_ == rig_TT550.name_) {
 		spref.set("tt550_line_out", tt550_line_out);
@@ -662,6 +666,8 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("pwr_avg", pwr_avg, pwr_avg);
 		spref.get("pwr_peak", pwr_peak, pwr_peak);
 		spref.get("pwr_scale", pwr_scale, pwr_scale);
+
+		if (spref.get("ft950_rg_reverse", i, i)) ft950_rg_reverse = i;
 
 		if (selrig->name_ == rig_TT550.name_) {
 			spref.get("tt550_line_out", tt550_line_out, tt550_line_out);

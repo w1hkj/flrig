@@ -786,7 +786,8 @@ end_serviceB:
 
 void servicePTT()
 {
-//	if (!tcpip && !RigSerial.IsOpen()) return;
+	if (quePTT.empty()) return;
+
 	guard_lock ptt_lock(&mutex_ptt, 28);
 	while (!quePTT.empty()) {
 		PTT = quePTT.front();
@@ -798,7 +799,7 @@ void servicePTT()
 
 void serviceSliders()
 {
-	if (!tcpip && !RigSerial.IsOpen()) return;
+	if (sliders.empty()) return;
 
 	SLIDER working(0,0);
 	guard_lock serial_lock(&mutex_serial, 29);

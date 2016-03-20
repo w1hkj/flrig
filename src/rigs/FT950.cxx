@@ -1144,7 +1144,11 @@ void RIG_FT950::get_mic_min_max_step(int &min, int &max, int &step)
 void RIG_FT950::set_rf_gain(int val)
 {
 	cmd = "RG0000;";
-	int rfval = (int)(val * 2.50);
+
+	if (progStatus.ft950_rg_reverse) val = 100 - val;
+	if (val > 100) val = 100;
+	if (val < 0) val = 0;
+	int rfval = (int)(val * 2.5);
 	for (int i = 5; i > 2; i--) {
 		cmd[i] = rfval % 10 + '0';
 		rfval /= 10;
@@ -1166,9 +1170,11 @@ int  RIG_FT950::get_rf_gain()
 		rfval *= 10;
 		rfval += replystr[p+i] - '0';
 	}
-	rfval = (int)(rfval / 2.50);
+	rfval = (int)(rfval / 2.5);
 	if (rfval > 100) rfval = 100;
-	return ceil(rfval);
+	if (rfval < 0) rfval = 0;
+	if (progStatus.ft950_rg_reverse) rfval = 100 - rfval;
+	return rfval;
 }
 
 void RIG_FT950::get_rf_min_max_step(int &min, int &max, int &step)

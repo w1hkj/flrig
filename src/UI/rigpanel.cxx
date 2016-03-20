@@ -497,6 +497,8 @@ static void cb_sldrNOTCH(Fl_Wheel_Value_Slider*, void*) {
 }
 
 static void cb_sldrRFGAIN(Fl_Wheel_Value_Slider*, void*) {
+	if ( Fl::event_button() == FL_RIGHT_MOUSE )
+		progStatus.ft950_rg_reverse = !progStatus.ft950_rg_reverse;
 	setRFGAIN();
 }
 

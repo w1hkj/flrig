@@ -147,6 +147,10 @@ struct status {
 	int		pwr_peak;
 	int		pwr_scale;
 
+// ft950 reverse RG0; readings
+
+	bool	ft950_rg_reverse;
+
 //============= transceiver specific prameters
 //tt550 controls
 	int		tt550_line_out;
