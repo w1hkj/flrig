@@ -469,7 +469,9 @@ void configXcvr()
 		txtCIV->value(hexstr);
 		txtCIV->activate();
 		btnCIVdefault->activate();
-		if (xcvr_name == rig_IC7200.name_ || xcvr_name == rig_IC7600.name_ ) {
+		if (xcvr_name == rig_IC7200.name_ || 
+			xcvr_name == rig_IC7300.name_ ||
+			xcvr_name == rig_IC7600.name_ ) {
 			btnUSBaudio->value(progStatus.USBaudio);
 			btnUSBaudio->activate();
 		} else

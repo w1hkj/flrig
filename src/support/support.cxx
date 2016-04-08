@@ -3785,10 +3785,9 @@ LOG_INFO("Use rig data\n");
 		txtCIV->activate();
 		btnCIVdefault->activate();
 		if (selrig->name_ == rig_IC7200.name_ ||
+			selrig->name_ == rig_IC7300.name_ ||
 			selrig->name_ == rig_IC7600.name_ ||
 			selrig->name_ == rig_IC7800.name_ ) {
-//		if (strstr(selrig->name_, "IC-7200") || strstr(selrig->name_, "IC-7600")
-//			|| strstr(selrig->name_, "IC-7800")) {
 			btnUSBaudio->value(progStatus.USBaudio = true);
 			btnUSBaudio->activate();
 		} else
@@ -3919,6 +3918,7 @@ void initConfigDialog()
 		txtCIV->activate();
 		btnCIVdefault->activate();
 		if (xcvr_name == rig_IC7200.name_ ||
+			xcvr_name == rig_IC7300.name_ ||
 			xcvr_name == rig_IC7600.name_ ||
 			xcvr_name == rig_IC7800.name_) {
 			btnUSBaudio->value(progStatus.USBaudio = true);
