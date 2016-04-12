@@ -2,8 +2,8 @@
 // Copyright (C) 2014
 //              David Freese, W1HKJ
 //
-// 2015-10-04
-// adapted from FT890.h by Ernst F. Schroeder DJ7HS
+// 2015-10-04 adapted from FT890.h by Ernst F. Schroeder DJ7HS
+// 2016-04-03 made getinfo() private  DJ7HS
 //
 // This file is part of flrig.
 //
@@ -47,8 +47,6 @@ public:
 	
 	void initialize();
 
-	bool get_info();
-
 	bool can_split() { return true;}
 	void set_split(bool val);
 	int  get_split();
@@ -80,6 +78,8 @@ public:
 
 private:
 	void init_cmd();
+	bool get_info();
+
 };
 
 

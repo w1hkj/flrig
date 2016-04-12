@@ -6,6 +6,7 @@
 // the FT-900 has two vfos and can work split
 // but it cannot change the (hidden) alternate vfo
 // 2015-12-03 1st stable version  DJ7HS
+// 2016-04-03 call get_info() within get_vfoA and get_vfoB  DJ7HS
 //
 // This file is part of flrig.
 //
@@ -63,12 +64,13 @@ RIG_FT900::RIG_FT900() {
 
 	has_smeter =
 	has_power_out =
-	has_get_info =
 	has_ptt_control =
 	has_split = 
 	has_split_AB =
 	has_getvfoAorB =
 	has_mode_control = true;
+
+	has_get_info = false;          // to be sure, it's needed that way
 
 	precision = 10;
 	ndigits = 7;
@@ -273,6 +275,9 @@ bool RIG_FT900::get_info()
 
 long RIG_FT900::get_vfoA ()
 {
+	if (!useB) {
+		get_info();
+	}
 	return A.freq;
 }
 
@@ -303,6 +308,9 @@ void RIG_FT900::set_modeA(int val)
 
 long RIG_FT900::get_vfoB()
 {
+	if (useB) {
+		get_info();
+	}
 	return B.freq;
 }
 
