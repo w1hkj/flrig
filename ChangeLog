@@ -1,8 +1,20 @@
 
 
-=Version 1.3.24=
+=Version 1.3.25=
 
-2016-01-16  David Freese  <iam_w1hkj@w1hkj.com>
+2016-04-12  David Freese  <iam_w1hkj@w1hkj.com>
+
+	52a21b6: FT900 update
+	acf388b: IC7300
+	50b07b3: FT950
+	9aaab6b: IC-7600 mods
+	c5f6adf: UI small sliders
+	8b73bbb: IC7200 update
+	23604a6: IC7000 exchange vfos
+	db07bd2: key_fldigi
+
+
+=Version 1.3.24=
 
 	29f82e6: K3 KX3 mods
 	c1645f0: xmlserver update
