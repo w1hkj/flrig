@@ -374,6 +374,28 @@ void RIG_IC7200::set_attenuator(int val)
 	cmd += val ? '\x20' : '\x00';
 	cmd.append( post );
 	waitFB("set att");
+	atten_level = val;
+}
+
+int RIG_IC7200::get_attenuator()
+{
+	cmd = pre_to;
+	cmd += '\x11';
+	cmd.append( post );
+	string resp = pre_fm;
+	resp += '\x11';
+	if (waitFOR(7, "get ATT")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			atten_level = replystr[p+5];
+		if (atten_level == 0x20) {
+			atten_label("20 dB", true);
+		} else {
+			atten_level = 0;
+			atten_label("ATT", false);
+		}
+	}
+	return atten_level;
 }
 
 void RIG_IC7200::set_noise(bool val)
@@ -457,7 +479,7 @@ void RIG_IC7200::set_preamp(int val)
 	cmd = pre_to;
 	cmd += '\x16';
 	cmd += '\x02';
-	cmd += (unsigned char)val;
+	cmd += val ? 0x01 : 0x00;
 	cmd.append( post );
 	waitFB("set Pre");
 }
@@ -474,7 +496,7 @@ int RIG_IC7200::get_preamp()
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			if (replystr[p+6] == 0x01) {
-				preamp_label("Pre", true);
+				preamp_label("Pre ON", true);
 				return true;
 			} else {
 				preamp_label("Pre", false);

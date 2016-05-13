@@ -24,6 +24,8 @@
 #include "ICbase.h"
 
 class RIG_IC7200 : public RIG_ICOM {
+private:
+	int atten_level;
 public:
 	RIG_IC7200();
 	~RIG_IC7200(){}
@@ -55,6 +57,7 @@ public:
 	int  get_volume_control();
 	void get_vol_min_max_step(int &min, int &max, int &step);
 	void set_attenuator(int val);
+	int  get_attenuator();
 	int  get_smeter();
 	int  get_power_out(void);
 	int  get_swr(void);
