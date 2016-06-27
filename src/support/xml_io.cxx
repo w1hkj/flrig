@@ -85,7 +85,7 @@ int  err_count = 5;
 
 bool ptt_on = false;
 
-int ignore = 0; // skip next "ignore" read loops
+int xml_ignore = 0; // skip next "xml_ignore" read loops
 
 int try_count = CHECK_UPDATE_COUNT;
 
@@ -155,7 +155,7 @@ void send_modes() {
 
 	try {
 		execute(rig_set_modes, modes, res);
-		ignore = 2;
+		xml_ignore = 2;
 		err_count = 5;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		err_count--;
@@ -176,7 +176,7 @@ void send_bandwidths()
 
 	try {
 		execute(rig_set_bandwidths, bandwidths, res);
-		ignore = 2;
+		xml_ignore = 2;
 		err_count = 5;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		err_count--;
@@ -190,7 +190,7 @@ void send_name()
 	try {
 		XmlRpcValue res;
 		execute(rig_set_name, XmlRpcValue(selrig->name_), res);
-		ignore = 2;
+		xml_ignore = 2;
 		err_count = 5;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		err_count--;
@@ -204,7 +204,7 @@ void send_ptt_changed(bool PTT)
 	try {
 		XmlRpcValue res;
 		execute((PTT ? main_set_tx : main_set_rx), XmlRpcValue(), res);
-		ignore = 2;
+		xml_ignore = 2;
 		err_count = 5;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		err_count--;
@@ -219,7 +219,7 @@ void send_new_freq(long freq)
 		xmlvfo.freq = freq;
 		XmlRpcValue f((double)freq), res;
 		execute(rig_set_frequency, f, res);
-		ignore = 2;
+		xml_ignore = 2;
 		err_count = 5;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		err_count--;
@@ -233,7 +233,7 @@ void send_smeter_val(int val)
 	try {
 		XmlRpcValue mval((int)val), res;
 		execute(rig_set_smeter, mval, res);
-		ignore = 2;
+		xml_ignore = 2;
 		err_count = 5;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		err_count--;
@@ -247,7 +247,7 @@ void send_pwrmeter_val(int val)
 	try {
 		XmlRpcValue mval((int)val), res;
 		execute(rig_set_pwrmeter, mval, res);
-		ignore = 2;
+		xml_ignore = 2;
 		err_count = 5;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		err_count--;
@@ -261,7 +261,7 @@ void send_new_notch(int freq)
 	try {
 		XmlRpcValue i(freq), res;
 		execute(rig_set_notch, i, res);
-		ignore = 2;
+		xml_ignore = 2;
 		err_count = 5;
 		if (freq == 0)
 			xml_notch_on = false;
@@ -299,7 +299,7 @@ void send_new_mode(int md)
 		xmlvfo.imode = md;
 		XmlRpcValue mode(selrig->modes_[md]), res;
 		execute(rig_set_mode, mode, res);
-		ignore = 2;
+		xml_ignore = 2;
 		err_count = 5;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		err_count--;
@@ -315,7 +315,7 @@ void send_new_bandwidth(int bw)
 		int selbw = (bw > 0x80) ? (bw >> 8 & 0x7F) : bw;
 		XmlRpcValue bandwidth(selrig->bandwidths_[selbw]), res;
 		execute(rig_set_bandwidth, bandwidth, res);
-		ignore = 2;
+		xml_ignore = 2;
 		err_count = 5;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		err_count--;
@@ -329,7 +329,7 @@ void send_sideband()
 	try {
 		XmlRpcValue sideband(selrig->get_modetype(vfo.imode) == 'U' ? "USB" : "LSB"), res;
 		execute(main_set_wf_sideband, sideband, res);
-		ignore = 2;
+		xml_ignore = 2;
 		err_count = 5;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		err_count--;
@@ -501,7 +501,7 @@ MilliSleep(500);
 		LOG_ERROR("Connected");
 		Fl::awake(set_fldigi_connect, (void *)1);
 		err_count = 5;
-		ignore = 2;
+		xml_ignore = 2;
 	} catch (const XmlRpc::XmlRpcException& e) {
 		throw e;
 	}
@@ -526,8 +526,8 @@ void send_no_rig()
 
 static void get_fldigi_status()
 {
-	if (ignore) {
-		--ignore;
+	if (xml_ignore) {
+		--xml_ignore;
 		return;
 	}
 	XmlRpcValue status;

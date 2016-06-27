@@ -164,7 +164,6 @@ void debug::slog(level_e level, const char* func, const char* srcf, int line, co
 
 void debug::elog(const char* func, const char* srcf, int line, const char* text)
 {
-	if (level > debug::level) return;
 	log(ERROR_LEVEL, func, srcf, line, "%s: %s", text, strerror(errno));
 }
 

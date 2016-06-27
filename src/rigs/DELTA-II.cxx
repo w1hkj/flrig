@@ -74,7 +74,7 @@ void RIG_TT535::set_vfoA (long freq)
 	cmd.append( to_bcd_be( freq, 8 ) );
 	cmd.append( post );
 	int ret = sendCommand(cmd);
-	if (ret != 6);
+	if (ret != 6)
 		checkresponse();
 }
 
