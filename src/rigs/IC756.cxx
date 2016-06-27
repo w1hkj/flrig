@@ -284,7 +284,7 @@ int RIG_IC756PRO::get_smeter()
 
 void RIG_IC756PRO::set_volume_control(int val)
 {
-	ICvol = (int)(val);
+	ICvol = (int)(val * 255 / 100);
 	cmd = pre_to;
 	cmd.append("\x14\x01");
 	cmd.append(to_bcd(ICvol, 3));
@@ -303,14 +303,14 @@ int RIG_IC756PRO::get_volume_control()
 	if (waitFOR(9, "get vol")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return ((int)(fm_bcd(&replystr[p+6],3)));
+			return ((int)ceil(fm_bcd(&replystr[p+6],3) * 100 / 255));
 	}
-	return 0;
+	return progStatus.volume;
 }
 
 void RIG_IC756PRO::get_vol_min_max_step(int &min, int &max, int &step)
 {
-	min = 0; max = 255; step = 1;
+	min = 0; max = 100; step = 1;
 }
 
 // Tranceiver PTT on/off
