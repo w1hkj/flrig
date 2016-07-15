@@ -808,12 +808,15 @@ int RIG_TS990::get_swr(void)
 	read_alc = false;
 
 	cmd = "RM21;";
+	sendCommand(cmd);
+
+	cmd = "RM;";
 	if (wait_char(';', 8, 20, "get swr", ASC) < 16) return 0;
 
-	size_t p = replystr.find("RM21");
+	size_t p = replystr.find("RM2");
 	if (p == string::npos) return 0;
 
-	mtr = atoi(&replystr[p + 4]);
+	mtr = atoi(&replystr[p + 3]);
 	mtr *= 10;
 	mtr /= 7;
 	if (mtr > 100) mtr = 100;
@@ -828,12 +831,15 @@ int RIG_TS990::get_alc(void)
 		return alc_val;
 	}
 	cmd = "RM11;";
+	sendCommand(cmd);
+
+	cmd = "RM;";
 	if (wait_char(';', 8, 20, "get alc", ASC) < 8) return 0;
 
-	size_t p = replystr.find("RM11");
+	size_t p = replystr.find("RM1");
 	if (p == string::npos) return 0;
 
-	alc_val = atoi(&replystr[p + 4]);
+	alc_val = atoi(&replystr[p + 3]);
 	alc_val *= 10;
 	alc_val /= 7;
 	if (alc_val > 100) alc_val = 100;
