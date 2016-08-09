@@ -110,6 +110,19 @@ RIG_IC7300::RIG_IC7300() {
 
 	_mode_type = IC7300_mode_type;
 
+	comm_baudrate = BR19200;
+	stopbits = 1;
+	comm_retries = 2;
+	comm_wait = 5;
+	comm_timeout = 50;
+	comm_echo = true;
+	comm_rtscts = false;
+	comm_rtsplus = true;
+	comm_dtrplus = true;
+	comm_catptt = true;
+	comm_rtsptt = false;
+	comm_dtrptt = false;
+
 	widgets = IC7300_widgets;
 
 	A.freq = 14070000;
