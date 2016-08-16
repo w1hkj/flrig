@@ -202,6 +202,10 @@ status progStatus = {
 	0,			// tt550_F2_func;
 	0,			// tt550_F3_func;
 
+	5,			// tt550_Nsamples;
+	true,		// tt550_at11_inline;
+	true,		// tt550_at11_hiZ;
+
 	0.0,		// vfo_adj;
 	600,		// bfo_freq;
 	0,			// rit_freq;
@@ -434,6 +438,10 @@ void status::saveLastState()
 		spref.set("tt550_F1_func", tt550_F1_func);
 		spref.set("tt550_F2_func", tt550_F2_func);
 		spref.set("tt550_F3_func", tt550_F3_func);
+
+		spref.set("tt550_Nsamples", tt550_Nsamples);
+		spref.set("tt550_at11_inline", tt550_at11_inline);
+		spref.set("tt550_at11_hiZ", tt550_at11_hiZ);
 
 	} else {
 		spref.set("line_out", line_out);
@@ -710,6 +718,10 @@ bool status::loadXcvrState(string xcvr)
 			spref.get("tt550_F1_func", tt550_F1_func, tt550_F1_func);
 			spref.get("tt550_F2_func", tt550_F2_func, tt550_F2_func);
 			spref.get("tt550_F3_func", tt550_F3_func, tt550_F3_func);
+
+			spref.get("tt550_Nsamples", tt550_Nsamples, tt550_Nsamples);
+			spref.get("tt550_at11_inline", i, tt550_at11_inline); tt550_at11_inline = i;
+			spref.get("tt550_at11_hiZ", i, tt550_at11_hiZ); tt550_at11_hiZ = i;
 
 		}
 		else {

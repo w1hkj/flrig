@@ -182,6 +182,15 @@ public:
 	void enable_tloop();
 	void set_nb_level();
 
+// TT-550 / at-11 internal tuner i/o commands
+	void at11_bypass();
+	void at11_autotune();
+	void at11_cap_up();
+	void at11_cap_dn();
+	void at11_ind_up();
+	void at11_ind_dn();
+	void at11_loZ();
+	void at11_hiZ();
 
 };
 

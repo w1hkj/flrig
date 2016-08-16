@@ -2658,6 +2658,25 @@ void initXcvrTab()
 		poll_noise->deactivate(); poll_noise->value(0);
 		poll_all->deactivate(); poll_all->value(0);
 
+		if (progStatus.tt550_at11_inline) {
+			tt550_AT_inline->value(1);
+			tt550_AT_inline->label("Inline");
+			tt550_AT_inline->redraw_label();
+			selrig->at11_autotune();
+		} else {
+			tt550_AT_inline->value(0);
+			tt550_AT_inline->label("Bypassed");
+			tt550_AT_inline->redraw_label();
+			selrig->at11_bypass();
+		}
+		if (progStatus.tt550_at11_hiZ) {
+			selrig->at11_hiZ();
+			tt550_AT_Z->value(1);
+		} else{
+			selrig->at11_loZ();
+			tt550_AT_Z->value(0);
+		}
+
 	} else {
 
 		tabsGeneric->remove(*genericBands);
@@ -3027,6 +3046,8 @@ void initRig()
 			}
 		opBW->activate();
 		opBW->index(vfoA.iBW);
+		
+		spnr_tt550_vfo_adj->value(progStatus.vfo_adj);
 
 	} else { // !TT550
 		if (progStatus.CIV > 0)
@@ -4135,7 +4156,11 @@ void cb_auto_notch()
 
 void cb_vfo_adj()
 {
-	progStatus.vfo_adj = spnr_vfo_adj->value();
+	if (xcvr_name == rig_TT550.name_) 
+		progStatus.vfo_adj = spnr_tt550_vfo_adj->value();
+	else
+		progStatus.vfo_adj = spnr_vfo_adj->value();
+printf("spnr_vfo_adj %f\n", progStatus.vfo_adj);
 	guard_lock serial_lock(&mutex_serial, 83);
 	selrig->setVfoAdj(progStatus.vfo_adj);
 }

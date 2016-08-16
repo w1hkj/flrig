@@ -87,26 +87,26 @@ static const int TT550_xmt_filter_width[] = {
 static const int TT550_steps[] = { 1, 10, 100, 1000, 10000 };
 
 static char TT550restart[]			= "XX\r";
-static char TT550init[]			= "P1\r";
+static char TT550init[]				= "P1\r";
 //static char TT550isRADIO[]		= " RADIO START";
 //static char TT550isDSP[]			= " DSP START";
 
 //static char TT550setFREQ[]		= "N123456\r";
 
 static char TT550setMODE[]			= "Mnn\r";
-static char TT550setRcvBW[]		= "Wx\r";
-static char TT550setXmtBW[]		= "Cx\r";
+static char TT550setRcvBW[]			= "Wx\r";
+static char TT550setXmtBW[]			= "Cx\r";
 static char TT550setVolume[]		= "Vn\r";
 static char TT550setAGC[]			= "Gc\r";
 static char TT550setRFGAIN[]		= "An\r";
 static char TT550setATT[]			= "Bc\r";
-static char TT550setCWWPM[]		= "Eabcdef\r";
+static char TT550setCWWPM[]			= "Eabcdef\r";
 static char TT550setMONVOL[]		= "Hn\r";
 static char TT550setCWMONVOL[]		= "Jn\r";
 static char TT550setNRNOTCH[]		= "Kna\r";
 static char TT550setLINEOUT[]		= "Ln\r"; // 63 - min, 0 - max
 static char TT550setMICLINE[]		= "O1cn\r"; // *******************************************
-static char TT550setPOWER[]		= "Pn\r"; // ****************************************
+static char TT550setPOWER[]			= "Pn\r"; // ****************************************
 static char TT550setXMT[]			= "Q1\r";
 static char TT550setRCV[]			= "Q0\r";
 static char TT550setSQUELCH[]		= "Sn\r";	// 0..19; 6db / unit
@@ -114,19 +114,19 @@ static char TT550setVOX[]			= "Uc\r";	// '0' = off; '1' = on
 static char TT550setVOXGAIN[]		= "UGn\r";	// 0 <= n <= 255
 static char TT550setANTIVOX[]		= "UAn\r";	// 0..255
 static char TT550setVOXHANG[]		= "UHn\r";	// 0..255; n= delay*0.0214 sec
-static char TT550setCWSPOTLVL[]	= "Fn\r";	// 0..255; 0 = off
-static char TT550setCWQSK[]		= "UQn\r";	// 0..255; 0 = none
+static char TT550setCWSPOTLVL[]		= "Fn\r";	// 0..255; 0 = off
+static char TT550setCWQSK[]			= "UQn\r";	// 0..255; 0 = none
 static char TT550setAUXHANG[]		= "UTn\r";	// 0..255; 0 = none
 static char TT550setBLANKER[]		= "Dn\r";	// 0..7; 0 = off
 static char TT550setSPEECH[]		= "Yn\r";	// 0..127; 0 = off
 
 static char TT550setDISABLE[]		= "#0\r";	// disable transmitter
 static char TT550setENABLE[]		= "#1\r";	// enable transmitter
-static char TT550setTLOOP_OFF[]	= "#2\r";	// disable T loop
+static char TT550setTLOOP_OFF[]		= "#2\r";	// disable T loop
 static char TT550setTLOOP_ON[]		= "#3\r";	// enable T loop
-static char TT550setKEYER_OFF[]	= "#6\r";	// enable keyer
+static char TT550setKEYER_OFF[]		= "#6\r";	// enable keyer
 static char TT550setKEYER_ON[]		= "#7\r";	// disable keyer
-static char TT550setALIVE_OFF[]	= "#8\r";	// disable keep alive
+static char TT550setALIVE_OFF[]		= "#8\r";	// disable keep alive
 //static char TT550setALIVE_ON[]	= "#9\r";	// enable keep alive
 
 //static char TT550getAGC[]			= "?Y\r";	// 0..255
@@ -216,7 +216,8 @@ RIG_TT550::RIG_TT550() {
 	has_auto_notch =
 	has_tune_control =
 	has_noise_control =
-	has_mode_control = true;
+	has_mode_control =
+	has_vfo_adj = true;
 
 	auto_notch = noise_reduction = false;
 
@@ -225,13 +226,24 @@ RIG_TT550::RIG_TT550() {
 
 }
 
+static const char* info(string s)
+{
+	static string infostr;
+	infostr.assign(s);
+	if (infostr[infostr.length()-1] == '\r')
+		infostr.replace(infostr.length()-1, 1, "<0d>");
+	infostr.append(" : ");
+	infostr.append(str2hex(s.c_str(), s.length()));
+	return infostr.c_str();
+}
+
 void RIG_TT550::showASCII(string s1, string s)
 {
 	while (s[0] == ' ' || s[0] == '\r' || s[0] == '\n') s.erase(0,1);
 	for (size_t i = 0; i < s.length(); i++) {
 		if (s[i] == '\r' || s[i] == '\n') s[i] = ' ';
 	}
-	LOG_WARN("%9s : %s", s1.c_str(), s.c_str());
+	LOG_INFO("%9s : %s", s1.c_str(), s.c_str());
 }
 
 void RIG_TT550::initialize()
@@ -312,6 +324,7 @@ void RIG_TT550::initialize()
 	onA = true;
 
 	encoder_count = 0;
+
 }
 
 void RIG_TT550::enable_xmtr()
@@ -355,9 +368,11 @@ void RIG_TT550::set_vfoRX(long freq)
 
 	int FiltAdj = (TT550_filter_width[def_bw])/2;		// filter bw (Hz)
 
-	long lFreq = freq * (1 + VfoAdj * 1e-6) + RitAdj;
+	long lFreq = freq * (1 + VfoAdj * 1e-6);
 
-LOG_INFO("rx freq = %ld", freq);
+LOG_INFO("RX freq = %ld / adjusted to %ld", freq, lFreq);
+
+	lFreq += RitAdj;
 
 	if(def_mode == TT550_DIGI_MODE) {
 		DigiAdj = 1500 - FiltAdj - 200;
@@ -424,7 +439,7 @@ void RIG_TT550::set_vfoTX(long freq)
 	int XitAdj;
 	long lFreq = freq * (1 + VfoAdj * 1e-6);
 
-LOG_INFO("tx freq = %ld", freq);
+LOG_INFO("TX freq = %ld / adjusted to %ld", freq, lFreq);
 
 	lFreq += XitAdj = XitActive ? XitFreq : 0;
 
@@ -479,7 +494,7 @@ LOG_INFO("tx freq = %ld", freq);
 
 void RIG_TT550::set_split(bool val)
 {
-printf("set split %s\n", val ? "ON" : "OFF");
+//printf("set split %s\n", val ? "ON" : "OFF");
 	split = val;
 //	selectA();
 	if (split) {
@@ -497,7 +512,7 @@ printf("set split %s\n", val ? "ON" : "OFF");
 
 void RIG_TT550::set_vfo(long freq)
 {
-//LOG_WARN("set vfo %ld", freq);
+//LOG_INFO("set vfo %ld", freq);
 	set_vfoRX(freq);
 	if (!split)
 		set_vfoTX(freq);
@@ -506,7 +521,7 @@ void RIG_TT550::set_vfo(long freq)
 
 void RIG_TT550::set_vfoA (long freq)
 {
-LOG_WARN("set vfo A %ld", freq);
+LOG_INFO("set vfo A %ld", freq);
 	freqA = freq;
 	if (onA)
 		set_vfo(freq);
@@ -528,7 +543,7 @@ long RIG_TT550::get_vfoA ()
 
 void RIG_TT550::set_vfoB (long freq)
 {
-LOG_WARN("set vfo B %ld", freq);
+LOG_INFO("set vfo B %ld", freq);
 	freqB = freq;
 	if (!onA)
 		set_vfo(freqB);
@@ -544,12 +559,21 @@ long RIG_TT550::get_vfoB ()
 }
 
 // Tranceiver PTT on/off
+static unsigned int fp[FPLEN];
+static unsigned int rp[FPLEN];
+static int iswr;
+
 void RIG_TT550::set_PTT_control(int val)
 {
+	if (val) {
+		for (int i = 0; i < FPLEN; i++)
+			fp[i] = rp[i] = 0;
+		iswr = 0;
+	}
 	if (val) cmd = TT550setXMT;
 	else     cmd = TT550setRCV;
 	sendCommand(cmd, 0);
-//LOG_WARN("%s", str2hex(cmd.c_str(), cmd.length()));
+LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_TT550::set_mode(int val)
@@ -579,14 +603,14 @@ void RIG_TT550::set_mode(int val)
 
 void RIG_TT550::set_modeA(int val)
 {
-LOG_WARN("mode A = %d", val);
+LOG_INFO("mode A = %d", val);
 	modeA = val;
 	set_mode(val);
 }
 
 void RIG_TT550::set_modeB(int val)
 {
-LOG_WARN("mode B = %d", val);
+LOG_INFO("mode B = %d", val);
 	modeB = val;
 	if (!onA)
 		set_mode(val);
@@ -598,24 +622,30 @@ int  RIG_TT550::get_modeB()
 }
 
 static int ret_mode = TT550_CW_MODE;
+
 static void tt550_tune_off(void *)
 {
-	pthread_mutex_lock(&mutex_serial);
-		selrig->set_power_control(0);
-		selrig->set_PTT_control(0);
-		sendCommand("$0\r", 0);
-LOG_INFO("%s", str2hex("$0\r", 3));
+	selrig->set_PTT_control(0);
+	selrig->set_power_control(progStatus.power_level);
+	if (onA)
 		selrig->set_modeA(ret_mode);
-	pthread_mutex_unlock(&mutex_serial);
+	else
+		selrig->set_modeB(ret_mode);
 }
 
 void RIG_TT550::tune_rig()
 {
-	ret_mode = modeA;
-	set_modeA(TT550_CW_MODE);
-	set_power_control(5);
-	sendCommand("$1\r", 0);
-LOG_INFO("%s", str2hex("$1\r", 3));
+	set_PTT_control(0);
+	if (onA) {
+		ret_mode = modeA;
+		set_modeA(TT550_CW_MODE);
+	}
+	else {
+		ret_mode = modeB;
+		set_modeB(TT550_CW_MODE);
+	}
+	set_power_control(10);
+
 	set_PTT_control(1);
 	Fl::add_timeout(5.0, tt550_tune_off);
 }
@@ -632,7 +662,7 @@ int RIG_TT550::get_modetype(int n)
 
 void RIG_TT550::set_bw(int val)
 {
-LOG_WARN("bw = %d", val);
+LOG_INFO("bw = %d", val);
 	def_bw = val;
 	int rxbw = TT550_filter_nbr[val];
 	int txbw = rxbw;
@@ -651,7 +681,7 @@ LOG_WARN("bw = %d", val);
 
 void RIG_TT550::set_bwA(int val)
 {
-LOG_WARN("bw A = %d", val);
+LOG_INFO("bw A = %d", val);
 	bwA = val;
 	set_bw(bwA);
 }
@@ -663,7 +693,7 @@ int RIG_TT550::get_bwA()
 
 void RIG_TT550::set_bwB(int val)
 {
-LOG_WARN("bw B = %d", val);
+LOG_INFO("bw B = %d", val);
 	bwB = val;
 	if (!onA)
 		set_bw(val);
@@ -715,7 +745,7 @@ void RIG_TT550::set_attenuator(int val)
 	if (val) cmd[1] = '1';
 	else     cmd[1] = '0';
 	sendCommand(cmd, 0);
-LOG_WARN("%s", str2hex(cmd.c_str(), cmd.length()));
+LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_TT550::set_volume_control(int val)
@@ -723,7 +753,7 @@ void RIG_TT550::set_volume_control(int val)
 	cmd = TT550setVolume;
 	cmd[1] = 0xFF & ((val * 255) / 100);
 	sendCommand(cmd, 0);
-LOG_WARN("%s", str2hex(cmd.c_str(), cmd.length()));
+LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_TT550::get_volume_control()
@@ -747,7 +777,7 @@ static void update_encA(void *d)
 
 void RIG_TT550::selectA()
 {
-LOG_WARN("%s", "select A");
+LOG_INFO("%s", "select A");
 	onA = true;
 	Fl::awake(hide_encA, NULL);
 	xcvrstream.clear();
@@ -755,7 +785,7 @@ LOG_WARN("%s", "select A");
 
 void RIG_TT550::selectB()
 {
-LOG_WARN("%s", "select B");
+LOG_INFO("%s", "select B");
 	onA = false;
 	Fl::awake(hide_encA, NULL);
 	xcvrstream.clear();
@@ -785,7 +815,7 @@ void RIG_TT550::process_freq_entry(char c)
 			if (!txt_encA->visible())
 				Fl::awake(show_encA, NULL);
 			Fl::awake(update_encA, (void*)xcvrstream.c_str());
-//			LOG_WARN("%s => %ld", str2hex(xcvrstream.c_str(), xcvrstream.length()), freq);
+//			LOG_INFO("%s => %ld", str2hex(xcvrstream.c_str(), xcvrstream.length()), freq);
 			keypad_timeout = progStatus.tt550_keypad_timeout / progStatus.serloop_timing;
 		}
 	} else {
@@ -811,7 +841,7 @@ void RIG_TT550::process_freq_entry(char c)
 
 void RIG_TT550::fkey_clear()
 {
-//	LOG_WARN("%s", tt550_fkey_strings[1]);
+//	LOG_INFO("%s", tt550_fkey_strings[1]);
 	xcvrstream.clear();
 	keypad_timeout = 0;
 	Fl::awake(hide_encA, NULL);
@@ -819,7 +849,7 @@ void RIG_TT550::fkey_clear()
 
 void RIG_TT550::fkey_cw_plus()
 {
-//	LOG_WARN("%s", tt550_fkey_strings[2]);
+//	LOG_INFO("%s", tt550_fkey_strings[2]);
 	if (progStatus.tt550_cw_wpm >= 80) return;
 	progStatus.tt550_cw_wpm++;
 	spnr_tt550_cw_wpm->value(progStatus.tt550_cw_wpm);
@@ -1042,15 +1072,7 @@ int RIG_TT550::get_smeter()
 
 int RIG_TT550::get_swr()
 {
-	double swr, nu;
-	if (fwdpwr == 0) return 0;
-	if (fwdpwr == refpwr) return 100;
-	nu = sqrt(refpwr / fwdpwr);
-	swr = (1 + nu) / (1 - nu) - 1.0;
-	swr *= 16.67;
-	if (swr < 0) swr = 0;
-	if (swr > 100) swr = 100;
-	return (int)swr;
+	return iswr;
 }
 
 int RIG_TT550::get_power_out()
@@ -1062,9 +1084,31 @@ int RIG_TT550::get_power_out()
 	size_t p = replystr.rfind("T");
 	if (p == string::npos) return fwdpwr;
 
-	fwdpwr = (unsigned char)replystr[p+1];
-	refpwr = (unsigned char)replystr[p+2];
+    for (int i = 0; i < FPLEN - 1; i++) {
+		fp[i] = fp[i+1];
+		rp[i] = rp[i+1];
+	}
+	fp[FPLEN-1] = (unsigned int)replystr[p+1];
+	rp[FPLEN-1] = (unsigned int)replystr[p+2];
+	fwdpwr = refpwr = 0;
+	for (int i = FPLEN - progStatus.tt550_Nsamples; i < FPLEN; i++) {
+		if (fp[i] > fwdpwr) {
+			fwdpwr = fp[i];
+			refpwr = rp[i];
+		}
+	}
 
+	double swr = 1.0;
+	if (fwdpwr < 5) iswr = 0;
+	else if (fwdpwr == refpwr) iswr = 100;
+	else {
+		swr = (fwdpwr + refpwr) / (fwdpwr - refpwr);
+		iswr =  (swr-1.0) * 25;
+		if (iswr < 0) iswr = 0;
+		if (iswr > 100) iswr = 100;
+	}
+
+	LOG_INFO("Pwr: fwd %.0f, ref %.0f, swr %.1f", fwdpwr, refpwr, swr);
 	return fwdpwr;
 }
 
@@ -1348,28 +1392,24 @@ void RIG_TT550::get_mic_min_max_step(int &min, int &max, int &step)
 	step = 1;
 }
 
-float pwr_set[] =
-{ 0, 3, 6, 10, 13, 17, 20, 24, 28, 34, 40, 46, 52, 59, 67, 75, 82, 90, 98, 104, 109 };
-
 void RIG_TT550::set_power_control(double val)
 {
+	int ival = 0;
 	if (def_mode == TT550_AM_MODE) {
 		progStatus.tt550_AM_level = (int)val;
 		cmd = TT550setAMCARRIER;
-		cmd[1] = (unsigned char)(val * .64);
+		ival = (val * .25 - 5) * 256 / 95;
 	} else {
 		progStatus.power_level = (int) val;
 		cmd =  TT550setPOWER;
-		size_t sel = 0;
-		for (sel = 0; sel < sizeof(pwr_set); sel++)
-			if (pwr_set[sel] >= val) break;
-		sel--;
-		float v = 5.0 * (sel + 1.0 * (val - pwr_set[sel])/(pwr_set[sel+1]-pwr_set[sel]));
-		cmd[1] = (unsigned char)(v * 2.55);
-//		cmd[1] = (unsigned char)(val * 2.55);
+		ival = (val - 5) * 256 / 95;
 	}
-	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
+	if (ival == 0x0d) ival++;
+	if (ival < 5) ival = 5;
+	if (ival > 255) ival = 255;
+	cmd[1] = ival;
 	sendCommand(cmd, 0);
+	LOG_INFO("%s", info(cmd));
 }
 
 void RIG_TT550::set_mon_vol()
@@ -1555,6 +1595,63 @@ void cb_tt550_cw_qsk()
 	pthread_mutex_lock(&mutex_serial);
 	selrig->set_cw_qsk();
 	pthread_mutex_unlock(&mutex_serial);
+}
+
+// TT-550 / at-11 internal tuner i/o commands
+void RIG_TT550::at11_bypass()
+{
+	cmd = "$0\r";
+	sendCommand(cmd, 0);
+	LOG_INFO("%s", info(cmd));
+}
+
+void RIG_TT550::at11_autotune()
+{
+	cmd = "$1\r";
+	sendCommand(cmd, 0);
+	LOG_INFO("%s", info(cmd));
+}
+
+void RIG_TT550::at11_cap_up()
+{
+	cmd = "$3\r";
+	sendCommand(cmd, 0);
+	LOG_INFO("%s", info(cmd));
+}
+
+void RIG_TT550::at11_cap_dn()
+{
+	cmd = "$4\r";
+	sendCommand(cmd, 0);
+	LOG_INFO("%s", info(cmd));
+}
+
+void RIG_TT550::at11_ind_up()
+{
+	cmd = "$5\r";
+	sendCommand(cmd, 0);
+	LOG_INFO("%s", info(cmd));
+}
+
+void RIG_TT550::at11_ind_dn()
+{
+	cmd = "$6\r";
+	sendCommand(cmd, 0);
+	LOG_INFO("%s", info(cmd));
+}
+
+void RIG_TT550::at11_hiZ()
+{
+	cmd = "$7\r";
+	sendCommand(cmd, 0);
+	LOG_INFO("%s", info(cmd));
+}
+
+void RIG_TT550::at11_loZ()
+{
+	cmd = "$8\r";
+	sendCommand(cmd, 0);
+	LOG_INFO("%s", info(cmd));
 }
 
 //======================================================================

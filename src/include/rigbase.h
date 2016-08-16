@@ -433,6 +433,16 @@ public:
 	int nrval2() { return _nrval2; }
 	int noise_reduction_level() { return _noise_reduction_level; }
 
+// TT-550 / at-11 internal tuner i/o commands
+	virtual void at11_bypass() {}
+	virtual void at11_autotune() {}
+	virtual void at11_cap_up() {}
+	virtual void at11_cap_dn() {}
+	virtual void at11_ind_up() {}
+	virtual void at11_ind_dn() {}
+	virtual void at11_loZ() {}
+	virtual void at11_hiZ() {}
+
 };
 
 extern rigbase *rigs[];

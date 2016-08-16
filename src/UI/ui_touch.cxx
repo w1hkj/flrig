@@ -1130,10 +1130,11 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				spnr_tt550_cw_weight = new Hspinner(
 					xpos + 60, by + bh + 2,
 					5*bh, bh, _("Weight"));
-				spnr_tt550_cw_weight->type(FL_INT_INPUT);
+				spnr_tt550_cw_weight->type(FL_FLOAT_INPUT);
 				spnr_tt550_cw_weight->minimum(0.75);
 				spnr_tt550_cw_weight->maximum(1.5);
 				spnr_tt550_cw_weight->step(0.05);
+				spnr_tt550_cw_weight->format("%.2f");
 				spnr_tt550_cw_weight->value(20);
 				spnr_tt550_cw_weight->callback((Fl_Callback*)cb_spnr_tt550_cw_weight);
 				spnr_tt550_cw_weight->align(Fl_Align(FL_ALIGN_LEFT));
@@ -1334,7 +1335,8 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				spnr_tt550_vfo_adj->minimum(-100);
 				spnr_tt550_vfo_adj->maximum(100);
 				spnr_tt550_vfo_adj->type(FL_FLOAT_INPUT);
-				spnr_tt550_vfo_adj->step(0.1);
+				spnr_tt550_vfo_adj->step(0.02);
+				spnr_tt550_vfo_adj->format("%.2f");
 				spnr_tt550_vfo_adj->value(progStatus.vfo_adj);
 
 			tt550_Rx->end();
@@ -1445,6 +1447,57 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				sel_tt550_F3_func->value(progStatus.tt550_F3_func);
 
 			tt550_302B->end();
+
+			tt550_AT = new Fl_Group(xpos, ypos+tabh, W, tabb, _("AT"));
+
+				tt550_AT_inline = new Fl_Light_Button(
+					15, by, 4*bh, bh, _("Inline"));
+				tt550_AT_inline->tooltip(_("Enabled - autotune\nDisabled - bypass"));
+				tt550_AT_inline->callback((Fl_Callback*)cb_AT_bypass);
+
+				tt550_AT_Z = new Fl_Light_Button(
+					RIGHT_OF(tt550_AT_inline) + 10, 
+					by, 4*bh, bh, _("Z hi"));
+				tt550_AT_Z->tooltip(_("Hi / Lo Impedance network"));
+				tt550_AT_Z->callback((Fl_Callback*)cb_AT_Z);
+
+				tt550_AT_capUP = new Fl_Button(
+					RIGHT_OF(tt550_AT_Z) + 10,
+					by, 2*bh, bh, _("C >"));
+				tt550_AT_capUP->tooltip(_("Increase C"));
+				tt550_AT_capUP->callback((Fl_Callback*)cb_AT_capUP);
+
+				tt550_AT_capDN = new Fl_Button(
+					RIGHT_OF(tt550_AT_capUP) + 10,
+					by, 2*bh, bh, _("C <"));
+				tt550_AT_capDN->tooltip(_("Decrease C"));
+				tt550_AT_capDN->callback((Fl_Callback*)cb_AT_capDN);
+
+				tt550_AT_indUP = new Fl_Button(
+					RIGHT_OF(tt550_AT_capDN) + 10,
+					by, 2*bh, bh, _("L >"));
+				tt550_AT_indUP->tooltip(_("Increase L"));
+				tt550_AT_indUP->callback((Fl_Callback*)cb_AT_indUP);
+
+				tt550_AT_indDN = new Fl_Button(
+					RIGHT_OF(tt550_AT_indUP) + 10,
+					by, 2*bh, bh, _("L <"));
+				tt550_AT_indDN->tooltip(_("Decrease L"));
+				tt550_AT_indDN->callback((Fl_Callback*)cb_AT_indDN);
+
+				tt550_Nsamples = new Fl_Simple_Counter(
+					RIGHT_OF(tt550_AT_indDN) + 10,
+					by, 4*bh, bh, _("N"));
+				tt550_Nsamples->tooltip(_("Fwd/Rev Pwr detect over # samples"));
+				tt550_Nsamples->align(FL_ALIGN_RIGHT);
+				tt550_Nsamples->step(1);
+				tt550_Nsamples->minimum(1);
+				tt550_Nsamples->maximum(FPLEN);
+				tt550_Nsamples->value(progStatus.tt550_Nsamples);
+				tt550_Nsamples->callback((Fl_Callback*)cb_tt550_Nsamples);
+
+			tt550_AT->end();
+
 
 		tabs550->end();
 

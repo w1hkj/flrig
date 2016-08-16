@@ -227,8 +227,19 @@ Fl_Choice *sel_tt550_F1_func=(Fl_Choice *)0;
 Fl_Choice *sel_tt550_F2_func=(Fl_Choice *)0;
 Fl_Choice *sel_tt550_F3_func=(Fl_Choice *)0;
 
+Fl_Group *tt550_AT=(Fl_Group *)0;
+Fl_Light_Button *tt550_AT_inline=(Fl_Light_Button *)0;
+Fl_Light_Button *tt550_AT_Z=(Fl_Light_Button *)0;
+Fl_Button *tt550_AT_capUP=(Fl_Button *)0;
+Fl_Button *tt550_AT_capDN=(Fl_Button *)0;
+Fl_Button *tt550_AT_indUP=(Fl_Button *)0;
+Fl_Button *tt550_AT_indDN=(Fl_Button *)0;
+Fl_Simple_Counter *tt550_Nsamples = (Fl_Simple_Counter *)0;
+
 Fl_Group *main_group = (Fl_Group *)0;
 Fl_Button *btnInitializing=(Fl_Button *)0;
+
+#define RIGHT_OF(widget) (widget->x() + widget->w())
 
 #include "ui_bitmaps.cxx"
 
@@ -849,6 +860,47 @@ static void cb_sel_tt550_F2_func(Fl_Choice* o, void*) {
 
 static void cb_sel_tt550_F3_func(Fl_Choice* o, void*) {
 	progStatus.tt550_F3_func = o->value();
+}
+
+static void cb_AT_bypass(Fl_Light_Button *btn, void*) {
+	if (!btn->value()) {
+		progStatus.tt550_at11_inline = false;
+		tt550_AT_inline->label("Bypassed");
+		tt550_AT_inline->redraw_label();
+		selrig->at11_bypass();
+	} else {
+		progStatus.tt550_at11_inline = true;
+		tt550_AT_inline->label("Inline");
+		tt550_AT_inline->redraw_label();
+		selrig->at11_autotune();
+	}
+}
+
+static void cb_AT_Z(Fl_Light_Button *btn, void*) {
+	if (btn->value())
+		selrig->at11_hiZ();
+	else
+		selrig->at11_loZ();
+}
+
+static void cb_AT_capUP(Fl_Button*, void*) {
+	selrig->at11_cap_up();
+}
+
+static void cb_AT_capDN(Fl_Button*, void*) {
+	selrig->at11_cap_dn();
+}
+
+static void cb_AT_indUP(Fl_Button*, void*) {
+	selrig->at11_ind_up();
+}
+
+static void cb_AT_indDN(Fl_Button*, void*) {
+	selrig->at11_ind_dn();
+}
+
+static void cb_tt550_Nsamples(Fl_Simple_Counter *, void *) {
+	progStatus.tt550_Nsamples =  tt550_Nsamples->value();
 }
 
 #include "ui_small.cxx"

@@ -29,6 +29,8 @@
 
 using namespace std;
 
+#define FPLEN 20 // used in tt550 power sample
+
 struct status {
 	int		mainX;
 	int		mainY;
@@ -193,6 +195,10 @@ struct status {
 	int		tt550_F1_func;
 	int		tt550_F2_func;
 	int		tt550_F3_func;
+
+	int		tt550_Nsamples;
+	bool	tt550_at11_inline;
+	bool	tt550_at11_hiZ;
 
 //and others
 	double	vfo_adj;
