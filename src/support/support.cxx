@@ -2292,7 +2292,9 @@ void adjust_small_ui()
 			sldrMICGAIN->label("");
 			sldrMICGAIN->redraw_label();
 		}
+		mnuSchema->set();
 	} else {
+		mnuSchema->clear();
 		y = cntRIT->y() + 2;
 		if (selrig->has_volume_control) {
 			y += 20;
@@ -2443,10 +2445,6 @@ void adjust_small_ui()
 		mnuTooltips->clear();
 		Fl_Tooltip::enable(0);
 	}
-	if (progStatus.schema)
-		mnuSchema->set();
-	else
-		mnuSchema->clear();
 
 	mainwindow->size( mainwindow->w(), y);
 	mainwindow->init_sizes();
@@ -2919,7 +2917,18 @@ void initXcvrTab()
 
 		tabsGeneric->redraw();
 
+		if (progStatus.restore_rig_data) {
+			mnuRestoreData->set();
+		} else {
+			mnuRestoreData->clear();
+		}
 		mnuRestoreData->show();
+
+		if (progStatus.use_rig_data) {
+			mnuKeepData->set();
+		} else {
+			mnuKeepData->clear();
+		}
 		mnuKeepData->show();
 
 		poll_frequency->activate(); poll_frequency->value(progStatus.poll_frequency);
@@ -3053,38 +3062,38 @@ void initRig()
 		if (progStatus.CIV > 0)
 			selrig->adjustCIV(progStatus.CIV);
 
-		if (progStatus.restore_rig_data) { //if (progStatus.use_rig_data) {
-LOG_INFO("Use rig data\n");
+		selrig->selectA();
+		if (selrig->has_get_info)
+			selrig->get_info();
+		transceiverA.freq = selrig->get_vfoA();
+		transceiverA.imode = selrig->get_modeA();
+		transceiverA.iBW = selrig->get_bwA();
 
-			selrig->selectA();
+		selrig->selectB();
+		if (selrig->has_get_info)
+			selrig->get_info();
+		transceiverB.freq = selrig->get_vfoB();
+		transceiverB.imode = selrig->get_modeB();
+		transceiverB.iBW = selrig->get_bwB();
 
-			if (selrig->has_get_info)
-				selrig->get_info();
+		if (progStatus.use_rig_data) {
+LOG_INFO("Use xcvr start values for Vfo A/B");
 
-			transceiverA.freq = selrig->get_vfoA();
-			transceiverA.imode = selrig->get_modeA();
-			selrig->adjust_bandwidth(transceiverA.imode);
-			transceiverA.iBW = selrig->get_bwA();
+//			selrig->selectA();
+//			selrig->adjust_bandwidth(transceiverA.imode);
 
-			selrig->selectB();
+//			selrig->selectB();
+//			selrig->adjust_bandwidth(transceiverB.imode);
 
-			if (selrig->has_get_info)
-				selrig->get_info();
+			vfo.freq = vfoA.freq = progStatus.freq_A = transceiverA.freq;
+			vfo.imode = vfoA.imode = progStatus.imode_A = transceiverA.imode;
+			vfo.iBW = vfoA.imode = progStatus.iBW_A = transceiverA.iBW;
 
-			transceiverB.freq = selrig->get_vfoB();
-			transceiverB.imode = selrig->get_modeB();
-			selrig->adjust_bandwidth(transceiverB.imode);
-			transceiverB.iBW = selrig->get_bwB();
+			vfoB.freq = progStatus.freq_B = transceiverB.freq;
+			vfoB.imode = progStatus.imode_B = transceiverB.imode;
+			vfoB.imode = progStatus.iBW_B = transceiverB.iBW;
 
-			progStatus.freq_A = transceiverA.freq;
-			progStatus.imode_A = transceiverA.imode;
-			progStatus.iBW_A = transceiverA.iBW;
-
-			progStatus.freq_B = transceiverB.freq;
-			progStatus.imode_B = transceiverB.imode;
-			progStatus.iBW_B = transceiverB.iBW;
-
-			if (selrig->restore_mbw) selrig->last_bw = transceiverA.iBW;
+//			if (selrig->restore_mbw) selrig->last_bw = transceiverA.iBW;
 
 		}
 

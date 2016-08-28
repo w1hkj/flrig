@@ -1549,9 +1549,9 @@ Fl_Double_Window* touch_rig_window() {
 
 	grp_menu->end();
 
-	mnuRestoreData = (touch_menu+12);
-	mnuKeepData = (touch_menu+13);
-	mnuTooltips = (touch_menu+17);
+	mnuRestoreData = (touch_menu+13);
+	mnuKeepData = (touch_menu+14);
+	mnuTooltips = (touch_menu+18);
 
 	btnInitializing = new Fl_Button(0, 28, mainW, mainH - 28, "Initializing");
 	btnInitializing->hide();

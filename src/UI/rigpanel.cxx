@@ -261,11 +261,15 @@ static void cb_mnuExit(Fl_Menu_*, void*) {
 }
 
 static void cb_mnuRestoreData(Fl_Menu_*, void*) {
-	progStatus.restore_rig_data = !progStatus.restore_rig_data;
+	if (mnuRestoreData->value()) progStatus.restore_rig_data = true;
+	else progStatus.restore_rig_data = false;
+//	progStatus.restore_rig_data = !progStatus.restore_rig_data;
 }
 
 static void cb_mnuKeepData(Fl_Menu_*, void*) {
-	progStatus.use_rig_data= !progStatus.use_rig_data;
+	if (mnuKeepData->value()) progStatus.use_rig_data = true;
+	else progStatus.use_rig_data = false;
+//	progStatus.use_rig_data= !progStatus.use_rig_data;
 }
 
 static void cb_mnuTooltips(Fl_Menu_*, void*) {

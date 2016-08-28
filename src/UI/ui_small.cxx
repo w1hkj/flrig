@@ -1332,8 +1332,8 @@ Fl_Double_Window* Small_rig_window() {
 
 	grp_small_menu->end();
 
-	mnuRestoreData = (menu_small_menu+12);
-	mnuKeepData = (menu_small_menu+13);
+	mnuRestoreData = (menu_small_menu+13);
+	mnuKeepData = (menu_small_menu+14);
 	mnuSchema = (menu_small_menu+18);
 	mnuTooltips = (menu_small_menu+19);
 

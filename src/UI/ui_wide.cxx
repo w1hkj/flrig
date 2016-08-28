@@ -1496,9 +1496,9 @@ Fl_Double_Window* Wide_rig_window() {
 
 	grp_menu->end();
 
-	mnuRestoreData = (menu_wide_menu+12);
-	mnuKeepData = (menu_wide_menu+13);
-	mnuTooltips = (menu_wide_menu+17);
+	mnuRestoreData = (menu_wide_menu+13);
+	mnuKeepData = (menu_wide_menu+14);
+	mnuTooltips = (menu_wide_menu+18);
 
 	btnInitializing = new Fl_Button(0,menuH,10,10);
 	btnInitializing->hide();
