@@ -3650,10 +3650,10 @@ LOG_INFO("Use xcvr start values for Vfo A/B");
 	set_power_controlImage(progStatus.power_level);
 
 	if (selrig->has_attenuator_control) {
-		if (progStatus.use_rig_data)
+//		if (progStatus.use_rig_data)
 			progStatus.attenuator = selrig->get_attenuator();
-		else
-			selrig->set_attenuator(progStatus.attenuator);
+//		else
+//			selrig->set_attenuator(progStatus.attenuator);
 		switch (progStatus.UIsize) {
 			case small_ui :
 				btnAttenuator->show();
@@ -3684,10 +3684,10 @@ LOG_INFO("Use xcvr start values for Vfo A/B");
 		}
 	} else {
 		if (selrig->has_preamp_control) {
-			if (progStatus.use_rig_data)
+//			if (progStatus.use_rig_data)
 				progStatus.preamp = selrig->get_preamp();
-			else
-				selrig->set_preamp(progStatus.preamp);
+//			else
+//				selrig->set_preamp(progStatus.preamp);
 			switch (progStatus.UIsize) {
 				case small_ui :
 					btnPreamp->show();

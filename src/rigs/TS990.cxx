@@ -273,10 +273,6 @@ void RIG_TS990::initialize()
 	cmd = "EX00100 00"; // turn off beeps
 	sendCommand(cmd);
 
-	selectA();
-	get_preamp();
-	get_attenuator();
-
 	read_menu_0607();
 	read_menu_0608();
 	set_menu_0607(false); // SSB uses lower/upper cutoff frequencies
@@ -315,6 +311,11 @@ void RIG_TS990::initialize()
 	B_default_AM_D3    = DEFAULT_AM_D3;
 	B_default_FSK      = DEFAULT_FSK;
 	B_default_PSK      = DEFAULT_PSK;
+
+	selectA();
+	get_preamp();
+	get_attenuator();
+
 }
 
 void RIG_TS990::shutdown()
@@ -797,21 +798,13 @@ int RIG_TS990::get_power_out()
 // ALC, SWR readings
 //==============================================================================
 
-static bool read_alc = false;
-static int alc_val = 0;
-
 int RIG_TS990::get_swr(void)
 {
 
 	int mtr = 0;
 
-	read_alc = false;
-
 	cmd = "RM21;";
-	sendCommand(cmd);
-
-	cmd = "RM;";
-	if (wait_char(';', 8, 20, "get swr", ASC) < 16) return 0;
+	if (wait_char(';', 8, 20, "get swr", ASC) < 8) return 0;
 
 	size_t p = replystr.find("RM2");
 	if (p == string::npos) return 0;
@@ -826,20 +819,13 @@ int RIG_TS990::get_swr(void)
 
 int RIG_TS990::get_alc(void)
 {
-	if (read_alc) {
-		read_alc = false;
-		return alc_val;
-	}
 	cmd = "RM11;";
-	sendCommand(cmd);
-
-	cmd = "RM;";
 	if (wait_char(';', 8, 20, "get alc", ASC) < 8) return 0;
 
 	size_t p = replystr.find("RM1");
 	if (p == string::npos) return 0;
 
-	alc_val = atoi(&replystr[p + 3]);
+	int alc_val = atoi(&replystr[p + 3]);
 	alc_val *= 10;
 	alc_val /= 7;
 	if (alc_val > 100) alc_val = 100;

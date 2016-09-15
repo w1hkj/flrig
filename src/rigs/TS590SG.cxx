@@ -447,35 +447,27 @@ int RIG_TS590SG::get_power_out()
 	return mtr;
 }
 
-static bool read_alc = false;
-static int alc_val = 0;
+//static bool read_alc = false;
+//static int alc_val = 0;
 
 int RIG_TS590SG::get_swr(void)
 {
 	int mtr = 0;
 
-	read_alc = false;
+	cmd = "RM1;";
+	sendCommand(cmd, 0);
+	showresp(WARN, ASC, "SWR meter", cmd, "");
 
 	cmd = "RM;";
-	if (wait_char(';', 8, 100, "get swr/alc", ASC) < 8) return 0;
+	if (wait_char(';', 8, 100, "get swr", ASC) < 8) return 0;
 
-	size_t p = replystr.find("RM3");
-	if (p != string::npos) {
-		replystr[p + 7] = 0;
-		alc_val = atoi(&replystr[p + 3]);
-		alc_val *= 100;
-		alc_val /= 15;
-		if (alc_val > 100) alc_val = 100;
-		read_alc = true;
-	}
-
-	p = replystr.find("RM1");
+	size_t p = replystr.find("RM1");
 	if (p == string::npos) return 0;
 
 	replystr[p + 7] = 0;
 	mtr = atoi(&replystr[p + 3]);
-	mtr *= 50;
-	mtr /= 15;
+	mtr *= 100;
+	mtr /= 30;
 	if (mtr > 100) mtr = 100;
 
 	return mtr;
@@ -483,10 +475,10 @@ int RIG_TS590SG::get_swr(void)
 
 int RIG_TS590SG::get_alc(void)
 {
-	if (read_alc) {
-		read_alc = false;
-		return alc_val;
-	}
+	cmd = "RM3;";
+	sendCommand(cmd, 0);
+	showresp(WARN, ASC, "ALC meter", cmd, "");
+
 	cmd = "RM;";
 	if (wait_char(';', 8, 100, "get alc", ASC) < 8) return 0;
 
@@ -494,9 +486,9 @@ int RIG_TS590SG::get_alc(void)
 	if (p == string::npos) return 0;
 
 	replystr[p + 7] = 0;
-	alc_val = atoi(&replystr[p + 3]);
+	int alc_val = atoi(&replystr[p + 3]);
 	alc_val *= 100;
-	alc_val /= 15;
+	alc_val /= 30;
 	if (alc_val > 100) alc_val = 100;
 	return alc_val;
 }
