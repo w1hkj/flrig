@@ -28,60 +28,16 @@ bool IC9100_DEBUG = true;
 const char IC9100name_[] = "IC-9100";
 
 const char *IC9100modes_[] = {
-	"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R", "PSK", "PSK-R", 
-	"LSB-D1", "LSB-D2", "LSB-D3",
-	"USB-D1", "USB-D2", "USB-D3", NULL};
+	"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R", "DV", NULL};
 
 const char IC9100_mode_type[] = {
-	'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U', 'U', 'L', 
-	'L', 'L', 'L',
-	'U', 'U', 'U' };
+	'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U', 'U' };
 
 const char IC9100_mode_nbr[] = {
-	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07, 0x08, 0x12, 0x13, 
-	0x00, 0x00, 0x00,
-	0x01, 0x01, 0x01 };
+	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07, 0x08, 0x17 };
 
-const char *IC9100_ssb_bws[] = {
-"50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
-"600",   "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
-"1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
-"2600", "2700", "2800", "2900", "3000", "3100", "3200", "3300", "3400", "3500",
-"3600", NULL };
-static int IC9100_bw_vals_SSB[] = {
- 1, 2, 3, 4, 5, 6, 7, 8, 9,10,
-11,12,13,14,15,16,17,18,19,20,
-21,22,23,24,25,26,27,28,29,30,
-31,32,33,34,35,36,37,38,39,40,
-41, WVALS_LIMIT};
-
-const char *IC9100_rtty_bws[] = {
-"50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
-"600",   "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
-"1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
-"2600", "2700", NULL };
-static int IC9100_bw_vals_RTTY[] = {
- 1, 2, 3, 4, 5, 6, 7, 8, 9,10,
-11,12,13,14,15,16,17,18,19,20,
-21,22,23,24,25,26,27,28,29,30,
-31,32, WVALS_LIMIT};
-
-const char *IC9100_am_bws[] = {
-"200",   "400",  "600",  "800", "1000", "1200", "1400", "1600", "1800", "2000",
-"2200", "2400", "2600", "2800", "3000", "3200", "3400", "3600", "3800", "4000",
-"4200", "4400", "4600", "4800", "5000", "5200", "5400", "5600", "5800", "6000",
-"6200", "6400", "6600", "6800", "7000", "7200", "7400", "9100", "7800", "8000",
-"8200", "8400", "8600", "8800", "9000", "9200", "9400", "9600", "9800", "10000", NULL };
-static int IC9100_bw_vals_AM[] = {
- 1, 2, 3, 4, 5, 6, 7, 8, 9,10,
-11,12,13,14,15,16,17,18,19,20,
-21,22,23,24,25,26,27,28,29,30,
-31,32,33,34,35,36,37,38,39,40,
-41,42,43,44,45,46,47,48,49,50,
-WVALS_LIMIT};
-
-const char *IC9100_fm_bws[] = {"FIXED", NULL };
-static int IC9100_bw_vals_FM[] = {1, WVALS_LIMIT};
+const char *IC9100_bws[] = { "FIL1", "FIL2", "FIL3", NULL };
+const int IC9100_bw_vals[] = { 0x01, 0x02, 0x03, WVALS_LIMIT};
 
 static GUI IC9100_widgets[]= {
 	{ (Fl_Widget *)btnVol, 2, 125,  50 },
@@ -103,8 +59,8 @@ RIG_IC9100::RIG_IC9100() {
 	defaultCIV = 0x7C;
 	name_ = IC9100name_;
 	modes_ = IC9100modes_;
-	bandwidths_ = IC9100_ssb_bws;
-	bw_vals_ = IC9100_bw_vals_SSB;
+	bandwidths_ = IC9100_bws;
+	bw_vals_ = IC9100_bw_vals;
 
 	_mode_type = IC9100_mode_type;
 	adjustCIV(defaultCIV);
@@ -197,22 +153,6 @@ void RIG_IC9100::set_modeA(int val)
 	if (IC9100_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	waitFB("set mode A");
-// digital set / clear
-	if (A.imode >= 10) {
-		cmd = pre_to;
-		cmd += '\x1A'; cmd += '\x06';
-		switch (A.imode) {
-			case 10 : case 13 : cmd += '\x01'; cmd += '\x01'; break;
-			case 11 : case 14 : cmd += '\x01'; cmd += '\x02'; break;
-			case 12 : case 15 : cmd += '\x01'; cmd += '\x03'; break;
-			default :
-				cmd += '\x00'; cmd += '\x00';
-		}
-		cmd.append( post);
-		if (IC9100_DEBUG)
-			LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-		waitFB("set digital");
-	}
 }
 
 int RIG_IC9100::get_modeA()
@@ -223,25 +163,13 @@ int RIG_IC9100::get_modeA()
 	cmd.append(post);
 	string resp = pre_fm;
 	resp += '\x04';
-	if (waitFOR(8, "get mode A")) {
-		for (md = 0; md < 10; md++) if (replystr[5] == IC9100_mode_nbr[md]) break;
-		if (md >= 10) md = 0;
+	if (waitFOR(8, "get mode/bw A")) {
+		for (md = 0; md < 9; md++) if (replystr[5] == IC9100_mode_nbr[md]) break;
 	} else {
 		checkresponse();
 		return A.imode;
 	}
-	if (md == 0 || md == 1) {
-		cmd = pre_to;
-		cmd.append("\x1a\x06");
-		cmd.append(post);
-		resp = pre_fm;
-		resp.append("\x1a\x06");
-		if (waitFOR(9, "get digital setting")) {
-			if (replystr[6] == 1 && replystr[7] > 0)
-				md = (md ? 13 : 10) + replystr[7];
-			}
-	}
-	if (md > 15) md = 0;
+	if (md > 8) md = 1; // force USB
 	A.imode = md;
 	return A.imode;
 }
@@ -256,22 +184,6 @@ void RIG_IC9100::set_modeB(int val)
 	if (IC9100_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	waitFB("set mode B");
-// digital set / clear
-	if (B.imode >= 10) {
-		cmd = pre_to;
-		cmd += '\x1A'; cmd += '\x06';
-		switch (B.imode) {
-			case 10 : case 13 : cmd += '\x01'; cmd += '\x01'; break;
-			case 11 : case 14 : cmd += '\x01'; cmd += '\x02'; break;
-			case 12 : case 15 : cmd += '\x01'; cmd += '\x03'; break;
-			default :
-				cmd += '\x00'; cmd += '\x00';
-		}
-		cmd.append( post);
-		if (IC9100_DEBUG)
-			LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-		waitFB("set digital");
-	}
 }
 
 int RIG_IC9100::get_modeB()
@@ -283,152 +195,86 @@ int RIG_IC9100::get_modeB()
 	string resp = pre_fm;
 	resp += '\x04';
 	if (waitFOR(8, "get mode A")) {
-		for (md = 0; md < 10; md++) if (replystr[5] == IC9100_mode_nbr[md]) break;
-		if (md >= 10) md = 0;
+		for (md = 0; md < 9; md++) if (replystr[5] == IC9100_mode_nbr[md]) break;
 	} else {
 		checkresponse();
 		return B.imode;
 	}
-	if (md == 0 || md == 1) {
-		cmd = pre_to;
-		cmd.append("\x1a\x06");
-		cmd.append(post);
-		resp = pre_fm;
-		resp.append("\x1a\x06");
-		if (waitFOR(9, "get digital setting")) {
-			if (replystr[6] == 1 && replystr[7] > 0)
-				md = (md ? 13 : 10) + replystr[7];
-			}
-	}
-	if (md > 15) md = 0;
+	if (md > 8) md = 1; // force USB
 	B.imode = md;
 	return B.imode;
 }
 
 int RIG_IC9100::get_bwA()
 {
-	if (A.imode == 5) return 0;
-
+	int bw = 0;
 	cmd = pre_to;
-	cmd.append("\x1a\x03");
+	cmd += '\x04';
 	cmd.append(post);
 	string resp = pre_fm;
-	resp.append("\x1a\x03");
-	if (waitFOR(8, "get bw A")) {
-		size_t p = replystr.rfind(resp);
-		A.iBW = fm_bcd(&replystr[p+6], 2);
+	resp += '\x04';
+	if (waitFOR(8, "get mode/bw A")) {
+		for (bw = 0; bw < 3; bw++) if (replystr[6] == IC9100_bw_vals[bw]) break;
+	} else {
+		return A.iBW;
 	}
+	if (bw > 2) bw = 0;
+	A.iBW = bw;
 	return A.iBW;
 }
 
 void RIG_IC9100::set_bwA(int val)
 {
 	A.iBW = val;
-	if (A.imode == 5) return;
 	cmd = pre_to;
-	cmd.append("\x1a\x03");
-	cmd.append(to_bcd(A.iBW, 2));
-	cmd.append(post);
+	cmd += '\x01';
+	cmd += IC9100_mode_nbr[A.imode];
+	cmd += IC9100_bw_vals[A.iBW];
+	cmd.append( post );
 	if (IC9100_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-	waitFB("set bw A");
+	waitFB("set bandwidth A");
 }
 
 int RIG_IC9100::get_bwB()
 {
-	if (B.imode == 5) return 0;
-
+	int bw = 0;
 	cmd = pre_to;
-	cmd.append("\x1a\x03");
+	cmd += '\x04';
 	cmd.append(post);
 	string resp = pre_fm;
-	resp.append("\x1a\x03");
-	if (waitFOR(8, "get bw A")) {
-		size_t p = replystr.rfind(resp);
-		B.iBW = fm_bcd(&replystr[p+6], 2);
+	resp += '\x04';
+	if (waitFOR(8, "get mode/bw B")) {
+		for (bw = 0; bw < 3; bw++) if (replystr[6] == IC9100_bw_vals[bw]) break;
+	} else {
+		return B.iBW;
 	}
+	if (bw > 2) bw = 0;
+	B.iBW = bw;
 	return B.iBW;
 }
 
 void RIG_IC9100::set_bwB(int val)
 {
 	B.iBW = val;
-	if (B.imode == 5) return;
 	cmd = pre_to;
-	cmd.append("\x1a\x03");
-	cmd.append(to_bcd(A.iBW, 2));
-	cmd.append(post);
+	cmd += '\x01';
+	cmd += IC9100_mode_nbr[B.imode];
+	cmd += IC9100_bw_vals[B.iBW];
+	cmd.append( post );
 	if (IC9100_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-	waitFB("set bw B");
+	waitFB("set bandwidth B");
 }
 
 int RIG_IC9100::adjust_bandwidth(int m)
 {
-	int bw = 0;
-	switch (m) {
-		case 2: // AM
-			bandwidths_ = IC9100_am_bws;
-			bw_vals_ = IC9100_bw_vals_AM;
-			bw = 19;
-			break;
-		case 5: // FM
-			bandwidths_ = IC9100_fm_bws;
-			bw_vals_ = IC9100_bw_vals_FM;
-			bw = 0;
-			break;
-		case 4: case 7: // RTTY
-			bandwidths_ = IC9100_rtty_bws;
-			bw_vals_ = IC9100_bw_vals_RTTY;
-			bw = 12;
-			break;
-		case 3: case 6: // CW
-			bandwidths_ = IC9100_ssb_bws;
-			bw_vals_ = IC9100_bw_vals_SSB;
-			bw = 12;
-			break;
-		case 8: case 9: // PKT
-			bandwidths_ = IC9100_ssb_bws;
-			bw_vals_ = IC9100_bw_vals_SSB;
-			bw = 34;
-			break;
-		case 0: case 1: // SSB
-		case 10: case 11 : case 12 :
-		case 13: case 14 : case 15 :
-		default:
-			bandwidths_ = IC9100_ssb_bws;
-			bw_vals_ = IC9100_bw_vals_SSB;
-			bw = 34;
-	}
-	return bw;
+	return 0;
 }
 
 int RIG_IC9100::def_bandwidth(int m)
 {
-	int bw = 0;
-	switch (m) {
-		case 2: // AM
-			bw = 19;
-			break;
-		case 5: // FM
-			bw = 0;
-			break;
-		case 4: case 7: // RTTY
-			bw = 12;
-			break;
-		case 3: case 6: // CW
-			bw = 12;
-			break;
-		case 8: case 9: // PKT
-			bw = 34;
-			break;
-		case 0: case 1: // SSB
-		case 10: case 11 : case 12 :
-		case 13: case 14 : case 15 :
-		default:
-			bw = 34;
-	}
-	return bw;
+	return 0;
 }
 
 void RIG_IC9100::set_mic_gain(int v)
@@ -796,18 +642,5 @@ int  RIG_IC9100::get_split()
 {
 	LOG_WARN("%s", "get split - not implemented");
 	return progStatus.split;
-/*
-	cmd = pre_to;
-	cmd += 0x0F;
-	cmd.append(post);
-	string resp = pre_fm;
-	resp += 0x0F;
-	if (waitFOR(8, "get split")) {
-		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			return (replystr[p+6] ? 1 : 0);
-	}
-	return 0;
-*/
 }
 
