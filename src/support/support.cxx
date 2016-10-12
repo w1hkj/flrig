@@ -678,6 +678,41 @@ void read_squelch()
 	Fl::awake(update_squelch, (void*)0);
 }
 
+struct POLL_PAIR { 
+	int *poll; 
+	void (*pollfunc)();
+};
+
+POLL_PAIR RX_poll_pairs[] = {
+	{&progStatus.poll_frequency, read_vfo},
+	{&progStatus.poll_mode, read_mode},
+	{&progStatus.poll_bandwidth, read_bandwidth},
+	{&progStatus.poll_smeter, read_smeter},
+	{&progStatus.poll_volume, read_volume},
+	{&progStatus.poll_auto_notch, read_auto_notch},
+	{&progStatus.poll_notch, read_notch},
+	{&progStatus.poll_ifshift, read_ifshift},
+	{&progStatus.poll_power_control, read_power_control},
+	{&progStatus.poll_pre_att, read_preamp_att},
+	{&progStatus.poll_micgain, read_mic_gain},
+	{&progStatus.poll_squelch, read_squelch},
+	{&progStatus.poll_rfgain, read_rfgain},
+	{&progStatus.poll_split, read_split},
+	{&progStatus.poll_vfoAorB, read_vfoAorB},
+	{&progStatus.poll_nr, read_nr},
+	{&progStatus.poll_noise, read_noise},
+	{NULL, NULL}
+};
+
+POLL_PAIR TX_poll_pairs[] = {
+	{&progStatus.poll_pout, read_power_out},
+	{&progStatus.poll_swr, read_swr},
+	{&progStatus.poll_alc, read_alc},
+	{NULL, NULL}
+};
+
+POLL_PAIR *poll_parameters;
+
 static bool resetrcv = true;
 static bool resetxmt = true;
 
@@ -911,9 +946,11 @@ void * serial_thread_loop(void *d)
 
 		if (!PTT) {
 			serviceA();
-			if (!quePTT.empty()) continue;
+			if (!quePTT.empty())
+				continue;
 			serviceB();
-			if (que_pending()) continue;
+			if (que_pending())
+				continue;
 
 			if (resetrcv) {
 				Fl::awake(zeroXmtMeters, 0);
@@ -923,10 +960,9 @@ void * serial_thread_loop(void *d)
 			}
 			resetxmt = true;
 
-			if (!loopcount--) {
+			if (--loopcount <= 0) {
 				loopcount = progStatus.serloop_timing / 10;
 				poll_nbr++;
-//LOG_INFO("============ query xcvr ============");
 
 				if (xcvr_name == rig_K3.name_) {
 					if (que_pending()) continue;
@@ -936,149 +972,22 @@ void * serial_thread_loop(void *d)
 					if (que_pending()) continue;
 					read_KX3();
 				}
-				else if ((xcvr_name == rig_K2.name_) ||
-						 (selrig->has_get_info &&
-						 (progStatus.poll_frequency || progStatus.poll_mode || progStatus.poll_bandwidth))) {
-					if (que_pending()) continue;
-					read_info();
-				}
 				else {
-					if (progStatus.poll_frequency)
-						if (!(poll_nbr % progStatus.poll_frequency)) {
-							read_vfo();
-						}
-
-					if (bypass_serial_thread_loop) goto serial_bypass_loop;
-					if (que_pending()) continue;
-
-					if (progStatus.poll_mode)
-						if (!(poll_nbr % progStatus.poll_mode)) {
-							read_mode();
-						}
-
-					if (bypass_serial_thread_loop) goto serial_bypass_loop;
-					if (que_pending()) continue;
-
-					if (progStatus.poll_bandwidth)
-						if (!(poll_nbr % progStatus.poll_bandwidth)) {
-							read_bandwidth();
-						}
-
-					if (bypass_serial_thread_loop) goto serial_bypass_loop;
-					if (que_pending()) continue;
+					if ((xcvr_name == rig_K2.name_) ||
+						(selrig->has_get_info &&
+							(progStatus.poll_frequency ||
+							 progStatus.poll_mode || 
+							 progStatus.poll_bandwidth) ) )
+						read_info();
+					if (que_pending() || bypass_serial_thread_loop) continue;
+					poll_parameters = &RX_poll_pairs[0];
+					while (poll_parameters->poll) {
+						if (que_pending() || bypass_serial_thread_loop) break;
+						if (*(poll_parameters->poll) && !(poll_nbr % *(poll_parameters->poll)))
+							(poll_parameters->pollfunc)();
+						poll_parameters++;
+					}
 				}
-
-				if (progStatus.poll_smeter)
-					if (!(poll_nbr % progStatus.poll_smeter)) {
-						read_smeter();
-					}
-
-				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (que_pending()) continue;
-
-				if (progStatus.poll_volume)
-					if (!(poll_nbr % progStatus.poll_volume)) {
-						read_volume();
-					}
-
-				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (que_pending()) continue;
-
-				if (progStatus.poll_auto_notch)
-					if (!(poll_nbr % progStatus.poll_auto_notch)) {
-						read_auto_notch();
-					}
-
-				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (que_pending()) continue;
-
-				if (progStatus.poll_notch)
-					if (!(poll_nbr % progStatus.poll_notch)) {
-						read_notch();
-					}
-
-				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (que_pending()) continue;
-
-				if (progStatus.poll_ifshift)
-					if (!(poll_nbr % progStatus.poll_ifshift)) {
-						read_ifshift();
-					}
-
-				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (que_pending()) continue;
-
-				if (progStatus.poll_power_control)
-					if (!(poll_nbr % progStatus.poll_power_control)) {
-						read_power_control();
-					}
-
-				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (que_pending()) continue;
-
-				if (progStatus.poll_pre_att)
-					if (!(poll_nbr % progStatus.poll_pre_att)) {
-						read_preamp_att();
-					}
-
-				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (que_pending()) continue;
-
-				if (progStatus.poll_micgain)
-					if (!(poll_nbr % progStatus.poll_micgain)) {
-						read_mic_gain();
-					}
-
-				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (que_pending()) continue;
-
-				if (progStatus.poll_squelch)
-					if (!(poll_nbr % progStatus.poll_squelch)) {
-						read_squelch();
-					}
-
-				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (que_pending()) continue;
-
-				if (progStatus.poll_rfgain)
-					if (!(poll_nbr % progStatus.poll_rfgain)) {
-						read_rfgain();
-					}
-
-				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (que_pending()) continue;
-
-				if (progStatus.poll_split)
-					if (!(poll_nbr % progStatus.poll_split)) {
-						read_split();
-					}
-
-				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (que_pending()) continue;
-
-				if (progStatus.poll_vfoAorB)
-					if (!(poll_nbr % progStatus.poll_vfoAorB)) {
-						read_vfoAorB();
-					}
-				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (que_pending()) continue;
-
-				if (progStatus.poll_nr)
-					if (!(poll_nbr % progStatus.poll_nr)) {
-						read_nr();
-					}
-
-				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-				if (que_pending()) continue;
-
-				if (progStatus.poll_noise)
-					if (!(poll_nbr % progStatus.poll_noise)) {
-						read_noise();
-					}
-
-				if (bypass_serial_thread_loop) goto serial_bypass_loop;
-
-//LOG_INFO("--");
 			}
 		} else {
 			if (resetxmt) {
@@ -1088,17 +997,16 @@ void * serial_thread_loop(void *d)
 				poll_nbr = 0;
 			}
 			resetrcv = true;
-			if (!loopcount--) {
+			if (--loopcount <= 0) {
 				loopcount = progStatus.serloop_timing / 10;
 				poll_nbr++;
-				if (progStatus.poll_pout)
-					if (!(poll_nbr % progStatus.poll_pout)) read_power_out();
-				if (!quePTT.empty()) continue;
-				if (progStatus.poll_swr)
-					if (!(poll_nbr % progStatus.poll_swr)) read_swr();
-				if (!quePTT.empty()) continue;
-				if (progStatus.poll_alc)
-					if (!(poll_nbr % progStatus.poll_alc)) read_alc();
+				poll_parameters = &TX_poll_pairs[0];
+				while (poll_parameters->poll) {
+					if (!quePTT.empty()) break;
+					if (*(poll_parameters->poll) && !(poll_nbr % *(poll_parameters->poll)))
+						(poll_parameters->pollfunc)();
+					poll_parameters++;
+				}
 			}
 		}
 serial_bypass_loop: ;
@@ -1438,10 +1346,7 @@ void cbAswapB()
 			queA.push(vfoA);
 		}
 	} else {
-//		{
-			guard_lock serial_lock(&mutex_serial, 39);
-//			bypass_serial_thread_loop = true;
-//		}
+		guard_lock serial_lock(&mutex_serial, 39);
 		if (!useB) {      // vfoA is used, swap vfos and update display B
 			vfoB.freq = FreqDispB->value();
 			FREQMODE temp = vfoB;
@@ -1457,21 +1362,13 @@ void cbAswapB()
 			FreqDispA->value(vfoA.freq);
 			FreqDispA->redraw();
 		}
-//		{
-			guard_lock queA_lock(&mutex_queA, 40);
-			while (!queA.empty()) queA.pop();
-			queA.push(vfoA);
-//		}
-//		{	
-			guard_lock queB_lock(&mutex_queB, 41);
-			while (!queB.empty()) queB.pop();
-			queB.push(vfoB);
-//		}
+		guard_lock queA_lock(&mutex_queA, 40);
+		while (!queA.empty()) queA.pop();
+		queA.push(vfoA);
+		guard_lock queB_lock(&mutex_queB, 41);
+		while (!queB.empty()) queB.pop();
+		queB.push(vfoB);
 		pushedB = true;
-//		{
-//			guard_lock serial_lock(&mutex_serial, 42);
-//			bypass_serial_thread_loop = false;
-//		}
 	}
 }
 

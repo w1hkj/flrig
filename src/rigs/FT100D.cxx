@@ -124,6 +124,22 @@ void RIG_FT100D::set_split(bool val)
 		showresp(WARN, HEX, "set split OFF", cmd, replystr);
 }
 
+//======================================================================
+// response to get_info()
+/*
+D: sendCommand:  cmd:  5, 00 00 00 01 FA
+D: readResponse: rsp:  8, 28 20 04 00 00 00 88 04
+W:07:47:40: status OK 50 ms
+cmd 00 00 00 01 FA
+ans 28 20 04 00 00 00 88 04
+D: sendCommand:  cmd:  5, 00 00 00 00 10
+D: readResponse: rsp: 32, 07 00 56 CB E8 11 08 00 03 81 00 00 03 33 21 22 0B 00 AB C0 C0 11 13 00 84 A0 00 00 03 33 01 21
+W:07:47:40: info OK 50 ms
+cmd 00 00 00 00 10
+ans 07 00 56 CB E8 11 08 00 03 81 00 00 03 33 21 22 0B 00 AB C0 C0 11 13 00 84 A0 00 00 03 33 01 21
+W: get_info: Vfo A = 14070000
+*/
+//======================================================================
 bool RIG_FT100D::get_info()
 {
 	bool memmode = false, vfobmode = false;
@@ -151,18 +167,17 @@ bool RIG_FT100D::get_info()
 	cmd[4] = 0x10;
 	ret = waitN(32, 100, "info");
 
-	if (ret >= 32) {
-		size_t p = ret - 32;
+	if (ret == 32) {
 		// primary
 		pfreq = 0;
 		for (size_t n = 1; n < 5; n++)
-			pfreq = pfreq * 256 + (unsigned char)replystr[p + n];
+			pfreq = pfreq * 256 + (unsigned char)replystr[n];
 		pfreq = pfreq * 1.25; // 100D resolution is 1.25 Hz / bit for read
-		pmode = replystr[p + 5] & 0x07;
+
+		pmode = replystr[5] & 0x07;
 		if (pmode > 7) pmode = 7;
-		pbw = (replystr[p + 5] >> 4) & 0x03;
+		pbw = (replystr[5] >> 4) & 0x03;
 		pbw = 3 - pbw;
-LOG_WARN("Vfo %c = %d", vfobmode ? 'B' : 'A', pfreq);
 		if (useB) {
 			B.freq = pfreq; B.imode = pmode; B.iBW = pbw;
 		} else {
@@ -221,6 +236,7 @@ int RIG_FT100D::get_bwA()
 
 long RIG_FT100D::get_vfoB()
 {
+printf("get_vfoB() %ld\n", A.freq);
 	return B.freq;
 }
 
