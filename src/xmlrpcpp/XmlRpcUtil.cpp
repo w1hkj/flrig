@@ -51,7 +51,7 @@ public:
     if (level <= _verbosity) { OutputDebugString(msg); OutputDebugString("\n"); }
 #else
     if (level <= _verbosity) std::cout << msg << std::endl; 
-#endif
+#endif  
   }
 
 } defaultLogHandler;
