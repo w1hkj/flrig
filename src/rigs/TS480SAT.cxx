@@ -950,6 +950,40 @@ void RIG_TS480SAT::get_rf_min_max_step(int &min, int &max, int &step)
 	min = 0; max = 100; step = 1;
 }
 
+// Noise blanker
+static int nb = 0;
+static int nb_val = 1;
+
+void RIG_TS480SAT::set_noise_reduction_val(int val)
+{
+	nb_val = val;
+	cmd.assign("NL");
+	cmd.append(to_decimal(nb_val, 3)).append(";");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET noise blanker val", cmd, replystr);
+}
+
+int  RIG_TS480SAT::get_noise_reduction_val()
+{
+	cmd = rsp = "NL;";
+	wait_char(';',6, 100, "GET noise blanker val", ASC);
+	size_t p = replystr.rfind("NL");
+	if (p == string::npos) return nb_val;
+	nb_val = atoi(&replystr[2]);
+	return nb_val;
+}
+
+void RIG_TS480SAT::set_noise_reduction(int val)
+{
+	nb = val;
+	if (!nb)
+		cmd.assign("NB0;");
+	else
+		cmd.assign("NB1;");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET noise blanker", cmd, replystr);
+}
+
 int  RIG_TS480SAT::get_agc()
 {
 	cmd = "GT;";

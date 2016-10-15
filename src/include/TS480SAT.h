@@ -106,6 +106,12 @@ public:
 	int  def_bandwidth(int m);
 	int  set_widths(int val);
 
+	void set_noise_reduction(int val);
+	void set_noise_reduction_val(int val);
+	int  get_noise_reduction_val();
+	void get_nr_min_max_step(int &min, int &max, int &step) {
+		min = 1; max = 10; step = 1; }
+
 	const char **bwtable(int);
 	const char **lotable(int);
 	const char **hitable(int);
