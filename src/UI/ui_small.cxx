@@ -113,7 +113,14 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	sldrVOLUME->when(FL_WHEN_CHANGED);
 	sldrVOLUME->reverse(true);
 
-	sldrRFGAIN = new Fl_Wheel_Value_Slider(54, 145, 156, 18, _("RF"));
+	btnAGC = new Fl_Light_Button(2, 145, 50, 18, _("AGC"));
+	btnAGC->tooltip(_("Automatic Gain Control"));
+	btnAGC->down_box(FL_THIN_DOWN_BOX);
+	btnAGC->value(0);
+	btnAGC->labelsize(12);
+	btnAGC->callback((Fl_Callback*)cb_btnAGC);
+
+	sldrRFGAIN = new Fl_Wheel_Value_Slider(54, 145, 156, 18);
 	sldrRFGAIN->tooltip(_("Adjust RF gain"));
 	sldrRFGAIN->type(5);
 	sldrRFGAIN->box(FL_THIN_DOWN_BOX);
@@ -1202,7 +1209,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			genericRx->hide();
 
 			cbo_nb_level = new Fl_ComboBox(12, 281, 80, 22, _("NB level"));
-			cbo_nb_level->tooltip(_("Select Transceiver"));
+			cbo_nb_level->tooltip(_("Noise Blanker"));
 			cbo_nb_level->box(FL_DOWN_BOX);
 			cbo_nb_level->color(FL_BACKGROUND_COLOR);
 			cbo_nb_level->selection_color(FL_BACKGROUND_COLOR);
@@ -1217,7 +1224,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			cbo_nb_level->end();
 
 			cbo_agc_level = new Fl_ComboBox(123, 281, 80, 22, _("AGC"));
-			cbo_agc_level->tooltip(_("Select Transceiver"));
+			cbo_agc_level->tooltip(_("AGC level"));
 			cbo_agc_level->box(FL_DOWN_BOX);
 			cbo_agc_level->color(FL_BACKGROUND_COLOR);
 			cbo_agc_level->selection_color(FL_BACKGROUND_COLOR);

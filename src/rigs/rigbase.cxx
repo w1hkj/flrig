@@ -85,6 +85,7 @@ rigbase::rigbase()
 	has_tune_control =
 	has_swr_control =
 	has_alc_control =
+	has_agc_control =
 	has_rf_control =
 	has_sql_control = 
 	has_data_port =

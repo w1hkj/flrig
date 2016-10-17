@@ -90,6 +90,9 @@ static int TS480SAT_FSK_bw_vals[] = { 1,2,3,4,WVALS_LIMIT};
 static const char *TS480SAT_FSKbw[] = {
 "FW0250;", "FW0500;", "FW1000;", "FW1500;" };
 
+static int agcval = 1;
+static bool fm_mode = false;
+
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
 	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
@@ -113,7 +116,6 @@ void RIG_TS480SAT::initialize()
 	rig_widgets[6].W = sldrMICGAIN;
 	rig_widgets[7].W = sldrPOWER;
 
-	if (progStatus.UIsize == small_ui) has_extras = false;
 	progStatus.rfgain = 100;
 	progStatus.volume = 25;
 	progStatus.power_level = 20;
@@ -161,12 +163,17 @@ RIG_TS480SAT::RIG_TS480SAT() {
 	has_notch_control = false;
 
 	has_extras = true;
+
+	has_noise_reduction =
+	has_noise_reduction_control =
+
 	has_split = true;
 	has_split_AB = true;
 	has_data_port = true;
 	has_micgain_control = true;
 	has_ifshift_control = true;
 	has_rf_control = true;
+	has_agc_control = true;
 	has_swr_control = true;
 	has_alc_control = true;
 	has_power_out = true;
@@ -518,6 +525,8 @@ const char **RIG_TS480SAT::hitable(int m)
 
 void RIG_TS480SAT::set_modeA(int val)
 {
+	if (val == 3) fm_mode = true;
+	else fm_mode = false;
 	A.imode = val;
 	cmd = "MD";
 	cmd += TS480SAT_mode_chr[val];
@@ -540,11 +549,15 @@ int RIG_TS480SAT::get_modeA()
 		A.imode = md;
 		A.iBW = set_widths(A.imode);
 	}
+	if (A.imode == 3) fm_mode = true;
+	else fm_mode = false;
 	return A.imode;
 }
 
 void RIG_TS480SAT::set_modeB(int val)
 {
+	if (val == 3) fm_mode = true;
+	else fm_mode = false;
 	B.imode = val;
 	cmd = "MD";
 	cmd += TS480SAT_mode_chr[val];
@@ -567,6 +580,8 @@ int RIG_TS480SAT::get_modeB()
 		B.imode = md;
 		B.iBW = set_widths(B.imode);
 	}
+	if (B.imode == 3) fm_mode = true;
+	else fm_mode = false;
 	return B.imode;
 }
 
@@ -935,3 +950,40 @@ void RIG_TS480SAT::get_rf_min_max_step(int &min, int &max, int &step)
 	min = 0; max = 100; step = 1;
 }
 
+int  RIG_TS480SAT::get_agc()
+{
+	cmd = "GT;";
+	wait_char(';', 6, 100, "GET agc val", ASC);
+	size_t p = replystr.rfind("GT");
+	if (p == string::npos) return agcval;
+	if (replystr[4] == ' ') return 0;
+	agcval = replystr[4] - '0' + 1; // '0' == off, '1' = fast, '2' = slow
+	return agcval;
+}
+
+int RIG_TS480SAT::incr_agc()
+{
+	if (fm_mode) return 0;
+	agcval++;
+	if (agcval == 4) agcval = 1;
+	cmd.assign("GT00");
+	cmd += (agcval + '0' - 1);
+	cmd += ";";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET agc", cmd, replystr);
+	return agcval;
+}
+
+
+static const char *agcstrs[] = {"FM", "AGC", "FST", "SLO"};
+const char *RIG_TS480SAT::agc_label()
+{
+	if (fm_mode) return agcstrs[0];
+	return agcstrs[agcval];
+}
+
+int  RIG_TS480SAT::agc_val()
+{
+	if (fm_mode) return 0;
+	return agcval;
+}

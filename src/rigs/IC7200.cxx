@@ -76,6 +76,7 @@ WVALS_LIMIT};
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol, 2, 125,  50 },
 	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },
+	{ (Fl_Widget *)btnAGC, 2, 145, 50 },
 	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },
 	{ (Fl_Widget *)sldrMICGAIN, 54, 165, 156 },
 	{ (Fl_Widget *)sldrSQUELCH, 266, 125, 156 },
@@ -124,6 +125,7 @@ RIG_IC7200::RIG_IC7200() {
 	has_power_out =
 	has_swr_control =
 	has_alc_control =
+	has_agc_control =
 	has_sql_control = true;
 	has_power_control = true;
 	has_volume_control = true;
@@ -155,14 +157,15 @@ void RIG_IC7200::initialize()
 {
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
-	rig_widgets[2].W = sldrRFGAIN;
-	rig_widgets[3].W = sldrMICGAIN;
-	rig_widgets[4].W = sldrSQUELCH;
-	rig_widgets[5].W = btnNR;
-	rig_widgets[6].W = sldrNR;
-	rig_widgets[7].W = btnNotch;
-	rig_widgets[8].W = sldrNOTCH;
-	rig_widgets[9].W = sldrPOWER;
+	rig_widgets[2].W = btnAGC;
+	rig_widgets[3].W = sldrRFGAIN;
+	rig_widgets[4].W = sldrMICGAIN;
+	rig_widgets[5].W = sldrSQUELCH;
+	rig_widgets[6].W = btnNR;
+	rig_widgets[7].W = sldrNR;
+	rig_widgets[8].W = btnNotch;
+	rig_widgets[9].W = sldrNOTCH;
+	rig_widgets[10].W = sldrPOWER;
 }
 
 //=============================================================================
@@ -971,4 +974,42 @@ void RIG_IC7200::get_notch_min_max_step(int &min, int &max, int &step)
 	min = 0;
 	max = 4040;
 	step = 20;
+}
+
+static int agcval = 0;
+int  RIG_IC7200::get_agc()
+{
+	cmd = pre_to;
+	cmd.append("\x16\x12");
+	cmd.append(post);
+	if (waitFOR(8, "get AGC")) {
+		size_t p = replystr.find(pre_fm);
+		if (p == string::npos) return agcval;
+		return (agcval = replystr[p+6]); // 0 = off, 1 = FAST, 2 = SLOW
+	}
+	return agcval;
+}
+
+int RIG_IC7200::incr_agc()
+{
+	agcval++;
+	if (agcval == 3) agcval = 0;
+	cmd = pre_to;
+	cmd.append("\x16\x12");
+	cmd += agcval;
+	cmd.append(post);
+	waitFB("set AGC");
+	return agcval;
+}
+
+
+static const char *agcstrs[] = {"AGC", "FST", "SLO"};
+const char *RIG_IC7200::agc_label()
+{
+	return agcstrs[agcval];
+}
+
+int  RIG_IC7200::agc_val()
+{
+	return (agcval + 1);
 }

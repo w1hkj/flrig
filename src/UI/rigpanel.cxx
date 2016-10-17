@@ -94,6 +94,7 @@ Fl_Box *bx_sep2b=(Fl_Box *)0;
 Fl_Group *grp_row2c=(Fl_Group *)0;
 Fl_Light_Button *btnNotch=(Fl_Light_Button *)0;
 Fl_Wheel_Value_Slider *sldrNOTCH=(Fl_Wheel_Value_Slider *)0;
+Fl_Light_Button *btnAGC=(Fl_Light_Button *)0;
 Fl_Wheel_Value_Slider *sldrRFGAIN=(Fl_Wheel_Value_Slider *)0;
 Fl_Box *bx_sep2c=(Fl_Box *)0;
 Fl_Group *grp_row2d=(Fl_Group *)0;
@@ -341,6 +342,10 @@ static void cb_mnuAbout(Fl_Menu_*, void*) {
 
 static void cb_btnALC_SWR(Fl_Button*, void*) {
 	cbALC_SWR();
+}
+
+static void cb_btnAGC(Fl_Button*, void*) {
+	cbAGC();
 }
 
 static void cb_scalePower(Fl_Button*, void*) {

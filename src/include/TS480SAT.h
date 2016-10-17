@@ -92,6 +92,11 @@ public:
 	int  get_rf_gain();
 	void get_rf_min_max_step(int &min, int &max, int &step);
 
+	int  get_agc();
+	int  incr_agc();
+	const char *agc_label();
+	int  agc_val();
+
 	void set_attenuator(int val);
 	int  get_attenuator();
 	void set_preamp(int val);

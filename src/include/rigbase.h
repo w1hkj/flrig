@@ -147,6 +147,7 @@ public:
 	bool has_tune_control;
 	bool has_swr_control;
 	bool has_alc_control;
+	bool has_agc_control;
 	bool has_rf_control;
 	bool has_sql_control;
 	bool has_smeter;
@@ -253,6 +254,11 @@ public:
 	virtual bool twovfos() {return false;}
 	virtual void swapvfos() {}
 	virtual bool  canswap() { return false;}
+
+	virtual int  get_agc() { return 0; }
+	virtual int  incr_agc() { return 0;}
+	virtual const char *agc_label() { return "";}
+	virtual int  agc_val() { return 0; }
 
 	virtual int  get_smeter(void) {return -1;}
 	virtual int  get_swr(void) {return -1;}

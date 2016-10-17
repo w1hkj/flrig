@@ -89,6 +89,7 @@ extern void setPTT( void *);
 extern void setPreampControl(void *);
 extern void setAttControl(void *);
 extern void setMicGainControl(void *);
+extern void setAGC(void *);
 
 extern void setMode();
 extern void setBW();
@@ -199,6 +200,8 @@ extern void cbPTT();
 extern void cbALC_SWR();
 //extern void cbPWR();
 extern void cbMute();
+extern void cbAGC();
+
 extern void cbEventLog();
 extern void cbBandSelect(int band);
 

@@ -86,6 +86,11 @@ public:
 	bool get_notch(int &val);
 	void get_notch_min_max_step(int &min, int &max, int &step);
 
+	int  get_agc();
+	int  incr_agc();
+	const char *agc_label();
+	int  agc_val();
+
 	int  adjust_bandwidth(int m);
 	int  def_bandwidth(int m);
 	void set_compression();

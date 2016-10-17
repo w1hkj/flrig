@@ -541,6 +541,13 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 			btnNotch->labelsize(16);
 			btnNotch->callback((Fl_Callback*)cb_btnNotch);
 
+			btnAGC = new Fl_Light_Button(xpos, ypos + ch/2, cw, rh, _("AGC"));
+			btnAGC->tooltip(_("Automatic Gain Control"));
+			btnAGC->down_box(FL_THIN_DOWN_BOX);
+			btnAGC->value(0);
+			btnAGC->labelsize(16);
+			btnAGC->callback((Fl_Callback*)cb_btnAGC);
+
 			col3a->end();
 
 			Fl_Group *col3b = new Fl_Group(xpos+cw, ypos, spw, ch,"");
@@ -564,7 +571,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 			sldrNOTCH->when(FL_WHEN_CHANGED);
 			sldrNOTCH->reverse(true);
 
-			sldrRFGAIN = new Fl_Wheel_Value_Slider(xpos+cw, ypos + ch/2, spw, rh, _("RF"));
+			sldrRFGAIN = new Fl_Wheel_Value_Slider(xpos+cw, ypos + ch/2, spw, rh);
 			sldrRFGAIN->tooltip(_("Adjust RF gain"));
 			sldrRFGAIN->type(5);
 			sldrRFGAIN->box(FL_THIN_DOWN_BOX);
@@ -925,7 +932,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				genericRx->hide();
 
 				cbo_nb_level = new Fl_ComboBox(xpos+90, by, 80, bh, _("NB level"));
-				cbo_nb_level->tooltip(_("Select Transceiver"));
+				cbo_nb_level->tooltip(_("Noise blanker level"));
 				cbo_nb_level->box(FL_DOWN_BOX);
 				cbo_nb_level->color(FL_BACKGROUND_COLOR);
 				cbo_nb_level->selection_color(FL_BACKGROUND_COLOR);
@@ -940,7 +947,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				cbo_nb_level->end();
 
 				cbo_agc_level = new Fl_ComboBox(xpos+244, by, 80, bh, _("AGC"));
-				cbo_agc_level->tooltip(_("Select Transceiver"));
+				cbo_agc_level->tooltip(_("AGC level"));
 				cbo_agc_level->box(FL_DOWN_BOX);
 				cbo_agc_level->color(FL_BACKGROUND_COLOR);
 				cbo_agc_level->selection_color(FL_BACKGROUND_COLOR);

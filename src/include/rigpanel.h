@@ -126,6 +126,7 @@ extern Fl_Box *bx_sep2b;
 extern Fl_Group *grp_row2c;
 extern Fl_Light_Button *btnNotch;
 extern Fl_Wheel_Value_Slider *sldrNOTCH;
+extern Fl_Light_Button *btnAGC;
 extern Fl_Wheel_Value_Slider *sldrRFGAIN;
 extern Fl_Box *bx_sep2c;
 extern Fl_Group *grp_row2d;

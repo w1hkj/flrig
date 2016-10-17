@@ -651,14 +651,22 @@ void update_rfgain(void *d)
 	if (spnrRFGAIN) spnrRFGAIN->value(progStatus.rfgain);
 }
 
+void read_agc()
+{
+	if (!selrig->has_agc_control) return;
+	progStatus.agc_level = selrig->get_agc();
+	Fl::awake(setAGC);
+}
+
 void read_rfgain()
 {
-	if (!selrig->has_rf_control || rfgain_changed) return;
-	{
+//	if (!selrig->has_rf_control || rfgain_changed) return;
+	if (selrig->has_rf_control) {
 		guard_lock serial_lock(&mutex_serial, 22);
 		progStatus.rfgain = selrig->get_rf_gain();
+		Fl::awake(update_rfgain, (void*)0);
+		read_agc();
 	}
-	Fl::awake(update_rfgain, (void*)0);
 }
 
 // squelch
@@ -1895,6 +1903,35 @@ void setSQUELCH()
 	if (spnrSQUELCH) sliders.push(SLIDER(SQL, spnrSQUELCH->value() ));
 }
 
+// val == 0 --> deactivate
+// val == 1 --> AGC off
+// val > 1  --> AGC active and set
+void redrawAGC()
+{
+	const char *lbl = selrig->agc_label();
+	int val = selrig->agc_val();
+
+	btnAGC->label(lbl);
+	btnAGC->redraw_label();
+	btnAGC->value(val > 1);
+	if (!val) btnAGC->deactivate();
+	else btnAGC->activate();
+}
+
+void setAGC(void *)
+{
+	if (!selrig->has_agc_control) return;
+	redrawAGC();
+}
+
+void cbAGC()
+{
+	if (!selrig->has_agc_control) return;
+	guard_lock serial_lock(&mutex_serial);
+	progStatus.agc_level = selrig->incr_agc();
+	redrawAGC();
+}
+
 void setRFGAIN()
 {
 	rfgain_changed = true;
@@ -2173,6 +2210,8 @@ void adjust_small_ui()
 	sldrSQUELCH->hide();
 	btnNR->hide();
 	sldrNR->hide();
+	btnAGC->hide();
+	sldrRFGAIN->redraw_label();
 
 	if (progStatus.schema == 1 && selrig->widgets[0].W != NULL) {
 		int i = 0;
@@ -2275,6 +2314,16 @@ void adjust_small_ui()
 	btnTune->position( btnTune->x(), y);
 	btnTune->redraw();
 
+	if (selrig->has_agc_control) {
+		btnAGC->show();
+		sldrRFGAIN->label("");
+		sldrRFGAIN->redraw_label();
+	} else {
+		btnAGC->hide();
+		sldrRFGAIN->label(_("RF"));
+		sldrRFGAIN->redraw_label();
+	}
+
 	if (xcvr_name == rig_FT1000MP.name_) {
 		y -= 20;
 		btnTune->position( btnTune->x(), y);
@@ -2365,6 +2414,8 @@ void adjust_wide_ui()
 	sldrSQUELCH->show();
 	btnNR->show();
 	sldrNR->show();
+	btnAGC->hide();
+	sldrRFGAIN->redraw_label();
 
 	if (xcvr_name == rig_TT550.name_) {
 		tabs550->show();
@@ -2390,6 +2441,15 @@ void adjust_wide_ui()
 		if (selrig->has_rit || selrig->has_xit || selrig->has_bfo)
 			tabsGeneric->add(genericRXB);
 		tabsGeneric->show();
+		if (selrig->has_agc_control) {
+			btnAGC->show();
+			sldrRFGAIN->label("");
+			sldrRFGAIN->redraw_label();
+		} else {
+			btnAGC->hide();
+			sldrRFGAIN->label(_("RF"));
+			sldrRFGAIN->redraw_label();
+		}
 	}
 
 	if (progStatus.tooltips) {
@@ -2431,6 +2491,16 @@ void adjust_touch_ui()
 
 	if (spnrSQUELCH) spnrSQUELCH->show();
 	if (sldrSQUELCH) sldrSQUELCH->show();
+
+	if (selrig->has_agc_control) {
+		btnAGC->show();
+		sldrRFGAIN->label("");
+		sldrRFGAIN->redraw_label();
+	} else {
+		btnAGC->hide();
+		sldrRFGAIN->label(_("RF"));
+		sldrRFGAIN->redraw_label();
+	}
 
 	btnNR->show();
 	if (spnrNR) spnrNR->show();
@@ -3566,6 +3636,15 @@ LOG_INFO("Use xcvr start values for Vfo A/B");
 			case wide_ui : case touch_ui : default :
 				btnAttenuator->deactivate();
 		}
+	}
+	if (selrig->has_agc_control) {
+		btnAGC->show();
+		sldrRFGAIN->label("");
+		sldrRFGAIN->redraw_label();
+	} else {
+		btnAGC->hide();
+		sldrRFGAIN->label(_("RF"));
+		sldrRFGAIN->redraw_label();
 	}
 
 // hijack the preamp control for a SPOT button on the TT550 Pegasus
