@@ -1,8 +1,35 @@
 
 
-=Version 1.3.26=
+=Version 1.3.27=
 
-2016-05-13  David Freese  <iam_w1hkj@w1hkj.com>
+2016-10-17  David Freese  <iam_w1hkj@w1hkj.com>
+
+	4d24585: New controls
+	f86e7d1: TS480SAT extras
+	c404c8a: Xmlrpcpp source director
+	efbbc70: FT100D
+	2fb8bbc: IC9100 mode/bw
+	c22d48a: TS990 TS590SG
+	5abb5bd: restore keep rig data
+	5166fea: TT 550 Pegasus mods
+	28f3c34: IC7300 serial defaults
+	5ba38d2: TS990 ALC/SWR
+
+2016-07-10  Kamal Mostafa  <kamal@whence.com>
+
+	d9cc0f6: fix XmlRpc tm_mday comparison typo
+
+2016-07-04  Robert Cunnings  <nw8l@whitemesa.com>
+
+	a10a7f2: mxe update
+
+2016-06-27  David Freese  <iam_w1hkj@w1hkj.com>
+
+	c3c68d9: IC756 volume range
+	765519d: C11 errors
+
+
+=Version 1.3.26=
 
 	8547731: IC7200 update
 
