@@ -28,20 +28,65 @@ bool IC9100_DEBUG = true;
 const char IC9100name_[] = "IC-9100";
 
 const char *IC9100modes_[] = {
-	"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R", "DV", NULL};
+"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R", "DV", 
+"LSB-D", "USB-D", NULL};
 
 const char IC9100_mode_type[] = {
-	'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U', 'U' };
+	'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U', 'U',
+	'L', 'U' };
 
 const char IC9100_mode_nbr[] = {
-	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07, 0x08, 0x17 };
+	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07, 0x08, 0x17,
+	0x00, 0x01 };
 
-const char *IC9100_bws[] = { "FIL1", "FIL2", "FIL3", NULL };
-const int IC9100_bw_vals[] = { 0x01, 0x02, 0x03, WVALS_LIMIT};
+const char *IC9100_ssb_bws[] = {
+"50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
+"600",   "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
+"1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
+"2600", "2700", "2800", "2900", "3000", "3100", "3200", "3300", "3400", "3500",
+"3600", NULL };
+
+static int IC9100_bw_vals_SSB[] = {
+ 1, 2, 3, 4, 5, 6, 7, 8, 9,10,
+11,12,13,14,15,16,17,18,19,20,
+21,22,23,24,25,26,27,28,29,30,
+31,32,33,34,35,36,37,38,39,40,
+41, WVALS_LIMIT};
+
+const char *IC9100_rtty_bws[] = {
+"50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
+"600",   "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
+"1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
+"2600", "2700", NULL };
+
+static int IC9100_bw_vals_RTTY[] = {
+ 1, 2, 3, 4, 5, 6, 7, 8, 9,10,
+11,12,13,14,15,16,17,18,19,20,
+21,22,23,24,25,26,27,28,29,30,
+31,32, WVALS_LIMIT};
+
+const char *IC9100_am_bws[] = {
+"200",   "400",  "600",  "800", "1000", "1200", "1400", "1600", "1800", "2000",
+"2200", "2400", "2600", "2800", "3000", "3200", "3400", "3600", "3800", "4000",
+"4200", "4400", "4600", "4800", "5000", "5200", "5400", "5600", "5800", "6000",
+"6200", "6400", "6600", "6800", "7000", "7200", "7400", "9100", "7800", "8000",
+"8200", "8400", "8600", "8800", "9000", "9200", "9400", "9600", "9800", "10000", NULL };
+
+static int IC9100_bw_vals_AM[] = {
+ 1, 2, 3, 4, 5, 6, 7, 8, 9,10,
+11,12,13,14,15,16,17,18,19,20,
+21,22,23,24,25,26,27,28,29,30,
+31,32,33,34,35,36,37,38,39,40,
+41,42,43,44,45,46,47,48,49,50,
+WVALS_LIMIT};
+
+const char *IC9100_fm_bws[] = {"FIXED", NULL };
+static int IC9100_bw_vals_FM[] = {1, WVALS_LIMIT};
 
 static GUI IC9100_widgets[]= {
 	{ (Fl_Widget *)btnVol, 2, 125,  50 },
 	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },
+	{ (Fl_Widget *)btnAGC, 2, 145, 50 },
 	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },
 	{ (Fl_Widget *)sldrSQUELCH, 54, 165, 156 },
 	{ (Fl_Widget *)btnNR, 2, 185,  50 },
@@ -59,8 +104,9 @@ RIG_IC9100::RIG_IC9100() {
 	defaultCIV = 0x7C;
 	name_ = IC9100name_;
 	modes_ = IC9100modes_;
-	bandwidths_ = IC9100_bws;
-	bw_vals_ = IC9100_bw_vals;
+
+	bandwidths_ = IC9100_ssb_bws;
+	bw_vals_ = IC9100_bw_vals_SSB;
 
 	_mode_type = IC9100_mode_type;
 	adjustCIV(defaultCIV);
@@ -82,6 +128,7 @@ RIG_IC9100::RIG_IC9100() {
 	has_power_out =
 	has_alc_control =
 	has_swr_control =
+	has_agc_control =
 
 	has_compON =
 	has_compression =
@@ -107,16 +154,17 @@ void RIG_IC9100::initialize()
 {
 	IC9100_widgets[0].W = btnVol;
 	IC9100_widgets[1].W = sldrVOLUME;
-	IC9100_widgets[2].W = sldrRFGAIN;
-	IC9100_widgets[3].W = sldrSQUELCH;
-	IC9100_widgets[4].W = btnNR;
-	IC9100_widgets[5].W = sldrNR;
-	IC9100_widgets[6].W = btnIFsh;
-	IC9100_widgets[7].W = sldrIFSHIFT;
-	IC9100_widgets[8].W = btnNotch;
-	IC9100_widgets[9].W = sldrNOTCH;
-	IC9100_widgets[10].W = sldrMICGAIN;
-	IC9100_widgets[11].W = sldrPOWER;
+	IC9100_widgets[2].W = btnAGC;
+	IC9100_widgets[3].W = sldrRFGAIN;
+	IC9100_widgets[4].W = sldrSQUELCH;
+	IC9100_widgets[5].W = btnNR;
+	IC9100_widgets[6].W = sldrNR;
+	IC9100_widgets[7].W = btnIFsh;
+	IC9100_widgets[8].W = sldrIFSHIFT;
+	IC9100_widgets[9].W = btnNotch;
+	IC9100_widgets[10].W = sldrNOTCH;
+	IC9100_widgets[11].W = sldrMICGAIN;
+	IC9100_widgets[12].W = sldrPOWER;
 	cmd = pre_to;
 	cmd += '\x1A'; cmd += '\x05';
 	cmd += '\x00'; cmd += '\x58'; cmd += '\x00';
@@ -153,6 +201,13 @@ void RIG_IC9100::set_modeA(int val)
 	if (IC9100_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	waitFB("set mode A");
+
+	cmd = pre_to;
+	cmd += '\x1A'; cmd += '\x06';
+	if (A.imode > 8) cmd += '\x01';
+	else cmd += '\x00';
+	cmd.append( post);
+	waitFB("data mode");
 }
 
 int RIG_IC9100::get_modeA()
@@ -170,7 +225,24 @@ int RIG_IC9100::get_modeA()
 		return A.imode;
 	}
 	if (md > 8) md = 1; // force USB
+
+	cmd = pre_to;
+	cmd += "\x1A\x06";
+	cmd.append(post);
+	resp = pre_fm;
+	resp += "\x1A\x06";
+	if (waitFOR(9, "data mode?")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			if ((replystr[p+6] & 0x01) == 0x01) {
+				if (md == 0) md = 9;
+				if (md == 1) md = 10;
+			}
+		}
+	}
+
 	A.imode = md;
+
 	return A.imode;
 }
 
@@ -184,6 +256,13 @@ void RIG_IC9100::set_modeB(int val)
 	if (IC9100_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	waitFB("set mode B");
+
+	cmd = pre_to;
+	cmd += '\x1A'; cmd += '\x06';
+	if (B.imode > 8) cmd += '\x01';
+	else cmd += '\x00';
+	cmd.append( post);
+	waitFB("data mode");
 }
 
 int RIG_IC9100::get_modeB()
@@ -201,80 +280,145 @@ int RIG_IC9100::get_modeB()
 		return B.imode;
 	}
 	if (md > 8) md = 1; // force USB
+
+	cmd = pre_to;
+	cmd += "\x1A\x06";
+	cmd.append(post);
+	resp = pre_fm;
+	resp += "\x1A\x06";
+	if (waitFOR(9, "data mode?")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			if ((replystr[p+6] & 0x01) == 0x01) {
+				if (md == 0) md = 9;
+				if (md == 1) md = 10;
+			}
+		}
+	}
+
 	B.imode = md;
-	return B.imode;
+
+	return A.imode;
 }
 
 int RIG_IC9100::get_bwA()
 {
-	int bw = 0;
+	if (A.imode == 5) return 0;
+
 	cmd = pre_to;
-	cmd += '\x04';
+	cmd.append("\x1a\x03");
 	cmd.append(post);
 	string resp = pre_fm;
-	resp += '\x04';
-	if (waitFOR(8, "get mode/bw A")) {
-		for (bw = 0; bw < 3; bw++) if (replystr[6] == IC9100_bw_vals[bw]) break;
-	} else {
-		return A.iBW;
+	resp.append("\x1a\x03");
+	if (waitFOR(8, "get bw A")) {
+		size_t p = replystr.rfind(resp);
+		A.iBW = fm_bcd(&replystr[p+6], 2);
 	}
-	if (bw > 2) bw = 0;
-	A.iBW = bw;
 	return A.iBW;
 }
 
 void RIG_IC9100::set_bwA(int val)
 {
 	A.iBW = val;
+	if (A.imode == 5) return;
 	cmd = pre_to;
-	cmd += '\x01';
-	cmd += IC9100_mode_nbr[A.imode];
-	cmd += IC9100_bw_vals[A.iBW];
-	cmd.append( post );
+	cmd.append("\x1a\x03");
+	cmd.append(to_bcd(A.iBW, 2));
+	cmd.append(post);
 	if (IC9100_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-	waitFB("set bandwidth A");
+	waitFB("set bw A");
 }
 
 int RIG_IC9100::get_bwB()
 {
-	int bw = 0;
+	if (B.imode == 5) return 0;
+
 	cmd = pre_to;
-	cmd += '\x04';
+	cmd.append("\x1a\x03");
 	cmd.append(post);
 	string resp = pre_fm;
-	resp += '\x04';
-	if (waitFOR(8, "get mode/bw B")) {
-		for (bw = 0; bw < 3; bw++) if (replystr[6] == IC9100_bw_vals[bw]) break;
-	} else {
-		return B.iBW;
+	resp.append("\x1a\x03");
+	if (waitFOR(8, "get bw A")) {
+		size_t p = replystr.rfind(resp);
+		B.iBW = fm_bcd(&replystr[p+6], 2);
 	}
-	if (bw > 2) bw = 0;
-	B.iBW = bw;
 	return B.iBW;
 }
 
 void RIG_IC9100::set_bwB(int val)
 {
 	B.iBW = val;
+	if (B.imode == 5) return;
 	cmd = pre_to;
-	cmd += '\x01';
-	cmd += IC9100_mode_nbr[B.imode];
-	cmd += IC9100_bw_vals[B.iBW];
-	cmd.append( post );
+	cmd.append("\x1a\x03");
+	cmd.append(to_bcd(A.iBW, 2));
+	cmd.append(post);
 	if (IC9100_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-	waitFB("set bandwidth B");
+	waitFB("set bw B");
 }
 
+// LSB, USB, AM, CW, RTTY, FM, CW-R, RTTY-R, DV, LSB-D, USB-D
+//  0    1    2   3   4     5   6      7      8    9     10
 int RIG_IC9100::adjust_bandwidth(int m)
 {
-	return 0;
+	int bw = 0;
+	switch (m) {
+		case 2: // AM
+			bandwidths_ = IC9100_am_bws;
+			bw_vals_ = IC9100_bw_vals_AM;
+			bw = 19;
+			break;
+		case 5: // FM
+			bandwidths_ = IC9100_fm_bws;
+			bw_vals_ = IC9100_bw_vals_FM;
+			bw = 0;
+			break;
+		case 4: case 7: // RTTY
+			bandwidths_ = IC9100_rtty_bws;
+			bw_vals_ = IC9100_bw_vals_RTTY;
+			bw = 12;
+			break;
+		case 3: case 6: // CW
+			bandwidths_ = IC9100_ssb_bws;
+			bw_vals_ = IC9100_bw_vals_SSB;
+			bw = 12;
+			break;
+		case 8:          // DV
+		case 0: case 1:  // SSB
+		case 9: case 10: // DATA
+		default:
+			bandwidths_ = IC9100_ssb_bws;
+			bw_vals_ = IC9100_bw_vals_SSB;
+			bw = 34;
+	}
+	return bw;
 }
 
 int RIG_IC9100::def_bandwidth(int m)
 {
-	return 0;
+	int bw = 0;
+	switch (m) {
+		case 2:          // AM
+			bw = 19;
+			break;
+		case 5:          // FM
+			bw = 0;
+			break;
+		case 4: case 7:  // RTTY
+			bw = 12;
+			break;
+		case 3: case 6:  // CW
+			bw = 12;
+			break;
+		case 8:          // DV
+		case 0: case 1:  // SSB
+		case 9: case 10: // DATA MODES
+		default:
+			bw = 34;
+	}
+	return bw;
 }
 
 void RIG_IC9100::set_mic_gain(int v)
@@ -642,5 +786,54 @@ int  RIG_IC9100::get_split()
 {
 	LOG_WARN("%s", "get split - not implemented");
 	return progStatus.split;
+
+	cmd = pre_to;
+	cmd += 0x0F;
+	cmd.append(post);
+	string resp = pre_fm;
+	resp += 0x0F;
+	if (waitFOR(8, "get split")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return (replystr[p+6] == 0x01 ? 1 : 0);
+	}
+	return 0;
 }
 
+static int agcval = 1;
+int  RIG_IC9100::get_agc()
+{
+	cmd = pre_to;
+	cmd.append("\x16\x12");
+	cmd.append(post);
+	if (waitFOR(8, "get AGC")) {
+		size_t p = replystr.find(pre_fm);
+		if (p == string::npos) return agcval;
+		return (agcval = replystr[p+6]); // 1 = FAST, 2 = MID, 3 = SLOW
+	}
+	return agcval;
+}
+
+int RIG_IC9100::incr_agc()
+{
+	agcval++;
+	if (agcval == 4) agcval = 1;
+	cmd = pre_to;
+	cmd.append("\x16\x12");
+	cmd += agcval;
+	cmd.append(post);
+	waitFB("set AGC");
+	return agcval;
+}
+
+
+static const char *agcstrs[] = {"FST", "MID", "SLO"};
+const char *RIG_IC9100::agc_label()
+{
+	return agcstrs[agcval - 1];
+}
+
+int  RIG_IC9100::agc_val()
+{
+	return (agcval);
+}

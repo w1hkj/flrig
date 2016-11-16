@@ -89,6 +89,11 @@ public:
 	int get_swr();
 	int get_alc();
 
+	int  get_agc();
+	int  incr_agc();
+	const char *agc_label();
+	int  agc_val();
+
 	int  get_auto_notch();
 	void set_auto_notch(int v);
 	void set_notch(bool on, int val);
