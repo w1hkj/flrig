@@ -28,19 +28,13 @@ bool IC7300_DEBUG = true;
 const char IC7300name_[] = "IC-7300";
 
 const char *IC7300modes_[] = {
-	"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R", "PSK", "PSK-R", 
-	"LSB-D1", "LSB-D2", "LSB-D3",
-	"USB-D1", "USB-D2", "USB-D3", NULL};
+	"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R", "LSB-D", "USB-D", NULL};
 
 const char IC7300_mode_type[] = {
-	'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U', 'U', 'L', 
-	'L', 'L', 'L',
-	'U', 'U', 'U' };
+	'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U', 'L', 'U' };
 
 const char IC7300_mode_nbr[] = {
-	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07, 0x08, 0x12, 0x13, 
-	0x00, 0x00, 0x00,
-	0x01, 0x01, 0x01 };
+	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07, 0x08, 0x00, 0x01 };
 
 const char *IC7300_ssb_bws[] = {
 "50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
@@ -310,27 +304,19 @@ void RIG_IC7300::swapvfos()
 	waitFB("swap vfos");
 }
 
+// LSB  USB  AM   CW  RTTY  FM  CW-R  RTTY-R  LSB-D  USB-D
+//  0    1    2    3   4     5    6     7      8      9  
+
 void RIG_IC7300::set_modeA(int val)
 {
 	A.imode = val;
 	cmd = pre_to;
-	cmd += '\x06';
+	cmd += '\x26';
 	cmd += IC7300_mode_nbr[val];
+	if (val > 7) cmd += '\x01';
+	else cmd += '\x00';
 	cmd.append( post );
 	waitFB("set modeA");
-
-// digital set / clear
-	if (val >= 10) {
-		cmd = pre_to;
-		cmd.append("\x1A\x06");
-		switch (val) {
-			case 10 : case 13 : cmd.append("\x01\x01"); break;
-			case 11 : case 14 : cmd.append("\x02\x01"); break;
-			case 12 : case 15 : cmd.append("\x03\x01"); break;
-		}
-		cmd.append( post);
-		waitFB("set digital mode ON/OFF");
-	}
 }
 
 int RIG_IC7300::get_modeA()
@@ -338,9 +324,9 @@ int RIG_IC7300::get_modeA()
 	int md = 0;
 	string resp;
 	size_t p;
-	cmd.assign(pre_to).append("\x04").append(post);
-	if (waitFOR(8, "get mode A")) {
-		resp.assign(pre_fm).append("\x04");
+	cmd.assign(pre_to).append("\x26").append(post);
+	if (waitFOR(9, "get mode A")) {
+		resp.assign(pre_fm).append("\x26");
 		p = replystr.rfind(resp);
 		if (p == string::npos) return A.imode;
 		for (md = 0; md < 10; md++) {
@@ -348,42 +334,21 @@ int RIG_IC7300::get_modeA()
 				A.imode = md;
 			}
 		}
-		if (A.imode < 2) {
-			cmd.assign(pre_to).append("\x1A\x06").append(post);
-			if (waitFOR(9, "data mode?")) {
-				resp.assign(pre_fm).append("\x1A\x06");
-				p = replystr.rfind(resp);
-				if (p == string::npos) return A.imode;
-				int dmode = replystr[p+6];
-				if (A.imode == 0) A.imode = 9 + dmode;
-				else if (A.imode == 1) A.imode = 12 + dmode;
-			}
-		}
+		if (replystr[p+6] == 0x01) A.imode += 8;
 	}
-	if (A.imode > 15) A.imode = 0;
+	if (A.imode > 9) A.imode = 1;
 	return A.imode;
 }
 
 void RIG_IC7300::set_modeB(int val)
 {
 	B.imode = val;
-	cmd.assign(pre_to).append("\x06");
+	cmd.assign(pre_to).append("\x26");
 	cmd += IC7300_mode_nbr[val];
+	if (val > 7) cmd += '\x01';
+	else cmd += '\x00';
 	cmd.append( post );
 	waitFB("set modeB");
-
-// digital set / clear
-	if (val >= 10) {
-		cmd = pre_to;
-		cmd.append("\x1A\x06");
-		switch (val) {
-			case 10 : case 13 : cmd.append("\x01\x01"); break;
-			case 11 : case 14 : cmd.append("\x02\x01"); break;
-			case 12 : case 15 : cmd.append("\x03\x01"); break;
-		}
-		cmd.append( post);
-		waitFB("set digital mode ON/OFF");
-	}
 }
 
 int RIG_IC7300::get_modeB()
@@ -391,28 +356,19 @@ int RIG_IC7300::get_modeB()
 	int md = 0;
 	string resp;
 	size_t p;
-	cmd.assign(pre_to).append("\x04").append(post);
-	if (waitFOR(8, "get mode B")) {
-		resp.assign(pre_fm).append("\x04");
+	cmd.assign(pre_to).append("\x26").append(post);
+	if (waitFOR(9, "get mode B")) {
+		resp.assign(pre_fm).append("\x26");
 		p = replystr.rfind(resp);
 		if (p == string::npos) return B.imode;
-		for (md = 0; md < 10; md++) if (replystr[p+5] == IC7300_mode_nbr[md]) break;
-		if (md == 10) md = 0;
-		B.imode = md;
-
-		if (B.imode < 2) {
-			cmd.assign(pre_to).append("\x1A\x06").append(post);
-			if (waitFOR(9, "data mode?")) {
-				resp.assign(pre_fm).append("\x1A\x06");
-				p = replystr.rfind(resp);
-				if (p == string::npos) return B.imode;
-				int dmode = replystr[p+6];
-				if (B.imode == 0) B.imode = 9 + dmode;
-				else if (B.imode == 1) B.imode = 12 + dmode;
+		for (md = 0; md < 10; md++) {
+			if (replystr[p+5] == IC7300_mode_nbr[md]) {
+				B.imode = md;
 			}
 		}
+		if (replystr[p+6] == 0x01) B.imode += 8;
 	}
-	if (B.imode > 15) B.imode = 0;
+	if (B.imode > 9) B.imode = 1;
 	return B.imode;
 }
 
@@ -424,7 +380,7 @@ int RIG_IC7300::get_bwA()
 	cmd.append(post);
 	if (waitFOR(8, "get_bwA")) {
 		string resp = pre_fm;
-		resp.append("\x1A\x02");
+		resp.append("\x1A\x03");
 		size_t p = replystr.find(resp);
 		if (p != string::npos)
 			A.iBW = fm_bcd(&replystr[p+6], 2);
@@ -452,7 +408,7 @@ int RIG_IC7300::get_bwB()
 	cmd.append(post);
 	if (waitFOR(8, "get_bwB")) {
 		string resp = pre_fm;
-		resp.append("\x1A\x02");
+		resp.append("\x1A\x03");
 		size_t p = replystr.find(resp);
 		if (p != string::npos)
 			B.iBW = fm_bcd(&replystr[p+6], 2);
@@ -472,6 +428,8 @@ void RIG_IC7300::set_bwB(int val)
 	waitFB("set bwB");
 }
 
+// LSB  USB  AM   CW  RTTY  FM  CW-R  RTTY-R  LSB-D  USB-D
+//  0    1    2    3   4     5    6     7      8      9  
 int RIG_IC7300::adjust_bandwidth(int m)
 {
 	int bw = 0;
@@ -500,15 +458,8 @@ int RIG_IC7300::adjust_bandwidth(int m)
 			bw_size_ = sizeof(IC7300_bw_vals_SSB);
 			bw = 12;
 			break;
-		case 8: case 9: // PKT
-			bandwidths_ = IC7300_ssb_bws;
-			bw_vals_ = IC7300_bw_vals_SSB;
-			bw_size_ = sizeof(IC7300_bw_vals_SSB);
-			bw = 34;
-			break;
+		case 8: case 9: // DATA
 		case 0: case 1: // SSB
-		case 10: case 11 : case 12 :
-		case 13: case 14 : case 15 :
 		default:
 			bandwidths_ = IC7300_ssb_bws;
 			bw_vals_ = IC7300_bw_vals_SSB;
@@ -534,12 +485,8 @@ int RIG_IC7300::def_bandwidth(int m)
 		case 3: case 6: // CW
 			bw = 12;
 			break;
-		case 8: case 9: // PKT
-			bw = 34;
-			break;
+		case 8: case 9: // DATA
 		case 0: case 1: // SSB
-		case 10: case 11 : case 12 :
-		case 13: case 14 : case 15 :
 		default:
 			bw = 34;
 	}
@@ -959,7 +906,6 @@ int RIG_IC7300::get_preamp()
 
 void RIG_IC7300::set_attenuator(int val)
 {
-	unsigned char level = 0x00;
 	if (atten_level == 0x00) {
 		atten_level = 0x06;
 		atten_label("6 dB", true);
