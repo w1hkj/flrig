@@ -200,6 +200,7 @@ struct status {
 	bool	tt550_at11_inline;
 	bool	tt550_at11_hiZ;
 
+// =========================
 //and others
 	double	vfo_adj;
 	int		bfo_freq;
@@ -209,7 +210,24 @@ struct status {
 	bool	use_bpf_center;
 
 // =========================
-
+// User command buttons
+   string	label1;
+   string	command1;
+   string	label2;
+   string	command2;
+   string	label3;
+   string	command3;
+   string	label4;
+   string	command4;
+   string	label5;
+   string	command5;
+   string	label6;
+   string	command6;
+   string	label7;
+   string	command7;
+   string	label8;
+   string	command8;
+// =========================
 	int		bg_red;
 	int		bg_green;
 	int		bg_blue;

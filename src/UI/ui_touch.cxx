@@ -1111,6 +1111,36 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 
 			genericAux->end();
 
+			genericUser = new Fl_Group(xpos, ypos+tabh, W, tabb, _("User"));
+				genericUser->hide();
+
+				btnUser1 = new Fl_Button(5, by, 80, 50, "USER 1");
+				btnUser1->callback((Fl_Callback*)cb_btnUser, (void*)1);
+
+				btnUser2 = new Fl_Button(90, by, 80, 50, "USER 2");
+				btnUser2->callback((Fl_Callback*)cb_btnUser, (void*)2);
+
+				btnUser3 = new Fl_Button(175, by, 80, 50, "USER 3");
+				btnUser3->callback((Fl_Callback*)cb_btnUser, (void*)3);
+
+				btnUser4 = new Fl_Button(260, by, 80, 50, "USER 4");
+				btnUser4->callback((Fl_Callback*)cb_btnUser, (void*)4);
+
+				btnUser5 = new Fl_Button(345, by, 80, 50, "USER 5");
+				btnUser5->callback((Fl_Callback*)cb_btnUser, (void*)5);
+
+				btnUser6 = new Fl_Button(430, by, 80, 50, "USER 6");
+				btnUser6->callback((Fl_Callback*)cb_btnUser, (void*)6);
+
+				btnUser7 = new Fl_Button(515, by, 80, 50, "USER 7");
+				btnUser7->callback((Fl_Callback*)cb_btnUser, (void*)7);
+
+				btnUser8 = new Fl_Button(600, by, 80, 50, "USER 8");
+				btnUser8->callback((Fl_Callback*)cb_btnUser, (void*)8);
+
+			genericUser->end();
+
+
 		tabsGeneric->end();
 
 		xpos = X;

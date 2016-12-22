@@ -18,82 +18,104 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
-Fl_Tabs *tabsConfig=(Fl_Tabs *)0;
-Fl_Group *tabPrimary=(Fl_Group *)0;
-Fl_ComboBox *selectRig=(Fl_ComboBox *)0;
-Fl_Counter *cntRigCatRetries=(Fl_Counter *)0;
-Fl_Counter *cntRigCatTimeout=(Fl_Counter *)0;
-Fl_Counter *cntRigCatWait=(Fl_Counter *)0;
-Fl_Counter *query_interval=(Fl_Counter *)0;
-Fl_Counter *byte_interval=(Fl_Counter *)0;
-Fl_ComboBox *selectCommPort=(Fl_ComboBox *)0;
-Fl_ComboBox *mnuBaudrate=(Fl_ComboBox *)0;
-Fl_Check_Button *btnTwoStopBit=(Fl_Check_Button *)0;
-Fl_Check_Button *btnOneStopBit=(Fl_Check_Button *)0;
-Fl_Check_Button *btnRigCatEcho=(Fl_Check_Button *)0;
-Fl_Round_Button *btncatptt=(Fl_Round_Button *)0;
-Fl_Round_Button *btnrtsptt=(Fl_Round_Button *)0;
-Fl_Round_Button *btndtrptt=(Fl_Round_Button *)0;
-Fl_Check_Button *chkrtscts=(Fl_Check_Button *)0;
-Fl_Check_Button *btnrtsplus=(Fl_Check_Button *)0;
-Fl_Check_Button *btndtrplus=(Fl_Check_Button *)0;
-Fl_Int_Input *txtCIV=(Fl_Int_Input *)0;
-Fl_Button *btnCIVdefault=(Fl_Button *)0;
-Fl_Check_Button *btnUSBaudio=(Fl_Check_Button *)0;
+Fl_Tabs *tabsConfig = (Fl_Tabs *)0;
+Fl_Group *tabPrimary = (Fl_Group *)0;
+Fl_ComboBox *selectRig = (Fl_ComboBox *)0;
+Fl_Counter *cntRigCatRetries = (Fl_Counter *)0;
+Fl_Counter *cntRigCatTimeout = (Fl_Counter *)0;
+Fl_Counter *cntRigCatWait = (Fl_Counter *)0;
+Fl_Counter *query_interval = (Fl_Counter *)0;
+Fl_Counter *byte_interval = (Fl_Counter *)0;
+Fl_ComboBox *selectCommPort = (Fl_ComboBox *)0;
+Fl_ComboBox *mnuBaudrate = (Fl_ComboBox *)0;
+Fl_Check_Button *btnTwoStopBit = (Fl_Check_Button *)0;
+Fl_Check_Button *btnOneStopBit = (Fl_Check_Button *)0;
+Fl_Check_Button *btnRigCatEcho = (Fl_Check_Button *)0;
+Fl_Round_Button *btncatptt = (Fl_Round_Button *)0;
+Fl_Round_Button *btnrtsptt = (Fl_Round_Button *)0;
+Fl_Round_Button *btndtrptt = (Fl_Round_Button *)0;
+Fl_Check_Button *chkrtscts = (Fl_Check_Button *)0;
+Fl_Check_Button *btnrtsplus = (Fl_Check_Button *)0;
+Fl_Check_Button *btndtrplus = (Fl_Check_Button *)0;
+Fl_Int_Input *txtCIV = (Fl_Int_Input *)0;
+Fl_Button *btnCIVdefault = (Fl_Button *)0;
+Fl_Check_Button *btnUSBaudio = (Fl_Check_Button *)0;
 Fl_Group *tabTCPIP = (Fl_Group *)0;
 Fl_Input2 *inp_tcpip_addr = (Fl_Input2 *)0;
 Fl_Input2 *inp_tcpip_port = (Fl_Input2 *)0;
-Fl_Check_Button *chk_use_tcpip=(Fl_Check_Button *)0;
-Fl_Box *box_tcpip_connect=(Fl_Box *)0;
-Fl_Counter *inp_tcpip_ping_delay=(Fl_Counter *)0;
-Fl_Counter *cntRetryAfter=(Fl_Counter *)0;
-Fl_Counter *cntDropsAllowed=(Fl_Counter *)0;
+Fl_Check_Button *chk_use_tcpip = (Fl_Check_Button *)0;
+Fl_Box *box_tcpip_connect = (Fl_Box *)0;
+Fl_Counter *inp_tcpip_ping_delay = (Fl_Counter *)0;
+Fl_Counter *cntRetryAfter = (Fl_Counter *)0;
+Fl_Counter *cntDropsAllowed = (Fl_Counter *)0;
 
-Fl_Group *tabPTT=(Fl_Group *)0;
-Fl_ComboBox *selectSepPTTPort=(Fl_ComboBox *)0;
-Fl_Round_Button *btnSepRTSptt=(Fl_Round_Button *)0;
-Fl_Check_Button *btnSepRTSplus=(Fl_Check_Button *)0;
-Fl_Round_Button *btnSepDTRptt=(Fl_Round_Button *)0;
-Fl_Check_Button *btnSepDTRplus=(Fl_Check_Button *)0;
-Fl_Group *tabAux=(Fl_Group *)0;
-Fl_ComboBox *selectAuxPort=(Fl_ComboBox *)0;
+Fl_Group *tabPTT = (Fl_Group *)0;
+Fl_ComboBox *selectSepPTTPort = (Fl_ComboBox *)0;
+Fl_Round_Button *btnSepRTSptt = (Fl_Round_Button *)0;
+Fl_Check_Button *btnSepRTSplus = (Fl_Check_Button *)0;
+Fl_Round_Button *btnSepDTRptt = (Fl_Round_Button *)0;
+Fl_Check_Button *btnSepDTRplus = (Fl_Check_Button *)0;
+Fl_Group *tabAux = (Fl_Group *)0;
+Fl_ComboBox *selectAuxPort = (Fl_ComboBox *)0;
 
-Fl_Group *tabPolling=(Fl_Group *)0;
-Fl_Value_Input *poll_smeter=(Fl_Value_Input *)0;
-Fl_Value_Input *poll_pout=(Fl_Value_Input *)0;
-Fl_Value_Input *poll_swr=(Fl_Value_Input *)0;
-Fl_Value_Input *poll_alc=(Fl_Value_Input *)0;
-Fl_Value_Input *poll_frequency=(Fl_Value_Input *)0;
-Fl_Value_Input *poll_mode=(Fl_Value_Input *)0;
-Fl_Value_Input *poll_bandwidth=(Fl_Value_Input *)0;
-Fl_Value_Input *poll_volume=(Fl_Value_Input *)0;
-Fl_Value_Input *poll_micgain=(Fl_Value_Input *)0;
-Fl_Value_Input *poll_rfgain=(Fl_Value_Input *)0;
-Fl_Value_Input *poll_power_control=(Fl_Value_Input *)0;
-Fl_Value_Input *poll_ifshift=(Fl_Value_Input *)0;
-Fl_Value_Input *poll_notch=(Fl_Value_Input *)0;
-Fl_Value_Input *poll_auto_notch=(Fl_Value_Input *)0;
-Fl_Value_Input *poll_pre_att=(Fl_Value_Input *)0;
-Fl_Value_Input *poll_squelch=(Fl_Value_Input *)0;
-Fl_Value_Input *poll_split=(Fl_Value_Input *)0;
-Fl_Value_Input *poll_noise=(Fl_Value_Input *)0;
-Fl_Value_Input *poll_nr=(Fl_Value_Input *)0;
-Fl_Button *btnClearAddControls=(Fl_Button *)0;
-Fl_Value_Input *poll_all=(Fl_Value_Input *)0;
-Fl_Button *btnSetAllAdd=(Fl_Button *)0;
-Fl_Group *tabSndCmd=(Fl_Group *)0;
-Fl_Input2 *txt_command=(Fl_Input2 *)0;
-Fl_Button *btn_send_command=(Fl_Button *)0;
-Fl_Output *txt_response=(Fl_Output *)0;
-Fl_Box *box_xcvr_connect=(Fl_Box *)0;
-Fl_Box *box_fldigi_connect=(Fl_Box *)0;
-Fl_Button *btnCancelCommConfig=(Fl_Button *)0;
-Fl_Return_Button *btnOkXcvrDialog=(Fl_Return_Button *)0;
+Fl_Group *tabPolling = (Fl_Group *)0;
+Fl_Value_Input *poll_smeter = (Fl_Value_Input *)0;
+Fl_Value_Input *poll_pout = (Fl_Value_Input *)0;
+Fl_Value_Input *poll_swr = (Fl_Value_Input *)0;
+Fl_Value_Input *poll_alc = (Fl_Value_Input *)0;
+Fl_Value_Input *poll_frequency = (Fl_Value_Input *)0;
+Fl_Value_Input *poll_mode = (Fl_Value_Input *)0;
+Fl_Value_Input *poll_bandwidth = (Fl_Value_Input *)0;
+Fl_Value_Input *poll_volume = (Fl_Value_Input *)0;
+Fl_Value_Input *poll_micgain = (Fl_Value_Input *)0;
+Fl_Value_Input *poll_rfgain = (Fl_Value_Input *)0;
+Fl_Value_Input *poll_power_control = (Fl_Value_Input *)0;
+Fl_Value_Input *poll_ifshift = (Fl_Value_Input *)0;
+Fl_Value_Input *poll_notch = (Fl_Value_Input *)0;
+Fl_Value_Input *poll_auto_notch = (Fl_Value_Input *)0;
+Fl_Value_Input *poll_pre_att = (Fl_Value_Input *)0;
+Fl_Value_Input *poll_squelch = (Fl_Value_Input *)0;
+Fl_Value_Input *poll_split = (Fl_Value_Input *)0;
+Fl_Value_Input *poll_noise = (Fl_Value_Input *)0;
+Fl_Value_Input *poll_nr = (Fl_Value_Input *)0;
+Fl_Button *btnClearAddControls = (Fl_Button *)0;
+Fl_Value_Input *poll_all = (Fl_Value_Input *)0;
+Fl_Button *btnSetAllAdd = (Fl_Button *)0;
 
-Fl_Group *tabXMLRPC=(Fl_Group *)0;
-Fl_Input *server_addr=(Fl_Input *)0;
-Fl_Int_Input *server_port=(Fl_Int_Input *)0;
-Fl_Check_Button *btn_xmlrpc_server=(Fl_Check_Button *)0;
+Fl_Group *tabSndCmd = (Fl_Group *)0;
+Fl_Input2 *txt_command = (Fl_Input2 *)0;
+Fl_Button *btn_send_command = (Fl_Button *)0;
+Fl_Output *txt_response = (Fl_Output *)0;
+Fl_Box *box_xcvr_connect = (Fl_Box *)0;
+Fl_Box *box_fldigi_connect = (Fl_Box *)0;
+Fl_Button *btnCancelCommConfig = (Fl_Button *)0;
+Fl_Return_Button *btnOkXcvrDialog = (Fl_Return_Button *)0;
+
+Fl_Group *tabXMLRPC = (Fl_Group *)0;
+Fl_Input *server_addr = (Fl_Input *)0;
+Fl_Int_Input *server_port = (Fl_Int_Input *)0;
+Fl_Check_Button *btn_xmlrpc_server = (Fl_Check_Button *)0;
+
+Fl_Group *tabCmds = (Fl_Group *)0;
+Fl_Box *bx1 = (Fl_Box *)0;
+Fl_Box *bx2 = (Fl_Box *)0;
+Fl_Input2 * cmdlbl1 = (Fl_Input2 *)0;
+Fl_Input2 * cmdlbl2 = (Fl_Input2 *)0;
+Fl_Input2 * cmdlbl3 = (Fl_Input2 *)0;
+Fl_Input2 * cmdlbl4 = (Fl_Input2 *)0;
+Fl_Input2 * cmdlbl5 = (Fl_Input2 *)0;
+Fl_Input2 * cmdlbl6 = (Fl_Input2 *)0;
+Fl_Input2 * cmdlbl7 = (Fl_Input2 *)0;
+Fl_Input2 * cmdlbl8 = (Fl_Input2 *)0;
+Fl_Input2 * cmdtext1 = (Fl_Input2 *)0;
+Fl_Input2 * cmdtext2 = (Fl_Input2 *)0;
+Fl_Input2 * cmdtext3 = (Fl_Input2 *)0;
+Fl_Input2 * cmdtext4 = (Fl_Input2 *)0;
+Fl_Input2 * cmdtext5 = (Fl_Input2 *)0;
+Fl_Input2 * cmdtext6 = (Fl_Input2 *)0;
+Fl_Input2 * cmdtext7 = (Fl_Input2 *)0;
+Fl_Input2 * cmdtext8 = (Fl_Input2 *)0;
+Fl_Output * cmdResponse = (Fl_Output *)0;
 
 static void cb_xmlrpc_server(Fl_Check_Button *w, void *)
 {
@@ -425,12 +447,88 @@ static void cb_btnSetAllAdd(Fl_Button*, void*) {
 	progStatus.poll_nr = progStatus.poll_all;
 }
 
-static void cb_btn_send_command(Fl_Button*, void*) {
-	cb_send_command();
+static void cb_btn_send_command(Fl_Button *o, void*) {
+	cb_send_command(txt_command->value(), txt_response);
 }
 
 static void cb_btnCancelCommConfig(Fl_Button*, void*) {
 	cbCancelXcvrDialog();
+}
+
+static void cb_cmdlbl(Fl_Input2 *o, void *d) {
+	long val = reinterpret_cast<long>(d);
+	switch (val) {
+		case 1: 
+			progStatus.label1 = o->value();
+			btnUser1->label(o->value()); 
+			btnUser1->redraw_label();
+			break;
+		case 2: 
+			progStatus.label2 = o->value();
+			btnUser2->label(o->value()); 
+			btnUser2->redraw_label();
+			break;
+		case 3: 
+			progStatus.label3 = o->value();
+			btnUser3->label(o->value()); 
+			btnUser3->redraw_label();
+			break;
+		case 4: 
+			progStatus.label4 = o->value();
+			btnUser4->label(o->value()); 
+			btnUser4->redraw_label();
+			break;
+		case 5: 
+			progStatus.label5 = o->value();
+			btnUser5->label(o->value()); 
+			btnUser5->redraw_label();
+			break;
+		case 6: 
+			progStatus.label6 = o->value();
+			btnUser6->label(o->value()); 
+			btnUser6->redraw_label();
+			break;
+		case 7: 
+			progStatus.label7 = o->value();
+			btnUser7->label(o->value()); 
+			btnUser7->redraw_label();
+			break;
+		case 8: 
+			progStatus.label8 = o->value();
+			btnUser8->label(o->value()); 
+			btnUser8->redraw_label();
+			break;
+	}
+}
+
+static void cb_cmdtext(Fl_Input2 *o, void *d) {
+	long val = reinterpret_cast<long>(d);
+	switch (val) {
+		case 1: 
+			progStatus.command1 = o->value();
+			break;
+		case 2: 
+			progStatus.command2 = o->value();
+			break;
+		case 3: 
+			progStatus.command3 = o->value();
+			break;
+		case 4: 
+			progStatus.command4 = o->value();
+			break;
+		case 5: 
+			progStatus.command5 = o->value();
+			break;
+		case 6: 
+			progStatus.command6 = o->value();
+			break;
+		case 7: 
+			progStatus.command7 = o->value();
+			break;
+		case 8: 
+			progStatus.command8 = o->value();
+			break;
+	}
 }
 
 static void cb_btnOkXcvrDialog(Fl_Return_Button*, void*) {
@@ -443,7 +541,7 @@ Fl_Double_Window* w = new Fl_Double_Window(480, 255, _("I/O Ports"));
 
 tabsConfig = new Fl_Tabs(0, 8, 482, 246);
 
-	tabPrimary = new Fl_Group(2, 30, 475, 222, _("Primary"));
+	tabPrimary = new Fl_Group(2, 30, 475, 222, _("Xcvr"));
 
 		Fl_Group* xcr_grp1 = new Fl_Group(5, 34, 465, 140);
 			xcr_grp1->box(FL_ENGRAVED_FRAME);
@@ -995,7 +1093,7 @@ _("Use only if your setup requires a separate\nSerial Port for a special Control
 
 	tabPolling->end();
 
-	tabSndCmd = new Fl_Group(2, 30, 475, 222, _("Cmds"));
+	tabSndCmd = new Fl_Group(2, 30, 475, 222, _("Send"));
 		tabSndCmd->hide();
 
 		txt_command = new Fl_Input2(29, 53, 434, 23,
@@ -1030,12 +1128,106 @@ _("Enter text as ASCII string\nOr sequence of hex values, x80 etc separated by s
 
 	tabSndCmd->end();
 
+	tabCmds = new Fl_Group(2, 30, 475, 222, _("Cmds"));
+		tabCmds->hide();
+		bx1 = new Fl_Box(15, 32, 80, 22, "Label");
+		bx1->box(FL_FLAT_BOX);
+		bx1->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+		bx2 = new Fl_Box(100, 32, 370, 22, "Command");
+		bx2->box(FL_FLAT_BOX);
+		bx2->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+
+		cmdlbl1 = new Fl_Input2(15, 54, 80, 20, "1");
+		cmdlbl1->align(FL_ALIGN_LEFT);
+		cmdlbl1->value(progStatus.label1.c_str());
+		cmdlbl1->callback((Fl_Callback*)cb_cmdlbl, (void *)1);
+
+		cmdtext1 = new Fl_Input2(100, 54, 370, 20, "");
+		cmdtext1->align(FL_ALIGN_LEFT);
+		cmdtext1->value(progStatus.command1.c_str());
+		cmdtext1->callback((Fl_Callback*)cb_cmdtext, (void *)1);
+
+		cmdlbl2 = new Fl_Input2(15, 74, 80, 20, "2");
+		cmdlbl2->align(FL_ALIGN_LEFT);
+		cmdlbl2->value(progStatus.label2.c_str());
+		cmdlbl2->callback((Fl_Callback*)cb_cmdlbl, (void *)2);
+
+		cmdtext2 = new Fl_Input2(100, 74, 370, 20, "");
+		cmdtext2->align(FL_ALIGN_LEFT);
+		cmdtext2->value(progStatus.command2.c_str());
+		cmdtext2->callback((Fl_Callback*)cb_cmdtext, (void *)2);
+
+		cmdlbl3 = new Fl_Input2(15, 94, 80, 20, "3");
+		cmdlbl3->align(FL_ALIGN_LEFT);
+		cmdlbl3->value(progStatus.label3.c_str());
+		cmdlbl3->callback((Fl_Callback*)cb_cmdlbl, (void *)3);
+
+		cmdtext3 = new Fl_Input2(100, 94, 370, 20, "");
+		cmdtext3->align(FL_ALIGN_LEFT);
+		cmdtext3->value(progStatus.command3.c_str());
+		cmdtext3->callback((Fl_Callback*)cb_cmdtext, (void *)3);
+
+		cmdlbl4 = new Fl_Input2(15, 114, 80, 20, "4");
+		cmdlbl4->align(FL_ALIGN_LEFT);
+		cmdlbl4->value(progStatus.label4.c_str());
+		cmdlbl4->callback((Fl_Callback*)cb_cmdlbl, (void *)4);
+
+		cmdtext4 = new Fl_Input2(100, 114, 370, 20, "");
+		cmdtext4->align(FL_ALIGN_LEFT);
+		cmdtext4->value(progStatus.command4.c_str());
+		cmdtext4->callback((Fl_Callback*)cb_cmdtext, (void *)4);
+
+		cmdlbl5 = new Fl_Input2(15, 134, 80, 20, "5");
+		cmdlbl5->align(FL_ALIGN_LEFT);
+		cmdlbl5->value(progStatus.label5.c_str());
+		cmdlbl5->callback((Fl_Callback*)cb_cmdlbl, (void *)5);
+
+		cmdtext5 = new Fl_Input2(100, 134, 370, 20, "");
+		cmdtext5->align(FL_ALIGN_LEFT);
+		cmdtext5->value(progStatus.command5.c_str());
+		cmdtext5->callback((Fl_Callback*)cb_cmdtext, (void *)5);
+
+		cmdlbl6 = new Fl_Input2(15, 154, 80, 20, "6");
+		cmdlbl6->align(FL_ALIGN_LEFT);
+		cmdlbl6->value(progStatus.label6.c_str());
+		cmdlbl6->callback((Fl_Callback*)cb_cmdlbl, (void *)6);
+
+		cmdtext6 = new Fl_Input2(100, 154, 370, 20, "");
+		cmdtext6->align(FL_ALIGN_LEFT);
+		cmdtext6->value(progStatus.command6.c_str());
+		cmdtext6->callback((Fl_Callback*)cb_cmdtext, (void *)6);
+
+		cmdlbl7 = new Fl_Input2(15, 174, 80, 20, "7");
+		cmdlbl7->align(FL_ALIGN_LEFT);
+		cmdlbl7->value(progStatus.label7.c_str());
+		cmdlbl7->callback((Fl_Callback*)cb_cmdlbl, (void *)7);
+
+		cmdtext7 = new Fl_Input2(100, 174, 370, 20, "");
+		cmdtext7->align(FL_ALIGN_LEFT);
+		cmdtext7->value(progStatus.command7.c_str());
+		cmdtext7->callback((Fl_Callback*)cb_cmdtext, (void *)7);
+
+		cmdlbl8 = new Fl_Input2(15, 194, 80, 20, "8");
+		cmdlbl8->align(FL_ALIGN_LEFT);
+		cmdlbl8->value(progStatus.label8.c_str());
+		cmdlbl8->callback((Fl_Callback*)cb_cmdlbl, (void *)8);
+
+		cmdtext8 = new Fl_Input2(100, 194, 370, 20, "");
+		cmdtext8->align(FL_ALIGN_LEFT);
+		cmdtext8->value(progStatus.command8.c_str());
+		cmdtext8->callback((Fl_Callback*)cb_cmdtext, (void *)8);
+
+		cmdResponse = new Fl_Output(100, 218, 370, 20, "Response:");
+		cmdResponse->align(FL_ALIGN_LEFT);
+
+	tabCmds->end();
+
 tabsConfig->end();
 
-btnCancelCommConfig = new Fl_Button(358, 2, 50, 25, _("Close"));
+btnCancelCommConfig = new Fl_Button(w->w() - 104, 2, 50, 25, _("Close"));
 btnCancelCommConfig->callback((Fl_Callback*)cb_btnCancelCommConfig);
 
-btnOkXcvrDialog = new Fl_Return_Button(420, 2, 55, 25, _("Init"));
+btnOkXcvrDialog = new Fl_Return_Button(w->w() - 52, 2, 50, 25, _("Init"));
 btnOkXcvrDialog->callback((Fl_Callback*)cb_btnOkXcvrDialog);
 
 w->end();

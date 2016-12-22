@@ -168,6 +168,17 @@ extern Fl_Light_Button *btnBreakIn;
 extern Hspinner *spnr_cw_delay;
 extern Hspinner *cnt_cw_qsk;
 
+extern Fl_Group  *genericUser;
+extern Fl_Button *btnUser1;
+extern Fl_Button *btnUser2;
+extern Fl_Button *btnUser3;
+extern Fl_Button *btnUser4;
+extern Fl_Button *btnUser5;
+extern Fl_Button *btnUser6;
+extern Fl_Button *btnUser7;
+extern Fl_Button *btnUser8;
+extern Fl_Output * cmdResponse;
+
 extern Hspinner *spnr_cw_spot_tone;
 extern Hspinner *spnr_cw_qsk;
 extern Hspinner *spnr_cw_weight;
@@ -313,6 +324,24 @@ extern Fl_Input *inAlphaTag;
 extern Fl_Tabs *tabsConfig;
 extern Fl_Group *tabPrimary;
 extern Fl_ComboBox *selectRig;
+
+extern Fl_Group *tabCmds;
+extern Fl_Input2 * cmdlbl1;
+extern Fl_Input2 * cmdlbl2;
+extern Fl_Input2 * cmdlbl3;
+extern Fl_Input2 * cmdlbl4;
+extern Fl_Input2 * cmdlbl5;
+extern Fl_Input2 * cmdlbl6;
+extern Fl_Input2 * cmdlbl7;
+extern Fl_Input2 * cmdlbl8;
+extern Fl_Input2 * cmdtext1;
+extern Fl_Input2 * cmdtext2;
+extern Fl_Input2 * cmdtext3;
+extern Fl_Input2 * cmdtext4;
+extern Fl_Input2 * cmdtext5;
+extern Fl_Input2 * cmdtext6;
+extern Fl_Input2 * cmdtext7;
+extern Fl_Input2 * cmdtext8;
 
 extern Fl_Counter *cntRigCatRetries;
 extern Fl_Counter *cntRigCatTimeout;

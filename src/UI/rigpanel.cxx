@@ -178,6 +178,16 @@ Fl_Check_Button *btn_ext_tuner=(Fl_Check_Button *)0;
 Fl_Check_Button *btn_xcvr_auto_on=(Fl_Check_Button *)0;
 Fl_Check_Button *btn_xcvr_auto_off=(Fl_Check_Button *)0;
 
+Fl_Group  *genericUser = (Fl_Group *)0;
+Fl_Button *btnUser1 = (Fl_Button *)0;
+Fl_Button *btnUser2 = (Fl_Button *)0;
+Fl_Button *btnUser3 = (Fl_Button *)0;
+Fl_Button *btnUser4 = (Fl_Button *)0;
+Fl_Button *btnUser5 = (Fl_Button *)0;
+Fl_Button *btnUser6 = (Fl_Button *)0;
+Fl_Button *btnUser7 = (Fl_Button *)0;
+Fl_Button *btnUser8 = (Fl_Button *)0;
+
 Fl_Group *genericRXB=(Fl_Group *)0;
 Hspinner *cntRIT=(Hspinner *)0;
 Hspinner *cntXIT=(Hspinner *)0;
@@ -701,6 +711,20 @@ static void cb_btn_xcvr_auto_on(Fl_Check_Button* o, void*) {
 
 static void cb_btn_xcvr_auto_off(Fl_Check_Button* o, void*) {
 	progStatus.xcvr_auto_off = o->value();
+}
+
+static void cb_btnUser( Fl_Button * o, void *d) {
+	long val = reinterpret_cast<long>(d);
+	switch (val) {
+		case 1: cb_send_command(progStatus.command1, cmdResponse); break;
+		case 2: cb_send_command(progStatus.command2, cmdResponse); break;
+		case 3: cb_send_command(progStatus.command3, cmdResponse); break;
+		case 4: cb_send_command(progStatus.command4, cmdResponse); break;
+		case 5: cb_send_command(progStatus.command5, cmdResponse); break;
+		case 6: cb_send_command(progStatus.command6, cmdResponse); break;
+		case 7: cb_send_command(progStatus.command7, cmdResponse); break;
+		case 8: cb_send_command(progStatus.command8, cmdResponse); break;
+	}
 }
 
 static void cb_cntRIT(Hspinner*, void*) {

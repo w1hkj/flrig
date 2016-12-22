@@ -301,7 +301,7 @@ extern void zeroXmtMeters(void *d);
 extern void set_power_controlImage(double);
 extern void update_UI_PTT(void *d = NULL);
 
-extern void cb_send_command();
+extern void cb_send_command(string cmd, Fl_Output *resp = 0);
 extern const string lt_trim(const string& pString, const string& pWhitespace = " \"\t");
 extern void editAlphaTag();
 

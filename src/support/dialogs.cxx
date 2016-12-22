@@ -1477,10 +1477,10 @@ Fl_Color flrig_def_color(int n)
 }
 
 
-void cb_send_command()
+void cb_send_command(string command, Fl_Output *resp)
 {
+	if (command.empty()) return;
 	bool usehex = false;
-	string command = txt_command->value();
 	if (command.empty()) return;
 	string cmd = "";
 	if (command.find("x") != string::npos) { // hex strings
@@ -1497,6 +1497,11 @@ void cb_send_command()
 // lock out polling loops until done
 	guard_lock gl_serial(&mutex_serial, 201);
 
+	if (resp) {
+		resp->value("");
+		resp->redraw();
+	}
+
 	sendCommand(cmd, 0);
 
 	int timeout = 1000;
@@ -1508,7 +1513,10 @@ void cb_send_command()
 	}
 
 	readResponse();
-	txt_response->value(
-		usehex ? str2hex(replystr.c_str(), replystr.length()) :
-		replystr.c_str());
+	if (resp) {
+		resp->value(
+			usehex ? str2hex(replystr.c_str(), replystr.length()) :
+			replystr.c_str());
+		resp->redraw();
+	}
 }

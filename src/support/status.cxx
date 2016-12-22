@@ -206,13 +206,31 @@ status progStatus = {
 	true,		// tt550_at11_inline;
 	true,		// tt550_at11_hiZ;
 
+// =========================
 	0.0,		// vfo_adj;
 	600,		// bfo_freq;
 	0,			// rit_freq;
 	0,			// xit_freq;
 	1500,		// bpf_center;
 	true,		// use_bpf_center;
-
+// =========================
+	"cmd 1",		// string	label1;
+	"",				// string	command1;
+	"cmd 2",		// string	label2;
+	"",				// string	command2;
+	"cmd 3",		// string	label3;
+	"",				// string	command3;
+	"cmd 4",		// string	label4;
+	"", 			// string	command4;
+	"cmd 5",		// string	label5;
+	"",				// string	command5;
+	"cmd 6",		// string	label6;
+	"",				// string	command6;
+	"cmd 7",		// string	label7;
+	"",				// string	command7;
+	"cmd 8",		// string	label8;
+	"",				// string	command8;
+// =========================
 	232,		// int	 bg_red;
 	255,		// int	 bg_green;
 	232,		// int	 bg_blue;
@@ -479,6 +497,23 @@ void status::saveLastState()
 	spref.set("bpf_center", bpf_center);
 	spref.set("use_bpf_center", use_bpf_center);
 
+	spref.set("label1", label1.c_str());
+	spref.set("command1", command1.c_str());
+	spref.set("label2", label2.c_str());
+	spref.set("command2", command2.c_str());
+	spref.set("label3", label3.c_str());
+	spref.set("command3", command3.c_str());
+	spref.set("label4", label4.c_str());
+	spref.set("command4", command4.c_str());
+	spref.set("label5", label5.c_str());
+	spref.set("command5", command5.c_str());
+	spref.set("label6", label6.c_str());
+	spref.set("command6", command6.c_str());
+	spref.set("label7", label7.c_str());
+	spref.set("command7", command7.c_str());
+	spref.set("label8", label8.c_str());
+	spref.set("command8", command8.c_str());
+
 	spref.set("fg_red", fg_red);
 	spref.set("fg_green", fg_green);
 	spref.set("fg_blue", fg_blue);
@@ -560,7 +595,7 @@ bool status::loadXcvrState(string xcvr)
 	if (spref.entryExists("version")) {
 
 		int i;
-		char defbuffer[200];
+		char defbuffer[500];
 
 		spref.get("mainx", mainX, mainX);
 		spref.get("mainy", mainY, mainY);
@@ -578,7 +613,7 @@ bool status::loadXcvrState(string xcvr)
 			if (mainW < TOUCH_MAINW) mainW = TOUCH_MAINW;
 		}
 
-		spref.get("xcvr_serial_port", defbuffer, "NONE", 199);
+		spref.get("xcvr_serial_port", defbuffer, "NONE", 499);
 		xcvr_serial_port = defbuffer;
 		if (xcvr_serial_port.find("tty") == 0)
 			xcvr_serial_port.insert(0, "/dev/");
@@ -612,12 +647,12 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("civadr", CIV, CIV);
 		if (spref.get("usbaudio", i, i)) USBaudio = i;
 
-		spref.get("aux_serial_port", defbuffer, "NONE", 199);
+		spref.get("aux_serial_port", defbuffer, "NONE", 499);
 		aux_serial_port = defbuffer;
 		if (spref.get("aux_rts", i, i)) aux_rts = i;
 		if (spref.get("aux_dtr", i, i)) aux_dtr = i;
 
-		spref.get("sep_serial_port", defbuffer, "NONE", 199);
+		spref.get("sep_serial_port", defbuffer, "NONE", 499);
 		sep_serial_port = defbuffer;
 		if (spref.get("sep_rtsptt", i, i)) sep_rtsptt = i;
 		if (spref.get("sep_dtrptt", i, i)) sep_dtrptt = i;
@@ -760,6 +795,39 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("bpf_center", bpf_center, bpf_center);
 		spref.get("use_bpf_center", i, i); use_bpf_center = i;
 
+		spref.get("label1", defbuffer,  label1.c_str(), 499);
+		label1 = defbuffer;
+		spref.get("command1", defbuffer, command1.c_str(), 499);
+		command1 = defbuffer;
+		spref.get("label2", defbuffer, label2.c_str(), 499);
+		label2 = defbuffer;
+		spref.get("command2", defbuffer, command2.c_str(), 499);
+		command2 = defbuffer;
+		spref.get("label3", defbuffer, label3.c_str(), 499);
+		label3 = defbuffer;
+		spref.get("command3", defbuffer, command3.c_str(), 499);
+		command3 = defbuffer;
+		spref.get("label4", defbuffer, label4.c_str(), 499);
+		label4 = defbuffer;
+		spref.get("command4", defbuffer, command4.c_str(), 499);
+		command4 = defbuffer;
+		spref.get("label5", defbuffer, label5.c_str(), 499);
+		label5 = defbuffer;
+		spref.get("command5", defbuffer, command5.c_str(), 499);
+		command5 = defbuffer;
+		spref.get("label6", defbuffer, label6.c_str(), 499);
+		label6 = defbuffer;
+		spref.get("command6", defbuffer, command6.c_str(), 499);
+		command6 = defbuffer;
+		spref.get("label7", defbuffer, label7.c_str(), 499);
+		label7 = defbuffer;
+		spref.get("command7", defbuffer, command7.c_str(), 499);
+		command7 = defbuffer;
+		spref.get("label8", defbuffer, label8.c_str(), 499);
+		label8 = defbuffer;
+		spref.get("command8", defbuffer, command8.c_str(), 499);
+		command8 = defbuffer;
+
 		spref.get("fg_red", fg_red, fg_red);
 		spref.get("fg_green", fg_green, fg_green);
 		spref.get("fg_blue", fg_blue, fg_blue);
@@ -813,17 +881,17 @@ bool status::loadXcvrState(string xcvr)
 		i = 0;
 		if (spref.get("tooltips", i, i)) tooltips = i;
 
-		spref.get("ui_scheme", defbuffer, "gtk+", 199);
+		spref.get("ui_scheme", defbuffer, "gtk+", 499);
 		ui_scheme = defbuffer;
 
-		spref.get("server_port", defbuffer, "7362", 199);
+		spref.get("server_port", defbuffer, "7362", 499);
 		server_port = defbuffer;
-		spref.get("server_addr", defbuffer, "127.0.0.1", 199);
+		spref.get("server_addr", defbuffer, "127.0.0.1", 499);
 		server_addr = defbuffer;
 
-		spref.get("tcpip_port", defbuffer, "4001", 199);
+		spref.get("tcpip_port", defbuffer, "4001", 499);
 		tcpip_port = defbuffer;
-		spref.get("tcpip_addr", defbuffer, "127.0.0.1", 199);
+		spref.get("tcpip_addr", defbuffer, "127.0.0.1", 499);
 		tcpip_addr = defbuffer;
 		spref.get("tcpip_ping_delay", tcpip_ping_delay, tcpip_ping_delay);
 		spref.get("tcpip_tcpip_reconnect_after", tcpip_reconnect_after, tcpip_reconnect_after);
@@ -850,12 +918,12 @@ void status::loadLastState()
 	Fl_Preferences xcvrpref(RigHomeDir.c_str(), "w1hkj.com", PACKAGE_TARNAME);
 	if (xcvrpref.entryExists("xcvr_name")) {
 		char defbuffer[200];
-		xcvrpref.get("xcvr_name", defbuffer, "NONE", 199);
+		xcvrpref.get("xcvr_name", defbuffer, "NONE", 499);
 		xcvr_name = defbuffer;
 // for backward compatability
 	} else if (xcvrpref.entryExists("last_xcvr_used")) {
 		char defbuffer[200];
-		xcvrpref.get("last_xcvr_used", defbuffer, "NONE", 199);
+		xcvrpref.get("last_xcvr_used", defbuffer, "NONE", 499);
 		xcvr_name = defbuffer;
 	}
 	loadXcvrState(xcvr_name.c_str());
@@ -969,6 +1037,15 @@ void status::UI_laststate()
 	if (restore_rig_data) mnuRestoreData->set();
 	else mnuRestoreData->clear();
 
+	btnUser1->label(label1.c_str()); btnUser1->redraw_label();
+	btnUser2->label(label2.c_str()); btnUser2->redraw_label();
+	btnUser3->label(label3.c_str()); btnUser3->redraw_label();
+	btnUser4->label(label4.c_str()); btnUser4->redraw_label();
+	btnUser5->label(label5.c_str()); btnUser5->redraw_label();
+	btnUser6->label(label6.c_str()); btnUser6->redraw_label();
+	btnUser7->label(label7.c_str()); btnUser7->redraw_label();
+	btnUser8->label(label8.c_str()); btnUser8->redraw_label();
+
 	Fl::scheme(ui_scheme.c_str());
 }
 
@@ -1056,6 +1133,23 @@ string status::info()
 	info << "pwr_avg            : " << pwr_avg << "\n";
 	info << "pwr_peak           : " << pwr_peak << "\n";
 	info << "pwr_scale          : " << pwr_scale << "\n";
+
+	info << "label 1            : " << label1 << "\n";
+	info << "command 1          : " << command1 << "\n";
+	info << "label 2            : " << label1 << "\n";
+	info << "command 2          : " << command1 << "\n";
+	info << "label 3            : " << label1 << "\n";
+	info << "command 3          : " << command1 << "\n";
+	info << "label 4            : " << label1 << "\n";
+	info << "command 4          : " << command1 << "\n";
+	info << "label 5            : " << label1 << "\n";
+	info << "command 5          : " << command1 << "\n";
+	info << "label 6            : " << label1 << "\n";
+	info << "command 6          : " << command1 << "\n";
+	info << "label 7            : " << label1 << "\n";
+	info << "command 7          : " << command1 << "\n";
+	info << "label 8            : " << label1 << "\n";
+	info << "command 8          : " << command1 << "\n";
 
 	return info.str();
 }

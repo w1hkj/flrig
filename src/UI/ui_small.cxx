@@ -1299,6 +1299,35 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 
 		genericMisc->end();
 
+		genericUser = new Fl_Group(0, 271, 425, 49, _("User"));
+			genericUser->hide();
+
+			btnUser1 = new Fl_Button(5, genericUser->y() + 7, 100, 20, "USER 1");
+			btnUser1->callback((Fl_Callback*)cb_btnUser, (void*)1);
+
+			btnUser2 = new Fl_Button(110, genericUser->y() + 7, 100, 20, "USER 2");
+			btnUser2->callback((Fl_Callback*)cb_btnUser, (void*)2);
+
+			btnUser3 = new Fl_Button(215, genericUser->y() + 7, 100, 20, "USER 3");
+			btnUser3->callback((Fl_Callback*)cb_btnUser, (void*)3);
+
+			btnUser4 = new Fl_Button(320, genericUser->y() + 7, 100, 20, "USER 4");
+			btnUser4->callback((Fl_Callback*)cb_btnUser, (void*)4);
+
+			btnUser5 = new Fl_Button(5, genericUser->y() + 29, 100, 20, "USER 5");
+			btnUser5->callback((Fl_Callback*)cb_btnUser, (void*)5);
+
+			btnUser6 = new Fl_Button(110, genericUser->y() + 29, 100, 20, "USER 6");
+			btnUser6->callback((Fl_Callback*)cb_btnUser, (void*)6);
+
+			btnUser7 = new Fl_Button(215, genericUser->y() + 29, 100, 20, "USER 7");
+			btnUser7->callback((Fl_Callback*)cb_btnUser, (void*)7);
+
+			btnUser8 = new Fl_Button(320, genericUser->y() + 29, 100, 20, "USER 8");
+			btnUser8->callback((Fl_Callback*)cb_btnUser, (void*)8);
+
+		genericUser->end();
+
 	tabsGeneric->end();
 
 	g->end();

@@ -2650,6 +2650,7 @@ void initXcvrTab()
 		tabsGeneric->remove(*genericSpeech);
 		tabsGeneric->remove(*genericRx);
 		tabsGeneric->remove(*genericMisc);
+		tabsGeneric->remove(*genericUser);
 
 		if (selrig->has_band_selection) {
 			if (progStatus.UIsize != touch_ui)
@@ -2881,6 +2882,13 @@ void initXcvrTab()
 			}
 
 		}
+		tabsGeneric->insert(*genericUser, 6);
+		if (progStatus.UIsize != touch_ui)
+		genericUser->resize(
+			tabsGeneric->x() + 2,
+			tabsGeneric->y() + 19,
+			tabsGeneric->w() - 4,
+			tabsGeneric->h() - 21);
 
 		tabsGeneric->redraw();
 

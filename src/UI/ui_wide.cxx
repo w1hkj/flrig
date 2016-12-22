@@ -786,7 +786,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				opSelect60->end();
 }
 			genericBands->end();
-			tabsGeneric->resizable(genericBands);
+//			tabsGeneric->resizable(genericBands);
 
 			genericCW = new Fl_Group(xpos, ypos, W, tabs2_h, _("CW"));
 {
@@ -1027,6 +1027,37 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 }
 			genericMisc->end();
 
+			genericUser = new Fl_Group(xpos, ypos, W, tabs2_h, _("User"));
+{
+				genericUser->hide();
+
+				btnUser1 = new Fl_Button(5, genericUser->y() + 15, 88, 24, "USER 1");
+				btnUser1->callback((Fl_Callback*)cb_btnUser, (void*)1);
+
+				btnUser2 = new Fl_Button(95, genericUser->y() + 15, 88, 24, "USER 2");
+				btnUser2->callback((Fl_Callback*)cb_btnUser, (void*)2);
+
+				btnUser3 = new Fl_Button(185, genericUser->y() + 15, 88, 24, "USER 3");
+				btnUser3->callback((Fl_Callback*)cb_btnUser, (void*)3);
+
+				btnUser4 = new Fl_Button(275, genericUser->y() + 15, 88, 24, "USER 4");
+				btnUser4->callback((Fl_Callback*)cb_btnUser, (void*)4);
+
+				btnUser5 = new Fl_Button(365, genericUser->y() + 15, 88, 24, "USER 5");
+				btnUser5->callback((Fl_Callback*)cb_btnUser, (void*)5);
+
+				btnUser6 = new Fl_Button(455, genericUser->y() + 15, 88, 24, "USER 6");
+				btnUser6->callback((Fl_Callback*)cb_btnUser, (void*)6);
+
+				btnUser7 = new Fl_Button(545, genericUser->y() + 15, 88, 24, "USER 7");
+				btnUser7->callback((Fl_Callback*)cb_btnUser, (void*)7);
+
+				btnUser8 = new Fl_Button(635, genericUser->y() + 15, 88, 24, "USER 8");
+				btnUser8->callback((Fl_Callback*)cb_btnUser, (void*)8);
+
+}
+			genericUser->end();
+
 			genericRXB = new Fl_Group(xpos, ypos, W, tabs2_h, _("RIT/XIT/BFO"));
 {
 				genericRXB->hide();
@@ -1094,8 +1125,11 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				btnDataPort->value(progStatus.data_port);
 }
 			genericAux->end();
+
 }
 		tabsGeneric->end();
+
+		tabsGeneric->resizable(genericBands);
 		tabsGeneric->hide();
 
 		ypos = ytabs;
