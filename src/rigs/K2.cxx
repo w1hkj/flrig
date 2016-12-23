@@ -136,6 +136,13 @@ void RIG_K2::initialize()
  *   34..35 fill
  *   37     ; terminator
  * The fixed-value fields (space, 0, and 1) are provided for syntactic compatibility with existing software.
+ * 
+ * received from M1CNK
+ * 01234567890123457890123456789012345678
+ * FA00014039310;
+ * IF00014039310     +007000 0002000001 ;
+ * IF00014039310     +007000 0002000001 ;
+ * 
 */
 // set replystr to teststr to test for various control bytes
 //const char *teststr = "IFfffffffffff*****+yyyyrx*000m0s1b01*;";
