@@ -51,9 +51,9 @@ Fl_Counter *cntDropsAllowed = (Fl_Counter *)0;
 
 Fl_Group *tabPTT = (Fl_Group *)0;
 Fl_ComboBox *selectSepPTTPort = (Fl_ComboBox *)0;
-Fl_Round_Button *btnSepRTSptt = (Fl_Round_Button *)0;
+Fl_Check_Button *btnSepRTSptt = (Fl_Check_Button *)0;
 Fl_Check_Button *btnSepRTSplus = (Fl_Check_Button *)0;
-Fl_Round_Button *btnSepDTRptt = (Fl_Round_Button *)0;
+Fl_Check_Button *btnSepDTRptt = (Fl_Check_Button *)0;
 Fl_Check_Button *btnSepDTRplus = (Fl_Check_Button *)0;
 Fl_Group *tabAux = (Fl_Group *)0;
 Fl_ComboBox *selectAuxPort = (Fl_ComboBox *)0;
@@ -282,9 +282,7 @@ static void cb_selectSepPTTPort(Fl_ComboBox*, void*) {
 	btnOkXcvrDialog->redraw();
 }
 
-static void cb_btnSepRTSptt(Fl_Round_Button* o, void*) {
-	if (o->value() == 1)
-		btnSepDTRptt->value(0);
+static void cb_btnSepRTSptt(Fl_Check_Button* o, void*) {
 	btnOkXcvrDialog->labelcolor(FL_RED);
 	btnOkXcvrDialog->redraw();
 }
@@ -294,9 +292,7 @@ static void cb_btnSepRTSplus(Fl_Check_Button*, void*) {
 	btnOkXcvrDialog->redraw();
 }
 
-static void cb_btnSepDTRptt(Fl_Round_Button* o, void*) {
-	if (o->value() == 1)
-		btnSepRTSptt->value(0);
+static void cb_btnSepDTRptt(Fl_Check_Button* o, void*) {
 	btnOkXcvrDialog->labelcolor(FL_RED);
 	btnOkXcvrDialog->redraw();
 }
@@ -844,9 +840,8 @@ _("Use only if your setup requires a separate\nSerial Port for a PTT control lin
 		selectSepPTTPort->when(FL_WHEN_RELEASE);
 		selectSepPTTPort->end();
 
-		btnSepRTSptt = new Fl_Round_Button(111, 159, 129, 23, _("PTT via RTS"));
+		btnSepRTSptt = new Fl_Check_Button(111, 159, 129, 23, _("PTT via RTS"));
 		btnSepRTSptt->tooltip(_("RTS is ptt line"));
-		btnSepRTSptt->down_box(FL_ROUND_DOWN_BOX);
 		btnSepRTSptt->callback((Fl_Callback*)cb_btnSepRTSptt);
 		btnSepRTSptt->value(progStatus.sep_rtsptt);
 
@@ -856,9 +851,8 @@ _("Use only if your setup requires a separate\nSerial Port for a PTT control lin
 		btnSepRTSplus->callback((Fl_Callback*)cb_btnSepRTSplus);
 		btnSepRTSplus->value(progStatus.sep_rtsplus);
 
-		btnSepDTRptt = new Fl_Round_Button(111, 186, 129, 22, _("PTT via DTR"));
+		btnSepDTRptt = new Fl_Check_Button(111, 186, 129, 22, _("PTT via DTR"));
 		btnSepDTRptt->tooltip(_("DTR is ptt line"));
-		btnSepDTRptt->down_box(FL_ROUND_DOWN_BOX);
 		btnSepDTRptt->callback((Fl_Callback*)cb_btnSepDTRptt);
 		btnSepDTRptt->value(progStatus.sep_dtrptt);
 
