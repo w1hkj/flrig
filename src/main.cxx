@@ -100,6 +100,8 @@ bool RIG_DEBUG = false;
 bool XML_DEBUG = false;
 bool EXPAND_CONTROLS = false;
 
+int xmlport = 12345;
+
 //----------------------------------------------------------------------
 void about()
 {
@@ -402,7 +404,7 @@ int main (int argc, char *argv[])
 			exit(EXIT_FAILURE);
 		}
 	} else
-		start_server();
+		start_server(xmlport);
 
 	createXcvrDialog();
 

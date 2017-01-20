@@ -309,6 +309,7 @@ void status::saveLastState()
 	xcvr_name = selrig->name_;
 	Fl_Preferences xcvrpref(RigHomeDir.c_str(), "w1hkj.com", PACKAGE_TARNAME);
 	xcvrpref.set("xcvr_name", xcvr_name.c_str());
+	xcvrpref.set("xml_port", xmlport);
 
 	int mX = mainwindow->x();
 	int mY = mainwindow->y();
@@ -926,6 +927,8 @@ void status::loadLastState()
 		xcvrpref.get("last_xcvr_used", defbuffer, "NONE", 499);
 		xcvr_name = defbuffer;
 	}
+	xcvrpref.get("xml_port", xmlport, xmlport);
+
 	loadXcvrState(xcvr_name.c_str());
 }
 

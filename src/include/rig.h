@@ -56,6 +56,8 @@ extern string TempDir;
 extern string rigfile;
 extern string pttfile;
 
+extern int    xmlport;
+
 extern string defFileName;
 extern string title;
 
