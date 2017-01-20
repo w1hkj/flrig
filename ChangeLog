@@ -1,8 +1,18 @@
 
 
-=Version 1.3.27=
+=Version 1.3.28=
 
-2016-10-17  David Freese  <iam_w1hkj@w1hkj.com>
+2017-01-20  David Freese  <iam_w1hkj@w1hkj.com>
+
+	5add320: Multiple xmlrpc servers
+	cf1b1bb: Separate PTT
+	07bf4b5: K2 comments
+	c5edf8e: User defined command buttons
+	71e5aac: ic7300 update
+	5960bd9: IC9100 update
+
+
+=Version 1.3.27=
 
 	4d24585: New controls
 	f86e7d1: TS480SAT extras
