@@ -19,6 +19,7 @@
 // ----------------------------------------------------------------------------
 /*
  * Driver for PCR-1000 April 2012, Brian Miezejewski, k5hfi
+ * patched 1/23/2017, Dave, G0WBX
  */
 
 /* Todo:
@@ -124,6 +125,7 @@ void RIG_PCR1000::initialize()
 	// Set the radio with the default values
 	set_volume_control(current_volume) ;
 	set_squelch(sql);
+	set_if_shift(if_shift);	// mid = off					// wbx
 
 	RIG_DEBUG = true;
 }
@@ -170,7 +172,6 @@ RIG_PCR1000::RIG_PCR1000() : current_vfo(A) {
 
 	has_micgain_control =
 	has_notch_control =
-	has_ifshift_control =
 	has_swr_control = false;
 
 	has_smeter =
@@ -191,7 +192,7 @@ RIG_PCR1000::RIG_PCR1000() : current_vfo(A) {
 void RIG_PCR1000::shutdown() {
 	// Turn off the radio
 	sendCommand(power_off_command,6);
-	showresp(WARN, ASC, "Power ON", power_on_command , replystr);
+	showresp(WARN, ASC, "Power OFF", power_on_command , replystr);
 }
 //----------------------------------------------------------------------
 
@@ -426,7 +427,7 @@ void RIG_PCR1000::set_squelch(int val) {
 	sql = val ;
 	set2Hex( val, &(squelch_command[3])) ;
 	sendCommand(squelch_command, 5);
-	showresp(WARN, ASC, "S meter", squelch_command, replystr);
+	showresp(WARN, ASC, "Set Squelch", squelch_command, replystr);
 }
 
 int  RIG_PCR1000::get_squelch() {
@@ -440,15 +441,18 @@ int  RIG_PCR1000::get_squelch() {
 
 /*
  * Since the PCR1000 IF shift shifts in 10 hertz increments we display and store
- * the actual shift. Just dived by 10 and and 80 before its set.
++ * the actual shift. Just divide by 10 and add 80 before its set.
+ * 
+ * The "and add 80" above is decimal, it should be in Hex, so that's 128 Decimal
+ * The showresp text lable was wrong too, it's been corrected.
  *
  */
 void RIG_PCR1000::set_if_shift(int val) {
 
 	if_shift = val ;
-	set2Hex( val/10 + 80, &(if_shift_command[3])) ;
+	set2Hex( val/10 + 128, &(if_shift_command[3])) ;
 	sendCommand(if_shift_command, 5);
-	showresp(WARN, ASC, "S meter", if_shift_command, replystr);
+	showresp(WARN, ASC, "IF Shift", if_shift_command, replystr);
 }
 
 
@@ -468,12 +472,12 @@ void RIG_PCR1000::set_attenuator(int val) {
 		if( val ) {
 			// Turn att on
 			sendCommand(att_on_command, 5);
-			showresp(WARN, ASC, "S meter", att_on_command, replystr);
+			showresp(WARN, ASC, "Set Attenuator ON", att_on_command, replystr);		// wbx
 			attenuator = 1 ;
 		} else {
 			// Turn att off
 			sendCommand(att_off_command, 5);
-			showresp(WARN, ASC, "S meter", att_off_command, replystr);
+			showresp(WARN, ASC, "Set Attenuator OFF", att_off_command, replystr);	// wbx
 			attenuator = 0 ;
 		}
 	}
