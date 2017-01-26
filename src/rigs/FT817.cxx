@@ -44,6 +44,8 @@ RIG_FT817::RIG_FT817() {
 	modeA = 1;
 	bwA = 0;
 
+	has_smeter =
+	has_power_out =
 	has_ptt_control =
 	has_mode_control = true;
 
@@ -124,6 +126,17 @@ void RIG_FT817::set_PTT_control(int val)
 	set_getACK();
 }
 
+// mapping for smeter and power out
+static int smeter_map[] = {
+0, 7, 13, 19, 25, 30, 35, 40, 45, 50, 55, 61, 68, 77, 88, 100
+};
+
+// power out is scaled by 10 to allow display on flrig power scales
+static int pmeter_map[] = {
+  0,   5,    7,  10,  17,  25,  33,  41,  50 };
+//0, 0.5, 0.75, 1.0, 1.7, 2.5, 3.3, 4.1, 5.0
+
+
 int  RIG_FT817::get_power_out(void)
 {
 	init_cmd();
@@ -131,8 +144,9 @@ int  RIG_FT817::get_power_out(void)
 	int ret = waitN(1, 100, "get pwr out", HEX);
 	if (!ret) return 0;
 	int fwdpwr = replybuff[0];
-	fwdpwr = fwdpwr * 100 / 15;
-	return fwdpwr;
+	if (fwdpwr > 8) fwdpwr = 8;
+	if (fwdpwr < 0) fwdpwr = 0;
+	return pmeter_map[fwdpwr];
 }
 
 int  RIG_FT817::get_smeter(void)
@@ -142,6 +156,7 @@ int  RIG_FT817::get_smeter(void)
 	int ret = waitN(1, 100, "get smeter", HEX);
 	if (!ret) return 0;
 	int sval = replybuff[0];
-	sval = (sval-1) * 100 / 15;
-	return sval;
+	if (sval < 0) sval = 0;
+	if (sval > 15) sval = 15;
+	return smeter_map[sval];
 }
