@@ -117,9 +117,9 @@ void RIG_TS480SAT::initialize()
 	rig_widgets[7].W = sldrPOWER;
 
 	progStatus.rfgain = 100;
-	progStatus.volume = 25;
-	progStatus.power_level = 20;
-	progStatus.mic_gain = 25;
+	progStatus.volume = 5;
+	progStatus.power_level = 10;
+	progStatus.mic_gain = 50;
 	check_menu_45();
 };
 
@@ -141,8 +141,8 @@ RIG_TS480SAT::RIG_TS480SAT() {
 
 	widgets = rig_widgets;
 
-	comm_baudrate = BR4800;
-	stopbits = 2;
+	comm_baudrate = BR57600;
+	stopbits = 1;
 	comm_retries = 2;
 	comm_wait = 5;
 	comm_timeout = 50;
@@ -158,14 +158,13 @@ RIG_TS480SAT::RIG_TS480SAT() {
 
 	can_change_alt_vfo = true;
 
-	has_noise_control = false;
-	has_tune_control = false;
-	has_notch_control = false;
-
 	has_extras = true;
 
 	has_noise_reduction =
 	has_noise_reduction_control =
+	has_auto_notch =
+	has_noise_control =
+	has_sql_control =
 
 	has_split = true;
 	has_split_AB = true;
@@ -179,7 +178,6 @@ RIG_TS480SAT::RIG_TS480SAT() {
 	has_power_out = true;
 	has_dsp_controls = true;
 	has_smeter = true;
-	has_swr_control = true;
 	has_attenuator_control = true;
 	has_preamp_control = true;
 	has_mode_control = true;
@@ -192,6 +190,9 @@ RIG_TS480SAT::RIG_TS480SAT() {
 	precision = 1;
 	ndigits = 8;
 
+	_noise_reduction_level = 0;
+	_nrval1 = 2;
+	_nrval2 = 4;
 }
 
 const char * RIG_TS480SAT::get_bwname_(int n, int md) 
@@ -950,38 +951,79 @@ void RIG_TS480SAT::get_rf_min_max_step(int &min, int &max, int &step)
 	min = 0; max = 100; step = 1;
 }
 
-// Noise blanker
-static int nb = 0;
-static int nb_val = 1;
+// Noise Reduction (TS2000.cxx) NR1 only works; no NR2 and don' no why
+void RIG_TS480SAT::set_noise_reduction(int val)
+{
+	if (val == -1) {
+		return;
+	}
+	_noise_reduction_level = val;
+	if (_noise_reduction_level == 0) {
+		nr_label("NR", false);
+	} else if (_noise_reduction_level == 1) {
+		nr_label("NR1", true);
+	} else if (_noise_reduction_level == 2) {
+		nr_label("NR2", true);
+	}
+	cmd.assign("NR");
+	cmd += '0' + _noise_reduction_level;
+	cmd += ';';
+	sendCommand (cmd);
+	showresp(WARN, ASC, "SET noise reduction", cmd, "");
+}
+
+int  RIG_TS480SAT::get_noise_reduction()
+{
+	cmd = rsp = "NR";
+	cmd.append(";");
+	if (wait_char(';', 4, 100, "GET noise reduction", ASC) == 4) {
+		size_t p = replystr.rfind(rsp);
+		if (p == string::npos) return _noise_reduction_level;
+		_noise_reduction_level = replystr[p+2] - '0';
+	}
+
+	if (_noise_reduction_level == 1) {
+		nr_label("NR1", true);
+	} else if (_noise_reduction_level == 2) {
+		nr_label("NR2", true);
+	} else {
+		nr_label("NR", false);
+	}
+
+	return _noise_reduction_level;
+}
 
 void RIG_TS480SAT::set_noise_reduction_val(int val)
 {
-	nb_val = val;
-	cmd.assign("NL");
-	cmd.append(to_decimal(nb_val, 3)).append(";");
+	if (_noise_reduction_level == 0) return;
+	if (_noise_reduction_level == 1) _nrval1 = val;
+	else _nrval2 = val;
+
+	cmd.assign("RL").append(to_decimal(val, 2)).append(";");
 	sendCommand(cmd);
-	showresp(WARN, ASC, "SET noise blanker val", cmd, replystr);
+	showresp(WARN, ASC, "SET_noise_reduction_val", cmd, "");
 }
 
 int  RIG_TS480SAT::get_noise_reduction_val()
 {
-	cmd = rsp = "NL;";
-	wait_char(';',6, 100, "GET noise blanker val", ASC);
-	size_t p = replystr.rfind("NL");
-	if (p == string::npos) return nb_val;
-	nb_val = atoi(&replystr[2]);
-	return nb_val;
-}
+	int nrval = 0;
+	if (_noise_reduction_level == 0) return 0;
+	int val = progStatus.noise_reduction_val;
+	cmd = rsp = "RL";
+	cmd.append(";");
+	if (wait_char(';', 5, 100, "GET noise reduction val", ASC) == 5) {
+		size_t p = replystr.rfind(rsp);
+		if (p == string::npos) {
+			nrval = (_noise_reduction_level == 1 ? _nrval1 : _nrval2);
+			return nrval;
+		}
+		val = atoi(&replystr[p+2]);
+	}
 
-void RIG_TS480SAT::set_noise_reduction(int val)
-{
-	nb = val;
-	if (!nb)
-		cmd.assign("NB0;");
-	else
-		cmd.assign("NB1;");
-	sendCommand(cmd);
-	showresp(WARN, ASC, "SET noise blanker", cmd, replystr);
+	if (_noise_reduction_level == 1) _nrval1 = val;
+	else _nrval2 = val;
+
+	return val;
 }
 
 int  RIG_TS480SAT::get_agc()
@@ -1020,4 +1062,76 @@ int  RIG_TS480SAT::agc_val()
 {
 	if (fm_mode) return 0;
 	return agcval;
+}
+
+// Auto Notch, beat canceller (TS2000.cxx) BC1 only, not BC2
+void RIG_TS480SAT::set_auto_notch(int v)
+{
+	cmd = v ? "BC1;" : "BC0;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set auto notch", cmd, "");
+
+}
+
+int  RIG_TS480SAT::get_auto_notch()
+{
+	cmd = "BC;";
+	if (wait_char(';', 4, 100, "get auto notch", ASC) == 4) {
+		int anotch = 0;
+		size_t p = replystr.rfind("BC");
+		if (p != string::npos) {
+			anotch = (replystr[p+2] == '1');
+			return anotch;
+		}
+	}
+	return 0;
+}
+
+// Noise Blanker (TS2000.cxx)
+void RIG_TS480SAT::set_noise(bool b)
+{
+	if (b)
+		cmd = "NB1;";
+	else
+		cmd = "NB0;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set NB", cmd, "");
+}
+
+int RIG_TS480SAT::get_noise()
+{
+	cmd = "NB;";
+	if (wait_char(';', 4, 100, "get Noise Blanker", ASC) == 4) {
+		size_t p = replystr.rfind("NB");
+		if (p == string::npos) return 0;
+		if (replystr[p+2] == '0') return 0;
+	}
+	return 1;
+}
+
+// Squelch (TS990.cxx)
+void RIG_TS480SAT::set_squelch(int val)
+{
+		cmd = "SQ0";
+		cmd.append(to_decimal(abs(val),3)).append(";");
+		sendCommand(cmd);
+		showresp(INFO, ASC, "set squelch", cmd, "");
+}
+
+int  RIG_TS480SAT::get_squelch()
+{
+	int val = 0;
+	cmd = "SQ0;";
+		if (wait_char(';', 7, 20, "get squelch", ASC) >= 7) {
+			size_t p = replystr.rfind("SQ0");
+			if (p == string::npos) return val;
+			replystr[p + 6] = 0;
+			val = atoi(&replystr[p + 3]);
+	}
+	return val;
+}
+
+void RIG_TS480SAT::get_squelch_min_max_step(int &min, int &max, int &step)
+{
+	min = 0; max = 255; step = 1;
 }
