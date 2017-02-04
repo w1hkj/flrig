@@ -121,7 +121,7 @@ struct status {
 	bool	spot_onoff;
 	int		cw_spot_tone;
 	bool	enable_keyer;
-	bool	break_in;
+	int		break_in;
 	double	cw_qsk;
 	double	cw_delay;
 	bool	vox_onoff;

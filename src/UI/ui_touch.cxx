@@ -825,8 +825,8 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				genericQSK->selection_color(FL_LIGHT1);
 				genericQSK->hide();
 
-				btnBreakIn = new Fl_Light_Button(xpos + 13, by, 54, bh, _("QSK"));
-				btnBreakIn->tooltip(_("Full break in on/off"));
+				btnBreakIn = new Fl_Button(xpos + 13, by, 60, bh, _("QSK"));
+				btnBreakIn->tooltip(_("Full break in"));
 				btnBreakIn->callback((Fl_Callback*)cb_btnBreakIn);
 				btnBreakIn->value(progStatus.break_in);
 
@@ -864,6 +864,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				spnr_vox_gain->minimum(0);
 				spnr_vox_gain->maximum(100);
 				spnr_vox_gain->step(1);
+				spnr_vox_gain->tooltip(_("VOX gain"));
 				spnr_vox_gain->callback((Fl_Callback*)cb_spnr_vox_gain);
 				spnr_vox_gain->value(progStatus.vox_gain);
 				spnr_vox_gain->align(FL_ALIGN_CENTER | FL_ALIGN_BOTTOM);
@@ -876,6 +877,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				spnr_anti_vox->minimum(0);
 				spnr_anti_vox->maximum(100);
 				spnr_anti_vox->step(1);
+				spnr_anti_vox->tooltip(_("Anti VOX gain"));
 				spnr_anti_vox->callback((Fl_Callback*)cb_spnr_anti_vox);
 				spnr_anti_vox->value(progStatus.vox_anti);
 				spnr_anti_vox->align(FL_ALIGN_CENTER | FL_ALIGN_BOTTOM);
@@ -888,6 +890,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				spnr_vox_hang->minimum(0);
 				spnr_vox_hang->maximum(100);
 				spnr_vox_hang->step(1);
+				spnr_vox_hang->tooltip(_("VOX hang time"));
 				spnr_vox_hang->callback((Fl_Callback*)cb_spnr_vox_hang);
 				spnr_vox_hang->value(progStatus.vox_hang);
 				spnr_vox_hang->align(FL_ALIGN_CENTER | FL_ALIGN_BOTTOM);
@@ -898,6 +901,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 					by, 70, bh, _("VOX"));
 				btn_vox->callback((Fl_Callback*)cb_btn_vox);
 				btn_vox->value(progStatus.vox_onoff);
+				btn_vox->tooltip(_("VOX on/off"));
 
 				btn_vox_on_dataport = new Fl_Check_Button(
 					btn_vox->x() +
@@ -916,12 +920,14 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				btnCompON = new Fl_Light_Button(xpos+230, by, 70, bh, _("On"));
 				btnCompON->callback((Fl_Callback*)cb_btnCompON);
 				btnCompON->value(progStatus.compON);
+				btnCompON->tooltip(_("Compression on/off"));
 
 				spnr_compression = new Hspinner(xpos+138, by, 5*bh, bh, _("Compression"));
 				spnr_compression->type(FL_INT_INPUT);
 				spnr_compression->minimum(0);
 				spnr_compression->maximum(100);
 				spnr_compression->step(1);
+				spnr_compression->tooltip(_("Compression level"));
 				spnr_compression->callback((Fl_Callback*)cb_spnr_compression);
 				spnr_compression->value(progStatus.compression);
 				spnr_compression->align(FL_ALIGN_CENTER | FL_ALIGN_BOTTOM);

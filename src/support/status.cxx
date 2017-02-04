@@ -130,7 +130,7 @@ status progStatus = {
 	false,		// bool spot_onoff;
 	700,		// int  cw_spot_tone;
 	false,		// bool enable_keyer;
-	false,		// bool	break_in;
+	0,			// bool	break_in;
 	15,			// double	cw_qsk;
 	200,		// double	cw_delay;
 

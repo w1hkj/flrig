@@ -22,6 +22,7 @@
 #include "rigpanel.h"
 #include "images.h"
 #include "rig.h"
+#include "rigs.h"
 #include "status.h"
 #include "support.h"
 #include "K3_ui.h"
@@ -126,7 +127,7 @@ Hspinner *spnr_cw_wpm=(Hspinner *)0;
 Fl_Check_Button *btn_enable_keyer=(Fl_Check_Button *)0;
 
 Fl_Group *genericQSK=(Fl_Group *)0;
-Fl_Light_Button *btnBreakIn=(Fl_Light_Button *)0;
+Fl_Button *btnBreakIn=(Fl_Button *)0;
 Hspinner *spnr_cw_delay=(Hspinner *)0;
 Hspinner *cnt_cw_qsk=(Hspinner *)0;
 
@@ -628,7 +629,14 @@ static void cb_btn_enable_keyer(Fl_Check_Button* o, void*) {
 }
 
 static void cb_btnBreakIn(Fl_Check_Button* o, void*) {
-	progStatus.break_in=o->value();
+	if (xcvr_name == rig_IC7300.name_) {
+		progStatus.break_in++;
+		if (progStatus.break_in == 3)
+			progStatus.break_in = 0;
+	}
+	else {
+		progStatus.break_in = ! progStatus.break_in;
+	}
 	cb_enable_break_in();
 }
 

@@ -133,17 +133,22 @@ char *print(FREQMODE data)
 	const char **bwt = selrig->bwtable(data.imode);
 	const char **dsplo = selrig->lotable(data.imode);
 	const char **dsphi = selrig->hitable(data.imode);
-	snprintf(str, 
-		sizeof(str), 
-		"---------------------------------\n%3s,%10ld, %4s, %02d => %5s %5s",
+	snprintf(
+		str, sizeof(str), 
+		"\
+FREQMODE: %3s\n\
+  freq: %10ld\n\
+  mode: %4s\n\
+  bwt index:  %02d\n\
+  bwt values: [%s] [%s]",
 		data.src == XML ? "xml" : data.src == UI ? "ui" : "srvr",
 		data.freq,
 		selrig->modes_ ? selrig->modes_[data.imode] : "modes n/a",
 		data.iBW,
 		(data.iBW > 256 && selrig->has_dsp_controls) ?
-			(dsplo ? dsplo[data.iBW & 0x7F] : "??") : (bwt ? bwt[data.iBW] : "lo n/a"),
+			(dsplo ? dsplo[data.iBW & 0x7F] : "??") : (bwt ? bwt[data.iBW] : "n/a"),
 		(data.iBW > 256 && selrig->has_dsp_controls) ?
-			(dsphi ? dsphi[(data.iBW >> 8) & 0x7F] : "??") : "hi n/a"
+			(dsphi ? dsphi[(data.iBW >> 8) & 0x7F] : "??") : ""
 		);
 	return str;
 }
@@ -736,9 +741,6 @@ void serviceA()
 		}
 	}
 
-//	if (RIG_DEBUG)
-	LOG_INFO("%s", print(vfoA));
-
 	if (!selrig->can_change_alt_vfo && useB) return;
 
 	if (changed_vfo && !useB) {
@@ -772,6 +774,9 @@ void serviceA()
 	}
 
 end_serviceA:
+
+	if (RIG_DEBUG) LOG_INFO("%s", print(vfoA));
+
 	changed_vfo = false;
 }
 
@@ -787,9 +792,6 @@ void serviceB()
 			queB.pop();
 		}
 	}
-
-//	if (RIG_DEBUG)
-	LOG_INFO("%s", print(vfoB));
 
 	if (!selrig->can_change_alt_vfo && !useB) return;
 
@@ -825,6 +827,9 @@ void serviceB()
 	pushedB = false;
 
 end_serviceB:
+
+	if (RIG_DEBUG) LOG_INFO("%s", print(vfoB));
+
 	changed_vfo = false;
 }
 
@@ -1335,24 +1340,30 @@ int movFreqB() {
 
 void cbAswapB()
 {
-	if (selrig->canswap()) {
-		selrig->swapvfos();
-		return;
-	}
 	if (Fl::event_button() == FL_RIGHT_MOUSE) {
 		return cbA2B();
 	}
-	if (!selrig->twovfos()) {
+	if (selrig->canswap()) { // this is what 7300 is doing now
+		selrig->swapvfos();
+		return;
+	}
+	if (!selrig->twovfos()) { // change to this & test
 		vfoB.freq = FreqDispB->value();
 		FREQMODE temp = vfoB;
 		vfoB = vfoA;
 		vfoA = temp;
 		FreqDispB->value(vfoB.freq);
 		FreqDispB->redraw();
-		{
+		FreqDispA->value(vfoA.freq);
+		FreqDispA->redraw();
+		if (!useB) {
 			guard_lock queA_lock(&mutex_queA, 38);
 			while (!queA.empty()) queA.pop();
 			queA.push(vfoA);
+		} else {
+			guard_lock queB_lock(&mutex_queB, 38);
+			while (!queB.empty()) queB.pop();
+			queB.push(vfoB);
 		}
 	} else {
 		guard_lock serial_lock(&mutex_serial, 39);
@@ -1913,9 +1924,16 @@ void redrawAGC()
 
 	btnAGC->label(lbl);
 	btnAGC->redraw_label();
-	btnAGC->value(val > 1);
+	if (xcvr_name ==  rig_IC7300.name_) {
+		if (val == 1) btnAGC->selection_color(FL_GREEN);
+		if (val == 2) btnAGC->selection_color(FL_YELLOW);
+		if (val == 3) btnAGC->selection_color(FL_RED);
+		btnAGC->value(1);
+	} else
+		btnAGC->value(val > 1);
 	if (!val) btnAGC->deactivate();
 	else btnAGC->activate();
+	btnAGC->redraw();
 }
 
 void setAGC(void *)
@@ -3847,6 +3865,10 @@ LOG_INFO("Use xcvr start values for Vfo A/B");
 
 	}
 
+	if (selrig->name_ ==  rig_IC7300.name_) {
+		selrig->enable_break_in();
+		redrawAGC();
+	}
 // enable buttons, change labels
 
 	if (xcvr_name == rig_TS990.name_) { // Setup TS990 Mon Button
@@ -4143,7 +4165,7 @@ void auto_notch_label(const char * l, bool on = false)
 // dynamic reassignment of IF shift range based on Bandwidth selection
 // only used by Icom transceivers with Inner/Outer passband controls
 
-int if_shift_bw_;
+int if_shift_bw_ = 0;
 
 void do_if_shift_range(void *)
 {

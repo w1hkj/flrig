@@ -164,7 +164,7 @@ extern Fl_Group *genericCW;
 extern Fl_Light_Button *btnSpot;
 
 extern Fl_Group *genericQSK;
-extern Fl_Light_Button *btnBreakIn;
+extern Fl_Button *btnBreakIn;
 extern Hspinner *spnr_cw_delay;
 extern Hspinner *cnt_cw_qsk;
 

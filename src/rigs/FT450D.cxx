@@ -936,12 +936,15 @@ void RIG_FT450D::set_cw_weight()
 
 void RIG_FT450D::enable_break_in()
 {
-	if (progStatus.break_in)
+	if (progStatus.break_in) {
 		cmd = "BI1;";
-	else
+		break_in_label("FULL");
+	} else {
 		cmd = "BI0;";
+		break_in_label("QSK");
+	}
 	sendCommand(cmd);
-	showresp(WARN, ASC, "SET keyer on/off", cmd, replystr);
+	showresp(WARN, ASC, "SET break in on/off", cmd, replystr);
 }
 
 void RIG_FT450D::set_cw_delay()

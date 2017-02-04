@@ -1,6 +1,8 @@
 // ----------------------------------------------------------------------------
 // Copyright (C) 2014
 //              David Freese, W1HKJ
+// Modified: January 2017
+//              Andy Stewart, KB1OIQ
 //
 // This file is part of flrig.
 //
@@ -53,7 +55,7 @@ public:
 	int  get_split();
 
 	void swapvfos();
-	bool  canswap() { return true;}
+	bool  canswap() { return false; } //true;}
 
 	void set_bwA(int val);
 	int  get_bwA();
@@ -73,24 +75,26 @@ public:
 		min = 0; max = 10; step = 1; }
 
 	void set_vox_onoff();
+
 	void set_vox_gain();
-	void set_vox_anti();
+	void get_vox_gain_min_max_step(int &min, int &max, int &step);
+
 	void set_vox_hang();
-	void get_vox_hang_min_max_step(int &min, int &max, int &step) {
-		min = 0; max = 200; step = 10; } //alh
+	void get_vox_hang_min_max_step(int &min, int &max, int &step);
 
-	void get_cw_wpm_min_max(int &min, int &max) {
-		min = 6; max = 60; }
-
-	void get_cw_qsk_min_max_step(double &min, double &max, double &step) {
-		min = 2.0; max = 13.0; step = 0.1; }
-
-	void get_cw_spot_tone_min_max_step(int &min, int &max, int &step) {
-		min = 300; max = 900; step = 5; }
+	void set_vox_anti();
+	void get_vox_anti_min_max_step(int &min, int &max, int &step);
 
 	void set_cw_wpm();
+	void get_cw_wpm_min_max(int &min, int &max);
+
+	void enable_break_in();
 	void set_cw_qsk();
+	void get_cw_qsk_min_max_step(double &min, double &max, double &step);
+
 	void set_cw_spot_tone();
+	void get_cw_spot_tone_min_max_step(int &min, int &max, int &step);
+
 	void set_cw_vol();
 
 	const char **bwtable(int m) {return bandwidths_;}
@@ -126,6 +130,12 @@ public:
 	int  get_noise_reduction();
 	void set_noise_reduction_val(int val);
 	int  get_noise_reduction_val();
+	void get_nr_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 15; step = 1; }
+
+	void set_if_shift(int val);
+	void get_if_min_max_step(int &min, int &max, int &step);
+	bool get_if_shift(int &val);
 
 	void set_squelch(int val);
 	int  get_squelch();
@@ -136,6 +146,11 @@ public:
 
 	void set_auto_notch(int val);
 	int  get_auto_notch();
+
+	int  get_agc();
+	int  incr_agc();
+	const char *agc_label();
+	int  agc_val();
 
 	void tune_rig();
 
