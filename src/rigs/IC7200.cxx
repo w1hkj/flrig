@@ -78,13 +78,15 @@ static GUI rig_widgets[]= {
 	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },
 	{ (Fl_Widget *)btnAGC, 2, 145, 50 },
 	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },
-	{ (Fl_Widget *)sldrMICGAIN, 54, 165, 156 },
 	{ (Fl_Widget *)sldrSQUELCH, 266, 125, 156 },
 	{ (Fl_Widget *)btnNR, 214, 145,  50 },
 	{ (Fl_Widget *)sldrNR, 266, 145, 156 },
-	{ (Fl_Widget *)btnNotch, 214, 165,  50 },
-	{ (Fl_Widget *)sldrNOTCH, 266, 165, 156 },
-	{ (Fl_Widget *)sldrPOWER, 54, 185, 156 },
+	{ (Fl_Widget *)btnIFsh, 214, 125,  50 },
+	{ (Fl_Widget *)sldrIFSHIFT, 266, 125, 156 },
+	{ (Fl_Widget *)btnNotch, 214, 145,  50 },
+	{ (Fl_Widget *)sldrNOTCH, 266, 145, 156 },
+	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },
+	{ (Fl_Widget *)sldrPOWER, 266, 185, 156 },
 	{ (Fl_Widget *)NULL, 0, 0, 0 }
 };
 
@@ -120,12 +122,12 @@ RIG_IC7200::RIG_IC7200() {
 	B.imode = 3;
 	B.iBW = 12;
 
-	has_extras =
-	has_smeter =
-	has_power_out =
-	has_swr_control =
-	has_alc_control =
-	has_agc_control =
+	has_extras = true;
+	has_smeter = true;
+	has_power_out = true;
+	has_swr_control = true;
+	has_alc_control = true;
+	has_agc_control = true;
 	has_sql_control = true;
 	has_power_control = true;
 	has_volume_control = true;
@@ -139,11 +141,13 @@ RIG_IC7200::RIG_IC7200() {
 	has_noise_reduction_control = true;
 	has_auto_notch = true;
 	has_notch_control = true;
+	has_ifshift_control = true;
 	has_rf_control = true;
 	has_compON = true;
 	has_vox_onoff = true;
 	has_ptt_control = true;
 	has_tune_control = true;
+	has_split_AB = true;
 
 	defaultCIV = 0x76;
 	adjustCIV(defaultCIV);
@@ -159,16 +163,19 @@ void RIG_IC7200::initialize()
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = btnAGC;
 	rig_widgets[3].W = sldrRFGAIN;
-	rig_widgets[4].W = sldrMICGAIN;
-	rig_widgets[5].W = sldrSQUELCH;
-	rig_widgets[6].W = btnNR;
-	rig_widgets[7].W = sldrNR;
-	rig_widgets[8].W = btnNotch;
-	rig_widgets[9].W = sldrNOTCH;
-	rig_widgets[10].W = sldrPOWER;
+	rig_widgets[4].W = sldrSQUELCH;
+	rig_widgets[5].W = btnNR;
+	rig_widgets[6].W = sldrNR;
+	rig_widgets[7].W = btnIFsh;
+	rig_widgets[8].W = sldrIFSHIFT;
+	rig_widgets[9].W = btnNotch;
+	rig_widgets[10].W = sldrNOTCH;
+	rig_widgets[11].W = sldrMICGAIN;
+	rig_widgets[12].W = sldrPOWER;
 }
 
-//=============================================================================
+//======================================================================
+
 void RIG_IC7200::selectA()
 {
 	cmd = pre_to;
@@ -237,13 +244,33 @@ void RIG_IC7200::set_vfoB (long freq)
 	waitFB("set vfo B");
 }
 
-void RIG_IC7200::set_split(bool b)
+bool RIG_IC7200::can_split()
 {
-	cmd = pre_to;
-	cmd += '\x0F';
-	cmd += b ? '\x01' : '\x00';
-	cmd.append( post );
-	waitFB("set split");
+	return true;
+}
+
+void RIG_IC7200::set_split(bool val)
+{
+	split = val;
+
+	if (val) {
+		cmd.assign(pre_to);
+		cmd.append("\x0F");
+		cmd += '\x01';
+		cmd.append( post );
+		waitFB("Split ON");
+	} else {
+		cmd.assign(pre_to);
+		cmd.append("\x0F");
+		cmd += '\x00';
+		cmd.append( post );
+		waitFB("Split OFF");
+	}
+}
+
+int RIG_IC7200::get_split()
+{
+	return split;
 }
 
 // Tranceiver PTT on/off
@@ -257,20 +284,19 @@ void RIG_IC7200::set_PTT_control(int val)
 	waitFB("set ptt");
 }
 
-
 // Volume control val 0 ... 100
 void RIG_IC7200::set_volume_control(int val)
 {
-	int ICvol = (int)(val * 255 / 100);
 	cmd = pre_to;
 	cmd.append("\x14\x01");
-	cmd.append(to_bcd(ICvol, 3));
+	cmd.append(bcd255(val));
 	cmd.append( post );
 	waitFB("set vol");
 }
 
 int RIG_IC7200::get_volume_control()
 {
+	int val = progStatus.volume;
 	string cstr = "\x14\x01";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -280,9 +306,9 @@ int RIG_IC7200::get_volume_control()
 	if (waitFOR(9, "get vol")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return (int)ceil(fm_bcd(&replystr[p + 6],3) * 100 / 255);
+			val = num100(&replystr[p+6]);
 	}
-	return progStatus.volume;
+	return progStatus.volume = val;
 }
 
 void RIG_IC7200::get_vol_min_max_step(int &min, int &max, int &step)
@@ -370,37 +396,6 @@ int RIG_IC7200::get_alc(void)
 	return mtr;
 }
 
-void RIG_IC7200::set_attenuator(int val)
-{
-	cmd = pre_to;
-	cmd += '\x11';
-	cmd += val ? '\x20' : '\x00';
-	cmd.append( post );
-	waitFB("set att");
-	atten_level = val;
-}
-
-int RIG_IC7200::get_attenuator()
-{
-	cmd = pre_to;
-	cmd += '\x11';
-	cmd.append( post );
-	string resp = pre_fm;
-	resp += '\x11';
-	if (waitFOR(7, "get ATT")) {
-		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			atten_level = replystr[p+5];
-		if (atten_level == 0x20) {
-			atten_label("20 dB", true);
-		} else {
-			atten_level = 0;
-			atten_label("ATT", false);
-		}
-	}
-	return atten_level;
-}
-
 void RIG_IC7200::set_noise(bool val)
 {
 	cmd = pre_to;
@@ -456,7 +451,7 @@ void RIG_IC7200::set_noise_reduction_val(int val)
 {
 	cmd = pre_to;
 	cmd.append("\x14\x06");
-	cmd.append(to_bcd(val * 255 / 100, 3));
+	cmd.append(bcd255(val));
 	cmd.append(post);
 	waitFB("set NRval");
 }
@@ -472,13 +467,56 @@ int RIG_IC7200::get_noise_reduction_val()
 	if (waitFOR(9, "get NRval")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return (int)ceil(fm_bcd(&replystr[p+6],3) * 100 / 255);
+			return num100(&replystr[p+6]);
 	}
 	return progStatus.noise_reduction_val;
 }
 
+void RIG_IC7200::set_attenuator(int val)
+{
+	if (val) {
+		atten_label("20 dB", true);
+		set_preamp(0);
+	} else
+		atten_label("ATT", false);
+
+	cmd = pre_to;
+	cmd += '\x11';
+	cmd += val ? '\x20' : '\x00';
+	cmd.append( post );
+	waitFB("set att");
+}
+
+int RIG_IC7200::get_attenuator()
+{
+	cmd = pre_to;
+	cmd += '\x11';
+	cmd.append( post );
+	string resp = pre_fm;
+	resp += '\x11';
+	if (waitFOR(7, "get ATT")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			if (!replystr[p+5]) {
+				atten_label("ATT", false);
+				return 0;
+			} else {
+				atten_label("20 dB", true);
+				return 1;
+			}
+		}
+	}
+	return 0;
+}
+
 void RIG_IC7200::set_preamp(int val)
 {
+	if (val) {
+		preamp_label("Pre ON", true);
+		set_attenuator(0);
+	} else
+		preamp_label("Pre", false);
+
 	cmd = pre_to;
 	cmd += '\x16';
 	cmd += '\x02';
@@ -500,10 +538,10 @@ int RIG_IC7200::get_preamp()
 		if (p != string::npos) {
 			if (replystr[p+6] == 0x01) {
 				preamp_label("Pre ON", true);
-				return true;
+				progStatus.preamp = true;
 			} else {
 				preamp_label("Pre", false);
-				return false;
+				progStatus.preamp = false;
 			}
 		}
 	}
@@ -512,10 +550,9 @@ int RIG_IC7200::get_preamp()
 
 void RIG_IC7200::set_rf_gain(int val)
 {
-	int ICrfg = (int)(val * 255 / 100);
 	cmd = pre_to;
 	cmd.append("\x14\x02");
-	cmd.append(to_bcd(ICrfg, 3));
+	cmd.append(bcd255(val));
 	cmd.append( post );
 	waitFB("set RF");
 }
@@ -530,17 +567,16 @@ int RIG_IC7200::get_rf_gain()
 	if (waitFOR(9, "get RF")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return (int)ceil(fm_bcd(&replystr[p + 6],3) * 100 / 255);
+			return num100(&replystr[p + 6]);
 	}
 	return progStatus.rfgain;
 }
 
 void RIG_IC7200::set_squelch(int val)
 {
-	int ICsql = (int)(val * 255 / 100);
 	cmd = pre_to;
 	cmd.append("\x14\x03");
-	cmd.append(to_bcd(ICsql, 3));
+	cmd.append(bcd255(val));
 	cmd.append( post );
 	waitFB("set Sqlch");
 }
@@ -556,7 +592,7 @@ int  RIG_IC7200::get_squelch()
 	if (waitFOR(9, "get squelch")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return (int)ceil(fm_bcd(&replystr[p+6], 3) * 100 / 255);
+			return num100(&replystr[p+6]);
 	}
 	return progStatus.squelch;
 }
@@ -565,7 +601,7 @@ void RIG_IC7200::set_power_control(double val)
 {
 	cmd = pre_to;
 	cmd.append("\x14\x0A");
-	cmd.append(to_bcd((int)(val * 255 / 100), 3));
+	cmd.append(bcd255(val));
 	cmd.append( post );
 	waitFB("set power");
 }
@@ -580,7 +616,7 @@ int RIG_IC7200::get_power_control()
 	if (waitFOR(9, "get power")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return (int)ceil(fm_bcd(&replystr[p + 6],3) * 100 / 255);
+			return num100(&replystr[p+6]);
 	}
 	return progStatus.power_level;
 }
@@ -602,18 +638,18 @@ int RIG_IC7200::get_mic_gain()
 	cmd.append(post);
 	if (waitFOR(9, "get mic")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			return (int)ceil(fm_bcd(&replystr[p+6],3) / 2.55);
+		if (p != string::npos) {
+			return num100(&replystr[p + 6]);
+		}
 	}
 	return 0;
 }
 
 void RIG_IC7200::set_mic_gain(int val)
 {
-	val = (int)(val * 255 / 100);
 	cmd = pre_to;
 	cmd.append("\x14\x0B");
-	cmd.append(to_bcd(val,3));
+	cmd.append(bcd255(val));
 	cmd.append(post);
 	waitFB("set mic");
 }
@@ -631,7 +667,6 @@ int RIG_IC7200::get_modeA()
 		if (p != string::npos) {
 			md = replystr[p + 5];
 			if (md > 6) md -= 2;
-			A.iBW = replystr[p + 6];
 		}
 	}
 	cmd = pre_to;
@@ -682,7 +717,6 @@ int RIG_IC7200::get_modeB()
 		if (p != string::npos) {
 			md = replystr[p+5];
 			if (md > 6) md -= 2;
-			B.iBW = replystr[p+6];
 		}
 	}
 	cmd = pre_to;
@@ -794,6 +828,8 @@ void RIG_IC7200::set_bwA(int val)
 	cmd.append(to_bcd(val, 2));
 	cmd.append( post );
 	waitFB("set BW A");
+	int bw = atoi(bandwidths_[A.iBW]);
+	if_shift_range(bw);
 }
 
 int  RIG_IC7200::get_bwA()
@@ -803,10 +839,16 @@ int  RIG_IC7200::get_bwA()
 	cmd.append( post );
 	string resp = pre_fm;
 	resp += "\x1A\x02";
+	int bwval = A.iBW;
 	if (waitFOR(8, "get BW A")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			A.iBW = (fm_bcd(&replystr[p+6],2));
+			bwval = (fm_bcd(&replystr[p+6],2));
+	}
+	if (bwval != A.iBW) {
+		A.iBW = bwval;
+		int bw = atoi(bandwidths_[A.iBW]);
+		if_shift_range(bw);
 	}
 	return A.iBW;
 }
@@ -819,6 +861,8 @@ void RIG_IC7200::set_bwB(int val)
 	cmd.append(to_bcd(val, 2));
 	cmd.append( post );
 	waitFB("set BW B");
+	int bw = atoi(bandwidths_[B.iBW]);
+	if_shift_range(bw);
 }
 
 int  RIG_IC7200::get_bwB()
@@ -828,10 +872,16 @@ int  RIG_IC7200::get_bwB()
 	cmd.append( post );
 	string resp = pre_fm;
 	resp += "\x1A\x02";
+	int bwval = B.iBW;
 	if (waitFOR(8, "get BW B")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			B.iBW = (fm_bcd(&replystr[p+6],2));
+			bwval = (fm_bcd(&replystr[p+6],2));
+	}
+	if (bwval != B.iBW) {
+		B.iBW = bwval;
+		int bw = atoi(bandwidths_[B.iBW]);
+		if_shift_range(bw);
 	}
 	return B.iBW;
 }
@@ -1012,4 +1062,50 @@ const char *RIG_IC7200::agc_label()
 int  RIG_IC7200::agc_val()
 {
 	return (agcval + 1);
+}
+
+static bool shift_was_on = false;
+
+extern int if_shift_bw_;
+
+void RIG_IC7200::set_if_shift(int val)
+{
+	progStatus.shift_val = val;
+
+	int shift;
+	if (if_shift_bw_ == 0) shift = 128;
+	else shift = (val + if_shift_bw_) * 128 / if_shift_bw_;
+	if (shift == 256) shift = 255;
+	if (shift < 0) shift = 0;
+
+	if (!progStatus.shift && !shift_was_on) return;
+	shift_was_on = progStatus.shift;
+
+	if (!progStatus.shift && shift == 128) return;
+
+	if (!progStatus.shift) shift = 128;
+
+	cmd = pre_to;
+	cmd.append("\x14\x07");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set IF on/off");
+
+	cmd = pre_to;
+	cmd.append("\x14\x08");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set IF val");
+}
+
+void RIG_IC7200::get_if_min_max_step(int &min, int &max, int &step)
+{
+	min = -50;
+	max = +50;
+	step = 1;
+}
+
+bool RIG_IC7200::get_if_shift(int &val) {
+	val = progStatus.shift_val;
+	return progStatus.shift;
 }

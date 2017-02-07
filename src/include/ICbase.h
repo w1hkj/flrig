@@ -51,6 +51,9 @@ public:
 	bool  waitFOR(size_t n, const char *sz);
 	void adjustCIV(uchar adr);
 
+	virtual void swapvfos();
+	virtual void A2B();
+
 };
 
 #endif

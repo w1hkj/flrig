@@ -253,7 +253,8 @@ public:
 	virtual int  get_split() {return split;}
 	virtual bool twovfos() {return false;}
 	virtual void swapvfos() {}
-	virtual bool  canswap() { return false;}
+	virtual bool canswap() { return false; }
+	virtual bool ICswap() { return false; }
 
 	virtual int  get_agc() { return 0; }
 	virtual int  incr_agc() { return 0;}
@@ -439,6 +440,9 @@ public:
 	int nrval2() { return _nrval2; }
 	int noise_reduction_level() { return _noise_reduction_level; }
 
+// TS990 monitor usurp'd use of IF shift control
+	virtual void set_monitor(bool) {}
+
 // TT-550 / at-11 internal tuner i/o commands
 	virtual void at11_bypass() {}
 	virtual void at11_autotune() {}
@@ -448,6 +452,9 @@ public:
 	virtual void at11_ind_dn() {}
 	virtual void at11_loZ() {}
 	virtual void at11_hiZ() {}
+
+	string bcd255(int val);
+	int    num100(string bcd);
 
 };
 

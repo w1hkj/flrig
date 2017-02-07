@@ -86,6 +86,10 @@ public:
 	bool get_notch(int &val);
 	void get_notch_min_max_step(int &min, int &max, int &step);
 
+	bool get_if_shift(int &val);
+	void set_if_shift(int val);
+	void get_if_min_max_step(int &min, int &max, int &step);
+
 	int  get_agc();
 	int  incr_agc();
 	const char *agc_label();
@@ -98,7 +102,8 @@ public:
 	int  get_auto_notch();
 	void set_vox_onoff();
 	void set_split(bool);
-	bool can_split() { return true; }
+	int  get_split();
+	bool can_split();
 	const char **bwtable(int);
 
 	void tune_rig();

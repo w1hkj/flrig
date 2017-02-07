@@ -164,3 +164,23 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 	return false;
 }
 
+// exchange & equalize are available in these Icom xcvrs
+// 718 706MKIIG 746 746PRO 756 756PRO 756PROII 756PROIII
+// 910 7000 7100 7200 7300 7410 7600 7700 7800 9100
+
+void RIG_ICOM::swapvfos()
+{
+	cmd = pre_to;
+	cmd += 0x07; cmd += 0xB0;
+	cmd.append(post);
+	waitFB("Exchange vfos");
+}
+
+void RIG_ICOM::A2B()
+{
+	cmd = pre_to;
+	cmd += 0x07; cmd += 0xA0;
+	cmd.append(post);
+	waitFB("Equalize vfos");
+}
+

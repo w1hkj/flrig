@@ -753,18 +753,18 @@ void serviceA()
 
 	if (vfoA.freq != vfo.freq || changed_vfo) {
 		selrig->set_vfoA(vfoA.freq);
-		Fl::awake(setFreqDispA, (void *)vfoA.freq);
 		vfo.freq = vfoA.freq;
+		Fl::awake(setFreqDispA, (void *)vfoA.freq);
 	}
-// adjust for change in bandwidths_
 	if (vfoA.imode != vfo.imode || changed_vfo) {
 		selrig->set_modeA(vfoA.imode);
 		vfo.imode = vfoA.imode;
 		Fl::awake(setModeControl);
-		vfo.iBW = vfoA.iBW;
+		int saveBW = vfoA.iBW;
 		set_bandwidth_control();
+		vfo.iBW = vfoA.iBW = saveBW;
+		selrig->set_bwB(saveBW);
 		Fl::awake(setBWControl);
-		selrig->set_bwA(vfo.iBW);
 	} else if (vfoA.iBW != vfo.iBW) {
 		selrig->set_bwA(vfoA.iBW);
 		vfo.iBW = vfoA.iBW;
@@ -812,10 +812,11 @@ void serviceB()
 		selrig->set_modeB(vfoB.imode);
 		vfo.imode = vfoB.imode;
 		Fl::awake(setModeControl);
-		vfo.iBW = vfoB.iBW;
+		int saveBW = vfoB.iBW;
 		set_bandwidth_control();
+		vfo.iBW = vfoB.iBW = saveBW;
+		selrig->set_bwB(saveBW);
 		Fl::awake(setBWControl);
-		selrig->set_bwB(vfo.iBW);
 	} else if (vfoB.iBW != vfo.iBW || pushedB) {
 		selrig->set_bwB(vfoB.iBW);
 		vfo.iBW = vfoB.iBW;
@@ -1481,8 +1482,7 @@ void cb_selectB() {
 	guard_lock serial_lock(&mutex_serial, 50);
 	changed_vfo = true;
 	vfoB.src = UI;
-	vfoB.freq = FreqDispB->value();
-	guard_lock queB_lock(&mutex_queB, 51);
+	vfoB.freq = FreqDispB->value();	guard_lock queB_lock(&mutex_queB, 51);
 	queB.push(vfoB);
 	useB = true;
 	highlight_vfo((void *)0);
@@ -4030,40 +4030,142 @@ void initRigCombo()
 	selectRig->index(0);
 }
 
+//----------------------------------------------------------------------
+// button label and label state changes
+// Note that an additional level of service request is made to insure
+// that the main thread is actually changing the widget
+
+// noise reduction
+static std::string nr_label_;
+static bool nr_state_;
+
+void do_nr_label(void *)
+{
+	btnNR->value(nr_state_ ? 1 : 0);
+	btnNR->label(nr_label_.c_str());
+	btnNR->redraw_label();
+}
+
 void nr_label(const char *l, bool on = false)
 {
-	btnNR->value(on ? 1 : 0);
-	btnNR->label(l);
-	btnNR->redraw_label();
+	nr_label_ = l;
+	nr_state_ = on;
+	Fl::awake(do_nr_label);
+}
+
+// noise blanker
+static std::string nb_label_;
+static bool nb_state_;
+
+void do_nb_label(void *)
+{
+	btnNOISE->value(nb_state_ ? 1 : 0);
+	btnNOISE->label(nb_label_.c_str());
+	btnNOISE->redraw_label();
 }
 
 void nb_label(const char * l, bool on = false)
 {
-	btnNOISE->value(on ? 1 : 0);
-	btnNOISE->label(l);
-	btnNOISE->redraw_label();
+	nb_label_ = l;
+	nb_state_ = on;
+	Fl::awake(do_nb_label);
+}
+
+// preamp label
+static std::string preamp_label_;
+static bool preamp_state_;
+
+void do_preamp_label(void *)
+{
+	btnPreamp->value(preamp_state_ ? 1 : 0);
+	btnPreamp->label(preamp_label_.c_str());
+	btnPreamp->redraw_label();
 }
 
 void preamp_label(const char * l, bool on = false)
 {
-	btnPreamp->value(on ? 1 : 0);
-	btnPreamp->label(l);
-	btnPreamp->redraw_label();
+	preamp_label_ = l;
+	preamp_state_ = on;
+	Fl::awake(do_preamp_label);
+}
+
+// atten label
+static std::string atten_label_;
+static bool atten_state_;
+
+void do_atten_label(void *)
+{
+	btnAttenuator->value(atten_state_ ? 1 : 0);
+	btnAttenuator->label(atten_label_.c_str());
+	btnAttenuator->redraw_label();
 }
 
 void atten_label(const char * l, bool on = false)
 {
-	btnAttenuator->value(on ? 1 : 0);
-	btnAttenuator->label(l);
-	btnAttenuator->redraw_label();
+	atten_label_ = l;
+	atten_state_ = on;
+	Fl::awake(do_atten_label);
+}
+
+// break-in label
+static std::string bkin_label_;
+
+void do_bkin_label(void *)
+{
+	btnBreakIn->label(atten_label_.c_str());
+	btnBreakIn->redraw_label();
+}
+
+void break_in_label(const char *l)
+{
+	bkin_label_ = l;
+	Fl::awake(do_bkin_label);
+}
+
+// autonotch label
+static std::string auto_notch_label_;
+static bool auto_notch_state_;
+
+void do_auto_notch_label(void *)
+{
+	btnAutoNotch->value(auto_notch_state_ ? 1 : 0);
+	btnAutoNotch->label(auto_notch_label_.c_str());
+	btnAutoNotch->redraw_label();
 }
 
 void auto_notch_label(const char * l, bool on = false)
 {
-	btnAutoNotch->value(on ? 1 : 0);
-	btnAutoNotch->label(l);
-	btnAutoNotch->redraw_label();
+	auto_notch_label_ = l;
+	auto_notch_state_ = on;
+	Fl::awake(do_auto_notch_label);
 }
+//----------------------------------------------------------------------
+// dynamic reassignment of IF shift range based on Bandwidth selection
+// only used by Icom transceivers with Inner/Outer passband controls
+
+int if_shift_bw_;
+
+void do_if_shift_range(void *)
+{
+	if (sldrIFSHIFT) sldrIFSHIFT->minimum(-if_shift_bw_);
+	if (sldrIFSHIFT) sldrIFSHIFT->maximum(if_shift_bw_);
+	if (sldrIFSHIFT) sldrIFSHIFT->step(50);
+	if (sldrIFSHIFT) sldrIFSHIFT->value(0);
+	if (sldrIFSHIFT) sldrIFSHIFT->redraw();
+	if (spnrIFSHIFT) spnrIFSHIFT->minimum(-if_shift_bw_);
+	if (spnrIFSHIFT) spnrIFSHIFT->maximum(if_shift_bw_);
+	if (spnrIFSHIFT) spnrIFSHIFT->step(50);
+	if (spnrIFSHIFT) spnrIFSHIFT->value(0);
+	if (spnrIFSHIFT) spnrIFSHIFT->redraw();
+}
+
+void if_shift_range(int bw)
+{
+	if_shift_bw_ = bw / 2;
+	Fl::awake(do_if_shift_range);
+}
+
+//----------------------------------------------------------------------
 
 void cbAuxPort()
 {
@@ -4153,7 +4255,6 @@ void cb_vfo_adj()
 		progStatus.vfo_adj = spnr_tt550_vfo_adj->value();
 	else
 		progStatus.vfo_adj = spnr_vfo_adj->value();
-printf("spnr_vfo_adj %f\n", progStatus.vfo_adj);
 	guard_lock serial_lock(&mutex_serial, 83);
 	selrig->setVfoAdj(progStatus.vfo_adj);
 }
