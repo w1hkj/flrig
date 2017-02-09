@@ -217,17 +217,6 @@ int RIG_IC7800::get_split()
 	return split;
 }
 
-void RIG_IC7800::swapvfos()
-{
-	cmd = pre_to;
-	cmd += 0x07; cmd += 0xB0;
-	cmd.append(post);
-	if (IC7800_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-	sendICcommand (cmd, 6);
-	checkresponse();
-}
-
 void RIG_IC7800::set_modeA(int val)
 {
 	A.imode = val;

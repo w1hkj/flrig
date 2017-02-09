@@ -76,6 +76,11 @@ public:
 	void set_cw_spot_tone();
 	void set_cw_vol();
 
+	bool canswap() { return true; }
+	bool ICswap() { return true; }
+
+//	bool hasA2b() { return true; }
+
 	const char **bwtable(int m) {return bandwidths_;}
 
 

@@ -41,6 +41,9 @@ public:
 
 	int  adjust_bandwidth(int m) { return 0; }
 
+	bool  canswap() { return true; }
+	bool ICswap() { return true; }
+
 private:
 	bool comp_is_on;
 };

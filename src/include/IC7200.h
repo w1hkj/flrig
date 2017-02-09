@@ -106,6 +106,11 @@ public:
 	bool can_split();
 	const char **bwtable(int);
 
+	bool  canswap() { return true; }
+	bool ICswap() { return true; }
+
+//	bool hasA2b() { return true; }
+
 	void tune_rig();
 
 

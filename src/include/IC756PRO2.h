@@ -93,6 +93,9 @@ public:
 
 	bool twovfos() { return false; }
 
+	bool  canswap() { return true; }
+	bool ICswap() { return true; }
+
 	const char **bwtable(int);
 
 protected:

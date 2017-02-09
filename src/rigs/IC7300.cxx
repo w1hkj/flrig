@@ -22,8 +22,6 @@
 
 #include "IC7300.h"
 
-bool IC7300_DEBUG = true;
-
 //=============================================================================
 // IC-7300
 
@@ -306,32 +304,6 @@ int RIG_IC7300::get_split()
 			split = replystr[p+5];
 	}
 	return split;
-}
-
-void RIG_IC7300::swapvfos()
-{
-// stop polling
-	guard_lock serial_lock(&mutex_serial);
-
-	FREQMODE tempA = vfoA;
-	FREQMODE tempB = vfoB;
-
-	cmd = pre_to;
-	cmd += 0x07; cmd += 0xB0;
-	cmd.append(post);
-	if (IC7300_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-	waitFB("swap vfos");
-
-	guard_lock queA_lock(&mutex_queA, 120);
-	while (!queA.empty()) queA.pop();
-	queA.push(tempB);
-	vfoA = tempB;
-
-	guard_lock queB_lock(&mutex_queB, 121);
-	while (!queB.empty()) queB.pop();
-	queB.push(tempA);
-	vfoB = tempA;
 }
 
 // LSB  USB  AM   CW  RTTY  FM  CW-R  RTTY-R  LSB-D  USB-D

@@ -49,6 +49,10 @@ public:
 
 	void set_split(bool);
 	bool can_split() { return true; }
+
+	bool  canswap() { return true; }
+	bool ICswap() { return true; }
+
 };
 
 #endif

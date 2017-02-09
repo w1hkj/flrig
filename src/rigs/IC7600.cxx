@@ -287,16 +287,6 @@ int RIG_IC7600::get_split()
 	return split;
 }
 
-void RIG_IC7600::swapvfos()
-{
-	cmd = pre_to;
-	cmd += 0x07; cmd += 0xB0;
-	cmd.append(post);
-	if (IC7600_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-	waitFB("swap vfos");
-}
-
 void RIG_IC7600::set_modeA(int val)
 {
 	A.imode = val;

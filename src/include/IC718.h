@@ -83,6 +83,9 @@ public:
 	void set_split(bool val);
 	int  get_split();
 
+	bool  canswap() { return true; }
+	bool ICswap() { return true; }
+
 protected:
 	int  filter_nbr;
 };

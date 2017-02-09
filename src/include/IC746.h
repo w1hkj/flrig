@@ -78,6 +78,9 @@ public:
 	virtual void set_split(bool val);
 	virtual bool can_split() { return true;}
 
+	virtual bool canswap() { return true; }
+	virtual bool ICswap() { return true; }
+
 protected:
 	int  preamp_level;
 	int  atten_level;
@@ -139,6 +142,7 @@ public:
 	bool can_split() { return true;}
 
 	bool twovfos() { return false; }
+
 	const char **bwtable(int);
 
 };

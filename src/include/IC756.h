@@ -29,6 +29,10 @@ public:
 	RIG_IC756();
 	~RIG_IC756(){}
 	void initialize();
+
+	virtual bool canswap() { return true; }
+	virtual bool ICswap() { return true; }
+
 };
 
 class RIG_IC756PRO : public RIG_ICOM {

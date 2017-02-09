@@ -73,7 +73,7 @@ public:
 	int  get_split();
 
 	bool canswap() { return true; }
-	void swapvfos();
+	bool ICswap() { return true; }
 
 	int  get_mic_gain();
 	void set_mic_gain(int val);

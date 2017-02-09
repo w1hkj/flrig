@@ -134,7 +134,7 @@ char *print(FREQMODE data)
 	const char **dsplo = selrig->lotable(data.imode);
 	const char **dsphi = selrig->hitable(data.imode);
 	snprintf(
-		str, sizeof(str), 
+		str, sizeof(str),
 		"\
 FREQMODE: %3s\n\
   freq: %10ld\n\
@@ -237,7 +237,7 @@ void read_vfoAorB()
 			val = selrig->get_vfoAorB();
 		}
 		if (val != useB) {
-			Fl::awake(update_vfoAorB, reinterpret_cast<void*>(val));		
+			Fl::awake(update_vfoAorB, reinterpret_cast<void*>(val));
 		}
 	}
 }
@@ -467,7 +467,7 @@ void read_preamp_att()
 // split
 void update_split(void *d)
 {
-	if (xcvr_name == rig_FT450.name_ || xcvr_name == rig_FT450D.name_ || 
+	if (xcvr_name == rig_FT450.name_ || xcvr_name == rig_FT450D.name_ ||
     	xcvr_name == rig_FT950.name_ || xcvr_name == rig_FTdx1200.name_ ||
 		xcvr_name == rig_TS480SAT.name_ || xcvr_name == rig_TS480HX.name_ ||
 		xcvr_name == rig_TS590S.name_ || xcvr_name == rig_TS590SG.name_ ||
@@ -691,8 +691,8 @@ void read_squelch()
 	Fl::awake(update_squelch, (void*)0);
 }
 
-struct POLL_PAIR { 
-	int *poll; 
+struct POLL_PAIR {
+	int *poll;
 	void (*pollfunc)();
 };
 
@@ -765,7 +765,7 @@ void serviceA()
 		int saveBW = vfoA.iBW;
 		set_bandwidth_control();
 		vfo.iBW = vfoA.iBW = saveBW;
-		selrig->set_bwB(saveBW);
+		selrig->set_bwA(saveBW);
 		Fl::awake(setBWControl);
 	} else if (vfoA.iBW != vfo.iBW) {
 		selrig->set_bwA(vfoA.iBW);
@@ -878,7 +878,15 @@ void serviceSliders()
 			case IFSH:
 				progStatus.shift = working.button;
 				progStatus.shift_val = working.value;
-				selrig->set_if_shift(working.value);
+				if (xcvr_name == rig_TS990.name_) {
+					if (progStatus.shift)
+						selrig->set_monitor(1);
+					else
+						selrig->set_monitor(0);
+					selrig->set_if_shift(working.value);
+				} else {
+					selrig->set_if_shift(working.value);
+				}
 				if_shift_changed = false;
 				break;
 			case NOTCH:
@@ -990,7 +998,7 @@ void * serial_thread_loop(void *d)
 					if ((xcvr_name == rig_K2.name_) ||
 						(selrig->has_get_info &&
 							(progStatus.poll_frequency ||
-							 progStatus.poll_mode || 
+							 progStatus.poll_mode ||
 							 progStatus.poll_bandwidth) ) )
 						read_info();
 					if (que_pending() || bypass_serial_thread_loop) continue;
@@ -1338,16 +1346,99 @@ int movFreqB() {
 	return 1;
 }
 
+void CATswapAB() // called by UI action; do not need Fl::awake(...)
+{
+	guard_lock queA_lock(&mutex_queA);
+	while (!queA.empty()) queA.pop();
+
+	guard_lock queB_lock(&mutex_queB);
+	while (!queB.empty()) queB.pop();
+
+	guard_lock serial_lock(&mutex_serial);
+	selrig->swapvfos();
+
+// Recent Icom xcvrs simply select A or B along with all of the xcvr
+// internal items associated with the newly active VFO
+
+	if (selrig->ICswap()) {
+		useB = !useB;
+		Fl_Color norm_fg = fl_rgb_color(progStatus.fg_red, progStatus.fg_green, progStatus.fg_blue);
+		Fl_Color norm_bg = fl_rgb_color(progStatus.bg_red, progStatus.bg_green, progStatus.bg_blue);
+		Fl_Color dim_bg = fl_color_average( norm_bg, FL_BLACK, 0.75);
+		if (useB) {
+			FreqDispA->SetONOFFCOLOR( norm_fg, dim_bg );
+			FreqDispB->SetONOFFCOLOR( norm_fg, norm_bg );
+			btnA->value(0);
+			btnB->value(1);
+		} else {
+			FreqDispA->SetONOFFCOLOR( norm_fg, norm_bg );
+			FreqDispB->SetONOFFCOLOR( norm_fg, dim_bg);
+			btnA->value(1);
+			btnB->value(0);
+		}
+		FreqDispA->redraw();
+		FreqDispB->redraw();
+		btnA->redraw();
+		btnB->redraw();
+
+	} else {
+
+		vfoB.freq = selrig->get_vfoB();
+		vfoB.imode = selrig->get_modeB();
+		vfoB.iBW = selrig->get_bwB();
+		FreqDispB->value(vfoB.freq);
+		FreqDispB->redraw();
+
+		vfoA.freq = selrig->get_vfoA();
+		vfoA.imode = selrig->get_modeA();
+		vfoA.iBW = selrig->get_bwA();
+		FreqDispA->value(vfoA.freq);
+		FreqDispA->redraw();
+
+		vfo = vfoA;
+	}
+
+	if (selrig->has_dsp_controls) {
+		if (vfo.iBW > 256) {
+			opBW->index(0);
+			opBW->hide();
+			opDSP_hi->index((vfo.iBW >> 8) & 0x7F);
+			opDSP_hi->hide();
+			opDSP_lo->index(vfo.iBW & 0xFF);
+			opDSP_lo->show();
+			btnDSP->label(selrig->SL_label);
+			btnDSP->redraw_label();
+			btnDSP->show();
+		} else {
+			opDSP_lo->index(0);
+			opDSP_hi->index(0);
+			opDSP_lo->hide();
+			opDSP_hi->hide();
+			btnDSP->hide();
+			opBW->index(vfo.iBW);
+			opBW->show();
+		}
+	} else {
+		opDSP_lo->hide();
+		opDSP_hi->hide();
+		btnDSP->hide();
+		opBW->index(vfo.iBW);
+		opBW->show();
+	}
+
+	return;
+}
+
 void cbAswapB()
 {
 	if (Fl::event_button() == FL_RIGHT_MOUSE) {
 		return cbA2B();
 	}
-	if (selrig->canswap()) { // this is what 7300 is doing now
-		selrig->swapvfos();
+	if (selrig->canswap()) {
+		CATswapAB();
 		return;
 	}
-	if (!selrig->twovfos()) { // change to this & test
+	if (!selrig->twovfos()) {
 		vfoB.freq = FreqDispB->value();
 		FREQMODE temp = vfoB;
 		vfoB = vfoA;
@@ -1451,7 +1542,7 @@ void cb_set_split(int val)
 	progStatus.split = val;
 
 	if (selrig->has_split_AB) {
-		guard_lock serial_lock(&mutex_serial, 46);
+		guard_lock serial_lock(&mutex_serial);
 		selrig->set_split(val);
 	} else if (val) {
 		if (useB) {
@@ -1475,12 +1566,18 @@ void cb_selectA() {
 		btnSplit->value(0);
 		cb_set_split(0);
 	}
-	guard_lock serial_lock(&mutex_serial, 48);
+	guard_lock serial_lock(&mutex_serial);
 	changed_vfo = true;
 	vfoA.src = UI;
 	vfoA.freq = FreqDispA->value();
-	guard_lock queA_lock(&mutex_queA, 49);
+
+	guard_lock queA_lock(&mutex_queA);
+	while (!queA.empty()) queA.pop();
 	queA.push(vfoA);
+
+	guard_lock queB_lock(&mutex_queB);
+	while (!queB.empty()) queB.pop();
+
 	useB = false;
 	highlight_vfo((void *)0);
 }
@@ -1490,12 +1587,20 @@ void cb_selectB() {
 		btnSplit->value(0);
 		cb_set_split(0);
 	}
-	guard_lock serial_lock(&mutex_serial, 50);
+	guard_lock serial_lock(&mutex_serial);
 	changed_vfo = true;
 	vfoB.src = UI;
-	vfoB.freq = FreqDispB->value();	guard_lock queB_lock(&mutex_queB, 51);
+	vfoB.freq = FreqDispB->value();
+
+	guard_lock queA_lock(&mutex_queA);
+	while (!queA.empty()) queA.pop();
+
+	guard_lock queB_lock(&mutex_queB);
+	while (!queB.empty()) queB.pop();
 	queB.push(vfoB);
+
 	useB = true;
+
 	highlight_vfo((void *)0);
 }
 
@@ -1680,7 +1785,7 @@ void setNR()
 {
 	if (!selrig->has_noise_reduction_control) return;
 	noise_reduction_changed = true;
-	if (xcvr_name == rig_TS2000.name_ || 
+	if (xcvr_name == rig_TS2000.name_ ||
 		xcvr_name == rig_TS590S.name_ ||
 		xcvr_name == rig_TS590SG.name_ ||
 		xcvr_name == rig_TS990.name_) {
@@ -2006,7 +2111,7 @@ void updateRFgain(void *d)
 	if (spnrRFGAIN) {
 		spnrRFGAIN->value((long)d);
 		spnrRFGAIN->redraw();
-	} 
+	}
 	if (sldrRFGAIN) {
 		sldrRFGAIN->value((long)d);
 		sldrRFGAIN->redraw();
@@ -3048,7 +3153,7 @@ void initRig()
 			}
 		opBW->activate();
 		opBW->index(vfoA.iBW);
-		
+
 		spnr_tt550_vfo_adj->value(progStatus.vfo_adj);
 
 	} else { // !TT550
@@ -4273,7 +4378,7 @@ void cb_auto_notch()
 
 void cb_vfo_adj()
 {
-	if (xcvr_name == rig_TT550.name_) 
+	if (xcvr_name == rig_TT550.name_)
 		progStatus.vfo_adj = spnr_tt550_vfo_adj->value();
 	else
 		progStatus.vfo_adj = spnr_vfo_adj->value();

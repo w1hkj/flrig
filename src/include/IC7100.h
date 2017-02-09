@@ -78,6 +78,8 @@ public:
 
 	const char **bwtable(int m) {return bandwidths_;}
 
+	bool  canswap() { return true; }
+	bool ICswap() { return true; }
 
 };
 

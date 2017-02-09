@@ -100,6 +100,11 @@ public:
 	bool get_notch(int &val);
 	void get_notch_min_max_step(int &min, int &max, int &step);
 
+	bool canswap() { return true; }
+	bool ICswap() { return true; }
+
+//	bool hasA2b() { return true; }
+
 	const char **bwtable(int m) {return bandwidths_;}
 
 };
