@@ -79,8 +79,13 @@ Fl_Value_Input *poll_split = (Fl_Value_Input *)0;
 Fl_Value_Input *poll_noise = (Fl_Value_Input *)0;
 Fl_Value_Input *poll_nr = (Fl_Value_Input *)0;
 Fl_Button *btnClearAddControls = (Fl_Button *)0;
+
+Fl_Value_Input *poll_meters = (Fl_Value_Input *)0;
+Fl_Button *btnSetMeters = (Fl_Button *)0;
+Fl_Value_Input *poll_ops = (Fl_Value_Input *)0;
+Fl_Button *btnSetOps = (Fl_Button *)0;
 Fl_Value_Input *poll_all = (Fl_Value_Input *)0;
-Fl_Button *btnSetAllAdd = (Fl_Button *)0;
+Fl_Button *btnSetAdd = (Fl_Button *)0;
 
 Fl_Group *tabSndCmd = (Fl_Group *)0;
 Fl_Input2 *txt_command = (Fl_Input2 *)0;
@@ -383,39 +388,41 @@ static void cb_poll_nr(Fl_Value_Input* o, void*) {
 	progStatus.poll_noise = o->value();
 }
 
-static void cb_btnClearAddControls(Fl_Button*, void*) {
-	poll_volume->value(0);
-	poll_micgain->value(0);
-	poll_rfgain->value(0);
-	poll_power_control->value(0);
-	poll_ifshift->value(0);
-	poll_notch->value(0);
-	poll_auto_notch->value(0);
-	poll_pre_att->value(0);
-	poll_squelch->value(0);
-	poll_split->value(0);
-	poll_noise->value(0);
-	poll_nr->value(0);
+static void cb_poll_meters(Fl_Value_Input* o, void*) {
+	progStatus.poll_meters = o->value();
+}
 
-	progStatus.poll_volume = 0;
-	progStatus.poll_micgain = 0;
-	progStatus.poll_rfgain = 0;
-	progStatus.poll_power_control = 0;
-	progStatus.poll_ifshift = 0;
-	progStatus.poll_notch = 0;
-	progStatus.poll_auto_notch = 0;
-	progStatus.poll_pre_att = 0;
-	progStatus.poll_squelch = 0;
-	progStatus.poll_split = 0;
-	progStatus.poll_noise = 0;
-	progStatus.poll_nr = 0;
+static void cb_btnSetMeters(Fl_Button*, void*) {
+	poll_smeter->value(progStatus.poll_meters);
+	poll_pout->value(progStatus.poll_meters);
+	poll_swr->value(progStatus.poll_meters);
+	poll_alc->value(progStatus.poll_meters);
+
+	progStatus.poll_smeter = progStatus.poll_meters;
+	progStatus.poll_pout = progStatus.poll_meters;
+	progStatus.poll_swr = progStatus.poll_meters;
+	progStatus.poll_alc = progStatus.poll_meters;
+}
+
+static void cb_poll_ops(Fl_Value_Input* o, void*) {
+	progStatus.poll_ops = o->value();
+}
+
+static void cb_btnSetOps(Fl_Button*, void*) {
+	poll_frequency->value(progStatus.poll_ops);
+	poll_mode->value(progStatus.poll_ops);
+	poll_bandwidth->value(progStatus.poll_ops);
+
+	progStatus.poll_frequency = progStatus.poll_ops;
+	progStatus.poll_mode = progStatus.poll_ops;
+	progStatus.poll_bandwidth = progStatus.poll_ops;
 }
 
 static void cb_poll_all(Fl_Value_Input* o, void*) {
 	progStatus.poll_all = o->value();
 }
 
-static void cb_btnSetAllAdd(Fl_Button*, void*) {
+static void cb_btnSetAdd(Fl_Button*, void*) {
 	poll_volume->value(progStatus.poll_all);
 	poll_micgain->value(progStatus.poll_all);
 	poll_rfgain->value(progStatus.poll_all);
@@ -896,7 +903,7 @@ _("Use only if your setup requires a separate\nSerial Port for a special Control
 			xcr_grp7->box(FL_ENGRAVED_BOX);
 			xcr_grp7->align(Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE));
 
-			poll_smeter = new Fl_Value_Input(13, 55, 30, 20, _("S-meter"));
+			poll_smeter = new Fl_Value_Input(10, 55, 30, 20, _("S-mtr"));
 			poll_smeter->tooltip(_("Poll every Nth interval"));
 			poll_smeter->maximum(10);
 			poll_smeter->step(1);
@@ -905,7 +912,7 @@ _("Use only if your setup requires a separate\nSerial Port for a special Control
 			poll_smeter->align(Fl_Align(FL_ALIGN_RIGHT));
 			poll_smeter->value(progStatus.poll_smeter);
 
-			poll_pout = new Fl_Value_Input(132, 55, 30, 20, _("Power out"));
+			poll_pout = new Fl_Value_Input(105, 55, 30, 20, _("Pwr out"));
 			poll_pout->tooltip(_("Poll every Nth interval"));
 			poll_pout->maximum(10);
 			poll_pout->step(1);
@@ -914,7 +921,7 @@ _("Use only if your setup requires a separate\nSerial Port for a special Control
 			poll_pout->align(Fl_Align(FL_ALIGN_RIGHT));
 			poll_pout->value(progStatus.poll_pout);
 
-			poll_swr = new Fl_Value_Input(252, 55, 30, 20, _("SWR"));
+			poll_swr = new Fl_Value_Input(200, 55, 30, 20, _("SWR"));
 			poll_swr->tooltip(_("Poll every Nth interval"));
 			poll_swr->maximum(10);
 			poll_swr->step(1);
@@ -923,7 +930,7 @@ _("Use only if your setup requires a separate\nSerial Port for a special Control
 			poll_swr->align(Fl_Align(FL_ALIGN_RIGHT));
 			poll_swr->value(progStatus.poll_swr);
 
-			poll_alc = new Fl_Value_Input(372, 55, 30, 20, _("ALC"));
+			poll_alc = new Fl_Value_Input(295, 55, 30, 20, _("ALC"));
 			poll_alc->tooltip(_("Poll every Nth interval"));
 			poll_alc->maximum(10);
 			poll_alc->step(1);
@@ -932,6 +939,19 @@ _("Use only if your setup requires a separate\nSerial Port for a special Control
 			poll_alc->align(Fl_Align(FL_ALIGN_RIGHT));
 			poll_alc->value(progStatus.poll_alc);
 
+			btnSetMeters = new Fl_Button(370, 55, 60, 20, _("Set all"));
+			btnSetMeters->tooltip("Set all meter polls");
+			btnSetMeters->callback((Fl_Callback*)cb_btnSetMeters);
+
+			poll_meters = new Fl_Value_Input(435, 55, 30, 20);
+			poll_meters->tooltip(_("Poll every Nth interval"));
+			poll_meters->maximum(10);
+			poll_meters->step(1);
+			poll_meters->value(progStatus.poll_meters);
+			poll_meters->callback((Fl_Callback*)cb_poll_meters);
+			poll_meters->align(Fl_Align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE));
+			poll_meters->value(progStatus.poll_meters);
+
 		xcr_grp7->end();
 
 
@@ -939,8 +959,8 @@ _("Use only if your setup requires a separate\nSerial Port for a special Control
 			xcr_grp8->box(FL_ENGRAVED_BOX);
 			xcr_grp8->align(Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE));
 
-			poll_frequency = new Fl_Value_Input(13, 103, 30, 20, _("Frequency"));
-			poll_frequency->tooltip(_("Poll every Nth interval"));
+			poll_frequency = new Fl_Value_Input(10, 103, 30, 20, _("Freq"));
+			poll_frequency->tooltip(_("Poll xcvr frequency"));
 			poll_frequency->maximum(10);
 			poll_frequency->step(1);
 			poll_frequency->value(1);
@@ -948,8 +968,8 @@ _("Use only if your setup requires a separate\nSerial Port for a special Control
 			poll_frequency->align(Fl_Align(FL_ALIGN_RIGHT));
 			poll_frequency->value(progStatus.poll_frequency);
 
-			poll_mode = new Fl_Value_Input(132, 103, 30, 20, _("Mode"));
-			poll_mode->tooltip(_("Poll every Nth interval"));
+			poll_mode = new Fl_Value_Input(105, 103, 30, 20, _("Mode"));
+			poll_mode->tooltip(_("Poll xcvr mode"));
 			poll_mode->maximum(10);
 			poll_mode->step(1);
 			poll_mode->value(1);
@@ -957,8 +977,8 @@ _("Use only if your setup requires a separate\nSerial Port for a special Control
 			poll_mode->align(Fl_Align(FL_ALIGN_RIGHT));
 			poll_mode->value(progStatus.poll_mode);
 
-			poll_bandwidth = new Fl_Value_Input(252, 103, 30, 20, _("Bandwidth"));
-			poll_bandwidth->tooltip(_("Poll every Nth interval"));
+			poll_bandwidth = new Fl_Value_Input(200, 103, 30, 20, _("BW"));
+			poll_bandwidth->tooltip(_("Poll xcvr bandwidth"));
 			poll_bandwidth->maximum(10);
 			poll_bandwidth->step(1);
 			poll_bandwidth->value(1);
@@ -966,112 +986,125 @@ _("Use only if your setup requires a separate\nSerial Port for a special Control
 			poll_bandwidth->align(Fl_Align(FL_ALIGN_RIGHT));
 			poll_bandwidth->value(progStatus.poll_bandwidth);
 
+			btnSetOps = new Fl_Button(370, 103, 60, 20, _("Set all"));
+			btnSetOps->tooltip("Poll all operating values");
+			btnSetOps->callback((Fl_Callback*)cb_btnSetOps);
+
+			poll_ops = new Fl_Value_Input(435, 103, 30, 20);
+			poll_ops->tooltip(_("Poll every Nth interval"));
+			poll_ops->maximum(10);
+			poll_ops->step(1);
+			poll_ops->value(progStatus.poll_ops);
+			poll_ops->callback((Fl_Callback*)cb_poll_ops);
+			poll_ops->align(Fl_Align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE));
+			poll_ops->value(progStatus.poll_ops);
+
 		xcr_grp8->end();
 
 		Fl_Group* xcr_grp9 = new Fl_Group(4, 130, 474, 122, _("Additional Controls"));
 			xcr_grp9->box(FL_ENGRAVED_FRAME);
 			xcr_grp9->align(Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE));
 
-			poll_volume = new Fl_Value_Input(12, 150, 30, 20, _("Volume"));
-			poll_volume->tooltip(_("Poll every Nth interval"));
+			poll_volume = new Fl_Value_Input(10, 150, 30, 20, _("Volume"));
+			poll_volume->tooltip(_("Volume control"));
 			poll_volume->maximum(10);
 			poll_volume->step(1);
 			poll_volume->callback((Fl_Callback*)cb_poll_volume);
 			poll_volume->align(Fl_Align(FL_ALIGN_RIGHT));
 			poll_volume->value(progStatus.poll_volume);
 
-			poll_micgain = new Fl_Value_Input(131, 150, 30, 20, _("Mic gain"));
-			poll_micgain->tooltip(_("Poll every Nth interval"));
+			poll_micgain = new Fl_Value_Input(105, 150, 30, 20, _("Mic"));
+			poll_micgain->tooltip(_("Microphone gain"));
 			poll_micgain->maximum(10);
 			poll_micgain->step(1);
 			poll_micgain->callback((Fl_Callback*)cb_poll_micgain);
 			poll_micgain->align(Fl_Align(FL_ALIGN_RIGHT));
 			poll_micgain->value(progStatus.poll_micgain);
 
-			poll_rfgain = new Fl_Value_Input(251, 150, 30, 20, _("RF gain"));
-			poll_rfgain->tooltip(_("Poll every Nth interval"));
+			poll_rfgain = new Fl_Value_Input(200, 150, 30, 20, _("RF"));
+			poll_rfgain->tooltip(_("RF gain"));
 			poll_rfgain->maximum(10);
 			poll_rfgain->step(1);
 			poll_rfgain->callback((Fl_Callback*)cb_poll_rfgain);
 			poll_rfgain->align(Fl_Align(FL_ALIGN_RIGHT));
 			poll_rfgain->value(progStatus.poll_rfgain);
 
-			poll_power_control = new Fl_Value_Input(371, 150, 30, 20, _("Power"));
-			poll_power_control->tooltip(_("Poll every Nth interval"));
+			poll_power_control = new Fl_Value_Input(295, 150, 30, 20, _("Power"));
+			poll_power_control->tooltip(_("Power output"));
 			poll_power_control->maximum(10);
 			poll_power_control->step(1);
 			poll_power_control->callback((Fl_Callback*)cb_poll_power_control);
 			poll_power_control->align(Fl_Align(FL_ALIGN_RIGHT));
 			poll_power_control->value(progStatus.poll_power_control);
 
-			poll_ifshift = new Fl_Value_Input(12, 175, 30, 20, _("IF shift"));
-			poll_ifshift->tooltip(_("Poll every Nth interval"));
+			poll_ifshift = new Fl_Value_Input(10, 175, 30, 20, _("IF"));
+			poll_ifshift->tooltip(_("IF shift"));
 			poll_ifshift->maximum(10);
 			poll_ifshift->step(1);
 			poll_ifshift->callback((Fl_Callback*)cb_poll_ifshift);
 			poll_ifshift->align(Fl_Align(FL_ALIGN_RIGHT));
 			poll_ifshift->value(progStatus.poll_ifshift);
 
-			poll_notch = new Fl_Value_Input(131, 175, 30, 20, _("Man\' Notch"));
-			poll_notch->tooltip(_("Poll every Nth interval"));
+			poll_notch = new Fl_Value_Input(105, 175, 30, 20, _("Notch"));
+			poll_notch->tooltip(_("Manual notch"));
 			poll_notch->maximum(10);
 			poll_notch->step(1);
 			poll_notch->callback((Fl_Callback*)cb_poll_notch);
 			poll_notch->align(Fl_Align(FL_ALIGN_RIGHT));
 			poll_notch->value(progStatus.poll_notch);
 
-			poll_auto_notch = new Fl_Value_Input(251, 175, 30, 20, _("Auto notch"));
-			poll_auto_notch->tooltip(_("Poll every Nth interval"));
+			poll_auto_notch = new Fl_Value_Input(200, 175, 30, 20, _("Auto"));
+			poll_auto_notch->tooltip(_("Auto notch"));
 			poll_auto_notch->maximum(10);
 			poll_auto_notch->step(1);
 			poll_auto_notch->callback((Fl_Callback*)cb_poll_auto_notch);
 			poll_auto_notch->align(Fl_Align(FL_ALIGN_RIGHT));
 			poll_auto_notch->value(progStatus.poll_auto_notch);
 
-			poll_pre_att = new Fl_Value_Input(12, 200, 30, 20, _("Pre/Att"));
-			poll_pre_att->tooltip(_("Poll every Nth interval"));
+			poll_pre_att = new Fl_Value_Input(10, 200, 30, 20, _("Pre/Att"));
+			poll_pre_att->tooltip(_("Preamp / Attenuator"));
 			poll_pre_att->maximum(10);
 			poll_pre_att->step(1);
 			poll_pre_att->callback((Fl_Callback*)cb_poll_pre_att);
 			poll_pre_att->align(Fl_Align(FL_ALIGN_RIGHT));
 			poll_pre_att->value(progStatus.poll_pre_att);
 
-			poll_squelch = new Fl_Value_Input(131, 200, 30, 20, _("Squelch"));
-			poll_squelch->tooltip(_("Poll every Nth interval"));
+			poll_squelch = new Fl_Value_Input(105, 200, 30, 20, _("Squelch"));
+			poll_squelch->tooltip(_("Squelch"));
 			poll_squelch->maximum(10);
 			poll_squelch->step(1);
 			poll_squelch->callback((Fl_Callback*)cb_poll_squelch);
 			poll_squelch->align(Fl_Align(FL_ALIGN_RIGHT));
 			poll_squelch->value(progStatus.poll_squelch);
 
-			poll_split = new Fl_Value_Input(251, 200, 30, 20, _("Split"));
-			poll_split->tooltip(_("Poll every Nth interval"));
+			poll_split = new Fl_Value_Input(200, 200, 30, 20, _("Split"));
+			poll_split->tooltip(_("Split vfo operation"));
 			poll_split->maximum(10);
 			poll_split->step(1);
 			poll_split->callback((Fl_Callback*)cb_poll_split);
 			poll_split->align(Fl_Align(FL_ALIGN_RIGHT));
 			poll_split->value(progStatus.poll_split);
 
-			poll_noise = new Fl_Value_Input(13, 225, 30, 20, _("Noise"));
-			poll_noise->tooltip(_("Poll every Nth interval"));
+			poll_noise = new Fl_Value_Input(10, 225, 30, 20, _("Blanker"));
+			poll_noise->tooltip(_("Noise blanker"));
 			poll_noise->maximum(10);
 			poll_noise->step(1);
 			poll_noise->callback((Fl_Callback*)cb_poll_noise);
 			poll_noise->align(Fl_Align(FL_ALIGN_RIGHT));
 			poll_noise->value(progStatus.poll_noise);
 
-			poll_nr = new Fl_Value_Input(132, 225, 30, 20, _("Noise red\'"));
-			poll_nr->tooltip(_("Poll every Nth interval"));
+			poll_nr = new Fl_Value_Input(105, 225, 30, 20, _("Noise red"));
+			poll_nr->tooltip(_("Noise reduction"));
 			poll_nr->maximum(10);
 			poll_nr->step(1);
 			poll_nr->callback((Fl_Callback*)cb_poll_nr);
 			poll_nr->align(Fl_Align(FL_ALIGN_RIGHT));
 			poll_nr->value(progStatus.poll_noise);
 
-			btnClearAddControls = new Fl_Button(330, 200, 70, 20, _("Clear all"));
-			btnClearAddControls->callback((Fl_Callback*)cb_btnClearAddControls);
+			btnSetAdd = new Fl_Button(370, 225, 60, 20, _("Set all"));
+			btnSetAdd->callback((Fl_Callback*)cb_btnSetAdd);
 
-			poll_all = new Fl_Value_Input(408, 225, 30, 20);
+			poll_all = new Fl_Value_Input(435, 225, 30, 20);
 			poll_all->tooltip(_("Poll every Nth interval"));
 			poll_all->maximum(10);
 			poll_all->step(1);
@@ -1079,9 +1112,6 @@ _("Use only if your setup requires a separate\nSerial Port for a special Control
 			poll_all->callback((Fl_Callback*)cb_poll_all);
 			poll_all->align(Fl_Align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE));
 			poll_all->value(progStatus.poll_all);
-
-			btnSetAllAdd = new Fl_Button(331, 225, 70, 20, _("Set all to"));
-			btnSetAllAdd->callback((Fl_Callback*)cb_btnSetAllAdd);
 
 		xcr_grp9->end();
 

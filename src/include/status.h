@@ -85,7 +85,9 @@ struct status {
 	int		poll_split;
 	int		poll_noise;
 	int		poll_nr;
-	int     	poll_vfoAorB;
+	int 	poll_vfoAorB;
+	int		poll_meters;
+	int		poll_ops;
 	int		poll_all;
 
 	int		iBW_A;
