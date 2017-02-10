@@ -83,6 +83,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 			scaleSmeter->box(FL_FLAT_BOX);
 			scaleSmeter->color((Fl_Color)246);
 			scaleSmeter->image(image_S60);
+			scaleSmeter->tooltip(_("S units meter"));
 
 			btnALC_SWR = new Fl_Button(xpos+1, ypos+1, 206, 20);
 			btnALC_SWR->tooltip(_("Press SWR / ALC"));
@@ -818,6 +819,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_cw_weight->callback((Fl_Callback*)cb_spnr_cw_weight);
 				spnr_cw_weight->align(Fl_Align(FL_ALIGN_LEFT));
 				spnr_cw_weight->value(progStatus.cw_weight);
+				spnr_cw_weight->tooltip(_("CW weight"));
 
 				spnr_cw_wpm = new Hspinner(435, 187, 70, 20, _("wpm"));
 				spnr_cw_wpm->type(FL_INT_INPUT);
@@ -827,6 +829,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_cw_wpm->callback((Fl_Callback*)cb_spnr_cw_wpm);
 				spnr_cw_wpm->align(Fl_Align(FL_ALIGN_LEFT));
 				spnr_cw_wpm->value(progStatus.cw_wpm);
+				spnr_cw_wpm->tooltip(_("CW words per minute"));
 
 				btn_enable_keyer = new Fl_Check_Button(649, 190, 60, 15, _("Keyer"));
 				btn_enable_keyer->tooltip(_("Enable internal keyer"));

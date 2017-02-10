@@ -427,6 +427,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			scaleSmeter = new Fl_Box(3, 63, 206, 20);
 			scaleSmeter->box(FL_FLAT_BOX);
 			scaleSmeter->image(image_S60);
+			scaleSmeter->tooltip(_("S units meter"));
 
 			btnALC_SWR = new Fl_Button(3, 63, 206, 20);
 			btnALC_SWR->tooltip(_("Press SWR / ALC"));
@@ -1054,6 +1055,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			spnr_cw_wpm->value(progStatus.cw_wpm);
 			spnr_cw_wpm->labelsize(12);
 			spnr_cw_wpm->align(FL_ALIGN_BOTTOM | FL_ALIGN_CENTER);
+			spnr_cw_wpm->tooltip(_("CW words per minute"));
 
 			spnr_cw_weight = new Hspinner(
 				spnr_cw_wpm->x() + spnr_cw_wpm->w() + 4, 280,
@@ -1067,6 +1069,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			spnr_cw_weight->value(progStatus.cw_weight);
 			spnr_cw_weight->labelsize(12);
 			spnr_cw_weight->align(FL_ALIGN_BOTTOM | FL_ALIGN_CENTER);
+			spnr_cw_weight->tooltip(_("CW weight"));
 
 			spnr_cw_spot_tone= new Hspinner(
 				spnr_cw_weight->w() + spnr_cw_weight->x() + 4, 280,

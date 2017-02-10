@@ -121,6 +121,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		scaleSmeter->box(FL_FLAT_BOX);
 		scaleSmeter->color((Fl_Color)246);
 		scaleSmeter->image(image_S60);
+		scaleSmeter->tooltip(_("S units meter"));
 
 		btnALC_SWR = new Fl_Button(xpos, ypos, 206, 20);
 		btnALC_SWR->tooltip(_("Press SWR / ALC"));
@@ -798,6 +799,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				spnr_cw_weight->callback((Fl_Callback*)cb_spnr_cw_weight);
 				spnr_cw_weight->value(progStatus.cw_weight);
 				spnr_cw_weight->align(FL_ALIGN_CENTER | FL_ALIGN_BOTTOM);
+				spnr_cw_weight->tooltip(_("CW weight"));
 
 				spnr_cw_wpm = new Hspinner(
 					spnr_cw_weight->x() + spnr_cw_weight->w() + 75, by,
@@ -809,6 +811,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				spnr_cw_wpm->callback((Fl_Callback*)cb_spnr_cw_wpm);
 				spnr_cw_wpm->value(progStatus.cw_wpm);
 				spnr_cw_wpm->align(FL_ALIGN_CENTER | FL_ALIGN_BOTTOM);
+				spnr_cw_wpm->tooltip(_("CW words per minute"));
 
 				btn_enable_keyer = new Fl_Check_Button(
 					spnr_cw_wpm->x() + spnr_cw_wpm->w() + 10, by,
