@@ -764,9 +764,11 @@ void serviceA()
 		Fl::awake(setModeControl);
 		int saveBW = vfoA.iBW;
 		set_bandwidth_control();
-		vfo.iBW = vfoA.iBW = saveBW;
-		selrig->set_bwA(saveBW);
-		Fl::awake(setBWControl);
+		if (saveBW != -1) {
+			vfo.iBW = vfoA.iBW = saveBW;
+			selrig->set_bwA(saveBW);
+			Fl::awake(setBWControl);
+		}
 	} else if (vfoA.iBW != vfo.iBW) {
 		selrig->set_bwA(vfoA.iBW);
 		vfo.iBW = vfoA.iBW;
@@ -816,9 +818,11 @@ void serviceB()
 		Fl::awake(setModeControl);
 		int saveBW = vfoB.iBW;
 		set_bandwidth_control();
-		vfo.iBW = vfoB.iBW = saveBW;
-		selrig->set_bwB(saveBW);
-		Fl::awake(setBWControl);
+		if (saveBW != -1) {
+			vfo.iBW = vfoB.iBW = saveBW;
+			selrig->set_bwB(saveBW);
+			Fl::awake(setBWControl);
+		}
 	} else if (vfoB.iBW != vfo.iBW || pushedB) {
 		selrig->set_bwB(vfoB.iBW);
 		vfo.iBW = vfoB.iBW;

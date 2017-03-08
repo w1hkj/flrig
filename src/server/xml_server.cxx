@@ -648,7 +648,7 @@ public:
 		while (selrig->modes_[i] != NULL) {
 			if (numode == selrig->modes_[i]) {
 				srvr_vfo.imode = i;
-				srvr_vfo.iBW = 0;
+				srvr_vfo.iBW = -1;//0;
 				push_xml();
 				break;
 			}
