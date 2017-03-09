@@ -235,7 +235,7 @@ long RIG_IC7300::get_vfoA ()
 		resp.assign(pre_fm).append("\x03");
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			A.freq = fm_bcd_be(&replystr[p+5], 10);
+			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
 	return A.freq;
 }
@@ -257,7 +257,7 @@ long RIG_IC7300::get_vfoB ()
 		resp.assign(pre_fm).append("\x03");
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			B.freq = fm_bcd_be(&replystr[p+5], 10);
+			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
 	return B.freq;
 }
@@ -429,7 +429,7 @@ int RIG_IC7300::get_bwA()
 		resp.append("\x1A\x03");
 		size_t p = replystr.find(resp);
 		if (p != string::npos)
-			bwval = fm_bcd(&replystr[p+6], 2);
+			bwval = fm_bcd(replystr.substr(p+6), 2);
 	}
 	if (bwval != A.iBW) {
 		A.iBW = bwval;
@@ -465,7 +465,7 @@ int RIG_IC7300::get_bwB()
 		resp.append("\x1A\x03");
 		size_t p = replystr.find(resp);
 		if (p != string::npos)
-			bwval = fm_bcd(&replystr[p+6], 2);
+			bwval = fm_bcd(replystr.substr(p+6), 2);
 	}
 	if (bwval != B.iBW) {
 		B.iBW = bwval;
@@ -567,7 +567,7 @@ int RIG_IC7300::get_mic_gain()
 	if (waitFOR(9, "get mic")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			val = num100(&replystr[p + 6]);
+			val = num100(replystr.substr(p + 6));
 	}
 	return val;
 }
@@ -793,7 +793,7 @@ int RIG_IC7300::get_volume_control()
 	if (waitFOR(9, "get vol")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			val = num100(&replystr[p + 6]);
+			val = num100(replystr.substr(p + 6));
 	}
 	return (val);
 }
@@ -823,7 +823,7 @@ int RIG_IC7300::get_power_control()
 	if (waitFOR(9, "get power")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			val = num100(&replystr[p+6]);
+			val = num100(replystr.substr(p+6));
 	}
 	progStatus.power_level = val;
 	return (progStatus.power_level);
@@ -846,7 +846,7 @@ int RIG_IC7300::get_smeter()
 	if (waitFOR(9, "get smeter")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			mtr = fm_bcd(&replystr[p+6], 3);
+			mtr = fm_bcd(replystr.substr(p+6), 3);
 			mtr = (int)ceil(mtr /2.41);
 			if (mtr > 100) mtr = 100;
 		}
@@ -866,7 +866,7 @@ int RIG_IC7300::get_power_out(void)
 	if (waitFOR(9, "get power out")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			mtr = fm_bcd(&replystr[p+6], 3);
+			mtr = fm_bcd(replystr.substr(p+6), 3);
 			mtr = (int)ceil(mtr /2.13);
 			if (mtr > 100) mtr = 100;
 		}
@@ -886,7 +886,7 @@ int RIG_IC7300::get_swr(void)
 	if (waitFOR(9, "get swr")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			mtr = fm_bcd(&replystr[p+6], 3);
+			mtr = fm_bcd(replystr.substr(p+6), 3);
 			mtr = (int)ceil(mtr /2.55);
 			if (mtr > 100) mtr = 100;
 		}
@@ -906,7 +906,7 @@ int RIG_IC7300::get_alc(void)
 	if (waitFOR(9, "get alc")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			mtr = fm_bcd(&replystr[p+6], 3);
+			mtr = fm_bcd(replystr.substr(p+6), 3);
 			mtr = (int)ceil(mtr /1.2);
 			if (mtr > 100) mtr = 100;
 		}
@@ -934,7 +934,7 @@ int RIG_IC7300::get_rf_gain()
 	if (waitFOR(9, "get RF")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			val = num100(&replystr[p + 6]);
+			val = num100(replystr.substr(p + 6));
 	}
 	progStatus.rfgain = val;
 	return (progStatus.rfgain);
@@ -1137,7 +1137,7 @@ int RIG_IC7300::get_noise_reduction_val()
 	if (waitFOR(9, "get NRval")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			val = num100(&replystr[p+6]);
+			val = num100(replystr.substr(p+6));
 	}
 	progStatus.noise_reduction_val = val;
 	return progStatus.noise_reduction_val;
@@ -1164,7 +1164,7 @@ int  RIG_IC7300::get_squelch()
 	if (waitFOR(9, "get squelch")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			val = num100(&replystr[p+6]);
+			val = num100(replystr.substr(p+6));
 	}
 	progStatus.squelch = val;
 	return (progStatus.squelch);
@@ -1251,7 +1251,7 @@ bool RIG_IC7300::get_notch(int &val)
 		if (waitFOR(9, "get notch val")) {
 			size_t p = replystr.rfind(resp);
 			if (p != string::npos) {
-				val = fm_bcd(&replystr[p+6],3);
+				val = fm_bcd(replystr.substr(p+6),3);
 				val = (val - 53) * 20;
 				if (val < 0) val = 0;
 				if (val > 4040) val = 4040;

@@ -1006,12 +1006,12 @@ int RIG_TS590S::get_bwA()
 		if (wait_char(';', 5, 100, "get lower", ASC) == 5) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[2], 2);
+			lo = fm_decimal(replystr.substr(2), 2);
 			cmd = "SH;";
 			if (wait_char(';', 5, 100, "get upper", ASC) == 5) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[2], 2);
+				hi = fm_decimal(replystr.substr(2), 2);
 				A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
 			}
 		}
@@ -1024,12 +1024,12 @@ int RIG_TS590S::get_bwA()
 		if (wait_char(';', 5, 100, "get width", ASC) == 5) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			hi = fm_decimal(&replystr[2], 2);
+			hi = fm_decimal(replystr.substr(2), 2);
 			cmd = "SH;";
 			if (wait_char(';', 5, 100, "get shift", ASC) == 5) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				lo = fm_decimal(&replystr[2], 2);
+				lo = fm_decimal(replystr.substr(2), 2);
 				A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
 			}
 		}
@@ -1079,12 +1079,12 @@ int RIG_TS590S::get_bwB()
 		if (wait_char(';', 5, 100, "get lower", ASC) == 5) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			lo = fm_decimal(&replystr[2], 2);
+			lo = fm_decimal(replystr.substr(2), 2);
 			cmd = "SH;";
 			if (wait_char(';', 5, 100, "get upper", ASC) == 5) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				hi = fm_decimal(&replystr[2], 2);
+				hi = fm_decimal(replystr.substr(2), 2);
 				B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
 			}
 		}
@@ -1097,12 +1097,12 @@ int RIG_TS590S::get_bwB()
 		if (wait_char(';', 5, 100, "get width", ASC) == 5) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			hi = fm_decimal(&replystr[2], 2);
+			hi = fm_decimal(replystr.substr(2), 2);
 			cmd = "SH;";
 			if (wait_char(';', 5, 100, "get shift", ASC) == 5 ) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				lo = fm_decimal(&replystr[2], 2);
+				lo = fm_decimal(replystr.substr(2), 2);
 				B.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
 			}
 		}
@@ -1187,7 +1187,7 @@ bool RIG_TS590S::get_if_shift(int &val)
 		if (wait_char(';', 8, 100, "get IF shift", ASC) == 8) {
 			size_t p = replystr.rfind("IS");
 			if (p != string::npos) {
-				val = fm_decimal(&replystr[p+3], 4);
+				val = fm_decimal(replystr.substr(p+3), 4);
 			} else
 				val = progStatus.shift_val;
 			return true;

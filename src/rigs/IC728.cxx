@@ -69,7 +69,7 @@ long RIG_IC728::get_vfoA ()
 	if (waitFOR(10, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			freqA = fm_bcd_be(&replystr[p+5], 8);
+			freqA = fm_bcd_be(replystr.substr(p+5), 8);
 	}
 	return freqA;
 }

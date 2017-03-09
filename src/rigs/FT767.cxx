@@ -66,8 +66,8 @@ long RIG_FT767::get_vfoA ()
 
 	int ret = waitN(20, 100, "get vfoA", HEX);
 	if (ret < 20) return freqA;
-	freqA = fm_bcd(replybuff, 14) * 10; // VFO-A in positions 14-17
-	modeA = replybuff[19];
+	freqA = fm_bcd(replystr.substr(14), 8) * 10; // VFO-A in positions 14-17
+	modeA = replystr[19];
 	return freqA;
 }
 

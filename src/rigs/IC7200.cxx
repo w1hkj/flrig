@@ -204,7 +204,7 @@ long RIG_IC7200::get_vfoA ()
 	if (waitFOR(11, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			A.freq = fm_bcd_be(&replystr[p+5], 10);
+			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
 	return A.freq;
 }
@@ -229,7 +229,7 @@ long RIG_IC7200::get_vfoB ()
 	if (waitFOR(11, "get vfo B")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			B.freq = fm_bcd_be(&replystr[p+5], 10);
+			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
 	return B.freq;
 }
@@ -306,7 +306,7 @@ int RIG_IC7200::get_volume_control()
 	if (waitFOR(9, "get vol")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			val = num100(&replystr[p+6]);
+			val = num100(replystr.substr(p+6));
 	}
 	return progStatus.volume = val;
 }
@@ -328,7 +328,7 @@ int RIG_IC7200::get_smeter()
 	if (waitFOR(9, "get smeter")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			mtr = fm_bcd(&replystr[p+6], 3);
+			mtr = fm_bcd(replystr.substr(p+6), 3);
 			mtr = (int)ceil(mtr /2.55);
 			if (mtr > 100) mtr = 100;
 		}
@@ -348,7 +348,7 @@ int RIG_IC7200::get_power_out(void)
 	if (waitFOR(9, "get power out")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			mtr = fm_bcd(&replystr[p+6], 3);
+			mtr = fm_bcd(replystr.substr(p+6), 3);
 			mtr = (int)ceil(mtr /2.55);
 			if (mtr > 100) mtr = 100;
 		}
@@ -368,7 +368,7 @@ int RIG_IC7200::get_swr(void)
 	if (waitFOR(9, "get swr")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			mtr = fm_bcd(&replystr[p+6], 3);
+			mtr = fm_bcd(replystr.substr(p+6), 3);
 			mtr = (int)ceil(mtr /2.55);
 			if (mtr > 100) mtr = 100;
 		}
@@ -388,7 +388,7 @@ int RIG_IC7200::get_alc(void)
 	if (waitFOR(9, "get alc")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			mtr = fm_bcd(&replystr[p+6], 3);
+			mtr = fm_bcd(replystr.substr(p+6), 3);
 			mtr = (int)ceil(mtr /2.55);
 			if (mtr > 100) mtr = 100;
 		}
@@ -467,7 +467,7 @@ int RIG_IC7200::get_noise_reduction_val()
 	if (waitFOR(9, "get NRval")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return num100(&replystr[p+6]);
+			return num100(replystr.substr(p+6));
 	}
 	return progStatus.noise_reduction_val;
 }
@@ -567,7 +567,7 @@ int RIG_IC7200::get_rf_gain()
 	if (waitFOR(9, "get RF")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return num100(&replystr[p + 6]);
+			return num100(replystr.substr(p + 6));
 	}
 	return progStatus.rfgain;
 }
@@ -592,7 +592,7 @@ int  RIG_IC7200::get_squelch()
 	if (waitFOR(9, "get squelch")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return num100(&replystr[p+6]);
+			return num100(replystr.substr(p+6));
 	}
 	return progStatus.squelch;
 }
@@ -613,12 +613,16 @@ int RIG_IC7200::get_power_control()
 	cmd = pre_to;
 	cmd.append(cstr).append(post);
 	resp.append(cstr);
+	int val = progStatus.power_level;
+	string retstr = "ret str";
 	if (waitFOR(9, "get power")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			return num100(&replystr[p+6]);
+		if (p != string::npos) {
+			val = num100(replystr.substr(p+6));
+			retstr = str2hex(replystr.substr(p).c_str(), 9);
+		}
 	}
-	return progStatus.power_level;
+	return val;
 }
 
 void RIG_IC7200::get_mic_gain_min_max_step(int &min, int &max, int &step)
@@ -639,7 +643,7 @@ int RIG_IC7200::get_mic_gain()
 	if (waitFOR(9, "get mic")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			return num100(&replystr[p + 6]);
+			return num100(replystr.substr(p + 6));
 		}
 	}
 	return 0;
@@ -843,7 +847,7 @@ int  RIG_IC7200::get_bwA()
 	if (waitFOR(8, "get BW A")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			bwval = (fm_bcd(&replystr[p+6],2));
+			bwval = (fm_bcd(replystr.substr(p+6),2));
 	}
 	if (bwval != A.iBW) {
 		A.iBW = bwval;
@@ -876,7 +880,7 @@ int  RIG_IC7200::get_bwB()
 	if (waitFOR(8, "get BW B")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			bwval = (fm_bcd(&replystr[p+6],2));
+			bwval = (fm_bcd(replystr.substr(p+6),2));
 	}
 	if (bwval != B.iBW) {
 		B.iBW = bwval;
@@ -1009,7 +1013,7 @@ bool RIG_IC7200::get_notch(int &val)
 		if (waitFOR(9, "get notch val")) {
 			size_t p = replystr.rfind(resp);
 			if (p != string::npos) {
-				val = fm_bcd(&replystr[p+6],3);
+				val = fm_bcd(replystr.substr(p+6),3);
 				val = (val - 53) * 20;
 				if (val < 0) val = 0;
 				if (val > 4040) val = 4040;

@@ -848,7 +848,7 @@ int RIG_FTdx1200::get_bwA()
 	if (p + 5 >= replystr.length()) return bwA;
 
 	replystr[p+5] = 0;
-	int bw_idx = fm_decimal(&replystr[p+3],2);
+	int bw_idx = fm_decimal(replystr.substr(p+3), 2);
 	const int *idx = bw_vals_;
 	int i = 0;
 	while (*idx != WVALS_LIMIT) {
@@ -906,7 +906,7 @@ int RIG_FTdx1200::get_bwB()
 	if (p + 5 >= replystr.length()) return bwB;
 
 	replystr[p+5] = 0;
-	int bw_idx = fm_decimal(&replystr[p+3],2);
+	int bw_idx = fm_decimal(replystr.substr(p+3), 2);
 	const int *idx = bw_vals_;
 	int i = 0;
 	while (*idx != WVALS_LIMIT) {
@@ -1004,7 +1004,7 @@ bool  RIG_FTdx1200::get_notch(int &val)
 		if (p == string::npos)
 			val = 10;
 		else
-			val = fm_decimal(&replystr[p+4],3) * 10;
+			val = fm_decimal(replystr.substr(p+4), 3) * 10;
 	}
 	return ison;
 }

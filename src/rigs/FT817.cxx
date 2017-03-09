@@ -66,9 +66,8 @@ long RIG_FT817::get_vfoA ()
 	cmd[4] = 0x03;
 	int ret = waitN(5, 100, "get vfoA", HEX);
 	if (ret < 5) return freqA;
-
-	freqA = fm_bcd(replybuff, 8) * 10;
-	int mode = replybuff[4];
+	freqA = fm_bcd(replystr, 8) * 10;
+	int mode = replystr[4];
 	for (int i = 0; i < 8; i++)
 		if (FT817_mode_val[i] == mode) {
 			modeA = i;
@@ -143,7 +142,7 @@ int  RIG_FT817::get_power_out(void)
 	cmd[4] = 0xF7;
 	int ret = waitN(1, 100, "get pwr out", HEX);
 	if (!ret) return 0;
-	int fwdpwr = replybuff[0];
+	int fwdpwr = replystr[0];
 	if (fwdpwr > 8) fwdpwr = 8;
 	if (fwdpwr < 0) fwdpwr = 0;
 	return pmeter_map[fwdpwr];
@@ -155,7 +154,7 @@ int  RIG_FT817::get_smeter(void)
 	cmd[4] = 0xE7;
 	int ret = waitN(1, 100, "get smeter", HEX);
 	if (!ret) return 0;
-	int sval = replybuff[0];
+	int sval = replystr[0];
 	if (sval < 0) sval = 0;
 	if (sval > 15) sval = 15;
 	return smeter_map[sval];

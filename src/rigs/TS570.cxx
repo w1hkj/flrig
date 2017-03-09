@@ -820,7 +820,7 @@ int  RIG_TS570::get_rf_gain()
 
 	size_t p = replystr.rfind("RG");
 	if (p != string::npos)
-		val = fm_decimal(&replystr[p+2], 3);
+		val = fm_decimal(replystr.substr(p+2), 3);
 	return val;
 }
 

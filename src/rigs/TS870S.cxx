@@ -1266,7 +1266,7 @@ bool RIG_TS870S::get_if_shift(int &val)
 		}
 		size_t p = replystr.rfind("IS");
 		if (p != string::npos) {
-			val = fm_decimal(&replystr[p+3], 4);
+			val = fm_decimal(replystr.substr(p+3), 4);
 		} else
 			val = progStatus.shift_val;
 		return true;

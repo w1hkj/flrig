@@ -116,10 +116,10 @@ bool RIG_FT747::get_info()
 //      ... f9 - Hz
 // | 00 00 | 01 04 | 02 05 | 00 00 | 00 00 | = 14.250.000 Hz
 
-		afreq = fm_bcd(&replybuff[9], 8);
-		bfreq = fm_bcd(&replybuff[16], 8);
+		afreq = fm_bcd(replystr.substr(9), 8);
+		bfreq = fm_bcd(replystr.substr(16), 8);
 
-		int md = replybuff[22];
+		int md = replystr[22];
 		switch (md) {
 			case 0x01 : amode = 6; // FMW
 						break;

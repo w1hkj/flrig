@@ -200,16 +200,16 @@ protected:
 
 	string to_bcd_be(long freq, int len);
 	string to_bcd(long freq, int len);
-	long fm_bcd (char *bcd, int len);
-	long fm_bcd_be(char *bcd, int len);
+	long fm_bcd (string bcd, int len);
+	long fm_bcd_be(string bcd, int len);
 	string to_binary_be(long freq, int len);
 	string to_binary(long freq, int len);
-	long fm_binary(char *binary, int len);
-	long fm_binary_be(char *binary_be, int len);
+	long fm_binary(string binary, int len);
+	long fm_binary_be(string binary_be, int len);
 	string to_decimal_be(long d, int len);
 	string to_decimal(long d, int len);
-	long fm_decimal(char *decimal, int len);
-	long fm_decimal_be(char *decimal_be, int len);
+	long fm_decimal(string decimal, int len);
+	long fm_decimal_be(string decimal_be, int len);
 
 public:
 	rigbase();

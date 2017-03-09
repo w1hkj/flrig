@@ -317,7 +317,7 @@ int RIG_IC7100::get_bwA()
 	resp.append("\x1a\x03");
 	if (waitFOR(8, "get bw A")) {
 		size_t p = replystr.rfind(resp);
-		A.iBW = fm_bcd(&replystr[p+6], 2);
+		A.iBW = fm_bcd(replystr.substr(p+6), 2);
 	}
 	return A.iBW;
 }
@@ -345,7 +345,7 @@ int RIG_IC7100::get_bwB()
 	resp.append("\x1a\x03");
 	if (waitFOR(8, "get bw B")) {
 		size_t p = replystr.rfind(resp);
-		B.iBW = fm_bcd(&replystr[p+6], 2);
+		B.iBW = fm_bcd(replystr.substr(p+6), 2);
 	}
 	return B.iBW;
 }

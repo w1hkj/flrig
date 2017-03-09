@@ -97,7 +97,7 @@ bool RIG_FT847::get_info()
 	cmd[4] = 0x03;
 	ret = waitN(5, 100, "get info", HEX);
 	if (ret >= 5) {
-		afreq = fm_bcd(&replystr[ret - 5], 8)*10;
+		afreq = fm_bcd(replystr.substr(ret - 5), 8)*10;
 		amode = replystr[ret - 1];
 		for (i = 0; i < 10; i++) if (FT847_mode_val[i] == amode) break;
 		if (i == 10) i = 1;

@@ -138,7 +138,7 @@ long RIG_IC718::get_vfoA ()
 	if (waitFOR(11, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			freqA = fm_bcd_be(&replystr[p+5], 10);
+			freqA = fm_bcd_be(replystr.substr(p+5), 10);
 	}
 	return freqA;
 }
@@ -163,7 +163,7 @@ long RIG_IC718::get_vfoB ()
 	if (waitFOR(11, "get vfo B")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			B.freq = fm_bcd_be(&replystr[p+5], 10);
+			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
 	return B.freq;
 }
@@ -200,7 +200,7 @@ int RIG_IC718::get_volume_control()
 	if (waitFOR(9, "get vol")) {
 		size_t p = replystr.rfind(resp);
 		if ( p != string::npos)
-			return (int)ceil(fm_bcd(&replystr[p+6],3) * 100 / 255);
+			return (int)ceil(fm_bcd(replystr.substr(p+6),3) * 100 / 255);
 	}
 	return 0;
 }
@@ -221,7 +221,7 @@ int RIG_IC718::get_smeter()
 	if (waitFOR(9, "get smeter")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			mtr = fm_bcd(&replystr[p+6], 3);
+			mtr = fm_bcd(replystr.substr(p+6), 3);
 			mtr = (int)ceil(1.3 * mtr - 36.0);
 			if (mtr < 0) mtr = 0;
 			if (mtr > 255) mtr = 255;
@@ -308,7 +308,7 @@ int RIG_IC718::get_noise_reduction_val()
 	if (waitFOR(9, "get nr val")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return (int)ceil(fm_bcd(&replystr[p+6],3) * 100 / 255);
+			return (int)ceil(fm_bcd(replystr.substr(p+6),3) * 100 / 255);
 	}
 	return 0;
 }
@@ -366,7 +366,7 @@ int RIG_IC718::get_rf_gain()
 	if (waitFOR(9, "get rfg")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return (int)ceil(fm_bcd(&replystr[p+6],3) * 100 / 255);
+			return (int)ceil(fm_bcd(replystr.substr(p+6),3) * 100 / 255);
 	}
 	return 0;
 }
@@ -400,7 +400,7 @@ int RIG_IC718::get_power_control()
 	if (waitFOR(9, "get power")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return (int)ceil(fm_bcd(&replystr[p + 6],3) * 100 / 255);
+			return (int)ceil(fm_bcd(replystr.substr(p + 6),3) * 100 / 255);
 	}
 	return progStatus.power_level;
 }
@@ -426,7 +426,7 @@ int RIG_IC718::get_mic_gain()
 	if (waitFOR(9, "get mic")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return (int)ceil(fm_bcd(&replystr[p+6],3) / 2.55);
+			return (int)ceil(fm_bcd(replystr.substr(p+6),3) / 2.55);
 	}
 	return 0;
 }

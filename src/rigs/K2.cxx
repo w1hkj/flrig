@@ -422,7 +422,7 @@ int RIG_K2::get_power_control()
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	hipower = (replystr[p+5] == '1');
-	int mtr = fm_decimal(&replystr[p+4], 3);
+	int mtr = fm_decimal(replystr.substr(p+4), 3);
 	if (!hipower) mtr /= 10;
 	return mtr;
 }

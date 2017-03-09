@@ -312,7 +312,7 @@ int RIG_IC9100::get_bwA()
 	resp.append("\x1a\x03");
 	if (waitFOR(8, "get bw A")) {
 		size_t p = replystr.rfind(resp);
-		A.iBW = fm_bcd(&replystr[p+6], 2);
+		A.iBW = fm_bcd(replystr.substr(p+6), 2);
 	}
 	return A.iBW;
 }
@@ -341,7 +341,7 @@ int RIG_IC9100::get_bwB()
 	resp.append("\x1a\x03");
 	if (waitFOR(8, "get bw A")) {
 		size_t p = replystr.rfind(resp);
-		B.iBW = fm_bcd(&replystr[p+6], 2);
+		B.iBW = fm_bcd(replystr.substr(p+6), 2);
 	}
 	return B.iBW;
 }
@@ -617,7 +617,7 @@ int RIG_IC9100::get_smeter()
 	if (waitFOR(9, "get smeter")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			mtr = fm_bcd(&replystr[p+6], 3);
+			mtr = fm_bcd(replystr.substr(p+6), 3);
 			mtr = (int)ceil(mtr /2.40);
 			if (mtr > 100) mtr = 100;
 		}
@@ -637,7 +637,7 @@ int RIG_IC9100::get_power_out()
 	if (waitFOR(9, "get pout")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			mtr = fm_bcd(&replystr[p+6], 3);
+			mtr = fm_bcd(replystr.substr(p+6), 3);
 			mtr = (int)ceil(mtr /2.15);
 			if (mtr > 100) mtr = 100;
 		}
@@ -657,7 +657,7 @@ int RIG_IC9100::get_swr()
 	if (waitFOR(9, "get SWR")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			mtr = fm_bcd(&replystr[p+6], 3);
+			mtr = fm_bcd(replystr.substr(p+6), 3);
 			mtr = (int)ceil(mtr /2.40);
 			if (mtr > 100) mtr = 100;
 		}
@@ -677,7 +677,7 @@ int RIG_IC9100::get_alc()
 	if (waitFOR(9, "get alc")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			mtr = fm_bcd(&replystr[p+6], 3);
+			mtr = fm_bcd(replystr.substr(p+6), 3);
 			mtr = (int)ceil(mtr /2.55);
 			if (mtr > 100) mtr = 100;
 		}
@@ -727,7 +727,7 @@ bool RIG_IC9100::get_notch(int &val)
 		if (waitFOR(9, "notch val")) {
 			size_t p = replystr.rfind(resp);
 			if (p != string::npos)
-				val = (int)ceil(fm_bcd(&replystr[p+6],3) * 3000.0 / 255.0);
+				val = (int)ceil(fm_bcd(replystr.substr(p+6),3) * 3000.0 / 255.0);
 		}
 	}
 	return on;

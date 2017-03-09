@@ -1738,12 +1738,12 @@ int RIG_TS990::get_bwA()
 		if (wait_char(';', 6, 20, "get CW width", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			SL = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(replystr.substr(3), 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get CW shift", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				SH = fm_decimal(&replystr[3], 2); //2 2
+				SH = fm_decimal(replystr.substr(3), 2); //2 2
 				A_default_CW = A.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 			}
 		}
@@ -1756,7 +1756,7 @@ int RIG_TS990::get_bwA()
 		if (wait_char(';', 6, 20, "get FSK Width", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			SL = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(replystr.substr(3), 2); //2 2
 			A_default_FSK = A.iBW = (SL & 0x7F);
 		}
 		break;
@@ -1768,7 +1768,7 @@ int RIG_TS990::get_bwA()
 		if (wait_char(';', 6, 20, "get PSK Width", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			SL = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(replystr.substr(3), 2); //2 2
 			A_default_PSK = A.iBW = (SL & 0x7F);
 		}
 		break;
@@ -1782,12 +1782,12 @@ int RIG_TS990::get_bwA()
 			if (wait_char(';', 6, 20, "get width", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				SL = fm_decimal(&replystr[3], 2); //2 2
+				SL = fm_decimal(replystr.substr(3), 2); //2 2
 				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter shift", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					SH = fm_decimal(&replystr[3], 2); //2 2
+					SH = fm_decimal(replystr.substr(3), 2); //2 2
 					A_default_SH_WI = A.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
@@ -1797,12 +1797,12 @@ int RIG_TS990::get_bwA()
 			if (wait_char(';', 6, 20, "get filter lower cutoff", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				SL = fm_decimal(&replystr[3], 2); //2 2
+				SL = fm_decimal(replystr.substr(3), 2); //2 2
 				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter upper cutoff", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					SH = fm_decimal(&replystr[3], 2); //2 2
+					SH = fm_decimal(replystr.substr(3), 2); //2 2
 					A_default_HI_LO = A.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
@@ -1818,12 +1818,12 @@ int RIG_TS990::get_bwA()
 			if (wait_char(';', 6, 20, "get width", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				SL = fm_decimal(&replystr[3], 2); //2 2
+				SL = fm_decimal(replystr.substr(3), 2); //2 2
 				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter shift", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-						SH = fm_decimal(&replystr[3], 2); //2
+						SH = fm_decimal(replystr.substr(3), 2); //2
 					A_default_SH_WI_D1 = A.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
@@ -1834,12 +1834,12 @@ int RIG_TS990::get_bwA()
 			if (wait_char(';', 6, 20, "get filter lower cutoff", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				SL = fm_decimal(&replystr[3], 2); //2 2
+				SL = fm_decimal(replystr.substr(3), 2); //2 2
 				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter upper cutoff", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					SH = fm_decimal(&replystr[3], 2); //2 2
+					SH = fm_decimal(replystr.substr(3), 2); //2 2
 					A_default_HI_LO = A.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
@@ -1855,12 +1855,12 @@ int RIG_TS990::get_bwA()
 			if (wait_char(';', 6, 20, "get width", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				SL = fm_decimal(&replystr[3], 2); //2 2
+				SL = fm_decimal(replystr.substr(3), 2); //2 2
 				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter shift", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					SH = fm_decimal(&replystr[3], 2); //2
+					SH = fm_decimal(replystr.substr(3), 2); //2
 					A_default_SH_WI_D2 = A.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
@@ -1871,12 +1871,12 @@ int RIG_TS990::get_bwA()
 			if (wait_char(';', 6, 20, "get filter lower cutoff", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				SL = fm_decimal(&replystr[3], 2); //2 2
+				SL = fm_decimal(replystr.substr(3), 2); //2 2
 				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter upper cutoff", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					SH = fm_decimal(&replystr[3], 2); //2 2
+					SH = fm_decimal(replystr.substr(3), 2); //2 2
 					A_default_HI_LO = A.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
@@ -1892,12 +1892,12 @@ int RIG_TS990::get_bwA()
 			if (wait_char(';', 6, 20, "get width", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				SL = fm_decimal(&replystr[3], 2); //2 2
+				SL = fm_decimal(replystr.substr(3), 2); //2 2
 				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter shift", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					SH = fm_decimal(&replystr[3], 2); //2
+					SH = fm_decimal(replystr.substr(3), 2); //2
 					A_default_SH_WI_D3 = A.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
@@ -1907,12 +1907,12 @@ int RIG_TS990::get_bwA()
 			if (wait_char(';', 6, 20, "get filter lower cutoff", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				SL = fm_decimal(&replystr[3], 2); //2 2
+				SL = fm_decimal(replystr.substr(3), 2); //2 2
 				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter upper cutoff", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					SH = fm_decimal(&replystr[3], 2); //2 2
+					SH = fm_decimal(replystr.substr(3), 2); //2 2
 					A_default_HI_LO = A.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
@@ -1927,12 +1927,12 @@ int RIG_TS990::get_bwA()
 		if (wait_char(';', 6, 20, "get AM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			SL = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(replystr.substr(3), 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get AM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				SH = fm_decimal(&replystr[3], 2); //2 2
+				SH = fm_decimal(replystr.substr(3), 2); //2 2
 				A_default_AM = A.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
@@ -1946,12 +1946,12 @@ int RIG_TS990::get_bwA()
 		if (wait_char(';', 6, 20, "get AM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			SL = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(replystr.substr(3), 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get AM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				SH = fm_decimal(&replystr[3], 2); //2 2
+				SH = fm_decimal(replystr.substr(3), 2); //2 2
 				A_default_AM_D1 = A.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
@@ -1965,12 +1965,12 @@ int RIG_TS990::get_bwA()
 		if (wait_char(';', 6, 20, "get AM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			SL = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(replystr.substr(3), 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get AM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				SH = fm_decimal(&replystr[3], 2); //2 2
+				SH = fm_decimal(replystr.substr(3), 2); //2 2
 				A_default_AM_D2 = A.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
@@ -1984,12 +1984,12 @@ int RIG_TS990::get_bwA()
 		if (wait_char(';', 6, 20, "get AM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			SL = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(replystr.substr(3), 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get AM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				SH = fm_decimal(&replystr[3], 2); //2 2
+				SH = fm_decimal(replystr.substr(3), 2); //2 2
 				A_default_AM_D3 = A.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
@@ -2003,12 +2003,12 @@ int RIG_TS990::get_bwA()
 		if (wait_char(';', 6, 20, "get FM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			SL = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(replystr.substr(3), 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get FM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				SH = fm_decimal(&replystr[3], 2); //2 2
+				SH = fm_decimal(replystr.substr(3), 2); //2 2
 				A_default_FM = A.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
@@ -2022,12 +2022,12 @@ int RIG_TS990::get_bwA()
 		if (wait_char(';', 6, 20, "get FM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			SL = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(replystr.substr(3), 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get FM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				SH = fm_decimal(&replystr[3], 2); //2 2
+				SH = fm_decimal(replystr.substr(3), 2); //2 2
 				A_default_FM_D1 = A.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
@@ -2041,12 +2041,12 @@ int RIG_TS990::get_bwA()
 		if (wait_char(';', 6, 20, "get FM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			SL = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(replystr.substr(3), 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get FM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				SH = fm_decimal(&replystr[3], 2); //2 2
+				SH = fm_decimal(replystr.substr(3), 2); //2 2
 				A_default_FM_D2 = A.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
@@ -2060,12 +2060,12 @@ int RIG_TS990::get_bwA()
 		if (wait_char(';', 6, 20, "get FM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			SL = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(replystr.substr(3), 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get FM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				SH = fm_decimal(&replystr[3], 2); //2 2
+				SH = fm_decimal(replystr.substr(3), 2); //2 2
 				A_default_FM_D3 = A.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
@@ -2088,12 +2088,12 @@ int RIG_TS990::get_bwB()
 		if (wait_char(';', 6, 20, "get CW width", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			SL = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(replystr.substr(3), 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get CW shift", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				SH = fm_decimal(&replystr[3], 2); //2 2
+				SH = fm_decimal(replystr.substr(3), 2); //2 2
 				B_default_CW = B.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 			}
 		}
@@ -2106,7 +2106,7 @@ int RIG_TS990::get_bwB()
 		if (wait_char(';', 6, 20, "get FSK Width", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			SL = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(replystr.substr(3), 2); //2 2
 			B_default_FSK = B.iBW = (SL & 0x7F);
 		}
 		break;
@@ -2118,7 +2118,7 @@ int RIG_TS990::get_bwB()
 		if (wait_char(';', 6, 20, "get PSK Width", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			SL = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(replystr.substr(3), 2); //2 2
 			B_default_PSK = B.iBW = (SL & 0x7F);
 		}
 		break;
@@ -2132,12 +2132,12 @@ int RIG_TS990::get_bwB()
 			if (wait_char(';', 6, 20, "get width", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				SL = fm_decimal(&replystr[3], 2); //2 2
+				SL = fm_decimal(replystr.substr(3), 2); //2 2
 				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter shift", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					SH = fm_decimal(&replystr[3], 2); //2 2
+					SH = fm_decimal(replystr.substr(3), 2); //2 2
 					B_default_SH_WI = B.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
@@ -2147,12 +2147,12 @@ int RIG_TS990::get_bwB()
 			if (wait_char(';', 6, 20, "get filter lower cutoff", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				SL = fm_decimal(&replystr[3], 2); //2 2
+				SL = fm_decimal(replystr.substr(3), 2); //2 2
 				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter upper cutoff", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					SH = fm_decimal(&replystr[3], 2); //2 2
+					SH = fm_decimal(replystr.substr(3), 2); //2 2
 					B_default_HI_LO = B.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
@@ -2168,12 +2168,12 @@ int RIG_TS990::get_bwB()
 			if (wait_char(';', 6, 20, "get width", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				SL = fm_decimal(&replystr[3], 2); //2 2
+				SL = fm_decimal(replystr.substr(3), 2); //2 2
 				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter shift", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-						SH = fm_decimal(&replystr[3], 2); //2
+						SH = fm_decimal(replystr.substr(3), 2); //2
 					B_default_SH_WI_D1 = B.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
@@ -2184,12 +2184,12 @@ int RIG_TS990::get_bwB()
 			if (wait_char(';', 6, 20, "get filter lower cutoff", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				SL = fm_decimal(&replystr[3], 2); //2 2
+				SL = fm_decimal(replystr.substr(3), 2); //2 2
 				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter upper cutoff", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					SH = fm_decimal(&replystr[3], 2); //2 2
+					SH = fm_decimal(replystr.substr(3), 2); //2 2
 					B_default_HI_LO = B.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
@@ -2205,12 +2205,12 @@ int RIG_TS990::get_bwB()
 			if (wait_char(';', 6, 20, "get width", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				SL = fm_decimal(&replystr[3], 2); //2 2
+				SL = fm_decimal(replystr.substr(3), 2); //2 2
 				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter shift", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					SH = fm_decimal(&replystr[3], 2); //2
+					SH = fm_decimal(replystr.substr(3), 2); //2
 					B_default_SH_WI_D2 = B.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
@@ -2221,12 +2221,12 @@ int RIG_TS990::get_bwB()
 			if (wait_char(';', 6, 20, "get filter lower cutoff", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				SL = fm_decimal(&replystr[3], 2); //2 2
+				SL = fm_decimal(replystr.substr(3), 2); //2 2
 				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter upper cutoff", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					SH = fm_decimal(&replystr[3], 2); //2 2
+					SH = fm_decimal(replystr.substr(3), 2); //2 2
 					B_default_HI_LO = B.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
@@ -2242,12 +2242,12 @@ int RIG_TS990::get_bwB()
 			if (wait_char(';', 6, 20, "get width", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				SL = fm_decimal(&replystr[3], 2); //2 2
+				SL = fm_decimal(replystr.substr(3), 2); //2 2
 				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter shift", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					SH = fm_decimal(&replystr[3], 2); //2
+					SH = fm_decimal(replystr.substr(3), 2); //2
 					B_default_SH_WI_D3 = B.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
@@ -2257,12 +2257,12 @@ int RIG_TS990::get_bwB()
 			if (wait_char(';', 6, 20, "get filter lower cutoff", ASC) == 6) {
 				p = replystr.rfind("SL");
 				if (p == string::npos) break;
-				SL = fm_decimal(&replystr[3], 2); //2 2
+				SL = fm_decimal(replystr.substr(3), 2); //2 2
 				cmd = "SH0;";
 				if (wait_char(';', 6, 20, "get filter upper cutoff", ASC) == 6) {
 					p = replystr.rfind("SH");
 					if (p == string::npos) break;
-					SH = fm_decimal(&replystr[3], 2); //2 2
+					SH = fm_decimal(replystr.substr(3), 2); //2 2
 					B_default_HI_LO = B.iBW = ((SH << 8) | (SL & 0x7F )) | 0x8000;
 				}
 			}
@@ -2277,12 +2277,12 @@ int RIG_TS990::get_bwB()
 		if (wait_char(';', 6, 20, "get AM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			SL = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(replystr.substr(3), 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get AM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				SH = fm_decimal(&replystr[3], 2); //2 2
+				SH = fm_decimal(replystr.substr(3), 2); //2 2
 				B_default_AM = B.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
@@ -2296,12 +2296,12 @@ int RIG_TS990::get_bwB()
 		if (wait_char(';', 6, 20, "get AM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			SL = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(replystr.substr(3), 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get AM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				SH = fm_decimal(&replystr[3], 2); //2 2
+				SH = fm_decimal(replystr.substr(3), 2); //2 2
 				B_default_AM_D1 = B.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
@@ -2315,12 +2315,12 @@ int RIG_TS990::get_bwB()
 		if (wait_char(';', 6, 20, "get AM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			SL = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(replystr.substr(3), 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get AM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				SH = fm_decimal(&replystr[3], 2); //2 2
+				SH = fm_decimal(replystr.substr(3), 2); //2 2
 				B_default_AM_D2 = B.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
@@ -2334,12 +2334,12 @@ int RIG_TS990::get_bwB()
 		if (wait_char(';', 6, 20, "get AM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			SL = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(replystr.substr(3), 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get AM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				SH = fm_decimal(&replystr[3], 2); //2 2
+				SH = fm_decimal(replystr.substr(3), 2); //2 2
 				B_default_AM_D3 = B.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
@@ -2353,12 +2353,12 @@ int RIG_TS990::get_bwB()
 		if (wait_char(';', 6, 20, "get FM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			SL = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(replystr.substr(3), 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get FM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				SH = fm_decimal(&replystr[3], 2); //2 2
+				SH = fm_decimal(replystr.substr(3), 2); //2 2
 				B_default_FM = B.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
@@ -2372,12 +2372,12 @@ int RIG_TS990::get_bwB()
 		if (wait_char(';', 6, 20, "get FM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			SL = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(replystr.substr(3), 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get FM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				SH = fm_decimal(&replystr[3], 2); //2 2
+				SH = fm_decimal(replystr.substr(3), 2); //2 2
 				B_default_FM_D1 = B.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
@@ -2391,12 +2391,12 @@ int RIG_TS990::get_bwB()
 		if (wait_char(';', 6, 20, "get FM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			SL = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(replystr.substr(3), 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get FM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				SH = fm_decimal(&replystr[3], 2); //2 2
+				SH = fm_decimal(replystr.substr(3), 2); //2 2
 				B_default_FM_D2 = B.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
@@ -2410,12 +2410,12 @@ int RIG_TS990::get_bwB()
 		if (wait_char(';', 6, 20, "get FM lo", ASC) == 6) {
 			p = replystr.rfind("SL");
 			if (p == string::npos) break;
-			SL = fm_decimal(&replystr[3], 2); //2 2
+			SL = fm_decimal(replystr.substr(3), 2); //2 2
 			cmd = "SH0;";
 			if (wait_char(';', 6, 20, "get FM hi", ASC) == 6) {
 				p = replystr.rfind("SH");
 				if (p == string::npos) break;
-				SH = fm_decimal(&replystr[3], 2); //2 2
+				SH = fm_decimal(replystr.substr(3), 2); //2 2
 				B_default_FM_D3 = B.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
@@ -2571,14 +2571,14 @@ int  RIG_TS990::get_rf_gain()
 
 		size_t p = replystr.rfind("RG");
 		if (p != string::npos)
-			val = fm_decimal(&replystr[p+3], 3);
+			val = fm_decimal(replystr.substr(p+3), 3);
 	} else {
 		cmd = "RG0;";
 		if (wait_char(';', 7, 20, "get rf gain", ASC) < 7) return val;
 
 		size_t p = replystr.rfind("RG");
 		if (p != string::npos)
-			val = fm_decimal(&replystr[p+3], 3);
+			val = fm_decimal(replystr.substr(p+3), 3);
 	}
 	return val;
 }
@@ -2660,7 +2660,7 @@ int  RIG_TS990::get_noise_reduction_val()
 		if (wait_char(';', 7, 20, "GET noise reduction val", ASC) < 7) return val;
 		size_t p = replystr.rfind(rsp);
 		if (p == string::npos) return val;
-		val = fm_decimal(&replystr[p+4], 2);
+		val = fm_decimal(replystr.substr(p+4), 2);
 	} else {
 		if (!nr_on) return val;
 		cmd = rsp = "RL10";
@@ -2668,7 +2668,7 @@ int  RIG_TS990::get_noise_reduction_val()
 		if (wait_char(';', 7, 20, "GET noise reduction val", ASC) < 7) return val;
 		size_t p = replystr.rfind(rsp);
 		if (p == string::npos) return val;
-		val = fm_decimal(&replystr[p+4], 2);
+		val = fm_decimal(replystr.substr(p+4), 2);
 	}
 	return val;
 }

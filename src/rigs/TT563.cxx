@@ -72,7 +72,7 @@ long RIG_TT563::get_vfoA ()
 	cmd.append( post );
 	int ret = sendCommand(cmd);
 	if (ret >= 11) {
-		freqA = fm_bcd_be(&replystr[ret - 11 + 5], 10);
+		freqA = fm_bcd_be(replystr.substr(ret - 11 + 5), 10);
 	}
 	return freqA;
 }

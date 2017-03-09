@@ -216,7 +216,7 @@ long RIG_IC7600::get_vfoA ()
 		resp.assign(pre_fm).append("\x03");
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			A.freq = fm_bcd_be(&replystr[p+5], 10);
+			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
 	return A.freq;
 }
@@ -238,7 +238,7 @@ long RIG_IC7600::get_vfoB ()
 		resp.assign(pre_fm).append("\x03");
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			B.freq = fm_bcd_be(&replystr[p+5], 10);
+			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
 	return B.freq;
 }
@@ -404,7 +404,7 @@ int RIG_IC7600::get_bwA()
 		resp.append("\x1A\x02");
 		size_t p = replystr.find(resp);
 		if (p != string::npos)
-			A.iBW = fm_bcd(&replystr[p+6], 2);
+			A.iBW = fm_bcd(replystr.substr(p+6), 2);
 	}
 	return A.iBW;
 }
@@ -432,7 +432,7 @@ int RIG_IC7600::get_bwB()
 		resp.append("\x1A\x02");
 		size_t p = replystr.find(resp);
 		if (p != string::npos)
-			B.iBW = fm_bcd(&replystr[p+6], 2);
+			B.iBW = fm_bcd(replystr.substr(p+6), 2);
 	}
 	return B.iBW;
 }
@@ -535,7 +535,7 @@ int RIG_IC7600::get_mic_gain()
 	if (waitFOR(9, "get mic")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			val = (int)ceil(fm_bcd(&replystr[p+6],3) / 2.55);
+			val = (int)ceil(fm_bcd(replystr.substr(p+6),3) / 2.55);
 	}
 	minmax(0,100,val);
 	return val;
@@ -720,7 +720,7 @@ int RIG_IC7600::get_volume_control()
 	if (waitFOR(9, "get vol")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			val = (int)ceil(fm_bcd(&replystr[p + 6],3) * 100 / 255);
+			val = (int)ceil(fm_bcd(replystr.substr(p + 6),3) * 100 / 255);
 	}
 	minmax(0, 100, val);
 	progStatus.volume = val;
@@ -754,7 +754,7 @@ int RIG_IC7600::get_power_control()
 	if (waitFOR(9, "get power")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			val = (int)ceil(fm_bcd(&replystr[p + 6],3) * 100 / 255);
+			val = (int)ceil(fm_bcd(replystr.substr(p + 6),3) * 100 / 255);
 	}
 	minmax(0, 100, val);
 	progStatus.power_level = val;
@@ -778,7 +778,7 @@ int RIG_IC7600::get_smeter()
 	if (waitFOR(9, "get smeter")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			mtr = fm_bcd(&replystr[p+6], 3);
+			mtr = fm_bcd(replystr.substr(p+6), 3);
 			mtr = (int)ceil(mtr /2.41);
 			if (mtr > 100) mtr = 100;
 		}
@@ -798,7 +798,7 @@ int RIG_IC7600::get_power_out(void)
 	if (waitFOR(9, "get power out")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			mtr = fm_bcd(&replystr[p+6], 3);
+			mtr = fm_bcd(replystr.substr(p+6), 3);
 			mtr = (int)ceil(mtr /2.13);
 			if (mtr > 100) mtr = 100;
 		}
@@ -818,7 +818,7 @@ int RIG_IC7600::get_swr(void)
 	if (waitFOR(9, "get swr")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			mtr = fm_bcd(&replystr[p+6], 3);
+			mtr = fm_bcd(replystr.substr(p+6), 3);
 			mtr = (int)ceil(mtr /2.55);
 			if (mtr > 100) mtr = 100;
 		}
@@ -838,7 +838,7 @@ int RIG_IC7600::get_alc(void)
 	if (waitFOR(9, "get alc")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			mtr = fm_bcd(&replystr[p+6], 3);
+			mtr = fm_bcd(replystr.substr(p+6), 3);
 			mtr = (int)ceil(mtr /1.2);
 			if (mtr > 100) mtr = 100;
 		}
@@ -868,7 +868,7 @@ int RIG_IC7600::get_rf_gain()
 	if (waitFOR(9, "get RF")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			val = (int)(fm_bcd(&replystr[p + 6],3) * 100 / 255);
+			val = (int)(fm_bcd(replystr.substr(p + 6),3) * 100 / 255);
 	}
 	minmax(0, 100, val);
 	progStatus.rfgain = val;
@@ -937,7 +937,6 @@ int RIG_IC7600::get_preamp()
 
 void RIG_IC7600::set_attenuator(int val)
 {
-	unsigned char level = 0x00;
 	if (atten_level == 0x00) {
 		atten_level = 0x06;
 		atten_label("6 dB", true);
@@ -1081,7 +1080,7 @@ int RIG_IC7600::get_noise_reduction_val()
 	if (waitFOR(9, "get NRval")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			val = (int)ceil(fm_bcd(&replystr[p+6],3) * 100 / 255);
+			val = (int)ceil(fm_bcd(replystr.substr(p+6),3) * 100 / 255);
 	}
 	minmax(0, 100, val);
 	progStatus.noise_reduction_val = val;
@@ -1111,7 +1110,7 @@ int  RIG_IC7600::get_squelch()
 	if (waitFOR(9, "get squelch")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			val = (int)ceil(fm_bcd(&replystr[p+6], 3) * 100 / 255);
+			val = (int)ceil(fm_bcd(replystr.substr(p+6), 3) * 100 / 255);
 	}
 	minmax(0, 100, val);
 	progStatus.squelch = val;
@@ -1199,7 +1198,7 @@ bool RIG_IC7600::get_notch(int &val)
 		if (waitFOR(9, "get notch val")) {
 			size_t p = replystr.rfind(resp);
 			if (p != string::npos) {
-				val = fm_bcd(&replystr[p+6],3);
+				val = fm_bcd(replystr.substr(p+6),3);
 				val = (val - 53) * 20;
 				if (val < 0) val = 0;
 				if (val > 4040) val = 4040;

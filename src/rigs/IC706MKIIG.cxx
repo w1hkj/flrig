@@ -95,7 +95,7 @@ long RIG_IC706MKIIG::get_vfoA ()
 	if (waitFOR(11, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			freqA = fm_bcd_be(&replystr[p+5], 10);
+			freqA = fm_bcd_be(replystr.substr(p+5), 10);
 	}
 	return freqA;
 }
@@ -120,7 +120,7 @@ long RIG_IC706MKIIG::get_vfoB ()
 	if (waitFOR(11, "get vfo B")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			freqB = fm_bcd_be(&replystr[p+5], 10);
+			freqB = fm_bcd_be(replystr.substr(p+5), 10);
 	}
 	return freqB;
 }
@@ -210,7 +210,7 @@ int RIG_IC706MKIIG::get_smeter()
 	if (waitFOR(9, "get smeter")) { // SHOULD BE 10 bytes
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return (int)ceil(fm_bcd(&replystr[p+6], 3) / 2.55);
+			return (int)ceil(fm_bcd(replystr.substr(p+6), 3) / 2.55);
 	}
 	return -1;
 }

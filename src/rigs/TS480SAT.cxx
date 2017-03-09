@@ -636,13 +636,13 @@ int RIG_TS480SAT::get_bwA()
 		if (wait_char(';', 5, 100, "get SL", ASC) == 5) {
 			p = replystr.rfind("SL");
 			if (p != string::npos)
-				lo = fm_decimal(&replystr[2], 2);
+				lo = fm_decimal(replystr.substr(p+2), 2);
 		}
 		cmd = "SH;";
 		if (wait_char(';', 5, 100, "get SH", ASC) == 5) {
 			p = replystr.rfind("SH");
 			if (p != string::npos)
-				hi = fm_decimal(&replystr[2], 2);
+				hi = fm_decimal(replystr.substr(p+2), 2);
 			A.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
 		}
 	} else if (A.imode == 2 || A.imode == 6) {
@@ -717,13 +717,13 @@ int RIG_TS480SAT::get_bwB()
 		if (wait_char(';', 5, 100, "get SL", ASC) == 5) {
 			p = replystr.rfind("SL");
 			if (p != string::npos)
-				lo = fm_decimal(&replystr[2], 2);
+				lo = fm_decimal(replystr.substr(p+2), 2);
 		}
 		cmd = "SH;";
 		if (wait_char(';', 5, 100, "get SH", ASC) == 5) {
 			p = replystr.rfind("SH");
 			if (p != string::npos)
-				hi = fm_decimal(&replystr[2], 2);
+				hi = fm_decimal(replystr.substr(p+2), 2);
 			B.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
 		}
 	} else if (B.imode == 2 || B.imode == 6) {
@@ -884,7 +884,7 @@ bool RIG_TS480SAT::get_if_shift(int &val)
 	if (wait_char(';', 8, 100, "get IF shift", ASC) == 8) {
 		size_t p = replystr.rfind("IS");
 		if (p != string::npos) {
-			val = fm_decimal(&replystr[p+3], 4);
+			val = fm_decimal(replystr.substr(p+3), 4);
 			if (replystr[p+2] == '-') val *= -1;
 			return (val != 0);
 		}
@@ -917,7 +917,7 @@ int  RIG_TS480SAT::get_mic_gain()
 
 	size_t p = replystr.rfind("MG");
 	if (p != string::npos)
-		val = fm_decimal(&replystr[p+2], 3);
+		val = fm_decimal(replystr.substr(p+2), 3);
 	return val;
 }
 
@@ -942,7 +942,7 @@ int  RIG_TS480SAT::get_rf_gain()
 
 	size_t p = replystr.rfind("RG");
 	if (p != string::npos)
-		val = fm_decimal(&replystr[p+2], 3);
+		val = fm_decimal(replystr.substr(p+2), 3);
 	return val;
 }
 

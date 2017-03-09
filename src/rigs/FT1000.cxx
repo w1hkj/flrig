@@ -152,9 +152,8 @@ long RIG_FT1000::get_vfoA ()
 	cmd[3] = 2; cmd[4] = 0x10;
 	int ret = waitN(17, 100, "get vfoA", HEX);
 	if (ret < 17) return freqA;
-	replybuff[9] = 0;
-	freqA = fm_bcd(&replybuff[6], 8) * 10;
-	bwA = replybuff[13] & 0x07;
+	freqA = fm_bcd(replystr.substr(6), 8) * 10;
+	bwA = replystr[13] & 0x07;
 	return freqA;
 }
 
@@ -228,7 +227,7 @@ int  RIG_FT1000::get_power_out(void)
 	cmd[4] = 0xF7;
 	int ret = waitN(5, 100, "get pwr out", HEX);
 	if (ret < 5) return 0;
-	return replybuff[0] && 0x0F;
+	return replystr[0] && 0x0F;
 }
 
 int  RIG_FT1000::get_smeter(void)
@@ -237,6 +236,6 @@ int  RIG_FT1000::get_smeter(void)
 	cmd[4] = 0xF7;
 	int ret = waitN(5, 100, "get smeter", HEX);
 	if (ret < 5) return 0;
-	return replybuff[0] && 0x0F;
+	return replystr[0] && 0x0F;
 }
 

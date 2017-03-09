@@ -209,7 +209,7 @@ int RIG_IC910H::get_smeter()
 	if (waitFOR(9, "get smeter")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			mtr = fm_bcd(&replystr[p+6], 3);
+			mtr = fm_bcd(replystr.substr(p+6), 3);
 			mtr = (int)(mtr /2.55);
 			if (mtr > 100) mtr = 100;
 		}

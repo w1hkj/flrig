@@ -408,7 +408,7 @@ int RIG_TS2000::get_smeter()
 		int smtr = 0;
 		size_t p = replystr.rfind("SM");
 		if (p != string::npos) {
-			smtr = fm_decimal(&replystr[p+3],4);
+			smtr = fm_decimal(replystr.substr(p+3),4);
 			if (rxona)
 				smtr = (smtr * 100) / 30;
 			else
@@ -426,7 +426,7 @@ int RIG_TS2000::get_swr()
 		int swrmtr = 0;
 		size_t p = replystr.rfind("RM1");
 		if (p != string::npos) {
-			swrmtr = fm_decimal(&replystr[p+3], 4);
+			swrmtr = fm_decimal(replystr.substr(p+3), 4);
 			swrmtr = (swrmtr * 10) / 3;
 			return swrmtr;
 		}
@@ -441,7 +441,7 @@ int  RIG_TS2000::get_alc(void)
 		int alcmtr = 0;
 		size_t p = replystr.rfind("RM3");
 		if (p != string::npos) {
-			alcmtr = fm_decimal(&replystr[p+3], 4);
+			alcmtr = fm_decimal(replystr.substr(p+3), 4);
 			alcmtr = (alcmtr * 10) / 3;
 			return alcmtr;
 		}
@@ -480,7 +480,7 @@ int RIG_TS2000::get_power_out()
 		size_t p = replystr.rfind("SM0");
 		if (p != string::npos) {
 			int poutmtr = 0;
-			poutmtr = fm_decimal(&replystr[p+3],4);
+			poutmtr = fm_decimal(replystr.substr(p+3),4);
 			if (poutmtr <= 6) poutmtr = poutmtr * 2;
 			else if (poutmtr <= 11) poutmtr = 11 + (poutmtr - 6)*(26 - 11)/(11 - 6);
 			else if (poutmtr <= 18) poutmtr = 26 + (poutmtr - 11)*(50 - 26)/(18 - 11);
@@ -499,7 +499,7 @@ int RIG_TS2000::get_power_control()
 		int pctrl = 0;
 		size_t p = replystr.rfind("PC");
 		if (p != string::npos) {
-			pctrl = fm_decimal(&replystr[p+2], 3);
+			pctrl = fm_decimal(replystr.substr(p+2), 3);
 			return pctrl;
 		}
 	}
@@ -514,7 +514,7 @@ int RIG_TS2000::get_volume_control()
 		int volctrl = 0;
 		size_t p = replystr.rfind("AG");
 		if (p != string::npos) {
-			volctrl = fm_decimal(&replystr[p+3],3);
+			volctrl = fm_decimal(replystr.substr(p+3),3);
 			return (int)(volctrl / 2.55);
 		}
 	}
@@ -802,13 +802,13 @@ int RIG_TS2000::get_bwA()
 		if (wait_char(';', 5, 100, "get SL", ASC) == 5) {
 			p = replystr.rfind("SL");
 			if (p != string::npos)
-				lo = fm_decimal(&replystr[2], 2);
+				lo = fm_decimal(replystr.substr(2), 2);
 		}
 		cmd = "SH;";
 		if (wait_char(';', 5, 100, "get SH", ASC) == 5) {
 			p = replystr.rfind("SH");
 			if (p != string::npos)
-				hi = fm_decimal(&replystr[2], 2);
+				hi = fm_decimal(replystr.substr(2), 2);
 			A.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
 		}
 	} else if (A.imode == CW || A.imode == CWR) { // CW
@@ -885,13 +885,13 @@ int RIG_TS2000::get_bwB()
 		if (wait_char(';', 5, 100, "get SL", ASC) == 5) {
 			p = replystr.rfind("SL");
 			if (p != string::npos)
-				lo = fm_decimal(&replystr[2], 2);
+				lo = fm_decimal(replystr.substr(2), 2);
 		}
 		cmd = "SH;";
 		if (wait_char(';', 5, 100, "get SH", ASC) == 5) {
 			p = replystr.rfind("SH");
 			if (p != string::npos)
-				hi = fm_decimal(&replystr[2], 2);
+				hi = fm_decimal(replystr.substr(2), 2);
 			B.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
 		}
 	} else if (B.imode == CW || B.imode == CWR) {
@@ -942,7 +942,7 @@ int RIG_TS2000::get_mic_gain()
 		int mgain = 0;
 		size_t p = replystr.rfind("MG");
 		if (p != string::npos) {
-			mgain = fm_decimal(&replystr[p+2], 3);
+			mgain = fm_decimal(replystr.substr(p+2), 3);
 			return mgain;
 		}
 	}
@@ -1003,7 +1003,7 @@ bool RIG_TS2000::get_if_shift(int &val)
 	if (wait_char(';', 8, 100, "get IF shift", ASC) == 8) {
 		size_t p = replystr.rfind("IS ");
 		if (p != string::npos) {
-			val = fm_decimal(&replystr[p+3], 4);
+			val = fm_decimal(replystr.substr(p+3), 4);
 			return true;
 		}
 	}
@@ -1051,7 +1051,7 @@ bool  RIG_TS2000::get_notch(int &val)
 				if (wait_char(';', 6, 100, "get notch val", ASC) == 6) {
 					p = replystr.rfind("BP");
 					if (p != string::npos)
-						val = 200 + 50 * fm_decimal(&replystr[p+2],3);
+						val = 200 + 50 * fm_decimal(replystr.substr(p+2),3);
 				}
 			}
 		}
@@ -1102,7 +1102,7 @@ int  RIG_TS2000::get_rf_gain()
 	if (wait_char(';', 6, 100, "get rf gain", ASC) == 6) {
 		size_t p = replystr.rfind("RG");
 		if (p != string::npos)
-			rfg = fm_decimal(&replystr[p+2] ,3) * 100 / 255;
+			rfg = fm_decimal(replystr.substr(p+2) ,3) * 100 / 255;
 	}
 	return rfg;
 }

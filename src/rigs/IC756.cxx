@@ -223,7 +223,7 @@ long RIG_IC756PRO::get_vfoA ()
 	if (waitFOR(11, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			A.freq = fm_bcd_be(&replystr[p+5], 10);
+			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
 	return A.freq;
 }
@@ -249,7 +249,7 @@ long RIG_IC756PRO::get_vfoB ()
 	if (waitFOR(11, "get vfo B")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			B.freq = fm_bcd_be(&replystr[p+5], 10);
+			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
 	return B.freq;
 }
@@ -275,7 +275,7 @@ int RIG_IC756PRO::get_smeter()
 	if (waitFOR(9, "get smeter")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return (int)ceil(fm_bcd(&replystr[p+6], 3) / 2.55);
+			return (int)ceil(fm_bcd(replystr.substr(p+6), 3) / 2.55);
 	}
 	return 0;
 }
@@ -303,7 +303,7 @@ int RIG_IC756PRO::get_volume_control()
 	if (waitFOR(9, "get vol")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return ((int)ceil(fm_bcd(&replystr[p+6],3) * 100 / 255));
+			return ((int)ceil(fm_bcd(replystr.substr(p+6),3) * 100 / 255));
 	}
 	return progStatus.volume;
 }

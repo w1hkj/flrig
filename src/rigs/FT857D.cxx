@@ -87,8 +87,8 @@ long RIG_FT857D::get_vfoA ()
 	cmd[4] = 0x03;
 	int ret = waitN(5, 100, "get vfo A", HEX);
 	if (ret == 5) {
-		freqA = fm_bcd(replybuff, 8) * 10;
-		int mode = replybuff[4];
+		freqA = fm_bcd(replystr, 8) * 10;
+		int mode = replystr[4];
 		for (int i = 0; i < 8; i++)
 			if (FT857D_mode_val[i] == mode) {
 				modeA = i;
@@ -115,8 +115,8 @@ long RIG_FT857D::get_vfoB ()
 	cmd[4] = 0x03;
 	int ret = waitN(5, 100, "get vfo B", HEX);
 	if (ret == 5) {
-		freqB = fm_bcd(replybuff, 8) * 10;
-		int mode = replybuff[4];
+		freqB = fm_bcd(replystr, 8) * 10;
+		int mode = replystr[4];
 		for (int i = 0; i < 8; i++)
 			if (FT857D_mode_val[i] == mode) {
 				modeB = i;
@@ -195,7 +195,7 @@ int  RIG_FT857D::get_power_out(void)
 	cmd[4] = 0xF7;
 	int ret = waitN(1, 100, "get pout", HEX);
 	if (ret == 1) {
-		int fwdpwr = replybuff[0] & 0x0F;
+		int fwdpwr = replystr[0] & 0x0F;
 		fwdpwr = fwdpwr * 100 / 15;
 		return fwdpwr;
 	}
@@ -208,7 +208,7 @@ int  RIG_FT857D::get_smeter(void)
 	cmd[4] = 0xE7;
 	int ret = waitN(1, 100, "get smeter", HEX);
 	if (ret == 1) {
-		int sval = replybuff[0] & 0x0F;
+		int sval = replystr[0] & 0x0F;
 		sval = (sval-1) * 100 / 15;
 		return sval;
 	}

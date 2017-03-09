@@ -186,7 +186,7 @@ string rigbase::to_bcd(long freq, int len)
 	return bcd;
 }
 
-long rigbase::fm_bcd (char *bcd, int len)
+long rigbase::fm_bcd (string bcd, int len)
 {
 	int i;
 	long f = 0;
@@ -202,7 +202,7 @@ long rigbase::fm_bcd (char *bcd, int len)
 }
 
 
-long rigbase::fm_bcd_be(char *bcd, int len)
+long rigbase::fm_bcd_be(string bcd, int len)
 {
 	char temp;
 	int numchars = len/2;
@@ -235,7 +235,7 @@ string rigbase::to_binary(long freq, int len)
 	return bin;
 }
 
-long rigbase::fm_binary(char *binary, int len)
+long rigbase::fm_binary(string binary, int len)
 {
 	int i;
 	long f = 0;
@@ -246,7 +246,7 @@ long rigbase::fm_binary(char *binary, int len)
 	return f;
 }
 
-long rigbase::fm_binary_be(char *binary_be, int len)
+long rigbase::fm_binary_be(string binary_be, int len)
 {
 	unsigned char temp;
 	int numchars = len/2;
@@ -281,7 +281,7 @@ string rigbase::to_decimal(long d, int len)
 	return sdec;
 }
 
-long rigbase::fm_decimal(char *decimal, int len)
+long rigbase::fm_decimal(string decimal, int len)
 {
 	long d = 0;
 	for (int i = 0; i < len; i++) {
@@ -291,7 +291,7 @@ long rigbase::fm_decimal(char *decimal, int len)
 	return d;
 }
 
-long rigbase::fm_decimal_be(char *decimal_be, int len)
+long rigbase::fm_decimal_be(string decimal_be, int len)
 {
 	unsigned char temp;
 	int numchars = len/2;
@@ -310,16 +310,16 @@ long rigbase::fm_decimal_be(char *decimal_be, int len)
 //======================================================================
 
 static int set100[] =
-{  0,  2,  5,  7, 10, 12, 15, 17, 20, 22,
-  25, 28, 30, 33, 35, 38, 40, 43, 45, 48,
-  51, 53, 56, 58, 61, 63, 66, 68, 71, 73,
-  76, 79, 81, 84, 86, 89, 91, 94, 96, 99,
- 102,104,107,109,112,114,117,119,122,124,
- 127,130,132,135,137,140,142,145,147,150,
- 153,155,158,160,163,165,168,170,173,175,
- 178,181,183,186,188,191,193,196,198,201,
- 204,206,209,211,214,216,219,221,224,226,
- 229,232,234,237,239,242,244,247,249,252,255};
+{  0,  3,  6,  8, 11, 13, 16, 18, 21, 23,
+  26, 29, 31, 34, 36, 39, 41, 44, 46, 49,
+  51, 54, 57, 59, 62, 64, 67, 69, 72, 74,
+  77, 80, 82, 85, 87, 90, 92, 95, 97,100,
+ 102,105,108,110,113,115,118,120,123,125,
+ 128,131,133,136,138,141,143,146,148,151,
+ 153,156,159,161,164,166,169,171,174,176,
+ 179,182,184,187,189,192,194,197,199,202,
+ 204,207,210,212,215,217,220,222,225,227,
+ 230,233,235,238,240,243,245,248,250,253,255};
 
 string rigbase::bcd255(int val)
 {
@@ -328,7 +328,7 @@ string rigbase::bcd255(int val)
 
 int rigbase::num100(string bcd)
 {
-	int val = fm_bcd((char *)bcd.c_str(), 3);
+	int val = fm_bcd(bcd, 3);
 	for (int n = 0; n < 101; n++) {
 		if (set100[n] > val)  return n - 1;
 		if (set100[n] == val) return n;

@@ -332,7 +332,7 @@ int RIG_IC7800::get_bwA()
 	cmd.append("\x1a\x03");
 	cmd.append(post);
 	if (sendICcommand (cmd, 8)) {
-		A.iBW = fm_bcd(&replystr[6], 2);
+		A.iBW = fm_bcd(replystr.substr(6), 2);
 	}
 	return A.iBW;
 }
@@ -358,7 +358,7 @@ int RIG_IC7800::get_bwB()
 	cmd.append("\x1a\x03");
 	cmd.append(post);
 	if (sendICcommand (cmd, 8)) {
-		B.iBW = fm_bcd(&replystr[6], 2);
+		B.iBW = fm_bcd(replystr.substr(6), 2);
 	}
 	return B.iBW;
 }

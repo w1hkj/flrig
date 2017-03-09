@@ -399,7 +399,7 @@ int RIG_K3::get_power_control()
 	if (ret < 6) return progStatus.power_level;
 	size_t p = replystr.rfind("PC");
 	if (p == string::npos) return progStatus.power_level;
-	return fm_decimal(&replystr[p+2], 3);
+	return fm_decimal(replystr.substr(p+2), 3);
 }
 
 void RIG_K3::get_pc_min_max_step(double &min, double &max, double &step)
@@ -496,8 +496,8 @@ int RIG_K3::get_smeter()
 	size_t p = replystr.rfind("SM");
 	if (p == string::npos) return 0;
 
-	replystr[p + 6] = 0;
-	int mtr = atoi(&replystr[p + 3]);
+	int mtr = fm_decimal(replystr.substr(p+2), 4);
+
 	if (mtr <= 6) mtr = (int) (50.0 * mtr / 6.0);
 	else mtr = (int)(50 + (mtr - 6.0) * 50.0 / 9.0);
 	return mtr;
