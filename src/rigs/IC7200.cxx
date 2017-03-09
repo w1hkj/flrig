@@ -1039,7 +1039,7 @@ int  RIG_IC7200::get_agc()
 	if (waitFOR(8, "get AGC")) {
 		size_t p = replystr.find(pre_fm);
 		if (p == string::npos) return agcval;
-		return (agcval = replystr[p+6]); // 0 = off, 1 = FAST, 2 = SLOW
+		return (agcval = replystr[p+6]); // 1 = off, 2 = FAST, 3 = SLOW
 	}
 	return agcval;
 }
@@ -1065,7 +1065,7 @@ const char *RIG_IC7200::agc_label()
 
 int  RIG_IC7200::agc_val()
 {
-	return (agcval + 1);
+	return (agcval);
 }
 
 static bool shift_was_on = false;

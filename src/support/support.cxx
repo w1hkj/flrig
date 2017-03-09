@@ -2023,9 +2023,10 @@ void setSQUELCH()
 	if (spnrSQUELCH) sliders.push(SLIDER(SQL, spnrSQUELCH->value() ));
 }
 
-// val == 0 --> deactivate
-// val == 1 --> AGC off
+// val == 0 --> AGC off
 // val > 1  --> AGC active and set
+
+int agcwas = 0;
 void redrawAGC()
 {
 	const char *lbl = selrig->agc_label();
@@ -2033,15 +2034,30 @@ void redrawAGC()
 
 	btnAGC->label(lbl);
 	btnAGC->redraw_label();
-	if (xcvr_name ==  rig_IC7300.name_) {
-		if (val == 1) btnAGC->selection_color(FL_GREEN);
-		if (val == 2) btnAGC->selection_color(FL_YELLOW);
-		if (val == 3) btnAGC->selection_color(FL_RED);
-		btnAGC->value(1);
-	} else
-		btnAGC->value(val > 1);
-	if (!val) btnAGC->deactivate();
-	else btnAGC->activate();
+
+	int rignbr = 0;
+	if (xcvr_name == rig_IC7200.name_) rignbr = 1;
+	if (xcvr_name == rig_IC7300.name_) rignbr = 2;
+	if (rignbr) {
+		if (val == 0) btnAGC->selection_color(FL_BACKGROUND_COLOR);  // off
+		if (val == 1) btnAGC->selection_color(
+			rignbr == 1 ? FL_GREEN : FL_RED); // fast
+		if (val == 2) btnAGC->selection_color(
+			rignbr == 1 ? FL_RED : FL_YELLOW);  // med / slow
+		if (val == 3) btnAGC->selection_color(FL_GREEN); // slow
+		btnAGC->value(val > 0);
+	} else {
+		if (val == 0)
+			btnAGC->value(0);
+		else
+			btnAGC->value(1);
+	}
+
+if (agcwas != val) {
+	agcwas = val;
+	std::cout << xcvr_name << " agc " << val << std::endl;
+}
+
 	btnAGC->redraw();
 }
 

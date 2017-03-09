@@ -995,6 +995,7 @@ void status::UI_laststate()
 	if (btnSpecial)			btnSpecial->selection_color(btn_lt_color);
 	if (btn_tt550_vox)		btn_tt550_vox->selection_color(btn_lt_color);
 	if (btn_tt550_CompON)	btn_tt550_CompON->selection_color(btn_lt_color);
+	if (btnAGC)				btnAGC->selection_color(btn_lt_color);
 
 	Fl_Color bg_slider = fl_rgb_color(slider_red, slider_green, slider_blue);
 	Fl_Color btn_slider = fl_rgb_color(slider_btn_red, slider_btn_green, slider_btn_blue);
