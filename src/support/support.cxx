@@ -998,21 +998,19 @@ void * serial_thread_loop(void *d)
 					if (que_pending()) continue;
 					read_KX3();
 				}
-				else {
-					if ((xcvr_name == rig_K2.name_) ||
-						(selrig->has_get_info &&
-							(progStatus.poll_frequency ||
-							 progStatus.poll_mode ||
-							 progStatus.poll_bandwidth) ) )
-						read_info();
-					if (que_pending() || bypass_serial_thread_loop) continue;
-					poll_parameters = &RX_poll_pairs[0];
-					while (poll_parameters->poll) {
-						if (que_pending() || bypass_serial_thread_loop) break;
-						if (*(poll_parameters->poll) && !(poll_nbr % *(poll_parameters->poll)))
-							(poll_parameters->pollfunc)();
-						poll_parameters++;
-					}
+				if ((xcvr_name == rig_K2.name_) ||
+					(selrig->has_get_info &&
+						(progStatus.poll_frequency ||
+						 progStatus.poll_mode ||
+						 progStatus.poll_bandwidth) ) )
+					read_info();
+				if (que_pending() || bypass_serial_thread_loop) continue;
+				poll_parameters = &RX_poll_pairs[0];
+				while (poll_parameters->poll) {
+					if (que_pending() || bypass_serial_thread_loop) break;
+					if (*(poll_parameters->poll) && !(poll_nbr % *(poll_parameters->poll)))
+						(poll_parameters->pollfunc)();
+					poll_parameters++;
 				}
 			}
 		} else {

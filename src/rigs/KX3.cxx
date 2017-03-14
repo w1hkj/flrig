@@ -17,6 +17,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
+#include <iostream>
 
 #include "KX3.h"
 #include "status.h"
@@ -555,28 +556,33 @@ void RIG_KX3::set_PTT_control(int val)
 	else	 sendCommand("RX;", 0);
 }
 
-//BG (Bargraph Read; GET only)
-//RSP format: BGnn; where <nn> is 00 (no bars) through 10 (bar 10) if the bargraph is in DOT mode, and 12 (no
-//bars) through 22 (all 10 bars) if the bargraph is in BAR mode. Reads the S-meter level on receive. Reads the
-//power output level or ALC level on transmit, depending on the RF/ALC selection. Also see SM/SM$ command,
-//which can read either main or sub RX S-meter level.
+// BG (Bargraph Read; GET only)
+// RSP format: BGnn; where <nn> is 00 (no bars) through 10 (bar 10) if the 
+// bargraph is in DOT mode, and 12 (no bars) through 22 (all 10 bars) if 
+// the bargraph is in BAR mode. Reads the S-meter level on receive. Reads 
+// the power output level or ALC level on transmit, depending on the RF/ALC 
+// selection. Also see SM/SM$ command, which can read either main or sub RX 
+// S-meter level.
 
-//SM $ (S-meter Read; GET only)
-//Basic RSP format: SMnnnn; where nnnn is 0000-0015. S9=6; S9+20=9; S9+40=12; S9+60=15.
-//KX3 Extended RSP format (KX31): nnnn is 0000-0021. S9=9; S9+20=13; S9+40=17; S9+60=21.
-//This command can be used to obtain either the main (SM) or sub (SM$) S-meter readings. Returns 0000 in transmit
-//mode. BG can be used to simply emulate the bar graph level, and applies to either RX or TX mode.
+// SM SM$ (S-meter Read; GET only)
+// Basic RSP format: SMnnnn; where nnnn is 0000-0015. 
+// S9=6; S9+20=9; S9+40=12; S9+60=15.
+// KX3 Extended RSP format (KX31): nnnn is 0000-0021. 
+// S9=9; S9+20=13; S9+40=17; S9+60=21.
+// This command can be used to obtain either the main (SM) or sub (SM$) 
+// S-meter readings. Returns 0000 in transmit mode. BG can be used to 
+// simply emulate the bar graph level, and applies to either RX or TX mode.
 
 int RIG_KX3::get_smeter()
 {
 	cmd = "SM;";
 	int ret = wait_char(';', 7, KX3_WAIT_TIME, "get Smeter", ASC);
 	if (ret < 7) return 0;
+
 	size_t p = replystr.rfind("SM");
 	if (p == string::npos) return 0;
 
 	int mtr = fm_decimal(replystr.substr(p+2), 4);
-
 	if (mtr <= 6) mtr = (int) (50.0 * mtr / 6.0);
 	else mtr = (int)(50 + (mtr - 6.0) * 50.0 / 9.0);
 
