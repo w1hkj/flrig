@@ -3093,174 +3093,133 @@ void initXcvrTab()
 
 }
 
-void initRig()
+void init_TT550()
 {
-	btnInitializing->show();
-	mainwindow->redraw();
+	selrig->selectA();
 
-	flrig_abort = false;
+	vfoB.freq = progStatus.freq_B;
+	vfoB.imode = progStatus.imode_B;
+	vfoB.iBW = progStatus.iBW_B;
+	FreqDispB->value(vfoB.freq);
+	selrig->set_vfoB(vfoB.freq);
+	selrig->set_modeB(vfoB.imode);
+	selrig->set_bwB(vfoB.iBW);
 
-	sldrRcvSignal->aging(progStatus.rx_peak);
-	sldrRcvSignal->avg(progStatus.rx_avg);
-	sldrFwdPwr->aging(progStatus.pwr_peak);
-	sldrFwdPwr->avg(progStatus.pwr_avg);
+	vfo.freq = vfoA.freq = progStatus.freq_A;
+	vfo.imode = vfoA.imode = progStatus.imode_A;
+	vfo.iBW = vfoA.iBW = progStatus.iBW_A;
+	FreqDispA->value( vfoA.freq );
+	selrig->set_vfoA(vfoA.freq);
+	selrig->set_modeA(vfoA.imode);
 
-	if (progStatus.use_tcpip) {
-		try {
-			connect_to_remote();
-		} catch (...) {
-			btnInitializing->hide();
-			mainwindow->redraw();
-			return;
-		}
-	}
-
-// disable the serial thread
-{
-	guard_lock gl_serial(&mutex_serial, 71);
-
-// Xcvr Auto Power on as soon as possible
-	if (selrig->has_xcvr_auto_on_off)
-		selrig->set_xcvr_auto_on();
-
-	selrig->initialize();
-	if (flrig_abort) goto failed;
-
-	FreqDispA->set_precision(selrig->precision);
-	FreqDispA->set_ndigits(selrig->ndigits);
-	FreqDispB->set_precision(selrig->precision);
-	FreqDispB->set_ndigits(selrig->ndigits);
-
-	if (xcvr_name == rig_TT550.name_) {
-		selrig->selectA();
-
-		vfoB.freq = progStatus.freq_B;
-		vfoB.imode = progStatus.imode_B;
-		vfoB.iBW = progStatus.iBW_B;
-		FreqDispB->value(vfoB.freq);
-		selrig->set_vfoB(vfoB.freq);
-		selrig->set_modeB(vfoB.imode);
-		selrig->set_bwB(vfoB.iBW);
-
-		vfo.freq = vfoA.freq = progStatus.freq_A;
-		vfo.imode = vfoA.imode = progStatus.imode_A;
-		vfo.iBW = vfoA.iBW = progStatus.iBW_A;
-		FreqDispA->value( vfoA.freq );
-		selrig->set_vfoA(vfoA.freq);
-		selrig->set_modeA(vfoA.imode);
-
-		if (vfoA.iBW == -1) vfoA.iBW = selrig->def_bandwidth(vfoA.imode);
+	if (vfoA.iBW == -1) vfoA.iBW = selrig->def_bandwidth(vfoA.imode);
 		selrig->set_bwA(vfoA.iBW);
 
-		rigmodes_.clear();
-		opMODE->clear();
-		for (int i = 0; selrig->modes_[i] != NULL; i++) {
-			rigmodes_.push_back(selrig->modes_[i]);
-			opMODE->add(selrig->modes_[i]);
+	rigmodes_.clear();
+	opMODE->clear();
+	for (int i = 0; selrig->modes_[i] != NULL; i++) {
+		rigmodes_.push_back(selrig->modes_[i]);
+		opMODE->add(selrig->modes_[i]);
+	}
+	opMODE->activate();
+	opMODE->index(vfoA.imode);
+
+	rigbws_.clear();
+	opBW->show();
+	opBW->clear();
+	old_bws = selrig->bandwidths_;
+	for (int i = 0; selrig->bandwidths_[i] != NULL; i++) {
+		rigbws_.push_back(selrig->bandwidths_[i]);
+			opBW->add(selrig->bandwidths_[i]);
 		}
-		opMODE->activate();
-		opMODE->index(vfoA.imode);
+	opBW->activate();
+	opBW->index(vfoA.iBW);
 
-		rigbws_.clear();
-		opBW->show();
-		opBW->clear();
-		old_bws = selrig->bandwidths_;
-		for (int i = 0; selrig->bandwidths_[i] != NULL; i++) {
-			rigbws_.push_back(selrig->bandwidths_[i]);
-				opBW->add(selrig->bandwidths_[i]);
-			}
-		opBW->activate();
-		opBW->index(vfoA.iBW);
+	spnr_tt550_vfo_adj->value(progStatus.vfo_adj);
 
-		spnr_tt550_vfo_adj->value(progStatus.vfo_adj);
+	btnPreamp->label("Spot");
+	btnPreamp->value(progStatus.tt550_spot_onoff);
+	switch (progStatus.UIsize) {
+		case small_ui :
+			btnPreamp->show();
+			break;
+		case wide_ui : case touch_ui : default :
+			btnPreamp->activate();
+	}
+}
 
-	} else { // !TT550
-		if (progStatus.CIV > 0)
-			selrig->adjustCIV(progStatus.CIV);
+void init_generic_rig()
+{
+	if (progStatus.CIV > 0)
+		selrig->adjustCIV(progStatus.CIV);
 
-		selrig->selectA();
-		if (selrig->has_get_info)
-			selrig->get_info();
-		transceiverA.freq = selrig->get_vfoA();
-		transceiverA.imode = selrig->get_modeA();
-		transceiverA.iBW = selrig->get_bwA();
+	selrig->selectA();
+	if (selrig->has_get_info)
+		selrig->get_info();
+	transceiverA.freq = selrig->get_vfoA();
+	transceiverA.imode = selrig->get_modeA();
+	transceiverA.iBW = selrig->get_bwA();
 
+	if (selrig->has_vfoAB) {
 		selrig->selectB();
 		if (selrig->has_get_info)
 			selrig->get_info();
 		transceiverB.freq = selrig->get_vfoB();
 		transceiverB.imode = selrig->get_modeB();
 		transceiverB.iBW = selrig->get_bwB();
+	} else {
+		transceiverB.freq = vfoB.freq = progStatus.freq_B;
+		transceiverB.imode = vfoB.imode = progStatus.imode_B;
+		transceiverB.iBW = vfoB.iBW = progStatus.iBW_B;
+	}
 
-		if (progStatus.use_rig_data) {
+	if (progStatus.use_rig_data) {
 LOG_INFO("Use xcvr start values for Vfo A/B");
+		vfo.freq = vfoA.freq = progStatus.freq_A = transceiverA.freq;
+		vfo.imode = vfoA.imode = progStatus.imode_A = transceiverA.imode;
+		vfo.iBW = vfoA.imode = progStatus.iBW_A = transceiverA.iBW;
+		vfoB.freq = progStatus.freq_B = transceiverB.freq;
+		vfoB.imode = progStatus.imode_B = transceiverB.imode;
+		vfoB.iBW = progStatus.iBW_B = transceiverB.iBW;
+	}
 
-//			selrig->selectA();
-//			selrig->adjust_bandwidth(transceiverA.imode);
-
-//			selrig->selectB();
-//			selrig->adjust_bandwidth(transceiverB.imode);
-
-			vfo.freq = vfoA.freq = progStatus.freq_A = transceiverA.freq;
-			vfo.imode = vfoA.imode = progStatus.imode_A = transceiverA.imode;
-			vfo.iBW = vfoA.imode = progStatus.iBW_A = transceiverA.iBW;
-
-			vfoB.freq = progStatus.freq_B = transceiverB.freq;
-			vfoB.imode = progStatus.imode_B = transceiverB.imode;
-			vfoB.imode = progStatus.iBW_B = transceiverB.iBW;
-
-//			if (selrig->restore_mbw) selrig->last_bw = transceiverA.iBW;
-
+	rigmodes_.clear();
+	opMODE->clear();
+	if (selrig->has_mode_control) {
+		for (int i = 0; selrig->modes_[i] != NULL; i++) {
+			rigmodes_.push_back(selrig->modes_[i]);
+			opMODE->add(selrig->modes_[i]);
 		}
+		opMODE->activate();
+		opMODE->index(progStatus.imode_A);
+	} else {
+		opMODE->add(" ");
+		opMODE->index(0);
+		opMODE->deactivate();
+	}
 
-		rigmodes_.clear();
-		opMODE->clear();
-		if (selrig->has_mode_control) {
-			for (int i = 0; selrig->modes_[i] != NULL; i++) {
-				rigmodes_.push_back(selrig->modes_[i]);
-				opMODE->add(selrig->modes_[i]);
-			}
-			opMODE->activate();
-			opMODE->index(progStatus.imode_A);
-		} else {
-			opMODE->add(" ");
-			opMODE->index(0);
-			opMODE->deactivate();
+	rigbws_.clear();
+	opBW->show();
+	opBW->clear();
+	if (selrig->has_bandwidth_control) {
+		old_bws = selrig->bandwidths_;
+		for (int i = 0; selrig->bandwidths_[i] != NULL; i++) {
+			rigbws_.push_back(selrig->bandwidths_[i]);
+			opBW->add(selrig->bandwidths_[i]);
 		}
-
-		rigbws_.clear();
-		opBW->show();
-		opBW->clear();
-		if (selrig->has_bandwidth_control) {
-			old_bws = selrig->bandwidths_;
-			for (int i = 0; selrig->bandwidths_[i] != NULL; i++) {
-				rigbws_.push_back(selrig->bandwidths_[i]);
-					opBW->add(selrig->bandwidths_[i]);
-				}
-			opBW->activate();
-			if (progStatus.iBW_A == -1) progStatus.iBW_A = selrig->def_bandwidth(vfoA.imode);
-			if (progStatus.iBW_B == -1) progStatus.iBW_B = selrig->def_bandwidth(vfoB.imode);
+		opBW->activate();
+		if (progStatus.iBW_A == -1) progStatus.iBW_A = selrig->def_bandwidth(vfoA.imode);
+		if (progStatus.iBW_B == -1) progStatus.iBW_B = selrig->def_bandwidth(vfoB.imode);
 			opBW->index(progStatus.iBW_A);
-		} else {
-			opBW->add(" ");
-			opBW->index(0);
-			opBW->deactivate();
-		}
+	} else {
+		opBW->add(" ");
+		opBW->index(0);
+		opBW->deactivate();
+	}
+}
 
-	} // !TT550
-
-	if (selrig->has_special)
-		btnSpecial->show();
-//		btnSpecial->activate();
-	else
-		btnSpecial->hide();
-//		btnSpecial->deactivate();
-
-	if (selrig->has_ext_tuner)
-		btn_ext_tuner->show();
-	else
-		btn_ext_tuner->hide();
-
+void init_rit()
+{
 	if (selrig->has_rit) {
 		int min, max, step;
 		selrig->get_RIT_min_max_step(min, max, step);
@@ -3284,7 +3243,10 @@ LOG_INFO("Use xcvr start values for Vfo A/B");
 				cntRIT->deactivate();
 		}
 	}
+}
 
+void init_xit()
+{
 	if (selrig->has_xit) {
 		int min, max, step;
 		selrig->get_XIT_min_max_step(min, max, step);
@@ -3307,7 +3269,10 @@ LOG_INFO("Use xcvr start values for Vfo A/B");
 				cntXIT->deactivate();
 		}
 	}
+}
 
+void init_bfo()
+{
 	if (selrig->has_bfo) {
 		int min, max, step;
 		selrig->get_BFO_min_max_step(min, max, step);
@@ -3331,7 +3296,10 @@ LOG_INFO("Use xcvr start values for Vfo A/B");
 				cntBFO->deactivate();
 		}
 	}
+}
 
+void init_dsp_controls()
+{
 	if (selrig->has_dsp_controls) {
 		opDSP_lo->clear();
 		opDSP_hi->clear();
@@ -3365,7 +3333,10 @@ LOG_INFO("Use xcvr start values for Vfo A/B");
 		opDSP_hi->hide();
 		opBW->show();
 	}
+}
 
+void init_volume_control()
+{
 	if (selrig->has_volume_control) {
 		int min, max, step;
 		selrig->get_vol_min_max_step(min, max, step);
@@ -3428,7 +3399,10 @@ LOG_INFO("Use xcvr start values for Vfo A/B");
 				if (spnrVOLUME) spnrVOLUME->deactivate();
 		}
 	}
+}
 
+void init_rf_control()
+{
 	if (selrig->has_rf_control) {
 		int min, max, step;
 		selrig->get_rf_min_max_step(min, max, step);
@@ -3478,7 +3452,10 @@ LOG_INFO("Use xcvr start values for Vfo A/B");
 				if (spnrRFGAIN) spnrRFGAIN->deactivate();
 		}
 	}
+}
 
+void init_sql_control()
+{
 	if (selrig->has_sql_control) {
 		int min, max, step;
 		selrig->get_squelch_min_max_step(min, max, step);
@@ -3528,7 +3505,10 @@ LOG_INFO("Use xcvr start values for Vfo A/B");
 				if (spnrSQUELCH) spnrSQUELCH->deactivate();
 		}
 	}
+}
 
+void init_noise_reduction_control()
+{
 	if (selrig->has_noise_reduction_control) {
 		int min, max, step;
 		selrig->get_nr_min_max_step(min, max, step);
@@ -3579,7 +3559,10 @@ LOG_INFO("Use xcvr start values for Vfo A/B");
 				break;
 		}
 	}
+}
 
+void init_if_shift_control()
+{
 	if (selrig->has_ifshift_control) {
 
 		int min, max, step;
@@ -3636,7 +3619,6 @@ LOG_INFO("Use xcvr start values for Vfo A/B");
 				break;
 		}
 	}
-
 	if (xcvr_name == rig_TS870S.name_) {
 		if (progStatus.imode_A == RIG_TS870S::tsCW ||
 			progStatus.imode_A == RIG_TS870S::tsCWR) {
@@ -3649,7 +3631,10 @@ LOG_INFO("Use xcvr start values for Vfo A/B");
 			if (spnrIFSHIFT) spnrIFSHIFT->deactivate();
 		}
 	}
+}
 
+void init_notch_control()
+{
 	if (selrig->has_notch_control) {
 		int min, max, step;
 		selrig->get_notch_min_max_step(min, max, step);
@@ -3698,7 +3683,10 @@ LOG_INFO("Use xcvr start values for Vfo A/B");
 				break;
 		}
 	}
+}
 
+void init_micgain_control()
+{
 	if (selrig->has_micgain_control) {
 		int min = 0, max = 0, step = 0;
 		selrig->get_mic_min_max_step(min, max, step);
@@ -3741,7 +3729,10 @@ LOG_INFO("Use xcvr start values for Vfo A/B");
 				if (spnrMICGAIN) spnrMICGAIN->deactivate();
 		}
 	}
+}
 
+void init_power_control()
+{
 	double min, max, step;
 	if (selrig->has_power_control) {
 		if (progStatus.use_rig_data)
@@ -3764,7 +3755,10 @@ LOG_INFO("Use xcvr start values for Vfo A/B");
 		if (spnrPOWER) spnrPOWER->redraw();
 	}
 	set_power_controlImage(progStatus.power_level);
+}
 
+void init_attenuator_control()
+{
 	if (selrig->has_attenuator_control) {
 //		if (progStatus.use_rig_data)
 			progStatus.attenuator = selrig->get_attenuator();
@@ -3786,6 +3780,10 @@ LOG_INFO("Use xcvr start values for Vfo A/B");
 				btnAttenuator->deactivate();
 		}
 	}
+}
+
+void init_agc_control()
+{
 	if (selrig->has_agc_control) {
 		btnAGC->show();
 		sldrRFGAIN->label("");
@@ -3795,42 +3793,32 @@ LOG_INFO("Use xcvr start values for Vfo A/B");
 		sldrRFGAIN->label(_("RF"));
 		sldrRFGAIN->redraw_label();
 	}
+}
 
-// hijack the preamp control for a SPOT button on the TT550 Pegasus
-	if (xcvr_name == rig_TT550.name_) {
-		btnPreamp->label("Spot");
-		btnPreamp->value(progStatus.tt550_spot_onoff);
-		switch (progStatus.UIsize) {
+void init_preamp_control()
+{
+	if (selrig->has_preamp_control) {
+		progStatus.preamp = selrig->get_preamp();
+	switch (progStatus.UIsize) {
 			case small_ui :
 				btnPreamp->show();
 				break;
 			case wide_ui : case touch_ui : default :
-				btnPreamp->activate();
+			btnPreamp->activate();
 		}
 	} else {
-		if (selrig->has_preamp_control) {
-//			if (progStatus.use_rig_data)
-				progStatus.preamp = selrig->get_preamp();
-//			else
-//				selrig->set_preamp(progStatus.preamp);
-			switch (progStatus.UIsize) {
-				case small_ui :
-					btnPreamp->show();
-					break;
-				case wide_ui : case touch_ui : default :
-				btnPreamp->activate();
-			}
-		} else {
-			switch (progStatus.UIsize) {
-				case small_ui :
-					btnPreamp->hide();
-					break;
-				case wide_ui : case touch_ui : default :
-					btnPreamp->deactivate();
-			}
+		switch (progStatus.UIsize) {
+			case small_ui :
+				btnPreamp->hide();
+				break;
+			case wide_ui : case touch_ui : default :
+				btnPreamp->deactivate();
 		}
 	}
+}
 
+void init_noise_control()
+{
 	if (selrig->has_noise_control) {
 		if (xcvr_name == rig_TS990.name_) {
 			btnNOISE->label("AGC"); //Set TS990 AGC Label
@@ -3858,7 +3846,10 @@ LOG_INFO("Use xcvr start values for Vfo A/B");
 				btnNOISE->deactivate();
 		}
 	}
+}
 
+void init_tune_control()
+{
 	if (selrig->has_tune_control) {
 		switch (progStatus.UIsize) {
 			case small_ui :
@@ -3876,7 +3867,10 @@ LOG_INFO("Use xcvr start values for Vfo A/B");
 				btnTune->deactivate();
 		}
 	}
+}
 
+void init_ptt_control()
+{
 	if (selrig->has_ptt_control ||
 		progStatus.comm_dtrptt || progStatus.comm_rtsptt ||
 		progStatus.sep_dtrptt || progStatus.sep_rtsptt) {
@@ -3884,7 +3878,10 @@ LOG_INFO("Use xcvr start values for Vfo A/B");
 	} else {
 		btnPTT->deactivate();
 	}
+}
 
+void init_auto_notch()
+{
 	if (selrig->has_auto_notch) {
 
 		if (xcvr_name == rig_RAY152.name_) {
@@ -3918,21 +3915,41 @@ LOG_INFO("Use xcvr start values for Vfo A/B");
 				btnAutoNotch->deactivate();
 		}
 	}
+}
 
+void init_swr_control()
+{
 	if (selrig->has_swr_control)
 		btnALC_SWR->activate();
 	else {
 		btnALC_SWR->deactivate();
 	}
+}
 
+void init_compression_control()
+{
 	if (selrig->has_compON || selrig->has_compression)
 		selrig->set_compression();
+}
 
-	adjust_control_positions();
-	initXcvrTab();
+void init_special_controls()
+{
+	if (selrig->has_special)
+		btnSpecial->show();
+	else
+		btnSpecial->hide();
+}
 
-	buildlist();
+void init_external_tuner()
+{
+	if (selrig->has_ext_tuner)
+		btn_ext_tuner->show();
+	else
+		btn_ext_tuner->hide();
+}
 
+void init_CIV()
+{
 	if (selrig->CIV) {
 		char hexstr[8];
 		snprintf(hexstr, sizeof(hexstr), "0x%2X", selrig->CIV);
@@ -3954,54 +3971,62 @@ LOG_INFO("Use xcvr start values for Vfo A/B");
 		btnUSBaudio->value(false);
 		btnUSBaudio->deactivate();
 	}
+}
 
-	if (selrig->name_ != rig_TT550.name_) {
-		vfoA.freq = progStatus.freq_A;
-		vfoA.imode = progStatus.imode_A;
-		vfoA.iBW = progStatus.iBW_A;
+void init_VFOs()
+{
+	if (selrig->name_ == rig_TT550.name_) return;
 
-		if (vfoA.iBW == -1) vfoA.iBW = selrig->def_bandwidth(vfoA.imode);
-		FreqDispA->value( vfoA.freq );
+	vfoA.freq = progStatus.freq_A;
+	vfoA.imode = progStatus.imode_A;
+	vfoA.iBW = progStatus.iBW_A;
 
-		vfoB.freq = progStatus.freq_B;
-		vfoB.imode = progStatus.imode_B;
-		vfoB.iBW = progStatus.iBW_B;
+	if (vfoA.iBW == -1) vfoA.iBW = selrig->def_bandwidth(vfoA.imode);
+	FreqDispA->value( vfoA.freq );
 
-		if (vfoB.iBW == -1) vfoB.iBW = selrig->def_bandwidth(vfoB.imode);
-		FreqDispB->value(vfoB.freq);
+	vfoB.freq = progStatus.freq_B;
+	vfoB.imode = progStatus.imode_B;
+	vfoB.iBW = progStatus.iBW_B;
 
+	if (vfoB.iBW == -1) vfoB.iBW = selrig->def_bandwidth(vfoB.imode);
+	FreqDispB->value(vfoB.freq);
+
+	if (selrig->has_vfoAB) {
 		selrig->selectB();
 		selrig->set_vfoB(vfoB.freq);
 		selrig->set_modeB(vfoB.imode);
 		selrig->set_bwB(vfoB.iBW);
-
-		selrig->selectA();
-		selrig->set_vfoA(vfoA.freq);
-		selrig->set_modeA(vfoA.imode);
-		selrig->set_bwA(vfoA.iBW);
-
-		vfo = vfoA;
-		updateBandwidthControl();
-
-		useB = false;
-		highlight_vfo((void *)0);
-
 	}
 
+	selrig->selectA();
+	selrig->set_vfoA(vfoA.freq);
+	selrig->set_modeA(vfoA.imode);
+	selrig->set_bwA(vfoA.iBW);
+
+	vfo = vfoA;
+	updateBandwidthControl();
+
+	useB = false;
+	highlight_vfo((void *)0);
+}
+
+void init_IC7300_special()
+{
 	if (selrig->name_ ==  rig_IC7300.name_) {
 		selrig->enable_break_in();
 		redrawAGC();
 	}
-// enable buttons, change labels
+}
 
+void init_TS990_special()
+{
 	if (xcvr_name == rig_TS990.name_) { // Setup TS990 Mon Button
 		btnIFsh->label("MON");
 	}
-	selrig->post_initialize();
+}
 
-// enable the serial thread
-	}
-
+void init_K3_KX3_special()
+{
 	if (xcvr_name == rig_K3.name_) {
 		btnB->hide();
 		btnA->hide();
@@ -4018,8 +4043,101 @@ LOG_INFO("Use xcvr start values for Vfo A/B");
 		btnB->show();
 		btnA->show();
 	}
+}
 
-	btnAswapB->show();
+void initRig()
+{
+	btnInitializing->show();
+	mainwindow->redraw();
+
+	flrig_abort = false;
+
+	sldrRcvSignal->aging(progStatus.rx_peak);
+	sldrRcvSignal->avg(progStatus.rx_avg);
+	sldrFwdPwr->aging(progStatus.pwr_peak);
+	sldrFwdPwr->avg(progStatus.pwr_avg);
+
+	if (progStatus.use_tcpip) {
+		try {
+			connect_to_remote();
+		} catch (...) {
+			btnInitializing->hide();
+			mainwindow->redraw();
+			return;
+		}
+	}
+
+// disable the serial thread
+	{
+		guard_lock gl_serial(&mutex_serial, 71);
+
+// Xcvr Auto Power on as soon as possible
+		if (selrig->has_xcvr_auto_on_off)
+			selrig->set_xcvr_auto_on();
+
+		selrig->initialize();
+
+		if (flrig_abort) goto failed;
+
+		FreqDispA->set_precision(selrig->precision);
+		FreqDispA->set_ndigits(selrig->ndigits);
+		FreqDispB->set_precision(selrig->precision);
+		FreqDispB->set_ndigits(selrig->ndigits);
+
+		FreqDispB->set_precision(selrig->precision);
+		FreqDispB->set_ndigits(selrig->ndigits);
+		FreqDispB->set_precision(selrig->precision);
+		FreqDispB->set_ndigits(selrig->ndigits);
+
+		if (xcvr_name == rig_TT550.name_)
+			init_TT550();
+		else
+			init_generic_rig();
+
+		init_special_controls();
+		init_external_tuner();
+		init_rit();
+		init_xit();
+		init_bfo();
+		init_dsp_controls();
+		init_volume_control();
+		init_rf_control();
+		init_sql_control();
+		init_noise_reduction_control();
+		init_if_shift_control();
+		init_notch_control();
+		init_micgain_control();
+		init_power_control();
+		init_attenuator_control();
+		init_agc_control();
+		init_preamp_control();
+		init_noise_control();
+		init_tune_control();
+		init_ptt_control();
+		init_auto_notch();
+		init_swr_control();
+		init_compression_control();
+
+		adjust_control_positions();
+
+		initXcvrTab();
+
+		buildlist();
+
+		init_CIV();
+
+		init_VFOs();
+
+		selrig->post_initialize();
+
+		init_IC7300_special();
+		init_TS990_special();
+		init_K3_KX3_special();
+
+		btnAswapB->show();
+
+	}  // enable the serial thread
+
 
 	bypass_serial_thread_loop = false;
 

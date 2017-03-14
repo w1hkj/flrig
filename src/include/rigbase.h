@@ -182,6 +182,8 @@ public:
 	bool has_ext_tuner;
 	bool has_band_selection;
 
+	bool has_vfoAB;
+
 	bool restore_mbw;
 
 	bool has_get_info;

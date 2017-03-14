@@ -123,6 +123,8 @@ rigbase::rigbase()
 	has_get_info = 
 	has_getvfoAorB = false;
 
+	has_vfoAB = true;
+
 	data_type = BINARY;
 
 	A.freq = 14070000L;
