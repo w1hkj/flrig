@@ -183,6 +183,8 @@ public:
 
 	bool sendTScommand(string, int, bool);
 
+	void set_monitor(bool);
+
 	const char **bwtable(int);
 	const char **lotable(int);
 	const char **hitable(int);
