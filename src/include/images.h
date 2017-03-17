@@ -23,6 +23,7 @@
 
 #include <FL/Fl_Bitmap.H>
 
+extern Fl_Bitmap image_p5;
 extern Fl_Bitmap image_p25;
 extern Fl_Bitmap image_p50;
 extern Fl_Bitmap image_p100;

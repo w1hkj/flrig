@@ -329,6 +329,12 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		btnB->callback((Fl_Callback*)cb_btnB);
 		btnB->value(useB);
 
+		labelMEMORY = new Fl_Box(xpos, ypos, 49, 100, _("MEM\nORY"));
+		labelMEMORY->box(FL_DOWN_BOX);
+		labelMEMORY->color(FL_YELLOW);
+		labelMEMORY->align(FL_ALIGN_CENTER);
+		labelMEMORY->hide();
+
 		xpos = W - 2 - 75;
 		btnPTT = new Fl_Light_Button(xpos, ypos, 75, 100, _("PTT"));
 		btnPTT->tooltip(_("Xmt On/Off"));

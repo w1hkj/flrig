@@ -30,12 +30,26 @@ public:
 
 	long get_vfoA();
 	void set_vfoA(long);
+	long get_vfoB();
+	void set_vfoB(long);
+	int  get_vfoAorB();
+	void selectA();
+	void selectB();
+
 	void set_PTT_control(int val);
 	void set_modeA(int val);
 	int  get_modeA();
+	void set_modeB(int val);
+	int  get_modeB();
 	int  get_modetype(int n);
-	int  get_power_out(void);
-	int  get_smeter(void);
+	int  get_power_out();
+	int  get_smeter();
+	int  get_swr();
+	int  get_alc();
+
+	bool can_split() { return true;}
+	void set_split(bool val);
+	int  get_split();
 
 	int  adjust_bandwidth(int m) { return 0;}
 

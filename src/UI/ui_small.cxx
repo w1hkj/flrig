@@ -291,6 +291,12 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	btnB->callback((Fl_Callback*)cb_btnB);
 	btnB->value(useB);
 
+	labelMEMORY = new Fl_Box(212, 62, 105, 20, _("MEMORY"));
+	labelMEMORY->box(FL_DOWN_BOX);
+	labelMEMORY->color(FL_YELLOW);
+	labelMEMORY->align(FL_ALIGN_CENTER);
+	labelMEMORY->hide();
+
 	btn_K3_swapAB = new Fl_Button(265, 62, 52, 20, _("A/B"));
 	btn_K3_swapAB->tooltip(_("Swap A/B"));
 	btn_K3_swapAB->down_box(FL_DOWN_BOX);

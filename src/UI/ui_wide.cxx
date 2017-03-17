@@ -233,6 +233,13 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				btnB->callback((Fl_Callback*)cb_btnB);
 				btnB->value(useB);
 
+				labelMEMORY = new Fl_Box(
+					btnA->x(), btnA->y(), 69+2+69, btnA->h(), _("MEMORY"));
+				labelMEMORY->box(FL_DOWN_BOX);
+				labelMEMORY->color(FL_YELLOW);
+				labelMEMORY->align(FL_ALIGN_CENTER);
+				labelMEMORY->hide();
+
 				btnTune = new Fl_Button(
 					btnB->x() + btnB->w() + 2, btnB->y(), 69, 20, _("Tune"));
 				btnTune->tooltip(_("Momentary Tune"));

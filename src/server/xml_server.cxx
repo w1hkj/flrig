@@ -410,7 +410,10 @@ public :
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 
 		if (!selrig->bandwidths_) {
-			result = "none";
+			XmlRpcValue bws;
+			bws[0][0] = "Bandwidth";
+			bws[0][1] = "NONE";
+			result = bws;
 			return;
 		}
 		XmlRpcValue bws;
@@ -471,7 +474,9 @@ public:
 			guard_lock queA_lock(&mutex_queA);
 			guard_lock queB_lock(&mutex_queB);
 			if (! queA.empty() || !queB.empty()) {
-				result[0] = "";
+//std::cout << (!queA.empty() ? "que A ": "que B") << "que not empty" << std::endl;
+//std::cout << "returning BW string " << selrig->bwtable(0)[0] << std::endl;
+				result[0] = selrig->bwtable(0)[0];//"NONE";
 				result[1] = "";
 				return;
 			}
@@ -479,10 +484,18 @@ public:
 
 		int BW = useB ? vfoB.iBW : vfoA.iBW;
 		int mode = useB ? vfoB.imode : vfoA.imode;
+
+		if (BW < 0) {
+			result[0] = "NONE";
+			result[1] = "";
+			return;
+		}
+
 		const char **bwt = selrig->bwtable(mode);
 		const char **dsplo = selrig->lotable(mode);
 		const char **dsphi = selrig->hitable(mode);
-//std::cout << "BW " << std::hex << BW << std::dec << "\n";
+//std::cout << "BW " << std::hex << BW << std::dec << std::endl;
+//std::cout << bwt[0] << std::endl;
 		result[0] = (BW > 256 && selrig->has_dsp_controls) ?
 					(dsplo ? dsplo[BW & 0x7F] : "") : 
 					(bwt ? bwt[BW] : "");
@@ -643,12 +656,20 @@ public:
 		}
 		std::string numode = string(params[0]);
 		int i = 0;
-		if (!selrig->modes_) return;
+//std::cout << "rig_set_mode " << numode << std::endl;
+
+		if (!selrig->modes_) {
+//std::cout << "selrig->modes_ is NULL" << std::endl;
+			return;
+		}
+//std::cout << numode << " : " << selrig->modes_[srvr_vfo.imode] << std::endl;
+
 		if (numode == selrig->modes_[srvr_vfo.imode]) return;
 		while (selrig->modes_[i] != NULL) {
 			if (numode == selrig->modes_[i]) {
 				srvr_vfo.imode = i;
 				srvr_vfo.iBW = -1;//0;
+//std::cout << print(srvr_vfo) << std::endl;
 				push_xml();
 				break;
 			}
@@ -692,8 +713,8 @@ public:
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 		string bwstr = params;
-		std::cout << bwstr << "\n";
-/*
+//		std::cout << bwstr << "\n";
+
 		int bw = int(params[0]);
 		if (useB) {
 			guard_lock queB_lock(&mutex_queB);
@@ -706,7 +727,7 @@ public:
 		}
 		srvr_vfo.iBW = bw;
 		push_xml();
-*/
+
 	}
 	std::string help() { return std::string("set_bw to VAL"); }
 

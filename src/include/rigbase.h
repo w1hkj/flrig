@@ -47,7 +47,7 @@ struct GUI {
 };
 
 enum {onA, onB};
-enum {UI, XML, SRVR};
+enum {UI, XML, SRVR, RIG};
 
 enum {BINARY, STRING};
 

@@ -127,6 +127,11 @@ bool run_serial_thread = true;
 bool PTT = false;
 int  powerlevel = 0;
 
+void trace(string s)
+{
+//	std::cout << s << std::endl;
+}
+
 char *print(FREQMODE data)
 {
 	static char str[256];
@@ -141,7 +146,8 @@ FREQMODE: %3s\n\
   mode: %4s\n\
   bwt index:  %02d\n\
   bwt values: [%s] [%s]",
-		data.src == XML ? "xml" : data.src == UI ? "ui" : "srvr",
+		data.src == XML ? "XML" : data.src == UI ? "UI" :
+			data.src == SRVR ? "SRVR" : "RIG",
 		data.freq,
 		selrig->modes_ ? selrig->modes_[data.imode] : "modes n/a",
 		data.iBW,
@@ -205,6 +211,36 @@ void read_vfo()
 void update_vfoAorB(void *d)
 {
 	long val = (long)d;
+
+	if (xcvr_name == rig_FT817.name_) {
+//trace("update_vfoAorB");
+		guard_lock serial_lock(&mutex_serial);
+		if (val) {
+			useB = true;
+			vfoB.src = RIG;
+			vfoB.freq = selrig->get_vfoB();
+			vfoB.imode = selrig->get_modeB();
+			vfoB.iBW = selrig->get_bwB();
+			changed_vfo = true;
+			guard_lock queB_lock(&mutex_queB, 38);
+			while (!queB.empty()) queB.pop();
+			queB.push(vfoB);
+			highlight_vfo(NULL);
+		} else {
+			useB = false;
+			vfoA.src = RIG;
+			vfoA.freq = selrig->get_vfoA();
+			vfoA.imode = selrig->get_modeA();
+			vfoA.iBW = selrig->get_bwA();
+			changed_vfo = true;
+			guard_lock queA_lock(&mutex_queA, 38);
+			while (!queA.empty()) queA.pop();
+			queA.push(vfoA);
+			highlight_vfo(NULL);
+		}
+		return;
+	}
+
 	if (val) {
 //	could use cb_selectB() here, but that switches off split mode
 		guard_lock serial_lock(&mutex_serial, 95);
@@ -215,6 +251,7 @@ void update_vfoAorB(void *d)
 		queB.push(vfoB);
 		useB = true;
 		highlight_vfo((void *)0);
+//		cb_selectB();
 	} else {
 //	could use cb_selectA() here, but that switches off split mode
 		guard_lock serial_lock(&mutex_serial, 97);
@@ -225,6 +262,7 @@ void update_vfoAorB(void *d)
 		queA.push(vfoA);
 		useB = false;
 		highlight_vfo((void *)0);
+//		cb_selectA();
 	}
 }
 
@@ -235,6 +273,12 @@ void read_vfoAorB()
 		{
 			guard_lock serial_lock(&mutex_serial, 99);
 			val = selrig->get_vfoAorB();
+			int retry = 10;
+			while (val == -1 && retry--) {
+				MilliSleep(50);
+				val = selrig->get_vfoAorB();
+			}
+			if (val == -1) val = 0;
 		}
 		if (val != useB) {
 			Fl::awake(update_vfoAorB, reinterpret_cast<void*>(val));
@@ -494,8 +538,11 @@ void update_split(void *d)
 		btnSplit->value(progStatus.split);
 }
 
+// read split during xmt on FT817
+// read split during rcv on all others
 void read_split()
 {
+	if ((xcvr_name != rig_FT817.name_) && PTT) return;
 	int val = progStatus.split;
 	if (selrig->can_split()) {
 		{
@@ -697,6 +744,7 @@ struct POLL_PAIR {
 };
 
 POLL_PAIR RX_poll_pairs[] = {
+	{&progStatus.poll_vfoAorB, read_vfoAorB},
 	{&progStatus.poll_frequency, read_vfo},
 	{&progStatus.poll_mode, read_mode},
 	{&progStatus.poll_bandwidth, read_bandwidth},
@@ -711,7 +759,6 @@ POLL_PAIR RX_poll_pairs[] = {
 	{&progStatus.poll_squelch, read_squelch},
 	{&progStatus.poll_rfgain, read_rfgain},
 	{&progStatus.poll_split, read_split},
-	{&progStatus.poll_vfoAorB, read_vfoAorB},
 	{&progStatus.poll_nr, read_nr},
 	{&progStatus.poll_noise, read_noise},
 	{NULL, NULL}
@@ -721,6 +768,7 @@ POLL_PAIR TX_poll_pairs[] = {
 	{&progStatus.poll_pout, read_power_out},
 	{&progStatus.poll_swr, read_swr},
 	{&progStatus.poll_alc, read_alc},
+	{&progStatus.poll_split, read_split}, // read during XMT on FT817
 	{NULL, NULL}
 };
 
@@ -732,6 +780,7 @@ static bool resetxmt = true;
 void serviceA()
 {
 	if (queA.empty()) return;
+trace("serviceA");
 	guard_lock serial_lock(&mutex_serial, 24);
 	{
 		guard_lock queA_lock(&mutex_queA, 25);
@@ -753,11 +802,9 @@ void serviceA()
 		goto end_serviceA;
 	}
 
-	if (vfoA.freq != vfo.freq || changed_vfo) {
-		selrig->set_vfoA(vfoA.freq);
-		vfo.freq = vfoA.freq;
-		Fl::awake(setFreqDispA, (void *)vfoA.freq);
-	}
+//trace(std::string("VFO is:\n").append(print(vfo)));
+//trace(std::string("VFO ->:\n").append(print(vfoA)));
+
 	if (vfoA.imode != vfo.imode || changed_vfo) {
 		selrig->set_modeA(vfoA.imode);
 		vfo.imode = vfoA.imode;
@@ -773,6 +820,12 @@ void serviceA()
 		selrig->set_bwA(vfoA.iBW);
 		vfo.iBW = vfoA.iBW;
 		Fl::awake(setBWControl);
+	}
+
+	if (vfoA.freq != vfo.freq || changed_vfo) {
+		selrig->set_vfoA(vfoA.freq);
+		vfo.freq = vfoA.freq;
+		Fl::awake(setFreqDispA, (void *)vfoA.freq);
 	}
 
 end_serviceA:
@@ -800,18 +853,15 @@ void serviceB()
 	if (changed_vfo && useB) {
 		selrig->selectB();
 	}
-
 // if TT550 or K3 and split or on vfoA just update the B vfo
 	if ((xcvr_name == rig_K3.name_) || (selrig->can_change_alt_vfo && !useB)) {
 		selrig->set_vfoB(vfoB.freq);
 		goto end_serviceB;
 	}
 
-	if (vfoB.freq != vfo.freq || pushedB || changed_vfo) {
-		selrig->set_vfoB(vfoB.freq);
-		vfo.freq = vfoB.freq;
-		Fl::awake(setFreqDispB, (void *)vfoB.freq);
-	}
+//trace(std::string("VFO is:\n").append(print(vfo)));
+//trace(std::string("VFO ->:\n").append(print(vfoB)));
+
 	if (vfoB.imode != vfo.imode || pushedB || changed_vfo) {
 		selrig->set_modeB(vfoB.imode);
 		vfo.imode = vfoB.imode;
@@ -828,6 +878,13 @@ void serviceB()
 		vfo.iBW = vfoB.iBW;
 		Fl::awake(setBWControl);
 	}
+
+	if (vfoB.freq != vfo.freq || pushedB || changed_vfo) {
+		selrig->set_vfoB(vfoB.freq);
+		vfo.freq = vfoB.freq;
+		Fl::awake(setFreqDispB, (void *)vfoB.freq);
+	}
+
 	pushedB = false;
 
 end_serviceB:
@@ -1569,16 +1626,16 @@ void cb_selectA() {
 		cb_set_split(0);
 	}
 	guard_lock serial_lock(&mutex_serial);
+	guard_lock queA_lock(&mutex_queA);
+	guard_lock queB_lock(&mutex_queB);
+
 	changed_vfo = true;
 	vfoA.src = UI;
 	vfoA.freq = FreqDispA->value();
 
-	guard_lock queA_lock(&mutex_queA);
+	while (!queB.empty()) queB.pop();
 	while (!queA.empty()) queA.pop();
 	queA.push(vfoA);
-
-	guard_lock queB_lock(&mutex_queB);
-	while (!queB.empty()) queB.pop();
 
 	useB = false;
 	highlight_vfo((void *)0);
@@ -1590,19 +1647,18 @@ void cb_selectB() {
 		cb_set_split(0);
 	}
 	guard_lock serial_lock(&mutex_serial);
+	guard_lock queA_lock(&mutex_queA);
+	guard_lock queB_lock(&mutex_queB);
+
 	changed_vfo = true;
 	vfoB.src = UI;
 	vfoB.freq = FreqDispB->value();
 
-	guard_lock queA_lock(&mutex_queA);
 	while (!queA.empty()) queA.pop();
-
-	guard_lock queB_lock(&mutex_queB);
 	while (!queB.empty()) queB.pop();
 	queB.push(vfoB);
 
 	useB = true;
-
 	highlight_vfo((void *)0);
 }
 
@@ -1939,36 +1995,45 @@ static int img = -1;
 
 void set_power_controlImage(double pwr)
 {
-	if (progStatus.pwr_scale == 0 || (progStatus.pwr_scale == 4 && pwr < 26.0)) {
+	if (progStatus.pwr_scale == 0 || (progStatus.pwr_scale == 5 && pwr <= 5.0)) {
 		if (img != 1) {
 			img = 1;
+			scalePower->image(image_p5);
+			sldrFwdPwr->maximum(5.0);
+			sldrFwdPwr->minimum(0.0);
+			scalePower->redraw();
+		}
+	}
+	else if (progStatus.pwr_scale == 1 || (progStatus.pwr_scale == 5 && pwr <= 25.0)) {
+		if (img != 2) {
+			img = 2;
 			scalePower->image(image_p25);
 			sldrFwdPwr->maximum(25.0);
 			sldrFwdPwr->minimum(0.0);
 			scalePower->redraw();
 		}
 	}
-	else if (progStatus.pwr_scale == 1 || (progStatus.pwr_scale == 4 && pwr < 51.0)) {
-		if (img != 2) {
-			img = 2;
+	else if (progStatus.pwr_scale == 2 || (progStatus.pwr_scale == 5 && pwr <= 50.0)) {
+		if (img != 3) {
+			img = 3;
 			scalePower->image(image_p50);
 			sldrFwdPwr->maximum(50.0);
 			sldrFwdPwr->minimum(0.0);
 			scalePower->redraw();
 		}
 	}
-	else if (progStatus.pwr_scale == 2 || (progStatus.pwr_scale == 4 && pwr < 101.0)) {
-		if (img != 3) {
-			img = 3;
+	else if (progStatus.pwr_scale == 3 || (progStatus.pwr_scale == 5 && pwr <= 100.0)) {
+		if (img != 4) {
+			img = 4;
 			scalePower->image(image_p100);
 			sldrFwdPwr->maximum(100.0);
 			sldrFwdPwr->minimum(0.0);
 			scalePower->redraw();
 		}
 	}
-	else if (progStatus.pwr_scale >= 3) {
-		if (img != 4) {
-			img = 4;
+	else if (progStatus.pwr_scale == 4 || (pwr > 100.0)) {
+		if (img != 5) {
+			img = 5;
 			scalePower->image(image_p200);
 			sldrFwdPwr->maximum(200.0);
 			sldrFwdPwr->minimum(0.0);
@@ -2051,10 +2116,9 @@ void redrawAGC()
 			btnAGC->value(1);
 	}
 
-if (agcwas != val) {
-	agcwas = val;
-	std::cout << xcvr_name << " agc " << val << std::endl;
-}
+	if (agcwas != val) {
+		agcwas = val;
+	}
 
 	btnAGC->redraw();
 }
@@ -2110,7 +2174,8 @@ void updateFwdPwr(void *d)
 	if (!sldrFwdPwr->visible()) {
 		sldrFwdPwr->show();
 	}
-	sldrFwdPwr->value(power);
+	if (xcvr_name == rig_FT817.name_) sldrFwdPwr->value(power / 10);
+	else sldrFwdPwr->value(power);
 	sldrFwdPwr->redraw();
 	if (!selrig->has_power_control)
 		set_power_controlImage(sldrFwdPwr->peak());
@@ -3153,27 +3218,59 @@ void init_generic_rig()
 	if (progStatus.CIV > 0)
 		selrig->adjustCIV(progStatus.CIV);
 
-	selrig->selectA();
-	if (selrig->has_get_info)
-		selrig->get_info();
-	transceiverA.freq = selrig->get_vfoA();
-	transceiverA.imode = selrig->get_modeA();
-	transceiverA.iBW = selrig->get_bwA();
+	if (selrig->has_getvfoAorB) {
 
-	if (selrig->has_vfoAB) {
+
+		int ret = selrig->get_vfoAorB();
+		int retry = 10;
+		while (ret == -1 && retry--) {
+			MilliSleep(50);
+			ret = selrig->get_vfoAorB();
+		}
+		if (ret == -1) ret = 0;
+
+		useB = ret;
+
 		selrig->selectB();
+		transceiverB.freq = vfoB.freq = progStatus.freq_B = selrig->get_vfoB();
+		transceiverB.imode = vfoB.imode = progStatus.imode_B = selrig->get_modeB();
+		transceiverB.iBW = vfoB.iBW = progStatus.iBW_B = selrig->get_bwA();
+
+		selrig->selectA();
+		transceiverA.freq = vfoA.freq = progStatus.freq_A = selrig->get_vfoA();
+		transceiverA.imode = vfoA.imode = progStatus.imode_B = selrig->get_modeA();
+		transceiverA.iBW = vfoA.iBW = progStatus.iBW_B =selrig->get_bwA();
+
+		if (useB) {
+			selrig->selectB();
+			vfo = vfoB;
+		} else {
+			vfo = vfoA;
+		}
+	}
+	else {
+		selrig->selectA();
 		if (selrig->has_get_info)
 			selrig->get_info();
-		transceiverB.freq = selrig->get_vfoB();
-		transceiverB.imode = selrig->get_modeB();
-		transceiverB.iBW = selrig->get_bwB();
-	} else {
-		transceiverB.freq = vfoB.freq = progStatus.freq_B;
-		transceiverB.imode = vfoB.imode = progStatus.imode_B;
-		transceiverB.iBW = vfoB.iBW = progStatus.iBW_B;
+		transceiverA.freq = selrig->get_vfoA();
+		transceiverA.imode = selrig->get_modeA();
+		transceiverA.iBW = selrig->get_bwA();
+
+		if (selrig->has_vfoAB) {
+			selrig->selectB();
+			if (selrig->has_get_info)
+				selrig->get_info();
+			transceiverB.freq = selrig->get_vfoB();
+			transceiverB.imode = selrig->get_modeB();
+			transceiverB.iBW = selrig->get_bwB();
+		} else {
+			transceiverB.freq = vfoB.freq = progStatus.freq_B;
+			transceiverB.imode = vfoB.imode = progStatus.imode_B;
+			transceiverB.iBW = vfoB.iBW = progStatus.iBW_B;
+		}
 	}
 
-	if (progStatus.use_rig_data) {
+	if (progStatus.use_rig_data && (xcvr_name != rig_FT817.name_)) {
 LOG_INFO("Use xcvr start values for Vfo A/B");
 		vfo.freq = vfoA.freq = progStatus.freq_A = transceiverA.freq;
 		vfo.imode = vfoA.imode = progStatus.imode_A = transceiverA.imode;
@@ -3735,6 +3832,7 @@ void init_power_control()
 {
 	double min, max, step;
 	if (selrig->has_power_control) {
+		sldrPOWER->activate();
 		if (progStatus.use_rig_data)
 			progStatus.power_level = selrig->get_power_control();
 		else
@@ -3753,7 +3851,9 @@ void init_power_control()
 		if (spnrPOWER) spnrPOWER->value(progStatus.power_level);
 		if (spnrPOWER) spnrPOWER->show();
 		if (spnrPOWER) spnrPOWER->redraw();
-	}
+	} else
+		sldrPOWER->deactivate();
+
 	set_power_controlImage(progStatus.power_level);
 }
 
@@ -3976,6 +4076,13 @@ void init_CIV()
 void init_VFOs()
 {
 	if (selrig->name_ == rig_TT550.name_) return;
+	if (selrig->name_ == rig_FT817.name_) {
+		FreqDispA->value(vfoA.freq);
+		FreqDispB->value(vfoB.freq);
+		updateBandwidthControl();
+		highlight_vfo(NULL);
+		return;
+	}
 
 	vfoA.freq = progStatus.freq_A;
 	vfoA.imode = progStatus.imode_A;

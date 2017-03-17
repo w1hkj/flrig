@@ -332,6 +332,7 @@ EXTRA_DIST = \
 	include/ValueSlider.h \
 	include/xml_server.h \
 	images/alc.xbm \
+	images/P5.xbm \
 	images/P25.xbm \
 	images/P50.xbm \
 	images/P100.xbm \

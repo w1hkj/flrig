@@ -65,6 +65,8 @@ Fl_Menu_Item *mnuAbout = (Fl_Menu_Item *)0;
 Fl_Box *tcpip_menu_box = (Fl_Box *)0;
 Fl_Group *tcpip_box = (Fl_Group *)0;
 
+Fl_Box *labelMEMORY = (Fl_Box *)0;
+
 Fl_Output *txt_encA=(Fl_Output *)0;
 
 Fl_Group *grpMeters=(Fl_Group *)0;
@@ -256,6 +258,7 @@ Fl_Button *btnInitializing=(Fl_Button *)0;
 #include "ui_bitmaps.cxx"
 
 static const char *mtr_scales[] = {
+"5 watt",
 "25 watt",
 "50 watt",
 "100 watt",
@@ -364,11 +367,11 @@ static void cb_scalePower(Fl_Button*, void*) {
 		select_power_meter_scales();
 }
 
-static bool on_A = true;
+extern bool useB;
 
 static void cb_btnA(Fl_Light_Button*, void*) {
 	if (Fl::event_button() == FL_RIGHT_MOUSE) {
-		if (on_A) {
+		if (!useB) {
 			addFreq();
 			btnA->value(1);
 			btnB->value(0);
@@ -377,7 +380,7 @@ static void cb_btnA(Fl_Light_Button*, void*) {
 			btnB->value(1);
 		}
 	} else {
-		if (!on_A) {
+		if (useB) {
 			cb_selectA();
 		} else {
 			if (FreqDispA->is_reversed_colors()) {
@@ -389,7 +392,6 @@ static void cb_btnA(Fl_Light_Button*, void*) {
 			}
 		}
 
-		on_A = true;
 		btnA->value(1);
 		btnB->value(0);
 		if (progStatus.UIsize == touch_ui) {
@@ -409,7 +411,7 @@ static void cb_btn_KX3_swapAB(Fl_Button*, void*) {
 
 static void cb_btnB(Fl_Light_Button*, void*) {
 	if (Fl::event_button() == FL_RIGHT_MOUSE) {
-		if (!on_A) {
+		if (useB) {
 			addFreq();
 			btnB->value(1);
 			btnA->value(0);
@@ -418,7 +420,7 @@ static void cb_btnB(Fl_Light_Button*, void*) {
 			btnA->value(1);
 		}
 	} else {
-		if (on_A) {
+		if (!useB) {
 			cb_selectB();
 		} else { 
 			if (FreqDispB->is_reversed_colors()) {
@@ -429,7 +431,6 @@ static void cb_btnB(Fl_Light_Button*, void*) {
 				Fl::focus(FreqDispB);
 			}
 		}
-		on_A = false;
 		btnB->value(1);
 		btnA->value(0);
 		if (progStatus.UIsize == touch_ui) {
