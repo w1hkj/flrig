@@ -1,6 +1,37 @@
 
 
+=Version 1.3.29=
+
+2017-03-17  David Freese  <iam_w1hkj@w1hkj.com>
+
+	8a18cbb: TS990 update
+	8f150ff: FT817
+	4f4b560: Xcvr Init
+	041ce65: k3 kx3
+	73d3a59: AGC button
+	b3492e3: BCD/Decimal conversions
+	8cd0764: initial bandwidth
+	fe8571a: Missing tooltips
+	6f5c24a: Polling
+	2fc88cd: Exchange-Equalize AB
+	20ffb3c: IC7200 mods
+	4985a5e: IC7300 update
+
+2017-01-27  Rafael García  <ea4bpn@gmail.com>
+
+	c8be4d9: TS480SAT update
+
+2017-01-26  David Freese  <iam_w1hkj@w1hkj.com>
+
+	0062796: FT817 metering
+
+2017-01-23  Dave G0WBX  <g8kbvdave@googlemail.com>
+
+	df4e296: PCR1000 update
+
+
 =Version 1.3.28=
+
 
 2017-01-20  David Freese  <iam_w1hkj@w1hkj.com>
 
