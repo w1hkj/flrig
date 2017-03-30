@@ -23,7 +23,7 @@
 
 #include "FT817.h"
 
-class RIG_FT857D : public RIG_FT817 {
+class RIG_FT857D : public rigbase {
 public:
 	RIG_FT857D();
 	~RIG_FT857D(){};
