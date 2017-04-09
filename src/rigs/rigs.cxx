@@ -86,7 +86,8 @@ RIG_TS480HX		rig_TS480HX;
 RIG_TS480SAT	rig_TS480SAT;
 RIG_TS570		rig_TS570;
 RIG_TS590S		rig_TS590S;
-RIG_TS590SG     rig_TS590SG;
+RIG_TS590SG		rig_TS590SG;
+RIG_TS850		rig_TS850;
 RIG_TS870S		rig_TS870S;
 RIG_TS990		rig_TS990;
 RIG_TS2000		rig_TS2000;
@@ -156,18 +157,19 @@ rigbase *rigs[] = {
 	&rig_TS480SAT,	// 52
 	&rig_TS570,		// 53
 	&rig_TS590S,	// 54
-	&rig_TS590SG,   // 55
-	&rig_TS870S,	// 56 wbx
-	&rig_TS990,		// 57
-	&rig_TS2000,	// 58
-	&rig_TT516,		// 59
-	&rig_TT535,		// 60
-	&rig_TT538,		// 61
-	&rig_TT550,		// 62
-	&rig_TT563,		// 63
-	&rig_TT566,		// 64
-	&rig_TT588,		// 65
-	&rig_TT599,		// 66
+	&rig_TS590SG,	// 55
+	&rig_TS850,		// 56
+	&rig_TS870S,	// 57 wbx
+	&rig_TS990,		// 58
+	&rig_TS2000,	// 59
+	&rig_TT516,		// 60
+	&rig_TT535,		// 61
+	&rig_TT538,		// 62
+	&rig_TT550,		// 63
+	&rig_TT563,		// 64
+	&rig_TT566,		// 65
+	&rig_TT588,		// 66
+	&rig_TT599,		// 67
 	NULL
 };
 
