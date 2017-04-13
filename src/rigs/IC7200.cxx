@@ -117,7 +117,7 @@ RIG_IC7200::RIG_IC7200() {
 
 	A.freq = 14070000;
 	A.imode = 1;
-	A.iBW = 32;
+	def_bw = A.iBW = 32;
 	B.freq = 7015000;
 	B.imode = 3;
 	B.iBW = 12;
