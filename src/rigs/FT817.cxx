@@ -28,7 +28,7 @@ static const char FT817name_[] = "FT-817";
 static const char *FT817modes_[] = {
 		"LSB", "USB", "CW", "CW-R", "AM", "FM", "DIG", "PKT", NULL};
 static const int FT817_mode_val[] =  { 0, 1, 2, 3, 4, 8, 0x0A, 0x0C };
-static const char FT817_mode_type[] = { 'L', 'U', 'L', 'U', 'U', 'U', 'U', 'U' };
+static const char FT817_mode_type[] = { 'L', 'U', 'U', 'L', 'U', 'U', 'U', 'U' };
 
 RIG_FT817::RIG_FT817() {
 // base class values	
