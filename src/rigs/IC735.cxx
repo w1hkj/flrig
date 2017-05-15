@@ -50,8 +50,8 @@ RIG_IC735::RIG_IC735() {
 	defaultCIV = 0x04;
 	adjustCIV(defaultCIV);
 
-	precision = 100;
-	ndigits = 6;
+	precision = 10;
+	ndigits = 7;
 
 };
 
