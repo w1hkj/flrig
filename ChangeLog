@@ -1,8 +1,18 @@
 
 
-=Version 1.3.30=
+=Version 1.3.31=
 
-2017-03-29  David Freese  <iam_w1hkj@w1hkj.com>
+2017-05-20  David Freese  <iam_w1hkj@w1hkj.com>
+
+	7f14db7: Documentation update
+	9c1a0f3: IC735
+	a5a453a: FT817 CW MODE
+	4deacd6: FT-891
+	c3e6371: IC7200 Initial BW
+	67ed018: TS850
+
+
+=Version 1.3.30=
 
 	fd596a8: FT857/897 base class
 
