@@ -65,6 +65,11 @@
 \image latex IC7200.png "IC 7200" width=3.75in
 \image html  IC7200.png "IC 7200"
 </center>
+\anchor icom_7300_a
+<center>
+\image latex IC7300.png "IC 7300" width=3.75in
+\image html  IC7300.png "IC 7300"
+</center>
 \anchor icom_7410_a
 <center>
 \image latex IC7410.png "IC 7410" width=3.75in
@@ -79,6 +84,16 @@
 <center>
 \image latex IC7700.png "IC 7700" width=3.75in
 \image html  IC7700.png "IC 7700"
+</center>
+\anchor icom_7800_a
+<center>
+\image latex IC7800.png "IC 7800" width=3.75in
+\image html  IC7800.png "IC 7800"
+</center>
+\anchor icom_9100_a
+<center>
+\image latex IC9100.png "IC 9100" width=3.75in
+\image html  IC9100.png "IC 9100"
 </center>
 \ref elecraft_rigs "Page Top"
 \ref sFlrigDesc "Return to Main Page"
