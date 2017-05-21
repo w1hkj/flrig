@@ -635,6 +635,21 @@ public:
 
 } rig_set_vfo(&rig_server);
 
+class main_set_frequency : public XmlRpcServerMethod {
+public:
+	main_set_frequency(XmlRpcServer* s) : XmlRpcServerMethod("main.set_frequency", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		long freq = static_cast<long>(double(params[0]));
+// set the frequency in vfoA or vfoB
+		if (useB) srvr_vfo = vfoB;
+		else       srvr_vfo = vfoA;
+		srvr_vfo.freq = freq;
+		push_xml();
+	}
+	std::string help() { return std::string("main.set_frequency NNNNNNNN (Hz)"); }
+
+} main_set_frequency(&rig_server);
 
 //------------------------------------------------------------------------------
 // Set mode
@@ -756,7 +771,8 @@ struct MLIST {
 	{ "rig.set_mode",     "i:i", "set MODE iaw MODE table" },
 	{ "rig.set_notch",    "d:d", "set NOTCH value in Hz" },
 	{ "rig.set_ptt",      "i:i", "set PTT 1/0 (on/off)" },
-	{ "rig.set_vfo",      "d:d", "set current VFO in Hz" }
+	{ "rig.set_vfo",      "d:d", "set current VFO in Hz" },
+	{ "main.set_frequency",      "d:d", "set current VFO in Hz" }
 };
 
 class rig_list_methods : public XmlRpcServerMethod {

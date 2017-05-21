@@ -28,6 +28,7 @@
 
 rigbase			rig_null;
 
+RIG_AOR5K		rig_AOR5K;
 RIG_FT100D		rig_FT100D;
 RIG_FT450		rig_FT450;
 RIG_FT450D		rig_FT450D;
@@ -172,6 +173,7 @@ rigbase *rigs[] = {
 	&rig_TT566,		// 66
 	&rig_TT588,		// 67
 	&rig_TT599,		// 68
+	&rig_AOR5K,		// 69
 	NULL
 };
 

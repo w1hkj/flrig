@@ -127,6 +127,7 @@ flrig_SOURCES += \
 	main.cxx \
 	rigs/rigbase.cxx \
 	rigs/rigs.cxx \
+	rigs/AOR5K.cxx \
 	rigs/FT100D.cxx \
 	rigs/FT450.cxx \
 	rigs/FT450D.cxx \
@@ -245,6 +246,7 @@ EXTRA_DIST = \
 	include/Fl_SigBar.h \
 	include/FreqControl.h \
 	include/hspinner.h \
+	include/AOR5K.h \
 	include/FT100D.h \
 	include/FT450.h \
 	include/FT450D.h \

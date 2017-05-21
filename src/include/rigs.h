@@ -22,6 +22,7 @@
 #define RIGS_H
 
 #include "rigbase.h"
+#include "AOR5K.h"
 #include "FT100D.h"
 #include "FT450.h"
 #include "FT450D.h"
@@ -158,5 +159,6 @@ extern RIG_TT563		rig_TT563;		// 65
 extern RIG_TT566		rig_TT566;		// 66
 extern RIG_TT588		rig_TT588;		// 67
 extern RIG_TT599		rig_TT599;		// 68
+extern RIG_AOR5K		rig_AOR5K;		// 69
 
 #endif
