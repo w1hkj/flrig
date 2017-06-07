@@ -4482,7 +4482,7 @@ static std::string bkin_label_;
 
 void do_bkin_label(void *)
 {
-	btnBreakIn->label(atten_label_.c_str());
+	btnBreakIn->label(bkin_label_.c_str());
 	btnBreakIn->redraw_label();
 }
 
