@@ -18,6 +18,10 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <iostream>
+
 #include "FT450D.h"
 #include "rig.h"
 
@@ -156,6 +160,8 @@ RIG_FT450D::RIG_FT450D() {
 
 void RIG_FT450D::initialize()
 {
+	LOG_INFO("%s", "Initializing FT-450D");
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = sldrRFGAIN;
@@ -170,18 +176,18 @@ void RIG_FT450D::initialize()
 
 // set progStatus defaults
 	if (progStatus.noise_reduction_val < 1) progStatus.noise_reduction_val = 1;
-// first-time-thru, or reset
-	if (progStatus.cw_qsk == 10 || progStatus.cw_qsk == 20) {
-		progStatus.cw_qsk = 30;
-		progStatus.cw_spot_tone = 700;
-		progStatus.cw_weight = 3.0;
-		progStatus.cw_wpm = 18;
-		progStatus.vox_gain = 50;
-		progStatus.vox_hang = 500;
-	}
 
 // turn off auto information mode
 	sendCommand("AI0;");
+
+	get_cw_weight();
+	get_cw_wpm();
+	get_break_in();
+	get_qsk();
+	get_qsk_delay();
+	get_cw_spot_tone();
+	get_vox_gain();
+	get_vox_hang();
 
 	selectA();
 }
@@ -309,7 +315,7 @@ int RIG_FT450D::get_split()
 {
 	size_t p;
 	int split = 0;
-	char rx, tx;
+	char tx;
 // tx vfo
 	cmd = rsp = "FT";
 	cmd.append(";");
@@ -318,16 +324,7 @@ int RIG_FT450D::get_split()
 	if (p == string::npos) return false;
 	tx = replystr[p+2] - '0';
 
-// rx vfo
-	cmd = rsp = "FR";
-	cmd.append(";");
-	wait_char(';',4, FL450D_WAIT_TIME, "get split rx vfo", ASC);
-
-	p = replystr.rfind(rsp);
-	if (p == string::npos) return false;
-	rx = replystr[p+2] - '0';
-
-	split = (tx == 1 ? 2 : 0) + (rx >= 4 ? 1 : 0);
+	split = (tx == 1 ? 2 : 0);
 
 	return split;
 }
@@ -987,7 +984,7 @@ void RIG_FT450D::set_noise_reduction_val(int val)
 {
 	cmd.assign("RL0").append(to_decimal(val, 2)).append(";");
 	sendCommand(cmd);
-	showresp(WARN, ASC, "SET_noise_reduction_val", cmd, replystr);
+	showresp(WARN, ASC, "SET_noise_reduction_level", cmd, replystr);
 }
 
 int  RIG_FT450D::get_noise_reduction_val()
@@ -995,7 +992,7 @@ int  RIG_FT450D::get_noise_reduction_val()
 	int val = 1;
 	cmd = rsp = "RL0";
 	cmd.append(";");
-	waitN(6, 100, "GET noise reduction val", ASC);
+	waitN(6, 100, "GET noise reduction level", ASC);
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return val;
 	val = atoi(&replystr[p+3]);
@@ -1015,7 +1012,7 @@ int  RIG_FT450D::get_noise_reduction()
 	int val;
 	cmd = rsp = "NR0";
 	cmd.append(";");
-	wait_char(';', 5, FL450D_WAIT_TIME, "GET noise reduction val", ASC);
+	wait_char(';', 5, FL450D_WAIT_TIME, "GET noise reduction", ASC);
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -1059,3 +1056,149 @@ void RIG_FT450D::get_rf_min_max_step(int &min, int &max, int &step)
 	max = 100;
 	step = 1;
 }
+
+//----------------------------------------------------------------------
+// these are used during initialization
+
+void RIG_FT450D::get_cw_weight()
+{
+	cmd = "EX024;";
+// response: EX024nn;  n = 25 (1:2.5) ~ 45 (1:4.5)
+	wait_char(';', 9, FL450D_WAIT_TIME, "get CW weight", ASC);
+//replystr = "EX024031;";
+//LOG_INFO ("%s", replystr.c_str());
+
+	size_t p = replystr.rfind("EX024");
+	if (p == string::npos) return;
+	replystr[p+8] = 0;
+	int val = atoi(&replystr[p+5]);
+	progStatus.cw_weight = val / 10.0;
+}
+
+void RIG_FT450D::get_cw_wpm()
+{
+	cmd = rsp = "KS;";
+// response: KSnnn;
+	wait_char(';', 6, FL450D_WAIT_TIME, "get WPM", ASC);
+//replystr = "KS32;";
+//LOG_INFO ("%s", replystr.c_str());
+
+	size_t p = replystr.rfind("KS");
+	if (p == string::npos) return;
+
+	replystr[p+5] = 0;
+	int val = atoi(&replystr[p+2]);
+	progStatus.cw_wpm = val;
+}
+
+void RIG_FT450D::get_break_in()
+{
+	cmd = "BI;";
+// response: BIn;
+	wait_char(';', 4, FL450D_WAIT_TIME, "get Break In", ASC);
+
+//replystr = "BI0;";
+//LOG_INFO ("%s", replystr.c_str());
+
+	size_t p = replystr.rfind("BI");
+	if (p != string::npos)
+		progStatus.break_in = (replystr[2] == '1');
+	if (progStatus.break_in) {
+		break_in_label("FULL");
+		progStatus.cw_delay = 0;
+	} else {
+		break_in_label("QSK");
+		get_qsk_delay();
+	}
+}
+
+void RIG_FT450D::get_qsk()
+{
+	cmd = "EX018;";
+// response: EX018N;  N = 0/1/2/3
+	wait_char(';', 7, FL450D_WAIT_TIME, "get CW qsk", ASC);
+
+//replystr = "EX0182;";
+//LOG_INFO ("%s", replystr.c_str());
+
+	size_t p = replystr.rfind("EX018");
+	if (p == string::npos) return;
+
+	switch (replystr[p+5]) {
+		default :
+		case '0' : progStatus.cw_qsk = 15; break;
+		case '1' : progStatus.cw_qsk = 20; break;
+		case '2' : progStatus.cw_qsk = 25; break;
+		case '3' : progStatus.cw_qsk = 30; break;
+	}
+}
+
+void RIG_FT450D::get_qsk_delay()
+{
+	cmd = "EX016;";
+// response: EX016NNNN;
+	wait_char(';', 10, FL450D_WAIT_TIME, "get CW delay", ASC);
+
+//replystr = "EX0160300;";
+//LOG_INFO ("%s", replystr.c_str());
+
+	size_t p = replystr.rfind("EX016");
+	if (p == string::npos) return;
+	replystr[p+9] = 0;
+	progStatus.cw_delay = atoi(&replystr[p+5]);
+}
+
+void RIG_FT450D::get_cw_spot_tone()
+{
+	cmd = "EX020;";
+// response EX020NN;
+	wait_char(';', 8, FL450D_WAIT_TIME, "get CW spot tone", ASC);
+
+//replystr = "EX02008;";
+//LOG_INFO ("%s", replystr.c_str());
+
+	size_t p = replystr.rfind("EX020");
+	if (p == string::npos) return;
+	replystr[p+7] = 0;
+	int n = atoi(&replystr[p+5]);
+	switch (n) {
+		case 0:
+		case 1: case 2: progStatus.cw_spot_tone = 400; break;
+		case 3: case 4: progStatus.cw_spot_tone = 500; break;
+		case 5: case 6: progStatus.cw_spot_tone = 600; break;
+		case 7: case 8: progStatus.cw_spot_tone = 700; break;
+		case 9: default: progStatus.cw_spot_tone = 800; break;
+	}
+}
+
+void RIG_FT450D::get_vox_gain()
+{
+	cmd = "VG;";
+// response VGnnn;
+	wait_char(';', 6, FL450D_WAIT_TIME, "get VOX gain", ASC);
+
+//replystr = "VG050;";
+//LOG_INFO ("%s", replystr.c_str());
+
+	size_t p = replystr.rfind("VG");
+	if (p == string::npos) return;
+	replystr[p+5] = 0;
+	progStatus.vox_gain = atoi(&replystr[p+2]);
+}
+
+void RIG_FT450D::get_vox_hang()
+{
+	cmd = "VD;";
+// response VDnnnn;
+	wait_char(';', 7, FL450D_WAIT_TIME, "get VOX delay", ASC);
+
+//replystr = "VD0250;";
+//LOG_INFO ("%s", replystr.c_str());
+
+	size_t p = replystr.rfind("VD");
+	if (p == string::npos) return;
+	replystr[p+6] = 0;
+	progStatus.vox_hang = atoi(&replystr[p+2]);
+}
+
+//----------------------------------------------------------------------

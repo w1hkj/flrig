@@ -511,8 +511,7 @@ void read_preamp_att()
 // split
 void update_split(void *d)
 {
-	if (xcvr_name == rig_FT450.name_ || xcvr_name == rig_FT450D.name_ ||
-    	xcvr_name == rig_FT950.name_ || xcvr_name == rig_FTdx1200.name_ ||
+	if (xcvr_name == rig_FT950.name_ || xcvr_name == rig_FTdx1200.name_ ||
 		xcvr_name == rig_TS480SAT.name_ || xcvr_name == rig_TS480HX.name_ ||
 		xcvr_name == rig_TS590S.name_ || xcvr_name == rig_TS590SG.name_ ||
 		xcvr_name == rig_TS2000.name_ || xcvr_name == rig_TS990.name_) {
@@ -2929,35 +2928,6 @@ void initXcvrTab()
 				spnr_cw_spot_tone->value(progStatus.cw_spot_tone);
 				selrig->set_cw_spot_tone();
 			} else spnr_cw_spot_tone->hide();
-		}
-
-		if (selrig->has_cw_break_in || selrig->has_cw_qsk || selrig->has_cw_delay) {
-			genericQSK->resize(
-				tabsGeneric->x() + 2,
-				tabsGeneric->y() + 19,
-				tabsGeneric->w() - 4,
-				tabsGeneric->h() - 21);
-			tabsGeneric->insert(*genericQSK, 6);
-			if (selrig->has_cw_qsk) {
-				double min, max, step;
-				selrig->get_cw_qsk_min_max_step(min, max, step);
-				spnr_cw_qsk->minimum(min);
-				spnr_cw_qsk->maximum(max);
-				spnr_cw_qsk->step(step);
-				spnr_cw_qsk->value(progStatus.cw_qsk);
-				spnr_cw_qsk->show();
-				selrig->set_cw_qsk();
-			} else spnr_cw_qsk->hide();
-			if (selrig->has_cw_delay) {
-				double min, max, step;
-				selrig->get_cw_delay_min_max_step( min, max, step );
-				spnr_cw_delay->minimum(min);
-				spnr_cw_delay->maximum(max);
-				spnr_cw_delay->step(step);
-				spnr_cw_delay->value(progStatus.cw_delay);
-				spnr_cw_delay->show();
-				selrig->set_cw_delay();
-			} else spnr_cw_delay->hide();
 		}
 
 		if (selrig->has_vox_onoff || selrig->has_vox_gain || selrig->has_vox_anti ||

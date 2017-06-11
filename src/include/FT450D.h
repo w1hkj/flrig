@@ -107,6 +107,15 @@ public:
 	void enable_keyer();
 	void enable_break_in();
 
+	void get_cw_weight();
+	void get_cw_wpm();
+	void get_break_in();
+	void get_qsk();
+	void get_qsk_delay();
+	void get_cw_spot_tone();
+	void get_vox_gain();
+	void get_vox_hang();
+
 	void set_cw_qsk();
 	void get_cw_qsk_min_max_step(double &min, double &max, double &step) {
 		min = 30; max = 3000; step = 10; }
