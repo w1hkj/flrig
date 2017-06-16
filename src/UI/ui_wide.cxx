@@ -607,7 +607,12 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 }
 			grp_row2d = new Fl_Group(552, 107, 182, 42);
 { // Power, Volume
-				sldrPOWER = new Fl_Wheel_Value_Slider(604, 108, 128, 18, _("PWR"));
+				btnPOWER = new Fl_Light_Button(552, 185, 50, 18, _("Pwr"));
+				btnPOWER->tooltip(_("Enable/Disable Power adjuster"));
+				btnPOWER->value(1);
+				btnPOWER-> callback((Fl_Callback*) cb_btnPOWER);
+
+				sldrPOWER = new Fl_Wheel_Value_Slider(604, 108, 128, 18, "");
 				sldrPOWER->tooltip(_("Adjust power level"));
 				sldrPOWER->type(5);
 				sldrPOWER->box(FL_THIN_DOWN_BOX);

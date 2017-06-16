@@ -2411,7 +2411,9 @@ void adjust_small_ui()
 	btnNotch->hide();
 	sldrNOTCH->hide();
 	sldrMICGAIN->hide();
+	btnPOWER->hide();
 	sldrPOWER->hide();
+	btnPOWER->hide();
 	sldrSQUELCH->hide();
 	btnNR->hide();
 	sldrNR->hide();
@@ -2432,6 +2434,11 @@ void adjust_small_ui()
 		if (selrig->has_data_port) {
 			sldrMICGAIN->label("");
 			sldrMICGAIN->redraw_label();
+		}
+		if (selrig->has_power_control) {
+			btnPOWER->resize( sldrPOWER->x() - 52, sldrPOWER->y(), 50, 18 );
+			btnPOWER->redraw();
+			btnPOWER->show();
 		}
 		mnuSchema->set();
 	} else {
@@ -2504,6 +2511,8 @@ void adjust_small_ui()
 			sldrPOWER->resize( 54, y, 368, 18 );
 			sldrPOWER->show();
 			sldrPOWER->redraw();
+			btnPOWER->resize( 2, y, 50, 18 );
+			btnPOWER->show();
 		}
 	}
 	y += 20;
@@ -2616,6 +2625,7 @@ void adjust_wide_ui()
 	sldrNOTCH->show();
 	sldrMICGAIN->show();
 	sldrPOWER->show();
+	btnPOWER->hide();
 	sldrSQUELCH->show();
 	btnNR->show();
 	sldrNR->show();
@@ -2654,6 +2664,13 @@ void adjust_wide_ui()
 			btnAGC->hide();
 			sldrRFGAIN->label(_("RF"));
 			sldrRFGAIN->redraw_label();
+		}
+		if (selrig->has_power_control) {
+			btnPOWER->resize(sldrPOWER->x() - 52, sldrPOWER->y(), 50, 18);
+			btnPOWER->show();
+		}
+		else {
+			sldrPOWER->deactivate();
 		}
 	}
 

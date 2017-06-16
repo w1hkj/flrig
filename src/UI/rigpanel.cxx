@@ -33,6 +33,7 @@
 
 // controls for touch screen interface
 Hspinner *spnrPOWER = (Hspinner *)0;
+Fl_Light_Button *btnPOWER = (Fl_Light_Button *)0;
 Hspinner *spnrVOLUME = (Hspinner *)0;
 Hspinner *spnrRFGAIN = (Hspinner *)0;
 Hspinner *spnrSQUELCH = (Hspinner *)0;
@@ -532,6 +533,11 @@ static void cb_sldrRFGAIN(Fl_Wheel_Value_Slider*, void*) {
 	if ( Fl::event_button() == FL_RIGHT_MOUSE )
 		progStatus.ft950_rg_reverse = !progStatus.ft950_rg_reverse;
 	setRFGAIN();
+}
+
+static void cb_btnPOWER(Fl_Light_Button *btn, void*) {
+	if (btn->value()) sldrPOWER->activate();
+	else sldrPOWER->deactivate();
 }
 
 static void cb_sldrPOWER(Fl_Wheel_Value_Slider*, void*) {

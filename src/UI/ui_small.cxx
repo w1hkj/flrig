@@ -240,7 +240,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	btnDataPort->hide();
 	btnDataPort->value(progStatus.data_port);
 
-	sldrMICGAIN = new Fl_Wheel_Value_Slider(54, 185, 156, 18, _("MIC"));
+	sldrMICGAIN = new Fl_Wheel_Value_Slider(54, 185, 156, 18, _("Mic"));
 	sldrMICGAIN->tooltip(_("Adjust Mic Gain"));
 	sldrMICGAIN->type(5);
 	sldrMICGAIN->box(FL_THIN_DOWN_BOX);
@@ -258,7 +258,12 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	sldrMICGAIN->when(FL_WHEN_CHANGED);
 	sldrMICGAIN->reverse(true);
 
-	sldrPOWER = new Fl_Wheel_Value_Slider(266, 185, 156, 18, _("PWR"));
+	btnPOWER = new Fl_Light_Button(212, 185, 50, 18, _("Pwr"));
+	btnPOWER->tooltip(_("Enable/Disable Power adjuster"));
+	btnPOWER->value(1);
+	btnPOWER-> callback((Fl_Callback*) cb_btnPOWER);
+
+	sldrPOWER = new Fl_Wheel_Value_Slider(266, 185, 156, 18, "");
 	sldrPOWER->tooltip(_("Adjust power level"));
 	sldrPOWER->type(5);
 	sldrPOWER->box(FL_THIN_DOWN_BOX);

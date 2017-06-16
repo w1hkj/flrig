@@ -134,6 +134,7 @@ extern Fl_Group *grp_row2d;
 
 extern Fl_Wheel_Value_Slider *sldrPOWER;
 
+extern Fl_Light_Button *btnPOWER;
 extern Hspinner *spnrPOWER;
 extern Hspinner *spnrVOLUME;
 extern Hspinner *spnrRFGAIN;
