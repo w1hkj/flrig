@@ -3,10 +3,11 @@
 //              David Freese, W1HKJ
 //
 // 2015-10-04 adapted from FT890.cxx by Ernst F. Schroeder DJ7HS
-// the FT-900 has two vfos and can work split
-// but it cannot change the (hidden) alternate vfo
+//            the FT-900 has two vfos and can work split
+//            but it cannot change the (hidden) alternate vfo
 // 2015-12-03 1st stable version  DJ7HS
 // 2016-04-03 call get_info() within get_vfoA and get_vfoB  DJ7HS
+// 2017-06-16 changes in support.cxx made adaptations necessary  DJ7HS
 //
 // This file is part of flrig.
 //
@@ -68,9 +69,9 @@ RIG_FT900::RIG_FT900() {
 	has_split = 
 	has_split_AB =
 	has_getvfoAorB =
+	has_get_info = 
 	has_mode_control = true;
 
-	has_get_info = false;          // to be sure, it's needed that way
 
 	precision = 10;
 	ndigits = 7;
@@ -126,55 +127,40 @@ int RIG_FT900::get_split()
 
 int  RIG_FT900::get_vfoAorB()
 {
-	return vfoAorB;       
+//  get flags for vfoAorB and split
+	init_cmd();
+	cmd[4] = 0xFA;
+	int ret = waitN(5, 100, "get flags info", HEX);
+//  after this command the FT-900 replies with 3 bytes of flags and 2 bytes of dummy data
+	if (ret >= 5) {
+		size_t p = ret - 5;
+		int sp = replybuff[p];
+		splitison = (sp & 0x04) ? 1 : 0;     // 1 if split is set
+		vfoAorB = (sp & 0x40) ? 1 : 0;       // 0 if vfoA, 1 if vfoB is in use
+     	return vfoAorB;       
+	}
+	return -1;                                // -1 signals error
 }
 
-void RIG_FT900::swapvfos()  // works, but only with a few tricks
+void RIG_FT900::swapvfos()    // works with a simple trick
 {
-	progStatus.poll_frequency = 0;  // stop polling read_info
-	progStatus.poll_mode = 0;
-	progStatus.poll_bandwidth = 0;
-	
-	MilliSleep(400);
-
-	FREQMODE tempA = vfoA;	
-	FREQMODE tempB = vfoB;	
-
 	init_cmd();
 	cmd[4] = 0x85;			// copy active vfo to background vfo
 	sendCommand(cmd);
 	showresp(WARN, HEX, "copy active vfo to background vfo", cmd, replystr);
 
 	if (!useB) {	
-		{	
-		guard_lock queA_lock(&mutex_queA, 120);
-		while (!queA.empty()) queA.pop();
-		queA.push(tempB);
-		}
-
-		FreqDispB->value(tempA.freq);
-		FreqDispB->redraw();
-		vfoB = tempA;
+		queA.push(vfoB);
+		B = vfoA;
 	} else {
-		{	
-		guard_lock queB_lock(&mutex_queB, 121);
-		while (!queB.empty()) queB.pop();
-		queB.push(tempA);
-		}
-
-		FreqDispA->value(tempB.freq);
-		FreqDispA->redraw();
-		vfoA = tempB;
+		queB.push(vfoA);
+		A = vfoB;
 	}
-
-	progStatus.poll_frequency = 1;  // restart polling read_info
-	progStatus.poll_mode = 1;
-	progStatus.poll_bandwidth = 1;
 }
 
 bool RIG_FT900::get_info()
 {
-//  first get the vfo, mode and bandwidth information
+//  get the vfo, mode and bandwidth information
 	init_cmd();
 	cmd[3] = 0x03;
 	cmd[4] = 0x10;
@@ -256,18 +242,7 @@ bool RIG_FT900::get_info()
 		B.freq = bfreq;
 		B.imode = bmode;
 		B.iBW = bBW;
-	}
 
-//  now get some flags
-	init_cmd();
-	cmd[4] = 0xFA;
-	ret = waitN(5, 100, "get flags info", HEX);
-//  after this command the FT-900 replies with 3 bytes of flags and 2 bytes of dummy data
-	if (ret >= 5) {
-		size_t p = ret - 5;
-		int sp = replybuff[p];
-		splitison = (sp & 0x04) ? 1 : 0;     // 1 if split is set
-		vfoAorB = (sp & 0x40) ? 1 : 0;       // 1 if vfoB is in use
 		return true;
 	}
 	return false;
@@ -275,9 +250,6 @@ bool RIG_FT900::get_info()
 
 long RIG_FT900::get_vfoA ()
 {
-	if (!useB) {
-		get_info();
-	}
 	return A.freq;
 }
 
@@ -308,9 +280,6 @@ void RIG_FT900::set_modeA(int val)
 
 long RIG_FT900::get_vfoB()
 {
-	if (useB) {
-		get_info();
-	}
 	return B.freq;
 }
 
@@ -339,9 +308,34 @@ int  RIG_FT900::get_modeB()
 	return B.imode;
 }
 
-// Tranceiver PTT on/off
+// Transceiver PTT on/off
 void RIG_FT900::set_PTT_control(int val)
 {
+// make sure no other vfo except either vfoA or vfoB is used for transmit
+     if (val) {	
+          if (!useB) {	    
+               selectA();
+          } else {
+               selectB();
+          }
+     }
+// make sure that in case of split the transmit mode is shown correctly 
+     if (splitison) {
+          if (val) {
+               if (!useB) {
+                    vfo = vfoB;
+               } else {
+                    vfo = vfoA;
+               }
+          } else {
+               if (!useB) {
+                    vfo = vfoA;
+               } else {
+                    vfo = vfoB;
+               }
+          }
+          Fl::awake(setModeControl);
+     }
 	init_cmd();
 	if (val) cmd[3] = 1;
 	else	 cmd[3] = 0;
