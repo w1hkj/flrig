@@ -1,8 +1,25 @@
 
 
-=Version 1.3.31=
+=Version 1.3.32=
 
-2017-05-20  David Freese  <iam_w1hkj@w1hkj.com>
+2017-07-05  David Freese  <iam_w1hkj@w1hkj.com>
+
+	a7ca53a: WIN COMM port
+
+2017-06-20  Ernst Schroeder DJ7HS  <ernst.schroeder@web.de>
+
+	115f675: FT900 update
+
+2017-06-16  David Freese  <iam_w1hkj@w1hkj.com>
+
+	81a98ac: Power slider
+	4cb23f2: FT-450D
+	a19a94a: Break-in Label
+	b3c8c2c: INSTALL
+	8d552a0: aor5k
+
+
+=Version 1.3.31=
 
 	7f14db7: Documentation update
 	9c1a0f3: IC735
