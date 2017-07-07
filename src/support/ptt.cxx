@@ -65,11 +65,11 @@ void rigPTT(bool on)
 	if (progStatus.comm_catptt) {
 		selrig->set_PTT_control(on);
 	} else if (progStatus.comm_dtrptt || progStatus.comm_rtsptt)
-		RigSerial.SetPTT(on);
-	else if (SepSerial.IsOpen() && (progStatus.sep_dtrptt || progStatus.sep_rtsptt) )
-		SepSerial.SetPTT(on);
+		RigSerial->SetPTT(on);
+	else if (SepSerial->IsOpen() && (progStatus.sep_dtrptt || progStatus.sep_rtsptt) )
+		SepSerial->SetPTT(on);
 	else
-		LOG_INFO("No PTT i/o connected");
+		LOG_ERROR("No PTT i/o connected");
 
 	if (!on && progStatus.split && !selrig->can_split())
 		fake_split(on);

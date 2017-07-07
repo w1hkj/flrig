@@ -373,9 +373,9 @@ void cbOkXcvrDialog()
 //	disconnect_from_remote(); // remote tcpip connection
 
 	{ guard_lock gl_serial(&mutex_serial, 200);
-		RigSerial.ClosePort();
-		AuxSerial.ClosePort();
-		SepSerial.ClosePort();
+		RigSerial->ClosePort();
+		AuxSerial->ClosePort();
+		SepSerial->ClosePort();
 		bypass_serial_thread_loop = true;
 	}
 
@@ -403,8 +403,12 @@ void cbOkXcvrDialog()
 	}
 
 	progStatus.xcvr_serial_port = selectCommPort->value();
+
 	progStatus.aux_serial_port = selectAuxPort->value();
+	progStatus.aux_SCU_17 = btnAux_SCU_17->value();
+
 	progStatus.sep_serial_port = selectSepPTTPort->value();
+	progStatus.sep_SCU_17 = btnSep_SCU_17->value();
 
 	progStatus.comm_baudrate = mnuBaudrate->index();
 	progStatus.stopbits = btnOneStopBit->value() ? 1 : 2;

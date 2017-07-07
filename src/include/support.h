@@ -59,9 +59,9 @@ extern bool useB;
 extern bool PTT;
 extern bool localptt;
 
-extern Cserial RigSerial;
-extern Cserial AuxSerial;
-extern Cserial SepSerial;
+extern Cserial *RigSerial;
+extern Cserial *AuxSerial;
+extern Cserial *SepSerial;
 
 extern bool run_xmlrcp_thread;
 extern bool bandwidth_changed;
@@ -281,9 +281,6 @@ extern Fl_Color flrig_def_color(int);
 extern void * serial_thread_loop( void * );
 extern bool bypass_serial_thread_loop;
 extern bool bypass_xmlrcp_thread_loop;
-
-extern Cserial RigSerial;
-extern Cserial AuxSerial;
 
 extern char szttyport[];
 extern int  baudttyport;

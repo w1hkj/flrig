@@ -64,6 +64,7 @@ status progStatus = {
 	0,			// int  byte_interval;
 
 	"NONE",		// string aux_serial_port;
+	false,		// bool aux_SCU_17;
 	false,		// bool aux_rts;
 	false,		// bool aux_dtr;
 
@@ -72,6 +73,7 @@ status progStatus = {
 	false,		// bool	sep_dtrptt;
 	false,		// bool	sep_rtsplus;
 	false,		// bool	sep_dtrplus;
+	false,		// bool	sep_SCU_17;
 	0,			// int	CIV;
 	false,		// bool	USBaudio;
 

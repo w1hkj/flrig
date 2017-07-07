@@ -347,12 +347,12 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 	int cnt = 0;
 	int waited = 0;
 	size_t num = n + cmd.length();
-	int delay =  num * 11000.0 / RigSerial.Baud() +
+	int delay =  num * 11000.0 / RigSerial->Baud() +
 			progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0;
 
 	replystr.clear();
 
-	if(!progStatus.use_tcpip && !RigSerial.IsOpen()) {
+	if(!progStatus.use_tcpip && !RigSerial->IsOpen()) {
 		snprintf(sztemp, sizeof(sztemp), "TEST %s", sz);
 		showresp(WARN, pr, sztemp, tosend, replystr);
 		return 0;
@@ -394,12 +394,12 @@ int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 	int waited = 0;
 	size_t num = n + cmd.length();
 
-	int delay =  num * 11000.0 / RigSerial.Baud() +
+	int delay =  num * 11000.0 / RigSerial->Baud() +
 			progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0;
 
 	replystr.clear();
 
-	if(!progStatus.use_tcpip && !RigSerial.IsOpen()) {
+	if(!progStatus.use_tcpip && !RigSerial->IsOpen()) {
 		snprintf(sztemp, sizeof(sztemp), "TEST %s", sz);
 		showresp(report_level, pr, sztemp, tosend, replystr);
 		return 0;

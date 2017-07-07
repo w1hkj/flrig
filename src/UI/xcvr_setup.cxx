@@ -51,12 +51,15 @@ Fl_Counter *cntDropsAllowed = (Fl_Counter *)0;
 
 Fl_Group *tabPTT = (Fl_Group *)0;
 Fl_ComboBox *selectSepPTTPort = (Fl_ComboBox *)0;
+Fl_Check_Button *btnSep_SCU_17 = (Fl_Check_Button *)0;
 Fl_Check_Button *btnSepRTSptt = (Fl_Check_Button *)0;
 Fl_Check_Button *btnSepRTSplus = (Fl_Check_Button *)0;
 Fl_Check_Button *btnSepDTRptt = (Fl_Check_Button *)0;
 Fl_Check_Button *btnSepDTRplus = (Fl_Check_Button *)0;
+
 Fl_Group *tabAux = (Fl_Group *)0;
 Fl_ComboBox *selectAuxPort = (Fl_ComboBox *)0;
+Fl_Check_Button *btnAux_SCU_17 = (Fl_Check_Button *)0;
 
 Fl_Group *tabPolling = (Fl_Group *)0;
 Fl_Value_Input *poll_smeter = (Fl_Value_Input *)0;
@@ -307,7 +310,17 @@ static void cb_btnSepDTRplus(Fl_Check_Button*, void*) {
 	btnOkXcvrDialog->redraw();
 }
 
+static void cb_btnSep_SCU_17(Fl_Check_Button*, void*) {
+	btnOkXcvrDialog->labelcolor(FL_RED);
+	btnOkXcvrDialog->redraw();
+}
+
 static void cb_selectAuxPort(Fl_ComboBox*, void*) {
+	btnOkXcvrDialog->labelcolor(FL_RED);
+	btnOkXcvrDialog->redraw();
+}
+
+static void cb_btnAux_SCU_17(Fl_Check_Button*, void*) {
 	btnOkXcvrDialog->labelcolor(FL_RED);
 	btnOkXcvrDialog->redraw();
 }
@@ -847,27 +860,32 @@ _("Use only if your setup requires a separate\nSerial Port for a PTT control lin
 		selectSepPTTPort->when(FL_WHEN_RELEASE);
 		selectSepPTTPort->end();
 
-		btnSepRTSptt = new Fl_Check_Button(111, 159, 129, 23, _("PTT via RTS"));
+		btnSepRTSptt = new Fl_Check_Button(111, 150, 128, 22, _("PTT via RTS"));
 		btnSepRTSptt->tooltip(_("RTS is ptt line"));
 		btnSepRTSptt->callback((Fl_Callback*)cb_btnSepRTSptt);
 		btnSepRTSptt->value(progStatus.sep_rtsptt);
 
-		btnSepRTSplus = new Fl_Check_Button(274, 159, 128, 23, _("RTS +12 v"));
+		btnSepRTSplus = new Fl_Check_Button(274, 150, 128, 22, _("RTS +12 v"));
 		btnSepRTSplus->tooltip(_("Initial state of RTS"));
 		btnSepRTSplus->down_box(FL_DOWN_BOX);
 		btnSepRTSplus->callback((Fl_Callback*)cb_btnSepRTSplus);
 		btnSepRTSplus->value(progStatus.sep_rtsplus);
 
-		btnSepDTRptt = new Fl_Check_Button(111, 186, 129, 22, _("PTT via DTR"));
+		btnSepDTRptt = new Fl_Check_Button(111, 176, 128, 22, _("PTT via DTR"));
 		btnSepDTRptt->tooltip(_("DTR is ptt line"));
 		btnSepDTRptt->callback((Fl_Callback*)cb_btnSepDTRptt);
 		btnSepDTRptt->value(progStatus.sep_dtrptt);
 
-		btnSepDTRplus = new Fl_Check_Button(274, 186, 128, 22, _("DTR +12 v"));
+		btnSepDTRplus = new Fl_Check_Button(274, 176, 128, 22, _("DTR +12 v"));
 		btnSepDTRplus->tooltip(_("Initial state of DTR"));
 		btnSepDTRplus->down_box(FL_DOWN_BOX);
 		btnSepDTRplus->callback((Fl_Callback*)cb_btnSepDTRplus);
 		btnSepDTRplus->value(progStatus.sep_dtrplus);
+
+		btnSep_SCU_17 = new Fl_Check_Button(111, 200, 128, 22, _("Serial Port is SCU-17 auxiliary"));
+		btnSep_SCU_17->tooltip(_("Set stop bits to ZERO"));
+		btnSep_SCU_17->callback((Fl_Callback*)cb_btnSep_SCU_17);
+		btnSep_SCU_17->value(progStatus.sep_SCU_17);
 
 	tabPTT->end();
 
@@ -888,6 +906,11 @@ _("Use only if your setup requires a separate\nSerial Port for a PTT control lin
 		selectAuxPort->align(Fl_Align(FL_ALIGN_LEFT));
 		selectAuxPort->when(FL_WHEN_RELEASE);
 		selectAuxPort->end();
+
+		btnAux_SCU_17 = new Fl_Check_Button(131, 170, 128, 22, _("Serial Port is SCU-17 auxiliary"));
+		btnAux_SCU_17->tooltip(_("Set stop bits to ZERO"));
+		btnAux_SCU_17->callback((Fl_Callback*)cb_btnSep_SCU_17);
+		btnAux_SCU_17->value(progStatus.sep_SCU_17);
 
 		Fl_Box *bxsep = new Fl_Box(56, 84, 399, 38,
 _("Use only if your setup requires a separate\nSerial Port for a special Control Signals"));

@@ -72,7 +72,7 @@
 #include "gettext.h"
 #include "xml_server.h"
 #include "xml_io.h"
-
+#include "serial.h"
 #include "ui.h"
 
 #include "flrig_icon.cxx"
@@ -346,6 +346,17 @@ int main (int argc, char *argv[])
 
 #endif
 	checkdirectories();
+
+#if SERIAL_DEBUG
+extern FILE *serlog;
+	std::string serlogname = RigHomeDir;
+	serlogname.append("serlog.txt");
+	serlog = fopen(serlogname.c_str(), "w");
+#endif
+
+	RigSerial = new Cserial;
+	SepSerial = new Cserial;
+	AuxSerial = new Cserial;
 
 	try {
 		debug::start(string(RigHomeDir).append("debug_log.txt").c_str());

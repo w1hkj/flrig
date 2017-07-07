@@ -55,6 +55,7 @@ struct status {
 	int		byte_interval;
 
 	string	aux_serial_port;
+	bool	aux_SCU_17;
 	bool	aux_rts;
 	bool	aux_dtr;
 
@@ -63,6 +64,7 @@ struct status {
 	bool	sep_dtrptt;
 	bool	sep_rtsplus;
 	bool	sep_dtrplus;
+	bool	sep_SCU_17;
 	int		CIV;
 	bool	USBaudio;
 

@@ -106,9 +106,9 @@ int  numinlist = 0;
 vector<string> rigmodes_;
 vector<string> rigbws_;
 
-Cserial RigSerial;
-Cserial AuxSerial;
-Cserial SepSerial;
+Cserial *RigSerial;
+Cserial *AuxSerial;
+Cserial *SepSerial;
 
 bool using_buttons = false;
 
@@ -2348,7 +2348,7 @@ LOG_INFO("Restore Xcvr Data");
 		selrig->set_xcvr_auto_off();
 
 	// close down the serial port
-	RigSerial.ClosePort();
+	RigSerial->ClosePort();
 
 	if (dlgDisplayConfig && dlgDisplayConfig->visible())
 		dlgDisplayConfig->hide();
@@ -4526,8 +4526,8 @@ void if_shift_range(int bw)
 
 void cbAuxPort()
 {
-	AuxSerial.setRTS(progStatus.aux_rts);
-	AuxSerial.setDTR(progStatus.aux_dtr);
+	AuxSerial->setRTS(progStatus.aux_rts);
+	AuxSerial->setDTR(progStatus.aux_dtr);
 }
 
 void cb_agc_level()

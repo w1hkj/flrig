@@ -63,18 +63,18 @@ bool startXcvrSerial()
 		return false;
 	}
 
-	RigSerial.Device(progStatus.xcvr_serial_port);
-	RigSerial.Baud(BaudRate(progStatus.comm_baudrate));
-	RigSerial.Stopbits(progStatus.stopbits);
-	RigSerial.Retries(progStatus.comm_retries);
-	RigSerial.Timeout(progStatus.comm_timeout);
-	RigSerial.RTSptt(progStatus.comm_rtsptt);
-	RigSerial.DTRptt(progStatus.comm_dtrptt);
-	RigSerial.RTSCTS(progStatus.comm_rtscts);
-	RigSerial.RTS(progStatus.comm_rtsplus);
-	RigSerial.DTR(progStatus.comm_dtrplus);
+	RigSerial->Device(progStatus.xcvr_serial_port);
+	RigSerial->Baud(BaudRate(progStatus.comm_baudrate));
+	RigSerial->Stopbits(progStatus.stopbits);
+	RigSerial->Retries(progStatus.comm_retries);
+	RigSerial->Timeout(progStatus.comm_timeout);
+	RigSerial->RTSptt(progStatus.comm_rtsptt);
+	RigSerial->DTRptt(progStatus.comm_dtrptt);
+	RigSerial->RTSCTS(progStatus.comm_rtscts);
+	RigSerial->RTS(progStatus.comm_rtsplus);
+	RigSerial->DTR(progStatus.comm_dtrplus);
 
-	if (!RigSerial.OpenPort()) {
+	if (!RigSerial->OpenPort()) {
 		LOG_ERROR("Cannot access %s", progStatus.xcvr_serial_port.c_str());
 		return false;
 	} else {
@@ -106,7 +106,7 @@ Serial port:\n\
 			progStatus.comm_dtrplus );
 	}
 
-	RigSerial.FlushBuffer();
+	RigSerial->FlushBuffer();
 
 	debug::level = level;
 
@@ -117,12 +117,13 @@ bool startAuxSerial()
 {
 	if (progStatus.aux_serial_port == "NONE") return false;
 
-	AuxSerial.Device(progStatus.aux_serial_port);
-	AuxSerial.Baud(1200);
-	AuxSerial.RTS(progStatus.aux_rts);
-	AuxSerial.DTR(progStatus.aux_dtr);
+	AuxSerial->Device(progStatus.aux_serial_port);
+	AuxSerial->Baud(BaudRate(progStatus.comm_baudrate));
+	AuxSerial->Stopbits(progStatus.stopbits);
+	AuxSerial->Retries(progStatus.comm_retries);
+	AuxSerial->Timeout(progStatus.comm_timeout);
 
-	if (!AuxSerial.OpenPort()) {
+	if (!AuxSerial->OpenPort()) {
 		LOG_ERROR("Cannot access %s", progStatus.aux_serial_port.c_str());
 		return false;
 	}
@@ -133,17 +134,17 @@ bool startSepSerial()
 {
 	if (progStatus.sep_serial_port == "NONE") return false;
 
-	SepSerial.Device(progStatus.sep_serial_port);
-	SepSerial.Baud(1200);
+	SepSerial->Device(progStatus.sep_serial_port);
+	SepSerial->Baud(BaudRate(progStatus.comm_baudrate));
 
-	SepSerial.RTSCTS(false);
-	SepSerial.RTS(progStatus.sep_rtsplus);
-	SepSerial.RTSptt(progStatus.sep_rtsptt);
+	SepSerial->RTSCTS(false);
+	SepSerial->RTS(progStatus.sep_rtsplus);
+	SepSerial->RTSptt(progStatus.sep_rtsptt);
 
-	SepSerial.DTR(progStatus.sep_dtrplus);
-	SepSerial.DTRptt(progStatus.sep_dtrptt);
+	SepSerial->DTR(progStatus.sep_dtrplus);
+	SepSerial->DTRptt(progStatus.sep_dtrptt);
 
-	if (!SepSerial.OpenPort()) {
+	if (!SepSerial->OpenPort()) {
 		LOG_ERROR("Cannot access %s", progStatus.sep_serial_port.c_str());
 		return false;
 	}
@@ -161,7 +162,7 @@ int readResponse()
 	if (progStatus.use_tcpip)
 		numread = read_from_remote(replystr);
 	else {
-		numread = RigSerial.ReadBuffer(replybuff, RXBUFFSIZE);
+		numread = RigSerial->ReadBuffer(replybuff, RXBUFFSIZE);
 		for (int i = 0; i < numread; replystr += replybuff[i++]);
 	}
 	if (numread)
@@ -179,7 +180,7 @@ int sendCommand (string s, int nread)
 		send_to_remote(s, progStatus.byte_interval);
 		int timeout = 
 			progStatus.comm_wait + progStatus.tcpip_ping_delay +
-			(int)((nread + progStatus.comm_echo ? numwrite : 0)*11000.0/RigSerial.Baud() );
+			(int)((nread + progStatus.comm_echo ? numwrite : 0)*11000.0/RigSerial->Baud() );
 		while (timeout > 0) {
 			if (timeout > 10) MilliSleep(10);
 			else MilliSleep(timeout);
@@ -190,7 +191,7 @@ int sendCommand (string s, int nread)
 		return readResponse();
 	}
 
-	if (RigSerial.IsOpen() == false) {
+	if (RigSerial->IsOpen() == false) {
 		replystr.clear();
 		return 0;
 	}
@@ -198,10 +199,10 @@ int sendCommand (string s, int nread)
 	LOG_DEBUG("cmd:%3d, %s", (int)s.length(), str2hex(s.data(), s.length()));
 
 	clearSerialPort();
-	RigSerial.WriteBuffer(s.c_str(), numwrite);
+	RigSerial->WriteBuffer(s.c_str(), numwrite);
 
 	int timeout = progStatus.comm_wait + 
-		(int)((nread + progStatus.comm_echo ? numwrite : 0)*11000.0/RigSerial.Baud());
+		(int)((nread + progStatus.comm_echo ? numwrite : 0)*11000.0/RigSerial->Baud());
 	while (timeout > 0) {
 		if (timeout > 10) MilliSleep(10);
 		else MilliSleep(timeout);
@@ -229,18 +230,18 @@ bool waitCommand(
 		send_to_remote(command, progStatus.byte_interval);
 		if (nread == 0) return 0;
 	} else {
-		if (RigSerial.IsOpen() == false) {
+		if (RigSerial->IsOpen() == false) {
 			LOG_DEBUG("cmd: %s", how == ASC ? command.c_str() : str2hex(command.data(), command.length()));
 			return 0;
 		}
 		replystr.clear();
 		clearSerialPort();
-		RigSerial.WriteBuffer(command.c_str(), numwrite);
+		RigSerial->WriteBuffer(command.c_str(), numwrite);
 		if (nread == 0) return 0;
 	}
 
 // minimimum time to wait for a response
-	int timeout = (int)((nread + progStatus.comm_echo ? numwrite : 0)*11000.0/RigSerial.Baud()
+	int timeout = (int)((nread + progStatus.comm_echo ? numwrite : 0)*11000.0/RigSerial->Baud()
 		+ progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0);
 	while (timeout > 0) {
 		if (timeout > 10) MilliSleep(10);
@@ -275,7 +276,7 @@ bool waitCommand(
 int waitResponse(int timeout)
 {
 	int n = 0;
-	if (!progStatus.use_tcpip && RigSerial.IsOpen() == false)
+	if (!progStatus.use_tcpip && RigSerial->IsOpen() == false)
 		return 0;
 
 	MilliSleep(10);
@@ -291,8 +292,8 @@ int waitResponse(int timeout)
 
 void clearSerialPort()
 {
-	if (RigSerial.IsOpen() == false) return;
-	RigSerial.FlushBuffer();
+	if (RigSerial->IsOpen() == false) return;
+	RigSerial->FlushBuffer();
 	replystr.clear();
 }
 

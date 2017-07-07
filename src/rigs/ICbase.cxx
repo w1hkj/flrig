@@ -32,7 +32,7 @@ void RIG_ICOM::adjustCIV(uchar adr)
 
 void RIG_ICOM::checkresponse()
 {
-	if (!progStatus.use_tcpip && !RigSerial.IsOpen())
+	if (!progStatus.use_tcpip && !RigSerial->IsOpen())
 		return;
 
 	if (replystr.rfind(ok) != string::npos)
@@ -47,7 +47,7 @@ bool RIG_ICOM::sendICcommand(string cmd, int nbr)
 {
 	int ret = sendCommand(cmd);
 
-	if (!progStatus.use_tcpip && !RigSerial.IsOpen())
+	if (!progStatus.use_tcpip && !RigSerial->IsOpen())
 		return false;
 
 	if (ret < nbr) {
@@ -85,14 +85,14 @@ bool RIG_ICOM::waitFB(const char *sz)
 	string returned = "";
 	string tosend = cmd;
 
-	if (!progStatus.use_tcpip && !RigSerial.IsOpen()) {
+	if (!progStatus.use_tcpip && !RigSerial->IsOpen()) {
 		replystr = returned;
 		snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
 		showresp(INFO, HEX, sztemp, tosend, returned);
 		return false;
 	}
 	int cnt = 0, repeat = 0, num = cmd.length() + ok.length();
-	int wait_msec = (int)(num*11000.0/RigSerial.Baud() +
+	int wait_msec = (int)(num*11000.0/RigSerial->Baud() +
 			progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0) / 10;
 	for (repeat = 0; repeat < progStatus.comm_retries; repeat++) {
 		sendCommand(cmd, 0);
@@ -132,9 +132,9 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 	string tosend = cmd;
 	int cnt = 0, repeat = 0;
 	size_t num = n + cmd.length();
-	int delay =  (int)(num * 11000.0 / RigSerial.Baud() + 
+	int delay =  (int)(num * 11000.0 / RigSerial->Baud() + 
 		progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0) / 10;
-	if (!progStatus.use_tcpip && !RigSerial.IsOpen()) {
+	if (!progStatus.use_tcpip && !RigSerial->IsOpen()) {
 		replystr = returned;
 		snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
 		showresp(INFO, HEX, sztemp, tosend, returned);

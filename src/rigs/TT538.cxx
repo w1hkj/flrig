@@ -170,7 +170,7 @@ RIG_TT538::RIG_TT538() {
 
 void RIG_TT538::checkresponse(string s)
 {
-	if (RigSerial.IsOpen() == false)
+	if (RigSerial->IsOpen() == false)
 		return;
 	string s1 = str2hex(cmd.c_str(), cmd.length());
 	string s2 = str2hex(replystr.c_str(), replystr.length());

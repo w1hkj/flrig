@@ -152,7 +152,9 @@ serial port.
 </center>
 <br>
 
-Your PTT h/w control may also make use of a second serial port.
+Your PTT h/w control may also make use of a second serial port.  If that port
+is the secondary serial port of the SCU-17 then you must also enable the "Serial Port is SCU-17 auxiliary"
+control.
 
 
 <center>
@@ -170,7 +172,8 @@ Your PTT h/w control may also make use of a second serial port.
 You might also need access to special h/w functions.  FLRIG provides this
 via the DTR and RTS signal lines of an independent serial port.  Additional
 main dialog controls are enabled and shown if you select anything other than
-NONE (the default) on this tab.
+NONE (the default) on this tab. Enable the "Serial Port is SCU-17 auxiliary"
+if you are using the SCU-17 secondary serial port.
 
 <center>
 \image latex polling.png "I/O Ports - Polling" width=4.9in

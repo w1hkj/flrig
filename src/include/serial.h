@@ -115,20 +115,9 @@ private:
 
 class Cserial  {
 public:
-	Cserial() {
-		rts = dtr = false;
-		rtsptt = dtrptt = false;
-		rtscts = false;
-		baud = CBR_9600;
-		stopbits = 2;
-		hComm = 0;
-	};
-	Cserial( std::string portname) {
-		device = portname;
-		Cserial();
-//		OpenPort();
-	};
-	virtual	~Cserial() {};
+	Cserial();
+	Cserial(std::string portname);
+	~Cserial();
 
 //Methods
 	bool OpenPort();
