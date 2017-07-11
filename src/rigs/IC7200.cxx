@@ -74,19 +74,20 @@ static int IC7200_bw_vals_AM[] = {
 WVALS_LIMIT};
 
 static GUI rig_widgets[]= {
-	{ (Fl_Widget *)btnVol, 2, 125,  50 },
-	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },
-	{ (Fl_Widget *)btnAGC, 2, 145, 50 },
-	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },
-	{ (Fl_Widget *)sldrSQUELCH, 266, 125, 156 },
-	{ (Fl_Widget *)btnNR, 214, 145,  50 },
-	{ (Fl_Widget *)sldrNR, 266, 145, 156 },
-	{ (Fl_Widget *)btnIFsh, 214, 125,  50 },
-	{ (Fl_Widget *)sldrIFSHIFT, 266, 125, 156 },
-	{ (Fl_Widget *)btnNotch, 214, 145,  50 },
-	{ (Fl_Widget *)sldrNOTCH, 266, 145, 156 },
-	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },
-	{ (Fl_Widget *)sldrPOWER, 266, 185, 156 },
+	{ (Fl_Widget *)btnVol, 2, 125,  50 },			//0
+	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },		//1
+	{ (Fl_Widget *)btnAGC, 2, 145, 50 },			//2
+	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },		//3
+	{ (Fl_Widget *)sldrSQUELCH, 54, 165, 156 },		//4
+	{ (Fl_Widget *)btnNR, 2, 185,  50 },			//5
+	{ (Fl_Widget *)sldrNR, 54, 185, 156 },			//6
+
+	{ (Fl_Widget *)btnIFsh, 214, 125,  50 },		//7
+	{ (Fl_Widget *)sldrIFSHIFT, 266, 125, 156 },	//8
+	{ (Fl_Widget *)btnNotch, 214, 145,  50 },			//9
+	{ (Fl_Widget *)sldrNOTCH, 266, 145, 156 },		//10
+	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },	//11
+	{ (Fl_Widget *)sldrPOWER, 266, 185, 156 },		//12
 	{ (Fl_Widget *)NULL, 0, 0, 0 }
 };
 
