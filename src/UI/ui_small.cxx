@@ -395,7 +395,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	btn_show_controls->tooltip(_("Show/Hide controls"));
 	btn_show_controls->callback((Fl_Callback*)cb_btn_show_controls);
 
-	btnAttenuator = new Fl_Light_Button(56, 206, 60, 18, _("Att"));
+	btnAttenuator = new Fl_Light_Button(26, 206, 60, 18, _("Att"));
 	btnAttenuator->tooltip(_("Attenuator On/Off"));
 	btnAttenuator->down_box(FL_THIN_DOWN_BOX);
 	btnAttenuator->labelsize(12);
