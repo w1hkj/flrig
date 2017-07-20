@@ -81,19 +81,21 @@ const char *IC7300_fm_bws[] = { "FIXED", NULL };
 static int IC7300_bw_vals_FM[] = { 1, WVALS_LIMIT};
 
 static GUI IC7300_widgets[]= {
-	{ (Fl_Widget *)btnVol, 2, 125,  50 },
-	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },
-	{ (Fl_Widget *)btnAGC, 2, 145, 50 },
-	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },
-	{ (Fl_Widget *)sldrSQUELCH, 266, 125, 156 },
-	{ (Fl_Widget *)btnNR, 214, 145,  50 },
-	{ (Fl_Widget *)sldrNR, 266, 145, 156 },
-	{ (Fl_Widget *)btnIFsh, 214, 125,  50 },
-	{ (Fl_Widget *)sldrIFSHIFT, 266, 125, 156 },
-	{ (Fl_Widget *)btnNotch, 214, 145,  50 },
-	{ (Fl_Widget *)sldrNOTCH, 266, 145, 156 },
-	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },
-	{ (Fl_Widget *)sldrPOWER, 266, 185, 156 },
+	{ (Fl_Widget *)btnVol, 2, 125,  50 },			// 0
+	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },		// 1
+	{ (Fl_Widget *)btnAGC, 2, 145, 50 },			// 2
+	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },		// 3
+	{ (Fl_Widget *)sldrSQUELCH, 54, 165, 156 },		// 4
+	{ (Fl_Widget *)btnNR, 2, 185,  50 },			// 5
+	{ (Fl_Widget *)sldrNR, 54, 185, 156 },			// 6
+
+	{ (Fl_Widget *)btnIFsh, 214, 125,  50 },		// 7
+	{ (Fl_Widget *)sldrIFSHIFT, 266, 125, 156 },	// 8
+	{ (Fl_Widget *)btnNotch, 214, 145,  50 },		// 9
+	{ (Fl_Widget *)sldrNOTCH, 266, 145, 156 },		// 10
+	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },	// 11
+	{ (Fl_Widget *)sldrPOWER, 266, 185, 156 },		// 12
+
 	{ (Fl_Widget *)NULL, 0, 0, 0 }
 };
 
@@ -188,6 +190,9 @@ RIG_IC7300::RIG_IC7300() {
 // IC7300 unique commands
 //======================================================================
 
+static int FIL_A = 1;
+static int FIL_B = 2;
+
 void RIG_IC7300::initialize()
 {
 	IC7300_widgets[0].W = btnVol;
@@ -203,6 +208,11 @@ void RIG_IC7300::initialize()
 	IC7300_widgets[10].W = sldrNOTCH;
 	IC7300_widgets[11].W = sldrMICGAIN;
 	IC7300_widgets[12].W = sldrPOWER;
+	selectA();
+	get_modeA();
+	selectB();
+	get_modeB();
+	selectA();
 }
 
 static inline void minmax(int min, int max, int &val)
@@ -306,23 +316,6 @@ int RIG_IC7300::get_split()
 	return split;
 }
 
-// LSB  USB  AM   CW  RTTY  FM  CW-R  RTTY-R  LSB-D  USB-D
-//  0    1    2    3   4     5    6     7      8      9
-
-void RIG_IC7300::set_modeA(int val)
-{
-	A.imode = val;
-	cmd.assign(pre_to);
-	cmd += '\x26';
-	cmd += '\x00';
-	cmd += IC7300_mode_nbr[val];
-	if (val > 7) cmd += '\x01';
-	else cmd += '\x00';
-	cmd += '\x03';               // FIXME Dave:  why assume FIL3?
-	cmd.append( post );
-	waitFB("set modeA");
-}
-
 // expecting
 //  0  1  2  3  4  5  6  7  8  9
 // FE FE E0 94 26 NN NN NN NN FD
@@ -337,7 +330,7 @@ void RIG_IC7300::set_modeA(int val)
 //                |                05 - FM
 //                |                07 - CW-R
 //                |                08 - RTTY-R
-//                |___________selected vfo, 00 - A, 01 - B
+//                |___________selected vfo, 00 - active, 01 - inactive
 
 int RIG_IC7300::get_modeA()
 {
@@ -366,23 +359,27 @@ int RIG_IC7300::get_modeA()
 				break;
 			}
 		}
+		FIL_A = replystr[p+8];
 	}
 
 	return A.imode;
 }
 
-void RIG_IC7300::set_modeB(int val)
+// LSB  USB  AM   CW  RTTY  FM  CW-R  RTTY-R  LSB-D  USB-D
+//  0    1    2    3   4     5    6     7      8      9
+
+void RIG_IC7300::set_modeA(int val)
 {
-	B.imode = val;
+	A.imode = val;
 	cmd.assign(pre_to);
 	cmd += '\x26';
 	cmd += '\x00';
 	cmd += IC7300_mode_nbr[val];
 	if (val > 7) cmd += '\x01';
 	else cmd += '\x00';
-	cmd += '\x03';
+	cmd += FIL_A;
 	cmd.append( post );
-	waitFB("set modeB");
+	waitFB("set modeA");
 }
 
 int RIG_IC7300::get_modeB()
@@ -412,9 +409,24 @@ int RIG_IC7300::get_modeB()
 				break;
 			}
 		}
+		FIL_B = replystr[p+8];
 	}
 
 	return B.imode;
+}
+
+void RIG_IC7300::set_modeB(int val)
+{
+	B.imode = val;
+	cmd.assign(pre_to);
+	cmd += '\x26';
+	cmd += '\x00';
+	cmd += IC7300_mode_nbr[val];
+	if (val > 7) cmd += '\x01';
+	else cmd += '\x00';
+	cmd += FIL_B;
+	cmd.append( post );
+	waitFB("set modeB");
 }
 
 int RIG_IC7300::get_bwA()
@@ -482,7 +494,7 @@ void RIG_IC7300::set_bwB(int val)
 	if (B.iBW > bw_size_) B.iBW = bw_size_;
 	cmd = pre_to;
 	cmd.append("\x1a\x03");
-	cmd.append(to_bcd(A.iBW, 2));
+	cmd.append(to_bcd(B.iBW, 2));
 	cmd.append(post);
 	waitFB("set bwB");
 	int bw = atoi(bandwidths_[B.iBW]);
@@ -854,6 +866,20 @@ int RIG_IC7300::get_smeter()
 	return mtr;
 }
 
+struct pwrpair {int mtr; float pwr;};
+
+static pwrpair pwrtbl[] = { 
+	{0, 0.0}, 
+	{49, 12.5},
+	{74, 20.0}, 
+	{89, 25.0}, 
+	{103, 30.0}, 
+	{124, 40.0}, 
+	{143, 50.0}, 
+	{183, 75.0},
+	{213, 100.0},
+	{255, 120.0 } };
+
 int RIG_IC7300::get_power_out(void)
 {
 	string cstr = "\x15\x11";
@@ -862,12 +888,20 @@ int RIG_IC7300::get_power_out(void)
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	int mtr= -1;
+	int mtr= 0;
 	if (waitFOR(9, "get power out")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			mtr = fm_bcd(replystr.substr(p+6), 3);
-			mtr = (int)ceil(mtr /2.13);
+			int i = 0;
+			for (i = 0; i < sizeof(pwrtbl) / sizeof(pwrpair); i++)
+				if (mtr >= pwrtbl[i].mtr && mtr < pwrtbl[i+1].mtr)
+					break;
+			if (mtr < 0) mtr = 0;
+			if (mtr > 255) mtr = 255;
+			mtr = (int)ceil(pwrtbl[i].pwr + 
+				(pwrtbl[i+1].pwr - pwrtbl[i].pwr)*(mtr - pwrtbl[i].mtr)/(pwrtbl[i+1].mtr - pwrtbl[i].mtr));
+			
 			if (mtr > 100) mtr = 100;
 		}
 	}
