@@ -1,10 +1,18 @@
 
 
+=Version 1.3.33=
+
+2017-07-21  David Freese  <iam_w1hkj@w1hkj.com>
+
+	8443bbe: IC7200 power scale
+	f7ec539: IC7300 VFO B
+	1c241bb: IC7200 small controls
+	15887f6: ATT control
+	fe6697a: WIN COMM port
+
+
 =Version 1.3.32=
 
-2017-07-05  David Freese  <iam_w1hkj@w1hkj.com>
-
-	a7ca53a: WIN COMM port
 
 2017-06-20  Ernst Schroeder DJ7HS  <ernst.schroeder@web.de>
 
