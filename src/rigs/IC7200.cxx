@@ -337,7 +337,21 @@ int RIG_IC7200::get_smeter()
 	return mtr;
 }
 
-int RIG_IC7200::get_power_out(void) 
+struct pwrpair {int mtr; float pwr;};
+
+static pwrpair pwrtbl[] = { 
+{0, 0.0},
+{40, 10.0},
+{76, 20.0},
+{92, 25.0},
+{103, 30.0},
+{124, 40.0},
+{143, 50.0},
+{183, 75.0},
+{213, 100.0},
+{255, 140.0} };
+
+int RIG_IC7200::get_power_out(void)
 {
 	string cstr = "\x15\x11";
 	string resp = pre_fm;
@@ -345,12 +359,20 @@ int RIG_IC7200::get_power_out(void)
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	int mtr= -1;
+	int mtr= 0;
 	if (waitFOR(9, "get power out")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			mtr = fm_bcd(replystr.substr(p+6), 3);
-			mtr = (int)ceil(mtr /2.55);
+			int i = 0;
+			for (i = 0; i < sizeof(pwrtbl) / sizeof(pwrpair); i++)
+				if (mtr >= pwrtbl[i].mtr && mtr < pwrtbl[i+1].mtr)
+					break;
+			if (mtr < 0) mtr = 0;
+			if (mtr > 255) mtr = 255;
+			mtr = (int)ceil(pwrtbl[i].pwr + 
+				(pwrtbl[i+1].pwr - pwrtbl[i].pwr)*(mtr - pwrtbl[i].mtr)/(pwrtbl[i+1].mtr - pwrtbl[i].mtr));
+			
 			if (mtr > 100) mtr = 100;
 		}
 	}
