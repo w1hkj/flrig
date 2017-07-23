@@ -236,8 +236,8 @@ int RIG_IC7100::get_modeA()
 	resp += '\x04';
 	if (waitFOR(8, "get mode A")) {
 		size_t p = replystr.rfind(resp);
-		for (md = CW7100; md <= DV7100; md++)
-			if (replystr[p+6] == IC7100_mode_nbr[md]) break;
+			for (md = LSB7100; md <= DV7100; md++)
+				if (replystr[p+5] == IC7100_mode_nbr[md]) break;
 		if (md == USB7100 || md == AM7100 || md == FM7100) {
 			cmd = pre_to;
 			cmd.append("\x1a\x06");
@@ -246,8 +246,7 @@ int RIG_IC7100::get_modeA()
 			resp.append("\x1a\x06");
 			if (waitFOR(9, "get digital setting")) {
 				size_t p = replystr.rfind(resp);
-				if ((replystr[p+6] & 0x04) == 0x04) {
-//					if (replystr[p+6] == 0x01) {
+				if ((replystr[p+6] & 0x01) == 0x01) {
 					if (md == USB7100) md = USBD7100;
 					else if (md == AM7100) md = AMD7100;
 					else if (md == FM7100) md = FMD7100;
@@ -286,8 +285,8 @@ int RIG_IC7100::get_modeB()
 	resp += '\x04';
 	if (waitFOR(8, "get mode B")) {
 		size_t p = replystr.rfind(resp);
-		for (md = CW7100; md <= DV7100; md++)
-			if (replystr[p+6] == IC7100_mode_nbr[md]) break;
+		for (md = LSB7100; md <= DV7100; md++)
+			if (replystr[p+5] == IC7100_mode_nbr[md]) break;
 		if (md == USB7100 || md == AM7100 || md == FM7100) {
 			cmd = pre_to;
 			cmd.append("\x1a\x06");
@@ -296,7 +295,7 @@ int RIG_IC7100::get_modeB()
 			resp.append("\x1a\x06");
 			if (waitFOR(9, "get digital")) {
 				size_t p = replystr.rfind(resp);
-				if ((replystr[p+6] & 0x04) == 0x04) {
+				if ((replystr[p+6] & 0x01) == 0x01) {
 					if (md == USB7100) md = USBD7100;
 					else if (md == AM7100) md = AMD7100;
 					else if (md == FM7100) md = FMD7100;
@@ -454,7 +453,7 @@ int RIG_IC7100::get_attenuator()
 	resp += '\x11';
 	if (waitFOR(7, "get attenuator")) {
 		size_t p = replystr.rfind(resp);
-		if (replystr[p+6] == 0x12) {
+		if (replystr[p+5] == 0x12) {
 			atten_level = 1;
 			atten_label("12 dB", true);
 		} else {
