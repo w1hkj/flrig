@@ -364,7 +364,7 @@ int RIG_IC7200::get_power_out(void)
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			mtr = fm_bcd(replystr.substr(p+6), 3);
-			int i = 0;
+			size_t i = 0;
 			for (i = 0; i < sizeof(pwrtbl) / sizeof(pwrpair); i++)
 				if (mtr >= pwrtbl[i].mtr && mtr < pwrtbl[i+1].mtr)
 					break;
