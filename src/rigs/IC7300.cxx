@@ -1154,7 +1154,9 @@ void RIG_IC7300::set_noise_reduction_val(int val)
 {
 	cmd = pre_to;
 	cmd.append("\x14\x06");
-	cmd.append(bcd255(val));
+	val *= 16;
+	val += 8;
+	cmd.append(to_bcd(val, 3));
 	cmd.append(post);
 	waitFB("set NRval");
 }
@@ -1170,8 +1172,11 @@ int RIG_IC7300::get_noise_reduction_val()
 	cmd.append(post);
 	if (waitFOR(9, "get NRval")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			val = num100(replystr.substr(p+6));
+		if (p != string::npos) {
+			val = fm_bcd(replystr.substr(p+6),3);
+			val -= 8;
+			val /= 16;
+		}
 	}
 	progStatus.noise_reduction_val = val;
 	return progStatus.noise_reduction_val;
