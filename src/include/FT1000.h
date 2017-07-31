@@ -25,25 +25,66 @@
 
 
 class RIG_FT1000 : public rigbase {
-public :
+private:
+
+	int afreq, amode, aBW;
+	int bfreq, bmode, bBW;
+
+bool notch_on;
+//int  m_60m_indx;
+
+public:
 	RIG_FT1000();
-	~RIG_FT1000() {};
+	~RIG_FT1000(){};
+
+	void initialize();
+// 	void post_initialize();
+
+	void selectA();
+	void selectB();
+
+	bool get_info();
+
 	long get_vfoA();
-	void set_vfoA(long);
-	void set_PTT_control(int val);
-	void set_modeA(int val);
 	int  get_modeA();
-	int  get_modetype(int n);
-	void set_bwA(int val);
 	int  get_bwA();
-	int  get_power_out(void);
-	int  get_smeter(void);
+	void set_vfoA(long);
+	void set_modeA(int val);
+	void set_bwA(int val);
+
+	bool canswap() {return true;}
+	void swapvfos();
+// 	void A2B();
+
+	bool can_split() { return true;}
+	void set_split(bool val);
+	int  get_split();
+
+	long get_vfoB();
+	int  get_modeB();
+	int  get_bwB();
+	void set_vfoB(long);
+	void set_modeB(int val);
+	void set_bwB(int val);
+
+	void set_PTT_control(int val);
 	void tune_rig();
+	int  get_smeter();
+	int  get_power_out();
 
 	int  adjust_bandwidth(int);
 
+	bool twovfos() {return true;}
+
+// 	void set_band_selection(int v);
+
+
 private:
+
 	void init_cmd();
+
+
 };
+
 
 #endif

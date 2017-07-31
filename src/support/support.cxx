@@ -1440,12 +1440,15 @@ void CATswapAB() // called by UI action; do not need Fl::awake(...)
 		btnB->redraw();
 
 	} else {
+		selrig->selectB();
 
 		vfoB.freq = selrig->get_vfoB();
 		vfoB.imode = selrig->get_modeB();
 		vfoB.iBW = selrig->get_bwB();
 		FreqDispB->value(vfoB.freq);
 		FreqDispB->redraw();
+
+		selrig->selectA();
 
 		vfoA.freq = selrig->get_vfoA();
 		vfoA.imode = selrig->get_modeA();
