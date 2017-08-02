@@ -1,0 +1,382 @@
+#!/usr/bin/perl
+
+# ----------------------------------------------------------------------------
+#      flrig-shell version 0.10
+#      A Perl script to control flrig over HTTP/XML-RPC.
+#
+#      flrig must have been built with xml-rpc support; see INSTALL.
+#
+# Copyright (C) 2015
+#              Dave Freese, W1HKJ
+#
+# flrig-shell is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# flrig-shell is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# ----------------------------------------------------------------------------
+
+use strict;
+use warnings;
+
+use RPC::XML qw(:types);
+use RPC::XML::Client;
+use Term::ReadLine;
+use POSIX qw(:termios_h);
+use IO::Handle;
+use Getopt::Std;
+use Data::Dumper;
+use Time::HiRes qw(gettimeofday tv_interval usleep);
+use LWP;
+
+################################################################################
+
+our $VERSION = "0.10";
+our $progname = (split(/\//, $0))[-1];
+our $histfile = $ENV{'HOME'} . "/.flrig/shell-history";
+
+our $client;
+our $ua;
+
+our $term;
+our $OUT = \*STDOUT;
+our $debug = 1;
+
+our %methods;
+our %commands;
+our %encoders;
+
+our %opts;
+
+################################################################################
+# terminal routines from perlfaq8
+
+our ($termios, $oterm, $echo, $noecho, $fd_stdin);
+
+sub term_get_attr
+{
+	$fd_stdin = fileno(STDIN);
+
+	$termios = POSIX::Termios->new();
+	$termios->getattr($fd_stdin);
+	$oterm = $termios->getlflag();
+
+	$echo = ECHO | ECHOK | ICANON;
+	$noecho = $oterm & ~$echo;
+}
+
+sub term_cbreak
+{
+	$termios->setlflag($noecho);
+	$termios->setcc(VTIME, 1);
+	$termios->setattr($fd_stdin, TCSANOW);
+}
+
+sub term_cooked
+{
+	$termios->setlflag($oterm);
+	$termios->setcc(VTIME, 0);
+	$termios->setattr($fd_stdin, TCSANOW);
+}
+
+sub term_getc
+{
+	my $key = '';
+	term_cbreak();
+	sysread(STDIN, $key, 1);
+	term_cooked();
+	return $key;
+}
+
+################################################################################
+# xml-rpc helper routines
+
+sub encode
+{
+	my $aref = $_[0];
+	return unless (exists( $methods{$aref->[0]} ));
+
+	my $sig = $methods{$aref->[0]}->[0]; $sig =~ s/.+://;
+	my @args = split(//, $sig);
+
+	# Try to find an encoder for each format string char.
+	# Use it to encode the corresponding method argument.
+	for (my $i = 0; $i <= $#args; $i++) {
+	if (exists($encoders{$args[$i]}) && exists($aref->[$i])) {
+		print "Encoding arg " . ($i+1) . " as $args[$i]\n" if ($debug);
+		$aref->[$i+1] = &{ $encoders{$args[$i]} }($aref->[$i+1]);
+	}
+	}
+}
+
+sub req
+{
+	encode(\@_);
+	my $r = $client->send_request(@_);
+	if (!ref($r)) {
+	print $OUT "Error: " . $r . "\n" unless ($r =~ /Unknown tag.+nil$/);
+	$r = undef;
+	}
+	elsif ($r->is_fault()) {
+	print $OUT "Error " . $r->value->{"faultCode"} . ": " .
+			   $r->value->{"faultString"} . "\n";
+	$r = undef;
+	}
+
+	return $r;
+}
+
+sub decode
+{
+	my $r;
+	return "" unless defined($r = req(@_));
+	return ref($r->value) ? Dumper($r->value) : $r->value;
+}
+
+sub execute($)
+{
+	my @line = split(/\s+/, $_[0]);
+	my $ret;
+
+	if (exists( $commands{$line[0]} )) {
+		my $cmd = shift(@line);
+		&{ $commands{$cmd}->[2] }(@line);
+	}
+	elsif (exists( $methods{$line[0]} )) {
+		# should we resplit the line?
+		my $sig = $methods{$line[0]}->[0]; $sig =~ s/.+://; $sig =~ s/n//;
+		print "Method " . $line[0] . " takes " . length($sig) . " args\n" if ($debug);
+		if (length($sig) != $#line) {
+			@line = split(/ +/, $_[0], length($sig) + 1);
+		}
+		print Dumper(\@line) if ($debug);
+		my $r = decode(@line);
+		if (defined $r) { print $OUT $r, "\n"};
+	}
+	else {
+		print $OUT $line[0] . ": command not found. Do you need ``help''?\n";
+	}
+}
+
+################################################################################
+# command routines
+
+sub help
+{
+	my @k = (@_ ? @_ : (sort keys %methods, sort keys %commands));
+
+	if (%methods) {
+		print $OUT "Server methods:", "\n" if (!@_);
+		foreach (@k) {
+			next unless (exists($methods{$_}));
+			printf($OUT "  %-32s%-8s%s\n", $_, $methods{$_}->[0], $methods{$_}->[1]);
+		}
+		print $OUT "\n" if (!@_);
+	}
+	print $OUT "Shell commands:", "\n" if (!@_);
+	foreach (@k) {
+		next unless (exists($commands{$_}));
+		printf("  %-32s%-8s%s\n", $_, $commands{$_}->[0], $commands{$_}->[1]);
+	}
+}
+
+sub print_history
+{
+	my $out = $_[0];
+
+	my @h = $term->GetHistory();
+	splice(@h, 0, $_[1]) if ($_[1] > 0);
+	print $out join("\n", @h), "\n" if (@h);
+}
+
+sub time_cmd
+{
+	my $t0 = [gettimeofday()];
+	execute("@_");
+	print tv_interval($t0), " seconds\n";
+}
+
+sub evaluate(@)
+{
+	warn "$@" unless (defined(eval "@_"));
+}
+
+sub source
+{
+	open(IN, '<', $_[0]) or warn "Could not read input file: $!\n" and return;
+	evaluate(<IN>);
+	close(IN);
+}
+
+
+################################################################################
+
+%opts = ( "c" => "", "d" => 0, "u" => "http://localhost:12345/RPC2" );
+
+%commands = (
+	"debug"     => [ "n:n", "Toggle debugging output", sub { $debug = (@_ ? $_[0] : !$debug); } ],
+	"eval"      => [ "s:s", "Evaluate Perl code", sub { evaluate "@_"; } ],
+	"exit"      => [ "n:n", "Exit the shell", sub { exit(0) } ],
+	"help"      => [ "n:n", "Print this command help", \&help ],
+	"history"   => [ "s:n", "Print command history", sub { print_history($OUT, 0); } ],
+	"reinit"    => [ "n:n", "Rebuild command list", sub { build_cmds(); setup_compl(); } ],
+);
+
+%encoders = ( "b" => \&RPC_BOOLEAN, "6" => \&RPC_BASE64,
+		  "d" => \&RPC_DOUBLE, "s" => \&RPC_STRING );
+
+################################################################################
+
+
+sub HELP_MESSAGE
+{
+print <<EOF
+
+Usage: $progname [-OPTIONS [-MORE_OPTIONS]] [--] [FILE ...]
+
+The following single-character options are accepted:
+
+		-c CMD  Execute command CMD and exit.
+
+		-d      Enable debugging output.
+
+		-u URL  Use URL to access the server.
+				The default is $opts{"u"}
+
+Files are evaluated as Perl code and may contain
+execute("COMMAND [ARG ...]") statements, where COMMAND
+is an flrig-shell command.
+
+Options may be merged together.  -- stops processing of options.
+Space is not required between options and their arguments.
+EOF
+;
+}
+
+sub handle_cmdline
+{
+	$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+	my $optstr = 'c:du:';
+	my $old_warn_handler = $SIG{__WARN__};
+	$SIG{__WARN__} = sub { die $_[0]; };
+	getopts($optstr, \%opts);
+	$SIG{__WARN__} = $old_warn_handler;
+
+	my @argopts;
+	my $last = 0;
+	foreach (split(//, $optstr)) {
+	push(@argopts, $last) if ($_ eq ":");
+	$last = $_;
+	}
+	foreach (@argopts) {
+	if (exists($opts{$_}) && !defined($opts{$_})) {
+		die "$0: option `-$_' requires an argument\n";
+		exit(1);
+	}
+	}
+
+	$debug = $opts{"d"};
+}
+
+################################################################################
+
+sub build_cmds
+{
+	%methods = ();
+
+# this uses system.listMethods to get all methods with a single request
+	if (defined(my $r = req("rig.list_methods"))) {
+	foreach (@{$r->value}) {
+	    $methods{ $_->{"name"} } = [ $_->{"signature"}, $_->{"help"} ];
+#	    $methods{ $_->{"name"} } = [ "i:s", "return a string" ];
+#		$methods{ $_ } = [ "i:s", "return a string" ];
+	}
+
+$methods{"system.listMethods"} = [ "i:n", "XML-RPC methods on this server." ];
+# $methods{"system.methodHelp"} = [ "i:s", "Given the name of a method, return a help string." ];
+	# $methods{"system.methodSignature"} = [ "A:s", "Given the name of a method, return an array of legal signatures." ];
+	# $methods{"system.multicall"} = [ "i:n", "Process an array of calls, and return an array of results." ];
+	# $methods{"system.shutdown"} = [ "i:i", "Shut down the server.  Return code is always zero." ];
+	}
+}
+
+sub setup_compl
+{
+# Use the hashes to set up simple completion for rpc methods and shell commands
+	if ($term->ReadLine eq "Term::ReadLine::Gnu") {
+	my $attribs = $term->Attribs();
+	$attribs->{"completion_entry_function"} = $attribs->{"list_completion_function"};
+	$attribs->{"completion_word"} = [keys %methods, keys %commands];
+	} elsif ($term->ReadLine eq "Term::ReadLine::Perl") {
+	readline::rl_basic_commands(keys %methods, keys %commands);
+	}
+}
+
+sub load_history
+{
+	open(HIST, '<', $histfile) or return 0;
+	while (<HIST>) {
+	chomp;
+	$term->addhistory($_);
+	}
+	my $r = $.;
+	close(HIST);
+	return $r;
+}
+
+sub save_history
+{
+	open(HIST, '>>', $histfile) or return;
+	print_history(\*HIST, $_[0]);
+	close(HIST);
+}
+
+################################################################################
+################################################################################
+
+# parse cmd line
+handle_cmdline();
+
+# create client
+$client = RPC::XML::Client->new($opts{"u"});
+
+# save terminal attributes; used by getc routine
+term_get_attr();
+
+# initialise termline
+$term = new Term::ReadLine "flrig-shell";
+#$OUT = $term->OUT || \*STDOUT;
+STDOUT->autoflush(1);
+my $histskip = load_history();
+
+# build commands hashes
+build_cmds();
+help();
+
+if ($opts{'c'} ne "") { # execute argument and exit
+	execute($opts{'c'});
+	exit(0);
+}
+elsif (@ARGV) {
+	source($_) foreach(@ARGV);
+	exit(0);
+}
+
+setup_compl();
+
+# ignore interrupts
+$SIG{INT} = 'IGNORE';
+
+# execute commands
+while (defined($_ = $term->readline("flrig % "))) {
+	execute($_) if (/\w/);
+}
+save_history($histskip);
