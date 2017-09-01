@@ -164,7 +164,26 @@ status progStatus = {
 	4,			// int pwr_scale ==> Autoselect
 
 //ft950 reversed RF gain values
-    false,      // bool ft950_rg_reverse
+	false,		// bool ft950_rg_reverse
+
+	false,		// bool	restore_frequency;
+	false,		// bool	restore_mode;
+	false,		// bool	restore_bandwidth;
+	false,		// bool	restore_volume;
+	false,		// bool	restore_mic_gain;
+	false,		// bool	restore_rf_gain;
+	false,		// bool	restore_power_control;
+	false,		// bool	restore_if_shift;
+	false,		// bool	restore_notch;
+	false,		// bool	restore_auto_notch;
+	false,		// bool	restore_noise;
+	false,		// bool	restore_squelch;
+	false,		// bool	restore_split;
+	false,		// bool	restore_pre_att;
+	false,		// bool	restore_nr;
+	false,		// bool	restore_comp_on_off;
+	false,		// bool	restore_comp_level;
+
 //tt550 controls
 	80,			// tt550_line_out;
 	1,			// tt550_agc_level;
@@ -397,6 +416,24 @@ void status::saveLastState()
 
 	spref.set("use_rig_data", use_rig_data);
 	spref.set("restore_rig_data", restore_rig_data);
+
+	spref.set("restore_frequency", restore_frequency);
+	spref.set("restore_mode", restore_mode);
+	spref.set("restore_bandwidth", restore_bandwidth);
+	spref.set("restore_volume", restore_volume);
+	spref.set("restore_mic_gain", restore_mic_gain);
+	spref.set("restore_rf_gain", restore_rf_gain);
+	spref.set("restore_power_control", restore_power_control);
+	spref.set("restore_if_shift", restore_if_shift);
+	spref.set("restore_notch", restore_notch);
+	spref.set("restore_auto_notch", restore_auto_notch);
+	spref.set("restore_noise", restore_noise);
+	spref.set("restore_squelch", restore_squelch);
+	spref.set("restore_split", restore_split);
+	spref.set("restore_pre_att", restore_pre_att);
+	spref.set("restore_nr", restore_nr);
+	spref.set("restore_comp_on_off", restore_comp_on_off);
+	spref.set("restore_comp_level", restore_comp_level);
 
 	spref.set("bool_spkr_on", spkr_on);
 	spref.set("int_volume", volume);
@@ -697,6 +734,24 @@ bool status::loadXcvrState(string xcvr)
 
 		if (spref.get("use_rig_data", i, i)) use_rig_data = i;
 		if (spref.get("restore_rig_data", i, i)) restore_rig_data = i;
+
+		if (spref.get("restore_frequency", i, i)) restore_frequency = i;
+		if (spref.get("restore_mode", i, i)) restore_mode = i;
+		if (spref.get("restore_bandwidth", i, i)) restore_bandwidth = i;
+		if (spref.get("restore_volume", i, i)) restore_volume = i;
+		if (spref.get("restore_mic_gain", i, i)) restore_mic_gain = i;
+		if (spref.get("restore_rf_gain", i, i)) restore_rf_gain = i;
+		if (spref.get("restore_power_control", i, i)) restore_power_control = i;
+		if (spref.get("restore_if_shift", i, i)) restore_if_shift = i;
+		if (spref.get("restore_notch", i, i)) restore_notch = i;
+		if (spref.get("restore_auto_notch", i, i)) restore_auto_notch = i;
+		if (spref.get("restore_noise", i, i)) restore_noise = i;
+		if (spref.get("restore_squelch", i, i)) restore_squelch = i;
+		if (spref.get("restore_split", i, i)) restore_split = i;
+		if (spref.get("restore_pre_att", i, i)) restore_pre_att = i;
+		if (spref.get("restore_nr", i, i)) restore_nr = i;
+		if (spref.get("restore_comp_on_off", i, i)) restore_comp_on_off = i;
+		if (spref.get("restore_comp_level", i, i)) restore_comp_level = i;
 
 		if (spref.get("bool_spkr_on", i, i)) spkr_on = i;
 		spref.get("int_volume", volume, volume);
@@ -1046,8 +1101,8 @@ void status::UI_laststate()
 	if (spnrMICGAIN)		spnrMICGAIN->color(bg_slider);
 	if (spnrMICGAIN)		spnrMICGAIN->selection_color(btn_slider);
 
-	if (restore_rig_data) mnuRestoreData->set();
-	else mnuRestoreData->clear();
+//	if (restore_rig_data) mnuRestoreData->set();
+//	else mnuRestoreData->clear();
 
 	btnUser1->label(label1.c_str()); btnUser1->redraw_label();
 	btnUser2->label(label2.c_str()); btnUser2->redraw_label();

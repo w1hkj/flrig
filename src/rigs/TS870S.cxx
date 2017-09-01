@@ -535,25 +535,34 @@ void RIG_TS870S::tune_rig()
 //----------------------------------------------------------------------
 // the TS-870 actually has 4 attenuator settings.
 // RA00; = Off,  RA01; = 6dB,  RA02; = 12dB,  RA03; = 18dB      wbx
-void RIG_TS870S::set_attenuator(int val) {
 
-	if (att_level == 0) {			// If attenuator level = 0 (off)
-		att_level = 1;				// then turn it on, at 6dB
+int  RIG_TS870S::next_attenuator()
+{
+	switch (atten_level) {
+		case 0: return 1;
+		case 1: return 2;
+		case 2: return 3;
+		case 3: return 0;
+	}
+	return 0;
+}
+
+void RIG_TS870S::set_attenuator(int val)
+{
+	atten_level = val;
+	if (atten_level == 1) {			// If attenuator level = 0 (off)
 		cmd = "RA01;";				// this is the command...
 		atten_label("Att 6", true);	// show it in the button...
 	}
-	else if (att_level == 1) {		// If attenuator level = 1 (6dB)
-		att_level = 2;				// then make it 12dB
+	else if (atten_level == 2) {
 		cmd = "RA02;";
 		atten_label("Att 12", true);
 	}
-	else if (att_level == 2) {		// if it's 12dB
-		att_level = 3;				// go to 18dB
+	else if (atten_level == 3) {
 		cmd = "RA03;";
 		atten_label("Att 18", true);
 	}
-	else if (att_level == 3) {		// If it's 18dB
-		att_level = 0;				// Loop back to none.
+	else if (atten_level == 0) {
 		cmd = "RA00;";
 		atten_label("Att", false);
 	}
@@ -573,22 +582,22 @@ int RIG_TS870S::get_attenuator() {
 
 	if (replystr[p + 2] == '0' && replystr[p + 3] == '0') {
 		att_on = 0;						// Attenuator is OFF
-		att_level = 0;					// remember it...
+		atten_level = 0;					// remember it...
 		atten_label("Att", false);		// show it...
 	}
 	else if (replystr[p + 2] == '0' && replystr[p + 3] == '1') {
 		att_on = 1;						// Attenuator is ON, 6dB
-		att_level = 1;					// remember the level
+		atten_level = 1;					// remember the level
 		atten_label("Att 6", true);		// show it...
 	}
 	else if (replystr[p + 2] == '0' && replystr[p + 3] == '2') {
 		att_on = 1;						// .. still ON, 12dB
-		att_level = 2;					// remember this level
+		atten_level = 2;					// remember this level
 		atten_label("Att 12", true);	// show it.
 	}
 	else if (replystr[p + 2] == '0' && replystr[p + 3] == '3') {
 		att_on = 1;						// .. still ON 18dB
-		att_level = 3;					// remember...
+		atten_level = 3;					// remember...
 		atten_label("Att 18", true);	// show this too..
 	}
 

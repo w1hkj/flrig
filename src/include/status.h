@@ -157,6 +157,24 @@ struct status {
 
 	bool	ft950_rg_reverse;
 
+	bool	restore_frequency;
+	bool	restore_mode;
+	bool	restore_bandwidth;
+	bool	restore_volume;
+	bool	restore_mic_gain;
+	bool	restore_rf_gain;
+	bool	restore_power_control;
+	bool	restore_if_shift;
+	bool	restore_notch;
+	bool	restore_auto_notch;
+	bool	restore_noise;
+	bool	restore_squelch;
+	bool	restore_split;
+	bool	restore_pre_att;
+	bool	restore_nr;
+	bool	restore_comp_on_off;
+	bool	restore_comp_level;
+
 //============= transceiver specific prameters
 //tt550 controls
 	int		tt550_line_out;

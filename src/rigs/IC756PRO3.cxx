@@ -754,23 +754,31 @@ void RIG_IC756PRO3::get_notch_min_max_step(int &min, int &max, int &step)
 	step = 20;
 }
 
+int  RIG_IC756PRO3::next_attenuator()
+{
+	switch (atten_level) {
+		case 0: return 1;
+		case 1: return 2;
+		case 2: return 3;
+		case 3: return 0;
+	}
+	return 0;
+}
+
 void RIG_IC756PRO3::set_attenuator(int val)
 {
+	atten_level = val;
 	int cmdval = 0;
-	if (atten_level == 0) {
-		atten_level = 1;
+	if (atten_level == 1) {
 		atten_label("6 dB", true);
 		cmdval = 0x06;
-	} else if (atten_level == 1) {
-		atten_level = 2;
+	} else if (atten_level == 2) {
 		atten_label("12 dB", true);
 		cmdval = 0x12;
-	} else if (atten_level == 2) {
-		atten_level = 3;
+	} else if (atten_level == 3) {
 		atten_label("18 dB", true);
 		cmdval = 0x18;
-	} else if (atten_level == 3) {
-		atten_level = 0;
+	} else if (atten_level == 0) {
 		atten_label("Att", false);
 		cmdval = 0x00;
 	}
@@ -810,16 +818,24 @@ int RIG_IC756PRO3::get_attenuator()
 	return atten_level;
 }
 
+int  RIG_IC756PRO3::next_preamp()
+{
+	switch (preamp_level) {
+		case 0: return 1;
+		case 1: return 2;
+		case 2: return 0;
+	}
+	return 0;
+}
+
 void RIG_IC756PRO3::set_preamp(int val)
 {
-	if (preamp_level == 0) {
-		preamp_level = 1;
+	preamp_level = val;
+	if (preamp_level == 1) {
 		preamp_label("Pre 1", true);
-	} else if (preamp_level == 1) {
-		preamp_level = 2;
-		preamp_label("Pre 2", true);
 	} else if (preamp_level == 2) {
-		preamp_level = 0;
+		preamp_label("Pre 2", true);
+	} else if (preamp_level == 0) {
 		preamp_label("Pre", false);
 	}
 	cmd = pre_to;

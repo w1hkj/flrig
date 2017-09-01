@@ -388,7 +388,7 @@ int RIG_IC7300::get_modeB()
 	size_t p;
 
 	cmd.assign(pre_to).append("\x26");
-	cmd += '\x01';
+	cmd += '\x00';
 	cmd.append(post);
 
 	string resp;
@@ -987,24 +987,40 @@ void RIG_IC7300::tune_rig()
 	waitFB("tune rig");
 }
 
+int RIG_IC7300::next_preamp()
+{
+	if (atten_level == 1)
+		return preamp_level;
+	switch (preamp_level) {
+		case 0: return 1;
+		case 1: return 2;
+		case 2: return 0;
+	}
+	return 0;
+}
+
 void RIG_IC7300::set_preamp(int val)
 {
-	if (val)
-		set_attenuator(0);
+	if (val) {
+		atten_level = 0;
+		atten_label("ATT", false);
+	}
 
 	cmd = pre_to;
 	cmd += '\x16';
 	cmd += '\x02';
 
-	if (preamp_level == 0) {
-		preamp_level = 1;
-		preamp_label("Amp 1", true);
-	} else if (preamp_level == 1) {
-		preamp_level = 2;
-		preamp_label("Amp 2", true);
-	} else if (preamp_level == 2) {
-		preamp_level = 0;
-		preamp_label("OFF", false);
+	preamp_level = val;
+	switch (val) {
+		case 1: 
+			preamp_label("Amp 1", true);
+			break;
+		case 2:
+			preamp_label("Amp 2", true);
+			break;
+		case 0:
+		default:
+			preamp_label("PRE", false);
 	}
 
 	cmd += (unsigned char)preamp_level;
@@ -1031,7 +1047,7 @@ int RIG_IC7300::get_preamp()
 			} else if (preamp_level == 2) {
 				preamp_label("Amp 2", true);
 			} else {
-				preamp_label("OFF", false);
+				preamp_label("PRE", false);
 				preamp_level = 0;
 			}
 	}
@@ -1042,15 +1058,24 @@ void RIG_IC7300::set_attenuator(int val)
 {
 	if (val) {
 		atten_label("20 dB", true);
-		set_preamp(0);
-	} else
+		atten_level = 1;
+		preamp_label("PRE", false);
+	} else {
+		atten_level = 0;
 		atten_label("ATT", false);
+	}
 
 	cmd = pre_to;
 	cmd += '\x11';
-	cmd += val ? '\x20' : '\x00';
+	cmd += atten_level ? '\x20' : '\x00';
 	cmd.append( post );
 	waitFB("set att");
+}
+
+int RIG_IC7300::next_attenuator()
+{
+	if (atten_level) return 0;
+	return 1;
 }
 
 int RIG_IC7300::get_attenuator()
@@ -1063,12 +1088,14 @@ int RIG_IC7300::get_attenuator()
 	if (waitFOR(7, "get ATT")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			if (!replystr[p+5]) {
-				atten_label("ATT", false);
-				return 0;
-			} else {
+			if (replystr[p+5] == 0x20) {
 				atten_label("20 dB", true);
+				atten_level = 1;
 				return 1;
+			} else {
+				atten_label("ATT", false);
+				atten_level = 0;
+				return 0;
 			}
 		}
 	}

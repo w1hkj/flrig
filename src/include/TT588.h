@@ -31,7 +31,6 @@ private:
 	double refv;
 	double VfoAdj;
 	int    vfo_corr;
-	int    atten_level;
 	int    an_;
 	int    nb_;
 
@@ -64,8 +63,11 @@ public:
 
 	void set_volume_control(int val);
 	int  get_volume_control();
+
+	int  next_attenuator();
 	void set_attenuator(int val);
 	int  get_attenuator();
+
 	void set_rf_gain(int val);
 	int  get_rf_gain();
 	void set_if_shift(int val);

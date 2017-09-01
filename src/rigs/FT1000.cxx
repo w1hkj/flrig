@@ -112,7 +112,7 @@ bool RIG_FT1000::get_info()
 	int md = 0;
 	int i = 0;
 
-	bool memmode = false;
+//	bool memmode = false;
 	init_cmd();
 	cmd[3] = 0x00;
 	cmd[4] = 0xFA;
@@ -120,11 +120,11 @@ bool RIG_FT1000::get_info()
 
 	if (ret >= 5) {
 		size_t p = ret - 5;
-		memmode = ((replystr[p+1] & 0x10) == 0x10); // Memory Tune Activated
+//		memmode = ((replystr[p+1] & 0x10) == 0x10); // Memory Tune Activated
 		split = ((replystr[p] & 0x01) == 0x01); // SPLIT is ON or OFF receive operation
 	}
 
-init_cmd();
+	init_cmd();
 	cmd[3] = 0x03;  // read 32 bytes of data for status of both vfos
 	cmd[4] = 0x10;
 	ret = waitN(32, 100, "get info", ASC);
@@ -157,13 +157,13 @@ init_cmd();
 		A.iBW = 5*((d[8] & 0x70) >> 4) + (d[8] & 0x07);
 
 		if (A.iBW > 4) A.iBW = 4;
-		if (A.imode == 2 & A.iBW == 2) { A.imode = 3; }
+		if ((A.imode == 2) && (A.iBW == 2)) { A.imode = 3; }
 
-		if (A.imode == 4 & A.iBW == 4) {A.imode = 5; A.iBW  = 0; }
-		if (A.imode == 4 & A.iBW == 0) {A.imode = 4; A.iBW = 4; }
+		if ((A.imode == 4) && (A.iBW == 4)) {A.imode = 5; A.iBW  = 0; }
+		if ((A.imode == 4) && (A.iBW == 0)) {A.imode = 4; A.iBW = 4; }
 
-	    if (A.imode == 6 & A.iBW == 0) {A.iBW  = 4; }
-	    if (A.imode == 11 & A.iBW == 0) {A.iBW  = 4; }
+	    if ((A.imode == 6) && (A.iBW == 0)) {A.iBW  = 4; }
+	    if ((A.imode == 11) && (A.iBW == 0)) {A.iBW  = 4; }
 
 		d += 16; // vfo B data string
 		B.freq = ((((d[1]<<8) + d[2])<<8) + d[3]) *10;
@@ -186,13 +186,11 @@ init_cmd();
 
 		if (B.iBW > 4) B.iBW = 4;
 		if (B.iBW > 4) B.iBW = 4;
-		if (B.imode == 2 & B.iBW == 2) { B.imode = 3; }
-
-		if (B.imode == 4 & B.iBW == 4) {B.imode = 5; B.iBW  = 0; }
-		if (B.imode == 4 & B.iBW == 0) {B.imode = 4; B.iBW = 4; }
-
-	    if (B.imode == 6 & B.iBW == 0) { B.iBW  = 4; }
-	    if (B.imode == 11 & B.iBW == 0) { B.iBW  = 4; }
+		if ((B.imode == 2) && (B.iBW == 2)) { B.imode = 3; }
+		if ((B.imode == 4) && (B.iBW == 4)) {B.imode = 5; B.iBW  = 0; }
+		if ((B.imode == 4) && (B.iBW == 0)) {B.imode = 4; B.iBW = 4; }
+		if ((B.imode == 6) && (B.iBW == 0)) { B.iBW  = 4; }
+		if ((B.imode == 11) && (B.iBW == 0)) { B.iBW  = 4; }
 
 		return true;
 	}

@@ -96,8 +96,11 @@ Fl_Button *btn_send_command = (Fl_Button *)0;
 Fl_Output *txt_response = (Fl_Output *)0;
 Fl_Box *box_xcvr_connect = (Fl_Box *)0;
 Fl_Box *box_fldigi_connect = (Fl_Box *)0;
-Fl_Button *btnCancelCommConfig = (Fl_Button *)0;
-Fl_Return_Button *btnOkXcvrDialog = (Fl_Return_Button *)0;
+
+Fl_Button *btnOkXcvrDialog = (Fl_Button *)0;
+Fl_Button *btnCloseCommConfig = (Fl_Button *)0;
+Fl_Button *btnOkSepSerial = (Fl_Button *)0;
+Fl_Button *btnOkAuxSerial = (Fl_Button *)0;
 
 Fl_Group *tabXMLRPC = (Fl_Group *)0;
 Fl_Input *server_addr = (Fl_Input *)0;
@@ -125,6 +128,27 @@ Fl_Input2 * cmdtext7 = (Fl_Input2 *)0;
 Fl_Input2 * cmdtext8 = (Fl_Input2 *)0;
 Fl_Output * cmdResponse = (Fl_Output *)0;
 
+Fl_Group *tabRestore = (Fl_Group *)0;
+Fl_Check_Button *btnRestoreFrequency	= (Fl_Check_Button *)0;
+Fl_Check_Button *btnRestoreMode			= (Fl_Check_Button *)0;
+Fl_Check_Button *btnRestoreBandwidth	= (Fl_Check_Button *)0;
+Fl_Check_Button *btnRestoreVolume		= (Fl_Check_Button *)0;
+Fl_Check_Button *btnRestoreMicGain		= (Fl_Check_Button *)0;
+Fl_Check_Button *btnRestoreRfGain		= (Fl_Check_Button *)0;
+Fl_Check_Button *btnRestorePowerControl	= (Fl_Check_Button *)0;
+Fl_Check_Button *btnRestoreIFshift		= (Fl_Check_Button *)0;
+Fl_Check_Button *btnRestoreNotch		= (Fl_Check_Button *)0;
+Fl_Check_Button *btnRestoreAutoNotch	= (Fl_Check_Button *)0;
+Fl_Check_Button *btnRestoreSquelch		= (Fl_Check_Button *)0;
+Fl_Check_Button *btnRestoreSplit		= (Fl_Check_Button *)0;
+Fl_Check_Button *btnRestorePreAtt		= (Fl_Check_Button *)0;
+Fl_Check_Button *btnRestoreNoise		= (Fl_Check_Button *)0;
+Fl_Check_Button *btnRestoreNR			= (Fl_Check_Button *)0;
+Fl_Check_Button *btnRestoreCompOnOff	= (Fl_Check_Button *)0;
+Fl_Check_Button *btnRestoreCompLevel	= (Fl_Check_Button *)0;
+Fl_Check_Button *btnUseRigData			= (Fl_Check_Button *)0;
+
+
 static void cb_xmlrpc_server(Fl_Check_Button *w, void *)
 {
 	progStatus.fldigi_is_server = btn_xmlrpc_server->value();
@@ -132,7 +156,7 @@ static void cb_xmlrpc_server(Fl_Check_Button *w, void *)
 
 static void cb_selectRig(Fl_ComboBox*, void*) {
 	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw();
+	btnOkXcvrDialog->redraw_label();
 	initConfigDialog();
 }
 
@@ -158,12 +182,12 @@ static void cb_byte_interval(Fl_Counter* o, void*) {
 
 static void cb_selectCommPort(Fl_ComboBox*, void*) {
 	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw();
+	btnOkXcvrDialog->redraw_label();
 }
 
 static void cb_mnuBaudrate(Fl_ComboBox*, void*) {
 	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw();
+	btnOkXcvrDialog->redraw_label();
 }
 
 static void cb_btnTwoStopBit(Fl_Check_Button* o, void*) {
@@ -173,7 +197,7 @@ static void cb_btnTwoStopBit(Fl_Check_Button* o, void*) {
 	} else
 		o->value(true);
 	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw();
+	btnOkXcvrDialog->redraw_label();
 }
 
 static void cb_btnOneStopBit(Fl_Check_Button* o, void*) {
@@ -183,12 +207,12 @@ static void cb_btnOneStopBit(Fl_Check_Button* o, void*) {
 	} else
 		o->value(true);
 	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw();
+	btnOkXcvrDialog->redraw_label();
 }
 
 static void cb_btnRigCatEcho(Fl_Check_Button*, void*) {
 	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw();
+	btnOkXcvrDialog->redraw_label();
 }
 
 static void cb_server_addr(Fl_Input* o, void*) {
@@ -240,36 +264,36 @@ static void cb_btncatptt(Fl_Round_Button* o, void*) {
 		btndtrptt->value(0);
 	}
 	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw();
+	btnOkXcvrDialog->redraw_label();
 }
 
 static void cb_btnrtsptt(Fl_Round_Button* o, void*) {
 	if (o->value() == 1)
 		btncatptt->value(0);
 	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw();
+	btnOkXcvrDialog->redraw_label();
 }
 
 static void cb_btndtrptt(Fl_Round_Button* o, void*) {
 	if (o->value() == 1)
 		btncatptt->value(0);
 	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw();
+	btnOkXcvrDialog->redraw_label();
 }
 
 static void cb_chkrtscts(Fl_Check_Button*, void*) {
 	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw();
+	btnOkXcvrDialog->redraw_label();
 }
 
 static void cb_btnrtsplus(Fl_Check_Button*, void*) {
 	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw();
+	btnOkXcvrDialog->redraw_label();
 }
 
 static void cb_btndtrplus(Fl_Check_Button*, void*) {
 	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw();
+	btnOkXcvrDialog->redraw_label();
 }
 
 static void cb_txtCIV(Fl_Int_Input* o, void*) {
@@ -286,43 +310,43 @@ static void cb_btnUSBaudio(Fl_Check_Button*, void*) {
 }
 
 static void cb_selectSepPTTPort(Fl_ComboBox*, void*) {
-	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw();
+	btnOkSepSerial->labelcolor(FL_RED);
+	btnOkSepSerial->redraw_label();
 }
 
 static void cb_btnSepRTSptt(Fl_Check_Button* o, void*) {
-	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw();
+	btnOkSepSerial->labelcolor(FL_RED);
+	btnOkSepSerial->redraw_label();
 }
 
 static void cb_btnSepRTSplus(Fl_Check_Button*, void*) {
-	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw();
+	btnOkSepSerial->labelcolor(FL_RED);
+	btnOkSepSerial->redraw_label();
 }
 
 static void cb_btnSepDTRptt(Fl_Check_Button* o, void*) {
-	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw();
+	btnOkSepSerial->labelcolor(FL_RED);
+	btnOkSepSerial->redraw_label();
 }
 
 static void cb_btnSepDTRplus(Fl_Check_Button*, void*) {
-	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw();
+	btnOkSepSerial->labelcolor(FL_RED);
+	btnOkSepSerial->redraw_label();
 }
 
 static void cb_btnSep_SCU_17(Fl_Check_Button*, void*) {
-	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw();
+	btnOkSepSerial->labelcolor(FL_RED);
+	btnOkSepSerial->redraw_label();
 }
 
 static void cb_selectAuxPort(Fl_ComboBox*, void*) {
-	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw();
+	btnOkAuxSerial->labelcolor(FL_RED);
+	btnOkAuxSerial->redraw_label();
 }
 
 static void cb_btnAux_SCU_17(Fl_Check_Button*, void*) {
-	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw();
+	btnOkAuxSerial->labelcolor(FL_RED);
+	btnOkAuxSerial->redraw_label();
 }
 
 static void cb_poll_smeter(Fl_Value_Input* o, void*) {
@@ -467,10 +491,6 @@ static void cb_btn_send_command(Fl_Button *o, void*) {
 	cb_send_command(txt_command->value(), txt_response);
 }
 
-static void cb_btnCancelCommConfig(Fl_Button*, void*) {
-	cbCancelXcvrDialog();
-}
-
 static void cb_cmdlbl(Fl_Input2 *o, void *d) {
 	long val = reinterpret_cast<long>(d);
 	switch (val) {
@@ -548,14 +568,169 @@ static void cb_cmdtext(Fl_Input2 *o, void *d) {
 }
 
 static void cb_btnOkXcvrDialog(Fl_Return_Button*, void*) {
-	cbOkXcvrDialog();
+	string p1 = selectCommPort->value();
+	string p2 = selectAuxPort->value();
+	string p3 = selectSepPTTPort->value();
+
+	if ( (p1.compare("NONE") != 0) && (p1 == p2 || p1 == p3) ) {
+		fl_message("Select separate ports");
+		return;
+	}
+
+	if (progStatus.UIsize == wide_ui) {
+		btn_show_controls->label("@-22->");
+		btn_show_controls->redraw_label();
+		grpTABS->hide();
+		mainwindow->resizable(grpTABS);
+		mainwindow->size(mainwindow->w(), 150);
+		mainwindow->size_range(735, 150, 0, 150);
+	}
+
+	// close the current rig control
+	closeRig();               // local serial comm connection
+
+	{ guard_lock gl_serial(&mutex_serial, 200);
+		RigSerial->ClosePort();
+		bypass_serial_thread_loop = true;
+	}
+
+	if (xcvr_name != rigs[selectRig->index()]->name_) {
+		clearList();
+		saveFreqList();
+		selrig = rigs[selectRig->index()];
+		xcvr_name = selrig->name_;
+	}
+
+	progStatus.xcvr_serial_port = selectCommPort->value();
+
+	progStatus.comm_baudrate = mnuBaudrate->index();
+	progStatus.stopbits = btnOneStopBit->value() ? 1 : 2;
+	progStatus.comm_retries = (int)cntRigCatRetries->value();
+	progStatus.comm_timeout = (int)cntRigCatTimeout->value();
+	progStatus.comm_wait = (int)cntRigCatWait->value();
+	progStatus.comm_echo = btnRigCatEcho->value();
+	progStatus.comm_rtsptt = btnrtsptt->value();
+	progStatus.comm_catptt = btncatptt->value();
+	progStatus.comm_dtrptt = btndtrptt->value();
+	progStatus.comm_rtscts = chkrtscts->value();
+	progStatus.comm_rtsplus = btnrtsplus->value();
+	progStatus.comm_dtrplus = btndtrplus->value();
+
+	progStatus.imode_B  = progStatus.imode_A  = selrig->def_mode;
+	progStatus.iBW_B    = progStatus.iBW_A    = selrig->def_bw;
+	progStatus.freq_B   = progStatus.freq_A   = selrig->def_freq;
+
+	init_title();
+
+	if (!startXcvrSerial()) {
+		if (progStatus.xcvr_serial_port.compare("NONE") == 0) {
+			LOG_WARN("No comm port ... test mode");
+		} else {
+			progStatus.xcvr_serial_port = "NONE";
+			selectCommPort->value(progStatus.xcvr_serial_port.c_str());
+		}
+	}
+
+	initRig();
+
+	btnOkXcvrDialog->labelcolor(FL_BLACK);
+	btnOkXcvrDialog->redraw_label();
+}
+
+static void cb_btnOkSepSerial(Fl_Button*, void*) {
+	string p2 = selectAuxPort->value();
+	string p3 = selectSepPTTPort->value();
+
+	if ((p3.compare("NONE") != 0) && p2 == p3) {
+		fl_message("Port used for Aux i/o");
+		return;
+	}
+
+	progStatus.sep_serial_port = selectSepPTTPort->value();
+	progStatus.sep_SCU_17 = btnSep_SCU_17->value();
+
+	progStatus.sep_dtrplus = btnSepDTRplus->value();
+	progStatus.sep_dtrptt = btnSepDTRptt->value();
+	progStatus.sep_rtsplus = btnSepRTSplus->value();
+	progStatus.sep_rtsptt = btnSepRTSptt->value();
+
+	if (!startSepSerial()) {
+		if (progStatus.sep_serial_port.compare("NONE") != 0) {
+			progStatus.sep_serial_port = "NONE";
+			selectSepPTTPort->value(progStatus.sep_serial_port.c_str());
+		}
+	}
+
+	btnOkSepSerial->labelcolor(FL_BLACK);
+	btnOkSepSerial->redraw_label();
+}
+
+static void cb_btnOkAuxSerial(Fl_Button*, void*) {
+	AuxSerial->ClosePort();
+
+	string p2 = selectAuxPort->value();
+	string p3 = selectSepPTTPort->value();
+
+	if ((p2.compare("NONE") != 0) && p2 == p3) {
+		fl_message("Port used for Sep serial");
+		return;
+	}
+
+	progStatus.aux_serial_port = selectAuxPort->value();
+	progStatus.aux_SCU_17 = btnAux_SCU_17->value();
+
+	if (!startAuxSerial()) {
+		if (progStatus.aux_serial_port.compare("NONE") != 0) {
+			progStatus.aux_serial_port = "NONE";
+			selectAuxPort->value(progStatus.aux_serial_port.c_str());
+		}
+	}
+
+	btnOkAuxSerial->labelcolor(FL_BLACK);
+	btnOkAuxSerial->redraw_label();
+}
+
+extern Fl_Double_Window *dlgXcvrConfig;
+
+static void cbCloseXcvrDialog(Fl_Button*, void*)
+{
+	btnOkXcvrDialog->labelcolor(FL_BLACK);
+	btnOkXcvrDialog->redraw_label();
+	btnOkAuxSerial->labelcolor(FL_BLACK);
+	btnOkAuxSerial->redraw_label();
+	btnOkSepSerial->labelcolor(FL_BLACK);
+	btnOkSepSerial->redraw_label();
+
+	dlgXcvrConfig->hide();
+}
+
+static void cb_restore(Fl_Check_Button *btn, void*)
+{
+	progStatus.restore_frequency = btnRestoreFrequency->value();
+	progStatus.restore_mode = btnRestoreMode->value();
+	progStatus.restore_bandwidth =  btnRestoreBandwidth->value();
+	progStatus.restore_volume = btnRestoreVolume->value();
+	progStatus.restore_mic_gain = btnRestoreMicGain->value();
+	progStatus.restore_rf_gain = btnRestoreRfGain->value();
+	progStatus.restore_power_control = btnRestorePowerControl->value();
+	progStatus.restore_if_shift = btnRestoreIFshift->value();
+	progStatus.restore_notch = btnRestoreNotch->value();
+	progStatus.restore_auto_notch = btnRestoreAutoNotch->value();
+	progStatus.restore_noise = btnRestoreNoise->value();
+	progStatus.restore_squelch = btnRestoreSquelch->value();
+	progStatus.restore_split = btnRestoreSplit->value();
+	progStatus.restore_pre_att = btnRestorePreAtt->value();
+	progStatus.restore_nr = btnRestoreNR->value();
+	progStatus.restore_comp_on_off = btnRestoreCompOnOff->value();
+	progStatus.restore_comp_level = btnRestoreCompLevel->value();
+	progStatus.use_rig_data = btnUseRigData->value();
 }
 
 Fl_Double_Window* XcvrDialog() {
 
 Fl_Double_Window* w = new Fl_Double_Window(480, 255, _("I/O Ports"));
 
-tabsConfig = new Fl_Tabs(0, 8, 482, 246);
+	tabsConfig = new Fl_Tabs(0, 8, 482, 246);
 
 	tabPrimary = new Fl_Group(2, 30, 475, 222, _("Xcvr"));
 
@@ -736,14 +911,17 @@ tabsConfig = new Fl_Tabs(0, 8, 482, 246);
 
 		xcr_grp5->end();
 
-		Fl_Group* xcr_grp6 = new Fl_Group(247, 212, 225, 36);
+		Fl_Group* xcr_grp6 = new Fl_Group(247, 212, 103, 36);
 			xcr_grp6->box(FL_ENGRAVED_FRAME);
 
-			btnUSBaudio = new Fl_Check_Button(261, 222, 104, 15, _("USB audio"));
+			btnUSBaudio = new Fl_Check_Button(250, 222, 100, 15, _("USB audio"));
 			btnUSBaudio->down_box(FL_DOWN_BOX);
 			btnUSBaudio->callback((Fl_Callback*)cb_btnUSBaudio);
 
 		xcr_grp6->end();
+
+		btnOkXcvrDialog = new Fl_Button(w->w() - 60, 214, 50, 24, _("Init"));
+		btnOkXcvrDialog->callback((Fl_Callback*)cb_btnOkXcvrDialog);
 
 	tabPrimary->end();
 
@@ -773,8 +951,8 @@ tabsConfig = new Fl_Tabs(0, 8, 482, 246);
 
 		Fl_Box *bx_xml_info = new Fl_Box(20, 140, 450, 100,
 _("\
-Changes to any of these values requires an flrig restart\n\n\
-before they are effective.\
+Recommended setup: flrig as server, fldigi as client\n\n\
+Changes to requires an flrig restart before they are effective.\n\
 "));
 		bx_xml_info->box(FL_ENGRAVED_FRAME);
 
@@ -887,6 +1065,9 @@ _("Use only if your setup requires a separate\nSerial Port for a PTT control lin
 		btnSep_SCU_17->callback((Fl_Callback*)cb_btnSep_SCU_17);
 		btnSep_SCU_17->value(progStatus.sep_SCU_17);
 
+		btnOkSepSerial = new Fl_Button(w->w() - 60, 214, 50, 24, _("Init"));
+		btnOkSepSerial->callback((Fl_Callback*)cb_btnOkSepSerial);
+
 	tabPTT->end();
 
 
@@ -909,12 +1090,15 @@ _("Use only if your setup requires a separate\nSerial Port for a PTT control lin
 
 		btnAux_SCU_17 = new Fl_Check_Button(131, 170, 128, 22, _("Serial Port is SCU-17 auxiliary"));
 		btnAux_SCU_17->tooltip(_("Set stop bits to ZERO"));
-		btnAux_SCU_17->callback((Fl_Callback*)cb_btnSep_SCU_17);
-		btnAux_SCU_17->value(progStatus.sep_SCU_17);
+		btnAux_SCU_17->callback((Fl_Callback*)cb_btnAux_SCU_17);
+		btnAux_SCU_17->value(progStatus.aux_SCU_17);
 
 		Fl_Box *bxsep = new Fl_Box(56, 84, 399, 38,
 _("Use only if your setup requires a separate\nSerial Port for a special Control Signals"));
 		bxsep->box(FL_FLAT_BOX);
+
+		btnOkAuxSerial = new Fl_Button(w->w() - 60, 214, 50, 24, _("Init"));
+		btnOkAuxSerial->callback((Fl_Callback*)cb_btnOkAuxSerial);
 
 	tabAux->end();
 
@@ -1269,16 +1453,149 @@ _("Enter text as ASCII string\nOr sequence of hex values, x80 etc separated by s
 
 	tabCmds->end();
 
-tabsConfig->end();
+	tabRestore = new Fl_Group(2, 30, 475, 222, _("Restore"));  // 470 width 180 height
+		tabRestore->hide();
 
-btnCancelCommConfig = new Fl_Button(w->w() - 104, 2, 50, 25, _("Close"));
-btnCancelCommConfig->callback((Fl_Callback*)cb_btnCancelCommConfig);
+		Fl_Box *restore_box = new Fl_Box(10, 35, 455, 30, 
+			_("Read / Restore these parameters"));
+		restore_box->box(FL_ENGRAVED_FRAME);
 
-btnOkXcvrDialog = new Fl_Return_Button(w->w() - 52, 2, 50, 25, _("Init"));
-btnOkXcvrDialog->callback((Fl_Callback*)cb_btnOkXcvrDialog);
+		btnRestoreFrequency = new Fl_Check_Button(10, 70, 20, 20, _("Freq"));
+		btnRestoreFrequency->tooltip(_("Restore frequency"));
+		btnRestoreFrequency->down_box(FL_DOWN_BOX);
+		btnRestoreFrequency->callback((Fl_Callback*)cb_restore);
+		btnRestoreFrequency->align(Fl_Align(FL_ALIGN_RIGHT));
+		btnRestoreFrequency->value(progStatus.restore_frequency == 1);
+
+		btnRestoreMode = new Fl_Check_Button(10, 95, 20, 20, _("Mode"));
+		btnRestoreMode->tooltip(_("Restore Mode"));
+		btnRestoreMode->down_box(FL_DOWN_BOX);
+		btnRestoreMode->callback((Fl_Callback*)cb_restore);
+		btnRestoreMode->align(Fl_Align(FL_ALIGN_RIGHT));
+		btnRestoreMode->value(progStatus.restore_mode == 1);
+
+		btnRestoreBandwidth = new Fl_Check_Button(10, 120, 20, 20, _("Bandwidth"));
+		btnRestoreBandwidth->tooltip(_("Restore bandwidth"));
+		btnRestoreBandwidth->down_box(FL_DOWN_BOX);
+		btnRestoreBandwidth->callback((Fl_Callback*)cb_restore);
+		btnRestoreBandwidth->align(Fl_Align(FL_ALIGN_RIGHT));
+		btnRestoreBandwidth->value(progStatus.restore_bandwidth == 1);
+
+		btnRestoreVolume = new Fl_Check_Button(10, 145, 20, 20, _("Volume"));
+		btnRestoreVolume->tooltip(_("Restore volume control"));
+		btnRestoreVolume->down_box(FL_DOWN_BOX);
+		btnRestoreVolume->callback((Fl_Callback*)cb_restore);
+		btnRestoreVolume->align(Fl_Align(FL_ALIGN_RIGHT));
+		btnRestoreVolume->value(progStatus.restore_volume == 1);
+
+		btnRestoreMicGain = new Fl_Check_Button(10, 170, 20, 20, _("Mic gain"));
+		btnRestoreMicGain->tooltip(_("Restore mic gain"));
+		btnRestoreMicGain->down_box(FL_DOWN_BOX);
+		btnRestoreMicGain->callback((Fl_Callback*)cb_restore);
+		btnRestoreMicGain->align(Fl_Align(FL_ALIGN_RIGHT));
+		btnRestoreMicGain->value(progStatus.restore_mic_gain == 1);
+
+		btnRestoreRfGain = new Fl_Check_Button(10, 195, 20, 20, _("RF gain"));
+		btnRestoreRfGain->tooltip(_("Restore RF gain"));
+		btnRestoreRfGain->down_box(FL_DOWN_BOX);
+		btnRestoreRfGain->callback((Fl_Callback*)cb_restore);
+		btnRestoreRfGain->align(Fl_Align(FL_ALIGN_RIGHT));
+		btnRestoreRfGain->value(progStatus.restore_rf_gain == 1);
+
+		btnRestorePowerControl = new Fl_Check_Button(10, 220, 20, 20, _("Pwr level"));
+		btnRestorePowerControl->tooltip(_("Restore power control"));
+		btnRestorePowerControl->down_box(FL_DOWN_BOX);
+		btnRestorePowerControl->callback((Fl_Callback*)cb_restore);
+		btnRestorePowerControl->align(Fl_Align(FL_ALIGN_RIGHT));
+		btnRestorePowerControl->value(progStatus.restore_power_control == 1);
+
+		btnRestoreIFshift = new Fl_Check_Button(130, 70, 20, 20, _("IFshift"));
+		btnRestoreIFshift->tooltip(_("Restore IF shift control"));
+		btnRestoreIFshift->down_box(FL_DOWN_BOX);
+		btnRestoreIFshift->callback((Fl_Callback*)cb_restore);
+		btnRestoreIFshift->align(Fl_Align(FL_ALIGN_RIGHT));
+		btnRestoreIFshift->value(progStatus.restore_if_shift == 1);
+
+		btnRestoreNotch = new Fl_Check_Button(130, 95, 20, 20, _("Notch"));
+		btnRestoreNotch->tooltip(_("Restore notch control"));
+		btnRestoreNotch->down_box(FL_DOWN_BOX);
+		btnRestoreNotch->callback((Fl_Callback*)cb_restore);
+		btnRestoreNotch->align(Fl_Align(FL_ALIGN_RIGHT));
+		btnRestoreNotch->value(progStatus.restore_notch == 1);
+
+		btnRestoreAutoNotch = new Fl_Check_Button(130, 120, 20, 20, _("Auto Ntch"));
+		btnRestoreAutoNotch->tooltip(_("Restore auto notch setting"));
+		btnRestoreAutoNotch->down_box(FL_DOWN_BOX);
+		btnRestoreAutoNotch->callback((Fl_Callback*)cb_restore);
+		btnRestoreAutoNotch->align(Fl_Align(FL_ALIGN_RIGHT));
+		btnRestoreAutoNotch->value(progStatus.restore_auto_notch == 1);
+
+		btnRestoreSquelch = new Fl_Check_Button(130, 145, 20, 20, _("Squelch"));
+		btnRestoreSquelch->tooltip(_("Restore squelch"));
+		btnRestoreSquelch->down_box(FL_DOWN_BOX);
+		btnRestoreSquelch->callback((Fl_Callback*)cb_restore);
+		btnRestoreSquelch->align(Fl_Align(FL_ALIGN_RIGHT));
+		btnRestoreSquelch->value(progStatus.restore_squelch == 1);
+
+		btnRestoreSplit = new Fl_Check_Button(130, 170, 20, 20, _("Split"));
+		btnRestoreSplit->tooltip(_("Restore split"));
+		btnRestoreSplit->down_box(FL_DOWN_BOX);
+		btnRestoreSplit->callback((Fl_Callback*)cb_restore);
+		btnRestoreSplit->align(Fl_Align(FL_ALIGN_RIGHT));
+		btnRestoreSplit->value(progStatus.restore_split == 1);
+
+		btnRestorePreAtt = new Fl_Check_Button(130, 195, 20, 20, _("Pre/Att"));
+		btnRestorePreAtt->tooltip(_("Restore Pre/Att"));
+		btnRestorePreAtt->down_box(FL_DOWN_BOX);
+		btnRestorePreAtt->callback((Fl_Callback*)cb_restore);
+		btnRestorePreAtt->align(Fl_Align(FL_ALIGN_RIGHT));
+		btnRestorePreAtt->value(progStatus.restore_pre_att == 1);
+
+		btnRestoreNoise = new Fl_Check_Button(130, 220, 20, 20, _("Blanker"));
+		btnRestoreNoise->tooltip(_("Restore noise blanker control"));
+		btnRestoreNoise->down_box(FL_DOWN_BOX);
+		btnRestoreNoise->callback((Fl_Callback*)cb_restore);
+		btnRestoreNoise->align(Fl_Align(FL_ALIGN_RIGHT));
+		btnRestoreNoise->value(progStatus.restore_noise == 1);
+
+		btnRestoreNR = new Fl_Check_Button(250, 70, 20, 20, _("Noise Red'"));
+		btnRestoreNR->tooltip(_("Restore noise reduction"));
+		btnRestoreNR->down_box(FL_DOWN_BOX);
+		btnRestoreNR->callback((Fl_Callback*)cb_restore);
+		btnRestoreNR->align(Fl_Align(FL_ALIGN_RIGHT));
+		btnRestoreNR->value(progStatus.restore_nr == 1);
+
+		btnRestoreCompOnOff = new Fl_Check_Button(250, 95, 20, 20, _("Comp On/Off"));
+		btnRestoreCompOnOff->tooltip(_("Restore Comp On/Off"));
+		btnRestoreCompOnOff->down_box(FL_DOWN_BOX);
+		btnRestoreCompOnOff->callback((Fl_Callback*)cb_restore);
+		btnRestoreCompOnOff->align(Fl_Align(FL_ALIGN_RIGHT));
+		btnRestoreCompOnOff->value(progStatus.restore_comp_on_off == 1);
+
+		btnRestoreCompLevel = new Fl_Check_Button(250, 120, 20, 20, _("Comp Level"));
+		btnRestoreCompLevel->tooltip(_("Restore comp level"));
+		btnRestoreCompLevel->down_box(FL_DOWN_BOX);
+		btnRestoreCompLevel->callback((Fl_Callback*)cb_restore);
+		btnRestoreCompLevel->align(Fl_Align(FL_ALIGN_RIGHT));
+		btnRestoreCompLevel->value(progStatus.restore_comp_level == 1);
+
+		btnUseRigData = new Fl_Check_Button(250, 220, 20, 20, _("Use xcvr data"));
+		btnUseRigData->tooltip(_("Set flrig to xcvr values at startup"));
+		btnUseRigData->down_box(FL_DOWN_BOX);
+		btnUseRigData->callback((Fl_Callback*)cb_restore);
+		btnUseRigData->align(Fl_Align(FL_ALIGN_RIGHT));
+		btnUseRigData->value(progStatus.use_rig_data == 1);
+
+	tabRestore->end();
+
+	tabsConfig->end();
+
+	btnCloseCommConfig = new Fl_Button(w->w() - 52, 2, 50, 25, _("Close"));
+	btnCloseCommConfig->callback((Fl_Callback*)cbCloseXcvrDialog);
 
 w->end();
 
 return w;
 
 }
+

@@ -499,15 +499,24 @@ void RIG_IC7200::set_attenuator(int val)
 {
 	if (val) {
 		atten_label("20 dB", true);
+		atten_level = 1;
 		set_preamp(0);
-	} else
+	} else {
 		atten_label("ATT", false);
+		atten_level = 0;
+	}
 
 	cmd = pre_to;
 	cmd += '\x11';
-	cmd += val ? '\x20' : '\x00';
+	cmd += atten_level ? '\x20' : '\x00';
 	cmd.append( post );
 	waitFB("set att");
+}
+
+int RIG_IC7200::next_attenuator()
+{
+	if (atten_level) return 0;
+	return 1;
 }
 
 int RIG_IC7200::get_attenuator()
@@ -522,9 +531,11 @@ int RIG_IC7200::get_attenuator()
 		if (p != string::npos) {
 			if (!replystr[p+5]) {
 				atten_label("ATT", false);
+				atten_level = 0;
 				return 0;
 			} else {
 				atten_label("20 dB", true);
+				atten_level = 1;
 				return 1;
 			}
 		}
@@ -532,18 +543,31 @@ int RIG_IC7200::get_attenuator()
 	return 0;
 }
 
+int RIG_IC7200::next_preamp()
+{
+	if (preamp_level)
+		return 0;
+	return 1;
+}
+
 void RIG_IC7200::set_preamp(int val)
 {
 	if (val) {
 		preamp_label("Pre ON", true);
-		set_attenuator(0);
-	} else
+		preamp_level = 1;
+		if (atten_level == 1) {
+			atten_label("ATT", false);
+			atten_level = 0;
+		}
+	} else {
 		preamp_label("Pre", false);
+		preamp_level = 0;
+	}
 
 	cmd = pre_to;
 	cmd += '\x16';
 	cmd += '\x02';
-	cmd += val ? 0x01 : 0x00;
+	cmd += preamp_level ? 0x01 : 0x00;
 	cmd.append( post );
 	waitFB("set Pre");
 }
@@ -561,14 +585,16 @@ int RIG_IC7200::get_preamp()
 		if (p != string::npos) {
 			if (replystr[p+6] == 0x01) {
 				preamp_label("Pre ON", true);
-				progStatus.preamp = true;
+				preamp_level = 1;
+//				progStatus.preamp = true;
 			} else {
 				preamp_label("Pre", false);
-				progStatus.preamp = false;
+				preamp_level = 0;
+//				progStatus.preamp = false;
 			}
 		}
 	}
-	return progStatus.preamp;
+	return preamp_level; //progStatus.preamp;
 }
 
 void RIG_IC7200::set_rf_gain(int val)

@@ -591,21 +591,30 @@ void RIG_FTdx1200::tune_rig()
 	}
 }
 
+int  RIG_FTdx1200::next_attenuator()
+{
+	switch (atten_level) {
+		case 0: return 1;
+		case 1: return 2;
+		case 2: return 3;
+		case 3: return 0;
+	}
+	return 0;
+}
+
 void RIG_FTdx1200::set_attenuator(int val)
 {
-	if (atten_level == 0) {
-		atten_level = 1;
+	atten_level = val;
+
+	if (atten_level == 1)
 		atten_label("6 dB", true);
-	} else if (atten_level == 1) {
-		atten_level = 2;
+	else if (atten_level == 2)
 		atten_label("12 dB", true);
-	} else if (atten_level == 2) {
-		atten_level = 3;
+	else if (atten_level == 3)
 		atten_label("18 dB", true);
-	} else if (atten_level == 3) {
-		atten_level = 0;
+	else if (atten_level == 0)
 		atten_label("Att", false);
-	}
+
 	cmd = "RA00;";
 	cmd[3] += atten_level;
 	sendCommand(cmd);
@@ -635,19 +644,28 @@ int RIG_FTdx1200::get_attenuator()
 	return atten_level;
 }
 
+int RIG_FTdx1200::next_preamp()
+{
+	switch (preamp_level) {
+		case 0: return 1;
+		case 1: return 2;
+		case 2: return 0;
+	}
+	return 0;
+}
+
 void RIG_FTdx1200::set_preamp(int val)
 {
+	preamp_level = val;
 	cmd = "PA00;";
-	if (preamp_level == 0) {
-		preamp_level = 1;
+
+	if (preamp_level == 1)
 		preamp_label("Amp 1", true);
-	} else if (preamp_level == 1) {
-		preamp_level = 2;
+	else if (preamp_level == 2)
 		preamp_label("Amp 2", true);
-	} else if (preamp_level == 2) {
-		preamp_level = 0;
+	else if (preamp_level == 0)
 		preamp_label("IPO", false);
-	}
+
 	cmd[3] = '0' + preamp_level;
 	sendCommand (cmd);
 	showresp(WARN, ASC, "SET preamp", cmd, replystr);

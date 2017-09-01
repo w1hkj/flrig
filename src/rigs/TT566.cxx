@@ -587,11 +587,22 @@ int  RIG_TT566::get_rf_gain()
 	return retval;
 }
 
+int  RIG_TT566::next_attenuator()
+{
+	switch (atten_level) {
+		case 0: return 1;
+		case 1: return 2;
+		case 2: return 3;
+		case 3: return 0;
+	}
+	return 0;
+}
+
 void RIG_TT566::set_attenuator(int val)
 {
+	atten_level = val;
 	cmd = TT566setATTa;
-	atten_level++;
-	if (atten_level == 4) atten_level = 0;
+
 	switch (atten_level) {
 		case 0: atten_label("0 dB", false); cmd += '0'; break;
 		case 1: atten_label("6 dB", true); 	cmd += '1'; break;

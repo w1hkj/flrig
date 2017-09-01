@@ -52,8 +52,6 @@ Fl_Menu_Bar *wide_menu=(Fl_Menu_Bar *)0;
 
 Fl_Menu_Item *mnuExit = (Fl_Menu_Item *)0;
 Fl_Menu_Item *mnuConfig = (Fl_Menu_Item *)0;
-Fl_Menu_Item *mnuRestoreData = (Fl_Menu_Item *)0;
-Fl_Menu_Item *mnuKeepData = (Fl_Menu_Item *)0;
 Fl_Menu_Item *mnuTooltips = (Fl_Menu_Item *)0;
 Fl_Menu_Item *mnuSchema = (Fl_Menu_Item *)0;
 Fl_Menu_Item *mnuColorConfig = (Fl_Menu_Item *)0;
@@ -276,18 +274,6 @@ static void cb_mnuExit(Fl_Menu_*, void*) {
 	cbExit();
 }
 
-static void cb_mnuRestoreData(Fl_Menu_*, void*) {
-	if (mnuRestoreData->value()) progStatus.restore_rig_data = true;
-	else progStatus.restore_rig_data = false;
-//	progStatus.restore_rig_data = !progStatus.restore_rig_data;
-}
-
-static void cb_mnuKeepData(Fl_Menu_*, void*) {
-	if (mnuKeepData->value()) progStatus.use_rig_data = true;
-	else progStatus.use_rig_data = false;
-//	progStatus.use_rig_data= !progStatus.use_rig_data;
-}
-
 static void cb_mnuTooltips(Fl_Menu_*, void*) {
 	progStatus.tooltips = ! progStatus.tooltips;
 }
@@ -325,6 +311,10 @@ static void cb_Events(Fl_Menu_*, void*) {
 
 static void cb_Polling(Fl_Menu_*, void*) {
 	open_poll_tab();
+}
+
+static void cb_Restore(Fl_Menu_*, void*) {
+	open_restore_tab();
 }
 
 static void cb_Send(Fl_Menu_*, void*) {
@@ -949,6 +939,25 @@ static void cb_AT_indDN(Fl_Button*, void*) {
 
 static void cb_tt550_Nsamples(Fl_Simple_Counter *, void *) {
 	progStatus.tt550_Nsamples =  tt550_Nsamples->value();
+}
+
+Fl_Menu_Item *getMenuItem(const char *caption, Fl_Menu_Item* menu = 0)
+{
+	if (menu == 0) {
+		return (Fl_Menu_Item*)0;
+	}
+
+	int size = menu->size() - 1;
+	Fl_Menu_Item *item = 0;
+	const char* label;
+	for (int i = 0; i < size; i++) {
+		label = menu[i].text;
+		if (label && !strcmp(label, caption)) {
+			item = menu + i;
+			break;
+		}
+	}
+	return item;
 }
 
 #include "ui_small.cxx"

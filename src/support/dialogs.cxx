@@ -351,115 +351,6 @@ void cbUSBaudio()
 	progStatus.USBaudio = btnUSBaudio->value();
 }
 
-void cbCancelXcvrDialog()
-{
-	btnOkXcvrDialog->labelcolor(FL_BLACK);
-	dlgXcvrConfig->hide();
-}
-
-void cbOkXcvrDialog()
-{
-	if (progStatus.UIsize == wide_ui) {
-		btn_show_controls->label("@-22->");
-		btn_show_controls->redraw_label();
-		grpTABS->hide();
-		mainwindow->resizable(grpTABS);
-		mainwindow->size(mainwindow->w(), 150);
-		mainwindow->size_range(735, 150, 0, 150);
-	}
-
-	// close the current rig control
-	closeRig();               // local serial comm connection
-//	disconnect_from_remote(); // remote tcpip connection
-
-	{ guard_lock gl_serial(&mutex_serial, 200);
-		RigSerial->ClosePort();
-		AuxSerial->ClosePort();
-		SepSerial->ClosePort();
-		bypass_serial_thread_loop = true;
-	}
-
-	string p1 = selectCommPort->value();
-	string p2 = selectAuxPort->value();
-	string p3 = selectSepPTTPort->value();
-
-	if (p1.compare("NONE") != 0)
-		if (p1 == p2 || p1 == p3) {
-			fl_message("Select separate ports");
-			return;
-		}
-
-	if (p2.compare("NONE") != 0)
-		if (p2 == p3) {
-			fl_message("Select separate ports");
-			return;
-		}
-
-	if (xcvr_name != rigs[selectRig->index()]->name_) {
-		clearList();
-		saveFreqList();
-		selrig = rigs[selectRig->index()];
-		xcvr_name = selrig->name_;
-	}
-
-	progStatus.xcvr_serial_port = selectCommPort->value();
-
-	progStatus.aux_serial_port = selectAuxPort->value();
-	progStatus.aux_SCU_17 = btnAux_SCU_17->value();
-
-	progStatus.sep_serial_port = selectSepPTTPort->value();
-	progStatus.sep_SCU_17 = btnSep_SCU_17->value();
-
-	progStatus.comm_baudrate = mnuBaudrate->index();
-	progStatus.stopbits = btnOneStopBit->value() ? 1 : 2;
-	progStatus.comm_retries = (int)cntRigCatRetries->value();
-	progStatus.comm_timeout = (int)cntRigCatTimeout->value();
-	progStatus.comm_wait = (int)cntRigCatWait->value();
-	progStatus.comm_echo = btnRigCatEcho->value();
-	progStatus.comm_rtsptt = btnrtsptt->value();
-	progStatus.comm_catptt = btncatptt->value();
-	progStatus.comm_dtrptt = btndtrptt->value();
-	progStatus.comm_rtscts = chkrtscts->value();
-	progStatus.comm_rtsplus = btnrtsplus->value();
-	progStatus.comm_dtrplus = btndtrplus->value();
-
-	progStatus.sep_dtrplus = btnSepDTRplus->value();
-	progStatus.sep_dtrptt = btnSepDTRptt->value();
-	progStatus.sep_rtsplus = btnSepRTSplus->value();
-	progStatus.sep_rtsptt = btnSepRTSptt->value();
-
-	progStatus.imode_B  = progStatus.imode_A  = selrig->def_mode;
-	progStatus.iBW_B    = progStatus.iBW_A    = selrig->def_bw;
-	progStatus.freq_B   = progStatus.freq_A   = selrig->def_freq;
-
-	init_title();
-
-	if (!startXcvrSerial()) {
-		if (progStatus.xcvr_serial_port.compare("NONE") == 0) {
-			LOG_WARN("No comm port ... test mode");
-		} else {
-			progStatus.xcvr_serial_port = "NONE";
-			selectCommPort->value(progStatus.xcvr_serial_port.c_str());
-		}
-	}
-	if (!startAuxSerial()) {
-		if (progStatus.aux_serial_port.compare("NONE") != 0) {
-			progStatus.aux_serial_port = "NONE";
-			selectAuxPort->value(progStatus.aux_serial_port.c_str());
-		}
-	}
-	if (!startSepSerial()) {
-		if (progStatus.sep_serial_port.compare("NONE") != 0) {
-			progStatus.sep_serial_port = "NONE";
-			selectSepPTTPort->value(progStatus.sep_serial_port.c_str());
-		}
-	}
-
-	initRig();
-
-	btnOkXcvrDialog->labelcolor(FL_BLACK);
-}
-
 void configXcvr()
 {
 
@@ -496,6 +387,12 @@ void open_poll_tab()
 {
 	dlgXcvrConfig->show();
 	tabsConfig->value(tabPolling);
+}
+
+void open_restore_tab()
+{
+	dlgXcvrConfig->show();
+	tabsConfig->value(tabRestore);
 }
 
 void open_send_command_tab()

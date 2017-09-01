@@ -27,9 +27,6 @@ class RIG_FT950 : public rigbase {
 private:
 	bool notch_on;
 	int  m_60m_indx;
-protected:
-	int  preamp_level;
-	int  atten_level;
 public:
 	RIG_FT950();
 	~RIG_FT950(){}
@@ -80,8 +77,10 @@ public:
 	int  get_volume_control();
 	void set_PTT_control(int val);
 	void tune_rig();
+	int  next_attenuator();
 	void set_attenuator(int val);
 	int  get_attenuator();
+	int  next_preamp();
 	void set_preamp(int val);
 	int  get_preamp();
 

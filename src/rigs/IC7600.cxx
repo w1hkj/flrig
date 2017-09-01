@@ -888,20 +888,27 @@ void RIG_IC7600::tune_rig()
 	waitFB("tune rig");
 }
 
+int RIG_IC7600::next_preamp()
+{
+	switch (preamp_level) {
+		case 0: return 1;
+		case 1: return 2;
+		case 2: return 0;
+	}
+	return 0;
+}
+
 void RIG_IC7600::set_preamp(int val)
 {
 	cmd = pre_to;
 	cmd += '\x16';
 	cmd += '\x02';
 
-	if (preamp_level == 0) {
-		preamp_level = 1;
+	if (preamp_level == 1) {
 		preamp_label("Amp 1", true);
-	} else if (preamp_level == 1) {
-		preamp_level = 2;
-		preamp_label("Amp 2", true);
 	} else if (preamp_level == 2) {
-		preamp_level = 0;
+		preamp_label("Amp 2", true);
+	} else if (preamp_level == 0) {
 		preamp_label("OFF", false);
 	}
 
@@ -935,19 +942,27 @@ int RIG_IC7600::get_preamp()
 	return progStatus.preamp = preamp_level;
 }
 
+int  RIG_IC7600::next_attenuator()
+{
+	switch (atten_level) {
+		case 0x00: return 0x06;
+		case 0x06: return 0x12;
+		case 0x12: return 0x18;
+		case 0x18: return 0x00;
+	}
+	return 0;
+}
+
 void RIG_IC7600::set_attenuator(int val)
 {
-	if (atten_level == 0x00) {
-		atten_level = 0x06;
+	atten_level = val;
+	if (atten_level == 0x06) {
 		atten_label("6 dB", true);
-	} else if (atten_level == 0x06) {
-		atten_level = 0x12;
-		atten_label("12 dB", true);
 	} else if (atten_level == 0x12) {
-		atten_level = 0x18;
-		atten_label("18 dB", true);
+		atten_label("12 dB", true);
 	} else if (atten_level == 0x18) {
-		atten_level = 0x00;
+		atten_label("18 dB", true);
+	} else if (atten_level == 0x00) {
 		atten_label("ATT", false);
 	}
 	cmd = pre_to;
@@ -976,7 +991,7 @@ int RIG_IC7600::get_attenuator()
 		} else if (atten_level == 0x18) {
 			atten_label("18 dB", true);
 		} else {
-			atten_level = 0;
+			atten_level = 0x00;
 			atten_label("ATT", false);
 		}
 	}

@@ -29,8 +29,7 @@ enum TS870MODES { tsLSB, tsUSB, tsCW, tsFM, tsAM, tsFSK, tsCWR, tsFSKR };
 
 private:
 	bool notch_on;
-//	int  preamp_level;
-	int  att_level;
+
 	int  nb_level;
 //	bool data_mode;
 	int  active_bandwidth;
@@ -88,6 +87,8 @@ public:
 	void set_power_control(double val);
 	void set_PTT_control(int val);
 	void tune_rig();
+
+	int  next_attenuator();
 	void set_attenuator(int val);
 	int  get_attenuator();
 //	void set_preamp(int val);

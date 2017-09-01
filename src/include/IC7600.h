@@ -24,9 +24,6 @@
 #include "IC746.h"
 
 class RIG_IC7600 : public RIG_ICOM  {
-protected:
-	int  preamp_level;
-	int  atten_level;
 public:
 	RIG_IC7600();
 	~RIG_IC7600(){}
@@ -116,9 +113,11 @@ public:
 	int  get_rf_gain();
 	void get_rf_min_max_step(double &min, double &max, double &step);
 
+	int  next_preamp();
 	void set_preamp(int val);
 	int  get_preamp();
 
+	int  next_attenuator();
 	void set_attenuator(int val);
 	int  get_attenuator();
 

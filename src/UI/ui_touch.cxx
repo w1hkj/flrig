@@ -35,10 +35,7 @@ Fl_Menu_Item touch_menu[] = {
  {_("PTT"), 0, (Fl_Callback*)cb_mnuPTT, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("AUX"), 0, (Fl_Callback*)cb_mnuAUX, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Polling"), 0, (Fl_Callback*)cb_Polling, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
- {0,0,0,0,0,0,0,0,0},
- {_("Start/Stop"), 0, 0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
- {_("Restore Freq/Mode"), 0,  (Fl_Callback*)cb_mnuRestoreData, 0, 6, FL_NORMAL_LABEL, 0, 14, 0},
- {_("Keep Freq/Mode"), 0,  (Fl_Callback*)cb_mnuKeepData, 0, 134, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("Restore"), 0, (Fl_Callback*)cb_Restore, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
  {_("UI"), 0, 0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Meter filtering"), 0,  (Fl_Callback*)cb_mnu_meter_filtering, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
@@ -1575,7 +1572,13 @@ Fl_Double_Window* touch_rig_window() {
 
 		Fl_Menu_Bar *touch_menubar = new Fl_Menu_Bar(0, 0, mainW-64, 28);
 		touch_menubar->textsize(18);
-		progStatus.tooltips ? (&touch_menu[6])->set() : (&touch_menu[6])->clear();
+
+		Fl_Menu_Item * mnu = getMenuItem(_("Tooltips"), touch_menu);
+		if (mnu) {
+			progStatus.tooltips ? mnu->set() : mnu->clear();
+			mnuTooltips = mnu;
+		}
+
 		touch_menubar->menu(touch_menu);
 
 		Fl_Group *mnu_box = new Fl_Group(mainW-64, 0, 64, 28);
@@ -1600,10 +1603,6 @@ Fl_Double_Window* touch_rig_window() {
 		grp_menu->resizable(touch_menubar);
 
 	grp_menu->end();
-
-	mnuRestoreData = (touch_menu+13);
-	mnuKeepData = (touch_menu+14);
-	mnuTooltips = (touch_menu+18);
 
 	btnInitializing = new Fl_Button(0, 28, mainW, mainH - 28, "Initializing");
 	btnInitializing->hide();

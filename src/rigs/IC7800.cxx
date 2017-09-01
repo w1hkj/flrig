@@ -458,14 +458,19 @@ void RIG_IC7800::set_mic_gain(int v)
 }
 
 static const char *atten_labels[] = {
-"OFF", "3 dB", "6 dB", "9 dB", "12 dB", "15 dB", "18 dB", "7 dB"};
+"ATT", "3 dB", "6 dB", "9 dB", "12 dB", "15 dB", "18 dB", "21 dB"};
+
+int  RIG_IC7800::next_attenuator()
+{
+	if (atten_level >= 7) return 0;
+	else return (atten_level + 1);
+}
 
 void RIG_IC7800::set_attenuator(int val)
 {
-	int cmdval = 0;
-	atten_level++;
-	if (atten_level >= 7) atten_level = 0;
-	cmdval = atten_level;
+	atten_level = val;
+
+	int cmdval = atten_level;
 	atten_label(atten_labels[atten_level], true);
 	cmd = pre_to;
 	cmd += '\x11';

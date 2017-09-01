@@ -159,6 +159,9 @@ rigbase::rigbase()
 	if_shift_max = 1500;
 	if_shift_step = 10;
 	if_shift_mid = 0;
+
+	atten_level = 0;
+	preamp_level = 0;
 }
 
 string rigbase::to_bcd_be(long freq, int len)

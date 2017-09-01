@@ -50,6 +50,7 @@ public:
 	virtual int  get_noise_reduction_val();
 	virtual void set_attenuator(int val);
 	virtual int  get_attenuator();
+	virtual int  next_preamp();
 	virtual void set_preamp(int val);
 	virtual int  get_preamp();
 

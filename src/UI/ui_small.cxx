@@ -32,10 +32,7 @@ Fl_Menu_Item menu_small_menu[] = {
  {_("PTT"), 0, (Fl_Callback*)cb_mnuPTT, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("AUX"), 0, (Fl_Callback*)cb_mnuAUX, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Polling"), 0, (Fl_Callback*)cb_Polling, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
- {0,0,0,0,0,0,0,0,0},
- {_("Start/Stop"), 0, 0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
- {_("Restore Freq/Mode"), 0,  (Fl_Callback*)cb_mnuRestoreData, 0, 6, FL_NORMAL_LABEL, 0, 14, 0},
- {_("Keep Freq/Mode"), 0,  (Fl_Callback*)cb_mnuKeepData, 0, 134, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("Restore"), 0, (Fl_Callback*)cb_Restore, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
  {_("UI"), 0, 0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Meter filtering"), 0,  (Fl_Callback*)cb_mnu_meter_filtering, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
@@ -1362,9 +1359,19 @@ Fl_Double_Window* Small_rig_window() {
 
 		small_menu = new Fl_Menu_Bar(0, 0, 424 - 64, 22);
 		small_menu->textsize(12);
-		progStatus.tooltips ? (&menu_small_menu[6])->set() : (&menu_small_menu[6])->clear();
-		progStatus.schema ? (&menu_small_menu[7])->set() : (&menu_small_menu[7])->clear();
 		small_menu->menu(menu_small_menu);
+
+		Fl_Menu_Item * mnu = getMenuItem(_("Tooltips"), menu_small_menu);
+		if (mnu) {
+			progStatus.tooltips ? mnu->set() : mnu->clear();
+			mnuTooltips = mnu;
+		}
+
+		mnu = getMenuItem(_("Small sliders"), menu_small_menu);
+		if (mnu) {
+			progStatus.schema ? mnu->set() : mnu->clear();
+			mnuSchema = mnu;
+		}
 
 		Fl_Group *mnu_box = new Fl_Group(424-64, 0, 64, 22);
 		mnu_box->box(FL_UP_BOX);
@@ -1387,11 +1394,6 @@ Fl_Double_Window* Small_rig_window() {
 		grp_small_menu->resizable(small_menu);
 
 	grp_small_menu->end();
-
-	mnuRestoreData = (menu_small_menu+13);
-	mnuKeepData = (menu_small_menu+14);
-	mnuSchema = (menu_small_menu+18);
-	mnuTooltips = (menu_small_menu+19);
 
 	txt_encA = new Fl_Output( 425 - 90, 1, 90, 20, "");
 	txt_encA->box(FL_THIN_DOWN_BOX);

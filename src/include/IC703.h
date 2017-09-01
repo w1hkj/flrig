@@ -46,6 +46,7 @@ public:
 
 	void set_attenuator(int val);
 	int  get_attenuator();
+	int  next_preamp();
 	void set_preamp(int val);
 	int  get_preamp();
 	void set_compression();

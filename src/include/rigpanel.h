@@ -380,6 +380,7 @@ extern Fl_Group *tabAux;
 extern Fl_ComboBox *selectAuxPort;
 extern Fl_Check_Button *btnAux_SCU_17;
 extern Fl_Group *tabPolling;
+extern Fl_Group *tabRestore;
 extern Fl_Group *tabTCPIP;
 extern Fl_Group *tabXMLRPC;
 
@@ -413,8 +414,12 @@ extern Fl_Output *txt_response;
 extern Fl_Box *box_xcvr_connect;
 extern Fl_Box *box_fldigi_connect;
 extern Fl_Box *box_tcpip_connect;
-extern Fl_Button *btnCancelCommConfig;
-extern Fl_Return_Button *btnOkXcvrDialog;
+
+extern Fl_Button *btnCloseCommConfig;
+extern Fl_Button *btnOkXcvrDialog;
+extern Fl_Button *btnOkSepSerial;
+extern Fl_Button *btnOkAuxSerial;
+
 extern Fl_Counter *inp_tcpip_ping_delay;
 extern Fl_Counter *cntRetryAfter;
 extern Fl_Counter *cntDropsAllowed;
@@ -430,5 +435,25 @@ extern Fl_Button *sel_auto;
 extern Fl_Button *sel_50;
 extern Fl_Button *sel_200;
 extern Fl_Output *pwr_scale_description;
+
+extern Fl_Group *tabRestore;
+extern Fl_Check_Button *btnRestoreFrequency;
+extern Fl_Check_Button *btnRestoreMode;
+extern Fl_Check_Button *btnRestoreBandwidth;
+extern Fl_Check_Button *btnRestoreVolume;
+extern Fl_Check_Button *btnRestoreMicGain;
+extern Fl_Check_Button *btnRestoreRfGain;
+extern Fl_Check_Button *btnRestorePowerControl;
+extern Fl_Check_Button *btnRestoreIFshift;
+extern Fl_Check_Button *btnRestoreNotch;
+extern Fl_Check_Button *btnRestoreAutoNotch;
+extern Fl_Check_Button *btnRestoreSquelch;
+extern Fl_Check_Button *btnRestoreSplit;
+extern Fl_Check_Button *btnRestorePreAtt;
+extern Fl_Check_Button *btnRestoreNoise;
+extern Fl_Check_Button *btnRestoreNR;
+extern Fl_Check_Button *btnRestoreCompOnOff;
+extern Fl_Check_Button *btnRestoreCompLevel;
+extern Fl_Check_Button *btnUseRigData;
 
 #endif

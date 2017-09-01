@@ -39,6 +39,34 @@ struct FREQMODE {
 	int  src;
 };
 
+struct INITVALS {
+	int		split;
+	int		power_control;
+	int		volume_control;
+	int		attenuatorA;
+	int		preampA;
+	int		attenuatorB;
+	int		preampB;
+	int		if_shift;
+	int		auto_notch;
+	int		notch;
+	int		noise;
+	int		nr;
+	int		mic_gain;
+	int		rf_gain;
+	int		squelch;
+	int		compression;
+	int		compON;
+	INITVALS() {
+		split = power_control = volume_control =
+		attenuatorA = attenuatorB =
+		preampA = preampB =
+		if_shift = notch = noise = nr =
+		mic_gain = rf_gain = squelch =
+		compression = compON = 0;
+	}
+};
+
 struct GUI {
 	Fl_Widget*	W;
 	int			x;
@@ -120,6 +148,9 @@ public:
 	int  if_shift_max;
 	int  if_shift_step;
 	int  if_shift_mid;
+
+	int  atten_level;
+	int  preamp_level;
 
 	bool has_xcvr_auto_on_off;
 	bool has_a2b;
@@ -280,9 +311,11 @@ public:
 	virtual void set_PTT_control(int val) {}
 	virtual void tune_rig() {}
 	virtual void set_attenuator(int val) {}
-	virtual int  get_attenuator() {return 0;}
+	virtual int  next_attenuator() { atten_level = !atten_level; return atten_level; }
+	virtual int  get_attenuator() {return atten_level;}
 	virtual void set_preamp(int val) {}
-	virtual int  get_preamp() {return 0;}
+	virtual int  next_preamp() { preamp_level = !preamp_level; return preamp_level; }
+	virtual int  get_preamp() {return preamp_level;}
 	virtual void set_if_shift(int val) {}
 	virtual bool get_if_shift(int &val) {val = 0; return false;}
 	virtual void get_if_min_max_step(int &min, int &max, int &step) {

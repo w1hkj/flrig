@@ -35,10 +35,7 @@ Fl_Menu_Item menu_wide_menu[] = {
  {_("PTT"), 0, (Fl_Callback*)cb_mnuPTT, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("AUX"), 0, (Fl_Callback*)cb_mnuAUX, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Polling"), 0, (Fl_Callback*)cb_Polling, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
- {0,0,0,0,0,0,0,0,0},
- {_("Start/Stop"), 0, 0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
- {_("Restore Freq/Mode"), 0,  (Fl_Callback*)cb_mnuRestoreData, 0, 6, FL_NORMAL_LABEL, 0, 14, 0},
- {_("Keep Freq/Mode"), 0,  (Fl_Callback*)cb_mnuKeepData, 0, 134, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("Restore"), 0, (Fl_Callback*)cb_Restore, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
  {_("UI"), 0, 0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Meter filtering"), 0,  (Fl_Callback*)cb_mnu_meter_filtering, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
@@ -1532,8 +1529,13 @@ Fl_Double_Window* Wide_rig_window() {
 
 		wide_menu = new Fl_Menu_Bar(0, 0, mainW - 64, menuH);
 		wide_menu->textsize(12);
-		progStatus.tooltips ? (&menu_wide_menu[6])->set() : (&menu_wide_menu[6])->clear();
 		wide_menu->menu(menu_wide_menu);
+
+		Fl_Menu_Item * mnu = getMenuItem(_("Tooltips"), menu_wide_menu);
+		if (mnu) {
+			progStatus.tooltips ? mnu->set() : mnu->clear();
+			mnuTooltips = mnu;
+		}
 
 		Fl_Group *mnu_box = new Fl_Group(mainW - 64, 0, 64, menuH);
 		mnu_box->box(FL_UP_BOX);
@@ -1557,10 +1559,6 @@ Fl_Double_Window* Wide_rig_window() {
 		grp_menu->resizable(wide_menu);
 
 	grp_menu->end();
-
-	mnuRestoreData = (menu_wide_menu+13);
-	mnuKeepData = (menu_wide_menu+14);
-	mnuTooltips = (menu_wide_menu+18);
 
 	btnInitializing = new Fl_Button(0,menuH,10,10);
 	btnInitializing->hide();

@@ -45,8 +45,10 @@ public:
 	void selectA();
 	void selectB();
 
+	int  next_attenuator();
 	void set_attenuator(int val);
 	int  get_attenuator();
+
 	int  get_smeter();
 	void set_noise(bool on);
 	int  get_noise();
@@ -72,7 +74,6 @@ public:
 
 
 private:
-	int atten_level;
 	int agcval;
 
 /*

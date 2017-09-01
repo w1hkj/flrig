@@ -28,9 +28,6 @@ private:
 	bool notch_on;
 	int  m_60m_indx;
 	// void update_bandwidths();
-protected:
-	int  preamp_level;
-	int  atten_level;
 public:
 	RIG_FTdx9000();
 	~RIG_FTdx9000(){}
@@ -79,8 +76,10 @@ public:
 	int  get_volume_control();
 	void set_PTT_control(int val);
 	void tune_rig();
+	int  next_attenuator();
 	void set_attenuator(int val);
 	int  get_attenuator();
+	int  next_preamp();
 	void set_preamp(int val);
 	int  get_preamp();
 

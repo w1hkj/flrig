@@ -40,8 +40,7 @@ private:
 	bool save_menu_0608;
 
 	bool notch_on;
-	int  preamp_level;
-	int  att_level;
+
 	int  nb_level;
 	bool data_mode;
 	int  active_mode;
@@ -143,10 +142,15 @@ public:
 
 	void set_PTT_control(int val);
 	void tune_rig();
+
+	int  next_attenuator();
 	void set_attenuator(int val);
 	int  get_attenuator();
+
+	int  next_preamp();
 	void set_preamp(int val);
 	int  get_preamp();
+
 	void set_ssbfilter(int val);
 	int  get_ssbfilter();
 

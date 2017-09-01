@@ -459,20 +459,28 @@ void RIG_FT5000::tune_rig()
 	showresp(WARN, ASC, "tune rig", cmd, replystr);
 }
 
+int RIG_FT5000::next_attenuator()
+{
+	switch (atten_level) {
+		case 0: return 1;
+		case 1: return 2;
+		case 2: return 3;
+		case 3: return 0;
+	}
+	return 0;
+}
+
 void RIG_FT5000::set_attenuator(int val)
 {
+	atten_level = val;
 	if (atten_level == 0) {
-		atten_level = 1;
-		atten_label("6 dB", true);
-	} else if (atten_level == 1) {
-		atten_level = 2;
-		atten_label("12 dB", true);
-	} else if (atten_level == 2) {
-		atten_level = 3;
-		atten_label("18 dB", true);
-	} else if (atten_level == 3) {
-		atten_level = 0;
 		atten_label("Att", false);
+	} else if (atten_level == 1) {
+		atten_label("6 dB", true);
+	} else if (atten_level == 2) {
+		atten_label("12 dB", true);
+	} else if (atten_level == 3) {
+		atten_label("18 dB", true);
 	}
 	cmd = "RA00;";
 	cmd[3] += atten_level;
@@ -503,20 +511,27 @@ int RIG_FT5000::get_attenuator()
 	return atten_level;
 }
 
+int RIG_FT5000::next_preamp()
+{
+	switch (preamp_level) {
+		case 0: return 1;
+		case 1: return 2;
+		case 2: return 0;
+	}
+	return 0;
+}
+
 void RIG_FT5000::set_preamp(int val)
 {
+	preamp_level = val;
 	cmd = "PA00;";
-	if (preamp_level == 0) {
-		preamp_level = 1;
+	if (preamp_level == 1) {
 		preamp_label("Amp 1", true);
-	} else if (preamp_level == 1) {
-		preamp_level = 2;
-		preamp_label("Amp 2", true);
 	} else if (preamp_level == 2) {
-		preamp_level = 3;
-		preamp_label("IPO2", true);
+		preamp_label("Amp 2", true);
 	} else if (preamp_level == 3) {
-		preamp_level = 0;
+		preamp_label("IPO2", true);
+	} else if (preamp_level == 0) {
 		preamp_label("IPO1", false);
 	}
 	cmd[3] = '0' + preamp_level;

@@ -27,7 +27,6 @@ class RIG_TT566 : public rigbase {
 private:
 	int fwdpwr;
 	int refpwr;
-	int atten_level;
 
 public:
 	RIG_TT566();
@@ -53,6 +52,7 @@ public:
 	int  get_modetype(int n);
 	void set_preamp(int);
 	int  get_preamp();
+	int  next_attenuator();
 	void set_attenuator(int val);
 	int  get_attenuator();
 

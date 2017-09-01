@@ -26,8 +26,6 @@
 class RIG_FT2000 : public rigbase {
 private:
 	bool notch_on;
-	int  atten_level;
-	int  preamp_level;
 	int  m_60m_indx;
 
 public:
@@ -47,8 +45,10 @@ public:
 	void set_power_control(double val);
 	void set_PTT_control(int val);
 	void tune_rig();
+	int  next_attenuator();
 	void set_attenuator(int val);
 	int  get_attenuator();
+	int  next_preamp();
 	void set_preamp(int val);
 	int  get_preamp();
 	void set_modeA(int val);

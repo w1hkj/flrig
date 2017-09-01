@@ -57,8 +57,10 @@ public:
 	int  adjust_bandwidth(int m);
 	int  def_bandwidth(int m);
 
+	int  next_attenuator();
 	void set_attenuator( int val );	//alh
 	int  get_attenuator();		//alh
+
 	void set_mic_gain(int v);
 
 	void set_compression();

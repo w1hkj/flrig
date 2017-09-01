@@ -344,20 +344,37 @@ int RIG_AOR5K::get_modetype(int n)
 	return AOR5K_mode_type[n];
 }
 
-void RIG_AOR5K::set_attenuator(int val)
+int  RIG_AOR5K::next_attenuator()
 {
 	switch (atten_level) {
-		case 0:	atten_level = 1;
+		case 0: return 1;
+		case 1: return 2;
+		case 2: return 22;
+		case 22: return 0;
+	}
+	return 0;
+}
+
+void RIG_AOR5K::set_attenuator(int val)
+{
+	atten_level = val;
+	switch (atten_level) {
+		case 1:
 			cmd = "AT1\r";
+			atten_label("10 dB", true);
 			break;
-		case 1: atten_level = 2;
+		case 2:
 			cmd = "AT2\r";
+			atten_label("20 dB", true);
 			break;
-		case 2:	atten_level = 22;
+		case 22:
 			cmd = "ATF\r";
+			atten_label("AUTO", true);
 			break;
-		case 22: atten_level = 0;
+		case 0:
+		default:
 			cmd = "AT0\r";
+			atten_label("0 dB", false);
 			break;
 	}
 	wait_char('\r', 1, AOR5K_WAIT_TIME, "set BW A", ASC);
@@ -383,8 +400,6 @@ int RIG_AOR5K::get_attenuator()
 	}
 	return atten_level;
 }
-
-
 
 //SM $ (S-meter Read; GET only)
 int RIG_AOR5K::get_smeter()

@@ -282,18 +282,26 @@ int RIG_IC746::get_attenuator()
 	return 0;
 }
 
+int  RIG_IC746::next_preamp()
+{
+	switch(preamp_level) {
+		case 0: return 1;
+		case 1: return 2;
+		case 2: return 0;
+	}
+	return 0;
+}
+
 void RIG_IC746::set_preamp(int val)
 {
-	if (preamp_level == 0) {
-		preamp_level = 1;
+	preamp_level = val;
+	if (preamp_level == 1)
 		preamp_label("Pre 1", true);
-	} else if (preamp_level == 1) {
-		preamp_level = 2;
+	else if (preamp_level == 2)
 		preamp_label("Pre 2", true);
-	} else if (preamp_level == 2) {
-		preamp_level = 0;
+	else if (preamp_level == 0)
 		preamp_label("Pre", false);
-	}
+
 	cmd = pre_to;
 	cmd += '\x16';
 	cmd += '\x02';

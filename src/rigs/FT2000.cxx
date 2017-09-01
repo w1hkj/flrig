@@ -132,8 +132,6 @@ RIG_FT2000::RIG_FT2000() {
 // derived specific
 	notch_on = false;
 
-	atten_level = 0;
-	preamp_level = 0;
 	m_60m_indx = 0;
 
 	precision = 10;
@@ -297,27 +295,35 @@ void RIG_FT2000::tune_rig()
 	sendCommand("AC002;",0);
 }
 
+int RIG_FT2000::next_attenuator()
+{
+	switch(atten_level) {
+		case 0: return 1;
+		case 1: return 2;
+		case 2: return 3;
+		case 3: return 0;
+	}
+	return 0;
+}
+
 void RIG_FT2000::set_attenuator(int val)
 {
-	switch (atten_level) {
-		case 0 :
-			atten_level = 1;
+	atten_level = val;
+	switch (val) {
+		case 1 :
 			atten_label("6 dB", true);
 			cmd = "RA01;";
 			break;
-		case 1 :
-			atten_level = 2;
+		case 2 :
 			atten_label("12 dB", true);
 			cmd = "RA02;";
 			break;
-		case 2 :
-			atten_level = 3;
+		case 3 :
 			atten_label("18 dB", true);
 			cmd = "RA03;";
 			break;
-		case 3 :
+		case 0 :
 		default :
-			atten_level = 0;
 			atten_label("Att", false);
 			cmd = "RA00;";
 	}
@@ -335,6 +341,7 @@ int RIG_FT2000::get_attenuator()
 	size_t p = replystr.rfind("RA");
 	if (p == string::npos) {
 		atten_label("Att", false);
+		atten_level = 0;
 		return 0;
 	}
 	int reply = replystr[p + 3];
@@ -359,22 +366,30 @@ int RIG_FT2000::get_attenuator()
 	return atten_level;
 }
 
-void RIG_FT2000::set_preamp(int val)
+int RIG_FT2000::next_preamp()
 {
 	switch (preamp_level) {
-		case 0 :
-			preamp_level = 1;
+		case 0: return 1;
+		case 1: return 2;
+		case 2: return 0;
+	}
+	return 0;
+}
+
+void RIG_FT2000::set_preamp(int val)
+{
+	preamp_level = val;
+	switch (preamp_level) {
+		case 1 :
 			preamp_label("Pre 1", true);
 			cmd = "PA01;";
 			break;
-		case 1 :
-			preamp_level = 2;
+		case 2 :
 			preamp_label("Pre 2", true);
 			cmd = "PA02;";
 			break;
-		case 2 :
+		case 0 :
 		default :
-			preamp_level = 0;
 			preamp_label("Pre", false);
 			cmd = "PA00;";
 	}
@@ -387,11 +402,13 @@ int RIG_FT2000::get_preamp()
 	int ret = waitN(5, 100, "get pre", ASC);
 	if (ret < 5) {
 		preamp_label("Pre", false);
+		preamp_level = 0;
 		return 0;
 	}
 	size_t p = replystr.rfind("PA");
 	if (p == string::npos) {
 		preamp_label("Pre", false);
+		preamp_level = 0;
 		return 0;
 	}
 	int reply = replystr[p + 3];

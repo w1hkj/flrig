@@ -90,9 +90,11 @@ public:
 	int  get_split();
 	bool can_split() { return true;}
 
+	int  next_attenuator();
 	void set_attenuator(int val);
 	int  get_attenuator();
 
+	int  next_preamp();
 	void set_preamp(int val);
 	int  get_preamp();
 
@@ -116,8 +118,6 @@ public:
 	const char **bwtable(int);
 
 protected:
-	int  preamp_level;
-	int  atten_level;
 	int  ICvol;
 
 };

@@ -62,6 +62,8 @@ FREQMODE transceiverA = {14070000, 0, 0, UI};
 FREQMODE transceiverB = {7070000, 0, 0, UI};
 FREQMODE xmlvfo       = {14070000, 0, 0, UI};
 
+INITVALS initvals;
+
 enum {VOL, MIC, PWR, SQL, IFSH, NOTCH, RFGAIN, NR };
 
 struct SLIDER {
@@ -1803,7 +1805,7 @@ void cbBFO()
 void cbAttenuator()
 {
 	guard_lock serial_lock(&mutex_serial, 57);
-	progStatus.attenuator = btnAttenuator->value();
+	progStatus.attenuator = selrig->next_attenuator();
 	selrig->set_attenuator(progStatus.attenuator);
 }
 
@@ -1816,7 +1818,7 @@ void setAttControl(void *d)
 void cbPreamp()
 {
 	guard_lock serial_lock(&mutex_serial, 58);
-	progStatus.preamp = btnPreamp->value();
+	progStatus.preamp = selrig->next_preamp();
 	selrig->set_preamp(progStatus.preamp);
 }
 
@@ -2268,22 +2270,198 @@ void setPTT( void *d)
 }
 
 
-void closeRig()
+void restore_rig_vals()
 {
-	// restore initial rig settings
-	if (!progStatus.restore_rig_data) return;
-
 	guard_lock serial_lock(&mutex_serial, 65);
+
 	selrig->selectB();
-	selrig->set_vfoB(transceiverB.freq);
-	selrig->set_modeB(transceiverB.imode);
-	selrig->set_bwB(transceiverB.iBW);
+		if (progStatus.restore_frequency)
+			selrig->set_vfoB(transceiverB.freq);
+		if (progStatus.restore_mode)
+			selrig->set_modeB(transceiverB.imode);
+		if (progStatus.restore_bandwidth)
+			selrig->set_bwB(transceiverB.iBW);
+		if (progStatus.restore_pre_att) {
+			selrig->set_attenuator(initvals.attenuatorB);
+			selrig->set_preamp(initvals.preampB);
+		}
+
 	selrig->selectA();
-	selrig->set_vfoA(transceiverA.freq);
-	selrig->set_modeA(transceiverA.imode);
-	selrig->set_bwA(transceiverA.iBW);
+		if (progStatus.restore_frequency)
+			selrig->set_vfoA(transceiverA.freq);
+		if (progStatus.restore_mode)
+			selrig->set_modeA(transceiverA.imode);
+		if (progStatus.restore_bandwidth)
+			selrig->set_bwA(transceiverA.iBW);
+		if (progStatus.restore_pre_att) {
+			selrig->set_attenuator(initvals.attenuatorA);
+			selrig->set_preamp(initvals.preampA);
+		}
+
+	if (progStatus.restore_auto_notch)
+		selrig->set_auto_notch(initvals.auto_notch);
+	if (progStatus.restore_split)
+		selrig->set_split(initvals.split);
+	if (progStatus.restore_power_control)
+		selrig->set_power_control(initvals.power_control);
+	if (progStatus.restore_volume)
+		selrig->set_volume_control(initvals.volume_control);
+
+	if (progStatus.restore_if_shift)
+		selrig->set_if_shift(initvals.if_shift);
+	if (progStatus.restore_notch)
+		selrig->set_notch(0, initvals.notch);
+	if (progStatus.restore_noise)
+		selrig->set_noise(initvals.noise);
+	if (progStatus.restore_nr)
+		selrig->set_noise_reduction(initvals.nr);
+	if (progStatus.restore_mic_gain)
+		selrig->set_mic_gain(initvals.mic_gain);
+	if (progStatus.restore_squelch)
+		selrig->set_squelch(initvals.squelch);
+	if (progStatus.restore_rf_gain)
+		selrig->set_rf_gain(initvals.rf_gain);
+
+// compression
+
 }
 
+void read_rig_vals()
+{
+// no guard_lock ... this function called from within a guard_lock block
+
+	selrig->selectB();
+	if (selrig->has_get_info)
+		selrig->get_info();
+	transceiverB.freq = selrig->get_vfoB();
+	transceiverB.imode = selrig->get_modeB();
+	transceiverB.iBW = selrig->get_bwB();
+	if (selrig->has_preamp_control)
+		initvals.preampB = selrig->get_preamp();
+	if (selrig->has_attenuator_control)
+		initvals.attenuatorB = selrig->get_attenuator();
+
+	selrig->selectA();
+	if (selrig->has_get_info)
+		selrig->get_info();
+	transceiverA.freq = selrig->get_vfoA();
+	transceiverA.imode = selrig->get_modeA();
+	transceiverA.iBW = selrig->get_bwA();
+	if (selrig->has_preamp_control)
+		initvals.preampA = selrig->get_preamp();
+	if (selrig->has_attenuator_control)
+		initvals.attenuatorA = selrig->get_attenuator();
+
+	if (selrig->has_preamp_control || selrig->has_attenuator_control)
+		btnRestorePreAtt->activate();
+	else
+		btnRestorePreAtt->deactivate();
+
+	if (selrig->has_auto_notch) {
+		btnRestoreAutoNotch->activate();
+		if (progStatus.restore_auto_notch && selrig->has_auto_notch)
+			initvals.auto_notch = selrig->get_auto_notch();
+	} else btnRestoreAutoNotch->deactivate();
+
+	if (selrig->has_split) {
+		btnRestoreSplit->activate();
+		if (progStatus.restore_split && selrig->has_split)
+			initvals.split = selrig->get_split();
+	} else
+		btnRestoreSplit->deactivate();
+
+	if (selrig->has_power_control) {
+		btnRestorePowerControl->activate();
+		if (progStatus.restore_power_control)
+			initvals.power_control = selrig->get_power_control();
+	} else
+		btnRestorePowerControl->deactivate();
+
+	if (selrig->has_volume_control) {
+		btnRestoreVolume->activate();
+		if (progStatus.restore_volume)
+			initvals.volume_control = selrig->get_volume_control();
+	} else
+		btnRestoreVolume->deactivate();
+
+	if (selrig->has_ifshift_control) {
+		btnRestoreIFshift->activate();
+		if (progStatus.restore_if_shift)
+			selrig->get_if_shift(initvals.if_shift);
+	} else
+		btnRestoreIFshift->deactivate();
+
+	if (selrig->has_notch_control) {
+		btnRestoreNotch->activate();
+		if (progStatus.restore_notch)
+			selrig->get_notch(initvals.notch);
+	} else
+		btnRestoreNotch->deactivate();
+
+	if (selrig->has_noise_control) {
+		btnRestoreNoise->activate();
+		if (progStatus.restore_noise)
+			initvals.noise = selrig->get_noise();
+	} else
+		btnRestoreNoise->deactivate();
+
+	if (selrig->has_noise_reduction_control) {
+		btnRestoreNR->activate();
+		if (progStatus.restore_nr)
+			initvals.nr = selrig->get_noise_reduction();
+	} else
+		btnRestoreNR->deactivate();
+
+	if (selrig->has_micgain_control) {
+		btnRestoreMicGain->activate();
+		if (progStatus.restore_mic_gain)
+			initvals.mic_gain = selrig->get_mic_gain();
+	} else
+		btnRestoreMicGain->deactivate();
+
+	if (selrig->has_sql_control) {
+		btnRestoreSquelch->activate();
+		if (progStatus.restore_squelch)
+			initvals.squelch = selrig->get_squelch();
+	} else
+		btnRestoreSquelch->deactivate();
+
+	if (selrig->has_rf_control) {
+		btnRestoreRfGain->activate();
+		if (progStatus.restore_rf_gain)
+			initvals.rf_gain = selrig->get_rf_gain();
+	} else
+		btnRestoreRfGain->deactivate();
+
+	if (selrig->has_compression || selrig->has_compON) {
+
+// get_compression NOT IMPLEMENTED in flrig
+//		if (progStatus.restore_comp_on_off || progStatus.restore_comp_level)
+//			selrig->set_compression();
+
+		if (selrig->has_compON)
+			btnRestoreCompOnOff->activate();
+		else
+			btnRestoreCompOnOff->deactivate();
+
+		if (selrig->has_compression)
+			btnRestoreCompLevel->activate();
+		else
+			btnRestoreCompLevel->deactivate();
+
+	} else {
+
+		btnRestoreCompOnOff->deactivate();
+		btnRestoreCompLevel->deactivate();
+
+	}
+}
+
+void closeRig()
+{
+	restore_rig_vals();
+	selrig->shutdown();
+}
 
 void cbExit()
 {
@@ -2332,6 +2510,7 @@ void cbExit()
 	}
 	pthread_join(*serial_thread, NULL);
 
+/*
 	if (progStatus.restore_rig_data){
 LOG_INFO("Restore Xcvr Data");
 		selrig->selectB();
@@ -2343,8 +2522,8 @@ LOG_INFO("Restore Xcvr Data");
 		selrig->set_modeA(transceiverA.imode);
 		selrig->set_bwA(transceiverA.iBW);
 	}
-
-	selrig->shutdown();
+*/
+	closeRig();
 
 	// xcvr auto off
 	if (selrig->has_xcvr_auto_on_off)
@@ -2443,9 +2622,9 @@ void adjust_small_ui()
 			btnPOWER->redraw();
 			btnPOWER->show();
 		}
-		mnuSchema->set();
+		if (mnuSchema) mnuSchema->set();
 	} else {
-		mnuSchema->clear();
+		if (mnuSchema) mnuSchema->clear();
 		y = cntRIT->y() + 2;
 		if (selrig->has_volume_control) {
 			y += 20;
@@ -2603,9 +2782,9 @@ void adjust_small_ui()
 
 	if (progStatus.tooltips) {
 		Fl_Tooltip::enable(1);
-		mnuTooltips->set();
+		if (mnuTooltips) mnuTooltips->set();
 	} else {
-		mnuTooltips->clear();
+		if (mnuTooltips) mnuTooltips->clear();
 		Fl_Tooltip::enable(0);
 	}
 
@@ -2679,9 +2858,9 @@ void adjust_wide_ui()
 
 	if (progStatus.tooltips) {
 		Fl_Tooltip::enable(1);
-		mnuTooltips->set();
+		if (mnuTooltips) mnuTooltips->set();
 	} else {
-		mnuTooltips->clear();
+		if (mnuTooltips) mnuTooltips->clear();
 		Fl_Tooltip::enable(0);
 	}
 
@@ -2759,9 +2938,9 @@ void adjust_touch_ui()
 
 	if (progStatus.tooltips) {
 		Fl_Tooltip::enable(1);
-		mnuTooltips->set();
+		if (mnuTooltips) mnuTooltips->set();
 	} else {
-		mnuTooltips->clear();
+		if (mnuTooltips) mnuTooltips->clear();
 		Fl_Tooltip::enable(0);
 	}
 
@@ -2814,11 +2993,6 @@ void initXcvrTab()
 		sel_tt550_F1_func->value(progStatus.tt550_F1_func);
 		sel_tt550_F2_func->value(progStatus.tt550_F2_func);
 		sel_tt550_F3_func->value(progStatus.tt550_F3_func);
-		mnuRestoreData->clear();
-		mnuRestoreData->hide();
-		mnuKeepData->clear();
-		mnuKeepData->hide();
-		progStatus.restore_rig_data = false;
 		progStatus.use_rig_data = false;
 		op_tt550_XmtBW->clear();
 		for (int i = 0; TT550_xmt_widths[i] != NULL; i++) {
@@ -3088,20 +3262,6 @@ void initXcvrTab()
 
 		tabsGeneric->redraw();
 
-		if (progStatus.restore_rig_data) {
-			mnuRestoreData->set();
-		} else {
-			mnuRestoreData->clear();
-		}
-		mnuRestoreData->show();
-
-		if (progStatus.use_rig_data) {
-			mnuKeepData->set();
-		} else {
-			mnuKeepData->clear();
-		}
-		mnuKeepData->show();
-
 		poll_frequency->activate(); poll_frequency->value(progStatus.poll_frequency);
 		poll_mode->activate(); poll_mode->value(progStatus.poll_mode);
 		poll_bandwidth->activate(); poll_bandwidth->value(progStatus.poll_bandwidth);
@@ -3210,7 +3370,6 @@ void init_generic_rig()
 
 	if (selrig->has_getvfoAorB) {
 
-
 		int ret = selrig->get_vfoAorB();
 		int retry = 10;
 		while (ret == -1 && retry--) {
@@ -3221,15 +3380,7 @@ void init_generic_rig()
 
 		useB = ret;
 
-		selrig->selectB();
-		transceiverB.freq = vfoB.freq = progStatus.freq_B = selrig->get_vfoB();
-		transceiverB.imode = vfoB.imode = progStatus.imode_B = selrig->get_modeB();
-		transceiverB.iBW = vfoB.iBW = progStatus.iBW_B = selrig->get_bwA();
-
-		selrig->selectA();
-		transceiverA.freq = vfoA.freq = progStatus.freq_A = selrig->get_vfoA();
-		transceiverA.imode = vfoA.imode = progStatus.imode_B = selrig->get_modeA();
-		transceiverA.iBW = vfoA.iBW = progStatus.iBW_B =selrig->get_bwA();
+		read_rig_vals();
 
 		if (useB) {
 			selrig->selectB();
@@ -3239,28 +3390,10 @@ void init_generic_rig()
 		}
 	}
 	else {
-		selrig->selectA();
-		if (selrig->has_get_info)
-			selrig->get_info();
-		transceiverA.freq = selrig->get_vfoA();
-		transceiverA.imode = selrig->get_modeA();
-		transceiverA.iBW = selrig->get_bwA();
-
-		if (selrig->has_vfoAB) {
-			selrig->selectB();
-			if (selrig->has_get_info)
-				selrig->get_info();
-			transceiverB.freq = selrig->get_vfoB();
-			transceiverB.imode = selrig->get_modeB();
-			transceiverB.iBW = selrig->get_bwB();
-		} else {
-			transceiverB.freq = vfoB.freq = progStatus.freq_B;
-			transceiverB.imode = vfoB.imode = progStatus.imode_B;
-			transceiverB.iBW = vfoB.iBW = progStatus.iBW_B;
-		}
+		read_rig_vals();
 	}
 
-	if (progStatus.use_rig_data && (xcvr_name != rig_FT817.name_)) {
+	if (progStatus.use_rig_data) {
 LOG_INFO("Use xcvr start values for Vfo A/B");
 		vfo.freq = vfoA.freq = progStatus.freq_A = transceiverA.freq;
 		vfo.imode = vfoA.imode = progStatus.imode_A = transceiverA.imode;
@@ -3850,10 +3983,8 @@ void init_power_control()
 void init_attenuator_control()
 {
 	if (selrig->has_attenuator_control) {
-//		if (progStatus.use_rig_data)
-			progStatus.attenuator = selrig->get_attenuator();
-//		else
-//			selrig->set_attenuator(progStatus.attenuator);
+		if (!progStatus.use_rig_data)
+			selrig->set_attenuator(progStatus.attenuator);
 		switch (progStatus.UIsize) {
 			case small_ui :
 				btnAttenuator->show();
@@ -3888,8 +4019,10 @@ void init_agc_control()
 void init_preamp_control()
 {
 	if (selrig->has_preamp_control) {
-		progStatus.preamp = selrig->get_preamp();
-	switch (progStatus.UIsize) {
+		if (!progStatus.use_rig_data)
+			selrig->set_preamp(progStatus.preamp);
+
+		switch (progStatus.UIsize) {
 			case small_ui :
 				btnPreamp->show();
 				break;

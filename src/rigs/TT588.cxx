@@ -413,11 +413,22 @@ void RIG_TT588::get_if_min_max_step(int &min, int &max, int &step)
 	step = 10;
 }
 
+int  RIG_TT588::next_attenuator()
+{
+	switch (atten_level) {
+		case 0: return 1;
+		case 1: return 2;
+		case 2: return 3;
+		case 3: return 0;
+	}
+	return 0;
+}
+
 void RIG_TT588::set_attenuator(int val)
 {
+	atten_level = val;
 	cmd = TT588setATT;
-	atten_level++;
-	if (atten_level == 4) atten_level = 0;
+
 	cmd[2] = '0' + atten_level;
 	switch (atten_level) {
 		case 0: atten_label("0 dB", false); break;

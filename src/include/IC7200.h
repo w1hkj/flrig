@@ -57,6 +57,7 @@ public:
 	int  get_volume_control();
 	void get_vol_min_max_step(int &min, int &max, int &step);
 	void set_attenuator(int val);
+	int  next_attenuator();
 	int  get_attenuator();
 	int  get_smeter();
 	int  get_power_out(void);
@@ -69,6 +70,7 @@ public:
 	void set_noise_reduction_val(int val);
 	int  get_noise_reduction_val();
 	void set_preamp(int val);
+	int  next_preamp();
 	int  get_preamp();
 	void set_rf_gain(int val);
 	int  get_rf_gain();
