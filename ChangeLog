@@ -1,6 +1,28 @@
 
 
+=Version 1.3.34=
+
+2017-09-01  David Freese  <w1hkj@bellsouth.net>
+
+	e9628ee: Save/Restore
+	9213bfc: flrig shell
+
+2017-07-31  Sean Sharkey  <g0oan@icloud.com>
+
+	22e70f6: FT1000 update
+
+2017-07-29  David Freese  <w1hkj@bellsouth.net>
+
+	34fdb94: IC7300 NR scale
+	fa0cdaf: IC7200/7300 compile warning
+
+2017-07-23  Steve Magnuson AG7GN  <steve.magnuson@gmail.com>
+
+	661374f: IC7100
+
+
 =Version 1.3.33=
+
 
 2017-07-21  David Freese  <iam_w1hkj@w1hkj.com>
 
