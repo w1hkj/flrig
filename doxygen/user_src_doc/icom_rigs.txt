@@ -3,97 +3,97 @@
 \anchor icom_703_a
 <center>
 \image latex IC703.png "IC 703" width=3.75in
-\image html  IC703.png "IC 703"
+\image html IC703.png "IC 703"
 </center>
 \anchor icom_706mk2g_a
 <center>
 \image latex IC706MKIIG.png "IC 706 MKIIG" width=3.75in
-\image html  IC706MKIIG.png "IC 706 MKIIG"
+\image html IC706MKIIG.png "IC 706 MKIIG"
 </center>
 \anchor icom_718_a
 <center>
 \image latex IC718.png "IC 718" width=3.75in
-\image html  IC718.png "IC 718"
+\image html IC718.png "IC 718"
 </center>
 \anchor icom_728_a
 <center>
 \image latex IC728.png "IC 728" width=3.75in
-\image html  IC728.png "IC 728"
+\image html IC728.png "IC 728"
 </center>
 \anchor icom_735_a
 <center>
 \image latex IC735.png "IC 735" width=3.75in
-\image html  IC735.png "IC 735"
+\image html IC735.png "IC 735"
 </center>
 \anchor icom_746_a
 <center>
 \image latex IC746.png "IC 746" width=3.75in
-\image html  IC746.png "IC 746"
+\image html IC746.png "IC 746"
 </center>
 \anchor icom_746pro_a
 <center>
 \image latex IC746PRO.png "IC 746" width=3.75in
-\image html  IC746PRO.png "IC 746"
+\image html IC746PRO.png "IC 746"
 </center>
 \anchor icom_756pro2_a
 <center>
 \image latex IC756PROII.png "IC 756 pro2" width=3.75in
-\image html  IC756PROII.png "IC 756 pro2"
+\image html IC756PROII.png "IC 756 pro2"
 </center>
 \anchor icom_756pro3_a
 <center>
 \image latex IC756PROIII.png "IC 756 pro3" width=3.75in
-\image html  IC756PROIII.png "IC 756 pro3"
+\image html IC756PROIII.png "IC 756 pro3"
 </center>
 \anchor icom_910h_a
 <center>
 \image latex IC910H.png "IC 910 H" width=3.75in
-\image html  IC910H.png "IC 910 H"
+\image html IC910H.png "IC 910 H"
 </center>
 \anchor icom_7000_a
 <center>
 \image latex IC7000.png "IC 7000" width=3.75in
-\image html  IC7000.png "IC 7000"
+\image html IC7000.png "IC 7000"
 </center>
 \anchor icom_7100_a
 <center>
 \image latex IC7100.png "IC 7100" width=3.75in
-\image html  IC7100.png "IC 7100"
+\image html IC7100.png "IC 7100"
 </center>
 \anchor icom_7200_a
 <center>
 \image latex IC7200.png "IC 7200" width=3.75in
-\image html  IC7200.png "IC 7200"
+\image html IC7200.png "IC 7200"
 </center>
 \anchor icom_7300_a
 <center>
 \image latex IC7300.png "IC 7300" width=3.75in
-\image html  IC7300.png "IC 7300"
+\image html IC7300.png "IC 7300"
 </center>
 \anchor icom_7410_a
 <center>
 \image latex IC7410.png "IC 7410" width=3.75in
-\image html  IC7410.png "IC 7410"
+\image html IC7410.png "IC 7410"
 </center>
 \anchor icom_7600_a
 <center>
 \image latex IC7600.png "IC 7600" width=3.75in
-\image html  IC7600.png "IC 7600"
+\image html IC7600.png "IC 7600"
 </center>
 \anchor icom_7700_a
 <center>
 \image latex IC7700.png "IC 7700" width=3.75in
-\image html  IC7700.png "IC 7700"
+\image html IC7700.png "IC 7700"
 </center>
 \anchor icom_7800_a
 <center>
 \image latex IC7800.png "IC 7800" width=3.75in
-\image html  IC7800.png "IC 7800"
+\image html IC7800.png "IC 7800"
 </center>
 \anchor icom_9100_a
 <center>
 \image latex IC9100.png "IC 9100" width=3.75in
-\image html  IC9100.png "IC 9100"
+\image html IC9100.png "IC 9100"
 </center>
 \ref elecraft_rigs "Page Top"
 \ref sFlrigDesc "Return to Main Page"

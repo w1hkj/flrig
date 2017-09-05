@@ -8,32 +8,32 @@
 \anchor kwd_ts450s_a
 <center>
 \image latex TS450S.png "TS 450S" width=3.75in
-\image html  TS450S.png "TS 450S"
+\image html TS450S.png "TS 450S"
 </center>
 \anchor kwd_ts480hx_a
 <center>
 \image latex TS480HX.png "TS 480HX" width=3.75in
-\image html  TS480HX.png "TS 480HX"
+\image html TS480HX.png "TS 480HX"
 </center>
 \anchor kwd_ts570_a
 <center>
 \image latex TS570.png "TS 570" width=3.75in
-\image html  TS570.png "TS 570"
+\image html TS570.png "TS 570"
 </center>
 \anchor kwd_ts590s_a
 <center>
 \image latex TS590S.png "TS 590S" width=3.75in
-\image html  TS590S.png "TS 590S"
+\image html TS590S.png "TS 590S"
 </center>
 \anchor kwd_ts990_a
 <center>
 \image latex TS-990.png "TS 990" width=3.75in
-\image html  TS-990.png "TS 990"
+\image html TS-990.png "TS 990"
 </center>
 \anchor kwd_ts2000_a
 <center>
 \image latex TS2000.png "TS 2000" width=3.75in
-\image html  TS2000.png "TS 2000"
+\image html TS2000.png "TS 2000"
 </center>
 \ref kenwood_rigs "Page Top"
 \ref sFlrigDesc "Return to Main Page"

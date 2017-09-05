@@ -40,23 +40,21 @@ computer screen dimensions and operator preferences.  The wide aspect
 ratio can be resized horizontally.  The narrow aspect ratios are fixed
 in width and height.
 
-\anchor ft950_rig_anchor
-
 <center>
-\image latex FT-950.png "" width=6in
-\image html FT-950.png ""
+\image latex ui-wide.png "" width=6in
+\image html ui-wide.png ""
 </center>
 <br>
 
 <center>
-\image latex FT-950-2.png "" width=4.3in
-\image html FT-950-2.png ""
+\image latex ui-narrow-ic7200.png "" width=4.3in
+\image html ui-narrow-ic7200.png ""
 </center>
 <br>
 
 <center>
-\image latex FT-950-4.png "" width=4.3in
-\image html FT-950-4.png ""
+\image latex ui-small-ic7200.png "" width=4.3in
+\image html ui-small-ic7200.png ""
 </center>
 <br>
 
@@ -64,8 +62,8 @@ A fourth interface is available for all transceivers.  It is suitable for use on
 a touch screen
 
 <center>
-\image latex FT-950-touch.png "Shown at 75% of full size" width=6in
-\image html FT-950-touch.png "Shown at 75% of full size"
+\image latex ui-touch.png "Shown at 75% of full size" width=5in
+\image html ui-touch.png "Shown at 75% of full size"
 </center>
 <br>
 
@@ -99,34 +97,31 @@ additional libraries or definition files are required.
 
 \section sSetUp Setup
 
-Select the transceiver with the "Config / Xcvr select" menu item.
+Select the transceiver with the "Config / Setup / Transceiver" menu item.
 
 <center>
-\image latex config-menu.png "" width=1.6in
-\image html config-menu.png ""
+\image latex config-setup-menu.png "" width=1.6in
+\image html config-setup-menu.png ""
 </center>
 <br>
 
-Check:
-
+Each of the menu items will open the configuration dialog to the respecive tab:
 <ul>
-	<li><b>Restore Freq/Mode</b> and FLRIG will read the current frequency /
-	    mode from the transceiver at start. It will then restore those at
-	    exit.</li>
-	<li><b>Keep Freq/Mode</b> and FLRIG use the transceiver frequency and
-	    mode for it's initial startup values.</li>
-	<li><b>Tooltips</b> and a small popup information box will appear above
-	    most controls when the mouse is allowed to hover over the control.</li>
-	<li><b>Small sliders</b> to compress the user interface as above in the
-	    right hand panel.</li>
+	<li><b>Transceiver</b> - select transceiver and configure serial i/o parameters</li>
+	<li><b>XmlRpc</b> - configure interface to fldigi xmlrpc server (if used)</li>
+	<li><b>tcpip</b> - configure interface to a remote tcpip/serial controlled transceiver</li>
+	<li><b>PTT</b> - configure separate PTT serial ports (if used)</li>
+	<li><b>AUX</b> - configure separate auxiliary serial ports (if used)</li>
+	<li><b>Polling</b> - select and configure transceiver parameters to poll</li>
+	<li><b>Restore</b> - select and configure transceiver parameters to read and restore</li>
 </ul>
 <br>
 
 \subsection ssXcvrSelect Xcvr Select
 
 <center>
-\image latex primary.png "I/O Ports - Primary" width=4.9in
-\image html primary.png "I/O Ports - Primary"
+\image latex xcvr.png "I/O Ports - Xcvr" width=4.9in
+\image html xcvr.png "I/O Ports - Xcvr"
 </center>
 <br>
 
@@ -145,7 +140,6 @@ If your serial connection is a CI-V device you might need to check "Echo"
 and also set either RTS or DTR to +12 if CI-V power is derived from the
 serial port.
 
-
 <center>
 \image latex ptt.png "I/O Ports - PTT" width=4.9in
 \image html ptt.png "I/O Ports - PTT"
@@ -155,7 +149,6 @@ serial port.
 Your PTT h/w control may also make use of a second serial port.  If that port
 is the secondary serial port of the SCU-17 then you must also enable the "Serial Port is SCU-17 auxiliary"
 control.
-
 
 <center>
 \image latex aux.png "I/O Ports - Aux" width=4.9in
@@ -217,13 +210,81 @@ Icom: xFE xFE x70 xE0 x1A x05 x00 x92 x00 xFD
 Press the SEND button to transfer the command to the transceiver.  The
 response will appear in the lower text control.
 
-Select the toggle button "Small sliders" on the Config menu for 1/2 size
-sliders and a dialog layout that uses less vertical space.
+<br>
 
 <center>
-\image latex ft950-small.png "FT950 Minimal" width=4.32in
-\image html ft950-small.png "FT950 Minimal"
+\image latex restore.png "Restoring transceiver Status" width=4.9in
+\image html restore.png "Restoring transceiver Status"
 </center>
+<br>
+
+flrig will read various transceiver parameters and restore them upon closing.
+The above dialog shows the available read/restore parameters for the Icom 7200.  If
+a parameter is not available (or coded) it will be disabled and grayed out.  Check
+each parameter that you want to read and restore.  Reading and restoring transceiver
+parameters takes time, especially on older transceivers with low baud rate serial
+i/o.  Check "Use xcvr data" i\If you want flrig to NOT change the transceiver operating state
+when it begins execution.
+
+\subsection ssUserInterface User Interface
+
+<center>
+\image latex config-ui-menu.png "" width=1.6in
+\image html config-ui-menu.png ""
+</center>
+<br>
+
+\subsection ssMetering Meter Display and Filters
+
+<center>
+\image latex meter-filters.png "Meter Filter Controls" width=4.18in
+\image html meter-filters.png "Meter Filter Controls"
+</center>
+<br>
+
+You can control the behavior of both the average and peak values of the
+S-meter and Power out meters.  Setting the controls to 1 for both average
+and peak will simply display the latest value available from the
+transceiver.  The average setting results in the display showing the
+average of the last N readings.  The peak value will display the average
+peak value over the last M readings.
+<br>
+
+<center>
+\image latex power-scale-select.png "Meter Scale" width=4.6in
+\image html power-scale-select.png "Meter Scale"
+</center>
+<br>
+
+Right click on the main dialog power meter scale to open up this selection
+dialog.  Each of the 4 scales and the "Auto scaled" box are buttons.  Press
+the one you want to use.  Auto-scaling adjusts the meter scale to the
+smallest scale consistent with the current measured peak power.  If that
+power is fluctuating near the transistion point between two scales you
+might want to fix the scale to either the larger or smaller.
+<br>
+
+\subsection ssSliders Slider sizing
+
+When the user interface is configured to be "small" then the UI submenu will
+contain the item "Small sliders".  Toggling this menu item will immediately
+change the size and positions of the various slider controls. Select the toggle button 
+"Small sliders" on the Config menu for 1/2 size sliders and a dialog layout 
+that uses less vertical space.
+
+<center>
+\image latex ui-narrow-ic7200.png "Small UI - Large Sliders" width=4.6in
+\image html ui-narrow-ic7200.png "Small UI - Large Sliders"
+</center>
+<br>
+
+<center>
+\image latex ui-small-ic7200.png "Small UI - Small Sliders" width=4.6in
+\image html ui-small-ic7200.png "Small UI - Small Sliders"
+</center>
+<br>
+
+\subsection ssAdditionalControls Additional Controls
 
 Additional control settings may be available depending on the transceiver
 being controlled.  These are in a drop-down area toggled by the arrow button
@@ -266,23 +327,8 @@ scheme appear as:
 \image latex touch-other-misc.png "FT-450D MISC panel" width = 6in
 \image html  touch-other-misc.png "FT-450D MISC panel"
 
-\subsection ssUserInterface User Interface
 
-\ref config_fonts_colors
-<br>
-
-<center>
-\image latex power-scale-select.png "Meter Scale" width=4.6in
-\image html power-scale-select.png "Meter Scale"
-</center>
-<br>
-
-Right click on the main dialog power meter scale to open up this selection
-dialog.  Each of the 4 scales and the "Auto scaled" box are buttons.  Press
-the one you want to use.  Auto-scaling adjusts the meter scale to the
-smallest scale consistent with the current measured peak power.  If that
-power is fluctuating near the transistion point between two scales you
-might want to fix the scale to either the larger or smaller.
+Select the User Interface menu item to configure various user preferences including \ref config_fonts_colors.
 <br>
 
 \section sOpControls Operating Controls
@@ -355,22 +401,6 @@ PTT can be activated at FLRIG or using the T/R button on FLDIGI.  FLDIGI
 also engages the PTT via the macro \<TX\> \<RX\> tags.  When operating digital
 modes with FLDIGI you should use the PTT from FLDIGI.
 
-\subsection ssMeterFiltering Meter Filtering
-
-<center>
-\image latex meter-filters.png "Meter Filter Controls" width=4.18in
-\image html meter-filters.png "Meter Filter Controls"
-</center>
-<br>
-
-You can control the behavior of both the average and peak values of the
-S-meter and Power out meters.  Setting the controls to 1 for both average
-and peak will simply display the latest value available from the
-transceiver.  The average setting results in the display showing the
-average of the last N readings.  The peak value will display the average
-peak value over the last M readings.
-
-
 <center>
 \image latex flrig-event-log.png "Event Log" width=7.5in
 \image html flrig-event-log.png "Event Log"
@@ -382,12 +412,27 @@ serial and xmlrpc data exchanges between FLRIG, FLDIGI, and the
 transceiver.
 
 
-\subsection ssMultipleConfigDir Multiple Configuration Directories
+\section ssMultipleConfigDir Controlling Multiple Transceivers
+
+You can have multiple instances of flrig running, each controlling a separate
+and unique transceiver.  Doing this requires a separate configuration folder
+for each target transceiver.  Either start flrig from a command line or
+copy the desktop launch icon and then modify it's "target" executable.  In
+either case you will be adding a command line parameter
+
+"--config-dir <target-dir>"
+
+Note the double dash.  The <target-dir> will be unique to each supported
+transceiver, for example: "C:\Users\<user-name>\flrig.ic7200" on Win-10, 
+"/home/<user>/flrig.ic7200" on Linux or OS X.  You will have to configure
+each instance with the correct interface parameters.
 
 <center>
 \image latex mulitple_configs.png "" width=2.48in
 \image html mulitple_configs.png ""
 </center>
+
+
 <br>
 
 \section sTT550 TT 550
