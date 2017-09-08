@@ -51,6 +51,7 @@ using namespace XmlRpc;
 // The server
 XmlRpcServer rig_server;
 
+extern bool xcvr_initialized;
 //------------------------------------------------------------------------------
 // Request for transceiver name
 //------------------------------------------------------------------------------
@@ -59,7 +60,10 @@ public:
 	rig_get_xcvr(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_xcvr", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		result = selrig->name_;
+		if (!xcvr_initialized)
+			result = "";
+		else
+			result = selrig->name_;
 	}
 
 	std::string help() { return std::string("returns noun name of transceiver"); }
@@ -154,7 +158,12 @@ public:
 	rig_get_info(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_info", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		string info;
+		string info = "";
+
+		if (!xcvr_initialized) {
+			result = info;
+			return;
+		}
 
 		uname = sname();   info.assign(uname);
 		utx = stx();       info.append(utx);
@@ -179,6 +188,11 @@ public:
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 		string info;  info.clear();
 		string temp;  temp.clear();
+
+		if (!xcvr_initialized) {
+			result = info;
+			return;
+		}
 
 		if (selrig->has_smeter && !btnPTT->value()) {
 			static char szval[10];
@@ -219,6 +233,12 @@ public:
 	rig_get_ptt(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_ptt", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
+
 		result = btnPTT->value();
 	}
 
@@ -235,6 +255,11 @@ public:
 	rig_get_vfo(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_vfo", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = "14070000";
+			return;
+		}
+
 		static char szfreq[20];
 		int freq;
 		if (useB) {
@@ -264,7 +289,10 @@ public:
 	rig_get_AB(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_AB", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-//		result[0] = useB ? "B" : "A";
+		if (!xcvr_initialized) {
+			result = "A";
+			return;
+		}
 		result = useB ? "B" : "A";
 	}
 
@@ -282,11 +310,15 @@ public:
 	rig_get_notch(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_notch", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
 
-	if (progStatus.notch)
-		result = (int)(progStatus.notch_val);
-	else
-		result = (int)0;
+		if (progStatus.notch)
+			result = (int)(progStatus.notch_val);
+		else
+			result = (int)0;
 	}
 
 	std::string help() { return std::string("returns notch value"); }
@@ -301,6 +333,11 @@ public:
 	rig_set_notch(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_notch", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
+
 		static int ntch;
 		ntch = static_cast<int>((double)(params[0]));
 		progStatus.notch_val = ntch;
@@ -327,12 +364,15 @@ public :
 	rig_get_modes(XmlRpcServer *s) : XmlRpcServerMethod("rig.get_modes", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		XmlRpcValue modes;
 
-		if (!selrig->modes_) {
-			result = "none";
+		if (!xcvr_initialized || !selrig->modes_) {
+			modes[0] = "CW";
+			modes[1] = "LSB";
+			modes[2] = "USB";
 			return;
 		}
-		XmlRpcValue modes;
+
 		int i = 0;
 		for (const char** mode = selrig->modes_; *mode; mode++, i++)
 			modes[i] = *mode;
@@ -352,6 +392,12 @@ public:
 	rig_get_sideband(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_sideband", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+
+		if (!xcvr_initialized) {
+			result = "U";
+			return;
+		}
+
 		int mode;
 		if (useB) {
 			guard_lock queB_lock(&mutex_queB);
@@ -380,6 +426,11 @@ public:
 	rig_get_mode(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_mode", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = "USB";
+			return;
+		}
+
 		int mode;
 		if (useB) {
 			guard_lock queB_lock(&mutex_queB);
@@ -409,7 +460,7 @@ public :
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 
-		if (!selrig->bandwidths_) {
+		if (!xcvr_initialized || !selrig->bandwidths_) {
 			XmlRpcValue bws;
 			bws[0][0] = "Bandwidth";
 			bws[0][1] = "NONE";
@@ -470,6 +521,13 @@ public:
 	rig_get_bw(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_bw", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+
+		if (!xcvr_initialized) {
+			result[0] = "NONE";
+			result[1] = "";
+			return;
+		}
+
 		{
 			guard_lock queA_lock(&mutex_queA);
 			guard_lock queB_lock(&mutex_queB);
@@ -514,7 +572,7 @@ public:
 	rig_get_smeter(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_smeter", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!selrig->has_smeter) 
+		if (!xcvr_initialized || !selrig->has_smeter) 
 			result = (int)(0);
 		else
 			result = (int)(mval);
@@ -527,7 +585,7 @@ public:
 	rig_get_pwrmeter(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_pwrmeter", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!selrig->has_power_out) 
+		if (!xcvr_initialized || !selrig->has_power_out) 
 			result = (int)(0);
 		else
 			result = (int)(mval);
@@ -579,6 +637,10 @@ public:
 	rig_set_ptt(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_ptt", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
 		int state = int(params[0]);
 		if (state) Fl::awake(setPTT, (void *)1);
 		else Fl::awake(setPTT, (void *)0);
@@ -606,6 +668,10 @@ public:
 	rig_set_AB(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_AB", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
 		std::string ans = std::string(params[0]);
 		if (ans == "A" && useB) Fl::awake(selectA);
 		if (ans == "B" && !useB) Fl::awake(selectB);
@@ -624,6 +690,10 @@ public:
 	rig_set_vfo(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_vfo", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
 		long freq = static_cast<long>(double(params[0]));
 // set the frequency in vfoA or vfoB
 		if (useB) srvr_vfo = vfoB;
@@ -640,6 +710,10 @@ public:
 	main_set_frequency(XmlRpcServer* s) : XmlRpcServerMethod("main.set_frequency", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
 		long freq = static_cast<long>(double(params[0]));
 // set the frequency in vfoA or vfoB
 		if (useB) srvr_vfo = vfoB;
@@ -660,6 +734,10 @@ public:
 	rig_set_mode(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_mode", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue &result) {
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
 		if (useB) {
 			guard_lock queB_lock(&mutex_queB);
 			if (!queB.empty()) srvr_vfo = queB.back();
@@ -705,6 +783,10 @@ public:
 	rig_set_bw(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_bw", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
 		int bw = int(params[0]);
 		if (useB) {
 			guard_lock queB_lock(&mutex_queB);
@@ -727,6 +809,10 @@ public:
 	rig_set_BW(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_BW", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
 		string bwstr = params;
 //		std::cout << bwstr << "\n";
 

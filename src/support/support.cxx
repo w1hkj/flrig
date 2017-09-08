@@ -4275,8 +4275,12 @@ void init_K3_KX3_special()
 	}
 }
 
+bool xcvr_initialized = false;
+
 void initRig()
 {
+	xcvr_initialized = false;
+
 	btnInitializing->show();
 	mainwindow->redraw();
 
@@ -4374,6 +4378,7 @@ void initRig()
 	btnInitializing->hide();
 	mainwindow->redraw();
 
+	xcvr_initialized = true;
 	return;
 
 failed:

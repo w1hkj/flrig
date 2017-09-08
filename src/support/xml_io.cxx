@@ -568,10 +568,13 @@ static void get_fldigi_status()
 	}
 }
 
+extern bool xcvr_initialized;
+
 void * digi_loop(void *d)
 {
 	for (;;) {
 		MilliSleep(RIG_UPDATE_INTERVAL);
+
 		if (!run_digi_loop) {
 			LOG_ERROR("Exiting digi loop");
 			try {
@@ -581,6 +584,7 @@ void * digi_loop(void *d)
 			}
 			break;
 		}
+		if (!xcvr_initialized) continue;
 
 		if (rig_reset || (!fldigi_online && (--try_count == 0))) {
 			try {
