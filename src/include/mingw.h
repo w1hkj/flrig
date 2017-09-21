@@ -2,14 +2,14 @@
 // Copyright (C) 2014
 //              David Freese, W1HKJ
 //
-// This file is part of flrig.
+// This file is part of fldigi
 //
-// flrig is free software; you can redistribute it and/or modify
+// fldigi is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
 //
-// flrig is distributed in the hope that it will be useful,
+// fldigi is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
@@ -21,9 +21,29 @@
 #ifndef MINGW_H_
 #define MINGW_H_
 
+#include "config.h"
+
 #include <sys/types.h>
 #include <pthread.h>
+
 #include <winsock2.h>
+
+#undef EADDRINUSE
+#define EADDRINUSE WSAEADDRINUSE
+
+#undef EISCONN
+#define EISCONN WSAEISCONN
+
+#undef EWOULDBLOCK
+#define EWOULDBLOCK WSAEWOULDBLOCK
+
+#undef EINPROGRESS
+#define EINPROGRESS WSAEINPROGRESS
+
+#undef EALREADY
+#define EALREADY WSAEALREADY
+
+//======================================================================
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,6 +56,10 @@ typedef long suseconds_t;
 #ifndef SIGUSR2
 #  define SIGUSR2 100
 #endif
+
+extern void was_init(void);
+extern int was_init_state(void);
+extern WSADATA * was_data(void);
 
 /*
  * simple adaptors
@@ -75,9 +99,6 @@ int mingw_rename(const char*, const char*);
 #endif
 #ifndef SHUT_RDWR
 #  define SHUT_RDWR SD_BOTH
-#endif
-#ifndef EADDRINUSE
-#  define EADDRINUSE WSAEADDRINUSE
 #endif
 
 int nanosleep (const struct timespec *req, struct timespec *rem);
