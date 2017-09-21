@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------------------
 // Copyright (C) 2014
-//              David Freese, W1HKJ
+//		David Freese, W1HKJ
 //
 // This file is part of flrig.
 //
@@ -25,19 +25,19 @@
 enum mFTdx5000 {
   mLSB, mUSB, mCW, mFM, mAM, mRTTY_L, mCW_R, mPKT_L, mRTTY_U, mPKT_FM, mFM_N, mPKT_U };
 // mLSB, mUSB, mCW, mFM, mAM, mRTTY_L, mCW_R, mPKT_L, mRTTY_U, mPKT_FM, mFM_N, mPKT_U
-//  0,    1,    2,   3,   4,   5,       6,     7,      8,       9,       10,    11	// mode index
-// 19,   19,    9,   0,   0,  10,       9,    15,     10,       0,        0,    15	// FTdx5000_def_bw
+//  0,    1,    2,   3,   4,   5,	6,     7,      8,	9,	10,    11	// mode index
+// 19,   19,    9,   0,   0,  10,	9,    15,     10,	0,	 0,    15	// FTdx5000_def_bw
 
 
 static const char FT5000name_[] = "FTdx5000";
 
 static const char *FT5000modes_[] = {
-"LSB", "USB", "CW", "FM", "AM", 
+"LSB", "USB", "CW", "FM", "AM",
 "RTTY-L", "CW-R", "PSK-L", "RTTY-U", "PKT-FM",
 "FM-N", "PSK-U", NULL};
 
 static const int FT5000_def_bw[] = {
-19, 19, 9, 0, 0, 
+19, 19, 9, 0, 0,
 10, 9, 15, 10, 0,
 0, 15 };
 
@@ -48,7 +48,7 @@ static const char *FT5000_widths_SSB[] = {
 "200", "400", "600", "850", "1100", "1350", "1500", // NA = 1 widths
 "1650", "1800", "1950", "2100", "2250", "2400",
 "2500", "2600", "2700", "2800", "2900", "3000",
-"3200", "3400", "3600", "3800", "4000",             // NA = 0 widths
+"3200", "3400", "3600", "3800", "4000",	      // NA = 0 widths
 NULL };
 
 static int FT5000_wvals_SSB[] = {
@@ -56,7 +56,7 @@ static int FT5000_wvals_SSB[] = {
 
 static const char *FT5000_widths_CW[] = {
 "50",   "100",  "150",  "200",  "250", "300",  "350", "400",  "450", "500", // NA1
-"800", "1200", "1400", "1700", "2000", "2400",                              // NA0
+"800", "1200", "1400", "1700", "2000", "2400",				  // NA0
 NULL };
 
 static int FT5000_wvals_CW[] = {
@@ -64,7 +64,7 @@ static int FT5000_wvals_CW[] = {
 
 static const char *FT5000_widths_RTTY[] = {
 "50",   "100",  "150",  "200",  "250", "300",  "350", "400",  "450", "500", // NA1
-"800", "1200", "1400", "1700", "2000", "2400",                              // NA0
+"800", "1200", "1400", "1700", "2000", "2400",				  // NA0
 NULL };
 
 static int FT5000_wvals_RTTY[] = {
@@ -72,7 +72,7 @@ static int FT5000_wvals_RTTY[] = {
 
 static const char *FT5000_widths_PSK[] = {
 "50",   "100",  "150",  "200",  "250", "300",  "350", "400",  "450", "500", // NA1
-"800", "1200", "1400", "1700", "2000", "2400",                              // NA0
+"800", "1200", "1400", "1700", "2000", "2400",				  // NA0
 NULL };
 
 static int FT5000_wvals_PSK[] = {
@@ -98,7 +98,7 @@ static const char *FT5000_US_60m[] = {NULL, "126", "127", "128", "130", NULL};
 static const char **Channels_60m = FT5000_US_60m;
 
 static GUI rig_widgets[]= {
-	{ (Fl_Widget *)btnVol,        2, 125,  50 },
+	{ (Fl_Widget *)btnVol,	 2, 125,  50 },
 	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
 	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },
 	{ (Fl_Widget *)btnIFsh,     214, 105,  50 },
@@ -107,7 +107,7 @@ static GUI rig_widgets[]= {
 	{ (Fl_Widget *)sldrNOTCH,   266, 125, 156 },
 	{ (Fl_Widget *)sldrMICGAIN, 266, 145, 156 },
 	{ (Fl_Widget *)sldrPOWER,    54, 165, 368 },
-	{ (Fl_Widget *)NULL,          0,   0,   0 }
+	{ (Fl_Widget *)NULL,	   0,   0,   0 }
 };
 
 void RIG_FT5000::initialize()
@@ -128,7 +128,7 @@ void RIG_FT5000::initialize()
 }
 
 RIG_FT5000::RIG_FT5000() {
-// base class values	
+// base class values
 	name_ = FT5000name_;
 	modes_ = FT5000modes_;
 	bandwidths_ = FT5000_widths_SSB;
@@ -362,6 +362,21 @@ int RIG_FT5000::get_smeter()
 	return mtr;
 }
 
+struct meterpair {int mtr; float val;};
+
+struct meterpair swrtbl[] = {
+	{13, 5},	// 1.0
+	{39, 15},	// 1.3
+	{52, 20},	// 1.5
+	{65, 25},	// 1.7
+	{77, 30},	// 1.8
+	{89, 34},	// 2.0
+	{102, 39},	// 2.5
+	{119, 46},	// 2.9
+	{198, 77},	// 4.0
+	{255, 99}	// 5.0
+};
+
 int RIG_FT5000::get_swr()
 {
 	cmd = rsp = "RM6";
@@ -371,22 +386,72 @@ int RIG_FT5000::get_swr()
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
-	int mtr = atoi(&replystr[p+3]);
-	return mtr / 2.56;
+	double rcvd = (double)(atoi(&replystr[p+3]));
+//	return mtr / 2.56;
+
+	size_t i;
+	for (i = 0; i < sizeof(swrtbl) / sizeof(*swrtbl); i++)
+		if (rcvd >= swrtbl[i].mtr && rcvd < swrtbl[i+1].mtr)
+			break;
+
+	double mtr =
+		(int)ceil(swrtbl[i].val +
+		(swrtbl[i+1].val - swrtbl[i].val )* (rcvd - swrtbl[i].mtr) / (swrtbl[i+1].mtr - swrtbl[i].mtr));
+	if (mtr < 0) mtr = 0;
+	if (mtr > 100) mtr = 100;
+
+	return (int)mtr;
 }
+
+//     Po Conversion Table
+
+static meterpair pwrtbl[] = {
+	{0, 0.0},
+	{57, 10.0},
+	{71, 20.0},
+	{89, 30.0},
+	{101, 40.0},
+	{115, 50.0},
+	{126, 60.0},
+	{136, 70.0},
+	{144, 80.0},
+	{152, 90.0},
+	{161, 100.0},
+	{168, 110.0},
+	{177, 120.0},
+	{184, 130.0},
+	{188, 140.0},
+	{197, 150.0},
+	{201, 160.0},
+	{207, 170.0},
+	{215, 180.0},
+	{220, 190.0},
+	{226, 200.0},
+	{231, 210.0},
+	{237, 220.0},
+	{242, 230.0},
+	{248, 240.0},
+	{255, 250.0}
+};
 
 int RIG_FT5000::get_power_out()
 {
 	cmd = rsp = "RM5";
 	sendCommand(cmd.append(";"));
 	waitN(7, 100, "get pout", ASC);
-
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
-	double mtr = (double)(atoi(&replystr[p+3]));
-//	mtr = -6.6263535 + .11813178 * mtr + .0013607405 * mtr * mtr;
-	mtr = 0.116 * mtr + 0.0011 * mtr * mtr;
+	double rcvd = (double)(atoi(&replystr[p+3]));
+	size_t i = 0;
+	for (i = 0; i < sizeof(pwrtbl) / sizeof(*pwrtbl); i++)
+		if (rcvd >= pwrtbl[i].mtr && rcvd < pwrtbl[i+1].mtr)
+			break;
+	double mtr =
+		(int)ceil(pwrtbl[i].val +
+		(pwrtbl[i+1].val - pwrtbl[i].val) * (rcvd - pwrtbl[i].mtr) / (pwrtbl[i+1].mtr - pwrtbl[i].mtr));
+	if (mtr > 250) mtr = 250;
+	if (mtr < 0) mtr = 0;
 	return (int)mtr;
 }
 
@@ -432,7 +497,7 @@ int RIG_FT5000::get_volume_control()
 	return val;
 }
 
-void RIG_FT5000::set_volume_control(int val) 
+void RIG_FT5000::set_volume_control(int val)
 {
 	int ivol = (int)(val * 250 / 100);
 	cmd = "AG0000;";
@@ -711,8 +776,8 @@ int RIG_FT5000::get_bwA()
 {
 	if (modeA == mFM || modeA == mAM || modeA == mFM_N || modeA == mPKT_FM) {
 		bwA = 0;
-		return bwA;	
-	} 
+		return bwA;
+	}
 	cmd = rsp = "SH0";
 	cmd += ';';
 	waitN(6, 100, "get bw A", ASC);
@@ -762,7 +827,7 @@ int RIG_FT5000::get_bwB()
 	if (modeB == mFM || modeB == mAM || modeB == mFM_N || modeB == mPKT_FM) {
 		bwB = 0;
 		return bwB;
-	} 
+	}
 	cmd = rsp = "SH0";
 	cmd += ';';
 	waitN(6, 100, "get bw B", ASC);
@@ -770,7 +835,7 @@ int RIG_FT5000::get_bwB()
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return bwB;
 	if (p + 5 >= replystr.length()) return bwB;
-	
+
 	replystr[p+5] = 0;
 	int bw_idx = fm_decimal(replystr.substr(p+3),2);
 	const int *idx = bw_vals_;
