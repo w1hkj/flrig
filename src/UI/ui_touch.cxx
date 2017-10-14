@@ -23,6 +23,12 @@ void cbSLIDERS(Fl_Widget *, void *);
 void cbBUTTONS(Fl_Widget *, void *);
 void cbOTHER(Fl_Widget *, void *);
 
+static void set_menu_item(std::string name, bool b);
+static void cb_TOUCH_btnAuxRTS(Fl_Light_Button* o, void*);
+static void cb_TOUCH_btnAuxDTR(Fl_Light_Button* o, void*);
+static void cb_TOUCH_mnuAuxRTS(Fl_Menu_Item* o, void*);
+static void cb_TOUCH_mnuAuxDTR(Fl_Menu_Item* o, void*);
+
 Fl_Menu_Item touch_menu[] = {
  {_("&File"), 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
  {_("E&xit"), 0,  (Fl_Callback*)cb_mnuExit, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
@@ -57,9 +63,50 @@ Fl_Menu_Item touch_menu[] = {
  {_("MAIN   "), 0, (Fl_Callback*)cbMAIN, 0, FL_MENU_RADIO | FL_MENU_VALUE, FL_NORMAL_LABEL, 0, 14, 0},
  {_("SLIDERS   "), 0, (Fl_Callback*)cbSLIDERS, 0, FL_MENU_RADIO, FL_NORMAL_LABEL, 0, 14, 0},
  {_("BUTTONS   "), 0, (Fl_Callback*)cbBUTTONS, 0, FL_MENU_RADIO, FL_NORMAL_LABEL, 0, 14, 0},
- {_("OTHER   "), 0, (Fl_Callback*)cbOTHER, 0, FL_MENU_RADIO | FL_MENU_DIVIDER, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("OTHER   "), 0, (Fl_Callback*)cbOTHER,            0, FL_MENU_RADIO | FL_MENU_DIVIDER, FL_NORMAL_LABEL, 0, 14, 0},
+ {"Aux DTR",  0, (Fl_Callback*)cb_TOUCH_mnuAuxDTR, 0, FL_MENU_TOGGLE | FL_MENU_DIVIDER, FL_NORMAL_LABEL, 0, 14, 0},
+ {"Aux RTS",  0, (Fl_Callback*)cb_TOUCH_mnuAuxRTS, 0, FL_MENU_TOGGLE | FL_MENU_DIVIDER, FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0}
 };
+
+static void set_menu_item(std::string name, bool b)
+{
+	for (size_t n = 0; n < sizeof(touch_menu) / sizeof(*touch_menu); n++)
+		if (touch_menu[n].text && (name == touch_menu[n].text)) {
+			if (b) touch_menu[n].set();
+			else   touch_menu[n].clear();
+			if (mainwindow) mainwindow->redraw();
+			break;
+		}
+}
+
+static void cb_TOUCH_btnAuxRTS(Fl_Light_Button* o, void*) {
+	progStatus.aux_rts = o->value();
+	set_menu_item("Aux RTS", progStatus.aux_rts);
+	btnAuxRTS->value(progStatus.aux_rts);
+	cbAuxPort();
+}
+
+static void cb_TOUCH_btnAuxDTR(Fl_Light_Button* o, void*) {
+	progStatus.aux_dtr = o->value();
+	set_menu_item("Aux DTR", progStatus.aux_dtr);
+	btnAuxDTR->value(progStatus.aux_dtr);
+	cbAuxPort();
+}
+
+static void cb_TOUCH_mnuAuxRTS(Fl_Menu_Item* o, void*) {
+	progStatus.aux_rts = !progStatus.aux_rts;
+	set_menu_item("Aux RTS", progStatus.aux_rts);
+	btnAuxRTS->value(progStatus.aux_rts);
+	cbAuxPort();
+}
+
+static void cb_TOUCH_mnuAuxDTR(Fl_Menu_Item* o, void*) {
+	progStatus.aux_dtr = !progStatus.aux_dtr;
+	set_menu_item("Aux DTR", progStatus.aux_dtr);
+	btnAuxDTR->value(progStatus.aux_dtr);
+	cbAuxPort();
+}
 
 Fl_Group *grpMAIN = (Fl_Group *)0;
 Fl_Group *grpSLIDERS = (Fl_Group *)0;
@@ -1104,14 +1151,14 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				btnAuxRTS->tooltip(_("RTS control pin"));
 				btnAuxRTS->down_box(FL_THIN_DOWN_BOX);
 				btnAuxRTS->labelsize(12);
-				btnAuxRTS->callback((Fl_Callback*)cb_btnAuxRTS);
+				btnAuxRTS->callback((Fl_Callback*)cb_TOUCH_btnAuxRTS);
 				btnAuxRTS->value(progStatus.aux_rts);
 
 				btnAuxDTR = new Fl_Light_Button(xpos+200, by, 60, bh, _("DTR"));
 				btnAuxDTR->tooltip(_("DTR control pin"));
 				btnAuxDTR->down_box(FL_THIN_DOWN_BOX);
 				btnAuxDTR->labelsize(12);
-				btnAuxDTR->callback((Fl_Callback*)cb_btnAuxDTR);
+				btnAuxDTR->callback((Fl_Callback*)cb_TOUCH_btnAuxDTR);
 				btnAuxDTR->value(progStatus.aux_dtr);
 
 				btnDataPort = new Fl_Light_Button(xpos+408, by, 60, bh, _("Data"));
@@ -1611,6 +1658,9 @@ Fl_Double_Window* touch_rig_window() {
 	txt_encA->box(FL_THIN_DOWN_BOX);
 	txt_encA->align(20);
 	txt_encA->hide();
+
+	set_menu_item("Aux RTS", progStatus.aux_rts);
+	set_menu_item("Aux DTR", progStatus.aux_dtr);
 
 	main_group = touch_main_group(0, 28, mainW, mainH);
 	main_group->show();
