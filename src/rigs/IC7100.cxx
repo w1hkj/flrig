@@ -162,6 +162,9 @@ RIG_IC7100::RIG_IC7100() {
 	has_compON =
 	has_compression =
 
+	has_split =
+	has_split_AB =
+
 	has_micgain_control =
 	has_bandwidth_control = true;
 
@@ -570,3 +573,41 @@ void RIG_IC7100::set_cw_vol()
 	cmd.append( post );
 	waitFB("SET cw sidetone volume");
 }
+
+bool RIG_IC7100::can_split()
+{
+	return true;
+}
+
+void RIG_IC7100::set_split(bool val)
+{
+	split = val;
+	cmd = pre_to;
+	cmd += '\x0F';
+	if (split) {
+		cmd += '\x01';
+		cmd.append(post);
+		waitFB("Split ON");
+	} else {
+	   cmd += '\x00';
+	   cmd.append( post );
+	   waitFB("Split OFF");
+	}
+}
+
+int RIG_IC7100::get_split()
+{
+	int split = 0;
+	cmd = pre_to;
+	cmd += '\x0F';
+	cmd.append( post );
+	if (waitFOR(7, "get split")) {
+		string resp = pre_fm;
+		resp.append("\x0F");
+		size_t p = replystr.find(resp);
+		if (p != string::npos)
+			split = replystr[p+5];
+	}
+	return split;
+}
+

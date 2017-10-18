@@ -81,6 +81,10 @@ public:
 	bool  canswap() { return true; }
 	bool ICswap() { return true; }
 
+	bool can_split();
+	void set_split(bool val);
+	int get_split();
+
 };
 
 #endif
