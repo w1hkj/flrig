@@ -415,7 +415,7 @@ int RIG_K2::get_power_out()
 
 int RIG_K2::get_power_control()
 {
-	rsp = cmd = "PC;";  // extended mode for get power
+	rsp = cmd = "PC";  // extended mode for get power
 	cmd += ';';
 	int ret = waitN(7, 100, "get pwr cont", ASC);
 	if (ret < 7) return progStatus.power_level;
