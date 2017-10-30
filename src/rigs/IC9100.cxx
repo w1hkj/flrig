@@ -138,6 +138,9 @@ RIG_IC9100::RIG_IC9100() {
 
 	has_split =
 
+	has_attenuator_control =
+	has_preamp_control =
+
 	has_micgain_control =
 	has_bandwidth_control = true;
 
@@ -439,46 +442,6 @@ void RIG_IC9100::set_mic_gain(int v)
 	waitFB("set mic gain");
 	if (IC9100_DEBUG)
 		LOG_WARN("%s", str2hex(cmd.data(), cmd.length()));
-}
-
-void RIG_IC9100::set_attenuator(int val)
-{
-	int cmdval = 0;
-	if (atten_level == 0) {
-		atten_level = 1;
-		atten_label("20 dB", true);
-		cmdval = 0x20;
-	} else {
-		atten_level = 0;
-		atten_label("Att", false);
-		cmdval = 0x00;
-	}
-	cmd = pre_to;
-	cmd += '\x11';
-	cmd += cmdval;
-	cmd.append( post );
-	waitFB("set attenuator");
-	if (IC9100_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-}
-
-int RIG_IC9100::get_attenuator()
-{
-	cmd = pre_to;
-	cmd += '\x11';
-	cmd.append( post );
-	string resp = pre_fm;
-	resp += '\x11';
-	if (waitFOR(7, "get attenuator")) {
-		if (replystr[5] == 0x20) {
-			atten_level = 1;
-			atten_label("20 dB", true);
-		} else {
-			atten_level = 0;
-			atten_label("Att", false);
-		}
-	}
-	return atten_level;
 }
 
 void RIG_IC9100::set_compression()
@@ -837,3 +800,116 @@ int  RIG_IC9100::agc_val()
 {
 	return (agcval);
 }
+
+void RIG_IC9100::set_attenuator(int val)
+{
+	if (val) {
+		atten_label("20 dB", true);
+		atten_level = 1;
+		set_preamp(0);
+	} else {
+		atten_label("ATT", false);
+		atten_level = 0;
+	}
+
+	cmd = pre_to;
+	cmd += '\x11';
+	cmd += atten_level ? '\x20' : '\x00';
+	cmd.append( post );
+	waitFB("set att");
+}
+
+int RIG_IC9100::next_attenuator()
+{
+	if (atten_level) return 0;
+	return 1;
+}
+
+int RIG_IC9100::get_attenuator()
+{
+	cmd = pre_to;
+	cmd += '\x11';
+	cmd.append( post );
+	string resp = pre_fm;
+	resp += '\x11';
+	if (waitFOR(7, "get ATT")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			if (!replystr[p+5]) {
+				atten_label("ATT", false);
+				atten_level = 0;
+				return 0;
+			} else {
+				atten_label("20 dB", true);
+				atten_level = 1;
+				return 1;
+			}
+		}
+	}
+	return 0;
+}
+
+int RIG_IC9100::next_preamp()
+{
+	switch (preamp_level) {
+		case 0: return 1;
+		case 1: return 2;
+		default:
+		case 2: return 0;
+	}
+	return 0;
+}
+
+void RIG_IC9100::set_preamp(int val)
+{
+	cmd = pre_to;
+	cmd += '\x16';
+	cmd += '\x02';
+
+	if (val == 0) {
+		preamp_label("Pre", false);
+		preamp_level = 0;
+	} else if (val == 1) {
+		preamp_label("Pre 1", true);
+		preamp_level = 1;
+	} else {
+		preamp_label("Pre 2", true);
+		preamp_level = 2;
+	}
+	cmd += preamp_level;
+
+	cmd.append( post );
+
+	waitFB("set Pre");
+
+	if (val)
+		set_attenuator(0);
+
+}
+
+int RIG_IC9100::get_preamp()
+{
+	string cstr = "\x16\x02";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+	if (waitFOR(8, "get Pre")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			if (replystr[p+6] == 0x01) {
+				preamp_label("Pre 1", true);
+				preamp_level = 1;
+			} else if (replystr[p+6] == 0x02) {
+				preamp_label("Pre 2", true);
+				preamp_level = 2;
+			} else {
+				preamp_label("Pre", false);
+				preamp_level = 0;
+			}
+		}
+	}
+	return preamp_level;
+}
+

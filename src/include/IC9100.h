@@ -48,8 +48,6 @@ public:
 	int  adjust_bandwidth(int m);
 	int  def_bandwidth(int m);
 
-	void set_attenuator( int val );
-	int  get_attenuator();
 	void set_mic_gain(int v);
 
 	void set_compression();
@@ -99,6 +97,14 @@ public:
 	void set_notch(bool on, int val);
 	bool get_notch(int &val);
 	void get_notch_min_max_step(int &min, int &max, int &step);
+
+	void set_attenuator(int val);
+	int get_attenuator();
+	int next_attenuator();
+
+	void set_preamp(int val);
+	int get_preamp();
+	int next_preamp();
 
 	bool canswap() { return true; }
 	bool ICswap() { return true; }
