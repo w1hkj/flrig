@@ -1,8 +1,22 @@
 
 
-=Version 1.3.35=
+=Version 1.3.36=
 
-2017-09-21  David Freese  <w1hkj@bellsouth.net>
+2017-10-30  David Freese  <w1hkj@bellsouth.net>
+
+	fc88084: IC 9100
+	cc62a5a: K2
+
+2017-10-18  steve AG7GN  <steve.magnuson@gmail.com>
+
+	ce45cb2: IC7100
+
+2017-10-14  David Freese  <w1hkj@bellsouth.net>
+
+	6236378: KH6TY
+
+
+=Version 1.3.35=
 
 	e10e7fe: FTdX5000 mods
 	5d71f8d: mingw-mods
