@@ -70,6 +70,7 @@ public:
 	int  get_mic_gain();
 
 	void set_compression();
+	int  get_compression();
 	void get_comp_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 10; step = 1; }
 

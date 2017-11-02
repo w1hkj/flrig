@@ -602,12 +602,6 @@ void RIG_IC7300::get_mic_gain_min_max_step(int &min, int &max, int &step)
 
 void RIG_IC7300::set_compression()
 {
-
-	cmd.assign(pre_to).append("\x14\x0E");
-	cmd.append(to_bcd(progStatus.compression * 255 / 10, 3));
-	cmd.append( post );
-	waitFB("set comp");
-
 	if (progStatus.compON) {
 		cmd = pre_to;
 		cmd.append("\x16\x44");
@@ -615,12 +609,48 @@ void RIG_IC7300::set_compression()
 		cmd.append(post);
 		waitFB("set Comp ON");
 
+		cmd.assign(pre_to).append("\x14\x0E");
+		cmd.append(to_bcd(progStatus.compression * 255 / 10, 3));
+		cmd.append( post );
+		waitFB("set comp");
+
 	} else{
 		cmd.assign(pre_to).append("\x16\x44");
 		cmd += '\x00';
 		cmd.append(post);
 		waitFB("set Comp OFF");
 	}
+}
+
+int RIG_IC7300::get_compression()
+{
+	std::string resp;
+
+	cmd.assign(pre_to).append("\x16\x44").append(post);
+	resp.assign(pre_fm).append("x16\x44");
+	if (waitFOR(8, "get comp on/off")) {
+		size_t p = replystr.find(resp);
+		if (p != string::npos)
+			progStatus.compON = replystr[p+6];
+	}
+	if (progStatus.compON) {
+		cmd.assign(pre_to).append("\x14\x0E").append(post);
+		resp.assign(pre_fm).append("\x14\x0E");
+
+		int val = 0;
+
+		cmd.append(post);
+		if (waitFOR(9, "get comp level")) {
+			size_t p = replystr.find(resp);
+			if (p != string::npos)
+				val = fm_bcd(replystr.substr(p+6), 3) * 10 / 255;
+		}
+		if (progStatus.compression != val) {
+			progStatus.compression = val;
+		}
+	}
+
+	return progStatus.compression;
 }
 
 void RIG_IC7300::set_vox_onoff()

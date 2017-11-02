@@ -429,6 +429,7 @@ public:
 	virtual void set_mon_vol() {}
 	virtual void set_squelch_level() {}
 	virtual void set_compression() {}
+	virtual int  get_compression() {return 0;}
 	virtual void get_comp_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 100; step = 1; }
 	virtual void set_auto_notch(int v) {}

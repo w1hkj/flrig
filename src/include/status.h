@@ -90,6 +90,7 @@ struct status {
 	int 	poll_vfoAorB;
 	int		poll_meters;
 	int		poll_ops;
+	int		poll_compression;
 	int		poll_all;
 
 	int		iBW_A;

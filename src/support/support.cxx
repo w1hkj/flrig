@@ -481,6 +481,24 @@ void read_noise()
 	Fl::awake(update_noise, (void*)0);
 }
 
+// compression
+void update_compression(void *d)
+{
+	if (btnCompON) btnCompON->value(progStatus.compON);
+	if (spnr_compression) spnr_compression->value(progStatus.compression);
+}
+
+void read_compression()
+{
+	if (selrig->has_compression || selrig->has_compON) {
+		{
+			guard_lock serial_lock(&mutex_serial, 13);
+			progStatus.compression = selrig->get_compression();
+		}
+		Fl::awake(update_compression, (void*)0);
+	}
+}
+
 // preamp - attenuator
 void update_preamp(void *d)
 {
@@ -762,6 +780,7 @@ POLL_PAIR RX_poll_pairs[] = {
 	{&progStatus.poll_split, read_split},
 	{&progStatus.poll_nr, read_nr},
 	{&progStatus.poll_noise, read_noise},
+	{&progStatus.poll_compression, read_compression},
 	{NULL, NULL}
 };
 
@@ -2322,7 +2341,11 @@ void restore_rig_vals()
 	if (progStatus.restore_rf_gain)
 		selrig->set_rf_gain(initvals.rf_gain);
 
-// compression
+	if (progStatus.restore_comp_on_off || progStatus.restore_comp_level) {
+		progStatus.compression = initvals.compression;
+		progStatus.compON = initvals.compON;
+		selrig->set_compression();
+	}
 
 }
 
@@ -2435,9 +2458,11 @@ void read_rig_vals()
 
 	if (selrig->has_compression || selrig->has_compON) {
 
-// get_compression NOT IMPLEMENTED in flrig
-//		if (progStatus.restore_comp_on_off || progStatus.restore_comp_level)
-//			selrig->set_compression();
+		if (progStatus.restore_comp_on_off || progStatus.restore_comp_level) {
+			selrig->get_compression();
+			initvals.compression = progStatus.compression;
+			initvals.compON = progStatus.compON;
+		}
 
 		if (selrig->has_compON)
 			btnRestoreCompOnOff->activate();

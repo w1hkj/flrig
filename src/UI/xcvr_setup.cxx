@@ -81,6 +81,7 @@ Fl_Value_Input *poll_squelch = (Fl_Value_Input *)0;
 Fl_Value_Input *poll_split = (Fl_Value_Input *)0;
 Fl_Value_Input *poll_noise = (Fl_Value_Input *)0;
 Fl_Value_Input *poll_nr = (Fl_Value_Input *)0;
+Fl_Value_Input *poll_compression = (Fl_Value_Input *)0;
 Fl_Button *btnClearAddControls = (Fl_Button *)0;
 
 Fl_Value_Input *poll_meters = (Fl_Value_Input *)0;
@@ -425,6 +426,10 @@ static void cb_poll_nr(Fl_Value_Input* o, void*) {
 	progStatus.poll_noise = o->value();
 }
 
+static void cb_poll_compression(Fl_Value_Input* o, void *) {
+	progStatus.poll_compression = o->value();
+}
+
 static void cb_poll_meters(Fl_Value_Input* o, void*) {
 	progStatus.poll_meters = o->value();
 }
@@ -472,6 +477,7 @@ static void cb_btnSetAdd(Fl_Button*, void*) {
 	poll_split->value(progStatus.poll_all);
 	poll_noise->value(progStatus.poll_all);
 	poll_nr->value(progStatus.poll_all);
+	poll_compression->value(progStatus.poll_all);
 
 	progStatus.poll_volume = progStatus.poll_all;
 	progStatus.poll_micgain = progStatus.poll_all;
@@ -485,6 +491,7 @@ static void cb_btnSetAdd(Fl_Button*, void*) {
 	progStatus.poll_split = progStatus.poll_all;
 	progStatus.poll_noise = progStatus.poll_all;
 	progStatus.poll_nr = progStatus.poll_all;
+	progStatus.poll_compression = progStatus.poll_all;
 }
 
 static void cb_btn_send_command(Fl_Button *o, void*) {
@@ -1307,6 +1314,14 @@ _("Use only if your setup requires a separate\nSerial Port for a special Control
 			poll_nr->callback((Fl_Callback*)cb_poll_nr);
 			poll_nr->align(Fl_Align(FL_ALIGN_RIGHT));
 			poll_nr->value(progStatus.poll_noise);
+
+			poll_compression = new Fl_Value_Input(295, 175, 30, 20, _("Comp'"));
+			poll_compression->tooltip(_("Compression"));
+			poll_compression->maximum(10);
+			poll_compression->step(1);
+			poll_compression->callback((Fl_Callback*)cb_poll_compression);
+			poll_compression->align(Fl_Align(FL_ALIGN_RIGHT));
+			poll_compression->value(progStatus.poll_compression);
 
 			btnSetAdd = new Fl_Button(370, 225, 60, 20, _("Set all"));
 			btnSetAdd->callback((Fl_Callback*)cb_btnSetAdd);

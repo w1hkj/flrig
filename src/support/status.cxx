@@ -99,6 +99,7 @@ status progStatus = {
 	1,			// int  poll_vfoAorB;
 	1,			// poll_meters;
 	1,			// poll_ops;
+	1,			// poll_compression;
 	4,			// int	poll_all;
 
 	-1,			// int  iBW_A;
@@ -404,6 +405,7 @@ void status::saveLastState()
 	spref.set("poll_split", poll_split);
 	spref.set("poll_noise", poll_noise);
 	spref.set("poll_nr", poll_nr);
+	spref.set("poll_compression", poll_compression);
 	spref.set("poll_all", poll_all);
 
 	spref.set("bw_A", iBW_A);
@@ -722,6 +724,7 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("poll_split", poll_split, poll_split);
 		spref.get("poll_noise", poll_noise, poll_noise);
 		spref.get("poll_nr", poll_nr, poll_nr);
+		spref.get("poll_compression", poll_compression, poll_compression);
 		spref.get("poll_all", poll_all, poll_all);
 
 		spref.get("bw_A", iBW_A, iBW_A);
