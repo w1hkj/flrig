@@ -604,7 +604,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 }
 			grp_row2d = new Fl_Group(552, 107, 182, 42);
 { // Power, Volume
-				btnPOWER = new Fl_Light_Button(552, 185, 50, 18, _("Pwr"));
+				btnPOWER = new Fl_Light_Button(552, 108, 50, 18, _("Pwr"));
 				btnPOWER->tooltip(_("Enable/Disable Power adjuster"));
 				btnPOWER->value(1);
 				btnPOWER-> callback((Fl_Callback*) cb_btnPOWER);
