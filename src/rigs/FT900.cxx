@@ -323,15 +323,15 @@ void RIG_FT900::set_PTT_control(int val)
      if (splitison) {
           if (val) {
                if (!useB) {
-                    vfo = vfoB;
+                    vfo = &vfoB;
                } else {
-                    vfo = vfoA;
+                    vfo = &vfoA;
                }
           } else {
                if (!useB) {
-                    vfo = vfoA;
+                    vfo = &vfoA;
                } else {
-                    vfo = vfoB;
+                    vfo = &vfoB;
                }
           }
           Fl::awake(setModeControl);

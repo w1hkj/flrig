@@ -42,8 +42,8 @@
 #include "rigs.h"
 #include "KX3_ui.h"
 
-extern queue<FREQMODE> queA;
-extern queue<FREQMODE> queB;
+extern queue<XCVR_STATE> queA;
+extern queue<XCVR_STATE> queB;
 extern queue<bool> quePTT;
 
 void read_KX3()
@@ -56,7 +56,7 @@ void read_KX3()
 		if (freq != vfoA.freq) {
 			vfoA.freq = freq;
 			Fl::awake(setFreqDispA, (void *)vfoA.freq);
-			vfo = vfoA;
+			vfo = &vfoA;
 		}
 		freq = selrig->get_vfoB();
 		if (freq != vfoB.freq) {
@@ -71,8 +71,8 @@ void read_KX3()
 		int nu_mode;
 		nu_mode = selrig->get_modeA();
 		if (nu_mode != vfoA.imode) {
-			vfoA.imode = vfo.imode = nu_mode;
-			selrig->set_bwA(vfo.iBW = selrig->adjust_bandwidth(nu_mode));
+			vfoA.imode = vfo->imode = nu_mode;
+			selrig->set_bwA(vfo->iBW = selrig->adjust_bandwidth(nu_mode));
 			Fl::awake(setModeControl);
 			Fl::awake(updateBandwidthControl);
 		}
@@ -88,7 +88,7 @@ void read_KX3()
 		int nu_BW;
 		nu_BW = selrig->get_bwA();
 		if (nu_BW != vfoA.iBW) {
-			vfoA.iBW = vfo.iBW = nu_BW;
+			vfoA.iBW = vfo->iBW = nu_BW;
 			Fl::awake(setBWControl);
 		}
 		nu_BW = selrig->get_bwB();
@@ -105,7 +105,7 @@ void KX3_set_split(int val)
 	selrig->set_split(val);
 }
 
-extern char *print(FREQMODE data);
+extern char *print(XCVR_STATE data);
 
 void KX3_A2B()
 {
@@ -122,10 +122,10 @@ void cb_KX3_swapAB()
 {
 	guard_lock serial_lock(&mutex_serial);
 
-	FREQMODE temp = vfoA;
+	XCVR_STATE temp = vfoA;
 	vfoA = vfoB;
 	vfoB = temp;
-	vfo = vfoA;
+	vfo = &vfoA;
 
 	selrig->set_vfoB(vfoB.freq);
 	selrig->set_bwB(vfoB.iBW);

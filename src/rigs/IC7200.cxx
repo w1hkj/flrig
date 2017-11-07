@@ -995,16 +995,20 @@ void RIG_IC7200::set_compression()
 	}
 }
 
+#include <iostream>
+
 int RIG_IC7200::get_compression()
 {
 	std::string resp;
 
 	cmd.assign(pre_to).append("\x16\x44").append(post);
-	resp.assign(pre_fm).append("x16\x44");
+
+	resp.assign(pre_fm).append("\x16\x44");
+
 	if (waitFOR(8, "get comp on/off")) {
 		size_t p = replystr.find(resp);
 		if (p != string::npos)
-			progStatus.compON = replystr[p+6];
+			progStatus.compON = (replystr[p+6] == 0x01);
 	}
 	if (progStatus.compON) {
 		cmd.assign(pre_to).append("\x14\x0E").append(post);

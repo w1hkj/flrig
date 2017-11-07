@@ -884,14 +884,14 @@ static BANDS ibands[] = {
 
 void RIG_TT550::fkey_band_plus()
 {
-	FREQMODE vfoplus = vfo;
+	XCVR_STATE vfoplus = *vfo;
 	for (size_t i = 1; i < sizeof(ibands) / sizeof(BANDS); i++) {
-		if (vfo.freq < ibands[i].lo) {
+		if (vfo->freq < ibands[i].lo) {
 			vfoplus.freq = ibands[i].digi;
 			break;
 		}
 	}
-	vfo.src = UI;
+	vfo->src = UI;
 	if (!useB) {
 		guard_lock queA_lock(&mutex_queA, 500);
 		queA.push(vfoplus);
@@ -903,14 +903,14 @@ void RIG_TT550::fkey_band_plus()
 
 void RIG_TT550::fkey_band_minus()
 {
-	FREQMODE vfoplus = vfo;
+	XCVR_STATE vfoplus = *vfo;
 	for (size_t i = sizeof(ibands) / sizeof(BANDS) - 2; i >= 0; i--) {
-		if (vfo.freq > ibands[i].hi) {
+		if (vfo->freq > ibands[i].hi) {
 			vfoplus.freq = ibands[i].digi;
 			break;
 		}
 	}
-	vfo.src = UI;
+	vfo->src = UI;
 	if (!useB) {
 		guard_lock queA_lock(&mutex_queA, 500);
 		queA.push(vfoplus);

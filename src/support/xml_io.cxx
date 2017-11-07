@@ -36,10 +36,10 @@
 using namespace std;
 using XmlRpc::XmlRpcValue;
 
-extern char *print(FREQMODE);
+extern char *print(XCVR_STATE &);
 
-extern queue<FREQMODE> queA;
-extern queue<FREQMODE> queB;
+extern queue<XCVR_STATE> queA;
+extern queue<XCVR_STATE> queB;
 extern queue<bool> quePTT;
 
 queue<long> qfreq;
@@ -327,7 +327,7 @@ void send_sideband()
 {
 	if (!fldigi_online) return;
 	try {
-		XmlRpcValue sideband(selrig->get_modetype(vfo.imode) == 'U' ? "USB" : "LSB"), res;
+		XmlRpcValue sideband(selrig->get_modetype(vfo->imode) == 'U' ? "USB" : "LSB"), res;
 		execute(main_set_wf_sideband, sideband, res);
 		xml_ignore = 2;
 		err_count = 5;
@@ -395,7 +395,7 @@ static void check_for_bandwidth_change(const XmlRpcValue& new_bw)
 		return;
 	}
 
-	if (!selrig->bandwidths_ || vfo.iBW == -1 )
+	if (!selrig->bandwidths_ || vfo->iBW == -1 )
 		return;
 
 	string sbw = new_bw;

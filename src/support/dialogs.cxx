@@ -1055,8 +1055,8 @@ void show_controls()
 				btn_show_controls->label("@-28->");
 				btn_show_controls->redraw_label();
 				mainwindow->resizable(grpTABS);
-				mainwindow->size(mainwindow->w(), 218);
-				mainwindow->size_range(735, 218, 0, 218);
+				mainwindow->size(mainwindow->w(), 220);
+				mainwindow->size_range(735, 220, 0, 220);
 				grpTABS->show();
 			}
 			mainwindow->redraw();
@@ -1087,7 +1087,6 @@ void show_controls()
 					btn_show_controls->redraw_label();
 					mainwindow->size( mainwindow->w(), mainwindow->h() + 70);
 				}
-				mainwindow->redraw();
 			} else {
 				tabs550->hide();
 				if (tabsGeneric->visible()) {
@@ -1101,8 +1100,9 @@ void show_controls()
 					btn_show_controls->redraw_label();
 					mainwindow->size( mainwindow->w(), mainwindow->h() + 70);
 				}
-				mainwindow->redraw();
 			}
+			grpTABS->show();
+			mainwindow->redraw();
 			break;
 		default :
 			break;

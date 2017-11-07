@@ -32,38 +32,68 @@
 
 using namespace std;
 
-struct FREQMODE {
+enum {onA, onB};
+enum {UI, XML, SRVR, RIG};
+enum {BINARY, STRING};
+
+struct XCVR_STATE {
 	long freq;
 	int  imode;
 	int  iBW;
 	int  src;
-};
 
-struct INITVALS {
 	int		split;
 	int		power_control;
 	int		volume_control;
-	int		attenuatorA;
-	int		preampA;
-	int		attenuatorB;
-	int		preampB;
+	int		attenuator;
+	int		preamp;
 	int		if_shift;
+	int		shift_val;
 	int		auto_notch;
 	int		notch;
+	int		notch_val;
 	int		noise;
 	int		nr;
+	int		nr_val;
 	int		mic_gain;
 	int		rf_gain;
+	int		agc_level;
 	int		squelch;
 	int		compression;
 	int		compON;
-	INITVALS() {
-		split = power_control = volume_control =
-		attenuatorA = attenuatorB =
-		preampA = preampB =
-		if_shift = notch = noise = nr =
-		mic_gain = rf_gain = squelch =
-		compression = compON = 0;
+
+	XCVR_STATE() {
+		freq = 0;
+		imode = 0;
+		iBW = 0;
+		src = UI;
+
+		split = 0;
+		power_control = 0;
+		volume_control = 0;
+		attenuator = 0;
+		preamp = 0;
+		if_shift = 0;
+		shift_val = 0;
+		auto_notch = 0;
+		notch = 0;
+		notch_val = 0;
+		noise = 0;
+		nr = 0;
+		nr_val = 0;
+		mic_gain = 0;
+		rf_gain = 0;
+		agc_level = 0;
+		squelch = 0;
+		compression = 0;
+		compON = 0;
+	}
+	XCVR_STATE(int a, int b, int c, int d) {
+		XCVR_STATE();
+		freq = a;
+		imode = b;
+		iBW = c;
+		src = d;
 	}
 };
 
@@ -73,11 +103,6 @@ struct GUI {
 	int			y;
 	int			w;
 };
-
-enum {onA, onB};
-enum {UI, XML, SRVR, RIG};
-
-enum {BINARY, STRING};
 
 class rigbase {
 #define WVALS_LIMIT -1
@@ -114,8 +139,8 @@ public:
 	int  defaultCIV;
 	bool USBaudio;
 
-	FREQMODE A;
-	FREQMODE B;
+	XCVR_STATE A;
+	XCVR_STATE B;
 	int  inuse;
 
 	int  modeA;

@@ -43,7 +43,7 @@
  *
  *	Note that while the PCR-1000 does not have a second VFO, we have virtualized a second
  *	vfo in the PCR-1000 flrig implementation. Each VFO stores its frequency, mode, and bandwidth.
- *	The FREQMODE variable is used to store the VFO states.
+ *	The XCVR_STATE variable is used to store the VFO states.
  */
 
 
@@ -200,7 +200,7 @@ void RIG_PCR1000::shutdown() {
  * Set the frequency in the current mode command
  */
 
-void RIG_PCR1000::setFreqModeBW(FREQMODE &freqMode) {
+void RIG_PCR1000::setFreqModeBW(XCVR_STATE &freqMode) {
 
 	RIG_PCR1000::freq_cmd myComm = {
 			{'K','0'},
@@ -400,7 +400,7 @@ void RIG_PCR1000::A2B() {
 }
 //----------------------------------------------------------------------
 void RIG_PCR1000::swapAB() {
-	FREQMODE T ;
+	XCVR_STATE T ;
 
 	T.freq = B.freq ;
 	T.iBW = B.iBW ;

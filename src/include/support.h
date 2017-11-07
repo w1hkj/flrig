@@ -50,10 +50,10 @@
 
 extern bool flrig_abort;
 
-extern FREQMODE vfo;
-extern FREQMODE vfoA;
-extern FREQMODE vfoB;
-extern FREQMODE xmlvfo;
+extern XCVR_STATE *vfo;
+extern XCVR_STATE vfoA;
+extern XCVR_STATE vfoB;
+extern XCVR_STATE xmlvfo;
 
 extern bool useB;
 extern bool PTT;
@@ -314,8 +314,8 @@ extern void update_notch(void *d);
 
 extern int mval;
 
-extern queue<FREQMODE> queA;
-extern queue<FREQMODE> queB;
+extern queue<XCVR_STATE> queA;
+extern queue<XCVR_STATE> queB;
 extern queue<bool> quePTT;
 
 #endif

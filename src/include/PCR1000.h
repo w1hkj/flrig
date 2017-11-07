@@ -74,7 +74,7 @@ private:
 	bool att_on;
 	bool is_PCR1000;
 	
-	FREQMODE&	current_vfo ;
+	XCVR_STATE&	current_vfo ;
 
 	// Internal methods
 	/*
@@ -83,7 +83,7 @@ private:
 	 * changed.
 	 */
 
-	void setFreqModeBW(FREQMODE &freqMode) ; 	// Set the frequency in the current mode
+	void setFreqModeBW(XCVR_STATE &freqMode) ; 	// Set the frequency in the current mode
 	int hexTo(const char c) const ; 			// Returns int value of c, i.e '2' returns 2, 'A' returns 10, etc.
 	void set2Hex(int ival, char *cptr) ;		// Set the hex value of ival into the first 2 chars of cptr
 

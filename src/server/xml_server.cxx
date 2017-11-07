@@ -599,15 +599,15 @@ public:
 #include <queue>
 #include "rigbase.h"
 
-extern char *print(FREQMODE);
-extern queue<FREQMODE> queA;
-extern queue<FREQMODE> queB;
+extern char *print(XCVR_STATE);
+extern queue<XCVR_STATE> queA;
+extern queue<XCVR_STATE> queB;
 extern queue<bool> quePTT;
 
-extern FREQMODE vfoA;
-extern FREQMODE vfoB;
+extern XCVR_STATE vfoA;
+extern XCVR_STATE vfoB;
 
-FREQMODE srvr_vfo;
+XCVR_STATE srvr_vfo;
 
 static void push_xml()
 {

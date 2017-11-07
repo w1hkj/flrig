@@ -1224,7 +1224,7 @@ void RIG_FTdx1200::enable_keyer()
 
 bool RIG_FTdx1200::set_cw_spot()
 {
-	if (vfo.imode == mCW || vfo.imode == mCW_R) {
+	if (vfo->imode == mCW || vfo->imode == mCW_R) {
 		cmd = "CS0;";
 		if (progStatus.spot_onoff) cmd[2] = '1';
 		sendCommand(cmd);
@@ -1385,7 +1385,7 @@ void RIG_FTdx1200::set_compression()
 // Audio Peak Filter, like set_cw_spot
 bool RIG_FTdx1200::set_cw_APF()
 {
-	if (vfo.imode == mCW || vfo.imode == mCW_R) {
+	if (vfo->imode == mCW || vfo->imode == mCW_R) {
 		cmd = "CO0000;";
 		if (progStatus.apf_onoff) cmd[5] = '2';
 		sendCommand(cmd);

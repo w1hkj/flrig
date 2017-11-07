@@ -1073,7 +1073,7 @@ void RIG_FTdx3000::enable_keyer()
 
 bool RIG_FTdx3000::set_cw_spot()
 {
-	if (vfo.imode == 2 || vfo.imode == 6) {
+	if (vfo->imode == 2 || vfo->imode == 6) {
 		cmd = "CS0;";
 		if (progStatus.spot_onoff) cmd[2] = '1';
 		sendCommand(cmd);

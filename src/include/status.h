@@ -100,7 +100,7 @@ struct status {
 	int		imode_B;
 	int		freq_B;
 	bool	use_rig_data;
-	bool	restore_rig_data;
+//	bool	restore_rig_data;
 
 	bool	spkr_on;
 	int		volume;

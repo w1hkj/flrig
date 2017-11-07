@@ -55,14 +55,13 @@ bool flrig_abort = false;
 
 int freqval = 0;
 
-FREQMODE vfoA         = {14070000, 0, 0, UI};
-FREQMODE vfoB         = {7070000, 0, 0, UI};
-FREQMODE vfo          = {0, 0, 0, UI};
-FREQMODE transceiverA = {14070000, 0, 0, UI};
-FREQMODE transceiverB = {7070000, 0, 0, UI};
-FREQMODE xmlvfo       = {14070000, 0, 0, UI};
+XCVR_STATE vfoA		= XCVR_STATE(14070000, 0, 0, UI);
+XCVR_STATE vfoB		= XCVR_STATE(7070000, 0, 0, UI);
+XCVR_STATE *vfo		= 0;
 
-INITVALS initvals;
+XCVR_STATE xmlvfo	= XCVR_STATE(14070000, 0, 0, UI);
+
+XCVR_STATE xcvr_vfoA, xcvr_vfoB;
 
 enum {VOL, MIC, PWR, SQL, IFSH, NOTCH, RFGAIN, NR };
 
@@ -75,13 +74,13 @@ struct SLIDER {
 
 queue<SLIDER> sliders;
 
-queue<FREQMODE> queA;
-queue<FREQMODE> queB;
+queue<XCVR_STATE> queA;
+queue<XCVR_STATE> queB;
 queue<bool> quePTT;
 
 bool useB = false;
 bool changed_vfo = false;
-bool pushedB = false;
+//bool pushedB = false;
 
 bool volume_changed = false;
 bool mic_changed = false;
@@ -94,15 +93,15 @@ bool noise_reduction_changed = false;
 
 const char **old_bws = NULL;
 
-// Add alpha-tag to FREQMODE;
-struct ATAG_FREQMODE {
+// Add alpha-tag to XCVR_STATE;
+struct ATAG_XCVR_STATE {
 	long freq;
 	int  imode;
 	int  iBW;
 	int  src;
 	char alpha_tag[ATAGSIZE];
 };
-ATAG_FREQMODE oplist[LISTSIZE];
+ATAG_XCVR_STATE oplist[LISTSIZE];
 
 int  numinlist = 0;
 vector<string> rigmodes_;
@@ -131,33 +130,90 @@ int  powerlevel = 0;
 
 void trace(string s)
 {
-//	std::cout << s << std::endl;
+	std::cout << s << std::endl;
 }
 
-char *print(FREQMODE data)
+char *print(XCVR_STATE &data)
 {
-	static char str[256];
+	static char str[1024];
 	const char **bwt = selrig->bwtable(data.imode);
 	const char **dsplo = selrig->lotable(data.imode);
 	const char **dsphi = selrig->hitable(data.imode);
 	snprintf(
 		str, sizeof(str),
 		"\
-FREQMODE: %3s\n\
-  freq: %10ld\n\
-  mode: %4s\n\
-  bwt index:  %02d\n\
-  bwt values: [%s] [%s]",
+Data Source: %s\
+  freq ...........%ld\n\
+  mode ...........%d [%s]\n\
+  bwt index ......%2d, [%s] [%s]\n\
+  split ..........%4d, power_control .%4d, volume_control %4d\n\
+  attenuator .....%4d, preamp ........%4d, rf gain .......%4d\n\
+  if_shift .......%4d, shift val .....%4d\n\
+  auto notch .....%4d, notch .........%4d, notch value ...%4d\n\
+  noise ..........%4d, nr ............%4d, nr val ........%4d\n\
+  mic gain .......%4d, agc level .....%4d, squelch .......%4d\n\
+  compression ....%4d, compON ........%4d",
 		data.src == XML ? "XML" : data.src == UI ? "UI" :
 			data.src == SRVR ? "SRVR" : "RIG",
 		data.freq,
+		data.imode,
 		selrig->modes_ ? selrig->modes_[data.imode] : "modes n/a",
 		data.iBW,
 		(data.iBW > 256 && selrig->has_dsp_controls) ?
 			(dsplo ? dsplo[data.iBW & 0x7F] : "??") : (bwt ? bwt[data.iBW] : "n/a"),
 		(data.iBW > 256 && selrig->has_dsp_controls) ?
-			(dsphi ? dsphi[(data.iBW >> 8) & 0x7F] : "??") : ""
-		);
+			(dsphi ? dsphi[(data.iBW >> 8) & 0x7F] : "??") : "",
+		data.split,
+		data.power_control,
+		data.volume_control,
+		data.attenuator,
+		data.preamp,
+		data.rf_gain,
+		data.if_shift,
+		data.shift_val,
+		data.auto_notch,
+		data.notch,
+		data.notch_val,
+		data.noise,
+		data.nr,
+		data.nr_val,
+		data.mic_gain,
+		data.agc_level,
+		data.squelch,
+		data.compression,
+		data.compON
+	);
+	return str;
+}
+
+char *print_ab()
+{
+	static char str[1024];
+	const char **bwtA = selrig->bwtable(vfoA.imode);
+	const char **dsploA = selrig->lotable(vfoA.imode);
+	const char **dsphiA = selrig->hitable(vfoA.imode);
+	const char **bwtB = selrig->bwtable(vfoB.imode);
+	const char **dsploB = selrig->lotable(vfoB.imode);
+	const char **dsphiB = selrig->hitable(vfoB.imode);
+	snprintf(
+		str, sizeof(str),
+		"\
+VFO-A: %10ld, %4s, [%s], [%s]\n\
+VFO-B: %10ld, %4s, [%s], [%s]",
+		vfoA.freq,
+		selrig->modes_ ? selrig->modes_[vfoA.imode] : "modes n/a",
+		(vfoA.iBW > 256 && selrig->has_dsp_controls) ?
+			(dsploA ? dsploA[vfoA.iBW & 0x7F] : "??") : (bwtA ? bwtA[vfoA.iBW] : "n/a"),
+		(vfoA.iBW > 256 && selrig->has_dsp_controls) ?
+			(dsphiA ? dsphiA[(vfoA.iBW >> 8) & 0x7F] : "??") : "",
+
+		vfoB.freq,
+		selrig->modes_ ? selrig->modes_[vfoB.imode] : "modes n/a",
+		(vfoB.iBW > 256 && selrig->has_dsp_controls) ?
+			(dsploB ? dsploB[vfoB.iBW & 0x7F] : "??") : (bwtB ? bwtB[vfoB.iBW] : "n/a"),
+		(vfoB.iBW > 256 && selrig->has_dsp_controls) ?
+			(dsphiB ? dsphiB[(vfoB.iBW >> 8) & 0x7F] : "??") : ""
+	);
 	return str;
 }
 
@@ -184,7 +240,7 @@ void read_vfo()
 		if (freq != vfoA.freq) {
 			vfoA.freq = freq;
 			Fl::awake(setFreqDispA, (void *)vfoA.freq);
-			vfo = vfoA;
+			vfo = &vfoA;
 		}
 		if ( selrig->twovfos() ) {
 			freq = selrig->get_vfoB();
@@ -198,7 +254,7 @@ void read_vfo()
 		if (freq != vfoB.freq) {
 			vfoB.freq = freq;
 			Fl::awake(setFreqDispB, (void *)vfoB.freq);
-			vfo = vfoB;
+			vfo = &vfoB;
 		}
 		if ( selrig->twovfos() ) {
 			freq = selrig->get_vfoA();
@@ -290,13 +346,13 @@ void read_vfoAorB()
 
 void setModeControl(void *)
 {
-	opMODE->index(vfo.imode);
+	opMODE->index(vfo->imode);
 
 // enables/disables the IF shift control, depending on the mode.
 // the IF Shift function, is ONLY valid in CW modes, with the 870S.
 
 	if (xcvr_name == rig_TS870S.name_) {
-		if (vfo.imode == RIG_TS870S::tsCW || vfo.imode == RIG_TS870S::tsCWR) {
+		if (vfo->imode == RIG_TS870S::tsCW || vfo->imode == RIG_TS870S::tsCWR) {
 			btnIFsh->activate();
 			if (sldrIFSHIFT) sldrIFSHIFT->activate();
 			if (spnrIFSHIFT) spnrIFSHIFT->activate();
@@ -318,10 +374,10 @@ void read_mode()
 		nu_mode = selrig->get_modeA();
 		if (nu_mode != vfoA.imode) {
 			{
-				vfoA.imode = vfo.imode = nu_mode;
-				selrig->adjust_bandwidth(vfo.imode);
+				vfoA.imode = vfo->imode = nu_mode;
+				selrig->adjust_bandwidth(vfo->imode);
 				nu_BW = selrig->get_bwA();
-				vfoA.iBW = vfo.iBW = nu_BW;
+				vfoA.iBW = vfo->iBW = nu_BW;
 			}
 //			Fl::awake(setModeControl);
 			set_bandwidth_control();
@@ -331,10 +387,10 @@ void read_mode()
 		nu_mode = selrig->get_modeB();
 		if (nu_mode != vfoB.imode) {
 			{
-				vfoB.imode = vfo.imode = nu_mode;
-				selrig->adjust_bandwidth(vfo.imode);
+				vfoB.imode = vfo->imode = nu_mode;
+				selrig->adjust_bandwidth(vfo->imode);
 				nu_BW = selrig->get_bwB();
-				vfoB.iBW = vfo.iBW = nu_BW;
+				vfoB.iBW = vfo->iBW = nu_BW;
 			}
 //			Fl::awake(setModeControl);
 			set_bandwidth_control();
@@ -346,12 +402,12 @@ void read_mode()
 void setBWControl(void *)
 {
 	if (selrig->has_dsp_controls) {
-		if (vfo.iBW > 256) {
+		if (vfo->iBW > 256) {
 			opBW->index(0);
 			opBW->hide();
-			opDSP_hi->index((vfo.iBW >> 8) & 0x7F);
+			opDSP_hi->index((vfo->iBW >> 8) & 0x7F);
 			opDSP_hi->hide();
-			opDSP_lo->index(vfo.iBW & 0xFF);
+			opDSP_lo->index(vfo->iBW & 0xFF);
 			opDSP_lo->show();
 			btnDSP->label(selrig->SL_label);
 			btnDSP->redraw_label();
@@ -362,14 +418,14 @@ void setBWControl(void *)
 			opDSP_lo->hide();
 			opDSP_hi->hide();
 			btnDSP->hide();
-			opBW->index(vfo.iBW);
+			opBW->index(vfo->iBW);
 			opBW->show();
 		}
 	} else {
 		opDSP_lo->hide();
 		opDSP_hi->hide();
 		btnDSP->hide();
-		opBW->index(vfo.iBW);
+		opBW->index(vfo->iBW);
 		opBW->show();
 	}
 }
@@ -381,13 +437,13 @@ void read_bandwidth()
 	if (!useB) {
 		nu_BW = selrig->get_bwA();
 		if (nu_BW != vfoA.iBW) {
-			vfoA.iBW = vfo.iBW = nu_BW;
+			vfoA.iBW = vfo->iBW = nu_BW;
 			Fl::awake(setBWControl);
 		}
 	} else {
 		nu_BW = selrig->get_bwB();
 		if (nu_BW != vfoB.iBW) {
-			vfoB.iBW = vfo.iBW = nu_BW;
+			vfoB.iBW = vfo->iBW = nu_BW;
 			Fl::awake(setBWControl);
 		}
 	}
@@ -463,6 +519,7 @@ void read_auto_notch()
 		guard_lock serial_lock(&mutex_serial, 11);
 		progStatus.auto_notch = selrig->get_auto_notch();
 	}
+	vfo->auto_notch = progStatus.auto_notch;
 	Fl::awake(update_auto_notch, (void*)0);
 }
 
@@ -478,6 +535,7 @@ void read_noise()
 		guard_lock serial_lock(&mutex_serial, 12);
 		progStatus.noise = selrig->get_noise();
 	}
+	vfo->noise = progStatus.noise;
 	Fl::awake(update_noise, (void*)0);
 }
 
@@ -495,6 +553,8 @@ void read_compression()
 			guard_lock serial_lock(&mutex_serial, 13);
 			progStatus.compression = selrig->get_compression();
 		}
+		vfo->compression = progStatus.compression;
+		vfo->compON = progStatus.compON;
 		Fl::awake(update_compression, (void*)0);
 	}
 }
@@ -517,6 +577,7 @@ void read_preamp_att()
 			guard_lock serial_lock(&mutex_serial, 13);
 			progStatus.preamp = selrig->get_preamp();
 		}
+		vfo->preamp = progStatus.preamp;
 		Fl::awake(update_preamp, (void*)0);
 	}
 	if (selrig->has_attenuator_control) {
@@ -524,6 +585,7 @@ void read_preamp_att()
 			guard_lock serial_lock(&mutex_serial, 14);
 			progStatus.attenuator = selrig->get_attenuator();
 		}
+		vfo->attenuator = progStatus.attenuator;
 		Fl::awake(update_attenuator, (void*)0);
 	}
 }
@@ -572,6 +634,7 @@ void read_split()
 			progStatus.split = val;
 			Fl::awake(update_split, (void*)0);
 		}
+		vfo->split = progStatus.split;
 	}
 }
 
@@ -625,6 +688,8 @@ void read_ifshift()
 		guard_lock serial_lock(&mutex_serial, 17);
 		progStatus.shift = selrig->get_if_shift(progStatus.shift_val);
 	}
+	vfo->if_shift = progStatus.shift;
+	vfo->shift_val = progStatus.shift_val;
 	Fl::awake(update_ifshift, (void*)0);
 }
 
@@ -644,6 +709,8 @@ void read_nr()
 		progStatus.noise_reduction = selrig->get_noise_reduction();
 		progStatus.noise_reduction_val = selrig->get_noise_reduction_val();
 	}
+	vfo->nr = progStatus.noise_reduction;
+	vfo->nr_val = progStatus.noise_reduction_val;
 	Fl::awake(update_nr, (void*)0);
 }
 
@@ -652,9 +719,9 @@ bool rig_notch;
 int  rig_notch_val;
 void update_notch(void *d)
 {
-	btnNotch->value(progStatus.notch = rig_notch);
-	if (sldrNOTCH) sldrNOTCH->value(progStatus.notch_val = rig_notch_val);
-	if (spnrNOTCH) spnrNOTCH->value(progStatus.notch_val = rig_notch_val);
+	btnNotch->value(progStatus.notch);
+	if (sldrNOTCH) sldrNOTCH->value(progStatus.notch_val);
+	if (spnrNOTCH) spnrNOTCH->value(progStatus.notch_val);
 }
 
 void read_notch()
@@ -664,8 +731,11 @@ void read_notch()
 		guard_lock serial_lock(&mutex_serial, 19);
 		rig_notch = selrig->get_notch(rig_notch_val);
 	}
-	if (rig_notch != progStatus.notch || rig_notch_val != progStatus.notch_val)
+	if (rig_notch != progStatus.notch || rig_notch_val != progStatus.notch_val) {
+		vfo->notch_val = progStatus.notch_val = rig_notch_val;
+		vfo->notch = progStatus.notch = rig_notch;
 		Fl::awake(update_notch, (void*)0);
+	}
 }
 
 // power_control
@@ -695,6 +765,7 @@ void read_power_control()
 		guard_lock serial_lock(&mutex_serial, 20);
 		progStatus.power_level = selrig->get_power_control();
 	}
+	vfo->power_control = progStatus.power_level;
 	Fl::awake(update_power_control, (void*)0);
 }
 
@@ -712,6 +783,7 @@ void read_mic_gain()
 		guard_lock serial_lock(&mutex_serial, 21);
 		progStatus.mic_gain = selrig->get_mic_gain();
 	}
+	vfo->mic_gain = progStatus.mic_gain;
 	Fl::awake(update_mic_gain, (void*)0);
 }
 
@@ -725,7 +797,7 @@ void update_rfgain(void *d)
 void read_agc()
 {
 	if (!selrig->has_agc_control) return;
-	progStatus.agc_level = selrig->get_agc();
+	vfo->agc_level = progStatus.agc_level = selrig->get_agc();
 	Fl::awake(setAGC);
 }
 
@@ -734,7 +806,7 @@ void read_rfgain()
 //	if (!selrig->has_rf_control || rfgain_changed) return;
 	if (selrig->has_rf_control) {
 		guard_lock serial_lock(&mutex_serial, 22);
-		progStatus.rfgain = selrig->get_rf_gain();
+		vfo->rf_gain = progStatus.rfgain = selrig->get_rf_gain();
 		Fl::awake(update_rfgain, (void*)0);
 		read_agc();
 	}
@@ -752,7 +824,7 @@ void read_squelch()
 	if (!selrig->has_sql_control || squelch_changed) return;
 	{
 		guard_lock serial_lock(&mutex_serial, 23);
-		progStatus.squelch = selrig->get_squelch();
+		vfo->squelch = progStatus.squelch = selrig->get_squelch();
 	}
 	Fl::awake(update_squelch, (void*)0);
 }
@@ -800,12 +872,16 @@ static bool resetxmt = true;
 void serviceA()
 {
 	if (queA.empty()) return;
-trace("serviceA");
+
+//std::cout << "Service A:\n" << print_ab() << std::endl;
+
+	XCVR_STATE nuvals;
+
 	guard_lock serial_lock(&mutex_serial, 24);
 	{
 		guard_lock queA_lock(&mutex_queA, 25);
 		while (!queA.empty()) {
-			vfoA = queA.front();
+			nuvals = queA.front();
 			queA.pop();
 		}
 	}
@@ -818,98 +894,115 @@ trace("serviceA");
 
 // if TT550 etal and on the B vfo
 	if (selrig->can_change_alt_vfo && useB) {
-		selrig->set_vfoA(vfoA.freq);
+		selrig->set_vfoA(nuvals.freq);
+		vfoA.freq = nuvals.freq;
 		goto end_serviceA;
 	}
 
-//trace(std::string("VFO is:\n").append(print(vfo)));
-//trace(std::string("VFO ->:\n").append(print(vfoA)));
+//std::cout << "nuvals: " << nuvals.freq << ", " << nuvals.imode << ", " << nuvals.iBW << std::endl;
 
-	if (vfoA.imode != vfo.imode || changed_vfo) {
-		selrig->set_modeA(vfoA.imode);
-		vfo.imode = vfoA.imode;
+	if (!useB) vfo = &vfoA;
+	if (vfoA.imode != nuvals.imode || changed_vfo) {
+//std::cout << "A.imode = " << vfoA.imode << ", nu.imode = " << nuvals.imode << std::endl;
+//std::cout << "A.iBW = " << vfoA.iBW << ", nu.iBW = " << nuvals.iBW << std::endl;
+		selrig->set_modeA(vfoA.imode = vfo->imode = nuvals.imode);
 		Fl::awake(setModeControl);
-		int saveBW = vfoA.iBW;
 		set_bandwidth_control();
-		if (saveBW != -1) {
-			vfo.iBW = vfoA.iBW = saveBW;
-			selrig->set_bwA(saveBW);
-			Fl::awake(setBWControl);
-		}
-	} else if (vfoA.iBW != vfo.iBW) {
-		selrig->set_bwA(vfoA.iBW);
-		vfo.iBW = vfoA.iBW;
+		selrig->set_bwA(vfo->iBW = vfoA.iBW = nuvals.iBW);
+		Fl::awake(setBWControl);
+	} else if (vfoA.iBW != nuvals.iBW) {
+//std::cout << "A.iBW = " << vfo->iBW << ", nu.iBW = " << nuvals.iBW << std::endl;
+		selrig->set_bwA(vfo->iBW = vfoA.iBW = nuvals.iBW);
 		Fl::awake(setBWControl);
 	}
 
-	if (vfoA.freq != vfo.freq || changed_vfo) {
-		selrig->set_vfoA(vfoA.freq);
-		vfo.freq = vfoA.freq;
+	if (vfoA.freq != nuvals.freq || changed_vfo) {
+		vfoA.freq = vfo->freq = nuvals.freq;
 		Fl::awake(setFreqDispA, (void *)vfoA.freq);
+		if (!useB)
+			selrig->set_vfoA(vfoA.freq);
 	}
 
 end_serviceA:
+//	if (!useB) vfo = &vfoA;
 
-	if (RIG_DEBUG) LOG_INFO("%s", print(vfoA));
+//std::cout << print(*vfo) << std::endl;
+//std::cout << print_ab() << std::endl;
+
+	if (RIG_DEBUG) {
+		LOG_INFO("%s", print_ab());
+		std::cout << print_ab() << std::endl;
+	}
 
 	changed_vfo = false;
 }
 
 void serviceB()
 {
-	if (queB.empty())
-		return;
+	if (queB.empty()) return;
+
+//std::cout << "Service B:\n" << print_ab() << std::endl;
+
+	XCVR_STATE nuvals;
 	guard_lock serial_lock(&mutex_serial, 26);
 	{
 		guard_lock queB_lock(&mutex_queB, 27);
 		while (!queB.empty()) {
-			vfoB = queB.front();
+			nuvals = queB.front();
 			queB.pop();
 		}
 	}
 
-	if (!selrig->can_change_alt_vfo && !useB) return;
+//std::cout << "nuvals: " << nuvals.freq << ", " << nuvals.imode << ", " << nuvals.iBW << std::endl;
+
+	if (!selrig->can_change_alt_vfo && !useB)
+		goto end_serviceB;
 
 	if (changed_vfo && useB) {
 		selrig->selectB();
 	}
 // if TT550 or K3 and split or on vfoA just update the B vfo
 	if ((xcvr_name == rig_K3.name_) || (selrig->can_change_alt_vfo && !useB)) {
-		selrig->set_vfoB(vfoB.freq);
+		selrig->set_vfoB(nuvals.freq);
+		vfoB.freq = nuvals.freq;
 		goto end_serviceB;
 	}
 
-//trace(std::string("VFO is:\n").append(print(vfo)));
-//trace(std::string("VFO ->:\n").append(print(vfoB)));
-
-	if (vfoB.imode != vfo.imode || pushedB || changed_vfo) {
-		selrig->set_modeB(vfoB.imode);
-		vfo.imode = vfoB.imode;
+	if (useB) vfo = &vfoB;
+	if (vfoB.imode != nuvals.imode || changed_vfo) {
+//std::cout << "B.imode = " << vfoB.imode << ", nu.imode = " << nuvals.imode << std::endl;
+//std::cout << "B.iBW = " << vfoB.iBW << ", nu.iBW = " << nuvals.iBW << std::endl;
+		selrig->set_modeB(vfo->imode = vfoB.imode = nuvals.imode);
 		Fl::awake(setModeControl);
-		int saveBW = vfoB.iBW;
 		set_bandwidth_control();
-		if (saveBW != -1) {
-			vfo.iBW = vfoB.iBW = saveBW;
-			selrig->set_bwB(saveBW);
-			Fl::awake(setBWControl);
-		}
-	} else if (vfoB.iBW != vfo.iBW || pushedB) {
-		selrig->set_bwB(vfoB.iBW);
-		vfo.iBW = vfoB.iBW;
+		selrig->set_bwB(vfo->iBW = vfoB.iBW = nuvals.iBW);
+		Fl::awake(setBWControl);
+	} else if (vfoB.iBW != nuvals.iBW) {
+//std::cout << "B.iBW = " << vfoB.iBW << ", nu.iBW = " << nuvals.iBW << std::endl;
+		selrig->set_bwB(vfo->iBW = vfoB.iBW = nuvals.iBW);
 		Fl::awake(setBWControl);
 	}
 
-	if (vfoB.freq != vfo.freq || pushedB || changed_vfo) {
-		selrig->set_vfoB(vfoB.freq);
-		vfo.freq = vfoB.freq;
+	if (vfoB.freq != nuvals.freq || changed_vfo) {
+		vfoB.freq = vfo->freq = nuvals.freq;
 		Fl::awake(setFreqDispB, (void *)vfoB.freq);
+		if (useB)
+			selrig->set_vfoB(vfoB.freq);
 	}
 
-	pushedB = false;
+//	pushedB = false;
 
 end_serviceB:
 
-	if (RIG_DEBUG) LOG_INFO("%s", print(vfoB));
+	if (useB) vfo = &vfoB;
+
+//std::cout << print(*vfo) << std::endl;
+//std::cout << print_ab() << std::endl;
+
+	if (RIG_DEBUG) {
+		LOG_INFO("%s", print_ab());
+		std::cout << print_ab() << std::endl;
+	}
 
 	changed_vfo = false;
 }
@@ -1119,7 +1212,7 @@ serial_bypass_loop: ;
 
 void setBW()
 {
-	FREQMODE fm = vfo;
+	XCVR_STATE fm = *vfo;
 	fm.src = UI;
 	fm.iBW = opBW->index();
 	if (useB) {
@@ -1133,7 +1226,7 @@ void setBW()
 
 void setDSP()
 {
-	FREQMODE fm = vfo;
+	XCVR_STATE fm = *vfo;
 	fm.src = UI;
 	fm.iBW = ((opDSP_hi->index() << 8) | 0x8000) | (opDSP_lo->index() & 0xFF) ;
 	if (useB) {
@@ -1170,22 +1263,22 @@ void set_bandwidth_control()
 {
 	if (!selrig->has_bandwidth_control) return;
 
-	vfo.iBW = selrig->adjust_bandwidth(vfo.imode);
+	vfo->iBW = selrig->adjust_bandwidth(vfo->imode);
 
-	if (vfo.iBW < 256) {
+	if (vfo->iBW < 256) {
 		int i = 0;
 		while (selrig->bandwidths_[i]) i++;
 		i--;
-		if (vfo.iBW > i) vfo.iBW = selrig->def_bandwidth(vfo.imode);
+		if (vfo->iBW > i) vfo->iBW = selrig->def_bandwidth(vfo->imode);
 	}
-	useB ? vfoB.iBW = vfo.iBW : vfoA.iBW = vfo.iBW;
+	useB ? vfoB.iBW = vfo->iBW : vfoA.iBW = vfo->iBW;
 	Fl::awake(updateBandwidthControl);
 }
 
 void updateBandwidthControl(void *d)
 {
 	if (selrig->has_bandwidth_control) {
-		if (selrig->adjust_bandwidth(vfo.imode) != -1) {
+		if (selrig->adjust_bandwidth(vfo->imode) != -1) {
 			opBW->clear();
 			rigbws_.clear();
 			for (int i = 0; selrig->bandwidths_[i] != NULL; i++) {
@@ -1200,13 +1293,13 @@ void updateBandwidthControl(void *d)
 					opDSP_lo->add(selrig->dsp_SL[i]);
 				for (int i = 0; selrig->dsp_SH[i] != NULL; i++)
 					opDSP_hi->add(selrig->dsp_SH[i]);
-				if (vfo.iBW > 256) {
+				if (vfo->iBW > 256) {
 					opBW->index(0);
 					opBW->hide();
 					opBW->hide();
-					opDSP_lo->index(vfo.iBW & 0xFF);
+					opDSP_lo->index(vfo->iBW & 0xFF);
 					opDSP_lo->hide();
-					opDSP_hi->index((vfo.iBW >> 8) & 0x7F);
+					opDSP_hi->index((vfo->iBW >> 8) & 0x7F);
 					btnDSP->label(selrig->SL_label);
 					opDSP_lo->show();
 					btnDSP->show();
@@ -1214,14 +1307,14 @@ void updateBandwidthControl(void *d)
 					opDSP_lo->hide();
 					opDSP_hi->hide();
 					btnDSP->hide();
-					opBW->index(vfo.iBW);
+					opBW->index(vfo->iBW);
 					opBW->show();
 				}
 			} else {  // no DSP control so update BW control, hide DSP
 				opDSP_lo->hide();
 				opDSP_hi->hide();
 				btnDSP->hide();
-				opBW->index(vfo.iBW);
+				opBW->index(vfo->iBW);
 				opBW->show();
 			}
 		}
@@ -1238,7 +1331,7 @@ void updateBandwidthControl(void *d)
 
 void setMode()
 {
-	FREQMODE fm = vfo;
+	XCVR_STATE fm = *vfo;
 	fm.imode = opMODE->index();
 	fm.iBW = selrig->def_bandwidth(fm.imode);
 	fm.src = UI;
@@ -1254,7 +1347,7 @@ void setMode()
 
 void sortList() {
 	if (!numinlist) return;
-	ATAG_FREQMODE temp;
+	ATAG_XCVR_STATE temp;
 	for (int i = 0; i < numinlist - 1; i++)
 		for (int j = i + 1; j < numinlist; j++)
 			if (oplist[i].freq > oplist[j].freq) {
@@ -1406,22 +1499,22 @@ void buildlist() {
 // flrig front panel changed
 
 int movFreqA() {
-	FREQMODE vfo = vfoA;
-	vfo.freq = FreqDispA->value();
-	vfo.src = UI;
+	XCVR_STATE nuvfo = vfoA;
+	nuvfo.freq = FreqDispA->value();
+	nuvfo.src = UI;
 	guard_lock queA_lock(&mutex_queA, 36);
-	queA.push(vfo);
+	queA.push(nuvfo);
 	return 1;
 }
 
 int movFreqB() {
 	if (progStatus.split && (!selrig->twovfos()))
 		return 0; // disallow for ICOM transceivers
-	FREQMODE vfo = vfoB;
-	vfo.freq = FreqDispB->value();
-	vfo.src = UI;
+	XCVR_STATE nuvfo = vfoB;
+	nuvfo.freq = FreqDispB->value();
+	nuvfo.src = UI;
 	guard_lock queB_lock(&mutex_queB, 37);
-	queB.push(vfo);
+	queB.push(nuvfo);
 	return 1;
 }
 
@@ -1477,16 +1570,16 @@ void CATswapAB() // called by UI action; do not need Fl::awake(...)
 		FreqDispA->value(vfoA.freq);
 		FreqDispA->redraw();
 
-		vfo = vfoA;
+		vfo = &vfoA;
 	}
 
 	if (selrig->has_dsp_controls) {
-		if (vfo.iBW > 256) {
+		if (vfo->iBW > 256) {
 			opBW->index(0);
 			opBW->hide();
-			opDSP_hi->index((vfo.iBW >> 8) & 0x7F);
+			opDSP_hi->index((vfo->iBW >> 8) & 0x7F);
 			opDSP_hi->hide();
-			opDSP_lo->index(vfo.iBW & 0xFF);
+			opDSP_lo->index(vfo->iBW & 0xFF);
 			opDSP_lo->show();
 			btnDSP->label(selrig->SL_label);
 			btnDSP->redraw_label();
@@ -1497,14 +1590,14 @@ void CATswapAB() // called by UI action; do not need Fl::awake(...)
 			opDSP_lo->hide();
 			opDSP_hi->hide();
 			btnDSP->hide();
-			opBW->index(vfo.iBW);
+			opBW->index(vfo->iBW);
 			opBW->show();
 		}
 	} else {
 		opDSP_lo->hide();
 		opDSP_hi->hide();
 		btnDSP->hide();
-		opBW->index(vfo.iBW);
+		opBW->index(vfo->iBW);
 		opBW->show();
 	}
 
@@ -1516,13 +1609,15 @@ void cbAswapB()
 	if (Fl::event_button() == FL_RIGHT_MOUSE) {
 		return cbA2B();
 	}
+
 	if (selrig->canswap()) {
 		CATswapAB();
 		return;
 	}
+
 	if (!selrig->twovfos()) {
 		vfoB.freq = FreqDispB->value();
-		FREQMODE temp = vfoB;
+		XCVR_STATE temp = vfoB;
 		vfoB = vfoA;
 		vfoA = temp;
 		FreqDispB->value(vfoB.freq);
@@ -1542,14 +1637,14 @@ void cbAswapB()
 		guard_lock serial_lock(&mutex_serial, 39);
 		if (!useB) {      // vfoA is used, swap vfos and update display B
 			vfoB.freq = FreqDispB->value();
-			FREQMODE temp = vfoB;
+			XCVR_STATE temp = vfoB;
 			vfoB = vfoA;
 			vfoA = temp;
 			FreqDispB->value(vfoB.freq);
 			FreqDispB->redraw();
 		} else {          // vfoB is used, swap vfos and update display A
 			vfoA.freq = FreqDispA->value();
-			FREQMODE temp = vfoA;
+			XCVR_STATE temp = vfoA;
 			vfoA = vfoB;
 			vfoB = temp;
 			FreqDispA->value(vfoA.freq);
@@ -1561,7 +1656,7 @@ void cbAswapB()
 		guard_lock queB_lock(&mutex_queB, 41);
 		while (!queB.empty()) queB.pop();
 		queB.push(vfoB);
-		pushedB = true;
+//		pushedB = true;
 	}
 }
 
@@ -1593,7 +1688,7 @@ void cbA2B()
 	}
 	FreqDispB->value(vfoB.freq);
 	FreqDispB->redraw();
-	pushedB = true;
+//	pushedB = true;
 }
 
 void highlight_vfo(void *d)
@@ -1698,7 +1793,7 @@ void selectFreq() {
 	if (!n) return;
 
 	n--;
-	FREQMODE fm;
+	XCVR_STATE fm;
 	fm.freq  = oplist[n].freq;
 	fm.imode = oplist[n].imode;
 	fm.iBW   = oplist[n].iBW;
@@ -2288,92 +2383,86 @@ void setPTT( void *d)
 	quePTT.push(val);
 }
 
+void restore_rig_vals_(XCVR_STATE &xcvrvfo)
+{
+	if (progStatus.restore_pre_att) {
+		selrig->set_attenuator(xcvrvfo.attenuator);
+		selrig->set_preamp(xcvrvfo.preamp);
+	}
+	if (progStatus.restore_auto_notch)
+		selrig->set_auto_notch(xcvrvfo.auto_notch);
+	if (progStatus.restore_split)
+		selrig->set_split(xcvrvfo.split);
+	if (progStatus.restore_power_control)
+		selrig->set_power_control(xcvrvfo.power_control);
+	if (progStatus.restore_volume)
+		selrig->set_volume_control(xcvrvfo.volume_control);
+
+	if (progStatus.restore_if_shift)
+		selrig->set_if_shift(xcvrvfo.if_shift);
+	if (progStatus.restore_notch)
+		selrig->set_notch(xcvrvfo.notch, xcvrvfo.notch_val);
+	if (progStatus.restore_noise)
+		selrig->set_noise(xcvrvfo.noise);
+	if (progStatus.restore_nr)
+		selrig->set_noise_reduction(xcvrvfo.nr);
+	if (progStatus.restore_mic_gain)
+		selrig->set_mic_gain(xcvrvfo.mic_gain);
+	if (progStatus.restore_squelch)
+		selrig->set_squelch(xcvrvfo.squelch);
+	if (progStatus.restore_rf_gain)
+		selrig->set_rf_gain(xcvrvfo.rf_gain);
+
+	if (progStatus.restore_comp_on_off || progStatus.restore_comp_level) {
+		progStatus.compression = xcvrvfo.compression;
+		progStatus.compON = xcvrvfo.compON;
+		selrig->set_compression();
+	}
+
+}
 
 void restore_rig_vals()
 {
 	guard_lock serial_lock(&mutex_serial, 65);
 
 	selrig->selectB();
-		if (progStatus.restore_frequency)
-			selrig->set_vfoB(transceiverB.freq);
-		if (progStatus.restore_mode)
-			selrig->set_modeB(transceiverB.imode);
-		if (progStatus.restore_bandwidth)
-			selrig->set_bwB(transceiverB.iBW);
-		if (progStatus.restore_pre_att) {
-			selrig->set_attenuator(initvals.attenuatorB);
-			selrig->set_preamp(initvals.preampB);
-		}
+
+	if (RIG_DEBUG) {
+		LOG_INFO("Restore xcvr B:\n%s", print(xcvr_vfoB));
+		std::cout << "Restore xcvr B:\n" << print(xcvr_vfoB) << std::endl;
+	}
+
+	if (progStatus.restore_frequency)
+		selrig->set_vfoB(xcvr_vfoB.freq);
+	if (progStatus.restore_mode)
+		selrig->set_modeB(xcvr_vfoB.imode);
+	if (progStatus.restore_bandwidth)
+		selrig->set_bwB(xcvr_vfoB.iBW);
+	restore_rig_vals_(xcvr_vfoB);
 
 	selrig->selectA();
-		if (progStatus.restore_frequency)
-			selrig->set_vfoA(transceiverA.freq);
-		if (progStatus.restore_mode)
-			selrig->set_modeA(transceiverA.imode);
-		if (progStatus.restore_bandwidth)
-			selrig->set_bwA(transceiverA.iBW);
-		if (progStatus.restore_pre_att) {
-			selrig->set_attenuator(initvals.attenuatorA);
-			selrig->set_preamp(initvals.preampA);
-		}
 
-	if (progStatus.restore_auto_notch)
-		selrig->set_auto_notch(initvals.auto_notch);
-	if (progStatus.restore_split)
-		selrig->set_split(initvals.split);
-	if (progStatus.restore_power_control)
-		selrig->set_power_control(initvals.power_control);
-	if (progStatus.restore_volume)
-		selrig->set_volume_control(initvals.volume_control);
-
-	if (progStatus.restore_if_shift)
-		selrig->set_if_shift(initvals.if_shift);
-	if (progStatus.restore_notch)
-		selrig->set_notch(0, initvals.notch);
-	if (progStatus.restore_noise)
-		selrig->set_noise(initvals.noise);
-	if (progStatus.restore_nr)
-		selrig->set_noise_reduction(initvals.nr);
-	if (progStatus.restore_mic_gain)
-		selrig->set_mic_gain(initvals.mic_gain);
-	if (progStatus.restore_squelch)
-		selrig->set_squelch(initvals.squelch);
-	if (progStatus.restore_rf_gain)
-		selrig->set_rf_gain(initvals.rf_gain);
-
-	if (progStatus.restore_comp_on_off || progStatus.restore_comp_level) {
-		progStatus.compression = initvals.compression;
-		progStatus.compON = initvals.compON;
-		selrig->set_compression();
+	if (RIG_DEBUG) {
+		LOG_INFO("Restore xcvr A:\n%s", print(xcvr_vfoA));
+		std::cout << "Restore xcvr A:\n" << print(xcvr_vfoA) << std::endl;
 	}
+
+	if (progStatus.restore_frequency)
+		selrig->set_vfoA(xcvr_vfoA.freq);
+	if (progStatus.restore_mode)
+		selrig->set_modeA(xcvr_vfoA.imode);
+	if (progStatus.restore_bandwidth)
+		selrig->set_bwB(xcvr_vfoA.iBW);
+	restore_rig_vals_(xcvr_vfoA);
 
 }
 
-void read_rig_vals()
+void read_rig_vals_(XCVR_STATE &xcvrvfo)
 {
-// no guard_lock ... this function called from within a guard_lock block
-
-	selrig->selectB();
-	if (selrig->has_get_info)
-		selrig->get_info();
-	transceiverB.freq = selrig->get_vfoB();
-	transceiverB.imode = selrig->get_modeB();
-	transceiverB.iBW = selrig->get_bwB();
 	if (selrig->has_preamp_control)
-		initvals.preampB = selrig->get_preamp();
+		xcvrvfo.preamp = selrig->get_preamp();
 	if (selrig->has_attenuator_control)
-		initvals.attenuatorB = selrig->get_attenuator();
-
-	selrig->selectA();
-	if (selrig->has_get_info)
-		selrig->get_info();
-	transceiverA.freq = selrig->get_vfoA();
-	transceiverA.imode = selrig->get_modeA();
-	transceiverA.iBW = selrig->get_bwA();
-	if (selrig->has_preamp_control)
-		initvals.preampA = selrig->get_preamp();
-	if (selrig->has_attenuator_control)
-		initvals.attenuatorA = selrig->get_attenuator();
+		xcvrvfo.attenuator = selrig->get_attenuator();
 
 	if (selrig->has_preamp_control || selrig->has_attenuator_control)
 		btnRestorePreAtt->activate();
@@ -2383,76 +2472,76 @@ void read_rig_vals()
 	if (selrig->has_auto_notch) {
 		btnRestoreAutoNotch->activate();
 		if (progStatus.restore_auto_notch && selrig->has_auto_notch)
-			initvals.auto_notch = selrig->get_auto_notch();
+			xcvrvfo.auto_notch = selrig->get_auto_notch();
 	} else btnRestoreAutoNotch->deactivate();
 
 	if (selrig->has_split) {
 		btnRestoreSplit->activate();
 		if (progStatus.restore_split && selrig->has_split)
-			initvals.split = selrig->get_split();
+			xcvrvfo.split = selrig->get_split();
 	} else
 		btnRestoreSplit->deactivate();
 
 	if (selrig->has_power_control) {
 		btnRestorePowerControl->activate();
 		if (progStatus.restore_power_control)
-			initvals.power_control = selrig->get_power_control();
+			xcvrvfo.power_control = selrig->get_power_control();
 	} else
 		btnRestorePowerControl->deactivate();
 
 	if (selrig->has_volume_control) {
 		btnRestoreVolume->activate();
 		if (progStatus.restore_volume)
-			initvals.volume_control = selrig->get_volume_control();
+			xcvrvfo.volume_control = selrig->get_volume_control();
 	} else
 		btnRestoreVolume->deactivate();
 
 	if (selrig->has_ifshift_control) {
 		btnRestoreIFshift->activate();
 		if (progStatus.restore_if_shift)
-			selrig->get_if_shift(initvals.if_shift);
+			selrig->get_if_shift(xcvrvfo.if_shift);
 	} else
 		btnRestoreIFshift->deactivate();
 
 	if (selrig->has_notch_control) {
 		btnRestoreNotch->activate();
 		if (progStatus.restore_notch)
-			selrig->get_notch(initvals.notch);
+			xcvrvfo.notch = selrig->get_notch(xcvrvfo.notch_val);
 	} else
 		btnRestoreNotch->deactivate();
 
 	if (selrig->has_noise_control) {
 		btnRestoreNoise->activate();
 		if (progStatus.restore_noise)
-			initvals.noise = selrig->get_noise();
+			xcvrvfo.noise = selrig->get_noise();
 	} else
 		btnRestoreNoise->deactivate();
 
 	if (selrig->has_noise_reduction_control) {
 		btnRestoreNR->activate();
 		if (progStatus.restore_nr)
-			initvals.nr = selrig->get_noise_reduction();
+			xcvrvfo.nr = selrig->get_noise_reduction();
 	} else
 		btnRestoreNR->deactivate();
 
 	if (selrig->has_micgain_control) {
 		btnRestoreMicGain->activate();
 		if (progStatus.restore_mic_gain)
-			initvals.mic_gain = selrig->get_mic_gain();
+			xcvrvfo.mic_gain = selrig->get_mic_gain();
 	} else
 		btnRestoreMicGain->deactivate();
 
 	if (selrig->has_sql_control) {
 		btnRestoreSquelch->activate();
 		if (progStatus.restore_squelch)
-			initvals.squelch = selrig->get_squelch();
+			xcvrvfo.squelch = selrig->get_squelch();
 	} else
 		btnRestoreSquelch->deactivate();
 
 	if (selrig->has_rf_control) {
 		btnRestoreRfGain->activate();
 		if (progStatus.restore_rf_gain)
-			initvals.rf_gain = selrig->get_rf_gain();
+			xcvrvfo.rf_gain = selrig->get_rf_gain();
 	} else
 		btnRestoreRfGain->deactivate();
 
@@ -2460,8 +2549,8 @@ void read_rig_vals()
 
 		if (progStatus.restore_comp_on_off || progStatus.restore_comp_level) {
 			selrig->get_compression();
-			initvals.compression = progStatus.compression;
-			initvals.compON = progStatus.compON;
+			xcvrvfo.compression = progStatus.compression;
+			xcvrvfo.compON = progStatus.compON;
 		}
 
 		if (selrig->has_compON)
@@ -2482,9 +2571,51 @@ void read_rig_vals()
 	}
 }
 
+void read_rig_vals()
+{
+// no guard_lock ... this function called from within a guard_lock block
+
+	selrig->selectB();
+std::cout << "select B: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+
+	if (selrig->has_get_info)
+		selrig->get_info();
+	xcvr_vfoB.freq = selrig->get_vfoB();
+std::cout << "get_vfoB: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+	xcvr_vfoB.imode = selrig->get_modeB();
+std::cout << "get_modeB: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+	xcvr_vfoB.iBW = selrig->get_bwB();
+std::cout << "get_bwB: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+	read_rig_vals_(xcvr_vfoB);
+
+	if (RIG_DEBUG) {
+		LOG_INFO("Read xcvr B:\n%s", print(xcvr_vfoB));
+		std::cout << "Read xcvr B:\n" << print(xcvr_vfoB) << std::endl;
+	}
+
+	selrig->selectA();
+std::cout << "select A: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+
+	if (selrig->has_get_info)
+		selrig->get_info();
+	xcvr_vfoA.freq = selrig->get_vfoA();
+std::cout << "get_vfoA: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+	xcvr_vfoA.imode = selrig->get_modeA();
+std::cout << "get_modeA: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+	xcvr_vfoA.iBW = selrig->get_bwA();
+std::cout << "get_bwA: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+	read_rig_vals_(xcvr_vfoA);
+
+	if (RIG_DEBUG) {
+		LOG_INFO("Read xcvr A:\n%s", print(xcvr_vfoA));
+		std::cout << "Read xcvr A:\n" << print(xcvr_vfoA) << std::endl;
+	}
+}
+
 void closeRig()
 {
-	restore_rig_vals();
+	if (progStatus.use_rig_data)
+		restore_rig_vals();
 	selrig->shutdown();
 }
 
@@ -2535,19 +2666,6 @@ void cbExit()
 	}
 	pthread_join(*serial_thread, NULL);
 
-/*
-	if (progStatus.restore_rig_data){
-LOG_INFO("Restore Xcvr Data");
-		selrig->selectB();
-		selrig->set_vfoB(transceiverB.freq);
-		selrig->set_modeB(transceiverB.imode);
-		selrig->set_bwB(transceiverB.iBW);
-		selrig->selectA();
-		selrig->set_vfoA(transceiverA.freq);
-		selrig->set_modeA(transceiverA.imode);
-		selrig->set_bwA(transceiverA.iBW);
-	}
-*/
 	closeRig();
 
 	// xcvr auto off
@@ -3068,22 +3186,31 @@ void initXcvrTab()
 
 	} else {
 
-		tabsGeneric->remove(*genericBands);
-		tabsGeneric->remove(*genericCW);
-		tabsGeneric->remove(*genericVOX);
-		tabsGeneric->remove(*genericSpeech);
-		tabsGeneric->remove(*genericRx);
-		tabsGeneric->remove(*genericMisc);
-		tabsGeneric->remove(*genericUser);
+//		tabsGeneric->remove(*genericBands);
+//		tabsGeneric->remove(*genericCW);
+//		tabsGeneric->remove(*genericVOX);
+//		tabsGeneric->remove(*genericSpeech);
+//		tabsGeneric->remove(*genericRx);
+//		tabsGeneric->remove(*genericMisc);
+//		tabsGeneric->remove(*genericUser);
+
+		genericBands->hide();
+		genericCW->hide();
+		genericVOX->hide();
+		genericSpeech->hide();
+		genericRx->hide();
+		genericMisc->hide();
+		genericUser->hide();
 
 		if (selrig->has_band_selection) {
 			if (progStatus.UIsize != touch_ui)
-			genericBands->resize(
-				tabsGeneric->x() + 2,
-				tabsGeneric->y() + 19,
-				tabsGeneric->w() - 4,
-				tabsGeneric->h() - 21);
-			tabsGeneric->insert(*genericBands, 0);
+//			genericBands->resize(
+//				tabsGeneric->x(), // + 2,
+//				tabsGeneric->y() + 20, // + 19,
+//				tabsGeneric->w(), // + 4,
+//				tabsGeneric->y() - 22); // -21);
+//			tabsGeneric->insert(*genericBands, 0);
+			genericBands->show();
 		}
 
 		poll_all->activate();
@@ -3092,12 +3219,13 @@ void initXcvrTab()
 		if (selrig->has_cw_wpm || selrig->has_cw_qsk || selrig->has_cw_weight ||
 			selrig->has_cw_keyer || selrig->has_cw_spot || selrig->has_cw_spot_tone) {
 			if (progStatus.UIsize == wide_ui)
-			genericCW->resize(
-				tabsGeneric->x() + 2,
-				tabsGeneric->y() + 19,
-				tabsGeneric->w() - 4,
-				tabsGeneric->h() - 21);
-			tabsGeneric->insert(*genericCW, 6);
+//			genericCW->resize(
+//				tabsGeneric->x(), // + 2,
+//				tabsGeneric->y() + 20, // + 19,
+//				tabsGeneric->w(), // + 4,
+//				tabsGeneric->y() - 22); // -21);
+//			tabsGeneric->insert(*genericCW, 6);
+			genericCW->show();
 			if (selrig->has_cw_wpm) {
 				int min, max;
 				selrig->get_cw_wpm_min_max(min, max);
@@ -3152,12 +3280,13 @@ void initXcvrTab()
 		if (selrig->has_vox_onoff || selrig->has_vox_gain || selrig->has_vox_anti ||
 			selrig->has_vox_hang || selrig->has_vox_on_dataport || selrig->has_cw_spot_tone) {
 			if (progStatus.UIsize == wide_ui)
-			genericVOX->resize(
-				tabsGeneric->x() + 2,
-				tabsGeneric->y() + 19,
-				tabsGeneric->w() - 4,
-				tabsGeneric->h() - 21);
-			tabsGeneric->insert(*genericVOX, 6);
+//			genericVOX->resize(
+//				tabsGeneric->x(), // + 2,
+//				tabsGeneric->y() + 20, // + 19,
+//				tabsGeneric->w(), // + 4,
+//				tabsGeneric->y() - 22); // -21);
+//			tabsGeneric->insert(*genericVOX, 6);
+			genericVOX->show();
 			if (selrig->has_vox_onoff) {
 				btn_vox->show();
 				btn_vox->value(progStatus.vox_onoff);
@@ -3202,12 +3331,13 @@ void initXcvrTab()
 
 		if (selrig->has_compON || selrig->has_compression) {
 			if (progStatus.UIsize == wide_ui)
-			genericSpeech->resize(
-				tabsGeneric->x() + 2,
-				tabsGeneric->y() + 19,
-				tabsGeneric->w() - 4,
-				tabsGeneric->h() - 21);
-			tabsGeneric->insert(*genericSpeech, 6);
+//			genericSpeech->resize(
+//				tabsGeneric->x(), // + 2,
+//				tabsGeneric->y() + 20, // + 19,
+//				tabsGeneric->w(), // + 4,
+//				tabsGeneric->y() - 22); // -21);
+//			tabsGeneric->insert(*genericSpeech, 6);
+			genericSpeech->show();
 			if (selrig->has_compON) {
 				btnCompON->show();
 				btnCompON->value(progStatus.compON);
@@ -3228,10 +3358,10 @@ void initXcvrTab()
 		if (selrig->has_agc_level || selrig->has_nb_level || selrig->has_bpf_center) {
 			if (progStatus.UIsize == wide_ui)
 			genericRx->resize(
-				tabsGeneric->x() + 2,
-				tabsGeneric->y() + 19,
-				tabsGeneric->w() - 4,
-				tabsGeneric->h() - 21);
+				tabsGeneric->x(), // + 2,
+				tabsGeneric->y() + 20, // + 19,
+				tabsGeneric->w(), // + 4,
+				tabsGeneric->y() - 22); // -21);
 			tabsGeneric->insert(*genericRx, 6);
 			if (selrig->has_agc_level) cbo_agc_level->activate(); else cbo_agc_level->deactivate();
 			if (selrig->has_nb_level) cbo_nb_level->activate(); else cbo_nb_level->deactivate();
@@ -3247,12 +3377,13 @@ void initXcvrTab()
 
 		if (selrig->has_vfo_adj || selrig->has_xcvr_auto_on_off) {
 			if (progStatus.UIsize == wide_ui)
-			genericMisc->resize(
-				tabsGeneric->x() + 2,
-				tabsGeneric->y() + 19,
-				tabsGeneric->w() - 4,
-				tabsGeneric->h() - 21);
-			tabsGeneric->insert(*genericMisc, 6);
+//			genericMisc->resize(
+//				tabsGeneric->x(), // + 2,
+//				tabsGeneric->y() + 20, // + 19,
+//				tabsGeneric->w(), // + 4,
+//				tabsGeneric->y() - 22); // -21);
+//			tabsGeneric->insert(*genericMisc, 6);
+			genericMisc->show();
 			if (selrig->has_vfo_adj) {
 				int min, max, step;
 				selrig->get_vfoadj_min_max_step(min, max, step);
@@ -3277,13 +3408,15 @@ void initXcvrTab()
 			}
 
 		}
-		tabsGeneric->insert(*genericUser, 6);
-		if (progStatus.UIsize != touch_ui)
-		genericUser->resize(
-			tabsGeneric->x() + 2,
-			tabsGeneric->y() + 19,
-			tabsGeneric->w() - 4,
-			tabsGeneric->h() - 21);
+//		tabsGeneric->insert(*genericUser, 6);
+		genericUser->show();
+
+//		if (progStatus.UIsize != touch_ui)
+//			genericUser->resize(
+//				tabsGeneric->x() + 2,
+//				tabsGeneric->y() + 19,
+//				tabsGeneric->w() + 4,
+//				tabsGeneric->y() -21);
 
 		tabsGeneric->redraw();
 
@@ -3345,9 +3478,9 @@ void init_TT550()
 	selrig->set_modeB(vfoB.imode);
 	selrig->set_bwB(vfoB.iBW);
 
-	vfo.freq = vfoA.freq = progStatus.freq_A;
-	vfo.imode = vfoA.imode = progStatus.imode_A;
-	vfo.iBW = vfoA.iBW = progStatus.iBW_A;
+	vfo->freq = vfoA.freq = progStatus.freq_A;
+	vfo->imode = vfoA.imode = progStatus.imode_A;
+	vfo->iBW = vfoA.iBW = progStatus.iBW_A;
 	FreqDispA->value( vfoA.freq );
 	selrig->set_vfoA(vfoA.freq);
 	selrig->set_modeA(vfoA.imode);
@@ -3405,28 +3538,32 @@ void init_generic_rig()
 
 		useB = ret;
 
-		read_rig_vals();
+		if (progStatus.use_rig_data) {
+			read_rig_vals();
+			vfoA = xcvr_vfoA;
+			vfoB = xcvr_vfoB;
+		} else {
+			xcvr_vfoA = vfoA;
+			xcvr_vfoB = vfoB;
+		}
 
 		if (useB) {
 			selrig->selectB();
-			vfo = vfoB;
+			vfo = &vfoB;
 		} else {
-			vfo = vfoA;
+			vfo = &vfoA;
 		}
 	}
-	else {
+	else if (progStatus.use_rig_data) {
 		read_rig_vals();
+		vfoA = xcvr_vfoA;
+		vfoB = xcvr_vfoB;
+	} else {
+		xcvr_vfoA = vfoA;
+		xcvr_vfoB = vfoB;
 	}
 
-	if (progStatus.use_rig_data) {
-LOG_INFO("Use xcvr start values for Vfo A/B");
-		vfo.freq = vfoA.freq = progStatus.freq_A = transceiverA.freq;
-		vfo.imode = vfoA.imode = progStatus.imode_A = transceiverA.imode;
-		vfo.iBW = vfoA.imode = progStatus.iBW_A = transceiverA.iBW;
-		vfoB.freq = progStatus.freq_B = transceiverB.freq;
-		vfoB.imode = progStatus.imode_B = transceiverB.imode;
-		vfoB.iBW = progStatus.iBW_B = transceiverB.iBW;
-	}
+	vfo = &vfoA;
 
 	rigmodes_.clear();
 	opMODE->clear();
@@ -3556,9 +3693,9 @@ void init_dsp_controls()
 		for (int i = 0; selrig->dsp_SH[i] != NULL; i++)
 			opDSP_hi->add(selrig->dsp_SH[i]);
 		opDSP_hi->tooltip(selrig->SH_tooltip);
-		if (vfo.iBW > 256) {
-			opDSP_lo->index(vfo.iBW & 0xFF);
-			opDSP_hi->index((vfo.iBW >> 8) & 0x7F);
+		if (vfo->iBW > 256) {
+			opDSP_lo->index(vfo->iBW & 0xFF);
+			opDSP_hi->index((vfo->iBW >> 8) & 0x7F);
 			btnDSP->show();
 			opDSP_hi->show();
 			opDSP_lo->hide();
@@ -4232,6 +4369,7 @@ void init_VFOs()
 		return;
 	}
 
+if (!progStatus.use_rig_data) {
 	vfoA.freq = progStatus.freq_A;
 	vfoA.imode = progStatus.imode_A;
 	vfoA.iBW = progStatus.iBW_A;
@@ -4258,10 +4396,17 @@ void init_VFOs()
 	selrig->set_modeA(vfoA.imode);
 	selrig->set_bwA(vfoA.iBW);
 
-	vfo = vfoA;
+	vfo = &vfoA;
 	updateBandwidthControl();
 
 	useB = false;
+} else {
+	vfo = &vfoA;
+	FreqDispA->value(vfoA.freq);
+	setModeControl(0);
+	updateBandwidthControl();
+	FreqDispB->value(vfoB.freq);
+}
 	highlight_vfo((void *)0);
 }
 
@@ -4861,7 +5006,7 @@ void cbBandSelect(int band)
 			selrig->adjust_bandwidth(vfoA.imode);
 			vfoA.iBW = selrig->get_bwA();
 		}
-		vfo = vfoA;
+		vfo = &vfoA;
 	} else {
 		vfoB.freq = selrig->get_vfoB();
 		if (selrig->has_mode_control)
@@ -4870,7 +5015,7 @@ void cbBandSelect(int band)
 			selrig->adjust_bandwidth(vfoB.imode);
 			vfoB.iBW = selrig->get_bwB();
 		}
-		vfo = vfoB;
+		vfo = &vfoB;
 	}
 // local display freqmdbw
 	if (selrig->has_mode_control)
@@ -4879,8 +5024,8 @@ void cbBandSelect(int band)
 		set_bandwidth_control();
 		Fl::awake(setBWControl);
 	}
-	if (!useB) Fl::awake(setFreqDispA, (void *)vfo.freq);
-	else Fl::awake(setFreqDispB, (void *)vfo.freq);
+	if (!useB) Fl::awake(setFreqDispA, (void *)vfo->freq);
+	else Fl::awake(setFreqDispB, (void *)vfo->freq);
 
 	MilliSleep(100);	// local sync-up
 	}

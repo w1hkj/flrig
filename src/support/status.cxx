@@ -104,12 +104,12 @@ status progStatus = {
 
 	-1,			// int  iBW_A;
 	1,			// int  imode_A;
-	7070000,	// long freq_A;
+	14070000,	// long freq_A;
 	-1,			// int  iBW_B;
 	1,			// int  imode_B;
 	7070000,	// long freq_B;
 	false,		// bool use_rig_data;
-	false,		// bool restore_rig_data;
+//	false,		// bool restore_rig_data;
 
 	false,		// bool spkr_on;
 	20,			// int  volume;
@@ -417,7 +417,7 @@ void status::saveLastState()
 	spref.set("freq_B", freq_B);
 
 	spref.set("use_rig_data", use_rig_data);
-	spref.set("restore_rig_data", restore_rig_data);
+//	spref.set("restore_rig_data", restore_rig_data);
 
 	spref.set("restore_frequency", restore_frequency);
 	spref.set("restore_mode", restore_mode);
@@ -736,7 +736,7 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("freq_B", freq_B, freq_B);
 
 		if (spref.get("use_rig_data", i, i)) use_rig_data = i;
-		if (spref.get("restore_rig_data", i, i)) restore_rig_data = i;
+//		if (spref.get("restore_rig_data", i, i)) restore_rig_data = i;
 
 		if (spref.get("restore_frequency", i, i)) restore_frequency = i;
 		if (spref.get("restore_mode", i, i)) restore_mode = i;
@@ -1104,9 +1104,6 @@ void status::UI_laststate()
 	if (spnrMICGAIN)		spnrMICGAIN->color(bg_slider);
 	if (spnrMICGAIN)		spnrMICGAIN->selection_color(btn_slider);
 
-//	if (restore_rig_data) mnuRestoreData->set();
-//	else mnuRestoreData->clear();
-
 	btnUser1->label(label1.c_str()); btnUser1->redraw_label();
 	btnUser2->label(label2.c_str()); btnUser2->redraw_label();
 	btnUser3->label(label3.c_str()); btnUser3->redraw_label();
@@ -1183,7 +1180,7 @@ string status::info()
 	info << "bw_B               : " << iBW_B << "\n";
 	info << "\n";
 	info << "use_rig_data       : " << use_rig_data << "\n";
-	info << "restore_rig_data   : " << restore_rig_data << "\n";
+//	info << "restore_rig_data   : " << restore_rig_data << "\n";
 	info << "\n";
 	info << "bool_spkr_on       : " << spkr_on << "\n";
 	info << "int_volume         : " << volume << "\n";

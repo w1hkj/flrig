@@ -627,7 +627,7 @@ int RIG_IC7300::get_compression()
 	std::string resp;
 
 	cmd.assign(pre_to).append("\x16\x44").append(post);
-	resp.assign(pre_fm).append("x16\x44");
+	resp.assign(pre_fm).append("\x16\x44");
 	if (waitFOR(8, "get comp on/off")) {
 		size_t p = replystr.find(resp);
 		if (p != string::npos)

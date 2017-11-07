@@ -1193,7 +1193,7 @@ void RIG_FT991::enable_keyer()
 
 bool RIG_FT991::set_cw_spot()
 {
-	if (vfo.imode == mCW || vfo.imode == mCW_R) {
+	if (vfo->imode == mCW || vfo->imode == mCW_R) {
 		cmd = "CS0;";
 		if (progStatus.spot_onoff) cmd[2] = '1';
 		sendCommand(cmd);

@@ -565,11 +565,20 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	cntBFO->callback((Fl_Callback*)cb_cntBFO);
 	cntBFO->align(Fl_Align(FL_ALIGN_RIGHT));
 
-	tabs550 = new Fl_Tabs(0, 252, 425, 70);
+int gph = 70;
+int gpy = 252;
+int tbh = 55;
+int tby = gpy + 20;
+
+	grpTABS = new Fl_Group(0, gpy, 425, gph);
+{
+	tabs550 = new Fl_Tabs(0, gpy, 425, gph);
+	{
 		tabs550->selection_color(FL_LIGHT1);
 		tabs550->hide();
 
-		tt550_CW = new Fl_Group(0, 272, 425, 50, _("CW"));
+		tt550_CW = new Fl_Group(0, tby, 425, tbh, _("CW"));
+		{
 			tt550_CW->color(FL_LIGHT1);
 			tt550_CW->selection_color(FL_LIGHT1);
 
@@ -649,10 +658,11 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			btn_tt550_enable_keyer->down_box(FL_DOWN_BOX);
 			btn_tt550_enable_keyer->callback((Fl_Callback*)cb_btn_tt550_enable_keyer);
 			btn_tt550_enable_keyer->value(progStatus.tt550_enable_keyer);
-
+		}
 		tt550_CW->end();
 
-		tt550_VOX = new Fl_Group(0, 272, 420, 50, _("Vox"));
+		tt550_VOX = new Fl_Group(0, tby, 425, tbh, _("Vox"));
+		{
 			tt550_VOX->hide();
 
 			spnr_tt550_vox_gain = new Hspinner(
@@ -696,10 +706,11 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 				50, 22, _("VOX"));
 			btn_tt550_vox->callback((Fl_Callback*)cb_btn_tt550_vox);
 			btn_tt550_vox->value(progStatus.tt550_vox_onoff);
-
+		}
 		tt550_VOX->end();
 
-		tt550_Speech = new Fl_Group(0, 272, 420, 50, _("Spch"));
+		tt550_Speech = new Fl_Group(0, tby, 425, tbh, _("Spch"));
+		{
 			tt550_Speech->hide();
 
 			btn_tt550_CompON = new Fl_Light_Button(
@@ -732,10 +743,11 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			spnr_tt550_mon_vol->callback((Fl_Callback*)cb_spnr_tt550_mon_vol);
 			spnr_tt550_mon_vol->value(progStatus.tt550_mon_vol);
 			spnr_tt550_mon_vol->align(FL_ALIGN_BOTTOM | FL_ALIGN_CENTER);
-
+		}
 		tt550_Speech->end();
 
-		tt550_Audio = new Fl_Group(0, 272, 420, 50, _("Audio"));
+		tt550_Audio = new Fl_Group(0, tby, 425, tbh, _("Audio"));
+		{
 			tt550_Audio->hide();
 
 			spnr_tt550_line_out = new Hspinner(
@@ -759,10 +771,11 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			btnAccInp->down_box(FL_DOWN_BOX);
 			btnAccInp->callback((Fl_Callback*)cb_btnAccInp);
 			btnAccInp->value(progStatus.tt550_use_line_in);
-
+		}
 		tt550_Audio->end();
 
-		tt550_Rx = new Fl_Group(2, 272, 420, 50, _("RX"));
+		tt550_Rx = new Fl_Group(0, tby, 425, tbh, _("RX"));
+		{
 			tt550_Rx->hide();
 
 			cbo_tt550_nb_level = new Fl_ComboBox(
@@ -814,10 +827,11 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			spnr_tt550_vfo_adj->step(0.02);
 			spnr_tt550_vfo_adj->format("%0.2f");
 			spnr_tt550_vfo_adj->value(progStatus.vfo_adj);
-
+		}
 		tt550_Rx->end();
 
-		tt550_Tx = new Fl_Group(2, 272, 420, 50, _("TX"));
+		tt550_Tx = new Fl_Group(0, tby, 425, tbh, _("TX"));
+		{
 			tt550_Tx->hide();
 
 			btn_tt550_enable_xmtr = new Fl_Check_Button(10, 280, 70, 22, _("Tx ON"));
@@ -857,10 +871,11 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			btn_tt550_use_xmt_bw->callback((Fl_Callback*)cb_btn_tt550_use_xmt_bw);
 			btn_tt550_use_xmt_bw->align(Fl_Align(FL_ALIGN_RIGHT));
 			btn_tt550_use_xmt_bw->value(progStatus.tt550_use_xmt_bw);
-
+		}
 		tt550_Tx->end();
 
-		tt550_302A = new Fl_Group(2, 272, 420, 50, _("302-A"));
+		tt550_302A = new Fl_Group(0, tby, 425, tbh, _("302-A"));
+		{
 			tt550_302A->hide();
 
 			spnr_tt550_keypad_time_out = new Hspinner(30, 280, 120, 22, _("Time out"), 16);
@@ -896,10 +911,11 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			sel_tt550_encoder_step->add("1|10|100|1 K|10 K");
 			sel_tt550_encoder_step->value(progStatus.tt550_encoder_step);
 			sel_tt550_encoder_step->align(FL_ALIGN_BOTTOM | FL_ALIGN_CENTER);
-
+		}
 		tt550_302A->end();
 
-		tt550_302B = new Fl_Group(2, 272, 420, 50, _("302-B"));
+		tt550_302B = new Fl_Group(0, tby, 425, tbh, _("302-B"));
+		{
 			tt550_302B->hide();
 
 			sel_tt550_F1_func = new Fl_Choice(34, 280, 99, 22, _("F1"));
@@ -922,11 +938,11 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			sel_tt550_F3_func->callback((Fl_Callback*)cb_sel_tt550_F3_func);
 			sel_tt550_F3_func->add("None|Clear|CW++|CW--|Band++|Band--|Step++|Step--");
 			sel_tt550_F3_func->value(progStatus.tt550_F3_func);
-
+		}
 		tt550_302B->end();
 
-		tt550_AT = new Fl_Group(2, 272, 420, 50, _("AT-11"));
-
+		tt550_AT = new Fl_Group(0, tby, 425, tbh, _("AT-11"));
+		{
 			tt550_AT_inline = new Fl_Light_Button(5, 288, 100, 22, _("Inline"));
 			tt550_AT_inline->tooltip(_("Enabled - autotune\nDisabled - bypass"));
 			tt550_AT_inline->callback((Fl_Callback*)cb_AT_bypass);
@@ -965,15 +981,17 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			tt550_Nsamples->maximum(FPLEN);
 			tt550_Nsamples->value(progStatus.tt550_Nsamples);
 			tt550_Nsamples->callback((Fl_Callback*)cb_tt550_Nsamples);
-
+		}
 		tt550_AT->end();
-
+	}
 	tabs550->end();
 
-	tabsGeneric = new Fl_Tabs(0, 252, 425, 70);
+	tabsGeneric = new Fl_Tabs(0, gpy, 425, gph);//0, 252, 425, 70);
+	{
 		tabsGeneric->selection_color(FL_LIGHT1);
 
-		genericBands = new Fl_Group(0, 271, 425, 49, _("Bands"));
+		genericBands = new Fl_Group(0, tby, 425, tbh, _("Bands"));
+		{
 
 			btnBandSelect_1 = new Fl_Button(4, 278, 60, 18, _("1.8"));
 			btnBandSelect_1->tooltip(_("160m Band"));
@@ -1045,9 +1063,13 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			opSelect60->when(FL_WHEN_RELEASE);
 			opSelect60->end();
 
+			Fl_Group dmybx(0, tby+tbh-2, 425, 2, ""); dmybx.end();
+		genericBands->resizable(dmybx);
+		}
 		genericBands->end();
 
-		genericCW = new Fl_Group(0, 271, 425, 49, _("CW"));
+		genericCW = new Fl_Group(0, tby, 425, tbh, _("CW"));
+		{
 			genericCW->color(FL_LIGHT1);
 			genericCW->selection_color(FL_LIGHT1);
 			genericCW->hide();
@@ -1107,9 +1129,13 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			btn_enable_keyer->callback((Fl_Callback*)cb_btn_enable_keyer);
 			btn_enable_keyer->value(progStatus.enable_keyer);
 
+			Fl_Group dmybx(0, tby+tbh-2, 425, 2, ""); dmybx.end();
+		genericCW->resizable(dmybx);
+		}
 		genericCW->end();
 
-		genericQSK = new Fl_Group(0, 271, 425, 49, _("QSK"));
+		genericQSK = new Fl_Group(0, tby, 425, tbh, _("QSK"));
+		{
 			genericQSK->color(FL_LIGHT1);
 			genericQSK->selection_color(FL_LIGHT1);
 			genericQSK->hide();
@@ -1145,9 +1171,13 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			spnr_cw_delay->value(progStatus.cw_delay);
 			spnr_cw_delay->align(FL_ALIGN_BOTTOM | FL_ALIGN_CENTER);
 
+			Fl_Group dmybx(0, tby+tbh-2, 425, 2, ""); dmybx.end();
+		genericQSK->resizable(dmybx);
+		}
 		genericQSK->end();
 
-		genericVOX = new Fl_Group(0, 271, 425, 49, _("Vox"));
+		genericVOX = new Fl_Group(0, tby, 425, tbh, _("Vox"));
+		{
 			genericVOX->hide();
 
 			spnr_vox_gain = new Hspinner(
@@ -1201,9 +1231,13 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			btn_vox_on_dataport->callback((Fl_Callback*)cb_btn_vox_on_dataport);
 			btn_vox_on_dataport->value(progStatus.vox_on_dataport);
 
+			Fl_Group dmybx(0, tby+tbh-2, 425, 2, ""); dmybx.end();
+		genericVOX->resizable(dmybx);
+		}
 		genericVOX->end();
 
-		genericSpeech = new Fl_Group(0, 271, 425, 49, _("Spch"));
+		genericSpeech = new Fl_Group(0, tby, 425, tbh, _("Spch"));
+		{
 			genericSpeech->hide();
 
 			btnCompON = new Fl_Light_Button(215, 281, 70, 22, _("On"));
@@ -1220,9 +1254,13 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			spnr_compression->callback((Fl_Callback*)cb_spnr_compression);
 			spnr_compression->value(progStatus.compression);
 
+			Fl_Group dmybx(0, tby+tbh-2, 425, 2, ""); dmybx.end();
+		genericSpeech->resizable(dmybx);
+		}
 		genericSpeech->end();
 
-		genericRx = new Fl_Group(0, 271, 425, 49, _("RX"));
+		genericRx = new Fl_Group(0, tby, 425, tbh, _("RX"));
+		{
 			genericRx->hide();
 
 			cbo_nb_level = new Fl_ComboBox(12, 281, 80, 22, _("NB level"));
@@ -1272,9 +1310,13 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			btn_use_bpf_center->callback((Fl_Callback*)cb_btn_use_bpf_center);
 			btn_use_bpf_center->value(progStatus.use_bpf_center);
 
+			Fl_Group dmybx(0, tby+tbh-2, 425, 2, ""); dmybx.end();
+		genericRx->resizable(dmybx);
+		}
 		genericRx->end();
 
-		genericMisc = new Fl_Group(0, 271, 425, 49, _("Misc"));
+		genericMisc = new Fl_Group(0, tby, 425, tbh, _("Misc"));
+		{
 			genericMisc->hide();
 
 			spnr_vfo_adj = new Hspinner(24, 279, 96, 22, _("Vfo Adj"));
@@ -1314,11 +1356,13 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			btn_xcvr_auto_off->callback((Fl_Callback*)cb_btn_xcvr_auto_off);
 			btn_xcvr_auto_off->value(progStatus.xcvr_auto_off);
 
+			Fl_Group dmybx(0, tby+tbh-2, 425, 2, ""); dmybx.end();
+		genericMisc->resizable(dmybx);
+		}
 		genericMisc->end();
 
-		genericUser = new Fl_Group(0, 271, 425, 49, _("User"));
-			genericUser->hide();
-
+		genericUser = new Fl_Group(0, tby, 425, tbh, _("User"));
+		{
 			btnUser1 = new Fl_Button(5, genericUser->y() + 7, 100, 20, "USER 1");
 			btnUser1->callback((Fl_Callback*)cb_btnUser, (void*)1);
 
@@ -1331,21 +1375,28 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			btnUser4 = new Fl_Button(320, genericUser->y() + 7, 100, 20, "USER 4");
 			btnUser4->callback((Fl_Callback*)cb_btnUser, (void*)4);
 
-			btnUser5 = new Fl_Button(5, genericUser->y() + 29, 100, 20, "USER 5");
+			btnUser5 = new Fl_Button(5, genericUser->y() + 28, 100, 20, "USER 5");
 			btnUser5->callback((Fl_Callback*)cb_btnUser, (void*)5);
 
-			btnUser6 = new Fl_Button(110, genericUser->y() + 29, 100, 20, "USER 6");
+			btnUser6 = new Fl_Button(110, genericUser->y() + 28, 100, 20, "USER 6");
 			btnUser6->callback((Fl_Callback*)cb_btnUser, (void*)6);
 
-			btnUser7 = new Fl_Button(215, genericUser->y() + 29, 100, 20, "USER 7");
+			btnUser7 = new Fl_Button(215, genericUser->y() + 28, 100, 20, "USER 7");
 			btnUser7->callback((Fl_Callback*)cb_btnUser, (void*)7);
 
-			btnUser8 = new Fl_Button(320, genericUser->y() + 29, 100, 20, "USER 8");
+			btnUser8 = new Fl_Button(320, genericUser->y() + 28, 100, 20, "USER 8");
 			btnUser8->callback((Fl_Callback*)cb_btnUser, (void*)8);
 
+			Fl_Group dmybx(0, tby+tbh-2, 425, 2, ""); dmybx.end();
+		genericUser->resizable(dmybx);
+		}
 		genericUser->end();
-
+	}
+	tabsGeneric->resizable(genericUser);
 	tabsGeneric->end();
+}
+grpTABS->end();
+grpTABS->hide();
 
 	g->end();
 	return g;
