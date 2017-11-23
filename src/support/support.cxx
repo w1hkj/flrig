@@ -910,7 +910,7 @@ void serviceA()
 		set_bandwidth_control();
 		selrig->set_bwA(vfo->iBW = vfoA.iBW = nuvals.iBW);
 		Fl::awake(setBWControl);
-	} else if (vfoA.iBW != nuvals.iBW) {
+	} else if (vfoA.iBW != nuvals.iBW) { // && nuvals.iBW != -1) {
 //std::cout << "A.iBW = " << vfo->iBW << ", nu.iBW = " << nuvals.iBW << std::endl;
 		selrig->set_bwA(vfo->iBW = vfoA.iBW = nuvals.iBW);
 		Fl::awake(setBWControl);
@@ -977,7 +977,7 @@ void serviceB()
 		set_bandwidth_control();
 		selrig->set_bwB(vfo->iBW = vfoB.iBW = nuvals.iBW);
 		Fl::awake(setBWControl);
-	} else if (vfoB.iBW != nuvals.iBW) {
+	} else if (vfoB.iBW != nuvals.iBW  && nuvals.iBW != -1) {
 //std::cout << "B.iBW = " << vfoB.iBW << ", nu.iBW = " << nuvals.iBW << std::endl;
 		selrig->set_bwB(vfo->iBW = vfoB.iBW = nuvals.iBW);
 		Fl::awake(setBWControl);
@@ -2576,16 +2576,16 @@ void read_rig_vals()
 // no guard_lock ... this function called from within a guard_lock block
 
 	selrig->selectB();
-std::cout << "select B: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+//std::cout << "select B: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
 
 	if (selrig->has_get_info)
 		selrig->get_info();
 	xcvr_vfoB.freq = selrig->get_vfoB();
-std::cout << "get_vfoB: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+//std::cout << "get_vfoB: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
 	xcvr_vfoB.imode = selrig->get_modeB();
-std::cout << "get_modeB: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+//std::cout << "get_modeB: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
 	xcvr_vfoB.iBW = selrig->get_bwB();
-std::cout << "get_bwB: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+//std::cout << "get_bwB: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
 	read_rig_vals_(xcvr_vfoB);
 
 	if (RIG_DEBUG) {
@@ -2594,16 +2594,16 @@ std::cout << "get_bwB: " << str2hex(replystr.c_str(), replystr.length()) << std:
 	}
 
 	selrig->selectA();
-std::cout << "select A: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+//std::cout << "select A: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
 
 	if (selrig->has_get_info)
 		selrig->get_info();
 	xcvr_vfoA.freq = selrig->get_vfoA();
-std::cout << "get_vfoA: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+//std::cout << "get_vfoA: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
 	xcvr_vfoA.imode = selrig->get_modeA();
-std::cout << "get_modeA: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+//std::cout << "get_modeA: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
 	xcvr_vfoA.iBW = selrig->get_bwA();
-std::cout << "get_bwA: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+//std::cout << "get_bwA: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
 	read_rig_vals_(xcvr_vfoA);
 
 	if (RIG_DEBUG) {

@@ -233,7 +233,8 @@ public:
 	rig_get_ptt(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_ptt", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		result = PTT;
+//std::cout << "rig_get_ptt " << PTT << std::endl;
+		result = int(PTT);
 	}
 
 	std::string help() { return std::string("returns state of PTT"); }
@@ -636,6 +637,7 @@ public:
 			return;
 		}
 		int state = int(params[0]);
+//std::cout << "rig_set_ptt " << state << std::endl;
 		if (state) Fl::awake(setPTT, (void *)1);
 		else Fl::awake(setPTT, (void *)0);
 	}
