@@ -233,13 +233,7 @@ public:
 	rig_get_ptt(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_ptt", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-
-		if (!xcvr_initialized) {
-			result = 0;
-			return;
-		}
-
-		result = btnPTT->value();
+		result = PTT;
 	}
 
 	std::string help() { return std::string("returns state of PTT"); }
