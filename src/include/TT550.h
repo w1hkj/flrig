@@ -175,7 +175,7 @@ public:
 	void set_vox_hang();
 	void set_aux_hang();
 	void set_mon_vol();
-	void set_compression();
+	void set_compression(int, int);
 	void set_squelch_level();
 	void tuner_bypass();
 	void enable_xmtr();

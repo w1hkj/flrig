@@ -137,23 +137,23 @@ void RIG_IC910H::set_vfoA (long freq)
 	waitFB("set vfo A");}
 
 
-void RIG_IC910H::set_compression()
+void RIG_IC910H::set_compression(int on, int val)
 {
-	if (progStatus.compON) {
+	if (on) {
 		cmd = pre_to;
 		cmd.append("\x14\x0E");
-		cmd.append(to_bcd(progStatus.compression * 255 / 100, 3));
+		cmd.append(to_bcd(val * 255 / 100, 3));
 		cmd.append( post );
 		waitFB("set comp");
-		if (comp_is_on != progStatus.compON) {
-			comp_is_on = progStatus.compON;
+		if (comp_is_on != on) {
+			comp_is_on = on;
 			cmd = pre_to;
 			cmd.append("\x16\01");
 			cmd.append( post );
 			waitFB("set comp val");
 		}
-	} else if (comp_is_on != progStatus.compON) {
-		comp_is_on = progStatus.compON;
+	} else if (comp_is_on != on) {
+		comp_is_on = on;
 		cmd = pre_to;
 		cmd.append("\x16\00");
 		cmd.append( post );

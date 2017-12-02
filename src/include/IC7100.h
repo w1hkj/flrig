@@ -52,7 +52,7 @@ public:
 	int  get_attenuator();
 	void set_mic_gain(int v);
 
-	void set_compression();
+	void set_compression(int, int);
 	void get_comp_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 10; step = 1; }
 	void set_vox_onoff();

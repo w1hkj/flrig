@@ -1190,12 +1190,12 @@ void RIG_FT891::set_xcvr_auto_off()
 	showresp(WARN, ASC, "SET xcvr auto on/off", cmd, replystr);
 }
 
-void RIG_FT891::set_compression()
+void RIG_FT891::set_compression(int on, int val)
 {
 	cmd = "PL";
-	cmd.append(to_decimal(progStatus.compression, 3)).append(";");
+	cmd.append(to_decimal(val, 3)).append(";");
 	sendCommand(cmd);
-	if (progStatus.compON)
+	if (on)
 		cmd = "PR01;";
 	else
 		cmd = "PR00;";

@@ -72,7 +72,7 @@ public:
 	int  get_mic_gain();
 	void get_mic_gain_min_max_step(int &min, int &max, int &step);
 
-	void set_compression();
+	void set_compression(int, int);
 	void set_auto_notch(int val);
 	int  get_auto_notch();
 	void set_vox_onoff();

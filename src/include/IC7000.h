@@ -91,7 +91,7 @@ public:
 
 	void set_noise_reduction_val(int val);
 	int  get_noise_reduction_val();
-	void set_compression();
+	void set_compression(int, int);
 	void get_comp_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 10; step = 1; }
 

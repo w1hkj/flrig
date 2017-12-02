@@ -272,7 +272,7 @@ void RIG_TT550::initialize()
 	set_volume_control(0);
 
 	set_auto_notch(auto_notch);
-	set_compression();
+	set_compression(0,0);
 
 	set_vox_hang();
 	set_vox_anti();
@@ -1331,7 +1331,7 @@ void RIG_TT550::set_aux_hang()
 	sendCommand(cmd, 0);
 }
 
-void RIG_TT550::set_compression()
+void RIG_TT550::set_compression(int on, int val)
 {
 	cmd = TT550setSPEECH;
 	cmd[1] = (0x7F) & (int)(progStatus.tt550_compression * 1.27);
@@ -1533,7 +1533,7 @@ void cb_tt550_vox_onoff()
 void cb_tt550_compression()
 {
 	pthread_mutex_lock(&mutex_serial);
-	selrig->set_compression();
+	selrig->set_compression(0,0);
 	pthread_mutex_unlock(&mutex_serial);
 }
 

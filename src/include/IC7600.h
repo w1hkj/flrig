@@ -67,7 +67,7 @@ public:
 	void get_mic_gain_min_max_step(int &min, int &max, int &step);
 	int  get_mic_gain();
 
-	void set_compression();
+	void set_compression(int, int);
 	void get_comp_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 10; step = 1; }
 

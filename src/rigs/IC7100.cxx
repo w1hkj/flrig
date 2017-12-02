@@ -467,11 +467,11 @@ int RIG_IC7100::get_attenuator()
 	return atten_level;
 }
 
-void RIG_IC7100::set_compression()
+void RIG_IC7100::set_compression(int on, int val)
 {
-	if (progStatus.compON) {
+	if (on) {
 		cmd.assign(pre_to).append("\x14\x0E");
-		cmd.append(to_bcd(progStatus.compression * 255 / 100, 3));
+		cmd.append(to_bcd(val * 255 / 100, 3));
 		cmd.append( post );
 		waitFB("set comp");
 

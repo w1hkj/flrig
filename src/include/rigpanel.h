@@ -48,6 +48,7 @@
 #include <FL/Fl_Round_Button.H>
 #include <FL/Fl_Counter.H>
 #include <FL/Fl_Simple_Counter.H>
+#include <FL/Fl_Progress.H>
 
 #include "flinput2.h"
 #include "Fl_SigBar.h"
@@ -260,7 +261,8 @@ extern Fl_Light_Button *tt550_AT_inline;
 extern Fl_Light_Button *tt550_AT_Z;
 
 extern Fl_Group  *main_group;
-extern Fl_Button *btnInitializing;
+extern Fl_Group  *grpInitializing;
+extern Fl_Progress *progress;
 
 extern Fl_Menu_Item *mnuExit;
 extern Fl_Menu_Item *mnuConfig;

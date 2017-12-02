@@ -99,8 +99,8 @@ public:
 
 	int  adjust_bandwidth(int m);
 	int  def_bandwidth(int m);
-	void set_compression();
-	int  get_compression();
+	void set_compression(int, int);
+	void get_compression(int &on, int &val);
 	void get_comp_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 10; step = 1; }
 	void set_auto_notch(int val);

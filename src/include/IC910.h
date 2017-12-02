@@ -31,7 +31,7 @@ public:
 	void initialize();
 
 	void set_vfoA(long);
-	void set_compression();
+	void set_compression(int, int);
 	void set_vox_onoff();
 	void set_vox_gain();
 	void set_vox_anti();

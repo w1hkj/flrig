@@ -293,6 +293,7 @@ void startup(void*)
 			if (EXPAND_CONTROLS && selrig->has_extras)
 				show_controls();
 	}
+
 }
 
 int main (int argc, char *argv[])
@@ -460,7 +461,7 @@ extern FILE *serlog;
 		btn_show_controls->redraw_label();
 	}
 
-	Fl::add_timeout(0, startup);//0.50, startup);
+	Fl::add_timeout(0.5, startup);
 
 	return Fl::run();
 

@@ -444,11 +444,11 @@ void RIG_IC9100::set_mic_gain(int v)
 		LOG_WARN("%s", str2hex(cmd.data(), cmd.length()));
 }
 
-void RIG_IC9100::set_compression()
+void RIG_IC9100::set_compression(int on, int val)
 {
-	if (progStatus.compON) {
+	if (on) {
 		cmd.assign(pre_to).append("\x14\x0E");
-		cmd.append(to_bcd(progStatus.compression * 255 / 100, 3));
+		cmd.append(to_bcd(val * 255 / 100, 3));
 		cmd.append( post );
 		waitFB("set comp");
 

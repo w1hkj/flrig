@@ -54,6 +54,10 @@ Fl_Menu_Item menu_small_menu[] = {
  {0,0,0,0,0,0,0,0,0}
 };
 
+int small_menuH = 22;
+int small_mainW = 425;
+int small_mainH = 360;
+
 Fl_Group *small_main_group(int X, int Y, int W, int H)
 {
 	Fl_Group *g = new Fl_Group(X,Y,W,H);
@@ -570,20 +574,20 @@ int gpy = 252;
 int tbh = 55;
 int tby = gpy + 20;
 
-	grpTABS = new Fl_Group(0, gpy, 425, gph);
+	grpTABS = new Fl_Group(0, gpy, small_mainW, gph);
 {
-	tabs550 = new Fl_Tabs(0, gpy, 425, gph);
+	tabs550 = new Fl_Tabs(0, gpy, small_mainW, gph);
 	{
 		tabs550->selection_color(FL_LIGHT1);
 		tabs550->hide();
 
-		tt550_CW = new Fl_Group(0, tby, 425, tbh, _("CW"));
+		tt550_CW = new Fl_Group(0, tby, small_mainW, tbh, _("CW"));
 		{
 			tt550_CW->color(FL_LIGHT1);
 			tt550_CW->selection_color(FL_LIGHT1);
 
 			spnr_tt550_cw_wpm = new Hspinner(
-				2, 280, 
+				2, 280,
 				70, 22, _("wpm"));
 			spnr_tt550_cw_wpm->type(FL_INT_INPUT);
 			spnr_tt550_cw_wpm->minimum(1);
@@ -610,7 +614,7 @@ int tby = gpy + 20;
 
 			spnr_tt550_cw_qsk = new Hspinner(
 				spnr_tt550_cw_weight->x() +
-				spnr_tt550_cw_weight->w() + 2, 280, 
+				spnr_tt550_cw_weight->w() + 2, 280,
 				70, 22, _("Delay"));
 			spnr_tt550_cw_qsk->tooltip(_("QSK delay (msec)"));
 			spnr_tt550_cw_qsk->type(1);
@@ -638,7 +642,7 @@ int tby = gpy + 20;
 
 			spnr_tt550_cw_spot = new Hspinner(
 				spnr_tt550_cw_vol->x() +
-				spnr_tt550_cw_vol->w() + 2, 280, 
+				spnr_tt550_cw_vol->w() + 2, 280,
 				70, 22, _("Spot Vol"));
 			spnr_tt550_cw_spot->tooltip(_("Spot volume"));
 			spnr_tt550_cw_spot->type(1);
@@ -661,12 +665,12 @@ int tby = gpy + 20;
 		}
 		tt550_CW->end();
 
-		tt550_VOX = new Fl_Group(0, tby, 425, tbh, _("Vox"));
+		tt550_VOX = new Fl_Group(0, tby, small_mainW, tbh, _("Vox"));
 		{
 			tt550_VOX->hide();
 
 			spnr_tt550_vox_gain = new Hspinner(
-				2, 280, 
+				2, 280,
 				70, 22, _("gain"));
 			spnr_tt550_vox_gain->type(1);
 			spnr_tt550_vox_gain->minimum(0);
@@ -678,7 +682,7 @@ int tby = gpy + 20;
 
 			spnr_tt550_anti_vox = new Hspinner(
 				spnr_tt550_vox_gain->x() +
-				spnr_tt550_vox_gain->w() + 4, 280, 
+				spnr_tt550_vox_gain->w() + 4, 280,
 				70, 22, _("anti"));
 			spnr_tt550_anti_vox->type(1);
 			spnr_tt550_anti_vox->minimum(0);
@@ -690,7 +694,7 @@ int tby = gpy + 20;
 
 			spnr_tt550_vox_hang = new Hspinner(
 				spnr_tt550_anti_vox->x() +
-				spnr_tt550_anti_vox->w() + 4, 280, 
+				spnr_tt550_anti_vox->w() + 4, 280,
 				70, 22, _("hang"));
 			spnr_tt550_vox_hang->type(1);
 			spnr_tt550_vox_hang->minimum(0);
@@ -709,7 +713,7 @@ int tby = gpy + 20;
 		}
 		tt550_VOX->end();
 
-		tt550_Speech = new Fl_Group(0, tby, 425, tbh, _("Spch"));
+		tt550_Speech = new Fl_Group(0, tby, small_mainW, tbh, _("Spch"));
 		{
 			tt550_Speech->hide();
 
@@ -746,12 +750,12 @@ int tby = gpy + 20;
 		}
 		tt550_Speech->end();
 
-		tt550_Audio = new Fl_Group(0, tby, 425, tbh, _("Audio"));
+		tt550_Audio = new Fl_Group(0, tby, small_mainW, tbh, _("Audio"));
 		{
 			tt550_Audio->hide();
 
 			spnr_tt550_line_out = new Hspinner(
-				4, 280, 
+				4, 280,
 				70, 22, _("line out"));
 			spnr_tt550_line_out->type(1);
 			spnr_tt550_line_out->minimum(0);
@@ -774,12 +778,12 @@ int tby = gpy + 20;
 		}
 		tt550_Audio->end();
 
-		tt550_Rx = new Fl_Group(0, tby, 425, tbh, _("RX"));
+		tt550_Rx = new Fl_Group(0, tby, small_mainW, tbh, _("RX"));
 		{
 			tt550_Rx->hide();
 
 			cbo_tt550_nb_level = new Fl_ComboBox(
-				4, 280, 
+				4, 280,
 				80, 22, _("NB level"));
 				cbo_tt550_nb_level->tooltip(_("Select Noise Blanker level"));
 			cbo_tt550_nb_level->box(FL_DOWN_BOX);
@@ -817,7 +821,7 @@ int tby = gpy + 20;
 
 			spnr_tt550_vfo_adj = new Hspinner(
 				cbo_tt550_agc_level->x() +
-				cbo_tt550_agc_level->w() + 5, 280, 
+				cbo_tt550_agc_level->w() + 5, 280,
 				100, 22, _("Vfo Adj(ppm)"), 16);
 			spnr_tt550_vfo_adj->callback((Fl_Callback*)cb_spnr_tt550_vfo_adj);
 			spnr_tt550_vfo_adj->align(FL_ALIGN_BOTTOM | FL_ALIGN_CENTER);
@@ -830,7 +834,7 @@ int tby = gpy + 20;
 		}
 		tt550_Rx->end();
 
-		tt550_Tx = new Fl_Group(0, tby, 425, tbh, _("TX"));
+		tt550_Tx = new Fl_Group(0, tby, small_mainW, tbh, _("TX"));
 		{
 			tt550_Tx->hide();
 
@@ -874,7 +878,7 @@ int tby = gpy + 20;
 		}
 		tt550_Tx->end();
 
-		tt550_302A = new Fl_Group(0, tby, 425, tbh, _("302-A"));
+		tt550_302A = new Fl_Group(0, tby, small_mainW, tbh, _("302-A"));
 		{
 			tt550_302A->hide();
 
@@ -914,7 +918,7 @@ int tby = gpy + 20;
 		}
 		tt550_302A->end();
 
-		tt550_302B = new Fl_Group(0, tby, 425, tbh, _("302-B"));
+		tt550_302B = new Fl_Group(0, tby, small_mainW, tbh, _("302-B"));
 		{
 			tt550_302B->hide();
 
@@ -941,7 +945,7 @@ int tby = gpy + 20;
 		}
 		tt550_302B->end();
 
-		tt550_AT = new Fl_Group(0, tby, 425, tbh, _("AT-11"));
+		tt550_AT = new Fl_Group(0, tby, small_mainW, tbh, _("AT-11"));
 		{
 			tt550_AT_inline = new Fl_Light_Button(5, 288, 100, 22, _("Inline"));
 			tt550_AT_inline->tooltip(_("Enabled - autotune\nDisabled - bypass"));
@@ -986,11 +990,11 @@ int tby = gpy + 20;
 	}
 	tabs550->end();
 
-	tabsGeneric = new Fl_Tabs(0, gpy, 425, gph);//0, 252, 425, 70);
+	tabsGeneric = new Fl_Tabs(0, gpy, small_mainW, gph);//0, 252, 425, 70);
 	{
 		tabsGeneric->selection_color(FL_LIGHT1);
 
-		genericBands = new Fl_Group(0, tby, 425, tbh, _("Bands"));
+		genericBands = new Fl_Group(0, tby, small_mainW, tbh, _("Bands"));
 		{
 
 			btnBandSelect_1 = new Fl_Button(4, 278, 60, 18, _("1.8"));
@@ -1063,12 +1067,12 @@ int tby = gpy + 20;
 			opSelect60->when(FL_WHEN_RELEASE);
 			opSelect60->end();
 
-			Fl_Group dmybx(0, tby+tbh-2, 425, 2, ""); dmybx.end();
+			Fl_Group dmybx(0, tby+tbh-2, small_mainW, 2, ""); dmybx.end();
 		genericBands->resizable(dmybx);
 		}
 		genericBands->end();
 
-		genericCW = new Fl_Group(0, tby, 425, tbh, _("CW"));
+		genericCW = new Fl_Group(0, tby, small_mainW, tbh, _("CW"));
 		{
 			genericCW->color(FL_LIGHT1);
 			genericCW->selection_color(FL_LIGHT1);
@@ -1116,7 +1120,7 @@ int tby = gpy + 20;
 			spnr_cw_spot_tone->align(FL_ALIGN_BOTTOM | FL_ALIGN_CENTER);
 
 			btnSpot = new Fl_Light_Button(
-				spnr_cw_spot_tone->x() + spnr_cw_spot_tone->w() + 4, 275, 
+				spnr_cw_spot_tone->x() + spnr_cw_spot_tone->w() + 4, 275,
 				60, 22, _("Spot"));
 			btnSpot->tooltip(_("Spot tone on/off"));
 			btnSpot->callback((Fl_Callback*)cb_btnSpot);
@@ -1129,12 +1133,12 @@ int tby = gpy + 20;
 			btn_enable_keyer->callback((Fl_Callback*)cb_btn_enable_keyer);
 			btn_enable_keyer->value(progStatus.enable_keyer);
 
-			Fl_Group dmybx(0, tby+tbh-2, 425, 2, ""); dmybx.end();
+			Fl_Group dmybx(0, tby+tbh-2, small_mainW, 2, ""); dmybx.end();
 		genericCW->resizable(dmybx);
 		}
 		genericCW->end();
 
-		genericQSK = new Fl_Group(0, tby, 425, tbh, _("QSK"));
+		genericQSK = new Fl_Group(0, tby, small_mainW, tbh, _("QSK"));
 		{
 			genericQSK->color(FL_LIGHT1);
 			genericQSK->selection_color(FL_LIGHT1);
@@ -1160,7 +1164,7 @@ int tby = gpy + 20;
 			spnr_cw_qsk->align(FL_ALIGN_BOTTOM | FL_ALIGN_CENTER);
 
 			spnr_cw_delay = new Hspinner(
-				spnr_cw_qsk->x() + spnr_cw_qsk->w() + 4, 280, 
+				spnr_cw_qsk->x() + spnr_cw_qsk->w() + 4, 280,
 				120, 22, _("QSK delay"), 16);
 			spnr_cw_delay->tooltip(_("msec"));
 			spnr_cw_delay->type(0);
@@ -1171,17 +1175,17 @@ int tby = gpy + 20;
 			spnr_cw_delay->value(progStatus.cw_delay);
 			spnr_cw_delay->align(FL_ALIGN_BOTTOM | FL_ALIGN_CENTER);
 
-			Fl_Group dmybx(0, tby+tbh-2, 425, 2, ""); dmybx.end();
+			Fl_Group dmybx(0, tby+tbh-2, small_mainW, 2, ""); dmybx.end();
 		genericQSK->resizable(dmybx);
 		}
 		genericQSK->end();
 
-		genericVOX = new Fl_Group(0, tby, 425, tbh, _("Vox"));
+		genericVOX = new Fl_Group(0, tby, small_mainW, tbh, _("Vox"));
 		{
 			genericVOX->hide();
 
 			spnr_vox_gain = new Hspinner(
-				4, 280, 
+				4, 280,
 				80, 22, _("gain"), 16);
 			spnr_vox_gain->type(1);
 			spnr_vox_gain->minimum(0);
@@ -1205,7 +1209,7 @@ int tby = gpy + 20;
 			spnr_anti_vox->align(FL_ALIGN_CENTER | FL_ALIGN_BOTTOM);
 
 			spnr_vox_hang = new Hspinner(
-				spnr_anti_vox->x() + spnr_anti_vox->w() + 10, 280, 
+				spnr_anti_vox->x() + spnr_anti_vox->w() + 10, 280,
 				80, 22, _("hang"), 16);
 			spnr_vox_hang->type(1);
 			spnr_vox_hang->minimum(0);
@@ -1217,26 +1221,26 @@ int tby = gpy + 20;
 			spnr_vox_hang->align(FL_ALIGN_CENTER | FL_ALIGN_BOTTOM);
 
 			btn_vox = new Fl_Light_Button(
-				spnr_vox_hang->x() + spnr_vox_hang->w() + 10, 280, 
+				spnr_vox_hang->x() + spnr_vox_hang->w() + 10, 280,
 				50, 22, _("VOX"));
 			btn_vox->callback((Fl_Callback*)cb_btn_vox);
 			btn_vox->value(progStatus.vox_onoff);
 			btn_vox->tooltip(_("VOX on/off"));
 
 			btn_vox_on_dataport = new Fl_Check_Button(
-				btn_vox->x() + btn_vox->w() + 10, 283, 
+				btn_vox->x() + btn_vox->w() + 10, 283,
 				50, 15, _("Data port"));
 			btn_vox_on_dataport->tooltip(_("Data port signal triggers VOX"));
 			btn_vox_on_dataport->down_box(FL_DOWN_BOX);
 			btn_vox_on_dataport->callback((Fl_Callback*)cb_btn_vox_on_dataport);
 			btn_vox_on_dataport->value(progStatus.vox_on_dataport);
 
-			Fl_Group dmybx(0, tby+tbh-2, 425, 2, ""); dmybx.end();
+			Fl_Group dmybx(0, tby+tbh-2, small_mainW, 2, ""); dmybx.end();
 		genericVOX->resizable(dmybx);
 		}
 		genericVOX->end();
 
-		genericSpeech = new Fl_Group(0, tby, 425, tbh, _("Spch"));
+		genericSpeech = new Fl_Group(0, tby, small_mainW, tbh, _("Spch"));
 		{
 			genericSpeech->hide();
 
@@ -1254,12 +1258,12 @@ int tby = gpy + 20;
 			spnr_compression->callback((Fl_Callback*)cb_spnr_compression);
 			spnr_compression->value(progStatus.compression);
 
-			Fl_Group dmybx(0, tby+tbh-2, 425, 2, ""); dmybx.end();
+			Fl_Group dmybx(0, tby+tbh-2, small_mainW, 2, ""); dmybx.end();
 		genericSpeech->resizable(dmybx);
 		}
 		genericSpeech->end();
 
-		genericRx = new Fl_Group(0, tby, 425, tbh, _("RX"));
+		genericRx = new Fl_Group(0, tby, small_mainW, tbh, _("RX"));
 		{
 			genericRx->hide();
 
@@ -1310,12 +1314,12 @@ int tby = gpy + 20;
 			btn_use_bpf_center->callback((Fl_Callback*)cb_btn_use_bpf_center);
 			btn_use_bpf_center->value(progStatus.use_bpf_center);
 
-			Fl_Group dmybx(0, tby+tbh-2, 425, 2, ""); dmybx.end();
+			Fl_Group dmybx(0, tby+tbh-2, small_mainW, 2, ""); dmybx.end();
 		genericRx->resizable(dmybx);
 		}
 		genericRx->end();
 
-		genericMisc = new Fl_Group(0, tby, 425, tbh, _("Misc"));
+		genericMisc = new Fl_Group(0, tby, small_mainW, tbh, _("Misc"));
 		{
 			genericMisc->hide();
 
@@ -1356,12 +1360,12 @@ int tby = gpy + 20;
 			btn_xcvr_auto_off->callback((Fl_Callback*)cb_btn_xcvr_auto_off);
 			btn_xcvr_auto_off->value(progStatus.xcvr_auto_off);
 
-			Fl_Group dmybx(0, tby+tbh-2, 425, 2, ""); dmybx.end();
+			Fl_Group dmybx(0, tby+tbh-2, small_mainW, 2, ""); dmybx.end();
 		genericMisc->resizable(dmybx);
 		}
 		genericMisc->end();
 
-		genericUser = new Fl_Group(0, tby, 425, tbh, _("User"));
+		genericUser = new Fl_Group(0, tby, small_mainW, tbh, _("User"));
 		{
 			btnUser1 = new Fl_Button(5, genericUser->y() + 7, 100, 20, "USER 1");
 			btnUser1->callback((Fl_Callback*)cb_btnUser, (void*)1);
@@ -1387,7 +1391,7 @@ int tby = gpy + 20;
 			btnUser8 = new Fl_Button(320, genericUser->y() + 28, 100, 20, "USER 8");
 			btnUser8->callback((Fl_Callback*)cb_btnUser, (void*)8);
 
-			Fl_Group dmybx(0, tby+tbh-2, 425, 2, ""); dmybx.end();
+			Fl_Group dmybx(0, tby+tbh-2, small_mainW, 2, ""); dmybx.end();
 		genericUser->resizable(dmybx);
 		}
 		genericUser->end();
@@ -1402,13 +1406,15 @@ grpTABS->hide();
 	return g;
 }
 
+static Fl_Box *filler = (Fl_Box *)0;
+
 Fl_Double_Window* Small_rig_window() {
-	Fl_Double_Window* w = new Fl_Double_Window(425, 360, _("Flrig"));
+	Fl_Double_Window* w = new Fl_Double_Window(small_mainW, small_mainH, _("Flrig"));
 	w->align(Fl_Align(FL_ALIGN_CLIP|FL_ALIGN_INSIDE));
 
-	Fl_Group* grp_small_menu = new Fl_Group(0,0,424,22);
+	Fl_Group* grp_small_menu = new Fl_Group(0,0,small_mainW,small_menuH);
 
-		small_menu = new Fl_Menu_Bar(0, 0, 424 - 64, 22);
+		small_menu = new Fl_Menu_Bar(0, 0, small_mainW - 64, small_menuH);
 		small_menu->textsize(12);
 		small_menu->menu(menu_small_menu);
 
@@ -1424,16 +1430,16 @@ Fl_Double_Window* Small_rig_window() {
 			mnuSchema = mnu;
 		}
 
-		Fl_Group *mnu_box = new Fl_Group(424-64, 0, 64, 22);
+		Fl_Group *mnu_box = new Fl_Group(small_mainW-64, 0, 64, small_menuH);
 		mnu_box->box(FL_UP_BOX);
 
-			tcpip_box = new Fl_Group(424-62, 2, 60, 18);
+			tcpip_box = new Fl_Group(small_mainW-62, 2, 60, 18);
 			tcpip_box->box(FL_FLAT_BOX);
 
-				tcpip_menu_box = new Fl_Box(424 - 62, 3, 16, 16);
+				tcpip_menu_box = new Fl_Box(small_mainH - 62, 3, 16, 16);
 				tcpip_menu_box->box(FL_DIAMOND_BOX);
 				tcpip_menu_box->color(FL_GREEN);
-				Fl_Box *tcpip_menu_label = new Fl_Box(424 - 62 + 18, 3, 64 - 22, 16, _("tcpip"));
+				Fl_Box *tcpip_menu_label = new Fl_Box(small_mainH - 62 + 18, 3, 64 - 22, 16, _("tcpip"));
 				tcpip_menu_label->box(FL_FLAT_BOX);
 				tcpip_menu_label->align(FL_ALIGN_CENTER);
 				tcpip_menu_label->tooltip(_("lit when connected to remote tcpip"));
@@ -1446,16 +1452,41 @@ Fl_Double_Window* Small_rig_window() {
 
 	grp_small_menu->end();
 
-	txt_encA = new Fl_Output( 425 - 90, 1, 90, 20, "");
+	txt_encA = new Fl_Output( small_mainW - 90, 1, 90, 20, "");
 	txt_encA->box(FL_THIN_DOWN_BOX);
 	txt_encA->align(20);
 	txt_encA->hide();
 
-	btnInitializing = new Fl_Button(0,0,360, 320, "Initializing");
-	btnInitializing->hide();
+	main_group = small_main_group(
+		0, small_menuH,
+		small_mainW, small_mainH);
 
-	main_group = small_main_group(0, 22, 425, 360 - 22);
-	main_group->show();
+	grpInitializing = new Fl_Group(
+		0 , small_menuH,
+		small_mainW, btnPTT->y() + btnPTT->h() + 2 - small_menuH, "");
+
+		grpInitializing->box(FL_FLAT_BOX);
+		grpInitializing->color(FL_WHITE);
+
+		progress = new Fl_Progress(
+			small_mainW / 4, grpInitializing->y() + grpInitializing->h() / 2,
+			small_mainW / 2, 20, "Initializing");
+		progress->maximum(100);
+		progress->minimum(0);
+		progress->labelcolor(FL_RED);
+		progress->labelsize(14);
+		progress->align(Fl_Align(FL_ALIGN_TOP));
+		progress->selection_color(FL_GREEN);
+
+		filler = new Fl_Box(grpInitializing->x(), grpInitializing->y() + grpInitializing->h() - 5,
+							grpInitializing->w(), 4);
+		filler->box(FL_FLAT_BOX);
+		filler->color(FL_WHITE);
+
+		grpInitializing->end();
+	grpInitializing->resizable(filler);
+
+	grpInitializing->show();
 
 	w->end();
 	return w;

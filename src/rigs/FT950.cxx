@@ -1399,15 +1399,15 @@ void RIG_FT950::set_xcvr_auto_off()
 	sendCommand(cmd);
 }
 
-void RIG_FT950::set_compression()
+void RIG_FT950::set_compression(int on, int val)
 {
-	if (progStatus.compON) {
-		if (progStatus.compression == 0) {
+	if (on) {
+		if (val == 0) {
 			cmd.assign("PR2;");	// mic eq on
 			sendCommand(cmd);
 			showresp(WARN, ASC, "set Comp EQ on", cmd, replystr);
 		} else {
-			cmd.assign("PR1;PL").append(to_decimal(progStatus.compression, 3)).append(";");
+			cmd.assign("PR1;PL").append(to_decimal(val, 3)).append(";");
 			sendCommand(cmd);
 			showresp(WARN, ASC, "set Comp on", cmd, replystr);
 		}

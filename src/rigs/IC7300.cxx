@@ -600,9 +600,9 @@ void RIG_IC7300::get_mic_gain_min_max_step(int &min, int &max, int &step)
 	step = 1;
 }
 
-void RIG_IC7300::set_compression()
+void RIG_IC7300::set_compression(int on, int val)
 {
-	if (progStatus.compON) {
+	if (on) {
 		cmd = pre_to;
 		cmd.append("\x16\x44");
 		cmd += '\x01';
@@ -610,7 +610,7 @@ void RIG_IC7300::set_compression()
 		waitFB("set Comp ON");
 
 		cmd.assign(pre_to).append("\x14\x0E");
-		cmd.append(to_bcd(progStatus.compression * 255 / 10, 3));
+		cmd.append(to_bcd(val * 255 / 10, 3));
 		cmd.append( post );
 		waitFB("set comp");
 
@@ -622,22 +622,21 @@ void RIG_IC7300::set_compression()
 	}
 }
 
-int RIG_IC7300::get_compression()
+void RIG_IC7300::get_compression(int &on, int &val)
 {
 	std::string resp;
+	on = 0; val = 0;
 
 	cmd.assign(pre_to).append("\x16\x44").append(post);
 	resp.assign(pre_fm).append("\x16\x44");
 	if (waitFOR(8, "get comp on/off")) {
 		size_t p = replystr.find(resp);
 		if (p != string::npos)
-			progStatus.compON = replystr[p+6];
+			on = replystr[p+6];
 	}
-	if (progStatus.compON) {
+	if (on) {
 		cmd.assign(pre_to).append("\x14\x0E").append(post);
 		resp.assign(pre_fm).append("\x14\x0E");
-
-		int val = 0;
 
 		cmd.append(post);
 		if (waitFOR(9, "get comp level")) {
@@ -645,12 +644,9 @@ int RIG_IC7300::get_compression()
 			if (p != string::npos)
 				val = fm_bcd(replystr.substr(p+6), 3) * 10 / 255;
 		}
-		if (progStatus.compression != val) {
-			progStatus.compression = val;
-		}
 	}
 
-	return progStatus.compression;
+	return;
 }
 
 void RIG_IC7300::set_vox_onoff()
@@ -1081,7 +1077,7 @@ int RIG_IC7300::get_preamp()
 				preamp_level = 0;
 			}
 	}
-	return progStatus.preamp = preamp_level;
+	return preamp_level;
 }
 
 void RIG_IC7300::set_attenuator(int val)
@@ -1235,8 +1231,7 @@ int RIG_IC7300::get_noise_reduction_val()
 			val /= 16;
 		}
 	}
-	progStatus.noise_reduction_val = val;
-	return progStatus.noise_reduction_val;
+	return val;
 }
 
 void RIG_IC7300::set_squelch(int val)

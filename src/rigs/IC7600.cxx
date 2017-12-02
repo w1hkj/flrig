@@ -570,11 +570,11 @@ void RIG_IC7600::get_mic_gain_min_max_step(int &min, int &max, int &step)
 
 // alh added ++++++++++++++++++++++++++++
 
-void RIG_IC7600::set_compression()
+void RIG_IC7600::set_compression(int on, int val)
 {
-	if (progStatus.compON) {
+	if (on) {
 		cmd.assign(pre_to).append("\x14\x0E");
-		cmd.append(to_bcd(progStatus.compression * 255 / 100, 3));
+		cmd.append(to_bcd(val * 255 / 100, 3));
 		cmd.append( post );
 		waitFB("set comp");
 

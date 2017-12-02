@@ -1612,12 +1612,13 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 Fl_Double_Window* touch_rig_window() {
 	int mainW = TOUCH_MAINW;
 	int mainH = TOUCH_MAINH;
+	int menuH = 28;
 	Fl_Double_Window* w = new Fl_Double_Window(mainW, mainH, _("Flrig"));
 	w->align(Fl_Align(FL_ALIGN_CLIP|FL_ALIGN_INSIDE));
 
 	Fl_Group* grp_menu = new Fl_Group(0,0,mainW,30);
 
-		Fl_Menu_Bar *touch_menubar = new Fl_Menu_Bar(0, 0, mainW-64, 28);
+		Fl_Menu_Bar *touch_menubar = new Fl_Menu_Bar(0, 0, mainW-64, menuH);
 		touch_menubar->textsize(18);
 
 		Fl_Menu_Item * mnu = getMenuItem(_("Tooltips"), touch_menu);
@@ -1651,9 +1652,6 @@ Fl_Double_Window* touch_rig_window() {
 
 	grp_menu->end();
 
-	btnInitializing = new Fl_Button(0, 28, mainW, mainH - 28, "Initializing");
-	btnInitializing->hide();
-
 	txt_encA = new Fl_Output( 0, 28, 90, 20, "");
 	txt_encA->box(FL_THIN_DOWN_BOX);
 	txt_encA->align(20);
@@ -1662,8 +1660,25 @@ Fl_Double_Window* touch_rig_window() {
 	set_menu_item("Aux RTS", progStatus.aux_rts);
 	set_menu_item("Aux DTR", progStatus.aux_dtr);
 
-	main_group = touch_main_group(0, 28, mainW, mainH);
-	main_group->show();
+	main_group = touch_main_group(0, menuH, mainW, mainH);
+	main_group->hide();
+
+	grpInitializing = new Fl_Group(0, menuH, mainW, mainH - menuH, "");
+
+		grpInitializing->box(FL_FLAT_BOX);
+		grpInitializing->color(FL_WHITE);
+
+		progress = new Fl_Progress(
+			mainW / 4, grpInitializing->h() / 2,
+			mainW / 2, 20, "Initializing");
+		progress->maximum(100);
+		progress->minimum(0);
+		progress->labelcolor(FL_RED);
+		progress->labelsize(18);
+		progress->align(Fl_Align(FL_ALIGN_TOP));
+		progress->selection_color(FL_GREEN);
+
+		grpInitializing->show();
 
 	w->resizable(main_group);
 

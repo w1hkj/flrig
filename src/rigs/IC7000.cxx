@@ -851,9 +851,9 @@ int RIG_IC7000::get_noise_reduction_val()
 	return 0;
 }
 
-void RIG_IC7000::set_compression()
+void RIG_IC7000::set_compression(int on, int val)
 {
-	if (progStatus.compON) {
+	if (on) {
 		cmd = pre_to;
 		cmd.append("\x16\x44");
 		cmd += '\x01';
@@ -861,7 +861,7 @@ void RIG_IC7000::set_compression()
 		waitFB("set Comp ON");
 
 		cmd.assign(pre_to).append("\x14\x0E");
-		cmd.append(to_bcd(progStatus.compression * 255 / 10, 3));	// 0 - 10
+		cmd.append(to_bcd(val * 255 / 10, 3));	// 0 - 10
 		cmd.append( post );
 		waitFB("set comp level");
 

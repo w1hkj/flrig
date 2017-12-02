@@ -1576,11 +1576,27 @@ Fl_Double_Window* Wide_rig_window() {
 
 	grp_menu->end();
 
-	btnInitializing = new Fl_Button(0,menuH,10,10);
-	btnInitializing->hide();
-
 	main_group = wide_main_group(0, menuH, mainW, mainH - menuH);
-	main_group->show();
+	main_group->hide();
+
+	grpInitializing = new Fl_Group(0, menuH, mainW, mainH - menuH, "");
+
+		grpInitializing->box(FL_FLAT_BOX);
+		grpInitializing->color(FL_WHITE);
+
+		progress = new Fl_Progress(
+			mainW / 4, grpInitializing->y() + grpInitializing->h() / 2,
+			mainW / 2, 20, "Initializing");
+		progress->maximum(100);
+		progress->minimum(0);
+		progress->labelcolor(FL_RED);
+		progress->labelsize(14);
+		progress->align(Fl_Align(FL_ALIGN_TOP));
+		progress->selection_color(FL_GREEN);
+
+		grpInitializing->end();
+
+	grpInitializing->show();
 
 	w->resizable(main_group);
 

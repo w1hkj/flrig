@@ -558,9 +558,9 @@ int RIG_IC718::get_auto_notch()
 	return 0;
 }
 
-void RIG_IC718::set_compression()
+void RIG_IC718::set_compression(int on, int val)
 {
-	if (progStatus.compON) {
+	if (on) {
 		cmd = pre_to;
 		cmd.append("\x16\x44");
 		cmd += '\x01';

@@ -250,7 +250,10 @@ Fl_Button *tt550_AT_indDN=(Fl_Button *)0;
 Fl_Simple_Counter *tt550_Nsamples = (Fl_Simple_Counter *)0;
 
 Fl_Group *main_group = (Fl_Group *)0;
-Fl_Button *btnInitializing=(Fl_Button *)0;
+
+Fl_Group *grpInitializing=(Fl_Group *)0;
+
+Fl_Progress *progress=(Fl_Progress *)0;
 
 #define RIGHT_OF(widget) (widget->x() + widget->w())
 

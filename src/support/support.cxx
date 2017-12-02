@@ -551,7 +551,10 @@ void read_compression()
 	if (selrig->has_compression || selrig->has_compON) {
 		{
 			guard_lock serial_lock(&mutex_serial, 13);
-			progStatus.compression = selrig->get_compression();
+			int on; int val;
+			selrig->get_compression( on, val );
+			progStatus.compON = on;
+			progStatus.compression = val;
 		}
 		vfo->compression = progStatus.compression;
 		vfo->compON = progStatus.compON;
@@ -1121,6 +1124,9 @@ inline bool que_pending()
 	return false;
 }
 
+bool close_rig = false;
+bool open_rig = true;
+
 void * serial_thread_loop(void *d)
 {
   static int  loopcount = progStatus.serloop_timing / 10;
@@ -1132,6 +1138,14 @@ void * serial_thread_loop(void *d)
 		MilliSleep(10);
 
 		if (bypass_serial_thread_loop) {
+			goto serial_bypass_loop;
+		}
+//		if (open_rig) {
+//			openRig();
+//			goto serial_bypass_loop;
+//		}
+		if (close_rig) {
+			closeRig();
 			goto serial_bypass_loop;
 		}
 
@@ -2383,6 +2397,15 @@ void setPTT( void *d)
 	quePTT.push(val);
 }
 
+void update_progress(void *d)
+{
+	unsigned long val = reinterpret_cast<unsigned long>(d);
+	progress->value(val);
+	progress->redraw();
+}
+
+int restore_progress = 0;
+
 void restore_rig_vals_(XCVR_STATE &xcvrvfo)
 {
 	if (progStatus.restore_pre_att) {
@@ -2393,10 +2416,15 @@ void restore_rig_vals_(XCVR_STATE &xcvrvfo)
 		selrig->set_auto_notch(xcvrvfo.auto_notch);
 	if (progStatus.restore_split)
 		selrig->set_split(xcvrvfo.split);
+
+	Fl::awake(update_progress, (void*)(restore_progress += 10));
+
 	if (progStatus.restore_power_control)
 		selrig->set_power_control(xcvrvfo.power_control);
 	if (progStatus.restore_volume)
 		selrig->set_volume_control(xcvrvfo.volume_control);
+
+	Fl::awake(update_progress, (void*)(restore_progress += 10));
 
 	if (progStatus.restore_if_shift)
 		selrig->set_if_shift(xcvrvfo.if_shift);
@@ -2404,25 +2432,36 @@ void restore_rig_vals_(XCVR_STATE &xcvrvfo)
 		selrig->set_notch(xcvrvfo.notch, xcvrvfo.notch_val);
 	if (progStatus.restore_noise)
 		selrig->set_noise(xcvrvfo.noise);
-	if (progStatus.restore_nr)
+
+	Fl::awake(update_progress, (void*)(restore_progress += 10));
+
+	if (progStatus.restore_nr) {
 		selrig->set_noise_reduction(xcvrvfo.nr);
+		selrig->set_noise_reduction_val(xcvrvfo.nr_val);
+	}
+
 	if (progStatus.restore_mic_gain)
 		selrig->set_mic_gain(xcvrvfo.mic_gain);
+
+	Fl::awake(update_progress, (void*)(restore_progress += 10));
+
 	if (progStatus.restore_squelch)
 		selrig->set_squelch(xcvrvfo.squelch);
 	if (progStatus.restore_rf_gain)
 		selrig->set_rf_gain(xcvrvfo.rf_gain);
 
+	Fl::awake(update_progress, (void*)(restore_progress += 10));
+
 	if (progStatus.restore_comp_on_off || progStatus.restore_comp_level) {
-		progStatus.compression = xcvrvfo.compression;
-		progStatus.compON = xcvrvfo.compON;
-		selrig->set_compression();
+		selrig->set_compression(xcvrvfo.compON, xcvrvfo.compression);
 	}
 
 }
 
 void restore_rig_vals()
 {
+	restore_progress = 0;
+
 	guard_lock serial_lock(&mutex_serial, 65);
 
 	selrig->selectB();
@@ -2454,7 +2493,6 @@ void restore_rig_vals()
 	if (progStatus.restore_bandwidth)
 		selrig->set_bwB(xcvr_vfoA.iBW);
 	restore_rig_vals_(xcvr_vfoA);
-
 }
 
 void read_rig_vals_(XCVR_STATE &xcvrvfo)
@@ -2482,6 +2520,10 @@ void read_rig_vals_(XCVR_STATE &xcvrvfo)
 	} else
 		btnRestoreSplit->deactivate();
 
+	progress->value(progress->value() + 10);
+	progress->redraw();
+	Fl::check();
+
 	if (selrig->has_power_control) {
 		btnRestorePowerControl->activate();
 		if (progStatus.restore_power_control)
@@ -2503,6 +2545,10 @@ void read_rig_vals_(XCVR_STATE &xcvrvfo)
 	} else
 		btnRestoreIFshift->deactivate();
 
+	progress->value(progress->value() + 10);
+	progress->redraw();
+	Fl::check();
+
 	if (selrig->has_notch_control) {
 		btnRestoreNotch->activate();
 		if (progStatus.restore_notch)
@@ -2517,10 +2563,16 @@ void read_rig_vals_(XCVR_STATE &xcvrvfo)
 	} else
 		btnRestoreNoise->deactivate();
 
+	progress->value(progress->value() + 10);
+	progress->redraw();
+	Fl::check();
+
 	if (selrig->has_noise_reduction_control) {
 		btnRestoreNR->activate();
-		if (progStatus.restore_nr)
+		if (progStatus.restore_nr) {
 			xcvrvfo.nr = selrig->get_noise_reduction();
+			xcvrvfo.nr_val = selrig->get_noise_reduction_val();
+		}
 	} else
 		btnRestoreNR->deactivate();
 
@@ -2538,6 +2590,10 @@ void read_rig_vals_(XCVR_STATE &xcvrvfo)
 	} else
 		btnRestoreSquelch->deactivate();
 
+	progress->value(progress->value() + 10);
+	progress->redraw();
+	Fl::check();
+
 	if (selrig->has_rf_control) {
 		btnRestoreRfGain->activate();
 		if (progStatus.restore_rf_gain)
@@ -2548,9 +2604,11 @@ void read_rig_vals_(XCVR_STATE &xcvrvfo)
 	if (selrig->has_compression || selrig->has_compON) {
 
 		if (progStatus.restore_comp_on_off || progStatus.restore_comp_level) {
-			selrig->get_compression();
-			xcvrvfo.compression = progStatus.compression;
-			xcvrvfo.compON = progStatus.compON;
+			int on;
+			int val;
+			selrig->get_compression( on, val);
+			xcvrvfo.compON = on;
+			xcvrvfo.compression = val;
 		}
 
 		if (selrig->has_compON)
@@ -2569,6 +2627,10 @@ void read_rig_vals_(XCVR_STATE &xcvrvfo)
 		btnRestoreCompLevel->deactivate();
 
 	}
+	progress->value(progress->value() + 10);
+	progress->redraw();
+	Fl::check();
+
 }
 
 void read_rig_vals()
@@ -2576,16 +2638,18 @@ void read_rig_vals()
 // no guard_lock ... this function called from within a guard_lock block
 
 	selrig->selectB();
-//std::cout << "select B: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
 
 	if (selrig->has_get_info)
 		selrig->get_info();
 	xcvr_vfoB.freq = selrig->get_vfoB();
-//std::cout << "get_vfoB: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+
 	xcvr_vfoB.imode = selrig->get_modeB();
-//std::cout << "get_modeB: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+
 	xcvr_vfoB.iBW = selrig->get_bwB();
-//std::cout << "get_bwB: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+
+	progress->value(0);
+	progress->redraw();
+
 	read_rig_vals_(xcvr_vfoB);
 
 	if (RIG_DEBUG) {
@@ -2594,16 +2658,15 @@ void read_rig_vals()
 	}
 
 	selrig->selectA();
-//std::cout << "select A: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
 
 	if (selrig->has_get_info)
 		selrig->get_info();
 	xcvr_vfoA.freq = selrig->get_vfoA();
-//std::cout << "get_vfoA: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+
 	xcvr_vfoA.imode = selrig->get_modeA();
-//std::cout << "get_modeA: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+
 	xcvr_vfoA.iBW = selrig->get_bwA();
-//std::cout << "get_bwA: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+
 	read_rig_vals_(xcvr_vfoA);
 
 	if (RIG_DEBUG) {
@@ -2612,15 +2675,60 @@ void read_rig_vals()
 	}
 }
 
+void close_UI(void *)
+{
+//std::cout << "close_UI(void *)" << std::endl;
+	
+	{
+		guard_lock serial_lock(&mutex_serial, 67);
+		run_serial_thread = false;
+	}
+	pthread_join(*serial_thread, NULL);
+
+	// xcvr auto off
+	if (selrig->has_xcvr_auto_on_off)
+		selrig->set_xcvr_auto_off();
+
+	// close down the serial port
+	RigSerial->ClosePort();
+
+	if (dlgDisplayConfig && dlgDisplayConfig->visible())
+		dlgDisplayConfig->hide();
+	if (dlgXcvrConfig && dlgXcvrConfig->visible())
+		dlgXcvrConfig->hide();
+	if (dlgMemoryDialog && dlgMemoryDialog->visible())
+		dlgMemoryDialog->hide();
+
+	debug::stop();
+
+	mainwindow->hide();
+}
+
+bool exiting = false;
 void closeRig()
 {
-	if (progStatus.use_rig_data)
-		restore_rig_vals();
+//std::cout << "closeRig()" << std::endl;
+
+	restore_rig_vals();
 	selrig->shutdown();
+	close_rig = false;
+	if (exiting) {
+		Fl::awake(close_UI);
+	}
 }
 
 void cbExit()
 {
+//std::cout << "cbExit()" << std::endl;
+	progress->label("Closing");
+	progress->redraw_label();
+	grpInitializing->resize(0, 0, mainwindow->w(), mainwindow->h());
+	progress->position(grpInitializing->w()/4, grpInitializing->y() + grpInitializing->h()/2);
+	progress->redraw();
+	grpInitializing->show();
+	progress->value(0);
+	main_group->hide();
+
 	progStatus.freq_A = vfoA.freq;
 	progStatus.imode_A = vfoA.imode;
 	progStatus.iBW_A = vfoA.iBW;
@@ -2630,6 +2738,8 @@ void cbExit()
 	progStatus.iBW_B = vfoB.iBW;
 
 	progStatus.spkr_on = btnVol->value();
+
+	saveFreqList();
 
 	if (spnrPOWER) progStatus.power_level = spnrPOWER->value();
 	if (spnrVOLUME) progStatus.volume = spnrVOLUME->value();
@@ -2656,34 +2766,13 @@ void cbExit()
 	progStatus.auto_notch = btnAutoNotch->value();
 	progStatus.saveLastState();
 
-	saveFreqList();
-
 // shutdown serial thread
 
+	exiting = true;
 	{
-		guard_lock serial_lock(&mutex_serial, 67);
-		run_serial_thread = false;
+		guard_lock serial_lock(&mutex_serial);
+		close_rig = true;
 	}
-	pthread_join(*serial_thread, NULL);
-
-	closeRig();
-
-	// xcvr auto off
-	if (selrig->has_xcvr_auto_on_off)
-		selrig->set_xcvr_auto_off();
-
-	// close down the serial port
-	RigSerial->ClosePort();
-
-	if (dlgDisplayConfig && dlgDisplayConfig->visible())
-		dlgDisplayConfig->hide();
-	if (dlgXcvrConfig && dlgXcvrConfig->visible())
-		dlgXcvrConfig->hide();
-	if (dlgMemoryDialog && dlgMemoryDialog->visible())
-		dlgMemoryDialog->hide();
-	debug::stop();
-
-	exit(0);
 }
 
 void cbALC_SWR()
@@ -3351,7 +3440,7 @@ void initXcvrTab()
 				spnr_compression->step(step);
 				spnr_compression->show();
 				spnr_compression->value(progStatus.compression);
-				selrig->set_compression();
+				selrig->set_compression(progStatus.compON, progStatus.compression);
 			} else
 				spnr_compression->hide();
 		}
@@ -3538,14 +3627,15 @@ void init_generic_rig()
 
 		useB = ret;
 
+		read_rig_vals();
 		if (progStatus.use_rig_data) {
-			read_rig_vals();
 			vfoA = xcvr_vfoA;
 			vfoB = xcvr_vfoB;
-		} else {
-			xcvr_vfoA = vfoA;
-			xcvr_vfoB = vfoB;
 		}
+//		 else {
+//			xcvr_vfoA = vfoA;
+//			xcvr_vfoB = vfoB;
+//		}
 
 		if (useB) {
 			selrig->selectB();
@@ -3554,13 +3644,16 @@ void init_generic_rig()
 			vfo = &vfoA;
 		}
 	}
-	else if (progStatus.use_rig_data) {
+	else {
 		read_rig_vals();
-		vfoA = xcvr_vfoA;
-		vfoB = xcvr_vfoB;
-	} else {
-		xcvr_vfoA = vfoA;
-		xcvr_vfoB = vfoB;
+		if (progStatus.use_rig_data) {
+			vfoA = xcvr_vfoA;
+			vfoB = xcvr_vfoB;
+		}
+//		 else {
+//			xcvr_vfoA = vfoA;
+//			xcvr_vfoB = vfoB;
+//		}
 	}
 
 	vfo = &vfoA;
@@ -4314,7 +4407,7 @@ void init_swr_control()
 void init_compression_control()
 {
 	if (selrig->has_compON || selrig->has_compression)
-		selrig->set_compression();
+		selrig->set_compression(progStatus.compON, progStatus.compression);
 }
 
 void init_special_controls()
@@ -4451,7 +4544,8 @@ void initRig()
 {
 	xcvr_initialized = false;
 
-	btnInitializing->show();
+	grpInitializing->show();
+	main_group->hide();
 	mainwindow->redraw();
 
 	flrig_abort = false;
@@ -4465,7 +4559,8 @@ void initRig()
 		try {
 			connect_to_remote();
 		} catch (...) {
-			btnInitializing->hide();
+			grpInitializing->hide();
+			main_group->show();
 			mainwindow->redraw();
 			return;
 		}
@@ -4545,14 +4640,16 @@ void initRig()
 
 	bypass_serial_thread_loop = false;
 
-	btnInitializing->hide();
+	grpInitializing->hide();
+	main_group->show();
 	mainwindow->redraw();
 
 	xcvr_initialized = true;
 	return;
 
 failed:
-	btnInitializing->hide();
+	grpInitializing->hide();
+	main_group->show();
 	mainwindow->redraw();
 
 	bypass_serial_thread_loop = true;
@@ -4685,6 +4782,8 @@ void initStatusConfigDialog()
 	}
 
 	initRig();
+
+	init_title();
 
 }
 
@@ -4907,7 +5006,7 @@ void cb_vox_on_dataport()
 void cb_compression()
 {
 	guard_lock serial_lock(&mutex_serial, 81);
-	selrig->set_compression();
+	selrig->set_compression(progStatus.compON, progStatus.compression);
 }
 
 void cb_auto_notch()

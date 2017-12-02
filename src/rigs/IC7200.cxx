@@ -482,6 +482,7 @@ void RIG_IC7200::set_noise_reduction_val(int val)
 
 int RIG_IC7200::get_noise_reduction_val()
 {
+	int val = 0;
 	string cstr = "\x14\x06";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -491,9 +492,9 @@ int RIG_IC7200::get_noise_reduction_val()
 	if (waitFOR(9, "get NRval")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return num100(replystr.substr(p+6));
+			val = num100(replystr.substr(p+6));
 	}
-	return progStatus.noise_reduction_val;
+	return val;
 }
 
 void RIG_IC7200::set_attenuator(int val)
@@ -973,9 +974,9 @@ int RIG_IC7200::get_auto_notch()
 	return progStatus.auto_notch;
 }
 
-void RIG_IC7200::set_compression()
+void RIG_IC7200::set_compression(int on, int val)
 {
-	if (progStatus.compON) {
+	if (on) {
 		cmd = pre_to;
 		cmd.append("\x16\x44");
 		cmd += '\x01';
@@ -983,7 +984,7 @@ void RIG_IC7200::set_compression()
 		waitFB("set Comp ON");
 
 		cmd.assign(pre_to).append("\x14\x0E");
-		cmd.append(to_bcd(progStatus.compression * 255 / 10, 3));
+		cmd.append(to_bcd(val * 255 / 10, 3));
 		cmd.append( post );
 		waitFB("set comp");
 
@@ -995,10 +996,9 @@ void RIG_IC7200::set_compression()
 	}
 }
 
-#include <iostream>
-
-int RIG_IC7200::get_compression()
+void RIG_IC7200::get_compression(int &on, int &val)
 {
+	on = 0; val = 0;
 	std::string resp;
 
 	cmd.assign(pre_to).append("\x16\x44").append(post);
@@ -1008,9 +1008,9 @@ int RIG_IC7200::get_compression()
 	if (waitFOR(8, "get comp on/off")) {
 		size_t p = replystr.find(resp);
 		if (p != string::npos)
-			progStatus.compON = (replystr[p+6] == 0x01);
+			on = (replystr[p+6] == 0x01);
 	}
-	if (progStatus.compON) {
+	if (on) {
 		cmd.assign(pre_to).append("\x14\x0E").append(post);
 		resp.assign(pre_fm).append("\x14\x0E");
 
@@ -1022,12 +1022,7 @@ int RIG_IC7200::get_compression()
 			if (p != string::npos)
 				val = fm_bcd(replystr.substr(p+6), 3) * 10 / 255;
 		}
-		if (progStatus.compression != val) {
-			progStatus.compression = val;
-		}
 	}
-
-	return progStatus.compression;
 }
 
 void RIG_IC7200::set_vox_onoff()

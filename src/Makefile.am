@@ -216,8 +216,8 @@ flrig_SOURCES += \
 	widgets/flslider2.cxx \
 	widgets/font_browser.cxx \
 	widgets/FreqControl.cxx \
-	widgets/hspinner.cxx \
 	widgets/ValueSlider.cxx \
+	widgets/hspinner.cxx \
 	server/xml_server.cxx 
 
 # Additional source files that are distributed
