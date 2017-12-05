@@ -208,6 +208,7 @@ public:
 	bool has_sql_control;
 	bool has_smeter;
 	bool has_power_out;
+	bool has_line_out;
 	bool has_split;
 	bool has_split_AB;
 	bool has_data_port;
@@ -416,6 +417,7 @@ public:
 		min = -100; max = 100; step = 1; }
 
 	virtual void set_line_out() {}
+	virtual int  get_line_out() { return 100; }
 	virtual void set_agc_level() {}
 	virtual void set_cw_weight() {}
 	virtual void get_cw_weight_min_max_step(double &min, double &max, double &step) {

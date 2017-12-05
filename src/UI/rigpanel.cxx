@@ -143,7 +143,7 @@ Fl_Light_Button *btnCompON=(Fl_Light_Button *)0;
 Hspinner *spnr_compression=(Hspinner *)0;
 Fl_Group *genericRx=(Fl_Group *)0;
 Fl_ComboBox *cbo_nb_level=(Fl_ComboBox *)0;
-Fl_ComboBox *cbo_agc_level=(Fl_ComboBox *)0;
+//Fl_ComboBox *cbo_agc_level=(Fl_ComboBox *)0;
 Hspinner *spnr_bpf_center=(Hspinner *)0;
 
 Fl_Button *btnALC_SWR=(Fl_Button *)0;

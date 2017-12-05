@@ -55,8 +55,8 @@ static FILE* rfile;
 static int rfd;
 static bool tty;
 
-static Fl_Double_Window*	window;
-static Fl_Browser*			btext;
+static Fl_Double_Window*	window = (Fl_Double_Window *)0;
+static Fl_Browser*			btext = (Fl_Browser *)0;
 static string buffer;
 
 debug* debug::inst = 0;
@@ -176,7 +176,8 @@ void debug::show(void)
 
 void debug::sync_text(void* arg)
 {
-    debug_in_use = true;
+	if (!btext) return;
+	debug_in_use = true;
 	size_t p0 = 0, p1 = estr.find('\n');
 	while (p1 != string::npos) {
 		btext->insert(1, estr.substr(p0,p1-p0).c_str());
@@ -184,8 +185,8 @@ void debug::sync_text(void* arg)
 		p0 = p1 + 1;
 		p1 = estr.find('\n', p0);
 	}
-    estr = "";
-    debug_in_use = false;
+	estr = "";
+	debug_in_use = false;
 }
 
 debug::debug(const char* filename)

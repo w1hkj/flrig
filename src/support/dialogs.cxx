@@ -435,11 +435,11 @@ void createXcvrDialog()
 	for (int i = 0; szBaudRates[i] != NULL; i++)
 		mnuBaudrate->add(szBaudRates[i]);
 
-	cbo_agc_level->clear();
-	cbo_agc_level->add("slow");
-	cbo_agc_level->add("med");
-	cbo_agc_level->add("fast");
-	cbo_agc_level->index(progStatus.agc_level);
+//	cbo_agc_level->clear();
+//	cbo_agc_level->add("slow");
+//	cbo_agc_level->add("med");
+//	cbo_agc_level->add("fast");
+//	cbo_agc_level->index(progStatus.agc_level);
 
 	cbo_tt550_agc_level->add("slow");
 	cbo_tt550_agc_level->add("med");
@@ -1074,18 +1074,25 @@ void show_controls()
 			mainwindow->redraw();
 			return;
 		case small_ui :
+			{
+				int wh = mainwindow->h();
+				int ww = mainwindow->w();
 			if (selrig->name_ == rig_TT550.name_) {
 				tabsGeneric->hide();
 				if (tabs550->visible()) {
 					tabs550->hide();
 					btn_show_controls->label("@-22->");
 					btn_show_controls->redraw_label();
-					mainwindow->size( mainwindow->w(), mainwindow->h() - 70);
+					wh -= 70;
+					mainwindow->resizable(grpTABS);
+					mainwindow->size( ww, wh);
 				} else {
 					tabs550->show();
 					btn_show_controls->label("@-28->");
 					btn_show_controls->redraw_label();
-					mainwindow->size( mainwindow->w(), mainwindow->h() + 70);
+					wh += 70;
+					mainwindow->resizable(grpTABS);
+					mainwindow->size( ww, wh);
 				}
 			} else {
 				tabs550->hide();
@@ -1093,14 +1100,19 @@ void show_controls()
 					tabsGeneric->hide();
 					btn_show_controls->label("@-22->");
 					btn_show_controls->redraw_label();
-					mainwindow->size( mainwindow->w(), mainwindow->h() - 70);
+					wh -= 70;
+					mainwindow->size( ww, wh);
+					mainwindow->size_range(ww, wh, ww, wh);
 				} else {
 					tabsGeneric->show();
 					btn_show_controls->label("@-28->");
 					btn_show_controls->redraw_label();
-					mainwindow->size( mainwindow->w(), mainwindow->h() + 70);
+					wh += 70;
+					mainwindow->size( ww, wh);
+					mainwindow->size_range(ww, wh, ww, wh);
 				}
 			}
+		}
 			grpTABS->show();
 			mainwindow->redraw();
 			break;

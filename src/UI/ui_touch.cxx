@@ -1005,19 +1005,19 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				cbo_nb_level->index(progStatus.nb_level);
 				cbo_nb_level->end();
 
-				cbo_agc_level = new Fl_ComboBox(xpos+244, by, 80, bh, _("AGC"));
-				cbo_agc_level->tooltip(_("AGC level"));
-				cbo_agc_level->box(FL_DOWN_BOX);
-				cbo_agc_level->color(FL_BACKGROUND_COLOR);
-				cbo_agc_level->selection_color(FL_BACKGROUND_COLOR);
-				cbo_agc_level->labeltype(FL_NORMAL_LABEL);
-				cbo_agc_level->labelfont(0);
-				cbo_agc_level->labelsize(14);
-				cbo_agc_level->labelcolor(FL_FOREGROUND_COLOR);
-				cbo_agc_level->callback((Fl_Callback*)cb_cbo_agc_level);
-				cbo_agc_level->align(Fl_Align(FL_ALIGN_LEFT));
-				cbo_agc_level->when(FL_WHEN_RELEASE);
-				cbo_agc_level->end();
+//				cbo_agc_level = new Fl_ComboBox(xpos+244, by, 80, bh, _("AGC"));
+//				cbo_agc_level->tooltip(_("AGC level"));
+//				cbo_agc_level->box(FL_DOWN_BOX);
+//				cbo_agc_level->color(FL_BACKGROUND_COLOR);
+//				cbo_agc_level->selection_color(FL_BACKGROUND_COLOR);
+//				cbo_agc_level->labeltype(FL_NORMAL_LABEL);
+//				cbo_agc_level->labelfont(0);
+//				cbo_agc_level->labelsize(14);
+//				cbo_agc_level->labelcolor(FL_FOREGROUND_COLOR);
+//				cbo_agc_level->callback((Fl_Callback*)cb_cbo_agc_level);
+//				cbo_agc_level->align(Fl_Align(FL_ALIGN_LEFT));
+//				cbo_agc_level->when(FL_WHEN_RELEASE);
+//				cbo_agc_level->end();
 
 				spnr_bpf_center = new Hspinner(xpos+474, by, 5*bh, bh, _("BPF Center Freq"));
 				spnr_bpf_center->tooltip(_("Bandpass Filter Center Freq"));
@@ -1666,7 +1666,7 @@ Fl_Double_Window* touch_rig_window() {
 	grpInitializing = new Fl_Group(0, menuH, mainW, mainH - menuH, "");
 
 		grpInitializing->box(FL_FLAT_BOX);
-		grpInitializing->color(FL_WHITE);
+		grpInitializing->color(FL_BACKGROUND_COLOR);
 
 		progress = new Fl_Progress(
 			mainW / 4, grpInitializing->h() / 2,

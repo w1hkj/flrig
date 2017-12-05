@@ -60,6 +60,8 @@ int small_mainH = 360;
 
 Fl_Group *small_main_group(int X, int Y, int W, int H)
 {
+std::cout << "X: " << X << ", Y: " << Y << ", W: " << W << ", H: " << H << std::endl;
+
 	Fl_Group *g = new Fl_Group(X,Y,W,H);
 	g->box(FL_FLAT_BOX);
 
@@ -573,6 +575,8 @@ int gph = 70;
 int gpy = 252;
 int tbh = 55;
 int tby = gpy + 20;
+
+std::cout << "gpy: " << gpy << ", gph: " << gph << std::endl;
 
 	grpTABS = new Fl_Group(0, gpy, small_mainW, gph);
 {
@@ -1282,19 +1286,19 @@ int tby = gpy + 20;
 			cbo_nb_level->index(progStatus.nb_level);
 			cbo_nb_level->end();
 
-			cbo_agc_level = new Fl_ComboBox(123, 281, 80, 22, _("AGC"));
-			cbo_agc_level->tooltip(_("AGC level"));
-			cbo_agc_level->box(FL_DOWN_BOX);
-			cbo_agc_level->color(FL_BACKGROUND_COLOR);
-			cbo_agc_level->selection_color(FL_BACKGROUND_COLOR);
-			cbo_agc_level->labeltype(FL_NORMAL_LABEL);
-			cbo_agc_level->labelfont(0);
-			cbo_agc_level->labelsize(14);
-			cbo_agc_level->labelcolor(FL_FOREGROUND_COLOR);
-			cbo_agc_level->callback((Fl_Callback*)cb_cbo_agc_level);
-			cbo_agc_level->align(Fl_Align(FL_ALIGN_BOTTOM));
-			cbo_agc_level->when(FL_WHEN_RELEASE);
-			cbo_agc_level->end();
+//			cbo_agc_level = new Fl_ComboBox(123, 281, 80, 22, _("AGC"));
+//			cbo_agc_level->tooltip(_("AGC level"));
+//			cbo_agc_level->box(FL_DOWN_BOX);
+//			cbo_agc_level->color(FL_BACKGROUND_COLOR);
+//			cbo_agc_level->selection_color(FL_BACKGROUND_COLOR);
+//			cbo_agc_level->labeltype(FL_NORMAL_LABEL);
+//			cbo_agc_level->labelfont(0);
+//			cbo_agc_level->labelsize(14);
+//			cbo_agc_level->labelcolor(FL_FOREGROUND_COLOR);
+//			cbo_agc_level->callback((Fl_Callback*)cb_cbo_agc_level);
+//			cbo_agc_level->align(Fl_Align(FL_ALIGN_BOTTOM));
+//			cbo_agc_level->when(FL_WHEN_RELEASE);
+//			cbo_agc_level->end();
 
 			spnr_bpf_center = new Hspinner(234, 281, 96, 22, _("BPF Center Freq"));
 			spnr_bpf_center->tooltip(_("Bandpass Filter Center Freq"));
@@ -1336,6 +1340,7 @@ int tby = gpy + 20;
 			spnr_line_out->maximum(100);
 			spnr_line_out->step(1);
 			spnr_line_out->value(20);
+			spnr_line_out->align(Fl_Align(34));
 			spnr_line_out->callback((Fl_Callback*)cb_spnr_line_out);
 			spnr_line_out->value(progStatus.line_out);
 
@@ -1466,7 +1471,7 @@ Fl_Double_Window* Small_rig_window() {
 		small_mainW, btnPTT->y() + btnPTT->h() + 2 - small_menuH, "");
 
 		grpInitializing->box(FL_FLAT_BOX);
-		grpInitializing->color(FL_WHITE);
+		grpInitializing->color(FL_BACKGROUND_COLOR);
 
 		progress = new Fl_Progress(
 			small_mainW / 4, grpInitializing->y() + grpInitializing->h() / 2,

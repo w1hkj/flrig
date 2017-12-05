@@ -199,7 +199,7 @@ extern Fl_Light_Button *btnCompON;
 extern Hspinner *spnr_compression;
 extern Fl_Group *genericRx;
 extern Fl_ComboBox *cbo_nb_level;
-extern Fl_ComboBox *cbo_agc_level;
+//extern Fl_ComboBox *cbo_agc_level;
 extern Hspinner *spnr_bpf_center;
 extern Fl_Check_Button *btn_use_bpf_center;
 extern Fl_Group *genericMisc;
