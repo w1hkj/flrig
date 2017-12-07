@@ -3303,9 +3303,7 @@ void initXcvrTab()
 			spnr_cw_wpm->minimum(min);
 			spnr_cw_wpm->maximum(max);
 			spnr_cw_wpm->value(progStatus.cw_wpm);
-			spnr_cw_wpm->show();
 			spnr_cw_wpm->activate();
-			selrig->set_cw_wpm();
 		} else spnr_cw_wpm->deactivate();
 
 		if (selrig->has_cw_qsk) {
@@ -3315,9 +3313,7 @@ void initXcvrTab()
 			spnr_cw_qsk->maximum(max);
 			spnr_cw_qsk->step(step);
 			spnr_cw_qsk->value(progStatus.cw_qsk);
-			spnr_cw_qsk->show();
 			spnr_cw_qsk->activate();
-			selrig->set_cw_qsk();
 		}else spnr_cw_qsk->deactivate();
 
 		if (selrig->has_cw_weight) {
@@ -3328,7 +3324,6 @@ void initXcvrTab()
 			spnr_cw_weight->step(step);
 			spnr_cw_weight->value(progStatus.cw_weight);
 			spnr_cw_weight->activate();
-			selrig->set_cw_weight();
 		} 
 		else spnr_cw_weight->deactivate();
 

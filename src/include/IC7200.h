@@ -69,6 +69,10 @@ public:
 	int  get_noise_reduction();
 	void set_noise_reduction_val(int val);
 	int  get_noise_reduction_val();
+	
+	void get_nr_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 15; step = 1; }
+
 	void set_preamp(int val);
 	int  next_preamp();
 	int  get_preamp();
@@ -115,6 +119,18 @@ public:
 	bool ICswap() { return true; }
 
 //	bool hasA2b() { return true; }
+
+	void set_cw_wpm();
+	void get_cw_wpm_min_max(int &min, int &max);
+
+	void enable_break_in();
+	void set_cw_qsk();
+	void get_cw_qsk_min_max_step(double &min, double &max, double &step);
+
+	void set_cw_spot_tone();
+	void get_cw_spot_tone_min_max_step(int &min, int &max, int &step);
+
+	void set_cw_vol();
 
 	void tune_rig();
 

@@ -151,6 +151,11 @@ RIG_IC7200::RIG_IC7200() {
 	has_tune_control = true;
 	has_split_AB = true;
 
+	has_cw_wpm = true;
+	has_cw_spot_tone = true;
+	has_cw_qsk = true;
+	has_cw_break_in = true;
+
 	defaultCIV = 0x76;
 	adjustCIV(defaultCIV);
 
@@ -174,6 +179,12 @@ void RIG_IC7200::initialize()
 	rig_widgets[10].W = sldrNOTCH;
 	rig_widgets[11].W = sldrMICGAIN;
 	rig_widgets[12].W = sldrPOWER;
+}
+
+static inline void minmax(int min, int max, int &val)
+{
+	if (val > max) val = max;
+	if (val < min) val = min;
 }
 
 //======================================================================
@@ -475,7 +486,8 @@ void RIG_IC7200::set_noise_reduction_val(int val)
 {
 	cmd = pre_to;
 	cmd.append("\x14\x06");
-	cmd.append(bcd255(val));
+	val = val * 16 + 8;
+	cmd.append(to_bcd(val, 3));
 	cmd.append(post);
 	waitFB("set NRval");
 }
@@ -492,7 +504,8 @@ int RIG_IC7200::get_noise_reduction_val()
 	if (waitFOR(9, "get NRval")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			val = num100(replystr.substr(p+6));
+			val = fm_bcd(replystr.substr(p+6), 3);
+			val = (val - 8) / 16;
 	}
 	return val;
 }
@@ -1014,8 +1027,6 @@ void RIG_IC7200::get_compression(int &on, int &val)
 		cmd.assign(pre_to).append("\x14\x0E").append(post);
 		resp.assign(pre_fm).append("\x14\x0E");
 
-		int val = 0;
-
 		cmd.append(post);
 		if (waitFOR(9, "get comp level")) {
 			size_t p = replystr.find(resp);
@@ -1197,4 +1208,81 @@ void RIG_IC7200::get_if_min_max_step(int &min, int &max, int &step)
 bool RIG_IC7200::get_if_shift(int &val) {
 	val = progStatus.shift_val;
 	return progStatus.shift;
+}
+
+// CW methods
+
+void RIG_IC7200::get_cw_wpm_min_max(int &min, int &max)
+{
+	min = 6; max = 48;
+}
+
+void RIG_IC7200::set_cw_wpm()
+{
+	int iwpm = round((progStatus.cw_wpm - 6) * 255 / 42 + 0.5);
+	minmax(0, 255, iwpm);
+
+	cmd.assign(pre_to).append("\x14\x0C");
+	cmd.append(to_bcd(iwpm, 3));
+	cmd.append( post );
+	waitFB("SET cw wpm");
+}
+
+void RIG_IC7200::enable_break_in()
+{
+// 16 47 00 break-in off
+// 16 47 01 break-in semi
+// 16 47 02 break-in full
+
+	cmd.assign(pre_to).append("\x16\x47");
+
+	switch (progStatus.break_in) {
+		case 2: cmd += '\x02'; break_in_label("FULL"); break;
+		case 1: cmd += '\x01'; break_in_label("SEMI");  break;
+		case 0:
+		default: cmd += '\x00'; break_in_label("BK-IN");
+	}
+	cmd.append(post);
+	waitFB("SET break-in");
+}
+
+void RIG_IC7200::get_cw_qsk_min_max_step(double &min, double &max, double &step)
+{
+	min = 2.0; max = 13.0; step = 0.1;
+}
+
+void RIG_IC7200::set_cw_qsk()
+{
+	int qsk = round ((progStatus.cw_qsk - 2.0) * 255.0 / 11.0 + 0.5);
+	minmax(0, 255, qsk);
+
+	cmd.assign(pre_to).append("\x14\x0F");
+	cmd.append(to_bcd(qsk, 3));
+	cmd.append(post);
+	waitFB("Set cw qsk delay");
+}
+
+void RIG_IC7200::get_cw_spot_tone_min_max_step(int &min, int &max, int &step)
+{
+	min = 300; max = 900; step = 5;
+}
+
+void RIG_IC7200::set_cw_spot_tone()
+{
+	cmd.assign(pre_to).append("\x14\x09"); // values 0=300Hz 255=900Hz
+	int n = round((progStatus.cw_spot_tone - 300) * 255.0 / 600.0 + 0.5);
+	minmax(0, 255, n);
+
+	cmd.append(to_bcd(n, 3));
+	cmd.append( post );
+	waitFB("SET cw spot tone");
+}
+
+void RIG_IC7200::set_cw_vol()
+{
+	cmd.assign(pre_to);
+	cmd.append("\x1A\x03\x06");
+	cmd.append(to_bcd((int)(progStatus.cw_vol * 2.55), 3));
+	cmd.append( post );
+	waitFB("SET cw sidetone volume");
 }
