@@ -288,29 +288,32 @@ int RIG_IC718::get_noise_reduction()
 	return 0;
 }
 
-// 0 < val < 100
 void RIG_IC718::set_noise_reduction_val(int val)
 {
 	cmd = pre_to;
 	cmd.append("\x14\x06");
-	cmd.append(to_bcd(val * 255 / 100, 3));
+	val = val * 16 + 8;
+	cmd.append(to_bcd(val, 3));
 	cmd.append(post);
-	waitFB("set nr val");
+	waitFB("set NRval");
 }
 
 int RIG_IC718::get_noise_reduction_val()
 {
-	cmd = pre_to;
-	cmd.append("\x14\x06");
-	cmd.append(post);
+	int val = 0;
+	string cstr = "\x14\x06";
 	string resp = pre_fm;
-	resp.append("\x14\x06");
-	if (waitFOR(9, "get nr val")) {
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append(post);
+	if (waitFOR(9, "get NRval")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return (int)ceil(fm_bcd(replystr.substr(p+6),3) * 100 / 255);
+			val = fm_bcd(replystr.substr(p+6), 3);
+			val = (val - 8) / 16;
 	}
-	return 0;
+	return val;
 }
 
 void RIG_IC718::set_preamp(int val)

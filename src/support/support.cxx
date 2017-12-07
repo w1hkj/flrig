@@ -1023,9 +1023,9 @@ void servicePTT()
 	}
 }
 
-void serviceSliders()
+int serviceSliders()
 {
-	if (sliders.empty()) return;
+	if (sliders.empty()) return 0;
 
 	SLIDER working(0,0);
 	guard_lock serial_lock(&mutex_serial, 29);
@@ -1114,6 +1114,7 @@ void serviceSliders()
 				break;
 		}
 	}
+	return 1;
 }
 
 inline bool que_pending()
@@ -1125,7 +1126,6 @@ inline bool que_pending()
 }
 
 bool close_rig = false;
-bool open_rig = true;
 
 void * serial_thread_loop(void *d)
 {
@@ -1140,17 +1140,18 @@ void * serial_thread_loop(void *d)
 		if (bypass_serial_thread_loop) {
 			goto serial_bypass_loop;
 		}
-//		if (open_rig) {
-//			openRig();
-//			goto serial_bypass_loop;
-//		}
+
 		if (close_rig) {
 			closeRig();
 			goto serial_bypass_loop;
 		}
 
-		serviceSliders();
 		servicePTT();
+
+		if (serviceSliders()) {
+			loopcount = progStatus.serloop_timing / 10;
+			goto serial_bypass_loop;
+		}
 
 //send any freq/mode/bw changes in the queu
 

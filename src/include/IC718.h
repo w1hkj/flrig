@@ -54,12 +54,16 @@ public:
 
 	void set_attenuator(int val);
 	int  get_smeter();
+
 	void set_noise(bool val);
 	int  get_noise();
 	void set_noise_reduction(int val);
 	int  get_noise_reduction();
 	void set_noise_reduction_val(int val);
 	int  get_noise_reduction_val();
+	void get_nr_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 15; step = 1; }
+
 	void set_preamp(int val);
 	int  get_preamp();
 	void set_rf_gain(int val);
