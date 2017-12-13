@@ -374,8 +374,15 @@ void RIG_IC756PRO::get_mic_gain_min_max_step(int &min, int &max, int &step)
 
 void RIG_IC756PRO::set_if_shift(int val)
 {
-	int shift = (int)((val + 50) * 2.56 );
-	if (shift == 256) shift = 255;
+	int shift;
+	sh_ = val;
+	if (val == 0) sh_on_ = false;
+	else sh_on_ = true;
+
+	shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
 	cmd = pre_to;
 	cmd.append("\x14\x07");
 	cmd.append(to_bcd(shift, 3));
@@ -393,7 +400,7 @@ void RIG_IC756PRO::get_if_min_max_step(int &min, int &max, int &step)
 {
 	min = -50;
 	max = +50;
-	step = 2;
+	step = 1;
 }
 
 int IC756PROsql = 0;

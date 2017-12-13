@@ -116,10 +116,6 @@ void RIG_TS480SAT::initialize()
 	rig_widgets[6].W = sldrMICGAIN;
 	rig_widgets[7].W = sldrPOWER;
 
-	progStatus.rfgain = 100;
-	progStatus.volume = 5;
-	progStatus.power_level = 10;
-	progStatus.mic_gain = 50;
 	check_menu_45();
 };
 

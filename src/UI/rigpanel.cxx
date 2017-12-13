@@ -142,7 +142,7 @@ Fl_Group *genericSpeech=(Fl_Group *)0;
 Fl_Light_Button *btnCompON=(Fl_Light_Button *)0;
 Hspinner *spnr_compression=(Hspinner *)0;
 Fl_Group *genericRx=(Fl_Group *)0;
-Fl_ComboBox *cbo_nb_level=(Fl_ComboBox *)0;
+Fl_Wheel_Value_Slider *sldr_nb_level=(Fl_Wheel_Value_Slider *)0;
 //Fl_ComboBox *cbo_agc_level=(Fl_ComboBox *)0;
 Hspinner *spnr_bpf_center=(Hspinner *)0;
 
@@ -675,8 +675,8 @@ static void cb_spnr_compression(Hspinner* o, void*) {
 	cb_compression();
 }
 
-static void cb_cbo_nb_level(Fl_ComboBox* o, void*) {
-	progStatus.nb_level = o->index();
+static void cb_sldr_nb_level(Fl_Wheel_Value_Slider* o, void*) {
+	progStatus.nb_level = o->value();
 	cb_nb_level();
 }
 

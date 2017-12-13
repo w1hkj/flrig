@@ -446,36 +446,33 @@ void RIG_IC756PRO3::get_mic_gain_min_max_step(int &min, int &max, int &step)
 
 void RIG_IC756PRO3::set_if_shift(int val)
 {
-	int shift = (int)(val * 128.0 / 825.0 + 128);
+	int shift;
+	sh_ = val;
+	if (val == 0) sh_on_ = false;
+	else sh_on_ = true;
+
+	shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
 	cmd = pre_to;
 	cmd.append("\x14\x07");
 	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
-	waitFB("set if-shift");
-}
+	waitFB("set IF on/off");
 
-bool  RIG_IC756PRO3::get_if_shift(int &val)
-{
-	string cstr = "\x14\x07";
-	string resp = pre_fm;
-	resp.append(cstr);
 	cmd = pre_to;
-	cmd.append(cstr);
+	cmd.append("\x14\x08");
+	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
-	val = progStatus.shift_val;
-	if (waitFOR(9, "get if-shift")) {
-		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			val = (int)((fm_bcd(replystr.substr(p+6), 3) - 128) * 825.0 / 128.0);
-	}
-	return (progStatus.shift = (val != 0));
+	waitFB("set IF val");
 }
 
 void RIG_IC756PRO3::get_if_min_max_step(int &min, int &max, int &step)
 {
-	min = -825;
-	max = +825;
-	step = 25;
+	min = -50;
+	max = +50;
+	step = 1;
 }
 
 void RIG_IC756PRO3::set_squelch(int val)

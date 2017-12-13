@@ -128,6 +128,9 @@ public:
 
 	void set_noise(bool val);
 	int  get_noise();
+	void set_nb_level(int val);
+	int  get_nb_level();
+
 	void set_noise_reduction(int val);
 	int  get_noise_reduction();
 	void set_noise_reduction_val(int val);
@@ -155,6 +158,11 @@ public:
 	int  agc_val();
 
 	void tune_rig();
+
+	void setVfoAdj(double v);
+	double getVfoAdj();
+	void get_vfoadj_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 100; step = 1; }
 
 };
 

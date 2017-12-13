@@ -104,7 +104,10 @@ void debug::stop(void)
 {
 	delete inst;
 	inst = 0;
-	delete window;
+	if (window) {
+		delete window;
+		window = 0;
+	}
 }
 
 static char fmt[1024];
@@ -180,8 +183,10 @@ void debug::sync_text(void* arg)
 	debug_in_use = true;
 	size_t p0 = 0, p1 = estr.find('\n');
 	while (p1 != string::npos) {
-		btext->insert(1, estr.substr(p0,p1-p0).c_str());
-		buffer.append(estr.substr(p0, p1 - p0)).append("\n");
+std::string insrt = estr.substr(p0, p1-p0);
+std::cout << insrt << std::endl;
+		btext->insert(1, insrt.c_str());
+		buffer.append(insrt.append("\n"));
 		p0 = p1 + 1;
 		p1 = estr.find('\n', p0);
 	}
@@ -212,6 +217,10 @@ debug::debug(const char* filename)
 
 debug::~debug()
 {
+	if (window) {
+		delete window;
+		window = 0;
+	}
 	fclose(wfile);
 	fclose(rfile);
 }
@@ -225,6 +234,7 @@ static void slider_cb(Fl_Widget* w, void*)
 
 static void clear_cb(Fl_Widget* w, void*)
 {
+	if (!btext) return;
 	btext->clear();
 	buffer.clear();
 }

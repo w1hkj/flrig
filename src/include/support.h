@@ -235,7 +235,6 @@ extern void auto_notch_label(const char *,bool on);
 extern void enable_bandselect_btn(int btn_num, bool enable = true);
 
 extern void break_in_label(const char *);
-extern void if_shift_range(int bw);
 
 // Display Dialog
 extern void cbUSBaudio();
@@ -316,6 +315,5 @@ extern int mval;
 
 extern queue<XCVR_STATE> queA;
 extern queue<XCVR_STATE> queB;
-extern queue<bool> quePTT;
 
 #endif

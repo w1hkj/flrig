@@ -71,7 +71,7 @@
 #include "util.h"
 #include "gettext.h"
 #include "xml_server.h"
-#include "xml_io.h"
+//#include "xml_io.h"
 #include "serial.h"
 #include "ui.h"
 
@@ -404,15 +404,16 @@ extern FILE *serlog;
 		exit(EXIT_FAILURE);
 	}
 
-	if (progStatus.fldigi_is_server) {
-		open_rig_xmlrpc();
-		digi_thread = new pthread_t;      
-		if (pthread_create(digi_thread, NULL, digi_loop, NULL)) {
-			perror("pthread_create");
-			exit(EXIT_FAILURE);
-		}
-	} else
-		start_server(xmlport);
+//	if (progStatus.fldigi_is_server) {
+//		open_rig_xmlrpc();
+//		digi_thread = new pthread_t;      
+//		if (pthread_create(digi_thread, NULL, digi_loop, NULL)) {
+//			perror("pthread_create");
+//			exit(EXIT_FAILURE);
+//		}
+//	} else
+
+	start_server(xmlport);
 
 	createXcvrDialog();
 
@@ -426,7 +427,11 @@ extern FILE *serlog;
 		case small_ui :
 			mainwindow->resize(
 				progStatus.mainX, progStatus.mainY, 
-				mainwindow->w(), btnPTT->y() + btnPTT->h() + 2);
+				mainwindow->w(), 150);//mainwindow->h());
+				grpInitializing->size(mainwindow->w(), mainwindow->h() - grpInitializing->y());
+				grpInitializing->redraw();
+				progress->position(progress->x(), grpInitializing->y() + grpInitializing->h()/2);
+				progress->redraw();
 			break;
 		case wide_ui :
 			mainwindow->resize(

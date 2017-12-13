@@ -88,7 +88,7 @@ bool RIG_ICOM::waitFB(const char *sz)
 	if (!progStatus.use_tcpip && !RigSerial->IsOpen()) {
 		replystr = returned;
 		snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
-		showresp(INFO, HEX, sztemp, tosend, returned);
+		showresp(DEBUG, HEX, sztemp, tosend, returned);
 		return false;
 	}
 	int cnt = 0, repeat = 0, num = cmd.length() + ok.length();
@@ -104,7 +104,7 @@ bool RIG_ICOM::waitFB(const char *sz)
 				replystr = returned;
 				waited = 10 * (repeat * wait_msec + cnt);
 				snprintf(sztemp, sizeof(sztemp), "%s ans in %d ms, OK", sz, waited);
-				showresp(INFO, HEX, sztemp, tosend, returned);
+				showresp(DEBUG, HEX, sztemp, tosend, returned);
 				return true;
 			}
 			if (returned.find(bad) != string::npos) {
@@ -121,7 +121,7 @@ bool RIG_ICOM::waitFB(const char *sz)
 	replystr = returned;
 	waited = 10 * repeat * wait_msec;
 	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %d ms", sz, waited);
-	showresp(INFO, HEX, sztemp, tosend, returned);
+	showresp(ERR, HEX, sztemp, tosend, returned);
 	return false;
 }
 
@@ -137,7 +137,7 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 	if (!progStatus.use_tcpip && !RigSerial->IsOpen()) {
 		replystr = returned;
 		snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
-		showresp(INFO, HEX, sztemp, tosend, returned);
+		showresp(DEBUG, HEX, sztemp, tosend, returned);
 		return false;
 	}
 	for (repeat = 0; repeat < progStatus.comm_retries; repeat++) {
@@ -150,7 +150,7 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 				replystr = returned;
 				waited = 10 * (repeat * delay + cnt);
 				snprintf(sztemp, sizeof(sztemp), "%s ans in %d ms, OK  ", sz, waited);
-				showresp(INFO, HEX, sztemp, tosend, returned);
+				showresp(DEBUG, HEX, sztemp, tosend, returned);
 				return true;
 			}
 			MilliSleep(10);

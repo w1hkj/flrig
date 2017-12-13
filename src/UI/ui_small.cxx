@@ -27,7 +27,7 @@ Fl_Menu_Item menu_small_menu[] = {
  {_("&Config"), 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Setup"), 0, 0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Transceiver"), 0,  (Fl_Callback*)cb_mnuConfigXcvr, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
- {_("XmlRpc"), 0,  (Fl_Callback*)cb_mnuXMLRPC, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
+// {_("XmlRpc"), 0,  (Fl_Callback*)cb_mnuXMLRPC, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("tcpip"), 0, (Fl_Callback*)cb_mnuTCPIP, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("PTT"), 0, (Fl_Callback*)cb_mnuPTT, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("AUX"), 0, (Fl_Callback*)cb_mnuAUX, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
@@ -60,8 +60,6 @@ int small_mainH = 360;
 
 Fl_Group *small_main_group(int X, int Y, int W, int H)
 {
-std::cout << "X: " << X << ", Y: " << Y << ", W: " << W << ", H: " << H << std::endl;
-
 	Fl_Group *g = new Fl_Group(X,Y,W,H);
 	g->box(FL_FLAT_BOX);
 
@@ -113,7 +111,7 @@ std::cout << "X: " << X << ", Y: " << Y << ", W: " << W << ", H: " << H << std::
 	sldrVOLUME->textsize(12);
 	sldrVOLUME->callback((Fl_Callback*)cb_sldrVOLUME);
 	sldrVOLUME->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-	sldrVOLUME->when(FL_WHEN_CHANGED);
+	sldrVOLUME->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
 	sldrVOLUME->reverse(true);
 
 	btnAGC = new Fl_Light_Button(2, 145, 50, 18, _("AGC"));
@@ -139,7 +137,7 @@ std::cout << "X: " << X << ", Y: " << Y << ", W: " << W << ", H: " << H << std::
 	sldrRFGAIN->textsize(12);
 	sldrRFGAIN->callback((Fl_Callback*)cb_sldrRFGAIN);
 	sldrRFGAIN->align(Fl_Align(FL_ALIGN_LEFT));
-	sldrRFGAIN->when(FL_WHEN_CHANGED);
+	sldrRFGAIN->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
 	sldrRFGAIN->reverse(true);
 
 	sldrSQUELCH = new Fl_Wheel_Value_Slider(54, 165, 156, 18, _("SQL"));
@@ -158,7 +156,7 @@ std::cout << "X: " << X << ", Y: " << Y << ", W: " << W << ", H: " << H << std::
 	sldrSQUELCH->textsize(12);
 	sldrSQUELCH->callback((Fl_Callback*)cb_sldrSQUELCH);
 	sldrSQUELCH->align(Fl_Align(FL_ALIGN_LEFT));
-	sldrSQUELCH->when(FL_WHEN_CHANGED);
+	sldrSQUELCH->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
 	sldrSQUELCH->reverse(true);
 
 	btnIFsh = new Fl_Light_Button(214, 125, 50, 18, _("IFsh"));
@@ -183,7 +181,7 @@ std::cout << "X: " << X << ", Y: " << Y << ", W: " << W << ", H: " << H << std::
 	sldrIFSHIFT->textsize(12);
 	sldrIFSHIFT->callback((Fl_Callback*)cb_sldrIFSHIFT);
 	sldrIFSHIFT->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-	sldrIFSHIFT->when(FL_WHEN_CHANGED);
+	sldrIFSHIFT->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
 	sldrIFSHIFT->reverse(true);
 
 	btnNotch = new Fl_Light_Button(214, 145, 50, 18, _("Nch"));
@@ -208,7 +206,7 @@ std::cout << "X: " << X << ", Y: " << Y << ", W: " << W << ", H: " << H << std::
 	sldrNOTCH->textsize(12);
 	sldrNOTCH->callback((Fl_Callback*)cb_sldrNOTCH);
 	sldrNOTCH->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-	sldrNOTCH->when(FL_WHEN_CHANGED);
+	sldrNOTCH->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
 	sldrNOTCH->reverse(true);
 
 	btnNR = new Fl_Light_Button(214, 165, 50, 18, _("NR"));
@@ -232,7 +230,7 @@ std::cout << "X: " << X << ", Y: " << Y << ", W: " << W << ", H: " << H << std::
 	sldrNR->textsize(12);
 	sldrNR->callback((Fl_Callback*)cb_sldrNR);
 	sldrNR->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-	sldrNR->when(FL_WHEN_CHANGED);
+	sldrNR->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
 	sldrNR->reverse(true);
 
 	btnDataPort = new Fl_Light_Button(2, 246, 50, 18, _("Data"));
@@ -258,7 +256,7 @@ std::cout << "X: " << X << ", Y: " << Y << ", W: " << W << ", H: " << H << std::
 	sldrMICGAIN->textsize(12);
 	sldrMICGAIN->callback((Fl_Callback*)cb_sldrMICGAIN);
 	sldrMICGAIN->align(Fl_Align(FL_ALIGN_LEFT));
-	sldrMICGAIN->when(FL_WHEN_CHANGED);
+	sldrMICGAIN->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
 	sldrMICGAIN->reverse(true);
 
 	btnPOWER = new Fl_Light_Button(212, 185, 50, 18, _("Pwr"));
@@ -282,7 +280,7 @@ std::cout << "X: " << X << ", Y: " << Y << ", W: " << W << ", H: " << H << std::
 	sldrPOWER->textsize(12);
 	sldrPOWER->callback((Fl_Callback*)cb_sldrPOWER);
 	sldrPOWER->align(Fl_Align(FL_ALIGN_LEFT));
-	sldrPOWER->when(FL_WHEN_CHANGED);
+	sldrPOWER->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
 	sldrPOWER->reverse(true);
 
 	btnA = new Fl_Light_Button(212, 62, 52, 20, _("vfoA"));
@@ -575,8 +573,6 @@ int gph = 70;
 int gpy = 252;
 int tbh = 55;
 int tby = gpy + 20;
-
-std::cout << "gpy: " << gpy << ", gph: " << gph << std::endl;
 
 	grpTABS = new Fl_Group(0, gpy, small_mainW, gph);
 {
@@ -1271,20 +1267,23 @@ std::cout << "gpy: " << gpy << ", gph: " << gph << std::endl;
 		{
 			genericRx->hide();
 
-			cbo_nb_level = new Fl_ComboBox(12, 281, 80, 22, _("NB level"));
-			cbo_nb_level->tooltip(_("Noise Blanker"));
-			cbo_nb_level->box(FL_DOWN_BOX);
-			cbo_nb_level->color(FL_BACKGROUND_COLOR);
-			cbo_nb_level->selection_color(FL_BACKGROUND_COLOR);
-			cbo_nb_level->labeltype(FL_NORMAL_LABEL);
-			cbo_nb_level->labelfont(0);
-			cbo_nb_level->labelsize(14);
-			cbo_nb_level->labelcolor(FL_FOREGROUND_COLOR);
-			cbo_nb_level->callback((Fl_Callback*)cb_cbo_nb_level);
-			cbo_nb_level->align(Fl_Align(FL_ALIGN_BOTTOM));
-			cbo_nb_level->when(FL_WHEN_RELEASE);
-			cbo_nb_level->index(progStatus.nb_level);
-			cbo_nb_level->end();
+			sldr_nb_level = new Fl_Wheel_Value_Slider(5, 281, 200, 22, _("NB level"));
+			sldr_nb_level->tooltip(_("Noise Blanker level"));
+			sldr_nb_level->type(5);
+			sldr_nb_level->box(FL_THIN_DOWN_BOX);
+			sldr_nb_level->color(FL_BACKGROUND_COLOR);
+			sldr_nb_level->selection_color(FL_BACKGROUND_COLOR);
+			sldr_nb_level->labeltype(FL_NORMAL_LABEL);
+			sldr_nb_level->labelfont(0);
+			sldr_nb_level->labelsize(14);
+			sldr_nb_level->labelcolor(FL_FOREGROUND_COLOR);
+			sldr_nb_level->minimum(0);
+			sldr_nb_level->maximum(0);
+			sldr_nb_level->step(1);
+			sldr_nb_level->callback((Fl_Callback*)cb_sldr_nb_level);
+			sldr_nb_level->align(Fl_Align(FL_ALIGN_BOTTOM));
+			sldr_nb_level->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
+			sldr_nb_level->value(progStatus.nb_level);
 
 //			cbo_agc_level = new Fl_ComboBox(123, 281, 80, 22, _("AGC"));
 //			cbo_agc_level->tooltip(_("AGC level"));
@@ -1464,21 +1463,20 @@ Fl_Double_Window* Small_rig_window() {
 
 	main_group = small_main_group(
 		0, small_menuH,
-		small_mainW, small_mainH);
+		small_mainW, small_mainH - small_menuH);
 
 	grpInitializing = new Fl_Group(
-		0 , small_menuH,
-		small_mainW, btnPTT->y() + btnPTT->h() + 2 - small_menuH, "");
+		main_group->x(), main_group->y(), main_group->w(), main_group->h());
 
 		grpInitializing->box(FL_FLAT_BOX);
-		grpInitializing->color(FL_BACKGROUND_COLOR);
+		grpInitializing->color(FL_LIGHT2);
 
 		progress = new Fl_Progress(
 			small_mainW / 4, grpInitializing->y() + grpInitializing->h() / 2,
 			small_mainW / 2, 20, "Initializing");
 		progress->maximum(100);
 		progress->minimum(0);
-		progress->labelcolor(FL_RED);
+		progress->labelcolor(FL_DARK_RED);
 		progress->labelsize(14);
 		progress->align(Fl_Align(FL_ALIGN_TOP));
 		progress->selection_color(FL_GREEN);
@@ -1486,7 +1484,7 @@ Fl_Double_Window* Small_rig_window() {
 		filler = new Fl_Box(grpInitializing->x(), grpInitializing->y() + grpInitializing->h() - 5,
 							grpInitializing->w(), 4);
 		filler->box(FL_FLAT_BOX);
-		filler->color(FL_WHITE);
+		filler->color(FL_LIGHT2);
 
 		grpInitializing->end();
 	grpInitializing->resizable(filler);

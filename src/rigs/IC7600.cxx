@@ -919,6 +919,7 @@ void RIG_IC7600::set_preamp(int val)
 
 int RIG_IC7600::get_preamp()
 {
+	preamp_level = progStatus.preamp;
 	string cstr = "\x16\x02";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -939,7 +940,7 @@ int RIG_IC7600::get_preamp()
 			}
 		}
 	}
-	return progStatus.preamp = preamp_level;
+	return preamp_level;
 }
 
 int  RIG_IC7600::next_attenuator()
@@ -1085,7 +1086,7 @@ void RIG_IC7600::set_noise_reduction_val(int val)
 
 int RIG_IC7600::get_noise_reduction_val()
 {
-	int val = 0;
+	int val = progStatus.noise_reduction_val;
 	string cstr = "\x14\x06";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -1098,8 +1099,7 @@ int RIG_IC7600::get_noise_reduction_val()
 			val = (int)ceil(fm_bcd(replystr.substr(p+6),3) * 100 / 255);
 	}
 	minmax(0, 100, val);
-	progStatus.noise_reduction_val = val;
-	return progStatus.noise_reduction_val;
+	return val;
 }
 
 void RIG_IC7600::set_squelch(int val)

@@ -63,33 +63,14 @@ XCVR_STATE xmlvfo	= XCVR_STATE(14070000, 0, 0, UI);
 
 XCVR_STATE xcvr_vfoA, xcvr_vfoB;
 
-enum {VOL, MIC, PWR, SQL, IFSH, NOTCH, RFGAIN, NR };
-
-struct SLIDER {
-	int  which;
-	float value;
-	int  button;
-	SLIDER(int a, float f, int b = 0) {which = a; value = f; button = b;}
-};
-
-queue<SLIDER> sliders;
+enum {VOL, MIC, PWR, SQL, IFSH, NOTCH, RFGAIN, NR, NB };
 
 queue<XCVR_STATE> queA;
 queue<XCVR_STATE> queB;
-queue<bool> quePTT;
 
 bool useB = false;
 bool changed_vfo = false;
 //bool pushedB = false;
-
-bool volume_changed = false;
-bool mic_changed = false;
-bool power_changed = false;
-bool squelch_changed = false;
-bool if_shift_changed = false;
-bool notch_changed = false;
-bool rfgain_changed = false;
-bool noise_reduction_changed = false;
 
 const char **old_bws = NULL;
 
@@ -514,29 +495,41 @@ void update_auto_notch(void *d)
 
 void read_auto_notch()
 {
-	if (!selrig->has_auto_notch || notch_changed) return;
+	int val;
+	if (!selrig->has_auto_notch) return;
 	{
 		guard_lock serial_lock(&mutex_serial, 11);
-		progStatus.auto_notch = selrig->get_auto_notch();
+		val = selrig->get_auto_notch();
 	}
-	vfo->auto_notch = progStatus.auto_notch;
-	Fl::awake(update_auto_notch, (void*)0);
+	if (val != progStatus.auto_notch) {
+		progStatus.auto_notch = vfo->auto_notch = val;
+		Fl::awake(update_auto_notch, (void*)0);
+	}
 }
 
 // NOISE blanker
 void update_noise(void *d)
 {
 	btnNOISE->value(progStatus.noise);
+	sldr_nb_level->value(progStatus.nb_level);
 }
+
+bool inhibit_nb_level = false;
 
 void read_noise()
 {
+	int on = 0, val = 0;
+	if (inhibit_nb_level) return;
 	{
 		guard_lock serial_lock(&mutex_serial, 12);
-		progStatus.noise = selrig->get_noise();
+		on = selrig->get_noise();
+		val = selrig->get_nb_level();
 	}
-	vfo->noise = progStatus.noise;
-	Fl::awake(update_noise, (void*)0);
+	if ((on != progStatus.noise) || (val != progStatus.nb_level)) {
+		vfo->noise = progStatus.noise = on;
+		vfo->nb_level = progStatus.nb_level = val;
+		Fl::awake(update_noise, (void*)0);
+	}
 }
 
 // compression
@@ -548,17 +541,17 @@ void update_compression(void *d)
 
 void read_compression()
 {
+	int on; int val;
 	if (selrig->has_compression || selrig->has_compON) {
 		{
 			guard_lock serial_lock(&mutex_serial, 13);
-			int on; int val;
 			selrig->get_compression( on, val );
-			progStatus.compON = on;
-			progStatus.compression = val;
 		}
-		vfo->compression = progStatus.compression;
-		vfo->compON = progStatus.compON;
-		Fl::awake(update_compression, (void*)0);
+		if (on != progStatus.compON || val != progStatus.compression) {
+			vfo->compression = progStatus.compression = val;
+			vfo->compON = progStatus.compON = on;
+			Fl::awake(update_compression, (void*)0);
+		}
 	}
 }
 
@@ -575,21 +568,26 @@ void update_attenuator(void *d)
 
 void read_preamp_att()
 {
+	int val;
 	if (selrig->has_preamp_control) {
 		{
 			guard_lock serial_lock(&mutex_serial, 13);
-			progStatus.preamp = selrig->get_preamp();
+			val = selrig->get_preamp();
 		}
-		vfo->preamp = progStatus.preamp;
-		Fl::awake(update_preamp, (void*)0);
+		if (val != progStatus.preamp) {
+			vfo->preamp = progStatus.preamp = val;
+			Fl::awake(update_preamp, (void*)0);
+		}
 	}
 	if (selrig->has_attenuator_control) {
 		{
 			guard_lock serial_lock(&mutex_serial, 14);
-			progStatus.attenuator = selrig->get_attenuator();
+			val = selrig->get_attenuator();
 		}
-		vfo->attenuator = progStatus.attenuator;
-		Fl::awake(update_attenuator, (void*)0);
+		if (val != progStatus.attenuator) {
+			vfo->attenuator = progStatus.attenuator = val;
+			Fl::awake(update_attenuator, (void*)0);
+		}
 	}
 }
 
@@ -657,9 +655,11 @@ void update_volume(void *d)
 long nlzero = 0L;
 long nlone = 1L;
 
+bool inhibit_volume = false;
 void read_volume()
 {
-	if (!selrig->has_volume_control || volume_changed) return;
+	if (inhibit_volume) return;
+	if (!selrig->has_volume_control) return;
 	int vol;
 	{
 		guard_lock serial_lock(&mutex_serial, 16);
@@ -679,21 +679,26 @@ void read_volume()
 void update_ifshift(void *d)
 {
 	btnIFsh->value(progStatus.shift);
-//	if (progStatus.shift)
 	if (sldrIFSHIFT) sldrIFSHIFT->value(progStatus.shift_val);
 	if (spnrIFSHIFT) spnrIFSHIFT->value(progStatus.shift_val);
 }
 
+bool inhibit_shift = false;
 void read_ifshift()
 {
-	if (!selrig->has_ifshift_control || if_shift_changed) return;
+	int on = 0;
+	int val = 0;
+	if (inhibit_shift) return;
+	if (!selrig->has_ifshift_control) return;
 	{
 		guard_lock serial_lock(&mutex_serial, 17);
-		progStatus.shift = selrig->get_if_shift(progStatus.shift_val);
+		on = selrig->get_if_shift(val);
 	}
-	vfo->if_shift = progStatus.shift;
-	vfo->shift_val = progStatus.shift_val;
-	Fl::awake(update_ifshift, (void*)0);
+	if ((on != progStatus.shift) || (val != progStatus.shift_val)) {
+		vfo->if_shift = progStatus.shift = on;
+		vfo->shift_val = progStatus.shift_val = val;
+		Fl::awake(update_ifshift, (void*)0);
+	}
 }
 
 // noise reduction
@@ -704,22 +709,26 @@ void update_nr(void *d)
 	if (spnrNR) spnrNR->value(progStatus.noise_reduction_val);
 }
 
+bool inhibit_nr = false;
 void read_nr()
 {
-	if (!selrig->has_noise_reduction || noise_reduction_changed) return;
+	int on = 0;
+	int val = 0;
+	if (inhibit_nr) return;
+	if (!selrig->has_noise_reduction) return;
 	{
 		guard_lock serial_lock(&mutex_serial, 18);
-		progStatus.noise_reduction = selrig->get_noise_reduction();
-		progStatus.noise_reduction_val = selrig->get_noise_reduction_val();
+		on = selrig->get_noise_reduction();
+		val = selrig->get_noise_reduction_val();
 	}
-	vfo->nr = progStatus.noise_reduction;
-	vfo->nr_val = progStatus.noise_reduction_val;
-	Fl::awake(update_nr, (void*)0);
+	if ((on != progStatus.noise_reduction) || (val != progStatus.noise_reduction_val)) {
+		vfo->nr = progStatus.noise_reduction = on;
+		vfo->nr_val = progStatus.noise_reduction_val = val;
+		Fl::awake(update_nr, (void*)0);
+	}
 }
 
 // manual notch
-bool rig_notch;
-int  rig_notch_val;
 void update_notch(void *d)
 {
 	btnNotch->value(progStatus.notch);
@@ -727,16 +736,20 @@ void update_notch(void *d)
 	if (spnrNOTCH) spnrNOTCH->value(progStatus.notch_val);
 }
 
+bool inhibit_notch = false;
 void read_notch()
 {
-	if (!selrig->has_notch_control || notch_changed) return;
+	int on = 0;
+	int val = 0;
+	if (inhibit_notch) return;
+	if (!selrig->has_notch_control) return;
 	{
 		guard_lock serial_lock(&mutex_serial, 19);
-		rig_notch = selrig->get_notch(rig_notch_val);
+		on = selrig->get_notch(val);
 	}
-	if (rig_notch != progStatus.notch || rig_notch_val != progStatus.notch_val) {
-		vfo->notch_val = progStatus.notch_val = rig_notch_val;
-		vfo->notch = progStatus.notch = rig_notch;
+	if ((on != progStatus.notch) || (val != progStatus.notch_val)) {
+		vfo->notch_val = progStatus.notch_val = val;
+		vfo->notch = progStatus.notch = on;
 		Fl::awake(update_notch, (void*)0);
 	}
 }
@@ -761,15 +774,20 @@ void update_power_control(void *d)
 	}
 }
 
+bool inhibit_power = false;
 void read_power_control()
 {
-	if (!selrig->has_power_control || power_changed) return;
+	int val;
+	if (inhibit_power) return;
+	if (!selrig->has_power_control) return;
 	{
 		guard_lock serial_lock(&mutex_serial, 20);
-		progStatus.power_level = selrig->get_power_control();
+		val = selrig->get_power_control();
 	}
-	vfo->power_control = progStatus.power_level;
-	Fl::awake(update_power_control, (void*)0);
+	if (val != progStatus.power_level) {
+		vfo->power_control = progStatus.power_level = val;
+		Fl::awake(update_power_control, (void*)0);
+	}
 }
 
 // mic gain
@@ -779,15 +797,32 @@ void update_mic_gain(void *d)
 	if (spnrMICGAIN) spnrMICGAIN->value(progStatus.mic_gain);
 }
 
+bool inhibit_mic = false;
 void read_mic_gain()
 {
-	if (!selrig->has_micgain_control || mic_changed) return;
+	int val;
+	if (inhibit_mic) return;
+	if (!selrig->has_micgain_control) return;
 	{
 		guard_lock serial_lock(&mutex_serial, 21);
-		progStatus.mic_gain = selrig->get_mic_gain();
+		val = selrig->get_mic_gain();
 	}
-	vfo->mic_gain = progStatus.mic_gain;
-	Fl::awake(update_mic_gain, (void*)0);
+	if (val != progStatus.mic_gain) {
+		vfo->mic_gain = progStatus.mic_gain = val;
+		Fl::awake(update_mic_gain, (void*)0);
+	}
+}
+
+void read_agc()
+{
+	int val;
+	if (!selrig->has_agc_control) return;
+	guard_lock serial_lock(&mutex_serial);
+	val = selrig->get_agc();
+	if (val != progStatus.agc_level) {
+		vfo->agc_level = progStatus.agc_level = val;
+		Fl::awake(setAGC);
+	}
 }
 
 // rf gain
@@ -797,22 +832,20 @@ void update_rfgain(void *d)
 	if (spnrRFGAIN) spnrRFGAIN->value(progStatus.rfgain);
 }
 
-void read_agc()
-{
-	if (!selrig->has_agc_control) return;
-	vfo->agc_level = progStatus.agc_level = selrig->get_agc();
-	Fl::awake(setAGC);
-}
-
+bool inhibit_rfgain = false;
 void read_rfgain()
 {
-//	if (!selrig->has_rf_control || rfgain_changed) return;
+	int val;
+	if (inhibit_rfgain) return;
 	if (selrig->has_rf_control) {
 		guard_lock serial_lock(&mutex_serial, 22);
-		vfo->rf_gain = progStatus.rfgain = selrig->get_rf_gain();
-		Fl::awake(update_rfgain, (void*)0);
-		read_agc();
+		val = selrig->get_rf_gain();
+		if (val != progStatus.rfgain) {
+			progStatus.rfgain = val;
+			Fl::awake(update_rfgain, (void*)0);
+		}
 	}
+	read_agc();
 }
 
 // squelch
@@ -822,14 +855,20 @@ void update_squelch(void *d)
 	if (spnrSQUELCH) spnrSQUELCH->value(progStatus.squelch);
 }
 
+bool inhibit_squelch = false;
 void read_squelch()
 {
-	if (!selrig->has_sql_control || squelch_changed) return;
+	int val;
+	if (inhibit_squelch) return;
+	if (!selrig->has_sql_control) return;
 	{
 		guard_lock serial_lock(&mutex_serial, 23);
-		vfo->squelch = progStatus.squelch = selrig->get_squelch();
+		val = selrig->get_squelch();
 	}
-	Fl::awake(update_squelch, (void*)0);
+	if (val != progStatus.squelch) {
+		vfo->squelch = progStatus.squelch = val;
+		Fl::awake(update_squelch, (void*)0);
+	}
 }
 
 struct POLL_PAIR {
@@ -1010,116 +1049,8 @@ end_serviceB:
 	changed_vfo = false;
 }
 
-void servicePTT()
-{
-	if (quePTT.empty()) return;
-
-	guard_lock ptt_lock(&mutex_ptt, 28);
-	while (!quePTT.empty()) {
-		PTT = quePTT.front();
-		quePTT.pop();
-		rigPTT(PTT);
-		Fl::awake(update_UI_PTT);
-	}
-}
-
-int serviceSliders()
-{
-	if (sliders.empty()) return 0;
-
-	SLIDER working(0,0);
-	guard_lock serial_lock(&mutex_serial, 29);
-	while(!sliders.empty()) {
-		working = sliders.front();
-		sliders.pop();
-		switch (working.which) {
-			case VOL:
-				selrig->set_volume_control(working.value);
-				progStatus.volume = working.value;
-				volume_changed = false;
-				break;
-			case MIC:
-				progStatus.mic_gain = working.value;
-				selrig->set_mic_gain(working.value);
-				mic_changed = false;
-				break;
-			case PWR:
-				selrig->set_power_control(working.value);
-				power_changed = false;
-				break;
-			case SQL:
-				progStatus.squelch = working.value;
-				selrig->set_squelch(working.value);
-				squelch_changed = false;
-				break;
-			case IFSH:
-				progStatus.shift = working.button;
-				progStatus.shift_val = working.value;
-				if (xcvr_name == rig_TS990.name_) {
-					if (progStatus.shift)
-						selrig->set_monitor(1);
-					else
-						selrig->set_monitor(0);
-					selrig->set_if_shift(working.value);
-				} else {
-					selrig->set_if_shift(working.value);
-				}
-				if_shift_changed = false;
-				break;
-			case NOTCH:
-				progStatus.notch = working.button;
-				progStatus.notch_val = working.value;
-				selrig->set_notch(working.button, working.value);
-				notch_changed = false;
-				break;
-			case RFGAIN:
-				progStatus.rfgain = working.value;
-				selrig->set_rf_gain(working.value);
-				rfgain_changed = false;
-				break;
-			case NR:
-				if (xcvr_name == rig_TS2000.name_) {
-					if (working.button != -1) { // pia
-						if (selrig->noise_reduction_level() == 0) {
-							selrig->set_noise_reduction(1);
-							selrig->set_noise_reduction_val(selrig->nrval1());
-							progStatus.noise_reduction = 1;
-							progStatus.noise_reduction_val = selrig->nrval1();
-							Fl::awake(update_nr, (void*)0);
-						} else if (selrig->currmode() != RIG_TS2000::FM &&
-								  selrig->noise_reduction_level() == 1) {
-							selrig->set_noise_reduction(2);
-							selrig->set_noise_reduction_val(selrig->nrval2());
-							progStatus.noise_reduction = 2;
-							progStatus.noise_reduction_val = selrig->nrval2();
-							Fl::awake(update_nr, (void*)0);
-						} else
-							selrig->set_noise_reduction(0);
-					} else {
-						progStatus.noise_reduction_val = working.value;
-						selrig->set_noise_reduction_val(working.value);
-						Fl::awake(update_nr, (void*)0);
-					}
-				} else { // not TS2000
-					if (working.button != -1) {
-						progStatus.noise_reduction = working.button;
-						selrig->set_noise_reduction(working.button);
-					}
-					progStatus.noise_reduction_val = working.value;
-					selrig->set_noise_reduction_val(working.value);
-				}
-				noise_reduction_changed = false;
-				break;
-			default :
-				break;
-		}
-	}
-	return 1;
-}
-
 inline bool que_pending()
 {
-	if (!quePTT.empty()) return true;
 	if (!queA.empty()) return true;
 	if (!queB.empty()) return true;
 	return false;
@@ -1146,19 +1077,11 @@ void * serial_thread_loop(void *d)
 			goto serial_bypass_loop;
 		}
 
-		servicePTT();
-
-		if (serviceSliders()) {
-			loopcount = progStatus.serloop_timing / 10;
-			goto serial_bypass_loop;
-		}
-
 //send any freq/mode/bw changes in the queu
 
 		if (!PTT) {
 			serviceA();
-			if (!quePTT.empty())
-				continue;
+
 			serviceB();
 			if (que_pending())
 				continue;
@@ -1211,7 +1134,6 @@ void * serial_thread_loop(void *d)
 				poll_nbr++;
 				poll_parameters = &TX_poll_pairs[0];
 				while (poll_parameters->poll) {
-					if (!quePTT.empty()) break;
 					if (*(poll_parameters->poll) && !(poll_nbr % *(poll_parameters->poll)))
 						(poll_parameters->pollfunc)();
 					poll_parameters++;
@@ -1957,37 +1879,6 @@ void setPreampControl(void *d)
 	btnPreamp->value(val);
 }
 
-void cbNoise()
-{
-	progStatus.noise = btnNOISE->value();
-	guard_lock serial_lock(&mutex_serial, 59);
-	selrig->set_noise(progStatus.noise);
-}
-
-void cbNR()
-{
-	if (!selrig->has_noise_reduction_control) return;
-	noise_reduction_changed = true;
-	if (sldrNR) sliders.push(SLIDER(NR, sldrNR->value(), btnNR->value() ) );
-	if (spnrNR) sliders.push(SLIDER(NR, spnrNR->value(), btnNR->value() ) );
-}
-
-void setNR()
-{
-	if (!selrig->has_noise_reduction_control) return;
-	noise_reduction_changed = true;
-	if (xcvr_name == rig_TS2000.name_ ||
-		xcvr_name == rig_TS590S.name_ ||
-		xcvr_name == rig_TS590SG.name_ ||
-		xcvr_name == rig_TS990.name_) {
-		if (sldrNR) sliders.push(SLIDER(NR, sldrNR->value(), -1 ) );
-		if (spnrNR) sliders.push(SLIDER(NR, spnrNR->value(), -1 ) );
-	} else {
-		if (sldrNR) sliders.push(SLIDER(NR, sldrNR->value(), btnNR->value() ) );
-		if (spnrNR) sliders.push(SLIDER(NR, spnrNR->value(), btnNR->value() ) );
-	}
-}
-
 void cbAN()
 {
 	progStatus.auto_notch = btnAutoNotch->value();
@@ -1998,25 +1889,59 @@ void cbAN()
 void cbbtnNotch()
 {
 	if (!selrig->has_notch_control) return;
-	notch_changed = true;
-	if (sldrNOTCH) sliders.push(SLIDER(NOTCH, sldrNOTCH->value(), btnNotch->value() ));
-	if (spnrNOTCH) sliders.push(SLIDER(NOTCH, spnrNOTCH->value(), btnNotch->value() ));
+	guard_lock serial_lock(&mutex_serial);
+
+	int btn, cnt = 0;
+
+	btn = btnNotch->value();
+	progStatus.notch = btn;
+
+	selrig->set_notch(btn, progStatus.notch_val);
+
+	MilliSleep(progStatus.comm_wait);
+	int on, val;
+	on = selrig->get_notch(val);
+	while ((on != btn) && (cnt++ < 10)) {
+		MilliSleep(progStatus.comm_wait);
+		on = selrig->get_notch(val);
+		Fl::awake();
+	}
 }
 
 void setNotch()
 {
 	if (!selrig->has_notch_control) return;
-	notch_changed = true;
-	if (sldrNOTCH) sliders.push(SLIDER(NOTCH, sldrNOTCH->value(), btnNotch->value() ));
-	if (spnrNOTCH) sliders.push(SLIDER(NOTCH, spnrNOTCH->value(), btnNotch->value() ));
+	guard_lock serial_lock(&mutex_serial);
+
+	if (Fl::event() == FL_DRAG) {
+		inhibit_notch = true;
+		return;
+	}
+	inhibit_notch = false;
+
+	int set = 0, get = 0, cnt = 0;
+	if (sldrNOTCH) {
+		set = sldrNOTCH->value();
+	} else {
+		set = spnrNOTCH->value();
+	}
+	progStatus.notch_val = set;
+	selrig->set_notch(progStatus.notch, set);
+	MilliSleep(progStatus.comm_wait);
+	selrig->get_notch(get);
+	while ((get != set) && (cnt++ < 10)) {
+		MilliSleep(progStatus.comm_wait);
+		selrig->get_notch(get);
+		Fl::awake();
+	}
 }
 
 // called from xml_io thread
+// xcvr updated in xml_io / xml_server code
+// this only updates the dialog controls
+
 void setNotchControl(void *d)
 {
-//	guard_lock serial_lock(&mutex_serial, 61);
-//	selrig->set_notch(progStatus.notch, progStatus.notch_val);
-
 	if (sldrNOTCH) sldrNOTCH->value(progStatus.notch_val);
 	if (spnrNOTCH) spnrNOTCH->value(progStatus.notch_val);
 	btnNotch->value(progStatus.notch);
@@ -2067,16 +1992,66 @@ void setIFshiftControl(void *d)
 
 void setIFshift()
 {
-	if_shift_changed = true;
-	if (sldrIFSHIFT) sliders.push(SLIDER(IFSH, sldrIFSHIFT->value(), btnIFsh->value()));
-	if (spnrIFSHIFT) sliders.push(SLIDER(IFSH, spnrIFSHIFT->value(), btnIFsh->value()));
+	guard_lock serial_lock(&mutex_serial);
+
+	if (Fl::event() == FL_DRAG) {
+		inhibit_shift = true;
+		return;
+	}
+	inhibit_shift = false;
+
+	int btn = 0, set = 0, cnt = 0;
+
+	btn = btnIFsh->value();
+	progStatus.shift = btn;
+
+	if (sldrIFSHIFT) {
+		set = sldrIFSHIFT->value();
+	} else if (spnrIFSHIFT) {
+		set = spnrIFSHIFT->value();
+	}
+	progStatus.shift_val = set;
+
+	if (xcvr_name == rig_TS990.name_) {
+		if (progStatus.shift)
+			selrig->set_monitor(1);
+		else
+			selrig->set_monitor(0);
+	}
+	selrig->set_if_shift(set);
+	MilliSleep(progStatus.comm_wait);
+	int val = 0;
+	selrig->get_if_shift(val);
+	while ((val != set) && (cnt++ < 10)) {
+		MilliSleep(progStatus.comm_wait);
+		selrig->get_if_shift(val);
+		Fl::awake();
+	}
 }
 
 void cbIFsh()
 {
-	if_shift_changed = true;
-	if (sldrIFSHIFT) sliders.push(SLIDER(IFSH, sldrIFSHIFT->value(), btnIFsh->value()));
-	if (spnrIFSHIFT) sliders.push(SLIDER(IFSH, spnrIFSHIFT->value(), btnIFsh->value()));
+	guard_lock serial_lock(&mutex_serial);
+
+	int btn, set, cnt = 0;
+	if (sldrIFSHIFT) {
+		set = sldrIFSHIFT->value();
+		btn = btnIFsh->value();
+	} else {
+		set = spnrIFSHIFT->value();
+		btn = btnIFsh->value();
+	}
+	if (btn == 0) set = 0;
+
+	selrig->set_if_shift(set);
+	MilliSleep(progStatus.comm_wait);
+	int val, on;
+	on = selrig->get_if_shift(val);
+	while ((on != btn) && (cnt++ < 10)) {
+		MilliSleep(progStatus.comm_wait);
+		on = selrig->get_if_shift(val);
+		Fl::awake();
+	}
 }
 
 void cbEventLog()
@@ -2086,39 +2061,90 @@ void cbEventLog()
 
 void setVolume()
 {
-	volume_changed = true;
-	if (spnrVOLUME) sliders.push(SLIDER(VOL, spnrVOLUME->value()));
-	if (sldrVOLUME) sliders.push(SLIDER(VOL, sldrVOLUME->value()));
+	guard_lock serial_lock(&mutex_serial);
+
+	int event = Fl::event();
+	if (event == FL_DRAG) {
+		inhibit_volume = true;
+		return;
+	}
+	inhibit_volume = false;
+
+	int set, get, cnt = 0;
+	if (spnrVOLUME) set = spnrVOLUME->value();
+	else set = sldrVOLUME->value();
+
+	selrig->set_volume_control(set);
+	MilliSleep(progStatus.comm_wait);
+	get = selrig->get_volume_control();
+	while (get != set && cnt++ < 10) {
+		MilliSleep(progStatus.comm_wait);
+		get = selrig->get_volume_control();
+		Fl::awake();
+	}
+	progStatus.volume = set;
 }
 
 void cbMute()
 {
-	volume_changed = true;
+	guard_lock serial_lock(&mutex_serial);
+
+	int set = 0, get, cnt = 0;
 	if (btnVol->value() == 0) {
 		if (spnrVOLUME) spnrVOLUME->deactivate();
 		if (sldrVOLUME) sldrVOLUME->deactivate();
-		sliders.push(SLIDER(VOL, 0));
 	} else {
 		if (spnrVOLUME) {
 			spnrVOLUME->activate();
-			sliders.push(SLIDER(VOL, spnrVOLUME->value()));
+			set = spnrVOLUME->value();
 		}
 		if (sldrVOLUME) {
 			sldrVOLUME->activate();
-			sliders.push(SLIDER(VOL, sldrVOLUME->value()));
+			set = sldrVOLUME->value();
 		}
 	}
+	selrig->set_volume_control(set);
+	MilliSleep(progStatus.comm_wait);
+	get = selrig->get_volume_control();
+	while (get != set && cnt++ < 10) {
+		MilliSleep(progStatus.comm_wait);
+		get = selrig->get_volume_control();
+		Fl::awake();
+	}
+	progStatus.volume = set;
 }
 
 void setMicGain()
 {
-	mic_changed = true;
-	if (sldrMICGAIN) sliders.push(SLIDER(MIC, sldrMICGAIN->value()));
-	if (spnrMICGAIN) sliders.push(SLIDER(MIC, spnrMICGAIN->value()));
+	guard_lock serial_lock(&mutex_serial);
+
+	if (Fl::event() == FL_DRAG) {
+		inhibit_mic = true;
+		return;
+	}
+	inhibit_mic = false;
+
+	int set = 0, get = 0, cnt = 0;
+
+	if (sldrMICGAIN) set = sldrMICGAIN->value();
+	if (spnrMICGAIN) set = spnrMICGAIN->value();
+
+	progStatus.mic_gain = set;
+	selrig->set_mic_gain(set);
+	MilliSleep(progStatus.comm_wait);
+
+	get = selrig->get_mic_gain();
+	while ((get != set) && (cnt++ < 10)) {
+		MilliSleep(progStatus.comm_wait);
+		get = selrig->get_mic_gain();
+		Fl::awake();
+	}
+
 }
 
 void setMicGainControl(void* d)
 {
+	guard_lock serial_lock(&mutex_serial);
 	int val = (long)d;
 	if (sldrMICGAIN) sldrMICGAIN->value(val);
 	if (spnrMICGAIN) spnrMICGAIN->value(val);
@@ -2178,9 +2204,19 @@ void set_power_controlImage(double pwr)
 
 void setPower()
 {
-	float pwr = 0;
-	if (spnrPOWER) pwr = progStatus.power_level = spnrPOWER->value();
-	if (sldrPOWER) pwr = progStatus.power_level = sldrPOWER->value();
+	guard_lock serial_lock(&mutex_serial);
+
+	if (Fl::event() == FL_DRAG) {
+		inhibit_power = true;
+		return;
+	}
+	inhibit_power = false;
+
+	int set = 0, get = 0, cnt = 0;
+
+	if (spnrPOWER) set = progStatus.power_level = spnrPOWER->value();
+	if (sldrPOWER) set = progStatus.power_level = sldrPOWER->value();
+
 	if (xcvr_name == rig_K2.name_) {
 		double min, max, step;
 		selrig->get_pc_min_max_step(min, max, step);
@@ -2195,9 +2231,15 @@ void setPower()
 		if (sldrPOWER) sldrPOWER->value(progStatus.power_level);
 		if (sldrPOWER) sldrPOWER->redraw();
 	}
-	power_changed = true;
-	sliders.push(SLIDER(PWR, progStatus.power_level));
-	set_power_controlImage(pwr);
+
+	selrig->set_power_control(set);
+	MilliSleep(progStatus.comm_wait);
+	get = selrig->get_power_control();
+	while (get != set && cnt++ < 10) {
+		MilliSleep(progStatus.comm_wait);
+		get = selrig->get_power_control();
+		Fl::awake();
+	}
 }
 
 void cbTune()
@@ -2208,25 +2250,39 @@ void cbTune()
 
 void cbPTT()
 {
-	guard_lock ptt_lock(&mutex_ptt, 63);
-	quePTT.push(btnPTT->value());
+	setPTT(reinterpret_cast<void *>(btnPTT->value()));
 }
 
 void setSQUELCH()
 {
-	squelch_changed = true;
-	if (sldrSQUELCH) sliders.push(SLIDER(SQL, sldrSQUELCH->value() ));
-	if (spnrSQUELCH) sliders.push(SLIDER(SQL, spnrSQUELCH->value() ));
-}
+	guard_lock serial_lock(&mutex_serial);
 
-// val == 0 --> AGC off
-// val > 1  --> AGC active and set
+	if (Fl::event() == FL_DRAG) {
+		inhibit_squelch = true;
+		return;
+	}
+	inhibit_squelch = false;
+
+	int set = 0, get = 0, cnt = 0;
+	if (sldrSQUELCH) set = sldrSQUELCH->value();
+	if (spnrSQUELCH) set = spnrSQUELCH->value();
+
+	progStatus.squelch = set;
+	selrig->set_squelch(set);
+	MilliSleep(progStatus.comm_wait);
+	get = selrig->get_squelch();
+	while (get != set && cnt++ < 10) {
+		MilliSleep(progStatus.comm_wait);
+		get = selrig->get_squelch();
+		Fl::awake();
+	}
+}
 
 int agcwas = 0;
 void redrawAGC()
 {
 	const char *lbl = selrig->agc_label();
-	int val = selrig->agc_val();
+	int val = progStatus.agc_level;
 
 	btnAGC->label(lbl);
 	btnAGC->redraw_label();
@@ -2272,9 +2328,28 @@ void cbAGC()
 
 void setRFGAIN()
 {
-	rfgain_changed = true;
-	if (spnrRFGAIN) sliders.push(SLIDER(RFGAIN, spnrRFGAIN->value()));
-	if (sldrRFGAIN) sliders.push(SLIDER(RFGAIN, sldrRFGAIN->value()));
+	guard_lock serial_lock(&mutex_serial);
+
+	if (Fl::event() == FL_DRAG) {
+		inhibit_rfgain = true;
+		return;
+	}
+	inhibit_rfgain = false;
+
+	int set = 0, get = 0, cnt = 0;
+
+	if (spnrRFGAIN) set = spnrRFGAIN->value();
+	if (sldrRFGAIN) set = sldrRFGAIN->value();
+
+	progStatus.rfgain = set;
+	selrig->set_rf_gain(set);
+	MilliSleep(progStatus.comm_wait);
+	get = selrig->get_rf_gain();
+	while ((get != set) && (cnt++ < 10)) {
+		MilliSleep(progStatus.comm_wait);
+		get = selrig->get_rf_gain();
+		Fl::awake();
+	}
 }
 
 
@@ -2284,6 +2359,7 @@ void updateALC(void * d)
 	double data = (long)d;
 	sldrRcvSignal->hide();
 	sldrSWR->hide();
+	sldrALC->show();
 	sldrALC->value(data);
 	sldrALC->redraw();
 }
@@ -2393,9 +2469,20 @@ void saveFreqList()
 
 void setPTT( void *d)
 {
-	int val = (long)d;
+	int set = (long)d;
+	int get, cnt = 0;
+	rigPTT(set);
+
 	guard_lock ptt_lock(&mutex_ptt, 64);
-	quePTT.push(val);
+	MilliSleep(10);
+	get = selrig->get_PTT();
+	while ((get != set) && (cnt++ < 10)) {
+		MilliSleep(10);
+		get = selrig->get_PTT();
+		Fl::awake();
+	}
+	PTT = set;
+	Fl::awake(update_UI_PTT);
 }
 
 void update_progress(void *d)
@@ -2453,9 +2540,12 @@ void restore_rig_vals_(XCVR_STATE &xcvrvfo)
 
 	Fl::awake(update_progress, (void*)(restore_progress += 10));
 
-	if (progStatus.restore_comp_on_off || progStatus.restore_comp_level) {
+	if (progStatus.restore_comp_on_off && progStatus.restore_comp_level)
 		selrig->set_compression(xcvrvfo.compON, xcvrvfo.compression);
-	}
+	else if (progStatus.restore_comp_on_off)
+		selrig->set_compression(xcvrvfo.compON, progStatus.compression);
+	else if (progStatus.restore_comp_level)
+		selrig->set_compression(progStatus.compON, xcvrvfo.compression);
 
 }
 
@@ -2604,13 +2694,7 @@ void read_rig_vals_(XCVR_STATE &xcvrvfo)
 
 	if (selrig->has_compression || selrig->has_compON) {
 
-		if (progStatus.restore_comp_on_off || progStatus.restore_comp_level) {
-			int on;
-			int val;
-			selrig->get_compression( on, val);
-			xcvrvfo.compON = on;
-			xcvrvfo.compression = val;
-		}
+		selrig->get_compression( xcvrvfo.compON, xcvrvfo.compression );
 
 		if (selrig->has_compON)
 			btnRestoreCompOnOff->activate();
@@ -2623,11 +2707,10 @@ void read_rig_vals_(XCVR_STATE &xcvrvfo)
 			btnRestoreCompLevel->deactivate();
 
 	} else {
-
 		btnRestoreCompOnOff->deactivate();
 		btnRestoreCompLevel->deactivate();
-
 	}
+
 	progress->value(progress->value() + 10);
 	progress->redraw();
 	Fl::check();
@@ -2670,6 +2753,11 @@ void read_rig_vals()
 
 	read_rig_vals_(xcvr_vfoA);
 
+	if (selrig->has_agc_control) {
+		progStatus.agc_level = selrig->get_agc();
+		redrawAGC();
+	}
+
 	if (RIG_DEBUG) {
 		LOG_INFO("Read xcvr A:\n%s", print(xcvr_vfoA));
 		std::cout << "Read xcvr A:\n" << print(xcvr_vfoA) << std::endl;
@@ -2678,8 +2766,6 @@ void read_rig_vals()
 
 void close_UI(void *)
 {
-//std::cout << "close_UI(void *)" << std::endl;
-	
 	{
 		guard_lock serial_lock(&mutex_serial, 67);
 		run_serial_thread = false;
@@ -2708,8 +2794,6 @@ void close_UI(void *)
 bool exiting = false;
 void closeRig()
 {
-//std::cout << "closeRig()" << std::endl;
-
 	restore_rig_vals();
 	selrig->shutdown();
 	close_rig = false;
@@ -2720,7 +2804,6 @@ void closeRig()
 
 void cbExit()
 {
-//std::cout << "cbExit()" << std::endl;
 	progress->label("Closing");
 	progress->redraw_label();
 	grpInitializing->resize(0, 0, mainwindow->w(), mainwindow->h());
@@ -3325,7 +3408,7 @@ void initXcvrTab()
 			spnr_cw_weight->step(step);
 			spnr_cw_weight->value(progStatus.cw_weight);
 			spnr_cw_weight->activate();
-		} 
+		}
 		else spnr_cw_weight->deactivate();
 
 		if (selrig->has_cw_keyer) {
@@ -3419,9 +3502,9 @@ void initXcvrTab()
 			spnr_compression->deactivate();
 
 		if (selrig->has_nb_level)
-			cbo_nb_level->activate();
+			sldr_nb_level->activate();
 		else
-			cbo_nb_level->deactivate();
+			sldr_nb_level->deactivate();
 
 		if (selrig->has_bpf_center) {
 			spnr_bpf_center->value(progStatus.bpf_center);
@@ -3584,10 +3667,6 @@ void init_generic_rig()
 			vfoA = xcvr_vfoA;
 			vfoB = xcvr_vfoB;
 		}
-//		 else {
-//			xcvr_vfoA = vfoA;
-//			xcvr_vfoB = vfoB;
-//		}
 
 		if (useB) {
 			selrig->selectB();
@@ -3602,11 +3681,9 @@ void init_generic_rig()
 			vfoA = xcvr_vfoA;
 			vfoB = xcvr_vfoB;
 		}
-//		 else {
-//			xcvr_vfoA = vfoA;
-//			xcvr_vfoB = vfoB;
-//		}
 	}
+	progStatus.compON = xcvr_vfoA.compON;
+	progStatus.compression = xcvr_vfoA.compression;
 
 	vfo = &vfoA;
 
@@ -4249,6 +4326,7 @@ void init_preamp_control()
 
 void init_noise_control()
 {
+	int min, max, step;
 	if (selrig->has_noise_control) {
 		if (xcvr_name == rig_TS990.name_) {
 			btnNOISE->label("AGC"); //Set TS990 AGC Label
@@ -4259,23 +4337,21 @@ void init_noise_control()
 		else
 			selrig->set_noise(progStatus.noise);
 		btnNOISE->value(progStatus.noise);
-		switch (progStatus.UIsize) {
-			case small_ui :
-				btnNOISE->show();
-				break;
-			case wide_ui : case touch_ui : default :
-				btnNOISE->activate();
-		}
+		btnNOISE->activate();
 	}
-	else {
-		switch (progStatus.UIsize) {
-			case small_ui :
-				btnNOISE->hide();
-				break;
-			case wide_ui : case touch_ui : default :
-				btnNOISE->deactivate();
-		}
-	}
+	else
+		btnNOISE->deactivate();
+
+	if (selrig->has_nb_level) {
+		selrig->get_nb_min_max_step(min, max, step);
+		sldr_nb_level->minimum(min);
+		sldr_nb_level->maximum(max);
+		sldr_nb_level->step(step);
+		sldr_nb_level->value(progStatus.nb_level);
+		sldr_nb_level->activate();
+		sldr_nb_level->redraw();
+	} else
+		sldr_nb_level->deactivate();
 }
 
 void init_tune_control()
@@ -4858,33 +4934,6 @@ void auto_notch_label(const char * l, bool on = false)
 	auto_notch_state_ = on;
 	Fl::awake(do_auto_notch_label);
 }
-//----------------------------------------------------------------------
-// dynamic reassignment of IF shift range based on Bandwidth selection
-// only used by Icom transceivers with Inner/Outer passband controls
-
-int if_shift_bw_ = 0;
-
-void do_if_shift_range(void *)
-{
-	if (sldrIFSHIFT) sldrIFSHIFT->minimum(-if_shift_bw_);
-	if (sldrIFSHIFT) sldrIFSHIFT->maximum(if_shift_bw_);
-	if (sldrIFSHIFT) sldrIFSHIFT->step(50);
-	if (sldrIFSHIFT) sldrIFSHIFT->value(0);
-	if (sldrIFSHIFT) sldrIFSHIFT->redraw();
-	if (spnrIFSHIFT) spnrIFSHIFT->minimum(-if_shift_bw_);
-	if (spnrIFSHIFT) spnrIFSHIFT->maximum(if_shift_bw_);
-	if (spnrIFSHIFT) spnrIFSHIFT->step(50);
-	if (spnrIFSHIFT) spnrIFSHIFT->value(0);
-	if (spnrIFSHIFT) spnrIFSHIFT->redraw();
-}
-
-void if_shift_range(int bw)
-{
-	if_shift_bw_ = bw / 2;
-	Fl::awake(do_if_shift_range);
-}
-
-//----------------------------------------------------------------------
 
 void cbAuxPort()
 {
@@ -4906,8 +4955,8 @@ void cb_cw_wpm()
 
 void cb_cw_vol()
 {
-//	guard_lock serial_lock(&mutex_serial);
-//		selrig->set_cw_vol();
+	guard_lock serial_lock(&mutex_serial);
+		selrig->set_cw_vol();
 }
 
 void cb_cw_spot()
@@ -4994,11 +5043,169 @@ void cb_special()
 	selrig->set_special(btnSpecial->value());
 }
 
+void cbNoise()
+{
+	guard_lock serial_lock(&mutex_serial);
+
+	int btn, get, cnt = 0;
+
+	btn = progStatus.noise = btnNOISE->value();
+
+	selrig->set_noise(btn);
+	MilliSleep(progStatus.comm_wait);
+	get = selrig->get_noise();
+	while ((get != btn) && (cnt++ < 10)) {
+		MilliSleep(progStatus.comm_wait);
+		get = selrig->get_noise();
+		Fl::awake();
+	}
+}
+
 void cb_nb_level()
 {
-	guard_lock serial_lock(&mutex_serial, 86);
-	progStatus.nb_level = cbo_nb_level->index();
-	selrig->set_nb_level();
+
+	if (!selrig->has_nb_level) return;
+	int set = 0, get, cnt = 0;
+
+	guard_lock serial_lock(&mutex_serial);
+
+	if (Fl::event() == FL_DRAG) {
+		inhibit_nb_level = true;
+		return;
+	}
+	inhibit_nb_level = false;
+
+	set = sldr_nb_level->value();
+
+	progStatus.nb_level = set;
+	selrig->set_nb_level(set);
+	MilliSleep(progStatus.comm_wait);
+	get = selrig->get_nb_level();
+	while ((get != set) && (cnt++ < 10)) {
+		MilliSleep(progStatus.comm_wait);
+		get = selrig->get_nb_level();
+		Fl::awake();
+	}
+}
+
+void cbNR()
+{
+	if (!selrig->has_noise_reduction_control) return;
+	guard_lock serial_lock(&mutex_serial);
+
+	int btn = 0, set = 0, get, cnt = 0;
+	if (sldrNR) {
+		set = sldrNR->value();
+		btn = btnNR->value();
+	}
+	if (spnrNR) {
+		set = spnrNR->value();
+		btn = btnNR->value();
+	}
+
+	if (xcvr_name == rig_TS2000.name_) {
+		if (btn != -1) { // pia
+			if (selrig->noise_reduction_level() == 0) {
+				selrig->set_noise_reduction(1);
+				selrig->set_noise_reduction_val(selrig->nrval1());
+				progStatus.noise_reduction = 1;
+				progStatus.noise_reduction_val = selrig->nrval1();
+			} else if (selrig->currmode() != RIG_TS2000::FM &&
+					  selrig->noise_reduction_level() == 1) {
+				selrig->set_noise_reduction(2);
+				selrig->set_noise_reduction_val(selrig->nrval2());
+				progStatus.noise_reduction = 2;
+				progStatus.noise_reduction_val = selrig->nrval2();
+			} else
+				selrig->set_noise_reduction(0);
+		} else {
+			progStatus.noise_reduction_val = set;
+			selrig->set_noise_reduction_val(set);
+		}
+	} else { // not TS2000
+
+		progStatus.noise_reduction = btn;
+
+		selrig->set_noise_reduction(btn);
+		MilliSleep(progStatus.comm_wait);
+
+		get = selrig->get_noise_reduction();
+		while ((get != btn) && (cnt++ < 10)) {
+			MilliSleep(progStatus.comm_wait);
+			get = selrig->get_noise_reduction();
+			Fl::awake();
+		}
+		progStatus.noise_reduction_val = set;
+		selrig->set_noise_reduction_val(set);
+		MilliSleep(progStatus.comm_wait);
+		get = selrig->get_noise_reduction_val();
+		cnt = 0;
+		while ((get != set) && (cnt++ < 10)) {
+			MilliSleep(progStatus.comm_wait);
+			get = selrig->get_noise_reduction_val();
+			Fl::awake();
+		}
+	}
+
+}
+
+void setNR()
+{
+	if (!selrig->has_noise_reduction_control) return;
+	guard_lock serial_lock(&mutex_serial);
+
+	int btn = 0, get = 0, set = 0, cnt = 0;
+
+	if (Fl::event() == FL_DRAG) {
+		inhibit_nr = true;
+		return;
+	}
+	inhibit_nr = false;
+
+	if (xcvr_name == rig_TS2000.name_ ||
+		xcvr_name == rig_TS590S.name_ ||
+		xcvr_name == rig_TS590SG.name_ ||
+		xcvr_name == rig_TS990.name_) {
+		if (sldrNR) {
+			set = sldrNR->value();
+			btn = -1;
+		}
+		if (spnrNR) {
+			set = spnrNR->value();
+			btn = -1;
+		}
+	} else {
+		if (sldrNR) {
+			set = sldrNR->value();
+			btn = btnNR->value();
+		}
+		if (spnrNR) {
+			set = spnrNR->value();
+			btn = btnNR->value();
+		}
+	}
+
+	progStatus.noise_reduction = btn;
+	selrig->set_noise_reduction(btn);
+	MilliSleep(progStatus.comm_wait);
+	get = selrig->get_noise_reduction();
+	while ((get != btn) && (cnt++ < 10)) {
+		MilliSleep(progStatus.comm_wait);
+		get = selrig->get_noise_reduction();
+		Fl::awake();
+	}
+	progStatus.noise_reduction_val = set;
+	selrig->set_noise_reduction_val(set);
+	MilliSleep(progStatus.comm_wait);
+
+	get = selrig->get_noise_reduction_val();
+	cnt = 0;
+	while ((get != set) && (cnt++ < 10)) {
+		MilliSleep(progStatus.comm_wait);
+		get = selrig->get_noise_reduction_val();
+		Fl::awake();
+	}
+
 }
 
 void cb_spot()

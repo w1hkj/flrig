@@ -264,6 +264,15 @@ int RIG_IC718::get_noise()
 	return 0;
 }
 
+void RIG_IC718::set_nb_level(int val)
+{
+}
+
+int  RIG_IC718::get_nb_level()
+{
+	return 0;
+}
+
 void RIG_IC718::set_noise_reduction(int val)
 {
 	cmd = pre_to;

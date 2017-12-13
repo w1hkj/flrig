@@ -44,7 +44,6 @@
 
 extern queue<XCVR_STATE> queA;
 extern queue<XCVR_STATE> queB;
-extern queue<bool> quePTT;
 
 void read_KX3()
 {
@@ -64,8 +63,6 @@ void read_KX3()
 			Fl::awake(setFreqDispB, (void *)vfoB.freq);
 		}
 	}
-	if (!quePTT.empty())
-		return;
 
 	if (progStatus.poll_mode) {
 		int nu_mode;
@@ -81,8 +78,6 @@ void read_KX3()
 			vfoB.imode = nu_mode;
 		}
 	}
-	if (!quePTT.empty())
-		return;
 
 	if (progStatus.poll_bandwidth) {
 		int nu_BW;

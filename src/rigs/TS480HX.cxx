@@ -114,11 +114,6 @@ void RIG_TS480HX::initialize()
 	rig_widgets[6].W = sldrMICGAIN;
 	rig_widgets[7].W = sldrPOWER;
 
-	if (progStatus.UIsize == small_ui) has_extras = false;
-	progStatus.rfgain = 100;
-	progStatus.volume = 25;
-	progStatus.power_level = 20;
-	progStatus.mic_gain = 25;
 	check_menu_45();
 };
 

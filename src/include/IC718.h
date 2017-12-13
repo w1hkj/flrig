@@ -57,6 +57,9 @@ public:
 
 	void set_noise(bool val);
 	int  get_noise();
+	void set_nb_level(int val);
+	int  get_nb_level();
+
 	void set_noise_reduction(int val);
 	int  get_noise_reduction();
 	void set_noise_reduction_val(int val);

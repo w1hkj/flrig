@@ -169,6 +169,8 @@ RIG_IC7300::RIG_IC7300() {
 	has_preamp_control = true;
 
 	has_noise_control = true;
+	has_nb_level = true;
+
 	has_noise_reduction = true;
 	has_noise_reduction_control = true;
 
@@ -183,6 +185,8 @@ RIG_IC7300::RIG_IC7300() {
 
 	precision = 1;
 	ndigits = 8;
+
+	has_vfo_adj = true;
 
 };
 
@@ -445,8 +449,6 @@ int RIG_IC7300::get_bwA()
 	}
 	if (bwval != A.iBW) {
 		A.iBW = bwval;
-		int bw = atoi(bandwidths_[A.iBW]);
-		if_shift_range(bw);
 	}
 	return A.iBW;
 }
@@ -461,8 +463,6 @@ void RIG_IC7300::set_bwA(int val)
 	cmd.append(to_bcd(A.iBW, 2));
 	cmd.append(post);
 	waitFB("set bwA");
-	int bw = atoi(bandwidths_[A.iBW]);
-	if_shift_range(bw);
 }
 
 int RIG_IC7300::get_bwB()
@@ -481,8 +481,6 @@ int RIG_IC7300::get_bwB()
 	}
 	if (bwval != B.iBW) {
 		B.iBW = bwval;
-		int bw = atoi(bandwidths_[B.iBW]);
-		if_shift_range(bw);
 	}
 	return B.iBW;
 }
@@ -497,8 +495,6 @@ void RIG_IC7300::set_bwB(int val)
 	cmd.append(to_bcd(B.iBW, 2));
 	cmd.append(post);
 	waitFB("set bwB");
-	int bw = atoi(bandwidths_[B.iBW]);
-	if_shift_range(bw);
 }
 
 // LSB  USB  AM   FM   CW  CW-R  RTTY  RTTY-R  LSB-D  USB-D  AM-D  FM-D
@@ -600,53 +596,51 @@ void RIG_IC7300::get_mic_gain_min_max_step(int &min, int &max, int &step)
 	step = 1;
 }
 
+static int comp_level[] = {11,34,58,81,104,128,151,174,197,221,244};
 void RIG_IC7300::set_compression(int on, int val)
 {
-	if (on) {
-		cmd = pre_to;
-		cmd.append("\x16\x44");
-		cmd += '\x01';
-		cmd.append(post);
-		waitFB("set Comp ON");
+	cmd = pre_to;
+	cmd.append("\x16\x44");
+	if (on) cmd += '\x01';
+	else cmd += '\x00';
+	cmd.append(post);
+	waitFB("set Comp ON/OFF");
 
-		cmd.assign(pre_to).append("\x14\x0E");
-		cmd.append(to_bcd(val * 255 / 10, 3));
-		cmd.append( post );
-		waitFB("set comp");
+	if (val < 0) return;
+	if (val > 10) return;
 
-	} else{
-		cmd.assign(pre_to).append("\x16\x44");
-		cmd += '\x00';
-		cmd.append(post);
-		waitFB("set Comp OFF");
-	}
+	cmd.assign(pre_to).append("\x14\x0E");
+	cmd.append(to_bcd(comp_level[val], 3));
+	cmd.append( post );
+	waitFB("set comp");
 }
 
 void RIG_IC7300::get_compression(int &on, int &val)
 {
 	std::string resp;
-	on = 0; val = 0;
 
 	cmd.assign(pre_to).append("\x16\x44").append(post);
+
 	resp.assign(pre_fm).append("\x16\x44");
+
 	if (waitFOR(8, "get comp on/off")) {
 		size_t p = replystr.find(resp);
 		if (p != string::npos)
-			on = replystr[p+6];
+			on = (replystr[p+6] == 0x01);
 	}
-	if (on) {
-		cmd.assign(pre_to).append("\x14\x0E").append(post);
-		resp.assign(pre_fm).append("\x14\x0E");
 
-		cmd.append(post);
-		if (waitFOR(9, "get comp level")) {
-			size_t p = replystr.find(resp);
-			if (p != string::npos)
-				val = fm_bcd(replystr.substr(p+6), 3) * 10 / 255;
+	cmd.assign(pre_to).append("\x14\x0E").append(post);
+	resp.assign(pre_fm).append("\x14\x0E");
+
+	if (waitFOR(9, "get comp level")) {
+		size_t p = replystr.find(resp);
+		int level = 0;
+		if (p != string::npos) {
+			level = fm_bcd(replystr.substr(p+6), 3);
+			for (val = 0; val < 11; val++)
+				if (level <= comp_level[val]) break;
 		}
 	}
-
-	return;
 }
 
 void RIG_IC7300::set_vox_onoff()
@@ -863,8 +857,7 @@ int RIG_IC7300::get_power_control()
 		if (p != string::npos)
 			val = num100(replystr.substr(p+6));
 	}
-	progStatus.power_level = val;
-	return (progStatus.power_level);
+	return val;
 }
 
 void RIG_IC7300::get_pc_min_max_step(double &min, double &max, double &step)
@@ -996,8 +989,7 @@ int RIG_IC7300::get_rf_gain()
 		if (p != string::npos)
 			val = num100(replystr.substr(p + 6));
 	}
-	progStatus.rfgain = val;
-	return (progStatus.rfgain);
+	return val;
 }
 
 void RIG_IC7300::get_rf_min_max_step(double &min, double &max, double &step)
@@ -1137,17 +1129,9 @@ void RIG_IC7300::set_noise(bool val)
 	waitFB("set noise");
 }
 
-
-/*
-
-I:12:06:50: get noise ans in 0 ms, OK
-cmd FE FE 7A E0 16 22 FD
-ans FE FE 7A E0 16 22 FD FE FE E0 7A 16 22 00 FD
-
-*/
-
 int RIG_IC7300::get_noise()
 {
+	int val = progStatus.noise;
 	string cstr = "\x16\x22";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -1156,10 +1140,37 @@ int RIG_IC7300::get_noise()
 	cmd.append(post);
 	if (waitFOR(8, "get noise")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			return (replystr[p+6] ? 1 : 0);
+		if (p != string::npos) {
+			val = replystr[p+6];
+		}
 	}
-	return progStatus.noise;
+	return val;
+}
+
+void RIG_IC7300::set_nb_level(int val)
+{
+	cmd = pre_to;
+	cmd.append("\x14\x12");
+	cmd.append(bcd255(val));
+	cmd.append( post );
+	waitFB("set NB level");
+}
+
+int  RIG_IC7300::get_nb_level()
+{
+	int val = progStatus.nb_level;
+	string cstr = "\x14\x12";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append(post);
+	if (waitFOR(9, "get NB level")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			val = num100(replystr.substr(p+6));
+	}
+	return val;
 }
 
 void RIG_IC7300::set_noise_reduction(int val)
@@ -1216,7 +1227,7 @@ void RIG_IC7300::set_noise_reduction_val(int val)
 
 int RIG_IC7300::get_noise_reduction_val()
 {
-	int val = 0;
+	int val = progStatus.noise_reduction_val;
 	string cstr = "\x14\x06";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -1257,8 +1268,7 @@ int  RIG_IC7300::get_squelch()
 		if (p != string::npos)
 			val = num100(replystr.substr(p+6));
 	}
-	progStatus.squelch = val;
-	return (progStatus.squelch);
+	return val;
 }
 
 void RIG_IC7300::set_auto_notch(int val)
@@ -1308,14 +1318,11 @@ void RIG_IC7300::set_notch(bool on, int val)
 		waitFB("set notch");
 		IC7300_notchon = on;
 	}
-
-	if (on) {
-		cmd = pre_to;
-		cmd.append("\x14\x0D");
-		cmd.append(to_bcd(notch,3));
-		cmd.append(post);
-		waitFB("set notch val");
-	}
+	cmd = pre_to;
+	cmd.append("\x14\x0D");
+	cmd.append(to_bcd(notch,3));
+	cmd.append(post);
+	waitFB("set notch val");
 }
 
 bool RIG_IC7300::get_notch(int &val)
@@ -1397,26 +1404,16 @@ int  RIG_IC7300::agc_val()
 	return (agcval);
 }
 
-static bool shift_was_on = false;
-
-extern int if_shift_bw_;
-
 void RIG_IC7300::set_if_shift(int val)
 {
-	progStatus.shift_val = val;
-
 	int shift;
-	if (if_shift_bw_ == 0) shift = 128;
-	else shift = (val + if_shift_bw_) * 128 / if_shift_bw_;
-	if (shift == 256) shift = 255;
+	sh_ = val;
+	if (val == 0) sh_on_ = false;
+	else sh_on_ = true;
+
+	shift = 128 + val * 128 / 50;
 	if (shift < 0) shift = 0;
-
-	if (!progStatus.shift && !shift_was_on) return;
-	shift_was_on = progStatus.shift;
-
-	if (!progStatus.shift && shift == 128) return;
-
-	if (!progStatus.shift) shift = 128;
+	if (shift > 255) shift = 255;
 
 	cmd = pre_to;
 	cmd.append("\x14\x07");
@@ -1431,6 +1428,11 @@ void RIG_IC7300::set_if_shift(int val)
 	waitFB("set IF val");
 }
 
+bool RIG_IC7300::get_if_shift(int &val) {
+	val = sh_;
+	return sh_on_;
+}
+
 void RIG_IC7300::get_if_min_max_step(int &min, int &max, int &step)
 {
 	min = -50;
@@ -1438,7 +1440,31 @@ void RIG_IC7300::get_if_min_max_step(int &min, int &max, int &step)
 	step = 1;
 }
 
-bool RIG_IC7300::get_if_shift(int &val) {
-	val = progStatus.shift_val;
-	return progStatus.shift;
+void RIG_IC7300::setVfoAdj(double v)
+{
+	vfo_ = v;
+	cmd.assign(pre_to);
+	cmd.append("\x1A\x05");
+	cmd += '\x00';
+	cmd += '\x58';
+	cmd.append(bcd255(int(v)));
+	cmd.append(post);
+	waitFB("SET vfo adjust");
+}
+
+double RIG_IC7300::getVfoAdj()
+{
+	cmd.assign(pre_to);
+	cmd.append("\x1A\x05");
+	cmd += '\x00';
+	cmd += '\x58';
+	cmd.append(post);
+
+	if (waitFOR(11, "get vfo adj")) {
+		size_t p = replystr.find(pre_fm);
+		if (p != string::npos) {
+			vfo_ = num100(replystr.substr(p+8));
+		}
+	}
+	return vfo_;
 }

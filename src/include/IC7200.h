@@ -63,8 +63,12 @@ public:
 	int  get_power_out(void);
 	int  get_swr(void);
 	int  get_alc(void);
+
 	void set_noise(bool val);
 	int  get_noise();
+	void set_nb_level(int val);
+	int  get_nb_level();
+
 	void set_noise_reduction(int val);
 	int  get_noise_reduction();
 	void set_noise_reduction_val(int val);
@@ -103,12 +107,15 @@ public:
 
 	int  adjust_bandwidth(int m);
 	int  def_bandwidth(int m);
+
 	void set_compression(int, int);
 	void get_compression(int &on, int &val);
 	void get_comp_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 10; step = 1; }
+
 	void set_auto_notch(int val);
 	int  get_auto_notch();
+
 	void set_vox_onoff();
 	void set_split(bool);
 	int  get_split();
@@ -134,6 +141,10 @@ public:
 
 	void tune_rig();
 
+	void setVfoAdj(double v);
+	double getVfoAdj();
+	void get_vfoadj_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 100; step = 1; }
 
 protected:
 	int  filter_nbr;

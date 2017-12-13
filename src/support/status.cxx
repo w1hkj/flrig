@@ -108,8 +108,7 @@ status progStatus = {
 	-1,			// int  iBW_B;
 	1,			// int  imode_B;
 	7070000,	// long freq_B;
-	false,		// bool use_rig_data;
-//	false,		// bool restore_rig_data;
+	true,		// bool use_rig_data;
 
 	false,		// bool spkr_on;
 	20,			// int  volume;
@@ -167,23 +166,23 @@ status progStatus = {
 //ft950 reversed RF gain values
 	false,		// bool ft950_rg_reverse
 
-	false,		// bool	restore_frequency;
-	false,		// bool	restore_mode;
-	false,		// bool	restore_bandwidth;
-	false,		// bool	restore_volume;
-	false,		// bool	restore_mic_gain;
-	false,		// bool	restore_rf_gain;
-	false,		// bool	restore_power_control;
-	false,		// bool	restore_if_shift;
-	false,		// bool	restore_notch;
-	false,		// bool	restore_auto_notch;
-	false,		// bool	restore_noise;
-	false,		// bool	restore_squelch;
-	false,		// bool	restore_split;
-	false,		// bool	restore_pre_att;
-	false,		// bool	restore_nr;
-	false,		// bool	restore_comp_on_off;
-	false,		// bool	restore_comp_level;
+	true,		// bool	restore_frequency;
+	true,		// bool	restore_mode;
+	true,		// bool	restore_bandwidth;
+	true,		// bool	restore_volume;
+	true,		// bool	restore_mic_gain;
+	true,		// bool	restore_rf_gain;
+	true,		// bool	restore_power_control;
+	true,		// bool	restore_if_shift;
+	true,		// bool	restore_notch;
+	true,		// bool	restore_auto_notch;
+	true,		// bool	restore_noise;
+	true,		// bool	restore_squelch;
+	true,		// bool	restore_split;
+	true,		// bool	restore_pre_att;
+	true,		// bool	restore_nr;
+	true,		// bool	restore_comp_on_off;
+	true,		// bool	restore_comp_level;
 
 //tt550 controls
 	80,			// tt550_line_out;
@@ -849,11 +848,15 @@ bool status::loadXcvrState(string xcvr)
 
 		if (spref.get("noise_reduction", i, i)) noise_reduction = i;
 		spref.get("noise_red_val", noise_reduction_val, noise_reduction_val);
-		spref.get("nb_level", nb_level, nb_level);
 
 		if (spref.get("bool_noise", i, i)) noise = i;
+		spref.get("nb_level", nb_level, nb_level);
+
 		spref.get("int_preamp", preamp, preamp);
 		spref.get("int_att", attenuator, attenuator);
+
+		spref.get("compression", compression, compression);
+		if (spref.get("compON", i, i)) compON = i;
 
 		spref.get("vfo_adj", vfo_adj, vfo_adj);
 		spref.get("bfo_freq", bfo_freq, bfo_freq);

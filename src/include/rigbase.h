@@ -53,6 +53,7 @@ struct XCVR_STATE {
 	int		notch;
 	int		notch_val;
 	int		noise;
+	int		nb_level;
 	int		nr;
 	int		nr_val;
 	int		mic_gain;
@@ -79,6 +80,7 @@ struct XCVR_STATE {
 		notch = 0;
 		notch_val = 0;
 		noise = 0;
+		nb_level = 0;
 		nr = 0;
 		nr_val = 0;
 		mic_gain = 0;
@@ -326,50 +328,79 @@ public:
 	virtual void select_swr() {}
 	virtual void select_alc() {}
 	virtual int  get_power_out(void) {return -1;}
-	virtual int  get_power_control(void) {return 0;}
-	virtual void set_power_control(double val) {}
+
+int po_, po_val;
+	virtual int  get_power_control(void) {return po_;}
+	virtual void set_power_control(double val) {po_ = val;}
 	virtual void get_pc_min_max_step(double &min, double &max, double &step) {
 		min = 0; max = 100; step = 1; }
-	virtual int  get_volume_control() {return 0;}
+
+int vl_;
+	virtual void set_volume_control(int val) {vl_ = val;}
+	virtual int  get_volume_control() {return vl_;}
 	virtual void get_vol_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 100; step = 1; }
-	virtual void set_volume_control(int val) {}
-	virtual void set_PTT_control(int val) {}
+
+int ptt_;
+	virtual void set_PTT_control(int val) {ptt_ = val;}
+	virtual int  get_PTT() {return ptt_;}
 	virtual void tune_rig() {}
-	virtual void set_attenuator(int val) {}
+
+	virtual void set_attenuator(int val) {atten_level = val;}
 	virtual int  next_attenuator() { atten_level = !atten_level; return atten_level; }
 	virtual int  get_attenuator() {return atten_level;}
-	virtual void set_preamp(int val) {}
+
+	virtual void set_preamp(int val) {preamp_level = val;}
 	virtual int  next_preamp() { preamp_level = !preamp_level; return preamp_level; }
 	virtual int  get_preamp() {return preamp_level;}
-	virtual void set_if_shift(int val) {}
-	virtual bool get_if_shift(int &val) {val = 0; return false;}
+
+int sh_;
+bool sh_on_;
+	virtual void set_if_shift(int val) {sh_ = val;}
+	virtual void set_if_shift_on(int on) { sh_on_ = on; }
+	virtual bool get_if_shift(int &val) {val = sh_; return sh_on_;}
 	virtual void get_if_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 100; step = 1; }
 	virtual void get_if_mid() {};
-	virtual void set_notch(bool on, int val) {}
-	virtual bool get_notch(int &val) {val = 0; return false;}
+
+int no_, noval_;
+	virtual void set_notch(bool on, int val) { no_ = on; noval_ = val;}
+	virtual bool get_notch(int &val) {val = noval_; return no_;}
 	virtual void get_notch_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 100; step = 1; }
-	virtual void set_noise(bool on) {}
-	virtual int  get_noise(){return 0;}
-	virtual void set_noise_reduction_val(int val) {}
-	virtual int  get_noise_reduction_val() {return 0;}
+
+int nb_, nbval_;
+	virtual void set_noise(bool on) {nb_ = on;}
+	virtual int  get_noise(){return nb_;}
+	virtual void set_nb_level(int val) {nbval_ = val;}
+	virtual int  get_nb_level() { return nbval_; }
+	virtual void get_nb_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 100; step = 1; }
+
+int nr_, nrval_;
+	virtual void set_noise_reduction(int val) {nr_ = val;}
+	virtual int  get_noise_reduction() {return nr_;}
+	virtual void set_noise_reduction_val(int val) {nrval_ = val;}
+	virtual int  get_noise_reduction_val() {return nrval_;}
 	virtual void get_nr_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 100; step = 1; }
-	virtual void set_noise_reduction(int val) {}
-	virtual int  get_noise_reduction() {return 0;}
-	virtual void set_mic_gain(int val) {}
-	virtual int  get_mic_gain() {return 0;}
+
+int mcval_;
+	virtual void set_mic_gain(int val) {mcval_ = val;}
+	virtual int  get_mic_gain() {return mcval_;}
 	virtual void get_mic_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 100; step = 1; }
 	virtual void set_mic_line(int val) {}
-	virtual void set_squelch(int val) {}
-	virtual int  get_squelch() {return 0;}
+
+int sqval_;
+	virtual void set_squelch(int val) {sqval_ = val;}
+	virtual int  get_squelch() {return sqval_;}
 	virtual void get_squelch_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 100; step = 1; }
-	virtual void set_rf_gain(int val) {}
-	virtual int  get_rf_gain() {return 0;}
+
+int rfg_;
+	virtual void set_rf_gain(int val) {rfg_ = val;}
+	virtual int  get_rf_gain() {return rfg_;}
 	virtual void get_rf_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 100; step = 1; }
 
@@ -396,8 +427,9 @@ public:
 			return pbwt[0];
 	}
 
-	virtual void setRit(int v) {}
-	virtual int  getRit() {return 0;}
+int ritval_;
+	virtual void setRit(int v) {ritval_ = v;}
+	virtual int  getRit() {return ritval_;}
 	virtual void get_RIT_min_max_step(int &min, int &max, int &step) {
 		min = -100; max = 100; step = 1; }
 
@@ -406,19 +438,22 @@ public:
 	virtual void get_XIT_min_max_step(int &min, int &max, int &step) {
 		min = -100; max = 100; step = 1; }
 
-	virtual void setBfo(int v) {}
-	virtual int  getBfo() {return 0;}
+int bfo_;
+	virtual void setBfo(int v) {bfo_ = v;}
+	virtual int  getBfo() {return bfo_;}
 	virtual void get_BFO_min_max_step(int &min, int &max, int &step) {
 		min = -100; max = 100; step = 1; }
 
-	virtual void setVfoAdj(double v) {}
-	virtual double getVfoAdj() {return 0;}
+int vfo_;
+	virtual void setVfoAdj(double v) {vfo_ = v;}
+	virtual double getVfoAdj() {return vfo_;}
 	virtual void get_vfoadj_min_max_step(int &min, int &max, int &step) {
 		min = -100; max = 100; step = 1; }
 
 	virtual void set_line_out() {}
 	virtual int  get_line_out() { return 100; }
 	virtual void set_agc_level() {}
+
 	virtual void set_cw_weight() {}
 	virtual void get_cw_weight_min_max_step(double &min, double &max, double &step) {
 		min = 2.5; max = 4.5; step = 0.1; } // default for FT950/FT450D

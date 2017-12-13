@@ -117,7 +117,6 @@ void RIG_FT900::set_split(bool val)
 		showresp(WARN, HEX, "set split ON", cmd, replystr);
 	else
 		showresp(WARN, HEX, "set split OFF", cmd, replystr);
-	progStatus.split = val;
 }
 
 int RIG_FT900::get_split()
