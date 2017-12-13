@@ -304,8 +304,8 @@ struct status {
 
 	string	ui_scheme;
 
-	string	server_port;
-	string	server_addr;
+//	string	server_port;
+//	string	server_addr;
 
 	string	tcpip_port;
 	string	tcpip_addr;
@@ -319,7 +319,7 @@ struct status {
 
 	bool	external_tuner;
 
-	bool	fldigi_is_server;
+//	bool	fldigi_is_server;
 
 	void saveLastState();
 	void loadLastState();

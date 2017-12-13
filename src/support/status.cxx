@@ -308,8 +308,8 @@ status progStatus = {
 
 	"gtk+",		// string ui_scheme
 
-	"7362",		// string server_port
-	"127.0.0.1",// string server_address
+//	"7362",		// string server_port
+//	"127.0.0.1",// string server_address
 
 	"4001",		// string tcpip_port
 	"127.0.0.1",// string tcpip_address
@@ -324,7 +324,7 @@ status progStatus = {
 
 	false,		// bool external_tuner
 
-	false		// bool fldigi_is_server
+//	false		// bool fldigi_is_server
 };
 
 void status::saveLastState()
@@ -613,8 +613,8 @@ void status::saveLastState()
 
 	spref.set("ui_scheme", ui_scheme.c_str());
 
-	spref.set("server_port", server_port.c_str());
-	spref.set("server_addr", server_addr.c_str());
+//	spref.set("server_port", server_port.c_str());
+//	spref.set("server_addr", server_addr.c_str());
 
 	spref.set("tcpip_port", tcpip_port.c_str());
 	spref.set("tcpip_addr", tcpip_addr.c_str());
@@ -628,7 +628,7 @@ void status::saveLastState()
 
 	spref.set("external_tuner", external_tuner);
 
-	spref.set("fldigi_is_server", fldigi_is_server);
+//	spref.set("fldigi_is_server", fldigi_is_server);
 
 	spref.set("hrd_buttons", hrd_buttons);
 }
@@ -954,10 +954,10 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("ui_scheme", defbuffer, "gtk+", 499);
 		ui_scheme = defbuffer;
 
-		spref.get("server_port", defbuffer, "7362", 499);
-		server_port = defbuffer;
-		spref.get("server_addr", defbuffer, "127.0.0.1", 499);
-		server_addr = defbuffer;
+//		spref.get("server_port", defbuffer, "7362", 499);
+//		server_port = defbuffer;
+//		spref.get("server_addr", defbuffer, "127.0.0.1", 499);
+//		server_addr = defbuffer;
 
 		spref.get("tcpip_port", defbuffer, "4001", 499);
 		tcpip_port = defbuffer;
@@ -973,7 +973,7 @@ bool status::loadXcvrState(string xcvr)
 
 		if (spref.get("external_tuner", i,i)) external_tuner = i;
 
-		if (spref.get("fldigi_is_server", i,i)) fldigi_is_server = i;
+//		if (spref.get("fldigi_is_server", i,i)) fldigi_is_server = i;
 
 		if (spref.get("hrd_buttons", i, i)) hrd_buttons = i;
 	}

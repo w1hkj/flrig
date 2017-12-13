@@ -103,10 +103,10 @@ Fl_Button *btnCloseCommConfig = (Fl_Button *)0;
 Fl_Button *btnOkSepSerial = (Fl_Button *)0;
 Fl_Button *btnOkAuxSerial = (Fl_Button *)0;
 
-Fl_Group *tabXMLRPC = (Fl_Group *)0;
-Fl_Input *server_addr = (Fl_Input *)0;
-Fl_Int_Input *server_port = (Fl_Int_Input *)0;
-Fl_Check_Button *btn_xmlrpc_server = (Fl_Check_Button *)0;
+//Fl_Group *tabXMLRPC = (Fl_Group *)0;
+//Fl_Input *server_addr = (Fl_Input *)0;
+//Fl_Int_Input *server_port = (Fl_Int_Input *)0;
+//Fl_Check_Button *btn_xmlrpc_server = (Fl_Check_Button *)0;
 
 Fl_Group *tabCmds = (Fl_Group *)0;
 Fl_Box *bx1 = (Fl_Box *)0;
@@ -150,10 +150,10 @@ Fl_Check_Button *btnRestoreCompLevel	= (Fl_Check_Button *)0;
 Fl_Check_Button *btnUseRigData			= (Fl_Check_Button *)0;
 
 
-static void cb_xmlrpc_server(Fl_Check_Button *w, void *)
-{
-	progStatus.fldigi_is_server = btn_xmlrpc_server->value();
-}
+//static void cb_xmlrpc_server(Fl_Check_Button *w, void *)
+//{
+//	progStatus.fldigi_is_server = btn_xmlrpc_server->value();
+//}
 
 static void cb_selectRig(Fl_ComboBox*, void*) {
 	btnOkXcvrDialog->labelcolor(FL_RED);
@@ -216,13 +216,13 @@ static void cb_btnRigCatEcho(Fl_Check_Button*, void*) {
 	btnOkXcvrDialog->redraw_label();
 }
 
-static void cb_server_addr(Fl_Input* o, void*) {
-	progStatus.server_addr = o->value();
-}
+//static void cb_server_addr(Fl_Input* o, void*) {
+//	progStatus.server_addr = o->value();
+//}
 
-static void cb_server_port(Fl_Int_Input* o, void*) {
-	progStatus.server_port = o->value();
-}
+//static void cb_server_port(Fl_Int_Input* o, void*) {
+//	progStatus.server_port = o->value();
+//}
 
 static void cb_tcpip_addr(Fl_Input2* o, void*) {
 	progStatus.tcpip_addr = o->value();
@@ -931,7 +931,7 @@ Fl_Double_Window* w = new Fl_Double_Window(480, 255, _("I/O Ports"));
 		btnOkXcvrDialog->callback((Fl_Callback*)cb_btnOkXcvrDialog);
 
 	tabPrimary->end();
-
+/*
 	tabXMLRPC = new Fl_Group(2, 30, 475, 222, _("XML"));
 		tabXMLRPC->hide();
 
@@ -964,7 +964,7 @@ Changes to requires an flrig restart before they are effective.\n\
 		bx_xml_info->box(FL_ENGRAVED_FRAME);
 
 	tabXMLRPC->end();
-
+*/
 	tabTCPIP = new Fl_Group(2, 30, 475, 222, _("TCPIP"));
 		tabTCPIP->hide();
 

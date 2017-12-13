@@ -47,7 +47,7 @@
 #include "rig_io.h"
 #include "serial.h"
 #include "support.h"
-#include "xml_io.h"
+//#include "xml_io.h"
 
 extern Fl_Double_Window *mainwindow;
 extern string HomeDir;

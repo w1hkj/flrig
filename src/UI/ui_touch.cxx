@@ -36,7 +36,7 @@ Fl_Menu_Item touch_menu[] = {
  {_("&Config"), 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Setup"), 0, 0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Transceiver"), 0,  (Fl_Callback*)cb_mnuConfigXcvr, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
- {_("XmlRpc"), 0,  (Fl_Callback*)cb_mnuXMLRPC, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
+// {_("XmlRpc"), 0,  (Fl_Callback*)cb_mnuXMLRPC, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("tcpip"), 0, (Fl_Callback*)cb_mnuTCPIP, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("PTT"), 0, (Fl_Callback*)cb_mnuPTT, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("AUX"), 0, (Fl_Callback*)cb_mnuAUX, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},

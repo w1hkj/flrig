@@ -206,7 +206,6 @@ flrig_SOURCES += \
 	support/support.cxx \
 	support/threads.cxx \
 	support/util.cxx \
-	support/xml_io.cxx \
 	UI/K3_ui.cxx \
 	UI/KX3_ui.cxx \
 	UI/rigpanel.cxx \
@@ -308,7 +307,6 @@ EXTRA_DIST = \
 	include/rig_io.h \
 	include/rigpanel.h \
 	include/serial.h \
-	include/xml_io.h \
 	include/socket.h \
 	include/socket_io.h \
 	include/status.h \
