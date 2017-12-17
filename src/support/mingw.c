@@ -33,6 +33,8 @@
 #include <config.h>
 
 #include <ctype.h>
+#include <winsock2.h>
+
 #include "compat.h"
 #include "util.h"
 

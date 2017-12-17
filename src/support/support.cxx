@@ -360,7 +360,7 @@ void read_mode()
 				nu_BW = selrig->get_bwA();
 				vfoA.iBW = vfo->iBW = nu_BW;
 			}
-//			Fl::awake(setModeControl);
+			Fl::awake(setModeControl);
 			set_bandwidth_control();
 			Fl::awake(setModeControl);
 		}
@@ -373,7 +373,7 @@ void read_mode()
 				nu_BW = selrig->get_bwB();
 				vfoB.iBW = vfo->iBW = nu_BW;
 			}
-//			Fl::awake(setModeControl);
+			Fl::awake(setModeControl);
 			set_bandwidth_control();
 			Fl::awake(setModeControl);
 		}
@@ -972,8 +972,7 @@ end_serviceA:
 //std::cout << print_ab() << std::endl;
 
 	if (RIG_DEBUG) {
-		LOG_INFO("%s", print_ab());
-		std::cout << print_ab() << std::endl;
+		LOG_INFO("\n%s", print_ab());
 	}
 
 	changed_vfo = false;
@@ -1042,8 +1041,7 @@ end_serviceB:
 //std::cout << print_ab() << std::endl;
 
 	if (RIG_DEBUG) {
-		LOG_INFO("%s", print_ab());
-		std::cout << print_ab() << std::endl;
+		LOG_INFO("\n%s", print_ab());
 	}
 
 	changed_vfo = false;

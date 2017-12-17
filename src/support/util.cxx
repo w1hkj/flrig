@@ -145,15 +145,19 @@ int set_nodelay(int fd, unsigned char v)
 
 
 #ifdef __WIN32__
-#  include <ws2tcpip.h>
-#endif
-
+# include <winsock2.h>
+int get_bufsize(int fd, int dir, int* len)
+{
+	int optlen = sizeof(*len);
+#else
 int get_bufsize(int fd, int dir, int* len)
 {
 	socklen_t optlen = sizeof(*len);
+#endif
 	return getsockopt(fd, SOL_SOCKET, (dir == 0 ? SO_RCVBUF : SO_SNDBUF),
 			  (char*)len, &optlen);
 }
+
 int set_bufsize(int fd, int dir, int len)
 {
 	return setsockopt(fd, SOL_SOCKET, (dir == 0 ? SO_RCVBUF : SO_SNDBUF),

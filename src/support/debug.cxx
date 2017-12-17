@@ -100,8 +100,11 @@ void debug::start(const char* filename)
 	window->end();
 }
 
+bool   debug_in_use = false;
+
 void debug::stop(void)
 {
+	while (debug_in_use) { MilliSleep(50); Fl::awake();}
 	delete inst;
 	inst = 0;
 	if (window) {
@@ -113,7 +116,6 @@ void debug::stop(void)
 static char fmt[1024];
 static char sztemp[8096];
 static string estr = "";
-bool   debug_in_use = false;
 
 void debug::log(level_e level, const char* func, const char* srcf, int line, const char* format, ...)
 {
@@ -217,6 +219,7 @@ debug::debug(const char* filename)
 
 debug::~debug()
 {
+	while (debug_in_use) { MilliSleep(50); Fl::awake();}
 	if (window) {
 		delete window;
 		window = 0;
