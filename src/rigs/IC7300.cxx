@@ -1328,7 +1328,6 @@ void RIG_IC7300::set_notch(bool on, int val)
 bool RIG_IC7300::get_notch(int &val)
 {
 	bool on = false;
-	val = 0;
 
 	string cstr = "\x16\x48";
 	string resp = pre_fm;

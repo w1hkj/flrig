@@ -335,7 +335,7 @@ public:
 
 		static int ntch;
 		ntch = static_cast<int>((double)(params[0]));
-		progStatus.notch_val = ntch;
+		if (ntch) progStatus.notch_val = ntch;
 		if (ntch)
 			progStatus.notch = true;
 		else
