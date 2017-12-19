@@ -21,6 +21,8 @@
 #include "ICbase.h"
 #include "debug.h"
 #include "support.h"
+#include "icons.h"
+#include "tod_clock.h"
 
 //=============================================================================
 
@@ -79,16 +81,27 @@ void RIG_ICOM::delayCommand(string cmd, int wait)
 	progStatus.comm_wait = oldwait;
 }
 
+static int waitcount = 0;
+static bool timeout_alert = false;
+static char sztimeout_alert[200];
+
+static void show_timeout(void *)
+{
+	fl_alert2("%s", sztimeout_alert);
+}
+
 bool RIG_ICOM::waitFB(const char *sz)
 {
-	char sztemp[50];
+	char sztemp[100];
 	string returned = "";
 	string tosend = cmd;
+	unsigned long tod_start = zmsec();
 
 	if (!progStatus.use_tcpip && !RigSerial->IsOpen()) {
 		replystr = returned;
 		snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
 		showresp(DEBUG, HEX, sztemp, tosend, returned);
+		waitcount = 0;
 		return false;
 	}
 	int cnt = 0, repeat = 0, num = cmd.length() + ok.length();
@@ -102,38 +115,55 @@ bool RIG_ICOM::waitFB(const char *sz)
 			returned.append(replystr);
 			if (returned.find(ok) != string::npos) {
 				replystr = returned;
-				waited = 10 * (repeat * wait_msec + cnt);
-				snprintf(sztemp, sizeof(sztemp), "%s ans in %d ms, OK", sz, waited);
-				showresp(DEBUG, HEX, sztemp, tosend, returned);
+				unsigned long int waited = zmsec() - tod_start;
+				snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, OK", sz, waited);
+				if (repeat)
+					showresp(WARN, HEX, sztemp, tosend, returned);
+				else
+					showresp(DEBUG, HEX, sztemp, tosend, returned);
+				waitcount = 0;
 				return true;
 			}
 			if (returned.find(bad) != string::npos) {
 				replystr = returned;
-				waited = 10 * (repeat * wait_msec + cnt);
-				snprintf(sztemp, sizeof(sztemp), "%s ans in %d ms, FAIL", sz, waited);
+				unsigned long int waited = zmsec() - tod_start;
+				snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, FAIL", sz, waited);
 				showresp(ERR, HEX, sztemp, tosend, returned);
+				waitcount = 0;
 				return false;
 			}
 			MilliSleep(10);
 			Fl::awake();
 		}
 	}
+	waitcount++;
 	replystr = returned;
-	waited = 10 * repeat * wait_msec;
-	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %d ms", sz, waited);
+	unsigned long int waited = zmsec() - tod_start;
+	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %ld ms", sz, waited);
 	showresp(ERR, HEX, sztemp, tosend, returned);
+
+	if (waitcount > 4 && !timeout_alert) {
+		timeout_alert = true;
+		snprintf(sztimeout_alert, sizeof(sztimeout_alert), 
+			"Serial i/o failure\n%s TIME OUT in %ld ms",
+			sz, waited);
+			Fl::awake(show_timeout);
+	}
 	return false;
 }
 
 bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 {
-	char sztemp[50];
+	char sztemp[100];
 	string returned = "";
 	string tosend = cmd;
 	int cnt = 0, repeat = 0;
 	size_t num = n + cmd.length();
+	unsigned long int tod_start = zmsec();
+
 	int delay =  (int)(num * 11000.0 / RigSerial->Baud() + 
 		progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0) / 10;
+
 	if (!progStatus.use_tcpip && !RigSerial->IsOpen()) {
 		replystr = returned;
 		snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
@@ -148,8 +178,8 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 			returned.append(replystr);
 			if (returned.length() >= num) {
 				replystr = returned;
-				waited = 10 * (repeat * delay + cnt);
-				snprintf(sztemp, sizeof(sztemp), "%s ans in %d ms, OK  ", sz, waited);
+				unsigned long int waited = zmsec() - tod_start;
+				snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, OK  ", sz, waited);
 				showresp(DEBUG, HEX, sztemp, tosend, returned);
 				return true;
 			}
@@ -157,10 +187,20 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 			Fl::awake();
 		}
 	}
+
+	waitcount++;
 	replystr = returned;
-	waited = 10 * repeat * delay;
-	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %d ms", sz, waited);
+	unsigned long int waited = zmsec() - tod_start;
+	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %ld ms", sz, waited);
 	showresp(ERR, HEX, sztemp, tosend, returned);
+
+	if (waitcount > 4 && !timeout_alert) {
+		timeout_alert = true;
+		snprintf(sztimeout_alert, sizeof(sztimeout_alert), 
+			"Serial i/o failure\n%s TIME OUT in %ld ms",
+			sz, waited);
+			Fl::awake(show_timeout);
+	}
 	return false;
 }
 

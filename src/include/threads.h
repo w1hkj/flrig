@@ -23,6 +23,12 @@
 
 #include <config.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <fcntl.h>
+
 #include <pthread.h>
 #include <stdint.h>
 
@@ -94,6 +100,9 @@ bool thread_in_list(int id, const int* list);
 // which will also interrupt blocking calls.  On woe32 we use
 // pthread_cancel and there is no good/sane way to interrupt.
 #ifndef __WOE32__
+
+#include <signal.h>
+
 #  define SET_THREAD_CANCEL()					\
 	do {							\
 		sigset_t usr2;					\

@@ -75,6 +75,8 @@
 #include "serial.h"
 #include "ui.h"
 
+#include "tod_clock.h"
+
 #include "flrig_icon.cxx"
 
 int parse_args(int argc, char **argv, int& idx);
@@ -403,6 +405,8 @@ extern FILE *serlog;
 		perror("pthread_create");
 		exit(EXIT_FAILURE);
 	}
+
+	TOD_init();
 
 //	if (progStatus.fldigi_is_server) {
 //		open_rig_xmlrpc();

@@ -45,6 +45,8 @@
 
 #include "rigpanel.h"
 
+#include "tod_clock.h";
+
 using namespace std;
 
 rigbase *selrig = rigs[0];
@@ -2849,6 +2851,8 @@ void cbExit()
 	progStatus.saveLastState();
 
 // shutdown serial thread
+
+	TOD_close();
 
 	exiting = true;
 	{

@@ -205,6 +205,7 @@ flrig_SOURCES += \
 	support/status.cxx \
 	support/support.cxx \
 	support/threads.cxx \
+	support/timeops.cxx \
 	support/util.cxx \
 	UI/K3_ui.cxx \
 	UI/KX3_ui.cxx \
@@ -217,6 +218,7 @@ flrig_SOURCES += \
 	widgets/FreqControl.cxx \
 	widgets/ValueSlider.cxx \
 	widgets/hspinner.cxx \
+	support/tod_clock.cxx \
 	server/xml_server.cxx 
 
 # Additional source files that are distributed
@@ -331,6 +333,8 @@ EXTRA_DIST = \
 	include/TT566.h \
 	include/TT588.h \
 	include/TT599.h \
+	include/timeops.h \
+	include/tod_clock.h \
 	include/ui.h \
 	include/util.h \
 	include/ValueSlider.h \

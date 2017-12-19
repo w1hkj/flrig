@@ -30,6 +30,8 @@
 #include "status.h"
 #include "rigbase.h"
 #include "rig_io.h"
+#include "icons.h"
+#include "tod_clock.h"
 
 #include "socket_io.h"
 
@@ -213,6 +215,15 @@ int sendCommand (string s, int nread)
 	return readResponse();
 }
 
+static int waitcount = 0;
+static bool timeout_alert = false;
+static char sztimeout_alert[200];
+
+static void show_timeout(void *)
+{
+	fl_alert2("%s",sztimeout_alert);
+}
+
 bool waitCommand(
 				string command,
 				int nread,
@@ -232,13 +243,19 @@ bool waitCommand(
 	} else {
 		if (RigSerial->IsOpen() == false) {
 			LOG_DEBUG("cmd: %s", how == ASC ? command.c_str() : str2hex(command.data(), command.length()));
+			waitcount = 0;
 			return 0;
 		}
 		replystr.clear();
 		clearSerialPort();
 		RigSerial->WriteBuffer(command.c_str(), numwrite);
-		if (nread == 0) return 0;
+		if (nread == 0) {
+			waitcount = 0;
+			return 0;
+		}
 	}
+
+	int tod_start = zmsec();
 
 // minimimum time to wait for a response
 	int timeout = (int)((nread + progStatus.comm_echo ? numwrite : 0)*11000.0/RigSerial->Baud()
@@ -259,17 +276,28 @@ bool waitCommand(
 		if (	((int)returned.length() >= nread) || 
 				(returned.find(term) != string::npos) ) {
 			replystr = returned;
-			snprintf(sztemp, sizeof(sztemp), "%s rcvd in %d msec", info.c_str(), waited + timeout);
+			waited = zmsec() - tod_start;
+			snprintf(sztemp, sizeof(sztemp), "%s rcvd in %d msec", info.c_str(), waited);
 			showresp(level, how, sztemp, command, returned);
+			waitcount = 0;
 			return true;
 		}
 		waited += 10;
 		MilliSleep(10);
 		Fl::awake();
 	}
+	waitcount++;
 	replystr = returned;
-	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %d ms",  info.c_str(), waited + timeout);
-	showresp(ERR, how, sztemp, command, returned);
+	waited = zmsec() - tod_start;
+	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %d ms", command.c_str(), waited);
+	showresp(ERR, HEX, sztemp, command, returned);
+	if (waitcount > 4 && !timeout_alert) {
+		timeout_alert = true;
+		snprintf(sztimeout_alert, sizeof(sztimeout_alert), 
+			"Serial i/o failure\n%s TIME OUT in %d ms",
+			command.c_str(), waited);
+			Fl::awake(show_timeout);
+	}
 	return false;
 }
 
