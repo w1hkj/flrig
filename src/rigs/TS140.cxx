@@ -71,6 +71,8 @@ RIG_TS140::RIG_TS140() {
 		IFaaaaaaaaaaaXXXXXbbbbbcdXeefghjklmmX;
 		12345678901234567890123456789012345678
 		01234567890123456789012345678901234567 byte #
+		IF00014070000       -00300     000200;
+
 		where:
 			aaaaaaaaaaa => decimal value of vfo frequency
 			bbbbb => rit/xit frequency
@@ -88,7 +90,7 @@ RIG_TS140::RIG_TS140() {
 		 
 	Test output from Minicom to IF; command		 
 
-	IF00014070000	   -00300	 000200;
+	IF00014070000   -00300 000200;
 
 	0001000 is vfoA in LSB
 	0002000 is vfoA in USB
@@ -126,13 +128,6 @@ void RIG_TS140::set_vfoA (long freq)
 	sendCommand(cmd);
 }
 
-// Tranceiver PTT on/off
-void RIG_TS140::set_PTT_control(int val)
-{
-	if (val) sendCommand("TX;");
-	else	 sendCommand("RX;");
-}
-
 int RIG_TS140::get_modetype(int n)
 {
 	return TS140_mode_type[n];
@@ -159,4 +154,47 @@ int RIG_TS140::get_modeA()
 	modeA = md;
 
 	return modeA;
+}
+
+// Tranceiver PTT on/off
+void RIG_TS140::set_PTT_control(int val)
+{
+	if (val) sendCommand("TX;");
+	else	 sendCommand("RX;");
+	ptt_ = val;
+}
+
+/*
+========================================================================
+	frequency & mode data are contained in the IF; response
+		IFaaaaaaaaaaaXXXXXbbbbbcdXeefghjklmmX;
+		12345678901234567890123456789012345678
+		01234567890123456789012345678901234567 byte #
+		          1         2         3
+		                            ^ position 28
+		where:
+			aaaaaaaaaaa => decimal value of vfo frequency
+			bbbbb => rit/xit frequency
+			c => rit off/on
+			d => xit off/on
+			e => memory channel
+			f => tx/rx
+			g => mode
+			h => function
+			j => scan off/on
+			k => split off /on
+			l => tone off /on
+			m => tone number
+			X => unused characters
+		 
+========================================================================
+*/ 
+
+int RIG_TS140::get_PTT()
+{
+	cmd = "IF;";
+	int ret = wait_char(';', 38, 100, "get VFO", ASC);
+	if (ret < 38) return ptt_;
+	ptt_ = (replybuff[28] == '1');
+	return ptt_;
 }

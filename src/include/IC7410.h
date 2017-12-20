@@ -79,7 +79,8 @@ public:
 	bool canswap() { return true; }
 	bool ICswap() { return true; }
 
-//	bool hasA2b() { return true; }
+	void set_PTT_control(int val);
+	int  get_PTT();
 
 	const char **bwtable(int m) {return bandwidths_;}
 

@@ -2469,12 +2469,15 @@ void saveFreqList()
 
 void setPTT( void *d)
 {
+	guard_lock ptt_lock(&mutex_ptt, 64);
+
 	int set = (long)d;
 	int get, cnt = 0;
+
 	rigPTT(set);
 
-	guard_lock ptt_lock(&mutex_ptt, 64);
-	MilliSleep(10);
+	guard_lock serial_lock(&mutex_serial);
+
 	get = selrig->get_PTT();
 	while ((get != set) && (cnt++ < 10)) {
 		MilliSleep(10);

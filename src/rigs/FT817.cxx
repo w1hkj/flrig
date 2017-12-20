@@ -283,7 +283,7 @@ void RIG_FT817::set_PTT_control(int val)
 	std::string s = "set PTT ";
 	s.append(val ? "ON":"OFF");
 	showresp(INFO, HEX, s.c_str(), cmd, replystr);
-//	set_getACK();
+	ptt_ = val;
 }
 
 // mapping for smeter and power out

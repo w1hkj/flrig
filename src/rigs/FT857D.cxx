@@ -185,6 +185,7 @@ void RIG_FT857D::set_PTT_control(int val)
 	replystr.clear();
 	set_getACK();
 	showresp(WARN, HEX, "set PTT", cmd, replystr);
+	ptt_ = val;
 }
 
 // mod submitted by Rich, WA4SXZ, for power_out and smeter

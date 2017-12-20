@@ -54,6 +54,7 @@ public:
 	int  get_volume_control();
 	void get_vol_min_max_step(int &min, int &max, int &step);
 	void set_PTT_control(int val);
+	int  get_PTT();
 	void set_noise(bool val);
 	int  get_noise();
 	void set_noise_reduction(int val);

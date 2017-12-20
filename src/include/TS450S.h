@@ -60,6 +60,7 @@ public:
 	int  get_smeter();
 	int  get_swr();
 	void set_PTT_control(int val);
+	int  get_PTT();
 
 	int  adjust_bandwidth(int val) { return 0; }
 

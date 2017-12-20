@@ -474,6 +474,7 @@ void RIG_K3::set_PTT_control(int val)
 {
 	if (val) sendCommand("TX;", 0);
 	else	 sendCommand("RX;", 0);
+	ptt_ = val;
 }
 
 //BG (Bargraph Read; GET only)

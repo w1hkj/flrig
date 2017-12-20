@@ -341,6 +341,7 @@ void RIG_FT900::set_PTT_control(int val)
 	cmd[4] = 0x0F;
 	sendCommand(cmd, 0);
 	LOG_INFO("%s", str2hex(cmd.c_str(), 5));
+	ptt_ = val;
 }
 
 int RIG_FT900::get_smeter()

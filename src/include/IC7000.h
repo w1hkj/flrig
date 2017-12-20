@@ -95,6 +95,9 @@ public:
 	void get_comp_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 10; step = 1; }
 
+	void set_PTT_control(int val);
+	int  get_PTT();
+
 };
 
 

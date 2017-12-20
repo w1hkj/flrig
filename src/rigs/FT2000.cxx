@@ -288,7 +288,21 @@ void RIG_FT2000::set_PTT_control(int val)
 {
 	if (val) sendCommand("TX1;", 0);
 	else	 sendCommand("TX0;", 0);
+	ptt_ = val;
 }
+
+int RIG_FT2000::get_PTT()
+{
+	cmd = "TX;";
+	rsp = "TX";
+	waitN(4, 100, "get PTT", ASC);
+
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return ptt_;
+	ptt_ =  (replystr[p+2] != '0' ? 1 : 0);
+	return ptt_;
+}
+
 
 void RIG_FT2000::tune_rig()
 {

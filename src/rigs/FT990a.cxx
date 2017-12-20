@@ -252,6 +252,7 @@ void RIG_FT990A::set_PTT_control(int val)
 		showresp(WARN, HEX, "set PTT ON", cmd, "");
 	else
 		showresp(WARN, HEX, "set PTT OFF", cmd, "");
+	ptt_ = val;
 }
 
 int RIG_FT990A::get_smeter()

@@ -85,6 +85,9 @@ public:
 	void set_split(bool val);
 	int get_split();
 
+	void set_PTT_control(int val);
+	int  get_PTT();
+
 };
 
 #endif

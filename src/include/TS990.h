@@ -141,6 +141,7 @@ public:
 	int  get_power_out();
 
 	void set_PTT_control(int val);
+	int  get_PTT();
 	void tune_rig();
 
 	int  next_attenuator();

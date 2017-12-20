@@ -113,6 +113,9 @@ public:
 
 	const char **bwtable(int m) {return bandwidths_;}
 
+	void set_PTT_control(int val);
+	int  get_PTT();
+
 };
 
 #endif

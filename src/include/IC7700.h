@@ -27,6 +27,10 @@ class RIG_IC7700 : public RIG_IC746PRO {
 public:
 	RIG_IC7700();
 	~RIG_IC7700(){}
+
+	void set_PTT_control(int val);
+	int  get_PTT();
+
 };
 
 #endif

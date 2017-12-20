@@ -873,3 +873,30 @@ void RIG_IC7000::set_compression(int on, int val)
 	}
 }
 
+// Tranceiver PTT on/off
+void RIG_IC7000::set_PTT_control(int val)
+{
+	cmd = pre_to;
+	cmd += '\x1c';
+	cmd += '\x00';
+	cmd += (unsigned char) val;
+	cmd.append( post );
+	waitFB("set ptt");
+	ptt_ = val;
+}
+
+int RIG_IC7000::get_PTT()
+{
+	cmd = pre_to;
+	cmd += '\x1c'; cmd += '\x00';
+	string resp = pre_fm;
+	resp += '\x1c'; resp += '\x00';
+	cmd.append(post);
+	if (waitFOR(8, "get PTT")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			ptt_ = replystr[p + 6];
+	}
+	return ptt_;
+}
+

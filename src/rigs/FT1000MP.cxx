@@ -442,6 +442,7 @@ void RIG_FT1000MP::set_PTT_control(int val)
 	cmd[4] = 0x0F;
 	sendCommand(cmd, 0);
 LOG_INFO("%s", str2hex(cmd.c_str(), 5));
+	ptt_ = val;
 }
 
 void RIG_FT1000MP::tune_rig()

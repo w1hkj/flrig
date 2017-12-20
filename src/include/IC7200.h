@@ -53,6 +53,7 @@ public:
 	int  get_bwB();
 
 	void set_PTT_control(int val);
+	int  get_PTT();
 	void set_volume_control(int val);
 	int  get_volume_control();
 	void get_vol_min_max_step(int &min, int &max, int &step);

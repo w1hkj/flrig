@@ -125,6 +125,7 @@ void RIG_MARK_V::set_PTT_control(int val)
 	else	 cmd[3] = 0;
 	cmd[4] = 0x0F;
 	sendCommand(cmd, 0);
+	ptt_ = val;
 }
 
 int  RIG_MARK_V::get_power_out(void)

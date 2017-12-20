@@ -368,6 +368,7 @@ void RIG_FT1000::set_PTT_control(int val)
 		showresp(WARN, HEX, "set PTT ON", cmd, replystr);
 	else
 		showresp(WARN, HEX, "set PTT OFF", cmd, replystr);
+	ptt_ = val;
 }
 
 

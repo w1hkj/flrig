@@ -240,6 +240,7 @@ void RIG_RAY152::set_PTT_control(int val)
 	cmd = val ? "X1\r" : "X0\r";
 	sendCommand(cmd,0);
 LOG_INFO("%s", cmd.c_str());
+	ptt_ = val;
 }
 
 void RIG_RAY152::set_modeA(int md)

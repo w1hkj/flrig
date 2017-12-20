@@ -458,6 +458,7 @@ void RIG_K2::set_PTT_control(int val)
 	else	 cmd = "RX;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET ptt", cmd, replystr);
+	ptt_ = val;
 }
 
 void RIG_K2::set_attenuator(int val)

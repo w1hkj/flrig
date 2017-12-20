@@ -460,7 +460,21 @@ void RIG_FT450D::set_PTT_control(int val)
 	cmd = val ? "TX1;" : "TX0;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET PTT", cmd, replystr);
+	ptt_ = val;
 }
+
+int RIG_FT450D::get_PTT()
+{
+	cmd = "TX;";
+	rsp = "TX";
+	waitN(4, 100, "get PTT", ASC);
+
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return ptt_;
+	ptt_ =  (replystr[p+2] != '0' ? 1 : 0);
+	return ptt_;
+}
+
 
 void RIG_FT450D::tune_rig()
 {

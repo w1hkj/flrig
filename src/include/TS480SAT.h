@@ -59,6 +59,8 @@ public:
 	int  get_alc();
 	int  get_power_out();
 	void set_PTT_control(int val);
+	int  get_PTT();
+
 	void tune_rig();
 
 	void set_bwA(int val);

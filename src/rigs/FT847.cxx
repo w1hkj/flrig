@@ -190,6 +190,7 @@ void RIG_FT847::set_PTT_control(int val)
 	replystr.clear();
 	sendCommand(cmd);
 	showresp(WARN, HEX, "set PTT", cmd, replystr);
+	ptt_ = val;
 }
 
 int RIG_FT847::get_smeter()

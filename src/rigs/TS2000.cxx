@@ -539,6 +539,41 @@ void RIG_TS2000::set_PTT_control(int val)
 	showresp(WARN, ASC, "set PTT", cmd, "");
 }
 
+/*
+========================================================================
+	frequency & mode data are contained in the IF; response
+		IFaaaaaaaaaaaXXXXXbbbbbcdXeefghjklmmX;
+		12345678901234567890123456789012345678
+		01234567890123456789012345678901234567 byte #
+		          1         2         3
+		                            ^ position 28
+		where:
+			aaaaaaaaaaa => decimal value of vfo frequency
+			bbbbb => rit/xit frequency
+			c => rit off/on
+			d => xit off/on
+			e => memory channel
+			f => tx/rx
+			g => mode
+			h => function
+			j => scan off/on
+			k => split off /on
+			l => tone off /on
+			m => tone number
+			X => unused characters
+		 
+========================================================================
+*/ 
+
+int RIG_TS2000::get_PTT()
+{
+	cmd = "IF;";
+	int ret = wait_char(';', 38, 100, "get VFO", ASC);
+	if (ret < 38) return ptt_;
+	ptt_ = (replybuff[28] == '1');
+	return ptt_;
+}
+
 void RIG_TS2000::tune_rig()
 {
 //	cmd = "AC111;";

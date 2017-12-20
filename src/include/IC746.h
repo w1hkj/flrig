@@ -42,6 +42,7 @@ public:
 	virtual int  get_volume_control();
 	virtual void get_vol_min_max_step(int &min, int &max, int &step);
 	virtual void set_PTT_control(int val);
+	virtual int  get_PTT();
 	virtual void set_noise(bool val);
 	virtual int  get_noise();
 	virtual void set_noise_reduction(int val);

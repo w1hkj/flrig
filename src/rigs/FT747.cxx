@@ -222,5 +222,6 @@ void RIG_FT747::set_PTT_control(int val)
 	cmd[3] = val ? 0x01 : 0x00;
 	cmd[4] = 0x0F;
 	sendCommand(cmd);
+	ptt_ = val;
 }
 
