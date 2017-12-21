@@ -186,7 +186,7 @@ void debug::sync_text(void* arg)
 	size_t p0 = 0, p1 = estr.find('\n');
 	while (p1 != string::npos) {
 std::string insrt = estr.substr(p0, p1-p0);
-std::cout << insrt << std::endl;
+//std::cout << insrt << std::endl;
 		btext->insert(1, insrt.c_str());
 		buffer.append(insrt.append("\n"));
 		p0 = p1 + 1;

@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <cstring>
 #include <ctime>
 #include <sys/types.h>
@@ -298,6 +299,26 @@ void startup(void*)
 
 }
 
+void rotate_log(std::string filename)
+{
+	const int n = 5; // rename existing log files to keep up to 5 old versions
+	ostringstream oldfn, newfn;
+	ostringstream::streampos p;
+
+	oldfn << filename << '.';
+	newfn << filename << '.';
+	p = oldfn.tellp();
+
+	for (int i = n - 1; i > 0; i--) {
+		oldfn.seekp(p);
+		newfn.seekp(p);
+		oldfn << i;
+		newfn << i + 1;
+		rename(oldfn.str().c_str(), newfn.str().c_str());
+	}
+	rename(filename.c_str(), oldfn.str().c_str());
+}
+
 int main (int argc, char *argv[])
 {
 	std::terminate_handler(flrig_terminate);
@@ -362,7 +383,10 @@ extern FILE *serlog;
 	AuxSerial = new Cserial;
 
 	try {
-		debug::start(string(RigHomeDir).append("debug_log.txt").c_str());
+		std::string fname = RigHomeDir;
+		fname.append("debug_log.txt");
+		rotate_log(fname);
+		debug::start(fname.c_str());
 		time_t t = time(NULL);
 		LOG(debug::INFO_LEVEL, debug::LOG_OTHER, _("%s log started on %s"), PACKAGE_STRING, ctime(&t));
 	}
