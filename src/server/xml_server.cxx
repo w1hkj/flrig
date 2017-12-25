@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <vector>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -47,6 +48,8 @@
 #include "XmlRpc.h"
 
 using namespace XmlRpc;
+
+#include "tod_clock.h"
 
 // The server
 XmlRpcServer rig_server;
@@ -233,7 +236,6 @@ public:
 	rig_get_ptt(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_ptt", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-//std::cout << "rig_get_ptt " << PTT << std::endl;
 		result = int(PTT);
 	}
 
@@ -372,6 +374,7 @@ public :
 		for (const char** mode = selrig->modes_; *mode; mode++, i++)
 			modes[i] = *mode;
 		result = modes;
+
 		}
 
 	std::string help() { return std::string("returns list of modes"); }
@@ -406,6 +409,7 @@ public:
 		std::string result_string = "";
 		result_string += selrig->get_modetype(mode);
 		result = result_string;
+
 	}
 
 	std::string help() { return std::string("returns current xcvr sideband (U/L)"); }
@@ -439,6 +443,7 @@ public:
 		std::string result_string = "none";
 		if (selrig->modes_) result_string = selrig->modes_[mode];
 		result = result_string;
+
 	}
 
 	std::string help() { return std::string("returns current xcvr mode"); }
@@ -500,6 +505,7 @@ public :
 				n++; i++;
 			}
 		}
+
 		result = bws;
 	}
 
@@ -517,44 +523,50 @@ public:
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 
-		if (!xcvr_initialized) {
-			result[0] = "NONE";
-			result[1] = "";
-			return;
-		}
+		result[0] = "NONE";
+		result[1] = "";
+
+		if (!xcvr_initialized) return;
 
 		{
 			guard_lock queA_lock(&mutex_queA);
 			guard_lock queB_lock(&mutex_queB);
-			if (! queA.empty() || !queB.empty()) {
-//std::cout << (!queA.empty() ? "que A ": "que B") << "que not empty" << std::endl;
-//std::cout << "returning BW string " << selrig->bwtable(0)[0] << std::endl;
-				result[0] = selrig->bwtable(0)[0];//"NONE";
-				result[1] = "";
-				return;
-			}
+			if (! queA.empty() || !queB.empty()) return;
 		}
 
 		int BW = useB ? vfoB.iBW : vfoA.iBW;
 		int mode = useB ? vfoB.imode : vfoA.imode;
 
-		if (BW < 0) {
-			result[0] = "NONE";
-			result[1] = "";
-			return;
-		}
-
 		const char **bwt = selrig->bwtable(mode);
 		const char **dsplo = selrig->lotable(mode);
 		const char **dsphi = selrig->hitable(mode);
-//std::cout << "BW " << std::hex << BW << std::dec << std::endl;
-//std::cout << bwt[0] << std::endl;
-		result[0] = (BW > 256 && selrig->has_dsp_controls) ?
-					(dsplo ? dsplo[BW & 0x7F] : "") : 
-					(bwt ? bwt[BW] : "");
-		result[1] = (BW > 256 && selrig->has_dsp_controls) ?
-					(dsphi ? dsphi[(BW >> 8) & 0x7F] : "") : 
-					"";
+
+		int max_bwt = 0,
+			max_lotable = 0,
+			max_hitable = 0;
+		if (bwt)   while (bwt[max_bwt] != NULL) max_bwt++;
+		if (dsplo) while (dsplo[max_lotable] != NULL) max_lotable++;
+		if (dsphi) while (dsphi[max_hitable] != NULL) max_hitable++;
+
+		int SB = BW & 0x7F;
+		if (SB < 0) SB = 0;
+		if (SB > max_bwt) SB = max_bwt;
+
+		int SL = BW & 0x7F;
+		if (SL >= max_lotable) SL = max_lotable - 1;
+		if (SL < 0) SL = 0;
+
+		int SH = (BW >> 8) & 0x7F;
+		if (SH >= max_hitable) SH = max_hitable - 1;
+		if (SH < 0) SH = 0;
+
+		result[0] = result[1] = "";
+		if (BW > 256 && selrig->has_dsp_controls) {
+			if (dsplo) result[0] = dsplo[SL];
+			if (dsphi) result[1] = dsphi[SH];
+		} else
+			if (bwt) result[0] = bwt[SB];
+
 	}
 
 	std::string help() { return std::string("returns current bw L/U value"); }
@@ -594,7 +606,6 @@ public:
 #include <queue>
 #include "rigbase.h"
 
-extern char *print(XCVR_STATE);
 extern queue<XCVR_STATE> queA;
 extern queue<XCVR_STATE> queB;
 extern queue<bool> quePTT;
@@ -613,7 +624,6 @@ static void push_xml()
 		srvr_vfo.imode,
 		(srvr_vfo.iBW / 256),
 		(srvr_vfo.iBW & 0xFF));
-//std::cout << pr << "\n";
 	LOG_DEBUG("%s", pr);
 	if (useB) {
 		guard_lock gl_xmlqueB(&mutex_queB, 101);
@@ -637,7 +647,8 @@ public:
 			return;
 		}
 		int state = int(params[0]);
-//std::cout << "rig_set_ptt " << state << std::endl;
+
+//std::cout << "set ptt" << state << std::endl;
 		if (state) Fl::awake(setPTT, (void *)1);
 		else Fl::awake(setPTT, (void *)0);
 	}
@@ -669,6 +680,9 @@ public:
 			return;
 		}
 		std::string ans = std::string(params[0]);
+
+//std::cout << "select vfo " << ans << std::endl;
+
 		if (ans == "A" && useB) Fl::awake(selectA);
 		if (ans == "B" && !useB) Fl::awake(selectB);
 	}
@@ -695,6 +709,7 @@ public:
 		if (useB) srvr_vfo = vfoB;
 		else       srvr_vfo = vfoA;
 		srvr_vfo.freq = freq;
+//std::cout << "set vfo " << freq << std::endl;
 		push_xml();
 	}
 	std::string help() { return std::string("rig.set_vfo NNNNNNNN (Hz)"); }
@@ -715,6 +730,8 @@ public:
 		if (useB) srvr_vfo = vfoB;
 		else       srvr_vfo = vfoA;
 		srvr_vfo.freq = freq;
+//std::cout << "set freq " << freq << std::endl;
+
 		push_xml();
 	}
 	std::string help() { return std::string("main.set_frequency NNNNNNNN (Hz)"); }
@@ -745,25 +762,21 @@ public:
 		}
 		std::string numode = string(params[0]);
 		int i = 0;
-//std::cout << "rig_set_mode " << numode << std::endl;
 
 		if (!selrig->modes_) {
-//std::cout << "selrig->modes_ is NULL" << std::endl;
 			return;
 		}
-//std::cout << numode << " : " << selrig->modes_[srvr_vfo.imode] << std::endl;
-
 		if (numode == selrig->modes_[srvr_vfo.imode]) return;
 		while (selrig->modes_[i] != NULL) {
 			if (numode == selrig->modes_[i]) {
 				srvr_vfo.imode = i;
-				srvr_vfo.iBW = -1;//0;
-//std::cout << print(srvr_vfo) << std::endl;
+				srvr_vfo.iBW = selrig->def_bandwidth(i);
 				push_xml();
 				break;
 			}
 			i++;
 		}
+//std::cout << "set mode\n";
 	}
 	std::string help() { return std::string("set_mode MODE_NAME"); }
 
@@ -795,6 +808,7 @@ public:
 		}
 		srvr_vfo.iBW = bw;
 		push_xml();
+//std::cout << "set bw\n";
 	}
 	std::string help() { return std::string("set_bw to VAL"); }
 
@@ -810,7 +824,6 @@ public:
 			return;
 		}
 		string bwstr = params;
-//		std::cout << bwstr << "\n";
 
 		int bw = int(params[0]);
 		if (useB) {

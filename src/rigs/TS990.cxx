@@ -107,7 +107,7 @@ static const char *TS990_filt_shift_tooltip = "shift";
 static const char *TS990_filt_shift_label = "S";
 
 #define DEFAULT_SH_WI     0x8510  // SHIFT 1500, WIDTH 2800
-#define DEFAULT_SH_WI_D1  0x8511  // SHIFT 1500, WIDTH 3000
+#define DEFAULT_SH_WI_D1  0x850B  // SHIFT 1500, WIDTH 3000
 #define DEFAULT_SH_WI_D2  0x850A  // SHIFT 1500, WIDTH 1000
 #define DEFAULT_SH_WI_D3  0x8508  // SHIFT 1500, WIDTH 500
 
@@ -331,9 +331,6 @@ void RIG_TS990::initialize()
 	B_default_PSK      = DEFAULT_PSK;
 
 	selectA();
-//	get_preamp();
-//	get_attenuator();
-
 }
 
 void RIG_TS990::shutdown()
@@ -426,17 +423,13 @@ void RIG_TS990::selectA()
 
 	cmd = "CB0;";
 	sendCommand(cmd);
+	showresp(INFO, ASC, "Main band", cmd, "");
+	rxtxa = true;
+
+	cmd = "MV00;";
+	sendCommand(cmd);
 	showresp(INFO, ASC, "Rx A, Tx A", cmd, "");
 	rxtxa = true;
-//	get_attenuator();
-//	get_preamp();
-//	get_smeter();
-//	get_power_out();
-//	get_volume_control();
-//	get_rf_gain();
-//	get_noise_reduction_val();
-//	get_auto_notch();
-//	get_agc();
 }
 
 void RIG_TS990::selectB()
@@ -445,17 +438,13 @@ void RIG_TS990::selectB()
 
 	cmd = "CB1;";
 	sendCommand(cmd);
+	showresp(INFO, ASC, "Sub band", cmd, "");
+	rxtxa = false;
+
+	cmd = "MV10;";
+	sendCommand(cmd);
 	showresp(INFO, ASC, "Rx B, Tx B", cmd, "");
 	rxtxa = false;
-//	get_attenuator();
-//	get_preamp();
-//	get_smeter();
-//	get_power_out();
-//	get_volume_control();
-//	get_rf_gain();
-//	get_noise_reduction_val();
-//	get_auto_notch();
-//	get_agc();
 }
 
 //==============================================================================
@@ -670,7 +659,6 @@ void RIG_TS990::set_split(bool val)
 			showresp(INFO, ASC, "Rx on A, Tx on A", cmd, "");
 		}
 	}
-//	Fl::awake(highlight_vfo, (void *)0);
 }
 
 int RIG_TS990::get_split()
@@ -1025,39 +1013,9 @@ void RIG_TS990::set_PTT_control(int val)
 	ptt_ = val;
 }
 
-/*
-========================================================================
-	frequency & mode data are contained in the IF; response
-		IFaaaaaaaaaaaXXXXXbbbbbcdXeefghjklmmX;
-		12345678901234567890123456789012345678
-		01234567890123456789012345678901234567 byte #
-		          1         2         3
-		                            ^ position 28
-		where:
-			aaaaaaaaaaa => decimal value of vfo frequency
-			bbbbb => rit/xit frequency
-			c => rit off/on
-			d => xit off/on
-			e => memory channel
-			f => tx/rx
-			g => mode
-			h => function
-			j => scan off/on
-			k => split off /on
-			l => tone off /on
-			m => tone number
-			X => unused characters
-		 
-========================================================================
-*/ 
-
 int RIG_TS990::get_PTT()
 {
-//	cmd = "IF;";
-//	int ret = wait_char(';', 38, 100, "get VFO", ASC);
-//	if (ret < 38) return ptt_;
-//	ptt_ = (replybuff[28] == '1');
-//	return ptt_;
+	return ptt_;
 }
 
 //==============================================================================
@@ -1078,33 +1036,28 @@ void RIG_TS990::tune_rig()
 
 void RIG_TS990::set_modeA(int val)
 {
-	ts990debug("set_modeA(int val)");
+	stringstream ss;
+	ss << "set_modeA(" << val << ") " << TS990modes_[val];
+	ts990debug(ss.str());
 
-	active_mode = A.imode = val;
+	A.imode = val;
 	cmd = "OM0";
 	cmd += TS990_mode_chr[val];
 	cmd += ';';
 	sendCommand(cmd);
 	showresp(INFO, ASC, "set mode main band", cmd, "");
 	set_widths(val);
-//	get_bwA();
+	data_mode = (A.imode >= LSBD1);
 }
 
 int RIG_TS990::get_modeA()
 {
-	ts990debug("get_modeA()");
-
 	int md = A.imode;
 	cmd = "OM0;";
 	if (wait_char(';', 5, TS990_WAIT, "get mode main band", ASC) < 5) return A.imode;
 
 	size_t p = replystr.rfind("OM");
 	if (p == string::npos) return A.imode;
-
-// this switch statement can be replaced with
-// md = replystr[p+3] - 1;
-// if (md < LSB) md = LSB;
-// if (md > AMD3) md = AMD3;
 
 	switch (replystr[p + 3]) {
 		case '1' : md = LSB; break;
@@ -1132,44 +1085,45 @@ int RIG_TS990::get_modeA()
 		default : md = A.imode;
 	}
 
+	ts990debug("get_modeA()");
+
 	if (md != A.imode) {
-LOG_WARN("get mode A: %s", TS990modes_[md]);
-		active_mode = A.imode = md;
+		stringstream ss;
+		ss << "get_modeB(" <<  md << ") " << TS990modes_[md];
+		ts990debug(ss.str());
+
+		LOG_INFO("get mode A: %s", TS990modes_[md]);
+		A.imode = md;
 		set_widths(md);
 	}
-//	get_agc();
+	data_mode = (A.imode >= LSBD1);
 	return A.imode;
 }
 
 void RIG_TS990::set_modeB(int val)
 {
-	ts990debug("set_modeB(int val)");
+	stringstream ss;
+	ss << "set_modeB(" << val << ") " << TS990modes_[val];
+	ts990debug(ss.str());
 
-	active_mode = B.imode = val;
+	B.imode = val;
 	cmd = "OM1";
 	cmd += TS990_mode_chr[val];
 	cmd += ';';
 	sendCommand(cmd);
 	showresp(INFO, ASC, "set mode sub band", cmd, "");
 	set_widths(val);
-//	get_bwB();
+	data_mode = (B.imode >= LSBD1);
 }
 
 int RIG_TS990::get_modeB()
 {
-	ts990debug("get_modeB()");
-
 	int md = B.imode;
 	cmd = "OM1;";
 	if (wait_char(';', 5, TS990_WAIT, "get mode sub band", ASC) < 5) return B.imode;
 
 	size_t p = replystr.rfind("OM");
 	if (p == string::npos) return B.imode;
-
-// this switch statement can be replaced with
-// md = replystr[p+3] - 1;
-// if (md < LSB) md = LSB;
-// if (md > AMD3) md = AMD3;
 
 	switch (replystr[p + 3]) {
 		case '1' : md = LSB; break;
@@ -1196,11 +1150,18 @@ int RIG_TS990::get_modeB()
 		case 'N' : md = AMD3; break;
 		default : md = B.imode;
 	}
+
+	ts990debug("get_modeb()");
+
 	if (md != B.imode) {
-		active_mode = B.imode = md;
+		stringstream ss;
+		ss << "get_modeB(" <<  md << ") " << TS990modes_[md];
+		ts990debug(ss.str());
+
+		B.imode = md;
 		set_widths(md);
 	}
-//	get_agc();
+	data_mode = (B.imode >= LSBD1);
 	return B.imode;
 }
 
@@ -1213,6 +1174,8 @@ void RIG_TS990::set_mic_gain(int val)
 	ts990debug("set_mic_gain(int val)");
 
 	cmd = "MG000;";
+	val *= 255;
+	val /= 100;
 	for (int i = 3; i > 0; i--) {
 		cmd[1+i] += val % 10;
 		val /= 10;
@@ -1235,6 +1198,8 @@ int RIG_TS990::get_mic_gain()
 		if (p == string::npos) return val;
 		replystr[p + 5] = 0;
 		val = fm_decimal(replystr.substr(p+2), 3);
+		val *= 100;
+		val /= 255;
 	}
 	return val;
 }
@@ -1613,43 +1578,49 @@ int RIG_TS990::def_bandwidth(int val)
 
 void RIG_TS990::set_bwA(int val)
 {
-	ts990debug("set_bwA(int val)");
-
 	size_t SL = 0, SH = 0;
+	size_t sl = 0, sh = 0;
+
 	SL = val & 0x7F;
+	if (SL < 0) SL = 0;
 	SH = (val >> 8) & 0x7F;
+	if (SH < 0) SH = 0;
+
+	stringstream ss;
+	ss << "set_bwA( " << SH << "/" << SL << " )";
+	ts990debug(ss.str());
 
 	switch (A.imode) {
 	case LSB: case USB:
 		if (val < 256) break;
 		if (menu_0607) {
-			if (SL >= sizeof(TS990_CAT_filt_width)/sizeof(*TS990_CAT_filt_width) ||
-				 SH >= sizeof(TS990_CAT_filt_shift)/sizeof(*TS990_CAT_filt_shift) )
-				A.iBW = A_default_SH_WI;
-			else
-				A.iBW = val;
+			sl = sizeof(TS990_CAT_filt_width)/sizeof(*TS990_CAT_filt_width) - 1;
+			sh = sizeof(TS990_CAT_filt_shift)/sizeof(*TS990_CAT_filt_shift) - 1;
+			if (SL > sl) SL = sl;
+			if (SH > sh) SH = sh;
 			cmd = "SL0";
-			cmd += TS990_CAT_filt_width[A.iBW & 0x7F];
+			cmd += TS990_CAT_filt_width[SL];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set width", cmd, "");
 			cmd = "SH0";
-			cmd += TS990_CAT_filt_shift[(A.iBW >> 8) & 0x7F];
+			cmd += TS990_CAT_filt_shift[SH];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set filter shift", cmd, "");
+			A.iBW = ((SH << 8) & SL) & 0x8000;
 		} else {
-			if (SH >= sizeof(TS990_CAT_filt_SH)/sizeof(*TS990_CAT_filt_SH) ||
-				 SL >= sizeof(TS990_CAT_filt_SL)/sizeof(*TS990_CAT_filt_SL) )
-				A.iBW = A_default_HI_LO;
-			else
-				A.iBW = val;
+			sh = sizeof(TS990_CAT_filt_SH)/sizeof(*TS990_CAT_filt_SH) - 1;
+			sl = sizeof(TS990_CAT_filt_SL)/sizeof(*TS990_CAT_filt_SL) - 1;
+			if (SL > sl) SL = sl;
+			if (SH > sh) SH = sh;
 			cmd = "SL0";
-			cmd += TS990_CAT_filt_SL[A.iBW & 0x7F];
+			cmd += TS990_CAT_filt_SL[SL];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set filter lower cutoff", cmd, "");
 			cmd = "SH0";
-			cmd += TS990_CAT_filt_SH[(A.iBW >> 8) & 0x7F];
+			cmd += TS990_CAT_filt_SH[SH];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set filter upper cutoff", cmd, "");
+			A.iBW = ((SH << 8) & SL) & 0x8000;
 		}
 		break;
 
@@ -1657,152 +1628,155 @@ void RIG_TS990::set_bwA(int val)
 	case USBD1: case USBD2: case USBD3:
 		if (val < 256) break;
 		if (menu_0608) {
-			if (SL >= sizeof(TS990_CAT_filt_width)/sizeof(*TS990_CAT_filt_width) ||
-				 SH >= sizeof(TS990_CAT_filt_shift)/sizeof(*TS990_CAT_filt_shift) )
-				A.iBW = A_default_SH_WI;
-			else
-				A.iBW = val;
+			sl = sizeof(TS990_CAT_filt_width)/sizeof(*TS990_CAT_filt_width) - 1;
+			sh = sizeof(TS990_CAT_filt_shift)/sizeof(*TS990_CAT_filt_shift) - 1;
+			if (SL > sl) SL = sl;
+			if (SH > sh) SH = sh;
 			cmd = "SL0";
-			cmd += TS990_CAT_filt_width[A.iBW & 0x7F];
+			cmd += TS990_CAT_filt_width[SL];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set data width", cmd, "");
 			cmd = "SH0";
-			cmd += TS990_CAT_filt_shift[(A.iBW >> 8) & 0x7F];
+			cmd += TS990_CAT_filt_shift[SH];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set data shift", cmd, "");
+			A.iBW = ((SH << 8) & SL) & 0x8000;
 		} else {
-			if (SH >= sizeof(TS990_CAT_filt_SH)/sizeof(*TS990_CAT_filt_SH) ||
-				 SL >= sizeof(TS990_CAT_filt_SL)/sizeof(*TS990_CAT_filt_SL) )
-				A.iBW = A_default_HI_LO;
-			else
-				A.iBW = val;
+			sh = sizeof(TS990_CAT_filt_SH)/sizeof(*TS990_CAT_filt_SH) - 1;
+			sl = sizeof(TS990_CAT_filt_SL)/sizeof(*TS990_CAT_filt_SL) - 1;
+			if (SL > sl) SL = sl;
+			if (SH > sh) SH = sh;
 			cmd = "SL0";
-			cmd += TS990_CAT_filt_SL[A.iBW & 0x7F];
+			cmd += TS990_CAT_filt_SL[SL];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set data lower cutoff", cmd, "");
 			cmd = "SH0";
-			cmd += TS990_CAT_filt_SH[(A.iBW >> 8) & 0x7F];
+			cmd += TS990_CAT_filt_SH[SH];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set data upper cutoff", cmd, "");
+			A.iBW = ((SH << 8) & SL) & 0x8000;
 		}
 		break;
 
 	case AM: case AMD1: case AMD2: case AMD3:
 		if (val < 256) break;
-		if (SH >= sizeof(TS990_CAT_AM_SH) / sizeof(*TS990_CAT_AM_SH) ||
-			SL >= sizeof(TS990_CAT_AM_SL) / sizeof(*TS990_CAT_AM_SL) )
-			A.iBW = A_default_AM;
-		else
-			A.iBW = val;
+		sh = sizeof(TS990_CAT_AM_SH) / sizeof(*TS990_CAT_AM_SH) - 1;
+		sl = sizeof(TS990_CAT_AM_SL) / sizeof(*TS990_CAT_AM_SL) - 1;
+		if (SL > sl) SL = sl;
+		if (SH > sh) SH = sh;
 		cmd = "SL0";
-		cmd += TS990_CAT_AM_SL[A.iBW & 0x7F];
+		cmd += TS990_CAT_AM_SL[SL];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set AM lower", cmd, "");
 		cmd = "SH0";
-		cmd += TS990_CAT_AM_SH[(A.iBW >> 8) & 0x7F];
+		cmd += TS990_CAT_AM_SH[SH];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set AM upper", cmd, "");
+		A.iBW = ((SH << 8) & SL) & 0x8000;
 		break;
 
 	case FM: case FMD1: case FMD2: case FMD3:
 		if (val < 256) break;
-		if (SH >= sizeof(TS990_CAT_filt_SH) / sizeof(*TS990_CAT_filt_SH) ||
-			SL >= sizeof(TS990_CAT_filt_SL) / sizeof(*TS990_CAT_filt_SL) )
-			A.iBW = A_default_FM;
-		else
-			A.iBW = val;
+		sh = sizeof(TS990_CAT_filt_SH) / sizeof(*TS990_CAT_filt_SH) - 1;
+		sl = sizeof(TS990_CAT_filt_SL) / sizeof(*TS990_CAT_filt_SL) - 1;
+		if (SL > sl) SL = sl;
+		if (SH > sh) SH = sh;
 		cmd = "SL0";
-		cmd += TS990_CAT_filt_SL[A.iBW & 0x7F];
+		cmd += TS990_CAT_filt_SL[SL];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set FM lower", cmd, "");
 		cmd = "SH0";
-		cmd += TS990_CAT_filt_SH[(A.iBW >> 8) & 0x7F];
+		cmd += TS990_CAT_filt_SH[SH];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set FM upper", cmd, "");
+		A.iBW = ((SH << 8) & SL) & 0x8000;
 		break;
 
 	case CW: case CWR:
 		if (val < 256) break;
-		if (SL >= sizeof(TS990_CAT_CW_width) / sizeof(*TS990_CAT_CW_width) ||
-			SH >= sizeof(TS990_CAT_CW_shift) / sizeof(*TS990_CAT_CW_shift) )
-			A.iBW = A_default_CW;
-		else
-			A.iBW = val;
+		sl = sizeof(TS990_CAT_CW_width) / sizeof(*TS990_CAT_CW_width) - 1;
+		sh = sizeof(TS990_CAT_CW_shift) / sizeof(*TS990_CAT_CW_shift) - 1;
+		if (SL > sl) SL = sl;
+		if (SH > sh) SH = sh;
 		cmd = "SL0";
-		cmd += TS990_CAT_CW_width[A.iBW & 0x7F];
+		cmd += TS990_CAT_CW_width[SL];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set cw width", cmd, "");
 		cmd = "SH0";
-		cmd += TS990_CAT_CW_shift[(A.iBW >> 8) & 0x7F];
+		cmd += TS990_CAT_CW_shift[SH];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set cw shift", cmd, "");
+		A.iBW = ((SH << 8) & SL) & 0x8000;
 		break;
 
 	case FSK: case FSKR:
 		if (val > 256) break;
-		if (SL >= sizeof(TS990_CAT_FSK_filt) / sizeof(*TS990_CAT_FSK_filt))
-			A.iBW = A_default_FSK;
-		else
-			A.iBW = val;
+		sl = sizeof(TS990_CAT_FSK_filt) / sizeof(*TS990_CAT_FSK_filt) - 1;
+		if (SL > sl) SL = sl;
 		cmd = "SL0";
-		cmd += TS990_CAT_FSK_filt[A.iBW & 0x7F];
+		cmd += TS990_CAT_FSK_filt[SL];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set FSK bw", cmd, "");
+		A.iBW = SL;
 		break;
 
 	case PSK: case PSKR:
 		if (val > 256) break;
-		if (SL >= sizeof(TS990_CAT_PSK_filt) / sizeof(*TS990_CAT_PSK_filt))
-			A.iBW = A_default_PSK;
-		else
-			A.iBW = val;
+		sl = sizeof(TS990_CAT_PSK_filt) / sizeof(*TS990_CAT_PSK_filt) - 1;
+		if (SL > sl) SL = sl;
 		cmd = "SL0";
-		cmd += TS990_CAT_PSK_filt[A.iBW & 0x7F];
+		cmd += TS990_CAT_PSK_filt[SL];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set PSK bw", cmd, "");
+		A.iBW = SL;
 		break;
 	}
 }
 
 void RIG_TS990::set_bwB(int val)
 {
-	ts990debug("set_bwB(int val)");
-
 	size_t SL = 0, SH = 0;
+	size_t sl = 0, sh = 0;
 	SL = val & 0x7F;
+	if (SL < 0) SL = 0;
 	SH = (val >> 8) & 0x7F;
+	if (SH < 0) SH = 0;
+
+	stringstream ss;
+	ss << "set_bwB( " << SH << "/" << SL << " )";
+	ts990debug(ss.str());
 
 	switch (B.imode) {
 	case LSB: case USB:
 		if (val < 256) break;
-		if (!menu_0607) {
-			if (SL >= sizeof(TS990_CAT_filt_width)/sizeof(*TS990_CAT_filt_width) ||
-				 SH >= sizeof(TS990_CAT_filt_shift)/sizeof(*TS990_CAT_filt_shift) )
-				B.iBW = B_default_SH_WI;
-			else
-				B.iBW = val;
+		if (menu_0607) {
+			sl = sizeof(TS990_CAT_filt_width)/sizeof(*TS990_CAT_filt_width) - 1;
+			sh = sizeof(TS990_CAT_filt_shift)/sizeof(*TS990_CAT_filt_shift) - 1;
+			if (SL > sl) SL = sl;
+			if (SH > sh) SH = sh;
 			cmd = "SL0";
-			cmd += TS990_CAT_filt_width[B.iBW & 0x7F];
+			cmd += TS990_CAT_filt_width[SL];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set width", cmd, "");
 			cmd = "SH0";
-			cmd += TS990_CAT_filt_shift[(B.iBW >> 8) & 0x7F];
+			cmd += TS990_CAT_filt_shift[SH];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set filter shift", cmd, "");
+			B.iBW = ((SH << 8) & SL) & 0x8000;
 		} else {
-			if (SH >= sizeof(TS990_CAT_filt_SH)/sizeof(*TS990_CAT_filt_SH) ||
-				SL >= sizeof(TS990_CAT_filt_SL)/sizeof(*TS990_CAT_filt_SL) )
-				B.iBW = B_default_HI_LO;
-			else
-				B.iBW = val;
+			sl = sizeof(TS990_CAT_filt_SL)/sizeof(*TS990_CAT_filt_SL) - 1;
+			sh = sizeof(TS990_CAT_filt_SH)/sizeof(*TS990_CAT_filt_SH) - 1;
+			if (SL > sl) SL = sl;
+			if (SH > sh) SH = sh;
 			cmd = "SL0";
-			cmd += TS990_CAT_filt_SL[B.iBW & 0x7F];
+			cmd += TS990_CAT_filt_SL[SL];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set filter lower cutoff", cmd, "");
 			cmd = "SH0";
-			cmd += TS990_CAT_filt_SH[(B.iBW >> 8) & 0x7F];
+			cmd += TS990_CAT_filt_SH[SH];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set filter upper cutoff", cmd, "");
+			B.iBW = ((SH << 8) & SL) & 0x8000;
 		}
 		break;
 
@@ -1810,109 +1784,107 @@ void RIG_TS990::set_bwB(int val)
 	case USBD1: case USBD2: case USBD3:
 		if (val < 256) break;
 		if (menu_0608) {
-			if (SL >= sizeof(TS990_CAT_filt_width)/sizeof(*TS990_CAT_filt_width) ||
-				SH >= sizeof(TS990_CAT_filt_shift)/sizeof(*TS990_CAT_filt_shift) )
-				B.iBW = B_default_SH_WI;
-			else
-				B.iBW = val;
+			sl = sizeof(TS990_CAT_filt_width)/sizeof(*TS990_CAT_filt_width) - 1;
+			sh = sizeof(TS990_CAT_filt_shift)/sizeof(*TS990_CAT_filt_shift) - 1;
+			if (SL > sl) SL = sl;
+			if (SH > sh) SH = sh;
 			cmd = "SL0";
-			cmd += TS990_CAT_filt_width[B.iBW & 0x7F];
+			cmd += TS990_CAT_filt_width[SL];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set data width", cmd, "");
 			cmd = "SH0";
-			cmd += TS990_CAT_filt_shift[(B.iBW >> 8) & 0x7F];
+			cmd += TS990_CAT_filt_shift[SH];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set data shift", cmd, "");
+			B.iBW = ((SH << 8) & SL) & 0x8000;
 		} else {
-			if (SH >= sizeof(TS990_CAT_filt_SH)/sizeof(*TS990_CAT_filt_SH) ||
-				 SL >= sizeof(TS990_CAT_filt_SL)/sizeof(*TS990_CAT_filt_SL) )
-				B.iBW = B_default_HI_LO;
-			else
-				B.iBW = val;
+			sh = sizeof(TS990_CAT_filt_SH)/sizeof(*TS990_CAT_filt_SH) - 1;
+			sl = sizeof(TS990_CAT_filt_SL)/sizeof(*TS990_CAT_filt_SL) - 1;
+			if (SL > sl) SL = sl;
+			if (SH > sh) SH = sh;
 			cmd = "SL0";
-			cmd += TS990_CAT_filt_SL[B.iBW & 0x7F];
+			cmd += TS990_CAT_filt_SL[SL];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set data lower cutoff", cmd, "");
 			cmd = "SH0";
-			cmd += TS990_CAT_filt_SH[(B.iBW >> 8) & 0x7F];
+			cmd += TS990_CAT_filt_SH[SH];
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set data upper cutoff", cmd, "");
+			B.iBW = ((SH << 8) & SL) & 0x8000;
 		}
 		break;
 
 	case AM: case AMD1: case AMD2: case AMD3:
 		if (val < 256) break;
-		if (SH >= sizeof(TS990_CAT_AM_SH) / sizeof(*TS990_CAT_AM_SH) ||
-			SL >= sizeof(TS990_CAT_AM_SL) / sizeof(*TS990_CAT_AM_SL) )
-			B.iBW = B_default_AM;
-		else
-			B.iBW = val;
+		sh = sizeof(TS990_CAT_AM_SH) / sizeof(*TS990_CAT_AM_SH) - 1;
+		sl = sizeof(TS990_CAT_AM_SL) / sizeof(*TS990_CAT_AM_SL) - 1;
+		if (SL > sl) SL = sl;
+		if (SH > sh) SH = sh;
 		cmd = "SL0";
-		cmd += TS990_CAT_AM_SL[B.iBW & 0x7F];
+		cmd += TS990_CAT_AM_SL[SL];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set AM lower", cmd, "");
 		cmd = "SH0";
-		cmd += TS990_CAT_AM_SH[(B.iBW >> 8) & 0x7F];
+		cmd += TS990_CAT_AM_SH[SH];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set AM upper", cmd, "");
+		B.iBW = ((SH << 8) & SL) & 0x8000;
 		break;
 
 	case FM: case FMD1: case FMD2: case FMD3:
 		if (val < 256) break;
-		if (SH >= sizeof(TS990_CAT_filt_SH) / sizeof(*TS990_CAT_filt_SH) ||
-			SL >= sizeof(TS990_CAT_filt_SL) / sizeof(*TS990_CAT_filt_SL) )
-			B.iBW = B_default_FM;
-		else
-			B.iBW = val;
+		sh = sizeof(TS990_CAT_filt_SH) / sizeof(*TS990_CAT_filt_SH) - 1;
+		sl = sizeof(TS990_CAT_filt_SL) / sizeof(*TS990_CAT_filt_SL) - 1;
+		if (SL > sl) SL = sl;
+		if (SH > sh) SH = sh;
 		cmd = "SL0";
-		cmd += TS990_CAT_filt_SL[B.iBW & 0x7F];
+		cmd += TS990_CAT_filt_SL[SL];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set FM lower", cmd, "");
 		cmd = "SH0";
-		cmd += TS990_CAT_filt_SH[(B.iBW >> 8) & 0x7F];
+		cmd += TS990_CAT_filt_SH[SH];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set FM upper", cmd, "");
+		B.iBW = ((SH << 8) & SL) & 0x8000;
 		break;
 
 	case CW: case CWR:
 		if (val < 256) break;
-		if (SL >= sizeof(TS990_CAT_CW_width) / sizeof(*TS990_CAT_CW_width) ||
-			SH >= sizeof(TS990_CAT_CW_shift) / sizeof(*TS990_CAT_CW_shift) )
-			B.iBW = B_default_CW;
-		else
-			B.iBW = val;
+		sl = sizeof(TS990_CAT_CW_width) / sizeof(*TS990_CAT_CW_width) - 1;
+		sh = sizeof(TS990_CAT_CW_shift) / sizeof(*TS990_CAT_CW_shift) - 1;
+		if (SL > sl) SL = sl;
+		if (SH > sh) SH = sh;
 		cmd = "SL0";
-		cmd += TS990_CAT_CW_width[B.iBW & 0x7F];
+		cmd += TS990_CAT_CW_width[SL];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set cw width", cmd, "");
 		cmd = "SH0";
-		cmd += TS990_CAT_CW_shift[(B.iBW >> 8) & 0x7F];
+		cmd += TS990_CAT_CW_shift[SH];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set cw shift", cmd, "");
+		B.iBW = ((SH << 8) & SL) & 0x8000;
 		break;
 
 	case FSK: case FSKR:
 		if (val > 256) break;
-		if (SL >= sizeof(TS990_CAT_FSK_filt) / sizeof(*TS990_CAT_FSK_filt))
-			B.iBW = B_default_FSK;
-		else
-			B.iBW = val;
+		sl = sizeof(TS990_CAT_FSK_filt) / sizeof(*TS990_CAT_FSK_filt) - 1;
+		if (SL > sl) SL = sl;
 		cmd = "SL0";
-		cmd += TS990_CAT_FSK_filt[B.iBW & 0x7F];
+		cmd += TS990_CAT_FSK_filt[SL];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set FSK bw", cmd, "");
+		B.iBW = SL;
 		break;
 
 	case PSK: case PSKR:
 		if (val > 256) break;
-		if (SL >= sizeof(TS990_CAT_PSK_filt) / sizeof(*TS990_CAT_PSK_filt))
-			B.iBW = B_default_PSK;
-		else
-			B.iBW = val;
+		sl = sizeof(TS990_CAT_PSK_filt) / sizeof(*TS990_CAT_PSK_filt) - 1;
+		if (SL > sl) SL = sl;
 		cmd = "SL0";
-		cmd += TS990_CAT_PSK_filt[B.iBW & 0x7F];
+		cmd += TS990_CAT_PSK_filt[SL];
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set PSK bw", cmd, "");
+		B.iBW = SL;
 		break;
 	}
 }
@@ -1923,8 +1895,6 @@ void RIG_TS990::set_bwB(int val)
 // response SLbbb;  SHbbb;
 int RIG_TS990::get_bwA()
 {
-	ts990debug("get_bwA()");
-
 	size_t p;
 	int SL = 0, SH = 0;
 
@@ -1977,7 +1947,7 @@ read_menu_0608();
 	case LSB: case USB:
 		SL = A.iBW & 0x7F;
 		SH = (A.iBW >> 8) & 0x7F;
-		if (!menu_0607) {
+		if (menu_0607) {
 			A.iBW = A_default_SH_WI;
 			cmd = "SL0;";
 			if (wait_char(';', 6, TS990_WAIT, "get width", ASC) == 6) {
@@ -2013,7 +1983,7 @@ read_menu_0608();
 	case LSBD1: case USBD1:
 			SL = A.iBW & 0x7F;
 			SH = (A.iBW >> 8) & 0x7F;
-		if (!menu_0608) {
+		if (menu_0608) {
 			A.iBW = A_default_SH_WI_D1;
 			cmd = "SL0;";
 			if (wait_char(';', 6, TS990_WAIT, "get width", ASC) == 6) {
@@ -2270,8 +2240,12 @@ read_menu_0608();
 				A_default_FM_D3 = A.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
-		return A.iBW;
 	}
+
+	stringstream ss;
+	ss << "mode: " << TS990modes_[A.imode] << ", get_bwA( " << SH << "/" << SL << " )";
+	ts990debug(ss.str());
+
 	return A.iBW;
 }
 
@@ -2281,8 +2255,6 @@ read_menu_0608();
 // responses SHbbb; SLbbb;
 int RIG_TS990::get_bwB()
 {
-	ts990debug("get_bwA()");
-
 	size_t p;
 	int SL = 0, SH = 0;
 
@@ -2335,7 +2307,7 @@ read_menu_0608();
 	case LSB: case USB:
 		SL = B.iBW & 0x7F;
 		SH = (B.iBW >> 8) & 0x7F;
-		if (!menu_0607) {
+		if (menu_0607) {
 			B.iBW = B_default_SH_WI;
 			cmd = "SL0;";
 			if (wait_char(';', 6, TS990_WAIT, "get width", ASC) == 6) {
@@ -2371,7 +2343,7 @@ read_menu_0608();
 	case LSBD1: case USBD1:
 			SL = B.iBW & 0x7F;
 			SH = (B.iBW >> 8) & 0x7F;
-		if (!menu_0608) {
+		if (menu_0608) {
 			B.iBW = B_default_SH_WI_D1;
 			cmd = "SL0;";
 			if (wait_char(';', 6, TS990_WAIT, "get width", ASC) == 6) {
@@ -2627,8 +2599,12 @@ read_menu_0608();
 				B_default_FM_D3 = B.iBW = ((SH << 8) | (SL & 0x7F)) | 0x8000;
 			}
 		}
-		return B.iBW;
 	}
+
+	stringstream ss;
+	ss << "mode: " << TS990modes_[B.imode] << ", get_bwB( " << SH << "/" << SL << " )";
+	ts990debug(ss.str());
+
 	return B.iBW;
 }
 
@@ -2722,6 +2698,8 @@ void RIG_TS990::set_squelch(int val)
 {
 	ts990debug("set_squelch(int val)");
 
+	val *= 255;
+	val /= 100;
 	if (useB) {
 		cmd = "SQ1";
 		cmd.append(to_decimal(abs(val),3)).append(";");
@@ -2758,6 +2736,8 @@ int  RIG_TS990::get_squelch()
 			val = fm_decimal(replystr.substr(p+3), 3);
 		}
 	}
+	val *= 100;
+	val /= 255;
 	return val;
 }
 
@@ -2765,13 +2745,15 @@ void RIG_TS990::get_squelch_min_max_step(int &min, int &max, int &step)
 {
 	ts990debug("get_squelch_min_max_step(int &min, int &max, int &step)");
 
-	min = 0; max = 255; step = 1;
+	min = 0; max = 100; step = 1;
 }
 
 void RIG_TS990::set_rf_gain(int val)
 {
 	ts990debug("set_rf_gain(int val)");
 
+	val *= 255;
+	val /= 100;
 	if (useB) {
 		cmd = "RG1";
 		cmd.append(to_decimal(val,3)).append(";");
@@ -2801,6 +2783,8 @@ int  RIG_TS990::get_rf_gain()
 		size_t p = replystr.rfind("RG");
 		if (p != string::npos)
 			val = fm_decimal(replystr.substr(p+3), 3);
+			val *= 100;
+			val /= 255;
 	} else {
 		cmd = "RG0;";
 		if (wait_char(';', 7, TS990_WAIT, "get rf gain", ASC) < 7) return val;
@@ -2808,6 +2792,8 @@ int  RIG_TS990::get_rf_gain()
 		size_t p = replystr.rfind("RG");
 		if (p != string::npos)
 			val = fm_decimal(replystr.substr(p+3), 3);
+			val *= 100;
+			val /= 255;
 	}
 	return val;
 }
@@ -2817,7 +2803,7 @@ void RIG_TS990::get_rf_min_max_step(int &min, int &max, int &step)
 	ts990debug("get_rf_min_max_step(int &min, int &max, int &step)");
 
 	min = 0;
-	max = 255;
+	max = 100;
 	step = 1;
 }
 
@@ -2998,7 +2984,6 @@ bool  RIG_TS990::get_notch(int &val)
 	ts990debug("get_notch(int &val)");
 
 	if (useB) {
-		val = 1500;
 		cmd = "NT1;";
 		if (wait_char(';', 5, TS990_WAIT, "get notch state", ASC) < 5) return 0;
 		size_t p = replystr.rfind("NT");
@@ -3014,7 +2999,6 @@ bool  RIG_TS990::get_notch(int &val)
 		}
 		return 0;
 	} else {
-		val = 1500;
 		cmd = "NT0;";
 		if (wait_char(';', 5, TS990_WAIT, "get notch state", ASC) < 5) return 0;
 		size_t p = replystr.rfind("NT");
@@ -3050,9 +3034,11 @@ void RIG_TS990::get_notch_min_max_step(int &min, int &max, int &step)
 
 void RIG_TS990::set_if_shift(int val)
 {
-	ts990debug("set_if_shift(int val)");
+	ts990debug("set_monitor_level(int val)");
 
 	progStatus.shift_val = val;
+	val *= 255;
+	val /= 100;
 	cmd = "ML";
 	cmd.append(to_decimal(val,3)).append(";");
 	sendCommand(cmd);
@@ -3062,16 +3048,17 @@ void RIG_TS990::set_if_shift(int val)
 //response MLsss;
 bool RIG_TS990::get_if_shift(int &val)
 {
-	ts990debug("get_if_shift(int &val)");
+	ts990debug("get_monitor_level(int &val)");
 
 	cmd = "ML;";
 	if (wait_char(';', 6, TS990_WAIT, "get Mon Level", ASC) == 6) {
 		size_t p = replystr.rfind("ML");
 		if (p != string::npos) {
 			val = fm_decimal(&replystr[p+2], 3);
+			val *= 100;
+			val /= 100;
 		}
 	}
-	val = progStatus.shift_val;
 
 	bool on = false;
 	cmd = "MO0;";
@@ -3085,10 +3072,10 @@ bool RIG_TS990::get_if_shift(int &val)
 
 void RIG_TS990::get_if_min_max_step(int &min, int &max, int &step)
 {
-	ts990debug("get_if_min_max_step(int &min, int &max, int &step)");
+	ts990debug("get_mon_min_max_step(int &min, int &max, int &step)");
 
 	if_shift_min = min = 0;
-	if_shift_max = max = 255;
+	if_shift_max = max = 100;
 	if_shift_step = step = 1;
 	if_shift_mid = 10;
 }

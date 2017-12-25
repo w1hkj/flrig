@@ -741,8 +741,8 @@ void update_notch(void *d)
 bool inhibit_notch = false;
 void read_notch()
 {
-	int on = 0;
-	int val = 0;
+	int on = progStatus.notch;
+	int val = progStatus.notch_val;
 	if (inhibit_notch) return;
 	if (!selrig->has_notch_control) return;
 	{
@@ -1899,7 +1899,7 @@ void cbbtnNotch()
 	selrig->set_notch(btn, progStatus.notch_val);
 
 	MilliSleep(progStatus.comm_wait);
-	int on, val;
+	int on, val = progStatus.notch_val;
 	on = selrig->get_notch(val);
 	while ((on != btn) && (cnt++ < 10)) {
 		MilliSleep(progStatus.comm_wait);
