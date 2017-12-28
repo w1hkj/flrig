@@ -1,8 +1,30 @@
 
 
-=Version 1.3.36=
+=Version 1.3.37=
 
-2017-10-30  David Freese  <w1hkj@bellsouth.net>
+2017-12-25  David Freese  <w1hkj@bellsouth.net>
+
+	318525f: TS990 / xmlrpc server mods
+	6ae502c: IC7200 filter width
+	ab52166: Rotate log
+	c028b78: Get PTT
+	72540db: Comm timeout
+	77df05d: IC7200/7300 notch
+	1591335: TS990 changes
+	ab76f02: Remove xmlrpc client
+	d4eba84: UI service paradigm
+	8e3ed6f: IC718
+	d7e240d: IC7200
+	7b24e97: Extras drop down panel
+	96fc5cd: start-stop
+	dbdd895: OS X race conditions
+	b1c196e: PTT xmlrpc get
+	5c2d2a0: Value by VFO
+	7f2cd8b: UI wide power button
+	a16b2c9: Comp Level
+
+
+=Version 1.3.36=
 
 	fc88084: IC 9100
 	cc62a5a: K2
