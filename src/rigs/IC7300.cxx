@@ -293,20 +293,16 @@ bool RIG_IC7300::can_split()
 void RIG_IC7300::set_split(bool val)
 {
 	split = val;
-	if (val) {
-		cmd.assign(pre_to).append("\x0F\x01").append( post );
-		waitFB("Split ON");
-	} else {
-		cmd.assign(pre_to).append("\x0F");
-		cmd += '\x00';
-		cmd.append( post );
-		waitFB("Split OFF");
-	}
+	cmd = pre_to;
+	cmd += 0x0F;
+	cmd += val ? 0x01 : 0x00;
+	cmd.append(post);
+	waitFB(val ? "set split ON" : "set split OFF");
 }
 
 int RIG_IC7300::get_split()
 {
-	int split = 0;
+	int read_split = 0;
 	cmd.assign(pre_to);
 	cmd.append("\x0F");
 	cmd.append( post );
@@ -315,7 +311,9 @@ int RIG_IC7300::get_split()
 		resp.append("\x0F");
 		size_t p = replystr.find(resp);
 		if (p != string::npos)
-			split = replystr[p+5];
+			read_split = replystr[p+5];
+		if (read_split != 0xFA) // fail byte
+			split = read_split;
 	}
 	return split;
 }

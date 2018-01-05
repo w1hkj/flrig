@@ -494,30 +494,30 @@ int RIG_IC7000::get_auto_notch()
 
 void RIG_IC7000::set_split(bool val)
 {
+	split = val;
 	cmd = pre_to;
 	cmd += 0x0F;
 	cmd += val ? 0x01 : 0x00;
 	cmd.append(post);
-	waitFB("set split");
+	waitFB(val ? "set split ON" : "set split OFF");
 }
 
 int  RIG_IC7000::get_split()
 {
-	LOG_WARN("%s", "get split - not implemented");
-	return progStatus.split;
-/*
-	cmd = pre_to;
-	cmd += 0x0F;
-	cmd.append(post);
-	string resp = pre_fm;
-	resp += 0x0F;
-	if (waitFOR(8, "get split")) {
-		size_t p = replystr.rfind(resp);
+	int read_split = 0;
+	cmd.assign(pre_to);
+	cmd.append("\x0F");
+	cmd.append( post );
+	if (waitFOR(7, "get split")) {
+		string resp = pre_fm;
+		resp.append("\x0F");
+		size_t p = replystr.find(resp);
 		if (p != string::npos)
-			return (replystr[p+6] ? 1 : 0);
+			read_split = replystr[p+5];
+		if (read_split != 0xFA) // fail byte
+			split = read_split;
 	}
-	return 0;
-*/
+	return split;
 }
 
 // Volume control val 0 ... 100

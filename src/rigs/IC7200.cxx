@@ -267,22 +267,14 @@ bool RIG_IC7200::can_split()
 void RIG_IC7200::set_split(bool val)
 {
 	split = val;
-
-	if (val) {
-		cmd.assign(pre_to);
-		cmd.append("\x0F");
-		cmd += '\x01';
-		cmd.append( post );
-		waitFB("Split ON");
-	} else {
-		cmd.assign(pre_to);
-		cmd.append("\x0F");
-		cmd += '\x00';
-		cmd.append( post );
-		waitFB("Split OFF");
-	}
+	cmd = pre_to;
+	cmd += 0x0F;
+	cmd += val ? 0x01 : 0x00;
+	cmd.append(post);
+	waitFB(val ? "set split ON" : "set split OFF");
 }
 
+// 7200 does not respond to get split CAT command
 int RIG_IC7200::get_split()
 {
 	return split;

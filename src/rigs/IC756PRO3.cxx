@@ -568,17 +568,30 @@ int RIG_IC756PRO3::get_power_control()
 
 void RIG_IC756PRO3::set_split(bool val)
 {
+	split = val;
 	cmd = pre_to;
 	cmd += 0x0F;
 	cmd += val ? 0x01 : 0x00;
 	cmd.append(post);
-	waitFB("set split");
+	waitFB(val ? "set split ON" : "set split OFF");
 }
 
 int RIG_IC756PRO3::get_split()
 {
-	LOG_WARN("%s", "get split - not implemented");
-	return progStatus.split;
+	int read_split = 0;
+	cmd.assign(pre_to);
+	cmd.append("\x0F");
+	cmd.append( post );
+	if (waitFOR(7, "get split")) {
+		string resp = pre_fm;
+		resp.append("\x0F");
+		size_t p = replystr.find(resp);
+		if (p != string::npos)
+			read_split = replystr[p+5];
+		if (read_split != 0xFA) // fail byte
+			split = read_split;
+	}
+	return split;
 }
 
 int RIG_IC756PRO3::adjust_bandwidth(int m)
