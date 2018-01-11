@@ -464,7 +464,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				sldrSQUELCH->textsize(12);
 				sldrSQUELCH->callback((Fl_Callback*)cb_sldrSQUELCH);
 				sldrSQUELCH->align(Fl_Align(FL_ALIGN_LEFT));
-				sldrSQUELCH->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
+				sldrSQUELCH->when(FL_WHEN_RELEASE);
 				Fl_Group::current()->resizable(sldrSQUELCH);
 				sldrSQUELCH->reverse(true);
 
@@ -483,7 +483,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				sldrMICGAIN->textsize(12);
 				sldrMICGAIN->callback((Fl_Callback*)cb_sldrMICGAIN);
 				sldrMICGAIN->align(Fl_Align(FL_ALIGN_LEFT));
-				sldrMICGAIN->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
+				sldrMICGAIN->when(FL_WHEN_RELEASE);
 				sldrMICGAIN->reverse(true);
 
 			grp_row2a->end();
@@ -513,7 +513,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				sldrIFSHIFT->textsize(12);
 				sldrIFSHIFT->callback((Fl_Callback*)cb_sldrIFSHIFT);
 				sldrIFSHIFT->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-				sldrIFSHIFT->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
+				sldrIFSHIFT->when(FL_WHEN_RELEASE);
 				sldrIFSHIFT->reverse(true);
 
 				btnNR = new Fl_Light_Button(186, 128, 50, 18, _("NR"));
@@ -537,7 +537,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				sldrNR->textsize(12);
 				sldrNR->callback((Fl_Callback*)cb_sldrNR);
 				sldrNR->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-				sldrNR->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
+				sldrNR->when(FL_WHEN_RELEASE);
 				Fl_Group::current()->resizable(sldrNR);
 				sldrNR->reverse(true);
 
@@ -569,7 +569,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				sldrNOTCH->textsize(12);
 				sldrNOTCH->callback((Fl_Callback*)cb_sldrNOTCH);
 				sldrNOTCH->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-				sldrNOTCH->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
+				sldrNOTCH->when(FL_WHEN_RELEASE);
 				sldrNOTCH->reverse(true);
 
 				btnAGC = new Fl_Light_Button(370, 128, 50, 18, _("AGC"));
@@ -595,7 +595,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				sldrRFGAIN->textsize(12);
 				sldrRFGAIN->callback((Fl_Callback*)cb_sldrRFGAIN);
 				sldrRFGAIN->align(Fl_Align(FL_ALIGN_LEFT));
-				sldrRFGAIN->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
+				sldrRFGAIN->when(FL_WHEN_RELEASE);
 				Fl_Group::current()->resizable(sldrRFGAIN);
 				sldrRFGAIN->reverse(true);
 			grp_row2c->end();
@@ -625,7 +625,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				sldrPOWER->textsize(12);
 				sldrPOWER->callback((Fl_Callback*)cb_sldrPOWER);
 				sldrPOWER->align(Fl_Align(FL_ALIGN_LEFT));
-				sldrPOWER->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
+				sldrPOWER->when(FL_WHEN_RELEASE);
 				sldrPOWER->reverse(true);
 
 				btnVol = new Fl_Light_Button(552, 128, 50, 18, _("Vol"));
@@ -651,7 +651,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				sldrVOLUME->textsize(12);
 				sldrVOLUME->callback((Fl_Callback*)cb_sldrVOLUME);
 				sldrVOLUME->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-				sldrVOLUME->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
+				sldrVOLUME->when(FL_WHEN_RELEASE);
 				Fl_Group::current()->resizable(sldrVOLUME);
 				sldrVOLUME->reverse(true);
 
@@ -675,7 +675,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				sldrVOLUME->textsize(12);
 				sldrVOLUME->callback((Fl_Callback*)cb_sldrVOLUME);
 				sldrVOLUME->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-				sldrVOLUME->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
+				sldrVOLUME->when(FL_WHEN_RELEASE);
 				Fl_Group::current()->resizable(sldrVOLUME);
 				sldrVOLUME->reverse(true);
 #endif
@@ -980,7 +980,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				sldr_nb_level->step(1);
 				sldr_nb_level->callback((Fl_Callback*)cb_sldr_nb_level);
 				sldr_nb_level->align(Fl_Align(FL_ALIGN_LEFT));
-				sldr_nb_level->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
+				sldr_nb_level->when(FL_WHEN_RELEASE);
 				sldr_nb_level->value(progStatus.nb_level);
 
 //				cbo_agc_level = new Fl_ComboBox(244, ypos + 10, 80, 20, _("AGC"));

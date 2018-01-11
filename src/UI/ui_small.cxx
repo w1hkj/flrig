@@ -111,7 +111,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	sldrVOLUME->textsize(12);
 	sldrVOLUME->callback((Fl_Callback*)cb_sldrVOLUME);
 	sldrVOLUME->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-	sldrVOLUME->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
+	sldrVOLUME->when(FL_WHEN_RELEASE);
 	sldrVOLUME->reverse(true);
 
 	btnAGC = new Fl_Light_Button(2, 145, 50, 18, _("AGC"));
@@ -137,7 +137,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	sldrRFGAIN->textsize(12);
 	sldrRFGAIN->callback((Fl_Callback*)cb_sldrRFGAIN);
 	sldrRFGAIN->align(Fl_Align(FL_ALIGN_LEFT));
-	sldrRFGAIN->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
+	sldrRFGAIN->when(FL_WHEN_RELEASE);
 	sldrRFGAIN->reverse(true);
 
 	sldrSQUELCH = new Fl_Wheel_Value_Slider(54, 165, 156, 18, _("SQL"));
@@ -156,7 +156,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	sldrSQUELCH->textsize(12);
 	sldrSQUELCH->callback((Fl_Callback*)cb_sldrSQUELCH);
 	sldrSQUELCH->align(Fl_Align(FL_ALIGN_LEFT));
-	sldrSQUELCH->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
+	sldrSQUELCH->when(FL_WHEN_RELEASE);
 	sldrSQUELCH->reverse(true);
 
 	btnIFsh = new Fl_Light_Button(214, 125, 50, 18, _("IFsh"));
@@ -181,7 +181,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	sldrIFSHIFT->textsize(12);
 	sldrIFSHIFT->callback((Fl_Callback*)cb_sldrIFSHIFT);
 	sldrIFSHIFT->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-	sldrIFSHIFT->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
+	sldrIFSHIFT->when(FL_WHEN_RELEASE);
 	sldrIFSHIFT->reverse(true);
 
 	btnNotch = new Fl_Light_Button(214, 145, 50, 18, _("Nch"));
@@ -206,7 +206,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	sldrNOTCH->textsize(12);
 	sldrNOTCH->callback((Fl_Callback*)cb_sldrNOTCH);
 	sldrNOTCH->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-	sldrNOTCH->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
+	sldrNOTCH->when(FL_WHEN_RELEASE);
 	sldrNOTCH->reverse(true);
 
 	btnNR = new Fl_Light_Button(214, 165, 50, 18, _("NR"));
@@ -230,7 +230,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	sldrNR->textsize(12);
 	sldrNR->callback((Fl_Callback*)cb_sldrNR);
 	sldrNR->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-	sldrNR->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
+	sldrNR->when(FL_WHEN_RELEASE);
 	sldrNR->reverse(true);
 
 	btnDataPort = new Fl_Light_Button(2, 246, 50, 18, _("Data"));
@@ -256,7 +256,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	sldrMICGAIN->textsize(12);
 	sldrMICGAIN->callback((Fl_Callback*)cb_sldrMICGAIN);
 	sldrMICGAIN->align(Fl_Align(FL_ALIGN_LEFT));
-	sldrMICGAIN->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
+	sldrMICGAIN->when(FL_WHEN_RELEASE);
 	sldrMICGAIN->reverse(true);
 
 	btnPOWER = new Fl_Light_Button(212, 185, 50, 18, _("Pwr"));
@@ -280,7 +280,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	sldrPOWER->textsize(12);
 	sldrPOWER->callback((Fl_Callback*)cb_sldrPOWER);
 	sldrPOWER->align(Fl_Align(FL_ALIGN_LEFT));
-	sldrPOWER->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
+	sldrPOWER->when(FL_WHEN_RELEASE);
 	sldrPOWER->reverse(true);
 
 	btnA = new Fl_Light_Button(212, 62, 52, 20, _("vfoA"));
@@ -1282,7 +1282,7 @@ int tby = gpy + 20;
 			sldr_nb_level->step(1);
 			sldr_nb_level->callback((Fl_Callback*)cb_sldr_nb_level);
 			sldr_nb_level->align(Fl_Align(FL_ALIGN_BOTTOM));
-			sldr_nb_level->when(FL_WHEN_CHANGED | FL_WHEN_RELEASE);
+			sldr_nb_level->when(FL_WHEN_RELEASE);
 			sldr_nb_level->value(progStatus.nb_level);
 
 //			cbo_agc_level = new Fl_ComboBox(123, 281, 80, 22, _("AGC"));
