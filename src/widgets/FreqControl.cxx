@@ -23,6 +23,7 @@
 #include <FL/Fl_Float_Input.H>
 #include <FL/fl_draw.H>
 #include <FL/Fl_Box.H>
+#include <iostream>
 
 #include <cstdlib>
 #include <cmath>
@@ -500,6 +501,7 @@ void cFreqControl::visual_beep()
 	Fl::add_timeout(0.1, restore_color, this);
 }
 
+bool once = true;
 void cFreqControl::set_ndigits(int nbr)
 {
 	delete decbx;
@@ -541,7 +543,19 @@ void cFreqControl::set_ndigits(int nbr)
 	int xpos;
 
 	minVal = 0;
-	maxVal = (long int)(pow(10, nD) - 1) * precision;
+	maxVal = 
+		(nD == 1 ? 9L :
+		(nD == 2 ? 99L :
+		(nD == 3 ? 999L :
+		(nD == 4 ? 9999L :
+		(nD == 5 ? 99999L :
+		(nD == 6 ? 999999L :
+		(nD == 7 ? 9999999L :
+		(nD == 8 ? 99999999L :
+		(nD == 9 ? 999999999L :
+		1410065407L )))))))));
+
+	if (nD < 8) maxVal *= precision;
 	double fmaxval = maxVal / 1000.0;
 
 	static char tt[100];

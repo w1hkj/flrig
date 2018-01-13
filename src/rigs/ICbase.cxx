@@ -99,8 +99,8 @@ bool RIG_ICOM::waitFB(const char *sz)
 
 	if (!progStatus.use_tcpip && !RigSerial->IsOpen()) {
 		replystr = returned;
-		snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
-		showresp(DEBUG, HEX, sztemp, tosend, returned);
+//		snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
+//		showresp(DEBUG, HEX, sztemp, tosend, returned);
 		waitcount = 0;
 		return false;
 	}
@@ -166,8 +166,8 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 
 	if (!progStatus.use_tcpip && !RigSerial->IsOpen()) {
 		replystr = returned;
-		snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
-		showresp(DEBUG, HEX, sztemp, tosend, returned);
+//		snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
+//		showresp(DEBUG, HEX, sztemp, tosend, returned);
 		return false;
 	}
 	for (repeat = 0; repeat < progStatus.comm_retries; repeat++) {

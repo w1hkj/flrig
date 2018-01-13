@@ -162,7 +162,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 			grpMeters->end();
 { // FreqDispA
 		FreqDispA = new cFreqControl(
-			grpMeters->x() + grpMeters->w() + 1, ypos, 290, 60, _("9"));
+			grpMeters->x() + grpMeters->w() + 1, ypos, 290, 60, _("10"));
 		FreqDispA->box(FL_DOWN_BOX);
 		FreqDispA->color(FL_BACKGROUND_COLOR);
 		FreqDispA->selection_color(FL_BACKGROUND_COLOR);

@@ -23,7 +23,7 @@
 
 #include "IC746.h"
 
-class RIG_IC9100 : public RIG_IC746PRO {
+class RIG_IC9100 : public RIG_ICOM {
 public:
 	RIG_IC9100();
 	~RIG_IC9100(){}
@@ -32,6 +32,12 @@ public:
 
 	void selectA();
 	void selectB();
+
+	long get_vfoA ();
+	void set_vfoA (long freq);
+
+	long get_vfoB(void);
+	void set_vfoB(long f);
 
 	void set_modeA(int val);
 	int  get_modeA();
@@ -49,6 +55,18 @@ public:
 	int  def_bandwidth(int m);
 
 	void set_mic_gain(int v);
+
+	void set_volume_control(int val);
+	int  get_volume_control();
+	void get_vol_min_max_step(int &min, int &max, int &step);
+
+	void set_power_control(double val);
+	int  get_power_control();
+	void get_pc_min_max_step(double &min, double &max, double &step);
+
+	void set_rf_gain(int val);
+	int  get_rf_gain();
+	void get_rf_min_max_step(double &min, double &max, double &step);
 
 	void set_compression(int, int);
 	void get_comp_min_max_step(int &min, int &max, int &step) {
@@ -92,11 +110,31 @@ public:
 	const char *agc_label();
 	int  agc_val();
 
-	int  get_auto_notch();
-	void set_auto_notch(int v);
+	void set_noise(bool val);
+	int  get_noise();
+	void set_nb_level(int val);
+	int  get_nb_level();
+
+	void set_noise_reduction(int val);
+	int  get_noise_reduction();
+	void set_noise_reduction_val(int val);
+	int  get_noise_reduction_val();
+	void get_nr_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 15; step = 1; }
+
+	void set_if_shift(int val);
+	void get_if_min_max_step(int &min, int &max, int &step);
+	bool get_if_shift(int &val);
+
+	void set_squelch(int val);
+	int  get_squelch();
+
 	void set_notch(bool on, int val);
 	bool get_notch(int &val);
 	void get_notch_min_max_step(int &min, int &max, int &step);
+
+	int  get_auto_notch();
+	void set_auto_notch(int v);
 
 	void set_attenuator(int val);
 	int get_attenuator();
@@ -115,6 +153,7 @@ public:
 
 	void set_PTT_control(int val);
 	int  get_PTT();
+	void tune_rig();
 
 };
 

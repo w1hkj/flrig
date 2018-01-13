@@ -329,7 +329,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		xpos += grpMeters->w() + 2;
 		ypos = Y + 2;
 
-		FreqDispA = new cFreqControl(xpos, ypos, 480, 100, _("9"));
+		FreqDispA = new cFreqControl(xpos, ypos, 480, 100, _("10"));
 		FreqDispA->box(FL_DOWN_BOX);
 		FreqDispA->color(FL_BACKGROUND_COLOR);
 		FreqDispA->selection_color(FL_BACKGROUND_COLOR);
