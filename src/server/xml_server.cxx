@@ -548,25 +548,25 @@ public:
 		if (dsplo) while (dsplo[max_lotable] != NULL) max_lotable++;
 		if (dsphi) while (dsphi[max_hitable] != NULL) max_hitable++;
 
-		int SB = BW & 0x7F;
-		if (SB < 0) SB = 0;
-		if (SB > max_bwt) SB = max_bwt;
-
-		int SL = BW & 0x7F;
-		if (SL >= max_lotable) SL = max_lotable - 1;
-		if (SL < 0) SL = 0;
-
-		int SH = (BW >> 8) & 0x7F;
-		if (SH >= max_hitable) SH = max_hitable - 1;
-		if (SH < 0) SH = 0;
-
 		result[0] = result[1] = "";
-		if (BW > 256 && selrig->has_dsp_controls) {
+		if (BW < 256 && bwt) {
+			int SB = BW & 0x7F;
+			if (SB < 0) SB = 0;
+			if (SB > max_bwt) SB = max_bwt-1;
+			result[0] = bwt[SB];
+		}
+		else if (dsplo && dsphi) {
+			int SL = BW & 0x7F;
+			if (SL >= max_lotable) SL = max_lotable - 1;
+			if (SL < 0) SL = 0;
+
+			int SH = (BW >> 8) & 0x7F;
+			if (SH >= max_hitable) SH = max_hitable - 1;
+			if (SH < 0) SH = 0;
+
 			if (dsplo) result[0] = dsplo[SL];
 			if (dsphi) result[1] = dsphi[SH];
-		} else
-			if (bwt) result[0] = bwt[SB];
-
+		}
 	}
 
 	std::string help() { return std::string("returns current bw L/U value"); }
