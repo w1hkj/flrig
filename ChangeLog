@@ -1,8 +1,16 @@
 
 
-=Version 1.3.37=
+=Version 1.3.38=
 
-2017-12-25  David Freese  <w1hkj@bellsouth.net>
+2018-01-13  David Freese  <w1hkj@bellsouth.net>
+
+	afe3bbe: xml server
+	bc0b5db: IC7100 / 9100
+	782310c: sliders
+	8facc1a: Icom Split query
+
+
+=Version 1.3.37=
 
 	318525f: TS990 / xmlrpc server mods
 	6ae502c: IC7200 filter width
@@ -17,6 +25,7 @@
 	d7e240d: IC7200
 	7b24e97: Extras drop down panel
 	96fc5cd: start-stop
+	e5af612: FT-991A
 	dbdd895: OS X race conditions
 	b1c196e: PTT xmlrpc get
 	5c2d2a0: Value by VFO
