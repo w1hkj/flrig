@@ -48,6 +48,12 @@
 #define LISTSIZE 200
 #define ATAGSIZE 21
 
+// remove comment when debugging a CIV stream
+//#define IC_DEBUG
+#ifdef IC_DEBUG
+extern std::string ICDEBUGfname;
+#endif
+
 extern bool flrig_abort;
 
 extern XCVR_STATE *vfo;

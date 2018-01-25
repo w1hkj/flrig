@@ -90,8 +90,14 @@ static void show_timeout(void *)
 	fl_alert2("%s", sztimeout_alert);
 }
 
+#include <fstream>
+
 bool RIG_ICOM::waitFB(const char *sz)
 {
+#ifdef IC_DEBUG
+	ofstream civ(ICDEBUGfname.c_str(), ios::app);
+#endif
+
 	char sztemp[100];
 	string returned = "";
 	string tosend = cmd;
@@ -102,11 +108,18 @@ bool RIG_ICOM::waitFB(const char *sz)
 //		snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
 //		showresp(DEBUG, HEX, sztemp, tosend, returned);
 		waitcount = 0;
+#ifdef IC_DEBUG
+civ << sz << std::endl;
+civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
+civ.close();
+#endif
 		return false;
 	}
 	int cnt = 0, repeat = 0, num = cmd.length() + ok.length();
+
 	int wait_msec = (int)(num*11000.0/RigSerial->Baud() +
 			progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0) / 10;
+
 	for (repeat = 0; repeat < progStatus.comm_retries; repeat++) {
 		sendCommand(cmd, 0);
 		returned = "";
@@ -121,7 +134,14 @@ bool RIG_ICOM::waitFB(const char *sz)
 					showresp(WARN, HEX, sztemp, tosend, returned);
 				else
 					showresp(DEBUG, HEX, sztemp, tosend, returned);
+
 				waitcount = 0;
+#ifdef IC_DEBUG
+civ << sztemp << std::endl;
+civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
+civ << "    " << str2hex(returned.c_str(), returned.length()) << std::endl;
+civ.close();
+#endif
 				return true;
 			}
 			if (returned.find(bad) != string::npos) {
@@ -130,6 +150,13 @@ bool RIG_ICOM::waitFB(const char *sz)
 				snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, FAIL", sz, waited);
 				showresp(ERR, HEX, sztemp, tosend, returned);
 				waitcount = 0;
+
+#ifdef IC_DEBUG
+civ << sztemp << std::endl;
+civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
+civ << "    " << str2hex(returned.c_str(), returned.length()) << std::endl;
+civ.close();
+#endif
 				return false;
 			}
 			MilliSleep(10);
@@ -142,18 +169,34 @@ bool RIG_ICOM::waitFB(const char *sz)
 	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %ld ms", sz, waited);
 	showresp(ERR, HEX, sztemp, tosend, returned);
 
+#ifdef IC_DEBUG
+civ << sztemp << std::endl;
+civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
+civ << "    " << str2hex(returned.c_str(), returned.length()) << std::endl;
+#endif
+
 	if (waitcount > 4 && !timeout_alert) {
 		timeout_alert = true;
 		snprintf(sztimeout_alert, sizeof(sztimeout_alert), 
 			"Serial i/o failure\n%s TIME OUT in %ld ms",
 			sz, waited);
 			Fl::awake(show_timeout);
+#ifdef IC_DEBUG
+civ << sztemp << std::endl;
+#endif
 	}
+#ifdef IC_DEBUG
+civ.close();
+#endif
 	return false;
 }
 
 bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 {
+#ifdef IC_DEBUG
+	ofstream civ(ICDEBUGfname.c_str(), ios::app);
+#endif
+
 	char sztemp[100];
 	string returned = "";
 	string tosend = cmd;
@@ -168,6 +211,11 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 		replystr = returned;
 //		snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
 //		showresp(DEBUG, HEX, sztemp, tosend, returned);
+#ifdef IC_DEBUG
+civ << sz << std::endl;
+civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
+civ.close();
+#endif
 		return false;
 	}
 	for (repeat = 0; repeat < progStatus.comm_retries; repeat++) {
@@ -181,6 +229,13 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 				unsigned long int waited = zmsec() - tod_start;
 				snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, OK  ", sz, waited);
 				showresp(DEBUG, HEX, sztemp, tosend, returned);
+
+#ifdef IC_DEBUG
+civ << sztemp << std::endl;
+civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
+civ << "    " << str2hex(returned.c_str(), returned.length()) << std::endl;
+civ.close();
+#endif
 				return true;
 			}
 			MilliSleep(10);
@@ -201,6 +256,13 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 			sz, waited);
 			Fl::awake(show_timeout);
 	}
+
+#ifdef IC_DEBUG
+civ << sztemp << std::endl;
+civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
+civ << "    " << str2hex(returned.c_str(), returned.length()) << std::endl;
+civ.close();
+#endif
 	return false;
 }
 
