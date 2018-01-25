@@ -45,7 +45,7 @@
 
 #include "rigpanel.h"
 
-#include "tod_clock.h";
+#include "tod_clock.h"
 
 using namespace std;
 
@@ -59,7 +59,7 @@ int freqval = 0;
 
 XCVR_STATE vfoA		= XCVR_STATE(14070000, 0, 0, UI);
 XCVR_STATE vfoB		= XCVR_STATE(7070000, 0, 0, UI);
-XCVR_STATE *vfo		= 0;
+XCVR_STATE *vfo		= &vfoA;
 
 XCVR_STATE xmlvfo	= XCVR_STATE(14070000, 0, 0, UI);
 
@@ -934,6 +934,7 @@ void serviceA()
 
 	if (changed_vfo && !useB) {
 		selrig->selectA();
+		vfo = &vfoA;
 	}
 
 // if TT550 etal and on the B vfo
@@ -1003,6 +1004,7 @@ void serviceB()
 
 	if (changed_vfo && useB) {
 		selrig->selectB();
+		vfo = &vfoB;
 	}
 // if TT550 or K3 and split or on vfoA just update the B vfo
 	if ((xcvr_name == rig_K3.name_) || (selrig->can_change_alt_vfo && !useB)) {
@@ -1694,6 +1696,7 @@ void cb_selectA() {
 
 	useB = false;
 	highlight_vfo((void *)0);
+	vfo = &vfoA;
 }
 
 void cb_selectB() {
@@ -1715,6 +1718,7 @@ void cb_selectB() {
 
 	useB = true;
 	highlight_vfo((void *)0);
+	vfo = &vfoB;
 }
 
 void setLower()
@@ -3607,12 +3611,14 @@ void init_TT550()
 	selrig->set_modeB(vfoB.imode);
 	selrig->set_bwB(vfoB.iBW);
 
-	vfo->freq = vfoA.freq = progStatus.freq_A;
-	vfo->imode = vfoA.imode = progStatus.imode_A;
-	vfo->iBW = vfoA.iBW = progStatus.iBW_A;
+	vfoA.freq = progStatus.freq_A;
+	vfoA.imode = progStatus.imode_A;
+	vfoA.iBW = progStatus.iBW_A;
 	FreqDispA->value( vfoA.freq );
 	selrig->set_vfoA(vfoA.freq);
 	selrig->set_modeA(vfoA.imode);
+
+	vfo = &vfoA;
 
 	if (vfoA.iBW == -1) vfoA.iBW = selrig->def_bandwidth(vfoA.imode);
 		selrig->set_bwA(vfoA.iBW);

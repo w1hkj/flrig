@@ -565,6 +565,7 @@ static int iswr;
 
 void RIG_TT550::set_PTT_control(int val)
 {
+	ptt_ = val;
 	if (val) {
 		for (int i = 0; i < FPLEN; i++)
 			fp[i] = rp[i] = 0;
@@ -574,6 +575,11 @@ void RIG_TT550::set_PTT_control(int val)
 	else     cmd = TT550setRCV;
 	sendCommand(cmd, 0);
 LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
+}
+
+int RIG_TT550::get_PTT()
+{
+	return ptt_;
 }
 
 void RIG_TT550::set_mode(int val)
@@ -718,8 +724,6 @@ int RIG_TT550::def_bandwidth(int m)
 
 void RIG_TT550::set_if_shift(int val)
 {
-//	PbtFreq = val;
-//	if (PbtFreq) PbtActive = true;
 	pbt = val;
 	if (pbt) PbtActive = true;
 	set_vfoRX(onA ? freqA : freqB);
@@ -727,7 +731,7 @@ void RIG_TT550::set_if_shift(int val)
 
 bool RIG_TT550::get_if_shift(int &val)
 {
-	val = pbt;//PbtFreq;
+	val = pbt;
 	if (!val) return false;
 	return true;
 }
@@ -741,11 +745,18 @@ void RIG_TT550::get_if_min_max_step(int &min, int &max, int &step)
 
 void RIG_TT550::set_attenuator(int val)
 {
+	progStatus.attenuator = val;
 	cmd = TT550setATT;
 	if (val) cmd[1] = '1';
 	else     cmd[1] = '0';
 	sendCommand(cmd, 0);
 LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
+}
+
+int RIG_TT550::get_attenuator()
+{
+	return progStatus.attenuator;
+
 }
 
 void RIG_TT550::set_volume_control(int val)
@@ -1269,6 +1280,11 @@ void RIG_TT550::set_preamp(int val)
 	set_cw_spot();
 }
 
+int RIG_TT550::get_preamp()
+{
+	return progStatus.preamp;
+}
+
 void RIG_TT550::set_cw_weight()
 {
 	set_cw_wpm();
@@ -1375,6 +1391,11 @@ void RIG_TT550::set_mic_gain(int v)
 	}
 }
 
+int RIG_TT550::get_mic_gain()
+{
+	return progStatus.mic_gain;
+}
+
 void RIG_TT550::set_mic_line(int v)
 {
 	if (progStatus.tt550_use_line_in) {
@@ -1410,6 +1431,11 @@ void RIG_TT550::set_power_control(double val)
 	cmd[1] = ival;
 	sendCommand(cmd, 0);
 	LOG_INFO("%s", info(cmd));
+}
+
+int RIG_TT550::get_power_control()
+{
+	return progStatus.power_level;
 }
 
 void RIG_TT550::set_mon_vol()
