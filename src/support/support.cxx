@@ -2589,7 +2589,7 @@ void restore_rig_vals()
 	if (progStatus.restore_mode)
 		selrig->set_modeA(xcvr_vfoA.imode);
 	if (progStatus.restore_bandwidth)
-		selrig->set_bwB(xcvr_vfoA.iBW);
+		selrig->set_bwA(xcvr_vfoA.iBW);
 	restore_rig_vals_(xcvr_vfoA);
 }
 
