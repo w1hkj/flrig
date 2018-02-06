@@ -35,6 +35,7 @@
 #include "rigpanel.h"
 #include "ui.h"
 #include "debug.h"
+#include "IC706MKIIG.h"
 
 string xcvr_name = "NONE";
 
@@ -236,6 +237,17 @@ status progStatus = {
 	0,			// xit_freq;
 	1500,		// bpf_center;
 	true,		// use_bpf_center;
+
+// =========================
+// IC706MKIIG filters
+	false,		// bool		use706filters
+	"EMPTY",	// string	ssb_cw_wide;
+	"NORMAL",	// string	ssb_cw_normal;
+	"EMPTY",	// string	ssb_cw_narrow;
+// optional filter strings
+// "EMPTY", "NARR", "NORM", "WIDE", "MED",
+// "FL-101", "FL-232", "FL-100", "FL-223", "FL-103"
+
 // =========================
 	"cmd 1",		// string	label1;
 	"",				// string	command1;
@@ -541,6 +553,19 @@ void status::saveLastState()
 	spref.set("xit_freq", xit_freq);
 	spref.set("bpf_center", bpf_center);
 	spref.set("use_bpf_center", use_bpf_center);
+
+	if (selrig->name_ == IC706MKIIGname_) {
+		spref.set("use706filters", use706filters);
+		spref.set("Set_IC706MKIIG_filter_names", "");
+		spref.set("IC706MKIIG_filter_names_1", \
+"EMPTY,NARR,NORM,WIDE,MED" );
+		spref.set("IC706MKIIG_filter_names_2", \
+"FL-101,FL-232,FL-100,FL-223,FL-103" );
+		spref.set("ssb_cw_wide", ssb_cw_wide.c_str());
+		spref.set("ssb_cw_normal", ssb_cw_normal.c_str());
+		spref.set("ssb_cw_narrow", ssb_cw_narrow.c_str());
+		selrig->initialize();
+	}
 
 	spref.set("label1", label1.c_str());
 	spref.set("command1", command1.c_str());
@@ -864,6 +889,14 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("xit_freq", xit_freq, xit_freq);
 		spref.get("bpf_center", bpf_center, bpf_center);
 		spref.get("use_bpf_center", i, i); use_bpf_center = i;
+
+		if (spref.get("use706filters", i, i)) use706filters = i;
+		spref.get("ssb_cw_wide", defbuffer, ssb_cw_wide.c_str(), 499);
+		ssb_cw_wide = defbuffer;
+		spref.get("ssb_cw_normal", defbuffer, ssb_cw_normal.c_str(), 499);
+		ssb_cw_normal = defbuffer;
+		spref.get("ssb_cw_narrow", defbuffer, ssb_cw_narrow.c_str(), 499);
+		ssb_cw_narrow = defbuffer;
 
 		spref.get("label1", defbuffer,  label1.c_str(), 499);
 		label1 = defbuffer;

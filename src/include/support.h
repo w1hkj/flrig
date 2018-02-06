@@ -49,7 +49,7 @@
 #define ATAGSIZE 21
 
 // remove comment when debugging a CIV stream
-//#define IC_DEBUG
+#define IC_DEBUG
 #ifdef IC_DEBUG
 extern std::string ICDEBUGfname;
 #endif

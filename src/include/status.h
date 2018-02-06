@@ -231,6 +231,12 @@ struct status {
 	int		bpf_center;
 	bool	use_bpf_center;
 
+// IC706MKIIG filters
+	bool	use706filters;
+	string	ssb_cw_wide;		//FL-103
+	string	ssb_cw_normal;		//FL-272
+	string	ssb_cw_narrow;		//FL-232
+
 // =========================
 // User command buttons
    string	label1;

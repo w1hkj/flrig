@@ -38,16 +38,24 @@
 using namespace std;
 
 // used for transceivers with a single vfo, called only by rigPTT
+static XCVR_STATE fake_vfo;
+
+static void showfreq(void *)
+{
+	FreqDispA->value(vfoA.freq);
+}
+
 static void fake_split(int on)
 {
 	if (on) {
-		selrig->set_vfoA(vfoB.freq);
-		selrig->set_modeA(vfoB.imode);
-		selrig->set_bwA(vfoB.iBW);
-	} else {
+		fake_vfo = vfoA;
+		vfoA.freq = vfoB.freq;
 		selrig->set_vfoA(vfoA.freq);
-		selrig->set_modeA(vfoA.imode);
-		selrig->set_bwA(vfoA.iBW);
+		Fl::awake(showfreq);
+	} else {
+		vfoA = fake_vfo;
+		selrig->set_vfoA(vfoA.freq);
+		Fl::awake(showfreq);
 	}
 }
 
@@ -55,8 +63,6 @@ static void fake_split(int on)
 
 void rigPTT(bool on)
 {
-//	wait_query = true;
-
 	guard_lock gl_serial(&mutex_serial, 300);
 
 	if (on && progStatus.split && !selrig->can_split())
@@ -73,6 +79,4 @@ void rigPTT(bool on)
 
 	if (!on && progStatus.split && !selrig->can_split())
 		fake_split(on);
-
-//	wait_query = false;
 }

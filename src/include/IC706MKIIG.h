@@ -28,6 +28,7 @@ public:
 	RIG_IC706MKIIG();
 	~RIG_IC706MKIIG(){}
 
+	void initialize();
 	void selectA();
 	void selectB();
 
@@ -40,19 +41,29 @@ public:
 	void set_modeA(int val);
 	int  get_modeA();
 	int  get_modetype(int n);
-//	void set_bwA(int val);
-//	int  get_bwA();
+	void set_bwA(int val);
+	int  get_bwA();
+
+   int adjust_bandwidth(int val);
+   int def_bandwidth(int m);
 
 	int  get_smeter();
 //	int  get_swr();
 	void set_attenuator(int val);
 
-	void set_split(bool);
-	bool can_split() { return true; }
+	const char **bwtable(int);
 
-	bool  canswap() { return true; }
+//	void set_split(bool val);
+//	bool can_split() { return true; }
+
+	bool canswap() { return true; }
 	bool ICswap() { return true; }
 
+protected:
+   int filter_nbr;
+
 };
+
+extern const char IC706MKIIGname_[];
 
 #endif

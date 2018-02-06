@@ -23,19 +23,31 @@
 //=============================================================================
 // IC-706MKIIG
 //
+
+// optional filter strings
+// "EMPTY", "NARR", "NORM", "WIDE", "MED",
+// "FL-101", "FL-232", "FL-100", "FL-223", "FL-272", "FL-103", "FL-94"
+
 const char IC706MKIIGname_[] = "IC-706MKIIG";
 const char *IC706MKIIGmodes_[] = { "LSB", "USB", "AM", "CW", "RTTY", "FM", "WFM", NULL};
+
+enum {
+	LSB706, USB706, AM706, CW706, RTTY706, FM706, WFM706 };
+
 const char IC706MKIIG_mode_type[] =
 	{ 'L', 'U', 'U', 'L', 'L', 'U', 'U'};
-//const char *IC706MKIIG_widths[] = { "WIDE", "NARR", NULL};
-const char *IC706MKIIG_widths[] = { "n/a", NULL};
-static int IC706MKIIG_bw_vals[] = { 1, WVALS_LIMIT};
+const char *IC706MKIIG_ssb_cw_rtty_bws[] = { "WIDE", "NORMAL", "NARROW", NULL};
+static int IC706MKIIG_vals_ssb_cw_rtty_bws[] = { 1, 2, 3, WVALS_LIMIT };
+const char *IC706MKIIG_am_fm_bws[] = { "NORMAL", "NARROW", NULL};
+static int IC706MKIIG_vals_am_fm_bws[] = { 1, 2, WVALS_LIMIT };
+const char *IC706MKIIG_wfm_bws[] = { "FIXED", NULL};
+static int IC706MKIIG_vals_wfm_bws[] = { 1, WVALS_LIMIT};
 
 RIG_IC706MKIIG::RIG_IC706MKIIG() {
 	name_ = IC706MKIIGname_;
 	modes_ = IC706MKIIGmodes_;
-	bandwidths_ = IC706MKIIG_widths;
-	bw_vals_ = IC706MKIIG_bw_vals;
+	bandwidths_ = IC706MKIIG_ssb_cw_rtty_bws;
+	bw_vals_ = IC706MKIIG_vals_ssb_cw_rtty_bws;
 	_mode_type = IC706MKIIG_mode_type;
 	comm_baudrate = BR19200;
 	stopbits = 1;
@@ -52,9 +64,14 @@ RIG_IC706MKIIG::RIG_IC706MKIIG() {
 	def_freq = freqA = freqB = A.freq = B.imode = 14070000;
 	def_mode = modeA = modeB = A.imode = B.imode = 1;
 	def_bw = bwA = bwB = A.iBW = B.iBW = 0;
+	filter_nbr = 0;
 
-	has_smeter =
-	has_mode_control =
+	has_mode_control = true;
+	has_bandwidth_control = true;
+
+//	has_split = true;
+	has_smeter = true;
+	has_mode_control = true;
 	has_attenuator_control = true;
 
 	defaultCIV = 0x58;
@@ -66,6 +83,20 @@ RIG_IC706MKIIG::RIG_IC706MKIIG() {
 };
 
 //=============================================================================
+
+void RIG_IC706MKIIG::initialize()
+{
+	if (progStatus.use706filters) {
+		if (!progStatus.ssb_cw_wide.empty())   IC706MKIIG_ssb_cw_rtty_bws[0] = progStatus.ssb_cw_wide.c_str();
+		if (!progStatus.ssb_cw_normal.empty()) IC706MKIIG_ssb_cw_rtty_bws[1] = progStatus.ssb_cw_normal.c_str();
+		if (!progStatus.ssb_cw_narrow.empty()) IC706MKIIG_ssb_cw_rtty_bws[2] = progStatus.ssb_cw_narrow.c_str();
+	} else {
+		IC706MKIIG_ssb_cw_rtty_bws[0] = "FIXED";
+		IC706MKIIG_ssb_cw_rtty_bws[1] = NULL;
+	  IC706MKIIG_vals_ssb_cw_rtty_bws[0] = 1;
+	  IC706MKIIG_vals_ssb_cw_rtty_bws[1] = WVALS_LIMIT;
+	}
+}
 
 void RIG_IC706MKIIG::selectA()
 {
@@ -135,22 +166,47 @@ void RIG_IC706MKIIG::set_vfoB (long freq)
 	waitFB("set vfo B");
 }
 
-void RIG_IC706MKIIG::set_split(bool b)
-{
-	cmd = pre_to;
-	cmd += '\x0F';
-	cmd += b ? '\x01' : '\x00';
-	cmd.append( post );
-	waitFB("set split");
-}
+//void RIG_IC706MKIIG::set_split(bool b)
+//{
+//	cmd = pre_to;
+//	cmd += 0x0F;
+//	cmd += b ? 0x01 : 0x00;
+//	cmd.append( post );
+//	waitFB("set split");
+//}
+
+// When wide or normal operation is available, 
+//   add “00” for wide operation or 
+//       “01” for normal operation;
+// When normal or narrow operation is available,
+//   add “00” for normal operation or 
+//       “01” for narrow operation;
+// When wide, normal and narrow operation is available,
+//   add “00” for wide operation,
+//       “01” for normal operation 
+//   and “02” for narrow
 
 void RIG_IC706MKIIG::set_modeA(int val)
 {
 	modeA = val;
 	cmd = pre_to;
-	cmd += '\x06';
-	cmd += val > 5 ? val + 2 : val;
-	cmd += bwA;
+	cmd += 0x06;
+	cmd += val;
+	switch (val) {
+		case AM706: case FM706:  
+		   cmd += IC706MKIIG_vals_am_fm_bws[filter_nbr];
+			break;
+		case WFM706:  
+		   cmd += IC706MKIIG_vals_wfm_bws[filter_nbr]; 
+			break;
+		case LSB706: case USB706: case CW706: case RTTY706: default:
+		  if (progStatus.use706filters) {
+			  cmd += IC706MKIIG_vals_ssb_cw_rtty_bws[filter_nbr];
+		 } else { // No filters
+			cmd += 0x01;
+		 }
+			break;
+	}
 	cmd.append( post );
 	waitFB("set mode A");
 }
@@ -158,16 +214,15 @@ void RIG_IC706MKIIG::set_modeA(int val)
 int RIG_IC706MKIIG::get_modeA()
 {
 	cmd = pre_to;
-	cmd += '\x04';
+	cmd += 0x04;
 	cmd.append(post);
 	string resp = pre_fm;
-	resp += '\x04';
+	resp += 0x04;
 	if (waitFOR(8, "get mode A")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			modeA = replystr[p+5];
-			if (modeA > 6) modeA -= 2;
-//			bwA = replystr[p+6];
+			filter_nbr = replystr[p+6] - 1;
 		}
 	}
 	return modeA;
@@ -178,18 +233,78 @@ int RIG_IC706MKIIG::get_modetype(int n)
 	return _mode_type[n];
 }
 
-/*
 void RIG_IC706MKIIG::set_bwA(int val)
 {
-	bwA = val;
+	filter_nbr = val;
 	set_modeA(modeA);
 }
 
-int  RIG_IC706MKIIG::get_bwA()
+int RIG_IC706MKIIG::get_bwA()
 {
-	return bwA;
+	return filter_nbr; 
 }
-*/
+
+int RIG_IC706MKIIG::adjust_bandwidth(int m)
+{  
+	switch (m) {
+		case LSB706: case USB706: case CW706: case RTTY706: 
+			bandwidths_ = IC706MKIIG_ssb_cw_rtty_bws;
+			bw_vals_ = IC706MKIIG_vals_ssb_cw_rtty_bws;
+			return 1;
+			break;
+		case AM706: case FM706:  
+			bandwidths_ = IC706MKIIG_am_fm_bws;
+			bw_vals_ = IC706MKIIG_vals_am_fm_bws;
+			return 0;
+			break;
+		case WFM706:  
+			bandwidths_ = IC706MKIIG_wfm_bws;
+			bw_vals_ = IC706MKIIG_vals_wfm_bws;
+			return 0;
+			break;
+		default:
+			bandwidths_ = IC706MKIIG_ssb_cw_rtty_bws;
+			bw_vals_ = IC706MKIIG_vals_ssb_cw_rtty_bws;
+			return 1;
+			break;
+	}
+	return 0;
+}
+
+int RIG_IC706MKIIG::def_bandwidth(int m)
+{
+	switch (m) {
+		default:
+		case LSB706: case USB706: case CW706: case RTTY706: 
+			return 1;
+			break;
+		case AM706: case FM706:  
+			return 0;
+			break;
+		case WFM706:  
+			return 0;
+			break;
+	}
+	return 1;
+}
+
+const char **RIG_IC706MKIIG::bwtable(int m)
+{
+	switch (m) {
+		case LSB706: case USB706: case CW706: case RTTY706: 
+			return IC706MKIIG_ssb_cw_rtty_bws;
+			break;
+		case AM706: case FM706:  
+			return IC706MKIIG_am_fm_bws;
+			break;
+		case WFM706:  
+			return IC706MKIIG_wfm_bws;
+			break;
+		default:
+			return IC706MKIIG_ssb_cw_rtty_bws;
+			break;
+	}
+}   
 
 void RIG_IC706MKIIG::set_attenuator(int val)
 {
