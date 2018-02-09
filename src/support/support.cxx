@@ -1313,9 +1313,9 @@ void updateSelect() {
 	char szline[80 + ATAGSIZE];
 	char szatag[ATAGSIZE];
 	int i;
+	FreqSelect->clear();
 	if (!numinlist) return;
 	sortList();
-	FreqSelect->clear();
 // stripe lines
 	int bg1, bg2, bg_clr;
 	bg1 = FL_WHITE; bg2 = FL_LIGHT2;
@@ -1787,11 +1787,13 @@ void delFreq() {
 		long n = FreqSelect->value() - 1;
 		for (int i = n; i < numinlist; i ++)
 			oplist[i] = oplist[i+1];
-		oplist[numinlist - 1].imode = USB;
-		oplist[numinlist - 1].freq = 0;
-		oplist[numinlist - 1].iBW = 0;
-		memset(oplist[numinlist - 1].alpha_tag, 0, ATAGSIZE);
-		numinlist--;
+		if (numinlist) {
+			oplist[numinlist - 1].imode = USB;
+			oplist[numinlist - 1].freq = 0;
+			oplist[numinlist - 1].iBW = 0;
+			memset(oplist[numinlist - 1].alpha_tag, 0, ATAGSIZE);
+			numinlist--;
+		}
 		updateSelect();
 	}
 }
