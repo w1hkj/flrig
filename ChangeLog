@@ -1,8 +1,19 @@
 
 
-=Version 1.3.38=
+=Version 1.3.39=
 
-2018-01-13  David Freese  <w1hkj@bellsouth.net>
+2018-02-08  David Freese  <w1hkj@bellsouth.net>
+
+	fa86d2e: Memory delete
+	93e5e53: IC706MKG
+	cfc78d0: OS X build script
+	3654db2: IC7850
+	bb7ddc3: civ tests
+	61f49f2: restore ab
+	22b57eb: TT550
+
+
+=Version 1.3.38=
 
 	afe3bbe: xml server
 	bc0b5db: IC7100 / 9100
