@@ -108,8 +108,13 @@ static void freq_mode_bw()
 	int mode;
 	int BW;
 	static char szval[20];
+
+	guard_lock queA_lock(&mutex_queA);
+	guard_lock queB_lock(&mutex_queB);
+	if (! queA.empty() || !queB.empty())
+		return;
+
 	if (useB) {
-		guard_lock queB_lock(&mutex_queB);
 		if (!queB.empty()) {
 			freq = queB.back().freq;
 			mode = queB.back().imode;
@@ -118,7 +123,6 @@ static void freq_mode_bw()
 			mode = vfoB.imode;
 		}
 	} else {
-		guard_lock queA_lock(&mutex_queA);
 		if (!queA.empty()) {
 			freq = queA.back().freq;
 			mode = queA.back().imode;
@@ -257,14 +261,17 @@ public:
 			return;
 		}
 
+		guard_lock queA_lock(&mutex_queA);
+		guard_lock queB_lock(&mutex_queB);
+		if (! queA.empty() || !queB.empty())
+			return;
+
 		static char szfreq[20];
 		int freq;
 		if (useB) {
-			guard_lock queB_lock(&mutex_queB);
 			if (!queB.empty()) freq = queB.back().freq;
 			else freq = vfoB.freq;
 		} else {
-			guard_lock queA_lock(&mutex_queA);
 			if (!queA.empty()) freq = queA.back().freq;
 			else freq = vfoA.freq;
 		}
@@ -396,13 +403,16 @@ public:
 			return;
 		}
 
+		guard_lock queA_lock(&mutex_queA);
+		guard_lock queB_lock(&mutex_queB);
+		if (! queA.empty() || !queB.empty())
+			return;
+
 		int mode;
 		if (useB) {
-			guard_lock queB_lock(&mutex_queB);
 			if (!queB.empty()) mode = queB.back().imode;
 			else mode = vfoB.imode;
 		} else {
-			guard_lock queA_lock(&mutex_queA);
 			if (!queA.empty()) mode = queA.back().imode;
 			else mode = vfoA.imode;
 		}
@@ -430,13 +440,16 @@ public:
 			return;
 		}
 
+		guard_lock queA_lock(&mutex_queA);
+		guard_lock queB_lock(&mutex_queB);
+		if (! queA.empty() || !queB.empty())
+			return;
+
 		int mode;
 		if (useB) {
-			guard_lock queB_lock(&mutex_queB);
 			if (!queB.empty()) mode = queB.back().imode;
 			else mode = vfoB.imode;
 		} else {
-			guard_lock queA_lock(&mutex_queA);
 			if (!queA.empty()) mode = queA.back().imode;
 			else mode = vfoA.imode;
 		}
@@ -468,6 +481,11 @@ public :
 			return;
 		}
 		XmlRpcValue bws;
+
+		guard_lock queA_lock(&mutex_queA);
+		guard_lock queB_lock(&mutex_queB);
+		if (! queA.empty() || !queB.empty())
+			return;
 
 		int mode = useB ? vfoB.imode : vfoA.imode;
 		const char **bwt = selrig->bwtable(mode);
@@ -528,11 +546,10 @@ public:
 
 		if (!xcvr_initialized) return;
 
-		{
-			guard_lock queA_lock(&mutex_queA);
-			guard_lock queB_lock(&mutex_queB);
-			if (! queA.empty() || !queB.empty()) return;
-		}
+		guard_lock queA_lock(&mutex_queA);
+		guard_lock queB_lock(&mutex_queB);
+		if (! queA.empty() || !queB.empty())
+			return;
 
 		int BW = useB ? vfoB.iBW : vfoA.iBW;
 		int mode = useB ? vfoB.imode : vfoA.imode;
@@ -552,7 +569,7 @@ public:
 		if (BW < 256 && bwt) {
 			int SB = BW & 0x7F;
 			if (SB < 0) SB = 0;
-			if (SB > max_bwt) SB = max_bwt-1;
+			if (SB >= max_bwt) SB = max_bwt-1;
 			result[0] = bwt[SB];
 		}
 		else if (dsplo && dsphi) {
