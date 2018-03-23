@@ -54,7 +54,8 @@ static GUI rig_widgets[]= {
 };
 
 RIG_FT450::RIG_FT450() {
-// base class values	
+// base class values
+	IDstr = "ID";
 	name_ = FT450name_;
 	modes_ = FT450modes_;
 	bandwidths_ = FT450_widths;
@@ -152,7 +153,7 @@ void RIG_FT450::initialize()
 	}
 
 // turn off auto information mode
-	sendCommand("AI0;");
+	sendOK("AI0;");
 
 	selectA();
 }
@@ -185,7 +186,7 @@ void RIG_FT450::set_band_selection(int v)
 		}
 	}
 
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "Select Band Stacks", cmd, replystr);
 }
 
@@ -197,19 +198,19 @@ int  RIG_FT450::adjust_bandwidth(int m)
 void RIG_FT450::selectA()
 {
 	cmd = "VS0;";
-	sendCommand(cmd, 0);
+	sendOK(cmd);
 }
 
 void RIG_FT450::selectB()
 {
 	cmd = "VS1;";
-	sendCommand(cmd, 0);
+	sendOK(cmd);
 }
 
 void RIG_FT450::A2B()
 {
 	cmd = "VV;";
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "vfo A --> B", cmd, replystr);
 }
 
@@ -236,7 +237,7 @@ void RIG_FT450::set_vfoA (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "SET vfo A", cmd, replystr);
 }
 
@@ -263,7 +264,7 @@ void RIG_FT450::set_vfoB (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "SET vfo B", cmd, replystr);
 }
 
@@ -271,7 +272,7 @@ void RIG_FT450::set_split(bool on)
 {
 	if (on) cmd = "FT1;";
 	else cmd = "FT0;";
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "SET split", cmd, replystr);
 }
 
@@ -342,7 +343,7 @@ int RIG_FT450::get_swr()
 int RIG_FT450::get_power_out()
 {
 	cmd = rsp = "RM5";
-	sendCommand(cmd.append(";"));
+	sendOK(cmd.append(";"));
 	waitN(7, 100, "get pout", ASC);
 
 	size_t p = replystr.rfind(rsp);
@@ -374,7 +375,7 @@ void RIG_FT450::set_power_control(double val)
 		cmd[i] += ival % 10;
 		ival /= 10;
 	}
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "SET power", cmd, replystr);
 }
 
@@ -401,7 +402,7 @@ void RIG_FT450::set_volume_control(int val)
 		cmd[i] += ivol % 10;
 		ivol /= 10;
 	}
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "SET vol", cmd, replystr);
 }
 
@@ -414,7 +415,7 @@ void RIG_FT450::get_vol_min_max_step(int &min, int &max, int &step)
 void RIG_FT450::set_PTT_control(int val)
 {
 	cmd = val ? "TX1;" : "TX0;";
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "SET PTT", cmd, replystr);
 	ptt_ = val;
 }
@@ -434,7 +435,7 @@ int RIG_FT450::get_PTT()
 void RIG_FT450::tune_rig()
 {
 	cmd = "AC002;";
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "tune rig", cmd, replystr);
 }
 
@@ -442,7 +443,7 @@ void RIG_FT450::set_attenuator(int val)
 {
 	if (val) cmd = "RA01;";
 	else	 cmd = "RA00;";
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "get att", cmd, replystr);
 }
 
@@ -461,7 +462,7 @@ void RIG_FT450::set_preamp(int val)
 {
 	if (val) cmd = "PA00;";
 	else	 cmd = "PA01;";
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "set preamp", cmd, replystr);
 }
 
@@ -482,14 +483,14 @@ void RIG_FT450::set_modeA(int val)
 	cmd = "MD0";
 	cmd += mode_chr[val];
 	cmd += ';';
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "SET mode A", cmd, replystr);
 	if (val == 2 || val == 6) return;
 	if (progStatus.spot_onoff) {
 		progStatus.spot_onoff = false;
 		set_spot_onoff();
 		cmd = "CS0;";
-		sendCommand(cmd);
+		sendOK(cmd);
 		showresp(WARN, ASC, "SET spot off", cmd, replystr);
 		btnSpot->value(0);
 	}
@@ -519,7 +520,7 @@ void RIG_FT450::set_bwA(int val)
 		case 2 : cmd = "SH031;"; break;
 		default: cmd = "SH031;";
 	}
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "SET bwA", cmd, replystr);
 }
 
@@ -544,14 +545,14 @@ void RIG_FT450::set_modeB(int val)
 	cmd = "MD0";
 	cmd += mode_chr[val];
 	cmd += ';';
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "SET mode B", cmd, replystr);
 	if (val == 2 || val == 6) return;
 	if (progStatus.spot_onoff) {
 		progStatus.spot_onoff = false;
 		set_spot_onoff();
 		cmd = "CS0;";
-		sendCommand(cmd);
+		sendOK(cmd);
 		showresp(WARN, ASC, "SET spot off", cmd, replystr);
 		btnSpot->value(0);
 	}
@@ -581,7 +582,7 @@ void RIG_FT450::set_bwB(int val)
 		case 2 : cmd = "SH031;"; break;
 		default: cmd = "SH031;";
 	}
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "SET bwB", cmd, replystr);
 }
 
@@ -614,7 +615,7 @@ void RIG_FT450::set_if_shift(int val)
 		cmd[3+i] += val % 10;
 		val /= 10;
 	}
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "SET ifshift", cmd, replystr);
 }
 
@@ -643,13 +644,13 @@ void RIG_FT450::set_notch(bool on, int val)
 {
 	cmd = "BP00000;";
 	if (on == false) {
-		sendCommand(cmd);
+		sendOK(cmd);
 		showresp(WARN, ASC, "SET notch off", cmd, replystr);
 		notch_on = false;
 		return;
 	}
 	cmd[6] = '1';
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "SET notch on", cmd, replystr);
 	notch_on = true;
 
@@ -660,7 +661,7 @@ void RIG_FT450::set_notch(bool on, int val)
 		cmd[3 + i] += val % 10;
 		val /=10;
 	}
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "SET notch val", cmd, replystr);
 }
 
@@ -702,7 +703,7 @@ void RIG_FT450::set_noise(bool b)
 		cmd = "NB01;";
 	else
 		cmd = "NB00;";
-	sendCommand (cmd);
+	sendOK (cmd);
 	showresp(WARN, ASC, "SET NB", cmd, replystr);
 }
 
@@ -716,9 +717,9 @@ void RIG_FT450::set_xcvr_auto_on()
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) {	// rig is off, power on
 		cmd = "PS1;";
-		sendCommand(cmd);
+		sendOK(cmd);
 		MilliSleep(1500);	// 1.0 < T < 2.0 seconds
-		sendCommand(cmd);
+		sendOK(cmd);
 		MilliSleep(3000);	// Wait for rig startup?  Maybe not needed.
 	}
 }
@@ -728,7 +729,7 @@ void RIG_FT450::set_xcvr_auto_off()
 	if (!progStatus.xcvr_auto_off) return;
 
 	cmd = "PS0;";
-	sendCommand(cmd);
+	sendOK(cmd);
 }
 
 // val 0 .. 100
@@ -740,7 +741,7 @@ void RIG_FT450::set_mic_gain(int val)
 		cmd[1+i] += val % 10;
 		val /= 10;
 	}
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "SET mic", cmd, replystr);
 }
 
@@ -767,7 +768,7 @@ void RIG_FT450::set_special(int v)
 {
 	if (v) cmd = "VR1;";
 	else   cmd = "VR0;";
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "Set special", cmd, replystr);
 }
 
@@ -775,7 +776,7 @@ void RIG_FT450::set_vox_onoff()
 {
 	cmd = "VX0;";
 	if (progStatus.vox_onoff) cmd[2] = '1';
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "SET vox on/off", cmd, replystr);
 }
 
@@ -783,7 +784,7 @@ void RIG_FT450::set_vox_gain()
 {
 	cmd = "VG";
 	cmd.append(to_decimal(progStatus.vox_gain, 3)).append(";");
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "SET vox gain", cmd, replystr);
 }
 
@@ -791,7 +792,7 @@ void RIG_FT450::set_vox_hang()
 {
 	cmd = "VD";
 	cmd.append(to_decimal(progStatus.vox_hang, 4)).append(";");
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "SET vox delay", cmd, replystr);
 }
 
@@ -801,7 +802,7 @@ void RIG_FT450::set_cw_wpm()
 	if (progStatus.cw_wpm > 60) progStatus.cw_wpm = 60;
 	if (progStatus.cw_wpm < 4) progStatus.cw_wpm = 4;
 	cmd.append(to_decimal(progStatus.cw_wpm, 3)).append(";");
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "SET cw wpm", cmd, replystr);
 }
 
@@ -810,7 +811,7 @@ void RIG_FT450::enable_keyer()
 {
 	cmd = "KR0;";
 	if (progStatus.enable_keyer) cmd[2] = '1';
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "SET keyer on/off", cmd, replystr);
 }
 
@@ -819,7 +820,7 @@ bool RIG_FT450::set_cw_spot()
 	if (vfo->imode == 2 || vfo->imode == 6) {
 		cmd = "CS0;";
 		if (progStatus.spot_onoff) cmd[2] = '1';
-		sendCommand(cmd);
+		sendOK(cmd);
 		showresp(WARN, ASC, "SET spot on/off", cmd, replystr);
 		return true;
 	} else
@@ -830,7 +831,7 @@ void RIG_FT450::set_cw_weight()
 {
 	int n = round(progStatus.cw_weight * 10);
 	cmd.assign("EX024").append(to_decimal(n, 2)).append(";");
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "SET cw weight", cmd, replystr);
 }
 
@@ -838,7 +839,7 @@ void RIG_FT450::set_cw_qsk()
 {
 	int n = progStatus.cw_qsk / 5 - 3;
 	cmd.assign("EX018").append(to_decimal(n, 1)).append(";");
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "SET cw qsk", cmd, replystr);
 }
 
@@ -847,7 +848,7 @@ void RIG_FT450::set_cw_spot_tone()
 	int n = (progStatus.cw_spot_tone - 400) / 50 + 1;
 	cmd = "EX020";
 	cmd.append(to_decimal(n, 2)).append(";");
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "SET cw tone", cmd, replystr);
 }
 
@@ -855,7 +856,7 @@ void RIG_FT450::set_cw_spot_tone()
 void RIG_FT450::set_noise_reduction_val(int val)
 {
 	cmd.assign("RL0").append(to_decimal(val, 2)).append(";");
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "SET_noise_reduction_val", cmd, replystr);
 }
 
@@ -875,7 +876,7 @@ int  RIG_FT450::get_noise_reduction_val()
 void RIG_FT450::set_noise_reduction(int val)
 {
 	cmd.assign("NR0").append(val ? "1" : "0" ).append(";");
-	sendCommand(cmd);
+	sendOK(cmd);
 	showresp(WARN, ASC, "SET noise reduction", cmd, replystr);
 }
 

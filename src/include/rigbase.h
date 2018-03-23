@@ -554,6 +554,10 @@ int vfo_;
 	string bcd255(int val);
 	int    num100(string bcd);
 
+// Yaesu force ID response before sending command
+	std::string IDstr;
+	bool id_OK(std::string ID, int wait);
+	void sendOK(std::string cmd);
 };
 
 extern rigbase *rigs[];

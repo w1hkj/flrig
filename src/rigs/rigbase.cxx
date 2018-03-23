@@ -38,6 +38,7 @@ static GUI basewidgets[] = { {NULL, 0, 0} };
 
 rigbase::rigbase()
 {
+	IDstr = "";
 	name_ = szNORIG;
 	modes_ = szNOMODES;
 	bandwidths_ = szNOBWS;
@@ -434,4 +435,38 @@ int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 	return 0;
 }
 
+// Yaesu transceiver - wait for response to identifier request
+// return boolean state of response
+// ID  - for most
+// AI  - for FTdx9000
+// wait - wait nnn milliseconds before declaring transceiver DOA
+//        default 200 msec
+// retry - number of retries, default 
+bool rigbase::id_OK(string ID, int wait)
+{
+	string returned;
+	for (int n = 0; n < progStatus.comm_retries; n++) {
+		sendCommand(string(ID).append(";", 0));
+		returned = "";
+		for (int cnt = 0; cnt < wait / 10; cnt++) {
+			readResponse();
+			returned.append(replystr);
+			if (returned.find(ID)) {
+				return true;
+			}
+			MilliSleep(10);
+			Fl::awake();
+		}
+	}
+	return false;
+}
 
+void rigbase::sendOK(string cmd)
+{
+	if (IDstr.empty()) {
+		sendCommand(cmd,0);
+		return;
+	}
+	if (id_OK(IDstr, 100))
+		sendCommand(cmd, 0);
+}
