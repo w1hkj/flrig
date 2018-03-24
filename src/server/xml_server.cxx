@@ -247,6 +247,20 @@ public:
 
 } rig_get_ptt(&rig_server);
 
+//------------------------------------------------------------------------------
+// Request for split state
+//------------------------------------------------------------------------------
+class rig_get_split : public XmlRpcServerMethod {
+public:
+	rig_get_split(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_split", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		result = progStatus.split;
+	}
+
+	std::string help() { return std::string("returns state of split"); }
+
+} rig_get_split(&rig_server);
 
 //------------------------------------------------------------------------------
 // Request for active vfo frequency
@@ -675,6 +689,65 @@ public:
 } rig_set_ptt(&rig_server);
 
 //------------------------------------------------------------------------------
+// Execute vfo Swap
+//------------------------------------------------------------------------------
+void do_swap(void *)
+{
+	cbAswapB();
+}
+
+class rig_set_swap : public XmlRpcServerMethod {
+public:
+	rig_set_swap(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_swap", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
+		Fl::awake(do_swap, (void *)0);
+	}
+
+	std::string help() { return std::string("executes vfo swap"); }
+
+} rig_set_swap(&rig_server);
+
+//------------------------------------------------------------------------------
+// Execute vfo split operation
+//------------------------------------------------------------------------------
+void do_split(void *v)
+{
+	if (v == (void *)(1)) {
+		btnSplit->value(1);
+		btnSplit->redraw();
+		cb_set_split(1);
+	} else {
+		btnSplit->value(0);
+		btnSplit->redraw();
+		cb_set_split(0);
+	}
+}
+
+class rig_set_split : public XmlRpcServerMethod {
+public:
+	rig_set_split(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_split", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
+		int state = int(params[0]);
+
+		if (state) Fl::awake(do_split, (void *)1);
+		else Fl::awake(do_split, (void *)0);
+	}
+
+	std::string help() { return std::string("executes vfo split"); }
+
+} rig_set_split(&rig_server);
+
+//------------------------------------------------------------------------------
 // Set vfo in use A or B
 //------------------------------------------------------------------------------
 static void selectA(void *)
@@ -874,6 +947,7 @@ struct MLIST {
 	{ "rig.get_ptt",      "s:n", "return PTT state" },
 	{ "rig.get_pwrmeter", "s:n", "return PWR out" },
 	{ "rig.get_smeter",   "s:n", "return Smeter" },
+	{ "rig.get_split",    "s:n", "return split state" },
 	{ "rig.get_update",   "s:n", "return update to info" },
 	{ "rig.get_vfo",      "s:n", "return current VFO in Hz" },
 	{ "rig.get_xcvr",     "s:n", "returns name of transceiver" },
@@ -884,6 +958,8 @@ struct MLIST {
 	{ "rig.set_notch",    "d:d", "set NOTCH value in Hz" },
 	{ "rig.set_ptt",      "i:i", "set PTT 1/0 (on/off)" },
 	{ "rig.set_vfo",      "d:d", "set current VFO in Hz" },
+	{ "rig.set_swap",     "i:i", "set Swap 1/0 (on/off)" },
+	{ "rig.set_split",    "i:i", "set split 1/0 (on/off)" },
 	{ "main.set_frequency",      "d:d", "set current VFO in Hz" }
 };
 

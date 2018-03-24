@@ -1678,10 +1678,6 @@ void cb_set_split(int val)
 }
 
 void cb_selectA() {
-	if (progStatus.split) {
-		btnSplit->value(0);
-		cb_set_split(0);
-	}
 	guard_lock serial_lock(&mutex_serial);
 	guard_lock queA_lock(&mutex_queA);
 	guard_lock queB_lock(&mutex_queB);
@@ -1700,10 +1696,6 @@ void cb_selectA() {
 }
 
 void cb_selectB() {
-	if (progStatus.split) {
-		btnSplit->value(0);
-		cb_set_split(0);
-	}
 	guard_lock serial_lock(&mutex_serial);
 	guard_lock queA_lock(&mutex_queA);
 	guard_lock queB_lock(&mutex_queB);
