@@ -58,6 +58,7 @@ Fl_Menu_Item touch_menu[] = {
  {_("&About"), 0,  (Fl_Callback*)cb_mnuAbout, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Send command"), 0, (Fl_Callback*)cb_Send, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
  {_("&Events"), 0,  (Fl_Callback*)cb_Events, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("&xml-help"), 0,  (Fl_Callback*)cb_xml_help, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
  {_("      "), 0, 0, 0, FL_MENU_DIVIDER, FL_NORMAL_LABEL, 0, 14, 0},
  {_("MAIN   "), 0, (Fl_Callback*)cbMAIN, 0, FL_MENU_RADIO | FL_MENU_VALUE, FL_NORMAL_LABEL, 0, 14, 0},

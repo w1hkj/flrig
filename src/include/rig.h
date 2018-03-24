@@ -73,6 +73,8 @@ extern bool RIG_DEBUG;
 extern bool XML_DEBUG;
 extern bool EXPAND_CONTROLS;
 
+extern void cb_xml_help(Fl_Menu_*, void*);
+
 enum UISIZE {small_ui, wide_ui, touch_ui};
 
 #endif

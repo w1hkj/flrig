@@ -696,9 +696,9 @@ void do_swap(void *)
 	cbAswapB();
 }
 
-class rig_set_swap : public XmlRpcServerMethod {
+class rig_swap : public XmlRpcServerMethod {
 public:
-	rig_set_swap(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_swap", s) {}
+	rig_swap(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_swap", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 		if (!xcvr_initialized) {
@@ -710,7 +710,7 @@ public:
 
 	std::string help() { return std::string("executes vfo swap"); }
 
-} rig_set_swap(&rig_server);
+} rig_swap(&rig_server);
 
 //------------------------------------------------------------------------------
 // Execute vfo split operation
@@ -827,6 +827,28 @@ public:
 	std::string help() { return std::string("main.set_frequency NNNNNNNN (Hz)"); }
 
 } main_set_frequency(&rig_server);
+
+class rig_set_frequency : public XmlRpcServerMethod {
+public:
+	rig_set_frequency(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_frequency", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
+		long freq = static_cast<long>(double(params[0]));
+// set the frequency in vfoA or vfoB
+		if (useB) srvr_vfo = vfoB;
+		else       srvr_vfo = vfoA;
+		srvr_vfo.freq = freq;
+//std::cout << "set freq " << freq << std::endl;
+
+		push_xml();
+	}
+	std::string help() { return std::string("rig.set_frequency NNNNNNNN (Hz)"); }
+
+} rig_set_frequency(&rig_server);
 
 //------------------------------------------------------------------------------
 // Set mode
@@ -954,13 +976,14 @@ struct MLIST {
 	{ "rig.set_AB",       "s:s", "set VFO A/B" },
 	{ "rig.set_bw",       "i:i", "set BW iaw BW table" },
 	{ "rig.set_BW",       "i:i", "set L/U pair" },
+	{ "rig.set_frequency","d:d", "set current VFO in Hz" },
 	{ "rig.set_mode",     "i:i", "set MODE iaw MODE table" },
 	{ "rig.set_notch",    "d:d", "set NOTCH value in Hz" },
 	{ "rig.set_ptt",      "i:i", "set PTT 1/0 (on/off)" },
 	{ "rig.set_vfo",      "d:d", "set current VFO in Hz" },
-	{ "rig.set_swap",     "i:i", "set Swap 1/0 (on/off)" },
+	{ "rig.swap",         "i:i", "execute vfo swap" },
 	{ "rig.set_split",    "i:i", "set split 1/0 (on/off)" },
-	{ "main.set_frequency",      "d:d", "set current VFO in Hz" }
+	{ "main.set_frequency", "d:d", "set current VFO in Hz" }
 };
 
 class rig_list_methods : public XmlRpcServerMethod {
@@ -1019,4 +1042,20 @@ void exit_server()
 	rig_server.exit();
 }
 
+std::string print_xmlhelp()
+{
+	string pstr;
+	string line;
+	for (size_t n = 0; n < sizeof(mlist) / sizeof(*mlist); ++n) {
+		line.clear();
+		line.assign(mlist[n].name);
+		line.append(20 - line.length(), ' ');
+		line.append(mlist[n].signature);
+		line.append("  ");
+		line.append(mlist[n].help);
+		line.append("\n");
+		pstr.append(line);
+	}
+	return pstr;
+}
 

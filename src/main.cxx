@@ -509,21 +509,49 @@ extern FILE *serlog;
 
 }
 
+#include <FL/Fl_Multiline_Output.H>
+
+void cl_print(std::string cl)
+{
+#ifndef __WIN32__
+	std::cout << cl;
+#endif
+	Fl_Double_Window clwin(50,50,500,500, "Command line text");
+		Fl_Multiline_Output cltext(2,2,496,496);
+		cltext.textfont(FL_COURIER);
+		cltext.value(cl.c_str());
+	clwin.end();
+	clwin.show();
+	while (clwin.visible()) {
+		Fl::wait();
+		MilliSleep(50);
+	}
+}
+
+void cb_xml_help(Fl_Menu_*, void*)
+{
+	cl_print(print_xmlhelp());
+}
+
 int parse_args(int argc, char **argv, int& idx)
 {
 	if (strcasecmp("--help", argv[idx]) == 0) {
-		printf("Usage: \n\
+		cl_print("\
+Usage: \n\
   --help this help text\n\
   --version\n\
   --config-dir <DIR>\n\
   --debug-level N (0..4)\n\
   --rig_debug\n\
   --xml_debug\n\
+  --xml-help\n\
   --exp (expand menu tab controls)\n\n");
 		exit(0);
 	} 
 	if (strcasecmp("--version", argv[idx]) == 0) {
-		printf("Version: "VERSION"\n");
+		std::string ver = "Version: ";
+		ver.append(VERSION).append("\n");
+		cl_print(ver);
 		exit (0);
 	}
 	if (strcasecmp("--rig_debug", argv[idx]) == 0) {
@@ -535,6 +563,10 @@ int parse_args(int argc, char **argv, int& idx)
 		XML_DEBUG = true;
 		idx++;
 		return 1;
+	}
+	if (strcasecmp("--xml-help", argv[idx]) == 0) {
+		cl_print(print_xmlhelp());
+		exit(0);
 	}
 	if (strcasecmp("--debug-level", argv[idx]) == 0) {
 		string level = argv[idx + 1];
