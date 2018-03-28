@@ -24,6 +24,8 @@
 #include "icons.h"
 #include "tod_clock.h"
 
+#include "status.h"
+
 //=============================================================================
 
 void RIG_ICOM::adjustCIV(uchar adr)
@@ -201,7 +203,9 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 	string returned = "";
 	string tosend = cmd;
 	int cnt = 0, repeat = 0;
-	size_t num = n + cmd.length();
+	size_t num = n;
+	if (progStatus.comm_echo) num += cmd.length();
+
 	unsigned long int tod_start = zmsec();
 
 	int delay =  (int)(num * 11000.0 / RigSerial->Baud() + 
