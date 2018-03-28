@@ -310,8 +310,8 @@ public:
 	virtual const char **hitable(int m) {return NULL;}
 
 	virtual bool can_split() { return false;}
-	virtual void set_split(bool val) {split = val;}
-	virtual int  get_split() {return split;}
+	virtual void set_split(bool val);
+	virtual int  get_split();
 	virtual bool twovfos() {return false;}
 	virtual void swapvfos() {}
 	virtual bool canswap() { return false; }

@@ -118,7 +118,7 @@ rigbase::rigbase()
 	has_smeter =
 	has_power_out =
 	has_line_out =
-	has_split =
+//	has_split =
 	has_split_AB =
 	has_a2b =
 	has_band_selection =
@@ -469,4 +469,14 @@ void rigbase::sendOK(string cmd)
 	}
 	if (id_OK(IDstr, 100))
 		sendCommand(cmd, 0);
+}
+
+void rigbase::set_split(bool val) 
+{
+	split = val;
+}
+
+int  rigbase::get_split() 
+{
+	return split;
 }

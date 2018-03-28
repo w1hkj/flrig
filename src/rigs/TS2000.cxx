@@ -255,6 +255,9 @@ const char * RIG_TS2000::get_bwname_(int n, int md)
 	return bwname;
 }
 
+static int txvfo = 0;
+static int rxvfo = 0;
+
 void RIG_TS2000::selectA()
 {
 	cmd = "FR0;";
@@ -264,6 +267,7 @@ void RIG_TS2000::selectA()
 	sendCommand(cmd);
 	showresp(WARN, ASC, "Tx on A", cmd, "");
 	rxona = true;
+	txvfo = rxvfo = 0;
 }
 
 void RIG_TS2000::selectB()
@@ -275,11 +279,13 @@ void RIG_TS2000::selectB()
 	sendCommand(cmd);
 	showresp(WARN, ASC, "Tx on B", cmd, "");
 	rxona = false;
+	txvfo = rxvfo = 1;
 }
 
 void RIG_TS2000::set_split(bool val) 
 {
 	split = val;
+
 	if (useB) {
 		if (val) {
 			cmd = "FR1;";
@@ -288,6 +294,8 @@ void RIG_TS2000::set_split(bool val)
 			cmd = "FT0;";
 			sendCommand(cmd);
 			showresp(WARN, ASC, "Tx on A", cmd, "");
+			rxvfo = 1;
+			txvfo = 0;
 		} else {
 			cmd = "FR1;";
 			sendCommand(cmd);
@@ -295,6 +303,7 @@ void RIG_TS2000::set_split(bool val)
 			cmd = "FT1;";
 			sendCommand(cmd);
 			showresp(WARN, ASC, "Tx on B", cmd, "");
+			rxvfo = txvfo = 1;
 		}
 		rxona = false;
 	} else {
@@ -305,6 +314,7 @@ void RIG_TS2000::set_split(bool val)
 			cmd = "FT1;";
 			sendCommand(cmd);
 			showresp(WARN, ASC, "Tx on B", cmd, "");
+			rxvfo = 0; txvfo = 1;
 		} else {
 			cmd = "FR0;";
 			sendCommand(cmd);
@@ -312,36 +322,42 @@ void RIG_TS2000::set_split(bool val)
 			cmd = "FT0;";
 			sendCommand(cmd);
 			showresp(WARN, ASC, "Tx on A", cmd, "");
+			rxvfo = txvfo = 0;
 		}
 		rxona = true;
 	}
+
 	Fl::awake(highlight_vfo, (void *)0);
 }
+
 
 int RIG_TS2000::get_split()
 {
 	size_t p;
-	int split = 0;
 	int rx = 0, tx = 0;
 // tx vfo
 	cmd = "FT;";
 	if (wait_char(';', 4, 100, "get split tx vfo", ASC) == 4) {
 		p = replystr.rfind("FT");
-		if (p == string::npos) return split;
-		tx = replystr[p+2] - '0';
-	}
+		if (p == string::npos) 
+			tx = txvfo;
+		else
+			tx = replystr[p+2];
+	} else tx = txvfo;
 
 // rx vfo
 	cmd = "FR;";
 	if (wait_char(';', 4, 100, "get split rx vfo", ASC) == 4) {
 		p = replystr.rfind("FR");
-		if (p == string::npos) return split;
-		rx = replystr[p+2] - '0';
-	}
-// split test
-	split = tx * 2 + rx;
+		if (p == string::npos) 
+			rx = rxvfo;
+		else
+			rx = replystr[p+2];
+	} else rx = rxvfo;
 
-	return split;
+// split test
+	return (tx != rx);
+
 }
 
 long RIG_TS2000::get_vfoA ()

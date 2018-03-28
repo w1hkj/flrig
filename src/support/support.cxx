@@ -638,6 +638,8 @@ void read_split()
 			Fl::awake(update_split, (void*)0);
 		}
 		vfo->split = progStatus.split;
+	} else {
+		vfo->split = progStatus.split;// = selrig->get_split();
 	}
 }
 
@@ -1657,6 +1659,10 @@ void cb_set_split(int val)
 {
 	progStatus.split = val;
 
+	if (!selrig->can_split()) {
+		return;
+	}
+
 	if (selrig->has_split_AB) {
 		guard_lock serial_lock(&mutex_serial);
 		selrig->set_split(val);
@@ -2471,6 +2477,17 @@ void setPTT( void *d)
 
 	int set = (long)d;
 	int get, cnt = 0;
+
+	if (progStatus.split && !selrig->can_split()) {
+		guard_lock serial_lock(&mutex_serial);
+		if (set) {
+			if (useB) selrig->set_vfoB(vfoA.freq);
+			else selrig->set_vfoA(vfoB.freq);
+		} else {
+			if (useB) selrig->set_vfoB(vfoB.freq);
+			else selrig->set_vfoA(vfoA.freq);
+		}
+	}
 
 	rigPTT(set);
 

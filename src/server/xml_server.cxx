@@ -255,6 +255,7 @@ public:
 	rig_get_split(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_split", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+std::cout << "progStatus.split " << progStatus.split << std::endl;
 		result = progStatus.split;
 	}
 
