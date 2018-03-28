@@ -224,7 +224,7 @@ civ.close();
 		for ( cnt = 0; cnt < delay; cnt++) {
 			readResponse();
 			returned.append(replystr);
-			if (returned.length() >= n) {
+			if (returned.length() >= num) {
 				replystr = returned;
 				unsigned long int waited = zmsec() - tod_start;
 				snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, OK  ", sz, waited);
