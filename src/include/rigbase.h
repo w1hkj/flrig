@@ -97,6 +97,12 @@ struct XCVR_STATE {
 		iBW = c;
 		src = d;
 	}
+	bool equals(XCVR_STATE alt) {
+		if (freq != alt.freq) return false;
+		if (iBW != alt.iBW) return false;
+		if (imode != alt.imode) return false;
+		return true;
+	}
 };
 
 struct GUI {

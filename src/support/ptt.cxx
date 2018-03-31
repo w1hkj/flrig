@@ -63,8 +63,6 @@ static void fake_split(int on)
 
 void rigPTT(bool on)
 {
-	guard_lock gl_serial(&mutex_serial, 300);
-
 	if (on && progStatus.split && !selrig->can_split())
 		fake_split(on);
 

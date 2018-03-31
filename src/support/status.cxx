@@ -157,6 +157,7 @@ status progStatus = {
 	0,			// int  auto_notch;
 
 	0,			// int  split;
+	0,			// int  no_txqsy
 
 	5,			// int rx_avg;
 	5,			// int rx_peak;
@@ -458,6 +459,7 @@ void status::saveLastState()
 	spref.set("int_shift", shift_val);
 	spref.set("rfgain", rfgain);
 	spref.set("squelch", squelch);
+	spref.set("no_txqsy", no_txqsy);
 
 	spref.set("schema", schema);
 
@@ -790,6 +792,7 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("int_shift", shift_val, shift_val);
 		spref.get("rfgain", rfgain, rfgain);
 		spref.get("squelch", squelch, squelch);
+		spref.get("no_txqsy", no_txqsy, no_txqsy);
 
 		spref.get("schema", schema, schema);
 

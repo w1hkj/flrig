@@ -255,7 +255,6 @@ public:
 	rig_get_split(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_split", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-std::cout << "progStatus.split " << progStatus.split << std::endl;
 		result = progStatus.split;
 	}
 
@@ -276,19 +275,14 @@ public:
 			return;
 		}
 
-		guard_lock queA_lock(&mutex_queA);
-		guard_lock queB_lock(&mutex_queB);
-		if (! queA.empty() || !queB.empty())
-			return;
-
 		static char szfreq[20];
 		int freq;
 		if (useB) {
-			if (!queB.empty()) freq = queB.back().freq;
-			else freq = vfoB.freq;
+			guard_lock queB_lock(&mutex_queB);
+			freq = vfoB.freq;
 		} else {
-			if (!queA.empty()) freq = queA.back().freq;
-			else freq = vfoA.freq;
+			guard_lock queA_lock(&mutex_queA);
+			freq = vfoA.freq;
 		}
 		snprintf(szfreq, sizeof(szfreq), "%d", freq);
 		std::string result_string = szfreq;
@@ -298,6 +292,56 @@ public:
 	std::string help() { return std::string("returns active vfo in Hertz"); }
 
 } rig_get_vfo(&rig_server);
+
+//------------------------------------------------------------------------------
+// Request for vfo A frequency
+//------------------------------------------------------------------------------
+class rig_get_vfoA : public XmlRpcServerMethod {
+public:
+	rig_get_vfoA(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_vfoA", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = "14070000";
+			return;
+		}
+
+		guard_lock queA_lock(&mutex_queA);
+
+		static char szfreq[20];
+		snprintf(szfreq, sizeof(szfreq), "%ld", vfoA.freq);
+		std::string result_string = szfreq;
+		result = result_string;
+	}
+
+	std::string help() { return std::string("returns active vfo in Hertz"); }
+
+} rig_get_vfoA(&rig_server);
+
+//------------------------------------------------------------------------------
+// Request for vfo A frequency
+//------------------------------------------------------------------------------
+class rig_get_vfoB : public XmlRpcServerMethod {
+public:
+	rig_get_vfoB(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_vfoB", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = "14070000";
+			return;
+		}
+
+		guard_lock queB_lock(&mutex_queB);
+
+		static char szfreq[20];
+		snprintf(szfreq, sizeof(szfreq), "%ld", vfoB.freq);
+		std::string result_string = szfreq;
+		result = result_string;
+	}
+
+	std::string help() { return std::string("returns active vfo in Hertz"); }
+
+} rig_get_vfoB(&rig_server);
 
 //------------------------------------------------------------------------------
 // Request for vfo in use
@@ -420,8 +464,8 @@ public:
 
 		guard_lock queA_lock(&mutex_queA);
 		guard_lock queB_lock(&mutex_queB);
-		if (! queA.empty() || !queB.empty())
-			return;
+//		if (! queA.empty() || !queB.empty())
+//			return;
 
 		int mode;
 		if (useB) {
@@ -457,8 +501,8 @@ public:
 
 		guard_lock queA_lock(&mutex_queA);
 		guard_lock queB_lock(&mutex_queB);
-		if (! queA.empty() || !queB.empty())
-			return;
+//		if (! queA.empty() || !queB.empty())
+//			return;
 
 		int mode;
 		if (useB) {
@@ -499,8 +543,8 @@ public :
 
 		guard_lock queA_lock(&mutex_queA);
 		guard_lock queB_lock(&mutex_queB);
-		if (! queA.empty() || !queB.empty())
-			return;
+//		if (! queA.empty() || !queB.empty())
+//			return;
 
 		int mode = useB ? vfoB.imode : vfoA.imode;
 		const char **bwt = selrig->bwtable(mode);
@@ -563,8 +607,6 @@ public:
 
 		guard_lock queA_lock(&mutex_queA);
 		guard_lock queB_lock(&mutex_queB);
-		if (! queA.empty() || !queB.empty())
-			return;
 
 		int BW = useB ? vfoB.iBW : vfoA.iBW;
 		int mode = useB ? vfoB.imode : vfoA.imode;
@@ -664,6 +706,34 @@ static void push_xml()
 		guard_lock gl_xmlqueA(&mutex_queA, 102);
 		queA.push(srvr_vfo);
 	}
+}
+
+static void push_xmlA()
+{
+	srvr_vfo.src = SRVR;
+	char pr[200];
+	snprintf(pr, sizeof(pr), "srvr: %ld, mode: %i, bw-HI: %i | bw-LO %i",
+		srvr_vfo.freq,
+		srvr_vfo.imode,
+		(srvr_vfo.iBW / 256),
+		(srvr_vfo.iBW & 0xFF));
+	LOG_DEBUG("%s", pr);
+	guard_lock gl_xmlqueA(&mutex_queA, 102);
+	queA.push(srvr_vfo);
+}
+
+static void push_xmlB()
+{
+	srvr_vfo.src = SRVR;
+	char pr[200];
+	snprintf(pr, sizeof(pr), "srvr: %ld, mode: %i, bw-HI: %i | bw-LO %i",
+		srvr_vfo.freq,
+		srvr_vfo.imode,
+		(srvr_vfo.iBW / 256),
+		(srvr_vfo.iBW & 0xFF));
+	LOG_DEBUG("%s", pr);
+	guard_lock gl_xmlqueB(&mutex_queB, 102);
+	queB.push(srvr_vfo);
 }
 
 //------------------------------------------------------------------------------
@@ -783,6 +853,50 @@ public:
 } rig_set_AB(&rig_server);
 
 //------------------------------------------------------------------------------
+// Set vfoA frequency
+//------------------------------------------------------------------------------
+
+class rig_set_vfoA : public XmlRpcServerMethod {
+public:
+	rig_set_vfoA(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_vfoA", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
+		long freq = static_cast<long>(double(params[0]));
+		srvr_vfo = vfoA;
+		srvr_vfo.freq = freq;
+		push_xmlA();
+	}
+	std::string help() { return std::string("rig.set_vfo NNNNNNNN (Hz)"); }
+
+} rig_set_vfoA(&rig_server);
+
+//------------------------------------------------------------------------------
+// Set vfo B frequency
+//------------------------------------------------------------------------------
+
+class rig_set_vfoB : public XmlRpcServerMethod {
+public:
+	rig_set_vfoB(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_vfoB", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
+		long freq = static_cast<long>(double(params[0]));
+		srvr_vfo = vfoB;
+		srvr_vfo.freq = freq;
+		push_xmlB();
+	}
+	std::string help() { return std::string("rig.set_vfo NNNNNNNN (Hz)"); }
+
+} rig_set_vfoB(&rig_server);
+
+//------------------------------------------------------------------------------
 // Set active vfo frequency
 //------------------------------------------------------------------------------
 
@@ -806,6 +920,7 @@ public:
 	std::string help() { return std::string("rig.set_vfo NNNNNNNN (Hz)"); }
 
 } rig_set_vfo(&rig_server);
+
 
 class main_set_frequency : public XmlRpcServerMethod {
 public:
@@ -973,6 +1088,8 @@ struct MLIST {
 	{ "rig.get_split",    "s:n", "return split state" },
 	{ "rig.get_update",   "s:n", "return update to info" },
 	{ "rig.get_vfo",      "s:n", "return current VFO in Hz" },
+	{ "rig.get_vfoA",     "s:n", "return vfo A in Hz" },
+	{ "rig.get_vfoB",     "s:n", "return vfo B in Hz" },
 	{ "rig.get_xcvr",     "s:n", "returns name of transceiver" },
 	{ "rig.set_AB",       "s:s", "set VFO A/B" },
 	{ "rig.set_bw",       "i:i", "set BW iaw BW table" },
@@ -982,6 +1099,8 @@ struct MLIST {
 	{ "rig.set_notch",    "d:d", "set NOTCH value in Hz" },
 	{ "rig.set_ptt",      "i:i", "set PTT 1/0 (on/off)" },
 	{ "rig.set_vfo",      "d:d", "set current VFO in Hz" },
+	{ "rig.set_vfoA",     "d:d", "set vfo A in Hz" },
+	{ "rig.set_vfoB",     "d:d", "set vfo B in Hz" },
 	{ "rig.swap",         "i:i", "execute vfo swap" },
 	{ "rig.set_split",    "i:i", "set split 1/0 (on/off)" },
 	{ "main.set_frequency", "d:d", "set current VFO in Hz" }

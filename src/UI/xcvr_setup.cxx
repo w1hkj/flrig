@@ -37,6 +37,7 @@ Fl_Round_Button *btndtrptt = (Fl_Round_Button *)0;
 Fl_Check_Button *chkrtscts = (Fl_Check_Button *)0;
 Fl_Check_Button *btnrtsplus = (Fl_Check_Button *)0;
 Fl_Check_Button *btndtrplus = (Fl_Check_Button *)0;
+Fl_Check_Button *btn_notxqsy = (Fl_Check_Button *)0;
 Fl_Int_Input *txtCIV = (Fl_Int_Input *)0;
 Fl_Button *btnCIVdefault = (Fl_Button *)0;
 Fl_Check_Button *btnUSBaudio = (Fl_Check_Button *)0;
@@ -295,6 +296,10 @@ static void cb_btnrtsplus(Fl_Check_Button*, void*) {
 static void cb_btndtrplus(Fl_Check_Button*, void*) {
 	btnOkXcvrDialog->labelcolor(FL_RED);
 	btnOkXcvrDialog->redraw_label();
+}
+
+static void cb_btn_notxqsy(Fl_Check_Button*, void*) {
+	progStatus.no_txqsy = btn_notxqsy->value();
 }
 
 static void cb_txtCIV(Fl_Int_Input* o, void*) {
@@ -786,7 +791,7 @@ Fl_Double_Window* w = new Fl_Double_Window(480, 255, _("I/O Ports"));
 			mnuBaudrate->when(FL_WHEN_RELEASE);
 			mnuBaudrate->end();
 
-			btnOneStopBit = new Fl_Check_Button(80, 120, 22, 15, _("1"));
+			btnOneStopBit = new Fl_Check_Button(20, 120, 22, 15, _("1"));
 			btnOneStopBit->tooltip(_("One Stop Bit"));
 			btnOneStopBit->down_box(FL_DOWN_BOX);
 			btnOneStopBit->callback((Fl_Callback*)cb_btnOneStopBit);
@@ -799,11 +804,18 @@ Fl_Double_Window* w = new Fl_Double_Window(480, 255, _("I/O Ports"));
 			btnTwoStopBit->align(Fl_Align(FL_ALIGN_RIGHT));
 			btnTwoStopBit->value(progStatus.stopbits == 2);
 
-			btnRigCatEcho = new Fl_Check_Button(80, 145, 22, 15, _("Echo "));
+			btnRigCatEcho = new Fl_Check_Button(20, 145, 22, 15, _("Echo "));
 			btnRigCatEcho->down_box(FL_DOWN_BOX);
 			btnRigCatEcho->callback((Fl_Callback*)cb_btnRigCatEcho);
 			btnRigCatEcho->align(Fl_Align(FL_ALIGN_RIGHT));
 			btnRigCatEcho->value(progStatus.comm_echo);
+
+			btn_notxqsy = new Fl_Check_Button(120, 145, 22, 15, _("Disable tx_qsy"));
+			btn_notxqsy->down_box(FL_DOWN_BOX);
+			btn_notxqsy->callback((Fl_Callback*)cb_btn_notxqsy);
+			btn_notxqsy->align(Fl_Align(FL_ALIGN_RIGHT));
+			btn_notxqsy->value(progStatus.no_txqsy);
+			btn_notxqsy->tooltip(_("check if transceiver cannot change freq\nwhen PTT enabled"));
 
 			cntRigCatRetries = new Fl_Counter(350, 40, 100, 20, _("Retries"));
 			cntRigCatRetries->tooltip(_("Number of  times to resend\ncommand before giving up"));

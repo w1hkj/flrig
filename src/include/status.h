@@ -146,6 +146,7 @@ struct status {
 	int		auto_notch;
 
 	int		split;
+	int		no_txqsy;
 
 	int		rx_avg;
 	int		rx_peak;

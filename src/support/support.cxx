@@ -21,10 +21,12 @@
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <fcntl.h>
 
 #include "icons.h"
@@ -111,9 +113,52 @@ bool run_serial_thread = true;
 bool PTT = false;
 int  powerlevel = 0;
 
-void trace(string s)
+void trace(int n, ...) // all args of type const char *
 {
-	std::cout << s << std::endl;
+	if (!RIG_DEBUG) return;
+	if (!n) return;
+	stringstream s;
+	va_list vl;
+	va_start(vl, n);
+	s.seekp(0);
+	s << va_arg(vl, const char *);
+	for (int i = 1; i < n; i++)
+		s << " " << va_arg(vl, const char *);
+	va_end(vl);
+	s << "\n";
+	std::cout << s.str();
+}
+
+string printXCVR_STATE(XCVR_STATE &data)
+{
+	stringstream str;
+	const char **bwt = selrig->bwtable(data.imode);
+	const char **dsplo = selrig->lotable(data.imode);
+	const char **dsphi = selrig->hitable(data.imode);
+	str << data.freq << ", ";
+	str <<
+		(selrig->modes_ ? selrig->modes_[data.imode] : "modes n/a");
+	if (data.iBW > 256 && selrig->has_dsp_controls) {
+		str << ", " <<
+		(dsplo ? dsplo[data.iBW & 0x7F] : "??") <<
+		(bwt ? bwt[data.iBW] : "n/a");
+	}
+	if (data.iBW > 256 && selrig->has_dsp_controls) {
+		str << ", " <<
+		(dsphi ? dsphi[(data.iBW >> 8) & 0x7F] : "??");
+	}
+	return str.str();
+}
+
+string print_ab()
+{
+	std::string s;
+	s.assign("VFO-A: ");
+	s.append(printXCVR_STATE(vfoA));
+	s.append("\n");
+	s.append("VFO-B: ");
+	s.append(printXCVR_STATE(vfoB));
+	return s;
 }
 
 char *print(XCVR_STATE &data)
@@ -165,37 +210,6 @@ Data Source: %s\
 		data.squelch,
 		data.compression,
 		data.compON
-	);
-	return str;
-}
-
-char *print_ab()
-{
-	static char str[1024];
-	const char **bwtA = selrig->bwtable(vfoA.imode);
-	const char **dsploA = selrig->lotable(vfoA.imode);
-	const char **dsphiA = selrig->hitable(vfoA.imode);
-	const char **bwtB = selrig->bwtable(vfoB.imode);
-	const char **dsploB = selrig->lotable(vfoB.imode);
-	const char **dsphiB = selrig->hitable(vfoB.imode);
-	snprintf(
-		str, sizeof(str),
-		"\
-VFO-A: %10ld, %4s, [%s], [%s]\n\
-VFO-B: %10ld, %4s, [%s], [%s]",
-		vfoA.freq,
-		selrig->modes_ ? selrig->modes_[vfoA.imode] : "modes n/a",
-		(vfoA.iBW > 256 && selrig->has_dsp_controls) ?
-			(dsploA ? dsploA[vfoA.iBW & 0x7F] : "??") : (bwtA ? bwtA[vfoA.iBW] : "n/a"),
-		(vfoA.iBW > 256 && selrig->has_dsp_controls) ?
-			(dsphiA ? dsphiA[(vfoA.iBW >> 8) & 0x7F] : "??") : "",
-
-		vfoB.freq,
-		selrig->modes_ ? selrig->modes_[vfoB.imode] : "modes n/a",
-		(vfoB.iBW > 256 && selrig->has_dsp_controls) ?
-			(dsploB ? dsploB[vfoB.iBW & 0x7F] : "??") : (bwtB ? bwtB[vfoB.iBW] : "n/a"),
-		(vfoB.iBW > 256 && selrig->has_dsp_controls) ?
-			(dsphiB ? dsphiB[(vfoB.iBW >> 8) & 0x7F] : "??") : ""
 	);
 	return str;
 }
@@ -254,7 +268,6 @@ void update_vfoAorB(void *d)
 	long val = (long)d;
 
 	if (xcvr_name == rig_FT817.name_) {
-//trace("update_vfoAorB");
 		guard_lock serial_lock(&mutex_serial);
 		if (val) {
 			useB = true;
@@ -915,149 +928,143 @@ POLL_PAIR *poll_parameters;
 static bool resetrcv = true;
 static bool resetxmt = true;
 
+bool queA_pending = false;
+XCVR_STATE pendingA;
+
 void serviceA()
 {
 	if (queA.empty()) return;
 
-//std::cout << "Service A:\n" << print_ab() << std::endl;
-
 	XCVR_STATE nuvals;
-
-	guard_lock serial_lock(&mutex_serial, 24);
 	{
-		guard_lock queA_lock(&mutex_queA, 25);
+		guard_lock queA_lock(&mutex_queA, 27);
 		while (!queA.empty()) {
 			nuvals = queA.front();
 			queA.pop();
 		}
+
+		// only allow QSY in Rx if no_txqsy enabled
+		if (PTT) {
+			if (progStatus.no_txqsy ||
+				(PTT && ((vfoA.iBW != nuvals.iBW) || (vfoA.imode != nuvals.imode)))) {
+				queA.push(nuvals);
+				queA_pending = true;
+				return;
+			}
+		}
+
+		if (useB) {
+			if (selrig->can_change_alt_vfo) {
+				if ((vfoA.imode == nuvals.imode) && (vfoA.iBW == nuvals.iBW)) {
+					selrig->set_vfoA(nuvals.freq);
+					vfoA.freq = nuvals.freq;
+					trace(2, "set alt VFO A", printXCVR_STATE(nuvals).c_str());
+					if (nuvals.src != UI)
+						Fl::awake(setFreqDispA, (void *)nuvals.freq);
+					return;
+				}
+			}
+			if (!queA_pending || !pendingA.equals(nuvals)) {
+				trace(2, "pending VFO A", printXCVR_STATE(nuvals).c_str());
+				pendingA = nuvals;
+			}
+			queA.push(nuvals);
+			queA_pending = true;
+			return;
+		}
 	}
 
-	if (!selrig->can_change_alt_vfo && useB) return;
+	queA_pending = false;
+	trace(2, "set VFO A", printXCVR_STATE(nuvals).c_str());
 
-	if (changed_vfo && !useB) {
-		selrig->selectA();
-		vfo = &vfoA;
-	}
-
-// if TT550 etal and on the B vfo
-	if (selrig->can_change_alt_vfo && useB) {
-		selrig->set_vfoA(nuvals.freq);
-		vfoA.freq = nuvals.freq;
-		goto end_serviceA;
-	}
-
-//std::cout << "nuvals: " << nuvals.freq << ", " << nuvals.imode << ", " << nuvals.iBW << std::endl;
-
-	if (!useB) vfo = &vfoA;
-	if (vfoA.imode != nuvals.imode || changed_vfo) {
-//std::cout << "A.imode = " << vfoA.imode << ", nu.imode = " << nuvals.imode << std::endl;
-//std::cout << "A.iBW = " << vfoA.iBW << ", nu.iBW = " << nuvals.iBW << std::endl;
-		selrig->set_modeA(vfoA.imode = vfo->imode = nuvals.imode);
+	if (vfoA.imode != nuvals.imode) {
+		selrig->set_modeA(vfoA.imode = nuvals.imode);
 		Fl::awake(setModeControl);
 		set_bandwidth_control();
-		selrig->set_bwA(vfo->iBW = vfoA.iBW = nuvals.iBW);
+		selrig->set_bwA(vfoA.iBW = nuvals.iBW);
 		Fl::awake(setBWControl);
-	} else if (vfoA.iBW != nuvals.iBW) { // && nuvals.iBW != -1) {
-//std::cout << "A.iBW = " << vfo->iBW << ", nu.iBW = " << nuvals.iBW << std::endl;
-		selrig->set_bwA(vfo->iBW = vfoA.iBW = nuvals.iBW);
+	} else if ((vfoA.iBW != nuvals.iBW)  && (nuvals.iBW != -1)) {
+		selrig->set_bwA(vfoA.iBW = nuvals.iBW);
 		Fl::awake(setBWControl);
 	}
 
-	if (vfoA.freq != nuvals.freq || changed_vfo) {
-		vfoA.freq = vfo->freq = nuvals.freq;
-		Fl::awake(setFreqDispA, (void *)vfoA.freq);
-		if (!useB)
-			selrig->set_vfoA(vfoA.freq);
-	}
+	vfoA.freq = nuvals.freq;
+	Fl::awake(setFreqDispA, (void *)vfoA.freq);
+	selrig->set_vfoA(vfoA.freq);
 
-end_serviceA:
-//	if (!useB) vfo = &vfoA;
+	vfo = &vfoA;
 
-//std::cout << print(*vfo) << std::endl;
-//std::cout << print_ab() << std::endl;
+	trace(1, print_ab().c_str());
 
-	if (RIG_DEBUG) {
-		LOG_INFO("\n%s", print_ab());
-	}
-
-	changed_vfo = false;
 }
+
+bool queB_pending = false;
+XCVR_STATE pendingB;
 
 void serviceB()
 {
 	if (queB.empty()) return;
 
-//std::cout << "Service B:\n" << print_ab() << std::endl;
-
 	XCVR_STATE nuvals;
-	guard_lock serial_lock(&mutex_serial, 26);
 	{
 		guard_lock queB_lock(&mutex_queB, 27);
 		while (!queB.empty()) {
 			nuvals = queB.front();
 			queB.pop();
 		}
+
+		// only allow QSY in Rx if no_txqsy enabled
+		if (PTT) {
+			if (progStatus.no_txqsy ||
+				(PTT && ((vfoB.iBW != nuvals.iBW) || (vfoB.imode != nuvals.imode)))) {
+				queB.push(nuvals);
+				queB_pending = true;
+				return;
+			}
+		}
+
+		if (!useB) {
+			if (selrig->can_change_alt_vfo) {
+				if ((vfoB.imode == nuvals.imode) && (vfoB.iBW == nuvals.iBW)) {
+					selrig->set_vfoB(nuvals.freq);
+					vfoB.freq = nuvals.freq;
+					trace(2, "set alt VFO B", printXCVR_STATE(nuvals).c_str());
+					if (nuvals.src != UI)
+						Fl::awake(setFreqDispB, (void *)nuvals.freq);
+					return;
+				}
+			}
+			if (!queB_pending || !pendingB.equals(nuvals)) {
+				trace(2, "pending queB", printXCVR_STATE(nuvals).c_str());
+				pendingB = nuvals;
+			}
+			queB.push(nuvals);
+			queB_pending = true;
+			return;
+		}
 	}
 
-//std::cout << "nuvals: " << nuvals.freq << ", " << nuvals.imode << ", " << nuvals.iBW << std::endl;
+	queB_pending = false;
+	trace(2, "set VFO B", printXCVR_STATE(nuvals).c_str());
 
-	if (!selrig->can_change_alt_vfo && !useB)
-		goto end_serviceB;
-
-	if (changed_vfo && useB) {
-		selrig->selectB();
-		vfo = &vfoB;
-	}
-// if TT550 or K3 and split or on vfoA just update the B vfo
-	if ((xcvr_name == rig_K3.name_) || (selrig->can_change_alt_vfo && !useB)) {
-		selrig->set_vfoB(nuvals.freq);
-		vfoB.freq = nuvals.freq;
-		goto end_serviceB;
-	}
-
-	if (useB) vfo = &vfoB;
-	if (vfoB.imode != nuvals.imode || changed_vfo) {
-//std::cout << "B.imode = " << vfoB.imode << ", nu.imode = " << nuvals.imode << std::endl;
-//std::cout << "B.iBW = " << vfoB.iBW << ", nu.iBW = " << nuvals.iBW << std::endl;
-		selrig->set_modeB(vfo->imode = vfoB.imode = nuvals.imode);
+	if (vfoB.imode != nuvals.imode) {
+		selrig->set_modeB(vfoB.imode = nuvals.imode);
 		Fl::awake(setModeControl);
 		set_bandwidth_control();
-		selrig->set_bwB(vfo->iBW = vfoB.iBW = nuvals.iBW);
+		selrig->set_bwB(vfoB.iBW = nuvals.iBW);
 		Fl::awake(setBWControl);
-	} else if (vfoB.iBW != nuvals.iBW  && nuvals.iBW != -1) {
-//std::cout << "B.iBW = " << vfoB.iBW << ", nu.iBW = " << nuvals.iBW << std::endl;
-		selrig->set_bwB(vfo->iBW = vfoB.iBW = nuvals.iBW);
+	} else if ((vfoB.iBW != nuvals.iBW)  && (nuvals.iBW != -1)) {
+		selrig->set_bwB(vfoB.iBW = nuvals.iBW);
 		Fl::awake(setBWControl);
 	}
 
-	if (vfoB.freq != nuvals.freq || changed_vfo) {
-		vfoB.freq = vfo->freq = nuvals.freq;
-		Fl::awake(setFreqDispB, (void *)vfoB.freq);
-		if (useB)
-			selrig->set_vfoB(vfoB.freq);
-	}
+	vfoB.freq = nuvals.freq;
+	Fl::awake(setFreqDispB, (void *)vfoB.freq);
+	selrig->set_vfoB(vfoB.freq);
 
-//	pushedB = false;
+	vfo = &vfoB;
 
-end_serviceB:
-
-	if (useB) vfo = &vfoB;
-
-//std::cout << print(*vfo) << std::endl;
-//std::cout << print_ab() << std::endl;
-
-	if (RIG_DEBUG) {
-		LOG_INFO("\n%s", print_ab());
-	}
-
-	changed_vfo = false;
-}
-
-inline bool que_pending()
-{
-	if (!queA.empty()) return true;
-	if (!queB.empty()) return true;
-	return false;
+	trace(1, print_ab().c_str());
 }
 
 bool close_rig = false;
@@ -1083,13 +1090,13 @@ void * serial_thread_loop(void *d)
 
 //send any freq/mode/bw changes in the queu
 
-		if (!PTT) {
+		{
+			guard_lock serial(&mutex_serial);
 			serviceA();
-
 			serviceB();
-			if (que_pending())
-				continue;
+		}
 
+		if (!PTT) {
 			if (resetrcv) {
 				Fl::awake(zeroXmtMeters, 0);
 				resetrcv = false;
@@ -1103,11 +1110,9 @@ void * serial_thread_loop(void *d)
 				poll_nbr++;
 
 				if (xcvr_name == rig_K3.name_) {
-					if (que_pending()) continue;
 					read_K3();
 				}
 				else if (xcvr_name == rig_KX3.name_) {
-					if (que_pending()) continue;
 					read_KX3();
 				}
 				if ((xcvr_name == rig_K2.name_) ||
@@ -1116,10 +1121,10 @@ void * serial_thread_loop(void *d)
 						 progStatus.poll_mode ||
 						 progStatus.poll_bandwidth) ) )
 					read_info();
-				if (que_pending() || bypass_serial_thread_loop) continue;
+				if (bypass_serial_thread_loop) continue;
 				poll_parameters = &RX_poll_pairs[0];
 				while (poll_parameters->poll) {
-					if (que_pending() || bypass_serial_thread_loop) break;
+					if (bypass_serial_thread_loop) break;
 					if (*(poll_parameters->poll) && !(poll_nbr % *(poll_parameters->poll)))
 						(poll_parameters->pollfunc)();
 					poll_parameters++;
@@ -1449,8 +1454,8 @@ int movFreqA() {
 }
 
 int movFreqB() {
-	if (progStatus.split && (!selrig->twovfos()))
-		return 0; // disallow for ICOM transceivers
+//	if (progStatus.split && (!selrig->twovfos()))
+//		return 0; // disallow for ICOM transceivers
 	XCVR_STATE nuvfo = vfoB;
 	nuvfo.freq = FreqDispB->value();
 	nuvfo.src = UI;
@@ -1666,57 +1671,31 @@ void cb_set_split(int val)
 	if (selrig->has_split_AB) {
 		guard_lock serial_lock(&mutex_serial);
 		selrig->set_split(val);
-	} else if (val) {
-		if (useB) {
-			if (vfoB.freq != FreqDispB->value()) {
-				vfoB.freq = FreqDispB->value();
-				guard_lock serial_lock(&mutex_serial, 47);
-				selrig->selectB();
-				selrig->set_vfoB(vfoB.freq);
-				selrig->selectA();
-			}
-			btnA->value(1);
-			btnB->value(0);
-			cb_selectA();
-		}
-	} else
-		cb_selectA();
+	}
 }
 
-void cb_selectA() {
-	guard_lock serial_lock(&mutex_serial);
-	guard_lock queA_lock(&mutex_queA);
-	guard_lock queB_lock(&mutex_queB);
-
-	changed_vfo = true;
+void cb_selectA()
+{
 	vfoA.src = UI;
 	vfoA.freq = FreqDispA->value();
-
-	while (!queB.empty()) queB.pop();
-	while (!queA.empty()) queA.pop();
-	queA.push(vfoA);
+	trace(2, "select A", printXCVR_STATE(vfoA).c_str());
 
 	useB = false;
+	guard_lock serial(&mutex_serial);
+	selrig->selectA();
 	highlight_vfo((void *)0);
-	vfo = &vfoA;
 }
 
-void cb_selectB() {
-	guard_lock serial_lock(&mutex_serial);
-	guard_lock queA_lock(&mutex_queA);
-	guard_lock queB_lock(&mutex_queB);
-
-	changed_vfo = true;
+void cb_selectB()
+{
 	vfoB.src = UI;
 	vfoB.freq = FreqDispB->value();
-
-	while (!queA.empty()) queA.pop();
-	while (!queB.empty()) queB.pop();
-	queB.push(vfoB);
+	trace(2, "select B", printXCVR_STATE(vfoB).c_str());
 
 	useB = true;
+	guard_lock serial(&mutex_serial);
+	selrig->selectB();
 	highlight_vfo((void *)0);
-	vfo = &vfoB;
 }
 
 void setLower()
@@ -2478,25 +2457,44 @@ void setPTT( void *d)
 	int set = (long)d;
 	int get, cnt = 0;
 
-	if (progStatus.split && !selrig->can_split()) {
-		guard_lock serial_lock(&mutex_serial);
-		if (set) {
-			if (useB) selrig->set_vfoB(vfoA.freq);
-			else selrig->set_vfoA(vfoB.freq);
+	trace(1, 
+		std::string("ptt ").
+			append(set==1 ? "ON" : "OFF").
+			append(", useB ").append(useB ? "ON" : "OFF").c_str());
+	trace(3, 
+		"split ",
+		(progStatus.split ? "ON" : "OFF"),
+		std::string("pending queu ").append((queA_pending ? "A" : (queB_pending ? "B" : "none" ))).c_str()
+		);
+
+	if (progStatus.split) {// && !selrig->can_split()) {
+		if (useB) {
+			if (set && queA_pending) {
+				guard_lock serial_lock(&mutex_serial);
+				selrig->selectA();
+				useB = false;
+				serviceA();
+				useB = true;
+				selrig->selectB();
+			}
 		} else {
-			if (useB) selrig->set_vfoB(vfoB.freq);
-			else selrig->set_vfoA(vfoA.freq);
+			if (set && queB_pending) {
+				guard_lock serial_lock(&mutex_serial);
+				selrig->selectB();
+				useB = true;
+				serviceB();
+				useB = false;
+				selrig->selectA();
+			}
 		}
 	}
 
 	rigPTT(set);
 
-	guard_lock serial_lock(&mutex_serial);
-
 	get = selrig->get_PTT();
 	while ((get != set) && (cnt++ < 10)) {
 		MilliSleep(10);
-		get = selrig->get_PTT();
+		{ guard_lock serial_lock(&mutex_serial); get = selrig->get_PTT(); }
 		Fl::awake();
 	}
 	PTT = set;
@@ -2575,10 +2573,7 @@ void restore_rig_vals()
 
 	selrig->selectB();
 
-	if (RIG_DEBUG) {
-		LOG_INFO("Restore xcvr B:\n%s", print(xcvr_vfoB));
-		std::cout << "Restore xcvr B:\n" << print(xcvr_vfoB) << std::endl;
-	}
+	trace(2, "Restore xcvr B:\n", print(xcvr_vfoB));
 
 	if (progStatus.restore_frequency)
 		selrig->set_vfoB(xcvr_vfoB.freq);
@@ -2590,10 +2585,7 @@ void restore_rig_vals()
 
 	selrig->selectA();
 
-	if (RIG_DEBUG) {
-		LOG_INFO("Restore xcvr A:\n%s", print(xcvr_vfoA));
-		std::cout << "Restore xcvr A:\n" << print(xcvr_vfoA) << std::endl;
-	}
+	trace(2, "Restore xcvr A:\n", print(xcvr_vfoA));
 
 	if (progStatus.restore_frequency)
 		selrig->set_vfoA(xcvr_vfoA.freq);
@@ -2754,10 +2746,7 @@ void read_rig_vals()
 
 	read_rig_vals_(xcvr_vfoB);
 
-	if (RIG_DEBUG) {
-		LOG_INFO("Read xcvr B:\n%s", print(xcvr_vfoB));
-		std::cout << "Read xcvr B:\n" << print(xcvr_vfoB) << std::endl;
-	}
+	trace(2, "Read xcvr B:\n", print(xcvr_vfoB));
 
 	selrig->selectA();
 
@@ -2776,10 +2765,7 @@ void read_rig_vals()
 		redrawAGC();
 	}
 
-	if (RIG_DEBUG) {
-		LOG_INFO("Read xcvr A:\n%s", print(xcvr_vfoA));
-		std::cout << "Read xcvr A:\n" << print(xcvr_vfoA) << std::endl;
-	}
+	trace(2, "Read xcvr A:\n", print(xcvr_vfoA));
 }
 
 void close_UI(void *)

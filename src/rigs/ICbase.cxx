@@ -83,7 +83,6 @@ void RIG_ICOM::delayCommand(string cmd, int wait)
 	progStatus.comm_wait = oldwait;
 }
 
-static int waitcount = 0;
 static bool timeout_alert = false;
 static char sztimeout_alert[200];
 
@@ -107,9 +106,6 @@ bool RIG_ICOM::waitFB(const char *sz)
 
 	if (!progStatus.use_tcpip && !RigSerial->IsOpen()) {
 		replystr = returned;
-//		snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
-//		showresp(DEBUG, HEX, sztemp, tosend, returned);
-		waitcount = 0;
 #ifdef IC_DEBUG
 civ << sz << std::endl;
 civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
@@ -136,8 +132,6 @@ civ.close();
 					showresp(WARN, HEX, sztemp, tosend, returned);
 				else
 					showresp(DEBUG, HEX, sztemp, tosend, returned);
-
-				waitcount = 0;
 #ifdef IC_DEBUG
 civ << sztemp << std::endl;
 civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
@@ -151,8 +145,6 @@ civ.close();
 				unsigned long int waited = zmsec() - tod_start;
 				snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, FAIL", sz, waited);
 				showresp(ERR, HEX, sztemp, tosend, returned);
-				waitcount = 0;
-
 #ifdef IC_DEBUG
 civ << sztemp << std::endl;
 civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
@@ -165,7 +157,6 @@ civ.close();
 			Fl::awake();
 		}
 	}
-	waitcount++;
 	replystr = returned;
 	unsigned long int waited = zmsec() - tod_start;
 	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %ld ms", sz, waited);
@@ -177,16 +168,6 @@ civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
 civ << "    " << str2hex(returned.c_str(), returned.length()) << std::endl;
 #endif
 
-	if (waitcount > 4 && !timeout_alert) {
-		timeout_alert = true;
-		snprintf(sztimeout_alert, sizeof(sztimeout_alert), 
-			"Serial i/o failure\n%s TIME OUT in %ld ms",
-			sz, waited);
-			Fl::awake(show_timeout);
-#ifdef IC_DEBUG
-civ << sztemp << std::endl;
-#endif
-	}
 #ifdef IC_DEBUG
 civ.close();
 #endif
@@ -247,19 +228,10 @@ civ.close();
 		}
 	}
 
-	waitcount++;
 	replystr = returned;
 	unsigned long int waited = zmsec() - tod_start;
 	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %ld ms", sz, waited);
 	showresp(ERR, HEX, sztemp, tosend, returned);
-
-	if (waitcount > 4 && !timeout_alert) {
-		timeout_alert = true;
-		snprintf(sztimeout_alert, sizeof(sztimeout_alert), 
-			"Serial i/o failure\n%s TIME OUT in %ld ms",
-			sz, waited);
-			Fl::awake(show_timeout);
-	}
 
 #ifdef IC_DEBUG
 civ << sztemp << std::endl;
