@@ -1,0 +1,4 @@
+mv -f ~/AddListenThread.ps .
+rm AddListenThread.pdf AddListenThreadR.pdf
+gs -o AddListenThread.pdf -sDEVICE=pdfwrite -g16480x23840 AddListenThread.ps
+pdf-stapler cat AddListenThread.pdf 1R AddListenThreadR.pdf
