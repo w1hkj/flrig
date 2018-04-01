@@ -45,10 +45,16 @@
 #include "icons.h"
 #include "gettext.h"
 #include "rig.h"
+#include "tod_clock.h"
+
+#include "threads.h"
+
 
 using namespace std;
 
 #define MAX_LINES 65536
+
+pthread_mutex_t debug_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 static FILE* wfile;
 static FILE* rfile;
@@ -131,17 +137,16 @@ void debug::log(level_e level, const char* func, const char* srcf, int line, con
 
 	vsnprintf(sztemp, sizeof(sztemp), fmt, args);
 
+	guard_lock dlock(&debug_mutex);
 	estr.append(sztemp);
 
-//	if (RIG_DEBUG) printf("%s", sztemp);
-
-	fprintf(wfile, "%s", sztemp);
+	fprintf(wfile, "[%s] %s", zext_time(), sztemp);
 
 	va_end(args);
 
 	fflush(wfile);
 
-    Fl::awake(sync_text, 0);
+	Fl::awake(sync_text, 0);
 }
 
 void debug::slog(level_e level, const char* func, const char* srcf, int line, const char* format, ...)
@@ -157,11 +162,12 @@ void debug::slog(level_e level, const char* func, const char* srcf, int line, co
 	va_start(args, format);
 
 	vsnprintf(sztemp, sizeof(sztemp), fmt, args);
+
+	guard_lock dlock(&debug_mutex);
 	estr.append(sztemp);
 
-//printf("%s\n", sztemp);
+	fprintf(wfile, "[%s] %s", zext_time(), sztemp);
 
-	fprintf(wfile, "%s", sztemp);
 	va_end(args);
 
 	fflush(wfile);
@@ -181,12 +187,13 @@ void debug::show(void)
 
 void debug::sync_text(void* arg)
 {
+	guard_lock dlock(&debug_mutex);
 	if (!btext) return;
 	debug_in_use = true;
 	size_t p0 = 0, p1 = estr.find('\n');
+	std::string insrt;
 	while (p1 != string::npos) {
-std::string insrt = estr.substr(p0, p1-p0);
-//std::cout << insrt << std::endl;
+		insrt = estr.substr(p0, p1-p0);
 		btext->insert(1, insrt.c_str());
 		buffer.append(insrt.append("\n"));
 		p0 = p1 + 1;

@@ -914,7 +914,6 @@ public:
 		if (useB) srvr_vfo = vfoB;
 		else       srvr_vfo = vfoA;
 		srvr_vfo.freq = freq;
-//std::cout << "set vfo " << freq << std::endl;
 		push_xml();
 	}
 	std::string help() { return std::string("rig.set_vfo NNNNNNNN (Hz)"); }

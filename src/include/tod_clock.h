@@ -26,6 +26,7 @@ extern unsigned long zmsec();
 extern char* zdate();
 extern char* ztime();
 extern char* zshowtime();
+extern char *zext_time();
 
 //======================================================================
 // TOD Thread loop

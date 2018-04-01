@@ -75,6 +75,13 @@ char* ztime()
 	return ztbuf + 9;
 }
 
+char exttime[9];
+char *zext_time()
+{
+	guard_lock zmsec_lock(&TOD_mutex);
+	return exttime;
+}
+
 char* zshowtime() {
 	static char s[5];
 	strncpy(s, &ztbuf[9], 4);
@@ -99,6 +106,13 @@ void ztimer(void *)
 		memset(ztbuf, 0, sizeof(ztbuf));
 	else
 		ztbuf[8] = '\0';
+
+	exttime[0] = ztbuf[9];  exttime[1] = ztbuf[10];  
+	exttime[2] = ':';
+	exttime[3] = ztbuf[11]; exttime[4] = ztbuf[12];
+	exttime[5] = ':';
+	exttime[6] = ztbuf[13]; exttime[7] = ztbuf[13];
+	exttime[8] = 0;
 }
 
 //======================================================================

@@ -399,6 +399,10 @@ extern FILE *serlog;
 		ICDEBUGfname.append("civ.txt");
 		rotate_log(ICDEBUGfname);
 #endif
+		string trace_fname = RigHomeDir;
+		trace_fname.append("trace.txt");
+		rotate_log(trace_fname);
+
 	}
 	catch (const char* error) {
 		cerr << error << '\n';
@@ -514,9 +518,6 @@ extern FILE *serlog;
 
 void cl_print(std::string cl)
 {
-#ifndef __WIN32__
-	std::cout << cl;
-#endif
 	Fl_Double_Window clwin(50,50,500,500, "Command line text");
 		Fl_Multiline_Output cltext(2,2,496,496);
 		cltext.textfont(FL_COURIER);
@@ -537,7 +538,7 @@ void cb_xml_help(Fl_Menu_*, void*)
 int parse_args(int argc, char **argv, int& idx)
 {
 	if (strcasecmp("--help", argv[idx]) == 0) {
-		cl_print("\
+		std::cout << "\
 Usage: \n\
   --help this help text\n\
   --version\n\
@@ -546,13 +547,13 @@ Usage: \n\
   --rig_debug\n\
   --xml_debug\n\
   --xml-help\n\
-  --exp (expand menu tab controls)\n\n");
+  --exp (expand menu tab controls)\n\n";
 		exit(0);
 	} 
 	if (strcasecmp("--version", argv[idx]) == 0) {
 		std::string ver = "Version: ";
 		ver.append(VERSION).append("\n");
-		cl_print(ver);
+		std::cout << ver;
 		exit (0);
 	}
 	if (strcasecmp("--rig_debug", argv[idx]) == 0) {
@@ -566,7 +567,7 @@ Usage: \n\
 		return 1;
 	}
 	if (strcasecmp("--xml-help", argv[idx]) == 0) {
-		cl_print(print_xmlhelp());
+		std::cout << print_xmlhelp();
 		exit(0);
 	}
 	if (strcasecmp("--debug-level", argv[idx]) == 0) {

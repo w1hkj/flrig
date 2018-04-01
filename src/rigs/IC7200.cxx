@@ -287,9 +287,12 @@ void RIG_IC7200::set_PTT_control(int val)
 	cmd = pre_to;
 	cmd += '\x1c';
 	cmd += '\x00';
-	cmd += (unsigned char) val;
+	cmd += (val ? '\x01' : '\x00');
 	cmd.append( post );
-	waitFB("set ptt");
+	if (val)
+		waitFB("set ptt ON");
+	else
+		waitFB("set ptt OFF");
 	ptt_ = val;
 }
 

@@ -39,6 +39,7 @@
 #include "ptt.h"
 #include "socket_io.h"
 #include "ui.h"
+#include "tod_clock.h"
 
 #include "rig.h"
 #include "rigs.h"
@@ -71,6 +72,7 @@ enum {VOL, MIC, PWR, SQL, IFSH, NOTCH, RFGAIN, NR, NB };
 
 queue<XCVR_STATE> queA;
 queue<XCVR_STATE> queB;
+queue<bool>ptt_request;
 
 bool useB = false;
 bool changed_vfo = false;
@@ -111,22 +113,31 @@ bool bypass_serial_thread_loop = true;
 bool run_serial_thread = true;
 
 bool PTT = false;
+
+void check_ptt_queue();
+
 int  powerlevel = 0;
 
 void trace(int n, ...) // all args of type const char *
 {
-	if (!RIG_DEBUG) return;
 	if (!n) return;
+//	if (!RIG_DEBUG) return;
 	stringstream s;
 	va_list vl;
 	va_start(vl, n);
 	s.seekp(0);
-	s << va_arg(vl, const char *);
+	s << zext_time() << ": " << va_arg(vl, const char *);
 	for (int i = 1; i < n; i++)
 		s << " " << va_arg(vl, const char *);
 	va_end(vl);
 	s << "\n";
-	std::cout << s.str();
+
+	string trace_fname = RigHomeDir;
+	trace_fname.append("trace.txt");
+	ofstream tracefile(trace_fname.c_str(), ios::app);
+	if (tracefile)
+		tracefile << s.str();
+	tracefile.close();
 }
 
 string printXCVR_STATE(XCVR_STATE &data)
@@ -140,13 +151,17 @@ string printXCVR_STATE(XCVR_STATE &data)
 		(selrig->modes_ ? selrig->modes_[data.imode] : "modes n/a");
 	if (data.iBW > 256 && selrig->has_dsp_controls) {
 		str << ", " <<
-		(dsplo ? dsplo[data.iBW & 0x7F] : "??") <<
-		(bwt ? bwt[data.iBW] : "n/a");
-	}
+		(dsplo ? dsplo[data.iBW & 0x7F] : "??");
+	} else if (bwt) {
+		str << ", " << bwt[data.iBW];
+	} else
+		str << ", n/a";
+
 	if (data.iBW > 256 && selrig->has_dsp_controls) {
 		str << ", " <<
 		(dsphi ? dsphi[(data.iBW >> 8) & 0x7F] : "??");
 	}
+
 	return str.str();
 }
 
@@ -155,8 +170,7 @@ string print_ab()
 	std::string s;
 	s.assign("VFO-A: ");
 	s.append(printXCVR_STATE(vfoA));
-	s.append("\n");
-	s.append("VFO-B: ");
+	s.append("; VFO-B: ");
 	s.append(printXCVR_STATE(vfoB));
 	return s;
 }
@@ -1078,6 +1092,7 @@ void * serial_thread_loop(void *d)
 
 //send any freq/mode/bw changes in the queu
 
+		check_ptt_queue();
 		{
 			guard_lock serial(&mutex_serial);
 			serviceA();
@@ -1112,6 +1127,8 @@ void * serial_thread_loop(void *d)
 				if (bypass_serial_thread_loop) continue;
 				poll_parameters = &RX_poll_pairs[0];
 				while (poll_parameters->poll) {
+					check_ptt_queue();
+					if (PTT) break;
 					if (bypass_serial_thread_loop) break;
 					if (*(poll_parameters->poll) && !(poll_nbr % *(poll_parameters->poll)))
 						(poll_parameters->pollfunc)();
@@ -1131,6 +1148,8 @@ void * serial_thread_loop(void *d)
 				poll_nbr++;
 				poll_parameters = &TX_poll_pairs[0];
 				while (poll_parameters->poll) {
+					check_ptt_queue();
+					if (!PTT) break;
 					if (*(poll_parameters->poll) && !(poll_nbr % *(poll_parameters->poll)))
 						(poll_parameters->pollfunc)();
 					poll_parameters++;
@@ -2441,9 +2460,24 @@ void saveFreqList()
 void setPTT( void *d)
 {
 	guard_lock ptt_lock(&mutex_ptt, 64);
-
 	int set = (long)d;
+	ptt_request.push(set);
+}
+
+void check_ptt_queue()
+{
+	guard_lock ptt_lock(&mutex_ptt, 64);
+
+	int set;
 	int get, cnt = 0;
+
+	if (ptt_request.empty())
+		return;
+
+	while (!ptt_request.empty()) {
+		set = ptt_request.front();
+		ptt_request.pop();
+	}
 
 	trace(1, 
 		std::string("ptt ").
@@ -2475,6 +2509,7 @@ void setPTT( void *d)
 		}
 	}
 
+	PTT = set;
 	rigPTT(set);
 
 	get = selrig->get_PTT();
@@ -2483,7 +2518,7 @@ void setPTT( void *d)
 		{ guard_lock serial_lock(&mutex_serial); get = selrig->get_PTT(); }
 		Fl::awake();
 	}
-	PTT = set;
+//	PTT = set;
 	Fl::awake(update_UI_PTT);
 }
 
@@ -2559,7 +2594,7 @@ void restore_rig_vals()
 
 	selrig->selectB();
 
-	trace(2, "Restore xcvr B:\n", print(xcvr_vfoB));
+//	trace(2, "Restore xcvr B:\n", print(xcvr_vfoB));
 
 	if (progStatus.restore_frequency)
 		selrig->set_vfoB(xcvr_vfoB.freq);
@@ -2571,7 +2606,7 @@ void restore_rig_vals()
 
 	selrig->selectA();
 
-	trace(2, "Restore xcvr A:\n", print(xcvr_vfoA));
+//	trace(2, "Restore xcvr A:\n", print(xcvr_vfoA));
 
 	if (progStatus.restore_frequency)
 		selrig->set_vfoA(xcvr_vfoA.freq);
@@ -2732,7 +2767,7 @@ void read_rig_vals()
 
 	read_rig_vals_(xcvr_vfoB);
 
-	trace(2, "Read xcvr B:\n", print(xcvr_vfoB));
+//	trace(2, "Read xcvr B:\n", print(xcvr_vfoB));
 
 	selrig->selectA();
 
@@ -2751,7 +2786,7 @@ void read_rig_vals()
 		redrawAGC();
 	}
 
-	trace(2, "Read xcvr A:\n", print(xcvr_vfoA));
+//	trace(2, "Read xcvr A:\n", print(xcvr_vfoA));
 }
 
 void close_UI(void *)
