@@ -26,7 +26,40 @@
 
 #include "status.h"
 
+bool RIG_ICOM::listenThreadRunning = false;
+pthread_t RIG_ICOM::listenThread;
+
 //=============================================================================
+
+RIG_ICOM::RIG_ICOM()
+{
+    CIV = 0x56;
+    pre_to = "\xFE\xFE\x56\xE0";
+    pre_fm = "\xFE\xFE\xE0\x56";
+    post = "\xFD";
+    ok = "\xFE\xFE\xE0\x56\xFB\xFD";
+    bad = "\xFE\xFE\xE0\x56\xFA\xFD";
+
+    // There are many RIG_ICOM objects that get created during startup. There
+    // needs to be only one static listen thread for all of them.
+    if(!listenThreadRunning) {
+        listenThreadRunning = true;
+        // Start the listen thread. TBD DJW - handle error condition.
+        (void)pthread_create(&listenThread, NULL, serialListenThreadLoop, (void *)name_.c_str());
+    }
+}
+
+RIG_ICOM::~RIG_ICOM()
+{
+    // There are many RIG_ICOM objects that get created during startup. There
+    // needs to be only one static listen thread for all of them.
+    if(listenThreadRunning) {
+        listenThreadRunning = false;
+        puts("Joining Listen Thread");
+        pthread_join(listenThread, NULL);
+        puts("Joined");
+    }
+}
 
 void RIG_ICOM::adjustCIV(uchar adr)
 {
@@ -290,3 +323,25 @@ void RIG_ICOM::A2B()
 	waitFB("Equalize vfos");
 }
 
+void *RIG_ICOM::serialListenThreadLoop(void *p)
+{
+    //int n, nread;
+    printf("Listen Thread Starting %s\n", (char *)p);
+
+    while(listenThreadRunning) {
+        //nread = readResponse();
+        sleep(1);
+        putchar('.');
+        //if(nread) {
+        //    printf("serialListenThreadLoop: read %d bytes:", nread);
+        //    for(n = 0; n < nread; n++) {
+        //        printf(" %02X", replystr[n]);
+        //    }
+        //    putchar('\n');
+        //}
+    }
+
+    puts("Listen Thread Ending");
+
+    return NULL;
+}
