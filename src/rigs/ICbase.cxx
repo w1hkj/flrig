@@ -49,6 +49,8 @@ void RIG_ICOM::checkresponse()
 
 bool RIG_ICOM::sendICcommand(string cmd, int nbr)
 {
+	guard_lock reply_lock(&mutex_replystr);
+
 	int ret = sendCommand(cmd);
 
 	if (!progStatus.use_tcpip && !RigSerial->IsOpen())
@@ -59,19 +61,22 @@ bool RIG_ICOM::sendICcommand(string cmd, int nbr)
 		return false;
 	}
 
-	if (ret > nbr) replystr.erase(0, ret - nbr);
+	if (ret > nbr) respstr.erase(0, ret - nbr);
 
 // look for preamble at beginning
-	if (replystr.rfind(pre_fm) == string::npos)  {
+	if (respstr.rfind(pre_fm) == string::npos)  {
 		LOG_ERROR("preamble: %s not in %s", pre_fm.c_str(), cmd.c_str());
+		replystr.clear();
 		return false;
 	}
 
 // look for postamble
-	if (replystr.rfind(post) == string::npos) {
+	if (respstr.rfind(post) == string::npos) {
 		LOG_ERROR("postample: %s not at end of %s", post.c_str(), cmd.c_str());
+		replystr.clear();
 		return false;
 	}
+	replystr = respstr;
 	return true;
 }
 
@@ -99,6 +104,8 @@ bool RIG_ICOM::waitFB(const char *sz)
 	ofstream civ(ICDEBUGfname.c_str(), ios::app);
 #endif
 
+	guard_lock reply_lock(&mutex_replystr);
+
 	char sztemp[100];
 	string returned = "";
 	string tosend = cmd;
@@ -123,7 +130,7 @@ civ.close();
 		returned = "";
 		for ( cnt = 0; cnt < wait_msec; cnt++) {
 			readResponse();
-			returned.append(replystr);
+			returned.append(respstr);
 			if (returned.find(ok) != string::npos) {
 				replystr = returned;
 				unsigned long int waited = zmsec() - tod_start;
@@ -180,6 +187,8 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 	ofstream civ(ICDEBUGfname.c_str(), ios::app);
 #endif
 
+	guard_lock reply_lock(&mutex_replystr);
+
 	char sztemp[100];
 	string returned = "";
 	string tosend = cmd;
@@ -208,7 +217,7 @@ civ.close();
 		returned = "";
 		for ( cnt = 0; cnt < delay; cnt++) {
 			readResponse();
-			returned.append(replystr);
+			returned.append(respstr);
 			if (returned.length() >= num) {
 				replystr = returned;
 				unsigned long int waited = zmsec() - tod_start;

@@ -57,9 +57,9 @@ extern bool waitCommand(
 				int how = ASC,
 				int level = INFO );
 
-extern void clearSerialPort();
 extern char replybuff[];
-extern string replystr;
+//extern string replystr;
+extern string respstr;
 
 extern void showresp(int level, int how, string s, string tx, string rx);
 

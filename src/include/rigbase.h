@@ -261,6 +261,8 @@ public:
 	int  _nrval2;
 	int  _currmode;
 
+	std::string replystr;
+
 protected:
 	string cmd; // command string
 	string rsp; // expected response string (header etc)

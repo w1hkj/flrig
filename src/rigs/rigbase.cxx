@@ -346,6 +346,8 @@ int rigbase::num100(string bcd)
 
 int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 {
+	guard_lock reply_lock(&mutex_replystr);
+
 	char sztemp[50];
 	string returned = "";
 	string tosend = cmd;
@@ -369,7 +371,7 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 	returned = "";
 	for ( cnt = 0; cnt < timeout / 10; cnt++) {
 		readResponse();
-		returned.append(replystr);
+		returned.append(respstr);
 		if (returned.length() >= n) {
 			replystr = returned;
 			waited = cnt * 10 + delay;
@@ -392,6 +394,8 @@ int report_level = INFO;
 
 int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 {
+	guard_lock reply_lock(&mutex_replystr);
+
 	char sztemp[50];
 	string returned = "";
 	string tosend = cmd;
@@ -416,7 +420,7 @@ int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 	returned = "";
 	for ( cnt = 0; cnt < timeout / 10; cnt++) {
 		readResponse();
-		returned.append(replystr);
+		returned.append(respstr);
 		if (returned.find(ch) != string::npos) {
 			replystr = returned;
 			waited = cnt * 10 + delay;
@@ -444,20 +448,24 @@ int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 // retry - number of retries, default 
 bool rigbase::id_OK(string ID, int wait)
 {
+	guard_lock reply_lock(&mutex_replystr);
+
 	string returned;
 	for (int n = 0; n < progStatus.comm_retries; n++) {
 		sendCommand(string(ID).append(";", 0));
 		returned = "";
 		for (int cnt = 0; cnt < wait / 10; cnt++) {
 			readResponse();
-			returned.append(replystr);
+			returned.append(respstr);
 			if (returned.find(ID)) {
+				replystr = returned;
 				return true;
 			}
 			MilliSleep(10);
 			Fl::awake();
 		}
 	}
+	replystr.clear();
 	return false;
 }
 

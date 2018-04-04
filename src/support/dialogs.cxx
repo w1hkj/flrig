@@ -1428,8 +1428,10 @@ void cb_send_command(string command, Fl_Output *resp)
 	readResponse();
 	if (resp) {
 		resp->value(
-			usehex ? str2hex(replystr.c_str(), replystr.length()) :
-			replystr.c_str());
+			usehex ? str2hex(
+				selrig->replystr.c_str(),
+				selrig->replystr.length()) :
+			selrig->replystr.c_str() );
 		resp->redraw();
 	}
 }

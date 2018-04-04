@@ -154,22 +154,22 @@ bool startSepSerial()
 }
 
 char replybuff[RXBUFFSIZE+1];
-string replystr;
+//string replystr;
+string respstr;
 
 int readResponse()
 {
 	int numread = 0;
-	replystr.clear();
+	respstr.clear();
 	memset(replybuff, 0, RXBUFFSIZE + 1);
 	if (progStatus.use_tcpip)
-		numread = read_from_remote(replystr);
+		numread = read_from_remote(respstr);
 	else {
 		numread = RigSerial->ReadBuffer(replybuff, RXBUFFSIZE);
-		for (int i = 0; i < numread; replystr += replybuff[i++]);
+		for (int i = 0; i < numread; respstr += replybuff[i++]);
 	}
 	if (numread)
-		LOG_DEBUG("rsp:%3d, %s", numread, str2hex(replystr.c_str(), replystr.length()));
-//LOG_WARN("rsp:%3d, %s", numread, str2hex(replystr.c_str(), replystr.length()));
+		LOG_DEBUG("rsp:%3d, %s", numread, str2hex(respstr.c_str(), respstr.length()));
 	return numread;
 }
 
@@ -194,13 +194,13 @@ int sendCommand (string s, int nread)
 	}
 
 	if (RigSerial->IsOpen() == false) {
-		replystr.clear();
 		return 0;
 	}
 
 	LOG_DEBUG("cmd:%3d, %s", (int)s.length(), str2hex(s.data(), s.length()));
 
-	clearSerialPort();
+	RigSerial->FlushBuffer();
+
 	RigSerial->WriteBuffer(s.c_str(), numwrite);
 
 	int timeout = progStatus.comm_wait + 
@@ -233,6 +233,8 @@ bool waitCommand(
 				int how,
 				int level )
 {
+	guard_lock reply_lock(&mutex_replystr);
+
 	int numwrite = (int)command.length();
 	if (nread == 0)
 		LOG_DEBUG("cmd:%3d, %s", numwrite, how == ASC ? command.c_str() : str2hex(command.data(), numwrite));
@@ -246,8 +248,10 @@ bool waitCommand(
 			waitcount = 0;
 			return 0;
 		}
-		replystr.clear();
-		clearSerialPort();
+
+		RigSerial->FlushBuffer();
+//		replystr.clear();
+
 		RigSerial->WriteBuffer(command.c_str(), numwrite);
 		if (nread == 0) {
 			waitcount = 0;
@@ -272,10 +276,10 @@ bool waitCommand(
 	int waited = 0;
 	while (waited < msec) {
 		if (readResponse())
-			returned.append(replystr);
+			returned.append(respstr);
 		if (	((int)returned.length() >= nread) || 
 				(returned.find(term) != string::npos) ) {
-			replystr = returned;
+			selrig->replystr = returned;
 			waited = zmsec() - tod_start;
 			snprintf(sztemp, sizeof(sztemp), "%s rcvd in %d msec", info.c_str(), waited);
 			showresp(level, how, sztemp, command, returned);
@@ -287,7 +291,7 @@ bool waitCommand(
 		Fl::awake();
 	}
 	waitcount++;
-	replystr = returned;
+	selrig->replystr = returned;
 	waited = zmsec() - tod_start;
 	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %d ms", command.c_str(), waited);
 	showresp(ERR, HEX, sztemp, command, returned);
@@ -316,13 +320,6 @@ int waitResponse(int timeout)
 			Fl::awake();
 		}
 	return n;
-}
-
-void clearSerialPort()
-{
-	if (RigSerial->IsOpen() == false) return;
-	RigSerial->FlushBuffer();
-	replystr.clear();
 }
 
 void showresp(int level, int how, string s, string tx, string rx) 

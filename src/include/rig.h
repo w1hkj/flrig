@@ -68,6 +68,7 @@ extern pthread_mutex_t mutex_xmlrpc;
 extern pthread_mutex_t mutex_queA;
 extern pthread_mutex_t mutex_queB;
 extern pthread_mutex_t mutex_ptt;
+extern pthread_mutex_t mutex_replystr;
 
 extern bool RIG_DEBUG;
 extern bool XML_DEBUG;
