@@ -43,6 +43,9 @@ public:
 	bool CheckPort(string);
 
 	bool IsOpen() { return fd < 0 ? 0 : 1; };
+	void printConfig(); // TBD DJW temporary.
+	void getVminVtime(cc_t * pvmin, cc_t * pvtime); // TBD DJW Probably won't use.
+	void setVminVtime(cc_t vmin, cc_t vtime); // TBD DJW Probably won't use.
 	void ClosePort();
 
 	void Device (std::string dev) { device = dev;};

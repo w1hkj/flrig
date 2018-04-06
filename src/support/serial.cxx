@@ -183,6 +183,56 @@ bool Cserial::OpenPort()  {
 	return true;
 }
 
+void Cserial::printConfig(void)
+{
+	struct termios tio;
+	tcgetattr(fd, &tio);
+
+	printf("c_iflag = %04X\n", tio.c_iflag);
+	printf("c_oflag = %04X\n", tio.c_oflag);
+	printf("c_cflag = %04X\n", tio.c_cflag);
+	printf("c_lflag = %04X\n", tio.c_lflag);
+	printf("c_line = %02X\n",  tio.c_line);
+
+	printf("c_cc[%s] = %02X\n", "VINTR", VINTR);
+	printf("c_cc[%s] = %02X\n", "VQUIT", VQUIT);
+	printf("c_cc[%s] = %02X\n", "VERASE", VERASE);
+	printf("c_cc[%s] = %02X\n", "VKILL", VKILL);
+	printf("c_cc[%s] = %02X\n", "VEOF", VEOF);
+	printf("c_cc[%s] = %02X\n", "VTIME", VTIME);
+	printf("c_cc[%s] = %02X\n", "VMIN", VMIN);
+	printf("c_cc[%s] = %02X\n", "VSWTC", VSWTC);
+	printf("c_cc[%s] = %02X\n", "VSTART", VSTART);
+	printf("c_cc[%s] = %02X\n", "VSTOP", VSTOP);
+	printf("c_cc[%s] = %02X\n", "VSUSP", VSUSP);
+	printf("c_cc[%s] = %02X\n", "VEOL", VEOL);
+	printf("c_cc[%s] = %02X\n", "VREPRINT", VREPRINT);
+	printf("c_cc[%s] = %02X\n", "VDISCARD", VDISCARD);
+	printf("c_cc[%s] = %02X\n", "VWERASE", VWERASE);
+	printf("c_cc[%s] = %02X\n", "VLNEXT", VLNEXT);
+	printf("c_cc[%s] = %02X\n", "VEOL2", VEOL2);
+
+	printf("c_ispeed = %X\n",  tio.c_ispeed);
+	printf("c_ospeed = %X\n",  tio.c_ospeed);
+}
+
+void Cserial::getVminVtime(cc_t * pvmin, cc_t * pvtime)
+{
+	struct termios tio;
+	tcgetattr(fd, &tio);
+	*pvmin  = tio.c_cc[VMIN];
+	*pvtime = tio.c_cc[VTIME];
+}
+
+void Cserial::setVminVtime(cc_t vmin, cc_t vtime)
+{
+	struct termios tio;
+	tcgetattr(fd, &tio);
+	tio.c_cc[VMIN]  = vmin;
+	tio.c_cc[VTIME] = vtime;
+	tcsetattr (fd, TCSANOW, &tio);
+}
+
 ///////////////////////////////////////////////////////
 // Function name	: Cserial::setPTT
 // Return type	  : void

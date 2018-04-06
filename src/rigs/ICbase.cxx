@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------------------
 // Copyright (C) 2014
-//              David Freese, W1HKJ
+//			  David Freese, W1HKJ
 //
 // This file is part of flrig.
 //
@@ -33,32 +33,51 @@ pthread_t RIG_ICOM::listenThread;
 
 RIG_ICOM::RIG_ICOM()
 {
-    CIV = 0x56;
-    pre_to = "\xFE\xFE\x56\xE0";
-    pre_fm = "\xFE\xFE\xE0\x56";
-    post = "\xFD";
-    ok = "\xFE\xFE\xE0\x56\xFB\xFD";
-    bad = "\xFE\xFE\xE0\x56\xFA\xFD";
-
-    // There are many RIG_ICOM objects that get created during startup. There
-    // needs to be only one static listen thread for all of them.
-    if(!listenThreadRunning) {
-        listenThreadRunning = true;
-        // Start the listen thread. TBD DJW - handle error condition.
-        (void)pthread_create(&listenThread, NULL, serialListenThreadLoop, (void *)name_.c_str());
-    }
+	CIV = 0x56;
+	pre_to = "\xFE\xFE\x56\xE0";
+	pre_fm = "\xFE\xFE\xE0\x56";
+	post = "\xFD";
+	ok = "\xFE\xFE\xE0\x56\xFB\xFD";
+	bad = "\xFE\xFE\xE0\x56\xFA\xFD";
 }
 
 RIG_ICOM::~RIG_ICOM()
 {
-    // There are many RIG_ICOM objects that get created during startup. There
-    // needs to be only one static listen thread for all of them.
-    if(listenThreadRunning) {
-        listenThreadRunning = false;
-        puts("Joining Listen Thread");
-        pthread_join(listenThread, NULL);
-        puts("Joined");
-    }
+}
+
+void RIG_ICOM::initialize()
+{
+	puts("RIG_ICOM::initialize()");
+
+	//RigSerial->printConfig();
+
+	//RigSerial->getVminVtime(cc_t * pvmin, cc_t * pvtime)
+	//RigSerial->setVminVtime(cc_t vmin, cc_t vtime)
+
+	// Can be called more than once if someone is selecting different ICOM radios.
+	printf("Starting Listen Thread - %s\n", name_.c_str());
+	listenThreadRunning = true;
+	// Tweak the performance up. We want fast reaction to unsolicited (remote scope) data.
+	// vtime = 1
+	// vmin = 0
+// Six characters or 50 mS.
+//c_cc[VTIME] = 5;
+//c_cc[VMIN]  = 6;
+
+	// Start the listen thread. TBD DJW - handle error condition.
+	(void)pthread_create(&listenThread, NULL, CIV_listen_thread_loop, NULL);
+
+	flrig_abort = false;	// TBD DJW - Base setting this on failure starting the listen thread.
+}
+
+void RIG_ICOM::post_initialize() {puts("RIG_ICOM::post_initialize()");}
+
+void RIG_ICOM::shutdown()        {
+	puts("RIG_ICOM::shutdown()");
+	listenThreadRunning = false;
+	puts("Joining Listen Thread");
+	pthread_join(listenThread, NULL);
+	puts("Joined");
 }
 
 void RIG_ICOM::adjustCIV(uchar adr)
@@ -129,100 +148,100 @@ static void show_timeout(void *)
 
 bool RIG_ICOM::waitFB(const char *sz)
 {
-#ifdef IC_DEBUG
-	ofstream civ(ICDEBUGfname.c_str(), ios::app);
-#endif
-
-	char sztemp[100];
-	string returned = "";
-	string tosend = cmd;
-	unsigned long tod_start = zmsec();
-
-	if (!progStatus.use_tcpip && !RigSerial->IsOpen()) {
-		replystr = returned;
-//		snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
-//		showresp(DEBUG, HEX, sztemp, tosend, returned);
-		waitcount = 0;
-#ifdef IC_DEBUG
-civ << sz << std::endl;
-civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-civ.close();
-#endif
-		return false;
-	}
-	int cnt = 0, repeat = 0, num = cmd.length() + ok.length();
-
-	int wait_msec = (int)(num*11000.0/RigSerial->Baud() +
-			progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0) / 10;
-
-	for (repeat = 0; repeat < progStatus.comm_retries; repeat++) {
-		sendCommand(cmd, 0);
-		returned = "";
-		for ( cnt = 0; cnt < wait_msec; cnt++) {
-			readResponse();
-			returned.append(replystr);
-			if (returned.find(ok) != string::npos) {
-				replystr = returned;
-				unsigned long int waited = zmsec() - tod_start;
-				snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, OK", sz, waited);
-				if (repeat)
-					showresp(WARN, HEX, sztemp, tosend, returned);
-				else
-					showresp(DEBUG, HEX, sztemp, tosend, returned);
-
-				waitcount = 0;
-#ifdef IC_DEBUG
-civ << sztemp << std::endl;
-civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-civ << "    " << str2hex(returned.c_str(), returned.length()) << std::endl;
-civ.close();
-#endif
-				return true;
-			}
-			if (returned.find(bad) != string::npos) {
-				replystr = returned;
-				unsigned long int waited = zmsec() - tod_start;
-				snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, FAIL", sz, waited);
-				showresp(ERR, HEX, sztemp, tosend, returned);
-				waitcount = 0;
-
-#ifdef IC_DEBUG
-civ << sztemp << std::endl;
-civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-civ << "    " << str2hex(returned.c_str(), returned.length()) << std::endl;
-civ.close();
-#endif
-				return false;
-			}
-			MilliSleep(10);
-			Fl::awake();
-		}
-	}
-	waitcount++;
-	replystr = returned;
-	unsigned long int waited = zmsec() - tod_start;
-	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %ld ms", sz, waited);
-	showresp(ERR, HEX, sztemp, tosend, returned);
-
-#ifdef IC_DEBUG
-civ << sztemp << std::endl;
-civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-civ << "    " << str2hex(returned.c_str(), returned.length()) << std::endl;
-#endif
-
-	if (waitcount > 4 && !timeout_alert) {
-		timeout_alert = true;
-		snprintf(sztimeout_alert, sizeof(sztimeout_alert), 
-			"Serial i/o failure\n%s TIME OUT in %ld ms",
-			sz, waited);
-			Fl::awake(show_timeout);
-#ifdef IC_DEBUG
-civ << sztemp << std::endl;
-#endif
-	}
-#ifdef IC_DEBUG
-civ.close();
-#endif
+//#ifdef IC_DEBUG
+//  ofstream civ(ICDEBUGfname.c_str(), ios::app);
+//#endif
+//
+//  char sztemp[100];
+//  string returned = "";
+//  string tosend = cmd;
+//  unsigned long tod_start = zmsec();
+//
+//  if (!progStatus.use_tcpip && !RigSerial->IsOpen()) {
+//	  replystr = returned;
+////        snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
+////        showresp(DEBUG, HEX, sztemp, tosend, returned);
+//	  waitcount = 0;
+//#ifdef IC_DEBUG
+//civ << sz << std::endl;
+//civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
+//civ.close();
+//#endif
+//	  return false;
+//  }
+//  int cnt = 0, repeat = 0, num = cmd.length() + ok.length();
+//
+//  int wait_msec = (int)(num*11000.0/RigSerial->Baud() +
+//		  progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0) / 10;
+//
+//  for (repeat = 0; repeat < progStatus.comm_retries; repeat++) {
+//	  sendCommand(cmd, 0);
+//	  returned = "";
+//	  for ( cnt = 0; cnt < wait_msec; cnt++) {
+//		  readICResponse(wait_msec);
+//		  returned.append(replystr);
+//		  if (returned.find(ok) != string::npos) {
+//			  replystr = returned;
+//			  unsigned long int waited = zmsec() - tod_start;
+//			  snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, OK", sz, waited);
+//			  if (repeat)
+//				  showresp(WARN, HEX, sztemp, tosend, returned);
+//			  else
+//				  showresp(DEBUG, HEX, sztemp, tosend, returned);
+//
+//			  waitcount = 0;
+//#ifdef IC_DEBUG
+//civ << sztemp << std::endl;
+//civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
+//civ << "    " << str2hex(returned.c_str(), returned.length()) << std::endl;
+//civ.close();
+//#endif
+//			  return true;
+//		  }
+//		  if (returned.find(bad) != string::npos) {
+//			  replystr = returned;
+//			  unsigned long int waited = zmsec() - tod_start;
+//			  snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, FAIL", sz, waited);
+//			  showresp(ERR, HEX, sztemp, tosend, returned);
+//			  waitcount = 0;
+//
+//#ifdef IC_DEBUG
+//civ << sztemp << std::endl;
+//civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
+//civ << "    " << str2hex(returned.c_str(), returned.length()) << std::endl;
+//civ.close();
+//#endif
+//			  return false;
+//		  }
+//		  MilliSleep(10);
+//		  Fl::awake();
+//	  }
+//  }
+//  waitcount++;
+//  replystr = returned;
+//  unsigned long int waited = zmsec() - tod_start;
+//  snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %ld ms", sz, waited);
+//  showresp(ERR, HEX, sztemp, tosend, returned);
+//
+//#ifdef IC_DEBUG
+//civ << sztemp << std::endl;
+//civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
+//civ << "    " << str2hex(returned.c_str(), returned.length()) << std::endl;
+//#endif
+//
+//  if (waitcount > 4 && !timeout_alert) {
+//	  timeout_alert = true;
+//	  snprintf(sztimeout_alert, sizeof(sztimeout_alert), 
+//		  "Serial i/o failure\n%s TIME OUT in %ld ms",
+//		  sz, waited);
+//		  Fl::awake(show_timeout);
+//#ifdef IC_DEBUG
+//civ << sztemp << std::endl;
+//#endif
+//  }
+//#ifdef IC_DEBUG
+//civ.close();
+//#endif
 	return false;
 }
 
@@ -235,19 +254,19 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 	char sztemp[100];
 	string returned = "";
 	string tosend = cmd;
-	int cnt = 0, repeat = 0;
+	int repeat = 0;
 	size_t num = n;
 	if (progStatus.comm_echo) num += cmd.length();
 
 	unsigned long int tod_start = zmsec();
 
-	int delay =  (int)(num * 11000.0 / RigSerial->Baud() + 
+	int wait_msec =  (int)(num * 11000.0 / RigSerial->Baud() + 
 		progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0) / 10;
 
 	if (!progStatus.use_tcpip && !RigSerial->IsOpen()) {
 		replystr = returned;
-//		snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
-//		showresp(DEBUG, HEX, sztemp, tosend, returned);
+//	  snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
+//	  showresp(DEBUG, HEX, sztemp, tosend, returned);
 #ifdef IC_DEBUG
 civ << sz << std::endl;
 civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
@@ -258,14 +277,13 @@ civ.close();
 	for (repeat = 0; repeat < progStatus.comm_retries; repeat++) {
 		sendCommand(tosend, 0);
 		returned = "";
-		for ( cnt = 0; cnt < delay; cnt++) {
-			readResponse();
-			returned.append(replystr);
-			if (returned.length() >= num) {
-				replystr = returned;
-				unsigned long int waited = zmsec() - tod_start;
-				snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, OK  ", sz, waited);
-				showresp(DEBUG, HEX, sztemp, tosend, returned);
+		readICResponse(wait_msec);
+		returned.append(replystr);
+		if (returned.length() >= num) {
+			replystr = returned;
+			unsigned long int waited = zmsec() - tod_start;
+			snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, OK  ", sz, waited);
+			showresp(DEBUG, HEX, sztemp, tosend, returned);
 
 #ifdef IC_DEBUG
 civ << sztemp << std::endl;
@@ -273,11 +291,10 @@ civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
 civ << "    " << str2hex(returned.c_str(), returned.length()) << std::endl;
 civ.close();
 #endif
-				return true;
-			}
-			MilliSleep(10);
-			Fl::awake();
+			return true;
 		}
+		MilliSleep(10);
+		Fl::awake();
 	}
 
 	waitcount++;
@@ -323,25 +340,69 @@ void RIG_ICOM::A2B()
 	waitFB("Equalize vfos");
 }
 
-void *RIG_ICOM::serialListenThreadLoop(void *p)
+int RIG_ICOM::readICResponse(int wait_msec)
 {
-    //int n, nread;
-    printf("Listen Thread Starting %s\n", (char *)p);
+//	for (cnt = 0; cnt < wait_msec; cnt++) {
+//		readICResponse();
+//		returned.append(replystr);
+//		if (returned.find(ok) != string::npos) {
+//			replystr = returned;
+//			unsigned long int waited = zmsec() - tod_start;
+//			snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, OK", sz, waited);
+//			if (repeat)
+//				showresp(WARN, HEX, sztemp, tosend, returned);
+//			else
+//				showresp(DEBUG, HEX, sztemp, tosend, returned);
+//
+//			waitcount = 0;
+//#ifdef IC_DEBUG
+//civ << sztemp << std::endl;
+//civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
+//civ << "    " << str2hex(returned.c_str(), returned.length()) << std::endl;
+//civ.close();
+//#endif
+//			return true;
+//		}
+//		if (returned.find(bad) != string::npos) {
+//			replystr = returned;
+//			unsigned long int waited = zmsec() - tod_start;
+//			snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, FAIL", sz, waited);
+//			showresp(ERR, HEX, sztemp, tosend, returned);
+//			waitcount = 0;
+//
+//#ifdef IC_DEBUG
+//civ << sztemp << std::endl;
+//civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
+//civ << "    " << str2hex(returned.c_str(), returned.length()) << std::endl;
+//civ.close();
+//#endif
+//			return false;
+//		}
+//		MilliSleep(10);
+//		Fl::awake();
+//	}
+	return 0;
+}
 
-    while(listenThreadRunning) {
-        //nread = readResponse();
-        sleep(1);
-        putchar('.');
-        //if(nread) {
-        //    printf("serialListenThreadLoop: read %d bytes:", nread);
-        //    for(n = 0; n < nread; n++) {
-        //        printf(" %02X", replystr[n]);
-        //    }
-        //    putchar('\n');
-        //}
-    }
+// TBD DJW - Add shutdown to override virtual function in rigbase.
 
-    puts("Listen Thread Ending");
+void *RIG_ICOM::CIV_listen_thread_loop(void *p)
+{
+	int n, nread = 0;
+	puts("Listen Thread Starting");
 
-    return NULL;
+	while(listenThreadRunning) {
+		nread = readResponse();
+		if(nread) {
+			printf("serialListenThreadLoop: read %d bytes:", nread);
+			for(n = 0; n < nread; n++) {
+				printf(" %02X", (unsigned char)replystr[n]);
+			}
+			putchar('\n');
+		}
+	}
+
+	puts("Listen Thread Ending");
+
+	return NULL;
 }

@@ -199,6 +199,8 @@ static int FIL_B = 2;
 
 void RIG_IC7300::initialize()
 {
+	RIG_ICOM::initialize();	// TBD DJW - Add similiar to all classes derived from RIG_ICOM.
+
 	IC7300_widgets[0].W = btnVol;
 	IC7300_widgets[1].W = sldrVOLUME;
 	IC7300_widgets[2].W = btnAGC;

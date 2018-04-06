@@ -2,3 +2,8 @@ mv -f ~/AddListenThread.ps .
 rm AddListenThread.pdf AddListenThreadR.pdf
 gs -o AddListenThread.pdf -sDEVICE=pdfwrite -g16480x23840 AddListenThread.ps
 pdf-stapler cat AddListenThread.pdf 1R AddListenThreadR.pdf
+
+(gdb) print /x *resp.c_str()@9
+$7 = {0xfe, 0xfe, 0xe0, 0x94, 0x11, 0x0, 0x0, 0x0, 0x0}
+
+set autoindent noexpandtab tabstop=4 shiftwidth=4

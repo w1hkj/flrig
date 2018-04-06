@@ -28,9 +28,9 @@
 
 class RIG_ICOM : public rigbase {
 private:
-    static bool listenThreadRunning;
-    static pthread_t listenThread;
-    static void *serialListenThreadLoop(void *p);
+	static bool listenThreadRunning;
+	static pthread_t listenThread;
+	static void *CIV_listen_thread_loop(void *p);
 protected:
 	string pre_to;
 	string pre_fm;
@@ -42,6 +42,9 @@ protected:
 public:
 	RIG_ICOM();
 	virtual ~RIG_ICOM();
+	void initialize();
+	void post_initialize();
+	void shutdown();
 	void checkresponse();
 	bool sendICcommand(string str, int nbr);
 	void delayCommand(string cmd, int wait);
@@ -52,6 +55,7 @@ public:
 	virtual void swapvfos();
 	virtual void A2B();
 
+	int readICResponse(int wait_msec);
 };
 
 #endif
