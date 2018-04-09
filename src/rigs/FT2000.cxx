@@ -171,6 +171,18 @@ void RIG_FT2000::set_band_selection(int v)
 	showresp(WARN, ASC, "Select Band Stacks", cmd, replystr);
 }
 
+void RIG_FT2000::selectA()
+{
+	cmd = "VS0;";
+	sendOK(cmd);
+}
+
+void RIG_FT2000::selectB()
+{
+	cmd = "VS1;";
+	sendOK(cmd);
+}
+
 long RIG_FT2000::get_vfoA ()
 {
 	cmd = "FA;";
@@ -190,6 +202,32 @@ void RIG_FT2000::set_vfoA (long freq)
 {
 	freqA = freq;
 	cmd = "FA00000000;";
+	for (int i = 9; i > 1; i--) {
+		cmd[i] += freq % 10;
+		freq /= 10;
+	}
+	sendCommand(cmd, 0);
+}
+
+long RIG_FT2000::get_vfoB ()
+{
+	cmd = "FB;";
+	int ret = waitN(11, 100, "get vfoB", ASC);
+	if (ret < 11) return freqB;
+	size_t p = replystr.rfind("FA");
+	if (p == string::npos) return freqB;
+	int f = 0;
+	for (size_t n = 2; n < 10; n++)
+		f = f*10 + replystr[p + n] - '0';
+	freqB = f;
+
+	return freqB;
+}
+
+void RIG_FT2000::set_vfoB (long freq)
+{
+	freqB = freq;
+	cmd = "FB00000000;";
 	for (int i = 9; i > 1; i--) {
 		cmd[i] += freq % 10;
 		freq /= 10;
@@ -464,6 +502,26 @@ int RIG_FT2000::get_modeA()
 	return modeA;
 }
 
+void RIG_FT2000::set_modeB(int val)
+{
+	modeA = val;
+	cmd = "MD1";
+	cmd += FT2000_mode_chr[val];
+	cmd += ';';
+	sendCommand(cmd, 0);
+}
+
+int RIG_FT2000::get_modeB()
+{
+	cmd = "MD1;";
+	int ret = waitN(5, 100, "get modeB", ASC);
+	if (ret < 5) return modeB;
+	size_t p = replystr.rfind("MD");
+	if (p == string::npos) return modeB;
+	modeB = replystr[p + 3] - '1';
+	return modeB;
+}
+
 int RIG_FT2000::adjust_bandwidth(int m)
 {
 	switch (m) {
@@ -557,12 +615,62 @@ void RIG_FT2000::set_bwA(int val)
 		case 3 : case 4 : case 9 : case 10 :
 			break;
 	}
-	sendCommand("NA10;", 0);
+	sendCommand("NA01;", 0);
 }
 
 int RIG_FT2000::get_bwA()
 {
 	return bwA;
+}
+
+void RIG_FT2000::set_bwB(int val)
+{
+	bwB = val;
+
+	if (val == 0) {
+		sendCommand("NA10;", 0);
+		return;
+	}
+
+	val--;
+	switch (modeA) {
+//SSB
+		case 0 : case 1 :
+			cmd = "EX106";
+			if (val > 9) cmd += '1';
+			else         cmd += '0';
+			val %= 10;
+			cmd += val + '0';
+			cmd += ';';
+			sendCommand(cmd, 0);
+			break;
+//CW
+		case 2 : case 6 :
+			cmd = "EX097";
+			if (val > 9) cmd += '1';
+			else         cmd += '0';
+			val %= 10;
+			cmd += val + '0';
+			cmd += ';';
+			sendCommand(cmd, 0);
+			break;
+//PKT-RTTY
+		case 5 : case 7 : case 8 : case 11 :
+			cmd = "EX1030";
+			cmd += val + '0';
+			cmd += ';';
+			sendCommand(cmd, 0);
+			break;
+//AM-FM
+		case 3 : case 4 : case 9 : case 10 :
+			break;
+	}
+	sendCommand("NA11;", 0);
+}
+
+int RIG_FT2000::get_bwB()
+{
+	return bwB;
 }
 
 int RIG_FT2000::get_modetype(int n)

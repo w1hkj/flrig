@@ -83,6 +83,7 @@ void RIG_FT857D::init_cmd()
 
 long RIG_FT857D::get_vfoA ()
 {
+	if (useB) return freqA;
 	init_cmd();
 	cmd[4] = 0x03;
 	int ret = waitN(5, 100, "get vfo A", HEX);
@@ -111,6 +112,7 @@ void RIG_FT857D::set_vfoA (long freq)
 
 long RIG_FT857D::get_vfoB ()
 {
+	if (!useB) return freqB;
 	init_cmd();
 	cmd[4] = 0x03;
 	int ret = waitN(5, 100, "get vfo B", HEX);

@@ -236,7 +236,6 @@ int RIG_FT100D::get_bwA()
 
 long RIG_FT100D::get_vfoB()
 {
-printf("get_vfoB() %ld\n", A.freq);
 	return B.freq;
 }
 
