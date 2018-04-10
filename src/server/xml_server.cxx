@@ -769,7 +769,7 @@ void do_swap(void *)
 
 class rig_swap : public XmlRpcServerMethod {
 public:
-	rig_swap(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_swap", s) {}
+	rig_swap(XmlRpcServer* s) : XmlRpcServerMethod("rig.swap", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 		if (!xcvr_initialized) {
@@ -782,6 +782,24 @@ public:
 	std::string help() { return std::string("executes vfo swap"); }
 
 } rig_swap(&rig_server);
+
+// deprecated method - retain for backward compatibility
+
+class rig_set_swap : public XmlRpcServerMethod {
+public:
+	rig_set_swap(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_swap", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
+		Fl::awake(do_swap, (void *)0);
+	}
+
+	std::string help() { return std::string("executes vfo swap"); }
+
+} rig_set_swap(&rig_server);
 
 //------------------------------------------------------------------------------
 // Execute vfo split operation
@@ -1073,6 +1091,7 @@ public:
 struct MLIST {
 	string name; string signature; string help;
 } mlist[] = {
+	{ "main.set_frequency", "d:d", "set current VFO in Hz" },
 	{ "rig.get_AB",       "s:n", "returns vfo in use A or B" },
 	{ "rig.get_bw",       "s:n", "return BW of current VFO" },
 	{ "rig.get_bws",      "s:n", "return table of BW values" },
@@ -1100,9 +1119,8 @@ struct MLIST {
 	{ "rig.set_vfo",      "d:d", "set current VFO in Hz" },
 	{ "rig.set_vfoA",     "d:d", "set vfo A in Hz" },
 	{ "rig.set_vfoB",     "d:d", "set vfo B in Hz" },
-	{ "rig.swap",         "i:i", "execute vfo swap" },
 	{ "rig.set_split",    "i:i", "set split 1/0 (on/off)" },
-	{ "main.set_frequency", "d:d", "set current VFO in Hz" }
+	{ "rig.swap",         "i:i", "execute vfo swap" }
 };
 
 class rig_list_methods : public XmlRpcServerMethod {
