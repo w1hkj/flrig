@@ -332,6 +332,8 @@ int main (int argc, char *argv[])
 	HomeDir.clear();
 	RigHomeDir.clear();
 
+	TOD_init();
+
 	Fl::args(argc, argv, arg_idx, parse_args);
 	Fl::set_fonts(0);
 
@@ -444,7 +446,7 @@ extern FILE *serlog;
 		exit(EXIT_FAILURE);
 	}
 
-	TOD_init();
+//	TOD_init();
 
 //	if (progStatus.fldigi_is_server) {
 //		open_rig_xmlrpc();

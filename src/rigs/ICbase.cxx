@@ -108,7 +108,11 @@ bool RIG_ICOM::waitFB(const char *sz)
 
 #ifdef IC_DEBUG
 	ofstream civ(ICDEBUGfname.c_str(), ios::app);
-	civ << "\n[" << zext_time() << "] wait FB(): " << sz << std::endl;
+	if (!RigSerial->IsOpen()){
+		civ << "[" << zext_time() << "] wait FB(): " << sz << std::endl;
+		civ << "Sent " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
+	}
+//	civ << std::endl;
 #endif
 
 	guard_lock reply_lock(&mutex_replystr);
@@ -142,8 +146,9 @@ bool RIG_ICOM::waitFB(const char *sz)
 				else
 					showresp(DEBUG, HEX, sztemp, tosend, returned);
 #ifdef IC_DEBUG
-civ << "[" << waited << " msec] OK: ";
-civ << str2hex(returned.c_str(), returned.length()) << std::endl;
+civ << "[" << waited << " msec] " << sz << " OK\n";
+civ << "Sent: " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
+civ << "Rcvd: " << str2hex(returned.c_str(), returned.length()) << std::endl;
 civ.close();
 #endif
 				return true;
@@ -154,8 +159,9 @@ civ.close();
 				snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, FAIL", sz, waited);
 				showresp(ERR, HEX, sztemp, tosend, returned);
 #ifdef IC_DEBUG
-civ << "[" << waited << " msec] FAILED: ";
-civ << str2hex(returned.c_str(), returned.length()) << std::endl;
+civ << "[" << waited << " msec] " << sz << " FAILED\n";
+civ << "Sent: " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
+civ << "Rcvd: " << str2hex(returned.c_str(), returned.length()) << std::endl;
 civ.close();
 #endif
 				return false;
@@ -170,8 +176,9 @@ civ.close();
 	showresp(ERR, HEX, sztemp, tosend, replystr);
 
 #ifdef IC_DEBUG
-civ << "[" << waited << " msec] TIMED OUT: ";
-civ << str2hex(returned.c_str(), returned.length()) << std::endl;
+civ << "[" << waited << " msec] " << sz << " TIMED OUT\n";
+civ << "Sent: " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
+civ << "Rcvd: " << str2hex(returned.c_str(), returned.length()) << std::endl;
 civ.close();
 #endif
 
@@ -184,7 +191,11 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 
 #ifdef IC_DEBUG
 	ofstream civ(ICDEBUGfname.c_str(), ios::app);
-	civ << "\n[" << zext_time() << "] wait FOR(): " << sz << std::endl;
+	if (!RigSerial->IsOpen()) {
+		civ << "[" << zext_time() << "] wait FOR(): " << sz;
+		civ << "Sent: " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
+	}
+//	civ << std::endl;
 #endif
 
 	guard_lock reply_lock(&mutex_replystr);
@@ -218,8 +229,9 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 				showresp(DEBUG, HEX, sztemp, tosend, returned);
 
 #ifdef IC_DEBUG
-civ << "[" << waited << " msec] OK: ";
-civ << str2hex(returned.c_str(), returned.length()) << std::endl;
+civ << "[" << waited << " msec] " << sz << " OK\n";
+civ << "Sent: " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
+civ << "Rcvd: " << str2hex(returned.c_str(), returned.length()) << std::endl;
 civ.close();
 #endif
 				return true;
@@ -235,8 +247,9 @@ civ.close();
 	showresp(ERR, HEX, sztemp, tosend, returned);
 
 #ifdef IC_DEBUG
-civ << "[" << waited << " msec] TIMED OUT: ";
-civ << str2hex(returned.c_str(), returned.length()) << std::endl;
+civ << "[" << waited << " msec] " << sz << " TIMED OUT\n";
+civ << "Sent: " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
+civ << "Rcvd: " << str2hex(returned.c_str(), returned.length()) << std::endl;
 civ.close();
 #endif
 	return false;

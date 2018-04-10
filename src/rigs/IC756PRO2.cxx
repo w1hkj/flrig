@@ -162,6 +162,7 @@ void RIG_IC756PRO2::A2B()
 
 long RIG_IC756PRO2::get_vfoA ()
 {
+	if (useB) return A.freq;
 	string cstr = "\x03";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -188,6 +189,7 @@ void RIG_IC756PRO2::set_vfoA (long freq)
 
 long RIG_IC756PRO2::get_vfoB ()
 {
+	if (!useB) return B.freq;
 	string cstr = "\x03";
 	string resp = pre_fm;
 	resp.append(cstr);

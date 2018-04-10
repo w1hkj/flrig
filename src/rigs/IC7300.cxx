@@ -188,6 +188,8 @@ RIG_IC7300::RIG_IC7300() {
 
 	has_vfo_adj = true;
 
+	can_change_alt_vfo = true;
+
 };
 
 //======================================================================
@@ -244,12 +246,23 @@ void RIG_IC7300::selectB()
 long RIG_IC7300::get_vfoA ()
 {
 	string resp;
-	cmd.assign(pre_to).append("\x03").append( post );
-	if (waitFOR(11, "get vfo A")) {
-		resp.assign(pre_fm).append("\x03");
+
+	cmd.assign(pre_to).append("\x25");
+	resp.assign(pre_fm).append("\x25");
+
+	if (useB) {
+		cmd  += '\x01';
+		resp += '\x01';
+	} else {
+		cmd  += '\x00';
+		resp += '\x00';
+	}
+
+	cmd.append(post);
+	if (waitFOR(12, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
+			A.freq = fm_bcd_be(replystr.substr(p+6), 10);
 	}
 	return A.freq;
 }
@@ -257,21 +270,36 @@ long RIG_IC7300::get_vfoA ()
 void RIG_IC7300::set_vfoA (long freq)
 {
 	A.freq = freq;
-	cmd.assign(pre_to).append("\x05");
-	cmd.append( to_bcd_be( freq, 10 ) );
+
+	cmd.assign(pre_to).append("\x25");
+	if (useB) cmd += '\x01';
+	else      cmd += '\x00';
+
+	cmd.append( to_bcd_be( freq, 10) );
 	cmd.append( post );
 	waitFB("set vfo A");
 }
 
 long RIG_IC7300::get_vfoB ()
 {
-	string resp = pre_fm;
-	cmd.assign(pre_to).append("\x03").append(post);
-	if (waitFOR(11, "get vfo B")) {
-		resp.assign(pre_fm).append("\x03");
+	string resp;
+
+	cmd.assign(pre_to).append("\x25");
+	resp.assign(pre_fm).append("\x25");
+
+	if (useB) {
+		cmd  += '\x00';
+		resp += '\x00';
+	} else {
+		cmd  += '\x01';
+		resp += '\x01';
+	}
+
+	cmd.append(post);
+	if (waitFOR(12, "get vfo B")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
+			B.freq = fm_bcd_be(replystr.substr(p+6), 10);
 	}
 	return B.freq;
 }
@@ -279,7 +307,11 @@ long RIG_IC7300::get_vfoB ()
 void RIG_IC7300::set_vfoB (long freq)
 {
 	B.freq = freq;
-	cmd.assign(pre_to).append("\x05");
+
+	cmd.assign(pre_to).append("\x25");
+	if (useB) cmd += '\x00';
+	else      cmd += '\x01';
+
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append( post );
 	waitFB("set vfo B");
@@ -340,7 +372,8 @@ int RIG_IC7300::get_modeA()
 	size_t p;
 
 	cmd.assign(pre_to).append("\x26");
-	cmd += '\x00';
+	if (useB) cmd += '\x01';
+	else      cmd += '\x00';
 	cmd.append(post);
 
 	string resp;
@@ -375,7 +408,8 @@ void RIG_IC7300::set_modeA(int val)
 	A.imode = val;
 	cmd.assign(pre_to);
 	cmd += '\x26';
-	cmd += '\x00';
+	if (useB) cmd += '\x01';  // inactive vfo
+	else      cmd += '\x00';  // active vfo
 	cmd += IC7300_mode_nbr[val];
 	if (val > 7) cmd += '\x01';
 	else cmd += '\x00';
@@ -390,7 +424,8 @@ int RIG_IC7300::get_modeB()
 	size_t p;
 
 	cmd.assign(pre_to).append("\x26");
-	cmd += '\x00';
+	if (useB) cmd += '\x00';
+	else      cmd += '\x01';
 	cmd.append(post);
 
 	string resp;
@@ -422,7 +457,9 @@ void RIG_IC7300::set_modeB(int val)
 	B.imode = val;
 	cmd.assign(pre_to);
 	cmd += '\x26';
-	cmd += '\x00';
+	if (useB) cmd += '\x00';  // active vfo
+	else      cmd += '\x01';  // inactive vfo
+
 	cmd += IC7300_mode_nbr[val];
 	if (val > 7) cmd += '\x01';
 	else cmd += '\x00';
@@ -434,6 +471,9 @@ void RIG_IC7300::set_modeB(int val)
 int RIG_IC7300::get_bwA()
 {
 	if (A.imode == 3 || A.imode == 11) return 0; // FM, FM-D
+
+	if (useB) selectA();
+
 	cmd = pre_to;
 	cmd.append("\x1a\x03");
 	cmd.append(post);
@@ -448,24 +488,36 @@ int RIG_IC7300::get_bwA()
 	if (bwval != A.iBW) {
 		A.iBW = bwval;
 	}
+
+	if (useB) selectB();
+
 	return A.iBW;
 }
 
 void RIG_IC7300::set_bwA(int val)
 {
-	A.iBW = val;
+
 	if (A.imode == 3 || A.imode == 11) return; // FM, FM-D
+
+	A.iBW = val;
+	if (useB) selectA();
+
 	if (A.imode > bw_size_) A.imode = bw_size_;
 	cmd = pre_to;
 	cmd.append("\x1a\x03");
 	cmd.append(to_bcd(A.iBW, 2));
 	cmd.append(post);
 	waitFB("set bwA");
+
+	if (useB) selectB();
 }
 
 int RIG_IC7300::get_bwB()
 {
 	if (B.imode == 3 || B.imode == 11) return 0; // FM, FM-D
+
+	if (!useB) selectB();
+
 	cmd = pre_to;
 	cmd.append("\x1a\x03");
 	cmd.append(post);
@@ -480,19 +532,26 @@ int RIG_IC7300::get_bwB()
 	if (bwval != B.iBW) {
 		B.iBW = bwval;
 	}
+
+	if (!useB) selectA();
 	return B.iBW;
 }
 
 void RIG_IC7300::set_bwB(int val)
 {
-	B.iBW = val;
 	if (B.imode == 3 || B.imode == 11) return; // FM, FM-D
+	B.iBW = val;
+
+	if (!useB) selectB();
+
 	if (B.iBW > bw_size_) B.iBW = bw_size_;
 	cmd = pre_to;
 	cmd.append("\x1a\x03");
 	cmd.append(to_bcd(B.iBW, 2));
 	cmd.append(post);
 	waitFB("set bwB");
+
+	if (!useB) selectA();
 }
 
 // LSB  USB  AM   FM   CW  CW-R  RTTY  RTTY-R  LSB-D  USB-D  AM-D  FM-D

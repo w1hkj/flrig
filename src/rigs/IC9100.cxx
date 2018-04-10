@@ -261,6 +261,7 @@ void RIG_IC9100::selectB()
 
 long RIG_IC9100::get_vfoA ()
 {
+	if (useB) return A.freq;
 	string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
@@ -292,6 +293,7 @@ void RIG_IC9100::set_vfoA (long freq)
 
 long RIG_IC9100::get_vfoB ()
 {
+	if (!useB) return B.freq;
 	string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;

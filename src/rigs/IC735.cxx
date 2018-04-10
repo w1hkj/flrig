@@ -76,6 +76,7 @@ void RIG_IC735::selectB()
 
 long RIG_IC735::get_vfoA ()
 {
+	if (useB) return A.freq;
 	string cstr = "\x03";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -102,6 +103,7 @@ void RIG_IC735::set_vfoA (long freq)
 
 long RIG_IC735::get_vfoB ()
 {
+	if (!useB) return B.freq;
 	string cstr = "\x03";
 	string resp = pre_fm;
 	resp.append(cstr);

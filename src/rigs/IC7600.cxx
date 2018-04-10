@@ -210,6 +210,7 @@ void RIG_IC7600::selectB()
 
 long RIG_IC7600::get_vfoA ()
 {
+	if (useB) return A.freq;
 	string resp;
 	cmd.assign(pre_to).append("\x03").append( post );
 	if (waitFOR(11, "get vfo A")) {
@@ -232,6 +233,7 @@ void RIG_IC7600::set_vfoA (long freq)
 
 long RIG_IC7600::get_vfoB ()
 {
+	if (!useB) return B.freq;
 	string resp = pre_fm;
 	cmd.assign(pre_to).append("\x03").append(post);
 	if (waitFOR(11, "get vfo B")) {

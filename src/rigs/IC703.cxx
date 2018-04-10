@@ -131,6 +131,7 @@ void RIG_IC703::initialize()
 
 long RIG_IC703::get_vfoA ()
 {
+	if (useB) return A.freq;
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
@@ -139,14 +140,14 @@ long RIG_IC703::get_vfoA ()
 	if (waitFOR(11, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			freqA = fm_bcd_be(replystr.substr(p+5), 10);
+			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
-	return freqA;
+	return A.freq;
 }
 
 void RIG_IC703::set_vfoA (long freq)
 {
-	freqA = freq;
+	A.freq = freq;
 	cmd = pre_to;
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 10 ) );

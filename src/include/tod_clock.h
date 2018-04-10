@@ -22,7 +22,7 @@
 #ifndef TOD_H_
 #define TOD_H_
 
-extern unsigned long zmsec();
+extern int   zmsec();
 extern char* zdate();
 extern char* ztime();
 extern char* zshowtime();

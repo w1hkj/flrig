@@ -53,11 +53,14 @@ using namespace std;
 static pthread_t TOD_thread;
 static pthread_mutex_t TOD_mutex     = PTHREAD_MUTEX_INITIALIZER;
 
-static unsigned long  _zmsec = 0;
+static int _zmsec = 0;
+static int _zsec = 0;
+static int _zmin = 0;
+static int _zhr = 0;
 
 static char ztbuf[20] = "20120602 123000";
 
-unsigned long zmsec(void)
+int zmsec(void)
 {
 	guard_lock zmsec_lock(&TOD_mutex);
 	return _zmsec;
@@ -71,14 +74,19 @@ char* zdate()
 
 char* ztime()
 {
+	static char now[7];
 	guard_lock zmsec_lock(&TOD_mutex);
-	return ztbuf + 9;
+	snprintf(now, sizeof(now), "%02d%02d%02d",
+		_zhr, _zmin, _zsec);
+	return now;
 }
 
 char exttime[9];
 char *zext_time()
 {
 	guard_lock zmsec_lock(&TOD_mutex);
+	snprintf(exttime, sizeof(exttime), "%02d:%02d:%02d",
+		_zhr, _zmin, _zsec);
 	return exttime;
 }
 
@@ -113,6 +121,11 @@ void ztimer(void *)
 	exttime[5] = ':';
 	exttime[6] = ztbuf[13]; exttime[7] = ztbuf[13];
 	exttime[8] = 0;
+
+	_zmsec = 0;
+	_zsec = tm.tm_sec;
+	_zmin = tm.tm_min;
+	_zhr  = tm.tm_hour;
 }
 
 //======================================================================
@@ -122,7 +135,6 @@ static bool first_call = true;
 
 void *TOD_loop(void *args)
 {
-	int count = 100;
 	while(1) {
 
 		if (TOD_exit) break;
@@ -134,17 +146,23 @@ void *TOD_loop(void *args)
 			double st = 1000.0 - tv.tv_usec / 1e3;
 			MilliSleep(st);
 			first_call = false;
-			_zmsec += st;
+			ztimer((void *)0);
 		} else {
-			{
-				guard_lock zmsec_lock(&TOD_mutex);
-				_zmsec += 10;
+			MilliSleep(100);
+			guard_lock zmsec_lock(&TOD_mutex);
+			_zmsec++;
+			if (_zmsec >= 10) {
+				_zmsec = 0;
+				_zsec++;
+				if (_zsec >= 60) {
+					_zsec = 0;
+					_zmin++;
+					if (_zmin >= 60) {
+						_zmin = 0;
+						_zhr++;
+					}
+				}
 			}
-			if (--count == 0) {
-				Fl::awake(ztimer);
-				count = 100;
-			}
-			MilliSleep(10);
 		}
 	}
 

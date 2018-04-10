@@ -118,6 +118,7 @@ void RIG_IC706MKIIG::selectB()
 
 long RIG_IC706MKIIG::get_vfoA ()
 {
+	if (useB) return A.freq;
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
@@ -126,14 +127,14 @@ long RIG_IC706MKIIG::get_vfoA ()
 	if (waitFOR(11, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			freqA = fm_bcd_be(replystr.substr(p+5), 10);
+			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
-	return freqA;
+	return A.freq;
 }
 
 void RIG_IC706MKIIG::set_vfoA (long freq)
 {
-	freqA = freq;
+	A.freq = freq;
 	cmd = pre_to;
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 10 ) );
@@ -143,6 +144,7 @@ void RIG_IC706MKIIG::set_vfoA (long freq)
 
 long RIG_IC706MKIIG::get_vfoB ()
 {
+	if (!useB) return B.freq;
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
@@ -151,14 +153,14 @@ long RIG_IC706MKIIG::get_vfoB ()
 	if (waitFOR(11, "get vfo B")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			freqB = fm_bcd_be(replystr.substr(p+5), 10);
+			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
-	return freqB;
+	return B.freq;
 }
 
 void RIG_IC706MKIIG::set_vfoB (long freq)
 {
-	freqB = freq;
+	B.freq = freq;
 	cmd = pre_to;
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 10 ) );

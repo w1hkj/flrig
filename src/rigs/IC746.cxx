@@ -142,6 +142,7 @@ void RIG_IC746::selectB()
 
 long RIG_IC746::get_vfoA ()
 {
+	if (useB) return A.freq;
 	string cstr = "\x03";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -168,6 +169,7 @@ void RIG_IC746::set_vfoA (long freq)
 
 long RIG_IC746::get_vfoB ()
 {
+	if (!useB) return B.freq;
 	string cstr = "\x03";
 	string resp = pre_fm;
 	resp.append(cstr);

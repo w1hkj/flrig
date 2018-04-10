@@ -212,6 +212,7 @@ void RIG_IC7200::selectB()
 
 long RIG_IC7200::get_vfoA ()
 {
+	if (useB) return A.freq;
 	string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
@@ -237,6 +238,7 @@ void RIG_IC7200::set_vfoA (long freq)
 
 long RIG_IC7200::get_vfoB ()
 {
+	if (!useB) return B.freq;
 	string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
