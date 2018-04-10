@@ -61,6 +61,11 @@ status progStatus = {
 	false,		// bool comm_rtscts;
 	false,		// bool comm_rtsplus;
 	false,		// bool comm_dtrplus;
+
+                // This was determined to be the values before adding these elements. Six characters or 50 mS.
+    6,          // int  comm_vmin  c_cc[VMIN]  = 6
+    5,          // int  comm_vtime c_cc[VTIME] = 5
+
 	200,		// int  serloop_timing;
 	0,			// int  byte_interval;
 
@@ -374,6 +379,8 @@ void status::saveLastState()
 	spref.set("comm_retries", comm_retries);
 	spref.set("comm_wait", comm_wait);
 	spref.set("comm_timeout", comm_timeout);
+	spref.set("comm_vmin", comm_vmin);
+	spref.set("comm_vtime", comm_vtime);
 	spref.set("serloop_timing", serloop_timing);
 	spref.set("byte_interval", byte_interval);
 

@@ -81,6 +81,12 @@ public:
 	void Stopbits(int n) {stopbits = (n == 1 ? 1 : 2);}
 	int  Stopbits() { return stopbits;}
 
+	void Vmin(int vmn){vmin = vmn;}
+	int  Vmin(){return vmin;}
+
+	void Vtime(int vtm){vtime = vtm;}
+	int  Vtime(){return vtime;}
+
 	int  ReadBuffer (char *b, int nbr);
 	int  WriteBuffer(const char *str, int nbr);
 	bool WriteByte(char bybyte);
@@ -103,6 +109,8 @@ private:
 	bool	rtsptt;
 	bool	rtscts;
 	int		stopbits;
+	int     vmin;
+	int     vtime;
 	char	bfr[2048];
 //Methods
 	bool	IOselect();

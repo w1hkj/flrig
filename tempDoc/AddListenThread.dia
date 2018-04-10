@@ -1035,7 +1035,7 @@ endif#</dia:string>
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
-            <dia:string>#readICResponse(timeout)
+            <dia:string>#RIG_ICOM::readICResponse(timeout)
 Uses mutex to get response from queue.
 Timeout is done here.
 Note, this will always parse a complete response.#</dia:string>
@@ -1437,7 +1437,7 @@ Data#</dia:string>
       </dia:attribute>
       <dia:attribute name="conn_endpoints">
         <dia:point val="69.3913,46.5663"/>
-        <dia:point val="72.2862,50.5315"/>
+        <dia:point val="72.2863,50.5315"/>
       </dia:attribute>
       <dia:attribute name="numcp">
         <dia:int val="1"/>
@@ -1517,7 +1517,7 @@ Converts c char buffer to c++ string#</dia:string>
         <dia:point val="68.3527,50.5439"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="68.3026,50.4939;77.6752,52.4939"/>
+        <dia:rectangle val="68.3027,50.4939;77.6752,52.4939"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="68.3527,50.5439"/>
@@ -1549,7 +1549,7 @@ Converts c char buffer to c++ string#</dia:string>
             <dia:real val="0.80000000000000004"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="68.8026,51.6889"/>
+            <dia:point val="68.8027,51.6889"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
@@ -1565,7 +1565,7 @@ Converts c char buffer to c++ string#</dia:string>
         <dia:point val="72.9259,42.876"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="72.6153,42.8256;73.3389,50.6068"/>
+        <dia:rectangle val="72.6154,42.8256;73.339,50.6068"/>
       </dia:attribute>
       <dia:attribute name="conn_endpoints">
         <dia:point val="72.9259,42.876"/>
@@ -1641,11 +1641,11 @@ Fl::awake()#</dia:string>
         <dia:point val="73.0811,52.4928"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="72.798,52.4384;73.5185,54.0493"/>
+        <dia:rectangle val="72.798,52.4385;73.5185,54.0493"/>
       </dia:attribute>
       <dia:attribute name="conn_endpoints">
         <dia:point val="73.0811,52.4928"/>
-        <dia:point val="73.2144,53.9379"/>
+        <dia:point val="73.2145,53.9379"/>
       </dia:attribute>
       <dia:attribute name="numcp">
         <dia:int val="1"/>

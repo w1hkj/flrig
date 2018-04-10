@@ -75,6 +75,8 @@ bool startXcvrSerial()
 	RigSerial->RTSCTS(progStatus.comm_rtscts);
 	RigSerial->RTS(progStatus.comm_rtsplus);
 	RigSerial->DTR(progStatus.comm_dtrplus);
+	RigSerial->Vmin(progStatus.comm_vmin);
+	RigSerial->Vtime(progStatus.comm_vtime);
 
 	if (!RigSerial->OpenPort()) {
 		LOG_ERROR("Cannot access %s", progStatus.xcvr_serial_port.c_str());

@@ -51,6 +51,8 @@ struct status {
 	bool	comm_rtscts;
 	bool	comm_rtsplus;
 	bool	comm_dtrplus;
+    int     comm_vmin;
+    int     comm_vtime;
 	int		serloop_timing;
 	int		byte_interval;
 

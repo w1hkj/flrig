@@ -18,6 +18,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
+#include <mutex>
+#include <condition_variable>
+#include <chrono>
 #include "ICbase.h"
 #include "debug.h"
 #include "support.h"
@@ -25,6 +28,8 @@
 #include "tod_clock.h"
 
 #include "status.h"
+
+using namespace std::chrono;
 
 bool RIG_ICOM::listenThreadRunning = false;
 pthread_t RIG_ICOM::listenThread;
@@ -60,9 +65,6 @@ void RIG_ICOM::initialize()
 	// Tweak the performance up. We want fast reaction to unsolicited (remote scope) data.
 	// vtime = 1
 	// vmin = 0
-// Six characters or 50 mS.
-//c_cc[VTIME] = 5;
-//c_cc[VMIN]  = 6;
 
 	// Start the listen thread. TBD DJW - handle error condition.
 	(void)pthread_create(&listenThread, NULL, CIV_listen_thread_loop, NULL);
@@ -340,8 +342,32 @@ void RIG_ICOM::A2B()
 	waitFB("Equalize vfos");
 }
 
+mutex              civ_response_mutex;
+condition_variable civ_response_present;
+bool               civ_response_ready = false;
+string             civ_response;
+high_resolution_clock::time_point t0;
+
 int RIG_ICOM::readICResponse(int wait_msec)
 {
+  	high_resolution_clock::time_point t;
+  	duration<double, milli> time_span;
+
+	unique_lock<mutex> lk(civ_response_mutex);
+	civ_response_present.wait(lk, []{return civ_response_ready;});
+	civ_response_ready = false;
+
+	t = high_resolution_clock::now();
+	time_span = t - t0;
+	printf("    readICResponse t=%f:", time_span.count());
+	for(size_t n = 0; n < civ_response.length(); n++) {
+		printf(" %02X", (unsigned char)civ_response[n]);
+	}
+	putchar('\n');
+
+	lk.unlock();
+	civ_response_present.notify_one();
+
 //	for (cnt = 0; cnt < wait_msec; cnt++) {
 //		readICResponse();
 //		returned.append(replystr);
@@ -385,20 +411,68 @@ int RIG_ICOM::readICResponse(int wait_msec)
 }
 
 // TBD DJW - Add shutdown to override virtual function in rigbase.
-
 void *RIG_ICOM::CIV_listen_thread_loop(void *p)
 {
-	int n, nread = 0;
+	size_t nread = 0;
+	size_t start_position, end_position, length;
+	static string s;
+	static bool saved = false;
+
+  	high_resolution_clock::time_point t;
+  	duration<double, milli> time_span;
+
+	t0 = high_resolution_clock::now();
+
 	puts("Listen Thread Starting");
 
 	while(listenThreadRunning) {
+
 		nread = readResponse();
+
 		if(nread) {
-			printf("serialListenThreadLoop: read %d bytes:", nread);
-			for(n = 0; n < nread; n++) {
-				printf(" %02X", (unsigned char)replystr[n]);
+
+			printf("serialListenThreadLoop: read %d bytes:\n", (int)nread);
+
+			start_position = 0;
+			while(string::npos != (end_position = replystr.find((char)0xFD, start_position))) {
+
+				length = 1 + end_position - start_position;
+
+				if(saved) {
+					saved = false;
+					s.append(replystr, start_position, length);
+				} else {
+					s.assign(replystr, start_position, length);
+				}
+
+				civ_response.assign(s);
+				{
+					lock_guard<mutex> lk(civ_response_mutex);
+					civ_response_ready = true;
+					t = high_resolution_clock::now();
+					time_span = t - t0;
+					printf("  t=%f mS, s=%3d, e=%3d, l=%3d, sl=%3d\n",
+							time_span.count(), (int)start_position, (int)end_position, (int)length, (int)s.length());
+
+				}
+				civ_response_present.notify_one();
+
+				{
+					unique_lock<mutex> lk(civ_response_mutex);
+					civ_response_present.wait(lk, []{return !civ_response_ready;});
+				}
+
+				start_position = end_position + 1;
 			}
-			putchar('\n');
+
+			printf("  start = %3d, end = %3d\n", (int)start_position, (int)end_position);
+
+			if(start_position < nread) {
+				// TBD DJW - Have not seen this yet. Need a way to cause it to test it.
+				puts("  *** SAVING ***");
+				saved = true;
+				s.assign(replystr, start_position, string::npos);
+			}
 		}
 	}
 
