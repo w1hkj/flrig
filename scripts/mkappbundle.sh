@@ -112,7 +112,7 @@ signature="$PACKAGE_TARNAME"
 binary="$PACKAGE_TARNAME"
 icon="$flrig_icon"
 version="${flrig_VERSION_MAJOR}.${flrig_VERSION_MINOR}"
-appversion="$flrig_VERSION"
+appversion="$PACKAGE_VERSION"
 
 bundle
 
