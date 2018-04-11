@@ -106,13 +106,12 @@ void debug::start(const char* filename)
 	window->end();
 }
 
-bool   debug_in_use = false;
-
 void debug::stop(void)
 {
-	while (debug_in_use) { MilliSleep(50); Fl::awake();}
+	guard_lock dlock(&debug_mutex);
 	delete inst;
 	inst = 0;
+	btext = 0;
 	if (window) {
 		delete window;
 		window = 0;
@@ -130,14 +129,12 @@ void debug::log(level_e level, const char* func, const char* srcf, int line, con
 
 	snprintf(fmt, sizeof(fmt), "%c: %s: %s\n", *prefix[level], func, format);
 
-    while(debug_in_use) MilliSleep(1);
-    
 	va_list args;
 	va_start(args, format);
 
 	vsnprintf(sztemp, sizeof(sztemp), fmt, args);
 
-	guard_lock dlock(&debug_mutex);
+//	guard_lock dlock(&debug_mutex);
 	estr.append(sztemp);
 
 	fprintf(wfile, "[%s] %s", zext_time(), sztemp);
@@ -156,14 +153,12 @@ void debug::slog(level_e level, const char* func, const char* srcf, int line, co
 
 	snprintf(fmt, sizeof(fmt), "%c:%s\n", *prefix[level], format);
 
-    while(debug_in_use) MilliSleep(1);
-    
 	va_list args;
 	va_start(args, format);
 
 	vsnprintf(sztemp, sizeof(sztemp), fmt, args);
 
-	guard_lock dlock(&debug_mutex);
+//	guard_lock dlock(&debug_mutex);
 	estr.append(sztemp);
 
 	fprintf(wfile, "[%s] %s", zext_time(), sztemp);
@@ -188,8 +183,8 @@ void debug::show(void)
 void debug::sync_text(void* arg)
 {
 	guard_lock dlock(&debug_mutex);
-	if (!btext) return;
-	debug_in_use = true;
+	if (inst == 0 || btext == 0) return;
+
 	size_t p0 = 0, p1 = estr.find('\n');
 	std::string insrt;
 	while (p1 != string::npos) {
@@ -200,7 +195,6 @@ void debug::sync_text(void* arg)
 		p1 = estr.find('\n', p0);
 	}
 	estr = "";
-	debug_in_use = false;
 }
 
 debug::debug(const char* filename)
@@ -226,7 +220,6 @@ debug::debug(const char* filename)
 
 debug::~debug()
 {
-	while (debug_in_use) { MilliSleep(50); Fl::awake();}
 	if (window) {
 		delete window;
 		window = 0;

@@ -33,7 +33,7 @@
 using namespace std;
 
 enum {onA, onB};
-enum {UI, XML, SRVR, RIG};
+enum {UI, XML, SRVR, RIG, FORCE};
 enum {BINARY, STRING};
 
 struct XCVR_STATE {

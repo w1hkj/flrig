@@ -110,6 +110,7 @@ int meter_image = SWR_IMAGE;
 //=============================================================================
 
 bool bypass_serial_thread_loop = true;
+bool skip_polls = false;
 bool run_serial_thread = true;
 
 bool PTT = false;
@@ -237,7 +238,7 @@ Data Source: %s\
 
 void read_info()
 {
-	guard_lock serial_lock(&mutex_serial, 1);
+	trace(1,"read_info()");
 	selrig->get_info();
 }
 
@@ -246,7 +247,7 @@ void read_info()
 void read_vfo()
 {
 // transceiver changed ?
-	guard_lock serial_lock(&mutex_serial, 2);
+	trace(1,"read_vfo()");
 	long  freq;
 	if (!useB) { // vfo-A
 		trace(2, "!useB", "get vfo A");
@@ -288,7 +289,7 @@ void update_vfoAorB(void *d)
 	long val = (long)d;
 
 	if (xcvr_name == rig_FT817.name_) {
-		guard_lock serial_lock(&mutex_serial);
+		trace(1,"update_vfoAorB()  1");
 		if (val) {
 			useB = true;
 			vfoB.src = RIG;
@@ -317,7 +318,7 @@ void update_vfoAorB(void *d)
 
 	if (val) {
 //	could use cb_selectB() here, but that switches off split mode
-		guard_lock serial_lock(&mutex_serial, 95);
+		trace(1,"update_vfoAorB()  2");
 		changed_vfo = true;
 		vfoB.src = UI;
 		vfoB.freq = FreqDispB->value();
@@ -325,10 +326,9 @@ void update_vfoAorB(void *d)
 		queB.push(vfoB);
 		useB = true;
 		highlight_vfo((void *)0);
-//		cb_selectB();
 	} else {
 //	could use cb_selectA() here, but that switches off split mode
-		guard_lock serial_lock(&mutex_serial, 97);
+		trace(1,"update_vfoAorB()  3");
 		changed_vfo = true;
 		vfoA.src = UI;
 		vfoA.freq = FreqDispA->value();
@@ -336,7 +336,6 @@ void update_vfoAorB(void *d)
 		queA.push(vfoA);
 		useB = false;
 		highlight_vfo((void *)0);
-//		cb_selectA();
 	}
 }
 
@@ -345,7 +344,7 @@ void read_vfoAorB()
 	int val;
 	if (selrig->has_getvfoAorB) {
 		{
-			guard_lock serial_lock(&mutex_serial, 99);
+			trace(1,"read_vfoAorB()");
 			val = selrig->get_vfoAorB();
 			int retry = 10;
 			while (val == -1 && retry--) {
@@ -383,7 +382,7 @@ void setModeControl(void *)
 // mode and bandwidth
 void read_mode()
 {
-	guard_lock serial_lock(&mutex_serial, 3);
+	trace(1,"read_mode()");
 	int nu_mode;
 	int nu_BW;
 	if (!useB) {
@@ -448,7 +447,7 @@ void setBWControl(void *)
 
 void read_bandwidth()
 {
-	guard_lock serial_lock(&mutex_serial, 5);
+	trace(1,"read_bandwidth()");
 	int nu_BW;
 	if (!useB) {
 		nu_BW = selrig->get_bwA();
@@ -472,7 +471,7 @@ void read_smeter()
 	if (!selrig->has_smeter) return;
 	int  sig;
 	{
-		guard_lock serial_lock(&mutex_serial, 7);
+		trace(1,"read_smeter()");
 		sig = selrig->get_smeter();
 	}
 	if (sig == -1) return;
@@ -486,7 +485,7 @@ void read_power_out()
 	if (!selrig->has_power_out) return;
 	int sig;
 	{
-		guard_lock serial_lock(&mutex_serial, 8);
+		trace(1,"read_power_out()");
 		sig = selrig->get_power_out();
 	}
 	if (sig == -1) return;
@@ -501,7 +500,7 @@ void read_swr()
 		!selrig->has_swr_control) return;
 	int sig;
 	{
-		guard_lock serial_lock(&mutex_serial, 9);
+		trace(1,"read_swr()");
 		sig = selrig->get_swr();
 	}
 	if (sig > -1)
@@ -515,7 +514,7 @@ void read_alc()
 		!selrig->has_alc_control) return;
 	int sig;
 	{
-		guard_lock serial_lock(&mutex_serial, 10);
+		trace(1,"read_alc()");
 		sig = selrig->get_alc();
 	}
 	if (sig > -1)
@@ -533,7 +532,7 @@ void read_auto_notch()
 	int val;
 	if (!selrig->has_auto_notch) return;
 	{
-		guard_lock serial_lock(&mutex_serial, 11);
+		trace(1,"read_auto_notch()");
 		val = selrig->get_auto_notch();
 	}
 	if (val != progStatus.auto_notch) {
@@ -556,7 +555,7 @@ void read_noise()
 	int on = 0, val = 0;
 	if (inhibit_nb_level) return;
 	{
-		guard_lock serial_lock(&mutex_serial, 12);
+		trace(1,"read_noise()");
 		on = selrig->get_noise();
 		val = selrig->get_nb_level();
 	}
@@ -579,7 +578,7 @@ void read_compression()
 	int on; int val;
 	if (selrig->has_compression || selrig->has_compON) {
 		{
-			guard_lock serial_lock(&mutex_serial, 13);
+			trace(1,"read_compression()");
 			selrig->get_compression( on, val );
 		}
 		if (on != progStatus.compON || val != progStatus.compression) {
@@ -606,7 +605,7 @@ void read_preamp_att()
 	int val;
 	if (selrig->has_preamp_control) {
 		{
-			guard_lock serial_lock(&mutex_serial, 13);
+			trace(1,"read_preamp_att()  1");
 			val = selrig->get_preamp();
 		}
 		if (val != progStatus.preamp) {
@@ -616,7 +615,7 @@ void read_preamp_att()
 	}
 	if (selrig->has_attenuator_control) {
 		{
-			guard_lock serial_lock(&mutex_serial, 14);
+			trace(1,"read_preamp_att()  2");
 			val = selrig->get_attenuator();
 		}
 		if (val != progStatus.attenuator) {
@@ -663,7 +662,7 @@ void read_split()
 	int val = progStatus.split;
 	if (selrig->can_split()) {
 		{
-			guard_lock serial_lock(&mutex_serial, 15);
+			trace(1,"read_split()");
 			val = selrig->get_split();
 		}
 		if (val != progStatus.split) {
@@ -699,7 +698,7 @@ void read_volume()
 	if (!selrig->has_volume_control) return;
 	int vol;
 	{
-		guard_lock serial_lock(&mutex_serial, 16);
+		trace(1,"read_volume()");
 		vol = selrig->get_volume_control();
 	}
 	if (vol != progStatus.volume) {
@@ -728,7 +727,7 @@ void read_ifshift()
 	if (inhibit_shift) return;
 	if (!selrig->has_ifshift_control) return;
 	{
-		guard_lock serial_lock(&mutex_serial, 17);
+		trace(1,"read_if_shift()");
 		on = selrig->get_if_shift(val);
 	}
 	if ((on != progStatus.shift) || (val != progStatus.shift_val)) {
@@ -754,7 +753,7 @@ void read_nr()
 	if (inhibit_nr) return;
 	if (!selrig->has_noise_reduction) return;
 	{
-		guard_lock serial_lock(&mutex_serial, 18);
+		trace(1,"read_nr()");
 		on = selrig->get_noise_reduction();
 		val = selrig->get_noise_reduction_val();
 	}
@@ -781,7 +780,7 @@ void read_notch()
 	if (inhibit_notch) return;
 	if (!selrig->has_notch_control) return;
 	{
-		guard_lock serial_lock(&mutex_serial, 19);
+		trace(1,"read_notch()");
 		on = selrig->get_notch(val);
 	}
 	if ((on != progStatus.notch) || (val != progStatus.notch_val)) {
@@ -818,7 +817,7 @@ void read_power_control()
 	if (inhibit_power) return;
 	if (!selrig->has_power_control) return;
 	{
-		guard_lock serial_lock(&mutex_serial, 20);
+		trace(1,"read_power_control()");
 		val = selrig->get_power_control();
 	}
 	if (val != progStatus.power_level) {
@@ -841,7 +840,7 @@ void read_mic_gain()
 	if (inhibit_mic) return;
 	if (!selrig->has_micgain_control) return;
 	{
-		guard_lock serial_lock(&mutex_serial, 21);
+		trace(1,"read_mic_gain()");
 		val = selrig->get_mic_gain();
 	}
 	if (val != progStatus.mic_gain) {
@@ -854,7 +853,7 @@ void read_agc()
 {
 	int val;
 	if (!selrig->has_agc_control) return;
-	guard_lock serial_lock(&mutex_serial);
+	trace(1,"read_agc()");
 	val = selrig->get_agc();
 	if (val != progStatus.agc_level) {
 		vfo->agc_level = progStatus.agc_level = val;
@@ -875,7 +874,7 @@ void read_rfgain()
 	int val;
 	if (inhibit_rfgain) return;
 	if (selrig->has_rf_control) {
-		guard_lock serial_lock(&mutex_serial, 22);
+		trace(1,"read_rfgain");
 		val = selrig->get_rf_gain();
 		if (val != progStatus.rfgain) {
 			progStatus.rfgain = val;
@@ -899,7 +898,7 @@ void read_squelch()
 	if (inhibit_squelch) return;
 	if (!selrig->has_sql_control) return;
 	{
-		guard_lock serial_lock(&mutex_serial, 23);
+		trace(1,"read_squelch()");
 		val = selrig->get_squelch();
 	}
 	if (val != progStatus.squelch) {
@@ -996,20 +995,22 @@ void serviceA()
 
 		trace(2, "set VFO A", printXCVR_STATE(nuvals).c_str());
 
-		if (vfoA.imode != nuvals.imode) {
+		if (vfoA.imode != nuvals.imode || nuvals.src == FORCE) {
 			selrig->set_modeA(vfoA.imode = nuvals.imode);
 			Fl::awake(setModeControl);
 			set_bandwidth_control();
 			selrig->set_bwA(vfoA.iBW = nuvals.iBW);
 			Fl::awake(setBWControl);
-		} else if ((vfoA.iBW != nuvals.iBW)  && (nuvals.iBW != -1)) {
-			selrig->set_bwA(vfoA.iBW = nuvals.iBW);
-			Fl::awake(setBWControl);
+		} else if (vfoA.iBW != nuvals.iBW || nuvals.src == FORCE) {
+			if (nuvals.iBW != -1) {
+				selrig->set_bwA(vfoA.iBW = nuvals.iBW);
+				Fl::awake(setBWControl);
+			}
 		}
 
 		vfoA.freq = nuvals.freq;
 		Fl::awake(setFreqDispA, (void *)vfoA.freq);
-		selrig->set_vfoA(nuvals.freq);//vfoA.freq);
+		selrig->set_vfoA(vfoA.freq);
 
 		vfo = &vfoA;
 
@@ -1069,20 +1070,22 @@ void serviceB()
 
 		trace(2, "set VFO B", printXCVR_STATE(nuvals).c_str());
 
-		if (vfoB.imode != nuvals.imode) {
+		if (vfoB.imode != nuvals.imode ||nuvals.src == FORCE) {
 			selrig->set_modeB(vfoB.imode = nuvals.imode);
 			Fl::awake(setModeControl);
 			set_bandwidth_control();
 			selrig->set_bwB(vfoB.iBW = nuvals.iBW);
 			Fl::awake(setBWControl);
-		} else if ((vfoB.iBW != nuvals.iBW)  && (nuvals.iBW != -1)) {
-			selrig->set_bwB(vfoB.iBW = nuvals.iBW);
-			Fl::awake(setBWControl);
+		} else if (vfoB.iBW != nuvals.iBW || nuvals.src == FORCE) {
+			if (nuvals.iBW != -1) {
+				selrig->set_bwB(vfoB.iBW = nuvals.iBW);
+				Fl::awake(setBWControl);
+			}
 		}
 
 		vfoB.freq = nuvals.freq;
 		Fl::awake(setFreqDispB, (void *)vfoB.freq);
-		selrig->set_vfoB(nuvals.freq);//vfoB.freq);
+		selrig->set_vfoB(vfoB.freq);
 
 		vfo = &vfoB;
 
@@ -1110,8 +1113,10 @@ void * serial_thread_loop(void *d)
 		}
 
 		if (close_rig) {
-			closeRig();
-			goto serial_bypass_loop;
+trace(1, "serial_thread_loop: close_rig");
+return NULL;
+//			closeRig();
+//			goto serial_bypass_loop;
 		}
 
 //send any freq/mode/bw changes in the queu
@@ -1119,6 +1124,7 @@ void * serial_thread_loop(void *d)
 		check_ptt_queue();
 		{
 			guard_lock serial(&mutex_serial);
+			trace(1,"serial_thread_loop a/b service");
 			serviceA();
 			serviceB();
 		}
@@ -1154,6 +1160,11 @@ void * serial_thread_loop(void *d)
 				}
 				poll_parameters = &RX_poll_pairs[0];
 				while (poll_parameters->poll) {
+					// need to put thread asleep to allow other threads
+					// access to serial mutex
+					MilliSleep(1);
+
+					if (skip_polls) break;
 					check_ptt_queue();
 					if (PTT) {
 						trace(1, "PTT detected");
@@ -1174,10 +1185,13 @@ void * serial_thread_loop(void *d)
 						trace(1, "bypass_serial_thread_loop");
 						goto serial_bypass_loop;//break;
 					}
-					if (*(poll_parameters->poll) && !(poll_nbr % *(poll_parameters->poll)))
+					if (*(poll_parameters->poll) && !(poll_nbr % *(poll_parameters->poll))) {
+						guard_lock serial_lock(&mutex_serial);
 						(poll_parameters->pollfunc)();
+					}
 					poll_parameters++;
 				}
+				skip_polls = false;
 			}
 		} else {
 			if (resetxmt) {
@@ -1192,15 +1206,20 @@ void * serial_thread_loop(void *d)
 				poll_nbr++;
 				poll_parameters = &TX_poll_pairs[0];
 				while (poll_parameters->poll) {
+					MilliSleep(1);
+					if (skip_polls) break;
 					check_ptt_queue();
 					if (!PTT) {
 						trace(1, "!PTT detected");
 						goto serial_bypass_loop;//break;
 					}
-					if (*(poll_parameters->poll) && !(poll_nbr % *(poll_parameters->poll)))
+					if (*(poll_parameters->poll) && !(poll_nbr % *(poll_parameters->poll))) {
+						guard_lock serial_lock(&mutex_serial);
 						(poll_parameters->pollfunc)();
+					}
 					poll_parameters++;
 				}
+				skip_polls = false;
 			}
 		}
 serial_bypass_loop: ;
@@ -1527,6 +1546,7 @@ void CATswapAB() // called by UI action; do not need Fl::awake(...)
 	while (!queB.empty()) queB.pop();
 
 	guard_lock serial_lock(&mutex_serial);
+	trace(1,"CATswapAB()");
 	selrig->swapvfos();
 
 // Recent Icom xcvrs simply select A or B along with all of the xcvr
@@ -1614,7 +1634,8 @@ void cbAswapB()
 			queB.push(vfoB);
 		}
 	} else {
-		guard_lock serial_lock(&mutex_serial, 39);
+		guard_lock serial_lock(&mutex_serial);
+		trace(1,"cbAswapB()");
 		if (!useB) {      // vfoA is used, swap vfos and update display B
 			vfoB.freq = FreqDispB->value();
 			XCVR_STATE temp = vfoB;
@@ -1651,14 +1672,16 @@ void cbA2B()
 		return;
 	}
 	if (xcvr_name == rig_K2.name_) {
-		guard_lock serial_lock(&mutex_serial, 43);
+		guard_lock serial_lock(&mutex_serial);
+		trace(1,"cbA2B() 1");
 		vfoB = vfoA;
 		selrig->set_vfoB(vfoB.freq);
 		FreqDispB->value(vfoB.freq);
 		return;
 	}
 	if (selrig->has_a2b) {
-		guard_lock serial_lock(&mutex_serial, 44);
+		guard_lock serial_lock(&mutex_serial);
+		trace(1,"cbA2B() 2");
 		selrig->A2B();
 	}
 
@@ -1692,7 +1715,7 @@ void highlight_vfo(void *d)
 	FreqDispB->redraw();
 	btnA->redraw();
 	btnB->redraw();
-	Fl::flush();
+	Fl::check();
 }
 
 void cb_set_split(int val)
@@ -1705,39 +1728,53 @@ void cb_set_split(int val)
 
 	if (selrig->has_split_AB) {
 		guard_lock serial_lock(&mutex_serial);
+		trace(1,"cb_set_split()");
 		selrig->set_split(val);
 	}
 }
 
 void cb_selectA()
 {
-	vfoA.src = UI;
-	vfoA.freq = FreqDispA->value();
-	trace(2, "select A", printXCVR_STATE(vfoA).c_str());
-
 	guard_lock serial(&mutex_serial);
+
 	selrig->selectA();
 	useB = false;
+
 	vfo = &vfoA;
 	setModeControl((void *)0);
 	updateBandwidthControl();
 	highlight_vfo((void *)0);
+
+	XCVR_STATE nuvfo = vfoA;
+	nuvfo.src = FORCE;//UI;
+
+	trace(2, "cb_selectA() ", printXCVR_STATE(nuvfo).c_str());
+
+	guard_lock queA_lock(&mutex_queA);
+	queA.push(nuvfo);
+	skip_polls = true;
+	return;
 }
 
 void cb_selectB()
 {
-	vfoB.src = UI;
-	vfoB.freq = FreqDispB->value();
-
-	trace(2, "select B", printXCVR_STATE(vfoB).c_str());
-
 	guard_lock serial(&mutex_serial);
-	selrig->selectB();
+
 	useB = true;
+
 	vfo = &vfoB;
 	setModeControl((void *)0);
 	updateBandwidthControl();
 	highlight_vfo((void *)0);
+
+	XCVR_STATE nuvfo = vfoB;
+	nuvfo.src = FORCE;//UI;
+	trace(2, "cb_selectB() ", printXCVR_STATE(nuvfo).c_str());
+
+	guard_lock queB_lock(&mutex_queB);
+	queB.push(nuvfo);
+	skip_polls = true;
+	return;
 }
 
 void setLower()
@@ -1859,28 +1896,32 @@ void addFreq() {
 
 void cbRIT()
 {
-	guard_lock serial_lock(&mutex_serial, 54);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cbRIT()");
 	if (selrig->has_rit)
 		selrig->setRit((int)cntRIT->value());
 }
 
 void cbXIT()
 {
-	guard_lock serial_lock(&mutex_serial, 55);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cbXIT()");
 	selrig->setXit((int)cntXIT->value());
 }
 
 void cbBFO()
 {
 	if (selrig->has_bfo) {
-		guard_lock serial_lock(&mutex_serial, 56);
+		guard_lock serial_lock(&mutex_serial);
+		trace(1, "cbBFO()");
 		selrig->setBfo((int)cntBFO->value());
 	}
 }
 
 void cbAttenuator()
 {
-	guard_lock serial_lock(&mutex_serial, 57);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cbAttenuator()");
 	progStatus.attenuator = selrig->next_attenuator();
 	selrig->set_attenuator(progStatus.attenuator);
 }
@@ -1893,7 +1934,8 @@ void setAttControl(void *d)
 
 void cbPreamp()
 {
-	guard_lock serial_lock(&mutex_serial, 58);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cbPreamp()");
 	progStatus.preamp = selrig->next_preamp();
 	selrig->set_preamp(progStatus.preamp);
 }
@@ -1907,7 +1949,8 @@ void setPreampControl(void *d)
 void cbAN()
 {
 	progStatus.auto_notch = btnAutoNotch->value();
-	guard_lock serial_lock(&mutex_serial, 60);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cbAN()");
 	selrig->set_auto_notch(progStatus.auto_notch);
 }
 
@@ -1915,6 +1958,7 @@ void cbbtnNotch()
 {
 	if (!selrig->has_notch_control) return;
 	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cbbtnNotch()");
 
 	int btn, cnt = 0;
 
@@ -1937,6 +1981,7 @@ void setNotch()
 {
 	if (!selrig->has_notch_control) return;
 	guard_lock serial_lock(&mutex_serial);
+	trace(1, "setNotch()");
 
 	if (Fl::event() == FL_DRAG) {
 		inhibit_notch = true;
@@ -2018,6 +2063,7 @@ void setIFshiftControl(void *d)
 void setIFshift()
 {
 	guard_lock serial_lock(&mutex_serial);
+	trace(1, "setIFshift()");
 
 	if (Fl::event() == FL_DRAG) {
 		inhibit_shift = true;
@@ -2057,6 +2103,7 @@ void setIFshift()
 void cbIFsh()
 {
 	guard_lock serial_lock(&mutex_serial);
+	trace(1, "setIFsh()");
 
 	int btn, set, cnt = 0;
 	if (sldrIFSHIFT) {
@@ -2087,6 +2134,7 @@ void cbEventLog()
 void setVolume()
 {
 	guard_lock serial_lock(&mutex_serial);
+	trace(1, "setVolume()");
 
 	int event = Fl::event();
 	if (event == FL_DRAG) {
@@ -2113,6 +2161,7 @@ void setVolume()
 void cbMute()
 {
 	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cbMute()");
 
 	int set = 0, get, cnt = 0;
 	if (btnVol->value() == 0) {
@@ -2142,6 +2191,7 @@ void cbMute()
 void setMicGain()
 {
 	guard_lock serial_lock(&mutex_serial);
+	trace(1, "setMicGain()");
 
 	if (Fl::event() == FL_DRAG) {
 		inhibit_mic = true;
@@ -2170,6 +2220,7 @@ void setMicGain()
 void setMicGainControl(void* d)
 {
 	guard_lock serial_lock(&mutex_serial);
+	trace(1, "setMicGainControl()");
 	int val = (long)d;
 	if (sldrMICGAIN) sldrMICGAIN->value(val);
 	if (spnrMICGAIN) spnrMICGAIN->value(val);
@@ -2230,6 +2281,7 @@ void set_power_controlImage(double pwr)
 void setPower()
 {
 	guard_lock serial_lock(&mutex_serial);
+	trace(1, "setPower()");
 
 	if (Fl::event() == FL_DRAG) {
 		inhibit_power = true;
@@ -2269,7 +2321,8 @@ void setPower()
 
 void cbTune()
 {
-	guard_lock serial_lock(&mutex_serial, 62);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cbTune()");
 	selrig->tune_rig();
 }
 
@@ -2281,6 +2334,7 @@ void cbPTT()
 void setSQUELCH()
 {
 	guard_lock serial_lock(&mutex_serial);
+	trace(1, "setSQUELCH()");
 
 	if (Fl::event() == FL_DRAG) {
 		inhibit_squelch = true;
@@ -2347,6 +2401,7 @@ void cbAGC()
 {
 	if (!selrig->has_agc_control) return;
 	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cbAGC()");
 	progStatus.agc_level = selrig->incr_agc();
 	redrawAGC();
 }
@@ -2354,6 +2409,7 @@ void cbAGC()
 void setRFGAIN()
 {
 	guard_lock serial_lock(&mutex_serial);
+	trace(1, "setRFGAIN()");
 
 	if (Fl::event() == FL_DRAG) {
 		inhibit_rfgain = true;
@@ -2526,6 +2582,7 @@ void check_ptt_queue()
 		if (useB) {
 			if (set && !queA.empty()) {
 				guard_lock serial_lock(&mutex_serial);
+				trace(1, "check_ptt_queue() 1");
 				selrig->selectA();
 				useB = false;
 				serviceA();
@@ -2535,6 +2592,7 @@ void check_ptt_queue()
 		} else {
 			if (set && !queB.empty()) {
 				guard_lock serial_lock(&mutex_serial);
+				trace(1, "check_ptt_queue() 2");
 				selrig->selectB();
 				useB = true;
 				serviceB();
@@ -2550,18 +2608,24 @@ void check_ptt_queue()
 	get = selrig->get_PTT();
 	while ((get != set) && (cnt++ < 10)) {
 		MilliSleep(10);
-		{ guard_lock serial_lock(&mutex_serial); get = selrig->get_PTT(); }
+		{
+			guard_lock serial_lock(&mutex_serial);
+			trace(1, "check_ptt_queue() 3");
+			get = selrig->get_PTT();
+		}
 		Fl::awake();
 	}
 //	PTT = set;
 	Fl::awake(update_UI_PTT);
 }
 
-void update_progress(void *d)
+void update_progress(int val)
 {
-	unsigned long val = reinterpret_cast<unsigned long>(d);
+	std::cout << "update_progress(" << val << ")" << std::endl;
+
 	progress->value(val);
 	progress->redraw();
+	Fl::check();
 }
 
 int restore_progress = 0;
@@ -2577,14 +2641,14 @@ void restore_rig_vals_(XCVR_STATE &xcvrvfo)
 	if (progStatus.restore_split)
 		selrig->set_split(xcvrvfo.split);
 
-	Fl::awake(update_progress, (void*)(restore_progress += 10));
+	update_progress(restore_progress += 10);
 
 	if (progStatus.restore_power_control)
 		selrig->set_power_control(xcvrvfo.power_control);
 	if (progStatus.restore_volume)
 		selrig->set_volume_control(xcvrvfo.volume_control);
 
-	Fl::awake(update_progress, (void*)(restore_progress += 10));
+	update_progress(restore_progress += 10);
 
 	if (progStatus.restore_if_shift)
 		selrig->set_if_shift(xcvrvfo.if_shift);
@@ -2593,7 +2657,7 @@ void restore_rig_vals_(XCVR_STATE &xcvrvfo)
 	if (progStatus.restore_noise)
 		selrig->set_noise(xcvrvfo.noise);
 
-	Fl::awake(update_progress, (void*)(restore_progress += 10));
+	update_progress(restore_progress += 10);
 
 	if (progStatus.restore_nr) {
 		selrig->set_noise_reduction(xcvrvfo.nr);
@@ -2603,14 +2667,14 @@ void restore_rig_vals_(XCVR_STATE &xcvrvfo)
 	if (progStatus.restore_mic_gain)
 		selrig->set_mic_gain(xcvrvfo.mic_gain);
 
-	Fl::awake(update_progress, (void*)(restore_progress += 10));
+	update_progress(restore_progress += 10);
 
 	if (progStatus.restore_squelch)
 		selrig->set_squelch(xcvrvfo.squelch);
 	if (progStatus.restore_rf_gain)
 		selrig->set_rf_gain(xcvrvfo.rf_gain);
 
-	Fl::awake(update_progress, (void*)(restore_progress += 10));
+	update_progress(restore_progress += 10);
 
 	if (progStatus.restore_comp_on_off && progStatus.restore_comp_level)
 		selrig->set_compression(xcvrvfo.compON, xcvrvfo.compression);
@@ -2625,12 +2689,13 @@ void restore_rig_vals()
 {
 	restore_progress = 0;
 
-	guard_lock serial_lock(&mutex_serial, 65);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "restore_rig_vals()");
 
 	selrig->selectB();
 	useB = true;
 
-//	trace(2, "Restore xcvr B:\n", print(xcvr_vfoB));
+	trace(2, "Restore xcvr B:\n", print(xcvr_vfoB));
 
 	if (progStatus.restore_frequency)
 		selrig->set_vfoB(xcvr_vfoB.freq);
@@ -2643,7 +2708,7 @@ void restore_rig_vals()
 	selrig->selectA();
 	useB = false;
 
-//	trace(2, "Restore xcvr A:\n", print(xcvr_vfoA));
+	trace(2, "Restore xcvr A:\n", print(xcvr_vfoA));
 
 	if (progStatus.restore_frequency)
 		selrig->set_vfoA(xcvr_vfoA.freq);
@@ -2828,10 +2893,11 @@ void read_rig_vals()
 //	trace(2, "Read xcvr A:\n", print(xcvr_vfoA));
 }
 
-void close_UI(void *)
+void close_UI()
 {
 	{
-		guard_lock serial_lock(&mutex_serial, 67);
+		guard_lock serial_lock(&mutex_serial);
+		trace(1, "close_UI()");
 		run_serial_thread = false;
 	}
 	pthread_join(*serial_thread, NULL);
@@ -2855,27 +2921,31 @@ void close_UI(void *)
 	mainwindow->hide();
 }
 
-bool exiting = false;
 void closeRig()
 {
+	trace(1, "closeRig()");
 	restore_rig_vals();
 	selrig->shutdown();
 	close_rig = false;
-	if (exiting) {
-		Fl::awake(close_UI);
-	}
 }
 
 void cbExit()
 {
+	main_group->hide();
+	main_group->redraw();
+
+	grpInitializing->size(mainwindow->w(), mainwindow->h() - grpInitializing->y());
+	grpInitializing->show();
+	grpInitializing->redraw();
+
 	progress->label("Closing");
 	progress->redraw_label();
-	grpInitializing->resize(0, 0, mainwindow->w(), mainwindow->h());
+
 	progress->position(grpInitializing->w()/4, grpInitializing->y() + grpInitializing->h()/2);
-	progress->redraw();
-	grpInitializing->show();
 	progress->value(0);
-	main_group->hide();
+	progress->redraw();
+
+	Fl::check();
 
 	progStatus.freq_A = vfoA.freq;
 	progStatus.imode_A = vfoA.imode;
@@ -2916,13 +2986,18 @@ void cbExit()
 
 // shutdown serial thread
 
-	exiting = true;
 	{
 		guard_lock serial_lock(&mutex_serial);
+		trace(1, "shutdown serial thread");
 		close_rig = true;
+		skip_polls = true;
 	}
 
+	closeRig();
+
 	TOD_close();
+
+	close_UI();
 
 }
 
@@ -2934,7 +3009,8 @@ void cbALC_SWR()
 		meter_image = ALC_IMAGE;
 		sldrALC->show();
 		{
-			guard_lock serial_lock(&mutex_serial, 68);
+			guard_lock serial_lock(&mutex_serial);
+			trace(1, "cbALC_SWR()  1");
 			selrig->select_alc();
 		}
 	} else {
@@ -2942,7 +3018,8 @@ void cbALC_SWR()
 		meter_image = SWR_IMAGE;
 		sldrSWR->show();
 		{
-			guard_lock serial_lock(&mutex_serial, 69);
+			guard_lock serial_lock(&mutex_serial);
+			trace(1, "cbALC_SWR()  2");
 			selrig->select_swr();
 		}
 	}
@@ -4683,7 +4760,8 @@ void initRig()
 
 // disable the serial thread
 	{
-		guard_lock gl_serial(&mutex_serial, 71);
+		guard_lock gl_serial(&mutex_serial);
+		trace(1, "init_rig()");
 
 // Xcvr Auto Power on as soon as possible
 		if (selrig->has_xcvr_auto_on_off)
@@ -5030,77 +5108,89 @@ void cbAuxPort()
 
 void cb_agc_level()
 {
-	guard_lock serial_lock(&mutex_serial, 72);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cb_agc_level()");
 	selrig->set_agc_level();
 }
 
 void cb_cw_wpm()
 {
-	guard_lock serial_lock(&mutex_serial, 73);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cb_cw_wpm()");
 	selrig->set_cw_wpm();
 }
 
 void cb_cw_vol()
 {
 	guard_lock serial_lock(&mutex_serial);
-		selrig->set_cw_vol();
+	trace(1, "cb_cw_vol()");
+	selrig->set_cw_vol();
 }
 
 void cb_cw_spot()
 {
 	int ret;
-	guard_lock serial_lock(&mutex_serial, 74);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cb_cw_spot()");
 	ret = selrig->set_cw_spot();
 	if (!ret) btnSpot->value(0);
 }
 
 void cb_cw_spot_tone()
 {
-	guard_lock serial_lock(&mutex_serial, 75);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cb_cw_spot_tone()");
 	selrig->set_cw_spot_tone();
 }
 
 
 void cb_vox_gain()
 {
-	guard_lock serial_lock(&mutex_serial, 76);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cb_vox_gain()");
 	selrig->set_vox_gain();
 }
 
 void cb_vox_anti()
 {
-	guard_lock serial_lock(&mutex_serial, 77);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cb_vox_anti()");
 	selrig->set_vox_anti();
 }
 
 void cb_vox_hang()
 {
-	guard_lock serial_lock(&mutex_serial, 78);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cb_vox_hang()");
 	selrig->set_vox_hang();
 }
 
 void cb_vox_onoff()
 {
-	guard_lock serial_lock(&mutex_serial, 79);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cb_vox_onoff()");
 	selrig->set_vox_onoff();
 }
 
 void cb_vox_on_dataport()
 {
-	guard_lock serial_lock(&mutex_serial, 80);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cb_dataport()");
 	selrig->set_vox_on_dataport();
 }
 
 void cb_compression()
 {
-	guard_lock serial_lock(&mutex_serial, 81);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cb_compression");
 	selrig->set_compression(progStatus.compON, progStatus.compression);
 }
 
 void cb_auto_notch()
 {
 	progStatus.auto_notch = btnAutoNotch->value();
-	guard_lock serial_lock(&mutex_serial, 82);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cb_autonotch()");
 	selrig->set_auto_notch(progStatus.auto_notch);
 }
 
@@ -5110,7 +5200,8 @@ void cb_vfo_adj()
 		progStatus.vfo_adj = spnr_tt550_vfo_adj->value();
 	else
 		progStatus.vfo_adj = spnr_vfo_adj->value();
-	guard_lock serial_lock(&mutex_serial, 83);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cb_vfo_adj()");
 	selrig->setVfoAdj(progStatus.vfo_adj);
 }
 
@@ -5120,19 +5211,22 @@ void cb_line_out()
 
 void cb_bpf_center()
 {
-	guard_lock serial_lock(&mutex_serial, 84);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cb_bpf_center()");
 	selrig->set_if_shift(selrig->pbt);
 }
 
 void cb_special()
 {
-	guard_lock serial_lock(&mutex_serial, 85);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cb_special()");
 	selrig->set_special(btnSpecial->value());
 }
 
 void cbNoise()
 {
 	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cbNoise()");
 
 	int btn, get, cnt = 0;
 
@@ -5155,6 +5249,7 @@ void cb_nb_level()
 	int set = 0, get, cnt = 0;
 
 	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cb_nb_level()");
 
 	if (Fl::event() == FL_DRAG) {
 		inhibit_nb_level = true;
@@ -5179,6 +5274,7 @@ void cbNR()
 {
 	if (!selrig->has_noise_reduction_control) return;
 	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cbNR()");
 
 	int btn = 0, set = 0, get, cnt = 0;
 	if (sldrNR) {
@@ -5240,6 +5336,7 @@ void setNR()
 {
 	if (!selrig->has_noise_reduction_control) return;
 	guard_lock serial_lock(&mutex_serial);
+	trace(1, "setNR()");
 
 	int btn = 0, get = 0, set = 0, cnt = 0;
 
@@ -5297,49 +5394,56 @@ void setNR()
 
 void cb_spot()
 {
-	guard_lock serial_lock(&mutex_serial, 87);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cb_spot()");
 	selrig->set_cw_spot();
 }
 
 void cb_enable_keyer()
 {
-	guard_lock serial_lock(&mutex_serial, 88);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cb_enable_keyer()");
 	selrig->enable_keyer();
 }
 
 void cb_enable_break_in()
 {
-	guard_lock serial_lock(&mutex_serial, 89);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cb_enable_break_in()");
 	selrig->enable_break_in();
 }
 
 void cb_cw_weight()
 {
-	guard_lock serial_lock(&mutex_serial, 89);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cb_cw_weight()");
 	selrig->set_cw_weight();
 }
 
 void cb_cw_qsk()
 {
-	guard_lock serial_lock(&mutex_serial, 90);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cb_cw_qsk()");
 	selrig->set_cw_qsk();
 }
 
 void cb_cw_delay()
 {
-	guard_lock serial_lock(&mutex_serial, 90);
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cb_cw_delay()");
 	selrig->set_cw_delay();
 }
 
 void cbBandSelect(int band)
 {
 // bypass local
-	{ guard_lock gl_serial(&mutex_serial, 91);
+	{ guard_lock gl_serial(&mutex_serial);
+		trace(1, "cbBandSelect(...) 1");
 		bypass_serial_thread_loop = true;
 	}
 	{
-		guard_lock gl_serial(&mutex_serial, 92);
-
+		guard_lock gl_serial(&mutex_serial);
+		trace(1, "cbBandSelect(...) 2");
 	selrig->set_band_selection(band);
 	MilliSleep(100);	// rig sync-up
 // get freqmdbw
@@ -5376,7 +5480,8 @@ void cbBandSelect(int band)
 	}
 
 // enable local
-	guard_lock gl_serial(&mutex_serial, 94);
+	guard_lock gl_serial(&mutex_serial);
+	trace(1, "cbBandSelect() 3");
 	bypass_serial_thread_loop = false;
 }
 
