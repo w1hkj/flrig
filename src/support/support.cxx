@@ -4594,6 +4594,7 @@ void init_VFOs()
 		highlight_vfo((void *)0);
 		useB = false;
 	}
+	selrig->set_split(0);
 }
 
 void init_IC7300_special()
