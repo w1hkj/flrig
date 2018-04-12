@@ -978,10 +978,14 @@ void serviceA()
 				trace(2, "set alt VFO A", printXCVR_STATE(nuvals).c_str());
 			} else {
 				selrig->selectA();
+				useB = false;
 				if (vfoA.freq != nuvals.freq) selrig->set_vfoA(nuvals.freq);
 				if (vfoA.imode != nuvals.imode) selrig->set_modeA(nuvals.imode);
 				if (vfoA.iBW != nuvals.iBW) selrig->set_bwA(nuvals.iBW);
-				if (queA.empty()) selrig->selectB();
+				if (queA.empty()) {
+					selrig->selectB();
+					useB = true;
+				}
 				vfoA = nuvals;
 				trace(2, "set B: ", printXCVR_STATE(nuvals).c_str());
 			}
@@ -1048,10 +1052,14 @@ void serviceB()
 				trace(2, "set alt VFO B", printXCVR_STATE(nuvals).c_str());
 			} else {
 				selrig->selectB();
+				useB = true;
 				if (vfoB.freq != nuvals.freq) selrig->set_vfoB(nuvals.freq);
 				if (vfoB.imode != nuvals.imode) selrig->set_modeB(nuvals.imode);
 				if (vfoB.iBW != nuvals.iBW) selrig->set_bwB(nuvals.iBW);
-				if (queB.empty()) selrig->selectA();
+				if (queB.empty()) {
+					selrig->selectA();
+					useB = false;
+				}
 				vfoB = nuvals;
 				trace(2, "set B: ", printXCVR_STATE(nuvals).c_str());
 			}
@@ -1549,6 +1557,7 @@ void CATswapAB() // called by UI action; do not need Fl::awake(...)
 
 	} else {
 		selrig->selectB();
+		useB = true;
 
 		vfoB.freq = selrig->get_vfoB();
 		vfoB.imode = selrig->get_modeB();
@@ -1557,6 +1566,7 @@ void CATswapAB() // called by UI action; do not need Fl::awake(...)
 		FreqDispB->redraw();
 
 		selrig->selectA();
+		useB = false;
 
 		vfoA.freq = selrig->get_vfoA();
 		vfoA.imode = selrig->get_modeA();
@@ -2519,8 +2529,8 @@ void check_ptt_queue()
 				selrig->selectA();
 				useB = false;
 				serviceA();
-				useB = true;
 				selrig->selectB();
+				useB = true;
 			}
 		} else {
 			if (set && !queB.empty()) {
@@ -2528,8 +2538,8 @@ void check_ptt_queue()
 				selrig->selectB();
 				useB = true;
 				serviceB();
-				useB = false;
 				selrig->selectA();
+				useB = false;
 			}
 		}
 	}
@@ -2618,6 +2628,7 @@ void restore_rig_vals()
 	guard_lock serial_lock(&mutex_serial, 65);
 
 	selrig->selectB();
+	useB = true;
 
 //	trace(2, "Restore xcvr B:\n", print(xcvr_vfoB));
 
@@ -2630,6 +2641,7 @@ void restore_rig_vals()
 	restore_rig_vals_(xcvr_vfoB);
 
 	selrig->selectA();
+	useB = false;
 
 //	trace(2, "Restore xcvr A:\n", print(xcvr_vfoA));
 
@@ -2778,6 +2790,7 @@ void read_rig_vals()
 // no guard_lock ... this function called from within a guard_lock block
 
 	selrig->selectB();
+	useB = true;
 
 	if (selrig->has_get_info)
 		selrig->get_info();
@@ -2795,6 +2808,7 @@ void read_rig_vals()
 //	trace(2, "Read xcvr B:\n", print(xcvr_vfoB));
 
 	selrig->selectA();
+	useB = false;
 
 	if (selrig->has_get_info)
 		selrig->get_info();
@@ -3646,6 +3660,7 @@ void initXcvrTab()
 void init_TT550()
 {
 	selrig->selectA();
+	useB = false;
 
 	vfoB.freq = progStatus.freq_B;
 	vfoB.imode = progStatus.imode_B;
@@ -4547,13 +4562,16 @@ void init_VFOs()
 	}
 
 	if (!progStatus.use_rig_data) {
+
 		vfoB.freq = progStatus.freq_B;
 		vfoB.imode = progStatus.imode_B;
 		vfoB.iBW = progStatus.iBW_B;
 		if (vfoB.iBW == -1)
 			vfoB.iBW = selrig->def_bandwidth(vfoB.imode);
 		FreqDispB->value(vfoB.freq);
+
 		selrig->selectB();
+		useB = true;
 		selrig->set_vfoB(vfoB.freq);
 		selrig->set_modeB(vfoB.imode);
 		selrig->set_bwB(vfoB.iBW);
@@ -4564,7 +4582,9 @@ void init_VFOs()
 		if (vfoA.iBW == -1)
 			vfoA.iBW = selrig->def_bandwidth(vfoA.imode);
 		FreqDispA->value( vfoA.freq );
+
 		selrig->selectA();
+		useB = false;
 		selrig->set_vfoA(vfoA.freq);
 		selrig->set_modeA(vfoA.imode);
 		selrig->set_bwA(vfoA.iBW);
@@ -4575,6 +4595,7 @@ void init_VFOs()
 		useB = false;
 	} else {
 		selrig->selectB();
+		useB = true;
 		vfoB.freq = selrig->get_vfoB();
 		vfoB.imode = selrig->get_modeB();
 		vfoB.iBW = selrig->get_bwB();
@@ -4582,6 +4603,7 @@ void init_VFOs()
 		trace(2, "B: ", printXCVR_STATE(vfoB).c_str());
 
 		selrig->selectA();
+		useB = false;
 		vfoA.freq = selrig->get_vfoA();
 		vfoA.imode = selrig->get_modeA();
 		vfoA.iBW = selrig->get_bwA();
@@ -4592,7 +4614,6 @@ void init_VFOs()
 		setModeControl((void *)0);
 		updateBandwidthControl();
 		highlight_vfo((void *)0);
-		useB = false;
 	}
 	selrig->set_split(0);
 }

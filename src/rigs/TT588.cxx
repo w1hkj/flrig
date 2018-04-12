@@ -307,11 +307,11 @@ int RIG_TT588::get_modeA()
 int RIG_TT588::get_modeB()
 {
 	cmd = TT588getMODE;
-	int ret = waitN(4, 100, "get mode A");
+	int ret = waitN(4, 100, "get mode B");
 	if (ret < 4) return modeB;
 	size_t p = replystr.rfind("M");
 	if (p == string::npos) return modeB;
-	modeB = replystr[p + 1] - '0';
+	modeB = replystr[p + 2] - '0';
 	return modeB;
 }
 

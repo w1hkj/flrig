@@ -214,11 +214,11 @@ void RIG_IC7300::initialize()
 	IC7300_widgets[10].W = sldrNOTCH;
 	IC7300_widgets[11].W = sldrMICGAIN;
 	IC7300_widgets[12].W = sldrPOWER;
-	selectA();
-	get_modeA();
-	selectB();
-	get_modeB();
-	selectA();
+//	selectA();
+//	get_modeA();
+//	selectB();
+//	get_modeB();
+//	selectA();
 }
 
 static inline void minmax(int min, int max, int &val)
@@ -371,13 +371,18 @@ int RIG_IC7300::get_modeA()
 	int md = 0;
 	size_t p;
 
-	cmd.assign(pre_to).append("\x26");
-	if (useB) cmd += '\x01';
-	else      cmd += '\x00';
-	cmd.append(post);
-
 	string resp;
+	cmd.assign(pre_to).append("\x26");
 	resp.assign(pre_fm).append("\x26");
+
+	if (useB) {
+		cmd += '\x01';
+		resp += '\x01';
+	} else {
+		cmd += '\x00';
+		resp += '\x00';
+	}
+	cmd.append(post);
 
 	if (waitFOR(10, "get mode A")) {
 		p = replystr.rfind(resp);
@@ -410,6 +415,7 @@ void RIG_IC7300::set_modeA(int val)
 	cmd += '\x26';
 	if (useB) cmd += '\x01';  // inactive vfo
 	else      cmd += '\x00';  // active vfo
+
 	cmd += IC7300_mode_nbr[val];
 	if (val > 7) cmd += '\x01';
 	else cmd += '\x00';
@@ -423,13 +429,18 @@ int RIG_IC7300::get_modeB()
 	int md = 0;
 	size_t p;
 
-	cmd.assign(pre_to).append("\x26");
-	if (useB) cmd += '\x00';
-	else      cmd += '\x01';
-	cmd.append(post);
-
 	string resp;
+	cmd.assign(pre_to).append("\x26");
 	resp.assign(pre_fm).append("\x26");
+
+	if (useB) {
+		cmd += '\x00';   // active vfo
+		resp += '\x00';
+	} else {
+		cmd += '\x01';   // inactive vfo
+		resp += '\x01';
+	}
+	cmd.append(post);
 
 	if (waitFOR(10, "get mode B")) {
 		p = replystr.rfind(resp);
