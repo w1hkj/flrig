@@ -1012,11 +1012,12 @@ bool status::loadXcvrState(string xcvr)
 //		if (spref.get("fldigi_is_server", i,i)) fldigi_is_server = i;
 
 		if (spref.get("hrd_buttons", i, i)) hrd_buttons = i;
+
+		LOG_INFO("%s", info().c_str());
+
+		return true;
 	}
-
-	LOG_INFO("%s", info().c_str());
-
-	return true;
+	return false;
 }
 
 void status::loadLastState()
@@ -1034,7 +1035,7 @@ void status::loadLastState()
 	}
 	xcvrpref.get("xml_port", xmlport, xmlport);
 
-	loadXcvrState(xcvr_name.c_str());
+	loadXcvrState(xcvr_name);
 }
 
 void status::UI_laststate()

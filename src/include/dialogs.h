@@ -18,6 +18,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
+#ifndef __DIALOGS_H__
+#define __DIALOGS_H__
+
 #include <string>
 
 #include "font_browser.h"
@@ -30,4 +33,6 @@ extern Fl_Double_Window *dlgControls;
 
 extern Font_Browser     *fntbrowser;
 
+extern void init_port_combos();
 
+#endif // __DIALOGS_H__

@@ -250,7 +250,7 @@ void read_vfo()
 	trace(1,"read_vfo()");
 	long  freq;
 	if (!useB) { // vfo-A
-		trace(2, "!useB", "get vfo A");
+		trace(2, "vfoA active", "get vfo A");
 		freq = selrig->get_vfoA();
 		if (freq != vfoA.freq) {
 			vfoA.freq = freq;
@@ -258,7 +258,7 @@ void read_vfo()
 			vfo = &vfoA;
 		}
 		if ( selrig->twovfos() ) {
-			trace(2, "!useB", "get vfo B");
+			trace(2, "vfoA active", "get vfo B");
 			freq = selrig->get_vfoB();
 			if (freq != vfoB.freq) {
 				vfoB.freq = freq;
@@ -266,7 +266,7 @@ void read_vfo()
 			}
 		}
 	} else { // vfo-B
-		trace(2, "useB", "get vfo B");
+		trace(2, "vfoB active", "get vfo B");
 		freq = selrig->get_vfoB();
 		if (freq != vfoB.freq) {
 			vfoB.freq = freq;
@@ -274,7 +274,7 @@ void read_vfo()
 			vfo = &vfoB;
 		}
 		if ( selrig->twovfos() ) {
-			trace(2, "useB", "get vfo A");
+			trace(2, "vfoB active", "get vfo A");
 			freq = selrig->get_vfoA();
 			if (freq != vfoA.freq) {
 				vfoA.freq = freq;
@@ -386,6 +386,7 @@ void read_mode()
 	int nu_mode;
 	int nu_BW;
 	if (!useB) {
+		trace(2, "vfoA active", "get_modeA()");
 		nu_mode = selrig->get_modeA();
 		if (nu_mode != vfoA.imode) {
 			{
@@ -399,6 +400,7 @@ void read_mode()
 			Fl::awake(setModeControl);
 		}
 	} else {
+		trace(2, "vfoB active", "get_modeB()");
 		nu_mode = selrig->get_modeB();
 		if (nu_mode != vfoB.imode) {
 			{
@@ -450,12 +452,14 @@ void read_bandwidth()
 	trace(1,"read_bandwidth()");
 	int nu_BW;
 	if (!useB) {
+		trace(2, "vfoA active", "get_bwA()");
 		nu_BW = selrig->get_bwA();
 		if (nu_BW != vfoA.iBW) {
 			vfoA.iBW = vfo->iBW = nu_BW;
 			Fl::awake(setBWControl);
 		}
 	} else {
+		trace(2, "vfoB active", "get_bwA()");
 		nu_BW = selrig->get_bwB();
 		if (nu_BW != vfoB.iBW) {
 			vfoB.iBW = vfo->iBW = nu_BW;
@@ -1124,7 +1128,7 @@ return NULL;
 		check_ptt_queue();
 		{
 			guard_lock serial(&mutex_serial);
-			trace(1,"serial_thread_loop a/b service");
+//			trace(1,"serial_thread_loop a/b service");
 			serviceA();
 			serviceB();
 		}
@@ -1760,6 +1764,7 @@ void cb_selectB()
 {
 	guard_lock serial(&mutex_serial);
 
+	selrig->selectB();
 	useB = true;
 
 	vfo = &vfoB;
@@ -2621,8 +2626,6 @@ void check_ptt_queue()
 
 void update_progress(int val)
 {
-	std::cout << "update_progress(" << val << ")" << std::endl;
-
 	progress->value(val);
 	progress->redraw();
 	Fl::check();
@@ -2853,6 +2856,7 @@ void read_rig_vals_(XCVR_STATE &xcvrvfo)
 void read_rig_vals()
 {
 // no guard_lock ... this function called from within a guard_lock block
+	trace(1, "read_rig_vals()");
 
 	selrig->selectB();
 	useB = true;
@@ -2870,7 +2874,7 @@ void read_rig_vals()
 
 	read_rig_vals_(xcvr_vfoB);
 
-//	trace(2, "Read xcvr B:\n", print(xcvr_vfoB));
+	trace(2, "Read xcvr B:\n", print(xcvr_vfoB));
 
 	selrig->selectA();
 	useB = false;
@@ -2890,7 +2894,7 @@ void read_rig_vals()
 		redrawAGC();
 	}
 
-//	trace(2, "Read xcvr A:\n", print(xcvr_vfoA));
+	trace(2, "Read xcvr A:\n", print(xcvr_vfoA));
 }
 
 void close_UI()
@@ -4643,8 +4647,13 @@ void init_VFOs()
 		vfoB.freq = progStatus.freq_B;
 		vfoB.imode = progStatus.imode_B;
 		vfoB.iBW = progStatus.iBW_B;
+
+trace(2, "init_VFOs() 1 : vfoB ", printXCVR_STATE(vfoB).c_str());
+
 		if (vfoB.iBW == -1)
 			vfoB.iBW = selrig->def_bandwidth(vfoB.imode);
+trace(2, "init_VFOs() 2 : vfoB ", printXCVR_STATE(vfoB).c_str());
+
 		FreqDispB->value(vfoB.freq);
 
 		selrig->selectB();
@@ -4656,8 +4665,14 @@ void init_VFOs()
 		vfoA.freq = progStatus.freq_A;
 		vfoA.imode = progStatus.imode_A;
 		vfoA.iBW = progStatus.iBW_A;
+
+trace(2, "init_VFOs() 1 vfoA ", printXCVR_STATE(vfoA).c_str());
+
 		if (vfoA.iBW == -1)
 			vfoA.iBW = selrig->def_bandwidth(vfoA.imode);
+
+trace(2, "init_VFOs() 2 vfoA ", printXCVR_STATE(vfoA).c_str());
+
 		FreqDispA->value( vfoA.freq );
 
 		selrig->selectA();
@@ -4836,6 +4851,7 @@ void initRig()
 	grpInitializing->hide();
 	main_group->show();
 	mainwindow->redraw();
+	Fl::check();
 
 	xcvr_initialized = true;
 	return;
@@ -4862,47 +4878,49 @@ void initConfigDialog()
 {
 	int picked = selectRig->index();
 	rigbase *srig = rigs[picked];
-	string xcvr_name = srig->name_;
-	selectCommPort->index(0);
+	xcvr_name = srig->name_;
 
-	selectCommPort->value(progStatus.xcvr_serial_port.c_str());
-	btnOneStopBit->value( progStatus.stopbits == 1 );
-	btnTwoStopBit->value( progStatus.stopbits == 2 );
+	if (!progStatus.loadXcvrState(xcvr_name) ) {
 
-	mnuBaudrate->index( srig->comm_baudrate );
-	btnOneStopBit->value( srig->stopbits == 1 );
-	btnTwoStopBit->value( srig->stopbits == 2 );
-	cntRigCatRetries->value( srig->comm_retries );
-	cntRigCatTimeout->value( srig->comm_timeout );
-	cntRigCatWait->value( srig->comm_wait );
-	btnRigCatEcho->value( srig->comm_echo );
-	btncatptt->value( srig->comm_catptt );
-	btnrtsptt->value( srig->comm_rtsptt );
-	btndtrptt->value( srig->comm_dtrptt );
-	chkrtscts->value( srig->comm_rtscts );
-	btnrtsplus->value( srig->comm_rtsplus );
-	btndtrplus->value( srig->comm_dtrplus );
+		selectCommPort->index(0);
+		mnuBaudrate->index( srig->comm_baudrate );
+		btnOneStopBit->value( srig->stopbits == 1 );
+		btnTwoStopBit->value( srig->stopbits == 2 );
+		cntRigCatRetries->value( srig->comm_retries );
+		cntRigCatTimeout->value( srig->comm_timeout );
+		cntRigCatWait->value( srig->comm_wait );
+		btnRigCatEcho->value( srig->comm_echo );
+		btncatptt->value( srig->comm_catptt );
+		btnrtsptt->value( srig->comm_rtsptt );
+		btndtrptt->value( srig->comm_dtrptt );
+		chkrtscts->value( srig->comm_rtscts );
+		btnrtsplus->value( srig->comm_rtsplus );
+		btndtrplus->value( srig->comm_dtrplus );
 
-	if (xcvr_name.find("IC") == 0) {
-		char hexstr[8];
-		snprintf(hexstr, sizeof(hexstr), "0x%2X", srig->CIV);
-		txtCIV->value(hexstr);
-		txtCIV->activate();
-		btnCIVdefault->activate();
-		if (xcvr_name == rig_IC7200.name_ ||
-			xcvr_name == rig_IC7300.name_ ||
-			xcvr_name == rig_IC7600.name_ ||
-			xcvr_name == rig_IC7800.name_) {
-			btnUSBaudio->value(progStatus.USBaudio = true);
-			btnUSBaudio->activate();
-		} else
+		if (xcvr_name.find("IC") == 0) {
+			char hexstr[8];
+			snprintf(hexstr, sizeof(hexstr), "0x%2X", srig->CIV);
+			txtCIV->value(hexstr);
+			txtCIV->activate();
+			btnCIVdefault->activate();
+			if (xcvr_name == rig_IC7200.name_ ||
+				xcvr_name == rig_IC7300.name_ ||
+				xcvr_name == rig_IC7600.name_ ||
+				xcvr_name == rig_IC7800.name_) {
+				btnUSBaudio->value(progStatus.USBaudio = true);
+				btnUSBaudio->activate();
+			} else
+				btnUSBaudio->deactivate();
+		} else {
+			txtCIV->value("");
+			txtCIV->deactivate();
+			btnCIVdefault->deactivate();
+			btnUSBaudio->value(false);
 			btnUSBaudio->deactivate();
+		}
 	} else {
-		txtCIV->value("");
-		txtCIV->deactivate();
-		btnCIVdefault->deactivate();
-		btnUSBaudio->value(false);
-		btnUSBaudio->deactivate();
+		initStatusConfigDialog();
+		std::cout << progStatus.info();
 	}
 }
 
@@ -4936,8 +4954,6 @@ void initStatusConfigDialog()
 	btnSepDTRptt->value(progStatus.sep_dtrptt);
 	btnSepRTSplus->value(progStatus.sep_rtsplus);
 	btnSepRTSptt->value(progStatus.sep_rtsptt);
-
-	init_title();
 
 	if (progStatus.use_tcpip) {
 		box_xcvr_connect->color(FL_BACKGROUND2_COLOR);
@@ -4974,9 +4990,9 @@ void initStatusConfigDialog()
 		}
 	}
 
-	initRig();
-
 	init_title();
+
+	initRig();
 
 }
 

@@ -446,17 +446,6 @@ extern FILE *serlog;
 		exit(EXIT_FAILURE);
 	}
 
-//	TOD_init();
-
-//	if (progStatus.fldigi_is_server) {
-//		open_rig_xmlrpc();
-//		digi_thread = new pthread_t;      
-//		if (pthread_create(digi_thread, NULL, digi_loop, NULL)) {
-//			perror("pthread_create");
-//			exit(EXIT_FAILURE);
-//		}
-//	} else
-
 	start_server(xmlport);
 
 	createXcvrDialog();

@@ -18,6 +18,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
+#include "dialogs.h"
+
 Fl_Tabs *tabsConfig = (Fl_Tabs *)0;
 Fl_Group *tabPrimary = (Fl_Group *)0;
 Fl_ComboBox *selectRig = (Fl_ComboBox *)0;
@@ -738,6 +740,11 @@ static void cb_restore(Fl_Check_Button *btn, void*)
 	progStatus.use_rig_data = btnUseRigData->value();
 }
 
+void cb_comports(Fl_Button *b, void* d)
+{
+	init_port_combos();
+}
+
 Fl_Double_Window* XcvrDialog() {
 
 Fl_Double_Window* w = new Fl_Double_Window(480, 255, _("I/O Ports"));
@@ -763,7 +770,14 @@ Fl_Double_Window* w = new Fl_Double_Window(480, 255, _("I/O Ports"));
 			selectRig->when(FL_WHEN_RELEASE);
 			selectRig->end();
 
-			selectCommPort = new Fl_ComboBox(80, 65, 190, 22, _("Ser. Port"));
+			Fl_Button *comports = new Fl_Button(xcr_grp1->x()+4, 65,
+							80 - xcr_grp1->x() - 8, 22, _("Ser Port"));
+			comports->box(FL_THIN_UP_BOX);
+			comports->tooltip(_("Update serial port combo"));
+			comports->callback((Fl_Callback*)cb_comports);
+			comports->when(FL_WHEN_RELEASE);
+
+			selectCommPort = new Fl_ComboBox(80, 65, 190, 22, "");
 			selectCommPort->tooltip(_("Xcvr serial port"));
 			selectCommPort->box(FL_DOWN_BOX);
 			selectCommPort->color(FL_BACKGROUND2_COLOR);
@@ -773,7 +787,7 @@ Fl_Double_Window* w = new Fl_Double_Window(480, 255, _("I/O Ports"));
 			selectCommPort->labelsize(14);
 			selectCommPort->labelcolor(FL_FOREGROUND_COLOR);
 			selectCommPort->callback((Fl_Callback*)cb_selectCommPort);
-			selectCommPort->align(Fl_Align(FL_ALIGN_LEFT));
+			selectCommPort->align(Fl_Align(FL_ALIGN_CENTER));
 			selectCommPort->when(FL_WHEN_RELEASE);
 			selectCommPort->end();
 
