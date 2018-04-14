@@ -20,7 +20,10 @@
 
 #include <mutex>
 #include <condition_variable>
-#include <chrono>
+#include <chrono>	// TBD DJW - For timestamps.
+#include <ctime>	// TBD DJW - For timestamps.
+#include <iostream>	// TBD DJW - For timestamps.
+#include <iomanip>	// TBD DJW - For timestamps.
 #include "ICbase.h"
 #include "debug.h"
 #include "support.h"
@@ -30,6 +33,39 @@
 #include "status.h"
 
 using namespace std::chrono;
+
+// TBD DJW - Temporary while I figure out performance. This and ic7300_jig both
+// use a system_clock so timestamps can be compared while both programs are
+// running.
+class timestamp {
+	public:
+		void print(ostream &out) const
+		{
+			system_clock::time_point now;
+			system_clock::duration   dtn;
+			time_t                   now_c;
+			int                      tenth_ms;
+
+			now = system_clock::now();
+			dtn = now.time_since_epoch();
+			tenth_ms = (dtn.count() % system_clock::period::den) / 100000;
+			now_c = system_clock::to_time_t(now);
+
+			out << std::put_time(localtime(&now_c), "%T") << '.' << setfill('0') << setw(4) << tenth_ms;
+		}
+};
+
+ostream &operator<<(ostream &out, const timestamp &obj)
+{
+	obj.print(out);
+	return out;
+}
+
+// TBD DJW - Carefully check that replystr is always protected.
+mutex              civ_response_mutex;
+condition_variable civ_response_present;
+bool               civ_response_ready = false;
+system_clock::time_point t0;
 
 bool RIG_ICOM::listenThreadRunning = false;
 pthread_t RIG_ICOM::listenThread;
@@ -103,6 +139,8 @@ void RIG_ICOM::checkresponse()
 
 bool RIG_ICOM::sendICcommand(string cmd, int nbr)
 {
+	std::cout << timestamp() << "sendICcommand:" << std::endl;
+
 	int ret = sendCommand(cmd);
 
 	if (!progStatus.use_tcpip && !RigSerial->IsOpen())
@@ -131,6 +169,8 @@ bool RIG_ICOM::sendICcommand(string cmd, int nbr)
 
 void RIG_ICOM::delayCommand(string cmd, int wait)
 {
+	std::cout << timestamp() << "delayCommand:" << std::endl;
+
 	int oldwait = progStatus.comm_wait;
 	progStatus.comm_wait += wait;
 	sendCommand(cmd);
@@ -254,7 +294,6 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 #endif
 
 	char sztemp[100];
-	string returned = "";
 	string tosend = cmd;
 	int repeat = 0;
 	size_t num = n;
@@ -266,7 +305,7 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 		progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0) / 10;
 
 	if (!progStatus.use_tcpip && !RigSerial->IsOpen()) {
-		replystr = returned;
+		// TBD DJW - Fix this. replystr = returned;
 //	  snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
 //	  showresp(DEBUG, HEX, sztemp, tosend, returned);
 #ifdef IC_DEBUG
@@ -277,20 +316,20 @@ civ.close();
 		return false;
 	}
 	for (repeat = 0; repeat < progStatus.comm_retries; repeat++) {
+
+		std::cout << timestamp() << ": waitFOR:" << std::endl;
+
 		sendCommand(tosend, 0);
-		returned = "";
 		readICResponse(wait_msec);
-		returned.append(replystr);
-		if (returned.length() >= num) {
-			replystr = returned;
+		if (replystr.length() >= num) {
 			unsigned long int waited = zmsec() - tod_start;
 			snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, OK  ", sz, waited);
-			showresp(DEBUG, HEX, sztemp, tosend, returned);
+			showresp(DEBUG, HEX, sztemp, tosend, replystr);
 
 #ifdef IC_DEBUG
 civ << sztemp << std::endl;
 civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-civ << "    " << str2hex(returned.c_str(), returned.length()) << std::endl;
+civ << "    " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
 civ.close();
 #endif
 			return true;
@@ -300,10 +339,9 @@ civ.close();
 	}
 
 	waitcount++;
-	replystr = returned;
 	unsigned long int waited = zmsec() - tod_start;
 	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %ld ms", sz, waited);
-	showresp(ERR, HEX, sztemp, tosend, returned);
+	showresp(ERR, HEX, sztemp, tosend, replystr);
 
 	if (waitcount > 4 && !timeout_alert) {
 		timeout_alert = true;
@@ -316,7 +354,7 @@ civ.close();
 #ifdef IC_DEBUG
 civ << sztemp << std::endl;
 civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-civ << "    " << str2hex(returned.c_str(), returned.length()) << std::endl;
+civ << "    " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
 civ.close();
 #endif
 	return false;
@@ -342,71 +380,21 @@ void RIG_ICOM::A2B()
 	waitFB("Equalize vfos");
 }
 
-mutex              civ_response_mutex;
-condition_variable civ_response_present;
-bool               civ_response_ready = false;
-string             civ_response;
-high_resolution_clock::time_point t0;
-
 int RIG_ICOM::readICResponse(int wait_msec)
 {
-  	high_resolution_clock::time_point t;
-  	duration<double, milli> time_span;
-
 	unique_lock<mutex> lk(civ_response_mutex);
 	civ_response_present.wait(lk, []{return civ_response_ready;});
 	civ_response_ready = false;
 
-	t = high_resolution_clock::now();
-	time_span = t - t0;
-	printf("    readICResponse t=%f:", time_span.count());
-	for(size_t n = 0; n < civ_response.length(); n++) {
-		printf(" %02X", (unsigned char)civ_response[n]);
+	std::cout << timestamp() << ": readICResponse: ";
+	for(size_t n = 0; n < replystr.length(); n++) {
+		printf(" %02X", (unsigned char)replystr[n]);
 	}
 	putchar('\n');
 
 	lk.unlock();
 	civ_response_present.notify_one();
 
-//	for (cnt = 0; cnt < wait_msec; cnt++) {
-//		readICResponse();
-//		returned.append(replystr);
-//		if (returned.find(ok) != string::npos) {
-//			replystr = returned;
-//			unsigned long int waited = zmsec() - tod_start;
-//			snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, OK", sz, waited);
-//			if (repeat)
-//				showresp(WARN, HEX, sztemp, tosend, returned);
-//			else
-//				showresp(DEBUG, HEX, sztemp, tosend, returned);
-//
-//			waitcount = 0;
-//#ifdef IC_DEBUG
-//civ << sztemp << std::endl;
-//civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-//civ << "    " << str2hex(returned.c_str(), returned.length()) << std::endl;
-//civ.close();
-//#endif
-//			return true;
-//		}
-//		if (returned.find(bad) != string::npos) {
-//			replystr = returned;
-//			unsigned long int waited = zmsec() - tod_start;
-//			snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, FAIL", sz, waited);
-//			showresp(ERR, HEX, sztemp, tosend, returned);
-//			waitcount = 0;
-//
-//#ifdef IC_DEBUG
-//civ << sztemp << std::endl;
-//civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-//civ << "    " << str2hex(returned.c_str(), returned.length()) << std::endl;
-//civ.close();
-//#endif
-//			return false;
-//		}
-//		MilliSleep(10);
-//		Fl::awake();
-//	}
 	return 0;
 }
 
@@ -418,11 +406,6 @@ void *RIG_ICOM::CIV_listen_thread_loop(void *p)
 	static string s;
 	static bool saved = false;
 
-  	high_resolution_clock::time_point t;
-  	duration<double, milli> time_span;
-
-	t0 = high_resolution_clock::now();
-
 	puts("Listen Thread Starting");
 
 	while(listenThreadRunning) {
@@ -431,7 +414,7 @@ void *RIG_ICOM::CIV_listen_thread_loop(void *p)
 
 		if(nread) {
 
-			printf("serialListenThreadLoop: read %d bytes:\n", (int)nread);
+			std::cout << timestamp() << ": serialListenThreadLoop: read " << nread << " bytes:" << std::endl;
 
 			start_position = 0;
 			while(string::npos != (end_position = replystr.find((char)0xFD, start_position))) {
@@ -445,15 +428,15 @@ void *RIG_ICOM::CIV_listen_thread_loop(void *p)
 					s.assign(replystr, start_position, length);
 				}
 
-				civ_response.assign(s);
+				replystr.assign(s);
 				{
 					lock_guard<mutex> lk(civ_response_mutex);
 					civ_response_ready = true;
-					t = high_resolution_clock::now();
-					time_span = t - t0;
-					printf("  t=%f mS, s=%3d, e=%3d, l=%3d, sl=%3d\n",
-							time_span.count(), (int)start_position, (int)end_position, (int)length, (int)s.length());
-
+					std::cout << timestamp() <<
+						": s="  << start_position << 
+						", e="  << end_position   <<
+						", l="  << length         <<
+						", sl=" << s.length()     << std::endl;
 				}
 				civ_response_present.notify_one();
 
@@ -465,11 +448,9 @@ void *RIG_ICOM::CIV_listen_thread_loop(void *p)
 				start_position = end_position + 1;
 			}
 
-			printf("  start = %3d, end = %3d\n", (int)start_position, (int)end_position);
-
 			if(start_position < nread) {
 				// TBD DJW - Have not seen this yet. Need a way to cause it to test it.
-				puts("  *** SAVING ***");
+				puts("*** SAVING ***");
 				saved = true;
 				s.assign(replystr, start_position, string::npos);
 			}
