@@ -87,7 +87,7 @@ public:
 	void set_cw_spot_tone();
 	void set_cw_vol();
 
-	const char **bwtable(int m) {return bandwidths_;}
+	const char **bwtable(int m);
 
 	void get_pc_min_max_step(double &min, double &max, double &step) {
 		min = 5; max = 200; step = 1; }

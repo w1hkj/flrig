@@ -149,7 +149,7 @@ public:
 
 //	bool hasA2b() { return true; }
 
-	const char **bwtable(int m) {return bandwidths_;}
+	const char **bwtable(int m);
 
 	void set_PTT_control(int val);
 	int  get_PTT();

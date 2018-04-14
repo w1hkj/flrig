@@ -21,6 +21,9 @@
 // ----------------------------------------------------------------------------
 
 #include "IC7300.h"
+#include "support.h"
+
+#define EMULATE 0 // emulate 7200 operations
 
 //=============================================================================
 // IC-7300
@@ -126,10 +129,10 @@ RIG_IC7300::RIG_IC7300() {
 	widgets = IC7300_widgets;
 
 	A.freq = 14070000;
-	A.imode = 13;
+	A.imode = 9;
 	A.iBW = 34;
 	B.freq = 7070000;
-	B.imode = 13;
+	B.imode = 9;
 	B.iBW = 34;
 
 	has_extras = true;
@@ -186,18 +189,12 @@ RIG_IC7300::RIG_IC7300() {
 	precision = 1;
 	ndigits = 8;
 
-	has_vfo_adj = true;
+//	has_vfo_adj = true;
 
+#if !EMULATE
 	can_change_alt_vfo = true;
-
+#endif
 };
-
-//======================================================================
-// IC7300 unique commands
-//======================================================================
-
-static int FIL_A = 1;
-static int FIL_B = 2;
 
 void RIG_IC7300::initialize()
 {
@@ -214,11 +211,8 @@ void RIG_IC7300::initialize()
 	IC7300_widgets[10].W = sldrNOTCH;
 	IC7300_widgets[11].W = sldrMICGAIN;
 	IC7300_widgets[12].W = sldrPOWER;
-//	selectA();
-//	get_modeA();
-//	selectB();
-//	get_modeB();
-//	selectA();
+
+	selectA(); // for A to be active vfo
 }
 
 static inline void minmax(int min, int max, int &val)
@@ -233,6 +227,11 @@ void RIG_IC7300::selectA()
 	cmd += '\x00';
 	cmd.append(post);
 	waitFB("select A");
+
+	trace(4, "selectA():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
 }
 
 void RIG_IC7300::selectB()
@@ -241,7 +240,252 @@ void RIG_IC7300::selectB()
 	cmd += '\x01';
 	cmd.append(post);
 	waitFB("select B");
+
+	trace(4, "selectB():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
 }
+
+////////////////////////////////////////////////////////////////////////
+#if EMULATE // change to zero for alternate vfo usage
+////////////////////////////////////////////////////////////////////////
+long RIG_IC7300::get_vfoA ()
+{
+	if (useB) return A.freq;
+	string resp = pre_fm;
+	resp += '\x03';
+	cmd = pre_to;
+	cmd += '\x03';
+	cmd.append( post );
+
+	if (waitFOR(11, "get vfo A")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
+	}
+
+	trace(4, "get_vfoA():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
+
+	return A.freq;
+}
+
+void RIG_IC7300::set_vfoA (long freq)
+{
+	A.freq = freq;
+	cmd = pre_to;
+	cmd += '\x05';
+	cmd.append( to_bcd_be( freq, 10 ) );
+	cmd.append( post );
+
+	waitFB("set vfo A");
+
+	trace(4, "set_vfoA():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
+}
+
+long RIG_IC7300::get_vfoB ()
+{
+	if (!useB) return B.freq;
+	string resp = pre_fm;
+	resp += '\x03';
+	cmd = pre_to;
+	cmd += '\x03';
+	cmd.append( post );
+
+	if (waitFOR(11, "get vfo B")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
+	}
+
+	trace(4, "get_vfoB():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
+
+	return B.freq;
+}
+
+void RIG_IC7300::set_vfoB (long freq)
+{
+	B.freq = freq;
+	cmd = pre_to;
+	cmd += '\x05';
+	cmd.append( to_bcd_be( freq, 10 ) );
+	cmd.append( post );
+
+	waitFB("set vfo B");
+
+	trace(4, "set_vfoA():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
+}
+
+int RIG_IC7300::get_modeA()
+{
+	int md = A.imode;
+	string resp = pre_fm;
+	resp += '\x04';
+	cmd = pre_to;
+	cmd += '\x04';
+	cmd.append(post);
+	if (waitFOR(8, "get mode A")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			md = replystr[p + 5];
+			if (md > 6) md -= 2;
+		}
+	}
+
+	trace(4, "get_modeA():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
+
+	cmd = pre_to;
+	cmd += "\x1A\x04";
+	cmd.append(post);
+	resp = pre_fm;
+	resp += "\x1A\x04";
+	if (waitFOR(9, "data mode?")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			if ((replystr[p+6] & 0x01) == 0x01 && A.imode < 4) {
+				A.imode += 8;
+			if (A.imode > 11)
+				A.imode = 1;
+			}
+		}
+	}
+
+	trace(4, "get_data_mode_A():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
+
+	return (A.imode = md);
+}
+
+void RIG_IC7300::set_modeA(int val)
+{
+	A.imode = val;
+	if (val > 7) val -= 8;
+	cmd = pre_to;
+	cmd += '\x06';
+	cmd += val > 4 ? val + 2 : val;
+	cmd.append( post );
+	waitFB("set mode A");
+
+	trace(4, "set_modeA():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
+
+	cmd = pre_to;
+	cmd += '\x1A'; cmd += '\x04';
+	if (A.imode > 7) cmd += '\x01';
+	else cmd += '\x00';
+	cmd.append( post);
+	waitFB("data mode");
+
+	trace(4, "set_data_mode_A():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
+
+}
+
+int RIG_IC7300::get_modeB()
+{
+	int md = B.imode;
+	cmd = pre_to;
+	cmd += '\x04';
+	cmd.append(post);
+	string resp = pre_fm;
+	resp += '\x04';
+	if (waitFOR(8, "get mode B")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			md = replystr[p+5];
+			if (md > 6) md -= 2;
+		}
+	}
+
+	trace(4, "get_modeB():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
+
+	cmd = pre_to;
+	cmd += "\x1A\x04";
+	cmd.append(post);
+	resp = pre_fm;
+	resp += "\x1A\x04";
+	if (waitFOR(9, "get data B")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			if ((replystr[p+6] & 0x01) == 0x01 && B.imode < 4) {
+				B.imode += 8;
+			if (B.imode > 11)
+				B.imode = 1;
+			}
+		}
+	}
+
+	trace(4, "get_data_mode_b():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
+
+	return (B.imode = md);
+}
+
+void RIG_IC7300::set_modeB(int val)
+{
+	B.imode = val;
+	if (val > 7) val -= 8;
+	cmd = pre_to;
+	cmd += '\x06';
+	cmd += val > 4 ? val + 2 : val;
+	cmd.append( post );
+	waitFB("set mode B");
+
+	trace(4, "set_modeB():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
+
+	cmd = pre_to;
+	cmd += '\x1A'; cmd += '\x04';
+	if (B.imode > 7) cmd += '\x01';
+	else cmd += '\x00';
+	cmd.append( post);
+	waitFB("data mode");
+
+	trace(4, "set_data_mode_B():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
+
+}
+
+////////////////////////////////////////////////////////////////////////
+#else
+////////////////////////////////////////////////////////////////////////
+
+//======================================================================
+// IC7300 unique commands
+//======================================================================
+
+static int FIL_A = 1;
+static int FIL_B = 2;
 
 long RIG_IC7300::get_vfoA ()
 {
@@ -264,6 +508,12 @@ long RIG_IC7300::get_vfoA ()
 		if (p != string::npos)
 			A.freq = fm_bcd_be(replystr.substr(p+6), 10);
 	}
+
+	trace(4, "get_vfoA():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
+
 	return A.freq;
 }
 
@@ -278,6 +528,12 @@ void RIG_IC7300::set_vfoA (long freq)
 	cmd.append( to_bcd_be( freq, 10) );
 	cmd.append( post );
 	waitFB("set vfo A");
+
+	trace(4, "set_vfoA():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
+
 }
 
 long RIG_IC7300::get_vfoB ()
@@ -301,6 +557,12 @@ long RIG_IC7300::get_vfoB ()
 		if (p != string::npos)
 			B.freq = fm_bcd_be(replystr.substr(p+6), 10);
 	}
+
+	trace(4, "get_vfoB():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
+
 	return B.freq;
 }
 
@@ -315,39 +577,11 @@ void RIG_IC7300::set_vfoB (long freq)
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append( post );
 	waitFB("set vfo B");
-}
 
-bool RIG_IC7300::can_split()
-{
-	return true;
-}
-
-void RIG_IC7300::set_split(bool val)
-{
-	split = val;
-	cmd = pre_to;
-	cmd += 0x0F;
-	cmd += val ? 0x01 : 0x00;
-	cmd.append(post);
-	waitFB(val ? "set split ON" : "set split OFF");
-}
-
-int RIG_IC7300::get_split()
-{
-	int read_split = 0;
-	cmd.assign(pre_to);
-	cmd.append("\x0F");
-	cmd.append( post );
-	if (waitFOR(7, "get split")) {
-		string resp = pre_fm;
-		resp.append("\x0F");
-		size_t p = replystr.find(resp);
-		if (p != string::npos)
-			read_split = replystr[p+5];
-		if (read_split != 0xFA) // fail byte
-			split = read_split;
-	}
-	return split;
+	trace(4, "set_vfoB():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
 }
 
 // expecting
@@ -402,6 +636,11 @@ int RIG_IC7300::get_modeA()
 		FIL_A = replystr[p+8];
 	}
 
+	trace(4, "get_modeA():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
+
 	return A.imode;
 }
 
@@ -422,6 +661,13 @@ void RIG_IC7300::set_modeA(int val)
 	cmd += FIL_A;
 	cmd.append( post );
 	waitFB("set modeA");
+
+	trace(4, "set_modeA():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
+
+	if (!useB) adjust_bandwidth(val);
 }
 
 int RIG_IC7300::get_modeB()
@@ -460,6 +706,11 @@ int RIG_IC7300::get_modeB()
 		FIL_B = replystr[p+8];
 	}
 
+	trace(4, "get_modeB():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
+
 	return B.imode;
 }
 
@@ -477,6 +728,61 @@ void RIG_IC7300::set_modeB(int val)
 	cmd += FIL_B;
 	cmd.append( post );
 	waitFB("set modeB");
+
+	trace(4, "set_modeB():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
+
+	if (useB) adjust_bandwidth(val);
+}
+
+////////////////////////////////////////////////////////////////////////
+#endif // ifdef 1
+////////////////////////////////////////////////////////////////////////
+
+bool RIG_IC7300::can_split()
+{
+	return true;
+}
+
+void RIG_IC7300::set_split(bool val)
+{
+	split = val;
+	cmd = pre_to;
+	cmd += 0x0F;
+	cmd += val ? 0x01 : 0x00;
+	cmd.append(post);
+	waitFB(val ? "set split ON" : "set split OFF");
+
+	trace(4, "set_split():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
+}
+
+int RIG_IC7300::get_split()
+{
+	int read_split = 0;
+	cmd.assign(pre_to);
+	cmd.append("\x0F");
+	cmd.append( post );
+	if (waitFOR(7, "get split")) {
+		string resp = pre_fm;
+		resp.append("\x0F");
+		size_t p = replystr.find(resp);
+		if (p != string::npos)
+			read_split = replystr[p+5];
+		if (read_split != 0xFA) // fail byte
+			split = read_split;
+	}
+
+	trace(4, "set_split():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
+
+	return split;
 }
 
 int RIG_IC7300::get_bwA()
@@ -502,6 +808,11 @@ int RIG_IC7300::get_bwA()
 
 	if (useB) selectB();
 
+	trace(4, "get_bwA():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
+
 	return A.iBW;
 }
 
@@ -513,12 +824,16 @@ void RIG_IC7300::set_bwA(int val)
 	A.iBW = val;
 	if (useB) selectA();
 
-	if (A.imode > bw_size_) A.imode = bw_size_;
 	cmd = pre_to;
 	cmd.append("\x1a\x03");
 	cmd.append(to_bcd(A.iBW, 2));
 	cmd.append(post);
 	waitFB("set bwA");
+
+	trace(4, "set_bwA():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
 
 	if (useB) selectB();
 }
@@ -545,6 +860,12 @@ int RIG_IC7300::get_bwB()
 	}
 
 	if (!useB) selectA();
+
+	trace(4, "get_bwB():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
+
 	return B.iBW;
 }
 
@@ -555,12 +876,16 @@ void RIG_IC7300::set_bwB(int val)
 
 	if (!useB) selectB();
 
-	if (B.iBW > bw_size_) B.iBW = bw_size_;
 	cmd = pre_to;
 	cmd.append("\x1a\x03");
 	cmd.append(to_bcd(B.iBW, 2));
 	cmd.append(post);
 	waitFB("set bwB");
+
+	trace(4, "set_bwB():\n", 
+		str2hex(cmd.c_str(), cmd.length()),
+		"\n",
+		str2hex(replystr.c_str(), replystr.length()));
 
 	if (!useB) selectA();
 }
@@ -575,25 +900,21 @@ int RIG_IC7300::adjust_bandwidth(int m)
 		case 2: case 10: // AM, AM-D
 			bandwidths_ = IC7300_am_bws;
 			bw_vals_ = IC7300_bw_vals_AM;
-			bw_size_ = sizeof(IC7300_bw_vals_AM);
 			bw = 19;
 			break;
 		case 3: case 11: // FM, FM-D
 			bandwidths_ = IC7300_fm_bws;
 			bw_vals_ = IC7300_bw_vals_FM;
-			bw_size_ = sizeof(IC7300_bw_vals_FM);
 			bw = 0;
 			break;
 		case 6: case 7: // RTTY, RTTY-R
 			bandwidths_ = IC7300_rtty_bws;
 			bw_vals_ = IC7300_bw_vals_RTTY;
-			bw_size_ = sizeof(IC7300_bw_vals_RTTY);
 			bw = 12;
 			break;
 		case 4: case 5: // CW, CW -R
 			bandwidths_ = IC7300_ssb_bws;
 			bw_vals_ = IC7300_bw_vals_SSB;
-			bw_size_ = sizeof(IC7300_bw_vals_SSB);
 			bw = 12;
 			break;
 		case 0: case 1: // LSB, USB
@@ -601,10 +922,31 @@ int RIG_IC7300::adjust_bandwidth(int m)
 		default:
 			bandwidths_ = IC7300_ssb_bws;
 			bw_vals_ = IC7300_bw_vals_SSB;
-			bw_size_ = sizeof(IC7300_bw_vals_SSB);
 			bw = 34;
 	}
 	return bw;
+}
+
+const char ** RIG_IC7300::bwtable(int m)
+{
+	const char **table;
+	switch (m) {
+		case 2: case 10: // AM, AM-D
+			table = IC7300_am_bws;
+			break;
+		case 3: case 11: // FM, FM-D
+			table = IC7300_fm_bws;
+			break;
+		case 6: case 7: // RTTY, RTTY-R
+			table = IC7300_rtty_bws;
+			break;
+		case 4: case 5: // CW, CW -R
+		case 0: case 1: // LSB, USB
+		case 8: case 9: // LSB-D, USB-D
+		default:
+			table = IC7300_ssb_bws;
+	}
+	return table;
 }
 
 int RIG_IC7300::def_bandwidth(int m)

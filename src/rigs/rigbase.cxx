@@ -49,7 +49,6 @@ rigbase::rigbase()
 	SH_tooltip = szdsptooltip;
 	SH_label = szbtnlabel;
 	bw_vals_ = &ibw_val;
-	bw_size_ = 0;
 
 	widgets = basewidgets;
 

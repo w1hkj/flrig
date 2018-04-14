@@ -102,7 +102,7 @@ public:
 	void set_cw_spot_tone();
 	void set_cw_vol();
 
-	const char **bwtable(int m) {return bandwidths_;}
+	const char **bwtable(int m);
 
 	bool  canswap() { return true; }
 	bool ICswap() { return true; }

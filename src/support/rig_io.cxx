@@ -202,13 +202,6 @@ int sendCommand (string s, int nread)
 	LOG_DEBUG("cmd:%3d, %s", (int)s.length(), str2hex(s.data(), s.length()));
 
 	RigSerial->FlushBuffer();
-
-#ifdef IC_DEBUG
-ofstream civ(ICDEBUGfname.c_str(), ios::app);
-civ << "[" << zext_time() << "] sendCommand: ";
-civ << str2hex(s.c_str(), s.length()) << std::endl;
-#endif
-
 	RigSerial->WriteBuffer(s.c_str(), numwrite);
 
 	int timeout = progStatus.comm_wait + 

@@ -1013,7 +1013,8 @@ bool status::loadXcvrState(string xcvr)
 
 		if (spref.get("hrd_buttons", i, i)) hrd_buttons = i;
 
-		LOG_INFO("%s", info().c_str());
+trace(1, info().c_str());
+//		LOG_INFO("%s", info().c_str());
 
 		return true;
 	}
@@ -1160,7 +1161,7 @@ string status::info()
 {
 	stringstream info;
 
-	info << "\n ============= Prefs File Contents =============\n\n";
+	info << "status::info()\n============== Prefs File Contents =============\n\n";
 	info << "xcvr_serial_port   : " << xcvr_serial_port << "\n";
 	info << "comm_baudrate      : " << comm_baudrate << "\n";
 	info << "comm_stopbits      : " << stopbits << "\n";

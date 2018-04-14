@@ -128,7 +128,7 @@ void trace(int n, ...) // all args of type const char *
 	va_start(vl, n);
 	s.seekp(0);
 	char szmsec[4];
-	snprintf(szmsec, sizeof(szmsec), ".%d", zmsec());
+	snprintf(szmsec, sizeof(szmsec), ".%02d", zmsec());
 	s << zext_time() << szmsec << " : " << va_arg(vl, const char *);
 	for (int i = 1; i < n; i++)
 		s << " " << va_arg(vl, const char *);
@@ -974,12 +974,13 @@ void serviceA()
 
 		if (useB) {
 			if (selrig->can_change_alt_vfo) {
+				trace(2, "B active, set alt vfo A", printXCVR_STATE(nuvals).c_str());
 				if (vfoA.freq != nuvals.freq) selrig->set_vfoA(nuvals.freq);
 				if (vfoA.imode != nuvals.imode) selrig->set_modeA(nuvals.imode);
 				if (vfoA.iBW != nuvals.iBW) selrig->set_bwA(nuvals.iBW);
 				vfoA = nuvals;
-				trace(2, "set alt VFO A", printXCVR_STATE(nuvals).c_str());
 			} else {
+				trace(2, "B active, set vfo A", printXCVR_STATE(nuvals).c_str());
 				selrig->selectA();
 				useB = false;
 				if (vfoA.freq != nuvals.freq) selrig->set_vfoA(nuvals.freq);
@@ -990,7 +991,6 @@ void serviceA()
 					useB = true;
 				}
 				vfoA = nuvals;
-				trace(2, "set B: ", printXCVR_STATE(nuvals).c_str());
 			}
 			Fl::awake(setFreqDispA, (void *)nuvals.freq);
 			continue;
@@ -1050,12 +1050,13 @@ void serviceB()
 
 		if (!useB) {
 			if (selrig->can_change_alt_vfo) {
+				trace(2, "A active, set alt vfo B", printXCVR_STATE(nuvals).c_str());
 				if (vfoB.freq != nuvals.freq) selrig->set_vfoB(nuvals.freq);
 				if (vfoB.imode != nuvals.imode) selrig->set_modeB(nuvals.imode);
 				if (vfoB.iBW != nuvals.iBW) selrig->set_bwB(nuvals.iBW);
 				vfoB = nuvals;
-				trace(2, "set alt VFO B", printXCVR_STATE(nuvals).c_str());
 			} else {
+				trace(2, "A active, set vfo B", printXCVR_STATE(nuvals).c_str());
 				selrig->selectB();
 				useB = true;
 				if (vfoB.freq != nuvals.freq) selrig->set_vfoB(nuvals.freq);
@@ -1066,7 +1067,6 @@ void serviceB()
 					useB = false;
 				}
 				vfoB = nuvals;
-				trace(2, "set B: ", printXCVR_STATE(nuvals).c_str());
 			}
 			Fl::awake(setFreqDispB, (void *)nuvals.freq);
 			continue;
@@ -1117,10 +1117,8 @@ void * serial_thread_loop(void *d)
 		}
 
 		if (close_rig) {
-trace(1, "serial_thread_loop: close_rig");
-return NULL;
-//			closeRig();
-//			goto serial_bypass_loop;
+			trace(1, "serial_thread_loop: close_rig");
+			return NULL;
 		}
 
 //send any freq/mode/bw changes in the queu
@@ -1128,7 +1126,6 @@ return NULL;
 		check_ptt_queue();
 		{
 			guard_lock serial(&mutex_serial);
-//			trace(1,"serial_thread_loop a/b service");
 			serviceA();
 			serviceB();
 		}
@@ -1741,7 +1738,11 @@ void cb_selectA()
 {
 	guard_lock serial(&mutex_serial);
 
+	XCVR_STATE nuvfo = vfoA;
+	trace(2, "cb_selectA() ", printXCVR_STATE(nuvfo).c_str());
+
 	selrig->selectA();
+
 	useB = false;
 
 	vfo = &vfoA;
@@ -1749,10 +1750,7 @@ void cb_selectA()
 	updateBandwidthControl();
 	highlight_vfo((void *)0);
 
-	XCVR_STATE nuvfo = vfoA;
 	nuvfo.src = FORCE;//UI;
-
-	trace(2, "cb_selectA() ", printXCVR_STATE(nuvfo).c_str());
 
 	guard_lock queA_lock(&mutex_queA);
 	queA.push(nuvfo);
@@ -1764,6 +1762,9 @@ void cb_selectB()
 {
 	guard_lock serial(&mutex_serial);
 
+	XCVR_STATE nuvfo = vfoB;
+	trace(2, "cb_selectB() ", printXCVR_STATE(nuvfo).c_str());
+
 	selrig->selectB();
 	useB = true;
 
@@ -1772,9 +1773,7 @@ void cb_selectB()
 	updateBandwidthControl();
 	highlight_vfo((void *)0);
 
-	XCVR_STATE nuvfo = vfoB;
 	nuvfo.src = FORCE;//UI;
-	trace(2, "cb_selectB() ", printXCVR_STATE(nuvfo).c_str());
 
 	guard_lock queB_lock(&mutex_queB);
 	queB.push(nuvfo);
@@ -2698,8 +2697,6 @@ void restore_rig_vals()
 	selrig->selectB();
 	useB = true;
 
-	trace(2, "Restore xcvr B:\n", print(xcvr_vfoB));
-
 	if (progStatus.restore_frequency)
 		selrig->set_vfoB(xcvr_vfoB.freq);
 	if (progStatus.restore_mode)
@@ -2708,10 +2705,10 @@ void restore_rig_vals()
 		selrig->set_bwB(xcvr_vfoB.iBW);
 	restore_rig_vals_(xcvr_vfoB);
 
+	trace(2, "Restore xcvr B:\n", print(xcvr_vfoB));
+
 	selrig->selectA();
 	useB = false;
-
-	trace(2, "Restore xcvr A:\n", print(xcvr_vfoA));
 
 	if (progStatus.restore_frequency)
 		selrig->set_vfoA(xcvr_vfoA.freq);
@@ -2720,6 +2717,9 @@ void restore_rig_vals()
 	if (progStatus.restore_bandwidth)
 		selrig->set_bwA(xcvr_vfoA.iBW);
 	restore_rig_vals_(xcvr_vfoA);
+
+	trace(2, "Restore xcvr A:\n", print(xcvr_vfoA));
+
 }
 
 void read_rig_vals_(XCVR_STATE &xcvrvfo)
@@ -4648,11 +4648,8 @@ void init_VFOs()
 		vfoB.imode = progStatus.imode_B;
 		vfoB.iBW = progStatus.iBW_B;
 
-trace(2, "init_VFOs() 1 : vfoB ", printXCVR_STATE(vfoB).c_str());
-
 		if (vfoB.iBW == -1)
 			vfoB.iBW = selrig->def_bandwidth(vfoB.imode);
-trace(2, "init_VFOs() 2 : vfoB ", printXCVR_STATE(vfoB).c_str());
 
 		FreqDispB->value(vfoB.freq);
 
@@ -4662,16 +4659,14 @@ trace(2, "init_VFOs() 2 : vfoB ", printXCVR_STATE(vfoB).c_str());
 		selrig->set_modeB(vfoB.imode);
 		selrig->set_bwB(vfoB.iBW);
 
+		trace(2, "init_VFOs() vfoB ", printXCVR_STATE(vfoB).c_str());
+
 		vfoA.freq = progStatus.freq_A;
 		vfoA.imode = progStatus.imode_A;
 		vfoA.iBW = progStatus.iBW_A;
 
-trace(2, "init_VFOs() 1 vfoA ", printXCVR_STATE(vfoA).c_str());
-
 		if (vfoA.iBW == -1)
 			vfoA.iBW = selrig->def_bandwidth(vfoA.imode);
-
-trace(2, "init_VFOs() 2 vfoA ", printXCVR_STATE(vfoA).c_str());
 
 		FreqDispA->value( vfoA.freq );
 
@@ -4685,6 +4680,9 @@ trace(2, "init_VFOs() 2 vfoA ", printXCVR_STATE(vfoA).c_str());
 		updateBandwidthControl();
 		highlight_vfo((void *)0);
 		useB = false;
+
+		trace(2, "init_VFOs() 1 vfoA ", printXCVR_STATE(vfoA).c_str());
+
 	} else {
 		selrig->selectB();
 		useB = true;

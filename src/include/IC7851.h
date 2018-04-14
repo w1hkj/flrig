@@ -93,7 +93,7 @@ public:
 
 	void set_cw_vol();
 
-	const char **bwtable(int m) {return bandwidths_;}
+	const char **bwtable(int m);
 
 	void get_pc_min_max_step(double &min, double &max, double &step);
 

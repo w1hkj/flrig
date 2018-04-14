@@ -683,6 +683,28 @@ int RIG_IC7100::adjust_bandwidth(int m)
 	return 0;
 }
 
+const char ** RIG_IC7100::bwtable(int m)
+{
+	const char **table;
+	switch (m) {
+		case AM7100: case AMD7100:
+			table = IC7100_am_bws;
+			break;
+		case DV7100:
+		case FM7100: case WFM7100: case FMD7100:
+			table = IC7100_fixed_bws;
+			break;
+		case RTTY7100: case RTTYR7100:
+			table = IC7100_rtty_bws;
+			break;
+		case CW7100: case CWR7100:
+		case USB7100: case LSB7100: case USBD7100: case LSBD7100:
+		default:
+			table = IC7100_ssb_bws;
+	}
+	return table;
+}
+
 int RIG_IC7100::def_bandwidth(int m)
 {
 	return adjust_bandwidth(m);

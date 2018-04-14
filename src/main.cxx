@@ -90,10 +90,6 @@ string TempDir;
 string defFileName;
 string title;
 
-#ifdef IC_DEBUG
-string ICDEBUGfname;
-#endif
-
 pthread_t *serial_thread = 0;
 pthread_t *digi_thread = 0;
 
@@ -396,11 +392,6 @@ extern FILE *serlog;
 		debug::start(fname.c_str());
 		time_t t = time(NULL);
 		LOG(debug::INFO_LEVEL, debug::LOG_OTHER, _("%s log started on %s"), PACKAGE_STRING, ctime(&t));
-#ifdef IC_DEBUG
-		ICDEBUGfname = RigHomeDir;
-		ICDEBUGfname.append("civ.txt");
-		rotate_log(ICDEBUGfname);
-#endif
 		string trace_fname = RigHomeDir;
 		trace_fname.append("trace.txt");
 		rotate_log(trace_fname);

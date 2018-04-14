@@ -411,6 +411,29 @@ int RIG_IC7800::adjust_bandwidth(int m)
 	return bw;
 }
 
+const char ** RIG_IC7800::bwtable(int m)
+{
+	const char **table;
+	switch (m) {
+		case 2: // AM
+			table = IC7800_am_bws;
+			break;
+		case 5: // FM
+			table = IC7800_fm_bws;
+			break;
+		case 4: case 8: // RTTY
+			table = IC7800_rtty_bws;
+			break;
+		case 3: case 7: // CW
+		case 0: case 1: // SSB
+		case 12: case 13: // PKT
+		default:
+			table = IC7800_ssb_bws;
+			break;
+	}
+	return table;
+}
+
 int RIG_IC7800::def_bandwidth(int m)
 {
 	int bw = 0;

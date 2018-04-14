@@ -413,7 +413,6 @@ void RIG_IC7600::set_bwA(int val)
 {
 	A.iBW = val;
 	if (A.imode == 5) return;
-	if (A.imode > bw_size_) A.imode = bw_size_;
 	cmd = pre_to;
 	cmd.append("\x1a\x03");
 	cmd.append(to_bcd(A.iBW, 2));
@@ -441,7 +440,6 @@ void RIG_IC7600::set_bwB(int val)
 {
 	B.iBW = val;
 	if (B.imode == 5) return;
-	if (B.iBW > bw_size_) B.iBW = bw_size_;
 	cmd = pre_to;
 	cmd.append("\x1a\x03");
 	cmd.append(to_bcd(A.iBW, 2));
@@ -456,31 +454,26 @@ int RIG_IC7600::adjust_bandwidth(int m)
 		case 2: // AM
 			bandwidths_ = IC7600_am_bws;
 			bw_vals_ = IC7600_bw_vals_AM;
-			bw_size_ = sizeof(IC7600_bw_vals_AM);
 			bw = 19;
 			break;
 		case 5: // FM
 			bandwidths_ = IC7600_fm_bws;
 			bw_vals_ = IC7600_bw_vals_FM;
-			bw_size_ = sizeof(IC7600_bw_vals_FM);
 			bw = 0;
 			break;
 		case 4: case 7: // RTTY
 			bandwidths_ = IC7600_rtty_bws;
 			bw_vals_ = IC7600_bw_vals_RTTY;
-			bw_size_ = sizeof(IC7600_bw_vals_RTTY);
 			bw = 12;
 			break;
 		case 3: case 6: // CW
 			bandwidths_ = IC7600_ssb_bws;
 			bw_vals_ = IC7600_bw_vals_SSB;
-			bw_size_ = sizeof(IC7600_bw_vals_SSB);
 			bw = 12;
 			break;
 		case 8: case 9: // PKT
 			bandwidths_ = IC7600_ssb_bws;
 			bw_vals_ = IC7600_bw_vals_SSB;
-			bw_size_ = sizeof(IC7600_bw_vals_SSB);
 			bw = 34;
 			break;
 		case 0: case 1: // SSB
@@ -489,10 +482,33 @@ int RIG_IC7600::adjust_bandwidth(int m)
 		default:
 			bandwidths_ = IC7600_ssb_bws;
 			bw_vals_ = IC7600_bw_vals_SSB;
-			bw_size_ = sizeof(IC7600_bw_vals_SSB);
 			bw = 34;
 	}
 	return bw;
+}
+
+const char ** RIG_IC7600::bwtable(int m)
+{
+	const char **table;
+	switch (m) {
+		case 2: // AM
+			table = IC7600_am_bws;
+			break;
+		case 5: // FM
+			table = IC7600_fm_bws;
+			break;
+		case 4: case 7: // RTTY
+			table = IC7600_rtty_bws;
+			break;
+		case 3: case 6: // CW
+		case 8: case 9: // PKT
+		case 0: case 1: // SSB
+		case 10: case 11 : case 12 :
+		case 13: case 14 : case 15 :
+		default:
+			table = IC7600_ssb_bws;
+	}
+	return table;
 }
 
 int RIG_IC7600::def_bandwidth(int m)

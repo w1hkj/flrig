@@ -357,6 +357,27 @@ int RIG_IC7410::adjust_bandwidth(int m)
 	return 0;
 }
 
+const char ** RIG_IC7410::bwtable(int m)
+{
+	const char **table;
+	switch (m) {
+		case AM7410:
+			table = IC7410_am_bws;
+			break;
+		case FM7410: case FMD7410:
+			table = IC7410_fm_bws;
+			break;
+		case RTTY7410: case RTTYR7410:
+			table = IC7410_rtty_bws;
+			break;
+		case CW7410: case CWR7410:
+		case USB7410: case LSB7410: case LSBD7410 : case USBD7410:
+		default:
+			table = IC7410_ssb_bws;
+	}
+	return table;
+}
+
 int RIG_IC7410::def_bandwidth(int m)
 {
 	return adjust_bandwidth(m);

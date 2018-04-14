@@ -608,12 +608,10 @@ static void cb_btnOkXcvrDialog(Fl_Return_Button*, void*) {
 		bypass_serial_thread_loop = true;
 	}
 
-	if (xcvr_name != rigs[selectRig->index()]->name_) {
-		clearList();
-		saveFreqList();
-		selrig = rigs[selectRig->index()];
-		xcvr_name = selrig->name_;
-	}
+	clearList();
+	saveFreqList();
+	selrig = rigs[selectRig->index()];
+	xcvr_name = selrig->name_;
 
 	progStatus.xcvr_serial_port = selectCommPort->value();
 

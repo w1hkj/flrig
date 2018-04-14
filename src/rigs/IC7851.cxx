@@ -468,6 +468,27 @@ int RIG_IC7851::adjust_bandwidth(int m)
 	return bw;
 }
 
+const char ** RIG_IC7851::bwtable(int m)
+{
+	const char ** table;
+	switch (m) {
+		case 2: // AM
+			table = IC7851_am_bws;
+			break;
+		case 5: // FM
+			table = IC7851_fm_bws;
+			break;
+		case 3: case 7: // CW
+		case 4: case 8: // RTTY
+		case 0: case 1: // SSB
+		case 12: case 13: // PKT
+		default:
+			table = IC7851_ssb_bws;
+			break;
+	}
+	return table;
+}
+
 int RIG_IC7851::def_bandwidth(int m)
 {
 	int bw = 0;

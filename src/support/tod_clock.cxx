@@ -63,7 +63,7 @@ static char ztbuf[20] = "20120602 123000";
 int zmsec(void)
 {
 	guard_lock zmsec_lock(&TOD_mutex);
-	return _zmsec;
+	return _zmsec % 1000;
 }
 
 char* zdate()
@@ -148,10 +148,10 @@ void *TOD_loop(void *args)
 			first_call = false;
 			ztimer((void *)0);
 		} else {
-			MilliSleep(100);
+			MilliSleep(10);
 			guard_lock zmsec_lock(&TOD_mutex);
-			_zmsec++;
-			if (_zmsec >= 10) {
+			_zmsec += 10;
+			if (_zmsec % 1000 == 0) {
 				_zmsec = 0;
 				_zsec++;
 				if (_zsec >= 60) {

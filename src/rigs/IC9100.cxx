@@ -605,6 +605,27 @@ int RIG_IC9100::adjust_bandwidth(int m)
 	return bw;
 }
 
+const char ** RIG_IC9100::bwtable(int m)
+{
+	const char ** table;
+	switch (m) {
+		case AM9100: case AM9100D:
+			table = IC9100_am_bws;
+			break;
+		case FM9100: case FM9100D :
+		case DV9100: case DVR9100 :
+			table = IC9100_fixed_bws;
+			break;
+		case CW9100: case CW9100R:
+		case RTTY9100: case RTTY9100R:
+		case LSB9100: case USB9100:
+		case LSB9100D: case USB9100D:
+		default:
+			table = IC9100_ssb_bws;
+	}
+	return table;
+}
+
 int RIG_IC9100::def_bandwidth(int m)
 {
 	int bw = 0;

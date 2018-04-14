@@ -82,7 +82,7 @@ public:
 	void set_PTT_control(int val);
 	int  get_PTT();
 
-	const char **bwtable(int m) {return bandwidths_;}
+	const char **bwtable(int m);
 
 
 };

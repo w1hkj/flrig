@@ -106,15 +106,6 @@ bool RIG_ICOM::waitFB(const char *sz)
 {
 	guard_lock cmd_lock(&command_mutex);
 
-#ifdef IC_DEBUG
-	ofstream civ(ICDEBUGfname.c_str(), ios::app);
-	if (!RigSerial->IsOpen()){
-		civ << "[" << zext_time() << "] wait FB(): " << sz << std::endl;
-		civ << "Sent " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-	}
-//	civ << std::endl;
-#endif
-
 	guard_lock reply_lock(&mutex_replystr);
 
 	char sztemp[100];
@@ -123,7 +114,7 @@ bool RIG_ICOM::waitFB(const char *sz)
 	unsigned long tod_start = zmsec();
 
 	if (!progStatus.use_tcpip && !RigSerial->IsOpen()) {
-		replystr = returned;
+		replystr = cmd;//returned;
 		return false;
 	}
 	int cnt = 0, repeat = 0, num = cmd.length() + ok.length();
@@ -145,12 +136,6 @@ bool RIG_ICOM::waitFB(const char *sz)
 					showresp(WARN, HEX, sztemp, tosend, returned);
 				else
 					showresp(DEBUG, HEX, sztemp, tosend, returned);
-#ifdef IC_DEBUG
-civ << "[" << waited << " msec] " << sz << " OK\n";
-civ << "Sent: " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-civ << "Rcvd: " << str2hex(returned.c_str(), returned.length()) << std::endl;
-civ.close();
-#endif
 				return true;
 			}
 			if (returned.find(bad) != string::npos) {
@@ -158,12 +143,6 @@ civ.close();
 				unsigned long int waited = zmsec() - tod_start;
 				snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, FAIL", sz, waited);
 				showresp(ERR, HEX, sztemp, tosend, returned);
-#ifdef IC_DEBUG
-civ << "[" << waited << " msec] " << sz << " FAILED\n";
-civ << "Sent: " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-civ << "Rcvd: " << str2hex(returned.c_str(), returned.length()) << std::endl;
-civ.close();
-#endif
 				return false;
 			}
 			MilliSleep(10);
@@ -175,28 +154,12 @@ civ.close();
 	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %ld ms", sz, waited);
 	showresp(ERR, HEX, sztemp, tosend, replystr);
 
-#ifdef IC_DEBUG
-civ << "[" << waited << " msec] " << sz << " TIMED OUT\n";
-civ << "Sent: " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-civ << "Rcvd: " << str2hex(returned.c_str(), returned.length()) << std::endl;
-civ.close();
-#endif
-
 	return false;
 }
 
 bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 {
 	guard_lock cmd_lock(&command_mutex);
-
-#ifdef IC_DEBUG
-	ofstream civ(ICDEBUGfname.c_str(), ios::app);
-	if (!RigSerial->IsOpen()) {
-		civ << "[" << zext_time() << "] wait FOR(): " << sz;
-		civ << "Sent: " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-	}
-//	civ << std::endl;
-#endif
 
 	guard_lock reply_lock(&mutex_replystr);
 
@@ -213,7 +176,7 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 		progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 50) / 10;
 
 	if (!progStatus.use_tcpip && !RigSerial->IsOpen()) {
-		replystr = returned;
+		replystr = cmd;//returned;
 		return false;
 	}
 	for (repeat = 0; repeat < progStatus.comm_retries; repeat++) {
@@ -227,13 +190,6 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 				unsigned long int waited = zmsec() - tod_start;
 				snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, OK  ", sz, waited);
 				showresp(DEBUG, HEX, sztemp, tosend, returned);
-
-#ifdef IC_DEBUG
-civ << "[" << waited << " msec] " << sz << " OK\n";
-civ << "Sent: " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-civ << "Rcvd: " << str2hex(returned.c_str(), returned.length()) << std::endl;
-civ.close();
-#endif
 				return true;
 			}
 			MilliSleep(10);
@@ -246,12 +202,6 @@ civ.close();
 	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %ld ms", sz, waited);
 	showresp(ERR, HEX, sztemp, tosend, returned);
 
-#ifdef IC_DEBUG
-civ << "[" << waited << " msec] " << sz << " TIMED OUT\n";
-civ << "Sent: " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-civ << "Rcvd: " << str2hex(returned.c_str(), returned.length()) << std::endl;
-civ.close();
-#endif
 	return false;
 }
 
