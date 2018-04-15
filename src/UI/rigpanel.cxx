@@ -680,10 +680,10 @@ static void cb_sldr_nb_level(Fl_Wheel_Value_Slider* o, void*) {
 	cb_nb_level();
 }
 
-static void cb_cbo_agc_level(Fl_ComboBox* o, void*) {
-	progStatus.agc_level = o->index();
-	cb_agc_level();
-}
+//static void cb_cbo_agc_level(Fl_ComboBox* o, void*) {
+//	progStatus.agc_level = o->index();
+//	cb_agc_level();
+//}
 
 static void cb_spnr_bpf_center(Hspinner* o, void*) {
 	progStatus.bpf_center=o->value();

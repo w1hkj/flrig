@@ -92,14 +92,6 @@ void RIG_ICOM::delayCommand(string cmd, int wait)
 	progStatus.comm_wait = oldwait;
 }
 
-static bool timeout_alert = false;
-static char szext_timeout_alert[200];
-
-static void show_timeout(void *)
-{
-	fl_alert2("%s", szext_timeout_alert);
-}
-
 #include <fstream>
 
 bool RIG_ICOM::waitFB(const char *sz)

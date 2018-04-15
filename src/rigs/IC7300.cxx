@@ -1339,7 +1339,7 @@ int RIG_IC7300::get_power_out(void)
 		if (p != string::npos) {
 			mtr = fm_bcd(replystr.substr(p+6), 3);
 			size_t i = 0;
-			for (i = 0; i < sizeof(pwrtbl) / sizeof(pwrpair); i++)
+			for (i = 0; i < sizeof(pwrtbl) / sizeof(pwrpair) - 1; i++)
 				if (mtr >= pwrtbl[i].mtr && mtr < pwrtbl[i+1].mtr)
 					break;
 			if (mtr < 0) mtr = 0;

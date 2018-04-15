@@ -26,6 +26,7 @@
 #include <sstream>
 #include <cstring>
 #include <ctime>
+#include <exception>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdio.h>
@@ -166,13 +167,6 @@ void visit_URL(void* arg)
 //----------------------------------------------------------------------
 
 extern void saveFreqList();
-
-void * flrig_terminate(void) {
-	std::cerr << "terminating" << std::endl;
-	fl_message("Closing flrig");
-	cbExit();
-	return 0;
-}
 
 void showEvents(void *)
 {
@@ -320,9 +314,15 @@ void rotate_log(std::string filename)
 	rename(filename.c_str(), oldfn.str().c_str());
 }
 
+void flrig_terminate() {
+	std::cerr << "terminating" << std::endl;
+	fl_message("Closing flrig");
+	cbExit();
+}
+
 int main (int argc, char *argv[])
 {
-	std::terminate_handler(flrig_terminate);
+	std::set_terminate(flrig_terminate);
 
 	int arg_idx;
 	HomeDir.clear();

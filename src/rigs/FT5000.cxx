@@ -391,7 +391,7 @@ int RIG_FT5000::get_swr()
 //	return mtr / 2.56;
 
 	size_t i;
-	for (i = 0; i < sizeof(swrtbl) / sizeof(*swrtbl); i++)
+	for (i = 0; i < sizeof(swrtbl) / sizeof(*swrtbl) - 1; i++)
 		if (rcvd >= swrtbl[i].mtr && rcvd < swrtbl[i+1].mtr)
 			break;
 
@@ -445,7 +445,7 @@ int RIG_FT5000::get_power_out()
 	if (p + 6 >= replystr.length()) return 0;
 	double rcvd = (double)(atoi(&replystr[p+3]));
 	size_t i = 0;
-	for (i = 0; i < sizeof(pwrtbl) / sizeof(*pwrtbl); i++)
+	for (i = 0; i < sizeof(pwrtbl) / sizeof(*pwrtbl) - 1; i++)
 		if (rcvd >= pwrtbl[i].mtr && rcvd < pwrtbl[i+1].mtr)
 			break;
 	double mtr =
