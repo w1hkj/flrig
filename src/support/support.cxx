@@ -459,7 +459,7 @@ void read_bandwidth()
 			Fl::awake(setBWControl);
 		}
 	} else {
-		trace(2, "vfoB active", "get_bwA()");
+		trace(2, "vfoB active", "get_bwB()");
 		nu_BW = selrig->get_bwB();
 		if (nu_BW != vfoB.iBW) {
 			vfoB.iBW = vfo->iBW = nu_BW;
