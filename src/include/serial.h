@@ -107,7 +107,6 @@ private:
 	int		stopbits;
 	int     vmin;
 	int     vtime;
-	char	bfr[2048];
 //Methods
 	bool	IOselect();
 };
