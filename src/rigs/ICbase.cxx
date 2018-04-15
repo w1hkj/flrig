@@ -18,8 +18,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
-#include <mutex>
-#include <condition_variable>
+#include <pthread.h>
 #include <chrono>	// TBD DJW - For timestamps.
 #include <ctime>	// TBD DJW - For timestamps.
 #include <iostream>	// TBD DJW - For timestamps.
@@ -32,7 +31,7 @@
 
 #include "status.h"
 
-using namespace std::chrono;
+using namespace std::chrono;	// TBD DJW - For timestamps.
 
 // TBD DJW - Temporary while I figure out performance. This and ic7300_jig both
 // use a system_clock so timestamps can be compared while both programs are
@@ -62,24 +61,25 @@ ostream &operator<<(ostream &out, const timestamp &obj)
 }
 
 // TBD DJW - Carefully check that replystr is always protected.
-mutex              civ_response_mutex;
-condition_variable civ_response_present;
-bool               civ_response_ready = false;
-string             civ_response_string;
+static pthread_mutex_t civ_resp_mutex   = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t  civ_resp_cond    = PTHREAD_COND_INITIALIZER;
+static bool            civ_resp_waiting = false;
+static string          civ_resp_string;
 
+RIG_ICOM *RIG_ICOM::this_rig = NULL;
 bool RIG_ICOM::listenThreadRunning = false;
 pthread_t RIG_ICOM::listenThread;
 
 //=============================================================================
-
 RIG_ICOM::RIG_ICOM()
 {
 	CIV = 0x56;
-	pre_to = "\xFE\xFE\x56\xE0";
-	pre_fm = "\xFE\xFE\xE0\x56";
-	post = "\xFD";
-	ok = "\xFE\xFE\xE0\x56\xFB\xFD";
-	bad = "\xFE\xFE\xE0\x56\xFA\xFD";
+	pre_to              = "\xFE\xFE\x56\xE0";
+	pre_fm              = "\xFE\xFE\xE0\x56";
+	post                = "\xFD";
+	ok                  = "\xFE\xFE\xE0\x56\xFB\xFD";
+	bad                 = "\xFE\xFE\xE0\x56\xFA\xFD";
+	scope_waveform_data = "\xFE\xFE\xE0\x56\x27\x00";
 }
 
 RIG_ICOM::~RIG_ICOM()
@@ -89,6 +89,14 @@ RIG_ICOM::~RIG_ICOM()
 void RIG_ICOM::initialize()
 {
 	puts("RIG_ICOM::initialize()");
+
+	flrig_abort = false;	// TBD DJW - Base setting this on failure starting the listen thread.
+
+	if(this_rig) {
+		flrig_abort = true;
+		LOG_ERROR("RIG_ICOM already initialized");
+	}
+	this_rig = this;
 
 	//RigSerial->printConfig();
 
@@ -104,8 +112,6 @@ void RIG_ICOM::initialize()
 
 	// Start the listen thread. TBD DJW - handle error condition.
 	(void)pthread_create(&listenThread, NULL, CIV_listen_thread_loop, NULL);
-
-	flrig_abort = false;	// TBD DJW - Base setting this on failure starting the listen thread.
 }
 
 void RIG_ICOM::post_initialize() {puts("RIG_ICOM::post_initialize()");}
@@ -121,7 +127,7 @@ void RIG_ICOM::shutdown()        {
 void RIG_ICOM::adjustCIV(uchar adr)
 {
 	CIV = adr;
-	pre_to[2] = ok[3] = bad[3] = pre_fm[3] = CIV;
+	pre_to[2] = ok[3] = bad[3] = pre_fm[3] = scope_waveform_data[3] = CIV;
 }
 
 void RIG_ICOM::checkresponse()
@@ -129,11 +135,11 @@ void RIG_ICOM::checkresponse()
 	if (!progStatus.use_tcpip && !RigSerial->IsOpen())
 		return;
 
-	if (civ_response_string.rfind(ok) != string::npos)
+	if (civ_resp_string.rfind(ok) != string::npos)
 		return;
 
 	string s1 = str2hex(cmd.c_str(), cmd.length());
-	string s2 = str2hex(civ_response_string.c_str(), civ_response_string.length());
+	string s2 = str2hex(civ_resp_string.c_str(), civ_resp_string.length());
 	LOG_ERROR("\nsent  %s\nreply %s", s1.c_str(), s2.c_str());
 }
 
@@ -195,7 +201,6 @@ bool RIG_ICOM::waitFB(const char *sz)
 #endif
 
 	char sztemp[100];
-	string tosend = cmd;
 	int repeat = 0;
 	int timeout_ms;
 	size_t num = ok.length();
@@ -205,7 +210,7 @@ bool RIG_ICOM::waitFB(const char *sz)
 
 	if (!progStatus.use_tcpip && !RigSerial->IsOpen()) {
 		//snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
-		//showresp(DEBUG, HEX, sztemp, tosend, returned);
+		//showresp(DEBUG, HEX, sztemp, cmd, returned);
 		waitcount = 0;
 #ifdef IC_DEBUG
 civ << sz << std::endl;
@@ -225,35 +230,34 @@ civ.close();
 
 		std::cout << timestamp() << ": waitFB" << std::endl;
 
-		sendCommand(cmd, 0);
-		readICResponse(timeout_ms);
-		if (civ_response_string.find(ok) != string::npos) {
+		waitICResponse(timeout_ms);
+		if (civ_resp_string.find(ok) != string::npos) {
 			unsigned long int waited = zmsec() - tod_start;
 			snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, OK", sz, waited);
 			if (repeat)
-				showresp(WARN, HEX, sztemp, tosend, civ_response_string);
+				showresp(WARN, HEX, sztemp, cmd, civ_resp_string);
 			else
-				showresp(DEBUG, HEX, sztemp, tosend, civ_response_string);
+				showresp(DEBUG, HEX, sztemp, cmd, civ_resp_string);
 
 			waitcount = 0;
 #ifdef IC_DEBUG
 civ << sztemp << std::endl;
 civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-civ << "    " << str2hex(civ_response_string.c_str(), civ_response_string.length()) << std::endl;
+civ << "    " << str2hex(civ_resp_string.c_str(), civ_resp_string.length()) << std::endl;
 civ.close();
 #endif
 			return true;
 		}
-		if (civ_response_string.find(bad) != string::npos) {
+		if (civ_resp_string.find(bad) != string::npos) {
 			unsigned long int waited = zmsec() - tod_start;
 			snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, FAIL", sz, waited);
-			showresp(ERR, HEX, sztemp, tosend, civ_response_string);
+			showresp(ERR, HEX, sztemp, cmd, civ_resp_string);
 			waitcount = 0;
 
 #ifdef IC_DEBUG
 civ << sztemp << std::endl;
 civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-civ << "    " << str2hex(civ_response_string.c_str(), civ_response_string.length()) << std::endl;
+civ << "    " << str2hex(civ_resp_string.c_str(), civ_resp_string.length()) << std::endl;
 civ.close();
 #endif
 			return false;
@@ -265,7 +269,7 @@ civ.close();
 	waitcount++;
 	unsigned long int waited = zmsec() - tod_start;
 	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %ld ms", sz, waited);
-	showresp(ERR, HEX, sztemp, tosend, civ_response_string);
+	showresp(ERR, HEX, sztemp, cmd, civ_resp_string);
 
 	if (waitcount > 4 && !timeout_alert) {
 		timeout_alert = true;
@@ -277,7 +281,7 @@ civ.close();
 #ifdef IC_DEBUG
 civ << sztemp << std::endl;
 civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-civ << "    " << str2hex(civ_response_string.c_str(), civ_response_string.length()) << std::endl;
+civ << "    " << str2hex(civ_resp_string.c_str(), civ_resp_string.length()) << std::endl;
 civ << sztemp << std::endl;
 #endif
 
@@ -296,7 +300,6 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 #endif
 
 	char sztemp[100];
-	string tosend = cmd;
 	int repeat = 0;
 	int timeout_ms;
 	size_t num = n;
@@ -307,7 +310,7 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 	if (!progStatus.use_tcpip && !RigSerial->IsOpen()) {
 		// TBD DJW - Fix this. replystr = returned;
 //	  snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
-//	  showresp(DEBUG, HEX, sztemp, tosend, returned);
+//	  showresp(DEBUG, HEX, sztemp, cmd, returned);
 #ifdef IC_DEBUG
 civ << sz << std::endl;
 civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
@@ -326,17 +329,16 @@ civ.close();
 
 		std::cout << timestamp() << ": waitFOR: " << n << " bytes" << std::endl;
 
-		sendCommand(tosend, 0);
-		readICResponse(timeout_ms);
-		if (civ_response_string.length() >= num) {
+		waitICResponse(timeout_ms);
+		if (civ_resp_string.length() >= num) {
 			unsigned long int waited = zmsec() - tod_start;
 			snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, OK  ", sz, waited);
-			showresp(DEBUG, HEX, sztemp, tosend, civ_response_string);
+			showresp(DEBUG, HEX, sztemp, cmd, civ_resp_string);
 
 #ifdef IC_DEBUG
 civ << sztemp << std::endl;
 civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-civ << "    " << str2hex(civ_response_string.c_str(), civ_response_string.length()) << std::endl;
+civ << "    " << str2hex(civ_resp_string.c_str(), civ_resp_string.length()) << std::endl;
 civ.close();
 #endif
 			return true;
@@ -348,7 +350,7 @@ civ.close();
 	waitcount++;
 	unsigned long int waited = zmsec() - tod_start;
 	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %ld ms", sz, waited);
-	showresp(ERR, HEX, sztemp, tosend, civ_response_string);
+	showresp(ERR, HEX, sztemp, cmd, civ_resp_string);
 
 	if (waitcount > 4 && !timeout_alert) {
 		timeout_alert = true;
@@ -361,7 +363,7 @@ civ.close();
 #ifdef IC_DEBUG
 civ << sztemp << std::endl;
 civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-civ << "    " << str2hex(civ_response_string.c_str(), civ_response_string.length()) << std::endl;
+civ << "    " << str2hex(civ_resp_string.c_str(), civ_resp_string.length()) << std::endl;
 civ.close();
 #endif
 	return false;
@@ -387,17 +389,16 @@ void RIG_ICOM::A2B()
 	waitFB("Equalize vfos");
 }
 
-int RIG_ICOM::readICResponse(int timeout_ms)
+int RIG_ICOM::waitICResponse(int timeout_ms)
 {
-	unique_lock<mutex> lk(civ_response_mutex);
-    civ_response_present.wait(lk, []{return civ_response_ready;});
-    civ_response_ready = false;
+	pthread_mutex_lock(&civ_resp_mutex);
+    civ_resp_waiting = true;
+	sendCommand(cmd);
+    pthread_cond_wait(&civ_resp_cond, &civ_resp_mutex);
+	pthread_mutex_unlock(&civ_resp_mutex);
 
-	std::cout << timestamp() << ": readICResponse(timeout_ms=" << timeout_ms << "): " << 
-        str2hex(civ_response_string.c_str(), civ_response_string.length()) << std::endl;
-
-	lk.unlock();
-	civ_response_present.notify_one();
+	std::cout << timestamp() << ": waitICResponse(timeout_ms=" << timeout_ms << "): " << 
+        str2hex(civ_resp_string.c_str(), civ_resp_string.length()) << std::endl;
 
 	return 0;
 }
@@ -427,20 +428,21 @@ void *RIG_ICOM::CIV_listen_thread_loop(void *p)
 
 				if(saved) {
 					saved = false;
-					civ_response_string.append(replystr, start_position, length);
+					civ_resp_string.append(replystr, start_position, length);
 				} else {
-					civ_response_string.assign(replystr, start_position, length);
+					civ_resp_string.assign(replystr, start_position, length);
 				}
 
-				{
-					lock_guard<mutex> lk(civ_response_mutex);
-					civ_response_ready = true;
-				}
-				civ_response_present.notify_one();
-
-				{
-					unique_lock<mutex> lk(civ_response_mutex);
-					civ_response_present.wait(lk, []{return !civ_response_ready;});
+				pthread_mutex_lock(&civ_resp_mutex);
+				if(civ_resp_waiting && string::npos == civ_resp_string.find(this_rig->scope_waveform_data)) {
+					// This is the response we're waiting for.
+					civ_resp_waiting = false;
+					pthread_cond_signal(&civ_resp_cond);
+					pthread_mutex_unlock(&civ_resp_mutex);
+				} else {
+					// This was unsolicited.
+					pthread_mutex_unlock(&civ_resp_mutex);
+					// TBD - Send to scope.
 				}
 
 				start_position = end_position + 1;
@@ -450,7 +452,7 @@ void *RIG_ICOM::CIV_listen_thread_loop(void *p)
 				// TBD DJW - Have not seen this yet. Need a way to cause it to test it.
 				puts("*** SAVING ***");
 				saved = true;
-				civ_response_string.assign(replystr, start_position, string::npos);
+				civ_resp_string.assign(replystr, start_position, string::npos);
 			}
 		}
 	}

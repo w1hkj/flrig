@@ -31,14 +31,17 @@ private:
 	static bool listenThreadRunning;
 	static pthread_t listenThread;
 	static void *CIV_listen_thread_loop(void *p);
+	static RIG_ICOM *this_rig;
 protected:
 	string pre_to;
 	string pre_fm;
 	string post;
 	string ok;
 	string bad;
+	string scope_waveform_data;
 	int    waited;
 	const char *_mode_type;
+	int waitICResponse(int timeout_ms);
 public:
 	RIG_ICOM();
 	virtual ~RIG_ICOM();
@@ -54,8 +57,6 @@ public:
 
 	virtual void swapvfos();
 	virtual void A2B();
-
-	int readICResponse(int timeout_ms);
 };
 
 #endif
