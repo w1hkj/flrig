@@ -55,7 +55,7 @@ public:
 	virtual void swapvfos();
 	virtual void A2B();
 
-	int readICResponse(int wait_msec);
+	int readICResponse(int timeout_ms);
 };
 
 #endif

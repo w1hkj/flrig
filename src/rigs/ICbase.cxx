@@ -65,7 +65,7 @@ ostream &operator<<(ostream &out, const timestamp &obj)
 mutex              civ_response_mutex;
 condition_variable civ_response_present;
 bool               civ_response_ready = false;
-system_clock::time_point t0;
+string             civ_response_string;
 
 bool RIG_ICOM::listenThreadRunning = false;
 pthread_t RIG_ICOM::listenThread;
@@ -129,11 +129,11 @@ void RIG_ICOM::checkresponse()
 	if (!progStatus.use_tcpip && !RigSerial->IsOpen())
 		return;
 
-	if (replystr.rfind(ok) != string::npos)
+	if (civ_response_string.rfind(ok) != string::npos)
 		return;
 
 	string s1 = str2hex(cmd.c_str(), cmd.length());
-	string s2 = str2hex(replystr.c_str(), replystr.length());
+	string s2 = str2hex(civ_response_string.c_str(), civ_response_string.length());
 	LOG_ERROR("\nsent  %s\nreply %s", s1.c_str(), s2.c_str());
 }
 
@@ -190,100 +190,102 @@ static void show_timeout(void *)
 
 bool RIG_ICOM::waitFB(const char *sz)
 {
-//#ifdef IC_DEBUG
-//  ofstream civ(ICDEBUGfname.c_str(), ios::app);
-//#endif
-//
-//  char sztemp[100];
-//  string returned = "";
-//  string tosend = cmd;
-//  unsigned long tod_start = zmsec();
-//
-//  if (!progStatus.use_tcpip && !RigSerial->IsOpen()) {
-//	  replystr = returned;
-////        snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
-////        showresp(DEBUG, HEX, sztemp, tosend, returned);
-//	  waitcount = 0;
-//#ifdef IC_DEBUG
-//civ << sz << std::endl;
-//civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-//civ.close();
-//#endif
-//	  return false;
-//  }
-//  int cnt = 0, repeat = 0, num = cmd.length() + ok.length();
-//
-//  int wait_msec = (int)(num*11000.0/RigSerial->Baud() +
-//		  progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0) / 10;
-//
-//  for (repeat = 0; repeat < progStatus.comm_retries; repeat++) {
-//	  sendCommand(cmd, 0);
-//	  returned = "";
-//	  for ( cnt = 0; cnt < wait_msec; cnt++) {
-//		  readICResponse(wait_msec);
-//		  returned.append(replystr);
-//		  if (returned.find(ok) != string::npos) {
-//			  replystr = returned;
-//			  unsigned long int waited = zmsec() - tod_start;
-//			  snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, OK", sz, waited);
-//			  if (repeat)
-//				  showresp(WARN, HEX, sztemp, tosend, returned);
-//			  else
-//				  showresp(DEBUG, HEX, sztemp, tosend, returned);
-//
-//			  waitcount = 0;
-//#ifdef IC_DEBUG
-//civ << sztemp << std::endl;
-//civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-//civ << "    " << str2hex(returned.c_str(), returned.length()) << std::endl;
-//civ.close();
-//#endif
-//			  return true;
-//		  }
-//		  if (returned.find(bad) != string::npos) {
-//			  replystr = returned;
-//			  unsigned long int waited = zmsec() - tod_start;
-//			  snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, FAIL", sz, waited);
-//			  showresp(ERR, HEX, sztemp, tosend, returned);
-//			  waitcount = 0;
-//
-//#ifdef IC_DEBUG
-//civ << sztemp << std::endl;
-//civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-//civ << "    " << str2hex(returned.c_str(), returned.length()) << std::endl;
-//civ.close();
-//#endif
-//			  return false;
-//		  }
-//		  MilliSleep(10);
-//		  Fl::awake();
-//	  }
-//  }
-//  waitcount++;
-//  replystr = returned;
-//  unsigned long int waited = zmsec() - tod_start;
-//  snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %ld ms", sz, waited);
-//  showresp(ERR, HEX, sztemp, tosend, returned);
-//
-//#ifdef IC_DEBUG
-//civ << sztemp << std::endl;
-//civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-//civ << "    " << str2hex(returned.c_str(), returned.length()) << std::endl;
-//#endif
-//
-//  if (waitcount > 4 && !timeout_alert) {
-//	  timeout_alert = true;
-//	  snprintf(sztimeout_alert, sizeof(sztimeout_alert), 
-//		  "Serial i/o failure\n%s TIME OUT in %ld ms",
-//		  sz, waited);
-//		  Fl::awake(show_timeout);
-//#ifdef IC_DEBUG
-//civ << sztemp << std::endl;
-//#endif
-//  }
-//#ifdef IC_DEBUG
-//civ.close();
-//#endif
+#ifdef IC_DEBUG
+	ofstream civ(ICDEBUGfname.c_str(), ios::app);
+#endif
+
+	char sztemp[100];
+	string tosend = cmd;
+	int repeat = 0;
+	int timeout_ms;
+	size_t num = ok.length();
+	if (progStatus.comm_echo) num += cmd.length();
+
+	unsigned long tod_start = zmsec();
+
+	if (!progStatus.use_tcpip && !RigSerial->IsOpen()) {
+		//snprintf(sztemp, sizeof(sztemp), "%s TEST", sz);
+		//showresp(DEBUG, HEX, sztemp, tosend, returned);
+		waitcount = 0;
+#ifdef IC_DEBUG
+civ << sz << std::endl;
+civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
+civ.close();
+#endif
+	return false;
+	}
+
+	// TBD DJW Figure out what timeout_ms should be when progStatus.use_tcpip.
+	// 100 mS is how long we give the radio to respond.  1000 converts seconds
+	// to milliseconds. 10 bit times is approximatly what it takes to send a
+	// byte over a serial port.
+	timeout_ms = 100 + ((1000 * 10 * num) / RigSerial->Baud());
+
+	for (repeat = 0; repeat < progStatus.comm_retries; repeat++) {
+
+		std::cout << timestamp() << ": waitFB" << std::endl;
+
+		sendCommand(cmd, 0);
+		readICResponse(timeout_ms);
+		if (civ_response_string.find(ok) != string::npos) {
+			unsigned long int waited = zmsec() - tod_start;
+			snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, OK", sz, waited);
+			if (repeat)
+				showresp(WARN, HEX, sztemp, tosend, civ_response_string);
+			else
+				showresp(DEBUG, HEX, sztemp, tosend, civ_response_string);
+
+			waitcount = 0;
+#ifdef IC_DEBUG
+civ << sztemp << std::endl;
+civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
+civ << "    " << str2hex(civ_response_string.c_str(), civ_response_string.length()) << std::endl;
+civ.close();
+#endif
+			return true;
+		}
+		if (civ_response_string.find(bad) != string::npos) {
+			unsigned long int waited = zmsec() - tod_start;
+			snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, FAIL", sz, waited);
+			showresp(ERR, HEX, sztemp, tosend, civ_response_string);
+			waitcount = 0;
+
+#ifdef IC_DEBUG
+civ << sztemp << std::endl;
+civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
+civ << "    " << str2hex(civ_response_string.c_str(), civ_response_string.length()) << std::endl;
+civ.close();
+#endif
+			return false;
+		}
+		MilliSleep(10);
+		Fl::awake();
+	}
+
+	waitcount++;
+	unsigned long int waited = zmsec() - tod_start;
+	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %ld ms", sz, waited);
+	showresp(ERR, HEX, sztemp, tosend, civ_response_string);
+
+	if (waitcount > 4 && !timeout_alert) {
+		timeout_alert = true;
+		snprintf(sztimeout_alert, sizeof(sztimeout_alert), 
+			"Serial i/o failure\n%s TIME OUT in %ld ms",
+			sz, waited);
+			Fl::awake(show_timeout);
+
+#ifdef IC_DEBUG
+civ << sztemp << std::endl;
+civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
+civ << "    " << str2hex(civ_response_string.c_str(), civ_response_string.length()) << std::endl;
+civ << sztemp << std::endl;
+#endif
+
+	}
+
+#ifdef IC_DEBUG
+civ.close();
+#endif
 	return false;
 }
 
@@ -296,13 +298,11 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 	char sztemp[100];
 	string tosend = cmd;
 	int repeat = 0;
+	int timeout_ms;
 	size_t num = n;
 	if (progStatus.comm_echo) num += cmd.length();
 
 	unsigned long int tod_start = zmsec();
-
-	int wait_msec =  (int)(num * 11000.0 / RigSerial->Baud() + 
-		progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0) / 10;
 
 	if (!progStatus.use_tcpip && !RigSerial->IsOpen()) {
 		// TBD DJW - Fix this. replystr = returned;
@@ -315,21 +315,28 @@ civ.close();
 #endif
 		return false;
 	}
+
+	// TBD DJW Figure out what timeout_ms should be when progStatus.use_tcpip.
+	// 100 mS is how long we give the radio to respond.  1000 converts seconds
+	// to milliseconds. 10 bit times is approximatly what it takes to send a
+	// byte over a serial port.
+	timeout_ms = 100 + ((1000 * 10 * num) / RigSerial->Baud());
+
 	for (repeat = 0; repeat < progStatus.comm_retries; repeat++) {
 
-		std::cout << timestamp() << ": waitFOR:" << std::endl;
+		std::cout << timestamp() << ": waitFOR: " << n << " bytes" << std::endl;
 
 		sendCommand(tosend, 0);
-		readICResponse(wait_msec);
-		if (replystr.length() >= num) {
+		readICResponse(timeout_ms);
+		if (civ_response_string.length() >= num) {
 			unsigned long int waited = zmsec() - tod_start;
 			snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, OK  ", sz, waited);
-			showresp(DEBUG, HEX, sztemp, tosend, replystr);
+			showresp(DEBUG, HEX, sztemp, tosend, civ_response_string);
 
 #ifdef IC_DEBUG
 civ << sztemp << std::endl;
 civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-civ << "    " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+civ << "    " << str2hex(civ_response_string.c_str(), civ_response_string.length()) << std::endl;
 civ.close();
 #endif
 			return true;
@@ -341,7 +348,7 @@ civ.close();
 	waitcount++;
 	unsigned long int waited = zmsec() - tod_start;
 	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %ld ms", sz, waited);
-	showresp(ERR, HEX, sztemp, tosend, replystr);
+	showresp(ERR, HEX, sztemp, tosend, civ_response_string);
 
 	if (waitcount > 4 && !timeout_alert) {
 		timeout_alert = true;
@@ -354,7 +361,7 @@ civ.close();
 #ifdef IC_DEBUG
 civ << sztemp << std::endl;
 civ << "    " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-civ << "    " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+civ << "    " << str2hex(civ_response_string.c_str(), civ_response_string.length()) << std::endl;
 civ.close();
 #endif
 	return false;
@@ -380,17 +387,14 @@ void RIG_ICOM::A2B()
 	waitFB("Equalize vfos");
 }
 
-int RIG_ICOM::readICResponse(int wait_msec)
+int RIG_ICOM::readICResponse(int timeout_ms)
 {
 	unique_lock<mutex> lk(civ_response_mutex);
-	civ_response_present.wait(lk, []{return civ_response_ready;});
-	civ_response_ready = false;
+    civ_response_present.wait(lk, []{return civ_response_ready;});
+    civ_response_ready = false;
 
-	std::cout << timestamp() << ": readICResponse: ";
-	for(size_t n = 0; n < replystr.length(); n++) {
-		printf(" %02X", (unsigned char)replystr[n]);
-	}
-	putchar('\n');
+	std::cout << timestamp() << ": readICResponse(timeout_ms=" << timeout_ms << "): " << 
+        str2hex(civ_response_string.c_str(), civ_response_string.length()) << std::endl;
 
 	lk.unlock();
 	civ_response_present.notify_one();
@@ -403,13 +407,13 @@ void *RIG_ICOM::CIV_listen_thread_loop(void *p)
 {
 	size_t nread = 0;
 	size_t start_position, end_position, length;
-	static string s;
 	static bool saved = false;
 
 	puts("Listen Thread Starting");
 
 	while(listenThreadRunning) {
 
+        // readResponse() fills replystr with nread bytes. replystr.length() will equal nread.
 		nread = readResponse();
 
 		if(nread) {
@@ -423,20 +427,14 @@ void *RIG_ICOM::CIV_listen_thread_loop(void *p)
 
 				if(saved) {
 					saved = false;
-					s.append(replystr, start_position, length);
+					civ_response_string.append(replystr, start_position, length);
 				} else {
-					s.assign(replystr, start_position, length);
+					civ_response_string.assign(replystr, start_position, length);
 				}
 
-				replystr.assign(s);
 				{
 					lock_guard<mutex> lk(civ_response_mutex);
 					civ_response_ready = true;
-					std::cout << timestamp() <<
-						": s="  << start_position << 
-						", e="  << end_position   <<
-						", l="  << length         <<
-						", sl=" << s.length()     << std::endl;
 				}
 				civ_response_present.notify_one();
 
@@ -452,7 +450,7 @@ void *RIG_ICOM::CIV_listen_thread_loop(void *p)
 				// TBD DJW - Have not seen this yet. Need a way to cause it to test it.
 				puts("*** SAVING ***");
 				saved = true;
-				s.assign(replystr, start_position, string::npos);
+				civ_response_string.assign(replystr, start_position, string::npos);
 			}
 		}
 	}
