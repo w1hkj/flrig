@@ -7,3 +7,7 @@ pdf-stapler cat AddListenThread.pdf 1R AddListenThreadR.pdf
 $7 = {0xfe, 0xfe, 0xe0, 0x94, 0x11, 0x0, 0x0, 0x0, 0x0}
 
 set autoindent noexpandtab tabstop=4 shiftwidth=4
+
+Using RigSerial->Timeout() as amount of time to give the radio to respond. It
+is used in one other place as amount of time for IOSelect() to work. Should
+probably be diffenent variables?
