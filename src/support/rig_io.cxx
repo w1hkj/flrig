@@ -68,7 +68,6 @@ bool startXcvrSerial()
 	RigSerial->Device(progStatus.xcvr_serial_port);
 	RigSerial->Baud(BaudRate(progStatus.comm_baudrate));
 	RigSerial->Stopbits(progStatus.stopbits);
-	RigSerial->Retries(progStatus.comm_retries);
 	RigSerial->Timeout(progStatus.comm_timeout);
 	RigSerial->RTSptt(progStatus.comm_rtsptt);
 	RigSerial->DTRptt(progStatus.comm_dtrptt);
@@ -87,7 +86,6 @@ Serial port:\n\
     Port     : %s\n\
     Baud     : %d\n\
     Stopbits : %d\n\
-    Retries  : %d\n\
     Timeout  : %d\n\
     Loop     : %d\n\
     RTSCTS   : %d\n\
@@ -99,7 +97,6 @@ Serial port:\n\
 			progStatus.xcvr_serial_port.c_str(),
 			progStatus.comm_baudrate,
 			progStatus.stopbits,
-			progStatus.comm_retries,
 			progStatus.comm_timeout,
 			progStatus.serloop_timing,
 			progStatus.comm_rtscts,
@@ -124,7 +121,6 @@ bool startAuxSerial()
 	AuxSerial->Device(progStatus.aux_serial_port);
 	AuxSerial->Baud(BaudRate(progStatus.comm_baudrate));
 	AuxSerial->Stopbits(progStatus.stopbits);
-	AuxSerial->Retries(progStatus.comm_retries);
 	AuxSerial->Timeout(progStatus.comm_timeout);
 
 	if (!AuxSerial->OpenPort()) {

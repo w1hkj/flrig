@@ -57,9 +57,6 @@ public:
 	void Timeout(int tm) { timeout = tm;}
 	int  Timeout() { return timeout; }
 
-	void Retries(int r) { retries = r;}
-	int  Retries() { return retries;}
-
 	void RTS(bool r){rts = r;}
 	bool RTS(){return rts;}
 	void setRTS(bool r);
@@ -101,7 +98,6 @@ private:
 	int		speed;
 	struct	termios oldtio, newtio;
 	int		timeout;
-	int		retries;
 	int		status, origstatus;
 	bool	dtr;
 	bool	dtrptt;
@@ -165,9 +161,6 @@ public:
 	void Baud(int b) { baud = b;};
 	int  Baud() { return baud;};
 
-	void Retries(int r) { retries = r;}
-	int  Retries() { return retries;}
-
 	void RTS(bool r){rts = r;}
 	bool RTS(){return rts;}
 	void setRTS(bool b);
@@ -216,7 +209,6 @@ private:
 	bool busyflag;
 
 	int		baud;
-	int		retries;
 
 	bool	dtr;
 	bool	dtrptt;

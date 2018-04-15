@@ -49,7 +49,6 @@ Cserial::Cserial() {
 	device = "/dev/ttyS0";
 	baud = 1200;
 	timeout = 50; //msec
-	retries = 5;
 	rts = dtr = false;
 	rtsptt = dtrptt = false;
 	rtscts = false;
