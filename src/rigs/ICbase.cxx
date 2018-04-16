@@ -229,11 +229,7 @@ civ.close();
 	// converts seconds to milliseconds. 10 bit times is approximatly what it
 	// takes to send a byte over a serial port.
 	timeout_ms = RigSerial->Timeout() + ((1000 * 10 * num) / RigSerial->Baud());
-	for (repeat = 0; repeat < progStatus.comm_retries; repeat++) {
-		comm_status = waitICResponse(timeout_ms);
-		if(0 == comm_status)
-			break;
-	}
+	comm_status = waitICResponse(timeout_ms);
 
 	if(0 != comm_status) {
 		waitcount++;
@@ -304,7 +300,6 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 #endif
 
 	char sztemp[100];
-	int repeat = 0;
 	int timeout_ms;
 	size_t num = n;
 	int comm_status;	// 0 is success, 110 is ETIMEDOUT.
@@ -331,11 +326,7 @@ civ.close();
 	// converts seconds to milliseconds. 10 bit times is approximatly what it
 	// takes to send a byte over a serial port.
 	timeout_ms = RigSerial->Timeout() + ((1000 * 10 * num) / RigSerial->Baud());
-	for (repeat = 0; repeat < progStatus.comm_retries; repeat++) {
-		comm_status = waitICResponse(timeout_ms);
-		if(0 == comm_status)
-			break;
-	}
+	comm_status = waitICResponse(timeout_ms);
 
 	if(0 != comm_status) {
 		waitcount++;
@@ -373,6 +364,8 @@ civ.close();
 #endif
 		return true;
 	}
+
+	return false;
 }
 
 // exchange & equalize are available in these Icom xcvrs
@@ -401,46 +394,61 @@ int RIG_ICOM::waitICResponse(int timeout_ms)
 {
 	struct timespec time_to_wait;
 	int timeout_calc;
-	int timed_out;
+	int comm_status;	// 0 is success, 110 is ETIMEDOUT.
 
-	timeout_calc = timeout_ms;
+	for (int repeat = 0; repeat < progStatus.comm_retries; repeat++) {
 
-	pthread_mutex_lock(&civ_resp_mutex);
+		timeout_calc = timeout_ms;
 
-    civ_resp_waiting = true;
-	sendCommand(cmd);
+		pthread_mutex_lock(&civ_resp_mutex);
+		civ_resp_waiting = true;
+		sendCommand(cmd);
 
-	clock_gettime(CLOCK_REALTIME, &time_to_wait);
-	while(1000L <= timeout_calc) {
-		timeout_calc -= 1000L;
-		time_to_wait.tv_sec++;
+		clock_gettime(CLOCK_REALTIME, &time_to_wait);
+		while(1000L <= timeout_calc) {
+			timeout_calc -= 1000L;
+			time_to_wait.tv_sec++;
+		}
+		time_to_wait.tv_nsec += (unsigned long)timeout_calc * 1000000L;
+		while(1000000000L <= time_to_wait.tv_nsec) {
+			time_to_wait.tv_nsec -= 1000000000L;
+			time_to_wait.tv_sec++;
+		}
+
+		comm_status = 0;
+		while(civ_resp_waiting && 0 == comm_status)
+			comm_status = pthread_cond_timedwait(&civ_resp_cond, &civ_resp_mutex, &time_to_wait);
+
+		pthread_mutex_unlock(&civ_resp_mutex);
+		
+		// CIV_listen_thread_loop() is unblocked, but we haven't processed the
+		// response yet.  It's okay because we have a stop-and-wait situation.
+		// This answer is to a something we asked for and we won't ask for
+		// anything more until we've processed this answer. CIV_listen_thread
+		// controlled data is sent to the remote scope in a string different
+		// from civ_resp_string.
+
+		std::cout << timestamp() << ": waitICResponse(timeout_ms=" << timeout_ms << "): comm_status=";
+		if(ETIMEDOUT == comm_status)
+			std::cout << "ETIMEDOUT: ";
+		else
+			std::cout << comm_status << ": ";
+		std::cout << "repeat=" << repeat << ": " <<
+			str2hex(civ_resp_string.c_str(), civ_resp_string.length()) << std::endl;
+
+		if(0 == comm_status)
+			break;
 	}
-	time_to_wait.tv_nsec += (unsigned long)timeout_calc * 1000000L;
-	while(1000000000L <= time_to_wait.tv_nsec) {
-		time_to_wait.tv_nsec -= 1000000000L;
-		time_to_wait.tv_sec++;
-	}
 
-	timed_out = 0;
-	while(civ_resp_waiting && 0 == timed_out)
-    	timed_out = pthread_cond_timedwait(&civ_resp_cond, &civ_resp_mutex, &time_to_wait);
-
-	pthread_mutex_unlock(&civ_resp_mutex);
-
-	std::cout << timestamp() << ": waitICResponse(timeout_ms=" << timeout_ms << "): timed_out=";
-	if(ETIMEDOUT == timed_out)
-		std::cout << "ETIMEDOUT: ";
-	else
-		std::cout << timed_out << ": ";
-
-	std::cout << str2hex(civ_resp_string.c_str(), civ_resp_string.length()) << std::endl;
-
-	return timed_out;
+	return comm_status;
 }
 
 // TBD DJW - Add shutdown to override virtual function in rigbase.
 void *RIG_ICOM::CIV_listen_thread_loop(void *p)
 {
+	// civ_data_string will always be controlled by this thread.
+	// This thread uses civ_resp_string to shuttle data to a different thread.
+	string civ_data_string;
 	size_t nread = 0;
 	size_t start_position, end_position, length;
 	static bool saved = false;
@@ -463,21 +471,27 @@ void *RIG_ICOM::CIV_listen_thread_loop(void *p)
 
 				if(saved) {
 					saved = false;
-					civ_resp_string.append(replystr, start_position, length);
+					civ_data_string.append(replystr, start_position, length);
 				} else {
-					civ_resp_string.assign(replystr, start_position, length);
+					civ_data_string.assign(replystr, start_position, length);
 				}
 
 				pthread_mutex_lock(&civ_resp_mutex);
-				if(civ_resp_waiting && string::npos == civ_resp_string.find(this_rig->scope_waveform_data)) {
-					// This is the response we're waiting for.
+				if(civ_resp_waiting && string::npos == civ_data_string.find(this_rig->scope_waveform_data)) {
+					// This is the response we're waiting for.  civ_data_string
+					// must be immediately available to this thread in case
+					// remote scope data comes in before the thread on the
+					// other side of the mutex isn't done processing this
+					// response yet.
 					civ_resp_waiting = false;
+					civ_resp_string.assign(civ_data_string);
 					pthread_cond_signal(&civ_resp_cond);
 					pthread_mutex_unlock(&civ_resp_mutex);
 				} else {
 					// This was unsolicited.
-					pthread_mutex_unlock(&civ_resp_mutex);
 					// TBD - Send to scope.
+					// Finish with civ_data_string before unlocking mutex.
+					pthread_mutex_unlock(&civ_resp_mutex);
 				}
 
 				start_position = end_position + 1;
@@ -487,7 +501,7 @@ void *RIG_ICOM::CIV_listen_thread_loop(void *p)
 				// TBD DJW - Have not seen this yet. Need a way to cause it to test it.
 				puts("*** SAVING ***");
 				saved = true;
-				civ_resp_string.assign(replystr, start_position, string::npos);
+				civ_data_string.assign(replystr, start_position, string::npos);
 			}
 		}
 	}
