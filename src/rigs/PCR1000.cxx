@@ -127,7 +127,6 @@ void RIG_PCR1000::initialize()
 	set_squelch(sql);
 	set_if_shift(if_shift);	// mid = off					// wbx
 
-	RIG_DEBUG = true;
 }
 
 //----------------------------------------------------------------------

@@ -475,8 +475,6 @@ void RIG_IC7800::set_mic_gain(int v)
 	}
 	sendICcommand (cmd, 6);
 	checkresponse();
-	if (RIG_DEBUG)
-		LOG_WARN("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 static const char *atten_labels[] = {
@@ -500,8 +498,6 @@ void RIG_IC7800::set_attenuator(int val)
 	cmd.append( post );
 	sendICcommand(cmd,6);
 	checkresponse();
-	if (RIG_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 int RIG_IC7800::get_attenuator()

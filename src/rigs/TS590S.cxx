@@ -168,7 +168,6 @@ void RIG_TS590S::initialize()
 	cmd = "EX003000000;";
 	sendCommand(cmd);
 
-	RIG_DEBUG = true;
 	cmd = "AC000;"; sendCommand(cmd);
 	selectA();
 	get_preamp();

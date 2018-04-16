@@ -522,18 +522,7 @@ void RIG_IC7851::set_mic_gain(int v)
 	cmd.append("\x14\x0B");
 	cmd.append(to_bcd(ICvol, 3));
 	cmd.append( post );
-
-//	else {
-//		cmd = pre_to;
-//		cmd += '\x1A'; cmd += '\x05';
-//		cmd += '\x00'; cmd += '\x29';
-//		cmd.append(to_bcd(ICvol, 3));
-//		cmd.append( post );
-//	}
-
 	waitFB("set mic gain");
-	if (RIG_DEBUG)
-		LOG_WARN("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 static const char *atten_labels[] = {
@@ -556,8 +545,6 @@ void RIG_IC7851::set_attenuator(int val)
 	cmd += cmdval;
 	cmd.append( post );
 	waitFB("set_attenuator");
-	if (RIG_DEBUG)
-		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 }
 
 int RIG_IC7851::get_attenuator()

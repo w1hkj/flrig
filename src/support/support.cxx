@@ -122,7 +122,7 @@ int  powerlevel = 0;
 void trace(int n, ...) // all args of type const char *
 {
 	if (!n) return;
-//	if (!RIG_DEBUG) return;
+	if (!RIG_DEBUG) return;
 	stringstream s;
 	va_list vl;
 	va_start(vl, n);

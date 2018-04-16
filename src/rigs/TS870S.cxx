@@ -140,7 +140,6 @@ void RIG_TS870S::initialize()
 
 	get_preamp();
 	get_attenuator();
-	RIG_DEBUG = true;
 }
 
 // add code here for shutting down the transceiver ...
