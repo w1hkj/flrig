@@ -25,26 +25,28 @@
 #define FL891_WAIT_TIME 200
 
 enum mFT891 {
-  mLSB,    mUSB,    mCW,   mFM,    mAM,   mRTTY_L, mCW_R, 
-  mPKT_L, mRTTY_U, mPKT_FM, mFM_N, mPKT_U, mAM_N };
-//  0,      1,       2,     3,      4,       5,      6,
-//  7,      8,       9,    10,     11,      12,      13 // mode index
+ mLSB, mUSB, mCW, mFM,  mAM, mRTTY_L, 
+ mCW_R, mPKT_L, mRTTY_U, mFM_N, mPKT_U, mAM_N };
+//  0,  1,  2,  3,  4,   5,    6,      
+//  7,    8,       9,      B,    C,      D // mode index
 
 static const char FT891name_[] = "FT-891";
 
 static const char *FT891modes_[] = {
-"LSB", "USB", "CW-U", "FM", "AM", "RTTY-L",
-"CW-L", "DATA-L", "RTTY-U", "DATA-FM",
-"FM-N", "DATA-U", "AM-N", NULL};
+"LSB", "USB", "CW-U", "FM", "AM",
+"RTTY-L", "CW-L", "DATA-L", "RTTY-U", "FM-N",
+"DATA-U", "AM-N", NULL};
 
 static const char FT891_mode_chr[] =  {
-	'1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D' };
+ '1', '2', '3', '4', '5',
+ '6', '7', '8', '9', 'B',
+ 'C', 'D' };
 static const char FT891_mode_type[] = {
-	'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L', 'U', 'U', 'U', 'U', 'U' };
+	'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L', 'U', 'U', 'U', 'U' };
 
 static const int FT891_def_bw[] = {
-    17,   17,   5,   0,   0,   10,       5,     16,     10,       0,       0,     16,     0 };
-// mLSB, mUSB, mCW, mFM, mAM, mRTTY_L, mCW_R, mPKT_L, mRTTY_U, mPKT_FM, mFM_N, mPKT_U, mAM_N
+    17,   17,   5,   0,   0,   10,       5,     16,     10,     0,     16,     0 };
+// mLSB, mUSB, mCW, mFM, mAM, mRTTY_L, mCW_R, mPKT_L, mRTTY_U, mFM_N, mPKT_U, mAM_N
 
 static const char *FT891_widths_SSB[] = {
 "200",   "400",  "600",  "850", "1100", "1350", "1500", "1650", "1800", "1950",
@@ -78,21 +80,7 @@ static const char *FT891_widths_AMFMnorm[] = { "NORM", NULL };
 
 static const int FT891_wvals_AMFM[] = { 0, WVALS_LIMIT };
 
-// mPKT_FM Multi bandwidth mode
-static const char *FT891_widths_NN[] = {"NORM", "NARR", NULL };
-
 static const int FT891_wvals_NN[] = {0, 1, WVALS_LIMIT};
-
-// US 60M 5-USB, 5-CW
-//static const char *US_60m_chan[]  = {"000","125","126","127","128","130","141","142","143","144","146",NULL};
-//static const char *US_60m_label[] = {"VFO","U51","U52","U53","U54","U55","U56","U57","U58","U59","U50",NULL};
-
-// UK 60m channel numbers by Brian, G8SEZ
-//static const char *UK_60m_chan[]  = {"000","118","120","121","127","128","129","130",NULL};
-//static const char *UK_60m_label[] = {"VFO","U51","U52","U53","U54","U55","U56","U57",NULL};
-
-//static const char **Channels_60m = US_60m_chan;
-//static const char **label_60m    = US_60m_label;
 
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
@@ -224,39 +212,20 @@ void RIG_FT891::initialize()
 // Disable Auto Information mode
 	sendOK("AI0;");
 
-// "MRnnn;" if valid, returns last channel used, "mrlll...;", along with channel nnn info.
-//	cmd = "MR118;";
-//	wait_char(';', 27, FL891_WAIT_TIME, "Read UK 60m Channel Mem", ASC);
-//	size_t p = replystr.rfind("MR");
-//	if (p == string::npos) {
-//		Channels_60m = US_60m_chan;
-//		label_60m    = US_60m_label;
-//		opSelect60->clear();
-//		char **p = (char **)US_60m_label;
-//		while (*p) opSelect60->add(*p++);
-//	}
-//	else {
-//		Channels_60m = UK_60m_chan;
-//		label_60m    = UK_60m_label;
-//		opSelect60->clear();
-//		char **p = (char **)UK_60m_label;
-//		while (*p) opSelect60->add(*p++);
-//	}
-//	opSelect60->index(m_60m_indx);
-
 }
 
 void RIG_FT891::post_initialize()
 {
-	enable_bandselect_btn(12, false);
-	enable_bandselect_btn(13, true);
 }
 
 long RIG_FT891::get_vfoA ()
 {
 	cmd = rsp = "FA";
 	cmd += ';';
+
 	wait_char(';',12, FL891_WAIT_TIME, "get vfo A", ASC);
+
+	trace(4, "get_vfoA():\n", cmd.c_str(), "\n", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqA;
@@ -276,8 +245,12 @@ void RIG_FT891::set_vfoA (long freq)
 		cmd[ndigits + 1 - i] += freq % 10;
 		freq /= 10;
 	}
+
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET vfo A", cmd, replystr);
+
+	trace(4, "set_vfoA():\n", cmd.c_str(), "\n", replystr.c_str());
+
 }
 
 long RIG_FT891::get_vfoB ()
@@ -285,6 +258,8 @@ long RIG_FT891::get_vfoB ()
 	cmd = rsp = "FB";
 	cmd += ';';
 	wait_char(';',12, FL891_WAIT_TIME, "get vfo B", ASC);
+
+	trace(4, "get_vfoB():\n", cmd.c_str(), "\n", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqB;
@@ -305,44 +280,62 @@ void RIG_FT891::set_vfoB (long freq)
 		cmd[ndigits + 1 - i] += freq % 10;
 		freq /= 10;
 	}
+
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET vfo B", cmd, replystr);
+
+	trace(4, "set_vfoB():\n", cmd.c_str(), "\n", replystr.c_str());
 }
 
 void RIG_FT891::selectA()
 {
 	cmd = "SV;";
+
 	sendOK(cmd);
 	showresp(WARN, ASC, "select A", cmd, replystr);
+
+	trace(4, "selectA():\n", cmd.c_str(), "\n", replystr.c_str());
 }
 
 void RIG_FT891::selectB()
 {
 	cmd = "SV;";
+
 	sendOK(cmd);
 	showresp(WARN, ASC, "select B", cmd, replystr);
+
+	trace(4, "selectB():\n", cmd.c_str(), "\n", replystr.c_str());
 }
 
 
 void RIG_FT891::A2B()
 {
 	cmd = "AB;";
+
 	sendOK(cmd);
 	showresp(WARN, ASC, "vfo A->B", cmd, replystr);
+
+	trace(4, "A2B():\n", cmd.c_str(), "\n", replystr.c_str());
 }
 
 void RIG_FT891::B2A()
 {
 	cmd = "BA;";
+
 	sendOK(cmd);
 	showresp(WARN, ASC, "vfo B->A", cmd, replystr);
+
+	trace(4, "B2A():\n", cmd.c_str(), "\n", replystr.c_str());
 }
 
 void RIG_FT891::swapAB()
 {
 	cmd = "SV;";
+
 	sendOK(cmd);
 	showresp(WARN, ASC, "vfo A<>B", cmd, replystr);
+
+	trace(4, "swapAB():\n", cmd.c_str(), "\n", replystr.c_str());
 }
 
 int RIG_FT891::get_smeter()
@@ -423,8 +416,12 @@ void RIG_FT891::set_power_control(double val)
 		cmd[i] += ival % 10;
 		ival /= 10;
 	}
+
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET power", cmd, replystr);
+
+	trace(4, "set_power_control():\n", cmd.c_str(), "\n", replystr.c_str());
+
 }
 
 // Volume control return 0 ... 100
@@ -450,17 +447,23 @@ void RIG_FT891::set_volume_control(int val)
 		cmd[i] += ivol % 10;
 		ivol /= 10;
 	}
+
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET vol", cmd, replystr);
+
+	trace(4, "set_volume_control():\n", cmd.c_str(), "\n", replystr.c_str());
 }
 
 // Tranceiver PTT on/off
 void RIG_FT891::set_PTT_control(int val)
 {
 	cmd = val ? "TX1;" : "TX0;";
+
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET PTT", cmd, replystr);
 	ptt_ = val;
+
+	trace(4, "set_ptt_control():\n", cmd.c_str(), "\n", replystr.c_str());
 }
 
 int RIG_FT891::get_PTT()
@@ -479,18 +482,12 @@ int RIG_FT891::get_PTT()
 // internal or external tune mode
 void RIG_FT891::tune_rig()
 {
-	cmd = "AC;";
-	wait_char(';',6, FL891_WAIT_TIME, "is Int. Tuner Enabled", ASC);
-	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return;
-	if ((p + 5) >= replystr.length()) return;
-	if (replystr[p+4] == '0') {
-		return;
-	}
-
-	cmd = "AC002;";
+	cmd = "AC012;";
 	sendOK(cmd);
 	showresp(WARN, ASC, "tune rig", cmd, replystr);
+
+	trace(4, "tune_rig():\n", cmd.c_str(), "\n", replystr.c_str());
+
 }
 
 void RIG_FT891::set_attenuator(int val)
@@ -565,10 +562,6 @@ int RIG_FT891::adjust_bandwidth(int val)
 			bandwidths_ = FT891_widths_AMFMnar;
 			bw_vals_    = FT891_wvals_AMFM;
 			break;
-		case mPKT_FM :
-			bandwidths_ = FT891_widths_NN;
-			bw_vals_ = FT891_wvals_NN;
-			break;
 		case mPKT_L :
 		case mPKT_U :
 			bandwidths_ = FT891_widths_SSBD;
@@ -589,7 +582,6 @@ int RIG_FT891::def_bandwidth(int val)
 const char ** RIG_FT891::bwtable(int n)
 {
 	switch (n) {
-		case mPKT_FM : return FT891_widths_NN;
 		case mFM     :
 		case mAM     : return FT891_widths_AMFMnorm;
 		case mFM_N   :
@@ -608,12 +600,17 @@ const char ** RIG_FT891::bwtable(int n)
 void RIG_FT891::set_modeA(int val)
 {
 	modeA = val;
+	adjust_bandwidth(modeA);
+
 	cmd = "MD0";
 	cmd += FT891_mode_chr[val];
 	cmd += ';';
+
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET mode A", cmd, replystr);
-	adjust_bandwidth(modeA);
+
+	trace(4, "set_modeA():\n", cmd.c_str(), "\n", replystr.c_str());
+
 }
 
 int RIG_FT891::get_modeA()
@@ -631,19 +628,28 @@ int RIG_FT891::get_modeA()
 			modeA = md;
 		}
 	}
+
 	adjust_bandwidth(modeA);
+
+	trace(4, "get_modeA():\n", cmd.c_str(), "\n", replystr.c_str());
+
 	return modeA;
 }
 
 void RIG_FT891::set_modeB(int val)
 {
 	modeB = val;
+	adjust_bandwidth(modeB);
+
 	cmd = "MD0";
 	cmd += FT891_mode_chr[val];
 	cmd += ';';
+
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET mode B", cmd, replystr);
-	adjust_bandwidth(modeB);
+
+	trace(4, "set_modeB():\n", cmd.c_str(), "\n", replystr.c_str());
+
 }
 
 int RIG_FT891::get_modeB()
@@ -661,7 +667,11 @@ int RIG_FT891::get_modeB()
 			modeB = md;
 		}
 	}
+
 	adjust_bandwidth(modeB);
+
+	trace(4, "get_modeB():\n", cmd.c_str(), "\n", replystr.c_str());
+
 	return modeB;
 }
 
@@ -671,25 +681,22 @@ void RIG_FT891::set_bwA(int val)
 	bwA = val;
 
 	if (modeA == mFM || modeA == mAM || modeA == mFM_N || modeA == mAM_N) return;
-	if (modeA == mPKT_FM) {
-		if (val == 1) cmd = "NA01;";
-		else cmd = "NA00;";
-		sendOK(cmd);
-		showresp(WARN, ASC, "SET bw A", cmd, replystr);
-		return;
-	}
+	cmd = "NA00;";
 	if ((((modeA == mLSB || modeA == mUSB) && val < 8)) ||
 		((modeA == mCW || modeA == mCW_R ||
 		  modeA == mRTTY_L || modeA == mRTTY_U ||
-		  modeA == mPKT_L || modeA == mPKT_U) && val < 4) ) cmd = "NA01;";
-	else cmd = "NA00;";
+		  modeA == mPKT_L || modeA == mPKT_U) && val < 4) )
+		cmd = "NA01;";
 
-	cmd.append("SH0");
+	cmd.append("SH01");
 	cmd += '0' + bw_indx / 10;
 	cmd += '0' + bw_indx % 10;
 	cmd += ';';
+
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET bw A", cmd, replystr);
+
+	trace(4, "set_bwA():\n", cmd.c_str(), "\n", replystr.c_str());
 }
 
 int RIG_FT891::get_bwA()
@@ -699,27 +706,20 @@ int RIG_FT891::get_bwA()
 		bwA = 0;
 		return bwA;
 	}
-	if (modeA == mPKT_FM) {
-		cmd = rsp = "NA0";
-		cmd += ';';
-		wait_char(';',5, FL891_WAIT_TIME, "get bw A narrow", ASC);
-		p = replystr.rfind(rsp);
-		if (p == string::npos) { bwA = 0; return bwA; }
-		if (p + 4 >= replystr.length()) { bwA = 0; return bwA; }
-		if (replystr[p+3] == '1') bwA = 1;	// narrow on
-		else bwA = 0;
-		return bwA;
-	}
-	cmd = rsp = "SH0";
+
+	cmd = rsp = "SH01";
 	cmd += ';';
-	wait_char(';',6, FL891_WAIT_TIME, "get bw A", ASC);
+
+	wait_char(';',7, FL891_WAIT_TIME, "get bw A", ASC);
+
+	trace(4, "get_bwA():\n", cmd.c_str(), "\n", replystr.c_str());
 
 	p = replystr.rfind(rsp);
 	if (p == string::npos) return bwA;
-	if (p + 5 >= replystr.length()) return bwA;
+	if (p + 6 >= replystr.length()) return bwA;
 
-	replystr[p+5] = 0;
-	int bw_idx = fm_decimal(replystr.substr(p+3), 2);
+	replystr[p+6] = 0;
+	int bw_idx = fm_decimal(replystr.substr(p+4), 2);
 	const int *idx = bw_vals_;
 	int i = 0;
 	while (*idx != WVALS_LIMIT) {
@@ -729,6 +729,7 @@ int RIG_FT891::get_bwA()
 	}
 	if (*idx == WVALS_LIMIT) i--;
 	bwA = i;
+
 	return bwA;
 }
 
@@ -738,25 +739,23 @@ void RIG_FT891::set_bwB(int val)
 	bwB = val;
 
 	if (modeB == mFM || modeB == mAM || modeB == mFM_N || modeB == mAM_N) return;
-	if (modeB == mPKT_FM) {
-		if (val == 1) cmd = "NA01;";
-		else cmd = "NA00;";
-		sendOK(cmd);
-		showresp(WARN, ASC, "SET bw B", cmd, replystr);
-		return;
-	}
+	cmd = "NA00;";
 	if ((((modeB == mLSB || modeB == mUSB) && val < 8)) ||
 		((modeB == mCW || modeB == mCW_R ||
 		  modeB == mRTTY_L || modeB == mRTTY_U ||
-		  modeB == mPKT_L || modeB == mPKT_U) && val < 4) ) cmd = "NA01;";
-	else cmd = "NA00;";
+		  modeB == mPKT_L || modeB == mPKT_U) && val < 4) )
+		cmd = "NA01;";
 
-	cmd.append("SH0");
+	cmd.append("SH01");
 	cmd += '0' + bw_indx / 10;
 	cmd += '0' + bw_indx % 10;
 	cmd += ';';
+
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET bw B", cmd, replystr);
+
+	trace(4, "set_bwB():\n", cmd.c_str(), "\n", replystr.c_str());
+
 }
 
 int RIG_FT891::get_bwB()
@@ -766,27 +765,18 @@ int RIG_FT891::get_bwB()
 		bwB = 0;
 		return bwB;
 	}
-	if (modeB == mPKT_FM) {
-		cmd = rsp = "NA0";
-		cmd += ';';
-		wait_char(';',5, FL891_WAIT_TIME, "get bw B narrow", ASC);
-		p = replystr.rfind(rsp);
-		if (p == string::npos) { bwB = 0; return bwB; }
-		if (p + 4 >= replystr.length()) { bwB = 0; return bwB; }
-		if (replystr[p+3] == '1') bwB = 1;	// narrow on
-		else bwB = 0;
-		return bwB;
-	}
 	cmd = rsp = "SH0";
 	cmd += ';';
-	wait_char(';',6, FL891_WAIT_TIME, "get bw B", ASC);
+	wait_char(';',7, FL891_WAIT_TIME, "get bw B", ASC);
+
+	trace(4, "get_bwB():\n", cmd.c_str(), "\n", replystr.c_str());
 
 	p = replystr.rfind(rsp);
 	if (p == string::npos) return bwB;
-	if (p + 5 >= replystr.length()) return bwB;
+	if (p + 6 >= replystr.length()) return bwB;
 
-	replystr[p+5] = 0;
-	int bw_idx = fm_decimal(replystr.substr(p+3), 2);
+	replystr[p+6] = 0;
+	int bw_idx = fm_decimal(replystr.substr(p+4), 2);
 	const int *idx = bw_vals_;
 	int i = 0;
 	while (*idx != WVALS_LIMIT) {
@@ -806,11 +796,12 @@ int RIG_FT891::get_modetype(int n)
 
 void RIG_FT891::set_if_shift(int val)
 {
-	cmd = "IS0+0000;";
-	if (val < 0) cmd[3] = '-';
+	cmd = "IS01+0000;";
+	if (val == 0) cmd[3] = '0';
+	if (val < 0) cmd[4] = '-';
 	val = abs(val);
 	for (int i = 4; i > 0; i--) {
-		cmd[3+i] += val % 10;
+		cmd[4+i] += val % 10;
 		val /= 10;
 	}
 	sendOK(cmd);
@@ -821,14 +812,14 @@ bool RIG_FT891::get_if_shift(int &val)
 {
 	cmd = rsp = "IS0";
 	cmd += ';';
-	wait_char(';',9, FL891_WAIT_TIME, "get if shift", ASC);
+	wait_char(';',10, FL891_WAIT_TIME, "get if shift", ASC);
 
 	size_t p = replystr.rfind(rsp);
 	val = progStatus.shift_val;
 	if (p == string::npos) return progStatus.shift;
-	val = atoi(&replystr[p+4]);
-	if (replystr[p+3] == '-') val = -val;
-	return (val != 0);
+	val = atoi(&replystr[p+5]);
+	if (replystr[p+4] == '-') val = -val;
+	return (replystr[3] == '1');
 }
 
 void RIG_FT891::get_if_min_max_step(int &min, int &max, int &step)
@@ -1024,13 +1015,16 @@ void RIG_FT891::get_mic_min_max_step(int &min, int &max, int &step)
 void RIG_FT891::set_rf_gain(int val)
 {
 	cmd = "RG0000;";
-	int rfval = (int)(val * 2.50);
 	for (int i = 5; i > 2; i--) {
-		cmd[i] = rfval % 10 + '0';
-		rfval /= 10;
+		cmd[i] = val % 10 + '0';
+		val /= 10;
 	}
+
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET rfgain", cmd, replystr);
+
+	trace(4, "set_rf_gain():\n", cmd.c_str(), "\n", replystr.c_str());
+
 }
 
 int  RIG_FT891::get_rf_gain()
@@ -1040,14 +1034,14 @@ int  RIG_FT891::get_rf_gain()
 	cmd += ';';
 	wait_char(';',7, FL891_WAIT_TIME, "get rfgain", ASC);
 
+	trace(4, "get_rf_gain():\n", cmd.c_str(), "\n", replystr.c_str());
+
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.rfgain;
 	for (int i = 3; i < 6; i++) {
 		rfval *= 10;
 		rfval += replystr[p+i] - '0';
 	}
-	rfval = (int)(rfval / 2.50);
-	if (rfval > 100) rfval = 100;
 	return ceil(rfval);
 }
 
