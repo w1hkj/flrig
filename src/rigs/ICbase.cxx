@@ -498,10 +498,16 @@ void *RIG_ICOM::CIV_listen_thread_loop(void *p)
 			}
 
 			if(start_position < nread) {
-				// TBD DJW - Have not seen this yet. Need a way to cause it to test it.
+				// TBD DJW - Saw this, but can't recreate. Need a way to cause it to test it.
+                // Aborted because, I think, replystr was zero length. Maybe a problem with
+                // threads and misplaced mutex?
 				puts("*** SAVING ***");
 				saved = true;
-				civ_data_string.assign(replystr, start_position, string::npos);
+                if(replystr.length() > start_position)
+				    civ_data_string.assign(replystr, start_position, string::npos);
+                else
+                    printf("ERROR: replystr.length()=%d, start_position=%d\n",
+                            replystr.length(), start_position);
 			}
 		}
 	}
