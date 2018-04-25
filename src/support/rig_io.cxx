@@ -87,6 +87,8 @@ Serial port:\n\
     Baud     : %d\n\
     Stopbits : %d\n\
     Timeout  : %d\n\
+    VMIN     : %d\n\
+    VTIME    : %d\n\
     Loop     : %d\n\
     RTSCTS   : %d\n\
     CATptt   : %d\n\
@@ -98,13 +100,15 @@ Serial port:\n\
 			progStatus.comm_baudrate,
 			progStatus.stopbits,
 			progStatus.comm_timeout,
+			progStatus.comm_vmin,
+			progStatus.comm_vtime,
 			progStatus.serloop_timing,
 			progStatus.comm_rtscts,
 			progStatus.comm_catptt,
 			progStatus.comm_rtsptt,
 			progStatus.comm_dtrptt,
 			progStatus.comm_rtsplus,
-			progStatus.comm_dtrplus );
+			progStatus.comm_dtrplus);
 	}
 
 	RigSerial->FlushBuffer();

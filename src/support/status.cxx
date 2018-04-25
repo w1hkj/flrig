@@ -54,6 +54,11 @@ status progStatus = {
 	2,			// int comm_retries;
 	5,			// int comm_wait;
 	50,			// int comm_timeout;
+
+                // This was determined to be the values before adding these elements.
+    1,          // int  comm_vmin  c_cc[VMIN]  = 1
+    0,          // int  comm_vtime c_cc[VTIME] = 0
+
 	false,		// bool comm_echo;
 	false,		// bool comm_catptt;
 	false,		// bool comm_rtsptt;
@@ -61,10 +66,6 @@ status progStatus = {
 	false,		// bool comm_rtscts;
 	false,		// bool comm_rtsplus;
 	false,		// bool comm_dtrplus;
-
-                // This was determined to be the values before adding these elements. Six characters or 50 mS.
-    6,          // int  comm_vmin  c_cc[VMIN]  = 6
-    5,          // int  comm_vtime c_cc[VTIME] = 5
 
 	200,		// int  serloop_timing;
 	0,			// int  byte_interval;
@@ -710,6 +711,8 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("comm_retries", comm_retries, comm_retries);
 		spref.get("comm_wait", comm_wait, comm_wait);
 		spref.get("comm_timeout", comm_timeout, comm_timeout);
+		if (spref.get("comm_vmin", i, i)) comm_vmin = i;
+		if (spref.get("comm_vtime", i, i)) comm_vtime = i;
 		spref.get("serloop_timing", serloop_timing, serloop_timing);
 		if (serloop_timing < 10) serloop_timing = 10; // minimum loop delay of 10 msec
 		spref.get("byte_interval", byte_interval, byte_interval);
@@ -1170,6 +1173,8 @@ string status::info()
 	info << "comm_retries       : " << comm_retries << "\n";
 	info << "comm_wait          : " << comm_wait << "\n";
 	info << "comm_timeout       : " << comm_timeout << "\n";
+	info << "comm_vmin          : " << comm_vmin << "\n";
+	info << "comm_vtime         : " << comm_vtime << "\n";
 	info << "serloop_timing     : " << serloop_timing << "\n";
 	info << "byte_interval      : " << byte_interval << "\n";
 	info << "\n";

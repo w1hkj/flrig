@@ -44,6 +44,8 @@ struct status {
 	int		comm_retries;
 	int		comm_wait;
 	int		comm_timeout;
+    int     comm_vmin;
+    int     comm_vtime;
 	bool	comm_echo;
 	bool	comm_catptt;
 	bool	comm_rtsptt;
@@ -51,8 +53,6 @@ struct status {
 	bool	comm_rtscts;
 	bool	comm_rtsplus;
 	bool	comm_dtrplus;
-    int     comm_vmin;
-    int     comm_vtime;
 	int		serloop_timing;
 	int		byte_interval;
 

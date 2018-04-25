@@ -99,10 +99,7 @@ void RIG_ICOM::initialize()
 	}
 	this_rig = this;
 
-	//RigSerial->printConfig();
-
-	//RigSerial->getVminVtime(cc_t * pvmin, cc_t * pvtime)
-	//RigSerial->setVminVtime(cc_t vmin, cc_t vtime)
+	RigSerial->printConfig();
 
 	// Can be called more than once if someone is selecting different ICOM radios.
 	printf("Starting Listen Thread - %s\n", name_.c_str());
