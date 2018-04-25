@@ -86,13 +86,25 @@ public:
 	bool get_if_shift(int &val);
 	void get_if_min_max_step(int &min, int &max, int &step);
 
+	void set_noise(bool b);
+	int  get_noise();
+
 	void set_mic_gain(int val);
 	int  get_mic_gain();
 	void get_mic_min_max_step(int &min, int &max, int &step);
 
+	void set_squelch(int val);
+	int  get_squelch();
+	void get_squelch_min_max_step(int &min, int &max, int &step);
+
 	void set_rf_gain(int val);
 	int  get_rf_gain();
 	void get_rf_min_max_step(int &min, int &max, int &step);
+
+	int  get_agc();
+	int  incr_agc();
+	const char *agc_label();
+	int  agc_val();
 
 	void set_attenuator(int val);
 	int  get_attenuator();
@@ -102,6 +114,16 @@ public:
 	int  adjust_bandwidth(int m);
 	int  def_bandwidth(int m);
 	int  set_widths(int val);
+
+	void set_noise_reduction_val(int val);
+	int  get_noise_reduction_val();
+	void set_noise_reduction(int val);
+	int  get_noise_reduction();
+	void get_nr_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 9; step = 1; }
+
+	void set_auto_notch(int v);
+	int  get_auto_notch();
 
 	const char **bwtable(int);
 	const char **lotable(int);

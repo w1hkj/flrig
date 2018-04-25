@@ -382,6 +382,17 @@ int RIG_TS480SAT::get_smeter()
 	return mtr;
 }
 
+struct pwrpair {int mtr; float pwr;};
+
+static pwrpair pwrtbl[] = { 
+	{0, 0.0}, 
+	{2, 5.0},
+	{4, 10.0}, 
+	{7, 25.0}, 
+	{11, 50.0}, 
+	{16, 100.0}, 
+	{20, 200.0} };
+
 int RIG_TS480SAT::get_power_out()
 {
 	int mtr = 0;
@@ -390,8 +401,17 @@ int RIG_TS480SAT::get_power_out()
 
 	size_t p = replystr.rfind("SM");
 	if (p != string::npos) {
-		mtr = 5 * atoi(&replystr[p + 3]);
-		if (mtr > 100) mtr = 100;
+		mtr = atoi(&replystr[p + 3]);
+
+		size_t i = 0;
+		for (i = 0; i < sizeof(pwrtbl) / sizeof(pwrpair) - 1; i++)
+			if (mtr >= pwrtbl[i].mtr && mtr < pwrtbl[i+1].mtr)
+				break;
+		if (mtr < 0) mtr = 0;
+		if (mtr > 20) mtr = 20;
+		mtr = (int)ceil(pwrtbl[i].pwr + 
+			(pwrtbl[i+1].pwr - pwrtbl[i].pwr)*(mtr - pwrtbl[i].mtr)/(pwrtbl[i+1].mtr - pwrtbl[i].mtr));
+		if (mtr > 200) mtr = 200;
 	}
 	return mtr;
 }

@@ -78,7 +78,6 @@ static const char *TS480HX_CWwidths[] = {
 "2000", NULL};
 static int TS480HX_CW_bw_vals[] = {1,2,3,4,5,6,7,8,9,10,11,WVALS_LIMIT};
 
-
 static const char *TS480HX_CWbw[] = {
 "FW0050;", "FW0080;", "FW0100;", "FW0150;", "FW0200;", 
 "FW0300;", "FW0400;", "FW0500;", "FW0600;", "FW1000;", 
@@ -90,6 +89,9 @@ static int TS480HX_FSK_bw_vals[] = { 1,2,3,4,WVALS_LIMIT};
 
 static const char *TS480HX_FSKbw[] = {
 "FW0250;", "FW0500;", "FW1000;", "FW1500;" };
+
+static int agcval = 1;
+static bool fm_mode = false;
 
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
@@ -121,22 +123,22 @@ RIG_TS480HX::RIG_TS480HX() {
 // base class values
 	name_ = TS480HXname_;
 	modes_ = TS480HXmodes_;
-	_mode_type  = TS480HX_mode_type;
-	bandwidths_ = TS480HX_SH;
-	bw_vals_ = TS480HX_HI_bw_vals;
+	_mode_type = TS480HX_mode_type;
+	bandwidths_ = TS480HX_empty;
+	bw_vals_ = TS480HX_bw_vals;
 
 	dsp_SL     = TS480HX_SL;
 	SL_tooltip = TS480HX_SL_tooltip;
 	SL_label   = TS480HX_btn_SL_label;
 
 	dsp_SH     = TS480HX_SH;
-	SH_tooltip = TS480HX_SL_tooltip;
+	SH_tooltip = TS480HX_SH_tooltip;
 	SH_label   = TS480HX_btn_SH_label;
 
 	widgets = rig_widgets;
 
-	comm_baudrate = BR4800;
-	stopbits = 2;
+	comm_baudrate = BR57600;
+	stopbits = 1;
 	comm_retries = 2;
 	comm_wait = 5;
 	comm_timeout = 50;
@@ -150,34 +152,43 @@ RIG_TS480HX::RIG_TS480HX() {
 	B.iBW = A.iBW = 0x8A03;
 	B.freq = A.freq = 14070000;
 
-	has_tune_control = false;
-	has_noise_control = false;
-	has_notch_control = false;
+	can_change_alt_vfo = true;
 
 	has_extras = true;
+
+	has_noise_reduction =
+	has_noise_reduction_control =
+	has_auto_notch =
+	has_noise_control =
+	has_sql_control =
+
 	has_split = true;
 	has_split_AB = true;
 	has_data_port = true;
 	has_micgain_control = true;
 	has_ifshift_control = true;
 	has_rf_control = true;
+	has_agc_control = true;
+	has_swr_control = true;
+	has_alc_control = true;
 	has_power_out = true;
 	has_dsp_controls = true;
 	has_smeter = true;
-	has_swr_control = true;
-	has_alc_control = true;
 	has_attenuator_control = true;
 	has_preamp_control = true;
 	has_mode_control = true;
 	has_bandwidth_control = true;
 	has_volume_control = true;
 	has_power_control = true;
-	has_tune_control =  true;
+	has_tune_control = true;
 	has_ptt_control = true;
 
 	precision = 1;
 	ndigits = 8;
 
+	_noise_reduction_level = 0;
+	_nrval1 = 2;
+	_nrval2 = 4;
 }
 
 const char * RIG_TS480HX::get_bwname_(int n, int md) 
@@ -201,8 +212,7 @@ void RIG_TS480HX::check_menu_45()
 // read current switch 45 setting
 	menu_45 = false;
 	cmd = "EX0450000;";
-	int ret = wait_char(';', 11, 100, "Check menu item 45", ASC);
-	if (ret >= 11) {
+	if (wait_char(';', 11, 100, "Check menu item 45", ASC) >= 11) {
 		size_t p = replystr.rfind("EX045");
 		if (p != string::npos)
 			menu_45 = (replystr[p+9] == '1');
@@ -248,6 +258,7 @@ void RIG_TS480HX::selectB()
 void RIG_TS480HX::set_split(bool val) 
 {
 	split = val;
+	split = val;
 	if (useB) {
 		if (val) {
 			cmd = "FR1;FT0;";
@@ -288,9 +299,8 @@ int RIG_TS480HX::get_split()
 	if (wait_char(';', 4, 100, "get split tx vfo", ASC) == 4) {
 		p = replystr.rfind(rsp);
 		if (p == string::npos) return split;
-			tx = replystr[p+2];
+		tx = replystr[p+2];
 	}
-
 // rx vfo
 	cmd = rsp = "FR";
 	cmd.append(";");
@@ -308,7 +318,7 @@ int RIG_TS480HX::get_split()
 long RIG_TS480HX::get_vfoA ()
 {
 	cmd = "FA;";
-	if (wait_char(';', 14, 100, "get vfo A", ASC) != 14) return A.freq;
+	if (wait_char(';', 14, 100, "get vfo A", ASC) < 14) return A.freq;
 
 	size_t p = replystr.rfind("FA");
 	if (p != string::npos && (p + 12 < replystr.length())) {
@@ -335,7 +345,7 @@ void RIG_TS480HX::set_vfoA (long freq)
 long RIG_TS480HX::get_vfoB ()
 {
 	cmd = "FB;";
-	if (wait_char(';', 14, 100, "get vfo B", ASC) != 14) return B.freq;
+	if (wait_char(';', 14, 100, "get vfo B", ASC) < 14) return B.freq;
 
 	size_t p = replystr.rfind("FB");
 	if (p != string::npos && (p + 12 < replystr.length())) {
@@ -364,7 +374,7 @@ int RIG_TS480HX::get_smeter()
 {
 	int mtr = 0;
 	cmd = "SM0;";
-	if (wait_char(';', 8, 100, "get Smeter", ASC) != 8) return 0;
+	if (wait_char(';', 8, 100, "get Smeter", ASC) < 8) return 0;
 
 	size_t p = replystr.rfind("SM");
 	if (p != string::npos)
@@ -372,16 +382,36 @@ int RIG_TS480HX::get_smeter()
 	return mtr;
 }
 
+struct pwrpair {int mtr; float pwr;};
+
+static pwrpair pwrtbl[] = { 
+	{0, 0.0}, 
+	{2, 5.0},
+	{4, 10.0}, 
+	{7, 25.0}, 
+	{11, 50.0}, 
+	{16, 100.0}, 
+	{20, 200.0} };
+
 int RIG_TS480HX::get_power_out()
 {
 	int mtr = 0;
 	cmd = "SM0;";
-	if (wait_char(';', 8, 100, "get power", ASC) != 8) return mtr;
+	if (wait_char(';', 8, 100, "get power", ASC) < 8) return mtr;
 
 	size_t p = replystr.rfind("SM");
 	if (p != string::npos) {
-		mtr = 5 * atoi(&replystr[p + 3]);
-		if (mtr > 100) mtr = 100;
+		mtr = atoi(&replystr[p + 3]);
+
+		size_t i = 0;
+		for (i = 0; i < sizeof(pwrtbl) / sizeof(pwrpair) - 1; i++)
+			if (mtr >= pwrtbl[i].mtr && mtr < pwrtbl[i+1].mtr)
+				break;
+		if (mtr < 0) mtr = 0;
+		if (mtr > 20) mtr = 20;
+		mtr = (int)ceil(pwrtbl[i].pwr + 
+			(pwrtbl[i+1].pwr - pwrtbl[i].pwr)*(mtr - pwrtbl[i].mtr)/(pwrtbl[i+1].mtr - pwrtbl[i].mtr));
+		if (mtr > 200) mtr = 200;
 	}
 	return mtr;
 }
@@ -397,7 +427,7 @@ int RIG_TS480HX::get_swr()
 {
 	int mtr = 0;
 	cmd = "RM;";
-	if (wait_char(';', 8, 100, "get SWR/ALC", ASC) != 8) return (int)mtr;
+	if (wait_char(';', 8, 100, "get SWR/ALC", ASC) < 8) return (int)mtr;
 
 	size_t p = replystr.rfind("RM1");
 	if (p != string::npos)
@@ -501,6 +531,8 @@ const char **RIG_TS480HX::hitable(int m)
 
 void RIG_TS480HX::set_modeA(int val)
 {
+	if (val == 3) fm_mode = true;
+	else fm_mode = false;
 	A.imode = val;
 	cmd = "MD";
 	cmd += TS480HX_mode_chr[val];
@@ -513,7 +545,7 @@ void RIG_TS480HX::set_modeA(int val)
 int RIG_TS480HX::get_modeA()
 {
 	cmd = "MD;";
-	if (wait_char(';', 14, 100, "get vfo A", ASC) < 14) return A.imode;
+	if (wait_char(';', 4, 100, "get modeA", ASC) < 4) return A.imode;
 
 	size_t p = replystr.rfind("MD");
 	if (p != string::npos && (p + 2 < replystr.length())) {
@@ -523,11 +555,15 @@ int RIG_TS480HX::get_modeA()
 		A.imode = md;
 		A.iBW = set_widths(A.imode);
 	}
+	if (A.imode == 3) fm_mode = true;
+	else fm_mode = false;
 	return A.imode;
 }
 
 void RIG_TS480HX::set_modeB(int val)
 {
+	if (val == 3) fm_mode = true;
+	else fm_mode = false;
 	B.imode = val;
 	cmd = "MD";
 	cmd += TS480HX_mode_chr[val];
@@ -540,7 +576,7 @@ void RIG_TS480HX::set_modeB(int val)
 int RIG_TS480HX::get_modeB()
 {
 	cmd = "MD;";
-	if (wait_char(';', 14, 100, "get vfo B", ASC) < 14) return B.imode;
+	if (wait_char(';', 4, 100, "get modeB", ASC) < 4) return B.imode;
 
 	size_t p = replystr.rfind("MD");
 	if (p != string::npos && (p + 2 < replystr.length())) {
@@ -550,6 +586,8 @@ int RIG_TS480HX::get_modeB()
 		B.imode = md;
 		B.iBW = set_widths(B.imode);
 	}
+	if (B.imode == 3) fm_mode = true;
+	else fm_mode = false;
 	return B.imode;
 }
 
@@ -696,8 +734,6 @@ int RIG_TS480HX::get_bwB()
 	} else if (B.imode == 2 || B.imode == 6) {
 		cmd = "FW;";
 		if (wait_char(';', 7, 100, "get FW", ASC) == 7) {
-			sendCommand(cmd);
-			showresp(WARN, ASC, "get FW", cmd, replystr);
 			p = replystr.rfind("FW");
 			if (p != string::npos) {
 				for (i = 0; i < 11; i++)
@@ -749,8 +785,8 @@ void RIG_TS480HX::set_volume_control(int val)
 	snprintf(szval, sizeof(szval), "%04d", val * 255 / 100);
 	cmd += szval;
 	cmd += ';';
+	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set vol", cmd, "");
 }
 
 int RIG_TS480HX::get_volume_control()
@@ -775,15 +811,15 @@ void RIG_TS480HX::set_power_control(double val)
 	snprintf(szval, sizeof(szval), "%03d", (int)val);
 	cmd += szval;
 	cmd += ';';
+	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set power", cmd, "");
 }
 
 int RIG_TS480HX::get_power_control()
 {
 	int val = progStatus.power_level;
 	cmd = "PC;";
-	if (wait_char(';', 6, 100, "get power", ASC) < 6) return val;
+	if (wait_char(';', 6, 100, "get Power control", ASC) < 6) return val;
 
 	size_t p = replystr.rfind("PC");
 	if (p == string::npos) return val;
@@ -823,7 +859,7 @@ void RIG_TS480HX::set_preamp(int val)
 int RIG_TS480HX::get_preamp()
 {
 	cmd = "PA;";
-	if (wait_char(';', 5, 100, "get preamp", ASC)  < 5) return progStatus.preamp;
+	if (wait_char(';', 5, 100, "get preamp", ASC) < 5) return progStatus.preamp;
 
 	size_t p = replystr.rfind("PA");
 	if (p == string::npos) return progStatus.preamp;
@@ -834,8 +870,8 @@ int RIG_TS480HX::get_preamp()
 void RIG_TS480HX::tune_rig()
 {
 	cmd = "AC111;";
+	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd);
-	showresp(WARN, ASC, "tune", cmd, "");
 }
 
 void RIG_TS480HX::set_if_shift(int val)
@@ -918,6 +954,191 @@ int  RIG_TS480HX::get_rf_gain()
 void RIG_TS480HX::get_rf_min_max_step(int &min, int &max, int &step)
 {
 	min = 0; max = 100; step = 1;
+}
+
+// Noise Reduction (TS2000.cxx) NR1 only works; no NR2 and don' no why
+void RIG_TS480HX::set_noise_reduction(int val)
+{
+	if (val == -1) {
+		return;
+	}
+	_noise_reduction_level = val;
+	if (_noise_reduction_level == 0) {
+		nr_label("NR", false);
+	} else if (_noise_reduction_level == 1) {
+		nr_label("NR1", true);
+	} else if (_noise_reduction_level == 2) {
+		nr_label("NR2", true);
+	}
+	cmd.assign("NR");
+	cmd += '0' + _noise_reduction_level;
+	cmd += ';';
+	sendCommand (cmd);
+	showresp(WARN, ASC, "SET noise reduction", cmd, "");
+}
+
+int  RIG_TS480HX::get_noise_reduction()
+{
+	cmd = rsp = "NR";
+	cmd.append(";");
+	if (wait_char(';', 4, 100, "GET noise reduction", ASC) == 4) {
+		size_t p = replystr.rfind(rsp);
+		if (p == string::npos) return _noise_reduction_level;
+		_noise_reduction_level = replystr[p+2] - '0';
+	}
+
+	if (_noise_reduction_level == 1) {
+		nr_label("NR1", true);
+	} else if (_noise_reduction_level == 2) {
+		nr_label("NR2", true);
+	} else {
+		nr_label("NR", false);
+	}
+
+	return _noise_reduction_level;
+}
+
+void RIG_TS480HX::set_noise_reduction_val(int val)
+{
+	if (_noise_reduction_level == 0) return;
+	if (_noise_reduction_level == 1) _nrval1 = val;
+	else _nrval2 = val;
+
+	cmd.assign("RL").append(to_decimal(val, 2)).append(";");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET_noise_reduction_val", cmd, "");
+}
+
+int  RIG_TS480HX::get_noise_reduction_val()
+{
+	int nrval = 0;
+	if (_noise_reduction_level == 0) return 0;
+	int val = progStatus.noise_reduction_val;
+	cmd = rsp = "RL";
+	cmd.append(";");
+	if (wait_char(';', 5, 100, "GET noise reduction val", ASC) == 5) {
+		size_t p = replystr.rfind(rsp);
+		if (p == string::npos) {
+			nrval = (_noise_reduction_level == 1 ? _nrval1 : _nrval2);
+			return nrval;
+		}
+		val = atoi(&replystr[p+2]);
+	}
+
+	if (_noise_reduction_level == 1) _nrval1 = val;
+	else _nrval2 = val;
+
+	return val;
+}
+
+int  RIG_TS480HX::get_agc()
+{
+	cmd = "GT;";
+	wait_char(';', 6, 100, "GET agc val", ASC);
+	size_t p = replystr.rfind("GT");
+	if (p == string::npos) return agcval;
+	if (replystr[4] == ' ') return 0;
+	agcval = replystr[4] - '0' + 1; // '0' == off, '1' = fast, '2' = slow
+	return agcval;
+}
+
+int RIG_TS480HX::incr_agc()
+{
+	if (fm_mode) return 0;
+	agcval++;
+	if (agcval == 4) agcval = 1;
+	cmd.assign("GT00");
+	cmd += (agcval + '0' - 1);
+	cmd += ";";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET agc", cmd, replystr);
+	return agcval;
+}
+
+
+static const char *agcstrs[] = {"FM", "AGC", "FST", "SLO"};
+const char *RIG_TS480HX::agc_label()
+{
+	if (fm_mode) return agcstrs[0];
+	return agcstrs[agcval];
+}
+
+int  RIG_TS480HX::agc_val()
+{
+	if (fm_mode) return 0;
+	return agcval;
+}
+
+// Auto Notch, beat canceller (TS2000.cxx) BC1 only, not BC2
+void RIG_TS480HX::set_auto_notch(int v)
+{
+	cmd = v ? "BC1;" : "BC0;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set auto notch", cmd, "");
+
+}
+
+int  RIG_TS480HX::get_auto_notch()
+{
+	cmd = "BC;";
+	if (wait_char(';', 4, 100, "get auto notch", ASC) == 4) {
+		int anotch = 0;
+		size_t p = replystr.rfind("BC");
+		if (p != string::npos) {
+			anotch = (replystr[p+2] == '1');
+			return anotch;
+		}
+	}
+	return 0;
+}
+
+// Noise Blanker (TS2000.cxx)
+void RIG_TS480HX::set_noise(bool b)
+{
+	if (b)
+		cmd = "NB1;";
+	else
+		cmd = "NB0;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set NB", cmd, "");
+}
+
+int RIG_TS480HX::get_noise()
+{
+	cmd = "NB;";
+	if (wait_char(';', 4, 100, "get Noise Blanker", ASC) == 4) {
+		size_t p = replystr.rfind("NB");
+		if (p == string::npos) return 0;
+		if (replystr[p+2] == '0') return 0;
+	}
+	return 1;
+}
+
+// Squelch (TS990.cxx)
+void RIG_TS480HX::set_squelch(int val)
+{
+		cmd = "SQ0";
+		cmd.append(to_decimal(abs(val),3)).append(";");
+		sendCommand(cmd);
+		showresp(INFO, ASC, "set squelch", cmd, "");
+}
+
+int  RIG_TS480HX::get_squelch()
+{
+	int val = 0;
+	cmd = "SQ0;";
+		if (wait_char(';', 7, 20, "get squelch", ASC) >= 7) {
+			size_t p = replystr.rfind("SQ0");
+			if (p == string::npos) return val;
+			replystr[p + 6] = 0;
+			val = atoi(&replystr[p + 3]);
+	}
+	return val;
+}
+
+void RIG_TS480HX::get_squelch_min_max_step(int &min, int &max, int &step)
+{
+	min = 0; max = 255; step = 1;
 }
 
 // Tranceiver PTT on/off
