@@ -53,8 +53,8 @@ public:
 	
 	bool twovfos() {return true;}
 
-	bool canswap() {return true;}
-	void swapvfos();
+	bool canswap() {return false;}
+//	void swapvfos();
 
 	long get_vfoA();
 	void set_vfoA(long);

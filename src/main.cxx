@@ -95,13 +95,20 @@ pthread_t *serial_thread = 0;
 pthread_t *digi_thread = 0;
 
 pthread_mutex_t mutex_serial = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t mutex_xmlrpc = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t mutex_queA = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t mutex_queB = PTHREAD_MUTEX_INITIALIZER;
+
+//pthread_mutex_t mutex_xmlrpc = PTHREAD_MUTEX_INITIALIZER;
+
+pthread_mutex_t mutex_vfoque = PTHREAD_MUTEX_INITIALIZER;
+
+//pthread_mutex_t mutex_vfoque = PTHREAD_MUTEX_INITIALIZER;
+//pthread_mutex_t mutex_vfoque = PTHREAD_MUTEX_INITIALIZER;
+
 pthread_mutex_t mutex_ptt = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_replystr = PTHREAD_MUTEX_INITIALIZER;
 
-bool RIG_DEBUG = false;
+pthread_mutex_t mutex_service_que = PTHREAD_MUTEX_INITIALIZER;
+
+bool RIG_DEBUG = true;//false;
 bool XML_DEBUG = false;
 bool EXPAND_CONTROLS = false;
 

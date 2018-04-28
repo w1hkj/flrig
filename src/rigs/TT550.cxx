@@ -33,6 +33,7 @@
 #include "util.h"
 #include "debug.h"
 
+#include "rigbase.h"
 #include "rig.h"
 
 static const char TT550name_[] = "TT-550";
@@ -895,40 +896,40 @@ static BANDS ibands[] = {
 
 void RIG_TT550::fkey_band_plus()
 {
-	XCVR_STATE vfoplus = *vfo;
+	VFOQUEUE qvfo;
+	if (useB) qvfo.vfo = vfoB;
+	else      qvfo.vfo = vfoA;
 	for (size_t i = 1; i < sizeof(ibands) / sizeof(BANDS); i++) {
-		if (vfo->freq < ibands[i].lo) {
-			vfoplus.freq = ibands[i].digi;
+		if (qvfo.vfo.freq < ibands[i].lo) {
+			qvfo.vfo.freq = ibands[i].digi;
 			break;
 		}
 	}
-	vfo->src = UI;
-	if (!useB) {
-		guard_lock queA_lock(&mutex_queA, 500);
-		queA.push(vfoplus);
-	} else {
-		guard_lock queB_lock(&mutex_queB, 500);
-		queB.push(vfoplus);
-	}
+	qvfo.vfo.src = UI;
+	qvfo.vfo.iBW = 255;
+	qvfo.vfo.imode = -1;
+	if (useB) qvfo.change = vB;
+	else      qvfo.change = vA;
+	vfoque.push(qvfo);
 }
 
 void RIG_TT550::fkey_band_minus()
 {
-	XCVR_STATE vfoplus = *vfo;
+	VFOQUEUE qvfo;
+	if (useB) qvfo.vfo = vfoB;
+	else      qvfo.vfo = vfoA;
 	for (size_t i = sizeof(ibands) / sizeof(BANDS) - 2; i >= 0; i--) {
-		if (vfo->freq > ibands[i].hi) {
-			vfoplus.freq = ibands[i].digi;
+		if (qvfo.vfo.freq > ibands[i].hi) {
+			qvfo.vfo.freq = ibands[i].digi;
 			break;
 		}
 	}
-	vfo->src = UI;
-	if (!useB) {
-		guard_lock queA_lock(&mutex_queA, 500);
-		queA.push(vfoplus);
-	} else {
-		guard_lock queB_lock(&mutex_queB, 500);
-		queB.push(vfoplus);
-	}
+	qvfo.vfo.src = UI;
+	qvfo.vfo.iBW = 255;
+	qvfo.vfo.imode = -1;
+	if (useB) qvfo.change = vB;
+	else      qvfo.change = vA;
+	vfoque.push(qvfo);
 }
 
 void RIG_TT550::fkey_step_plus()

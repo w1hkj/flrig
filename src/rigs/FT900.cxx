@@ -72,7 +72,6 @@ RIG_FT900::RIG_FT900() {
 	has_get_info = 
 	has_mode_control = true;
 
-
 	precision = 10;
 	ndigits = 7;
 
@@ -141,21 +140,21 @@ int  RIG_FT900::get_vfoAorB()
 	return -1;                                // -1 signals error
 }
 
-void RIG_FT900::swapvfos()    // works with a simple trick
-{
-	init_cmd();
-	cmd[4] = 0x85;			// copy active vfo to background vfo
-	sendCommand(cmd);
-	showresp(WARN, HEX, "copy active vfo to background vfo", cmd, replystr);
+//void RIG_FT900::swapvfos()    // works with a simple trick
+//{
+//	init_cmd();
+//	cmd[4] = 0x85;			// copy active vfo to background vfo
+//	sendCommand(cmd);
+//	showresp(WARN, HEX, "copy active vfo to background vfo", cmd, replystr);
 
-	if (!useB) {	
-		queA.push(vfoB);
-		B = vfoA;
-	} else {
-		queB.push(vfoA);
-		A = vfoB;
-	}
-}
+//	if (!useB) {
+//		queA.push(vfoB);
+//		B = vfoA;
+//	} else {
+//		queB.push(vfoA);
+//		A = vfoB;
+//	}
+//}
 
 bool RIG_FT900::get_info()
 {

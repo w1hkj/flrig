@@ -38,8 +38,7 @@ using XmlRpc::XmlRpcValue;
 
 extern char *print(XCVR_STATE &);
 
-extern queue<XCVR_STATE> queA;
-extern queue<XCVR_STATE> queB;
+extern queue<XCVR_STATE> vfoque;
 extern queue<bool> quePTT;
 
 queue<long> qfreq;
@@ -440,27 +439,9 @@ static void check_for_notch_change(const XmlRpcValue& new_notch)
 
 static void push2que()
 {
-	if (useB) {
-		if (!queB.empty()) {
-			if (XML_DEBUG)
-				LOG_ERROR("B not empty %s", print(xmlvfo));
-			return;
-		}
-		if (XML_DEBUG)
-			LOG_ERROR("pushed to B %s", print(xmlvfo));
-		guard_lock gl_xmlqueB(&mutex_queB, 101);
-		queB.push(xmlvfo);
-	} else {
-		if (!queA.empty()) {
-			if (XML_DEBUG)
-				LOG_ERROR("A not empty %s", print(xmlvfo));
-			return;
-		}
-		if (XML_DEBUG)
-			LOG_ERROR("pushed to A %s", print(xmlvfo));
-		guard_lock gl_xmlqueA(&mutex_queA, 102);
-		queA.push(xmlvfo);
-	}
+	guard_lock que_lock( &mutex_vfoque );
+	vfoque.push( (useB ? B : A), xmlvfo);
+	xmlvfo_changed = false;
 }
 
 void set_fldigi_connect (void *d)

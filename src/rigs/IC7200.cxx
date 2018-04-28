@@ -22,7 +22,7 @@
 #include "IC7200.h"
 #include "support.h"
 
-bool DEBUG_7200 = true;
+bool DEBUG_7200 = false;
 
 //=============================================================================
 // IC-7200
@@ -199,9 +199,9 @@ void RIG_IC7200::selectA()
 	cmd += '\x07';
 	cmd += '\x00';
 	cmd.append(post);
-trace(2, "selectA()", str2hex(cmd.c_str(), cmd.length()));
+if (DEBUG_7200) trace(2, "selectA()", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("select A");
-
+	inuse = onA;
 }
 
 void RIG_IC7200::selectB()
@@ -210,8 +210,9 @@ void RIG_IC7200::selectB()
 	cmd += '\x07';
 	cmd += '\x01';
 	cmd.append(post);
-trace(2, "selectB()", str2hex(cmd.c_str(), cmd.length()));
+if (DEBUG_7200) trace(2, "selectB()", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("select B");
+	inuse = onB;
 }
 
 long RIG_IC7200::get_vfoA ()
@@ -227,7 +228,7 @@ long RIG_IC7200::get_vfoA ()
 		if (p != string::npos)
 			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
-trace(2, "get_vfoA()", str2hex(replystr.c_str(), replystr.length()));
+if (DEBUG_7200) trace(2, "get_vfoA()", str2hex(replystr.c_str(), replystr.length()));
 	return A.freq;
 }
 
@@ -238,7 +239,7 @@ void RIG_IC7200::set_vfoA (long freq)
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append( post );
-trace(2, "set_vfoA()", str2hex(cmd.c_str(), cmd.length()));
+if (DEBUG_7200) trace(2, "set_vfoA()", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("set vfo A");
 }
 
@@ -255,7 +256,7 @@ long RIG_IC7200::get_vfoB ()
 		if (p != string::npos)
 			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
-trace(2, "get_vfoB()", str2hex(replystr.c_str(), replystr.length()));
+if (DEBUG_7200) trace(2, "get_vfoB()", str2hex(replystr.c_str(), replystr.length()));
 	return B.freq;
 }
 
@@ -266,7 +267,7 @@ void RIG_IC7200::set_vfoB (long freq)
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append( post );
-trace(2, "set_vfoB()", str2hex(cmd.c_str(), cmd.length()));
+if (DEBUG_7200) trace(2, "set_vfoB()", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("set vfo B");
 }
 
@@ -791,7 +792,7 @@ int RIG_IC7200::get_modeA()
 			if (md > 6) md -= 2;
 		}
 	}
-trace(2, "get_modeA()", str2hex(replystr.c_str(), replystr.length()));
+if (DEBUG_7200) trace(2, "get_modeA()", str2hex(replystr.c_str(), replystr.length()));
 	cmd = pre_to;
 	cmd += "\x1A\x04";
 	cmd.append(post);
@@ -806,7 +807,7 @@ trace(2, "get_modeA()", str2hex(replystr.c_str(), replystr.length()));
 			}
 		}
 	}
-trace(2, "get_data_modeA()", str2hex(replystr.c_str(), replystr.length()));
+if (DEBUG_7200) trace(2, "get_data_modeA()", str2hex(replystr.c_str(), replystr.length()));
 	return (A.imode = md);
 }
 
@@ -818,7 +819,7 @@ void RIG_IC7200::set_modeA(int val)
 	cmd += '\x06';
 	cmd += val > 4 ? val + 2 : val;
 	cmd.append( post );
-trace(2, "set_modeA()", str2hex(cmd.c_str(), cmd.length()));
+if (DEBUG_7200) trace(2, "set_modeA()", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("set mode A");
 
 	cmd = pre_to;
@@ -826,7 +827,7 @@ trace(2, "set_modeA()", str2hex(cmd.c_str(), cmd.length()));
 	if (A.imode > 6) cmd += '\x01';
 	else cmd += '\x00';
 	cmd.append( post);
-trace(2, "set_data_modeA()", str2hex(cmd.c_str(), cmd.length()));
+if (DEBUG_7200) trace(2, "set_data_modeA()", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("data mode");
 }
 
@@ -845,7 +846,7 @@ int RIG_IC7200::get_modeB()
 			if (md > 6) md -= 2;
 		}
 	}
-trace(2, "get_modeB()", str2hex(replystr.c_str(), replystr.length()));
+if (DEBUG_7200) trace(2, "get_modeB()", str2hex(replystr.c_str(), replystr.length()));
 	cmd = pre_to;
 	cmd += "\x1A\x04";
 	cmd.append(post);
@@ -860,7 +861,7 @@ trace(2, "get_modeB()", str2hex(replystr.c_str(), replystr.length()));
 			}
 		}
 	}
-trace(2, "get_data_modeB()", str2hex(replystr.c_str(), replystr.length()));
+if (DEBUG_7200) trace(2, "get_data_modeB()", str2hex(replystr.c_str(), replystr.length()));
 	return (B.imode = md);
 }
 
@@ -872,7 +873,7 @@ void RIG_IC7200::set_modeB(int val)
 	cmd += '\x06';
 	cmd += val > 4 ? val + 2 : val;
 	cmd.append( post );
-trace(2, "set_modeB()", str2hex(cmd.c_str(), cmd.length()));
+if (DEBUG_7200) trace(2, "set_modeB()", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("set mode B");
 
 	cmd = pre_to;
@@ -880,7 +881,7 @@ trace(2, "set_modeB()", str2hex(cmd.c_str(), cmd.length()));
 	if (B.imode > 6) cmd += '\x01';
 	else cmd += '\x00';
 	cmd.append( post);
-trace(2, "set_data_modeB()", str2hex(cmd.c_str(), cmd.length()));
+if (DEBUG_7200) trace(2, "set_data_modeB()", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("data mode");
 }
 
@@ -957,7 +958,7 @@ void RIG_IC7200::set_bwA(int val)
 	cmd.append("\x1A\x02");
 	cmd.append(to_bcd(val, 2));
 	cmd.append( post );
-trace(2, "set_bwA()", str2hex(cmd.c_str(), cmd.length()));
+if (DEBUG_7200) trace(4, "set_bwA() ", bwtable(A.imode)[val], ": ", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("set BW A");
 }
 
@@ -977,7 +978,7 @@ int  RIG_IC7200::get_bwA()
 	if (bwval != A.iBW) {
 		A.iBW = bwval;
 	}
-trace(2, "get_bwA()", str2hex(replystr.c_str(), replystr.length()));
+if (DEBUG_7200) trace(2, "get_bwA()", str2hex(replystr.c_str(), replystr.length()));
 	return A.iBW;
 }
 
@@ -988,7 +989,7 @@ void RIG_IC7200::set_bwB(int val)
 	cmd.append("\x1A\x02");
 	cmd.append(to_bcd(val, 2));
 	cmd.append( post );
-trace(2, "set_bwA()", str2hex(cmd.c_str(), cmd.length()));
+if (DEBUG_7200) trace(4, "set_bwB() ", bwtable(B.imode)[val], ": ", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("set BW B");
 }
 
@@ -1008,7 +1009,7 @@ int  RIG_IC7200::get_bwB()
 	if (bwval != B.iBW) {
 		B.iBW = bwval;
 	}
-trace(2, "get_bwB()", str2hex(replystr.c_str(), replystr.length()));
+if (DEBUG_7200) trace(2, "get_bwB()", str2hex(replystr.c_str(), replystr.length()));
 	return B.iBW;
 }
 

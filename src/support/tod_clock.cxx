@@ -51,9 +51,9 @@
 using namespace std;
 
 static pthread_t TOD_thread;
-static pthread_mutex_t TOD_mutex     = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t TOD_mutex     = PTHREAD_MUTEX_INITIALIZER;
 
-static int _zmsec = 0;
+static long long _zmsec = 0;
 static int _zsec = 0;
 static int _zmin = 0;
 static int _zhr = 0;
@@ -63,7 +63,7 @@ static char ztbuf[20] = "20120602 123000";
 int zmsec(void)
 {
 	guard_lock zmsec_lock(&TOD_mutex);
-	return _zmsec % 1000;
+	return _zmsec;
 }
 
 char* zdate()
@@ -151,8 +151,7 @@ void *TOD_loop(void *args)
 			MilliSleep(10);
 			guard_lock zmsec_lock(&TOD_mutex);
 			_zmsec += 10;
-			if (_zmsec % 1000 == 0) {
-				_zmsec = 0;
+			if (_zmsec % 100 == 0) {
 				_zsec++;
 				if (_zsec >= 60) {
 					_zsec = 0;

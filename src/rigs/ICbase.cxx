@@ -28,7 +28,7 @@
 
 #include "threads.h"
 
-static pthread_mutex_t command_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t command_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 //=============================================================================
 
@@ -104,6 +104,7 @@ bool RIG_ICOM::waitFB(const char *sz)
 	string returned = "";
 	string tosend = cmd;
 	unsigned long tod_start = zmsec();
+	unsigned long msec_start = 0;
 
 	if (!progStatus.use_tcpip && !RigSerial->IsOpen()) {
 		replystr = cmd;//returned;
@@ -115,6 +116,7 @@ bool RIG_ICOM::waitFB(const char *sz)
 			progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 50) / 10;
 
 	for (repeat = 0; repeat < progStatus.comm_retries; repeat++) {
+		msec_start = zmsec();
 		sendCommand(cmd, 0);
 		returned = "";
 		for ( cnt = 0; cnt < wait_msec; cnt++) {
@@ -122,7 +124,7 @@ bool RIG_ICOM::waitFB(const char *sz)
 				returned.append(respstr);
 			if (returned.find(ok) != string::npos) {
 				replystr = returned;
-				unsigned long int waited = zmsec() - tod_start;
+				unsigned long int waited = zmsec() - msec_start;
 				snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, OK", sz, waited);
 				if (repeat)
 					showresp(WARN, HEX, sztemp, tosend, returned);
@@ -132,7 +134,7 @@ bool RIG_ICOM::waitFB(const char *sz)
 			}
 			if (returned.find(bad) != string::npos) {
 				replystr = returned;
-				unsigned long int waited = zmsec() - tod_start;
+				unsigned long int waited = zmsec() - msec_start;
 				snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, FAIL", sz, waited);
 				showresp(ERR, HEX, sztemp, tosend, returned);
 				return false;
@@ -163,6 +165,7 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 	if (progStatus.comm_echo) num += cmd.length();
 
 	unsigned long int tod_start = zmsec();
+	unsigned long int msec_start = 0;
 
 	int delay =  (int)(num * 11000.0 / RigSerial->Baud() + 
 		progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 50) / 10;
@@ -172,6 +175,7 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 		return false;
 	}
 	for (repeat = 0; repeat < progStatus.comm_retries; repeat++) {
+		msec_start = zmsec();
 		sendCommand(tosend, 0);
 		returned = "";
 		for ( cnt = 0; cnt < delay; cnt++) {
@@ -179,7 +183,7 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 			returned.append(respstr);
 			if (returned.length() >= num) {
 				replystr = returned;
-				unsigned long int waited = zmsec() - tod_start;
+				unsigned long int waited = zmsec() - msec_start;
 				snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, OK  ", sz, waited);
 				showresp(DEBUG, HEX, sztemp, tosend, returned);
 				return true;

@@ -33,7 +33,7 @@
 using namespace std;
 
 enum {onA, onB};
-enum {UI, XML, SRVR, RIG, FORCE};
+enum {UI, XML, SRVR, RIG};
 enum {BINARY, STRING};
 
 struct XCVR_STATE {
@@ -97,12 +97,29 @@ struct XCVR_STATE {
 		iBW = c;
 		src = d;
 	}
-	bool equals(XCVR_STATE alt) {
-		if (freq != alt.freq) return false;
-		if (iBW != alt.iBW) return false;
-		if (imode != alt.imode) return false;
-		return true;
-	}
+//	bool equals(XCVR_STATE alt) {
+//		if (freq != alt.freq) return false;
+//		if (iBW != alt.iBW) return false;
+//		if (imode != alt.imode) return false;
+//		return true;
+//	}
+};
+
+enum {
+	vA,   // apply to vfoA
+	vB,   // apply to vfoB
+	vX,   // apply to current vfo
+	sA,  // select vfoA
+	sB,  // select vfoB
+	ON,  // ptt ON
+	OFF, // ptt OFF
+};
+
+struct VFOQUEUE {
+	int change; // A B AA BB ON OFF
+	XCVR_STATE vfo;
+	VFOQUEUE() {}
+	VFOQUEUE(int c, XCVR_STATE v) { change = c; vfo = v; }
 };
 
 struct GUI {
@@ -297,11 +314,11 @@ public:
 	virtual int  get_modetype(int n) {return 'U';}
 	virtual void set_modeB(int val) {B.imode = val; set_modeA(val);}
 	virtual int  get_modeB() {return B.imode;}
-	virtual void selectA(){}
-	virtual void selectB(){}
+	virtual void selectA(){ inuse = onA;}
+	virtual void selectB(){ inuse = onB;}
 	virtual void A2B(){}
 	virtual void B2A(){}
-	virtual int  get_vfoAorB(){return 0;}
+	virtual int  get_vfoAorB(){return inuse;}
 
 	virtual void swapAB(){}
 

@@ -25,35 +25,55 @@
 #include <stdlib.h>
 
 #include "threads.h"
+#include "support.h"
 
 /// This ensures that a mutex is always unlocked when leaving a function or block.
-extern pthread_mutex_t mutex_rcv_socket;
+
+extern pthread_mutex_t mutex_replystr;
+extern pthread_mutex_t command_mutex;
+extern pthread_mutex_t mutex_replystr;
+extern pthread_mutex_t mutex_vfoque;
 extern pthread_mutex_t mutex_serial;
-extern pthread_mutex_t mutex_xmlrpc;
-extern pthread_mutex_t mutex_queA;
-extern pthread_mutex_t mutex_queB;
+extern pthread_mutex_t debug_mutex;
+extern pthread_mutex_t mutex_rcv_socket;
 extern pthread_mutex_t mutex_ptt;
+extern pthread_mutex_t TOD_mutex;
+extern pthread_mutex_t mutex_service_que;
 
 // Change to 1 to observe guard lock/unlock processing on stdout
 #define DEBUG_GUARD_LOCK 0
-
 guard_lock::guard_lock(pthread_mutex_t* m, int h) : mutex(m), how(h) {
+char szlock[100];
 	pthread_mutex_lock(mutex);
+	if (mutex == &TOD_mutex) return;
+	snprintf(szlock, sizeof(szlock), "lock %s : %d", name(mutex), how);
+	if (how >= 100)
+		trace(1, szlock);
 	if (how != 0 && DEBUG_GUARD_LOCK)
-		printf("lock %s : %d\n", name(mutex), how);
+		printf("%s", szlock);
 }
 
 guard_lock::~guard_lock(void) {
+char szunlock[100];
+	if (mutex != &TOD_mutex) {
+		snprintf(szunlock, sizeof(szunlock), "unlock %s : %d\n", name(mutex), how);
+		if (how >= 100)
+			trace(1, szunlock);
+		if (how != 0 && DEBUG_GUARD_LOCK)
+			printf("%s", szunlock);
+	}
 	pthread_mutex_unlock(mutex);
-	if (how != 0 && DEBUG_GUARD_LOCK)
-		printf("unlock %s : %d\n", name(mutex), how);
 }
 
 const char * guard_lock::name(pthread_mutex_t *m) {
-		if (m == &mutex_ptt) return "PTT";
-		if (m == &mutex_queA) return "QueA";
-		if (m == &mutex_queB) return "QueB";
-		if (m == &mutex_rcv_socket) return "Rcv Socket";
-		if (m == &mutex_serial) return "Serial";
-		return "Unknown";
-	}
+	if (m == &mutex_replystr) return "mutex_replystr";
+	if (m == &command_mutex) return "command_mutex";
+	if (m == &mutex_replystr) return "mutex_replystr";
+	if (m == &mutex_vfoque) return "mutex_vfoque";
+	if (m == &mutex_serial) return "mutex_serial";
+	if (m == &debug_mutex) return "debug_mutex";
+	if (m == &mutex_rcv_socket) return "mutex_rcv_socket";
+	if (m == &mutex_ptt) return "mutex_ptt";
+	if (m == &TOD_mutex) return "TOD_mutex";
+	if (m == &mutex_service_que) return "mutex_service_que";
+}

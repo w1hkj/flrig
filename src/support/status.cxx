@@ -1013,7 +1013,7 @@ bool status::loadXcvrState(string xcvr)
 
 		if (spref.get("hrd_buttons", i, i)) hrd_buttons = i;
 
-trace(1, info().c_str());
+//trace(1, info().c_str());
 //		LOG_INFO("%s", info().c_str());
 
 		return true;

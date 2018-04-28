@@ -53,11 +53,12 @@ extern bool flrig_abort;
 extern XCVR_STATE *vfo;
 extern XCVR_STATE vfoA;
 extern XCVR_STATE vfoB;
-extern XCVR_STATE xmlvfo;
+//extern XCVR_STATE xmlvfo;
 
 extern bool useB;
 extern bool PTT;
 extern bool localptt;
+extern bool skip_polls;
 
 extern Cserial *RigSerial;
 extern Cserial *AuxSerial;
@@ -73,6 +74,9 @@ extern std::vector<std::string> rigbws_;
 
 extern rigbase *selrig;
 
+extern void serviceA(XCVR_STATE nuvals);
+extern void serviceB(XCVR_STATE nuvals);
+
 extern void cbExit();
 
 extern void setVolumeControl(void *);
@@ -80,6 +84,7 @@ extern void setModeControl(void *);
 extern void set_bandwidth_control();
 extern void updateBandwidthControl(void *d = NULL);
 extern void updateBW(void *);
+extern void update_split(void *);
 extern void setBWControl(void *);
 extern void setNotchControl(void *);
 extern void adjust_if_shift_control(void *);
@@ -313,8 +318,7 @@ extern void update_notch(void *d);
 
 extern int mval;
 
-extern queue<XCVR_STATE> queA;
-extern queue<XCVR_STATE> queB;
+extern queue<VFOQUEUE> vfoque;
 
 extern void trace(int n, ...); // all args of type const char *
 extern string printXCVR_STATE(XCVR_STATE &data);

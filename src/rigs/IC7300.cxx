@@ -27,6 +27,7 @@
 
 //=============================================================================
 // IC-7300
+bool DEBUG_7300 = false;
 
 const char IC7300name_[] = "IC-7300";
 
@@ -228,7 +229,7 @@ void RIG_IC7300::selectA()
 	cmd.append(post);
 	waitFB("select A");
 
-	trace(4, "selectA():\n", 
+if (DEBUG_7300) trace(4, "selectA():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -241,7 +242,7 @@ void RIG_IC7300::selectB()
 	cmd.append(post);
 	waitFB("select B");
 
-	trace(4, "selectB():\n", 
+if (DEBUG_7300) trace(4, "selectB():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -265,7 +266,7 @@ long RIG_IC7300::get_vfoA ()
 			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
 
-	trace(4, "get_vfoA():\n", 
+if (DEBUG_7300) trace(4, "get_vfoA():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -283,7 +284,7 @@ void RIG_IC7300::set_vfoA (long freq)
 
 	waitFB("set vfo A");
 
-	trace(4, "set_vfoA():\n", 
+if (DEBUG_7300) trace(4, "set_vfoA():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -304,7 +305,7 @@ long RIG_IC7300::get_vfoB ()
 			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
 
-	trace(4, "get_vfoB():\n", 
+if (DEBUG_7300) trace(4, "get_vfoB():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -322,7 +323,7 @@ void RIG_IC7300::set_vfoB (long freq)
 
 	waitFB("set vfo B");
 
-	trace(4, "set_vfoA():\n", 
+if (DEBUG_7300) trace(4, "set_vfoA():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -344,7 +345,7 @@ int RIG_IC7300::get_modeA()
 		}
 	}
 
-	trace(4, "get_modeA():\n", 
+if (DEBUG_7300) trace(4, "get_modeA():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -365,7 +366,7 @@ int RIG_IC7300::get_modeA()
 		}
 	}
 
-	trace(4, "get_data_mode_A():\n", 
+if (DEBUG_7300) trace(4, "get_data_mode_A():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -383,7 +384,7 @@ void RIG_IC7300::set_modeA(int val)
 	cmd.append( post );
 	waitFB("set mode A");
 
-	trace(4, "set_modeA():\n", 
+if (DEBUG_7300) trace(4, "set_modeA():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -395,7 +396,7 @@ void RIG_IC7300::set_modeA(int val)
 	cmd.append( post);
 	waitFB("data mode");
 
-	trace(4, "set_data_mode_A():\n", 
+if (DEBUG_7300) trace(4, "set_data_mode_A():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -418,7 +419,7 @@ int RIG_IC7300::get_modeB()
 		}
 	}
 
-	trace(4, "get_modeB():\n", 
+if (DEBUG_7300) trace(4, "get_modeB():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -439,7 +440,7 @@ int RIG_IC7300::get_modeB()
 		}
 	}
 
-	trace(4, "get_data_mode_b():\n", 
+if (DEBUG_7300) trace(4, "get_data_mode_b():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -457,7 +458,7 @@ void RIG_IC7300::set_modeB(int val)
 	cmd.append( post );
 	waitFB("set mode B");
 
-	trace(4, "set_modeB():\n", 
+if (DEBUG_7300) trace(4, "set_modeB():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -469,7 +470,7 @@ void RIG_IC7300::set_modeB(int val)
 	cmd.append( post);
 	waitFB("data mode");
 
-	trace(4, "set_data_mode_B():\n", 
+if (DEBUG_7300) trace(4, "set_data_mode_B():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -509,7 +510,7 @@ long RIG_IC7300::get_vfoA ()
 			A.freq = fm_bcd_be(replystr.substr(p+6), 10);
 	}
 
-	trace(4, "get_vfoA():\n", 
+if (DEBUG_7300) trace(4, "get_vfoA():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -529,7 +530,7 @@ void RIG_IC7300::set_vfoA (long freq)
 	cmd.append( post );
 	waitFB("set vfo A");
 
-	trace(4, "set_vfoA():\n", 
+if (DEBUG_7300) trace(4, "set_vfoA():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -558,7 +559,7 @@ long RIG_IC7300::get_vfoB ()
 			B.freq = fm_bcd_be(replystr.substr(p+6), 10);
 	}
 
-	trace(4, "get_vfoB():\n", 
+if (DEBUG_7300) trace(4, "get_vfoB():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -578,7 +579,7 @@ void RIG_IC7300::set_vfoB (long freq)
 	cmd.append( post );
 	waitFB("set vfo B");
 
-	trace(4, "set_vfoB():\n", 
+if (DEBUG_7300) trace(4, "set_vfoB():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -636,7 +637,7 @@ int RIG_IC7300::get_modeA()
 		FIL_A = replystr[p+8];
 	}
 
-	trace(4, "get_modeA():\n", 
+if (DEBUG_7300) trace(4, "get_modeA():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -662,7 +663,7 @@ void RIG_IC7300::set_modeA(int val)
 	cmd.append( post );
 	waitFB("set modeA");
 
-	trace(4, "set_modeA():\n", 
+if (DEBUG_7300) trace(4, "set_modeA():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -706,7 +707,7 @@ int RIG_IC7300::get_modeB()
 		FIL_B = replystr[p+8];
 	}
 
-	trace(4, "get_modeB():\n", 
+if (DEBUG_7300) trace(4, "get_modeB():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -729,7 +730,7 @@ void RIG_IC7300::set_modeB(int val)
 	cmd.append( post );
 	waitFB("set modeB");
 
-	trace(4, "set_modeB():\n", 
+if (DEBUG_7300) trace(4, "set_modeB():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -755,7 +756,7 @@ void RIG_IC7300::set_split(bool val)
 	cmd.append(post);
 	waitFB(val ? "set split ON" : "set split OFF");
 
-	trace(4, "set_split():\n", 
+if (DEBUG_7300) trace(4, "set_split():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -777,7 +778,7 @@ int RIG_IC7300::get_split()
 			split = read_split;
 	}
 
-	trace(4, "set_split():\n", 
+if (DEBUG_7300) trace(4, "set_split():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -808,7 +809,7 @@ int RIG_IC7300::get_bwA()
 
 	if (useB) selectB();
 
-	trace(4, "get_bwA():\n", 
+if (DEBUG_7300) trace(4, "get_bwA():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -830,7 +831,7 @@ void RIG_IC7300::set_bwA(int val)
 	cmd.append(post);
 	waitFB("set bwA");
 
-	trace(4, "set_bwA():\n", 
+if (DEBUG_7300) trace(4, "set_bwA():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -861,7 +862,7 @@ int RIG_IC7300::get_bwB()
 
 	if (!useB) selectA();
 
-	trace(4, "get_bwB():\n", 
+if (DEBUG_7300) trace(4, "get_bwB():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
@@ -882,7 +883,7 @@ void RIG_IC7300::set_bwB(int val)
 	cmd.append(post);
 	waitFB("set bwB");
 
-	trace(4, "set_bwB():\n", 
+if (DEBUG_7300) trace(4, "set_bwB():\n", 
 		str2hex(cmd.c_str(), cmd.length()),
 		"\n",
 		str2hex(replystr.c_str(), replystr.length()));
