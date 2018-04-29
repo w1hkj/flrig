@@ -752,6 +752,7 @@ public:
 		}
 
 		Fl::awake(do_swap, (void *)0);
+		MilliSleep(200);
 	}
 
 	std::string help() { return std::string("executes vfo swap"); }
@@ -771,6 +772,7 @@ public:
 		}
 
 		Fl::awake(do_swap, (void *)0);
+		MilliSleep(200);
 	}
 
 	std::string help() { return std::string("executes vfo swap"); }
@@ -852,6 +854,7 @@ std::cout << "!ptt_off()\n";
 
 trace(4, "set_AB ", ans.c_str(), " ", printXCVR_STATE(vfo).c_str());
 		vfoque.push (VFOQUEUE((ans == "A" ? sA : sB), vfo));
+		MilliSleep(200);
 		skip_polls = true;
 	}
 
