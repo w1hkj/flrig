@@ -721,7 +721,7 @@ const char **RIG_TS2000::hitable(int val)
 
 void RIG_TS2000::set_modeA(int val)
 {
-	if (val >= (int)sizeof(TS2000_mode_chr)) return;
+	if (val >= (int)(sizeof(TS2000_mode_chr)/sizeof(*TS2000_mode_chr))) return;
 	_currmode = A.imode = val;
 	cmd = "MD";
 	cmd += TS2000_mode_chr[val];
@@ -755,7 +755,7 @@ int RIG_TS2000::get_modeA()
 
 void RIG_TS2000::set_modeB(int val)
 {
-	if (val >= (int)sizeof(TS2000_mode_chr)) return;
+	if (val >= (int)(sizeof(TS2000_mode_chr)/sizeof(*TS2000_mode_chr))) return;
 	_currmode = B.imode = val;
 	cmd = "MD";
 	cmd += TS2000_mode_chr[val];
@@ -812,13 +812,13 @@ void RIG_TS2000::set_bwA(int val)
 		A.iBW = val;
 		cmd = "SL";
 		int index = A.iBW & 0x7F;
-		if (index >= (int)sizeof(TS2000_CAT_SL)) return;
+		if (index >= (int)(sizeof(TS2000_CAT_SL)/sizeof(*TS2000_CAT_SL))) return;
 		cmd = TS2000_CAT_SL[index];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set lower", cmd, "");
 		cmd = "SH";
 		index = (A.iBW >> 8) & 0x7F;
-		if (index >= (int)sizeof(TS2000_CAT_SH)) return;
+		if (index >= (int)(sizeof(TS2000_CAT_SH)/sizeof(*TS2000_CAT_SH))) return;
 		cmd = TS2000_CAT_SH[index];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set upper", cmd, "");
@@ -827,14 +827,14 @@ void RIG_TS2000::set_bwA(int val)
 	else if (A.imode == CW || A.imode == CWR) {
 		A.iBW = val;
 		int index = A.iBW & 0x7F;
-		if (index >= (int)sizeof(TS2000_CWbw)) return;
+		if (index >= (int)(sizeof(TS2000_CWbw)/sizeof(*TS2000_CWbw))) return;
 		cmd = TS2000_CWbw[index];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set CW bw", cmd, "");
 	}else if (A.imode == FSK || A.imode == FSKR) {
 		A.iBW = val;
 		int index = A.iBW & 0x7F;
-		if (index >= (int)sizeof(TS2000_FSKbw)) return;
+		if (index >= (int)(sizeof(TS2000_FSKbw)/sizeof(*TS2000_FSKbw))) return;
 		cmd = TS2000_FSKbw[index];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set FSK bw", cmd, "");
@@ -867,7 +867,7 @@ int RIG_TS2000::get_bwA()
 		if (wait_char(';', 7, 100, "get FW", ASC) == 7) {
 			p = replystr.rfind("FW");
 			if (p != string::npos) {
-				for (i = 0; i < sizeof(TS2000_CWbw); i++)
+				for (i = 0; i < sizeof(TS2000_CWbw)/sizeof(*TS2000_CWbw); i++)
 					if (replystr.find(TS2000_CWbw[i]) == p)
 						break;
 				A.iBW = i;
@@ -878,7 +878,7 @@ int RIG_TS2000::get_bwA()
 		if (wait_char(';', 7, 100, "get FW", ASC) == 7) {
 			p = replystr.rfind("FW");
 			if (p != string::npos) {
-				for (i = 0; i < sizeof(TS2000_FSKbw); i++)
+				for (i = 0; i < sizeof(TS2000_FSKbw)/sizeof(*TS2000_FSKbw); i++)
 					if (replystr.find(TS2000_FSKbw[i]) == p)
 						break;
 				A.iBW = i;
@@ -895,13 +895,13 @@ void RIG_TS2000::set_bwB(int val)
 		B.iBW = val;
 		cmd = "SL";
 		int index = B.iBW & 0x7F;
-		if (index >= (int)sizeof(TS2000_CAT_SL)) return;
+		if (index >= (int)(sizeof(TS2000_CAT_SL)/sizeof(*TS2000_CAT_SL))) return;
 		cmd = TS2000_CAT_SL[index];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set lower", cmd, "");
 		cmd = "SH";
 		index = (B.iBW >> 8) & 0x7F;
-		if (index >= (int)sizeof(TS2000_CAT_SH)) return;
+		if (index >= (int)(sizeof(TS2000_CAT_SH)/sizeof(*TS2000_CAT_SH))) return;
 		cmd = TS2000_CAT_SH[index];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set upper", cmd, "");
@@ -910,14 +910,14 @@ void RIG_TS2000::set_bwB(int val)
 	else if (B.imode == CW || B.imode == CWR) {
 		B.iBW = val;
 		int index = B.iBW & 0x7F;
-		if (index >= (int)sizeof(TS2000_CWbw)) return;
+		if (index >= (int)(sizeof(TS2000_CWbw)/sizeof(*TS2000_CWbw))) return;
 		cmd = TS2000_CWbw[index];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set CW bw", cmd, "");
 	}else if (B.imode == FSK || B.imode == FSKR) {
 		B.iBW = val;
 		int index = B.iBW & 0x7F;
-		if (index >= (int)sizeof(TS2000_FSKbw)) return;
+		if (index >= (int)(sizeof(TS2000_FSKbw)/sizeof(*TS2000_FSKbw))) return;
 		cmd = TS2000_FSKbw[index];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set FSK bw", cmd, "");
@@ -950,7 +950,7 @@ int RIG_TS2000::get_bwB()
 		if (wait_char(';', 7, 100, "get FW", ASC) == 7) {
 			p = replystr.rfind("FW");
 			if (p != string::npos) {
-				for (i = 0; i < sizeof(TS2000_CWbw); i++)
+				for (i = 0; i < sizeof(TS2000_CWbw)/sizeof(*TS2000_CWbw); i++)
 					if (replystr.find(TS2000_CWbw[i]) == p)
 						break;
 				B.iBW = i;
@@ -961,7 +961,7 @@ int RIG_TS2000::get_bwB()
 		if (wait_char(';', 7, 100, "get FW", ASC) == 7) {
 			p = replystr.rfind("FW");
 			if (p != string::npos) {
-				for (i = 0; i < sizeof(TS2000_FSKbw); i++)
+				for (i = 0; i < sizeof(TS2000_FSKbw)/sizeof(*TS2000_FSKbw); i++)
 					if (replystr.find(TS2000_FSKbw[i]) == p)
 						break;
 				B.iBW = i;
@@ -973,7 +973,7 @@ int RIG_TS2000::get_bwB()
 
 int RIG_TS2000::get_modetype(int n)
 {
-	if (n >= (int)sizeof(TS2000_mode_type)) return 0;
+	if (n >= (int)(sizeof(TS2000_mode_type)/sizeof(*TS2000_mode_type))) return 0;
 	return TS2000_mode_type[n];
 }
 
