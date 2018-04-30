@@ -360,7 +360,7 @@ int RIG_IC756PRO::get_noise()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
-	if (waitFOR(9, "get noise")) {
+	if (waitFOR(8, "get noise")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			return (replystr[p+6] ? 1 : 0);

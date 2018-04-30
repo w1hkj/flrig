@@ -105,6 +105,8 @@ static GUI rig_widgets[]= {
 	{ (Fl_Widget *)NULL,          0,   0,   0 }
 };
 
+static string menu012 = "EX01200004";
+
 void RIG_TS480HX::initialize()
 {
 	rig_widgets[0].W = btnVol;
@@ -117,7 +119,17 @@ void RIG_TS480HX::initialize()
 	rig_widgets[7].W = sldrPOWER;
 
 	check_menu_45();
-};
+
+	menu012.clear();
+	cmd = "EX0120000;"; // read menu 012 state
+//might return something like EX01200004;
+
+	if (wait_char(';', 11, 100, "read ex 012", ASC) == 11)
+		menu012 = replystr;
+
+	cmd = "EX01200000;";
+	sendCommand(cmd);
+}
 
 RIG_TS480HX::RIG_TS480HX() {
 // base class values
@@ -239,6 +251,10 @@ void RIG_TS480HX::check_menu_45()
 
 void RIG_TS480HX::shutdown()
 {
+// restore state of xcvr beeps
+	if (menu012.empty()) return;
+	cmd = menu012;
+	sendCommand(cmd);
 }
 
 void RIG_TS480HX::selectA()
