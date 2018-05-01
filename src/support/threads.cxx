@@ -38,7 +38,7 @@ extern pthread_mutex_t debug_mutex;
 extern pthread_mutex_t mutex_rcv_socket;
 extern pthread_mutex_t mutex_ptt;
 extern pthread_mutex_t TOD_mutex;
-extern pthread_mutex_t mutex_service_que;
+extern pthread_mutex_t mutex_srvc_reqs;
 
 // Change to 1 to observe guard lock/unlock processing on stdout
 #define DEBUG_GUARD_LOCK 0
@@ -75,5 +75,5 @@ const char * guard_lock::name(pthread_mutex_t *m) {
 	if (m == &mutex_rcv_socket) return "mutex_rcv_socket";
 	if (m == &mutex_ptt) return "mutex_ptt";
 	if (m == &TOD_mutex) return "TOD_mutex";
-	if (m == &mutex_service_que) return "mutex_service_que";
+	if (m == &mutex_srvc_reqs) return "mutex_service_requests";
 }

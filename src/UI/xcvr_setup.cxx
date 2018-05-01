@@ -39,7 +39,7 @@ Fl_Round_Button *btndtrptt = (Fl_Round_Button *)0;
 Fl_Check_Button *chkrtscts = (Fl_Check_Button *)0;
 Fl_Check_Button *btnrtsplus = (Fl_Check_Button *)0;
 Fl_Check_Button *btndtrplus = (Fl_Check_Button *)0;
-Fl_Check_Button *btn_notxqsy = (Fl_Check_Button *)0;
+//Fl_Check_Button *btn_notxqsy = (Fl_Check_Button *)0;
 Fl_Int_Input *txtCIV = (Fl_Int_Input *)0;
 Fl_Button *btnCIVdefault = (Fl_Button *)0;
 Fl_Check_Button *btnUSBaudio = (Fl_Check_Button *)0;
@@ -300,9 +300,9 @@ static void cb_btndtrplus(Fl_Check_Button*, void*) {
 	btnOkXcvrDialog->redraw_label();
 }
 
-static void cb_btn_notxqsy(Fl_Check_Button*, void*) {
-	progStatus.no_txqsy = btn_notxqsy->value();
-}
+//static void cb_btn_notxqsy(Fl_Check_Button*, void*) {
+//	progStatus.no_txqsy = btn_notxqsy->value();
+//}
 
 static void cb_txtCIV(Fl_Int_Input* o, void*) {
 	progStatus.CIV = atol(o->value());
@@ -822,12 +822,12 @@ Fl_Double_Window* w = new Fl_Double_Window(480, 255, _("I/O Ports"));
 			btnRigCatEcho->align(Fl_Align(FL_ALIGN_RIGHT));
 			btnRigCatEcho->value(progStatus.comm_echo);
 
-			btn_notxqsy = new Fl_Check_Button(120, 145, 22, 15, _("Disable tx_qsy"));
-			btn_notxqsy->down_box(FL_DOWN_BOX);
-			btn_notxqsy->callback((Fl_Callback*)cb_btn_notxqsy);
-			btn_notxqsy->align(Fl_Align(FL_ALIGN_RIGHT));
-			btn_notxqsy->value(progStatus.no_txqsy);
-			btn_notxqsy->tooltip(_("check if transceiver cannot change freq\nwhen PTT enabled"));
+//			btn_notxqsy = new Fl_Check_Button(120, 145, 22, 15, _("Disable tx_qsy"));
+//			btn_notxqsy->down_box(FL_DOWN_BOX);
+//			btn_notxqsy->callback((Fl_Callback*)cb_btn_notxqsy);
+//			btn_notxqsy->align(Fl_Align(FL_ALIGN_RIGHT));
+//			btn_notxqsy->value(progStatus.no_txqsy);
+//			btn_notxqsy->tooltip(_("check if transceiver cannot change freq\nwhen PTT enabled"));
 
 			cntRigCatRetries = new Fl_Counter(350, 40, 100, 20, _("Retries"));
 			cntRigCatRetries->tooltip(_("Number of  times to resend\ncommand before giving up"));

@@ -58,7 +58,6 @@ extern XCVR_STATE vfoB;
 extern bool useB;
 extern bool PTT;
 extern bool localptt;
-extern bool skip_polls;
 
 extern Cserial *RigSerial;
 extern Cserial *AuxSerial;
@@ -318,7 +317,7 @@ extern void update_notch(void *d);
 
 extern int mval;
 
-extern queue<VFOQUEUE> vfoque;
+extern queue<VFOQUEUE> srvc_reqs;
 
 extern void trace(int n, ...); // all args of type const char *
 extern string printXCVR_STATE(XCVR_STATE &data);

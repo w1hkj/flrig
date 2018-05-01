@@ -106,7 +106,7 @@ pthread_mutex_t mutex_vfoque = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_ptt = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_replystr = PTHREAD_MUTEX_INITIALIZER;
 
-pthread_mutex_t mutex_service_que = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex_srvc_reqs = PTHREAD_MUTEX_INITIALIZER;
 
 bool RIG_DEBUG = true;//false;
 bool XML_DEBUG = false;

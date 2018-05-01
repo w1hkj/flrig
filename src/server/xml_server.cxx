@@ -228,14 +228,23 @@ public:
 //------------------------------------------------------------------------------
 // Request for split state
 //------------------------------------------------------------------------------
+inline void wait()
+{
+	int n = 0;
+	while (!srvc_reqs.empty()) {
+		MilliSleep(10);
+		if (++n == 1000) break;
+	}
+}
+
 class rig_get_split : public XmlRpcServerMethod {
 public:
 	rig_get_split(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_split", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 
-		guard_lock service_lock(&mutex_service_que, 155);
-
+		wait();
+		guard_lock service_lock(&mutex_srvc_reqs, 155);
 		result = progStatus.split;
 	}
 
@@ -259,7 +268,8 @@ public:
 		static char szfreq[20];
 		int freq;
 
-		guard_lock service_lock(&mutex_service_que);//, 156);
+		wait();
+		guard_lock service_lock(&mutex_srvc_reqs);//, 156);
 
 		if (useB)
 			freq = vfoB.freq;
@@ -290,7 +300,8 @@ public:
 		}
 		int freq;
 
-		guard_lock service_lock(&mutex_service_que);//, 157);
+		wait();
+		guard_lock service_lock(&mutex_srvc_reqs);//, 157);
 
 		freq = vfoA.freq;
 
@@ -319,7 +330,8 @@ public:
 		}
 		int freq;
 
-		guard_lock service_lock(&mutex_service_que);//, 158);
+		wait();
+		guard_lock service_lock(&mutex_srvc_reqs);//, 158);
 
 		freq = vfoB.freq;
 
@@ -348,7 +360,8 @@ public:
 			return;
 		}
 
-		guard_lock service_lock(&mutex_service_que);//, 159);
+		wait();
+		guard_lock service_lock(&mutex_srvc_reqs);//, 159);
 
 		result = useB ? "B" : "A";
 	}
@@ -371,8 +384,6 @@ public:
 			result = 0;
 			return;
 		}
-
-		guard_lock service_lock(&mutex_service_que);//, 160);
 
 		if (progStatus.notch)
 			result = (int)(progStatus.notch_val);
@@ -432,7 +443,8 @@ public :
 			return;
 		}
 
-		guard_lock service_lock(&mutex_service_que);//, 150);
+		wait();
+		guard_lock service_lock(&mutex_srvc_reqs);//, 150);
 
 		trace(1, "rig_get_modes");
 
@@ -463,7 +475,8 @@ public:
 		}
 		int mode;
 
-		guard_lock service_lock(&mutex_service_que);//, 151);
+		wait();
+		guard_lock service_lock(&mutex_srvc_reqs);//, 151);
 
 		mode = vfo->imode;
 
@@ -493,7 +506,8 @@ public:
 		}
 
 		int mode;
-		guard_lock service_lock(&mutex_service_que);//, 152);
+		wait();
+		guard_lock service_lock(&mutex_srvc_reqs);//, 152);
 
 		mode = vfo->imode;
 
@@ -527,7 +541,8 @@ public :
 		}
 		XmlRpcValue bws;
 
-		guard_lock service_lock(&mutex_service_que);//, 153);
+		wait();
+		guard_lock service_lock(&mutex_srvc_reqs);//, 153);
 
 		int mode = useB ? vfoB.imode : vfoA.imode;
 		const char **bwt = selrig->bwtable(mode);
@@ -588,7 +603,8 @@ public:
 
 		if (!xcvr_initialized) return;
 
-		guard_lock service_lock(&mutex_service_que);//, 154);
+		wait();
+		guard_lock service_lock(&mutex_srvc_reqs);//, 154);
 
 		int BW = useB ? vfoB.iBW : vfoA.iBW;
 		int mode = useB ? vfoB.imode : vfoA.imode;
@@ -664,7 +680,7 @@ public:
 #include <queue>
 #include "rigbase.h"
 
-extern queue<VFOQUEUE> vfoque;
+extern queue<VFOQUEUE> srvc_reqs;
 extern queue<bool> quePTT;
 
 extern XCVR_STATE vfoA;
@@ -684,28 +700,25 @@ std::string print(int f, int m, int b)
 static void push_xml()
 {
 	srvr_vfo.src = SRVR;
-//	guard_lock que_lock( &mutex_vfoque, 108);
-	guard_lock service_lock(&mutex_service_que, 108);
+	guard_lock service_lock(&mutex_srvc_reqs, 108);
 trace(2, "push_xml()", print(srvr_vfo.freq, srvr_vfo.imode, srvr_vfo.iBW).c_str());
-	vfoque.push(VFOQUEUE(vX, srvr_vfo));//(useB ? vB : vA), srvr_vfo ));
+	srvc_reqs.push(VFOQUEUE(vX, srvr_vfo));//(useB ? vB : vA), srvr_vfo ));
 }
 
 static void push_xmlA()
 {
 	srvr_vfo.src = SRVR;
-	guard_lock service_lock(&mutex_service_que, 109);
-//	guard_lock que_lock(&mutex_vfoque, 109);
+	guard_lock service_lock(&mutex_srvc_reqs, 109);
 trace(2, "push_xmlA()", print(srvr_vfo.freq, srvr_vfo.imode, srvr_vfo.iBW).c_str());
-	vfoque.push(VFOQUEUE( vA, srvr_vfo));
+	srvc_reqs.push(VFOQUEUE( vA, srvr_vfo));
 }
 
 static void push_xmlB()
 {
 	srvr_vfo.src = SRVR;
-	guard_lock service_lock(&mutex_service_que, 110);
-//	guard_lock que_lock(&mutex_vfoque, 110);
+	guard_lock service_lock(&mutex_srvc_reqs, 110);
 trace(2, "push_xmlB()", print(srvr_vfo.freq, srvr_vfo.imode, srvr_vfo.iBW).c_str());
-	vfoque.push(VFOQUEUE(vB, srvr_vfo));
+	srvc_reqs.push(VFOQUEUE(vB, srvr_vfo));
 }
 
 
@@ -723,10 +736,13 @@ public:
 		}
 		int state = int(params[0]);
 
-//std::cout << "set ptt" << state << std::endl;
+		guard_lock que_lock(&mutex_srvc_reqs, 180);
 
-		if (state) Fl::awake(setPTT, (void *)1);
-		else Fl::awake(setPTT, (void *)0);
+		VFOQUEUE xcvrptt;
+		if (state) xcvrptt.change = ON;
+		else       xcvrptt.change = OFF;
+		trace(1, (state ? "rig_set_ptt ON" : "rig_set_ptt OFF"));
+		srvc_reqs.push(xcvrptt);
 	}
 
 	std::string help() { return std::string("sets PTT on (1) or off (0)"); }
@@ -736,10 +752,10 @@ public:
 //------------------------------------------------------------------------------
 // Execute vfo Swap
 //------------------------------------------------------------------------------
-void do_swap(void *)
-{
-	cbAswapB();
-}
+//void do_swap(void *)
+//{
+//	cbAswapB();
+//}
 
 class rig_swap : public XmlRpcServerMethod {
 public:
@@ -751,8 +767,19 @@ public:
 			return;
 		}
 
-		Fl::awake(do_swap, (void *)0);
-		MilliSleep(200);
+	guard_lock que_lock( &mutex_srvc_reqs, 160);
+	if (useB) {
+		srvc_reqs.push(VFOQUEUE(vB, vfoA));
+		srvc_reqs.push(VFOQUEUE(sA, vfoA));
+		srvc_reqs.push(VFOQUEUE(vA, vfoB));
+		srvc_reqs.push(VFOQUEUE(sB, vfoB));
+	} else {
+		srvc_reqs.push(VFOQUEUE(vA, vfoB));
+		srvc_reqs.push(VFOQUEUE(sB, vfoB));
+		srvc_reqs.push(VFOQUEUE(vB, vfoA));
+		srvc_reqs.push(VFOQUEUE(sA, vfoA));
+	}
+
 	}
 
 	std::string help() { return std::string("executes vfo swap"); }
@@ -771,8 +798,19 @@ public:
 			return;
 		}
 
-		Fl::awake(do_swap, (void *)0);
-		MilliSleep(200);
+	guard_lock que_lock( &mutex_srvc_reqs, 161);
+	if (useB) {
+		srvc_reqs.push(VFOQUEUE(vB, vfoA));
+		srvc_reqs.push(VFOQUEUE(sA, vfoA));
+		srvc_reqs.push(VFOQUEUE(vA, vfoB));
+		srvc_reqs.push(VFOQUEUE(sB, vfoB));
+	} else {
+		srvc_reqs.push(VFOQUEUE(vA, vfoB));
+		srvc_reqs.push(VFOQUEUE(sB, vfoB));
+		srvc_reqs.push(VFOQUEUE(vB, vfoA));
+		srvc_reqs.push(VFOQUEUE(sA, vfoA));
+	}
+
 	}
 
 	std::string help() { return std::string("executes vfo swap"); }
@@ -844,18 +882,14 @@ std::cout << "!ptt_off()\n";
 			return;
 		}
 
-		guard_lock service_lock(&mutex_service_que, 111);
-//		guard_lock que_lock( &mutex_vfoque, 111);
+		guard_lock service_lock(&mutex_srvc_reqs, 111);
 		XCVR_STATE vfo = vfoA;
 
 		vfo.src = SRVR;
 
-//		guard_lock que_lock( &mutex_vfoque, 111);
 
 trace(4, "set_AB ", ans.c_str(), " ", printXCVR_STATE(vfo).c_str());
-		vfoque.push (VFOQUEUE((ans == "A" ? sA : sB), vfo));
-		MilliSleep(200);
-		skip_polls = true;
+		srvc_reqs.push (VFOQUEUE((ans == "A" ? sA : sB), vfo));
 	}
 
 	std::string help() { return std::string("sets vfo in use A or B"); }
@@ -934,16 +968,15 @@ public:
 		srvr_vfo.iBW = 255;
 
 		push_xml();
-
+/*
 		int ifreq = 0;
 		int n = 0;
 		while (ifreq != srvr_vfo.freq) {
 			MilliSleep(10);
-//			guard_lock que_lock(&mutex_vfoque, 4000);
 			ifreq = vfo->freq;
 			n++;
 		}
-
+*/
 	}
 	std::string help() { return std::string("rig.set_vfo NNNNNNNN (Hz)"); }
 
@@ -968,16 +1001,15 @@ public:
 		srvr_vfo.iBW = 255;
 
 		push_xml();
-
+/*
 		int ifreq = 0;
 		int n = 0;
 		while (ifreq != srvr_vfo.freq) {
 			MilliSleep(10);
-//			guard_lock que_lock(&mutex_vfoque, 4001);
 			ifreq = vfo->freq;
 			n++;
 		}
-
+*/
 	}
 	std::string help() { return std::string("main.set_frequency NNNNNNNN (Hz)"); }
 
@@ -1006,7 +1038,6 @@ public:
 		int n = 0;
 		while (ifreq != srvr_vfo.freq) {
 			MilliSleep(10);
-//			guard_lock que_lock(&mutex_vfoque,4002);
 			ifreq = vfo->freq;
 			n++;
 		}
@@ -1028,7 +1059,7 @@ public:
 			result = 0;
 			return;
 		}
-//		guard_lock que_lock( &mutex_vfoque, 113 );
+
 		if (useB)
 			srvr_vfo = vfoB;
 		else
@@ -1057,7 +1088,6 @@ public:
 		int n = 0;
 		while (imode != srvr_vfo.imode) {
 			MilliSleep(10);
-//			guard_lock que_lock(&mutex_vfoque,4003);
 			imode = vfo->imode;
 			n++;
 		}
@@ -1083,7 +1113,7 @@ public:
 		int bw = int(params[0]);
 
 		{
-			guard_lock lock(&mutex_service_que);
+			guard_lock lock(&mutex_srvc_reqs);
 			if (useB) srvr_vfo = vfoB;
 			else      srvr_vfo = vfoA;
 
@@ -1136,7 +1166,6 @@ public:
 		int n = 0;
 		while (iBW != srvr_vfo.iBW) {
 			MilliSleep(10);
-//			guard_lock que_lock(&mutex_vfoque, 4006);
 			iBW = vfo->iBW;
 			n++;
 		}
@@ -1157,7 +1186,7 @@ public:
 		string bwstr = params;
 
 		int bw = int(params[0]);
-		guard_lock que_lock ( &mutex_vfoque, 115 );
+		guard_lock que_lock ( &mutex_srvc_reqs, 115 );
 		if (useB)
 			srvr_vfo = vfoB;
 		else
@@ -1174,7 +1203,6 @@ public:
 		int n = 0;
 		while (iBW != srvr_vfo.iBW) {
 			MilliSleep(10);
-//			guard_lock que_lock(&mutex_vfoque, 4007);
 			iBW = vfo->iBW;
 			n++;
 		}

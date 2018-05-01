@@ -68,7 +68,7 @@ extern pthread_mutex_t mutex_xmlrpc;
 extern pthread_mutex_t mutex_vfoque;
 extern pthread_mutex_t mutex_ptt;
 extern pthread_mutex_t mutex_replystr;
-extern pthread_mutex_t mutex_service_que;
+extern pthread_mutex_t mutex_srvc_reqs;
 
 extern bool RIG_DEBUG;
 extern bool XML_DEBUG;

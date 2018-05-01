@@ -910,7 +910,7 @@ void RIG_TT550::fkey_band_plus()
 	qvfo.vfo.imode = -1;
 	if (useB) qvfo.change = vB;
 	else      qvfo.change = vA;
-	vfoque.push(qvfo);
+	srvc_reqs.push(qvfo);
 }
 
 void RIG_TT550::fkey_band_minus()
@@ -929,7 +929,7 @@ void RIG_TT550::fkey_band_minus()
 	qvfo.vfo.imode = -1;
 	if (useB) qvfo.change = vB;
 	else      qvfo.change = vA;
-	vfoque.push(qvfo);
+	srvc_reqs.push(qvfo);
 }
 
 void RIG_TT550::fkey_step_plus()
