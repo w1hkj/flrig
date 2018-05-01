@@ -10,4 +10,8 @@ set autoindent noexpandtab tabstop=4 shiftwidth=4
 
 Using RigSerial->Timeout() as amount of time to give the radio to respond. It
 is used in one other place as amount of time for IOSelect() to work. Should
-probably be diffenent variables?
+probably be different variables?
+
+https://www.atlassian.com/blog/git/simple-git-workflow-simple
+git fetch origin
+git rebase origin/master
