@@ -128,7 +128,7 @@ void trace(int n, ...) // all args of type const char *
 	va_end(vl);
 	s << "\n";
 
-std::cout << s.str();
+std::cout << s.str(); std::cout.flush();
 
 	string trace_fname = RigHomeDir;
 	trace_fname.append("trace.txt");

@@ -119,10 +119,10 @@ void ztimer(void *)
 	exttime[2] = ':';
 	exttime[3] = ztbuf[11]; exttime[4] = ztbuf[12];
 	exttime[5] = ':';
-	exttime[6] = ztbuf[13]; exttime[7] = ztbuf[13];
+	exttime[6] = ztbuf[13]; exttime[7] = ztbuf[14];
 	exttime[8] = 0;
 
-	_zmsec = 0;
+	_zmsec = tv.tv_usec/1000;
 	_zsec = tm.tm_sec;
 	_zmin = tm.tm_min;
 	_zhr  = tm.tm_hour;
@@ -148,20 +148,9 @@ void *TOD_loop(void *args)
 			first_call = false;
 			ztimer((void *)0);
 		} else {
-			MilliSleep(10);
+			MilliSleep(5);
 			guard_lock zmsec_lock(&TOD_mutex);
-			_zmsec += 10;
-			if (_zmsec % 100 == 0) {
-				_zsec++;
-				if (_zsec >= 60) {
-					_zsec = 0;
-					_zmin++;
-					if (_zmin >= 60) {
-						_zmin = 0;
-						_zhr++;
-					}
-				}
-			}
+			ztimer((void *)0);
 		}
 	}
 
