@@ -233,7 +233,7 @@ inline void wait()
 	int n = 0;
 	while (!srvc_reqs.empty()) {
 		MilliSleep(10);
-		if (++n == 1000) break;
+		if (++n == 50) break;
 	}
 }
 
@@ -766,20 +766,11 @@ public:
 			result = 0;
 			return;
 		}
-
-	guard_lock que_lock( &mutex_srvc_reqs, 160);
-	if (useB) {
-		srvc_reqs.push(VFOQUEUE(vB, vfoA));
-		srvc_reqs.push(VFOQUEUE(sA, vfoA));
-		srvc_reqs.push(VFOQUEUE(vA, vfoB));
-		srvc_reqs.push(VFOQUEUE(sB, vfoB));
-	} else {
-		srvc_reqs.push(VFOQUEUE(vA, vfoB));
-		srvc_reqs.push(VFOQUEUE(sB, vfoB));
-		srvc_reqs.push(VFOQUEUE(vB, vfoA));
-		srvc_reqs.push(VFOQUEUE(sA, vfoA));
-	}
-
+		guard_lock lock(&mutex_srvc_reqs);
+		VFOQUEUE xcvr;
+		xcvr.change = SWAP;
+		trace(1, "xmlrpc SWAP");
+		srvc_reqs.push(xcvr);
 	}
 
 	std::string help() { return std::string("executes vfo swap"); }
@@ -798,18 +789,11 @@ public:
 			return;
 		}
 
-	guard_lock que_lock( &mutex_srvc_reqs, 161);
-	if (useB) {
-		srvc_reqs.push(VFOQUEUE(vB, vfoA));
-		srvc_reqs.push(VFOQUEUE(sA, vfoA));
-		srvc_reqs.push(VFOQUEUE(vA, vfoB));
-		srvc_reqs.push(VFOQUEUE(sB, vfoB));
-	} else {
-		srvc_reqs.push(VFOQUEUE(vA, vfoB));
-		srvc_reqs.push(VFOQUEUE(sB, vfoB));
-		srvc_reqs.push(VFOQUEUE(vB, vfoA));
-		srvc_reqs.push(VFOQUEUE(sA, vfoA));
-	}
+		guard_lock lock(&mutex_srvc_reqs);
+		VFOQUEUE xcvr;
+		xcvr.change = SWAP;
+		trace(1, "xmlrpc SWAP");
+		srvc_reqs.push(xcvr);
 
 	}
 
@@ -832,16 +816,12 @@ public:
 		}
 		int state = int(params[0]);
 
-		if (selrig->has_split_AB) {
-			guard_lock serial_lock(&mutex_serial);
-			ostringstream s;
-			s << "set split(" << (state ? "ON" : "OFF") << ")";
-			trace(1, s.str().c_str());
-			progStatus.split = state;
-			selrig->set_split(state);
+		VFOQUEUE xcvr_split;
+		if (state) xcvr_split.change = sON;
+		else       xcvr_split.change = sOFF;
+		trace(1, (state ? "rig_set_split ON" : "rig_set_split OFF"));
+		srvc_reqs.push(xcvr_split);
 
-			Fl::awake(update_split);
-		}
 	}
 
 	std::string help() { return std::string("executes vfo split"); }

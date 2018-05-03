@@ -116,6 +116,8 @@ extern void cb_selectA();
 extern void cb_selectB();
 extern void highlight_vfo(void *);
 extern void cb_set_split(int);
+extern void execute_swapAB();
+extern void execute_A2B();
 extern void cbAswapB();
 extern void cbRIT();
 extern void cbXIT();

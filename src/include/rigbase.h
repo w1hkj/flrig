@@ -113,6 +113,10 @@ enum {
 	sB,  // select vfoB
 	ON,  // ptt ON
 	OFF, // ptt OFF
+	sON, // split ON
+	sOFF, // split OFF
+	A2B,  // active to inactive vfo
+	SWAP  // swap vfo's
 };
 
 struct VFOQUEUE {

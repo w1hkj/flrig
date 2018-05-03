@@ -76,4 +76,5 @@ const char * guard_lock::name(pthread_mutex_t *m) {
 	if (m == &mutex_ptt) return "mutex_ptt";
 	if (m == &TOD_mutex) return "TOD_mutex";
 	if (m == &mutex_srvc_reqs) return "mutex_service_requests";
+	return "";
 }
