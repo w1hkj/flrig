@@ -1725,11 +1725,13 @@ void execute_A2B()
 			selrig->set_vfoA(vfoA.freq);
 			selrig->set_modeA(vfoA.imode);
 			selrig->set_bwA(vfoA.iBW);
+			FreqDispA->value(vfoA.freq);
 		} else {
 			vfoB = vfoA;
 			selrig->set_vfoB(vfoB.freq);
 			selrig->set_modeB(vfoB.imode);
 			selrig->set_bwB(vfoB.iBW);
+			FreqDispB->value(vfoB.freq);
 		}
 	}
 	Fl::awake(updateUI);
