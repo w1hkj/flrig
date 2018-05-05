@@ -1407,31 +1407,38 @@ void cb_send_command(string command, Fl_Output *resp)
 		}
 	} else
 		cmd = command;
-// lock out polling loops until done
-	guard_lock gl_serial(&mutex_serial, 201);
 
 	if (resp) {
 		resp->value("");
 		resp->redraw();
 	}
 
-	sendCommand(cmd, 0);
+//	trace(2, 
+//		"send command:\n", 
+//		usehex ? str2hex(
+//				cmd.c_str(),
+//				cmd.length()) :
+//		cmd.c_str() );
 
-	int timeout = 1000;
-	while (timeout > 0) {
-		if (timeout > 10) MilliSleep(10);
-		else MilliSleep(timeout);
-		timeout -= 10;
-		Fl::awake();
-	}
+// lock out polling loops until done
+	guard_lock lock1(&mutex_srvc_reqs);
+	guard_lock lock2(&mutex_serial);
 
-	readResponse();
+	sendCommand(cmd, cmd.length());
+
+//	trace(2, 
+//		"reply:\n",
+//		usehex ? str2hex(
+//				respstr.c_str(),
+//				respstr.length()) :
+//			respstr.c_str() );
+
 	if (resp) {
 		resp->value(
 			usehex ? str2hex(
-				selrig->replystr.c_str(),
-				selrig->replystr.length()) :
-			selrig->replystr.c_str() );
+				respstr.c_str(),
+				respstr.length()) :
+			respstr.c_str() );
 		resp->redraw();
 	}
 }

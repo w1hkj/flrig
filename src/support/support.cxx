@@ -120,7 +120,7 @@ void trace(int n, ...) // all args of type const char *
 	stringstream s;
 	va_list vl;
 	va_start(vl, n);
-	char szmsec[4];
+	char szmsec[5];
 	snprintf(szmsec, sizeof(szmsec), ".%03d", zmsec());
 	s << zext_time() << szmsec << " : " << va_arg(vl, const char *);
 	for (int i = 1; i < n; i++)

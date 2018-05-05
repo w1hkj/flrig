@@ -18,7 +18,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
+#include <sstream>
+#include <string>
+
 #include "dialogs.h"
+#include "ICbase.h"
 
 Fl_Tabs *tabsConfig = (Fl_Tabs *)0;
 Fl_Group *tabPrimary = (Fl_Group *)0;
@@ -96,6 +100,8 @@ Fl_Button *btnSetAdd = (Fl_Button *)0;
 
 Fl_Group *tabSndCmd = (Fl_Group *)0;
 Fl_Input2 *txt_command = (Fl_Input2 *)0;
+Fl_Button *btn_icom_pre = (Fl_Button *)0;
+Fl_Button *btn_icom_post = (Fl_Button *)0;
 Fl_Button *btn_send_command = (Fl_Button *)0;
 Fl_Output *txt_response = (Fl_Output *)0;
 Fl_Box *box_xcvr_connect = (Fl_Box *)0;
@@ -503,6 +509,37 @@ static void cb_btnSetAdd(Fl_Button*, void*) {
 
 static void cb_btn_send_command(Fl_Button *o, void*) {
 	cb_send_command(txt_command->value(), txt_response);
+}
+
+static const char hexsym[] = "0123456789ABCDEF";
+static std::string str2hex(std::string str)
+{
+	static std::string hexbuf;
+
+	size_t len = str.length();
+
+	if (!len) return "";
+ 
+	hexbuf.clear();
+	for (size_t i = 0; i < len; i++) {
+		hexbuf += 'x';
+		hexbuf += hexsym[(str[i] & 0xFF) >> 4];
+		hexbuf += hexsym[str[i] & 0xF];
+		hexbuf += ' ';
+	}
+	return hexbuf;
+}
+
+static void cb_btn_icom_pre(Fl_Button *o, void*) {
+	if (!selrig->ICOMrig) return;
+	txt_command->value(str2hex(selrig->pre_to).c_str());
+}
+
+static void cb_btn_icom_post(Fl_Button *o, void*) {
+	if (!selrig->ICOMrig) return;
+	std::string s = txt_command->value();
+	s.append(str2hex(selrig->post));
+	txt_command->value(s.c_str());
 }
 
 static void cb_cmdlbl(Fl_Input2 *o, void *d) {
@@ -1366,7 +1403,7 @@ _("Use only if your setup requires a separate\nSerial Port for a special Control
 	tabSndCmd = new Fl_Group(2, 30, 475, 222, _("Send"));
 		tabSndCmd->hide();
 
-		txt_command = new Fl_Input2(29, 53, 434, 23,
+		txt_command = new Fl_Input2(30, 53, 435, 24,
 _("Enter text as ASCII string\nOr sequence of hex values, x80 etc separated by spaces"));
 		txt_command->box(FL_DOWN_BOX);
 		txt_command->color(FL_BACKGROUND2_COLOR);
@@ -1378,11 +1415,17 @@ _("Enter text as ASCII string\nOr sequence of hex values, x80 etc separated by s
 		txt_command->align(Fl_Align(FL_ALIGN_BOTTOM_LEFT));
 		txt_command->when(FL_WHEN_RELEASE);
 
-		btn_send_command = new Fl_Button(392, 156, 71, 19, _("SEND"));
-		btn_send_command->callback((Fl_Callback*)cb_btn_send_command);
-
-		txt_response = new Fl_Output(29, 115, 434, 23, _("Response to the SEND button"));
+		txt_response = new Fl_Output(30, 115, 435, 24, _("Response to the SEND button"));
 		txt_response->align(Fl_Align(FL_ALIGN_BOTTOM_LEFT));
+
+		btn_icom_pre = new Fl_Button(385, 145, 80, 20, _("ICOM pre"));
+		btn_icom_pre->callback((Fl_Callback*)cb_btn_icom_pre);
+
+		btn_icom_post = new Fl_Button(385, 173, 80, 20, _("ICOM post"));
+		btn_icom_post->callback((Fl_Callback*)cb_btn_icom_post);
+
+		btn_send_command = new Fl_Button(385, 201, 80, 20, _("SEND"));
+		btn_send_command->callback((Fl_Callback*)cb_btn_send_command);
 
 		box_xcvr_connect = new Fl_Box(29, 180, 18, 18, _("Connected to transceiver"));
 		box_xcvr_connect->tooltip(_("Lit when connected"));

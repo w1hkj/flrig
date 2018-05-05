@@ -272,7 +272,13 @@ public:
 
 	bool has_get_info;
 
+// Icom Xcvr 
 	bool ICOMrig;
+	string pre_to;
+	string pre_fm;
+	string post;
+	string ok;
+	string bad;
 
 	int  data_type;
 
