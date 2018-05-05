@@ -352,13 +352,15 @@ void showresp(int level, int how, string s, string tx, string rx)
 	case ERR:
 		SLOG_ERROR("%s: %10s\ncmd %s\nans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
 		break;
-	case WARN:
-		SLOG_WARN("%s: %10s\ncmd %s\nans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
-		break;
 	case INFO:
 		SLOG_INFO("%s: %10s\ncmd %s\nans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
 		break;
-	default:
+	case DEBUG:
 		SLOG_DEBUG("%s: %10s\ncmd %s\nans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
+		break;
+	case WARN:
+	default:
+		SLOG_WARN("%s: %10s\ncmd %s\nans %s", sztm, s.c_str(), s1.c_str(), s2.c_str());
+		break;
 	}
 }

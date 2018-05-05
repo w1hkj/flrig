@@ -81,7 +81,6 @@ public:
 	virtual bool can_split() { return true;}
 
 	virtual bool canswap() { return true; }
-	virtual bool ICswap() { return true; }
 
 protected:
 	int  preamp_level;

@@ -94,6 +94,12 @@ void RIG_ICOM::delayCommand(string cmd, int wait)
 
 #include <fstream>
 
+void RIG_ICOM::ICtrace(string cmd, string hexstr) 
+{
+	string s1 = str2hex(hexstr.c_str(), hexstr.length());
+	trace(2, cmd.c_str(), s1.c_str());
+}
+
 bool RIG_ICOM::waitFB(const char *sz)
 {
 	guard_lock cmd_lock(&command_mutex);
@@ -205,19 +211,25 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 // 718 706MKIIG 746 746PRO 756 756PRO 756PROII 756PROIII
 // 910 7000 7100 7200 7300 7410 7600 7700 7800 9100
 
-void RIG_ICOM::swapvfos()
+// 5/04/18 dhf
+
+void RIG_ICOM::swapAB()
 {
 	cmd = pre_to;
 	cmd += 0x07; cmd += 0xB0;
+	ICtrace("A<>B", cmd);
 	cmd.append(post);
-	waitFB("Exchange vfos");
+	waitFB("A<>B");
+	ICtrace("A<>B", replystr);
 }
 
 void RIG_ICOM::A2B()
 {
 	cmd = pre_to;
 	cmd += 0x07; cmd += 0xA0;
+	ICtrace("A2B", cmd);
 	cmd.append(post);
 	waitFB("Equalize vfos");
+	ICtrace("A2B", replystr);
 }
 

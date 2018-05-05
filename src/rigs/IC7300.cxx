@@ -192,9 +192,9 @@ RIG_IC7300::RIG_IC7300() {
 
 //	has_vfo_adj = true;
 
-#if !EMULATE
 	can_change_alt_vfo = true;
-#endif
+	has_a2b = true;
+
 };
 
 void RIG_IC7300::initialize()
@@ -213,7 +213,10 @@ void RIG_IC7300::initialize()
 	IC7300_widgets[11].W = sldrMICGAIN;
 	IC7300_widgets[12].W = sldrPOWER;
 
-	selectA(); // for A to be active vfo
+	selectA();    // force A to be active vfo
+	get_modeA();  // reads both active & inactive FIL in use
+	get_modeB();
+
 }
 
 static inline void minmax(int min, int max, int &val)
@@ -248,245 +251,22 @@ if (DEBUG_7300) trace(4, "selectB():\n",
 		str2hex(replystr.c_str(), replystr.length()));
 }
 
-////////////////////////////////////////////////////////////////////////
-#if EMULATE // change to zero for alternate vfo usage
-////////////////////////////////////////////////////////////////////////
-long RIG_IC7300::get_vfoA ()
-{
-	if (useB) return A.freq;
-	string resp = pre_fm;
-	resp += '\x03';
-	cmd = pre_to;
-	cmd += '\x03';
-	cmd.append( post );
-
-	if (waitFOR(11, "get vfo A")) {
-		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
-	}
-
-if (DEBUG_7300) trace(4, "get_vfoA():\n", 
-		str2hex(cmd.c_str(), cmd.length()),
-		"\n",
-		str2hex(replystr.c_str(), replystr.length()));
-
-	return A.freq;
-}
-
-void RIG_IC7300::set_vfoA (long freq)
-{
-	A.freq = freq;
-	cmd = pre_to;
-	cmd += '\x05';
-	cmd.append( to_bcd_be( freq, 10 ) );
-	cmd.append( post );
-
-	waitFB("set vfo A");
-
-if (DEBUG_7300) trace(4, "set_vfoA():\n", 
-		str2hex(cmd.c_str(), cmd.length()),
-		"\n",
-		str2hex(replystr.c_str(), replystr.length()));
-}
-
-long RIG_IC7300::get_vfoB ()
-{
-	if (!useB) return B.freq;
-	string resp = pre_fm;
-	resp += '\x03';
-	cmd = pre_to;
-	cmd += '\x03';
-	cmd.append( post );
-
-	if (waitFOR(11, "get vfo B")) {
-		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
-	}
-
-if (DEBUG_7300) trace(4, "get_vfoB():\n", 
-		str2hex(cmd.c_str(), cmd.length()),
-		"\n",
-		str2hex(replystr.c_str(), replystr.length()));
-
-	return B.freq;
-}
-
-void RIG_IC7300::set_vfoB (long freq)
-{
-	B.freq = freq;
-	cmd = pre_to;
-	cmd += '\x05';
-	cmd.append( to_bcd_be( freq, 10 ) );
-	cmd.append( post );
-
-	waitFB("set vfo B");
-
-if (DEBUG_7300) trace(4, "set_vfoA():\n", 
-		str2hex(cmd.c_str(), cmd.length()),
-		"\n",
-		str2hex(replystr.c_str(), replystr.length()));
-}
-
-int RIG_IC7300::get_modeA()
-{
-	int md = A.imode;
-	string resp = pre_fm;
-	resp += '\x04';
-	cmd = pre_to;
-	cmd += '\x04';
-	cmd.append(post);
-	if (waitFOR(8, "get mode A")) {
-		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
-			md = replystr[p + 5];
-			if (md > 6) md -= 2;
-		}
-	}
-
-if (DEBUG_7300) trace(4, "get_modeA():\n", 
-		str2hex(cmd.c_str(), cmd.length()),
-		"\n",
-		str2hex(replystr.c_str(), replystr.length()));
-
-	cmd = pre_to;
-	cmd += "\x1A\x04";
-	cmd.append(post);
-	resp = pre_fm;
-	resp += "\x1A\x04";
-	if (waitFOR(9, "data mode?")) {
-		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
-			if ((replystr[p+6] & 0x01) == 0x01 && A.imode < 4) {
-				A.imode += 8;
-			if (A.imode > 11)
-				A.imode = 1;
-			}
-		}
-	}
-
-if (DEBUG_7300) trace(4, "get_data_mode_A():\n", 
-		str2hex(cmd.c_str(), cmd.length()),
-		"\n",
-		str2hex(replystr.c_str(), replystr.length()));
-
-	return (A.imode = md);
-}
-
-void RIG_IC7300::set_modeA(int val)
-{
-	A.imode = val;
-	if (val > 7) val -= 8;
-	cmd = pre_to;
-	cmd += '\x06';
-	cmd += val > 4 ? val + 2 : val;
-	cmd.append( post );
-	waitFB("set mode A");
-
-if (DEBUG_7300) trace(4, "set_modeA():\n", 
-		str2hex(cmd.c_str(), cmd.length()),
-		"\n",
-		str2hex(replystr.c_str(), replystr.length()));
-
-	cmd = pre_to;
-	cmd += '\x1A'; cmd += '\x04';
-	if (A.imode > 7) cmd += '\x01';
-	else cmd += '\x00';
-	cmd.append( post);
-	waitFB("data mode");
-
-if (DEBUG_7300) trace(4, "set_data_mode_A():\n", 
-		str2hex(cmd.c_str(), cmd.length()),
-		"\n",
-		str2hex(replystr.c_str(), replystr.length()));
-
-}
-
-int RIG_IC7300::get_modeB()
-{
-	int md = B.imode;
-	cmd = pre_to;
-	cmd += '\x04';
-	cmd.append(post);
-	string resp = pre_fm;
-	resp += '\x04';
-	if (waitFOR(8, "get mode B")) {
-		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
-			md = replystr[p+5];
-			if (md > 6) md -= 2;
-		}
-	}
-
-if (DEBUG_7300) trace(4, "get_modeB():\n", 
-		str2hex(cmd.c_str(), cmd.length()),
-		"\n",
-		str2hex(replystr.c_str(), replystr.length()));
-
-	cmd = pre_to;
-	cmd += "\x1A\x04";
-	cmd.append(post);
-	resp = pre_fm;
-	resp += "\x1A\x04";
-	if (waitFOR(9, "get data B")) {
-		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
-			if ((replystr[p+6] & 0x01) == 0x01 && B.imode < 4) {
-				B.imode += 8;
-			if (B.imode > 11)
-				B.imode = 1;
-			}
-		}
-	}
-
-if (DEBUG_7300) trace(4, "get_data_mode_b():\n", 
-		str2hex(cmd.c_str(), cmd.length()),
-		"\n",
-		str2hex(replystr.c_str(), replystr.length()));
-
-	return (B.imode = md);
-}
-
-void RIG_IC7300::set_modeB(int val)
-{
-	B.imode = val;
-	if (val > 7) val -= 8;
-	cmd = pre_to;
-	cmd += '\x06';
-	cmd += val > 4 ? val + 2 : val;
-	cmd.append( post );
-	waitFB("set mode B");
-
-if (DEBUG_7300) trace(4, "set_modeB():\n", 
-		str2hex(cmd.c_str(), cmd.length()),
-		"\n",
-		str2hex(replystr.c_str(), replystr.length()));
-
-	cmd = pre_to;
-	cmd += '\x1A'; cmd += '\x04';
-	if (B.imode > 7) cmd += '\x01';
-	else cmd += '\x00';
-	cmd.append( post);
-	waitFB("data mode");
-
-if (DEBUG_7300) trace(4, "set_data_mode_B():\n", 
-		str2hex(cmd.c_str(), cmd.length()),
-		"\n",
-		str2hex(replystr.c_str(), replystr.length()));
-
-}
-
-////////////////////////////////////////////////////////////////////////
-#else
-////////////////////////////////////////////////////////////////////////
-
 //======================================================================
 // IC7300 unique commands
 //======================================================================
 
 static int FIL_A = 1;
 static int FIL_B = 2;
+
+void RIG_IC7300::swapAB()
+{
+	cmd = pre_to;
+	cmd += 0x07; cmd += 0xB0;
+	cmd.append(post);
+	waitFB("Exchange vfos");
+	get_modeA(); // get mode to update the FIL_A / B usage
+	get_modeB();
+}
 
 long RIG_IC7300::get_vfoA ()
 {
@@ -737,10 +517,6 @@ if (DEBUG_7300) trace(4, "set_modeB():\n",
 
 	if (useB) adjust_bandwidth(val);
 }
-
-////////////////////////////////////////////////////////////////////////
-#endif // ifdef 1
-////////////////////////////////////////////////////////////////////////
 
 bool RIG_IC7300::can_split()
 {

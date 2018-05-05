@@ -272,6 +272,8 @@ public:
 
 	bool has_get_info;
 
+	bool ICOMrig;
+
 	int  data_type;
 
 // for pia TS2000 without a front panel
@@ -339,10 +341,10 @@ public:
 	virtual bool can_split() { return false;}
 	virtual void set_split(bool val);
 	virtual int  get_split();
+
 	virtual bool twovfos() {return false;}
-	virtual void swapvfos() {}
+
 	virtual bool canswap() { return false; }
-	virtual bool ICswap() { return false; }
 
 	virtual int  get_agc() { return 0; }
 	virtual int  incr_agc() { return 0;}

@@ -52,9 +52,7 @@ public:
 	int  get_split();
 
 	bool canswap() { return true; }
-	bool ICswap() { return true; }
-
-//	bool hasA2b() { return true; }
+	void swapAB();
 
 	void set_bwA(int val);
 	int  get_bwA();

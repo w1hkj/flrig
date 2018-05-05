@@ -154,6 +154,7 @@ RIG_IC7200::RIG_IC7200() {
 	has_tune_control = true;
 	has_split_AB = true;
 	has_vfo_adj = true;
+	has_a2b = true;
 
 	has_cw_wpm = true;
 	has_cw_spot_tone = true;

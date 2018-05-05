@@ -328,7 +328,7 @@ void RIG_FT1000::selectB()
  	showresp(WARN, HEX, "select B", cmd, replystr);
 }
 
-void RIG_FT1000::swapvfos() 
+void RIG_FT1000::swapAB() 
 {
 	init_cmd();
 	cmd[4] = 0x85;

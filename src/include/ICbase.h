@@ -42,6 +42,7 @@ public:
 		post = "\xFD";
 		ok = "\xFE\xFE\xE0\x56\xFB\xFD";
 		bad = "\xFE\xFE\xE0\x56\xFA\xFD";
+		ICOMrig = true;
 	}
 	virtual ~RIG_ICOM() {}
 	void checkresponse();
@@ -51,8 +52,10 @@ public:
 	bool  waitFOR(size_t n, const char *sz);
 	void adjustCIV(uchar adr);
 
-	virtual void swapvfos();
+	virtual void swapAB();
 	virtual void A2B();
+
+	void ICtrace(string cmd, string hexstr);
 
 };
 

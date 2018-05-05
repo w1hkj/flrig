@@ -119,11 +119,12 @@ rigbase::rigbase()
 	has_line_out =
 //	has_split =
 	has_split_AB =
-	has_a2b =
 	has_band_selection =
 	has_get_info = 
-	has_getvfoAorB = false;
+	has_getvfoAorB = 
+	ICOMrig = false;
 
+	has_a2b = true;
 	has_vfoAB = true;
 
 	data_type = BINARY;

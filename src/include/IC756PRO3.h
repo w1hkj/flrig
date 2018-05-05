@@ -32,7 +32,6 @@ public:
 
 	void selectA();
 	void selectB();
-	void A2B();
 
 	long get_vfoA(void);
 	void set_vfoA(long f);
@@ -113,7 +112,9 @@ public:
 	bool twovfos() { return false; }
 
 	bool  canswap() { return true; }
-	bool ICswap() { return true; }
+
+	void swapAB();
+	void A2B();
 
 	const char **bwtable(int);
 

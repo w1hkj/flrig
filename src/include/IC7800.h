@@ -44,7 +44,6 @@ public:
 	int  get_split();
 
 	bool canswap() { return true; }
-	bool ICswap() { return true; }
 
 //	bool hasA2b() { return true; }
 

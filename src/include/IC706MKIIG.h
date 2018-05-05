@@ -57,7 +57,6 @@ public:
 //	bool can_split() { return true; }
 
 	bool canswap() { return true; }
-	bool ICswap() { return true; }
 
 protected:
    int filter_nbr;

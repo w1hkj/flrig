@@ -77,7 +77,6 @@ public:
 	void set_cw_vol();
 
 	bool canswap() { return true; }
-	bool ICswap() { return true; }
 
 	void set_PTT_control(int val);
 	int  get_PTT();

@@ -124,9 +124,6 @@ public:
 	const char **bwtable(int);
 
 	bool  canswap() { return true; }
-	bool ICswap() { return true; }
-
-//	bool hasA2b() { return true; }
 
 	void set_cw_wpm();
 	void get_cw_wpm_min_max(int &min, int &max);

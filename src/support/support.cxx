@@ -1629,24 +1629,30 @@ int movFreqB() {
 
 void execute_swapAB()
 {
-	if (selrig->ICswap()) {
-		if (!useB) {
-			selrig->selectB();
-			useB = true;
-			vfoB.freq = selrig->get_vfoB();
-			vfoB.imode = selrig->get_modeB();
-			vfoB.iBW = selrig->get_bwB();
-			vfo = &vfoB;
+	if (selrig->canswap()) {
+		selrig->swapAB();
+		if (selrig->ICOMrig) {
+			if (useB) {
+				selrig->selectA();
+				vfo = &vfoA;
+				useB = false;
+			} else {
+				selrig->selectB();
+				vfo = &vfoB;
+				useB = true;
+			}
 		} else {
-			selrig->selectA();
-			useB = false;
-			vfoA.freq = selrig->get_vfoA();
-			vfoA.imode = selrig->get_modeA();
-			vfoA.iBW = selrig->get_bwA();
-			vfo = &vfoA;
+			XCVR_STATE temp = vfoB;
+			vfoB = vfoA;
+			vfoA = temp;
+			if (useB) {
+				selrig->selectB();
+				vfo = &vfoB;
+			} else {
+				selrig->selectA();
+				vfo = &vfoA;
+			}
 		}
-	} else if (selrig->canswap()) {
-		selrig->swapvfos();
 	} else {
 		if (useB) {
 			XCVR_STATE vfotemp = vfoA;
@@ -1658,6 +1664,7 @@ void execute_swapAB()
 			selrig->set_vfoB(vfotemp.freq);
 			selrig->set_modeB(vfotemp.imode);
 			selrig->set_bwB(vfotemp.iBW);
+			vfo = &vfoB;
 		} else {
 			XCVR_STATE vfotemp = vfoB;
 			selrig->selectB();
@@ -1668,6 +1675,7 @@ void execute_swapAB()
 			selrig->set_vfoA(vfotemp.freq);
 			selrig->set_modeA(vfotemp.imode);
 			selrig->set_bwA(vfotemp.iBW);
+			vfo = &vfoA;
 		}
 	}
 	Fl::awake(updateUI);
@@ -1704,6 +1712,13 @@ void execute_A2B()
 	if (selrig->has_a2b) {
 		trace(1,"cbA2B() 2");
 		selrig->A2B();
+		if (useB) {
+			vfoA = vfoB;
+			FreqDispA->value(vfoA.freq);
+		} else {
+			vfoB = vfoA;
+			FreqDispB->value(vfoB.freq);
+		}
 	} else {
 		if (useB) {
 			vfoA = vfoB;
@@ -1725,6 +1740,8 @@ void highlight_vfo(void *d)
 	Fl_Color norm_fg = fl_rgb_color(progStatus.fg_red, progStatus.fg_green, progStatus.fg_blue);
 	Fl_Color norm_bg = fl_rgb_color(progStatus.bg_red, progStatus.bg_green, progStatus.bg_blue);
 	Fl_Color dim_bg = fl_color_average( norm_bg, FL_BLACK, 0.75);
+	FreqDispA->value(vfoA.freq);
+	FreqDispB->value(vfoB.freq);
 	if (useB) {
 		FreqDispA->SetONOFFCOLOR( norm_fg, dim_bg );
 		FreqDispB->SetONOFFCOLOR( norm_fg, norm_bg );

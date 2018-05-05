@@ -31,7 +31,6 @@ public:
 	void initialize();
 
 	virtual bool canswap() { return true; }
-	virtual bool ICswap() { return true; }
 
 };
 
@@ -90,6 +89,9 @@ public:
 	int  get_auto_notch();
 
 	bool twovfos() { return false; }
+
+	void swapAB();
+	void A2B();
 
 	const char **bwtable(int);
 

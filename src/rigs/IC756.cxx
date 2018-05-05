@@ -179,6 +179,7 @@ RIG_IC756PRO::RIG_IC756PRO() {
 	has_ptt_control =
 	has_noise_control =
 	has_rf_control = true;
+	has_a2b = true;
 
 	precision = 1;
 	ndigits = 9;
@@ -192,6 +193,22 @@ void RIG_IC756PRO::initialize()
 	ic756pro_widgets[2].W = sldrRFGAIN;
 	ic756pro_widgets[3].W = sldrMICGAIN;
 	ic756pro_widgets[4].W = sldrPOWER;
+}
+
+void RIG_IC756PRO::swapAB()
+{
+	cmd = pre_to;
+	cmd += 0x07; cmd += 0xB0;
+	cmd.append(post);
+	waitFB("Exchange vfos");
+}
+
+void RIG_IC756PRO::A2B()
+{
+	cmd = pre_to;
+	cmd += 0x07; cmd += 0xB1;
+	cmd.append(post);
+	waitFB("Equalize vfos");
 }
 
 void RIG_IC756PRO::selectA()

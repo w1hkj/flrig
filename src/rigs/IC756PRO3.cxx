@@ -120,6 +120,7 @@ RIG_IC756PRO3::RIG_IC756PRO3() {
 	has_noise_control =
 	has_sql_control =
 	has_rf_control = true;
+	has_a2b = true;
 
 	adjustCIV(defaultCIV);
 
@@ -142,6 +143,23 @@ void RIG_IC756PRO3::initialize()
 	ic756pro3_widgets[9].W = sldrPOWER;
 }
 
+void RIG_IC756PRO3::swapAB()
+{
+	cmd = pre_to;
+	cmd += 0x07; cmd += 0xB0;
+	cmd.append(post);
+	waitFB("Exchange vfos");
+}
+
+void RIG_IC756PRO3::A2B()
+{
+	cmd = pre_to;
+	cmd += 0x07; cmd += 0xB1;
+	cmd.append(post);
+	waitFB("Equalize vfos");
+}
+
+
 void RIG_IC756PRO3::selectA()
 {
 	cmd = pre_to;
@@ -158,15 +176,6 @@ void RIG_IC756PRO3::selectB()
 	cmd += '\xB1';
 	cmd.append(post);
 	waitFB("sel B");
-}
-
-void RIG_IC756PRO3::A2B()
-{
-	cmd = pre_to;
-	cmd += '\x07';
-	cmd += '\xB1';
-	cmd.append(post);
-	waitFB("A->B");
 }
 
 long RIG_IC756PRO3::get_vfoA ()

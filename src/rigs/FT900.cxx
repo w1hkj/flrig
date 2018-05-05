@@ -140,7 +140,7 @@ int  RIG_FT900::get_vfoAorB()
 	return -1;                                // -1 signals error
 }
 
-//void RIG_FT900::swapvfos()    // works with a simple trick
+//void RIG_FT900::swapAB()    // works with a simple trick
 //{
 //	init_cmd();
 //	cmd[4] = 0x85;			// copy active vfo to background vfo

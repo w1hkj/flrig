@@ -53,7 +53,7 @@ public:
 	void set_bwA(int val);
 
 	bool canswap() {return true;}
-	void swapvfos();
+	void swapAB();
 // 	void A2B();
 
 	bool can_split() { return true;}

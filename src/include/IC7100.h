@@ -105,7 +105,6 @@ public:
 	const char **bwtable(int m);
 
 	bool  canswap() { return true; }
-	bool ICswap() { return true; }
 
 	bool can_split();
 	void set_split(bool val);

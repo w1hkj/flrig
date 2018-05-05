@@ -145,7 +145,6 @@ public:
 	int next_preamp();
 
 	bool canswap() { return true; }
-	bool ICswap() { return true; }
 
 //	bool hasA2b() { return true; }
 
