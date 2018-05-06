@@ -288,46 +288,31 @@ void RIG_TS2000::set_split(bool val)
 
 	if (useB) {
 		if (val) {
-			cmd = "FR1;";
+			cmd = "FR1;FT0;";
 			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on B", cmd, "");
-			cmd = "FT0;";
-			sendCommand(cmd);
-			showresp(WARN, ASC, "Tx on A", cmd, "");
-			rxvfo = 1;
-			txvfo = 0;
+			showresp(WARN, ASC, "Rx on B, Tx on A", cmd, "");
+			rxvfo = 1; txvfo = 0;
 		} else {
-			cmd = "FR1;";
+			cmd = "FR1;FT1;";
 			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on B", cmd, "");
-			cmd = "FT1;";
-			sendCommand(cmd);
-			showresp(WARN, ASC, "Tx on B", cmd, "");
+			showresp(WARN, ASC, "Rx on B, Tx on B", cmd, "");
 			rxvfo = txvfo = 1;
 		}
 		rxona = false;
 	} else {
 		if (val) {
-			cmd = "FR0;";
+			cmd = "FR0;FT1;";
 			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on A", cmd, "");
-			cmd = "FT1;";
-			sendCommand(cmd);
-			showresp(WARN, ASC, "Tx on B", cmd, "");
+			showresp(WARN, ASC, "Rx on A, Tx on B", cmd, "");
 			rxvfo = 0; txvfo = 1;
 		} else {
-			cmd = "FR0;";
+			cmd = "FR0;FT0;";
 			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on A", cmd, "");
-			cmd = "FT0;";
-			sendCommand(cmd);
-			showresp(WARN, ASC, "Tx on A", cmd, "");
+			showresp(WARN, ASC, "Rx on A, Tx on A", cmd, "");
 			rxvfo = txvfo = 0;
 		}
 		rxona = true;
 	}
-
-	Fl::awake(highlight_vfo, (void *)0);
 }
 
 

@@ -274,7 +274,6 @@ void RIG_TS480SAT::selectB()
 void RIG_TS480SAT::set_split(bool val) 
 {
 	split = val;
-	split = val;
 	if (useB) {
 		if (val) {
 			cmd = "FR1;FT0;";
@@ -296,7 +295,6 @@ void RIG_TS480SAT::set_split(bool val)
 			showresp(WARN, ASC, "Rx on A, Tx on A", cmd, "");
 		}
 	}
-	Fl::awake(highlight_vfo, (void *)0);
 }
 
 bool RIG_TS480SAT::can_split()

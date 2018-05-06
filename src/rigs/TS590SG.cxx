@@ -321,7 +321,6 @@ void RIG_TS590SG::set_split(bool val)
 			showresp(WARN, ASC, "Rx on A, Tx on A", cmd, "");
 		}
 	}
-	Fl::awake(highlight_vfo, (void *)0);
 }
 
 int RIG_TS590SG::get_split()
