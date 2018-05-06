@@ -305,81 +305,47 @@ void read_vfo()
 	}
 }
 
+void updateUI(void *)
+{
+	setModeControl(NULL);
+	updateBandwidthControl(NULL);
+	setBWControl(NULL);
+	highlight_vfo(NULL);
+}
+
 void update_vfoAorB(void *d)
 {
-	return;
-	// cannot use this logic with new queue handler
-	long val = (long)d;
-
 	if (xcvr_name == rig_FT817.name_) {
-		trace1(1,"update_vfoAorB()  1");
-		if (val) {
-			useB = true;
+		trace1(1,"FT817, update_vfoAorB()");
+		if (useB) {
 			vfoB.src = RIG;
 			vfoB.freq = selrig->get_vfoB();
 			vfoB.imode = selrig->get_modeB();
 			vfoB.iBW = selrig->get_bwB();
-			changed_vfo = true;
-			guard_lock que_lock(&mutex_srvc_reqs, 200);
-			while (!srvc_reqs.empty()) srvc_reqs.pop();
-			srvc_reqs.push(VFOQUEUE(vB, vfoB));
-			highlight_vfo(NULL);
 		} else {
-			useB = false;
 			vfoA.src = RIG;
 			vfoA.freq = selrig->get_vfoA();
 			vfoA.imode = selrig->get_modeA();
 			vfoA.iBW = selrig->get_bwA();
-			changed_vfo = true;
-			guard_lock que_lock(&mutex_srvc_reqs, 201);
-			while (!srvc_reqs.empty()) srvc_reqs.pop();
-			srvc_reqs.push(VFOQUEUE(vA, vfoA));
-			highlight_vfo(NULL);
 		}
 		return;
 	}
-
-	if (val) {
-//	could use cb_selectB() here, but that switches off split mode
-		trace1(1,"update_vfoAorB()  2");
-		changed_vfo = true;
-		vfoB.src = UI;
-		vfoB.freq = FreqDispB->value();
-		guard_lock que_lock(&mutex_srvc_reqs, 202);
-		srvc_reqs.push(VFOQUEUE(vB, vfoB));
-		useB = true;
-		highlight_vfo((void *)0);
-	} else {
-//	could use cb_selectA() here, but that switches off split mode
-		trace1(1,"update_vfoAorB()  3");
-		changed_vfo = true;
-		vfoA.src = UI;
-		vfoA.freq = FreqDispA->value();
-		guard_lock que_lock(&mutex_srvc_reqs, 203);
-		srvc_reqs.push(VFOQUEUE(vA, vfoA));
-		useB = false;
-		highlight_vfo((void *)0);
-	}
+	updateUI((void*)0);
 }
 
 void read_vfoAorB()
 {
-	return;
-// change for use with new queue handler
 	int val;
 	if (selrig->has_getvfoAorB) {
 		{
 			trace1(1,"read_vfoAorB()");
 			val = selrig->get_vfoAorB();
-			int retry = 10;
-			while (val == -1 && retry--) {
-				MilliSleep(50);
-				val = selrig->get_vfoAorB();
-			}
 			if (val == -1) val = 0;
 		}
 		if (val != useB) {
+			useB = val;
 			Fl::awake(update_vfoAorB, reinterpret_cast<void*>(val));
+			MilliSleep(50);
 		}
 	}
 }
@@ -973,17 +939,6 @@ POLL_PAIR *poll_parameters;
 
 static bool resetrcv = true;
 static bool resetxmt = true;
-
-//static bool waitUI = false;
-
-void updateUI(void *)
-{
-	setModeControl(NULL);
-	updateBandwidthControl(NULL);
-	setBWControl(NULL);
-	highlight_vfo(NULL);
-//	waitUI = false;
-}
 
 void serviceQUE()
 {
@@ -1683,7 +1638,7 @@ void execute_swapAB()
 
 void cbAswapB()
 {
-	guard_lock lock(&mutex_srvc_reqs);
+	guard_lock lock(&mutex_srvc_reqs, 211);
 	if (Fl::event_button() == FL_RIGHT_MOUSE) {
 		VFOQUEUE xcvr;
 		xcvr.change = A2B;

@@ -235,6 +235,9 @@ inline void wait()
 		MilliSleep(10);
 		if (++n == 50) break;
 	}
+	ostringstream s;
+	s << "wait for srvc_reqs " << 10 * n << " msec";
+	trace(1, s.str().c_str());
 }
 
 class rig_get_split : public XmlRpcServerMethod {
@@ -269,7 +272,7 @@ public:
 		int freq;
 
 		wait();
-		guard_lock service_lock(&mutex_srvc_reqs);//, 156);
+		guard_lock service_lock(&mutex_srvc_reqs, 156);
 
 		if (useB)
 			freq = vfoB.freq;
@@ -278,7 +281,7 @@ public:
 
 		snprintf(szfreq, sizeof(szfreq), "%d", freq);
 		std::string result_string = szfreq;
-trace(3, "freq on vfo ", (useB ? "B " : "A "), szfreq);
+trace(2, "rig_get_vfo ", szfreq);
 		result = result_string;
 	}
 
@@ -301,14 +304,14 @@ public:
 		int freq;
 
 		wait();
-		guard_lock service_lock(&mutex_srvc_reqs);//, 157);
+		guard_lock service_lock(&mutex_srvc_reqs, 157);
 
 		freq = vfoA.freq;
 
 		static char szfreq[20];
 		snprintf(szfreq, sizeof(szfreq), "%d", freq);
 		std::string result_string = szfreq;
-trace(2, "freq on vfo A", szfreq);
+trace(2, "rig_get_vfoA", szfreq);
 		result = result_string;
 	}
 
@@ -331,14 +334,14 @@ public:
 		int freq;
 
 		wait();
-		guard_lock service_lock(&mutex_srvc_reqs);//, 158);
+		guard_lock service_lock(&mutex_srvc_reqs, 158);
 
 		freq = vfoB.freq;
 
 		static char szfreq[20];
 		snprintf(szfreq, sizeof(szfreq), "%d", freq);
 		std::string result_string = szfreq;
-trace(2, "freq on vfo B", szfreq);
+trace(2, "rig_get_vfoB", szfreq);
 		result = result_string;
 	}
 
@@ -361,8 +364,8 @@ public:
 		}
 
 		wait();
-		guard_lock service_lock(&mutex_srvc_reqs);//, 159);
-
+		guard_lock service_lock(&mutex_srvc_reqs, 159);
+		trace(2, "rig_get_AB: " , (useB ? "B" : "A"));
 		result = useB ? "B" : "A";
 	}
 
@@ -444,7 +447,7 @@ public :
 		}
 
 		wait();
-		guard_lock service_lock(&mutex_srvc_reqs);//, 150);
+		guard_lock service_lock(&mutex_srvc_reqs, 150);
 
 		trace(1, "rig_get_modes");
 
@@ -476,7 +479,7 @@ public:
 		int mode;
 
 		wait();
-		guard_lock service_lock(&mutex_srvc_reqs);//, 151);
+		guard_lock service_lock(&mutex_srvc_reqs, 151);
 
 		mode = vfo->imode;
 
@@ -507,7 +510,7 @@ public:
 
 		int mode;
 		wait();
-		guard_lock service_lock(&mutex_srvc_reqs);//, 152);
+		guard_lock service_lock(&mutex_srvc_reqs, 152);
 
 		mode = vfo->imode;
 
@@ -542,7 +545,7 @@ public :
 		XmlRpcValue bws;
 
 		wait();
-		guard_lock service_lock(&mutex_srvc_reqs);//, 153);
+		guard_lock service_lock(&mutex_srvc_reqs, 153);
 
 		int mode = useB ? vfoB.imode : vfoA.imode;
 		const char **bwt = selrig->bwtable(mode);
@@ -604,7 +607,7 @@ public:
 		if (!xcvr_initialized) return;
 
 		wait();
-		guard_lock service_lock(&mutex_srvc_reqs);//, 154);
+		guard_lock service_lock(&mutex_srvc_reqs, 154);
 
 		int BW = useB ? vfoB.iBW : vfoA.iBW;
 		int mode = useB ? vfoB.imode : vfoA.imode;
@@ -766,7 +769,7 @@ public:
 			result = 0;
 			return;
 		}
-		guard_lock lock(&mutex_srvc_reqs);
+		guard_lock lock(&mutex_srvc_reqs, 181);
 		VFOQUEUE xcvr;
 		xcvr.change = SWAP;
 		trace(1, "xmlrpc SWAP");
@@ -789,7 +792,7 @@ public:
 			return;
 		}
 
-		guard_lock lock(&mutex_srvc_reqs);
+		guard_lock lock(&mutex_srvc_reqs, 182);
 		VFOQUEUE xcvr;
 		xcvr.change = SWAP;
 		trace(1, "xmlrpc SWAP");
@@ -1093,7 +1096,7 @@ public:
 		int bw = int(params[0]);
 
 		{
-			guard_lock lock(&mutex_srvc_reqs);
+			guard_lock lock(&mutex_srvc_reqs, 183);
 			if (useB) srvr_vfo = vfoB;
 			else      srvr_vfo = vfoA;
 
