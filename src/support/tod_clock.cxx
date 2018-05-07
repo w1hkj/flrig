@@ -38,8 +38,6 @@
 
 #include <FL/Fl.H>
 
-#include "threads.h"
-
 #include "util.h"
 #include "debug.h"
 //#include "status.h"
@@ -50,57 +48,12 @@
 
 using namespace std;
 
-static pthread_t TOD_thread;
-pthread_mutex_t TOD_mutex     = PTHREAD_MUTEX_INITIALIZER;
-
-static long long _zmsec = 0;
+static int _zmsec = 0;
 static int _zsec = 0;
 static int _zmin = 0;
 static int _zhr = 0;
 
-static char ztbuf[20] = "20120602 123000";
-
-int zmsec(void)
-{
-	guard_lock zmsec_lock(&TOD_mutex);
-	return _zmsec;
-}
-
-char* zdate()
-{
-	guard_lock zmsec_lock(&TOD_mutex);
-	return ztbuf;
-}
-
-char* ztime()
-{
-	static char now[7];
-	guard_lock zmsec_lock(&TOD_mutex);
-	snprintf(now, sizeof(now), "%02d%02d%02d",
-		_zhr, _zmin, _zsec);
-	return now;
-}
-
-char exttime[9];
-char *zext_time()
-{
-	guard_lock zmsec_lock(&TOD_mutex);
-	snprintf(exttime, sizeof(exttime), "%02d:%02d:%02d",
-		_zhr, _zmin, _zsec);
-	return exttime;
-}
-
-char* zshowtime() {
-	static char s[5];
-	strncpy(s, &ztbuf[9], 4);
-	s[4] = 0;
-	return s;
-}
-
-static bool TOD_exit = false;
-static bool TOD_enabled = false;
-
-void ztimer(void *)
+void ztimer()
 {
 	struct tm tm;
 	time_t t_temp;
@@ -110,84 +63,25 @@ void ztimer(void *)
 
 	t_temp=(time_t)tv.tv_sec;
 	gmtime_r(&t_temp, &tm);
-	if (!strftime(ztbuf, sizeof(ztbuf), "%Y%m%d %H%M%S", &tm))
-		memset(ztbuf, 0, sizeof(ztbuf));
-	else
-		ztbuf[8] = '\0';
 
-	exttime[0] = ztbuf[9];  exttime[1] = ztbuf[10];  
-	exttime[2] = ':';
-	exttime[3] = ztbuf[11]; exttime[4] = ztbuf[12];
-	exttime[5] = ':';
-	exttime[6] = ztbuf[13]; exttime[7] = ztbuf[14];
-	exttime[8] = 0;
-
-	_zmsec = tv.tv_usec/1000;
+	_zmsec = (tv.tv_usec/1000) % 1000;
 	_zsec = tm.tm_sec;
 	_zmin = tm.tm_min;
 	_zhr  = tm.tm_hour;
 }
 
-//======================================================================
-// TOD Thread loop
-//======================================================================
-static bool first_call = true;
-
-void *TOD_loop(void *args)
+int zmsec(void)
 {
-	while(1) {
-
-		if (TOD_exit) break;
-
-		if (first_call) {
-			guard_lock zmsec_lock(&TOD_mutex);
-			struct timeval tv;
-			gettimeofday(&tv, NULL);
-			double st = 1000.0 - tv.tv_usec / 1e3;
-			MilliSleep(st);
-			first_call = false;
-			ztimer((void *)0);
-		} else {
-			MilliSleep(5);
-			guard_lock zmsec_lock(&TOD_mutex);
-			ztimer((void *)0);
-		}
-	}
-
-// exit the TOD thread
-	SET_THREAD_CANCEL();
-	return NULL;
+	ztimer();
+	return _zmsec;
 }
 
-//======================================================================
-//
-//======================================================================
-void TOD_init()
+char exttime[13];
+char *ztime()
 {
-	TOD_exit = false;
-
-	if (pthread_create(&TOD_thread, NULL, TOD_loop, NULL) < 0) {
-		LOG_ERROR("%s", "pthread_create failed");
-		return;
-	}
-
-	LOG_INFO("%s", "Time Of Day thread started");
-
-	TOD_enabled = true;
+	ztimer();
+	snprintf(exttime, sizeof(exttime),
+		"%02d:%02d:%02d.%03d",
+		_zhr, _zmin, _zsec, _zmsec);
+	return exttime;
 }
-
-//======================================================================
-//
-//======================================================================
-void TOD_close()
-{
-	if (!TOD_enabled) return;
-
-	TOD_exit = true;
-	pthread_join(TOD_thread, NULL);
-	TOD_enabled = false;
-
-	LOG_INFO("%s", "Time Of Day thread terminated. ");
-
-}
-

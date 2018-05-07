@@ -120,9 +120,7 @@ void trace(int n, ...) // all args of type const char *
 	stringstream s;
 	va_list vl;
 	va_start(vl, n);
-	char szmsec[5];
-	snprintf(szmsec, sizeof(szmsec), ".%03d", zmsec());
-	s << zext_time() << szmsec << " : " << va_arg(vl, const char *);
+	s << ztime() << " : " << va_arg(vl, const char *);
 	for (int i = 1; i < n; i++)
 		s << " " << va_arg(vl, const char *);
 	va_end(vl);
@@ -140,21 +138,19 @@ std::cout << s.str(); std::cout.flush();
 
 void trace1(int n, ...) // all args of type const char *
 {
-	return;  // comment to enable trace2 (reads)
+	return;  // comment to enable trace1 (reads)
 	if (!n) return;
 	if (!RIG_DEBUG) return;
 	stringstream s;
 	va_list vl;
 	va_start(vl, n);
-	char szmsec[4];
-	snprintf(szmsec, sizeof(szmsec), ".%02d", zmsec() % 100);
-	s << zext_time() << szmsec << " : " << va_arg(vl, const char *);
+	s << ztime() << " : " << va_arg(vl, const char *);
 	for (int i = 1; i < n; i++)
 		s << " " << va_arg(vl, const char *);
 	va_end(vl);
 	s << "\n";
 
-std::cout << s.str();
+std::cout << s.str(); std::cout.flush();
 
 	string trace_fname = RigHomeDir;
 	trace_fname.append("trace.txt");
@@ -2898,8 +2894,6 @@ void cbExit()
 	}
 
 	closeRig();
-
-	TOD_close();
 
 	close_UI();
 

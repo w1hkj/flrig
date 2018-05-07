@@ -137,7 +137,7 @@ void debug::log(level_e level, const char* func, const char* srcf, int line, con
 //	guard_lock dlock(&debug_mutex);
 	estr.append(sztemp);
 
-	fprintf(wfile, "[%s] %s", zext_time(), sztemp);
+	fprintf(wfile, "[%s] %s", ztime(), sztemp);
 
 	va_end(args);
 
@@ -161,7 +161,7 @@ void debug::slog(level_e level, const char* func, const char* srcf, int line, co
 //	guard_lock dlock(&debug_mutex);
 	estr.append(sztemp);
 
-	fprintf(wfile, "[%s] %s", zext_time(), sztemp);
+	fprintf(wfile, "[%s] %s", ztime(), sztemp);
 
 	va_end(args);
 

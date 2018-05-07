@@ -23,17 +23,6 @@
 #define TOD_H_
 
 extern int   zmsec();
-extern char* zdate();
-extern char* ztime();
-extern char* zshowtime();
-extern char *zext_time();
-
-//======================================================================
-// TOD Thread loop
-//======================================================================
-
-extern void *TOD_loop(void *args);
-extern void TOD_init();
-extern void TOD_close();
+extern char *ztime();
 
 #endif // TOD_H_

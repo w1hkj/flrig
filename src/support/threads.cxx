@@ -37,7 +37,6 @@ extern pthread_mutex_t mutex_serial;
 extern pthread_mutex_t debug_mutex;
 extern pthread_mutex_t mutex_rcv_socket;
 extern pthread_mutex_t mutex_ptt;
-extern pthread_mutex_t TOD_mutex;
 extern pthread_mutex_t mutex_srvc_reqs;
 
 // Change to 1 to observe guard lock/unlock processing on stdout
@@ -45,7 +44,6 @@ extern pthread_mutex_t mutex_srvc_reqs;
 guard_lock::guard_lock(pthread_mutex_t* m, int h) : mutex(m), how(h) {
 char szlock[100];
 	pthread_mutex_lock(mutex);
-	if (mutex == &TOD_mutex) return;
 	snprintf(szlock, sizeof(szlock), "lock %s : %d", name(mutex), how);
 	if (how >= 100)
 		trace(1, szlock);
@@ -55,13 +53,11 @@ char szlock[100];
 
 guard_lock::~guard_lock(void) {
 char szunlock[100];
-	if (mutex != &TOD_mutex) {
-		snprintf(szunlock, sizeof(szunlock), "unlock %s : %d\n", name(mutex), how);
-		if (how >= 100)
-			trace(1, szunlock);
-		if (how != 0 && DEBUG_GUARD_LOCK)
-			printf("%s", szunlock);
-	}
+	snprintf(szunlock, sizeof(szunlock), "unlock %s : %d\n", name(mutex), how);
+	if (how >= 100)
+		trace(1, szunlock);
+	if (how != 0 && DEBUG_GUARD_LOCK)
+		printf("%s", szunlock);
 	pthread_mutex_unlock(mutex);
 }
 
@@ -74,7 +70,6 @@ const char * guard_lock::name(pthread_mutex_t *m) {
 	if (m == &debug_mutex) return "debug_mutex";
 	if (m == &mutex_rcv_socket) return "mutex_rcv_socket";
 	if (m == &mutex_ptt) return "mutex_ptt";
-	if (m == &TOD_mutex) return "TOD_mutex";
 	if (m == &mutex_srvc_reqs) return "mutex_service_requests";
 	return "";
 }

@@ -77,8 +77,6 @@
 #include "serial.h"
 #include "ui.h"
 
-#include "tod_clock.h"
-
 #include "flrig_icon.cxx"
 
 int parse_args(int argc, char **argv, int& idx);
@@ -334,8 +332,6 @@ int main (int argc, char *argv[])
 	int arg_idx;
 	HomeDir.clear();
 	RigHomeDir.clear();
-
-	TOD_init();
 
 	Fl::args(argc, argv, arg_idx, parse_args);
 	Fl::set_fonts(0);
