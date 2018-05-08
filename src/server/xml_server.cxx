@@ -23,17 +23,17 @@
 //  Boston, MA  02110-1301 USA.
 //
 // ---------------------------------------------------------------------
-
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <vector>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <fcntl.h>
+#include <vector>
 #include <pthread.h>
 
 #include <FL/Fl.H>
@@ -55,6 +55,33 @@ using namespace XmlRpc;
 XmlRpcServer rig_server;
 
 extern bool xcvr_initialized;
+
+//------------------------------------------------------------------------------
+// xmlrpc xml_trace
+//------------------------------------------------------------------------------
+void xml_trace(int n, ...) // all args of type const char *
+{
+	if (XML_DEBUG == 0) return;
+
+	if (!n) return;
+	stringstream s;
+	va_list vl;
+	va_start(vl, n);
+	s << ztime() << " : " << va_arg(vl, const char *);
+	for (int i = 1; i < n; i++)
+		s << " " << va_arg(vl, const char *);
+	va_end(vl);
+	s << "\n";
+
+std::cout << s.str(); std::cout.flush();
+
+	string xml_trace_fname = RigHomeDir;
+	xml_trace_fname.append("xml_trace.txt");
+	ofstream xml_tracefile(xml_trace_fname.c_str(), ios::app);
+	if (xml_tracefile)
+		xml_tracefile << s.str();
+	xml_tracefile.close();
+}
 
 //------------------------------------------------------------------------------
 // Request for transceiver name
@@ -237,7 +264,7 @@ inline void wait()
 	}
 	ostringstream s;
 	s << "wait for srvc_reqs " << 10 * n << " msec";
-	trace(1, s.str().c_str());
+	xml_trace(1, s.str().c_str());
 }
 
 class rig_get_split : public XmlRpcServerMethod {
@@ -281,7 +308,7 @@ public:
 
 		snprintf(szfreq, sizeof(szfreq), "%d", freq);
 		std::string result_string = szfreq;
-trace(2, "rig_get_vfo ", szfreq);
+xml_trace(2, "rig_get_vfo ", szfreq);
 		result = result_string;
 	}
 
@@ -311,7 +338,7 @@ public:
 		static char szfreq[20];
 		snprintf(szfreq, sizeof(szfreq), "%d", freq);
 		std::string result_string = szfreq;
-trace(2, "rig_get_vfoA", szfreq);
+xml_trace(2, "rig_get_vfoA", szfreq);
 		result = result_string;
 	}
 
@@ -341,7 +368,7 @@ public:
 		static char szfreq[20];
 		snprintf(szfreq, sizeof(szfreq), "%d", freq);
 		std::string result_string = szfreq;
-trace(2, "rig_get_vfoB", szfreq);
+xml_trace(2, "rig_get_vfoB", szfreq);
 		result = result_string;
 	}
 
@@ -365,7 +392,7 @@ public:
 
 		wait();
 		guard_lock service_lock(&mutex_srvc_reqs, 159);
-		trace(2, "rig_get_AB: " , (useB ? "B" : "A"));
+		xml_trace(2, "rig_get_AB: " , (useB ? "B" : "A"));
 		result = useB ? "B" : "A";
 	}
 
@@ -449,7 +476,7 @@ public :
 		wait();
 		guard_lock service_lock(&mutex_srvc_reqs, 150);
 
-		trace(1, "rig_get_modes");
+		xml_trace(1, "rig_get_modes");
 
 		int i = 0;
 		for (const char** mode = selrig->modes_; *mode; mode++, i++)
@@ -485,7 +512,7 @@ public:
 
 		std::string result_string = "";
 		result_string += selrig->get_modetype(mode);
-trace(2, "rig_get_sideband ", result_string.c_str());
+xml_trace(2, "rig_get_sideband ", result_string.c_str());
 		result = result_string;
 
 	}
@@ -516,7 +543,7 @@ public:
 
 		std::string result_string = "none";
 		if (selrig->modes_) result_string = selrig->modes_[mode];
-trace(3, "mode on ", (useB ? "B " : "A "), result_string.c_str());
+xml_trace(3, "mode on ", (useB ? "B " : "A "), result_string.c_str());
 		result = result_string;
 
 	}
@@ -643,7 +670,7 @@ public:
 			if (dsphi) result[1] = dsphi[SH];
 		}
 		std::string s1 = result[0], s2 = result[1];
-trace( 5, "bandwidth on ", (useB ? "B " : "A "), s1.c_str(), " | ", s2.c_str());
+xml_trace( 5, "bandwidth on ", (useB ? "B " : "A "), s1.c_str(), " | ", s2.c_str());
 	}
 
 	std::string help() { return std::string("returns current bw L/U value"); }
@@ -704,7 +731,7 @@ static void push_xml()
 {
 	srvr_vfo.src = SRVR;
 	guard_lock service_lock(&mutex_srvc_reqs, 108);
-trace(2, "push_xml()", print(srvr_vfo.freq, srvr_vfo.imode, srvr_vfo.iBW).c_str());
+xml_trace(2, "push_xml()", print(srvr_vfo.freq, srvr_vfo.imode, srvr_vfo.iBW).c_str());
 	srvc_reqs.push(VFOQUEUE(vX, srvr_vfo));//(useB ? vB : vA), srvr_vfo ));
 }
 
@@ -712,7 +739,7 @@ static void push_xmlA()
 {
 	srvr_vfo.src = SRVR;
 	guard_lock service_lock(&mutex_srvc_reqs, 109);
-trace(2, "push_xmlA()", print(srvr_vfo.freq, srvr_vfo.imode, srvr_vfo.iBW).c_str());
+xml_trace(2, "push_xmlA()", print(srvr_vfo.freq, srvr_vfo.imode, srvr_vfo.iBW).c_str());
 	srvc_reqs.push(VFOQUEUE( vA, srvr_vfo));
 }
 
@@ -720,7 +747,7 @@ static void push_xmlB()
 {
 	srvr_vfo.src = SRVR;
 	guard_lock service_lock(&mutex_srvc_reqs, 110);
-trace(2, "push_xmlB()", print(srvr_vfo.freq, srvr_vfo.imode, srvr_vfo.iBW).c_str());
+xml_trace(2, "push_xmlB()", print(srvr_vfo.freq, srvr_vfo.imode, srvr_vfo.iBW).c_str());
 	srvc_reqs.push(VFOQUEUE(vB, srvr_vfo));
 }
 
@@ -744,7 +771,7 @@ public:
 		VFOQUEUE xcvrptt;
 		if (state) xcvrptt.change = ON;
 		else       xcvrptt.change = OFF;
-		trace(1, (state ? "rig_set_ptt ON" : "rig_set_ptt OFF"));
+		xml_trace(1, (state ? "rig_set_ptt ON" : "rig_set_ptt OFF"));
 		srvc_reqs.push(xcvrptt);
 	}
 
@@ -772,7 +799,7 @@ public:
 		guard_lock lock(&mutex_srvc_reqs, 181);
 		VFOQUEUE xcvr;
 		xcvr.change = SWAP;
-		trace(1, "xmlrpc SWAP");
+		xml_trace(1, "xmlrpc SWAP");
 		srvc_reqs.push(xcvr);
 	}
 
@@ -795,7 +822,7 @@ public:
 		guard_lock lock(&mutex_srvc_reqs, 182);
 		VFOQUEUE xcvr;
 		xcvr.change = SWAP;
-		trace(1, "xmlrpc SWAP");
+		xml_trace(1, "xmlrpc SWAP");
 		srvc_reqs.push(xcvr);
 
 	}
@@ -822,7 +849,7 @@ public:
 		VFOQUEUE xcvr_split;
 		if (state) xcvr_split.change = sON;
 		else       xcvr_split.change = sOFF;
-		trace(1, (state ? "rig_set_split ON" : "rig_set_split OFF"));
+		xml_trace(1, (state ? "rig_set_split ON" : "rig_set_split OFF"));
 		srvc_reqs.push(xcvr_split);
 
 	}
@@ -871,7 +898,7 @@ std::cout << "!ptt_off()\n";
 		vfo.src = SRVR;
 
 
-trace(4, "set_AB ", ans.c_str(), " ", printXCVR_STATE(vfo).c_str());
+xml_trace(4, "set_AB ", ans.c_str(), " ", printXCVR_STATE(vfo).c_str());
 		srvc_reqs.push (VFOQUEUE((ans == "A" ? sA : sB), vfo));
 	}
 
@@ -1109,7 +1136,7 @@ public:
 			bw = atol(selrig->bandwidths_[i]);
 ostringstream s;
 s << "nearest bandwidth " << selrig->bandwidths_[i];
-trace(2,"Set to ", s.str().c_str());
+xml_trace(2,"Set to ", s.str().c_str());
 			srvr_vfo.iBW = i;//bw * 256 * 256;
 			srvr_vfo.freq = 0;
 			srvr_vfo.imode = -1;

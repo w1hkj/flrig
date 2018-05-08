@@ -20,6 +20,7 @@
 
 #include <cstdlib>
 #include <string>
+#include <sstream>
 #include <vector>
 #include <queue>
 
@@ -32,6 +33,7 @@
 
 #include "threads.h"
 #include "XmlRpc.h"
+#include "xml_server.h"
 
 using namespace std;
 using XmlRpc::XmlRpcValue;
@@ -346,10 +348,10 @@ static void check_for_ptt_change(const XmlRpcValue& trx_state)
 {
 	bool nuptt = (trx_state == "TX");
 	if (nuptt != ptt_on) {
-		if (XML_DEBUG) {
-			string txstate = trx_state;
-			LOG_ERROR("%s", txstate.c_str());
-		}
+
+		string txstate = trx_state;
+		xml_trace(1, txstate.c_str());
+
 		ptt_on = nuptt;
 		Fl::awake(setPTT, (void*)ptt_on);
 	}
@@ -389,8 +391,9 @@ static void check_for_bandwidth_change(const XmlRpcValue& new_bw)
 {
 	if (xmlmode_changed) {
 		xmlvfo.iBW = selrig->def_bandwidth(xmlvfo.imode);
-		if (XML_DEBUG)
-			LOG_ERROR("default BW %d: %s", xmlvfo.iBW, print(xmlvfo));
+		ostringstream s;
+		s << "default BW " << xmlvfo.iBW << " : " << print(xmlvfo);
+		xml_trace(1, s.str().c_str());
 		return;
 	}
 

@@ -70,8 +70,8 @@ extern pthread_mutex_t mutex_ptt;
 extern pthread_mutex_t mutex_replystr;
 extern pthread_mutex_t mutex_srvc_reqs;
 
-extern bool RIG_DEBUG;
-extern bool XML_DEBUG;
+extern int  RIG_DEBUG;
+extern int  XML_DEBUG;
 extern bool EXPAND_CONTROLS;
 
 extern void cb_xml_help(Fl_Menu_*, void*);

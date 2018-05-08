@@ -115,8 +115,9 @@ int  powerlevel = 0;
 
 void trace(int n, ...) // all args of type const char *
 {
+	if (RIG_DEBUG == 0) return;
+
 	if (!n) return;
-	if (!RIG_DEBUG) return;
 	stringstream s;
 	va_list vl;
 	va_start(vl, n);
@@ -138,9 +139,8 @@ std::cout << s.str(); std::cout.flush();
 
 void trace1(int n, ...) // all args of type const char *
 {
-	return;  // comment to enable trace1 (reads)
+	if (RIG_DEBUG < 2) return;
 	if (!n) return;
-	if (!RIG_DEBUG) return;
 	stringstream s;
 	va_list vl;
 	va_start(vl, n);
@@ -646,11 +646,8 @@ void update_split(void *d)
 		btnSplit->redraw();
 }
 
-// read split during xmt on FT817
-// read split during rcv on all others
 void read_split()
 {
-//	if ((xcvr_name != rig_FT817.name_) && PTT) return;
 	int val = progStatus.split;
 	if (selrig->has_split) {
 		val = selrig->get_split();
@@ -660,7 +657,7 @@ void read_split()
 		s << "read_split() " << (val ? "ON" : "OFF");
 		trace1(1, s.str().c_str());
 	} else {
-		vfo->split = progStatus.split;// = selrig->get_split();
+		vfo->split = progStatus.split;
 	}
 }
 

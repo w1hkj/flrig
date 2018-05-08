@@ -106,8 +106,8 @@ pthread_mutex_t mutex_replystr = PTHREAD_MUTEX_INITIALIZER;
 
 pthread_mutex_t mutex_srvc_reqs = PTHREAD_MUTEX_INITIALIZER;
 
-bool RIG_DEBUG = true;//false;
-bool XML_DEBUG = false;
+int RIG_DEBUG = 1;
+int XML_DEBUG = 1;
 bool EXPAND_CONTROLS = false;
 
 int xmlport = 12345;
@@ -529,7 +529,7 @@ Usage: \n\
   --version\n\
   --config-dir <DIR>\n\
   --debug-level N (0..4)\n\
-  --rig_debug\n\
+  --rig_debug N (0, 1, 2)\n\
   --xml_debug\n\
   --xml-help\n\
   --exp (expand menu tab controls)\n\n";
@@ -542,8 +542,14 @@ Usage: \n\
 		exit (0);
 	}
 	if (strcasecmp("--rig_debug", argv[idx]) == 0) {
-		RIG_DEBUG = true;
-		idx++;
+		string level = argv[idx + 1];
+		switch (level[0]) {
+			case '0': RIG_DEBUG = 0; break;
+			case '1': RIG_DEBUG = 1; break;
+			case '2': RIG_DEBUG = 2; break;
+			default : RIG_DEBUG = 0;
+		}
+		idx += 2;
 		return 1;
 	}
 	if (strcasecmp("--xml_debug", argv[idx]) == 0) {
