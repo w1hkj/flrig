@@ -318,31 +318,10 @@ void RIG_TS2000::set_split(bool val)
 
 int RIG_TS2000::get_split()
 {
-	size_t p;
-	int rx = 0, tx = 0;
-// tx vfo
-	cmd = "FT;";
-	if (wait_char(';', 4, 100, "get split tx vfo", ASC) == 4) {
-		p = replystr.rfind("FT");
-		if (p == string::npos) 
-			tx = txvfo;
-		else
-			tx = replystr[p+2];
-	} else tx = txvfo;
-
-// rx vfo
-	cmd = "FR;";
-	if (wait_char(';', 4, 100, "get split rx vfo", ASC) == 4) {
-		p = replystr.rfind("FR");
-		if (p == string::npos) 
-			rx = rxvfo;
-		else
-			rx = replystr[p+2];
-	} else rx = rxvfo;
-
-// split test
-	return (tx != rx);
-
+	cmd = "IF;";
+	int ret = wait_char(';', 38, 100, "get split", ASC);
+	if (ret < 38) return 0;
+	return (replybuff[32] == '1');
 }
 
 long RIG_TS2000::get_vfoA ()
