@@ -76,7 +76,7 @@ void xml_trace(int n, ...) // all args of type const char *
 std::cout << s.str(); std::cout.flush();
 
 	string xml_trace_fname = RigHomeDir;
-	xml_trace_fname.append("xml_trace.txt");
+	xml_trace_fname.append("trace.txt");
 	ofstream xml_tracefile(xml_trace_fname.c_str(), ios::app);
 	if (xml_tracefile)
 		xml_tracefile << s.str();
@@ -274,7 +274,7 @@ public:
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 
 		wait();
-		guard_lock service_lock(&mutex_srvc_reqs, 155);
+		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_split");
 		result = progStatus.split;
 	}
 
@@ -299,7 +299,7 @@ public:
 		int freq;
 
 		wait();
-		guard_lock service_lock(&mutex_srvc_reqs, 156);
+		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_vfo");
 
 		if (useB)
 			freq = vfoB.freq;
@@ -331,7 +331,7 @@ public:
 		int freq;
 
 		wait();
-		guard_lock service_lock(&mutex_srvc_reqs, 157);
+		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_vfoA");
 
 		freq = vfoA.freq;
 
@@ -361,7 +361,7 @@ public:
 		int freq;
 
 		wait();
-		guard_lock service_lock(&mutex_srvc_reqs, 158);
+		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_vfoB");
 
 		freq = vfoB.freq;
 
@@ -391,7 +391,7 @@ public:
 		}
 
 		wait();
-		guard_lock service_lock(&mutex_srvc_reqs, 159);
+		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_AB");
 		xml_trace(2, "rig_get_AB: " , (useB ? "B" : "A"));
 		result = useB ? "B" : "A";
 	}
@@ -446,7 +446,7 @@ public:
 		else
 			progStatus.notch = false;
 
-		guard_lock serial_lock(&mutex_serial, 103);
+		guard_lock serial_lock(&mutex_serial, "xml rig_set_notch");
 		selrig->set_notch(progStatus.notch, progStatus.notch_val);
 		Fl::awake(setNotchControl, static_cast<void *>(&ntch));
 	}
@@ -474,7 +474,7 @@ public :
 		}
 
 		wait();
-		guard_lock service_lock(&mutex_srvc_reqs, 150);
+		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_modes");
 
 		xml_trace(1, "rig_get_modes");
 
@@ -506,7 +506,7 @@ public:
 		int mode;
 
 		wait();
-		guard_lock service_lock(&mutex_srvc_reqs, 151);
+		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_sideband");
 
 		mode = vfo->imode;
 
@@ -537,7 +537,7 @@ public:
 
 		int mode;
 		wait();
-		guard_lock service_lock(&mutex_srvc_reqs, 152);
+		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_mode");
 
 		mode = vfo->imode;
 
@@ -572,7 +572,7 @@ public :
 		XmlRpcValue bws;
 
 		wait();
-		guard_lock service_lock(&mutex_srvc_reqs, 153);
+		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_bws");
 
 		int mode = useB ? vfoB.imode : vfoA.imode;
 		const char **bwt = selrig->bwtable(mode);
@@ -634,7 +634,7 @@ public:
 		if (!xcvr_initialized) return;
 
 		wait();
-		guard_lock service_lock(&mutex_srvc_reqs, 154);
+		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_bw");
 
 		int BW = useB ? vfoB.iBW : vfoA.iBW;
 		int mode = useB ? vfoB.imode : vfoA.imode;
@@ -730,7 +730,7 @@ std::string print(int f, int m, int b)
 static void push_xml()
 {
 	srvr_vfo.src = SRVR;
-	guard_lock service_lock(&mutex_srvc_reqs, 108);
+	guard_lock service_lock(&mutex_srvc_reqs, "xml_push");
 xml_trace(2, "push_xml()", print(srvr_vfo.freq, srvr_vfo.imode, srvr_vfo.iBW).c_str());
 	srvc_reqs.push(VFOQUEUE(vX, srvr_vfo));//(useB ? vB : vA), srvr_vfo ));
 }
@@ -738,7 +738,7 @@ xml_trace(2, "push_xml()", print(srvr_vfo.freq, srvr_vfo.imode, srvr_vfo.iBW).c_
 static void push_xmlA()
 {
 	srvr_vfo.src = SRVR;
-	guard_lock service_lock(&mutex_srvc_reqs, 109);
+	guard_lock service_lock(&mutex_srvc_reqs, "xml_pushA");
 xml_trace(2, "push_xmlA()", print(srvr_vfo.freq, srvr_vfo.imode, srvr_vfo.iBW).c_str());
 	srvc_reqs.push(VFOQUEUE( vA, srvr_vfo));
 }
@@ -746,7 +746,7 @@ xml_trace(2, "push_xmlA()", print(srvr_vfo.freq, srvr_vfo.imode, srvr_vfo.iBW).c
 static void push_xmlB()
 {
 	srvr_vfo.src = SRVR;
-	guard_lock service_lock(&mutex_srvc_reqs, 110);
+	guard_lock service_lock(&mutex_srvc_reqs, "xml_pushB");
 xml_trace(2, "push_xmlB()", print(srvr_vfo.freq, srvr_vfo.imode, srvr_vfo.iBW).c_str());
 	srvc_reqs.push(VFOQUEUE(vB, srvr_vfo));
 }
@@ -766,7 +766,7 @@ public:
 		}
 		int state = int(params[0]);
 
-		guard_lock que_lock(&mutex_srvc_reqs, 180);
+		guard_lock que_lock(&mutex_srvc_reqs, "xml rig_set_ptt");
 
 		VFOQUEUE xcvrptt;
 		if (state) xcvrptt.change = ON;
@@ -796,7 +796,7 @@ public:
 			result = 0;
 			return;
 		}
-		guard_lock lock(&mutex_srvc_reqs, 181);
+		guard_lock lock(&mutex_srvc_reqs, "xml rig_swap");
 		VFOQUEUE xcvr;
 		xcvr.change = SWAP;
 		xml_trace(1, "xmlrpc SWAP");
@@ -819,7 +819,7 @@ public:
 			return;
 		}
 
-		guard_lock lock(&mutex_srvc_reqs, 182);
+		guard_lock lock(&mutex_srvc_reqs, "xml rig_set_swap");
 		VFOQUEUE xcvr;
 		xcvr.change = SWAP;
 		xml_trace(1, "xmlrpc SWAP");
@@ -845,6 +845,8 @@ public:
 			return;
 		}
 		int state = int(params[0]);
+
+		guard_lock lock(&mutex_srvc_reqs, "xml rig_set_split");
 
 		VFOQUEUE xcvr_split;
 		if (state) xcvr_split.change = sON;
@@ -892,7 +894,7 @@ std::cout << "!ptt_off()\n";
 			return;
 		}
 
-		guard_lock service_lock(&mutex_srvc_reqs, 111);
+		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_set_AB");
 		XCVR_STATE vfo = vfoA;
 
 		vfo.src = SRVR;
@@ -1123,7 +1125,7 @@ public:
 		int bw = int(params[0]);
 
 		{
-			guard_lock lock(&mutex_srvc_reqs, 183);
+			guard_lock lock(&mutex_srvc_reqs, "xml rig_set_bandwidth");
 			if (useB) srvr_vfo = vfoB;
 			else      srvr_vfo = vfoA;
 
@@ -1196,7 +1198,7 @@ public:
 		string bwstr = params;
 
 		int bw = int(params[0]);
-		guard_lock que_lock ( &mutex_srvc_reqs, 115 );
+		guard_lock que_lock ( &mutex_srvc_reqs, "xml rig_set_BW" );
 		if (useB)
 			srvr_vfo = vfoB;
 		else

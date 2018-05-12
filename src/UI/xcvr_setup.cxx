@@ -640,7 +640,7 @@ static void cb_btnOkXcvrDialog(Fl_Return_Button*, void*) {
 	// close the current rig control
 	closeRig();               // local serial comm connection
 
-	{ guard_lock gl_serial(&mutex_serial, 200);
+	{ guard_lock gl_serial(&mutex_serial);
 		RigSerial->ClosePort();
 		bypass_serial_thread_loop = true;
 	}

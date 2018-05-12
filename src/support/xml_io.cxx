@@ -125,7 +125,7 @@ void open_rig_xmlrpc()
 
 void close_rig_xmlrpc()
 {
-	guard_lock gl_xmlclose(&mutex_xmlrpc, 100);
+	guard_lock gl_xmlclose(&mutex_xmlrpc);
 
 	delete client;
 	client = NULL;
@@ -572,7 +572,7 @@ void * digi_loop(void *d)
 
 		if (rig_reset || (!fldigi_online && (--try_count == 0))) {
 			try {
-				guard_lock gl_xmloop(&mutex_xmlrpc, 103);
+				guard_lock gl_xmloop(&mutex_xmlrpc);
 				send_rig_info();
 			} catch (const XmlRpc::XmlRpcException& e) {
 				fldigi_online = false;
@@ -585,10 +585,10 @@ void * digi_loop(void *d)
 		if (fldigi_online) {
 			try {
 				if (qfreq.empty()) {
-					guard_lock gl_xmloop(&mutex_xmlrpc, 104);
+					guard_lock gl_xmloop(&mutex_xmlrpc);
 					get_fldigi_status();
 				} else {
-					guard_lock gl_xmloop(&mutex_xmlrpc, 105);
+					guard_lock gl_xmloop(&mutex_xmlrpc);
 					send_queue();
 				}
 			} catch (const XmlRpc::XmlRpcException& e) {

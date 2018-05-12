@@ -935,7 +935,7 @@ static bool resetxmt = true;
 
 void serviceQUE()
 {
-	guard_lock que_lock(&mutex_srvc_reqs, 3000);
+	guard_lock que_lock(&mutex_srvc_reqs, "serviceQUE");
 	guard_lock serial(&mutex_serial);
 
 	queue<VFOQUEUE> pending; // creates an empty queue
@@ -1287,7 +1287,7 @@ void setBW()
 	XCVR_STATE fm = *vfo;
 	fm.src = UI;
 	fm.iBW = opBW->index();
-	guard_lock que_lock( &mutex_srvc_reqs, 206 );
+	guard_lock que_lock( &mutex_srvc_reqs, "setBW" );
 	srvc_reqs.push( VFOQUEUE((useB ? vB : vA), fm));
 }
 
@@ -1296,7 +1296,7 @@ void setDSP()
 	XCVR_STATE fm = *vfo;
 	fm.src = UI;
 	fm.iBW = ((opDSP_hi->index() << 8) | 0x8000) | (opDSP_lo->index() & 0xFF) ;
-	guard_lock que_lock( & mutex_srvc_reqs, 207 );
+	guard_lock que_lock( & mutex_srvc_reqs, "setDSP" );
 	srvc_reqs.push ( VFOQUEUE((useB ? vB : vA), fm));
 }
 
@@ -1398,7 +1398,7 @@ void setMode()
 	fm.iBW = selrig->def_bandwidth(fm.imode);
 	fm.src = UI;
 
-	guard_lock que_lock( &mutex_srvc_reqs, 208 );
+	guard_lock que_lock( &mutex_srvc_reqs, "setMode" );
 	srvc_reqs.push(VFOQUEUE( (useB ? vB : vA), fm));
 }
 
@@ -1559,7 +1559,7 @@ int movFreqA() {
 	XCVR_STATE nuvfo = vfoA;
 	nuvfo.freq = FreqDispA->value();
 	nuvfo.src = UI;
-	guard_lock que_lock(&mutex_srvc_reqs, 209);
+	guard_lock que_lock(&mutex_srvc_reqs, "movFreqA");
 	srvc_reqs.push(VFOQUEUE(vA, nuvfo));
 	return 1;
 }
@@ -1570,7 +1570,7 @@ int movFreqB() {
 	XCVR_STATE nuvfo = vfoB;
 	nuvfo.freq = FreqDispB->value();
 	nuvfo.src = UI;
-	guard_lock que_lock(&mutex_srvc_reqs, 210);
+	guard_lock que_lock(&mutex_srvc_reqs, "movFreqB");
 	srvc_reqs.push(VFOQUEUE(vB, nuvfo));
 	return 1;
 }
@@ -1631,7 +1631,7 @@ void execute_swapAB()
 
 void cbAswapB()
 {
-	guard_lock lock(&mutex_srvc_reqs, 211);
+	guard_lock lock(&mutex_srvc_reqs, "cbAswapB");
 	if (Fl::event_button() == FL_RIGHT_MOUSE) {
 		VFOQUEUE xcvr;
 		xcvr.change = A2B;
@@ -1722,14 +1722,14 @@ void cb_set_split(int val)
 
 void cb_selectA()
 {
-	guard_lock que_lock( &mutex_srvc_reqs, 215);
+	guard_lock que_lock( &mutex_srvc_reqs, "cb_selectA");
 	srvc_reqs.push (VFOQUEUE(sA, vfoA));
 	return;
 }
 
 void cb_selectB()
 {
-	guard_lock que_lock( &mutex_srvc_reqs, 216);
+	guard_lock que_lock( &mutex_srvc_reqs, "cb_selectB");
 	srvc_reqs.push (VFOQUEUE(sB, vfoB));
 	return;
 }
@@ -1754,11 +1754,11 @@ void selectFreq() {
 	fm.src   = UI;
 	if (!useB) {
 		FreqDispA->value(fm.freq);
-		guard_lock que_lock(&mutex_srvc_reqs, 217);
+		guard_lock que_lock(&mutex_srvc_reqs, "selectFreq on A");
 		srvc_reqs.push(VFOQUEUE(vA, fm));
 	} else {
 		FreqDispB->value(fm.freq);
-		guard_lock que_lock(&mutex_srvc_reqs, 218);
+		guard_lock que_lock(&mutex_srvc_reqs, "selectFreq on B");
 		srvc_reqs.push(VFOQUEUE(vB, fm));
 	}
 }
@@ -2507,7 +2507,7 @@ void saveFreqList()
 
 void setPTT( void *d)
 {
-	guard_lock que_lock(&mutex_srvc_reqs, 3000);
+	guard_lock que_lock(&mutex_srvc_reqs, "setPTT");
 
 	int set = (long)d;
 

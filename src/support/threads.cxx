@@ -40,24 +40,44 @@ extern pthread_mutex_t mutex_ptt;
 extern pthread_mutex_t mutex_srvc_reqs;
 
 // Change to 1 to observe guard lock/unlock processing on stdout
-#define DEBUG_GUARD_LOCK 0
-guard_lock::guard_lock(pthread_mutex_t* m, int h) : mutex(m), how(h) {
-char szlock[100];
+//#define DEBUG_GUARD_LOCK 0
+//guard_lock::guard_lock(pthread_mutex_t* m, int h) : mutex(m), how(h) {
+//char szlock[100];
+//	pthread_mutex_lock(mutex);
+//	snprintf(szlock, sizeof(szlock), "lock %s : %d", name(mutex), how);
+//	how = h
+//	if (how >= 100)
+//		trace(1, szlock);
+//	if (how != 0 && DEBUG_GUARD_LOCK)
+//		printf("%s", szlock);
+//}
+
+//guard_lock::~guard_lock(void) {
+//char szunlock[100];
+//	snprintf(szunlock, sizeof(szunlock), "unlock %s : %d\n", name(mutex), how);
+//	if (how >= 100)
+//		trace(1, szunlock);
+//	if (how != 0 && DEBUG_GUARD_LOCK)
+//		printf("%s", szunlock);
+//	pthread_mutex_unlock(mutex);
+//}
+
+guard_lock::guard_lock(pthread_mutex_t* m, std::string h) : mutex(m) {
 	pthread_mutex_lock(mutex);
-	snprintf(szlock, sizeof(szlock), "lock %s : %d", name(mutex), how);
-	if (how >= 100)
-		trace(1, szlock);
-	if (how != 0 && DEBUG_GUARD_LOCK)
-		printf("%s", szlock);
+	if (!h.empty()) {
+		how = h;
+		std::string szlock;
+		szlock.assign("lock ").append(name(mutex)).append(" : ").append(how);
+		trace(1, szlock.c_str());
+	}
 }
 
 guard_lock::~guard_lock(void) {
-char szunlock[100];
-	snprintf(szunlock, sizeof(szunlock), "unlock %s : %d\n", name(mutex), how);
-	if (how >= 100)
-		trace(1, szunlock);
-	if (how != 0 && DEBUG_GUARD_LOCK)
-		printf("%s", szunlock);
+	if (!how.empty()) {
+		std::string szlock;
+		szlock.assign("unlock ").append(name(mutex)).append(" : ").append(how).append("\n");
+		trace(1, szlock.c_str());
+	}
 	pthread_mutex_unlock(mutex);
 }
 

@@ -28,11 +28,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
-
 #include <pthread.h>
 #include <stdint.h>
-
 #include <semaphore.h>
+#include <string>
+
 #if !HAVE_SEM_TIMEDWAIT
 #  include <time.h>
 int sem_timedwait(sem_t* sem, const struct timespec* abs_timeout);
@@ -124,12 +124,14 @@ bool thread_in_list(int id, const int* list);
 class guard_lock
 {
 public:
-	guard_lock(pthread_mutex_t* m, int h = 0);
+//	guard_lock(pthread_mutex_t* m, int h = 0);
+	guard_lock(pthread_mutex_t* m, std::string h = "");
 	~guard_lock(void);
 	const char *name(pthread_mutex_t *m);
 private:
 	pthread_mutex_t* mutex;
-	int how;
+	std::string how;
+//	int how;
 };
 
 #endif // !THREADS_H_
