@@ -224,21 +224,6 @@ RIG_TS2000::RIG_TS2000() {
 	is_tuning = false;
 }
 
-// return true iff transceiver is still in tune mode
-
-bool RIG_TS2000::tuning()
-{
-	if (!is_tuning) return false;
-	cmd = "AC;";
-	if (wait_char(';', 6, 100, "tuning?", ASC) == 6) {
-		if (replystr[4] == '1') return true;
-	}
-	is_tuning = false;
-	skip_get = 2;
-	return is_tuning;
-}
-
-
 const char * RIG_TS2000::get_bwname_(int n, int md) 
 {
 	static char bwname[20];
@@ -253,129 +238,6 @@ const char * RIG_TS2000::get_bwname_(int n, int md)
 			(md == CW || md == CWR) ? TS2000_CWwidths[n] : TS2000_FSKwidths[n]);
 	}
 	return bwname;
-}
-
-static int txvfo = 0;
-static int rxvfo = 0;
-
-void RIG_TS2000::selectA()
-{
-	cmd = "FR0;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "Rx on A", cmd, "");
-	cmd = "FT0;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "Tx on A", cmd, "");
-	rxona = true;
-	txvfo = rxvfo = 0;
-}
-
-void RIG_TS2000::selectB()
-{
-	cmd = "FR1;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "Rx on B", cmd, "");
-	cmd = "FT1;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "Tx on B", cmd, "");
-	rxona = false;
-	txvfo = rxvfo = 1;
-}
-
-void RIG_TS2000::set_split(bool val) 
-{
-	split = val;
-
-	if (useB) {
-		if (val) {
-			cmd = "FR1;FT0;";
-			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on B, Tx on A", cmd, "");
-			rxvfo = 1; txvfo = 0;
-		} else {
-			cmd = "FR1;FT1;";
-			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on B, Tx on B", cmd, "");
-			rxvfo = txvfo = 1;
-		}
-		rxona = false;
-	} else {
-		if (val) {
-			cmd = "FR0;FT1;";
-			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on A, Tx on B", cmd, "");
-			rxvfo = 0; txvfo = 1;
-		} else {
-			cmd = "FR0;FT0;";
-			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on A, Tx on A", cmd, "");
-			rxvfo = txvfo = 0;
-		}
-		rxona = true;
-	}
-}
-
-
-int RIG_TS2000::get_split()
-{
-	cmd = "IF;";
-	int ret = wait_char(';', 38, 100, "get split", ASC);
-	if (ret < 38) return 0;
-	return (replybuff[32] == '1');
-}
-
-long RIG_TS2000::get_vfoA ()
-{
-	cmd = "FA;";
-	if (wait_char(';', 14, 100, "get vfo A", ASC) == 14) {
-		size_t p = replystr.rfind("FA");
-		if (p != string::npos) {
-			int f = 0;
-			for (size_t n = 2; n < 13; n++)
-				f = f*10 + replystr[p+n] - '0';
-			A.freq = f;
-		}
-	}
-	return A.freq;
-}
-
-void RIG_TS2000::set_vfoA (long freq)
-{
-	A.freq = freq;
-	cmd = "FA00000000000;";
-	for (int i = 12; i > 1; i--) {
-		cmd[i] += freq % 10;
-		freq /= 10;
-	}
-	sendCommand(cmd);
-	showresp(WARN, ASC, "set vfo A", cmd, "");
-}
-
-long RIG_TS2000::get_vfoB ()
-{
-	cmd = "FB;";
-	if (wait_char(';', 14, 100, "get vfo B", ASC) == 14) {
-		size_t p = replystr.rfind("FB");
-		if (p != string::npos) {
-			int f = 0;
-			for (size_t n = 2; n < 13; n++)
-				f = f*10 + replystr[p+n] - '0';
-			B.freq = f;
-		}
-	}
-	return B.freq;
-}
-
-void RIG_TS2000::set_vfoB (long freq)
-{
-	B.freq = freq;
-	cmd = "FB00000000000;";
-	for (int i = 12; i > 1; i--) {
-		cmd[i] += freq % 10;
-		freq /= 10;
-	}
-	sendCommand(cmd);
-	showresp(WARN, ASC, "set vfo B", cmd, "");
 }
 
 int RIG_TS2000::get_smeter()
@@ -397,50 +259,6 @@ int RIG_TS2000::get_smeter()
 		}
 	}
 	return 0;
-}
-
-int RIG_TS2000::get_swr()
-{
-	cmd = "RM;";
-	if (wait_char(';', 8, 100, "get swr", ASC) == 8) {
-		int swrmtr = 0;
-		size_t p = replystr.rfind("RM1");
-		if (p != string::npos) {
-			swrmtr = fm_decimal(replystr.substr(p+3), 4);
-			swrmtr = (swrmtr * 10) / 3;
-			return swrmtr;
-		}
-	}
-	return 0;
-}
-
-int  RIG_TS2000::get_alc(void) 
-{
-	cmd = "RM;";
-	if (wait_char(';', 8, 100, "get alc", ASC) == 8) {
-		int alcmtr = 0;
-		size_t p = replystr.rfind("RM3");
-		if (p != string::npos) {
-			alcmtr = fm_decimal(replystr.substr(p+3), 4);
-			alcmtr = (alcmtr * 10) / 3;
-			return alcmtr;
-		}
-	}
-	return 0;
-}
-
-void  RIG_TS2000::select_swr()
-{
-	cmd = "RM1;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "select SWR", cmd, "");
-}
-
-void  RIG_TS2000::select_alc()
-{
-	cmd = "RM3;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "select ALC", cmd, "");
 }
 
 // Transceiver power level
@@ -484,88 +302,6 @@ int RIG_TS2000::get_power_control()
 		}
 	}
 	return 0;
-}
-
-// Volume control return 0 ... 100
-int RIG_TS2000::get_volume_control()
-{
-	cmd = "AG0;";
-	if (wait_char(';', 7, 100, "get vol", ASC) == 7) {
-		int volctrl = 0;
-		size_t p = replystr.rfind("AG");
-		if (p != string::npos) {
-			volctrl = fm_decimal(replystr.substr(p+3),3);
-			return (int)(volctrl / 2.55);
-		}
-	}
-	return 0;
-}
-
-void RIG_TS2000::set_volume_control(int val) 
-{
-	int ivol = (int)(val * 2.55);
-	cmd = "AG0";
-	cmd.append(to_decimal(ivol, 3)).append(";");
-	sendCommand(cmd);
-	showresp(WARN, ASC, "set vol", cmd, "");
-}
-
-// Tranceiver PTT on/off
-void RIG_TS2000::set_PTT_control(int val)
-{
-	if (val) cmd = "TX;";
-	else	 cmd = "RX;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "set PTT", cmd, "");
-}
-
-/*
-========================================================================
-	frequency & mode data are contained in the IF; response
-		IFaaaaaaaaaaaXXXXXbbbbbcdXeefghjklmmX;
-		12345678901234567890123456789012345678
-		01234567890123456789012345678901234567 byte #
-		          1         2         3
-		                            ^ position 28
-		where:
-			aaaaaaaaaaa => decimal value of vfo frequency
-			bbbbb => rit/xit frequency
-			c => rit off/on
-			d => xit off/on
-			e => memory channel
-			f => tx/rx
-			g => mode
-			h => function
-			j => scan off/on
-			k => split off /on
-			l => tone off /on
-			m => tone number
-			X => unused characters
-		 
-========================================================================
-*/ 
-
-int RIG_TS2000::get_PTT()
-{
-	cmd = "IF;";
-	int ret = wait_char(';', 38, 100, "get VFO", ASC);
-	if (ret < 38) return ptt_;
-	ptt_ = (replybuff[28] == '1');
-	return ptt_;
-}
-
-void RIG_TS2000::tune_rig()
-{
-//	cmd = "AC111;";
-//	       | |||______ start tuner = 1
-//	       | ||_______ set TX hold = 1
-//	       | |________ set RX hold = 1
-//	       |__________ tune transceiver command prefix
-	if (tuning()) return;
-	cmd = "AC111;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "send tune command", cmd, "");
-	is_tuning = true;
 }
 
 void RIG_TS2000::set_attenuator(int val)
@@ -941,6 +677,385 @@ int RIG_TS2000::get_modetype(int n)
 	return TS2000_mode_type[n];
 }
 
+void RIG_TS2000::get_if_min_max_step(int &min, int &max, int &step)
+{
+	if_shift_min = min = 400;
+	if_shift_max = max = 1000;
+	if_shift_step = step = 50;
+	if_shift_mid = 700;
+}
+
+void RIG_TS2000::set_notch(bool on, int val)
+{
+	if (on) {
+		cmd = "BC2;"; // set manual notch
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set notch on", cmd, "");
+		cmd = "BP";
+//		val = round((val - 220) / 50);
+		val = round((val - 200) / 50);
+		cmd.append(to_decimal(val, 3)).append(";");
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set notch val", cmd, "");
+	} else {
+		cmd = "BC0;"; // no notch action
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set notch off", cmd, "");
+	}
+}
+
+bool  RIG_TS2000::get_notch(int &val)
+{
+	bool ison = false;
+	cmd = "BC;";
+	if (wait_char(';', 4, 100, "get notch on/off", ASC) == 4) {
+		size_t p = replystr.rfind("BC");
+		if (p != string::npos) {
+			if (replystr[p+2] == '2') {
+				ison = true;
+				cmd = "BP;";
+				if (wait_char(';', 6, 100, "get notch val", ASC) == 6) {
+					p = replystr.rfind("BP");
+					if (p != string::npos)
+						val = 200 + 50 * fm_decimal(replystr.substr(p+2),3);
+				}
+			}
+		}
+	}
+	return (ison);
+}
+
+void RIG_TS2000::get_notch_min_max_step(int &min, int &max, int &step)
+{
+	min = 200;
+	max = 3350;
+	step = 50;
+}
+
+void RIG_TS2000::set_auto_notch(int v)
+{
+	cmd = v ? "NT1;" : "NT0;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set auto notch", cmd, "");
+}
+
+int  RIG_TS2000::get_auto_notch()
+{
+	cmd = "NT;";
+	if (wait_char(';', 4, 100, "get auto notch", ASC) == 4) {
+		int anotch = 0;
+		size_t p = replystr.rfind("NT");
+		if (p != string::npos) {
+			anotch = (replystr[p+2] == '1');
+			return anotch;
+		}
+	}
+	return 0;
+}
+
+void RIG_TS2000::set_noise_reduction(int val)
+{
+	if (val == -1) {
+		return;
+	}
+	_noise_reduction_level = val;
+	if (_noise_reduction_level == 0) {
+		nr_label("NR", false);
+	} else if (_noise_reduction_level == 1) {
+		nr_label("NR1", true);
+	} else if (_noise_reduction_level == 2) {
+		nr_label("NR2", true);
+	}
+	cmd.assign("NR");
+	cmd += '0' + _noise_reduction_level;
+	cmd += ';';
+	sendCommand (cmd);
+	showresp(WARN, ASC, "SET noise reduction", cmd, "");
+}
+
+int  RIG_TS2000::get_noise_reduction()
+{
+	cmd = rsp = "NR";
+	cmd.append(";");
+	if (wait_char(';', 4, 100, "GET noise reduction", ASC) == 4) {
+		size_t p = replystr.rfind(rsp);
+		if (p == string::npos) return _noise_reduction_level;
+		_noise_reduction_level = replystr[p+2] - '0';
+	}
+
+	if (_noise_reduction_level == 1) {
+		nr_label("NR1", true);
+	} else if (_noise_reduction_level == 2) {
+		nr_label("NR2", true);
+	} else {
+		nr_label("NR", false);
+	}
+
+	return _noise_reduction_level;
+}
+
+void RIG_TS2000::set_noise_reduction_val(int val)
+{
+	if (_noise_reduction_level == 0) return;
+	if (_noise_reduction_level == 1) _nrval1 = val;
+	else _nrval2 = val;
+
+	cmd.assign("RL").append(to_decimal(val, 2)).append(";");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET_noise_reduction_val", cmd, "");
+}
+
+int  RIG_TS2000::get_noise_reduction_val()
+{
+	int nrval = 0;
+	if (_noise_reduction_level == 0) return 0;
+	int val = progStatus.noise_reduction_val;
+	cmd = rsp = "RL";
+	cmd.append(";");
+	if (wait_char(';', 5, 100, "GET noise reduction val", ASC) == 5) {
+		size_t p = replystr.rfind(rsp);
+		if (p == string::npos) {
+			nrval = (_noise_reduction_level == 1 ? _nrval1 : _nrval2);
+			return nrval;
+		}
+		val = atoi(&replystr[p+2]);
+	}
+
+	if (_noise_reduction_level == 1) _nrval1 = val;
+	else _nrval2 = val;
+
+	return val;
+}
+
+
+/*
+static int txvfo = 0;
+static int rxvfo = 0;
+
+void RIG_TS2000::selectA()
+{
+	cmd = "FR0;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "Rx on A", cmd, "");
+	cmd = "FT0;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "Tx on A", cmd, "");
+	rxona = true;
+	txvfo = rxvfo = 0;
+}
+
+void RIG_TS2000::selectB()
+{
+	cmd = "FR1;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "Rx on B", cmd, "");
+	cmd = "FT1;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "Tx on B", cmd, "");
+	rxona = false;
+	txvfo = rxvfo = 1;
+}
+
+void RIG_TS2000::set_split(bool val) 
+{
+	split = val;
+	if (useB) {
+		if (val) {
+			cmd = "FR1;FT0;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on B, Tx on A", cmd, "");
+			rxvfo = 1; txvfo = 0;
+		} else {
+			cmd = "FR1;FT1;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on B, Tx on B", cmd, "");
+			rxvfo = txvfo = 1;
+		}
+		rxona = false;
+	} else {
+		if (val) {
+			cmd = "FR0;FT1;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on A, Tx on B", cmd, "");
+			rxvfo = 0; txvfo = 1;
+		} else {
+			cmd = "FR0;FT0;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on A, Tx on A", cmd, "");
+			rxvfo = txvfo = 0;
+		}
+		rxona = true;
+	}
+}
+
+
+int RIG_TS2000::get_split()
+{
+	cmd = "IF;";
+	int ret = wait_char(';', 38, 100, "get split", ASC);
+	if (ret < 38) return 0;
+	return (replybuff[32] == '1');
+}
+
+long RIG_TS2000::get_vfoA ()
+{
+	cmd = "FA;";
+	if (wait_char(';', 14, 100, "get vfo A", ASC) == 14) {
+		size_t p = replystr.rfind("FA");
+		if (p != string::npos) {
+			int f = 0;
+			for (size_t n = 2; n < 13; n++)
+				f = f*10 + replystr[p+n] - '0';
+			A.freq = f;
+		}
+	}
+	return A.freq;
+}
+
+void RIG_TS2000::set_vfoA (long freq)
+{
+	A.freq = freq;
+	cmd = "FA00000000000;";
+	for (int i = 12; i > 1; i--) {
+		cmd[i] += freq % 10;
+		freq /= 10;
+	}
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set vfo A", cmd, "");
+}
+
+long RIG_TS2000::get_vfoB ()
+{
+	cmd = "FB;";
+	if (wait_char(';', 14, 100, "get vfo B", ASC) == 14) {
+		size_t p = replystr.rfind("FB");
+		if (p != string::npos) {
+			int f = 0;
+			for (size_t n = 2; n < 13; n++)
+				f = f*10 + replystr[p+n] - '0';
+			B.freq = f;
+		}
+	}
+	return B.freq;
+}
+
+void RIG_TS2000::set_vfoB (long freq)
+{
+	B.freq = freq;
+	cmd = "FB00000000000;";
+	for (int i = 12; i > 1; i--) {
+		cmd[i] += freq % 10;
+		freq /= 10;
+	}
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set vfo B", cmd, "");
+}
+
+int RIG_TS2000::get_PTT()
+{
+	cmd = "IF;";
+	int ret = wait_char(';', 38, 100, "get VFO", ASC);
+	if (ret < 38) return ptt_;
+	ptt_ = (replybuff[28] == '1');
+	return ptt_;
+}
+
+// Tranceiver PTT on/off
+void RIG_TS2000::set_PTT_control(int val)
+{
+	if (val) cmd = "TX;";
+	else	 cmd = "RX;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set PTT", cmd, "");
+}
+
+// Volume control return 0 ... 100
+int RIG_TS2000::get_volume_control()
+{
+	cmd = "AG0;";
+	if (wait_char(';', 7, 100, "get vol", ASC) == 7) {
+		int volctrl = 0;
+		size_t p = replystr.rfind("AG");
+		if (p != string::npos) {
+			volctrl = fm_decimal(replystr.substr(p+3),3);
+			return (int)(volctrl / 2.55);
+		}
+	}
+	return 0;
+}
+
+void RIG_TS2000::set_volume_control(int val) 
+{
+	int ivol = (int)(val * 2.55);
+	cmd = "AG0";
+	cmd.append(to_decimal(ivol, 3)).append(";");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set vol", cmd, "");
+}
+
+void RIG_TS2000::tune_rig()
+{
+//	cmd = "AC111;";
+//	       | |||______ start tuner = 1
+//	       | ||_______ set TX hold = 1
+//	       | |________ set RX hold = 1
+//	       |__________ tune transceiver command prefix
+	if (tuning()) return;
+	cmd = "AC111;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "send tune command", cmd, "");
+	is_tuning = true;
+}
+
+int  RIG_TS2000::get_alc(void) 
+{
+	cmd = "RM;";
+	if (wait_char(';', 8, 100, "get alc", ASC) == 8) {
+		int alcmtr = 0;
+		size_t p = replystr.rfind("RM3");
+		if (p != string::npos) {
+			alcmtr = fm_decimal(replystr.substr(p+3), 4);
+			alcmtr = (alcmtr * 10) / 3;
+			return alcmtr;
+		}
+	}
+	return 0;
+}
+
+void  RIG_TS2000::select_swr()
+{
+	cmd = "RM1;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "select SWR", cmd, "");
+}
+
+void  RIG_TS2000::select_alc()
+{
+	cmd = "RM3;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "select ALC", cmd, "");
+}
+
+void RIG_TS2000::set_rf_gain(int val)
+{
+	cmd = "RG";
+	cmd.append(to_decimal(val * 255 / 100, 3)).append(";");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set rf gain", cmd, "");
+}
+
+int  RIG_TS2000::get_rf_gain()
+{
+	cmd = "RG;";
+	int rfg = 100;
+	if (wait_char(';', 6, 100, "get rf gain", ASC) == 6) {
+		size_t p = replystr.rfind("RG");
+		if (p != string::npos)
+			rfg = fm_decimal(replystr.substr(p+2) ,3) * 100 / 255;
+	}
+	return rfg;
+}
+
 // val 0 .. 100
 void RIG_TS2000::set_mic_gain(int val)
 {
@@ -1026,173 +1141,33 @@ bool RIG_TS2000::get_if_shift(int &val)
 	return false;
 }
 
-void RIG_TS2000::get_if_min_max_step(int &min, int &max, int &step)
-{
-	if_shift_min = min = 400;
-	if_shift_max = max = 1000;
-	if_shift_step = step = 50;
-	if_shift_mid = 700;
-}
+// return true iff transceiver is still in tune mode
 
-void RIG_TS2000::set_notch(bool on, int val)
+bool RIG_TS2000::tuning()
 {
-	if (on) {
-		cmd = "BC2;"; // set manual notch
-		sendCommand(cmd);
-		showresp(WARN, ASC, "set notch on", cmd, "");
-		cmd = "BP";
-//		val = round((val - 220) / 50);
-		val = round((val - 200) / 50);
-		cmd.append(to_decimal(val, 3)).append(";");
-		sendCommand(cmd);
-		showresp(WARN, ASC, "set notch val", cmd, "");
-	} else {
-		cmd = "BC0;"; // no notch action
-		sendCommand(cmd);
-		showresp(WARN, ASC, "set notch off", cmd, "");
+	if (!is_tuning) return false;
+	cmd = "AC;";
+	if (wait_char(';', 6, 100, "tuning?", ASC) == 6) {
+		if (replystr[4] == '1') return true;
 	}
+	is_tuning = false;
+	skip_get = 2;
+	return is_tuning;
 }
 
-bool  RIG_TS2000::get_notch(int &val)
+int RIG_TS2000::get_swr()
 {
-	bool ison = false;
-	cmd = "BC;";
-	if (wait_char(';', 4, 100, "get notch on/off", ASC) == 4) {
-		size_t p = replystr.rfind("BC");
+	cmd = "RM;";
+	if (wait_char(';', 8, 100, "get swr", ASC) == 8) {
+		int swrmtr = 0;
+		size_t p = replystr.rfind("RM1");
 		if (p != string::npos) {
-			if (replystr[p+2] == '2') {
-				ison = true;
-				cmd = "BP;";
-				if (wait_char(';', 6, 100, "get notch val", ASC) == 6) {
-					p = replystr.rfind("BP");
-					if (p != string::npos)
-						val = 200 + 50 * fm_decimal(replystr.substr(p+2),3);
-				}
-			}
-		}
-	}
-	return (ison);
-}
-
-void RIG_TS2000::get_notch_min_max_step(int &min, int &max, int &step)
-{
-	min = 200;
-	max = 3350;
-	step = 50;
-}
-
-void RIG_TS2000::set_auto_notch(int v)
-{
-	cmd = v ? "NT1;" : "NT0;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "set auto notch", cmd, "");
-}
-
-int  RIG_TS2000::get_auto_notch()
-{
-	cmd = "NT;";
-	if (wait_char(';', 4, 100, "get auto notch", ASC) == 4) {
-		int anotch = 0;
-		size_t p = replystr.rfind("NT");
-		if (p != string::npos) {
-			anotch = (replystr[p+2] == '1');
-			return anotch;
+			swrmtr = fm_decimal(replystr.substr(p+3), 4);
+			swrmtr = (swrmtr * 10) / 3;
+			return swrmtr;
 		}
 	}
 	return 0;
 }
 
-void RIG_TS2000::set_rf_gain(int val)
-{
-	cmd = "RG";
-	cmd.append(to_decimal(val * 255 / 100, 3)).append(";");
-	sendCommand(cmd);
-	showresp(WARN, ASC, "set rf gain", cmd, "");
-}
-
-int  RIG_TS2000::get_rf_gain()
-{
-	cmd = "RG;";
-	int rfg = 100;
-	if (wait_char(';', 6, 100, "get rf gain", ASC) == 6) {
-		size_t p = replystr.rfind("RG");
-		if (p != string::npos)
-			rfg = fm_decimal(replystr.substr(p+2) ,3) * 100 / 255;
-	}
-	return rfg;
-}
-
-void RIG_TS2000::set_noise_reduction(int val)
-{
-	if (val == -1) {
-		return;
-	}
-	_noise_reduction_level = val;
-	if (_noise_reduction_level == 0) {
-		nr_label("NR", false);
-	} else if (_noise_reduction_level == 1) {
-		nr_label("NR1", true);
-	} else if (_noise_reduction_level == 2) {
-		nr_label("NR2", true);
-	}
-	cmd.assign("NR");
-	cmd += '0' + _noise_reduction_level;
-	cmd += ';';
-	sendCommand (cmd);
-	showresp(WARN, ASC, "SET noise reduction", cmd, "");
-}
-
-int  RIG_TS2000::get_noise_reduction()
-{
-	cmd = rsp = "NR";
-	cmd.append(";");
-	if (wait_char(';', 4, 100, "GET noise reduction", ASC) == 4) {
-		size_t p = replystr.rfind(rsp);
-		if (p == string::npos) return _noise_reduction_level;
-		_noise_reduction_level = replystr[p+2] - '0';
-	}
-
-	if (_noise_reduction_level == 1) {
-		nr_label("NR1", true);
-	} else if (_noise_reduction_level == 2) {
-		nr_label("NR2", true);
-	} else {
-		nr_label("NR", false);
-	}
-
-	return _noise_reduction_level;
-}
-
-void RIG_TS2000::set_noise_reduction_val(int val)
-{
-	if (_noise_reduction_level == 0) return;
-	if (_noise_reduction_level == 1) _nrval1 = val;
-	else _nrval2 = val;
-
-	cmd.assign("RL").append(to_decimal(val, 2)).append(";");
-	sendCommand(cmd);
-	showresp(WARN, ASC, "SET_noise_reduction_val", cmd, "");
-}
-
-int  RIG_TS2000::get_noise_reduction_val()
-{
-	int nrval = 0;
-	if (_noise_reduction_level == 0) return 0;
-	int val = progStatus.noise_reduction_val;
-	cmd = rsp = "RL";
-	cmd.append(";");
-	if (wait_char(';', 5, 100, "GET noise reduction val", ASC) == 5) {
-		size_t p = replystr.rfind(rsp);
-		if (p == string::npos) {
-			nrval = (_noise_reduction_level == 1 ? _nrval1 : _nrval2);
-			return nrval;
-		}
-		val = atoi(&replystr[p+2]);
-	}
-
-	if (_noise_reduction_level == 1) _nrval1 = val;
-	else _nrval2 = val;
-
-	return val;
-}
-
+*/

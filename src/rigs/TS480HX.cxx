@@ -257,132 +257,6 @@ void RIG_TS480HX::shutdown()
 	sendCommand(cmd);
 }
 
-void RIG_TS480HX::selectA()
-{
-	cmd = "FR0;FT0;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "Rx on A, Tx on A", cmd, "");
-}
-
-void RIG_TS480HX::selectB()
-{
-	cmd = "FR1;FT1;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "Rx on B, Tx on B", cmd, "");
-}
-
-void RIG_TS480HX::set_split(bool val) 
-{
-	split = val;
-	if (useB) {
-		if (val) {
-			cmd = "FR1;FT0;";
-			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on B, Tx on A", cmd, "");
-		} else {
-			cmd = "FR1;FT1;";
-			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on B, Tx on B", cmd, "");
-		}
-	} else {
-		if (val) {
-			cmd = "FR0;FT1;";
-			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on A, Tx on B", cmd, "");
-		} else {
-			cmd = "FR0;FT0;";
-			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on A, Tx on A", cmd, "");
-		}
-	}
-}
-
-bool RIG_TS480HX::can_split()
-{
-	return true;
-}
-
-int RIG_TS480HX::get_split()
-{
-	size_t p;
-	int split = 0;
-	char rx = 0, tx = 0;
-// tx vfo
-	cmd = rsp = "FT";
-	cmd.append(";");
-	if (wait_char(';', 4, 100, "get split tx vfo", ASC) == 4) {
-		p = replystr.rfind(rsp);
-		if (p == string::npos) return split;
-		tx = replystr[p+2];
-	}
-// rx vfo
-	cmd = rsp = "FR";
-	cmd.append(";");
-	if (wait_char(';', 4, 100, "get split rx vfo", ASC) == 4) {
-		p = replystr.rfind(rsp);
-		if (p == string::npos) return split;
-		rx = replystr[p+2];
-// split test
-		split = (tx == '1' ? 2 : 0) + (rx == '1' ? 1 : 0);
-	}
-
-	return split;
-}
-
-long RIG_TS480HX::get_vfoA ()
-{
-	cmd = "FA;";
-	if (wait_char(';', 14, 100, "get vfo A", ASC) < 14) return A.freq;
-
-	size_t p = replystr.rfind("FA");
-	if (p != string::npos && (p + 12 < replystr.length())) {
-		int f = 0;
-		for (size_t n = 2; n < 13; n++)
-			f = f*10 + replystr[p+n] - '0';
-		A.freq = f;
-	}
-	return A.freq;
-}
-
-void RIG_TS480HX::set_vfoA (long freq)
-{
-	A.freq = freq;
-	cmd = "FA00000000000;";
-	for (int i = 12; i > 1; i--) {
-		cmd[i] += freq % 10;
-		freq /= 10;
-	}
-	sendCommand(cmd);
-	showresp(WARN, ASC, "set vfo A", cmd, "");
-}
-
-long RIG_TS480HX::get_vfoB ()
-{
-	cmd = "FB;";
-	if (wait_char(';', 14, 100, "get vfo B", ASC) < 14) return B.freq;
-
-	size_t p = replystr.rfind("FB");
-	if (p != string::npos && (p + 12 < replystr.length())) {
-		int f = 0;
-		for (size_t n = 2; n < 13; n++)
-			f = f*10 + replystr[p+n] - '0';
-		B.freq = f;
-	}
-	return B.freq;
-}
-
-void RIG_TS480HX::set_vfoB (long freq)
-{
-	B.freq = freq;
-	cmd = "FB00000000000;";
-	for (int i = 12; i > 1; i--) {
-		cmd[i] += freq % 10;
-		freq /= 10;
-	}
-	sendCommand(cmd);
-	showresp(WARN, ASC, "set vfo B", cmd, "");
-}
-
 // SM cmd 0 ... 100 (rig values 0 ... 15)
 int RIG_TS480HX::get_smeter()
 {
@@ -792,30 +666,6 @@ int RIG_TS480HX::def_bandwidth(int val)
 	return adjust_bandwidth(val);
 }
 
-void RIG_TS480HX::set_volume_control(int val)
-{
-	cmd = "AG";
-	char szval[5];
-	snprintf(szval, sizeof(szval), "%04d", val * 255 / 100);
-	cmd += szval;
-	cmd += ';';
-	LOG_WARN("%s", cmd.c_str());
-	sendCommand(cmd);
-}
-
-int RIG_TS480HX::get_volume_control()
-{
-	int val = progStatus.volume;
-	cmd = "AG0;";
-	if (wait_char(';', 7, 100, "get vol", ASC) < 7) return val;
-
-	size_t p = replystr.rfind("AG");
-	if (p == string::npos) return val;
-	replystr[p + 6] = 0;
-	val = atoi(&replystr[p + 3]);
-	val = val * 100 / 255;
-	return val;
-}
 
 void RIG_TS480HX::set_power_control(double val)
 {
@@ -881,13 +731,6 @@ int RIG_TS480HX::get_preamp()
 	return 0;
 }
 
-void RIG_TS480HX::tune_rig()
-{
-	cmd = "AC111;";
-	LOG_WARN("%s", cmd.c_str());
-	sendCommand(cmd);
-}
-
 void RIG_TS480HX::set_if_shift(int val)
 {
 	cmd = "IS+";
@@ -918,56 +761,6 @@ void RIG_TS480HX::get_if_min_max_step(int &min, int &max, int &step)
 	if_shift_max = max = 1100;
 	if_shift_step = step = 10;
 	if_shift_mid = 0;
-}
-
-void RIG_TS480HX::set_mic_gain(int val)
-{
-	cmd = "MG";
-	cmd.append(to_decimal(val,3)).append(";");
-	sendCommand(cmd);
-	showresp(WARN, ASC, "set mic gain", cmd, "");
-}
-
-int  RIG_TS480HX::get_mic_gain()
-{
-	int val = progStatus.mic_gain;
-	cmd = "MG;";
-	if (wait_char(';', 6, 100, "get mic gain", ASC) < 6) return val;
-
-	size_t p = replystr.rfind("MG");
-	if (p != string::npos)
-		val = fm_decimal(replystr.substr(p+2), 3);
-	return val;
-}
-
-void RIG_TS480HX::get_mic_min_max_step(int &min, int &max, int &step)
-{
-	min = 0; max = 100; step = 1;
-}
-
-void RIG_TS480HX::set_rf_gain(int val)	
-{
-	cmd = "RG";
-	cmd.append(to_decimal(val,3)).append(";");
-	sendCommand(cmd);
-	showresp(WARN, ASC, "set rf gain", cmd, "");
-}
-
-int  RIG_TS480HX::get_rf_gain()
-{
-	int val = progStatus.rfgain;
-	cmd = "RG;";
-	if (wait_char(';', 6, 100, "get rf gain", ASC) < 6) return val;
-
-	size_t p = replystr.rfind("RG");
-	if (p != string::npos)
-		val = fm_decimal(replystr.substr(p+2), 3);
-	return val;
-}
-
-void RIG_TS480HX::get_rf_min_max_step(int &min, int &max, int &step)
-{
-	min = 0; max = 100; step = 1;
 }
 
 // Noise Reduction (TS2000.cxx) NR1 only works; no NR2 and don' no why
@@ -1128,6 +921,178 @@ int RIG_TS480HX::get_noise()
 	return 1;
 }
 
+// Tranceiver PTT on/off
+void RIG_TS480HX::set_PTT_control(int val)
+{
+	if (val) {
+		if (progStatus.data_port) cmd = "TX1;"; // DTS transmission using ANI input
+		else cmd = "TX0;"; // mic input
+	} else cmd = "RX;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set PTT", cmd, "");
+}
+
+int RIG_TS480HX::get_PTT()
+{
+	cmd = "IF;";
+	int ret = wait_char(';', 38, 100, "get VFO", ASC);
+	if (ret < 38) return ptt_;
+	ptt_ = (replybuff[28] == '1');
+	return ptt_;
+}
+
+void RIG_TS480HX::set_rf_gain(int val)
+{
+	cmd = "RG";
+	cmd.append(to_decimal(val,3)).append(";");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set rf gain", cmd, "");
+}
+
+int  RIG_TS480HX::get_rf_gain()
+{
+	int val = progStatus.rfgain;
+	cmd = "RG;";
+	if (wait_char(';', 6, 100, "get rf gain", ASC) < 6) return val;
+
+	size_t p = replystr.rfind("RG");
+	if (p != string::npos)
+		val = fm_decimal(replystr.substr(p+2), 3);
+	return val;
+}
+
+void RIG_TS480HX::get_rf_min_max_step(int &min, int &max, int &step)
+{
+	min = 0; max = 100; step = 1;
+}
+
+/*
+void RIG_TS480HX::selectA()
+{
+	cmd = "FR0;FT0;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "Rx on A, Tx on A", cmd, "");
+}
+
+void RIG_TS480HX::selectB()
+{
+	cmd = "FR1;FT1;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "Rx on B, Tx on B", cmd, "");
+}
+
+void RIG_TS480HX::set_split(bool val) 
+{
+	split = val;
+	if (useB) {
+		if (val) {
+			cmd = "FR1;FT0;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on B, Tx on A", cmd, "");
+		} else {
+			cmd = "FR1;FT1;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on B, Tx on B", cmd, "");
+		}
+	} else {
+		if (val) {
+			cmd = "FR0;FT1;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on A, Tx on B", cmd, "");
+		} else {
+			cmd = "FR0;FT0;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on A, Tx on A", cmd, "");
+		}
+	}
+}
+
+bool RIG_TS480HX::can_split()
+{
+	return true;
+}
+
+int RIG_TS480HX::get_split()
+{
+	size_t p;
+	int split = 0;
+	char rx = 0, tx = 0;
+// tx vfo
+	cmd = rsp = "FT";
+	cmd.append(";");
+	if (wait_char(';', 4, 100, "get split tx vfo", ASC) == 4) {
+		p = replystr.rfind(rsp);
+		if (p == string::npos) return split;
+		tx = replystr[p+2];
+	}
+// rx vfo
+	cmd = rsp = "FR";
+	cmd.append(";");
+	if (wait_char(';', 4, 100, "get split rx vfo", ASC) == 4) {
+		p = replystr.rfind(rsp);
+		if (p == string::npos) return split;
+		rx = replystr[p+2];
+// split test
+		split = (tx == '1' ? 2 : 0) + (rx == '1' ? 1 : 0);
+	}
+
+	return split;
+}
+
+long RIG_TS480HX::get_vfoA ()
+{
+	cmd = "FA;";
+	if (wait_char(';', 14, 100, "get vfo A", ASC) < 14) return A.freq;
+
+	size_t p = replystr.rfind("FA");
+	if (p != string::npos && (p + 12 < replystr.length())) {
+		int f = 0;
+		for (size_t n = 2; n < 13; n++)
+			f = f*10 + replystr[p+n] - '0';
+		A.freq = f;
+	}
+	return A.freq;
+}
+
+void RIG_TS480HX::set_vfoA (long freq)
+{
+	A.freq = freq;
+	cmd = "FA00000000000;";
+	for (int i = 12; i > 1; i--) {
+		cmd[i] += freq % 10;
+		freq /= 10;
+	}
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set vfo A", cmd, "");
+}
+
+long RIG_TS480HX::get_vfoB ()
+{
+	cmd = "FB;";
+	if (wait_char(';', 14, 100, "get vfo B", ASC) < 14) return B.freq;
+
+	size_t p = replystr.rfind("FB");
+	if (p != string::npos && (p + 12 < replystr.length())) {
+		int f = 0;
+		for (size_t n = 2; n < 13; n++)
+			f = f*10 + replystr[p+n] - '0';
+		B.freq = f;
+	}
+	return B.freq;
+}
+
+void RIG_TS480HX::set_vfoB (long freq)
+{
+	B.freq = freq;
+	cmd = "FB00000000000;";
+	for (int i = 12; i > 1; i--) {
+		cmd[i] += freq % 10;
+		freq /= 10;
+	}
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set vfo B", cmd, "");
+}
+
 // Squelch (TS990.cxx)
 void RIG_TS480HX::set_squelch(int val)
 {
@@ -1155,48 +1120,61 @@ void RIG_TS480HX::get_squelch_min_max_step(int &min, int &max, int &step)
 	min = 0; max = 255; step = 1;
 }
 
-// Tranceiver PTT on/off
-void RIG_TS480HX::set_PTT_control(int val)
+void RIG_TS480HX::set_mic_gain(int val)
 {
-	if (val) {
-		if (progStatus.data_port) cmd = "TX1;"; // DTS transmission using ANI input
-		else cmd = "TX0;"; // mic input
-	} else cmd = "RX;";
+	cmd = "MG";
+	cmd.append(to_decimal(val,3)).append(";");
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set PTT", cmd, "");
+	showresp(WARN, ASC, "set mic gain", cmd, "");
 }
 
-/*
-========================================================================
-	frequency & mode data are contained in the IF; response
-		IFaaaaaaaaaaaXXXXXbbbbbcdXeefghjklmmX;
-		12345678901234567890123456789012345678
-		01234567890123456789012345678901234567 byte #
-		          1         2         3
-		                            ^ position 28
-		where:
-			aaaaaaaaaaa => decimal value of vfo frequency
-			bbbbb => rit/xit frequency
-			c => rit off/on
-			d => xit off/on
-			e => memory channel
-			f => tx/rx
-			g => mode
-			h => function
-			j => scan off/on
-			k => split off /on
-			l => tone off /on
-			m => tone number
-			X => unused characters
-		 
-========================================================================
-*/ 
-
-int RIG_TS480HX::get_PTT()
+int  RIG_TS480HX::get_mic_gain()
 {
-	cmd = "IF;";
-	int ret = wait_char(';', 38, 100, "get VFO", ASC);
-	if (ret < 38) return ptt_;
-	ptt_ = (replybuff[28] == '1');
-	return ptt_;
+	int val = progStatus.mic_gain;
+	cmd = "MG;";
+	if (wait_char(';', 6, 100, "get mic gain", ASC) < 6) return val;
+
+	size_t p = replystr.rfind("MG");
+	if (p != string::npos)
+		val = fm_decimal(replystr.substr(p+2), 3);
+	return val;
 }
+
+void RIG_TS480HX::get_mic_min_max_step(int &min, int &max, int &step)
+{
+	min = 0; max = 100; step = 1;
+}
+
+void RIG_TS480HX::set_volume_control(int val)
+{
+	cmd = "AG";
+	char szval[5];
+	snprintf(szval, sizeof(szval), "%04d", val * 255 / 100);
+	cmd += szval;
+	cmd += ';';
+	LOG_WARN("%s", cmd.c_str());
+	sendCommand(cmd);
+}
+
+int RIG_TS480HX::get_volume_control()
+{
+	int val = progStatus.volume;
+	cmd = "AG0;";
+	if (wait_char(';', 7, 100, "get vol", ASC) < 7) return val;
+
+	size_t p = replystr.rfind("AG");
+	if (p == string::npos) return val;
+	replystr[p + 6] = 0;
+	val = atoi(&replystr[p + 3]);
+	val = val * 100 / 255;
+	return val;
+}
+
+void RIG_TS480HX::tune_rig()
+{
+	cmd = "AC111;";
+	LOG_WARN("%s", cmd.c_str());
+	sendCommand(cmd);
+}
+
+*/

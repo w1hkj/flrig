@@ -124,8 +124,8 @@ rigbase::rigbase()
 	has_getvfoAorB = 
 	ICOMrig = false;
 
-	has_a2b = true;
-	has_vfoAB = true;
+	has_a2b = false;
+	has_vfoAB = false;
 
 	data_type = BINARY;
 

@@ -275,159 +275,6 @@ const char * RIG_TS590S::get_bwname_(int n, int md)
 	return bwname;
 }
 
-void RIG_TS590S::selectA()
-{
-	cmd = "FR0;";
-	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "Rx A", cmd, "");
-	cmd = "FT0;";
-	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "Tx A", cmd, "");
-	rxtxa = true;
-}
-
-void RIG_TS590S::selectB()
-{
-	cmd = "FR1;";
-	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "Rx B", cmd, "");
-	cmd = "FT1;";
-	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "Tx B", cmd, "");
-	rxtxa = false;
-}
-
-void RIG_TS590S::set_split(bool val) 
-{
-	split = val;
-	if (useB) {
-		if (val) {
-			cmd = "FR1;FT0;";
-			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on B, Tx on A", cmd, "");
-		} else {
-			cmd = "FR1;FT1;";
-			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on B, Tx on B", cmd, "");
-		}
-	} else {
-		if (val) {
-			cmd = "FR0;FT1;";
-			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on A, Tx on B", cmd, "");
-		} else {
-			cmd = "FR0;FT0;";
-			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on A, Tx on A", cmd, "");
-		}
-	}
-}
-
-int RIG_TS590S::get_split()
-{
-	size_t p;
-	int split = 0;
-	char rx = 0, tx = 0;
-// tx vfo
-	cmd = rsp = "FT";
-	cmd.append(";");
-	if (wait_char(';', 4, 100, "get split tx vfo", ASC) == 4) {
-		p = replystr.rfind(rsp);
-		if (p == string::npos) return split;
-		tx = replystr[p+2];
-	}
-// rx vfo
-	cmd = rsp = "FR";
-	cmd.append(";");
-	if (wait_char(';', 4, 100, "get split rx vfo", ASC) == 4) {
-		p = replystr.rfind(rsp);
-		if (p == string::npos) return split;
-		rx = replystr[p+2];
-// split test
-		split = (tx == '1' ? 2 : 0) + (rx == '1' ? 1 : 0);
-	}
-
-	return split;
-}
-
-long RIG_TS590S::get_vfoA ()
-{
-	cmd = "FA;";
-	if (wait_char(';', 14, 100, "get vfoA", ASC) < 14) return A.freq;
-
-	size_t p = replystr.rfind("FA");
-	if (p == string::npos) return A.freq;
-
-	long f = 0L;
-	long mul = 1L;
-	for (size_t n = 12; n > 1; n--) {
-		f += (replystr[p + n] - '0') * mul;
-		mul *= 10;
-	}
-	A.freq = f;
-	return A.freq;
-}
-
-void RIG_TS590S::set_vfoA (long freq)
-{
-	A.freq = freq;
-	cmd = "FA00000000000;";
-	for (int i = 12; i > 1; i--) {
-		cmd[i] += freq % 10;
-		freq /= 10;
-	}
-	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "set vfo A", cmd, "");
-}
-
-long RIG_TS590S::get_vfoB ()
-{
-	cmd = "FB;";
-	if (wait_char(';', 14, 100, "get vfoB", ASC) < 14) return B.freq;
-
-	size_t p = replystr.rfind("FB");
-	if (p == string::npos) return B.freq;
-
-	long f = 0L;
-	long mul = 1L;
-	for (size_t n = 12; n > 1; n--) {
-		f += (replystr[p + n] - '0') * mul;
-		mul *= 10;
-	}
-	B.freq = f;
-
-	return B.freq;
-}
-
-void RIG_TS590S::set_vfoB (long freq)
-{
-	B.freq = freq;
-	cmd = "FB00000000000;";
-	for (int i = 12; i > 1; i--) {
-		cmd[i] += freq % 10;
-		freq /= 10;
-	}
-	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "set vfo B", cmd, "");
-}
-
-int RIG_TS590S::get_smeter()
-{
-	int mtr = 0;
-	cmd = "SM0;";
-	if (wait_char(';', 8, 100, "get", ASC) < 8) return 0;
-
-	size_t p = replystr.find("SM0");
-	if (p == string::npos) return 0;
-
-	replystr[p + 7] = 0;
-	mtr = atoi(&replystr[p + 3]);
-	mtr *= 50;
-	mtr /= 15;
-	if (mtr > 100) mtr = 100;
-	return mtr;
-}
-
 int RIG_TS590S::get_power_out()
 {
 	int mtr = 0;
@@ -443,60 +290,6 @@ int RIG_TS590S::get_power_out()
 	if (mtr > 100) mtr = 100;
 
 	return mtr;
-}
-
-static bool read_alc = false;
-static int alc_val = 0;
-
-int RIG_TS590S::get_swr(void)
-{
-	int mtr = 0;
-
-	read_alc = false;
-
-	cmd = "RM;";
-	if (wait_char(';', 8, 100, "get swr/alc", ASC) < 8) return 0;
-
-	size_t p = replystr.find("RM3");
-	if (p != string::npos) {
-		replystr[p + 7] = 0;
-		alc_val = atoi(&replystr[p + 3]);
-		alc_val *= 100;
-		alc_val /= 15;
-		if (alc_val > 100) alc_val = 100;
-		read_alc = true;
-	}
-
-	p = replystr.find("RM1");
-	if (p == string::npos) return 0;
-
-	replystr[p + 7] = 0;
-	mtr = atoi(&replystr[p + 3]);
-	mtr *= 50;
-	mtr /= 15;
-	if (mtr > 100) mtr = 100;
-
-	return mtr;
-}
-
-int RIG_TS590S::get_alc(void)
-{
-	if (read_alc) {
-		read_alc = false;
-		return alc_val;
-	}
-	cmd = "RM;";
-	if (wait_char(';', 8, 100, "get alc", ASC) < 8) return 0;
-
-	size_t p = replystr.find("RM3");
-	if (p == string::npos) return 0;
-
-	replystr[p + 7] = 0;
-	alc_val = atoi(&replystr[p + 3]);
-	alc_val *= 100;
-	alc_val /= 15;
-	if (alc_val > 100) alc_val = 100;
-	return alc_val;
 }
 
 // Transceiver power level
@@ -522,37 +315,6 @@ int RIG_TS590S::get_power_control()
 	replystr[p + 5] = 0;
 	mtr = atoi(&replystr[p + 2]);
 	return mtr;
-}
-
-// Volume control return 0 ... 100
-int RIG_TS590S::get_volume_control()
-{
-	cmd = "AG0;";
-	if (wait_char(';', 7, 100, "get vol ctrl", ASC) < 7) return 0;
-
-	size_t p = replystr.rfind("AG");
-	if (p == string::npos) return 0;
-
-	replystr[p + 6] = 0;
-	int val = atoi(&replystr[p + 3]);
-	return (int)(val / 2.55);
-}
-
-void RIG_TS590S::set_volume_control(int val) 
-{
-	int ivol = (int)(val * 2.55);
-	cmd = "AG0000;";
-	for (int i = 5; i > 2; i--) {
-		cmd[i] += ivol % 10;
-		ivol /= 10;
-	}
-	sendCommand(cmd, 0);
-}
-
-void RIG_TS590S::tune_rig()
-{
-	cmd = "AC111;";
-	sendCommand(cmd, 0);
 }
 
 void RIG_TS590S::set_attenuator(int val)
@@ -1101,55 +863,6 @@ int RIG_TS590S::get_modetype(int n)
 	return TS590S_mode_type[n];
 }
 
-// val 0 .. 100
-void RIG_TS590S::set_mic_gain(int val)
-{
-	cmd = "MG000;";
-	for (int i = 3; i > 0; i--) {
-		cmd[1+i] += val % 10;
-		val /= 10;
-	}
-	sendCommand(cmd, 0);
-}
-
-int RIG_TS590S::get_mic_gain()
-{
-	int val = 0;
-	cmd = "MG;";
-	if (wait_char(';', 6, 100, "get mic ctrl", ASC) >= 6) {
-		size_t p = replystr.rfind("MG");
-		if (p == string::npos) return val;
-		replystr[p + 5] = 0;
-		val = atoi(&replystr[p + 2]);
-	}
-	return val;
-}
-
-void RIG_TS590S::get_mic_min_max_step(int &min, int &max, int &step)
-{
-	min = 0;
-	max = 100;
-	step = 1;
-}
-
-void RIG_TS590S::set_noise(bool val)
-{
-	if (nb_level == 0) {
-		nb_level = 1;
-		nb_label("NB 1", true);
-	} else if (nb_level == 1) {
-		nb_level = 2;
-		nb_label("NB 2", true);
-	} else if (nb_level == 2) {
-		nb_level = 0;
-		nb_label("NB", false);
-	}
-	cmd = "NB0;";
-	cmd[2] += nb_level;
-	LOG_INFO("%s", cmd.c_str());
-	sendCommand(cmd, 0);
-}
-
 //======================================================================
 // IF shift command only available if the transceiver is in the CW mode
 // step size is 50 Hz
@@ -1188,67 +901,6 @@ void RIG_TS590S::get_if_min_max_step(int &min, int &max, int &step)
 	if_shift_max = max = 1000;
 	if_shift_step = step = 50;
 	if_shift_mid = 800;
-}
-
-void RIG_TS590S::set_squelch(int val)
-{
-	cmd = "SQ0";
-	cmd.append(to_decimal(abs(val),3)).append(";");
-	sendCommand(cmd,0);
-	showresp(WARN, ASC, "set squelch", cmd, "");
-}
-
-int  RIG_TS590S::get_squelch()
-{
-	int val = 0;
-	cmd = "SQ0;";
-	if (wait_char(';', 7, 100, "get squelch", ASC) >= 7) {
-		size_t p = replystr.rfind("SQ0");
-		if (p == string::npos) return val;
-		replystr[p + 6] = 0;
-		val = atoi(&replystr[p + 3]);
-	}
-	return val;
-}
-
-void RIG_TS590S::get_squelch_min_max_step(int &min, int &max, int &step)
-{
-	min = 0; max = 255; step = 1;
-}
-
-void RIG_TS590S::set_rf_gain(int val)
-{
-	cmd = "RG000;";
-	int rfval = 255 - val;
-	for (int i = 4; i > 1; i--) {
-		cmd[i] = rfval % 10 + '0';
-		rfval /= 10;
-	}
-	sendCommand(cmd);
-	showresp(WARN, ASC, "SET rfgain", cmd, "");
-}
-
-int  RIG_TS590S::get_rf_gain()
-{
-	int rfval = 0;
-	cmd = rsp = "RG";
-	cmd += ';';
-	if (wait_char(';', 6, 100, "get rfgain", ASC) == 6) {
-		size_t p = replystr.rfind(rsp);
-		if (p == string::npos) return progStatus.rfgain;
-		for (int i = 2; i < 5; i++) {
-			rfval *= 10;
-			rfval += replystr[p+i] - '0';
-		}
-	}
-	return 255 - rfval;
-}
-
-void RIG_TS590S::get_rf_min_max_step(int &min, int &max, int &step)
-{
-	min = 0;
-	max = 255;
-	step = 1;
 }
 
 void RIG_TS590S::set_noise_reduction(int val)
@@ -1382,6 +1034,104 @@ void RIG_TS590S::get_notch_min_max_step(int &min, int &max, int &step)
 	step = 20;
 }
 
+void RIG_TS590S::set_noise(bool val)
+{
+	if (nb_level == 0) {
+		nb_level = 1;
+		nb_label("NB 1", true);
+	} else if (nb_level == 1) {
+		nb_level = 2;
+		nb_label("NB 2", true);
+	} else if (nb_level == 2) {
+		nb_level = 0;
+		nb_label("NB", false);
+	}
+	cmd = "NB0;";
+	cmd[2] += nb_level;
+	LOG_INFO("%s", cmd.c_str());
+	sendCommand(cmd, 0);
+}
+
+int RIG_TS590S::get_noise()
+{
+	cmd = "NB;";
+	if (wait_char(';', 4, 100, "get Noise Blanker", ASC) == 4) {
+		size_t p = replystr.rfind("NB");
+		if (p == string::npos) return 0;
+		if (replystr[p+2] == '0') return 0;
+		nb_level = replystr[p+2] - '0';
+		if (nb_level == 0) {
+			nb_label("NB", false);
+		} else if (nb_level == 1) {
+			nb_label("NB 1", true);
+		} else if (nb_level == 2) {
+			nb_label("NB 2", true);
+		}
+	}
+	return nb_level;
+}
+
+int RIG_TS590S::get_smeter()
+{
+	int mtr = 0;
+	cmd = "SM0;";
+	if (wait_char(';', 8, 100, "get", ASC) < 8) return 0;
+
+	size_t p = replystr.find("SM0");
+	if (p == string::npos) return 0;
+
+	replystr[p + 7] = 0;
+	mtr = atoi(&replystr[p + 3]);
+	mtr *= 50;
+	mtr /= 15;
+	if (mtr > 100) mtr = 100;
+	return mtr;
+}
+
+void RIG_TS590S::set_rf_gain(int val)
+{
+	cmd = "RG000;";
+	int rfval = 255 - val;
+	for (int i = 4; i > 1; i--) {
+		cmd[i] = rfval % 10 + '0';
+		rfval /= 10;
+	}
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET rfgain", cmd, "");
+}
+
+int  RIG_TS590S::get_rf_gain()
+{
+	int rfval = 0;
+	cmd = rsp = "RG";
+	cmd += ';';
+	if (wait_char(';', 6, 100, "get rfgain", ASC) == 6) {
+		size_t p = replystr.rfind(rsp);
+		if (p == string::npos) return progStatus.rfgain;
+		for (int i = 2; i < 5; i++) {
+			rfval *= 10;
+			rfval += replystr[p+i] - '0';
+		}
+	}
+	return 255 - rfval;
+}
+
+void RIG_TS590S::get_rf_min_max_step(int &min, int &max, int &step)
+{
+	min = 0;
+	max = 255;
+	step = 1;
+}
+
+int RIG_TS590S::get_PTT()
+{
+	cmd = "IF;";
+	int ret = wait_char(';', 38, 100, "get VFO", ASC);
+	if (ret < 38) return ptt_;
+	ptt_ = (replybuff[28] == '1');
+	return ptt_;
+}
+
 // Tranceiver PTT on/off
 void RIG_TS590S::set_PTT_control(int val)
 {
@@ -1396,37 +1146,282 @@ void RIG_TS590S::set_PTT_control(int val)
 }
 
 /*
-========================================================================
-	frequency & mode data are contained in the IF; response
-		IFaaaaaaaaaaaXXXXXbbbbbcdXeefghjklmmX;
-		12345678901234567890123456789012345678
-		01234567890123456789012345678901234567 byte #
-		          1         2         3
-		                            ^ position 28
-		where:
-			aaaaaaaaaaa => decimal value of vfo frequency
-			bbbbb => rit/xit frequency
-			c => rit off/on
-			d => xit off/on
-			e => memory channel
-			f => tx/rx
-			g => mode
-			h => function
-			j => scan off/on
-			k => split off /on
-			l => tone off /on
-			m => tone number
-			X => unused characters
-		 
-========================================================================
-*/ 
-
-int RIG_TS590S::get_PTT()
+void RIG_TS590S::selectA()
 {
-	cmd = "IF;";
-	int ret = wait_char(';', 38, 100, "get VFO", ASC);
-	if (ret < 38) return ptt_;
-	ptt_ = (replybuff[28] == '1');
-	return ptt_;
+	cmd = "FR0;";
+	sendCommand(cmd, 0);
+	showresp(WARN, ASC, "Rx A", cmd, "");
+	cmd = "FT0;";
+	sendCommand(cmd, 0);
+	showresp(WARN, ASC, "Tx A", cmd, "");
+	rxtxa = true;
 }
 
+void RIG_TS590S::selectB()
+{
+	cmd = "FR1;";
+	sendCommand(cmd, 0);
+	showresp(WARN, ASC, "Rx B", cmd, "");
+	cmd = "FT1;";
+	sendCommand(cmd, 0);
+	showresp(WARN, ASC, "Tx B", cmd, "");
+	rxtxa = false;
+}
+
+void RIG_TS590S::set_split(bool val) 
+{
+	split = val;
+	if (useB) {
+		if (val) {
+			cmd = "FR1;FT0;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on B, Tx on A", cmd, "");
+		} else {
+			cmd = "FR1;FT1;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on B, Tx on B", cmd, "");
+		}
+	} else {
+		if (val) {
+			cmd = "FR0;FT1;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on A, Tx on B", cmd, "");
+		} else {
+			cmd = "FR0;FT0;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on A, Tx on A", cmd, "");
+		}
+	}
+}
+
+int RIG_TS590S::get_split()
+{
+	size_t p;
+	int split = 0;
+	char rx = 0, tx = 0;
+// tx vfo
+	cmd = rsp = "FT";
+	cmd.append(";");
+	if (wait_char(';', 4, 100, "get split tx vfo", ASC) == 4) {
+		p = replystr.rfind(rsp);
+		if (p == string::npos) return split;
+		tx = replystr[p+2];
+	}
+// rx vfo
+	cmd = rsp = "FR";
+	cmd.append(";");
+	if (wait_char(';', 4, 100, "get split rx vfo", ASC) == 4) {
+		p = replystr.rfind(rsp);
+		if (p == string::npos) return split;
+		rx = replystr[p+2];
+// split test
+		split = (tx == '1' ? 2 : 0) + (rx == '1' ? 1 : 0);
+	}
+
+	return split;
+}
+
+long RIG_TS590S::get_vfoA ()
+{
+	cmd = "FA;";
+	if (wait_char(';', 14, 100, "get vfoA", ASC) < 14) return A.freq;
+
+	size_t p = replystr.rfind("FA");
+	if (p == string::npos) return A.freq;
+
+	long f = 0L;
+	long mul = 1L;
+	for (size_t n = 12; n > 1; n--) {
+		f += (replystr[p + n] - '0') * mul;
+		mul *= 10;
+	}
+	A.freq = f;
+	return A.freq;
+}
+
+void RIG_TS590S::set_vfoA (long freq)
+{
+	A.freq = freq;
+	cmd = "FA00000000000;";
+	for (int i = 12; i > 1; i--) {
+		cmd[i] += freq % 10;
+		freq /= 10;
+	}
+	sendCommand(cmd, 0);
+	showresp(WARN, ASC, "set vfo A", cmd, "");
+}
+
+long RIG_TS590S::get_vfoB ()
+{
+	cmd = "FB;";
+	if (wait_char(';', 14, 100, "get vfoB", ASC) < 14) return B.freq;
+
+	size_t p = replystr.rfind("FB");
+	if (p == string::npos) return B.freq;
+
+	long f = 0L;
+	long mul = 1L;
+	for (size_t n = 12; n > 1; n--) {
+		f += (replystr[p + n] - '0') * mul;
+		mul *= 10;
+	}
+	B.freq = f;
+
+	return B.freq;
+}
+
+void RIG_TS590S::set_vfoB (long freq)
+{
+	B.freq = freq;
+	cmd = "FB00000000000;";
+	for (int i = 12; i > 1; i--) {
+		cmd[i] += freq % 10;
+		freq /= 10;
+	}
+	sendCommand(cmd, 0);
+	showresp(WARN, ASC, "set vfo B", cmd, "");
+}
+
+// Volume control return 0 ... 100
+int RIG_TS590S::get_volume_control()
+{
+	cmd = "AG0;";
+	if (wait_char(';', 7, 100, "get vol ctrl", ASC) < 7) return 0;
+
+	size_t p = replystr.rfind("AG");
+	if (p == string::npos) return 0;
+
+	replystr[p + 6] = 0;
+	int val = atoi(&replystr[p + 3]);
+	return (int)(val / 2.55);
+}
+
+void RIG_TS590S::set_volume_control(int val) 
+{
+	int ivol = (int)(val * 2.55);
+	cmd = "AG0000;";
+	for (int i = 5; i > 2; i--) {
+		cmd[i] += ivol % 10;
+		ivol /= 10;
+	}
+	sendCommand(cmd, 0);
+}
+
+void RIG_TS590S::tune_rig()
+{
+	cmd = "AC111;";
+	sendCommand(cmd, 0);
+}
+
+static bool read_alc = false;
+static int alc_val = 0;
+
+int RIG_TS590S::get_swr(void)
+{
+	int mtr = 0;
+
+	read_alc = false;
+
+	cmd = "RM;";
+	if (wait_char(';', 8, 100, "get swr/alc", ASC) < 8) return 0;
+
+	size_t p = replystr.find("RM3");
+	if (p != string::npos) {
+		replystr[p + 7] = 0;
+		alc_val = atoi(&replystr[p + 3]);
+		alc_val *= 100;
+		alc_val /= 15;
+		if (alc_val > 100) alc_val = 100;
+		read_alc = true;
+	}
+
+	p = replystr.find("RM1");
+	if (p == string::npos) return 0;
+
+	replystr[p + 7] = 0;
+	mtr = atoi(&replystr[p + 3]);
+	mtr *= 50;
+	mtr /= 15;
+	if (mtr > 100) mtr = 100;
+
+	return mtr;
+}
+
+int RIG_TS590S::get_alc(void)
+{
+	if (read_alc) {
+		read_alc = false;
+		return alc_val;
+	}
+	cmd = "RM;";
+	if (wait_char(';', 8, 100, "get alc", ASC) < 8) return 0;
+
+	size_t p = replystr.find("RM3");
+	if (p == string::npos) return 0;
+
+	replystr[p + 7] = 0;
+	alc_val = atoi(&replystr[p + 3]);
+	alc_val *= 100;
+	alc_val /= 15;
+	if (alc_val > 100) alc_val = 100;
+	return alc_val;
+}
+
+// val 0 .. 100
+void RIG_TS590S::set_mic_gain(int val)
+{
+	cmd = "MG000;";
+	for (int i = 3; i > 0; i--) {
+		cmd[1+i] += val % 10;
+		val /= 10;
+	}
+	sendCommand(cmd, 0);
+}
+
+int RIG_TS590S::get_mic_gain()
+{
+	int val = 0;
+	cmd = "MG;";
+	if (wait_char(';', 6, 100, "get mic ctrl", ASC) >= 6) {
+		size_t p = replystr.rfind("MG");
+		if (p == string::npos) return val;
+		replystr[p + 5] = 0;
+		val = atoi(&replystr[p + 2]);
+	}
+	return val;
+}
+
+void RIG_TS590S::get_mic_min_max_step(int &min, int &max, int &step)
+{
+	min = 0;
+	max = 100;
+	step = 1;
+}
+
+void RIG_TS590S::set_squelch(int val)
+{
+	cmd = "SQ0";
+	cmd.append(to_decimal(abs(val),3)).append(";");
+	sendCommand(cmd,0);
+	showresp(WARN, ASC, "set squelch", cmd, "");
+}
+
+int  RIG_TS590S::get_squelch()
+{
+	int val = 0;
+	cmd = "SQ0;";
+	if (wait_char(';', 7, 100, "get squelch", ASC) >= 7) {
+		size_t p = replystr.rfind("SQ0");
+		if (p == string::npos) return val;
+		replystr[p + 6] = 0;
+		val = atoi(&replystr[p + 3]);
+	}
+	return val;
+}
+
+void RIG_TS590S::get_squelch_min_max_step(int &min, int &max, int &step)
+{
+	min = 0; max = 255; step = 1;
+}
+
+*/

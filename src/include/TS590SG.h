@@ -21,31 +21,32 @@
 #ifndef _TS590SG_H
 #define _TS590SG_H
 
-#include "rigbase.h"
+#include "KENWOOD.h"
 
-class RIG_TS590SG : public rigbase {
-private:
-	bool notch_on;
-	int  preamp_level;
-	int  att_level;
-	int  nb_level;
-	int  noise_reduction_level;
-	bool data_mode;
-	int  active_mode;
-	int  active_bandwidth;
-	bool rxtxa;
+class RIG_TS590SG : public KENWOOD {
 public:
 enum TS590MODES { LSB, USB, CW, FM, AM, FSK, CWR, FSKR, LSBD, USBD, FMD };
 	RIG_TS590SG();
 	~RIG_TS590SG(){}
-	
+
 	void initialize();
 	void shutdown();
 
-	long get_vfoA();
-	void set_vfoA(long);
-	long get_vfoB();
-	void set_vfoB(long);
+//	long get_vfoA();
+//	void set_vfoA(long);
+//	long get_vfoB();
+//	void set_vfoB(long);
+
+//	void selectA();
+//	void selectB();
+
+//	bool can_split() { return true;}
+//	void set_split(bool val);
+//	int  get_split();
+//	bool twovfos() {return true;}
+
+	void set_PTT_control(int val);
+	int  get_PTT();
 
 	int  get_modetype(int n);
 	void set_modeA(int val);
@@ -63,26 +64,17 @@ enum TS590MODES { LSB, USB, CW, FM, AM, FSK, CWR, FSKR, LSBD, USBD, FMD };
 	void set_bwB(int val);
 	int  get_bwB();
 
-	void selectA();
-	void selectB();
-
-	bool can_split() { return true;}
-	void set_split(bool val);
-	int  get_split();
-	bool twovfos() {return true;}
-
 	int  get_smeter();
-	int  get_swr();
-	int  get_alc();
+//	int  get_swr();
+//	int  get_alc();
 	int  get_power_out();
 	int  get_power_control();
-	void set_volume_control(int val);
-	int  get_volume_control();
-	void set_power_control(double val);
-	void set_PTT_control(int val);
-	int  get_PTT();
 
-	void tune_rig();
+//	void set_volume_control(int val);
+//	int  get_volume_control();
+	void set_power_control(double val);
+
+//	void tune_rig();
 	void set_attenuator(int val);
 	int  get_attenuator();
 	void set_preamp(int val);
@@ -93,13 +85,15 @@ enum TS590MODES { LSB, USB, CW, FM, AM, FSK, CWR, FSKR, LSBD, USBD, FMD };
 	void get_if_min_max_step(int &min, int &max, int &step);
 
 	void set_noise(bool b);
-	void set_mic_gain(int val);
-	int  get_mic_gain();
-	void get_mic_min_max_step(int &min, int &max, int &step);
+	int  get_noise();
 
-	void set_squelch(int val);
-	int  get_squelch();
-	void get_squelch_min_max_step(int &min, int &max, int &step);
+//	void set_mic_gain(int val);
+//	int  get_mic_gain();
+//	void get_mic_min_max_step(int &min, int &max, int &step);
+
+//	void set_squelch(int val);
+//	int  get_squelch();
+//	void get_squelch_min_max_step(int &min, int &max, int &step);
 
 	void set_rf_gain(int val);
 	int  get_rf_gain();
@@ -119,7 +113,7 @@ enum TS590MODES { LSB, USB, CW, FM, AM, FSK, CWR, FSKR, LSBD, USBD, FMD };
 	void set_auto_notch(int v);
 	int  get_auto_notch();
 
-	bool sendTScommand(string, int, bool);
+//	bool sendTScommand(string, int, bool);
 
 	const char **bwtable(int);
 	const char **lotable(int);

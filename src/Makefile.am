@@ -172,6 +172,7 @@ flrig_SOURCES += \
 	rigs/IC7851.cxx \
 	rigs/IC9100.cxx \
 	rigs/IC7700.cxx \
+	rigs/KENWOOD.cxx \
 	rigs/K2.cxx \
 	rigs/K3.cxx \
 	rigs/KX3.cxx \
@@ -243,6 +244,7 @@ EXTRA_DIST = \
 	include/flrigrc.h \
 	include/flinput2.h \
 	include/icons.h \
+	include/KENWOOD.h \
 	include/pixmaps.h \
 	include/flslider2.h \
 	include/Fl_SigBar.h \
