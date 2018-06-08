@@ -30,7 +30,7 @@ private:
 	int afreq, amode, aBW;
 	int bfreq, bmode, bBW;
 
-bool notch_on;
+	bool notch_on;
 //int  m_60m_indx;
 
 public:

@@ -38,6 +38,36 @@ static const char *FT1000widths_[] = {
 
 static int FT1000_bw_vals[] = {0,1,2,3,4,WVALS_LIMIT};
 
+//static const char *FT1000_US_60m[] = {NULL, "126", "127", "128", "130", NULL};
+//static const char **Channels_60m = FT1000_US_60m;
+
+static GUI rig_widgets[]= {
+	{ (Fl_Widget *)btnVol,        2, 125,  50 },
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },
+	{ (Fl_Widget *)btnIFsh,     214, 105,  50 },
+	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
+	{ (Fl_Widget *)btnNotch,    214, 125,  50 },
+	{ (Fl_Widget *)sldrNOTCH,   266, 125, 156 },
+	{ (Fl_Widget *)sldrMICGAIN, 266, 145, 156 },
+	{ (Fl_Widget *)sldrPOWER,   266, 165, 156 },
+	{ (Fl_Widget *)btnNR,         2, 165,  50 },
+	{ (Fl_Widget *)sldrNR,       54, 165, 156 },
+	{ (Fl_Widget *)NULL,          0,   0,   0 }
+};
+
+void RIG_FT1000::initialize()
+{
+	//return
+	rig_widgets[0].W = btnVol;
+	rig_widgets[1].W = sldrVOLUME;
+	rig_widgets[2].W = btnIFsh;
+	rig_widgets[3].W = sldrIFSHIFT;
+	rig_widgets[4].W = btnNotch;
+	rig_widgets[5].W = sldrNOTCH;
+	rig_widgets[6].W = sldrMICGAIN;
+	rig_widgets[7].W = sldrPOWER;
+}
 
 RIG_FT1000::RIG_FT1000() {
 	name_ = FT1000name_;
@@ -62,9 +92,10 @@ RIG_FT1000::RIG_FT1000() {
 	//amode = bmode = A.imode = B.imode = 1;
 	aBW = bBW = A.iBW = B.iBW = 0;
 
-	precision = 10;
-	ndigits = 7;
-	max_power = 200;
+	widgets = rig_widgets;
+//	m_60m_indx = 0;
+	has_band_selection =
+	has_extras =
 
 	has_split_AB = true;
 	has_get_info = true;
@@ -74,6 +105,10 @@ RIG_FT1000::RIG_FT1000() {
 	has_bandwidth_control = true;
 	has_ptt_control = true;
 	has_tune_control = true;
+
+	precision = 10;
+	ndigits = 7;
+	max_power = 200;
 }
 
 
@@ -94,14 +129,20 @@ void RIG_FT1000::init_cmd()
 	cmd = "00000";
 	for (size_t i = 0; i < 5; i++) cmd[i] = 0;
 	replystr.clear();
-
 }
 
 
-void RIG_FT1000::initialize()
-{
-	//return
-}
+// void RIG_FT1000::post_initialize()
+// {
+// 	enable_bandselect_btn(12, false);
+// 	enable_bandselect_btn(13, true);
+// }
+
+
+//void RIG_FT1000::set_band_selection(int v)
+//{
+//int inc_60m = false;
+//}
 
 
 bool RIG_FT1000::get_info()
@@ -110,9 +151,7 @@ bool RIG_FT1000::get_info()
 	unsigned char *d = 0;
 	int alt = 0;
 	int md = 0;
-	int i = 0;
 
-//	bool memmode = false;
 	init_cmd();
 	cmd[3] = 0x00;
 	cmd[4] = 0xFA;
@@ -120,7 +159,6 @@ bool RIG_FT1000::get_info()
 
 	if (ret >= 5) {
 		size_t p = ret - 5;
-//		memmode = ((replystr[p+1] & 0x10) == 0x10); // Memory Tune Activated
 		split = ((replystr[p] & 0x01) == 0x01); // SPLIT is ON or OFF receive operation
 	}
 
@@ -131,39 +169,35 @@ bool RIG_FT1000::get_info()
 	d = (unsigned char *)replybuff;
 	if (ret >= 32) {
 		if (ret > 32) d += (ret - 32);
+
 		// vfo A data string
 		A.freq = ((((d[1]<<8) + d[2])<<8) + d[3]) *10;
 		md = d[7] & 0x07;
 		alt = d[8] & 0x80;
 
-			switch (md) {
-			case 0 : A.imode = 0;
-			break; // LSB
-			case 1 : A.imode = 1;
-			break; // USB
-			case 2 : A.imode = 2;
-			break; // CW
-			case 3 : A.imode = 4;
-			break; // AM
-			case 4 : A.imode = 6;
-			break; // FM
-			case 5 : A.imode = 8;
-			break; // RTTY
-			case 6 : A.imode = 10;
-			break; // PKT
-			}
+		switch (md) {
+			case 0 : A.imode = 0; break; // LSB
+			case 1 : A.imode = 1; break; // USB
+			case 2 : A.imode = 2; break; // CW
+			case 3 : A.imode = 4; break; // AM
+			case 4 : A.imode = 6; break; // FM
+			case 5 : A.imode = 8; break; // RTTY
+			case 6 : A.imode = 10; break; // PKT
+			default: A.imode = 1;
+		}
 
 		A.imode = A.imode + ((alt == 128) ? 1 : 0);
 		A.iBW = 5*((d[8] & 0x70) >> 4) + (d[8] & 0x07);
 
 		if (A.iBW > 4) A.iBW = 4;
-		if ((A.imode == 2) && (A.iBW == 2)) { A.imode = 3; }
+		if (A.imode == 2 && A.iBW == 2) { A.imode = 3; }
 
-		if ((A.imode == 4) && (A.iBW == 4)) {A.imode = 5; A.iBW  = 0; }
-		if ((A.imode == 4) && (A.iBW == 0)) {A.imode = 4; A.iBW = 4; }
+		if (A.imode == 4 && A.iBW == 4) {A.imode = 5; A.iBW  = 0; }
+		if (A.imode == 4 && A.iBW == 0) {A.imode = 4; A.iBW = 4; }
 
-	    if ((A.imode == 6) && (A.iBW == 0)) {A.iBW  = 4; }
-	    if ((A.imode == 11) && (A.iBW == 0)) {A.iBW  = 4; }
+		if (A.imode == 6 && A.iBW == 0) {A.iBW  = 4; }
+		if (A.imode == 11 && A.iBW == 0) {A.iBW  = 4; }
+
 
 		d += 16; // vfo B data string
 		B.freq = ((((d[1]<<8) + d[2])<<8) + d[3]) *10;
@@ -178,19 +212,21 @@ bool RIG_FT1000::get_info()
 			case 4 : B.imode = 6; break; // FM
 			case 5 : B.imode = 8; break; // RTTY
 			case 6 : B.imode = 10; break; // PKT
-			default : B.imode = 1; break;
-			}
+			default : B.imode = 1;
+		}
 
-		B.imode = i + ((alt == 128) ? 1 : 0);
+		B.imode = B.imode + ((alt == 128) ? 1 : 0);
 		B.iBW = 5*((d[8] & 0x70) >> 4) + (d[8] & 0x07);
 
-		if (B.iBW > 4) B.iBW = 4;
-		if (B.iBW > 4) B.iBW = 4;
-		if ((B.imode == 2) && (B.iBW == 2)) { B.imode = 3; }
-		if ((B.imode == 4) && (B.iBW == 4)) {B.imode = 5; B.iBW  = 0; }
-		if ((B.imode == 4) && (B.iBW == 0)) {B.imode = 4; B.iBW = 4; }
-		if ((B.imode == 6) && (B.iBW == 0)) { B.iBW  = 4; }
-		if ((B.imode == 11) && (B.iBW == 0)) { B.iBW  = 4; }
+		if (B.iBW >= 4) B.iBW = 4;
+
+		if (B.imode == 2 && B.iBW == 2) B.imode = 3;
+
+		if (B.imode == 4 && B.iBW == 4) {B.imode = 5; B.iBW  = 0; }
+		if (B.imode == 4 && B.iBW == 0) {B.imode = 4; B.iBW = 4; }
+
+		if (B.imode == 6 && B.iBW == 0) { B.iBW  = 4; }
+		if (B.imode == 11 && B.iBW == 0) { B.iBW  = 4; }
 
 		return true;
 	}
@@ -218,6 +254,7 @@ int RIG_FT1000::get_bwA()
 
 void RIG_FT1000::set_vfoA (long freq)
 {
+
 	A.freq = freq;
 	freq /=10; //
 	cmd = to_bcd_be(freq, 8);
@@ -236,22 +273,27 @@ void RIG_FT1000::set_modeA(int val)
 	cmd[4] = 0x0C;
 	sendCommand(cmd);
 	showresp(WARN, HEX, "set mode A", cmd, replystr);
-	MilliSleep(50);
-
-
+	MilliSleep(25);
 
 }
 
+
 void RIG_FT1000::set_bwA (int val)
 {
-	if (A.imode == 5) {val = 4;}
+	//if (A.imode == 5) {val = 4;}
+
+	if (A.imode == 2) return;
+	if (A.imode == 3) return;
+	if (A.imode == 4) return;
+	if (A.imode == 5) return;
+
 	A.iBW = val;
 	init_cmd();
 	cmd[3] = FT1000_bw_vals[val];
 	cmd[4] = 0x8C;
 	sendCommand(cmd);
 	showresp(WARN, HEX, "set BW A", cmd, replystr);
-	MilliSleep(50);
+	//MilliSleep(25);
 }
 
 
@@ -292,54 +334,63 @@ void RIG_FT1000::set_modeB(int val)
 	cmd[3] = FT1000_mode_val[val] + 0x80;
 	cmd[4] = 0x0C;
 	sendCommand(cmd);
-	MilliSleep(50);
+	MilliSleep(25);
 	showresp(WARN, HEX, "set mode B", cmd, replystr);
-	
+
 }
 
 
 void RIG_FT1000::set_bwB(int val)
 {
-	if (B.imode == 5) {val = 4;}
+	if (B.imode == 2) return;
+	if (B.imode == 3) return;
+	if (B.imode == 4) return;
+	if (B.imode == 5) return;
+
 	B.iBW = val;
 	init_cmd();
 	cmd[3] = FT1000_bw_vals[val] + 0x80;
 	cmd[4] = 0x8C;
 	sendCommand(cmd);
+	//MilliSleep(50);
 	showresp(WARN, HEX, "set bw B", cmd, replystr);
-	MilliSleep(50);
+
 }
+
 
 void RIG_FT1000::selectA()
 {
-  init_cmd();
- 	cmd[3] = 0x00;
- 	cmd[4] = 0x05;
- 	sendCommand(cmd);
- 	showresp(WARN, HEX, "select A", cmd, replystr);
+	init_cmd();
+	cmd[3] = 0x00;
+	cmd[4] = 0x05;
+	sendCommand(cmd);
+	showresp(WARN, HEX, "select A", cmd, replystr);
 }
+
 
 void RIG_FT1000::selectB()
 {
- 	init_cmd();
- 	cmd[3] = 0x01;
- 	cmd[4] = 0x05;
- 	sendCommand(cmd);
- 	showresp(WARN, HEX, "select B", cmd, replystr);
+	init_cmd();
+	cmd[3] = 0x01;
+	cmd[4] = 0x05;
+	sendCommand(cmd);
+	showresp(WARN, HEX, "select B", cmd, replystr);
 }
 
-void RIG_FT1000::swapAB() 
+void RIG_FT1000::swapAB()
 {
 	init_cmd();
-	cmd[4] = 0x85;
+	cmd[3] = 0x01;
+	cmd[4] = 0x05;
+	//cmd[4] = 0x85;
 	sendCommand(cmd);
 	showresp(WARN, HEX, "copy active vfo to background vfo", cmd, replystr);
-	MilliSleep(50);
+	MilliSleep(25);
+
 }
 
 
 void RIG_FT1000::set_split(bool val)
-
 {
 	split = val;
 	init_cmd();
@@ -351,6 +402,7 @@ void RIG_FT1000::set_split(bool val)
 	else
 		showresp(WARN, HEX, "set split OFF", cmd, replystr);
 }
+
 
 int RIG_FT1000::get_split()
 {
@@ -368,7 +420,6 @@ void RIG_FT1000::set_PTT_control(int val)
 		showresp(WARN, HEX, "set PTT ON", cmd, replystr);
 	else
 		showresp(WARN, HEX, "set PTT OFF", cmd, replystr);
-	ptt_ = val;
 }
 
 
@@ -403,8 +454,7 @@ int RIG_FT1000::get_smeter()
 
 int RIG_FT1000::get_power_out()
 {
-
-float pwr;
+	float pwr;
 
 	init_cmd();
 	cmd[4] = 0xF7;
