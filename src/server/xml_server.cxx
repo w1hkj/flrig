@@ -42,9 +42,9 @@
 
 #include "support.h"
 #include "debug.h"
+#include "trace.h"
 
 #include "xml_server.h"
-
 #include "XmlRpc.h"
 
 using namespace XmlRpc;
@@ -55,33 +55,6 @@ using namespace XmlRpc;
 XmlRpcServer rig_server;
 
 extern bool xcvr_initialized;
-
-//------------------------------------------------------------------------------
-// xmlrpc xml_trace
-//------------------------------------------------------------------------------
-void xml_trace(int n, ...) // all args of type const char *
-{
-	if (XML_DEBUG == 0) return;
-
-	if (!n) return;
-	stringstream s;
-	va_list vl;
-	va_start(vl, n);
-	s << ztime() << " : " << va_arg(vl, const char *);
-	for (int i = 1; i < n; i++)
-		s << " " << va_arg(vl, const char *);
-	va_end(vl);
-	s << "\n";
-
-std::cout << s.str(); std::cout.flush();
-
-	string xml_trace_fname = RigHomeDir;
-	xml_trace_fname.append("trace.txt");
-	ofstream xml_tracefile(xml_trace_fname.c_str(), ios::app);
-	if (xml_tracefile)
-		xml_tracefile << s.str();
-	xml_tracefile.close();
-}
 
 //------------------------------------------------------------------------------
 // Request for transceiver name
@@ -301,10 +274,15 @@ public:
 		wait();
 		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_vfo");
 
-		if (useB)
-			freq = vfoB.freq;
-		else
-			freq = vfoA.freq;
+		if (selrig->ICOMmainsub) {
+			if (progStatus.split && PTT) freq = vfoB.freq;
+			else freq = vfoA.freq;
+		} else {
+			if (useB)
+				freq = vfoB.freq;
+			else
+				freq = vfoA.freq;
+		}
 
 		snprintf(szfreq, sizeof(szfreq), "%d", freq);
 		std::string result_string = szfreq;
@@ -543,7 +521,7 @@ public:
 
 		std::string result_string = "none";
 		if (selrig->modes_) result_string = selrig->modes_[mode];
-xml_trace(3, "mode on ", (useB ? "B " : "A "), result_string.c_str());
+xml_trace(2, "mode on ", (useB ? "B " : "A "), result_string.c_str());
 		result = result_string;
 
 	}
@@ -890,7 +868,7 @@ public:
 		}
 
 		if (!ptt_off()) {
-std::cout << "!ptt_off()\n";
+			trace(1, "!ptt_off()");
 			return;
 		}
 
@@ -1059,7 +1037,7 @@ public:
 } rig_set_frequency(&rig_server);
 
 //------------------------------------------------------------------------------
-// Set mode
+// Set mode on current vfo
 //------------------------------------------------------------------------------
 
 class rig_set_mode : public XmlRpcServerMethod {
@@ -1108,6 +1086,120 @@ public:
 
 } rig_set_mode(&rig_server);
 
+
+//------------------------------------------------------------------------------
+// Set mode on vfo A
+//------------------------------------------------------------------------------
+
+class rig_set_modeA : public XmlRpcServerMethod {
+public:
+	rig_set_modeA(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_modeA", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue &result) {
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
+
+		srvr_vfo = vfoA;
+
+		std::string numode = string(params[0]);
+		int i = 0;
+
+		if (!selrig->modes_) {
+			return;
+		}
+		if (numode == selrig->modes_[srvr_vfo.imode]) return;
+		while (selrig->modes_[i] != NULL) {
+			if (numode == selrig->modes_[i]) {
+				srvr_vfo.imode = i;
+
+				srvr_vfo.freq = 0;
+				srvr_vfo.iBW = 255;
+				if (selrig->can_change_alt_vfo || !useB)
+					push_xml();
+				else {
+					XCVR_STATE vfo = vfoA;
+					vfo.src = SRVR;
+					srvc_reqs.push (VFOQUEUE(sA, vfo));
+					push_xml();
+					vfo = vfoB;
+					vfo.src = SRVR;
+					srvc_reqs.push (VFOQUEUE(sB, vfo));
+				}
+				break;
+			}
+			i++;
+		}
+		int imode = -1;
+		int n = 0;
+		while (imode != srvr_vfo.imode) {
+			MilliSleep(10);
+			imode = vfoA.imode;
+			n++;
+		}
+	}
+	std::string help() { return std::string("set_mode on vfo A"); }
+
+} rig_set_modeA(&rig_server);
+
+
+//------------------------------------------------------------------------------
+// Set mode on vfo B
+//------------------------------------------------------------------------------
+
+class rig_set_modeB : public XmlRpcServerMethod {
+public:
+	rig_set_modeB(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_modeB", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue &result) {
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
+
+		srvr_vfo = vfoB;
+
+		std::string numode = string(params[0]);
+		int i = 0;
+
+		if (!selrig->modes_) {
+			return;
+		}
+		if (numode == selrig->modes_[srvr_vfo.imode]) return;
+		while (selrig->modes_[i] != NULL) {
+			if (numode == selrig->modes_[i]) {
+				srvr_vfo.imode = i;
+
+				srvr_vfo.freq = 0;
+				srvr_vfo.iBW = 255;
+
+				if (selrig->can_change_alt_vfo || useB)
+					push_xml();
+				else {
+					XCVR_STATE vfo = vfoB;
+					vfo.src = SRVR;
+					srvc_reqs.push (VFOQUEUE(sB, vfo));
+					push_xml();
+					vfo = vfoA;
+					vfo.src = SRVR;
+					srvc_reqs.push (VFOQUEUE(sA, vfo));
+				}
+				break;
+			}
+			i++;
+		}
+		int imode = -1;
+		int n = 0;
+		while (imode != srvr_vfo.imode) {
+			MilliSleep(10);
+			imode = vfoB.imode;
+			n++;
+		}
+	}
+	std::string help() { return std::string("set_mode on vfo B"); }
+
+} rig_set_modeB(&rig_server);
 
 //------------------------------------------------------------------------------
 // Set bandwidth
@@ -1233,6 +1325,8 @@ struct MLIST {
 	{ "rig.get_bws",      "s:n", "return table of BW values" },
 	{ "rig.get_info",     "s:n", "return an info string" },
 	{ "rig.get_mode",     "s:n", "return MODE of current VFO" },
+	{ "rig.get_modeA",    "s:n", "return MODE of current VFO A" },
+	{ "rig.get_modeB",    "s:n", "return MODE of current VFO B" },
 	{ "rig.get_modes",    "s:n", "return table of MODE values" },
 	{ "rig.get_sideband", "s:n", "return sideband (U/L)" },
 	{ "rig.get_notch",    "s:n", "return notch value" },
@@ -1251,6 +1345,8 @@ struct MLIST {
 	{ "rig.set_BW",       "i:i", "set L/U pair" },
 	{ "rig.set_frequency","d:d", "set current VFO in Hz" },
 	{ "rig.set_mode",     "i:i", "set MODE iaw MODE table" },
+	{ "rig.set_modeA",    "i:i", "set MODE A iaw MODE table" },
+	{ "rig.set_modeB",    "i:i", "set MODE B iaw MODE table" },
 	{ "rig.set_notch",    "d:d", "set NOTCH value in Hz" },
 	{ "rig.set_ptt",      "i:i", "set PTT 1/0 (on/off)" },
 	{ "rig.set_vfo",      "d:d", "set current VFO in Hz" },
@@ -1296,7 +1392,7 @@ void * xml_thread_loop(void *d)
 
 void start_server(int port)
 {
-	XmlRpc::setVerbosity(0);
+	XmlRpc::setVerbosity(progStatus.rpc_level);
 
 // Create the server socket on the specified port
 	rig_server.bindAndListen(port);

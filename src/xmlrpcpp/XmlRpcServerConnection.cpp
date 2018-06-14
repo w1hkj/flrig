@@ -29,9 +29,10 @@
 #include <string.h>
 #include <strings.h>
 
+#include "support.h"
+#include "trace.h"
+
 using namespace XmlRpc;
-
-
 
 // The server delegates handling client requests to a serverConnection object.
 XmlRpcServerConnection::XmlRpcServerConnection(XmlRpcSocket::Socket fd,
@@ -108,7 +109,7 @@ XmlRpcServerConnection::readHeader()
   if (bp == 0) {
     // EOF in the middle of a request is an error, otherwise its ok
     if (eof) {
-      XmlRpcUtil::log(4, "XmlRpcServerConnection::readHeader: EOF");
+      XmlRpcUtil::log(4, "readHeader: EOF");
       if (_header.length() > 0)
         XmlRpcUtil::error("XmlRpcServerConnection::readHeader: EOF while reading header");
       return false;   // Either way we close the connection
@@ -129,7 +130,7 @@ XmlRpcServerConnection::readHeader()
     return false;
   }
   	
-  XmlRpcUtil::log(3, "XmlRpcServerConnection::readHeader: specified content length is %d.", _contentLength);
+  XmlRpcUtil::log(3, "readHeader: specified content length is %d.", _contentLength);
 
   // Otherwise copy non-header data to request buffer and set state to read request.
   _request = bp;
@@ -163,8 +164,12 @@ XmlRpcServerConnection::readRequest()
     if ( ! nbRead(_request, &eof))
     {
       XmlRpcUtil::error("XmlRpcServerConnection::readRequest: read error (%s).",XmlRpcSocket::getErrorMsg().c_str());
+      if (progStatus.rpctrace)
+        rpc_trace(2, 
+          "readRequest: read error ", 
+          XmlRpcSocket::getErrorMsg().c_str());
       return false;
-    }
+   }
 
     // If we haven't gotten the entire request yet, return (keep reading)
     if (int(_request.length()) < _contentLength)
@@ -178,9 +183,11 @@ XmlRpcServerConnection::readRequest()
     }
   }
 
-  // Otherwise, parse and dispatch the request
-  XmlRpcUtil::log(3, "XmlRpcServerConnection::readRequest read %d bytes.", _request.length());
-  //XmlRpcUtil::log(5, "XmlRpcServerConnection::readRequest:\n%s\n", _request.c_str());
+// Otherwise, parse and dispatch the request
+  if (progStatus.rpctrace)
+    rpc_trace(2, "readRequest:\n", _request.c_str());
+  else
+    XmlRpcUtil::log(3, "readRequest:\n%s\n", _request.c_str());
 
   _connectionState = WRITE_RESPONSE;
 
@@ -199,6 +206,8 @@ XmlRpcServerConnection::writeResponse()
     if (_response.length() == 0)
     {
       XmlRpcUtil::error("XmlRpcServerConnection::writeResponse: empty response.");
+	  if (progStatus.rpctrace)
+		 rpc_trace(1, "writeResponse: empty response\n");
       return false;
     }
   }
@@ -207,9 +216,17 @@ XmlRpcServerConnection::writeResponse()
   if ( ! nbWrite(_response, &_bytesWritten))
   {
     XmlRpcUtil::error("XmlRpcServerConnection::writeResponse: write error (%s).",XmlRpcSocket::getErrorMsg().c_str());
+    if (progStatus.rpctrace)
+		rpc_trace(2, 
+			"writeResponse: write error: ",
+			XmlRpcSocket::getErrorMsg().c_str());
     return false;
   }
-  XmlRpcUtil::log(3, "XmlRpcServerConnection::writeResponse: wrote %d of %d bytes.", _bytesWritten, _response.length());
+
+  XmlRpcUtil::log(3, "XmlRpcServerConnection::writeResponse:\n%s\n", _response.c_str());
+
+	if (progStatus.rpctrace)
+		rpc_trace(2, "writeResponse:\n", _response.c_str());
 
   // Prepare to read the next request
   if (_bytesWritten == int(_response.length()))

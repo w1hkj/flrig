@@ -23,6 +23,9 @@
 
 #include "dialogs.h"
 #include "ICbase.h"
+#include "trace.h"
+
+#include "XmlRpc.h"
 
 Fl_Tabs *tabsConfig = (Fl_Tabs *)0;
 Fl_Group *tabPrimary = (Fl_Group *)0;
@@ -112,6 +115,15 @@ Fl_Button *btnCloseCommConfig = (Fl_Button *)0;
 Fl_Button *btnOkSepSerial = (Fl_Button *)0;
 Fl_Button *btnOkAuxSerial = (Fl_Button *)0;
 
+Fl_Group *tabTRACE = (Fl_Group *)0;
+Fl_Check_Button *btn_trace = (Fl_Check_Button *)0;
+Fl_Check_Button *btn_xmltrace = (Fl_Check_Button *)0;
+Fl_Check_Button *btn_rigtrace = (Fl_Check_Button *)0;
+Fl_Check_Button *btn_debugtrace = (Fl_Check_Button *)0;
+Fl_Check_Button *btn_rpctrace = (Fl_Check_Button *)0;
+Fl_ComboBox *selectlevel = (Fl_ComboBox *)0;
+Fl_Button *btn_viewtrace = (Fl_Button *)0;
+
 //Fl_Group *tabXMLRPC = (Fl_Group *)0;
 //Fl_Input *server_addr = (Fl_Input *)0;
 //Fl_Int_Input *server_port = (Fl_Int_Input *)0;
@@ -158,11 +170,34 @@ Fl_Check_Button *btnRestoreCompOnOff	= (Fl_Check_Button *)0;
 Fl_Check_Button *btnRestoreCompLevel	= (Fl_Check_Button *)0;
 Fl_Check_Button *btnUseRigData			= (Fl_Check_Button *)0;
 
+static void cb_btn_trace(Fl_Check_Button *, void *) {
+	progStatus.trace = btn_trace->value();
+}
 
-//static void cb_xmlrpc_server(Fl_Check_Button *w, void *)
-//{
-//	progStatus.fldigi_is_server = btn_xmlrpc_server->value();
-//}
+static void cb_btn_rigtrace(Fl_Check_Button *, void *) {
+	progStatus.rigtrace = btn_rigtrace->value();
+}
+
+static void cb_btn_xmltrace(Fl_Check_Button *, void *) {
+	progStatus.xmltrace = btn_xmltrace->value();
+}
+
+static void cb_btn_debugtrace(Fl_Check_Button *, void *) {
+	progStatus.debugtrace = btn_debugtrace->value();
+}
+
+static void cb_btn_rpctrace(Fl_Check_Button *, void *) {
+	progStatus.rpctrace = btn_rpctrace->value();
+}
+
+static void cb_selectlevel(Fl_ComboBox *, void *) {
+	progStatus.rpc_level = selectlevel->index();
+	XmlRpc::setVerbosity(progStatus.rpc_level);
+}
+
+static void cb_btn_viewtrace(Fl_Button *, void *) {
+	tracewindow->show();
+}
 
 static void cb_selectRig(Fl_ComboBox*, void*) {
 	btnOkXcvrDialog->labelcolor(FL_RED);
@@ -782,11 +817,11 @@ void cb_comports(Fl_Button *b, void* d)
 
 Fl_Double_Window* XcvrDialog() {
 
-Fl_Double_Window* w = new Fl_Double_Window(480, 255, _("I/O Ports"));
+Fl_Double_Window* w = new Fl_Double_Window(490, 255, _("Configuration"));
 
-	tabsConfig = new Fl_Tabs(0, 8, 482, 246);
+	tabsConfig = new Fl_Tabs(2, 2, 486, 251);
 
-	tabPrimary = new Fl_Group(2, 30, 475, 222, _("Xcvr"));
+	tabPrimary = new Fl_Group(2, 26, 486, 226, _("Xcvr"));
 
 		Fl_Group* xcr_grp1 = new Fl_Group(5, 34, 465, 140);
 			xcr_grp1->box(FL_ENGRAVED_FRAME);
@@ -992,41 +1027,47 @@ Fl_Double_Window* w = new Fl_Double_Window(480, 255, _("I/O Ports"));
 		btnOkXcvrDialog->callback((Fl_Callback*)cb_btnOkXcvrDialog);
 
 	tabPrimary->end();
-/*
-	tabXMLRPC = new Fl_Group(2, 30, 475, 222, _("XML"));
-		tabXMLRPC->hide();
 
-		Fl_Group* grp_fldigi_server = new Fl_Group(80, 40, 300, 80);
-		grp_fldigi_server->box(FL_ENGRAVED_FRAME);
+	tabTRACE = new Fl_Group(2, 26, 486, 226, _("Trace"));
+		tabTRACE->hide();
+		btn_trace = new Fl_Check_Button(10, 44, 80, 20, _("Trace support code"));
+		btn_trace->value(progStatus.trace);
+		btn_trace->callback((Fl_Callback*)cb_btn_trace);
+		btn_trace->tooltip(_("Enable trace support"));
 
-		btn_xmlrpc_server = new Fl_Check_Button(200, 44, 80, 20, _("Use fldigi server"));
-		btn_xmlrpc_server->tooltip(_("Change requires restart!\nAre you sure?"));
-		btn_xmlrpc_server->value(progStatus.fldigi_is_server);
-		btn_xmlrpc_server->callback((Fl_Callback*)cb_xmlrpc_server);
+		btn_debugtrace = new Fl_Check_Button(10, 68, 80, 20, _("Trace debug code"));
+		btn_debugtrace->value(progStatus.debugtrace);
+		btn_debugtrace->callback((Fl_Callback*)cb_btn_debugtrace);
+		btn_debugtrace->tooltip(_("Display debug output on trace view"));
 
-		server_addr = new Fl_Input(200, 68, 140, 22, _("Fldigi address:"));
-		server_addr->tooltip(_("xmlrpc server address (7362)\nchange requires restart!\nAre you sure?"));
-		server_addr->callback((Fl_Callback*)cb_server_addr);
-		server_addr->value(progStatus.server_addr.c_str());
+		btn_rigtrace = new Fl_Check_Button(10, 90, 80, 20, _("Trace rig class code"));
+		btn_rigtrace->value(progStatus.rigtrace);
+		btn_rigtrace->callback((Fl_Callback*)cb_btn_rigtrace);
+		btn_rigtrace->tooltip(_("Enable trace of rig methods"));
 
-		server_port = new Fl_Int_Input(200, 92, 100, 22, _("Fldigi port:"));
-		server_port->tooltip(_("xmlrpc server address (7362)\nchange requires restart!\nAre you sure?"));
-		server_port->type(2);
-		server_port->callback((Fl_Callback*)cb_server_port);
-		server_port->value(progStatus.server_port.c_str());
+		btn_xmltrace = new Fl_Check_Button(10, 114, 80, 20, _("Trace xml_server code"));
+		btn_xmltrace->value(progStatus.xmltrace);
+		btn_xmltrace->callback((Fl_Callback*)cb_btn_xmltrace);
+		btn_xmltrace->tooltip(_("Enable trace of xmlrpc functions"));
 
-		grp_fldigi_server->end();
+		btn_rpctrace = new Fl_Check_Button(10, 138, 80, 20, _("Trace xmlrpcpp code"));
+		btn_rpctrace->value(progStatus.rpctrace);
+		btn_rpctrace->callback((Fl_Callback*)cb_btn_rpctrace);
+		btn_rpctrace->tooltip(_("Enable trace of XmlRpc methods"));
 
-		Fl_Box *bx_xml_info = new Fl_Box(20, 140, 450, 100,
-_("\
-Recommended setup: flrig as server, fldigi as client\n\n\
-Changes to requires an flrig restart before they are effective.\n\
-"));
-		bx_xml_info->box(FL_ENGRAVED_FRAME);
+		selectlevel = new Fl_ComboBox(30, 158, 80, 20, _("XmlRpc trace level"));
+		selectlevel->add("0|1|2|3|4|5");
+		selectlevel->align(FL_ALIGN_RIGHT);
+		selectlevel->index(progStatus.rpc_level);
+		selectlevel->tooltip(_("0 = off ... 5 maximum depth"));
+		selectlevel->callback((Fl_Callback*)cb_selectlevel);
 
-	tabXMLRPC->end();
-*/
-	tabTCPIP = new Fl_Group(2, 30, 475, 222, _("TCPIP"));
+		btn_viewtrace = new Fl_Button(486 - 96, 226 - 30, 84, 24, _("View Trace"));
+		btn_viewtrace->callback((Fl_Callback*)cb_btn_viewtrace);
+
+	tabTRACE->end();
+
+	tabTCPIP = new Fl_Group(2, 26, 486, 226, _("TCPIP"));
 		tabTCPIP->hide();
 
 		inp_tcpip_addr = new Fl_Input2(120, 50, 300, 22, _("TCPIP address:"));
@@ -1085,7 +1126,7 @@ Changes to requires an flrig restart before they are effective.\n\
 
 	tabTCPIP->end();
 
-	tabPTT = new Fl_Group(2, 30, 475, 222, _("PTT"));
+	tabPTT = new Fl_Group(2, 26, 486, 226, _("PTT"));
 		tabPTT->hide();
 
 		Fl_Box *bxptt = new Fl_Box(53, 73, 399, 37,
@@ -1139,7 +1180,7 @@ _("Use only if your setup requires a separate\nSerial Port for a PTT control lin
 	tabPTT->end();
 
 
-	tabAux = new Fl_Group(2, 30, 475, 222, _("Aux"));
+	tabAux = new Fl_Group(2, 26, 486, 226, _("Aux"));
 		tabAux->hide();
 
 		selectAuxPort = new Fl_ComboBox(131, 132, 192, 22, _("Aux"));
@@ -1171,7 +1212,7 @@ _("Use only if your setup requires a separate\nSerial Port for a special Control
 	tabAux->end();
 
 
-	tabPolling = new Fl_Group(2, 30, 476, 222, _("Poll"));
+	tabPolling = new Fl_Group(2, 26, 486, 226, _("Poll"));
 		tabPolling->hide();
 
 		Fl_Group* xcr_grp7 = new Fl_Group(4, 34, 474, 48, _("Meters"));
@@ -1400,7 +1441,7 @@ _("Use only if your setup requires a separate\nSerial Port for a special Control
 
 	tabPolling->end();
 
-	tabSndCmd = new Fl_Group(2, 30, 475, 222, _("Send"));
+	tabSndCmd = new Fl_Group(2, 26, 486, 226, _("Send"));
 		tabSndCmd->hide();
 
 		txt_command = new Fl_Input2(30, 53, 435, 24,
@@ -1441,7 +1482,7 @@ _("Enter text as ASCII string\nOr sequence of hex values, x80 etc separated by s
 
 	tabSndCmd->end();
 
-	tabCmds = new Fl_Group(2, 30, 475, 222, _("Cmds"));
+	tabCmds = new Fl_Group(2, 26, 486, 226, _("Cmds"));
 		tabCmds->hide();
 		bx1 = new Fl_Box(15, 32, 80, 22, "Label");
 		bx1->box(FL_FLAT_BOX);
@@ -1535,7 +1576,7 @@ _("Enter text as ASCII string\nOr sequence of hex values, x80 etc separated by s
 
 	tabCmds->end();
 
-	tabRestore = new Fl_Group(2, 30, 475, 222, _("Restore"));  // 470 width 180 height
+	tabRestore = new Fl_Group(2, 26, 486, 226, _("Restore"));  // 470 width 180 height
 		tabRestore->hide();
 
 		Fl_Box *restore_box = new Fl_Box(10, 35, 455, 30, 
@@ -1672,7 +1713,7 @@ _("Enter text as ASCII string\nOr sequence of hex values, x80 etc separated by s
 
 	tabsConfig->end();
 
-	btnCloseCommConfig = new Fl_Button(w->w() - 52, 2, 50, 25, _("Close"));
+	btnCloseCommConfig = new Fl_Button(w->w() - 52, 2, 50, 24, _("Close"));
 	btnCloseCommConfig->callback((Fl_Callback*)cbCloseXcvrDialog);
 
 w->end();

@@ -326,7 +326,12 @@ struct status {
 
 	bool	external_tuner;
 
-//	bool	fldigi_is_server;
+	bool	trace;
+	bool	rigtrace;
+	bool	debugtrace;
+	bool	xmltrace;
+	bool	rpctrace;
+	int		rpc_level;
 
 	void saveLastState();
 	void loadLastState();

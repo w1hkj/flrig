@@ -337,7 +337,12 @@ status progStatus = {
 
 	false,		// bool external_tuner
 
-//	false		// bool fldigi_is_server
+	false,		// bool	trace;
+	false,		// bool	rigtrace;
+	false,		// bool	debugtrace;
+	false,		// bool	xmltrace;
+	false,		// bool	rpctrace;
+	0			// int	rpc_level;
 };
 
 void status::saveLastState()
@@ -655,7 +660,12 @@ void status::saveLastState()
 
 	spref.set("external_tuner", external_tuner);
 
-//	spref.set("fldigi_is_server", fldigi_is_server);
+	spref.set("trace", trace);
+	spref.set("rigtrace", rigtrace);
+	spref.set("debugtrace", debugtrace);
+	spref.set("xmltrace", xmltrace);
+	spref.set("rpctrace", rpctrace);
+	spref.set("rpc_level", rpc_level);
 
 	spref.set("hrd_buttons", hrd_buttons);
 }
@@ -1009,12 +1019,15 @@ bool status::loadXcvrState(string xcvr)
 
 		if (spref.get("external_tuner", i,i)) external_tuner = i;
 
-//		if (spref.get("fldigi_is_server", i,i)) fldigi_is_server = i;
+		if (spref.get("trace", i, trace)) trace = i;
+		if (spref.get("rigtrace", i, rigtrace)) rigtrace = i;
+		if (spref.get("debugtrace", i, debugtrace)) debugtrace = i;
+		if (spref.get("xmltrace", i, xmltrace)) xmltrace = i;
+		if (spref.get("rpctrace", i, rpctrace)) rpctrace = i;
+
+		spref.get("rpc_level", rpc_level, rpc_level);
 
 		if (spref.get("hrd_buttons", i, i)) hrd_buttons = i;
-
-//trace(1, info().c_str());
-//		LOG_INFO("%s", info().c_str());
 
 		return true;
 	}

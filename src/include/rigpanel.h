@@ -382,6 +382,7 @@ extern Fl_Group *tabAux;
 extern Fl_ComboBox *selectAuxPort;
 extern Fl_Check_Button *btnAux_SCU_17;
 extern Fl_Group *tabPolling;
+extern Fl_Group *tabTRACE;
 extern Fl_Group *tabRestore;
 extern Fl_Group *tabTCPIP;
 extern Fl_Group *tabXMLRPC;

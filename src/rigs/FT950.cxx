@@ -22,6 +22,7 @@
 #include "FT950.h"
 #include "debug.h"
 #include "support.h"
+#include "trace.h"
 
 #define FL950_WAIT_TIME 200
 
@@ -251,7 +252,7 @@ long RIG_FT950::get_vfoA ()
 	cmd += ';';
 	wait_char(';',11, FL950_WAIT_TIME, "get vfo A", ASC);
 
-	trace(4, "get_vfoA()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "get_vfoA()", cmd.c_str(), " => ", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqA;
@@ -273,7 +274,7 @@ void RIG_FT950::set_vfoA (long freq)
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET vfo A", cmd, replystr);
 
-	trace(4, "set_vfoA()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "set_vfoA()", cmd.c_str(), " => ", replystr.c_str());
 
 }
 
@@ -283,7 +284,7 @@ long RIG_FT950::get_vfoB ()
 	cmd += ';';
 	wait_char(';',11, FL950_WAIT_TIME, "get vfo B", ASC);
 
-	trace(4, "get_vfoB()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "get_vfoB()", cmd.c_str(), " => ", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqB;
@@ -305,7 +306,7 @@ void RIG_FT950::set_vfoB (long freq)
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET vfo B", cmd, replystr);
 
-	trace(4, "set_vfoB()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "set_vfoB()", cmd.c_str(), " => ", replystr.c_str());
 }
 
 void RIG_FT950::setVfoAdj(double v)
@@ -319,7 +320,7 @@ void RIG_FT950::setVfoAdj(double v)
 	cmd.append(cmdstr);
 	cmd.append(";");
 	sendOK(cmd);
-	trace(4, "set_VfoAdj()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "set_VfoAdj()", cmd.c_str(), " => ", replystr.c_str());
 }
 
 double RIG_FT950::getVfoAdj() 
@@ -328,7 +329,7 @@ double RIG_FT950::getVfoAdj()
 	sendOK(cmd.append(";"));
 	wait_char(';',9, FL950_WAIT_TIME, "get Vfo Adjust", ASC);
 
-	trace(4, "get_VfoAdj()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "get_VfoAdj()", cmd.c_str(), " => ", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -353,7 +354,7 @@ void RIG_FT950::selectA()
 	sendOK(cmd);
 	showresp(WARN, ASC, "select A", cmd, replystr);
 
-	trace(4, "selectA()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "selectA()", cmd.c_str(), " => ", replystr.c_str());
 }
 
 void RIG_FT950::selectB()
@@ -362,7 +363,7 @@ void RIG_FT950::selectB()
 	sendOK(cmd);
 	showresp(WARN, ASC, "select B", cmd, replystr);
 
-	trace(4, "selectB()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "selectB()", cmd.c_str(), " => ", replystr.c_str());
 }
 
 void RIG_FT950::A2B()
@@ -371,7 +372,7 @@ void RIG_FT950::A2B()
 	sendOK(cmd);
 	showresp(WARN, ASC, "vfo A --> B", cmd, replystr);
 
-	trace(4, "A2B()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "A2B()", cmd.c_str(), " => ", replystr.c_str());
 }
 
 bool RIG_FT950::can_split()
@@ -387,24 +388,24 @@ void RIG_FT950::set_split(bool val)
 			cmd = "FR4;FT2;";
 			sendOK(cmd);
 			showresp(WARN, ASC, "Rx on B, Tx on A", cmd, replystr);
-			trace(4, "RxB, TxA()", cmd.c_str(), " => ", replystr.c_str());
+			rig_trace(4, "RxB, TxA()", cmd.c_str(), " => ", replystr.c_str());
 		} else {
 			cmd = "FR4;FT3;";
 			sendOK(cmd);
 			showresp(WARN, ASC, "Rx on B, Tx on B", cmd, replystr);
-			trace(4, "RxB, TxB()", cmd.c_str(), " => ", replystr.c_str());
+			rig_trace(4, "RxB, TxB()", cmd.c_str(), " => ", replystr.c_str());
 		}
 	} else {
 		if (val) {
 			cmd = "FR0;FT3;";
 			sendOK(cmd);
 			showresp(WARN, ASC, "Rx on A, Tx on B", cmd, replystr);
-			trace(4, "RxA, TxB()", cmd.c_str(), " => ", replystr.c_str());
+			rig_trace(4, "RxA, TxB()", cmd.c_str(), " => ", replystr.c_str());
 		} else {
 			cmd = "FR0;FT2;";
 			sendOK(cmd);
 			showresp(WARN, ASC, "Rx on A, Tx on A", cmd, replystr);
-			trace(4, "RxA, TxA()", cmd.c_str(), " => ", replystr.c_str());
+			rig_trace(4, "RxA, TxA()", cmd.c_str(), " => ", replystr.c_str());
 		}
 	}
 	Fl::awake(highlight_vfo, (void *)0);
@@ -420,7 +421,7 @@ int RIG_FT950::get_split()
 	cmd.append(";");
 	wait_char(';',4, FL950_WAIT_TIME, "get split tx vfo", ASC);
 
-	trace(4, "get_split()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "get_split()", cmd.c_str(), " => ", replystr.c_str());
 
 	p = replystr.rfind(rsp);
 	if (p == string::npos) return false;
@@ -431,7 +432,7 @@ int RIG_FT950::get_split()
 	cmd.append(";");
 	wait_char(';',4, FL950_WAIT_TIME, "get split rx vfo", ASC);
 
-	trace(4, "get_split()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "get_split()", cmd.c_str(), " => ", replystr.c_str());
 
 	p = replystr.rfind(rsp);
 	if (p == string::npos) return false;
@@ -525,7 +526,7 @@ void RIG_FT950::set_power_control(double val)
 	}
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET power", cmd, replystr);
-	trace(4, "set_power_control()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "set_power_control()", cmd.c_str(), " => ", replystr.c_str());
 }
 
 // Volume control return 0 ... 100
@@ -554,7 +555,7 @@ void RIG_FT950::set_volume_control(int val)
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET vol", cmd, replystr);
 
-	trace(4, "set_volume_control()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "set_volume_control()", cmd.c_str(), " => ", replystr.c_str());
 }
 
 // Tranceiver PTT on/off
@@ -564,7 +565,7 @@ void RIG_FT950::set_PTT_control(int val)
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET PTT", cmd, replystr);
 
-	trace(4, "set_PTT_control()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "set_PTT_control()", cmd.c_str(), " => ", replystr.c_str());
 
 	ptt_ = val;
 }
@@ -673,7 +674,7 @@ void RIG_FT950::set_attenuator(int val)
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET att", cmd, replystr);
 
-	trace(4, "set_attenuator()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "set_attenuator()", cmd.c_str(), " => ", replystr.c_str());
 
 }
 
@@ -725,7 +726,7 @@ void RIG_FT950::set_preamp(int val)
 	sendOK (cmd);
 	showresp(WARN, ASC, "SET preamp", cmd, replystr);
 
-	trace(4, "set_preamp()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "set_preamp()", cmd.c_str(), " => ", replystr.c_str());
 
 }
 
@@ -818,7 +819,7 @@ void RIG_FT950::set_modeA(int val)
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET mode A", cmd, replystr);
 
-	trace(4, "set_modeA()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "set_modeA()", cmd.c_str(), " => ", replystr.c_str());
 
 	adjust_bandwidth(modeA);
 	if (val == mCW || val == mCW_R) return;
@@ -829,7 +830,7 @@ void RIG_FT950::set_modeA(int val)
 		sendOK(cmd);
 		showresp(WARN, ASC, "SET spot off", cmd, replystr);
 
-		trace(4, "set_spot_off()", cmd.c_str(), " => ", replystr.c_str());
+		rig_trace(4, "set_spot_off()", cmd.c_str(), " => ", replystr.c_str());
 
 		btnSpot->value(0);
 	}
@@ -841,7 +842,7 @@ int RIG_FT950::get_modeA()
 	cmd += ';';
 	wait_char(';',5, FL950_WAIT_TIME, "get mode A", ASC);
 
-	trace(4, "get_modeA()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "get_modeA()", cmd.c_str(), " => ", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p != string::npos) {
@@ -865,7 +866,7 @@ void RIG_FT950::set_modeB(int val)
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET mode B", cmd, replystr);
 
-	trace(4, "set_modeB()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "set_modeB()", cmd.c_str(), " => ", replystr.c_str());
 
 	adjust_bandwidth(modeB);
 	if (val == mCW || val == mCW_R) return;
@@ -876,7 +877,7 @@ void RIG_FT950::set_modeB(int val)
 		sendOK(cmd);
 		showresp(WARN, ASC, "SET spot off", cmd, replystr);
 
-		trace(4, "set_spot off()", cmd.c_str(), " => ", replystr.c_str());
+		rig_trace(4, "set_spot off()", cmd.c_str(), " => ", replystr.c_str());
 
 		btnSpot->value(0);
 	}
@@ -888,7 +889,7 @@ int RIG_FT950::get_modeB()
 	cmd += ';';
 	wait_char(';',5, FL950_WAIT_TIME, "get mode B", ASC);
 
-	trace(4, "get_modeB()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "get_modeB()", cmd.c_str(), " => ", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p != string::npos) {
@@ -915,7 +916,7 @@ void RIG_FT950::set_bwA(int val)
 		sendOK(cmd);
 		showresp(WARN, ASC, "SET bw A", cmd, replystr);
 
-		trace(4, "set_bwA()", cmd.c_str(), " => ", replystr.c_str());
+		rig_trace(4, "set_bwA()", cmd.c_str(), " => ", replystr.c_str());
 
 		return;
 	}
@@ -932,7 +933,7 @@ void RIG_FT950::set_bwA(int val)
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET bw A", cmd, replystr);
 
-	trace(4, "set_bwA()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "set_bwA()", cmd.c_str(), " => ", replystr.c_str());
 }
 
 int RIG_FT950::get_bwA()
@@ -947,7 +948,7 @@ int RIG_FT950::get_bwA()
 		cmd += ';';
 		wait_char(';',5, FL950_WAIT_TIME, "get bw A narrow", ASC);
 
-		trace(4, "get_bwA()", cmd.c_str(), " => ", replystr.c_str());
+		rig_trace(4, "get_bwA()", cmd.c_str(), " => ", replystr.c_str());
 
 		p = replystr.rfind(rsp);
 		if (p == string::npos) { bwA = 0; return bwA; }
@@ -960,7 +961,7 @@ int RIG_FT950::get_bwA()
 	cmd += ';';
 	wait_char(';',6, FL950_WAIT_TIME, "get bw A", ASC);
 
-	trace(4, "get_bwA()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "get_bwA()", cmd.c_str(), " => ", replystr.c_str());
 
 	p = replystr.rfind(rsp);
 	if (p == string::npos) return bwA;
@@ -992,7 +993,7 @@ void RIG_FT950::set_bwB(int val)
 		sendOK(cmd);
 		showresp(WARN, ASC, "SET bw B", cmd, replystr);
 
-		trace(4, "set_bwB()", cmd.c_str(), " => ", replystr.c_str());
+		rig_trace(4, "set_bwB()", cmd.c_str(), " => ", replystr.c_str());
 
 		return;
 	}
@@ -1009,7 +1010,7 @@ void RIG_FT950::set_bwB(int val)
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET bw B", cmd, replystr);
 
-	trace(4, "set_bwB()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "set_bwB()", cmd.c_str(), " => ", replystr.c_str());
 }
 
 int RIG_FT950::get_bwB()
@@ -1024,7 +1025,7 @@ int RIG_FT950::get_bwB()
 		cmd += ';';
 		wait_char(';',5, FL950_WAIT_TIME, "get bw B narrow", ASC);
 
-		trace(4, "get_bwB()", cmd.c_str(), " => ", replystr.c_str());
+		rig_trace(4, "get_bwB()", cmd.c_str(), " => ", replystr.c_str());
 
 		p = replystr.rfind(rsp);
 		if (p == string::npos) { bwB = 0; return bwB; }
@@ -1037,7 +1038,7 @@ int RIG_FT950::get_bwB()
 	cmd += ';';
 	wait_char(';',6, FL950_WAIT_TIME, "get bw B", ASC);
 
-	trace(4, "get_bwB()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "get_bwB()", cmd.c_str(), " => ", replystr.c_str());
 
 	p = replystr.rfind(rsp);
 	if (p == string::npos) return bwB;
@@ -1074,7 +1075,7 @@ void RIG_FT950::set_if_shift(int val)
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET if shift", cmd, replystr);
 
-	trace(4, "set_if_shift()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "set_if_shift()", cmd.c_str(), " => ", replystr.c_str());
 
 }
 
@@ -1108,7 +1109,7 @@ void RIG_FT950::set_notch(bool on, int val)
 		sendOK(cmd);
 		showresp(WARN, ASC, "SET notch on", cmd, replystr);
 
-		trace(4, "set_notch_on()", cmd.c_str(), " => ", replystr.c_str());
+		rig_trace(4, "set_notch_on()", cmd.c_str(), " => ", replystr.c_str());
 
 		cmd = "BP01000;";
 		if (val % 10 >= 5) val += 10;
@@ -1120,7 +1121,7 @@ void RIG_FT950::set_notch(bool on, int val)
 		sendOK(cmd);
 		showresp(WARN, ASC, "SET notch val", cmd, replystr);
 
-		trace(4, "set_notch_val()", cmd.c_str(), " => ", replystr.c_str());
+		rig_trace(4, "set_notch_val()", cmd.c_str(), " => ", replystr.c_str());
 
 		return;
 	}
@@ -1130,7 +1131,7 @@ void RIG_FT950::set_notch(bool on, int val)
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET notch off", cmd, replystr);
 
-	trace(4, "set_notch_off()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "set_notch_off()", cmd.c_str(), " => ", replystr.c_str());
 
 }
 
@@ -1202,7 +1203,7 @@ void RIG_FT950::set_noise(bool b)
 	sendOK (cmd);
 	showresp(WARN, ASC, "SET NB", cmd, replystr);
 
-	trace(4, "set_NB()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "set_NB()", cmd.c_str(), " => ", replystr.c_str());
 
 }
 
@@ -1239,7 +1240,7 @@ void RIG_FT950::set_mic_gain(int val)
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET mic", cmd, replystr);
 
-	trace(4, "set_mic_gain()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "set_mic_gain()", cmd.c_str(), " => ", replystr.c_str());
 
 }
 
@@ -1279,7 +1280,7 @@ void RIG_FT950::set_rf_gain(int val)
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET rfgain", cmd, replystr);
 
-	trace(4, "set_rf_gain()", cmd.c_str(), " => ", replystr.c_str());
+	rig_trace(4, "set_rf_gain()", cmd.c_str(), " => ", replystr.c_str());
 
 }
 

@@ -106,8 +106,10 @@ pthread_mutex_t mutex_replystr = PTHREAD_MUTEX_INITIALIZER;
 
 pthread_mutex_t mutex_srvc_reqs = PTHREAD_MUTEX_INITIALIZER;
 
-int RIG_DEBUG = 1;
-int XML_DEBUG = 1;
+pthread_mutex_t mutex_trace = PTHREAD_MUTEX_INITIALIZER;
+
+int use_trace = 0;
+
 bool EXPAND_CONTROLS = false;
 
 int xmlport = 12345;
@@ -408,6 +410,8 @@ extern FILE *serlog;
 
 	progStatus.loadLastState();
 
+	if (use_trace) progStatus.trace = true;
+
 	switch (progStatus.UIsize) {
 		case touch_ui :
 			mainwindow = touch_rig_window();
@@ -529,9 +533,9 @@ Usage: \n\
   --version\n\
   --config-dir <DIR>\n\
   --debug-level N (0..4)\n\
-  --rig_debug N (0, 1, 2)\n\
-  --xml_debug\n\
+  --trace\n\
   --xml-help\n\
+  --xml-trace\n\
   --exp (expand menu tab controls)\n\n";
 		exit(0);
 	} 
@@ -541,19 +545,8 @@ Usage: \n\
 		std::cout << ver;
 		exit (0);
 	}
-	if (strcasecmp("--rig_debug", argv[idx]) == 0) {
-		string level = argv[idx + 1];
-		switch (level[0]) {
-			case '0': RIG_DEBUG = 0; break;
-			case '1': RIG_DEBUG = 1; break;
-			case '2': RIG_DEBUG = 2; break;
-			default : RIG_DEBUG = 0;
-		}
-		idx += 2;
-		return 1;
-	}
-	if (strcasecmp("--xml_debug", argv[idx]) == 0) {
-		XML_DEBUG = true;
+	if (strcasecmp("--trace", argv[idx]) == 0) {
+		use_trace = true;
 		idx++;
 		return 1;
 	}

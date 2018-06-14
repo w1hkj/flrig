@@ -208,6 +208,7 @@ flrig_SOURCES += \
 	support/support.cxx \
 	support/threads.cxx \
 	support/timeops.cxx \
+	support/trace.cxx \
 	support/util.cxx \
 	UI/K3_ui.cxx \
 	UI/KX3_ui.cxx \
@@ -318,6 +319,7 @@ EXTRA_DIST = \
 	include/status.h \
 	include/support.h \
 	include/threads.h \
+	include/trace.h \
 	include/TS140.h \
 	include/TS450S.h \
 	include/TS480HX.h \

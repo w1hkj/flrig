@@ -29,6 +29,9 @@
 #include <stdarg.h>
 #include <fcntl.h>
 
+#include <FL/Fl_Text_Display.H>
+#include <FL/Fl_Text_Buffer.H>
+
 #include "icons.h"
 #include "support.h"
 #include "debug.h"
@@ -40,15 +43,13 @@
 #include "socket_io.h"
 #include "ui.h"
 #include "tod_clock.h"
-
 #include "rig.h"
 #include "rigs.h"
 #include "K3_ui.h"
 #include "KX3_ui.h"
-
 #include "rigpanel.h"
-
 #include "tod_clock.h"
+#include "trace.h"
 
 using namespace std;
 
@@ -112,53 +113,6 @@ bool run_serial_thread = true;
 bool PTT = false;
 
 int  powerlevel = 0;
-
-void trace(int n, ...) // all args of type const char *
-{
-	if (RIG_DEBUG == 0) return;
-
-	if (!n) return;
-	stringstream s;
-	va_list vl;
-	va_start(vl, n);
-	s << ztime() << " : " << va_arg(vl, const char *);
-	for (int i = 1; i < n; i++)
-		s << " " << va_arg(vl, const char *);
-	va_end(vl);
-	s << "\n";
-
-std::cout << s.str(); std::cout.flush();
-
-	string trace_fname = RigHomeDir;
-	trace_fname.append("trace.txt");
-	ofstream tracefile(trace_fname.c_str(), ios::app);
-	if (tracefile)
-		tracefile << s.str();
-	tracefile.close();
-}
-
-void trace1(int n, ...) // all args of type const char *
-{
-	if (RIG_DEBUG < 2) return;
-	if (!n) return;
-	stringstream s;
-	va_list vl;
-	va_start(vl, n);
-	s << ztime() << " : " << va_arg(vl, const char *);
-	for (int i = 1; i < n; i++)
-		s << " " << va_arg(vl, const char *);
-	va_end(vl);
-	s << "\n";
-
-std::cout << s.str(); std::cout.flush();
-
-	string trace_fname = RigHomeDir;
-	trace_fname.append("trace.txt");
-	ofstream tracefile(trace_fname.c_str(), ios::app);
-	if (tracefile)
-		tracefile << s.str();
-	tracefile.close();
-}
 
 string printXCVR_STATE(XCVR_STATE &data)
 {
@@ -950,6 +904,8 @@ void serviceQUE()
 
 		if (nuvals.change == ON || nuvals.change == OFF) { // PTT processing
 			PTT = (nuvals.change == ON);
+			if (nuvals.change == ON) trace(1,"ptt ON");
+			else trace(1,"ptt OFF");
 			rigPTT(PTT);
 			int get = selrig->get_PTT();
 			int cnt = 0;
@@ -957,6 +913,9 @@ void serviceQUE()
 				MilliSleep(10);
 				get = selrig->get_PTT();
 			}
+			stringstream s;
+			s << "ptt returned " << get << " in " << cnt * 10 << " msec";
+			trace(1, s.str().c_str());
 			Fl::awake(update_UI_PTT);
 			continue;
 		}
@@ -2599,7 +2558,7 @@ void restore_rig_vals()
 		selrig->set_bwB(xcvr_vfoB.iBW);
 	restore_rig_vals_(xcvr_vfoB);
 
-//	trace(2, "Restore xcvr B:\n", print(xcvr_vfoB));
+	trace(2, "Restored xcvr B:\n", print(xcvr_vfoB));
 
 	selrig->selectA();
 	useB = false;
@@ -2612,8 +2571,7 @@ void restore_rig_vals()
 		selrig->set_bwA(xcvr_vfoA.iBW);
 	restore_rig_vals_(xcvr_vfoA);
 
-//	trace(2, "Restore xcvr A:\n", print(xcvr_vfoA));
-
+	trace(2, "Restored xcvr A:\n", print(xcvr_vfoA));
 }
 
 void read_rig_vals_(XCVR_STATE &xcvrvfo)
@@ -2768,7 +2726,7 @@ void read_rig_vals()
 
 	read_rig_vals_(xcvr_vfoB);
 
-//	trace(2, "Read xcvr B:\n", print(xcvr_vfoB));
+	trace(2, "Read xcvr B:\n", print(xcvr_vfoB));
 
 	selrig->selectA();
 	useB = false;
@@ -2788,7 +2746,13 @@ void read_rig_vals()
 		redrawAGC();
 	}
 
-//	trace(2, "Read xcvr A:\n", print(xcvr_vfoA));
+	trace(2, "Read xcvr A:\n", print(xcvr_vfoA));
+
+	if (selrig->has_FILTER)
+		selrig->set_FILTERS(progStatus.filters);
+
+	selrig->set_BANDWIDTHS(progStatus.bandwidths);
+
 }
 
 void close_UI()
@@ -2894,6 +2858,7 @@ void cbExit()
 
 	close_UI();
 
+	if (tracewindow) tracewindow->hide();
 }
 
 void cbALC_SWR()
@@ -4809,7 +4774,7 @@ void initConfigDialog()
 		}
 	} else {
 		initStatusConfigDialog();
-		std::cout << progStatus.info();
+		trace(1, progStatus.info().c_str());
 	}
 }
 
@@ -5417,13 +5382,13 @@ void enable_bandselect_btn(int btn_num, bool enable)
 // trim leading and trailing whitspace and double quote
 const string lt_trim(const string& pString, const string& pWhitespace)
 {
-    size_t beginStr, endStr, range;
+	size_t beginStr, endStr, range;
 	beginStr = pString.find_first_not_of(pWhitespace);
-    if (beginStr == string::npos) return "";	// no content
-    endStr = pString.find_last_not_of(pWhitespace);
-    range = endStr - beginStr + 1;
+	if (beginStr == string::npos) return "";	// no content
+	endStr = pString.find_last_not_of(pWhitespace);
+	range = endStr - beginStr + 1;
 
-    return pString.substr(beginStr, range);
+	return pString.substr(beginStr, range);
 }
 
 void editAlphaTag()

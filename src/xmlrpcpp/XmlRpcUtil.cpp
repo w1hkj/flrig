@@ -27,6 +27,10 @@
 
 #include "XmlRpc.h"
 
+#include "support.h"
+#include "status.h"
+#include "trace.h"
+
 using namespace XmlRpc;
 
 
@@ -43,15 +47,12 @@ const char XmlRpc::XMLRPC_VERSION[] = "XMLRPC++ 0.8";
 int XmlRpcLogHandler::_verbosity = 0;
 
 // Default log handler
+
 static class DefaultLogHandler : public XmlRpcLogHandler {
 public:
 
   void log(int level, const char* msg) { 
-#ifdef USE_WINDOWS_DEBUG
-    if (level <= _verbosity) { OutputDebugString(msg); OutputDebugString("\n"); }
-#else
-    if (level <= _verbosity) std::cout << msg << std::endl; 
-#endif  
+    if (level <= _verbosity && progStatus.rpctrace) rpc_trace(1, msg);
   }
 
 } defaultLogHandler;

@@ -69,9 +69,8 @@ extern pthread_mutex_t mutex_vfoque;
 extern pthread_mutex_t mutex_ptt;
 extern pthread_mutex_t mutex_replystr;
 extern pthread_mutex_t mutex_srvc_reqs;
+extern pthread_mutex_t mutex_trace;
 
-extern int  RIG_DEBUG;
-extern int  XML_DEBUG;
 extern bool EXPAND_CONTROLS;
 
 extern void cb_xml_help(Fl_Menu_*, void*);

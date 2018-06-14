@@ -389,6 +389,12 @@ void open_poll_tab()
 	tabsConfig->value(tabPolling);
 }
 
+void open_trace_tab()
+{
+	dlgXcvrConfig->show();
+	tabsConfig->value(tabTRACE);
+}
+
 void open_restore_tab()
 {
 	dlgXcvrConfig->show();

@@ -222,6 +222,7 @@ extern void initStatusConfigDialog();
 extern void initRigCombo();
 extern void createXcvrDialog();
 extern void open_poll_tab();
+extern void open_trace_tab();
 extern void open_restore_tab();
 extern void open_send_command_tab();
 extern void show_controls();

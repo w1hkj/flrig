@@ -316,6 +316,10 @@ static void cb_Polling(Fl_Menu_*, void*) {
 	open_poll_tab();
 }
 
+static void cb_mnuTrace(Fl_Menu_*, void*) {
+	open_trace_tab();
+}
+
 static void cb_Restore(Fl_Menu_*, void*) {
 	open_restore_tab();
 }

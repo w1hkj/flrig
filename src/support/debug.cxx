@@ -46,9 +46,9 @@
 #include "gettext.h"
 #include "rig.h"
 #include "tod_clock.h"
-
 #include "threads.h"
-
+#include "support.h"
+#include "trace.h"
 
 using namespace std;
 
@@ -137,6 +137,8 @@ void debug::log(level_e level, const char* func, const char* srcf, int line, con
 //	guard_lock dlock(&debug_mutex);
 	estr.append(sztemp);
 
+	if (progStatus.debugtrace) trace(1, sztemp);
+
 	fprintf(wfile, "[%s] %s", ztime(), sztemp);
 
 	va_end(args);
@@ -160,6 +162,8 @@ void debug::slog(level_e level, const char* func, const char* srcf, int line, co
 
 //	guard_lock dlock(&debug_mutex);
 	estr.append(sztemp);
+
+	if (progStatus.debugtrace) trace(1, sztemp);
 
 	fprintf(wfile, "[%s] %s", ztime(), sztemp);
 

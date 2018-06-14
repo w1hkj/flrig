@@ -23,9 +23,8 @@
 #include "support.h"
 #include "icons.h"
 #include "tod_clock.h"
-
+#include "trace.h"
 #include "status.h"
-
 #include "threads.h"
 
 pthread_mutex_t command_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -97,7 +96,7 @@ void RIG_ICOM::delayCommand(string cmd, int wait)
 void RIG_ICOM::ICtrace(string cmd, string hexstr) 
 {
 	string s1 = str2hex(hexstr.c_str(), hexstr.length());
-	trace(2, cmd.c_str(), s1.c_str());
+	rig_trace(2, cmd.c_str(), s1.c_str());
 }
 
 bool RIG_ICOM::waitFB(const char *sz)
@@ -219,6 +218,9 @@ void RIG_ICOM::swapAB()
 	cmd += 0x07; cmd += 0xB0;
 	ICtrace("A<>B", cmd);
 	cmd.append(post);
+	int fil = filB;
+	filB = filA;
+	filA = fil;
 	waitFB("A<>B");
 	ICtrace("A<>B", replystr);
 }

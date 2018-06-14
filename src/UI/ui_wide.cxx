@@ -35,6 +35,7 @@ Fl_Menu_Item menu_wide_menu[] = {
  {_("PTT"), 0, (Fl_Callback*)cb_mnuPTT, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("AUX"), 0, (Fl_Callback*)cb_mnuAUX, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Polling"), 0, (Fl_Callback*)cb_Polling, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("Trace"), 0, (Fl_Callback*)cb_mnuTrace, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Restore"), 0, (Fl_Callback*)cb_Restore, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
  {_("UI"), 0, 0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
