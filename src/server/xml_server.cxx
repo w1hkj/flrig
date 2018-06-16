@@ -531,6 +531,68 @@ xml_trace(2, "mode on ", (useB ? "B " : "A "), result_string.c_str());
 } rig_get_mode(&rig_server);
 
 //------------------------------------------------------------------------------
+// Request for vfo  A mode
+//------------------------------------------------------------------------------
+
+class rig_get_modeA : public XmlRpcServerMethod {
+public:
+	rig_get_modeA(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_modeA", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = "USB";
+			return;
+		}
+
+		int mode;
+		wait();
+		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_mode");
+
+		mode = vfoA.imode;
+
+		std::string result_string = "none";
+		if (selrig->modes_) result_string = selrig->modes_[mode];
+xml_trace(2, "mode A ", result_string.c_str());
+		result = result_string;
+
+	}
+
+	std::string help() { return std::string("returns vfo A mode"); }
+
+} rig_get_modeA(&rig_server);
+
+//------------------------------------------------------------------------------
+// Request for vfo  B mode
+//------------------------------------------------------------------------------
+
+class rig_get_modeB : public XmlRpcServerMethod {
+public:
+	rig_get_modeB(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_modeB", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = "USB";
+			return;
+		}
+
+		int mode;
+		wait();
+		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_mode");
+
+		mode = vfoB.imode;
+
+		std::string result_string = "none";
+		if (selrig->modes_) result_string = selrig->modes_[mode];
+xml_trace(2, "mode B ", result_string.c_str());
+		result = result_string;
+
+	}
+
+	std::string help() { return std::string("returns vfo A mode"); }
+
+} rig_get_modeB(&rig_server);
+
+//------------------------------------------------------------------------------
 // Request array of bandwidths
 //------------------------------------------------------------------------------
 
@@ -655,6 +717,124 @@ xml_trace( 5, "bandwidth on ", (useB ? "B " : "A "), s1.c_str(), " | ", s2.c_str
 
 } rig_get_bw(&rig_server);
 
+//------------------------------------------------------------------------------
+// Request for vfoA bandwidth
+//------------------------------------------------------------------------------
+
+class rig_get_bwA : public XmlRpcServerMethod {
+public:
+	rig_get_bwA(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_bwA", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+
+		result[0] = "NONE";
+		result[1] = "";
+
+		if (!xcvr_initialized) return;
+
+		wait();
+		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_bwA");
+
+		int BW = vfoA.iBW;
+		int mode = vfoA.imode;
+
+		const char **bwt = selrig->bwtable(mode);
+		const char **dsplo = selrig->lotable(mode);
+		const char **dsphi = selrig->hitable(mode);
+
+		int max_bwt = 0,
+			max_lotable = 0,
+			max_hitable = 0;
+		if (bwt)   while (bwt[max_bwt] != NULL) max_bwt++;
+		if (dsplo) while (dsplo[max_lotable] != NULL) max_lotable++;
+		if (dsphi) while (dsphi[max_hitable] != NULL) max_hitable++;
+
+		result[0] = result[1] = "";
+		if (BW < 256 && bwt) {
+			int SB = BW & 0x7F;
+			if (SB < 0) SB = 0;
+			if (SB >= max_bwt) SB = max_bwt-1;
+			result[0] = bwt[SB];
+		}
+		else if (dsplo && dsphi) {
+			int SL = BW & 0x7F;
+			if (SL >= max_lotable) SL = max_lotable - 1;
+			if (SL < 0) SL = 0;
+
+			int SH = (BW >> 8) & 0x7F;
+			if (SH >= max_hitable) SH = max_hitable - 1;
+			if (SH < 0) SH = 0;
+
+			if (dsplo) result[0] = dsplo[SL];
+			if (dsphi) result[1] = dsphi[SH];
+		}
+		std::string s1 = result[0], s2 = result[1];
+xml_trace( 4, "bandwidth on A", s1.c_str(), " | ", s2.c_str());
+	}
+
+	std::string help() { return std::string("returns current bw L/U value"); }
+
+} rig_get_bwA(&rig_server);
+
+
+//------------------------------------------------------------------------------
+// Request for vfoB bandwidth
+//------------------------------------------------------------------------------
+
+class rig_get_bwB : public XmlRpcServerMethod {
+public:
+	rig_get_bwB(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_bwB", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+
+		result[0] = "NONE";
+		result[1] = "";
+
+		if (!xcvr_initialized) return;
+
+		wait();
+		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_bwA");
+
+		int BW = vfoB.iBW;
+		int mode = vfoB.imode;
+
+		const char **bwt = selrig->bwtable(mode);
+		const char **dsplo = selrig->lotable(mode);
+		const char **dsphi = selrig->hitable(mode);
+
+		int max_bwt = 0,
+			max_lotable = 0,
+			max_hitable = 0;
+		if (bwt)   while (bwt[max_bwt] != NULL) max_bwt++;
+		if (dsplo) while (dsplo[max_lotable] != NULL) max_lotable++;
+		if (dsphi) while (dsphi[max_hitable] != NULL) max_hitable++;
+
+		result[0] = result[1] = "";
+		if (BW < 256 && bwt) {
+			int SB = BW & 0x7F;
+			if (SB < 0) SB = 0;
+			if (SB >= max_bwt) SB = max_bwt-1;
+			result[0] = bwt[SB];
+		}
+		else if (dsplo && dsphi) {
+			int SL = BW & 0x7F;
+			if (SL >= max_lotable) SL = max_lotable - 1;
+			if (SL < 0) SL = 0;
+
+			int SH = (BW >> 8) & 0x7F;
+			if (SH >= max_hitable) SH = max_hitable - 1;
+			if (SH < 0) SH = 0;
+
+			if (dsplo) result[0] = dsplo[SL];
+			if (dsphi) result[1] = dsphi[SH];
+		}
+		std::string s1 = result[0], s2 = result[1];
+xml_trace( 4, "bandwidth on B", s1.c_str(), " | ", s2.c_str());
+	}
+
+	std::string help() { return std::string("returns current bw L/U value"); }
+
+} rig_get_bwB(&rig_server);
 
 class rig_get_smeter : public XmlRpcServerMethod {
 public:
@@ -1316,6 +1496,46 @@ public:
 
 } rig_set_BW(&rig_server);
 
+class rig_cat_string : public XmlRpcServerMethod {
+public:
+	rig_cat_string(XmlRpcServer* s) : XmlRpcServerMethod("rig.cat_string", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		result = 0;
+		if (!xcvr_initialized) {
+			return;
+		}
+		std::string command = std::string(params[0]);
+		if (command.empty()) return;
+
+		std::string cmd = "";
+		if (command.find("x") != string::npos) { // hex strings
+			size_t p = 0;
+			unsigned int val;
+			while (( p = command.find("x", p)) != string::npos) {
+				sscanf(&command[p+1], "%x", &val);
+				cmd += (unsigned char) val;
+				p += 3;
+			}
+		} else
+			cmd = command;
+
+// lock out polling loops until done
+		{
+			guard_lock lock1(&mutex_srvc_reqs);
+			guard_lock lock2(&mutex_serial);
+			sendCommand(cmd, cmd.length());
+		}
+
+	xml_trace(2, "xmlrpc command:", command.c_str());
+
+	}
+
+	std::string help() { return std::string("sends xmlrpc CAT string to xcvr"); }
+
+} rig_cat_string(&rig_server);
+
+
 struct MLIST {
 	string name; string signature; string help;
 } mlist[] = {
@@ -1323,6 +1543,8 @@ struct MLIST {
 	{ "rig.get_AB",       "s:n", "returns vfo in use A or B" },
 	{ "rig.get_bw",       "s:n", "return BW of current VFO" },
 	{ "rig.get_bws",      "s:n", "return table of BW values" },
+	{ "rig.get_bwA",      "s:n", "return BW of vfo A" },
+	{ "rig.get_bwB",      "s:n", "return BW of vfo B" },
 	{ "rig.get_info",     "s:n", "return an info string" },
 	{ "rig.get_mode",     "s:n", "return MODE of current VFO" },
 	{ "rig.get_modeA",    "s:n", "return MODE of current VFO A" },
@@ -1353,7 +1575,8 @@ struct MLIST {
 	{ "rig.set_vfoA",     "d:d", "set vfo A in Hz" },
 	{ "rig.set_vfoB",     "d:d", "set vfo B in Hz" },
 	{ "rig.set_split",    "i:i", "set split 1/0 (on/off)" },
-	{ "rig.swap",         "i:i", "execute vfo swap" }
+	{ "rig.swap",         "i:i", "execute vfo swap" },
+	{ "rig.cat_string",   "n:s", "execute CAT string" }
 };
 
 class rig_list_methods : public XmlRpcServerMethod {

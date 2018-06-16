@@ -42,6 +42,8 @@
 #include <FL/x.H>
 #include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_Menu_Item.H>
+#include <FL/Fl_Text_Display.H>
+#include <FL/Fl_Text_Buffer.H>
 
 #ifdef WIN32
 #  include "flrigrc.h"
@@ -503,16 +505,22 @@ extern FILE *serlog;
 
 }
 
-#include <FL/Fl_Multiline_Output.H>
-
 void cl_print(std::string cl)
 {
-	Fl_Double_Window clwin(50,50,500,500, "Command line text");
-		Fl_Multiline_Output cltext(2,2,496,496);
-		cltext.textfont(FL_COURIER);
-		cltext.value(cl.c_str());
+	Fl_Double_Window clwin(50,50,600,500, "Command line text");
+		Fl_Text_Display cldisplay(2,2,596,496);
+		Fl_Text_Buffer  clbuff;
+
+		cldisplay.buffer(&clbuff);
+		cldisplay.textfont(FL_COURIER);
+
+		cldisplay.insert(cl.c_str());
+
 	clwin.end();
+	clwin.resizable(cldisplay);
+
 	clwin.show();
+
 	while (clwin.visible()) {
 		Fl::wait();
 		MilliSleep(50);
