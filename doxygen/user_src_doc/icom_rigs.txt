@@ -35,6 +35,11 @@
 \image latex IC746PRO.png "IC 746" width=3.75in
 \image html IC746PRO.png "IC 746"
 </center>
+\anchor icom_756pro_a
+<center>
+\image latex IC756PRO.png "IC 756 pro2" width=3.75in
+\image html IC756PRO.png "IC 756 pro2"
+</center>
 \anchor icom_756pro2_a
 <center>
 \image latex IC756PROII.png "IC 756 pro2" width=3.75in

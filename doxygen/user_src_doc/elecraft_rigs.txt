@@ -10,6 +10,11 @@
 \image latex K3.png "K3/KX3" width=3.75in
 \image html  K3.png "K3/KX3"
 </center>
+\anchor ek_kx3_a
+<center>
+\image latex KX3.png "K3/KX3" width=3.75in
+\image html  KX3.png "K3/KX3"
+</center>
 \ref elecraft_rigs "Page Top"
 \ref sFlrigDesc "Return to Main Page"
 */

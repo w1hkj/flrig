@@ -73,27 +73,27 @@ additional libraries or definition files are required.
 \section sSupportedTRX Supported Transceivers
 
 <center>
-| Elecraft         |Icom                                  |Kenwood                       |Ten-Tec                  | Yaesu                          | Other                      |
-|:----------------:|:------------------------------------:|:----------------------------:|:-----------------------:|:------------------------------:|:--------------------------:|
-|\ref ek_k2_a "K2" |\ref icom_703_a "IC-703"              |\ref kwd_ts140_a "TS 140"     |\ref tt_516_a   "TT 516" |\ref yaesu_100d_a "FT 100D"     |\ref o_pcr1000_a "PCR 1000" |
-|\ref ek_k3_a "K3" |\ref icom_706mk2g_a "IC 706 MK IIG"   |\ref kwd_ts450s_a "TS 450"    |\ref tt_535_a   "TT 535" |\ref yaesu_450_a "FT-450"       |\ref o_ray152_a  "RAY 152"  |
-|\ref ek_k3_a "KX3"|\ref icom_718_a "IC-718"              |\ref kwd_ts480hx_a "TS 480HX" |\ref tt_538_a   "TT 538" |\ref yaesu_450d_a "FT-450D"     |<br>                        |
-|<br>              |\ref icom_728_a "IC 728"              |\ref kwd_ts570_a   "TS 570"   |\ref tt_550_a   "TT 550" |\ref yaesu_747gx_a "FT 747GX"   |<br>                        |
-|<br>              |\ref icom_735_a "IC 735"              |\ref kwd_ts590s_a  "TS 590S"  |\ref tt_omni6_a "TT 563" |\ref yaesu_767_a  "FT 767"      |<br>                        |
-|<br>              |\ref icom_746_a "IC 746"              |\ref kwd_ts990_a   "TS 990"   |\ref tt_566_a   "TT 566" |\ref yaesu_817_a "FT 817"       |<br>                        |
-|<br>              |\ref icom_746pro_a "IC 746 Pro"       |\ref kwd_ts2000_a  "TS 2000"  |\ref tt_omni7_a "TT 588" |\ref yaesu_847_a "FT 847"       |<br>                        |
-|<br>              |\ref icom_756pro2_a "IC 756 Pro II"   |<br>                          |\ref tt_599_a   "TT 599" |\ref yaesu_857d_a "FT 857D"     |<br>                        |
-|<br>              |\ref icom_756pro3_a "IC 756 Pro III"  |<br>                          |<br>                     |\ref yaesu_897d_a "FT 897D"     |<br>                        |
-|<br>              |\ref icom_910h_a "IC 910H"            |<br>                          |<br>                     |\ref yaesu_950_a "FT-950"       |<br>                        |
-|<br>              |\ref icom_7000_a "IC 7000"            |<br>                          |<br>                     |\ref yaesu_1000mp_a "FT-1000MP" |<br>                        |
-|<br>              |\ref icom_7100_a "IC 7100"            |<br>                          |<br>                     |\ref yaesu_2000_a "FT 2000"     |<br>                        |
-|<br>              |\ref icom_7200_a "IC 7200"            |<br>                          |<br>                     |\ref yaesu_1200dx_a "FTdx1200"  |<br>                        |
-|<br>              |\ref icom_7300_a "IC 7300"            |<br>                          |<br>                     |\ref yaesu_3000dx_a "FTdx3000"  |<br>                        |
-|<br>              |\ref icom_7410_a "IC 7410"            |<br>                          |<br>                     |\ref yaesu_3000dx_a "FTdx3000"  |<br>                        |
-|<br>              |\ref icom_7600_a "IC 7600"            |<br>                          |<br>                     |<br>                            |<br>                        |
-|<br>              |\ref icom_7700_a "IC 7700"            |<br>                          |<br>                     |<br>                            |<br>                        |
-|<br>              |\ref icom_9100_a "IC 9100"            |<br>                          |<br>                     |<br>                            |<br>                        |
-</center>
+| Elecraft          |Icom                                  |Kenwood                        |Ten-Tec                  | Yaesu                          | Other                      |
+|:-----------------:|:------------------------------------:|:-----------------------------:|:-----------------------:|:------------------------------:|:--------------------------:|
+|\ref ek_k2_a "K2"  |\ref icom_703_a "IC-703"              |\ref kwd_ts140_a "TS 140"      |\ref tt_516_a   "TT 516" |\ref yaesu_100d_a "FT 100D"     |\ref o_pcr1000_a "PCR 1000" |
+|\ref ek_k3_a "K3"  |\ref icom_706mk2g_a "IC 706 MK IIG"   |\ref kwd_ts450s_a "TS 450"     |\ref tt_535_a   "TT 535" |\ref yaesu_450_a "FT-450"       |\ref o_ray152_a  "RAY 152"  |
+|\ref ek_kx3_a "KX3"|\ref icom_718_a "IC-718"              |\ref kwd_ts480hx_a "TS 480HX"  |\ref tt_538_a   "TT 538" |\ref yaesu_450d_a "FT-450D"     |<br>                        |
+|<br>               |\ref icom_728_a "IC 728"              |\ref kwd_ts480sat_a "TS 480SAT"|\ref tt_550_a   "TT 550" |\ref yaesu_747gx_a "FT 747GX"   |<br>                        |
+|<br>               |\ref icom_735_a "IC 735"              |\ref kwd_ts570_a   "TS 570"    |\ref tt_omni6_a "TT 563" |\ref yaesu_767_a  "FT 767"      |<br>                        |
+|<br>               |\ref icom_746_a "IC 746"              |\ref kwd_ts590s_a  "TS 590S"   |\ref tt_566_a   "TT 566" |\ref yaesu_817_a "FT 817"       |<br>                        |
+|<br>               |\ref icom_746pro_a "IC 746 Pro"       |\ref kwd_ts590sg_a  "TS 590SG" |\ref tt_omni7_a "TT 588" |\ref yaesu_847_a "FT 847"       |<br>                        |
+|<br>               |\ref icom_756pro2_a "IC 756 Pro II"   |\ref kwd_ts990_a   "TS 990"    |\ref tt_599_a   "TT 599" |\ref yaesu_857d_a "FT 857D"     |<br>                        |
+|<br>               |\ref icom_756pro3_a "IC 756 Pro III"  |\ref kwd_ts2000_a  "TS 2000"   |<br>                     |\ref yaesu_897d_a "FT 897D"     |<br>                        |
+|<br>               |\ref icom_910h_a "IC 910H"            |<br>                           |<br>                     |\ref yaesu_950_a "FT-950"       |<br>                        |
+|<br>               |\ref icom_7000_a "IC 7000"            |<br>                           |<br>                     |\ref yaesu_1000mp_a "FT-1000MP" |<br>                        |
+|<br>               |\ref icom_7100_a "IC 7100"            |<br>                           |<br>                     |\ref yaesu_2000_a "FT 2000"     |<br>                        |
+|<br>               |\ref icom_7200_a "IC 7200"            |<br>                           |<br>                     |\ref yaesu_1200dx_a "FTdx1200"  |<br>                        |
+|<br>               |\ref icom_7300_a "IC 7300"            |<br>                           |<br>                     |\ref yaesu_3000dx_a "FTdx3000"  |<br>                        |
+|<br>               |\ref icom_7410_a "IC 7410"            |<br>                           |<br>                     |\ref yaesu_3000dx_a "FTdx3000"  |<br>                        |
+|<br>               |\ref icom_7600_a "IC 7600"            |<br>                           |<br>                     |<br>                            |<br>                        |
+|<br>               |\ref icom_7700_a "IC 7700"            |<br>                           |<br>                     |<br>                            |<br>                        |
+|<br>               |\ref icom_9100_a "IC 9100"            |<br>                           |<br>                     |<br>                            |<br>                        |
+</center> 
 
 \section sSetUp Setup
 
@@ -108,11 +108,11 @@ Select the transceiver with the "Config / Setup / Transceiver" menu item.
 Each of the menu items will open the configuration dialog to the respecive tab:
 <ul>
 	<li><b>Transceiver</b> - select transceiver and configure serial i/o parameters</li>
-	<li><b>XmlRpc</b> - configure interface to fldigi xmlrpc server (if used)</li>
 	<li><b>tcpip</b> - configure interface to a remote tcpip/serial controlled transceiver</li>
 	<li><b>PTT</b> - configure separate PTT serial ports (if used)</li>
 	<li><b>AUX</b> - configure separate auxiliary serial ports (if used)</li>
 	<li><b>Polling</b> - select and configure transceiver parameters to poll</li>
+	<li><b>Trace</b> - select and display program execution paths</li>
 	<li><b>Restore</b> - select and configure transceiver parameters to read and restore</li>
 </ul>
 <br>
@@ -181,8 +181,8 @@ or control.  The polling cycle will slow down as you elect to poll more and
 more values.
 
 <center>
-\image latex send-cmd.png "I/O Ports - Polling" width=4.9in
-\image html send-cmd.png "I/O Ports - Polling"
+\image latex send.png "I/O Ports - Polling" width=4.9in
+\image html send.png "I/O Ports - Polling"
 </center>
 <br>
 
@@ -207,24 +207,51 @@ Yaesu:  x00 x00 x00 x01 x05
 Icom: xFE xFE x70 xE0 x1A x05 x00 x92 x00 xFD
 \endverbatim
 
+The buttone "ICOM pre" and "ICOM post" will insert the preamble and postamble
+hex code sequences for the selected Icom transceiver.
+
 Press the SEND button to transfer the command to the transceiver.  The
 response will appear in the lower text control.
+
+The diamond indicators will be lit for transceiver and fldigi connections respectively.
 
 <br>
 
 <center>
-\image latex restore.png "Restoring transceiver Status" width=4.9in
-\image html restore.png "Restoring transceiver Status"
+\image latex config-trace.png "Configure code execution trace" width=5.0in
+\image html  config-trace.png "Configure code execution trace"
 </center>
-<br>
+
+Several debugging tools are available in flrig, including the ability to observe code
+execution in various parts of the program.  The trace tool sends time annotated data to
+both a viewing dialog and a file named "trace.txt" which is written to the flrig files
+folder.
+<ul>
+<li> Trace support code - main processing loop execution points</li>
+<li> Trace debug code - replicate the event log debugging output</li>
+<li> Trace rig class code - execution points within a specific transceiver class (not for all)</li>
+<li> Trace xml_server code - execution points within the xmlrpc interface code for i/o to/from fldigi</li>
+<li> Trace xmlrpcpp code - sent and received xmlrpc data packets<br>
+six levels of detail 0 ... 5 can be specified</li>
+</ul>
+
+<center>
+\image latex trace-dialog.png "Example showing support code trace" width=5.0in
+\image html  trace-dialog.png "Example showing support code trace"
+</center>
 
 flrig will read various transceiver parameters and restore them upon closing.
-The above dialog shows the available read/restore parameters for the Icom 7200.  If
+The next image shows the available read/restore parameters for the Icom 7200.  If
 a parameter is not available (or coded) it will be disabled and grayed out.  Check
 each parameter that you want to read and restore.  Reading and restoring transceiver
 parameters takes time, especially on older transceivers with low baud rate serial
 i/o.  Check "Use xcvr data" i\If you want flrig to NOT change the transceiver operating state
 when it begins execution.
+
+<center>
+\image latex restore.png "Restoring transceiver Status" width=4.9in
+\image html restore.png "Restoring transceiver Status"
+</center>
 
 \subsection ssUserInterface User Interface
 
@@ -292,41 +319,57 @@ to the left of the attenuator button on the small aspect ratio dialog view.
 These are the controls for the Yeasu FT950.
 
 <center>
-\image latex FT-950-3.png "FLRIG - FT950" width=4.25in
-\image html FT-950-3.png "FLRIG - FT950"
-</center>
+\image latex FT950-BANDS.png "" width=4.25in
+\image html FT950-BANDS.png ""
 <br>
-<center>
-\image latex FT950-CW.png "FT950 CW" width=4.25in
-\image html FT950-CW.png "FT950 CW"
-\image latex FT950-VOX.png "FT950 Vox" width=4.25in
-\image html FT950-VOX.png "FT950 Vox"
-\image latex FT950-SPCH.png "FT950 SPCH" width=4.25in
-\image html FT950-SPCH.png "FT950 SPCH"
-\image latex FT950-MISC.png "FT950 MISC" width=4.25in
-\image html FT950-MISC.png "FT950 MISC"
+\image latex FT950-CW.png "" width=4.25in
+\image html FT950-CW.png ""
+<br>
+\image latex FT950-QSK.png "" width=4.25in
+\image html FT950-QSK.png ""
+<br>
+\image latex FT950-VOX.png "" width=4.25in
+\image html FT950-VOX.png ""
+<br>
+\image latex FT950-SPCH.png "" width=4.25in
+\image html FT950-SPCH.png ""
+<br>
+\image latex FT950-RX.png "" width=4.25in
+\image html FT950-RX.png ""
+<br>
+\image latex FT950-MISC.png "" width=4.25in
+\image html FT950-MISC.png ""
+<br>
+\image latex FT950-USER.png "" width=4.25in
+\image html FT950-USER.png ""
 </center>
 
 For the FT-450D, these control when accessed from the "touch" user interface 
 scheme appear as:
 
-\image latex touch-main.png "FT-450D main panel" width = 6in
-\image html  touch-main.png "FT-450D main panel"
-\image latex touch-buttons.png "FT-450D button panel" width = 6in
-\image html  touch-buttons.png "FT-450D button panel"
-\image latex touch-sliders.png "FT-450D sliders panel" width = 6in
-\image html  touch-sliders.png "FT-450D sliders panel"
-\image latex touch-other-bands.png "FT-450D 'Bands' panel" width = 6in
-\image html  touch-other-bands.png "FT-450D 'Bands' panel"
-\image latex touch-other-cw.png "FT-450D CW panel" width = 6in
-\image html  touch-other-cw.png "FT-450D CW panel"
-\image latex touch-other-qsk.png "FT-450D QSK panel" width = 6in
-\image html  touch-other-qsk.png "FT-450D QSK panel"
-\image latex touch-other-vox.png "FT-450D VOX panel" width = 6in
-\image html  touch-other-vox.png "FT-450D VOX panel"
-\image latex touch-other-misc.png "FT-450D MISC panel" width = 6in
-\image html  touch-other-misc.png "FT-450D MISC panel"
-
+\image latex touch-main.png "" width = 6in
+\image html  touch-main.png ""
+<br>
+\image latex touch-buttons.png "" width = 6in
+\image html  touch-buttons.png ""
+<br>
+\image latex touch-sliders.png "" width = 6in
+\image html  touch-sliders.png ""
+<br>
+\image latex touch-other-bands.png "" width = 6in
+\image html  touch-other-bands.png ""
+<br>
+\image latex touch-other-cw.png "" width = 6in
+\image html  touch-other-cw.png ""
+<br>
+\image latex touch-other-qsk.png "" width = 6in
+\image html  touch-other-qsk.png ""
+<br>
+\image latex touch-other-vox.png "" width = 6in
+\image html  touch-other-vox.png ""
+<br>
+\image latex touch-other-misc.png "" width = 6in
+\image html  touch-other-misc.png ""
 
 Select the User Interface menu item to configure various user preferences including \ref config_fonts_colors.
 <br>
@@ -351,7 +394,7 @@ newly entered frequency by pressing the Enter key.
 To paste a frequency from the clipboard (kHz only), press control-V followed
 by the Enter key
 
-Vfo-A and Vfo-B are separate control, A on the left, B on the right.
+Vfo-A and Vfo-B are separate controlS, A on the left, B on the right.
 
 Left click on the A->B button to swap vfos.  Right click on the A->B button
 to transfer vfoA to vfoB.

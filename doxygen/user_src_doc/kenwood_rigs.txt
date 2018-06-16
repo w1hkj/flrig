@@ -15,6 +15,11 @@
 \image latex TS480HX.png "TS 480HX" width=3.75in
 \image html TS480HX.png "TS 480HX"
 </center>
+\anchor kwd_ts480sat_a
+<center>
+\image latex TS480SAT.png "TS 480SAT" width=3.75in
+\image html TS480SAT.png "TS 480SAT"
+</center>
 \anchor kwd_ts570_a
 <center>
 \image latex TS570.png "TS 570" width=3.75in
@@ -25,10 +30,15 @@
 \image latex TS590S.png "TS 590S" width=3.75in
 \image html TS590S.png "TS 590S"
 </center>
+\anchor kwd_ts590sg_a
+<center>
+\image latex TS590SG.png "TS 590SG" width=3.75in
+\image html TS590SG.png "TS 590SG"
+</center>
 \anchor kwd_ts990_a
 <center>
-\image latex TS-990.png "TS 990" width=3.75in
-\image html TS-990.png "TS 990"
+\image latex TS990.png "TS 990" width=3.75in
+\image html TS990.png "TS 990"
 </center>
 \anchor kwd_ts2000_a
 <center>
