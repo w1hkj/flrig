@@ -1211,6 +1211,7 @@ public:
 			ifreq = vfo->freq;
 			n++;
 		}
+		result = 1;
 	}
 	std::string help() { return std::string("rig.set_frequency NNNNNNNN (Hz)"); }
 
@@ -1239,15 +1240,17 @@ public:
 		int i = 0;
 
 		if (!selrig->modes_) {
+			result = 0;
 			return;
 		}
 		if (numode == selrig->modes_[srvr_vfo.imode]) return;
+
 		while (selrig->modes_[i] != NULL) {
 			if (numode == selrig->modes_[i]) {
 				srvr_vfo.imode = i;
 
 				srvr_vfo.freq = 0;
-				srvr_vfo.iBW = 255;
+				srvr_vfo.iBW = selrig->def_bandwidth(srvr_vfo.imode);
 
 				push_xml();
 				break;
@@ -1261,6 +1264,7 @@ public:
 			imode = vfo->imode;
 			n++;
 		}
+		result = 1;
 	}
 	std::string help() { return std::string("set_mode MODE_NAME"); }
 
@@ -1287,6 +1291,7 @@ public:
 		int i = 0;
 
 		if (!selrig->modes_) {
+			result = 0;
 			return;
 		}
 		if (numode == selrig->modes_[srvr_vfo.imode]) return;
@@ -1295,9 +1300,9 @@ public:
 				srvr_vfo.imode = i;
 
 				srvr_vfo.freq = 0;
-				srvr_vfo.iBW = 255;
+				srvr_vfo.iBW = selrig->def_bandwidth(srvr_vfo.imode);
 				if (selrig->can_change_alt_vfo || !useB)
-					push_xml();
+					push_xmlA();
 				else {
 					XCVR_STATE vfo = vfoA;
 					vfo.src = SRVR;
@@ -1318,6 +1323,7 @@ public:
 			imode = vfoA.imode;
 			n++;
 		}
+		result = 1;
 	}
 	std::string help() { return std::string("set_mode on vfo A"); }
 
@@ -1344,6 +1350,7 @@ public:
 		int i = 0;
 
 		if (!selrig->modes_) {
+			result = 0;
 			return;
 		}
 		if (numode == selrig->modes_[srvr_vfo.imode]) return;
@@ -1352,11 +1359,11 @@ public:
 				srvr_vfo.imode = i;
 
 				srvr_vfo.freq = 0;
-				srvr_vfo.iBW = 255;
+				srvr_vfo.iBW = selrig->def_bandwidth(srvr_vfo.imode);
 
-				if (selrig->can_change_alt_vfo || useB)
-					push_xml();
-				else {
+				if (selrig->can_change_alt_vfo || useB) {
+					push_xmlB();
+				} else {
 					XCVR_STATE vfo = vfoB;
 					vfo.src = SRVR;
 					srvc_reqs.push (VFOQUEUE(sB, vfo));
@@ -1376,6 +1383,7 @@ public:
 			imode = vfoB.imode;
 			n++;
 		}
+		result = 1;
 	}
 	std::string help() { return std::string("set_mode on vfo B"); }
 
@@ -1490,7 +1498,7 @@ public:
 			iBW = vfo->iBW;
 			n++;
 		}
-
+		result = 1;
 	}
 	std::string help() { return std::string("set_bw to VAL"); }
 
