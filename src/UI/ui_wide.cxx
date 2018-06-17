@@ -241,8 +241,8 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				labelMEMORY->hide();
 
 				btnTune = new Fl_Button(
-					btnB->x() + btnB->w() + 2, btnB->y(), 69, 20, _("Tune"));
-				btnTune->tooltip(_("Momentary Tune"));
+					btnB->x() + btnB->w() + 2, btnB->y(), 69, 20, _("Tuner"));
+				btnTune->tooltip(_("Enable Auto Tune"));
 				btnTune->callback((Fl_Callback*)cb_btnTune);
 
 				bx_row0_expander = new Fl_Box(
@@ -328,6 +328,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 
 				btnFILT = new Fl_Button(btnDSP->x(), btnDSP->y(), 20, 20, _("1"));
 				btnFILT->callback((Fl_Callback*)cb_btnFILT);
+				btnFILT->tooltip(_("Select filter"));
 				btnFILT->hide();
 
 				opMODE = new Fl_ComboBox(
@@ -892,8 +893,6 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				opSelect60->when(FL_WHEN_RELEASE);
 				opSelect60->end();
 
-				Fl_Box dmybx(xpos, ypos + tabs2_h - 2, g->w(), 2, "");
-			genericBands->resizable(dmybx);
 			}
 			genericBands->end();
 
@@ -944,8 +943,6 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				btn_enable_keyer->callback((Fl_Callback*)cb_btn_enable_keyer);
 				btn_enable_keyer->value(progStatus.enable_keyer);
 
-				Fl_Box dmybx(xpos, ypos + tabs2_h - 2, g->w(), 2, "");
-			genericCW->resizable(dmybx);
 			}
 			genericCW->end();
 
@@ -981,8 +978,6 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_cw_delay->value(progStatus.cw_delay);
 				spnr_cw_delay->align(Fl_Align(FL_ALIGN_LEFT));
 
-				Fl_Box dmybx(xpos, ypos + tabs2_h - 2, g->w(), 2, "");
-			genericQSK->resizable(dmybx);
 			}
 			genericQSK->end();
 
@@ -1030,8 +1025,6 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				btn_vox_on_dataport->callback((Fl_Callback*)cb_btn_vox_on_dataport);
 				btn_vox_on_dataport->value(progStatus.vox_on_dataport);
 
-				Fl_Box dmybx(xpos, ypos + tabs2_h - 2, g->w(), 2, "");
-			genericVOX->resizable(dmybx);
 			}
 			genericVOX->end();
 
@@ -1053,8 +1046,6 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_compression->align(Fl_Align(FL_ALIGN_LEFT));
 				spnr_compression->value(progStatus.compression);
 
-				Fl_Box dmybx(xpos, ypos + tabs2_h - 2, g->w(), 2, "");
-			genericSpeech->resizable(dmybx);
 			}
 			genericSpeech->end();
 
@@ -1097,8 +1088,6 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				btn_use_bpf_center->callback((Fl_Callback*)cb_btn_use_bpf_center);
 				btn_use_bpf_center->value(progStatus.use_bpf_center);
 
-				Fl_Box dmybx(xpos, ypos + tabs2_h - 2, g->w(), 2, "");
-			genericRx->resizable(dmybx);
 			}
 			genericRx->end();
 
@@ -1142,8 +1131,6 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				btn_xcvr_auto_off->callback((Fl_Callback*)cb_btn_xcvr_auto_off);
 				btn_xcvr_auto_off->value(progStatus.xcvr_auto_off);
 
-				Fl_Box dmybx(xpos, ypos + tabs2_h - 2, g->w(), 2, "");
-			genericMisc->resizable(dmybx);
 			}
 			genericMisc->end();
 
@@ -1174,8 +1161,6 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				btnUser8 = new Fl_Button(635, ypos + 15, 88, 24, "USER 8");
 				btnUser8->callback((Fl_Callback*)cb_btnUser, (void*)8);
 
-				Fl_Box dmybx(xpos, ypos + tabs2_h - 2, W, 2, "");
-			genericUser->resizable(dmybx);
 			}
 			genericUser->end();
 
@@ -1183,7 +1168,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 			{
 				genericRXB->hide();
 
-				cntRIT = new Hspinner(218, 187, 60, 20, _("Rit"));
+				cntRIT = new Hspinner(218, ypos + 15, 60, 20, _("Rit"));
 				cntRIT->tooltip(_("RIT"));
 				cntRIT->type(FL_INT_INPUT);
 				cntRIT->labelsize(12);
@@ -1193,7 +1178,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				cntRIT->callback((Fl_Callback*)cb_cntRIT);
 				cntRIT->align(Fl_Align(FL_ALIGN_RIGHT));
 
-				cntXIT = new Hspinner(366, 187, 60, 20, _("Xit"));
+				cntXIT = new Hspinner(366, ypos + 15, 60, 20, _("Xit"));
 				cntXIT->tooltip(_("XIT"));
 				cntXIT->type(FL_INT_INPUT);
 				cntXIT->labelsize(12);
@@ -1203,7 +1188,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				cntXIT->callback((Fl_Callback*)cb_cntXIT);
 				cntXIT->align(Fl_Align(FL_ALIGN_RIGHT));
 
-				cntBFO = new Hspinner(514, 187, 54, 20, _("Bfo"));
+				cntBFO = new Hspinner(514, ypos + 15, 54, 20, _("Bfo"));
 				cntBFO->tooltip(_("BFO"));
 				cntBFO->type(FL_INT_INPUT);
 				cntBFO->labelsize(12);
@@ -1220,25 +1205,25 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 			{
 				genericAux->hide();
 
-				boxControl = new Fl_Box(57, 187, 130, 20, _("Auxilliary Controls:"));
+				boxControl = new Fl_Box(57, ypos + 15, 130, 20, _("Auxilliary Controls:"));
 				boxControl->box(FL_FLAT_BOX);
 				boxControl->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
 
-				btnAuxRTS = new Fl_Light_Button(272, 187, 60, 20, _("RTS"));
+				btnAuxRTS = new Fl_Light_Button(272, ypos + 15, 60, 20, _("RTS"));
 				btnAuxRTS->tooltip(_("RTS control pin"));
 				btnAuxRTS->down_box(FL_THIN_DOWN_BOX);
 				btnAuxRTS->labelsize(12);
 				btnAuxRTS->callback((Fl_Callback*)cb_btnAuxRTS);
 				btnAuxRTS->value(progStatus.aux_rts);
 
-				btnAuxDTR = new Fl_Light_Button(200, 187, 60, 20, _("DTR"));
+				btnAuxDTR = new Fl_Light_Button(200, ypos + 15, 60, 20, _("DTR"));
 				btnAuxDTR->tooltip(_("DTR control pin"));
 				btnAuxDTR->down_box(FL_THIN_DOWN_BOX);
 				btnAuxDTR->labelsize(12);
 				btnAuxDTR->callback((Fl_Callback*)cb_btnAuxDTR);
 				btnAuxDTR->value(progStatus.aux_dtr);
 
-				btnDataPort = new Fl_Light_Button(408, 187, 60, 20, _("Data"));
+				btnDataPort = new Fl_Light_Button(408, ypos + 15, 60, 20, _("Data"));
 				btnDataPort->tooltip(_("Input on Data Port"));
 				btnDataPort->down_box(FL_THIN_DOWN_BOX);
 				btnDataPort->labelsize(12);
@@ -1268,7 +1253,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				tt550_CW->color(FL_LIGHT1);
 				tt550_CW->selection_color(FL_LIGHT1);
 
-				spnr_tt550_cw_wpm = new Hspinner(55, 187, 67, 20, _("wpm"), 15);
+				spnr_tt550_cw_wpm = new Hspinner(55, ypos + 15, 67, 20, _("wpm"), 15);
 				spnr_tt550_cw_wpm->type(FL_INT_INPUT);
 				spnr_tt550_cw_wpm->minimum(5);
 				spnr_tt550_cw_wpm->maximum(80);
@@ -1278,7 +1263,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_tt550_cw_wpm->align(Fl_Align(FL_ALIGN_LEFT));
 				spnr_tt550_cw_wpm->value(progStatus.tt550_cw_wpm);
 
-				spnr_tt550_cw_weight = new Hspinner(187, 187, 67, 20, _("Weight"), 15);
+				spnr_tt550_cw_weight = new Hspinner(187, ypos + 15, 67, 20, _("Weight"), 15);
 				spnr_tt550_cw_weight->type(FL_FLOAT_INPUT);
 				spnr_tt550_cw_weight->minimum(0.75);
 				spnr_tt550_cw_weight->maximum(1.5);
@@ -1289,7 +1274,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_tt550_cw_weight->align(Fl_Align(FL_ALIGN_LEFT));
 				spnr_tt550_cw_weight->value(progStatus.tt550_cw_weight);
 
-				spnr_tt550_cw_qsk = new Hspinner(311, 187, 67, 20, _("Delay"), 15);
+				spnr_tt550_cw_qsk = new Hspinner(311, ypos + 15, 67, 20, _("Delay"), 15);
 				spnr_tt550_cw_qsk->tooltip(_("QSK delay (msec)"));
 				spnr_tt550_cw_qsk->type(FL_INT_INPUT);
 				spnr_tt550_cw_qsk->minimum(0);
@@ -1300,7 +1285,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_tt550_cw_qsk->align(Fl_Align(FL_ALIGN_LEFT));
 				spnr_tt550_cw_qsk->value(progStatus.tt550_cw_qsk);
 
-				spnr_tt550_cw_vol = new Hspinner(447, 187, 67, 20, _("S-T vol"), 15);
+				spnr_tt550_cw_vol = new Hspinner(447, ypos + 15, 67, 20, _("S-T vol"), 15);
 				spnr_tt550_cw_vol->tooltip(_("Side tone volume"));
 				spnr_tt550_cw_vol->type(FL_INT_INPUT);
 				spnr_tt550_cw_vol->minimum(5);
@@ -1311,7 +1296,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_tt550_cw_vol->align(Fl_Align(FL_ALIGN_LEFT));
 				spnr_tt550_cw_vol->value(progStatus.tt550_cw_vol);
 
-				spnr_tt550_cw_spot = new Hspinner(590, 187, 67, 20, _("Spot Vol"), 15);
+				spnr_tt550_cw_spot = new Hspinner(590, ypos + 15, 67, 20, _("Spot Vol"), 15);
 				spnr_tt550_cw_spot->tooltip(_("Spot volume"));
 				spnr_tt550_cw_spot->type(FL_INT_INPUT);
 				spnr_tt550_cw_spot->minimum(0);
@@ -1322,7 +1307,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_tt550_cw_spot->align(Fl_Align(FL_ALIGN_LEFT));
 				spnr_tt550_cw_spot->value(progStatus.tt550_cw_spot);
 
-				btn_tt550_enable_keyer = new Fl_Check_Button(662, 189, 63, 16, _("Keyer"));
+				btn_tt550_enable_keyer = new Fl_Check_Button(662, ypos + 17, 63, 16, _("Keyer"));
 				btn_tt550_enable_keyer->tooltip(_("Enable keyer"));
 				btn_tt550_enable_keyer->down_box(FL_DOWN_BOX);
 				btn_tt550_enable_keyer->callback((Fl_Callback*)cb_btn_tt550_enable_keyer);
@@ -1335,7 +1320,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 			{
 				tt550_VOX->hide();
 
-				spnr_tt550_vox_gain = new Hspinner(101, 187, 79, 20, _("gain"), 15);
+				spnr_tt550_vox_gain = new Hspinner(101, ypos + 15, 79, 20, _("gain"), 15);
 				spnr_tt550_vox_gain->type(FL_INT_INPUT);
 				spnr_tt550_vox_gain->minimum(0);
 				spnr_tt550_vox_gain->maximum(100);
@@ -1344,7 +1329,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_tt550_vox_gain->align(Fl_Align(FL_ALIGN_LEFT));
 				spnr_tt550_vox_gain->value(progStatus.tt550_vox_gain);
 
-				spnr_tt550_anti_vox = new Hspinner(299, 187, 78, 20, _("anti"), 15);
+				spnr_tt550_anti_vox = new Hspinner(299, ypos + 15, 78, 20, _("anti"), 15);
 				spnr_tt550_anti_vox->type(FL_INT_INPUT);
 				spnr_tt550_anti_vox->minimum(0);
 				spnr_tt550_anti_vox->maximum(100);
@@ -1353,7 +1338,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_tt550_anti_vox->align(Fl_Align(FL_ALIGN_LEFT));
 				spnr_tt550_anti_vox->value(progStatus.tt550_vox_anti);
 
-				spnr_tt550_vox_hang = new Hspinner(497, 187, 78, 20, _("hang"), 15);
+				spnr_tt550_vox_hang = new Hspinner(497, ypos + 15, 78, 20, _("hang"), 15);
 				spnr_tt550_vox_hang->type(FL_INT_INPUT);
 				spnr_tt550_vox_hang->minimum(0);
 				spnr_tt550_vox_hang->maximum(100);
@@ -1362,7 +1347,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_tt550_vox_hang->align(Fl_Align(FL_ALIGN_LEFT));
 				spnr_tt550_vox_hang->value(progStatus.tt550_vox_hang);
 
-				btn_tt550_vox = new Fl_Light_Button(633, 187, 78, 20, _("VOX"));
+				btn_tt550_vox = new Fl_Light_Button(633, ypos + 15, 78, 20, _("VOX"));
 				btn_tt550_vox->callback((Fl_Callback*)cb_btn_tt550_vox);
 				btn_tt550_vox->value(progStatus.tt550_vox_onoff);
 			}
@@ -1372,11 +1357,11 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 			{
 				tt550_Speech->hide();
 
-				btn_tt550_CompON = new Fl_Light_Button(559, 187, 78, 20, _("On"));
+				btn_tt550_CompON = new Fl_Light_Button(559, ypos + 15, 78, 20, _("On"));
 				btn_tt550_CompON->callback((Fl_Callback*)cb_btn_tt550_CompON);
 				btn_tt550_CompON->value(progStatus.tt550_compON);
 
-				spnr_tt550_compression = new Hspinner(422, 187, 78, 20, _("Comp"));
+				spnr_tt550_compression = new Hspinner(422, ypos + 15, 78, 20, _("Comp"));
 				spnr_tt550_compression->type(FL_INT_INPUT);
 				spnr_tt550_compression->minimum(0);
 				spnr_tt550_compression->maximum(100);
@@ -1385,7 +1370,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_tt550_compression->align(Fl_Align(FL_ALIGN_LEFT));
 				spnr_tt550_compression->value(progStatus.tt550_compression);
 
-				spnr_tt550_mon_vol = new Hspinner(247, 187, 78, 20, _("Mon vol"));
+				spnr_tt550_mon_vol = new Hspinner(247, ypos + 15, 78, 20, _("Mon vol"));
 				spnr_tt550_mon_vol->tooltip(_("Side tone volume"));
 				spnr_tt550_mon_vol->type(FL_INT_INPUT);
 				spnr_tt550_mon_vol->minimum(0);
@@ -1402,7 +1387,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 			{
 				tt550_Audio->hide();
 
-				spnr_tt550_line_out = new Hspinner(296, 187, 77, 20, _("line out"), 15);
+				spnr_tt550_line_out = new Hspinner(296, ypos + 15, 77, 20, _("line out"), 15);
 				spnr_tt550_line_out->type(FL_INT_INPUT);
 				spnr_tt550_line_out->minimum(0);
 				spnr_tt550_line_out->maximum(100);
@@ -1412,7 +1397,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_tt550_line_out->align(Fl_Align(FL_ALIGN_LEFT));
 				spnr_tt550_line_out->value(progStatus.tt550_line_out);
 
-				btnAccInp = new Fl_Check_Button(455, 187, 92, 16, _("Acc Inp."));
+				btnAccInp = new Fl_Check_Button(455, ypos + 15, 92, 16, _("Acc Inp."));
 				btnAccInp->tooltip(_("Enable to use accessory audio input"));
 				btnAccInp->down_box(FL_DOWN_BOX);
 				btnAccInp->callback((Fl_Callback*)cb_btnAccInp);
@@ -1424,7 +1409,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 			{
 				tt550_Rx->hide();
 
-				cbo_tt550_nb_level = new Fl_ComboBox(179, 187, 89, 20, _("NB level"));
+				cbo_tt550_nb_level = new Fl_ComboBox(179, ypos + 15, 89, 20, _("NB level"));
 				cbo_tt550_nb_level->tooltip(_("Select Noise Blanker level"));
 				cbo_tt550_nb_level->box(FL_DOWN_BOX);
 				cbo_tt550_nb_level->color(FL_WHITE);
@@ -1439,7 +1424,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				cbo_tt550_nb_level->index(progStatus.tt550_nb_level);
 				cbo_tt550_nb_level->end();
 
-				cbo_tt550_agc_level = new Fl_ComboBox(340, 187, 90, 20, _("AGC"));
+				cbo_tt550_agc_level = new Fl_ComboBox(340, ypos + 15, 90, 20, _("AGC"));
 				cbo_tt550_agc_level->tooltip(_("Select AGC"));
 				cbo_tt550_agc_level->box(FL_DOWN_BOX);
 				cbo_tt550_agc_level->color(FL_WHITE);
@@ -1454,7 +1439,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				cbo_tt550_agc_level->index(progStatus.tt550_agc_level);
 				cbo_tt550_agc_level->end();
 
-				spnr_tt550_vfo_adj = new Hspinner(556, 187, 134, 20, _("Vfo Adj(ppm)"));
+				spnr_tt550_vfo_adj = new Hspinner(556, ypos + 15, 134, 20, _("Vfo Adj(ppm)"));
 				spnr_tt550_vfo_adj->callback((Fl_Callback*)cb_spnr_tt550_vfo_adj);
 				spnr_tt550_vfo_adj->align(FL_ALIGN_LEFT);
 				spnr_tt550_vfo_adj->minimum(-100);
@@ -1471,23 +1456,23 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 			{
 				tt550_Tx->hide();
 
-				btn_tt550_enable_xmtr = new Fl_Check_Button(111, 187, 78, 16, _("Tx ON"));
+				btn_tt550_enable_xmtr = new Fl_Check_Button(111, ypos + 15, 78, 16, _("Tx ON"));
 				btn_tt550_enable_xmtr->down_box(FL_DOWN_BOX);
 				btn_tt550_enable_xmtr->value(1);
 				btn_tt550_enable_xmtr->callback((Fl_Callback*)cb_btn_tt550_enable_xmtr);
 				btn_tt550_enable_xmtr->value(progStatus.tt550_enable_xmtr);
 
-				btn_tt550_enable_tloop = new Fl_Check_Button(197, 187, 78, 16, _("Tloop"));
+				btn_tt550_enable_tloop = new Fl_Check_Button(197, ypos + 15, 78, 16, _("Tloop"));
 				btn_tt550_enable_tloop->down_box(FL_DOWN_BOX);
 				btn_tt550_enable_tloop->callback((Fl_Callback*)cb_btn_tt550_enable_tloop);
 				btn_tt550_enable_tloop->value(progStatus.tt550_enable_tloop);
 
-				btn_tt550_tuner_bypass = new Fl_Check_Button(283, 187, 78, 16, _("Tuner"));
+				btn_tt550_tuner_bypass = new Fl_Check_Button(283, ypos + 15, 78, 16, _("Tuner"));
 				btn_tt550_tuner_bypass->tooltip(_("Check to bypass tuner"));
 				btn_tt550_tuner_bypass->down_box(FL_DOWN_BOX);
 				btn_tt550_tuner_bypass->callback((Fl_Callback*)cb_btn_tt550_tuner_bypass);
 
-				op_tt550_XmtBW = new Fl_ComboBox(462, 187, 112, 20, _("Xmt BW"));
+				op_tt550_XmtBW = new Fl_ComboBox(462, ypos + 15, 112, 20, _("Xmt BW"));
 				op_tt550_XmtBW->tooltip(_("Select Transceiver Bandwidth"));
 				op_tt550_XmtBW->box(FL_DOWN_BOX);
 				op_tt550_XmtBW->color(FL_WHITE);
@@ -1502,7 +1487,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				op_tt550_XmtBW->index(progStatus.tt550_xmt_bw);
 				op_tt550_XmtBW->end();
 
-				btn_tt550_use_xmt_bw = new Fl_Check_Button(613, 187, 23, 16, _("Enable"));
+				btn_tt550_use_xmt_bw = new Fl_Check_Button(613, ypos + 15, 23, 16, _("Enable"));
 				btn_tt550_use_xmt_bw->tooltip(_("Use Xmt BW setting"));
 				btn_tt550_use_xmt_bw->down_box(FL_DOWN_BOX);
 				btn_tt550_use_xmt_bw->callback((Fl_Callback*)cb_btn_tt550_use_xmt_bw);
@@ -1515,7 +1500,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 			{
 				tt550_302A->hide();
 
-				spnr_tt550_keypad_time_out = new Hspinner(106, 187, 134, 20, _("Time out"));
+				spnr_tt550_keypad_time_out = new Hspinner(106, ypos + 15, 134, 20, _("Time out"));
 				spnr_tt550_keypad_time_out->tooltip(_("Clear M302 keypad after ## secs"));
 				spnr_tt550_keypad_time_out->minimum(0.5);
 				spnr_tt550_keypad_time_out->maximum(10);
@@ -1525,7 +1510,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_tt550_keypad_time_out->value(progStatus.tt550_keypad_timeout/1000.0);
 				spnr_tt550_keypad_time_out->step(0.1);
 
-				spnr_tt550_encoder_sensitivity = new Hspinner(354, 187, 89, 20, _("Sensitivity"));
+				spnr_tt550_encoder_sensitivity = new Hspinner(354, ypos + 15, 89, 20, _("Sensitivity"));
 				spnr_tt550_encoder_sensitivity->tooltip(_("1 - most sensitive"));
 				spnr_tt550_encoder_sensitivity->type(FL_INT_INPUT);
 				spnr_tt550_encoder_sensitivity->minimum(1);
@@ -1536,7 +1521,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_tt550_encoder_sensitivity->align(Fl_Align(FL_ALIGN_LEFT));
 				spnr_tt550_encoder_sensitivity->value(progStatus.tt550_encoder_sensitivity);
 
-				sel_tt550_encoder_step = new Fl_Choice(575, 187, 80, 20, _("Step size"));
+				sel_tt550_encoder_step = new Fl_Choice(575, ypos + 15, 80, 20, _("Step size"));
 				sel_tt550_encoder_step->down_box(FL_BORDER_BOX);
 				sel_tt550_encoder_step->callback((Fl_Callback*)cb_sel_tt550_encoder_step);
 				sel_tt550_encoder_step->add("1|10|100|1 K|10 K");
@@ -1548,21 +1533,21 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 			{
 				tt550_302B->hide();
 
-				sel_tt550_F1_func = new Fl_Choice(168, 187, 111, 20, _("F1"));
+				sel_tt550_F1_func = new Fl_Choice(168, ypos + 15, 111, 20, _("F1"));
 				sel_tt550_F1_func->tooltip(_("Assign Func Key"));
 				sel_tt550_F1_func->down_box(FL_BORDER_BOX);
 				sel_tt550_F1_func->callback((Fl_Callback*)cb_sel_tt550_F1_func);
 				sel_tt550_F1_func->add("None|Clear|CW++|CW--|Band++|Band--|Step++|Step--");
 				sel_tt550_F1_func->value(progStatus.tt550_F1_func);
 
-				sel_tt550_F2_func = new Fl_Choice(319, 187, 111, 20, _("F2"));
+				sel_tt550_F2_func = new Fl_Choice(319, ypos + 15, 111, 20, _("F2"));
 				sel_tt550_F2_func->tooltip(_("Assign Func Key"));
 				sel_tt550_F2_func->down_box(FL_BORDER_BOX);
 				sel_tt550_F2_func->callback((Fl_Callback*)cb_sel_tt550_F2_func);
 				sel_tt550_F2_func->add("None|Clear|CW++|CW--|Band++|Band--|Step++|Step--");
 				sel_tt550_F2_func->value(progStatus.tt550_F2_func);
 
-				sel_tt550_F3_func = new Fl_Choice(465, 187, 111, 20, _("F3"));
+				sel_tt550_F3_func = new Fl_Choice(465, ypos + 15, 111, 20, _("F3"));
 				sel_tt550_F3_func->tooltip(_("Assign Func Key"));
 				sel_tt550_F3_func->down_box(FL_BORDER_BOX);
 				sel_tt550_F3_func->callback((Fl_Callback*)cb_sel_tt550_F3_func);
@@ -1616,9 +1601,12 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 	}
 
 	grpTABS->end();
+
+	grpTABS->resizable(tabsGeneric);
+
 	grpTABS->hide();
 
-	Fl_Group *dmy = new Fl_Group(0, g->h() - 2, g->w(), 2, "");
+	Fl_Group *dmy = new Fl_Group(0, g->h(), g->w(), 2, "");
 
 	g->end();
 
@@ -1694,9 +1682,8 @@ Fl_Double_Window* Wide_rig_window() {
 
 	w->resizable(main_group);
 
-	w->size(WIDE_MAINW, WIDE_MAINH);//mainW, mainH);// - 70);
+	w->size(WIDE_MAINW, WIDE_MAINH);
 
-//	w->size_range(mainW, mainH - 70, 0, mainH - 70);
 	w->size_range(WIDE_MAINW, WIDE_MAINH, 0, WIDE_MAINH);
 
 	w->end();

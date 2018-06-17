@@ -2618,53 +2618,53 @@ void update_progress(int val)
 	Fl::check();
 }
 
-int restore_progress = 0;
-
 void restore_rig_vals_(XCVR_STATE &xcvrvfo)
 {
 	if (progStatus.restore_pre_att) {
 		selrig->set_attenuator(xcvrvfo.attenuator);
 		selrig->set_preamp(xcvrvfo.preamp);
 	}
+	update_progress(progress->value() + 5);
+
 	if (progStatus.restore_auto_notch)
 		selrig->set_auto_notch(xcvrvfo.auto_notch);
 	if (progStatus.restore_split)
 		selrig->set_split(xcvrvfo.split);
-
-	update_progress(restore_progress += 10);
+	update_progress(progress->value() + 5);
 
 	if (progStatus.restore_power_control)
 		selrig->set_power_control(xcvrvfo.power_control);
 	if (progStatus.restore_volume)
 		selrig->set_volume_control(xcvrvfo.volume_control);
-
-	update_progress(restore_progress += 10);
+	update_progress(progress->value() + 5);
 
 	if (progStatus.restore_if_shift)
 		selrig->set_if_shift(xcvrvfo.if_shift);
+	update_progress(progress->value() + 5);
+
 	if (progStatus.restore_notch)
 		selrig->set_notch(xcvrvfo.notch, xcvrvfo.notch_val);
 	if (progStatus.restore_noise)
 		selrig->set_noise(xcvrvfo.noise);
-
-	update_progress(restore_progress += 10);
+	update_progress(progress->value() + 5);
 
 	if (progStatus.restore_nr) {
 		selrig->set_noise_reduction(xcvrvfo.nr);
 		selrig->set_noise_reduction_val(xcvrvfo.nr_val);
 	}
+	update_progress(progress->value() + 5);
 
 	if (progStatus.restore_mic_gain)
 		selrig->set_mic_gain(xcvrvfo.mic_gain);
-
-	update_progress(restore_progress += 10);
+	update_progress(progress->value() + 5);
 
 	if (progStatus.restore_squelch)
 		selrig->set_squelch(xcvrvfo.squelch);
+	update_progress(progress->value() + 5);
+
 	if (progStatus.restore_rf_gain)
 		selrig->set_rf_gain(xcvrvfo.rf_gain);
-
-	update_progress(restore_progress += 10);
+	update_progress(progress->value() + 5);
 
 	if (progStatus.restore_comp_on_off && progStatus.restore_comp_level)
 		selrig->set_compression(xcvrvfo.compON, xcvrvfo.compression);
@@ -2672,12 +2672,13 @@ void restore_rig_vals_(XCVR_STATE &xcvrvfo)
 		selrig->set_compression(xcvrvfo.compON, progStatus.compression);
 	else if (progStatus.restore_comp_level)
 		selrig->set_compression(progStatus.compON, xcvrvfo.compression);
+	update_progress(progress->value() + 5);
 
 }
 
 void restore_rig_vals()
 {
-	restore_progress = 0;
+	update_progress(0);
 
 	guard_lock serial_lock(&mutex_serial);
 	trace(1, "restore_rig_vals()");
@@ -2739,9 +2740,7 @@ void read_rig_vals_(XCVR_STATE &xcvrvfo)
 	} else
 		btnRestoreSplit->deactivate();
 
-	progress->value(progress->value() + 10);
-	progress->redraw();
-	Fl::check();
+	update_progress(progress->value() + 4);
 
 	if (selrig->has_power_control) {
 		btnRestorePowerControl->activate();
@@ -2764,9 +2763,7 @@ void read_rig_vals_(XCVR_STATE &xcvrvfo)
 	} else
 		btnRestoreIFshift->deactivate();
 
-	progress->value(progress->value() + 10);
-	progress->redraw();
-	Fl::check();
+	update_progress(progress->value() + 4);
 
 	if (selrig->has_notch_control) {
 		btnRestoreNotch->activate();
@@ -2782,9 +2779,8 @@ void read_rig_vals_(XCVR_STATE &xcvrvfo)
 	} else
 		btnRestoreNoise->deactivate();
 
-	progress->value(progress->value() + 10);
-	progress->redraw();
-	Fl::check();
+
+	update_progress(progress->value() + 4);
 
 	if (selrig->has_noise_reduction_control) {
 		btnRestoreNR->activate();
@@ -2809,9 +2805,8 @@ void read_rig_vals_(XCVR_STATE &xcvrvfo)
 	} else
 		btnRestoreSquelch->deactivate();
 
-	progress->value(progress->value() + 10);
-	progress->redraw();
-	Fl::check();
+
+		update_progress(progress->value() + 4);
 
 	if (selrig->has_rf_control) {
 		btnRestoreRfGain->activate();
@@ -2839,9 +2834,7 @@ void read_rig_vals_(XCVR_STATE &xcvrvfo)
 		btnRestoreCompLevel->deactivate();
 	}
 
-	progress->value(progress->value() + 10);
-	progress->redraw();
-	Fl::check();
+	update_progress(progress->value() + 4);
 
 }
 
@@ -2850,36 +2843,45 @@ void read_rig_vals()
 // no guard_lock ... this function called from within a guard_lock block
 	trace(1, "read_rig_vals()");
 
+	update_progress(0);
+
 	selrig->selectB();
 	useB = true;
+
+	update_progress(progress->value() + 4);
 
 	if (selrig->has_get_info)
 		selrig->get_info();
 	xcvr_vfoB.freq = selrig->get_vfoB();
+	update_progress(progress->value() + 4);
 
 	xcvr_vfoB.imode = selrig->get_modeB();
+	update_progress(progress->value() + 4);
 
 	xcvr_vfoB.iBW = selrig->get_bwB();
+	update_progress(progress->value() + 4);
 
 	xcvr_vfoB.filter = selrig->get_FILT(xcvr_vfoB.imode);
-
-	progress->value(0);
-	progress->redraw();
 
 	read_rig_vals_(xcvr_vfoB);
 
 	trace(2, "Read xcvr B:\n", print(xcvr_vfoB));
 
 	selrig->selectA();
+	update_progress(progress->value() + 4);
+
 	useB = false;
 
 	if (selrig->has_get_info)
 		selrig->get_info();
 	xcvr_vfoA.freq = selrig->get_vfoA();
+	update_progress(progress->value() + 4);
 
 	xcvr_vfoA.imode = selrig->get_modeA();
+	update_progress(progress->value() + 4);
 
 	xcvr_vfoA.iBW = selrig->get_bwA();
+	update_progress(progress->value() + 4);
 
 	xcvr_vfoA.filter = selrig->get_FILT(xcvr_vfoA.imode);
 
@@ -2948,10 +2950,8 @@ void cbExit()
 	progress->redraw_label();
 
 	progress->position(grpInitializing->w()/4, grpInitializing->y() + grpInitializing->h()/2);
-	progress->value(0);
-	progress->redraw();
 
-	Fl::check();
+	update_progress(0);
 
 	progStatus.freq_A = vfoA.freq;
 	progStatus.imode_A = vfoA.imode;
@@ -4731,14 +4731,30 @@ void init_VFOs()
 		selrig->selectB();
 		useB = true;
 		selrig->set_vfoB(vfoB.freq);
+
+		update_progress(progress->value() + 4);
+
 		selrig->set_modeB(vfoB.imode);
+
+		update_progress(progress->value() + 4);
+
 		selrig->set_bwB(vfoB.iBW);
+
+		update_progress(progress->value() + 4);
 
 		trace(2, "init_VFOs() vfoB ", printXCVR_STATE(vfoB).c_str());
 
 		vfoA.freq = progStatus.freq_A;
+
+		update_progress(progress->value() + 4);
+
 		vfoA.imode = progStatus.imode_A;
+
+		update_progress(progress->value() + 4);
+
 		vfoA.iBW = progStatus.iBW_A;
+
+		update_progress(progress->value() + 4);
 
 		if (vfoA.iBW == -1)
 			vfoA.iBW = selrig->def_bandwidth(vfoA.imode);
@@ -4748,7 +4764,13 @@ void init_VFOs()
 		selrig->selectA();
 		useB = false;
 		selrig->set_vfoA(vfoA.freq);
+
+		update_progress(progress->value() + 4);
+
 		selrig->set_modeA(vfoA.imode);
+
+		update_progress(progress->value() + 4);
+
 		selrig->set_bwA(vfoA.iBW);
 
 		vfo = &vfoA;
@@ -4762,22 +4784,46 @@ void init_VFOs()
 		selrig->selectB();
 		useB = true;
 		vfoB.freq = selrig->get_vfoB();
+
+		update_progress(progress->value() + 4);
+
 		vfoB.imode = selrig->get_modeB();
+
+		update_progress(progress->value() + 4);
+
 		vfoB.iBW = selrig->get_bwB();
+
+		update_progress(progress->value() + 4);
+
 		FreqDispB->value(vfoB.freq);
 		trace(2, "B: ", printXCVR_STATE(vfoB).c_str());
 
 		selrig->selectA();
 		useB = false;
 		vfoA.freq = selrig->get_vfoA();
+
+		update_progress(progress->value() + 4);
+
 		vfoA.imode = selrig->get_modeA();
+
+		update_progress(progress->value() + 4);
+
 		vfoA.iBW = selrig->get_bwA();
+
+		update_progress(progress->value() + 4);
+
 		FreqDispA->value(vfoA.freq);
 		trace(2, "A: ", printXCVR_STATE(vfoA).c_str());
 
 		vfo = &vfoA;
 		setModeControl((void *)0);
+
+		update_progress(progress->value() + 4);
+
 		updateBandwidthControl();
+
+		update_progress(progress->value() + 4);
+
 		highlight_vfo((void *)0);
 	}
 	selrig->set_split(0);
@@ -4898,8 +4944,6 @@ void initRig()
 		init_swr_control();
 		init_compression_control();
 
-		adjust_control_positions();
-
 		initXcvrTab();
 
 		buildlist();
@@ -4922,6 +4966,9 @@ void initRig()
 	bypass_serial_thread_loop = false;
 
 	grpInitializing->hide();
+
+	adjust_control_positions();
+
 	main_group->show();
 	mainwindow->redraw();
 	Fl::check();

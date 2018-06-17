@@ -266,7 +266,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	btnIFsh->tooltip(_("IF Shift On/Off"));
 	btnIFsh->down_box(FL_THIN_DOWN_BOX);
 	btnIFsh->labelsize(12);
-	btnIFsh->callback((Fl_Callback*)cb_btnLOCK);
+	btnIFsh->callback((Fl_Callback*)cb_btnIFsh);
 
 	sldrIFSHIFT = new Fl_Wheel_Value_Slider(54, 265, 156, 18);
 	sldrIFSHIFT->tooltip(_("Adjust IF Shift"));
@@ -404,6 +404,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 
 	btnFILT = new Fl_Button(btnDSP->x(), btnDSP->y(), 18, 18, _("1"));
 	btnFILT->callback((Fl_Callback*)cb_btnFILT);
+	btnFILT->tooltip(_("Select filter"));
 	btnFILT->hide();
 
 	opDSP_lo = new Fl_ComboBox(231, 84, 86, 18, _("Lo Cut"));
@@ -478,8 +479,8 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	btnAutoNotch->labelsize(12);
 	btnAutoNotch->callback((Fl_Callback*)cb_btnAutoNotch);
 
-	btnTune = new Fl_Button(294, 325, 60, 18, _("Tune"));
-	btnTune->tooltip(_("Momentary Tune"));
+	btnTune = new Fl_Button(294, 325, 60, 18, _("Tuner"));
+	btnTune->tooltip(_("Enable Auto Tune"));
 	btnTune->callback((Fl_Callback*)cb_btnTune);
 
 	btnPTT = new Fl_Light_Button(362, 325, 60, 18, _("PTT"));
@@ -1464,7 +1465,14 @@ int tby = gpy + 20;
 grpTABS->end();
 grpTABS->hide();
 
+	Fl_Group *dmy = new Fl_Group(0, g->h(), g->w(), 2, "");
+
 	g->end();
+
+	g->resizable(dmy);
+
+	g->end();
+
 	return g;
 }
 

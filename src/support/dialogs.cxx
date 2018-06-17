@@ -1054,6 +1054,8 @@ void show_controls()
 	if (!(selrig->has_extras || selrig->name_ == rig_TT550.name_) && 
 		progStatus.aux_serial_port == "NONE")
 		return;
+	int wh = mainwindow->h();
+	int ww = mainwindow->w();
 	switch (progStatus.UIsize) {
 		case wide_ui :
 			if (mainwindow->h() > WIDE_MAINH) {
@@ -1063,13 +1065,13 @@ void show_controls()
 				mainwindow->size(mainwindow->w(), WIDE_MAINH);
 				mainwindow->size_range(735, WIDE_MAINH, 0, WIDE_MAINH);
 			} else {
-				int h = mainwindow->h();
-				h += grpTABS->h();
+				wh += grpTABS->h();
 				btn_show_controls->label("@-28->");
 				btn_show_controls->redraw_label();
 				grpTABS->show();
-				mainwindow->size(mainwindow->w(), h);
-				mainwindow->size_range(735, h, 0, h);
+				grpTABS->resize(0, wh - grpTABS->h(), ww, grpTABS->h());
+				mainwindow->size(ww, wh);
+				mainwindow->size_range(735, wh, 0, wh);
 			}
 			break;
 		case touch_ui : 
@@ -1085,8 +1087,6 @@ void show_controls()
 			break;
 		case small_ui :
 			{
-				int wh = mainwindow->h();
-				int ww = mainwindow->w();
 			if (selrig->name_ == rig_TT550.name_) {
 				tabsGeneric->hide();
 				if (tabs550->visible()) {
@@ -1094,14 +1094,12 @@ void show_controls()
 					btn_show_controls->label("@-22->");
 					btn_show_controls->redraw_label();
 					wh -= 70;
-					mainwindow->resizable(grpTABS);
 					mainwindow->size( ww, wh);
 				} else {
 					tabs550->show();
 					btn_show_controls->label("@-28->");
 					btn_show_controls->redraw_label();
 					wh += 70;
-					mainwindow->resizable(grpTABS);
 					mainwindow->size( ww, wh);
 				}
 			} else {

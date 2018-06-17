@@ -294,6 +294,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		btnFILT = new Fl_Button(btnDSP->x(), btnDSP->y(), 20, 20, _("1"));
 		btnFILT->callback((Fl_Callback*)cb_btnFILT);
 		btnFILT->labelsize(14);
+		btnFILT->tooltip(_("Select filter"));
 		btnFILT->hide();
 
 		opDSP_lo = new Fl_ComboBox(xpos+30, ypos, opBW->w() - 30, 35, "");
@@ -780,8 +781,8 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		btnSplit->value(progStatus.split);
 
 		xpos += btnSplit->w() + 2;
-		btnTune = new Fl_Button(xpos, ypos, bw, bh, _("Tune"));
-		btnTune->tooltip(_("Momentary Tune"));
+		btnTune = new Fl_Button(xpos, ypos, bw, bh, _("Tuner"));
+		btnTune->tooltip(_("Enable Auto Tune"));
 		btnTune->labelsize(16);
 		btnTune->callback((Fl_Callback*)cb_btnTune);
 
