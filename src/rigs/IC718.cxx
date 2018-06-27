@@ -31,7 +31,7 @@ const char IC718_mode_type[] = { 'L', 'U', 'U', 'L', 'L', 'U', 'U'};
 const char *IC718_widths[] = { "Wide", "Med", "Narr", NULL};
 static int IC718_bw_vals[] = {1,2,3,WVALS_LIMIT};
 
-static GUI rig_widgets[]= {
+static GUI IC718_widgetsdgets[]= {
 	{ (Fl_Widget *)btnVol,       2, 125,  50 },
 	{ (Fl_Widget *)sldrVOLUME,  54, 125, 156 },
 	{ (Fl_Widget *)sldrRFGAIN,  54, 145, 156 },
@@ -48,7 +48,7 @@ RIG_IC718::RIG_IC718() {
 	_mode_type = IC718_mode_type;
 	bandwidths_ = IC718_widths;
 	bw_vals_ = IC718_bw_vals;
-	widgets = rig_widgets;
+	widgets = IC718_widgetsdgets;
 
 	comm_baudrate = BR9600;
 	stopbits = 1;
@@ -96,13 +96,13 @@ RIG_IC718::RIG_IC718() {
 
 void RIG_IC718::initialize()
 {
-	rig_widgets[0].W = btnVol;
-	rig_widgets[1].W = sldrVOLUME;
-	rig_widgets[2].W = sldrRFGAIN;
-	rig_widgets[3].W = btnNR;
-	rig_widgets[4].W = sldrNR;
-	rig_widgets[5].W = sldrMICGAIN;
-	rig_widgets[6].W = sldrPOWER;
+	IC718_widgetsdgets[0].W = btnVol;
+	IC718_widgetsdgets[1].W = sldrVOLUME;
+	IC718_widgetsdgets[2].W = sldrRFGAIN;
+	IC718_widgetsdgets[3].W = btnNR;
+	IC718_widgetsdgets[4].W = sldrNR;
+	IC718_widgetsdgets[5].W = sldrMICGAIN;
+	IC718_widgetsdgets[6].W = sldrPOWER;
 }
 
 int  RIG_IC718::adjust_bandwidth(int m)

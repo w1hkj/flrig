@@ -144,6 +144,9 @@ public:
 	int get_preamp();
 	int next_preamp();
 
+	void set_pbt_inner(int val);
+	void set_pbt_outer(int val);
+
 	bool canswap() { return true; }
 
 //	bool hasA2b() { return true; }

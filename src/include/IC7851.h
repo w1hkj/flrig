@@ -92,6 +92,9 @@ public:
 
 	void set_cw_vol();
 
+	void set_pbt_inner(int val);
+	void set_pbt_outer(int val);
+
 	const char **bwtable(int m);
 
 	void get_pc_min_max_step(double &min, double &max, double &step);

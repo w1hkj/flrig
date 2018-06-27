@@ -18,6 +18,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 #include <iostream>
+#include <sstream>
 
 #include "IC7200.h"
 #include "support.h"
@@ -27,9 +28,25 @@
 // IC-7200
 
 const char IC7200name_[] = "IC-7200";
+
+// these are only defined in this file
+// undef'd at end of file
+#define NUM_FILTERS 3
+#define NUM_MODES  9
+
+static int mode_filterA[NUM_MODES] = {1,1,1,1,1,1,1,1,1};
+static int mode_filterB[NUM_MODES] = {1,1,1,1,1,1,1,1,1};
+
+static int mode_bwA[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,};
+static int mode_bwB[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,};
+
+static const char *szfilter[NUM_FILTERS] = {"W", "M", "N"};
+
 const char *IC7200modes_[] = { 
 "LSB", "USB", "AM", "CW", "RTTY", "CW-R", "RTTY-R", 
 "LSB-D", "USB-D", NULL};
+
+const char mdval[] = { 0, 1, 2, 3, 4, 7, 8, 0, 1};
 
 const char IC7200_mode_type[] = { 
 'L', 'U', 'U', 'L', 'L', 'U', 'U',
@@ -74,27 +91,47 @@ static int IC7200_bw_vals_AM[] = {
 31,32,33,34,35,36,37,38,39,40,
 WVALS_LIMIT};
 
-static GUI rig_widgets[]= {
-	{ (Fl_Widget *)btnVol, 2, 125,  50 },			//0
-	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },		//1
-	{ (Fl_Widget *)btnAGC, 2, 145, 50 },			//2
-	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },		//3
-	{ (Fl_Widget *)sldrSQUELCH, 54, 165, 156 },		//4
-	{ (Fl_Widget *)btnNR, 2, 185,  50 },			//5
-	{ (Fl_Widget *)sldrNR, 54, 185, 156 },			//6
-
-	{ (Fl_Widget *)btnIFsh, 214, 125,  50 },		//7
-	{ (Fl_Widget *)sldrIFSHIFT, 266, 125, 156 },	//8
-	{ (Fl_Widget *)btnNotch, 214, 145,  50 },			//9
-	{ (Fl_Widget *)sldrNOTCH, 266, 145, 156 },		//10
-	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },	//11
-	{ (Fl_Widget *)sldrPOWER, 266, 185, 156 },		//12
-	{ (Fl_Widget *)NULL, 0, 0, 0 }
-};
-
 //======================================================================
 // IC7200 unique commands
 //======================================================================
+
+static GUI IC7200_widgets[]= {
+	{ (Fl_Widget *)btnVol,        2, 125,  50 },	//0
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },	//1
+	{ (Fl_Widget *)btnAGC,        2, 145,  50 },	//2
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },	//3
+	{ (Fl_Widget *)sldrSQUELCH,  54, 165, 156 },	//4
+	{ (Fl_Widget *)btnNR,         2, 185,  50 },	//5
+	{ (Fl_Widget *)sldrNR,       54, 185, 156 },	//6
+	{ (Fl_Widget *)btnLOCK,     214, 105,  50 },	//7
+	{ (Fl_Widget *)sldrINNER,   266, 105, 156 },	//8
+	{ (Fl_Widget *)btnCLRPBT,   214, 125,  50 },	//9
+	{ (Fl_Widget *)sldrOUTER,   266, 125, 156 },	//10
+	{ (Fl_Widget *)btnNotch,    214, 145,  50 },	//11
+	{ (Fl_Widget *)sldrNOTCH,   266, 145, 156 },	//12
+	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },	//13
+	{ (Fl_Widget *)sldrPOWER,   266, 185, 156 },	//14
+	{ (Fl_Widget *)NULL, 0, 0, 0 }
+};
+
+void RIG_IC7200::initialize()
+{
+	IC7200_widgets[0].W = btnVol;
+	IC7200_widgets[1].W = sldrVOLUME;
+	IC7200_widgets[2].W = btnAGC;
+	IC7200_widgets[3].W = sldrRFGAIN;
+	IC7200_widgets[4].W = sldrSQUELCH;
+	IC7200_widgets[5].W = btnNR;
+	IC7200_widgets[6].W = sldrNR;
+	IC7200_widgets[7].W = btnLOCK;
+	IC7200_widgets[8].W = sldrINNER;
+	IC7200_widgets[9].W = btnCLRPBT;
+	IC7200_widgets[10].W = sldrOUTER;
+	IC7200_widgets[11].W = btnNotch;
+	IC7200_widgets[12].W = sldrNOTCH;
+	IC7200_widgets[13].W = sldrMICGAIN;
+	IC7200_widgets[14].W = sldrPOWER;
+}
 
 RIG_IC7200::RIG_IC7200() {
 	name_ = IC7200name_;
@@ -102,7 +139,7 @@ RIG_IC7200::RIG_IC7200() {
 	_mode_type = IC7200_mode_type;
 	bandwidths_ = IC7200_SSBwidths;
 	bw_vals_ = IC7200_bw_vals_SSB;
-	widgets = rig_widgets;
+	widgets = IC7200_widgets;
 
 	comm_baudrate = BR9600;
 	stopbits = 1;
@@ -117,12 +154,13 @@ RIG_IC7200::RIG_IC7200() {
 	comm_rtsptt = false;
 	comm_dtrptt = false;
 
-	A.freq = 14070000;
-	A.imode = 1;
+	def_freq = A.freq = 14070000;
+	def_mode = A.imode = 1;
 	def_bw = A.iBW = 32;
-	B.freq = 7015000;
-	B.imode = 3;
-	B.iBW = 12;
+
+	B.freq = 7070000;
+	B.imode = 1;
+	B.iBW = 32;
 
 	has_extras = true;
 	has_smeter = true;
@@ -144,7 +182,8 @@ RIG_IC7200::RIG_IC7200() {
 	has_noise_reduction_control = true;
 	has_auto_notch = true;
 	has_notch_control = true;
-	has_ifshift_control = true;
+	has_pbt_controls = true;
+	has_FILTER = true;
 	has_rf_control = true;
 	has_compON = true;
 	has_compression = true;
@@ -167,23 +206,6 @@ RIG_IC7200::RIG_IC7200() {
 	ndigits = 8;
 
 };
-
-void RIG_IC7200::initialize()
-{
-	rig_widgets[0].W = btnVol;
-	rig_widgets[1].W = sldrVOLUME;
-	rig_widgets[2].W = btnAGC;
-	rig_widgets[3].W = sldrRFGAIN;
-	rig_widgets[4].W = sldrSQUELCH;
-	rig_widgets[5].W = btnNR;
-	rig_widgets[6].W = sldrNR;
-	rig_widgets[7].W = btnIFsh;
-	rig_widgets[8].W = sldrIFSHIFT;
-	rig_widgets[9].W = btnNotch;
-	rig_widgets[10].W = sldrNOTCH;
-	rig_widgets[11].W = sldrMICGAIN;
-	rig_widgets[12].W = sldrPOWER;
-}
 
 static inline void minmax(int min, int max, int &val)
 {
@@ -785,11 +807,13 @@ int RIG_IC7200::get_modeA()
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
+
 	if (waitFOR(8, "get mode A")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			md = replystr[p + 5];
 			if (md > 6) md -= 2;
+			A.filter = replystr[p+6];
 		}
 	}
 	rig_trace(2, "get_modeA()", str2hex(replystr.c_str(), replystr.length()));
@@ -819,10 +843,11 @@ int RIG_IC7200::get_modeA()
 void RIG_IC7200::set_modeA(int val)
 {
 	A.imode = val;
-	if (val > 6) val -= 7;
+
 	cmd = pre_to;
 	cmd += '\x06';
-	cmd += val > 4 ? val + 2 : val;
+	cmd += mdval[A.imode];
+	cmd += mode_filterA[A.imode];
 	cmd.append( post );
 
 	waitFB("set mode A, default filter");
@@ -833,8 +858,8 @@ void RIG_IC7200::set_modeA(int val)
 
 	cmd = pre_to;
 	cmd += '\x1A'; cmd += '\x04';
-	if (A.imode > 6) cmd += '\x01';
-	else cmd += '\x00';
+	cmd += '\x01';
+	cmd += mode_filterA[A.imode];
 	cmd.append( post);
 	waitFB("set data mode A");
 
@@ -854,6 +879,7 @@ int RIG_IC7200::get_modeB()
 		if (p != string::npos) {
 			md = replystr[p+5];
 			if (md > 6) md -= 2;
+			B.filter = replystr[p+6];
 		}
 	}
 	rig_trace(2, "get_modeB()", str2hex(replystr.c_str(), replystr.length()));
@@ -883,10 +909,11 @@ int RIG_IC7200::get_modeB()
 void RIG_IC7200::set_modeB(int val)
 {
 	B.imode = val;
-	if (val > 6) val -= 7;
+
 	cmd = pre_to;
 	cmd += '\x06';
-	cmd += val > 4 ? val + 2 : val;
+	cmd += mdval[B.imode];
+	cmd += mode_filterB[B.imode];
 	cmd.append( post );
 	waitFB("set mode B, default filter");
 
@@ -896,8 +923,8 @@ void RIG_IC7200::set_modeB(int val)
 
 	cmd = pre_to;
 	cmd += '\x1A'; cmd += '\x04';
-	if (B.imode > 6) cmd += '\x01';
-	else cmd += '\x00';
+	cmd += '\x01';
+	cmd += mode_filterB[B.imode];
 	cmd.append( post);
 	waitFB("set data mode B");
 
@@ -1057,7 +1084,15 @@ int RIG_IC7200::adjust_bandwidth(int m)
 
 int RIG_IC7200::def_bandwidth(int m)
 {
-	return adjust_bandwidth(m);
+	int bw = adjust_bandwidth(m);
+	if (useB) {
+		if (mode_bwB[m] == -1)
+			mode_bwB[m] = bw;
+		return mode_bwB[m];
+	}
+	if (mode_bwA[m] == -1)
+		mode_bwA[m] = bw;
+	return mode_bwA[m];
 }
 
 const char ** RIG_IC7200::bwtable(int m)
@@ -1390,6 +1425,34 @@ void RIG_IC7200::get_if_min_max_step(int &min, int &max, int &step)
 	min = -50;
 	max = +50;
 	step = 1;
+}
+
+void RIG_IC7200::set_pbt_inner(int val)
+{
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x07");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	rig_trace(4, "set_pbt_inner(", val, ") ", str2hex(cmd.c_str(), cmd.length()));
+	waitFB("set PBT inner");
+}
+
+void RIG_IC7200::set_pbt_outer(int val)
+{
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x08");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	rig_trace(4, "set_pbt_outer(", val, ") ", str2hex(cmd.c_str(), cmd.length()));
+	waitFB("set PBT outer");
 }
 
 // CW methods

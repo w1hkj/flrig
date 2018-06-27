@@ -18,6 +18,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
+#include <string>
+#include <sstream>
+
 #include "debug.h"
 #include "support.h"
 
@@ -37,21 +40,43 @@ const char IC756_mode_type[] =
 const char *IC756_widths[] = { "NORM", "NARR", NULL};
 static int IC756_bw_vals[] = {1, 2, WVALS_LIMIT};
 
-static GUI ic756_widgets[]= {
-	{ (Fl_Widget *)btnVol, 2, 125,  50 },
-	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },
-	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },
-	{ (Fl_Widget *)sldrSQUELCH, 54, 165, 156 },
-	{ (Fl_Widget *)btnNR, 2, 185,  50 },
-	{ (Fl_Widget *)sldrNR, 54, 185, 156 },
-	{ (Fl_Widget *)btnIFsh, 214, 125,  50 },
-	{ (Fl_Widget *)sldrIFSHIFT, 266, 125, 156 },
-	{ (Fl_Widget *)btnNotch, 214, 145,  50 },
-	{ (Fl_Widget *)sldrNOTCH, 266, 145, 156 },
-	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },
-	{ (Fl_Widget *)sldrPOWER, 266, 185, 156 },
+static GUI IC756_widgets[]= {
+	{ (Fl_Widget *)btnVol,        2, 125,  50 },	//0
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },	//1
+	{ (Fl_Widget *)btnAGC,        2, 145,  50 },	//2
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },	//3
+	{ (Fl_Widget *)sldrSQUELCH,  54, 165, 156 },	//4
+	{ (Fl_Widget *)btnNR,         2, 185,  50 },	//5
+	{ (Fl_Widget *)sldrNR,       54, 185, 156 },	//6
+	{ (Fl_Widget *)btnLOCK,     214, 105,  50 },	//7
+	{ (Fl_Widget *)sldrINNER,   266, 105, 156 },	//8
+	{ (Fl_Widget *)btnCLRPBT,   214, 125,  50 },	//9
+	{ (Fl_Widget *)sldrOUTER,   266, 125, 156 },	//10
+	{ (Fl_Widget *)btnNotch,    214, 145,  50 },	//11
+	{ (Fl_Widget *)sldrNOTCH,   266, 145, 156 },	//12
+	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },	//13
+	{ (Fl_Widget *)sldrPOWER,   266, 185, 156 },	//14
 	{ (Fl_Widget *)NULL, 0, 0, 0 }
 };
+
+void RIG_IC756::initialize()
+{
+	IC756_widgets[0].W = btnVol;
+	IC756_widgets[1].W = sldrVOLUME;
+	IC756_widgets[2].W = btnAGC;
+	IC756_widgets[3].W = sldrRFGAIN;
+	IC756_widgets[4].W = sldrSQUELCH;
+	IC756_widgets[5].W = btnNR;
+	IC756_widgets[6].W = sldrNR;
+	IC756_widgets[7].W = btnLOCK;
+	IC756_widgets[8].W = sldrINNER;
+	IC756_widgets[9].W = btnCLRPBT;
+	IC756_widgets[10].W = sldrOUTER;
+	IC756_widgets[11].W = btnNotch;
+	IC756_widgets[12].W = sldrNOTCH;
+	IC756_widgets[13].W = sldrMICGAIN;
+	IC756_widgets[14].W = sldrPOWER;
+}
 
 RIG_IC756::RIG_IC756() {
 	defaultCIV = 0x50;
@@ -61,7 +86,7 @@ RIG_IC756::RIG_IC756() {
 	bw_vals_ = IC756_bw_vals;
 	_mode_type = IC756_mode_type;
 
-	widgets = ic756_widgets;
+	widgets = IC756_widgets;
 
 	comm_baudrate = BR19200;
 	stopbits = 1;
@@ -77,8 +102,8 @@ RIG_IC756::RIG_IC756() {
 	comm_dtrptt = false;
 
 	def_freq = freqB = freqA = B.freq = A.freq = 14070000L;
-	def_mode = modeB = modeA = B.imode = A.imode = 1;
-	def_bw = bwB = bwA = B.iBW = A.iBW = 0;
+	def_mode = B.imode = A.imode = 1;
+	def_bw = B.iBW = A.iBW = 0;
 	filter_nbr = 0;
 
 	ICvol = 0;
@@ -89,12 +114,12 @@ RIG_IC756::RIG_IC756() {
 	has_volume_control =
 	has_mode_control =
 	has_micgain_control =
+	has_auto_notch =
 	has_notch_control =
 	has_attenuator_control =
 	has_preamp_control =
-	has_ifshift_control =
+	has_pbt_controls =
 	has_ptt_control =
-	has_tune_control =
 	has_noise_control =
 	has_noise_reduction =
 	has_noise_reduction_control =
@@ -106,23 +131,35 @@ RIG_IC756::RIG_IC756() {
 	precision = 1;
 	ndigits = 9;
 
+	ICOMmainsub = true;
+
 	adjustCIV(defaultCIV);
 };
 
-void RIG_IC756::initialize()
+void RIG_IC756::set_pbt_inner(int val)
 {
-	ic756_widgets[0].W = btnVol;
-	ic756_widgets[1].W = sldrVOLUME;
-	ic756_widgets[2].W = sldrRFGAIN;
-	ic756_widgets[3].W = sldrSQUELCH;
-	ic756_widgets[4].W = btnNR;
-	ic756_widgets[5].W = sldrNR;
-	ic756_widgets[6].W = btnIFsh;
-	ic756_widgets[7].W = sldrIFSHIFT;
-	ic756_widgets[8].W = btnNotch;
-	ic756_widgets[9].W = sldrNOTCH;
-	ic756_widgets[10].W = sldrMICGAIN;
-	ic756_widgets[11].W = sldrPOWER;
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x07");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set PBT inner");
+}
+
+void RIG_IC756::set_pbt_outer(int val)
+{
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x08");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set PBT outer");
 }
 
 //=============================================================================
@@ -133,21 +170,42 @@ void RIG_IC756::initialize()
 const char IC756PROname_[] = "IC-756PRO";
 
 //=============================================================================
+enum { PRO_LSB, PRO_USB, PRO_AM, PRO_CW, PRO_RTTY, PRO_FM_, PRO_CWR, PRO_RTTYR };
+
+#define NUM_FILTERS 3
+#define NUM_MODES  9
+
+static int mode_filterA[NUM_MODES] = {1,1,1,1,1,1,1,1,1};
+static int mode_filterB[NUM_MODES] = {1,1,1,1,1,1,1,1,1};
+
+static const char *szfilter[NUM_FILTERS] = {"1", "2", "3"};
+
 const char *IC756PROmodes_[] = {
-		"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R", NULL};
+	"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R", NULL};
 
 const char IC756PRO_mode_type[] =
 	{ 'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U' };
 
-const char *IC756PRO_widths[] = { "FIXED", NULL};
-static int IC756PRO_bw_vals[] = { 1, WVALS_LIMIT};
+const char *IC756PRO_bw_vals[] = { "FIXED", NULL};
 
-static GUI ic756pro_widgets[]= {
-	{ (Fl_Widget *)btnVol, 2, 125,  50 },
-	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },
-	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },
-	{ (Fl_Widget *)sldrMICGAIN, 266, 125, 156 },
-	{ (Fl_Widget *)sldrPOWER, 266, 145, 156 },
+// IC756_widgets[] declared in RIG_IC756
+
+static GUI IC756PRO_widgets[]= {
+	{ (Fl_Widget *)btnVol,        2, 125,  50 },	//0
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },	//1
+	{ (Fl_Widget *)btnAGC,        2, 145,  50 },	//2
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },	//3
+	{ (Fl_Widget *)sldrSQUELCH,  54, 165, 156 },	//4
+	{ (Fl_Widget *)btnNR,         2, 185,  50 },	//5
+	{ (Fl_Widget *)sldrNR,       54, 185, 156 },	//6
+	{ (Fl_Widget *)btnLOCK,     214, 105,  50 },	//7
+	{ (Fl_Widget *)sldrINNER,   266, 105, 156 },	//8
+	{ (Fl_Widget *)btnCLRPBT,   214, 125,  50 },	//9
+	{ (Fl_Widget *)sldrOUTER,   266, 125, 156 },	//10
+	{ (Fl_Widget *)btnNotch,    214, 145,  50 },	//11
+	{ (Fl_Widget *)sldrNOTCH,   266, 145, 156 },	//12
+	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },	//13
+	{ (Fl_Widget *)sldrPOWER,   266, 185, 156 },	//14
 	{ (Fl_Widget *)NULL, 0, 0, 0 }
 };
 
@@ -155,31 +213,42 @@ RIG_IC756PRO::RIG_IC756PRO() {
 	defaultCIV = 0x5C;
 	name_ = IC756PROname_;
 	modes_ = IC756PROmodes_;
-	bandwidths_ = IC756PRO_widths;
-	bw_vals_ = IC756PRO_bw_vals;
+	bandwidths_ = IC756PRO_bw_vals;
 	_mode_type = IC756PRO_mode_type;
 
-	widgets = ic756pro_widgets;
+	widgets = IC756PRO_widgets;
 
 	def_freq = freqA = freqB = A.freq = 14070000;
 	def_mode = modeA = modeB = B.imode = 1;
-	def_bw = bwA = bwB = A.iBW = B.iBW = 0;
+	def_bw = A.iBW = B.iBW = 0;
 	atten_level = 3;
 	preamp_level = 2;
 	adjustCIV(defaultCIV);
 
-	has_smeter =
-	has_power_control =
-	has_volume_control =
-	has_mode_control =
-	has_micgain_control =
-	has_auto_notch =
-	has_attenuator_control =
-	has_preamp_control =
-	has_ptt_control =
-	has_noise_control =
+	has_extras = true;
+	has_bandwidth_control = true;
+	has_pbt_controls = true;
+	has_tune_control = true;
+	has_swr_control = true;
+	has_alc_control =  true;
+	has_smeter = true;
+	has_power_control = true;
+	has_volume_control = true;
+	has_mode_control = true;
+	has_micgain_control = true;
+	has_auto_notch = true;
+	has_notch_control = true;
+	has_attenuator_control = true;
+	has_preamp_control = true;
+	has_ptt_control = true;
+	has_noise_reduction = true;
+	has_noise_reduction_control = true;
+	has_noise_control = true;
 	has_rf_control = true;
 	has_a2b = true;
+	has_FILTER = true;
+
+	ICOMmainsub = true;
 
 	precision = 1;
 	ndigits = 9;
@@ -188,11 +257,21 @@ RIG_IC756PRO::RIG_IC756PRO() {
 
 void RIG_IC756PRO::initialize()
 {
-	ic756pro_widgets[0].W = btnVol;
-	ic756pro_widgets[1].W = sldrVOLUME;
-	ic756pro_widgets[2].W = sldrRFGAIN;
-	ic756pro_widgets[3].W = sldrMICGAIN;
-	ic756pro_widgets[4].W = sldrPOWER;
+	IC756PRO_widgets[0].W = btnVol;
+	IC756PRO_widgets[1].W = sldrVOLUME;
+	IC756PRO_widgets[2].W = btnAGC;
+	IC756PRO_widgets[3].W = sldrRFGAIN;
+	IC756PRO_widgets[4].W = sldrSQUELCH;
+	IC756PRO_widgets[5].W = btnNR;
+	IC756PRO_widgets[6].W = sldrNR;
+	IC756PRO_widgets[7].W = btnLOCK;
+	IC756PRO_widgets[8].W = sldrINNER;
+	IC756PRO_widgets[9].W = btnCLRPBT;
+	IC756PRO_widgets[10].W = sldrOUTER;
+	IC756PRO_widgets[11].W = btnNotch;
+	IC756PRO_widgets[12].W = sldrNOTCH;
+	IC756PRO_widgets[13].W = sldrMICGAIN;
+	IC756PRO_widgets[14].W = sldrPOWER;
 }
 
 void RIG_IC756PRO::swapAB()
@@ -200,7 +279,15 @@ void RIG_IC756PRO::swapAB()
 	cmd = pre_to;
 	cmd += 0x07; cmd += 0xB0;
 	cmd.append(post);
-	waitFB("Exchange vfos");
+	waitFB("Exchange main/sub");
+
+	selectA();
+	get_modeA();
+	get_bwA();
+	selectB();
+	get_modeB();
+	get_bwB();
+	if (!useB) selectA();
 }
 
 void RIG_IC756PRO::A2B()
@@ -208,7 +295,12 @@ void RIG_IC756PRO::A2B()
 	cmd = pre_to;
 	cmd += 0x07; cmd += 0xB1;
 	cmd.append(post);
-	waitFB("Equalize vfos");
+	waitFB("Equalize main/sub");
+
+	selectB();
+	get_modeB();
+	get_bwB();
+	if (!useB) selectA();
 }
 
 void RIG_IC756PRO::selectA()
@@ -335,6 +427,8 @@ void RIG_IC756PRO::get_vol_min_max_step(int &min, int &max, int &step)
 // Tranceiver PTT on/off
 void RIG_IC756PRO::set_PTT_control(int val)
 {
+	if (val) trace(1, "set_PTT_control(1)");
+	else trace(1, "set_PTT_control(0)");
 	cmd = pre_to;
 	cmd += '\x1c';
 	cmd += '\x00';
@@ -383,6 +477,62 @@ int RIG_IC756PRO::get_noise()
 			return (replystr[p+6] ? 1 : 0);
 	}
 	return 0;
+}
+
+void RIG_IC756PRO::set_noise_reduction(int val)
+{
+	cmd = pre_to;
+	cmd.append("\x16\x40");
+	cmd += val ? 1 : 0;
+	cmd.append(post);
+	waitFB("set NR");
+}
+
+int RIG_IC756PRO::get_noise_reduction()
+{
+	string cstr = "\x16\x40";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append(post);
+	if (waitFOR(8, "get NR")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			return (replystr[p+6] ? 1 : 0);
+	}
+	return progStatus.noise_reduction;
+}
+
+// 0 < val < 15
+void RIG_IC756PRO::set_noise_reduction_val(int val)
+{
+	cmd = pre_to;
+	cmd.append("\x14\x06");
+	if (val == 16) val = 255;
+	else val = val * 16;
+	cmd.append(to_bcd(val, 3));
+	cmd.append(post);
+	waitFB("set NRval");
+}
+
+int RIG_IC756PRO::get_noise_reduction_val()
+{
+	int val = progStatus.noise_reduction_val;
+	string cstr = "\x14\x06";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append(post);
+	if (waitFOR(9, "get NRval")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			val = fm_bcd(replystr.substr(p+6), 3);
+			if (val == 255) val = 16;
+			else val = val/ 16;
+	}
+	return val;
 }
 
 int RIG_IC756PRO::get_modetype(int n)
@@ -438,6 +588,32 @@ void RIG_IC756PRO::get_if_min_max_step(int &min, int &max, int &step)
 	step = 1;
 }
 
+void RIG_IC756PRO::set_pbt_inner(int val)
+{
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x07");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set PBT inner");
+}
+
+void RIG_IC756PRO::set_pbt_outer(int val)
+{
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x08");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set PBT outer");
+}
+
 int IC756PROsql = 0;
 void RIG_IC756PRO::set_squelch(int val)
 {
@@ -449,24 +625,57 @@ void RIG_IC756PRO::set_squelch(int val)
 	waitFB("set sql");
 }
 
-int IC756PROrfg = 0;
-void RIG_IC756PRO::set_rf_gain(int val)
-{
-	IC756PROrfg = (int)(val * 255 / 100);
-	cmd = pre_to;
-	cmd.append("\x14\x02");
-	cmd.append(to_bcd(IC756PROrfg, 3));
-	cmd.append( post );
-	waitFB("set rf gain");
-}
-
 void RIG_IC756PRO::set_power_control(double val)
 {
 	cmd = pre_to;
 	cmd.append("\x14\x0A");
-	cmd.append(to_bcd((int)(val * 255 / 100), 3));
+	cmd.append(bcd255(val));
 	cmd.append( post );
 	waitFB("set power");
+}
+
+int RIG_IC756PRO::get_power_control()
+{
+	string cstr = "\x14\x0A";
+	string resp = pre_fm;
+	cmd = pre_to;
+	cmd.append(cstr).append(post);
+	resp.append(cstr);
+	int val = progStatus.power_level;
+	string retstr = "ret str";
+	if (waitFOR(9, "get power")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			val = num100(replystr.substr(p+6));
+			retstr = str2hex(replystr.substr(p).c_str(), 9);
+		}
+	}
+	return val;
+}
+
+void RIG_IC756PRO::set_rf_gain(int val)
+{
+	cmd = pre_to;
+	cmd.append("\x14\x02");
+	cmd.append(bcd255(val));
+	cmd.append( post );
+	waitFB("set RF");
+}
+
+int RIG_IC756PRO::get_rf_gain()
+{
+	int val = progStatus.rfgain;
+	string cstr = "\x14\x02";
+	string resp = pre_fm;
+	cmd = pre_to;
+	cmd.append(cstr).append(post);
+	resp.append(cstr);
+	if (waitFOR(9, "get RF")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			val = num100(replystr.substr(p + 6));
+	}
+	return val;
 }
 
 void RIG_IC756PRO::set_split(bool val)
@@ -477,10 +686,6 @@ void RIG_IC756PRO::set_split(bool val)
 	cmd.append(post);
 	waitFB("set split");
 }
-
-//======================================================================
-// IC756PRO unique commands
-//======================================================================
 
 void RIG_IC756PRO::set_modeA(int val)
 {
@@ -493,13 +698,13 @@ void RIG_IC756PRO::set_modeA(int val)
 	cmd = pre_to;
 	cmd += '\x06';
 	cmd += val;
+	cmd += mode_filterA[A.imode];
 	cmd.append( post );
-	waitFB("set mode A");
 }
 
 int RIG_IC756PRO::get_modeA()
 {
-	int md;
+	int md = A.imode;
 	string cstr = "\x04";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -512,8 +717,10 @@ int RIG_IC756PRO::get_modeA()
 			md = replystr[p+5];
 			if (md > 6) md--;
 			A.imode = md;
+			A.filter = replystr[p+6];
 		}
 	}
+	mode_filterA[A.imode] = A.filter;
 	return A.imode;
 }
 
@@ -528,13 +735,13 @@ void RIG_IC756PRO::set_modeB(int val)
 	cmd = pre_to;
 	cmd += '\x06';
 	cmd += val;
+	cmd += mode_filterB[B.imode];
 	cmd.append( post );
-	waitFB("set mode B");
 }
 
 int RIG_IC756PRO::get_modeB()
 {
-	int md;
+	int md = B.imode;
 	string cstr = "\x04";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -547,24 +754,136 @@ int RIG_IC756PRO::get_modeB()
 			md = replystr[p+5];
 			if (md > 6) md--;
 			B.imode = md;
+			B.filter = replystr[p+6];
 		}
 	}
+	mode_filterB[B.imode] = B.filter;
 	return B.imode;
 }
 
 int RIG_IC756PRO::adjust_bandwidth(int m)
 {
-	return 0;
+	if (useB) return B.iBW;
+	return A.iBW;
 }
 
 int RIG_IC756PRO::def_bandwidth(int m)
 {
-	return (0);
+	if (useB) return B.iBW;
+	return A.iBW;
 }
 
 const char **RIG_IC756PRO::bwtable(int m)
 {
-	return IC756PRO_widths;
+	return IC756PRO_bw_vals;
+}
+
+void RIG_IC756PRO::set_bwA(int val)
+{
+	A.iBW = val;
+	int md = A.imode;
+	switch (md) {
+		case 7  : md = 8; break;
+		case 6  : md = 7; break;
+		default: break;
+	}
+	cmd = pre_to;
+	cmd += '\x06';
+	cmd += md;
+	cmd += A.iBW + 1;
+	cmd.append( post );
+	waitFB("set mode/filter A");
+}
+
+int RIG_IC756PRO::get_bwA()
+{
+	return A.iBW;
+}
+
+void RIG_IC756PRO::set_bwB(int val)
+{
+	B.iBW = val;
+	int md = B.imode;
+	switch (md) {
+		case 7  : md = 8; break;
+		case 6  : md = 7; break;
+		default: break;
+	}
+	cmd = pre_to;
+	cmd += '\x06';
+	cmd += md;
+	cmd += B.iBW + 1;
+	cmd.append( post );
+	waitFB("set mode/filter B");
+}
+
+int RIG_IC756PRO::get_bwB()
+{
+	return B.iBW;
+}
+
+bool IC756PRO_notchon = false;
+
+void RIG_IC756PRO::set_notch(bool on, int val)
+{
+	int notch = val / 20 + 53;
+	if (notch > 255) notch = 255;
+	if (on != IC756PRO_notchon) {
+		cmd = pre_to;
+		cmd.append("\x16\x48");
+		cmd += on ? '\x01' : '\x00';
+		cmd.append(post);
+		waitFB("set notch");
+		IC756PRO_notchon = on;
+	}
+
+	if (on) {
+		cmd = pre_to;
+		cmd.append("\x14\x0D");
+		cmd.append(to_bcd(notch,3));
+		cmd.append(post);
+		waitFB("set notch val");
+	}
+}
+
+bool RIG_IC756PRO::get_notch(int &val)
+{
+	bool on = false;
+	val = 0;
+
+	string cstr = "\x16\x48";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+	if (waitFOR(8, "get notch")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			on = replystr[p + 6] ? 1 : 0;
+		cmd = pre_to;
+		resp = pre_fm;
+		cstr = "\x14\x0D";
+		cmd.append(cstr);
+		resp.append(cstr);
+		cmd.append(post);
+		if (waitFOR(9, "get notch val")) {
+			size_t p = replystr.rfind(resp);
+			if (p != string::npos)
+				val = fm_bcd(replystr.substr(p+6),3);
+				val = (val - 53) * 20;
+				if (val < 0) val = 0;
+				if (val > 4040) val = 4040;
+		}
+	}
+	return on;
+}
+
+void RIG_IC756PRO::get_notch_min_max_step(int &min, int &max, int &step)
+{
+	min = 20;
+	max = 4040;
+	step = 20;
 }
 
 void RIG_IC756PRO::set_auto_notch(int v)
@@ -700,4 +1019,95 @@ int RIG_IC756PRO::get_preamp()
 	return preamp_level;
 }
 
+const char *RIG_IC756PRO::FILT(int val)
+{
+	if (val < 1) val = 1;
+	if (val > 3) val = 3;
+	return(szfilter[val - 1]);
+}
+
+int RIG_IC756PRO::get_FILT(int mode)
+{
+	if (useB) return mode_filterB[mode];
+	return mode_filterA[mode];
+}
+
+void RIG_IC756PRO::set_FILT(int filter)
+{
+	if (useB) {
+		B.filter = filter;
+		int val = B.imode;
+		mode_filterB[val - 1] = filter;
+		switch (val) {
+			case 7  : val = 8; break;
+			case 6  : val = 7; break;
+			default: break;
+		}
+		cmd = pre_to;
+		cmd += '\x06';
+		cmd += val;
+		cmd += filter;
+		cmd.append( post );
+		waitFB("set mode/filter B");
+
+	} else {
+		A.filter = filter;
+		int val = A.imode;
+		mode_filterA[val - 1] = filter;
+		switch (val) {
+			case 7  : val = 8; break;
+			case 6  : val = 7; break;
+			default: break;
+		}
+		cmd = pre_to;
+		cmd += '\x06';
+		cmd += val;
+		cmd += filter;
+		cmd.append( post );
+		waitFB("set filter A");
+	}
+}
+
+const char *RIG_IC756PRO::nextFILT()
+{
+	if (useB) {
+		B.filter++;
+		if (B.filter > 3) B.filter = 1;
+
+		set_FILT(B.filter);
+
+		return(szfilter[B.filter - 1]);
+	} else {
+		A.filter++;
+		if (A.filter > 3) A.filter = 1;
+
+		set_FILT(A.filter);
+
+		return(szfilter[A.filter - 1]);
+	}
+}
+
+void RIG_IC756PRO::set_FILTERS(std::string s)
+{
+	stringstream strm;
+	strm << s;
+	for (int i = 0; i < NUM_MODES; i++)
+		strm >> mode_filterA[i];
+	for (int i = 0; i < NUM_MODES; i++)
+		strm >> mode_filterB[i];
+}
+
+std::string RIG_IC756PRO::get_FILTERS()
+{
+	stringstream s;
+	for (int i = 0; i < NUM_MODES; i++)
+		s << mode_filterA[i] << " ";
+	for (int i = 0; i < NUM_MODES; i++)
+		s << mode_filterB[i] << " ";
+	return s.str();
+}
+
+// these are only defined in this file
+#undef NUM_FILTERS
+#undef NUM_MODES
 

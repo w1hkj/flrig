@@ -27,13 +27,24 @@ bool IC7800_DEBUG = true;
 
 const char IC7800name_[] = "IC-7800";
 
+enum {
+	LSB7800, USB7800, AM7800, CW7800, RTTY7800,
+	FM7800,  CWR7800, RTTYR7800, PSK7800, PSKR7800,
+	LSBD7800, USBD7800, AMD7800 };
+
 const char *IC7800modes_[] = {
-	"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R", "PSK", "PSK-R", NULL};
+	"LSB", "USB", "AM", "CW", "RTTY",
+	"FM", "CW-R", "RTTY-R", "PSK", "PSK-R", 
+	"LSB-D", "USB-D", "AM-D", NULL};
+
 const char IC7800_mode_type[] = {
-	'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U', 'U', 'L'};
+	'L', 'U', 'U', 'U', 'L',
+	'U', 'L', 'U', 'U', 'L',
+	'L', 'U', 'U' };
 
 const char IC7800_mode_nbr[] = {
-	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07, 0x08, 0x12, 0x13 };
+	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07, 0x08, 0x12, 0x13,
+	0X00, 0X01, 0X02 };
 
 const char *IC7800_ssb_bws[] = {
 "50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
@@ -77,20 +88,42 @@ const char *IC7800_fm_bws[] = { "FIXED", NULL };
 static int IC7800_bw_vals_FM[] = { 1, WVALS_LIMIT};
 
 static GUI IC7800_widgets[]= {
-	{ (Fl_Widget *)btnVol, 2, 125,  50 },
-	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },
-	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },
-	{ (Fl_Widget *)sldrSQUELCH, 54, 165, 156 },
-	{ (Fl_Widget *)btnNR, 2, 185,  50 },
-	{ (Fl_Widget *)sldrNR, 54, 185, 156 },
-	{ (Fl_Widget *)btnIFsh, 214, 125,  50 },
-	{ (Fl_Widget *)sldrIFSHIFT, 266, 125, 156 },
-	{ (Fl_Widget *)btnNotch, 214, 145,  50 },
-	{ (Fl_Widget *)sldrNOTCH, 266, 145, 156 },
-	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },
-	{ (Fl_Widget *)sldrPOWER, 266, 185, 156 },
+	{ (Fl_Widget *)btnVol,        2, 125,  50 },	//0
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },	//1
+	{ (Fl_Widget *)btnAGC,        2, 145,  50 },	//2
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },	//3
+	{ (Fl_Widget *)sldrSQUELCH,  54, 165, 156 },	//4
+	{ (Fl_Widget *)btnNR,         2, 185,  50 },	//5
+	{ (Fl_Widget *)sldrNR,       54, 185, 156 },	//6
+	{ (Fl_Widget *)btnLOCK,     214, 105,  50 },	//7
+	{ (Fl_Widget *)sldrINNER,   266, 105, 156 },	//8
+	{ (Fl_Widget *)btnCLRPBT,   214, 125,  50 },	//9
+	{ (Fl_Widget *)sldrOUTER,   266, 125, 156 },	//10
+	{ (Fl_Widget *)btnNotch,    214, 145,  50 },	//11
+	{ (Fl_Widget *)sldrNOTCH,   266, 145, 156 },	//12
+	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },	//13
+	{ (Fl_Widget *)sldrPOWER,   266, 185, 156 },	//14
 	{ (Fl_Widget *)NULL, 0, 0, 0 }
 };
+
+void RIG_IC7800::initialize()
+{
+	IC7800_widgets[0].W = btnVol;
+	IC7800_widgets[1].W = sldrVOLUME;
+	IC7800_widgets[2].W = btnAGC;
+	IC7800_widgets[3].W = sldrRFGAIN;
+	IC7800_widgets[4].W = sldrSQUELCH;
+	IC7800_widgets[5].W = btnNR;
+	IC7800_widgets[6].W = sldrNR;
+	IC7800_widgets[7].W = btnLOCK;
+	IC7800_widgets[8].W = sldrINNER;
+	IC7800_widgets[9].W = btnCLRPBT;
+	IC7800_widgets[10].W = sldrOUTER;
+	IC7800_widgets[11].W = btnNotch;
+	IC7800_widgets[12].W = sldrNOTCH;
+	IC7800_widgets[13].W = sldrMICGAIN;
+	IC7800_widgets[14].W = sldrPOWER;
+}
 
 RIG_IC7800::RIG_IC7800() {
 	defaultCIV = 0x6A;
@@ -128,6 +161,8 @@ RIG_IC7800::RIG_IC7800() {
 	has_attenuator_control =
 	has_preamp_control =
 	has_ifshift_control =
+	has_pbt_controls =
+	has_FILTER = 
 	has_ptt_control =
 	has_tune_control =
 	has_noise_control =
@@ -138,30 +173,25 @@ RIG_IC7800::RIG_IC7800() {
 	has_split_AB =
 	has_split = true;
 
+	ICOMmainsub = true;
+
 	precision = 1;
 	ndigits = 8;
+	filA = filB = 1;
+
+	def_freq = A.freq = 14070000;
+	def_mode = A.imode = 1;
+	def_bw = A.iBW = 34;
+
+	B.freq = 7070000;
+	B.imode = 1;
+	B.iBW = 34;
 
 };
 
 //======================================================================
 // IC7800 unique commands
 //======================================================================
-
-void RIG_IC7800::initialize()
-{
-	IC7800_widgets[0].W = btnVol;
-	IC7800_widgets[1].W = sldrVOLUME;
-	IC7800_widgets[2].W = sldrRFGAIN;
-	IC7800_widgets[3].W = sldrSQUELCH;
-	IC7800_widgets[4].W = btnNR;
-	IC7800_widgets[5].W = sldrNR;
-	IC7800_widgets[6].W = btnIFsh;
-	IC7800_widgets[7].W = sldrIFSHIFT;
-	IC7800_widgets[8].W = btnNotch;
-	IC7800_widgets[9].W = sldrNOTCH;
-	IC7800_widgets[10].W = sldrMICGAIN;
-	IC7800_widgets[11].W = sldrPOWER;
-}
 
 void RIG_IC7800::selectA()
 {
@@ -222,28 +252,24 @@ void RIG_IC7800::set_modeA(int val)
 	cmd = pre_to;
 	cmd += '\x06';
 	cmd += IC7800_mode_nbr[val];
+	cmd += filA;
 	cmd.append( post );
 	if (IC7800_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	sendICcommand (cmd, 6);
 	checkresponse();
 // digital set / clear
-	if (A.imode >= 10) {
+	if (val == LSBD7800 || val == USBD7800 || val == AMD7800) {
 		cmd = pre_to;
 		cmd += '\x1A'; cmd += '\x06';
-		switch (A.imode) {
-			case 12 : cmd += '\x01'; cmd += '\x01';break;
-			case 13 : cmd += '\x01'; cmd += '\x01';break;
-			default :
-				cmd += '\x00'; cmd += '\x00';
-		}
+		cmd += '\x01'; cmd += '\x01';
+		cmd += filA;
 		cmd.append( post);
-		if (IC7800_DEBUG)
-			LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-		sendICcommand (cmd, 6);
-		checkresponse();
+		waitFB("set digital");
 	}
 }
+
+static const char *szfilter[] = {"1", "2", "3"};
 
 int RIG_IC7800::get_modeA()
 {
@@ -257,13 +283,15 @@ int RIG_IC7800::get_modeA()
 		A.imode = md;
 	} else
 		checkresponse();
-	if (md == 0 || md == 1) {
+	if (md == LSB7800 || md == USB7800 || md == AM7800) {
 		cmd = pre_to;
 		cmd += '\x1A'; cmd += '\x06';
 		cmd.append(post);
 		if (sendICcommand(cmd, 9)) {
 			if (replystr[6] == 0x01 && A.imode == 0x01) {
-					A.imode = 9 + A.imode * 3 + replystr[6];
+					if (A.imode == LSB7800) A.imode = LSBD7800;
+					if (A.imode == USB7800) A.imode = USBD7800;
+					if (A.imode == AM7800) A.imode = AMD7800;
 			}
 		}
 	}
@@ -276,26 +304,20 @@ void RIG_IC7800::set_modeB(int val)
 	cmd = pre_to;
 	cmd += '\x06';
 	cmd += IC7800_mode_nbr[val];
+	cmd += filB;
 	cmd.append( post );
 	if (IC7800_DEBUG)
 		LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
 	sendICcommand (cmd, 6);
 	checkresponse();
 // digital set / clear
-	if (B.imode >= 12) {
+	if (val == LSBD7800 || val == USBD7800 || val == AMD7800) {
 		cmd = pre_to;
 		cmd += '\x1A'; cmd += '\x06';
-		switch (B.imode) {
-			case 12 : cmd += '\x01'; cmd += '\x01';break;
-			case 13 : cmd += '\x01'; cmd += '\x01';break;
-			default :
-				cmd += '\x00'; cmd += '\x00';
-		}
+		cmd += '\x01'; cmd += '\x01';
+		cmd += filB;
 		cmd.append( post);
-		if (IC7800_DEBUG)
-			LOG_INFO("%s", str2hex(cmd.data(), cmd.length()));
-		sendICcommand (cmd, 6);
-		checkresponse();
+		waitFB("set digital");
 	}
 }
 
@@ -311,13 +333,15 @@ int RIG_IC7800::get_modeB()
 		B.imode = md;
 	} else
 		checkresponse();
-	if (md == 0 || md == 1) {
+	if (md == LSB7800 || md == USB7800 || md == AM7800) {
 		cmd = pre_to;
 		cmd += '\x1A'; cmd += '\x06';
 		cmd.append(post);
 		if (sendICcommand(cmd, 9)) {
 			if (replystr[6] == 0x01 && A.imode == 0x01) {
-					A.imode = 9 + A.imode * 3 + replystr[6];
+					if (B.imode == LSB7800) B.imode = LSBD7800;
+					if (B.imode == USB7800) B.imode = USBD7800;
+					if (B.imode == AM7800) B.imode = AMD7800;
 			}
 		}
 	}
@@ -639,6 +663,63 @@ int RIG_IC7800::get_PTT()
 			ptt_ = replystr[p + 6];
 	}
 	return ptt_;
+}
+
+void RIG_IC7800::set_pbt_inner(int val)
+{
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x07");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set PBT inner");
+}
+
+void RIG_IC7800::set_pbt_outer(int val)
+{
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x08");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set PBT outer");
+}
+
+const char *RIG_IC7800::FILT(int &val)
+{
+	if (useB) {
+		if (filB < 0) filB = 0;
+		if (filB > 3) filB = 3;
+		val = filB;
+		return(szfilter[filB - 1]);
+	}
+	else {
+		if (filA < 0) filA = 0;
+		if (filA > 3) filA = 3;
+		val = filA;
+		return (szfilter[filA - 1]);
+	}
+}
+
+const char *RIG_IC7800::nextFILT()
+{
+	if (useB) {
+		filB++;
+		if (filB > 3) filB = 1;
+		set_modeB(B.imode);
+		return(szfilter[filB - 1]);
+	} else {
+		filA++;
+		if (filA > 3) filA = 1;
+		set_modeA(A.imode);
+		return(szfilter[filA - 1]);
+	}
 }
 
 

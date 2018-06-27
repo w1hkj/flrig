@@ -63,6 +63,25 @@ public:
 	int  adjust_bandwidth(int m);
 	int  def_bandwidth(int m);
 
+	void set_if_shift(int val);
+	void get_if_min_max_step(int &min, int &max, int &step);
+	bool get_if_shift(int &val);
+
+	void set_pbt_inner(int val);
+	void set_pbt_outer(int val);
+
+	const char *FILT(int val);
+	const char *nextFILT();
+
+	int  get_FILT(int mode);
+	void set_FILT(int filter);
+
+	void set_FILTERS(std::string s);
+	std::string get_FILTERS();
+
+	void set_BANDWIDTHS(std::string s);
+	std::string get_BANDWIDTHS();
+
 	void set_mic_gain(int v);
 	void get_mic_gain_min_max_step(int &min, int &max, int &step);
 	int  get_mic_gain();
@@ -136,10 +155,6 @@ public:
 	int  get_noise_reduction_val();
 	void get_nr_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 15; step = 1; }
-
-	void set_if_shift(int val);
-	void get_if_min_max_step(int &min, int &max, int &step);
-	bool get_if_shift(int &val);
 
 	void set_squelch(int val);
 	int  get_squelch();

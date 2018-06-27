@@ -64,19 +64,43 @@ static int IC756PRO3_bw_vals_RTTY[] = {
 const char *IC756PRO3_AMFMwidths[] = { "FILT-1", "FILT-2", "FILT-3", NULL };
 static int IC756PRO3_bw_vals_AMFM[] = { 1,2,3, WVALS_LIMIT};
 
-static GUI ic756pro3_widgets[]= {
-	{ (Fl_Widget *)btnVol, 2, 125,  50 },
-	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },
-	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },
-	{ (Fl_Widget *)sldrSQUELCH, 54, 165, 156 },
-	{ (Fl_Widget *)btnNR, 214, 125,  50 },
-	{ (Fl_Widget *)sldrNR, 266, 125, 156 },
-	{ (Fl_Widget *)btnIFsh, 214, 105,  50 },
-	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
-	{ (Fl_Widget *)sldrMICGAIN, 266, 145, 156 },
-	{ (Fl_Widget *)sldrPOWER, 266, 165, 156 },
+static GUI IC756PRO3_widgets[]= {
+	{ (Fl_Widget *)btnVol,        2, 125,  50 },	//0
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },	//1
+	{ (Fl_Widget *)btnAGC,        2, 145,  50 },	//2
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },	//3
+	{ (Fl_Widget *)sldrSQUELCH,  54, 165, 156 },	//4
+	{ (Fl_Widget *)btnNR,         2, 185,  50 },	//5
+	{ (Fl_Widget *)sldrNR,       54, 185, 156 },	//6
+	{ (Fl_Widget *)btnLOCK,     214, 105,  50 },	//7
+	{ (Fl_Widget *)sldrINNER,   266, 105, 156 },	//8
+	{ (Fl_Widget *)btnCLRPBT,   214, 125,  50 },	//9
+	{ (Fl_Widget *)sldrOUTER,   266, 125, 156 },	//10
+	{ (Fl_Widget *)btnNotch,    214, 145,  50 },	//11
+	{ (Fl_Widget *)sldrNOTCH,   266, 145, 156 },	//12
+	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },	//13
+	{ (Fl_Widget *)sldrPOWER,   266, 185, 156 },	//14
 	{ (Fl_Widget *)NULL, 0, 0, 0 }
 };
+
+void RIG_IC756PRO3::initialize()
+{
+	IC756PRO3_widgets[0].W = btnVol;
+	IC756PRO3_widgets[1].W = sldrVOLUME;
+	IC756PRO3_widgets[2].W = btnAGC;
+	IC756PRO3_widgets[3].W = sldrRFGAIN;
+	IC756PRO3_widgets[4].W = sldrSQUELCH;
+	IC756PRO3_widgets[5].W = btnNR;
+	IC756PRO3_widgets[6].W = sldrNR;
+	IC756PRO3_widgets[7].W = btnLOCK;
+	IC756PRO3_widgets[8].W = sldrINNER;
+	IC756PRO3_widgets[9].W = btnCLRPBT;
+	IC756PRO3_widgets[10].W = sldrOUTER;
+	IC756PRO3_widgets[11].W = btnNotch;
+	IC756PRO3_widgets[12].W = sldrNOTCH;
+	IC756PRO3_widgets[13].W = sldrMICGAIN;
+	IC756PRO3_widgets[14].W = sldrPOWER;
+}
 
 RIG_IC756PRO3::RIG_IC756PRO3() {
 	defaultCIV = 0x6E;
@@ -89,17 +113,20 @@ RIG_IC756PRO3::RIG_IC756PRO3() {
 	atten_level = 3; // will force initializing to 0 dB
 	preamp_level = 2; // will force initializaing to 0 dB
 
-	widgets = ic756pro3_widgets;
+	widgets = IC756PRO3_widgets;
 
 	def_freq = freqA = freqB = A.freq = 14070000;
 	def_mode = modeA = modeB = B.imode = 1;
 	def_bw = bwA = bwB = A.iBW = B.iBW = 32;
 
-	has_a2b =
+	has_extras =
 	has_split =
 	has_split_AB =
 	has_bandwidth_control =
-	has_ifshift_control =
+
+	has_pbt_controls = true;
+	has_FILTER = true;
+
 	has_tune_control =
 
 	has_swr_control =
@@ -112,6 +139,7 @@ RIG_IC756PRO3::RIG_IC756PRO3() {
 	has_mode_control =
 	has_micgain_control =
 	has_auto_notch =
+	has_notch_control =
 	has_attenuator_control =
 	has_preamp_control =
 	has_ptt_control =
@@ -119,29 +147,18 @@ RIG_IC756PRO3::RIG_IC756PRO3() {
 	has_noise_reduction_control =
 	has_noise_control =
 	has_sql_control =
-	has_rf_control = true;
+	has_rf_control =
 	has_a2b = true;
 
 	adjustCIV(defaultCIV);
 
+	ICOMmainsub = true;
+
 	precision = 1;
 	ndigits = 9;
+	filA = filB = 1;
 
 };
-
-void RIG_IC756PRO3::initialize()
-{
-	ic756pro3_widgets[0].W = btnVol;
-	ic756pro3_widgets[1].W = sldrVOLUME;
-	ic756pro3_widgets[2].W = sldrRFGAIN;
-	ic756pro3_widgets[3].W = sldrSQUELCH;
-	ic756pro3_widgets[4].W = btnNR;
-	ic756pro3_widgets[5].W = sldrNR;
-	ic756pro3_widgets[6].W = btnIFsh;
-	ic756pro3_widgets[7].W = sldrIFSHIFT;
-	ic756pro3_widgets[8].W = sldrMICGAIN;
-	ic756pro3_widgets[9].W = sldrPOWER;
-}
 
 void RIG_IC756PRO3::swapAB()
 {
@@ -502,6 +519,32 @@ void RIG_IC756PRO3::get_if_min_max_step(int &min, int &max, int &step)
 	step = 1;
 }
 
+void RIG_IC756PRO3::set_pbt_inner(int val)
+{
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x07");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set PBT inner");
+}
+
+void RIG_IC756PRO3::set_pbt_outer(int val)
+{
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x08");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set PBT outer");
+}
+
 void RIG_IC756PRO3::set_squelch(int val)
 {
 	int IC756PRO3sql = (int)(val * 2.55);
@@ -732,6 +775,7 @@ int  RIG_IC756PRO3::get_bwB()
 }
 
 bool IC756PRO3_notchon = false;
+
 void RIG_IC756PRO3::set_notch(bool on, int val)
 {
 	int notch = (int)(val/20.0 + 128);
@@ -925,6 +969,7 @@ void RIG_IC756PRO3::set_modeA(int val)
 	cmd = pre_to;
 	cmd += '\x06';
 	cmd += val;
+	cmd += filA;
 	cmd.append( post );
 	waitFB("set mode A");
 	if (datamode) { // LSB / USB ==> use DATA mode
@@ -934,6 +979,8 @@ void RIG_IC756PRO3::set_modeA(int val)
 		waitFB("data mode");
 	}
 }
+
+static const char *szfilter[] = {"1", "2", "3"};
 
 int RIG_IC756PRO3::get_modeA()
 {
@@ -949,7 +996,7 @@ int RIG_IC756PRO3::get_modeA()
 		if (p != string::npos) {
 			md = replystr[p+5];
 			if (md > 6) md--;
-			A.iBW = replystr[p+6];
+			filA = replystr[p+6];
 			cstr = "\x1A\x06";
 			resp = pre_fm;
 			resp.append(cstr);
@@ -990,6 +1037,7 @@ void RIG_IC756PRO3::set_modeB(int val)
 	cmd = pre_to;
 	cmd += '\x06';
 	cmd += val;
+	cmd += filB;
 	cmd.append( post );
 	waitFB("set mode B");
 	if (datamode) { // LSB / USB ==> use DATA mode
@@ -1014,7 +1062,7 @@ int RIG_IC756PRO3::get_modeB()
 		if (p != string::npos) {
 			md = replystr[p+5];
 			if (md > 6) md--;
-			B.iBW = replystr[p+6];
+			filA = replystr[p+6];
 			cstr = "\x1A\x06";
 			resp = pre_fm;
 			resp.append(cstr);
@@ -1072,4 +1120,32 @@ int RIG_IC756PRO3::get_auto_notch()
 	}
 	return progStatus.auto_notch;
 }
+
+const char *RIG_IC756PRO3::FILT(int &val)
+{
+	if (useB) {
+		val = filB;
+		return(szfilter[filB - 1]);
+	}
+	else {
+		val = filA;
+		return (szfilter[filA - 1]);
+	}
+}
+
+const char *RIG_IC756PRO3::nextFILT()
+{
+	if (useB) {
+		filB++;
+		if (filB > 3) filB = 1;
+		set_modeB(B.imode);
+		return(szfilter[filB - 1]);
+	} else {
+		filA++;
+		if (filA > 3) filA = 1;
+		set_modeA(A.imode);
+		return(szfilter[filA - 1]);
+	}
+}
+
 

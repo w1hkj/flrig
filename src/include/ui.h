@@ -25,7 +25,11 @@
 #define TOUCH_MAINH 134
 
 #define WIDE_MAINW 735
-#define WIDE_MAINH 218
+#define WIDE_MAINH 170
+
+#define SMALL_MENUH 22
+#define SMALL_MAINW 425
+#define SMALL_MAINH 360
 
 #endif
 

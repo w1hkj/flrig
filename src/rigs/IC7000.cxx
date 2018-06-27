@@ -77,19 +77,60 @@ const char *IC7000_FMwidths[] = { "FIXED", NULL };
 static int IC7000_bw_vals_FM[] = {
 1, WVALS_LIMIT};
 
-static GUI rig_widgets[]= {
-	{ (Fl_Widget *)btnVol,        2, 125,  50 },
-	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
-	{ (Fl_Widget *)sldrRFGAIN,  266, 125, 156 },
-	{ (Fl_Widget *)sldrMICGAIN, 266, 145, 156 },
-	{ (Fl_Widget *)sldrSQUELCH, 266, 105, 156 },
-	{ (Fl_Widget *)btnNR,         2, 145,  50 },
-	{ (Fl_Widget *)sldrNR,       54, 145, 156 },
-	{ (Fl_Widget *)btnNotch,      2, 165,  50 },
-	{ (Fl_Widget *)sldrNOTCH,    54, 165, 156 },
-	{ (Fl_Widget *)sldrPOWER,   266, 165, 156 },
+static GUI IC7000_widgets[]= {
+	{ (Fl_Widget *)btnVol,        2, 125,  50 },	//0
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },	//1
+	{ (Fl_Widget *)btnAGC,        2, 145,  50 },	//2
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },	//3
+	{ (Fl_Widget *)sldrSQUELCH,  54, 165, 156 },	//4
+	{ (Fl_Widget *)btnNR,         2, 185,  50 },	//5
+	{ (Fl_Widget *)sldrNR,       54, 185, 156 },	//6
+	{ (Fl_Widget *)btnLOCK,     214, 105,  50 },	//7
+	{ (Fl_Widget *)sldrINNER,   266, 105, 156 },	//8
+	{ (Fl_Widget *)btnCLRPBT,   214, 125,  50 },	//9
+	{ (Fl_Widget *)sldrOUTER,   266, 125, 156 },	//10
+	{ (Fl_Widget *)btnNotch,    214, 145,  50 },	//11
+	{ (Fl_Widget *)sldrNOTCH,   266, 145, 156 },	//12
+	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },	//13
+	{ (Fl_Widget *)sldrPOWER,   266, 185, 156 },	//14
 	{ (Fl_Widget *)NULL, 0, 0, 0 }
 };
+
+void RIG_IC7000::initialize()
+{
+	IC7000_widgets[0].W = btnVol;
+	IC7000_widgets[1].W = sldrVOLUME;
+	IC7000_widgets[2].W = btnAGC;
+	IC7000_widgets[3].W = sldrRFGAIN;
+	IC7000_widgets[4].W = sldrSQUELCH;
+	IC7000_widgets[5].W = btnNR;
+	IC7000_widgets[6].W = sldrNR;
+	IC7000_widgets[7].W = btnLOCK;
+	IC7000_widgets[8].W = sldrINNER;
+	IC7000_widgets[9].W = btnCLRPBT;
+	IC7000_widgets[10].W = sldrOUTER;
+	IC7000_widgets[11].W = btnNotch;
+	IC7000_widgets[12].W = sldrNOTCH;
+	IC7000_widgets[13].W = sldrMICGAIN;
+	IC7000_widgets[14].W = sldrPOWER;
+
+	cmd = pre_to;
+	cmd += '\x1A';
+	cmd += '\x05';
+	cmd += '\x00';
+	cmd += '\x92';
+	cmd += '\x00';
+	cmd.append(post);
+	if (!waitFB("CI-V") && RigSerial->IsOpen()) {
+		flrig_abort = true;
+		return;
+	}
+	cmd = pre_to;
+	cmd.append("\x16\x51");
+	cmd += '\x00';
+	cmd.append(post);
+	if (!waitFB("NF2 OFF") && RigSerial->IsOpen()) flrig_abort = true;
+}
 
 RIG_IC7000::RIG_IC7000() {
 	defaultCIV = 0x70;
@@ -99,11 +140,11 @@ RIG_IC7000::RIG_IC7000() {
 	bw_vals_ = IC7000_bw_vals_SSB;
 
 	_mode_type = IC7000_mode_type;
-	widgets = rig_widgets;
+	widgets = IC7000_widgets;
 
-	A.freq = 432399230;
-	A.imode = 1;
-	A.iBW = 28;
+	def_freq = A.freq = 432399230;
+	def_mode = A.imode = 1;
+	def_bw = A.iBW = 28;
 	B.freq = 432399230;
 	B.imode = 1;
 	B.iBW = 28;
@@ -149,37 +190,6 @@ RIG_IC7000::RIG_IC7000() {
 //======================================================================
 
 #include "debug.h"
-
-void RIG_IC7000::initialize()
-{
-	rig_widgets[0].W = btnVol;
-	rig_widgets[1].W = sldrVOLUME;
-	rig_widgets[2].W = sldrRFGAIN;
-	rig_widgets[3].W = sldrMICGAIN;
-	rig_widgets[4].W = sldrSQUELCH;
-	rig_widgets[5].W = btnNR;
-	rig_widgets[6].W = sldrNR;
-	rig_widgets[7].W = btnNotch;
-	rig_widgets[8].W = sldrNOTCH;
-	rig_widgets[9].W = sldrPOWER;
-
-	cmd = pre_to;
-	cmd += '\x1A';
-	cmd += '\x05';
-	cmd += '\x00';
-	cmd += '\x92';
-	cmd += '\x00';
-	cmd.append(post);
-	if (!waitFB("CI-V") && RigSerial->IsOpen()) {
-		flrig_abort = true;
-		return;
-	}
-	cmd = pre_to;
-	cmd.append("\x16\x51");
-	cmd += '\x00';
-	cmd.append(post);
-	if (!waitFB("NF2 OFF") && RigSerial->IsOpen()) flrig_abort = true;
-}
 
 void RIG_IC7000::selectA()
 {
@@ -900,5 +910,31 @@ int RIG_IC7000::get_PTT()
 			ptt_ = replystr[p + 6];
 	}
 	return ptt_;
+}
+
+void RIG_IC7000::set_pbt_inner(int val)
+{
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x07");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set PBT inner");
+}
+
+void RIG_IC7000::set_pbt_outer(int val)
+{
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x08");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set PBT outer");
 }
 

@@ -101,6 +101,7 @@ extern Fl_ComboBox *opBW;
 extern Fl_Button *btnDSP;
 extern Fl_ComboBox *opDSP_lo;
 extern Fl_ComboBox *opDSP_hi;
+extern Fl_Button *btnFILT;
 extern Fl_ComboBox *opMODE;
 extern Fl_Group *grp_row1b;
 extern Fl_Group *grp_row1b1;
@@ -132,6 +133,11 @@ extern Fl_Light_Button *btnAGC;
 extern Fl_Wheel_Value_Slider *sldrRFGAIN;
 extern Fl_Box *bx_sep2c;
 extern Fl_Group *grp_row2d;
+
+extern Fl_Light_Button *btnLOCK;
+extern Fl_Button *btnCLRPBT;
+extern Fl_Wheel_Value_Slider *sldrINNER;
+extern Fl_Wheel_Value_Slider *sldrOUTER;
 
 extern Fl_Wheel_Value_Slider *sldrPOWER;
 

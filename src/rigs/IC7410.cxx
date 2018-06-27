@@ -82,20 +82,42 @@ const char *IC7410_fm_bws[] = {
 "FIXED", NULL };
 
 static GUI IC7410_widgets[]= {
-	{ (Fl_Widget *)btnVol, 2, 125,  50 },
-	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },
-	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },
-	{ (Fl_Widget *)sldrSQUELCH, 54, 165, 156 },
-	{ (Fl_Widget *)btnNR, 2, 185,  50 },
-	{ (Fl_Widget *)sldrNR, 54, 185, 156 },
-	{ (Fl_Widget *)btnIFsh, 214, 125,  50 },
-	{ (Fl_Widget *)sldrIFSHIFT, 266, 125, 156 },
-	{ (Fl_Widget *)btnNotch, 214, 145,  50 },
-	{ (Fl_Widget *)sldrNOTCH, 266, 145, 156 },
-	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },
-	{ (Fl_Widget *)sldrPOWER, 266, 185, 156 },
+	{ (Fl_Widget *)btnVol,        2, 125,  50 },	//0
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },	//1
+	{ (Fl_Widget *)btnAGC,        2, 145,  50 },	//2
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },	//3
+	{ (Fl_Widget *)sldrSQUELCH,  54, 165, 156 },	//4
+	{ (Fl_Widget *)btnNR,         2, 185,  50 },	//5
+	{ (Fl_Widget *)sldrNR,       54, 185, 156 },	//6
+	{ (Fl_Widget *)btnLOCK,     214, 105,  50 },	//7
+	{ (Fl_Widget *)sldrINNER,   266, 105, 156 },	//8
+	{ (Fl_Widget *)btnCLRPBT,   214, 125,  50 },	//9
+	{ (Fl_Widget *)sldrOUTER,   266, 125, 156 },	//10
+	{ (Fl_Widget *)btnNotch,    214, 145,  50 },	//11
+	{ (Fl_Widget *)sldrNOTCH,   266, 145, 156 },	//12
+	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },	//13
+	{ (Fl_Widget *)sldrPOWER,   266, 185, 156 },	//14
 	{ (Fl_Widget *)NULL, 0, 0, 0 }
 };
+
+void RIG_IC7410::initialize()
+{
+	IC7410_widgets[0].W = btnVol;
+	IC7410_widgets[1].W = sldrVOLUME;
+	IC7410_widgets[2].W = btnAGC;
+	IC7410_widgets[3].W = sldrRFGAIN;
+	IC7410_widgets[4].W = sldrSQUELCH;
+	IC7410_widgets[5].W = btnNR;
+	IC7410_widgets[6].W = sldrNR;
+	IC7410_widgets[7].W = btnLOCK;
+	IC7410_widgets[8].W = sldrINNER;
+	IC7410_widgets[9].W = btnCLRPBT;
+	IC7410_widgets[10].W = sldrOUTER;
+	IC7410_widgets[11].W = btnNotch;
+	IC7410_widgets[12].W = sldrNOTCH;
+	IC7410_widgets[13].W = sldrMICGAIN;
+	IC7410_widgets[14].W = sldrPOWER;
+}
 
 RIG_IC7410::RIG_IC7410() {
 	defaultCIV = 0x80;
@@ -118,6 +140,9 @@ RIG_IC7410::RIG_IC7410() {
 
 	widgets = IC7410_widgets;
 
+	has_pbt_controls = true;
+	has_FILTER = true;
+
 	has_extras =
 
 	has_cw_wpm =
@@ -139,27 +164,21 @@ RIG_IC7410::RIG_IC7410() {
 	precision = 1;
 	ndigits = 9;
 
+	filA = filB = 1;
+
+	def_freq = A.freq = 14070000;
+	def_mode = A.imode = 1;
+	def_bw = A.iBW = 34;
+
+	B.freq = 7070000;
+	B.imode = 1;
+	B.iBW = 34;
+
 };
 
 //======================================================================
 // IC7410 unique commands
 //======================================================================
-
-void RIG_IC7410::initialize()
-{
-	IC7410_widgets[0].W = btnVol;
-	IC7410_widgets[1].W = sldrVOLUME;
-	IC7410_widgets[2].W = sldrRFGAIN;
-	IC7410_widgets[3].W = sldrSQUELCH;
-	IC7410_widgets[4].W = btnNR;
-	IC7410_widgets[5].W = sldrNR;
-	IC7410_widgets[6].W = btnIFsh;
-	IC7410_widgets[7].W = sldrIFSHIFT;
-	IC7410_widgets[8].W = btnNotch;
-	IC7410_widgets[9].W = sldrNOTCH;
-	IC7410_widgets[10].W = sldrMICGAIN;
-	IC7410_widgets[11].W = sldrPOWER;
-}
 
 void RIG_IC7410::selectA()
 {
@@ -185,6 +204,7 @@ void RIG_IC7410::set_modeA(int val)
 	cmd = pre_to;
 	cmd += '\x06';
 	cmd += IC7410_mode_nbr[val];
+	cmd += filA;
 	cmd.append( post );
 	waitFB("set mode A");
 // digital set / clear
@@ -192,10 +212,13 @@ void RIG_IC7410::set_modeA(int val)
 		cmd = pre_to;
 		cmd += '\x1A'; cmd += '\x06';
 		cmd += '\x01'; cmd += '\x01';
+		cmd += filA;
 		cmd.append( post);
 		waitFB("set digital");
 	}
 }
+
+static const char *szfilter[] = {"1", "2", "3"};
 
 int RIG_IC7410::get_modeA()
 {
@@ -208,7 +231,9 @@ int RIG_IC7410::get_modeA()
 	if (waitFOR(8, "get mode A")) {
 		size_t p = replystr.rfind(resp);
 		for (md = LSB7410; md <= RTTYR7410; md++)
-			if (replystr[p+6] == IC7410_mode_nbr[md]) break;
+			if (replystr[p+5] == IC7410_mode_nbr[md]) break;
+		filA = replystr[p+6];
+
 		if (md == LSB7410 || md == USB7410 || md == FM7410) {
 			cmd = pre_to;
 			cmd.append("\x1a\x06");
@@ -222,6 +247,7 @@ int RIG_IC7410::get_modeA()
 					else if (md == USB7410) md = USBD7410;
 					else if (md == FM7410) md = FMD7410;
 				}
+				if (replystr[p+7]) filA = replystr[p+7];
 			}
 		}
 		A.imode = md;
@@ -235,12 +261,14 @@ void RIG_IC7410::set_modeB(int val)
 	cmd = pre_to;
 	cmd += '\x06';
 	cmd += IC7410_mode_nbr[val];
+	cmd += filB;
 	cmd.append( post );
 	waitFB("set mode B");
 	if (val == LSBD7410 || val == USBD7410 || val == FMD7410) {
 		cmd = pre_to;
 		cmd += '\x1A'; cmd += '\x06';
 		cmd += '\x01'; cmd += '\x01';
+		cmd += filB;
 		cmd.append( post);
 		waitFB("set digital");
 	}
@@ -257,7 +285,9 @@ int RIG_IC7410::get_modeB()
 	if (waitFOR(8, "get mode B")) {
 		size_t p = replystr.rfind(resp);
 		for (md = LSB7410; md <= RTTYR7410; md++)
-			if (replystr[p+6] == IC7410_mode_nbr[md]) break;
+			if (replystr[p+5] == IC7410_mode_nbr[md]) break;
+		filA = replystr[p+6];
+
 		if (md == USB7410 || md == AM7410 || md == FM7410) {
 			cmd = pre_to;
 			cmd.append("\x1a\x06");
@@ -271,6 +301,7 @@ int RIG_IC7410::get_modeB()
 					else if (md == USB7410) md = USBD7410;
 					else if (md == FM7410) md = FMD7410;
 				}
+				if (replystr[p+7]) filB = replystr[p+7];
 			}
 		}
 		B.imode = md;
@@ -562,5 +593,62 @@ int RIG_IC7410::get_PTT()
 			ptt_ = replystr[p + 6];
 	}
 	return ptt_;
+}
+
+void RIG_IC7410::set_pbt_inner(int val)
+{
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x07");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set PBT inner");
+}
+
+void RIG_IC7410::set_pbt_outer(int val)
+{
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x08");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set PBT outer");
+}
+
+const char *RIG_IC7410::FILT(int &val)
+{
+	if (useB) {
+		if (filB < 0) filB = 0;
+		if (filB > 3) filB = 3;
+		val = filB;
+		return(szfilter[filB - 1]);
+	}
+	else {
+		if (filA < 0) filA = 0;
+		if (filA > 3) filA = 3;
+		val = filA;
+		return (szfilter[filA - 1]);
+	}
+}
+
+const char *RIG_IC7410::nextFILT()
+{
+	if (useB) {
+		filB++;
+		if (filB > 3) filB = 1;
+		set_modeB(B.imode);
+		return(szfilter[filB - 1]);
+	} else {
+		filA++;
+		if (filA > 3) filA = 1;
+		set_modeA(A.imode);
+		return(szfilter[filA - 1]);
+	}
 }
 

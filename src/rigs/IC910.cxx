@@ -30,19 +30,39 @@ const char IC910H_mode_type[] =
 const char *IC910H_widths[] = {"none", NULL};
 static int IC910H_bw_val[] = {1, WVALS_LIMIT};
 
-static GUI ic910h_widgets[]= {
-	{ (Fl_Widget *)btnVol, 2, 125,  50 },
-	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },
-	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },
-	{ (Fl_Widget *)sldrSQUELCH, 54, 165, 156 },
-	{ (Fl_Widget *)btnNR, 214, 125,  50 },
-	{ (Fl_Widget *)sldrNR, 266, 125, 156 },
-	{ (Fl_Widget *)btnIFsh, 214, 105,  50 },
-	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
-	{ (Fl_Widget *)sldrMICGAIN, 266, 145, 156 },
-	{ (Fl_Widget *)sldrPOWER, 266, 165, 156 },
+static GUI IC910_widgets[]= {
+	{ (Fl_Widget *)btnVol,        2, 125,  50 },	//0
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },	//1
+	{ (Fl_Widget *)btnAGC,        2, 145,  50 },	//2
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },	//3
+	{ (Fl_Widget *)sldrSQUELCH,  54, 165, 156 },	//4
+	{ (Fl_Widget *)btnNR,         2, 185,  50 },	//5
+	{ (Fl_Widget *)sldrNR,       54, 185, 156 },	//6
+	{ (Fl_Widget *)btnLOCK,     214, 125,  50 },	//7
+	{ (Fl_Widget *)sldrINNER,   266, 125, 156 },	//8
+	{ (Fl_Widget *)btnCLRPBT,   214, 145,  50 },	//9
+	{ (Fl_Widget *)sldrOUTER,   266, 145, 156 },	//10
+	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },	//11
+	{ (Fl_Widget *)sldrPOWER,   266, 185, 156 },	//12
 	{ (Fl_Widget *)NULL, 0, 0, 0 }
 };
+
+void RIG_IC910H::initialize()
+{
+	IC910_widgets[0].W = btnVol;
+	IC910_widgets[1].W = sldrVOLUME;
+	IC910_widgets[2].W = btnAGC;
+	IC910_widgets[3].W = sldrRFGAIN;
+	IC910_widgets[4].W = sldrSQUELCH;
+	IC910_widgets[5].W = btnNR;
+	IC910_widgets[6].W = sldrNR;
+	IC910_widgets[7].W = btnLOCK;
+	IC910_widgets[8].W = sldrINNER;
+	IC910_widgets[9].W = btnCLRPBT;
+	IC910_widgets[10].W = sldrOUTER;
+	IC910_widgets[11].W = sldrMICGAIN;
+	IC910_widgets[12].W = sldrPOWER;
+}
 
 RIG_IC910H::RIG_IC910H() {
 	defaultCIV = 0x60;
@@ -52,7 +72,7 @@ RIG_IC910H::RIG_IC910H() {
 	bandwidths_ = IC910H_widths;
 	bw_vals_ = IC910H_bw_val;
 
-	widgets = ic910h_widgets;
+	widgets = IC910_widgets;
 
 	def_freq = 1296070000L;
 	def_mode = 1;
@@ -78,6 +98,7 @@ RIG_IC910H::RIG_IC910H() {
 	has_attenuator_control =
 	has_preamp_control =
 	has_ifshift_control =
+	has_pbt_controls =
 	has_swr_control =
 	has_noise_control =
 	has_noise_reduction =
@@ -93,20 +114,6 @@ RIG_IC910H::RIG_IC910H() {
 	ndigits = 9;
 
 };
-
-void RIG_IC910H::initialize()
-{
-	ic910h_widgets[0].W = btnVol;
-	ic910h_widgets[1].W = sldrVOLUME;
-	ic910h_widgets[2].W = sldrRFGAIN;
-	ic910h_widgets[3].W = sldrSQUELCH;
-	ic910h_widgets[4].W = btnNR;
-	ic910h_widgets[5].W = sldrNR;
-	ic910h_widgets[6].W = btnIFsh;
-	ic910h_widgets[7].W = sldrIFSHIFT;
-	ic910h_widgets[8].W = sldrMICGAIN;
-	ic910h_widgets[9].W = sldrPOWER;
-}
 
 // this looks like trouble
 void RIG_IC910H::set_vfoA (long freq)
@@ -215,5 +222,31 @@ int RIG_IC910H::get_smeter()
 		}
 	}
 	return mtr;
+}
+
+void RIG_IC910H::set_pbt_inner(int val)
+{
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x07");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set PBT inner");
+}
+
+void RIG_IC910H::set_pbt_outer(int val)
+{
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x08");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set PBT outer");
 }
 

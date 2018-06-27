@@ -40,6 +40,7 @@ struct XCVR_STATE {
 	long freq;
 	int  imode;
 	int  iBW;
+	int  filter;
 	int  src;
 
 	int		split;
@@ -67,6 +68,7 @@ struct XCVR_STATE {
 		freq = 0;
 		imode = 0;
 		iBW = 0;
+		filter = 0;
 		src = UI;
 
 		split = 0;
@@ -216,6 +218,7 @@ public:
 	bool has_mode_control;
 	bool has_bandwidth_control;
 	bool has_dsp_controls;
+	bool has_FILTER;
 	bool has_micgain_control;
 	bool has_mic_line_control;
 	bool has_notch_control;
@@ -226,6 +229,7 @@ public:
 	bool has_attenuator_control;
 	bool has_preamp_control;
 	bool has_ifshift_control;
+	bool has_pbt_controls;
 	bool has_ptt_control;
 	bool has_tune_control;
 	bool has_swr_control;
@@ -274,11 +278,15 @@ public:
 
 // Icom Xcvr 
 	bool ICOMrig;
+	bool ICOMmainsub;
 	string pre_to;
 	string pre_fm;
 	string post;
 	string ok;
 	string bad;
+
+	int filA;
+	int filB;
 
 	int  data_type;
 
@@ -343,6 +351,18 @@ public:
 	virtual const char **bwtable(int m) {return bandwidths_;}
 	virtual const char **lotable(int m) {return NULL;}
 	virtual const char **hitable(int m) {return NULL;}
+
+	virtual const char *FILT(int val) { return "1"; }
+	virtual const char *nextFILT() { return "1";}
+
+	virtual int  get_FILT(int mode) { return 1; }
+	virtual void set_FILT(int filter) {}
+
+	virtual void set_BANDWIDTHS(std::string s) {}
+	virtual std::string get_BANDWIDTHS() { return ""; }
+
+	virtual void set_FILTERS(std::string s) {}
+	virtual std::string get_FILTERS() { return 0; }
 
 	virtual bool can_split() { return false;}
 	virtual void set_split(bool val);
@@ -419,6 +439,9 @@ int nr_, nrval_;
 	virtual int  get_noise_reduction_val() {return nrval_;}
 	virtual void get_nr_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 100; step = 1; }
+
+	virtual void set_pbt_inner(int val) {}
+	virtual void set_pbt_outer(int val) {}
 
 int mcval_;
 	virtual void set_mic_gain(int val) {mcval_ = val;}

@@ -75,10 +75,16 @@ public:
 
 	void set_if_shift(int val);
 	void get_if_min_max_step(int &min, int &max, int &step);
-	
+
+	void set_pbt_inner(int val);
+	void set_pbt_outer(int val);
+
+	const char *FILT(int &val);
+	const char *nextFILT();
+
 	void set_squelch(int val);
 	int  get_squelch();
-	
+
 	void set_rf_gain(int val);
 	int  get_rf_gain();
 	

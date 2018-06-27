@@ -52,6 +52,9 @@ public:
 	int  get_attenuator();
 	void set_mic_gain(int v);
 
+	void set_pbt_inner(int val);
+	void set_pbt_outer(int val);
+
 	void set_compression(int, int);
 	void get_comp_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 10; step = 1; }
@@ -80,6 +83,9 @@ public:
 
 	void set_PTT_control(int val);
 	int  get_PTT();
+
+	const char *FILT(int &val);
+	const char *nextFILT();
 
 	const char **bwtable(int m);
 

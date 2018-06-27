@@ -96,21 +96,42 @@ const char *IC9100_fixed_bws[] = { "FIXED", NULL };
 static int IC9100_bw_vals_fixed[] = { 1, WVALS_LIMIT};
 
 static GUI IC9100_widgets[]= {
-	{ (Fl_Widget *)btnVol, 2, 125,  50 },
-	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },
-	{ (Fl_Widget *)btnAGC, 2, 145, 50 },
-	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },
-	{ (Fl_Widget *)sldrSQUELCH, 54, 165, 156 },
-	{ (Fl_Widget *)btnNR, 2, 185,  50 },
-	{ (Fl_Widget *)sldrNR, 54, 185, 156 },
-	{ (Fl_Widget *)btnIFsh, 214, 125,  50 },
-	{ (Fl_Widget *)sldrIFSHIFT, 266, 125, 156 },
-	{ (Fl_Widget *)btnNotch, 214, 145,  50 },
-	{ (Fl_Widget *)sldrNOTCH, 266, 145, 156 },
-	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },
-	{ (Fl_Widget *)sldrPOWER, 266, 185, 156 },
+	{ (Fl_Widget *)btnVol,        2, 125,  50 },	//0
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },	//1
+	{ (Fl_Widget *)btnAGC,        2, 145,  50 },	//2
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },	//3
+	{ (Fl_Widget *)sldrSQUELCH,  54, 165, 156 },	//4
+	{ (Fl_Widget *)btnNR,         2, 185,  50 },	//5
+	{ (Fl_Widget *)sldrNR,       54, 185, 156 },	//6
+	{ (Fl_Widget *)btnLOCK,     214, 105,  50 },	//7
+	{ (Fl_Widget *)sldrINNER,   266, 105, 156 },	//8
+	{ (Fl_Widget *)btnCLRPBT,   214, 125,  50 },	//9
+	{ (Fl_Widget *)sldrOUTER,   266, 125, 156 },	//10
+	{ (Fl_Widget *)btnNotch,    214, 145,  50 },	//11
+	{ (Fl_Widget *)sldrNOTCH,   266, 145, 156 },	//12
+	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },	//13
+	{ (Fl_Widget *)sldrPOWER,   266, 185, 156 },	//14
 	{ (Fl_Widget *)NULL, 0, 0, 0 }
 };
+
+void RIG_IC9100::initialize()
+{
+	IC9100_widgets[0].W = btnVol;
+	IC9100_widgets[1].W = sldrVOLUME;
+	IC9100_widgets[2].W = btnAGC;
+	IC9100_widgets[3].W = sldrRFGAIN;
+	IC9100_widgets[4].W = sldrSQUELCH;
+	IC9100_widgets[5].W = btnNR;
+	IC9100_widgets[6].W = sldrNR;
+	IC9100_widgets[7].W = btnLOCK;
+	IC9100_widgets[8].W = sldrINNER;
+	IC9100_widgets[9].W = btnCLRPBT;
+	IC9100_widgets[10].W = sldrOUTER;
+	IC9100_widgets[11].W = btnNotch;
+	IC9100_widgets[12].W = sldrNOTCH;
+	IC9100_widgets[13].W = sldrMICGAIN;
+	IC9100_widgets[14].W = sldrPOWER;
+}
 
 RIG_IC9100::RIG_IC9100() {
 	defaultCIV = 0x7C;
@@ -144,6 +165,10 @@ RIG_IC9100::RIG_IC9100() {
 	B.freq = 7070000;
 	B.imode = USB9100D;
 	B.iBW = 34;
+
+	def_freq = 14070000L;
+	def_mode = USB9100D;
+	def_bw = 34;
 
 	widgets = IC9100_widgets;
 
@@ -192,11 +217,14 @@ RIG_IC9100::RIG_IC9100() {
 	has_auto_notch = true;
 	has_notch_control = true;
 	has_ifshift_control = true;
+	has_pbt_controls = true;
 
 	has_rf_control = true;
 
 	has_ptt_control = true;
 	has_tune_control = true;
+
+	ICOMmainsub = true;
 
 	precision = 1;
 	ndigits = 10;
@@ -206,30 +234,6 @@ RIG_IC9100::RIG_IC9100() {
 //======================================================================
 // IC9100 unique commands
 //======================================================================
-
-void RIG_IC9100::initialize()
-{
-	IC9100_widgets[0].W = btnVol;
-	IC9100_widgets[1].W = sldrVOLUME;
-	IC9100_widgets[2].W = btnAGC;
-	IC9100_widgets[3].W = sldrRFGAIN;
-	IC9100_widgets[4].W = sldrSQUELCH;
-	IC9100_widgets[5].W = btnNR;
-	IC9100_widgets[6].W = sldrNR;
-	IC9100_widgets[7].W = btnIFsh;
-	IC9100_widgets[8].W = sldrIFSHIFT;
-	IC9100_widgets[9].W = btnNotch;
-	IC9100_widgets[10].W = sldrNOTCH;
-	IC9100_widgets[11].W = sldrMICGAIN;
-	IC9100_widgets[12].W = sldrPOWER;
-
-//	cmd = pre_to;
-//	cmd += '\x1A'; cmd += '\x05';
-//	cmd += '\x00'; cmd += '\x58'; cmd += '\x00';
-//	cmd.append(post);
-//	waitFB("CI-V transceive OFF");
-//	checkresponse();
-}
 
 void RIG_IC9100::selectA()
 {
@@ -1571,5 +1575,31 @@ void RIG_IC9100::tune_rig()
 	LOG_INFO("%s", ss.str().c_str());
 #endif
 	waitFB("tune rig");
+}
+
+void RIG_IC9100::set_pbt_inner(int val)
+{
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x07");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set PBT inner");
+}
+
+void RIG_IC9100::set_pbt_outer(int val)
+{
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x08");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set PBT outer");
 }
 

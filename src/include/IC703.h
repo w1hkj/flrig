@@ -91,6 +91,9 @@ public:
 	bool get_if_shift(int &val);
 	void get_if_min_max_step(int &min, int &max, int &step);
 
+	void set_pbt_inner(int val);
+	void set_pbt_outer(int val);
+
 	void set_squelch(int val);
 	int  get_squelch();
 

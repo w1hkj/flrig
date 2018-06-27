@@ -56,9 +56,9 @@ Fl_Menu_Item menu_small_menu[] = {
  {0,0,0,0,0,0,0,0,0}
 };
 
-int small_menuH = 22;
-int small_mainW = 425;
-int small_mainH = 360;
+int small_menuH = SMALL_MENUH;
+int small_mainW = SMALL_MAINW;
+int small_mainH = SMALL_MAINH;
 
 Fl_Group *small_main_group(int X, int Y, int W, int H)
 {
@@ -161,38 +161,37 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	sldrSQUELCH->when(FL_WHEN_RELEASE);
 	sldrSQUELCH->reverse(true);
 
-	btnIFsh = new Fl_Light_Button(214, 125, 50, 18, _("IFsh"));
-	btnIFsh->tooltip(_("IF Shift On/Off"));
-	btnIFsh->down_box(FL_THIN_DOWN_BOX);
-	btnIFsh->labelsize(12);
-	btnIFsh->callback((Fl_Callback*)cb_btnIFsh);
+	btnNR = new Fl_Light_Button(2, 185, 50, 18, _("NR"));
+	btnNR->tooltip(_("Noise Reduction On/Off"));
+	btnNR->down_box(FL_THIN_DOWN_BOX);
+	btnNR->labelsize(12);
+	btnNR->callback((Fl_Callback*)cb_btnNR);
 
-	sldrIFSHIFT = new Fl_Wheel_Value_Slider(266, 125, 156, 18);
-	sldrIFSHIFT->tooltip(_("Adjust IF Shift"));
-	sldrIFSHIFT->type(5);
-	sldrIFSHIFT->box(FL_THIN_DOWN_BOX);
-	sldrIFSHIFT->color(FL_BACKGROUND_COLOR);
-	sldrIFSHIFT->selection_color(FL_BACKGROUND_COLOR);
-	sldrIFSHIFT->labeltype(FL_NORMAL_LABEL);
-	sldrIFSHIFT->labelfont(0);
-	sldrIFSHIFT->labelsize(12);
-	sldrIFSHIFT->labelcolor(FL_FOREGROUND_COLOR);
-	sldrIFSHIFT->minimum(-1000);
-	sldrIFSHIFT->maximum(1000);
-	sldrIFSHIFT->step(10);
-	sldrIFSHIFT->textsize(12);
-	sldrIFSHIFT->callback((Fl_Callback*)cb_sldrIFSHIFT);
-	sldrIFSHIFT->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-	sldrIFSHIFT->when(FL_WHEN_RELEASE);
-	sldrIFSHIFT->reverse(true);
+	sldrNR = new Fl_Wheel_Value_Slider(54, 185, 156, 18);
+	sldrNR->tooltip(_("Adjust noise reduction"));
+	sldrNR->type(5);
+	sldrNR->box(FL_THIN_DOWN_BOX);
+	sldrNR->color(FL_BACKGROUND_COLOR);
+	sldrNR->selection_color(FL_BACKGROUND_COLOR);
+	sldrNR->labeltype(FL_NORMAL_LABEL);
+	sldrNR->labelfont(0);
+	sldrNR->labelsize(12);
+	sldrNR->labelcolor(FL_FOREGROUND_COLOR);
+	sldrNR->maximum(100);
+	sldrNR->step(2);
+	sldrNR->textsize(12);
+	sldrNR->callback((Fl_Callback*)cb_sldrNR);
+	sldrNR->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
+	sldrNR->when(FL_WHEN_RELEASE);
+	sldrNR->reverse(true);
 
-	btnNotch = new Fl_Light_Button(214, 145, 50, 18, _("Nch"));
+	btnNotch = new Fl_Light_Button(2, 205, 50, 18, _("Nch"));
 	btnNotch->tooltip(_("Notch - Manual (off) Auto (on)"));
 	btnNotch->down_box(FL_THIN_DOWN_BOX);
 	btnNotch->labelsize(12);
 	btnNotch->callback((Fl_Callback*)cb_btnNotch);
 
-	sldrNOTCH = new Fl_Wheel_Value_Slider(266, 145, 156, 18);
+	sldrNOTCH = new Fl_Wheel_Value_Slider(54, 205, 156, 18);
 	sldrNOTCH->tooltip(_("Adjust Notch Frequency"));
 	sldrNOTCH->type(5);
 	sldrNOTCH->box(FL_THIN_DOWN_BOX);
@@ -211,31 +210,84 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	sldrNOTCH->when(FL_WHEN_RELEASE);
 	sldrNOTCH->reverse(true);
 
-	btnNR = new Fl_Light_Button(214, 165, 50, 18, _("NR"));
-	btnNR->tooltip(_("Noise Reduction On/Off"));
-	btnNR->down_box(FL_THIN_DOWN_BOX);
-	btnNR->labelsize(12);
-	btnNR->callback((Fl_Callback*)cb_btnNR);
+	btnLOCK = new Fl_Light_Button(2, 225, 50, 18, _("Lock"));
+	btnLOCK->tooltip(_("Lock PBT Inner/Outer sliders"));
+	btnLOCK->down_box(FL_THIN_DOWN_BOX);
+	btnLOCK->labelsize(12);
+	btnLOCK->callback((Fl_Callback*)cb_btnLOCK);
 
-	sldrNR = new Fl_Wheel_Value_Slider(266, 165, 156, 18);
-	sldrNR->tooltip(_("Adjust noise reduction"));
-	sldrNR->type(5);
-	sldrNR->box(FL_THIN_DOWN_BOX);
-	sldrNR->color(FL_BACKGROUND_COLOR);
-	sldrNR->selection_color(FL_BACKGROUND_COLOR);
-	sldrNR->labeltype(FL_NORMAL_LABEL);
-	sldrNR->labelfont(0);
-	sldrNR->labelsize(12);
-	sldrNR->labelcolor(FL_FOREGROUND_COLOR);
-	sldrNR->maximum(100);
-	sldrNR->step(2);
-	sldrNR->textsize(12);
-	sldrNR->callback((Fl_Callback*)cb_sldrNR);
-	sldrNR->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-	sldrNR->when(FL_WHEN_RELEASE);
-	sldrNR->reverse(true);
+	sldrINNER = new Fl_Wheel_Value_Slider(54, 225, 156, 18, "");
+	sldrINNER->tooltip(_("Adjust Icom Inner PBT"));
+	sldrINNER->type(5);
+	sldrINNER->box(FL_THIN_DOWN_BOX);
+	sldrINNER->color(FL_BACKGROUND_COLOR);
+	sldrINNER->selection_color(FL_BACKGROUND_COLOR);
+	sldrINNER->labeltype(FL_NORMAL_LABEL);
+	sldrINNER->labelfont(0);
+	sldrINNER->labelsize(12);
+	sldrINNER->labelcolor(FL_FOREGROUND_COLOR);
+	sldrINNER->minimum(-50);
+	sldrINNER->maximum(50);
+	sldrINNER->step(1);
+	sldrINNER->textsize(12);
+	sldrINNER->callback((Fl_Callback*)cb_sldrINNER);
+	sldrINNER->align(Fl_Align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE));
+	sldrINNER->when(FL_WHEN_RELEASE);
+	sldrINNER->reverse(true);
 
-	btnDataPort = new Fl_Light_Button(2, 246, 50, 18, _("Data"));
+	btnCLRPBT = new Fl_Button(
+		2, 245,
+		50, 18, _("ClrPBT"));
+	btnCLRPBT->tooltip(_("Zero PBT Inner/Outer sliders"));
+	btnCLRPBT->down_box(FL_THIN_DOWN_BOX);
+	btnCLRPBT->labelsize(12);
+	btnCLRPBT->callback((Fl_Callback*)cb_btnCLRPBT);
+
+	sldrOUTER = new Fl_Wheel_Value_Slider(54, 245, 156, 18, "");
+	sldrOUTER->tooltip(_("Adjust Icom Outer PBT"));
+	sldrOUTER->type(5);
+	sldrOUTER->box(FL_THIN_DOWN_BOX);
+	sldrOUTER->color(FL_BACKGROUND_COLOR);
+	sldrOUTER->selection_color(FL_BACKGROUND_COLOR);
+	sldrOUTER->labeltype(FL_NORMAL_LABEL);
+	sldrOUTER->labelfont(0);
+	sldrOUTER->labelsize(12);
+	sldrOUTER->labelcolor(FL_FOREGROUND_COLOR);
+	sldrOUTER->minimum(-50);
+	sldrOUTER->maximum(50);
+	sldrOUTER->step(1);
+	sldrOUTER->textsize(12);
+	sldrOUTER->callback((Fl_Callback*)cb_sldrOUTER);
+	sldrOUTER->align(Fl_Align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE));
+	sldrOUTER->when(FL_WHEN_RELEASE);
+	sldrOUTER->reverse(true);
+
+	btnIFsh = new Fl_Light_Button(2, 265, 50, 18, _("IFsh"));
+	btnIFsh->tooltip(_("IF Shift On/Off"));
+	btnIFsh->down_box(FL_THIN_DOWN_BOX);
+	btnIFsh->labelsize(12);
+	btnIFsh->callback((Fl_Callback*)cb_btnLOCK);
+
+	sldrIFSHIFT = new Fl_Wheel_Value_Slider(54, 265, 156, 18);
+	sldrIFSHIFT->tooltip(_("Adjust IF Shift"));
+	sldrIFSHIFT->type(5);
+	sldrIFSHIFT->box(FL_THIN_DOWN_BOX);
+	sldrIFSHIFT->color(FL_BACKGROUND_COLOR);
+	sldrIFSHIFT->selection_color(FL_BACKGROUND_COLOR);
+	sldrIFSHIFT->labeltype(FL_NORMAL_LABEL);
+	sldrIFSHIFT->labelfont(0);
+	sldrIFSHIFT->labelsize(12);
+	sldrIFSHIFT->labelcolor(FL_FOREGROUND_COLOR);
+	sldrIFSHIFT->minimum(-1000);
+	sldrIFSHIFT->maximum(1000);
+	sldrIFSHIFT->step(10);
+	sldrIFSHIFT->textsize(12);
+	sldrIFSHIFT->callback((Fl_Callback*)cb_sldrIFSHIFT);
+	sldrIFSHIFT->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
+	sldrIFSHIFT->when(FL_WHEN_RELEASE);
+	sldrIFSHIFT->reverse(true);
+
+	btnDataPort = new Fl_Light_Button(2, 285, 50, 18, _("Data"));
 	btnDataPort->tooltip(_("Input on Data Port"));
 	btnDataPort->down_box(FL_THIN_DOWN_BOX);
 	btnDataPort->labelsize(12);
@@ -243,7 +295,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	btnDataPort->hide();
 	btnDataPort->value(progStatus.data_port);
 
-	sldrMICGAIN = new Fl_Wheel_Value_Slider(54, 185, 156, 18, _("Mic"));
+	sldrMICGAIN = new Fl_Wheel_Value_Slider(54, 285, 156, 18, _("Mic"));
 	sldrMICGAIN->tooltip(_("Adjust Mic Gain"));
 	sldrMICGAIN->type(5);
 	sldrMICGAIN->box(FL_THIN_DOWN_BOX);
@@ -261,12 +313,12 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	sldrMICGAIN->when(FL_WHEN_RELEASE);
 	sldrMICGAIN->reverse(true);
 
-	btnPOWER = new Fl_Light_Button(212, 185, 50, 18, _("Pwr"));
+	btnPOWER = new Fl_Light_Button(2, 305, 50, 18, _("Pwr"));
 	btnPOWER->tooltip(_("Enable/Disable Power adjuster"));
 	btnPOWER->value(1);
 	btnPOWER-> callback((Fl_Callback*) cb_btnPOWER);
 
-	sldrPOWER = new Fl_Wheel_Value_Slider(266, 185, 156, 18, "");
+	sldrPOWER = new Fl_Wheel_Value_Slider(54, 305, 156, 18, "");
 	sldrPOWER->tooltip(_("Adjust power level"));
 	sldrPOWER->type(5);
 	sldrPOWER->box(FL_THIN_DOWN_BOX);
@@ -350,6 +402,10 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	btnDSP->callback((Fl_Callback*)cb_btnDSP);
 	btnDSP->hide();
 
+	btnFILT = new Fl_Button(btnDSP->x(), btnDSP->y(), 18, 18, _("1"));
+	btnFILT->callback((Fl_Callback*)cb_btnFILT);
+	btnFILT->hide();
+
 	opDSP_lo = new Fl_ComboBox(231, 84, 86, 18, _("Lo Cut"));
 	opDSP_lo->tooltip(_("Lo Cut Freq"));
 	opDSP_lo->box(FL_FLAT_BOX);
@@ -394,39 +450,39 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	opMODE->when(FL_WHEN_RELEASE);
 	opMODE->end();
 
-	btn_show_controls = new Fl_Button(3, 206, 18, 18, _("@-22->"));
+	btn_show_controls = new Fl_Button(3, 325, 18, 18, _("@-22->"));
 	btn_show_controls->tooltip(_("Show/Hide controls"));
 	btn_show_controls->callback((Fl_Callback*)cb_btn_show_controls);
 
-	btnAttenuator = new Fl_Light_Button(26, 206, 60, 18, _("Att"));
+	btnAttenuator = new Fl_Light_Button(26, 325, 60, 18, _("Att"));
 	btnAttenuator->tooltip(_("Attenuator On/Off"));
 	btnAttenuator->down_box(FL_THIN_DOWN_BOX);
 	btnAttenuator->labelsize(12);
 	btnAttenuator->callback((Fl_Callback*)cb_btnAttenuator);
 
-	btnPreamp = new Fl_Light_Button(93, 206, 60, 18, _("Pre"));
+	btnPreamp = new Fl_Light_Button(93, 325, 60, 18, _("Pre"));
 	btnPreamp->tooltip(_("Preamp On/Off"));
 	btnPreamp->down_box(FL_THIN_DOWN_BOX);
 	btnPreamp->labelsize(12);
 	btnPreamp->callback((Fl_Callback*)cb_btnPreamp);
 
-	btnNOISE = new Fl_Light_Button(160, 206, 60, 18, _("NB"));
+	btnNOISE = new Fl_Light_Button(160, 325, 60, 18, _("NB"));
 	btnNOISE->tooltip(_("Noise Blanker On/Off"));
 	btnNOISE->down_box(FL_THIN_DOWN_BOX);
 	btnNOISE->labelsize(12);
 	btnNOISE->callback((Fl_Callback*)cb_btnNOISE);
 
-	btnAutoNotch = new Fl_Light_Button(227, 206, 60, 18, _("AN"));
+	btnAutoNotch = new Fl_Light_Button(227, 325, 60, 18, _("AN"));
 	btnAutoNotch->tooltip(_("Auto Notch On/Off"));
 	btnAutoNotch->down_box(FL_THIN_DOWN_BOX);
 	btnAutoNotch->labelsize(12);
 	btnAutoNotch->callback((Fl_Callback*)cb_btnAutoNotch);
 
-	btnTune = new Fl_Button(294, 206, 60, 18, _("Tune"));
+	btnTune = new Fl_Button(294, 325, 60, 18, _("Tune"));
 	btnTune->tooltip(_("Momentary Tune"));
 	btnTune->callback((Fl_Callback*)cb_btnTune);
 
-	btnPTT = new Fl_Light_Button(362, 206, 60, 18, _("PTT"));
+	btnPTT = new Fl_Light_Button(362, 325, 60, 18, _("PTT"));
 	btnPTT->tooltip(_("Xmt On/Off"));
 	btnPTT->down_box(FL_THIN_DOWN_BOX);
 	btnPTT->labelsize(12);

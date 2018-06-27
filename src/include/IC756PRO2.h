@@ -66,11 +66,22 @@ public:
 	void get_mic_gain_min_max_step(int &min, int &max, int &step);
 	void set_if_shift(int val);
 	void get_if_min_max_step(int &min, int &max, int &step);
+
+	void set_pbt_inner(int val);
+	void set_pbt_outer(int val);
+
+	const char *FILT(int &val);
+	const char *nextFILT();
+
 	void set_squelch(int val);
 //	int  get_squelch();
 	void set_rf_gain(int val);
 //	int  get_rf_gain();
 	void set_power_control(double val);
+
+	void set_notch(bool on, int val);
+	bool get_notch(int &val);
+	void get_notch_min_max_step(int &min, int &max, int &step);
 
 	void set_split(bool val);
 	bool can_split() { return true;}
@@ -88,9 +99,6 @@ public:
 	int  get_alc();
 	int  get_power_out();
 	void tune_rig();
-	void set_notch(bool, int);
-	bool get_notch(int&);
-	void get_notch_min_max_step(int&, int&, int&);
 
 	bool twovfos() { return false; }
 

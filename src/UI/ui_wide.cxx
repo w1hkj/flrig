@@ -60,7 +60,8 @@ Fl_Menu_Item menu_wide_menu[] = {
 
 Fl_Group *wide_main_group(int X, int Y, int W, int H)
 {
-	Fl_Group *g = new Fl_Group(X, Y, W, H);
+	int tabs_h = 70;
+	Fl_Group *g = new Fl_Group(X, Y, WIDE_MAINW, WIDE_MAINH + tabs_h);
 	g->box(FL_FLAT_BOX);
 
 	int xpos = X + 2;
@@ -325,6 +326,10 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				opDSP_hi->hide();
 				opDSP_hi->end();
 
+				btnFILT = new Fl_Button(btnDSP->x(), btnDSP->y(), 20, 20, _("1"));
+				btnFILT->callback((Fl_Callback*)cb_btnFILT);
+				btnFILT->hide();
+
 				opMODE = new Fl_ComboBox(
 					opBW->x() + opBW->w() + 2, ypos, 
 					w1a, 20, _("Mode"));
@@ -446,11 +451,14 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 		grp_row1->resizable(grp_row1b);
 }
 
-{ // grp_row2 sliders
-		grp_row2 = new Fl_Group(0, 107, 734, 43);
-			grp_row2a = new Fl_Group(0, 107, 183, 42);
-{ // sql, mic
-				sldrSQUELCH = new Fl_Wheel_Value_Slider(54, 108, 128, 18, _("SQL"));
+  // grp_row2 sliders
+		grp_row2 = new Fl_Group(0, 107, WIDE_MAINW, 62);
+		int colW = WIDE_MAINW / 3;
+			grp_row2a = new Fl_Group(0, 107, colW, 62);
+  // sql, mic
+				sldrSQUELCH = new Fl_Wheel_Value_Slider(
+					grp_row2a->x() + 54, grp_row2a->y(), 
+					grp_row2a->w() - 54, 18, _("SQL"));
 				sldrSQUELCH->tooltip(_("Adjust Squelch"));
 				sldrSQUELCH->type(5);
 				sldrSQUELCH->box(FL_THIN_DOWN_BOX);
@@ -467,10 +475,11 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				sldrSQUELCH->callback((Fl_Callback*)cb_sldrSQUELCH);
 				sldrSQUELCH->align(Fl_Align(FL_ALIGN_LEFT));
 				sldrSQUELCH->when(FL_WHEN_RELEASE);
-				Fl_Group::current()->resizable(sldrSQUELCH);
 				sldrSQUELCH->reverse(true);
 
-				sldrMICGAIN = new Fl_Wheel_Value_Slider(54, 128, 128, 18, _("Mic"));
+				sldrMICGAIN = new Fl_Wheel_Value_Slider(
+					grp_row2a->x() + 54, grp_row2a->y() + 22,
+					grp_row2a->w() - 54, 18, _("Mic"));
 				sldrMICGAIN->tooltip(_("Adjust Mic Gain"));
 				sldrMICGAIN->type(5);
 				sldrMICGAIN->box(FL_THIN_DOWN_BOX);
@@ -488,130 +497,16 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				sldrMICGAIN->when(FL_WHEN_RELEASE);
 				sldrMICGAIN->reverse(true);
 
-			grp_row2a->end();
-			bx_sep2a = new Fl_Box(184, 108, 2, 42);
-}
-			grp_row2b = new Fl_Group(186, 107, 180, 42);
-{ // IFshift, NR
-				btnIFsh = new Fl_Light_Button(186, 108, 50, 18, _("IFsh"));
-				btnIFsh->tooltip(_("IF Shift On/Off"));
-				btnIFsh->down_box(FL_THIN_DOWN_BOX);
-				btnIFsh->labelsize(12);
-				btnIFsh->callback((Fl_Callback*)cb_btnIFsh);
-
-				sldrIFSHIFT = new Fl_Wheel_Value_Slider(237, 108, 128, 18);
-				sldrIFSHIFT->tooltip(_("Adjust IF Shift"));
-				sldrIFSHIFT->type(5);
-				sldrIFSHIFT->box(FL_THIN_DOWN_BOX);
-				sldrIFSHIFT->color(FL_BACKGROUND_COLOR);
-				sldrIFSHIFT->selection_color(FL_BACKGROUND_COLOR);
-				sldrIFSHIFT->labeltype(FL_NORMAL_LABEL);
-				sldrIFSHIFT->labelfont(0);
-				sldrIFSHIFT->labelsize(12);
-				sldrIFSHIFT->labelcolor(FL_FOREGROUND_COLOR);
-				sldrIFSHIFT->minimum(-1000);
-				sldrIFSHIFT->maximum(1000);
-				sldrIFSHIFT->step(10);
-				sldrIFSHIFT->textsize(12);
-				sldrIFSHIFT->callback((Fl_Callback*)cb_sldrIFSHIFT);
-				sldrIFSHIFT->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-				sldrIFSHIFT->when(FL_WHEN_RELEASE);
-				sldrIFSHIFT->reverse(true);
-
-				btnNR = new Fl_Light_Button(186, 128, 50, 18, _("NR"));
-				btnNR->tooltip(_("Noise Reduction On/Off"));
-				btnNR->down_box(FL_THIN_DOWN_BOX);
-				btnNR->labelsize(12);
-				btnNR->callback((Fl_Callback*)cb_btnNR);
-
-				sldrNR = new Fl_Wheel_Value_Slider(237, 128, 128, 18);
-				sldrNR->tooltip(_("Adjust noise reduction"));
-				sldrNR->type(5);
-				sldrNR->box(FL_THIN_DOWN_BOX);
-				sldrNR->color(FL_BACKGROUND_COLOR);
-				sldrNR->selection_color(FL_BACKGROUND_COLOR);
-				sldrNR->labeltype(FL_NORMAL_LABEL);
-				sldrNR->labelfont(0);
-				sldrNR->labelsize(12);
-				sldrNR->labelcolor(FL_FOREGROUND_COLOR);
-				sldrNR->maximum(100);
-				sldrNR->step(2);
-				sldrNR->textsize(12);
-				sldrNR->callback((Fl_Callback*)cb_sldrNR);
-				sldrNR->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-				sldrNR->when(FL_WHEN_RELEASE);
-				Fl_Group::current()->resizable(sldrNR);
-				sldrNR->reverse(true);
-
-			grp_row2b->end();
-
-			bx_sep2b = new Fl_Box(367, 107, 2, 42);
-}
-			grp_row2c = new Fl_Group(370, 107, 180, 42);
-{ // Notch, RF gain
-				btnNotch = new Fl_Light_Button(370, 108, 50, 18, _("Nch"));
-				btnNotch->tooltip(_("Notch - Manual (off) Auto (on)"));
-				btnNotch->down_box(FL_THIN_DOWN_BOX);
-				btnNotch->labelsize(12);
-				btnNotch->callback((Fl_Callback*)cb_btnNotch);
-
-				sldrNOTCH = new Fl_Wheel_Value_Slider(421, 108, 128, 18);
-				sldrNOTCH->tooltip(_("Adjust Notch Frequency"));
-				sldrNOTCH->type(5);
-				sldrNOTCH->box(FL_THIN_DOWN_BOX);
-				sldrNOTCH->color(FL_BACKGROUND_COLOR);
-				sldrNOTCH->selection_color(FL_BACKGROUND_COLOR);
-				sldrNOTCH->labeltype(FL_NORMAL_LABEL);
-				sldrNOTCH->labelfont(0);
-				sldrNOTCH->labelsize(14);
-				sldrNOTCH->labelcolor(FL_FOREGROUND_COLOR);
-				sldrNOTCH->minimum(-1000);
-				sldrNOTCH->maximum(1000);
-				sldrNOTCH->step(10);
-				sldrNOTCH->textsize(12);
-				sldrNOTCH->callback((Fl_Callback*)cb_sldrNOTCH);
-				sldrNOTCH->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-				sldrNOTCH->when(FL_WHEN_RELEASE);
-				sldrNOTCH->reverse(true);
-
-				btnAGC = new Fl_Light_Button(370, 128, 50, 18, _("AGC"));
-				btnAGC->tooltip(_("Automatic Gain Control"));
-				btnAGC->down_box(FL_THIN_DOWN_BOX);
-				btnAGC->value(0);
-				btnAGC->labelsize(12);
-				btnAGC->callback((Fl_Callback*)cb_btnAGC);
-
-				sldrRFGAIN = new Fl_Wheel_Value_Slider(421, 128, 128, 18);
-				sldrRFGAIN->tooltip(_("Adjust RF gain"));
-				sldrRFGAIN->type(5);
-				sldrRFGAIN->box(FL_THIN_DOWN_BOX);
-				sldrRFGAIN->color(FL_BACKGROUND_COLOR);
-				sldrRFGAIN->selection_color(FL_BACKGROUND_COLOR);
-				sldrRFGAIN->labeltype(FL_NORMAL_LABEL);
-				sldrRFGAIN->labelfont(0);
-				sldrRFGAIN->labelsize(14);
-				sldrRFGAIN->labelcolor(FL_FOREGROUND_COLOR);
-				sldrRFGAIN->maximum(100);
-				sldrRFGAIN->step(1);
-				sldrRFGAIN->value(15);
-				sldrRFGAIN->textsize(12);
-				sldrRFGAIN->callback((Fl_Callback*)cb_sldrRFGAIN);
-				sldrRFGAIN->align(Fl_Align(FL_ALIGN_LEFT));
-				sldrRFGAIN->when(FL_WHEN_RELEASE);
-				Fl_Group::current()->resizable(sldrRFGAIN);
-				sldrRFGAIN->reverse(true);
-			grp_row2c->end();
-
-			bx_sep2c = new Fl_Box(551, 107, 2, 42);
-}
-			grp_row2d = new Fl_Group(552, 107, 182, 42);
-{ // Power, Volume
-				btnPOWER = new Fl_Light_Button(552, 108, 50, 18, _("Pwr"));
+				btnPOWER = new Fl_Light_Button(
+					grp_row2a->x() + 2, grp_row2a->y() + 44,
+					50, 18, _("Pwr"));
 				btnPOWER->tooltip(_("Enable/Disable Power adjuster"));
 				btnPOWER->value(1);
 				btnPOWER-> callback((Fl_Callback*) cb_btnPOWER);
 
-				sldrPOWER = new Fl_Wheel_Value_Slider(604, 108, 128, 18, "");
+				sldrPOWER = new Fl_Wheel_Value_Slider(
+					grp_row2a->x() + 54, grp_row2a->y() + 44,
+					grp_row2a->w() - 54, 18, "");
 				sldrPOWER->tooltip(_("Adjust power level"));
 				sldrPOWER->type(5);
 				sldrPOWER->box(FL_THIN_DOWN_BOX);
@@ -630,7 +525,196 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				sldrPOWER->when(FL_WHEN_RELEASE);
 				sldrPOWER->reverse(true);
 
-				btnVol = new Fl_Light_Button(552, 128, 50, 18, _("Vol"));
+				Fl_Group::current()->resizable(sldrPOWER);
+			grp_row2a->end();
+
+			grp_row2b = new Fl_Group(colW, 107, colW, 62);
+ // IFshift, NR
+				btnIFsh = new Fl_Light_Button(
+					grp_row2b->x() + 2, grp_row2b->y(),
+					50, 18, _("IFsh"));
+				btnIFsh->tooltip(_("IF Shift On/Off"));
+				btnIFsh->down_box(FL_THIN_DOWN_BOX);
+				btnIFsh->labelsize(12);
+				btnIFsh->callback((Fl_Callback*)cb_btnIFsh);
+
+				sldrIFSHIFT = new Fl_Wheel_Value_Slider(
+					grp_row2b->x() + 54, grp_row2b->y(),
+					grp_row2b->w() - 54, 18);
+				sldrIFSHIFT->tooltip(_("Adjust IF Shift"));
+				sldrIFSHIFT->type(5);
+				sldrIFSHIFT->box(FL_THIN_DOWN_BOX);
+				sldrIFSHIFT->color(FL_BACKGROUND_COLOR);
+				sldrIFSHIFT->selection_color(FL_BACKGROUND_COLOR);
+				sldrIFSHIFT->labeltype(FL_NORMAL_LABEL);
+				sldrIFSHIFT->labelfont(0);
+				sldrIFSHIFT->labelsize(12);
+				sldrIFSHIFT->labelcolor(FL_FOREGROUND_COLOR);
+				sldrIFSHIFT->minimum(-1000);
+				sldrIFSHIFT->maximum(1000);
+				sldrIFSHIFT->step(10);
+				sldrIFSHIFT->textsize(12);
+				sldrIFSHIFT->callback((Fl_Callback*)cb_sldrIFSHIFT);
+				sldrIFSHIFT->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
+				sldrIFSHIFT->when(FL_WHEN_RELEASE);
+				sldrIFSHIFT->reverse(true);
+
+				btnLOCK = new Fl_Light_Button(
+					grp_row2b->x() + 2, grp_row2b->y(),
+					50, 18, _("Lock"));
+				btnLOCK->tooltip(_("Lock PBT Inner/Outer sliders"));
+				btnLOCK->down_box(FL_THIN_DOWN_BOX);
+				btnLOCK->labelsize(12);
+				btnLOCK->callback((Fl_Callback*)cb_btnLOCK);
+
+				sldrINNER = new Fl_Wheel_Value_Slider(
+					grp_row2b->x() + 54, grp_row2b->y(),
+					grp_row2b->w() - 54, 18, "");
+				sldrINNER->tooltip(_("Adjust Icom Inner PBT"));
+				sldrINNER->type(5);
+				sldrINNER->box(FL_THIN_DOWN_BOX);
+				sldrINNER->color(FL_BACKGROUND_COLOR);
+				sldrINNER->selection_color(FL_BACKGROUND_COLOR);
+				sldrINNER->labeltype(FL_NORMAL_LABEL);
+				sldrINNER->labelfont(0);
+				sldrINNER->labelsize(12);
+				sldrINNER->labelcolor(FL_FOREGROUND_COLOR);
+				sldrINNER->minimum(-50);
+				sldrINNER->maximum(50);
+				sldrINNER->step(1);
+				sldrINNER->textsize(12);
+				sldrINNER->callback((Fl_Callback*)cb_sldrINNER);
+				sldrINNER->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
+				sldrINNER->when(FL_WHEN_RELEASE);
+				sldrINNER->reverse(true);
+
+				btnCLRPBT = new Fl_Button(
+					grp_row2b->x() + 2, grp_row2b->y() + 22,
+					50, 18, _("ClrPBT"));
+				btnCLRPBT->tooltip(_("Zero PBT Inner/Outer sliders"));
+				btnCLRPBT->down_box(FL_THIN_DOWN_BOX);
+				btnCLRPBT->labelsize(12);
+				btnCLRPBT->callback((Fl_Callback*)cb_btnCLRPBT);
+
+				sldrOUTER = new Fl_Wheel_Value_Slider(
+					grp_row2b->x() + 54, grp_row2b->y() + 22,
+					grp_row2b->w() - 54, 18, "");
+				sldrOUTER->tooltip(_("Adjust Icom Outer PBT"));
+				sldrOUTER->type(5);
+				sldrOUTER->box(FL_THIN_DOWN_BOX);
+				sldrOUTER->color(FL_BACKGROUND_COLOR);
+				sldrOUTER->selection_color(FL_BACKGROUND_COLOR);
+				sldrOUTER->labeltype(FL_NORMAL_LABEL);
+				sldrOUTER->labelfont(0);
+				sldrOUTER->labelsize(12);
+				sldrOUTER->labelcolor(FL_FOREGROUND_COLOR);
+				sldrOUTER->minimum(-50);
+				sldrOUTER->maximum(50);
+				sldrOUTER->step(1);
+				sldrOUTER->textsize(12);
+				sldrOUTER->callback((Fl_Callback*)cb_sldrOUTER);
+				sldrOUTER->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
+				sldrOUTER->when(FL_WHEN_RELEASE);
+				sldrOUTER->reverse(true);
+
+				btnNotch = new Fl_Light_Button(
+					grp_row2b->x() + 2, grp_row2b->y() + 44,
+					50, 18, _("Nch"));
+				btnNotch->tooltip(_("Notch - Manual (off) Auto (on)"));
+				btnNotch->down_box(FL_THIN_DOWN_BOX);
+				btnNotch->labelsize(12);
+				btnNotch->callback((Fl_Callback*)cb_btnNotch);
+
+				sldrNOTCH = new Fl_Wheel_Value_Slider(
+					grp_row2b->x() + 54, grp_row2b->y() + 44,
+					grp_row2b->w() - 54, 18);
+				sldrNOTCH->tooltip(_("Adjust Notch Frequency"));
+				sldrNOTCH->type(5);
+				sldrNOTCH->box(FL_THIN_DOWN_BOX);
+				sldrNOTCH->color(FL_BACKGROUND_COLOR);
+				sldrNOTCH->selection_color(FL_BACKGROUND_COLOR);
+				sldrNOTCH->labeltype(FL_NORMAL_LABEL);
+				sldrNOTCH->labelfont(0);
+				sldrNOTCH->labelsize(14);
+				sldrNOTCH->labelcolor(FL_FOREGROUND_COLOR);
+				sldrNOTCH->minimum(-1000);
+				sldrNOTCH->maximum(1000);
+				sldrNOTCH->step(10);
+				sldrNOTCH->textsize(12);
+				sldrNOTCH->callback((Fl_Callback*)cb_sldrNOTCH);
+				sldrNOTCH->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
+				sldrNOTCH->when(FL_WHEN_RELEASE);
+				sldrNOTCH->reverse(true);
+
+				Fl_Group::current()->resizable(sldrINNER);
+
+			grp_row2b->end();
+
+			grp_row2c = new Fl_Group(2*colW, 107, WIDE_MAINW - 2*colW - 2, 62);
+ // AGC/RF gain, power, volume
+
+				btnAGC = new Fl_Light_Button(
+					grp_row2c->x() + 2, grp_row2c->y(),
+					50, 18, _("AGC"));
+				btnAGC->tooltip(_("Automatic Gain Control"));
+				btnAGC->down_box(FL_THIN_DOWN_BOX);
+				btnAGC->value(0);
+				btnAGC->labelsize(12);
+				btnAGC->callback((Fl_Callback*)cb_btnAGC);
+
+				sldrRFGAIN = new Fl_Wheel_Value_Slider(
+					grp_row2c->x() + 54, grp_row2c->y(),
+					grp_row2c->w() - 54, 18);
+				sldrRFGAIN->tooltip(_("Adjust RF gain"));
+				sldrRFGAIN->type(5);
+				sldrRFGAIN->box(FL_THIN_DOWN_BOX);
+				sldrRFGAIN->color(FL_BACKGROUND_COLOR);
+				sldrRFGAIN->selection_color(FL_BACKGROUND_COLOR);
+				sldrRFGAIN->labeltype(FL_NORMAL_LABEL);
+				sldrRFGAIN->labelfont(0);
+				sldrRFGAIN->labelsize(14);
+				sldrRFGAIN->labelcolor(FL_FOREGROUND_COLOR);
+				sldrRFGAIN->maximum(100);
+				sldrRFGAIN->step(1);
+				sldrRFGAIN->value(15);
+				sldrRFGAIN->textsize(12);
+				sldrRFGAIN->callback((Fl_Callback*)cb_sldrRFGAIN);
+				sldrRFGAIN->align(Fl_Align(FL_ALIGN_LEFT));
+				sldrRFGAIN->when(FL_WHEN_RELEASE);
+				sldrRFGAIN->reverse(true);
+
+				btnNR = new Fl_Light_Button(
+					grp_row2c->x() + 2, grp_row2c->y() + 22,
+					50, 18, _("NR"));
+				btnNR->tooltip(_("Noise Reduction On/Off"));
+				btnNR->down_box(FL_THIN_DOWN_BOX);
+				btnNR->labelsize(12);
+				btnNR->callback((Fl_Callback*)cb_btnNR);
+
+				sldrNR = new Fl_Wheel_Value_Slider(
+					grp_row2c->x() + 54, grp_row2c->y() + 22,
+					grp_row2c->w() - 54, 18);
+				sldrNR->tooltip(_("Adjust noise reduction"));
+				sldrNR->type(5);
+				sldrNR->box(FL_THIN_DOWN_BOX);
+				sldrNR->color(FL_BACKGROUND_COLOR);
+				sldrNR->selection_color(FL_BACKGROUND_COLOR);
+				sldrNR->labeltype(FL_NORMAL_LABEL);
+				sldrNR->labelfont(0);
+				sldrNR->labelsize(12);
+				sldrNR->labelcolor(FL_FOREGROUND_COLOR);
+				sldrNR->maximum(100);
+				sldrNR->step(2);
+				sldrNR->textsize(12);
+				sldrNR->callback((Fl_Callback*)cb_sldrNR);
+				sldrNR->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
+				sldrNR->when(FL_WHEN_RELEASE);
+
+				sldrNR->reverse(true);
+
+				btnVol = new Fl_Light_Button(
+					grp_row2c->x() + 2, grp_row2c->y() + 44,
+					50, 18, _("Vol"));
 				btnVol->tooltip(_("Speaker on/off"));
 				btnVol->down_box(FL_THIN_DOWN_BOX);
 				btnVol->value(1);
@@ -638,7 +722,9 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				btnVol->callback((Fl_Callback*)cb_btnVol);
 
 #ifdef __APPLE__
-				sldrVOLUME = new Fl_Wheel_Value_Slider(604, 128, 110, 18);
+				sldrVOLUME = new Fl_Wheel_Value_Slider(
+					grp_row2c->x() + 54, grp_row2c->y() + 44,
+					grp_row2c->w() - 54 - 18, 18);
 				sldrVOLUME->tooltip(_("Adjust Audio Volume"));
 				sldrVOLUME->type(5);
 				sldrVOLUME->box(FL_THIN_DOWN_BOX);
@@ -659,10 +745,14 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 
 // box to keep right side of slider control from lying under the OS X
 // dialog resize window decoration
-				Fl_Box *volbox = new Fl_Box(714, 128, 18, 18);
+				Fl_Box *volbox = new Fl_Box(
+					W-18, grp_row2c->y() + 44,
+					18, 18);
 				volbox->box(FL_FLAT_BOX);
 #else
-				sldrVOLUME = new Fl_Wheel_Value_Slider(604, 128, 128, 18);
+				sldrVOLUME = new Fl_Wheel_Value_Slider(
+					grp_row2c->x() + 54, grp_row2c->y() + 44,
+					grp_row2c->w() - 54, 18);
 				sldrVOLUME->tooltip(_("Adjust Audio Volume"));
 				sldrVOLUME->type(5);
 				sldrVOLUME->box(FL_THIN_DOWN_BOX);
@@ -681,29 +771,33 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				Fl_Group::current()->resizable(sldrVOLUME);
 				sldrVOLUME->reverse(true);
 #endif
-			grp_row2d->end();
-}
-		grp_row2->end();
-}
+				Fl_Group::current()->resizable(sldrVOLUME);
+			grp_row2c->end();
 
-	int ytabs = sldrVOLUME->y() + sldrVOLUME->h() + 2;
+		grp_row2->end();
+
+//----------------------------------------------------------------------
+// generic tabs
+//----------------------------------------------------------------------
+	int ytabs = grp_row2->y() + grp_row2->h();
 	xpos = 0;
-	int tabs_h = Y + H - 2 - ypos;
-	int tab_v = 24;
+	int tab_v = 20;//24;
 	int tabs2_h = tabs_h - tab_v;
 
 	ypos = ytabs;
 
-	grpTABS = new Fl_Group(xpos, ypos, W, tabs_h);
+	grpTABS = new Fl_Group(xpos, ypos, g->w(), tabs_h);
+
 	{
 		grpTABS->box(FL_FLAT_BOX);
 
-		tabsGeneric = new Fl_Tabs(xpos, ypos, W, tabs_h);
+		tabsGeneric = new Fl_Tabs(xpos, ypos, g->w(), tabs_h);
+
 		{
 			ypos += tab_v;
 			tabsGeneric->selection_color(FL_LIGHT1);
 
-			genericBands = new Fl_Group(xpos, ypos, W, tabs2_h, _("Bands"));
+			genericBands = new Fl_Group(xpos, ypos, g->w(), tabs2_h, _("Bands"));
 			{
 				btnBandSelect_1 = new Fl_Button(
 					xpos + 4, ypos + 10, 50, 22, _("1.8"));
@@ -798,7 +892,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				opSelect60->when(FL_WHEN_RELEASE);
 				opSelect60->end();
 
-				Fl_Box dmybx(xpos, ypos + tabs2_h - 2, W, 2, "");
+				Fl_Box dmybx(xpos, ypos + tabs2_h - 2, g->w(), 2, "");
 			genericBands->resizable(dmybx);
 			}
 			genericBands->end();
@@ -850,12 +944,12 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				btn_enable_keyer->callback((Fl_Callback*)cb_btn_enable_keyer);
 				btn_enable_keyer->value(progStatus.enable_keyer);
 
-				Fl_Box dmybx(xpos, ypos + tabs2_h - 2, W, 2, "");
+				Fl_Box dmybx(xpos, ypos + tabs2_h - 2, g->w(), 2, "");
 			genericCW->resizable(dmybx);
 			}
 			genericCW->end();
 
-			genericQSK = new Fl_Group(xpos, ypos, W, tabs2_h, _("QSK"));
+			genericQSK = new Fl_Group(xpos, ypos, g->w(), tabs2_h, _("QSK"));
 			{
 				genericQSK->color(FL_LIGHT1);
 				genericQSK->selection_color(FL_LIGHT1);
@@ -887,12 +981,12 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_cw_delay->value(progStatus.cw_delay);
 				spnr_cw_delay->align(Fl_Align(FL_ALIGN_LEFT));
 
-				Fl_Box dmybx(xpos, ypos + tabs2_h - 2, W, 2, "");
+				Fl_Box dmybx(xpos, ypos + tabs2_h - 2, g->w(), 2, "");
 			genericQSK->resizable(dmybx);
 			}
 			genericQSK->end();
 
-			genericVOX = new Fl_Group(xpos, ypos, W, tabs2_h, _("Vox"));
+			genericVOX = new Fl_Group(xpos, ypos, g->w(), tabs2_h, _("Vox"));
 			{
 
 				spnr_vox_gain = new Hspinner(129, ypos + 10, 70, 20, _("gain"));
@@ -936,12 +1030,12 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				btn_vox_on_dataport->callback((Fl_Callback*)cb_btn_vox_on_dataport);
 				btn_vox_on_dataport->value(progStatus.vox_on_dataport);
 
-				Fl_Box dmybx(xpos, ypos + tabs2_h - 2, W, 2, "");
+				Fl_Box dmybx(xpos, ypos + tabs2_h - 2, g->w(), 2, "");
 			genericVOX->resizable(dmybx);
 			}
 			genericVOX->end();
 
-			genericSpeech = new Fl_Group(xpos, ypos, W, tabs2_h, _("Spch"));
+			genericSpeech = new Fl_Group(xpos, ypos, g->w(), tabs2_h, _("Spch"));
 			{
 
 				btnCompON = new Fl_Light_Button(230, ypos + 10, 70, 20, _("On"));
@@ -959,12 +1053,12 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				spnr_compression->align(Fl_Align(FL_ALIGN_LEFT));
 				spnr_compression->value(progStatus.compression);
 
-				Fl_Box dmybx(xpos, ypos + tabs2_h - 2, W, 2, "");
+				Fl_Box dmybx(xpos, ypos + tabs2_h - 2, g->w(), 2, "");
 			genericSpeech->resizable(dmybx);
 			}
 			genericSpeech->end();
 
-			genericRx = new Fl_Group(xpos, ypos, W, tabs2_h, _("RX"));
+			genericRx = new Fl_Group(xpos, ypos, g->w(), tabs2_h, _("RX"));
 			{
 
 				sldr_nb_level = new Fl_Wheel_Value_Slider(90, ypos + 10, 180, 20, _("NB level"));
@@ -985,20 +1079,6 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				sldr_nb_level->when(FL_WHEN_RELEASE);
 				sldr_nb_level->value(progStatus.nb_level);
 
-//				cbo_agc_level = new Fl_ComboBox(244, ypos + 10, 80, 20, _("AGC"));
-//				cbo_agc_level->tooltip(_("AGC level"));
-//				cbo_agc_level->box(FL_DOWN_BOX);
-//				cbo_agc_level->color(FL_BACKGROUND_COLOR);
-//				cbo_agc_level->selection_color(FL_BACKGROUND_COLOR);
-//				cbo_agc_level->labeltype(FL_NORMAL_LABEL);
-//				cbo_agc_level->labelfont(0);
-//				cbo_agc_level->labelsize(14);
-//				cbo_agc_level->labelcolor(FL_FOREGROUND_COLOR);
-//				cbo_agc_level->callback((Fl_Callback*)cb_cbo_agc_level);
-//				cbo_agc_level->align(Fl_Align(FL_ALIGN_LEFT));
-//				cbo_agc_level->when(FL_WHEN_RELEASE);
-//				cbo_agc_level->end();
-
 				spnr_bpf_center = new Hspinner(474, ypos + 10, 96, 20, _("BPF Center Freq"));
 				spnr_bpf_center->tooltip(_("Bandpass Filter Center Freq"));
 				spnr_bpf_center->type(FL_INT_INPUT);
@@ -1017,12 +1097,12 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				btn_use_bpf_center->callback((Fl_Callback*)cb_btn_use_bpf_center);
 				btn_use_bpf_center->value(progStatus.use_bpf_center);
 
-				Fl_Box dmybx(xpos, ypos + tabs2_h - 2, W, 2, "");
+				Fl_Box dmybx(xpos, ypos + tabs2_h - 2, g->w(), 2, "");
 			genericRx->resizable(dmybx);
 			}
 			genericRx->end();
 
-			genericMisc = new Fl_Group(xpos, ypos, W, tabs2_h, _("Misc"));
+			genericMisc = new Fl_Group(xpos, ypos, g->w(), tabs2_h, _("Misc"));
 			{
 
 				spnr_vfo_adj = new Hspinner(60, ypos + 10, 96, 20, _("Vfo Adj"));
@@ -1062,12 +1142,12 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				btn_xcvr_auto_off->callback((Fl_Callback*)cb_btn_xcvr_auto_off);
 				btn_xcvr_auto_off->value(progStatus.xcvr_auto_off);
 
-				Fl_Box dmybx(xpos, ypos + tabs2_h - 2, W, 2, "");
+				Fl_Box dmybx(xpos, ypos + tabs2_h - 2, g->w(), 2, "");
 			genericMisc->resizable(dmybx);
 			}
 			genericMisc->end();
 
-			genericUser = new Fl_Group(xpos, ypos, W, tabs2_h, _("User"));
+			genericUser = new Fl_Group(xpos, ypos, g->w(), tabs2_h, _("User"));
 			{
 
 				btnUser1 = new Fl_Button(5, ypos + 15, 88, 24, "USER 1");
@@ -1099,7 +1179,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 			}
 			genericUser->end();
 
-			genericRXB = new Fl_Group(xpos, ypos, W, tabs2_h, _("RIT/XIT/BFO"));
+			genericRXB = new Fl_Group(xpos, ypos, g->w(), tabs2_h, _("RIT/XIT/BFO"));
 			{
 				genericRXB->hide();
 
@@ -1136,7 +1216,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 			}
 			genericRXB->end();
 
-			genericAux = new Fl_Group(xpos, ypos, W, tabs2_h, _("Aux"));
+			genericAux = new Fl_Group(xpos, ypos, g->w(), tabs2_h, _("Aux"));
 			{
 				genericAux->hide();
 
@@ -1173,8 +1253,12 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 		tabsGeneric->resizable(genericBands);
 		tabsGeneric->hide();
 
-		ypos = ytabs;
+//----------------------------------------------------------------------
+// TT 550 specifc tabs
+//----------------------------------------------------------------------
+		ypos = grpTABS->y();
 		tabs550 = new Fl_Tabs(xpos, ypos, W, tabs_h);
+
 		ypos += 24;
 		{
 			tabs550->selection_color(FL_LIGHT1);
@@ -1526,14 +1610,19 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 			}
 			tt550_AT->end();
 		}
+
 		tabs550->end();
 		tabs550->hide();
 	}
+
 	grpTABS->end();
 	grpTABS->hide();
 
+	Fl_Group *dmy = new Fl_Group(0, g->h() - 2, g->w(), 2, "");
+
 	g->end();
-	g->resizable(grpTABS);
+
+	g->resizable(dmy);
 
 	return g;
 }
@@ -1605,9 +1694,10 @@ Fl_Double_Window* Wide_rig_window() {
 
 	w->resizable(main_group);
 
-	w->size(mainW, mainH - 70);
+	w->size(WIDE_MAINW, WIDE_MAINH);//mainW, mainH);// - 70);
 
-	w->size_range(mainW, mainH - 70, 0, mainH - 70);
+//	w->size_range(mainW, mainH - 70, 0, mainH - 70);
+	w->size_range(WIDE_MAINW, WIDE_MAINH, 0, WIDE_MAINH);
 
 	w->end();
 

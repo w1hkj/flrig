@@ -99,6 +99,7 @@ extern void setMode();
 extern void setBW();
 extern void setDSP();
 extern void selectDSP();
+extern void selectFILT();
 
 extern void addFreq();
 extern void delFreq();
@@ -193,6 +194,10 @@ extern void setNotch();
 extern void cbAN();
 extern void setIFshift();
 extern void cbIFsh();
+extern void setLOCK();
+extern void setINNER();
+extern void setOUTER();
+extern void setCLRPBT();
 extern void setVolume();
 extern void setMicGain();
 extern void cbbtnMicLine();
@@ -323,6 +328,8 @@ extern int mval;
 extern queue<VFOQUEUE> srvc_reqs;
 
 extern void trace(int n, ...); // all args of type const char *
+extern void trace1(int n, ...); // all args of type const char *
+
 extern string printXCVR_STATE(XCVR_STATE &data);
 
 #endif

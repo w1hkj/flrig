@@ -28,7 +28,8 @@ bool IC7851_DEBUG = true;
 const char IC7851name_[] = "IC-7851";
 
 const char *IC7851modes_[] = {
-	"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R", "PSK", "PSK-R", 
+	"LSB", "USB", "AM", "CW", "RTTY",
+	"FM", "CW-R", "RTTY-R", "PSK", "PSK-R", 
 	"LSB-D1", "LSB-D2", "LSB-D3",
 	"USB-D1", "USB-D2", "USB-D3", NULL};
 
@@ -75,20 +76,42 @@ const char *IC7851_fm_bws[] = { "FIXED", NULL };
 static int IC7851_bw_vals_FM[] = { 1, WVALS_LIMIT};
 
 static GUI IC7851_widgets[]= {
-	{ (Fl_Widget *)btnVol, 2, 125,  50 },
-	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },
-	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },
-	{ (Fl_Widget *)sldrSQUELCH, 54, 165, 156 },
-	{ (Fl_Widget *)btnNR, 2, 185,  50 },
-	{ (Fl_Widget *)sldrNR, 54, 185, 156 },
-	{ (Fl_Widget *)btnIFsh, 214, 125,  50 },
-	{ (Fl_Widget *)sldrIFSHIFT, 266, 125, 156 },
-	{ (Fl_Widget *)btnNotch, 214, 145,  50 },
-	{ (Fl_Widget *)sldrNOTCH, 266, 145, 156 },
-	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },
-	{ (Fl_Widget *)sldrPOWER, 266, 185, 156 },
+	{ (Fl_Widget *)btnVol,        2, 125,  50 },	//0
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },	//1
+	{ (Fl_Widget *)btnAGC,        2, 145,  50 },	//2
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },	//3
+	{ (Fl_Widget *)sldrSQUELCH,  54, 165, 156 },	//4
+	{ (Fl_Widget *)btnNR,         2, 185,  50 },	//5
+	{ (Fl_Widget *)sldrNR,       54, 185, 156 },	//6
+	{ (Fl_Widget *)btnLOCK,     214, 105,  50 },	//7
+	{ (Fl_Widget *)sldrINNER,   266, 105, 156 },	//8
+	{ (Fl_Widget *)btnCLRPBT,   214, 125,  50 },	//9
+	{ (Fl_Widget *)sldrOUTER,   266, 125, 156 },	//10
+	{ (Fl_Widget *)btnNotch,    214, 145,  50 },	//11
+	{ (Fl_Widget *)sldrNOTCH,   266, 145, 156 },	//12
+	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },	//13
+	{ (Fl_Widget *)sldrPOWER,   266, 185, 156 },	//14
 	{ (Fl_Widget *)NULL, 0, 0, 0 }
 };
+
+void RIG_IC7851::initialize()
+{
+	IC7851_widgets[0].W = btnVol;
+	IC7851_widgets[1].W = sldrVOLUME;
+	IC7851_widgets[2].W = btnAGC;
+	IC7851_widgets[3].W = sldrRFGAIN;
+	IC7851_widgets[4].W = sldrSQUELCH;
+	IC7851_widgets[5].W = btnNR;
+	IC7851_widgets[6].W = sldrNR;
+	IC7851_widgets[7].W = btnLOCK;
+	IC7851_widgets[8].W = sldrINNER;
+	IC7851_widgets[9].W = btnCLRPBT;
+	IC7851_widgets[10].W = sldrOUTER;
+	IC7851_widgets[11].W = btnNotch;
+	IC7851_widgets[12].W = sldrNOTCH;
+	IC7851_widgets[13].W = sldrMICGAIN;
+	IC7851_widgets[14].W = sldrPOWER;
+}
 
 RIG_IC7851::RIG_IC7851() {
 	defaultCIV = 0x8E;
@@ -139,6 +162,7 @@ RIG_IC7851::RIG_IC7851() {
 	has_attenuator_control =
 	has_preamp_control =
 	has_ifshift_control =
+	has_pbt_controls =
 	has_ptt_control =
 	has_tune_control =
 	has_noise_control =
@@ -149,30 +173,17 @@ RIG_IC7851::RIG_IC7851() {
 	has_split_AB =
 	has_split = true;
 
+	ICOMmainsub = true;
+
 	precision = 1;
 	ndigits = 8;
+
 
 };
 
 //======================================================================
 // IC7851 unique commands
 //======================================================================
-
-void RIG_IC7851::initialize()
-{
-	IC7851_widgets[0].W = btnVol;
-	IC7851_widgets[1].W = sldrVOLUME;
-	IC7851_widgets[2].W = sldrRFGAIN;
-	IC7851_widgets[3].W = sldrSQUELCH;
-	IC7851_widgets[4].W = btnNR;
-	IC7851_widgets[5].W = sldrNR;
-	IC7851_widgets[6].W = btnIFsh;
-	IC7851_widgets[7].W = sldrIFSHIFT;
-	IC7851_widgets[8].W = btnNotch;
-	IC7851_widgets[9].W = sldrNOTCH;
-	IC7851_widgets[10].W = sldrMICGAIN;
-	IC7851_widgets[11].W = sldrPOWER;
-}
 
 void RIG_IC7851::selectA()
 {
@@ -862,5 +873,31 @@ int RIG_IC7851::get_alc(void)
 		}
 	}
 	return mtr;
+}
+
+void RIG_IC7851::set_pbt_inner(int val)
+{
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x07");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set PBT inner");
+}
+
+void RIG_IC7851::set_pbt_outer(int val)
+{
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x08");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set PBT outer");
 }
 

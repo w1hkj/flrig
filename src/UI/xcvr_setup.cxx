@@ -668,8 +668,8 @@ static void cb_btnOkXcvrDialog(Fl_Return_Button*, void*) {
 		btn_show_controls->redraw_label();
 		grpTABS->hide();
 		mainwindow->resizable(grpTABS);
-		mainwindow->size(mainwindow->w(), 150);
-		mainwindow->size_range(735, 150, 0, 150);
+		mainwindow->size(mainwindow->w(), WIDE_MAINH);
+		mainwindow->size_range(WIDE_MAINW, WIDE_MAINH, 0, WIDE_MAINH);
 	}
 
 	// close the current rig control

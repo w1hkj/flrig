@@ -32,6 +32,7 @@
 #include "rigpanel.h"
 #include "rigbase.h"
 #include "font_browser.h"
+#include "ui.h"
 
 #include <string>
 
@@ -870,6 +871,7 @@ void setColors()
 	if (btnAutoNotch)		btnAutoNotch->selection_color(btn_lt_color);
 	if (btnTune)			btnTune->selection_color(btn_lt_color);
 	if (btnPTT)				btnPTT->selection_color(btn_lt_color);
+	if (btnLOCK)			btnLOCK->selection_color(btn_lt_color);
 	if (btnAuxRTS)			btnAuxRTS->selection_color(btn_lt_color);
 	if (btnAuxDTR)			btnAuxDTR->selection_color(btn_lt_color);
 	if (btnSpot)			btnSpot->selection_color(btn_lt_color);
@@ -889,6 +891,10 @@ void setColors()
 	if (sldrNR)				sldrNR->selection_color(btn_slider);
 	if (sldrIFSHIFT)		sldrIFSHIFT->color(bg_slider);
 	if (sldrIFSHIFT)		sldrIFSHIFT->selection_color(btn_slider);
+	if (sldrINNER)			sldrINNER->color(bg_slider);
+	if (sldrINNER)			sldrINNER->selection_color(btn_slider);
+	if (sldrOUTER)			sldrOUTER->color(bg_slider);
+	if (sldrOUTER)			sldrOUTER->selection_color(btn_slider);
 	if (sldrNOTCH)			sldrNOTCH->color(bg_slider);
 	if (sldrNOTCH)			sldrNOTCH->selection_color(btn_slider);
 	if (sldrMICGAIN)		sldrMICGAIN->color(bg_slider);
@@ -1050,22 +1056,21 @@ void show_controls()
 		return;
 	switch (progStatus.UIsize) {
 		case wide_ui :
-			if (mainwindow->h() > 150) {
+			if (mainwindow->h() > WIDE_MAINH) {
 				btn_show_controls->label("@-22->");
 				btn_show_controls->redraw_label();
 				grpTABS->hide();
-				mainwindow->resizable(grpTABS);
-				mainwindow->size(mainwindow->w(), 150);
-				mainwindow->size_range(735, 150, 0, 150);
+				mainwindow->size(mainwindow->w(), WIDE_MAINH);
+				mainwindow->size_range(735, WIDE_MAINH, 0, WIDE_MAINH);
 			} else {
+				int h = mainwindow->h();
+				h += grpTABS->h();
 				btn_show_controls->label("@-28->");
 				btn_show_controls->redraw_label();
-				mainwindow->resizable(grpTABS);
-				mainwindow->size(mainwindow->w(), 220);
-				mainwindow->size_range(735, 220, 0, 220);
 				grpTABS->show();
+				mainwindow->size(mainwindow->w(), h);
+				mainwindow->size_range(735, h, 0, h);
 			}
-			mainwindow->redraw();
 			break;
 		case touch_ui : 
 			if (selrig->name_ == rig_TT550.name_) {
@@ -1077,8 +1082,7 @@ void show_controls()
 			}
 			tabs550->redraw();
 			tabsGeneric->redraw();
-			mainwindow->redraw();
-			return;
+			break;
 		case small_ui :
 			{
 				int wh = mainwindow->h();
@@ -1120,11 +1124,11 @@ void show_controls()
 			}
 		}
 			grpTABS->show();
-			mainwindow->redraw();
 			break;
 		default :
 			break;
 	}
+	mainwindow->redraw();
 }
 
 // a replica of the default color map used by Fltk

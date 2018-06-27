@@ -109,6 +109,10 @@ status progStatus = {
 	-1,			// int  iBW_B;
 	1,			// int  imode_B;
 	7070000,	// long freq_B;
+
+	"",			// std::string filters;
+	"",			// std::string bandwidths;
+
 	true,		// bool use_rig_data;
 
 	false,		// bool spkr_on;
@@ -119,6 +123,9 @@ status progStatus = {
 	0,			// int  notch_val;
 	false,		// bool shift;
 	0,			// int  shift_val;
+	0,			// bool pbt_lock;
+	0,			// int  pbt_inner;
+	0,			// int  pbt_outer;
 	100,		// int  rfgain;
 	10,			// int  squelch;
 
@@ -433,6 +440,9 @@ void status::saveLastState()
 	spref.set("mode_B", imode_B);
 	spref.set("freq_B", freq_B);
 
+	spref.set("filters", filters.c_str());
+	spref.set("bandwidths", bandwidths.c_str());
+
 	spref.set("use_rig_data", use_rig_data);
 //	spref.set("restore_rig_data", restore_rig_data);
 
@@ -462,6 +472,11 @@ void status::saveLastState()
 	spref.set("int_notch", notch_val);
 	spref.set("bool_shift", shift);
 	spref.set("int_shift", shift_val);
+
+	spref.set("pbt_lock", pbt_lock);
+	spref.set("pbt_inner", pbt_inner);
+	spref.set("pbt_outer", pbt_outer);
+
 	spref.set("rfgain", rfgain);
 	spref.set("squelch", squelch);
 	spref.set("no_txqsy", no_txqsy);
@@ -771,6 +786,12 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("mode_B", imode_B, imode_B);
 		spref.get("freq_B", freq_B, freq_B);
 
+		spref.get("filters", defbuffer, "", 499);
+		filters = defbuffer;
+
+		spref.get("bandwidths", defbuffer, "", 499);
+		bandwidths = defbuffer;
+
 		if (spref.get("use_rig_data", i, i)) use_rig_data = i;
 //		if (spref.get("restore_rig_data", i, i)) restore_rig_data = i;
 
@@ -800,6 +821,11 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("int_notch", notch_val, notch_val);
 		if (spref.get("bool_shift", i, i)) shift = i;
 		spref.get("int_shift", shift_val, shift_val);
+
+		if (spref.get("pbt_lock", i, pbt_lock)) pbt_lock = i;
+		if (spref.get("pbt_inner", i, pbt_inner)) pbt_inner = i;
+		if (spref.get("pbt_outer", i, pbt_outer)) pbt_outer = i;
+
 		spref.get("rfgain", rfgain, rfgain);
 		spref.get("squelch", squelch, squelch);
 		spref.get("no_txqsy", no_txqsy, no_txqsy);
@@ -1105,6 +1131,7 @@ void status::UI_laststate()
 	if (btnAutoNotch)		btnAutoNotch->selection_color(btn_lt_color);
 	if (btnTune)			btnTune->selection_color(btn_lt_color);
 	if (btnPTT)				btnPTT->selection_color(btn_lt_color);
+	if (btnLOCK)			btnLOCK->selection_color(btn_lt_color);
 	if (btnAuxRTS)			btnAuxRTS->selection_color(btn_lt_color);
 	if (btnAuxDTR)			btnAuxDTR->selection_color(btn_lt_color);
 	if (btnSpot)			btnSpot->selection_color(btn_lt_color);
@@ -1127,6 +1154,10 @@ void status::UI_laststate()
 	if (sldrNR)				sldrNR->selection_color(btn_slider);
 	if (sldrIFSHIFT)		sldrIFSHIFT->color(bg_slider);
 	if (sldrIFSHIFT)		sldrIFSHIFT->selection_color(btn_slider);
+	if (sldrINNER)			sldrINNER->color(bg_slider);
+	if (sldrINNER)			sldrINNER->selection_color(btn_slider);
+	if (sldrOUTER)			sldrOUTER->color(bg_slider);
+	if (sldrOUTER)			sldrOUTER->selection_color(btn_slider);
 	if (sldrNOTCH)			sldrNOTCH->color(bg_slider);
 	if (sldrNOTCH)			sldrNOTCH->selection_color(btn_slider);
 	if (sldrMICGAIN)		sldrMICGAIN->color(bg_slider);
@@ -1232,6 +1263,8 @@ string status::info()
 	info << "freq_B             : " << freq_B << "\n";
 	info << "mode_B             : " << imode_B << "\n";
 	info << "bw_B               : " << iBW_B << "\n";
+	info << "\n";
+	info << "filters            : " << filters << "\n";
 	info << "\n";
 	info << "use_rig_data       : " << use_rig_data << "\n";
 //	info << "restore_rig_data   : " << restore_rig_data << "\n";

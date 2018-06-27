@@ -41,6 +41,9 @@ public:
 
 	int  adjust_bandwidth(int m) { return 0; }
 
+	void set_pbt_inner(int val);
+	void set_pbt_outer(int val);
+
 	bool  canswap() { return true; }
 
 private:

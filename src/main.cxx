@@ -292,8 +292,8 @@ void startup(void*)
 			btn_show_controls->redraw_label();
 			grpTABS->hide();
 			mainwindow->resizable(grpTABS);
-			mainwindow->size(progStatus.mainW, 148);
-			mainwindow->size_range(735, 148, 0, 148);
+			mainwindow->size(progStatus.mainW, WIDE_MAINH);
+			mainwindow->size_range(735, WIDE_MAINH, 0, WIDE_MAINH);
 			mainwindow->redraw();
 		case small_ui :
 		default :

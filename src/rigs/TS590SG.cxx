@@ -132,17 +132,18 @@ static const char *TS590SG_FSKbw[] = {
 //----------------------------------------------------------------------
 
 static GUI rig_widgets[]= {
-	{ (Fl_Widget *)btnVol,        2, 125,  50 },
-	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
-	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },
-	{ (Fl_Widget *)btnIFsh,     214, 105,  50 },
-	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
-	{ (Fl_Widget *)btnNotch,    214, 125,  50 },
-	{ (Fl_Widget *)sldrNOTCH,   266, 125, 156 },
-	{ (Fl_Widget *)sldrMICGAIN, 266, 145, 156 },
-	{ (Fl_Widget *)sldrPOWER,   266, 165, 156 },
-	{ (Fl_Widget *)btnNR,         2, 165,  50 },
-	{ (Fl_Widget *)sldrNR,       54, 165, 156 },
+	{ (Fl_Widget *)btnVol,        2, 125,  50 }, // 0
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 }, // 1
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 }, // 2
+	{ (Fl_Widget *)btnNR,         2, 165,  50 }, // 3
+	{ (Fl_Widget *)sldrNR,       54, 165, 156 }, // 4
+	{ (Fl_Widget *)sldrPOWER,    54, 185, 368 }, // 5
+	{ (Fl_Widget *)btnIFsh,     214, 105,  50 }, // 6
+	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 }, // 7
+	{ (Fl_Widget *)btnNotch,    214, 125,  50 }, // 8
+	{ (Fl_Widget *)sldrNOTCH,   266, 125, 156 }, // 9
+	{ (Fl_Widget *)sldrSQUELCH, 266, 145, 156 }, // 10
+	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 }, // 11
 	{ (Fl_Widget *)NULL,          0,   0,   0 }
 };
 
@@ -153,14 +154,15 @@ void RIG_TS590SG::initialize()
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = sldrRFGAIN;
-	rig_widgets[3].W = btnIFsh;
-	rig_widgets[4].W = sldrIFSHIFT;
-	rig_widgets[5].W = btnNotch;
-	rig_widgets[6].W = sldrNOTCH;
-	rig_widgets[7].W = sldrMICGAIN;
-	rig_widgets[8].W = sldrPOWER;
-	rig_widgets[9].W = btnNR;
-	rig_widgets[10].W = sldrNR;
+	rig_widgets[3].W = btnNR;
+	rig_widgets[4].W = sldrNR;
+	rig_widgets[5].W = sldrPOWER;
+	rig_widgets[6].W = btnIFsh;
+	rig_widgets[7].W = sldrIFSHIFT;
+	rig_widgets[8].W = btnNotch;
+	rig_widgets[9].W = sldrNOTCH;
+	rig_widgets[10].W = sldrSQUELCH;
+	rig_widgets[11].W = sldrMICGAIN;
 
 //	cmd = "EX0050000;";
 //	if (wait_char(';', 11, 100, "read ex 003", ASC) == 11)

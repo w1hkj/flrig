@@ -66,15 +66,16 @@ public:
 	virtual int  get_bwB();
 
 	virtual void set_mic_gain(int val);
-//	virtual int  get_mic_gain();
 	virtual void get_mic_gain_min_max_step(int &min, int &max, int &step);
+
 	virtual void set_if_shift(int val);
-//	virtual bool get_if_shift(int val);
 	virtual void get_if_min_max_step(int &min, int &max, int &step);
+
+	void set_pbt_inner(int val);
+	void set_pbt_outer(int val);
+
 	virtual void set_squelch(int val);
-//	int  get_squelch();
 	virtual void set_rf_gain(int val);
-//	int  get_rf_gain();
 	virtual void set_power_control(double val);
 
 	virtual void set_split(bool val);
@@ -132,6 +133,9 @@ public:
 
 	virtual void set_if_shift(int val);
 	virtual void get_if_min_max_step(int &min, int &max, int &step);
+
+	void set_pbt_inner(int val);
+	void set_pbt_outer(int val);
 
 	virtual void set_power_control(double val);
 	virtual int  get_power_control();

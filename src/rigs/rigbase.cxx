@@ -81,6 +81,8 @@ rigbase::rigbase()
 	has_attenuator_control =
 	has_preamp_control =
 	has_ifshift_control =
+	has_pbt_controls =
+	has_FILTER =
 	has_ptt_control =
 	has_tune_control =
 	has_swr_control =
@@ -123,6 +125,7 @@ rigbase::rigbase()
 	has_get_info = 
 	has_getvfoAorB = 
 	ICOMrig = false;
+	ICOMmainsub = false;
 
 	has_a2b = false;
 	has_vfoAB = false;

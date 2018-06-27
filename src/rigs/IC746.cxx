@@ -35,21 +35,43 @@ const char IC746_mode_type[] =
 const char *IC746_widths[] = { "NORM", "NARR", NULL};
 static int IC746_bw_vals[] = { 1, 2, WVALS_LIMIT};
 
-static GUI ic746_widgets[]= {
-	{ (Fl_Widget *)btnVol, 2, 125,  50 },
-	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },
-	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },
-	{ (Fl_Widget *)sldrSQUELCH, 54, 165, 156 },
-	{ (Fl_Widget *)btnNR, 2, 185,  50 },
-	{ (Fl_Widget *)sldrNR, 54, 185, 156 },
-	{ (Fl_Widget *)btnIFsh, 214, 125,  50 },
-	{ (Fl_Widget *)sldrIFSHIFT, 266, 125, 156 },
-	{ (Fl_Widget *)btnNotch, 214, 145,  50 },
-	{ (Fl_Widget *)sldrNOTCH, 266, 145, 156 },
-	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },
-	{ (Fl_Widget *)sldrPOWER, 266, 185, 156 },
+static GUI IC746_widgetsdgets[]= {
+	{ (Fl_Widget *)btnVol,        2, 125,  50 },	//0
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },	//1
+	{ (Fl_Widget *)btnAGC,        2, 145,  50 },	//2
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },	//3
+	{ (Fl_Widget *)sldrSQUELCH,  54, 165, 156 },	//4
+	{ (Fl_Widget *)btnNR,         2, 185,  50 },	//5
+	{ (Fl_Widget *)sldrNR,       54, 185, 156 },	//6
+	{ (Fl_Widget *)btnLOCK,     214, 105,  50 },	//7
+	{ (Fl_Widget *)sldrINNER,   266, 105, 156 },	//8
+	{ (Fl_Widget *)btnCLRPBT,   214, 125,  50 },	//9
+	{ (Fl_Widget *)sldrOUTER,   266, 125, 156 },	//10
+	{ (Fl_Widget *)btnNotch,    214, 145,  50 },	//11
+	{ (Fl_Widget *)sldrNOTCH,   266, 145, 156 },	//12
+	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },	//13
+	{ (Fl_Widget *)sldrPOWER,   266, 185, 156 },	//14
 	{ (Fl_Widget *)NULL, 0, 0, 0 }
 };
+
+void RIG_IC746::initialize()
+{
+	IC746_widgetsdgets[0].W = btnVol;
+	IC746_widgetsdgets[1].W = sldrVOLUME;
+	IC746_widgetsdgets[2].W = btnAGC;
+	IC746_widgetsdgets[3].W = sldrRFGAIN;
+	IC746_widgetsdgets[4].W = sldrSQUELCH;
+	IC746_widgetsdgets[5].W = btnNR;
+	IC746_widgetsdgets[6].W = sldrNR;
+	IC746_widgetsdgets[7].W = btnLOCK;
+	IC746_widgetsdgets[8].W = sldrINNER;
+	IC746_widgetsdgets[9].W = btnCLRPBT;
+	IC746_widgetsdgets[10].W = sldrOUTER;
+	IC746_widgetsdgets[11].W = btnNotch;
+	IC746_widgetsdgets[12].W = sldrNOTCH;
+	IC746_widgetsdgets[13].W = sldrMICGAIN;
+	IC746_widgetsdgets[14].W = sldrPOWER;
+}
 
 RIG_IC746::RIG_IC746() {
 	defaultCIV = 0x56;
@@ -59,7 +81,7 @@ RIG_IC746::RIG_IC746() {
 	bw_vals_ = IC746_bw_vals;
 	_mode_type = IC746_mode_type;
 
-	widgets = ic746_widgets;
+	widgets = IC746_widgetsdgets;
 
 	comm_baudrate = BR9600;
 	stopbits = 1;
@@ -90,7 +112,8 @@ RIG_IC746::RIG_IC746() {
 	has_notch_control =
 	has_attenuator_control =
 	has_preamp_control =
-	has_ifshift_control =
+	has_pbt_controls = true;
+
 	has_ptt_control =
 	has_tune_control =
 	has_noise_control =
@@ -105,22 +128,6 @@ RIG_IC746::RIG_IC746() {
 	ndigits = 9;
 
 };
-
-void RIG_IC746::initialize()
-{
-	ic746_widgets[0].W = btnVol;
-	ic746_widgets[1].W = sldrVOLUME;
-	ic746_widgets[2].W = sldrRFGAIN;
-	ic746_widgets[3].W = sldrSQUELCH;
-	ic746_widgets[4].W = btnNR;
-	ic746_widgets[5].W = sldrNR;
-	ic746_widgets[6].W = btnIFsh;
-	ic746_widgets[7].W = sldrIFSHIFT;
-	ic746_widgets[8].W = btnNotch;
-	ic746_widgets[9].W = sldrNOTCH;
-	ic746_widgets[10].W = sldrMICGAIN;
-	ic746_widgets[11].W = sldrPOWER;
-}
 
 void RIG_IC746::selectA()
 {
@@ -566,6 +573,32 @@ void RIG_IC746::get_if_min_max_step(int &min, int &max, int &step)
 	step = 1;
 }
 
+void RIG_IC746::set_pbt_inner(int val)
+{
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x07");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set PBT inner");
+}
+
+void RIG_IC746::set_pbt_outer(int val)
+{
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x08");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set PBT outer");
+}
+
 int ICsql = 0;
 void RIG_IC746::set_squelch(int val)
 {
@@ -672,7 +705,8 @@ RIG_IC746PRO::RIG_IC746PRO() {
 	has_notch_control =
 	has_attenuator_control =
 	has_preamp_control =
-	has_ifshift_control =
+	has_pbt_controls = true;
+
 	has_ptt_control =
 	has_tune_control =
 	has_noise_control =
@@ -1260,6 +1294,32 @@ void RIG_IC746PRO::get_if_min_max_step(int &min, int &max, int &step)
 	min = -50;
 	max = +50;
 	step = 1;
+}
+
+void RIG_IC746PRO::set_pbt_inner(int val)
+{
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x07");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set PBT inner");
+}
+
+void RIG_IC746PRO::set_pbt_outer(int val)
+{
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x08");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set PBT outer");
 }
 
 void RIG_IC746PRO::set_split(bool val)

@@ -101,6 +101,21 @@ public:
 	void set_if_shift(int val);
 	void get_if_min_max_step(int &min, int &max, int &step);
 
+	void set_pbt_inner(int val);
+	void set_pbt_outer(int val);
+
+	const char *FILT(int val);
+	const char *nextFILT();
+
+	int  get_FILT(int mode);
+	void set_FILT(int filter);
+
+	void set_FILTERS(std::string s);
+	std::string get_FILTERS();
+
+	void set_BANDWIDTHS(std::string s);
+	std::string get_BANDWIDTHS();
+
 	int  get_agc();
 	int  incr_agc();
 	const char *agc_label();

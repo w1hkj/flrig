@@ -94,14 +94,15 @@ static int agcval = 1;
 static bool fm_mode = false;
 
 static GUI rig_widgets[]= {
-	{ (Fl_Widget *)btnVol,        2, 125,  50 },
-	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
-	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },
-	{ (Fl_Widget *)btnIFsh,     214, 105,  50 },
-	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
-	{ (Fl_Widget *)btnDataPort, 214, 125,  50 },
-	{ (Fl_Widget *)sldrMICGAIN, 266, 125, 156 },
-	{ (Fl_Widget *)sldrPOWER,   266, 145, 156 },
+	{ (Fl_Widget *)btnVol,        2, 125,  50 }, // 0
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 }, // 1
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 }, // 2
+	{ (Fl_Widget *)btnIFsh,     214, 105,  50 }, // 3
+	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 }, // 4
+	{ (Fl_Widget *)btnDataPort, 214, 125,  50 }, // 5
+	{ (Fl_Widget *)sldrSQUELCH, 266, 125, 156 }, // 6
+	{ (Fl_Widget *)sldrMICGAIN, 266, 145, 156 }, // 7
+	{ (Fl_Widget *)sldrPOWER,    54, 165, 368 }, // 8
 	{ (Fl_Widget *)NULL,          0,   0,   0 }
 };
 
@@ -115,8 +116,9 @@ void RIG_TS480HX::initialize()
 	rig_widgets[3].W = btnIFsh;
 	rig_widgets[4].W = sldrIFSHIFT;
 	rig_widgets[5].W = btnDataPort;
-	rig_widgets[6].W = sldrMICGAIN;
-	rig_widgets[7].W = sldrPOWER;
+	rig_widgets[6].W = sldrSQUELCH;
+	rig_widgets[7].W = sldrMICGAIN;
+	rig_widgets[8].W = sldrPOWER;
 
 	check_menu_45();
 

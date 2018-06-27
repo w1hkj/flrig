@@ -31,21 +31,23 @@
 #include "hspinner.h"
 #include "ui.h"
 
+Fl_Light_Button *btnPOWER = (Fl_Light_Button *)0;
+
 // controls for touch screen interface
 Hspinner *spnrPOWER = (Hspinner *)0;
-Fl_Light_Button *btnPOWER = (Fl_Light_Button *)0;
 Hspinner *spnrVOLUME = (Hspinner *)0;
 Hspinner *spnrRFGAIN = (Hspinner *)0;
 Hspinner *spnrSQUELCH = (Hspinner *)0;
 Hspinner *spnrNR = (Hspinner *)0;
 Hspinner *spnrIFSHIFT = (Hspinner *)0;
+Hspinner *spnrINNER = (Hspinner *)0;
+Hspinner *spnrOUTER = (Hspinner *)0;
 Hspinner *spnrNOTCH = (Hspinner *)0;
 Hspinner *spnrMICGAIN = (Hspinner *)0;
 
 static const int freq_sel_widths[]={110, 70, 70, 0};
 static Fl_Double_Window *meter_scale_dialog = (Fl_Double_Window *)0;
 static Fl_Double_Window *meter_filters = (Fl_Double_Window *)0;
-
 
 Fl_Menu_Bar *small_menu=(Fl_Menu_Bar *)0;
 Fl_Menu_Bar *wide_menu=(Fl_Menu_Bar *)0;
@@ -68,190 +70,197 @@ Fl_Box *labelMEMORY = (Fl_Box *)0;
 
 Fl_Output *txt_encA=(Fl_Output *)0;
 
-Fl_Group *grpMeters=(Fl_Group *)0;
+Fl_Group *grpMeters = (Fl_Group *)0;
 Fl_Box *scaleSmeter=(Fl_Box *)0;
 
-Fl_Light_Button *btnPreamp=(Fl_Light_Button *)0;
-Fl_Light_Button *btnNOISE=(Fl_Light_Button *)0;
-Fl_Light_Button *btnAutoNotch=(Fl_Light_Button *)0;
-Fl_Group *grp_row1b2=(Fl_Group *)0;
-Fl_Button *btnAswapB=(Fl_Button *)0;
-Fl_Button *btn_K3_swapAB=(Fl_Button *)0;
-Fl_Button *btn_KX3_swapAB=(Fl_Button *)0;
-Fl_Light_Button *btnB=(Fl_Light_Button *)0;
-Fl_Light_Button *btnSplit=(Fl_Light_Button *)0;
-Fl_Light_Button *btnPTT=(Fl_Light_Button *)0;
+Fl_Light_Button *btnPreamp = (Fl_Light_Button *)0;
+Fl_Light_Button *btnNOISE = (Fl_Light_Button *)0;
+Fl_Light_Button *btnAutoNotch = (Fl_Light_Button *)0;
+Fl_Group *grp_row1b2 = (Fl_Group *)0;
+Fl_Button *btnAswapB = (Fl_Button *)0;
+Fl_Button *btn_K3_swapAB = (Fl_Button *)0;
+Fl_Button *btn_KX3_swapAB = (Fl_Button *)0;
+Fl_Light_Button *btnB = (Fl_Light_Button *)0;
+Fl_Light_Button *btnSplit = (Fl_Light_Button *)0;
+Fl_Light_Button *btnPTT = (Fl_Light_Button *)0;
 Fl_Box *bx_row1_expander2=(Fl_Box *)0;
-Fl_Group *grp_row2=(Fl_Group *)0;
-Fl_Group *grp_row2a=(Fl_Group *)0;
-Fl_Wheel_Value_Slider *sldrSQUELCH=(Fl_Wheel_Value_Slider *)0;
-Fl_Wheel_Value_Slider *sldrMICGAIN=(Fl_Wheel_Value_Slider *)0;
+Fl_Group *grp_row2 = (Fl_Group *)0;
+Fl_Group *grp_row2a = (Fl_Group *)0;
+Fl_Wheel_Value_Slider *sldrSQUELCH = (Fl_Wheel_Value_Slider *)0;
+Fl_Wheel_Value_Slider *sldrMICGAIN = (Fl_Wheel_Value_Slider *)0;
 Fl_Box *bx_sep2a=(Fl_Box *)0;
-Fl_Group *grp_row2b=(Fl_Group *)0;
-Fl_Light_Button *btnIFsh=(Fl_Light_Button *)0;
-Fl_Wheel_Value_Slider *sldrIFSHIFT=(Fl_Wheel_Value_Slider *)0;
-Fl_Light_Button *btnNR=(Fl_Light_Button *)0;
-Fl_Wheel_Value_Slider *sldrNR=(Fl_Wheel_Value_Slider *)0;
+Fl_Group *grp_row2b = (Fl_Group *)0;
+Fl_Light_Button *btnIFsh = (Fl_Light_Button *)0;
+Fl_Wheel_Value_Slider *sldrIFSHIFT = (Fl_Wheel_Value_Slider *)0;
+
+Fl_Light_Button *btnLOCK = (Fl_Light_Button *)0;
+Fl_Button *btnCLRPBT = (Fl_Light_Button *)0;
+Fl_Wheel_Value_Slider *sldrINNER = (Fl_Wheel_Value_Slider *)0;
+Fl_Wheel_Value_Slider *sldrOUTER = (Fl_Wheel_Value_Slider *)0;
+
+Fl_Light_Button *btnNR = (Fl_Light_Button *)0;
+Fl_Wheel_Value_Slider *sldrNR = (Fl_Wheel_Value_Slider *)0;
 Fl_Box *bx_sep2b=(Fl_Box *)0;
-Fl_Group *grp_row2c=(Fl_Group *)0;
-Fl_Light_Button *btnNotch=(Fl_Light_Button *)0;
-Fl_Wheel_Value_Slider *sldrNOTCH=(Fl_Wheel_Value_Slider *)0;
-Fl_Light_Button *btnAGC=(Fl_Light_Button *)0;
-Fl_Wheel_Value_Slider *sldrRFGAIN=(Fl_Wheel_Value_Slider *)0;
+Fl_Group *grp_row2c = (Fl_Group *)0;
+Fl_Light_Button *btnNotch = (Fl_Light_Button *)0;
+Fl_Wheel_Value_Slider *sldrNOTCH = (Fl_Wheel_Value_Slider *)0;
+Fl_Light_Button *btnAGC = (Fl_Light_Button *)0;
+Fl_Wheel_Value_Slider *sldrRFGAIN = (Fl_Wheel_Value_Slider *)0;
 Fl_Box *bx_sep2c=(Fl_Box *)0;
-Fl_Group *grp_row2d=(Fl_Group *)0;
-Fl_Wheel_Value_Slider *sldrPOWER=(Fl_Wheel_Value_Slider *)0;
-Fl_Light_Button *btnVol=(Fl_Light_Button *)0;
-Fl_Wheel_Value_Slider *sldrVOLUME=(Fl_Wheel_Value_Slider *)0;
-Fl_Group *grpTABS=(Fl_Group *)0;
+Fl_Group *grp_row2d = (Fl_Group *)0;
+Fl_Wheel_Value_Slider *sldrPOWER = (Fl_Wheel_Value_Slider *)0;
+Fl_Light_Button *btnVol = (Fl_Light_Button *)0;
+Fl_Wheel_Value_Slider *sldrVOLUME = (Fl_Wheel_Value_Slider *)0;
+Fl_Group *grpTABS = (Fl_Group *)0;
 Fl_Tabs *tabsGeneric=(Fl_Tabs *)0;
-Fl_Group *genericBands=(Fl_Group *)0;
-Fl_Button *btnBandSelect_1=(Fl_Button *)0;
-Fl_Button *btnBandSelect_2=(Fl_Button *)0;
-Fl_Button *btnBandSelect_3=(Fl_Button *)0;
-Fl_Button *btnBandSelect_4=(Fl_Button *)0;
-Fl_Button *btnBandSelect_5=(Fl_Button *)0;
-Fl_Button *btnBandSelect_6=(Fl_Button *)0;
-Fl_Button *btnBandSelect_7=(Fl_Button *)0;
-Fl_Button *btnBandSelect_8=(Fl_Button *)0;
-Fl_Button *btnBandSelect_9=(Fl_Button *)0;
-Fl_Button *btnBandSelect_10=(Fl_Button *)0;
-Fl_Button *btnBandSelect_11=(Fl_Button *)0;
-Fl_ComboBox *opSelect60=(Fl_ComboBox *)0;
-Fl_Group *genericCW=(Fl_Group *)0;
-Fl_Light_Button *btnSpot=(Fl_Light_Button *)0;
+Fl_Group *genericBands = (Fl_Group *)0;
+Fl_Button *btnBandSelect_1 = (Fl_Button *)0;
+Fl_Button *btnBandSelect_2 = (Fl_Button *)0;
+Fl_Button *btnBandSelect_3 = (Fl_Button *)0;
+Fl_Button *btnBandSelect_4 = (Fl_Button *)0;
+Fl_Button *btnBandSelect_5 = (Fl_Button *)0;
+Fl_Button *btnBandSelect_6 = (Fl_Button *)0;
+Fl_Button *btnBandSelect_7 = (Fl_Button *)0;
+Fl_Button *btnBandSelect_8 = (Fl_Button *)0;
+Fl_Button *btnBandSelect_9 = (Fl_Button *)0;
+Fl_Button *btnBandSelect_10 = (Fl_Button *)0;
+Fl_Button *btnBandSelect_11 = (Fl_Button *)0;
+Fl_ComboBox *opSelect60 = (Fl_ComboBox *)0;
+Fl_Group *genericCW = (Fl_Group *)0;
+Fl_Light_Button *btnSpot = (Fl_Light_Button *)0;
 
-Hspinner *spnr_cw_spot_tone=(Hspinner *)0;
-Hspinner *spnr_cw_qsk=(Hspinner *)0;
-Hspinner *spnr_cw_weight=(Hspinner *)0;
-Hspinner *spnr_cw_wpm=(Hspinner *)0;
-Fl_Check_Button *btn_enable_keyer=(Fl_Check_Button *)0;
+Hspinner *spnr_cw_spot_tone = (Hspinner *)0;
+Hspinner *spnr_cw_qsk = (Hspinner *)0;
+Hspinner *spnr_cw_weight = (Hspinner *)0;
+Hspinner *spnr_cw_wpm = (Hspinner *)0;
+Fl_Check_Button *btn_enable_keyer = (Fl_Check_Button *)0;
 
-Fl_Group *genericQSK=(Fl_Group *)0;
-Fl_Button *btnBreakIn=(Fl_Button *)0;
-Hspinner *spnr_cw_delay=(Hspinner *)0;
-Hspinner *cnt_cw_qsk=(Hspinner *)0;
+Fl_Group *genericQSK = (Fl_Group *)0;
+Fl_Button *btnBreakIn = (Fl_Button *)0;
+Hspinner *spnr_cw_delay = (Hspinner *)0;
+Hspinner *cnt_cw_qsk = (Hspinner *)0;
 
-Fl_Group *genericVOX=(Fl_Group *)0;
-Hspinner *spnr_vox_gain=(Hspinner *)0;
-Hspinner *spnr_anti_vox=(Hspinner *)0;
-Hspinner *spnr_vox_hang=(Hspinner *)0;
-Fl_Light_Button *btn_vox=(Fl_Light_Button *)0;
-Fl_Check_Button *btn_vox_on_dataport=(Fl_Check_Button *)0;
-Fl_Group *genericSpeech=(Fl_Group *)0;
-Fl_Light_Button *btnCompON=(Fl_Light_Button *)0;
-Hspinner *spnr_compression=(Hspinner *)0;
-Fl_Group *genericRx=(Fl_Group *)0;
-Fl_Wheel_Value_Slider *sldr_nb_level=(Fl_Wheel_Value_Slider *)0;
-//Fl_ComboBox *cbo_agc_level=(Fl_ComboBox *)0;
-Hspinner *spnr_bpf_center=(Hspinner *)0;
+Fl_Group *genericVOX = (Fl_Group *)0;
+Hspinner *spnr_vox_gain = (Hspinner *)0;
+Hspinner *spnr_anti_vox = (Hspinner *)0;
+Hspinner *spnr_vox_hang = (Hspinner *)0;
+Fl_Light_Button *btn_vox = (Fl_Light_Button *)0;
+Fl_Check_Button *btn_vox_on_dataport = (Fl_Check_Button *)0;
+Fl_Group *genericSpeech = (Fl_Group *)0;
+Fl_Light_Button *btnCompON = (Fl_Light_Button *)0;
+Hspinner *spnr_compression = (Hspinner *)0;
+Fl_Group *genericRx = (Fl_Group *)0;
+Fl_Wheel_Value_Slider *sldr_nb_level = (Fl_Wheel_Value_Slider *)0;
+//Fl_ComboBox *cbo_agc_level = (Fl_ComboBox *)0;
+Hspinner *spnr_bpf_center = (Hspinner *)0;
 
-Fl_Button *btnALC_SWR=(Fl_Button *)0;
+Fl_Button *btnALC_SWR = (Fl_Button *)0;
 Fl_SigBar *sldrRcvSignal=(Fl_SigBar *)0;
 Fl_SigBar *sldrALC=(Fl_SigBar *)0;
 Fl_SigBar *sldrSWR=(Fl_SigBar *)0;
 Fl_SigBar *sldrFwdPwr=(Fl_SigBar *)0;
-Fl_Button *scalePower=(Fl_Button *)0;
+Fl_Button *scalePower = (Fl_Button *)0;
 Fl_Box *meter_fill_box=(Fl_Box *)0;
 cFreqControl *FreqDispA=(cFreqControl *)0;
 cFreqControl *FreqDispB=(cFreqControl *)0;
-Fl_Group *grp_row0a=(Fl_Group *)0;
-Fl_Light_Button *btnA=(Fl_Light_Button *)0;
-Fl_Button *btnTune=(Fl_Button *)0;
+Fl_Group *grp_row0a = (Fl_Group *)0;
+Fl_Light_Button *btnA = (Fl_Light_Button *)0;
+Fl_Button *btnTune = (Fl_Button *)0;
 Fl_Box *bx_row0_expander=(Fl_Box *)0;
-Fl_Button *btn_show_controls=(Fl_Button *)0;
-Fl_Group *grp_row1=(Fl_Group *)0;
-Fl_Group *grp_row1a=(Fl_Group *)0;
-Fl_ComboBox *opBW=(Fl_ComboBox *)0;
-Fl_ComboBox *opDSP_lo=(Fl_ComboBox *)0;
-Fl_Button *btnDSP=(Fl_Button *)0;
-Fl_ComboBox *opDSP_hi=(Fl_ComboBox *)0;
-Fl_ComboBox *opMODE=(Fl_ComboBox *)0;
-Fl_Group *grp_row1b=(Fl_Group *)0;
-Fl_Group *grp_row1b1=(Fl_Group *)0;
-Fl_Light_Button *btnAttenuator=(Fl_Light_Button *)0;
+Fl_Button *btn_show_controls = (Fl_Button *)0;
+Fl_Group *grp_row1 = (Fl_Group *)0;
+Fl_Group *grp_row1a = (Fl_Group *)0;
+Fl_ComboBox *opBW = (Fl_ComboBox *)0;
+Fl_ComboBox *opDSP_lo = (Fl_ComboBox *)0;
+Fl_Button *btnDSP = (Fl_Button *)0;
+Fl_ComboBox *opDSP_hi = (Fl_ComboBox *)0;
+Fl_Button *btnFILT= (Fl_Button*)0;
+Fl_ComboBox *opMODE = (Fl_ComboBox *)0;
+Fl_Group *grp_row1b = (Fl_Group *)0;
+Fl_Group *grp_row1b1 = (Fl_Group *)0;
+Fl_Light_Button *btnAttenuator = (Fl_Light_Button *)0;
 
-Fl_Check_Button *btn_use_bpf_center=(Fl_Check_Button *)0;
-Fl_Group *genericMisc=(Fl_Group *)0;
-Hspinner *spnr_vfo_adj=(Hspinner *)0;
-Hspinner *spnr_line_out=(Hspinner *)0;
-Fl_Light_Button *btnSpecial=(Fl_Light_Button *)0;
-Fl_Check_Button *btn_ext_tuner=(Fl_Check_Button *)0;
-Fl_Check_Button *btn_xcvr_auto_on=(Fl_Check_Button *)0;
-Fl_Check_Button *btn_xcvr_auto_off=(Fl_Check_Button *)0;
+Fl_Check_Button *btn_use_bpf_center = (Fl_Check_Button *)0;
+Fl_Group *genericMisc = (Fl_Group *)0;
+Hspinner *spnr_vfo_adj = (Hspinner *)0;
+Hspinner *spnr_line_out = (Hspinner *)0;
+Fl_Light_Button *btnSpecial = (Fl_Light_Button *)0;
+Fl_Check_Button *btn_ext_tuner = (Fl_Check_Button *)0;
+Fl_Check_Button *btn_xcvr_auto_on = (Fl_Check_Button *)0;
+Fl_Check_Button *btn_xcvr_auto_off = (Fl_Check_Button *)0;
 
 Fl_Group  *genericUser = (Fl_Group *)0;
-Fl_Button *btnUser1 = (Fl_Button *)0;
-Fl_Button *btnUser2 = (Fl_Button *)0;
-Fl_Button *btnUser3 = (Fl_Button *)0;
-Fl_Button *btnUser4 = (Fl_Button *)0;
-Fl_Button *btnUser5 = (Fl_Button *)0;
-Fl_Button *btnUser6 = (Fl_Button *)0;
-Fl_Button *btnUser7 = (Fl_Button *)0;
-Fl_Button *btnUser8 = (Fl_Button *)0;
+Fl_Button *btnUser1 = (Fl_Button*)0;
+Fl_Button *btnUser2 = (Fl_Button*)0;
+Fl_Button *btnUser3 = (Fl_Button*)0;
+Fl_Button *btnUser4 = (Fl_Button*)0;
+Fl_Button *btnUser5 = (Fl_Button*)0;
+Fl_Button *btnUser6 = (Fl_Button*)0;
+Fl_Button *btnUser7 = (Fl_Button*)0;
+Fl_Button *btnUser8 = (Fl_Button*)0;
 
-Fl_Group *genericRXB=(Fl_Group *)0;
-Hspinner *cntRIT=(Hspinner *)0;
-Hspinner *cntXIT=(Hspinner *)0;
-Hspinner *cntBFO=(Hspinner *)0;
-Fl_Group *genericAux=(Fl_Group *)0;
+Fl_Group *genericRXB = (Fl_Group *)0;
+Hspinner *cntRIT = (Hspinner *)0;
+Hspinner *cntXIT = (Hspinner *)0;
+Hspinner *cntBFO = (Hspinner *)0;
+Fl_Group *genericAux = (Fl_Group *)0;
 Fl_Box *boxControl=(Fl_Box *)0;
-Fl_Light_Button *btnAuxRTS=(Fl_Light_Button *)0;
+Fl_Light_Button *btnAuxRTS = (Fl_Light_Button *)0;
 
-Fl_Light_Button *btnAuxDTR=(Fl_Light_Button *)0;
-Fl_Light_Button *btnDataPort=(Fl_Light_Button *)0;
+Fl_Light_Button *btnAuxDTR = (Fl_Light_Button *)0;
+Fl_Light_Button *btnDataPort = (Fl_Light_Button *)0;
 
 Fl_Tabs *tabs550=(Fl_Tabs *)0;
-Fl_Group *tt550_CW=(Fl_Group *)0;
-Hspinner *spnr_tt550_cw_wpm=(Hspinner *)0;
-Hspinner *spnr_tt550_cw_weight=(Hspinner *)0;
-Hspinner *spnr_tt550_cw_qsk=(Hspinner *)0;
-Hspinner *spnr_tt550_cw_vol=(Hspinner *)0;
-Hspinner *spnr_tt550_cw_spot=(Hspinner *)0;
-Fl_Check_Button *btn_tt550_enable_keyer=(Fl_Check_Button *)0;
-Fl_Group *tt550_VOX=(Fl_Group *)0;
-Hspinner *spnr_tt550_vox_gain=(Hspinner *)0;
-Hspinner *spnr_tt550_anti_vox=(Hspinner *)0;
-Hspinner *spnr_tt550_vox_hang=(Hspinner *)0;
-Fl_Light_Button *btn_tt550_vox=(Fl_Light_Button *)0;
-Fl_Group *tt550_Speech=(Fl_Group *)0;
-Fl_Light_Button *btn_tt550_CompON=(Fl_Light_Button *)0;
-Hspinner *spnr_tt550_compression=(Hspinner *)0;
-Hspinner *spnr_tt550_mon_vol=(Hspinner *)0;
-Fl_Group *tt550_Audio=(Fl_Group *)0;
-Hspinner *spnr_tt550_line_out=(Hspinner *)0;
-Fl_Check_Button *btnAccInp=(Fl_Check_Button *)0;
-Fl_Group *tt550_Rx=(Fl_Group *)0;
-Fl_ComboBox *cbo_tt550_nb_level=(Fl_ComboBox *)0;
-Fl_ComboBox *cbo_tt550_agc_level=(Fl_ComboBox *)0;
-Hspinner *spnr_tt550_vfo_adj=(Hspinner *)0;
-Fl_Group *tt550_Tx=(Fl_Group *)0;
-Fl_Check_Button *btn_tt550_enable_xmtr=(Fl_Check_Button *)0;
-Fl_Check_Button *btn_tt550_enable_tloop=(Fl_Check_Button *)0;
-Fl_Check_Button *btn_tt550_tuner_bypass=(Fl_Check_Button *)0;
-Fl_ComboBox *op_tt550_XmtBW=(Fl_ComboBox *)0;
-Fl_Check_Button *btn_tt550_use_xmt_bw=(Fl_Check_Button *)0;
-Fl_Group *tt550_302A=(Fl_Group *)0;
-Hspinner *spnr_tt550_keypad_time_out=(Hspinner *)0;
-Hspinner *spnr_tt550_encoder_sensitivity=(Hspinner *)0;
-Fl_Choice *sel_tt550_encoder_step=(Fl_Choice *)0;
-Fl_Group *tt550_302B=(Fl_Group *)0;
-Fl_Choice *sel_tt550_F1_func=(Fl_Choice *)0;
-Fl_Choice *sel_tt550_F2_func=(Fl_Choice *)0;
-Fl_Choice *sel_tt550_F3_func=(Fl_Choice *)0;
+Fl_Group *tt550_CW = (Fl_Group *)0;
+Hspinner *spnr_tt550_cw_wpm = (Hspinner *)0;
+Hspinner *spnr_tt550_cw_weight = (Hspinner *)0;
+Hspinner *spnr_tt550_cw_qsk = (Hspinner *)0;
+Hspinner *spnr_tt550_cw_vol = (Hspinner *)0;
+Hspinner *spnr_tt550_cw_spot = (Hspinner *)0;
+Fl_Check_Button *btn_tt550_enable_keyer = (Fl_Check_Button *)0;
+Fl_Group *tt550_VOX = (Fl_Group *)0;
+Hspinner *spnr_tt550_vox_gain = (Hspinner *)0;
+Hspinner *spnr_tt550_anti_vox = (Hspinner *)0;
+Hspinner *spnr_tt550_vox_hang = (Hspinner *)0;
+Fl_Light_Button *btn_tt550_vox = (Fl_Light_Button *)0;
+Fl_Group *tt550_Speech = (Fl_Group *)0;
+Fl_Light_Button *btn_tt550_CompON = (Fl_Light_Button *)0;
+Hspinner *spnr_tt550_compression = (Hspinner *)0;
+Hspinner *spnr_tt550_mon_vol = (Hspinner *)0;
+Fl_Group *tt550_Audio = (Fl_Group *)0;
+Hspinner *spnr_tt550_line_out = (Hspinner *)0;
+Fl_Check_Button *btnAccInp = (Fl_Check_Button *)0;
+Fl_Group *tt550_Rx = (Fl_Group *)0;
+Fl_ComboBox *cbo_tt550_nb_level = (Fl_ComboBox *)0;
+Fl_ComboBox *cbo_tt550_agc_level = (Fl_ComboBox *)0;
+Hspinner *spnr_tt550_vfo_adj = (Hspinner *)0;
+Fl_Group *tt550_Tx = (Fl_Group *)0;
+Fl_Check_Button *btn_tt550_enable_xmtr = (Fl_Check_Button *)0;
+Fl_Check_Button *btn_tt550_enable_tloop = (Fl_Check_Button *)0;
+Fl_Check_Button *btn_tt550_tuner_bypass = (Fl_Check_Button *)0;
+Fl_ComboBox *op_tt550_XmtBW = (Fl_ComboBox *)0;
+Fl_Check_Button *btn_tt550_use_xmt_bw = (Fl_Check_Button *)0;
+Fl_Group *tt550_302A = (Fl_Group *)0;
+Hspinner *spnr_tt550_keypad_time_out = (Hspinner *)0;
+Hspinner *spnr_tt550_encoder_sensitivity = (Hspinner *)0;
+Fl_Choice *sel_tt550_encoder_step = (Fl_Choice *)0;
+Fl_Group *tt550_302B = (Fl_Group *)0;
+Fl_Choice *sel_tt550_F1_func = (Fl_Choice *)0;
+Fl_Choice *sel_tt550_F2_func = (Fl_Choice *)0;
+Fl_Choice *sel_tt550_F3_func = (Fl_Choice *)0;
 
-Fl_Group *tt550_AT=(Fl_Group *)0;
-Fl_Light_Button *tt550_AT_inline=(Fl_Light_Button *)0;
-Fl_Light_Button *tt550_AT_Z=(Fl_Light_Button *)0;
-Fl_Button *tt550_AT_capUP=(Fl_Button *)0;
-Fl_Button *tt550_AT_capDN=(Fl_Button *)0;
-Fl_Button *tt550_AT_indUP=(Fl_Button *)0;
-Fl_Button *tt550_AT_indDN=(Fl_Button *)0;
+Fl_Group *tt550_AT = (Fl_Group *)0;
+Fl_Light_Button *tt550_AT_inline = (Fl_Light_Button *)0;
+Fl_Light_Button *tt550_AT_Z = (Fl_Light_Button *)0;
+Fl_Button *tt550_AT_capUP = (Fl_Button *)0;
+Fl_Button *tt550_AT_capDN = (Fl_Button *)0;
+Fl_Button *tt550_AT_indUP = (Fl_Button *)0;
+Fl_Button *tt550_AT_indDN = (Fl_Button *)0;
 Fl_Simple_Counter *tt550_Nsamples = (Fl_Simple_Counter *)0;
 
 Fl_Group *main_group = (Fl_Group *)0;
 
-Fl_Group *grpInitializing=(Fl_Group *)0;
+Fl_Group *grpInitializing = (Fl_Group *)0;
 
 Fl_Progress *progress=(Fl_Progress *)0;
 
@@ -446,6 +455,10 @@ static void cb_btn_show_controls(Fl_Button*, void*) {
 	show_controls();
 }
 
+static void cb_btnFILT(Fl_Button *, void *) {
+	selectFILT();
+}
+
 static void cb_opBW(Fl_ComboBox*, void*) {
 	setBW();
 }
@@ -508,6 +521,22 @@ static void cb_btnIFsh(Fl_Light_Button*, void*) {
 
 static void cb_sldrIFSHIFT(Fl_Wheel_Value_Slider*, void*) {
 	setIFshift();
+}
+
+static void cb_btnLOCK(Fl_Button*, void*) {
+	setLOCK();
+}
+
+static void cb_sldrINNER(Fl_Wheel_Value_Slider*, void*) {
+	setINNER();
+}
+
+static void cb_btnCLRPBT(Fl_Light_Button*, void*) {
+	setCLRPBT();
+}
+
+static void cb_sldrOUTER(Fl_Wheel_Value_Slider*, void*) {
+	setOUTER();
 }
 
 static void cb_btnNR(Fl_Light_Button*, void*) {

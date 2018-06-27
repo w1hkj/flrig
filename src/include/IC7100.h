@@ -144,6 +144,12 @@ public:
 	bool get_if_shift(int &val);
 	void get_if_min_max_step(int &min, int &max, int &step);
 
+	void set_pbt_inner(int val);
+	void set_pbt_outer(int val);
+
+	const char *FILT(int &val);
+	const char *nextFILT();
+
 	void set_nb_level(int val);
 	int  get_nb_level();
 

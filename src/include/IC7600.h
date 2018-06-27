@@ -138,6 +138,12 @@ public:
 	void set_auto_notch(int val);
 	int  get_auto_notch();
 
+	void set_pbt_inner(int val);
+	void set_pbt_outer(int val);
+
+	const char *FILT(int &val);
+	const char *nextFILT();
+
 	void tune_rig();
 
 };

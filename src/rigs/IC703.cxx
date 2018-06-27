@@ -31,19 +31,39 @@ const char IC703_mode_type[] = {'L', 'U', 'U', 'L', 'L', 'U', 'U', 'U', 'L', 'U'
 const char *IC703_widths[] = { "NARR", "MED", "WIDE", NULL};
 static int IC703_bw_vals[] = {1,2,3, WVALS_LIMIT};
 
-static GUI IC703_widgets[]= {
-	{ (Fl_Widget *)btnVol, 2, 125,  50 },
-	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },
-	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },
-	{ (Fl_Widget *)sldrSQUELCH, 54, 165, 156 },
-	{ (Fl_Widget *)btnNR, 214, 125,  50 },
-	{ (Fl_Widget *)sldrNR, 266, 125, 156 },
-	{ (Fl_Widget *)btnIFsh, 214, 105,  50 },
-	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
-	{ (Fl_Widget *)sldrMICGAIN, 266, 145, 156 },
-	{ (Fl_Widget *)sldrPOWER, 266, 165, 156 },
+static GUI IC703_widgetsdgets[]= {
+	{ (Fl_Widget *)btnVol,        2, 125,  50 },	//0
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },	//1
+	{ (Fl_Widget *)btnAGC,        2, 145,  50 },	//2
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },	//3
+	{ (Fl_Widget *)sldrSQUELCH,  54, 165, 156 },	//4
+	{ (Fl_Widget *)btnNR,         2, 185,  50 },	//5
+	{ (Fl_Widget *)sldrNR,       54, 185, 156 },	//6
+	{ (Fl_Widget *)btnLOCK,     214, 125,  50 },	//7
+	{ (Fl_Widget *)sldrINNER,   266, 125, 156 },	//8
+	{ (Fl_Widget *)btnCLRPBT,   214, 145,  50 },	//9
+	{ (Fl_Widget *)sldrOUTER,   266, 145, 156 },	//10
+	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },	//11
+	{ (Fl_Widget *)sldrPOWER,   266, 185, 156 },	//12
 	{ (Fl_Widget *)NULL, 0, 0, 0 }
 };
+
+void RIG_IC703::initialize()
+{
+	IC703_widgetsdgets[0].W = btnVol;
+	IC703_widgetsdgets[1].W = sldrVOLUME;
+	IC703_widgetsdgets[2].W = btnAGC;
+	IC703_widgetsdgets[3].W = sldrRFGAIN;
+	IC703_widgetsdgets[4].W = sldrSQUELCH;
+	IC703_widgetsdgets[5].W = btnNR;
+	IC703_widgetsdgets[6].W = sldrNR;
+	IC703_widgetsdgets[7].W = btnLOCK;
+	IC703_widgetsdgets[8].W = sldrINNER;
+	IC703_widgetsdgets[9].W = btnCLRPBT;
+	IC703_widgetsdgets[10].W = sldrOUTER;
+	IC703_widgetsdgets[11].W = sldrMICGAIN;
+	IC703_widgetsdgets[12].W = sldrPOWER;
+}
 
 RIG_IC703::RIG_IC703() {
 	name_ = IC703name_;
@@ -66,7 +86,7 @@ RIG_IC703::RIG_IC703() {
 	modeA = 1;
 	bwA = 0;
 
-	widgets = IC703_widgets;
+	widgets = IC703_widgetsdgets;
 
 	has_smeter =
 	has_power_out =
@@ -80,6 +100,7 @@ RIG_IC703::RIG_IC703() {
 	has_noise_reduction_control =
 	has_noise_control =
 	has_ifshift_control =
+	has_pbt_controls =
 	has_micgain_control =
 	has_power_control =
 
@@ -114,20 +135,6 @@ RIG_IC703::RIG_IC703() {
 };
 
 //=============================================================================
-
-void RIG_IC703::initialize()
-{
-	IC703_widgets[0].W = btnVol;
-	IC703_widgets[1].W = sldrVOLUME;
-	IC703_widgets[2].W = sldrRFGAIN;
-	IC703_widgets[3].W = sldrSQUELCH;
-	IC703_widgets[4].W = btnNR;
-	IC703_widgets[5].W = sldrNR;
-	IC703_widgets[6].W = btnIFsh;
-	IC703_widgets[7].W = sldrIFSHIFT;
-	IC703_widgets[8].W = sldrMICGAIN;
-	IC703_widgets[9].W = sldrPOWER;
-}
 
 long RIG_IC703::get_vfoA ()
 {
@@ -739,3 +746,30 @@ void RIG_IC703::set_cw_vol()
 	cmd.append( post );
 	waitFB("SET cw sidetone volume");
 }
+
+void RIG_IC703::set_pbt_inner(int val)
+{
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x07");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set PBT inner");
+}
+
+void RIG_IC703::set_pbt_outer(int val)
+{
+	int shift = 128 + val * 128 / 50;
+	if (shift < 0) shift = 0;
+	if (shift > 255) shift = 255;
+
+	cmd = pre_to;
+	cmd.append("\x14\x08");
+	cmd.append(to_bcd(shift, 3));
+	cmd.append(post);
+	waitFB("set PBT outer");
+}
+

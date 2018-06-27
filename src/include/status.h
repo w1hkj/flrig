@@ -99,6 +99,10 @@ struct status {
 	int		iBW_B;
 	int		imode_B;
 	int		freq_B;
+
+	std::string filters;
+	std::string bandwidths;
+
 	bool	use_rig_data;
 
 	bool	spkr_on;
@@ -109,6 +113,9 @@ struct status {
 	int		notch_val;
 	bool	shift;
 	int		shift_val;
+	bool	pbt_lock;
+	int		pbt_inner;
+	int		pbt_outer;
 	int		rfgain;
 	int		squelch;
 
