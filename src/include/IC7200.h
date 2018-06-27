@@ -32,6 +32,8 @@ public:
 
 	void initialize();
 
+	bool check();
+
 	void selectA();
 	void selectB();
 

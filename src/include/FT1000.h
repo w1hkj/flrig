@@ -45,6 +45,8 @@ public:
 
 	bool get_info();
 
+	bool check();
+
 	long get_vfoA();
 	int  get_modeA();
 	int  get_bwA();

@@ -156,6 +156,14 @@ void RIG_TT516::initialize()
 	rig_widgets[1].W = sldrIFSHIFT;
 }
 
+bool RIG_TT516::check ()
+{
+	cmd = TT516getFREQA;
+	int ret = waitN(8, 150, "check", HEX);
+	if (ret != 8) return false;
+	return true;
+}
+
 long RIG_TT516::get_vfoA ()
 {
 	cmd = TT516getFREQA;

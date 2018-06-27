@@ -176,6 +176,14 @@ void RIG_KX3::shutdown()
 {
 }
 
+bool RIG_KX3::check ()
+{
+	cmd = "FA;";
+	int ret = wait_char(';', 14, KX3_WAIT_TIME, "check", ASC);
+	if (ret < 14) return false;
+	return true;
+}
+
 long RIG_KX3::get_vfoA ()
 {
 	cmd = "FA;";

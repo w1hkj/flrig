@@ -131,6 +131,14 @@ void RIG_TT599::shutdown()
 	showresp(WARN, ASC, "Enable BW control", cmd, replystr);
 }
 
+bool RIG_TT599::check ()
+{
+	cmd = "?AF\r";
+	int ret = waitCommand( cmd, 12, "check");
+	if (ret < 12) return false;
+	return true;
+}
+
 long RIG_TT599::get_vfoA ()
 {
 	size_t p;

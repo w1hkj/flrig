@@ -144,6 +144,15 @@ void RIG_FT1000::init_cmd()
 //int inc_60m = false;
 //}
 
+bool RIG_FT1000::check ()
+{
+	init_cmd();
+	cmd[3] = 0x00;
+	cmd[4] = 0xFA;
+	int ret = waitN(5, 100, "check");
+	if (ret >= 5) return true;
+	return false;
+}
 
 bool RIG_FT1000::get_info()
 {

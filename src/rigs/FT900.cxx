@@ -156,6 +156,16 @@ int  RIG_FT900::get_vfoAorB()
 //	}
 //}
 
+bool RIG_FT900::check()
+{
+	init_cmd();
+	cmd[3] = 0x03;
+	cmd[4] = 0x10;
+	int ret = waitN(18, 100, "check", HEX);
+	if (ret >= 18) return true;
+	return false;
+}
+
 bool RIG_FT900::get_info()
 {
 //  get the vfo, mode and bandwidth information

@@ -65,6 +65,16 @@ RIG_TT563::RIG_TT563() {
 
 };
 
+bool RIG_TT563::check ()
+{
+	cmd = pre_to;
+	cmd += '\x03';
+	cmd.append( post );
+	int ret = sendCommand(cmd);
+	if (ret < 11) return false;
+	return true;
+}
+
 long RIG_TT563::get_vfoA ()
 {
 	cmd = pre_to;

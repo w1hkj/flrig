@@ -28,6 +28,8 @@ public:
 	RIG_FT767();
 	~RIG_FT767(){};
 
+	bool check();
+
 	long get_vfoA();
 	void set_vfoA(long);
 	void set_modeA(int val);

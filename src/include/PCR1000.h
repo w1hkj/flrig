@@ -97,6 +97,8 @@ public:
 	void set_volume_control(int val);
 	int  get_volume_control();
 
+	bool check();
+
 	long get_vfoA();
 	void set_vfoA(long);
 	long get_vfoB();

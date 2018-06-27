@@ -101,6 +101,8 @@ bool using_buttons = false;
 enum { SWR_IMAGE, ALC_IMAGE };
 int meter_image = SWR_IMAGE;
 
+bool xcvr_initialized = false;
+
 //=============================================================================
 // loop for serial i/o thread
 // runs continuously until program is closed
@@ -2932,8 +2934,10 @@ void close_UI()
 void closeRig()
 {
 	trace(1, "closeRig()");
-	restore_rig_vals();
-	selrig->shutdown();
+	if (xcvr_initialized) {
+		restore_rig_vals();
+		selrig->shutdown();
+}
 	close_rig = false;
 }
 
@@ -3004,7 +3008,7 @@ void cbExit()
 		close_rig = true;
 	}
 
-	closeRig();
+	if (selrig->check()) closeRig();
 
 	close_UI();
 
@@ -3473,7 +3477,7 @@ void adjust_control_positions()
 	FreqDispB->set_hrd(progStatus.hrd_buttons);
 }
 
-void initXcvrTab()
+void initTabs()
 {
 	if (xcvr_name == rig_TT550.name_) {
 		spnr_tt550_line_out->value(progStatus.tt550_line_out);
@@ -4052,35 +4056,14 @@ void init_volume_control()
 			spnrVOLUME->maximum(max);
 			spnrVOLUME->step(step);
 			spnrVOLUME->redraw();
+			spnrVOLUME->activate();
 		}
 		if (sldrVOLUME) {
 			sldrVOLUME->minimum(min);
 			sldrVOLUME->maximum(max);
 			sldrVOLUME->step(step);
 			sldrVOLUME->redraw();
-		}
-		if (progStatus.use_rig_data) {
-			progStatus.volume = selrig->get_volume_control();
-			if (sldrVOLUME) sldrVOLUME->value(progStatus.volume);
-			if (sldrVOLUME) sldrVOLUME->activate();
-			btnVol->value(1);
-			if (spnrVOLUME) spnrVOLUME->value(progStatus.volume);
-			if (spnrVOLUME) spnrVOLUME->activate();
 			sldrVOLUME->activate();
-		} else {
-			if (sldrVOLUME) sldrVOLUME->value(progStatus.volume);
-			if (spnrVOLUME) spnrVOLUME->value(progStatus.volume);
-			if (progStatus.spkr_on == 0) {
-				btnVol->value(0);
-				if (sldrVOLUME) sldrVOLUME->deactivate();
-				if (spnrVOLUME) spnrVOLUME->deactivate();
-				selrig->set_volume_control(0);
-			} else {
-				btnVol->value(1);
-				if (sldrVOLUME) sldrVOLUME->activate();
-				if (spnrVOLUME) spnrVOLUME->activate();
-				selrig->set_volume_control(progStatus.volume);
-			}
 		}
 		switch (progStatus.UIsize) {
 			case small_ui :
@@ -4108,6 +4091,36 @@ void init_volume_control()
 	}
 }
 
+void set_init_volume_control()
+{
+	if (!selrig->has_volume_control)
+		return;
+
+	if (progStatus.use_rig_data) {
+		progStatus.volume = selrig->get_volume_control();
+		if (sldrVOLUME) sldrVOLUME->value(progStatus.volume);
+		if (sldrVOLUME) sldrVOLUME->activate();
+		btnVol->value(1);
+		if (spnrVOLUME) spnrVOLUME->value(progStatus.volume);
+		if (spnrVOLUME) spnrVOLUME->activate();
+		sldrVOLUME->activate();
+	} else {
+		if (sldrVOLUME) sldrVOLUME->value(progStatus.volume);
+		if (spnrVOLUME) spnrVOLUME->value(progStatus.volume);
+		if (progStatus.spkr_on == 0) {
+			btnVol->value(0);
+			if (sldrVOLUME) sldrVOLUME->deactivate();
+			if (spnrVOLUME) spnrVOLUME->deactivate();
+			selrig->set_volume_control(0);
+		} else {
+			btnVol->value(1);
+			if (sldrVOLUME) sldrVOLUME->activate();
+			if (spnrVOLUME) spnrVOLUME->activate();
+			selrig->set_volume_control(progStatus.volume);
+		}
+	}
+}
+
 void init_rf_control()
 {
 	if (selrig->has_rf_control) {
@@ -4121,32 +4134,15 @@ void init_rf_control()
 		if (spnrRFGAIN) spnrRFGAIN->maximum(max);
 		if (spnrRFGAIN) spnrRFGAIN->step(step);
 		if (spnrRFGAIN) spnrRFGAIN->redraw();
-		if (progStatus.use_rig_data) {
-			progStatus.rfgain = selrig->get_rf_gain();
-			if (sldrRFGAIN) sldrRFGAIN->value(progStatus.rfgain);
-			if (spnrRFGAIN) spnrRFGAIN->value(progStatus.rfgain);
-			switch (progStatus.UIsize) {
-				case small_ui :
-					if (sldrRFGAIN) sldrRFGAIN->show();
-					if (spnrRFGAIN) spnrRFGAIN->show();
-					break;
-				case wide_ui : case touch_ui : default :
-					if (sldrRFGAIN) sldrRFGAIN->activate();
-					if (spnrRFGAIN) spnrRFGAIN->activate();
-			}
-		} else {
-			if (sldrRFGAIN) sldrRFGAIN->value(progStatus.rfgain);
-			if (spnrRFGAIN) spnrRFGAIN->value(progStatus.rfgain);
-			selrig->set_rf_gain(progStatus.rfgain);
-			switch (progStatus.UIsize) {
-				case small_ui :
-					if (sldrRFGAIN) sldrRFGAIN->show();
-					if (spnrRFGAIN) spnrRFGAIN->show();
-					break;
-				case wide_ui : case touch_ui : default :
-					if (sldrRFGAIN) sldrRFGAIN->activate();
-					if (spnrRFGAIN) spnrRFGAIN->activate();
-			}
+
+		switch (progStatus.UIsize) {
+			case small_ui :
+				if (sldrRFGAIN) sldrRFGAIN->show();
+				if (spnrRFGAIN) spnrRFGAIN->show();
+				break;
+			case wide_ui : case touch_ui : default :
+				if (sldrRFGAIN) sldrRFGAIN->activate();
+				if (spnrRFGAIN) spnrRFGAIN->activate();
 		}
 	} else {
 		switch (progStatus.UIsize) {
@@ -4158,6 +4154,22 @@ void init_rf_control()
 				if (sldrRFGAIN) sldrRFGAIN->deactivate();
 				if (spnrRFGAIN) spnrRFGAIN->deactivate();
 		}
+	}
+}
+
+void set_init_rf_gain()
+{
+	if (!selrig->has_rf_control)
+		return;
+
+	if (progStatus.use_rig_data) {
+		progStatus.rfgain = selrig->get_rf_gain();
+		if (sldrRFGAIN) sldrRFGAIN->value(progStatus.rfgain);
+		if (spnrRFGAIN) spnrRFGAIN->value(progStatus.rfgain);
+	} else {
+		if (sldrRFGAIN) sldrRFGAIN->value(progStatus.rfgain);
+		if (spnrRFGAIN) spnrRFGAIN->value(progStatus.rfgain);
+		selrig->set_rf_gain(progStatus.rfgain);
 	}
 }
 
@@ -4174,33 +4186,16 @@ void init_sql_control()
 		if (spnrSQUELCH) spnrSQUELCH->maximum(max);
 		if (spnrSQUELCH) spnrSQUELCH->step(step);
 		if (spnrSQUELCH) spnrSQUELCH->redraw();
-		if (progStatus.use_rig_data) {
-			progStatus.squelch = selrig->get_squelch();
-			if (sldrSQUELCH) sldrSQUELCH->value(progStatus.squelch);
-			if (spnrSQUELCH) spnrSQUELCH->value(progStatus.squelch);
-			switch (progStatus.UIsize) {
-				case small_ui :
-					if (sldrSQUELCH) sldrSQUELCH->show();
-					if (spnrSQUELCH) spnrSQUELCH->show();
-					break;
-				case wide_ui : case touch_ui : default:
-					if (sldrSQUELCH) sldrSQUELCH->activate();
-					if (spnrSQUELCH) spnrSQUELCH->activate();
-			}
-		} else {
-			if (sldrSQUELCH) sldrSQUELCH->value(progStatus.squelch);
-			if (spnrSQUELCH) spnrSQUELCH->value(progStatus.squelch);
-			selrig->set_squelch(progStatus.squelch);
-			switch (progStatus.UIsize) {
-				case small_ui :
-					if (sldrSQUELCH) sldrSQUELCH->show();
-					if (spnrSQUELCH) spnrSQUELCH->show();
-					break;
-				case wide_ui : case touch_ui : default :
-					if (sldrSQUELCH) sldrSQUELCH->activate();
-					if (spnrSQUELCH) spnrSQUELCH->activate();
-			}
+		switch (progStatus.UIsize) {
+			case small_ui :
+				if (sldrSQUELCH) sldrSQUELCH->show();
+				if (spnrSQUELCH) spnrSQUELCH->show();
+				break;
+			case wide_ui : case touch_ui : default:
+				if (sldrSQUELCH) sldrSQUELCH->activate();
+				if (spnrSQUELCH) spnrSQUELCH->activate();
 		}
+
 	} else {
 		switch (progStatus.UIsize) {
 			case small_ui :
@@ -4211,6 +4206,42 @@ void init_sql_control()
 				if (sldrSQUELCH) sldrSQUELCH->deactivate();
 				if (spnrSQUELCH) spnrSQUELCH->deactivate();
 		}
+	}
+}
+
+void set_init_sql_control()
+{
+	if (!selrig->has_sql_control)
+		return;
+
+	if (progStatus.use_rig_data) {
+		progStatus.squelch = selrig->get_squelch();
+		if (sldrSQUELCH) sldrSQUELCH->value(progStatus.squelch);
+		if (spnrSQUELCH) spnrSQUELCH->value(progStatus.squelch);
+	} else {
+		if (sldrSQUELCH) sldrSQUELCH->value(progStatus.squelch);
+		if (spnrSQUELCH) spnrSQUELCH->value(progStatus.squelch);
+		selrig->set_squelch(progStatus.squelch);
+	}
+}
+
+void set_init_noise_reduction_control()
+{
+	if (!selrig->has_noise_reduction_control)
+		return;
+
+	if (progStatus.use_rig_data) {
+		progStatus.noise_reduction = selrig->get_noise_reduction();
+		progStatus.noise_reduction_val = selrig->get_noise_reduction_val();
+		btnNR->value(progStatus.noise_reduction);
+		if (sldrNR) sldrNR->value(progStatus.noise_reduction_val);
+		if (spnrNR) spnrNR->value(progStatus.noise_reduction_val);
+	} else {
+		btnNR->value(progStatus.noise_reduction);
+		if (sldrNR) sldrNR->value(progStatus.noise_reduction_val);
+		if (spnrNR) spnrNR->value(progStatus.noise_reduction_val);
+		selrig->set_noise_reduction(progStatus.noise_reduction);
+		selrig->set_noise_reduction_val(progStatus.noise_reduction_val);
 	}
 }
 
@@ -4242,19 +4273,6 @@ void init_noise_reduction_control()
 				if (spnrNR) spnrNR->show();//activate();
 				break;
 		}
-		if (progStatus.use_rig_data) {
-			progStatus.noise_reduction = selrig->get_noise_reduction();
-			progStatus.noise_reduction_val = selrig->get_noise_reduction_val();
-			btnNR->value(progStatus.noise_reduction);
-			if (sldrNR) sldrNR->value(progStatus.noise_reduction_val);
-			if (spnrNR) spnrNR->value(progStatus.noise_reduction_val);
-		} else {
-			btnNR->value(progStatus.noise_reduction);
-			if (sldrNR) sldrNR->value(progStatus.noise_reduction_val);
-			if (spnrNR) spnrNR->value(progStatus.noise_reduction_val);
-			selrig->set_noise_reduction(progStatus.noise_reduction);
-			selrig->set_noise_reduction_val(progStatus.noise_reduction_val);
-		}
 	} else {
 		switch (progStatus.UIsize) {
 			case small_ui :
@@ -4267,6 +4285,30 @@ void init_noise_reduction_control()
 				if (sldrNR) sldrNR->hide();//deactivate();
 				if (spnrNR) spnrNR->hide();//deactivate();
 				break;
+		}
+	}
+}
+
+void set_init_if_shift_control()
+{
+	if (!selrig->has_ifshift_control)
+		return;
+	if (progStatus.use_rig_data) {
+		progStatus.shift = selrig->get_if_shift(progStatus.shift_val);
+		btnIFsh->value(progStatus.shift);
+		if (sldrIFSHIFT) sldrIFSHIFT->value(progStatus.shift_val);
+		if (spnrIFSHIFT) spnrIFSHIFT->value(progStatus.shift_val);
+	} else {
+		if (progStatus.shift) {
+			btnIFsh->value(1);
+			if (sldrIFSHIFT) sldrIFSHIFT->value(progStatus.shift_val);
+			if (spnrIFSHIFT) spnrIFSHIFT->value(progStatus.shift_val);
+			selrig->set_if_shift(progStatus.shift_val);
+		} else {
+			btnIFsh->value(0);
+			if (sldrIFSHIFT) sldrIFSHIFT->value(selrig->if_shift_mid);
+			if (spnrIFSHIFT) spnrIFSHIFT->value(selrig->if_shift_mid);
+			selrig->set_if_shift(selrig->if_shift_mid);
 		}
 	}
 }
@@ -4295,24 +4337,6 @@ void init_if_shift_control()
 		if (spnrIFSHIFT) spnrIFSHIFT->maximum(max);
 		if (spnrIFSHIFT) spnrIFSHIFT->step(step);
 		if (spnrIFSHIFT) spnrIFSHIFT->redraw();
-		if (progStatus.use_rig_data) {
-			progStatus.shift = selrig->get_if_shift(progStatus.shift_val);
-			btnIFsh->value(progStatus.shift);
-			if (sldrIFSHIFT) sldrIFSHIFT->value(progStatus.shift_val);
-			if (spnrIFSHIFT) spnrIFSHIFT->value(progStatus.shift_val);
-		} else {
-			if (progStatus.shift) {
-				btnIFsh->value(1);
-				if (sldrIFSHIFT) sldrIFSHIFT->value(progStatus.shift_val);
-				if (spnrIFSHIFT) spnrIFSHIFT->value(progStatus.shift_val);
-				selrig->set_if_shift(progStatus.shift_val);
-			} else {
-				btnIFsh->value(0);
-				if (sldrIFSHIFT) sldrIFSHIFT->value(selrig->if_shift_mid);
-				if (spnrIFSHIFT) spnrIFSHIFT->value(selrig->if_shift_mid);
-				selrig->set_if_shift(selrig->if_shift_mid);
-			}
-		}
 		switch (progStatus.UIsize) {
 			case small_ui :
 				btnIFsh->show();
@@ -4376,17 +4400,6 @@ void init_notch_control()
 		if (spnrNOTCH) spnrNOTCH->maximum(max);
 		if (spnrNOTCH) spnrNOTCH->step(step);
 		if (spnrNOTCH) spnrNOTCH->redraw();
-		if (progStatus.use_rig_data) {
-			progStatus.notch = selrig->get_notch(progStatus.notch_val);
-			btnNotch->value(progStatus.notch);
-			if (sldrNOTCH) sldrNOTCH->value(progStatus.notch_val);
-			if (spnrNOTCH) spnrNOTCH->value(progStatus.notch_val);
-		} else {
-			btnNotch->value(progStatus.notch);
-			if (sldrNOTCH) sldrNOTCH->value(progStatus.notch_val);
-			if (spnrNOTCH) spnrNOTCH->value(progStatus.notch_val);
-			selrig->set_notch(progStatus.notch, progStatus.notch_val);
-		}
 		switch (progStatus.UIsize) {
 			case small_ui :
 				btnNotch->show();
@@ -4415,6 +4428,23 @@ void init_notch_control()
 	}
 }
 
+void set_init_notch_control()
+{
+	if (selrig->has_notch_control) {
+		if (progStatus.use_rig_data) {
+			progStatus.notch = selrig->get_notch(progStatus.notch_val);
+			btnNotch->value(progStatus.notch);
+			if (sldrNOTCH) sldrNOTCH->value(progStatus.notch_val);
+			if (spnrNOTCH) spnrNOTCH->value(progStatus.notch_val);
+		} else {
+			btnNotch->value(progStatus.notch);
+			if (sldrNOTCH) sldrNOTCH->value(progStatus.notch_val);
+			if (spnrNOTCH) spnrNOTCH->value(progStatus.notch_val);
+			selrig->set_notch(progStatus.notch, progStatus.notch_val);
+		}
+	}
+}
+
 void init_micgain_control()
 {
 	if (selrig->has_micgain_control) {
@@ -4426,12 +4456,7 @@ void init_micgain_control()
 		if (spnrMICGAIN) spnrMICGAIN->minimum(min);
 		if (spnrMICGAIN) spnrMICGAIN->maximum(max);
 		if (spnrMICGAIN) spnrMICGAIN->step(step);
-		if (progStatus.use_rig_data)
-			progStatus.mic_gain = selrig->get_mic_gain();
-		else
-			selrig->set_mic_gain(progStatus.mic_gain);
-		if (sldrMICGAIN) sldrMICGAIN->value(progStatus.mic_gain);
-		if (spnrMICGAIN) spnrMICGAIN->value(progStatus.mic_gain);
+
 		switch (progStatus.UIsize) {
 			case small_ui :
 				if (sldrMICGAIN) sldrMICGAIN->show();
@@ -4461,15 +4486,23 @@ void init_micgain_control()
 	}
 }
 
+void set_init_micgain_control()
+{
+	if (selrig->has_micgain_control) {
+		if (progStatus.use_rig_data)
+			progStatus.mic_gain = selrig->get_mic_gain();
+		else
+			selrig->set_mic_gain(progStatus.mic_gain);
+		if (sldrMICGAIN) sldrMICGAIN->value(progStatus.mic_gain);
+		if (spnrMICGAIN) spnrMICGAIN->value(progStatus.mic_gain);
+	}
+}
+
 void init_power_control()
 {
 	double min, max, step;
 	if (selrig->has_power_control) {
 		sldrPOWER->activate();
-		if (progStatus.use_rig_data)
-			progStatus.power_level = selrig->get_power_control();
-		else
-			selrig->set_power_control(progStatus.power_level);
 		selrig->get_pc_min_max_step(min, max, step);
 		if (sldrPOWER) sldrPOWER->minimum(min);
 		if (sldrPOWER) sldrPOWER->maximum(max);
@@ -4486,15 +4519,22 @@ void init_power_control()
 		if (spnrPOWER) spnrPOWER->redraw();
 	} else
 		sldrPOWER->deactivate();
+}
 
+void set_init_power_control()
+{
+	if (selrig->has_power_control) {
+		if (progStatus.use_rig_data)
+			progStatus.power_level = selrig->get_power_control();
+		else
+			selrig->set_power_control(progStatus.power_level);
+	}
 	set_power_controlImage(progStatus.power_level);
 }
 
 void init_attenuator_control()
 {
 	if (selrig->has_attenuator_control) {
-		if (!progStatus.use_rig_data)
-			selrig->set_attenuator(progStatus.attenuator);
 		switch (progStatus.UIsize) {
 			case small_ui :
 				btnAttenuator->show();
@@ -4510,6 +4550,14 @@ void init_attenuator_control()
 			case wide_ui : case touch_ui : default :
 				btnAttenuator->deactivate();
 		}
+	}
+}
+
+void set_init_attenuator_control()
+{
+	if (selrig->has_attenuator_control) {
+		if (!progStatus.use_rig_data)
+			selrig->set_attenuator(progStatus.attenuator);
 	}
 }
 
@@ -4529,9 +4577,6 @@ void init_agc_control()
 void init_preamp_control()
 {
 	if (selrig->has_preamp_control) {
-		if (!progStatus.use_rig_data)
-			selrig->set_preamp(progStatus.preamp);
-
 		switch (progStatus.UIsize) {
 			case small_ui :
 				btnPreamp->show();
@@ -4550,6 +4595,14 @@ void init_preamp_control()
 	}
 }
 
+void set_init_preamp_control()
+{
+	if (selrig->has_preamp_control) {
+		if (!progStatus.use_rig_data)
+			selrig->set_preamp(progStatus.preamp);
+	}
+}
+
 void init_noise_control()
 {
 	int min, max, step;
@@ -4558,11 +4611,6 @@ void init_noise_control()
 			btnNOISE->label("AGC"); //Set TS990 AGC Label
 			btnNR->label("NR1"); //Set TS990 NR Button
 		}
-		if (progStatus.use_rig_data)
-			progStatus.noise = selrig->get_noise();
-		else
-			selrig->set_noise(progStatus.noise);
-		btnNOISE->value(progStatus.noise);
 		btnNOISE->activate();
 	}
 	else
@@ -4578,6 +4626,18 @@ void init_noise_control()
 		sldr_nb_level->redraw();
 	} else
 		sldr_nb_level->deactivate();
+}
+
+void set_init_noise_control()
+{
+	if (selrig->has_noise_control) {
+		if (progStatus.use_rig_data)
+			progStatus.noise = selrig->get_noise();
+		else
+			selrig->set_noise(progStatus.noise);
+		btnNOISE->value(progStatus.noise);
+		btnNOISE->activate();
+	}
 }
 
 void init_tune_control()
@@ -4615,7 +4675,6 @@ void init_ptt_control()
 void init_auto_notch()
 {
 	if (selrig->has_auto_notch) {
-
 		if (xcvr_name == rig_RAY152.name_) {
 			btnAutoNotch->label("AGC");
 			btnAutoNotch->tooltip("AGC on/off");
@@ -4626,11 +4685,6 @@ void init_auto_notch()
 			btnAutoNotch->label("AN");
 			btnAutoNotch->tooltip("Auto notch on/off");
 		}
-		if (progStatus.use_rig_data)
-			progStatus.auto_notch = selrig->get_auto_notch();
-		else
-			selrig->set_auto_notch(progStatus.auto_notch);
-		btnAutoNotch->value(progStatus.auto_notch);
 		switch (progStatus.UIsize) {
 			case small_ui :
 				btnAutoNotch->show();
@@ -4649,6 +4703,17 @@ void init_auto_notch()
 	}
 }
 
+void set_init_auto_notch()
+{
+	if (selrig->has_auto_notch) {
+		if (progStatus.use_rig_data)
+			progStatus.auto_notch = selrig->get_auto_notch();
+		else
+			selrig->set_auto_notch(progStatus.auto_notch);
+		btnAutoNotch->value(progStatus.auto_notch);
+	}
+}
+
 void init_swr_control()
 {
 	if (selrig->has_swr_control)
@@ -4658,7 +4723,7 @@ void init_swr_control()
 	}
 }
 
-void init_compression_control()
+void set_init_compression_control()
 {
 	if (selrig->has_compON || selrig->has_compression)
 		selrig->set_compression(progStatus.compON, progStatus.compression);
@@ -4864,8 +4929,6 @@ void init_K3_KX3_special()
 	}
 }
 
-bool xcvr_initialized = false;
-
 void initRig()
 {
 	xcvr_initialized = false;
@@ -4897,29 +4960,6 @@ void initRig()
 		guard_lock gl_serial(&mutex_serial);
 		trace(1, "init_rig()");
 
-// Xcvr Auto Power on as soon as possible
-		if (selrig->has_xcvr_auto_on_off)
-			selrig->set_xcvr_auto_on();
-
-		selrig->initialize();
-
-		if (flrig_abort) goto failed;
-
-		FreqDispA->set_precision(selrig->precision);
-		FreqDispA->set_ndigits(selrig->ndigits);
-		FreqDispB->set_precision(selrig->precision);
-		FreqDispB->set_ndigits(selrig->ndigits);
-
-		FreqDispB->set_precision(selrig->precision);
-		FreqDispB->set_ndigits(selrig->ndigits);
-		FreqDispB->set_precision(selrig->precision);
-		FreqDispB->set_ndigits(selrig->ndigits);
-
-		if (xcvr_name == rig_TT550.name_)
-			init_TT550();
-		else
-			init_generic_rig();
-
 		init_special_controls();
 		init_external_tuner();
 		init_rit();
@@ -4942,10 +4982,46 @@ void initRig()
 		init_ptt_control();
 		init_auto_notch();
 		init_swr_control();
-		init_compression_control();
 
-		initXcvrTab();
+		selrig->initialize();
+		if (!selrig->check()) goto failed;
 
+		if (flrig_abort) goto failed;
+
+// Xcvr Auto Power on as soon as possible
+		if (selrig->has_xcvr_auto_on_off)
+			selrig->set_xcvr_auto_on();
+
+		FreqDispA->set_precision(selrig->precision);
+		FreqDispA->set_ndigits(selrig->ndigits);
+		FreqDispB->set_precision(selrig->precision);
+		FreqDispB->set_ndigits(selrig->ndigits);
+
+		FreqDispB->set_precision(selrig->precision);
+		FreqDispB->set_ndigits(selrig->ndigits);
+		FreqDispB->set_precision(selrig->precision);
+		FreqDispB->set_ndigits(selrig->ndigits);
+
+		if (xcvr_name == rig_TT550.name_)
+			init_TT550();
+		else
+			init_generic_rig();
+
+		set_init_volume_control();
+		set_init_rf_gain();
+		set_init_sql_control();
+		set_init_noise_reduction_control();
+		set_init_if_shift_control();
+		set_init_micgain_control();
+		set_init_power_control();
+		set_init_attenuator_control();
+		set_init_preamp_control();
+		set_init_noise_control();
+		set_init_auto_notch();
+		set_init_notch_control();
+		set_init_compression_control();
+
+		initTabs();
 		buildlist();
 
 		init_CIV();
@@ -4977,12 +5053,22 @@ void initRig()
 	return;
 
 failed:
+	xcvr_initialized = false;
+	adjust_control_positions();
 	grpInitializing->hide();
 	main_group->show();
 	mainwindow->redraw();
 
 	bypass_serial_thread_loop = true;
-	fl_alert2(_("Transceiver not responding"));
+
+	if (progStatus.xcvr_serial_port != "NONE")
+		fl_alert2(_("\
+Transceiver not responding!\n\n\
+Check serial (COM) port connection\n\
+Open menu Config/Setup/Transceiver\n\
+Press 'Ser Port' button, reselect port\n\
+Press 'Init' button."));
+
 	return;
 }
 
@@ -5083,7 +5169,13 @@ void initStatusConfigDialog()
 			if (progStatus.xcvr_serial_port.compare("NONE") == 0) {
 				LOG_WARN("No comm port ... test mode");
 			} else {
-				LOG_WARN("%s cannot be accessed", progStatus.xcvr_serial_port.c_str());
+				fl_alert2("\
+Cannot open %s!\n\n\
+Check serial (COM) port connection\n\
+Open menu Config/Setup/Transceiver\n\
+Press 'Ser Port' button, reselect port\n\
+Press 'Init' button.", progStatus.xcvr_serial_port.c_str());
+				LOG_WARN("Cannot open %s", progStatus.xcvr_serial_port.c_str());
 				progStatus.xcvr_serial_port = "NONE";
 				selectCommPort->value(progStatus.xcvr_serial_port.c_str());
 			}
@@ -5096,14 +5188,14 @@ void initStatusConfigDialog()
 		}
 		if (!startAuxSerial()) {
 			if (progStatus.aux_serial_port.compare("NONE") != 0) {
-				LOG_WARN("%s cannot be accessed", progStatus.aux_serial_port.c_str());
+				LOG_WARN("Cannot open %s", progStatus.aux_serial_port.c_str());
 				progStatus.aux_serial_port = "NONE";
 				selectAuxPort->value(progStatus.aux_serial_port.c_str());
 			}
 		}
 		if (!startSepSerial()) {
 			if (progStatus.sep_serial_port.compare("NONE") != 0) {
-				LOG_WARN("%s cannot be accessed", progStatus.sep_serial_port.c_str());
+				LOG_WARN("Cannot open %s", progStatus.sep_serial_port.c_str());
 				progStatus.sep_serial_port = "NONE";
 				selectSepPTTPort->value(progStatus.sep_serial_port.c_str());
 			}

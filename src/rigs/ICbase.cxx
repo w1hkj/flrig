@@ -18,6 +18,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
+#include <iostream>
+
 #include "ICbase.h"
 #include "debug.h"
 #include "support.h"
@@ -184,8 +186,8 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 		sendCommand(tosend, 0);
 		returned = "";
 		for ( cnt = 0; cnt < delay; cnt++) {
-			if (readResponse())	
-			returned.append(respstr);
+			if (readResponse())
+				returned.append(respstr);
 			if (returned.length() >= num) {
 				replystr = returned;
 				unsigned long int waited = zmsec() - msec_start;

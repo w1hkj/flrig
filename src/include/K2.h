@@ -36,6 +36,8 @@ public:
 	bool get_info();
 	bool twovfos() {return true;}
 
+	bool check();
+
 	long get_vfoA();
 	void set_vfoA(long);
 	void set_modeA(int val);

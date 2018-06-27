@@ -108,6 +108,15 @@ void RIG_FT890::set_split(bool val)
 		showresp(INFO, HEX, "set split OFF", cmd, replystr);
 }
 
+bool RIG_FT890::check()
+{
+	init_cmd();
+	cmd[3] = 0x03;
+	cmd[4] = 0x10;
+	int ret = waitN(28, 100, "check", HEX);
+	if (ret >= 28) return true;
+	return false;
+}
 
 bool RIG_FT890::get_info()
 {

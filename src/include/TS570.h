@@ -42,6 +42,8 @@ public:
 	void set_split(bool val);
 	int  get_split();
 
+	bool check();
+
 	long get_vfoA();
 	void set_vfoA(long);
 	long get_vfoB();

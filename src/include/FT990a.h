@@ -38,11 +38,13 @@ public:
 	
 	void initialize();
 
-	bool get_info();
-
 	bool can_split() { return true;}
 	void set_split(bool val);
 	bool twovfos() {return false;}
+
+	bool check();
+
+	bool get_info();
 
 	long get_vfoA();
 	void set_vfoA(long);

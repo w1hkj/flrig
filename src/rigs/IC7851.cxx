@@ -203,6 +203,18 @@ void RIG_IC7851::selectB()
 	waitFB("Select B");
 }
 
+bool RIG_IC7851::check ()
+{
+	string resp = pre_fm;
+	resp += '\x03';
+	cmd = pre_to;
+	cmd += '\x03';
+	cmd.append( post );
+	bool ok = waitFOR(11, "check vfo");
+	rig_trace(2, "check()", str2hex(replystr.c_str(), replystr.length()));
+	return ok;
+}
+
 long RIG_IC7851::get_vfoA ()
 {
 	if (useB) return A.freq;

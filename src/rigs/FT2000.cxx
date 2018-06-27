@@ -183,6 +183,14 @@ void RIG_FT2000::selectB()
 	sendOK(cmd);
 }
 
+bool RIG_FT2000::check ()
+{
+	cmd = "FA;";
+	int ret = waitN(11, 100, "check", ASC);
+	if (ret >= 11) return true;
+	return false;
+}
+
 long RIG_FT2000::get_vfoA ()
 {
 	cmd = "FA;";

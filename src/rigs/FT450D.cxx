@@ -246,6 +246,15 @@ void RIG_FT450D::A2B()
 	showresp(WARN, ASC, "vfo A --> B", cmd, replystr);
 }
 
+bool RIG_FT450D::check()
+{
+	cmd = rsp = "FA";
+	cmd += ';';
+	int ret = wait_char(';',11, FL450D_WAIT_TIME, "check", ASC);
+	if (ret >= 11) return true;
+	return false;
+}
+
 long RIG_FT450D::get_vfoA ()
 {
 	cmd = rsp = "FA";

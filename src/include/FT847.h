@@ -39,6 +39,8 @@ public:
 	bool can_split() { return false;}
 	bool twovfos() {return false;}
 
+	bool check();
+
 	long get_vfoA();
 	void set_vfoA(long);
 	void set_modeA(int val);

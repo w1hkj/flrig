@@ -60,6 +60,11 @@ int  RIG_TT535::adjust_bandwidth(int m)
 	return 0;
 }
 
+bool RIG_TT535::check()
+{
+	return true;
+}
+
 long RIG_TT535::get_vfoA ()
 {
 	return freqA;

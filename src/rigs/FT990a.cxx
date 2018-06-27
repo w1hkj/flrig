@@ -76,7 +76,7 @@ RIG_FT990A::RIG_FT990A() {
 	ndigits = 9;
 
 
-	has_get_info = false;
+	has_get_info = true;
 
 	has_split = has_split_AB =
 	has_smeter =
@@ -140,8 +140,80 @@ void RIG_FT990A::set_split(bool val)
 		showresp(WARN, HEX, "set split OFF", cmd, "");
 }
 
+bool RIG_FT990A::check()
+{
+	init_cmd();
+	cmd[3] = 0x00;
+	cmd[4] = 0xFA;
+	int ret = waitN(5, 100, "check");
+	if (ret >= 5) return true;
+	return false;
+}
+
 bool RIG_FT990A::get_info()
 {
+	bool memmode = false, vfobmode = false;
+	int pfreq, pmode, pbw;
+	init_cmd();
+	cmd[3] = 0x00;
+	cmd[4] = 0xFA;
+	int ret = waitN(5, 100, "Read flags");
+
+	if (ret >= 5) {
+		size_t p = ret - 5;
+		memmode = ((replystr[p+1] & 0x10) == 0x10);
+		vfobmode = ((replystr[p] & 0x02) == 0x02);
+		if (memmode) return false;
+		if (vfobmode && !useB) {
+			useB = true;
+			Fl::awake(highlight_vfo, (void *)0);
+		} else if (!vfobmode && useB) {
+			useB = false;
+			Fl::awake(highlight_vfo, (void *)0);
+		}
+	}
+
+	init_cmd();
+	cmd[4] = 0x10; // update info
+	cmd[0] = 0x02; // 1 16 byte sequences for current VFO / MEM
+	ret = waitN(16, 100, "Read info");
+
+	if (ret >= 16) {
+		size_t p = ret - 16;
+		// current VFO / MEM
+		pfreq = 0;
+		for (size_t n = 1; n < 5; n++)
+			pfreq = pfreq * 256 + (unsigned char)replystr[p + n];
+		pfreq = pfreq * 1.25; // 100D resolution is 1.25 Hz / bit for read
+
+		int rmode = replystr[p + 7] & 0x07;
+		switch (rmode) {
+			case 0 : pmode = 0; break; // LSB
+			case 1 : pmode = 1; break; // USB
+			case 2 : pmode = 2; break; // CW
+			case 3 : pmode = 5; break; // AM
+			case 4 : pmode = 6; break; // FM
+			case 5 : pmode = 8; break; // RTTY
+			case 6 : pmode = 9; break; // PKT
+			default : pmode = 1; break;
+		}
+
+		int rpbw = replystr[p + 8];
+		pbw = rpbw & 0x05;
+		if (pbw > 4) pbw = 4;
+		if ((rpbw & 0x80) == 0x80) {
+			if (pmode == 10) pmode = 11;
+			if (pmode == 8) pmode = 9;
+		}
+		if (pmode == 6) pbw = 0;
+		if (useB) {
+			B.freq = pfreq; B.imode = pmode; B.iBW = pbw;
+		} else {
+			A.freq = pfreq; A.imode = pmode; A.iBW = pbw;
+		}
+LOG_WARN("Vfo %c = %d, BW %s", vfobmode ? 'B' : 'A', pfreq, FT990Awidths_[pbw]);
+		return true;
+	}
 	return false;
 }
 

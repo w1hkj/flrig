@@ -37,6 +37,8 @@ public:
 
 	void initialize();
 
+	bool check();
+
 	long get_vfoA();
 	void set_vfoA(long);
 

@@ -238,6 +238,15 @@ void RIG_FTdx9000::set_band_selection(int v)
 	showresp(WARN, ASC, "Select Band Stacks", cmd, replystr);
 }
 
+bool RIG_FTdx9000::check ()
+{
+	cmd = rsp = "FA";
+	cmd += ';';
+	int ret = waitN(11, 100, "check", ASC);
+	if (ret >= 11) return true;
+	return false;
+}
+
 long RIG_FTdx9000::get_vfoA ()
 {
 	cmd = rsp = "FA";

@@ -44,6 +44,8 @@ enum TS590MODES { LSB, USB, CW, FM, AM, FSK, CWR, FSKR, LSBD, USBD, FMD };
 	virtual void initialize() = 0;
 	virtual void shutdown() = 0;
 
+	virtual bool check();
+
 	virtual long get_vfoA();
 	virtual void set_vfoA(long);
 	virtual long get_vfoB();

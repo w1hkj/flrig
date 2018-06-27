@@ -32,6 +32,8 @@ public:
 	virtual void selectA();
 	virtual void selectB();
 
+	bool check();
+
 	virtual long get_vfoA(void);
 	virtual void set_vfoA(long f);
 	virtual long get_vfoB(void);

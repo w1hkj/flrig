@@ -217,6 +217,14 @@ void RIG_AOR5K::selectB() {
 	wait_char('\r', 1, AOR5K_WAIT_TIME, "Select VFO B", ASC);
 }
 
+bool RIG_AOR5K::check()
+{
+	cmd = "RX\r";
+	int ret = wait_char('\r', 34, AOR5K_WAIT_TIME, "get vfo A", ASC);
+	if (ret < 34) return false;
+	return true;
+}
+
 long RIG_AOR5K::get_vfoA ()
 {
 	cmd = "RX\r";

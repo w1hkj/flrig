@@ -533,6 +533,11 @@ void RIG_TT550::process_encoder(int val)
 {
 }
 
+bool RIG_TT550::check()
+{
+	return true;
+}
+
 long RIG_TT550::get_vfoA ()
 {
 	if (onA) {

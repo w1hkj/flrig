@@ -246,6 +246,15 @@ void RIG_FT950::post_initialize()
 	enable_bandselect_btn(13, true);
 }
 
+bool RIG_FT950::check ()
+{
+	cmd = rsp = "FA";
+	cmd += ';';
+	int ret = wait_char(';',11, FL950_WAIT_TIME, "check", ASC);
+	if (ret >= 11) return true;
+	return false;
+}
+
 long RIG_FT950::get_vfoA ()
 {
 	cmd = rsp = "FA";

@@ -719,6 +719,14 @@ const char * RIG_TS990::get_bwname_(int n, int md)
 // Get/Set VFO for A and B
 //==============================================================================
 
+bool RIG_TS990::check ()
+{
+	cmd = "FA;";
+	int ret = wait_char(';', 14, 100, "check", ASC);
+	if (ret < 14) return false;
+	return true;
+}
+
 long RIG_TS990::get_vfoA ()
 {
 	ts990debug("get_vfoA()");

@@ -86,6 +86,14 @@ void RIG_TS450S::initialize()
 	sendCommand(cmd);
 }
 
+bool RIG_TS450S::check ()
+{
+	cmd = "FA;";
+	int ret = wait_char(';', 14, 100, "check", ASC);
+	if (ret < 14) return false;
+	return true;
+}
+
 long RIG_TS450S::get_vfoA ()
 {
 	cmd = "FA;";

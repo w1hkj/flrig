@@ -200,6 +200,14 @@ int RIG_TS570::get_split()
 	return split;
 }
 
+bool RIG_TS570::check ()
+{
+	cmd = "FA;";
+	int ret = wait_char(';', 14, 100, "check", ASC);
+	if (ret < 14) return false;
+	return true;
+}
+
 long RIG_TS570::get_vfoA ()
 {
 	cmd = "FA;";

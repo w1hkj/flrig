@@ -33,6 +33,8 @@ public:
 	void selectA();
 	void selectB();
 
+	bool check();
+
 	long get_vfoA(void);
 	void set_vfoA(long f);
 	int  get_modetype(int n);

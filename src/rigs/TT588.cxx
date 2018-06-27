@@ -201,6 +201,14 @@ void RIG_TT588::shutdown()
 	set_if_shift(0);
 }
 
+bool RIG_TT588::check ()
+{
+	cmd = TT588getFREQA;
+	int ret = waitN(6, 100, "check");
+	if (ret < 6) return false;
+	return true;
+}
+
 long RIG_TT588::get_vfoA ()
 {
 	cmd = TT588getFREQA;

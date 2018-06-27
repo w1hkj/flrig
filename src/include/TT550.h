@@ -81,6 +81,8 @@ public:
 	void initialize();
 	void shutdown();
 
+	bool check();
+
 	void set_vfo(long);
 	long get_vfoA();
 	void set_vfoA(long);

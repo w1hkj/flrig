@@ -107,6 +107,15 @@ bool RIG_FT847::get_info()
 	return false;
 }
 
+bool RIG_FT847::check ()
+{
+	init_cmd();
+	cmd[4] = 0x03;
+	int ret = waitN(5, 100, "check", HEX);
+	if (ret >= 5) return true;
+	return false;
+}
+
 long RIG_FT847::get_vfoA ()
 {
 	if (useB) return A.freq;

@@ -130,6 +130,14 @@ int KENWOOD::get_split()
 	return (replybuff[32] == '1');
 }
 
+bool KENWOOD::check()
+{
+	cmd = "FA;";
+	int ret = wait_char(';', 14, 100, "check", ASC);
+	if (ret < 14) return false;
+	return true;
+}
+
 long KENWOOD::get_vfoA ()
 {
 	cmd = "FA;";

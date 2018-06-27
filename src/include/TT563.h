@@ -28,6 +28,8 @@ public:
 	RIG_TT563();
 	~RIG_TT563(){}
 
+	bool check();
+
 	long get_vfoA();
 	void set_vfoA(long);
 	void set_PTT_control(int val);

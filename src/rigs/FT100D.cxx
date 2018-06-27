@@ -140,6 +140,17 @@ ans 07 00 56 CB E8 11 08 00 03 81 00 00 03 33 21 22 0B 00 AB C0 C0 11 13 00 84 A
 W: get_info: Vfo A = 14070000
 */
 //======================================================================
+
+bool RIG_FT100D::check()
+{
+	init_cmd();
+	cmd[3] = 0x01;
+	cmd[4] = 0xFA;
+	int ret = waitN(8, 100, "check");
+	if (ret >= 8) return true;
+	return false;
+}
+
 bool RIG_FT100D::get_info()
 {
 	bool memmode = false, vfobmode = false;

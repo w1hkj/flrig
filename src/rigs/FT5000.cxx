@@ -234,6 +234,15 @@ void RIG_FT5000::set_band_selection(int v)
 	showresp(WARN, ASC, "Select Band Stacks", cmd, replystr);
 }
 
+bool RIG_FT5000::check ()
+{
+	cmd = rsp = "FA";
+	cmd += ';';
+	int ret = waitN(11, 100, "get vfo A", ASC);
+	if (ret >= 11) return true;
+	return false;
+}
+
 long RIG_FT5000::get_vfoA ()
 {
 	cmd = rsp = "FA";

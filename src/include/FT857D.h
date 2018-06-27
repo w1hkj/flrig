@@ -28,6 +28,8 @@ public:
 	RIG_FT857D();
 	~RIG_FT857D(){};
 
+	bool check();
+
 	long get_vfoA();
 	void set_vfoA(long);
 

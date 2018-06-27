@@ -117,7 +117,7 @@ void RIG_PCR1000::initialize()
 
 	// If the radio is turned off, turn it on.
 
-	if(replystr.rfind("H100")) {
+	if (replystr.rfind("H100") != std::string::npos) {
 		sendCommand(power_on_command,6);
 		showresp(WARN, ASC, "Power ON", power_on_command , replystr);
 	}
@@ -127,6 +127,14 @@ void RIG_PCR1000::initialize()
 	set_squelch(sql);
 	set_if_shift(if_shift);	// mid = off					// wbx
 
+}
+
+bool RIG_PCR1000::check()
+{
+	sendCommand(check_power_command,6);
+	showresp(WARN, ASC, "Check Power", check_power_command , replystr);
+	if (replystr.rfind("H1") != std::string::npos) return true;
+	return false;
 }
 
 //----------------------------------------------------------------------

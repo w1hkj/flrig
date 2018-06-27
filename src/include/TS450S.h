@@ -37,6 +37,8 @@ public:
 
 	bool sendTScommand(string, int, bool);
 
+	bool check();
+
 	long get_vfoA();
 	void set_vfoA(long);
 	int  get_modeA();

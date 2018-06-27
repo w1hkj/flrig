@@ -250,6 +250,15 @@ void RIG_FTdx1200::shutdown()
 {
 }
 
+bool RIG_FTdx1200::check ()
+{
+	cmd = rsp = "FA";
+	cmd += ';';
+	int ret = waitN(11, 100, "check", ASC);
+	if (ret >= 11) return true;
+	return false;
+}
+
 long RIG_FTdx1200::get_vfoA ()
 {
 	cmd = rsp = "FA";

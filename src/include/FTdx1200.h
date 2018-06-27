@@ -35,6 +35,8 @@ public:
 	void post_initialize();
 	void shutdown();
 
+	bool check();
+
 	long get_vfoA();
 	void set_vfoA(long);
 

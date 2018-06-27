@@ -28,11 +28,13 @@ class RIG_RAY152 : public rigbase {
 public:
 	RIG_RAY152();
 	~RIG_RAY152(){}
-	
+
 	void initialize();
 	void shutdown();
 
 	void get_data();
+
+	bool check();
 
 	long get_vfoA();
 	void set_vfoA(long);

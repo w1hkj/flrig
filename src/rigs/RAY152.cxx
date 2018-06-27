@@ -104,6 +104,14 @@ Data string returned by the 'O' command
 		3	Z*\r         Meter function
 total  64
 */
+
+bool RIG_RAY152::check()
+{
+	int ret = sendCommand("O\r");
+	if (ret < 66) return false;
+	return true;
+}
+
 void RIG_RAY152::get_data()
 {
 	int ret = sendCommand("O\r");

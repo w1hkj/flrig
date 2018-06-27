@@ -35,6 +35,8 @@ public :
 	void set_split(bool val);
 	bool twovfos() {return true;}
 
+	bool check();
+
 	long get_vfoA();
 	void set_vfoA(long);
 	long get_vfoB(void);

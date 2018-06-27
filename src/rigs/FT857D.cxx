@@ -81,6 +81,15 @@ void RIG_FT857D::init_cmd()
 	for (size_t i = 0; i < 5; i++) cmd[i] = 0;
 }
 
+bool RIG_FT857D::check ()
+{
+	init_cmd();
+	cmd[4] = 0x03;
+	int ret = waitN(5, 100, "check", HEX);
+	if (ret >= 5) return true;
+	return false;
+}
+
 long RIG_FT857D::get_vfoA ()
 {
 	if (useB) return freqA;

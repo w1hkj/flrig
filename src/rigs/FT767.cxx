@@ -59,6 +59,15 @@ void RIG_FT767::init_cmd()
 	for (size_t i = 0; i < 5; i++) cmd[i] = 0;
 }
 
+bool RIG_FT767::check()
+{
+	init_cmd();
+	cmd[4] = 0x01; // CHECK command
+	int ret = waitN(20, 100, "check", HEX);
+	if (ret >= 20) return true;
+	return false;
+}
+
 long RIG_FT767::get_vfoA ()
 {
 	init_cmd();

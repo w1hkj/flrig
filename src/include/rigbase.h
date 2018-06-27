@@ -28,6 +28,7 @@
 #include <FL/Fl.H>
 #include "util.h"
 #include "debug.h"
+#include "trace.h"
 #include "rig_io.h"
 
 using namespace std;
@@ -322,6 +323,8 @@ public:
 	virtual void initialize() {}
 	virtual void post_initialize() {}
 	virtual void shutdown() {}
+
+	virtual bool check() { return false; }
 
 	virtual bool get_info(void) {return false;}
 	virtual long get_vfoA(void) {return A.freq;}

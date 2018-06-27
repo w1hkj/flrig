@@ -221,6 +221,16 @@ const unsigned char amsync[] = {
 0x08, 0x00, 0x57, 0x67, 0x02, 0x00, 0x00, 0x01, 0x11, 0x00, 0x11, 0x91, 0x11, 0x11, 0x11, 0xFA
 };
 
+bool RIG_FT1000MP::check()
+{
+	init_cmd();
+	cmd[3] = 0x03;
+	cmd[4] = 0x10;
+	int ret = waitN(32, 100, "check", ASC);
+	if (ret >= 32) return true;
+	return false;
+}
+
 bool RIG_FT1000MP::get_info(void)
 {
 	unsigned char *p = 0;

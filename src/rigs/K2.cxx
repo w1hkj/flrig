@@ -217,6 +217,15 @@ int RIG_K2::get_split()
 	return K2split;
 }
 
+bool RIG_K2::check ()
+{
+	rsp = cmd = "FA";
+	cmd += ';';
+	int ret = waitN(14, 100, "check", ASC);
+	if (ret < 14) return false;
+	return true;
+}
+
 long RIG_K2::get_vfoA ()
 {
 	rsp = cmd = "FA";

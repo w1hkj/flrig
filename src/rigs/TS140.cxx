@@ -104,6 +104,14 @@ RIG_TS140::RIG_TS140() {
 ========================================================================
 */ 
 
+bool RIG_TS140::check ()
+{
+	cmd = "IF;";
+	int ret = wait_char(';', 38, 100, "check", ASC);
+	if (ret < 38) return false;
+	return true;
+}
+
 long RIG_TS140::get_vfoA ()
 {
 	cmd = "IF;";

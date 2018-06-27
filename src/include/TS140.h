@@ -28,6 +28,8 @@ public:
 	RIG_TS140();
 	~RIG_TS140(){}
 
+	bool check();
+
 	long get_vfoA();
 	void set_vfoA(long);
 	void set_modeA(int val);

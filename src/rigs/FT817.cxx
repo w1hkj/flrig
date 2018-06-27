@@ -129,6 +129,15 @@ void RIG_FT817::selectB()
 	}
 }
 
+bool RIG_FT817::check ()
+{
+	init_cmd();
+	cmd[4] = 0x03;
+	int ret = waitN(5, 100, "check", HEX);
+	if (ret >= 5) return true;
+	return false;
+}
+
 long RIG_FT817::get_vfoA ()
 {
 	if (get_vfoAorB() == 1) return freqA;

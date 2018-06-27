@@ -40,6 +40,8 @@ public:
 
 	bool get_info();
 
+	bool check();
+
 	bool can_split() { return true;}
 	void set_split(bool val);
 	bool twovfos() {return false;}

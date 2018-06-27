@@ -219,6 +219,15 @@ void RIG_FT891::post_initialize()
 {
 }
 
+bool RIG_FT891::check ()
+{
+	cmd = rsp = "FA";
+	cmd += ';';
+	int ret = wait_char(';',12, FL891_WAIT_TIME, "check", ASC);
+	if (ret >= 12) return true;
+	return false;
+}
+
 long RIG_FT891::get_vfoA ()
 {
 	cmd = rsp = "FA";

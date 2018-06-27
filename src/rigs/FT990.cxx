@@ -136,6 +136,16 @@ void RIG_FT990::set_split(bool val)
 		showresp(WARN, HEX, "set split OFF", cmd, replystr);
 }
 
+bool RIG_FT990::check()
+{
+	init_cmd();
+	cmd[3] = 0x00;
+	cmd[4] = 0xFA;
+	int ret = waitN(5, 100, "check");
+	if (ret >= 5) return true;
+	return false;
+}
+
 bool RIG_FT990::get_info()
 {
 	bool memmode = false, vfobmode = false;

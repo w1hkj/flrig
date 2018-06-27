@@ -250,6 +250,13 @@ int  RIG_TT566::adjust_bandwidth(int m)
 	return 19;
 }
 
+bool RIG_TT566::check ()
+{
+	cmd = TT566getFREQa;
+	int ret = waitN(8, 100, "check");
+	if (ret < 8) return false;
+	return true;
+}
 
 long RIG_TT566::get_vfoA ()
 {
