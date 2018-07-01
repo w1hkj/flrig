@@ -203,7 +203,7 @@ status progStatus = {
 	10,			// tt550_cw_spot;
 	false,		// tt550_cw_spot_onoff;
 	20,			// tt550_cw_qsk;
-	true,		// tt550_enable_keyer;
+	false,		// tt550_enable_keyer;
 
 	false,		// tt550_vox_onoff;
 	0,			// tt550_vox_gain;
@@ -501,8 +501,7 @@ void status::saveLastState()
 		spref.set("tt550_cw_spot", tt550_cw_spot);
 		spref.set("tt550_spot_onoff", tt550_spot_onoff);
 		spref.set("tt550_cw_qsk", tt550_cw_qsk);
-		spref.set("enable_keyer", enable_keyer);
-		spref.set("break_in", break_in);
+		spref.set("tt550_enable_keyer", tt550_enable_keyer);
 		spref.set("cw_delay", cw_delay);
 
 		spref.set("tt550_vox_onoff", tt550_vox_onoff);

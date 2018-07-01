@@ -978,19 +978,21 @@ void serviceQUE()
 				break;
 			case sA: // select A
 			{
-				selrig->selectA();
 				useB = false;
+				selrig->selectA();
 				vfo = &vfoA;
 				trace(2, "case sA ", printXCVR_STATE(vfoA).c_str());
+				rig_trace(2, "case sA ", printXCVR_STATE(vfoA).c_str());
 				Fl::awake(updateUI);
 			}
 				break;
 			case sB: // select B
 			{
-				selrig->selectB();
 				useB = true;
+				selrig->selectB();
 				vfo = &vfoB;
 				trace(2, "case sB ", printXCVR_STATE(vfoB).c_str());
+				rig_trace(2, "case sB ", printXCVR_STATE(vfoB).c_str());
 				Fl::awake(updateUI);
 			}
 				break;
@@ -999,24 +1001,27 @@ void serviceQUE()
 				int on = 0;
 				if (nuvals.change == sON) on = 1;
 				trace(1, (on ? "split ON" : "split OFF"));
+				rig_trace(2, "case sB ", printXCVR_STATE(vfoB).c_str());
 				if (selrig->can_split() || selrig->has_split_AB) {
 					selrig->set_split(on);
 					progStatus.split = on;
 					Fl::awake(update_split, (void *)0);
 					if (selrig->ICOMmainsub) {
+						useB = false;
 						selrig->selectA();
 						vfo = &vfoA;
-						useB = false;
 					}
 				}
 			}
 				break;
 			case SWAP:
 				trace(1, "execute swapab()");
+				rig_trace(1, "execute swapab()");
 				execute_swapAB();
 				break;
 			case A2B:
 				trace(1, "execute A2B()");
+				rig_trace(1, "execute A2B()");
 				execute_A2B();
 				break;
 			default:
@@ -1070,6 +1075,7 @@ void serviceA(XCVR_STATE nuvals)
 	if (useB) {
 		if (selrig->can_change_alt_vfo) {
 			trace(2, "B active, set alt vfo A", printXCVR_STATE(nuvals).c_str());
+			rig_trace(2, "B active, set alt vfo A", printXCVR_STATE(nuvals).c_str());
 			if (vfoA.freq != nuvals.freq) 
 				selrig->set_vfoA(nuvals.freq);
 			if (vfoA.imode != nuvals.imode)
@@ -1077,18 +1083,19 @@ void serviceA(XCVR_STATE nuvals)
 			if (vfoA.iBW != nuvals.iBW)
 				selrig->set_bwA(nuvals.iBW);
 			vfoA = nuvals;
-		} else {
+		} else if (xcvr_name != rig_TT550.name_) {
 			trace(2, "B active, set vfo A", printXCVR_STATE(nuvals).c_str());
-			selrig->selectA();
+			rig_trace(2, "B active, set vfo A", printXCVR_STATE(nuvals).c_str());
 			useB = false;
+			selrig->selectA();
 			if (vfoA.freq != nuvals.freq) 
 				selrig->set_vfoA(nuvals.freq);
 			if (vfoA.imode != nuvals.imode)
 				selrig->set_modeA(nuvals.imode);
 			if (vfoA.iBW != nuvals.iBW)
 				selrig->set_bwA(nuvals.iBW);
-			selrig->selectB();
 			useB = true;
+			selrig->selectB();
 			vfoA = nuvals;
 		}
 		Fl::awake(setFreqDispA, (void *)nuvals.freq);
@@ -1135,18 +1142,18 @@ void serviceB(XCVR_STATE nuvals)
 			if (vfoB.iBW != nuvals.iBW)
 				selrig->set_bwB(nuvals.iBW);
 			vfoB = nuvals;
-		} else {
+		} else if (xcvr_name != rig_TT550.name_) {
 			trace(2, "A active, set vfo B", printXCVR_STATE(nuvals).c_str());
-			selrig->selectB();
 			useB = true;
+			selrig->selectB();
 			if (vfoB.freq != nuvals.freq)
 				selrig->set_vfoB(nuvals.freq);
 			if (vfoB.imode != nuvals.imode)
 				selrig->set_modeB(nuvals.imode);
 			if (vfoB.iBW != nuvals.iBW)
 				selrig->set_bwB(nuvals.iBW);
-			selrig->selectA();
 			useB = false;
+			selrig->selectA();
 			vfoB = nuvals;
 		}
 		Fl::awake(setFreqDispB, (void *)nuvals.freq);
@@ -1615,13 +1622,13 @@ void execute_swapAB()
 			useB = false;
 		} else if (selrig->ICOMrig) {
 			if (useB) {
+				useB = false;
 				selrig->selectA();
 				vfo = &vfoA;
-				useB = false;
 			} else {
+				useB = true;
 				selrig->selectB();
 				vfo = &vfoB;
-				useB = true;
 			}
 		} else {
 			XCVR_STATE temp = vfoB;
@@ -1698,11 +1705,11 @@ void execute_A2B()
 		FreqDispB->value(vfoB.freq);
 	}
 	if (selrig->ICOMmainsub) {
+		useB = false;
 		selrig->selectA();
 		selrig->A2B();
 		vfoB = vfoA;
 		vfo = &vfoA;
-		useB = false;
 	} else if (selrig->has_a2b) {
 		trace(1,"cbA2B() 2");
 		selrig->A2B();
@@ -2685,8 +2692,8 @@ void restore_rig_vals()
 	guard_lock serial_lock(&mutex_serial);
 	trace(1, "restore_rig_vals()");
 
-	selrig->selectB();
 	useB = true;
+	selrig->selectB();
 
 	if (progStatus.restore_frequency)
 		selrig->set_vfoB(xcvr_vfoB.freq);
@@ -2701,8 +2708,8 @@ void restore_rig_vals()
 
 	trace(2, "Restored xcvr B:\n", print(xcvr_vfoB));
 
-	selrig->selectA();
 	useB = false;
+	selrig->selectA();
 
 	if (progStatus.restore_frequency)
 		selrig->set_vfoA(xcvr_vfoA.freq);
@@ -2847,8 +2854,8 @@ void read_rig_vals()
 
 	update_progress(0);
 
-	selrig->selectB();
 	useB = true;
+	selrig->selectB();
 
 	update_progress(progress->value() + 4);
 
@@ -2869,10 +2876,9 @@ void read_rig_vals()
 
 	trace(2, "Read xcvr B:\n", print(xcvr_vfoB));
 
+	useB = false;
 	selrig->selectA();
 	update_progress(progress->value() + 4);
-
-	useB = false;
 
 	if (selrig->has_get_info)
 		selrig->get_info();
@@ -3785,8 +3791,8 @@ void initTabs()
 
 void init_TT550()
 {
-	selrig->selectA();
 	useB = false;
+	selrig->selectA();
 
 	vfoB.freq = progStatus.freq_B;
 	vfoB.imode = progStatus.imode_B;
@@ -4793,8 +4799,8 @@ void init_VFOs()
 
 		FreqDispB->value(vfoB.freq);
 
-		selrig->selectB();
 		useB = true;
+		selrig->selectB();
 		selrig->set_vfoB(vfoB.freq);
 
 		update_progress(progress->value() + 4);
@@ -4826,8 +4832,8 @@ void init_VFOs()
 
 		FreqDispA->value( vfoA.freq );
 
-		selrig->selectA();
 		useB = false;
+		selrig->selectA();
 		selrig->set_vfoA(vfoA.freq);
 
 		update_progress(progress->value() + 4);
@@ -4846,8 +4852,8 @@ void init_VFOs()
 		trace(2, "init_VFOs() vfoA ", printXCVR_STATE(vfoA).c_str());
 
 	} else {
-		selrig->selectB();
 		useB = true;
+		selrig->selectB();
 		vfoB.freq = selrig->get_vfoB();
 
 		update_progress(progress->value() + 4);
@@ -4863,8 +4869,8 @@ void init_VFOs()
 		FreqDispB->value(vfoB.freq);
 		trace(2, "B: ", printXCVR_STATE(vfoB).c_str());
 
-		selrig->selectA();
 		useB = false;
+		selrig->selectA();
 		vfoA.freq = selrig->get_vfoA();
 
 		update_progress(progress->value() + 4);
