@@ -36,19 +36,20 @@ bool KENWOOD::tuning()
 	return is_tuning;
 }
 
-static int txvfo = 0;
-static int rxvfo = 0;
-
 void KENWOOD::selectA()
 {
 	cmd = "FR0;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "Rx on A", cmd, "");
-	cmd = "FT0;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "Tx on A", cmd, "");
-	rxona = true;
-	txvfo = rxvfo = 0;
+	if (!split) {
+		cmd = "FT0;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "Tx on A", cmd, "");
+	} else {
+		cmd = "FT1;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "Tx on B", cmd, "");
+	}
 }
 
 void KENWOOD::selectB()
@@ -56,11 +57,15 @@ void KENWOOD::selectB()
 	cmd = "FR1;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "Rx on B", cmd, "");
-	cmd = "FT1;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "Tx on B", cmd, "");
-	rxona = false;
-	txvfo = rxvfo = 1;
+	if (!split) {
+		cmd = "FT1;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "Tx on B", cmd, "");
+	} else {
+		cmd = "FT0;";
+		sendCommand(cmd);
+		showresp(WARN, ASC, "Tx on A", cmd, "");
+	}
 }
 
 void KENWOOD::set_split(bool val) 
@@ -72,27 +77,21 @@ void KENWOOD::set_split(bool val)
 			cmd = "FR1;FT0;";
 			sendCommand(cmd);
 			showresp(WARN, ASC, "Rx on B, Tx on A", cmd, "");
-			rxvfo = 1; txvfo = 0;
 		} else {
 			cmd = "FR1;FT1;";
 			sendCommand(cmd);
 			showresp(WARN, ASC, "Rx on B, Tx on B", cmd, "");
-			rxvfo = txvfo = 1;
 		}
-		rxona = false;
 	} else {
 		if (val) {
 			cmd = "FR0;FT1;";
 			sendCommand(cmd);
 			showresp(WARN, ASC, "Rx on A, Tx on B", cmd, "");
-			rxvfo = 0; txvfo = 1;
 		} else {
 			cmd = "FR0;FT0;";
 			sendCommand(cmd);
 			showresp(WARN, ASC, "Rx on A, Tx on A", cmd, "");
-			rxvfo = txvfo = 0;
 		}
-		rxona = true;
 	}
 }
 
