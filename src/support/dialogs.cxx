@@ -1421,25 +1421,12 @@ void cb_send_command(string command, Fl_Output *resp)
 		resp->redraw();
 	}
 
-//	trace(2, 
-//		"send command:\n", 
-//		usehex ? str2hex(
-//				cmd.c_str(),
-//				cmd.length()) :
-//		cmd.c_str() );
-
 // lock out polling loops until done
 	guard_lock lock1(&mutex_srvc_reqs);
 	guard_lock lock2(&mutex_serial);
 
-	sendCommand(cmd, cmd.length());
-
-//	trace(2, 
-//		"reply:\n",
-//		usehex ? str2hex(
-//				respstr.c_str(),
-//				respstr.length()) :
-//			respstr.c_str() );
+	sendCommand(cmd, 0);
+	waitResponse(100);
 
 	if (resp) {
 		resp->value(
