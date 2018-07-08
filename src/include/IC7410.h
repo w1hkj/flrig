@@ -55,6 +55,9 @@ public:
 	void set_pbt_inner(int val);
 	void set_pbt_outer(int val);
 
+	int  get_pbt_inner();
+	int  get_pbt_outer();
+
 	void set_compression(int, int);
 	void get_comp_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 10; step = 1; }

@@ -97,6 +97,9 @@ public:
 	void set_pbt_inner(int val);
 	void set_pbt_outer(int val);
 
+	int  get_pbt_inner();
+	int  get_pbt_outer();
+
 	const char **bwtable(int m);
 
 	void get_pc_min_max_step(double &min, double &max, double &step);

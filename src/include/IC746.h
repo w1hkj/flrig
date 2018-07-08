@@ -76,6 +76,9 @@ public:
 	void set_pbt_inner(int val);
 	void set_pbt_outer(int val);
 
+	int  get_pbt_inner();
+	int  get_pbt_outer();
+
 	virtual void set_squelch(int val);
 	virtual void set_rf_gain(int val);
 	virtual void set_power_control(double val);
@@ -138,6 +141,9 @@ public:
 
 	void set_pbt_inner(int val);
 	void set_pbt_outer(int val);
+
+	int  get_pbt_inner();
+	int  get_pbt_outer();
 
 	virtual void set_power_control(double val);
 	virtual int  get_power_control();

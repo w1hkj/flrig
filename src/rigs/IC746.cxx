@@ -611,6 +611,46 @@ void RIG_IC746::set_pbt_outer(int val)
 	waitFB("set PBT outer");
 }
 
+int RIG_IC746::get_pbt_inner()
+{
+	int val = 0;
+	string cstr = "\x14\x07";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+	if (waitFOR(9, "get pbt inner")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			val = num100(replystr.substr(p+6));
+			val -= 50;
+		}
+	}
+	rig_trace(2, "get_pbt_inner()", str2hex(replystr.c_str(), replystr.length()));
+	return val;
+}
+
+int RIG_IC746::get_pbt_outer()
+{
+	int val = 0;
+	string cstr = "\x14\x08";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+	if (waitFOR(9, "get pbt inner")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			val = num100(replystr.substr(p+6));
+			val -= 50;
+		}
+	}
+	rig_trace(2, "get_pbt_outer()", str2hex(replystr.c_str(), replystr.length()));
+	return val;
+}
+
 int ICsql = 0;
 void RIG_IC746::set_squelch(int val)
 {
@@ -1332,6 +1372,46 @@ void RIG_IC746PRO::set_pbt_outer(int val)
 	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
 	waitFB("set PBT outer");
+}
+
+int RIG_IC746PRO::get_pbt_inner()
+{
+	int val = 0;
+	string cstr = "\x14\x07";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+	if (waitFOR(9, "get pbt inner")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			val = num100(replystr.substr(p+6));
+			val -= 50;
+		}
+	}
+	rig_trace(2, "get_pbt_inner()", str2hex(replystr.c_str(), replystr.length()));
+	return val;
+}
+
+int RIG_IC746PRO::get_pbt_outer()
+{
+	int val = 0;
+	string cstr = "\x14\x08";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+	if (waitFOR(9, "get pbt inner")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			val = num100(replystr.substr(p+6));
+			val -= 50;
+		}
+	}
+	rig_trace(2, "get_pbt_outer()", str2hex(replystr.c_str(), replystr.length()));
+	return val;
 }
 
 void RIG_IC746PRO::set_split(bool val)

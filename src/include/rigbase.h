@@ -445,6 +445,8 @@ int nr_, nrval_;
 
 	virtual void set_pbt_inner(int val) {}
 	virtual void set_pbt_outer(int val) {}
+	virtual int  get_pbt_inner() {return 0;}
+	virtual int  get_pbt_outer() {return 0;}
 
 int mcval_;
 	virtual void set_mic_gain(int val) {mcval_ = val;}

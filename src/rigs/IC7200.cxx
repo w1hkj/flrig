@@ -380,6 +380,7 @@ int RIG_IC7200::get_volume_control()
 		if (p != string::npos)
 			val = num100(replystr.substr(p+6));
 	}
+	rig_trace(2, "get_volume_control()", str2hex(replystr.c_str(), replystr.length()));
 	return val;
 }
 
@@ -1139,7 +1140,7 @@ void RIG_IC7200::set_bwA(int val)
 	cmd.append(to_bcd(val, 2));
 	cmd.append( post );
 	waitFB("set BW A");
-	mode_bwA[A.iBW] = val;
+	mode_bwA[A.imode] = val;
 	rig_trace(4, "set_bwA() ", bwtable(A.imode)[val], ": ", str2hex(replystr.c_str(), replystr.length()));
 }
 
@@ -1174,7 +1175,7 @@ void RIG_IC7200::set_bwB(int val)
 	cmd.append(to_bcd(val, 2));
 	cmd.append( post );
 	waitFB("set BW B");
-	mode_bwB[B.iBW] = val;
+	mode_bwB[B.imode] = val;
 	rig_trace(4, "set_bwB() ", bwtable(B.imode)[val], ": ", str2hex(replystr.c_str(), replystr.length()));
 }
 
@@ -1449,7 +1450,6 @@ void RIG_IC7200::set_pbt_inner(int val)
 	cmd.append("\x14\x07");
 	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
-	rig_trace(4, "set_pbt_inner(", val, ") ", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("set PBT inner");
 }
 
@@ -1463,8 +1463,47 @@ void RIG_IC7200::set_pbt_outer(int val)
 	cmd.append("\x14\x08");
 	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
-	rig_trace(4, "set_pbt_outer(", val, ") ", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("set PBT outer");
+}
+
+int RIG_IC7200::get_pbt_inner()
+{
+	int val = 0;
+	string cstr = "\x14\x07";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+	if (waitFOR(9, "get pbt inner")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			val = num100(replystr.substr(p+6));
+			val -= 50;
+		}
+	}
+	rig_trace(2, "get_pbt_inner()", str2hex(replystr.c_str(), replystr.length()));
+	return val;
+}
+
+int RIG_IC7200::get_pbt_outer()
+{
+	int val = 0;
+	string cstr = "\x14\x08";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+	if (waitFOR(9, "get pbt inner")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			val = num100(replystr.substr(p+6));
+			val -= 50;
+		}
+	}
+	rig_trace(2, "get_pbt_outer()", str2hex(replystr.c_str(), replystr.length()));
+	return val;
 }
 
 // CW methods

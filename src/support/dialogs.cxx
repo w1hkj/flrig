@@ -1425,7 +1425,7 @@ void cb_send_command(string command, Fl_Output *resp)
 	guard_lock lock1(&mutex_srvc_reqs);
 	guard_lock lock2(&mutex_serial);
 
-	sendCommand(cmd, 0);
+	sendCommand(cmd, 0);//cmd.length());
 	waitResponse(100);
 
 	if (resp) {

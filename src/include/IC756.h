@@ -35,6 +35,9 @@ public:
 	void set_pbt_inner(int val);
 	void set_pbt_outer(int val);
 
+	int  get_pbt_inner();
+	int  get_pbt_outer();
+
 };
 
 class RIG_IC756PRO : public RIG_ICOM {
@@ -91,6 +94,9 @@ public:
 
 	void set_pbt_inner(int val);
 	void set_pbt_outer(int val);
+
+	int  get_pbt_inner();
+	int  get_pbt_outer();
 
 	void set_squelch(int val);
 

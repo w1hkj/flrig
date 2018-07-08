@@ -688,12 +688,27 @@ void update_ifshift(void *d)
 	if (spnrIFSHIFT) spnrIFSHIFT->value(progStatus.shift_val);
 }
 
+void update_pbt(void *)
+{
+	if (sldrINNER) sldrINNER->value(progStatus.pbt_inner);
+	if (sldrOUTER) sldrOUTER->value(progStatus.pbt_outer);
+}
+
+void read_pbt()
+{
+	progStatus.pbt_inner = selrig->get_pbt_inner();
+	progStatus.pbt_outer = selrig->get_pbt_outer();
+	Fl::awake(update_pbt, (void*)0);
+}
+
 bool inhibit_shift = false;
 void read_ifshift()
 {
 	int on = 0;
 	int val = 0;
 	if (inhibit_shift) return;
+	if (selrig->has_pbt_controls)
+		return read_pbt();
 	if (!selrig->has_ifshift_control) return;
 	{
 		trace(1,"read_if_shift()");
@@ -3774,7 +3789,12 @@ void initTabs()
 		if (!selrig->has_auto_notch ||
 			xcvr_name == rig_FT1000MP.name_ )
 			{ poll_auto_notch->deactivate(); poll_auto_notch->value(0); }
-		if (!selrig->has_ifshift_control) { poll_ifshift->deactivate(); poll_ifshift->value(0); }
+		if (!selrig->has_ifshift_control &&
+			!selrig->has_pbt_controls) { poll_ifshift->deactivate(); poll_ifshift->value(0); }
+		if (selrig->has_pbt_controls) {
+			poll_ifshift->label("pbt");
+			poll_ifshift->redraw_label();
+		}
 		if (!selrig->has_power_control) { poll_power_control->deactivate(); poll_power_control->value(0); }
 		if (!selrig->has_preamp_control && !selrig->has_attenuator_control)
 			{ poll_pre_att->deactivate(); poll_pre_att->value(0); }

@@ -44,6 +44,9 @@ public:
 	void set_pbt_inner(int val);
 	void set_pbt_outer(int val);
 
+	int  get_pbt_inner();
+	int  get_pbt_outer();
+
 	bool  canswap() { return true; }
 
 private:
