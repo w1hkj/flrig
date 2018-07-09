@@ -5095,9 +5095,11 @@ void initRig()
 		init_swr_control();
 
 		selrig->initialize();
-		if (!selrig->check()) goto failed;
 
-		if (flrig_abort) goto failed;
+		if (progStatus.xcvr_serial_port != "NONE") {
+			if (!selrig->check()) goto failed;
+			if (flrig_abort) goto failed;
+		}
 
 // Xcvr Auto Power on as soon as possible
 		if (selrig->has_xcvr_auto_on_off)
@@ -5172,8 +5174,7 @@ failed:
 
 	bypass_serial_thread_loop = true;
 
-	if (progStatus.xcvr_serial_port != "NONE")
-		fl_alert2(_("\
+	fl_alert2(_("\
 Transceiver not responding!\n\n\
 Check serial (COM) port connection\n\
 Open menu Config/Setup/Transceiver\n\
