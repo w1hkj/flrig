@@ -141,6 +141,7 @@ public:
 	void set_xcvr_auto_off();
 
 	void set_compression(int, int);
+	void get_compression( int &on, int &val );
 	void get_comp_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 100; step = 5; }
 

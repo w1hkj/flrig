@@ -1566,21 +1566,33 @@ void RIG_FT950::set_xcvr_auto_off()
 
 void RIG_FT950::set_compression(int on, int val)
 {
-	if (on) {
-		if (val == 0) {
-			cmd.assign("PR2;");	// mic eq on
-			sendOK(cmd);
-			showresp(WARN, ASC, "set Comp EQ on", cmd, replystr);
-		} else {
-			cmd.assign("PR1;PL").append(to_decimal(val, 3)).append(";");
-			sendOK(cmd);
-			showresp(WARN, ASC, "set Comp on", cmd, replystr);
-		}
-	} else{
-		cmd.assign("PR0;");
-		sendOK(cmd);
-		showresp(WARN, ASC, "set Comp off", cmd, replystr);
-	}
+	cmd.assign("PL").append(to_decimal(val, 3)).append(";");
+	sendOK(cmd);
+	showresp(INFO, ASC, "set Comp level", cmd, replystr);
+
+	cmd.assign( on ? "PR1;" : "PR0;");
+	sendOK(cmd);
+	showresp(INFO, ASC, "set Comp on/off", cmd, replystr);
+	rig_trace(2, "set compression on/off", cmd.c_str());
+
+}
+
+void RIG_FT950::get_compression( int &on, int &val )
+{
+	on = progStatus.compON;
+	val = progStatus.compression;
+
+	cmd.assign("PL;");
+	wait_char(';', 6, FL950_WAIT_TIME, "GET compression value", ASC);
+	size_t p = replystr.rfind("PL");
+	if (p == string::npos) return;
+	val = fm_decimal(replystr.substr(p+3),2);
+
+	cmd.assign("PR;");
+	wait_char(';', 4, FL950_WAIT_TIME, "GET compression on/off", ASC);
+	p = replystr.rfind("PR");
+	if (p == string::npos) return;
+	on = (replystr[p+2] == '1');
 }
 
 /*
