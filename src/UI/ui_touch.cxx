@@ -187,7 +187,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		sldrRcvSignal->labelsize(14);
 		sldrRcvSignal->labelcolor(FL_FOREGROUND_COLOR);
 		sldrRcvSignal->align(Fl_Align(FL_ALIGN_CENTER));
-		sldrRcvSignal->when(FL_WHEN_RELEASE);
+		sldrRcvSignal->when(FL_WHEN_CHANGED);
 		sldrRcvSignal->hide();
 		sldrRcvSignal->minimum(0);
 		sldrRcvSignal->maximum(100);
@@ -201,7 +201,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		sldrALC->labelsize(14);
 		sldrALC->labelcolor(FL_FOREGROUND_COLOR);
 		sldrALC->align(Fl_Align(FL_ALIGN_CENTER));
-		sldrALC->when(FL_WHEN_RELEASE);
+		sldrALC->when(FL_WHEN_CHANGED);
 		sldrALC->hide();
 		sldrALC->minimum(0);
 		sldrALC->maximum(100);
@@ -215,7 +215,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		sldrSWR->labelsize(14);
 		sldrSWR->labelcolor(FL_FOREGROUND_COLOR);
 		sldrSWR->align(Fl_Align(FL_ALIGN_CENTER));
-		sldrSWR->when(FL_WHEN_RELEASE);
+		sldrSWR->when(FL_WHEN_CHANGED);
 		sldrSWR->hide();
 		sldrSWR->minimum(0);
 		sldrSWR->maximum(100);
@@ -229,7 +229,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		sldrFwdPwr->labelsize(14);
 		sldrFwdPwr->labelcolor(FL_FOREGROUND_COLOR);
 		sldrFwdPwr->align(Fl_Align(FL_ALIGN_CENTER));
-		sldrFwdPwr->when(FL_WHEN_RELEASE);
+		sldrFwdPwr->when(FL_WHEN_CHANGED);
 		sldrFwdPwr->hide();
 		sldrFwdPwr->minimum(0);
 		sldrFwdPwr->maximum(100);
@@ -427,7 +427,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 			sldrPOWER->textsize(14);
 			sldrPOWER->callback((Fl_Callback*)cb_sldrPOWER);
 			sldrPOWER->align(Fl_Align(FL_ALIGN_LEFT));
-			sldrPOWER->when(FL_WHEN_RELEASE);
+			sldrPOWER->when(FL_WHEN_CHANGED);
 			sldrPOWER->reverse(true);
 
 			sldrVOLUME = new Fl_Wheel_Value_Slider(xpos + 50, ypos + 51, ws - 50, 49);
@@ -445,7 +445,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 			sldrVOLUME->textsize(14);
 			sldrVOLUME->callback((Fl_Callback*)cb_sldrVOLUME);
 			sldrVOLUME->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-			sldrVOLUME->when(FL_WHEN_RELEASE);
+			sldrVOLUME->when(FL_WHEN_CHANGED);
 			Fl_Group::current()->resizable(sldrVOLUME);
 			sldrVOLUME->reverse(true);
 
@@ -492,7 +492,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 			sldrSQUELCH->textsize(14);
 			sldrSQUELCH->callback((Fl_Callback*)cb_sldrSQUELCH);
 			sldrSQUELCH->align(Fl_Align(FL_ALIGN_LEFT));
-			sldrSQUELCH->when(FL_WHEN_RELEASE);
+			sldrSQUELCH->when(FL_WHEN_CHANGED);
 			sldrSQUELCH->reverse(true);
 
 			sldrMICGAIN = new Fl_Wheel_Value_Slider(xpos + cw, ypos + ch/2, spw, rh, _("Mic"));
@@ -510,7 +510,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 			sldrMICGAIN->textsize(14);
 			sldrMICGAIN->callback((Fl_Callback*)cb_sldrMICGAIN);
 			sldrMICGAIN->align(Fl_Align(FL_ALIGN_LEFT));
-			sldrMICGAIN->when(FL_WHEN_RELEASE);
+			sldrMICGAIN->when(FL_WHEN_CHANGED);
 			sldrMICGAIN->reverse(true);
 
 			col1b->end();
@@ -571,7 +571,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 			sldrIFSHIFT->textsize(14);
 			sldrIFSHIFT->callback((Fl_Callback*)cb_sldrIFSHIFT);
 			sldrIFSHIFT->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-			sldrIFSHIFT->when(FL_WHEN_RELEASE);
+			sldrIFSHIFT->when(FL_WHEN_CHANGED);
 			sldrIFSHIFT->reverse(true);
 
 			sldrINNER = new Fl_Wheel_Value_Slider(xpos+cw, ypos, spw, ch / 3 - 1, "");
@@ -590,7 +590,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 			sldrINNER->textsize(12);
 			sldrINNER->callback((Fl_Callback*)cb_sldrINNER);
 			sldrINNER->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-			sldrINNER->when(FL_WHEN_RELEASE);
+			sldrINNER->when(FL_WHEN_CHANGED);
 			sldrINNER->reverse(true);
 
 			sldrOUTER = new Fl_Wheel_Value_Slider(
@@ -611,7 +611,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 			sldrOUTER->textsize(12);
 			sldrOUTER->callback((Fl_Callback*)cb_sldrOUTER);
 			sldrOUTER->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-			sldrOUTER->when(FL_WHEN_RELEASE);
+			sldrOUTER->when(FL_WHEN_CHANGED);
 			sldrOUTER->reverse(true);
 
 			sldrNR = new Fl_Wheel_Value_Slider(
@@ -630,7 +630,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 			sldrNR->textsize(14);
 			sldrNR->callback((Fl_Callback*)cb_sldrNR);
 			sldrNR->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-			sldrNR->when(FL_WHEN_RELEASE);
+			sldrNR->when(FL_WHEN_CHANGED);
 			sldrNR->reverse(true);
 
 			col2b->end();
@@ -681,7 +681,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 			sldrNOTCH->textsize(14);
 			sldrNOTCH->callback((Fl_Callback*)cb_sldrNOTCH);
 			sldrNOTCH->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-			sldrNOTCH->when(FL_WHEN_RELEASE);
+			sldrNOTCH->when(FL_WHEN_CHANGED);
 			sldrNOTCH->reverse(true);
 
 			sldrRFGAIN = new Fl_Wheel_Value_Slider(xpos+cw, ypos + ch/2, spw, rh);
@@ -700,7 +700,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 			sldrRFGAIN->textsize(14);
 			sldrRFGAIN->callback((Fl_Callback*)cb_sldrRFGAIN);
 			sldrRFGAIN->align(Fl_Align(FL_ALIGN_LEFT));
-			sldrRFGAIN->when(FL_WHEN_RELEASE);
+			sldrRFGAIN->when(FL_WHEN_CHANGED);
 			sldrRFGAIN->reverse(true);
 
 			col3b->end();
@@ -1067,7 +1067,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				sldr_nb_level->step(1);
 				sldr_nb_level->callback((Fl_Callback*)cb_sldr_nb_level);
 				sldr_nb_level->align(Fl_Align(FL_ALIGN_LEFT));
-				sldr_nb_level->when(FL_WHEN_RELEASE);
+				sldr_nb_level->when(FL_WHEN_CHANGED);
 				sldr_nb_level->value(progStatus.nb_level);
 
 //				cbo_agc_level = new Fl_ComboBox(xpos+244, by, 80, bh, _("AGC"));
@@ -1081,7 +1081,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 //				cbo_agc_level->labelcolor(FL_FOREGROUND_COLOR);
 //				cbo_agc_level->callback((Fl_Callback*)cb_cbo_agc_level);
 //				cbo_agc_level->align(Fl_Align(FL_ALIGN_LEFT));
-//				cbo_agc_level->when(FL_WHEN_RELEASE);
+//				cbo_agc_level->when(FL_WHEN_CHANGED);
 //				cbo_agc_level->end();
 
 				spnr_bpf_center = new Hspinner(xpos+474, by, 5*bh, bh, _("BPF Center Freq"));
