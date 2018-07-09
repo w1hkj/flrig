@@ -19,6 +19,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
+#include <iostream>
+#include <sstream>
+
 #include "FT950.h"
 #include "debug.h"
 #include "support.h"
@@ -31,6 +34,12 @@ enum mFT950 {
 //  0,    1,    2,   3,   4,   5,       6,     7,      8,       9,       10,    11,     12	// mode index
 
 static const char FT950name_[] = "FT-950";
+
+#undef  NUM_MODES
+#define NUM_MODES  13
+
+static int mode_bwA[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
+static int mode_bwB[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 
 static const char *FT950modes_[] = {
 "LSB", "USB", "CW", "FM", "AM", "RTTY-L",
@@ -795,9 +804,17 @@ int RIG_FT950::adjust_bandwidth(int val)
 	return FT950_def_bw[val];
 }
 
-int RIG_FT950::def_bandwidth(int val)
+int RIG_FT950::def_bandwidth(int m)
 {
-	return FT950_def_bw[val];
+	int bw = adjust_bandwidth(m);
+	if (useB) {
+		if (mode_bwB[m] == -1)
+			mode_bwB[m] = bw;
+		return mode_bwB[m];
+	}
+	if (mode_bwA[m] == -1)
+		mode_bwA[m] = bw;
+	return mode_bwA[m];
 }
 
 const char ** RIG_FT950::bwtable(int n)
@@ -942,6 +959,8 @@ void RIG_FT950::set_bwA(int val)
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET bw A", cmd, replystr);
 
+	mode_bwA[modeA] = bwA;
+
 	rig_trace(4, "set_bwA()", cmd.c_str(), " => ", replystr.c_str());
 }
 
@@ -950,6 +969,7 @@ int RIG_FT950::get_bwA()
 	size_t p;
 	if (modeA == mFM || modeA == mAM || modeA == mFM_N || modeA == mAM_N) {
 		bwA = 0;
+		mode_bwA[modeA] = bwA;
 		return bwA;	
 	}
 	if (modeA == mPKT_FM) {
@@ -987,6 +1007,7 @@ int RIG_FT950::get_bwA()
 	}
 	if (*idx == WVALS_LIMIT) i--;
 	bwA = i;
+	mode_bwA[modeA] = bwA;
 	return bwA;
 }
 
@@ -1019,6 +1040,8 @@ void RIG_FT950::set_bwB(int val)
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET bw B", cmd, replystr);
 
+	mode_bwB[modeB] = bwB;
+
 	rig_trace(4, "set_bwB()", cmd.c_str(), " => ", replystr.c_str());
 }
 
@@ -1027,6 +1050,7 @@ int RIG_FT950::get_bwB()
 	size_t p;
 	if (modeB == mFM || modeB == mAM || modeB == mFM_N || modeB == mAM_N) {
 		bwB = 0;
+		mode_bwB[modeB] = bwB;
 		return bwB;
 	}
 	if (modeB == mPKT_FM) {
@@ -1064,7 +1088,28 @@ int RIG_FT950::get_bwB()
 	}
 	if (*idx == WVALS_LIMIT) i--;
 	bwB = i;
+	mode_bwB[modeB] = bwB;
 	return bwB;
+}
+
+std::string RIG_FT950::get_BANDWIDTHS()
+{
+	stringstream s;
+	for (int i = 0; i < NUM_MODES; i++)
+		s << mode_bwA[i] << " ";
+	for (int i = 0; i < NUM_MODES; i++)
+		s << mode_bwB[i] << " ";
+	return s.str();
+}
+
+void RIG_FT950::set_BANDWIDTHS(std::string s)
+{
+	stringstream strm;
+	strm << s;
+	for (int i = 0; i < NUM_MODES; i++)
+		strm >> mode_bwA[i];
+	for (int i = 0; i < NUM_MODES; i++)
+		strm >> mode_bwB[i];
 }
 
 int RIG_FT950::get_modetype(int n)

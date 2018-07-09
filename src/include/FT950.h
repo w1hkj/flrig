@@ -66,6 +66,11 @@ public:
 	int  adjust_bandwidth(int val);
 	int  def_bandwidth(int val);
 
+	const char **bwtable(int);
+
+	void set_BANDWIDTHS(std::string s);
+	std::string get_BANDWIDTHS();
+
 	int  get_smeter();
 	int  get_swr();
 	int  get_alc();
@@ -108,7 +113,6 @@ public:
 	void set_rf_gain(int val);
 	int  get_rf_gain();
 	void get_rf_min_max_step(int &min, int &max, int &step);
-	const char **bwtable(int);
 
 	void set_vox_onoff();
 	void set_vox_gain();

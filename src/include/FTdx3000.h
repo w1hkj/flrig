@@ -66,6 +66,9 @@ public:
 	int  adjust_bandwidth(int val);
 	int  def_bandwidth(int val);
 
+	void set_BANDWIDTHS(std::string s);
+	std::string get_BANDWIDTHS();
+
 	int  get_smeter();
 	int  get_swr();
 	int  get_power_out();

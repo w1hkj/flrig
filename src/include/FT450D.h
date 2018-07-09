@@ -149,6 +149,9 @@ public:
 	int def_bandwidth(int);
 	const char ** bwtable(int);
 
+	void set_BANDWIDTHS(std::string s);
+	std::string get_BANDWIDTHS();
+
 };
 
 #endif

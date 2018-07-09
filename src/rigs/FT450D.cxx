@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
+#include <sstream>
 
 #include "FT450D.h"
 #include "rig.h"
@@ -32,6 +33,12 @@ static const char FT450Dname_[] = "FT-450D";
 enum mFT450D {
   mLSB, mUSB, mCW, mFM, mAM, mRTTY_L, mCW_R, mDATA_L, mRTTY_U, mFM_N, mDATA_U };
 //  0,    1,   2,   3,   4,    5,       6,     7,       8,        9,    10		mode index
+
+#undef  NUM_MODES
+#define NUM_MODES  11
+
+static int mode_bwA[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
+static int mode_bwB[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 
 static const char *FT450Dmodes_[] = {
 		"LSB", "USB", "CW", "FM", "AM", "RTTY-L", "CW-R", "DATA-L", "RTTY-U", "FM-N", "DATA-U", NULL};
@@ -198,6 +205,9 @@ void RIG_FT450D::set_band_selection(int v)
 	int inc_60m = false;
 	cmd = "IF;";
 	waitN(27, 100, "get vfo mode in set_band_selection", ASC);
+
+	rig_trace(2, "get set_band vfo_mode()", replystr.c_str());
+
 	size_t p = replystr.rfind("IF");
 	if (p == string::npos) return;
 	if (replystr[p+21] != '0') {	// vfo 60M memory mode
@@ -251,6 +261,9 @@ bool RIG_FT450D::check()
 	cmd = rsp = "FA";
 	cmd += ';';
 	int ret = wait_char(';',11, FL450D_WAIT_TIME, "check", ASC);
+
+	rig_trace(2, "check()", replystr.c_str());
+
 	if (ret >= 11) return true;
 	return false;
 }
@@ -260,6 +273,8 @@ long RIG_FT450D::get_vfoA ()
 	cmd = rsp = "FA";
 	cmd += ';';
 	wait_char(';',11, FL450D_WAIT_TIME, "get vfo A", ASC);
+
+	rig_trace(2, "get_vfoA()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqA;
@@ -289,6 +304,8 @@ long RIG_FT450D::get_vfoB ()
 	cmd = rsp = "FB";
 	cmd += ';';
 	wait_char(';',11, FL450D_WAIT_TIME, "get vfo B", ASC);
+
+	rig_trace(2, "get_vfoB()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqB;
@@ -345,6 +362,8 @@ int RIG_FT450D::get_smeter()
 	cmd += ';';
 	wait_char(';',7, FL450D_WAIT_TIME, "get smeter", ASC);
 
+	rig_trace(2, "get_smeter()", replystr.c_str());
+
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
@@ -367,6 +386,8 @@ int RIG_FT450D::get_swr()
 	cmd = rsp = "RM6";
 	cmd += ';';
 	wait_char(';',7, FL450D_WAIT_TIME, "get swr", ASC);
+
+	rig_trace(2, "get_swr()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -395,6 +416,8 @@ int RIG_FT450D::get_power_out()
 	sendOK(cmd.append(";"));
 	wait_char(';',7, FL450D_WAIT_TIME, "get pout", ASC);
 
+	rig_trace(2, "get_power_out()", replystr.c_str());
+
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
@@ -411,6 +434,8 @@ int RIG_FT450D::get_power_control()
 	cmd = rsp = "PC";
 	cmd += ';';
 	wait_char(';',6, FL450D_WAIT_TIME, "get power", ASC);
+
+	rig_trace(2, "get_power_control()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.power_level;
@@ -438,6 +463,8 @@ int RIG_FT450D::get_volume_control()
 	cmd = rsp = "AG0";
 	cmd += ';';
 	wait_char(';',7, FL450D_WAIT_TIME, "get vol", ASC);
+
+	rig_trace(2, "get_volume_control()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.volume;
@@ -479,6 +506,8 @@ int RIG_FT450D::get_PTT()
 	rsp = "TX";
 	waitN(4, 100, "get PTT", ASC);
 
+	rig_trace(2, "get_PTT()", replystr.c_str());
+
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return ptt_;
 	ptt_ =  (replystr[p+2] != '0' ? 1 : 0);
@@ -507,6 +536,8 @@ int RIG_FT450D::get_attenuator()
 	cmd += ';';
 	wait_char(';', 5, FL450D_WAIT_TIME, "get att", ASC);
 
+	rig_trace(2, "get_attenuator()", replystr.c_str());
+
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	return (replystr[p+3] == '1' ? 1 : 0);
@@ -525,6 +556,8 @@ int RIG_FT450D::get_preamp()
 	cmd = rsp = "PA0";
 	cmd += ';';
 	wait_char(';', 5, FL450D_WAIT_TIME, "get pre", ASC);
+
+	rig_trace(2, "get_preamp()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -563,9 +596,17 @@ int RIG_FT450D::adjust_bandwidth(int val)
 	return FT450D_def_bw[val];
 }
 
-int RIG_FT450D::def_bandwidth(int val)
+int RIG_FT450D::def_bandwidth(int m)
 {
-	return FT450D_def_bw[val];
+	int bw = adjust_bandwidth(m);
+	if (useB) {
+		if (mode_bwB[m] == -1)
+			mode_bwB[m] = bw;
+		return mode_bwB[m];
+	}
+	if (mode_bwA[m] == -1)
+		mode_bwA[m] = bw;
+	return mode_bwA[m];
 }
 
 const char ** RIG_FT450D::bwtable(int n)
@@ -614,6 +655,8 @@ int RIG_FT450D::get_modeA()
 	cmd += ';';
 	wait_char(';', 5, FL450D_WAIT_TIME, "get mode A", ASC);
 
+	rig_trace(2, "get_modeA()", replystr.c_str());
+
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return modeA;
 	int md = replystr[p+3];
@@ -634,6 +677,7 @@ void RIG_FT450D::set_bwA(int val)
 		default: cmd = "SH016;";
 	}
 	sendOK(cmd);
+	mode_bwA[modeA] = bwA;
 	showresp(WARN, ASC, "SET bwA", cmd, replystr);
 }
 
@@ -643,12 +687,15 @@ int RIG_FT450D::get_bwA()
 	cmd += ';';
 	wait_char(';', 6, FL450D_WAIT_TIME, "get bw A", ASC);
 
+	rig_trace(2, "get_bwA()", replystr.c_str());
+
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return bwA;
 	string bws = replystr.substr(p+3,2);
 	if (bws == "00") bwA = 0;
 	else if (bws == "16") bwA = 1;
 	else if (bws == "31") bwA = 2;
+	mode_bwA[modeA] = bwA;
 	return bwA;
 }
 
@@ -678,6 +725,8 @@ int RIG_FT450D::get_modeB()
 	cmd += ';';
 	wait_char(';', 5, FL450D_WAIT_TIME, "get mode B", ASC);
 
+	rig_trace(2, "get_modeB()", replystr.c_str());
+
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return modeB;
 	int md = replystr[p+3];
@@ -698,6 +747,7 @@ void RIG_FT450D::set_bwB(int val)
 		default: cmd = "SH031;";
 	}
 	sendOK(cmd);
+	mode_bwB[modeB] = bwB;
 	showresp(WARN, ASC, "SET bwB", cmd, replystr);
 }
 
@@ -707,13 +757,36 @@ int RIG_FT450D::get_bwB()
 	cmd += ';';
 	wait_char(';', 6, FL450D_WAIT_TIME, "get bw B", ASC);
 
+	rig_trace(2, "get_bwB()", replystr.c_str());
+
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return bwB;
 	string bws = replystr.substr(p+3,2);
 	if (bws == "00") bwB = 0;
 	else if (bws == "16") bwB = 1;
 	else if (bws == "31") bwB = 2;
+	mode_bwB[modeB] = bwB;
 	return bwB;
+}
+
+std::string RIG_FT450D::get_BANDWIDTHS()
+{
+	stringstream s;
+	for (int i = 0; i < NUM_MODES; i++)
+		s << mode_bwA[i] << " ";
+	for (int i = 0; i < NUM_MODES; i++)
+		s << mode_bwB[i] << " ";
+	return s.str();
+}
+
+void RIG_FT450D::set_BANDWIDTHS(std::string s)
+{
+	stringstream strm;
+	strm << s;
+	for (int i = 0; i < NUM_MODES; i++)
+		strm >> mode_bwA[i];
+	for (int i = 0; i < NUM_MODES; i++)
+		strm >> mode_bwB[i];
 }
 
 int RIG_FT450D::get_modetype(int n)
@@ -739,6 +812,8 @@ bool RIG_FT450D::get_if_shift(int &val)
 	cmd = rsp = "IS0";
 	cmd += ';';
 	wait_char(';', 9, FL450D_WAIT_TIME, "get if shift", ASC);
+
+	rig_trace(2, "get_if_shift()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	val = progStatus.shift_val;
@@ -791,6 +866,8 @@ bool  RIG_FT450D::get_notch(int &val)
 	cmd += ';';
 	wait_char(';', 8, FL450D_WAIT_TIME, "get notch on/off", ASC);
 
+	rig_trace(2, "get_notch()", replystr.c_str());
+
 	size_t p = replystr.rfind(rsp);
 	val = progStatus.notch_val = 0; // disabled default slider position
 	if (p == string::npos) return ison;
@@ -801,6 +878,9 @@ bool  RIG_FT450D::get_notch(int &val)
 		cmd = rsp = "BP01";
 		cmd += ';';
 		waitN(8, 100, "get notch val", ASC);
+
+		rig_trace(2, "get_notch_val()", replystr.c_str());
+
 		p = replystr.rfind(rsp);
 		if (p == string::npos || rsp.length() < 8) return ison;
 		val = atoi(&replystr[p+4]);
@@ -870,6 +950,8 @@ int RIG_FT450D::get_mic_gain()
 	cmd = rsp = "MG";
 	cmd += ';';
 	wait_char(';', 6, FL450D_WAIT_TIME, "get mic", ASC);
+
+	rig_trace(2, "get_mic_gain()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -1017,6 +1099,9 @@ int  RIG_FT450D::get_noise_reduction_val()
 	cmd = rsp = "RL0";
 	cmd.append(";");
 	waitN(6, 100, "GET noise reduction level", ASC);
+
+	rig_trace(2, "get_noise_reduction_val()", replystr.c_str());
+
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return val;
 	val = atoi(&replystr[p+3]);
@@ -1062,6 +1147,8 @@ int  RIG_FT450D::get_rf_gain()
 	cmd = rsp = "RG0";
 	cmd += ';';
 	wait_char(';', 7, FL450D_WAIT_TIME, "get rfgain", ASC);
+
+	rig_trace(2, "get_rf_gain()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.rfgain;

@@ -18,11 +18,20 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
+#include <iostream>
+#include <sstream>
+
 #include "FT2000.h"
 #include "debug.h"
 #include "support.h"
 
 static const char FT2000name_[] = "FT-2000";
+
+#undef  NUM_MODES
+#define NUM_MODES  12
+
+static int mode_bwA[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
+static int mode_bwB[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 
 static const char *FT2000modes_[] = {
 "LSB", "USB", "CW", "FM", "AM", "RTTY-L", "CW-R", "PKT-L", "RTTY-U", "PKT-FM", "FM-N", "PKT-U", NULL};
@@ -143,7 +152,10 @@ void RIG_FT2000::set_band_selection(int v)
 {
 	int inc_60m = false;
 	cmd = "IF;";
-	waitN(27, 100, "get vfo mode in set_band_selection", ASC);
+	wait_char(';', 27, 100, "get vfo mode in set_band_selection", ASC);
+
+	rig_trace(2, "get set_band vfo_mode()", replystr.c_str());
+
 	size_t p = replystr.rfind("IF");
 	if (p == string::npos) return;
 	if (replystr[p+21] != '0') {	// vfo 60M memory mode
@@ -186,7 +198,10 @@ void RIG_FT2000::selectB()
 bool RIG_FT2000::check ()
 {
 	cmd = "FA;";
-	int ret = waitN(11, 100, "check", ASC);
+	int ret = wait_char(';', 11, 100, "check", ASC);
+
+	rig_trace(2, "check()", replystr.c_str());
+
 	if (ret >= 11) return true;
 	return false;
 }
@@ -194,7 +209,10 @@ bool RIG_FT2000::check ()
 long RIG_FT2000::get_vfoA ()
 {
 	cmd = "FA;";
-	int ret = waitN(11, 100, "get vfoA", ASC);
+	int ret = wait_char(';', 11, 100, "get vfoA", ASC);
+
+	rig_trace(2, "get_vfoA()", replystr.c_str());
+
 	if (ret < 11) return freqA;
 	size_t p = replystr.rfind("FA");
 	if (p == string::npos) return freqA;
@@ -220,7 +238,10 @@ void RIG_FT2000::set_vfoA (long freq)
 long RIG_FT2000::get_vfoB ()
 {
 	cmd = "FB;";
-	int ret = waitN(11, 100, "get vfoB", ASC);
+	int ret = wait_char(';', 11, 100, "get vfoB", ASC);
+
+	rig_trace(2, "get_vfoB()", replystr.c_str());
+
 	if (ret < 11) return freqB;
 	size_t p = replystr.rfind("FA");
 	if (p == string::npos) return freqB;
@@ -246,7 +267,10 @@ void RIG_FT2000::set_vfoB (long freq)
 int RIG_FT2000::get_smeter()
 {
 	cmd = "SM0;";
-	int ret = waitN(7, 100, "get smeter", ASC);
+	int ret = wait_char(';', 7, 100, "get smeter", ASC);
+
+	rig_trace(2, "get_smeter()", replystr.c_str());
+
 	if (ret < 7) return 0;
 	size_t p = replystr.rfind("SM");
 	if (p == string::npos) return 0;
@@ -259,7 +283,10 @@ int RIG_FT2000::get_smeter()
 int RIG_FT2000::get_swr()
 {
 	cmd = "RM6;";
-	int ret = waitN(7, 100, "get swr", ASC);
+	int ret = wait_char(';', 7, 100, "get swr", ASC);
+
+	rig_trace(2, "get_swr()", replystr.c_str());
+
 	if (ret < 7) return 0;
 	size_t p = replystr.rfind("RM");
 	if (p == string::npos) return 0;
@@ -271,7 +298,10 @@ int RIG_FT2000::get_swr()
 int RIG_FT2000::get_power_out()
 {
 	cmd = "RM5;";
-	int ret = waitN(7, 100, "get pwr out", ASC);
+	int ret = wait_char(';', 7, 100, "get pwr out", ASC);
+
+	rig_trace(2, "get_power_out()", replystr.c_str());
+
 	if (ret < 7) return 0;
 	size_t p = replystr.rfind("RM");
 	if (p == string::npos) return 0;
@@ -284,7 +314,10 @@ int RIG_FT2000::get_power_out()
 int RIG_FT2000::get_power_control()
 {
 	cmd = "PC;";
-	int ret = waitN(6, 100, "get pwr ctl", ASC);
+	int ret = wait_char(';', 6, 100, "get pwr ctl", ASC);
+
+	rig_trace(2, "get_power_control()", replystr.c_str());
+
 	if (ret < 6) return 0;
 	size_t p = replystr.rfind("PC");
 	if (p == string::npos) return 0;
@@ -297,7 +330,10 @@ int RIG_FT2000::get_power_control()
 int RIG_FT2000::get_volume_control()
 {
 	cmd = "AG0;";
-	int ret = waitN(7, 100, "get vol", ASC);
+	int ret = wait_char(';', 7, 100, "get vol", ASC);
+
+	rig_trace(2, "get_volume_control()", replystr.c_str());
+
 	if (ret < 7) return 0;
 	size_t p = replystr.rfind("AG");
 	if (p == string::npos) return 0;
@@ -341,7 +377,9 @@ int RIG_FT2000::get_PTT()
 {
 	cmd = "TX;";
 	rsp = "TX";
-	waitN(4, 100, "get PTT", ASC);
+	wait_char(';', 4, 100, "get PTT", ASC);
+
+	rig_trace(2, "get_PTT()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return ptt_;
@@ -393,7 +431,10 @@ void RIG_FT2000::set_attenuator(int val)
 int RIG_FT2000::get_attenuator()
 {
 	cmd = "RA0;";
-	int ret = waitN(5, 100, "get att", ASC);
+	int ret = wait_char(';', 5, 100, "get att", ASC);
+
+	rig_trace(2, "get_attenuator()", replystr.c_str());
+
 	if (ret < 5) {
 		atten_label("Att", false);
 		return 0;
@@ -459,7 +500,10 @@ void RIG_FT2000::set_preamp(int val)
 int RIG_FT2000::get_preamp()
 {
 	cmd = "PA0;";
-	int ret = waitN(5, 100, "get pre", ASC);
+	int ret = wait_char(';', 5, 100, "get pre", ASC);
+
+	rig_trace(2, "get_preamp()", replystr.c_str());
+
 	if (ret < 5) {
 		preamp_label("Pre", false);
 		preamp_level = 0;
@@ -502,7 +546,10 @@ void RIG_FT2000::set_modeA(int val)
 int RIG_FT2000::get_modeA()
 {
 	cmd = "MD0;";
-	int ret = waitN(5, 100, "get modeA", ASC);
+	int ret = wait_char(';', 5, 100, "get modeA", ASC);
+
+	rig_trace(2, "get_modeA()", replystr.c_str());
+
 	if (ret < 5) return modeA;
 	size_t p = replystr.rfind("MD");
 	if (p == string::npos) return modeA;
@@ -522,7 +569,10 @@ void RIG_FT2000::set_modeB(int val)
 int RIG_FT2000::get_modeB()
 {
 	cmd = "MD1;";
-	int ret = waitN(5, 100, "get modeB", ASC);
+	int ret = wait_char(';', 5, 100, "get modeB", ASC);
+
+	rig_trace(2, "get_modeB()", replystr.c_str());
+
 	if (ret < 5) return modeB;
 	size_t p = replystr.rfind("MD");
 	if (p == string::npos) return modeB;
@@ -559,7 +609,15 @@ int RIG_FT2000::adjust_bandwidth(int m)
 
 int RIG_FT2000::def_bandwidth(int m)
 {
-	return 0;
+	int bw = adjust_bandwidth(m);
+	if (useB) {
+		if (mode_bwB[m] == -1)
+			mode_bwB[m] = bw;
+		return mode_bwB[m];
+	}
+	if (mode_bwA[m] == -1)
+		mode_bwA[m] = bw;
+	return mode_bwA[m];
 }
 
 const char **RIG_FT2000::bwtable(int m)
@@ -624,6 +682,7 @@ void RIG_FT2000::set_bwA(int val)
 			break;
 	}
 	sendCommand("NA01;", 0);
+	mode_bwA[modeA] = val;
 }
 
 int RIG_FT2000::get_bwA()
@@ -637,6 +696,7 @@ void RIG_FT2000::set_bwB(int val)
 
 	if (val == 0) {
 		sendCommand("NA10;", 0);
+		mode_bwA[modeA] = val;
 		return;
 	}
 
@@ -674,11 +734,32 @@ void RIG_FT2000::set_bwB(int val)
 			break;
 	}
 	sendCommand("NA11;", 0);
+	mode_bwA[modeA] = val;
 }
 
 int RIG_FT2000::get_bwB()
 {
 	return bwB;
+}
+
+std::string RIG_FT2000::get_BANDWIDTHS()
+{
+	stringstream s;
+	for (int i = 0; i < NUM_MODES; i++)
+		s << mode_bwA[i] << " ";
+	for (int i = 0; i < NUM_MODES; i++)
+		s << mode_bwB[i] << " ";
+	return s.str();
+}
+
+void RIG_FT2000::set_BANDWIDTHS(std::string s)
+{
+	stringstream strm;
+	strm << s;
+	for (int i = 0; i < NUM_MODES; i++)
+		strm >> mode_bwA[i];
+	for (int i = 0; i < NUM_MODES; i++)
+		strm >> mode_bwB[i];
 }
 
 int RIG_FT2000::get_modetype(int n)
@@ -702,7 +783,10 @@ bool RIG_FT2000::get_if_shift(int &val)
 {
 	static int oldval = 0;
 	cmd = "IS0;";
-	int ret = waitN(9, 100, "get if shift", ASC);
+	int ret = wait_char(';', 9, 100, "get if shift", ASC);
+
+	rig_trace(2, "get_if_shift()", replystr.c_str());
+
 	if (ret < 9) return false;
 	size_t p = replystr.rfind("IS");
 	if (p == string::npos) return false;
@@ -754,7 +838,10 @@ bool  RIG_FT2000::get_notch(int &val)
 {
 	bool ison = false;
 	cmd = "BP00;";
-	int ret = waitN(8, 100, "get notch", ASC);
+	int ret = wait_char(';', 8, 100, "get notch", ASC);
+
+	rig_trace(2, "get_notch()", replystr.c_str());
+
 	if (ret < 8) return ison;
 	size_t p = replystr.rfind("BP");
 	if (p == string::npos) return ison;
@@ -762,7 +849,10 @@ bool  RIG_FT2000::get_notch(int &val)
 	if (replystr[p + 6] == '1') {
 		ison = true;
 		cmd = "BP01;";
-		ret = waitN(8, 100, "get notch freq", ASC);
+		ret = wait_char(';', 8, 100, "get notch freq", ASC);
+
+		rig_trace(2, "get_notch_val()", replystr.c_str());
+
 		if (ret < 8) return ison;
 		p = replystr.rfind("BP");
 		if (p == string::npos) return ison;
@@ -807,7 +897,9 @@ int RIG_FT2000::get_mic_gain()
 {
 	cmd = rsp = "MG";
 	cmd += ';';
-	waitN(6, 100, "get mic", ASC);
+	wait_char(';', 6, 100, "get mic", ASC);
+
+	rig_trace(2, "get_mic_gain()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.mic_gain;

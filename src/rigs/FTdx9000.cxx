@@ -18,6 +18,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
+#include <iostream>
+#include <sstream>
+
 #include "FTdx9000.h"
 #include "debug.h"
 #include "support.h"
@@ -27,6 +30,12 @@ enum mFTdx9000 {
 // mLSB, mUSB, mCW, mFM, mAM, mRTTY_L, mCW_R, mPKT_L, mRTTY_U, mPKT_FM, mFM_N, mPKT_U, mAM_N
 //  0,    1,    2,   3,   4,   5,       6,     7,      8,       9,       10,    11,    12	// mode index
 // 19,   19,    9,   0,   0,  10,       9,    15,     10,       0,        0,    15,     0	// FTdx9000_def_bw
+
+#undef  NUM_MODES
+#define NUM_MODES  13
+
+static int mode_bwA[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
+static int mode_bwB[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 
 
 static const char FTdx9000name_[] = "FTdx9000";
@@ -210,7 +219,10 @@ void RIG_FTdx9000::set_band_selection(int v)
 {
 	int inc_60m = false;
 	cmd = "IF;";
-	waitN(27, 100, "get vfo mode in set_band_selection", ASC);
+	wait_char(';', 27, 100, "get vfo mode in set_band_selection", ASC);
+
+	rig_trace(2, "get set_band vfo_mode()", replystr.c_str());
+
 	size_t p = replystr.rfind("IF");
 	if (p == string::npos) return;
 	if (replystr[p+21] != '0') {	// vfo 60M memory mode
@@ -242,7 +254,10 @@ bool RIG_FTdx9000::check ()
 {
 	cmd = rsp = "FA";
 	cmd += ';';
-	int ret = waitN(11, 100, "check", ASC);
+	int ret = wait_char(';', 11, 100, "check", ASC);
+
+	rig_trace(2, "check()", replystr.c_str());
+
 	if (ret >= 11) return true;
 	return false;
 }
@@ -251,7 +266,9 @@ long RIG_FTdx9000::get_vfoA ()
 {
 	cmd = rsp = "FA";
 	cmd += ';';
-	waitN(11, 100, "get vfo A", ASC);
+	wait_char(';', 11, 100, "get vfo A", ASC);
+
+	rig_trace(2, "get_vfoA()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqA;
@@ -278,7 +295,9 @@ long RIG_FTdx9000::get_vfoB ()
 {
 	cmd = rsp = "FB";
 	cmd += ';';
-	waitN(11, 100, "get vfo B", ASC);
+	wait_char(';', 11, 100, "get vfo B", ASC);
+
+	rig_trace(2, "get_vfoB()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqB;
@@ -366,7 +385,9 @@ int RIG_FTdx9000::get_smeter()
 {
 	cmd = rsp = "SM0";
 	cmd += ';';
-	waitN(7, 100, "get smeter", ASC);
+	wait_char(';', 7, 100, "get smeter", ASC);
+
+	rig_trace(2, "get_smeter()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -380,7 +401,9 @@ int RIG_FTdx9000::get_swr()
 {
 	cmd = rsp = "RM6";
 	cmd += ';';
-	waitN(7, 100, "get swr", ASC);
+	wait_char(';', 7, 100, "get swr", ASC);
+
+	rig_trace(2, "get_swr()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -393,7 +416,9 @@ int RIG_FTdx9000::get_power_out()
 {
 	cmd = rsp = "RM5";
 	sendOK(cmd.append(";"));
-	waitN(7, 100, "get pout", ASC);
+	wait_char(';', 7, 100, "get pout", ASC);
+
+	rig_trace(2, "get_power_out()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -409,7 +434,9 @@ int RIG_FTdx9000::get_power_control()
 {
 	cmd = rsp = "PC";
 	cmd += ';';
-	waitN(6, 100, "get power", ASC);
+	wait_char(';', 6, 100, "get power", ASC);
+
+	rig_trace(2, "get_power_control()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.power_level;
@@ -436,7 +463,9 @@ int RIG_FTdx9000::get_volume_control()
 {
 	cmd = rsp = "AG0";
 	cmd += ';';
-	waitN(7, 100, "get vol", ASC);
+	wait_char(';', 7, 100, "get vol", ASC);
+
+	rig_trace(2, "get_volume_control()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.volume;
@@ -471,7 +500,9 @@ int RIG_FTdx9000::get_PTT()
 {
 	cmd = "TX;";
 	rsp = "TX";
-	waitN(4, 100, "get PTT", ASC);
+	wait_char(';', 4, 100, "get PTT", ASC);
+
+	rig_trace(2, "get_PTT()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return ptt_;
@@ -520,7 +551,9 @@ int RIG_FTdx9000::get_attenuator()
 {
 	cmd = rsp = "RA0";
 	cmd += ';';
-	waitN(5, 100, "get att", ASC);
+	wait_char(';', 5, 100, "get att", ASC);
+
+	rig_trace(2, "get_attenuator()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.attenuator;
@@ -569,7 +602,9 @@ int RIG_FTdx9000::get_preamp()
 {
 	cmd = rsp = "PA0";
 	cmd += ';';
-	waitN(5, 100, "get pre", ASC);
+	wait_char(';', 5, 100, "get pre", ASC);
+
+	rig_trace(2, "get_preamp()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p != string::npos)
@@ -612,9 +647,17 @@ int RIG_FTdx9000::adjust_bandwidth(int val)
 	return bw;
 }
 
-int RIG_FTdx9000::def_bandwidth(int val)
+int RIG_FTdx9000::def_bandwidth(int m)
 {
-	return FTdx9000_def_bw[val];
+	int bw = adjust_bandwidth(m);
+	if (useB) {
+		if (mode_bwB[m] == -1)
+			mode_bwB[m] = bw;
+		return mode_bwB[m];
+	}
+	if (mode_bwA[m] == -1)
+		mode_bwA[m] = bw;
+	return mode_bwA[m];
 }
 
 const char ** RIG_FTdx9000::bwtable(int n)
@@ -657,7 +700,9 @@ int RIG_FTdx9000::get_modeA()
 {
 	cmd = rsp = "MD0";
 	cmd += ';';
-	waitN(5, 100, "get mode A", ASC);
+	wait_char(';', 5, 100, "get mode A", ASC);
+
+	rig_trace(2, "get_modeA()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p != string::npos) {
@@ -696,7 +741,9 @@ int RIG_FTdx9000::get_modeB()
 {
 	cmd = rsp = "MD0";
 	cmd += ';';
-	waitN(5, 100, "get mode B", ASC);
+	wait_char(';', 5, 100, "get mode B", ASC);
+
+	rig_trace(2, "get_modeB()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p != string::npos) {
@@ -731,17 +778,21 @@ void RIG_FTdx9000::set_bwA(int val)
 	cmd += ';';
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET bw A", cmd, replystr);
+	mode_bwA[modeA] = val;
 }
 
 int RIG_FTdx9000::get_bwA()
 {
 	if (modeA == mFM || modeA == mAM || modeA == mFM_N || modeA == mPKT_FM) {
 		bwA = 0;
+		mode_bwA[modeA] = bwA;
 		return bwA;	
 	} 
 	cmd = rsp = "SH0";
 	cmd += ';';
-	waitN(6, 100, "get bw A", ASC);
+	wait_char(';', 6, 100, "get bw A", ASC);
+
+	rig_trace(2, "get_bwA()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return bwA;
@@ -758,6 +809,7 @@ int RIG_FTdx9000::get_bwA()
 	}
 	if (*idx == WVALS_LIMIT) i--;
 	bwA = i;
+	mode_bwA[modeA] = bwA;
 	return bwA;
 }
 
@@ -767,6 +819,7 @@ void RIG_FTdx9000::set_bwB(int val)
 	bwB = val;
 
 	if (modeB == mFM || modeB == mAM || modeB == mFM_N || modeB == mPKT_FM) {
+		mode_bwB[modeB] = 0;
 		return;
 	}
 	if ((((modeB == mLSB || modeB == mUSB)  && val < 8)) ||
@@ -780,6 +833,7 @@ void RIG_FTdx9000::set_bwB(int val)
 	cmd += '0' + bw_indx % 10;
 	cmd += ';';
 	sendOK(cmd);
+	mode_bwB[modeB] = bwB;
 	showresp(WARN, ASC, "SET bw B", cmd, replystr);
 }
 
@@ -787,11 +841,14 @@ int RIG_FTdx9000::get_bwB()
 {
 	if (modeB == mFM || modeB == mAM || modeB == mFM_N || modeB == mPKT_FM) {
 		bwB = 0;
+		mode_bwB[modeB] = bwB;
 		return bwB;
 	} 
 	cmd = rsp = "SH0";
 	cmd += ';';
-	waitN(6, 100, "get bw B", ASC);
+	wait_char(';', 6, 100, "get bw B", ASC);
+
+	rig_trace(2, "get_bwB()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return bwB;
@@ -808,7 +865,28 @@ int RIG_FTdx9000::get_bwB()
 	}
 	if (*idx == WVALS_LIMIT) i--;
 	bwB = i;
+	mode_bwB[modeB] = bwB;
 	return bwB;
+}
+
+std::string RIG_FTdx9000::get_BANDWIDTHS()
+{
+	stringstream s;
+	for (int i = 0; i < NUM_MODES; i++)
+		s << mode_bwA[i] << " ";
+	for (int i = 0; i < NUM_MODES; i++)
+		s << mode_bwB[i] << " ";
+	return s.str();
+}
+
+void RIG_FTdx9000::set_BANDWIDTHS(std::string s)
+{
+	stringstream strm;
+	strm << s;
+	for (int i = 0; i < NUM_MODES; i++)
+		strm >> mode_bwA[i];
+	for (int i = 0; i < NUM_MODES; i++)
+		strm >> mode_bwB[i];
 }
 
 int RIG_FTdx9000::get_modetype(int n)
@@ -835,7 +913,9 @@ bool RIG_FTdx9000::get_if_shift(int &val)
 {
 	cmd = rsp = "IS0";
 	cmd += ';';
-	waitN(9, 100, "get if shift", ASC);
+	wait_char(';', 9, 100, "get if shift", ASC);
+
+	rig_trace(2, "get_if_shift()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	val = progStatus.shift_val;
@@ -880,9 +960,11 @@ bool  RIG_FTdx9000::get_notch(int &val)
 	bool ison = false;
 	cmd = rsp = "BP00";
 	cmd += ';';
-	waitN(8, 100, "get notch on/off", ASC);
+	wait_char(';', 8, 100, "get notch on/off", ASC);
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return ison;
+
+	rig_trace(2, "get_notch()", replystr.c_str());
 
 	if (replystr[p+6] == '1') // manual notch enabled
 		ison = true;
@@ -890,7 +972,10 @@ bool  RIG_FTdx9000::get_notch(int &val)
 	val = progStatus.notch_val;
 	cmd = rsp = "BP01";
 	cmd += ';';
-	waitN(8, 100, "get notch val", ASC);
+	wait_char(';', 8, 100, "get notch val", ASC);
+
+	rig_trace(2, "get_notch_val()", replystr.c_str());
+
 	p = replystr.rfind(rsp);
 	if (p == string::npos)
 		val = 10;
@@ -918,7 +1003,10 @@ void RIG_FTdx9000::set_auto_notch(int v)
 int  RIG_FTdx9000::get_auto_notch()
 {
 	cmd = "BC0;";
-	waitN(5, 100, "get auto notch", ASC);
+	wait_char(';', 5, 100, "get auto notch", ASC);
+
+	rig_trace(2, "get_auto_notch()", replystr.c_str());
+
 	size_t p = replystr.rfind("BC0");
 	if (p == string::npos) return 0;
 	if (replystr[p+3] == '1') return 1;
@@ -949,7 +1037,9 @@ int RIG_FTdx9000::get_noise()
 {
 	cmd = rsp = "NB0";
 	cmd += ';';
-	waitN(5, 100, "get NB", ASC);
+	wait_char(';', 5, 100, "get NB", ASC);
+
+	rig_trace(2, "get_noise()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return FTdx9000_blanker_level;
@@ -983,7 +1073,9 @@ int RIG_FTdx9000::get_mic_gain()
 {
 	cmd = rsp = "MG";
 	cmd += ';';
-	waitN(6, 100, "get mic", ASC);
+	wait_char(';', 6, 100, "get mic", ASC);
+
+	rig_trace(2, "get_mic_gain()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.mic_gain;
@@ -1015,7 +1107,9 @@ int  RIG_FTdx9000::get_rf_gain()
 	int rfval = 0;
 	cmd = rsp = "RG0";
 	cmd += ';';
-	waitN(7, 100, "get rfgain", ASC);
+	wait_char(';', 7, 100, "get rfgain", ASC);
+
+	rig_trace(2, "get_rf_gain()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.rfgain;

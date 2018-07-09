@@ -17,6 +17,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
+#include <iostream>
+#include <sstream>
 
 #include "FT5000.h"
 #include "debug.h"
@@ -28,13 +30,18 @@ enum mFTdx5000 {
 //  0,    1,    2,   3,   4,   5,	6,     7,      8,	9,	10,    11	// mode index
 // 19,   19,    9,   0,   0,  10,	9,    15,     10,	0,	 0,    15	// FTdx5000_def_bw
 
-
 static const char FT5000name_[] = "FTdx5000";
 
 static const char *FT5000modes_[] = {
 "LSB", "USB", "CW", "FM", "AM",
-"RTTY-L", "CW-R", "PSK-L", "RTTY-U", "PKT-FM",
-"FM-N", "PSK-U", NULL};
+"RTTY-L", "CW-R", "PKT-L", "RTTY-U", "PKT-FM",
+"FM-N", "PKT-U", NULL};
+
+#undef  NUM_MODES
+#define NUM_MODES  12
+
+static int mode_bwA[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
+static int mode_bwB[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 
 static const int FT5000_def_bw[] = {
 19, 19, 9, 0, 0,
@@ -45,10 +52,9 @@ static const char FT5000_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '8',
 static const char FT5000_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L', 'U', 'U', 'U', 'U' };
 
 static const char *FT5000_widths_SSB[] = {
-"200", "400", "600", "850", "1100", "1350", "1500", // NA = 1 widths
-"1650", "1800", "1950", "2100", "2250", "2400",
-"2500", "2600", "2700", "2800", "2900", "3000",
-"3200", "3400", "3600", "3800", "4000",	      // NA = 0 widths
+"200",   "400",  "600",  "850", "1100", "1350", "1500", "1650", "1800", "1950", // 0..9
+"2100", "2250", "2400", "2500", "2600", "2700", "2800", "2900", "3000", "3200", // 10..19
+"3400", "3600", "3800", "4000", // 20..23
 NULL };
 
 static int FT5000_wvals_SSB[] = {
@@ -206,7 +212,10 @@ void RIG_FT5000::set_band_selection(int v)
 {
 	int inc_60m = false;
 	cmd = "IF;";
-	waitN(27, 100, "get vfo mode in set_band_selection", ASC);
+	wait_char(';',27, 100, "get vfo mode in set_band_selection", ASC);
+
+	rig_trace(2, "get set_band vfo_mode()", replystr.c_str());
+
 	size_t p = replystr.rfind("IF");
 	if (p == string::npos) return;
 	if (replystr[p+21] != '0') {	// vfo 60M memory mode
@@ -238,7 +247,10 @@ bool RIG_FT5000::check ()
 {
 	cmd = rsp = "FA";
 	cmd += ';';
-	int ret = waitN(11, 100, "get vfo A", ASC);
+	int ret = wait_char(';', 11, 100, "get vfo A", ASC);
+
+	rig_trace(2, "check()", replystr.c_str());
+
 	if (ret >= 11) return true;
 	return false;
 }
@@ -247,7 +259,9 @@ long RIG_FT5000::get_vfoA ()
 {
 	cmd = rsp = "FA";
 	cmd += ';';
-	waitN(11, 100, "get vfo A", ASC);
+	wait_char(';', 11, 100, "get vfo A", ASC);
+
+	rig_trace(2, "get_vfoA()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqA;
@@ -274,7 +288,9 @@ long RIG_FT5000::get_vfoB ()
 {
 	cmd = rsp = "FB";
 	cmd += ';';
-	waitN(11, 100, "get vfo B", ASC);
+	wait_char(';', 11, 100, "get vfo B", ASC);
+
+	rig_trace(2, "get_vfoB()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqB;
@@ -362,51 +378,56 @@ int RIG_FT5000::get_smeter()
 {
 	cmd = rsp = "SM0";
 	cmd += ';';
-	waitN(7, 100, "get smeter", ASC);
+	wait_char(';', 7, 100, "get smeter", ASC);
+
+	rig_trace(2, "get_smeter()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
 	int mtr = atoi(&replystr[p+3]);
-	mtr = mtr * 100.0 / 256.0;
+	mtr *= 100;
+	mtr /= 255;
+//	mtr = mtr * 100.0 / 256.0;
 	return mtr;
 }
 
 struct meterpair {int mtr; float val;};
 
 struct meterpair swrtbl[] = {
-	{13, 5},	// 1.0
-	{39, 15},	// 1.3
-	{52, 20},	// 1.5
-	{65, 25},	// 1.7
-	{77, 30},	// 1.8
-	{89, 34},	// 2.0
-	{102, 39},	// 2.5
-	{119, 46},	// 2.9
-	{198, 77},	// 4.0
-	{255, 99}	// 5.0
+	{0, 0.0},		// 1.0
+	{39, 7.5},		// 1.3
+	{52, 12.0},		// 1.5
+	{65, 17.0},		// 1.7
+	{77, 19.5},		// 1.8
+	{89, 24.0},		// 2.0
+	{102, 36.0},	// 2.5
+	{119, 47.0},	// 2.9
+	{198, 77.0},	// 4.0
+	{255, 100.0}	// 5.0
 };
 
 int RIG_FT5000::get_swr()
 {
 	cmd = rsp = "RM6";
 	cmd += ';';
-	waitN(7, 100, "get swr", ASC);
+	wait_char(';', 7, 100, "get swr", ASC);
+
+	rig_trace(2, "get_swr()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
-	double rcvd = (double)(atoi(&replystr[p+3]));
-//	return mtr / 2.56;
+	int rcvd = atoi(&replystr[p+3]);
 
 	size_t i;
 	for (i = 0; i < sizeof(swrtbl) / sizeof(*swrtbl) - 1; i++)
 		if (rcvd >= swrtbl[i].mtr && rcvd < swrtbl[i+1].mtr)
 			break;
 
-	double mtr =
-		(int)ceil(swrtbl[i].val +
-		(swrtbl[i+1].val - swrtbl[i].val )* (rcvd - swrtbl[i].mtr) / (swrtbl[i+1].mtr - swrtbl[i].mtr));
+	double mtr = (swrtbl[i+1].val - swrtbl[i].val ) / (swrtbl[i+1].mtr - swrtbl[i].mtr);
+	mtr *= (rcvd - swrtbl[i].mtr);
+	mtr += swrtbl[i].val;
 	if (mtr < 0) mtr = 0;
 	if (mtr > 100) mtr = 100;
 
@@ -416,53 +437,59 @@ int RIG_FT5000::get_swr()
 //     Po Conversion Table
 
 static meterpair pwrtbl[] = {
-	{0, 0.0},
-	{57, 10.0},
-	{71, 20.0},
-	{89, 30.0},
-	{101, 40.0},
-	{115, 50.0},
-	{126, 60.0},
-	{136, 70.0},
-	{144, 80.0},
-	{152, 90.0},
-	{161, 100.0},
-	{168, 110.0},
-	{177, 120.0},
-	{184, 130.0},
-	{188, 140.0},
-	{197, 150.0},
-	{201, 160.0},
-	{207, 170.0},
-	{215, 180.0},
-	{220, 190.0},
-	{226, 200.0},
-	{231, 210.0},
-	{237, 220.0},
-	{242, 230.0},
-	{248, 240.0},
-	{255, 250.0}
+	{0,0},
+	{55,10},
+	{75,20},
+	{90,30},
+	{101,40},
+	{115,50},
+	{125,60},
+	{136,70},
+	{144,80},
+	{152,90},
+	{161,100},
+	{168,110},
+	{177,120},
+	{184,130},
+	{190,140},
+	{197,150},
+	{202,160},
+	{209,170},
+	{215,180},
+	{220,190},
+	{225,200},
+	{230,210},
+	{237,220},
+	{242,230},
+	{248,240},
+	{255,250}
 };
 
 int RIG_FT5000::get_power_out()
 {
 	cmd = rsp = "RM5";
 	sendOK(cmd.append(";"));
-	waitN(7, 100, "get pout", ASC);
+	wait_char(';', 7, 100, "get pout", ASC);
+
+	rig_trace(2, "get_power_out()", replystr.c_str());
+
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
-	double rcvd = (double)(atoi(&replystr[p+3]));
+	int mtr = atoi(&replystr[p+3]);
+
 	size_t i = 0;
 	for (i = 0; i < sizeof(pwrtbl) / sizeof(*pwrtbl) - 1; i++)
-		if (rcvd >= pwrtbl[i].mtr && rcvd < pwrtbl[i+1].mtr)
+		if (mtr >= pwrtbl[i].mtr && mtr < pwrtbl[i+1].mtr)
 			break;
-	double mtr =
-		(int)ceil(pwrtbl[i].val +
-		(pwrtbl[i+1].val - pwrtbl[i].val) * (rcvd - pwrtbl[i].mtr) / (pwrtbl[i+1].mtr - pwrtbl[i].mtr));
-	if (mtr > 250) mtr = 250;
-	if (mtr < 0) mtr = 0;
-	return (int)mtr;
+
+	double val = (pwrtbl[i+1].val - pwrtbl[i].val) / (pwrtbl[i+1].mtr - pwrtbl[i].mtr);
+	val *= (mtr - pwrtbl[i].mtr);
+	val += pwrtbl[i].val;
+
+	if (val > 255) val = 255;
+	if (val < 10) val = 10;
+	return (int)val;
 }
 
 // Transceiver power level
@@ -470,19 +497,25 @@ int RIG_FT5000::get_power_control()
 {
 	cmd = rsp = "PC";
 	cmd += ';';
-	waitN(6, 100, "get power", ASC);
+	wait_char(';', 6, 100, "get power", ASC);
+
+	rig_trace(2, "get_power_control()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.power_level;
 	if (p + 5 >= replystr.length()) return progStatus.power_level;
 
 	int mtr = atoi(&replystr[p+2]);
+	mtr *= 200; mtr /= 255;
+
 	return mtr;
 }
 
 void RIG_FT5000::set_power_control(double val)
 {
-	int ival = (int)val;
+	int ival = (int) val;
+	ival *= 255;
+	ival /= 200;
 	cmd = "PC000;";
 	for (int i = 4; i > 1; i--) {
 		cmd[i] += ival % 10;
@@ -490,6 +523,7 @@ void RIG_FT5000::set_power_control(double val)
 	}
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET power", cmd, replystr);
+	rig_trace(2, "set_power_control()", cmd.c_str());
 }
 
 // Volume control return 0 ... 100
@@ -497,19 +531,21 @@ int RIG_FT5000::get_volume_control()
 {
 	cmd = rsp = "AG0";
 	cmd += ';';
-	waitN(7, 100, "get vol", ASC);
+	wait_char(';', 7, 100, "get vol", ASC);
+
+	rig_trace(2, "get_volume_control()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.volume;
 	if (p + 6 >= replystr.length()) return progStatus.volume;
-	int val = atoi(&replystr[p+3]) * 100 / 250;
+	int val = atoi(&replystr[p+3]) * 100 / 255;
 	if (val > 100) val = 100;
 	return val;
 }
 
 void RIG_FT5000::set_volume_control(int val)
 {
-	int ivol = (int)(val * 250 / 100);
+	int ivol = (int)(val * 255 / 100);
 	cmd = "AG0000;";
 	for (int i = 5; i > 2; i--) {
 		cmd[i] += ivol % 10;
@@ -532,7 +568,9 @@ int RIG_FT5000::get_PTT()
 {
 	cmd = "TX;";
 	rsp = "TX";
-	waitN(4, 100, "get PTT", ASC);
+	wait_char(';', 4, 100, "get PTT", ASC);
+
+	rig_trace(2, "get_PTT()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return ptt_;
@@ -581,7 +619,9 @@ int RIG_FT5000::get_attenuator()
 {
 	cmd = rsp = "RA0";
 	cmd += ';';
-	waitN(5, 100, "get att", ASC);
+	wait_char(';', 5, 100, "get att", ASC);
+
+	rig_trace(2, "get_attenuator()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.attenuator;
@@ -632,7 +672,9 @@ int RIG_FT5000::get_preamp()
 {
 	cmd = rsp = "PA0";
 	cmd += ';';
-	waitN(5, 100, "get pre", ASC);
+	wait_char(';', 5, 100, "get pre", ASC);
+
+	rig_trace(2, "get_preamp()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p != string::npos)
@@ -676,9 +718,17 @@ int RIG_FT5000::adjust_bandwidth(int val)
 	return bw;
 }
 
-int RIG_FT5000::def_bandwidth(int val)
+int RIG_FT5000::def_bandwidth(int m)
 {
-	return FT5000_def_bw[val];
+	int bw = adjust_bandwidth(m);
+	if (useB) {
+		if (mode_bwB[m] == -1)
+			mode_bwB[m] = bw;
+		return mode_bwB[m];
+	}
+	if (mode_bwA[m] == -1)
+		mode_bwA[m] = bw;
+	return mode_bwA[m];
 }
 
 const char ** RIG_FT5000::bwtable(int n)
@@ -720,7 +770,9 @@ int RIG_FT5000::get_modeA()
 {
 	cmd = rsp = "MD0";
 	cmd += ';';
-	waitN(5, 100, "get mode A", ASC);
+	wait_char(';', 5, 100, "get mode A", ASC);
+
+	rig_trace(2, "get_modeA()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p != string::npos) {
@@ -759,7 +811,9 @@ int RIG_FT5000::get_modeB()
 {
 	cmd = rsp = "MD0";
 	cmd += ';';
-	waitN(5, 100, "get mode B", ASC);
+	wait_char(';', 5, 100, "get mode B", ASC);
+
+	rig_trace(2, "get_modeB()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p != string::npos) {
@@ -780,6 +834,7 @@ void RIG_FT5000::set_bwA(int val)
 	bwA = val;
 
 	if (modeA == mFM || modeA == mAM || modeA == mFM_N || modeA == mPKT_FM ) {
+		mode_bwA[modeA] = val;
 		return;
 	}
 	if ((((modeA == mLSB || modeA == mUSB)  && val < 8)) ||
@@ -793,6 +848,7 @@ void RIG_FT5000::set_bwA(int val)
 	cmd += '0' + bw_indx % 10;
 	cmd += ';';
 	sendOK(cmd);
+	mode_bwA[modeA] = val;
 	showresp(WARN, ASC, "SET bw A", cmd, replystr);
 }
 
@@ -800,11 +856,14 @@ int RIG_FT5000::get_bwA()
 {
 	if (modeA == mFM || modeA == mAM || modeA == mFM_N || modeA == mPKT_FM) {
 		bwA = 0;
+		mode_bwA[modeA] = bwA;
 		return bwA;
 	}
 	cmd = rsp = "SH0";
 	cmd += ';';
-	waitN(6, 100, "get bw A", ASC);
+	wait_char(';', 6, 100, "get bw A", ASC);
+
+	rig_trace(2, "get_bwA()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return bwA;
@@ -821,6 +880,7 @@ int RIG_FT5000::get_bwA()
 	}
 	if (*idx == WVALS_LIMIT) i--;
 	bwA = i;
+	mode_bwA[modeA] = bwA;
 	return bwA;
 }
 
@@ -830,6 +890,7 @@ void RIG_FT5000::set_bwB(int val)
 	bwB = val;
 
 	if (modeB == mFM || modeB == mAM || modeB == mFM_N || modeB == mPKT_FM) {
+		mode_bwB[modeB] = val;
 		return;
 	}
 	if ((((modeB == mLSB || modeB == mUSB)  && val < 8)) ||
@@ -843,6 +904,7 @@ void RIG_FT5000::set_bwB(int val)
 	cmd += '0' + bw_indx % 10;
 	cmd += ';';
 	sendOK(cmd);
+	mode_bwB[modeB] = val;
 	showresp(WARN, ASC, "SET bw B", cmd, replystr);
 }
 
@@ -850,11 +912,14 @@ int RIG_FT5000::get_bwB()
 {
 	if (modeB == mFM || modeB == mAM || modeB == mFM_N || modeB == mPKT_FM) {
 		bwB = 0;
+		mode_bwB[modeB] = bwB;
 		return bwB;
 	}
 	cmd = rsp = "SH0";
 	cmd += ';';
-	waitN(6, 100, "get bw B", ASC);
+	wait_char(';', 6, 100, "get bw B", ASC);
+
+	rig_trace(2, "get_bwB()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return bwB;
@@ -871,7 +936,28 @@ int RIG_FT5000::get_bwB()
 	}
 	if (*idx == WVALS_LIMIT) i--;
 	bwB = i;
+	mode_bwB[modeB] = bwB;
 	return bwB;
+}
+
+std::string RIG_FT5000::get_BANDWIDTHS()
+{
+	stringstream s;
+	for (int i = 0; i < NUM_MODES; i++)
+		s << mode_bwA[i] << " ";
+	for (int i = 0; i < NUM_MODES; i++)
+		s << mode_bwB[i] << " ";
+	return s.str();
+}
+
+void RIG_FT5000::set_BANDWIDTHS(std::string s)
+{
+	stringstream strm;
+	strm << s;
+	for (int i = 0; i < NUM_MODES; i++)
+		strm >> mode_bwA[i];
+	for (int i = 0; i < NUM_MODES; i++)
+		strm >> mode_bwB[i];
 }
 
 int RIG_FT5000::get_modetype(int n)
@@ -898,7 +984,9 @@ bool RIG_FT5000::get_if_shift(int &val)
 {
 	cmd = rsp = "IS0";
 	cmd += ';';
-	waitN(9, 100, "get if shift", ASC);
+	wait_char(';', 9, 100, "get if shift", ASC);
+
+	rig_trace(2, "get_if_shift()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	val = progStatus.shift_val;
@@ -943,7 +1031,10 @@ bool  RIG_FT5000::get_notch(int &val)
 	bool ison = false;
 	cmd = rsp = "BP00";
 	cmd += ';';
-	waitN(8, 100, "get notch on/off", ASC);
+	wait_char(';', 8, 100, "get notch on/off", ASC);
+
+	rig_trace(2, "get_notch()", replystr.c_str());
+
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return ison;
 
@@ -953,7 +1044,10 @@ bool  RIG_FT5000::get_notch(int &val)
 	val = progStatus.notch_val;
 	cmd = rsp = "BP01";
 	cmd += ';';
-	waitN(8, 100, "get notch val", ASC);
+	wait_char(';', 8, 100, "get notch val", ASC);
+
+	rig_trace(2, "get_notch_val()", replystr.c_str());
+
 	p = replystr.rfind(rsp);
 	if (p == string::npos)
 		val = 10;
@@ -981,7 +1075,10 @@ void RIG_FT5000::set_auto_notch(int v)
 int  RIG_FT5000::get_auto_notch()
 {
 	cmd = "BC0;";
-	waitN(5, 100, "get auto notch", ASC);
+	wait_char(';', 5, 100, "get auto notch", ASC);
+
+	rig_trace(2, "get_auto_notch()", replystr.c_str());
+
 	size_t p = replystr.rfind("BC0");
 	if (p == string::npos) return 0;
 	if (replystr[p+3] == '1') return 1;
@@ -1012,7 +1109,9 @@ int RIG_FT5000::get_noise()
 {
 	cmd = rsp = "NB0";
 	cmd += ';';
-	waitN(5, 100, "get NB", ASC);
+	wait_char(';', 5, 100, "get NB", ASC);
+
+	rig_trace(2, "get_noise()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return FT5000_blanker_level;
@@ -1046,7 +1145,9 @@ int RIG_FT5000::get_mic_gain()
 {
 	cmd = rsp = "MG";
 	cmd += ';';
-	waitN(6, 100, "get mic", ASC);
+	wait_char(';', 6, 100, "get mic", ASC);
+
+	rig_trace(2, "get_mic_gain()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.mic_gain;
@@ -1064,7 +1165,7 @@ void RIG_FT5000::get_mic_min_max_step(int &min, int &max, int &step)
 void RIG_FT5000::set_rf_gain(int val)
 {
 	cmd = "RG0000;";
-	int rfval = val * 250 / 100;
+	int rfval = val * 255 / 100;
 	for (int i = 5; i > 2; i--) {
 		cmd[i] = rfval % 10 + '0';
 		rfval /= 10;
@@ -1078,7 +1179,9 @@ int  RIG_FT5000::get_rf_gain()
 	int rfval = 0;
 	cmd = rsp = "RG0";
 	cmd += ';';
-	waitN(7, 100, "get rfgain", ASC);
+	wait_char(';', 7, 100, "get rfgain", ASC);
+
+	rig_trace(2, "get_rf_gain()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.rfgain;
@@ -1086,7 +1189,7 @@ int  RIG_FT5000::get_rf_gain()
 		rfval *= 10;
 		rfval += replystr[p+i] - '0';
 	}
-	rfval = rfval * 100 / 250;
+	rfval = rfval * 100 / 255;
 	if (rfval > 100) rfval = 100;
 	return rfval;
 }

@@ -54,6 +54,13 @@ public:
 	void set_bwB(int val);
 	int  get_bwB();
 
+	int adjust_bandwidth(int);
+	int def_bandwidth(int);
+	const char ** bwtable(int);
+
+	void set_BANDWIDTHS(std::string s);
+	std::string get_BANDWIDTHS();
+
 	bool twovfos() {return true;}
 	bool can_split() {return true;}
 	void set_split(bool);
@@ -88,8 +95,6 @@ public:
 	void get_mic_min_max_step(int &min, int &max, int &step);
 	
 	void set_special(int v);
-
-	int  adjust_bandwidth(int m);
 
 	void set_vox_onoff();
 	void set_vox_gain();
