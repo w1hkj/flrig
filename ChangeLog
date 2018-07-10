@@ -1,8 +1,82 @@
 
 
-=Version 1.3.39=
+=Version 1.3.40=
 
-2018-02-08  David Freese  <w1hkj@bellsouth.net>
+2018-07-09  David Freese  <w1hkj@bellsouth.net>
+
+	d0e59a3: FT950 comp
+	35e4c75: NONE testing
+	17bb692: Yaesu mods
+	2a8249e: slider drag
+	1402141: IC PBT controls
+	bed34f2: KENWOOD vfoA/B split
+	b168de6: Send Command
+	e9fff86: tt550
+	8d515a4: Test Xcvr
+	991658c: ICOM transceivers
+	b7eaac2: UI init
+	e4b001f: modeA modeB
+	d380515: Documentation
+	94483a9: xml_server
+	d66b4b6: trace update
+
+2018-06-08  Sean Sharkey  <g0oan@icloud.com>
+
+	674134c: FT1000 update
+
+2018-05-12  David Freese  <w1hkj@bellsouth.net>
+
+	b8512d0: guard lock
+	f441895: KENWOOD base
+	e440c24: Trace
+	07b6621: ts2000 get split
+	d561ca0: TOD thread
+	9e05041: PTT on split
+	a3c1f86: TS2000 split
+	5de0c04: TS series A2B
+	dc0f217: Send command
+	afe64f4: ICOM A/B vfo handling
+	68fa0bf: xmlrpc split/swap/a2b
+	55284eb: fix tod clock
+	398522b: TS480
+	137c24a: PTT queue
+	efadab6: sizeof errors
+	dd5fb97: XMLRPC Select Vfo
+	22e2750: xmlrpc server
+	67d085f: TS480HX/SAT
+	e62b4a2: FT891 mods
+	b583d4b: Conditional trace
+	5abcd90: Warnings fixes
+	c054910: FT950 debug
+	4bf2ac6: Icom updates
+	2946e47: Vfo-B mode
+	8526ef2: Load prefs file
+	2d42c2f: Exit processing
+	a4f2190: appbundle
+	6360f33: Init no split
+	a00a7a6: xmlrpc method swap
+	24c4895: altvfo
+	ded9ad8: FT series vfo
+	f4d5f2e: Service queues
+	65fb95f: replystr mutex
+	6f770c0: ptt race / debug trace
+	f41e8a1: xmlrpc a/b vfo
+	a23d9fa: ICbase
+	8f4a204: Split operation
+
+2018-03-26  Michael Black  <mdblack98@yahoo.com>
+
+	7c88d0f: TT588
+
+2018-03-24  David Freese  <w1hkj@bellsouth.net>
+
+	bb31cf0: xmlrpc help
+	60dcf2e: xmlrpc swap/split
+	f6e55f7: Yaesu ID
+	47a8dc0: Mode change
+
+
+=Version 1.3.39=
 
 	fa86d2e: Memory delete
 	93e5e53: IC706MKG
