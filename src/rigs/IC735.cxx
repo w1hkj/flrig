@@ -81,7 +81,7 @@ bool RIG_IC735::check ()
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
-	bool ok = waitFOR(11, "check vfo");
+	bool ok = waitFOR(10, "check vfo");
 	rig_trace(2, "check()", str2hex(replystr.c_str(), replystr.length()));
 	return ok;
 }
