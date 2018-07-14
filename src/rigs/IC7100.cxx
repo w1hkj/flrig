@@ -432,9 +432,7 @@ void RIG_IC7100::set_modeA(int val)
 	cmd += '\x1A'; cmd += '\x06';
 	if (val >= LSBD7100) {
 		cmd += '\x01';
-		cmd += '\x01';
 	} else {
-		cmd += '\x00';
 		cmd += '\x00';
 	}
 	cmd += filA;
@@ -523,9 +521,7 @@ void RIG_IC7100::set_modeB(int val)
 	cmd += '\x1A'; cmd += '\x06';
 	if (val >= LSBD7100) {
 		cmd += '\x01';
-		cmd += '\x01';
 	} else {
-		cmd += '\x00';
 		cmd += '\x00';
 	}
 	cmd += filB;
