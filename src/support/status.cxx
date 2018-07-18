@@ -346,6 +346,8 @@ status progStatus = {
 
 	false,		// bool	trace;
 	false,		// bool	rigtrace;
+	false,		// bool	gettrace;
+	false,		// bool	settrace;
 	false,		// bool	debugtrace;
 	false,		// bool	xmltrace;
 	false,		// bool	rpctrace;
@@ -676,6 +678,8 @@ void status::saveLastState()
 
 	spref.set("trace", trace);
 	spref.set("rigtrace", rigtrace);
+	spref.set("gettrace", gettrace);
+	spref.set("settrace", settrace);
 	spref.set("debugtrace", debugtrace);
 	spref.set("xmltrace", xmltrace);
 	spref.set("rpctrace", rpctrace);
@@ -1046,6 +1050,8 @@ bool status::loadXcvrState(string xcvr)
 
 		if (spref.get("trace", i, trace)) trace = i;
 		if (spref.get("rigtrace", i, rigtrace)) rigtrace = i;
+		if (spref.get("gettrace", i, gettrace)) gettrace = i;
+		if (spref.get("settrace", i, settrace)) settrace = i;
 		if (spref.get("debugtrace", i, debugtrace)) debugtrace = i;
 		if (spref.get("xmltrace", i, xmltrace)) xmltrace = i;
 		if (spref.get("rpctrace", i, rpctrace)) rpctrace = i;

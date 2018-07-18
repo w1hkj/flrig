@@ -36,7 +36,6 @@ Fl_Menu_Item touch_menu[] = {
  {_("&Config"), 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Setup"), 0, 0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Transceiver"), 0,  (Fl_Callback*)cb_mnuConfigXcvr, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
-// {_("XmlRpc"), 0,  (Fl_Callback*)cb_mnuXMLRPC, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("tcpip"), 0, (Fl_Callback*)cb_mnuTCPIP, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("PTT"), 0, (Fl_Callback*)cb_mnuPTT, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("AUX"), 0, (Fl_Callback*)cb_mnuAUX, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
@@ -1680,6 +1679,10 @@ Fl_Double_Window* touch_rig_window() {
 	int menuH = 28;
 	Fl_Double_Window* w = new Fl_Double_Window(mainW, mainH, _("Flrig"));
 	w->align(Fl_Align(FL_ALIGN_CLIP|FL_ALIGN_INSIDE));
+
+	hidden_tabs = new Fl_Group(0,0,small_mainW, small_mainH);
+	hidden_tabs->hide();
+	hidden_tabs->end();
 
 	Fl_Group* grp_menu = new Fl_Group(0,0,mainW,30);
 

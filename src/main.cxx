@@ -83,7 +83,8 @@
 
 int parse_args(int argc, char **argv, int& idx);
 
-Fl_Double_Window *mainwindow;
+Fl_Double_Window *mainwindow = (Fl_Double_Window *)0;
+Fl_Double_Window *tabs_dialog = (Fl_Double_Window *)0;
 
 string HomeDir;
 string RigHomeDir;
@@ -267,8 +268,9 @@ void close_controls(void*)
 			mainwindow->size_range(735, 150, 0, 150);
 			break;
 		case small_ui :
-			if (EXPAND_CONTROLS && selrig->has_extras)
-				Fl::add_timeout(1.0, expand_controls);
+			if (tabs_dialog && tabs_dialog->visible()) tabs_dialog->hide();
+//			if (EXPAND_CONTROLS && selrig->has_extras)
+//				Fl::add_timeout(1.0, expand_controls);
 			break;
 		case touch_ui :
 		default :
@@ -297,8 +299,9 @@ void startup(void*)
 			mainwindow->redraw();
 		case small_ui :
 		default :
-			if (EXPAND_CONTROLS && selrig->has_extras)
-				show_controls();
+//			if (EXPAND_CONTROLS && selrig->has_extras)
+//				show_controls();
+				break;
 	}
 
 }
@@ -420,6 +423,8 @@ extern FILE *serlog;
 			break;
 		case small_ui :
 			mainwindow = Small_rig_window();
+			tabs_dialog = tabs_window();
+			tabs_dialog->hide();
 			break;
 		case wide_ui :
 		default :

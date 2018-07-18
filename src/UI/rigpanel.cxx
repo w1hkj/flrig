@@ -111,8 +111,13 @@ Fl_Group *grp_row2d = (Fl_Group *)0;
 Fl_Wheel_Value_Slider *sldrPOWER = (Fl_Wheel_Value_Slider *)0;
 Fl_Light_Button *btnVol = (Fl_Light_Button *)0;
 Fl_Wheel_Value_Slider *sldrVOLUME = (Fl_Wheel_Value_Slider *)0;
+
 Fl_Group *grpTABS = (Fl_Group *)0;
+
+Fl_Group *hidden_tabs = (Fl_Group *)0;
+
 Fl_Tabs *tabsGeneric=(Fl_Tabs *)0;
+
 Fl_Group *genericBands = (Fl_Group *)0;
 Fl_Button *btnBandSelect_1 = (Fl_Button *)0;
 Fl_Button *btnBandSelect_2 = (Fl_Button *)0;
@@ -126,9 +131,9 @@ Fl_Button *btnBandSelect_9 = (Fl_Button *)0;
 Fl_Button *btnBandSelect_10 = (Fl_Button *)0;
 Fl_Button *btnBandSelect_11 = (Fl_Button *)0;
 Fl_ComboBox *opSelect60 = (Fl_ComboBox *)0;
+
 Fl_Group *genericCW = (Fl_Group *)0;
 Fl_Light_Button *btnSpot = (Fl_Light_Button *)0;
-
 Hspinner *spnr_cw_spot_tone = (Hspinner *)0;
 Hspinner *spnr_cw_qsk = (Hspinner *)0;
 Hspinner *spnr_cw_weight = (Hspinner *)0;
@@ -138,7 +143,6 @@ Fl_Check_Button *btn_enable_keyer = (Fl_Check_Button *)0;
 Fl_Group *genericQSK = (Fl_Group *)0;
 Fl_Button *btnBreakIn = (Fl_Button *)0;
 Hspinner *spnr_cw_delay = (Hspinner *)0;
-Hspinner *cnt_cw_qsk = (Hspinner *)0;
 
 Fl_Group *genericVOX = (Fl_Group *)0;
 Hspinner *spnr_vox_gain = (Hspinner *)0;
@@ -146,9 +150,11 @@ Hspinner *spnr_anti_vox = (Hspinner *)0;
 Hspinner *spnr_vox_hang = (Hspinner *)0;
 Fl_Light_Button *btn_vox = (Fl_Light_Button *)0;
 Fl_Check_Button *btn_vox_on_dataport = (Fl_Check_Button *)0;
+
 Fl_Group *genericSpeech = (Fl_Group *)0;
 Fl_Light_Button *btnCompON = (Fl_Light_Button *)0;
 Hspinner *spnr_compression = (Hspinner *)0;
+
 Fl_Group *genericRx = (Fl_Group *)0;
 Fl_Wheel_Value_Slider *sldr_nb_level = (Fl_Wheel_Value_Slider *)0;
 //Fl_ComboBox *cbo_agc_level = (Fl_ComboBox *)0;

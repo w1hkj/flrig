@@ -1051,8 +1051,8 @@ void openMemoryDialog()
 
 void show_controls()
 {
-	if (!(selrig->has_extras || selrig->name_ == rig_TT550.name_) && 
-		progStatus.aux_serial_port == "NONE")
+	if (!(selrig->has_extras || selrig->name_ == rig_TT550.name_))
+//	 && progStatus.aux_serial_port == "NONE")
 		return;
 	int wh = mainwindow->h();
 	int ww = mainwindow->w();
@@ -1073,6 +1073,7 @@ void show_controls()
 				mainwindow->size(ww, wh);
 				mainwindow->size_range(735, wh, 0, wh);
 			}
+			mainwindow->redraw();
 			break;
 		case touch_ui : 
 			if (selrig->name_ == rig_TT550.name_) {
@@ -1084,49 +1085,26 @@ void show_controls()
 			}
 			tabs550->redraw();
 			tabsGeneric->redraw();
+			mainwindow->redraw();
 			break;
 		case small_ui :
-			{
 			if (selrig->name_ == rig_TT550.name_) {
 				tabsGeneric->hide();
-				if (tabs550->visible()) {
-					tabs550->hide();
-					btn_show_controls->label("@-22->");
-					btn_show_controls->redraw_label();
-					wh -= 70;
-					mainwindow->size( ww, wh);
-				} else {
-					tabs550->show();
-					btn_show_controls->label("@-28->");
-					btn_show_controls->redraw_label();
-					wh += 70;
-					mainwindow->size( ww, wh);
-				}
+				tabs550->show();
 			} else {
 				tabs550->hide();
-				if (tabsGeneric->visible()) {
-					tabsGeneric->hide();
-					btn_show_controls->label("@-22->");
-					btn_show_controls->redraw_label();
-					wh -= 70;
-					mainwindow->size( ww, wh);
-					mainwindow->size_range(ww, wh, ww, wh);
-				} else {
-					tabsGeneric->show();
-					btn_show_controls->label("@-28->");
-					btn_show_controls->redraw_label();
-					wh += 70;
-					mainwindow->size( ww, wh);
-					mainwindow->size_range(ww, wh, ww, wh);
-				}
+				tabsGeneric->show();
 			}
-		}
-			grpTABS->show();
+			if (tabs_dialog->visible())
+				tabs_dialog->hide();
+			else {
+				tabs_dialog->position(mainwindow->x(), mainwindow->y() + mainwindow->h() + 26);
+				tabs_dialog->show();
+			}
 			break;
 		default :
 			break;
 	}
-	mainwindow->redraw();
 }
 
 // a replica of the default color map used by Fltk
@@ -1426,14 +1404,16 @@ void cb_send_command(string command, Fl_Output *resp)
 	guard_lock lock2(&mutex_serial);
 
 	sendCommand(cmd, 0);//cmd.length());
+	set_trace(2, "command: ", command.c_str());
 	waitResponse(100);
 
+	std::string retstr = usehex ? 
+		str2hex(respstr.c_str(), respstr.length()) :
+		respstr;
+	set_trace(2, "response: ", retstr.c_str());
+
 	if (resp) {
-		resp->value(
-			usehex ? str2hex(
-				respstr.c_str(),
-				respstr.length()) :
-			respstr.c_str() );
+		resp->value(retstr.c_str());
 		resp->redraw();
 	}
 }

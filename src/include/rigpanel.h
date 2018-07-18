@@ -65,6 +65,7 @@ extern Fl_Double_Window* Memory_Dialog();
 extern Fl_Double_Window* Wide_rig_window();
 extern Fl_Double_Window* Small_rig_window();
 extern Fl_Double_Window* touch_rig_window();
+extern Fl_Double_Window* tabs_window();
 
 extern void select_power_meter_scales();
 
@@ -156,6 +157,7 @@ extern Fl_Wheel_Value_Slider *sldrVOLUME;
 extern Fl_Group *grpTABS;
 
 extern Fl_Tabs *tabsGeneric;
+extern Fl_Group *hidden_tabs;
 extern Fl_Group *genericBands;
 extern Fl_Button *btnBandSelect_1;
 extern Fl_Button *btnBandSelect_2;

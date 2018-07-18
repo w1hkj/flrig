@@ -119,6 +119,8 @@ Fl_Group *tabTRACE = (Fl_Group *)0;
 Fl_Check_Button *btn_trace = (Fl_Check_Button *)0;
 Fl_Check_Button *btn_xmltrace = (Fl_Check_Button *)0;
 Fl_Check_Button *btn_rigtrace = (Fl_Check_Button *)0;
+Fl_Check_Button *btn_gettrace = (Fl_Check_Button *)0;
+Fl_Check_Button *btn_settrace = (Fl_Check_Button *)0;
 Fl_Check_Button *btn_debugtrace = (Fl_Check_Button *)0;
 Fl_Check_Button *btn_rpctrace = (Fl_Check_Button *)0;
 Fl_ComboBox *selectlevel = (Fl_ComboBox *)0;
@@ -176,6 +178,14 @@ static void cb_btn_trace(Fl_Check_Button *, void *) {
 
 static void cb_btn_rigtrace(Fl_Check_Button *, void *) {
 	progStatus.rigtrace = btn_rigtrace->value();
+}
+
+static void cb_btn_gettrace(Fl_Check_Button *, void *) {
+	progStatus.gettrace = btn_gettrace->value();
+}
+
+static void cb_btn_settrace(Fl_Check_Button *, void *) {
+	progStatus.settrace = btn_settrace->value();
 }
 
 static void cb_btn_xmltrace(Fl_Check_Button *, void *) {
@@ -1030,12 +1040,12 @@ Fl_Double_Window* w = new Fl_Double_Window(490, 255, _("Configuration"));
 
 	tabTRACE = new Fl_Group(2, 26, 486, 226, _("Trace"));
 		tabTRACE->hide();
-		btn_trace = new Fl_Check_Button(10, 44, 80, 20, _("Trace support code"));
+		btn_trace = new Fl_Check_Button(10, 40, 80, 20, _("Trace support code"));
 		btn_trace->value(progStatus.trace);
 		btn_trace->callback((Fl_Callback*)cb_btn_trace);
 		btn_trace->tooltip(_("Enable trace support"));
 
-		btn_debugtrace = new Fl_Check_Button(10, 68, 80, 20, _("Trace debug code"));
+		btn_debugtrace = new Fl_Check_Button(10, 65, 80, 20, _("Trace debug code"));
 		btn_debugtrace->value(progStatus.debugtrace);
 		btn_debugtrace->callback((Fl_Callback*)cb_btn_debugtrace);
 		btn_debugtrace->tooltip(_("Display debug output on trace view"));
@@ -1045,17 +1055,27 @@ Fl_Double_Window* w = new Fl_Double_Window(490, 255, _("Configuration"));
 		btn_rigtrace->callback((Fl_Callback*)cb_btn_rigtrace);
 		btn_rigtrace->tooltip(_("Enable trace of rig methods"));
 
-		btn_xmltrace = new Fl_Check_Button(10, 114, 80, 20, _("Trace xml_server code"));
+		btn_gettrace = new Fl_Check_Button(10, 115, 80, 20, _("Trace rig class get code"));
+		btn_gettrace->value(progStatus.gettrace);
+		btn_gettrace->callback((Fl_Callback*)cb_btn_gettrace);
+		btn_gettrace->tooltip(_("Enable trace of rig get methods"));
+
+		btn_settrace = new Fl_Check_Button(10, 140, 80, 20, _("Trace rig class set code"));
+		btn_settrace->value(progStatus.settrace);
+		btn_settrace->callback((Fl_Callback*)cb_btn_settrace);
+		btn_settrace->tooltip(_("Enable trace of rig set methods"));
+
+		btn_xmltrace = new Fl_Check_Button(10, 165, 80, 20, _("Trace xml_server code"));
 		btn_xmltrace->value(progStatus.xmltrace);
 		btn_xmltrace->callback((Fl_Callback*)cb_btn_xmltrace);
 		btn_xmltrace->tooltip(_("Enable trace of xmlrpc functions"));
 
-		btn_rpctrace = new Fl_Check_Button(10, 138, 80, 20, _("Trace xmlrpcpp code"));
+		btn_rpctrace = new Fl_Check_Button(10, 190, 80, 20, _("Trace xmlrpcpp code"));
 		btn_rpctrace->value(progStatus.rpctrace);
 		btn_rpctrace->callback((Fl_Callback*)cb_btn_rpctrace);
 		btn_rpctrace->tooltip(_("Enable trace of XmlRpc methods"));
 
-		selectlevel = new Fl_ComboBox(30, 158, 80, 20, _("XmlRpc trace level"));
+		selectlevel = new Fl_ComboBox(30, 215, 80, 20, _("XmlRpc trace level"));
 		selectlevel->add("0|1|2|3|4|5");
 		selectlevel->align(FL_ALIGN_RIGHT);
 		selectlevel->index(progStatus.rpc_level);

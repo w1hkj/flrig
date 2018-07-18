@@ -335,6 +335,8 @@ struct status {
 
 	bool	trace;
 	bool	rigtrace;
+	bool	settrace;
+	bool	gettrace;
 	bool	debugtrace;
 	bool	xmltrace;
 	bool	rpctrace;

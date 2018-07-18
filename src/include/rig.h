@@ -50,6 +50,7 @@
 //#include "xml_io.h"
 
 extern Fl_Double_Window *mainwindow;
+extern Fl_Double_Window *tabs_dialog;
 extern string HomeDir;
 extern string RigHomeDir;
 extern string TempDir;
