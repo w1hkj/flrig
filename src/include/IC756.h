@@ -130,8 +130,25 @@ public:
 	int  adjust_bandwidth(int);
 	int  def_bandwidth(int);
 
+	void set_vox_onoff();
+
+	void set_compression(int, int);
+	void get_compression(int &on, int &val);
+	void get_comp_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 10; step = 1; }
+
 	void set_auto_notch(int v);
 	int  get_auto_notch();
+
+	void set_cw_wpm();
+	void get_cw_wpm_min_max(int &min, int &max);
+
+	void enable_break_in();
+	void set_cw_qsk();
+	void get_cw_qsk_min_max_step(double &min, double &max, double &step);
+
+	void set_cw_spot_tone();
+	void get_cw_spot_tone_min_max_step(int &min, int &max, int &step);
 
 	bool twovfos() { return false; }
 

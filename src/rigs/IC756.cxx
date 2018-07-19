@@ -1,4 +1,4 @@
-// ----------------------------------------------------------------------------
+// ---------------------------------------------------------------------
 // Copyright (C) 2014
 //              David Freese, W1HKJ
 //
@@ -16,7 +16,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-// ----------------------------------------------------------------------------
+// ---------------------------------------------------------------------
 
 #include <string>
 #include <sstream>
@@ -24,9 +24,15 @@
 #include "debug.h"
 #include "support.h"
 
-//=============================================================================
+//======================================================================
+static inline void minmax(int min, int max, int &val)
+{
+	if (val > max) val = max;
+	if (val < min) val = min;
+}
+//======================================================================
 // 756
-//=============================================================================
+//======================================================================
 #include "IC756.h"
 
 const char IC756name_[] = "IC-756";
@@ -287,6 +293,15 @@ RIG_IC756PRO::RIG_IC756PRO() {
 	has_rf_control = true;
 	has_a2b = true;
 	has_FILTER = true;
+
+	has_compON = true;
+	has_compression = true;
+	has_vox_onoff = true;
+
+	has_cw_wpm = true;
+	has_cw_spot_tone = true;
+	has_cw_qsk = true;
+	has_cw_break_in = true;
 
 	ICOMmainsub = true;
 
@@ -1197,6 +1212,133 @@ std::string RIG_IC756PRO::get_FILTERS()
 	for (int i = 0; i < NUM_MODES; i++)
 		s << mode_filterB[i] << " ";
 	return s.str();
+}
+
+// CW methods
+
+void RIG_IC756PRO::get_cw_wpm_min_max(int &min, int &max)
+{
+	min = 6; max = 48;
+}
+
+void RIG_IC756PRO::set_cw_wpm()
+{
+	int iwpm = round((progStatus.cw_wpm - 6) * 255 / 42 + 0.5);
+	minmax(0, 255, iwpm);
+
+	cmd.assign(pre_to).append("\x14\x0C");
+	cmd.append(to_bcd(iwpm, 3));
+	cmd.append( post );
+	waitFB("SET cw wpm");
+}
+
+void RIG_IC756PRO::enable_break_in()
+{
+	cmd.assign(pre_to).append("\x16\x47");
+
+	switch (progStatus.break_in) {
+		case 1: cmd += '\x01'; break_in_label("SEMI");  break;
+		case 0:
+		default: cmd += '\x00'; break_in_label("BK-IN");
+	}
+	cmd.append(post);
+	waitFB("SET break-in");
+}
+
+void RIG_IC756PRO::get_cw_qsk_min_max_step(double &min, double &max, double &step)
+{
+	min = 2.0; max = 13.0; step = 0.1;
+}
+
+void RIG_IC756PRO::set_cw_qsk()
+{
+	int qsk = round ((progStatus.cw_qsk - 2.0) * 255.0 / 11.0 + 0.5);
+	minmax(0, 255, qsk);
+
+	cmd.assign(pre_to).append("\x14\x0F");
+	cmd.append(to_bcd(qsk, 3));
+	cmd.append(post);
+	waitFB("Set cw qsk delay");
+}
+
+void RIG_IC756PRO::get_cw_spot_tone_min_max_step(int &min, int &max, int &step)
+{
+	min = 300; max = 900; step = 5;
+}
+
+void RIG_IC756PRO::set_cw_spot_tone()
+{
+	cmd.assign(pre_to).append("\x14\x09"); // values 0=300Hz 255=900Hz
+	int n = round((progStatus.cw_spot_tone - 300) * 255.0 / 600.0 + 0.5);
+	minmax(0, 255, n);
+
+	cmd.append(to_bcd(n, 3));
+	cmd.append( post );
+	waitFB("SET cw spot tone");
+}
+
+static int comp_level[] = {11,34,58,81,104,128,151,174,197,221,244};
+void RIG_IC756PRO::set_compression(int on, int val)
+{
+	cmd = pre_to;
+	cmd.append("\x16\x44");
+	if (on) cmd += '\x01';
+	else cmd += '\x00';
+	cmd.append(post);
+	waitFB("set Comp ON/OFF");
+
+	if (val < 0) return;
+	if (val > 10) return;
+
+	cmd.assign(pre_to).append("\x14\x0E");
+	cmd.append(to_bcd(comp_level[val], 3));
+	cmd.append( post );
+	waitFB("set comp");
+}
+
+void RIG_IC756PRO::get_compression(int &on, int &val)
+{
+	std::string resp;
+
+	cmd.assign(pre_to).append("\x16\x44").append(post);
+
+	resp.assign(pre_fm).append("\x16\x44");
+
+	if (waitFOR(8, "get comp on/off")) {
+		size_t p = replystr.find(resp);
+		if (p != string::npos)
+			on = (replystr[p+6] == 0x01);
+	}
+
+	cmd.assign(pre_to).append("\x14\x0E").append(post);
+	resp.assign(pre_fm).append("\x14\x0E");
+
+	if (waitFOR(9, "get comp level")) {
+		size_t p = replystr.find(resp);
+		int level = 0;
+		if (p != string::npos) {
+			level = fm_bcd(replystr.substr(p+6), 3);
+			for (val = 0; val < 11; val++)
+				if (level <= comp_level[val]) break;
+		}
+	}
+}
+
+void RIG_IC756PRO::set_vox_onoff()
+{
+	if (progStatus.vox_onoff) {
+		cmd = pre_to;
+		cmd.append("\x16\x46");
+		cmd += '\x01';
+		cmd.append(post);
+		waitFB("set Vox ON");
+	} else {
+		cmd = pre_to;
+		cmd.append("\x16\x46");
+		cmd += '\x00';
+		cmd.append(post);
+		waitFB("set Vox OFF");
+	}
 }
 
 // these are only defined in this file
