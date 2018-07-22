@@ -356,7 +356,7 @@ static void cb_btndtrplus(Fl_Check_Button*, void*) {
 //}
 
 static void cb_txtCIV(Fl_Int_Input* o, void*) {
-	progStatus.CIV = atol(o->value());
+//	progStatus.CIV = atol(o->value());
 	cbCIV();
 }
 

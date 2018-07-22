@@ -3959,6 +3959,7 @@ void initTabs()
 		poll_split->activate(); poll_split->value(progStatus.poll_split);
 		poll_noise->activate(); poll_noise->value(progStatus.poll_noise);
 		poll_nr->activate(); poll_nr->value(progStatus.poll_nr);
+		poll_compression->activate(); poll_compression->value(progStatus.poll_compression);
 
 		if (!selrig->has_bandwidth_control) { poll_bandwidth->deactivate(); poll_bandwidth->value(0); }
 		if (!selrig->has_smeter) { poll_smeter->deactivate(); poll_smeter->value(0); }
@@ -3985,6 +3986,7 @@ void initTabs()
 		if (!selrig->has_split) { poll_split->deactivate(); poll_split->value(0); }
 		if (!selrig->has_noise_control) {poll_noise->deactivate(); poll_noise->value(0);}
 		if (!selrig->has_noise_reduction) {poll_nr->deactivate(); poll_nr->value(0);}
+		if (!selrig->has_compression) { poll_compression->deactivate(); poll_compression->value(0); }
 
 	}
 
@@ -4956,7 +4958,7 @@ void init_CIV()
 {
 	if (selrig->CIV) {
 		char hexstr[8];
-		snprintf(hexstr, sizeof(hexstr), "0x%2X", selrig->CIV);
+		snprintf(hexstr, sizeof(hexstr), "0x%02X", selrig->CIV);
 		txtCIV->value(hexstr);
 		txtCIV->activate();
 		btnCIVdefault->activate();
@@ -5312,9 +5314,9 @@ void initConfigDialog()
 		btnrtsplus->value( srig->comm_rtsplus );
 		btndtrplus->value( srig->comm_dtrplus );
 
-		if (xcvr_name.find("IC") == 0) {
+		if (selrig->CIV) {
 			char hexstr[8];
-			snprintf(hexstr, sizeof(hexstr), "0x%2X", srig->CIV);
+			snprintf(hexstr, sizeof(hexstr), "0x%02X", srig->CIV);
 			txtCIV->value(hexstr);
 			txtCIV->activate();
 			btnCIVdefault->activate();

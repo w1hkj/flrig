@@ -331,7 +331,7 @@ void cbCIVdefault()
 	char hexstr[8];
 	int picked = selectRig->index();
 	rigbase *srig = rigs[picked];
-	snprintf(hexstr, sizeof(hexstr), "0x%2X", srig->defaultCIV);
+	snprintf(hexstr, sizeof(hexstr), "0x%02X", srig->defaultCIV);
 	txtCIV->value(hexstr);
 	progStatus.CIV = srig->defaultCIV;
 	srig->adjustCIV(progStatus.CIV);
@@ -359,9 +359,9 @@ void configXcvr()
 	selectAuxPort->value(progStatus.aux_serial_port.c_str());
 	selectSepPTTPort->value(progStatus.sep_serial_port.c_str());
 
-	if (xcvr_name.find("IC") == 0) {
+	if (selrig->CIV) {
 		char hexstr[8];
-		snprintf(hexstr, sizeof(hexstr), "0x%2X", selrig->CIV);
+		snprintf(hexstr, sizeof(hexstr), "0x%02X", selrig->CIV);
 		txtCIV->value(hexstr);
 		txtCIV->activate();
 		btnCIVdefault->activate();
