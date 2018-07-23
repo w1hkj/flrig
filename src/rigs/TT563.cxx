@@ -36,6 +36,7 @@ RIG_TT563::RIG_TT563() {
 	modes_ = RIG_TT563modes_;
 	bandwidths_ = RIG_TT563widths;
 	bw_vals_ = TT563_bw_vals;
+
 	comm_baudrate = BR9600;
 	stopbits = 1;
 	comm_retries = 2;
@@ -48,55 +49,187 @@ RIG_TT563::RIG_TT563() {
 	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
-	modeA = 1;
-	bwA = 0;
 
-	def_mode = modeB = modeA = 1;
-	def_bw = bwB = bwA = 1;
-	def_freq = freqB = freqA = 14070000;
+	def_freq = A.freq = 14070000;
+	def_mode = A.imode = 1;
+	def_bw = A.iBW = 1;
+
+	B.freq = 7070000;
+	B.imode = 1;
+	B.iBW = 1;
 
 	has_mode_control = true;
 	has_ptt_control = true;
 
-	pre_to[2] = ok[3] = bad[3] = pre_fm[3] = 0x04;
+	has_a2b = true;
+	has_getvfoAorB = true;
+	has_split_AB = true;
+
+	defaultCIV = 0x04;
+	adjustCIV(defaultCIV);
 
 	precision = 10;
 	ndigits = 7;
 
 };
 
+void RIG_TT563::selectA()
+{
+	cmd = pre_to;
+	cmd += '\x07';
+	cmd += '\x00';
+	cmd.append(post);
+	set_trace(2, "selectA()", str2hex(cmd.c_str(), cmd.length()));
+	waitFB("select A");
+	inuse = onA;
+}
+
+void RIG_TT563::selectB()
+{
+	cmd = pre_to;
+	cmd += '\x07';
+	cmd += '\x01';
+	cmd.append(post);
+	set_trace(2, "selectB()", str2hex(cmd.c_str(), cmd.length()));
+	waitFB("select B");
+	inuse = onB;
+}
+
+void RIG_TT563::swapAB()
+{
+	cmd = pre_to;
+	cmd += 0x07;
+	cmd += 0xB0;
+	cmd.append(post);
+
+	set_trace(2, "swapAB()", str2hex(cmd.c_str(), cmd.length()));
+	waitFB("swapAB()");
+}
+
+void RIG_TT563::A2B()
+{
+	cmd = pre_to;
+	cmd += 0x07;
+	cmd += 0xA0;
+	cmd.append(post);
+
+	set_trace(2, "A2B()", str2hex(cmd.c_str(), cmd.length()));
+	waitFB("A2B()");
+}
+
+bool RIG_TT563::can_split()
+{
+	return true;
+}
+
+void RIG_TT563::set_split(bool val)
+{
+	split = val;
+	cmd = pre_to;
+	cmd += 0x0F;
+	cmd += val ? 0x01 : 0x00;
+	cmd.append(post);
+	waitFB(val ? "set_split(ON)" : "set_split(OFF)");
+	set_trace(2, 
+		(val ? "set_split(ON)" : "set_split(OFF)"), 
+		str2hex(replystr.c_str(), replystr.length()));
+}
+
+// 7200 does not respond to get split CAT command
+int RIG_TT563::get_split()
+{
+	return split;
+}
+
 bool RIG_TT563::check ()
 {
+	string resp = pre_fm;
+	resp += '\x03';
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
-	int ret = sendCommand(cmd);
-	if (ret < 11) return false;
-	return true;
+	bool ok = waitFOR(11, "check vfo");
+	get_trace(2, "check()", str2hex(replystr.c_str(), replystr.length()));
+	return ok;
 }
 
 long RIG_TT563::get_vfoA ()
 {
+	if (useB) return A.freq;
+	string resp = pre_fm;
+	resp += '\x03';
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
-	int ret = sendCommand(cmd);
-	if (ret >= 11) {
-		freqA = fm_bcd_be(replystr.substr(ret - 11 + 5), 10);
+	if (waitFOR(11, "get vfo A")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
-	return freqA;
+	get_trace(2, "get_vfoA()", str2hex(replystr.c_str(), replystr.length()));
+	return A.freq;
 }
 
 void RIG_TT563::set_vfoA (long freq)
 {
-	freqA = freq;
+	A.freq = freq;
 	cmd = pre_to;
 	cmd += '\x05';
-	cmd.append( to_bcd_be( freq, 8 ) );
+	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append( post );
-	sendCommand(cmd);
-	checkresponse();
+	set_trace(2, "set_vfoA()", str2hex(cmd.c_str(), cmd.length()));
+	waitFB("set vfo A");
 }
+
+long RIG_TT563::get_vfoB ()
+{
+	if (!useB) return B.freq;
+	string resp = pre_fm;
+	resp += '\x03';
+	cmd = pre_to;
+	cmd += '\x03';
+	cmd.append( post );
+	if (waitFOR(11, "get vfo B")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
+	}
+	get_trace(2, "get_vfoB()", str2hex(replystr.c_str(), replystr.length()));
+	return B.freq;
+}
+
+void RIG_TT563::set_vfoB (long freq)
+{
+	B.freq = freq;
+	cmd = pre_to;
+	cmd += '\x05';
+	cmd.append( to_bcd_be( freq, 10 ) );
+	cmd.append( post );
+	set_trace(2, "set_vfoB()", str2hex(cmd.c_str(), cmd.length()));
+	waitFB("set vfo B");
+}
+
+int  RIG_TT563::get_vfoAorB()
+{
+	int ret = useB;
+	cmd = pre_to;
+	cmd += '\x17';
+	cmd.append(post);
+
+	string resp = pre_fm;
+	resp += '\x17';
+
+	if (waitFOR(6, "get_PTT()")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			ret = ((replystr[p+4] & 0x02) == 0x02);
+		}
+	}
+
+	get_trace(2, "get_vfoAorB()", str2hex(replystr.c_str(), replystr.length()));
+	return ret;
+}
+
 
 void RIG_TT563::set_PTT_control(int val)
 {
@@ -105,18 +238,41 @@ void RIG_TT563::set_PTT_control(int val)
 	cmd += val ? '\x01' : '\x02';
 	cmd.append( post );
 	sendCommand(cmd);
-	checkresponse();
+	set_trace(2, "set_PTT_control()", str2hex(cmd.c_str(), cmd.length()));
+	waitFB("set_PTT_control()");
+}
+
+int RIG_TT563::get_PTT()
+{
+	int ret = false;
+	cmd = pre_to;
+	cmd += '\x17';
+	cmd.append(post);
+
+	string resp = pre_fm;
+	resp += '\x17';
+
+	if (waitFOR(6, "get_PTT()")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			ret = ((replystr[p+4] & 0x04) == 0x04);
+		}
+	}
+
+	get_trace(2, "get_PTT()", str2hex(replystr.c_str(), replystr.length()));
+	return ret;
 }
 
 void RIG_TT563::set_modeA(int md)
 {
-	modeA = md;
+	A.imode = md;
 	cmd = pre_to;
 	cmd += '\x06';
-	cmd += modeA;
+	cmd += A.imode;
 	cmd.append(post);
 	sendCommand(cmd);
-	checkresponse();
+	set_trace(2, "set_modeA()", str2hex(cmd.c_str(), cmd.length()));
+	waitFB("set_modeA()");
 }
 
 int RIG_TT563::get_modeA()
@@ -124,12 +280,49 @@ int RIG_TT563::get_modeA()
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
-	int ret = sendCommand(cmd);
-	if (ret >= 8) {
-		modeA = replystr[ret - 8 + 5];
-		bwA = replystr[ret - 8 + 6];
+
+	string resp = pre_fm;
+	resp += '\x04';
+
+	if (waitFOR(7, "get modeA")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			A.imode = replystr[p+5];
+		}
 	}
-	return modeA;
+	get_trace(2, "get_modeA()", str2hex(replystr.c_str(), replystr.length()));
+	return A.imode;
+}
+
+void RIG_TT563::set_modeB(int md)
+{
+	B.imode = md;
+	cmd = pre_to;
+	cmd += '\x06';
+	cmd += B.imode;
+	cmd.append(post);
+	sendCommand(cmd);
+	set_trace(2, "set_modeB()", str2hex(cmd.c_str(), cmd.length()));
+	waitFB("set_modeB()");
+}
+
+int RIG_TT563::get_modeB()
+{
+	cmd = pre_to;
+	cmd += '\x04';
+	cmd.append(post);
+
+	string resp = pre_fm;
+	resp += '\x04';
+
+	if (waitFOR(7, "get mode")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			B.imode = replystr[p+5];
+		}
+	}
+	get_trace(2, "get_modeB()", str2hex(replystr.c_str(), replystr.length()));
+	return B.imode;
 }
 
 int RIG_TT563::get_modetype(int n)

@@ -30,11 +30,35 @@ public:
 
 	bool check();
 
+	void selectA();
+	void selectB();
+
 	long get_vfoA();
 	void set_vfoA(long);
+
+	long get_vfoB();
+	void set_vfoB(long);
+
+	bool  canswap() { return true; }
+
+	void swapAB();
+	void A2B();
+
+	int  get_vfoAorB();
+
+	void set_split(bool);
+	int  get_split();
+	bool can_split();
+
 	void set_PTT_control(int val);
+	int  get_PTT();
+
 	void set_modeA(int val);
 	int  get_modeA();
+
+	void set_modeB(int val);
+	int  get_modeB();
+
 	int  get_modetype(int n);
 
 	int  adjust_bandwidth(int m) { return 1; }
