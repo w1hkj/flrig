@@ -172,6 +172,12 @@ status progStatus = {
 	5,			// int pwr_peak;
 	4,			// int pwr_scale ==> Autoselect
 
+// ic7610 special controls
+	false,		// bool	digi_sel_on_off;
+	0,			// int	digi_sel_val;
+	6,			// int	ic7610att;
+	0,			// bool	dual_watch;
+
 //ft950 reversed RF gain values
 	false,		// bool ft950_rg_reverse
 
@@ -490,6 +496,11 @@ void status::saveLastState()
 	spref.set("pwr_avg", pwr_avg);
 	spref.set("pwr_peak", pwr_peak);
 	spref.set("pwr_scale", pwr_scale);
+
+	spref.set("digi_sel_on_off", digi_sel_on_off);
+	spref.set("digi_sel_val", digi_sel_val);
+	spref.set("dual_watch", dual_watch);
+	spref.set("ic7610att", index_ic7610att);
 
 	spref.set("ft950_rg_reverse", ft950_rg_reverse);
 
@@ -841,6 +852,12 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("pwr_peak", pwr_peak, pwr_peak);
 		spref.get("pwr_scale", pwr_scale, pwr_scale);
 
+		if (spref.get("digi_sel_on_off", i, i)) digi_sel_on_off = i;
+		spref.get("digi_sel_val", digi_sel_val, digi_sel_val);
+
+		if (spref.get("dual_watch", i, i)) dual_watch = i;
+		spref.get("ic7610att", index_ic7610att, index_ic7610att);
+
 		if (spref.get("ft950_rg_reverse", i, i)) ft950_rg_reverse = i;
 
 		if (selrig->name_ == rig_TT550.name_) {
@@ -1169,6 +1186,16 @@ void status::UI_laststate()
 	if (sldrMICGAIN)		sldrMICGAIN->selection_color(btn_slider);
 	if (sldrPOWER)			sldrPOWER->color(bg_slider);
 	if (sldrPOWER)			sldrPOWER->selection_color(btn_slider);
+
+	if (ic7610_digi_sel_val) {
+		ic7610_digi_sel_val->color(bg_slider);
+		ic7610_digi_sel_val->selection_color(btn_slider);
+	}
+
+	if (sldr_nb_level) {
+		sldr_nb_level->color(bg_slider);
+		sldr_nb_level->selection_color(btn_slider);
+	}
 
 	if (spnrPOWER)			spnrPOWER->color(bg_slider);
 	if (spnrPOWER)			spnrPOWER->selection_color(btn_slider);

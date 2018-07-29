@@ -1263,7 +1263,40 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 
 			genericUser->end();
 
+			tab7610 = new Fl_Group(xpos, ypos+tabh, W, tabb, _("IC7610"));
+				ic7610att = new Fl_ComboBox(5, by, 120, 50, "Att level");
+				ic7610att->add("OFF|3db|6db|9db|12db|15db|18db|21db|24db|27db|30db|33db|36db|39db|42db|45db|");
+				ic7610att->align(FL_ALIGN_RIGHT);
+				ic7610att->index(progStatus.index_ic7610att);
+				ic7610att->callback((Fl_Callback *)cb_ic7610_att);
 
+				ic7610dual_watch = new Fl_Light_Button(210, by, 100, 50, "Dual Watch");
+				ic7610dual_watch->value(progStatus.dual_watch);
+				ic7610dual_watch->callback((Fl_Callback *)cb_dual_watch);
+
+				ic7610digi_sel_on_off = new Fl_Light_Button(320, by, 100, 50, "Digi-Sel");
+				ic7610digi_sel_on_off->value(progStatus.digi_sel_on_off);
+				ic7610digi_sel_on_off->callback((Fl_Callback *)cb_digi_sel_on_off);
+
+				ic7610_digi_sel_val = new Fl_Wheel_Value_Slider(430, by, W - 440, 50, "");
+				ic7610_digi_sel_val->tooltip(_("Digi-Sel value"));
+				ic7610_digi_sel_val->type(5);
+				ic7610_digi_sel_val->box(FL_THIN_DOWN_BOX);
+				ic7610_digi_sel_val->color(FL_BACKGROUND_COLOR);
+				ic7610_digi_sel_val->selection_color(FL_BACKGROUND_COLOR);
+				ic7610_digi_sel_val->labeltype(FL_NORMAL_LABEL);
+				ic7610_digi_sel_val->labelfont(0);
+				ic7610_digi_sel_val->labelsize(14);
+				ic7610_digi_sel_val->labelcolor(FL_FOREGROUND_COLOR);
+				ic7610_digi_sel_val->minimum(0);
+				ic7610_digi_sel_val->maximum(255);
+				ic7610_digi_sel_val->step(1);
+				ic7610_digi_sel_val->callback((Fl_Callback*)cb_digi_sel_val);
+				ic7610_digi_sel_val->align(Fl_Align(FL_ALIGN_BOTTOM));
+				ic7610_digi_sel_val->when(FL_WHEN_CHANGED);
+				ic7610_digi_sel_val->value(progStatus.digi_sel_val);
+
+			tab7610->end();
 		tabsGeneric->end();
 
 		xpos = X;

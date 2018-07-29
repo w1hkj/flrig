@@ -288,6 +288,17 @@ extern void cb_lighted_button();
 extern void cb_lighted_default();
 extern void cb_change_hrd_button();
 
+// ic7610 functions
+
+extern void digi_sel_on_off();
+extern void set_ic7610_digi_sel_on_off(void *);
+extern void digi_sel_val();
+extern void set_ic7610_digi_sel_val(void *);
+extern void dual_watch();
+extern void set_ic7610_dual_watch(void *);
+extern void index_att();
+extern void set_ic7610_index_att(void *);
+
 extern Fl_Color flrig_def_color(int);
 
 extern void * serial_thread_loop( void * );

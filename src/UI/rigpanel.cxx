@@ -213,6 +213,12 @@ Fl_Group *genericAux = (Fl_Group *)0;
 Fl_Box *boxControl=(Fl_Box *)0;
 Fl_Light_Button *btnAuxRTS = (Fl_Light_Button *)0;
 
+Fl_Group *tab7610 = (Fl_Group *)0;
+Fl_ComboBox *ic7610att = (Fl_ComboBox *)0;
+Fl_Light_Button *ic7610dual_watch = (Fl_Light_Button *)0;
+Fl_Light_Button *ic7610digi_sel_on_off = (Fl_Light_Button *)0;
+Fl_Wheel_Value_Slider *ic7610_digi_sel_val = (Fl_Wheel_Value_Slider *)0;
+
 Fl_Light_Button *btnAuxDTR = (Fl_Light_Button *)0;
 Fl_Light_Button *btnDataPort = (Fl_Light_Button *)0;
 
@@ -772,6 +778,26 @@ static void cb_btnUser( Fl_Button * o, void *d) {
 		case 7: cb_send_command(progStatus.command7, cmdResponse); break;
 		case 8: cb_send_command(progStatus.command8, cmdResponse); break;
 	}
+}
+
+static void cb_digi_sel_on_off(Fl_Light_Button *o, void *d) {
+	progStatus.digi_sel_on_off = o->value();
+	digi_sel_on_off();
+}
+
+static void cb_digi_sel_val(Fl_Wheel_Value_Slider *o, void *d) {
+	progStatus.digi_sel_val = o->value();
+	digi_sel_val();
+}
+
+static void cb_dual_watch(Fl_Light_Button *o, void *d) {
+	progStatus.dual_watch = o->value();
+	dual_watch();
+}
+
+static void cb_ic7610_att(Fl_ComboBox *o, void *d) {
+	progStatus.index_ic7610att = o->index();
+	index_att();
 }
 
 static void cb_cntRIT(Hspinner*, void*) {

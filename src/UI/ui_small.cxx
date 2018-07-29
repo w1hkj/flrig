@@ -636,17 +636,20 @@ static Fl_Box *filler = (Fl_Box *)0;
 
 Fl_Double_Window *tabs_window()
 {
-	int gph = 70;
+	int gph = 70 + 22;
 
-	Fl_Double_Window *w = new Fl_Double_Window(0, 0, small_mainW, gph + 22, "flrig extra controls");
+	Fl_Double_Window *w = new Fl_Double_Window(
+		0, 0, 
+		small_mainW, gph,
+		"flrig extra controls");
 
 	grpTABS = new Fl_Group(0, 0, small_mainW, gph);
 
-	tabs550 = new Fl_Tabs(0, 0, small_mainW, gph + 24);
+	tabs550 = new Fl_Tabs(0, 0, small_mainW, gph);
 		tabs550->selection_color(FL_LIGHT1);
 		tabs550->hide();
 
-		tt550_CW = new Fl_Group(0, 24, small_mainW, gph, _("CW"));
+		tt550_CW = new Fl_Group(0, 24, small_mainW, gph - 24, _("CW"));
 			tt550_CW->color(FL_LIGHT1);
 			tt550_CW->selection_color(FL_LIGHT1);
 
@@ -728,7 +731,7 @@ Fl_Double_Window *tabs_window()
 			btn_tt550_enable_keyer->value(progStatus.tt550_enable_keyer);
 		tt550_CW->end();
 
-		tt550_VOX = new Fl_Group(0, 24, small_mainW, gph, _("Vox"));
+		tt550_VOX = new Fl_Group(0, 24, small_mainW, gph - 24, _("Vox"));
 			tt550_VOX->hide();
 
 			spnr_tt550_vox_gain = new Hspinner(
@@ -774,7 +777,7 @@ Fl_Double_Window *tabs_window()
 			btn_tt550_vox->value(progStatus.tt550_vox_onoff);
 		tt550_VOX->end();
 
-		tt550_Speech = new Fl_Group(0, 24, small_mainW, gph, _("Spch"));
+		tt550_Speech = new Fl_Group(0, 24, small_mainW, gph - 24, _("Spch"));
 			tt550_Speech->hide();
 
 			btn_tt550_CompON = new Fl_Light_Button(
@@ -835,7 +838,7 @@ Fl_Double_Window *tabs_window()
 			btnAccInp->value(progStatus.tt550_use_line_in);
 		tt550_Audio->end();
 
-		tt550_Rx = new Fl_Group(0, 24, small_mainW, gph, _("RX"));
+		tt550_Rx = new Fl_Group(0, 24, small_mainW, gph - 24, _("RX"));
 			tt550_Rx->hide();
 
 			cbo_tt550_nb_level = new Fl_ComboBox(
@@ -889,7 +892,7 @@ Fl_Double_Window *tabs_window()
 			spnr_tt550_vfo_adj->value(progStatus.vfo_adj);
 		tt550_Rx->end();
 
-		tt550_Tx = new Fl_Group(0, 24, small_mainW, gph, _("TX"));
+		tt550_Tx = new Fl_Group(0, 24, small_mainW, gph - 24, _("TX"));
 			tt550_Tx->hide();
 
 			btn_tt550_enable_xmtr = new Fl_Check_Button(10, 40, 70, 22, _("Tx ON"));
@@ -931,7 +934,7 @@ Fl_Double_Window *tabs_window()
 			btn_tt550_use_xmt_bw->value(progStatus.tt550_use_xmt_bw);
 		tt550_Tx->end();
 
-		tt550_302A = new Fl_Group(0, 24, small_mainW, gph, _("302-A"));
+		tt550_302A = new Fl_Group(0, 24, small_mainW, gph - 24, _("302-A"));
 			tt550_302A->hide();
 
 			spnr_tt550_keypad_time_out = new Hspinner(30, 40, 120, 22, _("Time out"), 16);
@@ -969,7 +972,7 @@ Fl_Double_Window *tabs_window()
 			sel_tt550_encoder_step->align(FL_ALIGN_BOTTOM | FL_ALIGN_CENTER);
 		tt550_302A->end();
 
-		tt550_302B = new Fl_Group(0, 24, small_mainW, gph, _("302-B"));
+		tt550_302B = new Fl_Group(0, 24, small_mainW, gph - 24, _("302-B"));
 			tt550_302B->hide();
 
 			sel_tt550_F1_func = new Fl_Choice(34, 40, 99, 22, _("F1"));
@@ -994,7 +997,7 @@ Fl_Double_Window *tabs_window()
 			sel_tt550_F3_func->value(progStatus.tt550_F3_func);
 		tt550_302B->end();
 
-		tt550_AT = new Fl_Group(0, 24, small_mainW, gph, _("AT-11"));
+		tt550_AT = new Fl_Group(0, 24, small_mainW, gph - 24, _("AT-11"));
 			tt550_AT_inline = new Fl_Light_Button(5, 40, 100, 22, _("Inline"));
 			tt550_AT_inline->tooltip(_("Enabled - autotune\nDisabled - bypass"));
 			tt550_AT_inline->callback((Fl_Callback*)cb_AT_bypass);
@@ -1036,9 +1039,9 @@ Fl_Double_Window *tabs_window()
 		tt550_AT->end();
 	tabs550->end();
 
-	tabsGeneric = new Fl_Tabs(0, 0, small_mainW, gph + 24);//0, 252, 425, 70);
+	tabsGeneric = new Fl_Tabs(0, 0, small_mainW, gph);
 		tabsGeneric->selection_color(FL_LIGHT1);
-		genericBands = new Fl_Group(0, 24, small_mainW, gph, _("Bands"));
+		genericBands = new Fl_Group(0, 24, small_mainW, gph - 24, _("Bands"));
 			btnBandSelect_1 = new Fl_Button(4, 40, 60, 18, _("1.8"));
 			btnBandSelect_1->tooltip(_("160m Band"));
 			btnBandSelect_1->color((Fl_Color)246);
@@ -1111,7 +1114,7 @@ Fl_Double_Window *tabs_window()
 
 		genericBands->end();
 
-		genericCW = new Fl_Group(0, 24, small_mainW, gph, _("CW"));
+		genericCW = new Fl_Group(0, 24, small_mainW, gph - 24, _("CW"));
 			genericCW->color(FL_LIGHT1);
 			genericCW->selection_color(FL_LIGHT1);
 			genericCW->hide();
@@ -1173,7 +1176,7 @@ Fl_Double_Window *tabs_window()
 
 		genericCW->end();
 
-		genericQSK = new Fl_Group(0, 24, small_mainW, gph, _("QSK"));
+		genericQSK = new Fl_Group(0, 24, small_mainW, gph - 24, _("QSK"));
 			genericQSK->color(FL_LIGHT1);
 			genericQSK->selection_color(FL_LIGHT1);
 			genericQSK->hide();
@@ -1211,7 +1214,7 @@ Fl_Double_Window *tabs_window()
 
 		genericQSK->end();
 
-		genericVOX = new Fl_Group(0, 24, small_mainW, gph, _("Vox"));
+		genericVOX = new Fl_Group(0, 24, small_mainW, gph - 24, _("Vox"));
 			genericVOX->hide();
 
 			spnr_vox_gain = new Hspinner(
@@ -1267,7 +1270,7 @@ Fl_Double_Window *tabs_window()
 
 		genericVOX->end();
 
-		genericSpeech = new Fl_Group(0, 24, small_mainW, gph, _("Spch"));
+		genericSpeech = new Fl_Group(0, 24, small_mainW, gph - 24, _("Spch"));
 			genericSpeech->hide();
 
 			btnCompON = new Fl_Light_Button(215, 40, 70, 22, _("On"));
@@ -1286,10 +1289,10 @@ Fl_Double_Window *tabs_window()
 
 		genericSpeech->end();
 
-		genericRx = new Fl_Group(0, 24, small_mainW, gph, _("RX"));
+		genericRx = new Fl_Group(0, 24, small_mainW, gph - 24, _("RX"));
 			genericRx->hide();
 
-			sldr_nb_level = new Fl_Wheel_Value_Slider(5, 40, 200, 22, _("NB level"));
+			sldr_nb_level = new Fl_Wheel_Value_Slider(5, 40, 200, 20, _("NB level"));
 			sldr_nb_level->tooltip(_("Noise Blanker level"));
 			sldr_nb_level->type(5);
 			sldr_nb_level->box(FL_THIN_DOWN_BOX);
@@ -1341,7 +1344,7 @@ Fl_Double_Window *tabs_window()
 
 		genericRx->end();
 
-		genericMisc = new Fl_Group(0, 24, small_mainW, gph, _("Misc"));
+		genericMisc = new Fl_Group(0, 24, small_mainW, gph - 24, _("Misc"));
 			genericMisc->hide();
 
 			spnr_vfo_adj = new Hspinner(24, 40, 96, 22, _("Vfo Adj"));
@@ -1384,7 +1387,7 @@ Fl_Double_Window *tabs_window()
 
 		genericMisc->end();
 
-		genericUser = new Fl_Group(0, 24, small_mainW, gph, _("User"));
+		genericUser = new Fl_Group(0, 24, small_mainW, gph - 24, _("User"));
 			btnUser1 = new Fl_Button(5, genericUser->y() + 12, 100, 20, "USER 1");
 			btnUser1->callback((Fl_Callback*)cb_btnUser, (void*)1);
 
@@ -1410,6 +1413,41 @@ Fl_Double_Window *tabs_window()
 			btnUser8->callback((Fl_Callback*)cb_btnUser, (void*)8);
 
 		genericUser->end();
+
+		tab7610 = new Fl_Group(0, 24, small_mainW, gph - 24, _("IC7610"));
+			ic7610att = new Fl_ComboBox(5, tab7610->y() + 10, 70, 20, "Att level");
+			ic7610att->add("OFF|3db|6db|9db|12db|15db|18db|21db|24db|27db|30db|33db|36db|39db|42db|45db|");
+			ic7610att->align(FL_ALIGN_RIGHT);
+			ic7610att->index(progStatus.index_ic7610att);
+			ic7610att->callback((Fl_Callback *)cb_ic7610_att);
+
+			ic7610dual_watch = new Fl_Light_Button(150, tab7610->y() + 10, 120, 20, "Dual Watch");
+			ic7610dual_watch->value(progStatus.dual_watch);
+			ic7610dual_watch->callback((Fl_Callback *)cb_dual_watch);
+
+			ic7610digi_sel_on_off = new Fl_Light_Button(5, tab7610->y() + 35, 70, 20, "Digi-Sel");
+			ic7610digi_sel_on_off->value(progStatus.digi_sel_on_off);
+			ic7610digi_sel_on_off->callback((Fl_Callback *)cb_digi_sel_on_off);
+
+			ic7610_digi_sel_val = new Fl_Wheel_Value_Slider(80, tab7610->y() + 35, small_mainW - 85, 20, "");
+			ic7610_digi_sel_val->tooltip(_("Digi-Sel value"));
+			ic7610_digi_sel_val->type(5);
+			ic7610_digi_sel_val->box(FL_THIN_DOWN_BOX);
+			ic7610_digi_sel_val->color(FL_BACKGROUND_COLOR);
+			ic7610_digi_sel_val->selection_color(FL_BACKGROUND_COLOR);
+			ic7610_digi_sel_val->labeltype(FL_NORMAL_LABEL);
+			ic7610_digi_sel_val->labelfont(0);
+			ic7610_digi_sel_val->labelsize(14);
+			ic7610_digi_sel_val->labelcolor(FL_FOREGROUND_COLOR);
+			ic7610_digi_sel_val->minimum(0);
+			ic7610_digi_sel_val->maximum(255);
+			ic7610_digi_sel_val->step(1);
+			ic7610_digi_sel_val->callback((Fl_Callback*)cb_digi_sel_val);
+			ic7610_digi_sel_val->align(Fl_Align(FL_ALIGN_BOTTOM));
+			ic7610_digi_sel_val->when(FL_WHEN_CHANGED);
+			ic7610_digi_sel_val->value(progStatus.digi_sel_val);
+
+		tab7610->end();
 
 	tabsGeneric->resizable(genericUser);
 	tabsGeneric->end();

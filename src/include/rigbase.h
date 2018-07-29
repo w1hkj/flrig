@@ -595,6 +595,15 @@ int vfo_;
 	int waitN(size_t n, int timeout, const char *, int pr = HEX);
 	int wait_char(int ch, size_t n, int timeout, const char *, int pr = HEX);
 
+// IC-7610
+	virtual void set_digi_sel(bool) {}
+	virtual void set_digi_val(int) {}
+	virtual int  get_digi_sel() {return 0;}
+	virtual int  get_digi_val() {return 0;}
+	virtual void set_dual_watch(bool) {}
+	virtual int  get_dual_watch() {return 0;}
+	virtual void set_index_att(int) {}
+
 // more pia TS2000 without front panel!
 	int currmode() { return _currmode; }
 	int nrval1() { return _nrval1; }

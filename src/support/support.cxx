@@ -2313,6 +2313,51 @@ void setCLRPBT()
 	sliders.push(slider);
 }
 
+//----------------------------------------------------------------------
+// these only apply to the IC7610
+//----------------------------------------------------------------------
+
+void digi_sel_on_off()
+{
+	selrig->set_digi_sel(progStatus.digi_sel_on_off);
+}
+
+void set_ic7610_digi_sel_on_off(void *)
+{
+	ic7610digi_sel_on_off->value(progStatus.digi_sel_on_off);
+}
+
+void digi_sel_val()
+{
+	selrig->set_digi_val(progStatus.digi_sel_val);
+}
+
+void set_ic7610_digi_sel_val(void *)
+{
+	ic7610_digi_sel_val->value(progStatus.digi_sel_val);
+}
+
+void dual_watch()
+{
+	selrig->set_dual_watch(progStatus.dual_watch);
+}
+
+void set_ic7610_dual_watch(void *)
+{
+}
+
+void index_att()
+{
+	selrig->set_index_att(progStatus.index_ic7610att);
+}
+
+void set_ic7610_index_att(void *)
+{
+	ic7610att->index(progStatus.index_ic7610att);
+}
+
+//----------------------------------------------------------------------
+
 void cbEventLog()
 {
 	debug::show();
@@ -3666,6 +3711,7 @@ void initTabs()
 		hidden_tabs->add(genericRx);
 		hidden_tabs->add(genericMisc);
 		hidden_tabs->add(genericUser);
+		hidden_tabs->add(tab7610);
 
 		if (selrig->has_band_selection) {
 			tabsGeneric->add(genericBands);
@@ -3884,6 +3930,13 @@ void initTabs()
 
 		tabsGeneric->add(genericUser);
 		genericUser->redraw();
+
+		if (selrig->name_ == rig_IC7610.name_) {
+			tabsGeneric->add(tab7610);
+			tab7610->redraw();
+			btnAttenuator->hide();
+		}
+
 		tabsGeneric->redraw();
 
 		poll_frequency->activate(); poll_frequency->value(progStatus.poll_frequency);

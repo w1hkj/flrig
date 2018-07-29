@@ -161,8 +161,13 @@ struct status {
 	int		pwr_peak;
 	int		pwr_scale;
 
-// ft950 reverse RG0; readings
+// ic7610 special controls
+	bool	digi_sel_on_off;
+	int		digi_sel_val;
+	int		index_ic7610att;
+	bool	dual_watch;
 
+// ft950 reverse RG0; readings
 	bool	ft950_rg_reverse;
 
 	bool	restore_frequency;

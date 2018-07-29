@@ -179,6 +179,12 @@ extern Fl_Button *btnBreakIn;
 extern Hspinner *spnr_cw_delay;
 extern Hspinner *cnt_cw_qsk;
 
+extern Fl_Group *tab7610;
+extern Fl_ComboBox *ic7610att;
+extern Fl_Light_Button *ic7610dual_watch;
+extern Fl_Light_Button *ic7610digi_sel_on_off;
+extern Fl_Wheel_Value_Slider *ic7610_digi_sel_val;
+
 extern Fl_Group  *genericUser;
 extern Fl_Button *btnUser1;
 extern Fl_Button *btnUser2;
