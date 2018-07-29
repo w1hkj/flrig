@@ -186,8 +186,8 @@ bool RIG_K3::check ()
 {
 	cmd = "FA;";
 	int ret = wait_char(';', 14, K3_WAIT_TIME, "check", ASC);
-	if (ret < 14) return freqA;
-	return false;
+	if (ret < 14) return false;
+	return true;
 }
 
 long RIG_K3::get_vfoA ()
