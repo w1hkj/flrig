@@ -90,7 +90,7 @@ void RIG_TT535::set_vfoB (long freq)
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 8 ) );
 	cmd.append( post );
-	if (sendCommand(cmd) != 6);
+	if (sendCommand(cmd) != 6)
 		checkresponse();
 }
 
@@ -119,7 +119,7 @@ void RIG_TT535::set_modeA(int md)
 	cmd += '\x06';
 	cmd += modeA;
 	cmd.append(post);
-	if (sendCommand(cmd) != 6);
+	if (sendCommand(cmd) != 6)
 		checkresponse();
 }
 
@@ -144,7 +144,7 @@ void RIG_TT535::set_modeB(int md)
 	cmd += '\x06';
 	cmd += modeB;
 	cmd.append(post);
-	if (sendCommand(cmd) != 6);
+	if (sendCommand(cmd) != 6)
 		checkresponse();
 }
 

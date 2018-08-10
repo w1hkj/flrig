@@ -2960,7 +2960,7 @@ void read_rig_vals_(XCVR_STATE &xcvrvfo)
 		btnRestoreSquelch->deactivate();
 
 
-		update_progress(progress->value() + 4);
+	update_progress(progress->value() + 4);
 
 	if (selrig->has_rf_control) {
 		btnRestoreRfGain->activate();

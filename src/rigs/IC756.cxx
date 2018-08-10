@@ -603,10 +603,11 @@ int RIG_IC756PRO::get_noise_reduction_val()
 	cmd.append(post);
 	if (waitFOR(9, "get NRval")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != string::npos) {
 			val = fm_bcd(replystr.substr(p+6), 3);
 			if (val == 255) val = 16;
 			else val = val/ 16;
+		}
 	}
 	return val;
 }
@@ -985,11 +986,12 @@ bool RIG_IC756PRO::get_notch(int &val)
 		cmd.append(post);
 		if (waitFOR(9, "get notch val")) {
 			size_t p = replystr.rfind(resp);
-			if (p != string::npos)
+			if (p != string::npos) {
 				val = fm_bcd(replystr.substr(p+6),3);
 				val = (val - 53) * 20;
 				if (val < 0) val = 0;
 				if (val > 4040) val = 4040;
+			}
 		}
 	}
 	return on;

@@ -600,9 +600,10 @@ int RIG_IC7200::get_noise_reduction_val()
 	cmd.append(post);
 	if (waitFOR(9, "get NRval")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != string::npos) {
 			val = fm_bcd(replystr.substr(p+6), 3);
 			val = (val - 8) / 16;
+		}
 	}
 	return val;
 }

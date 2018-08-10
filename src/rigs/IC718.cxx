@@ -334,7 +334,7 @@ int RIG_IC718::get_noise_reduction_val()
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			val = fm_bcd(replystr.substr(p+6), 3);
-			val = (val - 8) / 16;
+		val = (val - 8) / 16;
 	}
 	return val;
 }

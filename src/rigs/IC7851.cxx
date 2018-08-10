@@ -1036,7 +1036,6 @@ void RIG_IC7851::get_band_selection(int v)
 void RIG_IC7851::set_band_selection(int v)
 {
 	long freq = (useB ? B.freq : A.freq);
-	int fil = (useB ? filB : filA);
 	int mode = (useB ? B.imode : A.imode);
 
 	cmd.assign(pre_to);

@@ -1394,7 +1394,7 @@ int RIG_IC7300::get_preamp()
 	cmd.append( post );
 	if (waitFOR(8, "get Preamp Level")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != string::npos) {
 			preamp_level = replystr[p+6];
 			if (preamp_level == 1) {
 				preamp_label("Amp 1", true);
@@ -1404,6 +1404,7 @@ int RIG_IC7300::get_preamp()
 				preamp_label("PRE", false);
 				preamp_level = 0;
 			}
+		}
 	}
 	return preamp_level;
 }
