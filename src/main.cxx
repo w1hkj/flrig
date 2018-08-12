@@ -78,6 +78,7 @@
 //#include "xml_io.h"
 #include "serial.h"
 #include "ui.h"
+#include "icons.h"
 
 #include "flrig_icon.cxx"
 
@@ -539,17 +540,23 @@ void cb_xml_help(Fl_Menu_*, void*)
 
 int parse_args(int argc, char **argv, int& idx)
 {
-	if (strcasecmp("--help", argv[idx]) == 0) {
-		std::cout << "\
-Usage: \n\
+	std::string helpstr =
+"Usage: \n\
   --help this help text\n\
   --version\n\
-  --config-dir <DIR>\n\
+  --config-dir [fully qualified pathname to <DIR>]\n\
   --debug-level N (0..4)\n\
   --trace\n\
   --xml-help\n\
   --xml-trace\n\
-  --exp (expand menu tab controls)\n\n";
+  --exp (expand menu tab controls)";
+
+	if (strcasecmp("--help", argv[idx]) == 0) {
+#ifdef __WIN32__
+		fl_alert2("%s", helpstr.c_str());
+#else
+		std::cout << helpstr << std::endl;
+#endif
 		exit(0);
 	} 
 	if (strcasecmp("--version", argv[idx]) == 0) {
@@ -592,5 +599,9 @@ Usage: \n\
 		idx++;
 		return 1;
 	}
+	fl_alert2("Unknown command line parameter: \"%s\"\n\n%s", 
+		argv[idx], helpstr.c_str());
+	exit(0);
+
 	return 0;
 }
