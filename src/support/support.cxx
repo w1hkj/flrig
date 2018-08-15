@@ -3703,7 +3703,8 @@ void initTabs()
 
 	} else {
 
-		hidden_tabs->add(genericBands);
+		hidden_tabs->add(tab_yaesu_bands);
+		hidden_tabs->add(tab_icom_bands);
 		hidden_tabs->add(genericCW);
 		hidden_tabs->add(genericQSK);
 		hidden_tabs->add(genericVOX);
@@ -3714,8 +3715,13 @@ void initTabs()
 		hidden_tabs->add(tab7610);
 
 		if (selrig->has_band_selection) {
-			tabsGeneric->add(genericBands);
-			genericBands->redraw();
+			if (!selrig->ICOMrig) {
+				tabsGeneric->add(tab_yaesu_bands);
+				tab_yaesu_bands->redraw();
+			} else {
+				tabsGeneric->add(tab_icom_bands);
+				tab_icom_bands->redraw();
+			}
 		}
 
 		if (selrig->has_cw_wpm ||
@@ -5856,16 +5862,17 @@ void cb_cw_delay()
 
 void cbBandSelect(int band)
 {
-// bypass local
-	{ guard_lock gl_serial(&mutex_serial);
-		trace(1, "cbBandSelect(...) 1");
-		bypass_serial_thread_loop = true;
+	guard_lock gl_serial(&mutex_serial);
+
+	if (Fl::event_button() == FL_RIGHT_MOUSE) {
+		selrig->rTONE = choice_rTONE->value();
+		selrig->tTONE = choice_tTONE->value();
+		selrig->set_band_selection(band);
+		return;
 	}
-	{
-		guard_lock gl_serial(&mutex_serial);
-		trace(1, "cbBandSelect(...) 2");
-	selrig->set_band_selection(band);
-	MilliSleep(100);	// rig sync-up
+
+	selrig->get_band_selection(band);
+
 // get freqmdbw
 	if (!useB) {
 		vfoA.freq = selrig->get_vfoA();
@@ -5888,41 +5895,41 @@ void cbBandSelect(int band)
 	}
 // local display freqmdbw
 	if (selrig->has_mode_control) {
-		Fl::awake(setModeControl);
+		setModeControl(NULL);
 	}
 	if (selrig->has_bandwidth_control) {
 		set_bandwidth_control();
-		Fl::awake(setBWControl);
+		setBWControl(NULL);
 	}
-	if (!useB) Fl::awake(setFreqDispA, (void *)vfo->freq);
-	else Fl::awake(setFreqDispB, (void *)vfo->freq);
+	if (!useB) { FreqDispA->value(vfo->freq); FreqDispA->redraw(); }
+	else       { FreqDispB->value(vfo->freq); FreqDispB->redraw(); }
 
-	MilliSleep(100);	// local sync-up
+	if (selrig->CIV && (selrig->name_ != rig_IC7200.name_)) {
+		choice_tTONE->value(selrig->tTONE);
+		choice_tTONE->redraw();
+		choice_rTONE->value(selrig->rTONE);
+		choice_rTONE->redraw();
 	}
 
-// enable local
-	guard_lock gl_serial(&mutex_serial);
-	trace(1, "cbBandSelect() 3");
-	bypass_serial_thread_loop = false;
 }
 
-void enable_bandselect_btn(int btn_num, bool enable)
+void enable_yaesu_bandselect(int btn_num, bool enable)
 {
 	switch (btn_num) {
 		case 1:
 		case 9:
 			break;
 		case 10:	// 6m
-			if (enable) btnBandSelect_10->show();
-			else btnBandSelect_10->hide();
+			if (enable) btn_yaesu_select_10->show();
+			else btn_yaesu_select_10->hide();
 			break;
 		case 11:	// GEN
-			if (enable) btnBandSelect_11->show();
-			else btnBandSelect_11->hide();
+			if (enable) btn_yaesu_select_11->show();
+			else btn_yaesu_select_11->hide();
 			break;
 		case 13:
-			if (enable) opSelect60->show();
-			else opSelect60->hide();
+			if (enable) op_yaesu_select60->show();
+			else op_yaesu_select60->hide();
 			break;
 		default:
 			break;

@@ -93,6 +93,8 @@ public:
 
 	const char **bwtable(int m);
 
+	void set_band_selection(int v);
+	void get_band_selection(int v);
 
 };
 

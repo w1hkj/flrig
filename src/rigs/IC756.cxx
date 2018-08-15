@@ -305,6 +305,8 @@ RIG_IC756PRO::RIG_IC756PRO() {
 
 	ICOMmainsub = true;
 
+	has_band_selection = true;
+
 	precision = 1;
 	ndigits = 9;
 
@@ -327,6 +329,13 @@ void RIG_IC756PRO::initialize()
 	IC756PRO_widgets[12].W = sldrNOTCH;
 	IC756PRO_widgets[13].W = sldrMICGAIN;
 	IC756PRO_widgets[14].W = sldrPOWER;
+
+	btn_icom_select_11->deactivate();
+	btn_icom_select_12->deactivate();
+	btn_icom_select_13->deactivate();
+
+	choice_rTONE->activate();
+	choice_tTONE->activate();
 }
 
 void RIG_IC756PRO::swapAB()
@@ -1339,6 +1348,97 @@ void RIG_IC756PRO::set_vox_onoff()
 		cmd.append(post);
 		waitFB("set Vox OFF");
 	}
+}
+
+// Read/Write band stack registers
+//
+// Read 23 bytes
+//
+//  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22
+// FE FE nn E0 1A 01 bd rn f5 f4 f3 f2 f1 mo fi fg t1 t2 t3 r1 r2 r3 FD
+// Write 23 bytes
+//
+// FE FE E0 nn 1A 01 bd rn f5 f4 f3 f2 f1 mo fi fg t1 t2 t3 r1 r2 r3 FD
+//
+// nn - CI-V address
+// bd - band selection 1/2/3
+// rn - register number 1/2/3
+// f5..f1 - frequency BCD reverse
+// mo - mode
+// fi - filter #
+// fg flags: x01 use Tx tone, x02 use Rx tone, x10 data mode
+// t1..t3 - tx tone BCD fwd
+// r1..r3 - rx tone BCD fwd
+//
+// FE FE E0 94 1A 01 06 01 70 99 08 18 00 01 03 10 00 08 85 00 08 85 FD
+//
+// band 6; freq 0018,089,970; USB; data mode; t 88.5; r 88.5
+
+void RIG_IC756PRO::get_band_selection(int v)
+{
+	cmd.assign(pre_to);
+	cmd.append("\x1A\x01");
+	cmd += to_bcd_be( v, 2 );
+	cmd += '\x01';
+	cmd.append( post );
+
+	if (waitFOR(23, "get band stack")) {
+		set_trace(2, "get band stack", str2hex(replystr.c_str(), replystr.length()));
+		size_t p = replystr.rfind(pre_fm);
+		if (p != string::npos) {
+			long int bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
+			int bandmode = replystr[p+13];
+			int bandfilter = replystr[p+14];
+			int tone = fm_bcd(replystr.substr(p+16, 3), 6);
+			size_t index = 0;
+			for (index = 0; index < sizeof(PL_tones) / sizeof(*PL_tones); index++)
+				if (tone == PL_tones[index]) break;
+			tTONE = index;
+			tone = fm_bcd(replystr.substr(p+19, 3), 6);
+			for (index = 0; index < sizeof(PL_tones) / sizeof(*PL_tones); index++)
+				if (tone == PL_tones[index]) break;
+			rTONE = index;
+			if (useB) {
+				set_vfoB(bandfreq);
+				set_modeB(bandmode);
+				set_FILT(bandfilter);
+			} else {
+				set_vfoA(bandfreq);
+				set_modeA(bandmode);
+				set_FILT(bandfilter);
+			}
+		}
+	} else
+		set_trace(2, "get band stack", str2hex(replystr.c_str(), replystr.length()));
+}
+
+void RIG_IC756PRO::set_band_selection(int v)
+{
+	long freq = (useB ? B.freq : A.freq);
+	int fil = (useB ? filB : filA);
+	int mode = (useB ? B.imode : A.imode);
+
+	cmd.assign(pre_to);
+	cmd.append("\x1A\x01");
+	cmd += to_bcd_be( v, 2 );
+	cmd += '\x01';
+	cmd.append( to_bcd_be( freq, 10 ) );
+	cmd += mode;
+	cmd += fil;
+	cmd += '\x00';
+	cmd.append(to_bcd(PL_tones[tTONE], 6));
+	cmd.append(to_bcd(PL_tones[rTONE], 6));
+	cmd.append(post);
+	waitFB("set_band_selection");
+	set_trace(2, "set_band_selection()", str2hex(replystr.c_str(), replystr.length()));
+
+	cmd.assign(pre_to);
+	cmd.append("\x1A\x01");
+	cmd += to_bcd_be( v, 2 );
+	cmd += '\x01';
+	cmd.append( post );
+
+	waitFOR(23, "get band stack");
 }
 
 // these are only defined in this file

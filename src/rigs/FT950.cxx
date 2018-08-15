@@ -234,25 +234,26 @@ void RIG_FT950::initialize()
 	if (p == string::npos) {
 		Channels_60m = US_60m_chan;
 		label_60m    = US_60m_label;
-		opSelect60->clear();
+		op_yaesu_select60->clear();
 		char **p = (char **)US_60m_label;
-		while (*p) opSelect60->add(*p++);
+		while (*p) op_yaesu_select60->add(*p++);
 	}
 	else {
 		Channels_60m = UK_60m_chan;
 		label_60m    = UK_60m_label;
-		opSelect60->clear();
+		op_yaesu_select60->clear();
 		char **p = (char **)UK_60m_label;
-		while (*p) opSelect60->add(*p++);
+		while (*p) op_yaesu_select60->add(*p++);
 	}
-	opSelect60->index(m_60m_indx);
+	op_yaesu_select60->index(m_60m_indx);
+	op_yaesu_select60->activate();
 
 }
 
 void RIG_FT950::post_initialize()
 {
-	enable_bandselect_btn(12, false);
-	enable_bandselect_btn(13, true);
+	enable_yaesu_bandselect(12, false);
+	enable_yaesu_bandselect(13, true);
 }
 
 bool RIG_FT950::check ()
@@ -1466,11 +1467,11 @@ void RIG_FT950::set_cw_vol()
 }
 */
 
-void RIG_FT950::set_band_selection(int v)
+void RIG_FT950::get_band_selection(int v)
 {
 	int chan_mem_on = false;
 	cmd = "IF;";
-	wait_char(';',27, FL950_WAIT_TIME, "get vfo mode in set_band_selection", ASC);
+	wait_char(';',27, FL950_WAIT_TIME, "get vfo mode in get_band_selection", ASC);
 	size_t p = replystr.rfind("IF");
 	if (p == string::npos) return;
 	if ((p + 26) >= replystr.length()) return;
@@ -1479,7 +1480,7 @@ void RIG_FT950::set_band_selection(int v)
 	}
 
 	if (v == 13) {
-		m_60m_indx = opSelect60->index();
+		m_60m_indx = op_yaesu_select60->index();
 		if (m_60m_indx)
 			cmd.assign("MC").append(Channels_60m[m_60m_indx]).append(";");
 		else if (chan_mem_on)
@@ -1487,11 +1488,12 @@ void RIG_FT950::set_band_selection(int v)
 	} else {		// v == 1..11 band selection OR return to vfo mode == 0
 		if (chan_mem_on) {
 			cmd = "VM;";
-			opSelect60->index(m_60m_indx = 0);
+			op_yaesu_select60->index(m_60m_indx = 0);
 		} else {
 			if (v < 3)
 				v = v - 1;
 			cmd.assign("BS").append(to_decimal(v, 2)).append(";");
+			set_trace(2, "get band", cmd.c_str());
 		}
 	}
 

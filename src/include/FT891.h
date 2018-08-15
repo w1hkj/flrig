@@ -147,6 +147,7 @@ public:
 	void get_comp_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 100; step = 5; }
 
+	void get_band_selection(int v);
 };
 
 

@@ -158,6 +158,9 @@ public:
 	void set_nb_level(int val);
 	int  get_nb_level();
 
+	void set_band_selection(int v);
+	void get_band_selection(int v);
+
 };
 
 #endif

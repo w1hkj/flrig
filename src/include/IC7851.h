@@ -112,6 +112,9 @@ public:
 	int  get_swr(void);
 	int  get_alc(void);
 
+	void set_band_selection(int v);
+	void get_band_selection(int v);
+
 };
 
 #endif

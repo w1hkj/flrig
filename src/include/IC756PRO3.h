@@ -129,6 +129,9 @@ public:
 
 	const char **bwtable(int);
 
+	void set_band_selection(int v);
+	void get_band_selection(int v);
+
 protected:
 	int  ICvol;
 

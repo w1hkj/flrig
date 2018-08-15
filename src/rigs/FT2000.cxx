@@ -64,7 +64,7 @@ static int FT2000_wvals_AMFMwidths[] = {
 
 static const char *FT2000_US_60m[] = {NULL, "126", "127", "128", "130", NULL};
 // US has 5 60M presets. Using dummy numbers for all.
-// First NULL means skip 60m sets in set_band_selection().
+// First NULL means skip 60m sets in get_band_selection().
 // Maybe someone can do a cat command MC; on all 5 presets and add returned numbers above.
 // To send cat commands in flrig goto menu Config->Xcvr select->Send Cmd.
 
@@ -148,13 +148,13 @@ RIG_FT2000::RIG_FT2000() {
 
 }
 
-void RIG_FT2000::set_band_selection(int v)
+void RIG_FT2000::get_band_selection(int v)
 {
 	int inc_60m = false;
 	cmd = "IF;";
-	wait_char(';', 27, 100, "get vfo mode in set_band_selection", ASC);
+	wait_char(';', 27, 100, "get band", ASC);
 
-	rig_trace(2, "get set_band vfo_mode()", replystr.c_str());
+	set_trace(2, "get band", replystr.c_str());
 
 	size_t p = replystr.rfind("IF");
 	if (p == string::npos) return;

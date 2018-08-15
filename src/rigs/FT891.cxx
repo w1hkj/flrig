@@ -130,7 +130,6 @@ RIG_FT891::RIG_FT891() {
 	has_xcvr_auto_on_off =
 //	has_split =
 //	has_split_AB =
-//	has_band_selection =
 	has_noise_reduction =
 	has_noise_reduction_control =
 	has_extras =
@@ -149,6 +148,8 @@ RIG_FT891::RIG_FT891() {
 	has_cw_spot_tone =
 	has_cw_qsk =
 	has_cw_weight =
+
+	has_band_selection =
 
 	can_change_alt_vfo =
 	has_smeter =
@@ -212,6 +213,8 @@ void RIG_FT891::initialize()
 	}
 // Disable Auto Information mode
 	sendOK("AI0;");
+
+	op_yaesu_select60->deactivate();
 
 }
 
@@ -1218,6 +1221,17 @@ void RIG_FT891::set_compression(int on, int val)
 		cmd = "PR01;";
 	else
 		cmd = "PR00;";
+	set_trace(2, "get band", cmd.c_str());
 	sendOK(cmd);
 	showresp(WARN, ASC, "set Comp", cmd, replystr);
 }
+
+void RIG_FT891::get_band_selection(int v)
+{
+	if (v < 3) v = v - 1;
+	cmd.assign("BS").append(to_decimal(v, 2)).append(";");
+	sendOK(cmd);
+	showresp(WARN, ASC, "Select Band Stacks", cmd, replystr);
+	set_trace(2, "get band", cmd.c_str());
+}
+

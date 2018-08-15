@@ -129,7 +129,7 @@ public:
 	bool set_cw_spot();
 //	void set_cw_spot_tone();
 
-	void set_band_selection(int v);
+	void get_band_selection(int v);
 };
 
 

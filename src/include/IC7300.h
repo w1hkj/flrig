@@ -183,6 +183,9 @@ public:
 	void get_vfoadj_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 100; step = 1; }
 
+	void set_band_selection(int v);
+	void get_band_selection(int v);
+
 };
 
 #endif

@@ -59,13 +59,15 @@ static int FT450_wvals_fm_widths[] = {1, 2, WVALS_LIMIT};
 static const int FT450_def_bw[] = {
   2, 2, 0, 1, 1, 0, 0, 1, 0, 1, 1 };
 
+/*
 static const char *FT450_US_60m[] = {NULL, "126", "127", "128", "130", NULL};
 // US has 5 60M presets. Using dummy numbers for all.
-// First NULL means skip 60m sets in set_band_selection().
+// First NULL means skip 60m sets in get_band_selection().
 // Maybe someone can do a cat command MC; on all 5 presets and add returned numbers above.
 // To send cat commands in flrig goto menu Config->Xcvr select->Send Cmd.
 
 static const char **Channels_60m = FT450_US_60m;
+*/
 
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
@@ -116,7 +118,6 @@ RIG_FT450::RIG_FT450() {
 	has_xcvr_auto_on_off =
 	has_noise_reduction =
 	has_noise_reduction_control =
-	has_band_selection =
 	has_extras =
 	has_vox_onoff =
 	has_vox_gain =
@@ -138,6 +139,7 @@ RIG_FT450::RIG_FT450() {
 	has_volume_control =
 	has_mode_control =
 	has_noise_control =
+	has_band_selection =
 	has_bandwidth_control =
 	has_micgain_control =
 	has_notch_control =
@@ -180,45 +182,12 @@ void RIG_FT450::initialize()
 		progStatus.vox_hang = 500;
 	}
 
+	op_yaesu_select60->deactivate();
+
 // turn off auto information mode
 	sendOK("AI0;");
 
 	selectA();
-}
-
-void RIG_FT450::set_band_selection(int v)
-{
-	int inc_60m = false;
-	cmd = "IF;";
-	waitN(27, 100, "get vfo mode in set_band_selection", ASC);
-
-	rig_trace(2, "get set_band vfo_mode()", replystr.c_str());
-
-	size_t p = replystr.rfind("IF");
-	if (p == string::npos) return;
-	if (replystr[p+21] != '0') {	// vfo 60M memory mode
-		inc_60m = true;
-	}
-
-	if (v == 12) {	// 5MHz 60m presets
-		if (Channels_60m[0] == NULL) return;	// no 60m Channels so skip
-		if (inc_60m) {
-			if (Channels_60m[++m_60m_indx] == NULL)
-				m_60m_indx = 0;
-		}
-		cmd.assign("MC").append(Channels_60m[m_60m_indx]).append(";");
-	} else {		// v == 1..11 band selection OR return to vfo mode == 0
-		if (inc_60m)
-			cmd = "VM;";
-		else {
-			if (v < 3)
-				v = v - 1;
-			cmd.assign("BS").append(to_decimal(v, 2)).append(";");
-		}
-	}
-
-	sendOK(cmd);
-	showresp(WARN, ASC, "Select Band Stacks", cmd, replystr);
 }
 
 void RIG_FT450::selectA()
@@ -1058,3 +1027,49 @@ int  RIG_FT450::get_noise_reduction()
 	val = replystr[p+3] - '0';
 	return val;
 }
+
+void RIG_FT450::get_band_selection(int v)
+{
+	if (v < 3) v = v - 1;
+	cmd.assign("BS").append(to_decimal(v, 2)).append(";");
+	sendOK(cmd);
+	showresp(WARN, ASC, "Select Band Stacks", cmd, replystr);
+	set_trace(2, "get band", cmd.c_str());
+}
+
+/*
+void RIG_FT450::get_band_selection(int v)
+{
+	int inc_60m = false;
+	cmd = "IF;";
+	waitN(27, 100, "get band", ASC);
+
+	set_trace(2, "get band", replystr.c_str());
+
+	size_t p = replystr.rfind("IF");
+	if (p == string::npos) return;
+	if (replystr[p+21] != '0') {	// vfo 60M memory mode
+		inc_60m = true;
+	}
+
+	if (v == 12) {	// 5MHz 60m presets
+		if (Channels_60m[0] == NULL) return;	// no 60m Channels so skip
+		if (inc_60m) {
+			if (Channels_60m[++m_60m_indx] == NULL)
+				m_60m_indx = 0;
+		}
+		cmd.assign("MC").append(Channels_60m[m_60m_indx]).append(";");
+	} else {		// v == 1..11 band selection OR return to vfo mode == 0
+		if (inc_60m)
+			cmd = "VM;";
+		else {
+			if (v < 3)
+				v = v - 1;
+			cmd.assign("BS").append(to_decimal(v, 2)).append(";");
+		}
+	}
+
+	sendOK(cmd);
+	showresp(WARN, ASC, "Select Band Stacks", cmd, replystr);
+}
+*/

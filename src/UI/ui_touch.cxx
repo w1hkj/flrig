@@ -802,79 +802,159 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 
 			tabsGeneric->selection_color(FL_LIGHT1);
 
-			genericBands = new Fl_Group(xpos, ypos+tabh, W, tabb, _("Bands"));
+			tab_yaesu_bands = new Fl_Group(xpos, ypos+tabh, W, tabb, _("Bands"));
 
-				btnBandSelect_1 = new Fl_Button(xpos+4, by, 50, bh, _("1.8"));
-				btnBandSelect_1->tooltip(_("160m Band"));
-				btnBandSelect_1->color((Fl_Color)246);
-				btnBandSelect_1->callback((Fl_Callback*)cb_btnBandSelect_1);
+				btn_yaesu_select_1 = new Fl_Button(xpos+4, by, 50, bh, _("1.8"));
+				btn_yaesu_select_1->tooltip(_("160m Band"));
+				btn_yaesu_select_1->color((Fl_Color)246);
+				btn_yaesu_select_1->callback((Fl_Callback*)cb_btn_band_select, (void *)1);
 
-				btnBandSelect_2 = new Fl_Button(xpos+62, by, 50, bh, _("3.5"));
-				btnBandSelect_2->tooltip(_("80m band"));
-				btnBandSelect_2->color((Fl_Color)246);
-				btnBandSelect_2->callback((Fl_Callback*)cb_btnBandSelect_2);
+				btn_yaesu_select_2 = new Fl_Button(xpos+62, by, 50, bh, _("3.5"));
+				btn_yaesu_select_2->tooltip(_("80m band"));
+				btn_yaesu_select_2->color((Fl_Color)246);
+				btn_yaesu_select_2->callback((Fl_Callback*)cb_btn_band_select, (void *)2);
 
-				btnBandSelect_3 = new Fl_Button(xpos+120, by, 50, bh, _("7"));
-				btnBandSelect_3->tooltip(_("40m band"));
-				btnBandSelect_3->color((Fl_Color)246);
-				btnBandSelect_3->callback((Fl_Callback*)cb_btnBandSelect_3);
-				btnBandSelect_3->align(Fl_Align(FL_ALIGN_CLIP));
+				btn_yaesu_select_3 = new Fl_Button(xpos+120, by, 50, bh, _("7"));
+				btn_yaesu_select_3->tooltip(_("40m band"));
+				btn_yaesu_select_3->color((Fl_Color)246);
+				btn_yaesu_select_3->callback((Fl_Callback*)cb_btn_band_select, (void *)3);
+				btn_yaesu_select_3->align(Fl_Align(FL_ALIGN_CLIP));
 
-				btnBandSelect_4 = new Fl_Button(xpos+178, by, 50, bh, _("10"));
-				btnBandSelect_4->tooltip(_("30m band"));
-				btnBandSelect_4->color((Fl_Color)246);
-				btnBandSelect_4->callback((Fl_Callback*)cb_btnBandSelect_4);
+				btn_yaesu_select_4 = new Fl_Button(xpos+178, by, 50, bh, _("10"));
+				btn_yaesu_select_4->tooltip(_("30m band"));
+				btn_yaesu_select_4->color((Fl_Color)246);
+				btn_yaesu_select_4->callback((Fl_Callback*)cb_btn_band_select, (void *)4);
 
-				btnBandSelect_5 = new Fl_Button(xpos+237, by, 50, bh, _("14"));
-				btnBandSelect_5->tooltip(_("20m band"));
-				btnBandSelect_5->color((Fl_Color)246);
-				btnBandSelect_5->callback((Fl_Callback*)cb_btnBandSelect_5);
+				btn_yaesu_select_5 = new Fl_Button(xpos+237, by, 50, bh, _("14"));
+				btn_yaesu_select_5->tooltip(_("20m band"));
+				btn_yaesu_select_5->color((Fl_Color)246);
+				btn_yaesu_select_5->callback((Fl_Callback*)cb_btn_band_select, (void *)5);
 
-				btnBandSelect_6 = new Fl_Button(xpos+295, by, 50, bh, _("18"));
-				btnBandSelect_6->tooltip(_("17m band"));
-				btnBandSelect_6->color((Fl_Color)246);
-				btnBandSelect_6->callback((Fl_Callback*)cb_btnBandSelect_6);
+				btn_yaesu_select_6 = new Fl_Button(xpos+295, by, 50, bh, _("18"));
+				btn_yaesu_select_6->tooltip(_("17m band"));
+				btn_yaesu_select_6->color((Fl_Color)246);
+				btn_yaesu_select_6->callback((Fl_Callback*)cb_btn_band_select, (void *)6);
 
-				btnBandSelect_7 = new Fl_Button(xpos+353, by, 50, bh, _("21"));
-				btnBandSelect_7->tooltip(_("15m band"));
-				btnBandSelect_7->color((Fl_Color)246);
-				btnBandSelect_7->callback((Fl_Callback*)cb_btnBandSelect_7);
+				btn_yaesu_select_7 = new Fl_Button(xpos+353, by, 50, bh, _("21"));
+				btn_yaesu_select_7->tooltip(_("15m band"));
+				btn_yaesu_select_7->color((Fl_Color)246);
+				btn_yaesu_select_7->callback((Fl_Callback*)cb_btn_band_select, (void *)7);
 
-				btnBandSelect_8 = new Fl_Button(xpos+412, by, 50, bh, _("24"));
-				btnBandSelect_8->tooltip(_("12m band"));
-				btnBandSelect_8->color((Fl_Color)246);
-				btnBandSelect_8->callback((Fl_Callback*)cb_btnBandSelect_8);
+				btn_yaesu_select_8 = new Fl_Button(xpos+412, by, 50, bh, _("24"));
+				btn_yaesu_select_8->tooltip(_("12m band"));
+				btn_yaesu_select_8->color((Fl_Color)246);
+				btn_yaesu_select_8->callback((Fl_Callback*)cb_btn_band_select, (void *)8);
 
-				btnBandSelect_9 = new Fl_Button(xpos+470, by, 50, bh, _("28"));
-				btnBandSelect_9->tooltip(_("10m band"));
-				btnBandSelect_9->color((Fl_Color)246);
-				btnBandSelect_9->callback((Fl_Callback*)cb_btnBandSelect_9);
+				btn_yaesu_select_9 = new Fl_Button(xpos+470, by, 50, bh, _("28"));
+				btn_yaesu_select_9->tooltip(_("10m band"));
+				btn_yaesu_select_9->color((Fl_Color)246);
+				btn_yaesu_select_9->callback((Fl_Callback*)cb_btn_band_select, (void *)9);
 
-				btnBandSelect_10 = new Fl_Button(xpos+528, by, 50, bh, _("50"));
-				btnBandSelect_10->tooltip(_("6m band"));
-				btnBandSelect_10->color((Fl_Color)246);
-				btnBandSelect_10->callback((Fl_Callback*)cb_btnBandSelect_10);
+				btn_yaesu_select_10 = new Fl_Button(xpos+528, by, 50, bh, _("50"));
+				btn_yaesu_select_10->tooltip(_("6m band"));
+				btn_yaesu_select_10->color((Fl_Color)246);
+				btn_yaesu_select_10->callback((Fl_Callback*)cb_btn_band_select, (void *)10);
 
-				btnBandSelect_11 = new Fl_Button(xpos+587, by, 50, bh, _("GEN"));
-				btnBandSelect_11->tooltip(_("General RX"));
-				btnBandSelect_11->color((Fl_Color)246);
-				btnBandSelect_11->callback((Fl_Callback*)cb_btnBandSelect_11);
+				btn_yaesu_select_11 = new Fl_Button(xpos+587, by, 50, bh, _("GEN"));
+				btn_yaesu_select_11->tooltip(_("General RX"));
+				btn_yaesu_select_11->color((Fl_Color)246);
+				btn_yaesu_select_11->callback((Fl_Callback*)cb_btn_band_select, (void *)11);
 
-				opSelect60 = new Fl_ComboBox(xpos+653, by, 100, bh, _("combo"));
-				opSelect60->tooltip(_("vfo / 60 meter channel"));
-				opSelect60->box(FL_NO_BOX);
-				opSelect60->color((Fl_Color)246);
-				opSelect60->selection_color(FL_BACKGROUND_COLOR);
-				opSelect60->labeltype(FL_NORMAL_LABEL);
-				opSelect60->labelfont(0);
-				opSelect60->labelsize(12);
-				opSelect60->labelcolor(FL_FOREGROUND_COLOR);
-				opSelect60->callback((Fl_Callback*)cb_opSelect60);
-				opSelect60->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-				opSelect60->when(FL_WHEN_RELEASE);
-				opSelect60->end();
+				op_yaesu_select60 = new Fl_ComboBox(xpos+653, by, 100, bh, _("combo"));
+				op_yaesu_select60->tooltip(_("vfo / 60 meter channel"));
+				op_yaesu_select60->box(FL_NO_BOX);
+				op_yaesu_select60->color((Fl_Color)246);
+				op_yaesu_select60->selection_color(FL_BACKGROUND_COLOR);
+				op_yaesu_select60->labeltype(FL_NORMAL_LABEL);
+				op_yaesu_select60->labelfont(0);
+				op_yaesu_select60->labelsize(12);
+				op_yaesu_select60->labelcolor(FL_FOREGROUND_COLOR);
+				op_yaesu_select60->callback((Fl_Callback*)cb_btn_band_select, (void *)13);
+				op_yaesu_select60->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
+				op_yaesu_select60->when(FL_WHEN_RELEASE);
+				op_yaesu_select60->end();
 
-			genericBands->end();
+			tab_yaesu_bands->end();
+
+			tab_icom_bands = new Fl_Group(xpos, ypos+tabh, W, tabb, _("Bands"));
+
+				btn_icom_select_1 = new Fl_Button(xpos+4, by, 50, bh, _("1.8"));
+				btn_icom_select_1->tooltip(_("Left click - get\nRight click - set"));
+				btn_icom_select_1->color((Fl_Color)246);
+				btn_icom_select_1->callback((Fl_Callback*)cb_btn_band_select, (void *)1);
+
+				btn_icom_select_2 = new Fl_Button(xpos+58, by, 50, bh, _("3.5"));
+				btn_icom_select_2->tooltip(_("Left click - get\nRight click - set"));
+				btn_icom_select_2->color((Fl_Color)246);
+				btn_icom_select_2->callback((Fl_Callback*)cb_btn_band_select, (void *)2);
+
+				btn_icom_select_3 = new Fl_Button(xpos+112, by, 50, bh, _("7"));
+				btn_icom_select_3->tooltip(_("Left click - get\nRight click - set"));
+				btn_icom_select_3->color((Fl_Color)246);
+				btn_icom_select_3->callback((Fl_Callback*)cb_btn_band_select, (void *)3);
+				btn_icom_select_3->align(Fl_Align(FL_ALIGN_CLIP));
+
+				btn_icom_select_4 = new Fl_Button(xpos+166, by, 50, bh, _("10"));
+				btn_icom_select_4->tooltip(_("Left click - get\nRight click - set"));
+				btn_icom_select_4->color((Fl_Color)246);
+				btn_icom_select_4->callback((Fl_Callback*)cb_btn_band_select, (void *)4);
+
+				btn_icom_select_5 = new Fl_Button(xpos+220, by, 50, bh, _("14"));
+				btn_icom_select_5->tooltip(_("Left click - get\nRight click - set"));
+				btn_icom_select_5->color((Fl_Color)246);
+				btn_icom_select_5->callback((Fl_Callback*)cb_btn_band_select, (void *)5);
+
+				btn_icom_select_6 = new Fl_Button(xpos+274, by, 50, bh, _("18"));
+				btn_icom_select_6->tooltip(_("Left click - get\nRight click - set"));
+				btn_icom_select_6->color((Fl_Color)246);
+				btn_icom_select_6->callback((Fl_Callback*)cb_btn_band_select, (void *)6);
+
+				btn_icom_select_7 = new Fl_Button(xpos+328, by, 50, bh, _("21"));
+				btn_icom_select_7->tooltip(_("Left click - get\nRight click - set"));
+				btn_icom_select_7->color((Fl_Color)246);
+				btn_icom_select_7->callback((Fl_Callback*)cb_btn_band_select, (void *)7);
+
+				btn_icom_select_8 = new Fl_Button(xpos+372, by, 50, bh, _("24"));
+				btn_icom_select_8->tooltip(_("Left click - get\nRight click - set"));
+				btn_icom_select_8->color((Fl_Color)246);
+				btn_icom_select_8->callback((Fl_Callback*)cb_btn_band_select, (void *)8);
+
+				btn_icom_select_9 = new Fl_Button(xpos+426, by, 50, bh, _("28"));
+				btn_icom_select_9->tooltip(_("Left click - get\nRight click - set"));
+				btn_icom_select_9->color((Fl_Color)246);
+				btn_icom_select_9->callback((Fl_Callback*)cb_btn_band_select, (void *)9);
+
+				btn_icom_select_10 = new Fl_Button(xpos+480, by, 50, bh, _("50"));
+				btn_icom_select_10->tooltip(_("Left click - get\nRight click - set"));
+				btn_icom_select_10->color((Fl_Color)246);
+				btn_icom_select_10->callback((Fl_Callback*)cb_btn_band_select, (void *)10);
+
+				btn_icom_select_11 = new Fl_Button(xpos+534, by, 50, bh, _("144"));
+				btn_icom_select_11->tooltip(_("Left click - get\nRight click - set"));
+				btn_icom_select_11->color((Fl_Color)246);
+				btn_icom_select_11->callback((Fl_Callback*)cb_btn_band_select, (void *)11);
+
+				btn_icom_select_12 = new Fl_Button(xpos+ 588, by, 50, bh, _("440"));
+				btn_icom_select_12->tooltip(_("Left click - get\nRight click - set"));
+				btn_icom_select_12->color((Fl_Color)246);
+				btn_icom_select_12->callback((Fl_Callback*)cb_btn_band_select, (void *)12);
+
+				btn_icom_select_13 = new Fl_Button(xpos+ 642, by, 50, bh, _("1.2 G"));
+				btn_icom_select_13->tooltip(_("Left click - get\nRight click - set"));
+				btn_icom_select_13->color((Fl_Color)246);
+				btn_icom_select_13->callback((Fl_Callback*)cb_btn_band_select, (void *)13);
+
+				choice_tTONE = new Fl_PL_tone(xpos+ 696, by, 75, bh, _("tTONE"));
+				choice_tTONE->align((Fl_Align)FL_ALIGN_BOTTOM);
+				choice_tTONE->value(8);
+				choice_tTONE->end();
+
+				choice_rTONE = new Fl_PL_tone(xpos+ 775, by, 75, bh, _("rTONE"));
+				choice_rTONE->align((Fl_Align)FL_ALIGN_BOTTOM);
+				choice_rTONE->value(8);
+				choice_rTONE->end();
+
+			tab_icom_bands->end();
 
 			genericCW = new Fl_Group(xpos, ypos+tabh, W, tabb, _("CW"));
 				genericCW->color(FL_LIGHT1);

@@ -132,8 +132,6 @@ public:
 	void get_cw_spot_tone_min_max_step(int &min, int &max, int &step) {
 		min = 400; max = 800; step = 100; }
 
-	void set_band_selection(int v);
-
 	void get_nr_min_max_step(int &min, int &max, int &step) {
 		min = 1; max = 11; step = 1; }
 
@@ -151,6 +149,8 @@ public:
 
 	void set_BANDWIDTHS(std::string s);
 	std::string get_BANDWIDTHS();
+
+	void get_band_selection(int v);
 
 };
 

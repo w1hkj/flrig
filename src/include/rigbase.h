@@ -31,6 +31,8 @@
 #include "trace.h"
 #include "rig_io.h"
 
+#include "rigpanel.h"
+
 using namespace std;
 
 enum {onA, onB};
@@ -207,6 +209,9 @@ public:
 	int  atten_level;
 	int  preamp_level;
 
+	int  rTONE;  // index into szTONES, PL_tones arrar of receive PL tones
+	int  tTONE;
+
 	bool has_xcvr_auto_on_off;
 	bool has_a2b;
 	bool has_b2a;
@@ -365,7 +370,7 @@ public:
 	virtual std::string get_BANDWIDTHS() { return ""; }
 
 	virtual void set_FILTERS(std::string s) {}
-	virtual std::string get_FILTERS() { return 0; }
+	virtual std::string get_FILTERS() { return ""; }
 
 	virtual bool can_split() { return false;}
 	virtual void set_split(bool val);
@@ -565,6 +570,7 @@ int vfo_;
 	virtual void set_nb_level() {}
 	virtual void set_special(int v) {}
 	virtual void set_band_selection(int v) {}
+	virtual void get_band_selection(int v) {}
 	virtual void set_xcvr_auto_on() {}
 	virtual void set_xcvr_auto_off() {}
 

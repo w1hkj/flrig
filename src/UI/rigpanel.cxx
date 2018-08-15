@@ -118,19 +118,37 @@ Fl_Group *hidden_tabs = (Fl_Group *)0;
 
 Fl_Tabs *tabsGeneric=(Fl_Tabs *)0;
 
-Fl_Group *genericBands = (Fl_Group *)0;
-Fl_Button *btnBandSelect_1 = (Fl_Button *)0;
-Fl_Button *btnBandSelect_2 = (Fl_Button *)0;
-Fl_Button *btnBandSelect_3 = (Fl_Button *)0;
-Fl_Button *btnBandSelect_4 = (Fl_Button *)0;
-Fl_Button *btnBandSelect_5 = (Fl_Button *)0;
-Fl_Button *btnBandSelect_6 = (Fl_Button *)0;
-Fl_Button *btnBandSelect_7 = (Fl_Button *)0;
-Fl_Button *btnBandSelect_8 = (Fl_Button *)0;
-Fl_Button *btnBandSelect_9 = (Fl_Button *)0;
-Fl_Button *btnBandSelect_10 = (Fl_Button *)0;
-Fl_Button *btnBandSelect_11 = (Fl_Button *)0;
-Fl_ComboBox *opSelect60 = (Fl_ComboBox *)0;
+Fl_Group *tab_yaesu_bands = (Fl_Group *)0;
+Fl_Button *btn_yaesu_select_1 = (Fl_Button *)0;
+Fl_Button *btn_yaesu_select_2 = (Fl_Button *)0;
+Fl_Button *btn_yaesu_select_3 = (Fl_Button *)0;
+Fl_Button *btn_yaesu_select_4 = (Fl_Button *)0;
+Fl_Button *btn_yaesu_select_5 = (Fl_Button *)0;
+Fl_Button *btn_yaesu_select_6 = (Fl_Button *)0;
+Fl_Button *btn_yaesu_select_7 = (Fl_Button *)0;
+Fl_Button *btn_yaesu_select_8 = (Fl_Button *)0;
+Fl_Button *btn_yaesu_select_9 = (Fl_Button *)0;
+Fl_Button *btn_yaesu_select_10 = (Fl_Button *)0;
+Fl_Button *btn_yaesu_select_11 = (Fl_Button *)0;
+Fl_ComboBox *op_yaesu_select60 = (Fl_ComboBox *)0;
+
+Fl_Group *tab_icom_bands = (Fl_Group *)0;
+Fl_Button *btn_icom_select_1 = (Fl_Button *)0;
+Fl_Button *btn_icom_select_2 = (Fl_Button *)0;
+Fl_Button *btn_icom_select_3 = (Fl_Button *)0;
+Fl_Button *btn_icom_select_4 = (Fl_Button *)0;
+Fl_Button *btn_icom_select_5 = (Fl_Button *)0;
+Fl_Button *btn_icom_select_6 = (Fl_Button *)0;
+Fl_Button *btn_icom_select_7 = (Fl_Button *)0;
+Fl_Button *btn_icom_select_8 = (Fl_Button *)0;
+Fl_Button *btn_icom_select_9 = (Fl_Button *)0;
+Fl_Button *btn_icom_select_10 = (Fl_Button *)0;
+Fl_Button *btn_icom_select_11 = (Fl_Button *)0;
+Fl_Button *btn_icom_select_12 = (Fl_Button *)0;
+Fl_Button *btn_icom_select_13 = (Fl_Button *)0;
+
+Fl_PL_tone *choice_tTONE = (Fl_PL_tone *)0;
+Fl_PL_tone *choice_rTONE = (Fl_PL_tone *)0;
 
 Fl_Group *genericCW = (Fl_Group *)0;
 Fl_Light_Button *btnSpot = (Fl_Light_Button *)0;
@@ -590,52 +608,10 @@ static void cb_sldrVOLUME(Fl_Wheel_Value_Slider*, void*) {
 	setVolume();
 }
 
-static void cb_btnBandSelect_1(Fl_Button*, void*) {
-	cbBandSelect(1);
-}
-
-static void cb_btnBandSelect_2(Fl_Button*, void*) {
-	cbBandSelect(2);
-}
-
-static void cb_btnBandSelect_3(Fl_Button*, void*) {
-	cbBandSelect(3);
-}
-
-static void cb_btnBandSelect_4(Fl_Button*, void*) {
-	cbBandSelect(4);
-}
-
-static void cb_btnBandSelect_5(Fl_Button*, void*) {
-	cbBandSelect(5);
-}
-
-static void cb_btnBandSelect_6(Fl_Button*, void*) {
-	cbBandSelect(6);
-}
-
-static void cb_btnBandSelect_7(Fl_Button*, void*) {
-	cbBandSelect(7);
-}
-
-static void cb_btnBandSelect_8(Fl_Button*, void*) {
-	cbBandSelect(8);
-}
-
-static void cb_btnBandSelect_9(Fl_Button*, void*) {
-	cbBandSelect(9);
-}
-
-static void cb_btnBandSelect_10(Fl_Button*, void*) {
-	cbBandSelect(10);
-}
-
-static void cb_btnBandSelect_11(Fl_Button*, void*) {
-	cbBandSelect(11);
-}
-
-static void cb_opSelect60(Fl_ComboBox*, void*) {
-	cbBandSelect(13);
+static void cb_btn_band_select(Fl_Button *, void *d) {
+	long lband = reinterpret_cast<long>(d);
+	int band = lband;
+	cbBandSelect(band);
 }
 
 static void cb_btnSpot(Fl_Light_Button* o, void*) {
@@ -1027,6 +1003,14 @@ Fl_Menu_Item *getMenuItem(const char *caption, Fl_Menu_Item* menu = 0)
 	}
 	return item;
 }
+
+int PL_tones[] = {
+ 670,  693,  719,  744,  770,  797,  825,  854,  885,  915,
+ 948,  974, 1000, 1035, 1072, 1109, 1148, 1188, 1230, 1273,
+1318, 1365, 1413, 1462, 1514, 1567, 1598, 1622, 1655, 1679,
+1713, 1738, 1773, 1799, 1835, 1862, 1899, 1928, 1966, 1995,
+2035, 2065, 2107, 2181, 2257, 2291, 2336, 2418, 2503, 2540 };
+
 
 #include "ui_small.cxx"
 

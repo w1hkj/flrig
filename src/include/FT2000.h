@@ -88,7 +88,7 @@ public:
 	void set_BANDWIDTHS(std::string s);
 	std::string get_BANDWIDTHS();
 
-	void set_band_selection(int v);
+	void get_band_selection(int v);
 
 };
 

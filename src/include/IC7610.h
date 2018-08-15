@@ -191,6 +191,9 @@ public:
 	int  get_dual_watch();
 	void set_index_att(int);
 
+	void set_band_selection(int v);
+	void get_band_selection(int v);
+
 };
 
 #endif

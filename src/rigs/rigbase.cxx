@@ -156,6 +156,8 @@ rigbase::rigbase()
 	bpf_center = 0;
 	pbt = 0;
 
+	rTONE = tTONE = 8;
+
 	max_power = 100;
 
 	active_mode = 0; // wbx

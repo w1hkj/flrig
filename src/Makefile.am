@@ -221,6 +221,7 @@ flrig_SOURCES += \
 	widgets/flslider2.cxx \
 	widgets/font_browser.cxx \
 	widgets/FreqControl.cxx \
+	widgets/pl_tones.cxx \
 	widgets/ValueSlider.cxx \
 	widgets/hspinner.cxx \
 	support/tod_clock.cxx \
@@ -310,6 +311,7 @@ EXTRA_DIST = \
 	include/PCR1000.h \
 	include/RAY152.h \
 	include/mingw.h \
+	include/pl_tones.h \
 	include/ptt.h \
 	include/rig.h \
 	include/rigs.h \

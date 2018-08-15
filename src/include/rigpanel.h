@@ -49,6 +49,7 @@
 #include <FL/Fl_Counter.H>
 #include <FL/Fl_Simple_Counter.H>
 #include <FL/Fl_Progress.H>
+#include <FL/Fl_Input_Choice.H>
 
 #include "flinput2.h"
 #include "Fl_SigBar.h"
@@ -56,6 +57,7 @@
 #include "combo.h"
 #include "ValueSlider.h"
 #include "hspinner.h"
+#include "pl_tones.h"
 
 extern Fl_Double_Window* XcvrDialog();
 extern Fl_Double_Window* MetersDialog();
@@ -158,19 +160,41 @@ extern Fl_Group *grpTABS;
 
 extern Fl_Tabs *tabsGeneric;
 extern Fl_Group *hidden_tabs;
-extern Fl_Group *genericBands;
-extern Fl_Button *btnBandSelect_1;
-extern Fl_Button *btnBandSelect_2;
-extern Fl_Button *btnBandSelect_3;
-extern Fl_Button *btnBandSelect_4;
-extern Fl_Button *btnBandSelect_5;
-extern Fl_Button *btnBandSelect_6;
-extern Fl_Button *btnBandSelect_7;
-extern Fl_Button *btnBandSelect_8;
-extern Fl_Button *btnBandSelect_9;
-extern Fl_Button *btnBandSelect_10;
-extern Fl_Button *btnBandSelect_11;
-extern Fl_ComboBox *opSelect60;
+extern Fl_Group *tab_yaesu_bands;
+extern Fl_Button *btn_yaesu_select_1;
+extern Fl_Button *btn_yaesu_select_2;
+extern Fl_Button *btn_yaesu_select_3;
+extern Fl_Button *btn_yaesu_select_4;
+extern Fl_Button *btn_yaesu_select_5;
+extern Fl_Button *btn_yaesu_select_6;
+extern Fl_Button *btn_yaesu_select_7;
+extern Fl_Button *btn_yaesu_select_8;
+extern Fl_Button *btn_yaesu_select_9;
+extern Fl_Button *btn_yaesu_select_10;
+extern Fl_Button *btn_yaesu_select_11;
+extern Fl_ComboBox *op_yaesu_select60;
+
+extern Fl_Group *tab_icom_bands;
+extern Fl_Button *btn_icom_select_1;
+extern Fl_Button *btn_icom_select_2;
+extern Fl_Button *btn_icom_select_3;
+extern Fl_Button *btn_icom_select_4;
+extern Fl_Button *btn_icom_select_5;
+extern Fl_Button *btn_icom_select_6;
+extern Fl_Button *btn_icom_select_7;
+extern Fl_Button *btn_icom_select_8;
+extern Fl_Button *btn_icom_select_9;
+extern Fl_Button *btn_icom_select_10;
+extern Fl_Button *btn_icom_select_11;
+extern Fl_Button *btn_icom_select_12;
+extern Fl_Button *btn_icom_select_13;
+
+extern Fl_PL_tone *choice_tTONE;
+extern Fl_PL_tone *choice_rTONE;
+
+extern int PL_tones[50];
+extern const char *szTONES;
+
 extern Fl_Group *genericCW;
 extern Fl_Light_Button *btnSpot;
 

@@ -100,6 +100,9 @@ class RIG_IC746PRO : public RIG_IC746 {
 public:
 	RIG_IC746PRO();
 	virtual ~RIG_IC746PRO(){}
+
+	virtual void initialize();
+
 	virtual void set_modeA(int val);
 	virtual int  get_modeA();
 
@@ -156,6 +159,9 @@ public:
 	bool twovfos() { return false; }
 
 	const char **bwtable(int);
+
+	void set_band_selection(int v);
+	void get_band_selection(int v);
 
 };
 

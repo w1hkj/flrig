@@ -131,6 +131,13 @@ void RIG_IC7200::initialize()
 	IC7200_widgets[12].W = sldrNOTCH;
 	IC7200_widgets[13].W = sldrMICGAIN;
 	IC7200_widgets[14].W = sldrPOWER;
+
+	btn_icom_select_11->deactivate();
+	btn_icom_select_12->deactivate();
+	btn_icom_select_13->deactivate();
+
+	choice_rTONE->deactivate();
+	choice_tTONE->deactivate();
 }
 
 RIG_IC7200::RIG_IC7200() {
@@ -193,6 +200,8 @@ RIG_IC7200::RIG_IC7200() {
 	has_split_AB = true;
 	has_vfo_adj = true;
 	has_a2b = true;
+
+	has_band_selection = true;
 
 	has_cw_wpm = true;
 	has_cw_spot_tone = true;
@@ -1607,3 +1616,65 @@ double RIG_IC7200::getVfoAdj()
 	}
 	return vfo_;
 }
+
+void RIG_IC7200::get_band_selection(int v)
+{
+	cmd.assign(pre_to);
+	cmd.append("\x1A\x01");
+	cmd += to_bcd_be( v, 2 );
+	cmd += '\x01';
+	cmd.append( post );
+
+	if (waitFOR(17, "get band")) {
+		std::string ans = replystr;
+		size_t p = ans.rfind(pre_fm);
+		if (p != string::npos) {
+			long int bandfreq = fm_bcd_be(ans.substr(p+8, 5), 10);
+			int bandmode = ans[p+13];
+			int bandfilter = ans[p+14];
+			int banddata = ans[p+15] & 0x10;
+			if ((bandmode == 0 || bandmode == 1) && banddata) bandmode += 7;
+			if (useB) {
+				set_vfoB(bandfreq);
+				set_modeB(bandmode);
+				set_FILT(bandfilter);
+			} else {
+				set_vfoA(bandfreq);
+				set_modeA(bandmode);
+				set_FILT(bandfilter);
+			}
+			set_trace(2, "get", str2hex(ans.substr(p).c_str(), ans.substr(p).length()));
+		}
+	}
+}
+
+void RIG_IC7200::set_band_selection(int v)
+{
+	long freq = (useB ? B.freq : A.freq);
+	int mode = (useB ? B.imode : A.imode);
+	int fil = (useB ? B.filter : A.filter);
+
+	cmd.assign(pre_to);
+	cmd.append("\x1A\x01");
+	cmd += to_bcd_be( v, 2 );
+	cmd += '\x01';
+	cmd.append( to_bcd_be( freq, 10 ) );
+	cmd += mdval[mode];
+	cmd += fil;
+	if (mode >= 7)
+		cmd += '\x10';
+	else
+		cmd += '\x00';
+	cmd.append(post);
+	waitFB("set band");
+	set_trace(2, "SET", str2hex(cmd.c_str(), cmd.length()));
+
+	cmd.assign(pre_to);
+	cmd.append("\x1A\x01");
+	cmd += to_bcd_be( v, 2 );
+	cmd += '\x01';
+	cmd.append( post );
+
+	waitFOR(17, "get band stack");
+}
+

@@ -1224,11 +1224,11 @@ void RIG_FT991A::set_cw_vol()
 */
 
 /*
-void RIG_FT991A::set_band_selection(int v)
+void RIG_FT991A::get_band_selection(int v)
 {
 	int chan_mem_on = false;
 	cmd = "IF;";
-	wait_char(';',28, FL991_WAIT_TIME, "get vfo mode in set_band_selection", ASC);
+	wait_char(';',28, FL991_WAIT_TIME, "get vfo mode in get_band_selection", ASC);
 	size_t p = replystr.rfind("IF");
 	if (p == string::npos) return;
 	if ((p + 27) >= replystr.length()) return;
