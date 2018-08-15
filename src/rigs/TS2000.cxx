@@ -74,15 +74,16 @@ static const char *TS2000_FSKbw[] = {
 //------------------------------------------------------------------------------
 
 static GUI rig_widgets[]= {
-	{ (Fl_Widget *)btnVol,        2, 125,  50 },
-	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
-	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },
-	{ (Fl_Widget *)btnIFsh,     214, 105,  50 },
-	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
-	{ (Fl_Widget *)btnNotch,    214, 125,  50 },
-	{ (Fl_Widget *)sldrNOTCH,   266, 125, 156 },
-	{ (Fl_Widget *)sldrMICGAIN, 266, 145, 156 },
-	{ (Fl_Widget *)sldrPOWER,    54, 165, 368 },
+	{ (Fl_Widget *)btnVol,        2, 125,  50 }, // 0
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 }, // 1
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 }, // 2
+	{ (Fl_Widget *)btnIFsh,     214, 105,  50 }, // 3
+	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 }, // 4
+	{ (Fl_Widget *)btnNotch,    214, 125,  50 }, // 5
+	{ (Fl_Widget *)sldrNOTCH,   266, 125, 156 }, // 6
+	{ (Fl_Widget *)sldrSQUELCH, 266, 145, 156 }, // 7
+	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 }, // 8
+	{ (Fl_Widget *)sldrPOWER,    54, 165, 368 }, // 9
 	{ (Fl_Widget *)NULL,          0,   0,   0 }
 };
 
@@ -98,8 +99,9 @@ void RIG_TS2000::initialize()
 	rig_widgets[4].W = sldrIFSHIFT;
 	rig_widgets[5].W = btnNotch;
 	rig_widgets[6].W = sldrNOTCH;
-	rig_widgets[7].W = sldrMICGAIN;
-	rig_widgets[8].W = sldrPOWER;
+	rig_widgets[7].W = sldrSQUELCH;
+	rig_widgets[8].W = sldrMICGAIN;
+	rig_widgets[9].W = sldrPOWER;
 
 	menu012.clear();
 	cmd = "EX0120000;"; // read menu 012 state
@@ -208,6 +210,7 @@ RIG_TS2000::RIG_TS2000() {
 	has_preamp_control =
 	has_mode_control =
 	has_bandwidth_control =
+	has_sql_control =
 	has_ptt_control = true;
 
 	rxona = true;
