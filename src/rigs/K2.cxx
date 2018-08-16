@@ -102,8 +102,10 @@ void RIG_K2::initialize()
 
 //enable extended command mode
 	sendCommand("K22;", 0);
+	sett("enable extended command mode");
 //disable auto reporting of info
 	sendCommand("AI0;", 0);
+	sett("disable auto reporting");
 //ensure K2 is in VFO A
     get_power_control();
 }
@@ -162,6 +164,8 @@ bool RIG_K2::get_info()
 	rsp = cmd = "IF";
 	cmd += ';';
 	int ret = waitN(38, 100, "get info", ASC);
+	gett("get info");
+
 	if (ret < 38) return false;
 	size_t p = replystr.find(rsp);
 	if (PTT && (replystr[p+28]=='0')) Fl::awake(setPTT, (void*)0);
@@ -176,6 +180,7 @@ void RIG_K2::selectA()
 {
 	cmd = "FR0;FT0";
 	sendCommand(cmd);
+	sett("selectA");
 	K2split = false;
 	showresp(WARN, ASC, "select A", cmd, replystr);
 }
@@ -184,6 +189,7 @@ void RIG_K2::selectB()
 {
 	cmd = "FR1;FT1";
 	sendCommand(cmd);
+	sett("selectB");
 	K2split = false;
 	showresp(WARN, ASC, "select B", cmd, replystr);
 }
@@ -201,6 +207,7 @@ void RIG_K2::set_split(bool val)
 		else
 			cmd = "FR0;FT1;";
 		sendCommand(cmd);
+		sett("set split");
 		showresp(WARN, ASC, "set split ON", cmd, replystr);
 	} else {
 		if (useB)
@@ -208,6 +215,7 @@ void RIG_K2::set_split(bool val)
 		else
 			cmd = "FR0;FT0;";
 		sendCommand(cmd);
+		sett("set split");
 		showresp(WARN, ASC, "set split OFF", cmd, replystr);
 	}
 }
@@ -222,6 +230,7 @@ bool RIG_K2::check ()
 	rsp = cmd = "FA";
 	cmd += ';';
 	int ret = waitN(14, 100, "check", ASC);
+	gett("check");
 	if (ret < 14) return false;
 	return true;
 }
@@ -231,6 +240,8 @@ long RIG_K2::get_vfoA ()
 	rsp = cmd = "FA";
 	cmd += ';';
 	int ret = waitN(14, 100, "get vfo A", ASC);
+	gett("get vfoA");
+
 	if (ret < 14) return freqA;
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqA;
@@ -251,6 +262,7 @@ void RIG_K2::set_vfoA (long freq)
 	}
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET vfo A", cmd, replystr);
+	sett("set vfoA");
 }
 
 long RIG_K2::get_vfoB()
@@ -258,6 +270,8 @@ long RIG_K2::get_vfoB()
 	rsp = cmd = "FB";
 	cmd += ';';
 	int ret = waitN(14, 100, "get vfo B", ASC);
+	gett("get vfoB");
+
 	if (ret < 14) return freqB;
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqB;
@@ -278,6 +292,7 @@ void RIG_K2::set_vfoB(long freq)
 	}
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET vfo B", cmd, replystr);
+	sett("set vfoB");
 }
 
 void RIG_K2::set_modeA(int val)
@@ -288,6 +303,7 @@ void RIG_K2::set_modeA(int val)
 	cmd[2] += val;
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET mode A", cmd, replystr);
+	sett("set modeA");
 }
 
 int RIG_K2::get_modeA()
@@ -295,6 +311,8 @@ int RIG_K2::get_modeA()
 	rsp = cmd = "MD";
 	cmd += ';';
 	int ret = waitN(4, 100, "get mode A", ASC);
+	gett("get modeA");
+
 	if (ret < 4) return 0;
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -310,6 +328,7 @@ void RIG_K2::set_modeB(int val)
 	cmd[2] += val;
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET mode B", cmd, replystr);
+	sett("set modeB");
 }
 
 int  RIG_K2::get_modeB()
@@ -317,6 +336,8 @@ int  RIG_K2::get_modeB()
 	rsp = cmd = "MD";
 	cmd += ';';
 	int ret = waitN(4, 100, "get mode B", ASC);
+	gett("get modeB");
+
 	if (ret < 4) return 0;
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -341,6 +362,7 @@ void RIG_K2::set_bwA(int val)
 	}
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set bwA", cmd, replystr);
+	sett("set bwA");
 }
 
 int RIG_K2::get_bwA()
@@ -348,6 +370,8 @@ int RIG_K2::get_bwA()
 	rsp = cmd = "FW";
 	cmd += ';';
 	int ret = waitN(9, 100, "get bw A", ASC);
+	gett("get bwA");
+
 	if (ret < 9) return 0;
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -367,6 +391,7 @@ void RIG_K2::set_bwB(int val)
 	}
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set bwA", cmd, replystr);
+	sett("set bwB");
 }
 
 int  RIG_K2::get_bwB()
@@ -374,6 +399,8 @@ int  RIG_K2::get_bwB()
 	rsp = cmd = "FW";
 	cmd += ';';
 	int ret = waitN(9, 100, "get bw B", ASC);
+	gett("get bwB");
+
 	if (ret < 9) return 0;
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -386,6 +413,7 @@ void RIG_K2::tune_rig()
 	cmd = "SW20;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "tune", cmd, replystr);
+	sett("tune rig");
 }
 
 int RIG_K2::get_smeter()
@@ -393,6 +421,8 @@ int RIG_K2::get_smeter()
 	rsp = cmd = "BG";
 	cmd += ';';
 	int ret = waitN(5, 100, "get smeter", ASC);
+	gett("get smeter");
+
 	if (ret < 5) return 0;
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -410,6 +440,8 @@ int RIG_K2::get_power_out()
 	rsp = cmd = "BG";
 	cmd += ';';
 	int ret = waitN(5, 100, "get power", ASC);
+	gett("get power out");
+
 	if (ret < 5) return 0;
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -427,6 +459,8 @@ int RIG_K2::get_power_control()
 	rsp = cmd = "PC";  // extended mode for get power
 	cmd += ';';
 	int ret = waitN(7, 100, "get pwr cont", ASC);
+	gett("get power control");
+
 	if (ret < 7) return progStatus.power_level;
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -450,6 +484,7 @@ void RIG_K2::set_power_control(double val)
 	}
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET pwr", cmd, replystr);
+	sett("set power control");
 }
 
 void RIG_K2::get_pc_min_max_step(double &min, double &max, double &step)
@@ -467,6 +502,8 @@ void RIG_K2::set_PTT_control(int val)
 	else	 cmd = "RX;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET ptt", cmd, replystr);
+	sett("set PTT");
+
 	ptt_ = val;
 }
 
@@ -476,6 +513,7 @@ void RIG_K2::set_attenuator(int val)
 	else	 cmd = "RA00;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET att", cmd, replystr);
+	sett("set attenuator");
 }
 
 int RIG_K2::get_attenuator()
@@ -483,6 +521,8 @@ int RIG_K2::get_attenuator()
 	rsp = cmd = "RA";
 	cmd += ';';
 	int ret = waitN(5, 100, "get att", ASC);
+	gett("get_attenuator");
+
 	if (ret < 5) return 0;
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -495,6 +535,7 @@ void RIG_K2::set_preamp(int val)
 	else	 cmd = "PA0;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET pre", cmd, replystr);
+	sett("set preamp");
 }
 
 int RIG_K2::get_preamp()
@@ -502,6 +543,8 @@ int RIG_K2::get_preamp()
 	rsp = cmd = "PA";
 	cmd += ';';
 	int ret = waitN(4, 100, "get pre", ASC);
+	gett("get preamp");
+
 	if (ret < 4) return 0;
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;

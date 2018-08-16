@@ -24,9 +24,9 @@
 
 const char KX3name_[] = "KX3";
 
-const char *KX3modes_[] = 
+const char *KX3modes_[] =
 	{ "LSB", "USB", "CW", "FM", "AM", "DATA", "CW-R", "DATA-R", NULL};
-const char modenbr[] = 
+const char modenbr[] =
 	{ '1', '2', '3', '4', '5', '6', '7', '9' };
 static const char KX3_mode_type[] =
 	{ 'L', 'U', 'L', 'U', 'U', 'U', 'U', 'L' };
@@ -56,7 +56,7 @@ static GUI k3_widgets[]= {
 };
 
 RIG_KX3::RIG_KX3() {
-// base class values	
+// base class values
 	name_ = KX3name_;
 	modes_ = KX3modes_;
 	bandwidths_ = KX3_widths;
@@ -141,13 +141,17 @@ void RIG_KX3::initialize()
 	cmd = "AI0;"; // disable auto-info
 	sendCommand(cmd);
 	showresp(INFO, ASC, "disable auto-info", cmd, replystr);
+	sett("disable auto info");
 
 	cmd = "K31;"; // KX3 extended mode
 	sendCommand(cmd);
 	showresp(INFO, ASC, "KX3 extended mode", cmd, replystr);
+	sett("KX3 extended mode");
 
 	cmd = "OM;"; // request options to get power level
 	int ret = wait_char(';', 16, KX3_WAIT_TIME, "Options", ASC);
+	gett("get options");
+
 	if (ret) {
 		if (replystr.find("P") == string::npos) {
 			minpwr = 0;
@@ -180,6 +184,8 @@ bool RIG_KX3::check ()
 {
 	cmd = "FA;";
 	int ret = wait_char(';', 14, KX3_WAIT_TIME, "check", ASC);
+	gett("vfo check");
+
 	if (ret < 14) return false;
 	return true;
 }
@@ -188,10 +194,12 @@ long RIG_KX3::get_vfoA ()
 {
 	cmd = "FA;";
 	int ret = wait_char(';', 14, KX3_WAIT_TIME, "get vfo A", ASC);
+	gett("get vfoA");
+
 	if (ret < 14) return freqA;
 	size_t p = replystr.rfind("FA");
 	if (p == string::npos) return freqA;
-	
+
 	long f = 0;
 	for (size_t n = 2; n < 13; n++)
 		f = f*10 + replystr[p + n] - '0';
@@ -209,16 +217,19 @@ void RIG_KX3::set_vfoA (long freq)
 	}
 	sendCommand(cmd);
 	showresp(INFO, ASC, "set vfo A", cmd, replystr);
+	sett("set vfoA");
 }
 
 long RIG_KX3::get_vfoB ()
 {
 	cmd = "FB;";
 	int ret = wait_char(';', 14, KX3_WAIT_TIME, "get vfo B", ASC);
+	gett("get vfoB");
+
 	if (ret < 14) return freqB;
 	size_t p = replystr.rfind("FB");
 	if (p == string::npos) return freqB;
-	
+
 	long f = 0;
 	for (size_t n = 2; n < 13; n++)
 		f = f*10 + replystr[p + n] - '0';
@@ -240,10 +251,11 @@ void RIG_KX3::set_vfoB (long freq)
 	}
 	sendCommand(cmd);
 	showresp(INFO, ASC, "set vfo B", cmd, replystr);
+	sett("set vfoB");
 }
 
 // Volume control
-void RIG_KX3::set_volume_control(int val) 
+void RIG_KX3::set_volume_control(int val)
 {
 	int ivol = (int)(val * 2.55);
 	cmd = "AG000;";
@@ -253,12 +265,15 @@ void RIG_KX3::set_volume_control(int val)
 	}
 	sendCommand(cmd);
 	showresp(INFO, ASC, "set vol", cmd, replystr);
+	sett("set volume control");
 }
 
 int RIG_KX3::get_volume_control()
 {
 	cmd = "AG;";
 	int ret = wait_char(';', 6, KX3_WAIT_TIME, "get volume", ASC);
+	gett("get volume control");
+
 	if (ret < 6) return progStatus.volume;
 	size_t p = replystr.rfind("AG");
 	if (p == string::npos) return 0;
@@ -295,63 +310,63 @@ void RIG_KX3::set_pbt_values(int val)
 
 /*
  * MD $ (Operating Mode; GET/SET)
- * SET/RSP format: MDn; or MD$n; 
- *   where n is 
- *     1 (LSB), 
- *     2 (USB), 
- *     3 (CW), 
- *     4 (FM), 
- *     5 (AM), 
- *     6 (DATA), 
+ * SET/RSP format: MDn; or MD$n;
+ *   where n is
+ *     1 (LSB),
+ *     2 (USB),
+ *     3 (CW),
+ *     4 (FM),
+ *     5 (AM),
+ *     6 (DATA),
  *     7 (CW-REV),
  *     9 (DATA-REV).
- * Notes: 
+ * Notes:
  *   (1) K3 only: In Diversity Mode (accessed by holding SUB), sending MDn;
  *       sets both main and sub mode to n.
- *   (2) DATA and DATA-REV select the data sub-mode that was last in effect 
- *       on the present band. (To read/set data sub-mode, use DT.) 
+ *   (2) DATA and DATA-REV select the data sub-mode that was last in effect
+ *       on the present band. (To read/set data sub-mode, use DT.)
  *       The norm/rev conditions for the K3’s data sub-modes are
- *       handled in two pairs at present: 
- *         DATA A/PSK D, and 
- *         AFSK A/FSK D. 
- *       E.g., if the radio is set up for DATA A mode, alternating between 
- *             MD6 and MD9 will cause both DATA A and PSK D to be set to the 
- *             same normal/reverse condition. 
- *       In K2 command modes 1 and 3 (K21 and K23), the RSP message converts 
- *       modes 6 and 7 (DATA and DATA-REV) to modes 1 and 2 (LSB and USB). 
- *       This may be useful with existing software applications that don't 
+ *       handled in two pairs at present:
+ *         DATA A/PSK D, and
+ *         AFSK A/FSK D.
+ *       E.g., if the radio is set up for DATA A mode, alternating between
+ *             MD6 and MD9 will cause both DATA A and PSK D to be set to the
+ *             same normal/reverse condition.
+ *       In K2 command modes 1 and 3 (K21 and K23), the RSP message converts
+ *       modes 6 and 7 (DATA and DATA-REV) to modes 1 and 2 (LSB and USB).
+ *       This may be useful with existing software applications that don't
  * handle DATA modes correctly.
 */
 /* The DT command needs to be included for get/set mode
- * 
+ *
  * DT (DATA Sub-Mode; GET/SET)
- *   SET/RSP format: DTn; where n is the data sub-mode last used with VFO A, 
- *   whether or not DATA mode is in effect: 
- *     0 (DATA A), 
- *     1 (AFSK A), 
- *     2 (FSK D), 
- *     3 (PSK D). See MD for data normal/reverse considerations. 
- *   In Diversity Mode (K3 only, accessed by sending DV1 or via a long hold 
- *   of SUB), sending DTn matches the sub receiver’s mode to the main receiver’s. 
- *   Notes: 
+ *   SET/RSP format: DTn; where n is the data sub-mode last used with VFO A,
+ *   whether or not DATA mode is in effect:
+ *     0 (DATA A),
+ *     1 (AFSK A),
+ *     2 (FSK D),
+ *     3 (PSK D). See MD for data normal/reverse considerations.
+ *   In Diversity Mode (K3 only, accessed by sending DV1 or via a long hold
+ *   of SUB), sending DTn matches the sub receiver’s mode to the main receiver’s.
+ *   Notes:
  *     (1) Use DT only when the transceiver is in DATA mode; otherwise,
- *         the returned value may not be valid. 
- *     (2) In AI2/3 modes, changing the data sub-mode results in both FW 
+ *         the returned value may not be valid.
+ *     (2) In AI2/3 modes, changing the data sub-mode results in both FW
  *         and IS responses.
- *     (3) The present data sub-mode is also reported as part of the IF command, 
- *         although this requires that K31 be in effect. Refer to the IF command 
+ *     (3) The present data sub-mode is also reported as part of the IF command,
+ *         although this requires that K31 be in effect. Refer to the IF command
  *         for details.
 */
 /* and last but not least, the IF command
- * 
+ *
  * IF (Transceiver Information; GET only)
- *   RSP format: IF[f]*****+yyyyrx*00tmvspbd1*; 
+ *   RSP format: IF[f]*****+yyyyrx*00tmvspbd1*;
  *   where the fields are defined as follows:
- *     [f]    Operating frequency, excluding any RIT/XIT offset 
+ *     [f]    Operating frequency, excluding any RIT/XIT offset
  *            (11 digits; see FA command format)
  *      *     represents a space (BLANK, or ASCII 0x20)
  *      +     either "+" or "-" (sign of RIT/XIT offset)
- *      yyyy  RIT/XIT offset in Hz (range is -9999 to +9999 Hz when 
+ *      yyyy  RIT/XIT offset in Hz (range is -9999 to +9999 Hz when
  *            computer-controlled)
  *      r     1 if RIT is on, 0 if off
  *      x     1 if XIT is on, 0 if off
@@ -360,16 +375,16 @@ void RIG_KX3::set_pbt_values(int val)
  *      v     receive-mode VFO selection, 0 for VFO A, 1 for VFO B
  *      s     1 if scan is in progress, 0 otherwise
  *      p     1 if the transceiver is in split mode, 0 otherwise
- *      b     Basic RSP format: always 0; 
- *            K2 Extended RSP format (K22): 
+ *      b     Basic RSP format: always 0;
+ *            K2 Extended RSP format (K22):
  *            1 if present IF response is due to a band change; 0 otherwise
- *      d     Basic RSP format: always 0; 
- *            K3 Extended RSP format (K31): 
- *      1     DATA sub-mode, if applicable 
+ *      d     Basic RSP format: always 0;
+ *            K3 Extended RSP format (K31):
+ *      1     DATA sub-mode, if applicable
  *              (0=DATA A, 1=AFSK A, 2= FSK D, 3=PSK D)
- * The fixed-value fields (space, 0, and 1) are provided for syntactic 
+ * The fixed-value fields (space, 0, and 1) are provided for syntactic
  * compatibility with existing software.
- * 
+ *
  * 01234567890123456789012345678901234567
  * 0         1         2         3      7
  * IF00014070000*****+yyyyrx*00tmvspbd1*;
@@ -378,7 +393,7 @@ void RIG_KX3::set_pbt_values(int val)
  * IF00014070000     -000000 0002000011 ;  OFF
  * IF00014070000     -000000 0002001011 ;  ON
 */
- 
+
 void RIG_KX3::set_modeA(int val)
 {
 	modeA = val;
@@ -387,12 +402,15 @@ void RIG_KX3::set_modeA(int val)
 	sendCommand(cmd);
 	showresp(INFO, ASC, "set mode A", cmd, replystr);
 	set_pbt_values(val);
+	sett("set modeA");
 }
 
 int RIG_KX3::get_modeA()
 {
 	cmd = "MD;";
 	int ret = wait_char(';', 4, KX3_WAIT_TIME, "get mode A", ASC);
+	gett("get modeA");
+
 	if (ret < 4) return modeA;
 	size_t p = replystr.rfind("MD");
 	if (p == string::npos) return modeA;
@@ -414,12 +432,15 @@ void RIG_KX3::set_modeB(int val)
 	sendCommand(cmd);
 	showresp(INFO, ASC, "set mode B", cmd, replystr);
 	set_pbt_values(val);
+	sett("set modeB");
 }
 
 int RIG_KX3::get_modeB()
 {
 	cmd = "MD$;";
 	int ret = wait_char(';', 4, KX3_WAIT_TIME, "get mode B", ASC);
+	gett("get modeB");
+
 	if (ret < 4) return modeB;
 	size_t p = replystr.rfind("MD$");
 	if (p == string::npos) return modeB;
@@ -438,12 +459,15 @@ void RIG_KX3::set_preamp(int val)
 {
 	if (val) sendCommand("PA1;", 0);
 	else	 sendCommand("PA0;", 0);
+	sett("set preamp");
 }
 
 int RIG_KX3::get_preamp()
 {
 	cmd = "PA;";
 	int ret = wait_char(';', 4, KX3_WAIT_TIME, "get preamp", ASC);
+	gett("get preamp");
+
 	if (ret < 4) return progStatus.preamp;
 	size_t p = replystr.rfind("PA");
 	if (p == string::npos) return 0;
@@ -455,12 +479,15 @@ void RIG_KX3::set_attenuator(int val)
 {
 	if (val) sendCommand("RA01;", 0);
 	else	 sendCommand("RA00;", 0);
+	sett("set attenuator");
 }
 
 int RIG_KX3::get_attenuator()
 {
 	cmd = "RA;";
 	int ret = wait_char(';', 5, KX3_WAIT_TIME, "set ATT", ASC);
+	gett("get attenuator");
+
 	if (ret < 5) return progStatus.attenuator;
 	size_t p = replystr.rfind("RA");
 	if (p == string::npos) return 0;
@@ -478,12 +505,15 @@ void RIG_KX3::set_power_control(double val)
 	}
 	sendCommand(cmd);
 	showresp(INFO, ASC, "set power ctrl", cmd, replystr);
+	sett("set power control");
 }
 
 int RIG_KX3::get_power_control()
 {
 	cmd = "PC;";
 	int ret = wait_char(';', 6, KX3_WAIT_TIME, "get power level", ASC);
+	gett("get power control");
+
 	if (ret < 6) return progStatus.power_level;
 	size_t p = replystr.rfind("PC");
 	if (p == string::npos) return progStatus.power_level;
@@ -492,7 +522,7 @@ int RIG_KX3::get_power_control()
 
 void RIG_KX3::get_pc_min_max_step(double &min, double &max, double &step)
 {
-   min = minpwr; max = maxpwr; step = steppwr; 
+   min = minpwr; max = maxpwr; step = steppwr;
 }
 
 // Transceiver rf control
@@ -506,12 +536,15 @@ void RIG_KX3::set_rf_gain(int val)
 	}
 	sendCommand(cmd);
 	showresp(INFO, ASC, "set rfgain ctrl", cmd, replystr);
+	sett("set rf gain");
 }
 
 int RIG_KX3::get_rf_gain()
 {
 	cmd = "RG;";
 	int ret = wait_char(';', 6, KX3_WAIT_TIME, "get RF gain", ASC);
+	gett("get rf gain");
+
 	if (ret < 6) return progStatus.rfgain;
 	size_t p = replystr.rfind("RG");
 	if (p == string::npos) return progStatus.rfgain;
@@ -523,7 +556,7 @@ int RIG_KX3::get_rf_gain()
 
 void RIG_KX3::get_rf_min_max_step(int &min, int &max, int &step)
 {
-   min = 0; max = 250; step = 1; 
+   min = 0; max = 250; step = 1;
 }
 
 // Transceiver mic control
@@ -537,12 +570,15 @@ void RIG_KX3::set_mic_gain(int val)
 	}
 	sendCommand(cmd);
 	showresp(INFO, ASC, "set mic ctrl", cmd, replystr);
+	sett("set mic gain");
 }
 
 int RIG_KX3::get_mic_gain()
 {
 	cmd = "MG;";
 	int ret = wait_char(';', 6, KX3_WAIT_TIME, "get MIC gain", ASC);
+	gett("get mic gain");
+
 	if (ret < 6) return progStatus.mic_gain;
 	size_t p = replystr.rfind("MG");
 	if (p == string::npos) return progStatus.mic_gain;
@@ -554,7 +590,7 @@ int RIG_KX3::get_mic_gain()
 
 void RIG_KX3::get_mic_min_max_step(int &min, int &max, int &step)
 {
-   min = 0; max = 60; step = 1; 
+   min = 0; max = 60; step = 1;
 }
 
 // Tranceiver PTT on/off
@@ -563,29 +599,32 @@ void RIG_KX3::set_PTT_control(int val)
 	if (val) sendCommand("TX;", 0);
 	else	 sendCommand("RX;", 0);
 	ptt_ = val;
+	sett("set PTT");
 }
 
 // BG (Bargraph Read; GET only)
-// RSP format: BGnn; where <nn> is 00 (no bars) through 10 (bar 10) if the 
-// bargraph is in DOT mode, and 12 (no bars) through 22 (all 10 bars) if 
-// the bargraph is in BAR mode. Reads the S-meter level on receive. Reads 
-// the power output level or ALC level on transmit, depending on the RF/ALC 
-// selection. Also see SM/SM$ command, which can read either main or sub RX 
+// RSP format: BGnn; where <nn> is 00 (no bars) through 10 (bar 10) if the
+// bargraph is in DOT mode, and 12 (no bars) through 22 (all 10 bars) if
+// the bargraph is in BAR mode. Reads the S-meter level on receive. Reads
+// the power output level or ALC level on transmit, depending on the RF/ALC
+// selection. Also see SM/SM$ command, which can read either main or sub RX
 // S-meter level.
 
 // SM SM$ (S-meter Read; GET only)
-// Basic RSP format: SMnnnn; where nnnn is 0000-0015. 
+// Basic RSP format: SMnnnn; where nnnn is 0000-0015.
 // S9=6; S9+20=9; S9+40=12; S9+60=15.
-// KX3 Extended RSP format (KX31): nnnn is 0000-0021. 
+// KX3 Extended RSP format (KX31): nnnn is 0000-0021.
 // S9=9; S9+20=13; S9+40=17; S9+60=21.
-// This command can be used to obtain either the main (SM) or sub (SM$) 
-// S-meter readings. Returns 0000 in transmit mode. BG can be used to 
+// This command can be used to obtain either the main (SM) or sub (SM$)
+// S-meter readings. Returns 0000 in transmit mode. BG can be used to
 // simply emulate the bar graph level, and applies to either RX or TX mode.
 
 int RIG_KX3::get_smeter()
 {
 	cmd = "SM;";
 	int ret = wait_char(';', 7, KX3_WAIT_TIME, "get Smeter", ASC);
+	gett("get smeter");
+
 	if (ret < 7) return 0;
 
 	size_t p = replystr.rfind("SM");
@@ -602,12 +641,15 @@ void RIG_KX3::set_noise(bool on)
 {
 	if (on) sendCommand("NB1;", 0);
 	else	sendCommand("NB0;", 0);
+	sett("set noise blanker");
 }
 
 int RIG_KX3::get_noise()
 {
 	cmd = "NB;";
 	int ret = wait_char(';', 4, KX3_WAIT_TIME, "get Noise Blanker", ASC);
+	gett("get noise blanker");
+
 	if (ret < 4) return progStatus.noise;
 	size_t p = replystr.rfind("NB");
 	if (p == string::npos) return progStatus.noise;
@@ -629,12 +671,15 @@ void RIG_KX3::set_bwA(int val)
 	val /= 10; cmd[2] += val % 10;
 	sendCommand(cmd);
 	showresp(INFO, ASC, "set bw A", cmd, replystr);
+	sett("set bwA");
 }
 
 int RIG_KX3::get_bwA()
 {
 	cmd = "BW;";
 	int ret = wait_char(';', 7, KX3_WAIT_TIME, "get bandwidth A", ASC);
+	gett("get bwA");
+
 	if (ret < 7) return bwA;
 	size_t p = replystr.rfind("FW");
 	if (p == string::npos) return bwA;
@@ -662,12 +707,15 @@ void RIG_KX3::set_bwB(int val)
 	val /= 10; cmd[3] += val % 10;
 	sendCommand(cmd);
 	showresp(INFO, ASC, "set bw B", cmd, replystr);
+	sett("set bwB");
 }
 
 int RIG_KX3::get_bwB()
 {
 	cmd = "BW$;";
 	int ret = wait_char(';', 8, KX3_WAIT_TIME, "get bandwidth B", ASC);
+	gett("get bwB");
+
 	if (ret < 8) return bwB;
 	size_t p = replystr.rfind("FW$");
 	if (p == string::npos) return bwB;
@@ -683,6 +731,8 @@ int RIG_KX3::get_power_out()
 {
 	cmd = "BG;"; // responds BGnn; 0 < nn < 10
 	int ret = wait_char(';', 5, KX3_WAIT_TIME, "get power out", ASC);
+	gett("get power out");
+
 	if (ret < 5) return 0;
 	size_t p = replystr.rfind("BG");
 	if (p == string::npos) return 0;
@@ -703,10 +753,12 @@ void RIG_KX3::set_split(bool val)
 		cmd = "FT1;";
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set split ON", cmd, replystr);
+		sett("set split ON");
 	} else {
 		cmd = "FR0;";
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set split OFF", cmd, replystr);
+		sett("set split OFF");
 	}
 	split_on = val;
 }
@@ -723,6 +775,8 @@ int RIG_KX3::get_split()
 {
 	cmd = "IF;";
 	int ret = wait_char(';', 38, KX3_WAIT_TIME, "get split", ASC);
+	gett("get split");
+
 	if (ret < 38) return split_on;
 	size_t p = replystr.rfind("IF");
 	if (p == string::npos) return split_on;
@@ -730,7 +784,7 @@ int RIG_KX3::get_split()
 	return split_on;
 }
 
-void RIG_KX3::set_if_shift(int val) 
+void RIG_KX3::set_if_shift(int val)
 {
 	cmd = "IS 0000;";
 	cmd[6] += val % 10; val /= 10;
@@ -739,12 +793,15 @@ void RIG_KX3::set_if_shift(int val)
 	cmd[3] += val % 10;
 	sendCommand(cmd);
 	showresp(INFO, ASC, "set if shift", cmd, replystr);
+	sett("set if shift");
 }
 
 bool RIG_KX3::get_if_shift(int &val)
 {
 	cmd = "IS;";
 	int ret = wait_char(';', 8, KX3_WAIT_TIME, "get IF shift", ASC);
+	gett("get if shift");
+
 	val = progStatus.shift_val;
 	if (ret < 8) return progStatus.shift;
 	size_t p = replystr.rfind("IS ");
@@ -758,7 +815,7 @@ bool RIG_KX3::get_if_shift(int &val)
 
 void RIG_KX3::get_if_min_max_step(int &min, int &max, int &step)
 {
-	min = if_shift_min; max = if_shift_max; step = if_shift_step; 
+	min = if_shift_min; max = if_shift_max; step = if_shift_step;
 }
 
 void  RIG_KX3::get_if_mid()
@@ -767,9 +824,11 @@ void  RIG_KX3::get_if_mid()
 	sendCommand(cmd);
 	waitResponse(500);
 	showresp(INFO, ASC, "center pbt", cmd, replystr);
+	sett("set center pbt");
 
 	cmd = "IS;";
 	int ret = wait_char(';', 8, KX3_WAIT_TIME, "get PBT center", ASC);
+	gett("get center pbt");
 	if (ret < 8) return;
 	size_t p = replystr.rfind("IS ");
 	if (p == string::npos) return;
