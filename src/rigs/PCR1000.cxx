@@ -51,6 +51,22 @@
 #include "PCR1000.h"
 #include "support.h"
 
+//----------------------------------------------------------------------
+inline string str(string s) 
+{
+	size_t p;
+	while((p = s.find('\r')) != string::npos)
+		s.replace(p, 1, "<cr>");
+	while((p = s.find('\n')) != string::npos)
+		s.replace(p, 1, "<lf>");
+	return s;
+}
+
+#define strace(s, s1) set_trace(3, s, str(s1).c_str(), str(replystr).c_str());
+#define gtrace(s, s1) get_trace(3, s, str(s1).c_str(), str(replystr).c_str());
+ 
+//----------------------------------------------------------------------
+
 const char RIG_PCR1000::name[] = "PCR-1000";
 
 //	   mode array Index Values :-         0      1      2     3     4     5
@@ -114,12 +130,14 @@ void RIG_PCR1000::initialize()
 	sendCommand(check_power_command,6);
 
 	showresp(WARN, ASC, "Check Power", check_power_command , replystr);
+	gtrace("Check Power", check_power_command);
 
 	// If the radio is turned off, turn it on.
 
 	if (replystr.rfind("H100") != std::string::npos) {
 		sendCommand(power_on_command,6);
 		showresp(WARN, ASC, "Power ON", power_on_command , replystr);
+		strace("Power ON", power_on_command);
 	}
 
 	// Set the radio with the default values
@@ -131,10 +149,7 @@ void RIG_PCR1000::initialize()
 
 bool RIG_PCR1000::check()
 {
-	sendCommand(check_power_command,6);
-	showresp(WARN, ASC, "Check Power", check_power_command , replystr);
-	if (replystr.rfind("H1") != std::string::npos) return true;
-	return false;
+	return true;
 }
 
 //----------------------------------------------------------------------
@@ -199,7 +214,8 @@ RIG_PCR1000::RIG_PCR1000() : current_vfo(A) {
 void RIG_PCR1000::shutdown() {
 	// Turn off the radio
 	sendCommand(power_off_command,6);
-	showresp(WARN, ASC, "Power OFF", power_on_command , replystr);
+	strace("Power OFF", power_off_command);
+	showresp(WARN, ASC, "Power OFF", power_off_command , replystr);
 }
 //----------------------------------------------------------------------
 
@@ -237,7 +253,7 @@ void RIG_PCR1000::setFreqModeBW(XCVR_STATE &freqMode) {
 
 	sendCommand(myComm.command,5);
 	showresp(WARN, ASC, "set vfo", myComm.command, replystr);
-
+	strace("set vfo", myComm.command);
 }
 
 //----------------------------------------------------------------------
@@ -303,6 +319,7 @@ int RIG_PCR1000::get_smeter() {	 // returns 0-100
 	int ret = sendCommand(get_smeter_command,6) ;
 
 	showresp(WARN, ASC, "S meter", get_smeter_command, replystr);
+	gtrace("S meter", get_smeter_command);
 
 	ret = hexTo(replystr.c_str()[3]) * 16 + hexTo(replystr.c_str()[4]) ;
 
@@ -328,7 +345,7 @@ void RIG_PCR1000::set_volume_control(int val) // 0 .. 100
 
 	sendCommand(volume_command, 5);
 	showresp(WARN, ASC, "set volume", volume_command, replystr);
-
+	strace("set volume", volume_command);
 }
 
 //======================================================================
@@ -435,6 +452,7 @@ void RIG_PCR1000::set_squelch(int val) {
 	set2Hex( val, &(squelch_command[3])) ;
 	sendCommand(squelch_command, 5);
 	showresp(WARN, ASC, "Set Squelch", squelch_command, replystr);
+	strace("set squelch", squelch_command);
 }
 
 int  RIG_PCR1000::get_squelch() {
@@ -460,6 +478,7 @@ void RIG_PCR1000::set_if_shift(int val) {
 	set2Hex( val/10 + 128, &(if_shift_command[3])) ;
 	sendCommand(if_shift_command, 5);
 	showresp(WARN, ASC, "IF Shift", if_shift_command, replystr);
+	strace("if shift", if_shift_command);
 }
 
 
@@ -480,11 +499,13 @@ void RIG_PCR1000::set_attenuator(int val) {
 			// Turn att on
 			sendCommand(att_on_command, 5);
 			showresp(WARN, ASC, "Set Attenuator ON", att_on_command, replystr);		// wbx
+			strace("set att ON", att_on_command);
 			attenuator = 1 ;
 		} else {
 			// Turn att off
 			sendCommand(att_off_command, 5);
 			showresp(WARN, ASC, "Set Attenuator OFF", att_off_command, replystr);	// wbx
+			strace("set att OFF", att_off_command);
 			attenuator = 0 ;
 		}
 	}
@@ -505,11 +526,13 @@ void RIG_PCR1000::set_noise(bool on) {
 		// Turn on
 		sendCommand(noise_on_command, 5);
 		showresp(WARN, ASC, "Noise Reduction ON", noise_on_command, replystr);
+		strace("nr ON", noise_on_command);
 		noise = 1 ;
 	} else {
 		// Turn off
 		sendCommand(noise_off_command, 5);
 		showresp(WARN, ASC, "Noise Reduction OFF", noise_off_command, replystr);
+		strace("nr OFF", noise_off_command);
 		noise = 0 ;
 	}
 }
