@@ -268,6 +268,8 @@ void RIG_TT550::showASCII(string s1, string s)
 
 void RIG_TT550::initialize()
 {
+	progStatus.settrace = true;
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = sldrRFGAIN;
@@ -355,7 +357,7 @@ void RIG_TT550::enable_xmtr()
 	else
 		cmd = TT550setDISABLE;
 	sendCommand(cmd, 0);
-	rig_trace(2, "enable_xmtr()", noctl(cmd).c_str());
+	set_trace(2, "enable_xmtr()", noctl(cmd).c_str());
 }
 
 void RIG_TT550::enable_tloop()
@@ -365,7 +367,7 @@ void RIG_TT550::enable_tloop()
 	else
 		cmd = TT550setTLOOP_OFF;
 	sendCommand(cmd, 0);
-	rig_trace(2, "enable_tloop()", noctl(cmd).c_str());
+	set_trace(2, "enable_tloop()", noctl(cmd).c_str());
 }
 
 void RIG_TT550::shutdown()
@@ -376,7 +378,7 @@ void RIG_TT550::shutdown()
 	cmd = "Lx\r";
 	cmd[1] = 0x3F;
 	sendCommand(cmd, 0); // line out = minimum
-	rig_trace(2, "shutdown()", noctl(cmd).c_str());
+	set_trace(2, "shutdown()", noctl(cmd).c_str());
 }
 
 int DigiAdj = 0;
@@ -451,7 +453,7 @@ void RIG_TT550::set_vfoRX(long freq)
 
 	stringstream s;
 	s << "Rx freq = " << freq << " / adjusted to " << lFreq << ", " << noctl(cmd);
-	rig_trace(1, s.str().c_str());
+	set_trace(2, "set vfoRX", s.str().c_str());
 
 }
 
@@ -518,7 +520,7 @@ void RIG_TT550::set_vfoTX(long freq)
 
 	stringstream s;
 	s << "Tx freq = " << freq << " / adjusted to " << lFreq << ", " << noctl(cmd);
-	rig_trace(1, s.str().c_str());
+	set_trace(2, "set vfoTX", s.str().c_str());
 
 }
 
@@ -536,7 +538,7 @@ void RIG_TT550::set_split(bool val)
 		else
 			set_vfoTX(freqB);
 	}
-	rig_trace(2, "set split ", (val ? "ON" : "OFF"));
+	set_trace(2, "set split ", (val ? "ON" : "OFF"));
 }
 
 void RIG_TT550::set_vfo(long freq)
@@ -608,7 +610,8 @@ void RIG_TT550::set_PTT_control(int val)
 
 	stringstream s;
 	s << "set PTT " << (val ? "ON " : "OFF ") << noctl(cmd);
-	rig_trace(1, s.str().c_str());
+
+	set_trace(1, s.str().c_str());
 
 }
 
@@ -628,7 +631,7 @@ void RIG_TT550::set_mode(int val)
 
 		stringstream s;
 		s << "Set Mode " << noctl(cmd);
-		rig_trace(1, s.str().c_str());
+		set_trace(1, s.str().c_str());
 
 		cmd =  TT550setPOWER;
 		cmd[1] = 0xFF;
@@ -644,7 +647,7 @@ void RIG_TT550::set_mode(int val)
 
 		stringstream s;
 		s << "Set Mode " << noctl(cmd);
-		rig_trace(1, s.str().c_str());
+		set_trace(1, s.str().c_str());
 
 		set_power_control(progStatus.power_level);
 	}
@@ -695,6 +698,8 @@ void RIG_TT550::tune_rig()
 	set_power_control(10);
 
 	set_PTT_control(1);
+	set_trace(1, "tune rig");
+
 	Fl::add_timeout(5.0, tt550_tune_off);
 }
 
@@ -723,7 +728,7 @@ void RIG_TT550::set_bw(int val)
 
 	stringstream s;
 	s << "Set RX bandwidth " << val << " " << noctl(cmd);
-	rig_trace(1, s.str().c_str());
+	set_trace(1, s.str().c_str());
 
 	cmd = TT550setXmtBW;
 	cmd[1] = txbw;
@@ -731,7 +736,7 @@ void RIG_TT550::set_bw(int val)
 
 	stringstream s2;
 	s2 << "Set TX bandwidth " << val << " " << noctl(cmd);
-	rig_trace(1, s2.str().c_str());
+	set_trace(1, s2.str().c_str());
 
 	set_vfo(!useB ? freqA : freqB);
 }
@@ -802,7 +807,7 @@ void RIG_TT550::set_attenuator(int val)
 
 	stringstream s;
 	s << "Set attenuator " << noctl(cmd);
-	rig_trace(1, s.str().c_str());
+	set_trace(1, s.str().c_str());
 
 }
 
@@ -820,7 +825,7 @@ void RIG_TT550::set_volume_control(int val)
 
 	stringstream s;
 	s << "Set volume " << noctl(cmd);
-	rig_trace(1, s.str().c_str());
+	set_trace(1, s.str().c_str());
 }
 
 int RIG_TT550::get_volume_control()
@@ -846,7 +851,8 @@ void RIG_TT550::selectA()
 {
 	Fl::awake(hide_encA, NULL);
 	xcvrstream.clear();
-	rig_trace(1, "Select A");
+	set_trace(1, "Select A");
+
 	freqA = vfoA.freq;
 	set_modeA (vfoA.imode);
 	set_bwA (vfoA.iBW);
@@ -858,7 +864,7 @@ void RIG_TT550::selectB()
 {
 	Fl::awake(hide_encA, NULL);
 	xcvrstream.clear();
-	rig_trace(1, "Select B");
+	set_trace(1, "Select B");
 	freqB = vfoB.freq;
 	set_modeB (vfoB.imode);
 	set_bwB (vfoB.iBW);
@@ -1118,6 +1124,7 @@ int RIG_TT550::get_smeter()
 
 	p = 0;
 	sendCommand( TT550query, 0);
+	get_trace(1, "get smeter");
 	len = readResponse();
 
 	while ((p < len) && (replystr[p] != 'S') && (replystr[p] != 'T'))
@@ -1154,6 +1161,7 @@ int RIG_TT550::get_power_out()
 {
 	cmd = TT550getFWDREF;
 	int ret = sendCommand(cmd, 4);
+	get_trace(1, "get power out");
 
 	if (ret < 4) return fwdpwr;
 	size_t p = replystr.rfind("T");
@@ -1185,7 +1193,7 @@ int RIG_TT550::get_power_out()
 
 	stringstream s;
 	s << "Get pwr: fwc " << fwdpwr << ", refpwr" << refpwr << ", swr " << swr;
-	rig_trace(1, s.str().c_str());
+	set_trace(1, s.str().c_str());
 
 	return fwdpwr;
 }
@@ -1268,7 +1276,7 @@ void RIG_TT550::set_rf_gain(int val)
 
 	stringstream s;
 	s << "Set rf gain " << val << ", " << noctl(cmd);
-	rig_trace(1, s.str().c_str());
+	set_trace(1, s.str().c_str());
 
 }
 
@@ -1293,7 +1301,7 @@ void RIG_TT550::set_line_out()
 
 	stringstream s;
 	s << "Set line out " << progStatus.tt550_line_out << ", " << noctl(cmd);
-	rig_trace(1, s.str().c_str());
+	set_trace(1, s.str().c_str());
 }
 
 void RIG_TT550::set_agc_level()
@@ -1308,7 +1316,7 @@ void RIG_TT550::set_agc_level()
 
 	stringstream s;
 	s << "Set agc level " << progStatus.tt550_agc_level << ", " << noctl(cmd);
-	rig_trace(1, s.str().c_str());
+	set_trace(1, s.str().c_str());
 }
 
 void RIG_TT550::set_cw_wpm()
@@ -1328,7 +1336,7 @@ void RIG_TT550::set_cw_wpm()
 
 	stringstream s;
 	s << "Set CW wpm " << progStatus.tt550_cw_wpm << ", " << noctl(cmd);
-	rig_trace(1, s.str().c_str());
+	set_trace(1, s.str().c_str());
 }
 
 void RIG_TT550::set_cw_vol()
@@ -1341,7 +1349,7 @@ void RIG_TT550::set_cw_vol()
 
 	stringstream s;
 	s << "Set CW volume " << progStatus.tt550_cw_vol << ", " << noctl(cmd);
-	rig_trace(1, s.str().c_str());
+	set_trace(1, s.str().c_str());
 }
 
 bool RIG_TT550::set_cw_spot()
@@ -1355,7 +1363,7 @@ bool RIG_TT550::set_cw_spot()
 
 	stringstream s;
 	s << "Set CW spot " << progStatus.tt550_cw_spot << ", " << noctl(cmd);
-	rig_trace(1, s.str().c_str());
+	set_trace(1, s.str().c_str());
 
 	return true;
 }
@@ -1402,7 +1410,7 @@ void RIG_TT550::enable_keyer()
 
 	stringstream s;
 	s << "Set enable keyer " << (progStatus.tt550_enable_keyer ? "ON" : "OFF") << ", " << noctl(cmd);
-	rig_trace(1, s.str().c_str());
+	set_trace(1, s.str().c_str());
 }
 
 
@@ -1414,7 +1422,7 @@ void RIG_TT550::set_vox_onoff()
 
 	stringstream s;
 	s << "Set vox " << (progStatus.vox_onoff ? "ON" : "OFF") << ", " << noctl(cmd);
-	rig_trace(1, s.str().c_str());
+	set_trace(1, s.str().c_str());
 }
 
 void RIG_TT550::set_vox_gain()
@@ -1426,7 +1434,7 @@ void RIG_TT550::set_vox_gain()
 
 	stringstream s;
 	s << "Set vox gain " << progStatus.tt550_vox_gain << ", " << noctl(cmd);
-	rig_trace(1, s.str().c_str());
+	set_trace(1, s.str().c_str());
 }
 
 void RIG_TT550::set_vox_anti()
@@ -1438,7 +1446,7 @@ void RIG_TT550::set_vox_anti()
 
 	stringstream s;
 	s << "Set vox anti " << progStatus.tt550_vox_anti << ", " << noctl(cmd);
-	rig_trace(1, s.str().c_str());
+	set_trace(1, s.str().c_str());
 }
 
 void RIG_TT550::set_vox_hang()
@@ -1450,7 +1458,7 @@ void RIG_TT550::set_vox_hang()
 
 	stringstream s;
 	s << "Set vox hang " << progStatus.tt550_vox_hang << ", " << noctl(cmd);
-	rig_trace(1, s.str().c_str());
+	set_trace(1, s.str().c_str());
 }
 
 void RIG_TT550::set_aux_hang()
@@ -1461,7 +1469,7 @@ void RIG_TT550::set_aux_hang()
 
 	stringstream s;
 	s << "Set aux hang " << noctl(cmd);
-	rig_trace(1, s.str().c_str());
+	set_trace(1, s.str().c_str());
 }
 
 void RIG_TT550::set_compression(int on, int val)
@@ -1473,7 +1481,7 @@ void RIG_TT550::set_compression(int on, int val)
 
 	stringstream s;
 	s << "Set compression " << progStatus.tt550_compression << ", " << noctl(cmd);
-	rig_trace(1, s.str().c_str());
+	set_trace(1, s.str().c_str());
 }
 
 void RIG_TT550::set_auto_notch(int v)
@@ -1490,7 +1498,7 @@ void RIG_TT550::set_auto_notch(int v)
 
 	stringstream s;
 	s << "Set auto notch " << noctl(cmd);
-	rig_trace(1, s.str().c_str());
+	set_trace(1, s.str().c_str());
 }
 
 void RIG_TT550::set_noise_reduction(int b)
@@ -1506,7 +1514,7 @@ void RIG_TT550::set_noise_reduction(int b)
 
 	stringstream s;
 	s << "Set noise reduction " << noctl(cmd);
-	rig_trace(1, s.str().c_str());
+	set_trace(1, s.str().c_str());
 }
 
 void RIG_TT550::set_mic_gain(int v)
@@ -1520,7 +1528,7 @@ void RIG_TT550::set_mic_gain(int v)
 
 		stringstream s;
 		s << "Set mic gain " << noctl(cmd);
-		rig_trace(1, s.str().c_str());
+		set_trace(1, s.str().c_str());
 
 	}
 }
@@ -1540,7 +1548,7 @@ void RIG_TT550::set_mic_line(int v)
 
 		stringstream s;
 		s << "Set mic line " << noctl(cmd);
-		rig_trace(1, s.str().c_str());
+		set_trace(1, s.str().c_str());
 	}
 }
 
@@ -1571,7 +1579,7 @@ void RIG_TT550::set_power_control(double val)
 
 	stringstream s;
 	s << "Set power control " << noctl(cmd);
-	rig_trace(1, s.str().c_str());
+	set_trace(1, s.str().c_str());
 }
 
 int RIG_TT550::get_power_control()
@@ -1588,7 +1596,7 @@ void RIG_TT550::set_mon_vol()
 
 	stringstream s;
 	s << "Set mon volume " << progStatus.tt550_mon_vol << ", " << noctl(cmd);
-	rig_trace(1, s.str().c_str());
+	set_trace(1, s.str().c_str());
 }
 
 void RIG_TT550::set_squelch_level()
@@ -1600,7 +1608,7 @@ void RIG_TT550::set_squelch_level()
 
 	stringstream s;
 	s << "Set squelch level " << progStatus.tt550_squelch_level << ", " << noctl(cmd);
-	rig_trace(1, s.str().c_str());
+	set_trace(1, s.str().c_str());
 }
 
 void RIG_TT550::set_nb_level()
@@ -1611,7 +1619,7 @@ void RIG_TT550::set_nb_level()
 
 	stringstream s;
 	s << "Set nb level " << progStatus.tt550_nb_level << ", " << noctl(cmd);
-	rig_trace(1, s.str().c_str());
+	set_trace(1, s.str().c_str());
 }
 
 void RIG_TT550::set_noise(bool b)

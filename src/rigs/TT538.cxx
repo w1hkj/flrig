@@ -168,13 +168,14 @@ RIG_TT538::RIG_TT538() {
 
 //static int corrA = 0, corrB = 0;
 
+#define sTT(s) set_trace(3, s, str2hex(cmd.c_str(), cmd.length()), str2hex(replystr.c_str(), replystr.length()))
+#define gTT(s) get_trace(3, s, str2hex(cmd.c_str(), cmd.length()), str2hex(replystr.c_str(), replystr.length()))
+
 void RIG_TT538::checkresponse(string s)
 {
 	if (RigSerial->IsOpen() == false)
 		return;
-	string s1 = str2hex(cmd.c_str(), cmd.length());
-	string s2 = str2hex(replystr.c_str(), replystr.length());
-	LOG_ERROR("%s:\nsent  %s\nreply %s\n", s.c_str(), s1.c_str(), s2.c_str());
+	gTT(s.c_str());
 }
 
 void RIG_TT538::initialize()
@@ -198,6 +199,8 @@ bool RIG_TT538::check ()
 {
 	cmd = TT538getFREQA;
 	int ret = sendCommand(cmd);
+	gTT("check");
+
 	if (ret < 6) return false;
 	return true;
 }
@@ -206,6 +209,8 @@ long RIG_TT538::get_vfoA ()
 {
 	cmd = TT538getFREQA;
 	int ret = sendCommand(cmd);
+	gTT("get vfoA");
+
 	if (ret < 6) return (long)(freqA / (1 + VfoAdj/1e6) + 0.5);
 	size_t p = replystr.rfind("A");
 	if (p == string::npos) return (long)(freqA / (1 + VfoAdj/1e6) + 0.5);
@@ -228,6 +233,8 @@ void RIG_TT538::set_vfoA (long freq)
 	cmd[3] = xfreq & 0xff; xfreq = xfreq >> 8;
 	cmd[2] = xfreq & 0xff;
 	sendCommand(cmd);
+	sTT("set vfoA");
+
 	set_if_shift(pbt);
 	return ;
 }
@@ -237,6 +244,8 @@ long RIG_TT538::get_vfoB ()
 //	cmd = TT538getFREQB;
 	cmd = TT538getFREQA;
 	int ret = sendCommand(cmd);
+	gTT("get vfoB");
+
 	if (ret < 6) return (long)(freqB / (1 + VfoAdj/1e6) + 0.5);
 	size_t p = replystr.rfind("B");
 	if (p == string::npos) return (long)(freqB / (1 + VfoAdj/1e6) + 0.5);
@@ -260,6 +269,8 @@ void RIG_TT538::set_vfoB (long freq)
 	cmd[3] = xfreq & 0xff; xfreq = xfreq >> 8;
 	cmd[2] = xfreq & 0xff;
 	sendCommand(cmd);
+	sTT("set vfoB");
+
 	set_if_shift(pbt);
 	return ;
 }
@@ -276,12 +287,15 @@ void RIG_TT538::set_modeA(int val)
 	cmd[2] = TT538mode_chr[val];
 	cmd[3] = cmd[2];
 	sendCommand(cmd);
+	sTT("set modeA");
 }
 
 int RIG_TT538::get_modeA()
 {
 	cmd = TT538getMODE;
 	int ret = sendCommand(cmd);
+	gTT("get modeA");
+
 	if (ret < 4) return modeA;
 	size_t p = replystr.rfind("M");
 	if (p == string::npos) return modeA;
@@ -300,6 +314,8 @@ void RIG_TT538::set_bwA(int val)
 	cmd = TT538setBW;
 	cmd[2] = 38 - val;
 	sendCommand(cmd);
+	sTT("set bwA");
+
 	set_if_shift(pbt);
 }
 
@@ -307,6 +323,8 @@ int RIG_TT538::get_bwA()
 {
 	cmd = TT538getBW;
 	int ret = sendCommand(cmd);
+	gTT("get bwA");
+
 	if (ret < 3) return bwA;
 	size_t p = replystr.rfind("W");
 	if (p == string::npos) return bwA;
@@ -335,11 +353,14 @@ void RIG_TT538::set_if_shift(int val)
 	cmd[3] = (si & 0xff);
 	sendCommand(cmd);
 	int ret = sendCommand(TT538getPBT);
+	gTT("get PBT");
+
 	if (ret < 4) return;
 	size_t p = replystr.rfind("P");
 	if (p == string::npos) return;
 	if (replystr[p+1] != cmd[2] || replystr[p+2] != cmd[3]) {
 		sendCommand(cmd);
+		sTT("set if shift");
 	}
 }
 
@@ -364,6 +385,7 @@ void RIG_TT538::set_attenuator(int val)
 	if (val) cmd[2] = '1';
 	else     cmd[2] = '0';
 	sendCommand(cmd);
+	sTT("set attenuator");
 }
 
 
@@ -371,6 +393,8 @@ int RIG_TT538::get_attenuator()
 {
 	cmd = TT538getATT;
 	int ret = sendCommand(cmd);
+	gTT("get attenuator");
+
 	if (ret < 3) return 0;
 	size_t p = replystr.rfind("J");
 	if (p == string::npos) return 0;
@@ -384,6 +408,8 @@ int RIG_TT538::get_smeter()
 	double sig = 0.0;
 	cmd = TT538getSMETER;
 	int ret = sendCommand(cmd);
+	gTT("get smeter");
+
 	if (ret < 6) return 0;
 	size_t p = replystr.rfind("S");
 	if (p == string::npos) return 0;
@@ -425,6 +451,8 @@ int RIG_TT538::get_volume_control()
 {
 	cmd = TT538getVOL;
 	int ret = sendCommand(cmd);
+	gTT("get volume control");
+
 	if (ret < 3) return 0;
 	size_t p = replystr.rfind("U");
 	if (p == string::npos) return 0;
@@ -437,6 +465,7 @@ void RIG_TT538::set_volume_control(int vol)
 	cmd = TT538setVOL;
 	cmd[2] = val2pot(vol);
 	sendCommand(cmd);
+	sTT("set volume control");
 }
 
 void RIG_TT538::set_rf_gain(int val)
@@ -444,6 +473,7 @@ void RIG_TT538::set_rf_gain(int val)
 	cmd = TT538setRF;
 	cmd[2] = val2pot(val);
 	sendCommand(cmd);
+	sTT("set rf gain");
 }
 
 int  RIG_TT538::get_rf_gain()
@@ -462,11 +492,14 @@ void RIG_TT538::set_PTT_control(int val)
 {
 	if (val) sendCommand(TT538setXMT);
 	else     sendCommand(TT538setRCV);
+	sTT("set PTT");
 }
 
 int RIG_TT538::get_power_out()
 {
 	int ret = sendCommand("?S\r"); // same as get smeter in receive
+	gTT("get power out");
+
 	if (ret < 4) return fwdpwr;
 	size_t p = replystr.rfind("T");
 	if (p == string::npos) return fwdpwr;
@@ -474,7 +507,6 @@ int RIG_TT538::get_power_out()
 	fwdpwr = 0.8*fwdpwr + 0.2*(unsigned char)replystr[p+1];
 	refpwr = 0.8*refpwr + 0.2*(unsigned char)replystr[p+2];
 
-LOG_INFO("%s // %4.1f : %4.1f", str2hex(replystr.c_str(), replystr.length()), fwdpwr, refpwr);
 	return (int)fwdpwr;
 }
 
@@ -488,6 +520,7 @@ int RIG_TT538::get_swr()
 	swr *= 16.67;
 	if (swr < 0) swr = 0;
 	if (swr > 100) swr = 100;
-LOG_INFO("swr %4.2f", swr);
+	
+//LOG_INFO("swr %4.2f", swr);
 	return (int)swr;
 }
