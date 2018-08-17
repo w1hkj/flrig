@@ -34,4 +34,7 @@ extern void get_trace(int n, ...); // trace get methods
 extern void set_trace(int n, ...); // trace set methods
 extern void rpc_trace(int n, ...); // trace transceiver class methods
 
+#define gett(str) get_trace(3, str, cmd.c_str(), replystr.c_str())
+#define sett(str) set_trace(3, str, cmd.c_str(), replystr.c_str())
+
 #endif

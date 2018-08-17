@@ -118,6 +118,8 @@ static GUI rig_widgets[]= {
 
 void RIG_FT5000::initialize()
 {
+	progStatus.settrace = true;
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = sldrRFGAIN;
@@ -131,6 +133,7 @@ void RIG_FT5000::initialize()
 	cmd = "AI0;";
 	sendOK(cmd);
 	showresp(WARN, ASC, "Auto Info OFF", cmd, replystr);
+	sett("Auto Info OFF");
 }
 
 RIG_FT5000::RIG_FT5000() {
@@ -214,7 +217,7 @@ void RIG_FT5000::get_band_selection(int v)
 	cmd = "IF;";
 	wait_char(';',27, 100, "get band", ASC);
 
-	set_trace(2, "get band", replystr.c_str());
+	gett("get band");
 
 	size_t p = replystr.rfind("IF");
 	if (p == string::npos) return;
@@ -236,12 +239,12 @@ void RIG_FT5000::get_band_selection(int v)
 			if (v < 3)
 				v = v - 1;
 			cmd.assign("BS").append(to_decimal(v, 2)).append(";");
-			set_trace(2, "get band", cmd.c_str());
 		}
 	}
 
 	sendOK(cmd);
 	showresp(WARN, ASC, "Select Band Stacks", cmd, replystr);
+	sett("get band stacks");
 }
 
 bool RIG_FT5000::check ()
@@ -250,7 +253,7 @@ bool RIG_FT5000::check ()
 	cmd += ';';
 	int ret = wait_char(';', 11, 100, "get vfo A", ASC);
 
-	rig_trace(2, "check()", replystr.c_str());
+	sett("check");
 
 	if (ret >= 11) return true;
 	return false;
@@ -262,7 +265,7 @@ long RIG_FT5000::get_vfoA ()
 	cmd += ';';
 	wait_char(';', 11, 100, "get vfo A", ASC);
 
-	rig_trace(2, "get_vfoA()", replystr.c_str());
+	gett("get_vfoA");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqA;
@@ -283,6 +286,7 @@ void RIG_FT5000::set_vfoA (long freq)
 	}
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET vfo A", cmd, replystr);
+	sett("set_vfoA");
 }
 
 long RIG_FT5000::get_vfoB ()
@@ -291,7 +295,7 @@ long RIG_FT5000::get_vfoB ()
 	cmd += ';';
 	wait_char(';', 11, 100, "get vfo B", ASC);
 
-	rig_trace(2, "get_vfoB()", replystr.c_str());
+	gett("get_vfoB");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqB;
@@ -313,6 +317,7 @@ void RIG_FT5000::set_vfoB (long freq)
 	}
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET vfo B", cmd, replystr);
+	sett("set_vfoB");
 }
 
 
@@ -323,16 +328,18 @@ bool RIG_FT5000::twovfos()
 
 void RIG_FT5000::selectA()
 {
-	cmd = "FR0;FT2;";
+	cmd = "FR2;FT2;";
 	sendOK(cmd);
 	showresp(WARN, ASC, "select A", cmd, replystr);
+	sett("selectA");
 }
 
 void RIG_FT5000::selectB()
 {
-	cmd = "FR4;FT3;";
+	cmd = "FR3;FT3;";
 	sendOK(cmd);
 	showresp(WARN, ASC, "select B", cmd, replystr);
+	sett("selectB");
 }
 
 void RIG_FT5000::A2B()
@@ -340,6 +347,7 @@ void RIG_FT5000::A2B()
 	cmd = "AB;";
 	sendOK(cmd);
 	showresp(WARN, ASC, "vfo A --> B", cmd, replystr);
+	sett("A2B");
 }
 
 bool RIG_FT5000::can_split()
@@ -352,19 +360,23 @@ void RIG_FT5000::set_split(bool val)
 	split = val;
 	if (val) {
 		useB = false;
-		cmd = "FR0;";
+		cmd = "FR2;";
 		sendOK(cmd);
 		showresp(WARN, ASC, "Rx on A", cmd, replystr);
+		sett("set_split RX");
 		cmd = "FT3;";
 		sendOK(cmd);
 		showresp(WARN, ASC, "Tx on B", cmd, replystr);
+		sett("set_split TX");
 	} else {
-		cmd = "FR0;";
+		cmd = "FR2;";
 		sendOK(cmd);
 		showresp(WARN, ASC, "Rx on A", cmd, replystr);
+		sett("set_split RX");
 		cmd = "FT2;";
 		sendOK(cmd);
 		showresp(WARN, ASC, "Tx on A", cmd, replystr);
+		sett("set_split TX");
 	}
 	Fl::awake(highlight_vfo, (void *)0);
 }
@@ -381,7 +393,7 @@ int RIG_FT5000::get_smeter()
 	cmd += ';';
 	wait_char(';', 7, 100, "get smeter", ASC);
 
-	rig_trace(2, "get_smeter()", replystr.c_str());
+	gett("get_smeter");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -414,7 +426,7 @@ int RIG_FT5000::get_swr()
 	cmd += ';';
 	wait_char(';', 7, 100, "get swr", ASC);
 
-	rig_trace(2, "get_swr()", replystr.c_str());
+	gett("get_swr");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -472,7 +484,7 @@ int RIG_FT5000::get_power_out()
 	sendOK(cmd.append(";"));
 	wait_char(';', 7, 100, "get pout", ASC);
 
-	rig_trace(2, "get_power_out()", replystr.c_str());
+	gett("get_power_out");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -500,7 +512,7 @@ int RIG_FT5000::get_power_control()
 	cmd += ';';
 	wait_char(';', 6, 100, "get power", ASC);
 
-	rig_trace(2, "get_power_control()", replystr.c_str());
+	gett("get_power_control");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.power_level;
@@ -524,7 +536,7 @@ void RIG_FT5000::set_power_control(double val)
 	}
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET power", cmd, replystr);
-	rig_trace(2, "set_power_control()", cmd.c_str());
+	sett("set_power_control");
 }
 
 // Volume control return 0 ... 100
@@ -534,7 +546,7 @@ int RIG_FT5000::get_volume_control()
 	cmd += ';';
 	wait_char(';', 7, 100, "get vol", ASC);
 
-	rig_trace(2, "get_volume_control()", replystr.c_str());
+	gett("get_volume_control");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.volume;
@@ -554,6 +566,7 @@ void RIG_FT5000::set_volume_control(int val)
 	}
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET vol", cmd, replystr);
+	sett("set_volume_control");
 }
 
 // Tranceiver PTT on/off
@@ -562,6 +575,7 @@ void RIG_FT5000::set_PTT_control(int val)
 	cmd = val ? "TX1;" : "TX0;";
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET PTT", cmd, replystr);
+	sett("set_PTT_control");
 	ptt_ = val;
 }
 
@@ -571,7 +585,7 @@ int RIG_FT5000::get_PTT()
 	rsp = "TX";
 	wait_char(';', 4, 100, "get PTT", ASC);
 
-	rig_trace(2, "get_PTT()", replystr.c_str());
+	gett("get_PTT");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return ptt_;
@@ -585,6 +599,7 @@ void RIG_FT5000::tune_rig()
 	cmd = "AC002;";
 	sendOK(cmd);
 	showresp(WARN, ASC, "tune rig", cmd, replystr);
+	sett("tune_rig");
 }
 
 int RIG_FT5000::next_attenuator()
@@ -614,6 +629,7 @@ void RIG_FT5000::set_attenuator(int val)
 	cmd[3] += atten_level;
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET att", cmd, replystr);
+	sett("set_attenuator");
 }
 
 int RIG_FT5000::get_attenuator()
@@ -622,7 +638,7 @@ int RIG_FT5000::get_attenuator()
 	cmd += ';';
 	wait_char(';', 5, 100, "get att", ASC);
 
-	rig_trace(2, "get_attenuator()", replystr.c_str());
+	gett("get_attenuator");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.attenuator;
@@ -667,6 +683,7 @@ void RIG_FT5000::set_preamp(int val)
 	cmd[3] = '0' + preamp_level;
 	sendOK (cmd);
 	showresp(WARN, ASC, "SET preamp", cmd, replystr);
+	sett("set_preamp");
 }
 
 int RIG_FT5000::get_preamp()
@@ -675,7 +692,7 @@ int RIG_FT5000::get_preamp()
 	cmd += ';';
 	wait_char(';', 5, 100, "get pre", ASC);
 
-	rig_trace(2, "get_preamp()", replystr.c_str());
+	gett("get_preamp");
 
 	size_t p = replystr.rfind(rsp);
 	if (p != string::npos)
@@ -755,6 +772,8 @@ void RIG_FT5000::set_modeA(int val)
 	cmd += ';';
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET mode A", cmd, replystr);
+	sett("set_modeA");
+
 	adjust_bandwidth(modeA);
 	if (val == mCW || val == mCW_R) return;
 	if (progStatus.spot_onoff) {
@@ -763,6 +782,7 @@ void RIG_FT5000::set_modeA(int val)
 		cmd = "CS0;";
 		sendOK(cmd);
 		showresp(WARN, ASC, "SET spot off", cmd, replystr);
+		sett("set spot off");
 		btnSpot->value(0);
 	}
 }
@@ -773,7 +793,7 @@ int RIG_FT5000::get_modeA()
 	cmd += ';';
 	wait_char(';', 5, 100, "get mode A", ASC);
 
-	rig_trace(2, "get_modeA()", replystr.c_str());
+	gett("get_modeA");
 
 	size_t p = replystr.rfind(rsp);
 	if (p != string::npos) {
@@ -796,6 +816,8 @@ void RIG_FT5000::set_modeB(int val)
 	cmd += ';';
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET mode B", cmd, replystr);
+	sett("set_modeB");
+
 	adjust_bandwidth(modeA);
 	if (val == mCW || val == mCW_R) return;
 	if (progStatus.spot_onoff) {
@@ -804,6 +826,7 @@ void RIG_FT5000::set_modeB(int val)
 		cmd = "CS0;";
 		sendOK(cmd);
 		showresp(WARN, ASC, "SET spot off", cmd, replystr);
+		sett("set spot off");
 		btnSpot->value(0);
 	}
 }
@@ -814,7 +837,7 @@ int RIG_FT5000::get_modeB()
 	cmd += ';';
 	wait_char(';', 5, 100, "get mode B", ASC);
 
-	rig_trace(2, "get_modeB()", replystr.c_str());
+	gett("get_modeB");
 
 	size_t p = replystr.rfind(rsp);
 	if (p != string::npos) {
@@ -851,6 +874,7 @@ void RIG_FT5000::set_bwA(int val)
 	sendOK(cmd);
 	mode_bwA[modeA] = val;
 	showresp(WARN, ASC, "SET bw A", cmd, replystr);
+	sett("set_bwA");
 }
 
 int RIG_FT5000::get_bwA()
@@ -864,7 +888,7 @@ int RIG_FT5000::get_bwA()
 	cmd += ';';
 	wait_char(';', 6, 100, "get bw A", ASC);
 
-	rig_trace(2, "get_bwA()", replystr.c_str());
+	gett("get_bwA");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return bwA;
@@ -907,6 +931,7 @@ void RIG_FT5000::set_bwB(int val)
 	sendOK(cmd);
 	mode_bwB[modeB] = val;
 	showresp(WARN, ASC, "SET bw B", cmd, replystr);
+	sett("set_bwB");
 }
 
 int RIG_FT5000::get_bwB()
@@ -920,7 +945,7 @@ int RIG_FT5000::get_bwB()
 	cmd += ';';
 	wait_char(';', 6, 100, "get bw B", ASC);
 
-	rig_trace(2, "get_bwB()", replystr.c_str());
+	gett("get_bwB");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return bwB;
@@ -987,7 +1012,7 @@ bool RIG_FT5000::get_if_shift(int &val)
 	cmd += ';';
 	wait_char(';', 9, 100, "get if shift", ASC);
 
-	rig_trace(2, "get_if_shift()", replystr.c_str());
+	gett("get_if_shift");
 
 	size_t p = replystr.rfind(rsp);
 	val = progStatus.shift_val;
@@ -1034,7 +1059,7 @@ bool  RIG_FT5000::get_notch(int &val)
 	cmd += ';';
 	wait_char(';', 8, 100, "get notch on/off", ASC);
 
-	rig_trace(2, "get_notch()", replystr.c_str());
+	gett("get_notch");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return ison;
@@ -1047,7 +1072,7 @@ bool  RIG_FT5000::get_notch(int &val)
 	cmd += ';';
 	wait_char(';', 8, 100, "get notch val", ASC);
 
-	rig_trace(2, "get_notch_val()", replystr.c_str());
+	gett("get_notch_val");
 
 	p = replystr.rfind(rsp);
 	if (p == string::npos)
@@ -1078,7 +1103,7 @@ int  RIG_FT5000::get_auto_notch()
 	cmd = "BC0;";
 	wait_char(';', 5, 100, "get auto notch", ASC);
 
-	rig_trace(2, "get_auto_notch()", replystr.c_str());
+	gett("get_auto_notch");
 
 	size_t p = replystr.rfind("BC0");
 	if (p == string::npos) return 0;
@@ -1112,7 +1137,7 @@ int RIG_FT5000::get_noise()
 	cmd += ';';
 	wait_char(';', 5, 100, "get NB", ASC);
 
-	rig_trace(2, "get_noise()", replystr.c_str());
+	gett("get_noise");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return FT5000_blanker_level;
@@ -1140,6 +1165,7 @@ void RIG_FT5000::set_mic_gain(int val)
 	}
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET mic", cmd, replystr);
+	sett("set mic gain");
 }
 
 int RIG_FT5000::get_mic_gain()
@@ -1148,7 +1174,7 @@ int RIG_FT5000::get_mic_gain()
 	cmd += ';';
 	wait_char(';', 6, 100, "get mic", ASC);
 
-	rig_trace(2, "get_mic_gain()", replystr.c_str());
+	gett("get_mic_gain");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.mic_gain;
@@ -1173,6 +1199,7 @@ void RIG_FT5000::set_rf_gain(int val)
 	}
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET rfgain", cmd, replystr);
+	sett("set rf gain");
 }
 
 int  RIG_FT5000::get_rf_gain()
@@ -1182,7 +1209,7 @@ int  RIG_FT5000::get_rf_gain()
 	cmd += ';';
 	wait_char(';', 7, 100, "get rfgain", ASC);
 
-	rig_trace(2, "get_rf_gain()", replystr.c_str());
+	gett("get_rf_gain");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.rfgain;
@@ -1208,6 +1235,7 @@ void RIG_FT5000::set_vox_onoff()
 	if (progStatus.vox_onoff) cmd[2] = '1';
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET vox", cmd, replystr);
+	sett("set vox on/off");
 }
 
 void RIG_FT5000::set_vox_gain()
@@ -1216,6 +1244,7 @@ void RIG_FT5000::set_vox_gain()
 	cmd.append(to_decimal(progStatus.vox_gain, 3)).append(";");
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET vox gain", cmd, replystr);
+	sett("set vox gain");
 }
 
 void RIG_FT5000::set_vox_anti()
@@ -1224,6 +1253,7 @@ void RIG_FT5000::set_vox_anti()
 	cmd.append(to_decimal(progStatus.vox_anti, 3)).append(";");
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET anti-vox", cmd, replystr);
+	sett("set vox anti");
 }
 
 void RIG_FT5000::set_vox_hang()
@@ -1232,6 +1262,7 @@ void RIG_FT5000::set_vox_hang()
 	cmd.append(to_decimal(progStatus.vox_hang, 4)).append(";");
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET vox delay", cmd, replystr);
+	sett("set vox hang");
 }
 
 void RIG_FT5000::set_vox_on_dataport()
@@ -1240,6 +1271,7 @@ void RIG_FT5000::set_vox_on_dataport()
 	if (progStatus.vox_on_dataport) cmd[5] = '1';
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET vox on data port", cmd, replystr);
+	sett("set vox on data port");
 }
 
 void RIG_FT5000::set_cw_wpm()
@@ -1250,6 +1282,7 @@ void RIG_FT5000::set_cw_wpm()
 	cmd.append(to_decimal(progStatus.cw_wpm, 3)).append(";");
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET cw wpm", cmd, replystr);
+	sett("set cw wpm");
 }
 
 
@@ -1259,6 +1292,7 @@ void RIG_FT5000::enable_keyer()
 	if (progStatus.enable_keyer) cmd[2] = '1';
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET keyer on/off", cmd, replystr);
+	sett("enable keyer");
 }
 
 bool RIG_FT5000::set_cw_spot()
@@ -1268,6 +1302,7 @@ bool RIG_FT5000::set_cw_spot()
 		if (progStatus.spot_onoff) cmd[2] = '1';
 		sendOK(cmd);
 		showresp(WARN, ASC, "SET spot on/off", cmd, replystr);
+		sett("set cw spot on/off");
 		return true;
 	} else
 		return false;
@@ -1279,6 +1314,7 @@ void RIG_FT5000::set_cw_weight()
 	cmd.assign("EX065").append(to_decimal(n, 2)).append(";");
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET cw weight", cmd, replystr);
+	sett("set cw weight");
 }
 
 void RIG_FT5000::set_cw_qsk()
@@ -1287,6 +1323,7 @@ void RIG_FT5000::set_cw_qsk()
 	cmd.assign("EX068").append(to_decimal(n, 1)).append(";");
 	sendOK(cmd);
 	showresp(WARN, ASC, "SET cw qsk", cmd, replystr);
+	sett("set cw weight");
 }
 
 /*

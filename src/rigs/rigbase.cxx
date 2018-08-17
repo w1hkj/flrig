@@ -363,6 +363,7 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 			progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0;
 
 	replystr.clear();
+	RigSerial->FlushBuffer();
 
 	if(!progStatus.use_tcpip && !RigSerial->IsOpen()) {
 		snprintf(sztemp, sizeof(sztemp), "TEST %s", sz);
@@ -412,6 +413,7 @@ int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 			progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0;
 
 	replystr.clear();
+	RigSerial->FlushBuffer();
 
 	if(!progStatus.use_tcpip && !RigSerial->IsOpen()) {
 		snprintf(sztemp, sizeof(sztemp), "TEST %s", sz);
