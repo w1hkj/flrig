@@ -143,6 +143,7 @@ void process_sliders()
 			}
 		}
 		val = slider.val;
+		if (inhibit_pbt == 1) inhibit_pbt = 0;
 		switch (slider.fnc) {
 			case SLIDER::NOTCH    :
 				selrig->set_notch(progStatus.notch, val);
@@ -154,16 +155,13 @@ void process_sliders()
 				break;
 			case SLIDER::INNER    :
 				selrig->set_pbt_inner(val);
-				if (inhibit_pbt == 1) inhibit_pbt = 0;
 				break;
 			case SLIDER::OUTER    :
 				selrig->set_pbt_outer(val);
-				if (inhibit_pbt == 1) inhibit_pbt = 0;
 				break;
 			case SLIDER::LOCK     :
 				selrig->set_pbt_inner(val);
 				selrig->set_pbt_outer(val);
-				if (inhibit_pbt == 1) inhibit_pbt = 0;
 				break;
 			case SLIDER::VOLUME   :
 				selrig->set_volume_control(val);
@@ -791,7 +789,10 @@ void update_pbt(void *)
 
 void read_pbt()
 {
-	if (inhibit_pbt) return;
+	if (inhibit_pbt) {
+		inhibit_pbt = 0;
+		return;
+	}
 	progStatus.pbt_inner = selrig->get_pbt_inner();
 	progStatus.pbt_outer = selrig->get_pbt_outer();
 	Fl::awake(update_pbt, (void*)0);
@@ -2252,9 +2253,9 @@ void setINNER()
 	}
 
 	if (Fl::event() == FL_DRAG)
-		inhibit_pbt = 2;
-	else
 		inhibit_pbt = 1;
+	else
+		inhibit_pbt = 0;
 
 	progStatus.pbt_inner = sldrINNER->value();
 
@@ -2274,9 +2275,9 @@ void setOUTER()
 	}
 
 	if (Fl::event() == FL_DRAG)
-		inhibit_pbt = 2;
-	else
 		inhibit_pbt = 1;
+	else
+		inhibit_pbt = 0;
 
 	progStatus.pbt_outer = sldrOUTER->value();
 	if (progStatus.pbt_lock) {

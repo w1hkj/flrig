@@ -230,7 +230,7 @@ void RIG_IC7200::selectA()
 	cmd += '\x07';
 	cmd += '\x00';
 	cmd.append(post);
-	rig_trace(2, "selectA()", str2hex(cmd.c_str(), cmd.length()));
+	set_trace(2, "selectA()", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("select A");
 	inuse = onA;
 }
@@ -241,7 +241,7 @@ void RIG_IC7200::selectB()
 	cmd += '\x07';
 	cmd += '\x01';
 	cmd.append(post);
-	rig_trace(2, "selectB()", str2hex(cmd.c_str(), cmd.length()));
+	set_trace(2, "selectB()", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("select B");
 	inuse = onB;
 }
@@ -254,7 +254,7 @@ bool RIG_IC7200::check ()
 	cmd += '\x03';
 	cmd.append( post );
 	bool ok = waitFOR(11, "check vfo");
-	rig_trace(2, "check()", str2hex(replystr.c_str(), replystr.length()));
+	get_trace(2, "check()", str2hex(replystr.c_str(), replystr.length()));
 	return ok;
 }
 
@@ -271,7 +271,7 @@ long RIG_IC7200::get_vfoA ()
 		if (p != string::npos)
 			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
-	rig_trace(2, "get_vfoA()", str2hex(replystr.c_str(), replystr.length()));
+	get_trace(2, "get_vfoA()", str2hex(replystr.c_str(), replystr.length()));
 	return A.freq;
 }
 
@@ -282,7 +282,7 @@ void RIG_IC7200::set_vfoA (long freq)
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append( post );
-	rig_trace(2, "set_vfoA()", str2hex(cmd.c_str(), cmd.length()));
+	set_trace(2, "set_vfoA()", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("set vfo A");
 }
 
@@ -299,7 +299,7 @@ long RIG_IC7200::get_vfoB ()
 		if (p != string::npos)
 			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
-	rig_trace(2, "get_vfoB()", str2hex(replystr.c_str(), replystr.length()));
+	get_trace(2, "get_vfoB()", str2hex(replystr.c_str(), replystr.length()));
 	return B.freq;
 }
 
@@ -310,7 +310,7 @@ void RIG_IC7200::set_vfoB (long freq)
 	cmd += '\x05';
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append( post );
-	rig_trace(2, "set_vfoB()", str2hex(cmd.c_str(), cmd.length()));
+	set_trace(2, "set_vfoB()", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("set vfo B");
 }
 
@@ -389,7 +389,7 @@ int RIG_IC7200::get_volume_control()
 		if (p != string::npos)
 			val = num100(replystr.substr(p+6));
 	}
-	rig_trace(2, "get_volume_control()", str2hex(replystr.c_str(), replystr.length()));
+	get_trace(2, "get_volume_control()", str2hex(replystr.c_str(), replystr.length()));
 	return val;
 }
 
@@ -839,7 +839,7 @@ int RIG_IC7200::get_modeA()
 			A.filter = replystr[p+6];
 		}
 	}
-	rig_trace(2, "get_modeA()", str2hex(replystr.c_str(), replystr.length()));
+	get_trace(2, "get_modeA()", str2hex(replystr.c_str(), replystr.length()));
 
 	cmd = pre_to;
 	cmd += "\x1A\x04";
@@ -857,8 +857,8 @@ int RIG_IC7200::get_modeA()
 	}
 	mode_filterA[A.imode] = A.filter;
 
-	rig_trace(2, "get_data_modeA()", str2hex(replystr.c_str(), replystr.length()));
-	rig_trace(4, "mode_filterA[", IC7200modes_[md], "] = ", szfilter[A.filter-1]);
+	get_trace(2, "get_data_modeA()", str2hex(replystr.c_str(), replystr.length()));
+	get_trace(4, "mode_filterA[", IC7200modes_[md], "] = ", szfilter[A.filter-1]);
 
 	return (A.imode = md);
 }
@@ -875,7 +875,7 @@ void RIG_IC7200::set_modeA(int val)
 
 	waitFB("set mode A, default filter");
 
-	rig_trace(4, "set mode A[", IC7200modes_[A.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(4, "set mode A[", IC7200modes_[A.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
 
 	if (val < 7) return;
 
@@ -886,7 +886,7 @@ void RIG_IC7200::set_modeA(int val)
 	cmd.append( post);
 	waitFB("set data mode A");
 
-	rig_trace(2, "set_data_modeA()", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_data_modeA()", str2hex(replystr.c_str(), replystr.length()));
 }
 
 int RIG_IC7200::get_modeB()
@@ -905,7 +905,7 @@ int RIG_IC7200::get_modeB()
 			B.filter = replystr[p+6];
 		}
 	}
-	rig_trace(2, "get_modeB()", str2hex(replystr.c_str(), replystr.length()));
+	get_trace(2, "get_modeB()", str2hex(replystr.c_str(), replystr.length()));
 
 	cmd = pre_to;
 	cmd += "\x1A\x04";
@@ -923,8 +923,8 @@ int RIG_IC7200::get_modeB()
 	}
 	mode_filterB[B.imode] = B.filter;
 
-	rig_trace(2, "get_data_modeB()", str2hex(replystr.c_str(), replystr.length()));
-	rig_trace(4, "mode_filterB[", IC7200modes_[md], "] = ", szfilter[B.filter-1]);
+	get_trace(2, "get_data_modeB()", str2hex(replystr.c_str(), replystr.length()));
+	get_trace(4, "mode_filterB[", IC7200modes_[md], "] = ", szfilter[B.filter-1]);
 
 	return (B.imode = md);
 }
@@ -940,7 +940,7 @@ void RIG_IC7200::set_modeB(int val)
 	cmd.append( post );
 	waitFB("set mode B, default filter");
 
-	rig_trace(4, "set mode B[", IC7200modes_[B.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(4, "set mode B[", IC7200modes_[B.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
 
 	if (val < 7) return;
 
@@ -951,7 +951,7 @@ void RIG_IC7200::set_modeB(int val)
 	cmd.append( post);
 	waitFB("set data mode B");
 
-	rig_trace(2, "set data mode B ",  str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set data mode B ",  str2hex(replystr.c_str(), replystr.length()));
 
 }
 
@@ -979,7 +979,7 @@ void RIG_IC7200::set_FILT(int filter)
 		cmd.append( post );
 
 		waitFB("set mode/filter B");
-	rig_trace(2, "set mode/filter B", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set mode/filter B", str2hex(replystr.c_str(), replystr.length()));
 
 		if (B.imode < 7) return;
 
@@ -989,7 +989,7 @@ void RIG_IC7200::set_FILT(int filter)
 		cmd += filter;
 		cmd.append( post);
 		waitFB("set data mode/filter B");
-	rig_trace(2, "set data mode/filter B", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set data mode/filter B", str2hex(replystr.c_str(), replystr.length()));
 
 	} else {
 		A.filter = filter;
@@ -1001,7 +1001,7 @@ void RIG_IC7200::set_FILT(int filter)
 		cmd += filter;
 		cmd.append( post );
 		waitFB("set filter A ");
-	rig_trace(2, "set filter A", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set filter A", str2hex(replystr.c_str(), replystr.length()));
 
 		if (A.imode < 7) return;
 
@@ -1011,7 +1011,7 @@ void RIG_IC7200::set_FILT(int filter)
 		cmd += mode_filterA[A.imode];
 		cmd.append( post);
 		waitFB("set data filter A");
-	rig_trace(2, "set data filter A", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set data filter A", str2hex(replystr.c_str(), replystr.length()));
 	}
 
 }
@@ -1151,7 +1151,7 @@ void RIG_IC7200::set_bwA(int val)
 	cmd.append( post );
 	waitFB("set BW A");
 	mode_bwA[A.imode] = val;
-	rig_trace(4, "set_bwA() ", bwtable(A.imode)[val], ": ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(4, "set_bwA() ", bwtable(A.imode)[val], ": ", str2hex(replystr.c_str(), replystr.length()));
 }
 
 int  RIG_IC7200::get_bwA()
@@ -1170,7 +1170,7 @@ int  RIG_IC7200::get_bwA()
 	if (bwval != A.iBW) {
 		A.iBW = bwval;
 	}
-	rig_trace(2, "get_bwA()", str2hex(replystr.c_str(), replystr.length()));
+	get_trace(2, "get_bwA()", str2hex(replystr.c_str(), replystr.length()));
 
 	mode_bwA[A.imode] = A.iBW;
 
@@ -1186,7 +1186,7 @@ void RIG_IC7200::set_bwB(int val)
 	cmd.append( post );
 	waitFB("set BW B");
 	mode_bwB[B.imode] = val;
-	rig_trace(4, "set_bwB() ", bwtable(B.imode)[val], ": ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(4, "set_bwB() ", bwtable(B.imode)[val], ": ", str2hex(replystr.c_str(), replystr.length()));
 }
 
 int  RIG_IC7200::get_bwB()
@@ -1205,7 +1205,7 @@ int  RIG_IC7200::get_bwB()
 	if (bwval != B.iBW) {
 		B.iBW = bwval;
 	}
-	rig_trace(2, "get_bwB()", str2hex(replystr.c_str(), replystr.length()));
+	get_trace(2, "get_bwB()", str2hex(replystr.c_str(), replystr.length()));
 	mode_bwB[B.imode] = B.iBW;
 	return B.iBW;
 }
@@ -1492,7 +1492,7 @@ int RIG_IC7200::get_pbt_inner()
 			val -= 50;
 		}
 	}
-	rig_trace(2, "get_pbt_inner()", str2hex(replystr.c_str(), replystr.length()));
+	get_trace(2, "get_pbt_inner()", str2hex(replystr.c_str(), replystr.length()));
 	return val;
 }
 
@@ -1512,7 +1512,7 @@ int RIG_IC7200::get_pbt_outer()
 			val -= 50;
 		}
 	}
-	rig_trace(2, "get_pbt_outer()", str2hex(replystr.c_str(), replystr.length()));
+	get_trace(2, "get_pbt_outer()", str2hex(replystr.c_str(), replystr.length()));
 	return val;
 }
 
