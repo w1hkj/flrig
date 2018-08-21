@@ -25,6 +25,9 @@
 //=============================================================================
 // IC-7700
 
+#define isett(s) set_trace(2, s, str2hex(replystr.c_str(), replystr.length()));
+#define igett(s) get_trace(2, s, str2hex(replystr.c_str(), replystr.length()));
+
 const char IC7700name_[] = "IC-7700";
 
 const char *IC7700modes_[] = {
@@ -199,6 +202,7 @@ void RIG_IC7700::selectA()
 	cmd += '\x00';
 	cmd.append(post);
 	waitFB("select A");
+	isett("selectA");
 }
 
 void RIG_IC7700::selectB()
@@ -208,6 +212,7 @@ void RIG_IC7700::selectB()
 	cmd += '\x01';
 	cmd.append(post);
 	waitFB("select B");
+	isett("selectB");
 }
 
 void RIG_IC7700::set_modeA(int val)
@@ -219,6 +224,7 @@ void RIG_IC7700::set_modeA(int val)
 	cmd += filA;
 	cmd.append( post );
 	waitFB("set mode A");
+	isett("set mode A");
 // digital set / clear
 	if (val == LSBD7700 || val == USBD7700 || val == AMD7700 || val == FMD7700) {
 		cmd = pre_to;
@@ -227,6 +233,7 @@ void RIG_IC7700::set_modeA(int val)
 		cmd += filA;
 		cmd.append( post);
 		waitFB("set digital");
+		isett("set digital");
 	}
 }
 
@@ -241,6 +248,7 @@ int RIG_IC7700::get_modeA()
 	string resp = pre_fm;
 	resp += '\x04';
 	if (waitFOR(8, "get mode A")) {
+		igett("get mode A");
 		size_t p = replystr.rfind(resp);
 		for (md = LSB7700; md <= PSKR7700; md++)
 			if (replystr[p+5] == IC7700_mode_nbr[md]) break;
@@ -253,6 +261,7 @@ int RIG_IC7700::get_modeA()
 			resp = pre_fm;
 			resp.append("\x1a\x06");
 			if (waitFOR(9, "get digital setting")) {
+				igett("get digital setting");
 				size_t p = replystr.rfind(resp);
 				if (replystr[p+6] == 0x01) {
 					if (md == LSB7700) md = LSBD7700;
@@ -277,6 +286,7 @@ void RIG_IC7700::set_modeB(int val)
 	cmd += filB;
 	cmd.append( post );
 	waitFB("set mode B");
+	isett("set mode B");
 	if (val == LSBD7700 || val == USBD7700 || val == AMD7700 || val == FMD7700) {
 		cmd = pre_to;
 		cmd += '\x1A'; cmd += '\x06';
@@ -284,6 +294,7 @@ void RIG_IC7700::set_modeB(int val)
 		cmd += filB;
 		cmd.append( post);
 		waitFB("set digital");
+		isett("set digital");
 	}
 }
 
@@ -296,6 +307,7 @@ int RIG_IC7700::get_modeB()
 	string resp = pre_fm;
 	resp += '\x04';
 	if (waitFOR(8, "get mode B")) {
+		igett("get mode B");
 		size_t p = replystr.rfind(resp);
 		for (md = LSB7700; md <= PSKR7700; md++)
 			if (replystr[p+5] == IC7700_mode_nbr[md]) break;
@@ -308,6 +320,7 @@ int RIG_IC7700::get_modeB()
 			resp = pre_fm;
 			resp.append("\x1a\x06");
 			if (waitFOR(9, "get digital")) {
+				igett("get digital");
 				size_t p = replystr.rfind(resp);
 				if (replystr[p+6] == 0x01) {
 					if (md == LSB7700) md = LSBD7700;
@@ -331,6 +344,7 @@ int RIG_IC7700::get_bwA()
 	string resp = pre_fm;
 	resp.append("\x1a\x03");
 	if (waitFOR(8, "get bw A")) {
+		igett("get bw A");
 		size_t p = replystr.rfind(resp);
 		A.iBW = fm_bcd(replystr.substr(p+6), 2);
 	}
@@ -346,6 +360,7 @@ void RIG_IC7700::set_bwA(int val)
 	cmd.append(to_bcd(A.iBW, 2));
 	cmd.append(post);
 	waitFB("set bw A");
+	isett("set bw A");
 }
 
 int RIG_IC7700::get_bwB()
@@ -356,6 +371,7 @@ int RIG_IC7700::get_bwB()
 	string resp = pre_fm;
 	resp.append("\x1a\x03");
 	if (waitFOR(8, "get bw B")) {
+		igett("get bw B");
 		size_t p = replystr.rfind(resp);
 		B.iBW = fm_bcd(replystr.substr(p+6), 2);
 	}
@@ -371,6 +387,7 @@ void RIG_IC7700::set_bwB(int val)
 	cmd.append(to_bcd(B.iBW, 2));
 	cmd.append(post);
 	waitFB("set bw A");
+	isett("set bw A");
 }
 
 int RIG_IC7700::adjust_bandwidth(int m)
@@ -436,6 +453,7 @@ void RIG_IC7700::set_mic_gain(int v)
 	cmd.append(to_bcd(ICvol, 3));
 	cmd.append( post );
 	waitFB("set mic gain");
+	isett("set mic gain");
 }
 
 void RIG_IC7700::set_attenuator(int val)
@@ -455,6 +473,7 @@ void RIG_IC7700::set_attenuator(int val)
 	cmd += cmdval;
 	cmd.append( post );
 	waitFB("set attenuator");
+	isett("set attenuator");
 }
 
 int RIG_IC7700::get_attenuator()
@@ -465,6 +484,7 @@ int RIG_IC7700::get_attenuator()
 	string resp = pre_fm;
 	resp += '\x11';
 	if (waitFOR(7, "get attenuator")) {
+		igett("get attenuator");
 		size_t p = replystr.rfind(resp);
 		if (replystr[p+6] == 0x20) {
 			atten_level = 1;
@@ -484,18 +504,21 @@ void RIG_IC7700::set_compression(int on, int val)
 		cmd.append(to_bcd(val * 255 / 100, 3));
 		cmd.append( post );
 		waitFB("set comp");
+		isett("set comp");
 
 		cmd = pre_to;
 		cmd.append("\x16\x44");
 		cmd += '\x01';
 		cmd.append(post);
 		waitFB("set Comp ON");
+		isett("set comp ON");
 
 	} else{
 		cmd.assign(pre_to).append("\x16\x44");
 		cmd += '\x00';
 		cmd.append(post);
 		waitFB("set Comp OFF");
+		isett("set comp OFF");
 	}
 }
 
@@ -505,11 +528,13 @@ void RIG_IC7700::set_vox_onoff()
 		cmd.assign(pre_to).append("\x16\x46\x01");
 		cmd.append( post );
 		waitFB("set vox ON");
+		isett("set vox ON");
 	} else {
 		cmd.assign(pre_to).append("\x16\x46");
 		cmd += '\x00';
 		cmd.append( post );
 		waitFB("set vox OFF");
+		isett("set vox OFF");
 	}
 }
 
@@ -521,6 +546,7 @@ void RIG_IC7700::set_vox_gain()
 	cmd.append(to_bcd((int)(progStatus.vox_gain * 2.55), 3));
 	cmd.append( post );
 	waitFB("SET vox gain");
+	isett("set vox gain");
 }
 
 void RIG_IC7700::set_vox_anti()
@@ -531,6 +557,7 @@ void RIG_IC7700::set_vox_anti()
 	cmd.append(to_bcd((int)(progStatus.vox_anti * 2.55), 3));
 	cmd.append( post );
 	waitFB("SET anti-vox");
+	isett("set anti vox");
 }
 
 void RIG_IC7700::set_vox_hang()
@@ -541,6 +568,7 @@ void RIG_IC7700::set_vox_hang()
 	cmd.append(to_bcd((int)(progStatus.vox_hang / 10 ), 2));
 	cmd.append( post );
 	waitFB("SET vox hang");
+	isett("set vox hang");
 }
 
 // CW controls
@@ -551,6 +579,7 @@ void RIG_IC7700::set_cw_wpm()
 	cmd.append(to_bcd(round((progStatus.cw_wpm - 6) * 255 / (48 - 6)), 3));
 	cmd.append( post );
 	waitFB("SET cw wpm");
+	isett("set cw wpm");
 }
 
 void RIG_IC7700::set_cw_qsk()
@@ -560,6 +589,7 @@ void RIG_IC7700::set_cw_qsk()
 	cmd.append(to_bcd(n, 3));
 	cmd.append(post);
 	waitFB("Set cw qsk delay");
+	isett("set cw qsk delay");
 }
 
 void RIG_IC7700::set_cw_spot_tone()
@@ -571,6 +601,7 @@ void RIG_IC7700::set_cw_spot_tone()
 	cmd.append(to_bcd(n, 3));
 	cmd.append( post );
 	waitFB("SET cw spot tone");
+	isett("set cw spot tone");
 }
 
 void RIG_IC7700::set_cw_vol()
@@ -580,6 +611,7 @@ void RIG_IC7700::set_cw_vol()
 	cmd.append(to_bcd((int)(progStatus.cw_vol * 2.55), 3));
 	cmd.append( post );
 	waitFB("SET cw sidetone volume");
+	isett("set cw sidetone volume");
 }
 
 // Tranceiver PTT on/off
@@ -591,6 +623,7 @@ void RIG_IC7700::set_PTT_control(int val)
 	cmd += (unsigned char) val;
 	cmd.append( post );
 	waitFB("set ptt");
+	isett("set ptt");
 	ptt_ = val;
 }
 
@@ -602,6 +635,7 @@ int RIG_IC7700::get_PTT()
 	resp += '\x1c'; resp += '\x00';
 	cmd.append(post);
 	if (waitFOR(8, "get PTT")) {
+		igett("get ptt");
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			ptt_ = replystr[p + 6];
@@ -620,6 +654,7 @@ void RIG_IC7700::set_pbt_inner(int val)
 	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
 	waitFB("set PBT inner");
+	isett("set pbt inner");
 }
 
 void RIG_IC7700::set_pbt_outer(int val)
@@ -633,6 +668,7 @@ void RIG_IC7700::set_pbt_outer(int val)
 	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
 	waitFB("set PBT outer");
+	isett("set pbt outer");
 }
 
 int RIG_IC7700::get_pbt_inner()
@@ -645,13 +681,13 @@ int RIG_IC7700::get_pbt_inner()
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(9, "get pbt inner")) {
+		igett("get pbt inner");
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			val = num100(replystr.substr(p+6));
 			val -= 50;
 		}
 	}
-	rig_trace(2, "get_pbt_inner()", str2hex(replystr.c_str(), replystr.length()));
 	return val;
 }
 
@@ -665,13 +701,13 @@ int RIG_IC7700::get_pbt_outer()
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(9, "get pbt inner")) {
+		igett("get pbt inner");
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			val = num100(replystr.substr(p+6));
 			val -= 50;
 		}
 	}
-	rig_trace(2, "get_pbt_outer()", str2hex(replystr.c_str(), replystr.length()));
 	return val;
 }
 
@@ -739,7 +775,7 @@ void RIG_IC7700::get_band_selection(int v)
 	cmd.append( post );
 
 	if (waitFOR(23, "get band stack")) {
-		set_trace(2, "get band stack", str2hex(replystr.c_str(), replystr.length()));
+		igett("get band stack");
 		size_t p = replystr.rfind(pre_fm);
 		if (p != string::npos) {
 			long int bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
@@ -770,7 +806,7 @@ void RIG_IC7700::get_band_selection(int v)
 			}
 		}
 	} else
-		set_trace(2, "get band stack", str2hex(replystr.c_str(), replystr.length()));
+		isett("get band stack");
 }
 
 void RIG_IC7700::set_band_selection(int v)
@@ -794,7 +830,7 @@ void RIG_IC7700::set_band_selection(int v)
 	cmd.append(to_bcd(PL_tones[rTONE], 6));
 	cmd.append(post);
 	waitFB("set_band_selection");
-	set_trace(2, "set_band_selection()", str2hex(replystr.c_str(), replystr.length()));
+	isett("set band selection");
 
 	cmd.assign(pre_to);
 	cmd.append("\x1A\x01");
@@ -803,5 +839,6 @@ void RIG_IC7700::set_band_selection(int v)
 	cmd.append( post );
 
 	waitFOR(23, "get band stack");
+	igett("get band stack");
 }
 
