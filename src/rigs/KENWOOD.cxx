@@ -125,6 +125,7 @@ int KENWOOD::get_split()
 {
 	cmd = "IF;";
 	int ret = wait_char(';', 38, 100, "get split", ASC);
+	gett("split");
 	if (ret < 38) return 0;
 	return (replybuff[32] == '1');
 }
@@ -133,6 +134,7 @@ bool KENWOOD::check()
 {
 	cmd = "FA;";
 	int ret = wait_char(';', 14, 100, "check", ASC);
+	gett("check");
 	if (ret < 14) return false;
 	return true;
 }
@@ -149,6 +151,7 @@ long KENWOOD::get_vfoA ()
 			A.freq = f;
 		}
 	}
+	gett("vfoA");
 	return A.freq;
 }
 
@@ -162,6 +165,7 @@ void KENWOOD::set_vfoA (long freq)
 	}
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set vfo A", cmd, "");
+	sett("vfoA");
 }
 
 long KENWOOD::get_vfoB ()
@@ -176,6 +180,7 @@ long KENWOOD::get_vfoB ()
 			B.freq = f;
 		}
 	}
+	gett("vfoB");
 	return B.freq;
 }
 
@@ -189,6 +194,7 @@ void KENWOOD::set_vfoB (long freq)
 	}
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set vfo B", cmd, "");
+	sett("vfoB");
 }
 
 /*
@@ -223,6 +229,7 @@ int KENWOOD::get_PTT()
 	int ret = wait_char(';', 38, 100, "get VFO", ASC);
 	if (ret < 38) return ptt_;
 	ptt_ = (replybuff[28] == '1');
+	gett("PTT");
 	return ptt_;
 }
 
@@ -233,6 +240,7 @@ void KENWOOD::set_PTT_control(int val)
 	else	 cmd = "RX;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set PTT", cmd, "");
+	sett("PTT");
 }
 
 void KENWOOD::tune_rig()
@@ -246,22 +254,24 @@ void KENWOOD::tune_rig()
 	cmd = "AC111;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "send tune command", cmd, "");
+	sett("Tune");
 	is_tuning = true;
 }
 
 // Volume control return 0 ... 100
 int KENWOOD::get_volume_control()
 {
+	int volctrl = 0;
 	cmd = "AG0;";
 	if (wait_char(';', 7, 100, "get vol", ASC) == 7) {
-		int volctrl = 0;
 		size_t p = replystr.rfind("AG");
 		if (p != string::npos) {
 			volctrl = fm_decimal(replystr.substr(p+3),3);
-			return (int)(volctrl / 2.55);
+			volctrl = (int)(volctrl / 2.55);
 		}
 	}
-	return 0;
+	gett("volume");
+	return volctrl;
 }
 
 void KENWOOD::set_volume_control(int val) 
@@ -271,6 +281,7 @@ void KENWOOD::set_volume_control(int val)
 	cmd.append(to_decimal(ivol, 3)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set vol", cmd, "");
+	sett("volume");
 }
 
 void  KENWOOD::select_swr()
@@ -278,6 +289,7 @@ void  KENWOOD::select_swr()
 	cmd = "RM1;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select SWR", cmd, "");
+	sett("select SWR");
 }
 
 void  KENWOOD::select_alc()
@@ -285,6 +297,7 @@ void  KENWOOD::select_alc()
 	cmd = "RM3;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select ALC", cmd, "");
+	sett("select ALC");
 }
 
 void KENWOOD::set_rf_gain(int val)
@@ -293,6 +306,7 @@ void KENWOOD::set_rf_gain(int val)
 	cmd.append(to_decimal(val * 255 / 100, 3)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set rf gain", cmd, "");
+	sett("RFgain");
 }
 
 int  KENWOOD::get_rf_gain()
@@ -304,6 +318,7 @@ int  KENWOOD::get_rf_gain()
 		if (p != string::npos)
 			rfg = fm_decimal(replystr.substr(p+2) ,3) * 100 / 255;
 	}
+	gett("RFgain");
 	return rfg;
 }
 
@@ -321,20 +336,21 @@ void KENWOOD::set_mic_gain(int val)
 	cmd.append(to_decimal(val,3)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set mic", cmd, "");
+	sett("MICgain");
 }
 
 int KENWOOD::get_mic_gain()
 {
+	int mgain = 0;
 	cmd = "MG;";
 	if (wait_char(';', 6, 100, "get mic", ASC) == 6) {
-		int mgain = 0;
 		size_t p = replystr.rfind("MG");
 		if (p != string::npos) {
 			mgain = fm_decimal(replystr.substr(p+2), 3);
-			return mgain;
 		}
 	}
-	return 0;
+	gett("MICgain");
+	return mgain;
 }
 
 void KENWOOD::get_mic_min_max_step(int &min, int &max, int &step)
@@ -352,17 +368,20 @@ void KENWOOD::set_noise(bool b)
 		cmd = "NB0;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set NB", cmd, "");
+	sett("setNB");
 }
 
 int KENWOOD::get_noise()
 {
+	int response = 1;
 	cmd = "NB;";
 	if (wait_char(';', 4, 100, "get Noise Blanker", ASC) == 4) {
 		size_t p = replystr.rfind("NB");
-		if (p == string::npos) return 0;
-		if (replystr[p+2] == '0') return 0;
+		if (p == string::npos) response = 0;
+		if (replystr[p+2] == '0') response = 0;
 	}
-	return 1;
+	gett("Noise");
+	return response;
 }
 
 void KENWOOD::set_squelch(int val)
@@ -371,6 +390,7 @@ void KENWOOD::set_squelch(int val)
 	cmd.append(to_decimal(abs(val),3)).append(";");
 	sendCommand(cmd,0);
 	showresp(WARN, ASC, "set squelch", cmd, "");
+	sett("Squelch");
 }
 
 int  KENWOOD::get_squelch()
@@ -383,6 +403,7 @@ int  KENWOOD::get_squelch()
 		replystr[p + 6] = 0;
 		val = atoi(&replystr[p + 3]);
 	}
+	gett("Squelch");
 	return val;
 }
 
@@ -404,11 +425,13 @@ void KENWOOD::set_if_shift(int val)
 		cmd.append(to_decimal(abs(val),4)).append(";");
 		sendCommand(cmd,0);
 		showresp(WARN, ASC, "set IF shift", cmd, "");
+		sett("IF shift");
 	}
 }
 
 bool KENWOOD::get_if_shift(int &val)
 {
+	bool response = false;
 	if (active_mode == CW || active_mode == CWR) { // cw modes
 		cmd = "IS;";
 		if (wait_char(';', 8, 100, "get IF shift", ASC) == 8) {
@@ -417,216 +440,14 @@ bool KENWOOD::get_if_shift(int &val)
 				val = fm_decimal(replystr.substr(p+3), 4);
 			} else
 				val = progStatus.shift_val;
-			return true;
+			response = true;
 		}
 	}
 	val = progStatus.shift_val;
-	return false;
+	gett("IF shift");
+	return response;
 }
 
 void KENWOOD::get_if_min_max_step(int &min, int &max, int &step)
 {
-/*
-// 2000
-	if_shift_min = min = 400;
-	if_shift_max = max = 1000;
-	if_shift_step = step = 50;
-	if_shift_mid = 700;
-// 590, 590SG
-	if_shift_min = min = 300;
-	if_shift_max = max = 1000;
-	if_shift_step = step = 50;
-	if_shift_mid = 800;
-*/
 }
-
-
-/*
-
-// Transceiver power level
-void KENWOOD::set_power_control(double val)
-{
-	int ival = (int)val;
-	cmd = "PC";
-	cmd.append(to_decimal(ival, 3)).append(";");
-	sendCommand(cmd);
-	showresp(WARN, ASC, "set pwr ctrl", cmd, "");
-}
-
-int KENWOOD::get_power_control()
-{
-	cmd = "PC;";
-	if (wait_char(';', 6, 100, "get pout", ASC) == 6) {
-		int pctrl = 0;
-		size_t p = replystr.rfind("PC");
-		if (p != string::npos) {
-			pctrl = fm_decimal(replystr.substr(p+2), 3);
-			return pctrl;
-		}
-	}
-	return 0;
-}
-
-void KENWOOD::set_notch(bool on, int val)
-{
-	if (on) {
-		cmd = "BC2;"; // set manual notch
-		sendCommand(cmd);
-		showresp(WARN, ASC, "set notch on", cmd, "");
-		cmd = "BP";
-//		val = round((val - 220) / 50);
-		val = round((val - 200) / 50);
-		cmd.append(to_decimal(val, 3)).append(";");
-		sendCommand(cmd);
-		showresp(WARN, ASC, "set notch val", cmd, "");
-	} else {
-		cmd = "BC0;"; // no notch action
-		sendCommand(cmd);
-		showresp(WARN, ASC, "set notch off", cmd, "");
-	}
-}
-
-bool  KENWOOD::get_notch(int &val)
-{
-	bool ison = false;
-	cmd = "BC;";
-	if (wait_char(';', 4, 100, "get notch on/off", ASC) == 4) {
-		size_t p = replystr.rfind("BC");
-		if (p != string::npos) {
-			if (replystr[p+2] == '2') {
-				ison = true;
-				cmd = "BP;";
-				if (wait_char(';', 6, 100, "get notch val", ASC) == 6) {
-					p = replystr.rfind("BP");
-					if (p != string::npos)
-						val = 200 + 50 * fm_decimal(replystr.substr(p+2),3);
-				}
-			}
-		}
-	}
-	return (ison);
-}
-
-void KENWOOD::get_notch_min_max_step(int &min, int &max, int &step)
-{
-	min = 200;
-	max = 3350;
-	step = 50;
-}
-
-void KENWOOD::set_auto_notch(int v)
-{
-	cmd = v ? "NT1;" : "NT0;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "set auto notch", cmd, "");
-}
-
-int  KENWOOD::get_auto_notch()
-{
-	cmd = "NT;";
-	if (wait_char(';', 4, 100, "get auto notch", ASC) == 4) {
-		int anotch = 0;
-		size_t p = replystr.rfind("NT");
-		if (p != string::npos) {
-			anotch = (replystr[p+2] == '1');
-			return anotch;
-		}
-	}
-	return 0;
-}
-
-void KENWOOD::set_noise_reduction(int val)
-{
-	if (val == -1) {
-		return;
-	}
-	_noise_reduction_level = val;
-	if (_noise_reduction_level == 0) {
-		nr_label("NR", false);
-	} else if (_noise_reduction_level == 1) {
-		nr_label("NR1", true);
-	} else if (_noise_reduction_level == 2) {
-		nr_label("NR2", true);
-	}
-	cmd.assign("NR");
-	cmd += '0' + _noise_reduction_level;
-	cmd += ';';
-	sendCommand (cmd);
-	showresp(WARN, ASC, "SET noise reduction", cmd, "");
-}
-
-int  KENWOOD::get_noise_reduction()
-{
-	cmd = rsp = "NR";
-	cmd.append(";");
-	if (wait_char(';', 4, 100, "GET noise reduction", ASC) == 4) {
-		size_t p = replystr.rfind(rsp);
-		if (p == string::npos) return _noise_reduction_level;
-		_noise_reduction_level = replystr[p+2] - '0';
-	}
-
-	if (_noise_reduction_level == 1) {
-		nr_label("NR1", true);
-	} else if (_noise_reduction_level == 2) {
-		nr_label("NR2", true);
-	} else {
-		nr_label("NR", false);
-	}
-
-	return _noise_reduction_level;
-}
-
-void KENWOOD::set_noise_reduction_val(int val)
-{
-	if (_noise_reduction_level == 0) return;
-	if (_noise_reduction_level == 1) _nrval1 = val;
-	else _nrval2 = val;
-
-	cmd.assign("RL").append(to_decimal(val, 2)).append(";");
-	sendCommand(cmd);
-	showresp(WARN, ASC, "SET_noise_reduction_val", cmd, "");
-}
-
-int  KENWOOD::get_noise_reduction_val()
-{
-	int nrval = 0;
-	if (_noise_reduction_level == 0) return 0;
-	int val = progStatus.noise_reduction_val;
-	cmd = rsp = "RL";
-	cmd.append(";");
-	if (wait_char(';', 5, 100, "GET noise reduction val", ASC) == 5) {
-		size_t p = replystr.rfind(rsp);
-		if (p == string::npos) {
-			nrval = (_noise_reduction_level == 1 ? _nrval1 : _nrval2);
-			return nrval;
-		}
-		val = atoi(&replystr[p+2]);
-	}
-
-	if (_noise_reduction_level == 1) _nrval1 = val;
-	else _nrval2 = val;
-
-	return val;
-}
-
-int KENWOOD::get_alc(void)
-{
-	cmd = "RM3;";
-	sendCommand(cmd, 0);
-	showresp(WARN, ASC, "ALC meter", cmd, "");
-
-	cmd = "RM;";
-	if (wait_char(';', 8, 100, "get alc", ASC) < 8) return 0;
-
-	size_t p = replystr.find("RM3");
-	if (p == string::npos) return 0;
-
-	replystr[p + 7] = 0;
-	int alc_val = atoi(&replystr[p + 3]);
-	alc_val *= 100;
-	alc_val /= 30;
-	if (alc_val > 100) alc_val = 100;
-	return alc_val;
-}
-
-*/
