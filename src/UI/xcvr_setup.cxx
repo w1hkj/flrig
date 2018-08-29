@@ -1076,10 +1076,10 @@ Fl_Double_Window* w = new Fl_Double_Window(490, 255, _("Configuration"));
 		btn_rpctrace->tooltip(_("Enable trace of XmlRpc methods"));
 
 		selectlevel = new Fl_ComboBox(30, 215, 80, 20, _("XmlRpc trace level"));
-		selectlevel->add("0|1|2|3|4|5");
+		selectlevel->add("0|1|2|3|4");
 		selectlevel->align(FL_ALIGN_RIGHT);
 		selectlevel->index(progStatus.rpc_level);
-		selectlevel->tooltip(_("0 = off ... 5 maximum depth"));
+		selectlevel->tooltip(_("0 = off ... 4 maximum depth"));
 		selectlevel->callback((Fl_Callback*)cb_selectlevel);
 
 		btn_viewtrace = new Fl_Button(486 - 96, 226 - 30, 84, 24, _("View Trace"));
