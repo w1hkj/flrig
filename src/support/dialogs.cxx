@@ -1051,8 +1051,7 @@ void openMemoryDialog()
 
 void show_controls()
 {
-	if (!(selrig->has_extras || selrig->name_ == rig_TT550.name_))
-//	 && progStatus.aux_serial_port == "NONE")
+	if (selrig->name_ == rig_TT550.name_)
 		return;
 	int wh = mainwindow->h();
 	int ww = mainwindow->w();

@@ -217,7 +217,8 @@ RIG_TS2000::RIG_TS2000() {
 	has_mode_control =
 	has_bandwidth_control =
 	has_sql_control =
-	has_ptt_control = true;
+	has_ptt_control = 
+	has_extras = true;
 
 	rxona = true;
 

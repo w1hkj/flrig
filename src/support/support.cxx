@@ -3418,15 +3418,9 @@ void adjust_small_ui()
 
 	y += 20;
 
-	if (selrig->has_extras) {
-		btn_show_controls->show();
-		mainwindow->init_sizes();
-		mainwindow->size( mainwindow->w(), y);
-	} else {
-		mainwindow->size( mainwindow->w(), y);
-		mainwindow->init_sizes();
-		btn_show_controls->hide();
-	}
+	btn_show_controls->show();
+	mainwindow->init_sizes();
+	mainwindow->size( mainwindow->w(), y);
 
 	if (progStatus.tooltips) {
 		Fl_Tooltip::enable(1);
