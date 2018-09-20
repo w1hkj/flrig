@@ -221,7 +221,7 @@ void RIG_FTdx1200::initialize()
 		progStatus.vox_hang = 500;
 	}
 // Disable Auto Information mode
-	sendOK("AI0;");
+	sendCommand("AI0;");
 
 // "MRnnn;" if valid, returns last channel used, "mrlll...;", along with channel nnn info.
 	cmd = "MR118;";
@@ -296,7 +296,7 @@ void RIG_FTdx1200::set_vfoA (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "SET vfo A", cmd, replystr);
 	set_trace(3,"set_vfoA", cmd.c_str(), replystr.c_str());
 }
@@ -327,7 +327,7 @@ void RIG_FTdx1200::set_vfoB (long freq)
 		cmd[i] += freq % 10;
 		freq /= 10;
 	}
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "SET vfo B", cmd, replystr);
 	set_trace(3,"set_vfoB", cmd.c_str(), replystr.c_str());
 }
@@ -337,14 +337,14 @@ void RIG_FTdx1200::setVfoAdj(double v)
 	char cmdstr[20];
 	snprintf(cmdstr, sizeof(cmdstr), "EX035%+03d;", (int)v);
 	cmd = cmdstr;
-	sendOK(cmd);
+	sendCommand(cmd);
 	set_trace(3,"setVfoAdj", cmd.c_str(), replystr.c_str());
 }
 
 double RIG_FTdx1200::getVfoAdj()
 {
 	cmd = rsp = "EX035";
-	sendOK(cmd.append(";"));
+	sendCommand(cmd.append(";"));
 	wait_char(';', 9, 100, "get Vfo Adjust", ASC);
 
 	size_t p = replystr.rfind(rsp);
@@ -367,7 +367,7 @@ bool RIG_FTdx1200::twovfos()
 void RIG_FTdx1200::selectA()
 {
 	cmd = "FR0;FT2;";
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "select A", cmd, replystr);
 	set_trace(3,"selectA", cmd.c_str(), replystr.c_str());
 }
@@ -375,7 +375,7 @@ void RIG_FTdx1200::selectA()
 void RIG_FTdx1200::selectB()
 {
 	cmd = "FR4;FT3;";
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "select B", cmd, replystr);
 	set_trace(3,"selectB", cmd.c_str(), replystr.c_str());
 }
@@ -383,7 +383,7 @@ void RIG_FTdx1200::selectB()
 void RIG_FTdx1200::A2B()
 {
 	cmd = "AB;";
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "vfo A --> B", cmd, replystr);
 	set_trace(3,"A2B", cmd.c_str(), replystr.c_str());
 }
@@ -399,24 +399,24 @@ void RIG_FTdx1200::set_split(bool val)
 	if (useB) {
 		if (val) {
 			cmd = "FR4;FT2;";
-			sendOK(cmd);
+			sendCommand(cmd);
 			showresp(WARN, ASC, "Rx on B, Tx on A", cmd, replystr);
 			set_trace(3,"set_split", cmd.c_str(), replystr.c_str());
 		} else {
 			cmd = "FR4;FT3;";
-			sendOK(cmd);
+			sendCommand(cmd);
 			showresp(WARN, ASC, "Rx on B, Tx on B", cmd, replystr);
 			set_trace(3,"set_split", cmd.c_str(), replystr.c_str());
 		}
 	} else {
 		if (val) {
 			cmd = "FR0;FT3;";
-			sendOK(cmd);
+			sendCommand(cmd);
 			showresp(WARN, ASC, "Rx on A, Tx on B", cmd, replystr);
 			set_trace(3,"set_split", cmd.c_str(), replystr.c_str());
 		} else {
 			cmd = "FR0;FT2;";
-			sendOK(cmd);
+			sendCommand(cmd);
 			showresp(WARN, ASC, "Rx on A, Tx on A", cmd, replystr);
 			set_trace(3,"set_split", cmd.c_str(), replystr.c_str());
 		}
@@ -499,7 +499,7 @@ int RIG_FTdx1200::get_alc()
 int RIG_FTdx1200::get_power_out()
 {
 	cmd = rsp = "RM5";
-	sendOK(cmd.append(";"));
+	sendCommand(cmd.append(";"));
 	wait_char(';', 7, 100, "get pout", ASC);
 
 	get_trace(3, "get_power_out()", cmd.c_str(), replystr.c_str());
@@ -540,7 +540,7 @@ void RIG_FTdx1200::set_power_control(double val)
 		cmd[i] += ival % 10;
 		ival /= 10;
 	}
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "SET power", cmd, replystr);
 	set_trace(3,"set_power_control", cmd.c_str(), replystr.c_str());
 }
@@ -570,7 +570,7 @@ void RIG_FTdx1200::set_volume_control(int val)
 		cmd[i] += ivol % 10;
 		ivol /= 10;
 	}
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "SET vol", cmd, replystr);
 	set_trace(3,"set_volume_control", cmd.c_str(), replystr.c_str());
 }
@@ -579,7 +579,7 @@ void RIG_FTdx1200::set_volume_control(int val)
 void RIG_FTdx1200::set_PTT_control(int val)
 {
 	cmd = val ? "TX1;" : "TX0;";
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "SET PTT", cmd, replystr);
 	ptt_ = val;
 	set_trace(3,"set_PTT_control", cmd.c_str(), replystr.c_str());
@@ -624,7 +624,7 @@ void RIG_FTdx1200::tune_rig()
 
 	if (use_int_tuner) {
 		cmd = "AC002;";
-		sendOK(cmd);
+		sendCommand(cmd);
 		showresp(WARN, ASC, "tune rig", cmd, replystr);
 	} else {
 		if (extun_on == false) {
@@ -637,17 +637,17 @@ void RIG_FTdx1200::tune_rig()
 			useB ? set_vfoB(rfreq) : set_vfoA(rfreq);
 			rpwr = get_power_control();
 			set_power_control(10);
-			sendOK("EX0360000;");	// AM mic off
-//			sendOK("EX0560000;");	// FM mic off
+			sendCommand("EX0360000;");	// AM mic off
+//			sendCommand("EX0560000;");	// FM mic off
 			extun_on = true;
 			btnPTT->value(true);
-			sendOK("MX1;");
+			sendCommand("MX1;");
 		} else {
 			extun_on = false;
 			btnPTT->value(false);
-			sendOK("MX0;");
-			sendOK("EX0361000;");	// AM mic default
-//			sendOK("EX0560050;");	// FM mic default
+			sendCommand("MX0;");
+			sendCommand("EX0361000;");	// AM mic default
+//			sendCommand("EX0560050;");	// FM mic default
 			set_power_control(rpwr);
 			useB ? set_modeB(rmd) : set_modeA(rmd);
 			useB ? set_bwB(rbw) : set_bwA(rbw);
@@ -682,7 +682,7 @@ void RIG_FTdx1200::set_attenuator(int val)
 
 	cmd = "RA00;";
 	cmd[3] += atten_level;
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "SET att", cmd, replystr);
 	set_trace(3,"set_attenuator", cmd.c_str(), replystr.c_str());
 }
@@ -735,7 +735,7 @@ void RIG_FTdx1200::set_preamp(int val)
 		preamp_label("IPO", false);
 
 	cmd[3] = '0' + preamp_level;
-	sendOK (cmd);
+	sendCommand (cmd);
 	showresp(WARN, ASC, "SET preamp", cmd, replystr);
 	set_trace(3,"set_preamp", cmd.c_str(), replystr.c_str());
 }
@@ -828,7 +828,7 @@ void RIG_FTdx1200::set_modeA(int val)
 	cmd = "MD0";
 	cmd += FTdx1200_mode_chr[val];
 	cmd += ';';
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "SET mode A", cmd, replystr);
 	set_trace(3,"set_modeA", cmd.c_str(), replystr.c_str());
 	adjust_bandwidth(modeA);
@@ -837,7 +837,7 @@ void RIG_FTdx1200::set_modeA(int val)
 		progStatus.spot_onoff = false;
 		set_spot_onoff();
 		cmd = "CS0;";
-		sendOK(cmd);
+		sendCommand(cmd);
 		showresp(WARN, ASC, "SET spot off", cmd, replystr);
 		btnSpot->value(0);
 	}
@@ -870,7 +870,7 @@ void RIG_FTdx1200::set_modeB(int val)
 	cmd = "MD0";
 	cmd += FTdx1200_mode_chr[val];
 	cmd += ';';
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "SET mode B", cmd, replystr);
 	set_trace(3,"set_modeB", cmd.c_str(), replystr.c_str());
 	adjust_bandwidth(modeB);
@@ -879,7 +879,7 @@ void RIG_FTdx1200::set_modeB(int val)
 		progStatus.spot_onoff = false;
 		set_spot_onoff();
 		cmd = "CS0;";
-		sendOK(cmd);
+		sendCommand(cmd);
 		showresp(WARN, ASC, "SET spot off", cmd, replystr);
 		btnSpot->value(0);
 	}
@@ -931,7 +931,7 @@ void RIG_FTdx1200::set_bwA(int val)
 	cmd += '0' + bw_indx / 10;
 	cmd += '0' + bw_indx % 10;
 	cmd += ';';
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "SET bw A", cmd, replystr);
 	mode_bwA[modeA] = val;
 	set_trace(3,"set_bwA", cmd.c_str(), replystr.c_str());
@@ -995,7 +995,7 @@ void RIG_FTdx1200::set_bwB(int val)
 	cmd += '0' + bw_indx / 10;
 	cmd += '0' + bw_indx % 10;
 	cmd += ';';
-	sendOK(cmd);
+	sendCommand(cmd);
 	mode_bwB[modeB] = bwB;
 	showresp(WARN, ASC, "SET bw B", cmd, replystr);
 	set_trace(3,"set_bwB", cmd.c_str(), replystr.c_str());
@@ -1069,7 +1069,7 @@ void RIG_FTdx1200::set_if_shift(int val)
 		cmd[3+i] += val % 10;
 		val /= 10;
 	}
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "SET if shift", cmd, replystr);
 	set_trace(3,"set_if_shift", cmd.c_str(), replystr.c_str());
 }
@@ -1103,7 +1103,7 @@ void RIG_FTdx1200::set_notch(bool on, int val)
 // set notch frequency
 	if (on) {
 		cmd = "BP00001;";
-		sendOK(cmd);
+		sendCommand(cmd);
 		showresp(WARN, ASC, "SET notch on", cmd, replystr);
 
 		set_trace(3,"set_notch on", cmd.c_str(), replystr.c_str());
@@ -1115,7 +1115,7 @@ void RIG_FTdx1200::set_notch(bool on, int val)
 			cmd[3 + i] += val % 10;
 			val /=10;
 		}
-		sendOK(cmd);
+		sendCommand(cmd);
 		showresp(WARN, ASC, "SET notch val", cmd, replystr);
 
 		set_trace(3,"set_notch val", cmd.c_str(), replystr.c_str());
@@ -1125,7 +1125,7 @@ void RIG_FTdx1200::set_notch(bool on, int val)
 
 // set notch off
 	cmd = "BP00000;";
-	sendOK(cmd);
+	sendCommand(cmd);
 	set_trace(3,"set_notch off", cmd.c_str(), replystr.c_str());
 	showresp(WARN, ASC, "SET notch off", cmd, replystr);
 }
@@ -1169,7 +1169,7 @@ void RIG_FTdx1200::get_notch_min_max_step(int &min, int &max, int &step)
 void RIG_FTdx1200::set_auto_notch(int v)
 {
 	cmd.assign("BC0").append(v ? "1" : "0" ).append(";");
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "SET DNF Auto Notch Filter", cmd, replystr);
 	set_trace(3,"set_auto_notch", cmd.c_str(), replystr.c_str());
 }
@@ -1203,7 +1203,7 @@ void RIG_FTdx1200::set_noise(bool b)
 		nb_label("NB", false);
 	}
 	cmd[3] = '0' + FTdx1200_blanker_level;
-	sendOK (cmd);
+	sendCommand (cmd);
 	showresp(WARN, ASC, "SET NB", cmd, replystr);
 	set_trace(3,"set_noise", cmd.c_str(), replystr.c_str());
 }
@@ -1240,7 +1240,7 @@ void RIG_FTdx1200::set_mic_gain(int val)
 		cmd[1+i] += val % 10;
 		val /= 10;
 	}
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "SET mic", cmd, replystr);
 	set_trace(3,"set_mic_gain", cmd.c_str(), replystr.c_str());
 }
@@ -1276,7 +1276,7 @@ void RIG_FTdx1200::set_rf_gain(int val)
 		cmd[i] = rfval % 10 + '0';
 		rfval /= 10;
 	}
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "SET rfgain", cmd, replystr);
 	set_trace(3,"set_rf_gain", cmd.c_str(), replystr.c_str());
 }
@@ -1312,7 +1312,7 @@ void RIG_FTdx1200::set_vox_onoff()
 {
 	cmd = "VX0;";
 	if (progStatus.vox_onoff) cmd[2] = '1';
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "SET vox", cmd, replystr);
 	set_trace(3,"set_vox_onoff", cmd.c_str(), replystr.c_str());
 }
@@ -1321,7 +1321,7 @@ void RIG_FTdx1200::set_vox_gain()
 {
 	cmd = "VG";
 	cmd.append(to_decimal(progStatus.vox_gain, 3)).append(";");
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "SET vox gain", cmd, replystr);
 	set_trace(3,"set_vox_gain", cmd.c_str(), replystr.c_str());
 }
@@ -1330,7 +1330,7 @@ void RIG_FTdx1200::set_vox_anti()
 {
 	cmd = "EX117";
 	cmd.append(to_decimal(progStatus.vox_anti, 3)).append(";");
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "SET anti-vox", cmd, replystr);
 	set_trace(3,"set_vox_anti", cmd.c_str(), replystr.c_str());
 }
@@ -1339,7 +1339,7 @@ void RIG_FTdx1200::set_vox_hang()
 {
 	cmd = "VD";
 	cmd.append(to_decimal(progStatus.vox_hang, 4)).append(";");
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "SET vox delay", cmd, replystr);
 	set_trace(3,"set_vox_hang", cmd.c_str(), replystr.c_str());
 }
@@ -1348,7 +1348,7 @@ void RIG_FTdx1200::set_vox_on_dataport()
 {
 	cmd = "EX1140;";
 	if (progStatus.vox_on_dataport) cmd[5] = '1';
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "SET vox on data port", cmd, replystr);
 	set_trace(3,"set_vox_on_dataport", cmd.c_str(), replystr.c_str());
 }
@@ -1359,7 +1359,7 @@ void RIG_FTdx1200::set_cw_wpm()
 	if (progStatus.cw_wpm > 60) progStatus.cw_wpm = 60;
 	if (progStatus.cw_wpm < 4) progStatus.cw_wpm = 4;
 	cmd.append(to_decimal(progStatus.cw_wpm, 3)).append(";");
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "SET cw wpm", cmd, replystr);
 	set_trace(3,"set_cw_wpm", cmd.c_str(), replystr.c_str());
 }
@@ -1369,7 +1369,7 @@ void RIG_FTdx1200::enable_keyer()
 {
 	cmd = "KR0;";
 	if (progStatus.enable_keyer) cmd[2] = '1';
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "SET keyer on/off", cmd, replystr);
 	set_trace(3,"enable_keyer", cmd.c_str(), replystr.c_str());
 }
@@ -1379,7 +1379,7 @@ bool RIG_FTdx1200::set_cw_spot()
 	if (vfo->imode == mCW || vfo->imode == mCW_R) {
 		cmd = "CS0;";
 		if (progStatus.spot_onoff) cmd[2] = '1';
-		sendOK(cmd);
+		sendCommand(cmd);
 		showresp(WARN, ASC, "SET spot on/off", cmd, replystr);
 		set_trace(3,"set_cw_spot", cmd.c_str(), replystr.c_str());
 		return true;
@@ -1391,7 +1391,7 @@ void RIG_FTdx1200::set_cw_weight()
 {
 	int n = round(progStatus.cw_weight * 10);
 	cmd.assign("EX046").append(to_decimal(n, 2)).append(";");
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "SET cw weight", cmd, replystr);
 	set_trace(3,"set_cw_weight", cmd.c_str(), replystr.c_str());
 }
@@ -1400,7 +1400,7 @@ void RIG_FTdx1200::set_cw_qsk()
 {
 	int n = progStatus.cw_qsk / 5 - 3;
 	cmd.assign("EX049").append(to_decimal(n, 1)).append(";");
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "SET cw qsk", cmd, replystr);
 	set_trace(3,"set_cw_qsk", cmd.c_str(), replystr.c_str());
 }
@@ -1409,7 +1409,7 @@ void RIG_FTdx1200::set_cw_spot_tone()
 {
 	int n = (progStatus.cw_spot_tone - 300) / 50;
 	cmd.assign("EX045").append(to_decimal(n, 2)).append(";");
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "SET cw tone", cmd, replystr);
 	set_trace(3,"set_cw_spot_tone", cmd.c_str(), replystr.c_str());
 }
@@ -1453,7 +1453,7 @@ void RIG_FTdx1200::get_band_selection(int v)
 		}
 	}
 
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "Select Band Stacks", cmd, replystr);
 }
 
@@ -1461,7 +1461,7 @@ void RIG_FTdx1200::get_band_selection(int v)
 void RIG_FTdx1200::set_noise_reduction_val(int val)
 {
 	cmd.assign("RL0").append(to_decimal(val, 2)).append(";");
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "SET_noise_reduction_val", cmd, replystr);
 	set_trace(3,"set_noise_reduction_val", cmd.c_str(), replystr.c_str());
 }
@@ -1482,7 +1482,7 @@ int  RIG_FTdx1200::get_noise_reduction_val()
 void RIG_FTdx1200::set_noise_reduction(int val)
 {
 	cmd.assign("NR0").append(val ? "1" : "0" ).append(";");
-	sendOK(cmd);
+	sendCommand(cmd);
 	showresp(WARN, ASC, "SET noise reduction", cmd, replystr);
 	set_trace(3,"set_noise_reduction", cmd.c_str(), replystr.c_str());
 }
@@ -1509,9 +1509,9 @@ void RIG_FTdx1200::set_xcvr_auto_on()
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) {	// rig is off, power on
 		cmd = "PS1;";
-		sendOK(cmd);
+		sendCommand(cmd);
 		MilliSleep(1500);	// 1.0 < T < 2.0 seconds
-		sendOK(cmd);
+		sendCommand(cmd);
 		MilliSleep(3000);	// Wait for rig startup?  Maybe not needed.
 	}
 }
@@ -1521,7 +1521,7 @@ void RIG_FTdx1200::set_xcvr_auto_off()
 	if (!progStatus.xcvr_auto_off) return;
 
 	cmd = "PS0;";
-	sendOK(cmd);
+	sendCommand(cmd);
 }
 
 void RIG_FTdx1200::set_compression(int on, int val)
@@ -1529,18 +1529,18 @@ void RIG_FTdx1200::set_compression(int on, int val)
 	if (on) {
 		if (val == 0) {
 			cmd.assign("PR2;");	// mic eq on
-			sendOK(cmd);
+			sendCommand(cmd);
 			showresp(WARN, ASC, "set Comp EQ on", cmd, replystr);
 			set_trace(3,"set_compression EQ on", cmd.c_str(), replystr.c_str());
 		} else {
 			cmd.assign("PR1;PL").append(to_decimal(val, 3)).append(";");
-			sendOK(cmd);
+			sendCommand(cmd);
 			showresp(WARN, ASC, "set Comp on", cmd, replystr);
 			set_trace(3,"set_compression on", cmd.c_str(), replystr.c_str());
 		}
 	} else{
 		cmd.assign("PR0;");
-		sendOK(cmd);
+		sendCommand(cmd);
 		showresp(WARN, ASC, "set Comp off", cmd, replystr);
 		set_trace(3,"set_compression off", cmd.c_str(), replystr.c_str());
 	}
@@ -1553,7 +1553,7 @@ bool RIG_FTdx1200::set_cw_APF()
 	if (vfo->imode == mCW || vfo->imode == mCW_R) {
 		cmd = "CO0000;";
 		if (progStatus.apf_onoff) cmd[5] = '2';
-		sendOK(cmd);
+		sendCommand(cmd);
 		showresp(WARN, ASC, "SET APF on/off", cmd, replystr);
 		return true;
 	} else

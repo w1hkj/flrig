@@ -186,13 +186,13 @@ void RIG_FT2000::get_band_selection(int v)
 void RIG_FT2000::selectA()
 {
 	cmd = "VS0;";
-	sendOK(cmd);
+	sendCommand(cmd);
 }
 
 void RIG_FT2000::selectB()
 {
 	cmd = "VS1;";
-	sendOK(cmd);
+	sendCommand(cmd);
 }
 
 bool RIG_FT2000::check ()
