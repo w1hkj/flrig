@@ -125,12 +125,14 @@ void RIG_TS480SAT::initialize()
 	menu012.clear();
 	cmd = "EX0120000;"; // read menu 012 state
 //might return something like EX01200004;
+	gett("read menu 12");
 
 	if (wait_char(';', 11, 100, "read ex 012", ASC) == 11)
 		menu012 = replystr;
 
 	cmd = "EX01200000;";
 	sendCommand(cmd);
+	sett("set menu 12");
 };
 
 RIG_TS480SAT::RIG_TS480SAT() {
@@ -249,6 +251,7 @@ void RIG_TS480SAT::check_menu_45()
 		SH_label   = TS480SAT_btn_SH_label;
 		B.iBW = A.iBW = 0x8A03;
 	}
+	gett("check menu 45");
 }
 
 void RIG_TS480SAT::shutdown()
@@ -257,6 +260,7 @@ void RIG_TS480SAT::shutdown()
 	if (menu012.empty()) return;
 	cmd = menu012;
 	sendCommand(cmd);
+	sett("shutdown, restore menu 12");
 }
 
 // SM cmd 0 ... 100 (rig values 0 ... 15)
@@ -269,6 +273,7 @@ int RIG_TS480SAT::get_smeter()
 	size_t p = replystr.rfind("SM");
 	if (p != string::npos)
 		mtr = 5 * atoi(&replystr[p + 3]);
+	gett("get smeter");
 	return mtr;
 }
 
@@ -303,6 +308,7 @@ int RIG_TS480SAT::get_power_out()
 			(pwrtbl[i+1].pwr - pwrtbl[i].pwr)*(mtr - pwrtbl[i].mtr)/(pwrtbl[i+1].mtr - pwrtbl[i].mtr));
 		if (mtr > 200) mtr = 200;
 	}
+	gett("power out");
 	return mtr;
 }
 
@@ -328,6 +334,7 @@ int RIG_TS480SAT::get_swr()
 	else
 		alc = 0;
 	swralc_polled = true;
+	gett("swr");
 	return mtr;
 }
 
@@ -430,6 +437,7 @@ void RIG_TS480SAT::set_modeA(int val)
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set mode", cmd, "");
 	A.iBW = set_widths(val);
+	sett("set mode A");
 }
 
 int RIG_TS480SAT::get_modeA()
@@ -447,6 +455,7 @@ int RIG_TS480SAT::get_modeA()
 	}
 	if (A.imode == 3) fm_mode = true;
 	else fm_mode = false;
+	gett("mode A");
 	return A.imode;
 }
 
@@ -461,6 +470,7 @@ void RIG_TS480SAT::set_modeB(int val)
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set mode B", cmd, "");
 	B.iBW = set_widths(val);
+	sett("mode B");
 }
 
 int RIG_TS480SAT::get_modeB()
@@ -478,6 +488,7 @@ int RIG_TS480SAT::get_modeB()
 	}
 	if (B.imode == 3) fm_mode = true;
 	else fm_mode = false;
+	gett("mode B");
 	return B.imode;
 }
 
@@ -499,6 +510,7 @@ void RIG_TS480SAT::set_bwA(int val)
 		cmd.append(to_decimal(((A.iBW >> 8) & 0x7F), 2)).append(";");
 		sendCommand(cmd);
 		showresp(WARN, ASC, SH_tooltip, cmd, "");
+		sett("bw A");
 	}
 	if (val > 256) return;
 	else if (A.imode == 2 || A.imode == 6) {
@@ -506,11 +518,13 @@ void RIG_TS480SAT::set_bwA(int val)
 		cmd = TS480SAT_CWbw[A.iBW];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set CW bw", cmd, "");
+		sett("bw A");
 	}else if (A.imode == 5 || A.imode == 7) {
 		A.iBW = val;
 		cmd = TS480SAT_FSKbw[A.iBW];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set FSK bw", cmd, "");
+		sett("bw A");
 	}
 }
 
@@ -565,6 +579,7 @@ int RIG_TS480SAT::get_bwA()
 			}
 		}
 	}
+	gett("get bw A");
 	return A.iBW;
 }
 
@@ -581,6 +596,7 @@ void RIG_TS480SAT::set_bwB(int val)
 		cmd.append(to_decimal(((B.iBW >> 8) & 0x7F), 2)).append(";");
 		sendCommand(cmd);
 		showresp(WARN, ASC, SH_tooltip, cmd, "");
+		sett("bw B");
 	}
 	if (val > 256) return;
 	else if (B.imode == 2 || B.imode == 6) { // CW
@@ -588,11 +604,13 @@ void RIG_TS480SAT::set_bwB(int val)
 		cmd = TS480SAT_CWbw[B.iBW];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set CW bw", cmd, "");
+		sett("bw B");
 	}else if (B.imode == 5 || B.imode == 7) {
 		B.iBW = val;
 		cmd = TS480SAT_FSKbw[B.iBW];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set FSK bw", cmd, "");
+		sett("bw B");
 	}
 }
 
@@ -646,6 +664,7 @@ int RIG_TS480SAT::get_bwB()
 			}
 		}
 	}
+	gett("bw B");
 	return B.iBW;
 }
 
@@ -678,6 +697,7 @@ void RIG_TS480SAT::set_power_control(double val)
 	cmd += ';';
 	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd);
+	sett("power control");
 }
 
 int RIG_TS480SAT::get_power_control()
@@ -690,7 +710,7 @@ int RIG_TS480SAT::get_power_control()
 	if (p == string::npos) return val;
 
 	val = atoi(&replystr[p + 2]);
-
+	gett("power control");
 	return val;
 }
 
@@ -700,6 +720,7 @@ void RIG_TS480SAT::set_attenuator(int val)
 	else		cmd = "RA00;";
 	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd);
+	sett("attenuator");
 }
 
 int RIG_TS480SAT::get_attenuator()
@@ -708,6 +729,7 @@ int RIG_TS480SAT::get_attenuator()
 	if (wait_char(';', 7, 100, "get attenuator", ASC) < 7) return progStatus.attenuator;
 
 	size_t p = replystr.rfind("RA");
+	gett("attenuator");
 	if (p == string::npos) return progStatus.attenuator;
 	if (replystr[p+3] == '1') return 1;
 	return 0;
@@ -719,6 +741,7 @@ void RIG_TS480SAT::set_preamp(int val)
 	else		cmd = "PA0;";
 	LOG_WARN("%s", cmd.c_str());
 	sendCommand(cmd);
+	sett("preamp");
 }
 
 int RIG_TS480SAT::get_preamp()
@@ -727,6 +750,7 @@ int RIG_TS480SAT::get_preamp()
 	if (wait_char(';', 5, 100, "get preamp", ASC) < 5) return progStatus.preamp;
 
 	size_t p = replystr.rfind("PA");
+	gett("preamp");
 	if (p == string::npos) return progStatus.preamp;
 	if (replystr[p+2] == '1') return 1;
 	return 0;
@@ -739,6 +763,7 @@ void RIG_TS480SAT::set_if_shift(int val)
 	cmd.append(to_decimal(abs(val),4)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set IF shift", cmd, "");
+	sett("if shift");
 }
 
 bool RIG_TS480SAT::get_if_shift(int &val)
@@ -746,6 +771,7 @@ bool RIG_TS480SAT::get_if_shift(int &val)
 	cmd = "IS;";
 	if (wait_char(';', 8, 100, "get IF shift", ASC) == 8) {
 		size_t p = replystr.rfind("IS");
+		gett("if shift");
 		if (p != string::npos) {
 			val = fm_decimal(replystr.substr(p+3), 4);
 			if (replystr[p+2] == '-') val *= -1;
@@ -783,6 +809,7 @@ void RIG_TS480SAT::set_noise_reduction(int val)
 	cmd += ';';
 	sendCommand (cmd);
 	showresp(WARN, ASC, "SET noise reduction", cmd, "");
+	sett("noise reduction");
 }
 
 int  RIG_TS480SAT::get_noise_reduction()
@@ -802,7 +829,7 @@ int  RIG_TS480SAT::get_noise_reduction()
 	} else {
 		nr_label("NR", false);
 	}
-
+	gett("noise reduction");
 	return _noise_reduction_level;
 }
 
@@ -815,6 +842,7 @@ void RIG_TS480SAT::set_noise_reduction_val(int val)
 	cmd.assign("RL").append(to_decimal(val, 2)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET_noise_reduction_val", cmd, "");
+	sett("nr value");
 }
 
 int  RIG_TS480SAT::get_noise_reduction_val()
@@ -835,7 +863,7 @@ int  RIG_TS480SAT::get_noise_reduction_val()
 
 	if (_noise_reduction_level == 1) _nrval1 = val;
 	else _nrval2 = val;
-
+	gett("nr value");
 	return val;
 }
 
@@ -844,9 +872,11 @@ int  RIG_TS480SAT::get_agc()
 	cmd = "GT;";
 	wait_char(';', 6, 100, "GET agc val", ASC);
 	size_t p = replystr.rfind("GT");
+	gett("agc");
 	if (p == string::npos) return agcval;
 	if (replystr[4] == ' ') return 0;
 	agcval = replystr[4] - '0' + 1; // '0' == off, '1' = fast, '2' = slow
+
 	return agcval;
 }
 
@@ -860,6 +890,7 @@ int RIG_TS480SAT::incr_agc()
 	cmd += ";";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET agc", cmd, replystr);
+	sett("increment agc");
 	return agcval;
 }
 
@@ -883,7 +914,7 @@ void RIG_TS480SAT::set_auto_notch(int v)
 	cmd = v ? "BC1;" : "BC0;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set auto notch", cmd, "");
-
+	sett("auto notch");
 }
 
 int  RIG_TS480SAT::get_auto_notch()
@@ -892,6 +923,7 @@ int  RIG_TS480SAT::get_auto_notch()
 	if (wait_char(';', 4, 100, "get auto notch", ASC) == 4) {
 		int anotch = 0;
 		size_t p = replystr.rfind("BC");
+		gett("auto notch");
 		if (p != string::npos) {
 			anotch = (replystr[p+2] == '1');
 			return anotch;
@@ -909,6 +941,7 @@ void RIG_TS480SAT::set_noise(bool b)
 		cmd = "NB0;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set NB", cmd, "");
+	sett("noise");
 }
 
 int RIG_TS480SAT::get_noise()
@@ -916,6 +949,7 @@ int RIG_TS480SAT::get_noise()
 	cmd = "NB;";
 	if (wait_char(';', 4, 100, "get Noise Blanker", ASC) == 4) {
 		size_t p = replystr.rfind("NB");
+		gett("noise");
 		if (p == string::npos) return 0;
 		if (replystr[p+2] == '0') return 0;
 	}
@@ -931,12 +965,14 @@ void RIG_TS480SAT::set_PTT_control(int val)
 	} else cmd = "RX;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set PTT", cmd, "");
+	sett("ptt");
 }
 
 int RIG_TS480SAT::get_PTT()
 {
 	cmd = "IF;";
 	int ret = wait_char(';', 38, 100, "get VFO", ASC);
+	gett("ptt");
 	if (ret < 38) return ptt_;
 	ptt_ = (replybuff[28] == '1');
 	return ptt_;
@@ -948,6 +984,7 @@ void RIG_TS480SAT::set_rf_gain(int val)
 	cmd.append(to_decimal(val,3)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set rf gain", cmd, "");
+	sett("rf gain");
 }
 
 int  RIG_TS480SAT::get_rf_gain()
@@ -959,6 +996,7 @@ int  RIG_TS480SAT::get_rf_gain()
 	size_t p = replystr.rfind("RG");
 	if (p != string::npos)
 		val = fm_decimal(replystr.substr(p+2), 3);
+	gett("rf gain");
 	return val;
 }
 
