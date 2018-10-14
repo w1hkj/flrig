@@ -195,8 +195,12 @@ void Fl_PopBrowser::pophide ()
 	parentWindow->damage(FL_DAMAGE_ALL);
 	parentWindow->redraw();
 
+	Fl_ComboBox *p = (Fl_ComboBox*)parent();
 	Fl::grab(0);
-	Fl::focus(((Fl_ComboBox*)parent())->btn);
+	p->isbusy(false);
+	Fl::focus(p->btn);
+//	Fl::focus(((Fl_ComboBox*)parent())->btn);
+
 }   
 
 void Fl_PopBrowser::popbrwsr_cb_i (Fl_Widget *v, long d)
@@ -216,6 +220,7 @@ void Fl_PopBrowser::popbrwsr_cb_i (Fl_Widget *v, long d)
 
 	PB->pophide();
 
+	CB->isbusy(false);
 	CB->do_callback();
 
 	return;
@@ -244,6 +249,7 @@ void btnComboBox_cb (Fl_Widget *v, void *d)
 {
 	Fl_ComboBox *p = (Fl_ComboBox *)(v->parent());
 	p->fl_popbrwsr (p);
+	p->isbusy(true);
 	return;
 }
 

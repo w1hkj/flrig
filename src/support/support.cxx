@@ -481,13 +481,22 @@ void read_mode()
 void setBWControl(void *)
 {
 	if (selrig->has_dsp_controls) {
+		if (opDSP_lo->isbusy() || opDSP_hi->isbusy())
+			return;
 		if (vfo->iBW > 256) {
 			opBW->index(0);
 			opBW->hide();
-			opDSP_hi->index((vfo->iBW >> 8) & 0x7F);
-			opDSP_hi->hide();
-			opDSP_lo->index(vfo->iBW & 0xFF);
-			opDSP_lo->show();
+			if (opDSP_lo->visible()) {
+				opDSP_hi->index((vfo->iBW >> 8) & 0x7F);
+				opDSP_hi->hide();
+				opDSP_lo->index(vfo->iBW & 0xFF);
+				opDSP_lo->show();
+			} else {
+				opDSP_hi->index((vfo->iBW >> 8) & 0x7F);
+				opDSP_lo->index(vfo->iBW & 0xFF);
+				opDSP_lo->hide();
+				opDSP_hi->show();
+			}
 			btnDSP->label(selrig->SL_label);
 			btnDSP->redraw_label();
 			btnDSP->show();
@@ -502,6 +511,8 @@ void setBWControl(void *)
 		}
 	}
 	else {
+		if (opBW->isbusy())
+			return;
 		opDSP_lo->hide();
 		opDSP_hi->hide();
 		btnDSP->hide();

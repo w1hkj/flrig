@@ -84,6 +84,7 @@ class Fl_ComboBox : public Fl_Group  {
 	int				listtype;
 	int				numrows_;
 	int				type_;
+	bool			isbusy_;
 
 	int				width;
 	int				height;
@@ -102,6 +103,8 @@ public:
 	void value (const char *);
 	void put_value( const char *);
 	void fl_popbrwsr(Fl_Widget *);
+	bool isbusy() { return isbusy_; }
+	void isbusy(bool b) { isbusy_ = b; }
 
 	void type (int = 0);
 	void add (const char *s, void *d = 0);
