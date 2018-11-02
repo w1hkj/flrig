@@ -331,6 +331,8 @@ public:
 
 	virtual bool check() { return false; }
 
+	virtual void set_data_port() {}
+
 	virtual bool get_info(void) {return false;}
 	virtual long get_vfoA(void) {return A.freq;}
 	virtual void set_vfoA(long f) {A.freq = f;}

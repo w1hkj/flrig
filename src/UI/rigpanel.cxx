@@ -803,6 +803,7 @@ static void cb_btnDataPort(Fl_Light_Button* o, void*) {
 	if (o->value()) btnDataPort->label("Data");
 	else btnDataPort->label("Mic");
 	btnDataPort->redraw_label();
+	selrig->set_data_port();
 }
 
 static void cb_spnr_tt550_cw_wpm(Hspinner* o, void*) {

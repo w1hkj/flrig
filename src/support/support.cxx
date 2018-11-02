@@ -3012,7 +3012,7 @@ void read_rig_vals()
 	update_progress(0);
 
 	useB = true;
-	selrig->selectB();
+	selrig->selectB();		// first select call
 
 	update_progress(progress->value() + 4);
 
@@ -3034,7 +3034,7 @@ void read_rig_vals()
 	trace(2, "Read xcvr B:\n", print(xcvr_vfoB));
 
 	useB = false;
-	selrig->selectA();
+	selrig->selectA();		// second select call
 	update_progress(progress->value() + 4);
 
 	if (selrig->has_get_info)
@@ -3243,6 +3243,7 @@ void adjust_small_ui()
 	sldrSQUELCH->hide();
 	btnNR->hide();
 	sldrNR->hide();
+	btnNOISE->hide();
 	btnAGC->hide();
 	sldrRFGAIN->redraw_label();
 
@@ -3335,18 +3336,22 @@ void adjust_small_ui()
 			sldrNOTCH->show();
 			sldrNOTCH->redraw();
 		}
-		if (selrig->has_micgain_control) {
-			y += 20;
-			if (selrig->has_data_port) {
+		if (selrig->has_micgain_control || selrig->has_data_port) {
+			if (selrig->has_micgain_control && selrig->has_data_port) {
+				y += 20;
+				sldrMICGAIN->resize( 54, y, 368, 18 );
+				sldrMICGAIN->show();
+				sldrMICGAIN->redraw();
 				sldrMICGAIN->label("");
 				sldrMICGAIN->redraw_label();
 				btnDataPort->position( 2, y);
 				btnDataPort->show();
 				btnDataPort->redraw();
+			} else if (selrig->has_data_port) {
+				btnDataPort->position( 214, 105);
+				btnDataPort->show();
+				btnDataPort->redraw();
 			}
-			sldrMICGAIN->resize( 54, y, 368, 18 );
-			sldrMICGAIN->show();
-			sldrMICGAIN->redraw();
 		}
 		if (selrig->has_power_control) {
 			y += 20;
@@ -3478,13 +3483,24 @@ void adjust_wide_ui()
 	btnNR->show();
 	sldrNR->show();
 	btnAGC->hide();
+	btnDataPort->hide();
 	sldrRFGAIN->redraw_label();
+
+	if (!selrig->has_micgain_control)
+		sldrMICGAIN->deactivate();
+
+	if (!selrig->has_noise_reduction)
+		btnNR->deactivate();
+
+	if (!selrig->has_noise_reduction_control)
+		sldrNR->deactivate();
 
 	if (xcvr_name == rig_TT550.name_) {
 		tabs550->show();
 		tabsGeneric->hide();
 	} else {
 		tabs550->hide();
+
 		tabsGeneric->remove(genericAux);
 		if (progStatus.aux_serial_port != "NONE" || selrig->has_data_port) {
 			if (progStatus.aux_serial_port != "NONE") {
@@ -3495,9 +3511,9 @@ void adjust_wide_ui()
 				btnAuxDTR->deactivate();
 			}
 			if (selrig->has_data_port)
-				btnDataPort->activate();
+				btnDataPort->show();
 			else
-				btnDataPort->deactivate();
+				btnDataPort->hide();
 			tabsGeneric->add(genericAux);
 		}
 		tabsGeneric->remove(genericRXB);
@@ -3582,6 +3598,7 @@ void adjust_touch_ui()
 		tabs550->hide();
 		tabsGeneric->remove(genericAux);
 		if (progStatus.aux_serial_port != "NONE" || selrig->has_data_port) {
+std::cout << "has data port\n";
 			if (progStatus.aux_serial_port != "NONE") {
 				btnAuxRTS->activate();
 				btnAuxDTR->activate();
@@ -4668,32 +4685,31 @@ void set_init_notch_control()
 
 void init_micgain_control()
 {
-	if (selrig->has_micgain_control) {
-		int min = 0, max = 0, step = 0;
-		selrig->get_mic_min_max_step(min, max, step);
-		if (sldrMICGAIN) sldrMICGAIN->minimum(min);
-		if (sldrMICGAIN) sldrMICGAIN->maximum(max);
-		if (sldrMICGAIN) sldrMICGAIN->step(step);
-		if (spnrMICGAIN) spnrMICGAIN->minimum(min);
-		if (spnrMICGAIN) spnrMICGAIN->maximum(max);
-		if (spnrMICGAIN) spnrMICGAIN->step(step);
+	if (selrig->has_micgain_control || selrig->has_data_port) {
+		if (selrig->has_micgain_control) {
+			int min = 0, max = 0, step = 0;
+			selrig->get_mic_min_max_step(min, max, step);
+			if (sldrMICGAIN) sldrMICGAIN->minimum(min);
+			if (sldrMICGAIN) sldrMICGAIN->maximum(max);
+			if (sldrMICGAIN) sldrMICGAIN->step(step);
+			if (spnrMICGAIN) spnrMICGAIN->minimum(min);
+			if (spnrMICGAIN) spnrMICGAIN->maximum(max);
+			if (spnrMICGAIN) spnrMICGAIN->step(step);
 
-		switch (progStatus.UIsize) {
-			case small_ui :
-				if (sldrMICGAIN) sldrMICGAIN->show();
-				if (spnrMICGAIN) spnrMICGAIN->show();
-				break;
-			case wide_ui : case touch_ui : default :
-				if (sldrMICGAIN) sldrMICGAIN->activate();
-				if (spnrMICGAIN) spnrMICGAIN->activate();
-				break;
+			switch (progStatus.UIsize) {
+				case small_ui :
+					if (sldrMICGAIN) sldrMICGAIN->show();
+					if (spnrMICGAIN) spnrMICGAIN->show();
+					break;
+				case wide_ui : case touch_ui : default :
+					if (sldrMICGAIN) sldrMICGAIN->activate();
+					if (spnrMICGAIN) spnrMICGAIN->activate();
+					break;
+			}
+		} else {
+			if (sldrMICGAIN) sldrMICGAIN->deactivate();
+			if (spnrMICGAIN) spnrMICGAIN->deactivate();
 		}
-		if (selrig->has_data_port) {
-			btnDataPort->show();
-			btnDataPort->value(progStatus.data_port);
-			btnDataPort->label(progStatus.data_port ? "Data" : "Mic");
-			btnDataPort->redraw_label();
-		} else btnDataPort->hide();
 	} else {
 		switch (progStatus.UIsize) {
 			case small_ui :
@@ -5066,53 +5082,39 @@ void init_VFOs()
 
 		trace(2, "init_VFOs() vfoA ", printXCVR_STATE(vfoA).c_str());
 
-	} else {
+	} 
+	else {
 		useB = true;
-		selrig->selectB();
+		selrig->selectB();			// third select call
 		vfoB.freq = selrig->get_vfoB();
-
 		update_progress(progress->value() + 4);
-
 		vfoB.imode = selrig->get_modeB();
-
 		update_progress(progress->value() + 4);
-
 		vfoB.iBW = selrig->get_bwB();
-
 		update_progress(progress->value() + 4);
-
 		FreqDispB->value(vfoB.freq);
 		trace(2, "B: ", printXCVR_STATE(vfoB).c_str());
 
 		useB = false;
-		selrig->selectA();
+		selrig->selectA();			// fourth select call
 		vfoA.freq = selrig->get_vfoA();
-
 		update_progress(progress->value() + 4);
-
 		vfoA.imode = selrig->get_modeA();
-
 		update_progress(progress->value() + 4);
-
 		vfoA.iBW = selrig->get_bwA();
-
 		update_progress(progress->value() + 4);
-
 		FreqDispA->value(vfoA.freq);
 		trace(2, "A: ", printXCVR_STATE(vfoA).c_str());
 
 		vfo = &vfoA;
 		setModeControl((void *)0);
-
 		update_progress(progress->value() + 4);
-
 		updateBandwidthControl();
-
 		update_progress(progress->value() + 4);
-
 		highlight_vfo((void *)0);
 	}
-	selrig->set_split(0);
+
+	selrig->set_split(0);		// initialization set split call
 }
 
 void init_IC7300_special()

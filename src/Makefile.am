@@ -189,6 +189,7 @@ flrig_SOURCES += \
 	rigs/TS850.cxx \
 	rigs/TS870S.cxx \
 	rigs/TS940S.cxx \
+	rigs/TS950.cxx \
 	rigs/TS990.cxx \
 	rigs/TS2000.cxx \
 	rigs/TT516.cxx \
@@ -335,6 +336,7 @@ EXTRA_DIST = \
 	include/TS850.h \
 	include/TS870S.h \
 	include/TS940S.h \
+	include/TS950.h \
 	include/TS990.h \
 	include/TS2000.h \
 	include/TT516.h \
