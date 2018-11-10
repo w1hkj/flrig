@@ -179,7 +179,7 @@ RIG_FT991::RIG_FT991() {
 	has_tune_control = true;
 
 // derived specific
-	atten_level = 3;
+	atten_level = 1;
 	preamp_level = 2;
 	notch_on = false;
 	m_60m_indx = 0;
@@ -564,9 +564,7 @@ int  RIG_FT991::next_attenuator()
 {
 	switch (atten_level) {
 		case 0: return 1;
-		case 1: return 2;
-		case 2: return 3;
-		case 3: return 0;
+		case 1: return 0;
 	}
 	return 0;
 }
@@ -575,11 +573,7 @@ void RIG_FT991::set_attenuator(int val)
 {
 	atten_level = val;
 	if (atten_level == 1) {
-		atten_label("6 dB", true);
-	} else if (atten_level == 2) {
 		atten_label("12 dB", true);
-	} else if (atten_level == 3) {
-		atten_label("18 dB", true);
 	} else if (atten_level == 0) {
 		atten_label("Att", false);
 	}
@@ -600,11 +594,7 @@ int RIG_FT991::get_attenuator()
 	if (p + 3 >= replystr.length()) return progStatus.attenuator;
 	atten_level = replystr[p+3] - '0';
 	if (atten_level == 1) {
-		atten_label("6 dB", true);
-	} else if (atten_level == 2) {
 		atten_label("12 dB", true);
-	} else if (atten_level == 3) {
-		atten_label("18 dB", true);
 	} else {
 		atten_level = 0;
 		atten_label("Att", false);
@@ -1044,45 +1034,22 @@ int  RIG_FT991::get_auto_notch()
 	return 0;
 }
 
-int FT991_blanker_level = 2;
-
 void RIG_FT991::set_noise(bool b)
 {
-	cmd = "NB00;";
-	if (FT991_blanker_level == 0) {
-		FT991_blanker_level = 1;
-		nb_label("NB 1", true);
-	} else if (FT991_blanker_level == 1) {
-		FT991_blanker_level = 2;
-		nb_label("NB 2", true);
-	} else if (FT991_blanker_level == 2) {
-		FT991_blanker_level = 0;
-		nb_label("NB", false);
-	}
-	cmd[3] = '0' + FT991_blanker_level;
+	if (b) cmd = "NB01;";
+	else   cmd = "NB00;";
 	sendCommand (cmd);
-	showresp(WARN, ASC, "SET NB", cmd, replystr);
+	showresp(WARN, ASC, "SET noise blanker", cmd, replystr);
 }
 
 int RIG_FT991::get_noise()
 {
-	cmd = rsp = "NB0";
-	cmd += ';';
+	cmd = "NB0;";
 	wait_char(';',5, FL991_WAIT_TIME, "get NB", ASC);
 
-	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return FT991_blanker_level;
-
-	FT991_blanker_level = replystr[p+3] - '0';
-	if (FT991_blanker_level == 1) {
-		nb_label("NB 1", true);
-	} else if (FT991_blanker_level == 2) {
-		nb_label("NB 2", true);
-	} else {
-		nb_label("NB", false);
-		FT991_blanker_level = 0;
-	}
-	return FT991_blanker_level;
+	size_t p = replystr.rfind("NB0");
+	if (p == string::npos) return 0;
+	return replystr[p+3] - '0';
 }
 
 // val 0 .. 100
@@ -1343,7 +1310,8 @@ void RIG_FT991::set_xcvr_auto_on()
 	if (p == string::npos) {	// rig is off, power on
 		cmd = "PS1;";
 		sendCommand(cmd);
-		MilliSleep(1500);	// 1.0 < T < 2.0 seconds
+		MilliSleep(1100); // 1.0 < T < 2.0 seconds
+		sendCommand(cmd);
 		sendCommand(cmd);
 		MilliSleep(3000);	// Wait for rig startup?  Maybe not needed.
 	}
