@@ -3369,6 +3369,7 @@ void adjust_small_ui()
 	btnPreamp->position( btnPreamp->x(), y);
 	btnPreamp->redraw();
 	btnNOISE->position( btnNOISE->x(), y);
+	btnNOISE->show();
 	btnNOISE->redraw();
 	btnAutoNotch->position( btnAutoNotch->x(), y);
 	btnAutoNotch->redraw();
@@ -4848,10 +4849,13 @@ void init_noise_control()
 			btnNOISE->label("AGC"); //Set TS990 AGC Label
 			btnNR->label("NR1"); //Set TS990 NR Button
 		}
+		btnNOISE->show();
 		btnNOISE->activate();
 	}
-	else
+	else {
+		btnNOISE->hide();
 		btnNOISE->deactivate();
+	}
 
 	if (selrig->has_nb_level) {
 		selrig->get_nb_min_max_step(min, max, step);
@@ -4873,6 +4877,7 @@ void set_init_noise_control()
 		else
 			selrig->set_noise(progStatus.noise);
 		btnNOISE->value(progStatus.noise);
+		btnNOISE->show();
 		btnNOISE->activate();
 	}
 }
