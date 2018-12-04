@@ -1,8 +1,44 @@
 
 
-=Version 1.3.40=
+=Version 1.3.41=
 
-2018-07-09  David Freese  <w1hkj@bellsouth.net>
+2018-11-10  David Freese  <w1hkj@bellsouth.net>
+
+	dadd32c: FT991
+	af73be7: IC7300 noise blanker
+	ba55a05: TS-950
+	9da74e7: BW inhibit
+	09cfb60: ts480sat
+	b02db5b: Yaesu
+	e209b81: has_extras
+	51a0a72: XMLRPC debug level
+	fe4a31d: ts2000 get/set trace
+	0343328: IC7700 set/get
+	16850ec: pbt
+	0762082: FTdx1200
+	a976bab: PCR1000
+	16a757e: TT550/TT538
+	56b5f2a: FT450D/FTdx5000
+	0299ff2: IC7300
+	65164bc: k2/k3/kx3
+	05c7082: TS2000 squelch
+	9dc6f6f: Band Select
+	34f9c42: Bogus command line parameters
+	90e147e: Warnings fixes
+	adb529b: K3 bug fix
+	5aa7835: IC7610
+	f306f89: TS-940SAT
+	b70bf4e: OMNI-VI
+	7d225d7: Cosmetics
+	0cd455c: IC756PRO extra
+	cbc1a6d: IC 9100
+	a2a5cee: TAB controls
+	37ee48f: xml_io
+	60af694: IC7100
+	b7ad209: IC735
+
+
+=Version 1.3.40=
 
 	d0e59a3: FT950 comp
 	35e4c75: NONE testing
