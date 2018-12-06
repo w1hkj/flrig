@@ -599,8 +599,13 @@ int parse_args(int argc, char **argv, int& idx)
 		idx++;
 		return 1;
 	}
-	fl_alert2("Unknown command line parameter: \"%s\"\n\n%s", 
-		argv[idx], helpstr.c_str());
+#  ifdef __APPLE__
+	if (strncasecmp("-psn", argv[idx], 4) == 0) {
+		idx++;
+		return 1;
+	}
+#endif
+	fl_alert2("Unknown command line parameter: \"%s\"\n\n%s", argv[idx], helpstr.c_str());
 	exit(0);
 
 	return 0;
