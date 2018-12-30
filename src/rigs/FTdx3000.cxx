@@ -187,6 +187,7 @@ RIG_FTdx3000::RIG_FTdx3000() {
 	can_change_alt_vfo =
 	has_smeter =
 	has_swr_control =
+	has_alc_control =
 	has_power_out =
 	has_power_control =
 	has_volume_control =
@@ -220,7 +221,7 @@ void RIG_FTdx3000::get_band_selection(int v)
 	cmd = "IF;";
 	wait_char(';', 27, 100, "get band", ASC);
 
-	set_trace(2, "get band", replystr.c_str());
+	sett("get band");
 
 	size_t p = replystr.rfind("IF");
 	if (p == string::npos) return;
@@ -255,7 +256,7 @@ bool RIG_FTdx3000::check ()
 	cmd += ';';
 	int ret = wait_char(';', 11, 100, "check", ASC);
 
-	rig_trace(2, "check()", replystr.c_str());
+	gett("check()");
 
 	if (ret >= 11) return true;
 	return false;
@@ -267,7 +268,7 @@ long RIG_FTdx3000::get_vfoA ()
 	cmd += ';';
 	wait_char(';', 11, 100, "get vfo A", ASC);
 
-	rig_trace(2, "get_vfoA()", replystr.c_str());
+	gett("get_vfoA()");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqA;
@@ -296,7 +297,7 @@ long RIG_FTdx3000::get_vfoB ()
 	cmd += ';';
 	wait_char(';', 11, 100, "get vfo B", ASC);
 
-	rig_trace(2, "get_vfoB()", replystr.c_str());
+	gett("get_vfoB()");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqB;
@@ -386,7 +387,7 @@ int RIG_FTdx3000::get_smeter()
 	cmd += ';';
 	wait_char(';', 7, 100, "get smeter", ASC);
 
-	rig_trace(2, "get_smeter()", replystr.c_str());
+	gett("get_smeter()");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -402,7 +403,7 @@ int RIG_FTdx3000::get_swr()
 	cmd += ';';
 	wait_char(';', 7, 100, "get swr", ASC);
 
-	rig_trace(2, "get_swr()", replystr.c_str());
+	gett("get_swr()");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -411,21 +412,60 @@ int RIG_FTdx3000::get_swr()
 	return mtr / 2.56;
 }
 
+struct pwrpair {int mtr; float pwr;};
+
+static pwrpair pwrtbl[] = { 
+{ 32,  5.0 },
+{ 53, 10.0 },
+{ 80, 20.0 },
+{ 97, 30.0 },
+{119, 40.0 },
+{137, 50.0 },
+{154, 60.0 },
+{167, 70.0 },
+{177, 80.0 },
+{188, 90.0 },
+{197,100.0 },
+};
+
 int RIG_FTdx3000::get_power_out()
 {
 	cmd = rsp = "RM5";
 	sendCommand(cmd.append(";"));
 	wait_char(';', 7, 100, "get pout", ASC);
 
-	rig_trace(2, "get_power_out()", replystr.c_str());
+	gett("get_power_out()");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
-	double mtr = (double)(atoi(&replystr[p+3]));
-//	mtr = -6.6263535 + .11813178 * mtr + .0013607405 * mtr * mtr;
-	mtr = 0.116 * mtr + 0.0011 * mtr * mtr;
-	return (int)mtr;
+	int mtr = atoi(&replystr[p+3]);
+	size_t i = 0;
+	for (i = 0; i < sizeof(pwrtbl) / sizeof(pwrpair) - 1; i++)
+		if (mtr >= pwrtbl[i].mtr && mtr < pwrtbl[i+1].mtr)
+			break;
+	if (mtr < 0) mtr = 0;
+	if (mtr > 197) mtr = 197;
+	int pwr = (int)ceil(pwrtbl[i].pwr + 
+			  (pwrtbl[i+1].pwr - pwrtbl[i].pwr)*(mtr - pwrtbl[i].mtr) / (pwrtbl[i+1].mtr - pwrtbl[i].mtr));
+
+	if (pwr > 100) pwr = 100;
+
+	return (int)pwr;
+}
+
+int RIG_FTdx3000::get_alc()
+{
+	cmd = rsp = "RM4";
+	cmd += ';';
+	wait_char(';',7, 100, "get alc", ASC);
+	gett("get_alc");
+
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return 0;
+	if (p + 6 >= replystr.length()) return 0;
+	int mtr = atoi(&replystr[p+3]);
+	return (int)ceil(mtr / 2.56);
 }
 
 // Transceiver power level
@@ -435,7 +475,7 @@ int RIG_FTdx3000::get_power_control()
 	cmd += ';';
 	wait_char(';', 6, 100, "get power", ASC);
 
-	rig_trace(2, "get_power_control()", replystr.c_str());
+	gett("get_power_control()");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.power_level;
@@ -464,7 +504,7 @@ int RIG_FTdx3000::get_volume_control()
 	cmd += ';';
 	wait_char(';', 7, 100, "get vol", ASC);
 
-	rig_trace(2, "get_volume_control()", replystr.c_str());
+	gett("get_volume_control()");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.volume;
@@ -501,7 +541,7 @@ int RIG_FTdx3000::get_PTT()
 	rsp = "TX";
 	wait_char(';', 4, 100, "get PTT", ASC);
 
-	rig_trace(2, "get_PTT()", replystr.c_str());
+	gett("get_PTT()");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return ptt_;
@@ -552,7 +592,7 @@ int RIG_FTdx3000::get_attenuator()
 	cmd += ';';
 	wait_char(';', 5, 100, "get att", ASC);
 
-	rig_trace(2, "get_attenuator()", replystr.c_str());
+	gett("get_attenuator()");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.attenuator;
@@ -604,7 +644,7 @@ int RIG_FTdx3000::get_preamp()
 	cmd += ';';
 	wait_char(';', 5, 100, "get pre", ASC);
 
-	rig_trace(2, "get_preamp()", replystr.c_str());
+	gett("get_preamp()");
 
 	size_t p = replystr.rfind(rsp);
 	if (p != string::npos)
@@ -702,7 +742,7 @@ int RIG_FTdx3000::get_modeA()
 	cmd += ';';
 	wait_char(';', 5, 100, "get mode A", ASC);
 
-	rig_trace(2, "get_modeA()", replystr.c_str());
+	gett("get_modeA()");
 
 	size_t p = replystr.rfind(rsp);
 	if (p != string::npos) {
@@ -743,7 +783,7 @@ int RIG_FTdx3000::get_modeB()
 	cmd += ';';
 	wait_char(';', 5, 100, "get mode B", ASC);
 
-	rig_trace(2, "get_modeB()", replystr.c_str());
+	gett("get_modeB()");
 
 	size_t p = replystr.rfind(rsp);
 	if (p != string::npos) {
@@ -792,7 +832,7 @@ int RIG_FTdx3000::get_bwA()
 	cmd += ';';
 	wait_char(';', 6, 100, "get bw A", ASC);
 
-	rig_trace(2, "get_bwA()", replystr.c_str());
+	gett("get_bwA()");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return bwA;
@@ -848,7 +888,7 @@ int RIG_FTdx3000::get_bwB()
 	cmd += ';';
 	wait_char(';', 6, 100, "get bw B", ASC);
 
-	rig_trace(2, "get_bwB()", replystr.c_str());
+	gett("get_bwB()");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return bwB;
@@ -915,7 +955,7 @@ bool RIG_FTdx3000::get_if_shift(int &val)
 	cmd += ';';
 	wait_char(';', 9, 100, "get if shift", ASC);
 
-	rig_trace(2, "get_if_shift()", replystr.c_str());
+	gett("get_if_shift()");
 
 	size_t p = replystr.rfind(rsp);
 	val = progStatus.shift_val;
@@ -964,7 +1004,7 @@ bool  RIG_FTdx3000::get_notch(int &val)
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return ison;
 
-	rig_trace(2, "get_notch()", replystr.c_str());
+	gett("get_notch()");
 
 	if (replystr[p+6] == '1') // manual notch enabled
 		ison = true;
@@ -974,7 +1014,7 @@ bool  RIG_FTdx3000::get_notch(int &val)
 	cmd += ';';
 	wait_char(';', 8, 100, "get notch val", ASC);
 
-	rig_trace(2, "get_notch_val()", replystr.c_str());
+	gett("get_notch_val()");
 
 	p = replystr.rfind(rsp);
 	if (p == string::npos)
@@ -1005,7 +1045,7 @@ int  RIG_FTdx3000::get_auto_notch()
 	cmd = "BC0;";
 	wait_char(';', 5, 100, "get auto notch", ASC);
 
-	rig_trace(2, "get_auto_notch()", replystr.c_str());
+	gett("get_auto_notch()");
 
 	size_t p = replystr.rfind("BC0");
 	if (p == string::npos) return 0;
@@ -1039,7 +1079,7 @@ int RIG_FTdx3000::get_noise()
 	cmd += ';';
 	wait_char(';', 5, 100, "get NB", ASC);
 
-	rig_trace(2, "get_noise()", replystr.c_str());
+	gett("get_noise()");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return FTdx3000_blanker_level;
@@ -1075,7 +1115,7 @@ int RIG_FTdx3000::get_mic_gain()
 	cmd += ';';
 	wait_char(';', 6, 100, "get mic", ASC);
 
-	rig_trace(2, "get_mic_gain()", replystr.c_str());
+	gett("get_mic_gain()");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.mic_gain;
@@ -1109,7 +1149,7 @@ int  RIG_FTdx3000::get_rf_gain()
 	cmd += ';';
 	wait_char(';', 7, 100, "get rfgain", ASC);
 
-	rig_trace(2, "get_rf_gain()", replystr.c_str());
+	gett("get_rf_gain()");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.rfgain;
