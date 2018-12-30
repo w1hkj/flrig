@@ -22,7 +22,8 @@ AC_DEFUN([AC_CHECK_FLTK], [
       if test $? -ne 0; then
           AC_MSG_ERROR([$FLTK_CONFIG failed])
       fi
-      if test "x$FLTK_API_VERSION" = "x1.1" || test "x$FLTK_API_VERSION" = "x1.3"; then
+      if test "x$FLTK_API_VERSION" = "x1.3" ||
+         test "x$FLTK_API_VERSION" = "x1.4"; then
           HAVE_FLTK_API_VERSION=yes
       fi
       FLRIG_FLTK_API_MAJOR=${FLTK_API_VERSION%%.*}
@@ -30,7 +31,7 @@ AC_DEFUN([AC_CHECK_FLTK], [
       if test "${HAVE_FLTK_API_VERSION}" = "no"; then
           AC_MSG_ERROR([
   *** The version of FLTK found on your system provides API version $FLTK_API_VERSION.
-  *** To build $PACKAGE you need a FLTK version that provides API 1.1 or 1.3.
+  *** To build $PACKAGE you need a FLTK version that provides API 1.3 or 1.4.
           ])
       fi
       FLTK_CFLAGS=`$FLTK_CONFIG --cxxflags`
