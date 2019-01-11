@@ -22,6 +22,8 @@
 #include "rig.h"
 #include "stdlib.h"
 
+#include "debug.h"
+#include "support.h"
 
 static const char FT1000name_[] = "FT-1000/D";
 
@@ -150,8 +152,9 @@ bool RIG_FT1000::check ()
 	cmd[3] = 0x00;
 	cmd[4] = 0xFA;
 	int ret = waitN(5, 100, "check");
-	if (ret >= 5) return true;
-	return false;
+	if (ret < 5) return false;
+	getthex("check");
+	return true;
 }
 
 bool RIG_FT1000::get_info()
@@ -167,6 +170,7 @@ bool RIG_FT1000::get_info()
 	int ret = waitN(5, 100, "Read flags");
 
 	if (ret >= 5) {
+		getthex("Read flags");
 		size_t p = ret - 5;
 		split = ((replystr[p] & 0x01) == 0x01); // SPLIT is ON or OFF receive operation
 	}
@@ -175,6 +179,7 @@ bool RIG_FT1000::get_info()
 	cmd[3] = 0x03;  // read 32 bytes of data for status of both vfos
 	cmd[4] = 0x10;
 	ret = waitN(32, 100, "get info", ASC);
+	getthex("Get info");
 	d = (unsigned char *)replybuff;
 	if (ret >= 32) {
 		if (ret > 32) d += (ret - 32);
@@ -269,7 +274,8 @@ void RIG_FT1000::set_vfoA (long freq)
 	cmd = to_bcd_be(freq, 8);
 	cmd += 0x0A;
 	sendCommand(cmd);
-	showresp(WARN, HEX, "set freq A", cmd, replystr);
+//	showresp(WARN, HEX, "set freq A", cmd, replystr);
+	setthex("Set freq A");
 }
 
 
@@ -281,7 +287,8 @@ void RIG_FT1000::set_modeA(int val)
 	cmd[3] = FT1000_mode_val[val];
 	cmd[4] = 0x0C;
 	sendCommand(cmd);
-	showresp(WARN, HEX, "set mode A", cmd, replystr);
+//	showresp(WARN, HEX, "set mode A", cmd, replystr);
+	setthex("Set mode A");
 	MilliSleep(25);
 
 }
@@ -301,7 +308,8 @@ void RIG_FT1000::set_bwA (int val)
 	cmd[3] = FT1000_bw_vals[val];
 	cmd[4] = 0x8C;
 	sendCommand(cmd);
-	showresp(WARN, HEX, "set BW A", cmd, replystr);
+//	showresp(WARN, HEX, "set BW A", cmd, replystr);
+	setthex("Set BW A");
 	//MilliSleep(25);
 }
 
@@ -332,7 +340,8 @@ void RIG_FT1000::set_vfoB(long freq)
 	cmd = to_bcd_be(freq, 8);
 	cmd += 0x8A;
 	sendCommand(cmd);
-	showresp(WARN, HEX, "set freq B", cmd, replystr);
+//	showresp(WARN, HEX, "set freq B", cmd, replystr);
+	setthex("Set freq B");
 }
 
 void RIG_FT1000::set_modeB(int val)
@@ -344,8 +353,8 @@ void RIG_FT1000::set_modeB(int val)
 	cmd[4] = 0x0C;
 	sendCommand(cmd);
 	MilliSleep(25);
-	showresp(WARN, HEX, "set mode B", cmd, replystr);
-
+//	showresp(WARN, HEX, "set mode B", cmd, replystr);
+	setthex("Set mode B");
 }
 
 
@@ -361,9 +370,8 @@ void RIG_FT1000::set_bwB(int val)
 	cmd[3] = FT1000_bw_vals[val] + 0x80;
 	cmd[4] = 0x8C;
 	sendCommand(cmd);
-	//MilliSleep(50);
-	showresp(WARN, HEX, "set bw B", cmd, replystr);
-
+//	showresp(WARN, HEX, "set bw B", cmd, replystr);
+	setthex("Set bw B");
 }
 
 
@@ -373,7 +381,8 @@ void RIG_FT1000::selectA()
 	cmd[3] = 0x00;
 	cmd[4] = 0x05;
 	sendCommand(cmd);
-	showresp(WARN, HEX, "select A", cmd, replystr);
+//	showresp(WARN, HEX, "select A", cmd, replystr);
+	setthex("Set bw B");
 }
 
 
@@ -383,7 +392,8 @@ void RIG_FT1000::selectB()
 	cmd[3] = 0x01;
 	cmd[4] = 0x05;
 	sendCommand(cmd);
-	showresp(WARN, HEX, "select B", cmd, replystr);
+//	showresp(WARN, HEX, "select B", cmd, replystr);
+	setthex("Select B");
 }
 
 void RIG_FT1000::swapAB()
@@ -393,7 +403,8 @@ void RIG_FT1000::swapAB()
 	cmd[4] = 0x05;
 	//cmd[4] = 0x85;
 	sendCommand(cmd);
-	showresp(WARN, HEX, "copy active vfo to background vfo", cmd, replystr);
+//	showresp(WARN, HEX, "copy active vfo to background vfo", cmd, replystr);
+	setthex("Swap AB");
 	MilliSleep(25);
 
 }
@@ -407,9 +418,11 @@ void RIG_FT1000::set_split(bool val)
 	cmd[4] = 0x01;
 	sendCommand(cmd);
 	if (val)
-		showresp(WARN, HEX, "set split ON", cmd, replystr);
+//		showresp(WARN, HEX, "set split ON", cmd, replystr);
+		setthex("Set split ON");
 	else
-		showresp(WARN, HEX, "set split OFF", cmd, replystr);
+//		showresp(WARN, HEX, "set split OFF", cmd, replystr);
+		setthex("Set split OFF");
 }
 
 
@@ -426,9 +439,11 @@ void RIG_FT1000::set_PTT_control(int val)
 	cmd[4] = 0x0F;
 	sendCommand(cmd);
 	if (val)
-		showresp(WARN, HEX, "set PTT ON", cmd, replystr);
+//		showresp(WARN, HEX, "set PTT ON", cmd, replystr);
+		setthex("Ptt ON");
 	else
-		showresp(WARN, HEX, "set PTT OFF", cmd, replystr);
+//		showresp(WARN, HEX, "set PTT OFF", cmd, replystr);
+		setthex("Ptt OFF");
 }
 
 
@@ -437,7 +452,8 @@ void RIG_FT1000::tune_rig()
 	init_cmd();
 	cmd[4] = 0x82; // initiate tuner cycle
 	sendCommand(cmd,0);
-	LOG_INFO("%s", str2hex(cmd.c_str(), 5));
+	setthex("Tune xcvr");
+//	LOG_INFO("%s", str2hex(cmd.c_str(), 5));
 }
 
 
@@ -455,7 +471,10 @@ int RIG_FT1000::get_smeter()
 	else if (val <=154) val = 5 + 80 * (val - 15) / (154 - 15);
 	else val = 50 + 50 * (val - 154.0) / (255.0 - 154.0);
 
-	LOG_INFO("%s => %d",str2hex(replybuff,1), (int)val);
+//	LOG_INFO("%s => %d",str2hex(replybuff,1), (int)val);
+	char szmeter[5];
+	snprintf(szmeter, sizeof(szmeter), "%d", (int)val);
+	get_trace(3, "Smeter", str2hex(replybuff,1), szmeter);
 
 	return (int)val;
 }
@@ -476,7 +495,12 @@ int RIG_FT1000::get_power_out()
 	else if (pwr <= 114) {pwr /= 114; pwr = 80 * pwr * pwr; }
 	else if (pwr <= 130) {pwr /= 130; pwr = 105 * pwr * pwr; }
 	else {pwr /= 177; pwr = 160 * pwr * pwr; }
-	LOG_INFO("%s => %d",str2hex(replybuff,1), (int)pwr);
+//	LOG_INFO("%s => %d",str2hex(replybuff,1), (int)pwr);
+
+	char szmeter[5];
+	snprintf(szmeter, sizeof(szmeter), "%d", (int)pwr);
+	get_trace(3, "Smeter", str2hex(replybuff,1), szmeter);
+
 	return (int)pwr;
 }
 

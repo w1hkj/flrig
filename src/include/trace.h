@@ -37,4 +37,14 @@ extern void rpc_trace(int n, ...); // trace transceiver class methods
 #define gett(str) get_trace(3, str, cmd.c_str(), replystr.c_str())
 #define sett(str) set_trace(3, str, cmd.c_str(), replystr.c_str())
 
+#define getthex(str) get_trace(3, \
+	str, \
+	(str2hex(cmd.c_str(), cmd.length())), \
+	(str2hex(replystr.c_str(), replystr.length())) )
+
+#define setthex(str) set_trace(3, \
+	str, \
+	(str2hex(cmd.c_str(), cmd.length())), \
+	(str2hex(replystr.c_str(), replystr.length())) )
+
 #endif
