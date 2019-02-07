@@ -3161,15 +3161,16 @@ void cbExit()
 
 	progStatus.bandwidths = selrig->get_BANDWIDTHS();
 
-	progStatus.saveLastState();
+	if (selrig->check()) {
+		progStatus.saveLastState();
+		closeRig();
+	}
 
 	{
 		guard_lock serial_lock(&mutex_serial);
 		trace(1, "shutdown serial thread");
 		close_rig = true;
 	}
-
-	if (selrig->check()) closeRig();
 
 	close_UI();
 

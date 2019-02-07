@@ -822,6 +822,8 @@ void RIG_IC756PRO::set_modeA(int val)
 int RIG_IC756PRO::get_modeA()
 {
 	int md = A.imode;
+	int mf = mode_filterA[A.imode];
+
 	string cstr = "\x04";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -834,10 +836,11 @@ int RIG_IC756PRO::get_modeA()
 			md = replystr[p+5];
 			if (md > 6) md--;
 			A.imode = md;
-			A.filter = replystr[p+6];
+			mf = replystr[p+6];
 		}
 	}
-	mode_filterA[A.imode] = A.filter;
+	if (mf > 0 && mf < 4)
+		mode_filterA[A.imode] = A.filter = mf;
 	return A.imode;
 }
 
@@ -859,6 +862,8 @@ void RIG_IC756PRO::set_modeB(int val)
 int RIG_IC756PRO::get_modeB()
 {
 	int md = B.imode;
+	int mf = mode_filterB[B.imode];
+
 	string cstr = "\x04";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -871,10 +876,12 @@ int RIG_IC756PRO::get_modeB()
 			md = replystr[p+5];
 			if (md > 6) md--;
 			B.imode = md;
-			B.filter = replystr[p+6];
+			mf = replystr[p+6];
 		}
 	}
-	mode_filterB[B.imode] = B.filter;
+	if (mf > 0 && mf < 3)
+		mode_filterB[B.imode] = B.filter = mf;
+
 	return B.imode;
 }
 
@@ -1152,6 +1159,9 @@ int RIG_IC756PRO::get_FILT(int mode)
 
 void RIG_IC756PRO::set_FILT(int filter)
 {
+	if (filter < 1 || filter > 3)
+		return;
+
 	if (useB) {
 		B.filter = filter;
 		int val = B.imode;
@@ -1213,10 +1223,22 @@ void RIG_IC756PRO::set_FILTERS(std::string s)
 		strm >> mode_filterA[i];
 	for (int i = 0; i < NUM_MODES; i++)
 		strm >> mode_filterB[i];
+	for (int i = 0; i < NUM_MODES; i++) {
+		if (mode_filterA[i] < 1) mode_filterA[i] = 1;
+		if (mode_filterA[i] > 3) mode_filterA[i] = 3;
+		if (mode_filterB[i] < 1) mode_filterB[i] = 1;
+		if (mode_filterB[i] > 3) mode_filterB[i] = 3;
+	}
 }
 
 std::string RIG_IC756PRO::get_FILTERS()
 {
+	for (int i = 0; i < NUM_MODES; i++) {
+		if (mode_filterA[i] < 1) mode_filterA[i] = 1;
+		if (mode_filterA[i] > 3) mode_filterA[i] = 3;
+		if (mode_filterB[i] < 1) mode_filterB[i] = 1;
+		if (mode_filterB[i] > 3) mode_filterB[i] = 3;
+	}
 	stringstream s;
 	for (int i = 0; i < NUM_MODES; i++)
 		s << mode_filterA[i] << " ";

@@ -437,12 +437,13 @@ int RIG_IC7300::get_modeA()
 			}
 		}
 		A.filter = replystr[p+8];
+		if (A.filter > 0 && A.filter < 4)
+			mode_filterA[A.imode] = A.filter;
 	}
 
-end_wait_modeA:
 	get_trace(4, "get mode A[", IC7300modes_[A.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
 
-	mode_filterA[A.imode] = A.filter;
+end_wait_modeA:
 
 	return A.imode;
 }
@@ -504,10 +505,12 @@ int RIG_IC7300::get_modeB()
 		B.filter = replystr[p+8];
 	}
 
-end_wait_modeB:
 	get_trace(4, "get mode B[", IC7300modes_[B.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
 
-	mode_filterB[B.imode] = B.filter;
+	if (B.filter > 0 && B.filter < 4)
+		mode_filterB[B.imode] = B.filter;
+
+end_wait_modeB:
 
 	return B.imode;
 }
@@ -541,6 +544,9 @@ int RIG_IC7300::get_FILT(int mode)
 
 void RIG_IC7300::set_FILT(int filter)
 {
+	if (filter < 1 || filter > 3)
+		return;
+
 	if (useB) {
 		B.filter = filter;
 		mode_filterB[B.imode] = filter;
@@ -597,11 +603,23 @@ void RIG_IC7300::set_FILTERS(std::string s)
 		strm >> mode_filterA[i];
 	for (int i = 0; i < NUM_MODES; i++)
 		strm >> mode_filterB[i];
+	for (int i = 0; i < NUM_MODES; i++) {
+		if (mode_filterA[i] < 1) mode_filterA[i] = 1;
+		if (mode_filterA[i] > 3) mode_filterA[i] = 3;
+		if (mode_filterB[i] < 1) mode_filterB[i] = 1;
+		if (mode_filterB[i] > 3) mode_filterB[i] = 3;
+	}
 }
 
 std::string RIG_IC7300::get_FILTERS()
 {
 	stringstream s;
+	for (int i = 0; i < NUM_MODES; i++) {
+		if (mode_filterA[i] < 1) mode_filterA[i] = 1;
+		if (mode_filterA[i] > 3) mode_filterA[i] = 3;
+		if (mode_filterB[i] < 1) mode_filterB[i] = 1;
+		if (mode_filterB[i] > 3) mode_filterB[i] = 3;
+	}
 	for (int i = 0; i < NUM_MODES; i++)
 		s << mode_filterA[i] << " ";
 	for (int i = 0; i < NUM_MODES; i++)

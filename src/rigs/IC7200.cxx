@@ -825,6 +825,7 @@ void RIG_IC7200::set_mic_gain(int val)
 int RIG_IC7200::get_modeA()
 {
 	int md = A.imode;
+
 	string resp = pre_fm;
 	resp += '\x04';
 	cmd = pre_to;
@@ -855,7 +856,8 @@ int RIG_IC7200::get_modeA()
 			}
 		}
 	}
-	mode_filterA[A.imode] = A.filter;
+	if (A.filter > 0 && A.filter < 4)
+		mode_filterA[A.imode] = A.filter;
 
 	get_trace(2, "get_data_modeA()", str2hex(replystr.c_str(), replystr.length()));
 	get_trace(4, "mode_filterA[", IC7200modes_[md], "] = ", szfilter[A.filter-1]);
@@ -921,7 +923,8 @@ int RIG_IC7200::get_modeB()
 			}
 		}
 	}
-	mode_filterB[B.imode] = B.filter;
+	if (B.filter > 0 && B.filter < 4)
+		mode_filterB[B.imode] = B.filter;
 
 	get_trace(2, "get_data_modeB()", str2hex(replystr.c_str(), replystr.length()));
 	get_trace(4, "mode_filterB[", IC7200modes_[md], "] = ", szfilter[B.filter-1]);
@@ -968,6 +971,9 @@ int RIG_IC7200::get_FILT(int mode)
 
 void RIG_IC7200::set_FILT(int filter)
 {
+	if (filter < 1 || filter > 3)
+		return;
+
 	if (useB) {
 		B.filter = filter;
 		mode_filterB[B.imode] = filter;
@@ -1041,10 +1047,22 @@ void RIG_IC7200::set_FILTERS(std::string s)
 		strm >> mode_filterA[i];
 	for (int i = 0; i < NUM_MODES; i++)
 		strm >> mode_filterB[i];
+	for (int i = 0; i < NUM_MODES; i++) {
+		if (mode_filterA[i] < 1) mode_filterA[i] = 1;
+		if (mode_filterA[i] > 3) mode_filterA[i] = 3;
+		if (mode_filterB[i] < 1) mode_filterB[i] = 1;
+		if (mode_filterB[i] > 3) mode_filterB[i] = 3;
+	}
 }
 
 std::string RIG_IC7200::get_FILTERS()
 {
+	for (int i = 0; i < NUM_MODES; i++) {
+		if (mode_filterA[i] < 1) mode_filterA[i] = 1;
+		if (mode_filterA[i] > 3) mode_filterA[i] = 3;
+		if (mode_filterB[i] < 1) mode_filterB[i] = 1;
+		if (mode_filterB[i] > 3) mode_filterB[i] = 3;
+	}
 	stringstream s;
 	for (int i = 0; i < NUM_MODES; i++)
 		s << mode_filterA[i] << " ";
