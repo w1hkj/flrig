@@ -82,6 +82,7 @@
 #include "TS590SG.h"
 #include "TS850.h"
 #include "TS870S.h"		// wbx
+#include "TS890S.h"
 #include "TS940S.h"
 #include "TS950.h"
 #include "TS990.h"		// G0HIX
@@ -157,18 +158,19 @@ extern RIG_TS590S		rig_TS590S;		// 58
 extern RIG_TS590SG		rig_TS590SG;	// 59
 extern RIG_TS850		rig_TS850;		// 60
 extern RIG_TS870S		rig_TS870S;		// 61 wbx
-extern RIG_TS940S		rig_TS940S;		// 62
-extern RIG_TS950		rig_TS950;		// 63
-extern RIG_TS990		rig_TS990;		// 64 G0HIX
-extern RIG_TS2000		rig_TS2000;		// 65
-extern RIG_TT516		rig_TT516;		// 66
-extern RIG_TT535		rig_TT535;		// 67
-extern RIG_TT538		rig_TT538;		// 68
-extern RIG_TT550		rig_TT550;		// 69
-extern RIG_TT563		rig_TT563;		// 70
-extern RIG_TT566		rig_TT566;		// 71
-extern RIG_TT588		rig_TT588;		// 72
-extern RIG_TT599		rig_TT599;		// 73
-extern RIG_AOR5K		rig_AOR5K;		// 74
+extern RIG_TS890S		rig_TS890S;		// 62
+extern RIG_TS940S		rig_TS940S;		// 63
+extern RIG_TS950		rig_TS950;		// 64
+extern RIG_TS990		rig_TS990;		// 65 G0HIX
+extern RIG_TS2000		rig_TS2000;		// 66
+extern RIG_TT516		rig_TT516;		// 67
+extern RIG_TT535		rig_TT535;		// 68
+extern RIG_TT538		rig_TT538;		// 69
+extern RIG_TT550		rig_TT550;		// 70
+extern RIG_TT563		rig_TT563;		// 71
+extern RIG_TT566		rig_TT566;		// 72
+extern RIG_TT588		rig_TT588;		// 73
+extern RIG_TT599		rig_TT599;		// 74
+extern RIG_AOR5K		rig_AOR5K;		// 75
 
 #endif

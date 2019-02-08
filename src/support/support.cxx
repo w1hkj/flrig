@@ -709,6 +709,7 @@ void update_split(void *d)
 	if (xcvr_name == rig_FT950.name_ || xcvr_name == rig_FTdx1200.name_ ||
 		xcvr_name == rig_TS480SAT.name_ || xcvr_name == rig_TS480HX.name_ ||
 		xcvr_name == rig_TS590S.name_ || xcvr_name == rig_TS590SG.name_ ||
+		xcvr_name == rig_TS890S.name_ ||
 		xcvr_name == rig_TS2000.name_ || xcvr_name == rig_TS990.name_) {
 		switch (progStatus.split) {
 			case 0: btnSplit->value(0);
@@ -5800,6 +5801,7 @@ void setNR()
 	if (xcvr_name == rig_TS2000.name_ ||
 		xcvr_name == rig_TS590S.name_ ||
 		xcvr_name == rig_TS590SG.name_ ||
+		xcvr_name == rig_TS890S.name_ ||
 		xcvr_name == rig_TS990.name_) {
 		if (sldrNR) {
 			set = sldrNR->value();
