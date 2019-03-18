@@ -862,6 +862,15 @@ public:
 } rig_get_pwrmeter(&rig_server);
 
 
+class rig_get_power : public XmlRpcServerMethod {
+public:
+	rig_get_power(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_power", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		result = (int)(progStatus.power_level);
+	}
+} rig_get_power(&rig_server);
+
 //==============================================================================
 // set interface
 //==============================================================================
@@ -909,6 +918,45 @@ xml_trace(2, "push_xmlB()", print(srvr_vfo.freq, srvr_vfo.imode, srvr_vfo.iBW).c
 	srvc_reqs.push(VFOQUEUE(vB, srvr_vfo));
 }
 
+
+//------------------------------------------------------------------------------
+// Set Power in watts
+//------------------------------------------------------------------------------
+static int power_level;
+static void set_power(void *)
+{
+	int max_power;
+	int min_power = 0;
+	if (spnrPOWER) {
+		max_power = spnrPOWER->maximum();
+		if (power_level > max_power) power_level = max_power;
+		if (power_level < min_power) power_level = min_power;
+		spnrPOWER->value(power_level);
+	} else if (sldrPOWER) {
+		max_power = sldrPOWER->maximum();
+		if (power_level > max_power) power_level = max_power;
+		if (power_level < min_power) power_level = min_power;
+		sldrPOWER->value(power_level);
+	}
+	setPower();
+}
+
+class rig_set_power : public XmlRpcServerMethod {
+public:
+	rig_set_power(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_power", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
+		power_level = int(params[0]);
+		Fl::awake(set_power);
+	}
+
+	std::string help() { return std::string("sets power level in watts"); }
+
+} rig_set_power(&rig_server);
 
 //------------------------------------------------------------------------------
 // Set PTT on (1) or off (0)
@@ -1561,6 +1609,7 @@ struct MLIST {
 	{ "rig.get_sideband", "s:n", "return sideband (U/L)" },
 	{ "rig.get_notch",    "s:n", "return notch value" },
 	{ "rig.get_ptt",      "s:n", "return PTT state" },
+	{ "rig.get_power",    "s:n", "return power level control value" },
 	{ "rig.get_pwrmeter", "s:n", "return PWR out" },
 	{ "rig.get_smeter",   "s:n", "return Smeter" },
 	{ "rig.get_split",    "s:n", "return split state" },
@@ -1578,6 +1627,7 @@ struct MLIST {
 	{ "rig.set_modeA",    "i:i", "set MODE A iaw MODE table" },
 	{ "rig.set_modeB",    "i:i", "set MODE B iaw MODE table" },
 	{ "rig.set_notch",    "d:d", "set NOTCH value in Hz" },
+	{ "rig.set_power",    "i:i", "set power control level, watts" },
 	{ "rig.set_ptt",      "i:i", "set PTT 1/0 (on/off)" },
 	{ "rig.set_vfo",      "d:d", "set current VFO in Hz" },
 	{ "rig.set_vfoA",     "d:d", "set vfo A in Hz" },
