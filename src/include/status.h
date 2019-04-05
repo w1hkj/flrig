@@ -345,6 +345,7 @@ struct status {
 	bool	debugtrace;
 	bool	xmltrace;
 	bool	rpctrace;
+	bool	start_stop_trace;
 	int		rpc_level;
 
 	void saveLastState();
@@ -357,5 +358,7 @@ struct status {
 
 extern status progStatus;
 extern string xcvr_name;
+
+extern void ss_trace(bool on);
 
 #endif

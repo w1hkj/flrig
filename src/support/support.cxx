@@ -2845,6 +2845,8 @@ void restore_rig_vals_(XCVR_STATE &xcvrvfo)
 
 void restore_rig_vals()
 {
+	if (progStatus.start_stop_trace) ss_trace(true);
+
 	update_progress(0);
 
 	guard_lock serial_lock(&mutex_serial);
@@ -2880,6 +2882,8 @@ void restore_rig_vals()
 	restore_rig_vals_(xcvr_vfoA);
 
 	trace(2, "Restored xcvr A:\n", print(xcvr_vfoA));
+
+	if (progStatus.start_stop_trace) ss_trace(false);
 }
 
 void read_rig_vals_(XCVR_STATE &xcvrvfo)
@@ -3007,6 +3011,8 @@ void read_rig_vals_(XCVR_STATE &xcvrvfo)
 
 void read_rig_vals()
 {
+	if (progStatus.start_stop_trace) ss_trace(true);
+
 // no guard_lock ... this function called from within a guard_lock block
 	trace(1, "read_rig_vals()");
 
@@ -3065,6 +3071,7 @@ void read_rig_vals()
 
 	selrig->set_BANDWIDTHS(progStatus.bandwidths);
 
+	if (progStatus.start_stop_trace) ss_trace(false);
 }
 
 void close_UI()

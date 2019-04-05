@@ -357,6 +357,7 @@ status progStatus = {
 	false,		// bool	debugtrace;
 	false,		// bool	xmltrace;
 	false,		// bool	rpctrace;
+	false,		// bool	start_stop_trace;
 	0			// int	rpc_level;
 };
 
@@ -694,6 +695,7 @@ void status::saveLastState()
 	spref.set("debugtrace", debugtrace);
 	spref.set("xmltrace", xmltrace);
 	spref.set("rpctrace", rpctrace);
+	spref.set("startstoptrace", start_stop_trace);
 	spref.set("rpc_level", rpc_level);
 
 	spref.set("hrd_buttons", hrd_buttons);
@@ -1071,6 +1073,7 @@ bool status::loadXcvrState(string xcvr)
 		if (spref.get("settrace", i, settrace)) settrace = i;
 		if (spref.get("debugtrace", i, debugtrace)) debugtrace = i;
 		if (spref.get("xmltrace", i, xmltrace)) xmltrace = i;
+		if (spref.get("startstoptrace", i, start_stop_trace)) start_stop_trace = i;
 		if (spref.get("rpctrace", i, rpctrace)) rpctrace = i;
 
 		spref.get("rpc_level", rpc_level, rpc_level);
@@ -1359,5 +1362,30 @@ string status::info()
 	info << "command 8          : " << command1 << "\n";
 
 	return info.str();
+}
+
+static bool strace;
+static bool srigtrace;
+static bool ssettrace;
+static bool sgettrace;
+
+void ss_trace(bool on) {
+
+	if (on) {
+		strace = progStatus.trace;
+		srigtrace = progStatus.rigtrace;
+		ssettrace = progStatus.settrace;
+		sgettrace = progStatus.gettrace;
+
+		progStatus.trace =
+		progStatus.rigtrace =
+		progStatus.settrace =
+		progStatus.gettrace = true;
+	} else {
+		progStatus.trace = strace;
+		progStatus.rigtrace = srigtrace;
+		progStatus.settrace = ssettrace;
+		progStatus.gettrace = sgettrace;
+	}
 }
 

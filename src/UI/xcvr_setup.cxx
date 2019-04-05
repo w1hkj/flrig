@@ -123,6 +123,7 @@ Fl_Check_Button *btn_gettrace = (Fl_Check_Button *)0;
 Fl_Check_Button *btn_settrace = (Fl_Check_Button *)0;
 Fl_Check_Button *btn_debugtrace = (Fl_Check_Button *)0;
 Fl_Check_Button *btn_rpctrace = (Fl_Check_Button *)0;
+Fl_Check_Button *btn_start_stop_trace = (Fl_Check_Button *)0;
 Fl_ComboBox *selectlevel = (Fl_ComboBox *)0;
 Fl_Button *btn_viewtrace = (Fl_Button *)0;
 
@@ -198,6 +199,10 @@ static void cb_btn_debugtrace(Fl_Check_Button *, void *) {
 
 static void cb_btn_rpctrace(Fl_Check_Button *, void *) {
 	progStatus.rpctrace = btn_rpctrace->value();
+}
+
+static void cb_btn_start_stop_trace(Fl_Check_Button *, void *) {
+	progStatus.start_stop_trace = btn_start_stop_trace->value();
 }
 
 static void cb_selectlevel(Fl_ComboBox *, void *) {
@@ -1065,17 +1070,22 @@ Fl_Double_Window* w = new Fl_Double_Window(490, 255, _("Configuration"));
 		btn_settrace->callback((Fl_Callback*)cb_btn_settrace);
 		btn_settrace->tooltip(_("Enable trace of rig set methods"));
 
-		btn_xmltrace = new Fl_Check_Button(10, 165, 80, 20, _("Trace xml_server code"));
+		btn_xmltrace = new Fl_Check_Button(243, 40, 80, 20, _("Trace xml_server code"));
 		btn_xmltrace->value(progStatus.xmltrace);
 		btn_xmltrace->callback((Fl_Callback*)cb_btn_xmltrace);
 		btn_xmltrace->tooltip(_("Enable trace of xmlrpc functions"));
 
-		btn_rpctrace = new Fl_Check_Button(10, 190, 80, 20, _("Trace xmlrpcpp code"));
+		btn_rpctrace = new Fl_Check_Button(243, 65, 80, 20, _("Trace xmlrpcpp code"));
 		btn_rpctrace->value(progStatus.rpctrace);
 		btn_rpctrace->callback((Fl_Callback*)cb_btn_rpctrace);
 		btn_rpctrace->tooltip(_("Enable trace of XmlRpc methods"));
 
-		selectlevel = new Fl_ComboBox(30, 215, 80, 20, _("XmlRpc trace level"));
+		btn_start_stop_trace = new Fl_Check_Button(243, 90, 80, 20, _("Trace start/stop code"));
+		btn_start_stop_trace->value(progStatus.start_stop_trace);
+		btn_start_stop_trace->callback((Fl_Callback*)cb_btn_start_stop_trace);
+		btn_start_stop_trace->tooltip(_("Enable trace of start/stop operations"));
+
+		selectlevel = new Fl_ComboBox(243, 140, 80, 20, _("XmlRpc trace level"));
 		selectlevel->add("0|1|2|3|4");
 		selectlevel->align(FL_ALIGN_RIGHT);
 		selectlevel->index(progStatus.rpc_level);
