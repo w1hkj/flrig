@@ -1544,7 +1544,7 @@ Fl_Double_Window* Small_rig_window() {
 	hidden_tabs->hide();
 	hidden_tabs->end();
 
-	Fl_Group* grp_small_menu = new Fl_Group(0,0,small_mainW,small_menuH);
+	grp_menu = new Fl_Group(0,0,small_mainW,small_menuH);
 
 		small_menu = new Fl_Menu_Bar(0, 0, small_mainW - 64, small_menuH);
 		small_menu->textsize(12);
@@ -1580,9 +1580,9 @@ Fl_Double_Window* Small_rig_window() {
 			tcpip_box->hide();
 
 		mnu_box->end();
-		grp_small_menu->resizable(small_menu);
+		grp_menu->resizable(small_menu);
 
-	grp_small_menu->end();
+	grp_menu->end();
 
 	txt_encA = new Fl_Output( small_mainW - 90, 1, 90, 20, "");
 	txt_encA->box(FL_THIN_DOWN_BOX);
@@ -1594,13 +1594,13 @@ Fl_Double_Window* Small_rig_window() {
 		small_mainW, small_mainH - small_menuH);
 
 	grpInitializing = new Fl_Group(
-		main_group->x(), main_group->y(), main_group->w(), main_group->h());
+		0, 0, small_mainW, small_mainH);
 
 		grpInitializing->box(FL_FLAT_BOX);
 		grpInitializing->color(FL_LIGHT2);
 
 		progress = new Fl_Progress(
-			small_mainW / 4, grpInitializing->y() + grpInitializing->h() / 2,
+			small_mainW / 4, small_mainH / 2,
 			small_mainW / 2, 20, "Initializing");
 		progress->maximum(100);
 		progress->minimum(0);
@@ -1609,8 +1609,9 @@ Fl_Double_Window* Small_rig_window() {
 		progress->align(Fl_Align(FL_ALIGN_TOP));
 		progress->selection_color(FL_GREEN);
 
-		filler = new Fl_Box(grpInitializing->x(), grpInitializing->y() + grpInitializing->h() - 5,
-							grpInitializing->w(), 4);
+		filler = new Fl_Box(
+			0, small_mainH - 5,
+			small_mainW, 4);
 		filler->box(FL_FLAT_BOX);
 		filler->color(FL_LIGHT2);
 

@@ -2780,8 +2780,8 @@ void setPTT( void *d)
 
 void update_progress(int val)
 {
+	std::cout << val << std::endl;
 	progress->value(val);
-	progress->redraw();
 	Fl::check();
 }
 
@@ -2884,6 +2884,7 @@ void restore_rig_vals()
 	trace(2, "Restored xcvr A:\n", print(xcvr_vfoA));
 
 	if (progStatus.start_stop_trace) ss_trace(false);
+
 }
 
 void read_rig_vals_(XCVR_STATE &xcvrvfo)
@@ -5287,7 +5288,9 @@ void initRig()
 
 	main_group->show();
 	mainwindow->redraw();
-	Fl::check();
+	mainwindow->damage();
+	Fl::flush();
+//	Fl::check();
 
 	xcvr_initialized = true;
 	return;

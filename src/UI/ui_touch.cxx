@@ -1797,7 +1797,7 @@ Fl_Double_Window* touch_rig_window() {
 	hidden_tabs->hide();
 	hidden_tabs->end();
 
-	Fl_Group* grp_menu = new Fl_Group(0,0,mainW,30);
+	grp_menu = new Fl_Group(0,0,mainW,30);
 
 		Fl_Menu_Bar *touch_menubar = new Fl_Menu_Bar(0, 0, mainW-64, menuH);
 		touch_menubar->textsize(18);
@@ -1844,13 +1844,13 @@ Fl_Double_Window* touch_rig_window() {
 	main_group = touch_main_group(0, menuH, mainW, mainH);
 	main_group->hide();
 
-	grpInitializing = new Fl_Group(0, menuH, mainW, mainH - menuH, "");
+	grpInitializing = new Fl_Group(0, 0, mainW, mainH, "");
 
 		grpInitializing->box(FL_FLAT_BOX);
 		grpInitializing->color(FL_LIGHT2);
 
 		progress = new Fl_Progress(
-			mainW / 4, grpInitializing->h() / 2,
+			mainW / 4, mainH / 2,
 			mainW / 2, 20, "Initializing");
 		progress->maximum(100);
 		progress->minimum(0);

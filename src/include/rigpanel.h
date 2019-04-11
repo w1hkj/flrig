@@ -302,6 +302,8 @@ extern Fl_Group  *main_group;
 extern Fl_Group  *grpInitializing;
 extern Fl_Progress *progress;
 
+extern Fl_Group *grp_menu;
+
 extern Fl_Menu_Item *mnuExit;
 extern Fl_Menu_Item *mnuConfig;
 extern Fl_Menu_Item *mnuRestoreData;

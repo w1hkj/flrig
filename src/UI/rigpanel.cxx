@@ -49,6 +49,8 @@ static const int freq_sel_widths[]={110, 70, 70, 0};
 static Fl_Double_Window *meter_scale_dialog = (Fl_Double_Window *)0;
 static Fl_Double_Window *meter_filters = (Fl_Double_Window *)0;
 
+Fl_Group* grp_menu = (Fl_Group *)0;
+
 Fl_Menu_Bar *small_menu=(Fl_Menu_Bar *)0;
 Fl_Menu_Bar *wide_menu=(Fl_Menu_Bar *)0;
 
