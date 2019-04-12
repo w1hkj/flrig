@@ -1,4 +1,17 @@
-2019-01-10  David Freese  <w1hkj@bellsouth.net>
+
+
+=Version 1.3.43=
+
+2019-04-10  David Freese  <w1hkj@bellsouth.net>
+
+	afe2257: Start/Stop Progress
+	f9cd7e4: Trace start/exit
+	1ecc06f: New xmlrpc functions
+	1c2aa3f: TS890S
+	b7288a4: Icom filter table
+
+
+=Version 1.3.42=
 
 	855104a: FT1000 debugging
 	d915248: FLTK 1.4 test
