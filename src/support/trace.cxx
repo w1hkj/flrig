@@ -113,9 +113,6 @@ void trace(int n, ...) // all args of type const char *
 	s << "\n";
 	tracefile(s.str());
 
-std::cout << s.str();
-std::cout.flush();
-
 	guard_lock tt(&mutex_trace);
 	tracestrings.push_back(s.str());
 	Fl::awake(update_tracetext);
@@ -160,9 +157,6 @@ void rig_trace(int n, ...) // all args of type const char *
 	s << "\n";
 	tracefile(s.str());
 
-std::cout << s.str();
-std::cout.flush();
-
 	guard_lock tt(&mutex_trace);
 	tracestrings.push_back(s.str());
 	Fl::awake(update_tracetext);
@@ -185,9 +179,6 @@ void set_trace(int n, ...) // all args of type const char *
 	s << "\n";
 	tracefile(s.str());
 
-std::cout << s.str();
-std::cout.flush();
-
 	guard_lock tt(&mutex_trace);
 	tracestrings.push_back(s.str());
 	Fl::awake(update_tracetext);
@@ -209,9 +200,6 @@ void get_trace(int n, ...) // all args of type const char *
 	va_end(vl);
 	s << "\n";
 	tracefile(s.str());
-
-std::cout << s.str();
-std::cout.flush();
 
 	guard_lock tt(&mutex_trace);
 	tracestrings.push_back(s.str());

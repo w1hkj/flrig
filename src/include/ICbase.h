@@ -52,6 +52,10 @@ public:
 
 	void ICtrace(string cmd, string hexstr);
 
+	virtual int get_modetype(int n) {
+		return _mode_type[n];
+	}
+
 };
 
 #endif

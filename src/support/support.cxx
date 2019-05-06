@@ -2780,7 +2780,6 @@ void setPTT( void *d)
 
 void update_progress(int val)
 {
-	std::cout << val << std::endl;
 	progress->value(val);
 	Fl::check();
 }
@@ -3609,7 +3608,7 @@ void adjust_touch_ui()
 		tabs550->hide();
 		tabsGeneric->remove(genericAux);
 		if (progStatus.aux_serial_port != "NONE" || selrig->has_data_port) {
-std::cout << "has data port\n";
+//std::cout << "has data port\n";
 			if (progStatus.aux_serial_port != "NONE") {
 				btnAuxRTS->activate();
 				btnAuxDTR->activate();
