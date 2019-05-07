@@ -1194,24 +1194,24 @@ void serviceA(XCVR_STATE nuvals)
 		if (selrig->can_change_alt_vfo) {
 			trace(2, "B active, set alt vfo A", printXCVR_STATE(nuvals).c_str());
 			rig_trace(2, "B active, set alt vfo A", printXCVR_STATE(nuvals).c_str());
-			if (vfoA.freq != nuvals.freq)
-				selrig->set_vfoA(nuvals.freq);
 			if (vfoA.imode != nuvals.imode)
 				selrig->set_modeA(nuvals.imode);
 			if (vfoA.iBW != nuvals.iBW)
 				selrig->set_bwA(nuvals.iBW);
+			if (vfoA.freq != nuvals.freq)
+				selrig->set_vfoA(nuvals.freq);
 			vfoA = nuvals;
 		} else if (xcvr_name != rig_TT550.name_) {
 			trace(2, "B active, set vfo A", printXCVR_STATE(nuvals).c_str());
 			rig_trace(2, "B active, set vfo A", printXCVR_STATE(nuvals).c_str());
 			useB = false;
 			selrig->selectA();
-			if (vfoA.freq != nuvals.freq)
-				selrig->set_vfoA(nuvals.freq);
 			if (vfoA.imode != nuvals.imode)
 				selrig->set_modeA(nuvals.imode);
 			if (vfoA.iBW != nuvals.iBW)
 				selrig->set_bwA(nuvals.iBW);
+			if (vfoA.freq != nuvals.freq)
+				selrig->set_vfoA(nuvals.freq);
 			useB = true;
 			selrig->selectB();
 			vfoA = nuvals;
@@ -1223,53 +1223,55 @@ void serviceA(XCVR_STATE nuvals)
 	trace(2, "service VFO A", printXCVR_STATE(nuvals).c_str());
 
 	if ((nuvals.imode != -1) && (vfoA.imode != nuvals.imode)) {
+		std::string m1, m2;
+		m1 = selrig->modes_[nuvals.imode];
+		m2 = selrig->modes_[vfoA.imode];
 		selrig->set_modeA(vfoA.imode = nuvals.imode);
 		set_bandwidth_control();
 		selrig->set_bwA(vfoA.iBW);
+		if (m1.find("CW") != std::string::npos ||
+			m2.find("CW") != std::string::npos)
+			vfoA.freq = nuvals.freq = selrig->get_vfoA();
 	}
 	if (vfoA.iBW != nuvals.iBW) {
 		selrig->set_bwA(vfoA.iBW = nuvals.iBW);
 	}
-
 	if (vfoA.freq != nuvals.freq) {
 		trace(1, "change vfoA frequency");
 		selrig->set_vfoA(vfoA.freq = nuvals.freq);
 }
 	vfo = &vfoA;
 
-//	waitUI = true;
 	Fl::awake(setFreqDispA, (void *)vfoA.freq);
-	Fl::awake(updateUI);  // may be redundant
-//	while (waitUI) MilliSleep(1);
+//	Fl::awake(updateUI);  // may be redundant
 }
 
 void serviceB(XCVR_STATE nuvals)
 {
 	if (nuvals.freq == 0) nuvals.freq = vfoB.freq;
 	if (nuvals.imode == -1) nuvals.imode = vfoB.imode;
-//	find_bandwidth(nuvals);
 	if (nuvals.iBW == 255) nuvals.iBW = vfoB.iBW;
 
 	if (!useB) {
 		if (selrig->can_change_alt_vfo) {
 			trace(2, "A active, set alt vfo B", printXCVR_STATE(nuvals).c_str());
-			if (vfoB.freq != nuvals.freq)
-				selrig->set_vfoB(nuvals.freq);
 			if (vfoB.imode != nuvals.imode)
 				selrig->set_modeB(nuvals.imode);
 			if (vfoB.iBW != nuvals.iBW)
 				selrig->set_bwB(nuvals.iBW);
+			if (vfoB.freq != nuvals.freq)
+				selrig->set_vfoB(nuvals.freq);
 			vfoB = nuvals;
 		} else if (xcvr_name != rig_TT550.name_) {
 			trace(2, "A active, set vfo B", printXCVR_STATE(nuvals).c_str());
 			useB = true;
 			selrig->selectB();
-			if (vfoB.freq != nuvals.freq)
-				selrig->set_vfoB(nuvals.freq);
 			if (vfoB.imode != nuvals.imode)
 				selrig->set_modeB(nuvals.imode);
 			if (vfoB.iBW != nuvals.iBW)
 				selrig->set_bwB(nuvals.iBW);
+			if (vfoB.freq != nuvals.freq)
+				selrig->set_vfoB(nuvals.freq);
 			useB = false;
 			selrig->selectA();
 			vfoB = nuvals;
@@ -1281,17 +1283,21 @@ void serviceB(XCVR_STATE nuvals)
 	trace(2, "service VFO B", printXCVR_STATE(nuvals).c_str());
 
 	if ((nuvals.imode != -1) && (vfoB.imode != nuvals.imode)) {
+		std::string m1, m2;
+		m1 = selrig->modes_[nuvals.imode];
+		m2 = selrig->modes_[vfoB.imode];
 		selrig->set_modeB(vfoB.imode = nuvals.imode);
 		set_bandwidth_control();
 		selrig->set_bwB(vfoB.iBW);
+		if (m1.find("CW") != std::string::npos ||
+			m2.find("CW") != std::string::npos)
+			vfoB.freq = nuvals.freq = selrig->get_vfoB();
 	}
 	if (vfoB.iBW != nuvals.iBW) {
 		selrig->set_bwB(vfoB.iBW = nuvals.iBW);
 	}
-
 	if (vfoB.freq != nuvals.freq)
 		selrig->set_vfoB(vfoB.freq = nuvals.freq);
-
 
 	vfo = &vfoB;
 
