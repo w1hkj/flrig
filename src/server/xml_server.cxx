@@ -57,6 +57,21 @@ XmlRpcServer rig_server;
 extern bool xcvr_initialized;
 
 //------------------------------------------------------------------------------
+// Request for program version
+//------------------------------------------------------------------------------
+class main_get_version : public XmlRpcServerMethod {
+public:
+	main_get_version(XmlRpcServer* s) : XmlRpcServerMethod("main.get_version", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		result = FLRIG_VERSION;
+	}
+
+	std::string help() { return std::string("returns program version string"); }
+
+} main_get_version(&rig_server);
+
+//------------------------------------------------------------------------------
 // Request for transceiver name
 //------------------------------------------------------------------------------
 class rig_get_xcvr : public XmlRpcServerMethod {
@@ -83,6 +98,9 @@ string umode;
 string unotch;
 string ubw;
 string utx;
+string urfg;
+string uvol;
+string umic;
 
 static string sname()
 {
@@ -138,6 +156,42 @@ static string snotch()
 	return temp;
 }
 
+static string svol()
+{
+	string temp;
+	static char szval[20];
+	int volval = 0;
+	if (spnrVOLUME) volval = spnrVOLUME->value();
+	else if (sldrVOLUME) volval = sldrVOLUME->value();
+	snprintf(szval, sizeof(szval), "%d", volval);
+	temp.assign("Vol:").append(szval).append("\n");
+	return temp;
+}
+
+static string srfg()
+{
+	string temp;
+	static char szval[20];
+	int rfgval = 0;
+	if (spnrRFGAIN) rfgval = spnrRFGAIN->value();
+	else if (sldrRFGAIN) rfgval = sldrRFGAIN->value();
+	snprintf(szval, sizeof(szval), "%d", rfgval);
+	temp.assign("Rfg:").append(szval).append("\n");
+	return temp;
+}
+
+static string smic()
+{
+	string temp;
+	static char szval[20];
+	int micval = 0;
+	if (sldrMICGAIN) micval = sldrMICGAIN->value();
+	if (spnrMICGAIN) micval = spnrMICGAIN->value();
+	snprintf(szval, sizeof(szval), "%d", micval);
+	temp.assign("Mic:").append(szval).append("\n");
+	return temp;
+}
+
 class rig_get_info : public XmlRpcServerMethod {
 public:
 	rig_get_info(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_info", s) {}
@@ -157,6 +211,9 @@ public:
 		umode = tempmode;  info.append(umode);
 		ubw = tempbw;      info.append(ubw);
 		unotch = snotch(); info.append(unotch);
+		uvol = svol();     info.append(uvol);
+		umic = smic();     info.append(umic);
+		urfg = srfg();     info.append(urfg);
 
 		result = info;
 
@@ -198,6 +255,9 @@ public:
 		if (tempmode != umode) { umode = tempmode; info.append(umode); }
 		if (tempbw != ubw)     { ubw = tempbw;     info.append(ubw); }
 		if ((temp = snotch()) != unotch) { unotch = temp; info.append(unotch); }
+		uvol = svol();     info.append(uvol);
+		umic = smic();     info.append(umic);
+		urfg = srfg();     info.append(urfg);
 
 		if (info.empty()) info.assign("NIL");
 
@@ -432,6 +492,159 @@ public:
 	std::string help() { return std::string("sets notch value"); }
 
 } rig_set_notch(&rig_server);
+
+//------------------------------------------------------------------------------
+// Get rfgain value
+//------------------------------------------------------------------------------
+int  rig_xml_rfgain_val = 0;
+
+class rig_get_rfgain : public XmlRpcServerMethod {
+public:
+	rig_get_rfgain(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_rfgain", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
+
+		if (progStatus.rfgain)
+			result = (int)(progStatus.rfgain);
+		else
+			result = (int)0;
+	}
+
+	std::string help() { return std::string("returns rfgain value"); }
+
+} rig_get_rfgain(&rig_server);
+
+//------------------------------------------------------------------------------
+// Set rfgain value
+//------------------------------------------------------------------------------
+class rig_set_rfgain : public XmlRpcServerMethod {
+public:
+	rig_set_rfgain(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_rfgain", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
+
+		static int rfg;
+		rfg = static_cast<int>((double)(params[0]));
+		if (rfg) progStatus.rfgain = rfg;
+
+		guard_lock serial_lock(&mutex_serial, "xml rig_set_rfgain");
+		selrig->set_rf_gain(progStatus.rfgain);
+		Fl::awake(setRFGAINControl, static_cast<void *>(0));
+	}
+
+	std::string help() { return std::string("sets rfgain value"); }
+
+} rig_set_rfgain(&rig_server);
+
+//------------------------------------------------------------------------------
+// Get micgain value
+//------------------------------------------------------------------------------
+int  rig_xml_micgain_val = 0;
+
+class rig_get_micgain : public XmlRpcServerMethod {
+public:
+	rig_get_micgain(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_micgain", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
+
+		if (progStatus.mic_gain)
+			result = (int)(progStatus.mic_gain);
+		else
+			result = (int)0;
+	}
+
+	std::string help() { return std::string("returns micgain value"); }
+
+} rig_get_micgain(&rig_server);
+
+//------------------------------------------------------------------------------
+// Set micgain value
+//------------------------------------------------------------------------------
+class rig_set_micgain : public XmlRpcServerMethod {
+public:
+	rig_set_micgain(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_micgain", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
+
+		static int micg;
+		micg = static_cast<int>((double)(params[0]));
+		if (micg) progStatus.mic_gain = micg;
+
+		guard_lock serial_lock(&mutex_serial, "xml rig_set_micgain");
+		selrig->set_mic_gain(progStatus.mic_gain);
+		Fl::awake(setMicGainControl, static_cast<void *>(0));
+	}
+
+	std::string help() { return std::string("sets micgain value"); }
+
+} rig_set_micgain(&rig_server);
+
+//------------------------------------------------------------------------------
+// Get volume value
+//------------------------------------------------------------------------------
+int  rig_xml_volume_val = 0;
+
+class rig_get_volume : public XmlRpcServerMethod {
+public:
+	rig_get_volume(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_volume", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
+
+		if (progStatus.volume)
+			result = (int)(progStatus.volume);
+		else
+			result = (int)0;
+	}
+
+	std::string help() { return std::string("returns volume value"); }
+
+} rig_get_volume(&rig_server);
+
+//------------------------------------------------------------------------------
+// Set volume value
+//------------------------------------------------------------------------------
+class rig_set_volume : public XmlRpcServerMethod {
+public:
+	rig_set_volume(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_volume", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
+
+		static int volume;
+		volume = static_cast<int>((double)(params[0]));
+		if (volume) progStatus.volume = volume;
+
+		guard_lock serial_lock(&mutex_serial, "xml rig_set_volume");
+		selrig->set_volume_control(progStatus.volume);
+		Fl::awake(setVolumeControl, static_cast<void *>(0));
+	}
+
+	std::string help() { return std::string("sets volume value"); }
+
+} rig_set_volume(&rig_server);
 
 //------------------------------------------------------------------------------
 // Request list of modes
@@ -1596,6 +1809,7 @@ struct MLIST {
 	string name; string signature; string help;
 } mlist[] = {
 	{ "main.set_frequency", "d:d", "set current VFO in Hz" },
+	{ "main.get_version", "s:n", "returns version string" },
 	{ "rig.get_AB",       "s:n", "returns vfo in use A or B" },
 	{ "rig.get_bw",       "s:n", "return BW of current VFO" },
 	{ "rig.get_bws",      "s:n", "return table of BW values" },
@@ -1618,6 +1832,9 @@ struct MLIST {
 	{ "rig.get_vfoA",     "s:n", "return vfo A in Hz" },
 	{ "rig.get_vfoB",     "s:n", "return vfo B in Hz" },
 	{ "rig.get_xcvr",     "s:n", "returns name of transceiver" },
+	{ "rig.get_volume",   "s:n", "returns volume control value" },
+	{ "rig.get_rfgain",   "s:n", "returns rf gain control value" },
+	{ "rig.get_micgain",  "s:n", "returns mic gain control value" },
 	{ "rig.set_AB",       "s:s", "set VFO A/B" },
 	{ "rig.set_bw",       "i:i", "set BW iaw BW table" },
 	{ "rig.set_bandwidth","i:i", "set bandwidth to nearest requested value" },
@@ -1633,6 +1850,9 @@ struct MLIST {
 	{ "rig.set_vfoA",     "d:d", "set vfo A in Hz" },
 	{ "rig.set_vfoB",     "d:d", "set vfo B in Hz" },
 	{ "rig.set_split",    "i:i", "set split 1/0 (on/off)" },
+	{ "rig.set_volume",   "i:i", "sets volume control" },
+	{ "rig.set_rfgain",   "i:i", "sets rf gain control" },
+	{ "rig.set_micgain",  "i:i", "sets mic gain control" },
 	{ "rig.swap",         "i:i", "execute vfo swap" },
 	{ "rig.cat_string",   "n:s", "execute CAT string" }
 };

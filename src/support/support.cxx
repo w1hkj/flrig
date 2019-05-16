@@ -2403,6 +2403,14 @@ void setVolume()
 	sliders.push(sldr);
 }
 
+void setVolumeControl(void* d)
+{
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "setMicGainControl()");
+	if (sldrVOLUME) sldrVOLUME->value(progStatus.volume);
+	if (spnrVOLUME) spnrVOLUME->value(progStatus.volume);
+}
+
 void cbMute()
 {
 	guard_lock serial_lock(&mutex_serial);
@@ -2459,9 +2467,8 @@ void setMicGainControl(void* d)
 {
 	guard_lock serial_lock(&mutex_serial);
 	trace(1, "setMicGainControl()");
-	int val = (long)d;
-	if (sldrMICGAIN) sldrMICGAIN->value(val);
-	if (spnrMICGAIN) spnrMICGAIN->value(val);
+	if (sldrMICGAIN) sldrMICGAIN->value(progStatus.mic_gain);
+	if (spnrMICGAIN) spnrMICGAIN->value(progStatus.mic_gain);
 }
 
 static int img = -1;
@@ -2657,6 +2664,13 @@ void setRFGAIN()
 	sliders.push(slider);
 }
 
+void setRFGAINControl(void* d)
+{
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "setRFGAINControl()");
+	if (sldrRFGAIN) sldrRFGAIN->value(progStatus.rfgain);
+	if (spnrRFGAIN) spnrRFGAIN->value(progStatus.rfgain);
+}
 
 void updateALC(void * d)
 {
@@ -3352,16 +3366,18 @@ void adjust_small_ui()
 			sldrNOTCH->redraw();
 		}
 		if (selrig->has_micgain_control || selrig->has_data_port) {
-			if (selrig->has_micgain_control && selrig->has_data_port) {
+			if (selrig->has_micgain_control) {
 				y += 20;
 				sldrMICGAIN->resize( 54, y, 368, 18 );
 				sldrMICGAIN->show();
 				sldrMICGAIN->redraw();
-				sldrMICGAIN->label("");
-				sldrMICGAIN->redraw_label();
-				btnDataPort->position( 2, y);
-				btnDataPort->show();
-				btnDataPort->redraw();
+				if (selrig->has_data_port) {
+					sldrMICGAIN->label("");
+					sldrMICGAIN->redraw_label();
+					btnDataPort->position( 2, y);
+					btnDataPort->show();
+					btnDataPort->redraw();
+				}
 			} else if (selrig->has_data_port) {
 				btnDataPort->position( 214, 105);
 				btnDataPort->show();

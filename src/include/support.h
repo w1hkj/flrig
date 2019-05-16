@@ -94,6 +94,7 @@ extern void setPreampControl(void *);
 extern void setAttControl(void *);
 extern void setMicGainControl(void *);
 extern void setAGC(void *);
+extern void setRFGAINControl(void *);
 
 extern void setMode();
 extern void setBW();
