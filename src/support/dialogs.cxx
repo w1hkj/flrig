@@ -33,6 +33,7 @@
 #include "rigbase.h"
 #include "font_browser.h"
 #include "ui.h"
+#include "status.h"
 
 #include <string>
 
@@ -85,6 +86,13 @@ void add_combos(char *port)
 	selectSepPTTPort->add(port);
 }
 
+void add_status_to_combos()
+{
+	selectCommPort->add(progStatus.xcvr_serial_port.c_str());
+	selectAuxPort->add(progStatus.aux_serial_port.c_str());
+	selectSepPTTPort->add(progStatus.sep_serial_port.c_str());
+}
+
 //======================================================================
 // WIN32 init_port_combos
 //======================================================================
@@ -117,6 +125,7 @@ void init_port_combos()
 		LOG_WARN("Found serial port %s", ttyname);
 		add_combos(ttyname);
 	}
+	add_status_to_combos();
 }
 #endif //__WIN32__
 
@@ -152,6 +161,18 @@ void init_port_combos()
 		LOG_QUIET("Found serial port %s", gbuf.gl_pathv[j]);
 			add_combos(gbuf.gl_pathv[j]);
 	}
+	globfree(&gbuf);
+
+	glob("/dev/tty*", 0, NULL, &gbuf);
+	for (size_t j = 0; j < gbuf.gl_pathc; j++) {
+		if ( !(stat(gbuf.gl_pathv[j], &st) == 0 && S_ISCHR(st.st_mode)) ||
+		     strstr(gbuf.gl_pathv[j], "modem") )
+			continue;
+std::cout << "Serial port: " << gbuf.gl_pathv[j] << std::endl;
+		LOG_QUIET("Found serial port %s", gbuf.gl_pathv[j]);
+			add_combos(gbuf.gl_pathv[j]);
+	}
+
 	globfree(&gbuf);
 
 	if (getcwd(cwd, sizeof(cwd)) == NULL) goto out;
@@ -234,8 +255,10 @@ out:
 
 	if (sys) closedir(sys);
 	if (chdir(cwd) == -1) return;
-	if (ret) // do we need to fall back to the probe code below?
+	if (ret) { // do we need to fall back to the probe code below?
+		add_status_to_combos();
 		return;
+	}
 
 	const char* tty_fmt[] = {
 		"/dev/ttyS%u",
@@ -253,7 +276,7 @@ out:
 			add_combos(ttyname);
 		}
 	}
-
+	add_status_to_combos();
 }
 #endif // __linux__
 
@@ -290,6 +313,7 @@ void init_port_combos()
 		}
 		globfree(&gbuf);
 	}
+	add_status_to_combos();
 }
 #endif //__APPLE__
 

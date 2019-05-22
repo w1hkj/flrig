@@ -725,8 +725,8 @@ static void cb_btnOkXcvrDialog(Fl_Return_Button*, void*) {
 		if (progStatus.xcvr_serial_port.compare("NONE") == 0) {
 			LOG_WARN("No comm port ... test mode");
 		} else {
-			progStatus.xcvr_serial_port = "NONE";
-			selectCommPort->value(progStatus.xcvr_serial_port.c_str());
+//			progStatus.xcvr_serial_port = "NONE";
+//			selectCommPort->value(progStatus.xcvr_serial_port.c_str());
 		}
 	}
 
@@ -852,6 +852,7 @@ Fl_Double_Window* w = new Fl_Double_Window(490, 255, _("Configuration"));
 			selectRig->labelcolor(FL_FOREGROUND_COLOR);
 			selectRig->callback((Fl_Callback*)cb_selectRig);
 			selectRig->align(Fl_Align(FL_ALIGN_LEFT));
+			selectRig->readonly();
 			selectRig->when(FL_WHEN_RELEASE);
 			selectRig->end();
 
@@ -887,6 +888,7 @@ Fl_Double_Window* w = new Fl_Double_Window(490, 255, _("Configuration"));
 			mnuBaudrate->labelcolor(FL_FOREGROUND_COLOR);
 			mnuBaudrate->callback((Fl_Callback*)cb_mnuBaudrate);
 			mnuBaudrate->align(Fl_Align(FL_ALIGN_LEFT));
+			mnuBaudrate->readonly();
 			mnuBaudrate->when(FL_WHEN_RELEASE);
 			mnuBaudrate->end();
 
@@ -1090,6 +1092,7 @@ Fl_Double_Window* w = new Fl_Double_Window(490, 255, _("Configuration"));
 		selectlevel->align(FL_ALIGN_RIGHT);
 		selectlevel->index(progStatus.rpc_level);
 		selectlevel->tooltip(_("0 = off ... 4 maximum depth"));
+		selectlevel->readonly();
 		selectlevel->callback((Fl_Callback*)cb_selectlevel);
 
 		btn_viewtrace = new Fl_Button(486 - 96, 226 - 30, 84, 24, _("View Trace"));

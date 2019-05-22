@@ -267,6 +267,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		opBW->callback((Fl_Callback*)cb_opBW);
 		opBW->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
 		opBW->when(FL_WHEN_RELEASE);
+		opBW->readonly();
 		opBW->end();
 
 		opMODE = new Fl_ComboBox(xpos + opBW->w() + 2, ypos, 208 - opBW->w() - 2, 35, "");
@@ -283,6 +284,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		opMODE->callback((Fl_Callback*)cb_opMODE);
 		opMODE->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
 		opMODE->when(FL_WHEN_RELEASE);
+		opMODE->readonly();
 		opMODE->end();
 
 		btnDSP = new Fl_Button(xpos, ypos, 30, 35, _("L"));
@@ -310,6 +312,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		opDSP_lo->callback((Fl_Callback*)cb_opDSP_lo);
 		opDSP_lo->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
 		opDSP_lo->when(FL_WHEN_RELEASE);
+		opDSP_lo->readonly();
 		opDSP_lo->hide();
 		opDSP_lo->end();
 
@@ -327,6 +330,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		opDSP_hi->callback((Fl_Callback*)cb_opDSP_hi);
 		opDSP_hi->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
 		opDSP_hi->when(FL_WHEN_RELEASE);
+		opDSP_hi->readonly();
 		opDSP_hi->hide();
 		opDSP_hi->end();
 
@@ -872,6 +876,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				op_yaesu_select60->callback((Fl_Callback*)cb_btn_band_select, (void *)13);
 				op_yaesu_select60->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
 				op_yaesu_select60->when(FL_WHEN_RELEASE);
+				op_yaesu_select60->readonly();
 				op_yaesu_select60->end();
 
 			tab_yaesu_bands->end();
@@ -1348,6 +1353,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				ic7610att->add("OFF|3db|6db|9db|12db|15db|18db|21db|24db|27db|30db|33db|36db|39db|42db|45db|");
 				ic7610att->align(FL_ALIGN_RIGHT);
 				ic7610att->index(progStatus.index_ic7610att);
+				ic7610att->readonly();
 				ic7610att->callback((Fl_Callback *)cb_ic7610_att);
 
 				ic7610dual_watch = new Fl_Light_Button(210, by, 100, 50, "Dual Watch");
@@ -1579,6 +1585,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				cbo_tt550_nb_level->align(Fl_Align(FL_ALIGN_LEFT));
 				cbo_tt550_nb_level->when(FL_WHEN_RELEASE);
 				cbo_tt550_nb_level->index(progStatus.tt550_nb_level);
+				cbo_tt550_nb_level->readonly();
 				cbo_tt550_nb_level->end();
 
 				cbo_tt550_agc_level = new Fl_ComboBox(
@@ -1597,6 +1604,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				cbo_tt550_agc_level->align(Fl_Align(FL_ALIGN_LEFT));
 				cbo_tt550_agc_level->when(FL_WHEN_RELEASE);
 				cbo_tt550_agc_level->index(progStatus.tt550_agc_level);
+				cbo_tt550_agc_level->readonly();
 				cbo_tt550_agc_level->end();
 
 				spnr_tt550_vfo_adj = new Hspinner(
@@ -1646,6 +1654,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				op_tt550_XmtBW->align(Fl_Align(FL_ALIGN_LEFT));
 				op_tt550_XmtBW->when(FL_WHEN_RELEASE);
 				op_tt550_XmtBW->index(progStatus.tt550_xmt_bw);
+				op_tt550_XmtBW->readonly();
 				op_tt550_XmtBW->end();
 
 				btn_tt550_use_xmt_bw = new Fl_Check_Button(xpos+613, by, 23, bh, _("Enable"));

@@ -762,11 +762,13 @@ bool status::loadXcvrState(string xcvr)
 
 		spref.get("aux_serial_port", defbuffer, "NONE", 499);
 		aux_serial_port = defbuffer;
+
 		if (spref.get("aux_rts", i, i)) aux_rts = i;
 		if (spref.get("aux_dtr", i, i)) aux_dtr = i;
 
 		spref.get("sep_serial_port", defbuffer, "NONE", 499);
 		sep_serial_port = defbuffer;
+
 		if (spref.get("sep_rtsptt", i, i)) sep_rtsptt = i;
 		if (spref.get("sep_dtrptt", i, i)) sep_dtrptt = i;
 		if (spref.get("sep_rtsplus", i, i)) sep_rtsplus = i;

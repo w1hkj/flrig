@@ -266,7 +266,6 @@ Fl_ComboBox::Fl_ComboBox (int X,int Y,int W,int H, const char *lbl, int wtype)
 	} else {
 		val = new Fl_Input (X, Y, W-H, H, "");
 		val->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-		readonly();
 	}
 
 	btn = new Fl_Button (X + W - H + 1, Y, H - 1, H, "@2>");
