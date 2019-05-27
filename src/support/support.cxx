@@ -3029,18 +3029,28 @@ void read_rig_vals_(XCVR_STATE &xcvrvfo)
 
 }
 
-void read_rig_vals()
+void read_vfoA_vals()
 {
-	if (progStatus.start_stop_trace) ss_trace(true);
+	update_progress(progress->value() + 4);
 
-// no guard_lock ... this function called from within a guard_lock block
-	trace(1, "read_rig_vals()");
+	if (selrig->has_get_info)
+		selrig->get_info();
+	xcvr_vfoA.freq = selrig->get_vfoA();
+	update_progress(progress->value() + 4);
 
-	update_progress(0);
+	xcvr_vfoA.imode = selrig->get_modeA();
+	update_progress(progress->value() + 4);
 
-	useB = true;
-	selrig->selectB();		// first select call
+	xcvr_vfoA.iBW = selrig->get_bwA();
+	update_progress(progress->value() + 4);
 
+	xcvr_vfoA.filter = selrig->get_FILT(xcvr_vfoA.imode);
+
+	read_rig_vals_(xcvr_vfoA);
+}
+
+void read_vfoB_vals()
+{
 	update_progress(progress->value() + 4);
 
 	if (selrig->has_get_info)
@@ -3059,25 +3069,30 @@ void read_rig_vals()
 	read_rig_vals_(xcvr_vfoB);
 
 	trace(2, "Read xcvr B:\n", print(xcvr_vfoB));
+}
 
-	useB = false;
-	selrig->selectA();		// second select call
-	update_progress(progress->value() + 4);
+void read_rig_vals()
+{
+	if (progStatus.start_stop_trace) ss_trace(true);
 
-	if (selrig->has_get_info)
-		selrig->get_info();
-	xcvr_vfoA.freq = selrig->get_vfoA();
-	update_progress(progress->value() + 4);
+// no guard_lock ... this function called from within a guard_lock block
+	trace(1, "read_rig_vals()");
 
-	xcvr_vfoA.imode = selrig->get_modeA();
-	update_progress(progress->value() + 4);
-
-	xcvr_vfoA.iBW = selrig->get_bwA();
-	update_progress(progress->value() + 4);
-
-	xcvr_vfoA.filter = selrig->get_FILT(xcvr_vfoA.imode);
-
-	read_rig_vals_(xcvr_vfoA);
+	if (selrig->name_ == rig_FT891.name_) {
+		read_vfoA_vals;
+		useB = true;
+		selrig->selectB();		// first select call
+		read_vfoB_vals();
+		useB = false;
+		selrig->selectA();
+	} else {
+		useB = true;
+		selrig->selectB();		// first select call
+		read_vfoB_vals();
+		useB = false;
+		selrig->selectA();		// second select call
+		read_vfoA_vals;
+	}
 
 	if (selrig->has_agc_control) {
 		progStatus.agc_level = selrig->get_agc();
