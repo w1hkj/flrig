@@ -1114,8 +1114,6 @@ void openMemoryDialog()
 
 void show_controls()
 {
-	if (selrig->name_ == rig_TT550.name_)
-		return;
 	int wh = mainwindow->h();
 	int ww = mainwindow->w();
 	switch (progStatus.UIsize) {
