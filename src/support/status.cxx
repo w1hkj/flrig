@@ -25,6 +25,7 @@
 
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Progress.H>
+#include <FL/Enumerations.H>
 
 #include "status.h"
 #include "util.h"
@@ -131,6 +132,7 @@ status progStatus = {
 
 	0,			// int  schema;
 	true,		// bool hrd_buttons
+	FL_WHEN_CHANGED,	// int sliders_button
 
 	0,			// int  line_out;
 	false,		// bool data_port;
@@ -699,6 +701,7 @@ void status::saveLastState()
 	spref.set("rpc_level", rpc_level);
 
 	spref.set("hrd_buttons", hrd_buttons);
+	spref.set("sliders_button", sliders_button);
 }
 
 bool status::loadXcvrState(string xcvr)
@@ -1081,6 +1084,7 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("rpc_level", rpc_level, rpc_level);
 
 		if (spref.get("hrd_buttons", i, i)) hrd_buttons = i;
+		spref.get("sliders_button", sliders_button, sliders_button);
 
 		return true;
 	}

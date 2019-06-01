@@ -52,6 +52,7 @@ Fl_Return_Button *btnOkDisplayDialog=(Fl_Return_Button *)0;
 Fl_Light_Button *btn_lighted=(Fl_Light_Button *)0;
 Fl_Button *btn_lighted_default=(Fl_Button *)0;
 Fl_Check_Button *chk_hrd_button = (Fl_Check_Button *)0;
+Fl_Check_Button *chk_sliders_button = (Fl_Check_Button *)0;
 
 static void cb_btn_ui(Fl_Radio_Light_Button* o, void*) {
 	if (o == btn_wide_ui) progStatus.UIsize = wide_ui;
@@ -145,6 +146,10 @@ static void cb_hrd_button(Fl_Check_Button*, void*) {
 	cb_change_hrd_button();
 }
 
+static void cb_sliders_button(Fl_Check_Button*, void*) {
+	cb_change_sliders_button();
+}
+
 Fl_Double_Window* DisplayDialog() {
 	Fl_Double_Window* w = new Fl_Double_Window(424, 280, _("Flrig User Interface"));
 
@@ -177,11 +182,20 @@ Fl_Double_Window* DisplayDialog() {
 		su_grp1->w(), 30);
 		su_grp_hrd->box(FL_ENGRAVED_FRAME);
 		chk_hrd_button = new Fl_Check_Button(
-			btn_narrow_ui->x(), su_grp_hrd->y() + su_grp_hrd->h()/2 - 10,
-			100, 20, _("Freq Control top/bottom left click"));
+			10, su_grp_hrd->y() + su_grp_hrd->h()/2 - 10,
+			50, 20, _("Freq top/bottom left click"));
 		chk_hrd_button->value(progStatus.hrd_buttons);
 		chk_hrd_button->callback((Fl_Callback*)cb_hrd_button);
 		chk_hrd_button->tooltip(_("Off - left/right click paradigm"));
+		
+		chk_sliders_button = new Fl_Check_Button(
+			su_grp_hrd->w() / 2, su_grp_hrd->y() + su_grp_hrd->h()/2 - 10,
+			50, 20, _("Xcvr follows slider drag"));
+		chk_sliders_button->value(progStatus.hrd_buttons);
+		chk_sliders_button->callback((Fl_Callback*)cb_sliders_button);
+		chk_sliders_button->value(progStatus.sliders_button == FL_WHEN_CHANGED);
+		chk_sliders_button->tooltip(_("ON  send all slider changes to xcvr\nOFF wait for slider control release"));
+
 	su_grp_hrd->end();
 
 	Fl_Group* su_grp2 = new Fl_Group(

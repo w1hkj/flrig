@@ -3694,6 +3694,7 @@ void adjust_control_positions()
 	}
 	FreqDispA->set_hrd(progStatus.hrd_buttons);
 	FreqDispB->set_hrd(progStatus.hrd_buttons);
+	set_sliders_when();
 }
 
 void initTabs()

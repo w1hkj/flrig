@@ -288,6 +288,8 @@ extern void cb_slider_defaults();
 extern void cb_lighted_button();
 extern void cb_lighted_default();
 extern void cb_change_hrd_button();
+extern void cb_change_sliders_button();
+extern void set_sliders_when();
 
 // ic7610 functions
 

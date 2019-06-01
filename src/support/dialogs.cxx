@@ -56,6 +56,8 @@ using namespace std;
 #include "rig.h"
 #include "socket_io.h"
 
+#include "rigpanel.h"
+
 Fl_Double_Window *dlgDisplayConfig = NULL;
 Fl_Double_Window *dlgXcvrConfig = NULL;
 Fl_Double_Window *dlgMemoryDialog = NULL;
@@ -565,6 +567,43 @@ void cb_change_hrd_button()
 	progStatus.hrd_buttons = !progStatus.hrd_buttons;
 	FreqDispA->set_hrd(progStatus.hrd_buttons);
 	FreqDispB->set_hrd(progStatus.hrd_buttons);
+}
+
+void set_sliders_when()
+{
+	if (sldrSQUELCH)
+		sldrSQUELCH->when(progStatus.sliders_button);
+	if (sldrMICGAIN)
+		sldrMICGAIN->when(progStatus.sliders_button);
+	if (sldrIFSHIFT)
+		sldrIFSHIFT->when(progStatus.sliders_button);
+	if (sldrNR)
+		sldrNR->when(progStatus.sliders_button);
+	if (sldrNOTCH)
+		sldrNOTCH->when(progStatus.sliders_button);
+	if (sldrRFGAIN)
+		sldrRFGAIN->when(progStatus.sliders_button);
+	if (sldrINNER)
+		sldrINNER->when(progStatus.sliders_button);
+	if (sldrOUTER)
+		sldrOUTER->when(progStatus.sliders_button);
+	if (sldrPOWER)
+		sldrPOWER->when(progStatus.sliders_button);
+	if (sldrVOLUME)
+		sldrVOLUME->when(progStatus.sliders_button);
+	if (ic7610_digi_sel_val)
+		ic7610_digi_sel_val->when(progStatus.sliders_button);
+	if (sldr_nb_level)
+		sldr_nb_level->when(progStatus.sliders_button);
+}
+
+void cb_change_sliders_button()
+{
+	if (progStatus.sliders_button == FL_WHEN_CHANGED)
+		progStatus.sliders_button = FL_WHEN_RELEASE;
+	else
+		progStatus.sliders_button = FL_WHEN_CHANGED;
+	set_sliders_when();
 }
 
 void cb_slider_defaults()

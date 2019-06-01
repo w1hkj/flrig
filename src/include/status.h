@@ -121,6 +121,7 @@ struct status {
 
 	int		schema;
 	bool	hrd_buttons;
+	int		sliders_button;
 
 	int		line_out;
 	bool	data_port;
