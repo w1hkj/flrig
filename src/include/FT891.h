@@ -59,6 +59,9 @@ public:
 //	void set_split(bool val);
 //	int  get_split();
 
+	int get_sideband(int md);
+	void set_sideband(int md);
+
 	void set_modeA(int val);
 	int  get_modeA();
 	int  get_modetype(int n);
@@ -96,31 +99,48 @@ public:
 
 	void set_if_shift(int val);
 	bool get_if_shift(int &val);
-	void get_if_min_max_step(int &min, int &max, int &step);
+	void get_if_min_max_step(int &min, int &max, int &step) {
+		if_shift_min = min = -1200; if_shift_max = max = 1200; if_shift_step = step = 20; if_shift_mid = 0; }
 
 	void set_notch(bool on, int val);
 	bool get_notch(int &val);
-	void get_notch_min_max_step(int &min, int &max, int &step);
+	void get_notch_min_max_step(int &min, int &max, int &step) {
+		min = 10; max = 3200; step = 10; }
 
 	void set_auto_notch(int v);
 	int  get_auto_notch();
 
 	void set_noise(bool b); // noise reduction
 	int  get_noise();
+	void get_nb_min_max_step(int &min, int &max, int &step) {
+		min = 1; max = 15; step = 1; }
+	void set_nb_level(int val);
+	int  get_nb_level();
 
 	void set_noise_reduction_val(int val); // noise blanker
 	int  get_noise_reduction_val();
-	void get_nr_min_max_step(int &min, int &max, int &step);
+	void get_nr_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 10; step = 1; }
+
 	void set_noise_reduction(int val);
 	int  get_noise_reduction();
 
+
 	void set_mic_gain(int val);
 	int  get_mic_gain();
-	void get_mic_min_max_step(int &min, int &max, int &step);
+	void get_mic_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 100; step = 1; }
 
 	void set_rf_gain(int val);
 	int  get_rf_gain();
-	void get_rf_min_max_step(int &min, int &max, int &step);
+	void get_rf_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 30; step = 1; }
+
+	void set_squelch(int val);
+	int  get_squelch();
+	void get_squelch_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 100; step = 5; }
+	
 	const char **bwtable(int);
 
 	void set_vox_onoff();
@@ -144,6 +164,7 @@ public:
 	void set_xcvr_auto_off();
 
 	void set_compression(int, int);
+	void get_compression(int &on, int &val);
 	void get_comp_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 100; step = 5; }
 

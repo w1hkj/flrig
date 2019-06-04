@@ -155,6 +155,16 @@ bool startSepSerial()
 	return true;
 }
 
+// TODO: Review for thread safety.  
+//  Tried adding mutex, but deadlocks startup
+// progress dialog:
+// guard_lock reply_lock(&mutex_replystr); 
+//
+void assignReplyStr(string val)
+{
+	selrig->replystr = val;
+}
+
 char replybuff[RXBUFFSIZE+1];
 //string replystr;
 string respstr;
@@ -178,6 +188,12 @@ int readResponse()
 int sendCommand (string s, int nread)
 {
 	int numwrite = (int)s.size();
+
+	// TODO: Review for thread safety
+	//
+	// Clear command before sending, to keep the logs sensical.  Otherwise it looks like 
+	// reply was from this command, when it really was from a previous command.
+	assignReplyStr("");
 
 	if (progStatus.use_tcpip) {
 		readResponse();
@@ -280,7 +296,7 @@ bool waitCommand(
 			returned.append(respstr);
 		if (	((int)returned.length() >= nread) || 
 				(returned.find(term) != string::npos) ) {
-			selrig->replystr = returned;
+			assignReplyStr(returned);
 			waited = zmsec() - tod_start;
 			snprintf(sztemp, sizeof(sztemp), "%s rcvd in %d msec", info.c_str(), waited);
 			showresp(level, how, sztemp, command, returned);
@@ -292,7 +308,7 @@ bool waitCommand(
 		Fl::awake();
 	}
 	waitcount++;
-	selrig->replystr = returned;
+	assignReplyStr(returned);
 	waited = zmsec() - tod_start;
 	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %d ms", command.c_str(), waited);
 	showresp(ERR, HEX, sztemp, command, returned);

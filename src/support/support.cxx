@@ -31,6 +31,7 @@
 
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Text_Buffer.H>
+#include <FL/Enumerations.H>
 
 #include "icons.h"
 #include "support.h"
@@ -173,6 +174,11 @@ void process_sliders()
 				break;
 			case SLIDER::POWER    :
 				selrig->set_power_control(val);
+				if (inhibit_power) {
+					stringstream str;
+					str << "SLIDER::POWER inhibit_power=" << inhibit_power;
+					trace(1, str.str().c_str());
+				}
 				if (inhibit_power == 1) inhibit_power = 0;
 				break;
 			case SLIDER::SQUELCH  :
@@ -529,6 +535,10 @@ void read_bandwidth()
 		trace(2, "vfoA active", "get_bwA()");
 		nu_BW = selrig->get_bwA();
 		if (nu_BW != vfoA.iBW) {
+			stringstream s;
+			s << "Bandwidth A change. nu_BW=" << nu_BW << ", vfoA.iBW=" << vfoA.iBW << ", vfo->iBW=" << vfo->iBW;
+			trace(1, s.str().c_str());
+			
 			vfoA.iBW = vfo->iBW = nu_BW;
 //			Fl::awake(setBWControl);
 		}
@@ -536,6 +546,10 @@ void read_bandwidth()
 		trace(2, "vfoB active", "get_bwB()");
 		nu_BW = selrig->get_bwB();
 		if (nu_BW != vfoB.iBW) {
+			stringstream s;
+			s << "Bandwidth B change. nu_BW=" << nu_BW << ", vfoB.iBW=" << vfoB.iBW << ", vfo->iBW=" << vfo->iBW;
+			trace(1, s.str().c_str());
+			
 			vfoB.iBW = vfo->iBW = nu_BW;
 //			Fl::awake(setBWControl);
 		}
@@ -685,7 +699,7 @@ void read_preamp_att()
 			trace(1,"read_preamp_att()  1");
 			val = selrig->get_preamp();
 		}
-		if (val != progStatus.preamp) {
+		if (val != progStatus.preamp || val != vfo->preamp || (btnPreamp && val != btnPreamp->value())) {
 			vfo->preamp = progStatus.preamp = val;
 			Fl::awake(update_preamp, (void*)0);
 		}
@@ -695,7 +709,7 @@ void read_preamp_att()
 			trace(1,"read_preamp_att()  2");
 			val = selrig->get_attenuator();
 		}
-		if (val != progStatus.attenuator) {
+		if (val != progStatus.attenuator || val != vfo->attenuator || (btnAttenuator && val != btnAttenuator->value())) {
 			vfo->attenuator = progStatus.attenuator = val;
 			Fl::awake(update_attenuator, (void*)0);
 		}
@@ -910,10 +924,20 @@ void read_power_control()
 		trace(1,"read_power_control()");
 		val = selrig->get_power_control();
 	}
-	if (val != progStatus.power_level) {
+	if (val != progStatus.power_level  ||  val != vfo->power_control  ||  (sldrPOWER && val != sldrPOWER->value()) ) {
+		stringstream s;
+		s << "read_power_control(), UPDATE progStatus.power_level=" << progStatus.power_level << ", vfo->power_control=" << vfo->power_control << ", radio power=" << val << ", sldrPOWER->value()=" << (sldrPOWER ? sldrPOWER->value() : -1);
+		trace(1, s.str().c_str());
+
 		vfo->power_control = progStatus.power_level = val;
 		Fl::awake(update_power_control, (void*)0);
 	}
+	//else
+	//{
+	//	stringstream s;
+	//	s << "read_power_control(), CURRENT progStatus.power_level=" << progStatus.power_level << ", vfo->power_control=" << vfo->power_control << ", read power=" << val << ", sldrPOWER->value()=" << (sldrPOWER ? sldrPOWER->value() : -1);
+	//	trace(1, s.str().c_str());
+	//}
 }
 
 // mic gain
@@ -932,7 +956,7 @@ void read_mic_gain()
 		trace(1,"read_mic_gain()");
 		val = selrig->get_mic_gain();
 	}
-	if (val != progStatus.mic_gain) {
+	if (val != progStatus.mic_gain || val != vfo->mic_gain || (sldrMICGAIN && val != sldrMICGAIN->value())) {
 		vfo->mic_gain = progStatus.mic_gain = val;
 		Fl::awake(update_mic_gain, (void*)0);
 	}
@@ -988,7 +1012,8 @@ void read_squelch()
 		trace(1,"read_squelch()");
 		val = selrig->get_squelch();
 	}
-	if (val != progStatus.squelch) {
+	
+	if (val != progStatus.squelch || val != vfo->squelch || (sldrSQUELCH && val != sldrSQUELCH->value())) {
 		vfo->squelch = progStatus.squelch = val;
 		Fl::awake(update_squelch, (void*)0);
 	}
@@ -1033,6 +1058,28 @@ POLL_PAIR *poll_parameters;
 
 static bool resetrcv = true;
 static bool resetxmt = true;
+
+// On the Yaesu FT-891, the mode must be set before VFO, since mode 
+// changes can shift frequency.
+//
+// For example, might set freq to 7123.000, but then change mode from USB 
+// to DATA-U.  This mode shift would change the VFO to  7123.700, instead
+// of the desired 7123.000.
+//
+// Setting VFO after the mode change will prevent this type of frequency
+// shifting.
+void yaesu891UpdateA(XCVR_STATE * newVfo)
+{
+	selrig->set_modeA(newVfo->imode);
+	selrig->set_vfoA(newVfo->freq);
+	selrig->set_bwA(newVfo->iBW);
+}
+void yaesu891UpdateB(XCVR_STATE * newVfo)
+{
+	selrig->set_modeB(newVfo->imode);
+	selrig->set_vfoB(newVfo->freq);
+	selrig->set_bwB(newVfo->iBW);
+}
 
 void serviceQUE()
 {
@@ -1099,6 +1146,10 @@ void serviceQUE()
 				useB = false;
 				selrig->selectA();
 				vfo = &vfoA;
+				if (selrig->name_ == rig_FT891.name_) {
+					// Restore mode, then freq and bandwidth after select
+					yaesu891UpdateA(&vfoA);
+				}
 				trace(2, "case sA ", printXCVR_STATE(vfoA).c_str());
 				rig_trace(2, "case sA ", printXCVR_STATE(vfoA).c_str());
 				Fl::awake(updateUI);
@@ -1109,6 +1160,10 @@ void serviceQUE()
 				useB = true;
 				selrig->selectB();
 				vfo = &vfoB;
+				if (selrig->name_ == rig_FT891.name_) {
+					// Restore mode, then freq and bandwidth after select
+					yaesu891UpdateB(&vfoB);
+				}
 				trace(2, "case sB ", printXCVR_STATE(vfoB).c_str());
 				rig_trace(2, "case sB ", printXCVR_STATE(vfoB).c_str());
 				Fl::awake(updateUI);
@@ -1194,8 +1249,15 @@ void serviceA(XCVR_STATE nuvals)
 		if (selrig->can_change_alt_vfo) {
 			trace(2, "B active, set alt vfo A", printXCVR_STATE(nuvals).c_str());
 			rig_trace(2, "B active, set alt vfo A", printXCVR_STATE(nuvals).c_str());
-			if (vfoA.imode != nuvals.imode)
-				selrig->set_modeA(nuvals.imode);
+			if (vfoA.imode != nuvals.imode) {
+				if (selrig->name_ == rig_FT891.name_) {
+					// Mode change on ft891 requires mode first, so set all values
+					yaesu891UpdateA(&nuvals);
+					vfoA = nuvals;
+				} else {
+					selrig->set_modeA(nuvals.imode);
+				}
+			}
 			if (vfoA.iBW != nuvals.iBW)
 				selrig->set_bwA(nuvals.iBW);
 			if (vfoA.freq != nuvals.freq)
@@ -1223,15 +1285,23 @@ void serviceA(XCVR_STATE nuvals)
 	trace(2, "service VFO A", printXCVR_STATE(nuvals).c_str());
 
 	if ((nuvals.imode != -1) && (vfoA.imode != nuvals.imode)) {
-		std::string m1, m2;
-		m1 = selrig->modes_[nuvals.imode];
-		m2 = selrig->modes_[vfoA.imode];
-		selrig->set_modeA(vfoA.imode = nuvals.imode);
-		set_bandwidth_control();
-		selrig->set_bwA(vfoA.iBW);
-		if (m1.find("CW") != std::string::npos ||
-			m2.find("CW") != std::string::npos)
-			vfoA.freq = nuvals.freq = selrig->get_vfoA();
+		if (selrig->name_ == rig_FT891.name_) {
+			// Mode change on ft891 can change frequency, so set all values
+			yaesu891UpdateA(&nuvals);
+			vfoA = nuvals;
+			set_bandwidth_control();
+		} else {
+			std::string m1, m2;
+			m1 = selrig->modes_[nuvals.imode];
+			m2 = selrig->modes_[vfoA.imode];
+			selrig->set_modeA(vfoA.imode = nuvals.imode);
+			set_bandwidth_control();
+			selrig->set_bwA(vfoA.iBW);
+			if (m1.find("CW") != std::string::npos ||
+				m2.find("CW") != std::string::npos)
+				vfoA.freq = nuvals.freq = selrig->get_vfoA();
+		}
+		
 	}
 	if (vfoA.iBW != nuvals.iBW) {
 		selrig->set_bwA(vfoA.iBW = nuvals.iBW);
@@ -1255,8 +1325,15 @@ void serviceB(XCVR_STATE nuvals)
 	if (!useB) {
 		if (selrig->can_change_alt_vfo) {
 			trace(2, "A active, set alt vfo B", printXCVR_STATE(nuvals).c_str());
-			if (vfoB.imode != nuvals.imode)
-				selrig->set_modeB(nuvals.imode);
+			if (vfoB.imode != nuvals.imode) {
+				if (selrig->name_ == rig_FT891.name_) {
+					// Mode change on ft891 requires mode first, so set all values
+					yaesu891UpdateB(&nuvals);
+					vfoB = nuvals;
+				} else {
+					selrig->set_modeB(nuvals.imode);
+				}
+			}
 			if (vfoB.iBW != nuvals.iBW)
 				selrig->set_bwB(nuvals.iBW);
 			if (vfoB.freq != nuvals.freq)
@@ -1534,6 +1611,9 @@ void updateBandwidthControl(void *d)
 				}
 				opBW->show();
 			}
+			// Allow BW to receive rig updates as value is changed there, without needing
+			// to click the dropdown first
+			opBW->isbusy(false);
 		}
 	} else { // no BW, no DSP controls
 		opBW->index(0);
@@ -1754,6 +1834,20 @@ void execute_swapAB()
 				selrig->selectB();
 				vfo = &vfoB;
 			}
+		} else if (selrig->name_ == rig_FT891.name_) {
+			// No need for extra select, as swapAB accomplishes this
+			if (useB) {
+				useB = false;
+				vfo = &vfoA;
+				// Restore mode, then frequency and bandwidth after swap.
+				yaesu891UpdateA(&vfoA);
+			}
+			else {
+				useB = true;
+				vfo = &vfoB;
+				// Restore mode, then frequency and bandwidth after swap.
+				yaesu891UpdateB(&vfoB);
+			}
 		} else {
 			XCVR_STATE temp = vfoB;
 			vfoB = vfoA;
@@ -1847,15 +1941,23 @@ void execute_A2B()
 	} else {
 		if (useB) {
 			vfoA = vfoB;
-			selrig->set_vfoA(vfoA.freq);
-			selrig->set_modeA(vfoA.imode);
-			selrig->set_bwA(vfoA.iBW);
+			if (selrig->name_ == rig_FT891.name_) {
+				yaesu891UpdateA(&vfoA);
+			} else {
+				selrig->set_vfoA(vfoA.freq);
+				selrig->set_modeA(vfoA.imode);
+				selrig->set_bwA(vfoA.iBW);
+			}
 			FreqDispA->value(vfoA.freq);
 		} else {
 			vfoB = vfoA;
-			selrig->set_vfoB(vfoB.freq);
-			selrig->set_modeB(vfoB.imode);
-			selrig->set_bwB(vfoB.iBW);
+			if (selrig->name_ == rig_FT891.name_) {
+				yaesu891UpdateB(&vfoB);
+			} else {
+				selrig->set_vfoB(vfoB.freq);
+				selrig->set_modeB(vfoB.imode);
+				selrig->set_bwB(vfoB.iBW);
+			}
 			FreqDispB->value(vfoB.freq);
 		}
 	}
@@ -2443,12 +2545,16 @@ void cbMute()
 
 void setMicGain()
 {
-	trace(1, "setMicGain()");
-
-	if (Fl::event() == FL_DRAG)
+	Fl_Event evt = (Fl_Event)Fl::event();;
+	if (evt == FL_DRAG)
 		inhibit_mic = 2;
 	else
 		inhibit_mic = 1;
+
+	stringstream str;
+	str << "setMicGain(), evt=" << evt << ", inhibit_mic=" << inhibit_mic;
+	trace(1, str.str().c_str());
+
 
 	int set = 0;
 
@@ -2525,12 +2631,15 @@ void set_power_controlImage(double pwr)
 
 void setPower()
 {
-	trace(1, "setPower()");
-
-	if (Fl::event() == FL_DRAG)
+	Fl_Event evt = (Fl_Event)Fl::event();;
+	if (evt == FL_DRAG) {
 		inhibit_power = 2;
-	else
+	} else {
 		inhibit_power = 1;
+	}
+	stringstream str;
+	str << "setPower(), evt=" << evt << ", inhibit_power=" << inhibit_power;
+	trace(1, str.str().c_str());
 
 	int set = 0;
 
@@ -2874,11 +2983,21 @@ void restore_rig_vals()
 	useB = true;
 	selrig->selectB();
 
-	if (progStatus.restore_frequency)
-		selrig->set_vfoB(xcvr_vfoB.freq);
-	if (progStatus.restore_mode) {
-		selrig->set_modeB(xcvr_vfoB.imode);
-		selrig->set_FILT(xcvr_vfoB.filter);
+	if (selrig->name_ == rig_FT891.name_) {
+		// Mode must be set before VFO, since mode changes can shift frequency
+		if (progStatus.restore_mode) {
+			selrig->set_modeB(xcvr_vfoB.imode);
+			selrig->set_FILT(xcvr_vfoB.filter);
+		}
+		if (progStatus.restore_frequency)
+			selrig->set_vfoB(xcvr_vfoB.freq);
+	} else {
+		if (progStatus.restore_frequency)
+			selrig->set_vfoB(xcvr_vfoB.freq);
+		if (progStatus.restore_mode) {
+			selrig->set_modeB(xcvr_vfoB.imode);
+			selrig->set_FILT(xcvr_vfoB.filter);
+		}
 	}
 	if (progStatus.restore_bandwidth) {
 		selrig->set_bwB(xcvr_vfoB.iBW);
@@ -2890,11 +3009,21 @@ void restore_rig_vals()
 	useB = false;
 	selrig->selectA();
 
-	if (progStatus.restore_frequency)
-		selrig->set_vfoA(xcvr_vfoA.freq);
-	if (progStatus.restore_mode) {
-		selrig->set_modeA(xcvr_vfoA.imode);
-		selrig->set_FILT(xcvr_vfoA.filter);
+	if (selrig->name_ == rig_FT891.name_) {
+		// Mode must be set before VFO, since mode changes can shift frequency
+		if (progStatus.restore_mode) {
+			selrig->set_modeA(xcvr_vfoA.imode);
+			selrig->set_FILT(xcvr_vfoA.filter);
+		}
+		if (progStatus.restore_frequency)
+			selrig->set_vfoA(xcvr_vfoA.freq);
+	} else {
+		if (progStatus.restore_frequency)
+			selrig->set_vfoA(xcvr_vfoA.freq);
+		if (progStatus.restore_mode) {
+			selrig->set_modeA(xcvr_vfoA.imode);
+			selrig->set_FILT(xcvr_vfoA.filter);
+		}
 	}
 	if (progStatus.restore_bandwidth)
 		selrig->set_bwA(xcvr_vfoA.iBW);
@@ -3047,6 +3176,8 @@ void read_vfoA_vals()
 	xcvr_vfoA.filter = selrig->get_FILT(xcvr_vfoA.imode);
 
 	read_rig_vals_(xcvr_vfoA);
+
+	trace(2, "Read xcvr A:\n", print(xcvr_vfoA));
 }
 
 void read_vfoB_vals()
@@ -3077,14 +3208,21 @@ void read_rig_vals()
 
 // no guard_lock ... this function called from within a guard_lock block
 	trace(1, "read_rig_vals()");
-
+	update_progress(0);
+	
 	if (selrig->name_ == rig_FT891.name_) {
-		read_vfoA_vals;
+		// The FT-891 loses width WDH on A/B changes.  It also starts 
+		// with VFOA active, so no selectA() before reading VFOA values.
+		useB = false;
+		read_vfoA_vals();
 		useB = true;
 		selrig->selectB();		// first select call
 		read_vfoB_vals();
+		
+		// Restore VFOA mode, then freq and bandwidth
 		useB = false;
-		selrig->selectA();
+		selrig->selectA();		// second select call
+		yaesu891UpdateA(&xcvr_vfoA);
 	} else {
 		useB = true;
 		selrig->selectB();		// first select call
@@ -3098,8 +3236,6 @@ void read_rig_vals()
 		progStatus.agc_level = selrig->get_agc();
 		redrawAGC();
 	}
-
-	trace(2, "Read xcvr A:\n", print(xcvr_vfoA));
 
 	if (selrig->has_FILTER)
 		selrig->set_FILTERS(progStatus.filters);
@@ -3694,6 +3830,14 @@ void adjust_control_positions()
 	}
 	FreqDispA->set_hrd(progStatus.hrd_buttons);
 	FreqDispB->set_hrd(progStatus.hrd_buttons);
+	if (selrig->name_ == rig_FT891.name_) {
+		// Default FT891 to only send slider updates to rig once slider 
+		// is released. This avoids a condition where once slider is 
+		// released, the slider value no longer tracks changes from 
+		// controls on the rig.
+		progStatus.sliders_button = FL_WHEN_RELEASE;
+		chk_sliders_button->value(false);
+	}
 	set_sliders_when();
 }
 
@@ -4196,7 +4340,7 @@ void init_generic_rig()
 		opBW->activate();
 		if (progStatus.iBW_A == -1) progStatus.iBW_A = selrig->def_bandwidth(vfoA.imode);
 		if (progStatus.iBW_B == -1) progStatus.iBW_B = selrig->def_bandwidth(vfoB.imode);
-			opBW->index(progStatus.iBW_A);
+		opBW->index(progStatus.iBW_A);
 	} else {
 		opBW->add(" ");
 		opBW->index(0);
@@ -4522,6 +4666,16 @@ void set_init_noise_reduction_control()
 		btnNR->value(progStatus.noise_reduction);
 		if (sldrNR) sldrNR->value(progStatus.noise_reduction_val);
 		if (spnrNR) spnrNR->value(progStatus.noise_reduction_val);
+		
+		if (selrig->name_ == rig_FT891.name_) {
+			// On the FT-891, the usual definitions of NB and NR buttons
+			// as defined in FLRIG are reversed. Relabel them to match
+			// what the user sees in the radio screens, and handle the
+			// mapping to appropriate cat controls in the FT891.xx class.
+			btnNR->label("NB");
+			btnNR->tooltip(_("Noise Blanker On/Off"));
+		}
+		
 	} else {
 		btnNR->value(progStatus.noise_reduction);
 		if (sldrNR) sldrNR->value(progStatus.noise_reduction_val);
@@ -4547,6 +4701,14 @@ void init_noise_reduction_control()
 		if (spnrNR) spnrNR->step(step);
 		if (spnrNR) spnrNR->redraw();
 
+		if (selrig->name_ == rig_FT891.name_) {
+			// On the FT-891, the usual definitions of NB and NR buttons
+			// as defined in FLRIG are reversed. Relabel them to match
+			// what the user sees in the radio screens, and handle the
+			// mapping to appropriate cat controls in the FT891.xx class.
+			sldrNR->tooltip(_("Adjust noise blanker"));
+		}
+		
 		switch (progStatus.UIsize) {
 			case small_ui :
 				btnNR->show();
@@ -4820,6 +4982,10 @@ void set_init_power_control()
 void init_attenuator_control()
 {
 	if (selrig->has_attenuator_control) {
+		if (selrig->name_ == rig_FT891.name_) {
+			btnAttenuator->label("ATT");
+			btnAttenuator->redraw_label();
+		}		
 		switch (progStatus.UIsize) {
 			case small_ui :
 				btnAttenuator->show();
@@ -4862,6 +5028,10 @@ void init_agc_control()
 void init_preamp_control()
 {
 	if (selrig->has_preamp_control) {
+		if (selrig->name_ == rig_FT891.name_) {
+			btnPreamp->label("IPO");
+			btnPreamp->redraw_label();
+		}
 		switch (progStatus.UIsize) {
 			case small_ui :
 				btnPreamp->show();
@@ -4896,6 +5066,15 @@ void init_noise_control()
 			btnNOISE->label("AGC"); //Set TS990 AGC Label
 			btnNR->label("NR1"); //Set TS990 NR Button
 		}
+		if (selrig->name_ == rig_FT891.name_) {
+			// On the FT-891, the usual definitions of NB and NR buttons
+			// as defined in FLRIG are reversed. Relabel them to match
+			// what the user sees in the radio screens, and handle the
+			// mapping to appropriate cat controls in the FT891.xx class.
+			btnNOISE->label("DNR");
+			btnNOISE->tooltip(_("DSP Noise Reduction On/Off.  See RX tab for DNR level."));
+		}
+
 		btnNOISE->show();
 		btnNOISE->activate();
 	}
@@ -4910,6 +5089,16 @@ void init_noise_control()
 		sldr_nb_level->maximum(max);
 		sldr_nb_level->step(step);
 		sldr_nb_level->value(progStatus.nb_level);
+		
+		if (selrig->name_ == rig_FT891.name_) {
+			// On the FT-891, the usual definitions of NB and NR buttons
+			// as defined in FLRIG are reversed. Relabel them to match
+			// what the user sees in the radio screens, and handle the
+			// mapping to appropriate cat controls in the FT891.xx class.
+			sldr_nb_level->label("DNR level");
+			sldr_nb_level->tooltip(_("Adjust DSP Noise Reduction level"));
+		}
+		
 		sldr_nb_level->activate();
 		sldr_nb_level->redraw();
 	} else
@@ -4970,6 +5159,9 @@ void init_auto_notch()
 		} else if (xcvr_name == rig_FT1000MP.name_) {
 			btnAutoNotch->label("Tuner");
 			btnAutoNotch->tooltip("Tuner on/off");
+		} else if (xcvr_name == rig_FT891.name_) {
+			btnAutoNotch->label("DNF");
+			btnAutoNotch->tooltip("DSP Auto notch filter on/off");
 		} else {
 			btnAutoNotch->label("AN");
 			btnAutoNotch->tooltip("Auto notch on/off");
@@ -5014,8 +5206,16 @@ void init_swr_control()
 
 void set_init_compression_control()
 {
-	if (selrig->has_compON || selrig->has_compression)
+	if (selrig->has_compON || selrig->has_compression) {
 		selrig->set_compression(progStatus.compON, progStatus.compression);
+		
+		if (selrig->name_ == rig_FT891.name_) {
+			// On the FT-891, compression is called PRC, under function 
+			// menu FUNCTION-1.  Set the button to match for consistency.
+			btnCompON->label("PRC");
+			btnCompON->tooltip("Set speech processor for SSB modes on/off.");
+		}
+	}
 }
 
 void init_special_controls()
@@ -5136,27 +5336,58 @@ void init_VFOs()
 
 	} 
 	else {
-		useB = true;
-		selrig->selectB();			// third select call
-		vfoB.freq = selrig->get_vfoB();
-		update_progress(progress->value() + 4);
-		vfoB.imode = selrig->get_modeB();
-		update_progress(progress->value() + 4);
-		vfoB.iBW = selrig->get_bwB();
-		update_progress(progress->value() + 4);
-		FreqDispB->value(vfoB.freq);
-		trace(2, "B: ", printXCVR_STATE(vfoB).c_str());
+		// Capture VFOA mode and bandwidth, since it will be lost in VFO switch
+		if (selrig->name_ == rig_FT891.name_) {
+			useB = false;
+			vfoA.freq = selrig->get_vfoA();
+			update_progress(progress->value() + 4);
+			vfoA.imode = selrig->get_modeA();
+			update_progress(progress->value() + 4);
+			vfoA.iBW = selrig->get_bwA();
+			update_progress(progress->value() + 4);
+			FreqDispA->value(vfoA.freq);
+			trace(2, "A: ", printXCVR_STATE(vfoA).c_str());
 
-		useB = false;
-		selrig->selectA();			// fourth select call
-		vfoA.freq = selrig->get_vfoA();
-		update_progress(progress->value() + 4);
-		vfoA.imode = selrig->get_modeA();
-		update_progress(progress->value() + 4);
-		vfoA.iBW = selrig->get_bwA();
-		update_progress(progress->value() + 4);
-		FreqDispA->value(vfoA.freq);
-		trace(2, "A: ", printXCVR_STATE(vfoA).c_str());
+			
+			useB = true;
+			selrig->selectB();			// third select call
+			vfoB.freq = selrig->get_vfoB();
+			update_progress(progress->value() + 4);
+			vfoB.imode = selrig->get_modeB();
+			update_progress(progress->value() + 4);
+			vfoB.iBW = selrig->get_bwB();
+			update_progress(progress->value() + 4);
+			FreqDispB->value(vfoB.freq);
+			trace(2, "B: ", printXCVR_STATE(vfoB).c_str());
+
+			// Restore radio VFOA mode, then freq and bandwidth
+			useB = false;
+			selrig->selectA();			// fourth select call
+			yaesu891UpdateA(&vfoA);
+		} else {
+			useB = true;
+			selrig->selectB();			// third select call
+			vfoB.freq = selrig->get_vfoB();
+			update_progress(progress->value() + 4);
+			vfoB.imode = selrig->get_modeB();
+			update_progress(progress->value() + 4);
+			vfoB.iBW = selrig->get_bwB();
+			update_progress(progress->value() + 4);
+			FreqDispB->value(vfoB.freq);
+			trace(2, "B: ", printXCVR_STATE(vfoB).c_str());
+
+			useB = false;
+			selrig->selectA();			// fourth select call
+			vfoA.freq = selrig->get_vfoA();
+			update_progress(progress->value() + 4);
+			vfoA.imode = selrig->get_modeA();
+			update_progress(progress->value() + 4);
+			vfoA.iBW = selrig->get_bwA();
+			update_progress(progress->value() + 4);
+			FreqDispA->value(vfoA.freq);
+			trace(2, "A: ", printXCVR_STATE(vfoA).c_str());
+		}
+
 
 		vfo = &vfoA;
 		setModeControl((void *)0);
@@ -5751,7 +5982,6 @@ void cbNoise()
 
 void cb_nb_level()
 {
-
 	if (!selrig->has_nb_level) return;
 	int set = 0;
 
@@ -5786,6 +6016,7 @@ void cbNR()
 		set = spnrNR->value();
 		btn = btnNR->value();
 	}
+
 
 	if (xcvr_name == rig_TS2000.name_) {
 		if (btn != -1) { // pia

@@ -349,8 +349,10 @@ public:
 	virtual void A2B(){}
 	virtual void B2A(){}
 	virtual int  get_vfoAorB(){return inuse;}
+	virtual bool isOnA(){return inuse == onA;}
+	virtual bool isOnB(){return inuse == onB;}
 
-	virtual void swapAB(){}
+	virtual void swapAB(){inuse = isOnA() ? onB : onA;}
 
 	virtual void set_bwA(int val) {A.iBW = val;}
 	virtual int  get_bwA() {return A.iBW;}

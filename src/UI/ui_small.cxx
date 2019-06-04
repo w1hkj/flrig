@@ -1393,6 +1393,7 @@ Fl_Double_Window *tabs_window()
 			sldr_nb_level->callback((Fl_Callback*)cb_sldr_nb_level);
 			sldr_nb_level->align(Fl_Align(FL_ALIGN_BOTTOM));
 			sldr_nb_level->when(FL_WHEN_CHANGED);
+
 			sldr_nb_level->value(progStatus.nb_level);
 
 //			cbo_agc_level = new Fl_ComboBox(123, 40, 80, 22, _("AGC"));

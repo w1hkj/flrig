@@ -526,6 +526,9 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				sldrPOWER->textsize(12);
 				sldrPOWER->callback((Fl_Callback*)cb_sldrPOWER);
 				sldrPOWER->align(Fl_Align(FL_ALIGN_LEFT));
+				// TODO: Needed to fix bug in setPower(), where once slider is used, power levels stop tracking radio
+				// TODO: Other sliders might need same change?
+				// TODO: See also ui_small, and ui_touch for similar
 				sldrPOWER->when(FL_WHEN_CHANGED);
 				sldrPOWER->reverse(true);
 
@@ -712,6 +715,9 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				sldrNR->textsize(12);
 				sldrNR->callback((Fl_Callback*)cb_sldrNR);
 				sldrNR->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
+				// TODO: Needed to fix bug in setNR(), where once slider is used, levels stop tracking radio
+				// TODO: Other sliders might need same change?
+				// TODO: See also ui_small, and ui_touch for similar
 				sldrNR->when(FL_WHEN_CHANGED);
 
 				sldrNR->reverse(true);
@@ -1195,8 +1201,12 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				sldr_nb_level->step(1);
 				sldr_nb_level->callback((Fl_Callback*)cb_sldr_nb_level);
 				sldr_nb_level->align(Fl_Align(FL_ALIGN_LEFT));
+				// TODO: Needed to fix bug in cb_nb_level(), where once slider is used, NB levels stop tracking radio
+				// TODO: Other sliders might need same change?
+				// TODO: See also ui_small, and ui_touch for similar
 				sldr_nb_level->when(FL_WHEN_CHANGED);
 				sldr_nb_level->value(progStatus.nb_level);
+
 
 				spnr_bpf_center = new Hspinner(474, ypos + 10, 96, 20, _("BPF Center Freq"));
 				spnr_bpf_center->tooltip(_("Bandpass Filter Center Freq"));
