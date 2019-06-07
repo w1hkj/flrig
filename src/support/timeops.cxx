@@ -34,12 +34,14 @@
 #if !HAVE_CLOCK_GETTIME
 #  ifdef __APPLE__
 #    include <mach/mach_time.h>
+#    define CLOCK_REALTIME 0
+#    define CLOCK_MONOTONIC 6
 #  endif
 #  if TIME_WITH_SYS_TIME
 #    include <sys/time.h>
 #  endif
 #  include <errno.h>
-int clock_gettime(clockid_t clock_id, struct timespec* tp)
+int clock_gettime(clock_id_t clock_id, struct timespec* tp)
 {
 	if (clock_id == CLOCK_REALTIME) {
 		struct timeval t;
