@@ -3229,7 +3229,7 @@ void read_rig_vals()
 		read_vfoB_vals();
 		useB = false;
 		selrig->selectA();		// second select call
-		read_vfoA_vals;
+		read_vfoA_vals();
 	}
 
 	if (selrig->has_agc_control) {
