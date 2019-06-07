@@ -666,7 +666,8 @@ void update_compression(void *d)
 
 void read_compression()
 {
-	int on; int val;
+	int on = progStatus.compON;
+	int val = progStatus.compression;
 	if (selrig->has_compression || selrig->has_compON) {
 		{
 			trace(1,"read_compression()");
@@ -3340,10 +3341,8 @@ void cbExit()
 
 	progStatus.bandwidths = selrig->get_BANDWIDTHS();
 
-	if (selrig->check()) {
-		progStatus.saveLastState();
-		closeRig();
-	}
+	progStatus.saveLastState();
+	closeRig();
 
 	{
 		guard_lock serial_lock(&mutex_serial);
@@ -4935,13 +4934,31 @@ void init_micgain_control()
 
 void set_init_micgain_control()
 {
+	int min, max, step;
 	if (selrig->has_micgain_control) {
 		if (progStatus.use_rig_data)
 			progStatus.mic_gain = selrig->get_mic_gain();
 		else
 			selrig->set_mic_gain(progStatus.mic_gain);
-		if (sldrMICGAIN) sldrMICGAIN->value(progStatus.mic_gain);
-		if (spnrMICGAIN) spnrMICGAIN->value(progStatus.mic_gain);
+
+		selrig->get_mic_min_max_step(min, max, step);
+		if (sldrMICGAIN) {
+			sldrMICGAIN->minimum(min);
+			sldrMICGAIN->maximum(max);
+			sldrMICGAIN->step(step);
+			sldrMICGAIN->value(progStatus.mic_gain);
+			sldrMICGAIN->activate();
+		}
+		if (spnrMICGAIN) {
+			spnrMICGAIN->minimum(min);
+			spnrMICGAIN->maximum(max);
+			spnrMICGAIN->step(step);
+			spnrMICGAIN->value(progStatus.mic_gain);
+			spnrMICGAIN->activate();
+		}
+	} else {
+		if (sldrMICGAIN) sldrMICGAIN->deactivate();
+		if (spnrMICGAIN) sldrMICGAIN->deactivate();
 	}
 }
 
@@ -4949,6 +4966,11 @@ void init_power_control()
 {
 	double min, max, step;
 	if (selrig->has_power_control) {
+		if (progStatus.use_rig_data)
+			progStatus.power_level = selrig->get_power_control();
+		else
+			selrig->set_power_control(progStatus.power_level);
+
 		sldrPOWER->activate();
 		selrig->get_pc_min_max_step(min, max, step);
 		if (sldrPOWER) sldrPOWER->minimum(min);
@@ -4964,8 +4986,11 @@ void init_power_control()
 		if (spnrPOWER) spnrPOWER->value(progStatus.power_level);
 		if (spnrPOWER) spnrPOWER->show();
 		if (spnrPOWER) spnrPOWER->redraw();
-	} else
-		sldrPOWER->deactivate();
+
+	} else {
+ 		if (sldrPOWER) sldrPOWER->deactivate();
+		if (spnrPOWER) spnrPOWER->deactivate();
+	}
 }
 
 void set_init_power_control()
