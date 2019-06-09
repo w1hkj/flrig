@@ -650,4 +650,6 @@ extern const char *szNORIG;
 extern const char *szNOMODES[];
 extern const char *szNOBWS[];
 
+extern char bcdval[];
+
 #endif

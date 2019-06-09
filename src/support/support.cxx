@@ -4617,6 +4617,10 @@ void init_rf_control()
 				if (spnrRFGAIN) spnrRFGAIN->deactivate();
 		}
 	}
+	if (selrig->name_ == rig_ICF8101.name_) {
+		if (sldrRFGAIN) sldrRFGAIN->deactivate();
+		if (spnrRFGAIN) spnrRFGAIN->deactivate();
+	}
 }
 
 void set_init_rf_gain()

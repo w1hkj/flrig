@@ -77,6 +77,7 @@ RIG_IC7800		rig_IC7800;
 RIG_IC7851		rig_IC7851;
 RIG_IC9100		rig_IC9100;
 RIG_IC910H		rig_IC910H;
+RIG_ICF8101		rig_ICF8101;
 
 RIG_K2			rig_K2;
 RIG_K3			rig_K3;
@@ -159,35 +160,36 @@ rigbase *rigs[] = {
 	&rig_IC7851,	// 45
 	&rig_IC9100,	// 46
 	&rig_IC910H,	// 47
-	&rig_K2,		// 48
-	&rig_K3,		// 49
-	&rig_KX3,		// 50
-	&rig_PCR1000,	// 51
-	&rig_RAY152,	// 52
-	&rig_TS140,		// 53
-	&rig_TS450S,	// 54
-	&rig_TS480HX,	// 55
-	&rig_TS480SAT,	// 56
-	&rig_TS570,		// 57
-	&rig_TS590S,	// 58
-	&rig_TS590SG,	// 59
-	&rig_TS790,		// 60
-	&rig_TS850,		// 61
-	&rig_TS870S,	// 62 wbx
-	&rig_TS890S,	// 63
-	&rig_TS940S,	// 64
-	&rig_TS950,		// 65
-	&rig_TS990,		// 66
-	&rig_TS2000,	// 67
-	&rig_TT516,		// 68
-	&rig_TT535,		// 69
-	&rig_TT538,		// 70
-	&rig_TT550,		// 71
-	&rig_TT563,		// 72
-	&rig_TT566,		// 73
-	&rig_TT588,		// 74
-	&rig_TT599,		// 75
-	&rig_AOR5K,		// 76
+	&rig_ICF8101,	// 48
+	&rig_K2,		// 49
+	&rig_K3,		// 50
+	&rig_KX3,		// 51
+	&rig_PCR1000,	// 52
+	&rig_RAY152,	// 53
+	&rig_TS140,		// 54
+	&rig_TS450S,	// 55
+	&rig_TS480HX,	// 56
+	&rig_TS480SAT,	// 57
+	&rig_TS570,		// 58
+	&rig_TS590S,	// 59
+	&rig_TS590SG,	// 60
+	&rig_TS790,		// 61
+	&rig_TS850,		// 62
+	&rig_TS870S,	// 63 wbx
+	&rig_TS890S,	// 64
+	&rig_TS940S,	// 65
+	&rig_TS950,		// 66
+	&rig_TS990,		// 67
+	&rig_TS2000,	// 68
+	&rig_TT516,		// 69
+	&rig_TT535,		// 70
+	&rig_TT538,		// 71
+	&rig_TT550,		// 72
+	&rig_TT563,		// 73
+	&rig_TT566,		// 74
+	&rig_TT588,		// 75
+	&rig_TT599,		// 76
+	&rig_AOR5K,		// 77
 	NULL
 };
 
