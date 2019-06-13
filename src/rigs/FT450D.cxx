@@ -528,7 +528,7 @@ int RIG_FT450D::get_tune()
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	int val = replystr[p+4] - '0';
-	return !(val < 2);
+	return (val > 0);
 }
 
 void RIG_FT450D::set_attenuator(int val)
@@ -550,7 +550,7 @@ int RIG_FT450D::get_attenuator()
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
-	return (replystr[p+3] == '1' ? 1 : 0);
+	return (replystr[p+3] == '3' ? 1 : 0);
 }
 
 void RIG_FT450D::set_preamp(int val)

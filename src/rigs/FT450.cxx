@@ -477,7 +477,7 @@ int RIG_FT450::get_tune()
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	int val = replystr[p+4] - '0';
-	return !(val < 2);
+	return (val > 0);
 }
 
 void RIG_FT450::set_attenuator(int val)
@@ -498,7 +498,7 @@ int RIG_FT450::get_attenuator()
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
-	return (replystr[p+3] == '1' ? 1 : 0);
+	return (replystr[p+3] == '3' ? 1 : 0);
 }
 
 void RIG_FT450::set_preamp(int val)
@@ -519,7 +519,7 @@ int RIG_FT450::get_preamp()
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
-	return (replystr[p+3] == '1' ? 0 : 1);
+	return (replystr[p+3] == '1' ? 1 : 0);
 }
 
 const char ** RIG_FT450::bwtable(int n)
@@ -869,7 +869,7 @@ void RIG_FT450::set_xcvr_auto_on()
 		sendCommand(cmd);
 		MilliSleep(1500);	// 1.0 < T < 2.0 seconds
 		sendCommand(cmd);
-		MilliSleep(3000);	// Wait for rig startup?  Maybe not needed.
+//		MilliSleep(3000);	// Wait for rig startup?  Maybe not needed.
 	}
 }
 

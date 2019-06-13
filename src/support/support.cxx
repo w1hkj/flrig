@@ -5556,16 +5556,16 @@ void initRig()
 		init_auto_notch();
 		init_swr_control();
 
+		// Xcvr Auto Power on as soon as possible
+		if (selrig->has_xcvr_auto_on_off)
+			selrig->set_xcvr_auto_on();
+
 		selrig->initialize();
 
 		if (progStatus.xcvr_serial_port != "NONE") {
 			if (!selrig->check()) goto failed;
 			if (flrig_abort) goto failed;
 		}
-
-// Xcvr Auto Power on as soon as possible
-		if (selrig->has_xcvr_auto_on_off)
-			selrig->set_xcvr_auto_on();
 
 		FreqDispA->set_precision(selrig->precision);
 		FreqDispA->set_ndigits(selrig->ndigits);
