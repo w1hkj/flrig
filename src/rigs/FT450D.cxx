@@ -933,28 +933,20 @@ void RIG_FT450D::set_noise(bool b)
 
 void RIG_FT450D::set_xcvr_auto_on()
 {
-	if (!progStatus.xcvr_auto_on) return;
-
-	cmd = rsp = "PS";
-	cmd.append(";");
-	waitN(4, 100, "Test: Is Rig ON", ASC);
-	sett("test_xcvr_auto_on");
-
-	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) {	// rig is off, power on
-		cmd = "PS1;";
-		sendCommand(cmd);
-		sett("set_xcvr_auto_on");
-		MilliSleep(1500);	// 1.0 < T < 2.0 seconds
-		sendCommand(cmd);
-		MilliSleep(3000);	// Wait for rig startup?  Maybe not needed.
-	}
+// send dummy data request for ID (see pg 12 CAT reference book)
+	cmd = "ID;";
+	sendCommand(cmd);
+// wait 1 to 2 seconds
+	MilliSleep(1500);
+	cmd = "PS1;";
+	sendCommand(cmd);
+// wait for power on status
+	cmd = "PS;";
+	waitN(4, 500, "Xcvr ON?", ASC);
 }
 
 void RIG_FT450D::set_xcvr_auto_off()
 {
-	if (!progStatus.xcvr_auto_off) return;
-
 	cmd = "PS0;";
 	sendCommand(cmd);
 	sett("set_xcvr_auto_off");

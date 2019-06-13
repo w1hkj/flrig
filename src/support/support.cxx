@@ -3285,7 +3285,7 @@ void close_UI()
 	pthread_join(*serial_thread, NULL);
 
 	// xcvr auto off
-	if (selrig->has_xcvr_auto_on_off)
+	if (selrig->has_xcvr_auto_on_off && progStatus.xcvr_auto_off)
 		selrig->set_xcvr_auto_off();
 
 	// close down the serial port
@@ -5533,6 +5533,10 @@ void initRig()
 		guard_lock gl_serial(&mutex_serial);
 		trace(1, "init_rig()");
 
+		// Xcvr Auto Power on as soon as possible
+		if (selrig->has_xcvr_auto_on_off && progStatus.xcvr_auto_on)
+			selrig->set_xcvr_auto_on();
+
 		init_special_controls();
 		init_external_tuner();
 		init_rit();
@@ -5555,10 +5559,6 @@ void initRig()
 		init_ptt_control();
 		init_auto_notch();
 		init_swr_control();
-
-		// Xcvr Auto Power on as soon as possible
-		if (selrig->has_xcvr_auto_on_off)
-			selrig->set_xcvr_auto_on();
 
 		selrig->initialize();
 
