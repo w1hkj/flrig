@@ -784,11 +784,18 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		btnSplit->value(progStatus.split);
 
 		xpos += btnSplit->w() + 2;
-		btnTune = new Fl_Button(xpos, ypos, bw, bh, _("Tuner"));
-		btnTune->tooltip(_("Enable Auto Tune"));
+
+		btn_tune_on_off = new Fl_Light_Button(
+			xpos, ypos, 30, bh, "");
+		btn_tune_on_off->tooltip("Tuner On/Off");
+		btn_tune_on_off->callback((Fl_Callback*)cb_btn_tune_on_off);
+
+		btnTune = new Fl_Button(
+			btn_tune_on_off->x() + btn_tune_on_off->w(),
+			btn_tune_on_off->y(), bw - 30, bh, _("Tune"));
+		btnTune->tooltip(_("Manual Tune"));
 		btnTune->labelsize(16);
 		btnTune->callback((Fl_Callback*)cb_btnTune);
-
 
 	grpBUTTONS->end();
 

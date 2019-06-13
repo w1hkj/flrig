@@ -116,7 +116,7 @@ public:
 	virtual int  get_swr();
 	virtual int  get_alc();
 	virtual int  get_power_out();
-	virtual void tune_rig();
+
 	virtual int  adjust_bandwidth(int m);
 	virtual int  def_bandwidth(int m);
 	

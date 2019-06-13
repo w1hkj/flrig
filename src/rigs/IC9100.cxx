@@ -1501,15 +1501,6 @@ void RIG_IC9100::get_if_min_max_step(int &min, int &max, int &step)
 	step = 1;
 }
 
-void RIG_IC9100::tune_rig()
-{
-	cmd = pre_to;
-	cmd.append("\x1c\x01\x02");
-	cmd.append( post );
-	waitFB("tune rig");
-	set_trace(2, "tune_rig()", str2hex(replystr.c_str(), replystr.length()));
-}
-
 void RIG_IC9100::set_pbt_inner(int val)
 {
 	int shift = 128 + val * 128 / 50;

@@ -176,8 +176,6 @@ public:
 	const char *agc_label();
 	int  agc_val();
 
-	void tune_rig();
-
 	void setVfoAdj(double v);
 	double getVfoAdj();
 	void get_vfoadj_min_max_step(int &min, int &max, int &step) {

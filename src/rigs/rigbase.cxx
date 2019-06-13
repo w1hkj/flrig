@@ -155,6 +155,8 @@ rigbase::rigbase()
 	def_bw = 0;
 	bpf_center = 0;
 	pbt = 0;
+	
+	ptt_ = tune_ = 0;
 
 	rTONE = tTONE = 8;
 

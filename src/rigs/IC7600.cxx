@@ -952,14 +952,6 @@ void RIG_IC7600::get_rf_min_max_step(double &min, double &max, double &step)
 	min = 0; max = 100; step = 1;
 }
 
-void RIG_IC7600::tune_rig()
-{
-	cmd = pre_to;
-	cmd.append("\x1c\x01\x02");
-	cmd.append( post );
-	waitFB("tune rig");
-}
-
 int RIG_IC7600::next_preamp()
 {
 	switch (preamp_level) {

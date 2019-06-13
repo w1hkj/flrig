@@ -56,6 +56,8 @@ public:
 		return _mode_type[n];
 	}
 
+	virtual void tune_rig(int how);
+	virtual int  get_tune();
 };
 
 #endif

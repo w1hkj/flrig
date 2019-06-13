@@ -600,8 +600,42 @@ int RIG_FTdx1200::get_PTT()
 }
 
 
+void RIG_FTdx1200::tune_rig(int val)
+{
+	switch (val) {
+		case 0:
+			cmd = "AC000;";
+			break;
+		case 1:
+			cmd = "AC001;";
+			break;
+		case 2:
+		default:
+			cmd = "AC002;";
+			break;
+	}
+	sendCommand(cmd);
+	showresp(WARN, ASC, "tune rig", cmd, replystr);
+	sett("tune_rig");
+}
+
+int RIG_FTdx1200::get_tune()
+{
+	cmd = rsp = "AC";
+	cmd += ';';
+	waitN(5, 100, "get tune", ASC);
+
+	rig_trace(2, "get_tuner status()", replystr.c_str());
+
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return 0;
+	int val = replystr[p+4] - '0';
+	return !(val < 2);
+}
+
+/*
 // internal or external tune mode
-void RIG_FTdx1200::tune_rig()
+void RIG_FTdx1200::tune_rig(int)
 {
 	static bool extun_on = false;
 	static int rmd = modeA;
@@ -655,6 +689,7 @@ void RIG_FTdx1200::tune_rig()
 		}
 	}
 }
+*/
 
 int  RIG_FTdx1200::next_attenuator()
 {

@@ -684,7 +684,7 @@ static void tt550_tune_off(void *)
 		selrig->set_modeA(ret_mode);
 }
 
-void RIG_TT550::tune_rig()
+void RIG_TT550::tune_rig(int val)
 {
 	set_PTT_control(0);
 	if (!useB) {

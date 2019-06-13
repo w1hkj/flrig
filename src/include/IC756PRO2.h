@@ -103,7 +103,6 @@ public:
 	int  get_swr();
 	int  get_alc();
 	int  get_power_out();
-	void tune_rig();
 
 	bool twovfos() { return false; }
 

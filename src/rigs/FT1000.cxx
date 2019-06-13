@@ -447,7 +447,7 @@ void RIG_FT1000::set_PTT_control(int val)
 }
 
 
-void RIG_FT1000::tune_rig()
+void RIG_FT1000::tune_rig(int)
 {
 	init_cmd();
 	cmd[4] = 0x82; // initiate tuner cycle

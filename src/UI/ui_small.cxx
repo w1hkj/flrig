@@ -482,8 +482,14 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	btnAutoNotch->labelsize(12);
 	btnAutoNotch->callback((Fl_Callback*)cb_btnAutoNotch);
 
-	btnTune = new Fl_Button(294, 325, 60, 18, _("Tuner"));
-	btnTune->tooltip(_("Enable Auto Tune"));
+	btn_tune_on_off = new Fl_Light_Button(294, 325, 20, 18, "");
+	btn_tune_on_off->tooltip("Tuner On/Off");
+	btn_tune_on_off->callback((Fl_Callback*)cb_btn_tune_on_off);
+
+	btnTune = new Fl_Button(
+		btn_tune_on_off->x() + btn_tune_on_off->w(),
+		btn_tune_on_off->y(), 40, 18, _("Tune"));
+	btnTune->tooltip(_("Manual Tune"));
 	btnTune->callback((Fl_Callback*)cb_btnTune);
 
 	btnPTT = new Fl_Light_Button(362, 325, 60, 18, _("PTT"));

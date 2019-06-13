@@ -572,6 +572,24 @@ void read_smeter()
 	Fl::awake(updateSmeter, reinterpret_cast<void*>(sig));
 }
 
+int tunerval = 0;
+void update_UI_TUNER(void *)
+{
+	btn_tune_on_off->value(tunerval);
+	btn_tune_on_off->redraw();
+}
+
+void read_tuner()
+{
+	tunerval = selrig->get_tune();
+	if (tunerval != btn_tune_on_off->value()) {
+		stringstream s;
+		s << "tuner state: " << tunerval;
+		trace(1, s.str().c_str());
+		Fl::awake(update_UI_TUNER);
+	}
+}
+
 // read power out
 void read_power_out()
 {
@@ -1031,6 +1049,7 @@ POLL_PAIR RX_poll_pairs[] = {
 	{&progStatus.poll_mode, read_mode},
 	{&progStatus.poll_bandwidth, read_bandwidth},
 	{&progStatus.poll_smeter, read_smeter},
+	{&progStatus.poll_smeter, read_tuner},
 	{&progStatus.poll_volume, read_volume},
 	{&progStatus.poll_auto_notch, read_auto_notch},
 	{&progStatus.poll_notch, read_notch},
@@ -1114,10 +1133,12 @@ void serviceQUE()
 				MilliSleep(10);
 				get = selrig->get_PTT();
 			}
-			stringstream s;
-			s << "ptt returned " << get << " in " << cnt * 10 << " msec";
-			trace(1, s.str().c_str());
-			Fl::awake(update_UI_PTT);
+			{
+				stringstream s;
+				s << "ptt returned " << get << " in " << cnt * 10 << " msec";
+				trace(1, s.str().c_str());
+				Fl::awake(update_UI_PTT);
+			}
 			continue;
 		}
 
@@ -2673,8 +2694,16 @@ void cbTune()
 {
 	guard_lock serial_lock(&mutex_serial);
 	trace(1, "cbTune()");
-	selrig->tune_rig();
+	selrig->tune_rig(2);
 }
+
+void cb_tune_on_off()
+{
+	guard_lock serial_lock(&mutex_serial);
+	trace(1, "cb_tune_on_off()");
+	selrig->tune_rig(btn_tune_on_off->value());
+}
+
 
 void cbPTT()
 {
@@ -3556,6 +3585,8 @@ void adjust_small_ui()
 	btnAutoNotch->redraw();
 	btnTune->position( btnTune->x(), y);
 	btnTune->redraw();
+	btn_tune_on_off->position( btn_tune_on_off->x(), y);
+	btn_tune_on_off->redraw();
 
 	if (selrig->has_agc_control) {
 		btnAGC->show();
@@ -3571,6 +3602,8 @@ void adjust_small_ui()
 		y -= 20;
 		btnTune->position( btnTune->x(), y);
 		btnTune->redraw();
+		btn_tune_on_off->position( btn_tune_on_off->x(), y);
+		btn_tune_on_off->redraw();
 		btnAutoNotch->position( btnAutoNotch->x(), y);
 		btnAutoNotch->redraw();
 		btnPTT->position( btnPTT->x(), y);
@@ -5149,17 +5182,21 @@ void init_tune_control()
 		switch (progStatus.UIsize) {
 			case small_ui :
 				btnTune->show();
+				btn_tune_on_off->show();
 				break;
 			case wide_ui : case touch_ui : default :
 				btnTune->activate();
+				btn_tune_on_off->activate();
 		}
 	} else {
 		switch (progStatus.UIsize) {
 			case small_ui :
 				btnTune->hide();
+				btn_tune_on_off->hide();
 				break;
 			case wide_ui : case touch_ui : default :
 				btnTune->deactivate();
+				btn_tune_on_off->deactivate();
 		}
 	}
 }

@@ -528,14 +528,26 @@ int RIG_FT891::get_PTT()
 
 
 // internal or external tune mode
-void RIG_FT891::tune_rig()
+void RIG_FT891::tune_rig(int)
 {
 	cmd = "AC012;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "tune rig", cmd, replystr);
-
 	set_trace(4, "tune_rig():\n", cmd.c_str(), "\n", replystr.c_str());
+}
 
+int RIG_FT891::get_tune()
+{
+	cmd = rsp = "AC";
+	cmd += ';';
+	waitN(5, 100, "get tune", ASC);
+
+	rig_trace(2, "get_tuner status()", replystr.c_str());
+
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return 0;
+	int val = replystr[p+4] - '0';
+	return !(val < 2);
 }
 
 void RIG_FT891::set_attenuator(int val)

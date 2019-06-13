@@ -111,8 +111,6 @@ public:
 	int  adjust_bandwidth(int);
 	int  def_bandwidth(int);
 
-	void tune_rig();
-
 	void set_notch(bool, int);
 	bool get_notch(int&);
 	void get_notch_min_max_step(int&, int&, int&);

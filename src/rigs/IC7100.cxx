@@ -781,14 +781,6 @@ int RIG_IC7100::get_mic_gain()
 	return val;
 }
 
-void RIG_IC7100::tune_rig()
-{
-	cmd = pre_to;
-	cmd.append("\x1c\x01\x02");
-	cmd.append( post );
-	waitFB("tune rig");
-}
-
 void RIG_IC7100::get_mic_gain_min_max_step(int &min, int &max, int &step)
 {
 	min = 0; max = 100; step = 1;

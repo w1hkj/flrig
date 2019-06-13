@@ -1036,14 +1036,6 @@ int RIG_IC746PRO::get_power_out()
 	return -1;
 }
 
-void RIG_IC746PRO::tune_rig()
-{
-	cmd = pre_to;
-	cmd.append("\x1c\x01\x02");
-	cmd.append( post );
-	waitFB("tune");
-}
-
 void RIG_IC746PRO::set_bwA(int val)
 {
 //	if (bandwidths_ == IC746PRO_AMFMwidths) {

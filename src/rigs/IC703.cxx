@@ -657,14 +657,6 @@ int RIG_IC703::get_split()
 	return progStatus.split;
 }
 
-void RIG_IC703::tune_rig()
-{
-	cmd = pre_to;
-	cmd.append("\x1c\x01\x02");
-	cmd.append( post );
-	waitFB("tune");
-}
-
 void RIG_IC703::set_compression(int on, int val)
 {
 	if (on) {

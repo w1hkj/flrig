@@ -409,9 +409,11 @@ int vl_;
 		min = 0; max = 100; step = 1; }
 
 int ptt_;
+int tune_;
 	virtual void set_PTT_control(int val) {ptt_ = val;}
 	virtual int  get_PTT() {return ptt_;}
-	virtual void tune_rig() {}
+	virtual void tune_rig(int how) {}
+	virtual int  get_tune() { return tune_; }
 
 	virtual void set_attenuator(int val) {atten_level = val;}
 	virtual int  next_attenuator() { atten_level = !atten_level; return atten_level; }

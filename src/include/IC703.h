@@ -111,8 +111,6 @@ public:
 	void set_split(bool val);
 	int  get_split();
 
-	void tune_rig();
-
 protected:
 	int  preamp_level;
 	int  atten_level;

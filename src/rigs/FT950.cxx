@@ -603,7 +603,7 @@ int RIG_FT950::get_PTT()
 
 
 // internal or external tune mode
-void RIG_FT950::tune_rig()
+void RIG_FT950::tune_rig(int)
 {
 	if (!progStatus.external_tuner) {
 		cmd = "AC002;";

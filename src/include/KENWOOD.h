@@ -90,7 +90,10 @@ enum TS590MODES { LSB, USB, CW, FM, AM, FSK, CWR, FSKR, LSBD, USBD, FMD };
 	virtual int  get_volume_control();
 //	virtual void set_power_control(double val);
 
-	virtual void tune_rig();
+	virtual void tune_rig(int);
+	virtual int  get_tune();
+	virtual bool tuning();
+
 //	virtual void set_attenuator(int val);
 //	virtual int  get_attenuator();
 //	virtual void set_preamp(int val);
@@ -127,8 +130,6 @@ enum TS590MODES { LSB, USB, CW, FM, AM, FSK, CWR, FSKR, LSBD, USBD, FMD };
 
 //	virtual void set_auto_notch(int v);
 //	virtual int  get_auto_notch();
-
-	virtual bool tuning();
 
 //	virtual const char **bwtable(int);
 //	virtual const char **lotable(int);

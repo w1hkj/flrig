@@ -21,21 +21,6 @@
 #include "KENWOOD.h"
 #include "support.h"
 
-static bool is_tuning = false;
-static int  skip_get = 2;
-
-bool KENWOOD::tuning()
-{
-	if (!is_tuning) return false;
-	cmd = "AC;";
-	if (wait_char(';', 6, 100, "tuning?", ASC) == 6) {
-		if (replystr[4] == '1') return true;
-	}
-	is_tuning = false;
-	skip_get = 2;
-	return is_tuning;
-}
-
 void KENWOOD::selectA()
 {
 	cmd = "FR0;";
@@ -243,7 +228,7 @@ void KENWOOD::set_PTT_control(int val)
 	sett("PTT");
 }
 
-void KENWOOD::tune_rig()
+void KENWOOD::tune_rig(int val)
 {
 //	cmd = "AC111;";
 //	       | |||______ start tuner = 1
@@ -251,11 +236,39 @@ void KENWOOD::tune_rig()
 //	       | |________ set RX hold = 1
 //	       |__________ tune transceiver command prefix
 	if (tuning()) return;
-	cmd = "AC111;";
+	switch (val) {
+		case 0:
+			cmd = "AC000;"; break;
+		case 1:
+			cmd = "AC110;"; break;
+		case 2: default:
+			cmd = "AC111;"; break;
+	}
 	sendCommand(cmd);
-	showresp(WARN, ASC, "send tune command", cmd, "");
-	sett("Tune");
-	is_tuning = true;
+	showresp(WARN, ASC, "tune_rig", cmd, "");
+	sett("tune_run");
+}
+
+bool KENWOOD::tuning()
+{
+	cmd = "AC;";
+	if (wait_char(';', 6, 100, "tuning?", ASC) == 6) {
+		if (replystr[4] == '1') return true;
+	}
+	return false;
+}
+
+int KENWOOD::get_tune()
+{
+	cmd = "AC;";
+	if (wait_char(';', 6, 100, "tuning?", ASC) == 6) {
+		size_t p = replystr.rfind("AC");
+		if (p != std::string::npos) {
+			return (replystr[p+4] - '0');
+		}
+	}
+	gett("get_tune");
+	return 0;
 }
 
 // Volume control return 0 ... 100

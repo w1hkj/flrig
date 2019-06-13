@@ -207,6 +207,7 @@ extern void setRFGAIN();
 extern void setSQUELCH();
 
 extern void cbTune();
+extern void cb_tune_on_off();
 extern void cbPTT();
 //extern void cbSmeter();
 extern void cbALC_SWR();

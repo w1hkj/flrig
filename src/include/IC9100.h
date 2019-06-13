@@ -160,7 +160,6 @@ public:
 
 	void set_PTT_control(int val);
 	int  get_PTT();
-	void tune_rig();
 
 	void set_band_selection(int v);
 	void get_band_selection(int v);

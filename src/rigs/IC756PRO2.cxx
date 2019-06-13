@@ -808,14 +808,6 @@ int RIG_IC756PRO2::get_power_out()
 	return -1;
 }
 
-void RIG_IC756PRO2::tune_rig()
-{
-	cmd = pre_to;
-	cmd.append("\x1c\x01\x02");
-	cmd.append( post );
-	waitFB("tune");
-}
-
 void RIG_IC756PRO2::set_bwA(int val)
 {
 	if (bandwidths_ == IC756PRO2_AMFMwidths) {

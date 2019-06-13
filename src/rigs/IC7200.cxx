@@ -1325,14 +1325,6 @@ void RIG_IC7200::set_vox_onoff()
 	}
 }
 
-void RIG_IC7200::tune_rig()
-{
-	cmd = pre_to;
-	cmd.append("\x1c\x01\x02");
-	cmd.append( post );
-	waitFB("tune rig");
-}
-
 static bool IC7200_notchon = false;
 
 void RIG_IC7200::set_notch(bool on, int val)

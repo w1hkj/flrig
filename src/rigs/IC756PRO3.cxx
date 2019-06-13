@@ -757,14 +757,6 @@ const char **RIG_IC756PRO3::bwtable(int m)
 	return IC756PRO3_AMFMwidths;
 }
 
-void RIG_IC756PRO3::tune_rig()
-{
-	cmd = pre_to;
-	cmd.append("\x1c\x01\x02");
-	cmd.append( post );
-	waitFB("tune");
-}
-
 void RIG_IC756PRO3::set_bwA(int val)
 {
 	if (bandwidths_ == IC756PRO3_AMFMwidths) {

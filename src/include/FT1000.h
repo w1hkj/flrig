@@ -70,7 +70,7 @@ public:
 	void set_bwB(int val);
 
 	void set_PTT_control(int val);
-	void tune_rig();
+	void tune_rig(int);
 	int  get_smeter();
 	int  get_power_out();
 

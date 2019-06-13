@@ -67,8 +67,6 @@ public:
 	int  get_mic_gain();
 	void get_mic_gain_min_max_step(int &min, int &max, int &step);
 
-	void tune_rig();
-
 	void set_noise(bool val);
 	int get_noise();
 

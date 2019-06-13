@@ -239,9 +239,15 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				labelMEMORY->align(FL_ALIGN_CENTER);
 				labelMEMORY->hide();
 
+				btn_tune_on_off = new Fl_Light_Button(
+					btnB->x() + btnB->w() + 2, btnB->y(), 20, 20, "");
+				btn_tune_on_off->tooltip("Tuner On/Off");
+				btn_tune_on_off->callback((Fl_Callback*)cb_btn_tune_on_off);
+
 				btnTune = new Fl_Button(
-					btnB->x() + btnB->w() + 2, btnB->y(), 69, 20, _("Tuner"));
-				btnTune->tooltip(_("Enable Auto Tune"));
+					btn_tune_on_off->x() + btn_tune_on_off->w(),
+					btn_tune_on_off->y(), 49, 20, _("Tune"));
+				btnTune->tooltip(_("Manual Tune"));
 				btnTune->callback((Fl_Callback*)cb_btnTune);
 
 				bx_row0_expander = new Fl_Box(

@@ -125,7 +125,7 @@ public:
 	void set_PTT_control(int val);
 	int  get_PTT();
 
-	void tune_rig();
+	void tune_rig(int);
 
 	void set_attenuator(int val);
 	int  get_attenuator();

@@ -1399,15 +1399,6 @@ void RIG_IC7610::get_rf_min_max_step(double &min, double &max, double &step)
 	min = 0; max = 100; step = 1;
 }
 
-void RIG_IC7610::tune_rig()
-{
-	cmd = pre_to;
-	cmd.append("\x1c\x01\x02");
-	cmd.append( post );
-	waitFB("tune rig");
-	set_trace(2, "set_tune() ", str2hex(replystr.c_str(), replystr.length()));
-}
-
 int RIG_IC7610::next_preamp()
 {
 	switch (preamp_level) {

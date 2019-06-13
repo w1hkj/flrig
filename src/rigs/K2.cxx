@@ -408,7 +408,7 @@ int  RIG_K2::get_bwB()
 	return bwB;
 }
 
-void RIG_K2::tune_rig()
+void RIG_K2::tune_rig(int val)
 {
 	cmd = "SW20;";
 	sendCommand(cmd);

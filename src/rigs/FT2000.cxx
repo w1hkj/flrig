@@ -387,10 +387,37 @@ int RIG_FT2000::get_PTT()
 	return ptt_;
 }
 
-
-void RIG_FT2000::tune_rig()
+void RIG_FT2000::tune_rig(int val)
 {
-	sendCommand("AC002;",0);
+	switch (val) {
+		case 0:
+			cmd = "AC000;";
+			break;
+		case 1:
+			cmd = "AC001;";
+			break;
+		case 2:
+		default:
+			cmd = "AC002;";
+			break;
+	}
+	sendCommand(cmd);
+	showresp(WARN, ASC, "tune rig", cmd, replystr);
+	sett("tune_rig");
+}
+
+int RIG_FT2000::get_tune()
+{
+	cmd = rsp = "AC";
+	cmd += ';';
+	waitN(5, 100, "get tune", ASC);
+
+	rig_trace(2, "get_tuner status()", replystr.c_str());
+
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return 0;
+	int val = replystr[p+4] - '0';
+	return !(val < 2);
 }
 
 int RIG_FT2000::next_attenuator()

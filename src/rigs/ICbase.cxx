@@ -239,3 +239,39 @@ void RIG_ICOM::A2B()
 	ICtrace("A2B", replystr);
 }
 
+void RIG_ICOM::tune_rig(int how)
+{
+	cmd = pre_to;
+	cmd.append("\x1c\x01");
+	switch (how) {
+		default:
+		case 0:
+			cmd += '\x00';
+			break;
+		case 1:
+			cmd += '\x01';
+			break;
+		case 2:
+			cmd += '\x02';
+			break;
+	}
+	cmd.append( post );
+	waitFB("tune rig");
+	ICtrace("tune rig", replystr);
+}
+
+int RIG_ICOM::get_tune()
+{
+	string resp;
+	string cstr = "\x1C\x01";
+	cmd.assign(pre_to).append(cstr).append(post);
+	resp.assign(pre_fm).append(cstr);
+	int val = tune_;
+	if (waitFOR(8, "get TUNE")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			val = replystr[p + 6];
+	}
+	return (tune_ = val);
+}
+

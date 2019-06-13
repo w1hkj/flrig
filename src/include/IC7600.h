@@ -149,8 +149,6 @@ public:
 	const char *FILT(int &val);
 	const char *nextFILT();
 
-	void tune_rig();
-
 	void set_band_selection(int v);
 	void get_band_selection(int v);
 

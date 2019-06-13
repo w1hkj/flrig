@@ -72,7 +72,8 @@ public:
 	void set_power_control(double val);
 	void set_PTT_control(int val);
 	int  get_PTT();
-	void tune_rig();
+	void tune_rig(int);
+	int  get_tune();
 	void set_attenuator(int val);
 	int  get_attenuator();
 	void set_preamp(int val);

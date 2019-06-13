@@ -192,6 +192,7 @@ cFreqControl *FreqDispB=(cFreqControl *)0;
 Fl_Group *grp_row0a = (Fl_Group *)0;
 Fl_Light_Button *btnA = (Fl_Light_Button *)0;
 Fl_Button *btnTune = (Fl_Button *)0;
+Fl_Light_Button *btn_tune_on_off = (Fl_Light_Button *)0;
 Fl_Box *bx_row0_expander=(Fl_Box *)0;
 Fl_Button *btn_show_controls = (Fl_Button *)0;
 Fl_Group *grp_row1 = (Fl_Group *)0;
@@ -481,6 +482,10 @@ static void cb_btnB(Fl_Light_Button*, void*) {
 
 static void cb_btnTune(Fl_Button*, void*) {
 	cbTune();
+}
+
+static void cb_btn_tune_on_off(Fl_Light_Button *, void *) {
+	cb_tune_on_off();
 }
 
 static void cb_btn_show_controls(Fl_Button*, void*) {

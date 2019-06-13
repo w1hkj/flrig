@@ -63,7 +63,7 @@ public:
 	void set_preamp(int val);
 	int  get_preamp();
 
-	void tune_rig();
+	void tune_rig(int);
 	void set_PTT_control(int val);
 	void get_pc_min_max_step(double &min, double &max, double &step);
 	int  get_power_control();
