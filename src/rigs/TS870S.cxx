@@ -173,7 +173,7 @@ RIG_TS870S::RIG_TS870S() {
 	comm_rtscts = true;
 	comm_rtsplus = false;
 	comm_dtrplus = false;
-	comm_catptt = false;    // default to safe
+	comm_catptt = true;
 	comm_rtsptt = false;    // ditto (used for hardware handshake)
 	comm_dtrptt = false;    // ditto
 
@@ -190,28 +190,25 @@ RIG_TS870S::RIG_TS870S() {
 	has_ifshift_control =
 	has_swr_control = false;
 
+	has_mode_control =
+	has_bandwidth_control =
 	has_dsp_controls =
 	has_smeter =
 	has_power_out =
 	has_split =
 	has_split_AB =
+	has_rf_control =
+	has_ifshift_control =
 	has_noise_control =
 	has_micgain_control =
-	has_volume_control =      // see 'read_volume()' in support.cxx
+	has_volume_control =
+	has_ptt_control =
+	has_attenuator_control =
 	has_power_control = true;
 
 	has_tune_control = false; // disabled for now
 
-	has_attenuator_control = true;
-
 	has_preamp_control = false;
-
-	has_mode_control =
-	has_bandwidth_control =
-
-	has_ifshift_control =     // See 'update_ifshift' in support.cxx
-
-	has_ptt_control = true;
 
 	precision = 10;
 	ndigits = 7;
@@ -265,6 +262,8 @@ void RIG_TS870S::selectB()
 	vfo = 1;
 }
 
+// revert to use KENWOOD generic get set for split operation
+/*
 //----------------------------------------------------------------------
 // revision is similar to TS950S code
 //----------------------------------------------------------------------
@@ -338,10 +337,11 @@ int RIG_TS870S::get_split()
 		if (p == string::npos) return split;
 		rx = replystr[p+2];
 // split test
-		split = (tx == '1' ? 2 : 0) + (rx == '1' ? 1 : 0);
+        if (tx != rx) split = 1; // change submitted by G8KBV
 	}
 	return split;
 }
+*/
 
 //----------------------------------------------------------------------
 bool RIG_TS870S::check ()

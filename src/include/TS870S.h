@@ -21,9 +21,9 @@
 #ifndef _TS870S_H
 #define _TS870S_H
 
-#include "rigbase.h"
+#include "KENWOOD.h"
 
-class RIG_TS870S : public rigbase {
+class RIG_TS870S : public KENWOOD {
 public:
 enum TS870MODES { tsLSB, tsUSB, tsCW, tsFM, tsAM, tsFSK, tsCWR, tsFSKR };
 
@@ -76,8 +76,6 @@ public:
 	void selectB();
 
 	bool can_split() { return true;}
-	void set_split(bool val);    // boolean value only
-	int  get_split();			 // integer value
 	bool twovfos() {return true;}
 
 	int  get_smeter();
