@@ -327,6 +327,7 @@ void RIG_IC7200::set_split(bool val)
 	cmd += val ? 0x01 : 0x00;
 	cmd.append(post);
 	waitFB(val ? "set split ON" : "set split OFF");
+	set_trace(2, "set_split()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 // 7200 does not respond to get split CAT command
@@ -348,6 +349,7 @@ void RIG_IC7200::set_PTT_control(int val)
 	else
 		waitFB("set ptt OFF");
 	ptt_ = val;
+	set_trace(2, "set_PTT()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7200::get_PTT()
@@ -362,6 +364,7 @@ int RIG_IC7200::get_PTT()
 		if (p != string::npos)
 			ptt_ = replystr[p + 6];
 	}
+	get_trace(2, "get_PTT()", str2hex(replystr.c_str(), replystr.length()));
 	return ptt_;
 }
 
@@ -373,6 +376,7 @@ void RIG_IC7200::set_volume_control(int val)
 	cmd.append(bcd255(val));
 	cmd.append( post );
 	waitFB("set vol");
+	set_trace(2, "set_volume_control()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7200::get_volume_control()
@@ -415,6 +419,7 @@ int RIG_IC7200::get_smeter()
 			if (mtr > 100) mtr = 100;
 		}
 	}
+	get_trace(2, "get_smeter()", str2hex(replystr.c_str(), replystr.length()));
 	return mtr;
 }
 
@@ -457,6 +462,7 @@ int RIG_IC7200::get_power_out(void)
 			if (mtr > 100) mtr = 100;
 		}
 	}
+	get_trace(2, "get_power_out()", str2hex(replystr.c_str(), replystr.length()));
 	return mtr;
 }
 
@@ -477,6 +483,7 @@ int RIG_IC7200::get_swr(void)
 			if (mtr > 100) mtr = 100;
 		}
 	}
+	get_trace(2, "get_swr()", str2hex(replystr.c_str(), replystr.length()));
 	return mtr;
 }
 
@@ -497,6 +504,7 @@ int RIG_IC7200::get_alc(void)
 			if (mtr > 100) mtr = 100;
 		}
 	}
+	get_trace(2, "get_alc()", str2hex(replystr.c_str(), replystr.length()));
 	return mtr;
 }
 
@@ -507,6 +515,7 @@ void RIG_IC7200::set_noise(bool val)
 	cmd += val ? 1 : 0;
 	cmd.append(post);
 	waitFB("set noise");
+	set_trace(2, "set_noise()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7200::get_noise()
@@ -524,6 +533,7 @@ int RIG_IC7200::get_noise()
 			val = replystr[p+6];
 		}
 	}
+	get_trace(2, "get_noise()", str2hex(replystr.c_str(), replystr.length()));
 	return val;
 }
 
@@ -534,6 +544,7 @@ void RIG_IC7200::set_nb_level(int val)
 	cmd.append(bcd255(val));
 	cmd.append( post );
 	waitFB("set NB level");
+	set_trace(2, "set_nb_level()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int  RIG_IC7200::get_nb_level()
@@ -550,6 +561,7 @@ int  RIG_IC7200::get_nb_level()
 		if (p != string::npos)
 			val = num100(replystr.substr(p+6));
 	}
+	get_trace(2, "get_nb_level()", str2hex(replystr.c_str(), replystr.length()));
 	return val;
 }
 
@@ -560,6 +572,7 @@ void RIG_IC7200::set_noise_reduction(int val)
 	cmd += val ? 1 : 0;
 	cmd.append(post);
 	waitFB("set NR");
+	set_trace(2, "set_noise_reduction()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7200::get_noise_reduction()
@@ -575,6 +588,7 @@ int RIG_IC7200::get_noise_reduction()
 		if (p != string::npos)
 			return (replystr[p+6] ? 1 : 0);
 	}
+	get_trace(2, "get_noise_reduction()", str2hex(replystr.c_str(), replystr.length()));
 	return progStatus.noise_reduction;
 }
 
@@ -587,6 +601,7 @@ void RIG_IC7200::set_noise_reduction_val(int val)
 	cmd.append(to_bcd(val, 3));
 	cmd.append(post);
 	waitFB("set NRval");
+	set_trace(2, "set_noise_reduction_val()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7200::get_noise_reduction_val()
@@ -605,6 +620,7 @@ int RIG_IC7200::get_noise_reduction_val()
 			val = (val - 8) / 16;
 		}
 	}
+	get_trace(2, "get_nr_val()", str2hex(replystr.c_str(), replystr.length()));
 	return val;
 }
 
@@ -624,6 +640,7 @@ void RIG_IC7200::set_attenuator(int val)
 	cmd += atten_level ? '\x20' : '\x00';
 	cmd.append( post );
 	waitFB("set att");
+	set_trace(2, "set_attenuator()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7200::next_attenuator()
@@ -640,6 +657,7 @@ int RIG_IC7200::get_attenuator()
 	string resp = pre_fm;
 	resp += '\x11';
 	if (waitFOR(7, "get ATT")) {
+		get_trace(2, "get_ATT()", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			if (!replystr[p+5]) {
@@ -683,6 +701,7 @@ void RIG_IC7200::set_preamp(int val)
 	cmd += preamp_level ? 0x01 : 0x00;
 	cmd.append( post );
 	waitFB("set Pre");
+	set_trace(2, "set_preamp()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7200::get_preamp()
@@ -694,6 +713,7 @@ int RIG_IC7200::get_preamp()
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(8, "get Pre")) {
+		get_trace(2, "get_preamp()", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			if (replystr[p+6] == 0x01) {
@@ -717,6 +737,7 @@ void RIG_IC7200::set_rf_gain(int val)
 	cmd.append(bcd255(val));
 	cmd.append( post );
 	waitFB("set RF");
+	set_trace(2, "set_rf_gain()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7200::get_rf_gain()
@@ -732,6 +753,7 @@ int RIG_IC7200::get_rf_gain()
 		if (p != string::npos)
 			val = num100(replystr.substr(p + 6));
 	}
+	get_trace(2, "get_rf_gain()", str2hex(replystr.c_str(), replystr.length()));
 	return val;
 }
 
@@ -742,6 +764,7 @@ void RIG_IC7200::set_squelch(int val)
 	cmd.append(bcd255(val));
 	cmd.append( post );
 	waitFB("set Sqlch");
+	set_trace(2, "set_squelch()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int  RIG_IC7200::get_squelch()
@@ -758,6 +781,7 @@ int  RIG_IC7200::get_squelch()
 		if (p != string::npos)
 			val = num100(replystr.substr(p+6));
 	}
+	get_trace(2, "get_squelch()", str2hex(replystr.c_str(), replystr.length()));
 	return val;
 }
 
@@ -768,6 +792,7 @@ void RIG_IC7200::set_power_control(double val)
 	cmd.append(bcd255(val));
 	cmd.append( post );
 	waitFB("set power");
+	set_trace(2, "set_power_control()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7200::get_power_control()
@@ -786,6 +811,7 @@ int RIG_IC7200::get_power_control()
 			retstr = str2hex(replystr.substr(p).c_str(), 9);
 		}
 	}
+	get_trace(2, "get_power_control()", str2hex(replystr.c_str(), replystr.length()));
 	return val;
 }
 
@@ -810,6 +836,7 @@ int RIG_IC7200::get_mic_gain()
 			return num100(replystr.substr(p + 6));
 		}
 	}
+	get_trace(2, "get_mic_gain()", str2hex(replystr.c_str(), replystr.length()));
 	return 0;
 }
 
@@ -820,6 +847,7 @@ void RIG_IC7200::set_mic_gain(int val)
 	cmd.append(bcd255(val));
 	cmd.append(post);
 	waitFB("set mic");
+	set_trace(2, "set_mic_gain()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7200::get_modeA()
@@ -1236,6 +1264,7 @@ void RIG_IC7200::set_auto_notch(int val)
 	cmd += (unsigned char)val;
 	cmd.append( post );
 	waitFB("set AN");
+	set_trace(2, "set_auto_notch()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7200::get_auto_notch()
@@ -1247,6 +1276,7 @@ int RIG_IC7200::get_auto_notch()
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(8, "get AN")) {
+		get_trace(2, "get_auto_notch()", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			if (replystr[p+6] == 0x01) {
@@ -1270,6 +1300,7 @@ void RIG_IC7200::set_compression(int on, int val)
 	else cmd += '\x00';
 	cmd.append(post);
 	waitFB("set Comp ON/OFF");
+	set_trace(2, "set_compression_on_off()", str2hex(cmd.c_str(), cmd.length()));
 
 	if (val < 0) return;
 	if (val > 10) return;
@@ -1278,6 +1309,7 @@ void RIG_IC7200::set_compression(int on, int val)
 	cmd.append(to_bcd(comp_level[val], 3));
 	cmd.append( post );
 	waitFB("set comp");
+	set_trace(2, "set_compression_level()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_IC7200::get_compression(int &on, int &val)
@@ -1289,6 +1321,7 @@ void RIG_IC7200::get_compression(int &on, int &val)
 	resp.assign(pre_fm).append("\x16\x44");
 
 	if (waitFOR(8, "get comp on/off")) {
+		get_trace(2, "get_comp_on_off()", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.find(resp);
 		if (p != string::npos)
 			on = (replystr[p+6] == 0x01);
@@ -1298,6 +1331,7 @@ void RIG_IC7200::get_compression(int &on, int &val)
 	resp.assign(pre_fm).append("\x14\x0E");
 
 	if (waitFOR(9, "get comp level")) {
+		get_trace(2, "get_comp_level()", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.find(resp);
 		int level = 0;
 		if (p != string::npos) {
@@ -1323,6 +1357,7 @@ void RIG_IC7200::set_vox_onoff()
 		cmd.append(post);
 		waitFB("set Vox OFF");
 	}
+	set_trace(2, "set_vox_on_off()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 static bool IC7200_notchon = false;
@@ -1338,12 +1373,14 @@ void RIG_IC7200::set_notch(bool on, int val)
 		cmd.append(post);
 		waitFB("set notch");
 		IC7200_notchon = on;
+		set_trace(2, "set_notch_on_off()", str2hex(cmd.c_str(), cmd.length()));
 	}
 	cmd = pre_to;
 	cmd.append("\x14\x0D");
 	cmd.append(to_bcd(notch,3));
 	cmd.append(post);
 	waitFB("set notch val");
+	set_trace(2, "set_notch_val()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 bool RIG_IC7200::get_notch(int &val)
@@ -1357,6 +1394,7 @@ bool RIG_IC7200::get_notch(int &val)
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(8, "get notch")) {
+		get_trace(2, "get_notch_on_off()", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			on = replystr[p + 6] ? 1 : 0;
@@ -1367,6 +1405,7 @@ bool RIG_IC7200::get_notch(int &val)
 		resp.append(cstr);
 		cmd.append(post);
 		if (waitFOR(9, "get notch val")) {
+			get_trace(2, "get_notch_val()", str2hex(replystr.c_str(), replystr.length()));
 			size_t p = replystr.rfind(resp);
 			if (p != string::npos) {
 				val = fm_bcd(replystr.substr(p+6),3);
@@ -1397,6 +1436,7 @@ int  RIG_IC7200::get_agc()
 		if (p == string::npos) return agcval;
 		return (agcval = replystr[p+6]); // 1 = off, 2 = FAST, 3 = SLOW
 	}
+	get_trace(2, "get_agc()", str2hex(replystr.c_str(), replystr.length()));
 	return agcval;
 }
 
@@ -1440,12 +1480,14 @@ void RIG_IC7200::set_if_shift(int val)
 	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
 	waitFB("set IF on/off");
+	set_trace(2, "set_if_shift_on_off()", str2hex(cmd.c_str(), cmd.length()));
 
 	cmd = pre_to;
 	cmd.append("\x14\x08");
 	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
 	waitFB("set IF val");
+	set_trace(2, "set_if_shift_val()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 bool RIG_IC7200::get_if_shift(int &val) {
@@ -1471,6 +1513,7 @@ void RIG_IC7200::set_pbt_inner(int val)
 	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
 	waitFB("set PBT inner");
+	set_trace(2, "set_PBT_inner()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_IC7200::set_pbt_outer(int val)
@@ -1484,6 +1527,7 @@ void RIG_IC7200::set_pbt_outer(int val)
 	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
 	waitFB("set PBT outer");
+	set_trace(2, "set_PBT_outer()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7200::get_pbt_inner()
@@ -1542,6 +1586,7 @@ void RIG_IC7200::set_cw_wpm()
 	cmd.append(to_bcd(iwpm, 3));
 	cmd.append( post );
 	waitFB("SET cw wpm");
+	set_trace(2, "set_cw_wpm()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_IC7200::enable_break_in()
@@ -1560,6 +1605,7 @@ void RIG_IC7200::enable_break_in()
 	}
 	cmd.append(post);
 	waitFB("SET break-in");
+	set_trace(2, "set_break_in()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_IC7200::get_cw_qsk_min_max_step(double &min, double &max, double &step)
@@ -1576,6 +1622,7 @@ void RIG_IC7200::set_cw_qsk()
 	cmd.append(to_bcd(qsk, 3));
 	cmd.append(post);
 	waitFB("Set cw qsk delay");
+	set_trace(2, "set_cw_qsk()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_IC7200::get_cw_spot_tone_min_max_step(int &min, int &max, int &step)
@@ -1592,6 +1639,7 @@ void RIG_IC7200::set_cw_spot_tone()
 	cmd.append(to_bcd(n, 3));
 	cmd.append( post );
 	waitFB("SET cw spot tone");
+	set_trace(2, "set_cw_spot_tone()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_IC7200::set_cw_vol()
@@ -1601,6 +1649,7 @@ void RIG_IC7200::set_cw_vol()
 	cmd.append(to_bcd((int)(progStatus.cw_vol * 2.55), 3));
 	cmd.append( post );
 	waitFB("SET cw sidetone volume");
+	set_trace(2, "set_cw_vol()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_IC7200::setVfoAdj(double v)
@@ -1611,6 +1660,7 @@ void RIG_IC7200::setVfoAdj(double v)
 	cmd.append(bcd255(int(v)));
 	cmd.append(post);
 	waitFB("SET vfo adjust");
+	set_trace(2, "set_vfo_adj()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 double RIG_IC7200::getVfoAdj()
@@ -1625,6 +1675,7 @@ double RIG_IC7200::getVfoAdj()
 			vfo_ = num100(replystr.substr(p+7));
 		}
 	}
+	get_trace(2, "get_vfo_adj()", str2hex(replystr.c_str(), replystr.length()));
 	return vfo_;
 }
 
@@ -1654,7 +1705,7 @@ void RIG_IC7200::get_band_selection(int v)
 				set_modeA(bandmode);
 				set_FILT(bandfilter);
 			}
-			set_trace(2, "get", str2hex(ans.substr(p).c_str(), ans.substr(p).length()));
+			get_trace(2, "get_band", str2hex(ans.substr(p).c_str(), ans.substr(p).length()));
 		}
 	}
 }
@@ -1687,5 +1738,6 @@ void RIG_IC7200::set_band_selection(int v)
 	cmd.append( post );
 
 	waitFOR(17, "get band stack");
+	get_trace(2, "get_band_stack", str2hex(replystr.c_str(), replystr.length()));
 }
 
