@@ -90,10 +90,9 @@ public:
 
 	void set_pbt_values(int val);
 
+	bool power_10x();
+
 private:
-	double  minpwr;
-	double  maxpwr;
-	double  steppwr;
 
 // if shift value
 	int  if_mid;

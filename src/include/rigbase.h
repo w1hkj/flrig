@@ -642,6 +642,10 @@ int vfo_;
 	std::string IDstr;
 	bool id_OK(std::string ID, int wait);
 	void sendOK(std::string cmd);
+
+// KX3 power scale
+	bool power10x;
+	virtual bool power_10x() { return false; }
 };
 
 extern rigbase *rigs[];

@@ -110,6 +110,7 @@ RIG_KX3::RIG_KX3() {
 	precision = 1;
 	ndigits = 8;
 
+	progStatus.rfgain = 250;
 }
 
 int  RIG_KX3::adjust_bandwidth(int m)
@@ -147,22 +148,6 @@ void RIG_KX3::initialize()
 	sendCommand(cmd);
 	showresp(INFO, ASC, "KX3 extended mode", cmd, replystr);
 	sett("KX3 extended mode");
-
-	cmd = "OM;"; // request options to get power level
-	int ret = wait_char(';', 16, KX3_WAIT_TIME, "Options", ASC);
-	gett("get options");
-
-	if (ret) {
-		if (replystr.find("P") == string::npos) {
-			minpwr = 0;
-			maxpwr = 12;
-			steppwr = 1;
-		} else {
-			minpwr = 0;
-			maxpwr = 106;
-			steppwr = 1;
-		}
-	}
 
 	get_vfoA();
 	get_modeA();
@@ -494,7 +479,23 @@ int RIG_KX3::get_attenuator()
 	return (replystr[p + 3] == '1' ? 1 : 0);
 }
 
-// Transceiver power level
+/*
+ * PC (Requested Power Output Level; GET/SET)
+ *
+ * Basic SET/RSP format: PCnnn; For the K3, nnn is 000-012 or 000-110 watts depending on the power range.
+ *
+ * If CONFIG:KXV3 is set to TEST or if a transverter band with low-level I/O is selected, then the unit
+ * is hundreds of a milliwatt, and the available range is 0.00-1.50 mW.
+ *
+ * This can be checked using the IC command, byte a, bit 4.
+ *
+ */
+
+void RIG_KX3::get_pc_min_max_step(double &min, double &max, double &step)
+{
+	min = 0; max = 100; step = 1;
+}
+
 void RIG_KX3::set_power_control(double val)
 {
 	int ival = val;
@@ -520,9 +521,60 @@ int RIG_KX3::get_power_control()
 	return fm_decimal(replystr.substr(p+2), 3);
 }
 
-void RIG_KX3::get_pc_min_max_step(double &min, double &max, double &step)
+/*
+ * PO ** (Actual Power Output Level; GET only; KX3 only)
+ *
+ * RSP format: PCnnn;
+ *   where nnn is the power in tenths of a watt (QRP mode) or watts (QRO mode).
+ *
+ * Note: The QRO case only applies if the KXPA100 amplifier enabled via PA MODE=ON,
+ * is connected to the KX3 via the special control cable, and the PWR level is set
+ * to 11 W or higher. The reading is approximate,  * as it is estimated from the
+ * KX3’s drive level. For a more accurate reading, use the KXPA100’s “^PF;” command.
+*/
+
+bool RIG_KX3::power_10x()
 {
-   min = minpwr; max = maxpwr; step = steppwr;
+	return power10x;
+}
+
+int RIG_KX3::get_power_out()
+{
+	// test for KXPA100 presence
+	cmd = "^OP;";
+	int ret = 0;
+	size_t p = 0;
+	int mtr = 0;
+
+	ret = wait_char(';', 5, KX3_WAIT_TIME, "test KXPA", ASC);
+	gett("test KXPA");
+	if (ret >= 4) {
+		power10x = false;
+		if (replystr.find("^OP1;") != string::npos) {
+			cmd = "^PF;";
+			ret = wait_char(';', 8, KX3_WAIT_TIME, "get KXPA power out", ASC);
+			if (ret >= 8) {
+				p = replystr.rfind("^PF");
+				if (p == string::npos) return 0;
+				replystr[p + 7] = 0;
+				mtr = atoi(&replystr[p+3]);
+				if (mtr > 0) return mtr/10;
+			}
+		}
+	}
+
+	cmd = "PO;";
+	ret = wait_char(';', 6, KX3_WAIT_TIME, "get power out", ASC);
+	gett("get power out");
+
+	if (ret < 6) return 0;
+	p = replystr.rfind("PO");
+	if (p == string::npos) return 0;
+	replystr[p + 5] = 0;
+	mtr = atoi(&replystr[p + 2]); 
+	power10x = true; // scales to 0 to 120 W 
+
+	return mtr;
 }
 
 // Transceiver rf control
@@ -725,21 +777,6 @@ int RIG_KX3::get_bwB()
 	for (bwB = 0; bwB < 36; bwB++)
 		if (bw <= atoi(KX3_widths[bwB])) break;
 	return bwB;
-}
-
-int RIG_KX3::get_power_out()
-{
-	cmd = "BG;"; // responds BGnn; 0 < nn < 10
-	int ret = wait_char(';', 5, KX3_WAIT_TIME, "get power out", ASC);
-	gett("get power out");
-
-	if (ret < 5) return 0;
-	size_t p = replystr.rfind("BG");
-	if (p == string::npos) return 0;
-	replystr[p + 4] = 0;
-	int mtr = atoi(&replystr[p + 2]) * 10;
-	if (mtr > 100) mtr = 100;
-	return mtr;
 }
 
 bool RIG_KX3::can_split()

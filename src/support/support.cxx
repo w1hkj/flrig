@@ -2841,11 +2841,13 @@ void updateFwdPwr(void *d)
 	if (!sldrFwdPwr->visible()) {
 		sldrFwdPwr->show();
 	}
-	if (xcvr_name == rig_FT817.name_) sldrFwdPwr->value(power / 10);
-	else sldrFwdPwr->value(power);
+	if (xcvr_name == rig_FT817.name_) power /= 10;
+	if (xcvr_name == rig_KX3.name_ && selrig->power_10x()) power /= 10;
+	sldrFwdPwr->value(power);
+
 	sldrFwdPwr->redraw();
-	if (!selrig->has_power_control)
-		set_power_controlImage(sldrFwdPwr->peak());
+	if (selrig->has_power_control)
+		set_power_controlImage(power);
 }
 
 void updateSquelch(void *d)
@@ -3190,21 +3192,28 @@ void read_rig_vals_(XCVR_STATE &xcvrvfo)
 
 void read_vfoA_vals()
 {
+trace(1, "read_vfoA_vals()");
 	update_progress(progress->value() + 4);
 
 	if (selrig->has_get_info)
 		selrig->get_info();
+
+trace(1, "read vfoA()");
 	xcvr_vfoA.freq = selrig->get_vfoA();
 	update_progress(progress->value() + 4);
 
+trace(1, "read modeA()");
 	xcvr_vfoA.imode = selrig->get_modeA();
 	update_progress(progress->value() + 4);
 
+trace(1, "get bwA()");
 	xcvr_vfoA.iBW = selrig->get_bwA();
 	update_progress(progress->value() + 4);
 
+trace(1, "get FILT(A)");
 	xcvr_vfoA.filter = selrig->get_FILT(xcvr_vfoA.imode);
 
+trace(1, "read_rig_vals()");
 	read_rig_vals_(xcvr_vfoA);
 
 	trace(2, "Read xcvr A:\n", print(xcvr_vfoA));
@@ -3212,21 +3221,28 @@ void read_vfoA_vals()
 
 void read_vfoB_vals()
 {
+trace(1, "read_vfoB_vals()");
 	update_progress(progress->value() + 4);
 
 	if (selrig->has_get_info)
 		selrig->get_info();
+
+trace(1, "read vfoB()");
 	xcvr_vfoB.freq = selrig->get_vfoB();
 	update_progress(progress->value() + 4);
 
+trace(1, "read modeB()");
 	xcvr_vfoB.imode = selrig->get_modeB();
 	update_progress(progress->value() + 4);
 
+trace(1, "get bwB()");
 	xcvr_vfoB.iBW = selrig->get_bwB();
 	update_progress(progress->value() + 4);
 
+trace(1, "get FILT(B)");
 	xcvr_vfoB.filter = selrig->get_FILT(xcvr_vfoB.imode);
 
+trace(1, "read_rig_vals()");
 	read_rig_vals_(xcvr_vfoB);
 
 	trace(2, "Read xcvr B:\n", print(xcvr_vfoB));
@@ -3248,18 +3264,25 @@ void read_rig_vals()
 		useB = true;
 		selrig->selectB();		// first select call
 		read_vfoB_vals();
-		
+
 		// Restore VFOA mode, then freq and bandwidth
 		useB = false;
 		selrig->selectA();		// second select call
 		yaesu891UpdateA(&xcvr_vfoA);
 	} else {
-		useB = true;
-		selrig->selectB();		// first select call
-		read_vfoB_vals();
-		useB = false;
-		selrig->selectA();		// second select call
-		read_vfoA_vals();
+//		if (xcvr_name == rig_K2.name || xcvr_name == rig_K3.name || xcvr_name == rig_KX3.name) {
+//			SelectB();
+//			read_vfoB_vals();
+//			SelectA();
+//			read_vfoA_vals();
+//		} else {
+			useB = true;
+			selrig->selectB();		// first select call
+			read_vfoB_vals();
+			useB = false;
+			selrig->selectA();		// second select call
+			read_vfoA_vals();
+//		}
 	}
 
 	if (selrig->has_agc_control) {
