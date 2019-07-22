@@ -1,6 +1,28 @@
+2019-07-22  David Freese  <w1hkj@bellsouth.net>
+
+	d594e377: KX3
+	91baa81d: ic7200 test
+	083cd44a: FTdx101D
+	99a0fbe3: TS870S
+	69f8955d: FT-450 / FT-450D
+	62789e7a: Split Tune button
+	af99f654: auto_on_off
+	ada28215: IC F8101
+	1ed922e4: support
+	0b99c651: Read VFO A
+
+2019-06-07  Davide Gerhard  <w1hkj@bellsouth.net>
+
+	4a3fa638: MacOS high-DPI
+	cbf0eca9: timeops
+
+2019-06-07  Tony Corbett  <tonyc.uk@gmail.com>
+
+	a55ef90b: Fix FT-450 split
 
 
 =Version 1.3.45=
+
 
 2019-06-04  Douglas de la Torre  <zennix2014@zennix.com>
 
