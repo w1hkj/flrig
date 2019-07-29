@@ -339,7 +339,7 @@ bool RIG_FTdx101D::twovfos()
 
 void RIG_FTdx101D::selectA()
 {
-	cmd = "FT2;";
+	cmd = "FT2;FR01;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select A", cmd, replystr);
 	sett("selectA()");
@@ -347,7 +347,7 @@ void RIG_FTdx101D::selectA()
 
 void RIG_FTdx101D::selectB()
 {
-	cmd = "FT3;";
+	cmd = "FT3;FR10;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select B", cmd, replystr);
 	sett("selectB()");
