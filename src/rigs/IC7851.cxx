@@ -354,8 +354,10 @@ int RIG_IC7851::get_modeA()
 				p = replystr.rfind(resp);
 				if (p == string::npos) return A.imode;
 				int dmode = replystr[p+6];
-				if (A.imode == 0) A.imode = 9 + dmode;
-				else if (A.imode == 1) A.imode = 12 + dmode;
+				if(dmode != 0) {
+					if (A.imode == 0) A.imode = 9 + dmode;
+					else if (A.imode == 1) A.imode = 12 + dmode;
+				}
 			}
 		}
 	}
@@ -406,8 +408,10 @@ int RIG_IC7851::get_modeB()
 				p = replystr.rfind(resp);
 				if (p == string::npos) return B.imode;
 				int dmode = replystr[p+6];
-				if (B.imode == 0) B.imode = 9 + dmode;
-				else if (B.imode == 1) B.imode = 12 + dmode;
+				if(dmode != 0) {
+					if (B.imode == 0) B.imode = 9 + dmode;
+					else if (B.imode == 1) B.imode = 12 + dmode;
+				}
 			}
 		}
 	}
