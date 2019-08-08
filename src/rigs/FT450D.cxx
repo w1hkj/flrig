@@ -142,6 +142,7 @@ RIG_FT450D::RIG_FT450D() {
 
 	has_split =
 	has_split_AB =
+	has_getvfoAorB =
 	has_smeter =
 	has_swr_control =
 	has_alc_control =
@@ -306,10 +307,27 @@ void RIG_FT450D::set_vfoB (long freq)
 	if (!useB) selectA();
 }
 
+int RIG_FT450D::get_vfoAorB()
+{
+	size_t p;
+	char tx;
+	cmd = rsp = "VS";
+	cmd.append(";");
+	wait_char(';', 4, FL450D_WAIT_TIME, "get vfo A/B", ASC);
+	gett("get vfo A/B");
+	p = replystr.rfind(rsp);
+	return (replystr[p+2] == '1');
+}
+
 void RIG_FT450D::set_split(bool on)
 {
-	if (on) cmd = "FT1;";
-	else cmd = "FT0;";
+	if (useB) {
+		if (on) cmd = "FT0;";
+		else cmd = "FT1;";
+	} else {
+		if (on) cmd = "FT1;";
+		else cmd = "FT0;";
+	}
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET split", cmd, replystr);
 	sett("set_split");
@@ -328,12 +346,26 @@ int RIG_FT450D::get_split()
 
 	p = replystr.rfind(rsp);
 	if (p == string::npos) return false;
-	tx = replystr[p+2] - '0';
+	tx = replystr[p+2];
 
-	split = (tx == 1 ? 2 : 0);
+	if (useB)
+		split = (tx == '0');
+	else
+		split = (tx == '1');
 
 	return split;
 }
+
+struct mtrpair {int val; float mtr;};
+
+static mtrpair sm_tbl[] = { 
+{0, 0.0},
+{18, 6.0},
+{51, 17.0},
+{85, 28.0},
+{118, 39.0},
+{151, 50.0},
+{255, 100.0} };
 
 int RIG_FT450D::get_smeter()
 {
@@ -346,8 +378,20 @@ int RIG_FT450D::get_smeter()
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
-	int mtr = atoi(&replystr[p+3]);
-	mtr = mtr * 100.0 / 256.0;
+	int val = atoi(&replystr[p+3]);
+
+	size_t i = 0;
+	if (val < 0) val = 0;
+	if (val > 255) val = 255;
+	for (i = 0; i < sizeof(sm_tbl) / sizeof(mtrpair) - 1; i++)
+		if (val >= sm_tbl[i].val && val < sm_tbl[i+1].val)
+			break;
+	int mtr = (int)ceil(sm_tbl[i].mtr + 
+				(sm_tbl[i+1].mtr - sm_tbl[i].mtr) * 
+				(val - sm_tbl[i].val)/(sm_tbl[i+1].val - sm_tbl[i].val));
+
+	if (mtr > 100) mtr = 100;
+
 	return mtr;
 }
 

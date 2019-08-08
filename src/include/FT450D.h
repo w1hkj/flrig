@@ -43,6 +43,8 @@ public:
 	void selectA();
 	void selectB();
 	void A2B();
+	int  get_vfoAorB();
+
 	void set_modeA(int val);
 	int  get_modeA();
 	int  get_modetype(int n);
