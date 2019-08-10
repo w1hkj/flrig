@@ -3252,6 +3252,16 @@ void read_rig_vals()
 {
 	if (progStatus.start_stop_trace) ss_trace(true);
 
+	if (selrig->has_mode_control)
+		btnRestoreMode->activate();
+	else
+		btnRestoreMode->deactivate();
+
+	if (selrig->has_bandwidth_control)
+		btnRestoreBandwidth->activate();
+	else
+		btnRestoreBandwidth->deactivate();
+
 // no guard_lock ... this function called from within a guard_lock block
 	trace(1, "read_rig_vals()");
 	update_progress(0);

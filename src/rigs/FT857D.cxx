@@ -50,6 +50,7 @@ RIG_FT857D::RIG_FT857D() {
 	modeA = 1;
 	bwA = 0;
 
+	has_ptt_control =
 	has_split_AB =
 	has_smeter =
 	has_power_out =
@@ -64,16 +65,6 @@ RIG_FT897D::RIG_FT897D() {
 	name_ = FT897Dname_;
 	onB = false;
 };
-
-void RIG_FT857D::set_getACK() {
-	for (int i = 0; i < 5; i++) {
-		sendCommand(cmd, 0);
-		for (int j = 0; j < 10; j++) {
-			if (readResponse() == 1) return;
-			MilliSleep(50);
-		}
-	}
-}
 
 void RIG_FT857D::init_cmd()
 {
@@ -115,8 +106,8 @@ void RIG_FT857D::set_vfoA (long freq)
 	cmd = to_bcd(freq, 8);
 	cmd += 0x01;
 	replystr.clear();
-	set_getACK();
-	showresp(WARN, HEX, "set vfo A", cmd, replystr);
+	sendCommand(cmd);
+	showresp(INFO, HEX, "set vfo A", cmd, "");
 }
 
 long RIG_FT857D::get_vfoB ()
@@ -144,8 +135,8 @@ void RIG_FT857D::set_vfoB (long freq)
 	cmd = to_bcd(freq, 8);
 	cmd += 0x01;
 	replystr.clear();
-	set_getACK();
-	showresp(WARN, HEX, "set vfo B", cmd, replystr);
+	sendCommand(cmd);
+	showresp(INFO, HEX, "set vfo B", cmd, "");
 }
 
 int RIG_FT857D::get_modeA()
@@ -172,8 +163,8 @@ void RIG_FT857D::set_modeA(int val)
 	cmd[0] = FT857D_mode_val[val];
 	cmd[4] = 0x07;
 	replystr.clear();
-	set_getACK();
-	showresp(WARN, HEX, "set mode A", cmd, replystr);
+	sendCommand(cmd);
+	showresp(INFO, HEX, "set mode A", cmd, "");
 }
 
 void RIG_FT857D::set_modeB(int val)
@@ -183,8 +174,8 @@ void RIG_FT857D::set_modeB(int val)
 	cmd[0] = FT857D_mode_val[val];
 	cmd[4] = 0x07;
 	replystr.clear();
-	set_getACK();
-	showresp(WARN, HEX, "set mode B", cmd, replystr);
+	sendCommand(cmd);
+	showresp(INFO, HEX, "set mode B", cmd, "");
 }
 
 // Tranceiver PTT on/off
@@ -194,8 +185,8 @@ void RIG_FT857D::set_PTT_control(int val)
 	if (val) cmd[4] = 0x08;
 	else	 cmd[4] = 0x88;
 	replystr.clear();
-	set_getACK();
-	showresp(WARN, HEX, "set PTT", cmd, replystr);
+	sendCommand(cmd);
+	showresp(INFO, HEX, "set PTT", cmd, "");
 	ptt_ = val;
 }
 
@@ -234,8 +225,8 @@ void RIG_FT857D::selectA()
 	init_cmd();
 	cmd[4] = 0x81; // this is a toggle ... no way of knowing which is A or B
 	replystr.clear();
-	set_getACK();
-	showresp(WARN, HEX, "select A", cmd, replystr);
+	sendCommand(cmd);
+	showresp(INFO, HEX, "select A", cmd, "");
 }
 
 void RIG_FT857D::selectB()
@@ -245,8 +236,8 @@ void RIG_FT857D::selectB()
 	init_cmd();
 	cmd[4] = 0x81; // this is a toggle ... no way of knowing which is A or B
 	replystr.clear();
-	set_getACK();
-	showresp(WARN, HEX, "select B", cmd, replystr);
+	sendCommand(cmd);
+	showresp(INFO, HEX, "select B", cmd, "");
 }
 
 bool RIG_FT857D::can_split()
@@ -261,11 +252,11 @@ void RIG_FT857D::set_split(bool val)
 	init_cmd();
 	if (val) {
 		cmd[4] = 0x02;
-		set_getACK();
-		showresp(WARN, HEX, "set split ON", cmd, replystr);
+		sendCommand(cmd);
+		showresp(INFO, HEX, "set split ON", cmd, "");
 	} else {
 		cmd[4] = 0x82;
-		set_getACK();
-		showresp(WARN, HEX, "set split OFF", cmd, replystr);
+		sendCommand(cmd);
+		showresp(INFO, HEX, "set split OFF", cmd, "");
 	}
 }
