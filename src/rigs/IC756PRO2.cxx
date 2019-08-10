@@ -566,11 +566,17 @@ void RIG_IC756PRO2::set_power_control(double val)
 
 void RIG_IC756PRO2::set_split(bool val)
 {
+	split = val;
 	cmd = pre_to;
 	cmd += 0x0F;
 	cmd += val ? 0x01 : 0x00;
 	cmd.append(post);
 	waitFB("set split");
+}
+
+int  RIG_IC756PRO2::get_split()
+{
+	return split;
 }
 
 //======================================================================

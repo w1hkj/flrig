@@ -797,11 +797,17 @@ int RIG_IC756PRO::get_rf_gain()
 
 void RIG_IC756PRO::set_split(bool val)
 {
+	split = val;
 	cmd = pre_to;
 	cmd += 0x0F;
 	cmd += val ? 0x01 : 0x00;
 	cmd.append(post);
 	waitFB("set split");
+}
+
+int  RIG_IC756PRO::get_split()
+{
+	return split;
 }
 
 void RIG_IC756PRO::set_modeA(int val)

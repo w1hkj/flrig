@@ -84,6 +84,7 @@ public:
 	virtual void set_power_control(double val);
 
 	virtual void set_split(bool val);
+	virtual int  get_split();
 	virtual bool can_split() { return true;}
 
 	virtual bool canswap() { return true; }
@@ -153,7 +154,6 @@ public:
 
 	virtual void set_split(bool val);
 	virtual int  get_split();
-
 	bool can_split() { return true;}
 
 	bool twovfos() { return false; }

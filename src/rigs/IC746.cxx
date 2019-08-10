@@ -686,11 +686,17 @@ void RIG_IC746::set_power_control(double val)
 
 void RIG_IC746::set_split(bool val)
 {
+	split = val;
 	cmd = pre_to;
 	cmd += 0x0F;
 	cmd += val ? 0x10 : 0x00;
 	cmd.append(post);
 	waitFB("set split");
+}
+
+int RIG_IC746::get_split()
+{
+	return split;
 }
 
 //=============================================================================
@@ -1449,19 +1455,6 @@ void RIG_IC746PRO::set_split(bool val)
 
 int  RIG_IC746PRO::get_split()
 {
-	int read_split = 0;
-	cmd.assign(pre_to);
-	cmd.append("\x0F");
-	cmd.append( post );
-	if (waitFOR(7, "get split")) {
-		string resp = pre_fm;
-		resp.append("\x0F");
-		size_t p = replystr.find(resp);
-		if (p != string::npos)
-			read_split = replystr[p+5];
-		if (read_split != 0xFA) // fail byte
-			split = read_split;
-	}
 	return split;
 }
 

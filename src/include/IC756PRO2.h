@@ -89,6 +89,7 @@ public:
 	void get_notch_min_max_step(int &min, int &max, int &step);
 
 	void set_split(bool val);
+	int  get_split();
 	bool can_split() { return true;}
 
 	int  next_attenuator();
