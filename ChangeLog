@@ -2,7 +2,14 @@
 
 =Version 1.3.47=
 
-2019-08-02  David Freese  <w1hkj@bellsouth.net>
+2019-08-10  David Freese  <w1hkj@bellsouth.net>
+
+	6caa13a3: IC 746/756
+	c3f2d957: FT857D/897D
+	c97a8350: FT450D
+
+
+=Version 1.3.47=
 
 	0f66d98b: IC7600/IC7851
 	27713b62: FTdx101D
