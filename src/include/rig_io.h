@@ -46,7 +46,7 @@ extern bool startAuxSerial();
 extern bool startSepSerial();
 
 extern int readResponse();
-extern int sendCommand(string s, int nread = 0);
+extern int sendCommand(string s, int nread = 0, int wait = 0);
 extern int waitResponse(int);
 extern bool waitCommand(
 				string command,

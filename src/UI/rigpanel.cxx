@@ -134,6 +134,29 @@ Fl_Button *btn_yaesu_select_10 = (Fl_Button *)0;
 Fl_Button *btn_yaesu_select_11 = (Fl_Button *)0;
 Fl_ComboBox *op_yaesu_select60 = (Fl_ComboBox *)0;
 
+Fl_Group *tab_FT8n_bands = (Fl_Group *)0;
+Fl_Button *btn_FT8n_select_1 = (Fl_Button *)0;
+Fl_Button *btn_FT8n_select_2 = (Fl_Button *)0;
+Fl_Button *btn_FT8n_select_3 = (Fl_Button *)0;
+Fl_Button *btn_FT8n_select_4 = (Fl_Button *)0;
+Fl_Button *btn_FT8n_select_5 = (Fl_Button *)0;
+Fl_Button *btn_FT8n_select_6 = (Fl_Button *)0;
+Fl_Button *btn_FT8n_select_7 = (Fl_Button *)0;
+Fl_Button *btn_FT8n_select_8 = (Fl_Button *)0;
+Fl_Button *btn_FT8n_select_9 = (Fl_Button *)0;
+Fl_Button *btn_FT8n_select_10 = (Fl_Button *)0;
+Fl_Button *btn_FT8n_select_11 = (Fl_Button *)0;
+Fl_Button *btn_FT8n_select_12 = (Fl_Button *)0;
+Fl_Button *btn_FT8n_select_13 = (Fl_Button *)0;
+
+Fl_Group *tab_FT8n_CTCSS = (Fl_Group *)0;
+Fl_PL_tone *choice_FT8n_tTONE = (Fl_PL_tone *)0;
+Fl_PL_tone *choice_FT8n_rTONE = (Fl_PL_tone *)0;
+Fl_Button *setTONES = (Fl_Button *)0;
+Fl_ComboBox *FMoffset = (Fl_ComboBox *)0;
+Fl_Button *setOFFSET = (Fl_Button *)0;
+cFreqControl *FMoff_freq = (cFreqControl *)0;
+
 Fl_Group *tab_icom_bands = (Fl_Group *)0;
 Fl_Button *btn_icom_select_1 = (Fl_Button *)0;
 Fl_Button *btn_icom_select_2 = (Fl_Button *)0;
@@ -1017,8 +1040,21 @@ int PL_tones[] = {
  948,  974, 1000, 1035, 1072, 1109, 1148, 1188, 1230, 1273,
 1318, 1365, 1413, 1462, 1514, 1567, 1598, 1622, 1655, 1679,
 1713, 1738, 1773, 1799, 1835, 1862, 1899, 1928, 1966, 1995,
-2035, 2065, 2107, 2181, 2257, 2291, 2336, 2418, 2503, 2540 };
+2035, 2065, 2107, 2181, 2257, 2291, 2336, 2418, 2503, 2541 };
 
+void cb_tones(Fl_Button *b, void *)
+{
+	int tTONE = PL_tones[choice_FT8n_tTONE->value()];
+	int rTONE = PL_tones[choice_FT8n_rTONE->value()];
+	guard_lock serial(&mutex_serial);
+	selrig->set_tones(tTONE, rTONE);
+}
+
+void cb_offset(Fl_Button *b, void*)
+{
+	guard_lock serial(&mutex_serial);
+	selrig->set_offset(FMoffset->index(), FMoff_freq->value());
+}
 
 #include "ui_small.cxx"
 

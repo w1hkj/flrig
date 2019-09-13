@@ -56,6 +56,11 @@ public:
 
 	int  adjust_bandwidth(int m) { return 0; }
 
+	void set_band_selection(int v);
+
+	void set_tones(int, int);
+	void set_offset(int, int);
+
 private:
 	void init_cmd();
 

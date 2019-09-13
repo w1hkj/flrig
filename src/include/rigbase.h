@@ -423,6 +423,10 @@ int tune_;
 	virtual int  next_preamp() { preamp_level = !preamp_level; return preamp_level; }
 	virtual int  get_preamp() {return preamp_level;}
 
+// CTCSS tones / offset
+	virtual void set_tones(int tx_tone, int rx_tone) { return; }
+	virtual void set_offset(int indx, int offset) { return; }
+
 int sh_;
 bool sh_on_;
 	virtual void set_if_shift(int val) {sh_ = val;}

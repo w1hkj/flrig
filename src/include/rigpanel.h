@@ -175,6 +175,29 @@ extern Fl_Button *btn_yaesu_select_10;
 extern Fl_Button *btn_yaesu_select_11;
 extern Fl_ComboBox *op_yaesu_select60;
 
+extern Fl_Group *tab_FT8n_bands;
+extern Fl_Button *btn_FT8n_select_1;
+extern Fl_Button *btn_FT8n_select_2;
+extern Fl_Button *btn_FT8n_select_3;
+extern Fl_Button *btn_FT8n_select_4;
+extern Fl_Button *btn_FT8n_select_5;
+extern Fl_Button *btn_FT8n_select_6;
+extern Fl_Button *btn_FT8n_select_7;
+extern Fl_Button *btn_FT8n_select_8;
+extern Fl_Button *btn_FT8n_select_9;
+extern Fl_Button *btn_FT8n_select_10;
+extern Fl_Button *btn_FT8n_select_11;
+extern Fl_Button *btn_FT8n_select_12;
+extern Fl_Button *btn_FT8n_select_13;
+
+extern Fl_Group *tab_FT8n_CTCSS;
+extern Fl_PL_tone *choice_FT8n_tTONE;
+extern Fl_PL_tone *choice_FT8n_rTONE;
+extern Fl_Button *setTONES;
+extern Fl_ComboBox *FMoffset;
+extern Fl_Button *setOFFSET;
+extern cFreqControl *FMoff_freq;
+
 extern Fl_Group *tab_icom_bands;
 extern Fl_Button *btn_icom_select_1;
 extern Fl_Button *btn_icom_select_2;

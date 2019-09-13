@@ -914,6 +914,144 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 			}
 		tab_yaesu_bands->end();
 
+		tab_FT8n_bands = new Fl_Group(xpos, ypos, g->w(), tabs2_h, _("Bands"));
+		static const char setsave[] = _("Left click - set\nRight click - save");
+			btn_FT8n_select_1 = new Fl_Button(
+				xpos + 4, ypos + 10, 40, 22,
+				_("1.8"));
+			btn_FT8n_select_1->tooltip(setsave);
+			btn_FT8n_select_1->color((Fl_Color)246);
+			btn_FT8n_select_1->callback((Fl_Callback*)cb_btn_band_select, (void *)1);
+
+			btn_FT8n_select_2 = new Fl_Button(
+				btn_FT8n_select_1->x() + btn_FT8n_select_1->w() + 4, ypos + 10, 
+				40, 22, 
+				_("3.5"));
+			btn_FT8n_select_2->tooltip(setsave);
+			btn_FT8n_select_2->color((Fl_Color)246);
+			btn_FT8n_select_2->callback((Fl_Callback*)cb_btn_band_select, (void *)2);
+
+			btn_FT8n_select_3 = new Fl_Button(
+				btn_FT8n_select_2->x() + btn_FT8n_select_2->w() + 4, ypos + 10, 
+				40, 22, 
+				_("7"));
+			btn_FT8n_select_3->tooltip(setsave);
+			btn_FT8n_select_3->color((Fl_Color)246);
+			btn_FT8n_select_3->callback((Fl_Callback*)cb_btn_band_select, (void *)3);
+
+			btn_FT8n_select_4 = new Fl_Button(
+				btn_FT8n_select_3->x() + btn_FT8n_select_3->w() + 4, ypos + 10, 
+				40, 22, 
+				_("10"));
+			btn_FT8n_select_4->tooltip(setsave);
+			btn_FT8n_select_4->color((Fl_Color)246);
+			btn_FT8n_select_4->callback((Fl_Callback*)cb_btn_band_select, (void *)4);
+
+			btn_FT8n_select_5 = new Fl_Button(
+				btn_FT8n_select_4->x() + btn_FT8n_select_4->w() + 4, ypos + 10, 
+				40, 22, 
+				_("14"));
+			btn_FT8n_select_5->tooltip(setsave);
+			btn_FT8n_select_5->color((Fl_Color)246);
+			btn_FT8n_select_5->callback((Fl_Callback*)cb_btn_band_select, (void *)5);
+
+			btn_FT8n_select_6 = new Fl_Button(
+				btn_FT8n_select_5->x() + btn_FT8n_select_5->w() + 4, ypos + 10, 
+				40, 22, 
+				_("18"));
+			btn_FT8n_select_6->tooltip(setsave);
+			btn_FT8n_select_6->color((Fl_Color)246);
+			btn_FT8n_select_6->callback((Fl_Callback*)cb_btn_band_select, (void *)6);
+
+			btn_FT8n_select_7 = new Fl_Button(
+				btn_FT8n_select_6->x() + btn_FT8n_select_6->w() + 4, ypos + 10, 
+				40, 22, 
+				_("21"));
+			btn_FT8n_select_7->tooltip(setsave);
+			btn_FT8n_select_7->color((Fl_Color)246);
+			btn_FT8n_select_7->callback((Fl_Callback*)cb_btn_band_select, (void *)7);
+
+			btn_FT8n_select_8 = new Fl_Button(
+				btn_FT8n_select_7->x() + btn_FT8n_select_7->w() + 4, ypos + 10, 
+				40, 22, 
+				_("24"));
+			btn_FT8n_select_8->tooltip(setsave);
+			btn_FT8n_select_8->color((Fl_Color)246);
+			btn_FT8n_select_8->callback((Fl_Callback*)cb_btn_band_select, (void *)8);
+
+			btn_FT8n_select_9 = new Fl_Button(
+				btn_FT8n_select_8->x() + btn_FT8n_select_8->w() + 4, ypos + 10, 
+				40, 22, 
+				_("28"));
+			btn_FT8n_select_9->tooltip(setsave);
+			btn_FT8n_select_9->color((Fl_Color)246);
+			btn_FT8n_select_9->callback((Fl_Callback*)cb_btn_band_select, (void *)9);
+
+			btn_FT8n_select_10 = new Fl_Button(
+				btn_FT8n_select_9->x() + btn_FT8n_select_9->w() + 4, ypos + 10, 
+				40, 22, 
+				_("50"));
+			btn_FT8n_select_10->tooltip(setsave);
+			btn_FT8n_select_10->color((Fl_Color)246);
+			btn_FT8n_select_10->callback((Fl_Callback*)cb_btn_band_select, (void *)10);
+
+			btn_FT8n_select_11 = new Fl_Button(
+				btn_FT8n_select_10->x() + btn_FT8n_select_10->w() + 4, ypos + 10, 
+				40, 22, 
+				_("144"));
+			btn_FT8n_select_11->tooltip(setsave);
+			btn_FT8n_select_11->color((Fl_Color)246);
+			btn_FT8n_select_11->callback((Fl_Callback*)cb_btn_band_select, (void *)11);
+
+			btn_FT8n_select_12 = new Fl_Button(
+				btn_FT8n_select_11->x() + btn_FT8n_select_11->w() + 4, ypos + 10, 
+				40, 22, 
+				_("430"));
+			btn_FT8n_select_12->tooltip(setsave);
+			btn_FT8n_select_12->color((Fl_Color)246);
+			btn_FT8n_select_12->callback((Fl_Callback*)cb_btn_band_select, (void *)12);
+
+		tab_FT8n_bands->end();
+
+		tab_FT8n_CTCSS = new Fl_Group(xpos, ypos, g->w(), tabs2_h, _("CTCSS"));
+
+			choice_FT8n_tTONE = new Fl_PL_tone(xpos + 70, ypos + 15, 75, 22, _("Tone X:"));
+			choice_FT8n_tTONE->align((Fl_Align)FL_ALIGN_LEFT);
+			choice_FT8n_tTONE->value(8);
+			choice_FT8n_tTONE->end();
+
+			choice_FT8n_rTONE = new Fl_PL_tone(
+				choice_FT8n_tTONE->x() + choice_FT8n_tTONE->w() + 30, ypos + 15, 75, 22, _("R:"));
+			choice_FT8n_rTONE->align((Fl_Align)FL_ALIGN_LEFT);
+			choice_FT8n_rTONE->value(8);
+			choice_FT8n_rTONE->end();
+
+			setTONES = new Fl_Button(
+				choice_FT8n_rTONE->x() + choice_FT8n_rTONE->w() + 5, ypos + 15, 80, 22, _("Set"));
+			setTONES->callback((Fl_Callback*)cb_tones, 0);
+
+			FMoffset = new Fl_ComboBox(
+				setTONES->x() + setTONES->w() + 50, ypos + 15, 100, 22, "");
+			FMoffset->tooltip(_("Select FM operation"));
+			FMoffset->box(FL_NO_BOX);
+			FMoffset->color(FL_BACKGROUND2_COLOR);
+			FMoffset->selection_color(FL_BACKGROUND_COLOR);
+			FMoffset->add("simplex|minus|plus");
+			FMoffset->index(0);
+
+			FMoff_freq = new cFreqControl(FMoffset->x() + FMoffset->w() + 5, ypos + 12, 100, 26, "5");
+			FMoff_freq->value(600);
+			Fl_Box *MHZ = new Fl_Box(FMoff_freq->x() + FMoff_freq->w() + 4, ypos + 12, 40, 26, "MHz");
+			MHZ->box(FL_FLAT_BOX);
+			MHZ->align(FL_ALIGN_CENTER);
+			MHZ->labelsize(16);
+
+			setOFFSET = new Fl_Button(
+				MHZ->x() + MHZ->w() + 5, ypos + 15, 80, 22, _("Set"));
+			setOFFSET->callback((Fl_Callback*)cb_offset, 0);
+
+		tab_FT8n_CTCSS->end();
+
 		tab_icom_bands = new Fl_Group(xpos, ypos, g->w(), tabs2_h, _("Bands"));
 			btn_icom_select_1 = new Fl_Button(
 				xpos + 4, ypos + 10, 40, 22,

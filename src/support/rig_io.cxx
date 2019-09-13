@@ -185,7 +185,7 @@ int readResponse()
 	return numread;
 }
 
-int sendCommand (string s, int nread)
+int sendCommand (string s, int nread, int wait)
 {
 	int numwrite = (int)s.size();
 
@@ -222,6 +222,7 @@ int sendCommand (string s, int nread)
 
 	int timeout = progStatus.comm_wait + 
 		(int)((nread + progStatus.comm_echo ? numwrite : 0)*11000.0/RigSerial->Baud());
+	timeout += wait;
 	while (timeout > 0) {
 		if (timeout > 10) MilliSleep(10);
 		else MilliSleep(timeout);

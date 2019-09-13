@@ -739,7 +739,7 @@ void read_preamp_att()
 void update_split(void *d)
 {
 	/*
-	if (xcvr_name == rig_FT950.name_ || xcvr_name == rig_FTdx1200.name_ ||
+	if (xcvr_name == rig_yaesu.name_ || xcvr_name == rig_FTdx1200.name_ ||
 		xcvr_name == rig_TS480SAT.name_ || xcvr_name == rig_TS480HX.name_ ||
 		xcvr_name == rig_TS590S.name_ || xcvr_name == rig_TS590SG.name_ ||
 		xcvr_name == rig_TS890S.name_ ||
@@ -3012,28 +3012,22 @@ void restore_rig_vals()
 	guard_lock serial_lock(&mutex_serial);
 	trace(1, "restore_rig_vals()");
 
-	useB = true;
-	selrig->selectB();
+	if (!useB) {
+		useB = true;
+		selrig->selectB();
+	}
 
-	if (selrig->name_ == rig_FT891.name_) {
-		// Mode must be set before VFO, since mode changes can shift frequency
-		if (progStatus.restore_mode) {
-			selrig->set_modeB(xcvr_vfoB.imode);
-			selrig->set_FILT(xcvr_vfoB.filter);
-		}
-		if (progStatus.restore_frequency)
-			selrig->set_vfoB(xcvr_vfoB.freq);
-	} else {
-		if (progStatus.restore_frequency)
-			selrig->set_vfoB(xcvr_vfoB.freq);
-		if (progStatus.restore_mode) {
-			selrig->set_modeB(xcvr_vfoB.imode);
-			selrig->set_FILT(xcvr_vfoB.filter);
-		}
+	if (progStatus.restore_mode) {
+		selrig->set_modeB(xcvr_vfoB.imode);
+		selrig->set_FILT(xcvr_vfoB.filter);
 	}
-	if (progStatus.restore_bandwidth) {
+
+	if (progStatus.restore_frequency)
+		selrig->set_vfoB(xcvr_vfoB.freq);
+
+	if (progStatus.restore_bandwidth)
 		selrig->set_bwB(xcvr_vfoB.iBW);
-	}
+
 	restore_rig_vals_(xcvr_vfoB);
 
 	trace(2, "Restored xcvr B:\n", print(xcvr_vfoB));
@@ -3041,24 +3035,17 @@ void restore_rig_vals()
 	useB = false;
 	selrig->selectA();
 
-	if (selrig->name_ == rig_FT891.name_) {
-		// Mode must be set before VFO, since mode changes can shift frequency
-		if (progStatus.restore_mode) {
-			selrig->set_modeA(xcvr_vfoA.imode);
-			selrig->set_FILT(xcvr_vfoA.filter);
-		}
-		if (progStatus.restore_frequency)
-			selrig->set_vfoA(xcvr_vfoA.freq);
-	} else {
-		if (progStatus.restore_frequency)
-			selrig->set_vfoA(xcvr_vfoA.freq);
-		if (progStatus.restore_mode) {
-			selrig->set_modeA(xcvr_vfoA.imode);
-			selrig->set_FILT(xcvr_vfoA.filter);
-		}
+	if (progStatus.restore_mode) {
+		selrig->set_modeA(xcvr_vfoA.imode);
+		selrig->set_FILT(xcvr_vfoA.filter);
 	}
+
+	if (progStatus.restore_frequency)
+		selrig->set_vfoA(xcvr_vfoA.freq);
+
 	if (progStatus.restore_bandwidth)
 		selrig->set_bwA(xcvr_vfoA.iBW);
+
 	restore_rig_vals_(xcvr_vfoA);
 
 	trace(2, "Restored xcvr A:\n", print(xcvr_vfoA));
@@ -3280,21 +3267,15 @@ void read_rig_vals()
 		selrig->selectA();		// second select call
 		yaesu891UpdateA(&xcvr_vfoA);
 	} else {
-//		if (xcvr_name == rig_K2.name || xcvr_name == rig_K3.name || xcvr_name == rig_KX3.name) {
-//			SelectB();
-//			read_vfoB_vals();
-//			SelectA();
-//			read_vfoA_vals();
-//		} else {
-			useB = true;
-			selrig->selectB();		// first select call
-			read_vfoB_vals();
-			useB = false;
-			selrig->selectA();		// second select call
-			read_vfoA_vals();
-//		}
+		useB = true;
+		selrig->selectB();		// first select call to FT897D
+		read_vfoB_vals();
+		useB = false;
+		selrig->selectA();		// second select call
+		read_vfoA_vals();
 	}
-
+//std::cout << "xcvr_vfoA.freq " << xcvr_vfoA.freq << std::endl;
+//std::cout << "xcvr_vfoB.freq " << xcvr_vfoB.freq << std::endl;
 	if (selrig->has_agc_control) {
 		progStatus.agc_level = selrig->get_agc();
 		redrawAGC();
@@ -3652,8 +3633,10 @@ void adjust_small_ui()
 		xcvr_name == rig_FT897D.name_ ||
 		xcvr_name == rig_FT920.name_ ) {
 		y -= 20;
-		btnPTT->position( btnPTT->x(), y);
+		btnPTT->position( mainwindow->w() - btnPTT->w() - btn_show_controls->w() - 10, y);
 		btnPTT->redraw();
+		btn_show_controls->position( btnPTT->x() + btnPTT->w() + 5, y );
+		btn_show_controls->redraw();
 	}
 
 	int use_AuxPort = (progStatus.aux_serial_port != "NONE");
@@ -3984,6 +3967,8 @@ void initTabs()
 	} else {
 
 		hidden_tabs->add(tab_yaesu_bands);
+		hidden_tabs->add(tab_FT8n_bands);
+		hidden_tabs->add(tab_FT8n_CTCSS);
 		hidden_tabs->add(tab_icom_bands);
 		hidden_tabs->add(genericCW);
 		hidden_tabs->add(genericQSK);
@@ -3995,12 +3980,17 @@ void initTabs()
 		hidden_tabs->add(tab7610);
 
 		if (selrig->has_band_selection) {
-			if (!selrig->ICOMrig) {
-				tabsGeneric->add(tab_yaesu_bands);
-				tab_yaesu_bands->redraw();
-			} else {
+			if (selrig->ICOMrig) {
 				tabsGeneric->add(tab_icom_bands);
 				tab_icom_bands->redraw();
+			} else if (selrig->name_ == rig_FT857D.name_ || selrig->name_ == rig_FT897D.name_) {
+				tabsGeneric->add(tab_FT8n_bands);
+				tabsGeneric->add(tab_FT8n_CTCSS);
+				tab_FT8n_bands->redraw();
+				tab_FT8n_CTCSS->redraw();
+			} else {
+				tabsGeneric->add(tab_yaesu_bands);
+				tab_yaesu_bands->redraw();
 			}
 		}
 
@@ -5375,61 +5365,44 @@ void init_VFOs()
 		vfoB.freq = progStatus.freq_B;
 		vfoB.imode = progStatus.imode_B;
 		vfoB.iBW = progStatus.iBW_B;
+//std::cout << "use Status data, vfoB.freq " << vfoB.freq << std::endl;
 
 		if (vfoB.iBW == -1)
 			vfoB.iBW = selrig->def_bandwidth(vfoB.imode);
 
-		FreqDispB->value(vfoB.freq);
-
 		useB = true;
 		selrig->selectB();
-		selrig->set_vfoB(vfoB.freq);
-
-		update_progress(progress->value() + 4);
 
 		selrig->set_modeB(vfoB.imode);
-
-		update_progress(progress->value() + 4);
-
 		selrig->set_bwB(vfoB.iBW);
+		selrig->set_vfoB(vfoB.freq);
+		FreqDispB->value(vfoB.freq);
 
 		update_progress(progress->value() + 4);
 
 		trace(2, "init_VFOs() vfoB ", printXCVR_STATE(vfoB).c_str());
 
 		vfoA.freq = progStatus.freq_A;
-
-		update_progress(progress->value() + 4);
-
 		vfoA.imode = progStatus.imode_A;
-
-		update_progress(progress->value() + 4);
-
 		vfoA.iBW = progStatus.iBW_A;
-
-		update_progress(progress->value() + 4);
 
 		if (vfoA.iBW == -1)
 			vfoA.iBW = selrig->def_bandwidth(vfoA.imode);
 
-		FreqDispA->value( vfoA.freq );
-
 		useB = false;
 		selrig->selectA();
-		selrig->set_vfoA(vfoA.freq);
-
-		update_progress(progress->value() + 4);
 
 		selrig->set_modeA(vfoA.imode);
+		selrig->set_bwA(vfoA.iBW);
+		selrig->set_vfoA(vfoA.freq);
+		FreqDispA->value( vfoA.freq );
+//std::cout << "use Status data, vfoA.freq " << vfoA.freq << std::endl;
 
 		update_progress(progress->value() + 4);
-
-		selrig->set_bwA(vfoA.iBW);
 
 		vfo = &vfoA;
 		updateBandwidthControl();
 		highlight_vfo((void *)0);
-		useB = false;
 
 		trace(2, "init_VFOs() vfoA ", printXCVR_STATE(vfoA).c_str());
 
@@ -5464,27 +5437,12 @@ void init_VFOs()
 			selrig->selectA();			// fourth select call
 			yaesu891UpdateA(&vfoA);
 		} else {
-			useB = true;
-			selrig->selectB();			// third select call
-			vfoB.freq = selrig->get_vfoB();
-			update_progress(progress->value() + 4);
-			vfoB.imode = selrig->get_modeB();
-			update_progress(progress->value() + 4);
-			vfoB.iBW = selrig->get_bwB();
-			update_progress(progress->value() + 4);
+			vfoB = xcvr_vfoB;
+			vfoA = xcvr_vfoA;
+//std::cout << "use rig data, vfoA.freq " << vfoA.freq << std::endl;
+//std::cout << "use rig data, vfoB.freq " << vfoB.freq << std::endl;
 			FreqDispB->value(vfoB.freq);
-			trace(2, "B: ", printXCVR_STATE(vfoB).c_str());
-
-			useB = false;
-			selrig->selectA();			// fourth select call
-			vfoA.freq = selrig->get_vfoA();
-			update_progress(progress->value() + 4);
-			vfoA.imode = selrig->get_modeA();
-			update_progress(progress->value() + 4);
-			vfoA.iBW = selrig->get_bwA();
-			update_progress(progress->value() + 4);
 			FreqDispA->value(vfoA.freq);
-			trace(2, "A: ", printXCVR_STATE(vfoA).c_str());
 		}
 
 
@@ -6253,9 +6211,182 @@ void cb_cw_delay()
 	selrig->set_cw_delay();
 }
 
+void set_band(int band)
+{
+	switch (band) {
+		case 1: progStatus.f160 = vfo->freq;
+				progStatus.m160 = vfo->imode;
+				progStatus.txT_160 = choice_FT8n_tTONE->value();
+				progStatus.rxT_160 = choice_FT8n_rTONE->value();
+				progStatus.offset_160 = FMoffset->index();
+				progStatus.oF_160 = FMoff_freq->value();
+				break; // 160 meters
+		case 2: progStatus.f80 = vfo->freq;
+				progStatus.m80 = vfo->imode;
+				progStatus.txT_80 = choice_FT8n_tTONE->value();
+				progStatus.rxT_80 = choice_FT8n_rTONE->value();
+				progStatus.offset_80 = FMoffset->index();
+				progStatus.oF_80 = FMoff_freq->value();
+				break; // 80 meters
+		case 3: progStatus.f40 = vfo->freq;
+				progStatus.m40 = vfo->imode;
+				progStatus.txT_40 = choice_FT8n_tTONE->value();
+				progStatus.rxT_40 = choice_FT8n_rTONE->value();
+				progStatus.offset_40 = FMoffset->index();
+				progStatus.oF_40 = FMoff_freq->value();
+				break; // 40 meters
+		case 4: progStatus.f30 = vfo->freq;
+				progStatus.m30 = vfo->imode;
+				progStatus.txT_30 = choice_FT8n_tTONE->value();
+				progStatus.rxT_30 = choice_FT8n_rTONE->value();
+				progStatus.offset_30 = FMoffset->index();
+				progStatus.oF_30 = FMoff_freq->value();
+				break; // 30 meters
+		case 5: progStatus.f20 = vfo->freq;
+				progStatus.m20 = vfo->imode;
+				progStatus.txT_20 = choice_FT8n_tTONE->value();
+				progStatus.rxT_20 = choice_FT8n_rTONE->value();
+				progStatus.offset_20 = FMoffset->index();
+				progStatus.oF_20 = FMoff_freq->value();
+				break; // 20 meters
+		case 6: progStatus.f17 = vfo->freq;
+				progStatus.m17 = vfo->imode;
+				progStatus.txT_17 = choice_FT8n_tTONE->value();
+				progStatus.rxT_17 = choice_FT8n_rTONE->value();
+				progStatus.offset_17 = FMoffset->index();
+				progStatus.oF_17 = FMoff_freq->value();
+				break; // 17 meters
+		case 7: progStatus.f15 = vfo->freq;
+				progStatus.m15 = vfo->imode;
+				progStatus.txT_15 = choice_FT8n_tTONE->value();
+				progStatus.rxT_15 = choice_FT8n_rTONE->value();
+				progStatus.offset_15 = FMoffset->index();
+				progStatus.oF_15 = FMoff_freq->value();
+				break; // 15 meters
+		case 8: progStatus.f12 = vfo->freq;
+				progStatus.m12 = vfo->imode;
+				progStatus.txT_12 = choice_FT8n_tTONE->value();
+				progStatus.rxT_12 = choice_FT8n_rTONE->value();
+				progStatus.offset_12 = FMoffset->index();
+				progStatus.oF_12 = FMoff_freq->value();
+				break; // 12 meters
+		case 9: progStatus.f10 = vfo->freq;
+				progStatus.m10 = vfo->imode;
+				progStatus.txT_10 = choice_FT8n_tTONE->value();
+				progStatus.rxT_10 = choice_FT8n_rTONE->value();
+				progStatus.offset_10 = FMoffset->index();
+				progStatus.oF_10 = FMoff_freq->value();
+				break; // 10 meters
+		case 10:progStatus.f6 = vfo->freq;
+				progStatus.m6 = vfo->imode;
+				progStatus.txT_6 = choice_FT8n_tTONE->value();
+				progStatus.rxT_6 = choice_FT8n_rTONE->value();
+				progStatus.offset_6 = FMoffset->index();
+				progStatus.oF_6 = FMoff_freq->value();
+				break; // 6 meters
+		case 11:progStatus.f2 = vfo->freq;
+				progStatus.m2 = vfo->imode;
+				progStatus.txT_2 = choice_FT8n_tTONE->value();
+				progStatus.rxT_2 = choice_FT8n_rTONE->value();
+				progStatus.offset_2 = FMoffset->index();
+				progStatus.oF_2 = FMoff_freq->value();
+				break; // 2 meters
+		case 12:progStatus.f70 = vfo->freq;
+				progStatus.m70 = vfo->imode;
+				progStatus.txT_70 = choice_FT8n_tTONE->value();
+				progStatus.rxT_70 = choice_FT8n_rTONE->value();
+				progStatus.offset_70 = FMoffset->index();
+				progStatus.oF_70 = FMoff_freq->value();
+				break; // 70 cent'
+	}
+}
+
+
+void updateCTCSS(int band)
+{
+	switch (band) {
+		case 1: choice_FT8n_tTONE->value(progStatus.txT_160);
+				choice_FT8n_rTONE->value(progStatus.txT_160);
+				FMoffset->index(progStatus.offset_160);
+				FMoff_freq->value(progStatus.oF_160 );
+				break; // 160 meters
+		case 2: choice_FT8n_tTONE->value(progStatus.txT_80);
+				choice_FT8n_rTONE->value(progStatus.txT_80);
+				FMoffset->index(progStatus.offset_80);
+				FMoff_freq->value(progStatus.oF_80 );
+				break; // 80 meters
+		case 3: choice_FT8n_tTONE->value(progStatus.txT_40);
+				choice_FT8n_rTONE->value(progStatus.txT_40);
+				FMoffset->index(progStatus.offset_40);
+				FMoff_freq->value(progStatus.oF_40 );
+				break; // 40 meters
+		case 4: choice_FT8n_tTONE->value(progStatus.txT_30);
+				choice_FT8n_rTONE->value(progStatus.txT_30);
+				FMoffset->index(progStatus.offset_30);
+				FMoff_freq->value(progStatus.oF_30 );
+				break; // 30 meters
+		case 5: choice_FT8n_tTONE->value(progStatus.txT_20);
+				choice_FT8n_rTONE->value(progStatus.txT_20);
+				FMoffset->index(progStatus.offset_20);
+				FMoff_freq->value(progStatus.oF_20 );
+				break; // 20 meters
+		case 6: choice_FT8n_tTONE->value(progStatus.txT_17);
+				choice_FT8n_rTONE->value(progStatus.txT_17);
+				FMoffset->index(progStatus.offset_17);
+				FMoff_freq->value(progStatus.oF_17 );
+				break; // 17 meters
+		case 7: choice_FT8n_tTONE->value(progStatus.txT_15);
+				choice_FT8n_rTONE->value(progStatus.txT_15);
+				FMoffset->index(progStatus.offset_15);
+				FMoff_freq->value(progStatus.oF_15 );
+				break; // 15 meters
+		case 8: choice_FT8n_tTONE->value(progStatus.txT_12);
+				choice_FT8n_rTONE->value(progStatus.txT_12);
+				FMoffset->index(progStatus.offset_12);
+				FMoff_freq->value(progStatus.oF_12 );
+				break; // 12 meters
+		case 9: choice_FT8n_tTONE->value(progStatus.txT_10);
+				choice_FT8n_rTONE->value(progStatus.txT_10);
+				FMoffset->index(progStatus.offset_10);
+				FMoff_freq->value(progStatus.oF_10 );
+				break; // 10 meters
+		case 10:choice_FT8n_tTONE->value(progStatus.txT_6);
+				choice_FT8n_rTONE->value(progStatus.txT_6);
+				FMoffset->index(progStatus.offset_6);
+				FMoff_freq->value(progStatus.oF_6 );
+				break; // 6 meters
+		case 11:choice_FT8n_tTONE->value(progStatus.txT_2);
+				choice_FT8n_rTONE->value(progStatus.txT_2);
+				FMoffset->index(progStatus.offset_2);
+				FMoff_freq->value(progStatus.oF_2 );
+				break; // 2 meters
+		case 12:choice_FT8n_tTONE->value(progStatus.txT_70);
+				choice_FT8n_rTONE->value(progStatus.txT_70);
+				FMoffset->index(progStatus.offset_70);
+				FMoff_freq->value(progStatus.oF_70 );
+				progStatus.m70 = vfo->imode;
+				break; // 70 cent'
+	}
+}
+
 void cbBandSelect(int band)
 {
 	guard_lock gl_serial(&mutex_serial);
+
+	if (xcvr_name == rig_FT857D.name_ || xcvr_name == rig_FT897D.name_ ) {
+		if (Fl::event_button() == FL_LEFT_MOUSE) {
+			selrig->set_band_selection(band);
+			updateCTCSS(band);
+			if (band > 8) { // 10, 6, 2, 70
+				int tTONE = PL_tones[choice_FT8n_tTONE->value()];
+				int rTONE = PL_tones[choice_FT8n_rTONE->value()];
+				selrig->set_tones(tTONE, rTONE);
+				selrig->set_offset(FMoffset->index(), FMoff_freq->value());
+			}
+		} else if (Fl::event_button() == FL_RIGHT_MOUSE)
+			set_band(band);
+		return;
+	}
 
 	if (Fl::event_button() == FL_RIGHT_MOUSE) {
 		selrig->rTONE = choice_rTONE->value();

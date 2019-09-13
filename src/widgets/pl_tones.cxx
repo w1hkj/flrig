@@ -28,8 +28,7 @@
 #define BORDER 2
 
 /** 
- This widget creates a modal window for selecting a color from the colormap.
- Pretty much unchanged from Forms.
+ This widget creates a modal window for selecting a tone from a CTCSS map.
 */
 static const char *szTONES[] = {
  "67.0",  "69.3",  "71.9",  "74.4",  "77.0",

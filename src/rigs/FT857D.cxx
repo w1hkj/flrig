@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <iostream>
+
 #include "FT857D.h"
 #include "support.h"
 
@@ -56,14 +58,15 @@ RIG_FT857D::RIG_FT857D() {
 	has_power_out =
 	has_mode_control = true;
 
+	has_band_selection = true;
+
 	precision = 10;
-	ndigits = 8;
+	ndigits = 9;
 
 };
 
 RIG_FT897D::RIG_FT897D() {
 	name_ = FT897Dname_;
-	onB = false;
 };
 
 void RIG_FT857D::init_cmd()
@@ -77,13 +80,13 @@ bool RIG_FT857D::check ()
 	init_cmd();
 	cmd[4] = 0x03;
 	int ret = waitN(5, 100, "check", HEX);
-	if (ret >= 5) return true;
-	return false;
+	if (ret < 5) return false;
+	return true;
 }
 
 long RIG_FT857D::get_vfoA ()
 {
-	if (useB) return freqA;
+//	if (useB) return freqA;
 	init_cmd();
 	cmd[4] = 0x03;
 	int ret = waitN(5, 100, "get vfo A", HEX);
@@ -106,13 +109,13 @@ void RIG_FT857D::set_vfoA (long freq)
 	cmd = to_bcd(freq, 8);
 	cmd += 0x01;
 	replystr.clear();
-	sendCommand(cmd);
+	sendCommand(cmd, 0, 50);
 	showresp(INFO, HEX, "set vfo A", cmd, "");
 }
 
 long RIG_FT857D::get_vfoB ()
 {
-	if (!useB) return freqB;
+//	if (!useB) return freqB;
 	init_cmd();
 	cmd[4] = 0x03;
 	int ret = waitN(5, 100, "get vfo B", HEX);
@@ -135,7 +138,7 @@ void RIG_FT857D::set_vfoB (long freq)
 	cmd = to_bcd(freq, 8);
 	cmd += 0x01;
 	replystr.clear();
-	sendCommand(cmd);
+	sendCommand(cmd, 0, 50);
 	showresp(INFO, HEX, "set vfo B", cmd, "");
 }
 
@@ -163,7 +166,7 @@ void RIG_FT857D::set_modeA(int val)
 	cmd[0] = FT857D_mode_val[val];
 	cmd[4] = 0x07;
 	replystr.clear();
-	sendCommand(cmd);
+	sendCommand(cmd, 0, 50);
 	showresp(INFO, HEX, "set mode A", cmd, "");
 }
 
@@ -174,7 +177,7 @@ void RIG_FT857D::set_modeB(int val)
 	cmd[0] = FT857D_mode_val[val];
 	cmd[4] = 0x07;
 	replystr.clear();
-	sendCommand(cmd);
+	sendCommand(cmd, 0, 50);
 	showresp(INFO, HEX, "set mode B", cmd, "");
 }
 
@@ -185,7 +188,7 @@ void RIG_FT857D::set_PTT_control(int val)
 	if (val) cmd[4] = 0x08;
 	else	 cmd[4] = 0x88;
 	replystr.clear();
-	sendCommand(cmd);
+	sendCommand(cmd, 0, 20);
 	showresp(INFO, HEX, "set PTT", cmd, "");
 	ptt_ = val;
 }
@@ -220,23 +223,19 @@ int  RIG_FT857D::get_smeter(void)
 
 void RIG_FT857D::selectA()
 {
-	if (!onB) return;
-	onB = false;
 	init_cmd();
 	cmd[4] = 0x81; // this is a toggle ... no way of knowing which is A or B
 	replystr.clear();
-	sendCommand(cmd);
+	sendCommand(cmd, 0, 100);
 	showresp(INFO, HEX, "select A", cmd, "");
 }
 
 void RIG_FT857D::selectB()
 {
-	if (onB) return;
-	onB = true;
 	init_cmd();
 	cmd[4] = 0x81; // this is a toggle ... no way of knowing which is A or B
 	replystr.clear();
-	sendCommand(cmd);
+	sendCommand(cmd, 0, 100);
 	showresp(INFO, HEX, "select B", cmd, "");
 }
 
@@ -252,11 +251,63 @@ void RIG_FT857D::set_split(bool val)
 	init_cmd();
 	if (val) {
 		cmd[4] = 0x02;
-		sendCommand(cmd);
+		sendCommand(cmd, 0, 100);
 		showresp(INFO, HEX, "set split ON", cmd, "");
 	} else {
 		cmd[4] = 0x82;
-		sendCommand(cmd);
+		sendCommand(cmd, 0, 100);
 		showresp(INFO, HEX, "set split OFF", cmd, "");
 	}
+}
+
+void RIG_FT857D::set_band_selection(int v)
+{
+	long freq = 14070000L;
+	int  mode = 0;
+	switch (v) {
+		case 1: freq = progStatus.f160; mode = progStatus.m160; break; // 160 meters
+		case 2: freq = progStatus.f80;  mode = progStatus.m80;  break; // 80 meters
+		case 3: freq = progStatus.f40;  mode = progStatus.m40;  break; // 40 meters
+		case 4: freq = progStatus.f30;  mode = progStatus.m30;  break; // 30 meters
+		case 5: freq = progStatus.f20;  mode = progStatus.m20;  break; // 20 meters
+		case 6: freq = progStatus.f17;  mode = progStatus.m17;  break; // 17 meters
+		case 7: freq = progStatus.f15;  mode = progStatus.m15;  break; // 15 meters
+		case 8: freq = progStatus.f12;  mode = progStatus.m12;  break; // 12 meters
+		case 9: freq = progStatus.f10;  mode = progStatus.m10;  break; // 10 meters
+		case 10: freq = progStatus.f6;  mode = progStatus.m6;   break; // 6 meters
+		case 11: freq = progStatus.f2;  mode = progStatus.m2;   break; // 2 meters
+		case 12: freq = progStatus.f70; mode = progStatus.m70;  break; // 70 cent'
+	}
+	if (useB) {
+		set_modeB(mode);
+		set_vfoB(freq);
+	} else {
+		set_modeA(mode);
+		set_vfoA(freq);
+	}
+}
+
+void RIG_FT857D::set_tones(int tx, int rx)
+{
+	cmd.clear();
+	cmd.assign(to_bcd(tx, 4));
+	cmd.append(to_bcd(rx, 4));
+	cmd += 0x0B;
+	sendCommand(cmd, 0, 50);
+}
+
+// 0 - simplex, 1 - minus, 2 - plus
+void RIG_FT857D::set_offset(int indx, int offset)
+{
+	cmd.clear();
+	cmd += (indx == 0) ? 0x89 : (indx == 1) ? 0x09 : 0x49;
+	cmd.append("   ");
+	cmd += 0x09;
+	sendCommand(cmd, 0, 50);
+
+	offset *= 100;
+	cmd.clear();
+	cmd.assign(to_bcd(offset - (offset % 100), 8));
+	cmd += 0xF9;
+	sendCommand(cmd, 0, 50);
 }
