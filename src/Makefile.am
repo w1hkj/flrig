@@ -173,6 +173,7 @@ flrig_SOURCES += \
 	rigs/IC7800.cxx \
 	rigs/IC7851.cxx \
 	rigs/IC9100.cxx \
+	rigs/IC9700.cxx \
 	rigs/IC7700.cxx \
 	rigs/ICF8101.cxx \
 	rigs/KENWOOD.cxx \
@@ -308,6 +309,7 @@ EXTRA_DIST = \
 	include/IC7800.h \
 	include/IC7851.h \
 	include/IC9100.h \
+	include/IC9700.h \
 	include/ICF8101.h \
 	include/images.h \
 	include/K2.h \
