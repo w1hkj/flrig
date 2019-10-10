@@ -132,7 +132,11 @@ Fl_Button *btn_viewtrace = (Fl_Button *)0;
 //Fl_Int_Input *server_port = (Fl_Int_Input *)0;
 //Fl_Check_Button *btn_xmlrpc_server = (Fl_Check_Button *)0;
 
-Fl_Group *tabCmds = (Fl_Group *)0;
+Fl_Group *tabCommands = (Fl_Group *)0;
+Fl_Tabs  *tabCmds = (Fl_Tabs *)0;
+Fl_Group *tabCmds1 = (Fl_Group *)0;
+Fl_Group *tabCmds2 = (Fl_Group *)0;
+
 Fl_Box *bx1 = (Fl_Box *)0;
 Fl_Box *bx2 = (Fl_Box *)0;
 Fl_Input2 * cmdlbl1 = (Fl_Input2 *)0;
@@ -143,6 +147,15 @@ Fl_Input2 * cmdlbl5 = (Fl_Input2 *)0;
 Fl_Input2 * cmdlbl6 = (Fl_Input2 *)0;
 Fl_Input2 * cmdlbl7 = (Fl_Input2 *)0;
 Fl_Input2 * cmdlbl8 = (Fl_Input2 *)0;
+Fl_Input2 * cmdlbl9 = (Fl_Input2 *)0;
+Fl_Input2 * cmdlbl10 = (Fl_Input2 *)0;
+Fl_Input2 * cmdlbl11 = (Fl_Input2 *)0;
+Fl_Input2 * cmdlbl12 = (Fl_Input2 *)0;
+Fl_Input2 * cmdlbl13 = (Fl_Input2 *)0;
+Fl_Input2 * cmdlbl14 = (Fl_Input2 *)0;
+Fl_Input2 * cmdlbl15 = (Fl_Input2 *)0;
+Fl_Input2 * cmdlbl16 = (Fl_Input2 *)0;
+
 Fl_Input2 * cmdtext1 = (Fl_Input2 *)0;
 Fl_Input2 * cmdtext2 = (Fl_Input2 *)0;
 Fl_Input2 * cmdtext3 = (Fl_Input2 *)0;
@@ -151,6 +164,15 @@ Fl_Input2 * cmdtext5 = (Fl_Input2 *)0;
 Fl_Input2 * cmdtext6 = (Fl_Input2 *)0;
 Fl_Input2 * cmdtext7 = (Fl_Input2 *)0;
 Fl_Input2 * cmdtext8 = (Fl_Input2 *)0;
+Fl_Input2 * cmdtext9 = (Fl_Input2 *)0;
+Fl_Input2 * cmdtext10 = (Fl_Input2 *)0;
+Fl_Input2 * cmdtext11 = (Fl_Input2 *)0;
+Fl_Input2 * cmdtext12 = (Fl_Input2 *)0;
+Fl_Input2 * cmdtext13 = (Fl_Input2 *)0;
+Fl_Input2 * cmdtext14 = (Fl_Input2 *)0;
+Fl_Input2 * cmdtext15 = (Fl_Input2 *)0;
+Fl_Input2 * cmdtext16 = (Fl_Input2 *)0;
+
 Fl_Output * cmdResponse = (Fl_Output *)0;
 
 Fl_Group *tabRestore = (Fl_Group *)0;
@@ -593,79 +615,48 @@ static void cb_btn_icom_post(Fl_Button *o, void*) {
 }
 
 static void cb_cmdlbl(Fl_Input2 *o, void *d) {
-	long val = reinterpret_cast<long>(d);
-	switch (val) {
-		case 1: 
-			progStatus.label1 = o->value();
-			btnUser1->label(o->value()); 
-			btnUser1->redraw_label();
-			break;
-		case 2: 
-			progStatus.label2 = o->value();
-			btnUser2->label(o->value()); 
-			btnUser2->redraw_label();
-			break;
-		case 3: 
-			progStatus.label3 = o->value();
-			btnUser3->label(o->value()); 
-			btnUser3->redraw_label();
-			break;
-		case 4: 
-			progStatus.label4 = o->value();
-			btnUser4->label(o->value()); 
-			btnUser4->redraw_label();
-			break;
-		case 5: 
-			progStatus.label5 = o->value();
-			btnUser5->label(o->value()); 
-			btnUser5->redraw_label();
-			break;
-		case 6: 
-			progStatus.label6 = o->value();
-			btnUser6->label(o->value()); 
-			btnUser6->redraw_label();
-			break;
-		case 7: 
-			progStatus.label7 = o->value();
-			btnUser7->label(o->value()); 
-			btnUser7->redraw_label();
-			break;
-		case 8: 
-			progStatus.label8 = o->value();
-			btnUser8->label(o->value()); 
-			btnUser8->redraw_label();
-			break;
-	}
+	long val = reinterpret_cast<long>(d) - 1;
+	struct BPAIR { std::string *plbl; Fl_Button *b; } bpairs[] =
+	{ { &progStatus.label1, btnUser1 },
+	  { &progStatus.label2, btnUser2 },
+	  { &progStatus.label3, btnUser3 },
+	  { &progStatus.label4, btnUser4 },
+	  { &progStatus.label5, btnUser5 },
+	  { &progStatus.label6, btnUser6 },
+	  { &progStatus.label7, btnUser7 },
+	  { &progStatus.label8, btnUser8 },
+	  { &progStatus.label9, btnUser9 },
+	  { &progStatus.label10, btnUser10 },
+	  { &progStatus.label11, btnUser11 },
+	  { &progStatus.label12, btnUser12 },
+	  { &progStatus.label13, btnUser13 },
+	  { &progStatus.label14, btnUser14 },
+	  { &progStatus.label15, btnUser15 },
+	  { &progStatus.label16, btnUser16 } };
+
+	if (val < 0) val = 0;
+	if (val > 15) val = 15;
+
+	*bpairs[val].plbl = o->value();
+	bpairs[val].b->label(o->value());
+	bpairs[val].b->redraw_label();
 }
 
 static void cb_cmdtext(Fl_Input2 *o, void *d) {
-	long val = reinterpret_cast<long>(d);
-	switch (val) {
-		case 1: 
-			progStatus.command1 = o->value();
-			break;
-		case 2: 
-			progStatus.command2 = o->value();
-			break;
-		case 3: 
-			progStatus.command3 = o->value();
-			break;
-		case 4: 
-			progStatus.command4 = o->value();
-			break;
-		case 5: 
-			progStatus.command5 = o->value();
-			break;
-		case 6: 
-			progStatus.command6 = o->value();
-			break;
-		case 7: 
-			progStatus.command7 = o->value();
-			break;
-		case 8: 
-			progStatus.command8 = o->value();
-			break;
-	}
+	long val = reinterpret_cast<long>(d) - 1;
+	std::string *cmd[] =
+	{ &progStatus.command1, &progStatus.command2,
+	  &progStatus.command3, &progStatus.command4,
+	  &progStatus.command5, &progStatus.command6,
+	  &progStatus.command7, &progStatus.command8,
+	  &progStatus.command9, &progStatus.command10,
+	  &progStatus.command11, &progStatus.command12,
+	  &progStatus.command13, &progStatus.command14,
+	  &progStatus.command15, &progStatus.command16 };
+	if (val < 0) val = 0;
+	if (val > 15) val = 15;
+
+	*cmd[val] = o->value();
 }
 
 static void cb_btnOkXcvrDialog(Fl_Return_Button*, void*) {
@@ -1515,99 +1506,201 @@ _("Enter text as ASCII string\nOr sequence of hex values, x80 etc separated by s
 
 	tabSndCmd->end();
 
-	tabCmds = new Fl_Group(2, 26, 486, 226, _("Cmds"));
-		tabCmds->hide();
-		bx1 = new Fl_Box(15, 32, 80, 22, "Label");
-		bx1->box(FL_FLAT_BOX);
-		bx1->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
-		bx2 = new Fl_Box(100, 32, 370, 22, "Command");
-		bx2->box(FL_FLAT_BOX);
-		bx2->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+	tabCommands = new Fl_Group(2, 26, 486, 226, _("Cmds"));
+		
+		Fl_Tabs *tabCmds = new Fl_Tabs(2, 26, 486, 226);
 
-		cmdlbl1 = new Fl_Input2(15, 54, 80, 20, "1");
-		cmdlbl1->align(FL_ALIGN_LEFT);
-		cmdlbl1->value(progStatus.label1.c_str());
-		cmdlbl1->callback((Fl_Callback*)cb_cmdlbl, (void *)1);
+		tabCmds1 = new Fl_Group(2, 48, 486, 204, _("1-8"));
+		
+			bx1 = new Fl_Box(25, 50, 75, 16, "Label");
+			bx1->box(FL_FLAT_BOX);
+			bx1->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
 
-		cmdtext1 = new Fl_Input2(100, 54, 370, 20, "");
-		cmdtext1->align(FL_ALIGN_LEFT);
-		cmdtext1->value(progStatus.command1.c_str());
-		cmdtext1->callback((Fl_Callback*)cb_cmdtext, (void *)1);
+			bx2 = new Fl_Box(105, 50, 370, 16, "Command");
+			bx2->box(FL_FLAT_BOX);
+			bx2->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
 
-		cmdlbl2 = new Fl_Input2(15, 74, 80, 20, "2");
-		cmdlbl2->align(FL_ALIGN_LEFT);
-		cmdlbl2->value(progStatus.label2.c_str());
-		cmdlbl2->callback((Fl_Callback*)cb_cmdlbl, (void *)2);
+			cmdlbl1 = new Fl_Input2(25, 66, 80, 20, "1");
+			cmdlbl1->align(FL_ALIGN_LEFT);
+			cmdlbl1->value(progStatus.label1.c_str());
+			cmdlbl1->callback((Fl_Callback*)cb_cmdlbl, (void *)1);
 
-		cmdtext2 = new Fl_Input2(100, 74, 370, 20, "");
-		cmdtext2->align(FL_ALIGN_LEFT);
-		cmdtext2->value(progStatus.command2.c_str());
-		cmdtext2->callback((Fl_Callback*)cb_cmdtext, (void *)2);
+			cmdtext1 = new Fl_Input2(105, 66, 380, 20, "");
+			cmdtext1->align(FL_ALIGN_LEFT);
+			cmdtext1->value(progStatus.command1.c_str());
+			cmdtext1->callback((Fl_Callback*)cb_cmdtext, (void *)1);
 
-		cmdlbl3 = new Fl_Input2(15, 94, 80, 20, "3");
-		cmdlbl3->align(FL_ALIGN_LEFT);
-		cmdlbl3->value(progStatus.label3.c_str());
-		cmdlbl3->callback((Fl_Callback*)cb_cmdlbl, (void *)3);
+			cmdlbl2 = new Fl_Input2(25, 86, 80, 20, "2");
+			cmdlbl2->align(FL_ALIGN_LEFT);
+			cmdlbl2->value(progStatus.label2.c_str());
+			cmdlbl2->callback((Fl_Callback*)cb_cmdlbl, (void *)2);
 
-		cmdtext3 = new Fl_Input2(100, 94, 370, 20, "");
-		cmdtext3->align(FL_ALIGN_LEFT);
-		cmdtext3->value(progStatus.command3.c_str());
-		cmdtext3->callback((Fl_Callback*)cb_cmdtext, (void *)3);
+			cmdtext2 = new Fl_Input2(105, 86, 380, 20, "");
+			cmdtext2->align(FL_ALIGN_LEFT);
+			cmdtext2->value(progStatus.command2.c_str());
+			cmdtext2->callback((Fl_Callback*)cb_cmdtext, (void *)2);
 
-		cmdlbl4 = new Fl_Input2(15, 114, 80, 20, "4");
-		cmdlbl4->align(FL_ALIGN_LEFT);
-		cmdlbl4->value(progStatus.label4.c_str());
-		cmdlbl4->callback((Fl_Callback*)cb_cmdlbl, (void *)4);
+			cmdlbl3 = new Fl_Input2(25, 106, 80, 20, "3");
+			cmdlbl3->align(FL_ALIGN_LEFT);
+			cmdlbl3->value(progStatus.label3.c_str());
+			cmdlbl3->callback((Fl_Callback*)cb_cmdlbl, (void *)3);
 
-		cmdtext4 = new Fl_Input2(100, 114, 370, 20, "");
-		cmdtext4->align(FL_ALIGN_LEFT);
-		cmdtext4->value(progStatus.command4.c_str());
-		cmdtext4->callback((Fl_Callback*)cb_cmdtext, (void *)4);
+			cmdtext3 = new Fl_Input2(105, 106, 380, 20, "");
+			cmdtext3->align(FL_ALIGN_LEFT);
+			cmdtext3->value(progStatus.command3.c_str());
+			cmdtext3->callback((Fl_Callback*)cb_cmdtext, (void *)3);
 
-		cmdlbl5 = new Fl_Input2(15, 134, 80, 20, "5");
-		cmdlbl5->align(FL_ALIGN_LEFT);
-		cmdlbl5->value(progStatus.label5.c_str());
-		cmdlbl5->callback((Fl_Callback*)cb_cmdlbl, (void *)5);
+			cmdlbl4 = new Fl_Input2(25, 126, 80, 20, "4");
+			cmdlbl4->align(FL_ALIGN_LEFT);
+			cmdlbl4->value(progStatus.label4.c_str());
+			cmdlbl4->callback((Fl_Callback*)cb_cmdlbl, (void *)4);
 
-		cmdtext5 = new Fl_Input2(100, 134, 370, 20, "");
-		cmdtext5->align(FL_ALIGN_LEFT);
-		cmdtext5->value(progStatus.command5.c_str());
-		cmdtext5->callback((Fl_Callback*)cb_cmdtext, (void *)5);
+			cmdtext4 = new Fl_Input2(105, 126, 380, 20, "");
+			cmdtext4->align(FL_ALIGN_LEFT);
+			cmdtext4->value(progStatus.command4.c_str());
+			cmdtext4->callback((Fl_Callback*)cb_cmdtext, (void *)4);
 
-		cmdlbl6 = new Fl_Input2(15, 154, 80, 20, "6");
-		cmdlbl6->align(FL_ALIGN_LEFT);
-		cmdlbl6->value(progStatus.label6.c_str());
-		cmdlbl6->callback((Fl_Callback*)cb_cmdlbl, (void *)6);
+			cmdlbl5 = new Fl_Input2(25, 146, 80, 20, "5");
+			cmdlbl5->align(FL_ALIGN_LEFT);
+			cmdlbl5->value(progStatus.label5.c_str());
+			cmdlbl5->callback((Fl_Callback*)cb_cmdlbl, (void *)5);
 
-		cmdtext6 = new Fl_Input2(100, 154, 370, 20, "");
-		cmdtext6->align(FL_ALIGN_LEFT);
-		cmdtext6->value(progStatus.command6.c_str());
-		cmdtext6->callback((Fl_Callback*)cb_cmdtext, (void *)6);
+			cmdtext5 = new Fl_Input2(105, 146, 380, 20, "");
+			cmdtext5->align(FL_ALIGN_LEFT);
+			cmdtext5->value(progStatus.command5.c_str());
+			cmdtext5->callback((Fl_Callback*)cb_cmdtext, (void *)5);
 
-		cmdlbl7 = new Fl_Input2(15, 174, 80, 20, "7");
-		cmdlbl7->align(FL_ALIGN_LEFT);
-		cmdlbl7->value(progStatus.label7.c_str());
-		cmdlbl7->callback((Fl_Callback*)cb_cmdlbl, (void *)7);
+			cmdlbl6 = new Fl_Input2(25, 166, 80, 20, "6");
+			cmdlbl6->align(FL_ALIGN_LEFT);
+			cmdlbl6->value(progStatus.label6.c_str());
+			cmdlbl6->callback((Fl_Callback*)cb_cmdlbl, (void *)6);
 
-		cmdtext7 = new Fl_Input2(100, 174, 370, 20, "");
-		cmdtext7->align(FL_ALIGN_LEFT);
-		cmdtext7->value(progStatus.command7.c_str());
-		cmdtext7->callback((Fl_Callback*)cb_cmdtext, (void *)7);
+			cmdtext6 = new Fl_Input2(105, 166, 380, 20, "");
+			cmdtext6->align(FL_ALIGN_LEFT);
+			cmdtext6->value(progStatus.command6.c_str());
+			cmdtext6->callback((Fl_Callback*)cb_cmdtext, (void *)6);
 
-		cmdlbl8 = new Fl_Input2(15, 194, 80, 20, "8");
-		cmdlbl8->align(FL_ALIGN_LEFT);
-		cmdlbl8->value(progStatus.label8.c_str());
-		cmdlbl8->callback((Fl_Callback*)cb_cmdlbl, (void *)8);
+			cmdlbl7 = new Fl_Input2(25, 186, 80, 20, "7");
+			cmdlbl7->align(FL_ALIGN_LEFT);
+			cmdlbl7->value(progStatus.label7.c_str());
+			cmdlbl7->callback((Fl_Callback*)cb_cmdlbl, (void *)7);
 
-		cmdtext8 = new Fl_Input2(100, 194, 370, 20, "");
-		cmdtext8->align(FL_ALIGN_LEFT);
-		cmdtext8->value(progStatus.command8.c_str());
-		cmdtext8->callback((Fl_Callback*)cb_cmdtext, (void *)8);
+			cmdtext7 = new Fl_Input2(105, 186, 380, 20, "");
+			cmdtext7->align(FL_ALIGN_LEFT);
+			cmdtext7->value(progStatus.command7.c_str());
+			cmdtext7->callback((Fl_Callback*)cb_cmdtext, (void *)7);
 
-		cmdResponse = new Fl_Output(100, 218, 370, 20, "Response:");
+			cmdlbl8 = new Fl_Input2(25, 206, 80, 20, "8");
+			cmdlbl8->align(FL_ALIGN_LEFT);
+			cmdlbl8->value(progStatus.label8.c_str());
+			cmdlbl8->callback((Fl_Callback*)cb_cmdlbl, (void *)8);
+
+			cmdtext8 = new Fl_Input2(105, 206, 380, 20, "");
+			cmdtext8->align(FL_ALIGN_LEFT);
+			cmdtext8->value(progStatus.command8.c_str());
+			cmdtext8->callback((Fl_Callback*)cb_cmdtext, (void *)8);
+
+		tabCmds1->end();
+
+		tabCmds2 = new Fl_Group(2, 48, 486, 204, _("9-16"));
+			tabCmds2->hide();
+		
+			Fl_Box *bx2a = new Fl_Box(25, 50, 75, 16, "Label");
+			bx2a->box(FL_FLAT_BOX);
+			bx2a->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+
+			Fl_Box *bx2b = new Fl_Box(105, 50, 370, 16, "Command");
+			bx2b->box(FL_FLAT_BOX);
+			bx2b->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+
+			cmdlbl9 = new Fl_Input2(25, 66, 80, 20, "9");
+			cmdlbl9->align(FL_ALIGN_LEFT);
+			cmdlbl9->value(progStatus.label9.c_str());
+			cmdlbl9->callback((Fl_Callback*)cb_cmdlbl, (void *)9);
+
+			cmdtext9 = new Fl_Input2(105, 66, 380, 20, "");
+			cmdtext9->align(FL_ALIGN_LEFT);
+			cmdtext9->value(progStatus.command9.c_str());
+			cmdtext9->callback((Fl_Callback*)cb_cmdtext, (void *)9);
+
+			cmdlbl10 = new Fl_Input2(25, 86, 80, 20, "10");
+			cmdlbl10->align(FL_ALIGN_LEFT);
+			cmdlbl10->value(progStatus.label10.c_str());
+			cmdlbl10->callback((Fl_Callback*)cb_cmdlbl, (void *)10);
+
+			cmdtext10 = new Fl_Input2(105, 86, 380, 20, "");
+			cmdtext10->align(FL_ALIGN_LEFT);
+			cmdtext10->value(progStatus.command10.c_str());
+			cmdtext10->callback((Fl_Callback*)cb_cmdtext, (void *)10);
+
+			cmdlbl11 = new Fl_Input2(25, 106, 80, 20, "11");
+			cmdlbl11->align(FL_ALIGN_LEFT);
+			cmdlbl11->value(progStatus.label11.c_str());
+			cmdlbl11->callback((Fl_Callback*)cb_cmdlbl, (void *)11);
+
+			cmdtext11 = new Fl_Input2(105, 106, 380, 20, "");
+			cmdtext11->align(FL_ALIGN_LEFT);
+			cmdtext11->value(progStatus.command11.c_str());
+			cmdtext11->callback((Fl_Callback*)cb_cmdtext, (void *)11);
+
+			cmdlbl12 = new Fl_Input2(25, 126, 80, 20, "12");
+			cmdlbl12->align(FL_ALIGN_LEFT);
+			cmdlbl12->value(progStatus.label12.c_str());
+			cmdlbl12->callback((Fl_Callback*)cb_cmdlbl, (void *)12);
+
+			cmdtext12 = new Fl_Input2(105, 126, 380, 20, "");
+			cmdtext12->align(FL_ALIGN_LEFT);
+			cmdtext12->value(progStatus.command12.c_str());
+			cmdtext12->callback((Fl_Callback*)cb_cmdtext, (void *)12);
+
+			cmdlbl13 = new Fl_Input2(25, 146, 80, 20, "13");
+			cmdlbl13->align(FL_ALIGN_LEFT);
+			cmdlbl13->value(progStatus.label13.c_str());
+			cmdlbl13->callback((Fl_Callback*)cb_cmdlbl, (void *)13);
+
+			cmdtext13 = new Fl_Input2(105, 146, 380, 20, "");
+			cmdtext13->align(FL_ALIGN_LEFT);
+			cmdtext13->value(progStatus.command13.c_str());
+			cmdtext13->callback((Fl_Callback*)cb_cmdtext, (void *)13);
+
+			cmdlbl14 = new Fl_Input2(25, 166, 80, 20, "14");
+			cmdlbl14->align(FL_ALIGN_LEFT);
+			cmdlbl14->value(progStatus.label14.c_str());
+			cmdlbl14->callback((Fl_Callback*)cb_cmdlbl, (void *)14);
+
+			cmdtext14 = new Fl_Input2(105, 166, 380, 20, "");
+			cmdtext14->align(FL_ALIGN_LEFT);
+			cmdtext14->value(progStatus.command14.c_str());
+			cmdtext14->callback((Fl_Callback*)cb_cmdtext, (void *)14);
+
+			cmdlbl15 = new Fl_Input2(25, 186, 80, 20, "15");
+			cmdlbl15->align(FL_ALIGN_LEFT);
+			cmdlbl15->value(progStatus.label15.c_str());
+			cmdlbl15->callback((Fl_Callback*)cb_cmdlbl, (void *)15);
+
+			cmdtext15 = new Fl_Input2(105, 186, 380, 20, "");
+			cmdtext15->align(FL_ALIGN_LEFT);
+			cmdtext15->value(progStatus.command15.c_str());
+			cmdtext15->callback((Fl_Callback*)cb_cmdtext, (void *)15);
+
+			cmdlbl16 = new Fl_Input2(25, 206, 80, 20, "16");
+			cmdlbl16->align(FL_ALIGN_LEFT);
+			cmdlbl16->value(progStatus.label16.c_str());
+			cmdlbl16->callback((Fl_Callback*)cb_cmdlbl, (void *)16);
+
+			cmdtext16 = new Fl_Input2(105, 206, 380, 20, "");
+			cmdtext16->align(FL_ALIGN_LEFT);
+			cmdtext16->value(progStatus.command16.c_str());
+			cmdtext16->callback((Fl_Callback*)cb_cmdtext, (void *)16);
+
+		tabCmds2->end();
+
+		tabCmds->end();
+
+		cmdResponse = new Fl_Output(105, 228, 380, 20, "Response:");
 		cmdResponse->align(FL_ALIGN_LEFT);
 
-	tabCmds->end();
+	tabCommands->end();
 
 	tabRestore = new Fl_Group(2, 26, 486, 226, _("Restore"));  // 470 width 180 height
 		tabRestore->hide();

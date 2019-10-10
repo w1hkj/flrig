@@ -269,6 +269,23 @@ struct status {
    string	command7;
    string	label8;
    string	command8;
+
+   string	label9;
+   string	command9;
+   string	label10;
+   string	command10;
+   string	label11;
+   string	command11;
+   string	label12;
+   string	command12;
+   string	label13;
+   string	command13;
+   string	label14;
+   string	command14;
+   string	label15;
+   string	command15;
+   string	label16;
+   string	command16;
 // =========================
 	int		bg_red;
 	int		bg_green;

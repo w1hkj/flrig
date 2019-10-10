@@ -281,6 +281,24 @@ status progStatus = {
 	"",				// string	command7;
 	"cmd 8",		// string	label8;
 	"",				// string	command8;
+
+	"cmd 9",		// string	label9;
+	"",				// string	command9;
+	"cmd 10",		// string	label10;
+	"",				// string	command10;
+	"cmd 11",		// string	label11;
+	"",				// string	command11;
+	"cmd 12",		// string	label12;
+	"",				// string	command12;
+	"cmd 13",		// string	label13;
+	"",				// string	command13;
+	"cmd 14",		// string	label14;
+	"",				// string	command14;
+	"cmd 15",		// string	label15;
+	"",				// string	command15;
+	"cmd 16",		// string	label16;
+	"",				// string	command16;
+
 // =========================
 	232,		// int	 bg_red;
 	255,		// int	 bg_green;
@@ -635,6 +653,23 @@ void status::saveLastState()
 	spref.set("command7", command7.c_str());
 	spref.set("label8", label8.c_str());
 	spref.set("command8", command8.c_str());
+
+	spref.set("label9", label9.c_str());
+	spref.set("command9", command9.c_str());
+	spref.set("label10", label10.c_str());
+	spref.set("command10", command10.c_str());
+	spref.set("label11", label11.c_str());
+	spref.set("command11", command11.c_str());
+	spref.set("label12", label12.c_str());
+	spref.set("command12", command12.c_str());
+	spref.set("label13", label13.c_str());
+	spref.set("command13", command13.c_str());
+	spref.set("label14", label14.c_str());
+	spref.set("command14", command14.c_str());
+	spref.set("label15", label15.c_str());
+	spref.set("command15", command15.c_str());
+	spref.set("label16", label16.c_str());
+	spref.set("command16", command16.c_str());
 
 	spref.set("fg_red", fg_red);
 	spref.set("fg_green", fg_green);
@@ -1049,6 +1084,39 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("command8", defbuffer, command8.c_str(), 499);
 		command8 = defbuffer;
 
+		spref.get("label9", defbuffer,  label9.c_str(), 499);
+		label9 = defbuffer;
+		spref.get("command9", defbuffer, command9.c_str(), 499);
+		command9 = defbuffer;
+		spref.get("label10", defbuffer, label10.c_str(), 499);
+		label10 = defbuffer;
+		spref.get("command10", defbuffer, command10.c_str(), 499);
+		command10 = defbuffer;
+		spref.get("label11", defbuffer, label11.c_str(), 499);
+		label11 = defbuffer;
+		spref.get("command11", defbuffer, command11.c_str(), 499);
+		command11 = defbuffer;
+		spref.get("label12", defbuffer, label12.c_str(), 499);
+		label12 = defbuffer;
+		spref.get("command12", defbuffer, command12.c_str(), 499);
+		command12 = defbuffer;
+		spref.get("label13", defbuffer, label13.c_str(), 499);
+		label13 = defbuffer;
+		spref.get("command13", defbuffer, command13.c_str(), 499);
+		command13 = defbuffer;
+		spref.get("label14", defbuffer, label14.c_str(), 499);
+		label14 = defbuffer;
+		spref.get("command14", defbuffer, command14.c_str(), 499);
+		command14 = defbuffer;
+		spref.get("label15", defbuffer, label15.c_str(), 499);
+		label15 = defbuffer;
+		spref.get("command15", defbuffer, command15.c_str(), 499);
+		command15 = defbuffer;
+		spref.get("label16", defbuffer, label16.c_str(), 499);
+		label16 = defbuffer;
+		spref.get("command16", defbuffer, command16.c_str(), 499);
+		command16 = defbuffer;
+
 		spref.get("fg_red", fg_red, fg_red);
 		spref.get("fg_green", fg_green, fg_green);
 		spref.get("fg_blue", fg_blue, fg_blue);
@@ -1328,6 +1396,15 @@ void status::UI_laststate()
 	btnUser7->label(label7.c_str()); btnUser7->redraw_label();
 	btnUser8->label(label8.c_str()); btnUser8->redraw_label();
 
+	btnUser9->label(label9.c_str()); btnUser9->redraw_label();
+	btnUser10->label(label10.c_str()); btnUser10->redraw_label();
+	btnUser11->label(label11.c_str()); btnUser11->redraw_label();
+	btnUser12->label(label12.c_str()); btnUser12->redraw_label();
+	btnUser13->label(label13.c_str()); btnUser13->redraw_label();
+	btnUser14->label(label14.c_str()); btnUser14->redraw_label();
+	btnUser15->label(label15.c_str()); btnUser15->redraw_label();
+	btnUser16->label(label16.c_str()); btnUser16->redraw_label();
+
 	Fl::scheme(ui_scheme.c_str());
 }
 
@@ -1455,6 +1532,22 @@ string status::info()
 	info << "command 7          : " << command1 << "\n";
 	info << "label 8            : " << label1 << "\n";
 	info << "command 8          : " << command1 << "\n";
+	info << "label 9            : " << label9 << "\n";
+	info << "command 9          : " << command9 << "\n";
+	info << "label 10           : " << label10 << "\n";
+	info << "command 10         : " << command10 << "\n";
+	info << "label 11           : " << label11 << "\n";
+	info << "command 11         : " << command11 << "\n";
+	info << "label 12           : " << label12 << "\n";
+	info << "command 12         : " << command12 << "\n";
+	info << "label 13           : " << label13 << "\n";
+	info << "command 13         : " << command13 << "\n";
+	info << "label 14           : " << label14 << "\n";
+	info << "command 14         : " << command14 << "\n";
+	info << "label 15           : " << label15 << "\n";
+	info << "command 15         : " << command15 << "\n";
+	info << "label 16           : " << label16 << "\n";
+	info << "command 16         : " << command16 << "\n";
 
 	return info.str();
 }

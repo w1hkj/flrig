@@ -32,6 +32,7 @@ Fl_Menu_Item menu_small_menu[] = {
  {_("AUX"), 0, (Fl_Callback*)cb_mnuAUX, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Polling"), 0, (Fl_Callback*)cb_Polling, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Trace"), 0, (Fl_Callback*)cb_mnuTrace, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("Commands"), 0, (Fl_Callback*)cb_mnuCommands, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Restore"), 0, (Fl_Callback*)cb_Restore, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
  {_("UI"), 0, 0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
@@ -1577,32 +1578,59 @@ Fl_Double_Window *tabs_window()
 
 		genericMisc->end();
 
-		genericUser = new Fl_Group(0, 24, small_mainW, gph - 24, _("User"));
-			btnUser1 = new Fl_Button(5, genericUser->y() + 12, 100, 20, "USER 1");
+		genericUser_1 = new Fl_Group(0, 24, small_mainW, gph - 24, _("User A"));
+			btnUser1 = new Fl_Button(5, genericUser_1->y() + 12, 100, 20, "USER 1");
 			btnUser1->callback((Fl_Callback*)cb_btnUser, (void*)1);
 
-			btnUser2 = new Fl_Button(110, genericUser->y() + 12, 100, 20, "USER 2");
+			btnUser2 = new Fl_Button(110, genericUser_1->y() + 12, 100, 20, "USER 2");
 			btnUser2->callback((Fl_Callback*)cb_btnUser, (void*)2);
 
-			btnUser3 = new Fl_Button(215, genericUser->y() + 12, 100, 20, "USER 3");
+			btnUser3 = new Fl_Button(215, genericUser_1->y() + 12, 100, 20, "USER 3");
 			btnUser3->callback((Fl_Callback*)cb_btnUser, (void*)3);
 
-			btnUser4 = new Fl_Button(320, genericUser->y() + 12, 100, 20, "USER 4");
+			btnUser4 = new Fl_Button(320, genericUser_1->y() + 12, 100, 20, "USER 4");
 			btnUser4->callback((Fl_Callback*)cb_btnUser, (void*)4);
 
-			btnUser5 = new Fl_Button(5, genericUser->y() + 36, 100, 20, "USER 5");
+			btnUser5 = new Fl_Button(5, genericUser_1->y() + 36, 100, 20, "USER 5");
 			btnUser5->callback((Fl_Callback*)cb_btnUser, (void*)5);
 
-			btnUser6 = new Fl_Button(110, genericUser->y() + 36, 100, 20, "USER 6");
+			btnUser6 = new Fl_Button(110, genericUser_1->y() + 36, 100, 20, "USER 6");
 			btnUser6->callback((Fl_Callback*)cb_btnUser, (void*)6);
 
-			btnUser7 = new Fl_Button(215, genericUser->y() + 36, 100, 20, "USER 7");
+			btnUser7 = new Fl_Button(215, genericUser_1->y() + 36, 100, 20, "USER 7");
 			btnUser7->callback((Fl_Callback*)cb_btnUser, (void*)7);
 
-			btnUser8 = new Fl_Button(320, genericUser->y() + 36, 100, 20, "USER 8");
+			btnUser8 = new Fl_Button(320, genericUser_1->y() + 36, 100, 20, "USER 8");
 			btnUser8->callback((Fl_Callback*)cb_btnUser, (void*)8);
 
-		genericUser->end();
+		genericUser_1->end();
+
+		genericUser_2 = new Fl_Group(0, 24, small_mainW, gph - 24, _("User B"));
+			btnUser9 = new Fl_Button(5, genericUser_2->y() + 12, 100, 20, "USER 9");
+			btnUser9->callback((Fl_Callback*)cb_btnUser, (void*)9);
+
+			btnUser10 = new Fl_Button(110, genericUser_2->y() + 12, 100, 20, "USER 10");
+			btnUser10->callback((Fl_Callback*)cb_btnUser, (void*)10);
+
+			btnUser11 = new Fl_Button(215, genericUser_2->y() + 12, 100, 20, "USER 11");
+			btnUser11->callback((Fl_Callback*)cb_btnUser, (void*)11);
+
+			btnUser12 = new Fl_Button(320, genericUser_2->y() + 12, 100, 20, "USER 12");
+			btnUser12->callback((Fl_Callback*)cb_btnUser, (void*)12);
+
+			btnUser13 = new Fl_Button(5, genericUser_2->y() + 36, 100, 20, "USER 13");
+			btnUser13->callback((Fl_Callback*)cb_btnUser, (void*)13);
+
+			btnUser14 = new Fl_Button(110, genericUser_2->y() + 36, 100, 20, "USER 14");
+			btnUser14->callback((Fl_Callback*)cb_btnUser, (void*)14);
+
+			btnUser15 = new Fl_Button(215, genericUser_2->y() + 36, 100, 20, "USER 15");
+			btnUser15->callback((Fl_Callback*)cb_btnUser, (void*)15);
+
+			btnUser16 = new Fl_Button(320, genericUser_2->y() + 36, 100, 20, "USER 16");
+			btnUser16->callback((Fl_Callback*)cb_btnUser, (void*)16);
+
+		genericUser_2->end();
 
 		tab7610 = new Fl_Group(0, 24, small_mainW, gph - 24, _("IC7610"));
 			ic7610att = new Fl_ComboBox(5, tab7610->y() + 10, 70, 20, "Att level");
@@ -1640,7 +1668,7 @@ Fl_Double_Window *tabs_window()
 
 		tab7610->end();
 
-	tabsGeneric->resizable(genericUser);
+	tabsGeneric->resizable(genericUser_2);
 	tabsGeneric->end();
 
 	grpTABS->end();
