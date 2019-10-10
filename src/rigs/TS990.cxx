@@ -2799,10 +2799,11 @@ int  RIG_TS990::get_rf_gain()
 		if (wait_char(';', 7, TS990_WAIT, "get rf gain", ASC) < 7) return val;
 
 		size_t p = replystr.rfind("RG");
-		if (p != string::npos)
+		if (p != string::npos) {
 			val = fm_decimal(replystr.substr(p+3), 3);
 			val *= 100;
 			val /= 255;
+		}
 	}
 	return val;
 }
