@@ -3976,7 +3976,8 @@ void initTabs()
 		hidden_tabs->add(genericSpeech);
 		hidden_tabs->add(genericRx);
 		hidden_tabs->add(genericMisc);
-		hidden_tabs->add(genericUser);
+		hidden_tabs->add(genericUser_1);
+		hidden_tabs->add(genericUser_2);
 		hidden_tabs->add(tab7610);
 
 		if (selrig->has_band_selection) {
@@ -4204,8 +4205,10 @@ void initTabs()
 			genericMisc->redraw();
 		}
 
-		tabsGeneric->add(genericUser);
-		genericUser->redraw();
+		tabsGeneric->add(genericUser_1);
+		tabsGeneric->add(genericUser_2);
+		genericUser_1->redraw();
+		genericUser_2->redraw();
 
 		if (selrig->name_ == rig_IC7610.name_) {
 			tabsGeneric->add(tab7610);

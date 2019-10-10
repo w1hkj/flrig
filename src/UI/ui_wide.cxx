@@ -35,6 +35,7 @@ Fl_Menu_Item menu_wide_menu[] = {
  {_("AUX"), 0, (Fl_Callback*)cb_mnuAUX, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Polling"), 0, (Fl_Callback*)cb_Polling, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Trace"), 0, (Fl_Callback*)cb_mnuTrace, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("Commands"), 0, (Fl_Callback*)cb_mnuCommands, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Restore"), 0, (Fl_Callback*)cb_Restore, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
  {_("UI"), 0, 0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
@@ -1416,9 +1417,8 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 			}
 			genericMisc->end();
 
-			genericUser = new Fl_Group(xpos, ypos, g->w(), tabs2_h, _("User"));
+			genericUser_1 = new Fl_Group(xpos, ypos, g->w(), tabs2_h, _("User A"));
 			{
-
 				btnUser1 = new Fl_Button(5, ypos + 15, 88, 24, "USER 1");
 				btnUser1->callback((Fl_Callback*)cb_btnUser, (void*)1);
 
@@ -1442,9 +1442,36 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 
 				btnUser8 = new Fl_Button(635, ypos + 15, 88, 24, "USER 8");
 				btnUser8->callback((Fl_Callback*)cb_btnUser, (void*)8);
-
 			}
-			genericUser->end();
+			genericUser_1->end();
+
+			genericUser_2 = new Fl_Group(xpos, ypos, g->w(), tabs2_h, _("User B"));
+			{
+				btnUser9 = new Fl_Button(5, ypos + 15, 88, 24, "USER 9");
+				btnUser9->callback((Fl_Callback*)cb_btnUser, (void*)9);
+
+				btnUser10 = new Fl_Button(95, ypos + 15, 88, 24, "USER 10");
+				btnUser10->callback((Fl_Callback*)cb_btnUser, (void*)10);
+
+				btnUser11 = new Fl_Button(185, ypos + 15, 88, 24, "USER 11");
+				btnUser11->callback((Fl_Callback*)cb_btnUser, (void*)11);
+
+				btnUser12 = new Fl_Button(275, ypos + 15, 88, 24, "USER 12");
+				btnUser12->callback((Fl_Callback*)cb_btnUser, (void*)12);
+
+				btnUser13 = new Fl_Button(365, ypos + 15, 88, 24, "USER 13");
+				btnUser13->callback((Fl_Callback*)cb_btnUser, (void*)13);
+
+				btnUser14 = new Fl_Button(455, ypos + 15, 88, 24, "USER 14");
+				btnUser14->callback((Fl_Callback*)cb_btnUser, (void*)14);
+
+				btnUser15 = new Fl_Button(545, ypos + 15, 88, 24, "USER 15");
+				btnUser15->callback((Fl_Callback*)cb_btnUser, (void*)15);
+
+				btnUser16 = new Fl_Button(635, ypos + 15, 88, 24, "USER 16");
+				btnUser16->callback((Fl_Callback*)cb_btnUser, (void*)16);
+			}
+			genericUser_2->end();
 
 			genericRXB = new Fl_Group(xpos, ypos, g->w(), tabs2_h, _("RIT/XIT/BFO"));
 			{

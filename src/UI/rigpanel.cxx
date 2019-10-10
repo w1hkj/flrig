@@ -239,7 +239,7 @@ Fl_Check_Button *btn_ext_tuner = (Fl_Check_Button *)0;
 Fl_Check_Button *btn_xcvr_auto_on = (Fl_Check_Button *)0;
 Fl_Check_Button *btn_xcvr_auto_off = (Fl_Check_Button *)0;
 
-Fl_Group  *genericUser = (Fl_Group *)0;
+Fl_Group  *genericUser_1 = (Fl_Group *)0;
 Fl_Button *btnUser1 = (Fl_Button*)0;
 Fl_Button *btnUser2 = (Fl_Button*)0;
 Fl_Button *btnUser3 = (Fl_Button*)0;
@@ -248,6 +248,16 @@ Fl_Button *btnUser5 = (Fl_Button*)0;
 Fl_Button *btnUser6 = (Fl_Button*)0;
 Fl_Button *btnUser7 = (Fl_Button*)0;
 Fl_Button *btnUser8 = (Fl_Button*)0;
+
+Fl_Group  *genericUser_2 = (Fl_Group *)0;
+Fl_Button *btnUser9 = (Fl_Button*)0;
+Fl_Button *btnUser10 = (Fl_Button*)0;
+Fl_Button *btnUser11 = (Fl_Button*)0;
+Fl_Button *btnUser12 = (Fl_Button*)0;
+Fl_Button *btnUser13 = (Fl_Button*)0;
+Fl_Button *btnUser14 = (Fl_Button*)0;
+Fl_Button *btnUser15 = (Fl_Button*)0;
+Fl_Button *btnUser16 = (Fl_Button*)0;
 
 Fl_Group *genericRXB = (Fl_Group *)0;
 Hspinner *cntRIT = (Hspinner *)0;
@@ -383,6 +393,10 @@ static void cb_Polling(Fl_Menu_*, void*) {
 
 static void cb_mnuTrace(Fl_Menu_*, void*) {
 	open_trace_tab();
+}
+
+static void cb_mnuCommands(Fl_Menu_ *, void *) {
+	open_commands_tab();
 }
 
 static void cb_Restore(Fl_Menu_*, void*) {
@@ -783,6 +797,14 @@ static void cb_btnUser( Fl_Button * o, void *d) {
 		case 6: cb_send_command(progStatus.command6, cmdResponse); break;
 		case 7: cb_send_command(progStatus.command7, cmdResponse); break;
 		case 8: cb_send_command(progStatus.command8, cmdResponse); break;
+		case 9: cb_send_command(progStatus.command9, cmdResponse); break;
+		case 10: cb_send_command(progStatus.command10, cmdResponse); break;
+		case 11: cb_send_command(progStatus.command11, cmdResponse); break;
+		case 12: cb_send_command(progStatus.command12, cmdResponse); break;
+		case 13: cb_send_command(progStatus.command13, cmdResponse); break;
+		case 14: cb_send_command(progStatus.command14, cmdResponse); break;
+		case 15: cb_send_command(progStatus.command15, cmdResponse); break;
+		case 16: cb_send_command(progStatus.command16, cmdResponse); break;
 	}
 }
 

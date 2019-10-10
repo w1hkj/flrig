@@ -422,6 +422,12 @@ void open_trace_tab()
 	tabsConfig->value(tabTRACE);
 }
 
+void open_commands_tab()
+{
+	dlgXcvrConfig->show();
+	tabsConfig->value(tabCommands);
+}
+
 void open_restore_tab()
 {
 	dlgXcvrConfig->show();
