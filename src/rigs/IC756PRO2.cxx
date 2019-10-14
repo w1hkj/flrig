@@ -41,11 +41,11 @@ const char *IC756PRO2_SSBwidths[] = {
 "3600",
 NULL};
 static int IC756PRO2_bw_vals_SSB[] = {
- 1, 2, 3, 4, 5, 6, 7, 8, 9,10,
-11,12,13,14,15,16,17,18,19,20,
-21,22,23,24,25,26,27,28,29,30,
-31,32,33,34,35,36,37,38,39,40,
-41, WVALS_LIMIT};
+ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+10,11,12,13,14,15,16,17,18,19,
+20,21,22,23,24,25,26,27,28,29,
+30,31,32,33,34,35,36,37,38,39,
+40, WVALS_LIMIT};
 
 const char *IC756PRO2_RTTYwidths[] = {
   "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
@@ -54,13 +54,13 @@ const char *IC756PRO2_RTTYwidths[] = {
 "2600", "2700",
 NULL};
 static int IC756PRO2_bw_vals_RTTY[] = {
- 1, 2, 3, 4, 5, 6, 7, 8, 9,10,
-11,12,13,14,15,16,17,18,19,20,
-21,22,23,24,25,26,27,28,29,30,
-31,32, WVALS_LIMIT};
+ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+10,11,12,13,14,15,16,17,18,19,
+20,21,22,23,24,25,26,27,28,29,
+30,31, WVALS_LIMIT};
 
 const char *IC756PRO2_AMFMwidths[] = { "FILT-1", "FILT-2", "FILT-3", NULL };
-static int IC756PRO2_bw_vals_AMFM[] = { 1, 2, 3, WVALS_LIMIT};
+static int IC756PRO2_bw_vals_AMFM[] = { 0, 1, 2, WVALS_LIMIT};
 
 static GUI IC756PRO2_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },	//0
@@ -166,6 +166,7 @@ void RIG_IC756PRO2::swapAB()
 	cmd += 0x07; cmd += 0xB0;
 	cmd.append(post);
 	waitFB("Exchange vfos");
+	set_trace(2, "swapAB()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_IC756PRO2::A2B()
@@ -174,6 +175,7 @@ void RIG_IC756PRO2::A2B()
 	cmd += 0x07; cmd += 0xB1;
 	cmd.append(post);
 	waitFB("Equalize vfos");
+	set_trace(2, "A2B()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_IC756PRO2::selectA()
@@ -183,6 +185,7 @@ void RIG_IC756PRO2::selectA()
 	cmd += '\xD0';
 	cmd.append(post);
 	waitFB("sel A");
+	set_trace(2, "selectA()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_IC756PRO2::selectB()
@@ -192,6 +195,7 @@ void RIG_IC756PRO2::selectB()
 	cmd += '\xD1';
 	cmd.append(post);
 	waitFB("sel B");
+	set_trace(2, "selectB()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 bool RIG_IC756PRO2::check ()
@@ -202,7 +206,7 @@ bool RIG_IC756PRO2::check ()
 	cmd += '\x03';
 	cmd.append( post );
 	bool ok = waitFOR(11, "check vfo");
-	rig_trace(2, "check()", str2hex(replystr.c_str(), replystr.length()));
+	get_trace(2, "check()", str2hex(replystr.c_str(), replystr.length()));
 	return ok;
 }
 
@@ -220,6 +224,7 @@ long RIG_IC756PRO2::get_vfoA ()
 		if (p != string::npos)
 			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
+	get_trace(2, "get_vfoA()", str2hex(replystr.c_str(), replystr.length()));
 	return A.freq;
 }
 
@@ -231,6 +236,7 @@ void RIG_IC756PRO2::set_vfoA (long freq)
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append( post );
 	waitFB("set vfo A");
+	set_trace(2, "set_vfoA()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 long RIG_IC756PRO2::get_vfoB ()
@@ -247,6 +253,7 @@ long RIG_IC756PRO2::get_vfoB ()
 		if (p != string::npos)
 			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
+	get_trace(2, "get_vfoB()", str2hex(replystr.c_str(), replystr.length()));
 	return B.freq;
 }
 
@@ -258,6 +265,7 @@ void RIG_IC756PRO2::set_vfoB (long freq)
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append( post );
 	waitFB("set vfo B");
+	set_trace(2, "set_vfoB()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC756PRO2::get_smeter()
@@ -268,12 +276,14 @@ int RIG_IC756PRO2::get_smeter()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
+	int mtr = -1;
 	if (waitFOR(9, "get smeter")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return (int)ceil(fm_bcd(replystr.substr(p+6), 3) / 2.55);
+			mtr = (int)ceil(fm_bcd(replystr.substr(p+6), 3) / 2.55);
 	}
-	return 0;
+	get_trace(2, "get_smeter()", str2hex(replystr.c_str(), replystr.length()));
+	return mtr;
 }
 
 // Volume control val 0 ... 100
@@ -286,6 +296,7 @@ void RIG_IC756PRO2::set_volume_control(int val)
 	cmd.append(to_bcd(ICvol, 3));
 	cmd.append( post );
 	waitFB("set vol");
+	set_trace(2, "set_volume_control()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC756PRO2::get_volume_control()
@@ -301,6 +312,7 @@ int RIG_IC756PRO2::get_volume_control()
 		if (p != string::npos)
 			return ((int)(fm_bcd(replystr.substr(p+6),3)));
 	}
+	get_trace(2, "get_volume_control()", str2hex(replystr.c_str(), replystr.length()));
 	return 0;
 }
 
@@ -319,6 +331,7 @@ void RIG_IC756PRO2::set_PTT_control(int val)
 	cmd.append( post );
 	waitFB("set ptt");
 	ptt_ = val;
+	set_trace(2, "set_PTT()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC756PRO2::get_PTT()
@@ -333,6 +346,7 @@ int RIG_IC756PRO2::get_PTT()
 		if (p != string::npos)
 			ptt_ = replystr[p + 6];
 	}
+	get_trace(2, "get_PTT()", str2hex(replystr.c_str(), replystr.length()));
 	return ptt_;
 }
 
@@ -344,10 +358,12 @@ void RIG_IC756PRO2::set_noise(bool val)
 	cmd += val ? 1 : 0;
 	cmd.append(post);
 	waitFB("set noise");
+	set_trace(2, "set_noise()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC756PRO2::get_noise()
 {
+	int val = progStatus.noise;
 	string cstr = "\x16\x22";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -357,9 +373,10 @@ int RIG_IC756PRO2::get_noise()
 	if (waitFOR(8, "get noise")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return (replystr[p+6] ? 1 : 0);
+			val = (replystr[p+6] ? 1 : 0);
 	}
-	return 0;
+	get_trace(2, "get_noise()", str2hex(replystr.c_str(), replystr.length()));
+	return val;
 }
 
 void RIG_IC756PRO2::set_noise_reduction(int val)
@@ -553,6 +570,7 @@ void RIG_IC756PRO2::set_rf_gain(int val)
 	cmd.append(to_bcd(IC756PRO2rfg, 3));
 	cmd.append( post );
 	waitFB("set rf gain");
+	set_trace(2, "set_rf_gain()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_IC756PRO2::set_power_control(double val)
@@ -562,6 +580,7 @@ void RIG_IC756PRO2::set_power_control(double val)
 	cmd.append(to_bcd((int)(val * 255 / 100), 3));
 	cmd.append( post );
 	waitFB("set power");
+	set_trace(2, "set_power_control()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_IC756PRO2::set_split(bool val)
@@ -572,6 +591,7 @@ void RIG_IC756PRO2::set_split(bool val)
 	cmd += val ? 0x01 : 0x00;
 	cmd.append(post);
 	waitFB("set split");
+	set_trace(2, "set_split()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int  RIG_IC756PRO2::get_split()
@@ -601,11 +621,15 @@ void RIG_IC756PRO2::set_modeA(int val)
 	cmd += filA;
 	cmd.append( post );
 	waitFB("set mode A");
+
+	set_trace(4, "set mode A[", IC756PRO2modes_[A.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
+
 	if (datamode) { // LSB / USB ==> use DATA mode
 		cmd = pre_to;
 		cmd.append("\x1A\x06\x01");
 		cmd.append(post);
 		waitFB("data mode");
+		set_trace(2, "set_digital()", str2hex(cmd.c_str(), cmd.length()));
 	}
 }
 
@@ -620,7 +644,9 @@ int RIG_IC756PRO2::get_modeA()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
+//	replystr = "\xFE\xFE\x64\xE0\x04\xFD\xFE\xFE\xE0\x64\x04\x05\x01\xFD"; {
 	if (waitFOR(8, "get mode A")) {
+		get_trace(2, "get_modeA()", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			md = replystr[p+5];
@@ -632,7 +658,9 @@ int RIG_IC756PRO2::get_modeA()
 			cmd = pre_to;
 			cmd.append(cstr);
 			cmd.append(post);
+//			replystr = "\xFE\xFE\x64\xE0\x1A\x06\xFD\xFE\xFE\xE0\x64\x1A\x06\x00\xFD"; {
 			if (waitFOR(8, "data ?")) {
+				get_trace(2, "get_data_modeA()", str2hex(replystr.c_str(), replystr.length()));
 				p = replystr.rfind(resp);
 				if (p != string::npos) {
 					if (replystr[p+6]) {
@@ -669,11 +697,15 @@ void RIG_IC756PRO2::set_modeB(int val)
 	cmd += filB;
 	cmd.append( post );
 	waitFB("set mode B");
+
+	set_trace(4, "set mode B[", IC756PRO2modes_[A.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
+
 	if (datamode) { // LSB / USB ==> use DATA mode
 		cmd = pre_to;
 		cmd.append("\x1A\x06\x01");
 		cmd.append(post);
 		waitFB("data mode");
+		set_trace(2, "set_digital()", str2hex(cmd.c_str(), cmd.length()));
 	}
 }
 
@@ -687,6 +719,7 @@ int RIG_IC756PRO2::get_modeB()
 	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(8, "get mode B")) {
+		get_trace(2, "get_modeB()", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			md = replystr[p+5];
@@ -699,6 +732,7 @@ int RIG_IC756PRO2::get_modeB()
 			cmd.append(cstr);
 			cmd.append(post);
 			if (waitFOR(8, "data ?")) {
+				get_trace(2, "get_data_modeB()", str2hex(replystr.c_str(), replystr.length()));
 				p = replystr.rfind(resp);
 				if (p != string::npos) {
 					if (replystr[p+6]) {
@@ -773,12 +807,14 @@ int RIG_IC756PRO2::get_swr()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
+	int mtr = -1;
 	if (waitFOR(9, "get swr")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-		return (int)ceil(fm_bcd(replystr.substr(p + 6),3) / 2.55 );
+			mtr = (int)ceil(fm_bcd(replystr.substr(p + 6),3) / 2.55 );
 	}
-	return -1;
+	get_trace(2, "get_swr()", str2hex(replystr.c_str(), replystr.length()));
+	return mtr;
 }
 
 int RIG_IC756PRO2::get_alc()
@@ -789,12 +825,14 @@ int RIG_IC756PRO2::get_alc()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
+	int mtr = -1;
 	if (waitFOR(9, "get alc")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-		return (int)ceil(fm_bcd(replystr.substr(p + 6),3) / 2.55 );
+			mtr = (int)ceil(fm_bcd(replystr.substr(p + 6),3) / 2.55 );
 	}
-	return -1;
+	get_trace(2, "get_alc()", str2hex(replystr.c_str(), replystr.length()));
+	return mtr;
 }
 
 // Transceiver power level return power in watts
@@ -806,18 +844,20 @@ int RIG_IC756PRO2::get_power_out()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
+	int mtr = -1;
 	if (waitFOR(9, "get power")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-		return (int)ceil(fm_bcd(replystr.substr(p + 6),3) / 2.55 );
+			mtr = (int)ceil(fm_bcd(replystr.substr(p + 6),3) / 2.55 );
 	}
-	return -1;
+	get_trace(2, "get_power_out()", str2hex(replystr.c_str(), replystr.length()));
+	return mtr;
 }
 
 void RIG_IC756PRO2::set_bwA(int val)
 {
 	if (bandwidths_ == IC756PRO2_AMFMwidths) {
-		A.iBW = val + 1;
+		A.iBW = val;
 		set_modeA(A.imode);
 		return;
 	}
@@ -828,13 +868,11 @@ void RIG_IC756PRO2::set_bwA(int val)
 	cmd.append(to_bcd(A.iBW,2));
 	cmd.append( post );
 	waitFB("set bw A");
+	set_trace(4, "set_bwA() ", bwtable(A.imode)[val], ": ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int  RIG_IC756PRO2::get_bwA()
 {
-	if (bandwidths_ == IC756PRO2_AMFMwidths) {
-		return A.iBW - 1;
-	}
 	string cstr = "\x1A\x03";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -846,13 +884,18 @@ int  RIG_IC756PRO2::get_bwA()
 		if (p != string::npos)
 			A.iBW = (int)(fm_bcd(replystr.substr(p + 6), 2));
 	}
+	get_trace(2, "get_bwA()", str2hex(replystr.c_str(), replystr.length()));
+	if (bandwidths_ == IC756PRO2_AMFMwidths) {
+		if (A.iBW < 0) A.iBW = 0;
+		if (A.iBW > 2) A.iBW = 2;
+	}
 	return A.iBW;
 }
 
 void RIG_IC756PRO2::set_bwB(int val)
 {
 	if (bandwidths_ == IC756PRO2_AMFMwidths) {
-		B.iBW = val + 1;
+		B.iBW = val;
 		set_modeB(B.imode);
 		return;
 	}
@@ -863,13 +906,11 @@ void RIG_IC756PRO2::set_bwB(int val)
 	cmd.append(to_bcd(B.iBW,2));
 	cmd.append( post );
 	waitFB("set bw B");
+	set_trace(4, "set_bwB() ", bwtable(B.imode)[val], ": ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int  RIG_IC756PRO2::get_bwB()
 {
-	if (bandwidths_ == IC756PRO2_AMFMwidths) {
-		return B.iBW - 1;
-	}
 	string cstr = "\x1A\x03";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -880,6 +921,11 @@ int  RIG_IC756PRO2::get_bwB()
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			B.iBW = (int)(fm_bcd(replystr.substr(p + 6), 2));
+	}
+	get_trace(2, "get_bwB()", str2hex(replystr.c_str(), replystr.length()));
+	if (bandwidths_ == IC756PRO2_AMFMwidths) {
+		if (B.iBW < 0) B.iBW = 0;
+		if (B.iBW > 2) B.iBW = 2;
 	}
 	return B.iBW;
 }
@@ -1006,6 +1052,7 @@ int RIG_IC756PRO2::get_attenuator()
 			}
 		}
 	}
+	get_trace(2, "get_ATT()", str2hex(replystr.c_str(), replystr.length()));
 	return atten_level;
 }
 
@@ -1034,6 +1081,7 @@ void RIG_IC756PRO2::set_preamp(int val)
 	cmd += (unsigned char) preamp_level;
 	cmd.append( post );
 	waitFB("set preamp");
+	set_trace(2, "set_preamp()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC756PRO2::get_preamp()
@@ -1059,6 +1107,7 @@ int RIG_IC756PRO2::get_preamp()
 			}
 		}
 	}
+	get_trace(2, "get_preamp()", str2hex(replystr.c_str(), replystr.length()));
 	return preamp_level;
 }
 
