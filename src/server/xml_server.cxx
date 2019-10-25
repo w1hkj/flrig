@@ -1765,6 +1765,8 @@ public:
 
 } rig_set_BW(&rig_server);
 
+static std::string retstr = "";
+
 class rig_cat_string : public XmlRpcServerMethod {
 public:
 	rig_cat_string(XmlRpcServer* s) : XmlRpcServerMethod("rig.cat_string", s) {}
@@ -1775,12 +1777,14 @@ public:
 			return;
 		}
 		std::string command = std::string(params[0]);
+		bool usehex = false;
 		if (command.empty()) return;
 
 		std::string cmd = "";
 		if (command.find("x") != string::npos) { // hex strings
 			size_t p = 0;
 			unsigned int val;
+			usehex = true;
 			while (( p = command.find("x", p)) != string::npos) {
 				sscanf(&command[p+1], "%x", &val);
 				cmd += (unsigned char) val;
@@ -1794,6 +1798,17 @@ public:
 			guard_lock lock1(&mutex_srvc_reqs);
 			guard_lock lock2(&mutex_serial);
 			sendCommand(cmd, cmd.length());
+
+			retstr.clear();
+			waitResponse(100);
+
+			if (!respstr.empty()) {
+				retstr = usehex ? 
+					str2hex(respstr.c_str(), respstr.length()) :
+					respstr;
+				result = retstr;
+			} else
+				result = std::string("No response: ").append(selrig->name_);
 		}
 
 	xml_trace(2, "xmlrpc command:", command.c_str());
@@ -1854,7 +1869,7 @@ struct MLIST {
 	{ "rig.set_rfgain",   "i:i", "sets rf gain control" },
 	{ "rig.set_micgain",  "i:i", "sets mic gain control" },
 	{ "rig.swap",         "i:i", "execute vfo swap" },
-	{ "rig.cat_string",   "n:s", "execute CAT string" }
+	{ "rig.cat_string",   "s:s", "execute CAT string" }
 };
 
 class rig_list_methods : public XmlRpcServerMethod {
