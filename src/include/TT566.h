@@ -50,6 +50,7 @@ public:
 	int  get_bwB();
 
 	void set_PTT_control(int val);
+        int  get_PTT();
 
 	int  get_modetype(int n);
 	void set_preamp(int);
