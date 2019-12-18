@@ -756,7 +756,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				sldrVOLUME->textsize(12);
 				sldrVOLUME->callback((Fl_Callback*)cb_sldrVOLUME);
 				sldrVOLUME->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-				sldrVOLUME->when(FL_WHEN_CHANGED);
+				sldrVOLUME->when(FL_WHEN_CHANGED | FL_LEAVE);
 				Fl_Group::current()->resizable(sldrVOLUME);
 				sldrVOLUME->reverse(true);
 
@@ -784,7 +784,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				sldrVOLUME->textsize(12);
 				sldrVOLUME->callback((Fl_Callback*)cb_sldrVOLUME);
 				sldrVOLUME->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-				sldrVOLUME->when(FL_WHEN_CHANGED);
+				sldrVOLUME->when(FL_WHEN_CHANGED | FL_LEAVE);
 				Fl_Group::current()->resizable(sldrVOLUME);
 				sldrVOLUME->reverse(true);
 #endif

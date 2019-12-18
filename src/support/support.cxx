@@ -2241,9 +2241,10 @@ void setNotch()
 
 	trace(1, "setNotch()");
 
-	if (Fl::event() == FL_DRAG)
+	int ev = Fl::event();
+	if (ev == FL_DRAG || ev == FL_PUSH || ev == FL_MOUSEWHEEL)
 		inhibit_notch = 2;
-	else
+	else if (ev == FL_RELEASE || ev == FL_LEAVE)
 		inhibit_notch = 1;
 
 	int set = 0;
@@ -2318,9 +2319,10 @@ void setIFshift()
 {
 	trace(1, "setIFshift()");
 
-	if (Fl::event() == FL_DRAG)
+	int ev = Fl::event();
+	if (ev == FL_DRAG || ev == FL_PUSH || ev == FL_MOUSEWHEEL)
 		inhibit_shift = 2;
-	else
+	else if (ev == FL_RELEASE || ev == FL_LEAVE)
 		inhibit_shift = 1;
 
 	int btn = 0, set = 0;
@@ -2394,10 +2396,11 @@ void setINNER()
 		sldrOUTER->redraw();
 	}
 
-	if (Fl::event() == FL_DRAG)
+	int ev = Fl::event();
+	if (ev == FL_DRAG || ev == FL_PUSH || ev == FL_MOUSEWHEEL)
+		inhibit_pbt = 2;
+	else if (ev == FL_RELEASE || ev == FL_LEAVE)
 		inhibit_pbt = 1;
-	else
-		inhibit_pbt = 0;
 
 	progStatus.pbt_inner = sldrINNER->value();
 
@@ -2416,10 +2419,11 @@ void setOUTER()
 		sldrINNER->redraw();
 	}
 
-	if (Fl::event() == FL_DRAG)
+	int ev = Fl::event();
+	if (ev == FL_DRAG || ev == FL_PUSH || ev == FL_MOUSEWHEEL)
+		inhibit_pbt = 2;
+	else if (ev == FL_RELEASE || ev == FL_LEAVE)
 		inhibit_pbt = 1;
-	else
-		inhibit_pbt = 0;
 
 	progStatus.pbt_outer = sldrOUTER->value();
 	if (progStatus.pbt_lock) {
@@ -2509,10 +2513,10 @@ void cbEventLog()
 void setVolume()
 {
 	trace(1, "setVolume()");
-
-	if (Fl::event() == FL_DRAG)
+	int ev = Fl::event();
+	if (ev == FL_DRAG || ev == FL_PUSH || ev == FL_MOUSEWHEEL)
 		inhibit_volume = 2;
-	else
+	else if (ev == FL_RELEASE || ev == FL_LEAVE)
 		inhibit_volume = 1;
 
 	int set;
@@ -2714,9 +2718,10 @@ void setSQUELCH()
 {
 	trace(1, "setSQUELCH()");
 
-	if (Fl::event() == FL_DRAG)
+	int ev = Fl::event();
+	if (ev == FL_DRAG || ev == FL_PUSH || ev == FL_MOUSEWHEEL)
 		inhibit_squelch = 2;
-	else
+	else if (ev == FL_RELEASE || ev == FL_LEAVE)
 		inhibit_squelch = 1;
 
 	int set = 0;
@@ -2784,9 +2789,10 @@ void setRFGAIN()
 {
 	trace(1, "setRFGAIN()");
 
-	if (Fl::event() == FL_DRAG)
+	int ev = Fl::event();
+	if (ev == FL_DRAG || ev == FL_PUSH || ev == FL_MOUSEWHEEL)
 		inhibit_rfgain = 2;
-	else
+	else if (ev == FL_RELEASE || ev == FL_LEAVE)
 		inhibit_rfgain = 1;
 
 	int set = 0;
@@ -6047,9 +6053,10 @@ void cb_nb_level()
 
 	trace(1, "cb_nb_level()");
 
-	if (Fl::event() == FL_DRAG)
+	int ev = Fl::event();
+	if (ev == FL_DRAG || ev == FL_PUSH || ev == FL_MOUSEWHEEL)
 		inhibit_nb_level = 2;
-	else
+	else if (ev == FL_RELEASE || ev == FL_LEAVE)
 		inhibit_nb_level = 1;
 
 	set = sldr_nb_level->value();
@@ -6131,9 +6138,10 @@ void setNR()
 
 	int btn = 0, set = 0;
 
-	if (Fl::event() == FL_DRAG)
+	int ev = Fl::event();
+	if (ev == FL_DRAG || ev == FL_PUSH || ev == FL_MOUSEWHEEL)
 		inhibit_nr = 2;
-	else
+	else if (ev == FL_RELEASE || ev == FL_LEAVE)
 		inhibit_nr = 1;
 
 	if (xcvr_name == rig_TS2000.name_ ||
