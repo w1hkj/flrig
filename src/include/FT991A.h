@@ -1,5 +1,5 @@
 // ----------------------------------------------------------------------------
-// Copyright (C) 2017
+// Copyright (C) 2020
 //              David Freese, W1HKJ
 //
 // This file is part of flrig.
@@ -82,6 +82,7 @@ public:
 
 	int  get_volume_control();
 	void set_PTT_control(int val);
+	int  get_PTT();
 	void tune_rig();
 	int  next_attenuator();
 	void set_attenuator(int val);
@@ -128,7 +129,7 @@ public:
 	void set_cw_qsk();
 	bool set_cw_spot();
 	void set_cw_spot_tone();
-//	void get_band_selection(int v);
+//	void set_band_selection(int v);
 	void get_nr_min_max_step(int &min, int &max, int &step) {
 		min = 1; max = 15; step = 1; }	
 	void set_noise_reduction_val(int val);
@@ -139,7 +140,7 @@ public:
 	void set_xcvr_auto_on();
 	void set_xcvr_auto_off();
 
-	void set_compression();
+	void set_compression(int, int);
 	void get_comp_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 100; step = 5; }
 
