@@ -273,14 +273,9 @@ const char* uint2bin(unsigned u, size_t len)
 
 void MilliSleep(long msecs)
 {
-#ifndef __WIN32__
 	struct timespec tv;
 	tv.tv_sec = msecs / 1000;
 	tv.tv_nsec = (msecs - tv.tv_sec * 1000) * 1000000L;
 	nanosleep(&tv, NULL);
-#else
-	Sleep(msecs);
-#endif
-
 }
 
