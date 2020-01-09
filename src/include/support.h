@@ -37,6 +37,7 @@
 #include <FL/fl_draw.H>
 #include <FL/fl_show_colormap.H>
 #include <FL/fl_ask.H>
+#include <FL/Fl_Tree.H>
 
 #include "rig.h"
 #include "rigbase.h"
@@ -347,5 +348,19 @@ extern void trace(int n, ...); // all args of type const char *
 extern void trace1(int n, ...); // all args of type const char *
 
 extern string printXCVR_STATE(XCVR_STATE &data);
+
+extern Fl_Group *tabXCVR;
+extern Fl_Group *tabTRACE;
+extern Fl_Group *tabTCPIP;
+extern Fl_Group *tabPTT;
+extern Fl_Group *tabAUX;
+extern Fl_Group *tabPOLLING;
+extern Fl_Group *tabSNDCMD;
+extern Fl_Group *tabCOMMANDS;
+extern Fl_Group *tabRESTORE;
+
+extern Fl_Tree *tab_tree;
+
+extern void select_tab(const char *);
 
 #endif

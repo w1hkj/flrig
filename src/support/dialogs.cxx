@@ -22,6 +22,19 @@
 #include <FL/x.H>
 #include <FL/fl_draw.H>
 #include <string>
+#include <iostream>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
+#ifndef __WIN32__
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <sys/time.h>
+#include <termios.h>
+#include <glob.h>
+#endif
 
 #include "dialogs.h"
 #include "rigs.h"
@@ -34,29 +47,12 @@
 #include "font_browser.h"
 #include "ui.h"
 #include "status.h"
-
-#include <string>
-
-#include <iostream>
-
-using namespace std;
-
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#ifndef __WIN32__
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <sys/time.h>
-#include <termios.h>
-#include <glob.h>
-#endif
-
 #include "rig.h"
 #include "socket_io.h"
-
 #include "rigpanel.h"
+#include "gettext.h"
+
+using namespace std;
 
 Fl_Double_Window *dlgDisplayConfig = NULL;
 Fl_Double_Window *dlgXcvrConfig = NULL;
@@ -88,11 +84,11 @@ void add_combos(char *port)
 	selectSepPTTPort->add(port);
 }
 
-void add_status_to_combos()
+void set_combo_value()
 {
-	selectCommPort->add(progStatus.xcvr_serial_port.c_str());
-	selectAuxPort->add(progStatus.aux_serial_port.c_str());
-	selectSepPTTPort->add(progStatus.sep_serial_port.c_str());
+	selectCommPort->value(progStatus.xcvr_serial_port.c_str());
+	selectAuxPort->value(progStatus.aux_serial_port.c_str());
+	selectSepPTTPort->value(progStatus.sep_serial_port.c_str());
 }
 
 //======================================================================
@@ -127,7 +123,7 @@ void init_port_combos()
 		LOG_WARN("Found serial port %s", ttyname);
 		add_combos(ttyname);
 	}
-	add_status_to_combos();
+	set_combo_value();
 }
 #endif //__WIN32__
 
@@ -258,7 +254,7 @@ out:
 	if (sys) closedir(sys);
 	if (chdir(cwd) == -1) return;
 	if (ret) { // do we need to fall back to the probe code below?
-		add_status_to_combos();
+		set_combo_value();
 		return;
 	}
 
@@ -278,7 +274,7 @@ out:
 			add_combos(ttyname);
 		}
 	}
-	add_status_to_combos();
+	set_combo_value();
 }
 #endif // __linux__
 
@@ -298,7 +294,7 @@ void init_port_combos()
 	struct stat st;
 
 	const char* tty_fmt[] = {
-		"/dev/cu.*",
+//		"/dev/cu.*",
 		"/dev/tty.*"
 	};
 
@@ -315,7 +311,7 @@ void init_port_combos()
 		}
 		globfree(&gbuf);
 	}
-	add_status_to_combos();
+	set_combo_value();
 }
 #endif //__APPLE__
 
@@ -406,62 +402,47 @@ void configXcvr()
 		btnUSBaudio->deactivate();
 	}
 
-	dlgXcvrConfig->show();
-	tabsConfig->value(tabPrimary);
+	select_tab(_("Xcvr"));
 }
 
 void open_poll_tab()
 {
-	dlgXcvrConfig->show();
-	tabsConfig->value(tabPolling);
+	select_tab(_("Poll"));
 }
 
 void open_trace_tab()
 {
-	dlgXcvrConfig->show();
-	tabsConfig->value(tabTRACE);
+	select_tab(_("Trace"));
 }
 
 void open_commands_tab()
 {
-	dlgXcvrConfig->show();
-	tabsConfig->value(tabCommands);
+	select_tab(_("Cmds"));
 }
 
 void open_restore_tab()
 {
-	dlgXcvrConfig->show();
-	tabsConfig->value(tabRestore);
+	select_tab(_("Restore"));
 }
 
 void open_send_command_tab()
 {
-	dlgXcvrConfig->show();
-	tabsConfig->value(tabSndCmd);
+	select_tab(_("Send"));
 }
 
 void open_tcpip_tab()
 {
-	dlgXcvrConfig->show();
-	tabsConfig->value(tabTCPIP);
+	select_tab(_("TCPIP"));
 }
-
-//void open_xmlrpc_tab()
-//{
-//	dlgXcvrConfig->show();
-//	tabsConfig->value(tabXMLRPC);
-//}
 
 void open_ptt_tab()
 {
-	dlgXcvrConfig->show();
-	tabsConfig->value(tabPTT);
+	select_tab(_("PTT"));
 }
 
 void open_aux_tab()
 {
-	dlgXcvrConfig->show();
-	tabsConfig->value(tabAux);
+	select_tab(_("Aux"));
 }
 
 void createXcvrDialog()
@@ -473,12 +454,6 @@ void createXcvrDialog()
 	mnuBaudrate->clear();
 	for (int i = 0; szBaudRates[i] != NULL; i++)
 		mnuBaudrate->add(szBaudRates[i]);
-
-//	cbo_agc_level->clear();
-//	cbo_agc_level->add("slow");
-//	cbo_agc_level->add("med");
-//	cbo_agc_level->add("fast");
-//	cbo_agc_level->index(progStatus.agc_level);
 
 	cbo_tt550_agc_level->add("slow");
 	cbo_tt550_agc_level->add("med");
