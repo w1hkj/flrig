@@ -1,8 +1,21 @@
+2020-01-09  David Freese  <w1hkj@bellsouth.net>
+
+	c8a6d2fc: Config
+	800d3d7a: MilliSleep
+	454e43cd: FT991A
+	ceff481d: drag-release
+	7c4a13aa: TT566 update
+	d7767639: rig.cat_string
+	5be2e2b5: IC756PROII
+	195980fa: scripts
+	64a4be26: Unguarded statement
+	47d347ef: Increase User commands
+	6e50e739: IC9100
+	ecad1f9b: IC9700
+	4c615197: FT857/897
 
 
-=Version 1.3.47=
-
-2019-08-10  David Freese  <w1hkj@bellsouth.net>
+=Version 1.3.48=
 
 	6caa13a3: IC 746/756
 	c3f2d957: FT857D/897D
