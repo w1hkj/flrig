@@ -596,7 +596,7 @@ static void cb_btn_icom_post(Fl_Button *o, void*) {
 }
 
 static void cb_cmdlbl(Fl_Input2 *o, void *d) {
-	long val = reinterpret_cast<long>(d) - 1;
+	long val = reinterpret_cast<long>(d);
 	struct BPAIR { std::string *plbl; Fl_Button *b; } bpairs[] =
 	{ { &progStatus.label1, btnUser1 },
 	  { &progStatus.label2, btnUser2 },
@@ -624,7 +624,7 @@ static void cb_cmdlbl(Fl_Input2 *o, void *d) {
 }
 
 static void cb_cmdtext(Fl_Input2 *o, void *d) {
-	long val = reinterpret_cast<long>(d) - 1;
+	long val = reinterpret_cast<long>(d);
 	std::string *cmd[] =
 	{ &progStatus.command1, &progStatus.command2,
 	  &progStatus.command3, &progStatus.command4,
@@ -1530,7 +1530,7 @@ std::cout << X << ", " << Y << ", " << W << " x " << H << std::endl;
 		bx2->box(FL_FLAT_BOX);
 		bx2->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
 
-		static char *lbl[16] = {
+		static const char *lbl[16] = {
 			"1", "2", "3", "4", "5", "6", "7", "8",
 			"9", "10", "11", "12", "13", "14", "15", "16"};
 
