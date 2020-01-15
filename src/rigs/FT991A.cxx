@@ -17,12 +17,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
+#include <iostream>
 
 #include "FT991A.h"
 #include "debug.h"
 #include "support.h"
 
-#define FL991A_WAIT_TIME 200
+#define FL991A_WAIT_TIME 100
 
 enum mFT991 {
   mLSB, mUSB, mCW, mFM, mAM, mRTTY_L, mCW_R, mPKT_L, mRTTY_U, mPKT_FM, mFM_N, mPKT_U, mAM_N, mC4FM };
@@ -544,20 +545,26 @@ int RIG_FT991A::get_PTT()
 
 
 // internal or external tune mode
-void RIG_FT991A::tune_rig()
+void RIG_FT991A::tune_rig(int how)
 {
-	cmd = "AC;";
-	wait_char(';',6, FL991A_WAIT_TIME, "is Int. Tuner Enabled", ASC);
-	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return;
-	if ((p + 5) >= replystr.length()) return;
-	if (replystr[p+4] == '0') {
-		return;
-	}
-
-	cmd = "AC002;";
+	cmd = "AC000;";
+	if (how == 1) cmd[4] = '1';
+	else if (how == 2) cmd[4] = '2';
 	sendCommand(cmd);
 	showresp(WARN, ASC, "tune rig", cmd, replystr);
+}
+
+int  RIG_FT991A::get_tune()
+{
+	cmd = "AC;";
+	wait_char(';',6, FL991A_WAIT_TIME, "Tuner Enabled?", ASC);
+	size_t p = replystr.rfind("AC");
+	if (p == string::npos) return 0;
+	if ((p + 5) >= replystr.length()) return 0;
+	if (replystr[p+4] == '0') {
+		return 0;
+	}
+	return 1;
 }
 
 int  RIG_FT991A::next_attenuator()

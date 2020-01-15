@@ -542,22 +542,27 @@ int RIG_FT991::get_PTT()
 	return ptt_;
 }
 
-
 // internal or external tune mode
-void RIG_FT991::tune_rig()
+void RIG_FT991::tune_rig(int how)
 {
-	cmd = "AC;";
-	wait_char(';',6, FL991_WAIT_TIME, "is Int. Tuner Enabled", ASC);
-	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return;
-	if ((p + 5) >= replystr.length()) return;
-	if (replystr[p+4] == '0') {
-		return;
-	}
-
-	cmd = "AC002;";
+	cmd = "AC000;";
+	if (how == 1) cmd[4] = '1';
+	else if (how == 2) cmd[4] = '2';
 	sendCommand(cmd);
 	showresp(WARN, ASC, "tune rig", cmd, replystr);
+}
+
+int  RIG_FT991::get_tune()
+{
+	cmd = "AC;";
+	wait_char(';',6, 100, "Tuner Enabled?", ASC);
+	size_t p = replystr.rfind("AC");
+	if (p == string::npos) return 0;
+	if ((p + 5) >= replystr.length()) return 0;
+	if (replystr[p+4] == '0') {
+		return 0;
+	}
+	return 1;
 }
 
 int  RIG_FT991::next_attenuator()
