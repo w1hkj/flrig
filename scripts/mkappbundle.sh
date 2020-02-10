@@ -111,7 +111,7 @@ signature="$(echo $PACKAGE_TARNAME | sed 's/[aeiouAEIOU]//g; s/\(^....\).*/\1/')
 signature="$PACKAGE_TARNAME"
 binary="$PACKAGE_TARNAME"
 icon="$flrig_icon"
-version="${flrig_VERSION_MAJOR}.${flrig_VERSION_MINOR}"
+version="${FLRIG_VERSION_MAJOR}.${FLRIG_VERSION_MINOR}.${FLRIG_VERSION_PATCH}"
 appversion="$PACKAGE_VERSION"
 
 bundle
