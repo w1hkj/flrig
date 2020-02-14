@@ -150,14 +150,24 @@ public:
 	int  get_pbt_inner();
 	int  get_pbt_outer();
 
-	const char *FILT(int &val);
-	const char *nextFILT();
-
 	void set_nb_level(int val);
 	int  get_nb_level();
 
 	void set_band_selection(int v);
 	void get_band_selection(int v);
+
+	void   setVfoAdj(double v);
+	double getVfoAdj();
+
+	int   get_FILT(int mode);
+	void  set_FILT(int filter);
+	const char *FILT(int val);
+	const char *nextFILT();
+	void  set_FILTERS(std::string s);
+	std::string get_FILTERS();
+
+	void set_BANDWIDTHS(std::string s);
+	std::string get_BANDWIDTHS();
 
 };
 
