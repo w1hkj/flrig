@@ -286,7 +286,7 @@ void RIG_KX3::set_pbt_values(int val)
 		case 5 :
 		case 7 :
 			if_shift_min = 100; if_shift_max = 2100;
-			if_shift_step = 10; if_shift_mid = 1000;
+			if_shift_step = 10; if_shift_mid = 1500;
 			break;
 	}
 	progStatus.shift_val = if_shift_mid;
