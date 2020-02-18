@@ -1799,19 +1799,7 @@ void buildlist() {
 		readTagFile();
 		return;
 	}
-// else only read original file to make new MAT file
-	orgFN = RigHomeDir;
-	orgFN.append(selrig->name_);
-	orgFN.append(".arv");
-	fh = fopen(orgFN.c_str(), "r");
-	if (fh != NULL) {
-		fclose (fh);
-		tmpFN = defFileName;
-		defFileName = orgFN;
-		readFile();
-		defFileName = tmpFN;
-		return;
-	}
+// else clear the list
 	clearList();
 }
 
@@ -2916,10 +2904,11 @@ void updateSmeter(void *d) // 0 to 100;
 void saveFreqList()
 {
 	string atag;
-	if (!numinlist) {
-		remove(defFileName.c_str());
-		return;
-	}
+
+	if (!numinlist) return;
+
+	rotate_log(defFileName);
+
 	ofstream oList(defFileName.c_str());
 	if (!oList) {
 		fl_message ("Could not write to %s", defFileName.c_str());
