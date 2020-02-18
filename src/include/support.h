@@ -185,6 +185,7 @@ extern void about();
 
 extern void setNotch();
 extern void visit_URL(void* arg);
+extern void  rotate_log(std::string);
 
 extern void cbAttenuator();
 extern void cbPreamp();
