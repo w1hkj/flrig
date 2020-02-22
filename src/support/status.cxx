@@ -267,37 +267,53 @@ status progStatus = {
 // =========================
 	"cmd 1",		// string	label1;
 	"",				// string	command1;
+	"",				// string	shftcmd1;
 	"cmd 2",		// string	label2;
 	"",				// string	command2;
+	"",				// string	shftcmd2;
 	"cmd 3",		// string	label3;
 	"",				// string	command3;
+	"",				// string	shftcmd3;
 	"cmd 4",		// string	label4;
 	"", 			// string	command4;
+	"",				// string	shftcmd4;
 	"cmd 5",		// string	label5;
 	"",				// string	command5;
+	"",				// string	shftcmd5;
 	"cmd 6",		// string	label6;
 	"",				// string	command6;
+	"",				// string	shftcmd6;
 	"cmd 7",		// string	label7;
 	"",				// string	command7;
+	"",				// string	shftcmd7;
 	"cmd 8",		// string	label8;
 	"",				// string	command8;
+	"",				// string	shftcmd8;
 
 	"cmd 9",		// string	label9;
 	"",				// string	command9;
+	"",				// string	shftcmd9;
 	"cmd 10",		// string	label10;
 	"",				// string	command10;
+	"",				// string	shftcmd10;
 	"cmd 11",		// string	label11;
 	"",				// string	command11;
+	"",				// string	shftcmd11;
 	"cmd 12",		// string	label12;
 	"",				// string	command12;
+	"",				// string	shftcmd12;
 	"cmd 13",		// string	label13;
 	"",				// string	command13;
+	"",				// string	shftcmd13;
 	"cmd 14",		// string	label14;
 	"",				// string	command14;
+	"",				// string	shftcmd14;
 	"cmd 15",		// string	label15;
 	"",				// string	command15;
+	"",				// string	shftcmd15;
 	"cmd 16",		// string	label16;
 	"",				// string	command16;
+	"",				// string	shftcmd16;
 
 // =========================
 	232,		// int	 bg_red;
@@ -639,37 +655,67 @@ void status::saveLastState()
 
 	spref.set("label1", label1.c_str());
 	spref.set("command1", command1.c_str());
+	spref.set("shftcmd1", shftcmd1.c_str());
+
 	spref.set("label2", label2.c_str());
 	spref.set("command2", command2.c_str());
+	spref.set("shftcmd1", shftcmd2.c_str());
+
 	spref.set("label3", label3.c_str());
 	spref.set("command3", command3.c_str());
+	spref.set("shftcmd3", shftcmd3.c_str());
+
 	spref.set("label4", label4.c_str());
 	spref.set("command4", command4.c_str());
+	spref.set("shftcmd4", shftcmd4.c_str());
+
 	spref.set("label5", label5.c_str());
 	spref.set("command5", command5.c_str());
+	spref.set("shftcmd5", shftcmd5.c_str());
+
 	spref.set("label6", label6.c_str());
 	spref.set("command6", command6.c_str());
+	spref.set("shftcmd6", shftcmd6.c_str());
+
 	spref.set("label7", label7.c_str());
 	spref.set("command7", command7.c_str());
+	spref.set("shftcmd7", shftcmd7.c_str());
+
 	spref.set("label8", label8.c_str());
 	spref.set("command8", command8.c_str());
+	spref.set("shftcmd8", shftcmd8.c_str());
 
 	spref.set("label9", label9.c_str());
 	spref.set("command9", command9.c_str());
+	spref.set("shftcmd9", shftcmd9.c_str());
+
 	spref.set("label10", label10.c_str());
 	spref.set("command10", command10.c_str());
+	spref.set("shftcmd10", shftcmd10.c_str());
+
 	spref.set("label11", label11.c_str());
 	spref.set("command11", command11.c_str());
+	spref.set("shftcmd11", shftcmd11.c_str());
+
 	spref.set("label12", label12.c_str());
 	spref.set("command12", command12.c_str());
+	spref.set("shftcmd12", shftcmd12.c_str());
+
 	spref.set("label13", label13.c_str());
 	spref.set("command13", command13.c_str());
+	spref.set("shftcmd13", shftcmd13.c_str());
+
 	spref.set("label14", label14.c_str());
 	spref.set("command14", command14.c_str());
+	spref.set("shftcmd14", shftcmd14.c_str());
+
 	spref.set("label15", label15.c_str());
 	spref.set("command15", command15.c_str());
+	spref.set("shftcmd15", shftcmd15.c_str());
+
 	spref.set("label16", label16.c_str());
 	spref.set("command16", command16.c_str());
+	spref.set("shftcmd16", shftcmd16.c_str());
 
 	spref.set("fg_red", fg_red);
 	spref.set("fg_green", fg_green);
@@ -1055,67 +1101,113 @@ bool status::loadXcvrState(string xcvr)
 		label1 = defbuffer;
 		spref.get("command1", defbuffer, command1.c_str(), 499);
 		command1 = defbuffer;
+		spref.get("shftcmd1", defbuffer, shftcmd1.c_str(), 499);
+		shftcmd1 = defbuffer;
+
 		spref.get("label2", defbuffer, label2.c_str(), 499);
 		label2 = defbuffer;
 		spref.get("command2", defbuffer, command2.c_str(), 499);
 		command2 = defbuffer;
+		spref.get("shftcmd2", defbuffer, shftcmd2.c_str(), 499);
+		shftcmd2 = defbuffer;
+
 		spref.get("label3", defbuffer, label3.c_str(), 499);
 		label3 = defbuffer;
 		spref.get("command3", defbuffer, command3.c_str(), 499);
 		command3 = defbuffer;
+		spref.get("shftcmd3", defbuffer, shftcmd3.c_str(), 499);
+		shftcmd3 = defbuffer;
+
 		spref.get("label4", defbuffer, label4.c_str(), 499);
 		label4 = defbuffer;
 		spref.get("command4", defbuffer, command4.c_str(), 499);
 		command4 = defbuffer;
+		spref.get("shftcmd4", defbuffer, shftcmd4.c_str(), 499);
+		shftcmd4 = defbuffer;
+
 		spref.get("label5", defbuffer, label5.c_str(), 499);
 		label5 = defbuffer;
 		spref.get("command5", defbuffer, command5.c_str(), 499);
 		command5 = defbuffer;
+		spref.get("shftcmd5", defbuffer, shftcmd5.c_str(), 499);
+		shftcmd5 = defbuffer;
+
 		spref.get("label6", defbuffer, label6.c_str(), 499);
 		label6 = defbuffer;
 		spref.get("command6", defbuffer, command6.c_str(), 499);
 		command6 = defbuffer;
+		spref.get("shftcmd6", defbuffer, shftcmd6.c_str(), 499);
+		shftcmd6 = defbuffer;
+
 		spref.get("label7", defbuffer, label7.c_str(), 499);
 		label7 = defbuffer;
 		spref.get("command7", defbuffer, command7.c_str(), 499);
 		command7 = defbuffer;
+		spref.get("shftcmd7", defbuffer, shftcmd7.c_str(), 499);
+		shftcmd7 = defbuffer;
+
 		spref.get("label8", defbuffer, label8.c_str(), 499);
 		label8 = defbuffer;
 		spref.get("command8", defbuffer, command8.c_str(), 499);
 		command8 = defbuffer;
+		spref.get("shftcmd8", defbuffer, shftcmd8.c_str(), 499);
+		shftcmd8 = defbuffer;
 
 		spref.get("label9", defbuffer,  label9.c_str(), 499);
 		label9 = defbuffer;
 		spref.get("command9", defbuffer, command9.c_str(), 499);
 		command9 = defbuffer;
+		spref.get("shftcmd9", defbuffer, shftcmd9.c_str(), 499);
+		shftcmd9 = defbuffer;
+
 		spref.get("label10", defbuffer, label10.c_str(), 499);
 		label10 = defbuffer;
 		spref.get("command10", defbuffer, command10.c_str(), 499);
 		command10 = defbuffer;
+		spref.get("shftcmd10", defbuffer, shftcmd10.c_str(), 499);
+		shftcmd10 = defbuffer;
+
 		spref.get("label11", defbuffer, label11.c_str(), 499);
 		label11 = defbuffer;
 		spref.get("command11", defbuffer, command11.c_str(), 499);
 		command11 = defbuffer;
+		spref.get("shftcmd11", defbuffer, shftcmd11.c_str(), 499);
+		shftcmd11 = defbuffer;
+
 		spref.get("label12", defbuffer, label12.c_str(), 499);
 		label12 = defbuffer;
 		spref.get("command12", defbuffer, command12.c_str(), 499);
 		command12 = defbuffer;
+		spref.get("shftcmd12", defbuffer, shftcmd12.c_str(), 499);
+		shftcmd12 = defbuffer;
+
 		spref.get("label13", defbuffer, label13.c_str(), 499);
 		label13 = defbuffer;
 		spref.get("command13", defbuffer, command13.c_str(), 499);
 		command13 = defbuffer;
+		spref.get("shftcmd13", defbuffer, shftcmd13.c_str(), 499);
+		shftcmd13 = defbuffer;
+
 		spref.get("label14", defbuffer, label14.c_str(), 499);
 		label14 = defbuffer;
 		spref.get("command14", defbuffer, command14.c_str(), 499);
 		command14 = defbuffer;
+		spref.get("shftcmd14", defbuffer, shftcmd14.c_str(), 499);
+		shftcmd14 = defbuffer;
+
 		spref.get("label15", defbuffer, label15.c_str(), 499);
 		label15 = defbuffer;
 		spref.get("command15", defbuffer, command15.c_str(), 499);
 		command15 = defbuffer;
+		spref.get("shftcmd15", defbuffer, shftcmd15.c_str(), 499);
+		shftcmd15 = defbuffer;
+
 		spref.get("label16", defbuffer, label16.c_str(), 499);
 		label16 = defbuffer;
 		spref.get("command16", defbuffer, command16.c_str(), 499);
 		command16 = defbuffer;
+		spref.get("shftcmd16", defbuffer, shftcmd16.c_str(), 499);
+		shftcmd16 = defbuffer;
 
 		spref.get("fg_red", fg_red, fg_red);
 		spref.get("fg_green", fg_green, fg_green);

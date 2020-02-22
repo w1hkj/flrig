@@ -788,23 +788,45 @@ static void cb_btn_xcvr_auto_off(Fl_Check_Button* o, void*) {
 
 static void cb_btnUser( Fl_Button * o, void *d) {
 	long val = reinterpret_cast<long>(d);
-	switch (val) {
-		case 1: cb_send_command(progStatus.command1, cmdResponse); break;
-		case 2: cb_send_command(progStatus.command2, cmdResponse); break;
-		case 3: cb_send_command(progStatus.command3, cmdResponse); break;
-		case 4: cb_send_command(progStatus.command4, cmdResponse); break;
-		case 5: cb_send_command(progStatus.command5, cmdResponse); break;
-		case 6: cb_send_command(progStatus.command6, cmdResponse); break;
-		case 7: cb_send_command(progStatus.command7, cmdResponse); break;
-		case 8: cb_send_command(progStatus.command8, cmdResponse); break;
-		case 9: cb_send_command(progStatus.command9, cmdResponse); break;
-		case 10: cb_send_command(progStatus.command10, cmdResponse); break;
-		case 11: cb_send_command(progStatus.command11, cmdResponse); break;
-		case 12: cb_send_command(progStatus.command12, cmdResponse); break;
-		case 13: cb_send_command(progStatus.command13, cmdResponse); break;
-		case 14: cb_send_command(progStatus.command14, cmdResponse); break;
-		case 15: cb_send_command(progStatus.command15, cmdResponse); break;
-		case 16: cb_send_command(progStatus.command16, cmdResponse); break;
+	if (((Fl::event_state() & FL_SHIFT) == FL_SHIFT) ||
+		(Fl::event_button() == FL_RIGHT_MOUSE)) {
+		switch (val) {
+			case 1: cb_send_command(progStatus.shftcmd1, cmdResponse); break;
+			case 2: cb_send_command(progStatus.shftcmd2, cmdResponse); break;
+			case 3: cb_send_command(progStatus.shftcmd3, cmdResponse); break;
+			case 4: cb_send_command(progStatus.shftcmd4, cmdResponse); break;
+			case 5: cb_send_command(progStatus.shftcmd5, cmdResponse); break;
+			case 6: cb_send_command(progStatus.shftcmd6, cmdResponse); break;
+			case 7: cb_send_command(progStatus.shftcmd7, cmdResponse); break;
+			case 8: cb_send_command(progStatus.shftcmd8, cmdResponse); break;
+			case 9: cb_send_command(progStatus.shftcmd9, cmdResponse); break;
+			case 10: cb_send_command(progStatus.shftcmd10, cmdResponse); break;
+			case 11: cb_send_command(progStatus.shftcmd11, cmdResponse); break;
+			case 12: cb_send_command(progStatus.shftcmd12, cmdResponse); break;
+			case 13: cb_send_command(progStatus.shftcmd13, cmdResponse); break;
+			case 14: cb_send_command(progStatus.shftcmd14, cmdResponse); break;
+			case 15: cb_send_command(progStatus.shftcmd15, cmdResponse); break;
+			case 16: cb_send_command(progStatus.shftcmd16, cmdResponse); break;
+		}
+	} else {
+		switch (val) {
+			case 1: cb_send_command(progStatus.command1, cmdResponse); break;
+			case 2: cb_send_command(progStatus.command2, cmdResponse); break;
+			case 3: cb_send_command(progStatus.command3, cmdResponse); break;
+			case 4: cb_send_command(progStatus.command4, cmdResponse); break;
+			case 5: cb_send_command(progStatus.command5, cmdResponse); break;
+			case 6: cb_send_command(progStatus.command6, cmdResponse); break;
+			case 7: cb_send_command(progStatus.command7, cmdResponse); break;
+			case 8: cb_send_command(progStatus.command8, cmdResponse); break;
+			case 9: cb_send_command(progStatus.command9, cmdResponse); break;
+			case 10: cb_send_command(progStatus.command10, cmdResponse); break;
+			case 11: cb_send_command(progStatus.command11, cmdResponse); break;
+			case 12: cb_send_command(progStatus.command12, cmdResponse); break;
+			case 13: cb_send_command(progStatus.command13, cmdResponse); break;
+			case 14: cb_send_command(progStatus.command14, cmdResponse); break;
+			case 15: cb_send_command(progStatus.command15, cmdResponse); break;
+			case 16: cb_send_command(progStatus.command16, cmdResponse); break;
+		}
 	}
 }
 
