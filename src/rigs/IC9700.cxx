@@ -262,6 +262,34 @@ void RIG_IC9700::selectB()
 	set_trace(2, "selectB()", str2hex(replystr.c_str(), replystr.length()));
 }
 
+void RIG_IC9700::set_xcvr_auto_on()
+{
+	cmd.clear();
+	cmd.append(
+		(progStatus.comm_baudrate == 6 ? 25 :
+		 progStatus.comm_baudrate == 5 ? 13 :
+		 progStatus.comm_baudrate == 4 ? 7 :
+		 progStatus.comm_baudrate == 3 ? 3 : 2), '\xFE');
+	cmd.append(pre_to);
+	cmd += '\x18'; cmd += '\x01';
+	cmd.append(post);
+	waitFB("Power ON", 200);
+
+	cmd = pre_to;
+	cmd += '\x19'; cmd += '\x00';
+	cmd.append(post);
+	waitFOR(8, "get ID", 10000);
+}
+
+void RIG_IC9700::set_xcvr_auto_off()
+{
+	cmd.clear();
+	cmd.append(pre_to);
+	cmd += '\x18'; cmd += '\x00';
+	cmd.append(post);
+	waitFB("Power OFF", 200);
+}
+
 bool RIG_IC9700::check ()
 {
 	string resp = pre_fm;

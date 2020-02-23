@@ -22,7 +22,6 @@
 
 #include <iostream>
 #include <sstream>
-#define IC7100_DEBUG
 
 //=============================================================================
 // IC-7100
@@ -168,6 +167,7 @@ void RIG_IC7100::initialize()
 
 	choice_rTONE->activate();
 	choice_tTONE->activate();
+
 }
 
 RIG_IC7100::RIG_IC7100() {
@@ -244,6 +244,8 @@ RIG_IC7100::RIG_IC7100() {
 
 	restore_mbw = true;
 
+	has_xcvr_auto_on_off = true;
+
 	precision = 1;
 	ndigits = 9;
 	A.filter = B.filter = 1;
@@ -262,6 +264,47 @@ RIG_IC7100::RIG_IC7100() {
 //======================================================================
 // IC7100 unique commands
 //======================================================================
+
+void RIG_IC7100::set_xcvr_auto_on()
+{
+	cmd.clear();
+	int nr = progStatus.comm_baudrate == 6 ? 25 :
+			 progStatus.comm_baudrate == 5 ? 13 :
+			 progStatus.comm_baudrate == 4 ? 7 :
+			 progStatus.comm_baudrate == 3 ? 3 : 2;
+	cmd.append( nr, '\xFE');
+	cmd.append(pre_to);
+	cmd += '\x18'; cmd += '\x01';
+	cmd.append(post);
+	waitFB("Power ON", 2000);
+
+	cmd = pre_to;
+	cmd += '\x19'; cmd += '\x00';
+	cmd.append(post);
+	waitFOR(8, "get ID", 10000);
+}
+
+void RIG_IC7100::set_xcvr_auto_off()
+{
+	cmd.clear();
+	cmd.append(pre_to);
+	cmd += '\x18'; cmd += '\x00';
+	cmd.append(post);
+	waitFB("Power OFF", 200);
+}
+
+bool RIG_IC7100::check ()
+{
+	bool ok = false;
+	string resp = pre_fm;
+	resp += '\x03';
+	cmd = pre_to;
+	cmd += '\x03';
+	cmd.append( post );
+	ok = waitFOR(11, "check vfo");
+	get_trace(2, "check()", str2hex(replystr.c_str(), replystr.length()));
+	return ok;
+}
 
 static bool IC7100onA = true;
 
@@ -285,18 +328,6 @@ void RIG_IC7100::selectB()
 	set_trace(2, "selectB()", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("select B");
 	IC7100onA = false;
-}
-
-bool RIG_IC7100::check ()
-{
-	string resp = pre_fm;
-	resp += '\x03';
-	cmd = pre_to;
-	cmd += '\x03';
-	cmd.append( post );
-	bool ok = waitFOR(11, "check vfo");
-	get_trace(2, "check()", str2hex(replystr.c_str(), replystr.length()));
-	return ok;
 }
 
 long RIG_IC7100::get_vfoA ()
@@ -425,22 +456,21 @@ void RIG_IC7100::set_modeA(int val)
 	cmd = pre_to;
 	cmd += '\x06';
 	cmd += IC7100_mode_nbr[val];
-	cmd += A.filter;
+	if (val < LSBD7100)
+		cmd += A.filter;
 	cmd.append( post );
 	waitFB("set mode A");
 	set_trace(4, "set mode A[", IC7100modes_[A.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
 
-	cmd = pre_to;
-	cmd += '\x1A'; cmd += '\x06';
 	if (val >= LSBD7100) {
+		cmd = pre_to;
+		cmd += '\x1A'; cmd += '\x06';
 		cmd += '\x01';
-	} else {
-		cmd += '\x00';
+		cmd += A.filter;
+		cmd.append( post);
+		set_trace(2, "set_data_modeA()", str2hex(replystr.c_str(), replystr.length()));
+		waitFB("set data mode A");
 	}
-	cmd += mode_filterA[A.imode];
-	cmd.append( post);
-	waitFB("set data mode A");
-	set_trace(2, "set_data_modeA()", str2hex(replystr.c_str(), replystr.length()));
 }
 
 int RIG_IC7100::get_modeA()
@@ -505,22 +535,21 @@ void RIG_IC7100::set_modeB(int val)
 	cmd = pre_to;
 	cmd += '\x06';
 	cmd += IC7100_mode_nbr[val];
-	cmd += B.filter;
+	if (val < LSBD7100)
+		cmd += B.filter;
 	cmd.append( post );
 	waitFB("set mode B");
 	set_trace(4, "set mode B[", IC7100modes_[B.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
 
-	cmd = pre_to;
-	cmd += '\x1A'; cmd += '\x06';
 	if (val >= LSBD7100) {
+		cmd = pre_to;
+		cmd += '\x1A'; cmd += '\x06';
 		cmd += '\x01';
-	} else {
-		cmd += '\x00';
+		cmd += B.filter;
+		cmd.append( post);
+		set_trace(2, "set_data_modeB()", str2hex(replystr.c_str(), replystr.length()));
+		waitFB("set data mode B");
 	}
-	cmd += mode_filterB[B.imode];
-	cmd.append( post);
-	set_trace(2, "set_data_modeB()", str2hex(replystr.c_str(), replystr.length()));
-	waitFB("set data mode B");
 }
 
 int RIG_IC7100::get_modeB()
@@ -591,11 +620,6 @@ int RIG_IC7100::get_bwA()
 	cmd.append(post);
 	string resp = pre_fm;
 	resp.append("\x1a\x03");
-#ifdef IC7100_DEBUG
-	stringstream ss;
-	ss << "get_bwA() " << str2hex(replystr.c_str(), replystr.length());
-	LOG_INFO("%s", ss.str().c_str());
-#endif
 	if (waitFOR(8, "get bw A")) {
 		size_t p = replystr.rfind(resp);
 		A.iBW = fm_bcd(replystr.substr(p+6), 2);
@@ -615,15 +639,6 @@ void RIG_IC7100::set_bwA(int val)
 	cmd.append("\x1a\x03");
 	cmd.append(to_bcd(A.iBW, 2));
 	cmd.append(post);
-#ifdef IC7100_DEBUG
-	stringstream ss;
-	const char *bwstr = IC7100_ssb_bws[val];
-	if ((A.imode == AM7100) || (A.imode == AMD7100)) bwstr = IC7100_am_bws[val];
-	if ((A.imode == RTTY7100) || (A.imode == RTTYR7100)) bwstr = IC7100_rtty_bws[val];
-	ss << " (" << val << ") [" << bwstr << "] " <<
-	str2hex(cmd.data(), cmd.length());
-	LOG_INFO("%s", ss.str().c_str());
-#endif
 	waitFB("set bw A");
 }
 
@@ -638,11 +653,6 @@ int RIG_IC7100::get_bwB()
 	cmd.append(post);
 	string resp = pre_fm;
 	resp.append("\x1a\x03");
-#ifdef IC7100_DEBUG
-	stringstream ss;
-	ss << "get_bwB() " << str2hex(replystr.c_str(), replystr.length());
-	LOG_INFO("%s", ss.str().c_str());
-#endif
 	if (waitFOR(8, "get bw B")) {
 		size_t p = replystr.rfind(resp);
 		B.iBW = fm_bcd(replystr.substr(p+6), 2);
@@ -662,15 +672,6 @@ void RIG_IC7100::set_bwB(int val)
 	cmd.append("\x1a\x03");
 	cmd.append(to_bcd(B.iBW, 2));
 	cmd.append(post);
-#ifdef IC7100_DEBUG
-	stringstream ss;
-	const char *bwstr = IC7100_ssb_bws[val];
-	if ((A.imode == AM7100) || (A.imode == AMD7100)) bwstr = IC7100_am_bws[val];
-	if ((A.imode == RTTY7100) || (A.imode == RTTYR7100)) bwstr = IC7100_rtty_bws[val];
-	ss << " (" << val << ") [" << bwstr << "] " <<
-	str2hex(cmd.data(), cmd.length());
-	LOG_INFO("%s", ss.str().c_str());
-#endif
 	waitFB("set bw B");
 }
 
@@ -937,12 +938,6 @@ void RIG_IC7100::set_compression(int on, int val)
 		cmd.append(post);
 		waitFB("set Comp OFF");
 	}
-#ifdef IC7100_DEBUG
-	stringstream ss;
-	 ss << " (" << on << ", " << val << ") " << 
-		str2hex(cmd.data(), cmd.length());
-	LOG_INFO("%s", ss.str().c_str());
-#endif
 }
 
 void RIG_IC7100::set_vox_onoff()
@@ -950,21 +945,11 @@ void RIG_IC7100::set_vox_onoff()
 	if (progStatus.vox_onoff) {
 		cmd.assign(pre_to).append("\x16\x46\x01");
 		cmd.append( post );
-#ifdef IC7100_DEBUG
-	stringstream ss;
-	 ss << " () " << str2hex(cmd.data(), cmd.length());
-	LOG_INFO("%s", ss.str().c_str());
-#endif
 		waitFB("set vox ON");
 	} else {
 		cmd.assign(pre_to).append("\x16\x46");
 		cmd += '\x00';
 		cmd.append( post );
-#ifdef IC7100_DEBUG
-	stringstream ss;
-	ss << " () " << str2hex(cmd.data(), cmd.length());
-	LOG_INFO("%s", ss.str().c_str());
-#endif
 		waitFB("set vox OFF");
 	}
 }
@@ -976,12 +961,6 @@ void RIG_IC7100::set_vox_gain()
 	cmd +='\x63';
 	cmd.append(to_bcd((int)(progStatus.vox_gain * 2.55), 3));
 	cmd.append( post );
-#ifdef IC7100_DEBUG
-	stringstream ss;
-	ss << " [" << progStatus.vox_gain << "] " <<
-	str2hex(cmd.data(), cmd.length());
-	LOG_INFO("%s", ss.str().c_str());
-#endif
 	waitFB("SET vox gain");
 }
 
@@ -992,12 +971,6 @@ void RIG_IC7100::set_vox_anti()
 	cmd +='\x64';
 	cmd.append(to_bcd((int)(progStatus.vox_anti * 2.55), 3));
 	cmd.append( post );
-#ifdef IC7100_DEBUG
-	stringstream ss;
-	ss << " [" << progStatus.vox_anti << "] " <<
-	str2hex(cmd.data(), cmd.length());
-	LOG_INFO("%s", ss.str().c_str());
-#endif
 	waitFB("SET anti-vox");
 }
 
@@ -1008,12 +981,6 @@ void RIG_IC7100::set_vox_hang()
 	cmd +='\x65';
 	cmd.append(to_bcd((int)(progStatus.vox_hang / 10 ), 2));
 	cmd.append( post );
-#ifdef IC7100_DEBUG
-	stringstream ss;
-	ss << " [" << progStatus.vox_hang << "] " <<
-	str2hex(cmd.data(), cmd.length());
-	LOG_INFO("%s", ss.str().c_str());
-#endif
 	waitFB("SET vox hang");
 }
 
@@ -1024,12 +991,6 @@ void RIG_IC7100::set_cw_wpm()
 	cmd.assign(pre_to).append("\x14\x0C"); // values 0-255 = 6 to 48 WPM
 	cmd.append(to_bcd(round((progStatus.cw_wpm - 6) * 255 / (48 - 6)), 3));
 	cmd.append( post );
-#ifdef IC7100_DEBUG
-	stringstream ss;
-	ss << " [" << progStatus.cw_wpm << "] " <<
-	str2hex(cmd.data(), cmd.length());
-	LOG_INFO("%s", ss.str().c_str());
-#endif
 	waitFB("SET cw wpm");
 }
 
@@ -1039,12 +1000,6 @@ void RIG_IC7100::set_cw_qsk()
 	cmd.assign(pre_to).append("\x14\x0F");
 	cmd.append(to_bcd(n, 3));
 	cmd.append(post);
-#ifdef IC7100_DEBUG
-	stringstream ss;
-	ss << " [" << progStatus.cw_qsk << "] " <<
-	str2hex(cmd.data(), cmd.length());
-	LOG_INFO("%s", ss.str().c_str());
-#endif
 	waitFB("Set cw qsk delay");
 }
 
@@ -1056,12 +1011,6 @@ void RIG_IC7100::set_cw_spot_tone()
 	if (n < 0) n = 0;
 	cmd.append(to_bcd(n, 3));
 	cmd.append( post );
-#ifdef IC7100_DEBUG
-	stringstream ss;
-	ss << " [" << progStatus.cw_spot_tone << "] " <<
-	str2hex(cmd.data(), cmd.length());
-	LOG_INFO("%s", ss.str().c_str());
-#endif
 	waitFB("SET cw spot tone");
 }
 
@@ -1349,13 +1298,6 @@ void RIG_IC7100::set_notch(bool on, int val)
 	cmd.append(to_bcd(notch,3));
 	cmd.append(post);
 	waitFB("set notch val");
-
-#ifdef IC7100_DEBUG
-	stringstream ss;
-	 ss << " (" << on << ", " << val << ")" << str2hex(cmd.data(), cmd.length());
-	LOG_INFO("%s", ss.str().c_str());
-#endif
-
 }
 
 bool RIG_IC7100::get_notch(int &val)
@@ -1402,11 +1344,6 @@ void RIG_IC7100::set_auto_notch(int val)
 	cmd += '\x41';
 	cmd += val ? 0x01 : 0x00;
 	cmd.append( post );
-#ifdef IC7100_DEBUG
-	stringstream ss;
-	ss << " (" <<  val << ")" << str2hex(cmd.data(), cmd.length());
-	LOG_INFO("%s", ss.str().c_str());
-#endif
 	waitFB("set AN");
 }
 
@@ -1448,22 +1385,12 @@ void RIG_IC7100::set_if_shift(int val)
 	cmd.append("\x14\x07");
 	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
-#ifdef IC7100_DEBUG
-	stringstream ss;
-	ss << " inner(" <<  val << ")" << str2hex(cmd.data(), cmd.length());
-	LOG_INFO("%s", ss.str().c_str());
-#endif
 	waitFB("set IF inner");
 
 	cmd = pre_to;
 	cmd.append("\x14\x08");
 	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
-#ifdef IC7100_DEBUG
-	stringstream ss2;
-	ss2 << " outer(" <<  val << ")" << str2hex(cmd.data(), cmd.length());
-	LOG_INFO("%s", ss2.str().c_str());
-#endif
 	waitFB("set IF outer");
 }
 
@@ -1566,10 +1493,10 @@ int RIG_IC7100::get_noise()
 	cmd.append(post);
 	if (waitFOR(8, "get noise")) {
 		size_t p = replystr.rfind(resp);
+	get_trace(2, "get_noise()", str2hex(replystr.c_str(), replystr.length()));
 	if (p != string::npos)
 		return (replystr[p+6] ? 1 : 0);
 	}
-	get_trace(2, "get_noise()", str2hex(replystr.c_str(), replystr.length()));
 	return progStatus.noise;
 }
 
@@ -1622,10 +1549,10 @@ int RIG_IC7100::get_noise_reduction()
 	cmd.append(post);
 	if (waitFOR(8, "get NR")) {
 		size_t p = replystr.rfind(resp);
+	get_trace(2, "get_noise_reduction()", str2hex(replystr.c_str(), replystr.length()));
 	if (p != string::npos)
 		return (replystr[p+6] ? 1 : 0);
 	}
-	get_trace(2, "get_noise_reduction()", str2hex(replystr.c_str(), replystr.length()));
 	return progStatus.noise_reduction;
 }
 
@@ -1658,9 +1585,8 @@ int RIG_IC7100::get_noise_reduction_val()
 			val /= 16;
 		}
 	}
-	progStatus.noise_reduction_val = val;
 	get_trace(2, "get_nr_val()", str2hex(replystr.c_str(), replystr.length()));
-	return progStatus.noise_reduction_val;
+	return val;
 }
 
 // Read/Write band stack registers
@@ -1802,22 +1728,21 @@ void RIG_IC7100::set_FILT(int filter)
 		cmd = pre_to;
 		cmd += '\x06';
 		cmd += mdval[B.imode];
-		cmd += filter;
+		if (B.imode < LSBD7100)
+			cmd += filter;
 		cmd.append( post );
 		waitFB("set mode/filter B");
 		set_trace(2, "set mode/filter B", str2hex(replystr.c_str(), replystr.length()));
 
-		cmd = pre_to;
-		cmd += '\x1A'; cmd += '\x06';
 		if (B.imode >= LSBD7100) {
+			cmd = pre_to;
+			cmd += '\x1A'; cmd += '\x06';
 			cmd += '\x01';
-		} else {
-			cmd += '\x00';
+			cmd += filter;
+			cmd.append( post);
+			waitFB("set data mode B");
+			set_trace(2, "set data mode B", str2hex(replystr.c_str(), replystr.length()));
 		}
-		cmd += mode_filterB[B.imode];
-		cmd.append( post);
-		waitFB("set data mode/filter B");
-		set_trace(2, "set data mode/filter B", str2hex(replystr.c_str(), replystr.length()));
 	} else {
 		A.filter = filter;
 		mode_filterA[A.imode] = filter;
@@ -1825,22 +1750,21 @@ void RIG_IC7100::set_FILT(int filter)
 		cmd = pre_to;
 		cmd += '\x06';
 		cmd += mdval[A.imode];
-		cmd += filter;
+		if (A.imode < LSBD7100)
+			cmd += filter;
 		cmd.append( post );
 		waitFB("set filter A ");
 		set_trace(2, "set filter A", str2hex(replystr.c_str(), replystr.length()));
 
-		cmd = pre_to;
-		cmd += '\x1A'; cmd += '\x06';
 		if (A.imode >= LSBD7100) {
+			cmd = pre_to;
+			cmd += '\x1A'; cmd += '\x06';
 			cmd += '\x01';
-		} else {
-			cmd += '\x00';
+			cmd += filter;
+			cmd.append( post);
+			waitFB("set data mode A");
+			set_trace(2, "set data mode A", str2hex(replystr.c_str(), replystr.length()));
 		}
-		cmd += mode_filterA[A.imode];
-		cmd.append( post);
-		waitFB("set data mode/filter A");
-		set_trace(2, "set data mode/filter A", str2hex(replystr.c_str(), replystr.length()));
 	}
 }
 

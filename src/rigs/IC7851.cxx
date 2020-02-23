@@ -184,6 +184,8 @@ RIG_IC7851::RIG_IC7851() {
 
 	has_band_selection = true;
 
+	has_xcvr_auto_on_off = true;
+
 	precision = 1;
 	ndigits = 8;
 
@@ -210,6 +212,33 @@ void RIG_IC7851::selectB()
 	cmd.append(post);
 	sendICcommand(cmd, 6);
 	waitFB("Select B");
+}
+
+void RIG_IC7851::set_xcvr_auto_on()
+{
+	cmd.clear();
+	int fes[] = { 2, 2, 2, 3, 7, 13, 25, 50, 75, 150, 150, 150 };
+	if (progStatus.comm_baudrate >= 0 && progStatus.comm_baudrate <= 11) {
+		cmd.append( fes[progStatus.comm_baudrate], '\xFE');
+	}
+	cmd.append(pre_to);
+	cmd += '\x18'; cmd += '\x01';
+	cmd.append(post);
+	waitFB("Power ON", 200);
+
+	cmd = pre_to;
+	cmd += '\x19'; cmd += '\x00';
+	cmd.append(post);
+	waitFOR(8, "get ID", 10000);
+}
+
+void RIG_IC7851::set_xcvr_auto_off()
+{
+	cmd.clear();
+	cmd.append(pre_to);
+	cmd += '\x18'; cmd += '\x00';
+	cmd.append(post);
+	waitFB("Power OFF", 200);
 }
 
 bool RIG_IC7851::check ()

@@ -123,8 +123,6 @@ int  RIG_KX3::def_bandwidth(int m)
 	return def_mode_width[m];
 }
 
-extern int report_level;
-
 void RIG_KX3::initialize()
 {
 	debug::level = debug::INFO_LEVEL;
@@ -138,7 +136,6 @@ void RIG_KX3::initialize()
 	k3_widgets[5].W = sldrMICGAIN;
 	k3_widgets[6].W = sldrPOWER;
 
-	report_level = INFO;
 	cmd = "AI0;"; // disable auto-info
 	sendCommand(cmd);
 	showresp(INFO, ASC, "disable auto-info", cmd, replystr);

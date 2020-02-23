@@ -169,6 +169,9 @@ public:
 	void set_BANDWIDTHS(std::string s);
 	std::string get_BANDWIDTHS();
 
+	void set_xcvr_auto_on();
+	void set_xcvr_auto_off();
+
 };
 
 #endif

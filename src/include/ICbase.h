@@ -43,8 +43,8 @@ public:
 	void checkresponse();
 	bool sendICcommand(string str, int nbr);
 	void delayCommand(string cmd, int wait);
-	bool  waitFB(const char *sz);
-	bool  waitFOR(size_t n, const char *sz);
+	bool  waitFB(const char *sz, int timeout = 0);
+	bool  waitFOR(size_t n, const char *sz, int timeout = 0);
 	void adjustCIV(uchar adr);
 
 	virtual void swapAB();

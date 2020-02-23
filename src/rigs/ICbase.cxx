@@ -101,7 +101,7 @@ void RIG_ICOM::ICtrace(string cmd, string hexstr)
 	rig_trace(2, cmd.c_str(), s1.c_str());
 }
 
-bool RIG_ICOM::waitFB(const char *sz)
+bool RIG_ICOM::waitFB(const char *sz, int timeout)
 {
 	guard_lock cmd_lock(&command_mutex);
 
@@ -110,55 +110,60 @@ bool RIG_ICOM::waitFB(const char *sz)
 	char sztemp[100];
 	string returned = "";
 	string tosend = cmd;
-	unsigned long tod_start = zmsec();
 	unsigned long msec_start = 0;
+	int diff;
 
 	if (!progStatus.use_tcpip && !RigSerial->IsOpen()) {
 		replystr = cmd;//returned;
 		return false;
 	}
-	int cnt = 0, repeat = 0, num = cmd.length() + ok.length();
+	int num = cmd.length() + ok.length();
 
-	int wait_msec = (int)(num*11000.0/RigSerial->Baud() +
-			progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 50) / 10;
+	int wait_msec = progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0;
+	wait_msec += 100;
+	wait_msec += num * 11000.0 / RigSerial->Baud();
 
-	for (repeat = 0; repeat < progStatus.comm_retries; repeat++) {
-		msec_start = zmsec();
-		sendCommand(cmd, 0);
-		returned = "";
-		for ( cnt = 0; cnt < wait_msec; cnt++) {
-			if (readResponse())
-				returned.append(respstr);
-			if (returned.find(ok) != string::npos) {
-				replystr = returned;
-				unsigned long int waited = zmsec() - msec_start;
-				snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, OK", sz, waited);
-				if (repeat)
-					showresp(WARN, HEX, sztemp, tosend, returned);
-				else
-					showresp(DEBUG, HEX, sztemp, tosend, returned);
-				return true;
-			}
-			if (returned.find(bad) != string::npos) {
-				replystr = returned;
-				unsigned long int waited = zmsec() - msec_start;
-				snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, FAIL", sz, waited);
-				showresp(ERR, HEX, sztemp, tosend, returned);
-				return false;
-			}
-			MilliSleep(10);
-			Fl::awake();
+	timeout += wait_msec;
+
+	unsigned long int loop_start;
+
+	msec_start = zmsec();
+
+	respstr.clear();
+	sendCommand(cmd, 0);
+	returned.clear();
+	loop_start = zmsec();
+	diff = zmsec() - loop_start;
+
+	while ( diff < timeout) { //wait_msec + 10 ) {
+		returned.append(respstr);
+		if (returned.find(ok) != string::npos) {
+			replystr = returned;
+			unsigned long int waited = zmsec() - msec_start;
+			snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, OK", sz, waited);
+			showresp(DEBUG, HEX, sztemp, tosend, returned);
+			return true;
 		}
+		if (returned.find(bad) != string::npos) {
+			replystr = returned;
+			unsigned long int waited = zmsec() - msec_start;
+			snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, FAILED", sz, waited);
+			showresp(ERR, HEX, sztemp, tosend, returned);
+			return false;
+		}
+		readResponse();
+		diff = zmsec() - loop_start;
 	}
+
+	diff = zmsec() - msec_start;
 	replystr = returned;
-	unsigned long int waited = zmsec() - tod_start;
-	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %ld ms", sz, waited);
-	showresp(ERR, HEX, sztemp, tosend, replystr);
+	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT : %d ms", sz, diff);
+	showresp(ERR, HEX, sztemp, tosend, returned);
 
 	return false;
 }
 
-bool RIG_ICOM::waitFOR(size_t n, const char *sz)
+bool RIG_ICOM::waitFOR(size_t n, const char *sz, int timeout)
 {
 	guard_lock cmd_lock(&command_mutex);
 
@@ -167,42 +172,53 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz)
 	char sztemp[100];
 	string returned = "";
 	string tosend = cmd;
-	int cnt = 0, repeat = 0;
 	size_t num = n;
+	int diff = 0;
 	if (progStatus.comm_echo) num += cmd.length();
 
-	unsigned long int tod_start = zmsec();
-	unsigned long int msec_start = 0;
+	unsigned long int msec_start;
+	unsigned long int repeat_start;
+	unsigned long int loop_start;
 
-	int delay =  (int)(num * 11000.0 / RigSerial->Baud() + 
-		progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 50) / 10;
+	int delay = progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0;
+	delay += 100;
+	delay += num * 11000.0 / RigSerial->Baud();
 
 	if (!progStatus.use_tcpip && !RigSerial->IsOpen()) {
-		replystr = cmd;//returned;
+		replystr = cmd;
 		return false;
 	}
-	for (repeat = 0; repeat < progStatus.comm_retries; repeat++) {
-		msec_start = zmsec();
+	if (timeout == 0) timeout = progStatus.comm_retries * delay;
+	msec_start = zmsec();
+
+	repeat_start = zmsec();
+	respstr.clear();
+	while (int(zmsec() - repeat_start) < timeout) {
 		sendCommand(tosend, 0);
-		returned = "";
-		for ( cnt = 0; cnt < delay; cnt++) {
-			if (readResponse())
-				returned.append(respstr);
+		returned = respstr;//""; // sendCommand captures xcvr response in respstr
+		loop_start = zmsec();
+		diff = zmsec() - loop_start;
+		while ( diff < delay + 10 ) {
+			if (returned.find(bad) != string::npos) {
+				snprintf(sztemp, sizeof(sztemp), "%s : %d ms", sz, int(zmsec() - msec_start));
+				showresp(ERR, HEX, sztemp, tosend, returned);
+				return false;
+			}
 			if (returned.length() >= num) {
 				replystr = returned;
-				unsigned long int waited = zmsec() - msec_start;
-				snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, OK  ", sz, waited);
+				snprintf(sztemp, sizeof(sztemp), "%s : %d ms", sz, int(zmsec() - msec_start));
 				showresp(DEBUG, HEX, sztemp, tosend, returned);
 				return true;
 			}
-			MilliSleep(10);
-			Fl::awake();
+			if (readResponse())
+				returned.append(respstr);
+			diff = zmsec() - loop_start;
 		}
 	}
 
+	diff = zmsec() - msec_start;
 	replystr = returned;
-	unsigned long int waited = zmsec() - tod_start;
-	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %ld ms", sz, waited);
+	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT : %d ms", sz, diff);
 	showresp(ERR, HEX, sztemp, tosend, returned);
 
 	return false;
