@@ -115,6 +115,8 @@ public:
 	void set_band_selection(int v);
 	void get_band_selection(int v);
 
+	void set_xcvr_auto_on();
+	void set_xcvr_auto_off();
 };
 
 #endif

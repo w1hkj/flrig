@@ -124,8 +124,6 @@ int  RIG_K3::def_bandwidth(int m)
 
 #define K3_WAIT_TIME 800
 
-extern int report_level;
-
 void RIG_K3::initialize()
 {
 	debug::level = debug::INFO_LEVEL;
@@ -139,7 +137,6 @@ void RIG_K3::initialize()
 	k3_widgets[5].W = sldrMICGAIN;
 	k3_widgets[6].W = sldrPOWER;
 
-	report_level = INFO;
 	cmd = "AI0;"; // disable auto-info
 	sendCommand(cmd);
 	showresp(INFO, ASC, "disable auto-info", cmd, replystr);

@@ -515,7 +515,7 @@ static void cb_poll_noise(Fl_Value_Input* o, void*) {
 }
 
 static void cb_poll_nr(Fl_Value_Input* o, void*) {
-	progStatus.poll_noise = o->value();
+	progStatus.poll_nr = o->value();
 }
 
 static void cb_poll_compression(Fl_Value_Input* o, void *) {
@@ -1467,7 +1467,7 @@ Fl_Group *createPOLLING(int X, int Y, int W, int H, const char *label)
 		poll_nr->step(1);
 		poll_nr->callback((Fl_Callback*)cb_poll_nr);
 		poll_nr->align(Fl_Align(FL_ALIGN_RIGHT));
-		poll_nr->value(progStatus.poll_noise);
+		poll_nr->value(progStatus.poll_nr);
 
 		poll_compression = new Fl_Value_Input(X + 190, Y + 190, 30, 20, _("Comp'"));
 		poll_compression->tooltip(_("Compression"));

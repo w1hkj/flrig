@@ -166,7 +166,6 @@ void assignReplyStr(string val)
 }
 
 char replybuff[RXBUFFSIZE+1];
-//string replystr;
 string respstr;
 
 int readResponse()

@@ -113,7 +113,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	sldrVOLUME->textsize(12);
 	sldrVOLUME->callback((Fl_Callback*)cb_sldrVOLUME);
 	sldrVOLUME->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-	sldrVOLUME->when(FL_WHEN_CHANGED | FL_LEAVE);
+	sldrVOLUME->when(FL_WHEN_CHANGED | FL_MOUSEWHEEL | FL_LEAVE);
 	sldrVOLUME->reverse(true);
 
 	btnAGC = new Fl_Light_Button(2, 145, 50, 18, _("AGC"));

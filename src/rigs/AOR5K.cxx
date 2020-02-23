@@ -171,7 +171,6 @@ int  RIG_AOR5K::def_bandwidth(int m)
 
 #define AOR5K_WAIT_TIME 800
 
-extern int report_level;
 
 void RIG_AOR5K::initialize()
 {
@@ -187,7 +186,6 @@ void RIG_AOR5K::initialize()
 //	aor5k_widgets[5].W = sldrNOTCH;
 //	aor5k_widgets[6].W = sldrPOWER;
 
-	report_level = INFO;
 //	cmd = "AI0;"; // disable auto-info
 //	sendCommand(cmd);
 //	showresp(INFO, ASC, "disable auto-info", cmd, replystr);
