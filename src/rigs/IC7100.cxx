@@ -216,6 +216,9 @@ RIG_IC7100::RIG_IC7100() {
 	has_noise_reduction = true;
 	has_noise_reduction_control = true;
 
+	has_auto_notch = true;
+	has_notch_control = true;
+
 	has_attenuator_control = true;
 	has_preamp_control = true;
 
@@ -1285,7 +1288,13 @@ int RIG_IC7100::get_alc()
 
 void RIG_IC7100::set_notch(bool on, int val)
 {
-	int notch = (int)(val * 256.0 / 3000.0);
+	int freq = val - 1500;
+	if (vfo->imode == LSB7100 || vfo->imode == CW7100 || 
+		vfo->imode == RTTY7100 || vfo->imode == LSBD7100 )
+		freq = 1500 - val;
+	if (freq < -1500) freq = 1500;
+	if (freq > 1500) freq = 1500;
+	int notch = (int)(freq * 60.0 / 1200.0) + 128;
 
 	cmd = pre_to;
 	cmd.append("\x16\x48");
@@ -1303,7 +1312,7 @@ void RIG_IC7100::set_notch(bool on, int val)
 bool RIG_IC7100::get_notch(int &val)
 {
 	bool on = false;
-	val = 0;
+	val = 1500;
 
 	string cstr = "\x16\x48";
 	string resp = pre_fm;
@@ -1323,8 +1332,13 @@ bool RIG_IC7100::get_notch(int &val)
 		cmd.append(post);
 		if (waitFOR(9, "notch val")) {
 			size_t p = replystr.rfind(resp);
-			if (p != string::npos)
-				val = (int)ceil(fm_bcd(replystr.substr(p+6),3) * 3000.0 / 255.0);
+			if (p != string::npos) {
+				val = (int)ceil(fm_bcd(replystr.substr(p+6),3)) - 128;
+				if (vfo->imode == LSB7100 || vfo->imode == CW7100 || 
+					vfo->imode == RTTY7100 || vfo->imode == LSBD7100 )
+					val = -val;
+				val = val * 1200 / 60 + 1500;
+			}
 		}
 	}
 	return on;
