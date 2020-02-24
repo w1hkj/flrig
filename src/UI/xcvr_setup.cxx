@@ -91,6 +91,7 @@ Fl_Value_Input *poll_split = (Fl_Value_Input *)0;
 Fl_Value_Input *poll_noise = (Fl_Value_Input *)0;
 Fl_Value_Input *poll_nr = (Fl_Value_Input *)0;
 Fl_Value_Input *poll_compression = (Fl_Value_Input *)0;
+Fl_Value_Input *poll_tuner = (Fl_Value_Input *)0;
 Fl_Button *btnClearAddControls = (Fl_Button *)0;
 
 Fl_Value_Input *poll_meters = (Fl_Value_Input *)0;
@@ -522,6 +523,10 @@ static void cb_poll_compression(Fl_Value_Input* o, void *) {
 	progStatus.poll_compression = o->value();
 }
 
+static void cb_poll_tuner(Fl_Value_Input* o, void *) {
+	progStatus.poll_tuner = o->value();
+}
+
 static void cb_poll_meters(Fl_Value_Input* o, void*) {
 	progStatus.poll_meters = o->value();
 }
@@ -570,6 +575,7 @@ static void cb_btnSetAdd(Fl_Button*, void*) {
 	poll_noise->value(progStatus.poll_all);
 	poll_nr->value(progStatus.poll_all);
 	poll_compression->value(progStatus.poll_all);
+	poll_tuner->value(progStatus.poll_all);
 
 	progStatus.poll_volume = progStatus.poll_all;
 	progStatus.poll_micgain = progStatus.poll_all;
@@ -584,6 +590,7 @@ static void cb_btnSetAdd(Fl_Button*, void*) {
 	progStatus.poll_noise = progStatus.poll_all;
 	progStatus.poll_nr = progStatus.poll_all;
 	progStatus.poll_compression = progStatus.poll_all;
+	progStatus.poll_tuner = progStatus.poll_all;
 }
 
 static void cb_btn_send_command(Fl_Button *o, void*) {
@@ -1428,6 +1435,14 @@ Fl_Group *createPOLLING(int X, int Y, int W, int H, const char *label)
 		poll_auto_notch->callback((Fl_Callback*)cb_poll_auto_notch);
 		poll_auto_notch->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_auto_notch->value(progStatus.poll_auto_notch);
+
+		poll_tuner = new Fl_Value_Input(X + 280, Y + 140, 30, 20, _("Tuner"));
+		poll_tuner->tooltip(_("Auto Tuner"));
+		poll_tuner->maximum(10);
+		poll_tuner->step(1);
+		poll_tuner->callback((Fl_Callback*)cb_poll_tuner);
+		poll_tuner->align(Fl_Align(FL_ALIGN_RIGHT));
+		poll_tuner->value(progStatus.poll_tuner);
 
 		poll_pre_att = new Fl_Value_Input(X + 10, Y + 165, 30, 20, _("Pre/Att"));
 		poll_pre_att->tooltip(_("Preamp / Attenuator"));

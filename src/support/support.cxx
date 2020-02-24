@@ -1061,7 +1061,7 @@ POLL_PAIR RX_poll_pairs[] = {
 	{&progStatus.poll_mode, read_mode},
 	{&progStatus.poll_bandwidth, read_bandwidth},
 	{&progStatus.poll_smeter, read_smeter},
-	{&progStatus.poll_smeter, read_tuner},
+	{&progStatus.poll_tuner, read_tuner},
 	{&progStatus.poll_volume, read_volume},
 	{&progStatus.poll_auto_notch, read_auto_notch},
 	{&progStatus.poll_notch, read_notch},
