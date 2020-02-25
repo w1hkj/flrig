@@ -576,6 +576,13 @@ void RIG_FT891::set_preamp(int val)
 {
 	if (val) cmd = "PA01;";
 	else     cmd = "PA00;";
+	if (val) {
+		preamp_label("AMP", true);
+	} else {
+		preamp_label("IPO", false);
+	}
+	preamp_level = val;
+
 	sendCommand (cmd);
 	showresp(WARN, ASC, "SET preamp", cmd, replystr);
 }
@@ -589,6 +596,12 @@ int RIG_FT891::get_preamp()
 	size_t p = replystr.rfind(rsp);
 	if (p != string::npos)
 		preamp_level = replystr[p+3] - '0';
+
+	if (preamp_level == 1) {
+		preamp_label("Amp", true);
+	} else {
+		preamp_label("IPO", false);
+	}
 
 	return preamp_level;
 }
