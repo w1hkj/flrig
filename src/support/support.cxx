@@ -3290,9 +3290,9 @@ void close_UI()
 	}
 	pthread_join(*serial_thread, NULL);
 
-	// xcvr auto off
-	if (selrig->has_xcvr_auto_on_off && progStatus.xcvr_auto_off)
-		selrig->set_xcvr_auto_off();
+// xcvr auto off
+//	if (selrig->has_xcvr_auto_on_off && progStatus.xcvr_auto_off)
+//		selrig->set_xcvr_auto_off();
 
 	// close down the serial port
 	RigSerial->ClosePort();
@@ -3315,7 +3315,10 @@ void closeRig()
 	if (xcvr_initialized) {
 		restore_rig_vals();
 		selrig->shutdown();
-}
+	// xcvr auto off
+		if (selrig->has_xcvr_auto_on_off && progStatus.xcvr_auto_off)
+			selrig->set_xcvr_auto_off();
+	}
 	close_rig = false;
 }
 
