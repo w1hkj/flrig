@@ -1820,6 +1820,27 @@ public:
 } rig_cat_string(&rig_server);
 
 
+static void shutdown(void *)
+{
+	cbExit();
+}
+
+class rig_shutdown : public XmlRpcServerMethod {
+public:
+	rig_shutdown(XmlRpcServer* s) : XmlRpcServerMethod("rig.shutdown", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized) {
+			result = 0;
+			return;
+		}
+		Fl::awake(shutdown, static_cast<void *>(0));
+	}
+	std::string help() { return std::string("turn off rig / close flrig"); }
+
+} rig_shutdown(&rig_server);
+
+
 struct MLIST {
 	string name; string signature; string help;
 } mlist[] = {
@@ -1869,7 +1890,8 @@ struct MLIST {
 	{ "rig.set_rfgain",   "i:i", "sets rf gain control" },
 	{ "rig.set_micgain",  "i:i", "sets mic gain control" },
 	{ "rig.swap",         "i:i", "execute vfo swap" },
-	{ "rig.cat_string",   "s:s", "execute CAT string" }
+	{ "rig.cat_string",   "s:s", "execute CAT string" },
+	{ "rig.shutdown",     "i:i", "shutdown xcvr & flrig" }
 };
 
 class rig_list_methods : public XmlRpcServerMethod {
