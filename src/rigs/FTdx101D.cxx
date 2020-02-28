@@ -457,38 +457,32 @@ int RIG_FTdx101D::get_swr()
 
 struct pwrpair {int mtr; float pwr;};
 
-static pwrpair pwrtbl[] = { 
-{ 32,  5.0 },
-{ 53, 10.0 },
-{ 80, 20.0 },
-{ 97, 30.0 },
-{119, 40.0 },
-{137, 50.0 },
-{154, 60.0 },
-{167, 70.0 },
-{177, 80.0 },
-{188, 90.0 },
-{197,100.0 },
-};
-
 int RIG_FTdx101D::get_power_out()
 {
+	static pwrpair pwrtbl[] = { 
+		{ 35,  5.0 },
+		{ 94, 25.0 },
+		{147, 50.0 },
+		{176, 75.0 },
+		{205,100.0 }
+	};
+
 	cmd = rsp = "RM5";
 	sendCommand(cmd.append(";"));
 	wait_char(';', 7, 100, "get pout", ASC);
-
 	gett("get_power_out()");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
-	if (p + 6 >= replystr.length()) return 0;
-	int mtr = atoi(&replystr[p+3]);
+ 	replystr.erase(p, p + rsp.length());
+	replystr.erase(3);
+	int mtr = atoi(replystr.c_str());
 	size_t i = 0;
 	for (i = 0; i < sizeof(pwrtbl) / sizeof(pwrpair) - 1; i++)
 		if (mtr >= pwrtbl[i].mtr && mtr < pwrtbl[i+1].mtr)
 			break;
 	if (mtr < 0) mtr = 0;
-	if (mtr > 197) mtr = 197;
+	if (mtr > 205) mtr = 205;
 	int pwr = (int)ceil(pwrtbl[i].pwr + 
 			  (pwrtbl[i+1].pwr - pwrtbl[i].pwr)*(mtr - pwrtbl[i].mtr) / (pwrtbl[i+1].mtr - pwrtbl[i].mtr));
 
@@ -622,8 +616,8 @@ int RIG_FTdx101D::get_tune()
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
-	int val = replystr[p+4] - '0';
-	return !(val < 2);
+	if (replystr[p+4] == '0') return 0;
+	return 1;
 }
 
 
@@ -1404,19 +1398,19 @@ int RIG_FTdx101MP::get_power_out()
 		{167, 140.0 },
 		{177, 160.0 },
 		{188, 180.0 },
-		{197, 200.0 },
+		{197, 200.0 }
 	};
 
 	cmd = rsp = "RM5";
 	sendCommand(cmd.append(";"));
 	wait_char(';', 7, 100, "get pout", ASC);
-
 	gett("get_power_out()");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
-	if (p + 6 >= replystr.length()) return 0;
-	int mtr = atoi(&replystr[p+3]);
+ 	replystr.erase(p, p + rsp.length());
+	replystr.erase(3);
+	int mtr = atoi(replystr.c_str());
 	size_t i = 0;
 	for (i = 0; i < sizeof(pwrtbl) / sizeof(pwrpair) - 1; i++)
 		if (mtr >= pwrtbl[i].mtr && mtr < pwrtbl[i+1].mtr)
