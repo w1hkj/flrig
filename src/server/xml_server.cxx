@@ -1792,16 +1792,14 @@ public:
 			}
 		} else
 			cmd = command;
-
 // lock out polling loops until done
 		{
 			guard_lock lock1(&mutex_srvc_reqs);
 			guard_lock lock2(&mutex_serial);
-			sendCommand(cmd, cmd.length());
+			sendCommand(cmd, 0, 0);//cmd.length());
 
 			retstr.clear();
 			waitResponse(100);
-
 			if (!respstr.empty()) {
 				retstr = usehex ? 
 					str2hex(respstr.c_str(), respstr.length()) :
