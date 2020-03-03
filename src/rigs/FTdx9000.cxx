@@ -202,7 +202,8 @@ RIG_FTdx9000::RIG_FTdx9000() {
 	has_preamp_control =
 	has_ifshift_control =
 	has_ptt_control =
-	has_tune_control = true;
+	has_tune_control =
+	has_xcvr_auto_on_off = true;
 
 // derived specific
 	atten_level = 0;
@@ -213,6 +214,27 @@ RIG_FTdx9000::RIG_FTdx9000() {
 	precision = 1;
 	ndigits = 8;
 
+}
+
+void RIG_FTdx9000::set_xcvr_auto_on()
+{
+// send dummy data request for ID (see pg 12 CAT reference book)
+	cmd = "ID;";
+	sendCommand(cmd);
+// wait 1 to 2 seconds
+	MilliSleep(1500);
+	cmd = "PS1;";
+	sendCommand(cmd);
+// wait for power on status
+	cmd = "PS;";
+	waitN(4, 500, "Xcvr ON?", ASC);
+}
+
+void RIG_FTdx9000::set_xcvr_auto_off()
+{
+	cmd = "PS0;";
+	sendCommand(cmd);
+	sett("set_xcvr_auto_off");
 }
 
 void RIG_FTdx9000::get_band_selection(int v)
@@ -336,7 +358,7 @@ void RIG_FTdx9000::selectA()
 
 void RIG_FTdx9000::selectB()
 {
-	cmd = "FR4;FT3;";
+	cmd = "FR3;FT3;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select B", cmd, replystr);
 }
@@ -412,31 +434,55 @@ int RIG_FTdx9000::get_swr()
 	return mtr / 2.56;
 }
 
+struct pwrpair {int mtr; float pwr;};
+
 int RIG_FTdx9000::get_power_out()
 {
+	static pwrpair pwrtbl[] = { 
+		{ 32, 10.0 },
+		{ 53, 20.0 },
+		{ 80, 40.0 },
+		{ 97, 60.0 },
+		{119, 80.0 },
+		{137, 100.0 },
+		{154, 120.0 },
+		{167, 140.0 },
+		{177, 160.0 },
+		{188, 180.0 },
+		{197, 200.0 },
+	};
+
 	cmd = rsp = "RM5";
 	sendCommand(cmd.append(";"));
 	wait_char(';', 7, 100, "get pout", ASC);
 
-	rig_trace(2, "get_power_out()", replystr.c_str());
+	gett("get_power_out()");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
-	double mtr = (double)(atoi(&replystr[p+3]));
-//	mtr = -6.6263535 + .11813178 * mtr + .0013607405 * mtr * mtr;
-	mtr = 0.116 * mtr + 0.0011 * mtr * mtr;
-	return (int)mtr;
+	int mtr = atoi(&replystr[p+3]);
+	size_t i = 0;
+	for (i = 0; i < sizeof(pwrtbl) / sizeof(pwrpair) - 1; i++)
+		if (mtr >= pwrtbl[i].mtr && mtr < pwrtbl[i+1].mtr)
+			break;
+	if (mtr < 0) mtr = 0;
+	if (mtr > 197) mtr = 197;
+	int pwr = (int)ceil(pwrtbl[i].pwr + 
+			  (pwrtbl[i+1].pwr - pwrtbl[i].pwr)*(mtr - pwrtbl[i].mtr) / (pwrtbl[i+1].mtr - pwrtbl[i].mtr));
+
+	if (pwr > 200) pwr = 200;
+
+	return (int)pwr;
 }
 
-// Transceiver power level
 int RIG_FTdx9000::get_power_control()
 {
 	cmd = rsp = "PC";
 	cmd += ';';
 	wait_char(';', 6, 100, "get power", ASC);
 
-	rig_trace(2, "get_power_control()", replystr.c_str());
+	gett("get_power_control()");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.power_level;
@@ -938,7 +984,10 @@ void RIG_FTdx9000::set_if_shift(int val)
 
 bool RIG_FTdx9000::get_if_shift(int &val)
 {
-	cmd = rsp = "IS0";
+	if (useB)
+		cmd = rsp = "IS1";
+	else
+		cmd = rsp = "IS0";
 	cmd += ';';
 	wait_char(';', 9, 100, "get if shift", ASC);
 
