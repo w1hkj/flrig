@@ -57,14 +57,14 @@ static const char FTdx101D_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '8
 static const char FTdx101D_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L', 'U', 'U', 'U', 'U', 'U', 'U', 'U' };
 
 static const char *FTdx101D_widths_SSB[] = {
- "200",  "400",  "600",  "850", "1100", 
-"1350", "1500", "1650", "1800", "1950",
+ "300",  "400",  "600",  "850", "1100", 
+"1200", "1500", "1650", "1800", "1950",
 "2100", "2200", "2300", "2400", "2500",
 "2600", "2700", "2800", "2900", "3000",
-"3200", NULL };
+"3200", "3500", "4000", NULL };
 
 static int FTdx101D_wvals_SSB[] = {
-1,2,3,4,5,6,7,8,9,10,11,12,13,15,16,17,18,19,20,21, WVALS_LIMIT};
+1,2,3,4,5,6,7,8,9,10,11,12,13,15,16,17,18,19,20,21,22,23 WVALS_LIMIT};
 
 static const char *FTdx101D_widths_CW[] = {
   "50",  "100",  "150",  "200",  "250",
@@ -84,7 +84,7 @@ static const char *FTdx101D_widths_RTTY[] = {
 static int FTdx101D_wvals_RTTY[] = {
 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18, WVALS_LIMIT };
 
-static const char *FTdx101D_widths_PSK[] = {
+static const char *FTdx101D_widths_DATA[] = {
   "50",  "100",  "150",  "200",  "250", 
  "300",  "350",  "400",  "450",  "500",
  "600",  "800", "1200", "1400", "1700",
@@ -95,11 +95,12 @@ static int FTdx101D_wvals_PSK[] = {
 
 static const int FTdx101D_wvals_AMFM[] = { 0, WVALS_LIMIT };
 
-static const char *FTdx101D_widths_AMwide[] = { "AM-bw", NULL };
-static const char *FTdx101D_widths_AMnar[]  = { "AM-nar", NULL };
-static const char *FTdx101D_widths_FMnar[]  = { "FM-nar", NULL };
-static const char *FTdx101D_widths_FMwide[] = { "FM-wid", NULL };
-static const char *FTdx101D_widths_FMpkt[]  = { "FM-pkt", NULL };
+static const char *FTdx101D_widths_AMwide[] = { "9000", NULL };
+static const char *FTdx101D_widths_AMnar[]  = { "6000", NULL };
+static const char *FTdx101D_widths_FMnar[]  = { "9000", NULL };
+static const char *FTdx101D_widths_FMwide[] = { "16000", NULL };
+static const char *FTdx101D_widths_DATA_FM[]  = { "16000", NULL };
+static const char *FTdx101D_widths_DATA_FMN[] = { "9000", NULL };
 
 static const char *FTdx101D_US_60m[] = {NULL, "126", "127", "128", "130", NULL};
 // US has 5 60M presets. Using dummy numbers for all.
@@ -207,7 +208,8 @@ RIG_FTdx101D::RIG_FTdx101D() {
 	has_preamp_control =
 	has_ifshift_control =
 	has_ptt_control =
-	has_tune_control = true;
+	has_tune_control = 
+	has_xcvr_auto_on_off = true;
 
 // derived specific
 	atten_level = 0;
@@ -218,6 +220,27 @@ RIG_FTdx101D::RIG_FTdx101D() {
 	precision = 1;
 	ndigits = 8;
 
+}
+
+void RIG_FTdx101D::set_xcvr_auto_on()
+{
+// send dummy data request for ID (see pg 12 CAT reference book)
+	cmd = "ID;";
+	sendCommand(cmd);
+// wait 1 to 2 seconds
+	MilliSleep(1500);
+	cmd = "PS1;";
+	sendCommand(cmd);
+// wait for power on status
+	cmd = "PS;";
+	waitN(4, 500, "Xcvr ON?", ASC);
+}
+
+void RIG_FTdx101D::set_xcvr_auto_off()
+{
+	cmd = "PS0;";
+	sendCommand(cmd);
+	sett("set_xcvr_auto_off");
 }
 
 void RIG_FTdx101D::get_band_selection(int v)
@@ -720,13 +743,14 @@ int RIG_FTdx101D::adjust_bandwidth(int val)
 		else if (val ==  mAM) bandwidths_ = FTdx101D_widths_AMwide;
 		else if (val == mAM_N) bandwidths_ = FTdx101D_widths_AMnar;
 		else if (val == mFM_N) bandwidths_ = FTdx101D_widths_FMnar;
-		else if (val == mDATA_FM) bandwidths_ = FTdx101D_widths_FMpkt;
+		else if (val == mDATA_FM) bandwidths_ = FTdx101D_widths_DATA_FM;
+		else if (val == mDATA_FMN) bandwidths_ = FTdx101D_widths_DATA_FMN;
 		bw_vals_ = FTdx101D_wvals_AMFM;
 	} else if (val == mRTTY_L || val == mRTTY_U) { // RTTY
 		bandwidths_ = FTdx101D_widths_RTTY;
 		bw_vals_ = FTdx101D_wvals_RTTY;
 	} else if (val == mDATA_L || val == mDATA_U) { // PSK
-		bandwidths_ = FTdx101D_widths_PSK;
+		bandwidths_ = FTdx101D_widths_DATA;
 		bw_vals_ = FTdx101D_wvals_PSK;
 	} else {
 		bandwidths_ = FTdx101D_widths_SSB;
@@ -768,11 +792,11 @@ const char ** RIG_FTdx101D::bwtable(int n)
 		case mRTTY_L: case mRTTY_U: 
 			return FTdx101D_widths_RTTY;
 		case mDATA_L: case mDATA_U: 
-			return FTdx101D_widths_PSK;
+			return FTdx101D_widths_DATA;
 		case mFM_N: 
-			return FTdx101D_widths_FMnar;
+			return FTdx101D_widths_DATA_FMN;
 		case mDATA_FM: 
-			return FTdx101D_widths_FMpkt;
+			return FTdx101D_widths_DATA_FM;
 		default: ;
 	}
 	return FTdx101D_widths_SSB;
@@ -787,19 +811,7 @@ void RIG_FTdx101D::set_modeA(int val)
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET mode A", cmd, replystr);
 	adjust_bandwidth(modeA);
-//	if (val == mCW_U || val == mCW_L) return;
-//	if (progStatus.spot_onoff) {
-//		progStatus.spot_onoff = false;
-//		set_spot_onoff();
-//		cmd = "CS0;";
-//		sendCommand(cmd);
-//		showresp(WARN, ASC, "SET spot off", cmd, replystr);
-//		btnSpot->value(0);
-//	}
 }
-
-//static string Amode = "MD03;";
-//static string Bmode = "MD19;";
 
 int RIG_FTdx101D::get_modeA()
 {
@@ -808,8 +820,6 @@ int RIG_FTdx101D::get_modeA()
 	wait_char(';', 5, 100, "get mode A", ASC);
 
 	gett("get_modeA()");
-
-//replystr = Amode;
 
 	size_t p = replystr.rfind(rsp);
 	if (p != string::npos) {
@@ -835,15 +845,6 @@ void RIG_FTdx101D::set_modeB(int val)
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET mode B", cmd, replystr);
 	adjust_bandwidth(modeA);
-//	if (val == mCW_U || val == mCW_L) return;
-//	if (progStatus.spot_onoff) {
-//		progStatus.spot_onoff = false;
-//		set_spot_onoff();
-//		cmd = "CS0;";
-//		sendCommand(cmd);
-//		showresp(WARN, ASC, "SET spot off", cmd, replystr);
-//		btnSpot->value(0);
-//	}
 }
 
 int RIG_FTdx101D::get_modeB()
@@ -853,7 +854,6 @@ int RIG_FTdx101D::get_modeB()
 	wait_char(';', 5, 100, "get mode B", ASC);
 
 	gett("get_modeB()");
-//replystr = Bmode;
 
 	size_t p = replystr.rfind(rsp);
 	if (p != string::npos) {
@@ -869,9 +869,6 @@ int RIG_FTdx101D::get_modeB()
 	adjust_bandwidth(modeB);
 	return modeB;
 }
-
-//static string Abw = "SH0000;";
-//static string Bbw = "SH1013;";
 
 void RIG_FTdx101D::set_bwA(int val)
 {
@@ -908,7 +905,7 @@ int RIG_FTdx101D::get_bwA()
 	wait_char(';', 7, 100, "get bw A", ASC);
 
 	gett("get_bwA()");
-//replystr = Abw;
+
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return bwA;
 
@@ -918,7 +915,7 @@ int RIG_FTdx101D::get_bwA()
 		cmd = rsp = "NA0";
 		cmd += ';';
 		wait_char(';', 5, 100, "get narrow", ASC);
-//replystr = "NA00;";
+
 		p = replystr.rfind(rsp);
 		if (p == std::string::npos)
 			return mode_bwA[modeA] = bwA;
@@ -976,7 +973,7 @@ int RIG_FTdx101D::get_bwB()
 	wait_char(';', 7, 100, "get bw B", ASC);
 
 	gett("get_bwB()");
-//replystr = Bbw;
+
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return bwB;
 
@@ -987,7 +984,7 @@ int RIG_FTdx101D::get_bwB()
 		cmd = rsp = "NA1";
 		cmd += ';';
 		wait_char(';', 5, 100, "get narrow", ASC);
-//replystr = "NA11;";
+
 		p = replystr.rfind(rsp);
 		if (p == std::string::npos)
 			return mode_bwB[modeB] = bwB;
@@ -1038,9 +1035,9 @@ int RIG_FTdx101D::get_modetype(int n)
 void RIG_FTdx101D::set_if_shift(int val)
 {
 	if (useB)
-		cmd = "IS00+0000;";
-	else
 		cmd = "IS10+0000;";
+	else
+		cmd = "IS00+0000;";
 	if (val != 0) progStatus.shift = true;
 	else progStatus.shift = false;
 	if (val < 0) cmd[4] = '-';
@@ -1056,9 +1053,9 @@ void RIG_FTdx101D::set_if_shift(int val)
 bool RIG_FTdx101D::get_if_shift(int &val)
 {
 	if (useB)
-		cmd = rsp = "IS10";
+		cmd = rsp = "IS1";
 	else
-		cmd = rsp = "IS00";
+		cmd = rsp = "IS0";
 	cmd += ';';
 	wait_char(';', 10, 100, "get if shift", ASC);
 
@@ -1317,10 +1314,6 @@ void RIG_FTdx101D::set_vox_gain()
 
 void RIG_FTdx101D::set_vox_anti()
 {
-//	cmd = "EX346";
-//	cmd.append(to_decimal(progStatus.vox_anti, 3)).append(";");
-//	sendCommand(cmd);
-//	showresp(WARN, ASC, "SET anti-vox", cmd, replystr);
 }
 
 void RIG_FTdx101D::set_vox_hang()
@@ -1384,5 +1377,85 @@ void RIG_FTdx101D::set_cw_qsk()
 	cmd.assign("EX0202116").append(to_decimal(n, 1)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET cw qsk", cmd, replystr);
+}
+
+//======================================================================
+// FTdx101MP
+//======================================================================
+
+static const char FTdx101MPname_[] = "FTdx101MP";
+
+RIG_FTdx101MP::RIG_FTdx101MP() {
+// base class values
+	IDstr = "ID";
+	name_ = FTdx101MPname_;
+}
+
+int RIG_FTdx101MP::get_power_out()
+{
+	static pwrpair pwrtbl[] = { 
+		{ 32, 10.0 },
+		{ 53, 20.0 },
+		{ 80, 40.0 },
+		{ 97, 60.0 },
+		{119, 80.0 },
+		{137, 100.0 },
+		{154, 120.0 },
+		{167, 140.0 },
+		{177, 160.0 },
+		{188, 180.0 },
+		{197, 200.0 },
+	};
+
+	cmd = rsp = "RM5";
+	sendCommand(cmd.append(";"));
+	wait_char(';', 7, 100, "get pout", ASC);
+
+	gett("get_power_out()");
+
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return 0;
+	if (p + 6 >= replystr.length()) return 0;
+	int mtr = atoi(&replystr[p+3]);
+	size_t i = 0;
+	for (i = 0; i < sizeof(pwrtbl) / sizeof(pwrpair) - 1; i++)
+		if (mtr >= pwrtbl[i].mtr && mtr < pwrtbl[i+1].mtr)
+			break;
+	if (mtr < 0) mtr = 0;
+	if (mtr > 197) mtr = 197;
+	int pwr = (int)ceil(pwrtbl[i].pwr + 
+			  (pwrtbl[i+1].pwr - pwrtbl[i].pwr)*(mtr - pwrtbl[i].mtr) / (pwrtbl[i+1].mtr - pwrtbl[i].mtr));
+
+	if (pwr > 200) pwr = 200;
+
+	return (int)pwr;
+}
+
+int RIG_FTdx101MP::get_power_control()
+{
+	cmd = rsp = "PC";
+	cmd += ';';
+	wait_char(';', 6, 100, "get power", ASC);
+
+	gett("get_power_control()");
+
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return progStatus.power_level;
+	if (p + 5 >= replystr.length()) return progStatus.power_level;
+
+	int mtr = atoi(&replystr[p+2]);
+	return mtr;
+}
+
+void RIG_FTdx101MP::set_power_control(double val)
+{
+	int ival = (int)val;
+	cmd = "PC000;";
+	for (int i = 4; i > 1; i--) {
+		cmd[i] += ival % 10;
+		ival /= 10;
+	}
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET power", cmd, replystr);
 }
 
