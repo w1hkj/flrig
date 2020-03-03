@@ -131,6 +131,10 @@ public:
 //	void set_cw_spot_tone();
 
 	void get_band_selection(int v);
+
+	void set_xcvr_auto_on();
+	void set_xcvr_auto_off();
+
 };
 
 
