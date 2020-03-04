@@ -221,12 +221,14 @@ static inline void minmax(int min, int max, int &val)
 void RIG_IC7600::selectA()
 {
 	cmd.assign(pre_to).append("\x07\xD0").append(post);
+	set_trace(2, "selectA()", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("select A");
 }
 
 void RIG_IC7600::selectB()
 {
 	cmd.assign(pre_to).append("\x07\xD1").append(post);
+	set_trace(2, "selectB()", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("select B");
 }
 
@@ -253,6 +255,7 @@ long RIG_IC7600::get_vfoA ()
 		if (p != string::npos)
 			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
+	get_trace(2, "get_vfoA()", str2hex(replystr.c_str(), replystr.length()));
 	return A.freq;
 }
 
@@ -262,6 +265,7 @@ void RIG_IC7600::set_vfoA (long freq)
 	cmd.assign(pre_to).append("\x05");
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append( post );
+	set_trace(2, "set_vfoA()", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("set vfo A");
 }
 
@@ -276,6 +280,7 @@ long RIG_IC7600::get_vfoB ()
 		if (p != string::npos)
 			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
+	get_trace(2, "get_vfoB()", str2hex(replystr.c_str(), replystr.length()));
 	return B.freq;
 }
 
@@ -285,6 +290,7 @@ void RIG_IC7600::set_vfoB (long freq)
 	cmd.assign(pre_to).append("\x05");
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append( post );
+	set_trace(2, "set_vfoB()", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("set vfo B");
 }
 
@@ -300,6 +306,7 @@ void RIG_IC7600::set_split(bool val)
 	cmd += 0x0F;
 	cmd += val ? 0x01 : 0x00;
 	cmd.append(post);
+	set_trace(2, "set_split()", str2hex(cmd.c_str(), cmd.length()));
 	waitFB(val ? "set split ON" : "set split OFF");
 }
 
@@ -318,6 +325,7 @@ int RIG_IC7600::get_split()
 		if (read_split != 0xFA) // fail byte
 			split = read_split;
 	}
+	get_trace(2, "get_split()", str2hex(replystr.c_str(), replystr.length()));
 	return split;
 }
 
@@ -330,6 +338,7 @@ void RIG_IC7600::set_modeA(int val)
 	cmd += filA;
 	cmd.append( post );
 	waitFB("set modeA");
+	set_trace(4, "set mode A[", IC7600modes_[A.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
 
 // digital set / clear
 	if (val >= 10) {
@@ -342,6 +351,7 @@ void RIG_IC7600::set_modeA(int val)
 		}
 		cmd.append( post);
 		waitFB("set digital mode ON/OFF");
+		set_trace(2, "set_data_modeA()", str2hex(replystr.c_str(), replystr.length()));
 	}
 }
 
@@ -363,6 +373,7 @@ int RIG_IC7600::get_modeA()
 			}
 		}
 		filA = replystr[p+6];
+		get_trace(2, "get_modeA()", str2hex(replystr.c_str(), replystr.length()));
 		if (A.imode < 2) {
 			cmd.assign(pre_to).append("\x1A\x06").append(post);
 			if (waitFOR(9, "data mode?")) {
@@ -374,6 +385,7 @@ int RIG_IC7600::get_modeA()
 					if (A.imode == 0) A.imode = 9 + dmode;
 					else if (A.imode == 1) A.imode = 12 + dmode;
 				}
+				get_trace(2, "get_data_modeA()", str2hex(replystr.c_str(), replystr.length()));
 			}
 		}
 	}
@@ -389,6 +401,7 @@ void RIG_IC7600::set_modeB(int val)
 	cmd += filB;
 	cmd.append( post );
 	waitFB("set modeB");
+	set_trace(4, "set mode B[", IC7600modes_[A.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
 
 // digital set / clear
 	if (val >= 10) {
@@ -401,6 +414,7 @@ void RIG_IC7600::set_modeB(int val)
 		}
 		cmd.append( post);
 		waitFB("set digital mode ON/OFF");
+		set_trace(2, "set_data_modeB()", str2hex(replystr.c_str(), replystr.length()));
 	}
 }
 
@@ -418,6 +432,7 @@ int RIG_IC7600::get_modeB()
 		if (md == 10) md = 0;
 		B.imode = md;
 		filB = replystr[p+6];
+		get_trace(2, "get_modeB()", str2hex(replystr.c_str(), replystr.length()));
 
 		if (B.imode < 2) {
 			cmd.assign(pre_to).append("\x1A\x06").append(post);
@@ -430,6 +445,7 @@ int RIG_IC7600::get_modeB()
 					if (B.imode == 0) B.imode = 9 + dmode;
 					else if (B.imode == 1) B.imode = 12 + dmode;
 				}
+				get_trace(2, "get_data_modeB()", str2hex(replystr.c_str(), replystr.length()));
 			}
 		}
 	}
@@ -598,6 +614,7 @@ int RIG_IC7600::get_mic_gain()
 			val = (int)ceil(fm_bcd(replystr.substr(p+6),3) / 2.55);
 	}
 	minmax(0,100,val);
+	get_trace(2, "get_mic_gain()", str2hex(replystr.c_str(), replystr.length()));
 	return val;
 }
 
@@ -618,6 +635,7 @@ void RIG_IC7600::set_mic_gain(int v)
 		cmd.append( post );
 	}
 	waitFB("set mic gain");
+	set_trace(2, "set_mic_gain()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_IC7600::get_mic_gain_min_max_step(int &min, int &max, int &step)
@@ -746,6 +764,7 @@ void RIG_IC7600::set_PTT_control(int val)
 	cmd += (unsigned char) val;
 	cmd.append( post );
 	waitFB("set ptt");
+	set_trace(2, "set_PTT()", str2hex(cmd.c_str(), cmd.length()));
 	ptt_ = val;
 }
 
@@ -761,6 +780,7 @@ int RIG_IC7600::get_PTT()
 		if (p != string::npos)
 			ptt_ = replystr[p + 6];
 	}
+	get_trace(2, "get_PTT()", str2hex(replystr.c_str(), replystr.length()));
 	return ptt_;
 }
 
@@ -974,14 +994,17 @@ void RIG_IC7600::set_preamp(int val)
 
 	if (preamp_level == 1) {
 		preamp_label("Amp 1", true);
+		cmd += '\x01';
 	} else if (preamp_level == 2) {
 		preamp_label("Amp 2", true);
+		cmd += '\x02';
 	} else if (preamp_level == 0) {
 		preamp_label("OFF", false);
+		cmd += '\x00';
 	}
 
-	cmd += (unsigned char)preamp_level;
 	cmd.append( post );
+	set_trace(2, "set_preamp()", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("set Pre");
 }
 
@@ -995,6 +1018,7 @@ int RIG_IC7600::get_preamp()
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(8, "get Pre")) {
+		get_trace(2, "get_preamp()", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			preamp_level = replystr[p+6];
@@ -1038,6 +1062,7 @@ void RIG_IC7600::set_attenuator(int val)
 	cmd += '\x11';
 	cmd += atten_level;
 	cmd.append( post );
+	set_trace(2, "set_attenuator()", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("set att");
 }
 
@@ -1050,6 +1075,7 @@ int RIG_IC7600::get_attenuator()
 	cmd.append( post );
 
 	if (waitFOR(7, "get ATT")) {
+		get_trace(2, "get_ATT()", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			atten_level = replystr[p+5];
