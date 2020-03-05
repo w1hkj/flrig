@@ -59,6 +59,7 @@ using namespace std;
 rigbase *selrig = rigs[0];
 
 extern bool test;
+void init_notch_control();
 
 bool flrig_abort = false;
 
@@ -345,6 +346,7 @@ void setModeControl(void *)
 			if (spnrIFSHIFT) spnrIFSHIFT->deactivate();
 		}
 	}
+	init_notch_control();
 }
 
 void setFILTER(void *)

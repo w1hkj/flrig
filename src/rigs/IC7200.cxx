@@ -34,6 +34,12 @@ const char IC7200name_[] = "IC-7200";
 #define NUM_FILTERS 3
 #define NUM_MODES  9
 
+enum {
+	LSB7200, USB7200, AM7200,
+	CW7200, RTTY7200,
+	CWR7200, RTTYR7200,
+	LSBD7200, USBD7200 };
+
 static int mode_filterA[NUM_MODES] = {1,1,1,1,1,1,1,1,1};
 static int mode_filterB[NUM_MODES] = {1,1,1,1,1,1,1,1,1};
 
@@ -1362,30 +1368,46 @@ void RIG_IC7200::set_vox_onoff()
 
 static bool IC7200_notchon = false;
 
-void RIG_IC7200::set_notch(bool on, int val)
+void RIG_IC7200::set_notch(bool on, int freq)
 {
-	int notch = val / 20 + 53;
-	if (notch > 255) notch = 255;
-	if (on != IC7200_notchon) {
-		cmd = pre_to;
-		cmd.append("\x16\x48");
-		cmd += on ? '\x01' : '\x00';
-		cmd.append(post);
-		waitFB("set notch");
-		IC7200_notchon = on;
-		set_trace(2, "set_notch_on_off()", str2hex(cmd.c_str(), cmd.length()));
+	int hexval;
+	switch (vfo->imode) {
+		default: case USB7200: case USBD7200: case RTTYR7200:
+			hexval = freq - 1500;
+			break;
+		case LSB7200: case LSBD7200: case RTTY7200:
+			hexval = 1500 - freq;
+			break;
+		case CW7200:
+			hexval = progStatus.cw_spot_tone - freq;
+			break;
+		case CWR7200:
+			hexval = freq - progStatus.cw_spot_tone;
+			break;
 	}
+
+	hexval /= 20;
+	hexval += 128;
+	if (hexval < 0) hexval = 0;
+	if (hexval > 255) hexval = 255;
+
+	cmd = pre_to;
+	cmd.append("\x16\x48");
+	cmd += on ? '\x01' : '\x00';
+	cmd.append(post);
+	waitFB("set notch");
+
 	cmd = pre_to;
 	cmd.append("\x14\x0D");
-	cmd.append(to_bcd(notch,3));
+	cmd.append(to_bcd(hexval,3));
 	cmd.append(post);
 	waitFB("set notch val");
-	set_trace(2, "set_notch_val()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 bool RIG_IC7200::get_notch(int &val)
 {
 	bool on = false;
+	val = 1500;
 
 	string cstr = "\x16\x48";
 	string resp = pre_fm;
@@ -1394,24 +1416,35 @@ bool RIG_IC7200::get_notch(int &val)
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(8, "get notch")) {
-		get_trace(2, "get_notch_on_off()", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			on = replystr[p + 6] ? 1 : 0;
+			on = replystr[p + 6];
 		cmd = pre_to;
 		resp = pre_fm;
 		cstr = "\x14\x0D";
 		cmd.append(cstr);
 		resp.append(cstr);
 		cmd.append(post);
-		if (waitFOR(9, "get notch val")) {
-			get_trace(2, "get_notch_val()", str2hex(replystr.c_str(), replystr.length()));
+		if (waitFOR(9, "notch val")) {
 			size_t p = replystr.rfind(resp);
 			if (p != string::npos) {
-				val = fm_bcd(replystr.substr(p+6),3);
-				val = (val - 53) * 20;
-				if (val < 0) val = 0;
-				if (val > 4040) val = 4040;
+				val = (int)ceil(fm_bcd(replystr.substr(p+6),3));
+				val -= 128;
+				val *= 20;
+				switch (vfo->imode) {
+					default: case USB7200: case USBD7200: case RTTYR7200:
+						val = 1500 + val;
+						break;
+					case LSB: case LSBD7200: case RTTY7200:
+						val = 1500 - val;
+						break;
+					case CW7200:
+						val = progStatus.cw_spot_tone - val;
+						break;
+					case CWR7200:
+						val = progStatus.cw_spot_tone + val;
+						break;
+				}
 			}
 		}
 	}
@@ -1420,9 +1453,17 @@ bool RIG_IC7200::get_notch(int &val)
 
 void RIG_IC7200::get_notch_min_max_step(int &min, int &max, int &step)
 {
-	min = 0;
-	max = 4040;
-	step = 20;
+	switch (vfo->imode) {
+		default:
+		case USB7200: case USBD7200: case RTTYR7200:
+		case LSB7200: case LSBD7200: case RTTY7200:
+			min = 0; max = 3000; step = 20; break;
+		case CW7200: case CWR7200:
+			min = progStatus.cw_spot_tone - 500;
+			max = progStatus.cw_spot_tone + 500;
+			step = 20;
+			break;
+	}
 }
 
 static int agcval = 0;

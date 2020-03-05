@@ -842,3 +842,101 @@ void RIG_IC7700::set_band_selection(int v)
 	igett("get band stack");
 }
 
+void RIG_IC7700::set_notch(bool on, int freq)
+{
+	int hexval;
+	switch (vfo->imode) {
+		default: case USB7700: case USBD7700: case RTTYR7700:
+			hexval = freq - 1500;
+			break;
+		case LSB7700: case LSBD7700: case RTTY7700:
+			hexval = 1500 - freq;
+			break;
+		case CW7700:
+			hexval = progStatus.cw_spot_tone - freq;
+			break;
+		case CWR7700:
+			hexval = freq - progStatus.cw_spot_tone;
+			break;
+	}
+
+	hexval /= 20;
+	hexval += 128;
+	if (hexval < 0) hexval = 0;
+	if (hexval > 255) hexval = 255;
+
+	cmd = pre_to;
+	cmd.append("\x16\x48");
+	cmd += on ? '\x01' : '\x00';
+	cmd.append(post);
+	waitFB("set notch");
+
+	cmd = pre_to;
+	cmd.append("\x14\x0D");
+	cmd.append(to_bcd(hexval,3));
+	cmd.append(post);
+	waitFB("set notch val");
+}
+
+bool RIG_IC7700::get_notch(int &val)
+{
+	bool on = false;
+	val = 1500;
+
+	string cstr = "\x16\x48";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+	if (waitFOR(8, "get notch")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			on = replystr[p + 6];
+		cmd = pre_to;
+		resp = pre_fm;
+		cstr = "\x14\x0D";
+		cmd.append(cstr);
+		resp.append(cstr);
+		cmd.append(post);
+		if (waitFOR(9, "notch val")) {
+			size_t p = replystr.rfind(resp);
+			if (p != string::npos) {
+				val = (int)ceil(fm_bcd(replystr.substr(p+6),3));
+				val -= 128;
+				val *= 20;
+				switch (vfo->imode) {
+					default: case USB7700: case USBD7700: case RTTYR7700:
+						val = 1500 + val;
+						break;
+					case LSB: case LSBD7700: case RTTY7700:
+						val = 1500 - val;
+						break;
+					case CW7700:
+						val = progStatus.cw_spot_tone - val;
+						break;
+					case CWR7700:
+						val = progStatus.cw_spot_tone + val;
+						break;
+				}
+			}
+		}
+	}
+	return on;
+}
+
+void RIG_IC7700::get_notch_min_max_step(int &min, int &max, int &step)
+{
+	switch (vfo->imode) {
+		default:
+		case USB7700: case USBD7700: case RTTYR7700:
+		case LSB7700: case LSBD7700: case RTTY7700:
+			min = 0; max = 3000; step = 20; break;
+		case CW7700: case CWR7700:
+			min = progStatus.cw_spot_tone - 500;
+			max = progStatus.cw_spot_tone + 500;
+			step = 20;
+			break;
+	}
+}
+

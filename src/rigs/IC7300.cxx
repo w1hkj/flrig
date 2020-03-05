@@ -51,8 +51,8 @@ static int mode_bwB[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 static const char *szfilter[NUM_FILTERS] = {"1", "2", "3"};
 
 enum { 
-m73LSB, m73USB, m73AM, m73FM, m73CW, m73CWR, m73RTTY, m73RTTYR, 
-m73LSBD, m73USBD, m73AMD, m73FMD
+LSB7300, USB7300, AM7300, FM7300, CW7300, CWR7300, RTTY7300, RTTYR7300, 
+LSBD7300, USBD7300, AMD7300, FMD7300
 };
 
 const char *IC7300modes_[] = {
@@ -455,7 +455,7 @@ int RIG_IC7300::get_modeA()
 		if (p == string::npos)
 			goto end_wait_modeA;
 
-		for (md = 0; md < m73LSBD; md++) {
+		for (md = 0; md < LSBD7300; md++) {
 			if (replystr[p+6] == IC7300_mode_nbr[md]) {
 				A.imode = md;
 				if (replystr[p+7] == 0x01 && A.imode < 4)
@@ -490,7 +490,7 @@ void RIG_IC7300::set_modeA(int val)
 	else
 		cmd += '\x00';					// selected vfo
 	cmd += IC7300_mode_nbr[A.imode];	// operating mode
-	if (A.imode >= m73LSBD)
+	if (A.imode >= LSBD7300)
 		cmd += '\x01';					// data mode
 	else
 		cmd += '\x00';
@@ -521,7 +521,7 @@ int RIG_IC7300::get_modeB()
 		if (p == string::npos)
 			goto end_wait_modeB;
 
-		for (md = 0; md < m73LSBD; md++) {
+		for (md = 0; md < LSBD7300; md++) {
 			if (replystr[p+6] == IC7300_mode_nbr[md]) {
 				B.imode = md;
 				if (replystr[p+7] == 0x01 && B.imode < 4)
@@ -554,7 +554,7 @@ void RIG_IC7300::set_modeB(int val)
 	else
 		cmd += '\x01';					// unselected vfo
 	cmd += IC7300_mode_nbr[B.imode];	// operating mode
-	if (B.imode >= m73LSBD)
+	if (B.imode >= LSBD7300)
 		cmd += '\x01';					// data mode
 	else
 		cmd += '\x00';
@@ -583,7 +583,7 @@ void RIG_IC7300::set_FILT(int filter)
 		cmd += '\x26';
 		cmd += '\x00';						// selected vfo
 		cmd += IC7300_mode_nbr[B.imode];	// operating mode
-		if (B.imode >= m73LSBD) cmd += '\x01';	// data mode
+		if (B.imode >= LSBD7300) cmd += '\x01';	// data mode
 		else cmd += '\x00';
 		cmd += filter;						// filter
 		cmd.append( post );
@@ -597,7 +597,7 @@ void RIG_IC7300::set_FILT(int filter)
 		cmd += '\x26';
 		cmd += '\x00';						// selected vfo
 		cmd += IC7300_mode_nbr[A.imode];	// operating mode
-		if (A.imode >= m73LSBD) cmd += '\x01';	// data mode
+		if (A.imode >= LSBD7300) cmd += '\x01';	// data mode
 		else cmd += '\x00';
 		cmd += filter;						// filter
 		cmd.append( post );
@@ -1662,28 +1662,48 @@ int RIG_IC7300::get_auto_notch()
 
 static bool IC7300_notchon = false;
 
-void RIG_IC7300::set_notch(bool on, int val)
+void RIG_IC7300::set_notch(bool on, int freq)
 {
-	int notch = val / 20 + 53;
-	minmax(0, 255, notch);
-	if (on != IC7300_notchon) {
-		cmd = pre_to;
-		cmd.append("\x16\x48");
-		cmd += on ? '\x01' : '\x00';
-		cmd.append(post);
-		waitFB("set notch");
-		IC7300_notchon = on;
+	int hexval;
+	switch (vfo->imode) {
+		default: case USB7300: case USBD7300: case RTTYR7300:
+			hexval = freq - 1500;
+			break;
+		case LSB7300: case LSBD7300: case RTTY7300:
+			hexval = 1500 - freq;
+			break;
+		case CW7300:
+			hexval = progStatus.cw_spot_tone - freq;
+			break;
+		case CWR7300:
+			hexval = freq - progStatus.cw_spot_tone;
+			break;
 	}
+
+	hexval /= 20;
+	hexval += 128;
+	if (hexval < 0) hexval = 0;
+	if (hexval > 255) hexval = 255;
+
+	cmd = pre_to;
+	cmd.append("\x16\x48");
+	cmd += on ? '\x01' : '\x00';
+	cmd.append(post);
+	waitFB("set notch");
+	set_trace(2, "set_notch() ", str2hex(cmd.c_str(), cmd.length()));
+
 	cmd = pre_to;
 	cmd.append("\x14\x0D");
-	cmd.append(to_bcd(notch,3));
+	cmd.append(to_bcd(hexval,3));
 	cmd.append(post);
 	waitFB("set notch val");
+	set_trace(2, "set_notch_val() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 bool RIG_IC7300::get_notch(int &val)
 {
 	bool on = false;
+	val = 1500;
 
 	string cstr = "\x16\x48";
 	string resp = pre_fm;
@@ -1692,35 +1712,57 @@ bool RIG_IC7300::get_notch(int &val)
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(8, "get notch")) {
+		get_trace(2, "get_notch()", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			on = replystr[p + 6] ? 1 : 0;
+			on = replystr[p + 6];
 		cmd = pre_to;
 		resp = pre_fm;
 		cstr = "\x14\x0D";
 		cmd.append(cstr);
 		resp.append(cstr);
 		cmd.append(post);
-		if (waitFOR(9, "get notch val")) {
+		if (waitFOR(9, "notch val")) {
 			size_t p = replystr.rfind(resp);
 			if (p != string::npos) {
-				val = fm_bcd(replystr.substr(p+6),3);
-				val = (val - 53) * 20;
-				if (val < 0) val = 0;
-				if (val > 4040) val = 4040;
+				val = (int)ceil(fm_bcd(replystr.substr(p+6),3));
+				val -= 128;
+				val *= 20;
+				switch (vfo->imode) {
+					default: case USB7300: case USBD7300: case RTTYR7300:
+						val = 1500 + val;
+						break;
+					case LSB: case LSBD7300: case RTTY7300:
+						val = 1500 - val;
+						break;
+					case CW7300:
+						val = progStatus.cw_spot_tone - val;
+						break;
+					case CWR7300:
+						val = progStatus.cw_spot_tone + val;
+						break;
+				}
 			}
+			get_trace(2, "get_notch_val() ", str2hex(replystr.c_str(), replystr.length()));
 		}
 	}
-	return (IC7300_notchon = on);
+	return on;
 }
 
 void RIG_IC7300::get_notch_min_max_step(int &min, int &max, int &step)
 {
-	min = 0;
-	max = 4040;
-	step = 20;
+	switch (vfo->imode) {
+		default:
+		case USB7300: case USBD7300: case RTTYR7300:
+		case LSB7300: case LSBD7300: case RTTY7300:
+			min = 0; max = 3000; step = 20; break;
+		case CW7300: case CWR7300:
+			min = progStatus.cw_spot_tone - 500;
+			max = progStatus.cw_spot_tone + 500;
+			step = 20;
+			break;
+	}
 }
-
 static int agcval = 3;
 int  RIG_IC7300::get_agc()
 {

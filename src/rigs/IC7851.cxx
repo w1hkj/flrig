@@ -27,6 +27,12 @@ bool IC7851_DEBUG = true;
 
 const char IC7851name_[] = "IC-7851";
 
+enum {
+	LSB7851, USB7851, AM7851, CW7851, RTTY7851,
+	FM7851,  CWR7851, RTTYR7851, PSK7851, PSKR7851,
+	LSBD17851, LSBD27851, LSBD37851, 
+	USBD17851, USBD27851, USBD37851 };
+
 const char *IC7851modes_[] = {
 	"LSB", "USB", "AM", "CW", "RTTY",
 	"FM", "CW-R", "RTTY-R", "PSK", "PSK-R", 
@@ -1093,3 +1099,104 @@ void RIG_IC7851::set_band_selection(int v)
 
 	waitFOR(23, "get band stack");
 }
+
+void RIG_IC7851::set_notch(bool on, int freq)
+{
+	int hexval;
+	switch (vfo->imode) {
+		default:
+		case USB7851: case USBD17851: case USBD27851: case USBD37851: case RTTYR7851:
+			hexval = freq - 1500;
+			break;
+		case LSB7851: case LSBD17851: case LSBD27851: case LSBD37851: case RTTY7851:
+			hexval = 1500 - freq;
+			break;
+		case CW7851:
+			hexval = progStatus.cw_spot_tone - freq;
+			break;
+		case CWR7851:
+			hexval = freq - progStatus.cw_spot_tone;
+			break;
+	}
+
+	hexval /= 20;
+	hexval += 128;
+	if (hexval < 0) hexval = 0;
+	if (hexval > 255) hexval = 255;
+
+	cmd = pre_to;
+	cmd.append("\x16\x48");
+	cmd += on ? '\x01' : '\x00';
+	cmd.append(post);
+	waitFB("set notch");
+
+	cmd = pre_to;
+	cmd.append("\x14\x0D");
+	cmd.append(to_bcd(hexval,3));
+	cmd.append(post);
+	waitFB("set notch val");
+}
+
+bool RIG_IC7851::get_notch(int &val)
+{
+	bool on = false;
+	val = 1500;
+
+	string cstr = "\x16\x48";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+	if (waitFOR(8, "get notch")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			on = replystr[p + 6];
+		cmd = pre_to;
+		resp = pre_fm;
+		cstr = "\x14\x0D";
+		cmd.append(cstr);
+		resp.append(cstr);
+		cmd.append(post);
+		if (waitFOR(9, "notch val")) {
+			size_t p = replystr.rfind(resp);
+			if (p != string::npos) {
+				val = (int)ceil(fm_bcd(replystr.substr(p+6),3));
+				val -= 128;
+				val *= 20;
+				switch (vfo->imode) {
+					default:
+					case USB7851: case USBD17851: case USBD27851: case USBD37851: case RTTYR7851:
+						val = 1500 + val;
+						break;
+					case LSB: case LSBD17851: case LSBD27851: case LSBD37851: case RTTY7851:
+						val = 1500 - val;
+						break;
+					case CW7851:
+						val = progStatus.cw_spot_tone - val;
+						break;
+					case CWR7851:
+						val = progStatus.cw_spot_tone + val;
+						break;
+				}
+			}
+		}
+	}
+	return on;
+}
+
+void RIG_IC7851::get_notch_min_max_step(int &min, int &max, int &step)
+{
+	switch (vfo->imode) {
+		default:
+		case USB7851: case USBD17851: case USBD27851: case USBD37851: case RTTYR7851:
+		case LSB7851: case LSBD17851: case LSBD27851: case LSBD37851: case RTTY7851:
+			min = 0; max = 3000; step = 20; break;
+		case CW7851: case CWR7851:
+			min = progStatus.cw_spot_tone - 500;
+			max = progStatus.cw_spot_tone + 500;
+			step = 20;
+			break;
+	}
+}
+
