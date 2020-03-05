@@ -1286,27 +1286,42 @@ int RIG_IC7100::get_alc()
 	return mtr;
 }
 
-void RIG_IC7100::set_notch(bool on, int val)
+void RIG_IC7100::set_notch(bool on, int freq)
 {
-	int freq = val - 1500;
-	if (vfo->imode == LSB7100 || vfo->imode == CW7100 || 
-		vfo->imode == RTTY7100 || vfo->imode == LSBD7100 )
-		freq = 1500 - val;
-	if (freq < -1500) freq = 1500;
-	if (freq > 1500) freq = 1500;
-	int notch = (int)(freq * 60.0 / 1200.0) + 128;
+	int hexval;
+	switch (vfo->imode) {
+		default: case USB7100: case USBD7100: case RTTYR7100:
+			hexval = freq - 1500;
+			break;
+		case LSB7100: case LSBD7100: case RTTY7100:
+			hexval = 1500 - freq;
+			break;
+		case CW7100:
+			hexval = progStatus.cw_spot_tone - freq;
+			break;
+		case CWR7100:
+			hexval = freq - progStatus.cw_spot_tone;
+			break;
+	}
+
+	hexval /= 20;
+	hexval += 128;
+	if (hexval < 0) hexval = 0;
+	if (hexval > 255) hexval = 255;
 
 	cmd = pre_to;
 	cmd.append("\x16\x48");
 	cmd += on ? '\x01' : '\x00';
 	cmd.append(post);
 	waitFB("set notch");
+	set_trace(2, "set_notch() ", str2hex(cmd.c_str(), cmd.length()));
 
 	cmd = pre_to;
 	cmd.append("\x14\x0D");
-	cmd.append(to_bcd(notch,3));
+	cmd.append(to_bcd(hexval,3));
 	cmd.append(post);
 	waitFB("set notch val");
+	set_trace(2, "set_notch_val() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 bool RIG_IC7100::get_notch(int &val)
@@ -1321,6 +1336,7 @@ bool RIG_IC7100::get_notch(int &val)
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(8, "get notch")) {
+		get_trace(2, "get_notch()", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			on = replystr[p + 6];
@@ -1331,14 +1347,28 @@ bool RIG_IC7100::get_notch(int &val)
 		resp.append(cstr);
 		cmd.append(post);
 		if (waitFOR(9, "notch val")) {
+			get_trace(2, "get_notch_val() ", str2hex(replystr.c_str(), replystr.length()));
 			size_t p = replystr.rfind(resp);
 			if (p != string::npos) {
-				val = (int)ceil(fm_bcd(replystr.substr(p+6),3)) - 128;
-				if (vfo->imode == LSB7100 || vfo->imode == CW7100 || 
-					vfo->imode == RTTY7100 || vfo->imode == LSBD7100 )
-					val = -val;
-				val = val * 1200 / 60 + 1500;
+				val = (int)ceil(fm_bcd(replystr.substr(p+6),3));
+				val -= 128;
+				val *= 20;
+				switch (vfo->imode) {
+					default: case USB7100: case USBD7100: case RTTYR7100:
+						val = 1500 + val;
+						break;
+					case LSB: case LSBD7100: case RTTY7100:
+						val = 1500 - val;
+						break;
+					case CW7100:
+						val = progStatus.cw_spot_tone - val;
+						break;
+					case CWR7100:
+						val = progStatus.cw_spot_tone + val;
+						break;
+				}
 			}
+			get_trace(2, "get_notch_val() ", str2hex(replystr.c_str(), replystr.length()));
 		}
 	}
 	return on;
@@ -1346,9 +1376,17 @@ bool RIG_IC7100::get_notch(int &val)
 
 void RIG_IC7100::get_notch_min_max_step(int &min, int &max, int &step)
 {
-	min = 0;
-	max = 3000;
-	step = 20;
+	switch (vfo->imode) {
+		default:
+		case USB7100: case USBD7100: case RTTYR7100:
+		case LSB7100: case LSBD7100: case RTTY7100:
+			min = 0; max = 3000; step = 20; break;
+		case CW7100: case CWR7100:
+			min = progStatus.cw_spot_tone - 500;
+			max = progStatus.cw_spot_tone + 500;
+			step = 20;
+			break;
+	}
 }
 
 void RIG_IC7100::set_auto_notch(int val)

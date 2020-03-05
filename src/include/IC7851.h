@@ -115,6 +115,10 @@ public:
 	void set_band_selection(int v);
 	void get_band_selection(int v);
 
+	bool get_notch(int &val);
+	void set_notch(bool on, int val);
+	void get_notch_min_max_step(int &min, int &max, int &step);
+
 	void set_xcvr_auto_on();
 	void set_xcvr_auto_off();
 };
