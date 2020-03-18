@@ -59,7 +59,7 @@ const char *IC7300modes_[] = {
 	"LSB", "USB", "AM", "FM", "CW", "CW-R", "RTTY", "RTTY-R",
 	"LSB-D", "USB-D", "AM-D", "FM-D", NULL};
 
-const char IC7300_mode_type[] = {
+char IC7300_mode_type[] = {
 	'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U',
 	'L', 'U', 'U', 'U' };
 
@@ -252,6 +252,7 @@ RIG_IC7300::RIG_IC7300() {
 	can_change_alt_vfo = true;
 	has_a2b = true;
 
+	CW_sense = 0; // CW is LSB
 };
 
 static inline void minmax(int min, int max, int &val)
@@ -470,9 +471,22 @@ int RIG_IC7300::get_modeA()
 			mode_filterA[A.imode] = A.filter;
 	}
 
+end_wait_modeA:
+
 	get_trace(4, "get mode A[", IC7300modes_[A.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
 
-end_wait_modeA:
+	if (A.imode == CW7300 || A.imode == CWR7300) {
+		cmd.assign(pre_to).append("\x1A\x05");
+		cmd += '\x00'; cmd += '\x53';
+		resp.assign(pre_fm).append("\x1A\x05");
+		resp += '\x00'; resp += '\x53';
+		if (waitFOR(10, "get CW sideband")) {
+			p = replystr.rfind(resp);
+			CW_sense = replystr[p+8];
+			if (CW_sense) IC7300_mode_type[A.imode] = 'U';
+			else IC7300_mode_type[A.imode] = 'L';
+		}
+	}
 
 	return A.imode;
 }
@@ -534,12 +548,26 @@ int RIG_IC7300::get_modeB()
 		B.filter = replystr[p+8];
 	}
 
+end_wait_modeB:
+
 	get_trace(4, "get mode B[", IC7300modes_[B.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
 
 	if (B.filter > 0 && B.filter < 4)
 		mode_filterB[B.imode] = B.filter;
 
-end_wait_modeB:
+	get_trace(4, "get mode A[", IC7300modes_[B.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
+	if (B.imode == CW7300 || B.imode == CWR7300) {
+		cmd.assign(pre_to).append("\x1A\x05");
+		cmd += '\x00'; cmd += '\x53';
+		resp.assign(pre_fm).append("\x1A\x05");
+		resp += '\x00'; resp += '\x53';
+		if (waitFOR(10, "get CW sideband")) {
+			p = replystr.rfind(resp);
+			CW_sense = replystr[p+8];
+			if (CW_sense) IC7300_mode_type[B.imode] = 'U';
+			else IC7300_mode_type[B.imode] = 'L';
+		}
+	}
 
 	return B.imode;
 }
@@ -1673,10 +1701,16 @@ void RIG_IC7300::set_notch(bool on, int freq)
 			hexval = 1500 - freq;
 			break;
 		case CW7300:
-			hexval = progStatus.cw_spot_tone - freq;
+			if (CW_sense)
+				hexval = freq - progStatus.cw_spot_tone;
+			else
+				hexval = progStatus.cw_spot_tone - freq;
 			break;
 		case CWR7300:
-			hexval = freq - progStatus.cw_spot_tone;
+			if (CW_sense)
+				hexval = progStatus.cw_spot_tone - freq;
+			else
+				hexval = freq - progStatus.cw_spot_tone;
 			break;
 	}
 
@@ -1736,10 +1770,16 @@ bool RIG_IC7300::get_notch(int &val)
 						val = 1500 - val;
 						break;
 					case CW7300:
-						val = progStatus.cw_spot_tone - val;
+						if (CW_sense)
+							val = progStatus.cw_spot_tone + val;
+						else
+							val = progStatus.cw_spot_tone - val;
 						break;
 					case CWR7300:
-						val = progStatus.cw_spot_tone + val;
+						if (CW_sense)
+							val = progStatus.cw_spot_tone - val;
+						else
+							val = progStatus.cw_spot_tone + val;
 						break;
 				}
 			}
