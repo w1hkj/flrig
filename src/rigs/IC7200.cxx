@@ -54,7 +54,7 @@ const char *IC7200modes_[] = {
 
 const char mdval[] = { 0, 1, 2, 3, 4, 7, 8, 0, 1};
 
-const char IC7200_mode_type[] = { 
+static char IC7200_mode_type[] = { 
 'L', 'U', 'U', 'L', 'L', 'U', 'U',
 'L', 'U' };
 
@@ -220,6 +220,7 @@ RIG_IC7200::RIG_IC7200() {
 	precision = 1;
 	ndigits = 8;
 
+	CW_sense = 0; // normal
 };
 
 static inline void minmax(int min, int max, int &val)
@@ -859,6 +860,7 @@ void RIG_IC7200::set_mic_gain(int val)
 int RIG_IC7200::get_modeA()
 {
 	int md = A.imode;
+	size_t p = 0;
 
 	string resp = pre_fm;
 	resp += '\x04';
@@ -867,7 +869,7 @@ int RIG_IC7200::get_modeA()
 	cmd.append(post);
 
 	if (waitFOR(8, "get mode A")) {
-		size_t p = replystr.rfind(resp);
+		p = replystr.rfind(resp);
 		if (p != string::npos) {
 			md = replystr[p + 5];
 			if (md > 6) md -= 2;
@@ -882,7 +884,7 @@ int RIG_IC7200::get_modeA()
 	resp = pre_fm;
 	resp += "\x1A\x04";
 	if (waitFOR(9, "data mode?")) {
-		size_t p = replystr.rfind(resp);
+		p = replystr.rfind(resp);
 		if (p != string::npos) {
 			if ((replystr[p+6] & 0x01) == 0x01) {
 				if (md == 0) md = 7;
@@ -895,6 +897,17 @@ int RIG_IC7200::get_modeA()
 
 	get_trace(2, "get_data_modeA()", str2hex(replystr.c_str(), replystr.length()));
 	get_trace(4, "mode_filterA[", IC7200modes_[md], "] = ", szfilter[A.filter-1]);
+
+	if (A.imode == CW7200 || A.imode == CWR7200) {
+		cmd.assign(pre_to).append("\x1A\x03\x37");
+		resp.assign(pre_fm).append("\x1A\x03\x37");
+		if (waitFOR(9, "get CW sideband")) {
+			p = replystr.rfind(resp);
+			CW_sense = replystr[p + 7];
+			if (CW_sense) IC7200_mode_type[A.imode] = 'U';
+			else IC7200_mode_type[A.imode] = 'L';
+		}
+	}
 
 	return (A.imode = md);
 }
@@ -928,13 +941,15 @@ void RIG_IC7200::set_modeA(int val)
 int RIG_IC7200::get_modeB()
 {
 	int md = B.imode;
+	size_t p = 0;
+
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
 	string resp = pre_fm;
 	resp += '\x04';
 	if (waitFOR(8, "get mode B")) {
-		size_t p = replystr.rfind(resp);
+		p = replystr.rfind(resp);
 		if (p != string::npos) {
 			md = replystr[p+5];
 			if (md > 6) md -= 2;
@@ -949,7 +964,7 @@ int RIG_IC7200::get_modeB()
 	resp = pre_fm;
 	resp += "\x1A\x04";
 	if (waitFOR(9, "get data B")) {
-		size_t p = replystr.rfind(resp);
+		p = replystr.rfind(resp);
 		if (p != string::npos) {
 			if ((replystr[p+6] & 0x01) == 0x01) {
 				if (md == 0) md = 7;
@@ -962,6 +977,17 @@ int RIG_IC7200::get_modeB()
 
 	get_trace(2, "get_data_modeB()", str2hex(replystr.c_str(), replystr.length()));
 	get_trace(4, "mode_filterB[", IC7200modes_[md], "] = ", szfilter[B.filter-1]);
+
+	if (B.imode == CW7200 || B.imode == CWR7200) {
+		cmd.assign(pre_to).append("\x1A\x03\x37");
+		resp.assign(pre_fm).append("\x1A\x03\x37");
+		if (waitFOR(9, "get CW sideband")) {
+			p = replystr.rfind(resp);
+			CW_sense = replystr[p + 7];
+			if (CW_sense) IC7200_mode_type[B.imode] = 'U';
+			else IC7200_mode_type[B.imode] = 'L';
+		}
+	}
 
 	return (B.imode = md);
 }
@@ -1379,10 +1405,16 @@ void RIG_IC7200::set_notch(bool on, int freq)
 			hexval = 1500 - freq;
 			break;
 		case CW7200:
-			hexval = progStatus.cw_spot_tone - freq;
+			if (CW_sense)
+				hexval = freq - progStatus.cw_spot_tone;
+			else
+				hexval = progStatus.cw_spot_tone - freq;
 			break;
 		case CWR7200:
-			hexval = freq - progStatus.cw_spot_tone;
+			if (CW_sense)
+				hexval = progStatus.cw_spot_tone - freq;
+			else
+				hexval = freq - progStatus.cw_spot_tone;
 			break;
 	}
 
@@ -1439,10 +1471,16 @@ bool RIG_IC7200::get_notch(int &val)
 						val = 1500 - val;
 						break;
 					case CW7200:
-						val = progStatus.cw_spot_tone - val;
+						if (CW_sense)
+							val = progStatus.cw_spot_tone + val;
+						else
+							val = progStatus.cw_spot_tone - val;
 						break;
 					case CWR7200:
-						val = progStatus.cw_spot_tone + val;
+						if (CW_sense)
+							val = progStatus.cw_spot_tone - val;
+						else
+							val = progStatus.cw_spot_tone + val;
 						break;
 				}
 			}

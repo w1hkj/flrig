@@ -135,6 +135,7 @@ RIG_IC756PRO2::RIG_IC756PRO2() {
 	has_swr_control = true;
 	has_alc_control =  true;
 	has_smeter = true;
+	has_power_out = true;
 	has_power_control = true;
 	has_volume_control = true;
 	has_mode_control = true;

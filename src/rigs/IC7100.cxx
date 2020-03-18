@@ -58,7 +58,7 @@ enum {
 
 static const char mdval[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 17, 0, 1, 2, 5};
 
-static const char IC7100_mode_type[] = {
+static char IC7100_mode_type[] = {
 	'L', 'U', 'U', 'L', 'L',
 	'U', 'U', 'U', 'U', 'U', 
 	'L', 'U', 'U', 'U' };
@@ -261,7 +261,7 @@ RIG_IC7100::RIG_IC7100() {
 	B.imode = 1;
 	B.iBW = 34;
 
-
+	CW_sense = 0;
 };
 
 //======================================================================
@@ -479,6 +479,7 @@ void RIG_IC7100::set_modeA(int val)
 int RIG_IC7100::get_modeA()
 {
 	int md = 0;
+	size_t p = 0;
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
@@ -486,7 +487,7 @@ int RIG_IC7100::get_modeA()
 	resp += '\x04';
 
 	if (waitFOR(8, "get mode A")) {
-		size_t p = replystr.rfind(resp);
+		p = replystr.rfind(resp);
 		if (p != std::string::npos) {
 			for (md = 0; md < nummodes; md++)
 				if (replystr[p+5] == IC7100_mode_nbr[md]) 
@@ -510,7 +511,7 @@ int RIG_IC7100::get_modeA()
 		resp = pre_fm;
 		resp.append("\x1a\x06");
 		if (waitFOR(9, "get digital setting")) {
-			size_t p = replystr.rfind(resp);
+			p = replystr.rfind(resp);
 			if (p != string::npos) {
 				if ((replystr[p+6] & 0x01) == 0x01) {
 					if (md == USB7100) md = USBD7100;
@@ -528,6 +529,19 @@ int RIG_IC7100::get_modeA()
 
 	get_trace(2, "get_data_modeA()", str2hex(replystr.c_str(), replystr.length()));
 	get_trace(4, "mode_filterA[", IC7100modes_[md], "] = ", szfilter[A.filter-1]);
+
+	if (A.imode == CW7100 || A.imode == CWR7100) {
+		cmd.assign(pre_to).append("\x1A\x05");
+		cmd += '\x00'; cmd += '\x32';
+		resp.assign(pre_fm).append("\x1A\x05");
+		resp += '\x00'; resp += '\x32';
+		if (waitFOR(10, "get CW sideband")) {
+			p = replystr.rfind(resp);
+			CW_sense = replystr[p + 8];
+			if (CW_sense) IC7100_mode_type[A.imode] = 'U';
+			else IC7100_mode_type[A.imode] = 'L';
+		}
+	}
 
 	return A.imode;
 }
@@ -558,6 +572,8 @@ void RIG_IC7100::set_modeB(int val)
 int RIG_IC7100::get_modeB()
 {
 	int md = 0;
+	size_t p = 0;
+
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
@@ -565,7 +581,7 @@ int RIG_IC7100::get_modeB()
 	resp += '\x04';
 
 	if (waitFOR(8, "get mode B")) {
-		size_t p = replystr.rfind(resp);
+		p = replystr.rfind(resp);
 		if (p != std::string::npos) {
 			for (md = 0; md < nummodes; md++)
 				if (replystr[p+5] == IC7100_mode_nbr[md]) 
@@ -590,7 +606,7 @@ int RIG_IC7100::get_modeB()
 		resp = pre_fm;
 		resp.append("\x1a\x06");
 		if (waitFOR(9, "get digital setting")) {
-			size_t p = replystr.rfind(resp);
+			p = replystr.rfind(resp);
 			if (p != string::npos) {
 				if ((replystr[p+6] & 0x01) == 0x01) {
 					if (md == USB7100) md = USBD7100;
@@ -609,7 +625,20 @@ int RIG_IC7100::get_modeB()
 	get_trace(2, "get_data_modeB()", str2hex(replystr.c_str(), replystr.length()));
 	get_trace(4, "mode_filterB[", IC7100modes_[md], "] = ", szfilter[A.filter-1]);
 
-	return A.imode;
+	if (B.imode == CW7100 || B.imode == CWR7100) {
+		cmd.assign(pre_to).append("\x1A\x05");
+		cmd += '\x00'; cmd += '\x32';
+		resp.assign(pre_fm).append("\x1A\x05");
+		resp += '\x00'; resp += '\x32';
+		if (waitFOR(10, "get CW sideband")) {
+			p = replystr.rfind(resp);
+			CW_sense = replystr[p + 8];
+			if (CW_sense) IC7100_mode_type[B.imode] = 'U';
+			else IC7100_mode_type[B.imode] = 'L';
+		}
+	}
+
+	return B.imode;
 }
 
 int RIG_IC7100::get_bwA()
@@ -1297,10 +1326,16 @@ void RIG_IC7100::set_notch(bool on, int freq)
 			hexval = 1500 - freq;
 			break;
 		case CW7100:
-			hexval = progStatus.cw_spot_tone - freq;
+			if (CW_sense)
+				hexval = freq - progStatus.cw_spot_tone;
+			else
+				hexval = progStatus.cw_spot_tone - freq;
 			break;
 		case CWR7100:
-			hexval = freq - progStatus.cw_spot_tone;
+			if (CW_sense)
+				hexval = progStatus.cw_spot_tone - freq;
+			else
+				hexval = freq - progStatus.cw_spot_tone;
 			break;
 	}
 
@@ -1361,10 +1396,16 @@ bool RIG_IC7100::get_notch(int &val)
 						val = 1500 - val;
 						break;
 					case CW7100:
-						val = progStatus.cw_spot_tone - val;
+						if (CW_sense)
+							val = progStatus.cw_spot_tone + val;
+						else
+							val = progStatus.cw_spot_tone - val;
 						break;
 					case CWR7100:
-						val = progStatus.cw_spot_tone + val;
+						if (CW_sense)
+							val = progStatus.cw_spot_tone - val;
+						else
+							val = progStatus.cw_spot_tone + val;
 						break;
 				}
 			}

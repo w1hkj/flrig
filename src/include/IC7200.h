@@ -30,6 +30,8 @@ public:
 	RIG_IC7200();
 	~RIG_IC7200(){}
 
+	bool CW_sense;
+
 	void initialize();
 
 	bool check();

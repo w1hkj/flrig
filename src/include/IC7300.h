@@ -30,6 +30,8 @@ public:
 	RIG_IC7300();
 	~RIG_IC7300(){}
 
+	bool CW_sense;
+
 	void initialize();
 
 	void selectA();
