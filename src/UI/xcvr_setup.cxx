@@ -1553,7 +1553,6 @@ _("Enter text as ASCII string\nOr sequence of hex values, x80 etc separated by s
 
 Fl_Group *createCOMMANDS(int X, int Y, int W, int H, const char *label)
 {
-std::cout << X << ", " << Y << ", " << W << " x " << H << std::endl;
 	Fl_Group *tabCOMMANDS = new Fl_Group(X, Y, W, H, label);
 
 	Fl_Tabs *tabCmds = new Fl_Tabs(X, Y, W, H - 25);

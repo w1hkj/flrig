@@ -294,7 +294,7 @@ void init_port_combos()
 	struct stat st;
 
 	const char* tty_fmt[] = {
-//		"/dev/cu.*",
+		"/dev/cu.*",
 		"/dev/tty.*"
 	};
 

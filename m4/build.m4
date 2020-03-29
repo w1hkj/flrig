@@ -12,6 +12,9 @@ AC_DEFUN([AC_FLRIG_BUILD_INFO], [
   if test "x$target_win32" = "xyes"; then
       FLRIG_BUILD_CPPFLAGS="$FLRIG_BUILD_CPPFLAGS -D_WINDOWS"
   fi
+  if test "x$target_darwin" = "xyes"; then
+      FLRIG_BUILD_CPPFLAGS="$FLRIG_BUILD_CPPFLAGS -fno-stack-check -mmacosx-version-min=10.7”"
+  fi
 # CXXFLAGS
   FLRIG_BUILD_CXXFLAGS="$FLTK_CFLAGS -I\$(srcdir) -I\$(srcdir)/include  \
 $X_CFLAGS -pipe -Wall -fexceptions $OPT_CFLAGS $DEBUG_CFLAGS $PTW32_CFLAGS"
@@ -20,6 +23,9 @@ $X_CFLAGS -pipe -Wall -fexceptions $OPT_CFLAGS $DEBUG_CFLAGS $PTW32_CFLAGS"
   fi
   if test "x$target_mingw32" = "xyes"; then
       FLRIG_BUILD_CXXFLAGS="-mthreads $FLRIG_BUILD_CXXFLAGS"
+  fi
+  if test "x$target_darwin" = "xyes"; then
+      FLRIG_BUILD_CXXFLAGS="$FLRIG_BUILD_CXXFLAGS -fno-stack-check -mmacosx-version-min=10.7”"
   fi
 # LDFLAGS
   FLRIG_BUILD_LDFLAGS=
