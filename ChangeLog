@@ -1,4 +1,33 @@
-2020-01-09  David Freese  <w1hkj@bellsouth.net>
+
+
+=Version 1.3.50=
+
+2020-03-29  David Freese  <w1hkj@bellsouth.net>
+
+	cefe16c8: MacOS cu serial ports
+	6fa841ce: CW sense
+	205e0e08: Icom Manual Notch
+	dac9fc5d: IC7600 trace
+	9d9a64ce: FTdx9000D
+	67bfab3d: FTdx101MP
+	cd7e3294: xmrpc command strings
+	216de6fd: FTdx101D
+	00f1c3ff: Remote shutdown
+	043a4391: FT891 IPO
+	9d641b07: IC7100 notch
+	f0ad4da1: Poll tuner
+	e1f13d52: Sliders/Auto-on-off
+	79b18cac: User Command Buttons
+	96e74e64: Doc Update
+	aaaf2252: mat file aging
+	be747790: KX3
+	16df0425: IC7100
+	7f8141d0: mkappbundle
+	e7e7e2d9: Yaesu tuner
+	fe973dd8: Commands
+
+
+=Version 1.3.49=
 
 	c8a6d2fc: Config
 	800d3d7a: MilliSleep
