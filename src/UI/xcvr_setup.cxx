@@ -879,7 +879,6 @@ Fl_Group *createXCVR(int X, int Y, int W, int H, const char *label)
 		selectCommPort->callback((Fl_Callback*)cb_selectCommPort);
 		selectCommPort->align(Fl_Align(FL_ALIGN_CENTER));
 		selectCommPort->when(FL_WHEN_RELEASE);
-		selectCommPort->readonly();
 		selectCommPort->end();
 
 		mnuBaudrate = new Fl_ComboBox(X + 60, Y + 60, 240, 22, _("Baud:"));

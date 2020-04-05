@@ -166,9 +166,8 @@ void init_port_combos()
 		if ( !(stat(gbuf.gl_pathv[j], &st) == 0 && S_ISCHR(st.st_mode)) ||
 		     strstr(gbuf.gl_pathv[j], "modem") )
 			continue;
-std::cout << "Serial port: " << gbuf.gl_pathv[j] << std::endl;
 		LOG_QUIET("Found serial port %s", gbuf.gl_pathv[j]);
-			add_combos(gbuf.gl_pathv[j]);
+		add_combos(gbuf.gl_pathv[j]);
 	}
 
 	globfree(&gbuf);
