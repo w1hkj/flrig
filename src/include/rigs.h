@@ -101,6 +101,8 @@
 #include "TT588.h"
 #include "TT599.h"
 
+#include "Xiegu-5105.h"
+
 extern rigbase			rig_null;		// 0
 extern RIG_FT100D		rig_FT100D;		// 1
 extern RIG_FT450		rig_FT450;		// 2
@@ -183,5 +185,6 @@ extern RIG_TT566		rig_TT566;		// 78
 extern RIG_TT588		rig_TT588;		// 79
 extern RIG_TT599		rig_TT599;		// 80
 extern RIG_AOR5K		rig_AOR5K;		// 81
+extern RIG_XI5105		rig_XI5105;		// 82
 
 #endif
