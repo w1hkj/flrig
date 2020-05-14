@@ -56,11 +56,13 @@ LSBD7300, USBD7300, AMD7300, FMD7300
 };
 
 const char *IC7300modes_[] = {
-	"LSB", "USB", "AM", "FM", "CW", "CW-R", "RTTY", "RTTY-R",
+	"LSB", "USB", "AM", "FM",
+	"CW", "CW-R", "RTTY", "RTTY-R",
 	"LSB-D", "USB-D", "AM-D", "FM-D", NULL};
 
 char IC7300_mode_type[] = {
-	'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U',
+	'L', 'U', 'U', 'U',
+	'L', 'U', 'L', 'U',
 	'L', 'U', 'U', 'U' };
 
 const char IC7300_mode_nbr[] = {
@@ -478,6 +480,7 @@ end_wait_modeA:
 	if (A.imode == CW7300 || A.imode == CWR7300) {
 		cmd.assign(pre_to).append("\x1A\x05");
 		cmd += '\x00'; cmd += '\x53';
+		cmd.append(post);
 		resp.assign(pre_fm).append("\x1A\x05");
 		resp += '\x00'; resp += '\x53';
 		if (waitFOR(10, "get CW sideband")) {
@@ -486,6 +489,7 @@ end_wait_modeA:
 			if (CW_sense) IC7300_mode_type[A.imode] = 'U';
 			else IC7300_mode_type[A.imode] = 'L';
 		}
+		get_trace(2, "get CW sideband ", str2hex(replystr.c_str(), replystr.length()));
 	}
 
 	return A.imode;
@@ -559,6 +563,7 @@ end_wait_modeB:
 	if (B.imode == CW7300 || B.imode == CWR7300) {
 		cmd.assign(pre_to).append("\x1A\x05");
 		cmd += '\x00'; cmd += '\x53';
+		cmd.append(post);
 		resp.assign(pre_fm).append("\x1A\x05");
 		resp += '\x00'; resp += '\x53';
 		if (waitFOR(10, "get CW sideband")) {
@@ -567,6 +572,7 @@ end_wait_modeB:
 			if (CW_sense) IC7300_mode_type[B.imode] = 'U';
 			else IC7300_mode_type[B.imode] = 'L';
 		}
+		get_trace(2, "get CW sideband ", str2hex(replystr.c_str(), replystr.length()));
 	}
 
 	return B.imode;

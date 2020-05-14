@@ -46,17 +46,17 @@ static int mode_bwB[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 
 static const char *szfilter[NUM_FILTERS] = {"1", "2", "3"};
 
-const char *IC7100modes_[] = {
-"LSB", "USB", "AM", "CW", "RTTY",
-"FM", "WFM", "CW-R", "RTTY-R", "DV",
-"LSB-D", "USB-D", "AM-D", "FM-D", NULL};
-
 enum {
 	LSB7100, USB7100, AM7100, CW7100, RTTY7100,
 	FM7100, WFM7100, CWR7100, RTTYR7100, DV7100,
 	LSBD7100, USBD7100, AMD7100, FMD7100 };
 
 static const char mdval[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 17, 0, 1, 2, 5};
+
+const char *IC7100modes_[] = {
+"LSB", "USB", "AM", "CW", "RTTY",
+"FM", "WFM", "CW-R", "RTTY-R", "DV",
+"LSB-D", "USB-D", "AM-D", "FM-D", NULL};
 
 static char IC7100_mode_type[] = {
 	'L', 'U', 'U', 'L', 'L',
@@ -533,6 +533,7 @@ int RIG_IC7100::get_modeA()
 	if (A.imode == CW7100 || A.imode == CWR7100) {
 		cmd.assign(pre_to).append("\x1A\x05");
 		cmd += '\x00'; cmd += '\x32';
+		cmd.append(post);
 		resp.assign(pre_fm).append("\x1A\x05");
 		resp += '\x00'; resp += '\x32';
 		if (waitFOR(10, "get CW sideband")) {
@@ -541,6 +542,7 @@ int RIG_IC7100::get_modeA()
 			if (CW_sense) IC7100_mode_type[A.imode] = 'U';
 			else IC7100_mode_type[A.imode] = 'L';
 		}
+		get_trace(2, "get CW sideband ", str2hex(replystr.c_str(), replystr.length()));
 	}
 
 	return A.imode;
@@ -628,6 +630,7 @@ int RIG_IC7100::get_modeB()
 	if (B.imode == CW7100 || B.imode == CWR7100) {
 		cmd.assign(pre_to).append("\x1A\x05");
 		cmd += '\x00'; cmd += '\x32';
+		cmd.append(post);
 		resp.assign(pre_fm).append("\x1A\x05");
 		resp += '\x00'; resp += '\x32';
 		if (waitFOR(10, "get CW sideband")) {
@@ -636,6 +639,7 @@ int RIG_IC7100::get_modeB()
 			if (CW_sense) IC7100_mode_type[B.imode] = 'U';
 			else IC7100_mode_type[B.imode] = 'L';
 		}
+		get_trace(2, "get CW sideband ", str2hex(replystr.c_str(), replystr.length()));
 	}
 
 	return B.imode;

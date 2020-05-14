@@ -899,7 +899,7 @@ int RIG_IC7200::get_modeA()
 	get_trace(4, "mode_filterA[", IC7200modes_[md], "] = ", szfilter[A.filter-1]);
 
 	if (A.imode == CW7200 || A.imode == CWR7200) {
-		cmd.assign(pre_to).append("\x1A\x03\x37");
+		cmd.assign(pre_to).append("\x1A\x03\x37").append(post);
 		resp.assign(pre_fm).append("\x1A\x03\x37");
 		if (waitFOR(9, "get CW sideband")) {
 			p = replystr.rfind(resp);
@@ -979,7 +979,7 @@ int RIG_IC7200::get_modeB()
 	get_trace(4, "mode_filterB[", IC7200modes_[md], "] = ", szfilter[B.filter-1]);
 
 	if (B.imode == CW7200 || B.imode == CWR7200) {
-		cmd.assign(pre_to).append("\x1A\x03\x37");
+		cmd.assign(pre_to).append("\x1A\x03\x37").append(post);
 		resp.assign(pre_fm).append("\x1A\x03\x37");
 		if (waitFOR(9, "get CW sideband")) {
 			p = replystr.rfind(resp);
