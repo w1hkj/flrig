@@ -657,42 +657,87 @@ int RIG_IC9100::def_bandwidth(int m)
 
 void RIG_IC9100::set_mic_gain(int val)
 {
-	if (!progStatus.USBaudio) {
-		cmd = pre_to;
-		cmd.append("\x14\x0B");
-		cmd.append(bcd255(val));
-		cmd.append( post );
-	} else {
-		cmd = pre_to;
-		cmd += '\x1A'; cmd += '\x05';
-		cmd += '\x00'; cmd += '\x29';
-		cmd.append(bcd255(val));
-		cmd.append( post );
-	}
+	cmd = pre_to;
+	cmd.append("\x14\x0B");
+	cmd.append(bcd255(val));
+	cmd.append( post );
 	waitFB("set mic gain");
 	set_trace(2, "set_mic_gain()", str2hex(replystr.c_str(), replystr.length()));
 }
 
+int RIG_IC9100::get_mic_gain()
+{
+	int val = 0;
+	string cstr = "\x14\x0B";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append(post);
+	if (waitFOR(9, "get mic")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			val = num100(replystr.substr(p + 6));
+	}
+	get_trace(2, "get_mic_gain()", str2hex(replystr.c_str(), replystr.length()));
+	return val;
+}
+
+void RIG_IC9100::get_mic_gain_min_max_step(int &min, int &max, int &step)
+{
+	min = 0;
+	max = 100;
+	step = 1;
+}
+
+static int comp_level[] = {11,34,58,81,104,128,151,174,197,221,244};
 void RIG_IC9100::set_compression(int on, int val)
 {
-	if (on) {
-		cmd.assign(pre_to).append("\x14\x0E");
-		cmd.append(bcd255(val));
-		cmd.append( post );
-		waitFB("set comp");
+	cmd = pre_to;
+	cmd.append("\x16\x44");
+	if (on) cmd += '\x01';
+	else cmd += '\x00';
+	cmd.append(post);
+	waitFB("set Comp ON/OFF");
+	set_trace(2, "set Comp ON/OFF", str2hex(cmd.c_str(), cmd.length()));
+	if (val < 0) return;
+	if (val > 10) return;
 
-		cmd = pre_to;
-		cmd.append("\x16\x44");
-		cmd += '\x01';
-		cmd.append(post);
-		waitFB("set Comp ON");
-	} else{
-		cmd.assign(pre_to).append("\x16\x44");
-		cmd += '\x00';
-		cmd.append(post);
-		waitFB("set Comp OFF");
+	cmd.assign(pre_to).append("\x14\x0E");
+	cmd.append(to_bcd(comp_level[val], 3));
+	cmd.append( post );
+	waitFB("set comp");
+	set_trace(2, "set Comp", str2hex(cmd.c_str(), cmd.length()));
+}
+
+void RIG_IC9100::get_compression(int &on, int &val)
+{
+	std::string resp;
+
+	cmd.assign(pre_to).append("\x16\x44").append(post);
+
+	resp.assign(pre_fm).append("\x16\x44");
+
+	if (waitFOR(8, "get comp on/off")) {
+		size_t p = replystr.find(resp);
+		if (p != string::npos)
+			on = (replystr[p+6] == 0x01);
 	}
-	set_trace(2, "set_compression()", str2hex(replystr.c_str(), replystr.length()));
+	get_trace(2, "get comp on/off", str2hex(replystr.c_str(), replystr.length()));
+
+	cmd.assign(pre_to).append("\x14\x0E").append(post);
+	resp.assign(pre_fm).append("\x14\x0E");
+
+	if (waitFOR(9, "get comp level")) {
+		size_t p = replystr.find(resp);
+		int level = 0;
+		if (p != string::npos) {
+			level = fm_bcd(replystr.substr(p+6), 3);
+			for (val = 0; val < 11; val++)
+				if (level <= comp_level[val]) break;
+		}
+		get_trace(2, "get comp level", str2hex(replystr.c_str(), replystr.length()));
+	}
 }
 
 void RIG_IC9100::set_vox_onoff()
@@ -932,7 +977,24 @@ int RIG_IC9100::get_smeter()
 	return mtr;
 }
 
-int RIG_IC9100::get_power_out()
+struct pwrpair {int mtr; float pwr;};
+
+static pwrpair pwrtbl[] = { 
+	{0, 0.0},
+	{21, 5.0},
+	{43,10.0}, 
+	{65, 15.0},
+	{83, 20.0}, 
+	{95, 25.0}, 
+	{105, 30.0},
+	{114, 35.0}, 
+	{124, 40.0}, 
+	{143, 50.0}, 
+	{183, 75.0},
+	{213, 100.0},
+	{255, 120.0 } };
+
+int RIG_IC9100::get_power_out(void)
 {
 	string cstr = "\x15\x11";
 	string resp = pre_fm;
@@ -940,20 +1002,40 @@ int RIG_IC9100::get_power_out()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	int mtr= -1;
-	if (waitFOR(9, "get pout")) {
+	int mtr= 0;
+	if (waitFOR(9, "get power out")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			mtr = fm_bcd(replystr.substr(p+6), 3);
-			mtr = (int)ceil(mtr /2.15);
+			size_t i = 0;
+			for (i = 0; i < sizeof(pwrtbl) / sizeof(pwrpair) - 1; i++)
+				if (mtr >= pwrtbl[i].mtr && mtr < pwrtbl[i+1].mtr)
+					break;
+			if (mtr < 0) mtr = 0;
+			if (mtr > 255) mtr = 255;
+			mtr = (int)ceil(pwrtbl[i].pwr + 
+				(pwrtbl[i+1].pwr - pwrtbl[i].pwr)*(mtr - pwrtbl[i].mtr)/(pwrtbl[i+1].mtr - pwrtbl[i].mtr));
+			
 			if (mtr > 100) mtr = 100;
 		}
 	}
-	get_trace(2, "get_power_out()", str2hex(replystr.c_str(), replystr.length()));
 	return mtr;
 }
 
-int RIG_IC9100::get_swr()
+struct swrpair {int mtr; float swr;};
+
+// Table entries below correspond to SWR readings of 1.1, 1.5, 2.0, 2.5, 3.0 and infinity.
+// Values are also tweaked to fit the display of the SWR meter.
+
+static swrpair swrtbl[] = { 
+	{0, 0.0},
+	{48, 10.5},
+	{80, 23.0}, 
+	{103, 35.0},
+	{120, 48.0},
+	{255, 100.0 } };
+
+int RIG_IC9100::get_swr(void)
 {
 	string cstr = "\x15\x12";
 	string resp = pre_fm;
@@ -962,15 +1044,22 @@ int RIG_IC9100::get_swr()
 	cmd.append(cstr);
 	cmd.append( post );
 	int mtr= -1;
-	if (waitFOR(9, "get SWR")) {
+	if (waitFOR(9, "get swr")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			mtr = fm_bcd(replystr.substr(p+6), 3);
-			mtr = (int)ceil(mtr /2.40);
+			size_t i = 0;
+			for (i = 0; i < sizeof(swrtbl) / sizeof(swrpair) - 1; i++)
+				if (mtr >= swrtbl[i].mtr && mtr < swrtbl[i+1].mtr)
+					break;
+			if (mtr < 0) mtr = 0;
+			if (mtr > 255) mtr = 255;
+			mtr = (int)ceil(swrtbl[i].swr + 
+				(swrtbl[i+1].swr - swrtbl[i].swr)*(mtr - swrtbl[i].mtr)/(swrtbl[i+1].mtr - swrtbl[i].mtr));
+
 			if (mtr > 100) mtr = 100;
 		}
 	}
-	get_trace(2, "get_swr()", str2hex(replystr.c_str(), replystr.length()));
 	return mtr;
 }
 

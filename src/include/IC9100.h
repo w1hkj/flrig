@@ -57,6 +57,8 @@ public:
 	int  def_bandwidth(int m);
 
 	void set_mic_gain(int v);
+	void get_mic_gain_min_max_step(int &min, int &max, int &step);
+	int  get_mic_gain();
 
 	void set_volume_control(int val);
 	int  get_volume_control();
@@ -71,6 +73,7 @@ public:
 	void get_rf_min_max_step(double &min, double &max, double &step);
 
 	void set_compression(int, int);
+	void get_compression(int &on, int &val);
 	void get_comp_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 10; step = 1; }
 
@@ -103,8 +106,9 @@ public:
 	int  get_split();
 
 	int get_smeter();
-	int get_power_out();
-	int get_swr();
+	//chg to void
+	int get_power_out(void);
+	int get_swr(void);
 	int get_alc();
 
 	int  get_agc();
