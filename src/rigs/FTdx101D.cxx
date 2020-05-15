@@ -444,13 +444,14 @@ int RIG_FTdx101D::get_swr()
 {
 	cmd = rsp = "RM6";
 	cmd += ';';
-	wait_char(';', 7, 100, "get swr", ASC);
+	wait_char(';', 10, 100, "get swr", ASC);
 
 	gett("get_swr()");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
+	replystr[p+6] = 0;
 	int mtr = atoi(&replystr[p+3]);
 	return mtr / 2.56;
 }
