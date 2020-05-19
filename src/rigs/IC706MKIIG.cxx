@@ -138,8 +138,12 @@ long RIG_IC706MKIIG::get_vfoA ()
 	resp += '\x03';
 	if (waitFOR(11, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		if (p != string::npos) {
+			if (replystr[p+5] == -1)
+				A.freq = 0;
+			else
+				A.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		}
 	}
 	return A.freq;
 }
@@ -164,8 +168,12 @@ long RIG_IC706MKIIG::get_vfoB ()
 	resp += '\x03';
 	if (waitFOR(11, "get vfo B")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		if (p != string::npos) {
+			if (replystr[p+5] == -1)
+				A.freq = 0;
+			else
+				B.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		}
 	}
 	return B.freq;
 }

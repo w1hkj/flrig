@@ -269,8 +269,12 @@ long RIG_IC7851::get_vfoA ()
 	cmd.append( post );
 	if (waitFOR(11, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		if (p != string::npos) {
+			if (replystr[p+5] == -1)
+				A.freq = 0;
+			else
+				A.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		}
 	}
 	return A.freq;
 }
@@ -295,8 +299,12 @@ long RIG_IC7851::get_vfoB ()
 	cmd.append( post );
 	if (waitFOR(11, "get vfo B")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		if (p != string::npos) {
+			if (replystr[p+5] == -1)
+				A.freq = 0;
+			else
+				B.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		}
 	}
 	return B.freq;
 }
@@ -376,7 +384,11 @@ int RIG_IC7851::get_modeA()
 	if (waitFOR(8, "get mode A")) {
 		resp.assign(pre_fm).append("\x04");
 		p = replystr.rfind(resp);
+
 		if (p == string::npos) return A.imode;
+
+		if (replystr[p+5] == -1) { A.imode = 0; return A.imode; }
+
 		for (md = 0; md < 10; md++) {
 			if (replystr[p+5] == IC7851_mode_nbr[md]) {
 				A.imode = md;
@@ -428,14 +440,21 @@ int RIG_IC7851::get_modeB()
 	string resp;
 	size_t p;
 	cmd.assign(pre_to).append("\x04").append(post);
+
 	if (waitFOR(8, "get mode B")) {
 		resp.assign(pre_fm).append("\x04");
 		p = replystr.rfind(resp);
+
 		if (p == string::npos) return B.imode;
-		for (md = 0; md < 10; md++) if (replystr[p+5] == IC7851_mode_nbr[md]) break;
+
+		if (replystr[p+5] == -1) { B.imode = 0; return B.imode; }
+
+		for (md = 0; md < 10; md++) 
+			if (replystr[p+5] == IC7851_mode_nbr[md])
+				break;
+
 		if (md == 10) md = 0;
 		B.imode = md;
-
 		if (B.imode < 2) {
 			cmd.assign(pre_to).append("\x1A\x06").append(post);
 			if (waitFOR(9, "data mode?")) {
@@ -990,7 +1009,7 @@ int RIG_IC7851::get_pbt_outer()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(9, "get pbt inner")) {
+	if (waitFOR(9, "get pbt outer")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			val = num100(replystr.substr(p+6));

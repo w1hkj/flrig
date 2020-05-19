@@ -376,8 +376,12 @@ long RIG_IC7610::get_vfoA ()
 	cmd.append(post);
 	if (waitFOR(12, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			A.freq = fm_bcd_be(replystr.substr(p+6), 8);
+		if (p != string::npos) {
+			if (replystr[p+6] == -1)
+				A.freq = 0;
+			else
+				A.freq = fm_bcd_be(replystr.substr(p+6), 8);
+		}
 	}
 
 	get_trace(2, "get_vfoA() ", str2hex(replystr.c_str(), replystr.length()));
@@ -412,8 +416,12 @@ long RIG_IC7610::get_vfoB ()
 	cmd.append(post);
 	if (waitFOR(12, "get vfo B")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			B.freq = fm_bcd_be(replystr.substr(p+6), 8);
+		if (p != string::npos) {
+			if (replystr[p+6] == -1)
+				A.freq = 0;
+			else
+				B.freq = fm_bcd_be(replystr.substr(p+6), 8);
+		}
 	}
 
 	get_trace(2, "get_vfoB() ", str2hex(replystr.c_str(), replystr.length()));
@@ -469,6 +477,8 @@ int RIG_IC7610::get_modeA()
 		if (p == string::npos)
 			goto end_wait_modeA;
 
+		if (replystr[p+6] == -1) { A.imode = A.filter = 0; return A.imode; }
+
 		for (md = 0; md < m7610LSBD1; md++) {
 			if (replystr[p+6] == IC7610_mode_nbr[md]) {
 				A.imode = md;
@@ -482,8 +492,8 @@ int RIG_IC7610::get_modeA()
 					A.imode = 1;
 				break;
 			}
+			A.filter = replystr[p+8];
 		}
-		A.filter = replystr[p+8];
 	}
 
 end_wait_modeA:
@@ -543,6 +553,8 @@ int RIG_IC7610::get_modeB()
 		p = replystr.rfind(resp);
 		if (p == string::npos)
 			goto end_wait_modeB;
+
+		if (replystr[p+6] == -1) { B.imode = B.filter = 0; return B.imode; }
 
 		for (md = 0; md < m7610LSBD1; md++) {
 			if (replystr[p+6] == IC7610_mode_nbr[md]) {
@@ -1890,7 +1902,7 @@ int RIG_IC7610::get_pbt_outer()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(9, "get pbt inner")) {
+	if (waitFOR(9, "get pbt outer")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			val = num100(replystr.substr(p+6));

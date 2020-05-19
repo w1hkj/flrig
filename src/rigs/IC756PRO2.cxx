@@ -222,8 +222,12 @@ long RIG_IC756PRO2::get_vfoA ()
 	cmd.append(post);
 	if (waitFOR(11, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		if (p != string::npos) {
+			if (replystr[p+5] == -1)
+				A.freq = 0;
+			else
+				A.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		}
 	}
 	get_trace(2, "get_vfoA()", str2hex(replystr.c_str(), replystr.length()));
 	return A.freq;
@@ -251,8 +255,12 @@ long RIG_IC756PRO2::get_vfoB ()
 	cmd.append(post);
 	if (waitFOR(11, "get vfo B")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		if (p != string::npos) {
+			if (replystr[p+5] == -1)
+				A.freq = 0;
+			else
+				B.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		}
 	}
 	get_trace(2, "get_vfoB()", str2hex(replystr.c_str(), replystr.length()));
 	return B.freq;
@@ -540,7 +548,7 @@ int RIG_IC756PRO2::get_pbt_outer()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(9, "get pbt inner")) {
+	if (waitFOR(9, "get pbt outer")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			val = num100(replystr.substr(p+6));
@@ -650,31 +658,34 @@ int RIG_IC756PRO2::get_modeA()
 		get_trace(2, "get_modeA()", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			md = replystr[p+5];
-			if (md > 6) md--;
-			filA = replystr[p+6];
-			cstr = "\x1A\x06";
-			resp = pre_fm;
-			resp.append(cstr);
-			cmd = pre_to;
-			cmd.append(cstr);
-			cmd.append(post);
+			if (replystr[p+5] == -1) { A.imode = filA = 0; }
+			else {
+				md = replystr[p+5];
+				if (md > 6) md--;
+				filA = replystr[p+6];
+				cstr = "\x1A\x06";
+				resp = pre_fm;
+				resp.append(cstr);
+				cmd = pre_to;
+				cmd.append(cstr);
+				cmd.append(post);
 //			replystr = "\xFE\xFE\x64\xE0\x1A\x06\xFD\xFE\xFE\xE0\x64\x1A\x06\x00\xFD"; {
-			if (waitFOR(8, "data ?")) {
-				get_trace(2, "get_data_modeA()", str2hex(replystr.c_str(), replystr.length()));
-				p = replystr.rfind(resp);
-				if (p != string::npos) {
-					if (replystr[p+6]) {
-						switch (md) {
-							case 0 : md = 8; break;
-							case 1 : md = 9; break;
-							case 5 : md = 10; break;
-							default : break;
+				if (waitFOR(8, "data ?")) {
+					get_trace(2, "get_data_modeA()", str2hex(replystr.c_str(), replystr.length()));
+					p = replystr.rfind(resp);
+					if (p != string::npos) {
+						if (replystr[p+6]) {
+							switch (md) {
+								case 0 : md = 8; break;
+								case 1 : md = 9; break;
+								case 5 : md = 10; break;
+								default : break;
+							}
 						}
 					}
 				}
+				A.imode = md;
 			}
-			A.imode = md;
 		}
 	}
 	return A.imode;
@@ -723,30 +734,33 @@ int RIG_IC756PRO2::get_modeB()
 		get_trace(2, "get_modeB()", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			md = replystr[p+5];
-			if (md > 6) md--;
-			filB = replystr[p+6];
-			cstr = "\x1A\x06";
-			resp = pre_fm;
-			resp.append(cstr);
-			cmd = pre_to;
-			cmd.append(cstr);
-			cmd.append(post);
-			if (waitFOR(8, "data ?")) {
-				get_trace(2, "get_data_modeB()", str2hex(replystr.c_str(), replystr.length()));
-				p = replystr.rfind(resp);
-				if (p != string::npos) {
-					if (replystr[p+6]) {
-						switch (md) {
-							case 0 : md = 8; break;
-							case 1 : md = 9; break;
-							case 5 : md = 10; break;
-							default : break;
+			if (replystr[p+5] == -1) { B.imode = filB = 0; }
+			else {
+				md = replystr[p+5];
+				if (md > 6) md--;
+				filB = replystr[p+6];
+				cstr = "\x1A\x06";
+				resp = pre_fm;
+				resp.append(cstr);
+				cmd = pre_to;
+				cmd.append(cstr);
+				cmd.append(post);
+				if (waitFOR(8, "data ?")) {
+					get_trace(2, "get_data_modeB()", str2hex(replystr.c_str(), replystr.length()));
+					p = replystr.rfind(resp);
+					if (p != string::npos) {
+						if (replystr[p+6]) {
+							switch (md) {
+								case 0 : md = 8; break;
+								case 1 : md = 9; break;
+								case 5 : md = 10; break;
+								default : break;
+							}
 						}
 					}
 				}
+				B.imode = md;
 			}
-			B.imode = md;
 		}
 	}
 	return B.imode;

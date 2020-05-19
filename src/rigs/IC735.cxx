@@ -97,8 +97,12 @@ long RIG_IC735::get_vfoA ()
 	cmd.append( post );
 	if (waitFOR(10, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			freqA = fm_bcd_be(replystr.substr(p+5), 8);
+		if (p != string::npos) {
+			if (replystr[p+5] == -1)
+				A.freq = 0;
+			else
+				freqA = fm_bcd_be(replystr.substr(p+5), 8);
+		}
 	}
 	return freqA;
 }
@@ -124,8 +128,12 @@ long RIG_IC735::get_vfoB ()
 	cmd.append( post );
 	if (waitFOR(10, "get vfo B")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			freqB = fm_bcd_be(replystr.substr(p+5), 8);
+		if (p != string::npos) {
+			if (replystr[p+5] == -1)
+				A.freq = 0;
+			else
+				freqB = fm_bcd_be(replystr.substr(p+5), 8);
+		}
 	}
 	return freqB;
 }
@@ -160,7 +168,10 @@ int RIG_IC735::get_modeA()
 	if (waitFOR(7, "get mode")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			modeA = replystr[p+5];
+			if (replystr[p+5] == -1) { modeA = 0; }
+			else {
+				modeA = replystr[p+5];
+			}
 		}
 	}
 	return modeA;

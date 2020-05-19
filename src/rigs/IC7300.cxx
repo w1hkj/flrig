@@ -32,9 +32,6 @@
 //=============================================================================
 // IC-7300
 
-#define isett(s) set_trace(2, s, str2hex(replystr.c_str(), replystr.length()));
-#define igett(s) get_trace(2, s, str2hex(replystr.c_str(), replystr.length()));
-
 const char IC7300name_[] = "IC-7300";
 
 // these are only defined in this file
@@ -354,8 +351,12 @@ long RIG_IC7300::get_vfoA ()
 	cmd.append(post);
 	if (waitFOR(12, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			A.freq = fm_bcd_be(replystr.substr(p+6), 10);
+		if (p != string::npos) {
+			if (replystr[p+6] == -1)
+				A.freq = 0;
+			else
+				A.freq = fm_bcd_be(replystr.substr(p+6), 10);
+		}
 	}
 
 	igett("get_vfoA");
@@ -397,8 +398,12 @@ long RIG_IC7300::get_vfoB ()
 	cmd.append(post);
 	if (waitFOR(12, "get vfo B")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			B.freq = fm_bcd_be(replystr.substr(p+6), 10);
+		if (p != string::npos) {
+			if (replystr[p+6] == -1)
+				A.freq = 0;
+			else
+				B.freq = fm_bcd_be(replystr.substr(p+6), 10);
+		}
 	}
 
 	igett("get_vfoB");
@@ -458,19 +463,22 @@ int RIG_IC7300::get_modeA()
 		if (p == string::npos)
 			goto end_wait_modeA;
 
-		for (md = 0; md < LSBD7300; md++) {
-			if (replystr[p+6] == IC7300_mode_nbr[md]) {
-				A.imode = md;
-				if (replystr[p+7] == 0x01 && A.imode < 4)
-					A.imode += 8;
-				if (A.imode > 11)
-					A.imode = 1;
-				break;
+		if (replystr[p+6] == -1) { md = A.imode = 0; }
+		else {
+			for (md = 0; md < LSBD7300; md++) {
+				if (replystr[p+6] == IC7300_mode_nbr[md]) {
+					A.imode = md;
+					if (replystr[p+7] == 0x01 && A.imode < 4)
+						A.imode += 8;
+					if (A.imode > 11)
+						A.imode = 1;
+					break;
+				}
 			}
+			A.filter = replystr[p+8];
+			if (A.filter > 0 && A.filter < 4)
+				mode_filterA[A.imode] = A.filter;
 		}
-		A.filter = replystr[p+8];
-		if (A.filter > 0 && A.filter < 4)
-			mode_filterA[A.imode] = A.filter;
 	}
 
 end_wait_modeA:
@@ -539,17 +547,20 @@ int RIG_IC7300::get_modeB()
 		if (p == string::npos)
 			goto end_wait_modeB;
 
-		for (md = 0; md < LSBD7300; md++) {
-			if (replystr[p+6] == IC7300_mode_nbr[md]) {
-				B.imode = md;
-				if (replystr[p+7] == 0x01 && B.imode < 4)
-					B.imode += 8;
-				if (B.imode > 11)
-					B.imode = 1;
-				break;
+		if (replystr[p+6] == -1) { md = filA = 0; }
+		else {
+			for (md = 0; md < LSBD7300; md++) {
+				if (replystr[p+6] == IC7300_mode_nbr[md]) {
+					B.imode = md;
+					if (replystr[p+7] == 0x01 && B.imode < 4)
+						B.imode += 8;
+					if (B.imode > 11)
+						B.imode = 1;
+					break;
+				}
 			}
+			B.filter = replystr[p+8];
 		}
-		B.filter = replystr[p+8];
 	}
 
 end_wait_modeB:
@@ -1694,8 +1705,6 @@ int RIG_IC7300::get_auto_notch()
 	return progStatus.auto_notch;
 }
 
-static bool IC7300_notchon = false;
-
 void RIG_IC7300::set_notch(bool on, int freq)
 {
 	int hexval;
@@ -1893,7 +1902,7 @@ void RIG_IC7300::set_pbt_inner(int val)
 	cmd.append("\x14\x07");
 	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
-	set_trace(4, "set_pbt_inner(", val, ") ", str2hex(cmd.c_str(), cmd.length()));
+	isett("set_pbt_inner()");
 	waitFB("set PBT inner");
 }
 
@@ -1907,7 +1916,7 @@ void RIG_IC7300::set_pbt_outer(int val)
 	cmd.append("\x14\x08");
 	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
-	set_trace(4, "set_pbt_outer(", val, ") ", str2hex(cmd.c_str(), cmd.length()));
+	isett("set_pbt_outer()");
 	waitFB("set PBT outer");
 }
 
@@ -1940,7 +1949,7 @@ int RIG_IC7300::get_pbt_outer()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(9, "get pbt inner")) {
+	if (waitFOR(9, "get pbt outer")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			val = num100(replystr.substr(p+6));

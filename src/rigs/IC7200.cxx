@@ -275,8 +275,12 @@ long RIG_IC7200::get_vfoA ()
 	cmd.append( post );
 	if (waitFOR(11, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		if (p != string::npos) {
+			if (replystr[p+5] == -1)
+				A.freq = 0;
+			else
+				A.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		}
 	}
 	get_trace(2, "get_vfoA()", str2hex(replystr.c_str(), replystr.length()));
 	return A.freq;
@@ -303,8 +307,12 @@ long RIG_IC7200::get_vfoB ()
 	cmd.append( post );
 	if (waitFOR(11, "get vfo B")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		if (p != string::npos) {
+			if (replystr[p+5] == -1)
+				A.freq = 0;
+			else
+				B.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		}
 	}
 	get_trace(2, "get_vfoB()", str2hex(replystr.c_str(), replystr.length()));
 	return B.freq;
@@ -871,9 +879,12 @@ int RIG_IC7200::get_modeA()
 	if (waitFOR(8, "get mode A")) {
 		p = replystr.rfind(resp);
 		if (p != string::npos) {
-			md = replystr[p + 5];
-			if (md > 6) md -= 2;
-			A.filter = replystr[p+6];
+			if (replystr[p+5] == -1) { md = A.filter = 0; }
+			else {
+				md = replystr[p + 5];
+				if (md > 6) md -= 2;
+				A.filter = replystr[p+6];
+			}
 		}
 	}
 	get_trace(2, "get_modeA()", str2hex(replystr.c_str(), replystr.length()));
@@ -951,9 +962,12 @@ int RIG_IC7200::get_modeB()
 	if (waitFOR(8, "get mode B")) {
 		p = replystr.rfind(resp);
 		if (p != string::npos) {
-			md = replystr[p+5];
-			if (md > 6) md -= 2;
-			B.filter = replystr[p+6];
+			if (replystr[p+5] == -1) { md = B.filter = 0; }
+			else {
+				md = replystr[p+5];
+				if (md > 6) md -= 2;
+				B.filter = replystr[p+6];
+			}
 		}
 	}
 	get_trace(2, "get_modeB()", str2hex(replystr.c_str(), replystr.length()));
@@ -1392,8 +1406,6 @@ void RIG_IC7200::set_vox_onoff()
 	set_trace(2, "set_vox_on_off()", str2hex(cmd.c_str(), cmd.length()));
 }
 
-static bool IC7200_notchon = false;
-
 void RIG_IC7200::set_notch(bool on, int freq)
 {
 	int hexval;
@@ -1638,7 +1650,7 @@ int RIG_IC7200::get_pbt_outer()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(9, "get pbt inner")) {
+	if (waitFOR(9, "get pbt outer")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			val = num100(replystr.substr(p+6));

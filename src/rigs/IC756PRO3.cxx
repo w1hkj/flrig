@@ -227,8 +227,12 @@ long RIG_IC756PRO3::get_vfoA ()
 	cmd.append(post);
 	if (waitFOR(11, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		if (p != string::npos) {
+			if (replystr[p+5] == -1)
+				A.freq = 0;
+			else
+				A.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		}
 	}
 	return A.freq;
 }
@@ -254,8 +258,12 @@ long RIG_IC756PRO3::get_vfoB ()
 	cmd.append(post);
 	if (waitFOR(11, "get vfo B")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		if (p != string::npos) {
+			if (replystr[p+5] == -1)
+				B.freq = 0;
+			else
+				B.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		}
 	}
 	return B.freq;
 }
@@ -595,7 +603,7 @@ int RIG_IC756PRO3::get_pbt_outer()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(9, "get pbt inner")) {
+	if (waitFOR(9, "get pbt outer")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			val = num100(replystr.substr(p+6));
@@ -1035,23 +1043,26 @@ int RIG_IC756PRO3::get_modeA()
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			md = replystr[p+5];
-			if (md > 6) md--;
-			filA = replystr[p+6];
-			cstr = "\x1A\x06";
-			resp = pre_fm;
-			resp.append(cstr);
-			cmd = pre_to;
-			cmd.append(cstr);
-			cmd.append(post);
-			if (waitFOR(9, "data mode?")) {
-				p = replystr.rfind(resp);
-				if (p != string::npos) {
-					if (replystr[p+6]) {
-						switch (md) {
-							case 0 : md = 8; break;
-							case 1 : md = 9; break;
-							case 5 : md = 10; break;
-							default : break;
+			if (md == -1) { md = filA = 0; }
+			else {
+				if (md > 6) md--;
+				filA = replystr[p+6];
+				cstr = "\x1A\x06";
+				resp = pre_fm;
+				resp.append(cstr);
+				cmd = pre_to;
+				cmd.append(cstr);
+				cmd.append(post);
+				if (waitFOR(9, "data mode?")) {
+					p = replystr.rfind(resp);
+					if (p != string::npos) {
+						if (replystr[p+6]) {
+							switch (md) {
+								case 0 : md = 8; break;
+								case 1 : md = 9; break;
+								case 5 : md = 10; break;
+								default : break;
+							}
 						}
 					}
 				}
@@ -1101,23 +1112,26 @@ int RIG_IC756PRO3::get_modeB()
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			md = replystr[p+5];
-			if (md > 6) md--;
-			filA = replystr[p+6];
-			cstr = "\x1A\x06";
-			resp = pre_fm;
-			resp.append(cstr);
-			cmd = pre_to;
-			cmd.append(cstr);
-			cmd.append(post);
-			if (waitFOR(9, "data mode?")) {
-				p = replystr.rfind(resp);
-				if (p != string::npos) {
-					if (replystr[p+6]) {
-						switch (md) {
-							case 0 : md = 8; break;
-							case 1 : md = 9; break;
-							case 5 : md = 10; break;
-							default : break;
+			if (md == -1) { md = filB = 0; }
+			else {
+				if (md > 6) md--;
+				filB = replystr[p+6];
+				cstr = "\x1A\x06";
+				resp = pre_fm;
+				resp.append(cstr);
+				cmd = pre_to;
+				cmd.append(cstr);
+				cmd.append(post);
+				if (waitFOR(9, "data mode?")) {
+					p = replystr.rfind(resp);
+					if (p != string::npos) {
+						if (replystr[p+6]) {
+							switch (md) {
+								case 0 : md = 8; break;
+								case 1 : md = 9; break;
+								case 5 : md = 10; break;
+								default : break;
+							}
 						}
 					}
 				}

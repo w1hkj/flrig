@@ -284,8 +284,12 @@ long RIG_IC9100::get_vfoA ()
 	cmd.append( post );
 	if (waitFOR(11, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		if (p != string::npos) {
+			if (replystr[p+5] == -1)
+				A.freq = 0;
+			else
+				A.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		}
 	}
 	get_trace(2, "get_vfoA()", str2hex(replystr.c_str(), replystr.length()));
 	return A.freq;
@@ -312,8 +316,12 @@ long RIG_IC9100::get_vfoB ()
 	cmd.append( post );
 	if (waitFOR(11, "get vfo B")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		if (p != string::npos) {
+			if (replystr[p+5] == -1)
+				A.freq = 0;
+			else
+				B.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		}
 	}
 	get_trace(2, "get_vfoB()", str2hex(replystr.c_str(), replystr.length()));
 	return B.freq;
@@ -369,6 +377,9 @@ int RIG_IC9100::get_modeA()
 	if (ret) {
 		size_t p = replystr.find(resp);
 		if (p != std::string::npos) {
+
+			if (replystr[p+5] == -1) { A.imode = 0; return A.imode; }
+
 			for (md = 0; md < nummodes; md++)
 				if (replystr[p+5] == IC9100_mode_nbr[md])
 					break;
@@ -447,6 +458,9 @@ int RIG_IC9100::get_modeB()
 	if (ret) {
 		size_t p = replystr.find(resp);
 		if (p != std::string::npos) {
+
+			if (replystr[p+5] == -1) { B.imode = 0; return B.imode; }
+
 			for (md = 0; md < nummodes; md++)
 				if (replystr[p+5] == IC9100_mode_nbr[md])
 					break;

@@ -25,9 +25,6 @@
 //=============================================================================
 // IC-7700
 
-#define isett(s) set_trace(2, s, str2hex(replystr.c_str(), replystr.length()));
-#define igett(s) get_trace(2, s, str2hex(replystr.c_str(), replystr.length()));
-
 const char IC7700name_[] = "IC-7700";
 
 const char *IC7700modes_[] = {
@@ -250,6 +247,9 @@ int RIG_IC7700::get_modeA()
 	if (waitFOR(8, "get mode A")) {
 		igett("get mode A");
 		size_t p = replystr.rfind(resp);
+
+		if (replystr[p+5] == -1) { A.imode = filA = 0; return A.imode; }
+
 		for (md = LSB7700; md <= PSKR7700; md++)
 			if (replystr[p+5] == IC7700_mode_nbr[md]) break;
 		filA = replystr[p+6];
@@ -309,11 +309,13 @@ int RIG_IC7700::get_modeB()
 	if (waitFOR(8, "get mode B")) {
 		igett("get mode B");
 		size_t p = replystr.rfind(resp);
+
+		if (replystr[p+5] == -1) { B.imode = filB = 0; return B.imode; }
+
 		for (md = LSB7700; md <= PSKR7700; md++)
 			if (replystr[p+5] == IC7700_mode_nbr[md]) break;
 		filA = replystr[p+6];
-
-		if (md == LSB7700 || md == USB7700 || md == AM7700 || md == FM7700) {
+			if (md == LSB7700 || md == USB7700 || md == AM7700 || md == FM7700) {
 			cmd = pre_to;
 			cmd.append("\x1a\x06");
 			cmd.append(post);
@@ -700,7 +702,7 @@ int RIG_IC7700::get_pbt_outer()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(9, "get pbt inner")) {
+	if (waitFOR(9, "get pbt outer")) {
 		igett("get pbt inner");
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {

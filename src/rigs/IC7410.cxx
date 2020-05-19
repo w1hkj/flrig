@@ -239,27 +239,30 @@ int RIG_IC7410::get_modeA()
 	resp += '\x04';
 	if (waitFOR(8, "get mode A")) {
 		size_t p = replystr.rfind(resp);
-		for (md = LSB7410; md <= RTTYR7410; md++)
-			if (replystr[p+5] == IC7410_mode_nbr[md]) break;
-		filA = replystr[p+6];
+		if (replystr[p+5] == -1) { A.imode = filA = 0; }
+		else {
+			for (md = LSB7410; md <= RTTYR7410; md++)
+				if (replystr[p+5] == IC7410_mode_nbr[md]) break;
+			filA = replystr[p+6];
 
-		if (md == LSB7410 || md == USB7410 || md == FM7410) {
-			cmd = pre_to;
-			cmd.append("\x1a\x06");
-			cmd.append(post);
-			resp = pre_fm;
-			resp.append("\x1a\x06");
-			if (waitFOR(9, "get digital setting")) {
-				size_t p = replystr.rfind(resp);
-				if (replystr[p+6] == 0x01) {
-					if (md == LSB7410) md = LSBD7410;
-					else if (md == USB7410) md = USBD7410;
-					else if (md == FM7410) md = FMD7410;
+			if (md == LSB7410 || md == USB7410 || md == FM7410) {
+				cmd = pre_to;
+				cmd.append("\x1a\x06");
+				cmd.append(post);
+				resp = pre_fm;
+				resp.append("\x1a\x06");
+				if (waitFOR(9, "get digital setting")) {
+					size_t p = replystr.rfind(resp);
+					if (replystr[p+6] == 0x01) {
+						if (md == LSB7410) md = LSBD7410;
+						else if (md == USB7410) md = USBD7410;
+						else if (md == FM7410) md = FMD7410;
+					}
+					if (replystr[p+7]) filA = replystr[p+7];
 				}
-				if (replystr[p+7]) filA = replystr[p+7];
 			}
+			A.imode = md;
 		}
-		A.imode = md;
 	}
 	return A.imode;
 }
@@ -293,27 +296,31 @@ int RIG_IC7410::get_modeB()
 	resp += '\x04';
 	if (waitFOR(8, "get mode B")) {
 		size_t p = replystr.rfind(resp);
-		for (md = LSB7410; md <= RTTYR7410; md++)
-			if (replystr[p+5] == IC7410_mode_nbr[md]) break;
-		filA = replystr[p+6];
 
-		if (md == USB7410 || md == AM7410 || md == FM7410) {
-			cmd = pre_to;
-			cmd.append("\x1a\x06");
-			cmd.append(post);
-			resp = pre_fm;
-			resp.append("\x1a\x06");
-			if (waitFOR(9, "get digital")) {
-				size_t p = replystr.rfind(resp);
-				if (replystr[p+6] == 0x01) {
-					if (md == LSB7410) md = LSBD7410;
-					else if (md == USB7410) md = USBD7410;
-					else if (md == FM7410) md = FMD7410;
+		if (replystr[p+5] == -1) { B.imode = filB = 0; }
+		else {
+			for (md = LSB7410; md <= RTTYR7410; md++)
+				if (replystr[p+5] == IC7410_mode_nbr[md]) break;
+			filB = replystr[p+6];
+
+			if (md == USB7410 || md == AM7410 || md == FM7410) {
+				cmd = pre_to;
+				cmd.append("\x1a\x06");
+				cmd.append(post);
+				resp = pre_fm;
+				resp.append("\x1a\x06");
+				if (waitFOR(9, "get digital")) {
+					size_t p = replystr.rfind(resp);
+					if (replystr[p+6] == 0x01) {
+						if (md == LSB7410) md = LSBD7410;
+						else if (md == USB7410) md = USBD7410;
+						else if (md == FM7410) md = FMD7410;
+					}
+					if (replystr[p+7]) filB = replystr[p+7];
 				}
-				if (replystr[p+7]) filB = replystr[p+7];
 			}
+			B.imode = md;
 		}
-		B.imode = md;
 	}
 	return B.imode;
 }
@@ -659,7 +666,7 @@ int RIG_IC7410::get_pbt_outer()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(9, "get pbt inner")) {
+	if (waitFOR(9, "get pbt outer")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			val = num100(replystr.substr(p+6));

@@ -197,7 +197,7 @@ int RIG_IC756::get_pbt_outer()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(9, "get pbt inner")) {
+	if (waitFOR(9, "get pbt outer")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			val = num100(replystr.substr(p+6));
@@ -408,8 +408,12 @@ long RIG_IC756PRO::get_vfoA ()
 	cmd.append(post);
 	if (waitFOR(11, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		if (p != string::npos) {
+			if (replystr[p+5] == -1)
+				A.freq = 0;
+			else
+				A.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		}
 	}
 	return A.freq;
 }
@@ -435,8 +439,12 @@ long RIG_IC756PRO::get_vfoB ()
 	cmd.append(post);
 	if (waitFOR(11, "get vfo B")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		if (p != string::npos) {
+			if (replystr[p+5] == -1)
+				A.freq = 0;
+			else
+				B.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		}
 	}
 	return B.freq;
 }
@@ -720,7 +728,7 @@ int RIG_IC756PRO::get_pbt_outer()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(9, "get pbt inner")) {
+	if (waitFOR(9, "get pbt outer")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			val = num100(replystr.substr(p+6));
@@ -839,10 +847,13 @@ int RIG_IC756PRO::get_modeA()
 	if (waitFOR(8, "get mode A")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			md = replystr[p+5];
-			if (md > 6) md--;
-			A.imode = md;
-			mf = replystr[p+6];
+			if (replystr[p+5] == -1) { A.imode = mf = 0; }
+			else {
+				md = replystr[p+5];
+				if (md > 6) md--;
+				A.imode = md;
+				mf = replystr[p+6];
+			}
 		}
 	}
 	if (mf > 0 && mf < 4)
@@ -879,10 +890,13 @@ int RIG_IC756PRO::get_modeB()
 	if (waitFOR(8, "get mode B")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			md = replystr[p+5];
-			if (md > 6) md--;
-			B.imode = md;
-			mf = replystr[p+6];
+			if (replystr[p+5] == -1) { B.imode = mf = 0; }
+			else {
+				md = replystr[p+5];
+				if (md > 6) md--;
+				B.imode = md;
+				mf = replystr[p+6];
+			}
 		}
 	}
 	if (mf > 0 && mf < 3)

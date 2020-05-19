@@ -25,6 +25,10 @@
 #include "debug.h"
 #include "support.h"
 
+// set/get tracing
+#define isett(s) set_trace(2, s, str2hex(cmd.c_str(), cmd.length()));
+#define igett(s) get_trace(2, s, str2hex(replystr.c_str(), replystr.length()));
+
 class RIG_ICOM : public rigbase {
 protected:
 	int    waited;

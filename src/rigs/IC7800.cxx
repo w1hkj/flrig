@@ -287,23 +287,30 @@ int RIG_IC7800::get_modeA()
 	cmd += '\x04';
 	cmd.append(post);
 	if (sendICcommand (cmd, 8 )) {
-		for (md = 0; md < 10; md++) if (replystr[5] == IC7800_mode_nbr[md]) break;
+
+		size_t p = replystr.rfind(pre_fm);
+		if (p == string::npos) return A.imode;
+
+		if (replystr[p+5] == -1) {A.imode = 0; return A.imode; }
+
+		for (md = 0; md < 10; md++) if (replystr[p+5] == IC7800_mode_nbr[md]) break;
 		if (md == 10) md = 0;
-		A.imode = md;
-	} else
-		checkresponse();
-	if (md == LSB7800 || md == USB7800 || md == AM7800) {
-		cmd = pre_to;
-		cmd += '\x1A'; cmd += '\x06';
-		cmd.append(post);
-		if (sendICcommand(cmd, 9)) {
-			if (replystr[6] == 0x01 && A.imode == 0x01) {
+			A.imode = md;
+		if (md == LSB7800 || md == USB7800 || md == AM7800) {
+			cmd = pre_to;
+			cmd += '\x1A'; cmd += '\x06';
+			cmd.append(post);
+			if (sendICcommand(cmd, 9)) {
+				if (replystr[6] == 0x01 && A.imode == 0x01) {
 					if (A.imode == LSB7800) A.imode = LSBD7800;
 					if (A.imode == USB7800) A.imode = USBD7800;
 					if (A.imode == AM7800) A.imode = AMD7800;
+				}
 			}
 		}
-	}
+
+	} else
+		checkresponse();
 	return A.imode;
 }
 
@@ -337,23 +344,29 @@ int RIG_IC7800::get_modeB()
 	cmd += '\x04';
 	cmd.append(post);
 	if (sendICcommand (cmd, 8 )) {
-		for (md = 0; md < 10; md++) if (replystr[5] == IC7800_mode_nbr[md]) break;
+		size_t p = replystr.rfind(pre_fm);
+		if (p == string::npos) return A.imode;
+
+		if (replystr[p+5] == -1) {B.imode = 0; return B.imode; }
+
+		for (md = 0; md < 10; md++) if (replystr[p+5] == IC7800_mode_nbr[md]) break;
 		if (md == 10) md = 0;
 		B.imode = md;
-	} else
-		checkresponse();
-	if (md == LSB7800 || md == USB7800 || md == AM7800) {
-		cmd = pre_to;
-		cmd += '\x1A'; cmd += '\x06';
-		cmd.append(post);
-		if (sendICcommand(cmd, 9)) {
-			if (replystr[6] == 0x01 && A.imode == 0x01) {
+		if (md == LSB7800 || md == USB7800 || md == AM7800) {
+			cmd = pre_to;
+			cmd += '\x1A'; cmd += '\x06';
+			cmd.append(post);
+			if (sendICcommand(cmd, 9)) {
+				if (replystr[6] == 0x01 && A.imode == 0x01) {
 					if (B.imode == LSB7800) B.imode = LSBD7800;
 					if (B.imode == USB7800) B.imode = USBD7800;
 					if (B.imode == AM7800) B.imode = AMD7800;
+				}
 			}
 		}
-	}
+
+	} else
+		checkresponse();
 	return B.imode;
 }
 
@@ -729,7 +742,7 @@ int RIG_IC7800::get_pbt_outer()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(9, "get pbt inner")) {
+	if (waitFOR(9, "get pbt outer")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			val = num100(replystr.substr(p+6));

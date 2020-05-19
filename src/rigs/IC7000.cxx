@@ -223,7 +223,7 @@ bool RIG_IC7000::check ()
 	cmd += '\x03';
 	cmd.append( post );
 	bool ok = waitFOR(11, "check vfo");
-	rig_trace(2, "check()", str2hex(replystr.c_str(), replystr.length()));
+	isett("check()");
 	return ok;
 }
 
@@ -237,10 +237,15 @@ long RIG_IC7000::get_vfoA ()
 	cmd.append( post );
 	if (waitFOR(11, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		if (p != string::npos) {
+			if (replystr[p+5] == -1)
+				A.freq = 0;
+			else
+				A.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		}
 	} else if (RigSerial->IsOpen())
 		flrig_abort = true;
+	igett("get_vfoA()");
 	return A.freq;
 }
 
@@ -252,6 +257,7 @@ void RIG_IC7000::set_vfoA (long freq)
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append(post);
 	waitFB("set vfo A");
+	isett("set_vfoA()");
 }
 
 long RIG_IC7000::get_vfoB ()
@@ -264,10 +270,15 @@ long RIG_IC7000::get_vfoB ()
 	cmd.append( post );
 	if (waitFOR(11, "get vfo B")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		if (p != string::npos) {
+			if (replystr[p+5] == -1)
+				A.freq = 0;
+			else
+				B.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		}
 	} else if (RigSerial->IsOpen())
 		flrig_abort = true;
+	igett("get_vfoB()");
 	return B.freq;
 }
 
@@ -279,6 +290,7 @@ void RIG_IC7000::set_vfoB (long freq)
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append( post );
 	waitFB("set vfo B");
+	isett("set_vfoB()");
 }
 
 void RIG_IC7000::set_modeA(int val)
@@ -294,6 +306,7 @@ void RIG_IC7000::set_modeA(int val)
 	cmd += val;
 	cmd.append( post );
 	waitFB("set mode A");
+	isett("set_modeA()");
 }
 
 int RIG_IC7000::get_modeA()
@@ -308,11 +321,15 @@ int RIG_IC7000::get_modeA()
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			md = replystr[p+5];
-			if (md > 6) md--;
-			A.imode = md;
+			if (md == -1) { md = filA = 0; }
+			else {
+				if (md > 6) md--;
+				A.imode = md;
+			}
 		}
 	} else if (RigSerial->IsOpen())
 		flrig_abort = true;
+	igett("get_modeA()");
 	return A.imode;
 }
 
@@ -329,6 +346,7 @@ void RIG_IC7000::set_modeB(int val)
 	cmd += val;
 	cmd.append( post );
 	waitFB("set mode B");
+	isett("set_modeB()");
 }
 
 int RIG_IC7000::get_modeB()
@@ -343,11 +361,16 @@ int RIG_IC7000::get_modeB()
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			md = replystr[p+5];
-			if (md > 6) md--;
-			B.imode = md;
+			if (md == -1) { md = filB = 0; }
+			else {
+				if (md > 6) md--;
+				B.imode = md;
+			}
 		}
 	} else if (RigSerial->IsOpen())
 		flrig_abort = true;
+		
+	igett("get_modeB()");
 	return B.imode;
 }
 
@@ -365,6 +388,7 @@ int  RIG_IC7000::get_bwA()
 			A.iBW = (fm_bcd(replystr.substr(p+6),2));
 	} else if (RigSerial->IsOpen())
 		flrig_abort = true;
+	igett("get_bwA()");
 	return A.iBW;
 }
 
@@ -393,6 +417,7 @@ void RIG_IC7000::set_bwA(int val)
 	cmd.append(to_bcd(val, 2));
 	cmd.append( post );
 	waitFB("set bw A");
+	isett("set_bwA()");
 }
 
 void RIG_IC7000::set_bwB(int val)
@@ -403,6 +428,7 @@ void RIG_IC7000::set_bwB(int val)
 	cmd.append(to_bcd(val, 2));
 	cmd.append( post );
 	waitFB("set bw B");
+	isett("set_bwB()");
 }
 
 int RIG_IC7000::adjust_bandwidth(int m)
@@ -451,6 +477,7 @@ int RIG_IC7000::get_attenuator()
 		if (p != string::npos)
 			return (replystr[p+5] ? 1 : 0);
 	}
+	igett("get_attenuator()");
 	return progStatus.attenuator;
 }
 
@@ -461,6 +488,7 @@ void RIG_IC7000::set_attenuator(int val)
 	cmd += val ? '\x12' : '\x00';
 	cmd.append( post );
 	waitFB("set att");
+	isett("set_attenuator()");
 }
 
 void RIG_IC7000::set_preamp(int val)
@@ -471,6 +499,7 @@ void RIG_IC7000::set_preamp(int val)
 	cmd += val ? 0x01 : 0x00;
 	cmd.append( post );
 	waitFB("set preamp");
+	isett("set_preamp()");
 }
 
 int RIG_IC7000::get_preamp()
@@ -486,6 +515,7 @@ int RIG_IC7000::get_preamp()
 		if (p != string::npos)
 			return replystr[p+6] ? 1 : 0;
 	}
+	igett("get_preamp()");
 	return progStatus.preamp;
 }
 
@@ -497,6 +527,7 @@ void RIG_IC7000::set_auto_notch(int val)
 	cmd += val ? 0x01 : 0x00;
 	cmd.append( post );
 	waitFB("set AN");
+	isett("set_auto_notch()");
 }
 
 int RIG_IC7000::get_auto_notch()
@@ -519,6 +550,7 @@ int RIG_IC7000::get_auto_notch()
 			}
 		}
 	}
+	igett("get_auto_notch()");
 	return progStatus.auto_notch;
 }
 
@@ -530,6 +562,7 @@ void RIG_IC7000::set_split(bool val)
 	cmd += val ? 0x01 : 0x00;
 	cmd.append(post);
 	waitFB(val ? "set split ON" : "set split OFF");
+	isett("set_split()");
 }
 
 int  RIG_IC7000::get_split()
@@ -547,6 +580,7 @@ int  RIG_IC7000::get_split()
 		if (read_split != 0xFA) // fail byte
 			split = read_split;
 	}
+	igett("get_split()");
 	return split;
 }
 
@@ -559,6 +593,7 @@ void RIG_IC7000::set_volume_control(int val)
 	cmd.append(to_bcd(ICvol, 3));
 	cmd.append( post );
 	waitFB("set vol");
+	isett("set_volume_control()");
 }
 
 int RIG_IC7000::get_volume_control()
@@ -574,6 +609,7 @@ int RIG_IC7000::get_volume_control()
 		if (p != string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p + 6),3) * 100 / 255);
 	}
+	igett("get_volume_control()");
 	return progStatus.volume;
 }
 
@@ -590,6 +626,7 @@ void RIG_IC7000::set_rf_gain(int val)
 	cmd.append(to_bcd(ICrfg, 3));
 	cmd.append( post );
 	waitFB("set RF");
+	isett("set_rf_gain()");
 }
 
 int RIG_IC7000::get_rf_gain()
@@ -604,6 +641,7 @@ int RIG_IC7000::get_rf_gain()
 		if (p != string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p + 6),3) * 100 / 255);
 	}
+	igett("get_rf_gain()");
 	return progStatus.rfgain;
 }
 
@@ -615,6 +653,7 @@ void RIG_IC7000::set_squelch(int val)
 	cmd.append(to_bcd(ICsql, 3));
 	cmd.append( post );
 	waitFB("set sql");
+	isett("set_squelch()");
 }
 
 int  RIG_IC7000::get_squelch()
@@ -630,6 +669,7 @@ int  RIG_IC7000::get_squelch()
 		if (p != string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p+6), 3) * 100 / 255);
 	}
+	igett("get_squelch()");
 	return progStatus.squelch;
 }
 
@@ -640,6 +680,7 @@ void RIG_IC7000::set_power_control(double val)
 	cmd.append(to_bcd((int)(val * 255 / 100), 3));
 	cmd.append( post );
 	waitFB("set power");
+	isett("set_power_control()");
 }
 
 int RIG_IC7000::get_power_control()
@@ -654,6 +695,7 @@ int RIG_IC7000::get_power_control()
 		if (p != string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p + 6),3) * 100 / 255);
 	}
+	igett("get_power_control()");
 	return progStatus.power_level;
 }
 
@@ -730,6 +772,7 @@ int RIG_IC7000::get_mic_gain()
 		if (p != string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p+6),3) / 2.55);
 	}
+	igett("get_mic_gain()");
 	return 0;
 }
 
@@ -741,6 +784,7 @@ void RIG_IC7000::set_mic_gain(int val)
 	cmd.append(to_bcd(val,3));
 	cmd.append(post);
 	waitFB("set mic");
+	isett("set_mic_gain()");
 }
 
 void RIG_IC7000::get_mic_gain_min_max_step(int &min, int &max, int &step)
@@ -759,12 +803,14 @@ void RIG_IC7000::set_notch(bool on, int val)
 	cmd += on ? '\x01' : '\x00';
 	cmd.append(post);
 	waitFB("set notch");
+	isett("set_notc()");
 
 	cmd = pre_to;
 	cmd.append("\x14\x0D");
 	cmd.append(to_bcd(notch,3));
 	cmd.append(post);
 	waitFB("set notch val");
+	isett("set_notch_val()");
 
 }
 
@@ -780,6 +826,7 @@ bool RIG_IC7000::get_notch(int &val)
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(8, "get notch")) {
+		igett("get_notch()");
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			on = replystr[p + 6];
@@ -790,6 +837,7 @@ bool RIG_IC7000::get_notch(int &val)
 		resp.append(cstr);
 		cmd.append(post);
 		if (waitFOR(9, "notch val")) {
+			igett("get_notc_val()");
 			size_t p = replystr.rfind(resp);
 			if (p != string::npos)
 				val = (int)ceil(fm_bcd(replystr.substr(p+6),3) * 3000.0 / 255.0);
@@ -812,6 +860,7 @@ void RIG_IC7000::set_noise(bool val)
 	cmd += val ? 1 : 0;
 	cmd.append(post);
 	waitFB("set noise");
+	isett("set_noise()");
 }
 
 int RIG_IC7000::get_noise()
@@ -837,6 +886,7 @@ void RIG_IC7000::set_noise_reduction(int val)
 	cmd += val ? 0x01 : 0x00;
 	cmd.append(post);
 	waitFB("set NR");
+	isett("set_noise_reduction()");
 }
 
 int RIG_IC7000::get_noise_reduction()
@@ -852,6 +902,7 @@ int RIG_IC7000::get_noise_reduction()
 		if (p != string::npos)
 			return (replystr[p+6] == 0x01 ? 1 : 0);
 	}
+	igett("get_noise_reduction()");
 	return 0;
 }
 
@@ -863,6 +914,7 @@ void RIG_IC7000::set_noise_reduction_val(int val)
 	cmd.append(to_bcd(val * 255 / 100, 3));
 	cmd.append(post);
 	waitFB("set NR val");
+	isett("set_noise_reduction_val()");
 }
 
 int RIG_IC7000::get_noise_reduction_val()
@@ -874,6 +926,7 @@ int RIG_IC7000::get_noise_reduction_val()
 	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(9, "get NR val")) {
+		igett("get_noise_reduction_val()");
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p+6),3) / 2.55);
@@ -889,17 +942,20 @@ void RIG_IC7000::set_compression(int on, int val)
 		cmd += '\x01';
 		cmd.append(post);
 		waitFB("set Comp ON");
+		isett("set compression ON");
 
 		cmd.assign(pre_to).append("\x14\x0E");
 		cmd.append(to_bcd(val * 255 / 10, 3));	// 0 - 10
 		cmd.append( post );
 		waitFB("set comp level");
+		isett("set compression level");
 
 	} else{
 		cmd.assign(pre_to).append("\x16\x44");
 		cmd += '\x00';
 		cmd.append(post);
 		waitFB("set Comp OFF");
+		isett("set_commpression OFF");
 	}
 }
 
@@ -912,6 +968,7 @@ void RIG_IC7000::set_PTT_control(int val)
 	cmd += (unsigned char) val;
 	cmd.append( post );
 	waitFB("set ptt");
+	isett("set PTT");
 	ptt_ = val;
 }
 
@@ -923,6 +980,7 @@ int RIG_IC7000::get_PTT()
 	resp += '\x1c'; resp += '\x00';
 	cmd.append(post);
 	if (waitFOR(8, "get PTT")) {
+		igett("get PTT");
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			ptt_ = replystr[p + 6];
@@ -941,6 +999,7 @@ void RIG_IC7000::set_pbt_inner(int val)
 	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
 	waitFB("set PBT inner");
+	isett("set PBT inner");
 }
 
 void RIG_IC7000::set_pbt_outer(int val)
@@ -954,6 +1013,7 @@ void RIG_IC7000::set_pbt_outer(int val)
 	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
 	waitFB("set PBT outer");
+	isett("set PBT outer");
 }
 
 int RIG_IC7000::get_pbt_inner()
@@ -966,13 +1026,13 @@ int RIG_IC7000::get_pbt_inner()
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(9, "get pbt inner")) {
+		igett("get_pbt_inner()");
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			val = num100(replystr.substr(p+6));
 			val -= 50;
 		}
 	}
-	rig_trace(2, "get_pbt_inner()", str2hex(replystr.c_str(), replystr.length()));
 	return val;
 }
 
@@ -985,14 +1045,14 @@ int RIG_IC7000::get_pbt_outer()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(9, "get pbt inner")) {
+	if (waitFOR(9, "get pbt outer")) {
+		igett("get_pbt_outer()");
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			val = num100(replystr.substr(p+6));
 			val -= 50;
 		}
 	}
-	rig_trace(2, "get_pbt_outer()", str2hex(replystr.c_str(), replystr.length()));
 	return val;
 }
 
@@ -1028,7 +1088,7 @@ void RIG_IC7000::get_band_selection(int v)
 	cmd += '\x01';
 	cmd.append( post );
 	if (waitFOR(23, "get band stack")) {
-		set_trace(2, "get band stack", str2hex(replystr.c_str(), replystr.length()));
+		igett("get band stack");
 		size_t p = replystr.rfind(pre_fm);
 		if (p != string::npos) {
 			long int bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
@@ -1045,7 +1105,7 @@ void RIG_IC7000::get_band_selection(int v)
 			}
 		}
 	} else
-		set_trace(2, "get band stack", str2hex(replystr.c_str(), replystr.length()));
+		igett("get band stack");
 }
 
 void RIG_IC7000::set_band_selection(int v)
@@ -1066,6 +1126,8 @@ void RIG_IC7000::set_band_selection(int v)
 	cmd.append(to_bcd(PL_tones[rTONE], 6));
 	cmd.append(post);
 	waitFB("set_band_selection");
+	isett("set band selection");
+
 	set_trace(2, "set_band_selection()", str2hex(replystr.c_str(), replystr.length()));
 
 	cmd.assign(pre_to);
@@ -1075,5 +1137,6 @@ void RIG_IC7000::set_band_selection(int v)
 	cmd.append( post );
 
 	waitFOR(23, "get band stack");
+	igett("get band stack");
 }
 

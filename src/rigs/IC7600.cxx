@@ -252,8 +252,12 @@ long RIG_IC7600::get_vfoA ()
 	if (waitFOR(11, "get vfo A")) {
 		resp.assign(pre_fm).append("\x03");
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		if (p != string::npos) {
+			if (replystr[p+5] == -1)
+				A.freq = 0;
+			else
+				A.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		}
 	}
 	get_trace(2, "get_vfoA()", str2hex(replystr.c_str(), replystr.length()));
 	return A.freq;
@@ -277,8 +281,12 @@ long RIG_IC7600::get_vfoB ()
 	if (waitFOR(11, "get vfo B")) {
 		resp.assign(pre_fm).append("\x03");
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		if (p != string::npos) {
+			if (replystr[p+5] == -1)
+				A.freq = 0;
+			else
+				B.freq = fm_bcd_be(replystr.substr(p+5), 10);
+		}
 	}
 	get_trace(2, "get_vfoB()", str2hex(replystr.c_str(), replystr.length()));
 	return B.freq;
@@ -367,25 +375,28 @@ int RIG_IC7600::get_modeA()
 		resp.assign(pre_fm).append("\x04");
 		p = replystr.rfind(resp);
 		if (p == string::npos) return A.imode;
+
+		if (replystr[p+5] == -1) { A.imode = filA = 0; return A.imode; }
+
 		for (md = 0; md < 10; md++) {
 			if (replystr[p+5] == IC7600_mode_nbr[md]) {
 				A.imode = md;
-			}
-		}
-		filA = replystr[p+6];
-		get_trace(2, "get_modeA()", str2hex(replystr.c_str(), replystr.length()));
-		if (A.imode < 2) {
-			cmd.assign(pre_to).append("\x1A\x06").append(post);
-			if (waitFOR(9, "data mode?")) {
-				resp.assign(pre_fm).append("\x1A\x06");
-				p = replystr.rfind(resp);
-				if (p == string::npos) return A.imode;
-				int dmode = replystr[p+6];
-				if(dmode != 0) {
-					if (A.imode == 0) A.imode = 9 + dmode;
-					else if (A.imode == 1) A.imode = 12 + dmode;
+				filA = replystr[p+6];
+				get_trace(2, "get_modeA()", str2hex(replystr.c_str(), replystr.length()));
+				if (A.imode < 2) {
+					cmd.assign(pre_to).append("\x1A\x06").append(post);
+					if (waitFOR(9, "data mode?")) {
+						resp.assign(pre_fm).append("\x1A\x06");
+						p = replystr.rfind(resp);
+						if (p == string::npos) return A.imode;
+						int dmode = replystr[p+6];
+						if(dmode != 0) {
+							if (A.imode == 0) A.imode = 9 + dmode;
+							else if (A.imode == 1) A.imode = 12 + dmode;
+						}
+						get_trace(2, "get_data_modeA()", str2hex(replystr.c_str(), replystr.length()));
+					}
 				}
-				get_trace(2, "get_data_modeA()", str2hex(replystr.c_str(), replystr.length()));
 			}
 		}
 	}
@@ -428,6 +439,9 @@ int RIG_IC7600::get_modeB()
 		resp.assign(pre_fm).append("\x04");
 		p = replystr.rfind(resp);
 		if (p == string::npos) return B.imode;
+
+		if (replystr[p+5] == -1) { B.imode = filB = 0; return B.imode; }
+
 		for (md = 0; md < 10; md++) if (replystr[p+5] == IC7600_mode_nbr[md]) break;
 		if (md == 10) md = 0;
 		B.imode = md;
@@ -440,7 +454,7 @@ int RIG_IC7600::get_modeB()
 				resp.assign(pre_fm).append("\x1A\x06");
 				p = replystr.rfind(resp);
 				if (p == string::npos) return B.imode;
-				int dmode = replystr[p+6];
+				int dmode = replystr[p+6];	
 				if(dmode != 0) {
 					if (B.imode == 0) B.imode = 9 + dmode;
 					else if (B.imode == 1) B.imode = 12 + dmode;
@@ -1379,7 +1393,7 @@ int RIG_IC7600::get_pbt_outer()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(9, "get pbt inner")) {
+	if (waitFOR(9, "get pbt outer")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			val = num100(replystr.substr(p+6));
