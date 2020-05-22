@@ -310,7 +310,6 @@ void RIG_FT450D::set_vfoB (long freq)
 int RIG_FT450D::get_vfoAorB()
 {
 	size_t p;
-	char tx;
 	cmd = rsp = "VS";
 	cmd.append(";");
 	wait_char(';', 4, FL450D_WAIT_TIME, "get vfo A/B", ASC);
