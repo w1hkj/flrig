@@ -1,0 +1,504 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0305
+i18n_type 1
+i18n_include "gettext.h"
+i18n_function _
+header_name {.h}
+code_name {.cxx}
+Function {cwio_window()} {open
+} {
+  Fl_Window {} {
+    label {CW keying} open
+    xywh {610 38 670 130} type Double resizable
+    code0 {\#include "status.h"}
+    code1 {\#include "cwio.h"}
+    code2 {\#include "ValueSlider.h"} visible
+  } {
+    Fl_Input txt_to_send {
+      callback {control_function_keys();}
+      xywh {2 2 666 68} type Multiline align 16 when 1 resizable
+      class Fl_Input2
+    }
+    Fl_Group {} {open
+      xywh {0 70 670 60}
+    } {
+      Fl_Value_Slider sldr_cwioWPM {
+        label {char WPM}
+        callback {progStatus.cwioWPM = (int)o->value();}
+        tooltip {My transmit CW WPM} xywh {4 74 300 20} type {Horz Knob} color 246 selection_color 4 align 8 minimum 5 maximum 50 step 1 value 20 textsize 14
+        code0 {\#include "flslider2.h"}
+        code1 {o->value(progStatus.cwioWPM);}
+        class Fl_Value_Slider2
+      }
+      Fl_Button btn_cwio_config {
+        label Config
+        callback {open_cwio_config();}
+        tooltip {Clear transmit text} xywh {390 73 60 22}
+      }
+      Fl_Button btn_cwio_clear {
+        label Clear
+        callback {cwio_clear_text();}
+        tooltip {Clear transmit text} xywh {473 73 60 22}
+      }
+      Fl_Light_Button btn_cwioSEND {
+        label {Send/Pause}
+        callback {send_text(o->value());}
+        tooltip {Send / Pause sending characters} xywh {557 73 105 22}
+      }
+      Fl_Group {} {
+        xywh {2 98 220 30} box ENGRAVED_BOX
+      } {
+        Fl_Button {btn_msg[0]} {
+          label {F 1}
+          callback {exec_msg(0);}
+          tooltip {Action - Function Key Left click
+Edit - Control left click} xywh {5 102 50 22}
+        }
+        Fl_Button {btn_msg[1]} {
+          label {F 2}
+          callback {exec_msg(1);}
+          tooltip {Action - Function Key Left click
+Edit - Control left click} xywh {59 102 50 22}
+        }
+        Fl_Button {btn_msg[2]} {
+          label {F 3}
+          callback {exec_msg(2);}
+          tooltip {Action - Function Key Left click
+Edit - Control left click} xywh {113 102 50 22}
+        }
+        Fl_Button {btn_msg[3]} {
+          label {F 4}
+          callback {exec_msg(3);}
+          tooltip {Action - Function Key Left click
+Edit - Control left click} xywh {168 102 50 22}
+        }
+      }
+      Fl_Group {} {
+        xywh {225 98 220 30} box ENGRAVED_BOX
+      } {
+        Fl_Button {btn_msg[4]} {
+          label {F 5}
+          callback {exec_msg(4);}
+          tooltip {Action - Function Key Left click
+Edit - Control left click} xywh {229 102 50 22}
+        }
+        Fl_Button {btn_msg[5]} {
+          label {F 6}
+          callback {exec_msg(5);}
+          tooltip {Action - Function Key Left click
+Edit - Control left click} xywh {283 102 50 22}
+        }
+        Fl_Button {btn_msg[6]} {
+          label {F 7}
+          callback {exec_msg(6);}
+          tooltip {Action - Function Key Left click
+Edit - Control left click} xywh {337 102 50 22}
+        }
+        Fl_Button {btn_msg[7]} {
+          label {F 8}
+          callback {exec_msg(7);}
+          tooltip {Action - Function Key Left click
+Edit - Control left click} xywh {391 102 50 22}
+        }
+      }
+      Fl_Group {} {
+        xywh {448 98 220 30} box ENGRAVED_BOX
+      } {
+        Fl_Button {btn_msg[8]} {
+          label {F 9}
+          callback {exec_msg(8);}
+          tooltip {Action - Function Key Left click
+Edit - Control left click} xywh {451 102 50 22}
+        }
+        Fl_Button {btn_msg[9]} {
+          label {F 10}
+          callback {exec_msg(9);}
+          tooltip {Action - Function Key Left click
+Edit - Control left click} xywh {505 102 50 22}
+        }
+        Fl_Button {btn_msg[10]} {
+          label {F 11}
+          callback {exec_msg(10);}
+          tooltip {Action - Function Key Left click
+Edit - Control left click} xywh {559 102 50 22}
+        }
+        Fl_Button {btn_msg[11]} {
+          label {F 12}
+          callback {exec_msg(11);}
+          tooltip {Action - Function Key Left click
+Edit - Control left click} xywh {614 102 50 22}
+        }
+      }
+    }
+  }
+}
+
+Function {make_message_editor()} {open
+} {
+  Fl_Window {} {
+    label {Message Editor} open
+    xywh {740 370 603 348} type Double resizable visible
+  } {
+    Fl_Tabs {} {open
+      xywh {0 0 530 345} align 17
+    } {
+      Fl_Group {} {
+        label {F1-F4}
+        xywh {0 25 530 320}
+      } {
+        Fl_Box {} {
+          label Label
+          xywh {22 30 84 20}
+        }
+        Fl_Box {} {
+          label {Message Text}
+          xywh {211 30 223 20}
+        }
+        Fl_Input {edit_label[0]} {
+          label F1
+          callback {label_cb(1);}
+          xywh {5 74 80 22} align 5
+          code0 {\#include "flinput2.h"}
+          class Fl_Input2
+        }
+        Fl_Input {edit_msg[0]} {
+          callback {msg_cb(1);}
+          xywh {90 55 435 65} type Multiline
+          class Fl_Input2
+        }
+        Fl_Input {edit_label[1]} {
+          label F2
+          callback {label_cb(2);}
+          xywh {5 144 80 22} align 5
+          class Fl_Input2
+        }
+        Fl_Input {edit_msg[1]} {
+          callback {msg_cb(2);}
+          xywh {90 125 435 65} type Multiline
+          class Fl_Input2
+        }
+        Fl_Input {edit_label[2]} {
+          label F3
+          callback {label_cb(3);}
+          xywh {5 214 80 22} align 5
+          class Fl_Input2
+        }
+        Fl_Input {edit_msg[2]} {
+          callback {msg_cb(3);}
+          xywh {90 195 435 65} type Multiline
+          class Fl_Input2
+        }
+        Fl_Input {edit_label[3]} {
+          label F4
+          callback {label_cb(4);}
+          xywh {5 284 80 22} align 5
+          class Fl_Input2
+        }
+        Fl_Input {edit_msg[3]} {
+          callback {msg_cb(4);}
+          xywh {90 265 435 65} type Multiline
+          class Fl_Input2
+        }
+      }
+      Fl_Group {} {
+        label {F5-f8}
+        xywh {0 25 530 320} hide
+      } {
+        Fl_Box {} {
+          label Label
+          xywh {22 30 84 20}
+        }
+        Fl_Box {} {
+          label {Message Text}
+          xywh {211 30 223 20}
+        }
+        Fl_Input {edit_label[4]} {
+          label F5
+          callback {label_cb(5);}
+          xywh {5 74 80 22} align 5
+          class Fl_Input2
+        }
+        Fl_Input {edit_msg[4]} {
+          callback {msg_cb(5);}
+          xywh {90 55 435 65} type Multiline
+          class Fl_Input2
+        }
+        Fl_Input {edit_label[5]} {
+          label F6
+          callback {label_cb(6);}
+          xywh {5 144 80 22} align 5
+          class Fl_Input2
+        }
+        Fl_Input {edit_msg[5]} {
+          callback {msg_cb(6);}
+          xywh {90 125 435 65} type Multiline
+          class Fl_Input2
+        }
+        Fl_Input {edit_label[6]} {
+          label F7
+          callback {label_cb(7);}
+          xywh {5 214 80 22} align 5
+          class Fl_Input2
+        }
+        Fl_Input {edit_msg[6]} {
+          callback {msg_cb(7);}
+          xywh {90 195 435 65} type Multiline
+          class Fl_Input2
+        }
+        Fl_Input {edit_label[7]} {
+          label F8
+          callback {label_cb(8);}
+          xywh {5 284 80 22} align 5
+          class Fl_Input2
+        }
+        Fl_Input {edit_msg[7]} {
+          callback {msg_cb(8);}
+          xywh {90 265 435 65} type Multiline
+          class Fl_Input2
+        }
+      }
+      Fl_Group {} {
+        label {F9-F12}
+        xywh {0 25 530 320} hide
+      } {
+        Fl_Box {} {
+          label Label
+          xywh {22 30 84 20}
+        }
+        Fl_Box {} {
+          label {Message Text}
+          xywh {211 30 223 20}
+        }
+        Fl_Input {edit_label[8]} {
+          label F9
+          callback {label_cb(9);}
+          xywh {5 73 80 22} align 5
+          class Fl_Input2
+        }
+        Fl_Input {edit_msg[8]} {
+          callback {msg_cb(9);}
+          xywh {90 55 435 65} type Multiline
+          class Fl_Input2
+        }
+        Fl_Input {edit_label[9]} {
+          label F10
+          callback {label_cb(10);}
+          xywh {5 143 80 22} align 5
+          class Fl_Input2
+        }
+        Fl_Input {edit_msg[9]} {
+          callback {msg_cb(10);}
+          xywh {90 125 435 65} type Multiline
+          class Fl_Input2
+        }
+        Fl_Input {edit_label[10]} {
+          label F11
+          callback {label_cb(11);}
+          xywh {5 213 80 22} align 5
+          class Fl_Input2
+        }
+        Fl_Input {edit_msg[10]} {
+          callback {msg_cb(11);}
+          xywh {90 195 435 65} type Multiline
+          class Fl_Input2
+        }
+        Fl_Input {edit_label[11]} {
+          label F12
+          callback {label_cb(12);}
+          xywh {5 283 80 22} align 5
+          class Fl_Input2
+        }
+        Fl_Input {edit_msg[11]} {
+          callback {msg_cb(12);}
+          xywh {90 265 435 65} type Multiline
+          class Fl_Input2
+        }
+      }
+    }
+    Fl_Group {} {open selected
+      xywh {534 16 65 146} box ENGRAVED_FRAME
+    } {
+      Fl_Box {} {
+        label ProSign
+        xywh {537 19 59 20}
+      }
+      Fl_Box {} {
+        label {= BT}
+        tooltip {-...-} xywh {536 40 60 20}
+      }
+      Fl_Box {} {
+        label {+ KN}
+        tooltip {-.--.} xywh {536 60 60 20}
+      }
+      Fl_Box {} {
+        label {% SK}
+        tooltip {...-..-} xywh {536 79 60 20}
+      }
+      Fl_Box {} {
+        label {~ AA}
+        tooltip {.-..-.} xywh {536 98 60 20}
+      }
+      Fl_Box {} {
+        label {< AS}
+        tooltip {.----.} xywh {536 118 60 20}
+      }
+      Fl_Box {} {
+        label {> AR}
+        tooltip {.-.-.} xywh {536 137 60 20}
+      }
+    }
+    Fl_Button btn_cancel_edit {
+      label Cancel
+      callback {cancel_edit();}
+      tooltip {Exit editor, discard changes} xywh {534 268 65 22}
+    }
+    Fl_Button btn_apply_edit {
+      label Apply
+      callback {apply_edit();}
+      tooltip {Apply current changes to function keys} xywh {534 294 65 22}
+    }
+    Fl_Button btn_done_edit {
+      label Close
+      callback {done_edit();}
+      tooltip {Apply changes and close editor} xywh {534 321 65 22}
+    }
+    Fl_Group {} {open
+      xywh {534 168 65 86} box ENGRAVED_FRAME
+    } {
+      Fl_Box {} {
+        label Control
+        xywh {537 175 59 20}
+      }
+      Fl_Box {} {
+        label {[ Send}
+        xywh {537 199 59 20}
+      }
+      Fl_Box {} {
+        label {] Rcv}
+        xywh {537 226 59 20}
+      }
+    }
+  }
+}
+
+Function {cwio_config_dialog()} {open
+} {
+  Fl_Window {} {
+    label {CW Configuration} open
+    xywh {611 208 670 104} type Double visible
+  } {
+    Fl_Group {} {open
+      xywh {2 3 666 100} box ENGRAVED_FRAME
+    } {
+      Fl_Group select_cwioPORT {
+        label {Ser. Port}
+        callback {progStatus.cwioPORT = o->value();} open
+        tooltip {CWIO serial port} xywh {73 73 496 23} box DOWN_BOX color 53 align 4
+        code0 {\#include "combo.h"}
+        code1 {o->value(progStatus.cwioPORT.c_str());}
+        class Fl_ComboBox
+      } {}
+      Fl_Light_Button btn_cwioCONNECT {
+        label Connect
+        callback {if (o->value() == 0) {
+  close_cwkey();
+  btn_cwioCAT->activate();
+  btn_cwioAUX->activate();
+  btn_cwioSEP->activate();
+  progStatus.cwioCONNECTED = 0;
+}
+else if (!open_cwkey()) {
+  o->value(0);
+  btn_cwioCAT->activate();
+  btn_cwioAUX->activate();
+  btn_cwioSEP->activate();
+  progStatus.cwioCONNECTED = 0;
+} else {
+  btn_cwioCAT->value(0); btn_cwioCAT->deactivate();
+  btn_cwioAUX->value(0); btn_cwioAUX->deactivate();
+  btn_cwioSEP->value(0); btn_cwioSEP->deactivate();
+  progStatus.cwioCONNECTED = 1;
+}
+progStatus.cwioSHARED = 0;}
+        xywh {578 73 80 23}
+        code0 {o->value(progStatus.cwioCONNECTED);}
+      }
+      Fl_Check_Button btn_cwioCAT {
+        label {Use CAT}
+        callback {if (o->value()) {
+  progStatus.cwioSHARED = 1;
+  btn_cwioAUX->value(0); btn_cwioAUX->deactivate();
+  btn_cwioSEP->value(0); btn_cwioSEP->deactivate();
+  btn_cwioCONNECT->value(0); btn_cwioCONNECT->deactivate();
+}else {
+  progStatus.cwioSHARED = 0;
+  btn_cwioCONNECT->activate();
+  btn_cwioAUX->activate();
+  btn_cwioSEP->activate();
+}}
+        tooltip {Use DTR/RTS on CAT serial port} xywh {111 15 23 15} down_box DOWN_BOX align 4
+        code0 {o->value(progStatus.cwioSHARED == 1);}
+      }
+      Fl_Check_Button btn_cwioAUX {
+        label {Use AUX}
+        callback {if (o->value()) {
+  progStatus.cwioSHARED = 2;
+  btn_cwioCAT->value(0); btn_cwioCAT->deactivate();
+  btn_cwioSEP->value(0); btn_cwioSEP->deactivate();
+  btn_cwioCONNECT->value(0); btn_cwioCONNECT->deactivate();
+}else {
+  progStatus.cwioSHARED = 0;
+  btn_cwioCONNECT->activate();
+  btn_cwioCAT->activate();
+  btn_cwioSEP->activate();
+}}
+        tooltip {Use DTR/RTS on Auxiliary serial port} xywh {112 46 23 15} down_box DOWN_BOX align 4
+        code0 {o->value(progStatus.cwioSHARED == 2);}
+      }
+      Fl_Check_Button btn_cwioSEP {
+        label {Use SEP}
+        callback {if (o->value()) {
+  progStatus.cwioSHARED = 3;
+  btn_cwioAUX->value(0); btn_cwioAUX->deactivate();
+  btn_cwioCAT->value(0); btn_cwioCAT->deactivate();
+  btn_cwioCONNECT->value(0); btn_cwioCONNECT->deactivate();
+}else {
+  progStatus.cwioSHARED = 0;
+  btn_cwioCONNECT->activate();
+  btn_cwioAUX->activate();
+  btn_cwioCAT->activate();
+}}
+        tooltip {Use DTR/RTS Separate serial port} xywh {208 15 23 15} down_box DOWN_BOX align 4
+        code0 {o->value(progStatus.cwioSHARED == 3);}
+      }
+      Fl_Group listbox_cwioKEYLINE {
+        label {CW Keyline}
+        callback {progStatus.cwioKEYLINE = o->index();}
+        tooltip {Select either DTR or RTS for keyline} xywh {593 41 65 24} box DOWN_BOX color 7 align 4
+        code0 {\#include "combo.h"}
+        code1 {o->add("None|RTS|DTR");}
+        code2 {o->index(progStatus.cwioKEYLINE);}
+        class Fl_ListBox
+      } {}
+      Fl_Spinner cntr_cwioPTT {
+        label {PTT delay}
+        callback {progStatus.cwioPTT = o->value();}
+        tooltip {PTT delay before keydown
+0 = Break-in} xywh {608 10 50 25} minimum 0 value 0
+        code0 {o->value(progStatus.cwioPTT);}
+      }
+      Fl_Light_Button btn_cw_dtr_calibrate {
+        label Calibrate
+        callback {calibrate_cwio();}
+        xywh {384 10 84 24} selection_color 6
+      }
+      Fl_Counter cnt_cwio_comp {
+        label {Comp (msec)}
+        callback {progStatus.cwio_comp = int(o->value());}
+        tooltip {Timing compensation} xywh {368 41 100 24} align 4 minimum 0 maximum 10
+        code0 {o->value(progStatus.cwio_comp);}
+        code1 {o->lstep(1.0);}
+      }
+    }
+  }
+}

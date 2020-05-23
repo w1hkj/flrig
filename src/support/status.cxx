@@ -412,7 +412,17 @@ status progStatus = {
 	28070000L, 6, 0, 0, 0, 600,		// f10 meters
 	50070000L, 6, 0, 0, 0, 600,		// f6 meters
 	144070000L, 6, 0, 0, 0, 600,	// f2 meters
-	432100000L, 6, 0, 0, 0, 600		// f70 cent'
+	432100000L, 6, 0, 0, 0, 600,		// f70 cent'
+
+// cwio parameters
+	20,			// int    cwioWPM;
+	2,			// int    cwioKEYLINE; 1 == RTS, 2 == DTR
+	0,			// int    cwioSHARED; 0 = NONE, 1 = CAT, 2 = AUX, 3 = SEP
+	0,			// int    cwioPTT; 1 - use PTT, 0 - use Brea-in
+	0,			// int    cwioCONNECTED; 1 - connected state; 0 - unconnected state
+	0,			// double cwio_comp;
+	"",			// string cwioPORT;
+
 };
 
 void status::saveLastState()
@@ -841,6 +851,22 @@ void status::saveLastState()
 
 	spref.set("hrd_buttons", hrd_buttons);
 	spref.set("sliders_button", sliders_button);
+
+	spref.set("cwioWPM", cwioWPM);
+	spref.set("cwio_comp", cwio_comp);
+	spref.set("cwioKEYLINE", cwioKEYLINE);
+	spref.set("cwioSHARED", cwioSHARED);
+	spref.set("cwioPTT", cwioPTT);
+	spref.set("cwioCONNECTED", cwioCONNECTED);
+	spref.set("cwioPORT", cwioPORT.c_str());
+	char setbuff[20];
+	for (int n = 0; n < 12; n++) {
+		snprintf(setbuff, sizeof(setbuff), "cwiolabel[%d]", n);
+		spref.set(setbuff, cwio_labels[n].c_str());
+		snprintf(setbuff, sizeof(setbuff), "cwiomessage[%d]", n);
+		spref.set(setbuff, cwio_msgs[n].c_str());
+	}
+
 }
 
 bool status::loadXcvrState(string xcvr)
@@ -1345,6 +1371,24 @@ bool status::loadXcvrState(string xcvr)
 
 		if (spref.get("hrd_buttons", i, i)) hrd_buttons = i;
 		spref.get("sliders_button", sliders_button, sliders_button);
+
+		spref.get("cwioWPM", cwioWPM, cwioWPM);
+		spref.get("cwio_comp", cwio_comp, cwio_comp);
+		spref.get("cwioKEYLINE", cwioKEYLINE, cwioKEYLINE);
+		spref.get("cwioSHARED", cwioSHARED, cwioSHARED);
+		spref.get("cwioPTT", cwioPTT, cwioPTT);
+		spref.get("cwioCONNECTED", cwioCONNECTED, cwioCONNECTED);
+		spref.get("cwioPORT", defbuffer, "NONE", 499);
+		cwioPORT = defbuffer;
+		char getbuff[20];
+		for (int n = 0; n < 12; n++) {
+			snprintf(getbuff, sizeof(getbuff), "cwiolabel[%d]", n);
+			spref.get(getbuff, defbuffer, "", 499);
+			cwio_labels[n] = defbuffer;
+			snprintf(getbuff, sizeof(getbuff), "cwiomessage[%d]", n);
+			spref.get(getbuff, defbuffer, "", 499);
+			cwio_msgs[n] = defbuffer;
+		}
 
 		return true;
 	}

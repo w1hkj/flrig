@@ -21,6 +21,8 @@
 // clase wheel_slider - based on Fl_Slider
 // class wheel_value_slider - based on Fl_Value_Slider
 //======================================================================
+#ifndef _WHEEL_VALUE_SLIDER_H
+#define _WHEEL_VALUE_SLIDER_H
 
 #include <FL/Fl_Slider.H>
 #include <FL/Fl_Value_Slider.H>
@@ -48,3 +50,5 @@ public:
 	void reverse(bool rev) { reverse_ = rev;}
 	bool reverse() { return reverse_;}
 };
+
+#endif

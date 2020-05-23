@@ -26,6 +26,8 @@
 
 #include <cctype>
 
+#include <iostream>
+
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Widget.H>
@@ -115,6 +117,14 @@ int Fl_Input2::handle(int event)
 					default:
 						break;
 				}
+			}
+			if (b >= FL_F && b <= FL_F_Last) {
+				do_callback();
+				return 1;
+			}
+			if ( (Fl::event_state() & FL_ALT) && ((b == 'p') || (b == 's') || (b == 'c') ) ) {
+				do_callback();
+				return 1;
 			}
 		}
 			return Fl_Input::handle(event);

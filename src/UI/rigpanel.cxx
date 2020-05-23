@@ -30,6 +30,8 @@
 #include "socket_io.h"
 #include "hspinner.h"
 #include "ui.h"
+#include "cwioUI.h"
+#include "cwio.h"
 
 Fl_Light_Button *btnPOWER = (Fl_Light_Button *)0;
 
@@ -409,6 +411,16 @@ static void cb_Send(Fl_Menu_*, void*) {
 
 static void cb_mnuTCPIP(Fl_Menu_*, void*) {
 	open_tcpip_tab();
+}
+
+static void cb_keyer(Fl_Menu_*, void*) {
+	if (cwio_keyer_dialog == 0)
+		cwio_keyer_dialog = cwio_window();
+	for (int n = 0; n < 12; n++) {
+		btn_msg[n]->label(progStatus.cwio_labels[n].c_str());
+		btn_msg[n]->redraw_label();
+	}
+	cwio_keyer_dialog->show();
 }
 
 //static void cb_mnuXMLRPC(Fl_Menu_*, void*) {

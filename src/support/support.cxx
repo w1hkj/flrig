@@ -51,6 +51,7 @@
 #include "rigpanel.h"
 #include "tod_clock.h"
 #include "trace.h"
+#include "cwio.h"
 
 void initTabs();
 
@@ -3390,10 +3391,15 @@ void cbExit()
 		close_rig = true;
 	}
 
+	stop_cwio_thread();
+
 	close_UI();
 
 	if (tracewindow) tracewindow->hide();
 	if (tabs_dialog) tabs_dialog->hide();
+	if (cwio_keyer_dialog) cwio_keyer_dialog->hide();
+	if (cwio_editor) cwio_editor->hide();
+	if (cwio_configure) cwio_configure->hide();
 }
 
 void cbALC_SWR()

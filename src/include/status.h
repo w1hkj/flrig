@@ -400,6 +400,17 @@ struct status {
 	int		f2,    m2,  txT_2,   rxT_2,   offset_2,   oF_2;
 	int		f70,  m70,  txT_70,  rxT_70,  offset_70,  oF_70;
 
+// cwio parameters
+	int		cwioWPM;
+	int		cwioKEYLINE;
+	int		cwioSHARED;
+	int		cwioPTT;
+	int		cwioCONNECTED;
+	double	cwio_comp;
+	string	cwioPORT;
+	string	cwio_msgs[12];
+	string	cwio_labels[12];
+
 	void saveLastState();
 	void loadLastState();
 	bool loadXcvrState(string);

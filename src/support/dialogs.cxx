@@ -51,6 +51,7 @@
 #include "socket_io.h"
 #include "rigpanel.h"
 #include "gettext.h"
+#include "cwioUI.h"
 
 using namespace std;
 
@@ -75,6 +76,7 @@ void clear_combos()
 	selectCommPort->add("NONE");
 	selectAuxPort->add("NONE");
 	selectSepPTTPort->add("NONE");
+	select_cwioPORT->add("NONE");
 }
 
 void add_combos(char *port)
@@ -82,6 +84,7 @@ void add_combos(char *port)
 	selectCommPort->add(port);
 	selectAuxPort->add(port);
 	selectSepPTTPort->add(port);
+	select_cwioPORT->add(port);
 }
 
 void set_combo_value()
@@ -89,6 +92,7 @@ void set_combo_value()
 	selectCommPort->value(progStatus.xcvr_serial_port.c_str());
 	selectAuxPort->value(progStatus.aux_serial_port.c_str());
 	selectSepPTTPort->value(progStatus.sep_serial_port.c_str());
+	select_cwioPORT->value(progStatus.cwioPORT.c_str());
 }
 
 //======================================================================

@@ -121,6 +121,9 @@ clean-local:
 
 # Sources that we build. It is OK to have headers here.
 flrig_SOURCES += \
+	cwio/cwio.cxx \
+	cwio/morse.cxx \
+	cwio/cwioUI.cxx \
 	graphics/pixmaps.cxx \
 	graphics/icons.cxx \
 	graphics/images.cxx \
@@ -248,7 +251,9 @@ EXTRA_DIST = \
 	UI/xcvr_setup.cxx \
 	UI/meters_setup.cxx \
 	UI/power_meter_setup.cxx \
-	include/combo.h \
+	include/cwio.h \
+	include/cwioUI.h \
+	include/morse.h \
 	include/debug.h \
 	include/dialogs.h \
 	include/fileselect.h \
@@ -367,6 +372,7 @@ EXTRA_DIST = \
 	include/ValueSlider.h \
 	include/xml_server.h \
 	include/Xiegu-5105.h \
+	include/combo.h \
 	images/alc.xbm \
 	images/P5.xbm \
 	images/P25.xbm \

@@ -918,50 +918,24 @@ PTT %d, DTRptt %d, DTR %d, RTSptt %d, RTS %d, RTSCTS %d, DtrControl %2x, RtsCont
 	SetCommState(hComm, &dcb);
 }
 
-void Cserial::setRTS(bool b)
-{
-	if (hComm == INVALID_HANDLE_VALUE) return;
-
-	if (b == true)
-		dcb.fRtsControl = RTS_CONTROL_ENABLE;
-	else
-		dcb.fRtsControl = RTS_CONTROL_DISABLE;
-
-#if SERIAL_DEBUG
-	int retval = SetCommState(hComm, &dcb);
-	fprintf(serlog, "\
-Set RTS %d, DtrControl %2x, RtsControl %2x ==> %d\n",
-		b,
-		static_cast<unsigned int>(dcb.fDtrControl), 
-		static_cast<unsigned int>(dcb.fRtsControl),
-		retval );
-	return;
-#endif
-
-	SetCommState(hComm, &dcb);
-}
-
 void Cserial::setDTR(bool b)
 {
-	if (hComm == INVALID_HANDLE_VALUE) return;
+	if(hComm == INVALID_HANDLE_VALUE) {
+		LOG_PERROR("Invalid handle");
+		return;
+	}
+	if (b) EscapeCommFunction(hComm, SETDTR);
+	else   EscapeCommFunction(hComm, CLRDTR);
+}
 
-	if (b == true)
-		dcb.fDtrControl = DTR_CONTROL_ENABLE;
-	else
-		dcb.fDtrControl = DTR_CONTROL_DISABLE;
-
-#if SERIAL_DEBUG
-	int retval = SetCommState(hComm, &dcb);
-	fprintf(serlog, "\
-Set DTR %d, DtrControl %2x, RtsControl %2x ==> %d\n",
-		b,
-		static_cast<unsigned int>(dcb.fDtrControl), 
-		static_cast<unsigned int>(dcb.fRtsControl),
-		retval );
-	return;
-#endif
-
-	SetCommState(hComm, &dcb);
+void Cserial::setRTS(bool b)
+{
+	if(hComm == INVALID_HANDLE_VALUE) {
+		LOG_PERROR("Invalid handle");
+		return;
+	}
+	if (b) EscapeCommFunction(hComm, SETRTS);
+	else   EscapeCommFunction(hComm, CLRRTS);
 }
 
 Cserial::Cserial() {

@@ -79,6 +79,8 @@
 #include "serial.h"
 #include "ui.h"
 #include "icons.h"
+#include "cwio.h"
+#include "cwioUI.h"
 
 #include "flrig_icon.cxx"
 
@@ -86,6 +88,9 @@ int parse_args(int argc, char **argv, int& idx);
 
 Fl_Double_Window *mainwindow = (Fl_Double_Window *)0;
 Fl_Double_Window *tabs_dialog = (Fl_Double_Window *)0;
+Fl_Double_Window *cwio_keyer_dialog = (Fl_Double_Window *)0;
+Fl_Double_Window *cwio_editor = (Fl_Double_Window *)0;
+Fl_Double_Window *cwio_configure = (Fl_Double_Window *)0;
 
 string HomeDir;
 string RigHomeDir;
@@ -304,7 +309,6 @@ void startup(void*)
 //				show_controls();
 				break;
 	}
-
 }
 
 void rotate_log(std::string filename)
@@ -392,9 +396,11 @@ extern FILE *serlog;
 	serlog = fopen(serlogname.c_str(), "w");
 #endif
 
-	RigSerial = new Cserial;
-	SepSerial = new Cserial;
-	AuxSerial = new Cserial;
+	RigSerial	= new Cserial;
+	SepSerial	= new Cserial;
+	AuxSerial	= new Cserial;
+	cwio_serial	= new Cserial();
+	morse		= new Cmorse();
 
 	try {
 		std::string fname = RigHomeDir;
@@ -435,6 +441,10 @@ extern FILE *serlog;
 
 	progStatus.UI_laststate();
 
+	cwio_keyer_dialog = cwio_window();
+	cwio_editor = make_message_editor();
+	cwio_configure = cwio_config_dialog();
+
 	fntbrowser = new Font_Browser;
 	dlgMemoryDialog = Memory_Dialog();
 	dlgDisplayConfig = DisplayDialog();
@@ -453,6 +463,24 @@ extern FILE *serlog;
 	}
 
 	start_server(xmlport);
+	if (start_cwio_thread() != 0)
+		return 1;
+
+	if (progStatus.cwioCONNECTED) {
+		if (!open_cwkey()) {
+			btn_cwioCONNECT->value(0);
+			btn_cwioCAT->activate();
+			btn_cwioAUX->activate();
+			btn_cwioSEP->activate();
+			progStatus.cwioCONNECTED = 0;
+		} else {
+			btn_cwioCONNECT->value(1);
+			btn_cwioCAT->value(0); btn_cwioCAT->deactivate();
+			btn_cwioAUX->value(0); btn_cwioAUX->deactivate();
+			btn_cwioSEP->value(0); btn_cwioSEP->deactivate();
+			progStatus.cwioCONNECTED = 1;
+		}
+	}
 
 	createXcvrDialog();
 
