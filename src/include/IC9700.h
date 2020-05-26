@@ -57,6 +57,9 @@ public:
 	int  def_bandwidth(int m);
 
 	void set_mic_gain(int v);
+	void get_mic_gain_min_max_step(int &min, int &max, int &step);
+	int  get_mic_gain();
+
 
 	void set_volume_control(int val);
 	int  get_volume_control();

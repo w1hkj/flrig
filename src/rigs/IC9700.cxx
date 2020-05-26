@@ -699,20 +699,37 @@ int RIG_IC9700::def_bandwidth(int m)
 
 void RIG_IC9700::set_mic_gain(int val)
 {
-	if (!progStatus.USBaudio) {
-		cmd = pre_to;
-		cmd.append("\x14\x0B");
-		cmd.append(bcd255(val));
-		cmd.append( post );
-	} else {
-		cmd = pre_to;
-		cmd += '\x1A'; cmd += '\x05';
-		cmd += '\x00'; cmd += '\x29';
-		cmd.append(bcd255(val));
-		cmd.append( post );
-	}
+	cmd = pre_to;
+	cmd.append("\x14\x0B");
+	cmd.append(bcd255(val));
+	cmd.append( post );
 	waitFB("set mic gain");
 	set_trace(2, "set_mic_gain()", str2hex(replystr.c_str(), replystr.length()));
+}
+
+int RIG_IC9700::get_mic_gain()
+{
+	int val = 0;
+	string cstr = "\x14\x0B";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append(post);
+	if (waitFOR(9, "get mic")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			val = num100(replystr.substr(p + 6));
+	}
+	get_trace(2, "get_mic_gain()", str2hex(replystr.c_str(), replystr.length()));
+	return val;
+}
+
+void RIG_IC9700::get_mic_gain_min_max_step(int &min, int &max, int &step)
+{
+	min = 0;
+	max = 100;
+	step = 1;
 }
 
 void RIG_IC9700::set_compression(int on, int val)
