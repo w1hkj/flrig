@@ -444,6 +444,11 @@ void open_aux_tab()
 	select_tab(_("Aux"));
 }
 
+void open_server_tab()
+{
+	select_tab(_("Server"));
+}
+
 void createXcvrDialog()
 {
 	dlgXcvrConfig = XcvrDialog();

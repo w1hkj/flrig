@@ -45,6 +45,8 @@
 
 extern void start_server(int port = 12345);
 extern void exit_server();
+extern void set_server_port(int port = 12345);
+
 extern std::string print_xmlhelp();
 
 #endif

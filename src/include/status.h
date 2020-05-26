@@ -59,6 +59,8 @@ struct status {
 	bool	aux_rts;
 	bool	aux_dtr;
 
+	string	xmlport;
+
 	string	sep_serial_port;
 	bool	sep_rtsptt;
 	bool	sep_dtrptt;

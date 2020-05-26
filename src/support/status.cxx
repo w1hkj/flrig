@@ -70,6 +70,8 @@ status progStatus = {
 	false,		// bool aux_rts;
 	false,		// bool aux_dtr;
 
+	"12345",	// string xmlport;
+
 	"NONE",		// string	sep_serial_port;
 	false,		// bool	sep_rtsptt;
 	false,		// bool	sep_dtrptt;
@@ -418,7 +420,7 @@ void status::saveLastState()
 	xcvr_name = selrig->name_;
 	Fl_Preferences xcvrpref(RigHomeDir.c_str(), "w1hkj.com", PACKAGE_TARNAME);
 	xcvrpref.set("xcvr_name", xcvr_name.c_str());
-	xcvrpref.set("xml_port", xmlport);
+//	xcvrpref.set("xml_port", xmlport);
 
 	int mX = mainwindow->x();
 	int mY = mainwindow->y();
@@ -470,6 +472,8 @@ void status::saveLastState()
 	spref.set("sep_dtrptt", sep_dtrptt);
 	spref.set("sep_rtsplus", sep_rtsplus);
 	spref.set("set_dtrplus", sep_dtrplus);
+
+	spref.set("xmlport", xmlport.c_str());
 
 	spref.set("poll_smeter", poll_smeter);
 	spref.set("poll_frequency", poll_frequency);
@@ -911,6 +915,10 @@ bool status::loadXcvrState(string xcvr)
 		if (spref.get("sep_dtrptt", i, i)) sep_dtrptt = i;
 		if (spref.get("sep_rtsplus", i, i)) sep_rtsplus = i;
 		if (spref.get("sep_dtrplus", i, i)) sep_dtrplus = i;
+
+		spref.get("xmlport", defbuffer, "12345", 499);
+		xmlport = defbuffer;
+		::xmlport = atoi(xmlport.c_str());
 
 		spref.get("poll_smeter", poll_smeter, poll_smeter);
 		spref.get("poll_frequency", poll_frequency, poll_frequency);
@@ -1356,7 +1364,7 @@ void status::loadLastState()
 		xcvrpref.get("last_xcvr_used", defbuffer, "NONE", 499);
 		xcvr_name = defbuffer;
 	}
-	xcvrpref.get("xml_port", xmlport, xmlport);
+//	xcvrpref.get("xml_port", xmlport, xmlport);
 
 	loadXcvrState(xcvr_name);
 }

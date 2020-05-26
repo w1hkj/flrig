@@ -24,91 +24,97 @@
 #include "dialogs.h"
 #include "ICbase.h"
 #include "trace.h"
+#include "xml_server.h"
 
 #include "XmlRpc.h"
 
 Fl_Group *tabXCVR = (Fl_Group *)0;
-Fl_ComboBox *selectRig = (Fl_ComboBox *)0;
-Fl_Counter *cntRigCatRetries = (Fl_Counter *)0;
-Fl_Counter *cntRigCatTimeout = (Fl_Counter *)0;
-Fl_Counter *cntRigCatWait = (Fl_Counter *)0;
-Fl_Counter *query_interval = (Fl_Counter *)0;
-Fl_Counter *byte_interval = (Fl_Counter *)0;
-Fl_ComboBox *selectCommPort = (Fl_ComboBox *)0;
-Fl_ComboBox *mnuBaudrate = (Fl_ComboBox *)0;
-Fl_Check_Button *btnTwoStopBit = (Fl_Check_Button *)0;
-Fl_Check_Button *btnOneStopBit = (Fl_Check_Button *)0;
-Fl_Check_Button *btnRigCatEcho = (Fl_Check_Button *)0;
-Fl_Round_Button *btncatptt = (Fl_Round_Button *)0;
-Fl_Round_Button *btnrtsptt = (Fl_Round_Button *)0;
-Fl_Round_Button *btndtrptt = (Fl_Round_Button *)0;
-Fl_Check_Button *chkrtscts = (Fl_Check_Button *)0;
-Fl_Check_Button *btnrtsplus = (Fl_Check_Button *)0;
-Fl_Check_Button *btndtrplus = (Fl_Check_Button *)0;
-//Fl_Check_Button *btn_notxqsy = (Fl_Check_Button *)0;
-Fl_Int_Input *txtCIV = (Fl_Int_Input *)0;
-Fl_Button *btnCIVdefault = (Fl_Button *)0;
-Fl_Check_Button *btnUSBaudio = (Fl_Check_Button *)0;
+	Fl_ComboBox *selectRig = (Fl_ComboBox *)0;
+	Fl_Counter *cntRigCatRetries = (Fl_Counter *)0;
+	Fl_Counter *cntRigCatTimeout = (Fl_Counter *)0;
+	Fl_Counter *cntRigCatWait = (Fl_Counter *)0;
+	Fl_Counter *query_interval = (Fl_Counter *)0;
+	Fl_Counter *byte_interval = (Fl_Counter *)0;
+	Fl_ComboBox *selectCommPort = (Fl_ComboBox *)0;
+	Fl_ComboBox *mnuBaudrate = (Fl_ComboBox *)0;
+	Fl_Check_Button *btnTwoStopBit = (Fl_Check_Button *)0;
+	Fl_Check_Button *btnOneStopBit = (Fl_Check_Button *)0;
+	Fl_Check_Button *btnRigCatEcho = (Fl_Check_Button *)0;
+	Fl_Round_Button *btncatptt = (Fl_Round_Button *)0;
+	Fl_Round_Button *btnrtsptt = (Fl_Round_Button *)0;
+	Fl_Round_Button *btndtrptt = (Fl_Round_Button *)0;
+	Fl_Check_Button *chkrtscts = (Fl_Check_Button *)0;
+	Fl_Check_Button *btnrtsplus = (Fl_Check_Button *)0;
+	Fl_Check_Button *btndtrplus = (Fl_Check_Button *)0;
+	//Fl_Check_Button *btn_notxqsy = (Fl_Check_Button *)0;
+	Fl_Int_Input *txtCIV = (Fl_Int_Input *)0;
+	Fl_Button *btnCIVdefault = (Fl_Button *)0;
+	Fl_Check_Button *btnUSBaudio = (Fl_Check_Button *)0;
+
 Fl_Group *tabTCPIP = (Fl_Group *)0;
-Fl_Input2 *inp_tcpip_addr = (Fl_Input2 *)0;
-Fl_Input2 *inp_tcpip_port = (Fl_Input2 *)0;
-Fl_Check_Button *chk_use_tcpip = (Fl_Check_Button *)0;
-Fl_Box *box_tcpip_connect = (Fl_Box *)0;
-Fl_Counter *inp_tcpip_ping_delay = (Fl_Counter *)0;
-Fl_Counter *cntRetryAfter = (Fl_Counter *)0;
-Fl_Counter *cntDropsAllowed = (Fl_Counter *)0;
+	Fl_Input2 *inp_tcpip_addr = (Fl_Input2 *)0;
+	Fl_Input2 *inp_tcpip_port = (Fl_Input2 *)0;
+	Fl_Check_Button *chk_use_tcpip = (Fl_Check_Button *)0;
+	Fl_Box *box_tcpip_connect = (Fl_Box *)0;
+	Fl_Counter *inp_tcpip_ping_delay = (Fl_Counter *)0;
+	Fl_Counter *cntRetryAfter = (Fl_Counter *)0;
+	Fl_Counter *cntDropsAllowed = (Fl_Counter *)0;
 
 Fl_Group *tabPTT = (Fl_Group *)0;
-Fl_ComboBox *selectSepPTTPort = (Fl_ComboBox *)0;
-Fl_Check_Button *btnSep_SCU_17 = (Fl_Check_Button *)0;
-Fl_Check_Button *btnSepRTSptt = (Fl_Check_Button *)0;
-Fl_Check_Button *btnSepRTSplus = (Fl_Check_Button *)0;
-Fl_Check_Button *btnSepDTRptt = (Fl_Check_Button *)0;
-Fl_Check_Button *btnSepDTRplus = (Fl_Check_Button *)0;
+	Fl_ComboBox *selectSepPTTPort = (Fl_ComboBox *)0;
+	Fl_Check_Button *btnSep_SCU_17 = (Fl_Check_Button *)0;
+	Fl_Check_Button *btnSepRTSptt = (Fl_Check_Button *)0;
+	Fl_Check_Button *btnSepRTSplus = (Fl_Check_Button *)0;
+	Fl_Check_Button *btnSepDTRptt = (Fl_Check_Button *)0;
+	Fl_Check_Button *btnSepDTRplus = (Fl_Check_Button *)0;
 
 Fl_Group *tabAUX = (Fl_Group *)0;
-Fl_ComboBox *selectAuxPort = (Fl_ComboBox *)0;
-Fl_Check_Button *btnAux_SCU_17 = (Fl_Check_Button *)0;
+	Fl_ComboBox *selectAuxPort = (Fl_ComboBox *)0;
+	Fl_Check_Button *btnAux_SCU_17 = (Fl_Check_Button *)0;
+
+Fl_Group *tabSERVER = (Fl_Group *)0;
+	Fl_Box *server_text = (Fl_Box *)0;
+	Fl_Input2 *inp_serverport = (Fl_Input2 *)0;
 
 Fl_Group *tabPOLLING = (Fl_Group *)0;
-Fl_Value_Input *poll_smeter = (Fl_Value_Input *)0;
-Fl_Value_Input *poll_pout = (Fl_Value_Input *)0;
-Fl_Value_Input *poll_swr = (Fl_Value_Input *)0;
-Fl_Value_Input *poll_alc = (Fl_Value_Input *)0;
-Fl_Value_Input *poll_frequency = (Fl_Value_Input *)0;
-Fl_Value_Input *poll_mode = (Fl_Value_Input *)0;
-Fl_Value_Input *poll_bandwidth = (Fl_Value_Input *)0;
-Fl_Value_Input *poll_volume = (Fl_Value_Input *)0;
-Fl_Value_Input *poll_micgain = (Fl_Value_Input *)0;
-Fl_Value_Input *poll_rfgain = (Fl_Value_Input *)0;
-Fl_Value_Input *poll_power_control = (Fl_Value_Input *)0;
-Fl_Value_Input *poll_ifshift = (Fl_Value_Input *)0;
-Fl_Value_Input *poll_notch = (Fl_Value_Input *)0;
-Fl_Value_Input *poll_auto_notch = (Fl_Value_Input *)0;
-Fl_Value_Input *poll_pre_att = (Fl_Value_Input *)0;
-Fl_Value_Input *poll_squelch = (Fl_Value_Input *)0;
-Fl_Value_Input *poll_split = (Fl_Value_Input *)0;
-Fl_Value_Input *poll_noise = (Fl_Value_Input *)0;
-Fl_Value_Input *poll_nr = (Fl_Value_Input *)0;
-Fl_Value_Input *poll_compression = (Fl_Value_Input *)0;
-Fl_Value_Input *poll_tuner = (Fl_Value_Input *)0;
-Fl_Button *btnClearAddControls = (Fl_Button *)0;
+	Fl_Value_Input *poll_smeter = (Fl_Value_Input *)0;
+	Fl_Value_Input *poll_pout = (Fl_Value_Input *)0;
+	Fl_Value_Input *poll_swr = (Fl_Value_Input *)0;
+	Fl_Value_Input *poll_alc = (Fl_Value_Input *)0;
+	Fl_Value_Input *poll_frequency = (Fl_Value_Input *)0;
+	Fl_Value_Input *poll_mode = (Fl_Value_Input *)0;
+	Fl_Value_Input *poll_bandwidth = (Fl_Value_Input *)0;
+	Fl_Value_Input *poll_volume = (Fl_Value_Input *)0;
+	Fl_Value_Input *poll_micgain = (Fl_Value_Input *)0;
+	Fl_Value_Input *poll_rfgain = (Fl_Value_Input *)0;
+	Fl_Value_Input *poll_power_control = (Fl_Value_Input *)0;
+	Fl_Value_Input *poll_ifshift = (Fl_Value_Input *)0;
+	Fl_Value_Input *poll_notch = (Fl_Value_Input *)0;
+	Fl_Value_Input *poll_auto_notch = (Fl_Value_Input *)0;
+	Fl_Value_Input *poll_pre_att = (Fl_Value_Input *)0;
+	Fl_Value_Input *poll_squelch = (Fl_Value_Input *)0;
+	Fl_Value_Input *poll_split = (Fl_Value_Input *)0;
+	Fl_Value_Input *poll_noise = (Fl_Value_Input *)0;
+	Fl_Value_Input *poll_nr = (Fl_Value_Input *)0;
+	Fl_Value_Input *poll_compression = (Fl_Value_Input *)0;
+	Fl_Value_Input *poll_tuner = (Fl_Value_Input *)0;
+	Fl_Button *btnClearAddControls = (Fl_Button *)0;
 
-Fl_Value_Input *poll_meters = (Fl_Value_Input *)0;
-Fl_Button *btnSetMeters = (Fl_Button *)0;
-Fl_Value_Input *poll_ops = (Fl_Value_Input *)0;
-Fl_Button *btnSetOps = (Fl_Button *)0;
-Fl_Value_Input *poll_all = (Fl_Value_Input *)0;
-Fl_Button *btnSetAdd = (Fl_Button *)0;
+	Fl_Value_Input *poll_meters = (Fl_Value_Input *)0;
+	Fl_Button *btnSetMeters = (Fl_Button *)0;
+	Fl_Value_Input *poll_ops = (Fl_Value_Input *)0;
+	Fl_Button *btnSetOps = (Fl_Button *)0;
+	Fl_Value_Input *poll_all = (Fl_Value_Input *)0;
+	Fl_Button *btnSetAdd = (Fl_Button *)0;
 
 Fl_Group *tabSNDCMD = (Fl_Group *)0;
-Fl_Input2 *txt_command = (Fl_Input2 *)0;
-Fl_Button *btn_icom_pre = (Fl_Button *)0;
-Fl_Button *btn_icom_post = (Fl_Button *)0;
-Fl_Button *btn_send_command = (Fl_Button *)0;
-Fl_Output *txt_response = (Fl_Output *)0;
-Fl_Box *box_xcvr_connect = (Fl_Box *)0;
-Fl_Box *box_fldigi_connect = (Fl_Box *)0;
+	Fl_Input2 *txt_command = (Fl_Input2 *)0;
+	Fl_Button *btn_icom_pre = (Fl_Button *)0;
+	Fl_Button *btn_icom_post = (Fl_Button *)0;
+	Fl_Button *btn_send_command = (Fl_Button *)0;
+	Fl_Output *txt_response = (Fl_Output *)0;
+	Fl_Box *box_xcvr_connect = (Fl_Box *)0;
+	Fl_Box *box_fldigi_connect = (Fl_Box *)0;
 
 Fl_Button *btnOkXcvrDialog = (Fl_Button *)0;
 Fl_Button *btnCloseCommConfig = (Fl_Button *)0;
@@ -116,105 +122,105 @@ Fl_Button *btnOkSepSerial = (Fl_Button *)0;
 Fl_Button *btnOkAuxSerial = (Fl_Button *)0;
 
 Fl_Group *tabTRACE = (Fl_Group *)0;
-Fl_Check_Button *btn_trace = (Fl_Check_Button *)0;
-Fl_Check_Button *btn_xmltrace = (Fl_Check_Button *)0;
-Fl_Check_Button *btn_rigtrace = (Fl_Check_Button *)0;
-Fl_Check_Button *btn_gettrace = (Fl_Check_Button *)0;
-Fl_Check_Button *btn_settrace = (Fl_Check_Button *)0;
-Fl_Check_Button *btn_debugtrace = (Fl_Check_Button *)0;
-Fl_Check_Button *btn_rpctrace = (Fl_Check_Button *)0;
-Fl_Check_Button *btn_start_stop_trace = (Fl_Check_Button *)0;
-Fl_ComboBox *selectlevel = (Fl_ComboBox *)0;
-Fl_Button *btn_viewtrace = (Fl_Button *)0;
+	Fl_Check_Button *btn_trace = (Fl_Check_Button *)0;
+	Fl_Check_Button *btn_xmltrace = (Fl_Check_Button *)0;
+	Fl_Check_Button *btn_rigtrace = (Fl_Check_Button *)0;
+	Fl_Check_Button *btn_gettrace = (Fl_Check_Button *)0;
+	Fl_Check_Button *btn_settrace = (Fl_Check_Button *)0;
+	Fl_Check_Button *btn_debugtrace = (Fl_Check_Button *)0;
+	Fl_Check_Button *btn_rpctrace = (Fl_Check_Button *)0;
+	Fl_Check_Button *btn_start_stop_trace = (Fl_Check_Button *)0;
+	Fl_ComboBox *selectlevel = (Fl_ComboBox *)0;
+	Fl_Button *btn_viewtrace = (Fl_Button *)0;
 
 Fl_Group *tabCOMMANDS = (Fl_Group *)0;
-Fl_Tabs  *tabCmds = (Fl_Tabs *)0;
-Fl_Group *tabCmds1 = (Fl_Group *)0;
-Fl_Group *tabCmds2 = (Fl_Group *)0;
-Fl_Group *tabCmds3 = (Fl_Group *)0;
-Fl_Group *tabCmds4 = (Fl_Group *)0;
+	Fl_Tabs  *tabCmds = (Fl_Tabs *)0;
+	Fl_Group *tabCmds1 = (Fl_Group *)0;
+	Fl_Group *tabCmds2 = (Fl_Group *)0;
+	Fl_Group *tabCmds3 = (Fl_Group *)0;
+	Fl_Group *tabCmds4 = (Fl_Group *)0;
 
-Fl_Box *bx1a = (Fl_Box *)0;
-Fl_Box *bx1b = (Fl_Box *)0;
-Fl_Box *bx2a = (Fl_Box *)0;
-Fl_Box *bx2b = (Fl_Box *)0;
-Fl_Box *bx3a = (Fl_Box *)0;
-Fl_Box *bx3b = (Fl_Box *)0;
-Fl_Box *bx4a = (Fl_Box *)0;
-Fl_Box *bx4b = (Fl_Box *)0;
+	Fl_Box *bx1a = (Fl_Box *)0;
+	Fl_Box *bx1b = (Fl_Box *)0;
+	Fl_Box *bx2a = (Fl_Box *)0;
+	Fl_Box *bx2b = (Fl_Box *)0;
+	Fl_Box *bx3a = (Fl_Box *)0;
+	Fl_Box *bx3b = (Fl_Box *)0;
+	Fl_Box *bx4a = (Fl_Box *)0;
+	Fl_Box *bx4b = (Fl_Box *)0;
 
-Fl_Input2 * cmdlbl1 = (Fl_Input2 *)0;
-Fl_Input2 * cmdlbl2 = (Fl_Input2 *)0;
-Fl_Input2 * cmdlbl3 = (Fl_Input2 *)0;
-Fl_Input2 * cmdlbl4 = (Fl_Input2 *)0;
-Fl_Input2 * cmdlbl5 = (Fl_Input2 *)0;
-Fl_Input2 * cmdlbl6 = (Fl_Input2 *)0;
-Fl_Input2 * cmdlbl7 = (Fl_Input2 *)0;
-Fl_Input2 * cmdlbl8 = (Fl_Input2 *)0;
-Fl_Input2 * cmdlbl9 = (Fl_Input2 *)0;
-Fl_Input2 * cmdlbl10 = (Fl_Input2 *)0;
-Fl_Input2 * cmdlbl11 = (Fl_Input2 *)0;
-Fl_Input2 * cmdlbl12 = (Fl_Input2 *)0;
-Fl_Input2 * cmdlbl13 = (Fl_Input2 *)0;
-Fl_Input2 * cmdlbl14 = (Fl_Input2 *)0;
-Fl_Input2 * cmdlbl15 = (Fl_Input2 *)0;
-Fl_Input2 * cmdlbl16 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdlbl1 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdlbl2 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdlbl3 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdlbl4 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdlbl5 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdlbl6 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdlbl7 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdlbl8 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdlbl9 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdlbl10 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdlbl11 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdlbl12 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdlbl13 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdlbl14 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdlbl15 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdlbl16 = (Fl_Input2 *)0;
 
-Fl_Input2 * cmdtext1 = (Fl_Input2 *)0;
-Fl_Input2 * cmdtext2 = (Fl_Input2 *)0;
-Fl_Input2 * cmdtext3 = (Fl_Input2 *)0;
-Fl_Input2 * cmdtext4 = (Fl_Input2 *)0;
-Fl_Input2 * cmdtext5 = (Fl_Input2 *)0;
-Fl_Input2 * cmdtext6 = (Fl_Input2 *)0;
-Fl_Input2 * cmdtext7 = (Fl_Input2 *)0;
-Fl_Input2 * cmdtext8 = (Fl_Input2 *)0;
-Fl_Input2 * cmdtext9 = (Fl_Input2 *)0;
-Fl_Input2 * cmdtext10 = (Fl_Input2 *)0;
-Fl_Input2 * cmdtext11 = (Fl_Input2 *)0;
-Fl_Input2 * cmdtext12 = (Fl_Input2 *)0;
-Fl_Input2 * cmdtext13 = (Fl_Input2 *)0;
-Fl_Input2 * cmdtext14 = (Fl_Input2 *)0;
-Fl_Input2 * cmdtext15 = (Fl_Input2 *)0;
-Fl_Input2 * cmdtext16 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdtext1 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdtext2 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdtext3 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdtext4 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdtext5 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdtext6 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdtext7 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdtext8 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdtext9 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdtext10 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdtext11 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdtext12 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdtext13 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdtext14 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdtext15 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdtext16 = (Fl_Input2 *)0;
 
-Fl_Input2 * shftcmdtext1 = (Fl_Input2 *)0;
-Fl_Input2 * shftcmdtext2 = (Fl_Input2 *)0;
-Fl_Input2 * shftcmdtext3 = (Fl_Input2 *)0;
-Fl_Input2 * shftcmdtext4 = (Fl_Input2 *)0;
-Fl_Input2 * shftcmdtext5 = (Fl_Input2 *)0;
-Fl_Input2 * shftcmdtext6 = (Fl_Input2 *)0;
-Fl_Input2 * shftcmdtext7 = (Fl_Input2 *)0;
-Fl_Input2 * shftcmdtext8 = (Fl_Input2 *)0;
-Fl_Input2 * shftcmdtext9 = (Fl_Input2 *)0;
-Fl_Input2 * shftcmdtext10 = (Fl_Input2 *)0;
-Fl_Input2 * shftcmdtext11 = (Fl_Input2 *)0;
-Fl_Input2 * shftcmdtext12 = (Fl_Input2 *)0;
-Fl_Input2 * shftcmdtext13 = (Fl_Input2 *)0;
-Fl_Input2 * shftcmdtext14 = (Fl_Input2 *)0;
-Fl_Input2 * shftcmdtext15 = (Fl_Input2 *)0;
-Fl_Input2 * shftcmdtext16 = (Fl_Input2 *)0;
+	Fl_Input2 * shftcmdtext1 = (Fl_Input2 *)0;
+	Fl_Input2 * shftcmdtext2 = (Fl_Input2 *)0;
+	Fl_Input2 * shftcmdtext3 = (Fl_Input2 *)0;
+	Fl_Input2 * shftcmdtext4 = (Fl_Input2 *)0;
+	Fl_Input2 * shftcmdtext5 = (Fl_Input2 *)0;
+	Fl_Input2 * shftcmdtext6 = (Fl_Input2 *)0;
+	Fl_Input2 * shftcmdtext7 = (Fl_Input2 *)0;
+	Fl_Input2 * shftcmdtext8 = (Fl_Input2 *)0;
+	Fl_Input2 * shftcmdtext9 = (Fl_Input2 *)0;
+	Fl_Input2 * shftcmdtext10 = (Fl_Input2 *)0;
+	Fl_Input2 * shftcmdtext11 = (Fl_Input2 *)0;
+	Fl_Input2 * shftcmdtext12 = (Fl_Input2 *)0;
+	Fl_Input2 * shftcmdtext13 = (Fl_Input2 *)0;
+	Fl_Input2 * shftcmdtext14 = (Fl_Input2 *)0;
+	Fl_Input2 * shftcmdtext15 = (Fl_Input2 *)0;
+	Fl_Input2 * shftcmdtext16 = (Fl_Input2 *)0;
 
-Fl_Output * cmdResponse = (Fl_Output *)0;
+	Fl_Output * cmdResponse = (Fl_Output *)0;
 
 Fl_Group *tabRESTORE = (Fl_Group *)0;
-Fl_Check_Button *btnRestoreFrequency	= (Fl_Check_Button *)0;
-Fl_Check_Button *btnRestoreMode			= (Fl_Check_Button *)0;
-Fl_Check_Button *btnRestoreBandwidth	= (Fl_Check_Button *)0;
-Fl_Check_Button *btnRestoreVolume		= (Fl_Check_Button *)0;
-Fl_Check_Button *btnRestoreMicGain		= (Fl_Check_Button *)0;
-Fl_Check_Button *btnRestoreRfGain		= (Fl_Check_Button *)0;
-Fl_Check_Button *btnRestorePowerControl	= (Fl_Check_Button *)0;
-Fl_Check_Button *btnRestoreIFshift		= (Fl_Check_Button *)0;
-Fl_Check_Button *btnRestoreNotch		= (Fl_Check_Button *)0;
-Fl_Check_Button *btnRestoreAutoNotch	= (Fl_Check_Button *)0;
-Fl_Check_Button *btnRestoreSquelch		= (Fl_Check_Button *)0;
-Fl_Check_Button *btnRestoreSplit		= (Fl_Check_Button *)0;
-Fl_Check_Button *btnRestorePreAtt		= (Fl_Check_Button *)0;
-Fl_Check_Button *btnRestoreNoise		= (Fl_Check_Button *)0;
-Fl_Check_Button *btnRestoreNR			= (Fl_Check_Button *)0;
-Fl_Check_Button *btnRestoreCompOnOff	= (Fl_Check_Button *)0;
-Fl_Check_Button *btnRestoreCompLevel	= (Fl_Check_Button *)0;
-Fl_Check_Button *btnUseRigData			= (Fl_Check_Button *)0;
+	Fl_Check_Button *btnRestoreFrequency	= (Fl_Check_Button *)0;
+	Fl_Check_Button *btnRestoreMode			= (Fl_Check_Button *)0;
+	Fl_Check_Button *btnRestoreBandwidth	= (Fl_Check_Button *)0;
+	Fl_Check_Button *btnRestoreVolume		= (Fl_Check_Button *)0;
+	Fl_Check_Button *btnRestoreMicGain		= (Fl_Check_Button *)0;
+	Fl_Check_Button *btnRestoreRfGain		= (Fl_Check_Button *)0;
+	Fl_Check_Button *btnRestorePowerControl	= (Fl_Check_Button *)0;
+	Fl_Check_Button *btnRestoreIFshift		= (Fl_Check_Button *)0;
+	Fl_Check_Button *btnRestoreNotch		= (Fl_Check_Button *)0;
+	Fl_Check_Button *btnRestoreAutoNotch	= (Fl_Check_Button *)0;
+	Fl_Check_Button *btnRestoreSquelch		= (Fl_Check_Button *)0;
+	Fl_Check_Button *btnRestoreSplit		= (Fl_Check_Button *)0;
+	Fl_Check_Button *btnRestorePreAtt		= (Fl_Check_Button *)0;
+	Fl_Check_Button *btnRestoreNoise		= (Fl_Check_Button *)0;
+	Fl_Check_Button *btnRestoreNR			= (Fl_Check_Button *)0;
+	Fl_Check_Button *btnRestoreCompOnOff	= (Fl_Check_Button *)0;
+	Fl_Check_Button *btnRestoreCompLevel	= (Fl_Check_Button *)0;
+	Fl_Check_Button *btnUseRigData			= (Fl_Check_Button *)0;
 
 static void cb_btn_trace(Fl_Check_Button *, void *) {
 	progStatus.trace = btn_trace->value();
@@ -441,6 +447,12 @@ static void cb_selectAuxPort(Fl_ComboBox*, void*) {
 static void cb_btnAux_SCU_17(Fl_Check_Button*, void*) {
 	btnOkAuxSerial->labelcolor(FL_RED);
 	btnOkAuxSerial->redraw_label();
+}
+
+static void cb_server_port(Fl_Input2* o, void*) {
+	progStatus.xmlport = o->value();
+	::xmlport = atoi(progStatus.xmlport.c_str());
+	set_server_port(::xmlport);
 }
 
 static void cb_poll_smeter(Fl_Value_Input* o, void*) {
@@ -1270,6 +1282,31 @@ _("Use only if your setup requires a separate\nSerial Port for a special Control
 	return tabAUX;
 }
 
+Fl_Group *createSERVER(int X, int Y, int W, int H, const char *label)
+{
+	Fl_Group * tabSERVER = new Fl_Group(X, Y, W, H, label);
+	tabSERVER->hide();
+
+	server_text = new Fl_Box(X + 30, Y + 10, W - 60, 60,
+_("\
+Change port if multiple instances of flrig / fldigi will\n\
+execute concurrently.  Be sure to change the respective\n\
+fldigi configuration item for xmlrpc server port."));
+	server_text->box(FL_FLAT_BOX);
+	server_text->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+
+	inp_serverport = new Fl_Input2(X + 120, Y + 80, 100, 22, _("Xmlrpc port:"));
+	inp_serverport->tooltip(_("Socket port for xmlrpc server"));
+	inp_serverport->type(2);
+	inp_serverport->callback((Fl_Callback*)cb_server_port);
+	inp_serverport->value(progStatus.xmlport.c_str());
+	inp_serverport->when(FL_ENTER);
+
+	tabSERVER->end();
+
+	return tabSERVER;
+}
+
 Fl_Group *createPOLLING(int X, int Y, int W, int H, const char *label)
 {
 	tabPOLLING = new Fl_Group(X, Y, W, H, label);
@@ -1962,20 +1999,31 @@ Fl_Double_Window* XcvrDialog() {
 
 	tabXCVR  = createXCVR(xtabs, ytree, wtabs, htree, _("Xcvr"));
 	add_tree_item(tabXCVR);
+
 	tabTRACE    = createTRACE(xtabs, ytree, wtabs, htree, _("Trace"));
 	add_tree_item(tabTRACE);
+
 	tabTCPIP    = createTCPIP(xtabs, ytree, wtabs, htree, _("TCPIP"));
 	add_tree_item(tabTCPIP);
+
 	tabPTT      = createPTT(xtabs, ytree, wtabs, htree, _("PTT"));
 	add_tree_item(tabPTT);
-	tabAUX      = createAUX(xtabs, ytree, wtabs, htree, _("Aux"));
+
+	tabAUX      = createAUX(xtabs, ytree, wtabs, htree, _("Auxiliary"));
 	add_tree_item(tabAUX);
+
+	tabSERVER   = createSERVER(xtabs, ytree, wtabs, htree, _("Server"));
+	add_tree_item(tabSERVER);
+
 	tabPOLLING  = createPOLLING(xtabs, ytree, wtabs, htree, _("Poll"));
 	add_tree_item(tabPOLLING);
+
 	tabSNDCMD   = createSNDCMD(xtabs, ytree, wtabs, htree, _("Send"));
 	add_tree_item(tabSNDCMD);
+
 	tabCOMMANDS = createCOMMANDS(xtabs, ytree, wtabs, htree, _("Cmds"));
 	add_tree_item(tabCOMMANDS);
+
 	tabRESTORE  = createRestore(xtabs, ytree, wtabs, htree, _("Restore"));
 	add_tree_item(tabRESTORE);
 

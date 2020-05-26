@@ -241,6 +241,7 @@ extern void open_xmlrpc_tab();
 extern void open_tcpip_tab();
 extern void open_ptt_tab();
 extern void open_aux_tab();
+extern void open_server_tab();
 
 extern void cb_close_TT550_setup();
 extern void cbUseRepeatButtons(bool on);

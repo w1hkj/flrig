@@ -1948,6 +1948,11 @@ void exit_server()
 	rig_server.exit();
 }
 
+void set_server_port(int port)
+{
+	rig_server.bindAndListen(port);
+}
+
 std::string print_xmlhelp()
 {
 	string pstr;
