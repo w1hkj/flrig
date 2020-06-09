@@ -1419,6 +1419,38 @@ void serviceB(XCVR_STATE nuvals)
 
 }
 
+void set_ptt(void *d)
+{
+	if (d == (void*)0) {
+		btnPTT->value(0);
+		sldrSWR->hide();
+		sldrSWR->redraw();
+		sldrRcvSignal->show();
+		sldrRcvSignal->redraw();
+		btnALC_SWR->hide();
+		scaleSmeter->show();
+	} else {
+		btnPTT->value(1);
+		sldrRcvSignal->hide();
+		sldrRcvSignal->redraw();
+		scaleSmeter->hide();
+		sldrSWR->show();
+		sldrSWR->redraw();
+		btnALC_SWR->image(image_swr);
+		btnALC_SWR->redraw();
+		btnALC_SWR->show();
+	}
+}
+
+void check_ptt()
+{
+	int check = selrig->get_PTT();
+	if (check != PTT) {
+		PTT = check;
+		Fl::awake(set_ptt, (void *)PTT);
+	}
+}
+
 bool close_rig = false;
 
 void * serial_thread_loop(void *d)
@@ -1441,6 +1473,9 @@ void * serial_thread_loop(void *d)
 		}
 
 //send any freq/mode/bw changes in the queu
+
+// test for PTT change made at transceiver
+		check_ptt();
 
 		if (!srvc_reqs.empty())
 			serviceQUE();
