@@ -1444,6 +1444,7 @@ void set_ptt(void *d)
 
 void check_ptt()
 {
+	guard_lock serial(&mutex_serial);
 	int check = selrig->get_PTT();
 	if (check != PTT) {
 		PTT = check;
@@ -1475,7 +1476,7 @@ void * serial_thread_loop(void *d)
 //send any freq/mode/bw changes in the queu
 
 // test for PTT change made at transceiver
-		check_ptt();
+		if (progStatus.poll_frequency) check_ptt();
 
 		if (!srvc_reqs.empty())
 			serviceQUE();
