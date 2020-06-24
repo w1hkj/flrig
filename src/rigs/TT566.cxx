@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "TT566.h"
@@ -266,7 +266,7 @@ bool RIG_TT566::check ()
 	return true;
 }
 
-long RIG_TT566::get_vfoA ()
+unsigned long int RIG_TT566::get_vfoA ()
 {
 	cmd = TT566getFREQa; 
 	int ret = sendCommand(cmd, strlen(TT566rspFREQa)+9);
@@ -280,7 +280,7 @@ long RIG_TT566::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_TT566::set_vfoA (long freq)
+void RIG_TT566::set_vfoA (unsigned long int freq)
 {
 	A.freq = freq;
 	cmd = TT566setFREQa;
@@ -291,7 +291,7 @@ void RIG_TT566::set_vfoA (long freq)
 	return;
 }
 
-long RIG_TT566::get_vfoB ()
+unsigned long int RIG_TT566::get_vfoB ()
 {
 	cmd = TT566getFREQb;
 	int ret = sendCommand(cmd, strlen(TT566rspFREQb)+9);
@@ -305,7 +305,7 @@ long RIG_TT566::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_TT566::set_vfoB (long freq)
+void RIG_TT566::set_vfoB (unsigned long int freq)
 {
 	B.freq = freq;
 	cmd = TT566setFREQb;

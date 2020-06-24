@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "FT1000.h"
@@ -248,7 +248,7 @@ bool RIG_FT1000::get_info()
 }
 
 
-long RIG_FT1000::get_vfoA ()
+unsigned long int RIG_FT1000::get_vfoA ()
 {
 	return A.freq;
 }
@@ -266,7 +266,7 @@ int RIG_FT1000::get_bwA()
 }
 
 
-void RIG_FT1000::set_vfoA (long freq)
+void RIG_FT1000::set_vfoA (unsigned long int freq)
 {
 
 	A.freq = freq;
@@ -314,7 +314,7 @@ void RIG_FT1000::set_bwA (int val)
 }
 
 
-long RIG_FT1000::get_vfoB()
+unsigned long int RIG_FT1000::get_vfoB()
 {
 	return B.freq;
 }
@@ -332,7 +332,7 @@ int  RIG_FT1000::get_bwB()
 }
 
 
-void RIG_FT1000::set_vfoB(long freq)
+void RIG_FT1000::set_vfoB(unsigned long int freq)
 {
 
 	B.freq = freq;

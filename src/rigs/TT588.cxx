@@ -16,7 +16,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 /*
  * Note for anyone wishing to expand on the command set.
@@ -209,7 +209,7 @@ bool RIG_TT588::check ()
 	return true;
 }
 
-long RIG_TT588::get_vfoA ()
+unsigned long int RIG_TT588::get_vfoA ()
 {
 	cmd = TT588getFREQA;
 	int ret = waitN(6, 100, "get vfo A");
@@ -227,14 +227,14 @@ long RIG_TT588::get_vfoA ()
 			freqA = f;
 		}
 	}
-	return (long)(freqA - vfo_corr);
+	return (unsigned long int)(freqA - vfo_corr);
 }
 
-void RIG_TT588::set_vfoA (long freq)
+void RIG_TT588::set_vfoA (unsigned long int freq)
 {
 	freqA = freq;
 	vfo_corr = (freq / 1e6) * VfoAdj + 0.5;
-	long xfreq = freqA + vfo_corr;
+	unsigned long int xfreq = freqA + vfo_corr;
 	cmd = TT588setFREQA;
 	cmd[5] = xfreq & 0xff; xfreq = xfreq >> 8;
 	cmd[4] = xfreq & 0xff; xfreq = xfreq >> 8;
@@ -245,7 +245,7 @@ void RIG_TT588::set_vfoA (long freq)
 	return ;
 }
 
-long RIG_TT588::get_vfoB()
+unsigned long int RIG_TT588::get_vfoB()
 {
 	cmd = TT588getFREQB;
 	int ret = waitN(6, 100, "get vfo B");
@@ -258,14 +258,14 @@ long RIG_TT588::get_vfoB()
 			freqB = f;
 		}
 	}
-	return (long)(freqB - vfo_corr);
+	return (unsigned long int)(freqB - vfo_corr);
 }
 
-void RIG_TT588::set_vfoB (long freq)
+void RIG_TT588::set_vfoB (unsigned long int freq)
 {
 	freqB = freq;
 	vfo_corr = (freq / 1e6) * VfoAdj + 0.5;
-	long xfreq = freqB + vfo_corr;
+	unsigned long int xfreq = freqB + vfo_corr;
 	cmd = TT588setFREQB;
 	cmd[5] = xfreq & 0xff; xfreq = xfreq >> 8;
 	cmd[4] = xfreq & 0xff; xfreq = xfreq >> 8;

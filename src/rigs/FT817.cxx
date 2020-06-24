@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 #include <iostream>
 #include <sstream>
@@ -138,7 +138,7 @@ bool RIG_FT817::check ()
 	return false;
 }
 
-long RIG_FT817::get_vfoA ()
+unsigned long int RIG_FT817::get_vfoA ()
 {
 	if (get_vfoAorB() == 1) return freqA;
 	if (ft817_memory_mode) return freqA;
@@ -162,7 +162,7 @@ void RIG_FT817::set_getACK() {
 	}
 }
 
-void RIG_FT817::set_vfoA (long freq)
+void RIG_FT817::set_vfoA (unsigned long int freq)
 {
 	if (get_vfoAorB() == 1) return;
 	if (ft817_memory_mode) return;
@@ -216,7 +216,7 @@ MilliSleep(100);
 }
 
 // VFO B ===============================================================
-long RIG_FT817::get_vfoB ()
+unsigned long int RIG_FT817::get_vfoB ()
 {
 	if (get_vfoAorB() == 0) return freqB;
 	if (ft817_memory_mode) return freqB;
@@ -231,7 +231,7 @@ long RIG_FT817::get_vfoB ()
 	return freqB;
 }
 
-void RIG_FT817::set_vfoB (long freq)
+void RIG_FT817::set_vfoB (unsigned long int freq)
 {
 	if (get_vfoAorB() == 0) return;
 	if (ft817_memory_mode) return;

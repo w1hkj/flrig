@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "FT100D.h"
@@ -199,12 +199,12 @@ bool RIG_FT100D::get_info()
 	return false;
 }
 
-long RIG_FT100D::get_vfoA ()
+unsigned long int RIG_FT100D::get_vfoA ()
 {
 	return A.freq;
 }
 
-void RIG_FT100D::set_vfoA (long freq)
+void RIG_FT100D::set_vfoA (unsigned long int freq)
 {
 	A.freq = freq;
 	freq /=10; // 100D does not support 1 Hz resolution
@@ -245,12 +245,12 @@ int RIG_FT100D::get_bwA()
 	return A.iBW;
 }
 
-long RIG_FT100D::get_vfoB()
+unsigned long int RIG_FT100D::get_vfoB()
 {
 	return B.freq;
 }
 
-void RIG_FT100D::set_vfoB(long freq)
+void RIG_FT100D::set_vfoB(unsigned long int freq)
 {
 	B.freq = freq;
 	freq /=10; // 100D does not support 1 Hz resolution

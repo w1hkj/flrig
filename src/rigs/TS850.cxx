@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "TS850.h"
@@ -97,7 +97,7 @@ bool RIG_TS850::check ()
 	return true;
 }
 
-long RIG_TS850::get_vfoA ()
+unsigned long int RIG_TS850::get_vfoA ()
 {
 	cmd = "FA;";
 
@@ -114,7 +114,7 @@ long RIG_TS850::get_vfoA ()
 	return freqA;
 }
 
-void RIG_TS850::set_vfoA (long freq)
+void RIG_TS850::set_vfoA (unsigned long int freq)
 {
 	freqA = freq;
 	cmd = "FA00000000000;";
@@ -126,7 +126,7 @@ void RIG_TS850::set_vfoA (long freq)
 	showresp(WARN, ASC, "set vfo A", cmd, "");
 }
 
-long RIG_TS850::get_vfoB ()
+unsigned long int RIG_TS850::get_vfoB ()
 {
 	cmd = "FB;";
 	int ret = wait_char(';', 14, 100, "get vfo B", ASC);
@@ -142,7 +142,7 @@ long RIG_TS850::get_vfoB ()
 	return freqB;
 }
 
-void RIG_TS850::set_vfoB (long freq)
+void RIG_TS850::set_vfoB (unsigned long int freq)
 {
 	freqB = freq;
 	cmd = "FB00000000000;";

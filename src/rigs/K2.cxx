@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 // Additions by Kent Haase, VE4KEH
 //-----------------------------------------------------------------------------
@@ -235,7 +235,7 @@ bool RIG_K2::check ()
 	return true;
 }
 
-long RIG_K2::get_vfoA ()
+unsigned long int RIG_K2::get_vfoA ()
 {
 	rsp = cmd = "FA";
 	cmd += ';';
@@ -245,14 +245,14 @@ long RIG_K2::get_vfoA ()
 	if (ret < 14) return freqA;
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqA;
-	long f = 0;
+	unsigned long int f = 0;
 	for (size_t n = 2; n < 13; n++)
 		f = f*10 + replystr[p + n] - '0';
 	freqA = f;
 	return freqA;
 }
 
-void RIG_K2::set_vfoA (long freq)
+void RIG_K2::set_vfoA (unsigned long int freq)
 {
 	freqA = freq;
 	cmd = "FA00000000000;";
@@ -265,7 +265,7 @@ void RIG_K2::set_vfoA (long freq)
 	sett("set vfoA");
 }
 
-long RIG_K2::get_vfoB()
+unsigned long int RIG_K2::get_vfoB()
 {
 	rsp = cmd = "FB";
 	cmd += ';';
@@ -275,14 +275,14 @@ long RIG_K2::get_vfoB()
 	if (ret < 14) return freqB;
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqB;
-	long f = 0;
+	unsigned long int f = 0;
 	for (size_t n = 2; n < 13; n++)
 		f = f*10 + replystr[p + n] - '0';
 	freqB = f;
 	return freqB;
 }
 
-void RIG_K2::set_vfoB(long freq)
+void RIG_K2::set_vfoB(unsigned long int freq)
 {
 	freqB = freq;
 	cmd = "FB00000000000;";

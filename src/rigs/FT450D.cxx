@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <stdlib.h>
@@ -243,7 +243,7 @@ bool RIG_FT450D::check()
 	return false;
 }
 
-long RIG_FT450D::get_vfoA ()
+unsigned long int RIG_FT450D::get_vfoA ()
 {
 	cmd = rsp = "FA";
 	cmd += ';';
@@ -260,7 +260,7 @@ long RIG_FT450D::get_vfoA ()
 	return freqA;
 }
 
-void RIG_FT450D::set_vfoA (long freq)
+void RIG_FT450D::set_vfoA (unsigned long int freq)
 {
 	if (useB) selectA();
 	freqA = freq;
@@ -275,7 +275,7 @@ void RIG_FT450D::set_vfoA (long freq)
 	if (useB) selectB();
 }
 
-long RIG_FT450D::get_vfoB ()
+unsigned long int RIG_FT450D::get_vfoB ()
 {
 	cmd = rsp = "FB";
 	cmd += ';';
@@ -292,7 +292,7 @@ long RIG_FT450D::get_vfoB ()
 	return freqB;
 }
 
-void RIG_FT450D::set_vfoB (long freq)
+void RIG_FT450D::set_vfoB (unsigned long int freq)
 {
 	if (!useB) selectB();
 	freqB = freq;

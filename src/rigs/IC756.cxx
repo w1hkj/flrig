@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ---------------------------------------------------------------------
 
 #include <string>
@@ -397,7 +397,7 @@ bool RIG_IC756PRO::check ()
 	return ok;
 }
 
-long RIG_IC756PRO::get_vfoA ()
+unsigned long int RIG_IC756PRO::get_vfoA ()
 {
 	if (useB) return A.freq;
 	string cstr = "\x03";
@@ -418,7 +418,7 @@ long RIG_IC756PRO::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_IC756PRO::set_vfoA (long freq)
+void RIG_IC756PRO::set_vfoA (unsigned long int freq)
 {
 	A.freq = freq;
 	cmd = pre_to;
@@ -428,7 +428,7 @@ void RIG_IC756PRO::set_vfoA (long freq)
 	waitFB("set vfo A");
 }
 
-long RIG_IC756PRO::get_vfoB ()
+unsigned long int RIG_IC756PRO::get_vfoB ()
 {
 	if (!useB) return B.freq;
 	string cstr = "\x03";
@@ -449,7 +449,7 @@ long RIG_IC756PRO::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_IC756PRO::set_vfoB (long freq)
+void RIG_IC756PRO::set_vfoB (unsigned long int freq)
 {
 	B.freq = freq;
 	cmd = pre_to;
@@ -1430,7 +1430,7 @@ void RIG_IC756PRO::get_band_selection(int v)
 		set_trace(2, "get band stack", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(pre_fm);
 		if (p != string::npos) {
-			long int bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
+			unsigned long int bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
 			int bandmode = replystr[p+13];
 			int bandfilter = replystr[p+14];
 			int tone = fm_bcd(replystr.substr(p+16, 3), 6);
@@ -1458,7 +1458,7 @@ void RIG_IC756PRO::get_band_selection(int v)
 
 void RIG_IC756PRO::set_band_selection(int v)
 {
-	long freq = (useB ? B.freq : A.freq);
+	unsigned long int freq = (useB ? B.freq : A.freq);
 	int fil = (useB ? filB : filA);
 	int mode = (useB ? B.imode : A.imode);
 

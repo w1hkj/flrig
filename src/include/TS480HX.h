@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #ifndef _TS480HX_H
@@ -41,10 +41,10 @@ public:
 
 	void check_menu_45();
 
-//	long get_vfoA();
-//	void set_vfoA(long);
-//	long get_vfoB();
-//	void set_vfoB(long);
+//	unsigned long int get_vfoA();
+//	void set_vfoA(unsigned long int);
+//	unsigned long int get_vfoB();
+//	void set_vfoB(unsigned long int);
 
 //	void selectA();
 //	void selectB();

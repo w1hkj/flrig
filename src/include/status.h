@@ -98,10 +98,10 @@ struct status {
 
 	int		iBW_A;
 	int		imode_A;
-	int		freq_A;
+	unsigned long int	freq_A;
 	int		iBW_B;
 	int		imode_B;
-	int		freq_B;
+	unsigned long int	freq_B;
 
 	std::string filters;
 	std::string bandwidths;

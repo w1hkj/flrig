@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #ifndef _FTdx101D_H
@@ -36,11 +36,11 @@ public:
 
 	virtual bool check();
 
-	virtual long get_vfoA();
-	virtual void set_vfoA(long);
+	virtual unsigned long int get_vfoA();
+	virtual void set_vfoA(unsigned long int);
 
-	virtual long get_vfoB();
-	virtual void set_vfoB(long);
+	virtual unsigned long int get_vfoB();
+	virtual void set_vfoB(unsigned long int);
 
 	virtual bool twovfos();
 	virtual void selectA();

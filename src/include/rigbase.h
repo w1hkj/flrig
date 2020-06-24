@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #ifndef _RIG_BASE_H
@@ -40,7 +40,7 @@ enum {UI, XML, SRVR, RIG};
 enum {BINARY, STRING};
 
 struct XCVR_STATE {
-	long freq;
+	unsigned long int freq;
 	int  imode;
 	int  iBW;
 	int  filter;
@@ -177,10 +177,10 @@ public:
 
 	int  modeA;
 	int  bwA;
-	long freqA;
+	unsigned long int freqA;
 	int  modeB;
 	int  bwB;
-	long freqB;
+	unsigned long int freqB;
 	int  precision;
 	int  ndigits;
 	bool can_change_alt_vfo;
@@ -188,7 +188,7 @@ public:
 
 	int  def_mode;
 	int  def_bw;
-	long def_freq;
+	unsigned long int def_freq;
 	int  max_power;
 	int  last_bw;
 	int  bpf_center;
@@ -308,18 +308,18 @@ protected:
 	string cmd; // command string
 	string rsp; // expected response string (header etc)
 
-	string to_bcd_be(long freq, int len);
-	string to_bcd(long freq, int len);
-	long fm_bcd (string bcd, int len);
-	long fm_bcd_be(string bcd, int len);
-	string to_binary_be(long freq, int len);
-	string to_binary(long freq, int len);
-	long fm_binary(string binary, int len);
-	long fm_binary_be(string binary_be, int len);
-	string to_decimal_be(long d, int len);
-	string to_decimal(long d, int len);
-	long fm_decimal(string decimal, int len);
-	long fm_decimal_be(string decimal_be, int len);
+	string to_bcd_be(unsigned long int freq, int len);
+	string to_bcd(unsigned long int freq, int len);
+	unsigned long int fm_bcd (string bcd, int len);
+	unsigned long int fm_bcd_be(string bcd, int len);
+	string to_binary_be(unsigned long int freq, int len);
+	string to_binary(unsigned long int freq, int len);
+	unsigned long int fm_binary(string binary, int len);
+	unsigned long int fm_binary_be(string binary_be, int len);
+	string to_decimal_be(unsigned long int d, int len);
+	string to_decimal(unsigned long int d, int len);
+	unsigned long int fm_decimal(string decimal, int len);
+	unsigned long int fm_decimal_be(string decimal_be, int len);
 
 public:
 	rigbase();
@@ -334,10 +334,10 @@ public:
 	virtual void set_data_port() {}
 
 	virtual bool get_info(void) {return false;}
-	virtual long get_vfoA(void) {return A.freq;}
-	virtual void set_vfoA(long f) {A.freq = f;}
-	virtual long get_vfoB(void) {return B.freq;}
-	virtual void set_vfoB(long f) {B.freq = f; set_vfoA(f);}
+	virtual unsigned long int get_vfoA(void) {return A.freq;}
+	virtual void set_vfoA(unsigned long int f) {A.freq = f;}
+	virtual unsigned long int get_vfoB(void) {return B.freq;}
+	virtual void set_vfoB(unsigned long int f) {B.freq = f; set_vfoA(f);}
 
 	virtual void set_modeA(int val) {A.imode = val;}
 	virtual int  get_modeA() {return A.imode;}

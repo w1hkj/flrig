@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "FT920.h"
@@ -211,12 +211,12 @@ bool RIG_FT920::get_info()
 	return false;
 }
 
-long RIG_FT920::get_vfoA ()
+unsigned long int RIG_FT920::get_vfoA ()
 {
 	return A.freq;
 }
 
-void RIG_FT920::set_vfoA (long freq)
+void RIG_FT920::set_vfoA (unsigned long int freq)
 {
 	A.freq = freq;
 	freq /=10; // 920 does not support 1 Hz resolution
@@ -256,12 +256,12 @@ int RIG_FT920::get_bwA()
 	return A.iBW;
 }
 
-long RIG_FT920::get_vfoB()
+unsigned long int RIG_FT920::get_vfoB()
 {
 	return B.freq;
 }
 
-void RIG_FT920::set_vfoB(long freq)
+void RIG_FT920::set_vfoB(unsigned long int freq)
 {
 	B.freq = freq;
 	freq /=10; // 920 does not support 1 Hz resolution

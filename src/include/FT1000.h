@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #ifndef FT1000_H
@@ -47,10 +47,10 @@ public:
 
 	bool check();
 
-	long get_vfoA();
+	unsigned long int get_vfoA();
 	int  get_modeA();
 	int  get_bwA();
-	void set_vfoA(long);
+	void set_vfoA(unsigned long int);
 	void set_modeA(int val);
 	void set_bwA(int val);
 
@@ -62,10 +62,10 @@ public:
 	void set_split(bool val);
 	int  get_split();
 
-	long get_vfoB();
+	unsigned long int get_vfoB();
 	int  get_modeB();
 	int  get_bwB();
-	void set_vfoB(long);
+	void set_vfoB(unsigned long int);
 	void set_modeB(int val);
 	void set_bwB(int val);
 

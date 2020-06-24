@@ -47,7 +47,7 @@ void cFreqControl::IncFreq (int nbr) {
 }
 
 void cFreqControl::DecFreq (int nbr) {
-	long v = 1;
+	unsigned long int v = 1;
 	v = val - mult[nbr] * precision;
 	if (v >= minVal)
 		val = v;
@@ -130,7 +130,7 @@ cFreqControl::cFreqControl(int x, int y, int w, int h, const char *lbl):
 	color(OFFCOLOR);
 
 	minVal = 0;
-	maxVal = (long int)(pow(10, nD) - 1) * precision;
+	maxVal = (unsigned long int)(pow(10, nD) - 1) * precision;
 	double fmaxval = maxVal / 1000.0;
 
 	static char tt[100];
@@ -218,7 +218,7 @@ cFreqControl::~cFreqControl()
 
 void cFreqControl::updatevalue()
 {
-	long v = val / precision;
+	unsigned long int v = val / precision;
 	int i;
 	if (likely(v > 0L)) {
 		for (i = 0; i < nD; i++) {
@@ -327,7 +327,7 @@ static void blink_point(Fl_Widget* w)
 	Fl::add_timeout(0.2, (Fl_Timeout_Handler)blink_point, w);
 }
 
-void cFreqControl::value(long lv)
+void cFreqControl::value(unsigned long int lv)
 {
 	oldval = val = lv;
 	Fl::remove_timeout((Fl_Timeout_Handler)blink_point, decbx);
@@ -475,10 +475,10 @@ void cFreqControl::freq_input_cb(Fl_Widget*, void* arg)
 {
 	cFreqControl* fc = reinterpret_cast<cFreqControl*>(arg);
 	double val = strtod(fc->finp->value(), NULL);
-	long lval;
+	unsigned long int lval;
 	val *= 1e3;
 	val += 0.5;
-	lval = (long)val;
+	lval = (unsigned long int)val;
 	if (lval <= fc->maxVal) {
 		fc->val = (long)val;
 		fc->updatevalue();

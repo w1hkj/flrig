@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <stdio.h>
@@ -84,7 +84,7 @@ bool RIG_FT857D::check ()
 	return true;
 }
 
-long RIG_FT857D::get_vfoA ()
+unsigned long int RIG_FT857D::get_vfoA ()
 {
 //	if (useB) return freqA;
 	init_cmd();
@@ -102,7 +102,7 @@ long RIG_FT857D::get_vfoA ()
 	return freqA;
 }
 
-void RIG_FT857D::set_vfoA (long freq)
+void RIG_FT857D::set_vfoA (unsigned long int freq)
 {
 	freqA = freq;
 	freq /=10; // 857D does not support 1 Hz resolution
@@ -113,7 +113,7 @@ void RIG_FT857D::set_vfoA (long freq)
 	showresp(INFO, HEX, "set vfo A", cmd, "");
 }
 
-long RIG_FT857D::get_vfoB ()
+unsigned long int RIG_FT857D::get_vfoB ()
 {
 //	if (!useB) return freqB;
 	init_cmd();
@@ -131,7 +131,7 @@ long RIG_FT857D::get_vfoB ()
 	return freqB;
 }
 
-void RIG_FT857D::set_vfoB (long freq)
+void RIG_FT857D::set_vfoB (unsigned long int freq)
 {
 	freqB = freq;
 	freq /=10; // 857D does not support 1 Hz resolution
@@ -262,7 +262,7 @@ void RIG_FT857D::set_split(bool val)
 
 void RIG_FT857D::set_band_selection(int v)
 {
-	long freq = 14070000L;
+	unsigned long int freq = 14070000L;
 	int  mode = 0;
 	switch (v) {
 		case 1: freq = progStatus.f160; mode = progStatus.m160; break; // 160 meters

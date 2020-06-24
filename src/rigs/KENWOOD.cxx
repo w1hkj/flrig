@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "KENWOOD.h"
@@ -124,7 +124,7 @@ bool KENWOOD::check()
 	return true;
 }
 
-long KENWOOD::get_vfoA ()
+unsigned long int KENWOOD::get_vfoA ()
 {
 	cmd = "FA;";
 	if (wait_char(';', 14, 100, "get vfo A", ASC) == 14) {
@@ -140,7 +140,7 @@ long KENWOOD::get_vfoA ()
 	return A.freq;
 }
 
-void KENWOOD::set_vfoA (long freq)
+void KENWOOD::set_vfoA (unsigned long int freq)
 {
 	A.freq = freq;
 	cmd = "FA00000000000;";
@@ -153,7 +153,7 @@ void KENWOOD::set_vfoA (long freq)
 	sett("vfoA");
 }
 
-long KENWOOD::get_vfoB ()
+unsigned long int KENWOOD::get_vfoB ()
 {
 	cmd = "FB;";
 	if (wait_char(';', 14, 100, "get vfo B", ASC) == 14) {
@@ -169,7 +169,7 @@ long KENWOOD::get_vfoB ()
 	return B.freq;
 }
 
-void KENWOOD::set_vfoB (long freq)
+void KENWOOD::set_vfoB (unsigned long int freq)
 {
 	B.freq = freq;
 	cmd = "FB00000000000;";

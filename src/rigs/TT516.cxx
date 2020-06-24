@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 /*
@@ -164,7 +164,7 @@ bool RIG_TT516::check ()
 	return true;
 }
 
-long RIG_TT516::get_vfoA ()
+unsigned long int RIG_TT516::get_vfoA ()
 {
 	cmd = TT516getFREQA;
 	int ret = waitN(8, 150, "get vfo A", HEX);
@@ -179,7 +179,7 @@ long RIG_TT516::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_TT516::set_vfoA (long freq)
+void RIG_TT516::set_vfoA (unsigned long int freq)
 {
 	A.freq = freq;
 	cmd = TT516setFREQA;
@@ -193,7 +193,7 @@ void RIG_TT516::set_vfoA (long freq)
 	return;
 }
 
-long RIG_TT516::get_vfoB ()
+unsigned long int RIG_TT516::get_vfoB ()
 {
 	cmd = TT516getFREQB;
 	int ret = waitN(8, 150, "get vfo B", HEX);
@@ -210,7 +210,7 @@ long RIG_TT516::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_TT516::set_vfoB (long freq)
+void RIG_TT516::set_vfoB (unsigned long int freq)
 {
 	B.freq = freq;
 	cmd = TT516setFREQB;

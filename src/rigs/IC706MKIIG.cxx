@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "IC706MKIIG.h"
@@ -128,7 +128,7 @@ bool RIG_IC706MKIIG::check ()
 	return ok;
 }
 
-long RIG_IC706MKIIG::get_vfoA ()
+unsigned long int RIG_IC706MKIIG::get_vfoA ()
 {
 	if (useB) return A.freq;
 	cmd = pre_to;
@@ -148,7 +148,7 @@ long RIG_IC706MKIIG::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_IC706MKIIG::set_vfoA (long freq)
+void RIG_IC706MKIIG::set_vfoA (unsigned long int freq)
 {
 	A.freq = freq;
 	cmd = pre_to;
@@ -158,7 +158,7 @@ void RIG_IC706MKIIG::set_vfoA (long freq)
 	waitFB("set vfo A");
 }
 
-long RIG_IC706MKIIG::get_vfoB ()
+unsigned long int RIG_IC706MKIIG::get_vfoB ()
 {
 	if (!useB) return B.freq;
 	cmd = pre_to;
@@ -178,7 +178,7 @@ long RIG_IC706MKIIG::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_IC706MKIIG::set_vfoB (long freq)
+void RIG_IC706MKIIG::set_vfoB (unsigned long int freq)
 {
 	B.freq = freq;
 	cmd = pre_to;

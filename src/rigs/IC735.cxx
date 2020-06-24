@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "IC735.h"
@@ -86,7 +86,7 @@ bool RIG_IC735::check ()
 	return ok;
 }
 
-long RIG_IC735::get_vfoA ()
+unsigned long int RIG_IC735::get_vfoA ()
 {
 	if (useB) return A.freq;
 	string cstr = "\x03";
@@ -107,7 +107,7 @@ long RIG_IC735::get_vfoA ()
 	return freqA;
 }
 
-void RIG_IC735::set_vfoA (long freq)
+void RIG_IC735::set_vfoA (unsigned long int freq)
 {
 	freqA = freq;
 	cmd = pre_to;
@@ -117,7 +117,7 @@ void RIG_IC735::set_vfoA (long freq)
 	waitFB("set vfo A");
 }
 
-long RIG_IC735::get_vfoB ()
+unsigned long int RIG_IC735::get_vfoB ()
 {
 	if (!useB) return B.freq;
 	string cstr = "\x03";
@@ -138,7 +138,7 @@ long RIG_IC735::get_vfoB ()
 	return freqB;
 }
 
-void RIG_IC735::set_vfoB (long freq)
+void RIG_IC735::set_vfoB (unsigned long int freq)
 {
 	freqA = freq;
 	cmd = pre_to;

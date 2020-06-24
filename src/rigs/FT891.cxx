@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <sstream>
@@ -230,7 +230,7 @@ bool RIG_FT891::check ()
 	return false;
 }
 
-long RIG_FT891::get_vfoA ()
+unsigned long int RIG_FT891::get_vfoA ()
 {
 	// When VFOA is 'selected', radio has it actively loaded in FA, otherwise
 	// it is in FB
@@ -255,7 +255,7 @@ long RIG_FT891::get_vfoA ()
 	return freqA;
 }
 
-void RIG_FT891::set_vfoA (long freq)
+void RIG_FT891::set_vfoA (unsigned long int freq)
 {
 	freqA = freq;
 	
@@ -279,7 +279,7 @@ void RIG_FT891::set_vfoA (long freq)
 
 }
 
-long RIG_FT891::get_vfoB ()
+unsigned long int RIG_FT891::get_vfoB ()
 {
 	// When VFOB is 'selected', radio has it actively loaded in FA, otherwise
 	// it is in FB
@@ -304,7 +304,7 @@ long RIG_FT891::get_vfoB ()
 }
 
 
-void RIG_FT891::set_vfoB (long freq)
+void RIG_FT891::set_vfoB (unsigned long int freq)
 {
 	freqB = freq;
 	
@@ -758,7 +758,7 @@ void RIG_FT891::set_modeA(int val)
 
 	set_trace(4, "set_modeA():\n", cmd.c_str(), "\n", replystr.c_str());
 
-	set_sideband(val);
+//	set_sideband(val);
 }
 
 int RIG_FT891::get_modeA()
@@ -817,7 +817,7 @@ void RIG_FT891::set_modeB(int val)
 
 	set_trace(4, "set_modeB():\n", cmd.c_str(), "\n", replystr.c_str());
 
-	set_sideband(val);
+//	set_sideband(val);
 }
 
 int RIG_FT891::get_modeB()

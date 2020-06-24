@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "TT599.h"
@@ -139,7 +139,7 @@ bool RIG_TT599::check ()
 	return true;
 }
 
-long RIG_TT599::get_vfoA ()
+unsigned long int RIG_TT599::get_vfoA ()
 {
 	size_t p;
 	cmd = "?AF\r";
@@ -150,7 +150,7 @@ long RIG_TT599::get_vfoA ()
 	return freqA;
 }
 
-void RIG_TT599::set_vfoA (long freq)
+void RIG_TT599::set_vfoA (unsigned long int freq)
 {
 	freqA = freq;
 	cmd = "*AF";
@@ -160,7 +160,7 @@ void RIG_TT599::set_vfoA (long freq)
 	get_vfoA();
 }
 
-long RIG_TT599::get_vfoB ()
+unsigned long int RIG_TT599::get_vfoB ()
 {
 	size_t p;
 	cmd = "?BF\r";
@@ -171,7 +171,7 @@ long RIG_TT599::get_vfoB ()
 	return freqB;
 }
 
-void RIG_TT599::set_vfoB (long freq)
+void RIG_TT599::set_vfoB (unsigned long int freq)
 {
 	freqB = freq;
 	cmd = "*BF";

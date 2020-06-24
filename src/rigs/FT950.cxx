@@ -16,7 +16,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <iostream>
@@ -227,7 +227,7 @@ void RIG_FT950::initialize()
 // Disable Auto Information mode
 	sendCommand("AI0;");
 
-// "MRnnn;" if valid, returns last channel used, "mrlll...;", along with channel nnn info.
+// "MRnnn;" if valid, returns last channel used, "mrlll...;", aunsigned long int with channel nnn info.
 	cmd = "MR118;";
 	wait_char(';', 27, FL950_WAIT_TIME, "Read UK 60m Channel Mem", ASC);
 	size_t p = replystr.rfind("MR");
@@ -265,7 +265,7 @@ bool RIG_FT950::check ()
 	return false;
 }
 
-long RIG_FT950::get_vfoA ()
+unsigned long int RIG_FT950::get_vfoA ()
 {
 	cmd = rsp = "FA";
 	cmd += ';';
@@ -282,7 +282,7 @@ long RIG_FT950::get_vfoA ()
 	return freqA;
 }
 
-void RIG_FT950::set_vfoA (long freq)
+void RIG_FT950::set_vfoA (unsigned long int freq)
 {
 	freqA = freq;
 	cmd = "FA00000000;";
@@ -297,7 +297,7 @@ void RIG_FT950::set_vfoA (long freq)
 
 }
 
-long RIG_FT950::get_vfoB ()
+unsigned long int RIG_FT950::get_vfoB ()
 {
 	cmd = rsp = "FB";
 	cmd += ';';
@@ -314,7 +314,7 @@ long RIG_FT950::get_vfoB ()
 	return freqB;
 }
 
-void RIG_FT950::set_vfoB (long freq)
+void RIG_FT950::set_vfoB (unsigned long int freq)
 {
 	freqB = freq;
 	cmd = "FB00000000;";
@@ -615,7 +615,7 @@ void RIG_FT950::tune_rig(int)
 	static int rmd = modeA;
 	static int rbw = bwA;
 	static int rpwr = 100;
-	static long rfreq = freqA;	// fix for menu 047 OFSt default
+	static unsigned long int rfreq = freqA;	// fix for menu 047 OFSt default
 	int use_int_tuner = true;
 
 //  On-The-Fly bandstack by bandstack int/ext tuner

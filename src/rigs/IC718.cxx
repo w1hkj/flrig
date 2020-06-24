@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "IC718.h"
@@ -140,7 +140,7 @@ bool RIG_IC718::check ()
 	return ok;
 }
 
-long RIG_IC718::get_vfoA ()
+unsigned long int RIG_IC718::get_vfoA ()
 {
 	if (useB) return A.freq;
 	cmd = pre_to;
@@ -160,7 +160,7 @@ long RIG_IC718::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_IC718::set_vfoA (long freq)
+void RIG_IC718::set_vfoA (unsigned long int freq)
 {
 	A.freq = freq;
 	cmd = pre_to;
@@ -170,7 +170,7 @@ void RIG_IC718::set_vfoA (long freq)
 	waitFB("set vfo A");
 }
 
-long RIG_IC718::get_vfoB ()
+unsigned long int RIG_IC718::get_vfoB ()
 {
 	if (!useB) return B.freq;
 	string resp = pre_fm;
@@ -190,7 +190,7 @@ long RIG_IC718::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_IC718::set_vfoB (long freq)
+void RIG_IC718::set_vfoB (unsigned long int freq)
 {
 	B.freq = freq;
 	cmd = pre_to;

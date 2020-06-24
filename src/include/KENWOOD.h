@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #ifndef _KENWOOD_H
@@ -46,10 +46,10 @@ enum TS590MODES { LSB, USB, CW, FM, AM, FSK, CWR, FSKR, LSBD, USBD, FMD };
 
 	virtual bool check();
 
-	virtual long get_vfoA();
-	virtual void set_vfoA(long);
-	virtual long get_vfoB();
-	virtual void set_vfoB(long);
+	virtual unsigned long int get_vfoA();
+	virtual void set_vfoA(unsigned long int);
+	virtual unsigned long int get_vfoB();
+	virtual void set_vfoB(unsigned long int);
 
 	virtual void selectA();
 	virtual void selectB();

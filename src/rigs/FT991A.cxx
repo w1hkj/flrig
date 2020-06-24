@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 #include <iostream>
 
@@ -222,7 +222,7 @@ void RIG_FT991A::initialize()
 // Disable Auto Information mode
 	sendCommand("AI0;");
 
-// "MRnnn;" if valid, returns last channel used, "mrlll...;", along with channel nnn info.
+// "MRnnn;" if valid, returns last channel used, "mrlll...;", aunsigned long int with channel nnn info.
 	cmd = "MR118;";
 	wait_char(';', 27, FL991A_WAIT_TIME, "Read UK 60m Channel Mem", ASC);
 	size_t p = replystr.rfind("MR");
@@ -259,7 +259,7 @@ bool RIG_FT991A::check ()
 	return false;
 }
 
-long RIG_FT991A::get_vfoA ()
+unsigned long int RIG_FT991A::get_vfoA ()
 {
 	cmd = rsp = "FA";
 	cmd += ';';
@@ -275,7 +275,7 @@ long RIG_FT991A::get_vfoA ()
 	return freqA;
 }
 
-void RIG_FT991A::set_vfoA (long freq)
+void RIG_FT991A::set_vfoA (unsigned long int freq)
 {
 	freqA = freq;
 	cmd = "FA000000000;";
@@ -287,7 +287,7 @@ void RIG_FT991A::set_vfoA (long freq)
 	showresp(WARN, ASC, "SET vfo A", cmd, replystr);
 }
 
-long RIG_FT991A::get_vfoB ()
+unsigned long int RIG_FT991A::get_vfoB ()
 {
 	cmd = rsp = "FB";
 	cmd += ';';
@@ -304,7 +304,7 @@ long RIG_FT991A::get_vfoB ()
 }
 
 
-void RIG_FT991A::set_vfoB (long freq)
+void RIG_FT991A::set_vfoB (unsigned long int freq)
 {
 	freqB = freq;
 	cmd = "FB000000000;";

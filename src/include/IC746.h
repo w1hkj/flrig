@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #ifndef _IC746_H
@@ -34,10 +34,10 @@ public:
 
 	bool check();
 
-	virtual long get_vfoA(void);
-	virtual void set_vfoA(long f);
-	virtual long get_vfoB(void);
-	virtual void set_vfoB(long f);
+	virtual unsigned long int get_vfoA(void);
+	virtual void set_vfoA(unsigned long int f);
+	virtual unsigned long int get_vfoB(void);
+	virtual void set_vfoB(unsigned long int f);
 
 	virtual int  get_smeter();
 	virtual void set_volume_control(int val);

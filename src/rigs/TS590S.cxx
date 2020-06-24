@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "config.h"
@@ -1223,7 +1223,7 @@ int RIG_TS590S::get_split()
 	return split;
 }
 
-long RIG_TS590S::get_vfoA ()
+unsigned long int RIG_TS590S::get_vfoA ()
 {
 	cmd = "FA;";
 	if (wait_char(';', 14, 100, "get vfoA", ASC) < 14) return A.freq;
@@ -1231,8 +1231,8 @@ long RIG_TS590S::get_vfoA ()
 	size_t p = replystr.rfind("FA");
 	if (p == string::npos) return A.freq;
 
-	long f = 0L;
-	long mul = 1L;
+	unsigned long int f = 0L;
+	unsigned long int mul = 1L;
 	for (size_t n = 12; n > 1; n--) {
 		f += (replystr[p + n] - '0') * mul;
 		mul *= 10;
@@ -1241,7 +1241,7 @@ long RIG_TS590S::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_TS590S::set_vfoA (long freq)
+void RIG_TS590S::set_vfoA (unsigned long int freq)
 {
 	A.freq = freq;
 	cmd = "FA00000000000;";
@@ -1253,7 +1253,7 @@ void RIG_TS590S::set_vfoA (long freq)
 	showresp(WARN, ASC, "set vfo A", cmd, "");
 }
 
-long RIG_TS590S::get_vfoB ()
+unsigned long int RIG_TS590S::get_vfoB ()
 {
 	cmd = "FB;";
 	if (wait_char(';', 14, 100, "get vfoB", ASC) < 14) return B.freq;
@@ -1261,8 +1261,8 @@ long RIG_TS590S::get_vfoB ()
 	size_t p = replystr.rfind("FB");
 	if (p == string::npos) return B.freq;
 
-	long f = 0L;
-	long mul = 1L;
+	unsigned long int f = 0L;
+	unsigned long int mul = 1L;
 	for (size_t n = 12; n > 1; n--) {
 		f += (replystr[p + n] - '0') * mul;
 		mul *= 10;
@@ -1272,7 +1272,7 @@ long RIG_TS590S::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_TS590S::set_vfoB (long freq)
+void RIG_TS590S::set_vfoB (unsigned long int freq)
 {
 	B.freq = freq;
 	cmd = "FB00000000000;";

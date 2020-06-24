@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #ifndef _IC756_H
@@ -52,14 +52,14 @@ public:
 
 	bool check();
 
-	long get_vfoA(void);
-	void set_vfoA(long f);
+	unsigned long int get_vfoA(void);
+	void set_vfoA(unsigned long int f);
 	int  get_modetype(int n);
 	void set_modeA(int val);
 	int  get_modeA();
 
-	long get_vfoB(void);
-	void set_vfoB(long f);
+	unsigned long int get_vfoB(void);
+	void set_vfoB(unsigned long int f);
 	void set_modeB(int val);
 	int  get_modeB();
 

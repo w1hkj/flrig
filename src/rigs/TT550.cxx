@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 // TenTec Pegasus computer controlled transceiver
@@ -383,7 +383,7 @@ void RIG_TT550::shutdown()
 
 int DigiAdj = 0;
 
-void RIG_TT550::set_vfoRX(long freq)
+void RIG_TT550::set_vfoRX(unsigned long int freq)
 {
 	int NVal = 0, FVal = 0;	// N value / finetune value
     int TBfo = 0;			// temporary BFO (Hz)
@@ -394,7 +394,7 @@ void RIG_TT550::set_vfoRX(long freq)
 
 	int FiltAdj = (TT550_filter_width[def_bw])/2;		// filter bw (Hz)
 
-	long lFreq = freq * (1 + VfoAdj * 1e-6);
+	unsigned long int lFreq = freq * (1 + VfoAdj * 1e-6);
 
 	lFreq += RitAdj;
 
@@ -457,7 +457,7 @@ void RIG_TT550::set_vfoRX(long freq)
 
 }
 
-void RIG_TT550::set_vfoTX(long freq)
+void RIG_TT550::set_vfoTX(unsigned long int freq)
 {
 	int NVal = 0, FVal = 0;	// N value / finetune value
     int TBfo = 0;			// temporary BFO
@@ -466,7 +466,7 @@ void RIG_TT550::set_vfoTX(long freq)
 	int FilterBw = 0;		// Filter Bandwidth determined from table
 
 	int XitAdj;
-	long lFreq = freq * (1 + VfoAdj * 1e-6);
+	unsigned long int lFreq = freq * (1 + VfoAdj * 1e-6);
 
 	lFreq += XitAdj = XitActive ? XitFreq : 0;
 
@@ -541,7 +541,7 @@ void RIG_TT550::set_split(bool val)
 	set_trace(2, "set split ", (val ? "ON" : "OFF"));
 }
 
-void RIG_TT550::set_vfo(long freq)
+void RIG_TT550::set_vfo(unsigned long int freq)
 {
 	set_vfoRX(freq);
 	if (!split)
@@ -549,7 +549,7 @@ void RIG_TT550::set_vfo(long freq)
 	xcvrstream.clear();
 }
 
-void RIG_TT550::set_vfoA (long freq)
+void RIG_TT550::set_vfoA (unsigned long int freq)
 {
 	freqA = freq;
 	if (!useB)
@@ -566,7 +566,7 @@ bool RIG_TT550::check()
 	return true;
 }
 
-long RIG_TT550::get_vfoA ()
+unsigned long int RIG_TT550::get_vfoA ()
 {
 	if (!useB) {
 		freqA += enc_change;
@@ -575,14 +575,14 @@ long RIG_TT550::get_vfoA ()
 	return freqA;
 }
 
-void RIG_TT550::set_vfoB (long freq)
+void RIG_TT550::set_vfoB (unsigned long int freq)
 {
 	freqB = freq;
 	if (useB)
 		set_vfo(freqB);
 }
 
-long RIG_TT550::get_vfoB ()
+unsigned long int RIG_TT550::get_vfoB ()
 {
 	if (useB) {
 		freqB += enc_change;
@@ -876,7 +876,7 @@ void RIG_TT550::process_freq_entry(char c)
 {
 	static bool have_decimal = false;
 	float ffreq = 0.0;
-	long freq = 0;
+	unsigned long int freq = 0;
 	if (xcvrstream.empty()) have_decimal = false;
 	if (c != '\r') {
 		if ((c >= '0' && c <= '9') || c == '.') {
@@ -892,7 +892,7 @@ void RIG_TT550::process_freq_entry(char c)
 			ffreq = 0;
 			sscanf(xcvrstream.c_str(), "%f", &ffreq);
 			if (have_decimal) ffreq *= 1000;
-			freq = (long) ffreq;
+			freq = (unsigned long int) ffreq;
 			if (!txt_encA->visible())
 				Fl::awake(show_encA, NULL);
 			Fl::awake(update_encA, (void*)xcvrstream.c_str());
@@ -905,7 +905,7 @@ void RIG_TT550::process_freq_entry(char c)
 		ffreq = 0;
 		sscanf(xcvrstream.c_str(), "%f", &ffreq);
 		if (have_decimal) ffreq *= 1000;
-		freq = (long) ffreq;
+		freq = (unsigned long int) ffreq;
 		if (freq < 50000) freq *= 1000;
 		Fl::awake(hide_encA, NULL);
 		if (!useB) {

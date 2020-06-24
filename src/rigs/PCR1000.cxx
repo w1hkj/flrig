@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 /*
  * Driver for PCR-1000 April 2012, Brian Miezejewski, k5hfi
@@ -239,7 +239,7 @@ void RIG_PCR1000::setFreqModeBW(XCVR_STATE &freqMode) {
 
 	// Set the frequency in the selected mode command
 
-	long freq = freqMode.freq ;
+	unsigned long int freq = freqMode.freq ;
 	for( int pos = 9 ; pos >= 0 ; pos--,freq /= 10 ) {
 		myComm.frequency[pos] = '0'+(freq%10) ;
 	}
@@ -263,26 +263,26 @@ void RIG_PCR1000::setFreqModeBW(XCVR_STATE &freqMode) {
  */
 
 //----------------------------------------------------------------------
-void RIG_PCR1000::set_vfoA (long freq)
+void RIG_PCR1000::set_vfoA (unsigned long int freq)
 {
 	freqA = A.freq = freq;
 	setFreqModeBW(A) ;
 }
 
-long RIG_PCR1000::get_vfoA ()
+unsigned long int RIG_PCR1000::get_vfoA ()
 {
 	return A.freq;
 }
 
 
 //----------------------------------------------------------------------
-void RIG_PCR1000::set_vfoB (long freq)
+void RIG_PCR1000::set_vfoB (unsigned long int freq)
 {
 	freqB = B.freq = freq;
 	setFreqModeBW(B) ;
 }
 
-long RIG_PCR1000::get_vfoB ()
+unsigned long int RIG_PCR1000::get_vfoB ()
 {
 	return B.freq;
 }
@@ -768,7 +768,7 @@ ME00001200501 00 012500
  
 ME0000120050100 012500
 012500 is the step size expressed in HERTZ. It must
-be 6 digits long, padded with LEADING ZEROS. Examples are 001000 for
+be 6 digits unsigned long int, padded with LEADING ZEROS. Examples are 001000 for
 1000 hertz (1 Khz), 030000 for 30 Khz and 100000 for 100 Khz. The
 bandscope accepts values down to at least 10 hertz but the Icom
 software displays a LIMIT warning at 1 Khz and at 100 Khz.

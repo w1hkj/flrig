@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "FT847.h"
@@ -116,7 +116,7 @@ bool RIG_FT847::check ()
 	return false;
 }
 
-long RIG_FT847::get_vfoA ()
+unsigned long int RIG_FT847::get_vfoA ()
 {
 	if (useB) return A.freq;
 	if (get_info()) {
@@ -127,7 +127,7 @@ long RIG_FT847::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_FT847::set_vfoA (long freq)
+void RIG_FT847::set_vfoA (unsigned long int freq)
 {
 	A.freq = freq;
 	freq /=10; // 847 does not support 1 Hz resolution
@@ -154,7 +154,7 @@ void RIG_FT847::set_modeA(int val)
 	showresp(WARN, HEX, "set mode A", cmd, replystr);
 }
 
-long RIG_FT847::get_vfoB()
+unsigned long int RIG_FT847::get_vfoB()
 {
 	if (!useB) return B.freq;
 	if (get_info()) {
@@ -165,7 +165,7 @@ long RIG_FT847::get_vfoB()
 	return B.freq;
 }
 
-void RIG_FT847::set_vfoB(long freq)
+void RIG_FT847::set_vfoB(unsigned long int freq)
 {
 	B.freq = freq;
 	freq /=10; // 847 does not support 1 Hz resolution

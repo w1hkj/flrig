@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #ifndef _FT991_H
@@ -36,11 +36,11 @@ public:
 
 	bool check();
 
-	long get_vfoA();
-	void set_vfoA(long);
+	unsigned long int get_vfoA();
+	void set_vfoA(unsigned long int);
 
-	long get_vfoB();
-	void set_vfoB(long);
+	unsigned long int get_vfoB();
+	void set_vfoB(unsigned long int);
 
 	bool twovfos() { return true; }
 	bool canswap() { return true; }

@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 /*
@@ -205,28 +205,28 @@ bool RIG_TT538::check ()
 	return true;
 }
 
-long RIG_TT538::get_vfoA ()
+unsigned long int RIG_TT538::get_vfoA ()
 {
 	cmd = TT538getFREQA;
 	int ret = sendCommand(cmd);
 	gTT("get vfoA");
 
-	if (ret < 6) return (long)(freqA / (1 + VfoAdj/1e6) + 0.5);
+	if (ret < 6) return (unsigned long int)(freqA / (1 + VfoAdj/1e6) + 0.5);
 	size_t p = replystr.rfind("A");
-	if (p == string::npos) return (long)(freqA / (1 + VfoAdj/1e6) + 0.5);
+	if (p == string::npos) return (unsigned long int)(freqA / (1 + VfoAdj/1e6) + 0.5);
 	
 	int f = 0;
 	for (size_t n = 1; n < 5; n++)
 		f = f*256 + (unsigned char)replystr[p + n];
 	freqA = f;
 
-	return (long)(freqA / (1 + VfoAdj/1e6) + 0.5);
+	return (unsigned long int)(freqA / (1 + VfoAdj/1e6) + 0.5);
 }
 
-void RIG_TT538::set_vfoA (long freq)
+void RIG_TT538::set_vfoA (unsigned long int freq)
 {
 	freqA = freq;
-	long xfreq = freqA * (1 + VfoAdj/1e6) + 0.5;
+	unsigned long int xfreq = freqA * (1 + VfoAdj/1e6) + 0.5;
 	cmd = TT538setFREQA;
 	cmd[5] = xfreq & 0xff; xfreq = xfreq >> 8;
 	cmd[4] = xfreq & 0xff; xfreq = xfreq >> 8;
@@ -239,29 +239,29 @@ void RIG_TT538::set_vfoA (long freq)
 	return ;
 }
 
-long RIG_TT538::get_vfoB ()
+unsigned long int RIG_TT538::get_vfoB ()
 {
 //	cmd = TT538getFREQB;
 	cmd = TT538getFREQA;
 	int ret = sendCommand(cmd);
 	gTT("get vfoB");
 
-	if (ret < 6) return (long)(freqB / (1 + VfoAdj/1e6) + 0.5);
+	if (ret < 6) return (unsigned long int)(freqB / (1 + VfoAdj/1e6) + 0.5);
 	size_t p = replystr.rfind("B");
-	if (p == string::npos) return (long)(freqB / (1 + VfoAdj/1e6) + 0.5);
+	if (p == string::npos) return (unsigned long int)(freqB / (1 + VfoAdj/1e6) + 0.5);
 
 	int f = 0;
 	for (size_t n = 1; n < 5; n++)
 		f = f*256 + (unsigned char)replystr[p + n];
 	freqB = f;
 
-	return (long)(freqB / (1 + VfoAdj/1e6) + 0.5);
+	return (unsigned long int)(freqB / (1 + VfoAdj/1e6) + 0.5);
 }
 
-void RIG_TT538::set_vfoB (long freq)
+void RIG_TT538::set_vfoB (unsigned long int freq)
 {
 	freqB = freq;
-	long xfreq = freqB * (1 + VfoAdj/1e6) + 0.5;
+	unsigned long int xfreq = freqB * (1 + VfoAdj/1e6) + 0.5;
 //	cmd = TT538setFREQB;
 	cmd = TT538setFREQA;
 	cmd[5] = xfreq & 0xff; xfreq = xfreq >> 8;

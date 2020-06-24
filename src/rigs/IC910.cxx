@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "IC910.h"
@@ -116,9 +116,9 @@ RIG_IC910H::RIG_IC910H() {
 };
 
 // this looks like trouble
-void RIG_IC910H::set_vfoA (long freq)
+void RIG_IC910H::set_vfoA (unsigned long int freq)
 {
-	long nufreq;
+	unsigned long int nufreq;
 	if (freq > 1300000000L) nufreq = 1300000000L;
 	else if (freq > 450000000L && freq < 1240000000L && freqA <= 450000000L)
 		nufreq = 1240000000L;

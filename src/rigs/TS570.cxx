@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "TS570.h"
@@ -208,7 +208,7 @@ bool RIG_TS570::check ()
 	return true;
 }
 
-long RIG_TS570::get_vfoA ()
+unsigned long int RIG_TS570::get_vfoA ()
 {
 	cmd = "FA;";
 	if (wait_char(';', 14, 100, "get vfoA", ASC) < 14) return A.freq;
@@ -223,7 +223,7 @@ long RIG_TS570::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_TS570::set_vfoA (long freq)
+void RIG_TS570::set_vfoA (unsigned long int freq)
 {
 	A.freq = freq;
 	cmd = "FA00000000000;";
@@ -235,7 +235,7 @@ void RIG_TS570::set_vfoA (long freq)
 	showresp(WARN, ASC, "set vfoA", cmd, "");
 }
 
-long RIG_TS570::get_vfoB ()
+unsigned long int RIG_TS570::get_vfoB ()
 {
 	cmd = "FB;";
 	if (wait_char(';', 14, 100, "get vfoB", ASC) < 14) return freqB;
@@ -250,7 +250,7 @@ long RIG_TS570::get_vfoB ()
 	return freqB;
 }
 
-void RIG_TS570::set_vfoB (long freq)
+void RIG_TS570::set_vfoB (unsigned long int freq)
 {
 	freqB = freq;
 	cmd = "FB00000000000;";

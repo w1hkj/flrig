@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <iostream>
@@ -206,7 +206,7 @@ bool RIG_FT2000::check ()
 	return false;
 }
 
-long RIG_FT2000::get_vfoA ()
+unsigned long int RIG_FT2000::get_vfoA ()
 {
 	cmd = "FA;";
 	int ret = wait_char(';', 11, 100, "get vfoA", ASC);
@@ -224,7 +224,7 @@ long RIG_FT2000::get_vfoA ()
 	return freqA;
 }
 
-void RIG_FT2000::set_vfoA (long freq)
+void RIG_FT2000::set_vfoA (unsigned long int freq)
 {
 	freqA = freq;
 	cmd = "FA00000000;";
@@ -235,7 +235,7 @@ void RIG_FT2000::set_vfoA (long freq)
 	sendCommand(cmd, 0);
 }
 
-long RIG_FT2000::get_vfoB ()
+unsigned long int RIG_FT2000::get_vfoB ()
 {
 	cmd = "FB;";
 	int ret = wait_char(';', 11, 100, "get vfoB", ASC);
@@ -253,7 +253,7 @@ long RIG_FT2000::get_vfoB ()
 	return freqB;
 }
 
-void RIG_FT2000::set_vfoB (long freq)
+void RIG_FT2000::set_vfoB (unsigned long int freq)
 {
 	freqB = freq;
 	cmd = "FB00000000;";

@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <stdlib.h>
@@ -197,12 +197,12 @@ void RIG_RAY152::shutdown()
 LOG_INFO("%s", cmd.c_str());
 }
 
-long RIG_RAY152::get_vfoA ()
+unsigned long int RIG_RAY152::get_vfoA ()
 {
 	return A.freq;
 }
 
-void RIG_RAY152::set_vfoA (long freq)
+void RIG_RAY152::set_vfoA (unsigned long int freq)
 {
 	A.freq = freq;
 	cmd = "FT000000\r";
@@ -220,12 +220,12 @@ LOG_INFO("%s", cmd.c_str());
 LOG_INFO("%s", cmd.c_str());
 }
 
-long RIG_RAY152::get_vfoB ()
+unsigned long int RIG_RAY152::get_vfoB ()
 {
 	return B.freq;
 }
 
-void RIG_RAY152::set_vfoB (long freq)
+void RIG_RAY152::set_vfoB (unsigned long int freq)
 {
 	B.freq = freq;
 	cmd = "FT000000\r";

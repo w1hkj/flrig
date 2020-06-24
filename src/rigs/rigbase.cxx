@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "rigbase.h"
@@ -173,7 +173,7 @@ rigbase::rigbase()
 	preamp_level = 0;
 }
 
-string rigbase::to_bcd_be(long freq, int len)
+string rigbase::to_bcd_be(unsigned long int freq, int len)
 {
 	unsigned char a;
 	int numchars = len / 2;
@@ -190,7 +190,7 @@ string rigbase::to_bcd_be(long freq, int len)
 	return bcd;
 }
 
-string rigbase::to_bcd(long freq, int len)
+string rigbase::to_bcd(unsigned long int freq, int len)
 {
 	string bcd_be = to_bcd_be(freq, len);
 	string bcd = "";
@@ -200,10 +200,10 @@ string rigbase::to_bcd(long freq, int len)
 	return bcd;
 }
 
-long rigbase::fm_bcd (string bcd, int len)
+unsigned long int rigbase::fm_bcd (string bcd, int len)
 {
 	int i;
-	long f = 0;
+	unsigned long int f = 0;
 	int numchars = len/2;
 	if (len & 1) numchars ++;
 	for (i = 0; i < numchars; i++) {
@@ -216,7 +216,7 @@ long rigbase::fm_bcd (string bcd, int len)
 }
 
 
-long rigbase::fm_bcd_be(string bcd, int len)
+unsigned long int rigbase::fm_bcd_be(string bcd, int len)
 {
 	char temp;
 	int numchars = len/2;
@@ -229,7 +229,7 @@ long rigbase::fm_bcd_be(string bcd, int len)
 	return fm_bcd(bcd, len);
 }
 
-string rigbase::to_binary_be(long freq, int len)
+string rigbase::to_binary_be(unsigned long int freq, int len)
 {
 	static string bin = "";
 	for (int i = 0; i < len; i++) {
@@ -239,7 +239,7 @@ string rigbase::to_binary_be(long freq, int len)
 	return bin;
 }
 
-string rigbase::to_binary(long freq, int len)
+string rigbase::to_binary(unsigned long int freq, int len)
 {
 	static string bin = "";
 	string bin_be = to_binary_be(freq, len);
@@ -249,10 +249,10 @@ string rigbase::to_binary(long freq, int len)
 	return bin;
 }
 
-long rigbase::fm_binary(string binary, int len)
+unsigned long int rigbase::fm_binary(string binary, int len)
 {
 	int i;
-	long f = 0;
+	unsigned long int f = 0;
 	for (i = 0; i < len; i++) {
 		f *= 256;
 		f += (unsigned char)binary[i];
@@ -260,7 +260,7 @@ long rigbase::fm_binary(string binary, int len)
 	return f;
 }
 
-long rigbase::fm_binary_be(string binary_be, int len)
+unsigned long int rigbase::fm_binary_be(string binary_be, int len)
 {
 	unsigned char temp;
 	int numchars = len/2;
@@ -273,7 +273,7 @@ long rigbase::fm_binary_be(string binary_be, int len)
 	return fm_binary(binary_be, len);
 }
 
-string rigbase::to_decimal_be(long d, int len)
+string rigbase::to_decimal_be(unsigned long int d, int len)
 {
 	static string sdec_be;
 	sdec_be.clear();
@@ -284,7 +284,7 @@ string rigbase::to_decimal_be(long d, int len)
 	return sdec_be;
 }
 
-string rigbase::to_decimal(long d, int len)
+string rigbase::to_decimal(unsigned long int d, int len)
 {
 	static string sdec;
 	sdec.clear();
@@ -295,9 +295,9 @@ string rigbase::to_decimal(long d, int len)
 	return sdec;
 }
 
-long rigbase::fm_decimal(string decimal, int len)
+unsigned long int rigbase::fm_decimal(string decimal, int len)
 {
-	long d = 0;
+	unsigned long int d = 0;
 	for (int i = 0; i < len; i++) {
 		d *= 10;
 		d += decimal[i] - '0';
@@ -305,7 +305,7 @@ long rigbase::fm_decimal(string decimal, int len)
 	return d;
 }
 
-long rigbase::fm_decimal_be(string decimal_be, int len)
+unsigned long int rigbase::fm_decimal_be(string decimal_be, int len)
 {
 	unsigned char temp;
 	int numchars = len/2;

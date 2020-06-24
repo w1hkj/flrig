@@ -109,10 +109,10 @@ status progStatus = {
 
 	-1,			// int  iBW_A;
 	1,			// int  imode_A;
-	14070000,	// long freq_A;
+	14070000,	// unsigned long int freq_A;
 	-1,			// int  iBW_B;
 	1,			// int  imode_B;
-	7070000,	// long freq_B;
+	7070000,	// unsigned long int freq_B;
 
 	"",			// std::string filters;
 	"",			// std::string bandwidths;
@@ -510,11 +510,21 @@ void status::saveLastState()
 
 	spref.set("bw_A", iBW_A);
 	spref.set("mode_A", imode_A);
-	spref.set("freq_A", freq_A);
+
+	int freq_A_lower, freq_A_upper;
+	freq_A_upper = freq_A / 1000000000;
+	freq_A_lower = freq_A - freq_A_upper * 1000000000;
+	spref.set("freq_A_u", freq_A_upper);
+	spref.set("freq_A_l", freq_A_lower);
 
 	spref.set("bw_B", iBW_B);
 	spref.set("mode_B", imode_B);
-	spref.set("freq_B", freq_B);
+
+	int freq_B_lower, freq_B_upper;
+	freq_B_upper = freq_B / 1000000000;
+	freq_B_lower = freq_B - freq_B_upper * 1000000000;
+	spref.set("freq_B_u", freq_B_upper);
+	spref.set("freq_B_l", freq_B_lower);
 
 	spref.set("filters", filters.c_str());
 	spref.set("bandwidths", bandwidths.c_str());
@@ -971,11 +981,23 @@ bool status::loadXcvrState(string xcvr)
 
 		spref.get("bw_A", iBW_A, iBW_A);
 		spref.get("mode_A", imode_A, imode_A);
-		spref.get("freq_A", freq_A, freq_A);
+
+		int freq_A_upper = 0;
+		int freq_A_lower = 14070000;
+		spref.get("freq_A_u", freq_A_upper, freq_A_upper);
+		spref.get("freq_A_l", freq_A_lower, freq_A_lower);
+		freq_A = (unsigned long int)freq_A_upper * 1000000000 + freq_A_lower;
+std::cout << "freq A: " << freq_A << std::endl;
 
 		spref.get("bw_B", iBW_B, iBW_B);
 		spref.get("mode_B", imode_B, imode_B);
-		spref.get("freq_B", freq_B, freq_B);
+
+		int freq_B_upper = 0;
+		int freq_B_lower = 14070000;
+		spref.get("freq_B_u", freq_B_upper, freq_B_upper);
+		spref.get("freq_B_l", freq_B_lower, freq_B_lower);
+		freq_B = (unsigned long int)freq_B_upper * 1000000000 + freq_B_lower;
+std::cout << "freq B: " << freq_B << std::endl;
 
 		spref.get("filters", defbuffer, "", 499);
 		filters = defbuffer;

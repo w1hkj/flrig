@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "FT1000MP.h"
@@ -269,17 +269,17 @@ bool RIG_FT1000MP::get_info(void)
 	return false;
 }
 
-long RIG_FT1000MP::get_vfoA ()
+unsigned long int RIG_FT1000MP::get_vfoA ()
 {
 	return A.freq;
 }
 
-long RIG_FT1000MP::get_vfoB ()
+unsigned long int RIG_FT1000MP::get_vfoB ()
 {
 	return B.freq;
 }
 
-void RIG_FT1000MP::set_vfoA (long freq)
+void RIG_FT1000MP::set_vfoA (unsigned long int freq)
 {
 	A.freq = freq;
 	init_cmd();
@@ -293,7 +293,7 @@ void RIG_FT1000MP::set_vfoA (long freq)
 LOG_INFO("%s", str2hex(cmd.c_str(), cmd.length()));
 }
 
-void RIG_FT1000MP::set_vfoB (long freq)
+void RIG_FT1000MP::set_vfoB (unsigned long int freq)
 {
 	B.freq = freq;
 	init_cmd();

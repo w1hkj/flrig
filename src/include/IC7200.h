@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #ifndef _IC7200_H
@@ -39,11 +39,11 @@ public:
 	void selectA();
 	void selectB();
 
-	long get_vfoA ();
-	void set_vfoA (long freq);
+	unsigned long int get_vfoA ();
+	void set_vfoA (unsigned long int freq);
 
-	long get_vfoB(void);
-	void set_vfoB(long f);
+	unsigned long int get_vfoB(void);
+	void set_vfoB(unsigned long int f);
 
 	int  get_modetype(int n);
 	void set_modeA(int val);

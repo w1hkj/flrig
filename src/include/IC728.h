@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #ifndef _IC728_H
@@ -30,8 +30,8 @@ public:
 
 	bool check();
 
-	long get_vfoA();
-	void set_vfoA(long);
+	unsigned long int get_vfoA();
+	void set_vfoA(unsigned long int);
 
 	int  adjust_bandwidth(int m) { return 1; }
 

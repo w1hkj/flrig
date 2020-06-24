@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 // AOR 5000 driver based on several other drivers as examples.
 //          Written 05/2017 by Mario Lorenz, dl5mlo@amsat-dl.org
@@ -223,7 +223,7 @@ bool RIG_AOR5K::check()
 	return true;
 }
 
-long RIG_AOR5K::get_vfoA ()
+unsigned long int RIG_AOR5K::get_vfoA ()
 {
 	cmd = "RX\r";
 	int ret = wait_char('\r', 34, AOR5K_WAIT_TIME, "get vfo A", ASC);
@@ -233,7 +233,7 @@ long RIG_AOR5K::get_vfoA ()
 	if (p < 3) return freqA;
 	if (replystr[p-2] =='E') {
 		// VFO A is active. Instead of A we use E
-		long f = 0;
+		unsigned long int f = 0;
 		for (size_t n = 2; n < 12; n++)
 			f = f*10 + replystr[p + n] - '0';
 		freqA = f;
@@ -241,7 +241,7 @@ long RIG_AOR5K::get_vfoA ()
 	return freqA;
 }
 
-void RIG_AOR5K::set_vfoA (long freq)
+void RIG_AOR5K::set_vfoA (unsigned long int freq)
 {
 	freqA = freq;
 	cmd = "VE0000000000\r";
@@ -252,7 +252,7 @@ void RIG_AOR5K::set_vfoA (long freq)
 	wait_char('\r', 1, AOR5K_WAIT_TIME, "set VFO A", ASC);
 }
 
-long RIG_AOR5K::get_vfoB ()
+unsigned long int RIG_AOR5K::get_vfoB ()
 {
 	cmd = "RX\r";
 	int ret = wait_char('\r', 34, AOR5K_WAIT_TIME, "get vfo B", ASC);
@@ -262,7 +262,7 @@ long RIG_AOR5K::get_vfoB ()
 	if (p < 3) return freqB;
 	if (replystr[p-2] == 'B') {
 		// VFO B active
-		long f = 0;
+		unsigned long int f = 0;
 		for (size_t n = 2; n < 12; n++)
 			f = f*10 + replystr[p + n] - '0';
 		freqB = f;
@@ -270,7 +270,7 @@ long RIG_AOR5K::get_vfoB ()
 	return freqB;
 }
 
-void RIG_AOR5K::set_vfoB (long freq)
+void RIG_AOR5K::set_vfoB (unsigned long int freq)
 {
 	freqB = freq;
 	cmd = "VB0000000000\r";

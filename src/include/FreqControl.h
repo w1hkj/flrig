@@ -60,8 +60,8 @@ public:
 	cFreqControl(int x, int y, int w, int h, const char *lbl = "7");
 	~cFreqControl();
 	void updatevalue();
-	void value(long lv);
-	long value(){return val;};
+	void value(unsigned long int lv);
+	unsigned long int value(){return val;};
 	void font(Fl_Font fnt);
 	void SetONCOLOR (uchar r, uchar g, uchar b);
 	void SetOFFCOLOR (uchar r, uchar g, uchar b);
@@ -114,8 +114,8 @@ private:
 	Fl_Color REVOFFCOLOR;
 	int nD;
 	int active;
-	long maxVal;
-	long minVal;
+	unsigned long int maxVal;
+	unsigned long int minVal;
 
 	int pw; // decimal width
 	int wfill;
@@ -130,7 +130,7 @@ private:
 	int (*cbFunc)();
 	static void freq_input_cb(Fl_Widget* input, void* arg);
 protected:
-	long val, oldval;
+	unsigned long int val, oldval;
 	int  precision;
 	int  dpoint;
 	bool hrd_buttons;

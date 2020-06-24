@@ -1342,7 +1342,7 @@ public:
 			result = 0;
 			return;
 		}
-		long freq = static_cast<long>(double(params[0]));
+		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
 		srvr_vfo = vfoA;
 		srvr_vfo.freq = freq;
 		srvr_vfo.imode = -1;
@@ -1367,7 +1367,7 @@ public:
 			result = 0;
 			return;
 		}
-		long freq = static_cast<long>(double(params[0]));
+		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
 		srvr_vfo = vfoB;
 		srvr_vfo.freq = freq;
 		srvr_vfo.imode = -1;
@@ -1392,7 +1392,7 @@ public:
 			result = 0;
 			return;
 		}
-		long freq = static_cast<long>(double(params[0]));
+		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
 // set the frequency in vfoA or vfoB
 		if (useB) srvr_vfo = vfoB;
 		else       srvr_vfo = vfoA;
@@ -1425,7 +1425,7 @@ public:
 			result = 0;
 			return;
 		}
-		long freq = static_cast<long>(double(params[0]));
+		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
 // set the frequency in vfoA or vfoB
 		if (useB) srvr_vfo = vfoB;
 		else       srvr_vfo = vfoA;
@@ -1457,7 +1457,7 @@ public:
 			result = 0;
 			return;
 		}
-		long freq = static_cast<long>(double(params[0]));
+		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
 // set the frequency in vfoA or vfoB
 		if (useB) srvr_vfo = vfoB;
 		else       srvr_vfo = vfoA;
@@ -1467,7 +1467,7 @@ public:
 
 		push_xml();
 
-		int ifreq = 0;
+		unsigned long int ifreq = 0;
 		int n = 0;
 		while (ifreq != srvr_vfo.freq) {
 			MilliSleep(10);

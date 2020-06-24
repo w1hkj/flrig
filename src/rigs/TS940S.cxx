@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "TS940S.h"
@@ -134,7 +134,7 @@ int RIG_TS940S::getvfoAorB()
 }
 
 
-long RIG_TS940S::get_vfoA ()
+unsigned long int RIG_TS940S::get_vfoA ()
 {
 	cmd = "FA;";
 	if (wait_char(';', 14, 100, "get vfo A", ASC) < 14) return A.freq;
@@ -151,7 +151,7 @@ long RIG_TS940S::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_TS940S::set_vfoA (long freq)
+void RIG_TS940S::set_vfoA (unsigned long int freq)
 {
 	A.freq = freq;
 	cmd = "FA00000000000;";
@@ -164,7 +164,7 @@ void RIG_TS940S::set_vfoA (long freq)
 	set_trace(2, "set_vfoA()", replystr.c_str());
 }
 
-long RIG_TS940S::get_vfoB ()
+unsigned long int RIG_TS940S::get_vfoB ()
 {
 	cmd = "FB;";
 	if (wait_char(';', 14, 100, "get vfo B", ASC) < 14) return B.freq;
@@ -181,7 +181,7 @@ long RIG_TS940S::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_TS940S::set_vfoB (long freq)
+void RIG_TS940S::set_vfoB (unsigned long int freq)
 {
 	B.freq = freq;
 	cmd = "FB00000000000;";

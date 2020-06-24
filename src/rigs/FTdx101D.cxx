@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <iostream>
@@ -293,7 +293,7 @@ return true;
 	return false;
 }
 
-long RIG_FTdx101D::get_vfoA ()
+unsigned long int RIG_FTdx101D::get_vfoA ()
 {
 	cmd = rsp = "FA";
 	cmd += ';';
@@ -310,7 +310,7 @@ long RIG_FTdx101D::get_vfoA ()
 	return freqA;
 }
 
-void RIG_FTdx101D::set_vfoA (long freq)
+void RIG_FTdx101D::set_vfoA (unsigned long int freq)
 {
 	freqA = freq;
 	cmd = "FA000000000;";
@@ -323,7 +323,7 @@ void RIG_FTdx101D::set_vfoA (long freq)
 	sett("SET vfo A");
 }
 
-long RIG_FTdx101D::get_vfoB ()
+unsigned long int RIG_FTdx101D::get_vfoB ()
 {
 	cmd = rsp = "FB";
 	cmd += ';';
@@ -341,7 +341,7 @@ long RIG_FTdx101D::get_vfoB ()
 }
 
 
-void RIG_FTdx101D::set_vfoB (long freq)
+void RIG_FTdx101D::set_vfoB (unsigned long int freq)
 {
 	freqB = freq;
 	cmd = "FB000000000;";

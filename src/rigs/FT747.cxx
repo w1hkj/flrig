@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <stdio.h>
@@ -109,7 +109,7 @@ bool RIG_FT747::check()
 
 bool RIG_FT747::get_info()
 {
-	long int afreq = A.freq, bfreq = B.freq;
+	unsigned long int afreq = A.freq, bfreq = B.freq;
 	int amode = A.imode;
 	init_cmd();
 	cmd[4] = 0x10;
@@ -166,12 +166,12 @@ bool RIG_FT747::get_info()
 	return false;
 }
 
-long RIG_FT747::get_vfoA ()
+unsigned long int RIG_FT747::get_vfoA ()
 {
 	return A.freq;
 }
 
-void RIG_FT747::set_vfoA (long freq)
+void RIG_FT747::set_vfoA (unsigned long int freq)
 {
 	A.freq = freq;
 	freq /=10; // 747 does not support 1 Hz resolution
@@ -196,12 +196,12 @@ void RIG_FT747::set_modeA(int val)
 	sendCommand(cmd);
 }
 
-long RIG_FT747::get_vfoB ()
+unsigned long int RIG_FT747::get_vfoB ()
 {
 	return B.freq;
 }
 
-void RIG_FT747::set_vfoB (long freq)
+void RIG_FT747::set_vfoB (unsigned long int freq)
 {
 	B.freq = freq;
 	freq /=10;

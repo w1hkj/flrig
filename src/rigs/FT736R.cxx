@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <iostream>
@@ -115,7 +115,7 @@ void RIG_FT736R::selectB()
 	set_mode(B.imode);
 }
 
-long RIG_FT736R::get_vfoA ()
+unsigned long int RIG_FT736R::get_vfoA ()
 {
 	return A.freq;
 }
@@ -127,7 +127,7 @@ long RIG_FT736R::get_vfoA ()
 // 430.0 <= f < 450.0 MHz
 // 1.24 <= f < 1.30 GHz
 
-void RIG_FT736R::set_vfo(long freq)
+void RIG_FT736R::set_vfo(unsigned long int freq)
 {
 	if ( freq < 50000000L ) return;
 	if ( freq >= 54000000L && freq < 144000000L ) return;
@@ -154,7 +154,7 @@ void RIG_FT736R::set_vfo(long freq)
 	send();
 }
 
-void RIG_FT736R::set_vfoA (long freq)
+void RIG_FT736R::set_vfoA (unsigned long int freq)
 {
 	A.freq = freq;
 	if (inuse == onB)
@@ -183,12 +183,12 @@ void RIG_FT736R::set_modeA(int val)
 	set_mode(val);
 }
 
-long RIG_FT736R::get_vfoB ()
+unsigned long int RIG_FT736R::get_vfoB ()
 {
 	return B.freq;
 }
 
-void RIG_FT736R::set_vfoB (long freq)
+void RIG_FT736R::set_vfoB (unsigned long int freq)
 {
 	B.freq = freq;
 	if (inuse == onA)

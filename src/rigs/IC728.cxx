@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "IC728.h"
@@ -70,7 +70,7 @@ bool RIG_IC728::check ()
 	return ok;
 }
 
-long RIG_IC728::get_vfoA ()
+unsigned long int RIG_IC728::get_vfoA ()
 {
 	string cstr = "\x03";
 	string resp = pre_fm;
@@ -90,7 +90,7 @@ long RIG_IC728::get_vfoA ()
 	return freqA;
 }
 
-void RIG_IC728::set_vfoA (long freq)
+void RIG_IC728::set_vfoA (unsigned long int freq)
 {
 	freqA = freq;
 	cmd = pre_to;

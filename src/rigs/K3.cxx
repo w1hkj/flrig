@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "K3.h"
@@ -194,7 +194,7 @@ bool RIG_K3::check ()
 	return true;
 }
 
-long RIG_K3::get_vfoA ()
+unsigned long int RIG_K3::get_vfoA ()
 {
 	cmd = "FA;";
 	int ret = wait_char(';', 14, K3_WAIT_TIME, "get vfo A", ASC);
@@ -204,14 +204,14 @@ long RIG_K3::get_vfoA ()
 	size_t p = replystr.rfind("FA");
 	if (p == string::npos) return freqA;
 
-	long f = 0;
+	unsigned long int f = 0;
 	for (size_t n = 2; n < 13; n++)
 		f = f*10 + replystr[p + n] - '0';
 	freqA = f;
 	return freqA;
 }
 
-void RIG_K3::set_vfoA (long freq)
+void RIG_K3::set_vfoA (unsigned long int freq)
 {
 	freqA = freq;
 	cmd = "FA00000000000;";
@@ -224,7 +224,7 @@ void RIG_K3::set_vfoA (long freq)
 	sett("set vfoA");
 }
 
-long RIG_K3::get_vfoB ()
+unsigned long int RIG_K3::get_vfoB ()
 {
 	cmd = "FB;";
 	int ret = wait_char(';', 14, K3_WAIT_TIME, "get vfo B", ASC);
@@ -234,14 +234,14 @@ long RIG_K3::get_vfoB ()
 	size_t p = replystr.rfind("FB");
 	if (p == string::npos) return freqB;
 
-	long f = 0;
+	unsigned long int f = 0;
 	for (size_t n = 2; n < 13; n++)
 		f = f*10 + replystr[p + n] - '0';
 	freqB = f;
 	return freqB;
 }
 
-void RIG_K3::set_vfoB (long freq)
+void RIG_K3::set_vfoB (unsigned long int freq)
 {
 	if (split_on == false) {
 		LOG_INFO("split on");

@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "IC703.h"
@@ -148,7 +148,7 @@ bool RIG_IC703::check ()
 	return ok;
 }
 
-long RIG_IC703::get_vfoA ()
+unsigned long int RIG_IC703::get_vfoA ()
 {
 	if (useB) return A.freq;
 	cmd = pre_to;
@@ -168,7 +168,7 @@ long RIG_IC703::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_IC703::set_vfoA (long freq)
+void RIG_IC703::set_vfoA (unsigned long int freq)
 {
 	A.freq = freq;
 	cmd = pre_to;

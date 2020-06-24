@@ -19,7 +19,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <string>
@@ -333,7 +333,7 @@ bool RIG_IC7300::check ()
 	return ok;
 }
 
-long RIG_IC7300::get_vfoA ()
+unsigned long int RIG_IC7300::get_vfoA ()
 {
 	string resp;
 
@@ -364,7 +364,7 @@ long RIG_IC7300::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_IC7300::set_vfoA (long freq)
+void RIG_IC7300::set_vfoA (unsigned long int freq)
 {
 	A.freq = freq;
 
@@ -380,7 +380,7 @@ void RIG_IC7300::set_vfoA (long freq)
 
 }
 
-long RIG_IC7300::get_vfoB ()
+unsigned long int RIG_IC7300::get_vfoB ()
 {
 	string resp;
 
@@ -411,7 +411,7 @@ long RIG_IC7300::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_IC7300::set_vfoB (long freq)
+void RIG_IC7300::set_vfoB (unsigned long int freq)
 {
 	B.freq = freq;
 
@@ -2025,7 +2025,7 @@ void RIG_IC7300::get_band_selection(int v)
 		igett("get band stack");
 		size_t p = replystr.rfind(pre_fm);
 		if (p != string::npos) {
-			long int bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
+			unsigned long int bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
 			int bandmode = replystr[p+13];
 			int bandfilter = replystr[p+14];
 			int banddata = replystr[p+15] & 0x10;
@@ -2055,7 +2055,7 @@ void RIG_IC7300::get_band_selection(int v)
 
 void RIG_IC7300::set_band_selection(int v)
 {
-	long freq = (useB ? B.freq : A.freq);
+	unsigned long int freq = (useB ? B.freq : A.freq);
 	int fil = (useB ? B.filter : A.filter);
 	int mode = (useB ? B.imode : A.imode);
 

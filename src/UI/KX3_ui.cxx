@@ -50,7 +50,7 @@ void read_KX3()
 	guard_lock serial_lock(&mutex_serial);
 
 	if (progStatus.poll_frequency) {
-		long  freq;
+		unsigned long int freq;
 		freq = selrig->get_vfoA();
 		if (freq != vfoA.freq) {
 			vfoA.freq = freq;

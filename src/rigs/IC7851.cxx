@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "IC7851.h"
@@ -259,7 +259,7 @@ bool RIG_IC7851::check ()
 	return ok;
 }
 
-long RIG_IC7851::get_vfoA ()
+unsigned long int RIG_IC7851::get_vfoA ()
 {
 	if (useB) return A.freq;
 	string resp = pre_fm;
@@ -279,7 +279,7 @@ long RIG_IC7851::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_IC7851::set_vfoA (long freq)
+void RIG_IC7851::set_vfoA (unsigned long int freq)
 {
 	A.freq = freq;
 	cmd = pre_to;
@@ -289,7 +289,7 @@ void RIG_IC7851::set_vfoA (long freq)
 	waitFB("set vfo A");
 }
 
-long RIG_IC7851::get_vfoB ()
+unsigned long int RIG_IC7851::get_vfoB ()
 {
 	if (!useB) return B.freq;
 	string resp = pre_fm;
@@ -309,7 +309,7 @@ long RIG_IC7851::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_IC7851::set_vfoB (long freq)
+void RIG_IC7851::set_vfoB (unsigned long int freq)
 {
 	B.freq = freq;
 	cmd = pre_to;
@@ -1056,7 +1056,7 @@ void RIG_IC7851::get_band_selection(int v)
 		set_trace(2, "get band stack", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(pre_fm);
 		if (p != string::npos) {
-			long int bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
+			unsigned long int bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
 			int bandmode = replystr[p+13];
 			int bandfilter = replystr[p+14];
 			int banddata = replystr[p+15] & 0x10;
@@ -1093,7 +1093,7 @@ void RIG_IC7851::get_band_selection(int v)
 
 void RIG_IC7851::set_band_selection(int v)
 {
-	long freq = (useB ? B.freq : A.freq);
+	unsigned long int freq = (useB ? B.freq : A.freq);
 	int mode = (useB ? B.imode : A.imode);
 
 	cmd.assign(pre_to);
