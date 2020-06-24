@@ -3596,14 +3596,19 @@ void adjust_small_ui()
 	btnPreamp->position( btnPreamp->x(), y);
 	btnPreamp->redraw();
 	btnNOISE->position( btnNOISE->x(), y);
-	btnNOISE->show();
-	btnNOISE->redraw();
 	btnAutoNotch->position( btnAutoNotch->x(), y);
 	btnAutoNotch->redraw();
 	btnTune->position( btnTune->x(), y);
 	btnTune->redraw();
 	btn_tune_on_off->position( btn_tune_on_off->x(), y);
 	btn_tune_on_off->redraw();
+
+	if (selrig->has_noise_reduction) {
+		btnNOISE->show();
+	} else {
+		btnNOISE->hide();
+	}
+	btnNOISE->redraw();
 
 	if (selrig->has_agc_control) {
 		btnAGC->show();
@@ -5196,6 +5201,17 @@ void init_noise_control()
 		sldr_nb_level->deactivate();
 }
 
+void init_split_control()
+{
+	if (selrig->has_split) {
+		btnSplit->show();
+		btnSplit->activate();
+	} else {
+		btnSplit->hide();
+		btnSplit->deactivate();
+	}
+}
+
 void set_init_noise_control()
 {
 	if (selrig->has_noise_control) {
@@ -5206,6 +5222,9 @@ void set_init_noise_control()
 		btnNOISE->value(progStatus.noise);
 		btnNOISE->show();
 		btnNOISE->activate();
+	} else {
+		btnNOISE->hide();
+		btnNOISE->deactivate();
 	}
 }
 
@@ -5559,6 +5578,7 @@ void initRig()
 		init_ptt_control();
 		init_auto_notch();
 		init_swr_control();
+		init_split_control();
 
 		selrig->initialize();
 
@@ -5671,6 +5691,8 @@ void initConfigDialog()
 		cntRigCatRetries->value( srig->comm_retries );
 		cntRigCatTimeout->value( srig->comm_timeout );
 		cntRigCatWait->value( srig->comm_wait );
+		query_interval->value( srig->serloop_timing );
+
 		btnRigCatEcho->value( srig->comm_echo );
 		btncatptt->value( srig->comm_catptt );
 		btnrtsptt->value( srig->comm_rtsptt );
@@ -5724,6 +5746,8 @@ void initStatusConfigDialog()
 	cntRigCatTimeout->value( progStatus.comm_timeout );
 	cntRigCatWait->value( progStatus.comm_wait );
 	btnRigCatEcho->value( progStatus.comm_echo );
+	query_interval->value( progStatus.serloop_timing );
+	byte_interval->value( progStatus.byte_interval );
 
 	btncatptt->value( progStatus.comm_catptt );
 	btnrtsptt->value( progStatus.comm_rtsptt );

@@ -134,6 +134,7 @@ flrig_SOURCES += \
 	rigs/FT100D.cxx \
 	rigs/FT450.cxx \
 	rigs/FT450D.cxx \
+	rigs/FT736R.cxx \
 	rigs/FT747.cxx \
 	rigs/FT767.cxx \
 	rigs/FT817.cxx \
@@ -271,6 +272,7 @@ EXTRA_DIST = \
 	include/FT100D.h \
 	include/FT450.h \
 	include/FT450D.h \
+	include/FT736R.h \
 	include/FT747.h \
 	include/FT767.h \
 	include/FT817.h \

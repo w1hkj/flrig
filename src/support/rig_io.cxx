@@ -210,11 +210,11 @@ int sendCommand (string s, int nread, int wait)
 		return readResponse();
 	}
 
+	LOG_DEBUG("cmd:%3d, %s", (int)s.length(), str2hex(s.data(), s.length()));
+
 	if (RigSerial->IsOpen() == false) {
 		return 0;
 	}
-
-	LOG_DEBUG("cmd:%3d, %s", (int)s.length(), str2hex(s.data(), s.length()));
 
 	RigSerial->FlushBuffer();
 	RigSerial->WriteBuffer(s.c_str(), numwrite);
