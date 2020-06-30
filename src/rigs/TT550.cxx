@@ -947,7 +947,7 @@ void RIG_TT550::fkey_cw_minus()
 	selrig->set_cw_wpm();
 }
 
-struct BANDS { int lo; int hi; int digi; };
+struct BANDS { unsigned int lo; unsigned int hi; unsigned int digi; };
 
 static BANDS ibands[] = {
 { 0, 1800000, 28120000 },

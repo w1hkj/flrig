@@ -248,7 +248,7 @@ void read_vfo()
 {
 // transceiver changed ?
 	trace(1,"read_vfo()");
-	long  freq;
+	unsigned long int  freq;
 	if (!useB) { // vfo-A
 		trace(2, "vfoA active", "get vfo A");
 		freq = selrig->get_vfoA();
