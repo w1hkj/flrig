@@ -40,9 +40,9 @@ Fl_Group *tabXCVR = (Fl_Group *)0;
 	Fl_Check_Button *btnTwoStopBit = (Fl_Check_Button *)0;
 	Fl_Check_Button *btnOneStopBit = (Fl_Check_Button *)0;
 	Fl_Check_Button *btnRigCatEcho = (Fl_Check_Button *)0;
-	Fl_Round_Button *btncatptt = (Fl_Round_Button *)0;
-	Fl_Round_Button *btnrtsptt = (Fl_Round_Button *)0;
-	Fl_Round_Button *btndtrptt = (Fl_Round_Button *)0;
+	Fl_Check_Button *btncatptt = (Fl_Check_Button *)0;
+	Fl_Check_Button *btnrtsptt = (Fl_Check_Button *)0;
+	Fl_Check_Button *btndtrptt = (Fl_Check_Button *)0;
 	Fl_Check_Button *chkrtscts = (Fl_Check_Button *)0;
 	Fl_Check_Button *btnrtsplus = (Fl_Check_Button *)0;
 	Fl_Check_Button *btndtrplus = (Fl_Check_Button *)0;
@@ -116,7 +116,9 @@ Fl_Group *tabSNDCMD = (Fl_Group *)0;
 	Fl_Box *box_xcvr_connect = (Fl_Box *)0;
 	Fl_Box *box_fldigi_connect = (Fl_Box *)0;
 
-Fl_Button *btnOkXcvrDialog = (Fl_Button *)0;
+Fl_Button *btn_init_ser_port = (Fl_Button *)0;
+Fl_Button *btn2_init_ser_port = (Fl_Button *)0;
+
 Fl_Button *btnCloseCommConfig = (Fl_Button *)0;
 Fl_Button *btnOkSepSerial = (Fl_Button *)0;
 Fl_Button *btnOkAuxSerial = (Fl_Button *)0;
@@ -264,8 +266,12 @@ static void cb_btn_viewtrace(Fl_Button *, void *) {
 }
 
 static void cb_selectRig(Fl_ComboBox*, void*) {
-	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw_label();
+	btn_init_ser_port->labelcolor(FL_RED);
+	btn_init_ser_port->redraw_label();
+
+	btn2_init_ser_port->labelcolor(FL_RED);
+	btn2_init_ser_port->redraw_label();
+
 	initConfigDialog();
 }
 
@@ -290,13 +296,19 @@ static void cb_byte_interval(Fl_Counter* o, void*) {
 }
 
 static void cb_selectCommPort(Fl_ComboBox*, void*) {
-	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw_label();
+	btn_init_ser_port->labelcolor(FL_RED);
+	btn_init_ser_port->redraw_label();
+
+	btn2_init_ser_port->labelcolor(FL_RED);
+	btn2_init_ser_port->redraw_label();
 }
 
 static void cb_mnuBaudrate(Fl_ComboBox*, void*) {
-	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw_label();
+	btn_init_ser_port->labelcolor(FL_RED);
+	btn_init_ser_port->redraw_label();
+
+	btn2_init_ser_port->labelcolor(FL_RED);
+	btn2_init_ser_port->redraw_label();
 }
 
 static void cb_btnTwoStopBit(Fl_Check_Button* o, void*) {
@@ -305,8 +317,11 @@ static void cb_btnTwoStopBit(Fl_Check_Button* o, void*) {
 		progStatus.stopbits = 2;
 	} else
 		o->value(true);
-	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw_label();
+	btn_init_ser_port->labelcolor(FL_RED);
+	btn_init_ser_port->redraw_label();
+
+	btn2_init_ser_port->labelcolor(FL_RED);
+	btn2_init_ser_port->redraw_label();
 }
 
 static void cb_btnOneStopBit(Fl_Check_Button* o, void*) {
@@ -315,13 +330,19 @@ static void cb_btnOneStopBit(Fl_Check_Button* o, void*) {
 		progStatus.stopbits = 1;
 	} else
 		o->value(true);
-	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw_label();
+	btn_init_ser_port->labelcolor(FL_RED);
+	btn_init_ser_port->redraw_label();
+
+	btn2_init_ser_port->labelcolor(FL_RED);
+	btn2_init_ser_port->redraw_label();
 }
 
 static void cb_btnRigCatEcho(Fl_Check_Button*, void*) {
-	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw_label();
+	btn_init_ser_port->labelcolor(FL_RED);
+	btn_init_ser_port->redraw_label();
+
+	btn2_init_ser_port->labelcolor(FL_RED);
+	btn2_init_ser_port->redraw_label();
 }
 
 static void cb_tcpip_addr(Fl_Input2* o, void*) {
@@ -359,42 +380,60 @@ static void cb_cntDropsAllowed(Fl_Counter* o, void *) {
 	progStatus.tcpip_drops_allowed = o->value();
 }
 
-static void cb_btncatptt(Fl_Round_Button* o, void*) {
+static void cb_btncatptt(Fl_Check_Button* o, void*) {
 	if (o->value()== 1) {
 		btnrtsptt->value(0);
 		btndtrptt->value(0);
 	}
-	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw_label();
+	btn_init_ser_port->labelcolor(FL_RED);
+	btn_init_ser_port->redraw_label();
+
+	btn2_init_ser_port->labelcolor(FL_RED);
+	btn2_init_ser_port->redraw_label();
 }
 
-static void cb_btnrtsptt(Fl_Round_Button* o, void*) {
+static void cb_btnrtsptt(Fl_Check_Button* o, void*) {
 	if (o->value() == 1)
 		btncatptt->value(0);
-	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw_label();
+	btn_init_ser_port->labelcolor(FL_RED);
+	btn_init_ser_port->redraw_label();
+
+	btn2_init_ser_port->labelcolor(FL_RED);
+	btn2_init_ser_port->redraw_label();
 }
 
-static void cb_btndtrptt(Fl_Round_Button* o, void*) {
+static void cb_btndtrptt(Fl_Check_Button* o, void*) {
 	if (o->value() == 1)
 		btncatptt->value(0);
-	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw_label();
+	btn_init_ser_port->labelcolor(FL_RED);
+	btn_init_ser_port->redraw_label();
+
+	btn2_init_ser_port->labelcolor(FL_RED);
+	btn2_init_ser_port->redraw_label();
 }
 
 static void cb_chkrtscts(Fl_Check_Button*, void*) {
-	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw_label();
+	btn_init_ser_port->labelcolor(FL_RED);
+	btn_init_ser_port->redraw_label();
+
+	btn2_init_ser_port->labelcolor(FL_RED);
+	btn2_init_ser_port->redraw_label();
 }
 
 static void cb_btnrtsplus(Fl_Check_Button*, void*) {
-	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw_label();
+	btn_init_ser_port->labelcolor(FL_RED);
+	btn_init_ser_port->redraw_label();
+
+	btn2_init_ser_port->labelcolor(FL_RED);
+	btn2_init_ser_port->redraw_label();
 }
 
 static void cb_btndtrplus(Fl_Check_Button*, void*) {
-	btnOkXcvrDialog->labelcolor(FL_RED);
-	btnOkXcvrDialog->redraw_label();
+	btn_init_ser_port->labelcolor(FL_RED);
+	btn_init_ser_port->redraw_label();
+
+	btn2_init_ser_port->labelcolor(FL_RED);
+	btn2_init_ser_port->redraw_label();
 }
 
 static void cb_txtCIV(Fl_Int_Input* o, void*) {
@@ -447,6 +486,10 @@ static void cb_selectAuxPort(Fl_ComboBox*, void*) {
 static void cb_btnAux_SCU_17(Fl_Check_Button*, void*) {
 	btnOkAuxSerial->labelcolor(FL_RED);
 	btnOkAuxSerial->redraw_label();
+}
+
+static void cb_disable_CW_ptt(Fl_Check_Button *btn, void*) {
+	progStatus.disable_CW_ptt = btn->value();
 }
 
 static void cb_server_port(Fl_Input2* o, void*) {
@@ -702,7 +745,7 @@ static void cb_shftcmdtext(Fl_Input2 *o, void *d) {
 	*cmd[val] = o->value();
 }
 
-static void cb_btnOkXcvrDialog(Fl_Return_Button*, void*) {
+static void cb_init_ser_port(Fl_Return_Button*, void*) {
 	string p1 = selectCommPort->value();
 	string p2 = selectAuxPort->value();
 	string p3 = selectSepPTTPort->value();
@@ -766,8 +809,11 @@ static void cb_btnOkXcvrDialog(Fl_Return_Button*, void*) {
 
 	initRig();
 
-	btnOkXcvrDialog->labelcolor(FL_BLACK);
-	btnOkXcvrDialog->redraw_label();
+	btn_init_ser_port->labelcolor(FL_BLACK);
+	btn_init_ser_port->redraw_label();
+
+	btn2_init_ser_port->labelcolor(FL_BLACK);
+	btn2_init_ser_port->redraw_label();
 }
 
 static void cb_btnOkSepSerial(Fl_Button*, void*) {
@@ -854,10 +900,12 @@ Fl_Group *createXCVR(int X, int Y, int W, int H, const char *label)
 {
 	Fl_Group *tabXCVR = new Fl_Group(X, Y, W, H, label);
 
-	Fl_Group* xcr_grp1 = new Fl_Group(X + 4, Y + 4, W - 10, 142);
-		xcr_grp1->box(FL_ENGRAVED_FRAME);
+	Fl_Group* xcvr_grp1 = new Fl_Group(X + 2, Y + 2, W - 4, 200);
+		xcvr_grp1->box(FL_ENGRAVED_FRAME);
 
-		selectRig = new Fl_ComboBox(X + 60, Y + 10, 240, 22, _("Rig:"));
+		selectRig = new Fl_ComboBox(
+			xcvr_grp1->x() + 60, xcvr_grp1->y() + 4,
+			xcvr_grp1->w() - 64, 22, _("Rig:"));
 		selectRig->tooltip(_("Select Transceiver"));
 		selectRig->box(FL_DOWN_BOX);
 		selectRig->color(FL_BACKGROUND2_COLOR);
@@ -872,14 +920,17 @@ Fl_Group *createXCVR(int X, int Y, int W, int H, const char *label)
 		selectRig->when(FL_WHEN_RELEASE);
 		selectRig->end();
 
-		Fl_Button *comports = new Fl_Button(X + 8, Y + 35,
-						50, 22, _("Update"));
+		Fl_Button *comports = new Fl_Button(
+			xcvr_grp1->x() + 4, selectRig->y() + 26,
+			52, 22, _("Update"));
 		comports->box(FL_THIN_UP_BOX);
 		comports->tooltip(_("Update serial port combo"));
 		comports->callback((Fl_Callback*)cb_comports);
 		comports->when(FL_WHEN_RELEASE);
 
-		selectCommPort = new Fl_ComboBox(X + 60, Y + 35, 240, 22, "");
+		selectCommPort = new Fl_ComboBox(
+			selectRig->x(), comports->y(),
+			selectRig->w(), 22, "");
 		selectCommPort->tooltip(_("Xcvr serial port"));
 		selectCommPort->box(FL_DOWN_BOX);
 		selectCommPort->color(FL_BACKGROUND2_COLOR);
@@ -893,7 +944,9 @@ Fl_Group *createXCVR(int X, int Y, int W, int H, const char *label)
 		selectCommPort->when(FL_WHEN_RELEASE);
 		selectCommPort->end();
 
-		mnuBaudrate = new Fl_ComboBox(X + 60, Y + 60, 240, 22, _("Baud:"));
+		mnuBaudrate = new Fl_ComboBox(
+			selectCommPort->x(), selectCommPort->y() + 26,
+			160, 22, _("Baud:"));
 		mnuBaudrate->tooltip(_("Xcvr baudrate"));
 		mnuBaudrate->box(FL_DOWN_BOX);
 		mnuBaudrate->color(FL_BACKGROUND2_COLOR);
@@ -908,26 +961,42 @@ Fl_Group *createXCVR(int X, int Y, int W, int H, const char *label)
 		mnuBaudrate->when(FL_WHEN_RELEASE);
 		mnuBaudrate->end();
 
-		btnOneStopBit = new Fl_Check_Button(X + 20, Y + 88, 22, 15, _("1"));
+		btnOneStopBit = new Fl_Check_Button(
+			mnuBaudrate->x(), mnuBaudrate->y() + 26,
+			22, 22, _("1"));
 		btnOneStopBit->tooltip(_("One Stop Bit"));
 		btnOneStopBit->down_box(FL_DOWN_BOX);
 		btnOneStopBit->callback((Fl_Callback*)cb_btnOneStopBit);
 		btnOneStopBit->align(Fl_Align(FL_ALIGN_RIGHT));
 		btnOneStopBit->value(progStatus.stopbits == 1);
 
-		btnTwoStopBit = new Fl_Check_Button(X + 120, Y + 88, 22, 15, _("2 -StopBits"));
+		btnTwoStopBit = new Fl_Check_Button(
+			btnOneStopBit->x() + 120, btnOneStopBit->y(),
+			22, 22, _("2 -StopBits"));
 		btnTwoStopBit->down_box(FL_DOWN_BOX);
 		btnTwoStopBit->callback((Fl_Callback*)cb_btnTwoStopBit);
 		btnTwoStopBit->align(Fl_Align(FL_ALIGN_RIGHT));
 		btnTwoStopBit->value(progStatus.stopbits == 2);
 
-		btnRigCatEcho = new Fl_Check_Button(X + 20, Y + 113, 22, 15, _("Echo "));
+		btnRigCatEcho = new Fl_Check_Button(
+			btnOneStopBit->x(), btnOneStopBit->y() + 26,
+			22, 22, _("Echo "));
 		btnRigCatEcho->down_box(FL_DOWN_BOX);
 		btnRigCatEcho->callback((Fl_Callback*)cb_btnRigCatEcho);
 		btnRigCatEcho->align(Fl_Align(FL_ALIGN_RIGHT));
 		btnRigCatEcho->value(progStatus.comm_echo);
 
-		cntRigCatRetries = new Fl_Counter(X + 370, Y + 10, 110, 22, _("Retries"));
+		chkrtscts = new Fl_Check_Button(
+			btnTwoStopBit->x(), btnRigCatEcho->y(),
+			22, 22, _("RTS/CTS"));
+		chkrtscts->tooltip(_("Xcvr uses RTS/CTS handshake"));
+		chkrtscts->down_box(FL_DOWN_BOX);
+		chkrtscts->callback((Fl_Callback*)cb_chkrtscts);
+		chkrtscts->value(progStatus.comm_rtscts);
+
+		cntRigCatRetries = new Fl_Counter(
+			xcvr_grp1->x() + xcvr_grp1->w() - 110 - 4, mnuBaudrate->y(),
+			110, 22, _("Retries"));
 		cntRigCatRetries->tooltip(_("Number of  times to resend\ncommand before giving up"));
 		cntRigCatRetries->minimum(1);
 		cntRigCatRetries->maximum(10);
@@ -938,7 +1007,9 @@ Fl_Group *createXCVR(int X, int Y, int W, int H, const char *label)
 		cntRigCatRetries->value(progStatus.comm_retries);
 		cntRigCatRetries->lstep(10);
 
-		cntRigCatTimeout = new Fl_Counter(X + 370, Y + 35, 110, 22, _("Retry intvl"));
+		cntRigCatTimeout = new Fl_Counter(
+			cntRigCatRetries->x(), btnOneStopBit->y(),
+			110, 22, _("Retry intvl"));
 		cntRigCatTimeout->tooltip(_("Time between retries is msec"));
 		cntRigCatTimeout->minimum(2);
 		cntRigCatTimeout->maximum(200);
@@ -949,7 +1020,9 @@ Fl_Group *createXCVR(int X, int Y, int W, int H, const char *label)
 		cntRigCatTimeout->value(progStatus.comm_timeout);
 		cntRigCatTimeout->lstep(10);
 
-		cntRigCatWait = new Fl_Counter(X + 370, Y + 60, 110, 22, _("Cmds"));
+		cntRigCatWait = new Fl_Counter(
+			cntRigCatRetries->x(), btnRigCatEcho->y(),
+			110, 22, _("Cmds"));
 		cntRigCatWait->tooltip(_("Wait millseconds between sequential commands"));
 		cntRigCatWait->minimum(0);
 		cntRigCatWait->maximum(100);
@@ -960,7 +1033,9 @@ Fl_Group *createXCVR(int X, int Y, int W, int H, const char *label)
 		cntRigCatWait->value(progStatus.comm_wait);
 		cntRigCatWait->lstep(10);
 
-		query_interval = new Fl_Counter(X + 370, Y + 85, 110, 22, _("Poll intvl"));
+		query_interval = new Fl_Counter(
+			cntRigCatRetries->x(), cntRigCatWait->y() + 26,
+			110, 22, _("Poll intvl"));
 		query_interval->tooltip(_("Polling interval in msec"));
 		query_interval->minimum(10);
 		query_interval->maximum(5000);
@@ -971,7 +1046,9 @@ Fl_Group *createXCVR(int X, int Y, int W, int H, const char *label)
 		query_interval->value(progStatus.serloop_timing);
 		query_interval->lstep(10);
 
-		byte_interval = new Fl_Counter(X + 370, Y + 110, 110, 22, _("Byte intvl"));
+		byte_interval = new Fl_Counter(
+			cntRigCatRetries->x(), query_interval->y() + 26,
+			110, 22, _("Byte intvl"));
 		byte_interval->tooltip(_("Inter-byte interval (msec)"));
 		byte_interval->minimum(0);
 		byte_interval->maximum(200);
@@ -982,81 +1059,54 @@ Fl_Group *createXCVR(int X, int Y, int W, int H, const char *label)
 		byte_interval->value(progStatus.byte_interval);
 		byte_interval->lstep(10);
 
-	xcr_grp1->end();
+		Fl_Group* xcvr_grp4 = new Fl_Group(
+			xcvr_grp1->x() + 2, xcvr_grp1->y() + xcvr_grp1->h() - 38, 
+			150, 36);
+		xcvr_grp4->box(FL_ENGRAVED_FRAME);
+		xcvr_grp4->align(Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE));
 
-	Fl_Group* xcr_grp4 = new Fl_Group(X + 5, Y + 150, (W - 10)/2, 74);
-		xcr_grp4->box(FL_ENGRAVED_FRAME);
+			txtCIV = new Fl_Int_Input(
+				xcvr_grp4->x() + 4, xcvr_grp4->y() + 8,
+				58, 22, _("CI-V adr"));
+			txtCIV->tooltip(_("Enter hex value, ie: 0x5F"));
+			txtCIV->type(2);
+			txtCIV->callback((Fl_Callback*)cb_txtCIV);
+			txtCIV->align(Fl_Align(FL_ALIGN_RIGHT));
 
-		btncatptt = new Fl_Round_Button(X + 15, Y + 155, 149, 22, _("PTT via CAT"));
-		btncatptt->tooltip(_("PTT is a CAT command (not hardware)"));
-		btncatptt->down_box(FL_ROUND_DOWN_BOX);
-		btncatptt->callback((Fl_Callback*)cb_btncatptt);
-		btncatptt->value(progStatus.comm_catptt);
+			btnCIVdefault = new Fl_Button(
+				txtCIV->x() + txtCIV->w() + 4, txtCIV->y(),
+				70, 22, _("Default"));
+			btnCIVdefault->callback((Fl_Callback*)cb_btnCIVdefault);
 
-		btnrtsptt = new Fl_Round_Button(X + 15, Y + 175, 149, 22, _("PTT via RTS"));
-		btnrtsptt->tooltip(_("RTS is ptt line"));
-		btnrtsptt->down_box(FL_ROUND_DOWN_BOX);
-		btnrtsptt->callback((Fl_Callback*)cb_btnrtsptt);
-		btnrtsptt->value(progStatus.comm_rtsptt);
+		xcvr_grp4->end();
 
-		btndtrptt = new Fl_Round_Button(X + 15, Y + 195, 149, 22, _("PTT via DTR"));
-		btndtrptt->tooltip(_("DTR is ptt line"));
-		btndtrptt->down_box(FL_ROUND_DOWN_BOX);
-		btndtrptt->callback((Fl_Callback*)cb_btndtrptt);
-		btndtrptt->value(progStatus.comm_dtrptt);
+	xcvr_grp1->end();
 
-		chkrtscts = new Fl_Check_Button(X + 129, Y + 155, 98, 21, _("RTS/CTS"));
-		chkrtscts->tooltip(_("Xcvr uses RTS/CTS handshake"));
-		chkrtscts->down_box(FL_DOWN_BOX);
-		chkrtscts->callback((Fl_Callback*)cb_chkrtscts);
-		chkrtscts->value(progStatus.comm_rtscts);
+	Fl_Group* xcvr_grp5 = new Fl_Group(
+		xcvr_grp1->x(), xcvr_grp1->y() + xcvr_grp1->h() + 2,
+		152, H - xcvr_grp1->y() - xcvr_grp1->h() - 4);
+	xcvr_grp5->box(FL_ENGRAVED_FRAME);
 
-		btnrtsplus = new Fl_Check_Button(X + 129, Y + 175, 102, 21, _("RTS +12 v"));
-		btnrtsplus->tooltip(_("Initial state of RTS"));
-		btnrtsplus->down_box(FL_DOWN_BOX);
-		btnrtsplus->callback((Fl_Callback*)cb_btnrtsplus);
-		btnrtsplus->value(progStatus.comm_rtsplus);
-
-		btndtrplus = new Fl_Check_Button(X + 129, Y + 195, 100, 21, _("DTR +12 v"));
-		btndtrplus->tooltip(_("Initial state of DTR"));
-		btndtrplus->down_box(FL_DOWN_BOX);
-		btndtrplus->callback((Fl_Callback*)cb_btndtrplus);
-		btndtrplus->value(progStatus.comm_dtrplus);
-
-	xcr_grp4->end();
-
-	Fl_Group* xcr_grp5 = new Fl_Group(X + W/2, Y + 150, (W-10)/2, 36);
-		xcr_grp5->box(FL_ENGRAVED_FRAME);
-		xcr_grp5->align(Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE));
-
-		txtCIV = new Fl_Int_Input(X + 261, Y + 155, 58, 22, _("CI-V adr"));
-		txtCIV->tooltip(_("Enter hex value, ie: 0x5F"));
-		txtCIV->type(2);
-		txtCIV->callback((Fl_Callback*)cb_txtCIV);
-		txtCIV->align(Fl_Align(FL_ALIGN_RIGHT));
-
-		btnCIVdefault = new Fl_Button(X + 387, Y + 155, 69, 22, _("Default"));
-		btnCIVdefault->callback((Fl_Callback*)cb_btnCIVdefault);
-
-	xcr_grp5->end();
-
-	Fl_Group* xcr_grp6 = new Fl_Group(X + W/2, Y + 188, 120, 36);
-		xcr_grp6->box(FL_ENGRAVED_FRAME);
-
-		btnUSBaudio = new Fl_Check_Button(X + 250, Y + 200, 100, 15, _("USB audio"));
+		btnUSBaudio = new Fl_Check_Button(
+			xcvr_grp5->x() + 4, xcvr_grp5->y() + xcvr_grp5->h()  / 2 - 9,
+			100, 18, _("USB audio"));
 		btnUSBaudio->down_box(FL_DOWN_BOX);
 		btnUSBaudio->callback((Fl_Callback*)cb_btnUSBaudio);
 
-	xcr_grp6->end();
+	xcvr_grp5->end();
 
-	box_xcvr_connect = new Fl_Box(X + W - 100, Y + H - 50, 18, 18, _("Connected"));
+	box_xcvr_connect = new Fl_Box(
+		X + W - 90, Y + H - 27,
+		18, 18, _("Connected"));
 	box_xcvr_connect->tooltip(_("Lit when connected"));
 	box_xcvr_connect->box(FL_DIAMOND_DOWN_BOX);
 	box_xcvr_connect->color(FL_LIGHT1);
-	box_xcvr_connect->align(Fl_Align(FL_ALIGN_RIGHT));
+	box_xcvr_connect->align(Fl_Align(FL_ALIGN_LEFT));
 
-	btnOkXcvrDialog = new Fl_Button(X + W - 60, Y + H - 30, 50, 24, _("Init"));
-	btnOkXcvrDialog->callback((Fl_Callback*)cb_btnOkXcvrDialog);
+	btn_init_ser_port = new Fl_Button(
+		X + W - 60, Y + H - 30,
+		50, 24, _("Init"));
+	btn_init_ser_port->callback((Fl_Callback*)cb_init_ser_port);
 
 	tabXCVR->end();
 
@@ -1152,7 +1202,6 @@ Fl_Group *createTCPIP(int X, int Y, int W, int H, const char *label)
 
 		chk_use_tcpip = new Fl_Check_Button(X + 120, Y + 95, 18, 18, _("Use tcpip"));
 		chk_use_tcpip->tooltip(_("Rig control via tcpip"));
-		chk_use_tcpip->down_box(FL_DOWN_BOX);
 		chk_use_tcpip->callback((Fl_Callback*)cb_use_tcpip);
 		chk_use_tcpip->value(progStatus.use_tcpip);
 		chk_use_tcpip->align(Fl_Align(FL_ALIGN_LEFT));
@@ -1193,53 +1242,123 @@ Fl_Group *createPTT(int X, int Y, int W, int H, const char *label)
 	Fl_Group *tabPTT = new Fl_Group(X, Y, W, H, label);
 	tabPTT->hide();
 
-	Fl_Box *bxptt = new Fl_Box(X + 50, Y + 30, 400, 40,
-_("Use only if your setup requires a separate\nSerial Port for a PTT control line"));
-	bxptt->box(FL_FLAT_BOX);
+	Fl_Group *grp_CW_ptt = new Fl_Group(X + 2, Y + 20, W - 4, 30, 
+		_("CW mode PTT"));
+		grp_CW_ptt->box(FL_ENGRAVED_BOX);
+		grp_CW_ptt->align(Fl_Align(FL_ALIGN_TOP_LEFT));
 
-	selectSepPTTPort = new Fl_ComboBox(X + 120, Y + 80, 240, 22, _("PTT Port"));
-	selectSepPTTPort->tooltip(_("Aux control port"));
-	selectSepPTTPort->box(FL_DOWN_BOX);
-	selectSepPTTPort->color(FL_BACKGROUND2_COLOR);
-	selectSepPTTPort->selection_color(FL_BACKGROUND_COLOR);
-	selectSepPTTPort->labeltype(FL_NORMAL_LABEL);
-	selectSepPTTPort->labelfont(0);
-	selectSepPTTPort->labelsize(14);
-	selectSepPTTPort->labelcolor(FL_FOREGROUND_COLOR);
-	selectSepPTTPort->callback((Fl_Callback*)cb_selectSepPTTPort);
-	selectSepPTTPort->align(Fl_Align(FL_ALIGN_LEFT));
-	selectSepPTTPort->when(FL_WHEN_RELEASE);
-	selectSepPTTPort->end();
+		Fl_Check_Button *btn_disable_CW_ptt = new Fl_Check_Button(
+			grp_CW_ptt->x() + 10, grp_CW_ptt->y() + 4, 200, 22,
+			_("disable PTT in CW mode"));
+			btn_disable_CW_ptt->value(progStatus.disable_CW_ptt);
+			btn_disable_CW_ptt->callback((Fl_Callback*)cb_disable_CW_ptt); 
 
-	btnSepRTSptt = new Fl_Check_Button(X + 120, Y + 110, 128, 22, _("PTT via RTS"));
-	btnSepRTSptt->tooltip(_("RTS is ptt line"));
-	btnSepRTSptt->callback((Fl_Callback*)cb_btnSepRTSptt);
-	btnSepRTSptt->value(progStatus.sep_rtsptt);
+	grp_CW_ptt->end();
 
-	btnSepRTSplus = new Fl_Check_Button(X + 265, Y + 110, 128, 22, _("RTS +12 v"));
-	btnSepRTSplus->tooltip(_("Initial state of RTS"));
-	btnSepRTSplus->down_box(FL_DOWN_BOX);
-	btnSepRTSplus->callback((Fl_Callback*)cb_btnSepRTSplus);
-	btnSepRTSplus->value(progStatus.sep_rtsplus);
+	Fl_Group *grp_catptt = new Fl_Group (
+		grp_CW_ptt->x(), grp_CW_ptt->y() + grp_CW_ptt->h() + 20,
+		grp_CW_ptt->w(), 60, _("CAT Port PTT options"));
+	grp_catptt->box(FL_ENGRAVED_BOX);
+	grp_catptt->align(Fl_Align(FL_ALIGN_TOP_LEFT));
 
-	btnSepDTRptt = new Fl_Check_Button(X + 120, Y + 135, 128, 22, _("PTT via DTR"));
-	btnSepDTRptt->tooltip(_("DTR is ptt line"));
-	btnSepDTRptt->callback((Fl_Callback*)cb_btnSepDTRptt);
-	btnSepDTRptt->value(progStatus.sep_dtrptt);
+		int incr = (grp_CW_ptt->w() - 10) / 4;
 
-	btnSepDTRplus = new Fl_Check_Button(X + 265, Y + 135, 128, 22, _("DTR +12 v"));
-	btnSepDTRplus->tooltip(_("Initial state of DTR"));
-	btnSepDTRplus->down_box(FL_DOWN_BOX);
-	btnSepDTRplus->callback((Fl_Callback*)cb_btnSepDTRplus);
-	btnSepDTRplus->value(progStatus.sep_dtrplus);
+		btncatptt = new Fl_Check_Button(
+			grp_catptt->x() + 10, grp_catptt->y() + 5, 100, 22, _("PTT via CAT"));
+		btncatptt->tooltip(_("PTT is a CAT command (not hardware)"));
+		btncatptt->callback((Fl_Callback*)cb_btncatptt);
+		btncatptt->value(progStatus.comm_catptt);
 
-	btnSep_SCU_17 = new Fl_Check_Button(X + 120, Y + 160, 128, 22, _("Serial Port is SCU-17 auxiliary"));
-	btnSep_SCU_17->tooltip(_("Set stop bits to ZERO"));
-	btnSep_SCU_17->callback((Fl_Callback*)cb_btnSep_SCU_17);
-	btnSep_SCU_17->value(progStatus.sep_SCU_17);
+		btnrtsptt = new Fl_Check_Button(
+			btncatptt->x() + incr, grp_catptt->y() + 5, 100, 22, _("PTT via RTS"));
+		btnrtsptt->tooltip(_("RTS is ptt line"));
+		btnrtsptt->callback((Fl_Callback*)cb_btnrtsptt);
+		btnrtsptt->value(progStatus.comm_rtsptt);
 
-	btnOkSepSerial = new Fl_Button(X + W - 60, Y + H - 30, 50, 24, _("Init"));
-	btnOkSepSerial->callback((Fl_Callback*)cb_btnOkSepSerial);
+		btndtrptt = new Fl_Check_Button(
+			btnrtsptt->x() + incr, grp_catptt->y() + 5, 100, 22, _("PTT via DTR"));
+		btndtrptt->tooltip(_("DTR is ptt line"));
+		btndtrptt->callback((Fl_Callback*)cb_btndtrptt);
+		btndtrptt->value(progStatus.comm_dtrptt);
+
+		btnrtsplus = new Fl_Check_Button(
+			btnrtsptt->x(), btnrtsptt->y() + 24, 102, 21, _("RTS +12 v"));
+		btnrtsplus->tooltip(_("Initial state of RTS"));
+		btnrtsplus->callback((Fl_Callback*)cb_btnrtsplus);
+		btnrtsplus->value(progStatus.comm_rtsplus);
+
+		btndtrplus = new Fl_Check_Button(
+			btndtrptt->x(), btndtrptt->y() + 24, 100, 21, _("DTR +12 v"));
+		btndtrplus->tooltip(_("Initial state of DTR"));
+		btndtrplus->callback((Fl_Callback*)cb_btndtrplus);
+		btndtrplus->value(progStatus.comm_dtrplus);
+
+		btn2_init_ser_port = new Fl_Button(
+			btndtrptt->x() + incr, btndtrplus->y(), 50, 24, _("Init"));
+		btn2_init_ser_port->callback((Fl_Callback*)cb_init_ser_port);
+
+	grp_catptt->end();
+
+	Fl_Group *grp_ptt = new Fl_Group(
+		grp_catptt->x(), grp_catptt->y() + grp_catptt->h() + 20,
+		grp_catptt->w(), H - (grp_catptt->y() + grp_catptt->h() + 20),
+_("PTT control on Separate Serial Port"));
+		grp_ptt->box(FL_ENGRAVED_BOX);
+		grp_ptt->align(Fl_Align(FL_ALIGN_TOP_LEFT));
+
+		selectSepPTTPort = new Fl_ComboBox(
+			grp_catptt->x() + 50, grp_ptt->y() + 8,
+			grp_ptt->w() - 54, 22, _("Port"));
+		selectSepPTTPort->tooltip(_("Separate PTT serial port"));
+		selectSepPTTPort->box(FL_DOWN_BOX);
+		selectSepPTTPort->color(FL_BACKGROUND2_COLOR);
+		selectSepPTTPort->selection_color(FL_BACKGROUND_COLOR);
+		selectSepPTTPort->labeltype(FL_NORMAL_LABEL);
+		selectSepPTTPort->labelfont(0);
+		selectSepPTTPort->labelsize(14);
+		selectSepPTTPort->labelcolor(FL_FOREGROUND_COLOR);
+		selectSepPTTPort->callback((Fl_Callback*)cb_selectSepPTTPort);
+		selectSepPTTPort->align(Fl_Align(FL_ALIGN_LEFT));
+		selectSepPTTPort->when(FL_WHEN_RELEASE);
+		selectSepPTTPort->end();
+
+		btnSep_SCU_17 = new Fl_Check_Button(
+			selectSepPTTPort->x(), selectSepPTTPort->y() + 24,
+			128, 22, _("SCU-17"));
+		btnSep_SCU_17->tooltip(_("Port is SCU-17 auxilliary\nSet stop bits to ZERO"));
+		btnSep_SCU_17->callback((Fl_Callback*)cb_btnSep_SCU_17);
+		btnSep_SCU_17->value(progStatus.sep_SCU_17);
+
+		btnSepRTSptt = new Fl_Check_Button(
+			btnrtsptt->x(), selectSepPTTPort->y() + 24, 125, 22, _("PTT via RTS"));
+		btnSepRTSptt->tooltip(_("RTS is ptt line"));
+		btnSepRTSptt->callback((Fl_Callback*)cb_btnSepRTSptt);
+		btnSepRTSptt->value(progStatus.sep_rtsptt);
+
+		btnSepDTRptt = new Fl_Check_Button(
+			btndtrptt->x(), btnSepRTSptt->y(), 125, 22, _("PTT via DTR"));
+		btnSepDTRptt->tooltip(_("DTR is ptt line"));
+		btnSepDTRptt->callback((Fl_Callback*)cb_btnSepDTRptt);
+		btnSepDTRptt->value(progStatus.sep_dtrptt);
+
+		btnSepRTSplus = new Fl_Check_Button(
+			btnrtsptt->x(), btnSepRTSptt->y() + 24, 125, 22, _("RTS +12 v"));
+		btnSepRTSplus->tooltip(_("Initial state of RTS"));
+		btnSepRTSplus->callback((Fl_Callback*)cb_btnSepRTSplus);
+		btnSepRTSplus->value(progStatus.sep_rtsplus);
+
+		btnSepDTRplus = new Fl_Check_Button(
+			btndtrptt->x(), btnSepRTSplus->y(), 125, 22, _("DTR +12 v"));
+		btnSepDTRplus->tooltip(_("Initial state of DTR"));
+		btnSepDTRplus->callback((Fl_Callback*)cb_btnSepDTRplus);
+		btnSepDTRplus->value(progStatus.sep_dtrplus);
+
+		btnOkSepSerial = new Fl_Button(
+			btnSepDTRptt->x() + incr, btnSepDTRplus->y(),
+			50, 22, _("Init"));
+		btnOkSepSerial->callback((Fl_Callback*)cb_btnOkSepSerial);
+
+	grp_ptt->end();
 
 	tabPTT->end();
 
@@ -1312,9 +1431,9 @@ Fl_Group *createPOLLING(int X, int Y, int W, int H, const char *label)
 	tabPOLLING = new Fl_Group(X, Y, W, H, label);
 	tabPOLLING->hide();
 
-	Fl_Group* xcr_grp7 = new Fl_Group(X + 5, Y + 5, W - 10, 45, _("Meters"));
-		xcr_grp7->box(FL_ENGRAVED_BOX);
-		xcr_grp7->align(Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE));
+	Fl_Group* xcvr_grp7 = new Fl_Group(X + 5, Y + 5, W - 10, 45, _("Meters"));
+		xcvr_grp7->box(FL_ENGRAVED_BOX);
+		xcvr_grp7->align(Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE));
 
 		poll_smeter = new Fl_Value_Input(X + 10, Y + 25, 30, 20, _("S-mtr"));
 		poll_smeter->tooltip(_("Poll every Nth interval"));
@@ -1365,10 +1484,10 @@ Fl_Group *createPOLLING(int X, int Y, int W, int H, const char *label)
 		poll_meters->align(Fl_Align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE));
 		poll_meters->value(progStatus.poll_meters);
 
-	xcr_grp7->end();
-	Fl_Group* xcr_grp8 = new Fl_Group(X + 5, Y + 50, W - 10, 45, _("Operating Controls"));
-		xcr_grp8->box(FL_ENGRAVED_BOX);
-		xcr_grp8->align(Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE));
+	xcvr_grp7->end();
+	Fl_Group* xcvr_grp8 = new Fl_Group(X + 5, Y + 50, W - 10, 45, _("Operating Controls"));
+		xcvr_grp8->box(FL_ENGRAVED_BOX);
+		xcvr_grp8->align(Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE));
 
 		poll_frequency = new Fl_Value_Input(X + 10, Y + 70, 30, 20, _("Freq"));
 		poll_frequency->tooltip(_("Poll xcvr frequency"));
@@ -1410,11 +1529,11 @@ Fl_Group *createPOLLING(int X, int Y, int W, int H, const char *label)
 		poll_ops->align(Fl_Align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE));
 		poll_ops->value(progStatus.poll_ops);
 
-		xcr_grp8->end();
+		xcvr_grp8->end();
 
-	Fl_Group* xcr_grp9 = new Fl_Group(X + 5, Y + 95, W - 10, 130, _("Additional Controls"));
-		xcr_grp9->box(FL_ENGRAVED_FRAME);
-		xcr_grp9->align(Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE));
+	Fl_Group* xcvr_grp9 = new Fl_Group(X + 5, Y + 95, W - 10, 130, _("Additional Controls"));
+		xcvr_grp9->box(FL_ENGRAVED_FRAME);
+		xcvr_grp9->align(Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE));
 
 		poll_volume = new Fl_Value_Input(X + 10, Y + 115, 30, 20, _("Volume"));
 		poll_volume->tooltip(_("Volume control"));
@@ -1540,7 +1659,7 @@ Fl_Group *createPOLLING(int X, int Y, int W, int H, const char *label)
 		poll_all->align(Fl_Align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE));
 		poll_all->value(progStatus.poll_all);
 
-	xcr_grp9->end();
+	xcvr_grp9->end();
 
 	tabPOLLING->end();
 
@@ -1774,126 +1893,108 @@ Fl_Group *createRestore(int X, int Y, int W, int H, const char *label)
 
 	btnRestoreFrequency = new Fl_Check_Button(X + 8, Y + 40, 20, 20, _("Freq"));
 	btnRestoreFrequency->tooltip(_("Restore frequency"));
-	btnRestoreFrequency->down_box(FL_DOWN_BOX);
 	btnRestoreFrequency->callback((Fl_Callback*)cb_restore);
 	btnRestoreFrequency->align(Fl_Align(FL_ALIGN_RIGHT));
 	btnRestoreFrequency->value(progStatus.restore_frequency == 1);
 
 	btnRestoreMode = new Fl_Check_Button(X + 8, Y + 65, 20, 20, _("Mode"));
 	btnRestoreMode->tooltip(_("Restore Mode"));
-	btnRestoreMode->down_box(FL_DOWN_BOX);
 	btnRestoreMode->callback((Fl_Callback*)cb_restore);
 	btnRestoreMode->align(Fl_Align(FL_ALIGN_RIGHT));
 	btnRestoreMode->value(progStatus.restore_mode == 1);
 
 	btnRestoreBandwidth = new Fl_Check_Button(X + 8, Y + 90, 20, 20, _("Bandwidth"));
 	btnRestoreBandwidth->tooltip(_("Restore bandwidth"));
-	btnRestoreBandwidth->down_box(FL_DOWN_BOX);
 	btnRestoreBandwidth->callback((Fl_Callback*)cb_restore);
 	btnRestoreBandwidth->align(Fl_Align(FL_ALIGN_RIGHT));
 	btnRestoreBandwidth->value(progStatus.restore_bandwidth == 1);
 
 	btnRestoreVolume = new Fl_Check_Button(X + 8, Y + 115, 20, 20, _("Volume"));
 	btnRestoreVolume->tooltip(_("Restore volume control"));
-	btnRestoreVolume->down_box(FL_DOWN_BOX);
 	btnRestoreVolume->callback((Fl_Callback*)cb_restore);
 	btnRestoreVolume->align(Fl_Align(FL_ALIGN_RIGHT));
 	btnRestoreVolume->value(progStatus.restore_volume == 1);
 
 	btnRestoreMicGain = new Fl_Check_Button(X + 8, Y + 140, 20, 20, _("Mic gain"));
 	btnRestoreMicGain->tooltip(_("Restore mic gain"));
-	btnRestoreMicGain->down_box(FL_DOWN_BOX);
 	btnRestoreMicGain->callback((Fl_Callback*)cb_restore);
 	btnRestoreMicGain->align(Fl_Align(FL_ALIGN_RIGHT));
 	btnRestoreMicGain->value(progStatus.restore_mic_gain == 1);
 
 	btnRestoreRfGain = new Fl_Check_Button(X + 8, Y + 165, 20, 20, _("RF gain"));
 	btnRestoreRfGain->tooltip(_("Restore RF gain"));
-	btnRestoreRfGain->down_box(FL_DOWN_BOX);
 	btnRestoreRfGain->callback((Fl_Callback*)cb_restore);
 	btnRestoreRfGain->align(Fl_Align(FL_ALIGN_RIGHT));
 	btnRestoreRfGain->value(progStatus.restore_rf_gain == 1);
 
 	btnRestorePowerControl = new Fl_Check_Button(X + 8, Y + 190, 20, 20, _("Pwr level"));
 	btnRestorePowerControl->tooltip(_("Restore power control"));
-	btnRestorePowerControl->down_box(FL_DOWN_BOX);
 	btnRestorePowerControl->callback((Fl_Callback*)cb_restore);
 	btnRestorePowerControl->align(Fl_Align(FL_ALIGN_RIGHT));
 	btnRestorePowerControl->value(progStatus.restore_power_control == 1);
 
 	btnRestoreIFshift = new Fl_Check_Button(X + 128, Y + 40, 20, 20, _("IFshift"));
 	btnRestoreIFshift->tooltip(_("Restore IF shift control"));
-	btnRestoreIFshift->down_box(FL_DOWN_BOX);
 	btnRestoreIFshift->callback((Fl_Callback*)cb_restore);
 	btnRestoreIFshift->align(Fl_Align(FL_ALIGN_RIGHT));
 	btnRestoreIFshift->value(progStatus.restore_if_shift == 1);
 
 	btnRestoreNotch = new Fl_Check_Button(X + 128, Y + 65, 20, 20, _("Notch"));
 	btnRestoreNotch->tooltip(_("Restore notch control"));
-	btnRestoreNotch->down_box(FL_DOWN_BOX);
 	btnRestoreNotch->callback((Fl_Callback*)cb_restore);
 	btnRestoreNotch->align(Fl_Align(FL_ALIGN_RIGHT));
 	btnRestoreNotch->value(progStatus.restore_notch == 1);
 
 	btnRestoreAutoNotch = new Fl_Check_Button(X + 128, Y + 90, 20, 20, _("Auto Ntch"));
 	btnRestoreAutoNotch->tooltip(_("Restore auto notch setting"));
-	btnRestoreAutoNotch->down_box(FL_DOWN_BOX);
 	btnRestoreAutoNotch->callback((Fl_Callback*)cb_restore);
 	btnRestoreAutoNotch->align(Fl_Align(FL_ALIGN_RIGHT));
 	btnRestoreAutoNotch->value(progStatus.restore_auto_notch == 1);
 
 	btnRestoreSquelch = new Fl_Check_Button(X + 128, Y + 115, 20, 20, _("Squelch"));
 	btnRestoreSquelch->tooltip(_("Restore squelch"));
-	btnRestoreSquelch->down_box(FL_DOWN_BOX);
 	btnRestoreSquelch->callback((Fl_Callback*)cb_restore);
 	btnRestoreSquelch->align(Fl_Align(FL_ALIGN_RIGHT));
 	btnRestoreSquelch->value(progStatus.restore_squelch == 1);
 
 	btnRestoreSplit = new Fl_Check_Button(X + 128, Y + 140, 20, 20, _("Split"));
 	btnRestoreSplit->tooltip(_("Restore split"));
-	btnRestoreSplit->down_box(FL_DOWN_BOX);
 	btnRestoreSplit->callback((Fl_Callback*)cb_restore);
 	btnRestoreSplit->align(Fl_Align(FL_ALIGN_RIGHT));
 	btnRestoreSplit->value(progStatus.restore_split == 1);
 
 	btnRestorePreAtt = new Fl_Check_Button(X + 128, Y + 165, 20, 20, _("Pre/Att"));
 	btnRestorePreAtt->tooltip(_("Restore Pre/Att"));
-	btnRestorePreAtt->down_box(FL_DOWN_BOX);
 	btnRestorePreAtt->callback((Fl_Callback*)cb_restore);
 	btnRestorePreAtt->align(Fl_Align(FL_ALIGN_RIGHT));
 	btnRestorePreAtt->value(progStatus.restore_pre_att == 1);
 
 	btnRestoreNoise = new Fl_Check_Button(X + 128, Y + 190, 20, 20, _("Blanker"));
 	btnRestoreNoise->tooltip(_("Restore noise blanker control"));
-	btnRestoreNoise->down_box(FL_DOWN_BOX);
 	btnRestoreNoise->callback((Fl_Callback*)cb_restore);
 	btnRestoreNoise->align(Fl_Align(FL_ALIGN_RIGHT));
 	btnRestoreNoise->value(progStatus.restore_noise == 1);
 
 	btnRestoreNR = new Fl_Check_Button(X + 248, Y + 40, 20, 20, _("Noise Red'"));
 	btnRestoreNR->tooltip(_("Restore noise reduction"));
-	btnRestoreNR->down_box(FL_DOWN_BOX);
 	btnRestoreNR->callback((Fl_Callback*)cb_restore);
 	btnRestoreNR->align(Fl_Align(FL_ALIGN_RIGHT));
 	btnRestoreNR->value(progStatus.restore_nr == 1);
 
 	btnRestoreCompOnOff = new Fl_Check_Button(X + 248, Y + 65, 20, 20, _("Comp On/Off"));
 	btnRestoreCompOnOff->tooltip(_("Restore Comp On/Off"));
-	btnRestoreCompOnOff->down_box(FL_DOWN_BOX);
 	btnRestoreCompOnOff->callback((Fl_Callback*)cb_restore);
 	btnRestoreCompOnOff->align(Fl_Align(FL_ALIGN_RIGHT));
 	btnRestoreCompOnOff->value(progStatus.restore_comp_on_off == 1);
 
 	btnRestoreCompLevel = new Fl_Check_Button(X + 248, Y + 90, 20, 20, _("Comp Level"));
 	btnRestoreCompLevel->tooltip(_("Restore comp level"));
-	btnRestoreCompLevel->down_box(FL_DOWN_BOX);
 	btnRestoreCompLevel->callback((Fl_Callback*)cb_restore);
 	btnRestoreCompLevel->align(Fl_Align(FL_ALIGN_RIGHT));
 	btnRestoreCompLevel->value(progStatus.restore_comp_level == 1);
 
 	btnUseRigData = new Fl_Check_Button(X + 248, Y + 190, 20, 20, _("Use xcvr data"));
 	btnUseRigData->tooltip(_("Set flrig to xcvr values at startup"));
-	btnUseRigData->down_box(FL_DOWN_BOX);
 	btnUseRigData->callback((Fl_Callback*)cb_restore);
 	btnUseRigData->align(Fl_Align(FL_ALIGN_RIGHT));
 	btnUseRigData->value(progStatus.use_rig_data == 1);

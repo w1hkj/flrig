@@ -78,6 +78,9 @@ status progStatus = {
 	false,		// bool	sep_rtsplus;
 	false,		// bool	sep_dtrplus;
 	false,		// bool	sep_SCU_17;
+
+	false,		// bool	disable_CW_ptt;
+
 	0,			// int	CIV;
 	false,		// bool	USBaudio;
 
@@ -470,6 +473,9 @@ void status::saveLastState()
 	spref.set("rts_cts_flow", comm_rtscts);
 	spref.set("rts_plus", comm_rtsplus);
 	spref.set("dtr_plus", comm_dtrplus);
+
+	spref.set("disable_CW_ptt", disable_CW_ptt);
+
 	spref.set("civadr", CIV);
 	spref.set("usbaudio", USBaudio);
 
@@ -935,6 +941,9 @@ bool status::loadXcvrState(string xcvr)
 		if (spref.get("rts_cts_flow", i, i)) comm_rtscts = i;
 		if (spref.get("rts_plus", i, i)) comm_rtsplus = i;
 		if (spref.get("dtr_plus", i, i)) comm_dtrplus = i;
+
+		if (spref.get("disable_CW_ptt", i, i)) disable_CW_ptt = i;
+
 		spref.get("civadr", CIV, CIV);
 		if (spref.get("usbaudio", i, i)) USBaudio = i;
 

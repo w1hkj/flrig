@@ -45,7 +45,7 @@
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Int_Input.H>
 #include <FL/Fl_Value_Input.H>
-#include <FL/Fl_Round_Button.H>
+#include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Counter.H>
 #include <FL/Fl_Simple_Counter.H>
 #include <FL/Fl_Progress.H>
@@ -456,9 +456,9 @@ extern Fl_Input *server_addr;
 
 extern Fl_Int_Input *server_port;
 
-extern Fl_Round_Button *btncatptt;
-extern Fl_Round_Button *btnrtsptt;
-extern Fl_Round_Button *btndtrptt;
+extern Fl_Check_Button *btncatptt;
+extern Fl_Check_Button *btnrtsptt;
+extern Fl_Check_Button *btndtrptt;
 extern Fl_Check_Button *chkrtscts;
 extern Fl_Check_Button *btnrtsplus;
 extern Fl_Check_Button *btndtrplus;

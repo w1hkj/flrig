@@ -63,8 +63,14 @@ static void fake_split(int on)
 
 void rigPTT(bool on)
 {
-	if (on && progStatus.split && !selrig->can_split())
+	if (!on && progStatus.split && !selrig->can_split())
 		fake_split(on);
+
+	std::string smode = "";
+	if (selrig->modes_) smode = selrig->modes_[vfo->imode];
+	if ((smode.find("CW") != std::string::npos) && progStatus.disable_CW_ptt) {
+		return;
+	}
 
 	if (progStatus.comm_catptt) {
 		selrig->set_PTT_control(on);
@@ -75,6 +81,4 @@ void rigPTT(bool on)
 	else
 		LOG_ERROR("No PTT i/o connected");
 
-	if (!on && progStatus.split && !selrig->can_split())
-		fake_split(on);
 }

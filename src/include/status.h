@@ -67,6 +67,9 @@ struct status {
 	bool	sep_rtsplus;
 	bool	sep_dtrplus;
 	bool	sep_SCU_17;
+
+	bool	disable_CW_ptt;
+
 	int		CIV;
 	bool	USBaudio;
 
