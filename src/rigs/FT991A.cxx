@@ -462,8 +462,7 @@ int RIG_FT991A::get_power_out()
 	if (p + 6 >= replystr.length()) return 0;
 	double mtr = (double)(atoi(&replystr[p+3]));
 
-// following conversion iaw data measured by Terry, KJ4EED
-	mtr = (.06 * mtr) + (.002 * mtr * mtr);
+	mtr = 3.8 - 0.0047 * mtr + .0022257 * mtr * mtr;
 
 	return (int)ceil(mtr);
 }
