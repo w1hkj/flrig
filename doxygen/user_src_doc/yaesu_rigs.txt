@@ -28,8 +28,14 @@
 \image latex FT897D.png "FT-897D" width=3.75in
 \image html FT897D.png "FT-897D"
 \anchor yaesu_950_a
-\image latex FT-950.png "FT-950" width=6in
-\image html FT-950.png "FT-950"
+\image latex FT950.png "FT-950" width=6in
+\image html FT950.png "FT-950"
+\anchor yaesu_991
+\image latex FT991.png "FT-991" width=6in
+\image html FT991.png "FT-991"
+\anchor yaesu_991a
+\image latex FT991A.png "FT-991A" width=6in
+\image html FT991A.png "FT-991A"
 \anchor yaesu_1000mp_a
 \image latex FT1000MP.png "FT-1000mp" width=3.75in
 \image html FT1000MP.png "FT-1000mp"
@@ -37,6 +43,12 @@
 \image latex FT2000.png "FT-2000" width=6in
 \image html FT2000.png "FT-2000"
 \anchor yaesu_1200dx_a
+\anchor yaesu_FTdx101D
+\image latex FTdx101D.png "FTdx101D" width=6in
+\image html FTdx101D.png "FTdx101D"
+\anchor yaesu_FTdx101MP
+\image latex FTdx101MP.png "FTdx101MP" width=6in
+\image html FTdx101MP.png "FTdx101MP"
 \image latex FTdx1200.png "FT-dx1200" width=6in
 \image html FTdx1200.png "FT-dx1200"
 \anchor yaesu_3000dx_a
@@ -45,6 +57,9 @@
 \anchor yaesu_5000dx_a
 \image latex FTdx5000.png "FT-dx5000" width=3.75in
 \image html FTdx5000.png "FT-dx5000"
+\anchor yaesu_9000dx_a
+\image latex FTdx9000.png "FTdx9000" width=6in
+\image html FTdx9000.png "FTdx9000"
 \ref yaesu_rigs "Page Top"
 \ref sFlrigDesc "Return to Main Page"
 */

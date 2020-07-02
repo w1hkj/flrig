@@ -39,14 +39,18 @@ HTML_HEADER          =
 IMAGE_PATH           = ../images
 INPUT                = index.txt \
                        config_fonts_colors.txt \
-                       IC7600-how-to.txt \
-                       TT550-ops.txt \
                        elecraft_rigs.txt \
                        icom_rigs.txt \
                        kenwood_rigs.txt \
                        tentec_rigs.txt \
                        yaesu_rigs.txt \
-                       other_rigs.txt
+                       other_rigs.txt \
+                       prefs_file.txt \
+                       xmlrpc_cmds.txt \
+                       FT991A-how-to.txt \
+                       IC7600-how-to.txt \
+                       cw_keyer.txt \
+                       TT550-ops.txt
 INCLUDE_PATH         = .
 EXAMPLE_PATH         = .
 OUTPUT_DIRECTORY     = ../../doc/user_docs

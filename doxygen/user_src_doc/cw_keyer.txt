@@ -1,0 +1,70 @@
+/**
+\page cw_keyer CW Keyer Interface
+
+The CW keyer is specifically designed to work with a DTR/RTS keyline to 
+emulate the closure of a CW key.  Several transceivers have this capability 
+built in to the hardware.  Some expose a separate keying port (FT-991A) and 
+some share the CAT serial port (IC-7300).  A simple DTR/RTS keying circuit 
+can also provide the h/w interface.  This one provides galvanic isolation:
+
+<center>
+\image latex DTR_keyer.png width=2.0in
+\image html  DTR_keyer.png
+</center>
+
+Open the keyer dialog with the main dialog menu item "Keyer"
+
+<center>
+\image latex cwkeyer.png width=2.0in
+\image html  cwkeyer.png
+</center>
+
+<ul>
+<li>WPM slider selects the keyer speed</li>
+<li>Clear - clears the text in the transmit buffer</li>
+<li>transmit text will marquee to the left as each character is transmitted</li>
+<li>Send/Pause button toggles sending text.</li>
+<li>macro buttons / function keys load transmit buffer with canned message</li>
+<li>the transmit text buffer must have keyboard focus for character entry.  left click on the entry area to gain keyboard focus.</li>
+</ul>
+
+Tip for the function / macro buttons: 
+
+<center>
+\image latex cwkeyer_tooltip.png width=2.0in
+\image html  cwkeyer_tooltip.png
+</center>
+
+Control-left-click opens:
+
+<center>
+\image latex cwkeyer_editor.png width=2.0in
+\image html  cwkeyer_editor.png
+</center>
+
+A CQ macro with start/stop (ptt enable/disable): <pre>[CQ CQ DE W1HKJ K]</pre>
+
+Config opens:
+
+<center>
+\image latex cwkeyer_config.png width=2.0in
+\image html  cwkeyer_config.png
+</center>
+
+The DTR/RTS port can be either
+<ul>
+<li>shared with the CAT port</li>
+<li>shared with the SEP port</li>
+<li>shared with the AUX port</li>
+<li>a unique serial port configured on this dialog</li>
+<li>select either DTR or RTS for the keyline as required by h/w</li>
+<li>Calibrate button sends standard "PARIS " word, WPM times.  Program 
+measures actual time to transmit and sets compensation value.  Comp(msec) 
+can be adjusted by user.</li>
+</ul>
+
+PTT delay is in milliseconds.  Enter a non-zero value to enable a delay 
+between the PTT-on and the first CW keyline closure.  The same delay will 
+be applied to the last CW keyline closure and PTT-off.
+
+*/
