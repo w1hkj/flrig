@@ -108,6 +108,7 @@ status progStatus = {
 	1,			// poll_ops;
 	1,			// poll_compression;
 	1,			// poll_tuner;
+	1,			// poll_ptt;
 	4,			// int	poll_all;
 
 	-1,			// int  iBW_A;
@@ -512,6 +513,7 @@ void status::saveLastState()
 	spref.set("poll_nr", poll_nr);
 	spref.set("poll_compression", poll_compression);
 	spref.set("poll_tuner", poll_tuner);
+	spref.set("poll_ptt", poll_ptt);
 	spref.set("poll_all", poll_all);
 
 	spref.set("bw_A", iBW_A);
@@ -986,6 +988,7 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("poll_nr", poll_nr, poll_nr);
 		spref.get("poll_compression", poll_compression, poll_compression);
 		spref.get("poll_tuner", poll_tuner, poll_tuner);
+		spref.get("poll_ptt", poll_ptt, poll_ptt);
 		spref.get("poll_all", poll_all, poll_all);
 
 		spref.get("bw_A", iBW_A, iBW_A);
@@ -996,7 +999,6 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("freq_A_u", freq_A_upper, freq_A_upper);
 		spref.get("freq_A_l", freq_A_lower, freq_A_lower);
 		freq_A = (unsigned long int)freq_A_upper * 1000000000 + freq_A_lower;
-std::cout << "freq A: " << freq_A << std::endl;
 
 		spref.get("bw_B", iBW_B, iBW_B);
 		spref.get("mode_B", imode_B, imode_B);
@@ -1006,7 +1008,6 @@ std::cout << "freq A: " << freq_A << std::endl;
 		spref.get("freq_B_u", freq_B_upper, freq_B_upper);
 		spref.get("freq_B_l", freq_B_lower, freq_B_lower);
 		freq_B = (unsigned long int)freq_B_upper * 1000000000 + freq_B_lower;
-std::cout << "freq B: " << freq_B << std::endl;
 
 		spref.get("filters", defbuffer, "", 499);
 		filters = defbuffer;
@@ -1639,6 +1640,7 @@ string status::info()
 	info << "poll_split         : " << poll_split << "\n";
 	info << "poll_noise         : " << poll_noise << "\n";
 	info << "poll_nr            : " << poll_nr << "\n";
+	info << "poll_ptt           : " << poll_ptt << "\n";
 	info << "poll_all           : " << poll_all << "\n";
 	info << "\n";
 	info << "freq_A             : " << freq_A << "\n";

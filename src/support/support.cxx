@@ -1053,6 +1053,17 @@ void read_squelch()
 	}
 }
 
+void set_ptt(void *);
+
+void check_ptt()
+{
+	int check = selrig->get_PTT();
+	if (check != PTT) {
+		PTT = check;
+		Fl::awake(set_ptt, (void *)PTT);
+	}
+}
+
 struct POLL_PAIR {
 	int *poll;
 	void (*pollfunc)();
@@ -1078,6 +1089,7 @@ POLL_PAIR RX_poll_pairs[] = {
 	{&progStatus.poll_nr, read_nr},
 	{&progStatus.poll_noise, read_noise},
 	{&progStatus.poll_compression, read_compression},
+	{&progStatus.poll_ptt, check_ptt},
 	{NULL, NULL}
 };
 
@@ -1086,6 +1098,7 @@ POLL_PAIR TX_poll_pairs[] = {
 	{&progStatus.poll_swr, read_swr},
 	{&progStatus.poll_alc, read_alc},
 	{&progStatus.poll_split, read_split},
+	{&progStatus.poll_ptt, check_ptt},
 	{NULL, NULL}
 };
 
@@ -1442,16 +1455,6 @@ void set_ptt(void *d)
 	}
 }
 
-void check_ptt()
-{
-	guard_lock serial(&mutex_serial);
-	int check = selrig->get_PTT();
-	if (check != PTT) {
-		PTT = check;
-		Fl::awake(set_ptt, (void *)PTT);
-	}
-}
-
 bool close_rig = false;
 
 void * serial_thread_loop(void *d)
@@ -1474,10 +1477,6 @@ void * serial_thread_loop(void *d)
 		}
 
 //send any freq/mode/bw changes in the queu
-
-// test for PTT change made at transceiver
-		if (progStatus.poll_frequency) check_ptt();
-
 		if (!srvc_reqs.empty())
 			serviceQUE();
 
@@ -1517,6 +1516,7 @@ void * serial_thread_loop(void *d)
 					MilliSleep(1);
 
 					if (!srvc_reqs.empty()) goto serial_bypass_loop;//break;
+
 					if (PTT) {
 						trace(1, "PTT detected");
 						goto serial_bypass_loop;//break;
@@ -1548,6 +1548,7 @@ void * serial_thread_loop(void *d)
 				while (poll_parameters->poll) {
 					MilliSleep(1);
 					if (!srvc_reqs.empty()) goto serial_bypass_loop;
+
 					if (!PTT) {
 						trace(1, "!PTT detected");
 						goto serial_bypass_loop;

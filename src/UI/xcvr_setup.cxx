@@ -68,6 +68,11 @@ Fl_Group *tabPTT = (Fl_Group *)0;
 	Fl_Check_Button *btnSepDTRptt = (Fl_Check_Button *)0;
 	Fl_Check_Button *btnSepDTRplus = (Fl_Check_Button *)0;
 
+Fl_Group *tabGPIO = (Fl_Group *)0;
+	Fl_Check_Button *btn_enable_gpio[17];
+	Fl_Check_Button *btn_gpio_on[17];
+	Fl_Counter *cnt_gpio_pulse_width;
+
 Fl_Group *tabAUX = (Fl_Group *)0;
 	Fl_ComboBox *selectAuxPort = (Fl_ComboBox *)0;
 	Fl_Check_Button *btnAux_SCU_17 = (Fl_Check_Button *)0;
@@ -98,6 +103,7 @@ Fl_Group *tabPOLLING = (Fl_Group *)0;
 	Fl_Value_Input *poll_nr = (Fl_Value_Input *)0;
 	Fl_Value_Input *poll_compression = (Fl_Value_Input *)0;
 	Fl_Value_Input *poll_tuner = (Fl_Value_Input *)0;
+	Fl_Value_Input *poll_ptt = (Fl_Value_Input *)0;
 	Fl_Button *btnClearAddControls = (Fl_Button *)0;
 
 	Fl_Value_Input *poll_meters = (Fl_Value_Input *)0;
@@ -586,6 +592,10 @@ static void cb_poll_meters(Fl_Value_Input* o, void*) {
 	progStatus.poll_meters = o->value();
 }
 
+static void cb_poll_ptt(Fl_Value_Input* o, void*) {
+	progStatus.poll_ptt = o->value();
+}
+
 static void cb_btnSetMeters(Fl_Button*, void*) {
 	poll_smeter->value(progStatus.poll_meters);
 	poll_pout->value(progStatus.poll_meters);
@@ -631,6 +641,7 @@ static void cb_btnSetAdd(Fl_Button*, void*) {
 	poll_nr->value(progStatus.poll_all);
 	poll_compression->value(progStatus.poll_all);
 	poll_tuner->value(progStatus.poll_all);
+	poll_ptt->value(progStatus.poll_all);
 
 	progStatus.poll_volume = progStatus.poll_all;
 	progStatus.poll_micgain = progStatus.poll_all;
@@ -646,6 +657,7 @@ static void cb_btnSetAdd(Fl_Button*, void*) {
 	progStatus.poll_nr = progStatus.poll_all;
 	progStatus.poll_compression = progStatus.poll_all;
 	progStatus.poll_tuner = progStatus.poll_all;
+	progStatus.poll_ptt = progStatus.poll_all;
 }
 
 static void cb_btn_send_command(Fl_Button *o, void*) {
@@ -1567,6 +1579,14 @@ Fl_Group *createPOLLING(int X, int Y, int W, int H, const char *label)
 		poll_power_control->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_power_control->value(progStatus.poll_power_control);
 
+		poll_ptt = new Fl_Value_Input(X + 370, Y + 115, 30, 20, _("PTT"));
+		poll_ptt->tooltip(_("Push to talk"));
+		poll_ptt->maximum(10);
+		poll_ptt->step(1);
+		poll_ptt->callback((Fl_Callback*)cb_poll_ptt);
+		poll_ptt->align(Fl_Align(FL_ALIGN_RIGHT));
+		poll_ptt->value(progStatus.poll_ptt);
+
 		poll_ifshift = new Fl_Value_Input(X + 10, Y + 140, 30, 20, _("IF"));
 		poll_ifshift->tooltip(_("IF shift"));
 		poll_ifshift->maximum(10);
@@ -2003,6 +2023,8 @@ Fl_Group *createRestore(int X, int Y, int W, int H, const char *label)
 	return tabRESTORE;
 }
 
+#include "gpio.cxx"
+
 #include <vector>
 
 struct CONFIG_PAGE {
@@ -2034,6 +2056,7 @@ void cleartabs()
 	tabTCPIP->hide();
 	tabPTT->hide();
 	tabAUX->hide();
+	tabGPIO->hide();
 	tabPOLLING->hide();
 	tabSNDCMD->hide();
 	tabCOMMANDS->hide();
@@ -2109,6 +2132,9 @@ Fl_Double_Window* XcvrDialog() {
 
 	tabPTT      = createPTT(xtabs, ytree, wtabs, htree, _("PTT"));
 	add_tree_item(tabPTT);
+
+	tabGPIO     = createGPIO(xtabs, ytree, wtabs, htree, _("GPIO"));
+	add_tree_item(tabGPIO);
 
 	tabAUX      = createAUX(xtabs, ytree, wtabs, htree, _("Auxiliary"));
 	add_tree_item(tabAUX);

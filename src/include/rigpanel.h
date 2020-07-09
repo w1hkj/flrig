@@ -502,6 +502,7 @@ extern Fl_Value_Input *poll_split;
 extern Fl_Value_Input *poll_noise;
 extern Fl_Value_Input *poll_nr;
 extern Fl_Value_Input *poll_compression;
+extern Fl_Value_Input *poll_ptt;
 extern Fl_Button *btnClearAddControls;
 extern Fl_Value_Input *poll_all;
 extern Fl_Button *btnSetAllAdd;
