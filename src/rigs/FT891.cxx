@@ -523,6 +523,9 @@ int RIG_FT891::get_PTT()
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return ptt_;
 	ptt_ =  (replystr[p+2] != '0' ? 1 : 0);
+
+	get_trace(4, "get_ptt():\n", cmd.c_str(), "\n", replystr.c_str());
+
 	return ptt_;
 }
 
