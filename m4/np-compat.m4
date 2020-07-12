@@ -2,8 +2,6 @@ AC_DEFUN([AC_FLRIG_NP_COMPAT], [
   AC_REQUIRE([AC_FL_MACOSX])
   AC_REQUIRE([AC_FL_WIN32])
 
-  AM_CONDITIONAL([COMPAT_REGEX], [test "x$ac_cv_header_regex_h" != "xyes"])
-
   if test "x$target_mingw32" = "xyes"; then
       sem_libs="pthreadGC2"
   else
