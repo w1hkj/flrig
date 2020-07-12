@@ -31,48 +31,6 @@
 #  include "util.h"
 #endif
 
-#if !HAVE_CLOCK_GETTIME
-#  ifdef __APPLE__
-#    include <mach/mach_time.h>
-#    define CLOCK_REALTIME 0
-#    define CLOCK_MONOTONIC 6
-#  endif
-#  if TIME_WITH_SYS_TIME
-#    include <sys/time.h>
-#  endif
-#  include <errno.h>
-int clock_gettime(clock_id_t clock_id, struct timespec* tp)
-{
-	if (clock_id == CLOCK_REALTIME) {
-		struct timeval t;
-		if (unlikely(gettimeofday(&t, NULL) != 0))
-			return -1;
-		tp->tv_sec = t.tv_sec;
-		tp->tv_nsec = t.tv_usec * 1000;
-	}
-	else if (clock_id == CLOCK_MONOTONIC) {
-#if defined(__WOE32__)
-		int msec = GetTickCount();
-		tp->tv_sec = msec / 1000;
-		tp->tv_nsec = (msec % 1000) * 1000000;
-#elif defined(__APPLE__)
-		static mach_timebase_info_data_t info = { 0, 0 };
-		if (unlikely(info.denom == 0))
-			mach_timebase_info(&info);
-		uint64_t t = mach_absolute_time() * info.numer / info.denom;
-		tp->tv_sec = t / 1000000000;
-		tp->tv_nsec = t % 1000000000;
-#endif
-	}
-	else {
-		errno = EINVAL;
-		return -1;
-	}
-
-	return 0;
-}
-#endif // !HAVE_CLOCK_GETTIME
-
 struct timespec operator+(const struct timespec &t0, const double &t)
 {
         struct timespec r;
