@@ -433,10 +433,8 @@ int RIG_FT5000::get_swr()
 	if (p + 6 >= replystr.length()) return 0;
 	int rcvd = atoi(&replystr[p+3]);
 
-	size_t i;
-	for (i = 0; i < sizeof(swrtbl) / sizeof(*swrtbl) - 1; i++)
-		if (rcvd >= swrtbl[i].mtr && rcvd < swrtbl[i+1].mtr)
-			break;
+	size_t i = 0;
+	while (rcvd > swrtbl[i].mtr) i++;
 
 	double mtr = (swrtbl[i+1].val - swrtbl[i].val ) / (swrtbl[i+1].mtr - swrtbl[i].mtr);
 	mtr *= (rcvd - swrtbl[i].mtr);
@@ -492,9 +490,7 @@ int RIG_FT5000::get_power_out()
 	int mtr = atoi(&replystr[p+3]);
 
 	size_t i = 0;
-	for (i = 0; i < sizeof(pwrtbl) / sizeof(*pwrtbl) - 1; i++)
-		if (mtr >= pwrtbl[i].mtr && mtr < pwrtbl[i+1].mtr)
-			break;
+	while (mtr > pwrtbl[i].mtr) i++;
 
 	double val = (pwrtbl[i+1].val - pwrtbl[i].val) / (pwrtbl[i+1].mtr - pwrtbl[i].mtr);
 	val *= (mtr - pwrtbl[i].mtr);
