@@ -91,10 +91,11 @@ void XmlRpcUtil::log(int level, const char* fmt, ...)
   {
     va_list va;
     char buf[1024];
-    va_start( va, fmt);
+    va_start(va, fmt);
     vsnprintf(buf,sizeof(buf)-1,fmt,va);
     buf[sizeof(buf)-1] = 0;
     XmlRpcLogHandler::getLogHandler()->log(level, buf);
+	va_end(va);
   }
 }
 
@@ -107,6 +108,7 @@ void XmlRpcUtil::error(const char* fmt, ...)
   vsnprintf(buf,sizeof(buf)-1,fmt,va);
   buf[sizeof(buf)-1] = 0;
   XmlRpcErrorHandler::getErrorHandler()->error(buf);
+  va_end(va);
 }
 
 // Returns true if the tag is parsed. No attributes are parsed.

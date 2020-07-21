@@ -817,14 +817,14 @@ public :
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 
+		XmlRpcValue bws;
+
 		if (!xcvr_initialized || !selrig->bandwidths_) {
-			XmlRpcValue bws;
 			bws[0][0] = "Bandwidth";
 			bws[0][1] = "NONE";
 			result = bws;
 			return;
 		}
-		XmlRpcValue bws;
 
 		wait();
 		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_bws");
@@ -843,30 +843,29 @@ public :
 				bwt++;
 				i++;
 			}
+			result = bws;
 		}
 // double table either lo/hi or center/width
 		if (selrig->has_dsp_controls && dsplo && dsphi) {
-			int i = 0;
-			int n = 1;
 			std::string control_label = selrig->SL_label;
 			control_label.append("|").append(selrig->SL_tooltip);
 			bws[0][0] = control_label.c_str();
+			int i = 0; int n = 1;
 			while (dsplo[i]) {
 				bws[0][n] = dsplo[i];
 				n++; i++;
 			}
-			i = 0;
 			control_label.assign(selrig->SH_label);
 			control_label.append("|").append(selrig->SH_tooltip);
 			bws[1][0] = control_label.c_str();
-			n = 1;
+			i = 0; n = 1;
 			while (dsphi[i]) {
 				bws[1][n] = dsphi[i];
 				n++; i++;
 			}
+			result = bws;
 		}
 
-		result = bws;
 	}
 
 	std::string help() { return std::string("returns array of bandwidths"); }
