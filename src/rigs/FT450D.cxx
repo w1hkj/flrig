@@ -1246,7 +1246,7 @@ int  RIG_FT450D::get_rf_gain()
 	// Convert 0-255 to 0-100 for the slider widget.
 	rfval = (int)(rfval / 2.55);
 	if (rfval > 100) rfval = 100;
-	return ceil(rfval);
+	return rfval;
 }
 
 void RIG_FT450D::get_rf_min_max_step(int &min, int &max, int &step)
