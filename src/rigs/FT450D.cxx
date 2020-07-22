@@ -992,7 +992,14 @@ void RIG_FT450D::set_xcvr_auto_off()
 	sett("set_xcvr_auto_off");
 }
 
-// val 0 .. 100
+/*
+ * Mic gain, range, value if set from radio
+ * LOW    000-085  -> 1
+ * NORMAL 086-170 -> 86
+ * HIGH   171-255  -> 171
+ *
+ * (slider) val 0 .. 100
+ */
 void RIG_FT450D::set_mic_gain(int val)
 {
 	cmd = "MG000;";
@@ -1017,14 +1024,18 @@ int RIG_FT450D::get_mic_gain()
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	replystr[p+5] = 0;
-	return atoi(&replystr[p+2]);;
+	int val = atoi(&replystr[p+2]);
+
+	if (val > 170) return 100;
+	if (val > 85) return 50;
+	return 0;
 }
 
 void RIG_FT450D::get_mic_min_max_step(int &min, int &max, int &step)
 {
 	min = 0;
 	max = 100;
-	step = 1;
+	step = 50;
 }
 
 void RIG_FT450D::set_special(int v)
