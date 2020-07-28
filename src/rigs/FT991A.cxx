@@ -23,7 +23,7 @@
 #include "debug.h"
 #include "support.h"
 
-#define FL991A_WAIT_TIME 100
+#define FL991A_WAIT_TIME 200
 
 enum mFT991 {
   mLSB, mUSB, mCW, mFM, mAM, mRTTY_L, mCW_R, mPKT_L, mRTTY_U, mPKT_FM, mFM_N, mPKT_U, mAM_N, mC4FM };
@@ -386,28 +386,29 @@ void RIG_FT991A::set_split(bool val)
 int RIG_FT991A::get_split()
 {
 	size_t p;
-	int split = 0;
 	char rx, tx;
 // tx vfo
-	cmd = rsp = "FT";
+	cmd = rsp = "RI6";
 	cmd.append(";");
-	wait_char(';',4, FL991A_WAIT_TIME, "get split tx vfo", ASC);
+	wait_char(';', 5, FL991A_WAIT_TIME, "get split tx vfo", ASC);
 	p = replystr.rfind(rsp);
 	if (p == string::npos) return false;
-	tx = replystr[p+2] - '0';
+	tx = replystr[p+3] - '0';
 
 // rx vfo
-	cmd = rsp = "FR";
+// The FT991/A doesn't support FR so use RI7
+// Radio Information -> VFO-A RX -> 0 : 1
+	cmd = rsp = "RI7";
 	cmd.append(";");
-	wait_char(';',4, FL991A_WAIT_TIME, "get split rx vfo", ASC);
+	wait_char(';', 5, FL991A_WAIT_TIME, "get split rx vfo", ASC);
 
 	p = replystr.rfind(rsp);
 	if (p == string::npos) return false;
-	rx = replystr[p+2] - '0';
+	rx = replystr[p+3] - '0';
 
-	split = (tx == 1 ? 2 : 0) + (rx >= 4 ? 1 : 0);
-
-	return split;
+	// If tx & rx are different: not running split
+	if (tx == rx) return true;
+	return false;
 }
 
 
@@ -526,6 +527,7 @@ void RIG_FT991A::set_PTT_control(int val)
 {
 	cmd = val ? "TX1;" : "TX0;";
 	sendCommand(cmd);
+	MilliSleep(50);
 	showresp(WARN, ASC, "SET PTT", cmd, replystr);
 	ptt_ = val;
 }
