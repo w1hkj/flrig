@@ -390,7 +390,7 @@ int RIG_FT991::get_split()
 // tx vfo
 	cmd = rsp = "FT";
 	cmd.append(";");
-	wait_char(';',4, FL991_WAIT_TIME, "get split tx vfo", ASC);
+	wait_char(';', 4, FL991_WAIT_TIME, "get split tx vfo", ASC);
 	p = replystr.rfind(rsp);
 	if (p == string::npos) return false;
 	tx = replystr[p+2] - '0';
@@ -398,7 +398,7 @@ int RIG_FT991::get_split()
 // rx vfo
 	cmd = rsp = "FR";
 	cmd.append(";");
-	wait_char(';',4, FL991_WAIT_TIME, "get split rx vfo", ASC);
+	wait_char(';', 4, FL991_WAIT_TIME, "get split rx vfo", ASC);
 
 	p = replystr.rfind(rsp);
 	if (p == string::npos) return false;
@@ -555,6 +555,7 @@ void RIG_FT991::tune_rig(int how)
 int  RIG_FT991::get_tune()
 {
 	cmd = "AC;";
+	// Why override FL991_WAIT_TIME to be the same as FL991A_...?
 	wait_char(';',6, 100, "Tuner Enabled?", ASC);
 	size_t p = replystr.rfind("AC");
 	if (p == string::npos) return 0;
@@ -1310,7 +1311,7 @@ void RIG_FT991::set_xcvr_auto_on()
 
 	cmd = rsp = "PS";
 	cmd.append(";");
-	wait_char(';',4, FL991_WAIT_TIME, "Test: Is Rig ON", ASC);
+	wait_char(';', 4, FL991_WAIT_TIME, "Test: Is Rig ON", ASC);
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) {	// rig is off, power on
 		cmd = "PS1;";
