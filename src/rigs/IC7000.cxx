@@ -20,9 +20,16 @@
 
 #include "IC7000.h"
 #include "debug.h"
-
+#include <stdio.h>
 //=============================================================================
 // IC-7000
+
+enum {
+        LSB7000, USB7000, AM7000, CW7000, RTTY7000,
+        FM7000, WFM7000, CWR7000, RTTYR7000, DV7000,
+        LSBD7000, USBD7000, AMD7000, FMD7000 };
+
+
 
 const char IC7000name_[] = "IC-7000";
 
@@ -433,6 +440,7 @@ void RIG_IC7000::set_bwB(int val)
 
 int RIG_IC7000::adjust_bandwidth(int m)
 {
+	printf("IC7000 Adjust Bandwidth called\n");
 	if (m == 3 || m == 6) { //CW
 		bandwidths_ = IC7000_SSB_CWwidths;
 		bw_vals_ = IC7000_bw_vals_SSB;
@@ -449,7 +457,7 @@ int RIG_IC7000::adjust_bandwidth(int m)
 		return 28;
 	}
 	if (m == 5) { // FM
-		bandwidths_ = IC746PRO_AMFMwidths;
+		bandwidths_ = IC7000_FMwidths;
 		bw_vals_ = IC7000_bw_vals_FM;
 		return 0;
 	}
@@ -1140,3 +1148,29 @@ void RIG_IC7000::set_band_selection(int v)
 	igett("get band stack");
 }
 
+const char ** RIG_IC7000::bwtable(int m)
+{
+	printf("ic700 bwtable called\n");
+        const char **table;
+        switch (m) {
+                case AM7000: case AMD7000:
+                        table = IC7000_AMwidths;
+                        break;
+                case DV7000:
+                case FM7000: case WFM7000: case FMD7000:
+                        table = IC7000_SSB_CWwidths;    // To do correct this
+                        break;
+                case RTTY7000: case RTTYR7000:
+                        table = IC7000_RTTYwidths;
+                        break;
+                case CW7000: case CWR7000:
+                case USB7000: case LSB7000: case USBD7000: case LSBD7000:
+                        table = IC7000_SSB_CWwidths;
+			break;
+                default:
+			printf("Mode <%d> unknown \n",m);
+                        table = IC7000_SSB_CWwidths;
+			break;
+        }
+        return table;
+}
