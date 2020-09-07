@@ -1449,7 +1449,7 @@ void set_ptt(void *d)
 		scaleSmeter->hide();
 		sldrSWR->show();
 		sldrSWR->redraw();
-		btnALC_SWR->image(image_swr);
+		btnALC_SWR->image(meter_image == SWR_IMAGE ? image_swr : image_alc);
 		btnALC_SWR->redraw();
 		btnALC_SWR->show();
 	}
