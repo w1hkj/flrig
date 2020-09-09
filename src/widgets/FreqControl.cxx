@@ -33,6 +33,8 @@
 #include "util.h"
 #include "gettext.h"
 
+#include "status.h"
+
 const char *cFreqControl::Label[10] = {
 	"0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
@@ -78,9 +80,62 @@ void cbSelectDigit (Fl_Widget *btn, void * nbr)
 	fc->redraw();
 }
 
-cFreqControl::cFreqControl(int x, int y, int w, int h, const char *lbl):
-			  Fl_Group(x,y,w,h,"") {
+void cFreqControl::set_ndigits(int nbr)
+{
+	int H = Digit[0]->h();
+	int W = Digit[0]->w();
+	int ht = H;
+
+	fl_font(font_number, ht);
+	int fh = fl_height();
+	int fw = fl_width("0");
+
+	while ( ht && ((fh >= H) || (fw >= W))) {
+		if (--ht <= 1) break;
+		fl_font(font_number, ht);
+		fh = fl_height();
+		fw = fl_width("0");
+	}
+
+	Fl_Boxtype B = FL_FLAT_BOX;
+	int xpos = Digit[0]->x() + W;
+	int ypos = Digit[0]->y();
+	for (int n = 0; n < dpoint; n++) {
+		xpos -= W;
+		Digit[n]->box(B);
+		Digit[n]->labelfont(font_number);
+		Digit[n]->labelsize(fh);
+		Digit[n]->position(xpos, ypos);
+		Digit[n]->redraw_label();
+		Digit[n]->redraw();
+		Digit[n]->callback(cbSelectDigit, reinterpret_cast<void*>(n));
+	}
+
+	xpos -= W / 2;
+	decbx->position(xpos, ypos);
+	decbx->labelfont(font_number);
+	decbx->labelsize(fh);
+	decbx->redraw_label();
+	decbx->redraw();
+
+	for (int n = dpoint; n < nD; n++) {
+		xpos -= W;
+		Digit[n]->box(B);
+		Digit[n]->labelfont(font_number);
+		Digit[n]->labelsize(fh);
+		Digit[n]->position(xpos, ypos);
+		Digit[n]->redraw_label();
+		Digit[n]->redraw();
+		Digit[n]->callback(cbSelectDigit, reinterpret_cast<void*>(n));
+	}
+
+	font_size = ht;
+}
+
+cFreqControl::cFreqControl(int x, int y, int w, int h, const char *lbl) : Fl_Group(x,y,w,h,"")
+{
 	font_number = FL_COURIER;
+
 	ONCOLOR = FL_YELLOW;
 	OFFCOLOR = FL_BLACK;
 	SELCOLOR = fl_rgb_color(100, 100, 100);
@@ -89,121 +144,89 @@ cFreqControl::cFreqControl(int x, int y, int w, int h, const char *lbl):
 	precision = 1;
 	dpoint = 3;
 
-	W = w;
-	nD = atoi(lbl);
+	nD = atol(lbl);
 	if (nD > MAX_DIGITS) nD = MAX_DIGITS;
 	if (nD < MIN_DIGITS) nD = MIN_DIGITS;
 
-	bdr = 2;
-	fcHeight = h - 2 * bdr;
-
-	int fw, fh, ht = fcHeight;
-
-	fl_font(font_number, ++ht);
-	fh = fl_height() + 1;
-	while (fh > fcHeight) {
-		ht--;
-		fl_font(font_number, ht);
-		fh = fl_height();
-	}
-
-	fl_font(font_number, ht);
-	fw = fl_width("0") + 4;
-	pw = fw / 2;
-	while( (nD * fw + pw) >= (W - 2*bdr)) {
-		ht--;
-		fl_font(font_number, ht);
-		fw = fl_width("0") + 4;
-		pw = fw / 2;
-	}
-	fh = fl_height();
-
-	wfill = (w - nD * fw - pw - 2*bdr) / 2;
-	int wf2 = w - nD * fw - pw - 2*bdr - wfill;
-
-	fcWidth = fw;
-
-	fcTop = y + bdr;
-	int xpos;
+	minVal = 0;
+	maxVal = 
+		(nD == 1 ? 9L :
+		(nD == 2 ? 99L :
+		(nD == 3 ? 999L :
+		(nD == 4 ? 9999L :
+		(nD == 5 ? 99999L :
+		(nD == 6 ? 999999L :
+		(nD == 7 ? 9999999L :
+		(nD == 8 ? 99999999L :
+		(nD == 9 ? 999999999L :
+		1410065407L )))))))));
 
 	box(FL_DOWN_BOX);
-	color(OFFCOLOR);
+	bdr = Fl::box_dy(box());
 
-	minVal = 0;
-	maxVal = (unsigned long int)(pow(10, nD) - 1) * precision;
-	double fmaxval = maxVal / 1000.0;
+	Fl_Boxtype B = FL_FLAT_BOX;
 
-	static char tt[100];
-	snprintf(tt, sizeof(tt), "Enter frequency (max %.3f) or\nLeft/Right/Up/Down/Pg_Up/Pg_Down", fmaxval);
-	tooltip(tt);
+	int H = h - 2 * bdr;
+	int W = w - 2 * bdr;
+	int X = x + bdr;
+	int Y = y + bdr;
+	int wb = trunc(W / (nD + 0.5));
+	int fill = W - wb * (nD + 0.5);
 
-	hfill2 = new Fl_Box(x + w - bdr - wf2, fcTop, wf2, fcHeight, "");
-	hfill2->box(FL_FLAT_BOX);
-	hfill2->labelcolor(ONCOLOR);
-	hfill2->color(OFFCOLOR);
+	hfill = new Fl_Box(X, Y, fill, H, "");
+	hfill->box(FL_FLAT_BOX);
+	hfill->labelcolor(ONCOLOR);
+	hfill->color(ONCOLOR);
 
-	xpos = x + w - bdr - wfill;
 	for (int n = 0; n < 3; n++) {
-		xpos -= fcWidth;
-		Digit[n] = new Fl_Repeat_Button (
-			xpos,
-			fcTop,
-			fcWidth,
-			fcHeight,
-			" ");
-		Digit[n]->box(FL_FLAT_BOX); 
-		Digit[n]->labelfont(font_number);
+		Digit[n] = new Fl_Repeat_Button ( X + W - (n + 1) * wb, Y, wb, H, " ");
+		Digit[n]->box(B); 
 		Digit[n]->labelcolor(ONCOLOR);
 		Digit[n]->color(OFFCOLOR, SELCOLOR);
-		Digit[n]->labelsize(fh);
+		Digit[n]->align(FL_ALIGN_INSIDE);
 		Digit[n]->callback(cbSelectDigit, reinterpret_cast<void*>(n));
-		if (n == 0) mult[n] = 1;
-		else mult[n] = 10 * mult[n-1];
 	}
 
-	xpos -= pw;
-	decbx = new Fl_Box(xpos, fcTop, pw, fcHeight,".");
-	decbx->box(FL_FLAT_BOX);
-	decbx->labelfont(font_number);
+	decbx = new Fl_Box(X + W - 3*wb - wb/2, Y, wb / 2, H, ".");
+	decbx->box(B);
+	decbx->color(ONCOLOR);
 	decbx->labelcolor(ONCOLOR);
-	decbx->color(OFFCOLOR);
-	decbx->labelsize(fh);
+	decbx->align(FL_ALIGN_INSIDE);
 
 	for (int n = 3; n < nD; n++) {
-		xpos -= fcWidth;
-		Digit[n] = new Fl_Repeat_Button (
-			xpos,
-			fcTop,
-			fcWidth,
-			fcHeight,
-			" ");
-		Digit[n]->box(FL_FLAT_BOX); 
-		Digit[n]->labelfont(font_number);
+		Digit[n] = new Fl_Repeat_Button ( X + W - wb/2 - 3 * wb  - (n - 2) * wb, Y, wb, H, " ");
+		Digit[n]->box(B); 
 		Digit[n]->labelcolor(ONCOLOR);
 		Digit[n]->color(OFFCOLOR, SELCOLOR);
-		Digit[n]->labelsize(fh);
+		Digit[n]->align(FL_ALIGN_INSIDE);
 		Digit[n]->callback(cbSelectDigit, reinterpret_cast<void*>(n));
-		if (n == 0) mult[n] = 1;
-		else mult[n] = 10 * mult[n-1];
 	}
 
-	hfill1 = new Fl_Box(x + bdr, fcTop, Digit[nD-1]->x() - x - bdr, fcHeight, "");
-	hfill1->box(FL_FLAT_BOX);
-	hfill1->labelcolor(ONCOLOR);
-	hfill1->color(OFFCOLOR);
+	mult[0] = 1;
+	for (int n = 1; n < nD; n++ )
+		mult[n] = 10 * mult[n-1];
 
 	cbFunc = NULL;
-	end();
 
-	finp = new Fl_Float_Input(0, 0, 24,24);//1, 1);
+	finp = new Fl_Float_Input(0, 0, 24, 24);
 	finp->callback(freq_input_cb, this);
 	finp->when(FL_WHEN_CHANGED);
+	remove(finp);
 
-	parent()->remove(finp);
+	end();
 
 	precision = 1;
 	hrd_buttons = true;
 	colors_reversed = false;
+
+	minVal = 0;
+	maxVal = (unsigned long int)(pow(10.0, nD) - 1) * precision;
+	double fmaxval = maxVal / 1000.0;
+	static char tt[100];
+	snprintf(tt, sizeof(tt), "Enter frequency (max %.3f) or\nLeft/Right/Up/Down/Pg_Up/Pg_Down", fmaxval);
+	tooltip(tt);
+
+	set_ndigits(nD);
 
 }
 
@@ -233,7 +256,7 @@ void cFreqControl::updatevalue()
 			Digit[i]->label("");
 	}
 	decbx->label(".");
-	redraw();//damage();
+	redraw();
 }
 
 void cFreqControl::font(Fl_Font fnt)
@@ -241,6 +264,7 @@ void cFreqControl::font(Fl_Font fnt)
 	font_number = fnt;
 	set_ndigits(nD);
 	updatevalue();
+	redraw();
 }
 
 void cFreqControl::SetONOFFCOLOR( Fl_Color ONcolor, Fl_Color OFFcolor)
@@ -258,14 +282,7 @@ void cFreqControl::SetONOFFCOLOR( Fl_Color ONcolor, Fl_Color OFFcolor)
 	decbx->color(OFFCOLOR);
 	decbx->redraw();
 	decbx->redraw_label();
-	hfill1->labelcolor(ONCOLOR);
-	hfill1->color(OFFCOLOR);
-	hfill1->redraw();
-	hfill1->redraw_label();
-	hfill2->labelcolor(ONCOLOR);
-	hfill2->color(OFFCOLOR);
-	hfill2->redraw();
-	hfill2->redraw_label();
+	hfill->color(OFFCOLOR);
 	color(OFFCOLOR);
 	redraw();
 }
@@ -284,14 +301,7 @@ void cFreqControl::SetONCOLOR (uchar r, uchar g, uchar b)
 	decbx->color(OFFCOLOR);
 	decbx->redraw();
 	decbx->redraw_label();
-	hfill1->color(OFFCOLOR);
-	hfill1->labelcolor(ONCOLOR);
-	hfill1->redraw();
-	hfill1->redraw_label();
-	hfill2->labelcolor(ONCOLOR);
-	hfill2->color(OFFCOLOR);
-	hfill2->redraw();
-	hfill2->redraw_label();
+	hfill->color(OFFCOLOR);
 	color(OFFCOLOR);
 	redraw();
 }
@@ -303,20 +313,13 @@ void cFreqControl::SetOFFCOLOR (uchar r, uchar g, uchar b)
 
 	for (int n = 0; n < nD; n++) {
 		Digit[n]->labelcolor(ONCOLOR);
-		Digit[n]->color(OFFCOLOR);
+		Digit[n]->color(FL_RED);//OFFCOLOR);
 	}
 	decbx->labelcolor(ONCOLOR);
-	decbx->color(OFFCOLOR);
+	decbx->color(FL_BLUE);//OFFCOLOR);
 	decbx->redraw();
 	decbx->redraw_label();
-	hfill1->color(OFFCOLOR);
-	hfill1->labelcolor(ONCOLOR);
-	hfill1->redraw();
-	hfill1->redraw_label();
-	hfill2->labelcolor(ONCOLOR);
-	hfill2->color(OFFCOLOR);
-	hfill2->redraw();
-	hfill2->redraw_label();
+	hfill->color(OFFCOLOR);
 	color(OFFCOLOR);
 	redraw();
 }
@@ -339,23 +342,15 @@ void cFreqControl::restore_colors()
 	colors_reversed = false;
 	for (int n = 0; n < nD; n++) {
 		Digit[n]->labelcolor(ONCOLOR);
-		Digit[n]->color(OFFCOLOR);
+		Digit[n]->color(FL_RED);//OFFCOLOR);
 		Digit[n]->redraw();
 		Digit[n]->redraw_label();
 	}
 	decbx->labelcolor(ONCOLOR);
-	decbx->color(OFFCOLOR);
+	decbx->color(FL_BLUE);//OFFCOLOR);
 	decbx->redraw();
 	decbx->redraw_label();
-	hfill1->labelcolor(ONCOLOR);
-	hfill1->color(OFFCOLOR);
-	hfill1->redraw();
-	hfill1->redraw_label();
-	hfill2->labelcolor(ONCOLOR);
-	hfill2->color(OFFCOLOR);
-	hfill2->redraw();
-	hfill2->redraw_label();
-	color(OFFCOLOR);
+//	color(OFFCOLOR);
 	redraw();
 }
 
@@ -372,14 +367,6 @@ void cFreqControl::reverse_colors()
 	decbx->color(REVOFFCOLOR);
 	decbx->redraw();
 	decbx->redraw_label();
-	hfill1->labelcolor(REVONCOLOR);
-	hfill1->color(REVOFFCOLOR);
-	hfill1->redraw();
-	hfill1->redraw_label();
-	hfill2->labelcolor(REVONCOLOR);
-	hfill2->color(REVOFFCOLOR);
-	hfill2->redraw();
-	hfill2->redraw_label();
 	color(REVOFFCOLOR);
 	redraw();
 }
@@ -501,130 +488,15 @@ void cFreqControl::visual_beep()
 	Fl::add_timeout(0.1, restore_color, this);
 }
 
-bool once = true;
-void cFreqControl::set_ndigits(int nbr)
-{
-	delete decbx;
-	for (int n = 0; n < nD; n++) {
-		this->remove(Digit[n]);
-		delete Digit[n];
-	}
-
-	nD = nbr;
-	if (nD > MAX_DIGITS) nD = MAX_DIGITS;
-	if (nD < MIN_DIGITS) nD = MIN_DIGITS;
-
-	int fw, fh, ht = h() - 2*bdr;
-
-	fl_font(font_number, ht);
-	fh = fl_height() + 1;
-	while (fh > fcHeight) {
-		ht--;
-		fl_font(font_number, ht);
-		fh = fl_height();
-	}
-
-	fl_font(font_number, ht);
-	fw = fl_width("0") + 4;
-	pw = fw / 2;
-	while( (nD * fw + pw) >= (W - 2*bdr)) {
-		ht--;
-		fl_font(font_number, ht);
-		fw = fl_width("0") + 4;
-		pw = fw / 2;
-	}
-	fh = fl_height();
-	fcWidth = fw;
-
-	int wf1 = (w() - nD * fcWidth - pw - 2*bdr)/2;
-	int wf2 = w() - nD * fcWidth - pw - 2*bdr - wf1;
-
-	fcTop = y() + bdr;
-	int xpos;
-
-	minVal = 0;
-	maxVal = 
-		(nD == 1 ? 9L :
-		(nD == 2 ? 99L :
-		(nD == 3 ? 999L :
-		(nD == 4 ? 9999L :
-		(nD == 5 ? 99999L :
-		(nD == 6 ? 999999L :
-		(nD == 7 ? 9999999L :
-		(nD == 8 ? 99999999L :
-		(nD == 9 ? 999999999L :
-		1410065407L )))))))));
-
-	if (nD < 8) maxVal *= precision;
-	double fmaxval = maxVal / 1000.0;
-
-	static char tt[100];
-	snprintf(tt, sizeof(tt), "Enter frequency (max %.3f) or\nLeft/Right/Up/Down/Pg_Up/Pg_Down", fmaxval);
-	tooltip(tt);
-
-	hfill2->resize(x() + w() - bdr - wf2, fcTop, wf2, fcHeight);
-
-	xpos = x() + w() - bdr - wf2;
-	for (int n = 0; n < dpoint; n++) {
-		xpos -= fcWidth;
-		Digit[n] = new Fl_Repeat_Button (
-			xpos,
-			fcTop,
-			fcWidth,
-			fcHeight,
-			" ");
-		Digit[n]->box(FL_FLAT_BOX); 
-		Digit[n]->labelfont(font_number);
-		Digit[n]->labelcolor(ONCOLOR);
-		Digit[n]->color(OFFCOLOR, SELCOLOR);
-		Digit[n]->labelsize(fh);
-		Digit[n]->callback(cbSelectDigit, reinterpret_cast<void*>(n));
-		if (n == 0) mult[n] = 1;
-		else mult[n] = 10 * mult[n-1];
-		this->add(Digit[n]);
-	}
-
-	xpos -= pw;
-	decbx = new Fl_Box(xpos, fcTop, pw, fcHeight,".");
-	decbx->box(FL_FLAT_BOX);
-	decbx->labelfont(font_number);
-	decbx->labelcolor(ONCOLOR);
-	decbx->color(OFFCOLOR);
-	decbx->labelsize(fh);
-	this->add(decbx);
-
-	for (int n = dpoint; n < nD; n++) {
-		xpos -= fcWidth;
-		Digit[n] = new Fl_Repeat_Button (
-			xpos,
-			fcTop,
-			fcWidth,
-			fcHeight,
-			" ");
-		Digit[n]->box(FL_FLAT_BOX); 
-		Digit[n]->labelfont(font_number);
-		Digit[n]->labelcolor(ONCOLOR);
-		Digit[n]->color(OFFCOLOR, SELCOLOR);
-		Digit[n]->labelsize(fh);
-		Digit[n]->callback(cbSelectDigit, reinterpret_cast<void*>(n));
-		if (n == 0) mult[n] = 1;
-		else mult[n] = 10 * mult[n-1];
-		this->add(Digit[n]);
-	}
-
-	hfill1->resize(x() + bdr, fcTop, wf1, fcHeight);
-
-	redraw();
-}
-
 void cFreqControl::resize(int x, int y, int w, int h)
 {
 	Fl_Group::resize(x,y,w,h);
-
+	set_ndigits(nD);
+	updatevalue();
+	redraw();
+return;
 	int wf1 = (w - nD * fcWidth - pw - 2*bdr) / 2;
 	int wf2 = w - nD * fcWidth - pw - 2*bdr - wf1;
-
-	hfill2->resize(x + w - bdr - wf2, y + bdr, wf2, h - 2*bdr);
 
 	int xpos = x + w - bdr - wf2;
 	int ypos = y + bdr;
@@ -641,7 +513,6 @@ void cFreqControl::resize(int x, int y, int w, int h)
 		Digit[n]->resize(xpos, ypos, fcWidth, fcHeight);
 	}
 
-	hfill1->resize(x + bdr, y + bdr, wf1, h - 2*bdr);
-
 	Fl_Group::redraw();
 }
+

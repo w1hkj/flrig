@@ -444,7 +444,7 @@ void status::saveLastState()
 	if (mX >= 0 && mX >= 0) {
 		mainX = mX;
 		mainY = mY;
-		if (UIsize != small_ui) { mainW = mW; mainH = mH; }
+		if (UIsize == touch_ui) { mainW = mW; mainH = mH; }
 	}
 
 	Fl_Preferences spref(RigHomeDir.c_str(), "w1hkj.com", xcvr_name.c_str());
@@ -906,7 +906,10 @@ bool status::loadXcvrState(string xcvr)
 		}
 		current_ui_size = UIsize;
 		if (UIsize == wide_ui) {
-			if (mainW < WIDE_MAINW) mainW = WIDE_MAINW;
+			mainW = WIDE_MAINW;
+		}
+		if (UIsize == small_ui) {
+			mainW = SMALL_MAINW;
 		}
 		if (UIsize == touch_ui) {
 			if (mainW < TOUCH_MAINW) mainW = TOUCH_MAINW;

@@ -93,29 +93,30 @@ public:
 			default:
 				dpoint = 3; precision = 1; break;
 		}
+		set_ndigits(nD);
 	}
 
 	void set_ndigits(int val);
 
 private:
-	Fl_Repeat_Button	  	*Digit[MAX_DIGITS];
-	Fl_Float_Input			*finp;
-	static const char	 	*Label[];
+	Fl_Repeat_Button	*Digit[MAX_DIGITS];
+	Fl_Float_Input		*finp;
+	static const char	*Label[];
 	int					mult[MAX_DIGITS];
 	Fl_Box				*decbx;
-	Fl_Box				*hfill1;
-	Fl_Box				*hfill2;
-	Fl_Font  font_number;
-	Fl_Color OFFCOLOR;
-	Fl_Color ONCOLOR;
-	Fl_Color SELCOLOR;
-	Fl_Color ILLUMCOLOR;
-	Fl_Color REVONCOLOR;
-	Fl_Color REVOFFCOLOR;
-	int nD;
-	int active;
-	unsigned long int maxVal;
-	unsigned long int minVal;
+	Fl_Box				*hfill;
+	Fl_Font				font_number;
+	int					font_size;
+	Fl_Color			OFFCOLOR;
+	Fl_Color			ONCOLOR;
+	Fl_Color			SELCOLOR;
+	Fl_Color			ILLUMCOLOR;
+	Fl_Color			REVONCOLOR;
+	Fl_Color			REVOFFCOLOR;
+	int					nD;
+	int					active;
+	unsigned long int	maxVal;
+	unsigned long int	minVal;
 
 	int pw; // decimal width
 	int wfill;
