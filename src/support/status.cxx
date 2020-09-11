@@ -27,6 +27,8 @@
 #include <FL/Fl_Progress.H>
 #include <FL/Enumerations.H>
 
+#include "dialogs.h"
+
 #include "status.h"
 #include "util.h"
 #include "rig.h"
@@ -49,6 +51,15 @@ status progStatus = {
 	150,		// int mainH;
 	small_ui,	// UISIZE, UIsize;
 	false,		// UIchanged;
+
+	20,			// int memX;
+	20,			// int memY;
+	600,		// int memW;
+	164,		// int memH;
+
+	20,			// int ddX;
+	20,			// int ddY;
+
 	"NONE",		// string xcvr_serial_port;
 	0,			// int comm_baudrate;
 	2,			// int stopbits;
@@ -416,7 +427,11 @@ status progStatus = {
 	28070000L, 6, 0, 0, 0, 600,		// f10 meters
 	50070000L, 6, 0, 0, 0, 600,		// f6 meters
 	144070000L, 6, 0, 0, 0, 600,	// f2 meters
-	432100000L, 6, 0, 0, 0, 600,		// f70 cent'
+	432100000L, 6, 0, 0, 0, 600,	// f70 cent'
+
+// memory management
+	4,								// Fl_Font	memfontnbr;
+	14,								// int		memfontsize;
 
 // cwio parameters
 	20,			// int    cwioWPM;
@@ -441,6 +456,13 @@ void status::saveLastState()
 	int mW = mainwindow->w();
 	int mH = mainwindow->h();
 
+	if (dlgMemoryDialog) {
+		memX = dlgMemoryDialog->x();
+		memY = dlgMemoryDialog->y();
+		memW = dlgMemoryDialog->w();
+		memH = dlgMemoryDialog->h();
+	}
+
 	if (mX >= 0 && mX >= 0) {
 		mainX = mX;
 		mainY = mY;
@@ -457,6 +479,14 @@ void status::saveLastState()
 	spref.set("mainh", mainH);
 
 	spref.set("uisize", UIsize);
+
+	spref.set("memx", memX);
+	spref.set("memy", memY);
+	spref.set("memw", memW);
+	spref.set("memh", memH);
+
+	spref.set("ddx", ddX);
+	spref.set("ddy", ddY);
 
 	spref.set("xcvr_serial_port", xcvr_serial_port.c_str());
 	spref.set("comm_baudrate", comm_baudrate);
@@ -870,6 +900,9 @@ void status::saveLastState()
 	spref.set("hrd_buttons", hrd_buttons);
 	spref.set("sliders_button", sliders_button);
 
+	spref.set("memfontnbr", memfontnbr);
+	spref.set("memfontsize", memfontsize);
+
 	spref.set("cwioWPM", cwioWPM);
 	spref.set("cwio_comp", cwio_comp);
 	spref.set("cwioKEYLINE", cwioKEYLINE);
@@ -901,6 +934,15 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("mainw", mainW, mainW);
 		spref.get("mainh", mainH, mainH);
 		spref.get("uisize", UIsize, UIsize);
+
+		spref.get("memx", memX, memX);
+		spref.get("memy", memY, memY);
+		spref.get("memw", memW, memW);
+		spref.get("memh", memH, memH);
+
+		spref.get("ddX", ddX, ddX);
+		spref.get("ddY", ddY, ddY);
+
 		if (current_ui_size != -1) {
 			UIsize = current_ui_size;
 		}
@@ -1406,6 +1448,9 @@ bool status::loadXcvrState(string xcvr)
 
 		if (spref.get("hrd_buttons", i, i)) hrd_buttons = i;
 		spref.get("sliders_button", sliders_button, sliders_button);
+
+		spref.get("memfontnbr", memfontnbr, memfontnbr);
+		spref.get("memfontsize", memfontsize, memfontsize);
 
 		spref.get("cwioWPM", cwioWPM, cwioWPM);
 		spref.get("cwio_comp", cwio_comp, cwio_comp);

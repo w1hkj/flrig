@@ -38,6 +38,15 @@ struct status {
 	int		mainH;
 	int		UIsize;
 	bool	UIchanged;
+
+	int		memX;
+	int		memY;
+	int		memW;
+	int		memH;
+
+	int		ddX;
+	int		ddY;
+
 	string	xcvr_serial_port;
 	int		comm_baudrate;
 	int		stopbits;
@@ -403,6 +412,10 @@ struct status {
 	int		f6,    m6,  txT_6,   rxT_6,   offset_6,   oF_6;
 	int		f2,    m2,  txT_2,   rxT_2,   offset_2,   oF_2;
 	int		f70,  m70,  txT_70,  rxT_70,  offset_70,  oF_70;
+
+// memory management
+	Fl_Font	memfontnbr;
+	int		memfontsize;
 
 // cwio parameters
 	int		cwioWPM;

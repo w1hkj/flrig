@@ -452,6 +452,8 @@ Fl_Double_Window* DisplayDialog() {
 
 	w->end();
 
+	w->position( progStatus.ddX, progStatus.ddY );
+
 	return w;
 }
 

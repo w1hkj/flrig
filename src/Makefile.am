@@ -230,6 +230,7 @@ flrig_SOURCES += \
 	UI/rigpanel.cxx \
 	widgets/combo.cxx \
 	widgets/Fl_SigBar.cxx \
+	widgets/flbrowser2.cxx \
 	widgets/flinput2.cxx \
 	widgets/flslider2.cxx \
 	widgets/font_browser.cxx \
@@ -258,14 +259,15 @@ EXTRA_DIST = \
 	include/morse.h \
 	include/debug.h \
 	include/dialogs.h \
+	include/flbrowser2.h \
+	include/flinput2.h \
+	include/flslider2.h \
 	include/fileselect.h \
 	include/font_browser.h \
 	include/flrigrc.h \
-	include/flinput2.h \
 	include/icons.h \
 	include/KENWOOD.h \
 	include/pixmaps.h \
-	include/flslider2.h \
 	include/Fl_SigBar.h \
 	include/FreqControl.h \
 	include/hspinner.h \

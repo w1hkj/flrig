@@ -1740,7 +1740,7 @@ void clearList() {
 }
 
 void updateSelect() {
-	char szline[80 + ATAGSIZE];
+	char szline[1000];
 	char szatag[ATAGSIZE];
 	int i;
 	FreqSelect->clear();
@@ -1753,18 +1753,29 @@ void updateSelect() {
 	for (int n = 0; n < numinlist; n++) {
 		memset(szline, 0, sizeof(szline));
 		memset(szatag, 0, sizeof(szatag));
-		for (i = 0; i < ATAGSIZE - 1; i++) {
+		for (i = 0; i < ATAGSIZE; i++) {
 			szatag[i] = oplist[n].alpha_tag[i];
-			if (szatag[i] == 0) szatag[i] = ' ';
+			if (szatag[i] == '\n') szatag[i] = ' ';
 		}
 		bg_clr = (n % 2) ? bg1 : bg2;
-		snprintf(szline, sizeof(szline),
-			"@B%d@r%.3f\t@B%d@r%s\t@B%d@r%s\t@B%d@r%s", bg_clr,
-			oplist[n].freq / 1000.0, bg_clr,
-			selrig->get_bwname_(oplist[n].iBW, oplist[n].imode), bg_clr,
-			selrig->get_modename_(oplist[n].imode), bg_clr,
-			szatag );
+		snprintf(szline, sizeof(szline), "\
+@F%d@S%d@B%d@r%.3f\t\
+@F%d@S%d@B%d@.|\t\
+@F%d@S%d@B%d@r%s\t\
+@F%d@S%d@B%d@.|\t\
+@F%d@S%d@B%d@r%s\t\
+@F%d@S%d@B%d@.|\t\
+@F%d@S%d@B%d@.%s",
+			progStatus.memfontnbr, progStatus.memfontsize, bg_clr, oplist[n].freq / 1000.0,
+			progStatus.memfontnbr, progStatus.memfontsize, bg_clr,
+			progStatus.memfontnbr, progStatus.memfontsize, bg_clr, selrig->get_bwname_(oplist[n].iBW, oplist[n].imode),
+			progStatus.memfontnbr, progStatus.memfontsize, bg_clr,
+			progStatus.memfontnbr, progStatus.memfontsize, bg_clr, selrig->get_modename_(oplist[n].imode),
+			progStatus.memfontnbr, progStatus.memfontsize, bg_clr,
+			progStatus.memfontnbr, progStatus.memfontsize, bg_clr, szatag );
 		FreqSelect->add (szline);
+//if (n == 0)
+//std::cout << szline << std::endl;
 	}
 	inAlphaTag->value("");
 }
@@ -2114,35 +2125,45 @@ void selectFreq() {
 	}
 }
 
+#include <FL/names.h> 
 void select_and_close()
 {
-	switch (Fl::event_button()) {
-		case FL_LEFT_MOUSE:
-			if (FreqSelect->value() > 0)
-				inAlphaTag->value(oplist[FreqSelect->value() - 1].alpha_tag);
-			if (Fl::event_clicks()) { // double click
-				selectFreq();
-				cbCloseMemory();
-			}
-			break;
-		case FL_RIGHT_MOUSE:
-			if (FreqSelect->value() > 0)
-				inAlphaTag->value(oplist[FreqSelect->value() - 1].alpha_tag);
-			selectFreq();
-			break;
-		default:
-			break;
+	int key = Fl::event_key();
+	int btn = Fl::event_button();
+
+	if (FreqSelect->value() <= 0) return;
+
+	if ((btn == FL_LEFT_MOUSE && Fl::event_clicks()) ||
+		 btn == FL_RIGHT_MOUSE || 
+		 key == FL_Enter || 
+		 key == FL_Left) {
+		inAlphaTag->value(oplist[FreqSelect->value() - 1].alpha_tag);
+		selectFreq();
+		Fl::focus(FreqSelect);
+		return;
 	}
 
-// update Alpha Tag field when keyboard scrolling
-	switch (Fl::event_key()) {
-		case FL_Up:
-		case FL_Down:
-			if (FreqSelect->value() > 0)
-				inAlphaTag->value(oplist[FreqSelect->value() - 1].alpha_tag);
-			break;
-		default:
-			break;
+	if (btn == FL_LEFT_MOUSE || key == FL_Up || key == FL_Down) {
+		inAlphaTag->value(oplist[FreqSelect->value() - 1].alpha_tag);
+		Fl::focus(FreqSelect);
+		return;
+	}
+
+	if (key == FL_Right) {
+		addFreq();
+		FreqSelect->select(1, 1);
+		inAlphaTag->value(oplist[0].alpha_tag);
+		Fl::focus(FreqSelect);
+		return;
+	}
+
+	if (key == FL_Delete) {
+		long n = FreqSelect->value();
+		delFreq();
+		FreqSelect->select(n, 1);
+		inAlphaTag->value(oplist[n-1].alpha_tag);
+		Fl::focus(FreqSelect);
+		return;
 	}
 }
 

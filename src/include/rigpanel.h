@@ -52,6 +52,7 @@
 #include <FL/Fl_Input_Choice.H>
 
 #include "flinput2.h"
+#include "flbrowser2.h"
 #include "Fl_SigBar.h"
 #include "FreqControl.h"
 #include "combo.h"
@@ -399,7 +400,7 @@ extern Fl_Button *btnPickFreq;
 extern Fl_Button *btnDelFreq;
 extern Fl_Button *btnClearList;
 
-extern Fl_Browser *FreqSelect;
+extern Fl_Browser2 *FreqSelect;
 
 extern Fl_Input *inAlphaTag;
 

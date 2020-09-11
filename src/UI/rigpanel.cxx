@@ -47,7 +47,6 @@ Hspinner *spnrOUTER = (Hspinner *)0;
 Hspinner *spnrNOTCH = (Hspinner *)0;
 Hspinner *spnrMICGAIN = (Hspinner *)0;
 
-static const int freq_sel_widths[]={110, 70, 70, 0};
 static Fl_Double_Window *meter_scale_dialog = (Fl_Double_Window *)0;
 static Fl_Double_Window *meter_filters = (Fl_Double_Window *)0;
 

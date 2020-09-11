@@ -47,7 +47,7 @@
 #include "status.h"
 
 #define LISTSIZE 200
-#define ATAGSIZE 21
+#define ATAGSIZE 128 //21
 
 extern bool flrig_abort;
 
