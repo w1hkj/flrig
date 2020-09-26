@@ -433,6 +433,12 @@ status progStatus = {
 	4,								// Fl_Font	memfontnbr;
 	14,								// int		memfontsize;
 
+// gpio parameters
+	false,		// bool	gpio_ptt;
+	0,			// int	enable_gpio;
+	0,			// int	gpio_on;
+	0,			//int	gpio_pulse_width;
+
 // cwio parameters
 	20,			// int    cwioWPM;
 	2,			// int    cwioKEYLINE; 1 == RTS, 2 == DTR
@@ -902,6 +908,11 @@ void status::saveLastState()
 
 	spref.set("memfontnbr", memfontnbr);
 	spref.set("memfontsize", memfontsize);
+
+	spref.set("gpio_ptt", gpio_ptt);
+	spref.set("enable_gpio", enable_gpio);
+	spref.set("gpio_on", gpio_on);
+	spref.set("gpio_pulse_width", gpio_pulse_width);
 
 	spref.set("cwioWPM", cwioWPM);
 	spref.set("cwio_comp", cwio_comp);
@@ -1451,6 +1462,11 @@ bool status::loadXcvrState(string xcvr)
 
 		spref.get("memfontnbr", memfontnbr, memfontnbr);
 		spref.get("memfontsize", memfontsize, memfontsize);
+
+		if (spref.get("gpio_ptt", i, i)) gpio_ptt = i;
+		spref.get("enable_gpio", enable_gpio, enable_gpio);
+		spref.get("gpio_on", gpio_on, gpio_on);
+		spref.get("gpio_pulse_width", gpio_pulse_width, gpio_pulse_width);
 
 		spref.get("cwioWPM", cwioWPM, cwioWPM);
 		spref.get("cwio_comp", cwio_comp, cwio_comp);

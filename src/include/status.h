@@ -417,6 +417,12 @@ struct status {
 	Fl_Font	memfontnbr;
 	int		memfontsize;
 
+// gpio parameters
+	bool	gpio_ptt;
+	int		enable_gpio;
+	int		gpio_on;
+	int		gpio_pulse_width;
+
 // cwio parameters
 	int		cwioWPM;
 	int		cwioKEYLINE;

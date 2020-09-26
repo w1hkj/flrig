@@ -214,6 +214,7 @@ flrig_SOURCES += \
 	rigs/Xiegu-G90.cxx \
 	support/debug.cxx \
 	support/dialogs.cxx \
+	support/gpio_ptt.cxx \
 	support/ptt.cxx \
 	support/rig_io.cxx \
 	support/serial.cxx \
@@ -246,6 +247,7 @@ EXTRA_DIST = \
 	config.h \
 	flrig_icon.cxx \
 	UI/ui_bitmaps.cxx \
+	UI/gpio.cxx \
 	UI/ui_wide.cxx \
 	UI/ui_small.cxx \
 	UI/ui_touch.cxx \
@@ -256,6 +258,8 @@ EXTRA_DIST = \
 	UI/power_meter_setup.cxx \
 	include/cwio.h \
 	include/cwioUI.h \
+	include/gpio.h \
+	include/gpio_ptt.h \
 	include/morse.h \
 	include/debug.h \
 	include/dialogs.h \

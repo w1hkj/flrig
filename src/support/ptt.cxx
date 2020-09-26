@@ -35,6 +35,8 @@
 #include "rig.h"
 #include "support.h"
 
+#include "gpio_ptt.h"
+
 using namespace std;
 
 // used for transceivers with a single vfo, called only by rigPTT
@@ -72,13 +74,17 @@ void rigPTT(bool on)
 		return;
 	}
 
+// PTT priority: CAT; serial; separate serial; GPIO
+
 	if (progStatus.comm_catptt) {
 		selrig->set_PTT_control(on);
-	} else if (progStatus.comm_dtrptt || progStatus.comm_rtsptt)
+	} else if (progStatus.comm_dtrptt || progStatus.comm_rtsptt) {
 		RigSerial->SetPTT(on);
-	else if (SepSerial->IsOpen() && (progStatus.sep_dtrptt || progStatus.sep_rtsptt) )
+	} else if (SepSerial->IsOpen() && (progStatus.sep_dtrptt || progStatus.sep_rtsptt) ) {
 		SepSerial->SetPTT(on);
-	else
-		LOG_ERROR("No PTT i/o connected");
-
+	} else if (progStatus.gpio_ptt) {
+		set_gpio(on);
+	} else {
+		LOG_DEBUG("No PTT i/o connected");
+	}
 }

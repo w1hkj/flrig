@@ -240,6 +240,7 @@ extern void show_controls();
 extern void open_xmlrpc_tab();
 extern void open_tcpip_tab();
 extern void open_ptt_tab();
+extern void open_gpio_tab();
 extern void open_aux_tab();
 extern void open_server_tab();
 

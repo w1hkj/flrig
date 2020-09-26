@@ -443,6 +443,11 @@ void open_ptt_tab()
 	select_tab(_("PTT"));
 }
 
+void open_gpio_tab()
+{
+	select_tab(_("GPIO"));
+}
+
 void open_aux_tab()
 {
 	select_tab(_("Aux"));
