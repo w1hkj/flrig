@@ -1131,7 +1131,9 @@ void show_controls()
 			if (tabs_dialog->visible())
 				tabs_dialog->hide();
 			else {
-				tabs_dialog->position(mainwindow->x(), mainwindow->y() + mainwindow->h() + 26);
+				tabs_dialog->resize(
+					mainwindow->x(), mainwindow->y() + mainwindow->decorated_h(),
+					mainwindow->w(), tabs_dialog->h());
 				tabs_dialog->show();
 			}
 			break;

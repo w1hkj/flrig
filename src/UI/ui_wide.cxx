@@ -18,9 +18,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
-
-//unsigned char menu_wide_menu_i18n_done = 0;
-
 Fl_Group *gwide = (Fl_Group *)0;
 Fl_Group *grp_row1b1b = (Fl_Group *)0;
 
@@ -64,7 +61,6 @@ Fl_Menu_Item menu_wide_menu[] = {
 
 Fl_Group *wide_main_group(int X, int Y, int W, int H)
 {
-//	int tabs_h = 70;
 	Fl_Group *g = new Fl_Group(X, Y, WIDE_MAINW, WIDE_MAINH);
 	g->box(FL_FLAT_BOX);
 
@@ -820,10 +816,6 @@ Fl_Double_Window* Wide_rig_window() {
 	Fl_Double_Window* w = new Fl_Double_Window(mainW, mainH, _("Flrig"));
 	w->align(Fl_Align(FL_ALIGN_CLIP|FL_ALIGN_INSIDE));
 
-//	hidden_tabs = new Fl_Group(0,0,mainW, mainH);
-//	hidden_tabs->hide();
-//	hidden_tabs->end();
-
 	grp_menu = new Fl_Group(0, 0, mainW, menuH);
 
 		wide_menu = new Fl_Menu_Bar(0, 0, mainW - 64, menuH);
@@ -885,7 +877,6 @@ Fl_Double_Window* Wide_rig_window() {
 
 	w->size(WIDE_MAINW, WIDE_MAINH);
 
-//	w->size_range(WIDE_MAINW, WIDE_MAINH, 0, 0);
 	w->size_range(WIDE_MAINW, WIDE_MAINH, 0, WIDE_MAINH);
 
 	w->end();

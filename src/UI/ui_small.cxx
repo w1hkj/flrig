@@ -1676,16 +1676,14 @@ Fl_Double_Window *tabs_window()
 
 	grpTABS->end();
 	w->end();
+	w->resizable(grpTABS);
+	w->size_range (small_mainW, gph, 0, gph);
 	return w;
 }
 
 Fl_Double_Window* Small_rig_window() {
 	Fl_Double_Window* w = new Fl_Double_Window(small_mainW, small_mainH, _("Flrig"));
 	w->align(Fl_Align(FL_ALIGN_CLIP|FL_ALIGN_INSIDE));
-
-//	hidden_tabs = new Fl_Group(0,0,small_mainW, small_mainH);
-//	hidden_tabs->hide();
-//	hidden_tabs->end();
 
 	grp_menu = new Fl_Group(0,0,small_mainW,small_menuH);
 
