@@ -1774,8 +1774,6 @@ void updateSelect() {
 			progStatus.memfontnbr, progStatus.memfontsize, bg_clr,
 			progStatus.memfontnbr, progStatus.memfontsize, bg_clr, szatag );
 		FreqSelect->add (szline);
-//if (n == 0)
-//std::cout << szline << std::endl;
 	}
 	inAlphaTag->value("");
 }
@@ -3331,8 +3329,6 @@ void read_rig_vals()
 		selrig->selectA();		// second select call
 		read_vfoA_vals();
 	}
-//std::cout << "xcvr_vfoA.freq " << xcvr_vfoA.freq << std::endl;
-//std::cout << "xcvr_vfoB.freq " << xcvr_vfoB.freq << std::endl;
 	if (selrig->has_agc_control) {
 		progStatus.agc_level = selrig->get_agc();
 		redrawAGC();
@@ -3868,7 +3864,8 @@ void adjust_xig_wide()
 
 void adjust_wide_ui()
 {
-	mainwindow->resize( mainwindow->x(), mainwindow->y(), mainwindow->w(), WIDE_MAINH);
+	mainwindow->resize( 
+		progStatus.mainX, progStatus.mainY, progStatus.mainW, progStatus.mainH);
 	mainwindow->redraw();
 
 	btnVol->show();
@@ -4011,7 +4008,6 @@ void adjust_touch_ui()
 		tabs550->hide();
 		tabsGeneric->remove(genericAux);
 		if (progStatus.aux_serial_port != "NONE" || selrig->has_data_port) {
-//std::cout << "has data port\n";
 			if (progStatus.aux_serial_port != "NONE") {
 				btnAuxRTS->activate();
 				btnAuxDTR->activate();
@@ -5590,7 +5586,6 @@ void init_VFOs()
 		vfoB.freq = progStatus.freq_B;
 		vfoB.imode = progStatus.imode_B;
 		vfoB.iBW = progStatus.iBW_B;
-//std::cout << "use Status data, vfoB.freq " << vfoB.freq << std::endl;
 
 		if (vfoB.iBW == -1)
 			vfoB.iBW = selrig->def_bandwidth(vfoB.imode);
@@ -5621,7 +5616,6 @@ void init_VFOs()
 		selrig->set_bwA(vfoA.iBW);
 		selrig->set_vfoA(vfoA.freq);
 		FreqDispA->value( vfoA.freq );
-//std::cout << "use Status data, vfoA.freq " << vfoA.freq << std::endl;
 
 		update_progress(progress->value() + 4);
 
@@ -5664,8 +5658,6 @@ void init_VFOs()
 		} else {
 			vfoB = xcvr_vfoB;
 			vfoA = xcvr_vfoA;
-//std::cout << "use rig data, vfoA.freq " << vfoA.freq << std::endl;
-//std::cout << "use rig data, vfoB.freq " << vfoB.freq << std::endl;
 			FreqDispB->value(vfoB.freq);
 			FreqDispA->value(vfoA.freq);
 		}

@@ -455,7 +455,6 @@ void status::saveLastState()
 	xcvr_name = selrig->name_;
 	Fl_Preferences xcvrpref(RigHomeDir.c_str(), "w1hkj.com", PACKAGE_TARNAME);
 	xcvrpref.set("xcvr_name", xcvr_name.c_str());
-//	xcvrpref.set("xml_port", xmlport);
 
 	int mX = mainwindow->x();
 	int mY = mainwindow->y();
@@ -472,7 +471,7 @@ void status::saveLastState()
 	if (mX >= 0 && mX >= 0) {
 		mainX = mX;
 		mainY = mY;
-		if (UIsize == touch_ui) { mainW = mW; mainH = mH; }
+		if (UIsize == touch_ui || UIsize == wide_ui) { mainW = mW; mainH = mH; }
 	}
 
 	Fl_Preferences spref(RigHomeDir.c_str(), "w1hkj.com", xcvr_name.c_str());
@@ -959,7 +958,7 @@ bool status::loadXcvrState(string xcvr)
 		}
 		current_ui_size = UIsize;
 		if (UIsize == wide_ui) {
-			mainW = WIDE_MAINW;
+			mainW = progStatus.mainW;//WIDE_MAINW;
 		}
 		if (UIsize == small_ui) {
 			mainW = SMALL_MAINW;
