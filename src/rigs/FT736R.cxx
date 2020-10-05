@@ -170,7 +170,7 @@ int RIG_FT736R::get_modeA()
 void RIG_FT736R::set_mode(int val)
 {
 	init_cmd();
-	cmd[3] = FT736Rmode_val_[val];
+	cmd[0] = FT736Rmode_val_[val];
 	cmd[4] = 0x07;
 	send();
 }
