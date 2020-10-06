@@ -2027,24 +2027,12 @@ Fl_Group *createRestore(int X, int Y, int W, int H, const char *label)
 
 #include <vector>
 
-struct CONFIG_PAGE {
-	Fl_Group *grp;
-	std::string label;
-	CONFIG_PAGE( Fl_Group *_grp = 0, std::string _lbl = "") {
-		grp = _grp;
-		label = _lbl;
-	}
-	~CONFIG_PAGE() { 
-		if (grp) delete grp; }
-	}; 
-
-std::vector<CONFIG_PAGE *> config_pages; 
+std::vector< Fl_Group* > config_pages; 
 static Fl_Group *current = 0; 
 Fl_Tree *tab_tree;
 
 void add_tree_item(Fl_Group *g) {
-  CONFIG_PAGE *p1 = new CONFIG_PAGE(g, g->label());
-  config_pages.push_back(p1);
+  config_pages.push_back(g);
   tab_tree->add(g->label());
   g->hide();
 }
@@ -2085,10 +2073,10 @@ void SelectItem_CB(Fl_Widget *w) {
 		pname = pn;
 		size_t pos = std::string::npos;
 		for (size_t i = 0; i < config_pages.size(); i++) {
-			if ((pos = pname.find(config_pages[i]->label)) != std::string::npos) {
-				if (pname.substr(pos) == config_pages[i]->label) {
+			if ((pos = pname.find(config_pages[i]->label())) != std::string::npos) {
+				if (pname.substr(pos) == config_pages[i]->label()) {
 					if (current) current->hide();
-					current = config_pages[i]->grp;
+					current = config_pages[i];//->grp;
 					current->show();
 					return;
 				}
