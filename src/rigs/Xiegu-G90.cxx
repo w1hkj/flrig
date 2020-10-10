@@ -24,6 +24,8 @@
 #include <iostream>
 #include <sstream>
 
+#include "gettext.h"
+
 //=============================================================================
 // IC-_g90
 /*
@@ -95,7 +97,9 @@ void RIG_Xiegu_G90::initialize()
 	btn_icom_select_10->deactivate();
 	btn_icom_select_11->deactivate();
 	btn_icom_select_12->deactivate();
-	btn_icom_select_13->deactivate();
+
+	btn_icom_select_13->copy_label(_("GEN"));
+	btn_icom_select_13->tooltip(_("General RX"));
 
 	choice_rTONE->deactivate();
 	choice_tTONE->deactivate();
@@ -960,34 +964,22 @@ void RIG_Xiegu_G90::get_band_selection(int v)
 	int bandfreq, bandmode;
 	switch (v) {
 		default:
-		case 1: bandfreq = progStatus.f160;
-				bandmode = progStatus.m160;
-				break;
-		case 2: bandfreq = progStatus.f80;
-				bandmode = progStatus.m80;
-				break;
-		case 3: bandfreq = progStatus.f40;
-				bandmode = progStatus.m40;
-				break;
-		case 4: bandfreq = progStatus.f30;
-				bandmode = progStatus.m30;
-				break;
-		case 5: bandfreq = progStatus.f20;
-				bandmode = progStatus.m20;
-				break;
-		case 6: bandfreq = progStatus.f17;
-				bandmode = progStatus.m17;
-				break;
-		case 7: bandfreq = progStatus.f15;
-				bandmode = progStatus.m15;
-				break;
-		case 8: bandfreq = progStatus.f12;
-				bandmode = progStatus.m12;
-				break;
-		case 9: bandfreq = progStatus.f10;
-				bandmode = progStatus.m10;
-				break;
+		case 1:  bandfreq = progStatus.f160; bandmode = progStatus.m160; break;
+		case 2:  bandfreq = progStatus.f80;  bandmode = progStatus.m80;  break;
+		case 3:  bandfreq = progStatus.f40;  bandmode = progStatus.m40;  break;
+		case 4:  bandfreq = progStatus.f30;  bandmode = progStatus.m30;  break;
+		case 5:  bandfreq = progStatus.f20;  bandmode = progStatus.m20;  break;
+		case 6:  bandfreq = progStatus.f17;  bandmode = progStatus.m17;  break;
+		case 7:  bandfreq = progStatus.f15;  bandmode = progStatus.m15;  break;
+		case 8:  bandfreq = progStatus.f12;  bandmode = progStatus.m12;  break;
+		case 9:  bandfreq = progStatus.f10;  bandmode = progStatus.m10;  break;
+		case 10: bandfreq = progStatus.f6;   bandmode = progStatus.m6;   break;
+//		case 11: bandfreq = progStatus.f2;   bandmode = progStatus.m2;   break;
+//		case 12: bandfreq = progStatus.f70;  bandmode = progStatus.m70;  break;
+		case 13: bandfreq = progStatus.fgen; bandmode = progStatus.mgen; break;
 	}
+	if (bandmode < 0) bandmode = 0;
+	if (bandmode > 4) bandmode = 0;
 	if (useB) {
 		set_vfoB(bandfreq);
 		set_modeB(bandmode);
@@ -1002,33 +994,19 @@ void RIG_Xiegu_G90::set_band_selection(int v)
 {
 	switch (v) {
 		default:
-		case 1: progStatus.f160 = vfo->freq;
-				progStatus.m160 = vfo->imode;
-				break;
-		case 2: progStatus.f80 = vfo->freq;
-				progStatus.m80 = vfo->imode;
-				break;
-		case 3: progStatus.f40 = vfo->freq;
-				progStatus.m40 = vfo->imode;
-				break;
-		case 4: progStatus.f30 = vfo->freq;
-				progStatus.m30 = vfo->imode;
-				break;
-		case 5: progStatus.f20 = vfo->freq;
-				progStatus.m20 = vfo->imode;
-				break;
-		case 6: progStatus.f17 = vfo->freq;
-				progStatus.m17 = vfo->imode;
-				break;
-		case 7: progStatus.f15 = vfo->freq;
-				progStatus.m15 = vfo->imode;
-				break;
-		case 8: progStatus.f12 = vfo->freq;
-				progStatus.m12 = vfo->imode;
-				break;
-		case 9: progStatus.f10 = vfo->freq;
-				progStatus.m10 = vfo->imode;
-				break;
+		case 1:  progStatus.f160 = vfo->freq; progStatus.m160 = vfo->imode; break;
+		case 2:  progStatus.f80 = vfo->freq;  progStatus.m80 = vfo->imode;  break;
+		case 3:  progStatus.f40 = vfo->freq;  progStatus.m40 = vfo->imode;  break;
+		case 4:  progStatus.f30 = vfo->freq;  progStatus.m30 = vfo->imode;  break;
+		case 5:  progStatus.f20 = vfo->freq;  progStatus.m20 = vfo->imode;  break;
+		case 6:  progStatus.f17 = vfo->freq;  progStatus.m17 = vfo->imode;  break;
+		case 7:  progStatus.f15 = vfo->freq;  progStatus.m15 = vfo->imode;  break;
+		case 8:  progStatus.f12 = vfo->freq;  progStatus.m12 = vfo->imode;  break;
+		case 9:  progStatus.f10 = vfo->freq;  progStatus.m10 = vfo->imode;  break;
+		case 10: progStatus.f6 = vfo->freq;   progStatus.m6 = vfo->imode;   break;
+//		case 11: progStatus.f2 = vfo->freq;   progStatus.m2 = vfo->imode;   break;
+//		case 12: progStatus.f70 = vfo->freq;  progStatus.m70 = vfo->imode;  break;
+		case 13: progStatus.fgen = vfo->freq; progStatus.mgen = vfo->imode; break;
 	}
 	set_trace(1, "set_band_selection()");
 }

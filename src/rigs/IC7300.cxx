@@ -2075,13 +2075,29 @@ void RIG_IC7300::set_band_selection(int v)
 	cmd.append(post);
 	waitFB("set_band_selection");
 	isett("set_band_selection");
-
-	cmd.assign(pre_to);
-	cmd.append("\x1A\x01");
-	cmd += to_bcd_be( v, 2 );
-	cmd += '\x01';
-	cmd.append( post );
-
-	waitFOR(23, "get band stack");
 }
 
+/*
+
+rn - register number 1/2/3
+f5..f1 - frequency BCD reverse
+mo - mode
+fi - filter #
+fg flags: x01 use Tx tone, x02 use Rx tone, x10 data mode
+t1..t3 - tx tone BCD fwd
+r1..r3 - rx tone BCD fwd
+
+FE FE 94 E0 1A 01 05 01 FD 
+
+FE FE E0 94 1A 01 
+05 
+01 
+00 00 07 14 00 
+01 
+03
+10 
+00 10 00
+00 08 85 
+FD
+
+*/

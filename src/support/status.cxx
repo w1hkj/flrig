@@ -414,20 +414,22 @@ status progStatus = {
 	false,		// bool	start_stop_trace;
 	0,			// int	rpc_level;
 
-// bands; defaults for FT857 / FT897
+// bands; defaults for FT857 / FT897 / Xiegu-G90
 // frequency, mode, txCTCSS, rxCTCSS, offset, offset_freq;
-	1805000L, 6, 0, 0, 0, 600, 		// f160
-	3580000L, 6, 0, 0, 0, 600,		// f80 meters
-	7070000L, 6, 0, 0, 0, 600,		// f40 meters
-	10140000L, 6, 0, 0, 0, 600,		// f30 meters
-	14070000L, 6, 0, 0, 0, 600,		// f20 meters
-	18100000L, 6, 0, 0, 0, 600,		// f17 meters
-	21070000L, 6, 0, 0, 0, 600,		// f15 meters
-	24920000L, 6, 0, 0, 0, 600,		// f12 meters
-	28070000L, 6, 0, 0, 0, 600,		// f10 meters
-	50070000L, 6, 0, 0, 0, 600,		// f6 meters
-	144070000L, 6, 0, 0, 0, 600,	// f2 meters
-	432100000L, 6, 0, 0, 0, 600,	// f70 cent'
+	1805000L, 0, 0, 0, 0, 600, 		// f160
+	3580000L, 0, 0, 0, 0, 600,		// f80 meters
+	7070000L, 0, 0, 0, 0, 600,		// f40 meters
+	10140000L, 0, 0, 0, 0, 600,		// f30 meters
+	14070000L, 0, 0, 0, 0, 600,		// f20 meters
+	18100000L, 0, 0, 0, 0, 600,		// f17 meters
+	21070000L, 0, 0, 0, 0, 600,		// f15 meters
+	24920000L, 0, 0, 0, 0, 600,		// f12 meters
+	28070000L, 0, 0, 0, 0, 600,		// f10 meters
+	50070000L, 0, 0, 0, 0, 600,		// f6 meters
+	144070000L, 0, 0, 0, 0, 600,	// f2 meters
+	432100000L, 0, 0, 0, 0, 600,	// f70 cent'
+	1210000000L, 0, 0, 0, 0, 600,	// f12G
+	15000000L, 0, 0, 0, 0, 600,		// general
 
 // memory management
 	4,								// Fl_Font	memfontnbr;

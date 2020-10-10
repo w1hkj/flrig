@@ -1708,27 +1708,23 @@ int RIG_IC7100::get_noise_reduction_val()
 
 // Read/Write band stack registers
 //
-// Read 23 bytes
 //
-//  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22
-// FE FE nn E0 1A 01 bd rn f5 f4 f3 f2 f1 mo fi fg t1 t2 t3 r1 r2 r3 FD
-// Write 23 bytes
-//
-// FE FE E0 nn 1A 01 bd rn f5 f4 f3 f2 f1 mo fi fg t1 t2 t3 r1 r2 r3 FD
-//
-// nn - CI-V address
-// bd - band selection 1/2/3
-// rn - register number 1/2/3
-// f5..f1 - frequency BCD reverse
-// mo - mode
-// fi - filter #
-// fg flags: x01 use Tx tone, x02 use Rx tone, x10 data mode
-// t1..t3 - tx tone BCD fwd
-// r1..r3 - rx tone BCD fwd
-//
-// FE FE E0 94 1A 01 06 01 70 99 08 18 00 01 03 10 00 08 85 00 08 85 FD
-//
-// band 6; freq 0018,089,970; USB; data mode; t 88.5; r 88.5
+// ( 0) xFE xFE x88 xE0 x1A x01 band stack command
+// ( 6) x01                 frequency band code
+// ( 7) x01                 register code
+// ( 8) x00 x00 x91 x01 x00 frequency
+// (13) x03 x02             operating mode / filter setting
+// (15) x00                 data mode 0x00 / 0x01
+// (16) x00                 duplex tone setting
+// (17) x00                 digital squelch setting
+// (18) x00 x08 x85         repeater tone frequency
+// (21) x00 x08 x85         tone squelch frequency
+// (24) x00 x00 x23         dtcs code
+// (27) x00                 digital squelch code
+// (28) x00 x50 x00         duplex offset frequency
+// (31) x43 x51 x43 x51 x43 x51 x20 x20     destination call, 8 chars "CKCKCK  "
+// (39) x20 x20 x20 x20 x20 x20 x20 x20 x20 x20 x20 x20 x20 x20 x20 x20   memory name, 16 chars
+// (55) xFD
 
 void RIG_IC7100::get_band_selection(int v)
 {
@@ -1738,11 +1734,11 @@ void RIG_IC7100::get_band_selection(int v)
 	cmd += '\x01';
 	cmd.append( post );
 
-	if (waitFOR(23, "get band stack")) {
+	if (waitFOR(56, "get band stack")) {
 		set_trace(2, "get band stack", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(pre_fm);
 		if (p != string::npos) {
-			unsigned long int bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
+			unsigned long int bandfreq = fm_bcd_be(replystr.substr(p + 8, 5), 10);
 			int bandmode = replystr[p+13];
 			int bandfilter = replystr[p+14];
 			int banddata = replystr[p+15] & 0x10;
@@ -1750,6 +1746,22 @@ void RIG_IC7100::get_band_selection(int v)
 			if ((bandmode == 1) && banddata) bandmode = 11;
 			if ((bandmode == 2) && banddata) bandmode = 12;
 			if ((bandmode == 5) && banddata) bandmode = 13;
+			int tone = fm_bcd(replystr.substr(p + 18, 3), 6);
+			tTONE = 0;
+			for (size_t n = 0; n < sizeof(PL_tones) / sizeof(*PL_tones); n++) {
+				if (tone == PL_tones[n]) {
+					tTONE = n;
+					break;
+				}
+			}
+			tone = fm_bcd(replystr.substr(p + 21, 3), 6);
+			rTONE = 0;
+			for (size_t n = 0; n < sizeof(PL_tones) / sizeof(*PL_tones); n++) {
+				if (tone == PL_tones[n]) {
+					rTONE = n;
+					break;
+				}
+			}
 			if (useB) {
 				set_vfoB(bandfreq);
 				set_modeB(bandmode);
@@ -1774,26 +1786,25 @@ void RIG_IC7100::set_band_selection(int v)
 	cmd.append("\x1A\x01");
 	cmd += to_bcd_be( v, 2 );
 	cmd += '\x01';
-	cmd.append( to_bcd_be( freq, 10 ) );
-	cmd += mode;
-	cmd += fil;
-	if (mode >= 9)
-		cmd += '\x10';
+	cmd.append( to_bcd_be( freq, 10 ) );               // byte 8
+	cmd += IC7100_mode_nbr[mode];                      // byte 13
+	cmd += fil;                                        // byte 14
+	if (mode >= 9)                                     // byte 15  data mode
+		cmd += '\x01';
 	else
 		cmd += '\x00';
-	cmd.append(to_bcd(PL_tones[tTONE], 6));
-	cmd.append(to_bcd(PL_tones[rTONE], 6));
+	cmd += '\x00';                                     // byte 16 duplex tone
+	cmd += '\x00';                                     // byte 17 dig squelch
+	cmd.append(to_bcd(PL_tones[tTONE], 6));            // byte 18 repeater tone
+	cmd.append(to_bcd(PL_tones[rTONE], 6));            // byte 21 tone squelch freq
+    cmd += '\x00'; cmd += '\x00'; cmd += '\x23';       // byte 24 dtcs tone
+    cmd += '\x00';                                     // byte 27 digitital squelch code
+    cmd += '\x00'; cmd += '\x60'; cmd += '\x00';       // byte 28 duplex offset frequency
+    cmd.append("CKCKCK  ");                            // byte 31 destination call
+    cmd.append("                ");                    // byte 39 memory name, 16 chars
 	cmd.append(post);
 	waitFB("set_band_selection");
 	set_trace(2, "set_band_selection()", str2hex(replystr.c_str(), replystr.length()));
-
-	cmd.assign(pre_to);
-	cmd.append("\x1A\x01");
-	cmd += to_bcd_be( v, 2 );
-	cmd += '\x01';
-	cmd.append( post );
-
-	waitFOR(23, "get band stack");
 }
 
 void RIG_IC7100::setVfoAdj(double v)

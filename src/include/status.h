@@ -398,7 +398,7 @@ struct status {
 	bool	start_stop_trace;
 	int		rpc_level;
 
-// bands; defaults for FT857 / FT897
+// bands; defaults for FT857 / FT897 / Xiegu-G90
 // frequency, mode, txCTCSS, rxCTCSS, offset, offset_freq;
 	int		f160, m160, txT_160, rxT_160, offset_160, oF_160;
 	int		f80,  m80,  txT_80,  rxT_80,  offset_80,  oF_80;
@@ -412,6 +412,8 @@ struct status {
 	int		f6,    m6,  txT_6,   rxT_6,   offset_6,   oF_6;
 	int		f2,    m2,  txT_2,   rxT_2,   offset_2,   oF_2;
 	int		f70,  m70,  txT_70,  rxT_70,  offset_70,  oF_70;
+	int		f12G, m12G, txT_12G, rxT_12G, offset_12G, oF_12G;
+	int		fgen, mgen, txT_gen, rxT_gen, offset_gen, oF_gen;
 
 // memory management
 	Fl_Font	memfontnbr;
