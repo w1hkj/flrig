@@ -58,6 +58,7 @@ RIG_FTdx3000	rig_FTdx3000;
 RIG_FT5000		rig_FT5000;
 RIG_FTdx9000	rig_FTdx9000;
 RIG_IC703		rig_IC703;
+RIG_IC705		rig_IC705;
 RIG_IC706MKIIG	rig_IC706MKIIG;
 RIG_IC718		rig_IC718;
 RIG_IC728		rig_IC728;
@@ -144,61 +145,62 @@ rigbase *rigs[] = {
 	&rig_FT5000,	// 27
 	&rig_FTdx9000,	// 28
 	&rig_IC703,		// 29
-	&rig_IC706MKIIG,// 30
-	&rig_IC718,		// 31
-	&rig_IC728,		// 32
-	&rig_IC735,		// 33
-	&rig_IC746,		// 34
-	&rig_IC746PRO,	// 35
-	&rig_IC756,		// 36
-	&rig_IC756PRO,	// 37
-	&rig_IC756PRO2,	// 38
-	&rig_IC756PRO3,	// 39
-	&rig_IC7000,	// 40
-	&rig_IC7100,	// 41
-	&rig_IC7200,	// 42
-	&rig_IC7300,	// 43
-	&rig_IC7410,	// 44
-	&rig_IC7600,	// 45
-	&rig_IC7610,	// 46
-	&rig_IC7700,	// 47
-	&rig_IC7800,	// 48
-	&rig_IC7851,	// 49
-	&rig_IC9100,	// 50
-	&rig_IC9700,	// 51
-	&rig_IC910H,	// 52
-	&rig_ICF8101,	// 53
-	&rig_K2,		// 54
-	&rig_K3,		// 55
-	&rig_KX3,		// 56
-	&rig_PCR1000,	// 57
-	&rig_RAY152,	// 58
-	&rig_TS140,		// 59
-	&rig_TS450S,	// 60
-	&rig_TS480HX,	// 61
-	&rig_TS480SAT,	// 62
-	&rig_TS570,		// 63
-	&rig_TS590S,	// 64
-	&rig_TS590SG,	// 65
-	&rig_TS790,		// 66
-	&rig_TS850,		// 67
-	&rig_TS870S,	// 68
-	&rig_TS890S,	// 69
-	&rig_TS940S,	// 70
-	&rig_TS950,		// 71
-	&rig_TS990,		// 72
-	&rig_TS2000,	// 73
-	&rig_TT516,		// 74
-	&rig_TT535,		// 75
-	&rig_TT538,		// 76
-	&rig_TT550,		// 77
-	&rig_TT563,		// 78
-	&rig_TT566,		// 79
-	&rig_TT588,		// 80
-	&rig_TT599,		// 81
-	&rig_AOR5K,		// 82
-	&rig_XI5105,	// 83
-	&rig_XIG90,		// 84
+	&rig_IC705,		// 30
+	&rig_IC706MKIIG,// 31
+	&rig_IC718,		// 32
+	&rig_IC728,		// 33
+	&rig_IC735,		// 34
+	&rig_IC746,		// 35
+	&rig_IC746PRO,	// 36
+	&rig_IC756,		// 37
+	&rig_IC756PRO,	// 38
+	&rig_IC756PRO2,	// 39
+	&rig_IC756PRO3,	// 40
+	&rig_IC7000,	// 41
+	&rig_IC7100,	// 42
+	&rig_IC7200,	// 43
+	&rig_IC7300,	// 44
+	&rig_IC7410,	// 45
+	&rig_IC7600,	// 46
+	&rig_IC7610,	// 47
+	&rig_IC7700,	// 48
+	&rig_IC7800,	// 49
+	&rig_IC7851,	// 50
+	&rig_IC9100,	// 51
+	&rig_IC9700,	// 52
+	&rig_IC910H,	// 53
+	&rig_ICF8101,	// 54
+	&rig_K2,		// 55
+	&rig_K3,		// 56
+	&rig_KX3,		// 57
+	&rig_PCR1000,	// 58
+	&rig_RAY152,	// 59
+	&rig_TS140,		// 60
+	&rig_TS450S,	// 61
+	&rig_TS480HX,	// 62
+	&rig_TS480SAT,	// 63
+	&rig_TS570,		// 64
+	&rig_TS590S,	// 65
+	&rig_TS590SG,	// 66
+	&rig_TS790,		// 67
+	&rig_TS850,		// 68
+	&rig_TS870S,	// 69
+	&rig_TS890S,	// 70
+	&rig_TS940S,	// 71
+	&rig_TS950,		// 72
+	&rig_TS990,		// 73
+	&rig_TS2000,	// 74
+	&rig_TT516,		// 75
+	&rig_TT535,		// 76
+	&rig_TT538,		// 77
+	&rig_TT550,		// 78
+	&rig_TT563,		// 79
+	&rig_TT566,		// 80
+	&rig_TT588,		// 81
+	&rig_TT599,		// 82
+	&rig_AOR5K,		// 83
+	&rig_XI5105,	// 84
+	&rig_XIG90,		// 85
 
 	NULL
 };

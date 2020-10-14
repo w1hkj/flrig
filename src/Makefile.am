@@ -159,6 +159,7 @@ flrig_SOURCES += \
 	rigs/FTdx9000.cxx \
 	rigs/ICbase.cxx \
 	rigs/IC703.cxx \
+	rigs/IC705.cxx \
 	rigs/IC706MKIIG.cxx \
 	rigs/IC718.cxx \
 	rigs/IC728.cxx \
@@ -306,6 +307,7 @@ EXTRA_DIST = \
 	include/gettext.h \
 	include/ICbase.h \
 	include/IC703.h \
+	include/IC705.h \
 	include/IC706MKIIG.h \
 	include/IC718.h \
 	include/IC728.h \
