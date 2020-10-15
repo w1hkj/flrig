@@ -467,7 +467,7 @@ int RIG_IC705::get_modeA()
 
 		if (replystr[p+6] == -1) { md = A.imode = 0; }
 		else {
-			for (md = 0; md < LSBD705; md++) {
+			for (md = 0; md < DV705; md++) {
 				if (replystr[p+6] == IC705_mode_nbr[md]) {
 					A.imode = md;
 					if (replystr[p+7] == 0x01 && A.imode < CW705)
@@ -2012,18 +2012,22 @@ Rx 56 bytes
 18 | 00 08 85          repeater tone freq
 21 | 00 08 85          tone squelch freq
 25 | 00 00 23          dtcs code
-28 | 00                digital squelch code
-29 | 00 50 00          duplex offset freq
-32 | 43 51 43 51 43 51 20 20                          destination call 8 chars
-40 | 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20  register description 16 chars
-56 | FD
+27 | 00                digital squelch code
+28 | 00 50 00          duplex offset freq
+31 | 43 51 43 51 43 51 20 20                          destination call 8 chars
+39 | 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20  register description 16 chars
+55 | FD
 */
 // test string
 const char bstack[] = "\
 \xFE\xFE\xE0\xA4\x1A\
 \x01\x03\x01\
 \x00\x00\x05\x07\x00\
-\x01\x03\x00\x00\x00\
+\x02\
+\x02\
+\x01\
+\x00\
+\x00\
 \x00\x08\x85\
 \x00\x08\x85\
 \x00\x00\x23\
@@ -2053,41 +2057,47 @@ const char *sfreq[12] = {
 
 void RIG_IC705::get_band_selection(int v)
 {
+	int v2 = v;
+	switch (v) {
+		case 11: v2 = 13; break;
+		case 12: v2 = 14; break;
+		default: break;
+	}
 	cmd.assign(pre_to);
 	cmd.append("\x1A\x01");
-	cmd += to_bcd_be( v, 2 );
+	cmd += to_bcd_be( v2, 2 );
 	cmd += '\x01';
 	cmd.append( post );
 
 //replystr.clear();
 //for (int i = 0; i < 56; i++) replystr += bstack[i];
-//replystr[6] = to_bcd_be( v, 2)[0];
+//replystr[6] = to_bcd_be( v2, 2)[0];
 //for (int i = 0; i < 5; i++) replystr[i+8] = sfreq[v-1][i];
-//for (int i = 0; i < 24; i++) replystr[i+32] = reg_strings[i];
+//for (int i = 0; i < 24; i++) replystr[i+31] = reg_strings[i];
 
-//std::cout << "replystr (" << v << "): " << std::endl << str2hex(replystr.c_str(), replystr.length()) << std::endl;
 //if (1) {
 	if (waitFOR(56, "get band stack")) {
+std::cout << "replystr (" << v << "): " << std::endl << str2hex(replystr.c_str(), replystr.length()) << std::endl;
 		set_trace(2, "get band stack", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(pre_fm);
 		if (p != string::npos) {
-			unsigned long int bandfreq = fm_bcd_be(replystr.substr(p + 8, 5), 10);
-std::cout << "freq: " << bandfreq << std::endl;
-			int bandmode = replystr[p+13];
-std::cout << "bm: " << bandmode << std::endl;
-			for (int md = 0; md < LSBD705; md++) {
-				if (replystr[p+13] == IC705_mode_nbr[md]) {
-					bandmode = md;
-					if (replystr[p+15] == 0x01 && bandmode < CW705)
-						bandmode += 8;
-					if (bandmode > DV705)
-						bandmode = 1;
+			int bandfreq = fm_bcd_be(replystr.substr(p + 8, 5), 10);
+printf("freq:  %d\n", (int)bandfreq);
+			int bandmode = fm_bcd(replystr.substr(p + 13, 1) ,2);
+printf("bm:    %d\n", (int)bandmode);
+			int mode = 0;
+			for (int md = LSB705; md <= DV705; md++) {
+				if (replystr[p + 13] == IC705_mode_nbr[md]) {
+					mode = md;
+					if (replystr[p+15] == 0x01 && mode < CW705)
+						mode += 8;
 					break;
 				}
 			}
-std::cout << "mode # " << bandmode << std::endl;
-			int bandfilter = replystr[p+16];
-std::cout << "filter # " << bandfilter << std::endl;
+			if (mode > DV705) mode = USB705;
+printf("mode:  %d, %s\n", mode, IC705modes_[mode]);
+			int bandfilter = replystr[p+14];
+printf("filt:  %d\n", bandfilter);
 			int tone = fm_bcd(replystr.substr(p + 18, 3), 6);
 			tTONE = 0;
 			for (size_t n = 0; n < sizeof(PL_tones) / sizeof(*PL_tones); n++) {
@@ -2096,7 +2106,7 @@ std::cout << "filter # " << bandfilter << std::endl;
 					break;
 				}
 			}
-std::cout << "tTONE: # " << tTONE << ", " << tone << std::endl;
+printf("tTONE: %d\n", tTONE);
 			tone = fm_bcd(replystr.substr(p + 21, 3), 6);
 			rTONE = 0;
 			for (size_t n = 0; n < sizeof(PL_tones) / sizeof(*PL_tones); n++) {
@@ -2105,16 +2115,16 @@ std::cout << "tTONE: # " << tTONE << ", " << tone << std::endl;
 					break;
 				}
 			}
-std::cout << "rTONE: # " << rTONE << ", " << tone << std::endl;
-std::cout << "destination call: " << replystr.substr(32,8) << std::endl;
-std::cout << "Memory name:      " << replystr.substr(40,16) << std::endl;
+printf("rTONE: %d\n", rTONE);
+printf("call:  '%s'\n", replystr.substr(31,8).c_str());
+printf("mem:   '%s'\n", replystr.substr(39,16).c_str());
 			if (useB) {
 				set_vfoB(bandfreq);
-				set_modeB(bandmode);
+				set_modeB(mode);
 				set_FILT(bandfilter);
 			} else {
 				set_vfoA(bandfreq);
-				set_modeA(bandmode);
+				set_modeA(mode);
 				set_FILT(bandfilter);
 			}
 		}
@@ -2126,6 +2136,11 @@ std::cout << "get band selection failed:" << std::endl << str2hex(replystr.c_str
 
 void RIG_IC705::set_band_selection(int v)
 {
+	switch (v) {
+		case 11: v = 13; break;
+		case 12: v = 14; break;
+		default: break;
+	}
 	unsigned long int freq = (useB ? B.freq : A.freq);
 	int fil = (useB ? B.filter : A.filter);
 	int mode = (useB ? B.imode : A.imode);
