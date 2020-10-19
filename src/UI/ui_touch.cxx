@@ -344,28 +344,13 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		ypos = Y + 2;
 
 		FreqDispA = new cFreqControl(xpos, ypos, 480, 100, _("10"));
-		FreqDispA->box(FL_DOWN_BOX);
-		FreqDispA->color(FL_BACKGROUND_COLOR);
-		FreqDispA->selection_color(FL_BACKGROUND_COLOR);
 		FreqDispA->labeltype(FL_NORMAL_LABEL);
-		FreqDispA->labelfont(0);
-		FreqDispA->labelsize(14);
-		FreqDispA->labelcolor(FL_FOREGROUND_COLOR);
-		FreqDispA->align(Fl_Align(FL_ALIGN_CENTER));
 		FreqDispA->when(FL_WHEN_CHANGED);
 		FreqDispA->SetONOFFCOLOR (FL_YELLOW, FL_BLACK);
 		FreqDispA->setCallBack(movFreqA);
 
 // FreqDispB hides behind FreqDispA
-		FreqDispB = new cFreqControl(xpos, ypos, 480, 100, _("9"));
-		FreqDispB->box(FL_DOWN_BOX);
-		FreqDispB->color(FL_BACKGROUND_COLOR);
-		FreqDispB->selection_color(FL_BACKGROUND_COLOR);
-		FreqDispB->labeltype(FL_NORMAL_LABEL);
-		FreqDispB->labelfont(0);
-		FreqDispB->labelsize(14);
-		FreqDispB->labelcolor(FL_FOREGROUND_COLOR);
-		FreqDispB->align(Fl_Align(FL_ALIGN_CENTER));
+		FreqDispB = new cFreqControl(xpos, ypos, 480, 100, _("10"));
 		FreqDispB->when(FL_WHEN_CHANGED);
 		FreqDispB->SetONOFFCOLOR (FL_YELLOW, FL_BLACK);
 		FreqDispB->setCallBack(movFreqB);
@@ -729,14 +714,14 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		ypos += 15;
 		xpos = 2;
 
-		btnAttenuator = new Fl_Light_Button(xpos, ypos, bw, bh, _("Att"));
+		btnAttenuator = new Fl_Light_Button(xpos, ypos, bw, bh, _("ATT"));
 		btnAttenuator->tooltip(_("Attenuator On/Off"));
 		btnAttenuator->down_box(FL_THIN_DOWN_BOX);
 		btnAttenuator->labelsize(16);
 		btnAttenuator->callback((Fl_Callback*)cb_btnAttenuator);
 
 		xpos += btnAttenuator->w() + 2;
-		btnPreamp = new Fl_Light_Button(xpos, ypos, bw, bh, _("Pre"));
+		btnPreamp = new Fl_Light_Button(xpos, ypos, bw, bh, _("PRE"));
 		btnPreamp->tooltip(_("Preamp On/Off"));
 		btnPreamp->down_box(FL_THIN_DOWN_BOX);
 		btnPreamp->labelsize(16);
@@ -1230,7 +1215,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 			genericSpeech = new Fl_Group(xpos, ypos+tabh, W, tabb, _("Spch"));
 				genericSpeech->hide();
 
-				btnCompON = new Fl_Light_Button(xpos+230, by, 70, bh, _("On"));
+				btnCompON = new Fl_Light_Button(xpos+230, by, 100, bh, _("On"));
 				btnCompON->callback((Fl_Callback*)cb_btnCompON);
 				btnCompON->value(progStatus.compON);
 				btnCompON->tooltip(_("Compression on/off"));

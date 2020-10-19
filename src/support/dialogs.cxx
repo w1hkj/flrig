@@ -929,7 +929,6 @@ void setColors()
 	if (btnSpot)			btnSpot->selection_color(btn_lt_color);
 	if (btn_vox)			btn_vox->selection_color(btn_lt_color);
 	if (btnCompON)			btnCompON->selection_color(btn_lt_color);
-//	if (btnSpecial)			btnSpecial->selection_color(btn_lt_color);
 	if (btn_tt550_vox)		btn_tt550_vox->selection_color(btn_lt_color);
 	if (btn_tt550_CompON)	btn_tt550_CompON->selection_color(btn_lt_color);
 
@@ -956,7 +955,6 @@ void setColors()
 
 	if (spnrPOWER)			spnrPOWER->color(bg_slider);
 	if (spnrVOLUME)			spnrVOLUME->color(bg_slider);
-//	if (spnrPOWER)			spnrPOWER->selection_color(btn_slider);
 
 	mainwindow->redraw();
 }
@@ -1103,27 +1101,7 @@ void openMemoryDialog()
 
 void show_controls()
 {
-	int wh = mainwindow->h();
-	int ww = mainwindow->w();
 	switch (progStatus.UIsize) {
-		case wide_ui :
-			if (mainwindow->h() > WIDE_MAINH) {
-				btn_show_controls->label("@-22->");
-				btn_show_controls->redraw_label();
-				grpTABS->hide();
-				mainwindow->size(mainwindow->w(), WIDE_MAINH);
-				mainwindow->size_range(735, WIDE_MAINH, 0, WIDE_MAINH);
-			} else {
-				wh += grpTABS->h();
-				btn_show_controls->label("@-28->");
-				btn_show_controls->redraw_label();
-				grpTABS->show();
-				grpTABS->resize(0, wh - grpTABS->h(), ww, grpTABS->h());
-				mainwindow->size(ww, wh);
-				mainwindow->size_range(735, wh, 0, wh);
-			}
-			mainwindow->redraw();
-			break;
 		case touch_ui : 
 			if (selrig->name_ == rig_TT550.name_) {
 				tabs550->show();
@@ -1136,6 +1114,7 @@ void show_controls()
 			tabsGeneric->redraw();
 			mainwindow->redraw();
 			break;
+		case wide_ui :
 		case small_ui :
 			if (selrig->name_ == rig_TT550.name_) {
 				tabsGeneric->hide();

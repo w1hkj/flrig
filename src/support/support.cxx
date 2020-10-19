@@ -2206,7 +2206,7 @@ void cbRIT()
 {
 	guard_lock serial_lock(&mutex_serial);
 	trace(1, "cbRIT()");
-	if (selrig->has_rit)
+	if (selrig->has_rit  && cntRIT)
 		selrig->setRit((int)cntRIT->value());
 }
 
@@ -2769,6 +2769,10 @@ void redrawAGC()
 	const char *lbl = selrig->agc_label();
 	int val = progStatus.agc_level;
 
+	if (!selrig->has_rf_control) {
+		sldrSQUELCH->label("");
+		sldrSQUELCH->redraw_label();
+	}
 	btnAGC->label(lbl);
 	btnAGC->redraw_label();
 
@@ -3729,6 +3733,118 @@ void adjust_small_ui()
 
 }
 
+void adjust_xig_wide()
+{
+	btnPreamp->show();
+	btnAttenuator->show();
+	btnNOISE->show();
+	btnAutoNotch->hide();
+
+	btnAGC->resize(btnAutoNotch->x(), btnAutoNotch->y(), btnAutoNotch->w(), btnAutoNotch->h());
+	btnAGC->show();
+	grp_row1b1b->add(btnAGC);
+
+	btnAswapB->show();
+	btnSplit->show();
+	btnPTT->show();
+	btnTune->show();
+
+	int xig_y = grp_row2->y() + grp_row2->h() / 4;
+	int xig_h = 5 * btnAGC->h() / 4;
+
+	Fl_Group *xig_group = new Fl_Group(
+		2, xig_y,
+		mainwindow->w() - 4, xig_h);
+
+	Fl_Group *xig_gp1 = new Fl_Group(
+		xig_group->x(), xig_group->y(),
+		(xig_group->w() - 4) / 3, xig_h);
+
+	btnVol->resize(
+		xig_gp1->x(), xig_y,
+		54, xig_gp1->h());
+	xig_gp1->add(btnVol);
+
+	sldrVOLUME->resize(
+		xig_gp1->x() + 54, xig_y,
+		xig_gp1->w() - 54, xig_h);
+	xig_gp1->add(sldrVOLUME);
+
+	btnVol->show();
+	sldrVOLUME->show();
+
+	xig_gp1->end();
+	xig_gp1->resizable(sldrVOLUME);
+
+	Fl_Group *xig_gp2 = new Fl_Group(
+		xig_gp1->x() + xig_gp1->w() + 2, xig_y,
+		xig_gp1->w(), xig_h);
+
+	btnPOWER->resize(
+		xig_gp2->x(), xig_y,
+		54, xig_h);
+	xig_gp2->add(btnPOWER);
+
+	sldrPOWER->resize(
+		xig_gp2->x() + 54, xig_y,
+		xig_gp2->w() - 54, xig_h);
+	xig_gp2->add(sldrPOWER);
+
+	btnPOWER->show();
+	sldrPOWER->show();
+
+	xig_gp2->end();
+	xig_gp2->resizable(sldrPOWER);
+
+	Fl_Group *xig_gp3 = new Fl_Group(
+		xig_gp2->x() + xig_gp2->w() + 2, xig_y,
+		xig_group->w() - 2 * xig_gp1->w() - 4, xig_h);
+
+	xig_gp3->add(sldrSQUELCH);
+	sldrSQUELCH->resize(
+		xig_gp3->x() + 54, xig_y,
+		xig_gp3->w() - 54, xig_h);
+	sldrSQUELCH->label("SQL");
+	sldrSQUELCH->redraw_label();
+	sldrSQUELCH->show();
+
+	xig_gp3->end();
+	xig_gp3->resizable(sldrSQUELCH);
+
+	xig_group->end();
+
+	grp_row2a->remove(sldrMICGAIN);
+	grp_row2a->resize(xig_group->x(), xig_group->y(), xig_group->w(), xig_group->h());
+	grp_row2a->hide();
+	grp_row2b->remove(btnIFsh);
+	grp_row2b->remove(sldrIFSHIFT);
+	grp_row2b->resize(xig_group->x(), xig_group->y(), xig_group->w(), xig_group->h());
+	grp_row2b->hide();
+	grp_row2c->remove(sldrRFGAIN);
+	grp_row2c->resize(xig_group->x(), xig_group->y(), xig_group->w(), xig_group->h());
+	grp_row2c->hide();
+	grp_row2->resize(xig_group->x(), xig_group->y(), xig_group->w(), xig_group->h());
+	grp_row2->hide();
+	mainwindow->remove(grp_row2);
+
+	mainwindow->add(xig_group);
+
+	if (progStatus.tooltips) {
+		Fl_Tooltip::enable(1);
+		if (mnuTooltips) mnuTooltips->set();
+	} else {
+		if (mnuTooltips) mnuTooltips->clear();
+		Fl_Tooltip::enable(0);
+	}
+
+	mainwindow->redraw();
+
+	if (tabs_dialog && tabs_dialog->visible())
+		tabs_dialog->position(mainwindow->x(), mainwindow->y() + mainwindow->h() + 26);
+
+	return;
+}
+
 void adjust_wide_ui()
 {
 	mainwindow->resize( mainwindow->x(), mainwindow->y(), mainwindow->w(), WIDE_MAINH);
@@ -3914,7 +4030,10 @@ void adjust_control_positions()
 			adjust_small_ui();
 			break;
 		case wide_ui :
-			adjust_wide_ui();
+			if (xcvr_name == rig_XIG90.name_)
+				adjust_xig_wide();
+			else
+				adjust_wide_ui();
 			break;
 		case touch_ui :
 		default :
@@ -4011,22 +4130,38 @@ void initTabs()
 
 	} else {
 
-		hidden_tabs->add(tab_yaesu_bands);
-		hidden_tabs->add(tab_FT8n_bands);
-		hidden_tabs->add(tab_FT8n_CTCSS);
-		hidden_tabs->add(tab_icom_bands);
-		hidden_tabs->add(genericCW);
-		hidden_tabs->add(genericQSK);
-		hidden_tabs->add(genericVOX);
-		hidden_tabs->add(genericSpeech);
-		hidden_tabs->add(genericRx);
-		hidden_tabs->add(genericMisc);
-		hidden_tabs->add(genericUser_1);
-		hidden_tabs->add(genericUser_2);
-		hidden_tabs->add(tab7610);
+		if (hidden_tabs) {
+			hidden_tabs->add(tab_yaesu_bands);
+			hidden_tabs->add(tab_FT8n_bands);
+			hidden_tabs->add(tab_FT8n_CTCSS);
+			hidden_tabs->add(tab_icom_bands);
+			hidden_tabs->add(genericCW);
+			hidden_tabs->add(genericQSK);
+			hidden_tabs->add(genericVOX);
+			hidden_tabs->add(genericSpeech);
+			hidden_tabs->add(genericRx);
+			hidden_tabs->add(genericMisc);
+			hidden_tabs->add(genericUser_1);
+			hidden_tabs->add(genericUser_2);
+			hidden_tabs->add(tab7610);
+		} else {
+			tabsGeneric->remove(tab_yaesu_bands);
+			tabsGeneric->remove(tab_FT8n_bands);
+			tabsGeneric->remove(tab_FT8n_CTCSS);
+			tabsGeneric->remove(tab_icom_bands);
+			tabsGeneric->remove(genericCW);
+			tabsGeneric->remove(genericQSK);
+			tabsGeneric->remove(genericVOX);
+			tabsGeneric->remove(genericSpeech);
+			tabsGeneric->remove(genericRx);
+			tabsGeneric->remove(genericMisc);
+			tabsGeneric->remove(genericUser_1);
+			tabsGeneric->remove(genericUser_2);
+			tabsGeneric->remove(tab7610);
+		}
 
 		if (selrig->has_band_selection) {
-			if (selrig->ICOMrig) {
+			if (selrig->ICOMrig || selrig->name_ == rig_XIG90.name_) {
 				tabsGeneric->add(tab_icom_bands);
 				tab_icom_bands->redraw();
 			} else if (selrig->name_ == rig_FT857D.name_ || selrig->name_ == rig_FT897D.name_) {
@@ -4453,6 +4588,7 @@ void init_generic_rig()
 
 void init_rit()
 {
+	if (!cntRIT) return;
 	if (selrig->has_rit) {
 		int min, max, step;
 		selrig->get_RIT_min_max_step(min, max, step);
@@ -4460,26 +4596,31 @@ void init_rit()
 		cntRIT->maximum(max);
 		cntRIT->step(step);
 		switch (progStatus.UIsize) {
-			case small_ui :
-				cntRIT->show();
-				break;
-			case wide_ui : case touch_ui : default :
+			case touch_ui :
 				cntRIT->activate();
+				break;
+			case small_ui :
+			case wide_ui :
+			default :
+				cntRIT->show();
 		}
 		cntRIT->value(progStatus.rit_freq);
 	} else {
 		switch (progStatus.UIsize) {
-			case small_ui :
-				cntRIT->hide();
-				break;
-			case wide_ui: case touch_ui : default :
+			case touch_ui :
 				cntRIT->deactivate();
+				break;
+			case small_ui :
+			case wide_ui :
+			default :
+				cntRIT->hide();
 		}
 	}
 }
 
 void init_xit()
 {
+	if (!cntXIT) return;
 	if (selrig->has_xit) {
 		int min, max, step;
 		selrig->get_XIT_min_max_step(min, max, step);
@@ -4506,6 +4647,7 @@ void init_xit()
 
 void init_bfo()
 {
+	if (!cntBFO) return;
 	if (selrig->has_bfo) {
 		int min, max, step;
 		selrig->get_BFO_min_max_step(min, max, step);
@@ -5626,11 +5768,6 @@ void initRig()
 
 		FreqDispA->set_precision(selrig->precision);
 		FreqDispA->set_ndigits(selrig->ndigits);
-		FreqDispB->set_precision(selrig->precision);
-		FreqDispB->set_ndigits(selrig->ndigits);
-
-		FreqDispB->set_precision(selrig->precision);
-		FreqDispB->set_ndigits(selrig->ndigits);
 		FreqDispB->set_precision(selrig->precision);
 		FreqDispB->set_ndigits(selrig->ndigits);
 

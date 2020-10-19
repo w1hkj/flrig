@@ -159,6 +159,9 @@ extern Fl_Light_Button *btnVol;
 extern Fl_Wheel_Value_Slider *sldrVOLUME;
 extern Fl_Group *grpTABS;
 
+// wide UI group exposure
+extern Fl_Group *grp_row1b1b;
+
 extern Fl_Tabs *tabsGeneric;
 extern Fl_Group *hidden_tabs;
 extern Fl_Group *tab_yaesu_bands;

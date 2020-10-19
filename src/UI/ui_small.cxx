@@ -68,27 +68,27 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	g->box(FL_FLAT_BOX);
 
 	FreqDispA = new cFreqControl(1, 24, 210, 35, _("10"));
-	FreqDispA->box(FL_DOWN_BOX);
-	FreqDispA->color(FL_BACKGROUND_COLOR);
-	FreqDispA->selection_color(FL_BACKGROUND_COLOR);
-	FreqDispA->labeltype(FL_NORMAL_LABEL);
-	FreqDispA->labelfont(0);
-	FreqDispA->labelsize(14);
-	FreqDispA->labelcolor(FL_FOREGROUND_COLOR);
-	FreqDispA->align(Fl_Align(FL_ALIGN_CENTER));
+//	FreqDispA->box(FL_DOWN_BOX);
+//	FreqDispA->color(FL_BACKGROUND_COLOR);
+//	FreqDispA->selection_color(FL_BACKGROUND_COLOR);
+//	FreqDispA->labeltype(FL_NORMAL_LABEL);
+//	FreqDispA->labelfont(0);
+//	FreqDispA->labelsize(14);
+//	FreqDispA->labelcolor(FL_FOREGROUND_COLOR);
+//	FreqDispA->align(Fl_Align(FL_ALIGN_CENTER));
 	FreqDispA->when(FL_WHEN_CHANGED);
 	FreqDispA->SetONOFFCOLOR (FL_YELLOW, FL_BLACK);
 	FreqDispA->setCallBack(movFreqA);
 
 	FreqDispB = new cFreqControl(213, 24, 210, 35, _("10"));
-	FreqDispB->box(FL_DOWN_BOX);
-	FreqDispB->color(FL_BACKGROUND_COLOR);
-	FreqDispB->selection_color(FL_BACKGROUND_COLOR);
-	FreqDispB->labeltype(FL_NORMAL_LABEL);
-	FreqDispB->labelfont(0);
-	FreqDispB->labelsize(14);
-	FreqDispB->labelcolor(FL_FOREGROUND_COLOR);
-	FreqDispB->align(Fl_Align(FL_ALIGN_CENTER));
+//	FreqDispB->box(FL_DOWN_BOX);
+//	FreqDispB->color(FL_BACKGROUND_COLOR);
+//	FreqDispB->selection_color(FL_BACKGROUND_COLOR);
+//	FreqDispB->labeltype(FL_NORMAL_LABEL);
+//	FreqDispB->labelfont(0);
+//	FreqDispB->labelsize(14);
+//	FreqDispB->labelcolor(FL_FOREGROUND_COLOR);
+//	FreqDispB->align(Fl_Align(FL_ALIGN_CENTER));
 	FreqDispB->when(FL_WHEN_CHANGED);
 	FreqDispB->SetONOFFCOLOR (FL_YELLOW, FL_BLACK);
 	FreqDispB->setCallBack(movFreqB);
@@ -461,13 +461,13 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	btn_show_controls->tooltip(_("Show/Hide controls"));
 	btn_show_controls->callback((Fl_Callback*)cb_btn_show_controls);
 
-	btnAttenuator = new Fl_Light_Button(26, 325, 60, 18, _("Att"));
+	btnAttenuator = new Fl_Light_Button(26, 325, 60, 18, _("ATT"));
 	btnAttenuator->tooltip(_("Attenuator On/Off"));
 	btnAttenuator->down_box(FL_THIN_DOWN_BOX);
 	btnAttenuator->labelsize(12);
 	btnAttenuator->callback((Fl_Callback*)cb_btnAttenuator);
 
-	btnPreamp = new Fl_Light_Button(93, 325, 60, 18, _("Pre"));
+	btnPreamp = new Fl_Light_Button(93, 325, 60, 18, _("PRE"));
 	btnPreamp->tooltip(_("Preamp On/Off"));
 	btnPreamp->down_box(FL_THIN_DOWN_BOX);
 	btnPreamp->labelsize(12);
@@ -1465,7 +1465,7 @@ Fl_Double_Window *tabs_window()
 		genericSpeech = new Fl_Group(0, 24, small_mainW, gph - 24, _("Spch"));
 			genericSpeech->hide();
 
-			btnCompON = new Fl_Light_Button(215, 40, 70, 22, _("On"));
+			btnCompON = new Fl_Light_Button(215, 40, 100, 22, _("On"));
 			btnCompON->callback((Fl_Callback*)cb_btnCompON);
 			btnCompON->value(progStatus.compON);
 			btnCompON->tooltip(_("Compression on/off"));
@@ -1682,9 +1682,9 @@ Fl_Double_Window* Small_rig_window() {
 	Fl_Double_Window* w = new Fl_Double_Window(small_mainW, small_mainH, _("Flrig"));
 	w->align(Fl_Align(FL_ALIGN_CLIP|FL_ALIGN_INSIDE));
 
-	hidden_tabs = new Fl_Group(0,0,small_mainW, small_mainH);
-	hidden_tabs->hide();
-	hidden_tabs->end();
+//	hidden_tabs = new Fl_Group(0,0,small_mainW, small_mainH);
+//	hidden_tabs->hide();
+//	hidden_tabs->end();
 
 	grp_menu = new Fl_Group(0,0,small_mainW,small_menuH);
 

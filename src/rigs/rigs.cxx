@@ -111,6 +111,7 @@ RIG_TT566		rig_TT566;
 RIG_TT588		rig_TT588;
 RIG_TT599		rig_TT599;
 RIG_XI5105		rig_XI5105;
+RIG_Xiegu_G90	rig_XIG90;
 
 rigbase *rigs[] = {
 	&rig_null,		// 0
@@ -197,6 +198,7 @@ rigbase *rigs[] = {
 	&rig_TT599,		// 81
 	&rig_AOR5K,		// 82
 	&rig_XI5105,	// 83
+	&rig_XIG90,		// 84
 
 	NULL
 };

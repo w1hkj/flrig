@@ -268,10 +268,11 @@ void close_controls(void*)
 			if (EXPAND_CONTROLS && selrig->has_extras) return;
 			btn_show_controls->label("@-22->");
 			btn_show_controls->redraw_label();
-			grpTABS->hide();
-			mainwindow->resizable(grpTABS);
+//			grpTABS->hide();
+//			mainwindow->resizable(grpTABS);
 			mainwindow->size(progStatus.mainW, 150);
 			mainwindow->size_range(735, 150, 0, 150);
+			if (tabs_dialog && tabs_dialog->visible()) tabs_dialog->hide();
 			break;
 		case small_ui :
 			if (tabs_dialog && tabs_dialog->visible()) tabs_dialog->hide();
@@ -295,14 +296,17 @@ void startup(void*)
 			mainwindow->redraw();
 			break;
 		case wide_ui :
+		{
 			if (EXPAND_CONTROLS && selrig->has_extras) return;
 			btn_show_controls->label("@-22->");
 			btn_show_controls->redraw_label();
-			grpTABS->hide();
-			mainwindow->resizable(grpTABS);
-			mainwindow->size(progStatus.mainW, WIDE_MAINH);
-			mainwindow->size_range(735, WIDE_MAINH, 0, WIDE_MAINH);
+//			grpTABS->hide();
+//			mainwindow->resizable(grpTABS);
+//			int nuH = mainwindow->h();// - grpTABS->h();
+//			mainwindow->size(progStatus.mainW, nuH);//WIDE_MAINH);
+//			mainwindow->size_range(735, nuH, 0, 0);//nuH);
 			mainwindow->redraw();
+		}
 		case small_ui :
 		default :
 //			if (EXPAND_CONTROLS && selrig->has_extras)
@@ -436,6 +440,8 @@ extern FILE *serlog;
 		case wide_ui :
 		default :
 			mainwindow = Wide_rig_window();
+			tabs_dialog = tabs_window();
+			tabs_dialog->hide();
 	}
 	mainwindow->callback(exit_main);
 

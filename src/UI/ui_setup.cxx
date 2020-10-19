@@ -211,7 +211,7 @@ Fl_Double_Window* DisplayDialog() {
 			lblTest = new Fl_Box(
 				su_grp2a->x() + 2, su_grp2a->y() + 2, 206, 31, _("14070.000"));
 			lblTest->box(FL_FLAT_BOX);
-			lblTest->labelfont(4);
+			lblTest->labelfont(progStatus.fontnbr);
 			lblTest->labelsize(32);
 		su_grp2a->end();
 

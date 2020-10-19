@@ -211,6 +211,7 @@ flrig_SOURCES += \
 	rigs/TT588.cxx \
 	rigs/TT599.cxx \
 	rigs/Xiegu-5105.cxx \
+	rigs/Xiegu-G90.cxx \
 	support/debug.cxx \
 	support/dialogs.cxx \
 	support/ptt.cxx \
@@ -374,6 +375,7 @@ EXTRA_DIST = \
 	include/ValueSlider.h \
 	include/xml_server.h \
 	include/Xiegu-5105.h \
+	include/Xiegu-G90.h \
 	include/combo.h \
 	images/alc.xbm \
 	images/P5.xbm \
