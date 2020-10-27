@@ -258,6 +258,16 @@ extern Fl_Button *btnUser14;
 extern Fl_Button *btnUser15;
 extern Fl_Button *btnUser16;
 
+extern Fl_Group  *genericUser_3;
+extern Fl_Button *btnUser17;
+extern Fl_Button *btnUser18;
+extern Fl_Button *btnUser19;
+extern Fl_Button *btnUser20;
+extern Fl_Button *btnUser21;
+extern Fl_Button *btnUser22;
+extern Fl_Button *btnUser23;
+extern Fl_Button *btnUser24;
+
 extern Hspinner *spnr_cw_spot_tone;
 extern Hspinner *spnr_cw_qsk;
 extern Hspinner *spnr_cw_weight;

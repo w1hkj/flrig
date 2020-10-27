@@ -147,6 +147,8 @@ Fl_Group *tabCOMMANDS = (Fl_Group *)0;
 	Fl_Group *tabCmds2 = (Fl_Group *)0;
 	Fl_Group *tabCmds3 = (Fl_Group *)0;
 	Fl_Group *tabCmds4 = (Fl_Group *)0;
+	Fl_Group *tabCmds5 = (Fl_Group *)0;
+	Fl_Group *tabCmds6 = (Fl_Group *)0;
 
 	Fl_Box *bx1a = (Fl_Box *)0;
 	Fl_Box *bx1b = (Fl_Box *)0;
@@ -156,6 +158,10 @@ Fl_Group *tabCOMMANDS = (Fl_Group *)0;
 	Fl_Box *bx3b = (Fl_Box *)0;
 	Fl_Box *bx4a = (Fl_Box *)0;
 	Fl_Box *bx4b = (Fl_Box *)0;
+	Fl_Box *bx5a = (Fl_Box *)0;
+	Fl_Box *bx5b = (Fl_Box *)0;
+	Fl_Box *bx6a = (Fl_Box *)0;
+	Fl_Box *bx6b = (Fl_Box *)0;
 
 	Fl_Input2 * cmdlbl1 = (Fl_Input2 *)0;
 	Fl_Input2 * cmdlbl2 = (Fl_Input2 *)0;
@@ -173,6 +179,14 @@ Fl_Group *tabCOMMANDS = (Fl_Group *)0;
 	Fl_Input2 * cmdlbl14 = (Fl_Input2 *)0;
 	Fl_Input2 * cmdlbl15 = (Fl_Input2 *)0;
 	Fl_Input2 * cmdlbl16 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdlbl17 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdlbl18 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdlbl19 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdlbl20 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdlbl21 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdlbl22 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdlbl23 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdlbl24 = (Fl_Input2 *)0;
 
 	Fl_Input2 * cmdtext1 = (Fl_Input2 *)0;
 	Fl_Input2 * cmdtext2 = (Fl_Input2 *)0;
@@ -190,6 +204,14 @@ Fl_Group *tabCOMMANDS = (Fl_Group *)0;
 	Fl_Input2 * cmdtext14 = (Fl_Input2 *)0;
 	Fl_Input2 * cmdtext15 = (Fl_Input2 *)0;
 	Fl_Input2 * cmdtext16 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdtext17 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdtext18 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdtext19 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdtext20 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdtext21 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdtext22 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdtext23 = (Fl_Input2 *)0;
+	Fl_Input2 * cmdtext24 = (Fl_Input2 *)0;
 
 	Fl_Input2 * shftcmdtext1 = (Fl_Input2 *)0;
 	Fl_Input2 * shftcmdtext2 = (Fl_Input2 *)0;
@@ -207,6 +229,14 @@ Fl_Group *tabCOMMANDS = (Fl_Group *)0;
 	Fl_Input2 * shftcmdtext14 = (Fl_Input2 *)0;
 	Fl_Input2 * shftcmdtext15 = (Fl_Input2 *)0;
 	Fl_Input2 * shftcmdtext16 = (Fl_Input2 *)0;
+	Fl_Input2 * shftcmdtext17= (Fl_Input2 *)0;
+	Fl_Input2 * shftcmdtext18 = (Fl_Input2 *)0;
+	Fl_Input2 * shftcmdtext19 = (Fl_Input2 *)0;
+	Fl_Input2 * shftcmdtext20 = (Fl_Input2 *)0;
+	Fl_Input2 * shftcmdtext21 = (Fl_Input2 *)0;
+	Fl_Input2 * shftcmdtext22 = (Fl_Input2 *)0;
+	Fl_Input2 * shftcmdtext23 = (Fl_Input2 *)0;
+	Fl_Input2 * shftcmdtext24 = (Fl_Input2 *)0;
 
 	Fl_Output * cmdResponse = (Fl_Output *)0;
 
@@ -713,10 +743,18 @@ static void cb_cmdlbl(Fl_Input2 *o, void *d) {
 	  { &progStatus.label13, btnUser13 },
 	  { &progStatus.label14, btnUser14 },
 	  { &progStatus.label15, btnUser15 },
-	  { &progStatus.label16, btnUser16 } };
+	  { &progStatus.label16, btnUser16 },
+	  { &progStatus.label17, btnUser17 },
+	  { &progStatus.label18, btnUser18 },
+	  { &progStatus.label19, btnUser19 },
+	  { &progStatus.label20, btnUser20 },
+	  { &progStatus.label21, btnUser21 },
+	  { &progStatus.label22, btnUser22 },
+	  { &progStatus.label23, btnUser23 },
+	  { &progStatus.label24, btnUser24 } };
 
 	if (val < 0) val = 0;
-	if (val > 15) val = 15;
+	if (val > 23) val = 23;
 
 	*bpairs[val].plbl = o->value();
 	bpairs[val].b->label(o->value());
@@ -733,9 +771,13 @@ static void cb_cmdtext(Fl_Input2 *o, void *d) {
 	  &progStatus.command9, &progStatus.command10,
 	  &progStatus.command11, &progStatus.command12,
 	  &progStatus.command13, &progStatus.command14,
-	  &progStatus.command15, &progStatus.command16 };
+	  &progStatus.command15, &progStatus.command16,
+	  &progStatus.command17, &progStatus.command18,
+	  &progStatus.command19, &progStatus.command20,
+	  &progStatus.command21, &progStatus.command22,
+	  &progStatus.command23, &progStatus.command24 };
 	if (val < 0) val = 0;
-	if (val > 15) val = 15;
+	if (val > 23) val = 23;
 
 	*cmd[val] = o->value();
 }
@@ -750,9 +792,13 @@ static void cb_shftcmdtext(Fl_Input2 *o, void *d) {
 	  &progStatus.shftcmd9, &progStatus.shftcmd10,
 	  &progStatus.shftcmd11, &progStatus.shftcmd12,
 	  &progStatus.shftcmd13, &progStatus.shftcmd14,
-	  &progStatus.shftcmd15, &progStatus.shftcmd16 };
+	  &progStatus.shftcmd15, &progStatus.shftcmd16,
+	  &progStatus.shftcmd17, &progStatus.shftcmd18,
+	  &progStatus.shftcmd19, &progStatus.shftcmd20,
+	  &progStatus.shftcmd21, &progStatus.shftcmd22,
+	  &progStatus.shftcmd23, &progStatus.shftcmd24 };
 	if (val < 0) val = 0;
-	if (val > 15) val = 15;
+	if (val > 23) val = 23;
 
 	*cmd[val] = o->value();
 }
@@ -1733,46 +1779,64 @@ Fl_Group *createCOMMANDS(int X, int Y, int W, int H, const char *label)
 	Fl_Tabs *tabCmds = new Fl_Tabs(X, Y, W, H - 25);
 
 	std::string *cmdlbls[] = {
-		&progStatus.label1, &progStatus.label2, &progStatus.label3, &progStatus.label4,
-		&progStatus.label5, &progStatus.label6, &progStatus.label7, &progStatus.label8,
-		&progStatus.label9, &progStatus.label10, &progStatus.label11, &progStatus.label12,
-		&progStatus.label13, &progStatus.label14, &progStatus.label15, &progStatus.label16 };
+		&progStatus.label1,  &progStatus.label2,  &progStatus.label3,  &progStatus.label4,
+		&progStatus.label5,  &progStatus.label6,  &progStatus.label7,  &progStatus.label8,
+		&progStatus.label9,  &progStatus.label10, &progStatus.label11, &progStatus.label12,
+		&progStatus.label13, &progStatus.label14, &progStatus.label15, &progStatus.label16,
+		&progStatus.label17, &progStatus.label18, &progStatus.label19, &progStatus.label20,
+		&progStatus.label21, &progStatus.label22, &progStatus.label23, &progStatus.label24
+		};
 
 	Fl_Input2 *cmdbtns[] = {
-		cmdlbl1, cmdlbl2,  cmdlbl3,  cmdlbl4,
-		cmdlbl5, cmdlbl6,  cmdlbl7,  cmdlbl8,
-		cmdlbl9, cmdlbl10, cmdlbl11, cmdlbl12,
-		cmdlbl13, cmdlbl14, cmdlbl15, cmdlbl16 };
+		cmdlbl1,  cmdlbl2,  cmdlbl3,  cmdlbl4,
+		cmdlbl5,  cmdlbl6,  cmdlbl7,  cmdlbl8,
+		cmdlbl9,  cmdlbl10, cmdlbl11, cmdlbl12,
+		cmdlbl13, cmdlbl14, cmdlbl15, cmdlbl16,
+		cmdlbl17, cmdlbl18, cmdlbl19, cmdlbl20,
+		cmdlbl21, cmdlbl22, cmdlbl23, cmdlbl24
+		};
  
 	Fl_Input2 *cmdtexts[] = {
-		cmdtext1, cmdtext2,  cmdtext3,  cmdtext4,
+		cmdtext1,  cmdtext2,  cmdtext3,  cmdtext4,
 		cmdtext5,  cmdtext6,  cmdtext7,  cmdtext8,
-		cmdtext9, cmdtext10, cmdtext11, cmdtext12,
-		cmdtext13, cmdtext14, cmdtext15, cmdtext16 };
+		cmdtext9,  cmdtext10, cmdtext11, cmdtext12,
+		cmdtext13, cmdtext14, cmdtext15, cmdtext16,
+		cmdtext17, cmdtext18, cmdtext19, cmdtext20,
+		cmdtext21, cmdtext22, cmdtext23, cmdtext24
+		};
  
 	Fl_Input2 *shftcmdtexts[] = {
-		shftcmdtext1, shftcmdtext2,  shftcmdtext3,  shftcmdtext4,
-		shftcmdtext5, shftcmdtext6,  shftcmdtext7,  shftcmdtext8,
-		shftcmdtext9, shftcmdtext10, shftcmdtext11, shftcmdtext12,
-		shftcmdtext13, shftcmdtext14, shftcmdtext15, shftcmdtext16 };
+		shftcmdtext1,  shftcmdtext2,  shftcmdtext3,  shftcmdtext4,
+		shftcmdtext5,  shftcmdtext6,  shftcmdtext7,  shftcmdtext8,
+		shftcmdtext9,  shftcmdtext10, shftcmdtext11, shftcmdtext12,
+		shftcmdtext13, shftcmdtext14, shftcmdtext15, shftcmdtext16,
+		shftcmdtext17, shftcmdtext18, shftcmdtext19, shftcmdtext20,
+		shftcmdtext21, shftcmdtext22, shftcmdtext23, shftcmdtext24
+		};
  
 	std::string *cmd[] = { 
-		&progStatus.command1, &progStatus.command2, &progStatus.command3, &progStatus.command4,
-		&progStatus.command5, &progStatus.command6, &progStatus.command7, &progStatus.command8,
-		&progStatus.command9, &progStatus.command10, &progStatus.command11, &progStatus.command12,
-		&progStatus.command13, &progStatus.command14, &progStatus.command15, &progStatus.command16 };
+		&progStatus.command1,  &progStatus.command2,  &progStatus.command3,  &progStatus.command4,
+		&progStatus.command5,  &progStatus.command6,  &progStatus.command7,  &progStatus.command8,
+		&progStatus.command9,  &progStatus.command10, &progStatus.command11, &progStatus.command12,
+		&progStatus.command13, &progStatus.command14, &progStatus.command15, &progStatus.command16,
+		&progStatus.command17, &progStatus.command18, &progStatus.command19, &progStatus.command20,
+		&progStatus.command21, &progStatus.command22, &progStatus.command23, &progStatus.command24
+		};
 
 	std::string *shftcmd[] = { 
-		&progStatus.shftcmd1, &progStatus.shftcmd2, &progStatus.shftcmd3, &progStatus.shftcmd4,
-		&progStatus.shftcmd5, &progStatus.shftcmd6, &progStatus.shftcmd7, &progStatus.shftcmd8,
-		&progStatus.shftcmd9, &progStatus.shftcmd10, &progStatus.shftcmd11, &progStatus.shftcmd12,
-		&progStatus.shftcmd13, &progStatus.shftcmd14, &progStatus.shftcmd15, &progStatus.shftcmd16 };
+		&progStatus.shftcmd1,  &progStatus.shftcmd2,  &progStatus.shftcmd3,  &progStatus.shftcmd4,
+		&progStatus.shftcmd5,  &progStatus.shftcmd6,  &progStatus.shftcmd7,  &progStatus.shftcmd8,
+		&progStatus.shftcmd9,  &progStatus.shftcmd10, &progStatus.shftcmd11, &progStatus.shftcmd12,
+		&progStatus.shftcmd13, &progStatus.shftcmd14, &progStatus.shftcmd15, &progStatus.shftcmd16,
+		&progStatus.shftcmd17, &progStatus.shftcmd18, &progStatus.shftcmd19, &progStatus.shftcmd20,
+		&progStatus.shftcmd21, &progStatus.shftcmd22, &progStatus.shftcmd23, &progStatus.shftcmd24
+		};
 
-	static const char *lbl[16] = {
-		"1", "2", "3", "4", 
-		"5", "6", "7", "8",
-		"9", "10", "11", "12", 
-		"13", "14", "15", "16"};
+	static const char *lbl[24] = {
+		"1", "2", "3", "4", "5", "6", "7", "8",
+		"9", "10", "11", "12", "13", "14", "15", "16",
+		"17", "18", "19", "20", "21", "22", "23", "24"
+		};
 
 	tabCmds1 = new Fl_Group(X, Y + 20, W, H - 50, _("1-4"));
 
@@ -1890,6 +1954,64 @@ Fl_Group *createCOMMANDS(int X, int Y, int W, int H, const char *label)
 		}
 
 	tabCmds4->end();
+
+	tabCmds5 = new Fl_Group(X, Y + 20, W, H - 50, _("17-20"));
+
+		bx5a = new Fl_Box(X + 23, Y + 26, 75, 16, "Label");
+		bx5a->box(FL_FLAT_BOX);
+		bx5a->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+
+		bx5b = new Fl_Box(X + 80, Y + 26, W - 80 - 2, 16, "Command");
+		bx5b->box(FL_FLAT_BOX);
+		bx5b->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+
+		for (int n = 16; n < 20; n++) {
+			cmdbtns[n] = new Fl_Input2(X + 27, Y + 46 + (n % 4) * 40, 80, 20, lbl[n]);
+			cmdbtns[n]->align(FL_ALIGN_LEFT);
+			cmdbtns[n]->value(cmdlbls[n]->c_str());
+			cmdbtns[n]->callback((Fl_Callback*)cb_cmdlbl, (void *)long(n));
+
+			cmdtexts[n] = new Fl_Input2(X + 110, Y + 46 + (n % 4) * 40, W - 110 - 2, 20, "");
+			cmdtexts[n]->align(FL_ALIGN_LEFT);
+			cmdtexts[n]->value(cmd[n]->c_str());
+			cmdtexts[n]->callback((Fl_Callback*)cb_cmdtext, (void *)long(n));
+
+			shftcmdtexts[n] = new Fl_Input2(X + 110, Y + 66 + (n % 4) * 40, W - 110 - 2, 20, "SHIFT");
+			shftcmdtexts[n]->align(FL_ALIGN_LEFT);
+			shftcmdtexts[n]->value(shftcmd[n]->c_str());
+			shftcmdtexts[n]->callback((Fl_Callback*)cb_shftcmdtext, (void *)long(n));
+		}
+
+	tabCmds5->end();
+
+	tabCmds6 = new Fl_Group(X, Y + 20, W, H - 50, _("21-24"));
+
+		bx6a = new Fl_Box(X + 23, Y + 26, 75, 16, "Label");
+		bx6a->box(FL_FLAT_BOX);
+		bx6a->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+
+		bx6b = new Fl_Box(X + 80, Y + 26, W - 80 - 2, 16, "Command");
+		bx6b->box(FL_FLAT_BOX);
+		bx6b->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+
+		for (int n = 20; n < 24; n++) {
+			cmdbtns[n] = new Fl_Input2(X + 27, Y + 46 + (n % 4) * 40, 80, 20, lbl[n]);
+			cmdbtns[n]->align(FL_ALIGN_LEFT);
+			cmdbtns[n]->value(cmdlbls[n]->c_str());
+			cmdbtns[n]->callback((Fl_Callback*)cb_cmdlbl, (void *)long(n));
+
+			cmdtexts[n] = new Fl_Input2(X + 110, Y + 46 + (n % 4) * 40, W - 110 - 2, 20, "");
+			cmdtexts[n]->align(FL_ALIGN_LEFT);
+			cmdtexts[n]->value(cmd[n]->c_str());
+			cmdtexts[n]->callback((Fl_Callback*)cb_cmdtext, (void *)long(n));
+
+			shftcmdtexts[n] = new Fl_Input2(X + 110, Y + 66 + (n % 4) * 40, W - 110 - 2, 20, "SHIFT");
+			shftcmdtexts[n]->align(FL_ALIGN_LEFT);
+			shftcmdtexts[n]->value(shftcmd[n]->c_str());
+			shftcmdtexts[n]->callback((Fl_Callback*)cb_shftcmdtext, (void *)long(n));
+		}
+
+	tabCmds6->end();
 
 	tabCmds->end();
 

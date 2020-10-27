@@ -4160,6 +4160,7 @@ void initTabs()
 			hidden_tabs->add(genericMisc);
 			hidden_tabs->add(genericUser_1);
 			hidden_tabs->add(genericUser_2);
+			hidden_tabs->add(genericUser_3);
 			hidden_tabs->add(tab7610);
 		} else {
 			tabsGeneric->remove(tab_yaesu_bands);
@@ -4174,6 +4175,7 @@ void initTabs()
 			tabsGeneric->remove(genericMisc);
 			tabsGeneric->remove(genericUser_1);
 			tabsGeneric->remove(genericUser_2);
+			tabsGeneric->remove(genericUser_3);
 			tabsGeneric->remove(tab7610);
 		}
 
@@ -4404,8 +4406,10 @@ void initTabs()
 
 		tabsGeneric->add(genericUser_1);
 		tabsGeneric->add(genericUser_2);
+		tabsGeneric->add(genericUser_3);
 		genericUser_1->redraw();
 		genericUser_2->redraw();
+		genericUser_3->redraw();
 
 		if (selrig->name_ == rig_IC7610.name_) {
 			tabsGeneric->add(tab7610);

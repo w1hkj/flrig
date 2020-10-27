@@ -1057,7 +1057,7 @@ Fl_Double_Window *tabs_window()
 	tabsGeneric = new Fl_Tabs(0, 0, small_mainW, gph);
 		tabsGeneric->selection_color(FL_LIGHT1);
 
-		tab_yaesu_bands = new Fl_Group(0, 24, small_mainW, gph - 24, _("Bands"));
+		tab_yaesu_bands = new Fl_Group(0, 24, small_mainW, gph - 24, _("Band"));
 			btn_yaesu_select_1 = new Fl_Button(4, 40, 60, 18, _("1.8"));
 			btn_yaesu_select_1->tooltip(_("160m Band"));
 			btn_yaesu_select_1->color((Fl_Color)246);
@@ -1131,7 +1131,7 @@ Fl_Double_Window *tabs_window()
 
 		tab_yaesu_bands->end();
 
-		tab_FT8n_bands = new Fl_Group(0, 24, small_mainW, gph - 24, _("Bands"));
+		tab_FT8n_bands = new Fl_Group(0, 24, small_mainW, gph - 24, _("Band"));
 		static const char setsave[] = _("Left click - set\nRight click - save");
 			btn_FT8n_select_1 = new Fl_Button(4, 30, 60, 18, _("1.8"));
 			btn_FT8n_select_1->tooltip(setsave);
@@ -1229,7 +1229,7 @@ Fl_Double_Window *tabs_window()
 
 		tab_FT8n_CTCSS->end();
 
-		tab_icom_bands = new Fl_Group(0, 24, small_mainW, gph - 24, _("Bands"));
+		tab_icom_bands = new Fl_Group(0, 24, small_mainW, gph - 24, _("Band"));
 			btn_icom_select_1 = new Fl_Button(4, 30, 60, 18, _("1.8"));
 			btn_icom_select_1->tooltip(_("Left click - get\nRight click - set"));
 			btn_icom_select_1->color((Fl_Color)246);
@@ -1581,7 +1581,7 @@ Fl_Double_Window *tabs_window()
 
 		genericMisc->end();
 
-		genericUser_1 = new Fl_Group(0, 24, small_mainW, gph - 24, _("User A"));
+		genericUser_1 = new Fl_Group(0, 24, small_mainW, gph - 24, _("Cmd A"));
 			btnUser1 = new Fl_Button(5, genericUser_1->y() + 12, 100, 20, "USER 1");
 			btnUser1->callback((Fl_Callback*)cb_btnUser, (void*)1);
 
@@ -1608,7 +1608,7 @@ Fl_Double_Window *tabs_window()
 
 		genericUser_1->end();
 
-		genericUser_2 = new Fl_Group(0, 24, small_mainW, gph - 24, _("User B"));
+		genericUser_2 = new Fl_Group(0, 24, small_mainW, gph - 24, _("Cmd B"));
 			btnUser9 = new Fl_Button(5, genericUser_2->y() + 12, 100, 20, "USER 9");
 			btnUser9->callback((Fl_Callback*)cb_btnUser, (void*)9);
 
@@ -1634,6 +1634,33 @@ Fl_Double_Window *tabs_window()
 			btnUser16->callback((Fl_Callback*)cb_btnUser, (void*)16);
 
 		genericUser_2->end();
+
+		genericUser_3 = new Fl_Group(0, 24, small_mainW, gph - 24, _("Cmd C"));
+			btnUser17 = new Fl_Button(5, genericUser_3->y() + 12, 100, 20, "USER 1");
+			btnUser17->callback((Fl_Callback*)cb_btnUser, (void*)1);
+
+			btnUser18 = new Fl_Button(110, genericUser_3->y() + 12, 100, 20, "USER 2");
+			btnUser18->callback((Fl_Callback*)cb_btnUser, (void*)2);
+
+			btnUser19 = new Fl_Button(215, genericUser_3->y() + 12, 100, 20, "USER 3");
+			btnUser19->callback((Fl_Callback*)cb_btnUser, (void*)3);
+
+			btnUser20 = new Fl_Button(320, genericUser_3->y() + 12, 100, 20, "USER 4");
+			btnUser20->callback((Fl_Callback*)cb_btnUser, (void*)4);
+
+			btnUser21 = new Fl_Button(5, genericUser_3->y() + 36, 100, 20, "USER 5");
+			btnUser21->callback((Fl_Callback*)cb_btnUser, (void*)5);
+
+			btnUser22 = new Fl_Button(110, genericUser_3->y() + 36, 100, 20, "USER 6");
+			btnUser22->callback((Fl_Callback*)cb_btnUser, (void*)6);
+
+			btnUser23 = new Fl_Button(215, genericUser_3->y() + 36, 100, 20, "USER 7");
+			btnUser23->callback((Fl_Callback*)cb_btnUser, (void*)7);
+
+			btnUser24 = new Fl_Button(320, genericUser_3->y() + 36, 100, 20, "USER 8");
+			btnUser24->callback((Fl_Callback*)cb_btnUser, (void*)8);
+
+		genericUser_3->end();
 
 		tab7610 = new Fl_Group(0, 24, small_mainW, gph - 24, _("IC7610"));
 			ic7610att = new Fl_ComboBox(5, tab7610->y() + 10, 70, 20, "Att level");
@@ -1671,7 +1698,7 @@ Fl_Double_Window *tabs_window()
 
 		tab7610->end();
 
-	tabsGeneric->resizable(genericUser_2);
+	tabsGeneric->resizable(genericUser_3);
 	tabsGeneric->end();
 
 	grpTABS->end();

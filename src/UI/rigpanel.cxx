@@ -260,6 +260,16 @@ Fl_Button *btnUser14 = (Fl_Button*)0;
 Fl_Button *btnUser15 = (Fl_Button*)0;
 Fl_Button *btnUser16 = (Fl_Button*)0;
 
+Fl_Group  *genericUser_3 = (Fl_Group *)0;
+Fl_Button *btnUser17 = (Fl_Button*)0;
+Fl_Button *btnUser18 = (Fl_Button*)0;
+Fl_Button *btnUser19 = (Fl_Button*)0;
+Fl_Button *btnUser20 = (Fl_Button*)0;
+Fl_Button *btnUser21 = (Fl_Button*)0;
+Fl_Button *btnUser22 = (Fl_Button*)0;
+Fl_Button *btnUser23 = (Fl_Button*)0;
+Fl_Button *btnUser24 = (Fl_Button*)0;
+
 Fl_Group *genericRXB = (Fl_Group *)0;
 Hspinner *cntRIT = (Hspinner *)0;
 Hspinner *cntXIT = (Hspinner *)0;
@@ -826,6 +836,14 @@ static void cb_btnUser( Fl_Button * o, void *d) {
 			case 14: cb_send_command(progStatus.shftcmd14, cmdResponse); break;
 			case 15: cb_send_command(progStatus.shftcmd15, cmdResponse); break;
 			case 16: cb_send_command(progStatus.shftcmd16, cmdResponse); break;
+			case 17: cb_send_command(progStatus.shftcmd17, cmdResponse); break;
+			case 18: cb_send_command(progStatus.shftcmd18, cmdResponse); break;
+			case 19: cb_send_command(progStatus.shftcmd19, cmdResponse); break;
+			case 20: cb_send_command(progStatus.shftcmd20, cmdResponse); break;
+			case 21: cb_send_command(progStatus.shftcmd21, cmdResponse); break;
+			case 22: cb_send_command(progStatus.shftcmd22, cmdResponse); break;
+			case 23: cb_send_command(progStatus.shftcmd23, cmdResponse); break;
+			case 24: cb_send_command(progStatus.shftcmd24, cmdResponse); break;
 		}
 	} else {
 		switch (val) {
@@ -845,6 +863,14 @@ static void cb_btnUser( Fl_Button * o, void *d) {
 			case 14: cb_send_command(progStatus.command14, cmdResponse); break;
 			case 15: cb_send_command(progStatus.command15, cmdResponse); break;
 			case 16: cb_send_command(progStatus.command16, cmdResponse); break;
+			case 17: cb_send_command(progStatus.command17, cmdResponse); break;
+			case 18: cb_send_command(progStatus.command18, cmdResponse); break;
+			case 19: cb_send_command(progStatus.command19, cmdResponse); break;
+			case 20: cb_send_command(progStatus.command20, cmdResponse); break;
+			case 21: cb_send_command(progStatus.command21, cmdResponse); break;
+			case 22: cb_send_command(progStatus.command22, cmdResponse); break;
+			case 23: cb_send_command(progStatus.command23, cmdResponse); break;
+			case 24: cb_send_command(progStatus.command24, cmdResponse); break;
 		}
 	}
 }

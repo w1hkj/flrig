@@ -318,6 +318,32 @@ struct status {
    string	label16;
    string	command16;
    string	shftcmd16;
+
+   string	label17;
+   string	command17;
+   string	shftcmd17;
+   string	label18;
+   string	command18;
+   string	shftcmd18;
+   string	label19;
+   string	command19;
+   string	shftcmd19;
+   string	label20;
+   string	command20;
+   string	shftcmd20;
+   string	label21;
+   string	command21;
+   string	shftcmd21;
+   string	label22;
+   string	command22;
+   string	shftcmd22;
+   string	label23;
+   string	command23;
+   string	shftcmd23;
+   string	label24;
+   string	command24;
+   string	shftcmd24;
+
 // =========================
 	int		bg_red;
 	int		bg_green;

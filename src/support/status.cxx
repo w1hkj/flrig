@@ -333,7 +333,33 @@ status progStatus = {
 	"",				// string	command16;
 	"",				// string	shftcmd16;
 
+	"cmd 17",		// string	label17;
+	"",				// string	command17;
+	"",				// string	shftcmd17;
+	"cmd 18",		// string	label18;
+	"",				// string	command18;
+	"",				// string	shftcmd18;
+	"cmd 19",		// string	label19;
+	"",				// string	command19;
+	"",				// string	shftcmd19;
+	"cmd 20",		// string	label20;
+	"",				// string	command20;
+	"",				// string	shftcmd20;
+	"cmd 21",		// string	label21;
+	"",				// string	command21;
+	"",				// string	shftcmd21;
+	"cmd 22",		// string	label22;
+	"",				// string	command22;
+	"",				// string	shftcmd22;
+	"cmd 23",		// string	label23;
+	"",				// string	command23;
+	"",				// string	shftcmd23;
+	"cmd 24",		// string	label24;
+	"",				// string	command24;
+	"",				// string	shftcmd24;
+
 // =========================
+
 	232,		// int	 bg_red;
 	255,		// int	 bg_green;
 	232,		// int	 bg_blue;
@@ -787,6 +813,38 @@ void status::saveLastState()
 	spref.set("label16", label16.c_str());
 	spref.set("command16", command16.c_str());
 	spref.set("shftcmd16", shftcmd16.c_str());
+
+	spref.set("label17", label17.c_str());
+	spref.set("command17", command17.c_str());
+	spref.set("shftcmd17", shftcmd17.c_str());
+
+	spref.set("label18", label18.c_str());
+	spref.set("command18", command18.c_str());
+	spref.set("shftcmd18", shftcmd18.c_str());
+
+	spref.set("label19", label19.c_str());
+	spref.set("command19", command19.c_str());
+	spref.set("shftcmd19", shftcmd19.c_str());
+
+	spref.set("label20", label20.c_str());
+	spref.set("command20", command20.c_str());
+	spref.set("shftcmd20", shftcmd20.c_str());
+
+	spref.set("label21", label21.c_str());
+	spref.set("command21", command21.c_str());
+	spref.set("shftcmd21", shftcmd21.c_str());
+
+	spref.set("label22", label22.c_str());
+	spref.set("command22", command22.c_str());
+	spref.set("shftcmd22", shftcmd22.c_str());
+
+	spref.set("label23", label23.c_str());
+	spref.set("command23", command23.c_str());
+	spref.set("shftcmd23", shftcmd23.c_str());
+
+	spref.set("label24", label24.c_str());
+	spref.set("command24", command24.c_str());
+	spref.set("shftcmd24", shftcmd24.c_str());
 
 	spref.set("fg_red", fg_red);
 	spref.set("fg_green", fg_green);
@@ -1335,6 +1393,62 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("shftcmd16", defbuffer, shftcmd16.c_str(), 499);
 		shftcmd16 = defbuffer;
 
+		spref.get("label17", defbuffer,  label17.c_str(), 499);
+		label17 = defbuffer;
+		spref.get("command17", defbuffer, command17.c_str(), 499);
+		command17 = defbuffer;
+		spref.get("shftcmd17", defbuffer, shftcmd17.c_str(), 499);
+		shftcmd17 = defbuffer;
+
+		spref.get("label18", defbuffer, label18.c_str(), 499);
+		label18 = defbuffer;
+		spref.get("command18", defbuffer, command18.c_str(), 499);
+		command18 = defbuffer;
+		spref.get("shftcmd18", defbuffer, shftcmd18.c_str(), 499);
+		shftcmd18 = defbuffer;
+
+		spref.get("label19", defbuffer, label19.c_str(), 499);
+		label19 = defbuffer;
+		spref.get("command19", defbuffer, command19.c_str(), 499);
+		command19 = defbuffer;
+		spref.get("shftcmd19", defbuffer, shftcmd11.c_str(), 499);
+		shftcmd19 = defbuffer;
+
+		spref.get("label20", defbuffer, label20.c_str(), 499);
+		label20 = defbuffer;
+		spref.get("command20", defbuffer, command20.c_str(), 499);
+		command20 = defbuffer;
+		spref.get("shftcmd20", defbuffer, shftcmd20.c_str(), 499);
+		shftcmd20 = defbuffer;
+
+		spref.get("label21", defbuffer, label21.c_str(), 499);
+		label21 = defbuffer;
+		spref.get("command21", defbuffer, command21.c_str(), 499);
+		command21 = defbuffer;
+		spref.get("shftcmd21", defbuffer, shftcmd21.c_str(), 499);
+		shftcmd21 = defbuffer;
+
+		spref.get("label22", defbuffer, label22.c_str(), 499);
+		label22 = defbuffer;
+		spref.get("command22", defbuffer, command22.c_str(), 499);
+		command22 = defbuffer;
+		spref.get("shftcmd22", defbuffer, shftcmd22.c_str(), 499);
+		shftcmd22 = defbuffer;
+
+		spref.get("label23", defbuffer, label23.c_str(), 499);
+		label23 = defbuffer;
+		spref.get("command23", defbuffer, command23.c_str(), 499);
+		command23 = defbuffer;
+		spref.get("shftcmd23", defbuffer, shftcmd23.c_str(), 499);
+		shftcmd23 = defbuffer;
+
+		spref.get("label24", defbuffer, label24.c_str(), 499);
+		label24 = defbuffer;
+		spref.get("command24", defbuffer, command24.c_str(), 499);
+		command24 = defbuffer;
+		spref.get("shftcmd24", defbuffer, shftcmd24.c_str(), 499);
+		shftcmd24 = defbuffer;
+
 		spref.get("fg_red", fg_red, fg_red);
 		spref.get("fg_green", fg_green, fg_green);
 		spref.get("fg_blue", fg_blue, fg_blue);
@@ -1649,6 +1763,15 @@ void status::UI_laststate()
 	btnUser15->label(label15.c_str()); btnUser15->redraw_label();
 	btnUser16->label(label16.c_str()); btnUser16->redraw_label();
 
+	btnUser17->label(label17.c_str()); btnUser17->redraw_label();
+	btnUser18->label(label18.c_str()); btnUser18->redraw_label();
+	btnUser19->label(label19.c_str()); btnUser19->redraw_label();
+	btnUser20->label(label20.c_str()); btnUser20->redraw_label();
+	btnUser21->label(label21.c_str()); btnUser21->redraw_label();
+	btnUser22->label(label22.c_str()); btnUser22->redraw_label();
+	btnUser23->label(label23.c_str()); btnUser23->redraw_label();
+	btnUser24->label(label24.c_str()); btnUser24->redraw_label();
+
 	Fl::scheme(ui_scheme.c_str());
 }
 
@@ -1793,6 +1916,22 @@ string status::info()
 	info << "command 15         : " << command15 << "\n";
 	info << "label 16           : " << label16 << "\n";
 	info << "command 16         : " << command16 << "\n";
+	info << "label 17           : " << label17 << "\n";
+	info << "command 17         : " << command17 << "\n";
+	info << "label 18           : " << label18 << "\n";
+	info << "command 18         : " << command18 << "\n";
+	info << "label 19           : " << label19 << "\n";
+	info << "command 19         : " << command19 << "\n";
+	info << "label 20           : " << label20 << "\n";
+	info << "command 20         : " << command20 << "\n";
+	info << "label 21           : " << label21 << "\n";
+	info << "command 21         : " << command21 << "\n";
+	info << "label 22           : " << label22 << "\n";
+	info << "command 22         : " << command22 << "\n";
+	info << "label 23           : " << label23 << "\n";
+	info << "command 23         : " << command23 << "\n";
+	info << "label 24           : " << label24 << "\n";
+	info << "command 24         : " << command24 << "\n";
 
 	return info.str();
 }
