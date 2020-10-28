@@ -135,6 +135,23 @@ Fl_Button *btn_yaesu_select_10 = (Fl_Button *)0;
 Fl_Button *btn_yaesu_select_11 = (Fl_Button *)0;
 Fl_ComboBox *op_yaesu_select60 = (Fl_ComboBox *)0;
 
+Fl_Group  *tab_ft991_bands = (Fl_Group *)0;
+Fl_Button *btn_ft991_select_1 = (Fl_Button *)0;
+Fl_Button *btn_ft991_select_2 = (Fl_Button *)0;
+Fl_Button *btn_ft991_select_3 = (Fl_Button *)0;
+Fl_Button *btn_ft991_select_4 = (Fl_Button *)0;
+Fl_Button *btn_ft991_select_5 = (Fl_Button *)0;
+Fl_Button *btn_ft991_select_6 = (Fl_Button *)0;
+Fl_Button *btn_ft991_select_7 = (Fl_Button *)0;
+Fl_Button *btn_ft991_select_8 = (Fl_Button *)0;
+Fl_Button *btn_ft991_select_9 = (Fl_Button *)0;
+Fl_Button *btn_ft991_select_10 = (Fl_Button *)0;
+Fl_Button *btn_ft991_select_11 = (Fl_Button *)0;
+Fl_Button *btn_ft991_select_12 = (Fl_Button *)0;
+Fl_Button *btn_ft991_select_13 = (Fl_Button *)0;
+Fl_PL_tone *choice_ft991_tTONE = (Fl_PL_tone *)0;
+Fl_PL_tone *choice_ft991_rTONE = (Fl_PL_tone *)0;
+
 Fl_Group *tab_FT8n_bands = (Fl_Group *)0;
 Fl_Button *btn_FT8n_select_1 = (Fl_Button *)0;
 Fl_Button *btn_FT8n_select_2 = (Fl_Button *)0;

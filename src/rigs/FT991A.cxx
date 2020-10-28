@@ -81,15 +81,15 @@ static const char *FT991A_widths_NN[] = {"NORM", "NARR", NULL };
 static const int FT991A_wvals_NN[] = {0, 1, WVALS_LIMIT};
 
 // US 60M 5-USB, 5-CW
-static const char *US_60m_chan[]  = {"000","125","126","127","128","130","141","142","143","144","146",NULL};
-static const char *US_60m_label[] = {"VFO","U51","U52","U53","U54","U55","U56","U57","U58","U59","U50",NULL};
+//static const char *US_60m_chan[]  = {"000","125","126","127","128","130","141","142","143","144","146",NULL};
+//static const char *US_60m_label[] = {"VFO","U51","U52","U53","U54","U55","U56","U57","U58","U59","U50",NULL};
 
 // UK 60m channel numbers by Brian, G8SEZ
-static const char *UK_60m_chan[]  = {"000","118","120","121","127","128","129","130",NULL};
-static const char *UK_60m_label[] = {"VFO","U51","U52","U53","U54","U55","U56","U57",NULL};
+//static const char *UK_60m_chan[]  = {"000","118","120","121","127","128","129","130",NULL};
+//static const char *UK_60m_label[] = {"VFO","U51","U52","U53","U54","U55","U56","U57",NULL};
 
-static const char **Channels_60m = US_60m_chan;
-static const char **label_60m    = US_60m_label;
+//static const char **Channels_60m = US_60m_chan;
+//static const char **label_60m    = US_60m_label;
 
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
@@ -221,7 +221,7 @@ void RIG_FT991A::initialize()
 	}
 // Disable Auto Information mode
 	sendCommand("AI0;");
-
+/*
 // "MRnnn;" if valid, returns last channel used, "mrlll...;", aunsigned long int with channel nnn info.
 	cmd = "MR118;";
 	wait_char(';', 27, FL991A_WAIT_TIME, "Read UK 60m Channel Mem", ASC);
@@ -241,13 +241,13 @@ void RIG_FT991A::initialize()
 		while (*p) op_yaesu_select60->add(*p++);
 	}
 	op_yaesu_select60->index(m_60m_indx);
-
+*/
 }
 
 void RIG_FT991A::post_initialize()
 {
-	enable_yaesu_bandselect(12, false);
-	enable_yaesu_bandselect(13, true);
+//	enable_yaesu_bandselect(12, false);
+//	enable_yaesu_bandselect(13, false);
 }
 
 bool RIG_FT991A::check ()
@@ -264,6 +264,7 @@ unsigned long int RIG_FT991A::get_vfoA ()
 	cmd = rsp = "FA";
 	cmd += ';';
 	wait_char(';',12, FL991A_WAIT_TIME, "get vfo A", ASC);
+	gett("get_vfoA");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqA;
@@ -285,6 +286,7 @@ void RIG_FT991A::set_vfoA (unsigned long int freq)
 	}
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET vfo A", cmd, replystr);
+	sett("set_vfoA");
 }
 
 unsigned long int RIG_FT991A::get_vfoB ()
@@ -292,6 +294,7 @@ unsigned long int RIG_FT991A::get_vfoB ()
 	cmd = rsp = "FB";
 	cmd += ';';
 	wait_char(';',12, FL991A_WAIT_TIME, "get vfo B", ASC);
+	gett("get_vfoB");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return freqB;
@@ -314,6 +317,7 @@ void RIG_FT991A::set_vfoB (unsigned long int freq)
 	}
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET vfo B", cmd, replystr);
+	sett("set_vfoB");
 }
 
 void RIG_FT991A::selectA()
@@ -321,6 +325,7 @@ void RIG_FT991A::selectA()
 	cmd = "FT2;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select A", cmd, replystr);
+	sett("selectA");
 }
 
 void RIG_FT991A::selectB()
@@ -328,6 +333,7 @@ void RIG_FT991A::selectB()
 	cmd = "FT3;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select B", cmd, replystr);
+	sett("selectB");
 }
 
 void RIG_FT991A::A2B()
@@ -335,6 +341,7 @@ void RIG_FT991A::A2B()
 	cmd = "AB;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "vfo A->B", cmd, replystr);
+	sett("A2B");
 }
 
 void RIG_FT991A::B2A()
@@ -342,6 +349,7 @@ void RIG_FT991A::B2A()
 	cmd = "BA;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "vfo B->A", cmd, replystr);
+	sett("B2A");
 }
 
 void RIG_FT991A::swapAB()
@@ -349,6 +357,7 @@ void RIG_FT991A::swapAB()
 	cmd = "SV;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "vfo A<>B", cmd, replystr);
+	sett("swapAB");
 }
 
 bool RIG_FT991A::can_split()
@@ -380,6 +389,7 @@ void RIG_FT991A::set_split(bool val)
 			showresp(WARN, ASC, "Rx on A, Tx on A", cmd, replystr);
 		}
 	}
+	sett("set_split");
 	Fl::awake(highlight_vfo, (void *)0);
 }
 
@@ -392,6 +402,8 @@ int RIG_FT991A::get_split()
 	cmd = rsp = "FT";
 	cmd.append(";");
 	wait_char(';',4, FL991A_WAIT_TIME, "get split tx vfo", ASC);
+	gett("get split tx");
+
 	p = replystr.rfind(rsp);
 	if (p == string::npos) return false;
 	tx = replystr[p+2] - '0';
@@ -400,6 +412,7 @@ int RIG_FT991A::get_split()
 	cmd = rsp = "FR";
 	cmd.append(";");
 	wait_char(';',4, FL991A_WAIT_TIME, "get split rx vfo", ASC);
+	gett("get split rx");
 
 	p = replystr.rfind(rsp);
 	if (p == string::npos) return false;
@@ -416,6 +429,7 @@ int RIG_FT991A::get_smeter()
 	cmd = rsp = "SM0";
 	cmd += ';';
 	wait_char(';',7, FL991A_WAIT_TIME, "get smeter", ASC);
+	gett("get_smeter");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -430,6 +444,7 @@ int RIG_FT991A::get_swr()
 	cmd = rsp = "RM6";
 	cmd += ';';
 	wait_char(';',7, FL991A_WAIT_TIME, "get swr", ASC);
+	gett("get_swr");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -443,6 +458,7 @@ int RIG_FT991A::get_alc()
 	cmd = rsp = "RM4";
 	cmd += ';';
 	wait_char(';',7, FL991A_WAIT_TIME, "get alc", ASC);
+	gett("get_alc");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -456,6 +472,7 @@ int RIG_FT991A::get_power_out()
 	cmd = rsp = "RM5";
 	sendCommand(cmd.append(";"));
 	wait_char(';',7, FL991A_WAIT_TIME, "get pout", ASC);
+	gett("get_power_out");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -473,6 +490,7 @@ int RIG_FT991A::get_power_control()
 	cmd = rsp = "PC";
 	cmd += ';';
 	wait_char(';',6, FL991A_WAIT_TIME, "get power", ASC);
+	gett("get_power_control");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.power_level;
@@ -492,6 +510,7 @@ void RIG_FT991A::set_power_control(double val)
 	}
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET power", cmd, replystr);
+	sett("set_power_control");
 }
 
 // Volume control return 0 ... 100
@@ -500,6 +519,7 @@ int RIG_FT991A::get_volume_control()
 	cmd = rsp = "AG0";
 	cmd += ';';
 	wait_char(';',7, FL991A_WAIT_TIME, "get vol", ASC);
+	gett("get_volume_control");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.volume;
@@ -519,6 +539,7 @@ void RIG_FT991A::set_volume_control(int val)
 	}
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET vol", cmd, replystr);
+	sett("set_volume_control");
 }
 
 // Tranceiver PTT on/off
@@ -528,6 +549,7 @@ void RIG_FT991A::set_PTT_control(int val)
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET PTT", cmd, replystr);
 	ptt_ = val;
+	sett("set_ptt_control");
 }
 
 int RIG_FT991A::get_PTT()
@@ -551,12 +573,15 @@ void RIG_FT991A::tune_rig(int how)
 	else if (how == 2) cmd[4] = '2';
 	sendCommand(cmd);
 	showresp(WARN, ASC, "tune rig", cmd, replystr);
+	sett("tune_rig");
 }
 
 int  RIG_FT991A::get_tune()
 {
 	cmd = "AC;";
 	wait_char(';',6, FL991A_WAIT_TIME, "Tuner Enabled?", ASC);
+	gett("get_tune");
+
 	size_t p = replystr.rfind("AC");
 	if (p == string::npos) return 0;
 	if ((p + 5) >= replystr.length()) return 0;
@@ -587,6 +612,7 @@ void RIG_FT991A::set_attenuator(int val)
 	cmd[3] += atten_level;
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET att", cmd, replystr);
+	sett("set_attenuator");
 }
 
 int RIG_FT991A::get_attenuator()
@@ -594,6 +620,7 @@ int RIG_FT991A::get_attenuator()
 	cmd = rsp = "RA0";
 	cmd += ';';
 	wait_char(';',5, FL991A_WAIT_TIME, "get att", ASC);
+	gett("get_attenuator");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.attenuator;
@@ -632,6 +659,7 @@ void RIG_FT991A::set_preamp(int val)
 	cmd[3] = '0' + preamp_level;
 	sendCommand (cmd);
 	showresp(WARN, ASC, "SET preamp", cmd, replystr);
+	sett("set_preamp");
 }
 
 int RIG_FT991A::get_preamp()
@@ -639,6 +667,7 @@ int RIG_FT991A::get_preamp()
 	cmd = rsp = "PA0";
 	cmd += ';';
 	wait_char(';',5, FL991A_WAIT_TIME, "get pre", ASC);
+	gett("get_preamp");
 
 	size_t p = replystr.rfind(rsp);
 	if (p != string::npos)
@@ -732,6 +761,7 @@ void RIG_FT991A::set_modeA(int val)
 		showresp(WARN, ASC, "SET spot off", cmd, replystr);
 		btnSpot->value(0);
 	}
+	sett("set_modeA");
 }
 
 int RIG_FT991A::get_modeA()
@@ -739,6 +769,7 @@ int RIG_FT991A::get_modeA()
 	cmd = rsp = "MD0";
 	cmd += ';';
 	wait_char(';',5, FL991A_WAIT_TIME, "get mode A", ASC);
+	gett("get_modeA");
 
 	size_t p = replystr.rfind(rsp);
 	if (p != string::npos) {
@@ -771,6 +802,7 @@ void RIG_FT991A::set_modeB(int val)
 		showresp(WARN, ASC, "SET spot off", cmd, replystr);
 		btnSpot->value(0);
 	}
+	sett("set_modeB");
 }
 
 int RIG_FT991A::get_modeB()
@@ -778,6 +810,7 @@ int RIG_FT991A::get_modeB()
 	cmd = rsp = "MD0";
 	cmd += ';';
 	wait_char(';',5, FL991A_WAIT_TIME, "get mode B", ASC);
+	gett("get_modeB");
 
 	size_t p = replystr.rfind(rsp);
 	if (p != string::npos) {
@@ -817,6 +850,7 @@ void RIG_FT991A::set_bwA(int val)
 	cmd += ';';
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET bw A", cmd, replystr);
+	sett("set_bwA");
 }
 
 int RIG_FT991A::get_bwA()
@@ -840,6 +874,7 @@ int RIG_FT991A::get_bwA()
 	cmd = rsp = "SH0";
 	cmd += ';';
 	wait_char(';',6, FL991A_WAIT_TIME, "get bw A", ASC);
+	gett("get_bwA");
 
 	p = replystr.rfind(rsp);
 	if (p == string::npos) return bwA;
@@ -884,6 +919,7 @@ void RIG_FT991A::set_bwB(int val)
 	cmd += ';';
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET bw B", cmd, replystr);
+	sett("set_bwB");
 }
 
 int RIG_FT991A::get_bwB()
@@ -907,6 +943,7 @@ int RIG_FT991A::get_bwB()
 	cmd = rsp = "SH0";
 	cmd += ';';
 	wait_char(';',6, FL991A_WAIT_TIME, "get bw B", ASC);
+	gett("get_bwB");
 
 	p = replystr.rfind(rsp);
 	if (p == string::npos) return bwB;
@@ -942,6 +979,7 @@ void RIG_FT991A::set_if_shift(int val)
 	}
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET if shift", cmd, replystr);
+	sett("set_if_shift");
 }
 
 bool RIG_FT991A::get_if_shift(int &val)
@@ -949,6 +987,7 @@ bool RIG_FT991A::get_if_shift(int &val)
 	cmd = rsp = "IS0";
 	cmd += ';';
 	wait_char(';',9, FL991A_WAIT_TIME, "get if shift", ASC);
+	gett("get_if_shift");
 
 	size_t p = replystr.rfind(rsp);
 	val = progStatus.shift_val;
@@ -982,12 +1021,14 @@ void RIG_FT991A::set_notch(bool on, int val)
 		}
 		sendCommand(cmd);
 		showresp(WARN, ASC, "SET notch val", cmd, replystr);
+		sett("set_notch_val");
 		return;
 	}
 
 // set notch off
 	cmd = "BP00000;";
 	sendCommand(cmd);
+	sett("set_notch_on/off");
 	showresp(WARN, ASC, "SET notch off", cmd, replystr);
 }
 
@@ -997,6 +1038,7 @@ bool  RIG_FT991A::get_notch(int &val)
 	cmd = rsp = "BP00";
 	cmd += ';';
 	wait_char(';',8, FL991A_WAIT_TIME, "get notch on/off", ASC);
+	gett("get_notch");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return ison;
@@ -1028,12 +1070,14 @@ void RIG_FT991A::set_auto_notch(int v)
 	cmd.assign("BC0").append(v ? "1" : "0" ).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET DNF Auto Notch Filter", cmd, replystr);
+	sett("set_auto_notch");
 }
 
 int  RIG_FT991A::get_auto_notch()
 {
 	cmd = "BC0;";
 	wait_char(';',5, FL991A_WAIT_TIME, "get auto notch", ASC);
+	gett("get_auto_notch");
 	size_t p = replystr.rfind("BC0");
 	if (p == string::npos) return 0;
 	if (replystr[p+3] == '1') return 1;
@@ -1046,12 +1090,14 @@ void RIG_FT991A::set_noise(bool b)
 	else   cmd = "NB00;";
 	sendCommand (cmd);
 	showresp(WARN, ASC, "SET noise blanker", cmd, replystr);
+	sett("set_noise");
 }
 
 int RIG_FT991A::get_noise()
 {
 	cmd = "NB0;";
 	wait_char(';',5, FL991A_WAIT_TIME, "get NB", ASC);
+	gett("get_noise");
 
 	size_t p = replystr.rfind("NB0");
 	if (p == string::npos) return 0;
@@ -1069,6 +1115,7 @@ void RIG_FT991A::set_mic_gain(int val)
 	}
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET mic", cmd, replystr);
+	sett("set_mic_gain");
 }
 
 int RIG_FT991A::get_mic_gain()
@@ -1076,6 +1123,7 @@ int RIG_FT991A::get_mic_gain()
 	cmd = rsp = "MG";
 	cmd += ';';
 	wait_char(';',6, FL991A_WAIT_TIME, "get mic", ASC);
+	gett("get_mic_gain");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.mic_gain;
@@ -1102,6 +1150,7 @@ void RIG_FT991A::set_rf_gain(int val)
 	}
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET rfgain", cmd, replystr);
+	sett("set_rf_gain");
 }
 
 int  RIG_FT991A::get_rf_gain()
@@ -1110,6 +1159,7 @@ int  RIG_FT991A::get_rf_gain()
 	cmd = rsp = "RG0";
 	cmd += ';';
 	wait_char(';',7, FL991A_WAIT_TIME, "get rfgain", ASC);
+	gett("get_rf_gain");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.rfgain;
@@ -1135,6 +1185,7 @@ void RIG_FT991A::set_vox_onoff()
 	if (progStatus.vox_onoff) cmd[2] = '1';
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET vox", cmd, replystr);
+	sett("set_vox_onoff");
 }
 
 void RIG_FT991A::set_vox_gain()
@@ -1143,6 +1194,19 @@ void RIG_FT991A::set_vox_gain()
 	cmd.append(to_decimal(progStatus.vox_gain, 3)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET vox gain", cmd, replystr);
+	sett("set_vox_gain");
+}
+
+void RIG_FT991A::get_vox_gain()
+{
+	cmd = "VG;";
+	wait_char(';', 6, FL991A_WAIT_TIME, "get VOX gain", ASC);
+	gett("get_vox_gain");
+
+	size_t p = replystr.rfind("VG");
+	if (p == string::npos) return;
+	replystr[p+5] = 0;
+	progStatus.vox_gain = atoi(&replystr[p+2]);
 }
 
 void RIG_FT991A::set_vox_anti()
@@ -1151,6 +1215,7 @@ void RIG_FT991A::set_vox_anti()
 	cmd.append(to_decimal(progStatus.vox_anti, 3)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET anti-vox", cmd, replystr);
+	sett("set_vox_anti");
 }
 
 void RIG_FT991A::set_vox_hang()
@@ -1159,6 +1224,19 @@ void RIG_FT991A::set_vox_hang()
 	cmd.append(to_decimal(progStatus.vox_hang, 4)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET vox delay", cmd, replystr);
+	sett("set_vox_hang");
+}
+
+void RIG_FT991A::get_vox_hang()
+{
+	cmd = "VD;";
+	wait_char(';', 7, FL991A_WAIT_TIME, "get VOX delay", ASC);
+	gett("get_vox_hang");
+
+	size_t p = replystr.rfind("VD");
+	if (p == string::npos) return;
+	replystr[p+6] = 0;
+	progStatus.vox_hang = atoi(&replystr[p+2]);
 }
 
 void RIG_FT991A::set_vox_on_dataport()
@@ -1167,6 +1245,7 @@ void RIG_FT991A::set_vox_on_dataport()
 	if (progStatus.vox_on_dataport) cmd[5] = '1';
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET vox on data port", cmd, replystr);
+	sett("set_vox_on_dataport");
 }
 
 void RIG_FT991A::set_cw_wpm()
@@ -1177,6 +1256,7 @@ void RIG_FT991A::set_cw_wpm()
 	cmd.append(to_decimal(progStatus.cw_wpm, 3)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET cw wpm", cmd, replystr);
+	sett("set_cw_wpm");
 }
 
 
@@ -1186,6 +1266,7 @@ void RIG_FT991A::enable_keyer()
 	if (progStatus.enable_keyer) cmd[2] = '1';
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET keyer on/off", cmd, replystr);
+	sett("enable_keyer");
 }
 
 bool RIG_FT991A::set_cw_spot()
@@ -1195,6 +1276,7 @@ bool RIG_FT991A::set_cw_spot()
 		if (progStatus.spot_onoff) cmd[2] = '1';
 		sendCommand(cmd);
 		showresp(WARN, ASC, "SET spot on/off", cmd, replystr);
+		sett("set_cw_spot");
 		return true;
 	} else
 		return false;
@@ -1206,6 +1288,7 @@ void RIG_FT991A::set_cw_weight()
 	cmd.assign("EX014").append(to_decimal(n, 2)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET cw weight", cmd, replystr);
+	sett("set_cw_weight");
 }
 
 void RIG_FT991A::set_cw_qsk()
@@ -1214,6 +1297,7 @@ void RIG_FT991A::set_cw_qsk()
 	cmd.assign("EX056").append(to_decimal(n, 1)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET cw qsk", cmd, replystr);
+	sett("set_cw_qsk");
 }
 
 void RIG_FT991A::set_cw_spot_tone()
@@ -1222,46 +1306,12 @@ void RIG_FT991A::set_cw_spot_tone()
 	cmd.assign("EX059").append(to_decimal(n, 2)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET cw tone", cmd, replystr);
+	sett("set_cw_spot_tone");
 }
 
 /*
 void RIG_FT991A::set_cw_vol()
 {
-}
-*/
-
-/*
-void RIG_FT991A::get_band_selection(int v)
-{
-	int chan_mem_on = false;
-	cmd = "IF;";
-	wait_char(';',28, FL991A_WAIT_TIME, "get vfo mode in get_band_selection", ASC);
-	size_t p = replystr.rfind("IF");
-	if (p == string::npos) return;
-	if ((p + 27) >= replystr.length()) return;
-	if (replystr[p+21] != '0') {	// vfo 60M memory mode
-		chan_mem_on = true;
-	}
-
-	if (v == 13) {
-		m_60m_indx = op_yaesu_select60->index();
-		if (m_60m_indx)
-			cmd.assign("MC").append(Channels_60m[m_60m_indx]).append(";");
-		else if (chan_mem_on)
-			cmd = "VM;";
-	} else {		// v == 1..11 band selection OR return to vfo mode == 0
-		if (chan_mem_on) {
-			cmd = "VM;";
-			op_yaesu_select60->index(m_60m_indx = 0);
-		} else {
-			if (v < 3)
-				v = v - 1;
-			cmd.assign("BS").append(to_decimal(v, 2)).append(";");
-		}
-	}
-
-	sendCommand(cmd);
-	showresp(WARN, ASC, "Select Band Stacks", cmd, replystr);
 }
 */
 
@@ -1271,6 +1321,7 @@ void RIG_FT991A::set_noise_reduction_val(int val)
 	cmd.assign("RL0").append(to_decimal(val, 2)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET_noise_reduction_val", cmd, replystr);
+	sett("set_noise_reduction_val");
 }
 
 int  RIG_FT991A::get_noise_reduction_val()
@@ -1291,6 +1342,7 @@ void RIG_FT991A::set_noise_reduction(int val)
 	cmd.assign("NR0").append(val ? "1" : "0" ).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET noise reduction", cmd, replystr);
+	sett("set_noise_reduction_on/off");
 }
 
 int  RIG_FT991A::get_noise_reduction()
@@ -1321,6 +1373,7 @@ void RIG_FT991A::set_xcvr_auto_on()
 		sendCommand(cmd);
 		MilliSleep(3000);	// Wait for rig startup?  Maybe not needed.
 	}
+	sett("set_xcvr_auto_on");
 }
 
 void RIG_FT991A::set_xcvr_auto_off()
@@ -1330,6 +1383,7 @@ void RIG_FT991A::set_xcvr_auto_off()
 	cmd = "PS0;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET xcvr auto on/off", cmd, replystr);
+	sett("set_xcvr_auto_off");
 }
 
 void RIG_FT991A::set_compression(int on, int val)
@@ -1349,6 +1403,7 @@ void RIG_FT991A::set_compression(int on, int val)
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set Comp off", cmd, replystr);
 	}
+	sett("set_comression");
 }
 
 void RIG_FT991A::setVfoAdj(double v)
@@ -1363,6 +1418,7 @@ void RIG_FT991A::setVfoAdj(double v)
 	cmd.append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET vfo adjust", cmd, replystr);
+	sett("set_VfoAdj");
 }
 
 double RIG_FT991A::getVfoAdj() 
@@ -1383,3 +1439,10 @@ void RIG_FT991A::get_vfoadj_min_max_step(int &min, int &max, int &step)
 	step = 1;
 }
 
+void RIG_FT991A::get_band_selection(int v)
+{
+	const char *bands[] = {"00", "01", "03", "04", "05", "06", "07", "08", "09", "10", "15", "16", "11"};
+	cmd.assign("BS").append(bands[v-1]).append(";");
+	sendCommand(cmd);
+	sett("get band");
+}

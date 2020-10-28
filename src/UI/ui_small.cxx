@@ -1131,6 +1131,86 @@ Fl_Double_Window *tabs_window()
 
 		tab_yaesu_bands->end();
 
+		tab_ft991_bands = new Fl_Group(0, 24, small_mainW, gph - 24, _("Band"));
+			btn_ft991_select_1 = new Fl_Button(4, 30, 60, 18, _("1.8"));
+			btn_ft991_select_1->tooltip(_("Left click - get"));
+			btn_ft991_select_1->color((Fl_Color)246);
+			btn_ft991_select_1->callback((Fl_Callback*)cb_btn_band_select, (void *)1);
+
+			btn_ft991_select_2 = new Fl_Button(74, 30, 60, 18, _("3.5"));
+			btn_ft991_select_2->tooltip(_("Left click - get"));
+			btn_ft991_select_2->color((Fl_Color)246);
+			btn_ft991_select_2->callback((Fl_Callback*)cb_btn_band_select, (void *)2);
+
+			btn_ft991_select_3 = new Fl_Button(145, 30, 60, 18, _("7"));
+			btn_ft991_select_3->tooltip(_("Left click - get"));
+			btn_ft991_select_3->color((Fl_Color)246);
+			btn_ft991_select_3->callback((Fl_Callback*)cb_btn_band_select, (void *)3);
+
+			btn_ft991_select_4 = new Fl_Button(216, 30, 60, 18, _("10"));
+			btn_ft991_select_4->tooltip(_("Left click - get"));
+			btn_ft991_select_4->color((Fl_Color)246);
+			btn_ft991_select_4->callback((Fl_Callback*)cb_btn_band_select, (void *)4);
+
+			btn_ft991_select_5 = new Fl_Button(287, 30, 60, 18, _("14"));
+			btn_ft991_select_5->tooltip(_("Left click - get"));
+			btn_ft991_select_5->color((Fl_Color)246);
+			btn_ft991_select_5->callback((Fl_Callback*)cb_btn_band_select, (void *)5);
+
+			btn_ft991_select_6 = new Fl_Button(358, 30, 60, 18, _("18"));
+			btn_ft991_select_6->tooltip(_("Left click - get"));
+			btn_ft991_select_6->color((Fl_Color)246);
+			btn_ft991_select_6->callback((Fl_Callback*)cb_btn_band_select, (void *)6);
+
+			btn_ft991_select_7 = new Fl_Button(4, 50, 60, 18, _("21"));
+			btn_ft991_select_7->tooltip(_("Left click - get"));
+			btn_ft991_select_7->color((Fl_Color)246);
+			btn_ft991_select_7->callback((Fl_Callback*)cb_btn_band_select, (void *)7);
+
+			btn_ft991_select_8 = new Fl_Button(74, 50, 60, 18, _("24"));
+			btn_ft991_select_8->tooltip(_("Left click - get"));
+			btn_ft991_select_8->color((Fl_Color)246);
+			btn_ft991_select_8->callback((Fl_Callback*)cb_btn_band_select, (void *)8);
+
+			btn_ft991_select_9 = new Fl_Button(145, 50, 60, 18, _("28"));
+			btn_ft991_select_9->tooltip(_("Left click - get"));
+			btn_ft991_select_9->color((Fl_Color)246);
+			btn_ft991_select_9->callback((Fl_Callback*)cb_btn_band_select, (void *)9);
+
+			btn_ft991_select_10 = new Fl_Button(216, 50, 60, 18, _("50"));
+			btn_ft991_select_10->tooltip(_("Left click - get"));
+			btn_ft991_select_10->color((Fl_Color)246);
+			btn_ft991_select_10->callback((Fl_Callback*)cb_btn_band_select, (void *)10);
+
+			btn_ft991_select_11 = new Fl_Button(287, 50, 60, 18, _("144"));
+			btn_ft991_select_11->tooltip(_("Left click - get"));
+			btn_ft991_select_11->color((Fl_Color)246);
+			btn_ft991_select_11->callback((Fl_Callback*)cb_btn_band_select, (void *)11);
+
+			btn_ft991_select_12 = new Fl_Button(358, 50, 60, 18, _("430"));
+			btn_ft991_select_12->tooltip(_("Left click - get"));
+			btn_ft991_select_12->color((Fl_Color)246);
+			btn_ft991_select_12->callback((Fl_Callback*)cb_btn_band_select, (void *)12);
+
+			btn_ft991_select_13 = new Fl_Button(4, 70, 60, 18, _("Gen"));
+			btn_ft991_select_13->tooltip(_("Left click - get"));
+			btn_ft991_select_13->color((Fl_Color)246);
+			btn_ft991_select_13->callback((Fl_Callback*)cb_btn_band_select, (void *)13);
+
+			choice_ft991_tTONE = new Fl_PL_tone(145, 70, 75, 18, _("tTONE"));
+			choice_ft991_tTONE->align((Fl_Align)FL_ALIGN_LEFT);
+			choice_ft991_tTONE->value(8);
+			choice_ft991_tTONE->end();
+			choice_ft991_tTONE->hide();
+
+			choice_ft991_rTONE = new Fl_PL_tone(287, 70, 75, 18, _("rTONE"));
+			choice_ft991_rTONE->align((Fl_Align)FL_ALIGN_LEFT);
+			choice_ft991_rTONE->value(8);
+			choice_ft991_rTONE->end();
+			choice_ft991_rTONE->hide();
+
+		tab_ft991_bands->end();
+
 		tab_FT8n_bands = new Fl_Group(0, 24, small_mainW, gph - 24, _("Band"));
 		static const char setsave[] = _("Left click - set\nRight click - save");
 			btn_FT8n_select_1 = new Fl_Button(4, 30, 60, 18, _("1.8"));

@@ -117,8 +117,10 @@ public:
 
 	void set_vox_onoff();
 	void set_vox_gain();
+	void get_vox_gain();
 	void set_vox_anti();
 	void set_vox_hang();
+	void get_vox_hang();
 	void set_vox_on_dataport();
 
 	void get_cw_wpm_min_max(int &min, int &max) {
@@ -131,6 +133,7 @@ public:
 	bool set_cw_spot();
 	void set_cw_spot_tone();
 //	void set_band_selection(int v);
+	void get_band_selection(int v);
 	void get_nr_min_max_step(int &min, int &max, int &step) {
 		min = 1; max = 15; step = 1; }	
 	void set_noise_reduction_val(int val);

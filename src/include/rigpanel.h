@@ -179,6 +179,23 @@ extern Fl_Button *btn_yaesu_select_10;
 extern Fl_Button *btn_yaesu_select_11;
 extern Fl_ComboBox *op_yaesu_select60;
 
+extern Fl_Group  *tab_ft991_bands;
+extern Fl_Button *btn_ft991_select_1;
+extern Fl_Button *btn_ft991_select_2;
+extern Fl_Button *btn_ft991_select_3;
+extern Fl_Button *btn_ft991_select_4;
+extern Fl_Button *btn_ft991_select_5;
+extern Fl_Button *btn_ft991_select_6;
+extern Fl_Button *btn_ft991_select_7;
+extern Fl_Button *btn_ft991_select_8;
+extern Fl_Button *btn_ft991_select_9;
+extern Fl_Button *btn_ft991_select_10;
+extern Fl_Button *btn_ft991_select_11;
+extern Fl_Button *btn_ft991_select_12;
+extern Fl_Button *btn_ft991_select_13;
+extern Fl_PL_tone *choice_ft991_tTONE;
+extern Fl_PL_tone *choice_ft991_rTONE;
+
 extern Fl_Group *tab_FT8n_bands;
 extern Fl_Button *btn_FT8n_select_1;
 extern Fl_Button *btn_FT8n_select_2;

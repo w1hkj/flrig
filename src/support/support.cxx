@@ -4149,6 +4149,7 @@ void initTabs()
 
 		if (hidden_tabs) {
 			hidden_tabs->add(tab_yaesu_bands);
+			hidden_tabs->add(tab_ft991_bands);
 			hidden_tabs->add(tab_FT8n_bands);
 			hidden_tabs->add(tab_FT8n_CTCSS);
 			hidden_tabs->add(tab_icom_bands);
@@ -4164,6 +4165,7 @@ void initTabs()
 			hidden_tabs->add(tab7610);
 		} else {
 			tabsGeneric->remove(tab_yaesu_bands);
+			tabsGeneric->remove(tab_ft991_bands);
 			tabsGeneric->remove(tab_FT8n_bands);
 			tabsGeneric->remove(tab_FT8n_CTCSS);
 			tabsGeneric->remove(tab_icom_bands);
@@ -4188,6 +4190,9 @@ void initTabs()
 				tabsGeneric->add(tab_FT8n_CTCSS);
 				tab_FT8n_bands->redraw();
 				tab_FT8n_CTCSS->redraw();
+			} else if (selrig->name_ == rig_FT991A.name_) {
+				tabsGeneric->add(tab_ft991_bands);
+				tab_ft991_bands->redraw();
 			} else {
 				tabsGeneric->add(tab_yaesu_bands);
 				tab_yaesu_bands->redraw();

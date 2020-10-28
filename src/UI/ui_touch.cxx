@@ -877,6 +877,88 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 
 			tab_yaesu_bands->end();
 
+			tab_ft991_bands = new Fl_Group(xpos, ypos+tabh, W, tabb, _("Band"));
+
+				btn_ft991_select_1 = new Fl_Button(xpos+4, by, 50, bh, _("1.8"));
+				btn_ft991_select_1->tooltip(_("Left click - get\nRight click - set"));
+				btn_ft991_select_1->color((Fl_Color)246);
+				btn_ft991_select_1->callback((Fl_Callback*)cb_btn_band_select, (void *)1);
+
+				btn_ft991_select_2 = new Fl_Button(xpos+58, by, 50, bh, _("3.5"));
+				btn_ft991_select_2->tooltip(_("Left click - get\nRight click - set"));
+				btn_ft991_select_2->color((Fl_Color)246);
+				btn_ft991_select_2->callback((Fl_Callback*)cb_btn_band_select, (void *)2);
+
+				btn_ft991_select_3 = new Fl_Button(xpos+112, by, 50, bh, _("7"));
+				btn_ft991_select_3->tooltip(_("Left click - get\nRight click - set"));
+				btn_ft991_select_3->color((Fl_Color)246);
+				btn_ft991_select_3->callback((Fl_Callback*)cb_btn_band_select, (void *)3);
+				btn_ft991_select_3->align(Fl_Align(FL_ALIGN_CLIP));
+
+				btn_ft991_select_4 = new Fl_Button(xpos+166, by, 50, bh, _("10"));
+				btn_ft991_select_4->tooltip(_("Left click - get\nRight click - set"));
+				btn_ft991_select_4->color((Fl_Color)246);
+				btn_ft991_select_4->callback((Fl_Callback*)cb_btn_band_select, (void *)4);
+
+				btn_ft991_select_5 = new Fl_Button(xpos+220, by, 50, bh, _("14"));
+				btn_ft991_select_5->tooltip(_("Left click - get\nRight click - set"));
+				btn_ft991_select_5->color((Fl_Color)246);
+				btn_ft991_select_5->callback((Fl_Callback*)cb_btn_band_select, (void *)5);
+
+				btn_ft991_select_6 = new Fl_Button(xpos+274, by, 50, bh, _("18"));
+				btn_ft991_select_6->tooltip(_("Left click - get\nRight click - set"));
+				btn_ft991_select_6->color((Fl_Color)246);
+				btn_ft991_select_6->callback((Fl_Callback*)cb_btn_band_select, (void *)6);
+
+				btn_ft991_select_7 = new Fl_Button(xpos+328, by, 50, bh, _("21"));
+				btn_ft991_select_7->tooltip(_("Left click - get\nRight click - set"));
+				btn_ft991_select_7->color((Fl_Color)246);
+				btn_ft991_select_7->callback((Fl_Callback*)cb_btn_band_select, (void *)7);
+
+				btn_ft991_select_8 = new Fl_Button(xpos+372, by, 50, bh, _("24"));
+				btn_ft991_select_8->tooltip(_("Left click - get\nRight click - set"));
+				btn_ft991_select_8->color((Fl_Color)246);
+				btn_ft991_select_8->callback((Fl_Callback*)cb_btn_band_select, (void *)8);
+
+				btn_ft991_select_9 = new Fl_Button(xpos+426, by, 50, bh, _("28"));
+				btn_ft991_select_9->tooltip(_("Left click - get\nRight click - set"));
+				btn_ft991_select_9->color((Fl_Color)246);
+				btn_ft991_select_9->callback((Fl_Callback*)cb_btn_band_select, (void *)9);
+
+				btn_ft991_select_10 = new Fl_Button(xpos+480, by, 50, bh, _("50"));
+				btn_ft991_select_10->tooltip(_("Left click - get\nRight click - set"));
+				btn_ft991_select_10->color((Fl_Color)246);
+				btn_ft991_select_10->callback((Fl_Callback*)cb_btn_band_select, (void *)10);
+
+				btn_ft991_select_11 = new Fl_Button(xpos+534, by, 50, bh, _("144"));
+				btn_ft991_select_11->tooltip(_("Left click - get\nRight click - set"));
+				btn_ft991_select_11->color((Fl_Color)246);
+				btn_ft991_select_11->callback((Fl_Callback*)cb_btn_band_select, (void *)11);
+
+				btn_ft991_select_12 = new Fl_Button(xpos+ 588, by, 50, bh, _("440"));
+				btn_ft991_select_12->tooltip(_("Left click - get\nRight click - set"));
+				btn_ft991_select_12->color((Fl_Color)246);
+				btn_ft991_select_12->callback((Fl_Callback*)cb_btn_band_select, (void *)12);
+
+				btn_ft991_select_13 = new Fl_Button(xpos+ 642, by, 50, bh, _("Gen"));
+				btn_ft991_select_13->tooltip(_("Left click - get\nRight click - set"));
+				btn_ft991_select_13->color((Fl_Color)246);
+				btn_ft991_select_13->callback((Fl_Callback*)cb_btn_band_select, (void *)13);
+
+				choice_ft991_tTONE = new Fl_PL_tone(xpos+ 696, by, 75, bh, _("tTONE"));
+				choice_ft991_tTONE->align((Fl_Align)FL_ALIGN_BOTTOM);
+				choice_ft991_tTONE->value(8);
+				choice_ft991_tTONE->end();
+				choice_ft991_tTONE->hide();
+
+				choice_ft991_rTONE = new Fl_PL_tone(xpos+ 775, by, 75, bh, _("rTONE"));
+				choice_ft991_rTONE->align((Fl_Align)FL_ALIGN_BOTTOM);
+				choice_ft991_rTONE->value(8);
+				choice_ft991_rTONE->end();
+				choice_ft991_rTONE->hide();
+
+			tab_ft991_bands->end();
+
 			tab_FT8n_bands = new Fl_Group(xpos, ypos+tabh, W, tabb, _("Band"));
 			static const char setsave[] = _("Left click - set\nRight click - save");
 				btn_FT8n_select_1 = new Fl_Button(xpos+4, by, 50, bh, _("1.8"));
