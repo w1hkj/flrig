@@ -996,14 +996,14 @@ void RIG_FT450D::set_xcvr_auto_off()
 }
 
 // val 0 .. 100
+static int mg = 0;
 void RIG_FT450D::set_mic_gain(int val)
 {
 	cmd = "MG000;";
-	val = (int)(val * 2.55); // convert to 0 .. 255
-	for (int i = 3; i > 0; i--) {
-		cmd[1+i] += val % 10;
-		val /= 10;
-	}
+	if (val == 1) cmd = "MG000;";
+	else if (val == 2) cmd = "MG128;";
+	else cmd = "MG255;";
+	mg = val;
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET mic", cmd, replystr);
 	sett("set_mic_gain");
@@ -1018,15 +1018,18 @@ int RIG_FT450D::get_mic_gain()
 	gett("get_mic_gain");
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == string::npos) return mg;
 	replystr[p+5] = 0;
-	return atoi(&replystr[p+2]);;
+	int val = atoi(&replystr[p+2]);
+	if (val < 86) return 1;
+	if (val < 127) return 2;
+	return 3;
 }
 
 void RIG_FT450D::get_mic_min_max_step(int &min, int &max, int &step)
 {
-	min = 0;
-	max = 100;
+	min = 1;
+	max = 3;
 	step = 1;
 }
 
