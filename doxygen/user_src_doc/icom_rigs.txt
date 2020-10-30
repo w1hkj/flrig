@@ -1,124 +1,124 @@
 /**
-\page icom_rigs  Supported Icom Transceivers
+\page icom_rigs  Supported transceivers/ICom Transceivers
 \anchor icom_703_a
 <center>
-\image latex IC703.png "IC 703" width=3.75in
-\image html IC703.png "IC 703"
+\image latex transceivers/IC703.png "transceivers/IC 703" width=3.75in
+\image html transceivers/IC703.png "transceivers/IC 703"
 </center>
 \anchor icom_706mk2g_a
 <center>
-\image latex IC706MKIIG.png "IC 706 MKIIG" width=3.75in
-\image html IC706MKIIG.png "IC 706 MKIIG"
+\image latex transceivers/IC706MKIIG.png "transceivers/IC 706 MKIIG" width=3.75in
+\image html transceivers/IC706MKIIG.png "transceivers/IC 706 MKIIG"
 </center>
 \anchor icom_718_a
 <center>
-\image latex IC718.png "IC 718" width=3.75in
-\image html IC718.png "IC 718"
+\image latex transceivers/IC718.png "transceivers/IC 718" width=3.75in
+\image html transceivers/IC718.png "transceivers/IC 718"
 </center>
 \anchor icom_728_a
 <center>
-\image latex IC728.png "IC 728" width=3.75in
-\image html IC728.png "IC 728"
+\image latex transceivers/IC728.png "transceivers/IC 728" width=3.75in
+\image html transceivers/IC728.png "transceivers/IC 728"
 </center>
 \anchor icom_735_a
 <center>
-\image latex IC735.png "IC 735" width=3.75in
-\image html IC735.png "IC 735"
+\image latex transceivers/IC735.png "transceivers/IC 735" width=3.75in
+\image html transceivers/IC735.png "transceivers/IC 735"
 </center>
 \anchor icom_746_a
 <center>
-\image latex IC746.png "IC 746" width=3.75in
-\image html IC746.png "IC 746"
+\image latex transceivers/IC746.png "transceivers/IC 746" width=3.75in
+\image html transceivers/IC746.png "transceivers/IC 746"
 </center>
 \anchor icom_746pro_a
 <center>
-\image latex IC746PRO.png "IC 746" width=3.75in
-\image html IC746PRO.png "IC 746"
+\image latex transceivers/IC746PRO.png "transceivers/IC 746" width=3.75in
+\image html transceivers/IC746PRO.png "transceivers/IC 746"
 </center>
 \anchor icom_756pro_a
 <center>
-\image latex IC756PRO.png "IC 756 pro2" width=3.75in
-\image html IC756PRO.png "IC 756 pro2"
+\image latex transceivers/IC756PRO.png "transceivers/IC 756 pro2" width=3.75in
+\image html transceivers/IC756PRO.png "transceivers/IC 756 pro2"
 </center>
 \anchor icom_756pro2_a
 <center>
-\image latex IC756PROII.png "IC 756 pro2" width=3.75in
-\image html IC756PROII.png "IC 756 pro2"
+\image latex transceivers/IC756PROII.png "transceivers/IC 756 pro2" width=3.75in
+\image html transceivers/IC756PROII.png "transceivers/IC 756 pro2"
 </center>
 \anchor icom_756pro3_a
 <center>
-\image latex IC756PROIII.png "IC 756 pro3" width=3.75in
-\image html IC756PROIII.png "IC 756 pro3"
+\image latex transceivers/IC756PROIII.png "transceivers/IC 756 pro3" width=3.75in
+\image html transceivers/IC756PROIII.png "transceivers/IC 756 pro3"
 </center>
 \anchor icom_910h_a
 <center>
-\image latex IC910H.png "IC 910 H" width=3.75in
-\image html IC910H.png "IC 910 H"
+\image latex transceivers/IC910H.png "transceivers/IC 910 H" width=3.75in
+\image html transceivers/IC910H.png "transceivers/IC 910 H"
 </center>
 \anchor icom_7000_a
 <center>
-\image latex IC7000.png "IC 7000" width=3.75in
-\image html IC7000.png "IC 7000"
+\image latex transceivers/IC7000.png "transceivers/IC 7000" width=3.75in
+\image html transceivers/IC7000.png "transceivers/IC 7000"
 </center>
 \anchor icom_7100_a
 <center>
-\image latex IC7100.png "IC 7100" width=3.75in
-\image html IC7100.png "IC 7100"
+\image latex transceivers/IC7100.png "transceivers/IC 7100" width=3.75in
+\image html transceivers/IC7100.png "transceivers/IC 7100"
 </center>
 \anchor icom_7200_a
 <center>
-\image latex IC7200.png "IC 7200" width=3.75in
-\image html IC7200.png "IC 7200"
+\image latex transceivers/IC7200.png "transceivers/IC 7200" width=3.75in
+\image html transceivers/IC7200.png "transceivers/IC 7200"
 </center>
 \anchor icom_7300_a
 <center>
-\image latex IC7300.png "IC 7300" width=3.75in
-\image html IC7300.png "IC 7300"
+\image latex transceivers/IC7300.png "transceivers/IC 7300" width=3.75in
+\image html transceivers/IC7300.png "transceivers/IC 7300"
 </center>
 \anchor icom_7410_a
 <center>
-\image latex IC7410.png "IC 7410" width=3.75in
-\image html IC7410.png "IC 7410"
+\image latex transceivers/IC7410.png "transceivers/IC 7410" width=3.75in
+\image html transceivers/IC7410.png "transceivers/IC 7410"
 </center>
 \anchor icom_7600_a
 <center>
-\image latex IC7600.png "IC 7600" width=3.75in
-\image html IC7600.png "IC 7600"
+\image latex transceivers/IC7600.png "transceivers/IC 7600" width=3.75in
+\image html transceivers/IC7600.png "transceivers/IC 7600"
 </center>
 \anchor icom_7610_a
 <center>
-\image latex IC7610.png "IC 7610" width=3.75in
-\image html IC7610.png "IC 7610"
+\image latex transceivers/IC7610.png "transceivers/IC 7610" width=3.75in
+\image html transceivers/IC7610.png "transceivers/IC 7610"
 </center>
 \anchor icom_7700_a
 <center>
-\image latex IC7700.png "IC 7700" width=3.75in
-\image html IC7700.png "IC 7700"
+\image latex transceivers/IC7700.png "transceivers/IC 7700" width=3.75in
+\image html transceivers/IC7700.png "transceivers/IC 7700"
 </center>
 \anchor icom_7800_a
 <center>
-\image latex IC7800.png "IC 7800" width=3.75in
-\image html IC7800.png "IC 7800"
+\image latex transceivers/IC7800.png "transceivers/IC 7800" width=3.75in
+\image html transceivers/IC7800.png "transceivers/IC 7800"
 </center>
 \anchor icom_7851_a
 <center>
-\image latex IC7851.png "IC 7851" width=3.75in
-\image html IC7851.png "IC 7851"
+\image latex transceivers/IC7851.png "transceivers/IC 7851" width=3.75in
+\image html transceivers/IC7851.png "transceivers/IC 7851"
 </center>
 \anchor icom_9100_a
 <center>
-\image latex IC9100.png "IC 9100" width=3.75in
-\image html IC9100.png "IC 9100"
+\image latex transceivers/IC9100.png "transceivers/IC 9100" width=3.75in
+\image html transceivers/IC9100.png "transceivers/IC 9100"
 </center>
 \anchor icom_9700_a
 <center>
-\image latex IC9700.png "IC 9700" width=3.75in
-\image html IC9700.png "IC 9700"
+\image latex transceivers/IC9700.png "transceivers/IC 9700" width=3.75in
+\image html transceivers/IC9700.png "transceivers/IC 9700"
 </center>
 \anchor icom_f8101
 <center>
-\image latex IC-F8101.png "IC F8101" width=3.75in
-\image html IC-F8101.png "IC F8101"
+\image latex transceivers/IC-F8101.png "transceivers/IC F8101" width=3.75in
+\image html transceivers/IC-F8101.png "transceivers/IC F8101"
 </center>
 \ref elecraft_rigs "Page Top"
 \ref sFlrigDesc "Return to Main Page"

@@ -85,8 +85,8 @@ program running, Start flrig.  It will come up with just a basic display.
 Open the menu <em>Config/Setup/Transceiver</em>.
 
 <center>
-\image latex flrig_ft991a_xcvr.png "Select FT991A" width=6.0in
-\image html  flrig_ft991a_xcvr.png "Select FT991A"
+\image latex xcvr.png "Select FT991A" width=6.0in
+\image html  xcvr.png "Select FT991A"
 </center>
 
 Choose the FT991A from the Rig dropdown list. That will select the default 
@@ -116,8 +116,8 @@ do as they are labeled.</li>
 
 \subsection ssRestore Restore tab:
 <center>
-\image latex flrig_ft991a_restore.png width=6.0in
-\image html  flrig_ft991a_restore.png
+\image latex restore.png width=6.0in
+\image html  restore.png
 </center>
 
 and choose whether you want flrig to save and restore all the radio’s parameters 
@@ -127,8 +127,8 @@ same settings as the rig currently is using.
 
 \subsection ssPoll Poll tab
 <center>
-\image latex flrig_ft991a_poll.png width=6.0in
-\image html  flrig_ft991a_poll.png
+\image latex polling.png width=6.0in
+\image html  polling.png
 </center>
 and click the Set All buttons for the initial polling options. You can play with 
 these values later if you wish. The larger the number the slower the response time 
@@ -154,20 +154,14 @@ go to the fldigi menu “Configuration/Rig control/flrig” and check the top
 box to tell fldigi to use flrig for rig control with fldigi as client.   
 Leave the other controls at their default setting.
 <center>
-\image latex ft991a-fldigi-flrig.png width=6.0in
-\image html  ft991a-fldigi-flrig.png
+\image latex flrig-fldigi.png width=6.0in
+\image html  flirig-fldigi.png
 </center>
 Once that is done fldigi should communicate with flrig and changes such as 
 frequency or bandwidth in flrig or fldigi should be reflected in the other. 
 If the lower box is checked then flrig will send fldigi audio to the radio 
 when the PTT button is clicked otherwise PTT will just key the rig with no 
 power out. Click Save at the bottom of the page.
-
-Setup DATA-U as the mode and bandwidth as 3000 for now.
-<center>
-\image latex ft991a-fldigi-mode-bw.png width=6.0in
-\image html  ft991a-fldigi-mode-bw.png
-</center>
 
 All that is left is to customize fldigi for how you want to operate. Many 
 things can be changed such as the UI scheme, colors, Macros, and many more. 

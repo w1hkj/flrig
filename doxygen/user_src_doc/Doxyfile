@@ -1,7 +1,6 @@
 #
-#
-#
 # Copyright (C) 2014 Robert Stiles, KK5VD.
+#               2020 David Freese, W1HKJ
 #
 # Permission to use, copy, modify, and distribute this software and its
 # documentation under the terms of the GNU General Public License is hereby
@@ -13,7 +12,7 @@
 # input used in their production; they are not affected by this license.
 
 PROJECT_NAME         = "FLRIG Users Manual"
-PROJECT_NUMBER       = 1.3
+PROJECT_NUMBER       = 1.3.52
 PROJECT_BRIEF        =
 ALLEXTERNALS         = NO
 CASE_SENSE_NAMES     = NO
@@ -36,7 +35,9 @@ GENERATE_XML         = NO
 HTML_COLORSTYLE_SAT  = 0
 HTML_FOOTER          =
 HTML_HEADER          =
-IMAGE_PATH           = ../images
+IMAGE_PATH           = ../images ../images/ft-991a ../images/ic-7100 ../images/tt550 \
+                       ../images/config ../images/cw-keyer ../images/debugging \
+                       ../images/menus ../images/transceivers ../images/ui
 INPUT                = index.txt \
                        config_fonts_colors.txt \
                        elecraft_rigs.txt \

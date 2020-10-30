@@ -4,8 +4,8 @@
 \tableofcontents
 
 <center>
-\image latex TT550.png "FLRIG - TT550" width=4.32in
-\image html TT550.png "FLRIG - TT550"
+\image latex tt550/TT550.png "FLRIG - TT550" width=4.32in
+\image html tt550/TT550.png "FLRIG - TT550"
 </center>
 <br>
 
@@ -34,8 +34,8 @@ mode operations.
 
 
 <center>
-\image latex TT550-init.png "I/O Ports - Primary" width=4.9in
-\image html TT550-init.png "I/O Ports - Primary"
+\image latex tt550/TT550-init.png "I/O Ports - Primary" width=4.9in
+\image html tt550/TT550-init.png "I/O Ports - Primary"
 </center>
 <br>
 
@@ -59,8 +59,8 @@ Access to the additional controls is obtained by the down arrow button to
 the left of the Att control.
 
 <center>
-\image latex TT550-CW.png "TT550 - CW" width=4.34in
-\image html TT550-CW.png "TT550 - CW"
+\image latex tt550/TT550-CW.png "TT550 - CW" width=4.34in
+\image html tt550/TT550-CW.png "TT550 - CW"
 </center>
 <br>
 
@@ -76,8 +76,8 @@ front panel.  This volume is also relative to the receiver volume control.
 \subsection ssVOX VOX
 
 <center>
-\image latex TT550-VOX.png "TT550 - VOX" width=4.26in
-\image html TT550-VOX.png "TT550 - VOX"
+\image latex tt550/TT550-VOX.png "TT550 - VOX" width=4.26in
+\image html tt550/TT550-VOX.png "TT550 - VOX"
 </center>
 <br>
 
@@ -87,8 +87,8 @@ Vox controls are controlled IAW the 550 manual.
 \subsection ssSpeech Speech
 
 <center>
-\image latex TT550-SPCH.png "TT550 - Speech" width=4.24in
-\image html TT550-SPCH.png "TT550 - Speech"
+\image latex tt550/TT550-SPCH.png "TT550 - Speech" width=4.24in
+\image html tt550/TT550-SPCH.png "TT550 - Speech"
 </center>
 <br>
 
@@ -108,8 +108,8 @@ Pegasus has the built-in tuner it can be bypassed.
 \subsection ssAudio Audio
 
 <center>
-\image latex TT550-AUDIO.png "TT550 - Audio" width=4.27in
-\image html TT550-AUDIO.png "TT550 - Audio"
+\image latex tt550/TT550-AUDIO.png "TT550 - Audio" width=4.27in
+\image html tt550/TT550-AUDIO.png "TT550 - Audio"
 </center>
 <br>
 
@@ -120,8 +120,8 @@ be controlled independent of the speaker.
 \subsection ssRX RX
 
 <center>
-\image latex TT550-RX.png "TT550 - Receive" width=4.23in
-\image html TT550-RX.png "TT550 - Receive"
+\image latex tt550/TT550-RX.png "TT550 - Receive" width=4.23in
+\image html tt550/TT550-RX.png "TT550 - Receive"
 </center>
 <br>
 
@@ -132,8 +132,8 @@ VFO adjustment control.
 \subsection ssTX TX
 
 <center>
-\image latex TT550-TX.png "TT550 - Transmit" width=4.25in
-\image html TT550-TX.png "TT550 - Transmit"
+\image latex tt550/TT550-TX.png "TT550 - Transmit" width=4.25in
+\image html tt550/TT550-TX.png "TT550 - Transmit"
 </center>
 <br>
 
@@ -144,8 +144,8 @@ VFO adjustment control.
 \subsection ss302A 302A
 
 <center>
-\image latex TT550-302A.png "TT550 - 302A" width=4.25in
-\image html TT550-302A.png "TT550 - 302A"
+\image latex tt550/TT550-302A.png "TT550 - 302A" width=4.25in
+\image html tt550/TT550-302A.png "TT550 - 302A"
 </center>
 <br>
 
@@ -164,19 +164,8 @@ pad / encoder.
 
 As you enter keypad values from the keypad they will appear in an entry
 box at the upper right of the main dialog.  These are used for entering
-a frequency in kHz (i.e. 14.070 MHz is entered as 14070.000).
-
-<center>
-\image latex fkey-entry.png "" width=1.66in
-\image html fkey-entry.png ""
-</center>
-<br>
-
-
-Here the numbers 1 and 4 have been pressed in sequence.  You can abort the
-input by pressing the decimal value twice in succession.  You can also set
-a time out in seconds.  Failure to continue an entry within the time out
-period will also abort the input.
+a frequency in kHz (i.e. 14.070 MHz is entered as 14070.000).  You can abort the
+input by pressing the decimal value twice in succession.
 
 \ref tt550_ops_page "Page Top"
 

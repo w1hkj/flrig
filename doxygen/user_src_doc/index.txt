@@ -42,20 +42,20 @@ ratio can be resized horizontally.  The narrow aspect ratios are fixed
 in width and height.
 
 <center>
-\image latex ui-wide.png "" width=6in
-\image html ui-wide.png ""
+\image latex IC7100-ui-small.png "" width=6in
+\image html IC7100-ui-small.png ""
 </center>
 <br>
 
 <center>
-\image latex ui-narrow-ic7200.png "" width=4.3in
-\image html ui-narrow-ic7200.png ""
+\image latex IC7100-ui-narrow.png "" width=4.3in
+\image html IC7100-ui-narrow.png ""
 </center>
 <br>
 
 <center>
-\image latex ui-small-ic7200.png "" width=4.3in
-\image html ui-small-ic7200.png ""
+\image latex IC7100-ui-wide.png "" width=4.3in
+\image html IC7100-ui-wide.png ""
 </center>
 <br>
 
@@ -63,8 +63,8 @@ A fourth interface is available for all transceivers.  It is suitable for use on
 a touch screen
 
 <center>
-\image latex ui-touch.png "Shown at 75% of full size" width=5in
-\image html ui-touch.png "Shown at 75% of full size"
+\image latex ft-991a/FT-991A-ui-touch.png "Shown at 75% of full size" width=5in
+\image html ft-991a/FT-991A-ui-touch.png "Shown at 75% of full size"
 </center>
 <br>
 
@@ -79,7 +79,7 @@ additional libraries or definition files are required.
 |\ref ek_k2_a "K2"  |\ref icom_703_a "IC-703"              |\ref kwd_ts140_a "TS 140"      |\ref tt_516_a   "TT 516" |\ref yaesu_100d_a "FT 100D"     |\ref o_pcr1000_a "PCR 1000"      |
 |\ref ek_k3_a "K3"  |\ref icom_706mk2g_a "IC 706 MK IIG"   |\ref kwd_ts450s_a "TS 450"     |\ref tt_535_a   "TT 535" |\ref yaesu_450_a "FT-450"       |\ref o_ray152_a  "RAY 152"       |
 |\ref ek_kx3_a "KX3"|\ref icom_718_a "IC-718"              |\ref kwd_ts480hx_a "TS 480HX"  |\ref tt_538_a   "TT 538" |\ref yaesu_450d_a "FT-450D"     |\ref o_Xiegu-5105 "Xiegu 5105"   |
-|<br>               |\ref icom_728_a "IC 728"              |\ref kwd_ts480sat_a "TS 480SAT"|\ref tt_550_a   "TT 550" |\ref yaesu_747gx_a "FT 747GX"   |<br>                             |
+|<br>               |\ref icom_728_a "IC 728"              |\ref kwd_ts480sat_a "TS 480SAT"|\ref tt_550_a   "TT 550" |\ref yaesu_747gx_a "FT 747GX"   |\ref o_Xiegu-G90 "Xiegu G90"     |
 |<br>               |\ref icom_735_a "IC 735"              |\ref kwd_ts570_a   "TS 570"    |\ref tt_omni6_a "TT 563" |\ref yaesu_767_a  "FT 767"      |<br>                             |
 |<br>               |\ref icom_746_a "IC 746"              |\ref kwd_ts590s_a  "TS 590S"   |\ref tt_566_a   "TT 566" |\ref yaesu_817_a "FT 817"       |<br>                             |
 |<br>               |\ref icom_746pro_a "IC 746 Pro"       |\ref kwd_ts590sg_a  "TS 590SG" |\ref tt_omni7_a "TT 588" |\ref yaesu_847_a "FT 847"       |<br>                             |
@@ -107,8 +107,8 @@ additional libraries or definition files are required.
 Select the transceiver with the "Config / Setup / Transceiver" menu item.
 
 <center>
-\image latex config-setup-menu.png "" width=1.6in
-\image html config-setup-menu.png ""
+\image latex menus/config-setup-menu.png "" width=1.6in
+\image html menus/config-setup-menu.png ""
 </center>
 <br>
 
@@ -127,8 +127,8 @@ Each of the menu items will open the configuration dialog to the respecive tab:
 \subsection ssXcvrSelect Xcvr Select
 
 <center>
-\image latex xcvr.png "I/O Ports - Xcvr" width=4.9in
-\image html xcvr.png "I/O Ports - Xcvr"
+\image latex config/xcvr.png "I/O Ports - Xcvr" width=4.9in
+\image html config/xcvr.png "I/O Ports - Xcvr"
 </center>
 <br>
 
@@ -141,8 +141,8 @@ your particular h/w.
 \subsection ssPTT Configure PTT
 
 <center>
-\image latex ptt.png "I/O Ports - PTT" width=4.9in
-\image html ptt.png "I/O Ports - PTT"
+\image latex config/ptt.png "I/O Ports - PTT" width=4.9in
+\image html config/ptt.png "I/O Ports - PTT"
 </center>
 <br>
 
@@ -163,14 +163,14 @@ control.
 
 \subsection ssAUX Configure auxiliary ports
 <center>
-\image latex aux.png "I/O Ports - Aux" width=4.9in
-\image html aux.png "I/O Ports - Aux"
+\image latex config/aux.png "I/O Ports - Aux" width=4.9in
+\image html config/aux.png "I/O Ports - Aux"
 </center>
 <br>
 
 <center>
-\image latex aux-controls.png "Aux Controls" width=3.45in
-\image html aux-controls.png "Aux Controls"
+\image latex ui/aux-controls.png "Aux Controls" width=3.45in
+\image html ui/aux-controls.png "Aux Controls"
 </center>
 <br>
 
@@ -182,8 +182,8 @@ if you are using the SCU-17 secondary serial port.
 
 \subsection ssPOLLING Configure Polling
 <center>
-\image latex polling.png "I/O Ports - Polling" width=4.9in
-\image html polling.png "I/O Ports - Polling"
+\image latex config/polling.png "I/O Ports - Polling" width=4.9in
+\image html config/polling.png "I/O Ports - Polling"
 </center>
 <br>
 
@@ -196,8 +196,8 @@ more values.
 \subsection ssSENDING Send Command String
 
 <center>
-\image latex send.png "I/O Ports - Sending" width=4.9in
-\image html send.png "Sending"
+\image latex config/send.png "I/O Ports - Sending" width=4.9in
+\image html config/send.png "Sending"
 </center>
 <br>
 
@@ -233,8 +233,8 @@ The diamond indicators will be lit for transceiver and fldigi connections respec
 \subsection ssTRACE Configure Command Tracing
 
 <center>
-\image latex config-trace.png "Configure code execution trace" width=5.0in
-\image html  config-trace.png "Configure code execution trace"
+\image latex config/config-trace.png "Configure code execution trace" width=5.0in
+\image html  config/config-trace.png "Configure code execution trace"
 </center>
 
 Several debugging tools are available in flrig, including the ability to observe code
@@ -252,8 +252,8 @@ six levels of detail 0 ... 5 can be specified</li>
 </ul>
 
 <center>
-\image latex trace-dialog.png "Example showing support code trace" width=5.0in
-\image html  trace-dialog.png "Example showing support code trace"
+\image latex debugging/trace-dialog.png "Example showing support code trace" width=5.0in
+\image html  debugging/trace-dialog.png "Example showing support code trace"
 </center>
 
 \subsection ssRESTORE Configure Read/Restore Xvcr Settings
@@ -267,14 +267,14 @@ i/o.  Check "Use xcvr data" i\If you want flrig to NOT change the transceiver op
 when it begins execution.
 
 <center>
-\image latex restore.png "Restoring transceiver Status" width=4.9in
-\image html restore.png "Restoring transceiver Status"
+\image latex config/restore.png "Restoring transceiver Status" width=4.9in
+\image html config/restore.png "Restoring transceiver Status"
 </center>
 
 \subsection ssSERVER Configure XmlRpc Server
 <center>
-\image latex server.png "Configure server" width=5.0in
-\image html  server.png "Configure server"
+\image latex config/server.png "Configure server" width=5.0in
+\image html  config/server.png "Configure server"
 </center>
 
 flrig accepts remote control via an XmlRpc socket interface.  fldigi uses this 
@@ -284,16 +284,16 @@ several other third party programs also use this method.  See \ref xmlrpc_comman
 \subsection ssUserInterface User Interface
 
 <center>
-\image latex config-ui-menu.png "" width=1.6in
-\image html config-ui-menu.png ""
+\image latex menus/config-ui-menu.png "" width=1.6in
+\image html menus/config-ui-menu.png ""
 </center>
 <br>
 
 \subsection ssMetering Meter Display and Filters
 
 <center>
-\image latex meter-filters.png "Meter Filter Controls" width=4.18in
-\image html meter-filters.png "Meter Filter Controls"
+\image latex ui/meter-filters.png "Meter Filter Controls" width=4.18in
+\image html ui/meter-filters.png "Meter Filter Controls"
 </center>
 <br>
 
@@ -306,8 +306,8 @@ peak value over the last M readings.
 <br>
 
 <center>
-\image latex power-scale-select.png "Meter Scale" width=4.6in
-\image html power-scale-select.png "Meter Scale"
+\image latex ui/power-scale-select.png "Meter Scale" width=4.6in
+\image html ui/power-scale-select.png "Meter Scale"
 </center>
 <br>
 
@@ -328,14 +328,14 @@ change the size and positions of the various slider controls. Select the toggle 
 that uses less vertical space.
 
 <center>
-\image latex ui-narrow-ic7200.png "Small UI - Large Sliders" width=4.6in
-\image html ui-narrow-ic7200.png "Small UI - Large Sliders"
+\image latex FT-991A-ui-small.png "Small UI - Large Sliders" width=4.6in
+\image html FT-991A-ui-small.png "Small UI - Large Sliders"
 </center>
 <br>
 
 <center>
-\image latex ui-small-ic7200.png "Small UI - Small Sliders" width=4.6in
-\image html ui-small-ic7200.png "Small UI - Small Sliders"
+\image latex FT-991A-ui-narrow.png "Small UI - Small Sliders" width=4.6in
+\image html FT-991A-ui-narrow.png "Small UI - Small Sliders"
 </center>
 <br>
 
@@ -344,60 +344,30 @@ that uses less vertical space.
 Additional control settings may be available depending on the transceiver
 being controlled.  These are in a drop-down area toggled by the arrow button
 to the left of the attenuator button on the small aspect ratio dialog view.
-These are the controls for the Yeasu FT950.
+These are the controls for the Yeasu FT991A.
 
 <center>
-\image latex FT950-BANDS.png "" width=4.25in
-\image html FT950-BANDS.png ""
+\image latex ft-991a/FT-991A-xtras-band.png "" width=4.25in
+\image html ft-991a/FT-991A-xtras-band.png ""
 <br>
-\image latex FT950-CW.png "" width=4.25in
-\image html FT950-CW.png ""
+\image latex ft-991a/FT-991A-xtras-cw.png "" width=4.25in
+\image html ft-991a/FT-991A-xtras-cw.png ""
 <br>
-\image latex FT950-QSK.png "" width=4.25in
-\image html FT950-QSK.png ""
+\image latex ft-991a/FT-991A-xtras-qsk.png "" width=4.25in
+\image html ft-991a/FT-991A-xtras-qsk.png ""
 <br>
-\image latex FT950-VOX.png "" width=4.25in
-\image html FT950-VOX.png ""
+\image latex ft-991a/FT-991A-xtras-vox.png "" width=4.25in
+\image html ft-991a/FT-991A-xtras-vox.png ""
 <br>
-\image latex FT950-SPCH.png "" width=4.25in
-\image html FT950-SPCH.png ""
+\image latex ft-991a/FT-991A-xtras-spch.png "" width=4.25in
+\image html ft-991a/FT-991A-xtras-spch.png ""
 <br>
-\image latex FT950-RX.png "" width=4.25in
-\image html FT950-RX.png ""
+\image latex ft-991a/FT-991A-xtras-misc.png "" width=4.25in
+\image html ft-991a/FT-991A-xtras-misc.png ""
 <br>
-\image latex FT950-MISC.png "" width=4.25in
-\image html FT950-MISC.png ""
-<br>
-\image latex FT950-USER.png "" width=4.25in
-\image html FT950-USER.png ""
+\image latex ft-991a/FT-991A-xtras-cmd-a.png "" width=4.25in
+\image html ft-991a/FT-991A-xtras-cmd-a.png ""
 </center>
-
-For the FT-450D, these control when accessed from the "touch" user interface 
-scheme appear as:
-
-\image latex touch-main.png "" width = 6in
-\image html  touch-main.png ""
-<br>
-\image latex touch-buttons.png "" width = 6in
-\image html  touch-buttons.png ""
-<br>
-\image latex touch-sliders.png "" width = 6in
-\image html  touch-sliders.png ""
-<br>
-\image latex touch-other-bands.png "" width = 6in
-\image html  touch-other-bands.png ""
-<br>
-\image latex touch-other-cw.png "" width = 6in
-\image html  touch-other-cw.png ""
-<br>
-\image latex touch-other-qsk.png "" width = 6in
-\image html  touch-other-qsk.png ""
-<br>
-\image latex touch-other-vox.png "" width = 6in
-\image html  touch-other-vox.png ""
-<br>
-\image latex touch-other-misc.png "" width = 6in
-\image html  touch-other-misc.png ""
 
 Select the User Interface menu item to configure various user preferences including \ref config_fonts_colors.
 <br>
@@ -405,8 +375,8 @@ Select the User Interface menu item to configure various user preferences includ
 \section sOpControls Operating Controls
 
 <center>
-\image latex frequency-control.png "Frequency Control" width=4.6in
-\image html frequency-control.png "Frequency Control"
+\image latex ui/frequency-control.png "Frequency Control" width=4.6in
+\image html ui/frequency-control.png "Frequency Control"
 </center>
 <br>
 
@@ -437,8 +407,8 @@ frequency values using the arrow and page key buttons:
 <br>
 
 <center>
-\image latex buttons-sliders.png "Control Sliders" width=2.24in
-\image html buttons-sliders.png "Control Sliders"
+\image latex ui/buttons-sliders.png "Control Sliders" width=2.24in
+\image html ui/buttons-sliders.png "Control Sliders"
 </center>
 <br>
 
@@ -449,8 +419,8 @@ the volume control is active and the NR control is inactive.
 <br>
 
 <center>
-\image latex flrig-fldigi.png "FLRIG/FLDIGI" width=4.37in
-\image html flrig-fldigi.png "FLRIG/FLDIGI"
+\image latex ui/flrig-fldigi.png "FLRIG/FLDIGI" width=4.37in
+\image html ui/flrig-fldigi.png "FLRIG/FLDIGI"
 </center>
 <br>
 
@@ -512,8 +482,8 @@ The file is human readable.  Editing the file is not recommended.
 \subsection sEventLog Event Log
 
 <center>
-\image latex flrig-event-log.png "Event Log" width=7.5in
-\image html flrig-event-log.png "Event Log"
+\image latex debugging/flrig-event-log.png "Event Log" width=7.5in
+\image html debugging/flrig-event-log.png "Event Log"
 </center>
 <br>
 
@@ -543,16 +513,14 @@ each instance with the correct interface parameters.
 </center>
 
 \section stransceiver_how_to Transceiver How-To
-
 \subsection sFT991a FT 991A
 \ref ft991a_how_to_page
-\subsection sIC7100 IC 7100
-\subsection sIC7300 IC 7300
 \subsection sIC7600 IC 7600
 Andy's (VE3NVK / G8VTV) \ref ic7600_how_to_page
 \subsection sTT550 TT 550
 The TenTec Pegasus, TT-550 is a computer only transceiver.  FLRIG controls
-all aspects of this transceiver: \ref tt550_ops_page
+all aspects of this transceiver.
+\ref tt550_ops_page
 
 \section scw_keyer CW Keyer
 \ref cw_keyer

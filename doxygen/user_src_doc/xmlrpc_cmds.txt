@@ -53,4 +53,11 @@ rig.cwio_wpm        i:i  set cwio WPM
 rig.cwio_text       s:s  send text via cwio interface
 rig.cwio_send       i:i  cwio transmit 1/0 (on/off)
 </pre>
+
+The xmlrpc command structure can be accessed using the menu item help/xml-help.
+<center>
+\image latex ui/xmlrpc-help.png "" width=2.48in
+\image html ui/xmlrpc-help.png ""
+</center>
+
 */

@@ -8,15 +8,15 @@ some share the CAT serial port (IC-7300).  A simple DTR/RTS keying circuit
 can also provide the h/w interface.  This one provides galvanic isolation:
 
 <center>
-\image latex DTR_keyer.png width=2.0in
-\image html  DTR_keyer.png
+\image latex cw-keyer/DTR_keyer.png width=2.0in
+\image html  cw-keyer/DTR_keyer.png
 </center>
 
 Open the keyer dialog with the main dialog menu item "Keyer"
 
 <center>
-\image latex cwkeyer.png width=2.0in
-\image html  cwkeyer.png
+\image latex cw-keyer/cwkeyer.png width=2.0in
+\image html  cw-keyer/cwkeyer.png
 </center>
 
 <ul>
@@ -31,15 +31,15 @@ Open the keyer dialog with the main dialog menu item "Keyer"
 Tip for the function / macro buttons: 
 
 <center>
-\image latex cwkeyer_tooltip.png width=2.0in
-\image html  cwkeyer_tooltip.png
+\image latex cw-keyer/cwkeyer_tooltip.png width=2.0in
+\image html  cw-keyer/cwkeyer_tooltip.png
 </center>
 
 Control-left-click opens:
 
 <center>
-\image latex cwkeyer_editor.png width=2.0in
-\image html  cwkeyer_editor.png
+\image latex cw-keyer/cwkeyer_editor.png width=2.0in
+\image html  cw-keyer/cwkeyer_editor.png
 </center>
 
 A CQ macro with start/stop (ptt enable/disable): <pre>[CQ CQ DE W1HKJ K]</pre>
@@ -47,8 +47,8 @@ A CQ macro with start/stop (ptt enable/disable): <pre>[CQ CQ DE W1HKJ K]</pre>
 Config opens:
 
 <center>
-\image latex cwkeyer_config.png width=2.0in
-\image html  cwkeyer_config.png
+\image latex cw-keyer/cwkeyer_config.png width=2.0in
+\image html  cw-keyer/cwkeyer_config.png
 </center>
 
 The DTR/RTS port can be either
