@@ -499,8 +499,8 @@ void cbFreqControlFontBrowser(Fl_Widget*, void*) {
 void cbPrefFont()
 {
 	fntbrowser->fontNumber(progStatus.fontnbr);
-	fntbrowser->fontFilter(Font_Browser::FIXED_WIDTH);
-	fntbrowser->fontFilter(Font_Browser::ALL_TYPES);
+//	fntbrowser->fontFilter(Font_Browser::FIXED_WIDTH);
+//	fntbrowser->fontFilter(Font_Browser::ALL_TYPES);
 	fntbrowser->callback(cbFreqControlFontBrowser);
 	fntbrowser->show();
 }

@@ -99,8 +99,6 @@ void cbFreqFontBrowser()
 	fntSelectbrowser = new Font_Browser;
 	fntSelectbrowser->fontNumber(progStatus.memfontnbr);
 	fntSelectbrowser->fontSize(progStatus.memfontsize);
-	fntSelectbrowser->fontFilter(Font_Browser::FIXED_WIDTH);
-	fntSelectbrowser->fontFilter(Font_Browser::ALL_TYPES);
 	fntSelectbrowser->callback(cbFreqSelectFontBrowser);
 	fntSelectbrowser->show();
 }

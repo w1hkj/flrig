@@ -24,6 +24,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cstdio>
+#include <cassert>
 #include <iostream>
 #include <list>
 
@@ -145,7 +146,6 @@ Font_Browser::Font_Browser(int x, int y, int w, int h, const char *lbl )
 	lst_Font->align(FL_ALIGN_TOP_LEFT);
 	lst_Font->type(FL_HOLD_BROWSER);
 	lst_Font->callback(fb_callback, this);
-	fixed = 0;
 
 	txt_Size = new Fl_Value_Input2(290, 15, 50, 22, _("Size:"));
 	txt_Size->align(FL_ALIGN_TOP_LEFT);
@@ -366,7 +366,9 @@ void *find_fixed_fonts(void *)
 		test_font = Font_Browser::font_pairs[i].nbr;
 		is_fixed = -1;
 		Fl::awake(font_test);
-		while (is_fixed == -1) MilliSleep(10);
+		while (is_fixed == -1) {
+			MilliSleep(1);
+		}
 		Font_Browser::fixed[i] = is_fixed;
 #ifdef FBDEBUG
 		fprintf(
