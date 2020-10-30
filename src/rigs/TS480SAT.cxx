@@ -297,13 +297,11 @@ int RIG_TS480SAT::get_power_out()
 	size_t p = replystr.rfind("SM");
 	if (p != string::npos) {
 		mtr = atoi(&replystr[p + 3]);
-
-		size_t i = 0;
-		for (i = 0; i < sizeof(pwrtbl) / sizeof(pwrpair) - 1; i++)
-			if (mtr >= pwrtbl[i].mtr && mtr < pwrtbl[i+1].mtr)
-				break;
+		size_t i = 0; // outside of the if/else for scope reasons
 		if (mtr < 0) mtr = 0;
-		if (mtr > 20) mtr = 20;
+		else if (mtr > 20) mtr = 20;
+		else while(mtr > pwrtbl[i].mtr) i++;
+
 		mtr = (int)ceil(pwrtbl[i].pwr + 
 			(pwrtbl[i+1].pwr - pwrtbl[i].pwr)*(mtr - pwrtbl[i].mtr)/(pwrtbl[i+1].mtr - pwrtbl[i].mtr));
 		if (mtr > 200) mtr = 200;
@@ -327,7 +325,7 @@ int RIG_TS480SAT::get_swr()
 
 	size_t p = replystr.rfind("RM1");
 	if (p != string::npos)
-		mtr = 66 * atoi(&replystr[p + 3]) / 10;
+		mtr = 66 * atoi(&replystr[p+3]) / 10;
 	p = replystr.rfind("RM3");
 	if (p != string::npos)
 		alc = 66 * atoi(&replystr[p+3]) / 10;

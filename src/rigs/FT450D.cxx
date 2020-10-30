@@ -370,21 +370,18 @@ int RIG_FT450D::get_smeter()
 {
 	cmd = rsp = "SM0";
 	cmd += ';';
-	wait_char(';',7, FL450D_WAIT_TIME, "get smeter", ASC);
-
+	wait_char(';',7, FL450D_WAIT_TIME, "get smeter", ASC); // sets replystr via rigbase
 	gett("get_smeter");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
 	int val = atoi(&replystr[p+3]);
-
+	
 	size_t i = 0;
 	if (val < 0) val = 0;
-	if (val > 255) val = 255;
-	for (i = 0; i < sizeof(sm_tbl) / sizeof(mtrpair) - 1; i++)
-		if (val >= sm_tbl[i].val && val < sm_tbl[i+1].val)
-			break;
+	else if (val > 255) val = 255;
+	else while(val > sm_tbl[i].val) i++;
 	int mtr = (int)ceil(sm_tbl[i].mtr + 
 				(sm_tbl[i+1].mtr - sm_tbl[i].mtr) * 
 				(val - sm_tbl[i].val)/(sm_tbl[i+1].val - sm_tbl[i].val));
@@ -1228,7 +1225,7 @@ void RIG_FT450D::set_rf_gain(int val)
 
 int  RIG_FT450D::get_rf_gain()
 {
-	int rfval = 0;
+	//int rfval = 0;
 	cmd = rsp = "RG0";
 	cmd += ';';
 	wait_char(';', 7, FL450D_WAIT_TIME, "get rfgain", ASC);
@@ -1237,11 +1234,20 @@ int  RIG_FT450D::get_rf_gain()
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.rfgain;
-	for (int i = 3; i < 6; i++) {
-		rfval *= 10;
-		rfval += replystr[p+i] - '0';
-	}
-	rfval = 100 - (int)(rfval / 2.55);
+	//for (int i = 3; i < 6; i++) {
+	//	rfval *= 10;  // Shift out one decimal place so we can add the next character
+	//	rfval += replystr[p+i] - '0'; // Subtract ASCII 0 so we get a number
+	//}
+	
+	// Parse the RF value from the position returned by rfind for the response.
+	// Valid values are 0-255.
+	int rfval =
+		(replystr[p+3] - '0') * 100 +
+		(replystr[p+4] - '0') * 10 +
+		(replystr[p+5] - '0');
+
+	// Convert 0-255 to 0-100 for the slider widget.
+	rfval = (int)(rfval / 2.55);
 	if (rfval > 100) rfval = 100;
 	return ceil(rfval);
 }
