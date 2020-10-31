@@ -1661,7 +1661,7 @@ Fl_Double_Window *tabs_window()
 
 		genericMisc->end();
 
-		genericUser_1 = new Fl_Group(0, 24, small_mainW, gph - 24, _("Cmd A"));
+		genericUser_1 = new Fl_Group(0, 24, small_mainW, gph - 24, _("Cmds A"));
 			btnUser1 = new Fl_Button(5, genericUser_1->y() + 12, 100, 20, "USER 1");
 			btnUser1->callback((Fl_Callback*)cb_btnUser, (void*)1);
 
@@ -1688,7 +1688,7 @@ Fl_Double_Window *tabs_window()
 
 		genericUser_1->end();
 
-		genericUser_2 = new Fl_Group(0, 24, small_mainW, gph - 24, _("Cmd B"));
+		genericUser_2 = new Fl_Group(0, 24, small_mainW, gph - 24, _("B"));
 			btnUser9 = new Fl_Button(5, genericUser_2->y() + 12, 100, 20, "USER 9");
 			btnUser9->callback((Fl_Callback*)cb_btnUser, (void*)9);
 
@@ -1715,7 +1715,7 @@ Fl_Double_Window *tabs_window()
 
 		genericUser_2->end();
 
-		genericUser_3 = new Fl_Group(0, 24, small_mainW, gph - 24, _("Cmd C"));
+		genericUser_3 = new Fl_Group(0, 24, small_mainW, gph - 24, _("C"));
 			btnUser17 = new Fl_Button(5, genericUser_3->y() + 12, 100, 20, "USER 1");
 			btnUser17->callback((Fl_Callback*)cb_btnUser, (void*)1);
 
