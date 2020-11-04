@@ -64,6 +64,12 @@ public:
 	int  get_smeter();
 	int  get_swr();
 	int  get_alc();
+
+	int  get_agc();
+	int  incr_agc();
+	const char *agc_label();
+	int  agc_val();
+
 	int  get_power_out();
 	int  get_power_control();
 	void get_pc_min_max_step(double &min, double &max, double &step) {

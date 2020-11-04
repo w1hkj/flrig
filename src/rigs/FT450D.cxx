@@ -77,6 +77,7 @@ static const char **Channels_60m = FT450D_US_60m;
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
 	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
+	{ (Fl_Widget *)btnAGC,        2, 145,  50 },
 	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },
 	{ (Fl_Widget *)btnIFsh,     214, 105,  50 },
 	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
@@ -149,6 +150,7 @@ RIG_FT450D::RIG_FT450D() {
 	has_power_out =
 	has_power_control =
 	has_volume_control =
+	has_agc_control =
 	has_rf_control =
 	has_mode_control =
 	has_noise_control =
@@ -177,15 +179,16 @@ void RIG_FT450D::initialize()
 
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
-	rig_widgets[2].W = sldrRFGAIN;
-	rig_widgets[3].W = btnIFsh;
-	rig_widgets[4].W = sldrIFSHIFT;
-	rig_widgets[5].W = btnNotch;
-	rig_widgets[6].W = sldrNOTCH;
-	rig_widgets[7].W = sldrMICGAIN;
-	rig_widgets[8].W = sldrPOWER;
-	rig_widgets[9].W = btnNR;
-	rig_widgets[10].W = sldrNR;
+	rig_widgets[2].W = btnAGC;
+	rig_widgets[3].W = sldrRFGAIN;
+	rig_widgets[4].W = btnIFsh;
+	rig_widgets[5].W = sldrIFSHIFT;
+	rig_widgets[6].W = btnNotch;
+	rig_widgets[7].W = sldrNOTCH;
+	rig_widgets[8].W = sldrMICGAIN;
+	rig_widgets[9].W = sldrPOWER;
+	rig_widgets[10].W = btnNR;
+	rig_widgets[11].W = sldrNR;
 
 	op_yaesu_select60->deactivate();
 
@@ -203,6 +206,8 @@ void RIG_FT450D::initialize()
 	get_cw_spot_tone();
 	get_vox_gain();
 	get_vox_hang();
+
+	preamp_label("IPO", false);
 
 	selectA();
 }
@@ -571,8 +576,11 @@ int RIG_FT450D::get_tune()
 	return (val > 0);
 }
 
+static int attval = 0;
+
 void RIG_FT450D::set_attenuator(int val)
 {
+	attval = val;
 	if (val) cmd = "RA01;";
 	else	 cmd = "RA00;";
 	sendCommand(cmd);
@@ -589,30 +597,48 @@ int RIG_FT450D::get_attenuator()
 	gett("get_attenuator");
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
-	return (replystr[p+3] == '3' ? 1 : 0);
+	int val = attval;
+	if (p != string::npos)
+		val = (replystr[p+3] == '3' ? 1 : 0);
+	attval = val;
+	return val;
 }
 
+static int preval = 0;
+static bool wait_preamp = false;
 void RIG_FT450D::set_preamp(int val)
 {
-	if (val) cmd = "PA01;";
-	else	 cmd = "PA00;";
+	wait_preamp = true;
+	preval = val;
+	if (preval) cmd = "PA00;";
+	else		cmd = "PA01;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set preamp", cmd, replystr);
-	sett("set_pramp");
+	sett("set_preamp");
+	wait_preamp = false;
 }
 
 int RIG_FT450D::get_preamp()
 {
-	cmd = rsp = "PA0";
-	cmd += ';';
+	while (wait_preamp) {
+		Fl::awake();
+		MilliSleep(50);
+	}
+	cmd = "PA0;";
 	wait_char(';', 5, FL450D_WAIT_TIME, "get pre", ASC);
-
 	gett("get_preamp");
+	if (replystr.empty()) return preval;
 
-	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
-	return (replystr[p+3] == '1' ? 1 : 0);
+	size_t p = replystr.rfind("PA00;");
+	if (p != string::npos) {
+		preval = 1;
+		preamp_label("IPO", true);
+	} else if (replystr.rfind("PA01;") != string::npos) {
+		preval = 0;
+		preamp_label("IPO", false);
+	}
+
+	return preval;
 }
 
 int RIG_FT450D::adjust_bandwidth(int val)
@@ -1388,6 +1414,54 @@ void RIG_FT450D::get_band_selection(int v)
 	sendCommand(cmd);
 	showresp(WARN, ASC, "Select Band Stacks", cmd, replystr);
 	sett("get band");
+}
+
+static int agcval = 0;
+int  RIG_FT450D::get_agc()
+{
+    cmd = "GT0;";
+    wait_char(';', 6, FL450D_WAIT_TIME, "get agc", ASC);
+    gett("get_agc");
+    size_t p = replystr.rfind("GT");
+    if (p == std::string::npos) return agcval;
+
+    switch (replystr[3]) {
+        default:
+        case '0': agcval = 0; break;
+        case '1': agcval = 1; break;
+        case '2': 
+        case '3': agcval = 2; break;
+        case '4': 
+        case '6': agcval = 3; break;
+    }
+    return agcval;
+}
+
+int RIG_FT450D::incr_agc()
+{
+static const char ch[] = {'0', '1', '3', '4'};
+	agcval++;
+	if (agcval > 3) agcval = 0;
+	cmd = "GT00;";
+	cmd[3] = ch[agcval];
+
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET agc", cmd, replystr);
+	sett("set_agc");
+
+	return agcval;
+}
+
+
+static const char *agcstrs[] = {"AGC", "FST", "SLO", "AUT"};
+const char *RIG_FT450D::agc_label()
+{
+	return agcstrs[agcval];
+}
+
+int  RIG_FT450D::agc_val()
+{
+	return (agcval);
 }
 
 /*

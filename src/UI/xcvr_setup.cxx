@@ -80,6 +80,7 @@ Fl_Group *tabAUX = (Fl_Group *)0;
 Fl_Group *tabSERVER = (Fl_Group *)0;
 	Fl_Box *server_text = (Fl_Box *)0;
 	Fl_Input2 *inp_serverport = (Fl_Input2 *)0;
+	Fl_Box *box_fldigi_connect = (Fl_Box *)0;
 
 Fl_Group *tabPOLLING = (Fl_Group *)0;
 	Fl_Value_Input *poll_smeter = (Fl_Value_Input *)0;
@@ -120,7 +121,6 @@ Fl_Group *tabSNDCMD = (Fl_Group *)0;
 	Fl_Button *btn_send_command = (Fl_Button *)0;
 	Fl_Output *txt_response = (Fl_Output *)0;
 	Fl_Box *box_xcvr_connect = (Fl_Box *)0;
-	Fl_Box *box_fldigi_connect = (Fl_Box *)0;
 
 Fl_Button *btn_init_ser_port = (Fl_Button *)0;
 Fl_Button *btn2_init_ser_port = (Fl_Button *)0;
@@ -1479,6 +1479,12 @@ fldigi configuration item for xmlrpc server port."));
 	inp_serverport->value(progStatus.xmlport.c_str());
 	inp_serverport->when(FL_ENTER);
 
+	box_fldigi_connect = new Fl_Box(X + 25, Y + 145, 18, 18, _("Xmlrpc Client Connected"));
+	box_fldigi_connect->tooltip(_("Lit when connected to external xmlrpc client"));
+	box_fldigi_connect->box(FL_DIAMOND_DOWN_BOX);
+	box_fldigi_connect->color(FL_LIGHT1);
+	box_fldigi_connect->align(Fl_Align(FL_ALIGN_RIGHT));
+
 	tabSERVER->end();
 
 	return tabSERVER;
@@ -1760,12 +1766,6 @@ _("Enter text as ASCII string\nOr sequence of hex values, x80 etc separated by s
 
 	btn_send_command = new Fl_Button(X + 380, Y + 180, 80, 20, _("SEND"));
 	btn_send_command->callback((Fl_Callback*)cb_btn_send_command);
-
-	box_fldigi_connect = new Fl_Box(X + 25, Y + 145, 18, 18, _("Connected to fldigi"));
-	box_fldigi_connect->tooltip(_("Lit when connected"));
-	box_fldigi_connect->box(FL_DIAMOND_DOWN_BOX);
-	box_fldigi_connect->color(FL_LIGHT1);
-	box_fldigi_connect->align(Fl_Align(FL_ALIGN_RIGHT));
 
 	tabSNDCMD->end();
 
