@@ -756,7 +756,7 @@ void status::saveLastState()
 
 	spref.set("label2", label2.c_str());
 	spref.set("command2", command2.c_str());
-	spref.set("shftcmd1", shftcmd2.c_str());
+	spref.set("shftcmd2", shftcmd2.c_str());
 
 	spref.set("label3", label3.c_str());
 	spref.set("command3", command3.c_str());
