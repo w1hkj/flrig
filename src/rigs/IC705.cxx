@@ -1224,6 +1224,7 @@ void RIG_IC705::set_power_control(double val)
 	cmd.append("\x14\x0A");
 	cmd.append(bcd255(val));
 	cmd.append( post );
+	set_trace(2, "set_power_control()", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("set power");
 }
 
@@ -1240,12 +1241,13 @@ int RIG_IC705::get_power_control()
 		if (p != string::npos)
 			val = num100(replystr.substr(p+6));
 	}
+	get_trace(2, "get_power_control()", str2hex(replystr.c_str(), replystr.length()));
 	return val;
 }
 
 void RIG_IC705::get_pc_min_max_step(double &min, double &max, double &step)
 {
-	min = 0; max = 10; step = 0.1;
+	min = 0; max = 100; step = 1.0;
 }
 
 int RIG_IC705::get_smeter()
