@@ -496,12 +496,13 @@ int RIG_FTdx101D::get_alc()
 {
 	cmd = rsp = "RM4";
 	cmd += ';';
-	wait_char(';',7, 100, "get alc", ASC);
+	wait_char(';',10, 100, "get alc", ASC);
 	gett("get_alc");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
-	if (p + 6 >= replystr.length()) return 0;
+	if (p + 9 >= replystr.length()) return 0;
+	replystr[6] = '\x00';
 	int mtr = atoi(&replystr[p+3]);
 	return (int)ceil(mtr / 2.56);
 }
