@@ -1562,29 +1562,29 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 			genericUser_3 = new Fl_Group(xpos, ypos+tabh, W, tabb, _("Cmd C"));
 				genericUser_3->hide();
 
-				btnUser17 = new Fl_Button(5, by, 80, 50, "USER 9");
-				btnUser17->callback((Fl_Callback*)cb_btnUser, (void*)9);
+				btnUser17 = new Fl_Button(5, by, 80, 50, "USER 17");
+				btnUser17->callback((Fl_Callback*)cb_btnUser, (void*)17);
 
-				btnUser18 = new Fl_Button(90, by, 80, 50, "USER 10");
-				btnUser18->callback((Fl_Callback*)cb_btnUser, (void*)10);
+				btnUser18 = new Fl_Button(90, by, 80, 50, "USER 18");
+				btnUser18->callback((Fl_Callback*)cb_btnUser, (void*)18);
 
-				btnUser19 = new Fl_Button(175, by, 80, 50, "USER 11");
-				btnUser19->callback((Fl_Callback*)cb_btnUser, (void*)11);
+				btnUser19 = new Fl_Button(175, by, 80, 50, "USER 19");
+				btnUser19->callback((Fl_Callback*)cb_btnUser, (void*)19);
 
-				btnUser20 = new Fl_Button(260, by, 80, 50, "USER 12");
-				btnUser20->callback((Fl_Callback*)cb_btnUser, (void*)12);
+				btnUser20 = new Fl_Button(260, by, 80, 50, "USER 20");
+				btnUser20->callback((Fl_Callback*)cb_btnUser, (void*)20);
 
-				btnUser21 = new Fl_Button(345, by, 80, 50, "USER 13");
-				btnUser21->callback((Fl_Callback*)cb_btnUser, (void*)13);
+				btnUser21 = new Fl_Button(345, by, 80, 50, "USER 21");
+				btnUser21->callback((Fl_Callback*)cb_btnUser, (void*)21);
 
-				btnUser22 = new Fl_Button(430, by, 80, 50, "USER 14");
-				btnUser22->callback((Fl_Callback*)cb_btnUser, (void*)14);
+				btnUser22 = new Fl_Button(430, by, 80, 50, "USER 22");
+				btnUser22->callback((Fl_Callback*)cb_btnUser, (void*)22);
 
-				btnUser23 = new Fl_Button(515, by, 80, 50, "USER 15");
-				btnUser23->callback((Fl_Callback*)cb_btnUser, (void*)15);
+				btnUser23 = new Fl_Button(515, by, 80, 50, "USER 23");
+				btnUser23->callback((Fl_Callback*)cb_btnUser, (void*)23);
 
-				btnUser24 = new Fl_Button(600, by, 80, 50, "USER 16");
-				btnUser24->callback((Fl_Callback*)cb_btnUser, (void*)16);
+				btnUser24 = new Fl_Button(600, by, 80, 50, "USER 24");
+				btnUser24->callback((Fl_Callback*)cb_btnUser, (void*)24);
 
 			genericUser_3->end();
 

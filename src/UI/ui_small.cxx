@@ -1716,29 +1716,29 @@ Fl_Double_Window *tabs_window()
 		genericUser_2->end();
 
 		genericUser_3 = new Fl_Group(0, 24, small_mainW, gph - 24, _("C"));
-			btnUser17 = new Fl_Button(5, genericUser_3->y() + 12, 100, 20, "USER 1");
-			btnUser17->callback((Fl_Callback*)cb_btnUser, (void*)1);
+			btnUser17 = new Fl_Button(5, genericUser_3->y() + 12, 100, 20, "USER 17");
+			btnUser17->callback((Fl_Callback*)cb_btnUser, (void*)17);
 
-			btnUser18 = new Fl_Button(110, genericUser_3->y() + 12, 100, 20, "USER 2");
-			btnUser18->callback((Fl_Callback*)cb_btnUser, (void*)2);
+			btnUser18 = new Fl_Button(110, genericUser_3->y() + 12, 100, 20, "USER 18");
+			btnUser18->callback((Fl_Callback*)cb_btnUser, (void*)18);
 
-			btnUser19 = new Fl_Button(215, genericUser_3->y() + 12, 100, 20, "USER 3");
-			btnUser19->callback((Fl_Callback*)cb_btnUser, (void*)3);
+			btnUser19 = new Fl_Button(215, genericUser_3->y() + 12, 100, 20, "USER 19");
+			btnUser19->callback((Fl_Callback*)cb_btnUser, (void*)19);
 
-			btnUser20 = new Fl_Button(320, genericUser_3->y() + 12, 100, 20, "USER 4");
-			btnUser20->callback((Fl_Callback*)cb_btnUser, (void*)4);
+			btnUser20 = new Fl_Button(320, genericUser_3->y() + 12, 100, 20, "USER 20");
+			btnUser20->callback((Fl_Callback*)cb_btnUser, (void*)20);
 
-			btnUser21 = new Fl_Button(5, genericUser_3->y() + 36, 100, 20, "USER 5");
-			btnUser21->callback((Fl_Callback*)cb_btnUser, (void*)5);
+			btnUser21 = new Fl_Button(5, genericUser_3->y() + 36, 100, 20, "USER 21");
+			btnUser21->callback((Fl_Callback*)cb_btnUser, (void*)21);
 
-			btnUser22 = new Fl_Button(110, genericUser_3->y() + 36, 100, 20, "USER 6");
-			btnUser22->callback((Fl_Callback*)cb_btnUser, (void*)6);
+			btnUser22 = new Fl_Button(110, genericUser_3->y() + 36, 100, 20, "USER 22");
+			btnUser22->callback((Fl_Callback*)cb_btnUser, (void*)22);
 
-			btnUser23 = new Fl_Button(215, genericUser_3->y() + 36, 100, 20, "USER 7");
-			btnUser23->callback((Fl_Callback*)cb_btnUser, (void*)7);
+			btnUser23 = new Fl_Button(215, genericUser_3->y() + 36, 100, 20, "USER 23");
+			btnUser23->callback((Fl_Callback*)cb_btnUser, (void*)23);
 
-			btnUser24 = new Fl_Button(320, genericUser_3->y() + 36, 100, 20, "USER 8");
-			btnUser24->callback((Fl_Callback*)cb_btnUser, (void*)8);
+			btnUser24 = new Fl_Button(320, genericUser_3->y() + 36, 100, 20, "USER 24");
+			btnUser24->callback((Fl_Callback*)cb_btnUser, (void*)24);
 
 		genericUser_3->end();
 
