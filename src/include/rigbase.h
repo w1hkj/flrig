@@ -648,8 +648,8 @@ int vfo_;
 	void sendOK(std::string cmd);
 
 // KX3 power scale
-	bool power10x;
-	virtual bool power_10x() { return false; }
+	int powerScale;
+	virtual int power_scale() { return 1; }
 };
 
 extern rigbase *rigs[];

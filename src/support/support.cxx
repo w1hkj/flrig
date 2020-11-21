@@ -517,6 +517,7 @@ void read_tuner()
 }
 
 // read power out
+int pwrval = 0;
 void read_power_out()
 {
 	if (!selrig->has_power_out) return;
@@ -526,11 +527,12 @@ void read_power_out()
 		sig = selrig->get_power_out();
 	}
 	if (sig == -1) return;
-	mval = sig;
+	pwrval = sig;
 	Fl::awake(updateFwdPwr, reinterpret_cast<void*>(sig));
 }
 
 // read swr
+int swrval = 0;
 void read_swr()
 {
 	if ((meter_image != SWR_IMAGE) ||
@@ -540,8 +542,9 @@ void read_swr()
 		trace(1,"read_swr()");
 		sig = selrig->get_swr();
 	}
-	if (sig > -1)
-		Fl::awake(updateSWR, reinterpret_cast<void*>(sig));
+	if (sig == -1) return;
+	swrval = sig;
+	Fl::awake(updateSWR, reinterpret_cast<void*>(sig));
 }
 
 // alc
@@ -2909,8 +2912,7 @@ void updateFwdPwr(void *d)
 	if (!sldrFwdPwr->visible()) {
 		sldrFwdPwr->show();
 	}
-	if (xcvr_name == rig_FT817.name_) power /= 10;
-	if (xcvr_name == rig_KX3.name_ && selrig->power_10x()) power /= 10;
+	power /= selrig->power_scale();
 	sldrFwdPwr->value(power);
 
 	sldrFwdPwr->redraw();

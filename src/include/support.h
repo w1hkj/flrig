@@ -344,6 +344,8 @@ extern int rig_notch_val;
 extern void update_notch(void *d);
 
 extern int mval;
+extern int pwrval;
+extern int swrval;
 
 extern queue<VFOQUEUE> srvc_reqs;
 

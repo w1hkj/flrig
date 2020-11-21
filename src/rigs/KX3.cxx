@@ -530,9 +530,9 @@ int RIG_KX3::get_power_control()
  * KX3’s drive level. For a more accurate reading, use the KXPA100’s “^PF;” command.
 */
 
-bool RIG_KX3::power_10x()
+int RIG_KX3::power_scale()
 {
-	return power10x;
+	return powerScale;
 }
 
 int RIG_KX3::get_power_out()
@@ -546,7 +546,7 @@ int RIG_KX3::get_power_out()
 	ret = wait_char(';', 5, KX3_WAIT_TIME, "test KXPA", ASC);
 	gett("test KXPA");
 	if (ret >= 4) {
-		power10x = false;
+		powerScale = 1;
 		if (replystr.find("^OP1;") != string::npos) {
 			cmd = "^PF;";
 			ret = wait_char(';', 8, KX3_WAIT_TIME, "get KXPA power out", ASC);
@@ -569,7 +569,7 @@ int RIG_KX3::get_power_out()
 	if (p == string::npos) return 0;
 	replystr[p + 5] = 0;
 	mtr = atoi(&replystr[p + 2]); 
-	power10x = true; // scales to 0 to 120 W 
+	powerScale = 10; // scales to 0 to 120 W 
 
 	return mtr;
 }

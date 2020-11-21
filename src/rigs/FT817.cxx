@@ -382,3 +382,8 @@ int  RIG_FT817::get_split()
 	split = (replystr[0] & 0x20) == 0x20;
 	return split;
 }
+
+int RIG_FT817::power_scale()
+{
+    return 10;
+}

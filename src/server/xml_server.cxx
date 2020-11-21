@@ -245,7 +245,7 @@ public:
 		}
 		if (selrig->has_power_out && btnPTT->value()) {
 			static char szval[10];
-			snprintf(szval, sizeof(szval), "P:%d\n", (int)mval);
+			snprintf(szval, sizeof(szval), "P:%d\n", (int)pwrval);
 			info.append(szval);
 		}
 
@@ -1063,6 +1063,17 @@ public:
 	}
 } rig_get_smeter(&rig_server);
 
+class rig_get_pwrmeter_scale : public XmlRpcServerMethod {
+public:
+	rig_get_pwrmeter_scale(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_pwrmeter_scale", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized || !selrig->has_power_out)
+			result = (int)(0);
+		else
+			result = (int)(selrig->power_scale());
+	}
+} rig_get_pwrmeter_scale(&rig_server);
 
 class rig_get_pwrmeter : public XmlRpcServerMethod {
 public:
@@ -1072,10 +1083,21 @@ public:
 		if (!xcvr_initialized || !selrig->has_power_out) 
 			result = (int)(0);
 		else
-			result = (int)(mval);
+			result = (int)(pwrval);
 	}
 } rig_get_pwrmeter(&rig_server);
 
+class rig_get_swrmeter : public XmlRpcServerMethod {
+public:
+	rig_get_swrmeter(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_swrmeter", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_initialized || !selrig->has_swr_control) 
+			result = (int)(0);
+		else
+			result = (int)(swrval);
+	}
+} rig_get_swrmeter(&rig_server);
 
 class rig_get_power : public XmlRpcServerMethod {
 public:
@@ -1943,6 +1965,8 @@ struct MLIST {
 	{ "rig.get_ptt",      "s:n", "return PTT state" },
 	{ "rig.get_power",    "s:n", "return power level control value" },
 	{ "rig.get_pwrmeter", "s:n", "return PWR out" },
+	{ "rig.get_pwrmeter_scale", "s:n", "return scale for power meter" },
+	{ "rig.get_swrmeter", "s:n", "return SWR out" },
 	{ "rig.get_smeter",   "s:n", "return Smeter" },
 	{ "rig.get_split",    "s:n", "return split state" },
 	{ "rig.get_update",   "s:n", "return update to info" },

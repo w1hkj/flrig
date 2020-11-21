@@ -90,7 +90,7 @@ public:
 
 	void set_pbt_values(int val);
 
-	bool power_10x();
+	int power_scale();
 
 private:
 

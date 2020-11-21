@@ -54,6 +54,7 @@ public:
 	int  get_split();
 
 	int  adjust_bandwidth(int m) { return 0;}
+	int power_scale();
 
 private:
 	void init_cmd();

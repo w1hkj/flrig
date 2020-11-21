@@ -2,6 +2,7 @@
 // Copyright (C) 2020
 //              David Freese, W1HKJ
 //              Mark Gregory, G4LCH
+//              Morgan Jones <me@numin.it>
 //
 // This file is part of flrig.
 //
@@ -118,7 +119,7 @@ RIG_Xiegu_G90::RIG_Xiegu_G90() {
 	comm_retries = 2;
 	comm_wait = 20;
 	comm_timeout = 50;
-	comm_echo = true;
+	comm_echo = false;
 	comm_rtscts = false;
 	comm_rtsplus = true;
 	comm_dtrplus = true;
@@ -692,29 +693,6 @@ void RIG_Xiegu_G90::get_pc_min_max_step(double &min, double &max, double &step)
 	min = 1; max = 20; step = 1;
 }
 
-/*
-1W = xFE xFE x88 xE0 x14 x0A x00 x00 xFD
-2W = xFE xFE x88 xE0 x14 x0A x00 x13 xFD
-3W = xFE xFE x88 xE0 x14 x0A x00 x26 xFD
-4W = xFE xFE x88 xE0 x14 x0A x00 x40 xFD
-5W = xFE xFE x88 xE0 x14 x0A x00 x53 xFD
-6W = xFE xFE x88 xE0 x14 x0A x00 x67 xFD
-7W = xFE xFE x88 xE0 x14 x0A x00 x80 xFD
-8W = xFE xFE x88 xE0 x14 x0A x00 x93 xFD
-9W = xFE xFE x88 xE0 x14 x0A x01 x07 xFD
-10W = xFE xFE x88 xE0 x14 x0A x01 x20 xFD
-11W = xFE xFE x88 xE0 x14 x0A x01 x34 xFD
-12W = xFE xFE x88 xE0 x14 x0A x01 x47 xFD
-13W = xFE xFE x88 xE0 x14 x0A x01 x61 xFD
-14W = xFE xFE x88 xE0 x14 x0A x01 x74 xFD
-15W = xFE xFE x88 xE0 x14 x0A x01 x87 xFD
-16W = xFE xFE x88 xE0 x14 x0A x02 x01 xFD
-17W = xFE xFE x88 xE0 x14 x0A x02 x14 xFD
-18W = xFE xFE x88 xE0 x14 x0A x02 x28 xFD
-19W = xFE xFE x88 xE0 x14 x0A x02 x41 xFD
-20W = xFE xFE x88 xE0 x14 x0A x02 x55 xFD
-*/
-
 int RIG_Xiegu_G90::get_power_out(void)
 {
 	string cstr = "\x15\x11";
@@ -723,24 +701,17 @@ int RIG_Xiegu_G90::get_power_out(void)
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	int mtr= 0;
+	int mtr = 0;
 	if (waitFOR(9, "get power out")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
+			// Power is 10 * output in watts, as BCD
 			if (replystr[p + 7] == '\xFD') {
 				mtr = hexval(replystr[p + 6]);
 			} else {
-				mtr = 100 * hexval(replystr[p + 6]) + hexval(replystr[p + 7]);
+				mtr = 100 * hexval(replystr[p + 7]) + hexval(replystr[p + 6]);
 			}
 			if (mtr < 0) mtr = 0;
-			if (mtr > 255) mtr = 255;
-			size_t i = 0;
-			for (i = 0; i < sizeof(pwrtbl) / sizeof(meterpair) - 1; i++)
-				if (mtr >= pwrtbl[i].mtr && mtr < pwrtbl[i+1].mtr)
-					break;
-			mtr = (int)ceil(pwrtbl[i].val + 
-				(pwrtbl[i+1].val - pwrtbl[i].val)*(mtr - pwrtbl[i].mtr)/(pwrtbl[i+1].mtr - pwrtbl[i].mtr));
-			if (mtr > 20) mtr = 20;
 		}
 	}
 	get_trace(2, "get_power_out()", str2hex(replystr.c_str(), replystr.length()));
@@ -1044,11 +1015,15 @@ const char *RIG_Xiegu_G90::agc_label()
     return agcstrs[agcval];
 }
 
-int  RIG_Xiegu_G90::agc_val()
+int RIG_Xiegu_G90::agc_val()
 {
     return (agcval);
 }
 
+int RIG_Xiegu_G90::power_scale()
+{
+	return 10;
+}
 
 /*
 void RIG_Xiegu_G90::set_rf_gain(int val)

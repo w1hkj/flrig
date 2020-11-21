@@ -171,7 +171,7 @@ public:
 	int  incr_agc();
 	const char *agc_label();
 	int  agc_val();
-
+	int power_scale();
 };
 
 #endif
