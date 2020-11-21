@@ -317,6 +317,7 @@ void init_port_combos()
 	set_combo_value();
 }
 #endif //__APPLE__
+//======================================================================
 
 //======================================================================
 // FreeBSD init_port_combos
@@ -350,6 +351,44 @@ void init_port_combos()
 	}
 }
 #endif //__FreeBSD__
+//======================================================================
+
+//======================================================================
+// OpenBSD init_port_combos
+//======================================================================
+
+#ifdef __OpenBSD__
+
+#ifndef PATH_MAX
+#  define PATH_MAX 1024
+#endif
+#  define TTY_MAX 8
+
+void init_port_combos()
+{
+	int retval;
+	struct stat st;
+	char ttyname[PATH_MAX + 1];
+	const char* tty_fmt[] = {
+		"/dev/ttyd%u",
+		"/dev/ttyU%u",
+	}
+
+	clear_combos();
+
+	for (size_t i = 0; i < sizeof(tty_fmt)/sizeof(*tty_fmt); i++) {
+		for (unsigned j = 0; j < TTY_MAX; j++) {
+			snprintf(ttyname, sizeof(ttyname), tty_fmt[i], j);
+			if ( !(stat(ttyname, &st) == 0 && S_ISCHR(st.st_mode)) )
+				continue;
+			LOG_WARN("Found serial port %s", ttyname);
+			add_combos(ttyname);
+		}
+	}
+}
+
+#endif //__OpenBSD__
+//======================================================================
 
 void cbCIVdefault()
 {

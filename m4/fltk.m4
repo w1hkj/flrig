@@ -39,7 +39,7 @@ AC_DEFUN([AC_CHECK_FLTK], [
           FLTK_LIBS=`$FLTK_CONFIG --ldflags --use-images`
           if test "x$target_mingw32" != "xyes"; then
               if test "x$target_darwin" != "xyes"; then
-                  if grep -q "lX11" <<< "$FLTK_LIBS"; then
+                  if echo "$FLTK_LIBS" | grep "lX11"; then
                       FLTK_LIBS="$FLTK_LIBS";
                   else
                       FLTK_LIBS="$FLTK_LIBS -lm -lX11";
