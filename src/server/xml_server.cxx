@@ -1820,10 +1820,11 @@ public:
 		{
 			guard_lock lock1(&mutex_srvc_reqs);
 			guard_lock lock2(&mutex_serial);
-			sendCommand(cmd, 0, 0);//cmd.length());
+
+			RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
 
 			retstr.clear();
-			waitResponse(100);
+			waitResponse(10);//(100);
 			if (!respstr.empty()) {
 				retstr = usehex ? 
 					str2hex(respstr.c_str(), respstr.length()) :
@@ -1833,13 +1834,52 @@ public:
 				result = std::string("No response: ").append(selrig->name_);
 		}
 
-	xml_trace(2, "xmlrpc command:", command.c_str());
-
+		xml_trace(2, "xmlrpc command:", command.c_str());
 	}
 
 	std::string help() { return std::string("sends xmlrpc CAT string to xcvr"); }
 
 } rig_cat_string(&rig_server);
+
+class rig_cat_priority : public XmlRpcServerMethod {
+public:
+	rig_cat_priority(XmlRpcServer* s) : XmlRpcServerMethod("rig.cat_priority", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		result = 0;
+		if (!xcvr_initialized) {
+			return;
+		}
+		std::string command = std::string(params[0]);
+		bool usehex = false;
+		if (command.empty()) return;
+
+		std::string cmd = "";
+		if (command.find("x") != string::npos) { // hex strings
+			size_t p = 0;
+			unsigned int val;
+			usehex = true;
+			while (( p = command.find("x", p)) != string::npos) {
+				sscanf(&command[p+1], "%x", &val);
+				cmd += (unsigned char) val;
+				p += 3;
+			}
+		} else
+			cmd = command;
+
+		guard_lock lock1(&mutex_srvc_reqs);
+		guard_lock lock2(&mutex_serial);
+
+		RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
+		result = std::string("OK");
+
+		return;
+	}
+
+	std::string help() { return std::string("sends xmlrpc priority CAT string to xcvr"); }
+
+} rig_cat_priority(&rig_server);
+
 
 //------------------------------------------------------------------------------
 // Set cwio words per minute
@@ -1997,6 +2037,7 @@ struct MLIST {
 	{ "rig.set_micgain",  "i:i", "sets mic gain control" },
 	{ "rig.swap",         "i:i", "execute vfo swap" },
 	{ "rig.cat_string",   "s:s", "execute CAT string" },
+	{ "rig.cat_priority", "s:s", "priority CAT string" },
 	{ "rig.shutdown",     "i:i", "shutdown xcvr & flrig" },
 	{ "rig.cwio_wpm",     "i:i", "set cwio WPM" },
 	{ "rig.cwio_text",    "s:s", "send text via cwio interface" },
