@@ -1111,7 +1111,7 @@ int RIG_IC7100::get_power_control()
 
 void RIG_IC7100::get_pc_min_max_step(double &min, double &max, double &step)
 {
-	min = 2; max = 100; step = 1;
+	min = 0; max = 100; step = 1;
 }
 
 void RIG_IC7100::set_rf_gain(int val)
