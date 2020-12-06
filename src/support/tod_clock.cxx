@@ -64,7 +64,7 @@ void ztimer()
 	t_temp=(time_t)tv.tv_sec;
 	gmtime_r(&t_temp, &tm);
 
-	_zmsec = (tv.tv_usec/1000) % 1000 + tv.tv_sec * 1000;
+	_zmsec = tv.tv_usec / 1000;
 	_zsec = tm.tm_sec;
 	_zmin = tm.tm_min;
 	_zhr  = tm.tm_hour;
