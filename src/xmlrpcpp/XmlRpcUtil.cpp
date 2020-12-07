@@ -69,6 +69,7 @@ public:
 #ifdef USE_WINDOWS_DEBUG
 //    OutputDebugString(msg); OutputDebugString("\n");
 #else
+	rpc_trace(1, msg);
 //    std::cerr << msg << std::endl; 
 #endif  
   }
