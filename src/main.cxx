@@ -300,19 +300,13 @@ void startup(void*)
 			if (EXPAND_CONTROLS && selrig->has_extras) return;
 			btn_show_controls->label("@-22->");
 			btn_show_controls->redraw_label();
-//			grpTABS->hide();
-//			mainwindow->resizable(grpTABS);
-//			int nuH = mainwindow->h();// - grpTABS->h();
-//			mainwindow->size(progStatus.mainW, nuH);//WIDE_MAINH);
-//			mainwindow->size_range(735, nuH, 0, 0);//nuH);
 			mainwindow->redraw();
 		}
 		case small_ui :
 		default :
-//			if (EXPAND_CONTROLS && selrig->has_extras)
-//				show_controls();
-				break;
+			break;
 	}
+	start_server(xmlport);
 }
 
 void rotate_log(std::string filename)
@@ -468,7 +462,7 @@ extern FILE *serlog;
 		exit(EXIT_FAILURE);
 	}
 
-	start_server(xmlport);
+//	start_server(xmlport);
 	if (start_cwio_thread() != 0)
 		return 1;
 
@@ -539,7 +533,7 @@ extern FILE *serlog;
 		btn_show_controls->redraw_label();
 	}
 
-	Fl::add_timeout(0.5, startup);
+	Fl::add_timeout(0, startup);//0.5, startup);
 
 	return Fl::run();
 

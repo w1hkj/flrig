@@ -73,6 +73,7 @@ static void make_trace_window() {
 	tracebuffer = new Fl_Text_Buffer;
 	tracedisplay->buffer(tracebuffer);
 	tracedisplay->textfont(FL_SCREEN);
+	tracedisplay->wrap_mode(Fl_Text_Display::WRAP_NONE, 100);
 	btn_cleartrace = new Fl_Button(515, 275, 80, 20, _("Clear"));
 	btn_cleartrace->callback((Fl_Callback *)cb_cleartrace);
 	tracewindow->resizable(tracedisplay);
@@ -80,7 +81,13 @@ static void make_trace_window() {
 
 static void update_tracetext(void *)
 {
+	if (!tracewindow->visible()) {
+		tracestrings.clear();
+		return;
+	}
 	guard_lock tt(&mutex_trace);
+	if (tracedisplay->buffer()->length() > 100000)
+		tracedisplay->buffer()->text("");
 	for (size_t n = 0; n < tracestrings.size(); n++)
 		tracedisplay->insert(tracestrings[n].c_str());
 	tracestrings.clear();

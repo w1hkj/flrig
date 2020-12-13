@@ -186,6 +186,9 @@ void debug::show(void)
 
 void debug::sync_text(void* arg)
 {
+	if (!window->visible())
+		return;
+
 	guard_lock dlock(&debug_mutex);
 	if (inst == 0 || btext == 0) return;
 
