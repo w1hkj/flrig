@@ -41,6 +41,8 @@ public:
 	int  get_modeA();
 	int  get_modeB();
 
+	int  get_modetype(int n);
+
 	void set_modeA(int);
 	void set_modeB(int);
 
@@ -57,6 +59,11 @@ private:
 	void set_vfo(unsigned long int);
 	void set_mode(int);
 	void send();
+
+	// S Meter data minimum & maximum values from rig.  wbx
+	int rig_smin;
+	int rig_smax;
+
 };
 
 #endif

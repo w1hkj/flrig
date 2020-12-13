@@ -1,6 +1,7 @@
 // ----------------------------------------------------------------------------
-// Copyright (C) 2014
+// Copyright (C) 2014-2020
 //              David Freese, W1HKJ
+//              David Baxter, G0WBX
 //
 // This file is part of flrig.
 //
@@ -27,20 +28,25 @@
 
 // transceiver DOES NOT return any operating parameters other than
 // S-meter
+// ( and Squelch status.  *** G0WBX )
 
 static const char FT736Rname_[] = "FT-736R";
 
 static const char *FT736Rmodes_[] = {
 	"LSB", "USB", "CW", "CW-N", "FM", "FM-N", NULL};
+	
 static const int FT736Rmode_val_[] = {
 	0x00, 0x01, 0x02, 0x82, 0x08, 0x88 };
 
 static const char FT736R_mode_type[] = { 'L', 'U', 'L', 'L', 'U', 'U' };
 
+
+
 RIG_FT736R::RIG_FT736R() {
 // base class values
 	name_ = FT736Rname_;
 	modes_ = FT736Rmodes_;
+
 	comm_baudrate = BR4800;
 	stopbits = 2;
 	comm_retries = 2;
@@ -62,7 +68,8 @@ RIG_FT736R::RIG_FT736R() {
 
 	has_mode_control = true;
 	has_ptt_control = true;
-	
+	has_smeter = true;			// (this was missing ) ***G0WBX
+
 	precision = 10;
 	ndigits = 10;
 
@@ -81,6 +88,8 @@ void RIG_FT736R::send()
 
 void RIG_FT736R::initialize()
 {
+	rig_smin = 0x11;
+	rig_smax = 0x8A;
 	init_cmd();
 	send();
 	MilliSleep(200);
@@ -115,10 +124,6 @@ void RIG_FT736R::selectB()
 	set_mode(B.imode);
 }
 
-unsigned long int RIG_FT736R::get_vfoA ()
-{
-	return A.freq;
-}
 
 // transceiver supports frequency ranges:
 // 50.0 <= f < 54.0 MHz
@@ -162,9 +167,9 @@ void RIG_FT736R::set_vfoA (unsigned long int freq)
 	set_vfo(freq);
 }
 
-int RIG_FT736R::get_modeA()
+unsigned long int RIG_FT736R::get_vfoA ()
 {
-	return A.imode;
+	return A.freq;
 }
 
 void RIG_FT736R::set_mode(int val)
@@ -183,10 +188,11 @@ void RIG_FT736R::set_modeA(int val)
 	set_mode(val);
 }
 
-unsigned long int RIG_FT736R::get_vfoB ()
+int RIG_FT736R::get_modeA()
 {
-	return B.freq;
+	return A.imode;
 }
+
 
 void RIG_FT736R::set_vfoB (unsigned long int freq)
 {
@@ -196,9 +202,9 @@ void RIG_FT736R::set_vfoB (unsigned long int freq)
 	set_vfo(freq);
 }
 
-int RIG_FT736R::get_modeB()
+unsigned long int RIG_FT736R::get_vfoB ()
 {
-	return B.imode;
+	return B.freq;
 }
 
 void RIG_FT736R::set_modeB(int val)
@@ -208,6 +214,17 @@ void RIG_FT736R::set_modeB(int val)
 		return;
 	set_mode(val);
 }
+
+int RIG_FT736R::get_modeB()
+{
+	return B.imode;
+}
+
+int RIG_FT736R::get_modetype(int n)		// was missing, added G0WBX
+{										// Fldigi now happy in LSB.
+	return FT736R_mode_type[n];
+}
+
 
 void RIG_FT736R::set_PTT_control(int val)
 {
@@ -227,13 +244,21 @@ int  RIG_FT736R::get_PTT()
 
 int RIG_FT736R::get_smeter()
 {
-	init_cmd();
-	cmd[4] = 0xF7;
-	int ret = waitN(1, 100, "get smeter", HEX);
-	if (ret == 1) {
-		int sval = replystr[0] - 0x30;
-		sval = sval * 100 / (0xAD - 0x30);
-		return sval;
+	int sval = 0;		// cures the prepended data issue.  Thanks Dave HKJ!
+	init_cmd();			// presets to 5 null bytes
+	cmd[4] = 0xF7;		// the 'command' is always the last byte
+	send();				// send it. (this was missing)  ***G0WBX
+
+	int ret = waitN(5, 100, "get smeter", HEX); // returns the num' of bytes received.
+												// 5 bytes should be received, first 4 all the same data value.
+												// The last byte == the command.
+
+	if (ret >1) {
+		sval = replystr[ret-2] - rig_smin;			// get the data value, and offset.
+		sval = sval * 100 / (rig_smax - rig_smin);	// needed values deffined in FT736R.h
 	}
-	return 0;
+
+	return sval;	//	UI Display range is from 0..100? (A test showed sval == 50 == 'S'9)
 }
+
+
