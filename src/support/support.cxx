@@ -52,6 +52,7 @@
 #include "tod_clock.h"
 #include "trace.h"
 #include "cwio.h"
+#include "xml_server.h"
 
 void initTabs();
 
@@ -1458,25 +1459,21 @@ void set_ptt(void *d)
 	}
 }
 
-bool close_rig = false;
-
 void * serial_thread_loop(void *d)
 {
   static int  loopcount = progStatus.serloop_timing / 10;
   static int  poll_nbr = 0;
 
 	for(;;) {
-		if (!run_serial_thread) break;
+
+		if (!run_serial_thread) {
+			break;
+		}
 
 		MilliSleep(10);
 
 		if (bypass_serial_thread_loop) {
 			goto serial_bypass_loop;
-		}
-
-		if (close_rig) {
-			trace(1, "serial_thread_loop: close_rig");
-			return NULL;
 		}
 
 //send any freq/mode/bw changes in the queu
@@ -3365,11 +3362,13 @@ void close_UI()
 		trace(1, "close_UI()");
 		run_serial_thread = false;
 	}
+//std::cout << "close_UI()" << std::endl;
+//std::cout << "pthread_join(*serial_thread, NULL)" << std::endl;
 	pthread_join(*serial_thread, NULL);
 
 // xcvr auto off
-//	if (selrig->has_xcvr_auto_on_off && progStatus.xcvr_auto_off)
-//		selrig->set_xcvr_auto_off();
+	if (selrig->has_xcvr_auto_on_off && progStatus.xcvr_auto_off)
+		selrig->set_xcvr_auto_off();
 
 	// close down the serial port
 	RigSerial->ClosePort();
@@ -3392,11 +3391,7 @@ void closeRig()
 	if (xcvr_initialized) {
 		restore_rig_vals();
 		selrig->shutdown();
-	// xcvr auto off
-		if (selrig->has_xcvr_auto_on_off && progStatus.xcvr_auto_off)
-			selrig->set_xcvr_auto_off();
 	}
-	close_rig = false;
 }
 
 void cbExit()
@@ -3459,13 +3454,9 @@ void cbExit()
 	progStatus.saveLastState();
 	closeRig();
 
-	{
-		guard_lock serial_lock(&mutex_serial);
-		trace(1, "shutdown serial thread");
-		close_rig = true;
-	}
-
 	stop_cwio_thread();
+
+	exit_server();
 
 	close_UI();
 
@@ -5739,9 +5730,15 @@ void initRig()
 	xcvr_initialized = false;
 	if (tabs_dialog && tabs_dialog->visible()) tabs_dialog->hide();
 
-	grpInitializing->show();
 	main_group->hide();
+
+	grpInitializing->size(mainwindow->w(), mainwindow->h() - grpInitializing->y());
+	grpInitializing->show();
+	grpInitializing->redraw();
+	mainwindow->damage();
 	mainwindow->redraw();
+	update_progress(0);
+	Fl::check();
 
 	flrig_abort = false;
 
@@ -5767,8 +5764,15 @@ void initRig()
 		trace(1, "init_rig()");
 
 		// Xcvr Auto Power on as soon as possible
-		if (selrig->has_xcvr_auto_on_off && progStatus.xcvr_auto_on)
+		if (selrig->has_xcvr_auto_on_off && progStatus.xcvr_auto_on) {
+			progress->label("Auto Start");
+			progress->redraw_label();
+			update_progress(0);
 			selrig->set_xcvr_auto_on();
+			progress->label("Initializing");
+			progress->redraw_label();
+			update_progress(0);
+		}
 
 		bool check_ok = false;
 		if (progStatus.xcvr_serial_port != "NONE") check_ok = selrig->check();

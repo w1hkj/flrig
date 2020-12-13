@@ -533,7 +533,7 @@ extern FILE *serlog;
 		btn_show_controls->redraw_label();
 	}
 
-	Fl::add_timeout(0, startup);//0.5, startup);
+	Fl::add_timeout(0.1, startup);
 
 	return Fl::run();
 

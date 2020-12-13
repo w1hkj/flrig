@@ -314,9 +314,9 @@ int  Cserial::ReadBuffer (char *buf, int nchars)
 		}
 		retnum = read (fd, (char *)(buf + nread), nchars);
 		if (retnum < 0)
-			return 0;//nread;
+			return 0;
 		if (retnum == 0)
-			return nread;
+			break;
 		nread += retnum;
 		nchars -= retnum;
 	}

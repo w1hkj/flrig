@@ -1851,14 +1851,12 @@ public:
 			return;
 		}
 		std::string command = std::string(params[0]);
-		bool usehex = false;
 		if (command.empty()) return;
 
 		std::string cmd = "";
 		if (command.find("x") != string::npos) { // hex strings
 			size_t p = 0;
 			unsigned int val;
-			usehex = true;
 			while (( p = command.find("x", p)) != string::npos) {
 				sscanf(&command[p+1], "%x", &val);
 				cmd += (unsigned char) val;
@@ -2109,10 +2107,14 @@ std::string print_xmlhelp()
 {
 	string pstr;
 	string line;
+	size_t maxlen = 0;
+	for (size_t n = 0; n < sizeof(mlist) / sizeof(*mlist); n++)
+		if (mlist[n].name.length() > maxlen) maxlen = mlist[n].name.length();
+
 	for (size_t n = 0; n < sizeof(mlist) / sizeof(*mlist); ++n) {
 		line.clear();
 		line.assign(mlist[n].name);
-		line.append(20 - line.length(), ' ');
+		line.append(maxlen + 4 - line.length(), ' ');
 		line.append(mlist[n].signature);
 		line.append("  ");
 		line.append(mlist[n].help);
