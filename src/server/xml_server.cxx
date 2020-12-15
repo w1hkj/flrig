@@ -1066,12 +1066,19 @@ public:
 	rig_get_pwrmeter_scale(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_pwrmeter_scale", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_online || !selrig->has_power_out)
-			result = (int)(0);
-		else
-			result = (int)(selrig->power_scale());
+		result = (int)(selrig->power_scale());
 	}
 } rig_get_pwrmeter_scale(&rig_server);
+
+class rig_get_maxpwr : public XmlRpcServerMethod {
+public:
+	rig_get_maxpwr(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_maxpwr", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		result = (int)(selrig->power_max());
+	}
+} rig_get_maxpwr(&rig_server);
+
 
 class rig_get_pwrmeter : public XmlRpcServerMethod {
 public:
@@ -2002,6 +2009,7 @@ struct MLIST {
 	{ "rig.get_power",    "s:n", "return power level control value" },
 	{ "rig.get_pwrmeter", "s:n", "return PWR out" },
 	{ "rig.get_pwrmeter_scale", "s:n", "return scale for power meter" },
+	{ "rig.get_pwrmax",   "s:n", "return maximum power available" },
 	{ "rig.get_swrmeter", "s:n", "return SWR out" },
 	{ "rig.get_smeter",   "s:n", "return Smeter" },
 	{ "rig.get_split",    "s:n", "return split state" },

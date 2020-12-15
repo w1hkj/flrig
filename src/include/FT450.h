@@ -71,7 +71,7 @@ public:
 	int  get_power_out();
 	int  get_power_control();
 	void get_pc_min_max_step(double &min, double &max, double &step) {
-		min = 5; max = 100; step = 1; }
+		min = 5; pmax = max = 100; step = 1; }
 	void set_volume_control(int val);
 	int  get_volume_control();
 	void get_vol_min_max_step(int &min, int &max, int &step);

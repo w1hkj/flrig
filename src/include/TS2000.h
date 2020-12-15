@@ -77,7 +77,7 @@ enum TS2000MODES { LSB, USB, CW, FM, AM, FSK, CWR, FSKR, DIGI };
 //	int  get_volume_control();
 	void set_power_control(double val);
 	void get_pc_min_max_step(double &min, double &max, double &step) {
-		min = 5; max = 100; step = 1; }
+		min = 5; pmax = max = 100; step = 1; }
 
 //	void tune_rig();
 	void set_attenuator(int val);

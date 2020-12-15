@@ -98,7 +98,7 @@ public:
 	const char **bwtable(int m);
 
 	void get_pc_min_max_step(double &min, double &max, double &step) {
-		min = 5; max = 200; step = 1; }
+		min = 5; pmax = max = 200; step = 1; }
 
 	void set_PTT_control(int val);
 	int  get_PTT();

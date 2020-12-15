@@ -873,7 +873,7 @@ int RIG_IC7600::get_power_control()
 
 void RIG_IC7600::get_pc_min_max_step(double &min, double &max, double &step)
 {
-	min = 2; max = 100; step = 1;
+	min = 2; pmax = max = 100; step = 1;
 }
 
 int RIG_IC7600::get_smeter()

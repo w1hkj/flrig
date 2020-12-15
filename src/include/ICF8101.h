@@ -78,7 +78,7 @@ public:
 	void set_power_control(double val);
 	int  get_power_control();
 	void get_pc_min_max_step(double &min, double &max, double &step) {
-		min = 0; max = 2; step = 1; }
+		min = 0; pmax = max = 2; step = 1; }
 
 	void set_mic_gain(int val);
 	int  get_mic_gain();

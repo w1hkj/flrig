@@ -822,7 +822,7 @@ int RIG_IC7851::get_PTT()
 
 void RIG_IC7851::get_pc_min_max_step(double &min, double &max, double &step)
 {
-	min = 5; max = 200; step = 1;
+	min = 5; pmax = max = 200; step = 1;
 }
 
 // Volume control val 0 ... 100
