@@ -1368,10 +1368,23 @@ void RIG_FT991A::set_xcvr_auto_on()
 	if (p == string::npos) {	// rig is off, power on
 		cmd = "PS1;";
 		sendCommand(cmd);
-		MilliSleep(1100); // 1.0 < T < 2.0 seconds
+		for (int i = 0; i < 1500; i += 100) {
+			MilliSleep(100);
+			update_progress(100 * i / 4500);
+			Fl::awake();
+		}
 		sendCommand(cmd);
+		for (int i = 2500; i < 3000; i += 100) {
+			MilliSleep(100);
+			update_progress(100 * i / 4500);
+			Fl::awake();
+		}
 		sendCommand(cmd);
-		MilliSleep(3000);	// Wait for rig startup?  Maybe not needed.
+		for (int i = 3000; i < 4500; i += 100) {
+			MilliSleep(100);
+			update_progress(100 * i / 4500);
+			Fl::awake();
+		}
 	}
 	sett("set_xcvr_auto_on");
 }

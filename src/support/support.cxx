@@ -107,7 +107,7 @@ bool using_buttons = false;
 enum { SWR_IMAGE, ALC_IMAGE };
 int meter_image = SWR_IMAGE;
 
-bool xcvr_initialized = false;
+bool xcvr_online = false;
 
 //======================================================================
 // slider change processing
@@ -3388,10 +3388,11 @@ void close_UI()
 void closeRig()
 {
 	trace(1, "closeRig()");
-	if (xcvr_initialized) {
+	if (xcvr_online) {
 		restore_rig_vals();
 		selrig->shutdown();
 	}
+	xcvr_online = false;
 }
 
 void cbExit()
@@ -5727,7 +5728,7 @@ void init_K3_KX3_special()
 
 void initRig()
 {
-	xcvr_initialized = false;
+	xcvr_online = false;
 	if (tabs_dialog && tabs_dialog->visible()) tabs_dialog->hide();
 
 	main_group->hide();
@@ -5862,11 +5863,11 @@ void initRig()
 	Fl::flush();
 //	Fl::check();
 
-	xcvr_initialized = true;
+	xcvr_online = true;
 	return;
 
 failed:
-	xcvr_initialized = false;
+	xcvr_online = false;
 	adjust_control_positions();
 	grpInitializing->hide();
 	main_group->show();

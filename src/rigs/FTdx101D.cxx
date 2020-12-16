@@ -228,7 +228,11 @@ void RIG_FTdx101D::set_xcvr_auto_on()
 	cmd = "ID;";
 	sendCommand(cmd);
 // wait 1 to 2 seconds
-	MilliSleep(1500);
+	for (int i = 0; i < 1500; i += 100) {
+		MilliSleep(100);
+		update_progress(100 * i / 1500);
+		Fl::awake();
+	}
 	cmd = "PS1;";
 	sendCommand(cmd);
 // wait for power on status

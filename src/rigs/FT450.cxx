@@ -862,7 +862,12 @@ void RIG_FT450::set_xcvr_auto_on()
 	cmd = "ID;";
 	sendCommand(cmd);
 // wait 1 to 2 seconds
-	MilliSleep(1500);
+// wake up time for initialization
+	for (int i = 0; i < 1500; i += 100) {
+		MilliSleep(100);
+		update_progress(100 * i / 5000);
+		Fl::awake();
+	}
 	cmd = "PS1;";
 	sendCommand(cmd);
 // wait for power on status

@@ -24,6 +24,7 @@
 #include <sstream>
 
 #include "tod_clock.h"
+#include "support.h"
 
 //=============================================================================
 // IC-7100
@@ -274,7 +275,6 @@ RIG_IC7100::RIG_IC7100() {
 //======================================================================
 // IC7100 unique commands
 //======================================================================
-extern void update_progress(int);
 
 void RIG_IC7100::set_xcvr_auto_on()
 {
@@ -282,24 +282,26 @@ void RIG_IC7100::set_xcvr_auto_on()
 			 progStatus.comm_baudrate == 5 ? 13 :
 			 progStatus.comm_baudrate == 4 ? 7 :
 			 progStatus.comm_baudrate == 3 ? 3 : 2;
-	cmd.assign( nr, '\xFE');
-	cmd.append(pre_to);
-	cmd += '\x18'; cmd += '\x01';
-	cmd.append(post);
-	waitFB("Power ON", 2000);
-
-	int msec = 5000;   // wake up time for initialization
-	for (int i = 0; i < msec; i += 100) {
-		MilliSleep(100);
-		update_progress(progress->value() + 2);
-		Fl::awake();
-	}
 
 	cmd.assign(pre_to);
 	cmd += '\x19'; cmd += '\x00';
 	cmd.append(post);
-	std::string again = cmd;
-	waitFOR(8, "get ID", 100);
+
+	if (waitFOR(8, "get ID", 100) == false) {  // xcvr must be OFF
+		cmd.assign( nr, '\xFE');
+		cmd.append(pre_to);
+		cmd += '\x18'; cmd += '\x01';
+		cmd.append(post);
+		waitFB("Power ON", 2000);
+		isett("Power ON");
+// wake up time for initialization
+		for (int i = 0; i < 5000; i += 100) {
+			MilliSleep(100);
+			update_progress(100 * i / 5000);
+			Fl::awake();
+		}
+	}
+	return;
 }
 
 void RIG_IC7100::set_xcvr_auto_off()
@@ -308,10 +310,8 @@ void RIG_IC7100::set_xcvr_auto_off()
 	cmd.append(pre_to);
 	cmd += '\x18'; cmd += '\x00';
 	cmd.append(post);
-//std::cout << ztime() << " Power OFF " << hexstr(cmd).c_str() << std::endl;
 	waitFB("Power OFF", 200);
-//	isett("Power OFF");
-//std::cout << ztime() << " Power OFF " << hexstr(replystr).c_str() << std::endl;
+	isett("Power OFF");
 }
 
 bool RIG_IC7100::check ()

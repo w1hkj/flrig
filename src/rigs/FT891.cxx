@@ -1408,9 +1408,23 @@ void RIG_FT891::set_xcvr_auto_on()
 	if (p == string::npos) {	// rig is off, power on
 		cmd = "PS1;";
 		sendCommand(cmd);
-		MilliSleep(1500);	// 1.0 < T < 2.0 seconds
+// wake up time for initialization
+		for (int i = 0; i < 1500; i += 100) {
+			MilliSleep(100);
+			update_progress(100 * i / 6000);
+			Fl::awake();
+		}
+		for (int i = 1500; i < 3000; i += 100) {
+			MilliSleep(100);
+			update_progress(100 * i / 6000);
+			Fl::awake();
+		}
 		sendCommand(cmd);
-		MilliSleep(3000);	// Wait for rig startup?  Maybe not needed.
+		for (int i = 3000; i < 6000; i += 100) {
+			MilliSleep(100);
+			update_progress(100 * i / 6000);
+			Fl::awake();
+		}
 	}
 }
 

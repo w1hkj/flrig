@@ -1518,8 +1518,14 @@ void RIG_Xiegu_G90::set_xcvr_auto_on()
 	cmd.append(pre_to);
 	cmd += '\x18'; cmd += '\x01';
 	cmd.append(post);
-	waitFB("Power ON", 2000);
+	waitFB("Power ON", 200);
 	isett("Power ON");
+
+	for (int i = 0; i < 5000; i += 100) {
+		MilliSleep(100);
+		update_progress(100 * i / 5000);
+		Fl::awake();
+	}
 
 	cmd = pre_to;
 	cmd += '\x19'; cmd += '\x00';

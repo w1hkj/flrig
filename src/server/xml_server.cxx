@@ -56,8 +56,6 @@ using namespace XmlRpc;
 // The server
 XmlRpcServer rig_server;
 
-extern bool xcvr_initialized;
-
 //------------------------------------------------------------------------------
 // Request for program version
 //------------------------------------------------------------------------------
@@ -81,7 +79,7 @@ public:
 	rig_get_xcvr(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_xcvr", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized)
+		if (!xcvr_online)
 			result = "";
 		else
 			result = selrig->name_;
@@ -201,7 +199,7 @@ public:
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 		string info = "";
 
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = info;
 			return;
 		}
@@ -233,7 +231,7 @@ public:
 		string info;  info.clear();
 		string temp;  temp.clear();
 
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = info;
 			return;
 		}
@@ -325,7 +323,7 @@ public:
 	rig_get_vfo(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_vfo", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = "14070000";
 			return;
 		}
@@ -364,7 +362,7 @@ public:
 	rig_get_vfoA(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_vfoA", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = "14070000";
 			return;
 		}
@@ -394,7 +392,7 @@ public:
 	rig_get_vfoB(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_vfoB", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = "14070000";
 			return;
 		}
@@ -425,7 +423,7 @@ public:
 	rig_get_AB(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_AB", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = "A";
 			return;
 		}
@@ -450,7 +448,7 @@ public:
 	rig_get_notch(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_notch", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}
@@ -473,7 +471,7 @@ public:
 	rig_set_notch(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_notch", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}
@@ -505,7 +503,7 @@ public:
 	rig_get_rfgain(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_rfgain", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}
@@ -528,7 +526,7 @@ public:
 	rig_set_rfgain(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_rfgain", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}
@@ -556,7 +554,7 @@ public:
 	rig_get_micgain(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_micgain", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}
@@ -579,7 +577,7 @@ public:
 	rig_set_micgain(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_micgain", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}
@@ -607,7 +605,7 @@ public:
 	rig_get_volume(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_volume", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}
@@ -630,7 +628,7 @@ public:
 	rig_set_volume(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_volume", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}
@@ -659,7 +657,7 @@ public :
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 		XmlRpcValue modes;
 
-		if (!xcvr_initialized || !selrig->modes_) {
+		if (!xcvr_online || !selrig->modes_) {
 			modes[0] = "CW";
 			modes[1] = "LSB";
 			modes[2] = "USB";
@@ -692,7 +690,7 @@ public:
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = "U";
 			return;
 		}
@@ -723,7 +721,7 @@ public:
 	rig_get_mode(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_mode", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = "USB";
 			return;
 		}
@@ -754,7 +752,7 @@ public:
 	rig_get_modeA(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_modeA", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = "USB";
 			return;
 		}
@@ -785,7 +783,7 @@ public:
 	rig_get_modeB(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_modeB", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = "USB";
 			return;
 		}
@@ -817,7 +815,7 @@ public :
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 
-		if (!xcvr_initialized || !selrig->bandwidths_) {
+		if (!xcvr_online || !selrig->bandwidths_) {
 			XmlRpcValue bws;
 			bws[0][0] = "Bandwidth";
 			bws[0][1] = "NONE";
@@ -886,7 +884,7 @@ public:
 		result[0] = "NONE";
 		result[1] = "";
 
-		if (!xcvr_initialized) return;
+		if (!xcvr_online) return;
 
 		wait();
 		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_bw");
@@ -945,7 +943,7 @@ public:
 		result[0] = "NONE";
 		result[1] = "";
 
-		if (!xcvr_initialized) return;
+		if (!xcvr_online) return;
 
 		wait();
 		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_bwA");
@@ -1005,7 +1003,7 @@ public:
 		result[0] = "NONE";
 		result[1] = "";
 
-		if (!xcvr_initialized) return;
+		if (!xcvr_online) return;
 
 		wait();
 		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_bwA");
@@ -1056,7 +1054,7 @@ public:
 	rig_get_smeter(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_smeter", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized || !selrig->has_smeter) 
+		if (!xcvr_online || !selrig->has_smeter) 
 			result = (int)(0);
 		else
 			result = (int)(mval);
@@ -1068,7 +1066,7 @@ public:
 	rig_get_pwrmeter_scale(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_pwrmeter_scale", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized || !selrig->has_power_out)
+		if (!xcvr_online || !selrig->has_power_out)
 			result = (int)(0);
 		else
 			result = (int)(selrig->power_scale());
@@ -1080,7 +1078,7 @@ public:
 	rig_get_pwrmeter(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_pwrmeter", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized || !selrig->has_power_out) 
+		if (!xcvr_online || !selrig->has_power_out) 
 			result = (int)(0);
 		else
 			result = (int)(pwrval);
@@ -1092,7 +1090,7 @@ public:
 	rig_get_swrmeter(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_swrmeter", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized || !selrig->has_swr_control) 
+		if (!xcvr_online || !selrig->has_swr_control) 
 			result = (int)(0);
 		else
 			result = (int)(swrval);
@@ -1183,7 +1181,7 @@ public:
 	rig_set_power(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_power", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}
@@ -1203,7 +1201,7 @@ public:
 	rig_set_ptt(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_ptt", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}
@@ -1235,7 +1233,7 @@ public:
 	rig_swap(XmlRpcServer* s) : XmlRpcServerMethod("rig.swap", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}
@@ -1257,7 +1255,7 @@ public:
 	rig_set_swap(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_swap", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}
@@ -1283,7 +1281,7 @@ public:
 	rig_set_split(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_split", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}
@@ -1323,7 +1321,7 @@ public:
 	rig_set_AB(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_AB", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}
@@ -1360,7 +1358,7 @@ public:
 	rig_set_vfoA(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_vfoA", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}
@@ -1385,7 +1383,7 @@ public:
 	rig_set_vfoB(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_vfoB", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}
@@ -1410,7 +1408,7 @@ public:
 	rig_set_vfo(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_vfo", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}
@@ -1443,7 +1441,7 @@ public:
 	main_set_frequency(XmlRpcServer* s) : XmlRpcServerMethod("main.set_frequency", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}
@@ -1475,7 +1473,7 @@ public:
 	rig_set_frequency(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_frequency", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}
@@ -1511,7 +1509,7 @@ public:
 	rig_set_mode(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_mode", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue &result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}
@@ -1565,7 +1563,7 @@ public:
 	rig_set_modeA(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_modeA", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue &result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}
@@ -1624,7 +1622,7 @@ public:
 	rig_set_modeB(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_modeB", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue &result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}
@@ -1683,7 +1681,7 @@ public:
 	rig_set_bandwidth(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_bandwidth", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}
@@ -1722,7 +1720,7 @@ public:
 	rig_set_bw(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_bw", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}
@@ -1756,7 +1754,7 @@ public:
 	rig_set_BW(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_BW", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}
@@ -1797,7 +1795,7 @@ public:
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 		result = 0;
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			return;
 		}
 		std::string command = std::string(params[0]);
@@ -1847,7 +1845,7 @@ public:
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 		result = 0;
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			return;
 		}
 		std::string command = std::string(params[0]);
@@ -1972,7 +1970,7 @@ public:
 	rig_shutdown(XmlRpcServer* s) : XmlRpcServerMethod("rig.shutdown", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_initialized) {
+		if (!xcvr_online) {
 			result = 0;
 			return;
 		}

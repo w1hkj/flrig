@@ -368,4 +368,8 @@ extern Fl_Tree *tab_tree;
 
 extern void select_tab(const char *);
 
+extern void update_progress(int);
+
+extern bool xcvr_online;
+
 #endif

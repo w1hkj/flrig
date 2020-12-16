@@ -264,21 +264,25 @@ void RIG_IC9700::selectB()
 
 void RIG_IC9700::set_xcvr_auto_on()
 {
-	cmd.clear();
-	cmd.append(
-		(progStatus.comm_baudrate == 6 ? 25 :
-		 progStatus.comm_baudrate == 5 ? 13 :
-		 progStatus.comm_baudrate == 4 ? 7 :
-		 progStatus.comm_baudrate == 3 ? 3 : 2), '\xFE');
-	cmd.append(pre_to);
-	cmd += '\x18'; cmd += '\x01';
-	cmd.append(post);
-	waitFB("Power ON", 200);
-
 	cmd = pre_to;
 	cmd += '\x19'; cmd += '\x00';
 	cmd.append(post);
-	waitFOR(8, "get ID", 10000);
+	if (waitFOR(8, "get ID", 100) == false) {
+		cmd.clear();
+		int fes[] = { 2, 2, 2, 3, 7, 13, 25, 50, 75, 150, 150, 150 };
+		if (progStatus.comm_baudrate >= 0 && progStatus.comm_baudrate <= 11) {
+			cmd.append( fes[progStatus.comm_baudrate], '\xFE');
+		}
+		cmd.append(pre_to);
+		cmd += '\x18'; cmd += '\x01';
+		cmd.append(post);
+		waitFB("Power ON", 200);
+		for (int i = 0; i < 5000; i += 100) {
+			MilliSleep(100);
+			update_progress(100 * i / 5000);
+			Fl::awake();
+		}
+	}
 }
 
 void RIG_IC9700::set_xcvr_auto_off()
