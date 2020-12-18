@@ -598,14 +598,6 @@ void RIG_Xiegu_G90::set_cw_wpm()
 	waitFB("SET cw wpm");
 }
 
-static int hexval(int hex)
-{
-	int val = 0;
-	val += 10 * ((hex >> 4) & 0x0F);
-	val += hex & 0x0F;
-	return val;
-}
-
 static char hexchr(int val)
 {
 	static char c;

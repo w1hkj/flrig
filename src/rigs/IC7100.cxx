@@ -1292,24 +1292,24 @@ int RIG_IC7100::get_power_out(void)
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	int mtr= 0;
+	int mtr = 0;
+	int val = 0;
 	if (waitFOR(9, "get power out")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			mtr = fm_bcd(replystr.substr(p+6), 3);
+			mtr = hex2val(replystr.substr(p+6, 2));
+			mtr = max(0, min(mtr, 255));
 			size_t i = 0;
 			for (i = 0; i < sizeof(pwrtbl) / sizeof(meterpair) - 1; i++)
 				if (mtr >= pwrtbl[i].mtr && mtr < pwrtbl[i+1].mtr)
 					break;
-			if (mtr < 0) mtr = 0;
-			if (mtr > 255) mtr = 255;
-			mtr = (int)ceil(pwrtbl[i].val + 
+			val = (int)ceil(pwrtbl[i].val + 
 				(pwrtbl[i+1].val - pwrtbl[i].val)*(mtr - pwrtbl[i].mtr)/(pwrtbl[i+1].mtr - pwrtbl[i].mtr));
-			if (mtr > 100) mtr = 100;
+			if (val > 100) val = 100;
 		}
 	}
 	get_trace(2, "get_power_out()", hexstr(replystr).c_str());
-	return mtr;
+	return val;
 }
 
 int RIG_IC7100::get_swr()

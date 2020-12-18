@@ -642,6 +642,8 @@ int vfo_;
 
 	string bcd255(int val);
 	int    num100(string bcd);
+	int    hexval(int hex);
+	int    hex2val(string hexval);
 
 // Yaesu force ID response before sending command
 	std::string IDstr;

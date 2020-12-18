@@ -349,6 +349,21 @@ int rigbase::num100(string bcd)
 	}
 	return 0;
 }
+
+int rigbase::hexval(int hex)
+{
+	int val = 0;
+	val += 10 * ((hex >> 4) & 0x0F);
+	val += hex & 0x0F;
+	return val;
+}
+
+int rigbase::hex2val(string hexstr)
+{
+	return 100 * hexval(hexstr[0]) + hexval(hexstr[1]);
+}
+
+
 //======================================================================
 
 int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
