@@ -442,7 +442,7 @@ status progStatus = {
 
 // bands; defaults for FT857 / FT897 / Xiegu-G90
 // frequency, mode, txCTCSS, rxCTCSS, offset, offset_freq;
-	1805000L, 0, 0, 0, 0, 600, 		// f160
+	1805000L, 0, 0, 0, 0, 600,		// f160
 	3580000L, 0, 0, 0, 0, 600,		// f80 meters
 	7070000L, 0, 0, 0, 0, 600,		// f40 meters
 	10140000L, 0, 0, 0, 0, 600,		// f30 meters
@@ -928,39 +928,58 @@ void status::saveLastState()
 	spref.set("f160", f160); spref.set("m160", m160);
 	spref.set("txT160", txT_160); spref.set("rxT160", rxT_160);
 	spref.set("offset_160", offset_160); spref.set("oF_160", oF_160);
+
 	spref.set("f80", f80);   spref.set("m80", m80);
 	spref.set("txT80", txT_80); spref.set("rxT80", rxT_80);
 	spref.set("offset_80", offset_80); spref.set("oF_80", oF_80);
+
 	spref.set("f40", f40);   spref.set("m40", m40);
 	spref.set("txT40", txT_40); spref.set("rxT40", rxT_40);
 	spref.set("offset_40", offset_40); spref.set("oF_40", oF_40);
+
 	spref.set("f30", f30);   spref.set("m30", m30);
 	spref.set("txT30", txT_30); spref.set("rxT30", rxT_30);
 	spref.set("offset_30", offset_30); spref.set("oF_30", oF_30);
+
 	spref.set("f20", f20);   spref.set("m20", m20);
 	spref.set("txT20", txT_20); spref.set("rxT20", rxT_20);
 	spref.set("offset_20", offset_20); spref.set("oF_20", oF_20);
+
 	spref.set("f17", f17);   spref.set("m17", m17);
 	spref.set("txT17", txT_17); spref.set("rxT17", rxT_17);
 	spref.set("offset_17", offset_17); spref.set("oF_17", oF_17);
+
 	spref.set("f15", f15);   spref.set("m15", m15);
 	spref.set("txT15", txT_15); spref.set("rxT15", rxT_15);
 	spref.set("offset_15", offset_15); spref.set("oF_15", oF_15);
+
 	spref.set("f12", f12);   spref.set("m12", m12);
 	spref.set("txT12", txT_12); spref.set("rxT12", rxT_12);
 	spref.set("offset_12", offset_12); spref.set("oF_12", oF_12);
+
 	spref.set("f10", f10);   spref.set("m10", m10);
 	spref.set("txT10", txT_10); spref.set("rxT10", rxT_10);
 	spref.set("offset_10", offset_10); spref.set("oF_10", oF_10);
+
 	spref.set("f6", f6);     spref.set("m6", m6);
 	spref.set("txT6", txT_6); spref.set("rxT_6", rxT_6);
 	spref.set("offset_6", offset_6); spref.set("oF_6", oF_6);
+
 	spref.set("f2", f2);     spref.set("m2", m2);
 	spref.set("txT2", txT_2); spref.set("rxT2", rxT_2);
 	spref.set("offset_2", offset_2); spref.set("oF_2", oF_2);
+
 	spref.set("f70", f70);   spref.set("m70", m70);
 	spref.set("txT70", txT_70); spref.set("rxT70", rxT_70);
 	spref.set("offset_70", offset_70); spref.set("oF_70", oF_70);
+
+	spref.set("f12G", f12G);   spref.set("m12G", m12G);
+	spref.set("txT12G", txT_12G); spref.set("rxT12G", rxT_12G);
+	spref.set("offset_12G", offset_12G); spref.set("oF_12G", oF_12G);
+
+	spref.set("fgen", fgen);   spref.set("mgen", mgen);
+	spref.set("txTgen", txT_gen); spref.set("rxTgen", rxT_gen);
+	spref.set("offset_gen", offset_gen); spref.set("oF_gen", oF_gen);
 
 	spref.set("hrd_buttons", hrd_buttons);
 	spref.set("sliders_button", sliders_button);
@@ -1538,39 +1557,58 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("f160", f160, f160); spref.get("m160", m160, m160);
 		spref.get("txT160", txT_160, txT_160); spref.get("rxT160", rxT_160, rxT_160);
 		spref.get("offset_160", offset_160, offset_160); spref.get("oF_160", oF_160, oF_160);
+
 		spref.get("f80", f80, f80);    spref.get("m80", m80, m80);
 		spref.get("txT80", txT_80, txT_80); spref.get("rxT80", rxT_80, rxT_80);
 		spref.get("offset_80", offset_80, offset_80); spref.get("oF_80", oF_80, oF_80);
+
 		spref.get("f40", f40, f40);    spref.get("m40", m40, m40);
 		spref.get("txT40", txT_40, txT_40); spref.get("rxT40", rxT_40, rxT_40);
 		spref.get("offset_40", offset_40, offset_40); spref.get("oF_40", oF_40, oF_40);
+
 		spref.get("f30", f30, f30);    spref.get("m30", m30, m30);
 		spref.get("txT30", txT_30, txT_30); spref.get("rxT30", rxT_30, rxT_30);
 		spref.get("offset_30", offset_30, offset_30); spref.get("oF_30", oF_30, oF_30);
+
 		spref.get("f20", f20, f20);    spref.get("m20", m20, m20);
 		spref.get("txT20", txT_20, txT_20); spref.get("rxT20", rxT_20, rxT_20);
 		spref.get("offset_20", offset_20, offset_20); spref.get("oF_20", oF_20, oF_20);
+
 		spref.get("f17", f17, f17);    spref.get("m17", m17, m17);
 		spref.get("txT17", txT_17, txT_17); spref.get("rxT17", rxT_17, rxT_17);
 		spref.get("offset_17", offset_17, offset_17); spref.get("oF_17", oF_17, oF_17);
+
 		spref.get("f15", f15, f15);    spref.get("m15", m15, m15);
 		spref.get("txT15", txT_15, txT_15); spref.get("rxT15", rxT_15, rxT_15);
 		spref.get("offset_15", offset_15, offset_15); spref.get("oF_15", oF_15, oF_15);
+
 		spref.get("f12", f12, f12);    spref.get("m12", m12, m12);
 		spref.get("txT12", txT_12, txT_12); spref.get("rxT12", rxT_12, rxT_12);
 		spref.get("offset_12", offset_12, offset_12); spref.get("oF_12", oF_12, oF_12);
+
 		spref.get("f10", f10, f10);    spref.get("m10", m10, m10);
 		spref.get("txT10", txT_10, txT_10); spref.get("rxT10", rxT_10, rxT_10);
 		spref.get("offset_10", offset_10, offset_10); spref.get("oF_10", oF_10, oF_10);
+
 		spref.get("f6", f6, f6);       spref.get("m6", m6, m6);
 		spref.get("txT6", txT_6, txT_6); spref.get("rxT6", rxT_6, rxT_6);
 		spref.get("offset_6", offset_6, offset_6); spref.get("oF_6", oF_6, oF_6);
+
 		spref.get("f2", f2, f2);       spref.get("m2", m2, m2);
 		spref.get("txT2", txT_2, txT_2); spref.get("rxT2", rxT_2, rxT_2);
 		spref.get("offset_2", offset_2, offset_2); spref.get("oF_2", oF_2, oF_2);
+
 		spref.get("f70", f70, f70);    spref.get("m70", m70, m70);
 		spref.get("txT70", txT_70, txT_70); spref.get("rxT70", rxT_70, rxT_70);
 		spref.get("offset_70", offset_70, offset_70); spref.get("oF_70", oF_70, oF_70);
+
+		spref.get("f12G", f12G, f12G);    spref.get("m12G", m12G, m12G);
+		spref.get("txT12G", txT_12G, txT_12G); spref.get("rxT12G", rxT_12G, rxT_12G);
+		spref.get("offset_12G", offset_12G, offset_12G); spref.get("oF_12G", oF_12G, oF_12G);
+
+		spref.get("fgen", fgen, fgen);    spref.get("mgen", mgen, mgen);
+		spref.get("txTgen", txT_gen, txT_gen); spref.get("rxTgen", rxT_gen, rxT_gen);
+		spref.get("offset_gen", offset_gen, offset_gen); spref.get("oF_gen", oF_gen, oF_gen);
 
 		if (spref.get("hrd_buttons", i, i)) hrd_buttons = i;
 		spref.get("sliders_button", sliders_button, sliders_button);

@@ -6454,6 +6454,38 @@ void cb_cw_delay()
 	selrig->set_cw_delay();
 }
 
+void set_band_label(int band)
+{
+	switch (band) {
+		case 1:
+			break;
+		case 2:
+			break;
+		case 3:
+			break;
+		case 4:
+			break;
+		case 5:
+			break;
+		case 6:
+			break;
+		case 7:
+			break;
+		case 8:
+			break;
+		case 9:
+			break;
+		case 10:
+			break;
+		case 11:
+			break;
+		case 12:
+			break;
+		case 13:
+			break;
+	}
+}
+
 void set_band(int band)
 {
 	switch (band) {
@@ -6541,6 +6573,13 @@ void set_band(int band)
 				progStatus.offset_70 = FMoffset->index();
 				progStatus.oF_70 = FMoff_freq->value();
 				break; // 70 cent'
+		case 13:progStatus.f12G = vfo->freq;
+				progStatus.m12G = vfo->imode;
+				progStatus.txT_12G = choice_FT8n_tTONE->value();
+				progStatus.rxT_12G = choice_FT8n_rTONE->value();
+				progStatus.offset_12G = FMoffset->index();
+				progStatus.oF_12G = FMoff_freq->value();
+				break; // 1.2 GHz cent'
 	}
 }
 
@@ -6620,7 +6659,7 @@ void cbBandSelect(int band)
 		if (Fl::event_button() == FL_LEFT_MOUSE) {
 			selrig->set_band_selection(band);
 			updateCTCSS(band);
-			if (band > 8) { // 10, 6, 2, 70
+			if (band > 8) { // 10, 6, 2, 70, 1.2G
 				int tTONE = PL_tones[choice_FT8n_tTONE->value()];
 				int rTONE = PL_tones[choice_FT8n_rTONE->value()];
 				selrig->set_tones(tTONE, rTONE);
