@@ -62,6 +62,9 @@ public:
 
 	virtual void tune_rig(int how);
 	virtual int  get_tune();
+
+	virtual std::string hexstr(std::string s);
+
 };
 
 #endif

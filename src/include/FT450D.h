@@ -117,11 +117,11 @@ public:
 	void set_cw_weight();
 	void set_cw_wpm();
 	void enable_keyer();
-	void enable_break_in();
+	void set_break_in();
+	int  get_break_in();
 
 	void get_cw_weight();
 	void get_cw_wpm();
-	void get_break_in();
 	void get_qsk();
 	void get_qsk_delay();
 	void get_cw_spot_tone();

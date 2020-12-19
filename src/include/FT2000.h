@@ -83,6 +83,9 @@ public:
 	int  adjust_bandwidth(int);
 	int  def_bandwidth(int);
 
+	void set_break_in();
+	int  get_break_in();
+
 	bool sendFTcommand(string, int, bool);
 	const char **bwtable(int);
 

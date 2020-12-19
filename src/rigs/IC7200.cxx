@@ -1680,7 +1680,7 @@ void RIG_IC7200::set_cw_wpm()
 	set_trace(2, "set_cw_wpm()", str2hex(cmd.c_str(), cmd.length()));
 }
 
-void RIG_IC7200::enable_break_in()
+void RIG_IC7200::set_break_in()
 {
 // 16 47 00 break-in off
 // 16 47 01 break-in semi

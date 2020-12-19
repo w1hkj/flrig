@@ -540,7 +540,8 @@ int vfo_;
 	virtual void get_cw_wpm_min_max(int &min, int &max) {
 		min = 5; max = 50; } // default for FT950/FT450D
 	virtual void enable_keyer() {}
-	virtual void enable_break_in() {}
+	virtual void set_break_in() {}
+	virtual int  get_break_in() {return 0;}
 
 	virtual void set_cw_qsk() {}
 	virtual void get_cw_qsk_min_max_step(double &min, double &max, double &step) {

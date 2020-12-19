@@ -144,7 +144,9 @@ public:
 	void set_cw_wpm();
 	void get_cw_wpm_min_max(int &min, int &max);
 
-	void enable_break_in();
+	void set_break_in();
+	int  get_break_in();
+
 	void set_cw_qsk();
 	void get_cw_qsk_min_max_step(double &min, double &max, double &step);
 

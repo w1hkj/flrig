@@ -137,7 +137,7 @@ extern void cb_cw_qsk();
 extern void cb_cw_delay();
 extern void cb_cw_weight();
 extern void cb_enable_keyer();
-extern void cb_enable_break_in();
+extern void cb_set_break_in();
 
 extern void cb_vox_gain();
 extern void cb_vox_anti();

@@ -105,6 +105,7 @@ Fl_Group *tabPOLLING = (Fl_Group *)0;
 	Fl_Value_Input *poll_compression = (Fl_Value_Input *)0;
 	Fl_Value_Input *poll_tuner = (Fl_Value_Input *)0;
 	Fl_Value_Input *poll_ptt = (Fl_Value_Input *)0;
+	Fl_Value_Input *poll_break_in = (Fl_Value_Input *)0;
 	Fl_Button *btnClearAddControls = (Fl_Button *)0;
 
 	Fl_Value_Input *poll_meters = (Fl_Value_Input *)0;
@@ -624,6 +625,10 @@ static void cb_poll_meters(Fl_Value_Input* o, void*) {
 
 static void cb_poll_ptt(Fl_Value_Input* o, void*) {
 	progStatus.poll_ptt = o->value();
+}
+
+static void cb_poll_break_in(Fl_Value_Input* o, void*) {
+	progStatus.poll_break_in = o->value();
 }
 
 static void cb_btnSetMeters(Fl_Button*, void*) {
@@ -1718,6 +1723,14 @@ Fl_Group *createPOLLING(int X, int Y, int W, int H, const char *label)
 		poll_compression->callback((Fl_Callback*)cb_poll_compression);
 		poll_compression->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_compression->value(progStatus.poll_compression);
+
+		poll_break_in = new Fl_Value_Input(X + 280, Y + 165, 30, 20, _("QSK"));
+		poll_break_in->tooltip(_("Break In"));
+		poll_break_in->maximum(10);
+		poll_break_in->step(1);
+		poll_break_in->callback((Fl_Callback*)cb_poll_break_in);
+		poll_break_in->align(Fl_Align(FL_ALIGN_RIGHT));
+		poll_break_in->value(progStatus.poll_break_in);
 
 		btnSetAdd = new Fl_Button(X + 370, Y + 190, 60, 20, _("Set all"));
 		btnSetAdd->callback((Fl_Callback*)cb_btnSetAdd);

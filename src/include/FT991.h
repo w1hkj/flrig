@@ -130,6 +130,9 @@ public:
 	void set_cw_qsk();
 	bool set_cw_spot();
 	void set_cw_spot_tone();
+	void set_break_in();
+	int  get_break_in();
+
 //	void set_band_selection(int v);
 	void get_nr_min_max_step(int &min, int &max, int &step) {
 		min = 1; max = 15; step = 1; }	

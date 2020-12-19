@@ -1068,6 +1068,12 @@ void check_ptt()
 	}
 }
 
+void check_break_in()
+{
+	if (selrig->has_cw_break_in)
+		selrig->get_break_in();
+}
+
 struct POLL_PAIR {
 	int *poll;
 	void (*pollfunc)();
@@ -1094,6 +1100,7 @@ POLL_PAIR RX_poll_pairs[] = {
 	{&progStatus.poll_noise, read_noise},
 	{&progStatus.poll_compression, read_compression},
 	{&progStatus.poll_ptt, check_ptt},
+	{&progStatus.poll_break_in, check_break_in},
 	{NULL, NULL}
 };
 
@@ -5545,6 +5552,12 @@ void set_init_compression_control()
 	}
 }
 
+void set_init_break_in()
+{
+	if (!selrig->has_cw_break_in) return;
+	selrig->get_break_in();
+}
+
 void init_special_controls()
 {
 	if (selrig->has_special)
@@ -5691,13 +5704,13 @@ void init_VFOs()
 	selrig->set_split(0);		// initialization set split call
 }
 
-void init_IC7300_special()
-{
-	if (selrig->name_ ==  rig_IC7300.name_) {
-		selrig->enable_break_in();
-		redrawAGC();
-	}
-}
+//void init_IC7300_special()
+//{
+//	if (selrig->name_ ==  rig_IC7300.name_) {
+//		selrig->set_break_in();
+//		redrawAGC();
+//	}
+//}
 
 void init_TS990_special()
 {
@@ -5832,6 +5845,7 @@ void initRig()
 		set_init_auto_notch();
 		set_init_notch_control();
 		set_init_compression_control();
+		set_init_break_in();
 
 		initTabs();
 		buildlist();
@@ -5842,7 +5856,7 @@ void initRig()
 
 		selrig->post_initialize();
 
-		init_IC7300_special();
+//		init_IC7300_special();
 		init_TS990_special();
 		init_K3_KX3_special();
 
@@ -6426,11 +6440,11 @@ void cb_enable_keyer()
 	selrig->enable_keyer();
 }
 
-void cb_enable_break_in()
+void cb_set_break_in()
 {
 	guard_lock serial_lock(&mutex_serial);
-	trace(1, "cb_enable_break_in()");
-	selrig->enable_break_in();
+	trace(1, "cb_set_break_in()");
+	selrig->set_break_in();
 }
 
 void cb_cw_weight()

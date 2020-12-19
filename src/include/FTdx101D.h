@@ -133,6 +133,8 @@ public:
 //	virtual void set_cw_vol();
 	virtual bool set_cw_spot();
 //	virtual void set_cw_spot_tone();
+	void set_break_in();
+	int  get_break_in();
 
 	virtual void get_band_selection(int v);
 

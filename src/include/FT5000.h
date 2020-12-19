@@ -132,6 +132,8 @@ public:
 //	void set_cw_vol();
 	bool set_cw_spot();
 //	void set_cw_spot_tone();
+	void set_break_in();
+	int  get_break_in();
 
 	void get_band_selection(int v);
 };

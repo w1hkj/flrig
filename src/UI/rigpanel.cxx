@@ -748,7 +748,7 @@ static void cb_btnBreakIn(Fl_Check_Button* o, void*) {
 	else {
 		progStatus.break_in = ! progStatus.break_in;
 	}
-	cb_enable_break_in();
+	cb_set_break_in();
 }
 
 static void cb_spnr_vox_gain(Hspinner* o, void*) {

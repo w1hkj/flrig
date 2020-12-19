@@ -32,10 +32,6 @@
 
 */
 
-std::string hexstr(std::string s)
-{
-	return str2hex(s.c_str(), s.length());
-}
 
 const char IC7100name_[] = "IC-7100";
 
@@ -238,6 +234,7 @@ RIG_IC7100::RIG_IC7100() {
 	has_cw_wpm = true;
 	has_cw_spot_tone = true;
 	has_cw_qsk = true;
+	has_cw_break_in = true;
 	has_cw_vol = true;
 
 	has_vox_onoff = true;
@@ -1095,6 +1092,39 @@ void RIG_IC7100::set_cw_vol()
 	cmd.append( post );
 	set_trace(2, "set_cw_vol()", hexstr(cmd).c_str());
 	waitFB("SET cw sidetone volume");
+}
+
+void RIG_IC7100::set_break_in()
+{
+// 16 47 00 break-in off
+// 16 47 01 break-in on
+
+	cmd.assign(pre_to).append("\x16\x47");
+
+	switch (progStatus.break_in) {
+		case 1: cmd += '\x01'; break_in_label("QSK ON");  break;
+		case 0:
+		default: cmd += '\x00'; break_in_label("qsk");
+	}
+	cmd.append(post);
+	waitFB("SET break-in");
+}
+
+int RIG_IC7100::get_break_in()
+{
+	cmd.assign(pre_to).append("\x16\x47").append(post);
+	std::string resp;
+	resp.assign(pre_fm);
+	if (waitFOR(8, "get break in")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			progStatus.break_in = replystr[p+6];
+			if (progStatus.break_in == 0) break_in_label("qsk");
+			else  break_in_label("QSK ON");
+		}
+	}
+	get_trace(2, "get_break_in()", hexstr(replystr).c_str());
+	return progStatus.break_in;
 }
 
 void RIG_IC7100::set_power_control(double val)

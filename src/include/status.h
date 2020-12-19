@@ -107,6 +107,7 @@ struct status {
 	int		poll_compression;
 	int		poll_tuner;
 	int		poll_ptt;
+	int		poll_break_in;
 	int		poll_all;
 
 	int		iBW_A;

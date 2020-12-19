@@ -188,6 +188,8 @@ RIG_FTdx101D::RIG_FTdx101D() {
 //	has_cw_spot_tone = // does not exist???
 	has_cw_qsk =
 	has_cw_weight =
+	has_cw_break_in =
+
 	has_split_AB =
 
 	can_change_alt_vfo =
@@ -1377,6 +1379,35 @@ void RIG_FTdx101D::set_cw_qsk()
 	cmd.assign("EX0202116").append(to_decimal(n, 1)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET cw qsk", cmd, replystr);
+}
+
+void RIG_FTdx101D::set_break_in()
+{
+	if (progStatus.break_in) {
+		cmd = "BI1;";
+		break_in_label("BK-IN");
+	} else {
+		cmd = "BI0;";
+		break_in_label("QSK ?");
+	}
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET break in on/off", cmd, replystr);
+	sett("set_break_in");
+}
+
+int RIG_FTdx101D::get_break_in()
+{
+	cmd = "BI;";
+	wait_char(';', 4, 100, "get break in", ASC);
+	progStatus.break_in = (replystr[2] == '1');
+	if (progStatus.break_in) {
+		break_in_label("BK-IN");
+		progStatus.cw_delay = 0;
+	} else {
+		break_in_label("QSK ?");
+//		get_qsk_delay();
+	}
+	return progStatus.break_in;
 }
 
 //======================================================================

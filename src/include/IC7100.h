@@ -103,6 +103,8 @@ public:
 	void set_cw_qsk();
 	void set_cw_spot_tone();
 	void set_cw_vol();
+	void set_break_in();
+	int  get_break_in();
 
 	const char **bwtable(int m);
 

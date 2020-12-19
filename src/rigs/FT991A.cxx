@@ -158,6 +158,7 @@ RIG_FT991A::RIG_FT991A() {
 	has_cw_spot_tone =
 	has_cw_qsk =
 	has_cw_weight =
+	has_cw_break_in =
 
 	can_change_alt_vfo =
 	has_smeter =
@@ -1459,3 +1460,33 @@ void RIG_FT991A::get_band_selection(int v)
 	sendCommand(cmd);
 	sett("get band");
 }
+
+void RIG_FT991A::set_break_in()
+{
+	if (progStatus.break_in) {
+		cmd = "BI1;";
+		break_in_label("BK-IN");
+	} else {
+		cmd = "BI0;";
+		break_in_label("QSK ?");
+	}
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET break in on/off", cmd, replystr);
+	sett("set_break_in");
+}
+
+int RIG_FT991A::get_break_in()
+{
+	cmd = "BI;";
+	wait_char(';', 4, FL991A_WAIT_TIME, "get break in", ASC);
+	progStatus.break_in = (replystr[2] == '1');
+	if (progStatus.break_in) {
+		break_in_label("BK-IN");
+		progStatus.cw_delay = 0;
+	} else {
+		break_in_label("QSK ?");
+//		get_qsk_delay();
+	}
+	return progStatus.break_in;
+}
+

@@ -1285,7 +1285,7 @@ void RIG_IC756PRO::set_cw_wpm()
 	waitFB("SET cw wpm");
 }
 
-void RIG_IC756PRO::enable_break_in()
+void RIG_IC756PRO::set_break_in()
 {
 	cmd.assign(pre_to).append("\x16\x47");
 
@@ -1296,6 +1296,23 @@ void RIG_IC756PRO::enable_break_in()
 	}
 	cmd.append(post);
 	waitFB("SET break-in");
+}
+
+int RIG_IC756PRO::get_break_in()
+{
+	cmd.assign(pre_to).append("\x16\x47").append(post);
+	std::string resp;
+	resp.assign(pre_fm);
+	if (waitFOR(8, "get break in")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			progStatus.break_in = replystr[p+6];
+			if (progStatus.break_in == 0) break_in_label("qsk");
+			else  break_in_label("QSK ON");
+		}
+	}
+	get_trace(2, "get_break_in()", hexstr(replystr).c_str());
+	return progStatus.break_in;
 }
 
 void RIG_IC756PRO::get_cw_qsk_min_max_step(double &min, double &max, double &step)

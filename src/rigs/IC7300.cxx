@@ -1093,7 +1093,7 @@ void RIG_IC7300::set_cw_wpm()
 	waitFB("SET cw wpm");
 }
 
-void RIG_IC7300::enable_break_in()
+void RIG_IC7300::set_break_in()
 {
 // 16 47 00 break-in off
 // 16 47 01 break-in semi
@@ -1109,6 +1109,24 @@ void RIG_IC7300::enable_break_in()
 	}
 	cmd.append(post);
 	waitFB("SET break-in");
+}
+
+int RIG_IC7300::get_break_in()
+{
+	cmd.assign(pre_to).append("\x16\x47").append(post);
+	std::string resp;
+	resp.assign(pre_fm);
+	if (waitFOR(8, "get break in")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			progStatus.break_in = replystr[p+6];
+			if (progStatus.break_in == 0) break_in_label("qsk");
+			else  if (progStatus.break_in == 1) break_in_label("SEMI");
+			else  break_in_label("FULL");
+		}
+	}
+	get_trace(2, "get_break_in()", hexstr(replystr).c_str());
+	return progStatus.break_in;
 }
 
 void RIG_IC7300::get_cw_qsk_min_max_step(double &min, double &max, double &step)

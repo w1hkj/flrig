@@ -1135,7 +1135,7 @@ void RIG_FT450D::set_cw_weight()
 	sett("set_cw_weight");
 }
 
-void RIG_FT450D::enable_break_in()
+void RIG_FT450D::set_break_in()
 {
 	if (progStatus.break_in) {
 		cmd = "BI1;";
@@ -1146,7 +1146,22 @@ void RIG_FT450D::enable_break_in()
 	}
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET break in on/off", cmd, replystr);
-	sett("enable_break_in");
+	sett("set_break_in");
+}
+
+int RIG_FT450D::get_break_in()
+{
+	cmd = "BI;";
+	wait_char(';', 4, FL450D_WAIT_TIME, "get break in", ASC);
+	progStatus.break_in = (replystr[2] == '1');
+	if (progStatus.break_in) {
+		break_in_label("FULL");
+		progStatus.cw_delay = 0;
+	} else {
+		break_in_label("QSK");
+		get_qsk_delay();
+	}
+	return progStatus.break_in;
 }
 
 void RIG_FT450D::set_cw_delay()
@@ -1313,24 +1328,6 @@ void RIG_FT450D::get_cw_wpm()
 	replystr[p+5] = 0;
 	int val = atoi(&replystr[p+2]);
 	progStatus.cw_wpm = val;
-}
-
-void RIG_FT450D::get_break_in()
-{
-	cmd = "BI;";
-	wait_char(';', 4, FL450D_WAIT_TIME, "get Break In", ASC);
-	gett("get_break_in");
-
-	size_t p = replystr.rfind("BI");
-	if (p != string::npos)
-		progStatus.break_in = (replystr[2] == '1');
-	if (progStatus.break_in) {
-		break_in_label("FULL");
-		progStatus.cw_delay = 0;
-	} else {
-		break_in_label("QSK");
-		get_qsk_delay();
-	}
 }
 
 void RIG_FT450D::get_qsk()

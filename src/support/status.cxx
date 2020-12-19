@@ -120,6 +120,7 @@ status progStatus = {
 	1,			// poll_compression;
 	1,			// poll_tuner;
 	1,			// poll_ptt;
+	4,			// poll_break_in;
 	4,			// int	poll_all;
 
 	-1,			// int  iBW_A;
@@ -162,7 +163,7 @@ status progStatus = {
 	false,		// bool spot_onoff;
 	700,		// int  cw_spot_tone;
 	false,		// bool enable_keyer;
-	0,			// bool	break_in;
+	0,			// int	break_in;
 	15,			// double	cw_qsk;
 	200,		// double	cw_delay;
 
@@ -577,6 +578,7 @@ void status::saveLastState()
 	spref.set("poll_compression", poll_compression);
 	spref.set("poll_tuner", poll_tuner);
 	spref.set("poll_ptt", poll_ptt);
+	spref.set("poll_break_in", poll_break_in);
 	spref.set("poll_all", poll_all);
 
 	spref.set("bw_A", iBW_A);
@@ -1123,6 +1125,7 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("poll_compression", poll_compression, poll_compression);
 		spref.get("poll_tuner", poll_tuner, poll_tuner);
 		spref.get("poll_ptt", poll_ptt, poll_ptt);
+		spref.get("poll_break_in", poll_break_in, poll_break_in);
 		spref.get("poll_all", poll_all, poll_all);
 
 		spref.get("bw_A", iBW_A, iBW_A);
@@ -1264,7 +1267,7 @@ bool status::loadXcvrState(string xcvr)
 			spref.get("cw_qsk", cw_qsk, cw_qsk);
 			spref.get("(cw_delay", cw_delay, cw_delay);
 			if (spref.get("enable_keyer", i, i)) enable_keyer = i;
-			if (spref.get("break_in", i, i)) break_in = i;
+			if (spref.get("break_in", break_in, break_in));
 			if (spref.get("vox_onoff", i, i)) vox_onoff = i;
 			spref.get("vox_gain", vox_gain, vox_gain);
 			spref.get("vox_anti", vox_anti, vox_anti);
@@ -1867,6 +1870,7 @@ string status::info()
 	info << "poll_noise         : " << poll_noise << "\n";
 	info << "poll_nr            : " << poll_nr << "\n";
 	info << "poll_ptt           : " << poll_ptt << "\n";
+	info << "poll_break_in      : " << poll_break_in << "\n";
 	info << "poll_all           : " << poll_all << "\n";
 	info << "\n";
 	info << "freq_A             : " << freq_A << "\n";

@@ -296,3 +296,8 @@ int RIG_ICOM::get_tune()
 	return (tune_ = val);
 }
 
+std::string RIG_ICOM::hexstr(std::string s)
+{
+	return str2hex(s.c_str(), s.length());
+}
+
