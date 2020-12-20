@@ -292,25 +292,25 @@ out:
 
 void init_port_combos()
 {
-	clear_combos();
-
-	struct stat st;
-
+	std::string pname;
 	const char* tty_fmt[] = {
 		"/dev/cu.*",
 		"/dev/tty.*"
 	};
-
+	struct stat st;
 	glob_t gbuf;
+	bool is_serial;
 
+	clear_combos();
 	for (size_t i = 0; i < sizeof(tty_fmt)/sizeof(*tty_fmt); i++) {
 		glob(tty_fmt[i], 0, NULL, &gbuf);
 		for (size_t j = 0; j < gbuf.gl_pathc; j++) {
-			if ( !(stat(gbuf.gl_pathv[j], &st) == 0 && S_ISCHR(st.st_mode)) ||
-			     strstr(gbuf.gl_pathv[j], "modem") )
-				continue;
-			LOG_WARN("Found serial port %s", gbuf.gl_pathv[j]);
-			add_combos(gbuf.gl_pathv[j]);
+			pname = gbuf.gl_pathv[j];
+			is_serial = (stat(gbuf.gl_pathv[j], &st) == 0 && S_ISCHR(st.st_mode));
+			if ( is_serial || pname.find("modem") != std::string::npos ) {
+				LOG_WARN ("Found serial port %s", gbuf.gl_pathv[j]);
+				add_combos (gbuf.gl_pathv[j]);
+			}
 		}
 		globfree(&gbuf);
 	}
