@@ -88,15 +88,16 @@ int RIG_FT817::get_vfoAorB()
 	init_cmd();
 	cmd[1] = 0x55;
 	cmd[4] = 0xBB;
-	int ret = waitN(2, 100, "get active VFO", HEX);
-	int i = 0;
-	while (ret != 2 && i++ < 10) {
-		ret = waitN(2, 100, "get active VFO", HEX);
-	}
-	if (i == 10) {
-		return -1;
-	}
-
+	int ret = waitN(2, 100, "get active VFO");
+	getthex("get active VFO");
+//	int i = 0;
+//	while (ret != 2 && i++ < 10) {
+//		ret = waitN(2, 100, "get active VFO");
+//	}
+//	if (i == 10) {
+//		return -1;
+//	}
+	if (ret != 2) return -1;
 	ft817_memory_mode = ((replystr[0] & 0x80) == 0x00);
 	Fl::awake(memory_label);
 
@@ -110,7 +111,7 @@ void RIG_FT817::selectA()
 	init_cmd();
 	cmd[4] = 0x81;
 	sendCommand(cmd);
-	showresp(INFO, HEX, "select VFO A", cmd, replystr);
+	setthex("Select VFO A");
 	if (get_vfoAorB() != 0) {
 		selectA();
 	}
@@ -123,7 +124,7 @@ void RIG_FT817::selectB()
 	init_cmd();
 	cmd[4] = 0x81;
 	sendCommand(cmd);
-	showresp(INFO, HEX, "select VFO B", cmd, replystr);
+	setthex("Select VFO B");
 	if (get_vfoAorB() != 1) {
 		selectB();
 	}
@@ -133,9 +134,10 @@ bool RIG_FT817::check ()
 {
 	init_cmd();
 	cmd[4] = 0x03;
-	int ret = waitN(5, 100, "check", HEX);
-	if (ret >= 5) return true;
-	return false;
+	int ret = waitN(5, 100, "check");
+	if (ret < 5) return false;
+	getthex("check");
+	return true;
 }
 
 unsigned long int RIG_FT817::get_vfoA ()
@@ -144,7 +146,8 @@ unsigned long int RIG_FT817::get_vfoA ()
 	if (ft817_memory_mode) return freqA;
 	init_cmd();
 	cmd[4] = 0x03;
-	int ret = waitN(5, 100, "get vfoA", HEX);
+	int ret = waitN(5, 100, "get vfoA");
+	getthex("get_vfoA");
 	if (ret < 5) {
 		return freqA;
 	}
@@ -152,15 +155,15 @@ unsigned long int RIG_FT817::get_vfoA ()
 	return freqA;
 }
 
-void RIG_FT817::set_getACK() {
-	for (int i = 0; i < 5; i++) {
-		sendCommand(cmd, 0);
-		for (int j = 0; j < 10; j++) {
-			if (readResponse() == 1) return;
-			MilliSleep(50);
-		}
-	}
-}
+//void RIG_FT817::set_getACK() {
+//	for (int i = 0; i < 5; i++) {
+//		sendCommand(cmd, 0);
+//		for (int j = 0; j < 10; j++) {
+//			if (readResponse() == 1) return;
+//			MilliSleep(50);
+//		}
+//	}
+//}
 
 void RIG_FT817::set_vfoA (unsigned long int freq)
 {
@@ -171,7 +174,8 @@ void RIG_FT817::set_vfoA (unsigned long int freq)
 	cmd = to_bcd(freq, 8);
 	cmd += 0x01;
 	sendCommand(cmd);
-	showresp(INFO, HEX, "set freq A", cmd, replystr);
+	setthex("set_vfoA");
+//	showresp(INFO, HEX, "set freq A", cmd, replystr);
 }
 
 int RIG_FT817::get_modeA()
@@ -180,7 +184,8 @@ int RIG_FT817::get_modeA()
 	if (ft817_memory_mode) return modeA;
 	init_cmd();
 	cmd[4] = 0x03;
-	int ret = waitN(5, 100, "get mode A", HEX);
+	int ret = waitN(5, 100, "get mode A");
+	getthex("get_modeA");
 	if (ret < 5) {
 		return modeA;
 	}
@@ -205,11 +210,14 @@ void RIG_FT817::set_modeA(int val)
 	cmd[0] = FT817_mode_val[val];
 	cmd[4] = 0x07;
 	sendCommand(cmd);
-	showresp(INFO, HEX, "set mode A", cmd, replystr);
-MilliSleep(100);
+	setthex("set_modeA");
+//	showresp(INFO, HEX, "set mode A", cmd, replystr);
+
+	MilliSleep(100);
 	get_modeA();
 	int n = 0;
 	while (modeA != val && n++ < 10) {
+		MilliSleep(20);
 		get_modeA();
 	}
 	if (n == 10) LOG_ERROR("set_modeA failed");
@@ -222,7 +230,8 @@ unsigned long int RIG_FT817::get_vfoB ()
 	if (ft817_memory_mode) return freqB;
 	init_cmd();
 	cmd[4] = 0x03;
-	int ret = waitN(5, 100, "get vfoB", HEX);
+	int ret = waitN(5, 100, "get vfoB");
+	getthex("get_vfoB");
 	if (ret < 5) {
 		LOG_ERROR("get_vfoB failed");
 		return freqB;
@@ -240,7 +249,8 @@ void RIG_FT817::set_vfoB (unsigned long int freq)
 	cmd = to_bcd(freq, 8);
 	cmd += 0x01;
 	sendCommand(cmd);
-	showresp(INFO, HEX, "set freq B", cmd, replystr);
+	setthex("set_vfoB");
+//	showresp(INFO, HEX, "set freq B", cmd, replystr);
 }
 
 int RIG_FT817::get_modeB()
@@ -249,7 +259,8 @@ int RIG_FT817::get_modeB()
 	if (ft817_memory_mode) return modeB;
 	init_cmd();
 	cmd[4] = 0x03;
-	int ret = waitN(5, 100, "get mode B", HEX);
+	int ret = waitN(5, 100, "get mode B");
+	getthex("get_modeB");
 	if (ret < 5) {
 		LOG_ERROR("get mode B failed");
 		return modeB;
@@ -270,11 +281,13 @@ void RIG_FT817::set_modeB(int val)
 	cmd[0] = FT817_mode_val[val];
 	cmd[4] = 0x07;
 	sendCommand(cmd);
-	showresp(INFO, HEX, "set mode B", cmd, replystr);
+	setthex("set_modeB");
+//	showresp(INFO, HEX, "set mode B", cmd, replystr);
 MilliSleep(100);
 	get_modeB();
 	int n = 0;
 	while (modeB != val && n++ < 10) {
+		MilliSleep(20);
 		get_modeB();
 	}
 	if (n == 10) LOG_ERROR("set_modeB failed");
@@ -289,9 +302,10 @@ void RIG_FT817::set_PTT_control(int val)
 	if (val) cmd[4] = 0x08;
 	else	 cmd[4] = 0x88;
 	sendCommand(cmd);
-	std::string s = "set PTT ";
-	s.append(val ? "ON":"OFF");
-	showresp(INFO, HEX, s.c_str(), cmd, replystr);
+//	std::string s = "set PTT ";
+//	s.append(val ? "ON":"OFF");
+//	showresp(INFO, HEX, s.c_str(), cmd, replystr);
+	setthex("set_PTT_control");
 	ptt_ = val;
 }
 
@@ -325,7 +339,8 @@ int  RIG_FT817::get_power_out()
 {
 	init_cmd();
 	cmd[4] = 0xBD;
-	int ret = waitN(2, 100, "get PWR/SWR/ALC", HEX);
+	int ret = waitN(2, 100, "get PWR/SWR/ALC");
+	getthex("get_power_out");
 	if (ret != 2) return 0;
 
 	int fwdpwr = (replystr[0] & 0xF0) >> 4;
@@ -352,7 +367,8 @@ int  RIG_FT817::get_smeter()
 {
 	init_cmd();
 	cmd[4] = 0xE7;
-	int ret = waitN(1, 100, "get smeter", HEX);
+	int ret = waitN(1, 100, "get smeter");
+	getthex("get_smeter");
 	if (!ret) return 0;
 	int sval = replystr[0] & 0x0F;
 	if (sval < 0) sval = 0;
@@ -367,7 +383,8 @@ void RIG_FT817::set_split(bool val)
 	else     cmd[4] = 0x82;
 	split = val;
 	sendCommand(cmd);
-	showresp(INFO, HEX, "set SPLIT", cmd, replystr);
+	setthex("set_split");
+//	showresp(INFO, HEX, "set SPLIT", cmd, replystr);
 	return;
 }
 
@@ -377,7 +394,8 @@ int  RIG_FT817::get_split()
 	if (!PTT) return split;
 	init_cmd();
 	cmd[4] = 0xF7; // get transmit status
-	int ret = waitN(1, 100, "get TX status", HEX);
+	int ret = waitN(1, 100, "get TX status");
+	getthex("get_split");
 	if (ret == 0) return 0;
 	split = (replystr[0] & 0x20) == 0x20;
 	return split;

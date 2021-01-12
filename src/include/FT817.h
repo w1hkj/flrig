@@ -58,7 +58,7 @@ public:
 
 private:
 	void init_cmd();
-	void set_getACK();
+//	void set_getACK();
 };
 
 #endif
