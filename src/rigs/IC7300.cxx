@@ -1246,6 +1246,8 @@ void RIG_IC7300::set_power_control(double val)
 	cmd.append(bcd255(val));
 	cmd.append( post );
 	waitFB("set power");
+	set_trace(2, "set power control ", str2hex(replystr.c_str(), replystr.length()));
+
 }
 
 int RIG_IC7300::get_power_control()
@@ -1257,6 +1259,7 @@ int RIG_IC7300::get_power_control()
 	cmd.append(cstr).append(post);
 	resp.append(cstr);
 	if (waitFOR(9, "get power")) {
+		get_trace(2, "get power control ", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			val = num100(replystr.substr(p+6));
@@ -1317,6 +1320,7 @@ int RIG_IC7300::get_power_out(void)
 	int mtr= 0;
 	int val = 0;
 	if (waitFOR(9, "get power out")) {
+		get_trace(2, "get power out ", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			mtr = hex2val(replystr.substr(p+6, 2));
