@@ -50,6 +50,7 @@ public:
 	void set_vfoB(unsigned long int);
 	void set_modeB(int val);
 	int  get_modeB();
+	int  get_modetype(int n);
 
 	void set_PTT_control(int val);
 	int  get_smeter();

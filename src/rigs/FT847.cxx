@@ -192,6 +192,11 @@ int  RIG_FT847::get_modeB()
 	return B.imode;
 }
 
+int RIG_FT847::get_modetype(int n)
+{
+	return FT847_mode_type[n];
+}
+
 // Tranceiver PTT on/off
 void RIG_FT847::set_PTT_control(int val)
 {
