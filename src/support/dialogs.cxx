@@ -298,6 +298,8 @@ void init_port_combos()
 		"/dev/tty.*"
 	};
 	struct stat st;
+
+	clear_combos();
 	glob_t gbuf;
 	bool is_serial;
 
@@ -305,15 +307,20 @@ void init_port_combos()
 	for (size_t i = 0; i < sizeof(tty_fmt)/sizeof(*tty_fmt); i++) {
 		glob(tty_fmt[i], 0, NULL, &gbuf);
 		for (size_t j = 0; j < gbuf.gl_pathc; j++) {
-			pname = gbuf.gl_pathv[j];
-			is_serial = (stat(gbuf.gl_pathv[j], &st) == 0 && S_ISCHR(st.st_mode));
-			if ( is_serial || pname.find("modem") != std::string::npos ) {
-				LOG_WARN ("Found serial port %s", gbuf.gl_pathv[j]);
+			int ret1 = !stat(gbuf.gl_pathv[j], &st);
+			int ret2 = S_ISCHR(st.st_mode);
+			if (ret1) {
+				LOG_INFO("Serial port %s", gbuf.gl_pathv[j]);
+				LOG_INFO("  device mode:     %X", st.st_mode);
+				LOG_INFO("  char device?     %s", ret2 ? "Y" : "N");
+			} else
+				LOG_INFO("%s does not return stat query", gbuf.gl_pathv[j]);
+			if ( (ret1 && ret2 ) || strstr(gbuf.gl_pathv[j], "modem") )
 				add_combos (gbuf.gl_pathv[j]);
-			}
 		}
 		globfree(&gbuf);
 	}
+
 	set_combo_value();
 }
 #endif //__APPLE__
