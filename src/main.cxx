@@ -599,7 +599,8 @@ int parse_args(int argc, char **argv, int& idx)
 		return 1;
 	}
 	if (strcasecmp("--xml-help", argv[idx]) == 0) {
-		std::cout << print_xmlhelp();
+		std::string help = print_xmlhelp();
+		std::cout << help;
 		exit(0);
 	}
 	if (strcasecmp("--debug-level", argv[idx]) == 0) {

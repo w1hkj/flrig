@@ -457,6 +457,7 @@ public:
 			result = (int)(progStatus.notch_val);
 		else
 			result = (int)0;
+		xml_trace(1, "rig_get_notch");
 	}
 
 	std::string help() { return std::string("returns notch value"); }
@@ -477,8 +478,8 @@ public:
 		}
 
 		static int ntch;
-		ntch = static_cast<int>((double)(params[0]));
-		if (ntch) progStatus.notch_val = ntch;
+		ntch = (int)(params[0]);
+		progStatus.notch_val = ntch;
 		if (ntch)
 			progStatus.notch = true;
 		else
@@ -486,6 +487,7 @@ public:
 
 		guard_lock serial_lock(&mutex_serial, "xml rig_set_notch");
 		selrig->set_notch(progStatus.notch, progStatus.notch_val);
+		xml_trace(1, "rig_set_notch");
 		Fl::awake(setNotchControl, static_cast<void *>(&ntch));
 	}
 
@@ -512,6 +514,7 @@ public:
 			result = (int)(progStatus.rfgain);
 		else
 			result = (int)0;
+		xml_trace(1, "rig_get_rfgain");
 	}
 
 	std::string help() { return std::string("returns rfgain value"); }
@@ -532,11 +535,12 @@ public:
 		}
 
 		static int rfg;
-		rfg = static_cast<int>((double)(params[0]));
-		if (rfg) progStatus.rfgain = rfg;
+		rfg = static_cast<int>((double)((params[0])));
+		progStatus.rfgain = rfg;
 
 		guard_lock serial_lock(&mutex_serial, "xml rig_set_rfgain");
 		selrig->set_rf_gain(progStatus.rfgain);
+		xml_trace(1, "rig_set_rfgain");
 		Fl::awake(setRFGAINControl, static_cast<void *>(0));
 	}
 
@@ -563,6 +567,7 @@ public:
 			result = (int)(progStatus.mic_gain);
 		else
 			result = (int)0;
+		xml_trace(1, "rig_get_micgain");
 	}
 
 	std::string help() { return std::string("returns micgain value"); }
@@ -583,10 +588,11 @@ public:
 		}
 
 		static int micg;
-		micg = static_cast<int>((double)(params[0]));
-		if (micg) progStatus.mic_gain = micg;
+		micg = (int)(params[0]);
+		progStatus.mic_gain = micg;
 
 		guard_lock serial_lock(&mutex_serial, "xml rig_set_micgain");
+		xml_trace(1, "rig_set_micgain");
 		selrig->set_mic_gain(progStatus.mic_gain);
 		Fl::awake(setMicGainControl, static_cast<void *>(0));
 	}
@@ -614,6 +620,7 @@ public:
 			result = (int)(progStatus.volume);
 		else
 			result = (int)0;
+		xml_trace(1, "rig_get_volume");
 	}
 
 	std::string help() { return std::string("returns volume value"); }
@@ -634,11 +641,12 @@ public:
 		}
 
 		static int volume;
-		volume = static_cast<int>((double)(params[0]));
-		if (volume) progStatus.volume = volume;
+		volume = (int)(params[0]);
+		progStatus.volume = volume;
 
 		guard_lock serial_lock(&mutex_serial, "xml rig_set_volume");
 		selrig->set_volume_control(progStatus.volume);
+		xml_trace(1, "rig_set_volume");
 		Fl::awake(setVolumeControl, static_cast<void *>(0));
 	}
 
@@ -703,7 +711,7 @@ public:
 
 		std::string result_string = "";
 		result_string += selrig->get_modetype(mode);
-xml_trace(2, "rig_get_sideband ", result_string.c_str());
+		xml_trace(2, "rig_get_sideband ", result_string.c_str());
 		result = result_string;
 
 	}
@@ -734,7 +742,7 @@ public:
 
 		std::string result_string = "none";
 		if (selrig->modes_) result_string = selrig->modes_[mode];
-xml_trace(2, "mode on ", (useB ? "B " : "A "), result_string.c_str());
+		xml_trace(2, "mode on ", (useB ? "B " : "A "), result_string.c_str());
 		result = result_string;
 
 	}
@@ -765,7 +773,7 @@ public:
 
 		std::string result_string = "none";
 		if (selrig->modes_) result_string = selrig->modes_[mode];
-xml_trace(2, "mode A ", result_string.c_str());
+		xml_trace(2, "mode A ", result_string.c_str());
 		result = result_string;
 
 	}
@@ -796,7 +804,7 @@ public:
 
 		std::string result_string = "none";
 		if (selrig->modes_) result_string = selrig->modes_[mode];
-xml_trace(2, "mode B ", result_string.c_str());
+		xml_trace(2, "mode B ", result_string.c_str());
 		result = result_string;
 
 	}
@@ -923,7 +931,7 @@ public:
 			if (dsphi) result[1] = dsphi[SH];
 		}
 		std::string s1 = result[0], s2 = result[1];
-xml_trace( 5, "bandwidth on ", (useB ? "B " : "A "), s1.c_str(), " | ", s2.c_str());
+		xml_trace( 5, "bandwidth on ", (useB ? "B " : "A "), s1.c_str(), " | ", s2.c_str());
 	}
 
 	std::string help() { return std::string("returns current bw L/U value"); }
@@ -982,7 +990,7 @@ public:
 			if (dsphi) result[1] = dsphi[SH];
 		}
 		std::string s1 = result[0], s2 = result[1];
-xml_trace( 4, "bandwidth on A", s1.c_str(), " | ", s2.c_str());
+		xml_trace( 4, "bandwidth on A", s1.c_str(), " | ", s2.c_str());
 	}
 
 	std::string help() { return std::string("returns current bw L/U value"); }
@@ -1042,7 +1050,7 @@ public:
 			if (dsphi) result[1] = dsphi[SH];
 		}
 		std::string s1 = result[0], s2 = result[1];
-xml_trace( 4, "bandwidth on B", s1.c_str(), " | ", s2.c_str());
+		xml_trace( 4, "bandwidth on B", s1.c_str(), " | ", s2.c_str());
 	}
 
 	std::string help() { return std::string("returns current bw L/U value"); }
@@ -1059,6 +1067,9 @@ public:
 		else
 			result = (int)(mval);
 	}
+
+	std::string help() { return std::string("returns S-meter reading"); }
+
 } rig_get_smeter(&rig_server);
 
 class rig_get_pwrmeter_scale : public XmlRpcServerMethod {
@@ -1066,8 +1077,16 @@ public:
 	rig_get_pwrmeter_scale(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_pwrmeter_scale", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		result = (int)(selrig->power_scale());
+		if (!xcvr_online || !selrig->has_power_out)
+			result = (int)(0);
+		else {
+			guard_lock serial_lock(&mutex_serial);
+			result = (int)(selrig->power_scale());
+		}
 	}
+
+	std::string help() { return std::string("returns power scale X factor"); }
+
 } rig_get_pwrmeter_scale(&rig_server);
 
 class rig_get_maxpwr : public XmlRpcServerMethod {
@@ -1087,9 +1106,14 @@ public:
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 		if (!xcvr_online || !selrig->has_power_out) 
 			result = (int)(0);
-		else
-			result = (int)(pwrval);
+		else {
+			guard_lock serial_lock(&mutex_serial);
+			result = selrig->get_power_out();
+		}
 	}
+
+	std::string help() { return std::string("returns power meter reading"); }
+
 } rig_get_pwrmeter(&rig_server);
 
 class rig_get_swrmeter : public XmlRpcServerMethod {
@@ -1102,16 +1126,10 @@ public:
 		else
 			result = (int)(swrval);
 	}
+
+	std::string help() { return std::string("returns SWR meter reading"); }
+
 } rig_get_swrmeter(&rig_server);
-
-class rig_get_power : public XmlRpcServerMethod {
-public:
-	rig_get_power(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_power", s) {}
-
-	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		result = (int)(progStatus.power_level);
-	}
-} rig_get_power(&rig_server);
 
 //==============================================================================
 // set interface
@@ -1129,8 +1147,8 @@ XCVR_STATE srvr_vfo;
 
 std::string print(int f, int m, int b)
 {
-	std::ostringstream p;
-//	p.seekp(ios::beg);
+	static std::ostringstream p;
+	p.seekp(ios::beg);
 	if (b > 65536) b /= 65536;
 	p << "freq: " << f << ", imode: " << m << ", bw " << b;
 	return p.str();
@@ -1140,7 +1158,7 @@ static void push_xml()
 {
 	srvr_vfo.src = SRVR;
 	guard_lock service_lock(&mutex_srvc_reqs, "xml_push");
-xml_trace(2, "push_xml()", print(srvr_vfo.freq, srvr_vfo.imode, srvr_vfo.iBW).c_str());
+	xml_trace(2, "push_xml()", print(srvr_vfo.freq, srvr_vfo.imode, srvr_vfo.iBW).c_str());
 	srvc_reqs.push(VFOQUEUE(vX, srvr_vfo));//(useB ? vB : vA), srvr_vfo ));
 }
 
@@ -1148,7 +1166,7 @@ static void push_xmlA()
 {
 	srvr_vfo.src = SRVR;
 	guard_lock service_lock(&mutex_srvc_reqs, "xml_pushA");
-xml_trace(2, "push_xmlA()", print(srvr_vfo.freq, srvr_vfo.imode, srvr_vfo.iBW).c_str());
+	xml_trace(2, "push_xmlA()", print(srvr_vfo.freq, srvr_vfo.imode, srvr_vfo.iBW).c_str());
 	srvc_reqs.push(VFOQUEUE( vA, srvr_vfo));
 }
 
@@ -1164,24 +1182,6 @@ xml_trace(2, "push_xmlB()", print(srvr_vfo.freq, srvr_vfo.imode, srvr_vfo.iBW).c
 //------------------------------------------------------------------------------
 // Set Power in watts
 //------------------------------------------------------------------------------
-static int power_level;
-static void set_power(void *)
-{
-	int max_power;
-	int min_power = 0;
-	if (spnrPOWER) {
-		max_power = spnrPOWER->maximum();
-		if (power_level > max_power) power_level = max_power;
-		if (power_level < min_power) power_level = min_power;
-		spnrPOWER->value(power_level);
-	} else if (sldrPOWER) {
-		max_power = sldrPOWER->maximum();
-		if (power_level > max_power) power_level = max_power;
-		if (power_level < min_power) power_level = min_power;
-		sldrPOWER->value(power_level);
-	}
-	setPower();
-}
 
 class rig_set_power : public XmlRpcServerMethod {
 public:
@@ -1192,13 +1192,51 @@ public:
 			result = 0;
 			return;
 		}
-		power_level = int(params[0]);
-		Fl::awake(set_power);
+		int power_level = (int)(params[0]);
+
+		guard_lock lock(&mutex_serial);
+		selrig->set_power_control(power_level);
+		progStatus.power_level = power_level;
+		Fl::awake(update_power_control, (void*)0);
 	}
 
 	std::string help() { return std::string("sets power level in watts"); }
 
 } rig_set_power(&rig_server);
+
+class rig_get_power : public XmlRpcServerMethod {
+public:
+	rig_get_power(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_power", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		result = (int)(progStatus.power_level);
+	}
+
+	std::string help() { return std::string("returns power level setting in watts"); }
+
+} rig_get_power(&rig_server);
+
+
+//------------------------------------------------------------------------------
+// Enable tune
+//------------------------------------------------------------------------------
+class rig_tune : public XmlRpcServerMethod {
+public:
+	rig_tune(XmlRpcServer* s) : XmlRpcServerMethod("rig.tune", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online) {
+			result = 0;
+			return;
+		}
+		guard_lock que_lock(&mutex_srvc_reqs, "xml rig_tune");
+		guard_lock serial_lock(&mutex_serial);
+		selrig->tune_rig(2);
+	}
+
+	std::string help() { return std::string("enable transceiver tune function"); }
+
+} rig_tune(&rig_server);
 
 //------------------------------------------------------------------------------
 // Set PTT on (1) or off (0)
@@ -1428,15 +1466,6 @@ public:
 		srvr_vfo.iBW = 255;
 
 		push_xml();
-/*
-		int ifreq = 0;
-		int n = 0;
-		while (ifreq != srvr_vfo.freq) {
-			MilliSleep(10);
-			ifreq = vfo->freq;
-			n++;
-		}
-*/
 	}
 	std::string help() { return std::string("rig.set_vfo NNNNNNNN (Hz)"); }
 
@@ -1461,15 +1490,6 @@ public:
 		srvr_vfo.iBW = 255;
 
 		push_xml();
-/*
-		int ifreq = 0;
-		int n = 0;
-		while (ifreq != srvr_vfo.freq) {
-			MilliSleep(10);
-			ifreq = vfo->freq;
-			n++;
-		}
-*/
 	}
 	std::string help() { return std::string("main.set_frequency NNNNNNNN (Hz)"); }
 
@@ -1994,58 +2014,59 @@ struct MLIST {
 	{ "main.set_frequency", "d:d", "set current VFO in Hz" },
 	{ "main.get_version", "s:n", "returns version string" },
 	{ "rig.get_AB",       "s:n", "returns vfo in use A or B" },
-	{ "rig.get_bw",       "s:n", "return BW of current VFO" },
-	{ "rig.get_bws",      "s:n", "return table of BW values" },
-	{ "rig.get_bwA",      "s:n", "return BW of vfo A" },
-	{ "rig.get_bwB",      "s:n", "return BW of vfo B" },
+	{ "rig.get_bw",       "A:n", "return BW of current VFO" },
+	{ "rig.get_bws",      "A:n", "return table of BW values" },
+	{ "rig.get_bwA",      "A:n", "return BW of vfo A" },
+	{ "rig.get_bwB",      "A:n", "return BW of vfo B" },
 	{ "rig.get_info",     "s:n", "return an info string" },
 	{ "rig.get_mode",     "s:n", "return MODE of current VFO" },
 	{ "rig.get_modeA",    "s:n", "return MODE of current VFO A" },
 	{ "rig.get_modeB",    "s:n", "return MODE of current VFO B" },
-	{ "rig.get_modes",    "s:n", "return table of MODE values" },
+	{ "rig.get_modes",    "A:n", "return table of MODE values" },
 	{ "rig.get_sideband", "s:n", "return sideband (U/L)" },
-	{ "rig.get_notch",    "s:n", "return notch value" },
-	{ "rig.get_ptt",      "s:n", "return PTT state" },
-	{ "rig.get_power",    "s:n", "return power level control value" },
-	{ "rig.get_pwrmeter", "s:n", "return PWR out" },
+	{ "rig.get_notch",    "i:n", "return notch value" },
+	{ "rig.get_ptt",      "i:n", "return PTT state" },
+	{ "rig.get_power",    "i:n", "return power level control value" },
+	{ "rig.get_pwrmeter", "i:n", "return PWR out" },
 	{ "rig.get_pwrmeter_scale", "s:n", "return scale for power meter" },
 	{ "rig.get_pwrmax",   "s:n", "return maximum power available" },
 	{ "rig.get_swrmeter", "s:n", "return SWR out" },
 	{ "rig.get_smeter",   "s:n", "return Smeter" },
-	{ "rig.get_split",    "s:n", "return split state" },
+	{ "rig.get_split",    "i:n", "return split state" },
 	{ "rig.get_update",   "s:n", "return update to info" },
 	{ "rig.get_vfo",      "s:n", "return current VFO in Hz" },
 	{ "rig.get_vfoA",     "s:n", "return vfo A in Hz" },
 	{ "rig.get_vfoB",     "s:n", "return vfo B in Hz" },
 	{ "rig.get_xcvr",     "s:n", "returns name of transceiver" },
-	{ "rig.get_volume",   "s:n", "returns volume control value" },
-	{ "rig.get_rfgain",   "s:n", "returns rf gain control value" },
-	{ "rig.get_micgain",  "s:n", "returns mic gain control value" },
-	{ "rig.set_AB",       "s:s", "set VFO A/B" },
+	{ "rig.get_volume",   "i:n", "returns volume control value" },
+	{ "rig.get_rfgain",   "i:n", "returns rf gain control value" },
+	{ "rig.get_micgain",  "i:n", "returns mic gain control value" },
+	{ "rig.set_AB",       "n:s", "set VFO A/B" },
 	{ "rig.set_bw",       "i:i", "set BW iaw BW table" },
 	{ "rig.set_bandwidth","i:i", "set bandwidth to nearest requested value" },
 	{ "rig.set_BW",       "i:i", "set L/U pair" },
 	{ "rig.set_frequency","d:d", "set current VFO in Hz" },
-	{ "rig.set_mode",     "i:i", "set MODE iaw MODE table" },
-	{ "rig.set_modeA",    "i:i", "set MODE A iaw MODE table" },
-	{ "rig.set_modeB",    "i:i", "set MODE B iaw MODE table" },
-	{ "rig.set_notch",    "d:d", "set NOTCH value in Hz" },
-	{ "rig.set_power",    "i:i", "set power control level, watts" },
-	{ "rig.set_ptt",      "i:i", "set PTT 1/0 (on/off)" },
+	{ "rig.set_mode",     "i:s", "set MODE iaw MODE table" },
+	{ "rig.set_modeA",    "i:s", "set MODE A iaw MODE table" },
+	{ "rig.set_modeB",    "i:s", "set MODE B iaw MODE table" },
+	{ "rig.set_notch",    "n:i", "set NOTCH value in Hz" },
+	{ "rig.set_power",    "n:i", "set power control level, watts" },
+	{ "rig.set_ptt",      "n:i", "set PTT 1/0 (on/off)" },
 	{ "rig.set_vfo",      "d:d", "set current VFO in Hz" },
 	{ "rig.set_vfoA",     "d:d", "set vfo A in Hz" },
 	{ "rig.set_vfoB",     "d:d", "set vfo B in Hz" },
-	{ "rig.set_split",    "i:i", "set split 1/0 (on/off)" },
-	{ "rig.set_volume",   "i:i", "sets volume control" },
-	{ "rig.set_rfgain",   "i:i", "sets rf gain control" },
-	{ "rig.set_micgain",  "i:i", "sets mic gain control" },
-	{ "rig.swap",         "i:i", "execute vfo swap" },
+	{ "rig.set_split",    "n:i", "set split 1/0 (on/off)" },
+	{ "rig.set_volume",   "n:i", "sets volume control" },
+	{ "rig.set_rfgain",   "n:i", "sets rf gain control" },
+	{ "rig.set_micgain",  "n:i", "sets mic gain control" },
+	{ "rig.swap",         "n:n", "execute vfo swap" },
+	{ "rig.tune",         "n:n", "enable transceiver tune function"},
 	{ "rig.cat_string",   "s:s", "execute CAT string" },
 	{ "rig.cat_priority", "s:s", "priority CAT string" },
-	{ "rig.shutdown",     "i:i", "shutdown xcvr & flrig" },
-	{ "rig.cwio_wpm",     "i:i", "set cwio WPM" },
-	{ "rig.cwio_text",    "s:s", "send text via cwio interface" },
-	{ "rig.cwio_send",    "i:i", "cwio transmit 1/0 (on/off)"}
+	{ "rig.shutdown",     "i:n", "shutdown xcvr & flrig" },
+	{ "rig.cwio_wpm",     "n:i", "set cwio WPM" },
+	{ "rig.cwio_text",    "i:s", "send text via cwio interface" },
+	{ "rig.cwio_send",    "n:i", "cwio transmit 1/0 (on/off)"}
 };
 
 class rig_list_methods : public XmlRpcServerMethod {
@@ -2111,16 +2132,17 @@ void set_server_port(int port)
 
 std::string print_xmlhelp()
 {
-	string pstr;
+	static string pstr;
+	pstr.clear();
 	string line;
-	size_t maxlen = 0;
-	for (size_t n = 0; n < sizeof(mlist) / sizeof(*mlist); n++)
-		if (mlist[n].name.length() > maxlen) maxlen = mlist[n].name.length();
-
+	size_t f1_len = 0;
+	for (size_t n = 0; n < sizeof(mlist) / sizeof(*mlist); ++n) {
+		if (mlist[n].name.length() > f1_len) f1_len = mlist[n].name.length();
+	}
 	for (size_t n = 0; n < sizeof(mlist) / sizeof(*mlist); ++n) {
 		line.clear();
 		line.assign(mlist[n].name);
-		line.append(maxlen + 4 - line.length(), ' ');
+		line.append(f1_len + 2 - line.length(), ' ');
 		line.append(mlist[n].signature);
 		line.append("  ");
 		line.append(mlist[n].help);

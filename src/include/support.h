@@ -96,6 +96,7 @@ extern void setAttControl(void *);
 extern void setMicGainControl(void *);
 extern void setAGC(void *);
 extern void setRFGAINControl(void *);
+extern void update_power_control(void *);
 
 extern void setMode();
 extern void setBW();
