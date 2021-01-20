@@ -112,6 +112,12 @@ void close_gpio(void)
 	}
 }
 
+static int enabled = 0;
+int get_gpio()
+{
+	return enabled;
+}
+
 void set_gpio(bool ptt)
 {
 #define VALUE_MAX 30
@@ -119,7 +125,7 @@ void set_gpio(bool ptt)
 
 	string portname = "/sys/class/gpio/gpio";
 	string ctrlport;
-	bool enabled = false;
+	enabled = false;
 	int val = 0;
 	int fd;
 

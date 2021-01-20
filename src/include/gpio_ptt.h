@@ -30,5 +30,6 @@ extern void unexport_gpio(int bcm);
 extern void open_gpio(void);
 extern void close_gpio(void);
 extern void set_gpio(bool ptt);
+extern int  get_gpio();
 
 #endif

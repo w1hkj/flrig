@@ -53,6 +53,7 @@
 #include "trace.h"
 #include "cwio.h"
 #include "xml_server.h"
+#include "gpio_ptt.h"
 
 void initTabs();
 
@@ -463,9 +464,7 @@ void read_bandwidth()
 			stringstream s;
 			s << "Bandwidth A change. nu_BW=" << nu_BW << ", vfoA.iBW=" << vfoA.iBW << ", vfo->iBW=" << vfo->iBW;
 			trace(1, s.str().c_str());
-			
 			vfoA.iBW = vfo->iBW = nu_BW;
-//			Fl::awake(setBWControl);
 		}
 	} else {
 		trace(2, "vfoB active", "get_bwB()");
@@ -474,9 +473,7 @@ void read_bandwidth()
 			stringstream s;
 			s << "Bandwidth B change. nu_BW=" << nu_BW << ", vfoB.iBW=" << vfoB.iBW << ", vfo->iBW=" << vfo->iBW;
 			trace(1, s.str().c_str());
-			
 			vfoB.iBW = vfo->iBW = nu_BW;
-//			Fl::awake(setBWControl);
 		}
 	}
 	Fl::awake(setBWControl);
@@ -1061,11 +1058,26 @@ void set_ptt(void *);
 
 void check_ptt()
 {
-	int check = selrig->get_PTT();
-	if (check != PTT) {
-		PTT = check;
-		Fl::awake(set_ptt, (void *)PTT);
+	int check = 0;
+
+	if (progStatus.comm_catptt) {
+		check = selrig->get_PTT();
+	} else if (progStatus.comm_dtrptt) {
+		check = RigSerial->getPTT();
+	} else if (progStatus.comm_rtsptt) {
+		check = RigSerial->getPTT();
+	} else if (SepSerial->IsOpen() && progStatus.sep_dtrptt) {
+		check = SepSerial->getPTT();
+	} else if (SepSerial->IsOpen() && progStatus.sep_rtsptt) {
+		check = SepSerial->getPTT();
+	} else if (progStatus.gpio_ptt) {
+		check = get_gpio();
 	}
+
+	if (check != PTT)
+		PTT = check;
+
+	Fl::awake(set_ptt, (void *)PTT);
 }
 
 void check_break_in()
@@ -1166,13 +1178,13 @@ void serviceQUE()
 			if (nuvals.change == ON) trace(1,"ptt ON");
 			else trace(1,"ptt OFF");
 			rigPTT(PTT);
-			int get = selrig->get_PTT();
-			int cnt = 0;
-			while ((get != PTT) && (cnt++ < 100)) {
-				MilliSleep(10);
-				get = selrig->get_PTT();
-			}
-			{
+			if (progStatus.comm_catptt) {
+				int get = selrig->get_PTT();
+				int cnt = 0;
+				while ((get != PTT) && (cnt++ < 100)) {
+					MilliSleep(10);
+					get = selrig->get_PTT();
+				}
 				stringstream s;
 				s << "ptt returned " << get << " in " << cnt * 10 << " msec";
 				trace(1, s.str().c_str());

@@ -50,9 +50,12 @@ Cserial::Cserial() {
 	baud = 1200;
 	timeout = 50; //msec
 	retries = 5;
-	rts = dtr = false;
-	rtsptt = dtrptt = false;
-	rtscts = false;
+	rts = 
+	dtr = 
+	rtsptt = 
+	dtrptt =
+	rtscts = 
+	serptt = false;
 	status = 0;
 	stopbits = 2;
 	fd = -1;
@@ -187,6 +190,19 @@ bool Cserial::OpenPort()  {
 // Function name	: Cserial::setPTT
 // Return type	  : void
 ///////////////////////////////////////////////////////
+
+bool Cserial::RTSptt(){
+	return rtsptt;
+}
+
+bool Cserial::DTRptt(){
+	return dtrptt;
+}
+
+bool Cserial::getPTT() {
+	return serptt;
+}
+
 void Cserial::SetPTT(bool ON)
 {
 	if (fd < 0) {
@@ -221,6 +237,7 @@ void Cserial::SetPTT(bool ON)
 #endif
 		ioctl(fd, TIOCMSET, &status);
 	}
+	serptt = ON;
 //	LOG_DEBUG("No ptt specified");
 }
 
@@ -867,6 +884,18 @@ if (bPortReady == 0) {
 // Function name	: Cserial::setPTT
 // Return type	  : void
 ///////////////////////////////////////////////////////
+bool Cserial::RTSptt(){
+		return rtsptt;
+	}
+
+bool Cserial::DTRptt(){
+		return dtrptt;
+	}
+
+bool Cserial::getPTT() {
+	return serptt;
+}
+
 void Cserial::SetPTT(bool ON)
 {
 	if (hComm == INVALID_HANDLE_VALUE) {
@@ -914,7 +943,7 @@ PTT %d, DTRptt %d, DTR %d, RTSptt %d, RTS %d, RTSCTS %d, DtrControl %2x, RtsCont
 		static_cast<unsigned int>(dcb.fDtrControl), 
 		static_cast<unsigned int>(dcb.fRtsControl) );
 #endif
-
+	serptt = ON;
 	SetCommState(hComm, &dcb);
 }
 
@@ -939,9 +968,12 @@ void Cserial::setRTS(bool b)
 }
 
 Cserial::Cserial() {
-	rts = dtr = false;
-	rtsptt = dtrptt = false;
-	rtscts = false;
+	rts = 
+	dtr = 
+	rtsptt = 
+	dtrptt =
+	rtscts = 
+	serptt = false;
 	baud = CBR_9600;
 	stopbits = 2;
 	hComm = 0;

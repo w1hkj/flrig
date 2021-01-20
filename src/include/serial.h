@@ -62,18 +62,20 @@ public:
 	void setRTS(bool r);
 
 	void RTSptt(bool b){rtsptt = b;}
-	bool RTSptt(){return rtsptt;}
+	bool RTSptt();
 
-	void DTR(bool d){dtr = d;}
+	void DTR(bool d){ dtr = d; }
 	bool DTR(){return dtr;}
 	void setDTR(bool d);
 
 	void DTRptt(bool b){dtrptt = b;}
-	bool DTRptt(){return dtrptt;}
+	bool DTRptt();
 
 	void RTSCTS(bool b){rtscts = b;}
 	bool RTSCTS(){return rtscts;}
+
 	void SetPTT(bool b);
+	bool getPTT();
 
 	void Stopbits(int n) {stopbits = (n == 1 ? 1 : 2);}
 	int  Stopbits() { return stopbits;}
@@ -99,6 +101,7 @@ private:
 	bool	rts;
 	bool	rtsptt;
 	bool	rtscts;
+	bool	serptt;
 	int		stopbits;
 	char	bfr[2048];
 //Methods
@@ -162,18 +165,19 @@ public:
 	void setRTS(bool b);
 
 	void RTSptt(bool b){rtsptt = b;}
-	bool RTSptt(){return rtsptt;}
+	bool RTSptt();
 
 	void DTR(bool d){dtr = d;}
 	bool DTR(){return dtr;}
 	void setDTR(bool b);
 
 	void DTRptt(bool b){dtrptt = b;}
-	bool DTRptt(){return dtrptt;}
+	bool DTRptt();
 
 	void RTSCTS(bool b){rtscts = b;}
 	bool RTSCTS(){return rtscts;}
 	void SetPTT(bool b);
+	bool getPTT();
 
 	void Stopbits(int n) {stopbits = (n == 1 ? 1 : 2);}
 	int  Stopbits() { return stopbits;}
@@ -212,6 +216,7 @@ private:
 	bool	rts;
 	bool	rtsptt;
 	bool	rtscts;
+	bool	serptt;
 	int		stopbits;
 };
 
