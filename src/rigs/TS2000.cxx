@@ -125,6 +125,8 @@ void RIG_TS2000::initialize()
 	cmd = "NR;";
 	if (wait_char(';', 4, 100, "read current NR", ASC) == 4)
 		current_nr = replystr;
+	if (current_nr == "?;") return;
+
 	cmd = "NR1;";
 	sendCommand(cmd);
 	gett("get NR");
@@ -823,6 +825,10 @@ int  RIG_TS2000::get_noise_reduction()
 		size_t p = replystr.rfind(rsp);
 		if (p == string::npos) return _noise_reduction_level;
 		_noise_reduction_level = replystr[p+2] - '0';
+	}
+	if (replystr == "?;") {
+		_noise_reduction_level = 0;
+		return 0;
 	}
 
 	if (_noise_reduction_level == 1) {
