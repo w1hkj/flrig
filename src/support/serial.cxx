@@ -87,6 +87,7 @@ bool Cserial::CheckPort(string dev)  {
 ///////////////////////////////////////////////////////
 bool Cserial::OpenPort()  {
 
+	if (IsOpen()) ClosePort();
 	if ((fd = open( device.c_str(), O_RDWR | O_NOCTTY | O_NDELAY )) < 0)
 		return false;
 #if SERIAL_DEBUG
@@ -279,7 +280,7 @@ void Cserial::ClosePort()
 	if (fd < 0) return;
 	int myfd = fd;
 	fd = -1;
-	
+
 // Some serial drivers force RTS and DTR high immediately upon
 // opening the port, so our origstatus will indicate those bits
 // high (though the lines weren't actually high before we opened).
@@ -422,6 +423,8 @@ bool Cserial::CheckPort(string dev)  {
 bool Cserial::OpenPort()
 {
 	if (device.empty()) return false;
+
+	if (IsOpen()) ClosePort();
 
 	string COMportname = "//./";
 	COMportname.append(device);
@@ -976,7 +979,7 @@ Cserial::Cserial() {
 	serptt = false;
 	baud = CBR_9600;
 	stopbits = 2;
-	hComm = 0;
+	hComm = INVALID_HANDLE_VALUE;
 }
 
 Cserial::Cserial( std::string portname) {
