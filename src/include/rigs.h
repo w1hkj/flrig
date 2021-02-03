@@ -1,6 +1,7 @@
 // ----------------------------------------------------------------------------
-// Copyright (C) 2014
+// Copyright (C) 2014, 2020
 //              David Freese, W1HKJ
+//              Michael Black W9MDB
 //
 // This file is part of flrig.
 //
@@ -105,6 +106,7 @@
 #include "TT599.h"
 #include "Xiegu-5105.h"
 #include "Xiegu-G90.h"
+#include "PowerSDR.h"
 
 extern rigbase			rig_null;		// 0
 extern RIG_FT100D		rig_FT100D;		// 1
@@ -193,5 +195,6 @@ extern RIG_TT599		rig_TT599;		// 83
 extern RIG_AOR5K		rig_AOR5K;		// 84
 extern RIG_XI5105		rig_XI5105;		// 85
 extern RIG_Xiegu_G90	rig_XIG90;		// 86
+extern RIG_PowerSDR		rig_PowerSDR;	// 87
 
 #endif

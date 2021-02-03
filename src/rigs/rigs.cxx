@@ -1,6 +1,7 @@
 // ----------------------------------------------------------------------------
-// Copyright (C) 2014
+// Copyright (C) 2014, 2020
 //              David Freese, W1HKJ
+//              Michael Black W9MDB
 //
 // This file is part of flrig.
 //
@@ -114,6 +115,7 @@ RIG_TT588		rig_TT588;
 RIG_TT599		rig_TT599;
 RIG_XI5105		rig_XI5105;
 RIG_Xiegu_G90	rig_XIG90;
+RIG_PowerSDR	rig_PowerSDR;
 
 rigbase *rigs[] = {
 	&rig_null,		// 0
@@ -203,6 +205,7 @@ rigbase *rigs[] = {
 	&rig_AOR5K,		// 84
 	&rig_XI5105,	// 85
 	&rig_XIG90,		// 86
+	&rig_PowerSDR,	// 87
 
 	NULL
 };

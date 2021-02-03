@@ -188,6 +188,7 @@ flrig_SOURCES += \
 	rigs/K3.cxx \
 	rigs/KX3.cxx \
 	rigs/PCR1000.cxx \
+	rigs/PowerSDR.cxx \
 	rigs/RAY152.cxx \
 	rigs/TS140.cxx \
 	rigs/TS450S.cxx \
@@ -342,6 +343,7 @@ EXTRA_DIST = \
 	include/RAY152.h \
 	include/mingw.h \
 	include/pl_tones.h \
+	include/PowerSDR.h \
 	include/ptt.h \
 	include/rig.h \
 	include/rigs.h \
