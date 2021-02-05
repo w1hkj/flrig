@@ -26,11 +26,16 @@
 
 const char K2name_[] = "K2";
 
-const char *K2modes_[] = {
-		"LSB", "USB", "CW", "FM", "AM", "RTTY-L", "CW-R", "USER-L", "RTTY-U", NULL};
+static const char *K2modes_[] = 
+	{ "LSB",  "USB",  "CW",   "RTTY", "CW-R", "RTTY-R", NULL};
 
 static const char K2_mode_type[] =
-	{'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L', 'U', 'U'};
+	{ 'L',    'U',    'L',    'L',     'U',   'U' };
+
+static const char *K2_mode_str[] =
+	{ "MD1;", "MD2;", "MD3;", "MD6;", "MD7;", "MD9;" };
+
+static int K2_num_modes = 6;
 
 const char *K2_widths[] = {"FL1", "FL2", "FL3", "FL4", NULL};
 static int K2_bw_vals[] = { 1, 2, 3, 4, WVALS_LIMIT};
@@ -295,12 +300,19 @@ void RIG_K2::set_vfoB(unsigned long int freq)
 	sett("set vfoB");
 }
 
+// LSB        MD1;
+// LSB-rev    MD2;
+// USB        MD2;
+// USB-rev    MD1;
+// RTTY       MD6;
+// RTTY-rev   MD9;
+// CW         MD3;
+// CW-rev     MD7;
+
 void RIG_K2::set_modeA(int val)
 {
 	modeA = val;
-	val++;
-	cmd = "MD0;";
-	cmd[2] += val;
+	cmd = K2_mode_str[val];
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET mode A", cmd, replystr);
 	sett("set modeA");
@@ -316,16 +328,19 @@ int RIG_K2::get_modeA()
 	if (ret < 4) return 0;
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
-	modeA = replystr[p + 2] - '1';
+	for (int i = 0; i < K2_num_modes; i++) {
+		if (replystr.substr(p) == K2_mode_str[i]) {
+			modeA = i;
+			return modeA;
+		}
+	}
 	return modeA;
 }
 
 void RIG_K2::set_modeB(int val)
 {
 	modeB = val;
-	val++;
-	cmd = "MD0;";
-	cmd[2] += val;
+	cmd = K2_mode_str[val];
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET mode B", cmd, replystr);
 	sett("set modeB");
@@ -341,7 +356,12 @@ int  RIG_K2::get_modeB()
 	if (ret < 4) return 0;
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
-	modeB = replystr[p + 2] - '1';
+	for (int i = 0; i < K2_num_modes; i++) {
+		if (replystr.substr(p) == K2_mode_str[i]) {
+			modeB = i;
+			return modeB;
+		}
+	}
 	return modeB;
 }
 
