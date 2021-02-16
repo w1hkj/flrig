@@ -72,14 +72,16 @@ static const char **Channels_60m = FT450_US_60m;
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
 	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
+	{ (Fl_Widget *)btnAGC,        2, 145,  50 },
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },
 	{ (Fl_Widget *)btnIFsh,     214, 105,  50 },
 	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
 	{ (Fl_Widget *)btnNotch,    214, 125,  50 },
 	{ (Fl_Widget *)sldrNOTCH,   266, 125, 156 },
-	{ (Fl_Widget *)sldrMICGAIN,  54, 145, 156 },
-	{ (Fl_Widget *)sldrPOWER,    54, 165, 368 },
-	{ (Fl_Widget *)btnNR,       214, 145,  50 },
-	{ (Fl_Widget *)sldrNR,      266, 145, 156 },
+	{ (Fl_Widget *)sldrMICGAIN, 266, 145, 156 },
+	{ (Fl_Widget *)sldrPOWER,   266, 165, 156 },
+	{ (Fl_Widget *)btnNR,         2, 165,  50 },
+	{ (Fl_Widget *)sldrNR,       54, 165, 156 },
 	{ (Fl_Widget *)NULL,          0,   0,   0 }
 };
 
@@ -141,6 +143,8 @@ RIG_FT450::RIG_FT450() {
 	has_noise_control =
 	has_band_selection =
 	has_bandwidth_control =
+	has_agc_control =
+	has_rf_control =
 	has_micgain_control =
 	has_notch_control =
 	has_attenuator_control =
@@ -161,14 +165,16 @@ void RIG_FT450::initialize()
 {
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
-	rig_widgets[2].W = btnIFsh;
-	rig_widgets[3].W = sldrIFSHIFT;
-	rig_widgets[4].W = btnNotch;
-	rig_widgets[5].W = sldrNOTCH;
-	rig_widgets[6].W = sldrMICGAIN;
-	rig_widgets[7].W = sldrPOWER;
-	rig_widgets[8].W = btnNR;
-	rig_widgets[9].W = sldrNR;
+	rig_widgets[2].W = btnAGC;
+	rig_widgets[3].W = sldrRFGAIN;
+	rig_widgets[4].W = btnIFsh;
+	rig_widgets[5].W = sldrIFSHIFT;
+	rig_widgets[6].W = btnNotch;
+	rig_widgets[7].W = sldrNOTCH;
+	rig_widgets[8].W = sldrMICGAIN;
+	rig_widgets[9].W = sldrPOWER;
+	rig_widgets[10].W = btnNR;
+	rig_widgets[11].W = sldrNR;
 
 // set progStatus defaults
 	if (progStatus.noise_reduction_val < 1) progStatus.noise_reduction_val = 1;
@@ -1054,6 +1060,106 @@ void RIG_FT450::get_band_selection(int v)
 	sendCommand(cmd);
 	showresp(WARN, ASC, "Select Band Stacks", cmd, replystr);
 	set_trace(2, "get band", cmd.c_str());
+}
+
+void RIG_FT450::set_rf_gain(int val)
+{
+	cmd = "RG0000;";
+	int rfval = (int)(val * 2.55);
+	for (int i = 5; i > 2; i--) {
+		cmd[i] = rfval % 10 + '0';
+		rfval /= 10;
+	}
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET rfgain", cmd, replystr);
+	sett("set_rf_gain");
+}
+
+int  RIG_FT450::get_rf_gain()
+{
+	//int rfval = 0;
+	cmd = rsp = "RG0";
+	cmd += ';';
+	wait_char(';', 7, 100, "get rfgain", ASC);
+
+	gett("get_rf_gain");
+
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return progStatus.rfgain;
+	// Parse the RF value from the position returned by rfind for the response.
+	// Valid values are 0-255.
+	int rfval =
+		(replystr[p+3] - '0') * 100 +
+		(replystr[p+4] - '0') * 10 +
+		(replystr[p+5] - '0');
+
+	// Convert 0-255 to 0-100 for the slider widget.
+	rfval = (int)(rfval / 2.55);
+	if (rfval > 100) rfval = 100;
+	return rfval;
+}
+
+void RIG_FT450::get_rf_min_max_step(int &min, int &max, int &step)
+{
+	min = 0;
+	max = 100;
+	step = 1;
+}
+
+/*
+ P1 0: fixed
+ P2 0: AGC “OFF”
+  1: AGC “FAST”
+  2: AGC “SLOW”
+  3: AGC “SLOW”
+  4: AGC “AUTO”
+*/
+static int agcval = 0;
+int  RIG_FT450::get_agc()
+{
+    cmd = "GT0;";
+    wait_char(';', 6, 100, "get agc", ASC);
+    gett("get_agc");
+    size_t p = replystr.rfind("GT");
+    if (p == std::string::npos) return agcval;
+
+    switch (replystr[3]) {
+        default:
+        case '0': agcval = 0; break;
+        case '1': agcval = 1; break;
+        case '2': 
+        case '3': agcval = 2; break;
+        case '4': 
+        case '6': agcval = 3; break;
+    }
+    return agcval;
+}
+
+int RIG_FT450::incr_agc()
+{
+static const char ch[] = {'0', '1', '3', '4'};
+	agcval++;
+	if (agcval > 3) agcval = 0;
+	cmd = "GT00;";
+	cmd[3] = ch[agcval];
+
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET agc", cmd, replystr);
+	sett("set_agc");
+
+	return agcval;
+}
+
+
+static const char *agcstrs[] = {"AGC", "FST", "SLO", "AUT"};
+const char *RIG_FT450::agc_label()
+{
+	return agcstrs[agcval];
+}
+
+int  RIG_FT450::agc_val()
+{
+	return (agcval);
 }
 
 /*

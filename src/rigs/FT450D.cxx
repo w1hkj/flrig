@@ -198,18 +198,6 @@ void RIG_FT450D::initialize()
 // turn off auto information mode
 	sendCommand("AI0;");
 
-	get_cw_weight();
-	get_cw_wpm();
-	get_break_in();
-	get_qsk();
-	get_qsk_delay();
-	get_cw_spot_tone();
-	get_vox_gain();
-	get_vox_hang();
-
-	preamp_label("IPO", false);
-
-	selectA();
 }
 
 void RIG_FT450D::selectA()
@@ -1254,7 +1242,7 @@ int  RIG_FT450D::get_noise_reduction()
 void RIG_FT450D::set_rf_gain(int val)
 {
 	cmd = "RG0000;";
-	int rfval = (int)((100 - val) * 2.55);
+	int rfval = (int)(val * 2.55);
 	for (int i = 5; i > 2; i--) {
 		cmd[i] = rfval % 10 + '0';
 		rfval /= 10;
@@ -1275,11 +1263,6 @@ int  RIG_FT450D::get_rf_gain()
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.rfgain;
-	//for (int i = 3; i < 6; i++) {
-	//	rfval *= 10;  // Shift out one decimal place so we can add the next character
-	//	rfval += replystr[p+i] - '0'; // Subtract ASCII 0 so we get a number
-	//}
-	
 	// Parse the RF value from the position returned by rfind for the response.
 	// Valid values are 0-255.
 	int rfval =

@@ -80,21 +80,33 @@ public:
 	int  get_PTT();
 	void tune_rig(int);
 	int  get_tune();
+
 	void set_attenuator(int val);
 	int  get_attenuator();
 	void set_preamp(int val);
 	int  get_preamp();
+
 	void set_if_shift(int val);
 	bool get_if_shift(int &val);
 	void get_if_min_max_step(int &min, int &max, int &step);
+
 	void set_notch(bool on, int val);
 	bool get_notch(int &val);
 	void get_notch_min_max_step(int &min, int &max, int &step);
 	void set_noise(bool b);
+
 	void set_mic_gain(int val);
 	int  get_mic_gain();
 	void get_mic_min_max_step(int &min, int &max, int &step);
-	
+
+	void set_rf_gain(int val);
+	int  get_rf_gain();
+	void get_rf_min_max_step(int &min, int &max, int &step);
+
+	int  get_agc();
+	int  incr_agc();
+	const char *agc_label();
+	int  agc_val();
 	void set_special(int v);
 
 	void set_vox_onoff();
