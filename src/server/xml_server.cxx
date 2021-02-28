@@ -293,11 +293,16 @@ inline void wait()
 	int n = 0;
 	while (!srvc_reqs.empty()) {
 		MilliSleep(10);
-		if (++n == 50) break;
+		if (++n == 500) break;
 	}
-	ostringstream s;
-	s << "wait for srvc_reqs " << 10 * n << " msec";
-	xml_trace(1, s.str().c_str());
+	static char s[50];
+
+	if (n == 500)
+		snprintf(s, sizeof(s), "wait for srvc_reqs timed out");
+	else
+		snprintf(s, sizeof(s), "wait for srvc reqs %d msec", 10 * n);
+
+	xml_trace(1, s);
 }
 
 class rig_get_split : public XmlRpcServerMethod {

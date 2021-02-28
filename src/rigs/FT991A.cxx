@@ -559,7 +559,8 @@ int RIG_FT991A::get_PTT()
 {
 	cmd = "TX;";
 	rsp = "TX";
-	waitN(4, 100, "get PTT", ASC);
+	wait_char(';', 4, FL991A_WAIT_TIME, "get PTT", ASC);
+	gett("get PTT");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return ptt_;

@@ -1144,12 +1144,19 @@ void yaesu891UpdateA(XCVR_STATE * newVfo)
 	selrig->set_modeA(newVfo->imode);
 	selrig->set_vfoA(newVfo->freq);
 	selrig->set_bwA(newVfo->iBW);
+	selrig->get_modeA();
+	selrig->get_vfoA();
+	selrig->get_bwA();
 }
+
 void yaesu891UpdateB(XCVR_STATE * newVfo)
 {
 	selrig->set_modeB(newVfo->imode);
 	selrig->set_vfoB(newVfo->freq);
 	selrig->set_bwB(newVfo->iBW);
+	selrig->get_modeB();
+	selrig->get_vfoB();
+	selrig->get_bwB();
 }
 
 void serviceQUE()
@@ -1250,6 +1257,7 @@ void serviceQUE()
 				rig_trace(2, "case sB ", printXCVR_STATE(vfoB).c_str());
 				if (selrig->can_split() || selrig->has_split_AB) {
 					selrig->set_split(on);
+					selrig->get_split();
 					progStatus.split = on;
 					Fl::awake(update_split, (void *)0);
 					if (selrig->ICOMmainsub) {
@@ -1329,24 +1337,35 @@ void serviceA(XCVR_STATE nuvals)
 					vfoA = nuvals;
 				} else {
 					selrig->set_modeA(nuvals.imode);
+					selrig->get_modeA();
 				}
 			}
-			if (vfoA.iBW != nuvals.iBW)
+			if (vfoA.iBW != nuvals.iBW) {
 				selrig->set_bwA(nuvals.iBW);
-			if (vfoA.freq != nuvals.freq)
+				selrig->get_bwA();
+			}
+			if (vfoA.freq != nuvals.freq) {
 				selrig->set_vfoA(nuvals.freq);
+				selrig->get_vfoA();
+			}
 			vfoA = nuvals;
 		} else if (xcvr_name != rig_TT550.name_) {
 			trace(2, "B active, set vfo A", printXCVR_STATE(nuvals).c_str());
 			rig_trace(2, "B active, set vfo A", printXCVR_STATE(nuvals).c_str());
 			useB = false;
 			selrig->selectA();
-			if (vfoA.imode != nuvals.imode)
+			if (vfoA.imode != nuvals.imode) {
 				selrig->set_modeA(nuvals.imode);
-			if (vfoA.iBW != nuvals.iBW)
+				selrig->get_modeA();
+			}
+			if (vfoA.iBW != nuvals.iBW) {
 				selrig->set_bwA(nuvals.iBW);
-			if (vfoA.freq != nuvals.freq)
+				selrig->get_bwA();
+			}
+			if (vfoA.freq != nuvals.freq) {
 				selrig->set_vfoA(nuvals.freq);
+				selrig->get_vfoA();
+			}
 			useB = true;
 			selrig->selectB();
 			vfoA = nuvals;
@@ -1368,8 +1387,10 @@ void serviceA(XCVR_STATE nuvals)
 			m1 = selrig->modes_[nuvals.imode];
 			m2 = selrig->modes_[vfoA.imode];
 			selrig->set_modeA(vfoA.imode = nuvals.imode);
+			selrig->get_modeA();
 			set_bandwidth_control();
 			selrig->set_bwA(vfoA.iBW);
+			selrig->get_bwA();
 			if (m1.find("CW") != std::string::npos ||
 				m2.find("CW") != std::string::npos)
 				vfoA.freq = nuvals.freq = selrig->get_vfoA();
@@ -1378,10 +1399,12 @@ void serviceA(XCVR_STATE nuvals)
 	}
 	if (vfoA.iBW != nuvals.iBW) {
 		selrig->set_bwA(vfoA.iBW = nuvals.iBW);
+		selrig->get_bwA();
 	}
 	if (vfoA.freq != nuvals.freq) {
 		trace(1, "change vfoA frequency");
 		selrig->set_vfoA(vfoA.freq = nuvals.freq);
+		selrig->get_vfoA();
 }
 	vfo = &vfoA;
 
@@ -1405,23 +1428,34 @@ void serviceB(XCVR_STATE nuvals)
 					vfoB = nuvals;
 				} else {
 					selrig->set_modeB(nuvals.imode);
+					selrig->get_modeB();
 				}
 			}
-			if (vfoB.iBW != nuvals.iBW)
+			if (vfoB.iBW != nuvals.iBW) {
 				selrig->set_bwB(nuvals.iBW);
-			if (vfoB.freq != nuvals.freq)
+				selrig->get_bwB();
+			}
+			if (vfoB.freq != nuvals.freq) {
 				selrig->set_vfoB(nuvals.freq);
+				selrig->get_vfoB();
+			}
 			vfoB = nuvals;
 		} else if (xcvr_name != rig_TT550.name_) {
 			trace(2, "A active, set vfo B", printXCVR_STATE(nuvals).c_str());
 			useB = true;
 			selrig->selectB();
-			if (vfoB.imode != nuvals.imode)
+			if (vfoB.imode != nuvals.imode) {
 				selrig->set_modeB(nuvals.imode);
-			if (vfoB.iBW != nuvals.iBW)
+				selrig->get_modeB();
+			}
+			if (vfoB.iBW != nuvals.iBW) {
 				selrig->set_bwB(nuvals.iBW);
-			if (vfoB.freq != nuvals.freq)
+				selrig->get_bwB();
+			}
+			if (vfoB.freq != nuvals.freq) {
 				selrig->set_vfoB(nuvals.freq);
+				selrig->get_vfoB();
+			}
 			useB = false;
 			selrig->selectA();
 			vfoB = nuvals;
@@ -1437,17 +1471,22 @@ void serviceB(XCVR_STATE nuvals)
 		m1 = selrig->modes_[nuvals.imode];
 		m2 = selrig->modes_[vfoB.imode];
 		selrig->set_modeB(vfoB.imode = nuvals.imode);
+		selrig->get_modeB();
 		set_bandwidth_control();
 		selrig->set_bwB(vfoB.iBW);
+		selrig->get_bwB();
 		if (m1.find("CW") != std::string::npos ||
 			m2.find("CW") != std::string::npos)
 			vfoB.freq = nuvals.freq = selrig->get_vfoB();
 	}
 	if (vfoB.iBW != nuvals.iBW) {
 		selrig->set_bwB(vfoB.iBW = nuvals.iBW);
+		selrig->get_bwB();
 	}
-	if (vfoB.freq != nuvals.freq)
+	if (vfoB.freq != nuvals.freq) {
 		selrig->set_vfoB(vfoB.freq = nuvals.freq);
+		selrig->get_vfoB();
+	}
 
 	vfo = &vfoB;
 
@@ -1968,12 +2007,18 @@ void execute_swapAB()
 			selrig->set_vfoA(vfoA.freq);
 			selrig->set_modeA(vfoA.imode);
 			selrig->set_bwA(vfoA.iBW);
+			selrig->get_vfoA();
+			selrig->get_modeA();
+			selrig->get_bwA();
 
 			selrig->selectB();
 			vfoB = vfotemp;
 			selrig->set_vfoB(vfoB.freq);
 			selrig->set_modeB(vfoB.imode);
 			selrig->set_bwB(vfoB.iBW);
+			selrig->get_vfoB();
+			selrig->get_modeB();
+			selrig->get_bwB();
 			vfo = &vfoB;
 		} else {
 			XCVR_STATE vfotemp = vfoB;
@@ -1982,12 +2027,18 @@ void execute_swapAB()
 			selrig->set_vfoB(vfoB.freq);
 			selrig->set_modeB(vfoB.imode);
 			selrig->set_bwB(vfoB.iBW);
+			selrig->get_vfoB();
+			selrig->get_modeB();
+			selrig->get_bwB();
 
 			selrig->selectA();
 			vfoA = vfotemp;
 			selrig->set_vfoA(vfoA.freq);
 			selrig->set_modeA(vfoA.imode);
 			selrig->set_bwA(vfoA.iBW);
+			selrig->get_vfoA();
+			selrig->get_modeA();
+			selrig->get_bwA();
 			vfo = &vfoA;
 		}
 	}
@@ -2020,6 +2071,7 @@ void execute_A2B()
 		trace(1,"cbA2B() 1");
 		vfoB = vfoA;
 		selrig->set_vfoB(vfoB.freq);
+		selrig->get_vfoB();
 		FreqDispB->value(vfoB.freq);
 	}
 	if (selrig->ICOMmainsub) {
@@ -2047,6 +2099,9 @@ void execute_A2B()
 				selrig->set_vfoA(vfoA.freq);
 				selrig->set_modeA(vfoA.imode);
 				selrig->set_bwA(vfoA.iBW);
+				selrig->get_vfoA();
+				selrig->get_modeA();
+				selrig->get_bwA();
 			}
 			FreqDispA->value(vfoA.freq);
 		} else {
@@ -2057,6 +2112,9 @@ void execute_A2B()
 				selrig->set_vfoB(vfoB.freq);
 				selrig->set_modeB(vfoB.imode);
 				selrig->set_bwB(vfoB.iBW);
+				selrig->get_vfoB();
+				selrig->get_modeB();
+				selrig->get_bwB();
 			}
 			FreqDispB->value(vfoB.freq);
 		}
