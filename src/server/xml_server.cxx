@@ -46,12 +46,11 @@
 
 #include "xml_server.h"
 #include "XmlRpc.h"
+#include "tod_clock.h"
+#include "cwioUI.h"
+#include "ptt.h"
 
 using namespace XmlRpc;
-
-#include "tod_clock.h"
-
-#include "cwioUI.h"
 
 // The server
 XmlRpcServer rig_server;
@@ -371,17 +370,18 @@ public:
 			result = "14070000";
 			return;
 		}
-		int freq;
+//		int freq;
 
-		wait();
-		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_vfoA");
+		guard_lock serial(&mutex_serial);
 
-		freq = vfoA.freq;
+		vfoA.freq = selrig->get_vfoA();
+		Fl::awake(setFreqDispA, (void *)vfoA.freq);
 
 		static char szfreq[20];
-		snprintf(szfreq, sizeof(szfreq), "%d", freq);
+		snprintf(szfreq, sizeof(szfreq), "%d", (int)vfoA.freq);
 		std::string result_string = szfreq;
 xml_trace(2, "rig_get_vfoA", szfreq);
+
 		result = result_string;
 	}
 
@@ -401,17 +401,16 @@ public:
 			result = "14070000";
 			return;
 		}
-		int freq;
+		guard_lock serial(&mutex_serial);
 
-		wait();
-		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_vfoB");
-
-		freq = vfoB.freq;
+		vfoB.freq = selrig->get_vfoB();
+		Fl::awake(setFreqDispB, (void *)vfoB.freq);
 
 		static char szfreq[20];
-		snprintf(szfreq, sizeof(szfreq), "%d", freq);
+		snprintf(szfreq, sizeof(szfreq), "%d", (int)vfoB.freq);
 		std::string result_string = szfreq;
 xml_trace(2, "rig_get_vfoB", szfreq);
+
 		result = result_string;
 	}
 
@@ -1164,25 +1163,8 @@ static void push_xml()
 	srvr_vfo.src = SRVR;
 	guard_lock service_lock(&mutex_srvc_reqs, "xml_push");
 	xml_trace(2, "push_xml()", print(srvr_vfo.freq, srvr_vfo.imode, srvr_vfo.iBW).c_str());
-	srvc_reqs.push(VFOQUEUE(vX, srvr_vfo));//(useB ? vB : vA), srvr_vfo ));
+	srvc_reqs.push(VFOQUEUE(vX, srvr_vfo));
 }
-
-static void push_xmlA()
-{
-	srvr_vfo.src = SRVR;
-	guard_lock service_lock(&mutex_srvc_reqs, "xml_pushA");
-	xml_trace(2, "push_xmlA()", print(srvr_vfo.freq, srvr_vfo.imode, srvr_vfo.iBW).c_str());
-	srvc_reqs.push(VFOQUEUE( vA, srvr_vfo));
-}
-
-static void push_xmlB()
-{
-	srvr_vfo.src = SRVR;
-	guard_lock service_lock(&mutex_srvc_reqs, "xml_pushB");
-xml_trace(2, "push_xmlB()", print(srvr_vfo.freq, srvr_vfo.imode, srvr_vfo.iBW).c_str());
-	srvc_reqs.push(VFOQUEUE(vB, srvr_vfo));
-}
-
 
 //------------------------------------------------------------------------------
 // Set Power in watts
@@ -1246,6 +1228,9 @@ public:
 //------------------------------------------------------------------------------
 // Set PTT on (1) or off (0)
 //------------------------------------------------------------------------------
+
+extern bool PTT;
+
 class rig_set_ptt : public XmlRpcServerMethod {
 public:
 	rig_set_ptt(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_ptt", s) {}
@@ -1255,15 +1240,25 @@ public:
 			result = 0;
 			return;
 		}
-		int state = int(params[0]);
 
-		guard_lock que_lock(&mutex_srvc_reqs, "xml rig_set_ptt");
+		guard_lock ser_lock (&mutex_serial);
 
-		VFOQUEUE xcvrptt;
-		if (state) xcvrptt.change = ON;
-		else       xcvrptt.change = OFF;
-		xml_trace(1, (state ? "rig_set_ptt ON" : "rig_set_ptt OFF"));
-		srvc_reqs.push(xcvrptt);
+		PTT = int(params[0]);
+		xml_trace(1, (PTT ? "rig_set_ptt ON" : "rig_set_ptt OFF"));
+		rigPTT(PTT);
+		{
+			bool get = rigPTT();
+			int cnt = 0;
+			while ((get != PTT) && (cnt++ < 100)) {
+				MilliSleep(10);
+				get = rigPTT();
+			}
+			PTT = get;
+			stringstream s;
+			s << "ptt returned " << get << " in " << cnt * 10 << " msec";
+			xml_trace(1, s.str().c_str());
+			Fl::awake(update_UI_PTT);
+		}
 	}
 
 	std::string help() { return std::string("sets PTT on (1) or off (0)"); }
@@ -1413,12 +1408,16 @@ public:
 			return;
 		}
 		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
+
+		guard_lock serial(&mutex_serial);
+
 		srvr_vfo = vfoA;
 		srvr_vfo.freq = freq;
-		srvr_vfo.imode = -1;
-		srvr_vfo.iBW = 255;
+		selrig->set_vfoA(srvr_vfo.freq);
+		srvr_vfo.freq = selrig->get_vfoA();
+		vfoA = srvr_vfo;
 
-		push_xmlA();
+		Fl::awake(setFreqDispA, (void *)vfoA.freq);
 	}
 	std::string help() { return std::string("rig.set_vfo NNNNNNNN (Hz)"); }
 
@@ -1438,12 +1437,16 @@ public:
 			return;
 		}
 		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
+
+		guard_lock serial(&mutex_serial);
+
 		srvr_vfo = vfoB;
 		srvr_vfo.freq = freq;
-		srvr_vfo.imode = -1;
-		srvr_vfo.iBW = 255;
+		selrig->set_vfoB(srvr_vfo.freq);
+		srvr_vfo.freq = selrig->get_vfoB();
+		vfoB = srvr_vfo;
 
-		push_xmlB();
+		Fl::awake(setFreqDispB, (void *)vfoB.freq);
 	}
 	std::string help() { return std::string("rig.set_vfo NNNNNNNN (Hz)"); }
 
@@ -1616,29 +1619,27 @@ public:
 
 				srvr_vfo.freq = 0;
 				srvr_vfo.iBW = selrig->def_bandwidth(srvr_vfo.imode);
-				if (selrig->can_change_alt_vfo || !useB)
-					push_xmlA();
-				else {
-					XCVR_STATE vfo = vfoA;
-					vfo.src = SRVR;
-					srvc_reqs.push (VFOQUEUE(sA, vfo));
-					push_xml();
-					vfo = vfoB;
-					vfo.src = SRVR;
-					srvc_reqs.push (VFOQUEUE(sB, vfo));
+
+				if (useB) {
+					guard_lock serial_lock(&mutex_serial);
+					selrig->selectA();
+					selrig->set_modeA(srvr_vfo.imode);
+					if (selrig->get_modeA() == srvr_vfo.imode)
+						selrig->set_bwA(srvr_vfo.iBW);
+					vfoA = srvr_vfo;
+					selrig->selectB();
+					break;
+				} else {
+					guard_lock serial_lock(&mutex_serial);
+					selrig->set_modeA(srvr_vfo.imode);
+					if (selrig->get_modeA() == srvr_vfo.imode)
+						selrig->set_bwA(srvr_vfo.iBW);
+					vfoA = srvr_vfo;
+					break;
 				}
-				break;
 			}
 			i++;
 		}
-		int imode = -1;
-		int n = 0;
-		while (imode != srvr_vfo.imode) {
-			MilliSleep(10);
-			imode = vfoA.imode;
-			n++;
-		}
-		result = 1;
 	}
 	std::string help() { return std::string("set_mode on vfo A"); }
 
@@ -1676,29 +1677,26 @@ public:
 				srvr_vfo.freq = 0;
 				srvr_vfo.iBW = selrig->def_bandwidth(srvr_vfo.imode);
 
-				if (selrig->can_change_alt_vfo || useB) {
-					push_xmlB();
+				if (!useB) {
+					guard_lock serial_lock(&mutex_serial);
+					selrig->selectB();
+					selrig->set_modeB(srvr_vfo.imode);
+					if (selrig->get_modeB() == srvr_vfo.imode)
+						selrig->set_bwB(srvr_vfo.iBW);
+					vfoB = srvr_vfo;
+					selrig->selectA();
+					break;
 				} else {
-					XCVR_STATE vfo = vfoB;
-					vfo.src = SRVR;
-					srvc_reqs.push (VFOQUEUE(sB, vfo));
-					push_xml();
-					vfo = vfoA;
-					vfo.src = SRVR;
-					srvc_reqs.push (VFOQUEUE(sA, vfo));
+					guard_lock serial_lock(&mutex_serial);
+					selrig->set_modeB(srvr_vfo.imode);
+					if (selrig->get_modeB() == srvr_vfo.imode)
+						selrig->set_bwB(srvr_vfo.iBW);
+					vfoB = srvr_vfo;
+					break;
 				}
-				break;
 			}
 			i++;
 		}
-		int imode = -1;
-		int n = 0;
-		while (imode != srvr_vfo.imode) {
-			MilliSleep(10);
-			imode = vfoB.imode;
-			n++;
-		}
-		result = 1;
 	}
 	std::string help() { return std::string("set_mode on vfo B"); }
 
