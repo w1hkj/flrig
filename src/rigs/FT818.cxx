@@ -1,5 +1,5 @@
 // ----------------------------------------------------------------------------
-// Copyright (C) 2021
+// Copyright (C) 2014
 //              David Freese, W1HKJ
 //
 // This file is part of flrig.
@@ -20,24 +20,23 @@
 #include <iostream>
 #include <sstream>
 
-#include "FT817.h"
+#include "FT818.h"
 
 #include "rigpanel.h"
 
 //=============================================================================
-// FT817
+// FT818ND
 //=============================================================================
 
-static const char FT817name_[] = "FT-817";
-static const char *FT817modes_[] = {
+static const char FT818NDname_[] = "FT-818ND";
+static const char *FT818NDmodes_[] = {
 		"LSB", "USB", "CW", "CW-R", "AM", "FM", "DIG", "PKT", NULL};
-static const int FT817_mode_val[] =  { 0, 1, 2, 3, 4, 8, 0x0A, 0x0C };
-static const char FT817_mode_type[] = { 'L', 'U', 'U', 'L', 'U', 'U', 'U', 'U' };
+static const int FT818ND_mode_val[] =  { 0, 1, 2, 3, 4, 8, 0x0A, 0x0C };
+static const char FT818ND_mode_type[] = { 'L', 'U', 'U', 'L', 'U', 'U', 'U', 'U' };
 
-RIG_FT817::RIG_FT817() {
-// base class values	
-	name_ = FT817name_;
-	modes_ = FT817modes_;
+RIG_FT818ND::RIG_FT818ND() {
+	name_ = FT818NDname_;
+	modes_ = FT818NDmodes_;
 	comm_baudrate = BR4800;
 	stopbits = 2;
 	comm_retries = 2;
@@ -67,31 +66,35 @@ RIG_FT817::RIG_FT817() {
 
 }
 
-void RIG_FT817::init_cmd()
+void RIG_FT818ND::init_cmd()
 {
 	cmd = "00000";
 	for (size_t i = 0; i < 5; i++) cmd[i] = 0;
 }
 
-void RIG_FT817::selectA()
+void RIG_FT818ND::selectA()
 {
 	init_cmd();
+
 	// Without the ability to check VFO-A or B, just toggle them
+
 	cmd[4] = 0x81;
 	sendCommand(cmd);
 	setthex("Select VFO A");
 }
 
-void RIG_FT817::selectB()
+void RIG_FT818ND::selectB()
 {
 	init_cmd();
 	cmd[4] = 0x81;
+
 	// Without the ability to check VFO-A or B, just toggle them
+
 	sendCommand(cmd);
 	setthex("Select VFO B");
 }
 
-bool RIG_FT817::check ()
+bool RIG_FT818ND::check ()
 {
 	init_cmd();
 	cmd[4] = 0x03;
@@ -101,7 +104,7 @@ bool RIG_FT817::check ()
 	return true;
 }
 
-unsigned long int RIG_FT817::get_vfoA ()
+unsigned long int RIG_FT818ND::get_vfoA ()
 {
 	init_cmd();
 	cmd[4] = 0x03;
@@ -114,7 +117,7 @@ unsigned long int RIG_FT817::get_vfoA ()
 	return freqA;
 }
 
-void RIG_FT817::set_vfoA (unsigned long int freq)
+void RIG_FT818ND::set_vfoA (unsigned long int freq)
 {
 	freqA = freq;
 	freq /=10; // 817 does not support 1 Hz resolution
@@ -124,7 +127,7 @@ void RIG_FT817::set_vfoA (unsigned long int freq)
 	setthex("set_vfoA");
 }
 
-int RIG_FT817::get_modeA()
+int RIG_FT818ND::get_modeA()
 {
 	init_cmd();
 	cmd[4] = 0x03;
@@ -135,22 +138,22 @@ int RIG_FT817::get_modeA()
 	}
 	int mode = replystr[4];
 	for (int i = 0; i < 8; i++)
-		if (FT817_mode_val[i] == mode) {
+		if (FT818ND_mode_val[i] == mode) {
 			modeA = i;
 			break;
 		}
 	return modeA;
 }
 
-int RIG_FT817::get_modetype(int n)
+int RIG_FT818ND::get_modetype(int n)
 {
-	return FT817_mode_type[n];
+	return FT818ND_mode_type[n];
 }
 
-void RIG_FT817::set_modeA(int val)
+void RIG_FT818ND::set_modeA(int val)
 {
 	init_cmd();
-	cmd[0] = FT817_mode_val[val];
+	cmd[0] = FT818ND_mode_val[val];
 	cmd[4] = 0x07;
 	sendCommand(cmd);
 	setthex("set_modeA");
@@ -166,7 +169,7 @@ void RIG_FT817::set_modeA(int val)
 }
 
 // VFO B ===============================================================
-unsigned long int RIG_FT817::get_vfoB ()
+unsigned long int RIG_FT818ND::get_vfoB ()
 {
 	init_cmd();
 	cmd[4] = 0x03;
@@ -180,7 +183,7 @@ unsigned long int RIG_FT817::get_vfoB ()
 	return freqB;
 }
 
-void RIG_FT817::set_vfoB (unsigned long int freq)
+void RIG_FT818ND::set_vfoB (unsigned long int freq)
 {
 	freqB = freq;
 	freq /=10; // 817 does not support 1 Hz resolution
@@ -190,7 +193,7 @@ void RIG_FT817::set_vfoB (unsigned long int freq)
 	setthex("set_vfoB");
 }
 
-int RIG_FT817::get_modeB()
+int RIG_FT818ND::get_modeB()
 {
 	init_cmd();
 	cmd[4] = 0x03;
@@ -202,18 +205,17 @@ int RIG_FT817::get_modeB()
 	}
 	int mode = replystr[4];
 	for (int i = 0; i < 8; i++)
-		if (FT817_mode_val[i] == mode) {
+		if (FT818ND_mode_val[i] == mode) {
 			modeB = i;
 			break;
 		}
 	return modeB;
 }
 
-void RIG_FT817::set_modeB(int val)
+void RIG_FT818ND::set_modeB(int val)
 {
-// OLD	if (ft817_memory_mode) return;
 	init_cmd();
-	cmd[0] = FT817_mode_val[val];
+	cmd[0] = FT818ND_mode_val[val];
 	cmd[4] = 0x07;
 	sendCommand(cmd);
 	setthex("set_modeB");
@@ -231,7 +233,7 @@ MilliSleep(100);
 
 //======================================================================
 // Tranceiver PTT on/off
-void RIG_FT817::set_PTT_control(int val)
+void RIG_FT818ND::set_PTT_control(int val)
 {
 	init_cmd();
 	if (val) cmd[4] = 0x08;
@@ -274,7 +276,7 @@ static int alc;
 // b0 PWR|SWR
 // b1 ALC|MOD
 
-int  RIG_FT817::get_power_out()
+int  RIG_FT818ND::get_power_out()
 {
 	init_cmd();
 	cmd[4] = 0xBD;
@@ -292,17 +294,17 @@ int  RIG_FT817::get_power_out()
 	return pmeter_map[fwdpwr];
 }
 
-int  RIG_FT817::get_swr()
+int  RIG_FT818ND::get_swr()
 {
 	return swr_map[swr];
 }
 
-int  RIG_FT817::get_alc()
+int  RIG_FT818ND::get_alc()
 {
 	return alc_map[alc];
 }
 
-int  RIG_FT817::get_smeter()
+int  RIG_FT818ND::get_smeter()
 {
 	init_cmd();
 	cmd[4] = 0xE7;
@@ -315,7 +317,7 @@ int  RIG_FT817::get_smeter()
 	return smeter_map[sval];
 }
 
-void RIG_FT817::set_split(bool val)
+void RIG_FT818ND::set_split(bool val)
 {
 	init_cmd();
 	if (val) cmd[4] = 0x02;
@@ -328,7 +330,7 @@ void RIG_FT817::set_split(bool val)
 }
 
 extern bool PTT;
-int  RIG_FT817::get_split()
+int  RIG_FT818ND::get_split()
 {
 	if (!PTT) return split;
 	init_cmd();
@@ -340,7 +342,8 @@ int  RIG_FT817::get_split()
 	return split;
 }
 
-int RIG_FT817::power_scale()
+int RIG_FT818ND::power_scale()
 {
     return 10;
 }
+
