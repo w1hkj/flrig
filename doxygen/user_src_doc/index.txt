@@ -469,11 +469,25 @@ The file is human readable.  Editing the file is not recommended.
 
 \subsection sMatFile  Memory File
 
-The contents of a typical transceiver prefs file contains:
+Operating frequency, mode, and bandwidth can be saved to a memory file.  Save the current values to the 
+memory file using the "Memory / Save" menu item.  Open the memory manager using the
+"Memory / Manage" menu item
+
+<center>
+\image latex MemoryDialog.png "" width=3.0in
+\image html MemoryDialog.png ""
+</center>
+
+The "Add", "Pick", "Del" and "Clr" buttons operate as labeled.
+
+Left click on a line to enable modifying the Tag line for that entry.  Terminate the tag entry with the "Enter" key.
+
+The contents of a typical transceiver .mat file contains:
 <br>
 <pre>
-7070000 9 34 "40 meter digital"
-14070000 9 34 "20 meter digital"
+020000 2 5 "40 CW"
+7070000 11 16 "PSK sub band"
+7089000 11 16 "Feld Hell net"
 </pre>
 Each line contains a frequency (Hz), Mode Nr., Bandwidth Nr., and "text tag"
 
