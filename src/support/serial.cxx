@@ -437,10 +437,12 @@ bool Cserial::OpenPort()
 			  0,
 			  0);
 
-LOG_ERROR("Open Comm port %s ; hComm = %d", COMportname.c_str(), (int)hComm);
+	size_t sterr = reinterpret_cast<size_t>(hComm);
+	int err = sterr;
+LOG_ERROR("Open Comm port %s ; hComm = %d", COMportname.c_str(), err);
 #if SERIAL_DEBUG
-	fl_alert("Open Comm port %s ; hComm = %d", COMportname.c_str(), (int)hComm);
-	fprintf(serlog, "Open Comm port %s ; hComm = %d\n", COMportname.c_str(), (int)hComm);
+	fl_alert("Open Comm port %s ; hComm = %d", COMportname.c_str(), err);
+	fprintf(serlog, "Open Comm port %s ; hComm = %d\n", COMportname.c_str(), err);
 #endif
 
 	if (hComm == INVALID_HANDLE_VALUE) return false;

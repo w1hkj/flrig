@@ -699,7 +699,7 @@ static void cb_sldrVOLUME(Fl_Wheel_Value_Slider*, void*) {
 }
 
 static void cb_btn_band_select(Fl_Button *, void *d) {
-	long lband = reinterpret_cast<long>(d);
+	size_t lband = reinterpret_cast<size_t>(d);
 	int band = lband;
 	cbBandSelect(band);
 }
@@ -833,7 +833,7 @@ static void cb_btn_xcvr_auto_off(Fl_Check_Button* o, void*) {
 }
 
 static void cb_btnUser( Fl_Button * o, void *d) {
-	long val = reinterpret_cast<long>(d);
+	size_t val = reinterpret_cast<size_t>(d);
 	if (((Fl::event_state() & FL_SHIFT) == FL_SHIFT) ||
 		(Fl::event_button() == FL_RIGHT_MOUSE)) {
 		switch (val) {

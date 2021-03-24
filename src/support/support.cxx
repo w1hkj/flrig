@@ -256,7 +256,7 @@ void read_vfo()
 		freq = selrig->get_vfoA();
 		if (freq != vfoA.freq) {
 			vfoA.freq = freq;
-			Fl::awake(setFreqDispA, (void *)vfoA.freq);
+			Fl::awake(setFreqDispA, reinterpret_cast<void *>(vfoA.freq));
 			vfo = &vfoA;
 		}
 		if ( selrig->twovfos() ) {
@@ -264,7 +264,7 @@ void read_vfo()
 			freq = selrig->get_vfoB();
 			if (freq != vfoB.freq) {
 				vfoB.freq = freq;
-				Fl::awake(setFreqDispB, (void *)vfoB.freq);
+				Fl::awake(setFreqDispB, reinterpret_cast<void *>(vfoB.freq));
 			}
 		}
 	} else { // vfo-B
@@ -272,7 +272,7 @@ void read_vfo()
 		freq = selrig->get_vfoB();
 		if (freq != vfoB.freq) {
 			vfoB.freq = freq;
-			Fl::awake(setFreqDispB, (void *)vfoB.freq);
+			Fl::awake(setFreqDispB, reinterpret_cast<void *>(vfoB.freq));
 			vfo = &vfoB;
 		}
 		if ( selrig->twovfos() ) {
@@ -280,7 +280,7 @@ void read_vfo()
 			freq = selrig->get_vfoA();
 			if (freq != vfoA.freq) {
 				vfoA.freq = freq;
-				Fl::awake(setFreqDispA, (void *)vfoA.freq);
+				Fl::awake(setFreqDispA, reinterpret_cast<void *>(vfoA.freq));
 			}
 		}
 	}
@@ -1369,7 +1369,7 @@ void serviceA(XCVR_STATE nuvals)
 			selrig->selectB();
 			vfoA = nuvals;
 		}
-		Fl::awake(setFreqDispA, (void *)nuvals.freq);
+		Fl::awake(setFreqDispA, reinterpret_cast<void *>(nuvals.freq));
 		return;
 	}
 
@@ -1407,7 +1407,7 @@ void serviceA(XCVR_STATE nuvals)
 }
 	vfo = &vfoA;
 
-	Fl::awake(setFreqDispA, (void *)vfoA.freq);
+	Fl::awake(setFreqDispA, reinterpret_cast<void *>(vfoA.freq));
 //	Fl::awake(updateUI);  // may be redundant
 }
 
@@ -1459,7 +1459,7 @@ void serviceB(XCVR_STATE nuvals)
 			selrig->selectA();
 			vfoB = nuvals;
 		}
-		Fl::awake(setFreqDispB, (void *)nuvals.freq);
+		Fl::awake(setFreqDispB, reinterpret_cast<void *>(nuvals.freq));
 		return;
 	}
 
@@ -1489,7 +1489,7 @@ void serviceB(XCVR_STATE nuvals)
 
 	vfo = &vfoB;
 
-	Fl::awake(setFreqDispB, (void *)vfoB.freq);
+	Fl::awake(setFreqDispB, reinterpret_cast<void *>(vfoB.freq));
 
 }
 
@@ -2331,7 +2331,8 @@ void cbAttenuator()
 
 void setAttControl(void *d)
 {
-	int val = (long)d;
+	size_t szd = reinterpret_cast<size_t>(d);
+	int val = szd;
 	btnAttenuator->value(val);
 }
 
@@ -2345,7 +2346,8 @@ void cbPreamp()
 
 void setPreampControl(void *d)
 {
-	int val = (long)d;
+	size_t szd = reinterpret_cast<size_t>(d);
+	int val = szd;
 	btnPreamp->value(val);
 }
 
@@ -2447,7 +2449,8 @@ void setIFshiftButton(void *d)
 
 void setIFshiftControl(void *d)
 {
-	int val = (long)d;
+	size_t szd = reinterpret_cast<size_t>(d);
+	int val = szd;
 	if (sldrIFSHIFT) {
 		if (sldrIFSHIFT->value() != val)
 			sldrIFSHIFT->value(val);
@@ -2958,7 +2961,8 @@ void setRFGAINControl(void* d)
 void updateALC(void * d)
 {
 	if (meter_image != ALC_IMAGE) return;
-	double data = (long)d;
+	size_t szd = reinterpret_cast<size_t>(d);
+	double data = szd;
 	sldrRcvSignal->hide();
 	sldrSWR->hide();
 	sldrALC->show();
@@ -2969,7 +2973,8 @@ void updateALC(void * d)
 void updateSWR(void * d)
 {
 	if (meter_image != SWR_IMAGE) return;
-	double data = (long)d;
+	size_t szd = reinterpret_cast<size_t>(d);
+	double data = szd;
 	if (selrig->has_swr_control) {
 		sldrRcvSignal->hide();
 		sldrALC->hide();
@@ -2981,7 +2986,8 @@ void updateSWR(void * d)
 
 void updateFwdPwr(void *d)
 {
-	double power = (long)d;
+	size_t szd = reinterpret_cast<size_t>(d);
+	double power = szd;
 	if (!sldrFwdPwr->visible()) {
 		sldrFwdPwr->show();
 	}
@@ -2995,20 +3001,22 @@ void updateFwdPwr(void *d)
 
 void updateSquelch(void *d)
 {
-	if (sldrSQUELCH) sldrSQUELCH->value((long)d);
+	size_t szd = reinterpret_cast<size_t>(d);
+	if (sldrSQUELCH) sldrSQUELCH->value(szd);
 	if (sldrSQUELCH) sldrSQUELCH->redraw();
-	if (spnrSQUELCH) spnrSQUELCH->value((long)d);
+	if (spnrSQUELCH) spnrSQUELCH->value(szd);
 	if (spnrSQUELCH) spnrSQUELCH->redraw();
 }
 
 void updateRFgain(void *d)
 {
+	size_t szd = reinterpret_cast<size_t>(d);
 	if (spnrRFGAIN) {
-		spnrRFGAIN->value((long)d);
+		spnrRFGAIN->value(szd);
 		spnrRFGAIN->redraw();
 	}
 	if (sldrRFGAIN) {
-		sldrRFGAIN->value((long)d);
+		sldrRFGAIN->value(szd);
 		sldrRFGAIN->redraw();
 	}
 }
@@ -3025,21 +3033,24 @@ void zeroXmtMeters(void *d)
 
 void setFreqDispA(void *d)
 {
-	long f = (long)d;
+	size_t szd = reinterpret_cast<size_t>(d);
+	long f = szd;
 	FreqDispA->value(f);
 	FreqDispA->redraw();
 }
 
 void setFreqDispB(void *d)
 {
-	long f = (long)d;
+	size_t szd = reinterpret_cast<size_t>(d);
+	long f = szd;
 	FreqDispB->value(f);
 	FreqDispB->redraw();
 }
 
 void updateSmeter(void *d) // 0 to 100;
 {
-	double smeter = (long)d;
+	size_t szd = reinterpret_cast<size_t>(d);
+	double smeter = szd;
 	if (!sldrRcvSignal->visible()) {
 		sldrRcvSignal->show();
 		sldrFwdPwr->hide();
@@ -3075,7 +3086,7 @@ void setPTT( void *d)
 {
 	guard_lock que_lock(&mutex_srvc_reqs, "setPTT");
 
-	int set = (long)d;
+	int set = reinterpret_cast<size_t>(d);
 
 	VFOQUEUE xcvrptt;
 	if (set) xcvrptt.change = ON;

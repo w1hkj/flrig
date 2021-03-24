@@ -731,7 +731,7 @@ static void cb_btn_icom_post(Fl_Button *o, void*) {
 }
 
 static void cb_cmdlbl(Fl_Input2 *o, void *d) {
-	long val = reinterpret_cast<long>(d);
+	size_t val = reinterpret_cast<size_t>(d);
 	struct BPAIR { std::string *plbl; Fl_Button *b; } bpairs[] =
 	{ { &progStatus.label1, btnUser1 },
 	  { &progStatus.label2, btnUser2 },
@@ -767,7 +767,7 @@ static void cb_cmdlbl(Fl_Input2 *o, void *d) {
 }
 
 static void cb_cmdtext(Fl_Input2 *o, void *d) {
-	long val = reinterpret_cast<long>(d);
+	size_t val = reinterpret_cast<size_t>(d);
 	std::string *cmd[] =
 	{ &progStatus.command1, &progStatus.command2,
 	  &progStatus.command3, &progStatus.command4,
@@ -788,7 +788,7 @@ static void cb_cmdtext(Fl_Input2 *o, void *d) {
 }
 
 static void cb_shftcmdtext(Fl_Input2 *o, void *d) {
-	long val = reinterpret_cast<long>(d);
+	size_t val = reinterpret_cast<size_t>(d);
 	std::string *cmd[] =
 	{ &progStatus.shftcmd1, &progStatus.shftcmd2,
 	  &progStatus.shftcmd3, &progStatus.shftcmd4,
@@ -1865,17 +1865,17 @@ Fl_Group *createCOMMANDS(int X, int Y, int W, int H, const char *label)
 			cmdbtns[n] = new Fl_Input2(X + 27, Y + 46 + (n % 4) * 40, 80, 20, lbl[n]);
 			cmdbtns[n]->align(FL_ALIGN_LEFT);
 			cmdbtns[n]->value(cmdlbls[n]->c_str());
-			cmdbtns[n]->callback((Fl_Callback*)cb_cmdlbl, (void *)long(n));
+			cmdbtns[n]->callback((Fl_Callback*)cb_cmdlbl, reinterpret_cast<void *>(n));
 
 			cmdtexts[n] = new Fl_Input2(X + 110, Y + 46 + (n % 4) * 40, W - 110 - 2, 20, "");
 			cmdtexts[n]->align(FL_ALIGN_LEFT);
 			cmdtexts[n]->value(cmd[n]->c_str());
-			cmdtexts[n]->callback((Fl_Callback*)cb_cmdtext, (void *)long(n));
+			cmdtexts[n]->callback((Fl_Callback*)cb_cmdtext, reinterpret_cast<void *>(n));
 
 			shftcmdtexts[n] = new Fl_Input2(X + 110, Y + 66 + (n % 4) * 40, W - 110 - 2, 20, "SHIFT");
 			shftcmdtexts[n]->align(FL_ALIGN_LEFT);
 			shftcmdtexts[n]->value(shftcmd[n]->c_str());
-			shftcmdtexts[n]->callback((Fl_Callback*)cb_shftcmdtext, (void *)long(n));
+			shftcmdtexts[n]->callback((Fl_Callback*)cb_shftcmdtext, reinterpret_cast<void *>(n));
 		}
 
 	tabCmds1->end();
@@ -1894,17 +1894,17 @@ Fl_Group *createCOMMANDS(int X, int Y, int W, int H, const char *label)
 			cmdbtns[n] = new Fl_Input2(X + 27, Y + 46 + (n % 4) * 40, 80, 20, lbl[n]);
 			cmdbtns[n]->align(FL_ALIGN_LEFT);
 			cmdbtns[n]->value(cmdlbls[n]->c_str());
-			cmdbtns[n]->callback((Fl_Callback*)cb_cmdlbl, (void *)long(n));
+			cmdbtns[n]->callback((Fl_Callback*)cb_cmdlbl, reinterpret_cast<void *>(n));
 
 			cmdtexts[n] = new Fl_Input2(X + 110, Y + 46 + (n % 4) * 40, W - 110 - 2, 20, "");
 			cmdtexts[n]->align(FL_ALIGN_LEFT);
 			cmdtexts[n]->value(cmd[n]->c_str());
-			cmdtexts[n]->callback((Fl_Callback*)cb_cmdtext, (void *)long(n));
+			cmdtexts[n]->callback((Fl_Callback*)cb_cmdtext, reinterpret_cast<void *>(n));
 
 			shftcmdtexts[n] = new Fl_Input2(X + 110, Y + 66 + (n % 4) * 40, W - 110 - 2, 20, "SHIFT");
 			shftcmdtexts[n]->align(FL_ALIGN_LEFT);
 			shftcmdtexts[n]->value(shftcmd[n]->c_str());
-			shftcmdtexts[n]->callback((Fl_Callback*)cb_shftcmdtext, (void *)long(n));
+			shftcmdtexts[n]->callback((Fl_Callback*)cb_shftcmdtext, reinterpret_cast<void *>(n));
 		}
 
 	tabCmds2->end();
@@ -1924,17 +1924,17 @@ Fl_Group *createCOMMANDS(int X, int Y, int W, int H, const char *label)
 			cmdbtns[n] = new Fl_Input2(X + 27, Y + 46 + (n % 4) * 40, 80, 20, lbl[n]);
 			cmdbtns[n]->align(FL_ALIGN_LEFT);
 			cmdbtns[n]->value(cmdlbls[n]->c_str());
-			cmdbtns[n]->callback((Fl_Callback*)cb_cmdlbl, (void *)long(n));
+			cmdbtns[n]->callback((Fl_Callback*)cb_cmdlbl, reinterpret_cast<void *>(n));
 
 			cmdtexts[n] = new Fl_Input2(X + 110, Y + 46 + (n % 4) * 40, W - 110 - 2, 20, "");
 			cmdtexts[n]->align(FL_ALIGN_LEFT);
 			cmdtexts[n]->value(cmd[n]->c_str());
-			cmdtexts[n]->callback((Fl_Callback*)cb_cmdtext, (void *)long(n));
+			cmdtexts[n]->callback((Fl_Callback*)cb_cmdtext, reinterpret_cast<void *>(n));
 
 			shftcmdtexts[n] = new Fl_Input2(X + 110, Y + 66 + (n % 4) * 40, W - 110 - 2, 20, "SHIFT");
 			shftcmdtexts[n]->align(FL_ALIGN_LEFT);
 			shftcmdtexts[n]->value(shftcmd[n]->c_str());
-			shftcmdtexts[n]->callback((Fl_Callback*)cb_shftcmdtext, (void *)long(n));
+			shftcmdtexts[n]->callback((Fl_Callback*)cb_shftcmdtext, reinterpret_cast<void *>(n));
 		}
 
 	tabCmds3->end();
@@ -1953,17 +1953,17 @@ Fl_Group *createCOMMANDS(int X, int Y, int W, int H, const char *label)
 			cmdbtns[n] = new Fl_Input2(X + 27, Y + 46 + (n % 4) * 40, 80, 20, lbl[n]);
 			cmdbtns[n]->align(FL_ALIGN_LEFT);
 			cmdbtns[n]->value(cmdlbls[n]->c_str());
-			cmdbtns[n]->callback((Fl_Callback*)cb_cmdlbl, (void *)long(n));
+			cmdbtns[n]->callback((Fl_Callback*)cb_cmdlbl, reinterpret_cast<void *>(n));
 
 			cmdtexts[n] = new Fl_Input2(X + 110, Y + 46 + (n % 4) * 40, W - 110 - 2, 20, "");
 			cmdtexts[n]->align(FL_ALIGN_LEFT);
 			cmdtexts[n]->value(cmd[n]->c_str());
-			cmdtexts[n]->callback((Fl_Callback*)cb_cmdtext, (void *)long(n));
+			cmdtexts[n]->callback((Fl_Callback*)cb_cmdtext, reinterpret_cast<void *>(n));
 
 			shftcmdtexts[n] = new Fl_Input2(X + 110, Y + 66 + (n % 4) * 40, W - 110 - 2, 20, "SHIFT");
 			shftcmdtexts[n]->align(FL_ALIGN_LEFT);
 			shftcmdtexts[n]->value(shftcmd[n]->c_str());
-			shftcmdtexts[n]->callback((Fl_Callback*)cb_shftcmdtext, (void *)long(n));
+			shftcmdtexts[n]->callback((Fl_Callback*)cb_shftcmdtext, reinterpret_cast<void *>(n));
 		}
 
 	tabCmds4->end();
@@ -1982,17 +1982,17 @@ Fl_Group *createCOMMANDS(int X, int Y, int W, int H, const char *label)
 			cmdbtns[n] = new Fl_Input2(X + 27, Y + 46 + (n % 4) * 40, 80, 20, lbl[n]);
 			cmdbtns[n]->align(FL_ALIGN_LEFT);
 			cmdbtns[n]->value(cmdlbls[n]->c_str());
-			cmdbtns[n]->callback((Fl_Callback*)cb_cmdlbl, (void *)long(n));
+			cmdbtns[n]->callback((Fl_Callback*)cb_cmdlbl, reinterpret_cast<void *>(n));
 
 			cmdtexts[n] = new Fl_Input2(X + 110, Y + 46 + (n % 4) * 40, W - 110 - 2, 20, "");
 			cmdtexts[n]->align(FL_ALIGN_LEFT);
 			cmdtexts[n]->value(cmd[n]->c_str());
-			cmdtexts[n]->callback((Fl_Callback*)cb_cmdtext, (void *)long(n));
+			cmdtexts[n]->callback((Fl_Callback*)cb_cmdtext, reinterpret_cast<void *>(n));
 
 			shftcmdtexts[n] = new Fl_Input2(X + 110, Y + 66 + (n % 4) * 40, W - 110 - 2, 20, "SHIFT");
 			shftcmdtexts[n]->align(FL_ALIGN_LEFT);
 			shftcmdtexts[n]->value(shftcmd[n]->c_str());
-			shftcmdtexts[n]->callback((Fl_Callback*)cb_shftcmdtext, (void *)long(n));
+			shftcmdtexts[n]->callback((Fl_Callback*)cb_shftcmdtext, reinterpret_cast<void *>(n));
 		}
 
 	tabCmds5->end();
@@ -2011,17 +2011,17 @@ Fl_Group *createCOMMANDS(int X, int Y, int W, int H, const char *label)
 			cmdbtns[n] = new Fl_Input2(X + 27, Y + 46 + (n % 4) * 40, 80, 20, lbl[n]);
 			cmdbtns[n]->align(FL_ALIGN_LEFT);
 			cmdbtns[n]->value(cmdlbls[n]->c_str());
-			cmdbtns[n]->callback((Fl_Callback*)cb_cmdlbl, (void *)long(n));
+			cmdbtns[n]->callback((Fl_Callback*)cb_cmdlbl, reinterpret_cast<void *>(n));
 
 			cmdtexts[n] = new Fl_Input2(X + 110, Y + 46 + (n % 4) * 40, W - 110 - 2, 20, "");
 			cmdtexts[n]->align(FL_ALIGN_LEFT);
 			cmdtexts[n]->value(cmd[n]->c_str());
-			cmdtexts[n]->callback((Fl_Callback*)cb_cmdtext, (void *)long(n));
+			cmdtexts[n]->callback((Fl_Callback*)cb_cmdtext, reinterpret_cast<void *>(n));
 
 			shftcmdtexts[n] = new Fl_Input2(X + 110, Y + 66 + (n % 4) * 40, W - 110 - 2, 20, "SHIFT");
 			shftcmdtexts[n]->align(FL_ALIGN_LEFT);
 			shftcmdtexts[n]->value(shftcmd[n]->c_str());
-			shftcmdtexts[n]->callback((Fl_Callback*)cb_shftcmdtext, (void *)long(n));
+			shftcmdtexts[n]->callback((Fl_Callback*)cb_shftcmdtext, reinterpret_cast<void *>(n));
 		}
 
 	tabCmds6->end();

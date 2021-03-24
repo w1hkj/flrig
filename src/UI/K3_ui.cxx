@@ -54,13 +54,13 @@ void read_K3()
 		freq = selrig->get_vfoA();
 		if (freq != vfoA.freq) {
 			vfoA.freq = freq;
-			Fl::awake(setFreqDispA, (void *)vfoA.freq);
+			Fl::awake(setFreqDispA, reinterpret_cast<void *>(vfoA.freq));
 			vfo = &vfoA;
 		}
 		freq = selrig->get_vfoB();
 		if (freq != vfoB.freq) {
 			vfoB.freq = freq;
-			Fl::awake(setFreqDispB, (void *)vfoB.freq);
+			Fl::awake(setFreqDispB, reinterpret_cast<void *>(vfoB.freq));
 		}
 	}
 

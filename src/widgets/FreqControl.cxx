@@ -61,7 +61,7 @@ void cbSelectDigit (Fl_Widget *btn, void * nbr)
 {
 
 	Fl_Button *b = (Fl_Button *)btn;
-	int Nbr = (int)(reinterpret_cast<long> (nbr));
+	size_t Nbr = reinterpret_cast<size_t>(nbr);
 
 	cFreqControl *fc = (cFreqControl *)b->parent();
 	if (fc->hrd_buttons) {

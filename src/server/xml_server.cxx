@@ -375,7 +375,7 @@ public:
 		guard_lock serial(&mutex_serial);
 
 		vfoA.freq = selrig->get_vfoA();
-		Fl::awake(setFreqDispA, (void *)vfoA.freq);
+		Fl::awake(setFreqDispA, reinterpret_cast<void *>(vfoA.freq));
 
 		static char szfreq[20];
 		snprintf(szfreq, sizeof(szfreq), "%d", (int)vfoA.freq);
@@ -404,7 +404,7 @@ public:
 		guard_lock serial(&mutex_serial);
 
 		vfoB.freq = selrig->get_vfoB();
-		Fl::awake(setFreqDispB, (void *)vfoB.freq);
+		Fl::awake(setFreqDispB, reinterpret_cast<void *>(vfoB.freq));
 
 		static char szfreq[20];
 		snprintf(szfreq, sizeof(szfreq), "%d", (int)vfoB.freq);
@@ -1417,7 +1417,7 @@ public:
 		srvr_vfo.freq = selrig->get_vfoA();
 		vfoA = srvr_vfo;
 
-		Fl::awake(setFreqDispA, (void *)vfoA.freq);
+		Fl::awake(setFreqDispA, reinterpret_cast<void *>(vfoA.freq));
 	}
 	std::string help() { return std::string("rig.set_vfo NNNNNNNN (Hz)"); }
 
@@ -1446,7 +1446,7 @@ public:
 		srvr_vfo.freq = selrig->get_vfoB();
 		vfoB = srvr_vfo;
 
-		Fl::awake(setFreqDispB, (void *)vfoB.freq);
+		Fl::awake(setFreqDispB, reinterpret_cast<void *>(vfoB.freq));
 	}
 	std::string help() { return std::string("rig.set_vfo NNNNNNNN (Hz)"); }
 
