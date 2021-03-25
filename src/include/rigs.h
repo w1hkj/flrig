@@ -83,6 +83,7 @@
 #include "KX3.h"
 #include "PCR1000.h"
 #include "RAY152.h"
+#include "TMD710.h"
 #include "TS140.h"
 #include "TS450S.h"
 #include "TS480HX.h"
@@ -172,33 +173,34 @@ extern RIG_K3			rig_K3;			// 58
 extern RIG_KX3			rig_KX3;		// 59
 extern RIG_PCR1000		rig_PCR1000;	// 60
 extern RIG_RAY152		rig_RAY152;		// 61
-extern RIG_TS140		rig_TS140;		// 62
-extern RIG_TS450S		rig_TS450S;		// 63
-extern RIG_TS480HX		rig_TS480HX;	// 64
-extern RIG_TS480SAT	    rig_TS480SAT;	// 65
-extern RIG_TS570		rig_TS570;		// 66
-extern RIG_TS590S		rig_TS590S;		// 67
-extern RIG_TS590SG		rig_TS590SG;	// 68
-extern RIG_TS790		rig_TS790;		// 69
-extern RIG_TS850		rig_TS850;		// 70
-extern RIG_TS870S		rig_TS870S;		// 71
-extern RIG_TS890S		rig_TS890S;		// 72
-extern RIG_TS940S		rig_TS940S;		// 73
-extern RIG_TS950		rig_TS950;		// 74
-extern RIG_TS990		rig_TS990;		// 75
-extern RIG_TS2000		rig_TS2000;		// 76
-extern RIG_TT516		rig_TT516;		// 77
-extern RIG_TT535		rig_TT535;		// 78
-extern RIG_TT538		rig_TT538;		// 79
-extern RIG_TT550		rig_TT550;		// 80
-extern RIG_TT563		rig_TT563;		// 81
-extern RIG_TT566		rig_TT566;		// 82
-extern RIG_TT588		rig_TT588;		// 83
-extern RIG_TT599		rig_TT599;		// 84
-extern RIG_AOR5K		rig_AOR5K;		// 85
-extern RIG_XI5105		rig_XI5105;		// 86
-extern RIG_Xiegu_G90	rig_XIG90;		// 87
-extern RIG_PowerSDR		rig_PowerSDR;	// 88
+extern RIG_TMD710		rig_TMD710;		// 62
+extern RIG_TS140		rig_TS140;		// 63
+extern RIG_TS450S		rig_TS450S;		// 64
+extern RIG_TS480HX		rig_TS480HX;	// 65
+extern RIG_TS480SAT	    rig_TS480SAT;	// 66
+extern RIG_TS570		rig_TS570;		// 67
+extern RIG_TS590S		rig_TS590S;		// 68
+extern RIG_TS590SG		rig_TS590SG;	// 69
+extern RIG_TS790		rig_TS790;		// 60
+extern RIG_TS850		rig_TS850;		// 71
+extern RIG_TS870S		rig_TS870S;		// 72
+extern RIG_TS890S		rig_TS890S;		// 73
+extern RIG_TS940S		rig_TS940S;		// 74
+extern RIG_TS950		rig_TS950;		// 75
+extern RIG_TS990		rig_TS990;		// 76
+extern RIG_TS2000		rig_TS2000;		// 77
+extern RIG_TT516		rig_TT516;		// 78
+extern RIG_TT535		rig_TT535;		// 79
+extern RIG_TT538		rig_TT538;		// 80
+extern RIG_TT550		rig_TT550;		// 81
+extern RIG_TT563		rig_TT563;		// 82
+extern RIG_TT566		rig_TT566;		// 83
+extern RIG_TT588		rig_TT588;		// 84
+extern RIG_TT599		rig_TT599;		// 85
+extern RIG_AOR5K		rig_AOR5K;		// 86
+extern RIG_XI5105		rig_XI5105;		// 87
+extern RIG_Xiegu_G90	rig_XIG90;		// 88
+extern RIG_PowerSDR		rig_PowerSDR;	// 89
 
 
 #endif

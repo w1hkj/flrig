@@ -192,6 +192,7 @@ flrig_SOURCES += \
 	rigs/PCR1000.cxx \
 	rigs/PowerSDR.cxx \
 	rigs/RAY152.cxx \
+	rigs/TMD710.cxx \
 	rigs/TS140.cxx \
 	rigs/TS450S.cxx \
 	rigs/TS480HX.cxx \
@@ -361,6 +362,7 @@ EXTRA_DIST = \
 	include/support.h \
 	include/threads.h \
 	include/trace.h \
+	include/TMD710.h \
 	include/TS140.h \
 	include/TS450S.h \
 	include/TS480HX.h \
