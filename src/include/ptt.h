@@ -28,5 +28,6 @@
 #include <math.h>
 
 extern void rigPTT(bool);
+extern bool rigPTT();
 
 #endif

@@ -88,3 +88,30 @@ void rigPTT(bool on)
 		LOG_DEBUG("No PTT i/o connected");
 	}
 }
+
+bool rigPTT()
+{
+	if (progStatus.comm_catptt) {
+		return selrig->get_PTT();
+	} 
+	else if (progStatus.comm_dtrptt) {
+		return RigSerial->DTRptt();
+	} 
+	else if (progStatus.comm_rtsptt) {
+		return RigSerial->RTSptt();
+	} 
+	else if (SepSerial->IsOpen()) {
+		if (progStatus.sep_dtrptt)
+			return RigSerial->DTRptt();
+		else if (progStatus.sep_rtsptt)
+			return SepSerial->RTSptt();
+	} 
+	else if (progStatus.gpio_ptt) {
+		return get_gpio();
+	} 
+	else {
+		LOG_DEBUG("No PTT i/o connected");
+	}
+	return false;
+}
+

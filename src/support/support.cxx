@@ -1180,17 +1180,16 @@ void serviceQUE()
 				Fl::awake(update_UI_PTT);
 				return;
 			}
-
 			PTT = (nuvals.change == ON);
 			if (nuvals.change == ON) trace(1,"ptt ON");
 			else trace(1,"ptt OFF");
 			rigPTT(PTT);
-			if (progStatus.comm_catptt) {
-				int get = selrig->get_PTT();
+			{
+				bool get = rigPTT();
 				int cnt = 0;
 				while ((get != PTT) && (cnt++ < 100)) {
 					MilliSleep(10);
-					get = selrig->get_PTT();
+					get = rigPTT();
 				}
 				stringstream s;
 				s << "ptt returned " << get << " in " << cnt * 10 << " msec";
