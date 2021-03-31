@@ -28,10 +28,14 @@
 
 #include "morse.h"
 #include "serial.h"
+#include "threads.h"
 
 extern Fl_Double_Window *cwio_keyer_dialog;
 extern Fl_Double_Window *cwio_editor;
 extern Fl_Double_Window *cwio_configure;
+
+extern pthread_mutex_t cwio_text_mutex;
+extern string cwio_text;
 
 extern Cserial *cwio_serial;
 extern Cmorse  *morse;

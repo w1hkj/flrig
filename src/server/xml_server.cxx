@@ -1990,9 +1990,9 @@ static void set_cwio_wpm(void *)
 	}
 }
 
-class rig_cwio_wpm : public XmlRpcServerMethod {
+class rig_cwio_set_wpm : public XmlRpcServerMethod {
 public:
-	rig_cwio_wpm(XmlRpcServer* s) : XmlRpcServerMethod("rig.cwio_wpm", s) {}
+	rig_cwio_set_wpm(XmlRpcServer* s) : XmlRpcServerMethod("rig.cwio_set_wpm", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 		cwio_wpm = int(params[0]);
@@ -2001,28 +2001,36 @@ public:
 
 	std::string help() { return std::string("sets DTR/RTS WPM rate"); }
 
-} rig_set_cwio_wpm(&rig_server);
+} rig_cwio_set_wpm(&rig_server);
+
+class rig_cwio_get_wpm : public XmlRpcServerMethod {
+public:
+	rig_cwio_get_wpm(XmlRpcServer* s) : XmlRpcServerMethod("rig.cwio_get_wpm", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		result = int(progStatus.cwioWPM);
+	}
+
+	std::string help() { return std::string("sets DTR/RTS WPM rate"); }
+
+} rig_cwio_get_wpm(&rig_server);
+
 
 //------------------------------------------------------------------------------
 // Set cwio transmit string
 //------------------------------------------------------------------------------
 
 extern void add_cwio(string);
-static string cwio_text;
-static void add_to_cwio_text(void *)
-{
-	add_cwio(cwio_text);
-	cwio_text.clear();
-}
+string cwio_text;
 
 class rig_cwio_text : public XmlRpcServerMethod {
 public:
 	rig_cwio_text(XmlRpcServer* s) : XmlRpcServerMethod("rig.cwio_text", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		result = 0;
-		cwio_text = std::string(params[0]);
-		Fl::awake(add_to_cwio_text);
+		std::string s = (string)params[0];
+		guard_lock lck(&cwio_text_mutex);
+		cwio_text.append(s);
 	}
 
 	std::string help() { return std::string("sends text using cwio DTR/RTS keying"); }
@@ -2037,10 +2045,10 @@ static void set_cwio_send_button(void *val)
 {
 	if (val == (void *)1) {
 		btn_cwioSEND->value(1);
-		send_text(true);
 	} else {
 		btn_cwioSEND->value(0);
-		send_text(false);
+		guard_lock lck(&cwio_text_mutex);
+		cwio_text.clear();
 	}
 	btn_cwioSEND->redraw();
 }
@@ -2051,6 +2059,7 @@ public:
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 		int send_state = int(params[0]);
+		send_text(send_state);
 		Fl::awake(set_cwio_send_button, reinterpret_cast<void *>(send_state));
 	}
 
@@ -2142,6 +2151,7 @@ struct MLIST {
 	{ "rig.shutdown",     "i:n", "shutdown xcvr & flrig" },
 	{ "rig.cwio_wpm",     "n:i", "set cwio WPM" },
 	{ "rig.cwio_text",    "i:s", "send text via cwio interface" },
+	{ "rig.cwio_char",    "n:i", "send char via cwio interface" },
 	{ "rig.cwio_send",    "n:i", "cwio transmit 1/0 (on/off)"}
 };
 

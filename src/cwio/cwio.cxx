@@ -51,7 +51,7 @@ Cmorse  *morse = 0;
 static pthread_t       cwio_pthread;
 static pthread_cond_t  cwio_cond;
 static pthread_mutex_t cwio_mutex = PTHREAD_MUTEX_INITIALIZER;
-//static pthread_mutex_t cwio_text_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t cwio_text_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 enum { NONE, START, ADD, SEND, END, TERMINATE, CALIBRATE };
 int cwio_process = NONE;
@@ -144,6 +144,7 @@ void close_cwkey()
 }
 
 static string snd;
+
 void update_txt_to_send(void *)
 {
 	txt_to_send->value(snd.c_str());
@@ -152,20 +153,29 @@ void update_txt_to_send(void *)
 
 void sending_text()
 {
-	char c;
+	char c = 0;
 	if (progStatus.cwioPTT) {
 		setPTT((void *)1);
 		MilliSleep(progStatus.cwioPTT);
 	}
 	while (cwio_process == SEND) {
-		snd = txt_to_send->value();
-		if (snd.empty()) MilliSleep(10);
-		else {
-			c = snd[0];
-			snd.erase(0,1);
-			Fl::awake(update_txt_to_send);
-			send_cwkey(c);
+		c = 0;
+		{	guard_lock lck(&cwio_text_mutex);
+			if (!cwio_text.empty()) {
+				c = cwio_text[0];
+				cwio_text.erase(0,1);
+			}
 		}
+		if (!c) {
+			snd = txt_to_send->value();
+			if (!snd.empty()) {
+				c = snd[0];
+				snd.erase(0,1);
+				Fl::awake(update_txt_to_send);
+			}
+		}
+		if (c) send_cwkey(c);
+		else MilliSleep(5);
 	}
 	if (progStatus.cwioPTT) {
 		setPTT((void *)0);
