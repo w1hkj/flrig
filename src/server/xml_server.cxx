@@ -1018,7 +1018,7 @@ public:
 		if (!xcvr_online) return;
 
 		wait();
-		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_bwA");
+		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_bwB");
 
 		int BW = vfoB.iBW;
 		int mode = vfoB.imode;
