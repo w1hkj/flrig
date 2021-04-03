@@ -1,5 +1,5 @@
 // ----------------------------------------------------------------------------
-// Copyright (C) 2021
+// Copyright (C) 2014
 //              David Freese, W1HKJ
 //
 // This file is part of flrig.
@@ -15,29 +15,31 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
+
+// this uses an undocumented CAT READ command which
+// reads but does not set the byte located at 0x0055 in the xcvr EEPROM
+// bit 7 set == Vfo A/B in use, unset == Memory operation
+// bit 0 set == Vfo A, unset == Vfo B
+
 #include <iostream>
 #include <sstream>
 
-#include "FT817.h"
+#include "FT817BB.h"
 
 #include "rigpanel.h"
 
-//=============================================================================
-// FT817
-//=============================================================================
-
-static const char FT817name_[] = "FT-817";
-static const char *FT817modes_[] = {
+static const char FT817BBname_[] = "FT-817BB";
+static const char *FT817BBmodes_[] = {
 		"LSB", "USB", "CW", "CW-R", "AM", "FM", "DIG", "PKT", NULL};
-static const int FT817_mode_val[] =  { 0, 1, 2, 3, 4, 8, 0x0A, 0x0C };
-static const char FT817_mode_type[] = { 'L', 'U', 'U', 'L', 'U', 'U', 'U', 'U' };
+static const int FT817BB_mode_val[] =  { 0, 1, 2, 3, 4, 8, 0x0A, 0x0C };
+static const char FT817BB_mode_type[] = { 'L', 'U', 'U', 'L', 'U', 'U', 'U', 'U' };
 
-RIG_FT817::RIG_FT817() {
+RIG_FT817BB::RIG_FT817BB() {
 // base class values	
-	name_ = FT817name_;
-	modes_ = FT817modes_;
+	name_ = FT817BBname_;
+	modes_ = FT817BBmodes_;
 	comm_baudrate = BR4800;
 	stopbits = 2;
 	comm_retries = 2;
@@ -56,6 +58,7 @@ RIG_FT817::RIG_FT817() {
 	has_split_AB =
 	has_swr_control =
 	has_alc_control =
+	has_getvfoAorB =
 	has_vfoAB = 
 	has_smeter =
 	has_power_out =
@@ -67,31 +70,68 @@ RIG_FT817::RIG_FT817() {
 
 }
 
-void RIG_FT817::init_cmd()
+void RIG_FT817BB::init_cmd()
 {
 	cmd = "00000";
 	for (size_t i = 0; i < 5; i++) cmd[i] = 0;
 }
 
-void RIG_FT817::selectA()
+static bool ft817BB_memory_mode = false;
+
+void memory_label(void *)
 {
+	if (ft817BB_memory_mode) labelMEMORY->show();
+	else  labelMEMORY->hide();
+}
+
+int RIG_FT817BB::get_vfoAorB()
+{
+	return replystr[0] & 0x01;
 	init_cmd();
-	// Without the ability to check VFO-A or B, just toggle them
+	cmd[1] = 0x55;
+	cmd[4] = 0xBB;
+	int ret = waitN(2, 100, "get active VFO", HEX);
+	int i = 0;
+	while (ret != 2 && i++ < 10) {
+		ret = waitN(2, 100, "get active VFO", HEX);
+	}
+	if (i == 10) {
+		return -1;
+	}
+	getthex("get active VFO");
+
+	ft817BB_memory_mode = ((replystr[0] & 0x80) == 0x00);
+	Fl::awake(memory_label);
+
+	return replystr[0] & 0x01;
+}
+
+void RIG_FT817BB::selectA()
+{
+	int use = get_vfoAorB();
+
+	if (use <= 0) return;
+	if (ft817BB_memory_mode) return;
+
+	init_cmd();
 	cmd[4] = 0x81;
 	sendCommand(cmd);
 	setthex("Select VFO A");
 }
 
-void RIG_FT817::selectB()
+void RIG_FT817BB::selectB()
 {
+	int use = get_vfoAorB();
+	if (use == 1) return;
+	if (use == -1) return;
+	if (ft817BB_memory_mode) return;
 	init_cmd();
 	cmd[4] = 0x81;
-	// Without the ability to check VFO-A or B, just toggle them
 	sendCommand(cmd);
 	setthex("Select VFO B");
 }
 
-bool RIG_FT817::check ()
+bool RIG_FT817BB::check ()
 {
 	init_cmd();
 	cmd[4] = 0x03;
@@ -101,8 +141,12 @@ bool RIG_FT817::check ()
 	return true;
 }
 
-unsigned long int RIG_FT817::get_vfoA ()
+unsigned long int RIG_FT817BB::get_vfoA ()
 {
+	int use = get_vfoAorB();
+	if (use == -1) return freqA;
+	if (use == 1) return freqA;
+	if (ft817BB_memory_mode) return freqA;
 	init_cmd();
 	cmd[4] = 0x03;
 	int ret = waitN(5, 100, "get vfoA");
@@ -114,18 +158,36 @@ unsigned long int RIG_FT817::get_vfoA ()
 	return freqA;
 }
 
-void RIG_FT817::set_vfoA (unsigned long int freq)
+//void RIG_FT817BB::set_getACK() {
+//	for (int i = 0; i < 5; i++) {
+//		sendCommand(cmd, 0);
+//		for (int j = 0; j < 10; j++) {
+//			if (readResponse() == 1) return;
+//			MilliSleep(50);
+//		}
+//	}
+//}
+
+void RIG_FT817BB::set_vfoA (unsigned long int freq)
 {
+	int use = get_vfoAorB();
+	if (use == -1) return;
+	if (use == 1) return;
+	if (ft817BB_memory_mode) return;
 	freqA = freq;
-	freq /=10; // 817 does not support 1 Hz resolution
+	freq /=10; // 817BB does not support 1 Hz resolution
 	cmd = to_bcd(freq, 8);
 	cmd += 0x01;
 	sendCommand(cmd);
 	setthex("set_vfoA");
 }
 
-int RIG_FT817::get_modeA()
+int RIG_FT817BB::get_modeA()
 {
+	int use = get_vfoAorB();
+	if (use == -1) return modeA;
+	if (use == 1) return modeA;
+	if (ft817BB_memory_mode) return modeA;
 	init_cmd();
 	cmd[4] = 0x03;
 	int ret = waitN(5, 100, "get mode A");
@@ -135,30 +197,35 @@ int RIG_FT817::get_modeA()
 	}
 	int mode = replystr[4];
 	for (int i = 0; i < 8; i++)
-		if (FT817_mode_val[i] == mode) {
+		if (FT817BB_mode_val[i] == mode) {
 			modeA = i;
 			break;
 		}
 	return modeA;
 }
 
-int RIG_FT817::get_modetype(int n)
+int RIG_FT817BB::get_modetype(int n)
 {
-	return FT817_mode_type[n];
+	return FT817BB_mode_type[n];
 }
 
-void RIG_FT817::set_modeA(int val)
+void RIG_FT817BB::set_modeA(int val)
 {
+	if (ft817BB_memory_mode) return;
 	init_cmd();
-	cmd[0] = FT817_mode_val[val];
+	cmd[0] = FT817BB_mode_val[val];
 	cmd[4] = 0x07;
 	sendCommand(cmd);
 	setthex("set_modeA");
 }
 
 // VFO B ===============================================================
-unsigned long int RIG_FT817::get_vfoB ()
+unsigned long int RIG_FT817BB::get_vfoB ()
 {
+	int use = get_vfoAorB();
+	if (use == -1) return freqB;
+	if (use == 0) return freqB;
+	if (ft817BB_memory_mode) return freqB;
 	init_cmd();
 	cmd[4] = 0x03;
 	int ret = waitN(5, 100, "get vfoB");
@@ -170,18 +237,26 @@ unsigned long int RIG_FT817::get_vfoB ()
 	return freqB;
 }
 
-void RIG_FT817::set_vfoB (unsigned long int freq)
+void RIG_FT817BB::set_vfoB (unsigned long int freq)
 {
+	int use = get_vfoAorB();
+	if (use == -1) return;
+	if (use == 0) return;
+	if (ft817BB_memory_mode) return;
 	freqB = freq;
-	freq /=10; // 817 does not support 1 Hz resolution
+	freq /=10; // 817BB does not support 1 Hz resolution
 	cmd = to_bcd(freq, 8);
 	cmd += 0x01;
 	sendCommand(cmd);
 	setthex("set_vfoB");
 }
 
-int RIG_FT817::get_modeB()
+int RIG_FT817BB::get_modeB()
 {
+	int use = get_vfoAorB();
+	if (use < 0) return modeB;
+	if (use == 0) return modeB;
+	if (ft817BB_memory_mode) return modeB;
 	init_cmd();
 	cmd[4] = 0x03;
 	int ret = waitN(5, 100, "get mode B");
@@ -191,17 +266,18 @@ int RIG_FT817::get_modeB()
 	}
 	int mode = replystr[4];
 	for (int i = 0; i < 8; i++)
-		if (FT817_mode_val[i] == mode) {
+		if (FT817BB_mode_val[i] == mode) {
 			modeB = i;
 			break;
 		}
 	return modeB;
 }
 
-void RIG_FT817::set_modeB(int val)
+void RIG_FT817BB::set_modeB(int val)
 {
+	if (ft817BB_memory_mode) return;
 	init_cmd();
-	cmd[0] = FT817_mode_val[val];
+	cmd[0] = FT817BB_mode_val[val];
 	cmd[4] = 0x07;
 	sendCommand(cmd);
 	setthex("set_modeB");
@@ -210,7 +286,7 @@ void RIG_FT817::set_modeB(int val)
 
 //======================================================================
 // Tranceiver PTT on/off
-void RIG_FT817::set_PTT_control(int val)
+void RIG_FT817BB::set_PTT_control(int val)
 {
 	init_cmd();
 	if (val) cmd[4] = 0x08;
@@ -246,7 +322,7 @@ static int alc;
 // b0 PWR|SWR
 // b1 ALC|MOD
 
-int  RIG_FT817::get_power_out()
+int  RIG_FT817BB::get_power_out()
 {
 	init_cmd();
 	cmd[4] = 0xBD;
@@ -257,24 +333,23 @@ int  RIG_FT817::get_power_out()
 	int fwdpwr = (replystr[0] & 0xF0) >> 4;
 	swr = (replystr[1] & 0xF0) >> 4;
 	alc = (replystr[0] & 0x0F);
-//	int mod = (replystr[1] & 0x0F);
 
 	if (fwdpwr > 8) fwdpwr = 8;
 	if (fwdpwr < 0) fwdpwr = 0;
 	return pmeter_map[fwdpwr];
 }
 
-int  RIG_FT817::get_swr()
+int  RIG_FT817BB::get_swr()
 {
 	return swr_map[swr];
 }
 
-int  RIG_FT817::get_alc()
+int  RIG_FT817BB::get_alc()
 {
 	return alc_map[alc];
 }
 
-int  RIG_FT817::get_smeter()
+int  RIG_FT817BB::get_smeter()
 {
 	init_cmd();
 	cmd[4] = 0xE7;
@@ -287,7 +362,7 @@ int  RIG_FT817::get_smeter()
 	return smeter_map[sval];
 }
 
-void RIG_FT817::set_split(bool val)
+void RIG_FT817BB::set_split(bool val)
 {
 	init_cmd();
 	if (val) cmd[4] = 0x02;
@@ -299,7 +374,7 @@ void RIG_FT817::set_split(bool val)
 }
 
 extern bool PTT;
-int  RIG_FT817::get_split()
+int  RIG_FT817BB::get_split()
 {
 	if (!PTT) return split;
 	init_cmd();
@@ -311,7 +386,7 @@ int  RIG_FT817::get_split()
 	return split;
 }
 
-int RIG_FT817::power_scale()
+int RIG_FT817BB::power_scale()
 {
     return 10;
 }

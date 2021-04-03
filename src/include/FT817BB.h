@@ -18,15 +18,15 @@
 // aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
-#ifndef FT817_H
-#define FT817_H
+#ifndef FT817BB_H
+#define FT817BB_H
 
 #include "rigbase.h"
 
-class RIG_FT817 : public rigbase {
+class RIG_FT817BB : public rigbase {
 public:
-	RIG_FT817();
-	~RIG_FT817(){};
+	RIG_FT817BB();
+	~RIG_FT817BB(){};
 
 	bool check();
 
@@ -34,6 +34,7 @@ public:
 	void set_vfoA(unsigned long int);
 	unsigned long int get_vfoB();
 	void set_vfoB(unsigned long int);
+	int  get_vfoAorB();
 	void selectA();
 	void selectB();
 
@@ -58,6 +59,5 @@ public:
 private:
 	void init_cmd();
 };
-
 
 #endif

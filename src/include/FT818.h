@@ -1,5 +1,5 @@
 // ----------------------------------------------------------------------------
-// Copyright (C) 2021
+// Copyright (C) 2014
 //              David Freese, W1HKJ
 //
 // This file is part of flrig.
@@ -18,15 +18,15 @@
 // aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
-#ifndef FT817_H
-#define FT817_H
+#ifndef FT818ND_H
+#define FT818ND_H
 
 #include "rigbase.h"
 
-class RIG_FT817 : public rigbase {
+class RIG_FT818ND : public rigbase {
 public:
-	RIG_FT817();
-	~RIG_FT817(){};
+	RIG_FT818ND();
+	~RIG_FT818ND(){};
 
 	bool check();
 
