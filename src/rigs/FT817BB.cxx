@@ -70,6 +70,8 @@ RIG_FT817BB::RIG_FT817BB() {
 
 }
 
+//#define TEST 1
+
 void RIG_FT817BB::init_cmd()
 {
 	cmd = "00000";
@@ -84,8 +86,14 @@ void memory_label(void *)
 	else  labelMEMORY->hide();
 }
 
+int ab = 0;
+
 int RIG_FT817BB::get_vfoAorB()
 {
+#ifdef TEST
+std::cout << "get_vfoAorB()" << std::endl;
+return ab;
+#endif
 	return replystr[0] & 0x01;
 	init_cmd();
 	cmd[1] = 0x55;
@@ -108,31 +116,53 @@ int RIG_FT817BB::get_vfoAorB()
 
 void RIG_FT817BB::selectA()
 {
-	int use = get_vfoAorB();
+#ifdef TEST
+std::cout << "selectA()" << std::endl;
+ab = 0;
+return;
+#endif
 
-	if (use <= 0) return;
+	if (get_vfoAorB() == 0) return;
 	if (ft817BB_memory_mode) return;
-
 	init_cmd();
 	cmd[4] = 0x81;
 	sendCommand(cmd);
+	showresp(INFO, HEX, "select VFO A", cmd, replystr);
 	setthex("Select VFO A");
+	MilliSleep(100);
+	if (get_vfoAorB() == 0)
+		sett("selectA() SUCCESS");
+	else
+		sett("selectA() FAILED");
 }
 
 void RIG_FT817BB::selectB()
 {
-	int use = get_vfoAorB();
-	if (use == 1) return;
-	if (use == -1) return;
+#ifdef TEST
+std::cout << "selectB()" << std::endl;
+ab = 1;
+return;
+#endif
+	if (get_vfoAorB() == 1) return;
 	if (ft817BB_memory_mode) return;
 	init_cmd();
 	cmd[4] = 0x81;
 	sendCommand(cmd);
+	showresp(INFO, HEX, "select VFO B", cmd, replystr);
 	setthex("Select VFO B");
+	MilliSleep(100);
+	if (get_vfoAorB() == 1)
+		sett("selectB() SUCCESS");
+	else
+		sett("selectB() FAILED");
 }
 
 bool RIG_FT817BB::check ()
 {
+#ifdef TEST
+std::cout << "check()" << std::endl;
+return true;
+#endif
 	init_cmd();
 	cmd[4] = 0x03;
 	int ret = waitN(5, 100, "check");
@@ -143,9 +173,11 @@ bool RIG_FT817BB::check ()
 
 unsigned long int RIG_FT817BB::get_vfoA ()
 {
-	int use = get_vfoAorB();
-	if (use == -1) return freqA;
-	if (use == 1) return freqA;
+#ifdef TEST
+std::cout << "get_vfoA()" << std::endl;
+return freqA;
+#endif
+	if (get_vfoAorB() != 0) return freqA;
 	if (ft817BB_memory_mode) return freqA;
 	init_cmd();
 	cmd[4] = 0x03;
@@ -170,9 +202,13 @@ unsigned long int RIG_FT817BB::get_vfoA ()
 
 void RIG_FT817BB::set_vfoA (unsigned long int freq)
 {
-	int use = get_vfoAorB();
-	if (use == -1) return;
-	if (use == 1) return;
+#ifdef TEST
+std::cout << "set_vfoA(" << freq << ")" << std::endl;
+freqA = freq;
+return;
+#endif
+
+	if (get_vfoAorB() != 0) return;
 	if (ft817BB_memory_mode) return;
 	freqA = freq;
 	freq /=10; // 817BB does not support 1 Hz resolution
@@ -184,9 +220,11 @@ void RIG_FT817BB::set_vfoA (unsigned long int freq)
 
 int RIG_FT817BB::get_modeA()
 {
-	int use = get_vfoAorB();
-	if (use == -1) return modeA;
-	if (use == 1) return modeA;
+#ifdef TEST
+std::cout << "get_modeA()" << std::endl;
+return modeA;
+#endif
+	if (get_vfoAorB() != 0) return modeA;
 	if (ft817BB_memory_mode) return modeA;
 	init_cmd();
 	cmd[4] = 0x03;
@@ -211,7 +249,14 @@ int RIG_FT817BB::get_modetype(int n)
 
 void RIG_FT817BB::set_modeA(int val)
 {
+#ifdef TEST
+std::cout << "set_modeA(" << val << ")" << std::endl;
+modeA = val;
+return;
+#endif
 	if (ft817BB_memory_mode) return;
+	if (get_vfoAorB() != 0) return;
+
 	init_cmd();
 	cmd[0] = FT817BB_mode_val[val];
 	cmd[4] = 0x07;
@@ -222,9 +267,12 @@ void RIG_FT817BB::set_modeA(int val)
 // VFO B ===============================================================
 unsigned long int RIG_FT817BB::get_vfoB ()
 {
-	int use = get_vfoAorB();
-	if (use == -1) return freqB;
-	if (use == 0) return freqB;
+#ifdef TEST
+std::cout << "get_vfoB()" << std::endl;
+return freqB;
+#endif
+
+	if (get_vfoAorB() != 1) return freqB;
 	if (ft817BB_memory_mode) return freqB;
 	init_cmd();
 	cmd[4] = 0x03;
@@ -239,9 +287,13 @@ unsigned long int RIG_FT817BB::get_vfoB ()
 
 void RIG_FT817BB::set_vfoB (unsigned long int freq)
 {
-	int use = get_vfoAorB();
-	if (use == -1) return;
-	if (use == 0) return;
+std::cout << "set_vfoB(" << freq << ")" << std::endl;
+#ifdef TEST
+freqB = freq;
+return;
+#endif
+
+	if (get_vfoAorB() != 1) return;
 	if (ft817BB_memory_mode) return;
 	freqB = freq;
 	freq /=10; // 817BB does not support 1 Hz resolution
@@ -253,9 +305,11 @@ void RIG_FT817BB::set_vfoB (unsigned long int freq)
 
 int RIG_FT817BB::get_modeB()
 {
-	int use = get_vfoAorB();
-	if (use < 0) return modeB;
-	if (use == 0) return modeB;
+#ifdef TEST
+std::cout << "get_modeB()" << std::endl;
+return modeB;
+#endif
+	if (get_vfoAorB() != 1) return modeB;
 	if (ft817BB_memory_mode) return modeB;
 	init_cmd();
 	cmd[4] = 0x03;
@@ -275,7 +329,13 @@ int RIG_FT817BB::get_modeB()
 
 void RIG_FT817BB::set_modeB(int val)
 {
-	if (ft817BB_memory_mode) return;
+#ifdef TEST
+std::cout << "set_modeB(" << val << ")" << std::endl;
+modeB = val;
+return;
+#endif
+	int use = get_vfoAorB();
+	if (get_vfoAorB() != 1) return;
 	init_cmd();
 	cmd[0] = FT817BB_mode_val[val];
 	cmd[4] = 0x07;
@@ -288,6 +348,11 @@ void RIG_FT817BB::set_modeB(int val)
 // Tranceiver PTT on/off
 void RIG_FT817BB::set_PTT_control(int val)
 {
+#ifdef TEST
+std::cout << "set_PTT_control(" << val << ")" << std::endl;
+ptt_ = val;
+return;
+#endif
 	init_cmd();
 	if (val) cmd[4] = 0x08;
 	else	 cmd[4] = 0x88;
@@ -324,6 +389,10 @@ static int alc;
 
 int  RIG_FT817BB::get_power_out()
 {
+#ifdef TEST
+std::cout << "get_power_out()" << std::endl;
+return 25;
+#endif
 	init_cmd();
 	cmd[4] = 0xBD;
 	int ret = waitN(2, 100, "get PWR/SWR/ALC");
@@ -351,6 +420,10 @@ int  RIG_FT817BB::get_alc()
 
 int  RIG_FT817BB::get_smeter()
 {
+#ifdef TEST
+std::cout << "get_smeter()" << std::endl;
+return 30;
+#endif
 	init_cmd();
 	cmd[4] = 0xE7;
 	int ret = waitN(1, 100, "get smeter");
@@ -364,6 +437,11 @@ int  RIG_FT817BB::get_smeter()
 
 void RIG_FT817BB::set_split(bool val)
 {
+#ifdef TEST
+std::cout << "set_split(" << val << ")" << std::endl;
+split = val;
+return;
+#endif
 	init_cmd();
 	if (val) cmd[4] = 0x02;
 	else     cmd[4] = 0x82;
@@ -376,6 +454,10 @@ void RIG_FT817BB::set_split(bool val)
 extern bool PTT;
 int  RIG_FT817BB::get_split()
 {
+#ifdef TEST
+std::cout << "get_split()" << std::endl;
+return split;
+#endif
 	if (!PTT) return split;
 	init_cmd();
 	cmd[4] = 0xF7; // get transmit status

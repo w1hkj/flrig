@@ -296,8 +296,8 @@ void updateUI(void *)
 
 void update_vfoAorB(void *d)
 {
-	if (xcvr_name == rig_FT817.name_) {
-		trace(1,"FT817, update_vfoAorB()");
+	if (xcvr_name == rig_FT817.name_ || xcvr_name == rig_FT817BB.name_) {
+		trace(1,"FT817xx, update_vfoAorB()");
 		if (useB) {
 			vfoB.src = RIG;
 			vfoB.freq = selrig->get_vfoB();
@@ -1408,7 +1408,6 @@ void serviceA(XCVR_STATE nuvals)
 	vfo = &vfoA;
 
 	Fl::awake(setFreqDispA, (void *)vfoA.freq);
-//	Fl::awake(updateUI);  // may be redundant
 }
 
 void serviceB(XCVR_STATE nuvals)
@@ -3777,6 +3776,7 @@ void adjust_small_ui()
 	if (xcvr_name == rig_FT100D.name_ ||
 		xcvr_name == rig_FT767.name_  ||
 		xcvr_name == rig_FT817.name_  ||
+		xcvr_name == rig_FT817BB.name_ ||
 		xcvr_name == rig_FT847.name_  ||
 		xcvr_name == rig_FT857D.name_ ||
 		xcvr_name == rig_FT890.name_  ||
@@ -5671,7 +5671,7 @@ void init_CIV()
 void init_VFOs()
 {
 	if (selrig->name_ == rig_TT550.name_) return;
-	if (selrig->name_ == rig_FT817.name_) {
+	if (selrig->name_ == rig_FT817.name_ || selrig->name_ == rig_FT817BB.name_) {
 		FreqDispA->value(vfoA.freq);
 		FreqDispB->value(vfoB.freq);
 		updateBandwidthControl();
@@ -5858,7 +5858,8 @@ void initRig()
 		}
 
 		bool check_ok = false;
-		if (progStatus.xcvr_serial_port != "NONE") check_ok = selrig->check();
+		if (progStatus.xcvr_serial_port != "NONE")
+			check_ok = selrig->check();
 
 		init_special_controls();
 		init_external_tuner();
