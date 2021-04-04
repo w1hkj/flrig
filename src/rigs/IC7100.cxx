@@ -185,7 +185,7 @@ RIG_IC7100::RIG_IC7100() {
 
 	comm_retries = 2;
 	comm_wait = 20;
-	comm_timeout = 50;
+	comm_timeout = 2;
 	comm_echo = true;
 	comm_rtscts = false;
 	comm_rtsplus = true;
@@ -273,6 +273,8 @@ RIG_IC7100::RIG_IC7100() {
 // IC7100 unique commands
 //======================================================================
 
+static bool xcvr_is_on = false;
+
 void RIG_IC7100::set_xcvr_auto_on()
 {
 	int nr = progStatus.comm_baudrate == 6 ? 25 :
@@ -289,16 +291,22 @@ void RIG_IC7100::set_xcvr_auto_on()
 		cmd.append(pre_to);
 		cmd += '\x18'; cmd += '\x01';
 		cmd.append(post);
-		waitFB("Power ON", 2000);
-		isett("Power ON");
-// wake up time for initialization
-		for (int i = 0; i < 5000; i += 100) {
-			MilliSleep(100);
-			update_progress(100 * i / 5000);
-			Fl::awake();
+		if (waitFB("Power ON")) {
+			xcvr_is_on = true;
+			cmd = pre_to; cmd += '\x19'; cmd += '\x00';
+			cmd.append(post);
+			for (int i = 0; i < 50; i++) {
+				MilliSleep(100);
+				if (waitFOR(8, "get ID")) break;
+				update_progress(i*2);
+				Fl::awake();
+			}
+			return;
 		}
+		xcvr_is_on = false;
+		return;
 	}
-	return;
+	xcvr_is_on = true;
 }
 
 void RIG_IC7100::set_xcvr_auto_off()
@@ -313,15 +321,11 @@ void RIG_IC7100::set_xcvr_auto_off()
 
 bool RIG_IC7100::check ()
 {
-	bool ok = false;
-	string resp = pre_fm;
-	resp += '\x03';
+	if (xcvr_is_on) return true;
 	cmd = pre_to;
-	cmd += '\x03';
-	cmd.append( post );
-	ok = waitFOR(11, "check vfo");
-	igett("check()");
-	return ok;
+	cmd += '\x19'; cmd += '\x00';
+	cmd.append(post);
+	return (xcvr_is_on = waitFOR(8, "get ID"));
 }
 
 static bool IC7100onA = true;

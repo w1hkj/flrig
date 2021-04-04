@@ -157,6 +157,7 @@ bool Cserial::OpenPort()  {
 			break;
 		case 115200:
 			speed = B115200;
+			timeout = 2;
 			break;
 		default:
 			speed = B1200;

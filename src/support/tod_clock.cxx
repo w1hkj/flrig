@@ -48,17 +48,16 @@
 
 using namespace std;
 
-static int _zmsec = 0;
-static int _zsec = 0;
-static int _zmin = 0;
-static int _zhr = 0;
+static unsigned int _zmsec = 0;
+static unsigned int _zsec = 0;
+static unsigned int _zmin = 0;
+static unsigned int _zhr = 0;
+static struct tm tm;
+static time_t t_temp;
+static struct timeval tv;
 
 void ztimer()
 {
-	struct tm tm;
-	time_t t_temp;
-	struct timeval tv;
-
 	gettimeofday(&tv, NULL);
 
 	t_temp=(time_t)tv.tv_sec;
@@ -70,10 +69,10 @@ void ztimer()
 	_zhr  = tm.tm_hour;
 }
 
-int zmsec(void)
+unsigned long zmsec(void)
 {
 	ztimer();
-	return _zmsec;
+	return _zmsec + tv.tv_sec * 1000;
 }
 
 char exttime[13];

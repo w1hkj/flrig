@@ -294,12 +294,14 @@ void RIG_IC7300::swapAB()
 	get_modeB();
 }
 
+static bool xcvr_is_on = false;
+
 void RIG_IC7300::set_xcvr_auto_on()
 {
 	cmd = pre_to;
 	cmd += '\x19'; cmd += '\x00';
 	cmd.append(post);
-	if (waitFOR(8, "get ID", 100) == false) {
+	if (waitFOR(8, "get ID") == false) {
 		cmd.clear();
 		int fes[] = { 2, 2, 2, 3, 7, 13, 25, 50, 75, 150, 150, 150 };
 		if (progStatus.comm_baudrate >= 0 && progStatus.comm_baudrate <= 11) {
@@ -308,13 +310,22 @@ void RIG_IC7300::set_xcvr_auto_on()
 		cmd.append(pre_to);
 		cmd += '\x18'; cmd += '\x01';
 		cmd.append(post);
-		waitFB("Power ON", 200);
-		for (int i = 0; i < 5000; i += 100) {
-			MilliSleep(100);
-			update_progress(100 * i / 5000);
-			Fl::awake();
+		if (waitFB("Power ON")) {
+			xcvr_is_on = true;
+			cmd = pre_to; cmd += '\x19'; cmd += '\x00';
+			cmd.append(post);
+			for (int i = 0; i < 50; i++) {
+				MilliSleep(100);
+				if (waitFOR(8, "get ID")) break;
+				update_progress(i*2);
+				Fl::awake();
+			}
+			return;
 		}
+		xcvr_is_on = false;
+		return;
 	}
+	xcvr_is_on = true;
 }
 
 void RIG_IC7300::set_xcvr_auto_off()
@@ -328,14 +339,11 @@ void RIG_IC7300::set_xcvr_auto_off()
 
 bool RIG_IC7300::check ()
 {
-	string resp = pre_fm;
-	resp += '\x03';
+	if (xcvr_is_on) return true;
 	cmd = pre_to;
-	cmd += '\x03';
-	cmd.append( post );
-	bool ok = waitFOR(11, "check vfo");
-	isett("check vfo");
-	return ok;
+	cmd += '\x19'; cmd += '\x00';
+	cmd.append(post);
+	return (xcvr_is_on = waitFOR(8, "get ID"));
 }
 
 unsigned long int RIG_IC7300::get_vfoA ()

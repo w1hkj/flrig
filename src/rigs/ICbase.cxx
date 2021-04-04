@@ -105,7 +105,7 @@ bool RIG_ICOM::waitFB(const char *sz, int timeout)
 {
 	guard_lock cmd_lock(&command_mutex);
 
-	guard_lock reply_lock(&mutex_replystr);
+//	guard_lock reply_lock(&mutex_replystr);
 //std::cout << ztime() << " waitFB( " << sz << ", " << timeout << " ): " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
 
 	char sztemp[100];
@@ -126,17 +126,14 @@ bool RIG_ICOM::waitFB(const char *sz, int timeout)
 
 	timeout += wait_msec;
 
-	unsigned long int loop_start;
-
 	msec_start = zmsec();
 
 	respstr.clear();
 	sendCommand(cmd, 0);
 	returned.clear();
-	loop_start = zmsec();
-	diff = zmsec() - loop_start;
+	diff = zmsec() - msec_start;
 
-	while ( diff < timeout) { //wait_msec + 10 ) {
+	while ( diff < timeout) {
 		returned.append(respstr);
 		if (returned.find(ok) != string::npos) {
 			replystr = returned;
@@ -155,7 +152,7 @@ bool RIG_ICOM::waitFB(const char *sz, int timeout)
 			return false;
 		}
 		readResponse();
-		diff = zmsec() - loop_start;
+		diff = zmsec() - msec_start;
 	}
 
 	diff = zmsec() - msec_start;
@@ -167,25 +164,23 @@ bool RIG_ICOM::waitFB(const char *sz, int timeout)
 	return false;
 }
 
-bool RIG_ICOM::waitFOR(size_t n, const char *sz, int timeout)
+bool RIG_ICOM::waitFOR(size_t n, const char *sz, unsigned long timeout)
 {
 	guard_lock cmd_lock(&command_mutex);
 
-	guard_lock reply_lock(&mutex_replystr);
+//	guard_lock reply_lock(&mutex_replystr);
 
-//std::cout << ztime() << " waitFOR( " << n << ", " << sz << ", " << timeout << " ): " << str2hex(cmd.c_str(), cmd.length()) << std::endl;
-
-	char sztemp[100];
+	char sztemp[200];
 	string returned = "";
 	string tosend = cmd;
 	size_t num = n;
-	int diff = 0;
+	unsigned long diff = 0;
 	if (progStatus.comm_echo) num += cmd.length();
 
-	unsigned long int msec_start;
-	unsigned long int repeat_start;
+	unsigned long int start_msec;
+	unsigned long int now;
 
-	int delay = progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0;
+	unsigned long delay = progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0;
 	delay += 100;
 	delay += num * 11000.0 / RigSerial->Baud();
 
@@ -193,38 +188,42 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz, int timeout)
 		replystr = cmd;
 		return false;
 	}
-	if (timeout == 0) timeout = progStatus.comm_retries * delay;
-	msec_start = zmsec();
+	if (timeout < delay) timeout = delay;
+//	if (timeout == 0) timeout = delay;progStatus.comm_retries * delay;
 
-	repeat_start = zmsec();
+	now = start_msec = zmsec();
 	respstr.clear();
 
 	sendCommand(tosend, 0);
-	returned = respstr;
+	returned.clear();
+	now = zmsec();
+	diff = now - start_msec;
 
-	while (int(zmsec() - repeat_start) < timeout) {
+	while ( diff < timeout ) {
 		if (returned.find(bad) != string::npos) {
-			snprintf(sztemp, sizeof(sztemp), "%s : %d ms", sz, int(zmsec() - msec_start));
+			snprintf(sztemp, sizeof(sztemp), "%s : %lu ms", sz, diff);
 			showresp(ERR, HEX, sztemp, tosend, returned);
 //std::cout << ztime() << " ERROR: " << str2hex(returned.c_str(), returned.length()) << std::endl;
 			return false;
 		}
+		int ret = readResponse();
+		diff = (now = zmsec()) - start_msec;
+		if (ret) returned.append(respstr);
 		if (returned.length() >= num) {
-			replystr = returned;
-			snprintf(sztemp, sizeof(sztemp), "%s : %d ms", sz, int(zmsec() - msec_start));
-			showresp(DEBUG, HEX, sztemp, tosend, returned);
-//std::cout << ztime() << " Response: " << str2hex(returned.c_str(), returned.length()) << std::endl;
-			return true;
+			break;
 		}
-		if (readResponse())
-			returned.append(respstr);
 	}
-
-	diff = zmsec() - msec_start;
 	replystr = returned;
-	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT : %d ms", sz, diff);
-	showresp(ERR, HEX, sztemp, tosend, returned);
-//std::cout << ztime() << " " << sztemp << " " << str2hex(returned.c_str(), returned.length()) << std::endl;
+	snprintf(sztemp,
+			 sizeof(sztemp),
+			 "%s %s\n%s",
+			 ztime(), sz, str2hex(returned.c_str(), returned.length()) );
+	LOG_DEBUG("%s", sztemp);
+//std::cout << sztemp << std::endl;
+
+	if (returned.length() >= num) {
+		return true;
+	}
 
 	return false;
 }

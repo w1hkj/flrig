@@ -20,7 +20,7 @@
 
 #include <math.h>
 #include <string>
-
+#include <iostream>
 #include <fstream>
 
 #include <FL/Fl.H>
@@ -215,9 +215,10 @@ int sendCommand (string s, int nread, int wait)
 	if (RigSerial->IsOpen() == false) {
 		return 0;
 	}
-
 	RigSerial->FlushBuffer();
 	RigSerial->WriteBuffer(s.c_str(), numwrite);
+
+	if (nread == 0) return 0;
 
 	int timeout = progStatus.comm_wait + 
 		(int)((nread + progStatus.comm_echo ? numwrite : 0)*11000.0/RigSerial->Baud());
@@ -228,8 +229,8 @@ int sendCommand (string s, int nread, int wait)
 		timeout -= 10;
 		Fl::awake();
 	}
-	if (nread == 0) return 0;
-	return readResponse();
+	int ret = readResponse();
+	return ret;
 }
 
 static int waitcount = 0;

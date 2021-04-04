@@ -1072,10 +1072,10 @@ Fl_Group *createXCVR(int X, int Y, int W, int H, const char *label)
 
 		cntRigCatTimeout = new Fl_Counter(
 			cntRigCatRetries->x(), btnOneStopBit->y(),
-			110, 22, _("Retry intvl"));
-		cntRigCatTimeout->tooltip(_("Time between retries is msec"));
-		cntRigCatTimeout->minimum(2);
-		cntRigCatTimeout->maximum(200);
+			110, 22, _("Timeout"));
+		cntRigCatTimeout->tooltip(_("Serial port select timeout"));
+		cntRigCatTimeout->minimum(0);
+		cntRigCatTimeout->maximum(100);
 		cntRigCatTimeout->step(1);
 		cntRigCatTimeout->value(10);
 		cntRigCatTimeout->callback((Fl_Callback*)cb_cntRigCatTimeout);
