@@ -677,22 +677,25 @@ static void cb_btnSetAdd(Fl_Button*, void*) {
 	poll_compression->value(progStatus.poll_all);
 	poll_tuner->value(progStatus.poll_all);
 	poll_ptt->value(progStatus.poll_all);
+	poll_break_in->value(progStatus.poll_all);
 
-	progStatus.poll_volume = progStatus.poll_all;
-	progStatus.poll_micgain = progStatus.poll_all;
-	progStatus.poll_rfgain = progStatus.poll_all;
-	progStatus.poll_power_control = progStatus.poll_all;
-	progStatus.poll_ifshift = progStatus.poll_all;
-	progStatus.poll_notch = progStatus.poll_all;
-	progStatus.poll_auto_notch = progStatus.poll_all;
-	progStatus.poll_pre_att = progStatus.poll_all;
-	progStatus.poll_squelch = progStatus.poll_all;
-	progStatus.poll_split = progStatus.poll_all;
-	progStatus.poll_noise = progStatus.poll_all;
-	progStatus.poll_nr = progStatus.poll_all;
-	progStatus.poll_compression = progStatus.poll_all;
-	progStatus.poll_tuner = progStatus.poll_all;
-	progStatus.poll_ptt = progStatus.poll_all;
+	progStatus.poll_volume = 
+	progStatus.poll_micgain = 
+	progStatus.poll_rfgain = 
+	progStatus.poll_power_control = 
+	progStatus.poll_ifshift = 
+	progStatus.poll_notch = 
+	progStatus.poll_auto_notch = 
+	progStatus.poll_pre_att = 
+	progStatus.poll_squelch = 
+	progStatus.poll_split = 
+	progStatus.poll_noise = 
+	progStatus.poll_nr = 
+	progStatus.poll_compression = 
+	progStatus.poll_tuner = 
+	progStatus.poll_ptt = 
+	progStatus.poll_break_in = 
+		progStatus.poll_all;
 }
 
 static void cb_btn_send_command(Fl_Button *o, void*) {
@@ -1716,7 +1719,7 @@ Fl_Group *createPOLLING(int X, int Y, int W, int H, const char *label)
 		poll_nr->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_nr->value(progStatus.poll_nr);
 
-		poll_compression = new Fl_Value_Input(X + 190, Y + 190, 30, 20, _("Comp'"));
+		poll_compression = new Fl_Value_Input(X + 190, Y + 190, 30, 20, _("Comp"));
 		poll_compression->tooltip(_("Compression"));
 		poll_compression->maximum(10);
 		poll_compression->step(1);
