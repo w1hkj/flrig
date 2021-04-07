@@ -5999,8 +5999,10 @@ void initConfigDialog()
 		btnrtsptt->value( srig->comm_rtsptt );
 		btndtrptt->value( srig->comm_dtrptt );
 		chkrtscts->value( srig->comm_rtscts );
-		btnrtsplus->value( srig->comm_rtsplus );
-		btndtrplus->value( srig->comm_dtrplus );
+		btnrtsplus1->value( srig->comm_rtsplus );
+		btndtrplus1->value( srig->comm_dtrplus );
+		btnrtsplus2->value( srig->comm_rtsplus );
+		btndtrplus2->value( srig->comm_dtrplus );
 
 		if (selrig->CIV) {
 			char hexstr[8];
@@ -6054,8 +6056,10 @@ void initStatusConfigDialog()
 	btnrtsptt->value( progStatus.comm_rtsptt );
 	btndtrptt->value( progStatus.comm_dtrptt );
 	chkrtscts->value( progStatus.comm_rtscts );
-	btnrtsplus->value( progStatus.comm_rtsplus );
-	btndtrplus->value( progStatus.comm_dtrplus );
+	btnrtsplus1->value( progStatus.comm_rtsplus );
+	btndtrplus1->value( progStatus.comm_dtrplus );
+	btnrtsplus2->value( progStatus.comm_rtsplus );
+	btndtrplus2->value( progStatus.comm_dtrplus );
 
 	btnSepDTRplus->value(progStatus.sep_dtrplus);
 	btnSepDTRptt->value(progStatus.sep_dtrptt);

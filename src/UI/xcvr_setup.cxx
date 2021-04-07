@@ -44,8 +44,10 @@ Fl_Group *tabXCVR = (Fl_Group *)0;
 	Fl_Check_Button *btnrtsptt = (Fl_Check_Button *)0;
 	Fl_Check_Button *btndtrptt = (Fl_Check_Button *)0;
 	Fl_Check_Button *chkrtscts = (Fl_Check_Button *)0;
-	Fl_Check_Button *btnrtsplus = (Fl_Check_Button *)0;
-	Fl_Check_Button *btndtrplus = (Fl_Check_Button *)0;
+	Fl_Check_Button *btnrtsplus1 = (Fl_Check_Button *)0;
+	Fl_Check_Button *btndtrplus1 = (Fl_Check_Button *)0;
+	Fl_Check_Button *btnrtsplus2 = (Fl_Check_Button *)0;
+	Fl_Check_Button *btndtrplus2 = (Fl_Check_Button *)0;
 	//Fl_Check_Button *btn_notxqsy = (Fl_Check_Button *)0;
 	Fl_Int_Input *txtCIV = (Fl_Int_Input *)0;
 	Fl_Button *btnCIVdefault = (Fl_Button *)0;
@@ -457,20 +459,28 @@ static void cb_chkrtscts(Fl_Check_Button*, void*) {
 	btn2_init_ser_port->redraw_label();
 }
 
-static void cb_btnrtsplus(Fl_Check_Button*, void*) {
+static void cb_btnrtsplus(Fl_Check_Button *b, void*) {
+	int val = b->value();
 	btn_init_ser_port->labelcolor(FL_RED);
 	btn_init_ser_port->redraw_label();
 
 	btn2_init_ser_port->labelcolor(FL_RED);
 	btn2_init_ser_port->redraw_label();
+
+	btnrtsplus1->value(val);
+	btnrtsplus2->value(val);
 }
 
-static void cb_btndtrplus(Fl_Check_Button*, void*) {
+static void cb_btndtrplus(Fl_Check_Button *b, void*) {
+	int val = b->value();
 	btn_init_ser_port->labelcolor(FL_RED);
 	btn_init_ser_port->redraw_label();
 
 	btn2_init_ser_port->labelcolor(FL_RED);
 	btn2_init_ser_port->redraw_label();
+
+	btndtrplus1->value(val);
+	btndtrplus2->value(val);
 }
 
 static void cb_txtCIV(Fl_Int_Input* o, void*) {
@@ -855,8 +865,8 @@ static void cb_init_ser_port(Fl_Return_Button*, void*) {
 	progStatus.comm_catptt = btncatptt->value();
 	progStatus.comm_dtrptt = btndtrptt->value();
 	progStatus.comm_rtscts = chkrtscts->value();
-	progStatus.comm_rtsplus = btnrtsplus->value();
-	progStatus.comm_dtrplus = btndtrplus->value();
+	progStatus.comm_rtsplus = btnrtsplus1->value();
+	progStatus.comm_dtrplus = btndtrplus1->value();
 
 	progStatus.imode_B  = progStatus.imode_A  = selrig->def_mode;
 	progStatus.iBW_B    = progStatus.iBW_A    = selrig->def_bw;
@@ -1045,7 +1055,7 @@ Fl_Group *createXCVR(int X, int Y, int W, int H, const char *label)
 		btnTwoStopBit->value(progStatus.stopbits == 2);
 
 		btnRigCatEcho = new Fl_Check_Button(
-			btnOneStopBit->x(), btnOneStopBit->y() + 26,
+			btnOneStopBit->x(), btnOneStopBit->y() + 25,
 			22, 22, _("Echo "));
 		btnRigCatEcho->down_box(FL_DOWN_BOX);
 		btnRigCatEcho->callback((Fl_Callback*)cb_btnRigCatEcho);
@@ -1059,6 +1069,18 @@ Fl_Group *createXCVR(int X, int Y, int W, int H, const char *label)
 		chkrtscts->down_box(FL_DOWN_BOX);
 		chkrtscts->callback((Fl_Callback*)cb_chkrtscts);
 		chkrtscts->value(progStatus.comm_rtscts);
+
+		btnrtsplus1 = new Fl_Check_Button(
+			btnRigCatEcho->x(), btnRigCatEcho->y() + 25, 22, 22, _("RTS +12 v"));
+		btnrtsplus1->tooltip(_("Initial state of RTS"));
+		btnrtsplus1->callback((Fl_Callback*)cb_btnrtsplus);
+		btnrtsplus1->value(progStatus.comm_rtsplus);
+
+		btndtrplus1 = new Fl_Check_Button(
+			chkrtscts->x(), btnrtsplus1->y(), 22, 22, _("DTR +12 v"));
+		btndtrplus1->tooltip(_("Initial state of DTR"));
+		btndtrplus1->callback((Fl_Callback*)cb_btndtrplus);
+		btndtrplus1->value(progStatus.comm_dtrplus);
 
 		cntRigCatRetries = new Fl_Counter(
 			xcvr_grp1->x() + xcvr_grp1->w() - 110 - 4, mnuBaudrate->y(),
@@ -1347,20 +1369,20 @@ Fl_Group *createPTT(int X, int Y, int W, int H, const char *label)
 		btndtrptt->callback((Fl_Callback*)cb_btndtrptt);
 		btndtrptt->value(progStatus.comm_dtrptt);
 
-		btnrtsplus = new Fl_Check_Button(
+		btnrtsplus2 = new Fl_Check_Button(
 			btnrtsptt->x(), btnrtsptt->y() + 24, 102, 21, _("RTS +12 v"));
-		btnrtsplus->tooltip(_("Initial state of RTS"));
-		btnrtsplus->callback((Fl_Callback*)cb_btnrtsplus);
-		btnrtsplus->value(progStatus.comm_rtsplus);
+		btnrtsplus2->tooltip(_("Initial state of RTS"));
+		btnrtsplus2->callback((Fl_Callback*)cb_btnrtsplus);
+		btnrtsplus2->value(progStatus.comm_rtsplus);
 
-		btndtrplus = new Fl_Check_Button(
+		btndtrplus2 = new Fl_Check_Button(
 			btndtrptt->x(), btndtrptt->y() + 24, 100, 21, _("DTR +12 v"));
-		btndtrplus->tooltip(_("Initial state of DTR"));
-		btndtrplus->callback((Fl_Callback*)cb_btndtrplus);
-		btndtrplus->value(progStatus.comm_dtrplus);
+		btndtrplus2->tooltip(_("Initial state of DTR"));
+		btndtrplus2->callback((Fl_Callback*)cb_btndtrplus);
+		btndtrplus2->value(progStatus.comm_dtrplus);
 
 		btn2_init_ser_port = new Fl_Button(
-			btndtrptt->x() + incr, btndtrplus->y(), 50, 24, _("Init"));
+			btndtrptt->x() + incr, btndtrplus2->y(), 50, 24, _("Init"));
 		btn2_init_ser_port->callback((Fl_Callback*)cb_init_ser_port);
 
 	grp_catptt->end();
