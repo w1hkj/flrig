@@ -139,10 +139,10 @@ static void freq_mode_bw()
 	tempmode.assign("M:").append(selrig->modes_ ? selrig->modes_[mode] : "none").append("\n");
 
 	tempbw.assign("L:").append((BW > 256 && selrig->has_dsp_controls) ?
-						(dsplo ? dsplo[BW & 0x7F] : "") : 
+						(dsplo ? dsplo[BW & 0x7F] : "") :
 						(bwt ? bwt[BW] : "")).append("\n");
 	tempbw.append("U:").append((BW > 256 && selrig->has_dsp_controls) ?
-						(dsphi ? dsphi[(BW >> 8) & 0x7F] : "") : 
+						(dsphi ? dsphi[(BW >> 8) & 0x7F] : "") :
 						"").append("\n");
 }
 
@@ -289,6 +289,8 @@ public:
 //------------------------------------------------------------------------------
 inline void wait()
 {
+	return;
+
 	int n = 0;
 	while (!srvc_reqs.empty()) {
 		MilliSleep(10);
@@ -499,6 +501,34 @@ public:
 
 } rig_set_notch(&rig_server);
 
+class rig_set_verify_notch : public XmlRpcServerMethod {
+public:
+	rig_set_verify_notch(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_verify_notch", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online) {
+			result = 0;
+			return;
+		}
+
+		static int ntch;
+		ntch = (int)(params[0]);
+		progStatus.notch_val = ntch;
+		if (ntch)
+			progStatus.notch = true;
+		else
+			progStatus.notch = false;
+
+		guard_lock serial_lock(&mutex_serial, "xml rig_set_verify_notch");
+		selrig->set_notch(progStatus.notch, progStatus.notch_val);
+		xml_trace(1, "rig_set_verify_notch");
+		Fl::awake(setNotchControl, static_cast<void *>(&ntch));
+	}
+
+	std::string help() { return std::string("sets & verifies notch value"); }
+
+} rig_set_verify_notch(&rig_server);
+
 //------------------------------------------------------------------------------
 // Get rfgain value
 //------------------------------------------------------------------------------
@@ -528,6 +558,7 @@ public:
 //------------------------------------------------------------------------------
 // Set rfgain value
 //------------------------------------------------------------------------------
+
 class rig_set_rfgain : public XmlRpcServerMethod {
 public:
 	rig_set_rfgain(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_rfgain", s) {}
@@ -551,6 +582,33 @@ public:
 	std::string help() { return std::string("sets rfgain value"); }
 
 } rig_set_rfgain(&rig_server);
+
+class rig_set_verify_rfgain : public XmlRpcServerMethod {
+public:
+	rig_set_verify_rfgain(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_verify_rfgain", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online) {
+			result = 0;
+			return;
+		}
+
+		static int rfg;
+		rfg = static_cast<int>((double)((params[0])));
+		progStatus.rfgain = rfg;
+
+		guard_lock serial_lock(&mutex_serial, "xml rig_set _verify_rfgain");
+		selrig->set_rf_gain(progStatus.rfgain);
+
+		progStatus.rfgain = selrig->get_rf_gain();
+
+		xml_trace(1, "rig_set_verify_rfgain");
+		Fl::awake(setRFGAINControl, static_cast<void *>(0));
+	}
+
+	std::string help() { return std::string("sets & verifies rfgain value"); }
+
+} rig_set_verify_rfgain(&rig_server);
 
 //------------------------------------------------------------------------------
 // Get micgain value
@@ -581,6 +639,7 @@ public:
 //------------------------------------------------------------------------------
 // Set micgain value
 //------------------------------------------------------------------------------
+
 class rig_set_micgain : public XmlRpcServerMethod {
 public:
 	rig_set_micgain(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_micgain", s) {}
@@ -604,6 +663,33 @@ public:
 	std::string help() { return std::string("sets micgain value"); }
 
 } rig_set_micgain(&rig_server);
+
+class rig_set_verify_micgain : public XmlRpcServerMethod {
+public:
+	rig_set_verify_micgain(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_verify_micgain", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online) {
+			result = 0;
+			return;
+		}
+
+		static int micg;
+		micg = (int)(params[0]);
+		progStatus.mic_gain = micg;
+
+		guard_lock serial_lock(&mutex_serial, "xml rig_set_verify_micgain");
+		xml_trace(1, "rig_set_verify_micgain");
+		selrig->set_mic_gain(progStatus.mic_gain);
+
+		progStatus.mic_gain = selrig->get_mic_gain();
+
+		Fl::awake(setMicGainControl, static_cast<void *>(0));
+	}
+
+	std::string help() { return std::string("sets & verifies micgain value"); }
+
+} rig_set_verify_micgain(&rig_server);
 
 //------------------------------------------------------------------------------
 // Get volume value
@@ -634,6 +720,7 @@ public:
 //------------------------------------------------------------------------------
 // Set volume value
 //------------------------------------------------------------------------------
+
 class rig_set_volume : public XmlRpcServerMethod {
 public:
 	rig_set_volume(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_volume", s) {}
@@ -657,6 +744,33 @@ public:
 	std::string help() { return std::string("sets volume value"); }
 
 } rig_set_volume(&rig_server);
+
+class rig_set_verify_volume : public XmlRpcServerMethod {
+public:
+	rig_set_verify_volume(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_verify_volume", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online) {
+			result = 0;
+			return;
+		}
+
+		static int volume;
+		volume = (int)(params[0]);
+		progStatus.volume = volume;
+
+		guard_lock serial_lock(&mutex_serial, "xml rig_set_verify_volume");
+		selrig->set_volume_control(progStatus.volume);
+
+		progStatus.volume = selrig->get_volume_control();
+
+		xml_trace(1, "rig_set_verify_volume");
+		Fl::awake(setVolumeControl, static_cast<void *>(0));
+	}
+
+	std::string help() { return std::string("sets & verifies volume value"); }
+
+} rig_set_verify_volume(&rig_server);
 
 //------------------------------------------------------------------------------
 // Request list of modes
@@ -1066,7 +1180,7 @@ public:
 	rig_get_smeter(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_smeter", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_online || !selrig->has_smeter) 
+		if (!xcvr_online || !selrig->has_smeter)
 			result = (int)(0);
 		else
 			result = (int)(mval);
@@ -1108,7 +1222,7 @@ public:
 	rig_get_pwrmeter(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_pwrmeter", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_online || !selrig->has_power_out) 
+		if (!xcvr_online || !selrig->has_power_out)
 			result = (int)(0);
 		else {
 			guard_lock serial_lock(&mutex_serial);
@@ -1125,7 +1239,7 @@ public:
 	rig_get_swrmeter(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_swrmeter", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_online || !selrig->has_swr_control) 
+		if (!xcvr_online || !selrig->has_swr_control)
 			result = (int)(0);
 		else
 			result = (int)(swrval);
@@ -1147,8 +1261,6 @@ extern queue<bool> quePTT;
 extern XCVR_STATE vfoA;
 extern XCVR_STATE vfoB;
 
-XCVR_STATE srvr_vfo;
-
 std::string print(int f, int m, int b)
 {
 	static std::ostringstream p;
@@ -1156,14 +1268,6 @@ std::string print(int f, int m, int b)
 	if (b > 65536) b /= 65536;
 	p << "freq: " << f << ", imode: " << m << ", bw " << b;
 	return p.str();
-}
-
-static void push_xml()
-{
-	srvr_vfo.src = SRVR;
-	guard_lock service_lock(&mutex_srvc_reqs, "xml_push");
-	xml_trace(2, "push_xml()", print(srvr_vfo.freq, srvr_vfo.imode, srvr_vfo.iBW).c_str());
-	srvc_reqs.push(VFOQUEUE(vX, srvr_vfo));
 }
 
 //------------------------------------------------------------------------------
@@ -1190,6 +1294,29 @@ public:
 	std::string help() { return std::string("sets power level in watts"); }
 
 } rig_set_power(&rig_server);
+
+class rig_set_verify_power : public XmlRpcServerMethod {
+public:
+	rig_set_verify_power(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_verify_power", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online) {
+			result = 0;
+			return;
+		}
+		int power_level = (int)(params[0]);
+
+		guard_lock lock(&mutex_serial);
+		selrig->set_power_control(power_level);
+
+		progStatus.power_level = selrig->get_power_control();
+
+		Fl::awake(update_power_control, (void*)0);
+	}
+
+	std::string help() { return std::string("sets & verifies power level in watts"); }
+
+} rig_set_verify_power(&rig_server);
 
 class rig_get_power : public XmlRpcServerMethod {
 public:
@@ -1231,9 +1358,9 @@ public:
 
 extern bool PTT;
 
-class rig_set_ptt : public XmlRpcServerMethod {
+class rig_set_verify_ptt : public XmlRpcServerMethod {
 public:
-	rig_set_ptt(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_ptt", s) {}
+	rig_set_verify_ptt(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_verify_ptt", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 		if (!xcvr_online) {
@@ -1244,7 +1371,7 @@ public:
 		guard_lock ser_lock (&mutex_serial);
 
 		PTT = int(params[0]);
-		xml_trace(1, (PTT ? "rig_set_ptt ON" : "rig_set_ptt OFF"));
+		xml_trace(1, (PTT ? "rig_set_verify_ptt ON" : "rig_set_verify_ptt OFF"));
 		rigPTT(PTT);
 		{
 			bool get = rigPTT();
@@ -1261,10 +1388,31 @@ public:
 		}
 	}
 
-	std::string help() { return std::string("sets PTT on (1) or off (0), with post read request"); }
+	std::string help() { return std::string("sets & verifies PTT on (1) or off (0)"); }
+
+} rig_set_verify_ptt(&rig_server);
+
+class rig_set_ptt : public XmlRpcServerMethod {
+public:
+	rig_set_ptt(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_ptt", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online) {
+			result = 0;
+			return;
+		}
+
+		guard_lock ser_lock (&mutex_serial);
+
+		PTT = int(params[0]);
+		xml_trace(1, (PTT ? "rig_ptt ON" : "rig_ptt OFF"));
+		rigPTT(PTT);
+		Fl::awake(update_UI_PTT);
+	}
+
+	std::string help() { return std::string("sets PTT on (1) or off (0), NO read request"); }
 
 } rig_set_ptt(&rig_server);
-
 
 class rig_set_ptt_fast : public XmlRpcServerMethod {
 public:
@@ -1279,11 +1427,12 @@ public:
 		guard_lock ser_lock (&mutex_serial);
 
 		PTT = int(params[0]);
-		xml_trace(1, (PTT ? "rig_ptt_fast ON" : "rig_ptt_fast OFF"));
+		xml_trace(1, (PTT ? "rig_ptt ON" : "rig_ptt OFF"));
 		rigPTT(PTT);
+		Fl::awake(update_UI_PTT);
 	}
 
-	std::string help() { return std::string("sets PTT on (1) or off (0), NO read request"); }
+	std::string help() { return std::string("deprecated; use rig.set_ptt"); }
 
 } rig_set_ptt_fast(&rig_server);
 
@@ -1339,6 +1488,28 @@ public:
 
 } rig_set_swap(&rig_server);
 
+class rig_set_verify_swap : public XmlRpcServerMethod {
+public:
+	rig_set_verify_swap(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_verify_swap", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online) {
+			result = 0;
+			return;
+		}
+
+		guard_lock lock(&mutex_srvc_reqs, "xml rig_set_verify_swap");
+		VFOQUEUE xcvr;
+		xcvr.change = SWAP;
+		xml_trace(1, "xmlrpc SWAP");
+		srvc_reqs.push(xcvr);
+
+	}
+
+	std::string help() { return std::string("executes vfo swap"); }
+
+} rig_set_verify_swap(&rig_server);
+
 //------------------------------------------------------------------------------
 // Execute vfo split operation
 //------------------------------------------------------------------------------
@@ -1367,6 +1538,31 @@ public:
 	std::string help() { return std::string("executes vfo split"); }
 
 } rig_set_split(&rig_server);
+
+class rig_set_verify_split : public XmlRpcServerMethod {
+public:
+	rig_set_verify_split(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_verify_split", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online) {
+			result = 0;
+			return;
+		}
+		int state = int(params[0]);
+
+		guard_lock lock(&mutex_srvc_reqs, "xml rig_set_verify_split");
+
+		VFOQUEUE xcvr_split;
+		if (state) xcvr_split.change = sON;
+		else       xcvr_split.change = sOFF;
+		xml_trace(1, (state ? "rig_set_verify_split ON" : "rig_set_verify_split OFF"));
+		srvc_reqs.push(xcvr_split);
+
+	}
+
+	std::string help() { return std::string("sets & verifies vfo split"); }
+
+} rig_set_verify_split(&rig_server);
 
 //------------------------------------------------------------------------------
 // Set vfo in use A or B
@@ -1412,9 +1608,42 @@ xml_trace(4, "set_AB ", ans.c_str(), " ", printXCVR_STATE(vfo).c_str());
 		srvc_reqs.push (VFOQUEUE((ans == "A" ? sA : sB), vfo));
 	}
 
-	std::string help() { return std::string("sets vfo in use A or B"); }
+	std::string help() { return std::string("sets & verifies vfo in use A or B"); }
 
 } rig_set_AB(&rig_server);
+
+class rig_set_verify_AB : public XmlRpcServerMethod {
+public:
+	rig_set_verify_AB(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_verify_AB", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online) {
+			result = 0;
+			return;
+		}
+		std::string ans = std::string(params[0]);
+		if (!(ans == "A" || ans == "B")) {
+			return;
+		}
+
+		if (!ptt_off()) {
+			trace(1, "!ptt_off()");
+			return;
+		}
+
+		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_set_verify_AB");
+		XCVR_STATE vfo = vfoA;
+
+		vfo.src = SRVR;
+
+
+xml_trace(4, "set verify AB ", ans.c_str(), " ", printXCVR_STATE(vfo).c_str());
+		srvc_reqs.push (VFOQUEUE((ans == "A" ? sA : sB), vfo));
+	}
+
+	std::string help() { return std::string("sets & verifies vfo in use A or B"); }
+
+} rig_set_verify_AB(&rig_server);
 
 //------------------------------------------------------------------------------
 // Set vfoA frequency
@@ -1429,21 +1658,39 @@ public:
 			result = 0;
 			return;
 		}
-		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
+		unsigned long int freq = static_cast<unsigned long int>((double)params[0]);
 
 		guard_lock serial(&mutex_serial);
 
-		srvr_vfo = vfoA;
-		srvr_vfo.freq = freq;
-		selrig->set_vfoA(srvr_vfo.freq);
-		srvr_vfo.freq = selrig->get_vfoA();
-		vfoA = srvr_vfo;
+		selrig->set_vfoA(freq);
+		vfoA.freq = freq;
+		Fl::awake(setFreqDispA, (void *)freq);
 
-		Fl::awake(setFreqDispA, (void *)vfoA.freq);
 	}
 	std::string help() { return std::string("rig.set_vfo NNNNNNNN (Hz)"); }
 
 } rig_set_vfoA(&rig_server);
+
+class rig_set_verify_vfoA : public XmlRpcServerMethod {
+public:
+	rig_set_verify_vfoA(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_verify_vfoA", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online) {
+			result = 0;
+			return;
+		}
+		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
+
+		guard_lock serial(&mutex_serial);
+
+		selrig->set_vfoA(freq);
+		vfoA.freq = selrig->get_vfoA();
+		Fl::awake(setFreqDispA, (void *)vfoA.freq);
+	}
+	std::string help() { return std::string("rig.set_verify_vfo NNNNNNNN (Hz)"); }
+
+} rig_set_verify_vfoA(&rig_server);
 
 class rig_set_vfoA_fast : public XmlRpcServerMethod {
 public:
@@ -1458,14 +1705,11 @@ public:
 
 		guard_lock serial(&mutex_serial);
 
-		srvr_vfo = vfoA;
-		srvr_vfo.freq = freq;
-		selrig->set_vfoA(srvr_vfo.freq);
-		vfoA = srvr_vfo;
-
-		Fl::awake(setFreqDispA, (void *)vfoA.freq);
+		selrig->set_vfoA(freq);
+		vfoA.freq = freq;
+		Fl::awake(setFreqDispA, (void *)freq);
 	}
-	std::string help() { return std::string("rig.set_vfo NNNNNNNN (Hz)"); }
+	std::string help() { return std::string("deprecated; use rig.set_vfoA"); }
 
 } rig_set_vfoA_fast(&rig_server);
 
@@ -1486,17 +1730,34 @@ public:
 
 		guard_lock serial(&mutex_serial);
 
-		srvr_vfo = vfoB;
-		srvr_vfo.freq = freq;
-		selrig->set_vfoB(srvr_vfo.freq);
-		srvr_vfo.freq = selrig->get_vfoB();
-		vfoB = srvr_vfo;
-
-		Fl::awake(setFreqDispB, (void *)vfoB.freq);
+		selrig->set_vfoB(freq);
+		vfoB.freq = freq;
+		Fl::awake(setFreqDispB, (void *)freq);
 	}
 	std::string help() { return std::string("rig.set_vfo NNNNNNNN (Hz)"); }
 
 } rig_set_vfoB(&rig_server);
+
+class rig_set_verify_vfoB : public XmlRpcServerMethod {
+public:
+	rig_set_verify_vfoB(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_verify_vfoB", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online) {
+			result = 0;
+			return;
+		}
+		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
+
+		guard_lock serial(&mutex_serial);
+
+		selrig->set_vfoB(freq);
+		vfoB.freq = selrig->get_vfoB();
+		Fl::awake(setFreqDispB, (void *)vfoB.freq);
+	}
+	std::string help() { return std::string("rig.set_verify_vfo NNNNNNNN (Hz)"); }
+
+} rig_set_verify_vfoB(&rig_server);
 
 class rig_set_vfoB_fast : public XmlRpcServerMethod {
 public:
@@ -1510,15 +1771,11 @@ public:
 		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
 
 		guard_lock serial(&mutex_serial);
-
-		srvr_vfo = vfoB;
-		srvr_vfo.freq = freq;
-		selrig->set_vfoB(srvr_vfo.freq);
-		vfoB = srvr_vfo;
-
-		Fl::awake(setFreqDispA, (void *)vfoA.freq);
+		selrig->set_vfoB(freq);
+		vfoB.freq = freq;
+		Fl::awake(setFreqDispB, (void *)freq);
 	}
-	std::string help() { return std::string("rig.set_vfo NNNNNNNN (Hz)"); }
+	std::string help() { return std::string("deprecated; use rig.set_vfoB"); }
 
 } rig_set_vfoB_fast(&rig_server);
 
@@ -1536,18 +1793,49 @@ public:
 			return;
 		}
 		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
-// set the frequency in vfoA or vfoB
-		if (useB) srvr_vfo = vfoB;
-		else       srvr_vfo = vfoA;
-		srvr_vfo.freq = freq;
-		srvr_vfo.imode = -1;
-		srvr_vfo.iBW = 255;
 
-		push_xml();
+		guard_lock serial(&mutex_serial);
+		if (useB) {
+			selrig->set_vfoB(freq);
+			vfoB.freq = freq;
+			Fl::awake(setFreqDispB, (void *)freq);
+		}else {
+			selrig->set_vfoA(freq);
+			vfoA.freq = freq;
+			Fl::awake(setFreqDispA, (void *)freq);
+		}
+
 	}
 	std::string help() { return std::string("rig.set_vfo NNNNNNNN (Hz)"); }
 
 } rig_set_vfo(&rig_server);
+
+class rig_set_verify_vfo : public XmlRpcServerMethod {
+public:
+	rig_set_verify_vfo(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_verify_vfo", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online) {
+			result = 0;
+			return;
+		}
+		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
+
+		guard_lock serial(&mutex_serial);
+		if (useB) {
+			selrig->set_vfoB(freq);
+			vfoB.freq = selrig->get_vfoB();
+			Fl::awake(setFreqDispB, (void *)vfoB.freq);
+		}else {
+			selrig->set_vfoA(freq);
+			vfoA.freq = selrig->get_vfoA();
+			Fl::awake(setFreqDispA, (void *)vfoA.freq);
+		}
+
+	}
+	std::string help() { return std::string("rig.set_verify_vfo NNNNNNNN (Hz)"); }
+
+} rig_set_verify_vfo(&rig_server);
 
 
 class main_set_frequency : public XmlRpcServerMethod {
@@ -1560,14 +1848,18 @@ public:
 			return;
 		}
 		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
-// set the frequency in vfoA or vfoB
-		if (useB) srvr_vfo = vfoB;
-		else       srvr_vfo = vfoA;
-		srvr_vfo.freq = freq;
-		srvr_vfo.imode = -1;
-		srvr_vfo.iBW = 255;
 
-		push_xml();
+		guard_lock serial(&mutex_serial);
+		if (useB) {
+			selrig->set_vfoB(freq);
+			vfoB.freq = freq;
+			Fl::awake(setFreqDispB, (void *)freq);
+		}else {
+			selrig->set_vfoA(freq);
+			vfoA.freq = freq;
+			Fl::awake(setFreqDispA, (void *)freq);
+		}
+
 	}
 	std::string help() { return std::string("main.set_frequency NNNNNNNN (Hz)"); }
 
@@ -1583,27 +1875,51 @@ public:
 			return;
 		}
 		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
-// set the frequency in vfoA or vfoB
-		if (useB) srvr_vfo = vfoB;
-		else       srvr_vfo = vfoA;
-		srvr_vfo.freq = freq;
-		srvr_vfo.imode = -1;
-		srvr_vfo.iBW = 255;
 
-		push_xml();
-
-		unsigned long int ifreq = 0;
-		int n = 0;
-		while (ifreq != srvr_vfo.freq) {
-			MilliSleep(10);
-			ifreq = vfo->freq;
-			n++;
+		guard_lock serial(&mutex_serial);
+		if (useB) {
+			selrig->set_vfoB(freq);
+			vfoB.freq = freq;
+			Fl::awake(setFreqDispB, (void *)freq);
+		}else {
+			selrig->set_vfoA(freq);
+			vfoA.freq = freq;
+			Fl::awake(setFreqDispA, (void *)freq);
 		}
+
 		result = 1;
 	}
 	std::string help() { return std::string("rig.set_frequency NNNNNNNN (Hz)"); }
 
 } rig_set_frequency(&rig_server);
+
+class rig_set_verify_frequency : public XmlRpcServerMethod {
+public:
+	rig_set_verify_frequency(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_verify_frequency", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online) {
+			result = 0;
+			return;
+		}
+		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
+
+		guard_lock serial(&mutex_serial);
+		if (useB) {
+			selrig->set_vfoB(freq);
+			vfoB.freq = selrig->get_vfoB();
+			Fl::awake(setFreqDispB, (void *)vfoB.freq);
+		}else {
+			selrig->set_vfoA(freq);
+			vfoA.freq = selrig->get_vfoA();
+			Fl::awake(setFreqDispA, (void *)vfoA.freq);
+		}
+
+		result = 1;
+	}
+	std::string help() { return std::string("rig.set_verify_frequency NNNNNNNN (Hz)"); }
+
+} rig_set_verify_frequency(&rig_server);
 
 //------------------------------------------------------------------------------
 // Set mode on current vfo
@@ -1619,44 +1935,88 @@ public:
 			return;
 		}
 
-		if (useB)
-			srvr_vfo = vfoB;
-		else
-			srvr_vfo = vfoA;
+		XCVR_STATE nuvals;
+		nuvals.freq = 0;
+		nuvals.imode = -1;
+		nuvals.iBW = 255;
 
-		std::string numode = string(params[0]);
+		std::string numode = (string)params[0];
 		int i = 0;
 
 		if (!selrig->modes_) {
 			result = 0;
 			return;
 		}
-		if (numode == selrig->modes_[srvr_vfo.imode]) return;
 
 		while (selrig->modes_[i] != NULL) {
 			if (numode == selrig->modes_[i]) {
-				srvr_vfo.imode = i;
-
-				srvr_vfo.freq = 0;
-				srvr_vfo.iBW = selrig->def_bandwidth(srvr_vfo.imode);
-
-				push_xml();
+				nuvals.imode = i;
+				nuvals.iBW = selrig->def_bandwidth(i);
+				guard_lock serial_lock(&mutex_serial);
+				if (useB) {
+					serviceB(nuvals);
+				} else {
+					serviceA(nuvals);
+				}
+				Fl::awake(updateUI);
+				result = 1;
 				break;
 			}
 			i++;
 		}
-		int imode = -1;
-		int n = 0;
-		while (imode != srvr_vfo.imode) {
-			MilliSleep(10);
-			imode = vfo->imode;
-			n++;
-		}
-		result = 1;
+
 	}
+
 	std::string help() { return std::string("set_mode MODE_NAME"); }
 
 } rig_set_mode(&rig_server);
+
+class rig_set_verify_mode : public XmlRpcServerMethod {
+public:
+	rig_set_verify_mode(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_verify_mode", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue &result) {
+		result = 0;
+		if (!xcvr_online) {
+			return;
+		}
+
+		XCVR_STATE nuvals;
+		nuvals.freq = 0;
+		nuvals.imode = -1;
+		nuvals.iBW = 255;
+
+		std::string numode = (string)params[0];
+		int i = 0;
+
+		if (!selrig->modes_) {
+			return;
+		}
+
+		while (selrig->modes_[i] != NULL) {
+			if (numode == selrig->modes_[i]) {
+				nuvals.imode = i;
+				nuvals.iBW = selrig->def_bandwidth(i);
+				guard_lock serial_lock(&mutex_serial);
+				if (useB) {
+					serviceB(nuvals);
+					result = (i == selrig->get_modeB());
+				} else {
+					serviceA(nuvals);
+					result = (i == selrig->get_modeA());
+				}
+				Fl::awake(updateUI);
+				break;
+			}
+			i++;
+		}
+		return;
+
+	}
+
+	std::string help() { return std::string("set_mode MODE_NAME"); }
+
+} rig_set_verify_mode(&rig_server);
 
 
 //------------------------------------------------------------------------------
@@ -1673,47 +2033,77 @@ public:
 			return;
 		}
 
-		srvr_vfo = vfoA;
+		XCVR_STATE nuvals;
+		nuvals.freq = 0;
+		nuvals.imode = -1;
+		nuvals.iBW = 255;
 
-		std::string numode = string(params[0]);
+		std::string numode = (string)params[0];
 		int i = 0;
 
 		if (!selrig->modes_) {
 			result = 0;
 			return;
 		}
-		if (numode == selrig->modes_[srvr_vfo.imode]) return;
+
 		while (selrig->modes_[i] != NULL) {
 			if (numode == selrig->modes_[i]) {
-				srvr_vfo.imode = i;
-
-				srvr_vfo.freq = 0;
-				srvr_vfo.iBW = selrig->def_bandwidth(srvr_vfo.imode);
-
-				if (useB) {
-					guard_lock serial_lock(&mutex_serial);
-					selrig->selectA();
-					selrig->set_modeA(srvr_vfo.imode);
-					if (selrig->get_modeA() == srvr_vfo.imode)
-						selrig->set_bwA(srvr_vfo.iBW);
-					vfoA = srvr_vfo;
-					selrig->selectB();
-					break;
-				} else {
-					guard_lock serial_lock(&mutex_serial);
-					selrig->set_modeA(srvr_vfo.imode);
-					if (selrig->get_modeA() == srvr_vfo.imode)
-						selrig->set_bwA(srvr_vfo.iBW);
-					vfoA = srvr_vfo;
-					break;
-				}
+				nuvals.imode = i;
+				nuvals.iBW = selrig->def_bandwidth(i);
+				guard_lock serial_lock(&mutex_serial);
+				serviceA(nuvals);
+				Fl::awake(updateUI);
+				result = 1;
+				break;
 			}
 			i++;
 		}
+
 	}
+
 	std::string help() { return std::string("set_mode on vfo A"); }
 
 } rig_set_modeA(&rig_server);
+
+class rig_set_verify_modeA : public XmlRpcServerMethod {
+public:
+	rig_set_verify_modeA(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_verify_modeA", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue &result) {
+		result = 0;
+		if (!xcvr_online) {
+			return;
+		}
+
+		XCVR_STATE nuvals;
+		nuvals.freq = 0;
+		nuvals.imode = -1;
+		nuvals.iBW = 255;
+
+		std::string numode = (string)params[0];
+		int i = 0;
+
+		if (!selrig->modes_) {
+			return;
+		}
+
+		while (selrig->modes_[i] != NULL) {
+			if (numode == selrig->modes_[i]) {
+				nuvals.imode = i;
+				nuvals.iBW = selrig->def_bandwidth(i);
+				guard_lock serial_lock(&mutex_serial);
+				serviceA(nuvals);
+				Fl::awake(updateUI);
+				result = (i == selrig->get_modeA());
+				break;
+			}
+			i++;
+		}
+
+	}
+	std::string help() { return std::string("set_mode on vfo A"); }
+
+} rig_set_verify_modeA(&rig_server);
 
 
 //------------------------------------------------------------------------------
@@ -1730,47 +2120,76 @@ public:
 			return;
 		}
 
-		srvr_vfo = vfoB;
+		XCVR_STATE nuvals;
+		nuvals.freq = 0;
+		nuvals.imode = -1;
+		nuvals.iBW = 255;
 
-		std::string numode = string(params[0]);
+		std::string numode = (string)params[0];
 		int i = 0;
 
 		if (!selrig->modes_) {
 			result = 0;
 			return;
 		}
-		if (numode == selrig->modes_[srvr_vfo.imode]) return;
+
 		while (selrig->modes_[i] != NULL) {
 			if (numode == selrig->modes_[i]) {
-				srvr_vfo.imode = i;
-
-				srvr_vfo.freq = 0;
-				srvr_vfo.iBW = selrig->def_bandwidth(srvr_vfo.imode);
-
-				if (!useB) {
-					guard_lock serial_lock(&mutex_serial);
-					selrig->selectB();
-					selrig->set_modeB(srvr_vfo.imode);
-					if (selrig->get_modeB() == srvr_vfo.imode)
-						selrig->set_bwB(srvr_vfo.iBW);
-					vfoB = srvr_vfo;
-					selrig->selectA();
-					break;
-				} else {
-					guard_lock serial_lock(&mutex_serial);
-					selrig->set_modeB(srvr_vfo.imode);
-					if (selrig->get_modeB() == srvr_vfo.imode)
-						selrig->set_bwB(srvr_vfo.iBW);
-					vfoB = srvr_vfo;
-					break;
-				}
+				nuvals.imode = i;
+				nuvals.iBW = selrig->def_bandwidth(i);
+				guard_lock serial_lock(&mutex_serial);
+				serviceB(nuvals);
+				Fl::awake(updateUI);
+				result = 1;
+				break;
 			}
 			i++;
 		}
+
 	}
 	std::string help() { return std::string("set_mode on vfo B"); }
 
 } rig_set_modeB(&rig_server);
+
+class rig_set_verify_modeB : public XmlRpcServerMethod {
+public:
+	rig_set_verify_modeB(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_verify_modeB", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue &result) {
+		result= 0;
+		if (!xcvr_online) {
+			return;
+		}
+
+		XCVR_STATE nuvals;
+		nuvals.freq = 0;
+		nuvals.imode = -1;
+		nuvals.iBW = 255;
+
+		std::string numode = (string)params[0];
+		int i = 0;
+
+		if (!selrig->modes_) {
+			return;
+		}
+
+		while (selrig->modes_[i] != NULL) {
+			if (numode == selrig->modes_[i]) {
+				nuvals.imode = i;
+				nuvals.iBW = selrig->def_bandwidth(i);
+				guard_lock serial_lock(&mutex_serial);
+				serviceB(nuvals);
+				Fl::awake(updateUI);
+				result = (i == selrig->get_modeB());
+				break;
+			}
+			i++;
+		}
+
+	}
+	std::string help() { return std::string("set_mode on vfo B"); }
+
+} rig_set_verify_modeB(&rig_server);
 
 //------------------------------------------------------------------------------
 // Set bandwidth
@@ -1785,34 +2204,84 @@ public:
 			result = 0;
 			return;
 		}
-		int bw = int(params[0]);
+		int bw = (int)params[0];
 
-		{
-			guard_lock lock(&mutex_srvc_reqs, "xml rig_set_bandwidth");
-			if (useB) srvr_vfo = vfoB;
-			else      srvr_vfo = vfoA;
+		guard_lock lock(&mutex_srvc_reqs, "xml rig_set_bandwidth");
 
-			int i = 0;
-			while (	selrig->bandwidths_[i] && 
-				atol(selrig->bandwidths_[i]) < bw) {
-				i++;
-			}
-			if (!selrig->bandwidths_[i]) i--;
-			bw = atol(selrig->bandwidths_[i]);
-ostringstream s;
-s << "nearest bandwidth " << selrig->bandwidths_[i];
-xml_trace(2,"Set to ", s.str().c_str());
-			srvr_vfo.iBW = i;//bw * 256 * 256;
-			srvr_vfo.freq = 0;
-			srvr_vfo.imode = -1;
+		int i = 0;
+		while (	selrig->bandwidths_[i] &&
+			atol(selrig->bandwidths_[i]) < bw) {
+			i++;
 		}
+		if (!selrig->bandwidths_[i]) i--;
+		bw = atol(selrig->bandwidths_[i]);
 
-		push_xml();
+		ostringstream s;
+		s << "nearest bandwidth " << selrig->bandwidths_[i];
+		xml_trace(2,"Set to ", s.str().c_str());
+
+		XCVR_STATE nuvals;
+		nuvals.iBW = i;
+		if (useB) {
+			nuvals.freq = vfoB.freq;
+			nuvals.imode = vfoB.imode;
+			serviceB(nuvals);
+		} else {
+			nuvals.freq = vfoA.freq;
+			nuvals.imode = vfoA.imode;
+			serviceA(nuvals);
+		}
 
 	}
 	std::string help() { return std::string("set_bw to nearest requested"); }
 
 } rig_set_bandwidth(&rig_server);
+
+class rig_set_verify_bandwidth : public XmlRpcServerMethod {
+public:
+	rig_set_verify_bandwidth(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_verify_bandwidth", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online) {
+			result = 0;
+			return;
+		}
+		int bw = int(params[0]);
+
+		guard_lock lock(&mutex_srvc_reqs, "xml rig_set_verify_bandwidth");
+
+		int i = 0;
+		while (	selrig->bandwidths_[i] &&
+			atol(selrig->bandwidths_[i]) < bw) {
+			i++;
+		}
+		if (!selrig->bandwidths_[i]) i--;
+		bw = atol(selrig->bandwidths_[i]);
+
+		ostringstream s;
+		s << "nearest bandwidth " << selrig->bandwidths_[i];
+		xml_trace(2,"Set to ", s.str().c_str());
+
+		XCVR_STATE nuvals;
+		int retbw;
+		nuvals.iBW = i;
+		if (useB) {
+			nuvals.freq = vfoB.freq;
+			nuvals.imode = vfoB.imode;
+			serviceB(nuvals);
+			retbw = selrig->get_bwB();
+		} else {
+			nuvals.freq = vfoA.freq;
+			nuvals.imode = vfoA.imode;
+			serviceA(nuvals);
+			retbw = selrig->get_bwA();
+		}
+		result = (retbw == i);
+	}
+
+	std::string help() { return std::string("set_bw to nearest requested"); }
+
+} rig_set_verify_bandwidth(&rig_server);
 
 
 class rig_set_bw : public XmlRpcServerMethod {
@@ -1824,30 +2293,59 @@ public:
 			result = 0;
 			return;
 		}
-		int bw = int(params[0]);
+		int bw = (int)params[0];
 
-		if (useB)
-			srvr_vfo = vfoB;
-		else
-			srvr_vfo = vfoA;
-
-		srvr_vfo.iBW = bw;
-		srvr_vfo.freq = 0;
-		srvr_vfo.imode = -1;
-
-		push_xml();
-
-		int iBW = -1;
-		int n = 0;
-		while (iBW != srvr_vfo.iBW) {
-			MilliSleep(10);
-			iBW = vfo->iBW;
-			n++;
+		guard_lock que_lock ( &mutex_srvc_reqs, "xml rig_set_bw" );
+		XCVR_STATE nuvals;
+		nuvals.iBW = bw;
+		if (useB) {
+			nuvals.freq = vfoB.freq;
+			nuvals.imode = vfoB.imode;
+			serviceB(nuvals);
+		} else {
+			nuvals.freq = vfoA.freq;
+			nuvals.imode = vfoA.imode;
+			serviceA(nuvals);
 		}
+
 	}
 	std::string help() { return std::string("set_bw to VAL"); }
 
 } rig_set_bw(&rig_server);
+
+class rig_set_verify_bw : public XmlRpcServerMethod {
+public:
+	rig_set_verify_bw(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_verify_bw", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online) {
+			result = 0;
+			return;
+		}
+		string bwstr = params;
+
+		int bw = (int)params[0];
+		guard_lock que_lock ( &mutex_srvc_reqs, "xml rig_set_verify_bw" );
+
+		XCVR_STATE nuvals;
+		int retbw;
+		nuvals.iBW = bw;
+		if (useB) {
+			nuvals.freq = vfoB.freq;
+			nuvals.imode = vfoB.imode;
+			serviceB(nuvals);
+			retbw = selrig->get_bwB();
+		} else {
+			nuvals.freq = vfoA.freq;
+			nuvals.imode = vfoA.imode;
+			serviceA(nuvals);
+			retbw = selrig->get_bwA();
+		}
+		result = (retbw == bw);
+	}
+	std::string help() { return std::string("set_bw to VAL"); }
+
+} rig_set_verify_bw(&rig_server);
 
 class rig_set_BW : public XmlRpcServerMethod {
 public:
@@ -1860,32 +2358,62 @@ public:
 		}
 		string bwstr = params;
 
-		int bw = int(params[0]);
+		int bw = (int)params[0];
 		guard_lock que_lock ( &mutex_srvc_reqs, "xml rig_set_BW" );
-		if (useB)
-			srvr_vfo = vfoB;
-		else
-			srvr_vfo = vfoA;
 
-		srvr_vfo.iBW = bw;
-
-		srvr_vfo.freq = 0;
-		srvr_vfo.imode = -1;
-
-		push_xml();
-
-		int iBW = -1;
-		int n = 0;
-		while (iBW != srvr_vfo.iBW) {
-			MilliSleep(10);
-			iBW = vfo->iBW;
-			n++;
+		XCVR_STATE nuvals;
+		if (useB) {
+			nuvals.freq = vfoB.freq;
+			nuvals.imode = vfoB.imode;
+			nuvals.iBW = bw;
+			serviceB(nuvals);
+		} else {
+			nuvals.freq = vfoA.freq;
+			nuvals.imode = vfoA.imode;
+			nuvals.iBW = bw;
+			serviceA(nuvals);
 		}
+
 		result = 1;
 	}
 	std::string help() { return std::string("set_bw to VAL"); }
 
 } rig_set_BW(&rig_server);
+
+class rig_set_verify_BW : public XmlRpcServerMethod {
+public:
+	rig_set_verify_BW(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_verify_BW", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online) {
+			result = 0;
+			return;
+		}
+		string bwstr = params;
+
+		int bw = (int)params[0];
+		guard_lock que_lock ( &mutex_srvc_reqs, "xml rig_set_BW" );
+
+		XCVR_STATE nuvals;
+		int retbw;
+		nuvals.iBW = bw;
+		if (useB) {
+			nuvals.freq = vfoB.freq;
+			nuvals.imode = vfoB.imode;
+			serviceB(nuvals);
+			retbw = selrig->get_bwB();
+		} else {
+			nuvals.freq = vfoA.freq;
+			nuvals.imode = vfoA.imode;
+			retbw = selrig->get_bwA();
+			serviceA(nuvals);
+		}
+		result = (retbw == bw);
+
+	}
+	std::string help() { return std::string("set & verify BW to U/L values"); }
+
+} rig_set_verify_BW(&rig_server);
 
 static std::string retstr = "";
 
@@ -1924,7 +2452,7 @@ public:
 			retstr.clear();
 			waitResponse(10);//(100);
 			if (!respstr.empty()) {
-				retstr = usehex ? 
+				retstr = usehex ?
 					str2hex(respstr.c_str(), respstr.length()) :
 					respstr;
 				result = retstr;
@@ -2053,9 +2581,9 @@ static void set_cwio_send_button(void *val)
 	btn_cwioSEND->redraw();
 }
 
-class rig_set_cwio_send : public XmlRpcServerMethod {
+class rig_set_verify_cwio_send : public XmlRpcServerMethod {
 public:
-	rig_set_cwio_send(XmlRpcServer* s) : XmlRpcServerMethod("rig.cwio_send", s) {}
+	rig_set_verify_cwio_send(XmlRpcServer* s) : XmlRpcServerMethod("rig.cwio_send", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 		int send_state = int(params[0]);
@@ -2065,7 +2593,7 @@ public:
 
 	std::string help() { return std::string("sets cwio transmit on (1) or off (0)"); }
 
-} rig_set_cwio_send(&rig_server);
+} rig_set_verify_cwio_send(&rig_server);
 //------------------------------------------------------------------------------
 
 
@@ -2123,6 +2651,7 @@ struct MLIST {
 	{ "rig.get_volume",   "i:n", "returns volume control value" },
 	{ "rig.get_rfgain",   "i:n", "returns rf gain control value" },
 	{ "rig.get_micgain",  "i:n", "returns mic gain control value" },
+
 	{ "rig.set_AB",       "n:s", "set VFO A/B" },
 	{ "rig.set_bw",       "i:i", "set BW iaw BW table" },
 	{ "rig.set_bandwidth","i:i", "set bandwidth to nearest requested value" },
@@ -2134,16 +2663,36 @@ struct MLIST {
 	{ "rig.set_notch",    "n:i", "set NOTCH value in Hz" },
 	{ "rig.set_power",    "n:i", "set power control level, watts" },
 	{ "rig.set_ptt",      "n:i", "set PTT 1/0 (on/off)" },
-	{ "rig.set_ptt_fast", "n:i", "PTT 1/0 (on/off) (NO confirmation)" },
 	{ "rig.set_vfo",      "d:d", "set current VFO in Hz" },
 	{ "rig.set_vfoA",     "d:d", "set vfo A in Hz" },
 	{ "rig.set_vfoB",     "d:d", "set vfo B in Hz" },
-	{ "rig.set_vfoA_fast","d:d", "set vfo A in Hz (NO confirmation)" },
-	{ "rig.set_vfoB_fast","d:d", "set vfo B in Hz (NO confirmation)" },
 	{ "rig.set_split",    "n:i", "set split 1/0 (on/off)" },
-	{ "rig.set_volume",   "n:i", "sets volume control" },
-	{ "rig.set_rfgain",   "n:i", "sets rf gain control" },
-	{ "rig.set_micgain",  "n:i", "sets mic gain control" },
+	{ "rig.set_volume",   "n:i", "set volume control" },
+	{ "rig.set_rfgain",   "n:i", "set rf gain control" },
+	{ "rig.set_micgain",  "n:i", "set mic gain control" },
+
+	{ "rig.set_ptt_fast",        "n:i", "deprecated; use set_ptt" },
+	{ "rig.set_vfoA_fast",       "d:d", "deprecated; use set_vfoA" },
+	{ "rig.set_vfoB_fast",       "d:d", "deprecated; use set_vfoB" },
+
+	{ "rig.set_verify_AB",       "n:s", "set & verify VFO A/B" },
+	{ "rig.set_verify_bw",       "i:i", "set & verify BW iaw BW table" },
+	{ "rig.set_verify_bandwidth","i:i", "set & verify bandwidth to nearest requested value" },
+	{ "rig.set_verify_BW",       "i:i", "set & verify L/U pair" },
+	{ "rig.set_verify_frequency","d:d", "set & verify current VFO in Hz" },
+	{ "rig.set_verify_mode",     "i:s", "set & verify MODE iaw MODE table" },
+	{ "rig.set_verify_modeA",    "i:s", "set & verify MODE A iaw MODE table" },
+	{ "rig.set_verify_modeB",    "i:s", "set & verify MODE B iaw MODE table" },
+	{ "rig.set_verify_notch",    "n:i", "set & verify NOTCH value in Hz" },
+	{ "rig.set_verify_power",    "n:i", "set & verify power control level, watts" },
+	{ "rig.set_verify_ptt",      "n:i", "set & verify PTT 1/0 (on/off)" },
+	{ "rig.set_verify_vfoA",     "d:d", "set & verify vfo A in Hz" },
+	{ "rig.set_verify_vfoB",     "d:d", "set & verify vfo B in Hz" },
+	{ "rig.set_verify_split",    "n:i", "set & verify split 1/0 (on/off)" },
+	{ "rig.set_verify_volume",   "n:i", "set & verify volume control" },
+	{ "rig.set_verify_rfgain",   "n:i", "set & verify rf gain control" },
+	{ "rig.set_verify_micgain",  "n:i", "set & verify mic gain control" },
+
 	{ "rig.swap",         "n:n", "execute vfo swap" },
 	{ "rig.tune",         "n:n", "enable transceiver tune function"},
 	{ "rig.cat_string",   "s:s", "execute CAT string" },
@@ -2160,7 +2709,6 @@ public:
 	rig_list_methods(XmlRpcServer *s) : XmlRpcServerMethod("rig.list_methods", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-
 		vector<XmlRpcValue> methods;
 		for (size_t n = 0; n < sizeof(mlist) / sizeof(*mlist); ++n) {
 			XmlRpcValue::ValueStruct item;

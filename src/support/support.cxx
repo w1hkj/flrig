@@ -1322,7 +1322,6 @@ void serviceA(XCVR_STATE nuvals)
 {
 	if (nuvals.freq == 0) nuvals.freq = vfoA.freq;
 	if (nuvals.imode == -1) nuvals.imode = vfoA.imode;
-//	find_bandwidth(nuvals);
 	if (nuvals.iBW == 255) nuvals.iBW = vfoA.iBW;
 
 	if (useB) {

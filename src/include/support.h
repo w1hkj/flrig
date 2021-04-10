@@ -83,7 +83,7 @@ extern void setVolumeControl(void *);
 extern void setModeControl(void *);
 extern void set_bandwidth_control();
 extern void updateBandwidthControl(void *d = NULL);
-extern void updateBW(void *);
+extern void updateUI(void *);
 extern void update_split(void *);
 extern void setBWControl(void *);
 extern void setNotchControl(void *);
