@@ -52,7 +52,7 @@ static unsigned int _zmsec = 0;
 static unsigned int _zsec = 0;
 static unsigned int _zmin = 0;
 static unsigned int _zhr = 0;
-static struct tm tm;
+static struct tm tim;
 static time_t t_temp;
 static struct timeval tv;
 
@@ -61,12 +61,12 @@ void ztimer()
 	gettimeofday(&tv, NULL);
 
 	t_temp=(time_t)tv.tv_sec;
-	gmtime_r(&t_temp, &tm);
+	gmtime_r(&t_temp, &tim);
 
 	_zmsec = tv.tv_usec / 1000;
-	_zsec = tm.tm_sec;
-	_zmin = tm.tm_min;
-	_zhr  = tm.tm_hour;
+	_zsec = tim.tm_sec;
+	_zmin = tim.tm_min;
+	_zhr  = tim.tm_hour;
 }
 
 unsigned long zmsec(void)

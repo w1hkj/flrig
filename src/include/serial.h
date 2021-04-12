@@ -85,6 +85,18 @@ public:
 	bool WriteByte(char bybyte);
 	void FlushBuffer();
 
+	int  failed() { return failed_; }
+	void failed(int n) {
+		switch (n) {
+			case -1 : if (failed_) --failed_;
+					  break;
+			case 0 : failed_ = 0;
+					 break;
+			case 1 : ++failed_;
+					 break;
+			default: break;
+		}
+	}
 
 private:
 //Members
@@ -104,8 +116,12 @@ private:
 	bool	serptt;
 	int		stopbits;
 	char	bfr[2048];
+
+	int		failed_;
+
 //Methods
 	bool	IOselect();
+
 };
 
 //=============================================================================
@@ -182,6 +198,19 @@ public:
 	void Stopbits(int n) {stopbits = (n == 1 ? 1 : 2);}
 	int  Stopbits() { return stopbits;}
 
+	int  failed() { return failed_; }
+	void failed(int n) {
+		switch (n) {
+			case -1 : if (failed_) --failed_;
+					  break;
+			case 0 : failed_ = 0;
+					 break;
+			case 1 : ++failed_;
+					 break;
+			default: break;
+		}
+	}
+
 //Members
 private:
 	std::string device;
@@ -218,6 +247,8 @@ private:
 	bool	rtscts;
 	bool	serptt;
 	int		stopbits;
+
+	int		failed_;
 };
 
 #endif // __WIN32__

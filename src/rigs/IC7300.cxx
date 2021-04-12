@@ -301,6 +301,7 @@ void RIG_IC7300::set_xcvr_auto_on()
 	cmd = pre_to;
 	cmd += '\x19'; cmd += '\x00';
 	cmd.append(post);
+	RigSerial->failed(false);
 	if (waitFOR(8, "get ID") == false) {
 		cmd.clear();
 		int fes[] = { 2, 2, 2, 3, 7, 13, 25, 50, 75, 150, 150, 150 };
@@ -310,18 +311,25 @@ void RIG_IC7300::set_xcvr_auto_on()
 		cmd.append(pre_to);
 		cmd += '\x18'; cmd += '\x01';
 		cmd.append(post);
+		RigSerial->failed(0);
 		if (waitFB("Power ON")) {
 			xcvr_is_on = true;
 			cmd = pre_to; cmd += '\x19'; cmd += '\x00';
 			cmd.append(post);
-			for (int i = 0; i < 50; i++) {
-				MilliSleep(100);
-				if (waitFOR(8, "get ID")) break;
-				update_progress(i*2);
+			int i = 0;
+			for (i = 0; i < 200; i++) {
+				MilliSleep(50);
+				if (waitFOR(8, "get ID") == true) {
+					RigSerial->failed(0);
+					return;
+				}
+				update_progress(i / 2);
 				Fl::awake();
 			}
+			RigSerial->failed(0);
 			return;
 		}
+		RigSerial->failed(1);
 		xcvr_is_on = false;
 		return;
 	}
@@ -1293,7 +1301,7 @@ int RIG_IC7300::get_smeter()
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			mtr = fm_bcd(replystr.substr(p+6), 3);
-			mtr = (int)ceil(mtr /2.41);
+			mtr = (int)ceil(mtr / 2.41);
 			if (mtr > 100) mtr = 100;
 		}
 	}
@@ -1689,6 +1697,7 @@ void RIG_IC7300::set_squelch(int val)
 	waitFB("set Sqlch");
 }
 
+#include <iostream>
 int  RIG_IC7300::get_squelch()
 {
 	int val = progStatus.squelch;

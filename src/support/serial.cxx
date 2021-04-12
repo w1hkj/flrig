@@ -59,6 +59,7 @@ Cserial::Cserial() {
 	status = 0;
 	stopbits = 2;
 	fd = -1;
+	failed_ = 0;
 }
 
 Cserial::~Cserial() {
@@ -185,6 +186,8 @@ bool Cserial::OpenPort()  {
 
 	FlushBuffer();
 
+	failed_ = 0;
+
 	return true;
 }
 
@@ -297,6 +300,7 @@ void Cserial::ClosePort()
 	tcsetattr (myfd, TCSANOW, &oldtio);
 	close(myfd);
 	fd = -1;
+	failed_ = false;
 	return;
 }
 
@@ -448,6 +452,8 @@ LOG_ERROR("Open Comm port %s ; hComm = %d", COMportname.c_str(), (int)hComm);
 
 	ConfigurePort( baud, 8, false, NOPARITY, stopbits);
 	FlushBuffer();
+	failed_ = false;
+
 	return true;
 }
 
@@ -464,6 +470,7 @@ void Cserial::ClosePort()
 		CloseHandle(hComm);
 	}
 	hComm = INVALID_HANDLE_VALUE;
+	failed_ = false;
 	return;
 }
 
@@ -990,6 +997,7 @@ Cserial::Cserial( std::string portname) {
 
 Cserial::~Cserial() {
 	ClosePort();
+
 }
 
 #endif

@@ -66,8 +66,8 @@ static Fl_Browser*			btext = (Fl_Browser *)0;
 static string buffer;
 
 debug* debug::inst = 0;
-//debug::level_e debug::level = debug::ERROR_LEVEL;
-debug::level_e debug::level = debug::INFO_LEVEL;
+debug::level_e debug::level = debug::ERROR_LEVEL;
+//debug::level_e debug::level = debug::INFO_LEVEL;
 
 uint32_t debug::mask = ~0u;
 
@@ -166,6 +166,7 @@ void debug::slog(level_e level, const char* func, const char* srcf, int line, co
 	if (progStatus.debugtrace) trace(1, sztemp);
 
 	fprintf(wfile, "[%s] %s", ztime(), sztemp);
+std::cout << "[" << ztime() << "] " << sztemp << std::endl;
 
 	va_end(args);
 

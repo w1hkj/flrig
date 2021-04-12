@@ -834,8 +834,6 @@ static void cb_init_ser_port(Fl_Return_Button*, void*) {
 	if (progStatus.UIsize == wide_ui) {
 		btn_show_controls->label("@-22->");
 		btn_show_controls->redraw_label();
-		grpTABS->hide();
-		mainwindow->resizable(grpTABS);
 		mainwindow->size(mainwindow->w(), WIDE_MAINH);
 		mainwindow->size_range(WIDE_MAINW, WIDE_MAINH, 0, WIDE_MAINH);
 	}

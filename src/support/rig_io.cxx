@@ -63,7 +63,7 @@ bool startXcvrSerial()
 	bypass_serial_thread_loop = true;
 // setup commands for serial port
 	if (progStatus.xcvr_serial_port == "NONE") {
-		bypass_serial_thread_loop = false;
+//		bypass_serial_thread_loop = false;
 		return false;
 	}
 
@@ -239,7 +239,7 @@ static char sztimeout_alert[200];
 
 static void show_timeout(void *)
 {
-	fl_alert2("%s",sztimeout_alert);
+	fl_alert2("%s", sztimeout_alert);
 }
 
 bool waitCommand(
@@ -302,6 +302,7 @@ bool waitCommand(
 			snprintf(sztemp, sizeof(sztemp), "%s rcvd in %d msec", info.c_str(), waited);
 			showresp(level, how, sztemp, command, returned);
 			waitcount = 0;
+			RigSerial->failed(-1);
 			return true;
 		}
 		waited += 10;
@@ -316,8 +317,9 @@ bool waitCommand(
 	if (waitcount > 4 && !timeout_alert) {
 		timeout_alert = true;
 		snprintf(sztimeout_alert, sizeof(sztimeout_alert), 
-			"Serial i/o failure\n%s TIME OUT in %d ms",
+			"Serial i/o failure\n%s TIMED OUT in %d ms",
 			command.c_str(), waited);
+			RigSerial->failed(1);
 			Fl::awake(show_timeout);
 	}
 	return false;

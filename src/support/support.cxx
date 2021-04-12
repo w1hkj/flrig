@@ -1514,6 +1514,24 @@ void set_ptt(void *d)
 	}
 }
 
+#define MAX_FAILURES 5
+
+void serial_failed(void *)
+{
+	bypass_serial_thread_loop = true;
+	RigSerial->ClosePort();
+
+	box_xcvr_connect->color(FL_BACKGROUND2_COLOR);
+	box_xcvr_connect->redraw();
+
+	fl_alert2(_("\
+Serial communications failure!\n\n\
+  . Check serial (COM) port connection.\n\
+  . Open menu Config/Setup/Transceiver.\n\
+  . Press 'Ser Port' button, reselect port.\n\
+  . Press 'Init' button."));
+}
+
 void * serial_thread_loop(void *d)
 {
   static int  loopcount = progStatus.serloop_timing / 10;
@@ -1530,6 +1548,9 @@ void * serial_thread_loop(void *d)
 		if (bypass_serial_thread_loop) {
 			goto serial_bypass_loop;
 		}
+
+		if (RigSerial->failed() >= MAX_FAILURES)
+			Fl::awake(serial_failed);
 
 //send any freq/mode/bw changes in the queu
 		if (!srvc_reqs.empty())
@@ -1584,7 +1605,10 @@ void * serial_thread_loop(void *d)
 						guard_lock serial_lock(&mutex_serial);
 						(poll_parameters->pollfunc)();
 					}
+					if (RigSerial->failed() >= MAX_FAILURES)
+						Fl::awake(serial_failed);
 					poll_parameters++;
+
 				}
 			}
 		} else {
@@ -1612,6 +1636,8 @@ void * serial_thread_loop(void *d)
 						guard_lock serial_lock(&mutex_serial);
 						(poll_parameters->pollfunc)();
 					}
+					if (RigSerial->failed() >= MAX_FAILURES)
+						Fl::awake(serial_failed);
 					poll_parameters++;
 				}
 			}
@@ -3436,8 +3462,6 @@ void close_UI()
 		trace(1, "close_UI()");
 		run_serial_thread = false;
 	}
-//std::cout << "close_UI()" << std::endl;
-//std::cout << "pthread_join(*serial_thread, NULL)" << std::endl;
 	pthread_join(*serial_thread, NULL);
 
 // xcvr auto off
@@ -4012,6 +4036,8 @@ void adjust_wide_ui()
 		tabsGeneric->remove(genericRXB);
 		if (selrig->has_rit || selrig->has_xit || selrig->has_bfo)
 			tabsGeneric->add(genericRXB);
+
+		tabsGeneric->redraw();
 		tabsGeneric->show();
 		if (selrig->has_agc_control) {
 			btnAGC->show();
@@ -4153,411 +4179,460 @@ void adjust_control_positions()
 	set_sliders_when();
 }
 
-void initTabs()
+void init_TT550_tabs()
 {
-	if (xcvr_name == rig_TT550.name_) {
-		spnr_tt550_line_out->value(progStatus.tt550_line_out);
-		cbo_tt550_agc_level->index(progStatus.tt550_agc_level);
-		spnr_tt550_cw_wpm->value(progStatus.tt550_cw_wpm);
-		spnr_tt550_cw_vol->value(progStatus.tt550_cw_vol);
-		spnr_tt550_cw_spot->value(progStatus.tt550_cw_spot);
-		spnr_tt550_cw_weight->value(progStatus.tt550_cw_weight);
-		spnr_tt550_cw_qsk->value(progStatus.tt550_cw_qsk);
-		btn_tt550_enable_keyer->value(progStatus.tt550_enable_keyer);
-		btn_tt550_vox->value(progStatus.tt550_vox_onoff);
-		spnr_tt550_vox_gain->value(progStatus.tt550_vox_gain);
-		spnr_tt550_anti_vox->value(progStatus.tt550_vox_anti);
-		spnr_tt550_vox_hang->value(progStatus.tt550_vox_hang);
-		btn_tt550_CompON->value(progStatus.tt550_compON);
-		spnr_tt550_compression->value(progStatus.tt550_compression);
-		spnr_tt550_mon_vol->value(progStatus.tt550_mon_vol);
-		btn_tt550_enable_xmtr->value(progStatus.tt550_enable_xmtr);
-		btn_tt550_enable_tloop->value(progStatus.tt550_enable_tloop);
-		btn_tt550_tuner_bypass->value(progStatus.tt550_tuner_bypass);
-		btn_tt550_use_xmt_bw->value(progStatus.tt550_use_xmt_bw);
-		sel_tt550_encoder_step->value(progStatus.tt550_encoder_step);
-		spnr_tt550_encoder_sensitivity->value(progStatus.tt550_encoder_sensitivity);
-		sel_tt550_F1_func->value(progStatus.tt550_F1_func);
-		sel_tt550_F2_func->value(progStatus.tt550_F2_func);
-		sel_tt550_F3_func->value(progStatus.tt550_F3_func);
-		progStatus.use_rig_data = false;
-		op_tt550_XmtBW->clear();
-		for (int i = 0; TT550_xmt_widths[i] != NULL; i++) {
-			op_tt550_XmtBW->add(TT550_xmt_widths[i]);
-		}
-		op_tt550_XmtBW->activate();
-		op_tt550_XmtBW->index(progStatus.tt550_xmt_bw);
-
+	spnr_tt550_line_out->value(progStatus.tt550_line_out);
+	cbo_tt550_agc_level->index(progStatus.tt550_agc_level);
+	spnr_tt550_cw_wpm->value(progStatus.tt550_cw_wpm);
+	spnr_tt550_cw_vol->value(progStatus.tt550_cw_vol);
+	spnr_tt550_cw_spot->value(progStatus.tt550_cw_spot);
+	spnr_tt550_cw_weight->value(progStatus.tt550_cw_weight);
+	spnr_tt550_cw_qsk->value(progStatus.tt550_cw_qsk);
+	btn_tt550_enable_keyer->value(progStatus.tt550_enable_keyer);
+	btn_tt550_vox->value(progStatus.tt550_vox_onoff);
+	spnr_tt550_vox_gain->value(progStatus.tt550_vox_gain);
+	spnr_tt550_anti_vox->value(progStatus.tt550_vox_anti);
+	spnr_tt550_vox_hang->value(progStatus.tt550_vox_hang);
+	btn_tt550_CompON->value(progStatus.tt550_compON);
+	spnr_tt550_compression->value(progStatus.tt550_compression);
+	spnr_tt550_mon_vol->value(progStatus.tt550_mon_vol);
+	btn_tt550_enable_xmtr->value(progStatus.tt550_enable_xmtr);
+	btn_tt550_enable_tloop->value(progStatus.tt550_enable_tloop);
+	btn_tt550_tuner_bypass->value(progStatus.tt550_tuner_bypass);
+	btn_tt550_use_xmt_bw->value(progStatus.tt550_use_xmt_bw);
+	sel_tt550_encoder_step->value(progStatus.tt550_encoder_step);
+	spnr_tt550_encoder_sensitivity->value(progStatus.tt550_encoder_sensitivity);
+	sel_tt550_F1_func->value(progStatus.tt550_F1_func);
+	sel_tt550_F2_func->value(progStatus.tt550_F2_func);
+	sel_tt550_F3_func->value(progStatus.tt550_F3_func);
+	progStatus.use_rig_data = false;
+	op_tt550_XmtBW->clear();
+	for (int i = 0; TT550_xmt_widths[i] != NULL; i++) {
+		op_tt550_XmtBW->add(TT550_xmt_widths[i]);
+	}
+	op_tt550_XmtBW->activate();
+	op_tt550_XmtBW->index(progStatus.tt550_xmt_bw);
 		poll_smeter->activate(); poll_smeter->value(progStatus.poll_smeter);
-		poll_pout->activate(); poll_pout->value(progStatus.poll_pout);
-		poll_swr->activate(); poll_swr->value(progStatus.poll_swr);
-		poll_alc->activate(); poll_alc->value(progStatus.poll_alc);
-		poll_frequency->deactivate(); poll_frequency->value(0);
-		poll_mode->deactivate(); poll_mode->value(0);
-		poll_bandwidth->deactivate(); poll_bandwidth->value(0);
-		poll_volume->deactivate(); poll_volume->value(0);
-		poll_notch->deactivate(); poll_notch->value(0);
-		poll_auto_notch->deactivate(); poll_auto_notch->value(0);
-		poll_ifshift->deactivate(); poll_ifshift->value(0);
-		poll_power_control->deactivate(); poll_power_control->value(0);
-		poll_pre_att->deactivate(); poll_pre_att->value(0);
-		poll_squelch->deactivate(); poll_squelch->value(0);
-		poll_micgain->deactivate(); poll_micgain->value(0);
-		poll_rfgain->deactivate(); poll_rfgain->value(0);
-		poll_split->deactivate(); poll_split->value(0);
-		poll_nr->deactivate(); poll_nr->value(0);
-		poll_noise->deactivate(); poll_noise->value(0);
-		poll_all->deactivate(); poll_all->value(0);
+	poll_pout->activate(); poll_pout->value(progStatus.poll_pout);
+	poll_swr->activate(); poll_swr->value(progStatus.poll_swr);
+	poll_alc->activate(); poll_alc->value(progStatus.poll_alc);
+	poll_frequency->deactivate(); poll_frequency->value(0);
+	poll_mode->deactivate(); poll_mode->value(0);
+	poll_bandwidth->deactivate(); poll_bandwidth->value(0);
+	poll_volume->deactivate(); poll_volume->value(0);
+	poll_notch->deactivate(); poll_notch->value(0);
+	poll_auto_notch->deactivate(); poll_auto_notch->value(0);
+	poll_ifshift->deactivate(); poll_ifshift->value(0);
+	poll_power_control->deactivate(); poll_power_control->value(0);
+	poll_pre_att->deactivate(); poll_pre_att->value(0);
+	poll_squelch->deactivate(); poll_squelch->value(0);
+	poll_micgain->deactivate(); poll_micgain->value(0);
+	poll_rfgain->deactivate(); poll_rfgain->value(0);
+	poll_split->deactivate(); poll_split->value(0);
+	poll_nr->deactivate(); poll_nr->value(0);
+	poll_noise->deactivate(); poll_noise->value(0);
+	poll_all->deactivate(); poll_all->value(0);
 
-		if (progStatus.tt550_at11_inline) {
-			tt550_AT_inline->value(1);
-			tt550_AT_inline->label("Inline");
-			tt550_AT_inline->redraw_label();
-			selrig->at11_autotune();
-		} else {
-			tt550_AT_inline->value(0);
-			tt550_AT_inline->label("Bypassed");
-			tt550_AT_inline->redraw_label();
-			selrig->at11_bypass();
-		}
-		if (progStatus.tt550_at11_hiZ) {
-			selrig->at11_hiZ();
-			tt550_AT_Z->value(1);
-		} else{
-			selrig->at11_loZ();
-			tt550_AT_Z->value(0);
-		}
-
+	if (progStatus.tt550_at11_inline) {
+		tt550_AT_inline->value(1);
+		tt550_AT_inline->label("Inline");
+		tt550_AT_inline->redraw_label();
+		selrig->at11_autotune();
 	} else {
+		tt550_AT_inline->value(0);
+		tt550_AT_inline->label("Bypassed");
+		tt550_AT_inline->redraw_label();
+		selrig->at11_bypass();
+	}
+	if (progStatus.tt550_at11_hiZ) {
+		selrig->at11_hiZ();
+		tt550_AT_Z->value(1);
+	} else{
+		selrig->at11_loZ();
+		tt550_AT_Z->value(0);
+	}
+}
 
-		if (hidden_tabs) {
-			hidden_tabs->add(tab_yaesu_bands);
-			hidden_tabs->add(tab_ft991_bands);
-			hidden_tabs->add(tab_FT8n_bands);
-			hidden_tabs->add(tab_FT8n_CTCSS);
-			hidden_tabs->add(tab_icom_bands);
-			hidden_tabs->add(genericCW);
-			hidden_tabs->add(genericQSK);
-			hidden_tabs->add(genericVOX);
-			hidden_tabs->add(genericSpeech);
-			hidden_tabs->add(genericRx);
-			hidden_tabs->add(genericMisc);
-			hidden_tabs->add(genericUser_1);
-			hidden_tabs->add(genericUser_2);
-			hidden_tabs->add(genericUser_3);
-			hidden_tabs->add(tab7610);
-		} else {
-			tabsGeneric->remove(tab_yaesu_bands);
-			tabsGeneric->remove(tab_ft991_bands);
-			tabsGeneric->remove(tab_FT8n_bands);
-			tabsGeneric->remove(tab_FT8n_CTCSS);
-			tabsGeneric->remove(tab_icom_bands);
-			tabsGeneric->remove(genericCW);
-			tabsGeneric->remove(genericQSK);
-			tabsGeneric->remove(genericVOX);
-			tabsGeneric->remove(genericSpeech);
-			tabsGeneric->remove(genericRx);
-			tabsGeneric->remove(genericMisc);
-			tabsGeneric->remove(genericUser_1);
-			tabsGeneric->remove(genericUser_2);
-			tabsGeneric->remove(genericUser_3);
-			tabsGeneric->remove(tab7610);
-		}
+void init_Generic_Tabs()
+{
+	if (hidden_tabs) {
+		hidden_tabs->remove(tab_yaesu_bands);
+		hidden_tabs->remove(tab_ft991_bands);
+		hidden_tabs->remove(tab_FT8n_bands);
+		hidden_tabs->remove(tab_FT8n_CTCSS);
+		hidden_tabs->remove(tab_icom_bands);
+		hidden_tabs->remove(genericCW);
+		hidden_tabs->remove(genericQSK);
+		hidden_tabs->remove(genericVOX);
+		hidden_tabs->remove(genericSpeech);
+		hidden_tabs->remove(genericRx);
+		hidden_tabs->remove(genericMisc);
+		hidden_tabs->remove(genericUser_1);
+		hidden_tabs->remove(genericUser_2);
+		hidden_tabs->remove(genericUser_3);
+		hidden_tabs->remove(tab7610);
 
-		if (selrig->has_band_selection) {
-			if (selrig->ICOMrig || selrig->name_ == rig_XIG90.name_) {
-				tabsGeneric->add(tab_icom_bands);
-				tab_icom_bands->redraw();
-			} else if (selrig->name_ == rig_FT857D.name_ || selrig->name_ == rig_FT897D.name_) {
-				tabsGeneric->add(tab_FT8n_bands);
-				tabsGeneric->add(tab_FT8n_CTCSS);
-				tab_FT8n_bands->redraw();
-				tab_FT8n_CTCSS->redraw();
-			} else if (selrig->name_ == rig_FT991A.name_) {
-				tabsGeneric->add(tab_ft991_bands);
-				tab_ft991_bands->redraw();
-			} else {
-				tabsGeneric->add(tab_yaesu_bands);
-				tab_yaesu_bands->redraw();
-			}
-		}
-
-		if (selrig->has_cw_wpm ||
-			selrig->has_cw_weight ||
-			selrig->has_cw_keyer ||
-			selrig->has_cw_spot ||
-			selrig->has_cw_spot_tone ) {
-
-			if (selrig->has_cw_wpm) {
-				int min, max;
-				selrig->get_cw_wpm_min_max(min, max);
-				spnr_cw_wpm->minimum(min);
-				spnr_cw_wpm->maximum(max);
-				spnr_cw_wpm->value(progStatus.cw_wpm);
-				spnr_cw_wpm->show();
-			} else
-				spnr_cw_wpm->hide();
-
-			if (selrig->has_cw_weight) {
-				double min, max, step;
-				selrig->get_cw_weight_min_max_step( min, max, step );
-				spnr_cw_weight->minimum(min);
-				spnr_cw_weight->maximum(max);
-				spnr_cw_weight->step(step);
-				spnr_cw_weight->value(progStatus.cw_weight);
-				spnr_cw_weight->show();
-			} else
-				spnr_cw_weight->hide();
-
-			if (selrig->has_cw_keyer) {
-				btn_enable_keyer->show();
-				btn_enable_keyer->value(progStatus.enable_keyer);
-				selrig->enable_keyer();
-			}
-			else
-				btn_enable_keyer->hide();
-
-			if (selrig->has_cw_spot) {
-				btnSpot->value(progStatus.cw_spot);
-				selrig->set_cw_spot();
-				btnSpot->show();
-			} else
-				btnSpot->hide();
-
-			if (selrig->has_cw_spot_tone) {
-				spnr_cw_spot_tone->show();
-				int min, max, step;
-				selrig->get_cw_spot_tone_min_max_step(min, max, step);
-				spnr_cw_spot_tone->minimum(min);
-				spnr_cw_spot_tone->maximum(max);
-				spnr_cw_spot_tone->step(step);
-				spnr_cw_spot_tone->value(progStatus.cw_spot_tone);
-				selrig->set_cw_spot_tone();
-			} else
-				spnr_cw_spot_tone->hide();
-
-			tabsGeneric->add(genericCW);
-			genericCW->redraw();
-		}
-
-		if (selrig->has_cw_qsk) {
-
-			tabsGeneric->add(genericQSK);
-
-			btnBreakIn->show();
-			spnr_cw_delay->show();
-
-			if (selrig->has_cw_qsk) {
-				double min, max, step;
-				selrig->get_cw_qsk_min_max_step(min, max, step);
-				spnr_cw_qsk->minimum(min);
-				spnr_cw_qsk->maximum(max);
-				spnr_cw_qsk->step(step);
-				spnr_cw_qsk->value(progStatus.cw_qsk);
-				spnr_cw_qsk->show();
-			} else
-				spnr_cw_qsk->hide();
-		}
-
-		if (selrig->has_vox_onoff ||
-			selrig->has_vox_gain ||
-			selrig->has_vox_hang ||
-			selrig->has_vox_on_dataport) {
-
-			if (selrig->has_vox_onoff) {
-				btn_vox->value(progStatus.vox_onoff);
-				btn_vox->show();
-				selrig->set_vox_onoff();
-			} else btn_vox->hide();
-
-			if (selrig->has_vox_gain) {
-				int min, max, step;
-				selrig->get_vox_gain_min_max_step(min, max, step);
-				spnr_vox_gain->minimum(min);
-				spnr_vox_gain->maximum(max);
-				spnr_vox_gain->step(step);
-				spnr_vox_gain->value(progStatus.vox_gain);
-				spnr_vox_gain->show();
-				selrig->set_vox_gain();
-			} else spnr_vox_gain->hide();
-
-			if (selrig->has_vox_anti) {
-				int min, max, step;
-				selrig->get_vox_anti_min_max_step(min, max, step);
-				spnr_anti_vox->minimum(min);
-				spnr_anti_vox->maximum(max);
-				spnr_anti_vox->step(step);
-				spnr_anti_vox->value(progStatus.vox_anti);
-				spnr_anti_vox->show();
-				selrig->set_vox_anti();
-			} else spnr_anti_vox->hide();
-
-			if (selrig->has_vox_hang) {
-				int min, max, step;
-				selrig->get_vox_hang_min_max_step(min, max, step);
-				spnr_vox_hang->minimum(min);
-				spnr_vox_hang->maximum(max);
-				spnr_vox_hang->step(step);
-				spnr_vox_hang->value(progStatus.vox_hang);
-				spnr_vox_hang->show();
-				selrig->set_vox_hang();
-			} else spnr_vox_hang->hide();
-
-			if (selrig->has_vox_on_dataport) {
-				btn_vox_on_dataport->value(progStatus.vox_on_dataport);
-				btn_vox_on_dataport->show();
-				selrig->set_vox_on_dataport();
-			} else btn_vox_on_dataport->hide();
-
-			tabsGeneric->add(genericVOX);
-			genericVOX->redraw();
-		}
-
-		if (selrig->has_compON ||
-			selrig->has_compression ) {
-
-			if (selrig->has_compON) {
-				btnCompON->show();
-				btnCompON->value(progStatus.compON);
-			} else
-				btnCompON->hide();
-
-			if (selrig->has_compression) {
-				int min, max, step;
-				selrig->get_comp_min_max_step(min, max, step);
-				spnr_compression->minimum(min);
-				spnr_compression->maximum(max);
-				spnr_compression->step(step);
-				spnr_compression->show();
-				spnr_compression->value(progStatus.compression);
-				selrig->set_compression(progStatus.compON, progStatus.compression);
-			} else
-				spnr_compression->hide();
-
-			tabsGeneric->add(genericSpeech);
-			genericSpeech->redraw();
-		}
-
-		if (selrig->has_nb_level ||
-			selrig->has_bpf_center ) {
-
-			if (selrig->has_nb_level)
-				sldr_nb_level->show();
-			else
-				sldr_nb_level->hide();
-
-			if (selrig->has_bpf_center) {
-				spnr_bpf_center->value(progStatus.bpf_center);
-				spnr_bpf_center->show();
-				btn_use_bpf_center->show();
-			} else {
-				spnr_bpf_center->hide();
-				btn_use_bpf_center->hide();
-			}
-			tabsGeneric->add(genericRx);
-			genericRx->redraw();
-		}
-
-		if (selrig->has_vfo_adj ||
-			selrig->has_line_out ||
-			selrig->has_xcvr_auto_on_off ) {
-
-			if (selrig->has_vfo_adj) {
-				int min, max, step;
-				selrig->get_vfoadj_min_max_step(min, max, step);
-				spnr_vfo_adj->minimum(min);
-				spnr_vfo_adj->maximum(max);
-				spnr_vfo_adj->step(step);
-				progStatus.vfo_adj = selrig->getVfoAdj();
-				spnr_vfo_adj->value(progStatus.vfo_adj);
-				spnr_vfo_adj->show();
-			} else
-				spnr_vfo_adj->hide();
-
-			if (selrig->has_line_out)
-				spnr_line_out->show();
-			else
-				spnr_line_out->hide();
-
-			if (selrig->has_xcvr_auto_on_off) {
-				btn_xcvr_auto_on->value(progStatus.xcvr_auto_on);
-				btn_xcvr_auto_off->value(progStatus.xcvr_auto_off);
-				btn_xcvr_auto_on->show();
-				btn_xcvr_auto_off->show();
-			} else {
-				btn_xcvr_auto_on->hide();
-				btn_xcvr_auto_off->hide();
-			}
-			tabsGeneric->add(genericMisc);
-			genericMisc->redraw();
-		}
-
-		tabsGeneric->add(genericUser_1);
-		tabsGeneric->add(genericUser_2);
-		tabsGeneric->add(genericUser_3);
-		genericUser_1->redraw();
-		genericUser_2->redraw();
-		genericUser_3->redraw();
-
-		if (selrig->name_ == rig_IC7610.name_) {
-			tabsGeneric->add(tab7610);
-			tab7610->redraw();
-			btnAttenuator->hide();
-		}
-
-		tabsGeneric->redraw();
-
-		poll_frequency->activate(); poll_frequency->value(progStatus.poll_frequency);
-		poll_mode->activate(); poll_mode->value(progStatus.poll_mode);
-		poll_bandwidth->activate(); poll_bandwidth->value(progStatus.poll_bandwidth);
-
-		poll_smeter->activate(); poll_smeter->value(progStatus.poll_smeter);
-		poll_pout->activate(); poll_pout->value(progStatus.poll_pout);
-		poll_swr->activate(); poll_swr->value(progStatus.poll_swr);
-		poll_alc->activate(); poll_alc->value(progStatus.poll_alc);
-		poll_volume->activate(); poll_volume->value(progStatus.poll_volume);
-		poll_notch->activate(); poll_notch->value(progStatus.poll_notch);
-		poll_auto_notch->activate(); poll_auto_notch->value(progStatus.poll_auto_notch);
-		poll_ifshift->activate(); poll_ifshift->value(progStatus.poll_ifshift);
-		poll_power_control->activate(); poll_power_control->value(progStatus.poll_power_control);
-		poll_pre_att->activate(); poll_pre_att->value(progStatus.poll_pre_att);
-		poll_squelch->activate(); poll_squelch->value(progStatus.poll_squelch);
-		poll_micgain->activate(); poll_micgain->value(progStatus.poll_micgain);
-		poll_rfgain->activate(); poll_rfgain->value(progStatus.poll_rfgain);
-		poll_split->activate(); poll_split->value(progStatus.poll_split);
-		poll_noise->activate(); poll_noise->value(progStatus.poll_noise);
-		poll_nr->activate(); poll_nr->value(progStatus.poll_nr);
-		poll_compression->activate(); poll_compression->value(progStatus.poll_compression);
-
-		if (!selrig->has_bandwidth_control) { poll_bandwidth->deactivate(); poll_bandwidth->value(0); }
-		if (!selrig->has_smeter) { poll_smeter->deactivate(); poll_smeter->value(0); }
-		if (!selrig->has_power_out) { poll_pout->deactivate(); poll_pout->value(0); }
-		if (!selrig->has_swr_control) { poll_swr->deactivate(); poll_swr->value(0); }
-		if (!selrig->has_alc_control) { poll_alc->deactivate(); poll_alc->value(0); }
-		if (!selrig->has_volume_control) { poll_volume->deactivate(); poll_volume->value(0); }
-		if (!selrig->has_notch_control) { poll_notch->deactivate(); poll_notch->value(0); }
-		if (!selrig->has_auto_notch ||
-			xcvr_name == rig_FT1000MP.name_ )
-			{ poll_auto_notch->deactivate(); poll_auto_notch->value(0); }
-		if (!selrig->has_ifshift_control &&
-			!selrig->has_pbt_controls) { poll_ifshift->deactivate(); poll_ifshift->value(0); }
-		if (selrig->has_pbt_controls) {
-			poll_ifshift->label("pbt");
-			poll_ifshift->redraw_label();
-		}
-		if (!selrig->has_power_control) { poll_power_control->deactivate(); poll_power_control->value(0); }
-		if (!selrig->has_preamp_control && !selrig->has_attenuator_control)
-			{ poll_pre_att->deactivate(); poll_pre_att->value(0); }
-		if (!selrig->has_sql_control) { poll_squelch->deactivate(); poll_squelch->value(0); }
-		if (!selrig->has_micgain_control) { poll_micgain->deactivate(); poll_micgain->value(0); }
-		if (!selrig->has_rf_control) { poll_rfgain->deactivate(); poll_rfgain->value(0); }
-		if (!selrig->has_split) { poll_split->deactivate(); poll_split->value(0); }
-		if (!selrig->has_noise_control) {poll_noise->deactivate(); poll_noise->value(0);}
-		if (!selrig->has_noise_reduction) {poll_nr->deactivate(); poll_nr->value(0);}
-		if (!selrig->has_compression) { poll_compression->deactivate(); poll_compression->value(0); }
-
+		hidden_tabs->add(tab_yaesu_bands);
+		hidden_tabs->add(tab_ft991_bands);
+		hidden_tabs->add(tab_FT8n_bands);
+		hidden_tabs->add(tab_FT8n_CTCSS);
+		hidden_tabs->add(tab_icom_bands);
+		hidden_tabs->add(genericCW);
+		hidden_tabs->add(genericQSK);
+		hidden_tabs->add(genericVOX);
+		hidden_tabs->add(genericSpeech);
+		hidden_tabs->add(genericRx);
+		hidden_tabs->add(genericMisc);
+		hidden_tabs->add(genericUser_1);
+		hidden_tabs->add(genericUser_2);
+		hidden_tabs->add(genericUser_3);
+		hidden_tabs->add(tab7610);
+	} else {
+		tabsGeneric->remove(tab_yaesu_bands);
+		tabsGeneric->remove(tab_ft991_bands);
+		tabsGeneric->remove(tab_FT8n_bands);
+		tabsGeneric->remove(tab_FT8n_CTCSS);
+		tabsGeneric->remove(tab_icom_bands);
+		tabsGeneric->remove(genericCW);
+		tabsGeneric->remove(genericQSK);
+		tabsGeneric->remove(genericVOX);
+		tabsGeneric->remove(genericSpeech);
+		tabsGeneric->remove(genericRx);
+		tabsGeneric->remove(genericMisc);
+		tabsGeneric->remove(genericUser_1);
+		tabsGeneric->remove(genericUser_2);
+		tabsGeneric->remove(genericUser_3);
+		tabsGeneric->remove(tab7610);
 	}
 
+	if (selrig->has_band_selection) {
+		if (selrig->ICOMrig || selrig->name_ == rig_XIG90.name_) {
+			tabsGeneric->add(tab_icom_bands);
+			tab_icom_bands->redraw();
+			tab_icom_bands->show();
+		} else if (selrig->name_ == rig_FT857D.name_ || selrig->name_ == rig_FT897D.name_) {
+			tabsGeneric->add(tab_FT8n_bands);
+			tabsGeneric->add(tab_FT8n_CTCSS);
+			tab_FT8n_bands->redraw();
+			tab_FT8n_CTCSS->redraw();
+			tab_FT8n_bands->show();
+			tab_FT8n_CTCSS->show();
+		} else if (selrig->name_ == rig_FT991A.name_) {
+			tabsGeneric->add(tab_ft991_bands);
+			tab_ft991_bands->redraw();
+			tab_ft991_bands->show();
+		} else {
+			tabsGeneric->add(tab_yaesu_bands);
+			tab_yaesu_bands->redraw();
+			tab_yaesu_bands->show();
+		}
+	}
+
+	if (selrig->has_cw_wpm ||
+		selrig->has_cw_weight ||
+		selrig->has_cw_keyer ||
+		selrig->has_cw_spot ||
+		selrig->has_cw_spot_tone ) {
+
+		if (selrig->has_cw_wpm) {
+			int min, max;
+			selrig->get_cw_wpm_min_max(min, max);
+			spnr_cw_wpm->minimum(min);
+			spnr_cw_wpm->maximum(max);
+			spnr_cw_wpm->value(progStatus.cw_wpm);
+			spnr_cw_wpm->show();
+		} else
+			spnr_cw_wpm->hide();
+
+		if (selrig->has_cw_weight) {
+			double min, max, step;
+			selrig->get_cw_weight_min_max_step( min, max, step );
+			spnr_cw_weight->minimum(min);
+			spnr_cw_weight->maximum(max);
+			spnr_cw_weight->step(step);
+			spnr_cw_weight->value(progStatus.cw_weight);
+			spnr_cw_weight->show();
+		} else
+			spnr_cw_weight->hide();
+
+		if (selrig->has_cw_keyer) {
+			btn_enable_keyer->show();
+			btn_enable_keyer->value(progStatus.enable_keyer);
+			selrig->enable_keyer();
+		}
+		else
+			btn_enable_keyer->hide();
+
+		if (selrig->has_cw_spot) {
+			btnSpot->value(progStatus.cw_spot);
+			selrig->set_cw_spot();
+			btnSpot->show();
+		} else
+			btnSpot->hide();
+
+		if (selrig->has_cw_spot_tone) {
+			spnr_cw_spot_tone->show();
+			int min, max, step;
+			selrig->get_cw_spot_tone_min_max_step(min, max, step);
+			spnr_cw_spot_tone->minimum(min);
+			spnr_cw_spot_tone->maximum(max);
+			spnr_cw_spot_tone->step(step);
+			spnr_cw_spot_tone->value(progStatus.cw_spot_tone);
+			selrig->set_cw_spot_tone();
+		} else
+			spnr_cw_spot_tone->hide();
+
+		tabsGeneric->add(genericCW);
+		genericCW->redraw();
+		genericCW->show();
+	}
+
+	if (selrig->has_cw_qsk) {
+
+		btnBreakIn->show();
+		spnr_cw_delay->show();
+
+		if (selrig->has_cw_qsk) {
+			double min, max, step;
+			selrig->get_cw_qsk_min_max_step(min, max, step);
+			spnr_cw_qsk->minimum(min);
+			spnr_cw_qsk->maximum(max);
+			spnr_cw_qsk->step(step);
+			spnr_cw_qsk->value(progStatus.cw_qsk);
+			spnr_cw_qsk->show();
+		} else
+			spnr_cw_qsk->hide();
+
+		tabsGeneric->add(genericQSK);
+		genericQSK->redraw();
+		genericQSK->show();
+	}
+
+	if (selrig->has_vox_onoff ||
+		selrig->has_vox_gain ||
+		selrig->has_vox_hang ||
+		selrig->has_vox_on_dataport) {
+
+		if (selrig->has_vox_onoff) {
+			btn_vox->value(progStatus.vox_onoff);
+			btn_vox->show();
+			selrig->set_vox_onoff();
+		} else
+			btn_vox->hide();
+
+		if (selrig->has_vox_gain) {
+			int min, max, step;
+			selrig->get_vox_gain_min_max_step(min, max, step);
+			spnr_vox_gain->minimum(min);
+			spnr_vox_gain->maximum(max);
+			spnr_vox_gain->step(step);
+			spnr_vox_gain->value(progStatus.vox_gain);
+			spnr_vox_gain->show();
+			selrig->set_vox_gain();
+		} else
+			spnr_vox_gain->hide();
+
+		if (selrig->has_vox_anti) {
+			int min, max, step;
+			selrig->get_vox_anti_min_max_step(min, max, step);
+			spnr_anti_vox->minimum(min);
+			spnr_anti_vox->maximum(max);
+			spnr_anti_vox->step(step);
+			spnr_anti_vox->value(progStatus.vox_anti);
+			spnr_anti_vox->show();
+			selrig->set_vox_anti();
+		} else
+			spnr_anti_vox->hide();
+
+		if (selrig->has_vox_hang) {
+			int min, max, step;
+			selrig->get_vox_hang_min_max_step(min, max, step);
+			spnr_vox_hang->minimum(min);
+			spnr_vox_hang->maximum(max);
+			spnr_vox_hang->step(step);
+			spnr_vox_hang->value(progStatus.vox_hang);
+			spnr_vox_hang->show();
+			selrig->set_vox_hang();
+		} else
+			spnr_vox_hang->hide();
+
+		if (selrig->has_vox_on_dataport) {
+			btn_vox_on_dataport->value(progStatus.vox_on_dataport);
+			btn_vox_on_dataport->show();
+			selrig->set_vox_on_dataport();
+		} else
+			btn_vox_on_dataport->hide();
+
+		tabsGeneric->add(genericVOX);
+		genericVOX->redraw();
+		genericVOX->show();
+	}
+
+	if (selrig->has_compON ||
+		selrig->has_compression ) {
+
+		if (selrig->has_compON) {
+			btnCompON->show();
+			btnCompON->value(progStatus.compON);
+		} else
+			btnCompON->hide();
+
+		if (selrig->has_compression) {
+			int min, max, step;
+			selrig->get_comp_min_max_step(min, max, step);
+			spnr_compression->minimum(min);
+			spnr_compression->maximum(max);
+			spnr_compression->step(step);
+			spnr_compression->show();
+			spnr_compression->value(progStatus.compression);
+			selrig->set_compression(progStatus.compON, progStatus.compression);
+		} else
+			spnr_compression->hide();
+
+		tabsGeneric->add(genericSpeech);
+		genericSpeech->redraw();
+		genericSpeech->show();
+	}
+
+	if (selrig->has_nb_level ||
+		selrig->has_bpf_center ) {
+
+		if (selrig->has_nb_level)
+			sldr_nb_level->show();
+		else
+			sldr_nb_level->hide();
+
+		if (selrig->has_bpf_center) {
+			spnr_bpf_center->value(progStatus.bpf_center);
+			spnr_bpf_center->show();
+			btn_use_bpf_center->show();
+		} else {
+			spnr_bpf_center->hide();
+			btn_use_bpf_center->hide();
+		}
+		tabsGeneric->add(genericRx);
+		genericRx->redraw();
+		genericRx->show();
+	}
+
+	if (selrig->has_vfo_adj ||
+		selrig->has_line_out ||
+		selrig->has_xcvr_auto_on_off ) {
+
+		if (selrig->has_vfo_adj) {
+			int min, max, step;
+			selrig->get_vfoadj_min_max_step(min, max, step);
+			spnr_vfo_adj->minimum(min);
+			spnr_vfo_adj->maximum(max);
+			spnr_vfo_adj->step(step);
+			progStatus.vfo_adj = selrig->getVfoAdj();
+			spnr_vfo_adj->value(progStatus.vfo_adj);
+			spnr_vfo_adj->show();
+		} else
+			spnr_vfo_adj->hide();
+
+		if (selrig->has_line_out)
+			spnr_line_out->show();
+		else
+			spnr_line_out->hide();
+
+		if (selrig->has_xcvr_auto_on_off) {
+			btn_xcvr_auto_on->value(progStatus.xcvr_auto_on);
+			btn_xcvr_auto_off->value(progStatus.xcvr_auto_off);
+			btn_xcvr_auto_on->show();
+			btn_xcvr_auto_off->show();
+		} else {
+			btn_xcvr_auto_on->hide();
+			btn_xcvr_auto_off->hide();
+		}
+		tabsGeneric->add(genericMisc);
+		genericMisc->redraw();
+		genericMisc->show();
+	}
+
+	tabsGeneric->add(genericUser_1);
+	genericUser_1->redraw();
+	genericUser_1->show();
+
+	tabsGeneric->add(genericUser_2);
+	genericUser_2->redraw();
+	genericUser_2->show();
+
+	tabsGeneric->add(genericUser_3);
+	genericUser_3->redraw();
+	genericUser_3->show();
+
+	if (selrig->name_ == rig_IC7610.name_) {
+
+		tabsGeneric->add(tab7610);
+		tab7610->redraw();
+		tab7610->show();
+
+		btnAttenuator->hide();
+	}
+
+	tabsGeneric->redraw();
+	tabsGeneric->show();
+
+	tabs_dialog->init_sizes();
+
+	poll_frequency->activate(); poll_frequency->value(progStatus.poll_frequency);
+	poll_mode->activate(); poll_mode->value(progStatus.poll_mode);
+	poll_bandwidth->activate(); poll_bandwidth->value(progStatus.poll_bandwidth);
+
+	poll_smeter->activate(); poll_smeter->value(progStatus.poll_smeter);
+	poll_pout->activate(); poll_pout->value(progStatus.poll_pout);
+	poll_swr->activate(); poll_swr->value(progStatus.poll_swr);
+	poll_alc->activate(); poll_alc->value(progStatus.poll_alc);
+	poll_volume->activate(); poll_volume->value(progStatus.poll_volume);
+	poll_notch->activate(); poll_notch->value(progStatus.poll_notch);
+	poll_auto_notch->activate(); poll_auto_notch->value(progStatus.poll_auto_notch);
+	poll_ifshift->activate(); poll_ifshift->value(progStatus.poll_ifshift);
+	poll_power_control->activate(); poll_power_control->value(progStatus.poll_power_control);
+	poll_pre_att->activate(); poll_pre_att->value(progStatus.poll_pre_att);
+	poll_squelch->activate(); poll_squelch->value(progStatus.poll_squelch);
+	poll_micgain->activate(); poll_micgain->value(progStatus.poll_micgain);
+	poll_rfgain->activate(); poll_rfgain->value(progStatus.poll_rfgain);
+	poll_split->activate(); poll_split->value(progStatus.poll_split);
+	poll_noise->activate(); poll_noise->value(progStatus.poll_noise);
+	poll_nr->activate(); poll_nr->value(progStatus.poll_nr);
+	poll_compression->activate(); poll_compression->value(progStatus.poll_compression);
+
+	if (!selrig->has_bandwidth_control) { poll_bandwidth->deactivate(); poll_bandwidth->value(0); }
+	if (!selrig->has_smeter) { poll_smeter->deactivate(); poll_smeter->value(0); }
+	if (!selrig->has_power_out) { poll_pout->deactivate(); poll_pout->value(0); }
+	if (!selrig->has_swr_control) { poll_swr->deactivate(); poll_swr->value(0); }
+	if (!selrig->has_alc_control) { poll_alc->deactivate(); poll_alc->value(0); }
+	if (!selrig->has_volume_control) { poll_volume->deactivate(); poll_volume->value(0); }
+	if (!selrig->has_notch_control) { poll_notch->deactivate(); poll_notch->value(0); }
+	if (!selrig->has_auto_notch ||
+		xcvr_name == rig_FT1000MP.name_ )
+		{ poll_auto_notch->deactivate(); poll_auto_notch->value(0); }
+	if (!selrig->has_ifshift_control &&
+		!selrig->has_pbt_controls) { poll_ifshift->deactivate(); poll_ifshift->value(0); }
+	if (selrig->has_pbt_controls) {
+		poll_ifshift->label("pbt");
+		poll_ifshift->redraw_label();
+	}
+	if (!selrig->has_power_control) { poll_power_control->deactivate(); poll_power_control->value(0); }
+	if (!selrig->has_preamp_control && !selrig->has_attenuator_control)
+		{ poll_pre_att->deactivate(); poll_pre_att->value(0); }
+	if (!selrig->has_sql_control) { poll_squelch->deactivate(); poll_squelch->value(0); }
+	if (!selrig->has_micgain_control) { poll_micgain->deactivate(); poll_micgain->value(0); }
+	if (!selrig->has_rf_control) { poll_rfgain->deactivate(); poll_rfgain->value(0); }
+	if (!selrig->has_split) { poll_split->deactivate(); poll_split->value(0); }
+	if (!selrig->has_noise_control) {poll_noise->deactivate(); poll_noise->value(0);}
+	if (!selrig->has_noise_reduction) {poll_nr->deactivate(); poll_nr->value(0);}
+	if (!selrig->has_compression) { poll_compression->deactivate(); poll_compression->value(0); }
+
+}
+
+void initTabs()
+{
+	if (xcvr_name == rig_TT550.name_)
+		init_TT550_tabs();
+	else 
+		init_Generic_Tabs();
 }
 
 void init_TT550()
@@ -5325,10 +5400,6 @@ void init_power_control()
 {
 	double min, max, step;
 	if (selrig->has_power_control) {
-		if (progStatus.use_rig_data)
-			progStatus.power_level = selrig->get_power_control();
-		else
-			selrig->set_power_control(progStatus.power_level);
 
 		sldrPOWER->activate();
 		selrig->get_pc_min_max_step(min, max, step);
@@ -5772,14 +5843,6 @@ void init_VFOs()
 	selrig->set_split(0);		// initialization set split call
 }
 
-//void init_IC7300_special()
-//{
-//	if (selrig->name_ ==  rig_IC7300.name_) {
-//		selrig->set_break_in();
-//		redrawAGC();
-//	}
-//}
-
 void init_TS990_special()
 {
 	if (xcvr_name == rig_TS990.name_) { // Setup TS990 Mon Button
@@ -5810,6 +5873,7 @@ void init_K3_KX3_special()
 void initRig()
 {
 	xcvr_online = false;
+	RigSerial->failed(0);
 	if (tabs_dialog && tabs_dialog->visible()) tabs_dialog->hide();
 
 	main_group->hide();
@@ -5845,21 +5909,6 @@ void initRig()
 		guard_lock gl_serial(&mutex_serial);
 		trace(1, "init_rig()");
 
-		// Xcvr Auto Power on as soon as possible
-		if (selrig->has_xcvr_auto_on_off && progStatus.xcvr_auto_on) {
-			progress->label("Auto Start");
-			progress->redraw_label();
-			update_progress(0);
-			selrig->set_xcvr_auto_on();
-			progress->label("Initializing");
-			progress->redraw_label();
-			update_progress(0);
-		}
-
-		bool check_ok = false;
-		if (progStatus.xcvr_serial_port != "NONE")
-			check_ok = selrig->check();
-
 		init_special_controls();
 		init_external_tuner();
 		init_rit();
@@ -5884,12 +5933,20 @@ void initRig()
 		init_swr_control();
 		init_split_control();
 
+		// Xcvr Auto Power on as soon as possible
+		if (selrig->has_xcvr_auto_on_off && progStatus.xcvr_auto_on) {
+			progress->label("Auto Start");
+			progress->redraw_label();
+			update_progress(0);
+			selrig->set_xcvr_auto_on();
+			progress->label("Initializing");
+			progress->redraw_label();
+			update_progress(0);
+		}
 		selrig->initialize();
 
-		if (progStatus.xcvr_serial_port != "NONE") {
-			if (!check_ok) goto failed;
-			if (flrig_abort) goto failed;
-		}
+		if (!selrig->check()) goto failed;
+		if (flrig_abort) goto failed;
 
 		FreqDispA->set_precision(selrig->precision);
 		FreqDispA->set_ndigits(selrig->ndigits);
@@ -5925,7 +5982,6 @@ void initRig()
 
 		selrig->post_initialize();
 
-//		init_IC7300_special();
 		init_TS990_special();
 		init_K3_KX3_special();
 
@@ -5941,22 +5997,33 @@ void initRig()
 	adjust_control_positions();
 
 	main_group->show();
-	mainwindow->redraw();
 	mainwindow->damage();
+	mainwindow->redraw();
 	Fl::flush();
-//	Fl::check();
 
 	xcvr_online = true;
+	box_xcvr_connect->color(FL_GREEN);
+	box_xcvr_connect->redraw();
+
+	if (selrig->has_power_control) {
+		if (progStatus.use_rig_data)
+			progStatus.power_level = selrig->get_power_control();
+		else
+			selrig->set_power_control(progStatus.power_level);
+	}
 	return;
 
 failed:
+	bypass_serial_thread_loop = true;
+
 	xcvr_online = false;
 	adjust_control_positions();
 	grpInitializing->hide();
 	main_group->show();
 	mainwindow->redraw();
 
-	bypass_serial_thread_loop = true;
+	box_xcvr_connect->color(FL_BACKGROUND2_COLOR);
+	box_xcvr_connect->redraw();
 
 	fl_alert2(_("\
 Transceiver not responding!\n\n\

@@ -400,6 +400,7 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 			waited = cnt * 10 + delay;
 			snprintf(sztemp, sizeof(sztemp), "%s OK %d ms", sz, waited);
 			showresp(WARN, pr, sztemp, cmd, returned);
+			RigSerial->failed(-1);
 			return replystr.length();
 		}
 		MilliSleep(10);
@@ -410,6 +411,7 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 	waited = timeout + delay;
 	snprintf(sztemp, sizeof(sztemp), "%s failed %d ms", sz, waited);
 	showresp(ERR, pr, sztemp, cmd, returned);
+	RigSerial->failed(1);
 	return 0;
 }
 
@@ -448,6 +450,7 @@ int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 			waited = cnt * 10 + delay;
 			snprintf(sztemp, sizeof(sztemp), "%s OK %d ms", sz, waited);
 			showresp(DEBUG, pr, sztemp, cmd, returned);
+			RigSerial->failed(-1);
 			return replystr.length();
 		}
 		MilliSleep(10);
@@ -458,6 +461,7 @@ int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 	waited = timeout + delay;
 	snprintf(sztemp, sizeof(sztemp), "%s failed %d ms", sz, waited);
 	showresp(ERR, pr, sztemp, cmd, returned);
+	RigSerial->failed(1);
 	return 0;
 }
 

@@ -1157,22 +1157,23 @@ void show_controls()
 			if (selrig->name_ == rig_TT550.name_) {
 				tabs550->show();
 				tabsGeneric->hide();
+				tabs550->redraw();
 			} else {
 				tabs550->hide();
 				tabsGeneric->show();
+				tabsGeneric->redraw();
 			}
-			tabs550->redraw();
-			tabsGeneric->redraw();
 			mainwindow->redraw();
 			break;
 		case wide_ui :
-		case small_ui :
 			if (selrig->name_ == rig_TT550.name_) {
 				tabsGeneric->hide();
 				tabs550->show();
+				tabs550->redraw();
 			} else {
 				tabs550->hide();
 				tabsGeneric->show();
+				tabsGeneric->redraw();
 			}
 			if (tabs_dialog->visible())
 				tabs_dialog->hide();
@@ -1181,6 +1182,26 @@ void show_controls()
 					mainwindow->x(), mainwindow->y() + mainwindow->decorated_h(),
 					mainwindow->w(), tabs_dialog->h());
 				tabs_dialog->show();
+				tabs_dialog->redraw();
+			}
+			break;
+		case small_ui :
+			if (selrig->name_ == rig_TT550.name_) {
+				tabsGeneric->hide();
+				tabs550->show();
+				tabs550->redraw();
+			} else {
+				tabs550->hide();
+				tabsGeneric->show();
+				tabsGeneric->redraw();
+			}
+			if (tabs_dialog->visible())
+				tabs_dialog->hide();
+			else {
+				tabs_dialog->position(
+					mainwindow->x(), mainwindow->y() + mainwindow->decorated_h());
+				tabs_dialog->show();
+				tabs_dialog->redraw();
 			}
 			break;
 		default :

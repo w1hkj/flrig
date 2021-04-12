@@ -1182,8 +1182,10 @@ public:
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 		if (!xcvr_online || !selrig->has_smeter)
 			result = (int)(0);
-		else
-			result = (int)(mval);
+		else {
+			guard_lock serial_lock(&mutex_serial);
+			result = (int)(selrig->get_smeter());
+		}
 	}
 
 	std::string help() { return std::string("returns S-meter reading"); }
@@ -1226,7 +1228,7 @@ public:
 			result = (int)(0);
 		else {
 			guard_lock serial_lock(&mutex_serial);
-			result = selrig->get_power_out();
+			result = (int)selrig->get_power_out();
 		}
 	}
 
@@ -1241,8 +1243,10 @@ public:
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 		if (!xcvr_online || !selrig->has_swr_control)
 			result = (int)(0);
-		else
-			result = (int)(swrval);
+		else {
+			guard_lock serial_lock(&mutex_serial);
+			result = (int)(selrig->get_swr());
+		}
 	}
 
 	std::string help() { return std::string("returns SWR meter reading"); }

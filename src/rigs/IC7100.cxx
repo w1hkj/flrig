@@ -287,22 +287,30 @@ void RIG_IC7100::set_xcvr_auto_on()
 	cmd.append(post);
 
 	if (waitFOR(8, "get ID", 100) == false) {  // xcvr must be OFF
-		cmd.assign( nr, '\xFE');
+		cmd.append(nr, '\xFE');
 		cmd.append(pre_to);
 		cmd += '\x18'; cmd += '\x01';
 		cmd.append(post);
+		RigSerial->failed(0);
 		if (waitFB("Power ON")) {
-			xcvr_is_on = true;
 			cmd = pre_to; cmd += '\x19'; cmd += '\x00';
 			cmd.append(post);
-			for (int i = 0; i < 50; i++) {
-				MilliSleep(100);
-				if (waitFOR(8, "get ID")) break;
-				update_progress(i*2);
+			int i = 0;
+			for (i = 0; i < 100; i++) {
+				MilliSleep(50);
+				if (waitFOR(8, "get ID") == true) {
+					RigSerial->failed(0);
+					xcvr_is_on = true;
+					return;
+				}
+				update_progress(i);
 				Fl::awake();
 			}
+			xcvr_is_on = false;
+			RigSerial->failed(1);
 			return;
 		}
+		RigSerial->failed(1);
 		xcvr_is_on = false;
 		return;
 	}
