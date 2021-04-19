@@ -168,7 +168,6 @@ void set_trace(int n, ...) // all args of type const char *
 {
 	if (!tracewindow) make_trace_window();
 
-	if (!progStatus.settrace) return;
 
 	if (!n) return;
 	stringstream s;
@@ -179,6 +178,8 @@ void set_trace(int n, ...) // all args of type const char *
 		s << " " << va_arg(vl, const char *);
 	va_end(vl);
 	s << "\n";
+
+	if (!progStatus.settrace) return;
 
 	guard_lock tt(&mutex_trace);
 		tracestrings.push_back(s.str());
@@ -189,8 +190,6 @@ void get_trace(int n, ...) // all args of type const char *
 {
 	if (!tracewindow) make_trace_window();
 
-	if (!progStatus.gettrace) return;
-
 	if (!n) return;
 	stringstream s;
 	va_list vl;
@@ -200,6 +199,8 @@ void get_trace(int n, ...) // all args of type const char *
 		s << " " << va_arg(vl, const char *);
 	va_end(vl);
 	s << "\n";
+
+	if (!progStatus.gettrace) return;
 
 	guard_lock tt(&mutex_trace);
 		tracestrings.push_back(s.str());
