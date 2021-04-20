@@ -1585,7 +1585,10 @@ void * serial_thread_loop(void *d)
 					trace(1, "bypass serial thread loop");
 					goto serial_bypass_loop;// continue;
 				}
+
 				poll_parameters = &RX_poll_pairs[0];
+				get_trace(1, "\nPoll:");
+
 				while (poll_parameters->poll) {
 					// need to put thread asleep to allow other threads
 					// access to serial mutex

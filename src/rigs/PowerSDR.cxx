@@ -224,6 +224,7 @@ RIG_PowerSDR::RIG_PowerSDR() {
 	is_tuning = false;
 }
 
+static int ret = 0;
 
 const char * RIG_PowerSDR::get_bwname_(int n, int md)
 {
@@ -255,8 +256,10 @@ int RIG_PowerSDR::get_smeter()
 		cmd = "ZZSM0;";
 	else
 		cmd = "ZZSM1;";
-	int w = wait_char(';', 9, 100, "get smeter", ASC);
-	if (w == 9) {
+	get_trace(1, "get_smeter");
+	ret = wait_char(';', 9, 100, "get smeter", ASC);
+	gett("");
+	if (ret == 9) {
 		size_t p = replystr.rfind("SM");
 		if (p != string::npos) {
 			smtr = fm_decimal(replystr.substr(p+3),3);
@@ -264,7 +267,6 @@ int RIG_PowerSDR::get_smeter()
 			smtr = (smtr + 54);
 		}
 	}
-	gett("smeter");
 	return smtr;
 }
 
@@ -284,7 +286,10 @@ int RIG_PowerSDR::get_power_out()
 	int mtr = 0;
 
 	cmd = "ZZRM5;";
-	if (wait_char(';', 8, 100, "get power", ASC) < 8) return mtr;
+	get_trace(1, "get_power_out");
+	ret = wait_char(';', 8, 100, "get power", ASC);
+	gett("");
+	if (ret < 8) return mtr;
 	sscanf(&replystr[0],"ZZRM5%d", &mtr);
 
 	return mtr;
@@ -295,13 +300,15 @@ int RIG_PowerSDR::get_power_control()
 {
 	int pctrl = 0;
 	cmd = "PC;";
-	if (wait_char(';', 6, 100, "get pout", ASC) == 6) {
+	get_trace(1, "get_power_control");
+	ret = wait_char(';', 6, 100, "get pout", ASC);
+	gett("");
+	if (ret == 6) {
 		size_t p = replystr.rfind("PC");
 		if (p != string::npos) {
 			pctrl = fm_decimal(replystr.substr(p+2), 3);
 		}
 	}
-	gett("power control");
 	return pctrl;
 }
 
@@ -320,7 +327,10 @@ int RIG_PowerSDR::get_swr()
 	double mtr = 0;
 
 	cmd = "ZZRM8;";
-	if (wait_char(';', 8, 100, "get SWR", ASC) < 8) return (int)mtr;
+	get_trace(1, "get_swr");
+	ret = wait_char(';', 8, 100, "get SWR", ASC);
+	gett("");
+	if (ret < 8) return (int)mtr;
 	if(sscanf(&replystr[0], "ZZRM8%lf", &mtr)!=1)
 	{
 		return 0;
@@ -341,7 +351,10 @@ int RIG_PowerSDR::get_alc()
 {
 	double alc = 0;
 	cmd = "ZZRM4;";
-	if (wait_char(';', 8, 100, "get ALC", ASC) < 8) return (int)alc;
+	get_trace(1, "get_alc");
+	ret = wait_char(';', 8, 100, "get ALC", ASC);
+	gett("");
+	if (ret < 8) return (int)alc;
 	if (sscanf(&replystr[0], "ZZRM4%lf", &alc) != 1) alc=0;
 	return alc;
 }
@@ -361,9 +374,12 @@ int RIG_PowerSDR::get_preamp()
 	cmd = "ZZPA;";
 	stringstream str;
 	str << "ZZPA #1";
-	trace(2, __func__, str.str().c_str());
+//	trace(2, __func__, str.str().c_str());
 	sendCommand(cmd);
-	if (wait_char(';', 6, 100, "get PRE", ASC) != 6) {
+	get_trace(1, "get_preamp");
+	ret = wait_char(';', 6, 100, "get PRE", ASC);
+	gett("");
+	if (ret != 6) {
 		size_t p = replystr.rfind("PA");
 	str << "ZZPA #2 replystr=" << replystr << ", p=" << p;
 	trace(2, "get_preamp", replystr.c_str());
@@ -375,7 +391,6 @@ int RIG_PowerSDR::get_preamp()
 		}
 	}
 	else preamp_level = 0;
-	gett("preamp");
 	return preamp_level;
 }
 
@@ -485,8 +500,10 @@ int RIG_PowerSDR::get_modeA()
 {
 	if (tuning()) return A.imode;
 	cmd = "ZZMD;";
-	int ww = wait_char(';', 7, 100, "get mode A", 7);
-	if (ww == 7) {
+	get_trace(1, "get_modeA");
+	ret = wait_char(';', 7, 100, "get mode A", 7);
+	gett("");
+	if (ret == 7) {
 		size_t p = replystr.rfind("MD");
 		if (p != string::npos) {
 			int md;
@@ -497,7 +514,6 @@ int RIG_PowerSDR::get_modeA()
 		}
 	}
 	_currmode = A.imode;
-	gett("modeA");
 	return A.imode;
 }
 
@@ -521,7 +537,10 @@ int RIG_PowerSDR::get_modeB()
 {
 	if (tuning()) return B.imode;
 	cmd = "ZZMD;";
-	if (wait_char(';', 4, 100, "get mode B", ASC) == 7) {
+	get_trace(1, "get_modeB");
+	ret = wait_char(';', 4, 100, "get mode B", ASC);
+	gett("");
+	if (ret == 7) {
 		size_t p = replystr.rfind("MD");
 		if (p != string::npos) {
 			int md=0;
@@ -531,7 +550,6 @@ int RIG_PowerSDR::get_modeB()
 		}
 	}
 	_currmode = B.imode;
-	gett("modeB");
 	return B.imode;
 }
 
@@ -604,7 +622,10 @@ int RIG_PowerSDR::get_bwA()
 	}
 	else if (A.imode == LSB || A.imode == USB) {  
 		cmd = "ZZFI;";
-		if (wait_char(';', 7, 100, "get ZZFI", ASC) == 7) {
+		get_trace(1, "get_bw SSB");
+		ret = wait_char(';', 7, 100, "get ZZFI", ASC);
+		gett("");
+		if (ret == 7) {
 			p = replystr.rfind("ZZFI");
 			if (p != string::npos) {
 				for (i = 0; PowerSDR_CAT_USB[i] != NULL; i++)
@@ -615,11 +636,13 @@ int RIG_PowerSDR::get_bwA()
 				A.iBW = i;
 			}
 		}
-		gett("get_bwA USB");
 	} 
 	else if (A.imode == CWL || A.imode == CWU) {
 		cmd = "ZZFI;";
-		if (wait_char(';', 7, 100, "get ZZFI", ASC) == 7) {
+		get_trace(1, "get_bw CW");
+		ret = wait_char(';', 7, 100, "get ZZFI", ASC);
+		gett("");
+		if (ret == 7) {
 			p = replystr.rfind("ZZFI");
 			if (p != string::npos) {
 				for (i = 0; PowerSDR_CAT_CW[i] != NULL; i++)
@@ -628,11 +651,13 @@ int RIG_PowerSDR::get_bwA()
 				A.iBW = i;
 			}
 		}
-		gett("get_bwA CW");
 	} 
 	else if (A.imode == DIGU || A.imode == DIGL) {
 		cmd = "ZZFI;";
-		if (wait_char(';', 7, 100, "get ZZFI", ASC) == 7) {
+		get_trace(1, "get_bw DIGI");
+		ret = wait_char(';', 7, 100, "get ZZFI", ASC);
+		gett("");
+		if (ret == 7) {
 				for (i = 0; PowerSDR_CAT_DIG[i] != NULL; i++) {
 					if (replystr.compare(PowerSDR_CAT_DIG[i]) == 0) {
 						break;
@@ -640,11 +665,13 @@ int RIG_PowerSDR::get_bwA()
 				}
 				A.iBW = i;
 		}
-		gett("get_bwA DIG");
 	}
 	else if (A.imode == AM || A.imode == SAM || A.imode == DSB) {
 		cmd = "ZZFI;";
-		if (wait_char(';', 7, 100, "get ZZFI", ASC) == 7) {
+		get_trace(1, "get_bw AM");
+		ret = wait_char(';', 7, 100, "get ZZFI", ASC);
+		gett("");
+		if (ret == 7) {
 			p = replystr.rfind("ZZFI");
 			if (p != string::npos) {
 				for (i = 0; PowerSDR_CAT_AM[i] != NULL; i++)
@@ -653,7 +680,6 @@ int RIG_PowerSDR::get_bwA()
 				A.iBW = i;
 			}
 		}
-		gett("get_bwA AM");
 	}
 	vfoA.iBW = A.iBW;
 	progStatus.iBW_A = A.iBW;
@@ -720,14 +746,19 @@ bool  RIG_PowerSDR::get_notch(int &val)
 {
 	bool ison = false;
 	cmd = "BC;";
-	if (wait_char(';', 4, 100, "get notch on/off", ASC) == 4) {
+	get_trace(1, "get_notch");
+	ret = wait_char(';', 4, 100, "get notch on/off", ASC);
+	gett("");
+	if (ret == 4) {
 		size_t p = replystr.rfind("BC");
 		if (p != string::npos) {
 			if (replystr[p+2] == '2') {
 				ison = true;
 				cmd = "BP;";
-				if (wait_char(';', 6, 100, "get notch val", ASC) == 6) {
-					gett("notch val");
+				get_trace(1, "get_notch_val");
+				ret = wait_char(';', 6, 100, "get notch val", ASC);
+				gett("");
+				if (ret == 6) {
 					p = replystr.rfind("BP");
 					if (p != string::npos)
 						val = 200 + 50 * fm_decimal(replystr.substr(p+2),3);
@@ -735,7 +766,6 @@ bool  RIG_PowerSDR::get_notch(int &val)
 			}
 		}
 	}
-	gett("notch on/off");
 	return (ison);
 }
 
@@ -758,13 +788,15 @@ int  RIG_PowerSDR::get_auto_notch()
 {
 	int anotch = 0;
 	cmd = "NT;";
-	if (wait_char(';', 4, 100, "get auto notch", ASC) == 4) {
+	get_trace(1, "get_auto_notch");
+	ret = wait_char(';', 4, 100, "get auto notch", ASC);
+	gett("");
+	if (ret == 4) {
 		size_t p = replystr.rfind("NT");
 		if (p != string::npos) {
 			anotch = (replystr[p+2] == '1');
 		}
 	}
-	gett("auto notch");
 	return anotch;
 }
 
@@ -794,7 +826,10 @@ int  RIG_PowerSDR::get_noise_reduction()
 {
 	cmd = rsp = "ZZNR";
 	cmd.append(";");
-	if (wait_char(';', 4, 100, "GET noise reduction", ASC) == 6) {
+	get_trace(1, "get_noise_reduction");
+	ret = wait_char(';', 4, 100, "GET noise reduction", ASC);
+	gett("");
+	if (ret == 6) {
 		size_t p = replystr.rfind(rsp);
 		if (p == string::npos) return _noise_reduction_level;
 		_noise_reduction_level = replystr[p+4] - '0';
@@ -807,7 +842,6 @@ int  RIG_PowerSDR::get_noise_reduction()
 	} else {
 		nr_label("NR", false);
 	}
-	gett("nr level");
 	return _noise_reduction_level;
 }
 
@@ -830,7 +864,10 @@ int  RIG_PowerSDR::get_noise_reduction_val()
 	int val = progStatus.noise_reduction_val;
 	cmd = rsp = "ZZNR";
 	cmd.append(";");
-	if (wait_char(';', 5, 100, "GET noise reduction val", ASC) == 5) {
+	get_trace(1, "get_noise_reduction_val");
+	ret = wait_char(';', 5, 100, "GET noise reduction val", ASC);
+	gett("");
+	if (ret == 5) {
 		size_t p = replystr.rfind(rsp);
 		if (p == string::npos) {
 			nrval = (_noise_reduction_level == 1 ? _nrval1 : _nrval2);
@@ -838,8 +875,6 @@ int  RIG_PowerSDR::get_noise_reduction_val()
 		}
 		val = atoi(&replystr[p+2]);
 	}
-	gett("noise reduction val");
-
 	if (_noise_reduction_level == 1) _nrval1 = val;
 	else _nrval2 = val;
 
@@ -870,9 +905,9 @@ int RIG_PowerSDR::get_tune()
 {
 	cmd = rsp = "ZZTU";
 	cmd += ';';
-	waitN(5, 100, "get tune", ASC);
-
-	rig_trace(2, "get_tuner status()", replystr.c_str());
+	get_trace(1, "get_tune");
+	ret = wait_char(';', 6, 100, "get tune", ASC);
+	gett("");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;

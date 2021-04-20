@@ -21,6 +21,8 @@
 #include "KENWOOD.h"
 #include "support.h"
 
+static int ret = 0;
+
 void KENWOOD::selectA()
 {
 	cmd = "FR0;";
@@ -109,8 +111,9 @@ void KENWOOD::set_split(bool val)
 int KENWOOD::get_split()
 {
 	cmd = "IF;";
-	int ret = wait_char(';', 38, 100, "get split", ASC);
-	gett("split");
+	get_trace(1, "get_split");
+	ret = wait_char(';', 38, 100, "get split", ASC);
+	gett("");
 	if (ret < 38) return 0;
 	return (replybuff[32] == '1');
 }
@@ -118,16 +121,20 @@ int KENWOOD::get_split()
 bool KENWOOD::check()
 {
 	cmd = "FA;";
-	int ret = wait_char(';', 14, 100, "check", ASC);
-	gett("check");
-	if (ret < 14) return false;
+	get_trace(1, "check()");
+	ret = wait_char(';', 14, 100, "check", ASC);
+	gett("");
+//	if (ret < 14) return false;
 	return true;
 }
 
 unsigned long int KENWOOD::get_vfoA ()
 {
 	cmd = "FA;";
-	if (wait_char(';', 14, 100, "get vfo A", ASC) == 14) {
+	get_trace(1, "get_vfoA");
+	ret = wait_char(';', 14, 100, "get vfo A", ASC);
+	gett("");
+	if (ret == 14) {
 		size_t p = replystr.rfind("FA");
 		if (p != string::npos) {
 			int f = 0;
@@ -136,7 +143,6 @@ unsigned long int KENWOOD::get_vfoA ()
 			A.freq = f;
 		}
 	}
-	gett("vfoA");
 	return A.freq;
 }
 
@@ -156,7 +162,10 @@ void KENWOOD::set_vfoA (unsigned long int freq)
 unsigned long int KENWOOD::get_vfoB ()
 {
 	cmd = "FB;";
-	if (wait_char(';', 14, 100, "get vfo B", ASC) == 14) {
+	get_trace(1, "get_vfoB");
+	ret = wait_char(';', 14, 100, "get vfo B", ASC);
+	gett("");
+	if (ret == 14) {
 		size_t p = replystr.rfind("FB");
 		if (p != string::npos) {
 			int f = 0;
@@ -165,7 +174,6 @@ unsigned long int KENWOOD::get_vfoB ()
 			B.freq = f;
 		}
 	}
-	gett("vfoB");
 	return B.freq;
 }
 
@@ -211,18 +219,24 @@ void KENWOOD::set_vfoB (unsigned long int freq)
 int KENWOOD::get_PTT()
 {
 	cmd = "IF;";
-	int ret = wait_char(';', 38, 100, "get VFO", ASC);
+	get_trace(1, "get_PTT");
+	ret = wait_char(';', 38, 100, "get VFO", ASC);
+	gett("");
 	if (ret < 38) return ptt_;
 	ptt_ = (replybuff[28] == '1');
-	gett("PTT");
 	return ptt_;
 }
 
 // Tranceiver PTT on/off
 void KENWOOD::set_PTT_control(int val)
 {
-	if (val) cmd = "TX;";
-	else	 cmd = "RX;";
+	if (val) {
+		cmd = "TX;";
+		ptt_ = 1;
+	} else {
+		cmd = "RX;";
+		ptt_ = 0;
+	}
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set PTT", cmd, "");
 	sett("PTT");
@@ -261,13 +275,15 @@ bool KENWOOD::tuning()
 int KENWOOD::get_tune()
 {
 	cmd = "AC;";
-	if (wait_char(';', 6, 100, "tuning?", ASC) == 6) {
+	get_trace(1, "get_tune");
+	ret = wait_char(';', 6, 100, "tuning?", ASC);
+	gett("");
+	if (ret == 6) {
 		size_t p = replystr.rfind("AC");
 		if (p != std::string::npos) {
 			return (replystr[p+4] - '0');
 		}
 	}
-	gett("get_tune");
 	return 0;
 }
 
@@ -276,14 +292,16 @@ int KENWOOD::get_volume_control()
 {
 	int volctrl = 0;
 	cmd = "AG0;";
-	if (wait_char(';', 7, 100, "get vol", ASC) == 7) {
+	get_trace(1, "get_volume_control");
+	ret = wait_char(';', 7, 100, "get vol", ASC);
+	gett("");
+	if (ret == 7) {
 		size_t p = replystr.rfind("AG");
 		if (p != string::npos) {
 			volctrl = fm_decimal(replystr.substr(p+3),3);
 			volctrl = (int)(volctrl / 2.55);
 		}
 	}
-	gett("volume");
 	return volctrl;
 }
 
@@ -326,12 +344,14 @@ int  KENWOOD::get_rf_gain()
 {
 	cmd = "RG;";
 	int rfg = 100;
-	if (wait_char(';', 6, 100, "get rf gain", ASC) == 6) {
+	get_trace(1, "get_rf_gain");
+	ret = wait_char(';', 6, 100, "get rf gain", ASC);
+	gett("");
+	if (ret == 6) {
 		size_t p = replystr.rfind("RG");
 		if (p != string::npos)
 			rfg = fm_decimal(replystr.substr(p+2) ,3) * 100 / 255;
 	}
-	gett("RFgain");
 	return rfg;
 }
 
@@ -356,13 +376,15 @@ int KENWOOD::get_mic_gain()
 {
 	int mgain = 0;
 	cmd = "MG;";
-	if (wait_char(';', 6, 100, "get mic", ASC) == 6) {
+	get_trace(1, "get_mic_gain");
+	ret = wait_char(';', 6, 100, "get mic", ASC);
+	gett("");
+	if (ret == 6) {
 		size_t p = replystr.rfind("MG");
 		if (p != string::npos) {
 			mgain = fm_decimal(replystr.substr(p+2), 3);
 		}
 	}
-	gett("MICgain");
 	return mgain;
 }
 
@@ -388,12 +410,14 @@ int KENWOOD::get_noise()
 {
 	int response = 1;
 	cmd = "NB;";
-	if (wait_char(';', 4, 100, "get Noise Blanker", ASC) == 4) {
+	get_trace(1, "get_noise");
+	ret = wait_char(';', 4, 100, "get Noise Blanker", ASC);
+	gett("");
+	if (ret == 4) {
 		size_t p = replystr.rfind("NB");
 		if (p == string::npos) response = 0;
 		if (replystr[p+2] == '0') response = 0;
 	}
-	gett("Noise");
 	return response;
 }
 
@@ -410,13 +434,15 @@ int  KENWOOD::get_squelch()
 {
 	int val = 0;
 	cmd = "SQ0;";
-	if (wait_char(';', 7, 100, "get squelch", ASC) >= 7) {
+	get_trace(1, "get_squelch");
+	ret = wait_char(';', 7, 100, "get squelch", ASC);
+	gett("");
+	if (ret >= 7) {
 		size_t p = replystr.rfind("SQ0");
 		if (p == string::npos) return val;
 		replystr[p + 6] = 0;
 		val = atoi(&replystr[p + 3]);
 	}
-	gett("Squelch");
 	return val;
 }
 
@@ -447,7 +473,10 @@ bool KENWOOD::get_if_shift(int &val)
 	bool response = false;
 	if (active_mode == CW || active_mode == CWR) { // cw modes
 		cmd = "IS;";
-		if (wait_char(';', 8, 100, "get IF shift", ASC) == 8) {
+		get_trace(1, "get_IF_shift");
+		ret = wait_char(';', 8, 100, "get IF shift", ASC);
+		gett("");
+		if (ret == 8) {
 			size_t p = replystr.rfind("IS");
 			if (p != string::npos) {
 				val = fm_decimal(replystr.substr(p+3), 4);
@@ -457,7 +486,6 @@ bool KENWOOD::get_if_shift(int &val)
 		}
 	}
 	val = progStatus.shift_val;
-	gett("IF shift");
 	return response;
 }
 

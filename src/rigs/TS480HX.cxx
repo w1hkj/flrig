@@ -205,6 +205,8 @@ RIG_TS480HX::RIG_TS480HX() {
 	_nrval2 = 4;
 }
 
+static int ret = 0;
+
 const char * RIG_TS480HX::get_bwname_(int n, int md) 
 {
 	static char bwname[20];
@@ -264,7 +266,10 @@ int RIG_TS480HX::get_smeter()
 {
 	int mtr = 0;
 	cmd = "SM0;";
-	if (wait_char(';', 8, 100, "get Smeter", ASC) < 8) return 0;
+	get_trace(1, "get_smeter");
+	ret = wait_char(';', 8, 100, "get Smeter", ASC);
+	gett("");
+	if (ret < 8) return 0;
 
 	size_t p = replystr.rfind("SM");
 	if (p != string::npos)
@@ -287,7 +292,10 @@ int RIG_TS480HX::get_power_out()
 {
 	int mtr = 0;
 	cmd = "SM0;";
-	if (wait_char(';', 8, 100, "get power", ASC) < 8) return mtr;
+	get_trace(1, "get_power_out");
+	ret = wait_char(';', 8, 100, "get power", ASC);
+	gett("");
+	if (ret < 8) return mtr;
 
 	size_t p = replystr.rfind("SM");
 	if (p != string::npos) {
@@ -317,7 +325,10 @@ int RIG_TS480HX::get_swr()
 {
 	int mtr = 0;
 	cmd = "RM;";
-	if (wait_char(';', 8, 100, "get SWR/ALC", ASC) < 8) return (int)mtr;
+	get_trace(1, "get_swr");
+	ret = wait_char(';', 8, 100, "get SWR/ALC", ASC);
+	gett("");
+	if (ret < 8) return (int)mtr;
 
 	size_t p = replystr.rfind("RM1");
 	if (p != string::npos)
@@ -435,7 +446,10 @@ void RIG_TS480HX::set_modeA(int val)
 int RIG_TS480HX::get_modeA()
 {
 	cmd = "MD;";
-	if (wait_char(';', 4, 100, "get modeA", ASC) < 4) return A.imode;
+	get_trace(1, "get_modeA");
+	ret = wait_char(';', 4, 100, "get modeA", ASC);
+	gett("");
+	if (ret < 4) return A.imode;
 
 	size_t p = replystr.rfind("MD");
 	if (p != string::npos && (p + 2 < replystr.length())) {
@@ -466,7 +480,10 @@ void RIG_TS480HX::set_modeB(int val)
 int RIG_TS480HX::get_modeB()
 {
 	cmd = "MD;";
-	if (wait_char(';', 4, 100, "get modeB", ASC) < 4) return B.imode;
+	get_trace(1, "get_modeB");
+	ret = wait_char(';', 4, 100, "get modeB", ASC);
+	gett("");
+	if (ret < 4) return B.imode;
 
 	size_t p = replystr.rfind("MD");
 	if (p != string::npos && (p + 2 < replystr.length())) {
@@ -528,7 +545,10 @@ int RIG_TS480HX::get_bwA()
 	if (A.imode == 0 || A.imode == 1 || A.imode == 3 || A.imode == 4) {
 		int lo = A.iBW & 0xFF, hi = (A.iBW >> 8) & 0x7F;
 		cmd = "SL;";
-		if (wait_char(';', 5, 100, "get SL", ASC) == 5) {
+		get_trace(1, "get_bwA, SL");
+		ret = wait_char(';', 5, 100, "get SL", ASC);
+		gett("");
+		if (ret == 5) {
 			p = replystr.rfind("SL");
 			if (p != string::npos)
 				lo = fm_decimal(replystr.substr(p+2), 2);
@@ -542,7 +562,10 @@ int RIG_TS480HX::get_bwA()
 		}
 	} else if (A.imode == 2 || A.imode == 6) {
 		cmd = "FW;";
-		if (wait_char(';', 7, 100, "get FW", ASC) == 7) {
+		get_trace(1, "get_bwA, FW");
+		ret = wait_char(';', 7, 100, "get FW", ASC);
+		gett("");
+		if (ret == 7) {
 			p = replystr.rfind("FW");
 			if (p != string::npos) {
 				for (i = 0; i < 11; i++)
@@ -554,7 +577,10 @@ int RIG_TS480HX::get_bwA()
 		}
 	} else if (A.imode == 5 || A.imode == 7) {
 		cmd = "FW;";
-		if (wait_char(';', 7, 100, "get FW", ASC) == 7) {
+		get_trace(1, "get_bwA, FW");
+		ret = wait_char(';', 7, 100, "get FW", ASC);
+		gett("");
+		if (ret == 7) {
 			p = replystr.rfind("FW");
 			if (p != string::npos) {
 				for (i = 0; i < 4; i++)
@@ -609,13 +635,19 @@ int RIG_TS480HX::get_bwB()
 	if (B.imode == 0 || B.imode == 1 || B.imode == 3 || B.imode == 4) {
 		int lo = B.iBW & 0xFF, hi = (B.iBW >> 8) & 0x7F;
 		cmd = "SL;";
-		if (wait_char(';', 5, 100, "get SL", ASC) == 5) {
+		get_trace(1, "get SL");
+		ret = wait_char(';', 5, 100, "get SL", ASC);
+		gett("");
+		if (ret == 5) {
 			p = replystr.rfind("SL");
 			if (p != string::npos)
 				lo = fm_decimal(replystr.substr(p+2), 2);
 		}
 		cmd = "SH;";
-		if (wait_char(';', 5, 100, "get SH", ASC) == 5) {
+		get_trace(1, "get SH");
+		ret = wait_char(';', 5, 100, "get SH", ASC);
+		gett("");
+		if (ret == 5) {
 			p = replystr.rfind("SH");
 			if (p != string::npos)
 				hi = fm_decimal(replystr.substr(p+2), 2);
@@ -623,7 +655,10 @@ int RIG_TS480HX::get_bwB()
 		}
 	} else if (B.imode == 2 || B.imode == 6) {
 		cmd = "FW;";
-		if (wait_char(';', 7, 100, "get FW", ASC) == 7) {
+		get_trace(1, "get FW");
+		ret = wait_char(';', 7, 100, "get FW", ASC);
+		gett("");
+		if (ret == 7) {
 			p = replystr.rfind("FW");
 			if (p != string::npos) {
 				for (i = 0; i < 11; i++)
@@ -635,7 +670,10 @@ int RIG_TS480HX::get_bwB()
 		}
 	} else if (B.imode == 5 || B.imode == 7) {
 		cmd = "FW;";
-		if (wait_char(';', 7, 100, "get FW", ASC) == 7) {
+		get_trace(1, "get FW");
+		ret = wait_char(';', 7, 100, "get FW", ASC);
+		gett("");
+		if (ret == 7) {
 			p = replystr.rfind("FW");
 			if (p != string::npos) {
 				for (i = 0; i < 4; i++)
@@ -685,7 +723,10 @@ int RIG_TS480HX::get_power_control()
 {
 	int val = progStatus.power_level;
 	cmd = "PC;";
-	if (wait_char(';', 6, 100, "get Power control", ASC) < 6) return val;
+	get_trace(1, "get_power_control");
+	ret = wait_char(';', 6, 100, "get Power control", ASC);
+	gett("");
+	if (ret < 6) return val;
 
 	size_t p = replystr.rfind("PC");
 	if (p == string::npos) return val;
@@ -706,7 +747,10 @@ void RIG_TS480HX::set_attenuator(int val)
 int RIG_TS480HX::get_attenuator()
 {
 	cmd = "RA;";
-	if (wait_char(';', 7, 100, "get attenuator", ASC) < 7) return progStatus.attenuator;
+	get_trace(1, "get_attenuator");
+	ret = wait_char(';', 7, 100, "get attenuator", ASC);
+	gett("");
+	if (ret < 7) return progStatus.attenuator;
 
 	size_t p = replystr.rfind("RA");
 	if (p == string::npos) return progStatus.attenuator;
@@ -725,7 +769,10 @@ void RIG_TS480HX::set_preamp(int val)
 int RIG_TS480HX::get_preamp()
 {
 	cmd = "PA;";
-	if (wait_char(';', 5, 100, "get preamp", ASC) < 5) return progStatus.preamp;
+	get_trace(1, "get_preamp");
+	ret = wait_char(';', 5, 100, "get preamp", ASC);
+	gett("");
+	if (ret < 5) return progStatus.preamp;
 
 	size_t p = replystr.rfind("PA");
 	if (p == string::npos) return progStatus.preamp;
@@ -745,7 +792,10 @@ void RIG_TS480HX::set_if_shift(int val)
 bool RIG_TS480HX::get_if_shift(int &val)
 {
 	cmd = "IS;";
-	if (wait_char(';', 8, 100, "get IF shift", ASC) == 8) {
+	get_trace(1, "get_if_shift");
+	ret = wait_char(';', 8, 100, "get IF shift", ASC);
+	gett("");
+	if (ret == 8) {
 		size_t p = replystr.rfind("IS");
 		if (p != string::npos) {
 			val = fm_decimal(replystr.substr(p+3), 4);
@@ -790,7 +840,10 @@ int  RIG_TS480HX::get_noise_reduction()
 {
 	cmd = rsp = "NR";
 	cmd.append(";");
-	if (wait_char(';', 4, 100, "GET noise reduction", ASC) == 4) {
+	get_trace(1, "get_noise_reduction");
+	ret = wait_char(';', 4, 100, "GET noise reduction", ASC);
+	gett("");
+	if (ret == 4) {
 		size_t p = replystr.rfind(rsp);
 		if (p == string::npos) return _noise_reduction_level;
 		_noise_reduction_level = replystr[p+2] - '0';
@@ -825,7 +878,10 @@ int  RIG_TS480HX::get_noise_reduction_val()
 	int val = progStatus.noise_reduction_val;
 	cmd = rsp = "RL";
 	cmd.append(";");
-	if (wait_char(';', 5, 100, "GET noise reduction val", ASC) == 5) {
+	get_trace(1, "get_noise_reduction_val");
+	ret = wait_char(';', 5, 100, "GET noise reduction val", ASC);
+	gett("");
+	if (ret == 5) {
 		size_t p = replystr.rfind(rsp);
 		if (p == string::npos) {
 			nrval = (_noise_reduction_level == 1 ? _nrval1 : _nrval2);
@@ -843,7 +899,9 @@ int  RIG_TS480HX::get_noise_reduction_val()
 int  RIG_TS480HX::get_agc()
 {
 	cmd = "GT;";
-	wait_char(';', 6, 100, "GET agc val", ASC);
+	get_trace(1, "get_agc");
+	ret = wait_char(';', 6, 100, "GET agc val", ASC);
+	gett("");
 	size_t p = replystr.rfind("GT");
 	if (p == string::npos) return agcval;
 	if (replystr[4] == ' ') return 0;
@@ -890,7 +948,10 @@ void RIG_TS480HX::set_auto_notch(int v)
 int  RIG_TS480HX::get_auto_notch()
 {
 	cmd = "BC;";
-	if (wait_char(';', 4, 100, "get auto notch", ASC) == 4) {
+	get_trace(1, "get_auto_notch");
+	ret = wait_char(';', 4, 100, "get auto notch", ASC);
+	gett("");
+	if (ret == 4) {
 		int anotch = 0;
 		size_t p = replystr.rfind("BC");
 		if (p != string::npos) {
@@ -915,7 +976,10 @@ void RIG_TS480HX::set_noise(bool b)
 int RIG_TS480HX::get_noise()
 {
 	cmd = "NB;";
-	if (wait_char(';', 4, 100, "get Noise Blanker", ASC) == 4) {
+	get_trace(1, "get_noise");
+	ret = wait_char(';', 4, 100, "get Noise Blanker", ASC);
+	gett("");
+	if (ret == 4) {
 		size_t p = replystr.rfind("NB");
 		if (p == string::npos) return 0;
 		if (replystr[p+2] == '0') return 0;
@@ -937,7 +1001,9 @@ void RIG_TS480HX::set_PTT_control(int val)
 int RIG_TS480HX::get_PTT()
 {
 	cmd = "IF;";
-	int ret = wait_char(';', 38, 100, "get VFO", ASC);
+	get_trace(1, "get_PTT");
+	ret = wait_char(';', 38, 100, "get VFO", ASC);
+	gett("");
 	if (ret < 38) return ptt_;
 	ptt_ = (replybuff[28] == '1');
 	return ptt_;
@@ -955,7 +1021,10 @@ int  RIG_TS480HX::get_rf_gain()
 {
 	int val = progStatus.rfgain;
 	cmd = "RG;";
-	if (wait_char(';', 6, 100, "get rf gain", ASC) < 6) return val;
+	get_trace(1, "get_rf_gain");
+	ret = wait_char(';', 6, 100, "get rf gain", ASC);
+	gett("");
+	if (ret < 6) return val;
 
 	size_t p = replystr.rfind("RG");
 	if (p != string::npos)
@@ -967,216 +1036,3 @@ void RIG_TS480HX::get_rf_min_max_step(int &min, int &max, int &step)
 {
 	min = 0; max = 100; step = 1;
 }
-
-/*
-void RIG_TS480HX::selectA()
-{
-	cmd = "FR0;FT0;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "Rx on A, Tx on A", cmd, "");
-}
-
-void RIG_TS480HX::selectB()
-{
-	cmd = "FR1;FT1;";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "Rx on B, Tx on B", cmd, "");
-}
-
-void RIG_TS480HX::set_split(bool val) 
-{
-	split = val;
-	if (useB) {
-		if (val) {
-			cmd = "FR1;FT0;";
-			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on B, Tx on A", cmd, "");
-		} else {
-			cmd = "FR1;FT1;";
-			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on B, Tx on B", cmd, "");
-		}
-	} else {
-		if (val) {
-			cmd = "FR0;FT1;";
-			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on A, Tx on B", cmd, "");
-		} else {
-			cmd = "FR0;FT0;";
-			sendCommand(cmd);
-			showresp(WARN, ASC, "Rx on A, Tx on A", cmd, "");
-		}
-	}
-}
-
-bool RIG_TS480HX::can_split()
-{
-	return true;
-}
-
-int RIG_TS480HX::get_split()
-{
-	size_t p;
-	int split = 0;
-	char rx = 0, tx = 0;
-// tx vfo
-	cmd = rsp = "FT";
-	cmd.append(";");
-	if (wait_char(';', 4, 100, "get split tx vfo", ASC) == 4) {
-		p = replystr.rfind(rsp);
-		if (p == string::npos) return split;
-		tx = replystr[p+2];
-	}
-// rx vfo
-	cmd = rsp = "FR";
-	cmd.append(";");
-	if (wait_char(';', 4, 100, "get split rx vfo", ASC) == 4) {
-		p = replystr.rfind(rsp);
-		if (p == string::npos) return split;
-		rx = replystr[p+2];
-// split test
-		split = (tx == '1' ? 2 : 0) + (rx == '1' ? 1 : 0);
-	}
-
-	return split;
-}
-
-unsigned long int RIG_TS480HX::get_vfoA ()
-{
-	cmd = "FA;";
-	if (wait_char(';', 14, 100, "get vfo A", ASC) < 14) return A.freq;
-
-	size_t p = replystr.rfind("FA");
-	if (p != string::npos && (p + 12 < replystr.length())) {
-		int f = 0;
-		for (size_t n = 2; n < 13; n++)
-			f = f*10 + replystr[p+n] - '0';
-		A.freq = f;
-	}
-	return A.freq;
-}
-
-void RIG_TS480HX::set_vfoA (unsigned long int freq)
-{
-	A.freq = freq;
-	cmd = "FA00000000000;";
-	for (int i = 12; i > 1; i--) {
-		cmd[i] += freq % 10;
-		freq /= 10;
-	}
-	sendCommand(cmd);
-	showresp(WARN, ASC, "set vfo A", cmd, "");
-}
-
-unsigned long int RIG_TS480HX::get_vfoB ()
-{
-	cmd = "FB;";
-	if (wait_char(';', 14, 100, "get vfo B", ASC) < 14) return B.freq;
-
-	size_t p = replystr.rfind("FB");
-	if (p != string::npos && (p + 12 < replystr.length())) {
-		int f = 0;
-		for (size_t n = 2; n < 13; n++)
-			f = f*10 + replystr[p+n] - '0';
-		B.freq = f;
-	}
-	return B.freq;
-}
-
-void RIG_TS480HX::set_vfoB (unsigned long int freq)
-{
-	B.freq = freq;
-	cmd = "FB00000000000;";
-	for (int i = 12; i > 1; i--) {
-		cmd[i] += freq % 10;
-		freq /= 10;
-	}
-	sendCommand(cmd);
-	showresp(WARN, ASC, "set vfo B", cmd, "");
-}
-
-// Squelch (TS990.cxx)
-void RIG_TS480HX::set_squelch(int val)
-{
-		cmd = "SQ0";
-		cmd.append(to_decimal(abs(val),3)).append(";");
-		sendCommand(cmd);
-		showresp(INFO, ASC, "set squelch", cmd, "");
-}
-
-int  RIG_TS480HX::get_squelch()
-{
-	int val = 0;
-	cmd = "SQ0;";
-		if (wait_char(';', 7, 20, "get squelch", ASC) >= 7) {
-			size_t p = replystr.rfind("SQ0");
-			if (p == string::npos) return val;
-			replystr[p + 6] = 0;
-			val = atoi(&replystr[p + 3]);
-	}
-	return val;
-}
-
-void RIG_TS480HX::get_squelch_min_max_step(int &min, int &max, int &step)
-{
-	min = 0; max = 255; step = 1;
-}
-
-void RIG_TS480HX::set_mic_gain(int val)
-{
-	cmd = "MG";
-	cmd.append(to_decimal(val,3)).append(";");
-	sendCommand(cmd);
-	showresp(WARN, ASC, "set mic gain", cmd, "");
-}
-
-int  RIG_TS480HX::get_mic_gain()
-{
-	int val = progStatus.mic_gain;
-	cmd = "MG;";
-	if (wait_char(';', 6, 100, "get mic gain", ASC) < 6) return val;
-
-	size_t p = replystr.rfind("MG");
-	if (p != string::npos)
-		val = fm_decimal(replystr.substr(p+2), 3);
-	return val;
-}
-
-void RIG_TS480HX::get_mic_min_max_step(int &min, int &max, int &step)
-{
-	min = 0; max = 100; step = 1;
-}
-
-void RIG_TS480HX::set_volume_control(int val)
-{
-	cmd = "AG";
-	char szval[5];
-	snprintf(szval, sizeof(szval), "%04d", val * 255 / 100);
-	cmd += szval;
-	cmd += ';';
-	LOG_WARN("%s", cmd.c_str());
-	sendCommand(cmd);
-}
-
-int RIG_TS480HX::get_volume_control()
-{
-	int val = progStatus.volume;
-	cmd = "AG0;";
-	if (wait_char(';', 7, 100, "get vol", ASC) < 7) return val;
-
-	size_t p = replystr.rfind("AG");
-	if (p == string::npos) return val;
-	replystr[p + 6] = 0;
-	val = atoi(&replystr[p + 3]);
-	val = val * 100 / 255;
-	return val;
-}
-
-void RIG_TS480HX::tune_rig()
-{
-	cmd = "AC111;";
-	LOG_WARN("%s", cmd.c_str());
-	sendCommand(cmd);
-}
-
-*/

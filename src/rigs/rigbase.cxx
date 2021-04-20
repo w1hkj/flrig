@@ -384,7 +384,7 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 
 	if(!progStatus.use_tcpip && !RigSerial->IsOpen()) {
 		snprintf(sztemp, sizeof(sztemp), "TEST %s", sz);
-		showresp(WARN, pr, sztemp, tosend, replystr);
+//		showresp(WARN, pr, sztemp, tosend, replystr);
 		return 0;
 	}
 
@@ -434,7 +434,7 @@ int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 
 	if(!progStatus.use_tcpip && !RigSerial->IsOpen()) {
 		snprintf(sztemp, sizeof(sztemp), "TEST %s", sz);
-		showresp(DEBUG, pr, sztemp, tosend, replystr);
+//		showresp(DEBUG, pr, sztemp, tosend, replystr);
 		return 0;
 	}
 
