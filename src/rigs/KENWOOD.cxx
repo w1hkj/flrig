@@ -115,7 +115,7 @@ int KENWOOD::get_split()
 	ret = wait_char(';', 38, 100, "get split", ASC);
 	gett("");
 	if (ret < 38) return 0;
-	return (replybuff[32] == '1');
+	return (replystr[32] == '1');
 }
 
 bool KENWOOD::check()
@@ -223,7 +223,7 @@ int KENWOOD::get_PTT()
 	ret = wait_char(';', 38, 100, "get VFO", ASC);
 	gett("");
 	if (ret < 38) return ptt_;
-	ptt_ = (replybuff[28] == '1');
+	ptt_ = (replystr[28] == '1');
 	return ptt_;
 }
 

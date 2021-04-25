@@ -24,6 +24,7 @@
 
 #include <string>
 #include <sstream>
+#include <iostream>
 
 #include "IC7300.h"
 #include "support.h"
@@ -326,8 +327,8 @@ void RIG_IC7300::set_xcvr_auto_on()
 			get_trace(1, "getID()");
 			cmd.append(post);
 			int i = 0;
-			for (i = 0; i < 200; i++) {
-				MilliSleep(50);
+			for (i = 0; i < 100; i++) {
+				MilliSleep(100);
 				if (waitFOR(8, "get ID") == true) {
 					RigSerial->failed(0);
 					return;
@@ -1587,9 +1588,11 @@ void RIG_IC7300::set_preamp(int val)
 
 	cmd += (unsigned char)preamp_level;
 	cmd.append( post );
+	set_trace(1, "set_preamp");
 	waitFB(	(preamp_level == 0) ? "set Preamp OFF" :
 			(preamp_level == 1) ? "set Preamp Level 1" :
 			"set Preamp Level 2");
+	isett("");
 }
 
 int RIG_IC7300::get_preamp()
@@ -1610,12 +1613,12 @@ int RIG_IC7300::get_preamp()
 		if (p != string::npos) {
 			preamp_level = replystr[p+6];
 			if (preamp_level == 1) {
-				preamp_label("Amp 1", true);
+				preamp_label("Amp 1", preamp_level);
 			} else if (preamp_level == 2) {
-				preamp_label("Amp 2", true);
+				preamp_label("Amp 2", preamp_level);
 			} else {
-				preamp_label("PRE", false);
 				preamp_level = 0;
+				preamp_label("PRE", preamp_level);
 			}
 		}
 	}
@@ -1625,19 +1628,22 @@ int RIG_IC7300::get_preamp()
 void RIG_IC7300::set_attenuator(int val)
 {
 	if (val) {
-		atten_label("20 dB", true);
 		atten_level = 1;
-		preamp_label("PRE", false);
+		atten_label("20 dB", atten_level);
+		preamp_level = 0;
+		preamp_label("PRE", 0);
 	} else {
 		atten_level = 0;
-		atten_label("ATT", false);
+		atten_label("ATT", atten_level);
 	}
 
 	cmd = pre_to;
 	cmd += '\x11';
 	cmd += atten_level ? '\x20' : '\x00';
 	cmd.append( post );
+	set_trace(1, "set attenuator");
 	waitFB("set att");
+	isett("");
 }
 
 int RIG_IC7300::next_attenuator()
@@ -1662,17 +1668,15 @@ int RIG_IC7300::get_attenuator()
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			if (replystr[p+5] == 0x20) {
-				atten_label("20 dB", true);
 				atten_level = 1;
-				return 1;
+				atten_label("20 dB", atten_level);
 			} else {
-				atten_label("ATT", false);
 				atten_level = 0;
-				return 0;
+				atten_label("ATT", atten_level);
 			}
 		}
 	}
-	return 0;
+	return atten_level;
 }
 
 void RIG_IC7300::set_noise(bool val)

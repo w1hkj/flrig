@@ -233,7 +233,6 @@ bool RIG_FT1000MP::check()
 
 bool RIG_FT1000MP::get_info(void)
 {
-	unsigned char *p = 0;
 	int ret = 0;
 	int alt = 0;
 	int md = 0;
@@ -242,9 +241,11 @@ bool RIG_FT1000MP::get_info(void)
 	cmd[3] = 0x03;  // read both vfo's
 	cmd[4] = 0x10;
 	ret = waitN(32, 100, "get info", ASC);
-	p = (unsigned char *)replybuff;
+
+	std::string p;
 	if (ret >= 32) {
-		if (ret > 32) p += (ret - 32);
+		p = replystr.substr(replystr.length() - 32);
+
 		// vfo A data string
 		A.freq = ((((((p[1]<<8) + p[2])<<8) + p[3])<<8) + p[4])*10/16;
 		md = p[7] & 0x07;
@@ -489,7 +490,7 @@ int  RIG_FT1000MP::get_power_out(void)
 	int ret = sendCommand(cmd);
 	if (ret < 5) return 0;
 
-	pwr = (unsigned char)(replybuff[ret - 5]);
+	pwr = (unsigned char)(replystr[ret - 5]);
 
 	if (pwr <=53) {pwr /= 53; pwr = 10 * pwr * pwr; }
 	else if (pwr <= 77) {pwr /= 77; pwr = 20 * pwr * pwr; }
@@ -498,7 +499,7 @@ int  RIG_FT1000MP::get_power_out(void)
 	else if (pwr <= 130) {pwr /= 130; pwr = 50 * pwr * pwr; }
 	else {pwr /= 177; pwr = 100 * pwr * pwr; }
 
-	LOG_INFO("%s => %d",str2hex(replybuff,1), (int)pwr);
+	LOG_INFO("%s => %d", str2hex(replystr.c_str(), 1), (int)pwr);
 	return (int)pwr;
 }
 
@@ -511,12 +512,12 @@ int  RIG_FT1000MP::get_smeter(void)
 	int ret = waitN(5, 100, "get smeter", HEX);
 	if (ret < 5) return 0;
 
-	val = (unsigned char)(replybuff[ret-5]);
+	val = (unsigned char)(replystr[ret-5]);
 	if (val <= 15) val = 5;
 	else if (val <=154) val = 5 + 45 * (val - 15) / (154 - 15);
 	else val = 50 + 50 * (val - 154.0) / (255.0 - 154.0);
 
-	LOG_INFO("%s => %d",str2hex(replybuff,1), (int)val);
+	LOG_INFO("%s => %d",str2hex(replystr.c_str(), 1), (int)val);
 
 	return (int)val;
 }
@@ -530,13 +531,13 @@ int  RIG_FT1000MP::get_swr(void)
 	int ret = waitN(5, 100, "get swr", HEX);
 	if (ret < 5) return 0;
 
-	val = (unsigned char)(replybuff[ret-5]) - 10;
+	val = (unsigned char)(replystr[ret-5]) - 10;
 	val *=  (50.0 / 122.0);
 
 	if (val < 0) val = 0;
 	if (val > 100) val = 100;
 
-	LOG_INFO("%s => %d",str2hex(replybuff,1), (int)val);
+	LOG_INFO("%s => %d",str2hex(replystr.c_str(), 1), (int)val);
 
 	return (int)val;
 }
@@ -550,8 +551,8 @@ int  RIG_FT1000MP::get_alc(void)
 	int ret = waitN(5, 100, "get alc", HEX);
 	if (ret < 5) return 0;
 
-	val = (unsigned char)(replybuff[ret-5]);
-	LOG_INFO("%s => %d",str2hex(replybuff,1), val);
+	val = (unsigned char)(replystr[ret-5]);
+	LOG_INFO("%s => %d",str2hex(replystr.c_str(), 1), val);
 
 	return val * 100 / 255;
 }

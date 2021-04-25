@@ -333,7 +333,7 @@ int RIG_FT990A::get_smeter()
 	cmd[4] = 0xF7;
 	int ret = waitN(5, 100, "S-meter");
 	if (ret < 5) return 0;
-	int sval = (unsigned char)replybuff[0];
+	int sval = (unsigned char)replystr[0];
 	if (sval < 90) sval = 90;
 	if (sval > 200) sval = 200;
 	if (sval < 120) sval = 250 - 5 * sval / 3;
@@ -352,7 +352,7 @@ int RIG_FT990A::get_power_out()
 	cmd[4] = 0xF7;
 	int ret = waitN(5, 100, "Power out");
 	if (ret < 5) return 0;
-	int sval = (unsigned char)replybuff[0];
+	int sval = (unsigned char)replystr[0];
 	if (sval < 90) sval = 90;
 	if (sval > 200) sval = 200;
 	if (sval < 120) sval = 250 - 5 * sval / 3;

@@ -80,7 +80,7 @@ public:
 	void Stopbits(int n) {stopbits = (n == 1 ? 1 : 2);}
 	int  Stopbits() { return stopbits;}
 
-	int  ReadBuffer (char *b, int nbr);
+	int  ReadBuffer (std::string &buffer, int nbr, std::string find1 = "", std::string find2 = "");
 	int  WriteBuffer(const char *str, int nbr);
 	bool WriteByte(char bybyte);
 	void FlushBuffer();
@@ -149,15 +149,12 @@ public:
 	void IsBusy(bool val) { busyflag = val; };
 
 	bool ReadByte(char &resp);
-	int  ReadData (char *b, int nbr);
-	int  ReadBuffer (char *b, int nbr) {
-	  return ReadData (b,nbr);
-	}
-	int  ReadChars (char *b, int nbr, int msec);
 	DWORD GetBytesRead();
 
 	bool WriteByte(char bybyte);
 	DWORD GetBytesWritten();
+
+	int  ReadBuffer (std::string &buffer, int nbr, std::string find1 = "", std::string find2 = "");
 	int WriteBuffer(const char *str, int nbr);
 
 	bool SetCommunicationTimeouts(DWORD ReadIntervalTimeout,DWORD ReadTotalTimeoutMultiplier,DWORD ReadTotalTimeoutConstant,DWORD WriteTotalTimeoutMultiplier,DWORD WriteTotalTimeoutConstant);

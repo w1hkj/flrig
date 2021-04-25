@@ -292,7 +292,6 @@ Hspinner *cntRIT = (Hspinner *)0;
 Hspinner *cntXIT = (Hspinner *)0;
 Hspinner *cntBFO = (Hspinner *)0;
 Fl_Group *genericAux = (Fl_Group *)0;
-Fl_Box *boxControl=(Fl_Box *)0;
 Fl_Light_Button *btnAuxRTS = (Fl_Light_Button *)0;
 
 Fl_Group *tab7610 = (Fl_Group *)0;
@@ -623,8 +622,9 @@ static void cb_btnSplit(Fl_Light_Button* o, void*) {
 	cb_set_split(o->value());
 }
 
-static void cb_btnPTT(Fl_Light_Button*, void*) {
-	cbPTT();
+extern void doPTT(int);
+static void cb_btnPTT(Fl_Light_Button *b, void*) {
+	doPTT(b->value());
 }
 
 static void cb_sldrSQUELCH(Fl_Wheel_Value_Slider*, void*) {

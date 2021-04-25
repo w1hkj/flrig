@@ -159,8 +159,6 @@ bool RIG_FT1000::check ()
 
 bool RIG_FT1000::get_info()
 {
-
-	unsigned char *d = 0;
 	int alt = 0;
 	int md = 0;
 
@@ -180,9 +178,9 @@ bool RIG_FT1000::get_info()
 	cmd[4] = 0x10;
 	ret = waitN(32, 100, "get info", ASC);
 	getthex("Get info");
-	d = (unsigned char *)replybuff;
+	std::string d;
 	if (ret >= 32) {
-		if (ret > 32) d += (ret - 32);
+		d = replystr.substr(replystr.length() - 32);
 
 		// vfo A data string
 		A.freq = ((((d[1]<<8) + d[2])<<8) + d[3]) *10;
@@ -466,15 +464,15 @@ int RIG_FT1000::get_smeter()
 	int ret = waitN(5, 100, "get smeter", HEX);
 	if (ret < 5) return 0;
 
-	val = (unsigned char)(replybuff[ret-5]);
+	val = (unsigned char)(replystr[ret-5]);
 	if (val <= 15) val = 5;
 	else if (val <=154) val = 5 + 80 * (val - 15) / (154 - 15);
 	else val = 50 + 50 * (val - 154.0) / (255.0 - 154.0);
 
-//	LOG_INFO("%s => %d",str2hex(replybuff,1), (int)val);
+//	LOG_INFO("%s => %d",str2hex(replystr.c_str(), 1), (int)val);
 	char szmeter[5];
 	snprintf(szmeter, sizeof(szmeter), "%d", (int)val);
-	get_trace(3, "Smeter", str2hex(replybuff,1), szmeter);
+	get_trace(3, "Smeter", str2hex(replystr.c_str(), 1), szmeter);
 
 	return (int)val;
 }
@@ -488,18 +486,18 @@ int RIG_FT1000::get_power_out()
 	cmd[4] = 0xF7;
 	int ret = waitN(5, 100, "Power out");
 	if (ret < 5) return 0;
-	pwr = (unsigned char)(replybuff[ret - 5]);
+	pwr = (unsigned char)(replystr[ret - 5]);
 	if (pwr <=53) {pwr /= 53; pwr = 20 * pwr * pwr; }
 	else if (pwr <= 77) {pwr /= 77; pwr = 40 * pwr * pwr; }
 	else if (pwr <= 98) {pwr /= 98; pwr = 60 * pwr * pwr; }
 	else if (pwr <= 114) {pwr /= 114; pwr = 80 * pwr * pwr; }
 	else if (pwr <= 130) {pwr /= 130; pwr = 105 * pwr * pwr; }
 	else {pwr /= 177; pwr = 160 * pwr * pwr; }
-//	LOG_INFO("%s => %d",str2hex(replybuff,1), (int)pwr);
+//	LOG_INFO("%s => %d",str2hex(replystr.c_str(), 1), (int)pwr);
 
 	char szmeter[5];
 	snprintf(szmeter, sizeof(szmeter), "%d", (int)pwr);
-	get_trace(3, "Smeter", str2hex(replybuff,1), szmeter);
+	get_trace(3, "Smeter", str2hex(replystr.c_str(), 1), szmeter);
 
 	return (int)pwr;
 }

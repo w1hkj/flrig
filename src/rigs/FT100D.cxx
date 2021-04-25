@@ -315,7 +315,7 @@ int RIG_FT100D::get_smeter()
 	cmd[4] = 0xF7;
 	int ret = waitN(9, 100, "S-meter");
 	if (ret < 9) return 0;
-	int sval = (unsigned char)replybuff[ret - 6];
+	int sval = (unsigned char)replystr[ret - 6];
 	if (sval < 90) sval = 90;
 	if (sval > 200) sval = 200;
 	if (sval < 120) sval = 250 - 5 * sval / 3;

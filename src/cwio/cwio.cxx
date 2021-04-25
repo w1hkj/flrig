@@ -155,7 +155,7 @@ void sending_text()
 {
 	char c = 0;
 	if (progStatus.cwioPTT) {
-		setPTT((void *)1);
+		doPTT(1);
 		MilliSleep(progStatus.cwioPTT);
 	}
 	while (cwio_process == SEND) {
@@ -178,7 +178,7 @@ void sending_text()
 		else MilliSleep(5);
 	}
 	if (progStatus.cwioPTT) {
-		setPTT((void *)0);
+		doPTT(0);
 		MilliSleep(progStatus.cwioPTT);
 	}
 }

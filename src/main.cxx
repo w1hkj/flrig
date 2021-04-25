@@ -81,6 +81,7 @@
 #include "icons.h"
 #include "cwio.h"
 #include "cwioUI.h"
+#include "serial.h"
 
 #include "flrig_icon.cxx"
 
@@ -254,6 +255,9 @@ void exit_main(Fl_Widget *w)
 	if (Fl::event_key() == FL_Escape)
 		return;
 	cbExit();
+#if SERIAL_DEBUG
+	fclose(serlog);
+#endif
 }
 
 void expand_controls(void*)
@@ -384,7 +388,6 @@ int main (int argc, char *argv[])
 	checkdirectories();
 
 #if SERIAL_DEBUG
-extern FILE *serlog;
 	std::string serlogname = RigHomeDir;
 	serlogname.append("serlog.txt");
 	serlog = fopen(serlogname.c_str(), "w");

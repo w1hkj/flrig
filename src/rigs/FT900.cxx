@@ -80,7 +80,7 @@ RIG_FT900::RIG_FT900() {
 void RIG_FT900::initialize()
 {
 	progStatus.poll_split = 1;     // allow pollimg for split info
-	progStatus.poll_vfoAorB = 1;   // allow pollimg for vfo info
+//	progStatus.poll_vfoAorB = 1;   // allow pollimg for vfo info
 }
 
 void RIG_FT900::init_cmd()
@@ -132,7 +132,7 @@ int  RIG_FT900::get_vfoAorB()
 //  after this command the FT-900 replies with 3 bytes of flags and 2 bytes of dummy data
 	if (ret >= 5) {
 		size_t p = ret - 5;
-		int sp = replybuff[p];
+		int sp = replystr[p];
 		splitison = (sp & 0x04) ? 1 : 0;     // 1 if split is set
 		vfoAorB = (sp & 0x40) ? 1 : 0;       // 0 if vfoA, 1 if vfoB is in use
      	return vfoAorB;       
@@ -184,16 +184,16 @@ bool RIG_FT900::get_info()
 		afreq = 0;
 		bfreq = 0;
 		for (size_t n = 1; n < 4; n++) {
-			afreq = afreq * 256 + (unsigned char)replybuff[p + n];
-			bfreq = bfreq * 256 + (unsigned char)replybuff[p + 9 + n];
+			afreq = afreq * 256 + (unsigned char)replystr[p + n];
+			bfreq = bfreq * 256 + (unsigned char)replystr[p + 9 + n];
 		}
 		afreq = afreq * 10.0;
 		bfreq = bfreq * 10.0;
 		aBW = 0;   // normal BW
 //		mode data for vfoA is in byte 6
 //      	bandwidth data is in byte 8
-		int md = replybuff[p + 6];
-		int bw = replybuff[p + 8];
+		int md = replystr[p + 6];
+		int bw = replystr[p + 8];
 		switch (md) {
 			case 0 :   // LSB
 				amode = 0;
@@ -219,8 +219,8 @@ bool RIG_FT900::get_info()
 		bBW = 0;
 //		mode data for vfoB is in byte 15
 //      	bandwidth data is in byte 17
-		md = replybuff[p + 15];
-		bw = replybuff[p + 17];
+		md = replystr[p + 15];
+		bw = replystr[p + 17];
 		switch (md) {
 			case 0 :   // LSB
 				bmode = 0;
@@ -359,7 +359,7 @@ int RIG_FT900::get_smeter()
 	cmd[4] = 0xF7;
 	int ret = waitN(5, 100, "get smeter", HEX);
 	if (ret < 5) return 0;
-	int sval = (unsigned char)(replybuff[ret - 2]);
+	int sval = (unsigned char)(replystr[ret - 2]);
 	sval = sval * 100 / 255;
 	return sval;
 }
@@ -370,7 +370,7 @@ int RIG_FT900::get_power_out()
 	cmd[4] = 0xF7;
 	int ret = waitN(5, 100, "get pwr out", HEX);
 	if (ret < 5) return 0;
-	int sval = (unsigned char)(replybuff[ret - 2]);
+	int sval = (unsigned char)(replystr[ret - 2]);
 	sval = sval * 100 / 255;
 	return sval;
 }

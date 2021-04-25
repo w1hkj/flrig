@@ -592,24 +592,6 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 
 	sm_grp1->end();
 
-	boxControl = new Fl_Box(3, 231, 130, 17, _("Auxilliary Controls:"));
-	boxControl->box(FL_FLAT_BOX);
-	boxControl->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-
-	btnAuxRTS = new Fl_Light_Button(218, 230, 60, 18, _("RTS"));
-	btnAuxRTS->tooltip(_("RTS control pin"));
-	btnAuxRTS->down_box(FL_THIN_DOWN_BOX);
-	btnAuxRTS->labelsize(12);
-	btnAuxRTS->callback((Fl_Callback*)cb_btnAuxRTS);
-	btnAuxRTS->value(progStatus.aux_rts);
-
-	btnAuxDTR = new Fl_Light_Button(146, 230, 60, 18, _("DTR"));
-	btnAuxDTR->tooltip(_("DTR control pin"));
-	btnAuxDTR->down_box(FL_THIN_DOWN_BOX);
-	btnAuxDTR->labelsize(12);
-	btnAuxDTR->callback((Fl_Callback*)cb_btnAuxDTR);
-	btnAuxDTR->value(progStatus.aux_dtr);
-
 	cntRIT = new Hspinner(213, 104, 54, 18, _("R"));
 	cntRIT->tooltip(_("RIT"));
 	cntRIT->type(FL_INT_INPUT);
@@ -1777,6 +1759,25 @@ Fl_Double_Window *tabs_window()
 			ic7610_digi_sel_val->value(progStatus.digi_sel_val);
 
 		tab7610->end();
+
+		genericAux = new Fl_Group(0, 24, small_mainW, gph - 24, _("Aux"));
+
+			btnAuxRTS = new Fl_Light_Button(5, genericAux->y() + 10, 60, 18, _("RTS"));
+			btnAuxRTS->tooltip(_("RTS control pin"));
+			btnAuxRTS->down_box(FL_THIN_DOWN_BOX);
+			btnAuxRTS->labelsize(12);
+			btnAuxRTS->callback((Fl_Callback*)cb_btnAuxRTS);
+			btnAuxRTS->value(progStatus.aux_rts);
+
+			btnAuxDTR = new Fl_Light_Button(btnAuxRTS->x() + 80, btnAuxRTS->y(), 60, 18, _("DTR"));
+			btnAuxDTR->tooltip(_("DTR control pin"));
+			btnAuxDTR->down_box(FL_THIN_DOWN_BOX);
+			btnAuxDTR->labelsize(12);
+			btnAuxDTR->callback((Fl_Callback*)cb_btnAuxDTR);
+			btnAuxDTR->value(progStatus.aux_dtr);
+
+		genericAux->end();
+		genericAux->hide();
 
 	tabsGeneric->resizable(genericUser_3);
 	tabsGeneric->end();

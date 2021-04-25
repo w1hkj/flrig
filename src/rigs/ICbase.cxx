@@ -28,6 +28,8 @@
 #include "trace.h"
 #include "status.h"
 #include "threads.h"
+#include "socket_io.h"
+#include "serial.h"
 
 pthread_mutex_t command_mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -105,147 +107,68 @@ void RIG_ICOM::ICtrace(string cmd, string hexstr)
 	rig_trace(2, cmd.c_str(), s1.c_str());
 }
 
-bool RIG_ICOM::waitFB(const char *sz, int timeout)
-{
-	guard_lock cmd_lock(&command_mutex);
-
-	char sztemp[100];
-	string returned = "";
-	string tosend = cmd;
-	unsigned long int msec_start = 0;
-	int diff;
-
-	if (!progStatus.use_tcpip && !RigSerial->IsOpen()) {
-		replystr = cmd;
-		return false;
-	}
-
-	if (!RigSerial->IsOpen()) return false;
-
-	int num = cmd.length() + ok.length();
-
-	int wait_msec = progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0;
-	wait_msec += 100;
-	wait_msec += num * 11000.0 / RigSerial->Baud();
-
-	timeout += wait_msec;
-
-	msec_start = zmsec();
-
-	respstr.clear();
-	sendCommand(cmd, 0);
-	returned.clear();
-	diff = zmsec() - msec_start;
-
-	while ( diff < timeout) {
-		returned.append(respstr);
-		if (returned.find(ok) != string::npos) {
-			replystr = returned;
-			unsigned long int waited = zmsec() - msec_start;
-			snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, OK", sz, waited);
-			showresp(DEBUG, HEX, sztemp, tosend, returned);
-			RigSerial->failed(-1);
-			return true;
-		}
-		if (returned.find(bad) != string::npos) {
-			replystr = returned;
-			unsigned long int waited = zmsec() - msec_start;
-			snprintf(sztemp, sizeof(sztemp), "%s ans in %ld ms, FAILED", sz, waited);
-			showresp(ERR, HEX, sztemp, tosend, returned);
-			return false;
-		}
-		readResponse();
-		diff = zmsec() - msec_start;
-	}
-
-	RigSerial->failed(1);
-
-	diff = zmsec() - msec_start;
-	replystr = returned;
-	snprintf(sztemp, sizeof(sztemp), "TIMED OUT (%d) %s: %d ms", RigSerial->failed(), sz, diff);
-	showresp(ERR, HEX, sztemp, tosend, returned);
-
-	return false;
-}
-
 bool RIG_ICOM::waitFOR(size_t n, const char *sz, unsigned long timeout)
 {
-	guard_lock cmd_lock(&command_mutex);
+#if SERIAL_DEBUG
+fprintf(serlog, "waitFOR %s\n", sz);
+#endif
+//	guard_lock cmd_lock(&command_mutex);
 
 	static char sztemp[200];
 	memset(sztemp, 0, 200);
-	string returned = "";
-	string tosend = cmd;
 	string check = "1234";
+	string eor   = "\xFD";
+	string bad   = "\xFA\xFD";
 
 	check[0] = cmd[0];
 	check[1] = cmd[1];
 	check[2] = cmd[3];
 	check[3] = cmd[2];
 
-	size_t num = n;
-	unsigned long diff = 0;
-	if (progStatus.comm_echo) num += cmd.length();
+//	int delay =  (n + cmd.length()) * 11000.0 / RigSerial->Baud();
+	int delay =  n * 11000.0 / RigSerial->Baud();
+	int retnbr = 0;
 
-	unsigned long int start_msec;
-	unsigned long int now;
+	replystr.clear();
 
-	unsigned long delay = progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0;
-	delay += 100;
-	delay += num * 11000.0 / RigSerial->Baud();
-
-	if (!progStatus.use_tcpip && !RigSerial->IsOpen()) {
-		replystr = cmd;
-		return false;
-	}
-
-	if (!RigSerial->IsOpen()) return false;
-
-	if (timeout < delay) timeout = delay;
-
-	now = start_msec = zmsec();
-	respstr.clear();
-
-	sendCommand(tosend, 0);
-	returned.clear();
-	now = zmsec();
-	diff = now - start_msec;
-
-	while ( diff < timeout ) {
-		if (returned.find(bad) != string::npos) {
-			snprintf(sztemp, sizeof(sztemp), "%s ERROR : %ld ms", sz, diff);
-			showresp(ERR, HEX, sztemp, tosend, returned);
+	if (progStatus.use_tcpip) {
+		send_to_remote(cmd, progStatus.byte_interval);
+		MilliSleep(delay + progStatus.tcpip_ping_delay);
+		retnbr = read_from_remote(replystr);
+		LOG_DEBUG ("%s: read %d bytes, %s", sz, retnbr, replystr.c_str());
+	} else {
+		if(!RigSerial->IsOpen()) {
+			LOG_DEBUG("TEST %s", sz);
 			return false;
 		}
-		int ret = readResponse();
-		diff = (now = zmsec()) - start_msec;
-		if (ret) returned.append(respstr);
+		RigSerial->FlushBuffer();
+		RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
+//#if SERIAL_DEBUG
+//fprintf(serlog, "delay %d msec\n", delay);
+//#endif
+//		MilliSleep(delay);
 
-		if ((returned.find(check) != std::string::npos) && 
-			(returned[returned.length()-1] == '\xFD'))
-			break;
+		retnbr = RigSerial->ReadBuffer(replystr, n + cmd.length(), check, eor);
 	}
 
-	replystr = returned;
-	snprintf(sztemp,
-			 sizeof(sztemp),
-			 "%s\n%s",
-			 sz, str2hex(returned.c_str(), returned.length()) );
+	if (replystr.rfind(bad) != std::string::npos)
+		return false;
 
-	if ((returned.find(check) != std::string::npos) && 
-		(returned[returned.length()-1] == '\xFD')) {
-		snprintf(sztemp, sizeof(sztemp), "%s OK : %ld ms", sz, diff);
-
-		showresp(INFO, HEX, sztemp, tosend, returned);
-		RigSerial->failed(-1);
+	if (replystr.rfind(check) != std::string::npos && 
+		replystr.rfind(eor) != std::string::npos)
 		return true;
-	}
 
-	RigSerial->failed(1);
+	return false;
+}
 
-	snprintf(sztemp, sizeof(sztemp), "TIMED OUT (%d): %ld ms: %s", RigSerial->failed(), diff, sz);
-	showresp(ERR, HEX, sztemp, tosend, returned);
-
+bool RIG_ICOM::waitFB(const char *sz, int timeout)
+{
+#if SERIAL_DEBUG
+fprintf(serlog, "waitFB\n");
+#endif
+	waitFOR(6, sz, timeout);
+	if (replystr.rfind("\xFB\xFD") != std::string::npos)
+		return true;
 	return false;
 }
 

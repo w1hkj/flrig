@@ -24,12 +24,12 @@
 //=============================================================================
 // IC-7000
 
+static int ret = 0;  // used by get_trace
+
 enum {
         LSB7000, USB7000, AM7000, CW7000, RTTY7000,
         FM7000, WFM7000, CWR7000, RTTYR7000, DV7000,
         LSBD7000, USBD7000, AMD7000, FMD7000 };
-
-
 
 const char IC7000name_[] = "IC-7000";
 
@@ -242,7 +242,10 @@ unsigned long int RIG_IC7000::get_vfoA ()
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
-	if (waitFOR(11, "get vfo A")) {
+	get_trace(1, "get vfo A");
+	ret = waitFOR(11, "get vfo A");
+	igett("");
+	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			if (replystr[p+5] == -1)
@@ -252,7 +255,6 @@ unsigned long int RIG_IC7000::get_vfoA ()
 		}
 	} else if (RigSerial->IsOpen())
 		flrig_abort = true;
-	igett("get_vfoA()");
 	return A.freq;
 }
 
@@ -275,7 +277,10 @@ unsigned long int RIG_IC7000::get_vfoB ()
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
-	if (waitFOR(11, "get vfo B")) {
+	get_trace(1, "get vfo B");
+	ret = waitFOR(11, "get vfo B");
+	igett("");
+	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			if (replystr[p+5] == -1)
@@ -285,7 +290,6 @@ unsigned long int RIG_IC7000::get_vfoB ()
 		}
 	} else if (RigSerial->IsOpen())
 		flrig_abort = true;
-	igett("get_vfoB()");
 	return B.freq;
 }
 
@@ -324,7 +328,10 @@ int RIG_IC7000::get_modeA()
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
-	if (waitFOR(8, "get mode A")) {
+	get_trace(1,"get mode A");
+	ret = waitFOR(8, "get mode A"); 
+	igett("");
+	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			md = replystr[p+5];
@@ -336,7 +343,6 @@ int RIG_IC7000::get_modeA()
 		}
 	} else if (RigSerial->IsOpen())
 		flrig_abort = true;
-	igett("get_modeA()");
 	return A.imode;
 }
 
@@ -364,7 +370,10 @@ int RIG_IC7000::get_modeB()
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
-	if (waitFOR(8, "get mode B")) {
+	get_trace(1, "get mode B");
+	ret = waitFOR(8, "get mode B");
+	igett("");
+	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			md = replystr[p+5];
@@ -377,7 +386,6 @@ int RIG_IC7000::get_modeB()
 	} else if (RigSerial->IsOpen())
 		flrig_abort = true;
 		
-	igett("get_modeB()");
 	return B.imode;
 }
 
@@ -389,13 +397,15 @@ int  RIG_IC7000::get_bwA()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(8, "get bw A")) {
+	get_trace(1, "get bw A");
+	ret = waitFOR(8, "get bw A");
+	igett("");
+	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			A.iBW = (fm_bcd(replystr.substr(p+6),2));
 	} else if (RigSerial->IsOpen())
 		flrig_abort = true;
-	igett("get_bwA()");
 	return A.iBW;
 }
 
@@ -480,12 +490,14 @@ int RIG_IC7000::get_attenuator()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(7, "get att")) {
+	get_trace(1, "get att");
+	ret = waitFOR(7, "get att");
+	igett("");
+	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			return (replystr[p+5] ? 1 : 0);
 	}
-	igett("get_attenuator()");
 	return progStatus.attenuator;
 }
 
@@ -518,12 +530,14 @@ int RIG_IC7000::get_preamp()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(8, "get preamp")) {
+	get_trace(1, "get preamp");
+	ret = waitFOR(8, "get preamp");
+	igett("");
+	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			return replystr[p+6] ? 1 : 0;
 	}
-	igett("get_preamp()");
 	return progStatus.preamp;
 }
 
@@ -546,7 +560,10 @@ int RIG_IC7000::get_auto_notch()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(8, "get AN")) {
+	get_trace(1, "get autonotch");
+	ret = waitFOR(8, "get AN");
+	igett("");
+	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			if (replystr[p+6] == 0x01) {
@@ -558,7 +575,6 @@ int RIG_IC7000::get_auto_notch()
 			}
 		}
 	}
-	igett("get_auto_notch()");
 	return progStatus.auto_notch;
 }
 
@@ -579,7 +595,10 @@ int  RIG_IC7000::get_split()
 	cmd.assign(pre_to);
 	cmd.append("\x0F");
 	cmd.append( post );
-	if (waitFOR(7, "get split")) {
+	get_trace(1, "get split");
+	ret = waitFOR(7, "get split");
+	igett("");
+	if (ret) {
 		string resp = pre_fm;
 		resp.append("\x0F");
 		size_t p = replystr.find(resp);
@@ -588,7 +607,6 @@ int  RIG_IC7000::get_split()
 		if (read_split != 0xFA) // fail byte
 			split = read_split;
 	}
-	igett("get_split()");
 	return split;
 }
 
@@ -612,12 +630,14 @@ int RIG_IC7000::get_volume_control()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(9, "get vol")) {
+	get_trace(1, "get vol");
+	ret = waitFOR(9, "get vol");
+	igett("");
+	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p + 6),3) * 100 / 255);
 	}
-	igett("get_volume_control()");
 	return progStatus.volume;
 }
 
@@ -644,12 +664,14 @@ int RIG_IC7000::get_rf_gain()
 	cmd = pre_to;
 	cmd.append(cstr).append(post);
 	resp.append(cstr);
-	if (waitFOR(9, "get RF")) {
+	get_trace(1, "get rfgain");
+	ret = waitFOR(9, "get RF");
+	igett("");
+	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p + 6),3) * 100 / 255);
 	}
-	igett("get_rf_gain()");
 	return progStatus.rfgain;
 }
 
@@ -672,12 +694,14 @@ int  RIG_IC7000::get_squelch()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
-	if (waitFOR(9, "get sql")) {
+	get_trace(1, "get squelch");
+	ret = waitFOR(9, "get sql");
+	igett("");
+	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p+6), 3) * 100 / 255);
 	}
-	igett("get_squelch()");
 	return progStatus.squelch;
 }
 
@@ -698,12 +722,14 @@ int RIG_IC7000::get_power_control()
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr).append(post);
-	if (waitFOR(9, "get power")) {
+	get_trace(1, "get power");
+	ret = waitFOR(9, "get power");
+	igett("");
+	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p + 6),3) * 100 / 255);
 	}
-	igett("get_power_control()");
 	return progStatus.power_level;
 }
 
@@ -775,12 +801,14 @@ int RIG_IC7000::get_mic_gain()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
-	if (waitFOR(9, "get mic")) {
+	get_trace(1, "get micgain");
+	ret = waitFOR(9, "get mic");
+	igett("");
+	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p+6),3) / 2.55);
 	}
-	igett("get_mic_gain()");
 	return 0;
 }
 
@@ -833,8 +861,10 @@ bool RIG_IC7000::get_notch(int &val)
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(8, "get notch")) {
-		igett("get_notch()");
+	get_trace(1, "get notch");
+	ret = waitFOR(8, "get notch");
+	igett("");
+	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			on = replystr[p + 6];
@@ -844,8 +874,10 @@ bool RIG_IC7000::get_notch(int &val)
 		cmd.append(cstr);
 		resp.append(cstr);
 		cmd.append(post);
-		if (waitFOR(9, "notch val")) {
-			igett("get_notc_val()");
+		get_trace(1, "get notch value");
+		ret = waitFOR(9, "notch val");
+		igett("");
+		if (ret) {
 			size_t p = replystr.rfind(resp);
 			if (p != string::npos)
 				val = (int)ceil(fm_bcd(replystr.substr(p+6),3) * 3000.0 / 255.0);
@@ -905,12 +937,14 @@ int RIG_IC7000::get_noise_reduction()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
-	if (waitFOR(8, "get NR")) {
+	get_trace(1, "get noise reduction");
+	ret = waitFOR(8, "get NR");
+	igett("");
+	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			return (replystr[p+6] == 0x01 ? 1 : 0);
 	}
-	igett("get_noise_reduction()");
 	return 0;
 }
 
@@ -933,8 +967,10 @@ int RIG_IC7000::get_noise_reduction_val()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
-	if (waitFOR(9, "get NR val")) {
-		igett("get_noise_reduction_val()");
+	get_trace(1, "get noise reduction value");
+	ret = waitFOR(9, "get NR val");
+	igett("");
+	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p+6),3) / 2.55);
@@ -987,8 +1023,10 @@ int RIG_IC7000::get_PTT()
 	string resp = pre_fm;
 	resp += '\x1c'; resp += '\x00';
 	cmd.append(post);
-	if (waitFOR(8, "get PTT")) {
-		igett("get PTT");
+	get_trace(1, "get PTT");
+	ret = waitFOR(8, "get PTT");
+	igett("");
+	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			ptt_ = replystr[p + 6];
@@ -1033,8 +1071,10 @@ int RIG_IC7000::get_pbt_inner()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(9, "get pbt inner")) {
-		igett("get_pbt_inner()");
+	get_trace(1, "get pbt inner");
+	ret = waitFOR(9, "get pbt inner");
+	igett("");
+	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			val = num100(replystr.substr(p+6));
@@ -1053,8 +1093,10 @@ int RIG_IC7000::get_pbt_outer()
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
-	if (waitFOR(9, "get pbt outer")) {
-		igett("get_pbt_outer()");
+	get_trace(1, "get pbt outer");
+	ret = waitFOR(9, "get pbt outer");
+	igett("");
+	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			val = num100(replystr.substr(p+6));
@@ -1095,8 +1137,10 @@ void RIG_IC7000::get_band_selection(int v)
 	cmd += to_bcd_be( v, 2 );
 	cmd += '\x01';
 	cmd.append( post );
-	if (waitFOR(23, "get band stack")) {
-		igett("get band stack");
+	get_trace(1, "get band stack");
+	ret = waitFOR(23, "get band stack");
+	igett("");
+	if (ret) {
 		size_t p = replystr.rfind(pre_fm);
 		if (p != string::npos) {
 			unsigned long int bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
@@ -1112,8 +1156,7 @@ void RIG_IC7000::get_band_selection(int v)
 				set_FILT(bandfilter);
 			}
 		}
-	} else
-		igett("get band stack");
+	}
 }
 
 void RIG_IC7000::set_band_selection(int v)
@@ -1144,8 +1187,9 @@ void RIG_IC7000::set_band_selection(int v)
 	cmd += '\x01';
 	cmd.append( post );
 
-	waitFOR(23, "get band stack");
-	igett("get band stack");
+	get_trace(1, "get band stack");
+	ret = waitFOR(23, "get band stack");
+	igett("");
 }
 
 const char ** RIG_IC7000::bwtable(int m)

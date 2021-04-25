@@ -114,7 +114,7 @@ status progStatus = {
 	1,			// bool	poll_split;
 	1,			// bool	poll_noise;
 	1,			// bool	poll_nr;
-	1,			// int  poll_vfoAorB;
+//	0,			// int  poll_vfoAorB;
 	1,			// poll_meters;
 	1,			// poll_ops;
 	1,			// poll_compression;

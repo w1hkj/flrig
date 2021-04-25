@@ -1180,13 +1180,13 @@ public:
 	rig_get_smeter(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_smeter", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_online || !selrig->has_smeter)
-			result = (int)(0);
-		else {
+//		if (!xcvr_online || !selrig->has_smeter)
+//			result = (int)(0);
+//		else {
 			result = (int)mval;
 //			guard_lock serial_lock(&mutex_serial);
 //			result = (int)(selrig->get_smeter());
-		}
+//		}
 	}
 
 	std::string help() { return std::string("returns S-meter reading"); }

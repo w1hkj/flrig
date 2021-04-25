@@ -85,37 +85,38 @@ Fl_Group *tabSERVER = (Fl_Group *)0;
 	Fl_Box *box_fldigi_connect = (Fl_Box *)0;
 
 Fl_Group *tabPOLLING = (Fl_Group *)0;
-	Fl_Value_Input *poll_smeter = (Fl_Value_Input *)0;
-	Fl_Value_Input *poll_pout = (Fl_Value_Input *)0;
-	Fl_Value_Input *poll_swr = (Fl_Value_Input *)0;
-	Fl_Value_Input *poll_alc = (Fl_Value_Input *)0;
-	Fl_Value_Input *poll_frequency = (Fl_Value_Input *)0;
-	Fl_Value_Input *poll_mode = (Fl_Value_Input *)0;
-	Fl_Value_Input *poll_bandwidth = (Fl_Value_Input *)0;
-	Fl_Value_Input *poll_volume = (Fl_Value_Input *)0;
-	Fl_Value_Input *poll_micgain = (Fl_Value_Input *)0;
-	Fl_Value_Input *poll_rfgain = (Fl_Value_Input *)0;
-	Fl_Value_Input *poll_power_control = (Fl_Value_Input *)0;
-	Fl_Value_Input *poll_ifshift = (Fl_Value_Input *)0;
-	Fl_Value_Input *poll_notch = (Fl_Value_Input *)0;
-	Fl_Value_Input *poll_auto_notch = (Fl_Value_Input *)0;
-	Fl_Value_Input *poll_pre_att = (Fl_Value_Input *)0;
-	Fl_Value_Input *poll_squelch = (Fl_Value_Input *)0;
-	Fl_Value_Input *poll_split = (Fl_Value_Input *)0;
-	Fl_Value_Input *poll_noise = (Fl_Value_Input *)0;
-	Fl_Value_Input *poll_nr = (Fl_Value_Input *)0;
-	Fl_Value_Input *poll_compression = (Fl_Value_Input *)0;
-	Fl_Value_Input *poll_tuner = (Fl_Value_Input *)0;
-	Fl_Value_Input *poll_ptt = (Fl_Value_Input *)0;
-	Fl_Value_Input *poll_break_in = (Fl_Value_Input *)0;
+	Fl_Check_Button *poll_smeter = (Fl_Check_Button *)0;
+	Fl_Check_Button *poll_pout = (Fl_Check_Button *)0;
+	Fl_Check_Button *poll_swr = (Fl_Check_Button *)0;
+	Fl_Check_Button *poll_alc = (Fl_Check_Button *)0;
+	Fl_Check_Button *poll_frequency = (Fl_Check_Button *)0;
+	Fl_Check_Button *poll_mode = (Fl_Check_Button *)0;
+	Fl_Check_Button *poll_bandwidth = (Fl_Check_Button *)0;
+	Fl_Check_Button *poll_volume = (Fl_Check_Button *)0;
+	Fl_Check_Button *poll_micgain = (Fl_Check_Button *)0;
+	Fl_Check_Button *poll_rfgain = (Fl_Check_Button *)0;
+	Fl_Check_Button *poll_power_control = (Fl_Check_Button *)0;
+	Fl_Check_Button *poll_ifshift = (Fl_Check_Button *)0;
+	Fl_Check_Button *poll_notch = (Fl_Check_Button *)0;
+	Fl_Check_Button *poll_auto_notch = (Fl_Check_Button *)0;
+	Fl_Check_Button *poll_pre_att = (Fl_Check_Button *)0;
+	Fl_Check_Button *poll_squelch = (Fl_Check_Button *)0;
+	Fl_Check_Button *poll_split = (Fl_Check_Button *)0;
+	Fl_Check_Button *poll_noise = (Fl_Check_Button *)0;
+	Fl_Check_Button *poll_nr = (Fl_Check_Button *)0;
+	Fl_Check_Button *poll_compression = (Fl_Check_Button *)0;
+	Fl_Check_Button *poll_tuner = (Fl_Check_Button *)0;
+	Fl_Check_Button *poll_ptt = (Fl_Check_Button *)0;
+	Fl_Check_Button *poll_break_in = (Fl_Check_Button *)0;
 	Fl_Button *btnClearAddControls = (Fl_Button *)0;
 
-	Fl_Value_Input *poll_meters = (Fl_Value_Input *)0;
 	Fl_Button *btnSetMeters = (Fl_Button *)0;
-	Fl_Value_Input *poll_ops = (Fl_Value_Input *)0;
 	Fl_Button *btnSetOps = (Fl_Button *)0;
-	Fl_Value_Input *poll_all = (Fl_Value_Input *)0;
 	Fl_Button *btnSetAdd = (Fl_Button *)0;
+
+	Fl_Check_Button *poll_meters = (Fl_Check_Button *)0;
+	Fl_Check_Button *poll_ops = (Fl_Check_Button *)0;
+	Fl_Check_Button *poll_all = (Fl_Check_Button *)0;
 
 Fl_Group *tabSNDCMD = (Fl_Group *)0;
 	Fl_Input2 *txt_command = (Fl_Input2 *)0;
@@ -545,99 +546,99 @@ static void cb_server_port(Fl_Input2* o, void*) {
 	set_server_port(::xmlport);
 }
 
-static void cb_poll_smeter(Fl_Value_Input* o, void*) {
+static void cb_poll_smeter(Fl_Check_Button* o, void*) {
 	progStatus.poll_smeter = o->value();
 }
 
-static void cb_poll_pout(Fl_Value_Input* o, void*) {
+static void cb_poll_pout(Fl_Check_Button* o, void*) {
 	progStatus.poll_pout = o->value();
 }
 
-static void cb_poll_swr(Fl_Value_Input* o, void*) {
+static void cb_poll_swr(Fl_Check_Button* o, void*) {
 	progStatus.poll_swr = o->value();
 }
 
-static void cb_poll_alc(Fl_Value_Input* o, void*) {
+static void cb_poll_alc(Fl_Check_Button* o, void*) {
 	progStatus.poll_alc = o->value();
 }
 
-static void cb_poll_frequency(Fl_Value_Input* o, void*) {
+static void cb_poll_frequency(Fl_Check_Button* o, void*) {
 	progStatus.poll_frequency = o->value();
 }
 
-static void cb_poll_mode(Fl_Value_Input* o, void*) {
+static void cb_poll_mode(Fl_Check_Button* o, void*) {
 	progStatus.poll_mode = o->value();
 }
 
-static void cb_poll_bandwidth(Fl_Value_Input* o, void*) {
+static void cb_poll_bandwidth(Fl_Check_Button* o, void*) {
 	progStatus.poll_bandwidth = o->value();
 }
 
-static void cb_poll_volume(Fl_Value_Input* o, void*) {
+static void cb_poll_volume(Fl_Check_Button* o, void*) {
 	progStatus.poll_volume = o->value();
 }
 
-static void cb_poll_micgain(Fl_Value_Input* o, void*) {
+static void cb_poll_micgain(Fl_Check_Button* o, void*) {
 	progStatus.poll_micgain = o->value();
 }
 
-static void cb_poll_rfgain(Fl_Value_Input* o, void*) {
+static void cb_poll_rfgain(Fl_Check_Button* o, void*) {
 	progStatus.poll_rfgain = o->value();
 }
 
-static void cb_poll_power_control(Fl_Value_Input* o, void*) {
+static void cb_poll_power_control(Fl_Check_Button* o, void*) {
 	progStatus.poll_power_control = o->value();
 }
 
-static void cb_poll_ifshift(Fl_Value_Input* o, void*) {
+static void cb_poll_ifshift(Fl_Check_Button* o, void*) {
 	progStatus.poll_ifshift = o->value();
 }
 
-static void cb_poll_notch(Fl_Value_Input* o, void*) {
+static void cb_poll_notch(Fl_Check_Button* o, void*) {
 	progStatus.poll_notch = o->value();
 }
 
-static void cb_poll_auto_notch(Fl_Value_Input* o, void*) {
+static void cb_poll_auto_notch(Fl_Check_Button* o, void*) {
 	progStatus.poll_auto_notch = o->value();
 }
 
-static void cb_poll_pre_att(Fl_Value_Input* o, void*) {
+static void cb_poll_pre_att(Fl_Check_Button* o, void*) {
 	progStatus.poll_pre_att = o->value();
 }
 
-static void cb_poll_squelch(Fl_Value_Input* o, void*) {
+static void cb_poll_squelch(Fl_Check_Button* o, void*) {
 	progStatus.poll_squelch = o->value();
 }
 
-static void cb_poll_split(Fl_Value_Input* o, void*) {
+static void cb_poll_split(Fl_Check_Button* o, void*) {
 	progStatus.poll_split = o->value();
 }
 
-static void cb_poll_noise(Fl_Value_Input* o, void*) {
+static void cb_poll_noise(Fl_Check_Button* o, void*) {
 	progStatus.poll_noise = o->value();
 }
 
-static void cb_poll_nr(Fl_Value_Input* o, void*) {
+static void cb_poll_nr(Fl_Check_Button* o, void*) {
 	progStatus.poll_nr = o->value();
 }
 
-static void cb_poll_compression(Fl_Value_Input* o, void *) {
+static void cb_poll_compression(Fl_Check_Button* o, void *) {
 	progStatus.poll_compression = o->value();
 }
 
-static void cb_poll_tuner(Fl_Value_Input* o, void *) {
+static void cb_poll_tuner(Fl_Check_Button* o, void *) {
 	progStatus.poll_tuner = o->value();
 }
 
-static void cb_poll_meters(Fl_Value_Input* o, void*) {
+static void cb_poll_meters(Fl_Check_Button* o, void*) {
 	progStatus.poll_meters = o->value();
 }
 
-static void cb_poll_ptt(Fl_Value_Input* o, void*) {
+static void cb_poll_ptt(Fl_Check_Button* o, void*) {
 	progStatus.poll_ptt = o->value();
 }
 
-static void cb_poll_break_in(Fl_Value_Input* o, void*) {
+static void cb_poll_break_in(Fl_Check_Button* o, void*) {
 	progStatus.poll_break_in = o->value();
 }
 
@@ -653,7 +654,7 @@ static void cb_btnSetMeters(Fl_Button*, void*) {
 	progStatus.poll_alc = progStatus.poll_meters;
 }
 
-static void cb_poll_ops(Fl_Value_Input* o, void*) {
+static void cb_poll_ops(Fl_Check_Button* o, void*) {
 	progStatus.poll_ops = o->value();
 }
 
@@ -667,7 +668,7 @@ static void cb_btnSetOps(Fl_Button*, void*) {
 	progStatus.poll_bandwidth = progStatus.poll_ops;
 }
 
-static void cb_poll_all(Fl_Value_Input* o, void*) {
+static void cb_poll_all(Fl_Check_Button* o, void*) {
 	progStatus.poll_all = o->value();
 }
 
@@ -1109,7 +1110,7 @@ Fl_Group *createXCVR(int X, int Y, int W, int H, const char *label)
 		cntRigCatWait = new Fl_Counter(
 			cntRigCatRetries->x(), btnRigCatEcho->y(),
 			110, 22, _("Cmds"));
-		cntRigCatWait->tooltip(_("Wait millseconds between sequential commands"));
+		cntRigCatWait->tooltip(_("Wait millseconds between set/get commands"));
 		cntRigCatWait->minimum(0);
 		cntRigCatWait->maximum(100);
 		cntRigCatWait->step(1);
@@ -1527,37 +1528,29 @@ Fl_Group *createPOLLING(int X, int Y, int W, int H, const char *label)
 		xcvr_grp7->box(FL_ENGRAVED_BOX);
 		xcvr_grp7->align(Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE));
 
-		poll_smeter = new Fl_Value_Input(X + 10, Y + 25, 30, 20, _("S-mtr"));
+		poll_smeter = new Fl_Check_Button(X + 10, Y + 25, 30, 20, _("S-mtr"));
 		poll_smeter->tooltip(_("Poll every Nth interval"));
-		poll_smeter->maximum(10);
-		poll_smeter->step(1);
 		poll_smeter->value(1);
 		poll_smeter->callback((Fl_Callback*)cb_poll_smeter);
 		poll_smeter->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_smeter->value(progStatus.poll_smeter);
 
-		poll_pout = new Fl_Value_Input(X + 100, Y + 25, 30, 20, _("Pwr out"));
+		poll_pout = new Fl_Check_Button(X + 100, Y + 25, 30, 20, _("Pwr out"));
 		poll_pout->tooltip(_("Poll every Nth interval"));
-		poll_pout->maximum(10);
-		poll_pout->step(1);
 		poll_pout->value(1);
 		poll_pout->callback((Fl_Callback*)cb_poll_pout);
 		poll_pout->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_pout->value(progStatus.poll_pout);
 
-		poll_swr = new Fl_Value_Input(X + 190, Y + 25, 30, 20, _("SWR"));
+		poll_swr = new Fl_Check_Button(X + 190, Y + 25, 30, 20, _("SWR"));
 		poll_swr->tooltip(_("Poll every Nth interval"));
-		poll_swr->maximum(10);
-		poll_swr->step(1);
 		poll_swr->value(1);
 		poll_swr->callback((Fl_Callback*)cb_poll_swr);
 		poll_swr->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_swr->value(progStatus.poll_swr);
 
-		poll_alc = new Fl_Value_Input(X + 280, Y + 25, 30, 20, _("ALC"));
+		poll_alc = new Fl_Check_Button(X + 280, Y + 25, 30, 20, _("ALC"));
 		poll_alc->tooltip(_("Poll every Nth interval"));
-		poll_alc->maximum(10);
-		poll_alc->step(1);
 		poll_alc->value(1);
 		poll_alc->callback((Fl_Callback*)cb_poll_alc);
 		poll_alc->align(Fl_Align(FL_ALIGN_RIGHT));
@@ -1567,10 +1560,8 @@ Fl_Group *createPOLLING(int X, int Y, int W, int H, const char *label)
 		btnSetMeters->tooltip("Set all meter polls");
 		btnSetMeters->callback((Fl_Callback*)cb_btnSetMeters);
 
-		poll_meters = new Fl_Value_Input(X + 435, Y + 25, 30, 20);
-		poll_meters->tooltip(_("Poll every Nth interval"));
-		poll_meters->maximum(10);
-		poll_meters->step(1);
+		poll_meters = new Fl_Check_Button(X + 435, Y + 25, 30, 20);
+		poll_meters->tooltip(_("Poll all"));
 		poll_meters->value(progStatus.poll_meters);
 		poll_meters->callback((Fl_Callback*)cb_poll_meters);
 		poll_meters->align(Fl_Align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE));
@@ -1581,28 +1572,22 @@ Fl_Group *createPOLLING(int X, int Y, int W, int H, const char *label)
 		xcvr_grp8->box(FL_ENGRAVED_BOX);
 		xcvr_grp8->align(Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE));
 
-		poll_frequency = new Fl_Value_Input(X + 10, Y + 70, 30, 20, _("Freq"));
+		poll_frequency = new Fl_Check_Button(X + 10, Y + 70, 30, 20, _("Freq"));
 		poll_frequency->tooltip(_("Poll xcvr frequency"));
-		poll_frequency->maximum(10);
-		poll_frequency->step(1);
 		poll_frequency->value(1);
 		poll_frequency->callback((Fl_Callback*)cb_poll_frequency);
 		poll_frequency->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_frequency->value(progStatus.poll_frequency);
 
-		poll_mode = new Fl_Value_Input(X + 100, Y + 70, 30, 20, _("Mode"));
+		poll_mode = new Fl_Check_Button(X + 100, Y + 70, 30, 20, _("Mode"));
 		poll_mode->tooltip(_("Poll xcvr mode"));
-		poll_mode->maximum(10);
-		poll_mode->step(1);
 		poll_mode->value(1);
 		poll_mode->callback((Fl_Callback*)cb_poll_mode);
 		poll_mode->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_mode->value(progStatus.poll_mode);
 
-		poll_bandwidth = new Fl_Value_Input(X + 190, Y + 70, 30, 20, _("BW"));
+		poll_bandwidth = new Fl_Check_Button(X + 190, Y + 70, 30, 20, _("BW"));
 		poll_bandwidth->tooltip(_("Poll xcvr bandwidth"));
-		poll_bandwidth->maximum(10);
-		poll_bandwidth->step(1);
 		poll_bandwidth->value(1);
 		poll_bandwidth->callback((Fl_Callback*)cb_poll_bandwidth);
 		poll_bandwidth->align(Fl_Align(FL_ALIGN_RIGHT));
@@ -1612,10 +1597,8 @@ Fl_Group *createPOLLING(int X, int Y, int W, int H, const char *label)
 		btnSetOps->tooltip("Poll all operating values");
 		btnSetOps->callback((Fl_Callback*)cb_btnSetOps);
 
-		poll_ops = new Fl_Value_Input(X + 435, Y + 70, 30, 20);
-		poll_ops->tooltip(_("Poll every Nth interval"));
-		poll_ops->maximum(10);
-		poll_ops->step(1);
+		poll_ops = new Fl_Check_Button(X + 435, Y + 70, 30, 20);
+		poll_ops->tooltip(_("Poll all"));
 		poll_ops->value(progStatus.poll_ops);
 		poll_ops->callback((Fl_Callback*)cb_poll_ops);
 		poll_ops->align(Fl_Align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE));
@@ -1627,130 +1610,98 @@ Fl_Group *createPOLLING(int X, int Y, int W, int H, const char *label)
 		xcvr_grp9->box(FL_ENGRAVED_FRAME);
 		xcvr_grp9->align(Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE));
 
-		poll_volume = new Fl_Value_Input(X + 10, Y + 115, 30, 20, _("Volume"));
+		poll_volume = new Fl_Check_Button(X + 10, Y + 115, 30, 20, _("Volume"));
 		poll_volume->tooltip(_("Volume control"));
-		poll_volume->maximum(10);
-		poll_volume->step(1);
 		poll_volume->callback((Fl_Callback*)cb_poll_volume);
 		poll_volume->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_volume->value(progStatus.poll_volume);
 
-		poll_micgain = new Fl_Value_Input(X + 100, Y + 115, 30, 20, _("Mic"));
+		poll_micgain = new Fl_Check_Button(X + 100, Y + 115, 30, 20, _("Mic"));
 		poll_micgain->tooltip(_("Microphone gain"));
-		poll_micgain->maximum(10);
-		poll_micgain->step(1);
 		poll_micgain->callback((Fl_Callback*)cb_poll_micgain);
 		poll_micgain->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_micgain->value(progStatus.poll_micgain);
 
-		poll_rfgain = new Fl_Value_Input(X + 190, Y + 115, 30, 20, _("RF"));
+		poll_rfgain = new Fl_Check_Button(X + 190, Y + 115, 30, 20, _("RF"));
 		poll_rfgain->tooltip(_("RF gain"));
-		poll_rfgain->maximum(10);
-		poll_rfgain->step(1);
 		poll_rfgain->callback((Fl_Callback*)cb_poll_rfgain);
 		poll_rfgain->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_rfgain->value(progStatus.poll_rfgain);
 
-		poll_power_control = new Fl_Value_Input(X + 280, Y + 115, 30, 20, _("Power"));
+		poll_power_control = new Fl_Check_Button(X + 280, Y + 115, 30, 20, _("Power"));
 		poll_power_control->tooltip(_("Power output"));
-		poll_power_control->maximum(10);
-		poll_power_control->step(1);
 		poll_power_control->callback((Fl_Callback*)cb_poll_power_control);
 		poll_power_control->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_power_control->value(progStatus.poll_power_control);
 
-		poll_ptt = new Fl_Value_Input(X + 370, Y + 115, 30, 20, _("PTT"));
+		poll_ptt = new Fl_Check_Button(X + 370, Y + 115, 30, 20, _("PTT"));
 		poll_ptt->tooltip(_("Push to talk"));
-		poll_ptt->maximum(10);
-		poll_ptt->step(1);
 		poll_ptt->callback((Fl_Callback*)cb_poll_ptt);
 		poll_ptt->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_ptt->value(progStatus.poll_ptt);
 
-		poll_ifshift = new Fl_Value_Input(X + 10, Y + 140, 30, 20, _("IF"));
+		poll_ifshift = new Fl_Check_Button(X + 10, Y + 140, 30, 20, _("IF"));
 		poll_ifshift->tooltip(_("IF shift"));
-		poll_ifshift->maximum(10);
-		poll_ifshift->step(1);
 		poll_ifshift->callback((Fl_Callback*)cb_poll_ifshift);
 		poll_ifshift->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_ifshift->value(progStatus.poll_ifshift);
 
-		poll_notch = new Fl_Value_Input(X + 100, Y + 140, 30, 20, _("Notch"));
+		poll_notch = new Fl_Check_Button(X + 100, Y + 140, 30, 20, _("Notch"));
 		poll_notch->tooltip(_("Manual notch"));
-		poll_notch->maximum(10);
-		poll_notch->step(1);
 		poll_notch->callback((Fl_Callback*)cb_poll_notch);
 		poll_notch->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_notch->value(progStatus.poll_notch);
 
-		poll_auto_notch = new Fl_Value_Input(X + 190, Y + 140, 30, 20, _("Auto"));
+		poll_auto_notch = new Fl_Check_Button(X + 190, Y + 140, 30, 20, _("Auto"));
 		poll_auto_notch->tooltip(_("Auto notch"));
-		poll_auto_notch->maximum(10);
-		poll_auto_notch->step(1);
 		poll_auto_notch->callback((Fl_Callback*)cb_poll_auto_notch);
 		poll_auto_notch->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_auto_notch->value(progStatus.poll_auto_notch);
 
-		poll_tuner = new Fl_Value_Input(X + 280, Y + 140, 30, 20, _("Tuner"));
+		poll_tuner = new Fl_Check_Button(X + 280, Y + 140, 30, 20, _("Tuner"));
 		poll_tuner->tooltip(_("Auto Tuner"));
-		poll_tuner->maximum(10);
-		poll_tuner->step(1);
 		poll_tuner->callback((Fl_Callback*)cb_poll_tuner);
 		poll_tuner->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_tuner->value(progStatus.poll_tuner);
 
-		poll_pre_att = new Fl_Value_Input(X + 10, Y + 165, 30, 20, _("Pre/Att"));
+		poll_pre_att = new Fl_Check_Button(X + 10, Y + 165, 30, 20, _("Pre/Att"));
 		poll_pre_att->tooltip(_("Preamp / Attenuator"));
-		poll_pre_att->maximum(10);
-		poll_pre_att->step(1);
 		poll_pre_att->callback((Fl_Callback*)cb_poll_pre_att);
 		poll_pre_att->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_pre_att->value(progStatus.poll_pre_att);
 
-		poll_squelch = new Fl_Value_Input(X + 100, Y + 165, 30, 20, _("Squelch"));
+		poll_squelch = new Fl_Check_Button(X + 100, Y + 165, 30, 20, _("Squelch"));
 		poll_squelch->tooltip(_("Squelch"));
-		poll_squelch->maximum(10);
-		poll_squelch->step(1);
 		poll_squelch->callback((Fl_Callback*)cb_poll_squelch);
 		poll_squelch->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_squelch->value(progStatus.poll_squelch);
 
-		poll_split = new Fl_Value_Input(X + 190, Y + 165, 30, 20, _("Split"));
+		poll_split = new Fl_Check_Button(X + 190, Y + 165, 30, 20, _("Split"));
 		poll_split->tooltip(_("Split vfo operation"));
-		poll_split->maximum(10);
-		poll_split->step(1);
 		poll_split->callback((Fl_Callback*)cb_poll_split);
 		poll_split->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_split->value(progStatus.poll_split);
 
-		poll_noise = new Fl_Value_Input(X + 10, Y + 190, 30, 20, _("Blanker"));
+		poll_noise = new Fl_Check_Button(X + 10, Y + 190, 30, 20, _("Blanker"));
 		poll_noise->tooltip(_("Noise blanker"));
-		poll_noise->maximum(10);
-		poll_noise->step(1);
 		poll_noise->callback((Fl_Callback*)cb_poll_noise);
 		poll_noise->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_noise->value(progStatus.poll_noise);
 
-		poll_nr = new Fl_Value_Input(X + 100, Y + 190, 30, 20, _("Noise red"));
+		poll_nr = new Fl_Check_Button(X + 100, Y + 190, 30, 20, _("Noise red"));
 		poll_nr->tooltip(_("Noise reduction"));
-		poll_nr->maximum(10);
-		poll_nr->step(1);
 		poll_nr->callback((Fl_Callback*)cb_poll_nr);
 		poll_nr->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_nr->value(progStatus.poll_nr);
 
-		poll_compression = new Fl_Value_Input(X + 190, Y + 190, 30, 20, _("Comp"));
+		poll_compression = new Fl_Check_Button(X + 190, Y + 190, 30, 20, _("Comp"));
 		poll_compression->tooltip(_("Compression"));
-		poll_compression->maximum(10);
-		poll_compression->step(1);
 		poll_compression->callback((Fl_Callback*)cb_poll_compression);
 		poll_compression->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_compression->value(progStatus.poll_compression);
 
-		poll_break_in = new Fl_Value_Input(X + 280, Y + 165, 30, 20, _("QSK"));
+		poll_break_in = new Fl_Check_Button(X + 280, Y + 165, 30, 20, _("QSK"));
 		poll_break_in->tooltip(_("Break In"));
-		poll_break_in->maximum(10);
-		poll_break_in->step(1);
 		poll_break_in->callback((Fl_Callback*)cb_poll_break_in);
 		poll_break_in->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_break_in->value(progStatus.poll_break_in);
@@ -1758,11 +1709,9 @@ Fl_Group *createPOLLING(int X, int Y, int W, int H, const char *label)
 		btnSetAdd = new Fl_Button(X + 370, Y + 190, 60, 20, _("Set all"));
 		btnSetAdd->callback((Fl_Callback*)cb_btnSetAdd);
 
-		poll_all = new Fl_Value_Input(X + 435, Y + 190, 30, 20);
-		poll_all->tooltip(_("Poll every Nth interval"));
-		poll_all->maximum(10);
-		poll_all->step(1);
-		poll_all->value(4);
+		poll_all = new Fl_Check_Button(X + 435, Y + 190, 30, 20);
+		poll_all->tooltip(_("Poll all"));
+		poll_all->value(1);
 		poll_all->callback((Fl_Callback*)cb_poll_all);
 		poll_all->align(Fl_Align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE));
 		poll_all->value(progStatus.poll_all);

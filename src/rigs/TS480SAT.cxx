@@ -972,7 +972,7 @@ int RIG_TS480SAT::get_PTT()
 	int ret = wait_char(';', 38, 100, "get VFO", ASC);
 	gett("ptt");
 	if (ret < 38) return ptt_;
-	ptt_ = (replybuff[28] == '1');
+	ptt_ = (replystr[28] == '1');
 	return ptt_;
 }
 

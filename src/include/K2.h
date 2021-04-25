@@ -65,6 +65,8 @@ public:
 
 	void tune_rig(int);
 	void set_PTT_control(int val);
+	int  get_PTT();
+
 	void get_pc_min_max_step(double &min, double &max, double &step);
 	int  get_power_control();
 	void set_power_control(double val);

@@ -130,12 +130,12 @@ bool RIG_FT890::get_info()
 		afreq = 0;
 		bfreq = 0;
 		for (size_t n = 1; n < 5; n++) {
-			afreq = afreq * 256 + (unsigned char)replybuff[p + n];
-			bfreq = bfreq * 256 + (unsigned char)replybuff[p + 14 + n];
+			afreq = afreq * 256 + (unsigned char)replystr[p + n];
+			bfreq = bfreq * 256 + (unsigned char)replystr[p + 14 + n];
 		}
 		afreq = afreq * 1.25;
 		bfreq = bfreq * 1.25;
-		int md = replybuff[p+5];
+		int md = replystr[p+5];
 		switch (md) {
 			case 0 : 
 				amode = (md & 0x40) ? 1 : 0;
@@ -160,7 +160,7 @@ bool RIG_FT890::get_info()
 		}
 		aBW = (md & 0x80) ? 0 : 1;
 
-		md = replybuff[p + 19];
+		md = replystr[p + 19];
 		switch (md) {
 			case 0 : 
 				bmode = (md & 0x40) ? 1 : 0;
@@ -276,7 +276,7 @@ int RIG_FT890::get_smeter()
 	cmd[4] = 0xF7;
 	int ret = waitN(5, 100, "get smeter", HEX);
 	if (ret < 5) return 0;
-	int sval = (unsigned char)(replybuff[ret - 2]);
+	int sval = (unsigned char)(replystr[ret - 2]);
 	sval = sval * 100 / 255;
 	return sval;
 }
@@ -287,7 +287,7 @@ int RIG_FT890::get_power_out()
 	cmd[4] = 0xF7;
 	int ret = waitN(5, 100, "get pwr out", HEX);
 	if (ret < 5) return 0;
-	int sval = (unsigned char)(replybuff[ret - 2]);
+	int sval = (unsigned char)(replystr[ret - 2]);
 	sval = sval * 100 / 255;
 	return sval;
 }

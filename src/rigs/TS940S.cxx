@@ -126,7 +126,7 @@ int RIG_TS940S::getvfoAorB()
 
 	if (ret < 38) return vfovalue;
 
-	vfovalue = replybuff[ret - 38 + 30] - '0';
+	vfovalue = replystr[ret - 38 + 30] - '0';
 
 	showresp(WARN, ASC, "get vfo A or B", cmd, "");
 
@@ -220,7 +220,7 @@ int RIG_TS940S::get_modeA()
 
 	if (ret < 38) return modeA;
 
-	int md = replybuff[ret - 38 + 29] - '1';
+	int md = replystr[ret - 38 + 29] - '1';
 	if (md < 0) md = 0;
 	if (md > 5) md = 5;
 	modeA = md;
@@ -289,7 +289,7 @@ int RIG_TS940S::get_PTT()
 	get_trace(2, "get_PTT()", replystr.c_str());
 
 	if (ret < 38) return ptt_;
-	ptt_ = (replybuff[28] == '1');
+	ptt_ = (replystr[28] == '1');
 	showresp(WARN, ASC, "get ptt", cmd, "");
 	return ptt_;
 }
@@ -314,7 +314,7 @@ int RIG_TS940S::get_split()
 
 	if (ret < 38) return splitvalue;
 
-	splitvalue = replybuff[ret - 38 + 32] - '0';
+	splitvalue = replystr[ret - 38 + 32] - '0';
 
 	showresp(WARN, ASC, "get split", cmd, "");
 

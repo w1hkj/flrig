@@ -165,22 +165,19 @@ void assignReplyStr(string val)
 	selrig->replystr = val;
 }
 
-char replybuff[RXBUFFSIZE+1];
 string respstr;
+#define RXBUFFSIZE 100
 
-int readResponse()
+int readResponse(std::string req1, std::string req2)
 {
 	int numread = 0;
 	respstr.clear();
-	memset(replybuff, 0, RXBUFFSIZE + 1);
 	if (progStatus.use_tcpip)
 		numread = read_from_remote(respstr);
 	else {
-		numread = RigSerial->ReadBuffer(replybuff, RXBUFFSIZE);
-		for (int i = 0; i < numread; respstr += replybuff[i++]);
+		numread = RigSerial->ReadBuffer(respstr, RXBUFFSIZE, req1, req2);
 	}
-	if (numread)
-		LOG_DEBUG("rsp:%3d, %s", numread, str2hex(respstr.c_str(), respstr.length()));
+	LOG_DEBUG("rsp:%3d, %s", numread, str2hex(respstr.c_str(), respstr.length()));
 	return numread;
 }
 

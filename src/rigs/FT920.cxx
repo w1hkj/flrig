@@ -143,12 +143,12 @@ bool RIG_FT920::get_info()
 		afreq = 0;
 		bfreq = 0;
 		for (size_t n = 1; n < 5; n++) {
-			afreq = afreq * 256 + (unsigned char)replybuff[p + n];
-			bfreq = bfreq * 256 + (unsigned char)replybuff[p + 14 + n];
+			afreq = afreq * 256 + (unsigned char)replystr[p + n];
+			bfreq = bfreq * 256 + (unsigned char)replystr[p + 14 + n];
 		}
 		afreq = afreq * 1.25;
 		bfreq = bfreq * 1.25;
-		int md = replybuff[p+5];
+		int md = replystr[p+5];
 		switch (md) {
 			case 0 : 
 				amode = (md & 0x40) ? 1 : 0;
@@ -173,7 +173,7 @@ bool RIG_FT920::get_info()
 		}
 		aBW = (md & 0x80) ? 0 : 1;
 
-		md = replybuff[p + 19];
+		md = replystr[p + 19];
 		switch (md) {
 			case 0 : 
 				bmode = (md & 0x40) ? 1 : 0;
@@ -308,7 +308,7 @@ int RIG_FT920::get_smeter()
 	cmd[4] = 0xF7;
 	int ret = sendCommand(cmd, 9);
 	if (ret < 9) return 0;
-	int sval = (200 -  (unsigned char)replybuff[ret - 9 + 3]) / 1.1;
+	int sval = (200 -  (unsigned char)replystr[ret - 9 + 3]) / 1.1;
 	if (sval < 0) sval = 0;
 	if (sval > 100) sval = 100;
 	return sval;
@@ -330,8 +330,8 @@ int RIG_FT920::get_power_out()
 	cmd[4] = 0xF7;
 	int ret = sendCommand(cmd);
 	if (ret < 9) return 0;
-	fwdpwr = replybuff[ret - 9 + 1] / 2.56;
-	refpwr = replybuff[ret - 9 + 2] / 2.56;
+	fwdpwr = replystr[ret - 9 + 1] / 2.56;
+	refpwr = replystr[ret - 9 + 2] / 2.56;
 	return (int) fwdpwr;
 }
 */

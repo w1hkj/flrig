@@ -325,24 +325,48 @@ bool  Cserial::IOselect ()
 // Function name	: Cserial::ReadBuffer
 // Description	  : Reads upto nchars from the selected port
 // Return type	  : # characters received
-// Argument		 : pointer to buffer; # chars to read
+// Argument		 : pointer to buffer; # chars to read; string terminator
 ///////////////////////////////////////////////////////
-int  Cserial::ReadBuffer (char *buf, int nchars)
+int  Cserial::ReadBuffer (std::string &buf, int nchars, std::string find1, std::string find2)
 {
 	if (fd < 0) return 0;
 	int retnum, nread = 0;
-	while (nchars > 0) {
-		if (!IOselect()) {
+	char tempbuf[nchars + 1];
+
+	int tries = 0;
+	while (1) {
+		while (!IOselect()) {  // wait up to 50 msec for IOselect
+			if (++tries == 10) {
+				return 0;
+			}
+			MilliSleep(5);
+		}
+
+		memset(tempbuf, 0, nchars + 1);
+		retnum = read (fd, tempbuf, nchars);
+
+		if (retnum < 0) {
+			return 0;
+		}
+		if (retnum > 0) {
+			buf.append(tempbuf, retnum);
+			nread += retnum;
+		}
+		if (retnum == 0 || nread >= nchars) {
 			return nread;
 		}
-		retnum = read (fd, (char *)(buf + nread), nchars);
-		if (retnum < 0)
-			return 0;
-		if (retnum == 0)
-			break;
-		nread += retnum;
-		nchars -= retnum;
+
+		if (find1.length() && find2.length()) {
+			if (buf.rfind(find1) != std::string::npos &&
+				buf.rfind(find2) != std::string::npos)
+				return nread;
+		} else if (find1.length()) {
+			if (buf.rfind(find1) != std::string::npos) {
+				return nread;
+			}
+		}
 	}
+
 	return nread;
 }
 
@@ -444,7 +468,8 @@ bool Cserial::OpenPort()
 
 LOG_ERROR("Open Comm port %s ; hComm = %d", COMportname.c_str(), (int)hComm);
 #if SERIAL_DEBUG
-	fl_alert("Open Comm port %s ; hComm = %d", COMportname.c_str(), (int)hComm);
+//	fl_alert("Open Comm port %s ; hComm = %d", COMportname.c_str(), (int)hComm);
+	fprintf(serlog, "INVALID_HANDLE_VALUE: %d\n", (int)INVALID_HANDLE_VALUE);
 	fprintf(serlog, "Open Comm port %s ; hComm = %d\n", COMportname.c_str(), (int)hComm);
 #endif
 
@@ -524,19 +549,124 @@ static  DWORD dwBytesTxD=0;
 	return false;
 }
 
-int  Cserial::ReadData (char *buf, int nchars)
+int lines_written = 0;
+
+int  Cserial::ReadBuffer (std::string &buf, int nchars, std::string find1, std::string find2)
 {
-	DWORD dwRead = 0;
-	if (!ReadFile(hComm, buf, nchars, &dwRead, NULL))
+	bool hex = false;
+	std::string s1, s2;
+
+	if (find1.length()) if (find1.find('\xFE') != std::string::npos) hex = true;
+	if (find2.length()) if (find2.find('\xFD') != std::string::npos) hex = true;
+
+#if SERIAL_DEBUG
+if (hex) {
+	s1 = str2hex(find1.c_str(), find1.length());
+	s2 = str2hex(find2.c_str(), find2.length());
+} else {
+	s1 = find1;
+	s2 = find2;
+}
+#endif
+	if (hComm == INVALID_HANDLE_VALUE) {
+#if SERIAL_DEBUG
+	if (lines_written < 1000) {
+		fprintf(serlog, "ReadBuffer, invalid handle\n");
+		lines_written++;
+	}
+#endif
 		return 0;
-	return (int) dwRead;
+	}
+
+	DWORD dwRead = 0;
+	int nread = 0;
+	int retval = 0;
+	static char tempchar[2];
+
+	while (1) {
+		tempchar[0] = tempchar[1] = 0;
+		retval = ReadFile(hComm, &tempchar[0], 1, &dwRead, NULL);
+		if (retval == 0) {
+#if SERIAL_DEBUG
+	if (lines_written < 1000) {
+		fprintf(serlog, "retval == 0\n");
+		lines_written++;
+	}
+#endif
+			return nread;
+		}
+		if (dwRead == 0) {
+#if SERIAL_DEBUG
+	if (lines_written < 1000) {
+		fprintf(serlog, "ReadFile dwRead: %ld\n", dwRead);
+		lines_written++;
+	}
+#endif
+			return nread;
+		}
+
+		buf += tempchar[0];
+		nread++;
+
+		if (nread >= nchars) {
+#if SERIAL_DEBUG
+if (lines_written < 1000) {
+	if (hex)
+		fprintf(serlog, "ReadBuffer(%d): %s\n", nchars, str2hex(buf.c_str(), buf.length()));
+	else
+		fprintf(serlog, "ReadBuffer(%d): %s\n", nchars, buf.c_str());
+	lines_written++;
+}
+#endif
+			return nread;
+		}
+
+		if (find1.length() && find2.length()) {
+			size_t p1 = buf.rfind(find1);
+			size_t p2 = buf.rfind(find2);
+			if (p1 != std::string::npos &&
+				p2 != std::string::npos &&
+				p2 > p1) {
+#if SERIAL_DEBUG
+if (lines_written < 1000) {
+	if (hex)
+		fprintf(serlog, "ReadBuffer find 2: (%d): %s\n", nchars, str2hex(buf.c_str(), buf.length()));
+	else
+		fprintf(serlog, "ReadBuffer find 2: (%d): %s\n", nchars, buf.c_str());
+	lines_written++;
+}
+#endif
+				return nread;
+			}
+		} else if (find1.length()) {
+			if (buf.rfind(find1) != std::string::npos) {
+#if SERIAL_DEBUG
+if (lines_written < 1000) {
+	if (hex)
+		fprintf(serlog, "ReadBuffer find 1: (%d): %s\n", nchars, str2hex(buf.c_str(), buf.length()));
+	else
+		fprintf(serlog, "ReadBuffer find 1: (%d): %s\n", nchars, buf.c_str());
+	lines_written++;
+}
+#endif
+				return nread;
+			}
+		}
+	}
+
+#if SERIAL_DEBUG
+if (lines_written < 1000) {
+	if (hex)
+		fprintf(serlog, "ReadBuffer: (%d): %s\n", nchars, str2hex(buf.c_str(), buf.length()));
+	else
+		fprintf(serlog, "ReadBuffer: (%d): %s\n", nchars, buf.c_str());
+	lines_written++;
+}
+#endif
+
+	return nread;
 }
 
-int Cserial::ReadChars (char *buf, int nchars, int msec)
-{
-	if (msec) Sleep(msec);
-	return ReadData (buf, nchars);
-}
 
 void Cserial::FlushBuffer()
 {
@@ -575,6 +705,10 @@ int Cserial::WriteBuffer(const char *buff, int n)
 	if (hComm == INVALID_HANDLE_VALUE) return 0;
 
 	WriteFile (hComm, buff, n, &nBytesWritten, NULL);
+
+#if SERIAL_DEBUG
+	fprintf(serlog, "WriteBuffer: %s\n", str2hex(buff, n));
+#endif
 
 	return nBytesWritten;
 }
@@ -752,12 +886,13 @@ bool Cserial::ConfigurePort(
 	if((bPortReady = GetCommState(hComm, &dcb)) == 0) {
 	  LOG_ERROR("GetCommState Error on %s", device.c_str());
 #if SERIAL_DEBUG
-	fl_alert("GetCommState Error on %s", device.c_str());
+//	fl_alert("GetCommState Error on %s", device.c_str());
 	fprintf(serlog, "GetCommState Error on %s\n", device.c_str());
 #endif
 		CloseHandle(hComm);
 		return false;
 	}
+/*
 #if SERIAL_DEBUG
 	fprintf(serlog, "\
 \n\
@@ -799,7 +934,7 @@ DCB.fOutxDsrFlow    %d\n",
 	(int)dcb.fOutxCtsFlow,
 	(int)dcb.fOutxDsrFlow);
 #endif
-
+*/
 	dcb.DCBlength			= sizeof (dcb);
 	dcb.BaudRate			= BaudRate;
 	dcb.ByteSize			= ByteSize;
@@ -881,7 +1016,7 @@ DCB.fOutxDsrFlow    %d\n",
 //	if(bPortReady == 0) {
 #if SERIAL_DEBUG
 	long err = GetLastError();
-	fl_alert("SetCommState handle %d, returned %d\nError = %d", (int)hComm, bPortReady, (int)err);
+//	fl_alert("SetCommState handle %d, returned %d\nError = %d", (int)hComm, bPortReady, (int)err);
 	fprintf(serlog, "SetCommState handle %d, returned %d, error = %d\n", (int)hComm, bPortReady, (int)err);
 #endif
 if (bPortReady == 0) {
@@ -911,7 +1046,7 @@ void Cserial::SetPTT(bool ON)
 {
 	if (hComm == INVALID_HANDLE_VALUE) {
 #if SERIAL_DEBUG
-	fl_alert("SetPTT failed, invalid handle");
+//	fl_alert("SetPTT failed, invalid handle");
 	fprintf(serlog, "SetPTT failed, invalid handle\n");
 #endif
 		return;

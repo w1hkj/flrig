@@ -154,15 +154,15 @@ void RIG_K2::initialize()
 // set replystr to teststr to test for various control bytes
 //const char *teststr = "IFfffffffffff*****+yyyyrx*000m0s1b01*;";
 
-static void do_selectA(void *)
-{
-	cb_selectA();
-}
+//static void do_selectA(void *)
+//{
+//	cb_selectA();
+//}
 
-static void do_selectB(void *)
-{
-	cb_selectB();
-}
+//static void do_selectB(void *)
+//{
+//	cb_selectB();
+//}
 
 bool RIG_K2::get_info()
 {
@@ -173,10 +173,8 @@ bool RIG_K2::get_info()
 
 	if (ret < 38) return false;
 	size_t p = replystr.find(rsp);
-	if (PTT && (replystr[p+28]=='0')) Fl::awake(setPTT, (void*)0);
-	if (!PTT && (replystr[p+28]=='1')) Fl::awake(setPTT, (void*)1);
-	if (useB && (replystr[p+30]=='0')) Fl::awake(do_selectA, (void*)0);
-	else if(!useB && (replystr[p+30]=='1')) Fl::awake(do_selectB, (void*)0);
+	ptt_ = (replystr[p+28] == '1');
+	useB = (replystr[p+30] == '1');
 	K2split = replystr[p+32]-'0';
 	return true;
 }
@@ -525,6 +523,19 @@ void RIG_K2::set_PTT_control(int val)
 	sett("set PTT");
 
 	ptt_ = val;
+}
+
+int RIG_K2::get_PTT()
+{
+	rsp = cmd = "IF";
+	cmd += ';';
+	int ret = waitN(38, 100, "get info", ASC);
+	gett("get info");
+
+	if (ret < 38) return false;
+	size_t p = replystr.find(rsp);
+	ptt_ = (replystr[p+28] == '1');
+	return ptt_;
 }
 
 void RIG_K2::set_attenuator(int val)

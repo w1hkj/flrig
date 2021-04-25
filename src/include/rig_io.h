@@ -37,15 +37,13 @@ enum BAUDS {
 	BR300, BR600, BR1200, BR2400, BR4800, BR9600, BR19200,
 	BR38400, BR57600, BR115200, BR230400, BR460800 };
 
-#define RXBUFFSIZE 16384
-
 extern const char *szBaudRates[];
 
 extern bool startXcvrSerial();
 extern bool startAuxSerial();
 extern bool startSepSerial();
 
-extern int readResponse();
+extern int readResponse(std::string req1 = "", std::string req2 = "");
 extern int sendCommand(string s, int nread = 0, int wait = 0);
 extern int waitResponse(int);
 extern bool waitCommand(

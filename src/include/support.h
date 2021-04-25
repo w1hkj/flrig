@@ -211,7 +211,7 @@ extern void setSQUELCH();
 
 extern void cbTune();
 extern void cb_tune_on_off();
-extern void cbPTT();
+extern void doPTT(int);
 //extern void cbSmeter();
 extern void cbALC_SWR();
 //extern void cbPWR();
@@ -247,11 +247,11 @@ extern void open_server_tab();
 
 extern void cb_close_TT550_setup();
 extern void cbUseRepeatButtons(bool on);
-extern void nr_label(const char *, bool on);
-extern void nb_label(const char *, bool on);
-extern void preamp_label(const char *, bool on);
-extern void atten_label(const char *, bool on);
-extern void auto_notch_label(const char *,bool on);
+extern void nr_label(const char *, int on = 0);
+extern void nb_label(const char *, int on = 0);
+extern void preamp_label(const char *, int on = 0);
+extern void atten_label(const char *, int on = 0);
+extern void auto_notch_label(const char *, int on = 0);
 extern void enable_yaesu_bandselect(int btn_num, bool enable = true);
 
 extern void break_in_label(const char *);

@@ -120,7 +120,7 @@ unsigned long int RIG_TS140::get_vfoA ()
 
 	unsigned long int f = 0;
 	for (size_t n = 2; n < 13; n++)
-		f = f*10 + replybuff[ret - 38 + n] - '0';
+		f = f*10 + replystr[ret - 38 + n] - '0';
 	freqA = f;
 	return freqA;
 }
@@ -156,7 +156,7 @@ int RIG_TS140::get_modeA()
 	int ret = wait_char(';', 38, 100, "get mode", ASC);
 	if (ret < 38) return modeA;
 
-	int md = replybuff[ret - 38 + 29] - '1';
+	int md = replystr[ret - 38 + 29] - '1';
 	if (md < 0) md = 0;
 	if (md > 5) md = 5;
 	modeA = md;
@@ -203,6 +203,6 @@ int RIG_TS140::get_PTT()
 	cmd = "IF;";
 	int ret = wait_char(';', 38, 100, "get VFO", ASC);
 	if (ret < 38) return ptt_;
-	ptt_ = (replybuff[28] == '1');
+	ptt_ = (replystr[28] == '1');
 	return ptt_;
 }

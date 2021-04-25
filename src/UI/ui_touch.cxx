@@ -1474,10 +1474,6 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 			genericAux = new Fl_Group(xpos, ypos+tabh, W, tabb, _("Aux"));
 				genericAux->hide();
 
-				boxControl = new Fl_Box(xpos+57, by, 130, bh, _("Auxilliary Controls:"));
-				boxControl->box(FL_FLAT_BOX);
-				boxControl->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
-
 				btnAuxRTS = new Fl_Light_Button(xpos+272, by, 60, bh, _("RTS"));
 				btnAuxRTS->tooltip(_("RTS control pin"));
 				btnAuxRTS->down_box(FL_THIN_DOWN_BOX);
@@ -1500,6 +1496,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				btnDataPort->value(progStatus.data_port);
 
 			genericAux->end();
+			genericAux->hide();
 
 			genericUser_1 = new Fl_Group(xpos, ypos+tabh, W, tabb, _("Cmd A"));
 				genericUser_1->hide();

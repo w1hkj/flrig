@@ -23,7 +23,7 @@
 #include "debug.h"
 #include "rig_io.h"
 #include "support.h"
-
+#include "socket_io.h"
 
 const char *szNORIG = "NONE";
 const char *szNOMODES[] = {"LSB", "USB", NULL};
@@ -370,99 +370,69 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 {
 	guard_lock reply_lock(&mutex_replystr);
 
-	char sztemp[50];
-	string returned = "";
-	string tosend = cmd;
-	int cnt = 0;
-	int waited = 0;
-	size_t num = n + cmd.length();
-	int delay =  num * 11000.0 / RigSerial->Baud() +
-			progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0;
+	int delay =  (n + cmd.length()) * 11000.0 / RigSerial->Baud();
+	int retnbr = 0;
 
 	replystr.clear();
-	RigSerial->FlushBuffer();
 
-	if(!progStatus.use_tcpip && !RigSerial->IsOpen()) {
-		snprintf(sztemp, sizeof(sztemp), "TEST %s", sz);
-//		showresp(WARN, pr, sztemp, tosend, replystr);
+	if (progStatus.use_tcpip) {
+		send_to_remote(cmd, progStatus.byte_interval);
+		MilliSleep(delay + progStatus.tcpip_ping_delay);
+		retnbr = read_from_remote(replystr);
+		LOG_DEBUG ("%s: read %d bytes, %s", sz, retnbr, replystr.c_str());
+		return retnbr;
+	}
+
+	if(!RigSerial->IsOpen()) {
+		LOG_DEBUG("TEST %s", sz);
 		return 0;
 	}
 
-	sendCommand(tosend, 0);
+	RigSerial->FlushBuffer();
+	RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
+
 	MilliSleep(delay);
 
-	returned = "";
-	for ( cnt = 0; cnt < timeout / 10; cnt++) {
-		readResponse();
-		returned.append(respstr);
-		if (returned.length() >= n) {
-			replystr = returned;
-			waited = cnt * 10 + delay;
-			snprintf(sztemp, sizeof(sztemp), "%s OK %d ms", sz, waited);
-			showresp(WARN, pr, sztemp, cmd, returned);
-			RigSerial->failed(-1);
-			return replystr.length();
-		}
-		MilliSleep(10);
-		Fl::awake();
-	}
+	retnbr = RigSerial->ReadBuffer(replystr, n);
 
-	replystr = returned;
-	waited = timeout + delay;
-	snprintf(sztemp, sizeof(sztemp), "%s failed %d ms", sz, waited);
-	showresp(ERR, pr, sztemp, cmd, returned);
-	RigSerial->failed(1);
-	return 0;
+	LOG_DEBUG ("%s: read %d bytes, %s", sz, retnbr, replystr.c_str());
+	return retnbr;
+
 }
 
 int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 {
 	guard_lock reply_lock(&mutex_replystr);
 
-	char sztemp[50];
-	string returned = "";
-	string tosend = cmd;
-	int cnt = 0;
-	int waited = 0;
-	size_t num = n + cmd.length();
+	string wait_str;
+	wait_str += ch;
 
-	int delay =  num * 11000.0 / RigSerial->Baud() +
-			progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0;
+	int delay =  (n + cmd.length()) * 11000.0 / RigSerial->Baud();
+	int retnbr = 0;
 
 	replystr.clear();
-	RigSerial->FlushBuffer();
 
-	if(!progStatus.use_tcpip && !RigSerial->IsOpen()) {
-		snprintf(sztemp, sizeof(sztemp), "TEST %s", sz);
-//		showresp(DEBUG, pr, sztemp, tosend, replystr);
+	if (progStatus.use_tcpip) {
+		send_to_remote(cmd, progStatus.byte_interval);
+		MilliSleep(delay + progStatus.tcpip_ping_delay);
+		retnbr = read_from_remote(replystr);
+		LOG_DEBUG ("%s: read %d bytes, %s", sz, retnbr, replystr.c_str());
+		return retnbr;
+	}
+
+	if(!RigSerial->IsOpen()) {
+		LOG_DEBUG("TEST %s", sz);
 		return 0;
 	}
 
-	sendCommand(tosend, 0);
+	RigSerial->FlushBuffer();
+	RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
 	MilliSleep(delay);
 
-	returned = "";
-	for ( cnt = 0; cnt < timeout / 10; cnt++) {
-		readResponse();
-		returned.append(respstr);
-		if (returned.find(ch) != string::npos) {
-			replystr = returned;
-			waited = cnt * 10 + delay;
-			snprintf(sztemp, sizeof(sztemp), "%s OK %d ms", sz, waited);
-			showresp(DEBUG, pr, sztemp, cmd, returned);
-			RigSerial->failed(-1);
-			return replystr.length();
-		}
-		MilliSleep(10);
-		Fl::awake();
-	}
+	retnbr = RigSerial->ReadBuffer(replystr, n, wait_str);
 
-	replystr = returned;
-	waited = timeout + delay;
-	snprintf(sztemp, sizeof(sztemp), "%s failed %d ms", sz, waited);
-	showresp(ERR, pr, sztemp, cmd, returned);
-	RigSerial->failed(1);
-	return 0;
+	LOG_DEBUG ("%s: read %d bytes, %s", sz, retnbr, replystr.c_str());
+	return retnbr;
 }
 
 // Yaesu transceiver - wait for response to identifier request
@@ -476,15 +446,21 @@ bool rigbase::id_OK(string ID, int wait)
 {
 	guard_lock reply_lock(&mutex_replystr);
 
-	string returned;
+//	int retnbr = 0;
+
 	for (int n = 0; n < progStatus.comm_retries; n++) {
-		sendCommand(string(ID).append(";", 0));
-		returned = "";
+
+		RigSerial->FlushBuffer();
+		RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
+		MilliSleep(50);
+
 		for (int cnt = 0; cnt < wait / 10; cnt++) {
-			readResponse();
-			returned.append(respstr);
-			if (returned.find(ID)) {
-				replystr = returned;
+
+			replystr.clear();
+//			retnbr = 
+			RigSerial->ReadBuffer(replystr, 10, ID, ";");
+
+			if (replystr.rfind(ID)) {
 				return true;
 			}
 			MilliSleep(10);
@@ -498,11 +474,11 @@ bool rigbase::id_OK(string ID, int wait)
 void rigbase::sendOK(string cmd)
 {
 	if (IDstr.empty()) {
-		sendCommand(cmd,0);
+		sendCommand(cmd);
 		return;
 	}
 	if (id_OK(IDstr, 100))
-		sendCommand(cmd, 0);
+		sendCommand(cmd);
 }
 
 void rigbase::set_split(bool val) 
