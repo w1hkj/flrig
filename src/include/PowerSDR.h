@@ -82,8 +82,9 @@ enum PowerSDRMODES { LSB, USB, DSB, CWL, CWU, FM, AM, DIGU, SPEC, DIGL, SAM, DRM
 
 	void tune_rig(int val);
     int get_tune();
-	void set_preamp(int val);
-	int  get_preamp();
+//	void set_preamp(int val);
+//	int  get_preamp();
+//  int next_preamp();
 
 //	void set_if_shift(int val);
 //	bool get_if_shift(int &val);
@@ -105,13 +106,13 @@ enum PowerSDRMODES { LSB, USB, DSB, CWL, CWU, FM, AM, DIGU, SPEC, DIGL, SAM, DRM
 //	void set_noise(bool b);
 //	int  get_noise();
 
-//	void set_mic_gain(int val);
-//	int  get_mic_gain();
-//	void get_mic_min_max_step(int &min, int &max, int &step);
-//	void set_rf_gain(int val);
-//	int  get_rf_gain();
-//	void get_rf_min_max_step(int &min, int &max, int &step) {
-//		min = 0; max = 100; step = 1; }
+	void set_mic_gain(int val);
+	int  get_mic_gain();
+	void get_mic_min_max_step(int &min, int &max, int &step);
+	void set_rf_gain(int val);
+	int  get_rf_gain();
+	void get_rf_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 100; step = 1; }
 
 //	bool tuning();
 
@@ -122,7 +123,6 @@ enum PowerSDRMODES { LSB, USB, DSB, CWL, CWU, FM, AM, DIGU, SPEC, DIGL, SAM, DRM
 //	const char **hitable(int);
 
 	const char * get_bwname_(int bw, int md);
-
 };
 
 

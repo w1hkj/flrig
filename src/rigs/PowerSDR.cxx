@@ -192,7 +192,6 @@ RIG_PowerSDR::RIG_PowerSDR() {
 	has_split =
 	has_split_AB =
 	has_rf_control =
-	has_notch_control =
 	has_auto_notch =
 	has_ifshift_control =
 	has_smeter =
@@ -203,7 +202,7 @@ RIG_PowerSDR::RIG_PowerSDR() {
 	has_volume_control =
 	has_power_control =
 	has_tune_control =
-	has_preamp_control =
+//	has_preamp_control =
 	has_mode_control =
 	has_bandwidth_control =
 	has_sql_control =
@@ -216,7 +215,7 @@ RIG_PowerSDR::RIG_PowerSDR() {
 	ndigits = 9;
 
 	att_level = 0;
-	preamp_level = 0;
+//	preamp_level = 0;
 	_noise_reduction_level = 0;
 	_nrval1 = 2;
 	_nrval2 = 4;
@@ -359,40 +358,88 @@ int RIG_PowerSDR::get_alc()
 	return alc;
 }
 
+#if 0
+/* disabling this as Thetis ZZPA command is screwy and won't work on all the models
+Using the selector
+0dB = ZZPA1
+-10dB = ZZPA2 = -140
+-20dB = ZZPA0 = -130
+-30dB = ZZPA8 = -120 yet ZZPA8; does nothing
+
+If I look at the signal level for what the level is now.
+ZZPA0 = -130
+ZZPA1 = -150
+ZZPA2 = -140 -- but ZZPA then reports ZZPA7;
+ZZPA3 = -130
+ZZPA4 = -120
+ZZPA5 = -110
+ZZPA6 = -100
+ZZPA7 does nothing
+*/
+
+int  RIG_PowerSDR::next_preamp()
+{   
+    // strange sequence for ANAN 7000DLE MKII
+    switch(preamp_level)
+    {
+        case 0: preamp_level = 1;break;
+        case 1: preamp_level = 2;break;
+        case 7: preamp_level = 3;break;
+        case 3: preamp_level = 4;break;
+        case 4: preamp_level = 5;break;
+        case 5: preamp_level = 6;break;
+        default:
+        case 6: preamp_level = 0;break;
+    }
+    return preamp_level;
+}
+
 void RIG_PowerSDR::set_preamp(int val)
 {
 	preamp_level = val;
-	if (val) cmd = "ZZPA1;";
-	else     cmd = "ZZPA0;";
+	cmd = "ZZPA";
+    cmd.append(to_decimal(val, 1)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set PRE", cmd, "");
 	sett("preamp");
+        case 7: preamp_level = 0;break;
+    if (val == 0) {
+        preamp_label("Pre", false);
+        preamp_level = 0;
+    } else if (val == 1) {
+        preamp_label("Pre 1", true);
+        preamp_level = 1;
+    } else if (val == 7) {
+        preamp_label("Pre 2", true);
+        preamp_level = 2;
+    }
+
 }
 
 int RIG_PowerSDR::get_preamp()
 {
+    int preamp_level;
 	cmd = "ZZPA;";
 	stringstream str;
-	str << "ZZPA #1";
-//	trace(2, __func__, str.str().c_str());
 	sendCommand(cmd);
 	get_trace(1, "get_preamp");
 	ret = wait_char(';', 6, 100, "get PRE", ASC);
 	gett("");
-	if (ret != 6) {
+	if (ret == 6) {
 		size_t p = replystr.rfind("PA");
-	str << "ZZPA #2 replystr=" << replystr << ", p=" << p;
-	trace(2, "get_preamp", replystr.c_str());
+	    str << "ZZPA #2 replystr=" << replystr << ", p=" << p;
+	    trace(2, "get_preamp", replystr.c_str());
 		if (p != string::npos && (p+2 < replystr.length())) {
-			if (replystr[p+2] == '1')
-				preamp_level = 1;
-			else
-				preamp_level = 0;
+            preamp_level = fm_decimal(replystr.substr(p+2),1);
+            // need to map 7 to 2 to keep FLRig cbPreamp happy
+            // when ZZPA2; is sent ZZPA7; comes back
+            if (preamp_level == 7) preamp_level = 2; 
 		}
 	}
 	else preamp_level = 0;
 	return preamp_level;
 }
+#endif
 
 int RIG_PowerSDR::set_widths(int val)
 {
@@ -723,19 +770,12 @@ void RIG_PowerSDR::get_if_min_max_step(int &min, int &max, int &step)
 void RIG_PowerSDR::set_notch(bool on, int val)
 {
 	if (on) {
-		cmd = "BC2;"; // set manual notch
+		cmd = "ZZBC1;";
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set notch on", cmd, "");
 		sett("notch ON");
-		cmd = "BP";
-//		val = round((val - 220) / 50);
-		val = round((val - 200) / 50);
-		cmd.append(to_decimal(val, 3)).append(";");
-		sendCommand(cmd);
-		showresp(WARN, ASC, "set notch val", cmd, "");
-		sett("notch val");
 	} else {
-		cmd = "BC0;"; // no notch action
+		cmd = "ZZBC0;"; // no notch action
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set notch off", cmd, "");
 		sett("notch OFF");
@@ -807,11 +847,11 @@ void RIG_PowerSDR::set_noise_reduction(int val)
 	}
 	_noise_reduction_level = val;
 	if (_noise_reduction_level == 0) {
-		nr_label("ZZNR0", false);
+		nr_label("ZZNR0", 0);
 	} else if (_noise_reduction_level == 1) {
-		nr_label("ZZNR1", true);
+		nr_label("ZZNR1", 1);
 	} else {
-		nr_label("???", true);
+		nr_label("???", 2);
 		return;
 	}
 	cmd.assign("ZZNR");
@@ -836,11 +876,11 @@ int  RIG_PowerSDR::get_noise_reduction()
 	}
 
 	if (_noise_reduction_level == 1) {
-		nr_label("NR", true);
+		nr_label("NR", 1);
 	} else if (_noise_reduction_level == 2) {
-		nr_label("NR2", true);
+		nr_label("NR2", 2);
 	} else {
-		nr_label("NR", false);
+		nr_label("NR", 0);
 	}
 	return _noise_reduction_level;
 }
@@ -913,5 +953,63 @@ int RIG_PowerSDR::get_tune()
 	if (p == string::npos) return 0;
 	int val = replystr[p+4] - '0';
 	return val;
+}
+
+void RIG_PowerSDR::set_rf_gain(int val)
+{
+    cmd = "ZZAR+";
+    cmd.append(to_decimal(val, 3)).append(";");
+    sendCommand(cmd);
+    showresp(WARN, ASC, "set rf gain", cmd, "");
+    sett("RFgain");
+}
+
+int  RIG_PowerSDR::get_rf_gain()
+{
+    cmd = "ZZAR;";
+    int rfg = 100;
+    get_trace(1, "get_rf_gain");
+    ret = wait_char(';', 8, 100, "get rf gain", ASC);
+    gett("");
+    if (ret == 8) {
+        size_t p = replystr.rfind("AR");
+        if (p != string::npos)
+            rfg = fm_decimal(replystr.substr(p+3) ,3);
+    }
+    return rfg;
+}
+
+void RIG_PowerSDR::set_mic_gain(int val)
+{
+    cmd = "ZZMG";
+    if (val < 0) cmd += "-";
+    else cmd += "+";
+    cmd.append(to_decimal(abs(val),2)).append(";");
+    sendCommand(cmd);
+    showresp(WARN, ASC, "set mic", cmd, "");
+    sett("MICgain");
+}
+
+int RIG_PowerSDR::get_mic_gain()
+{
+    int mgain = 0;
+    cmd = "ZZMG;";
+    get_trace(1, "get_mic_gain");
+    ret = wait_char(';', 8, 100, "get mic", ASC);
+    gett("");
+    if (ret == 8) {
+        size_t p = replystr.rfind("MG");
+        if (p != string::npos) {
+            sscanf(replystr.c_str(),"ZZMG%d",&mgain);
+        }
+    }
+    return mgain;
+}
+
+void RIG_PowerSDR::get_mic_min_max_step(int &min, int &max, int &step)
+{
+    min = -40;
+    max = 10;
+    step = 1;
 }
 
