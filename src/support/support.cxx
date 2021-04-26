@@ -1092,11 +1092,11 @@ struct POLL_PAIR {
 };
 
 POLL_PAIR RX_poll_pairs[] = {
-	{&progStatus.poll_vfoAorB, read_vfoAorB},
-	{&progStatus.poll_frequency, read_vfo},
+//	{&progStatus.poll_vfoAorB, read_vfoAorB},
+//	{&progStatus.poll_frequency, read_vfo},
 	{&progStatus.poll_mode, read_mode},
 	{&progStatus.poll_bandwidth, read_bandwidth},
-	{&progStatus.poll_smeter, read_smeter},
+//	{&progStatus.poll_smeter, read_smeter},
 	{&progStatus.poll_tuner, read_tuner},
 	{&progStatus.poll_volume, read_volume},
 	{&progStatus.poll_auto_notch, read_auto_notch},
@@ -1111,7 +1111,7 @@ POLL_PAIR RX_poll_pairs[] = {
 	{&progStatus.poll_nr, read_nr},
 	{&progStatus.poll_noise, read_noise},
 	{&progStatus.poll_compression, read_compression},
-	{&progStatus.poll_ptt, check_ptt},
+//	{&progStatus.poll_ptt, check_ptt},
 	{&progStatus.poll_break_in, check_break_in},
 	{NULL, NULL}
 };
@@ -1121,14 +1121,14 @@ POLL_PAIR TX_poll_pairs[] = {
 	{&progStatus.poll_swr, read_swr},
 	{&progStatus.poll_alc, read_alc},
 	{&progStatus.poll_split, read_split},
-	{&progStatus.poll_ptt, check_ptt},
+//	{&progStatus.poll_ptt, check_ptt},
 	{NULL, NULL}
 };
 
 POLL_PAIR *poll_parameters;
 
-static bool resetrcv = true;
-static bool resetxmt = true;
+//static bool resetrcv = true;
+//static bool resetxmt = true;
 
 // On the Yaesu FT-891, the mode must be set before VFO, since mode 
 // changes can shift frequency.
@@ -1534,16 +1534,20 @@ Serial communications failure!\n\n\
 
 void * serial_thread_loop(void *d)
 {
-  static int  loopcount = progStatus.serloop_timing / 10;
-  static int  poll_nbr = 0;
+#define LOOP_DELAY 50
+//  static int  loopcount = progStatus.serloop_timing / LOOP_DELAY - 1;
+//  static int  poll_nbr = 0;
+	POLL_PAIR *rx_polling = &RX_poll_pairs[0];
+	POLL_PAIR *tx_polling = &TX_poll_pairs[0];
+	bool isRX = false;
 
 	for(;;) {
+
+		MilliSleep(LOOP_DELAY);
 
 		if (!run_serial_thread) {
 			break;
 		}
-
-		MilliSleep(10);
 
 		if (bypass_serial_thread_loop) {
 			goto serial_bypass_loop;
@@ -1553,20 +1557,46 @@ void * serial_thread_loop(void *d)
 			Fl::awake(serial_failed);
 
 //send any freq/mode/bw changes in the queu
-		if (!srvc_reqs.empty())
+		if (!srvc_reqs.empty()) {
 			serviceQUE();
+		}
+		get_trace(1, "50 msec");
+		{ guard_lock lk(&mutex_serial); check_ptt(); }
 
+		if (PTT) {
+			if (isRX) {
+				isRX = false;
+				Fl::awake(updateSmeter, 0);
+			}
+			{ guard_lock lk(&mutex_serial); (tx_polling->pollfunc)(); }
+			if ((++tx_polling)->poll == NULL) tx_polling = &TX_poll_pairs[0];
+		} else {
+			if (!isRX) {
+				isRX = true;
+				Fl::awake(zeroXmtMeters, 0);
+			}
+			{ guard_lock lk(&mutex_serial); read_vfoAorB(); read_vfo(); }
+			{ guard_lock lk(&mutex_serial); read_smeter(); }
+			{ guard_lock lk(&mutex_serial); (rx_polling->pollfunc)(); }
+			if ((++rx_polling)->poll == NULL) rx_polling = &RX_poll_pairs[0];
+		}
+serial_bypass_loop: ;
+	}
+	return NULL;
+
+// what to do about Elecraft K series idiosyncrasies ?
+/*
 		if (!PTT) {
 			if (resetrcv) {
 				Fl::awake(zeroXmtMeters, 0);
 				resetrcv = false;
-				loopcount = progStatus.serloop_timing / 10;
+				loopcount = progStatus.serloop_timing / 5 - 1;
 				poll_nbr = 0;
 			}
 			resetxmt = true;
 
-			if (--loopcount <= 0) {
-				loopcount = progStatus.serloop_timing / 10;
+			if (loopcount <= 0) {
+				loopcount = progStatus.serloop_timing / 5 - 1;
 				poll_nbr++;
 
 				if (xcvr_name == rig_K3.name_) {
@@ -1592,8 +1622,6 @@ void * serial_thread_loop(void *d)
 				while (poll_parameters->poll) {
 					// need to put thread asleep to allow other threads
 					// access to serial mutex
-					MilliSleep(1);
-
 					if (!srvc_reqs.empty()) goto serial_bypass_loop;//break;
 
 					if (PTT) {
@@ -1612,23 +1640,26 @@ void * serial_thread_loop(void *d)
 						Fl::awake(serial_failed);
 					poll_parameters++;
 
+					MilliSleep(5);
+					loopcount--;
+
 				}
 			}
 		} else {
 			if (resetxmt) {
 				Fl::awake(updateSmeter, (void *)(0));
 				resetxmt = false;
-				loopcount = progStatus.serloop_timing / 10;
+				loopcount = progStatus.serloop_timing / 5 - 1;
 				poll_nbr = 0;
 			}
 			resetrcv = true;
 			if (!srvc_reqs.empty()) goto serial_bypass_loop;
-			if (--loopcount <= 0) {
-				loopcount = progStatus.serloop_timing / 10;
+			if (loopcount <= 0) {
+				loopcount = progStatus.serloop_timing / 5 - 1;
 				poll_nbr++;
 				poll_parameters = &TX_poll_pairs[0];
 				while (poll_parameters->poll) {
-					MilliSleep(1);
+
 					if (!srvc_reqs.empty()) goto serial_bypass_loop;
 
 					if (!PTT) {
@@ -1642,12 +1673,15 @@ void * serial_thread_loop(void *d)
 					if (RigSerial->failed() >= MAX_FAILURES)
 						Fl::awake(serial_failed);
 					poll_parameters++;
+					MilliSleep(5);
+					loopcount--;
 				}
 			}
 		}
 serial_bypass_loop: ;
 	}
 	return NULL;
+*/
 }
 
 //=============================================================================

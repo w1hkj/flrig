@@ -1183,8 +1183,9 @@ public:
 		if (!xcvr_online || !selrig->has_smeter)
 			result = (int)(0);
 		else {
-			guard_lock serial_lock(&mutex_serial);
-			result = (int)(selrig->get_smeter());
+			result = (int)mval;
+//			guard_lock serial_lock(&mutex_serial);
+//			result = (int)(selrig->get_smeter());
 		}
 	}
 
@@ -1227,8 +1228,9 @@ public:
 		if (!xcvr_online || !selrig->has_power_out)
 			result = (int)(0);
 		else {
-			guard_lock serial_lock(&mutex_serial);
-			result = (int)selrig->get_power_out();
+			result = (int)pwrval;
+//			guard_lock serial_lock(&mutex_serial);
+//			result = (int)selrig->get_power_out();
 		}
 	}
 
