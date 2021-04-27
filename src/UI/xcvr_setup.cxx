@@ -22,7 +22,7 @@
 #include <string>
 
 #include "dialogs.h"
-#include "ICbase.h"
+#include "rigs.h"
 #include "trace.h"
 #include "xml_server.h"
 

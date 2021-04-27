@@ -38,7 +38,6 @@
 #include "rigpanel.h"
 #include "ui.h"
 #include "debug.h"
-#include "IC706MKIIG.h"
 
 string xcvr_name = "NONE";
 

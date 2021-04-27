@@ -69,6 +69,12 @@ void ztimer()
 	_zhr  = tim.tm_hour;
 }
 
+size_t todmsec()
+{
+	ztimer();
+	return (((((_zhr * 60) + _zmin) * 60) + _zsec) * 1000 + _zmsec);
+}
+
 unsigned long zmsec(void)
 {
 	ztimer();
