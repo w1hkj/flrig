@@ -300,22 +300,47 @@ void RIG_IC705::set_xcvr_auto_on()
 {
 	cmd = pre_to;
 	cmd += '\x19'; cmd += '\x00';
+
+	get_trace(1, "getID()");
+
 	cmd.append(post);
-	if (waitFOR(8, "get ID", 100) == false) {
+	RigSerial->failed(0);
+
+	if (waitFOR(8, "get ID") == false) {
 		cmd.clear();
 		int fes[] = { 2, 2, 2, 3, 7, 13, 25, 50, 75, 150, 150, 150 };
 		if (progStatus.comm_baudrate >= 0 && progStatus.comm_baudrate <= 11) {
 			cmd.append( fes[progStatus.comm_baudrate], '\xFE');
 		}
-		cmd.append(pre_to);
+		RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
+
+		cmd.assign(pre_to);
 		cmd += '\x18'; cmd += '\x01';
+		set_trace(1, "power_on()");
 		cmd.append(post);
-		waitFB("Power ON", 200);
-		for (int i = 0; i < 5000; i += 100) {
-			MilliSleep(100);
-			update_progress(100 * i / 5000);
-			Fl::awake();
+		RigSerial->failed(0);
+
+		if (waitFB("Power ON")) {
+			isett("power_on()");
+			cmd = pre_to; cmd += '\x19'; cmd += '\x00';
+			get_trace(1, "getID()");
+			cmd.append(post);
+			int i = 0;
+			for (i = 0; i < 150; i++) { // 15 second total timeout
+				if (waitFOR(8, "get ID", 100) == true) {
+					RigSerial->failed(0);
+					return;
+				}
+				update_progress(i / 2);
+				Fl::awake();
+			}
+			RigSerial->failed(0);
+			return;
 		}
+
+		isett("power_on()");
+		RigSerial->failed(1);
+		return;
 	}
 }
 

@@ -308,18 +308,22 @@ void RIG_IC7300::set_xcvr_auto_on()
 	get_trace(1, "getID()");
 
 	cmd.append(post);
-	RigSerial->failed(false);
+	RigSerial->failed(0);
+
 	if (waitFOR(8, "get ID") == false) {
 		cmd.clear();
 		int fes[] = { 2, 2, 2, 3, 7, 13, 25, 50, 75, 150, 150, 150 };
 		if (progStatus.comm_baudrate >= 0 && progStatus.comm_baudrate <= 11) {
 			cmd.append( fes[progStatus.comm_baudrate], '\xFE');
 		}
-		cmd.append(pre_to);
+		RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
+
+		cmd.assign(pre_to);
 		cmd += '\x18'; cmd += '\x01';
 		set_trace(1, "power_on()");
 		cmd.append(post);
 		RigSerial->failed(0);
+
 		if (waitFB("Power ON")) {
 			isett("power_on()");
 			xcvr_is_on = true;
@@ -327,9 +331,8 @@ void RIG_IC7300::set_xcvr_auto_on()
 			get_trace(1, "getID()");
 			cmd.append(post);
 			int i = 0;
-			for (i = 0; i < 100; i++) {
-				MilliSleep(100);
-				if (waitFOR(8, "get ID") == true) {
+			for (i = 0; i < 100; i++) { // 10 second total timeout
+				if (waitFOR(8, "get ID", 100) == true) {
 					RigSerial->failed(0);
 					return;
 				}
@@ -339,6 +342,7 @@ void RIG_IC7300::set_xcvr_auto_on()
 			RigSerial->failed(0);
 			return;
 		}
+
 		isett("power_on()");
 		RigSerial->failed(1);
 		xcvr_is_on = false;

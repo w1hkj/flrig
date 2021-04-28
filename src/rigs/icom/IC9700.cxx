@@ -230,6 +230,8 @@ RIG_IC9700::RIG_IC9700() {
 
 	ICOMmainsub = true;
 
+	has_xcvr_auto_on_off = true;
+
 	has_band_selection = true;
 
 	precision = 1;
@@ -240,6 +242,69 @@ RIG_IC9700::RIG_IC9700() {
 //======================================================================
 // IC9700 unique commands
 //======================================================================
+
+static int ret = 0;
+static bool xcvr_is_on = false;
+
+void RIG_IC9700::set_xcvr_auto_on()
+{
+	cmd = pre_to;
+	cmd += '\x19'; cmd += '\x00';
+
+	get_trace(1, "getID()");
+
+	cmd.append(post);
+	RigSerial->failed(0);
+
+	if (waitFOR(8, "get ID") == false) {
+		cmd.clear();
+		int fes[] = { 2, 2, 2, 3, 7, 13, 25, 50, 75, 150, 150, 150 };
+		if (progStatus.comm_baudrate >= 0 && progStatus.comm_baudrate <= 11) {
+			cmd.append( fes[progStatus.comm_baudrate], '\xFE');
+		}
+		RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
+
+		cmd.assign(pre_to);
+		cmd += '\x18'; cmd += '\x01';
+		set_trace(1, "power_on()");
+		cmd.append(post);
+		RigSerial->failed(0);
+
+		if (waitFB("Power ON")) {
+			isett("power_on()");
+			xcvr_is_on = true;
+			cmd = pre_to; cmd += '\x19'; cmd += '\x00';
+			get_trace(1, "getID()");
+			cmd.append(post);
+			int i = 0;
+			for (i = 0; i < 100; i++) { // 10 second total timeout
+				if (waitFOR(8, "get ID", 100) == true) {
+					RigSerial->failed(0);
+					return;
+				}
+				update_progress(i / 2);
+				Fl::awake();
+			}
+			RigSerial->failed(0);
+			return;
+		}
+
+		isett("power_on()");
+		RigSerial->failed(1);
+		xcvr_is_on = false;
+		return;
+	}
+	xcvr_is_on = true;
+}
+
+void RIG_IC9700::set_xcvr_auto_off()
+{
+	cmd.clear();
+	cmd.append(pre_to);
+	cmd += '\x18'; cmd += '\x00';
+	cmd.append(post);
+	waitFB("Power OFF", 200);
+}
 
 void RIG_IC9700::selectA()
 {
@@ -260,38 +325,6 @@ void RIG_IC9700::selectB()
 	cmd.append(post);
 	waitFB("select B");
 	set_trace(2, "selectB()", str2hex(replystr.c_str(), replystr.length()));
-}
-
-void RIG_IC9700::set_xcvr_auto_on()
-{
-	cmd = pre_to;
-	cmd += '\x19'; cmd += '\x00';
-	cmd.append(post);
-	if (waitFOR(8, "get ID", 100) == false) {
-		cmd.clear();
-		int fes[] = { 2, 2, 2, 3, 7, 13, 25, 50, 75, 150, 150, 150 };
-		if (progStatus.comm_baudrate >= 0 && progStatus.comm_baudrate <= 11) {
-			cmd.append( fes[progStatus.comm_baudrate], '\xFE');
-		}
-		cmd.append(pre_to);
-		cmd += '\x18'; cmd += '\x01';
-		cmd.append(post);
-		waitFB("Power ON", 200);
-		for (int i = 0; i < 5000; i += 100) {
-			MilliSleep(100);
-			update_progress(100 * i / 5000);
-			Fl::awake();
-		}
-	}
-}
-
-void RIG_IC9700::set_xcvr_auto_off()
-{
-	cmd.clear();
-	cmd.append(pre_to);
-	cmd += '\x18'; cmd += '\x00';
-	cmd.append(post);
-	waitFB("Power OFF", 200);
 }
 
 bool RIG_IC9700::check ()

@@ -109,11 +109,6 @@ void RIG_ICOM::ICtrace(string cmd, string hexstr)
 
 bool RIG_ICOM::waitFOR(size_t n, const char *sz, unsigned long timeout)
 {
-#if SERIAL_DEBUG
-fprintf(serlog, "waitFOR %s\n", sz);
-#endif
-//	guard_lock cmd_lock(&command_mutex);
-
 	static char sztemp[200];
 	memset(sztemp, 0, 200);
 	string check = "1234";
@@ -125,7 +120,6 @@ fprintf(serlog, "waitFOR %s\n", sz);
 	check[2] = cmd[3];
 	check[3] = cmd[2];
 
-//	int delay =  (n + cmd.length()) * 11000.0 / RigSerial->Baud();
 	int delay =  n * 11000.0 / RigSerial->Baud();
 	int retnbr = 0;
 
@@ -143,20 +137,32 @@ fprintf(serlog, "waitFOR %s\n", sz);
 		}
 		RigSerial->FlushBuffer();
 		RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
-//#if SERIAL_DEBUG
-//fprintf(serlog, "delay %d msec\n", delay);
-//#endif
-//		MilliSleep(delay);
 
-		retnbr = RigSerial->ReadBuffer(replystr, n + cmd.length(), check, eor);
+		size_t tout1 = todmsec();
+		size_t tout2 = tout1;
+		std::string tempstr;
+		int nret;
+		int tdiff = timeout;
+		while (tdiff > 0) {
+			tempstr.clear();
+			nret = RigSerial->ReadBuffer(tempstr, n + cmd.length(), check, eor);
+			replystr.append(tempstr);
+			retnbr += nret;
+
+			if (replystr.rfind(bad) != std::string::npos)
+				return false;
+			if (replystr.rfind(check) != std::string::npos && 
+				replystr.rfind(eor) != std::string::npos)
+				return true;
+
+			tout2 = todmsec();
+			if (tout2 < tout1) { // 24 hr roll over
+				tout2 += 24 * 60 * 60 * 1000;
+			}
+			tdiff = timeout - (tout2 - tout1);
+		}
+
 	}
-
-	if (replystr.rfind(bad) != std::string::npos)
-		return false;
-
-	if (replystr.rfind(check) != std::string::npos && 
-		replystr.rfind(eor) != std::string::npos)
-		return true;
 
 	return false;
 }
@@ -166,10 +172,12 @@ bool RIG_ICOM::waitFB(const char *sz, int timeout)
 #if SERIAL_DEBUG
 fprintf(serlog, "waitFB\n");
 #endif
-	waitFOR(6, sz, timeout);
-	if (replystr.rfind("\xFB\xFD") != std::string::npos)
-		return true;
-	return false;
+
+	if (!waitFOR(6, sz, timeout))
+		return false;
+	if (replystr.rfind("\xFB\xFD") == std::string::npos)
+		return false;
+	return true;
 }
 
 // exchange & equalize are available in these Icom xcvrs
