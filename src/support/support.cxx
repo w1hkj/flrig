@@ -233,21 +233,52 @@ Data Source: %s\n\
 	return str;
 }
 
-// the following functions are ONLY CALLED by the serial loop
-// read any data stream sent by transceiver
-// support for the K3 and KX3 read of VFO, MODE and BW are
-// in the K3_ui and KX3_ui source files
-
 void read_info()
 {
 	trace(1,"read_info()");
 	selrig->get_info();
 }
 
-// read current vfo frequency
+void update_vfoAorB(void *d)
+{
+	if (xcvr_name == rig_FT817.name_ || xcvr_name == rig_FT817BB.name_) {
+		trace(1,"FT817xx, update_vfoAorB()");
+		if (useB) {
+			vfoB.src = RIG;
+			vfoB.freq = selrig->get_vfoB();
+			vfoB.imode = selrig->get_modeB();
+			vfoB.iBW = selrig->get_bwB();
+		} else {
+			vfoA.src = RIG;
+			vfoA.freq = selrig->get_vfoA();
+			vfoA.imode = selrig->get_modeA();
+			vfoA.iBW = selrig->get_bwA();
+		}
+		return;
+	}
+	updateUI((void*)0);
+}
 
 void read_vfo()
 {
+	if (xcvr_name == rig_K3.name_) {
+		read_K3_vfo();
+		return;
+	}
+	if (xcvr_name == rig_KX3.name_) {
+		read_KX3_vfo();
+		return;
+	}
+
+//	read_vfoAorB();
+	if (selrig->has_getvfoAorB) {
+		int val = selrig->get_vfoAorB();
+		if (val != useB) {
+			useB = val;
+			Fl::awake(update_vfoAorB, reinterpret_cast<void*>(val));
+		}
+	}
+
 // transceiver changed ?
 	trace(1,"read_vfo()");
 	unsigned long int  freq;
@@ -298,43 +329,6 @@ void updateUI(void *)
 	highlight_vfo(NULL);
 }
 
-void update_vfoAorB(void *d)
-{
-	if (xcvr_name == rig_FT817.name_ || xcvr_name == rig_FT817BB.name_) {
-		trace(1,"FT817xx, update_vfoAorB()");
-		if (useB) {
-			vfoB.src = RIG;
-			vfoB.freq = selrig->get_vfoB();
-			vfoB.imode = selrig->get_modeB();
-			vfoB.iBW = selrig->get_bwB();
-		} else {
-			vfoA.src = RIG;
-			vfoA.freq = selrig->get_vfoA();
-			vfoA.imode = selrig->get_modeA();
-			vfoA.iBW = selrig->get_bwA();
-		}
-		return;
-	}
-	updateUI((void*)0);
-}
-
-void read_vfoAorB()
-{
-	int val;
-	if (selrig->has_getvfoAorB) {
-		{
-			trace(1,"read_vfoAorB()");
-			val = selrig->get_vfoAorB();
-			if (val == -1) val = 0;
-		}
-		if (val != useB) {
-			useB = val;
-			Fl::awake(update_vfoAorB, reinterpret_cast<void*>(val));
-			MilliSleep(50);
-		}
-	}
-}
-
 void setModeControl(void *)
 {
 	opMODE->index(vfo->imode);
@@ -371,6 +365,15 @@ trace(3, "Filter", (useB ? "B" : "A"), btnFILT->label());
 // mode and bandwidth
 void read_mode()
 {
+	if (xcvr_name == rig_K3.name_) {
+		read_K3_mode();
+		return;
+	}
+	if (xcvr_name == rig_KX3.name_) {
+		read_KX3_mode();
+		return;
+	}
+
 	int nu_mode;
 	int nu_BW;
 	if (!useB) {
@@ -459,6 +462,15 @@ void setBWControl(void *)
 
 void read_bandwidth()
 {
+	if (xcvr_name == rig_K3.name_) {
+		read_K3_bw();
+		return;
+	}
+	if (xcvr_name == rig_KX3.name_) {
+		read_KX3_bw();
+		return;
+	}
+
 	trace(1,"read_bandwidth()");
 	int nu_BW;
 	if (!useB) {
@@ -1603,7 +1615,6 @@ void * serial_thread_loop(void *d)
 			if (progStatus.byte_interval) MilliSleep(progStatus.byte_interval);
 
 			{	guard_lock lk(&mutex_serial);
-				read_vfoAorB();
 				read_vfo();
 			}
 
@@ -1638,15 +1649,6 @@ serial_bypass_loop: ;
 	}
 	return NULL;
 
-// what to do about Elecraft K series idiosyncrasies ?
-/*
-	if (xcvr_name == rig_K3.name_) {
-		read_K3();
-	}
-	else if (xcvr_name == rig_KX3.name_) {
-		read_KX3();
-	}
-*/
 }
 
 //=============================================================================

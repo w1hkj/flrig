@@ -24,6 +24,7 @@
 #include "rig_io.h"
 #include "support.h"
 #include "socket_io.h"
+#include "tod_clock.h"
 
 const char *szNORIG = "NONE";
 const char *szNOMODES[] = {"LSB", "USB", NULL};
@@ -404,8 +405,8 @@ int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 {
 	guard_lock reply_lock(&mutex_replystr);
 
-	string wait_str;
-	wait_str += ch;
+	string wait_str = " ";
+	wait_str[0] = ch;
 
 	int delay =  (n + cmd.length()) * 11000.0 / RigSerial->Baud();
 	int retnbr = 0;
@@ -427,9 +428,26 @@ int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 
 	RigSerial->FlushBuffer();
 	RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
-	MilliSleep(delay);
+		MilliSleep(delay);
 
-	retnbr = RigSerial->ReadBuffer(replystr, n, wait_str);
+	size_t tout1 = todmsec();
+	size_t tout2 = tout1;
+	std::string tempstr;
+	int nret;
+	size_t tdiff = timeout;
+	while (tdiff > 0) {
+		tempstr.clear();
+		nret = RigSerial->ReadBuffer(tempstr, n, wait_str);
+		replystr.append(tempstr);
+		retnbr += nret;
+		if (replystr.find(wait_str) != std::string::npos)
+			break;
+		tout2 = todmsec();
+		if (tout2 < tout1) { // 24 hr roll over
+			tout2 += 24 * 60 * 60 * 1000;
+		}
+		tdiff = timeout - (tout2 - tout1);
+	}
 
 	LOG_DEBUG ("%s: read %d bytes, %s", sz, retnbr, replystr.c_str());
 	return retnbr;

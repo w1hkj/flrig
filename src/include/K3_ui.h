@@ -20,7 +20,10 @@
 // aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
-void read_K3();
+void read_K3_vfo();
+void read_K3_mode();
+void read_K3_bw();
+
 void K3_set_split(int val);
 void K3_A2B();
 void cb_K3_swapAB();

@@ -549,6 +549,7 @@ static  DWORD dwBytesTxD=0;
 	return false;
 }
 
+#if SERIAL_DEBUG
 int lines_written = 0;
 
 int  Cserial::ReadBuffer (std::string &buf, int nchars, std::string find1, std::string find2)
@@ -559,22 +560,19 @@ int  Cserial::ReadBuffer (std::string &buf, int nchars, std::string find1, std::
 	if (find1.length()) if (find1.find('\xFE') != std::string::npos) hex = true;
 	if (find2.length()) if (find2.find('\xFD') != std::string::npos) hex = true;
 
-#if SERIAL_DEBUG
-if (hex) {
-	s1 = str2hex(find1.c_str(), find1.length());
-	s2 = str2hex(find2.c_str(), find2.length());
-} else {
-	s1 = find1;
-	s2 = find2;
-}
-#endif
-	if (hComm == INVALID_HANDLE_VALUE) {
-#if SERIAL_DEBUG
-	if (lines_written < 1000) {
-		fprintf(serlog, "ReadBuffer, invalid handle\n");
-		lines_written++;
+	if (hex) {
+		s1 = str2hex(find1.c_str(), find1.length());
+		s2 = str2hex(find2.c_str(), find2.length());
+	} else {
+		s1 = find1;
+		s2 = find2;
 	}
-#endif
+
+	if (hComm == INVALID_HANDLE_VALUE) {
+		if (lines_written < 1000) {
+			fprintf(serlog, "ReadBuffer, invalid handle\n");
+			lines_written++;
+		}
 		return 0;
 	}
 
@@ -587,21 +585,17 @@ if (hex) {
 		tempchar[0] = tempchar[1] = 0;
 		retval = ReadFile(hComm, &tempchar[0], 1, &dwRead, NULL);
 		if (retval == 0) {
-#if SERIAL_DEBUG
-	if (lines_written < 1000) {
-		fprintf(serlog, "retval == 0\n");
-		lines_written++;
-	}
-#endif
+			if (lines_written < 1000) {
+				fprintf(serlog, "retval == 0\n");
+				lines_written++;
+			}
 			return nread;
 		}
 		if (dwRead == 0) {
-#if SERIAL_DEBUG
-	if (lines_written < 1000) {
-		fprintf(serlog, "ReadFile dwRead: %ld\n", dwRead);
-		lines_written++;
-	}
-#endif
+			if (lines_written < 1000) {
+				fprintf(serlog, "ReadFile dwRead: %ld\n", dwRead);
+				lines_written++;
+			}
 			return nread;
 		}
 
@@ -609,15 +603,13 @@ if (hex) {
 		nread++;
 
 		if (nread >= nchars) {
-#if SERIAL_DEBUG
-if (lines_written < 1000) {
-	if (hex)
-		fprintf(serlog, "ReadBuffer(%d): %s\n", nchars, str2hex(buf.c_str(), buf.length()));
-	else
-		fprintf(serlog, "ReadBuffer(%d): %s\n", nchars, buf.c_str());
-	lines_written++;
-}
-#endif
+			if (lines_written < 1000) {
+				if (hex)
+					fprintf(serlog, "ReadBuffer(%d): %s\n", nchars, str2hex(buf.c_str(), buf.length()));
+				else
+					fprintf(serlog, "ReadBuffer(%d): %s\n", nchars, buf.c_str());
+				lines_written++;
+			}
 			return nread;
 		}
 
@@ -627,46 +619,91 @@ if (lines_written < 1000) {
 			if (p1 != std::string::npos &&
 				p2 != std::string::npos &&
 				p2 > p1) {
-#if SERIAL_DEBUG
-if (lines_written < 1000) {
-	if (hex)
-		fprintf(serlog, "ReadBuffer find 2: (%d): %s\n", nchars, str2hex(buf.c_str(), buf.length()));
-	else
-		fprintf(serlog, "ReadBuffer find 2: (%d): %s\n", nchars, buf.c_str());
-	lines_written++;
-}
-#endif
+					if (lines_written < 1000) {
+						if (hex)
+							fprintf(serlog, "ReadBuffer find 2: (%d): %s\n", nchars, str2hex(buf.c_str(), buf.length()));
+						else
+							fprintf(serlog, "ReadBuffer find 2: (%d): %s\n", nchars, buf.c_str());
+						lines_written++;
+					}
 				return nread;
 			}
 		} else if (find1.length()) {
 			if (buf.rfind(find1) != std::string::npos) {
-#if SERIAL_DEBUG
-if (lines_written < 1000) {
-	if (hex)
-		fprintf(serlog, "ReadBuffer find 1: (%d): %s\n", nchars, str2hex(buf.c_str(), buf.length()));
-	else
-		fprintf(serlog, "ReadBuffer find 1: (%d): %s\n", nchars, buf.c_str());
-	lines_written++;
-}
-#endif
+				if (lines_written < 1000) {
+					if (hex)
+						fprintf(serlog, "ReadBuffer find 1: (%d): %s\n", nchars, str2hex(buf.c_str(), buf.length()));
+					else
+						fprintf(serlog, "ReadBuffer find 1: (%d): %s\n", nchars, buf.c_str());
+					lines_written++;
+				}
 				return nread;
 			}
 		}
 	}
 
-#if SERIAL_DEBUG
-if (lines_written < 1000) {
-	if (hex)
-		fprintf(serlog, "ReadBuffer: (%d): %s\n", nchars, str2hex(buf.c_str(), buf.length()));
-	else
-		fprintf(serlog, "ReadBuffer: (%d): %s\n", nchars, buf.c_str());
-	lines_written++;
-}
-#endif
+	if (lines_written < 1000) {
+		if (hex)
+			fprintf(serlog, "ReadBuffer: (%d): %s\n", nchars, str2hex(buf.c_str(), buf.length()));
+		else
+			fprintf(serlog, "ReadBuffer: (%d): %s\n", nchars, buf.c_str());
+		lines_written++;
+	}
 
 	return nread;
 }
 
+#else
+
+int  Cserial::ReadBuffer (std::string &buf, int nchars, std::string find1, std::string find2)
+{
+	bool hex = false;
+
+	if (hComm == INVALID_HANDLE_VALUE) {
+		return 0;
+	}
+
+	DWORD dwRead = 0;
+	int nread = 0;
+	int retval = 0;
+	static char tempchar[2];
+
+	while (1) {
+		tempchar[0] = tempchar[1] = 0;
+		retval = ReadFile(hComm, &tempchar[0], 1, &dwRead, NULL);
+		if (retval == 0) {
+			return nread;
+		}
+		if (dwRead == 0) {
+			return nread;
+		}
+
+		buf += tempchar[0];
+		nread++;
+
+		if (nread >= nchars) {
+			return nread;
+		}
+
+		if (find1.length() && find2.length()) {
+			size_t p1 = buf.rfind(find1);
+			size_t p2 = buf.rfind(find2);
+			if (p1 != std::string::npos &&
+				p2 != std::string::npos &&
+				p2 > p1) {
+				return nread;
+			}
+		} else if (find1.length()) {
+			if (buf.rfind(find1) != std::string::npos) {
+				return nread;
+			}
+		}
+	}
+
+	return nread;
+}
+
+#endif
 
 void Cserial::FlushBuffer()
 {

@@ -20,7 +20,10 @@
 // aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
-void read_KX3();
+void read_KX3_vfo();
+void read_KX3_mode();
+void read_KX3_bw();
+
 void KX3_set_split(int val);
 void KX3_A2B();
 void cb_KX3_swapAB();

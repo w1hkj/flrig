@@ -45,54 +45,52 @@
 extern queue<XCVR_STATE> queA;
 extern queue<XCVR_STATE> queB;
 
-void read_KX3()
+void read_KX3_vfo()
 {
-	guard_lock serial_lock(&mutex_serial);
-
-	if (progStatus.poll_frequency) {
-		unsigned long int freq;
-		freq = selrig->get_vfoA();
-		if (freq != vfoA.freq) {
-			vfoA.freq = freq;
-			Fl::awake(setFreqDispA, (void *)vfoA.freq);
-			vfo = &vfoA;
-		}
-		freq = selrig->get_vfoB();
-		if (freq != vfoB.freq) {
-			vfoB.freq = freq;
-			Fl::awake(setFreqDispB, (void *)vfoB.freq);
-		}
+	unsigned long int freq;
+	freq = selrig->get_vfoA();
+	if (freq != vfoA.freq) {
+		vfoA.freq = freq;
+		Fl::awake(setFreqDispA, (void *)vfoA.freq);
+		vfo = &vfoA;
 	}
-
-	if (progStatus.poll_mode) {
-		int nu_mode;
-		nu_mode = selrig->get_modeA();
-		if (nu_mode != vfoA.imode) {
-			vfoA.imode = vfo->imode = nu_mode;
-			selrig->set_bwA(vfo->iBW = selrig->adjust_bandwidth(nu_mode));
-			Fl::awake(setModeControl);
-			Fl::awake(updateBandwidthControl);
-		}
-		nu_mode = selrig->get_modeB();
-		if (nu_mode != vfoB.imode) {
-			vfoB.imode = nu_mode;
-		}
+	freq = selrig->get_vfoB();
+	if (freq != vfoB.freq) {
+		vfoB.freq = freq;
+		Fl::awake(setFreqDispB, (void *)vfoB.freq);
 	}
-
-	if (progStatus.poll_bandwidth) {
-		int nu_BW;
-		nu_BW = selrig->get_bwA();
-		if (nu_BW != vfoA.iBW) {
-			vfoA.iBW = vfo->iBW = nu_BW;
-			Fl::awake(setBWControl);
-		}
-		nu_BW = selrig->get_bwB();
-		if (nu_BW != vfoB.iBW) {
-			vfoB.iBW = nu_BW;
-		}
-	}
-
 }
+
+void read_KX3_mode()
+{
+	int nu_mode;
+	nu_mode = selrig->get_modeA();
+	if (nu_mode != vfoA.imode) {
+		vfoA.imode = vfo->imode = nu_mode;
+		selrig->set_bwA(vfo->iBW = selrig->adjust_bandwidth(nu_mode));
+		Fl::awake(setModeControl);
+		Fl::awake(updateBandwidthControl);
+	}
+	nu_mode = selrig->get_modeB();
+	if (nu_mode != vfoB.imode) {
+		vfoB.imode = nu_mode;
+	}
+}
+
+void read_KX3_bw()
+{
+	int nu_BW;
+	nu_BW = selrig->get_bwA();
+	if (nu_BW != vfoA.iBW) {
+		vfoA.iBW = vfo->iBW = nu_BW;
+		Fl::awake(setBWControl);
+	}
+	nu_BW = selrig->get_bwB();
+	if (nu_BW != vfoB.iBW) {
+		vfoB.iBW = nu_BW;
+	}
+}
+
 
 void KX3_set_split(int val)
 {
