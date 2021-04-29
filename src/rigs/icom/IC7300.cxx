@@ -1940,6 +1940,8 @@ void RIG_IC7300::set_notch(bool on, int freq)
 	cmd.append(post);
 	waitFB("set notch val");
 	set_trace(2, "set_notch_val() ", str2hex(cmd.c_str(), cmd.length()));
+
+	get_notch(hexval);
 }
 
 bool RIG_IC7300::get_notch(int &val)

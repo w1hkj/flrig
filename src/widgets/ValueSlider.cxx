@@ -58,7 +58,7 @@
 */
 int Fl_Wheel_Slider::handle(int event)
 {
-	if (event == FL_RELEASE || event == FL_LEAVE) {
+	if (event == FL_RELEASE) {// || event == FL_LEAVE) {
 		do_callback();
 		return 1;
 	}
@@ -76,7 +76,7 @@ int Fl_Wheel_Slider::handle(int event)
 
 int Fl_Wheel_Value_Slider::handle(int event)
 {
-	if (event == FL_RELEASE || event == FL_LEAVE) {
+	if (event == FL_RELEASE) {// || event == FL_LEAVE) {
 		do_callback();
 		return 1;
 	}

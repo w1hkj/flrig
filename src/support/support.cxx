@@ -893,17 +893,15 @@ void update_notch(void *d)
 
 void read_notch()
 {
+	if (!selrig->has_notch_control) return;
+
 	int on = progStatus.notch;
 	int val = progStatus.notch_val;
-	if (inhibit_notch > 0) {
-		inhibit_notch--;
-		return;
-	}
-	if (!selrig->has_notch_control) return;
 	{
 		trace(1,"read_notch()");
 		on = selrig->get_notch(val);
 	}
+
 	if ((on != progStatus.notch) || (val != progStatus.notch_val)) {
 		vfo->notch_val = progStatus.notch_val = val;
 		vfo->notch = progStatus.notch = on;
@@ -1194,7 +1192,6 @@ void serviceQUE()
 		}
 
 		if (nuvals.change == ON || nuvals.change == OFF) { // PTT processing
-std::cout << "PTT changed to: " << nuvals.change << std::endl;
 			if (selrig->ICOMmainsub && useB) {  // disallowed operation
 				Fl::awake(update_UI_PTT);
 				return;
@@ -2409,21 +2406,22 @@ void cbbtnNotch()
 {
 	if (!selrig->has_notch_control) return;
 	guard_lock serial_lock(&mutex_serial);
-	trace(1, "cbbtnNotch()");
 
-	int btn, cnt = 0;
+//	trace(1, "cbbtnNotch()");
 
-	btn = btnNotch->value();
-	progStatus.notch = btn;
+	int val = 0, cnt = 0;
 
-	selrig->set_notch(btn, progStatus.notch_val);
+	progStatus.notch = btnNotch->value();
 
-	MilliSleep(50);
-	int on, val = progStatus.notch_val;
-	on = selrig->get_notch(val);
-	while ((on != btn) && (cnt++ < 10)) {
-		MilliSleep(progStatus.comm_wait);
-		on = selrig->get_notch(val);
+	selrig->set_notch(progStatus.notch, progStatus.notch_val);
+return;
+//	int on, val = progStatus.notch_val;
+
+//	on = selrig->get_notch(val);
+
+	while ((selrig->get_notch(val) != progStatus.notch) && (cnt++ < 10)) {
+//		MilliSleep(progStatus.comm_wait);
+//		on = ;
 		Fl::awake();
 	}
 }
@@ -2436,20 +2434,15 @@ void setNotch()
 
 	int ev = Fl::event();
 	if (ev == FL_LEAVE || ev == FL_ENTER) return;
-	if (ev == FL_DRAG || ev == FL_PUSH) {
-		inhibit_notch = 1;
-		return;
-	}
 
-	int set = 0;
-	if (sldrNOTCH) {
-		set = sldrNOTCH->value();
-	} else {
-		set = spnrNOTCH->value();
-	}
-
-	progStatus.notch_val = set;
 	guard_lock lock( &mutex_serial);
+
+	if (sldrNOTCH) {
+		progStatus.notch_val = sldrNOTCH->value();
+	} else {
+		progStatus.notch_val = spnrNOTCH->value();
+	}
+
 	selrig->set_notch(progStatus.notch, progStatus.notch_val);
 }
 
@@ -2693,10 +2686,6 @@ void setVolume() // UI call
 	trace(1, "setVolume()");
 	int ev = Fl::event();
 	if (ev == FL_LEAVE || ev == FL_ENTER) return;
-	if (ev == FL_DRAG || ev == FL_PUSH) {
-		inhibit_volume = 1;
-		return;
-	}
 	int set;
 	if (spnrVOLUME) set = spnrVOLUME->value();
 	else set = sldrVOLUME->value();
@@ -5315,6 +5304,7 @@ void init_notch_control()
 	if (selrig->has_notch_control) {
 		int min, max, step;
 		selrig->get_notch_min_max_step(min, max, step);
+
 		if (sldrNOTCH) sldrNOTCH->minimum(min);
 		if (sldrNOTCH) sldrNOTCH->maximum(max);
 		if (sldrNOTCH) sldrNOTCH->step(step);
@@ -6340,7 +6330,7 @@ void auto_notch_label(const char * l, int on)
 {
 	auto_notch_label_ = l;
 	auto_notch_state_ = on;
-	progStatus.notch = on;
+	progStatus.auto_notch = on;
 	Fl::awake(do_auto_notch_label);
 }
 
