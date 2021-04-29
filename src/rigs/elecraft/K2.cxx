@@ -105,17 +105,33 @@ int  RIG_K2::adjust_bandwidth(int m)
 
 void RIG_K2::initialize()
 {
+	progStatus.gettrace = 1;
+	progStatus.settrace = 1;
+
 	k2_widgets[0].W = sldrPOWER;
 
-//enable extended command mode
 	set_trace(1, "disable auto reporting");
-	sendCommand("K22;", 0);
-	sett("");
-	set_trace(1,"enable extended command mode");
 	sendCommand("AI0;", 0);
 	sett("");
+
+	set_trace(1,"enable extended command mode");
+	sendCommand("K22;", 0);
+	sett("");
+
 //ensure K2 is in VFO A
     get_power_control();
+}
+
+bool RIG_K2::check ()
+{
+	rsp = cmd = "FA";
+	cmd += ';';
+	get_trace(1, "check");
+	int ret = wait_char(';', 14, K2_WAIT, "check", ASC);
+	gett("");
+
+	if (ret < 14) return false;
+	return true;
 }
 
 /*
@@ -240,18 +256,6 @@ void RIG_K2::set_split(bool val)
 int RIG_K2::get_split()
 {
 	return K2split;
-}
-
-bool RIG_K2::check ()
-{
-	rsp = cmd = "FA";
-	cmd += ';';
-	get_trace(1, "check");
-	int ret = wait_char(';', 14, 8000,"check", ASC);
-	gett("");
-
-	if (ret < 14) return false;
-	return true;
 }
 
 unsigned long int RIG_K2::get_vfoA ()
