@@ -21,15 +21,17 @@
 #include "icom/IC7000.h"
 #include "debug.h"
 #include <stdio.h>
+#include <iostream>
+
 //=============================================================================
 // IC-7000
 
 static int ret = 0;  // used by get_trace
 
 enum {
-        LSB7000, USB7000, AM7000, CW7000, RTTY7000,
-        FM7000, WFM7000, CWR7000, RTTYR7000, DV7000,
-        LSBD7000, USBD7000, AMD7000, FMD7000 };
+	LSB7000, USB7000, AM7000, CW7000, RTTY7000,
+	FM7000, WFM7000, CWR7000, RTTYR7000, DV7000,
+	LSBD7000, USBD7000, AMD7000, FMD7000 };
 
 const char IC7000name_[] = "IC-7000";
 
@@ -57,7 +59,7 @@ const char *IC7000_RTTYwidths[] = {
   "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
  "600",  "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
-"2600", "2700", 
+"2600", "2700",
 NULL};
 static int IC7000_bw_vals_RTTY[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
@@ -132,19 +134,20 @@ void RIG_IC7000::initialize()
 	cmd += '\x92';
 	cmd += '\x00';
 	cmd.append(post);
-	if (!waitFB("CI-V") && RigSerial->IsOpen()) {
-		flrig_abort = true;
-		return;
-	}
+	waitFB("CI-V");
+
 	cmd = pre_to;
 	cmd.append("\x16\x51");
 	cmd += '\x00';
 	cmd.append(post);
-	if (!waitFB("NF2 OFF") && RigSerial->IsOpen()) flrig_abort = true;
+	waitFB("NF2 OFF");
 }
 
 RIG_IC7000::RIG_IC7000() {
+
 	defaultCIV = 0x70;
+	adjustCIV(defaultCIV);
+
 	name_ = IC7000name_;
 	modes_ = IC7000modes_;
 	bandwidths_ = IC7000_SSB_CWwidths;
@@ -160,8 +163,6 @@ RIG_IC7000::RIG_IC7000() {
 	B.imode = 1;
 	B.iBW = 28;
 
-	adjustCIV(defaultCIV);
-
 	restore_mbw = false;
 
 	has_ifshift_control = false;
@@ -174,21 +175,21 @@ RIG_IC7000::RIG_IC7000() {
 	has_alc_control =
 	has_swr_control =
 	has_split =
-	has_auto_notch = 
-	has_power_control = 
-	has_volume_control = 
-	has_mode_control = 
-	has_bandwidth_control = 
-	has_micgain_control = 
-	has_notch_control = 
-	has_noise_control = 
-	has_noise_reduction_control = 
-	has_noise_reduction = 
-	has_attenuator_control = 
-	has_preamp_control = 
-	has_ptt_control = 
-	has_tune_control = 
-	has_rf_control = 
+	has_auto_notch =
+	has_power_control =
+	has_volume_control =
+	has_mode_control =
+	has_bandwidth_control =
+	has_micgain_control =
+	has_notch_control =
+	has_noise_control =
+	has_noise_reduction_control =
+	has_noise_reduction =
+	has_attenuator_control =
+	has_preamp_control =
+	has_ptt_control =
+	has_tune_control =
+	has_rf_control =
 	has_sql_control = true;
 
 	has_band_selection = true;
@@ -210,7 +211,7 @@ void RIG_IC7000::selectA()
 	cmd += '\x07';
 	cmd += '\x00';
 	cmd.append(post);
-	if (!waitFB("sel A") && RigSerial->IsOpen()) flrig_abort = true;
+	waitFB("sel A");
 }
 
 void RIG_IC7000::selectB()
@@ -219,7 +220,7 @@ void RIG_IC7000::selectB()
 	cmd += '\x07';
 	cmd += '\x01';
 	cmd.append(post);
-	if (!waitFB("sel B") && RigSerial->IsOpen()) flrig_abort = true;
+	waitFB("sel B");
 }
 
 bool RIG_IC7000::check ()
@@ -229,8 +230,9 @@ bool RIG_IC7000::check ()
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
+	get_trace(1, "check");
 	bool ok = waitFOR(11, "check vfo");
-	isett("check()");
+	igett("check()");
 	return ok;
 }
 
@@ -253,8 +255,7 @@ unsigned long int RIG_IC7000::get_vfoA ()
 			else
 				A.freq = fm_bcd_be(replystr.substr(p+5), 10);
 		}
-	} else if (RigSerial->IsOpen())
-		flrig_abort = true;
+	}
 	return A.freq;
 }
 
@@ -288,8 +289,7 @@ unsigned long int RIG_IC7000::get_vfoB ()
 			else
 				B.freq = fm_bcd_be(replystr.substr(p+5), 10);
 		}
-	} else if (RigSerial->IsOpen())
-		flrig_abort = true;
+	}
 	return B.freq;
 }
 
@@ -329,7 +329,7 @@ int RIG_IC7000::get_modeA()
 	cmd += '\x04';
 	cmd.append(post);
 	get_trace(1,"get mode A");
-	ret = waitFOR(8, "get mode A"); 
+	ret = waitFOR(8, "get mode A");
 	igett("");
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -341,8 +341,7 @@ int RIG_IC7000::get_modeA()
 				A.imode = md;
 			}
 		}
-	} else if (RigSerial->IsOpen())
-		flrig_abort = true;
+	}
 	return A.imode;
 }
 
@@ -383,9 +382,8 @@ int RIG_IC7000::get_modeB()
 				B.imode = md;
 			}
 		}
-	} else if (RigSerial->IsOpen())
-		flrig_abort = true;
-		
+	}
+
 	return B.imode;
 }
 
@@ -404,8 +402,7 @@ int  RIG_IC7000::get_bwA()
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			A.iBW = (fm_bcd(replystr.substr(p+6),2));
-	} else if (RigSerial->IsOpen())
-		flrig_abort = true;
+	}
 	return A.iBW;
 }
 
@@ -421,8 +418,7 @@ int  RIG_IC7000::get_bwB()
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
 			B.iBW = (fm_bcd(replystr.substr(p+6),2));
-	} else if (RigSerial->IsOpen())
-		flrig_abort = true;
+	}
 	return B.iBW;
 }
 
@@ -450,7 +446,6 @@ void RIG_IC7000::set_bwB(int val)
 
 int RIG_IC7000::adjust_bandwidth(int m)
 {
-	printf("icom/IC7000 Adjust Bandwidth called\n");
 	if (m == 3 || m == 6) { //CW
 		bandwidths_ = IC7000_SSB_CWwidths;
 		bw_vals_ = IC7000_bw_vals_SSB;
@@ -1194,27 +1189,25 @@ void RIG_IC7000::set_band_selection(int v)
 
 const char ** RIG_IC7000::bwtable(int m)
 {
-	printf("ic700 bwtable called\n");
-        const char **table;
-        switch (m) {
-                case AM7000: case AMD7000:
-                        table = IC7000_AMwidths;
-                        break;
-                case DV7000:
-                case FM7000: case WFM7000: case FMD7000:
-                        table = IC7000_SSB_CWwidths;    // To do correct this
-                        break;
-                case RTTY7000: case RTTYR7000:
-                        table = IC7000_RTTYwidths;
-                        break;
-                case CW7000: case CWR7000:
-                case USB7000: case LSB7000: case USBD7000: case LSBD7000:
-                        table = IC7000_SSB_CWwidths;
+	const char **table;
+	switch (m) {
+		case AM7000: case AMD7000:
+			table = IC7000_AMwidths;
 			break;
-                default:
-			printf("Mode <%d> unknown \n",m);
-                        table = IC7000_SSB_CWwidths;
+		case DV7000:
+		case FM7000: case WFM7000: case FMD7000:
+			table = IC7000_SSB_CWwidths;
 			break;
-        }
-        return table;
+		case RTTY7000: case RTTYR7000:
+			table = IC7000_RTTYwidths;
+			break;
+		case CW7000: case CWR7000:
+		case USB7000: case LSB7000: case USBD7000: case LSBD7000:
+			table = IC7000_SSB_CWwidths;
+			break;
+		default:
+			table = IC7000_SSB_CWwidths;
+			break;
+	}
+	return table;
 }

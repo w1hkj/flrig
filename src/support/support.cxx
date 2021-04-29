@@ -64,8 +64,6 @@ rigbase *selrig = rigs[0];
 extern bool test;
 void init_notch_control();
 
-bool flrig_abort = false;
-
 int freqval = 0;
 
 XCVR_STATE vfoA		= XCVR_STATE(14070000, 0, 0, UI);
@@ -5915,8 +5913,6 @@ void initRig()
 	update_progress(0);
 	Fl::check();
 
-	flrig_abort = false;
-
 	sldrRcvSignal->aging(progStatus.rx_peak);
 	sldrRcvSignal->avg(progStatus.rx_avg);
 	sldrFwdPwr->aging(progStatus.pwr_peak);
@@ -5975,7 +5971,6 @@ void initRig()
 		selrig->initialize();
 
 		if (!selrig->check()) goto failed;
-		if (flrig_abort) goto failed;
 
 		FreqDispA->set_precision(selrig->precision);
 		FreqDispA->set_ndigits(selrig->ndigits);
