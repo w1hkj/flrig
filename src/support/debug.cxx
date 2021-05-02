@@ -166,7 +166,6 @@ void debug::slog(level_e level, const char* func, const char* srcf, int line, co
 	if (progStatus.debugtrace) trace(1, sztemp);
 
 	fprintf(wfile, "[%s] %s", ztime(), sztemp);
-std::cout << "[" << ztime() << "] " << sztemp << std::endl;
 
 	va_end(args);
 

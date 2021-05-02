@@ -70,8 +70,6 @@ RIG_FT817BB::RIG_FT817BB() {
 
 }
 
-//#define TEST 1
-
 void RIG_FT817BB::init_cmd()
 {
 	cmd = "00000";
@@ -90,10 +88,6 @@ int ab = 0;
 
 int RIG_FT817BB::get_vfoAorB()
 {
-#ifdef TEST
-std::cout << "get_vfoAorB()" << std::endl;
-return ab;
-#endif
 	return replystr[0] & 0x01;
 	init_cmd();
 	cmd[1] = 0x55;
@@ -116,12 +110,6 @@ return ab;
 
 void RIG_FT817BB::selectA()
 {
-#ifdef TEST
-std::cout << "selectA()" << std::endl;
-ab = 0;
-return;
-#endif
-
 	if (get_vfoAorB() == 0) return;
 	if (ft817BB_memory_mode) return;
 	init_cmd();
@@ -138,11 +126,6 @@ return;
 
 void RIG_FT817BB::selectB()
 {
-#ifdef TEST
-std::cout << "selectB()" << std::endl;
-ab = 1;
-return;
-#endif
 	if (get_vfoAorB() == 1) return;
 	if (ft817BB_memory_mode) return;
 	init_cmd();
@@ -159,10 +142,6 @@ return;
 
 bool RIG_FT817BB::check ()
 {
-#ifdef TEST
-std::cout << "check()" << std::endl;
-return true;
-#endif
 	init_cmd();
 	cmd[4] = 0x03;
 	int ret = waitN(5, 100, "check");
@@ -173,10 +152,6 @@ return true;
 
 unsigned long int RIG_FT817BB::get_vfoA ()
 {
-#ifdef TEST
-std::cout << "get_vfoA()" << std::endl;
-return freqA;
-#endif
 	if (get_vfoAorB() != 0) return freqA;
 	if (ft817BB_memory_mode) return freqA;
 	init_cmd();
@@ -202,12 +177,6 @@ return freqA;
 
 void RIG_FT817BB::set_vfoA (unsigned long int freq)
 {
-#ifdef TEST
-std::cout << "set_vfoA(" << freq << ")" << std::endl;
-freqA = freq;
-return;
-#endif
-
 	if (get_vfoAorB() != 0) return;
 	if (ft817BB_memory_mode) return;
 	freqA = freq;
@@ -220,10 +189,6 @@ return;
 
 int RIG_FT817BB::get_modeA()
 {
-#ifdef TEST
-std::cout << "get_modeA()" << std::endl;
-return modeA;
-#endif
 	if (get_vfoAorB() != 0) return modeA;
 	if (ft817BB_memory_mode) return modeA;
 	init_cmd();
@@ -249,11 +214,6 @@ int RIG_FT817BB::get_modetype(int n)
 
 void RIG_FT817BB::set_modeA(int val)
 {
-#ifdef TEST
-std::cout << "set_modeA(" << val << ")" << std::endl;
-modeA = val;
-return;
-#endif
 	if (ft817BB_memory_mode) return;
 	if (get_vfoAorB() != 0) return;
 
@@ -267,11 +227,6 @@ return;
 // VFO B ===============================================================
 unsigned long int RIG_FT817BB::get_vfoB ()
 {
-#ifdef TEST
-std::cout << "get_vfoB()" << std::endl;
-return freqB;
-#endif
-
 	if (get_vfoAorB() != 1) return freqB;
 	if (ft817BB_memory_mode) return freqB;
 	init_cmd();
@@ -287,12 +242,6 @@ return freqB;
 
 void RIG_FT817BB::set_vfoB (unsigned long int freq)
 {
-std::cout << "set_vfoB(" << freq << ")" << std::endl;
-#ifdef TEST
-freqB = freq;
-return;
-#endif
-
 	if (get_vfoAorB() != 1) return;
 	if (ft817BB_memory_mode) return;
 	freqB = freq;
@@ -305,10 +254,6 @@ return;
 
 int RIG_FT817BB::get_modeB()
 {
-#ifdef TEST
-std::cout << "get_modeB()" << std::endl;
-return modeB;
-#endif
 	if (get_vfoAorB() != 1) return modeB;
 	if (ft817BB_memory_mode) return modeB;
 	init_cmd();
@@ -329,11 +274,6 @@ return modeB;
 
 void RIG_FT817BB::set_modeB(int val)
 {
-#ifdef TEST
-std::cout << "set_modeB(" << val << ")" << std::endl;
-modeB = val;
-return;
-#endif
 	int use = get_vfoAorB();
 	if (get_vfoAorB() != 1) return;
 	init_cmd();
@@ -348,11 +288,6 @@ return;
 // Tranceiver PTT on/off
 void RIG_FT817BB::set_PTT_control(int val)
 {
-#ifdef TEST
-std::cout << "set_PTT_control(" << val << ")" << std::endl;
-ptt_ = val;
-return;
-#endif
 	init_cmd();
 	if (val) cmd[4] = 0x08;
 	else	 cmd[4] = 0x88;
@@ -389,10 +324,6 @@ static int alc;
 
 int  RIG_FT817BB::get_power_out()
 {
-#ifdef TEST
-std::cout << "get_power_out()" << std::endl;
-return 25;
-#endif
 	init_cmd();
 	cmd[4] = 0xBD;
 	int ret = waitN(2, 100, "get PWR/SWR/ALC");
@@ -420,10 +351,6 @@ int  RIG_FT817BB::get_alc()
 
 int  RIG_FT817BB::get_smeter()
 {
-#ifdef TEST
-std::cout << "get_smeter()" << std::endl;
-return 30;
-#endif
 	init_cmd();
 	cmd[4] = 0xE7;
 	int ret = waitN(1, 100, "get smeter");
@@ -437,11 +364,6 @@ return 30;
 
 void RIG_FT817BB::set_split(bool val)
 {
-#ifdef TEST
-std::cout << "set_split(" << val << ")" << std::endl;
-split = val;
-return;
-#endif
 	init_cmd();
 	if (val) cmd[4] = 0x02;
 	else     cmd[4] = 0x82;
@@ -454,10 +376,6 @@ return;
 extern bool PTT;
 int  RIG_FT817BB::get_split()
 {
-#ifdef TEST
-std::cout << "get_split()" << std::endl;
-return split;
-#endif
 	if (!PTT) return split;
 	init_cmd();
 	cmd[4] = 0xF7; // get transmit status

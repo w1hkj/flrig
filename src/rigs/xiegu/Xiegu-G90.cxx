@@ -71,9 +71,9 @@ static void btn_label(void *p)
 	bpair *bp = (bpair *)p;
 	Fl_Button *b = (Fl_Button *)bp->widget;
 	const char *lbl = bp->lbl.c_str();
-	if (!bp) { std::cout << "invalid bpair" << std::endl; return; }
-	if (!b) { std::cout << "button not valid" << std::endl; return; }
-	if (!lbl) { std::cout << "invalid label" << std::endl; return; }
+	if (!bp) return;
+	if (!b) return;
+	if (!lbl) return;
 	b->label(lbl);
 	b->redraw();
 }

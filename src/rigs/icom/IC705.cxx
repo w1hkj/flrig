@@ -2119,22 +2119,12 @@ void RIG_IC705::get_band_selection(int v)
 	cmd += '\x01';
 	cmd.append( post );
 
-//replystr.clear();
-//for (int i = 0; i < 56; i++) replystr += bstack[i];
-//replystr[6] = to_bcd_be( v2, 2)[0];
-//for (int i = 0; i < 5; i++) replystr[i+8] = sfreq[v-1][i];
-//for (int i = 0; i < 24; i++) replystr[i+31] = reg_strings[i];
-
-//if (1) {
 	if (waitFOR(56, "get band stack")) {
-std::cout << "replystr (" << v << "): " << std::endl << str2hex(replystr.c_str(), replystr.length()) << std::endl;
 		set_trace(2, "get band stack", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(pre_fm);
 		if (p != string::npos) {
 			int bandfreq = fm_bcd_be(replystr.substr(p + 8, 5), 10);
-printf("freq:  %d\n", (int)bandfreq);
 			int bandmode = fm_bcd(replystr.substr(p + 13, 1) ,2);
-printf("bm:    %d\n", (int)bandmode);
 			int mode = 0;
 			for (int md = LSB705; md <= DV705; md++) {
 				if (replystr[p + 13] == IC705_mode_nbr[md]) {
@@ -2145,9 +2135,7 @@ printf("bm:    %d\n", (int)bandmode);
 				}
 			}
 			if (mode > DV705) mode = USB705;
-printf("mode:  %d, %s\n", mode, IC705modes_[mode]);
 			int bandfilter = replystr[p+14];
-printf("filt:  %d\n", bandfilter);
 			int tone = fm_bcd(replystr.substr(p + 18, 3), 6);
 			tTONE = 0;
 			for (size_t n = 0; n < sizeof(PL_tones) / sizeof(*PL_tones); n++) {
@@ -2156,7 +2144,6 @@ printf("filt:  %d\n", bandfilter);
 					break;
 				}
 			}
-printf("tTONE: %d\n", tTONE);
 			tone = fm_bcd(replystr.substr(p + 21, 3), 6);
 			rTONE = 0;
 			for (size_t n = 0; n < sizeof(PL_tones) / sizeof(*PL_tones); n++) {
@@ -2165,9 +2152,6 @@ printf("tTONE: %d\n", tTONE);
 					break;
 				}
 			}
-printf("rTONE: %d\n", rTONE);
-printf("call:  '%s'\n", replystr.substr(31,8).c_str());
-printf("mem:   '%s'\n", replystr.substr(39,16).c_str());
 			if (useB) {
 				set_vfoB(bandfreq);
 				set_modeB(mode);
@@ -2180,8 +2164,6 @@ printf("mem:   '%s'\n", replystr.substr(39,16).c_str());
 		}
 		return;
 	}
-std::cout << "get band selection failed:" << std::endl << str2hex(replystr.c_str(), replystr.length()) << std::endl;
-//	set_trace(2, "get band stack", str2hex(replystr.c_str(), replystr.length()));
 }
 
 void RIG_IC705::set_band_selection(int v)
@@ -2215,8 +2197,6 @@ void RIG_IC705::set_band_selection(int v)
 	cmd.append("        ");
 	cmd.append("                ");
 	cmd.append(post);
-
-std::cout << "cmd: " << std::endl << str2hex(cmd.c_str(), cmd.length()) << std::endl;
 
 	waitFB("set_band_selection");
 
