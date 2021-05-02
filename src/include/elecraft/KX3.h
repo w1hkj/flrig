@@ -25,7 +25,7 @@
 
 class RIG_KX3 : public rigbase {
 
-#define KX3_WAIT_TIME 800
+#define KX3_WAIT_TIME 1000
 
 public:
 	RIG_KX3();

@@ -62,6 +62,8 @@ Fl_Button*			btn_cleartrace = (Fl_Button*)0;
 
 vector<string> tracestrings;
 
+bool stdout_trace = false;
+
 static void cb_cleartrace(Fl_Button *, void *)
 {
 	tracedisplay->buffer()->text("");
@@ -120,6 +122,8 @@ void trace(int n, ...) // all args of type const char *
 	va_end(vl);
 	s << "\n";
 
+	if (stdout_trace) std::cout << s.str();
+
 	tracestrings.push_back(s.str());
 	Fl::awake(update_tracetext);
 }
@@ -143,6 +147,8 @@ void xml_trace(int n, ...) // all args of type const char *
 	va_end(vl);
 	s << "\n";
 
+	if (stdout_trace) std::cout << s.str();
+
 	tracestrings.push_back(s.str());
 	Fl::awake(update_tracetext);
 }
@@ -165,6 +171,8 @@ void rig_trace(int n, ...) // all args of type const char *
 		s << " " << va_arg(vl, const char *);
 	va_end(vl);
 	s << "\n";
+
+	if (stdout_trace) std::cout << s.str();
 
 	tracestrings.push_back(s.str());
 	Fl::awake(update_tracetext);
@@ -190,6 +198,8 @@ void set_trace(int n, ...) // all args of type const char *
 
 	if (!progStatus.settrace) return;
 
+	if (stdout_trace) std::cout << s.str();
+
 	tracestrings.push_back(s.str());
 	Fl::awake(update_tracetext);
 }
@@ -212,6 +222,8 @@ void get_trace(int n, ...) // all args of type const char *
 	s << "\n";
 
 	if (!progStatus.gettrace) return;
+
+	if (stdout_trace) std::cout << s.str();
 
 	tracestrings.push_back(s.str());
 	Fl::awake(update_tracetext);
@@ -275,6 +287,8 @@ void rpc_trace(int n, ...) // all args of type const char *
 	}
 
 	if (str[str.length()-1] != '\n') str += '\n';
+
+	if (stdout_trace) std::cout << s.str();
 
 	tracestrings.push_back(str);
 	Fl::awake(update_tracetext);

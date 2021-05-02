@@ -18,6 +18,9 @@
 // aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
+#include <iostream>
+#include <strstream>
+
 #include "rigbase.h"
 #include "util.h"
 #include "debug.h"
@@ -401,12 +404,22 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 
 }
 
+static char szt[100];
+
 int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 {
 	guard_lock reply_lock(&mutex_replystr);
 
 	string wait_str = " ";
 	wait_str[0] = ch;
+
+snprintf(szt, sizeof(szt), "wait_char( %s, %d, %d, %s, %d )",
+		wait_str.c_str(),
+		(int)n,
+		timeout,
+		sz,
+		pr);
+get_trace(1, szt);
 
 	int delay =  (n + cmd.length()) * 11000.0 / RigSerial->Baud();
 	int retnbr = 0;
@@ -426,25 +439,37 @@ int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 		return 0;
 	}
 
+get_trace(1, "RigSerial->FlushBuffer()");
 	RigSerial->FlushBuffer();
+
+snprintf(szt, sizeof(szt), "WriteBuffer( %s, %d )", cmd.c_str(), (int)cmd.length());
+get_trace(1, szt);
 	RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
-		MilliSleep(delay);
+
+snprintf(szt, sizeof(szt), "MilliSleep( %d msec)", delay );
+get_trace(1, szt);
+	MilliSleep(delay);
 
 	size_t tout1 = todmsec();
 	size_t tout2 = tout1;
 	std::string tempstr;
 	int nret;
-	size_t tdiff = timeout;
+	int tdiff = timeout;
+snprintf(szt, sizeof(szt), "tdiff: %d", tdiff);
+get_trace(1, szt);
 	while (tdiff > 0) {
 		tempstr.clear();
-		nret = RigSerial->ReadBuffer(tempstr, n, wait_str);
+		nret = RigSerial->ReadBuffer(tempstr, n - retnbr, wait_str);
 		replystr.append(tempstr);
 		retnbr += nret;
+
+snprintf(szt, sizeof(szt), "tdiff: [%d] %s", tdiff, replystr.c_str());
+get_trace(1, szt);
 		if (replystr.find(wait_str) != std::string::npos)
 			break;
 		tout2 = todmsec();
 		if (tout2 < tout1) { // 24 hr roll over
-			tout2 += 24 * 60 * 60 * 1000;
+			tout2 += 60 * 60 * 60 * 1000;
 		}
 		tdiff = timeout - (tout2 - tout1);
 	}

@@ -123,9 +123,15 @@ int  RIG_KX3::def_bandwidth(int m)
 	return def_mode_width[m];
 }
 
+static int isok = false;
+extern bool stdout_trace;
+
 void RIG_KX3::initialize()
 {
-	debug::level = debug::INFO_LEVEL;
+	debug::level = debug::DEBUG_LEVEL;
+	progStatus.gettrace = 1;
+	progStatus.settrace = 1;
+	stdout_trace = true;
 
 	LOG_INFO("KX3");
 	k3_widgets[0].W = btnVol;
@@ -151,12 +157,14 @@ void RIG_KX3::initialize()
 	showresp(INFO, ASC, "KX3 extended mode", cmd, replystr);
 
 	get_vfoA();
-	get_modeA();
-	get_bwA();
+	if (isok) {
+		get_modeA();
+		get_bwA();
 
-	get_vfoB();
-	get_modeB();
-	get_bwB();
+		get_vfoB();
+		get_modeB();
+		get_bwB();
+	}
 
 	set_split(false); // normal ops
 
@@ -169,13 +177,21 @@ void RIG_KX3::shutdown()
 bool RIG_KX3::check ()
 {
 	cmd = "FA;";
+	get_trace(1, "check read vfoA");
 
-	get_trace(1, "vfo check");
-	int ret = wait_char(';', 14, 2000, "check", ASC);
+	int ret = 0, wait = 5;
+
+	while ( (ret = wait_char(';', 14, 100, "check read vfoA", ASC) < 14) && wait > 0) {
+		cmd = "FA;";
+		wait--;
+	}
+
 	gett("");
+	isok = true;
+	if (ret < 14) isok = false;
 
-	if (ret < 14) return false;
-	return true;
+	return isok;
+
 }
 
 unsigned long int RIG_KX3::get_vfoA ()
@@ -187,6 +203,7 @@ unsigned long int RIG_KX3::get_vfoA ()
 	gett("");
 
 	if (ret < 14) return freqA;
+
 	size_t p = replystr.rfind("FA");
 	if (p == string::npos) return freqA;
 
@@ -194,6 +211,8 @@ unsigned long int RIG_KX3::get_vfoA ()
 	for (size_t n = 2; n < 13; n++)
 		f = f*10 + replystr[p + n] - '0';
 	freqA = f;
+	isok = true;
+
 	return freqA;
 }
 

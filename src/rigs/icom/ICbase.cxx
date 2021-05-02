@@ -157,7 +157,7 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz, unsigned long timeout)
 
 			tout2 = todmsec();
 			if (tout2 < tout1) { // 24 hr roll over
-				tout2 += 24 * 60 * 60 * 1000;
+				tout2 += 60 * 60 * 60 * 1000;
 			}
 			tdiff = timeout - (tout2 - tout1);
 		}
