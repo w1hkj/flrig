@@ -48,45 +48,26 @@
 
 using namespace std;
 
-static unsigned int _zmsec = 0;
-static unsigned int _zsec = 0;
-static unsigned int _zmin = 0;
-static unsigned int _zhr = 0;
-static struct tm tim;
-static time_t t_temp;
-static struct timeval tv;
-
-void ztimer()
+size_t zmsec()
 {
+	static struct timeval tv;
 	gettimeofday(&tv, NULL);
-
-	t_temp=(time_t)tv.tv_sec;
-	gmtime_r(&t_temp, &tim);
-
-	_zmsec = tv.tv_usec / 1000;
-	_zsec = tim.tm_sec;
-	_zmin = tim.tm_min;
-	_zhr  = tim.tm_hour;
+	return (tv.tv_sec * 1000L + (tv.tv_usec / 1000L));
 }
 
-size_t todmsec()
-{
-	ztimer();
-	return (((((_zhr * 60) + _zmin) * 60) + _zsec) * 1000 + _zmsec);
-}
-
-unsigned long zmsec(void)
-{
-	ztimer();
-	return _zmsec + tv.tv_sec * 1000;
-}
-
-char exttime[13];
 char *ztime()
 {
-	ztimer();
+	static char exttime[13];
+
+	static struct tm tim;
+	static struct timeval tv;
+
+	gettimeofday(&tv, NULL);
+	gmtime_r(&tv.tv_sec, &tim);
+
 	snprintf(exttime, sizeof(exttime),
 		"%02d:%02d:%02d.%03d",
-		_zhr, _zmin, _zsec, _zmsec);
+		tim.tm_hour, tim.tm_min, tim.tm_sec, (int)(tv.tv_usec / 1000L) );
+
 	return exttime;
 }

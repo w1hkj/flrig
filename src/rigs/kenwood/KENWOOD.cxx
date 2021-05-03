@@ -220,7 +220,7 @@ void KENWOOD::set_vfoB (unsigned long int freq)
 
 size_t KENWOOD::check_ifstr()
 {
-	size_t now = todmsec();
+	size_t now = zmsec();
 	if ((lastmsec == 0) || now < lastmsec || (now - lastmsec) > 200) {
 		lastmsec = now;
 		cmd = "IF;";

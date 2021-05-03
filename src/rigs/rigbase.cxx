@@ -450,7 +450,7 @@ snprintf(szt, sizeof(szt), "MilliSleep( %d msec)", delay );
 get_trace(1, szt);
 	MilliSleep(delay);
 
-	size_t tout1 = todmsec();
+	size_t tout1 = zmsec();//todmsec();
 	size_t tout2 = tout1;
 	std::string tempstr;
 	int nret;
@@ -467,10 +467,8 @@ snprintf(szt, sizeof(szt), "tdiff: [%d] %s", tdiff, replystr.c_str());
 get_trace(1, szt);
 		if (replystr.find(wait_str) != std::string::npos)
 			break;
-		tout2 = todmsec();
-		if (tout2 < tout1) { // 24 hr roll over
-			tout2 += 60 * 60 * 60 * 1000;
-		}
+		tout2 = zmsec();//todmsec();
+		if (tout2 < tout1) tout1 = tout2;
 		tdiff = timeout - (tout2 - tout1);
 	}
 

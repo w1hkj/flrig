@@ -138,7 +138,7 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz, unsigned long timeout)
 		RigSerial->FlushBuffer();
 		RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
 
-		size_t tout1 = todmsec();
+		size_t tout1 = zmsec();
 		size_t tout2 = tout1;
 		std::string tempstr;
 		int nret;
@@ -155,10 +155,8 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz, unsigned long timeout)
 				replystr.rfind(eor) != std::string::npos)
 				return true;
 
-			tout2 = todmsec();
-			if (tout2 < tout1) { // 24 hr roll over
-				tout2 += 60 * 60 * 60 * 1000;
-			}
+			tout2 = zmsec();
+			if (tout2 < tout1) tout1 = tout2;
 			tdiff = timeout - (tout2 - tout1);
 		}
 
