@@ -686,8 +686,7 @@ void read_att()
 // split
 void update_split(void *d)
 {
-	/*
-	if (xcvr_name == rig_yaesu.name_ || xcvr_name == rig_FTdx1200.name_ ||
+	if (xcvr_name == rig_FTdx1200.name_ ||
 		xcvr_name == rig_TS480SAT.name_ || xcvr_name == rig_TS480HX.name_ ||
 		xcvr_name == rig_TS590S.name_ || xcvr_name == rig_TS590SG.name_ ||
 		xcvr_name == rig_TS890S.name_ ||
@@ -698,11 +697,11 @@ void update_split(void *d)
 					highlight_vfo(NULL);
 					break;
 			case 1: btnSplit->value(1);
-					useB = true;
+					useB = false;
 					highlight_vfo(NULL);
 					break;
 			case 2:	btnSplit->value(1);
-					useB = false;
+					useB = true;
 					highlight_vfo(NULL);
 					break;
 			case 3: btnSplit->value(0);
@@ -710,10 +709,8 @@ void update_split(void *d)
 					highlight_vfo(NULL);
 					break;
 		}
-	} else
-*/
-		btnSplit->value(progStatus.split);
-		btnSplit->redraw();
+	}
+	btnSplit->redraw();
 }
 
 void read_split()

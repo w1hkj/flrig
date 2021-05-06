@@ -1004,7 +1004,6 @@ void RIG_TS480SAT::get_rf_min_max_step(int &min, int &max, int &step)
 	min = 0; max = 100; step = 1;
 }
 
-/*
 void RIG_TS480SAT::selectA()
 {
 	cmd = "FR0;FT0;";
@@ -1070,9 +1069,13 @@ int RIG_TS480SAT::get_split()
 		p = replystr.rfind(rsp);
 		if (p == string::npos) return split;
 		rx = replystr[p+2];
-// split test
-		split = (tx == '1' ? 2 : 0) + (rx == '1' ? 1 : 0);
 	}
+
+// split test
+	if (tx == '0' && rx == '0') split = 0;
+	else if (tx == '1' && rx == '0') split = 1;
+	else if (tx == '0' && rx == '1') split = 2;
+	else if (tx == '1' && rx == '1') split = 3;
 
 	return split;
 }
@@ -1216,4 +1219,4 @@ void RIG_TS480SAT::tune_rig()
 	sendCommand(cmd);
 }
 
-*/
+

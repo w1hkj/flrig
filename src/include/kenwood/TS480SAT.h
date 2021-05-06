@@ -41,18 +41,18 @@ public:
 
 	void check_menu_45();
 
-//	unsigned long int get_vfoA();
-//	void set_vfoA(unsigned long int);
-//	unsigned long int get_vfoB();
-//	void set_vfoB(unsigned long int);
+	unsigned long int get_vfoA();
+	void set_vfoA(unsigned long int);
+	unsigned long int get_vfoB();
+	void set_vfoB(unsigned long int);
 
-//	void selectA();
-//	void selectB();
+	void selectA();
+	void selectB();
 
-//	void set_split(bool val);
-//	bool can_split();
-//	int  get_split();
-//	bool twovfos() {return true;}
+	void set_split(bool val);
+	bool can_split();
+	int  get_split();
+	bool twovfos() {return true;}
 
 	void set_PTT_control(int val);
 	int  get_PTT();
@@ -67,14 +67,14 @@ public:
 	int  get_swr();
 	int  get_alc();
 	int  get_power_out();
-//	void tune_rig();
+	void tune_rig();
 
 	void set_bwA(int val);
 	int  get_bwA();
 	void set_bwB(int val);
 	int  get_bwB();
-//	void set_volume_control(int val);
-//	int  get_volume_control();
+	void set_volume_control(int val);
+	int  get_volume_control();
 	void set_power_control(double val);
 	int  get_power_control();
 	void get_pc_min_max_step(double &min, double &max, double &step) {
@@ -87,13 +87,13 @@ public:
 	void set_noise(bool b);
 	int  get_noise();
 
-//	void set_mic_gain(int val);
-//	int  get_mic_gain();
-//	void get_mic_min_max_step(int &min, int &max, int &step);
+	void set_mic_gain(int val);
+	int  get_mic_gain();
+	void get_mic_min_max_step(int &min, int &max, int &step);
 
-//	void set_squelch(int val);
-//	int  get_squelch();
-//	void get_squelch_min_max_step(int &min, int &max, int &step);
+	void set_squelch(int val);
+	int  get_squelch();
+	void get_squelch_min_max_step(int &min, int &max, int &step);
 
 	void set_rf_gain(int val);
 	int  get_rf_gain();
