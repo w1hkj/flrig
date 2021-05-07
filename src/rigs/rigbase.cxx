@@ -439,7 +439,6 @@ get_trace(1, szt);
 		return 0;
 	}
 
-get_trace(1, "RigSerial->FlushBuffer()");
 	RigSerial->FlushBuffer();
 
 snprintf(szt, sizeof(szt), "WriteBuffer( %s, %d )", cmd.c_str(), (int)cmd.length());

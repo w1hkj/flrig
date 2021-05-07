@@ -8,6 +8,7 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
+
 //
 // flrig is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,6 +21,7 @@
 
 #include <string>
 #include <iostream>
+#include <errno.h>
 
 #include "serial.h"
 #include "debug.h"
@@ -28,9 +30,7 @@
 
 LOG_FILE_SOURCE(debug::LOG_RIGCONTROL);
 
-#if SERIAL_DEBUG
-FILE *serlog = 0;
-#endif
+char traceinfo[500];
 
 #ifndef __WIN32__
 #include <cstdio>
@@ -89,11 +89,16 @@ bool Cserial::CheckPort(string dev)  {
 bool Cserial::OpenPort()  {
 
 	if (IsOpen()) ClosePort();
-	if ((fd = open( device.c_str(), O_RDWR | O_NOCTTY | O_NDELAY )) < 0)
+	if ((fd = open( device.c_str(), O_RDWR | O_NOCTTY | O_NDELAY )) < 0) {
+		ser_trace(1, "OpenPort() FAILED");
 		return false;
-#if SERIAL_DEBUG
-	fprintf(serlog,"%s opened\n", device.c_str());
-#endif
+	}
+
+	if (progStatus.serialtrace) {
+		snprintf(traceinfo, sizeof(traceinfo),"%s opened", device.c_str());
+		ser_trace(1, traceinfo);
+	}
+
 // save current port settings
 	tcflush (fd, TCIFLUSH);
 
@@ -134,34 +139,41 @@ bool Cserial::OpenPort()  {
 	switch(baud) {
 		case 300:
 			speed = B300;
+			timeout = 1024;
 			break;
 		case 1200:
 			speed = B1200;
+			timeout = 512;
 			break;
 		case 2400:
 			speed = B2400;
+			timeout = 256;
 			break;
 		case 4800:
 			speed = B4800;
+			timeout = 128;
 			break;
+		default:
 		case 9600:
 			speed = B9600;
+			timeout = 64;
 			break;
 		case 19200:
 			speed = B19200;
+			timeout = 32;
 			break;
 		case 38400:
 			speed = B38400;
+			timeout = 16;
 			break;
 		case 57600:
 			speed = B57600;
+			timeout = 8;
 			break;
 		case 115200:
 			speed = B115200;
-			timeout = 2;
+			timeout = 4;
 			break;
-		default:
-			speed = B1200;
 	}
 	cfsetispeed(&newtio, speed);
 	cfsetospeed(&newtio, speed);
@@ -211,12 +223,14 @@ bool Cserial::getPTT() {
 void Cserial::SetPTT(bool ON)
 {
 	if (fd < 0) {
-#if SERIAL_DEBUG
-	fprintf(serlog, "ptt fd < 0\n");
-#endif
-	  LOG_ERROR("ptt fd < 0");
+		if (progStatus.serialtrace) {
+			snprintf(traceinfo, sizeof(traceinfo), "SetPTT(...) fd < 0");
+			ser_trace(1, traceinfo);
+		}
+		LOG_ERROR("ptt fd < 0");
 		return;
 	}
+
 	if (dtrptt || rtsptt) {
 		ioctl(fd, TIOCMGET, &status);
 		if (ON) {								  // ptt enabled
@@ -236,14 +250,14 @@ void Cserial::SetPTT(bool ON)
 		}
 		LOG_INFO("PTT %d, DTRptt %d, DTR %d, RTSptt %d, RTS %d, RTSCTS %d, status %2X",
 			  ON, dtrptt, dtr, rtsptt, rts, rtscts, status);
-#if SERIAL_DEBUG
-		fprintf(serlog,"PTT %d, DTRptt %d, DTR %d, RTSptt %d, RTS %d, RTSCTS %d, status %2X\n",
-			  ON, dtrptt, dtr, rtsptt, rts, rtscts, status);
-#endif
+		if (progStatus.serialtrace) {
+			snprintf(traceinfo, sizeof(traceinfo),"PTT %d, DTRptt %d, DTR %d, RTSptt %d, RTS %d, RTSCTS %d, status %2X",
+				ON, dtrptt, dtr, rtsptt, rts, rtscts, status);
+			ser_trace(1, traceinfo);
+		}
 		ioctl(fd, TIOCMSET, &status);
 	}
 	serptt = ON;
-//	LOG_DEBUG("No ptt specified");
 }
 
 void Cserial::setRTS(bool b)
@@ -314,9 +328,16 @@ bool  Cserial::IOselect ()
 	FD_SET (fd, &rfds);
 	tv.tv_sec = timeout/1000;
 	tv.tv_usec = (timeout % 1000) * 1000;
+
+static char IOsel[100];
+	snprintf(IOsel, sizeof(IOsel), "select( ..., %d msec)", timeout);
+	ser_trace(1, IOsel);
+
 	retval = select (FD_SETSIZE, &rfds, (fd_set *)0, (fd_set *)0, &tv);
-	if (retval <= 0) // no response from serial port or error returned
+
+	if (retval <= 0) { // no response from serial port or error returned
 		return false;
+	}
 	return true;
 }
 
@@ -329,42 +350,92 @@ bool  Cserial::IOselect ()
 ///////////////////////////////////////////////////////
 int  Cserial::ReadBuffer (std::string &buf, int nchars, std::string find1, std::string find2)
 {
-	if (fd < 0) return 0;
+	if (fd < 0) {
+ser_trace(1, "ReadBuffer(...) fd < 0");
+		return 0;
+	}
+
 	int retnum, nread = 0;
 	char tempbuf[nchars + 1];
-
 	int tries = 0;
+	bool hex = false;
+	std::string s1, s2;
+
+	if (find1.length()) {
+		if (find1.find('\xFE') != std::string::npos) {
+			hex = true;
+			s1 = str2hex(find1.c_str(), find1.length());
+		} else
+			s1 = find1;
+	}
+	if (find2.length()) {
+		if (find2.find('\xFD') != std::string::npos) {
+			hex = true;
+			s2 = str2hex(find2.c_str(), find2.length());
+		} else
+			s2 = find2;
+	}
+
 	while (1) {
-		while (!IOselect()) {  // wait up to 50 msec for IOselect
+		while (!IOselect()) {  // retry IOselect() 10 times with timeout msec
 			if (++tries == 10) {
+				if (progStatus.serialtrace) {
+					snprintf(traceinfo, sizeof(traceinfo), "!IOselect() err[%d] = %s",
+					errno,
+					(errno == EBADF ? "invalid file descriptor" :
+					 errno == EINTR ? "signal was caught" :
+					 errno == EINVAL ? "nfds is negative, or timeout is invalid" :
+					 errno == ENOMEM ? "unable to allocate memory" : "unknown error")
+					);
+					set_trace(1, traceinfo);
+				}
 				return 0;
 			}
-			MilliSleep(5);
 		}
 
 		memset(tempbuf, 0, nchars + 1);
 		retnum = read (fd, tempbuf, nchars);
 
 		if (retnum < 0) {
+			if (progStatus.serialtrace) {
+				snprintf(traceinfo, sizeof(traceinfo), "retnum < 0");
+				ser_trace(1, traceinfo);
+			}
 			return 0;
 		}
 		if (retnum > 0) {
 			buf.append(tempbuf, retnum);
 			nread += retnum;
 		}
-		if (retnum == 0 || nread >= nchars) {
-			return nread;
-		}
 
 		if (find1.length() && find2.length()) {
 			if (buf.rfind(find1) != std::string::npos &&
-				buf.rfind(find2) != std::string::npos)
-				return nread;
-		} else if (find1.length()) {
-			if (buf.rfind(find1) != std::string::npos) {
+				buf.rfind(find2) != std::string::npos) {
+					if (progStatus.serialtrace) {
+						snprintf(traceinfo, sizeof(traceinfo), "s1/s2: %s",
+							(hex ? str2hex(buf.c_str(), buf.length()) : buf.c_str()) );
+						ser_trace(1, traceinfo);
+					}
 				return nread;
 			}
+		} else if (find1.length()) {
+			if (buf.rfind(find1) != std::string::npos) {
+				if (progStatus.serialtrace) {
+					snprintf(traceinfo, sizeof(traceinfo), "s1   : %s",
+						(hex ? str2hex(buf.c_str(), buf.length()) : buf.c_str()) );
+					ser_trace(1, traceinfo);
+				}
+				return nread;
+			}
+		} else if (retnum == 0 || nread >= nchars) {
+			if (progStatus.serialtrace) {
+				snprintf(traceinfo, sizeof(traceinfo), "%5d: %s", nread, 
+					(hex ? str2hex(buf.c_str(), buf.length()) : buf.c_str()) );
+				ser_trace(1, traceinfo);;
+			}
+			return nread;
 		}
+
 	}
 
 	return nread;
@@ -378,7 +449,10 @@ int  Cserial::ReadBuffer (std::string &buf, int nchars, std::string find1, std::
 ///////////////////////////////////////////////////////
 int Cserial::WriteBuffer(const char *buff, int n)
 {
-	if (fd < 0) return 0;
+	if (fd < 0) {
+ser_trace(1, "WriteBuffer(...) fd < 0");
+		return 0;
+	}
 	int ret = write (fd, buff, n);
 	return ret;
 }
@@ -466,14 +540,25 @@ bool Cserial::OpenPort()
 			  0,
 			  0);
 
-LOG_ERROR("Open Comm port %s ; hComm = %d", COMportname.c_str(), (int)hComm);
-#if SERIAL_DEBUG
-//	fl_alert("Open Comm port %s ; hComm = %d", COMportname.c_str(), (int)hComm);
-	fprintf(serlog, "INVALID_HANDLE_VALUE: %d\n", (int)INVALID_HANDLE_VALUE);
-	fprintf(serlog, "Open Comm port %s ; hComm = %d\n", COMportname.c_str(), (int)hComm);
-#endif
+	if (hComm == INVALID_HANDLE_VALUE) {
+		LOG_ERROR("Open Comm port %s ; hComm = %d", COMportname.c_str(), (int)hComm);
 
-	if (hComm == INVALID_HANDLE_VALUE) return false;
+		if (progStatus.serialtrace) {
+			snprintf(traceinfo, sizeof(traceinfo), 
+				"INVALID_HANDLE_VALUE: Open Comm port %s ; hComm = %d\n", 
+				COMportname.c_str(), (int)hComm);
+			ser_trace(1, traceinfo);
+		}
+
+		return false;
+	}
+
+	if (progStatus.serialtrace) {
+		snprintf(traceinfo, sizeof(traceinfo), 
+			"Open Comm port %s ; hComm = %d\n", 
+			COMportname.c_str(), (int)hComm);
+		ser_trace(1, traceinfo);
+		}
 
 	ConfigurePort( baud, 8, false, NOPARITY, stopbits);
 	FlushBuffer();
@@ -549,9 +634,6 @@ static  DWORD dwBytesTxD=0;
 	return false;
 }
 
-#if SERIAL_DEBUG
-int lines_written = 0;
-
 int  Cserial::ReadBuffer (std::string &buf, int nchars, std::string find1, std::string find2)
 {
 	bool hex = false;
@@ -569,9 +651,9 @@ int  Cserial::ReadBuffer (std::string &buf, int nchars, std::string find1, std::
 	}
 
 	if (hComm == INVALID_HANDLE_VALUE) {
-		if (lines_written < 1000) {
-			fprintf(serlog, "ReadBuffer, invalid handle\n");
-			lines_written++;
+		if (progStatus.serialtrace) {
+			snprintf(traceinfo, sizeof(traceinfo), "ReadBuffer, invalid handle\n");
+			ser_trace(1, traceinfo);
 		}
 		return 0;
 	}
@@ -585,16 +667,16 @@ int  Cserial::ReadBuffer (std::string &buf, int nchars, std::string find1, std::
 		tempchar[0] = tempchar[1] = 0;
 		retval = ReadFile(hComm, &tempchar[0], 1, &dwRead, NULL);
 		if (retval == 0) {
-			if (lines_written < 1000) {
-				fprintf(serlog, "retval == 0\n");
-				lines_written++;
+			if (progStatus.serialtrace) {
+				snprintf(traceinfo, sizeof(traceinfo), "retval == 0\n");
+				ser_trace(1, traceinfo);
 			}
 			return nread;
 		}
 		if (dwRead == 0) {
-			if (lines_written < 1000) {
-				fprintf(serlog, "ReadFile dwRead: %ld\n", dwRead);
-				lines_written++;
+			if (progStatus.serialtrace) {
+				snprintf(traceinfo, sizeof(traceinfo), "ReadFile dwRead: %ld\n", dwRead);
+				ser_trace(1, traceinfo);
 			}
 			return nread;
 		}
@@ -603,12 +685,10 @@ int  Cserial::ReadBuffer (std::string &buf, int nchars, std::string find1, std::
 		nread++;
 
 		if (nread >= nchars) {
-			if (lines_written < 1000) {
-				if (hex)
-					fprintf(serlog, "ReadBuffer(%d): %s\n", nchars, str2hex(buf.c_str(), buf.length()));
-				else
-					fprintf(serlog, "ReadBuffer(%d): %s\n", nchars, buf.c_str());
-				lines_written++;
+			if (progStatus.serialtrace) {
+				snprintf(traceinfo, sizeof(traceinfo), "ReadBuffer(%d): %s\n", nchars,
+					(hex ? str2hex(buf.c_str(), buf.length()) : buf.c_str() ) );
+				ser_trace(1, traceinfo);
 			}
 			return nread;
 		}
@@ -619,91 +699,32 @@ int  Cserial::ReadBuffer (std::string &buf, int nchars, std::string find1, std::
 			if (p1 != std::string::npos &&
 				p2 != std::string::npos &&
 				p2 > p1) {
-					if (lines_written < 1000) {
-						if (hex)
-							fprintf(serlog, "ReadBuffer find 2: (%d): %s\n", nchars, str2hex(buf.c_str(), buf.length()));
-						else
-							fprintf(serlog, "ReadBuffer find 2: (%d): %s\n", nchars, buf.c_str());
-						lines_written++;
-					}
+				if (progStatus.serialtrace) {
+					snprintf(traceinfo, sizeof(traceinfo), "ReadBuffer find 2: (%d): %s\n", nchars, 
+						(hex ? str2hex(buf.c_str(), buf.length()) : buf.c_str()));
+					ser_trace(1, traceinfo);
+				}
 				return nread;
 			}
 		} else if (find1.length()) {
 			if (buf.rfind(find1) != std::string::npos) {
-				if (lines_written < 1000) {
-					if (hex)
-						fprintf(serlog, "ReadBuffer find 1: (%d): %s\n", nchars, str2hex(buf.c_str(), buf.length()));
-					else
-						fprintf(serlog, "ReadBuffer find 1: (%d): %s\n", nchars, buf.c_str());
-					lines_written++;
+				if (progStatus.serialtrace) {
+					snprintf(traceinfo, sizeof(traceinfo), "ReadBuffer find 1: (%d): %s\n", nchars, 
+						(hex ? str2hex(buf.c_str(), buf.length()) : buf.c_str()) );
+					ser_trace(1, traceinfo);
 				}
 				return nread;
 			}
 		}
 	}
 
-	if (lines_written < 1000) {
-		if (hex)
-			fprintf(serlog, "ReadBuffer: (%d): %s\n", nchars, str2hex(buf.c_str(), buf.length()));
-		else
-			fprintf(serlog, "ReadBuffer: (%d): %s\n", nchars, buf.c_str());
-		lines_written++;
+	if (progStatus.serialtrace) {
+		snprintf(traceinfo, sizeof(traceinfo), "ReadBuffer: (%d): %s\n", nchars, 
+			(hex ? str2hex(buf.c_str(), buf.length()) : buf.c_str()) );
+		ser_trace(1, traceinfo);
 	}
-
 	return nread;
 }
-
-#else
-
-int  Cserial::ReadBuffer (std::string &buf, int nchars, std::string find1, std::string find2)
-{
-	bool hex = false;
-
-	if (hComm == INVALID_HANDLE_VALUE) {
-		return 0;
-	}
-
-	DWORD dwRead = 0;
-	int nread = 0;
-	int retval = 0;
-	static char tempchar[2];
-
-	while (1) {
-		tempchar[0] = tempchar[1] = 0;
-		retval = ReadFile(hComm, &tempchar[0], 1, &dwRead, NULL);
-		if (retval == 0) {
-			return nread;
-		}
-		if (dwRead == 0) {
-			return nread;
-		}
-
-		buf += tempchar[0];
-		nread++;
-
-		if (nread >= nchars) {
-			return nread;
-		}
-
-		if (find1.length() && find2.length()) {
-			size_t p1 = buf.rfind(find1);
-			size_t p2 = buf.rfind(find2);
-			if (p1 != std::string::npos &&
-				p2 != std::string::npos &&
-				p2 > p1) {
-				return nread;
-			}
-		} else if (find1.length()) {
-			if (buf.rfind(find1) != std::string::npos) {
-				return nread;
-			}
-		}
-	}
-
-	return nread;
-}
-
-#endif
 
 void Cserial::FlushBuffer()
 {
@@ -743,9 +764,10 @@ int Cserial::WriteBuffer(const char *buff, int n)
 
 	WriteFile (hComm, buff, n, &nBytesWritten, NULL);
 
-#if SERIAL_DEBUG
-	fprintf(serlog, "WriteBuffer: %s\n", str2hex(buff, n));
-#endif
+	if (progStatus.serialtrace) {
+		snprintf(traceinfo, sizeof(traceinfo), "WriteBuffer: %s\n", str2hex(buff, n));
+		ser_trace(1, traceinfo);
+	}
 
 	return nBytesWritten;
 }
@@ -783,19 +805,21 @@ Write Total Timeout Multiplier...... %ld",
 	CommTimeoutsSaved.ReadTotalTimeoutConstant,
 	CommTimeoutsSaved.WriteTotalTimeoutConstant,
 	CommTimeoutsSaved.WriteTotalTimeoutMultiplier);
-#if SERIAL_DEBUG
-	fprintf(serlog, "\
+
+	if (progStatus.serialtrace) {
+		snprintf(traceinfo, sizeof(traceinfo), "\
 Read Interval Timeout............... %ld\n\
 Read Total Timeout Multiplier....... %ld\n\
 Read Total Timeout Constant Timeout. %ld\n\
 Write Total Timeout Constant........ %ld\n\
 Write Total Timeout Multiplier...... %ld\n",
-	CommTimeoutsSaved.ReadIntervalTimeout,
-	CommTimeoutsSaved.ReadTotalTimeoutMultiplier,
-	CommTimeoutsSaved.ReadTotalTimeoutConstant,
-	CommTimeoutsSaved.WriteTotalTimeoutConstant,
-	CommTimeoutsSaved.WriteTotalTimeoutMultiplier);
-#endif
+		CommTimeoutsSaved.ReadIntervalTimeout,
+		CommTimeoutsSaved.ReadTotalTimeoutMultiplier,
+		CommTimeoutsSaved.ReadTotalTimeoutConstant,
+		CommTimeoutsSaved.WriteTotalTimeoutConstant,
+		CommTimeoutsSaved.WriteTotalTimeoutMultiplier);
+		ser_trace(1, traceinfo);
+	}
 
 	CommTimeouts.ReadIntervalTimeout = ReadIntervalTimeout;
 	CommTimeouts.ReadTotalTimeoutMultiplier = ReadTotalTimeoutMultiplier;
@@ -922,56 +946,16 @@ bool Cserial::ConfigurePort(
 
 	if((bPortReady = GetCommState(hComm, &dcb)) == 0) {
 	  LOG_ERROR("GetCommState Error on %s", device.c_str());
-#if SERIAL_DEBUG
-//	fl_alert("GetCommState Error on %s", device.c_str());
-	fprintf(serlog, "GetCommState Error on %s\n", device.c_str());
-#endif
+
+		if (progStatus.serialtrace) {
+			snprintf(traceinfo, sizeof(traceinfo), "GetCommState Error on %s\n", device.c_str());
+			ser_trace(1, traceinfo);
+		}
+
 		CloseHandle(hComm);
 		return false;
 	}
-/*
-#if SERIAL_DEBUG
-	fprintf(serlog, "\
-\n\
-Get Comm State:\n\
-DCB.DCBlength       %d\n\
-DCB.Baudrate        %d\n\
-DCB.ByteSize        %d\n\
-DCB.Parity          %d\n\
-DCB.StopBits        %d\n\
-DCB.Binary          %d\n\
-DCB.fDtrControl     %d\n\
-DCB.fRtsControl     %d\n\
-DCB.fDsrSensitivity %d\n\
-DCB.fParity         %d\n\
-DCB.fOutX           %d\n\
-DCB.fInX            %d\n\
-DCB.fNull           %d\n\
-DCB.XonChar         %d\n\
-DCB.XoffChar        %d\n\
-DCB.fAbortOnError   %d\n\
-DCB.fOutxCtsFlow    %d\n\
-DCB.fOutxDsrFlow    %d\n",
-	(int)dcb.DCBlength,
-	(int)dcb.BaudRate,
-	(int)dcb.ByteSize,
-	(int)dcb.Parity,
-	(int)dcb.StopBits,
-	(int)dcb.fBinary,
-	(int)dcb.fDtrControl,
-	(int)dcb.fRtsControl,
-	(int)dcb.fDsrSensitivity,
-	(int)dcb.fParity,
-	(int)dcb.fOutX,
-	(int)dcb.fInX,
-	(int)dcb.fNull,
-	(int)dcb.XonChar,
-	(int)dcb.XoffChar,
-	(int)dcb.fAbortOnError,
-	(int)dcb.fOutxCtsFlow,
-	(int)dcb.fOutxDsrFlow);
-#endif
-*/
+
 	dcb.DCBlength			= sizeof (dcb);
 	dcb.BaudRate			= BaudRate;
 	dcb.ByteSize			= ByteSize;
@@ -1006,8 +990,8 @@ DCB.fOutxDsrFlow    %d\n",
 			dcb.fRtsControl = RTS_CONTROL_DISABLE;
 	}
 
-#if SERIAL_DEBUG
-	fprintf(serlog, "\
+	if (progStatus.serialtrace) {
+	snprintf(traceinfo, sizeof(traceinfo), "\
 \n\
 Set Comm State:\n\
 DCB.DCBlength       %d\n\
@@ -1046,17 +1030,18 @@ DCB.fOutxDsrFlow    %d\n",
 	(int)dcb.fAbortOnError,
 	(int)dcb.fOutxCtsFlow,
 	(int)dcb.fOutxDsrFlow);
-#endif
+		ser_trace(1, traceinfo);
+	}
 
 	bPortReady = SetCommState(hComm, &dcb);
 
-//	if(bPortReady == 0) {
-#if SERIAL_DEBUG
-	long err = GetLastError();
-//	fl_alert("SetCommState handle %d, returned %d\nError = %d", (int)hComm, bPortReady, (int)err);
-	fprintf(serlog, "SetCommState handle %d, returned %d, error = %d\n", (int)hComm, bPortReady, (int)err);
-#endif
-if (bPortReady == 0) {
+	if (progStatus.serialtrace) {
+		long err = GetLastError();
+		snprintf(traceinfo, sizeof(traceinfo), "SetCommState handle %d, returned %d, error = %d\n", (int)hComm, bPortReady, (int)err);
+		ser_trace(1, traceinfo);
+	}
+
+	if (bPortReady == 0) {
 		CloseHandle(hComm);
 		return false;
 	}
@@ -1082,10 +1067,10 @@ bool Cserial::getPTT() {
 void Cserial::SetPTT(bool ON)
 {
 	if (hComm == INVALID_HANDLE_VALUE) {
-#if SERIAL_DEBUG
-//	fl_alert("SetPTT failed, invalid handle");
-	fprintf(serlog, "SetPTT failed, invalid handle\n");
-#endif
+		if (progStatus.serialtrace) {
+			snprintf(traceinfo, sizeof(traceinfo), "SetPTT failed, invalid handle\n");
+			ser_trace(1, traceinfo);
+		}
 		return;
 	}
 	if ( !(dtrptt || rtsptt) )
@@ -1119,13 +1104,14 @@ void Cserial::SetPTT(bool ON)
 		ON, dtrptt, dtr, rtsptt, rts, rtscts, 
 		static_cast<unsigned int>(dcb.fDtrControl), 
 		static_cast<unsigned int>(dcb.fRtsControl) );
-#if SERIAL_DEBUG
-	fprintf(serlog, "\
+	if (progStatus.serialtrace) {
+		snprintf(traceinfo, sizeof(traceinfo), "\
 PTT %d, DTRptt %d, DTR %d, RTSptt %d, RTS %d, RTSCTS %d, DtrControl %2x, RtsControl %2x\n",
-		ON, dtrptt, dtr, rtsptt, rts, rtscts, 
-		static_cast<unsigned int>(dcb.fDtrControl), 
-		static_cast<unsigned int>(dcb.fRtsControl) );
-#endif
+			ON, dtrptt, dtr, rtsptt, rts, rtscts, 
+			static_cast<unsigned int>(dcb.fDtrControl), 
+			static_cast<unsigned int>(dcb.fRtsControl) );
+		ser_trace(1, traceinfo);
+	}
 	serptt = ON;
 	SetCommState(hComm, &dcb);
 }

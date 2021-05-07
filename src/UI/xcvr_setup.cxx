@@ -141,6 +141,7 @@ Fl_Group *tabTRACE = (Fl_Group *)0;
 	Fl_Check_Button *btn_settrace = (Fl_Check_Button *)0;
 	Fl_Check_Button *btn_debugtrace = (Fl_Check_Button *)0;
 	Fl_Check_Button *btn_rpctrace = (Fl_Check_Button *)0;
+	Fl_Check_Button *btn_serialtrace = (Fl_Check_Button *)0;
 	Fl_Check_Button *btn_start_stop_trace = (Fl_Check_Button *)0;
 	Fl_ComboBox *selectlevel = (Fl_ComboBox *)0;
 	Fl_Button *btn_viewtrace = (Fl_Button *)0;
@@ -292,6 +293,10 @@ static void cb_btn_rpctrace(Fl_Check_Button *, void *) {
 	progStatus.rpctrace = btn_rpctrace->value();
 }
 
+static void cb_btn_serialtrace(Fl_Check_Button *, void *) {
+	progStatus.serialtrace = btn_serialtrace->value();
+}
+
 static void cb_btn_start_stop_trace(Fl_Check_Button *, void *) {
 	progStatus.start_stop_trace = btn_start_stop_trace->value();
 }
@@ -302,6 +307,7 @@ static void cb_selectlevel(Fl_ComboBox *, void *) {
 }
 
 static void cb_btn_viewtrace(Fl_Button *, void *) {
+	if (!tracewindow) make_trace_window();
 	tracewindow->show();
 }
 
@@ -1240,12 +1246,17 @@ Fl_Group *createTRACE(int X, int Y, int W, int H, const char *label)
 	btn_rpctrace->callback((Fl_Callback*)cb_btn_rpctrace);
 	btn_rpctrace->tooltip(_("Enable trace of XmlRpc methods"));
 
-	btn_start_stop_trace = new Fl_Check_Button(X + 240, Y + 80, 80, 20, _("Trace start/stop code"));
+	btn_serialtrace = new Fl_Check_Button(X + 240, Y + 80, 80, 20, _("Trace serial code"));
+	btn_serialtrace->value(progStatus.serialtrace);
+	btn_serialtrace->callback((Fl_Callback*)cb_btn_serialtrace);
+	btn_serialtrace->tooltip(_("Enable trace of serial i/o"));
+
+	btn_start_stop_trace = new Fl_Check_Button(X + 240, Y + 110, 80, 20, _("Trace start/stop code"));
 	btn_start_stop_trace->value(progStatus.start_stop_trace);
 	btn_start_stop_trace->callback((Fl_Callback*)cb_btn_start_stop_trace);
 	btn_start_stop_trace->tooltip(_("Enable trace of start/stop operations"));
 
-	selectlevel = new Fl_ComboBox(X + 240, Y + 110, 80, 20, _("XmlRpc trace level"));
+	selectlevel = new Fl_ComboBox(X + 240, Y + 140, 80, 20, _("XmlRpc trace level"));
 	selectlevel->add("0|1|2|3|4");
 	selectlevel->align(FL_ALIGN_RIGHT);
 	selectlevel->index(progStatus.rpc_level);

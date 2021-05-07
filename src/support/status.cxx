@@ -437,6 +437,7 @@ status progStatus = {
 	false,		// bool	debugtrace;
 	false,		// bool	xmltrace;
 	false,		// bool	rpctrace;
+	false,		// bool	serialtrace;
 	false,		// bool	start_stop_trace;
 	0,			// int	rpc_level;
 
@@ -923,6 +924,7 @@ void status::saveLastState()
 	spref.set("debugtrace", debugtrace);
 	spref.set("xmltrace", xmltrace);
 	spref.set("rpctrace", rpctrace);
+	spref.set("serialtrace", serialtrace);
 	spref.set("startstoptrace", start_stop_trace);
 	spref.set("rpc_level", rpc_level);
 
@@ -1551,6 +1553,7 @@ bool status::loadXcvrState(string xcvr)
 		if (spref.get("settrace", i, settrace)) settrace = i;
 		if (spref.get("debugtrace", i, debugtrace)) debugtrace = i;
 		if (spref.get("xmltrace", i, xmltrace)) xmltrace = i;
+		if (spref.get("serialtrace", i, serialtrace)) serialtrace = i;
 		if (spref.get("startstoptrace", i, start_stop_trace)) start_stop_trace = i;
 		if (spref.get("rpctrace", i, rpctrace)) rpctrace = i;
 

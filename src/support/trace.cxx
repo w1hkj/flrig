@@ -69,7 +69,7 @@ static void cb_cleartrace(Fl_Button *, void *)
 	tracedisplay->buffer()->text("");
 }
 
-static void make_trace_window() {
+void make_trace_window() {
 	tracewindow = new Fl_Double_Window(600, 300, _("Trace log"));
 	tracedisplay = new Fl_Text_Display(0, 0, 600, 270);
 	tracebuffer = new Fl_Text_Buffer;
@@ -105,9 +105,9 @@ static void update_tracetext(void *)
 
 void trace(int n, ...) // all args of type const char *
 {
-	if (!tracewindow) make_trace_window();
-
 	if (!progStatus.trace) return;
+
+	if (!tracewindow) make_trace_window();
 
 	if (!n) return;
 
@@ -130,9 +130,9 @@ void trace(int n, ...) // all args of type const char *
 
 void xml_trace(int n, ...) // all args of type const char *
 {
-	if (!tracewindow) make_trace_window();
-
 	if (!progStatus.xmltrace) return;
+
+	if (!tracewindow) make_trace_window();
 
 	if (!n) return;
 
@@ -155,9 +155,9 @@ void xml_trace(int n, ...) // all args of type const char *
 
 void rig_trace(int n, ...) // all args of type const char *
 {
-	if (!tracewindow) make_trace_window();
-
 	if (!progStatus.rigtrace) return;
+
+	if (!tracewindow) make_trace_window();
 
 	if (!n) return;
 
@@ -180,8 +180,9 @@ void rig_trace(int n, ...) // all args of type const char *
 
 void set_trace(int n, ...) // all args of type const char *
 {
-	if (!tracewindow) make_trace_window();
+	if (!progStatus.settrace) return;
 
+	if (!tracewindow) make_trace_window();
 
 	if (!n) return;
 
@@ -195,8 +196,6 @@ void set_trace(int n, ...) // all args of type const char *
 		s << " " << va_arg(vl, const char *);
 	va_end(vl);
 	s << "\n";
-
-	if (!progStatus.settrace) return;
 
 	if (stdout_trace) std::cout << s.str();
 
@@ -206,6 +205,8 @@ void set_trace(int n, ...) // all args of type const char *
 
 void get_trace(int n, ...) // all args of type const char *
 {
+	if (!progStatus.gettrace) return;
+
 	if (!tracewindow) make_trace_window();
 
 	if (!n) return;
@@ -220,8 +221,6 @@ void get_trace(int n, ...) // all args of type const char *
 		s << " " << va_arg(vl, const char *);
 	va_end(vl);
 	s << "\n";
-
-	if (!progStatus.gettrace) return;
 
 	if (stdout_trace) std::cout << s.str();
 
@@ -294,3 +293,27 @@ void rpc_trace(int n, ...) // all args of type const char *
 	Fl::awake(update_tracetext);
 }
 
+void ser_trace(int n, ...) // all args of type const char *
+{
+	if (!progStatus.serialtrace) return;
+
+	if (!tracewindow) make_trace_window();
+
+	if (!n) return;
+
+	guard_lock tt(&mutex_trace);
+
+	stringstream s;
+	va_list vl;
+	va_start(vl, n);
+	s << ztime() << " : " << va_arg(vl, const char *);
+	for (int i = 1; i < n; i++)
+		s << " " << va_arg(vl, const char *);
+	va_end(vl);
+	s << "\n";
+
+	if (stdout_trace) std::cout << s.str();
+
+	tracestrings.push_back(s.str());
+	Fl::awake(update_tracetext);
+}

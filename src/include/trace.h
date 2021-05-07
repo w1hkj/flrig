@@ -32,7 +32,10 @@ extern void xml_trace(int n, ...); // all args of type const char *
 extern void rig_trace(int n, ...); // trace transceiver class methods
 extern void get_trace(int n, ...); // trace get methods
 extern void set_trace(int n, ...); // trace set methods
+extern void ser_trace(int n, ...); // trace serial methods
 extern void rpc_trace(int n, ...); // trace transceiver class methods
+
+extern void make_trace_window();
 
 #define gett(str) get_trace(3, str, cmd.c_str(), replystr.c_str())
 #define sett(str) set_trace(3, str, cmd.c_str(), replystr.c_str())

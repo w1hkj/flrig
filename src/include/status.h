@@ -422,6 +422,7 @@ struct status {
 	bool	debugtrace;
 	bool	xmltrace;
 	bool	rpctrace;
+	bool	serialtrace;
 	bool	start_stop_trace;
 	int		rpc_level;
 

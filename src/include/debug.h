@@ -97,11 +97,6 @@ unused__ static uint32_t log_source_ = debug::LOG_OTHER;
 
 #define LOG_SET_SOURCE(source__) log_source_ = source__
 
-#define SERIAL_DEBUG 1
-#if SERIAL_DEBUG
-extern FILE *serlog;
-#endif
-
 #endif // _DEBUG_H_
 
 // Local Variables:
