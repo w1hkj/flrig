@@ -2,6 +2,9 @@
 
 #include "gettext.h"
 #include "cwioUI.h"
+#include "cwio.h"
+static const char ps[] = "~%&+={}<>@"; 
+static const char szProsigns[] = "~|%|&|+|=|{|}|<|>|@"; 
 
 Fl_Input2 *txt_to_send=(Fl_Input2 *)0;
 
@@ -301,6 +304,79 @@ static void cb_edit_msgb(Fl_Input2*, void*) {
   msg_cb(12);
 }
 
+Fl_ListBox *listbox_BT=(Fl_ListBox *)0;
+
+#include <iostream>
+static void cb_listbox_BT(Fl_ListBox* o, void*) {
+  int c = o->index();
+progStatus.BT[0] = ps[c];
+morse->init();
+}
+
+Fl_ListBox *listbox_AA=(Fl_ListBox *)0;
+
+static void cb_listbox_AA(Fl_ListBox* o, void*) {
+  int c = o->index();
+progStatus.AA[0] = ps[c];
+morse->init();
+}
+
+Fl_ListBox *listbox_AS=(Fl_ListBox *)0;
+
+static void cb_listbox_AS(Fl_ListBox* o, void*) {
+  int c = o->index();
+progStatus.AS[0] = ps[c];
+morse->init();
+}
+
+Fl_ListBox *listbox_AR=(Fl_ListBox *)0;
+
+static void cb_listbox_AR(Fl_ListBox* o, void*) {
+  int c = o->index();
+progStatus.AR[0] = ps[c];
+morse->init();
+}
+
+Fl_ListBox *listbox_SK=(Fl_ListBox *)0;
+
+static void cb_listbox_SK(Fl_ListBox* o, void*) {
+  int c = o->index();
+progStatus.SK[0] = ps[c];
+morse->init();
+}
+
+Fl_ListBox *listbox_KN=(Fl_ListBox *)0;
+
+static void cb_listbox_KN(Fl_ListBox* o, void*) {
+  int c = o->index();
+progStatus.KN[0] = ps[c];
+morse->init();
+}
+
+Fl_ListBox *listbox_INT=(Fl_ListBox *)0;
+
+static void cb_listbox_INT(Fl_ListBox* o, void*) {
+  int c = o->index();
+progStatus.INT[0] = ps[c];
+morse->init();
+}
+
+Fl_ListBox *listbox_HM=(Fl_ListBox *)0;
+
+static void cb_listbox_HM(Fl_ListBox* o, void*) {
+  int c = o->index();
+progStatus.HM[0] = ps[c];
+morse->init();
+}
+
+Fl_ListBox *listbox_VE=(Fl_ListBox *)0;
+
+static void cb_listbox_VE(Fl_ListBox* o, void*) {
+  int c = o->index();
+progStatus.VE[0] = ps[c];
+morse->init();
+}
+
 Fl_Button *btn_cancel_edit=(Fl_Button *)0;
 
 static void cb_btn_cancel_edit(Fl_Button*, void*) {
@@ -321,7 +397,7 @@ static void cb_btn_done_edit(Fl_Button*, void*) {
 
 Fl_Double_Window* make_message_editor() {
   Fl_Double_Window* w;
-  { Fl_Double_Window* o = new Fl_Double_Window(603, 348, _("Message Editor"));
+  { Fl_Double_Window* o = new Fl_Double_Window(640, 345, _("Message Editor"));
     w = o; if (w) {/* empty */}
     { Fl_Tabs* o = new Fl_Tabs(0, 0, 530, 345);
       o->align(Fl_Align(FL_ALIGN_TOP|FL_ALIGN_INSIDE));
@@ -650,52 +726,167 @@ Fl_Double_Window* make_message_editor() {
       } // Fl_Group* o
       o->end();
     } // Fl_Tabs* o
-    { Fl_Group* o = new Fl_Group(534, 16, 65, 146);
+    { Fl_Group* o = new Fl_Group(534, 0, 101, 224);
       o->box(FL_ENGRAVED_FRAME);
-      { new Fl_Box(537, 19, 59, 20, _("ProSign"));
+
+      { Fl_ListBox* o = listbox_BT = new Fl_ListBox(570, 6, 60, 22, _("BT"));
+        listbox_BT->box(FL_DOWN_BOX);
+        listbox_BT->color(FL_BACKGROUND2_COLOR);
+        listbox_BT->selection_color(FL_BACKGROUND_COLOR);
+        listbox_BT->labeltype(FL_NORMAL_LABEL);
+        listbox_BT->labelfont(0);
+        listbox_BT->labelsize(14);
+        listbox_BT->labelcolor(FL_FOREGROUND_COLOR);
+        listbox_BT->callback((Fl_Callback*)cb_listbox_BT);
+        listbox_BT->align(Fl_Align(FL_ALIGN_LEFT));
+        listbox_BT->when(FL_WHEN_RELEASE);
+        o->add(szProsigns);
+        o->value(progStatus.BT.c_str());
+        o->labelsize(FL_NORMAL_SIZE);
+        listbox_BT->end();
+      } // Fl_ListBox* listbox_BT
+      { Fl_ListBox* o = listbox_AA = new Fl_ListBox(570, 30, 60, 22, _("AA"));
+        listbox_AA->box(FL_DOWN_BOX);
+        listbox_AA->color(FL_BACKGROUND2_COLOR);
+        listbox_AA->selection_color(FL_BACKGROUND_COLOR);
+        listbox_AA->labeltype(FL_NORMAL_LABEL);
+        listbox_AA->labelfont(0);
+        listbox_AA->labelsize(14);
+        listbox_AA->labelcolor(FL_FOREGROUND_COLOR);
+        listbox_AA->callback((Fl_Callback*)cb_listbox_AA);
+        listbox_AA->align(Fl_Align(FL_ALIGN_LEFT));
+        listbox_AA->when(FL_WHEN_RELEASE);
+        o->add(szProsigns);
+        o->value(progStatus.AA.c_str()); o->labelsize(FL_NORMAL_SIZE);
+        listbox_AA->end();
+      } // Fl_ListBox* listbox_AA
+      { Fl_ListBox* o = listbox_AS = new Fl_ListBox(570, 54, 60, 22, _("AS"));
+        listbox_AS->box(FL_DOWN_BOX);
+        listbox_AS->color(FL_BACKGROUND2_COLOR);
+        listbox_AS->selection_color(FL_BACKGROUND_COLOR);
+        listbox_AS->labeltype(FL_NORMAL_LABEL);
+        listbox_AS->labelfont(0);
+        listbox_AS->labelsize(14);
+        listbox_AS->labelcolor(FL_FOREGROUND_COLOR);
+        listbox_AS->callback((Fl_Callback*)cb_listbox_AS);
+        listbox_AS->align(Fl_Align(FL_ALIGN_LEFT));
+        listbox_AS->when(FL_WHEN_RELEASE);
+        o->add(szProsigns);
+        o->value(progStatus.AS.c_str()); o->labelsize(FL_NORMAL_SIZE);
+        listbox_AS->end();
+      } // Fl_ListBox* listbox_AS
+      { Fl_ListBox* o = listbox_AR = new Fl_ListBox(570, 78, 60, 22, _("AR"));
+        listbox_AR->box(FL_DOWN_BOX);
+        listbox_AR->color(FL_BACKGROUND2_COLOR);
+        listbox_AR->selection_color(FL_BACKGROUND_COLOR);
+        listbox_AR->labeltype(FL_NORMAL_LABEL);
+        listbox_AR->labelfont(0);
+        listbox_AR->labelsize(14);
+        listbox_AR->labelcolor(FL_FOREGROUND_COLOR);
+        listbox_AR->callback((Fl_Callback*)cb_listbox_AR);
+        listbox_AR->align(Fl_Align(FL_ALIGN_LEFT));
+        listbox_AR->when(FL_WHEN_RELEASE);
+        o->add(szProsigns);
+        o->value(progStatus.AR.c_str()); o->labelsize(FL_NORMAL_SIZE);
+        listbox_AR->end();
+      } // Fl_ListBox* listbox_AR
+      { Fl_ListBox* o = listbox_SK = new Fl_ListBox(570, 102, 60, 22, _("SK"));
+        listbox_SK->box(FL_DOWN_BOX);
+        listbox_SK->color(FL_BACKGROUND2_COLOR);
+        listbox_SK->selection_color(FL_BACKGROUND_COLOR);
+        listbox_SK->labeltype(FL_NORMAL_LABEL);
+        listbox_SK->labelfont(0);
+        listbox_SK->labelsize(14);
+        listbox_SK->labelcolor(FL_FOREGROUND_COLOR);
+        listbox_SK->callback((Fl_Callback*)cb_listbox_SK);
+        listbox_SK->align(Fl_Align(FL_ALIGN_LEFT));
+        listbox_SK->when(FL_WHEN_RELEASE);
+        o->add(szProsigns);
+        o->value(progStatus.SK.c_str()); o->labelsize(FL_NORMAL_SIZE);
+        listbox_SK->end();
+      } // Fl_ListBox* listbox_SK
+      { Fl_ListBox* o = listbox_KN = new Fl_ListBox(570, 126, 60, 22, _("KN"));
+        listbox_KN->box(FL_DOWN_BOX);
+        listbox_KN->color(FL_BACKGROUND2_COLOR);
+        listbox_KN->selection_color(FL_BACKGROUND_COLOR);
+        listbox_KN->labeltype(FL_NORMAL_LABEL);
+        listbox_KN->labelfont(0);
+        listbox_KN->labelsize(14);
+        listbox_KN->labelcolor(FL_FOREGROUND_COLOR);
+        listbox_KN->callback((Fl_Callback*)cb_listbox_KN);
+        listbox_KN->align(Fl_Align(FL_ALIGN_LEFT));
+        listbox_KN->when(FL_WHEN_RELEASE);
+        o->add(szProsigns);
+        o->value(progStatus.KN.c_str()); o->labelsize(FL_NORMAL_SIZE);
+        listbox_KN->end();
+      } // Fl_ListBox* listbox_KN
+      { Fl_ListBox* o = listbox_INT = new Fl_ListBox(570, 150, 60, 22, _("INT"));
+        listbox_INT->box(FL_DOWN_BOX);
+        listbox_INT->color(FL_BACKGROUND2_COLOR);
+        listbox_INT->selection_color(FL_BACKGROUND_COLOR);
+        listbox_INT->labeltype(FL_NORMAL_LABEL);
+        listbox_INT->labelfont(0);
+        listbox_INT->labelsize(14);
+        listbox_INT->labelcolor(FL_FOREGROUND_COLOR);
+        listbox_INT->callback((Fl_Callback*)cb_listbox_INT);
+        listbox_INT->align(Fl_Align(FL_ALIGN_LEFT));
+        listbox_INT->when(FL_WHEN_RELEASE);
+        o->add(szProsigns);
+        o->value(progStatus.INT.c_str()); o->labelsize(FL_NORMAL_SIZE);
+        listbox_INT->end();
+      } // Fl_ListBox* listbox_INT
+      { Fl_ListBox* o = listbox_HM = new Fl_ListBox(570, 174, 60, 22, _("HM"));
+        listbox_HM->box(FL_DOWN_BOX);
+        listbox_HM->color(FL_BACKGROUND2_COLOR);
+        listbox_HM->selection_color(FL_BACKGROUND_COLOR);
+        listbox_HM->labeltype(FL_NORMAL_LABEL);
+        listbox_HM->labelfont(0);
+        listbox_HM->labelsize(14);
+        listbox_HM->labelcolor(FL_FOREGROUND_COLOR);
+        listbox_HM->callback((Fl_Callback*)cb_listbox_HM);
+        listbox_HM->align(Fl_Align(FL_ALIGN_LEFT));
+        listbox_HM->when(FL_WHEN_RELEASE);
+        o->add(szProsigns);
+        o->value(progStatus.HM.c_str()); o->labelsize(FL_NORMAL_SIZE);
+        listbox_HM->end();
+      } // Fl_ListBox* listbox_HM
+      { Fl_ListBox* o = listbox_VE = new Fl_ListBox(570, 199, 60, 22, _("VE"));
+        listbox_VE->box(FL_DOWN_BOX);
+        listbox_VE->color(FL_BACKGROUND2_COLOR);
+        listbox_VE->selection_color(FL_BACKGROUND_COLOR);
+        listbox_VE->labeltype(FL_NORMAL_LABEL);
+        listbox_VE->labelfont(0);
+        listbox_VE->labelsize(14);
+        listbox_VE->labelcolor(FL_FOREGROUND_COLOR);
+        listbox_VE->callback((Fl_Callback*)cb_listbox_VE);
+        listbox_VE->align(Fl_Align(FL_ALIGN_LEFT));
+        listbox_VE->when(FL_WHEN_RELEASE);
+        o->add(szProsigns);
+        o->value(progStatus.VE.c_str()); o->labelsize(FL_NORMAL_SIZE);
+        listbox_VE->end();
+      } // Fl_ListBox* listbox_VE
+      o->end();
+    } // Fl_Group* o
+    { Fl_Group* o = new Fl_Group(534, 222, 90, 43);
+      o->box(FL_ENGRAVED_FRAME);
+      { new Fl_Box(538, 224, 82, 20, _("\'[\' Send"));
       } // Fl_Box* o
-      { Fl_Box* o = new Fl_Box(536, 40, 60, 20, _("= BT"));
-        o->tooltip(_("-...-"));
-      } // Fl_Box* o
-      { Fl_Box* o = new Fl_Box(536, 60, 60, 20, _("+ KN"));
-        o->tooltip(_("-.--."));
-      } // Fl_Box* o
-      { Fl_Box* o = new Fl_Box(536, 79, 60, 20, _("% SK"));
-        o->tooltip(_("...-..-"));
-      } // Fl_Box* o
-      { Fl_Box* o = new Fl_Box(536, 98, 60, 20, _("~ AA"));
-        o->tooltip(_(".-..-."));
-      } // Fl_Box* o
-      { Fl_Box* o = new Fl_Box(536, 118, 60, 20, _("< AS"));
-        o->tooltip(_(".----."));
-      } // Fl_Box* o
-      { Fl_Box* o = new Fl_Box(536, 137, 60, 20, _("> AR"));
-        o->tooltip(_(".-.-."));
+      { new Fl_Box(538, 244, 82, 20, _("\']\' Recv"));
       } // Fl_Box* o
       o->end();
     } // Fl_Group* o
-    { btn_cancel_edit = new Fl_Button(534, 268, 65, 22, _("Cancel"));
+    { btn_cancel_edit = new Fl_Button(546, 268, 65, 22, _("Cancel"));
       btn_cancel_edit->tooltip(_("Exit editor, discard changes"));
       btn_cancel_edit->callback((Fl_Callback*)cb_btn_cancel_edit);
     } // Fl_Button* btn_cancel_edit
-    { btn_apply_edit = new Fl_Button(534, 294, 65, 22, _("Apply"));
+    { btn_apply_edit = new Fl_Button(546, 294, 65, 22, _("Apply"));
       btn_apply_edit->tooltip(_("Apply current changes to function keys"));
       btn_apply_edit->callback((Fl_Callback*)cb_btn_apply_edit);
     } // Fl_Button* btn_apply_edit
-    { btn_done_edit = new Fl_Button(534, 321, 65, 22, _("Close"));
+    { btn_done_edit = new Fl_Button(546, 321, 65, 22, _("Close"));
       btn_done_edit->tooltip(_("Apply changes and close editor"));
       btn_done_edit->callback((Fl_Callback*)cb_btn_done_edit);
     } // Fl_Button* btn_done_edit
-    { Fl_Group* o = new Fl_Group(534, 168, 65, 86);
-      o->box(FL_ENGRAVED_FRAME);
-      { new Fl_Box(537, 175, 59, 20, _("Control"));
-      } // Fl_Box* o
-      { new Fl_Box(537, 199, 59, 20, _("[ Send"));
-      } // Fl_Box* o
-      { new Fl_Box(537, 226, 59, 20, _("] Rcv"));
-      } // Fl_Box* o
-      o->end();
-    } // Fl_Group* o
     o->end();
     o->resizable(o);
   } // Fl_Double_Window* o
@@ -807,7 +998,7 @@ static void cb_cnt_cwio_comp(Fl_Counter* o, void*) {
 
 Fl_Double_Window* cwio_config_dialog() {
   Fl_Double_Window* w;
-  { Fl_Double_Window* o = new Fl_Double_Window(670, 104, _("CW Configuration"));
+  { Fl_Double_Window* o = new Fl_Double_Window(670, 100, _("CW Configuration"));
     w = o; if (w) {/* empty */}
     { Fl_Group* o = new Fl_Group(2, 3, 666, 100);
       o->box(FL_ENGRAVED_FRAME);

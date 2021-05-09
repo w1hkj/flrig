@@ -5,6 +5,15 @@ i18n_include "gettext.h"
 i18n_function _
 header_name {.h}
 code_name {.cxx}
+decl {\#include "cwio.h"} {private local
+}
+
+decl {const char ps[] = "~%&+={}<>@";} {private local
+}
+
+decl {const char szProsigns[] = "~|%|&|+|=|{|}|<|>|@";} {private local
+}
+
 Function {cwio_window()} {open
 } {
   Fl_Window {} {
@@ -137,7 +146,7 @@ Function {make_message_editor()} {open
 } {
   Fl_Window {} {
     label {Message Editor} open
-    xywh {740 370 603 348} type Double resizable visible
+    xywh {613 338 640 345} type Double resizable visible
   } {
     Fl_Tabs {} {open
       xywh {0 0 530 345} align 17
@@ -315,68 +324,127 @@ Function {make_message_editor()} {open
         }
       }
     }
-    Fl_Group {} {open selected
-      xywh {534 16 65 146} box ENGRAVED_FRAME
+    Fl_Group {} {open
+      xywh {534 0 101 224} box ENGRAVED_FRAME
+    } {
+      Fl_Group listbox_BT {
+        label BT
+        callback {int c = o->index();
+progStatus.BT[0] = ps[c];
+morse->init();} open
+        xywh {570 6 60 22} box DOWN_BOX color 7 align 4
+        code0 {o->add(szProsigns);}
+        code1 {o->value(progStatus.BT.c_str()); o->labelsize(FL_NORMAL_SIZE);}
+        code2 {\#include "combo.h"}
+        class Fl_ListBox
+      } {}
+      Fl_Group listbox_AA {
+        label AA
+        callback {int c = o->index();
+progStatus.AA[0] = ps[c];
+morse->init();} open
+        xywh {570 30 60 22} box DOWN_BOX color 7 align 4
+        code0 {o->add(szProsigns);}
+        code1 {o->value(progStatus.AA.c_str()); o->labelsize(FL_NORMAL_SIZE);}
+        class Fl_ListBox
+      } {}
+      Fl_Group listbox_AS {
+        label AS
+        callback {int c = o->index();
+progStatus.AS[0] = ps[c];
+morse->init();} open
+        xywh {570 54 60 22} box DOWN_BOX color 7 align 4
+        code0 {o->add(szProsigns);}
+        code1 {o->value(progStatus.AS.c_str()); o->labelsize(FL_NORMAL_SIZE);}
+        class Fl_ListBox
+      } {}
+      Fl_Group listbox_AR {
+        label AR
+        callback {int c = o->index();
+progStatus.AR[0] = ps[c];
+morse->init();} open
+        xywh {570 78 60 22} box DOWN_BOX color 7 align 4
+        code0 {o->add(szProsigns);}
+        code1 {o->value(progStatus.AR.c_str()); o->labelsize(FL_NORMAL_SIZE);}
+        class Fl_ListBox
+      } {}
+      Fl_Group listbox_SK {
+        label SK
+        callback {int c = o->index();
+progStatus.SK[0] = ps[c];
+morse->init();} open
+        xywh {570 102 60 22} box DOWN_BOX color 7 align 4
+        code0 {o->add(szProsigns);}
+        code1 {o->value(progStatus.SK.c_str()); o->labelsize(FL_NORMAL_SIZE);}
+        class Fl_ListBox
+      } {}
+      Fl_Group listbox_KN {
+        label KN
+        callback {int c = o->index();
+progStatus.KN[0] = ps[c];
+morse->init();} open
+        xywh {570 126 60 22} box DOWN_BOX color 7 align 4
+        code0 {o->add(szProsigns);}
+        code1 {o->value(progStatus.KN.c_str()); o->labelsize(FL_NORMAL_SIZE);}
+        class Fl_ListBox
+      } {}
+      Fl_Group listbox_INT {
+        label INT
+        callback {int c = o->index();
+progStatus.INT[0] = ps[c];
+morse->init();} open
+        xywh {570 150 60 22} box DOWN_BOX color 7 align 4
+        code0 {o->add(szProsigns);}
+        code1 {o->value(progStatus.INT.c_str()); o->labelsize(FL_NORMAL_SIZE);}
+        class Fl_ListBox
+      } {}
+      Fl_Group listbox_HM {
+        label HM
+        callback {int c = o->index();
+progStatus.HM[0] = ps[c];
+morse->init();} open
+        xywh {570 174 60 22} box DOWN_BOX color 7 align 4
+        code0 {o->add(szProsigns);}
+        code1 {o->value(progStatus.HM.c_str()); o->labelsize(FL_NORMAL_SIZE);}
+        class Fl_ListBox
+      } {}
+      Fl_Group listbox_VE {
+        label VE
+        callback {int c = o->index();
+progStatus.VE[0] = ps[c];
+morse->init();} open selected
+        xywh {570 199 60 22} box DOWN_BOX color 7 align 4
+        code0 {o->add(szProsigns);}
+        code1 {o->value(progStatus.VE.c_str()); o->labelsize(FL_NORMAL_SIZE);}
+        class Fl_ListBox
+      } {}
+    }
+    Fl_Group {} {open
+      xywh {534 222 90 43} box ENGRAVED_FRAME
     } {
       Fl_Box {} {
-        label ProSign
-        xywh {537 19 59 20}
+        label {'[' Send}
+        xywh {538 224 82 20}
       }
       Fl_Box {} {
-        label {= BT}
-        tooltip {-...-} xywh {536 40 60 20}
-      }
-      Fl_Box {} {
-        label {+ KN}
-        tooltip {-.--.} xywh {536 60 60 20}
-      }
-      Fl_Box {} {
-        label {% SK}
-        tooltip {...-..-} xywh {536 79 60 20}
-      }
-      Fl_Box {} {
-        label {~ AA}
-        tooltip {.-..-.} xywh {536 98 60 20}
-      }
-      Fl_Box {} {
-        label {< AS}
-        tooltip {.----.} xywh {536 118 60 20}
-      }
-      Fl_Box {} {
-        label {> AR}
-        tooltip {.-.-.} xywh {536 137 60 20}
+        label {']' Recv}
+        xywh {538 244 82 20}
       }
     }
     Fl_Button btn_cancel_edit {
       label Cancel
       callback {cancel_edit();}
-      tooltip {Exit editor, discard changes} xywh {534 268 65 22}
+      tooltip {Exit editor, discard changes} xywh {546 268 65 22}
     }
     Fl_Button btn_apply_edit {
       label Apply
       callback {apply_edit();}
-      tooltip {Apply current changes to function keys} xywh {534 294 65 22}
+      tooltip {Apply current changes to function keys} xywh {546 294 65 22}
     }
     Fl_Button btn_done_edit {
       label Close
       callback {done_edit();}
-      tooltip {Apply changes and close editor} xywh {534 321 65 22}
-    }
-    Fl_Group {} {open
-      xywh {534 168 65 86} box ENGRAVED_FRAME
-    } {
-      Fl_Box {} {
-        label Control
-        xywh {537 175 59 20}
-      }
-      Fl_Box {} {
-        label {[ Send}
-        xywh {537 199 59 20}
-      }
-      Fl_Box {} {
-        label {] Rcv}
-        xywh {537 226 59 20}
-      }
+      tooltip {Apply changes and close editor} xywh {546 321 65 22}
     }
   }
 }
@@ -385,7 +453,7 @@ Function {cwio_config_dialog()} {open
 } {
   Fl_Window {} {
     label {CW Configuration} open
-    xywh {611 208 670 104} type Double visible
+    xywh {611 208 670 100} type Double visible
   } {
     Fl_Group {} {open
       xywh {2 3 666 100} box ENGRAVED_FRAME

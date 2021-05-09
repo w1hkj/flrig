@@ -44,6 +44,7 @@ public:
 
 	std::string tx_lookup(int);
 	int tx_length(int);
+	void init();
 };
 
 #endif

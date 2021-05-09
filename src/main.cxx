@@ -418,6 +418,7 @@ int main (int argc, char *argv[])
 	}
 
 	progStatus.loadLastState();
+std::cout << progStatus.info();
 
 	if (use_trace) progStatus.trace = true;
 
@@ -443,6 +444,7 @@ int main (int argc, char *argv[])
 	cwio_keyer_dialog = cwio_window();
 	cwio_editor = make_message_editor();
 	cwio_configure = cwio_config_dialog();
+	morse->init();
 
 	fntbrowser = new Font_Browser;
 	dlgMemoryDialog = Memory_Dialog();

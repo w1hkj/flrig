@@ -23,11 +23,20 @@ Fl_Double_Window* cwio_window();
 #include "flinput2.h"
 extern Fl_Input2 *edit_label[12];
 extern Fl_Input2 *edit_msg[12];
+#include "combo.h"
+extern Fl_ListBox *listbox_BT;
+extern Fl_ListBox *listbox_AA;
+extern Fl_ListBox *listbox_AS;
+extern Fl_ListBox *listbox_AR;
+extern Fl_ListBox *listbox_SK;
+extern Fl_ListBox *listbox_KN;
+extern Fl_ListBox *listbox_INT;
+extern Fl_ListBox *listbox_HM;
+extern Fl_ListBox *listbox_VE;
 extern Fl_Button *btn_cancel_edit;
 extern Fl_Button *btn_apply_edit;
 extern Fl_Button *btn_done_edit;
 Fl_Double_Window* make_message_editor();
-#include "combo.h"
 extern Fl_ComboBox *select_cwioPORT;
 extern Fl_Light_Button *btn_cwioCONNECT;
 #include <FL/Fl_Check_Button.H>

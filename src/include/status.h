@@ -464,12 +464,22 @@ struct status {
 	string	cwio_msgs[12];
 	string	cwio_labels[12];
 
+	string	BT;
+	string	AA;
+	string	AS;
+	string	AR;
+	string	KN;
+	string	SK;
+	string	INT;
+	string	HM;
+	string	VE;
+
 	void saveLastState();
 	void loadLastState();
 	bool loadXcvrState(string);
 	void UI_laststate();
 
-	string info();
+	std::string info();
 };
 
 extern status progStatus;

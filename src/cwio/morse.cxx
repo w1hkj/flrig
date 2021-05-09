@@ -25,6 +25,7 @@
 #include <iostream>
 
 #include "morse.h"
+#include "status.h"
 
 /*
  * Morse code characters table.  This table allows lookup of the Morse
@@ -198,6 +199,19 @@ int Cmorse::tx_length(int c)
 		else              len += 4;
 	len += 2;
 	return len;
+}
+
+void Cmorse::init()
+{
+	cw_table[0].chr[0] = progStatus.BT[0];
+	cw_table[1].chr[0] = progStatus.AA[0];
+	cw_table[2].chr[0] = progStatus.AS[0];
+	cw_table[3].chr[0] = progStatus.AR[0];
+	cw_table[4].chr[0] = progStatus.SK[0];
+	cw_table[5].chr[0] = progStatus.KN[0];
+	cw_table[6].chr[0] = progStatus.INT[0];
+	cw_table[7].chr[0] = progStatus.HM[0];
+	cw_table[8].chr[0] = progStatus.VE[0];
 }
 
 //----------------------------------------------------------------------

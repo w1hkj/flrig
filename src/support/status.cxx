@@ -477,6 +477,21 @@ status progStatus = {
 	0,			// double cwio_comp;
 	"",			// string cwioPORT;
 
+	"","","","","","",
+	"","","","","","",					// string	cwio_msgs[12];
+	"m2","m2","m3","m4","m4","m6",
+	"m7","m8","m9","m10","m11","m12",	// string	cwio_labels[12];
+
+	"=",		// string	BT;
+	"~",		// string	AA;
+	"<",		// string	AS;
+	">",		// string	AR;
+	"%",		// string	KN;
+	"+",		// string	SK;
+	"&",		// string	INT;
+	"{",		// string	HM;
+	"}",		// string	VE;
+
 };
 
 void status::saveLastState()
@@ -1008,7 +1023,18 @@ void status::saveLastState()
 		spref.set(setbuff, cwio_labels[n].c_str());
 		snprintf(setbuff, sizeof(setbuff), "cwiomessage[%d]", n);
 		spref.set(setbuff, cwio_msgs[n].c_str());
+	
 	}
+
+	spref.set("BT", BT.c_str());
+	spref.set("AA", AA.c_str());
+	spref.set("AS", AS.c_str());
+	spref.set("AR", AR.c_str());
+	spref.set("KN", KN.c_str());
+	spref.set("SK", SK.c_str());
+	spref.set("INT", INT.c_str());
+	spref.set("HM", HM.c_str());
+	spref.set("VE", VE.c_str());
 
 }
 
@@ -1644,7 +1670,26 @@ bool status::loadXcvrState(string xcvr)
 			cwio_msgs[n] = defbuffer;
 		}
 
-		return true;
+		spref.get("BT", defbuffer, BT.c_str(), 499);
+		BT = defbuffer;
+		spref.get("AA", defbuffer, AA.c_str(), 499);
+		AA = defbuffer;
+		spref.get("AS", defbuffer, AS.c_str(), 499);
+		AS = defbuffer;
+		spref.get("AR", defbuffer, AR.c_str(), 499);
+		AR = defbuffer;
+		spref.get("KN", defbuffer, KN.c_str(), 499);
+		KN = defbuffer;
+		spref.get("SK", defbuffer, SK.c_str(), 499);
+		SK = defbuffer;
+		spref.get("INT", defbuffer, INT.c_str(), 499);
+		INT = defbuffer;
+		spref.get("HM", defbuffer, HM.c_str(), 499);
+		HM = defbuffer;
+		spref.get("VE", defbuffer, VE.c_str(), 499);
+		VE = defbuffer;
+
+		return true; 
 	}
 	return false;
 }
@@ -1820,7 +1865,8 @@ void status::UI_laststate()
 
 string status::info()
 {
-	stringstream info;
+	std::stringstream info;
+	static std::string retinfo;
 
 	info << "status::info()\n============== Prefs File Contents =============\n\n";
 	info << "xcvr_serial_port   : " << xcvr_serial_port << "\n";
@@ -1977,7 +2023,17 @@ string status::info()
 	info << "label 24           : " << label24 << "\n";
 	info << "command 24         : " << command24 << "\n";
 
-	return info.str();
+	info << "BT                 : " << BT << "\n";
+	info << "AA                 : " << AA << "\n";
+	info << "AS                 : " << AS << "\n";
+	info << "AR                 : " << AR << "\n";
+	info << "KN                 : " << KN << "\n";
+	info << "SK                 : " << SK << "\n";
+	info << "INT                : " << INT << "\n";
+	info << "HM                 : " << HM << "\n";
+	info << "VE                 : " << VE << "\n";
+
+	return retinfo = info.str();
 }
 
 static bool strace;
