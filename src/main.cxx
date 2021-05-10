@@ -418,7 +418,6 @@ int main (int argc, char *argv[])
 	}
 
 	progStatus.loadLastState();
-std::cout << progStatus.info();
 
 	if (use_trace) progStatus.trace = true;
 

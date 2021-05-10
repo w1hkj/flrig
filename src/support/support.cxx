@@ -2569,8 +2569,10 @@ void setLOCK()
 
 void setINNER()
 {
+	progStatus.pbt_inner = sldrINNER->value();
 	if (progStatus.pbt_lock) {
-		sldrOUTER->value(sldrINNER->value());
+		progStatus.pbt_outer = progStatus.pbt_inner;
+		sldrOUTER->value(progStatus.pbt_outer);
 		sldrOUTER->redraw();
 	}
 
@@ -2580,16 +2582,20 @@ void setINNER()
 		inhibit_pbt = 1;
 		return;
 	}
-	progStatus.pbt_inner = sldrINNER->value();
+
 	guard_lock lock(&mutex_serial);
 	selrig->set_pbt_inner(progStatus.pbt_inner);
 	selrig->set_pbt_outer(progStatus.pbt_outer);
+	selrig->get_pbt_inner();
+	selrig->get_pbt_outer();
 }
 
 void setOUTER()
 {
+	progStatus.pbt_outer = sldrOUTER->value();
 	if (progStatus.pbt_lock) {
-		sldrINNER->value(sldrOUTER->value());
+		progStatus.pbt_inner = progStatus.pbt_outer;
+		sldrINNER->value(progStatus.pbt_inner);
 		sldrINNER->redraw();
 	}
 
@@ -2600,15 +2606,11 @@ void setOUTER()
 		return;
 	}
 
-	progStatus.pbt_outer = sldrOUTER->value();
-	if (progStatus.pbt_lock) {
-		progStatus.pbt_inner = progStatus.pbt_outer;
-		sldrINNER->value(progStatus.pbt_outer);
-		sldrINNER->redraw();
-	}
 	guard_lock lock(&mutex_serial);
 	selrig->set_pbt_outer(progStatus.pbt_outer);
 	selrig->set_pbt_inner(progStatus.pbt_inner);
+	selrig->get_pbt_outer();
+	selrig->get_pbt_inner();
 }
 
 void setCLRPBT()
