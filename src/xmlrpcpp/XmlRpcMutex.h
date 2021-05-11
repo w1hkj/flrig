@@ -34,7 +34,8 @@ namespace XmlRpc {
     ~XmlRpcMutex();
 
     //! Wait for the mutex to be available and then acquire the lock.
-    void acquire();
+    //! True return if acquired
+    bool acquire();
 
     //! Release the mutex.
     void release();

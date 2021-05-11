@@ -21,6 +21,7 @@
 
 #include "XmlRpcSocket.h"
 #include "XmlRpc.h"
+#include "XmlRpcMutex.h"
 
 #include "XmlRpcBase64.h"   // For HTTP authentication encoding
 
@@ -128,8 +129,17 @@ XmlRpcClient::execute(const char* method, XmlRpcValue const& params, XmlRpcValue
   // This is not a thread-safe operation, if you want to do multithreading, use separate
   // clients for each thread. If you want to protect yourself from multiple threads
   // accessing the same client, replace this code with a real mutex.
+#if 1
+  XmlRpcMutex myMutex;
+  if (myMutex.acquire() == false) 
+  {
+	  XmlRpcUtil::error("Unable to acquire mutex");
+	  return false;
+  }
+#else
   if (_executing)
     return false;
+#endif
 
   _executing = true;
   ClearFlagOnExit cf(_executing);

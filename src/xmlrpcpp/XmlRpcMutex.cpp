@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
+#define XMLRPC_THREADS
 #if defined(XMLRPC_THREADS)
 
 #include <config.h>
@@ -36,6 +37,7 @@ XmlRpcMutex::~XmlRpcMutex()
 {
   if (_pMutex)
   {
+    this->release();
 #if defined(_WINDOWS)
     ::CloseHandle((HANDLE)_pMutex);
 #else
@@ -47,13 +49,12 @@ XmlRpcMutex::~XmlRpcMutex()
 }
 
 //! Wait for the mutex to be available and then acquire the lock.
-void XmlRpcMutex::acquire()
+bool XmlRpcMutex::acquire()
 {
 #if defined(_WINDOWS)
   if ( ! _pMutex)
     _pMutex = ::CreateMutex(0, TRUE, 0);
-  else
-    ::WaitForSingleObject(_pMutex, INFINITE);
+  return ::WaitForSingleObject(_pMutex, 1000)==0?true:false;
 #else
   if ( ! _pMutex)
   {
