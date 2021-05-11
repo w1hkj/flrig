@@ -2124,7 +2124,7 @@ void RIG_IC705::get_band_selection(int v)
 		size_t p = replystr.rfind(pre_fm);
 		if (p != string::npos) {
 			int bandfreq = fm_bcd_be(replystr.substr(p + 8, 5), 10);
-			int bandmode = fm_bcd(replystr.substr(p + 13, 1) ,2);
+//			int bandmode = fm_bcd(replystr.substr(p + 13, 1) ,2);
 			int mode = 0;
 			for (int md = LSB705; md <= DV705; md++) {
 				if (replystr[p + 13] == IC705_mode_nbr[md]) {

@@ -243,7 +243,7 @@ RIG_IC9700::RIG_IC9700() {
 // IC9700 unique commands
 //======================================================================
 
-static int ret = 0;
+//static int ret = 0;
 static bool xcvr_is_on = false;
 
 void RIG_IC9700::set_xcvr_auto_on()

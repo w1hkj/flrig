@@ -311,22 +311,19 @@ void startup(void*)
 
 void rotate_log(std::string filename)
 {
-	const int n = 5; // rename existing log files to keep up to 5 old versions
-	ostringstream oldfn, newfn;
-	ostringstream::streampos p;
+	std::string f1, f2, f3, f4, f5;
 
-	oldfn << filename << '.';
-	newfn << filename << '.';
-	p = oldfn.tellp();
+	f1.assign(filename).append(".1");
+	f2.assign(filename).append(".2");
+	f3.assign(filename).append(".3");
+	f4.assign(filename).append(".4");
+	f5.assign(filename).append(".5");
 
-	for (int i = n - 1; i > 0; i--) {
-		oldfn.seekp(p);
-		newfn.seekp(p);
-		oldfn << i;
-		newfn << i + 1;
-		rename(oldfn.str().c_str(), newfn.str().c_str());
-	}
-	rename(filename.c_str(), oldfn.str().c_str());
+	rename(f4.c_str(), f5.c_str());
+	rename(f3.c_str(), f4.c_str());
+	rename(f2.c_str(), f3.c_str());
+	rename(f1.c_str(), f2.c_str());
+	rename(filename.c_str(), f1.c_str());
 }
 
 void flrig_terminate() {

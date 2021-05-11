@@ -1224,7 +1224,7 @@ void RIG_TS480HX::get_mic_min_max_step(int &min, int &max, int &step)
 void RIG_TS480HX::set_volume_control(int val)
 {
 	cmd = "AG";
-	char szval[5];
+	char szval[20];
 	snprintf(szval, sizeof(szval), "%04d", val * 255 / 100);
 	cmd += szval;
 	cmd += ';';
