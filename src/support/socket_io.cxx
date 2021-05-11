@@ -121,7 +121,7 @@ static void log_level(int level, string s, string data)
 void *rcv_socket_loop(void *)
 {
 	for (;;) {
-		MilliSleep(50);
+		MilliSleep(5);
 		{ guard_lock socket_lock(&mutex_rcv_socket);
 			if (exit_socket_loop) break;
 			if (tcpip && tcpip->fd() != -1) { 
@@ -275,8 +275,8 @@ LOG_QUIET("Retry connect in %d seconds", progStatus.tcpip_reconnect_after);
 	try {
 		guard_lock send_lock(&mutex_rcv_socket);
 		size_t len = cmd_string.length();
-		for (size_t i = 0; i < len; i += 8)
-			tcpip->send(&cmd_string[i], len - i > 8 ? 8 : len - i);
+		for (size_t i = 0; i < len; i += 1024)
+			tcpip->send(&cmd_string[i], len - i > 1024 ? 1024 : len - i);
 		log_level(WARN, "send to remote", cmd_string);
 		drop_count = 0;
 	} catch (const SocketException& e) {
