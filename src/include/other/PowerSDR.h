@@ -48,8 +48,8 @@ enum PowerSDRMODES { LSB, USB, DSB, CWL, CWU, FM, AM, DIGU, SPEC, DIGL, SAM, DRM
 //	int  get_split();
 //	bool twovfos() {return true;}
 
-//	void set_PTT_control(int val);
-//	int  get_PTT();
+	void set_PTT_control(int val);
+	int  get_PTT();
 
 	void set_modeA(int val);
 	int  get_modeA();
@@ -114,7 +114,7 @@ enum PowerSDRMODES { LSB, USB, DSB, CWL, CWU, FM, AM, DIGU, SPEC, DIGL, SAM, DRM
 	void get_rf_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 100; step = 1; }
 
-//	bool tuning();
+	bool tuning();
 
 //	bool sendTScommand(string, int, bool);
 

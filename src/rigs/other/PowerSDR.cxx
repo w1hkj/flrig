@@ -107,48 +107,24 @@ void RIG_PowerSDR::initialize()
 	rig_widgets[8].W = sldrMICGAIN;
 	rig_widgets[9].W = sldrPOWER;
 
-	menu012.clear();
-	cmd = "EX0120000;"; // read menu 012 state
-//might return something like EX01200004;
-
-	if (wait_char(';', 11, 100, "read ex 012", ASC) == 11)
-		menu012 = replystr;
-
-// disable beeps before resetting front panel display to SWR
-	cmd = "EX01200000;";
-	sendCommand(cmd);
-	sett("No beeps");
-	select_swr();
-
-// restore state of xcvr beeps
-//	cmd = menu012;
-//	sendCommand(cmd);
-
 // get current noise reduction values for NR1 and NR2
 	string current_nr;
-	cmd = "NR;";
-	if (wait_char(';', 4, 100, "read current NR", ASC) == 4)
-		current_nr = replystr;
-	gett("get NR");
-	cmd = "RL;";
-	if (wait_char(';', 5, 100, "GET noise reduction val", ASC) == 5) {
-		size_t p = replystr.rfind("RL");
-		if (p != string::npos)
-			_nrval1 = atoi(&replystr[p+2]);
-	}
-
-// restore xcvr setting for NR
-	cmd = current_nr;
-	sendCommand(cmd);
+	cmd = "ZZNR;";
+	wait_char(';', 6, 100, "read current NR", ASC);
+	gett("get ZZNR");
+	size_t p = replystr.rfind("RL");
+	if (p != string::npos)
+		_nrval1 = atoi(&replystr[p+2]);
+	cmd = "ZZNS;";
+	wait_char(';', 6, 100, "read current NR", ASC);
+    int nrval2=0;
+	if (p != string::npos)
+		nrval2 = atoi(&replystr[p+2]);
+    if (nrval2 == 1) _nrval1 = 2;
 }
 
 void RIG_PowerSDR::shutdown()
 {
-// restore state of xcvr beeps
-	if (menu012.empty()) return;
-	cmd = menu012;
-	sendCommand(cmd);
-	sett("restore beeps");
 }
 
 static bool is_tuning = false;
@@ -325,6 +301,7 @@ int RIG_PowerSDR::get_swr()
 {
 	double mtr = 0;
 
+    if (get_tune() != 0) return 0; // swr only works when tuning
 	cmd = "ZZRM8;";
 	get_trace(1, "get_swr");
 	ret = wait_char(';', 8, 100, "get SWR", ASC);
@@ -1013,3 +990,31 @@ void RIG_PowerSDR::get_mic_min_max_step(int &min, int &max, int &step)
     step = 1;
 }
 
+
+// Transceiver PTT on/off
+void RIG_PowerSDR::set_PTT_control(int val)
+{
+    if (val) sendCommand("ZZTX1;");
+    else     sendCommand("ZZTX0;");
+    ptt_ = val;
+}
+
+int RIG_PowerSDR::get_PTT()
+{
+    cmd = "ZZTX;";
+    get_trace(1, "get_PTT");
+    ret = wait_char(';', 6, 100, "get PTT", ASC);
+    gett("");
+    if (ret < 6) return ptt_;
+    ptt_ = (replystr[4] == '1');
+    return ptt_;
+}
+
+bool RIG_PowerSDR::tuning()
+{
+    cmd = "ZZTU;";
+    if (wait_char(';', 6, 100, "tuning?", ASC) == 6) {
+        if (replystr[4] == '1') return true;
+    }
+    return false;
+}
