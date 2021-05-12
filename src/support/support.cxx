@@ -711,7 +711,8 @@ void update_split(void *d)
 					highlight_vfo(NULL);
 					break;
 		}
-	}
+	} else
+		btnSplit->value(progStatus.split);
 	btnSplit->redraw();
 }
 
