@@ -76,28 +76,34 @@ void RIG_FT817::init_cmd()
 void RIG_FT817::selectA()
 {
 	init_cmd();
-	// Without the ability to check VFO-A or B, just toggle them
 	cmd[4] = 0x81;
 	sendCommand(cmd);
 	setthex("Select VFO A");
+
+	check();
 }
 
 void RIG_FT817::selectB()
 {
 	init_cmd();
 	cmd[4] = 0x81;
-	// Without the ability to check VFO-A or B, just toggle them
 	sendCommand(cmd);
 	setthex("Select VFO B");
+
+	check();
 }
 
 bool RIG_FT817::check ()
 {
+	int wait = 5, ret = 0;
 	init_cmd();
-	cmd[4] = 0x03;
-	int ret = waitN(5, 100, "check");
+	cmd[4] = 0x03; // get vfo
+	while ((ret = waitN(5, 100, "check")) < 5 && wait > 0) {
+		init_cmd();
+		cmd[4] = 0x03;
+		wait--;
+	}
 	if (ret < 5) return false;
-	getthex("check");
 	return true;
 }
 
@@ -154,6 +160,8 @@ void RIG_FT817::set_modeA(int val)
 	cmd[4] = 0x07;
 	sendCommand(cmd);
 	setthex("set_modeA");
+
+	check();
 }
 
 // VFO B ===============================================================
@@ -205,6 +213,8 @@ void RIG_FT817::set_modeB(int val)
 	cmd[4] = 0x07;
 	sendCommand(cmd);
 	setthex("set_modeB");
+
+	check();
 }
 
 
@@ -257,7 +267,6 @@ int  RIG_FT817::get_power_out()
 	int fwdpwr = (replystr[0] & 0xF0) >> 4;
 	swr = (replystr[1] & 0xF0) >> 4;
 	alc = (replystr[0] & 0x0F);
-//	int mod = (replystr[1] & 0x0F);
 
 	if (fwdpwr > 8) fwdpwr = 8;
 	if (fwdpwr < 0) fwdpwr = 0;

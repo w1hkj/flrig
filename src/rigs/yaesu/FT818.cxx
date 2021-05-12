@@ -76,11 +76,11 @@ void RIG_FT818ND::selectA()
 {
 	init_cmd();
 
-	// Without the ability to check VFO-A or B, just toggle them
-
 	cmd[4] = 0x81;
 	sendCommand(cmd);
 	setthex("Select VFO A");
+
+	check();
 }
 
 void RIG_FT818ND::selectB()
@@ -88,19 +88,23 @@ void RIG_FT818ND::selectB()
 	init_cmd();
 	cmd[4] = 0x81;
 
-	// Without the ability to check VFO-A or B, just toggle them
-
 	sendCommand(cmd);
 	setthex("Select VFO B");
+
+	check();
 }
 
 bool RIG_FT818ND::check ()
 {
+	int wait = 5, ret = 0;
 	init_cmd();
-	cmd[4] = 0x03;
-	int ret = waitN(5, 100, "check");
+	cmd[4] = 0x03; // get vfo
+	while ((ret = waitN(5, 100, "check")) < 5 && wait > 0) {
+		init_cmd();
+		cmd[4] = 0x03;
+		wait--;
+	}
 	if (ret < 5) return false;
-	getthex("check");
 	return true;
 }
 
@@ -219,7 +223,7 @@ void RIG_FT818ND::set_modeB(int val)
 	cmd[4] = 0x07;
 	sendCommand(cmd);
 	setthex("set_modeB");
-//	showresp(INFO, HEX, "set mode B", cmd, replystr);
+
 MilliSleep(100);
 	get_modeB();
 	int n = 0;
@@ -239,9 +243,6 @@ void RIG_FT818ND::set_PTT_control(int val)
 	if (val) cmd[4] = 0x08;
 	else	 cmd[4] = 0x88;
 	sendCommand(cmd);
-//	std::string s = "set PTT ";
-//	s.append(val ? "ON":"OFF");
-//	showresp(INFO, HEX, s.c_str(), cmd, replystr);
 	setthex("set_PTT_control");
 	ptt_ = val;
 }
@@ -287,7 +288,6 @@ int  RIG_FT818ND::get_power_out()
 	int fwdpwr = (replystr[0] & 0xF0) >> 4;
 	swr = (replystr[1] & 0xF0) >> 4;
 	alc = (replystr[0] & 0x0F);
-//	int mod = (replystr[1] & 0x0F);
 
 	if (fwdpwr > 8) fwdpwr = 8;
 	if (fwdpwr < 0) fwdpwr = 0;
@@ -325,7 +325,6 @@ void RIG_FT818ND::set_split(bool val)
 	split = val;
 	sendCommand(cmd);
 	setthex("set_split");
-//	showresp(INFO, HEX, "set SPLIT", cmd, replystr);
 	return;
 }
 

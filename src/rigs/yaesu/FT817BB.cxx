@@ -88,7 +88,6 @@ int ab = 0;
 
 int RIG_FT817BB::get_vfoAorB()
 {
-	return replystr[0] & 0x01;
 	init_cmd();
 	cmd[1] = 0x55;
 	cmd[4] = 0xBB;
@@ -117,7 +116,7 @@ void RIG_FT817BB::selectA()
 	sendCommand(cmd);
 	showresp(INFO, HEX, "select VFO A", cmd, replystr);
 	setthex("Select VFO A");
-	MilliSleep(100);
+
 	if (get_vfoAorB() == 0)
 		sett("selectA() SUCCESS");
 	else
@@ -133,7 +132,7 @@ void RIG_FT817BB::selectB()
 	sendCommand(cmd);
 	showresp(INFO, HEX, "select VFO B", cmd, replystr);
 	setthex("Select VFO B");
-	MilliSleep(100);
+
 	if (get_vfoAorB() == 1)
 		sett("selectB() SUCCESS");
 	else
@@ -142,11 +141,15 @@ void RIG_FT817BB::selectB()
 
 bool RIG_FT817BB::check ()
 {
+	int wait = 5, ret = 0;
 	init_cmd();
-	cmd[4] = 0x03;
-	int ret = waitN(5, 100, "check");
+	cmd[4] = 0x03; // get vfo
+	while ((ret = waitN(5, 100, "check")) < 5 && wait > 0) {
+		init_cmd();
+		cmd[4] = 0x03;
+		wait--;
+	}
 	if (ret < 5) return false;
-	getthex("check");
 	return true;
 }
 
@@ -164,16 +167,6 @@ unsigned long int RIG_FT817BB::get_vfoA ()
 	freqA = fm_bcd(replystr, 8) * 10;
 	return freqA;
 }
-
-//void RIG_FT817BB::set_getACK() {
-//	for (int i = 0; i < 5; i++) {
-//		sendCommand(cmd, 0);
-//		for (int j = 0; j < 10; j++) {
-//			if (readResponse() == 1) return;
-//			MilliSleep(50);
-//		}
-//	}
-//}
 
 void RIG_FT817BB::set_vfoA (unsigned long int freq)
 {
@@ -222,6 +215,8 @@ void RIG_FT817BB::set_modeA(int val)
 	cmd[4] = 0x07;
 	sendCommand(cmd);
 	setthex("set_modeA");
+
+	check();
 }
 
 // VFO B ===============================================================
@@ -234,6 +229,7 @@ unsigned long int RIG_FT817BB::get_vfoB ()
 	int ret = waitN(5, 100, "get vfoB");
 	getthex("get_vfoB");
 	if (ret < 5) {
+		LOG_ERROR("get_vfoB failed");
 		return freqB;
 	}
 	freqB = fm_bcd(replystr, 8) * 10;
@@ -274,15 +270,15 @@ int RIG_FT817BB::get_modeB()
 
 void RIG_FT817BB::set_modeB(int val)
 {
-	int use = get_vfoAorB();
 	if (get_vfoAorB() != 1) return;
 	init_cmd();
 	cmd[0] = FT817BB_mode_val[val];
 	cmd[4] = 0x07;
 	sendCommand(cmd);
 	setthex("set_modeB");
-}
 
+	check();
+}
 
 //======================================================================
 // Tranceiver PTT on/off
