@@ -51,8 +51,9 @@ public:
 	void selectA();
 	void selectB();
 
-	bool can_split();
+	bool can_split() { return true;}
 	void set_split(bool val);
+	int  get_split();
 
 	int  adjust_bandwidth(int m) { return 0; }
 

@@ -53,6 +53,7 @@ RIG_FT857D::RIG_FT857D() {
 	bwA = 0;
 
 	has_ptt_control =
+	has_split =
 	has_split_AB =
 	has_smeter =
 	has_power_out =
@@ -77,11 +78,17 @@ void RIG_FT857D::init_cmd()
 
 bool RIG_FT857D::check ()
 {
+	int wait = 5, ret = 0;
 	init_cmd();
-	cmd[4] = 0x03;
-	int ret = waitN(5, 100, "check", HEX);
+	cmd[4] = 0x03; // get vfo
+	while ((ret = waitN(5, 100, "check")) < 5 && wait > 0) {
+		init_cmd();
+		cmd[4] = 0x03;
+		wait--;
+	}
 	if (ret < 5) return false;
 	return true;
+
 }
 
 unsigned long int RIG_FT857D::get_vfoA ()
@@ -90,6 +97,7 @@ unsigned long int RIG_FT857D::get_vfoA ()
 	init_cmd();
 	cmd[4] = 0x03;
 	int ret = waitN(5, 100, "get vfo A", HEX);
+	getthex("get_vfoA");
 	if (ret == 5) {
 		freqA = fm_bcd(replystr, 8) * 10;
 		int mode = replystr[4];
@@ -110,7 +118,7 @@ void RIG_FT857D::set_vfoA (unsigned long int freq)
 	cmd += 0x01;
 	replystr.clear();
 	sendCommand(cmd, 0, 50);
-	showresp(INFO, HEX, "set vfo A", cmd, "");
+	setthex("set_vfoA");
 }
 
 unsigned long int RIG_FT857D::get_vfoB ()
@@ -119,6 +127,7 @@ unsigned long int RIG_FT857D::get_vfoB ()
 	init_cmd();
 	cmd[4] = 0x03;
 	int ret = waitN(5, 100, "get vfo B", HEX);
+	getthex("get_vfoB");
 	if (ret == 5) {
 		freqB = fm_bcd(replystr, 8) * 10;
 		int mode = replystr[4];
@@ -139,7 +148,7 @@ void RIG_FT857D::set_vfoB (unsigned long int freq)
 	cmd += 0x01;
 	replystr.clear();
 	sendCommand(cmd, 0, 50);
-	showresp(INFO, HEX, "set vfo B", cmd, "");
+	setthex("set_vfoB");
 }
 
 int RIG_FT857D::get_modeA()
@@ -167,7 +176,7 @@ void RIG_FT857D::set_modeA(int val)
 	cmd[4] = 0x07;
 	replystr.clear();
 	sendCommand(cmd, 0, 50);
-	showresp(INFO, HEX, "set mode A", cmd, "");
+	setthex("set_modeA");
 }
 
 void RIG_FT857D::set_modeB(int val)
@@ -178,7 +187,7 @@ void RIG_FT857D::set_modeB(int val)
 	cmd[4] = 0x07;
 	replystr.clear();
 	sendCommand(cmd, 0, 50);
-	showresp(INFO, HEX, "set mode B", cmd, "");
+	setthex("set_modeB");
 }
 
 // Tranceiver PTT on/off
@@ -189,7 +198,7 @@ void RIG_FT857D::set_PTT_control(int val)
 	else	 cmd[4] = 0x88;
 	replystr.clear();
 	sendCommand(cmd, 0, 20);
-	showresp(INFO, HEX, "set PTT", cmd, "");
+	setthex("set_PTT");
 	ptt_ = val;
 }
 
@@ -224,24 +233,19 @@ int  RIG_FT857D::get_smeter(void)
 void RIG_FT857D::selectA()
 {
 	init_cmd();
-	cmd[4] = 0x81; // this is a toggle ... no way of knowing which is A or B
-	replystr.clear();
-	sendCommand(cmd, 0, 100);
-	showresp(INFO, HEX, "select A", cmd, "");
+	cmd[4] = 0x81;
+	sendCommand(cmd);
+	setthex("Select VFO A");
+	check();
 }
 
 void RIG_FT857D::selectB()
 {
 	init_cmd();
-	cmd[4] = 0x81; // this is a toggle ... no way of knowing which is A or B
-	replystr.clear();
-	sendCommand(cmd, 0, 100);
-	showresp(INFO, HEX, "select B", cmd, "");
-}
-
-bool RIG_FT857D::can_split()
-{ 
-	return true;
+	cmd[4] = 0x81;
+	sendCommand(cmd);
+	setthex("Select VFO B");
+	check();
 }
 
 void RIG_FT857D::set_split(bool val)
@@ -258,6 +262,20 @@ void RIG_FT857D::set_split(bool val)
 		sendCommand(cmd, 0, 100);
 		showresp(INFO, HEX, "set split OFF", cmd, "");
 	}
+	setthex("set_split");
+}
+
+extern bool PTT;
+int  RIG_FT857D::get_split()
+{
+	if (!PTT) return split;
+	init_cmd();
+	cmd[4] = 0xF7; // get transmit status
+	int ret = waitN(1, 100, "get TX status");
+	getthex("get_split");
+	if (ret == 0) return 0;
+	split = (replystr[0] & 0x20) == 0x20;
+	return split;
 }
 
 void RIG_FT857D::set_band_selection(int v)

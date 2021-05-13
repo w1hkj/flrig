@@ -241,8 +241,10 @@ void update_vfoAorB(void *d)
 {
 	if (xcvr_name == rig_FT817.name_ || 
 		xcvr_name == rig_FT817BB.name_ ||
-		xcvr_name == rig_FT818ND.name_ ) {
-		trace(1,"FT81xxx, update_vfoAorB()");
+		xcvr_name == rig_FT818ND.name_ ||
+		xcvr_name == rig_FT857D.name_ ||
+		xcvr_name == rig_FT897D.name_ ) {
+		trace(1,"FT8xxx, update_vfoAorB()");
 		if (useB) {
 			vfoB.src = RIG;
 			vfoB.freq = selrig->get_vfoB();
@@ -5772,9 +5774,11 @@ void init_VFOs()
 {
 	if (selrig->name_ == rig_TT550.name_) return;
 
-	if (selrig->name_ == rig_FT817.name_ || 
-		selrig->name_ == rig_FT817BB.name_ ||
-		xcvr_name == rig_FT818ND.name_ ) {
+	if (xcvr_name == rig_FT817.name_ || 
+		xcvr_name == rig_FT817BB.name_ ||
+		xcvr_name == rig_FT818ND.name_ ||
+		xcvr_name == rig_FT857D.name_ ||
+		xcvr_name == rig_FT897D.name_ ) {
 		if (useB) {
 			selrig->selectA();
 			useB = false;
