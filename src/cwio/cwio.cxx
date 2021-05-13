@@ -59,19 +59,28 @@ bool cwio_thread_running = false;
 
 void send_cwkey(char c)
 {
+	static std::string code = "";
+	static double tc = 0;
+	static double tch = 0;
+	static double twd = 0;
 	Cserial *port = cwio_serial;
+
 	if (progStatus.cwioSHARED == 1) {
 		port = RigSerial; // sharing CAT port
 		bypass_serial_thread_loop = true;
 	}
 	if (progStatus.cwioSHARED == 2) port = AuxSerial; // sharing AUX port
 	if (progStatus.cwioSHARED == 3) port = SepSerial; // sharing SEP port
-	if (!port) return;
-	if (!port->IsOpen()) return;
 
-	double tc = 1200.0 / progStatus.cwioWPM;
-	double tch = 3 * tc;
-	double twd = 4 * tc;
+	if (!port) 
+		goto exit_send_cwkey;
+
+	if (!port->IsOpen()) 
+		goto exit_send_cwkey;
+
+	tc = 1200.0 / progStatus.cwioWPM;
+	tch = 3 * tc;
+	twd = 4 * tc;
 
 	if ((progStatus.cwio_comp > 0) && (progStatus.cwio_comp < tc)) {
 		tc = round (tc - progStatus.cwio_comp);
@@ -81,12 +90,14 @@ void send_cwkey(char c)
 
 	if (c == ' ' || c == 0x0a) {
 		MilliSleep(twd);
-		return;
+		goto exit_send_cwkey;
 	}
 
-	string code = morse->tx_lookup(c);
+	code = morse->tx_lookup(c);
 	for (size_t n = 0; n < code.length(); n++) {
-		if (cwio_process == END) return;
+		if (cwio_process == END) {
+			goto exit_send_cwkey;
+		}
 		if (progStatus.cwioKEYLINE == 2) {
 			port->setDTR(1);
 		} else if (progStatus.cwioKEYLINE == 1) {
@@ -108,6 +119,7 @@ void send_cwkey(char c)
 			MilliSleep(tc);
 	}
 
+exit_send_cwkey:
 	if (progStatus.cwioSHARED == 1) {
 		bypass_serial_thread_loop = false;
 	}
@@ -214,9 +226,6 @@ void do_calibration()
 
 	progStatus.cwio_comp = 50 * (1.0 - 60000.0 / (end_time - start_time));
 
-//std::cout << "start_time: " << start_time << ", end_time: " << end_time << std::endl;
-//std::cout << "cwio_comp: " << progStatus.cwio_comp << std::endl;
-
 	Fl::awake(update_comp_value);
 }
 
@@ -281,7 +290,6 @@ int start_cwio_thread()
 void stop_cwio_thread()
 {
 	if(!cwio_thread_running) return;
-//std::cout << "stopping cwio thread" << std::endl;
 
 	cwio_process = END;
 	btn_cwioSEND->value(0);
@@ -292,10 +300,7 @@ void stop_cwio_thread()
 	pthread_cond_signal(&cwio_cond);
 	MilliSleep(50);
 
-//std::cout << "joining cwio_pthread" << std::endl;
-
 	pthread_join(cwio_pthread, NULL);
-//std::cout << "cwio thread - stopped" << std::endl;
 
 	LOG_INFO("%s", "cwio thread - stopped");
 

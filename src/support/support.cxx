@@ -1574,6 +1574,7 @@ void * serial_thread_loop(void *d)
 		if (!srvc_reqs.empty()) {
 			serviceQUE();
 		}
+
 		get_trace(1, "serial thread loop:");
 
 		{	guard_lock lk(&mutex_serial);
