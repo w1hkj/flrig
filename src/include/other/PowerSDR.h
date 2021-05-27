@@ -43,10 +43,10 @@ enum PowerSDRMODES { LSB, USB, DSB, CWL, CWU, FM, AM, DIGU, SPEC, DIGL, SAM, DRM
 //	void selectA();
 //	void selectB();
 
-//	bool can_split() { return true;}
-//	void set_split(bool val);
-//	int  get_split();
-//	bool twovfos() {return true;}
+	bool can_split() { return true;}
+	void set_split(bool val);
+	int  get_split();
+	bool twovfos() {return true;}
 
 	void set_PTT_control(int val);
 	int  get_PTT();

@@ -726,6 +726,7 @@ int RIG_PowerSDR::get_bwB() // same as A
 	stringstream str;
 	str << "B.iBW = " << B.iBW;
 	trace(2, __func__, str.str().c_str());
+    vfoB.iBW = B.iBW;
 	progStatus.iBW_B = B.iBW;
 	return B.iBW;
 }
@@ -1018,3 +1019,25 @@ bool RIG_PowerSDR::tuning()
     }
     return false;
 }
+
+void RIG_PowerSDR::set_split(bool val)
+{
+    if (val) {
+        cmd = "ZZSP1;";
+        sendCommand(cmd);
+    } else {
+        cmd = "ZZSP0;";
+    }
+}
+
+int RIG_PowerSDR::get_split()
+{
+    cmd = "ZZSP;";
+    get_trace(1, "get_split");
+    ret = wait_char(';', 6, 100, "get split", ASC);
+    gett("");
+    if (ret < 6) return ptt_;
+    split = (replystr[4] == '1');
+    return split;
+}
+
