@@ -3680,15 +3680,16 @@ void adjust_small_ui()
 	btnAGC->hide();
 	sldrRFGAIN->redraw_label();
 
-	if (progStatus.schema == 1 && selrig->widgets[0].W != NULL) {
+	if (progStatus.schema == 1 && selrig->widgets[0].W != (Fl_Widget *)0) {
 		int i = 0;
 		while (selrig->widgets[i].W != NULL) {
-			selrig->widgets[i].W->resize(
-				selrig->widgets[i].x, selrig->widgets[i].y,
-				selrig->widgets[i].w, selrig->widgets[i].W->h() );
+			if (selrig->widgets[i].w != 0) 
+				selrig->widgets[i].W->resize(
+					selrig->widgets[i].x, selrig->widgets[i].y,
+					selrig->widgets[i].w, selrig->widgets[i].W->h() );
+			if (selrig->widgets[i].y > y) y = selrig->widgets[i].y;
 			selrig->widgets[i].W->show();
 			selrig->widgets[i].W->redraw();
-			if (selrig->widgets[i].y > y) y = selrig->widgets[i].y;
 			i++;
 		}
 		if (selrig->has_data_port) {
@@ -4206,6 +4207,20 @@ void adjust_control_positions()
 			adjust_touch_ui();
 			break;
 	}
+// change control labels / tooltips if necessary
+	int i = 0;
+	while (selrig->widgets[i].W != NULL) {
+		if (!selrig->widgets[i].label.empty()) {
+			selrig->widgets[i].W->label(selrig->widgets[i].label.c_str());
+			selrig->widgets[i].W->redraw_label();
+		}
+		if (!selrig->widgets[i].hint.empty()) {
+			selrig->widgets[i].W->tooltip(selrig->widgets[i].hint.c_str());
+		}
+		selrig->widgets[i].W->redraw();
+		i++;
+	}
+
 	FreqDispA->set_hrd(progStatus.hrd_buttons);
 	FreqDispB->set_hrd(progStatus.hrd_buttons);
 	if (selrig->name_ == rig_FT891.name_) {

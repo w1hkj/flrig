@@ -32,7 +32,7 @@ class Fl_Wheel_Slider : public Fl_Slider
 private:
 	bool reverse_;
 public:
-	Fl_Wheel_Slider(int x, int y, int w, int h, const char *label = 0)
+	Fl_Wheel_Slider(int x, int y, int w, int h, const char *label = "")
 		: Fl_Slider(x, y, w, h, label), reverse_(false) { }
 	int handle(int event);
 	void reverse(bool rev) { reverse_ = rev;}
@@ -44,7 +44,7 @@ class Fl_Wheel_Value_Slider : public Fl_Value_Slider
 private:
 	bool reverse_;
 public:
-	Fl_Wheel_Value_Slider(int x, int y, int w, int h, const char *label = 0)
+	Fl_Wheel_Value_Slider(int x, int y, int w, int h, const char *label = "")
 		: Fl_Value_Slider(x, y, w, h, label), reverse_(false) { }
 	int handle(int event);
 	void reverse(bool rev) { reverse_ = rev;}

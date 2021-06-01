@@ -136,6 +136,8 @@ struct GUI {
 	int			x;
 	int			y;
 	int			w;
+	string		label;
+	string		hint;
 };
 
 class rigbase {

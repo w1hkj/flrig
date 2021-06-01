@@ -109,22 +109,22 @@ const char *IC7300_fm_bws[] = { "FIXED", NULL };
 static int IC7300_bw_vals_FM[] = { 1, WVALS_LIMIT};
 
 static GUI IC7300_widgets[]= {
-	{ (Fl_Widget *)btnVol,        2, 125,  50 },	//0
-	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },	//1
-	{ (Fl_Widget *)btnAGC,        2, 145,  50 },	//2
-	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },	//3
-	{ (Fl_Widget *)sldrSQUELCH,  54, 165, 156 },	//4
-	{ (Fl_Widget *)btnNR,         2, 185,  50 },	//5
-	{ (Fl_Widget *)sldrNR,       54, 185, 156 },	//6
-	{ (Fl_Widget *)btnLOCK,     214, 105,  50 },	//7
-	{ (Fl_Widget *)sldrINNER,   266, 105, 156 },	//8
-	{ (Fl_Widget *)btnCLRPBT,   214, 125,  50 },	//9
-	{ (Fl_Widget *)sldrOUTER,   266, 125, 156 },	//10
-	{ (Fl_Widget *)btnNotch,    214, 145,  50 },	//11
-	{ (Fl_Widget *)sldrNOTCH,   266, 145, 156 },	//12
-	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 },	//13
-	{ (Fl_Widget *)sldrPOWER,   266, 185, 156 },	//14
-	{ (Fl_Widget *)NULL, 0, 0, 0 }
+	{ btnVol,        2, 125,  50 },	//0
+	{ sldrVOLUME,   54, 125, 156 },	//1
+	{ btnAGC,        2, 145,  50 },	//2
+	{ sldrRFGAIN,   54, 145, 156 },	//3
+	{ sldrSQUELCH,  54, 165, 156 },	//4
+	{ btnNR,         2, 185,  50 },	//5
+	{ sldrNR,       54, 185, 156 },	//6
+	{ btnLOCK,     214, 105,  50 },	//7
+	{ sldrINNER,   266, 105, 156 },	//8
+	{ btnCLRPBT,   214, 125,  50 },	//9
+	{ sldrOUTER,   266, 125, 156 },	//10
+	{ btnNotch,    214, 145,  50 },	//11
+	{ sldrNOTCH,   266, 145, 156 },	//12
+	{ sldrMICGAIN, 266, 165, 156 },	//13
+	{ sldrPOWER,   266, 185, 156 },	//14
+	{ NULL, 0, 0, 0 }
 };
 
 void RIG_IC7300::initialize()
@@ -1642,7 +1642,6 @@ int RIG_IC7300::next_preamp()
 
 void RIG_IC7300::set_preamp(int val)
 {
-	PREAMBLE
 	if (val) {
 		atten_level = 0;
 		atten_label("ATT", false);
