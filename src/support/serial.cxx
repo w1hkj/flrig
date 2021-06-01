@@ -143,36 +143,36 @@ bool Cserial::OpenPort()  {
 			break;
 		case 1200:
 			speed = B1200;
-			timeout = 512;
+			timeout = 1024;
 			break;
 		case 2400:
 			speed = B2400;
-			timeout = 256;
+			timeout = 1024;
 			break;
 		case 4800:
 			speed = B4800;
-			timeout = 128;
+			timeout = 512;
 			break;
 		default:
 		case 9600:
 			speed = B9600;
-			timeout = 64;
+			timeout = 256;
 			break;
 		case 19200:
 			speed = B19200;
-			timeout = 32;
+			timeout = 128;
 			break;
 		case 38400:
 			speed = B38400;
-			timeout = 16;
+			timeout = 64;
 			break;
 		case 57600:
 			speed = B57600;
-			timeout = 8;
+			timeout = 32;
 			break;
 		case 115200:
 			speed = B115200;
-			timeout = 4;
+			timeout = 16;
 			break;
 	}
 	cfsetispeed(&newtio, speed);
@@ -326,12 +326,9 @@ bool  Cserial::IOselect ()
 
 	FD_ZERO (&rfds);
 	FD_SET (fd, &rfds);
+
 	tv.tv_sec = timeout/1000;
 	tv.tv_usec = (timeout % 1000) * 1000;
-
-static char IOsel[100];
-	snprintf(IOsel, sizeof(IOsel), "select( ..., %d msec)", timeout);
-	ser_trace(1, IOsel);
 
 	retval = select (FD_SETSIZE, &rfds, (fd_set *)0, (fd_set *)0, &tv);
 
@@ -351,15 +348,25 @@ static char IOsel[100];
 int  Cserial::ReadBuffer (std::string &buf, int nchars, std::string find1, std::string find2)
 {
 	if (fd < 0) {
-ser_trace(1, "ReadBuffer(...) fd < 0");
+		ser_trace(1, "ReadBuffer(...) fd < 0");
 		return 0;
 	}
 
-	int retnum, nread = 0;
-	char tempbuf[nchars + 1];
-	int tries = 0;
+	int retnum = 0, nread = 0;
+	static char tempbuf[201];
+	int tries = 10;
 	bool hex = false;
 	std::string s1, s2;
+	size_t p1, p2;
+
+	fd_set rfds;
+	struct timeval tv;
+
+	FD_ZERO (&rfds);
+	FD_SET (fd, &rfds);
+
+	tv.tv_sec = timeout/1000;
+	tv.tv_usec = (timeout % 1000) * 1000;
 
 	if (find1.length()) {
 		if (find1.find('\xFE') != std::string::npos) {
@@ -376,67 +383,46 @@ ser_trace(1, "ReadBuffer(...) fd < 0");
 			s2 = find2;
 	}
 
-	while (1) {
-		while (!IOselect()) {  // retry IOselect() 10 times with timeout msec
-			if (++tries == 10) {
-				if (progStatus.serialtrace) {
-					snprintf(traceinfo, sizeof(traceinfo), "!IOselect() err[%d] = %s",
-					errno,
-					(errno == EBADF ? "invalid file descriptor" :
-					 errno == EINTR ? "signal was caught" :
-					 errno == EINVAL ? "nfds is negative, or timeout is invalid" :
-					 errno == ENOMEM ? "unable to allocate memory" : "unknown error")
-					);
-					set_trace(1, traceinfo);
+	while (--tries) {
+
+		if (select (FD_SETSIZE, &rfds, (fd_set *)0, (fd_set *)0, &tv) > 0) {
+			if (FD_ISSET( fd, &rfds) ) {
+				memset(tempbuf, 0, 201);
+				if ((retnum = read (fd, tempbuf, 200)) > 0) {
+					buf.append(tempbuf, retnum);
+					nread = buf.length();
 				}
-				return 0;
 			}
-		}
-
-		memset(tempbuf, 0, nchars + 1);
-		retnum = read (fd, tempbuf, nchars);
-
-		if (retnum < 0) {
-			if (progStatus.serialtrace) {
-				snprintf(traceinfo, sizeof(traceinfo), "retnum < 0");
-				ser_trace(1, traceinfo);
-			}
-			return 0;
-		}
-		if (retnum > 0) {
-			buf.append(tempbuf, retnum);
-			nread += retnum;
 		}
 
 		if (find1.length() && find2.length()) {
-			if (buf.rfind(find1) != std::string::npos &&
-				buf.rfind(find2) != std::string::npos) {
-					if (progStatus.serialtrace) {
-						snprintf(traceinfo, sizeof(traceinfo), "s1/s2: %s",
-							(hex ? str2hex(buf.c_str(), buf.length()) : buf.c_str()) );
-						ser_trace(1, traceinfo);
-					}
+			p1 = buf.rfind(find1);
+			p2 = buf.rfind(find2);
+			if (p1 != std::string::npos &&
+				p2 != std::string::npos &&
+				p2 > p1) {
+				snprintf(traceinfo, sizeof(traceinfo), "s1/s2: %s",
+					(hex ? str2hex(buf.c_str(), buf.length()) : buf.c_str()) );
+				if (progStatus.serialtrace) ser_trace(1, traceinfo);
 				return nread;
 			}
 		} else if (find1.length()) {
-			if (buf.rfind(find1) != std::string::npos) {
-				if (progStatus.serialtrace) {
-					snprintf(traceinfo, sizeof(traceinfo), "s1   : %s",
-						(hex ? str2hex(buf.c_str(), buf.length()) : buf.c_str()) );
-					ser_trace(1, traceinfo);
-				}
+			p1 = buf.rfind(find1);
+			if (p1 != std::string::npos) {
+				snprintf(traceinfo, sizeof(traceinfo), "s1   : %s",
+					(hex ? str2hex(buf.c_str(), buf.length()) : buf.c_str()) );
+				if (progStatus.serialtrace) ser_trace(1, traceinfo);
 				return nread;
 			}
-		} else if (retnum == 0 || nread >= nchars) {
-			if (progStatus.serialtrace) {
-				snprintf(traceinfo, sizeof(traceinfo), "%5d: %s", nread, 
-					(hex ? str2hex(buf.c_str(), buf.length()) : buf.c_str()) );
-				ser_trace(1, traceinfo);;
-			}
+		} else if (nread >= nchars) {
+			snprintf(traceinfo, sizeof(traceinfo), "%d / %d: %s", nread, nchars, 
+				(hex ? str2hex(buf.c_str(), buf.length()) : buf.c_str()) );
+			if (progStatus.serialtrace) ser_trace(1, traceinfo);;
 			return nread;
 		}
-
 	}
+	if (progStatus.serialtrace)
+		ser_trace(2, "FAILED: ", (hex ? str2hex(buf.c_str(), buf.length()) : buf.c_str()) );
 
 	return nread;
 }

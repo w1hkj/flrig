@@ -324,6 +324,11 @@ void rotate_log(std::string filename)
 	rename(f2.c_str(), f3.c_str());
 	rename(f1.c_str(), f2.c_str());
 	rename(filename.c_str(), f1.c_str());
+
+	ofstream tfile(filename.c_str());
+	tfile << "flrig " << VERSION << std::endl << std::endl;
+	tfile.close();
+
 }
 
 void flrig_terminate() {

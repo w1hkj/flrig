@@ -118,11 +118,11 @@ void cb_K3_swapAB()
 	XCVR_STATE temp = vfoA;
 	vfoA = vfoB;
 	vfoB = temp;
-	vfo = &vfoA;
 
 	selrig->set_vfoB(vfoB.freq);
 	selrig->set_bwB(vfoB.iBW);
 	selrig->set_modeB(vfoB.imode);
+	FreqDispB->value(vfoB.freq);
 
 	selrig->set_vfoA(vfoA.freq);
 	selrig->set_bwA(vfoA.iBW);
@@ -132,7 +132,6 @@ void cb_K3_swapAB()
 	opMODE->index(vfoA.imode);
 	FreqDispA->value(vfoA.freq);
 
-	FreqDispB->value(vfoB.freq);
-
+	vfo = &vfoA;
 	Fl::focus(FreqDispA);
 }

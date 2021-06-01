@@ -21,6 +21,7 @@
 #ifndef THREADS_H_
 #define THREADS_H_
 
+#include <iostream>
 #include <config.h>
 
 #include <sys/types.h>
@@ -133,5 +134,14 @@ private:
 	std::string how;
 //	int how;
 };
+
+struct cpreamble
+{
+    std::string m_func;
+    cpreamble(const char* func) : m_func(func) 
+    { std::cout << func << " entry" << std::endl; }
+    ~cpreamble() { std::cout << m_func << " exit" << std::endl; }
+};
+#define PREAMBLE cpreamble _cpreamble(__func__);
 
 #endif // !THREADS_H_

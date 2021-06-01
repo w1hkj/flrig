@@ -81,9 +81,13 @@ Fl_Light_Button *btnNOISE = (Fl_Light_Button *)0;
 Fl_Light_Button *btnAutoNotch = (Fl_Light_Button *)0;
 Fl_Group *grp_row1b2 = (Fl_Group *)0;
 Fl_Button *btnAswapB = (Fl_Button *)0;
+
 Fl_Button *btn_K3_swapAB = (Fl_Button *)0;
+Fl_Button *btn_K3_A2B = (Fl_Button *)0;
+
 Fl_Button *btn_KX3_swapAB = (Fl_Button *)0;
-Fl_Light_Button *btnB = (Fl_Light_Button *)0;
+Fl_Button *btn_KX3_A2B = (Fl_Button *)0;
+
 Fl_Light_Button *btnSplit = (Fl_Light_Button *)0;
 Fl_Light_Button *btnPTT = (Fl_Light_Button *)0;
 Fl_Box *bx_row1_expander2=(Fl_Box *)0;
@@ -94,6 +98,7 @@ Fl_Wheel_Value_Slider *sldrMICGAIN = (Fl_Wheel_Value_Slider *)0;
 Fl_Box *bx_sep2a=(Fl_Box *)0;
 Fl_Group *grp_row2b = (Fl_Group *)0;
 Fl_Light_Button *btnIFsh = (Fl_Light_Button *)0;
+Fl_Button *btn_KX3_IFsh = (Fl_Button *)0;
 Fl_Wheel_Value_Slider *sldrIFSHIFT = (Fl_Wheel_Value_Slider *)0;
 
 Fl_Light_Button *btnLOCK = (Fl_Light_Button *)0;
@@ -232,6 +237,7 @@ cFreqControl *FreqDispA=(cFreqControl *)0;
 cFreqControl *FreqDispB=(cFreqControl *)0;
 Fl_Group *grp_row0a = (Fl_Group *)0;
 Fl_Light_Button *btnA = (Fl_Light_Button *)0;
+Fl_Light_Button *btnB = (Fl_Light_Button *)0;
 Fl_Button *btnTune = (Fl_Button *)0;
 Fl_Light_Button *btn_tune_on_off = (Fl_Light_Button *)0;
 Fl_Box *bx_row0_expander=(Fl_Box *)0;

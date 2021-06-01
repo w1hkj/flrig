@@ -466,7 +466,10 @@ status progStatus = {
 	false,		// bool	gpio_ptt;
 	0,			// int	enable_gpio;
 	0,			// int	gpio_on;
-	0,			//int	gpio_pulse_width;
+	0,			// int	gpio_pulse_width;
+
+// KXPA 100 presence
+	0,			// int kxpa on line = 1
 
 // cwio parameters
 	20,			// int    cwioWPM;

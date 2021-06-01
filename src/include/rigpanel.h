@@ -92,7 +92,9 @@ extern Fl_Group *grp_row0a;
 
 extern Fl_Light_Button *btnA;
 extern Fl_Button *btn_K3_swapAB;
+extern Fl_Button *btn_K3_A2B;
 extern Fl_Button *btn_KX3_swapAB;
+extern Fl_Button *btn_KX3_A2B;
 extern Fl_Light_Button *btnB;
 extern Fl_Box *labelMEMORY;
 extern Fl_Button *btnTune;
@@ -127,6 +129,7 @@ extern Fl_Wheel_Value_Slider *sldrMICGAIN;
 extern Fl_Box *bx_sep2a;
 extern Fl_Group *grp_row2b;
 extern Fl_Light_Button *btnIFsh;
+extern Fl_Button *btn_KX3_IFsh;
 extern Fl_Wheel_Value_Slider *sldrIFSHIFT;
 extern Fl_Light_Button *btnNR;
 extern Fl_Wheel_Value_Slider *sldrNR;

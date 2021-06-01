@@ -151,6 +151,7 @@ void RIG_IC7300::initialize()
 
 	choice_rTONE->activate();
 	choice_tTONE->activate();
+
 }
 
 RIG_IC7300::RIG_IC7300() {
@@ -253,6 +254,21 @@ RIG_IC7300::RIG_IC7300() {
 	has_a2b = true;
 
 	CW_sense = 0; // CW is LSB
+
+//	progStatus.gettrace   = 
+//	progStatus.settrace   = 
+//	progStatus.serialtrace =
+//	progStatus.rigtrace    =
+//	progStatus.xmltrace    =
+//	progStatus.trace       = false;
+
+//	progStatus.gettrace   = true;
+//	progStatus.settrace   = true;
+//	progStatus.serialtrace = true;
+//	progStatus.rigtrace    = true;
+//	progStatus.xmltrace    = true;
+//	progStatus.trace       = true;
+
 };
 
 static inline void minmax(int min, int max, int &val)
@@ -263,24 +279,24 @@ static inline void minmax(int min, int max, int &val)
 
 void RIG_IC7300::selectA()
 {
-	set_trace(1, "selectA()");
 	cmd.assign(pre_to).append("\x07");
 	cmd += '\x00';
 	cmd.append(post);
-	waitFB("select A");
 
-	isett("selectA");
+	set_trace(1, "select A");
+	waitFB("select A");
+	seth();
 }
 
 void RIG_IC7300::selectB()
 {
-	set_trace(1, "selectB()");
 	cmd.assign(pre_to).append("\x07");
 	cmd += '\x01';
 	cmd.append(post);
-	waitFB("select B");
 
-	isett("selectB");
+	set_trace(1, "select B");
+	waitFB("select B");
+	seth();
 }
 
 //======================================================================
@@ -292,7 +308,11 @@ void RIG_IC7300::swapAB()
 	cmd = pre_to;
 	cmd += 0x07; cmd += 0xB0;
 	cmd.append(post);
+
+	set_trace(1, "swap AB");
 	waitFB("Exchange vfos");
+	seth();
+
 	get_modeA(); // get mode to update the filter A / B usage
 	get_modeB();
 }
@@ -320,12 +340,13 @@ void RIG_IC7300::set_xcvr_auto_on()
 
 		cmd.assign(pre_to);
 		cmd += '\x18'; cmd += '\x01';
-		set_trace(1, "power_on()");
+//		set_trace(1, "power_on()");
 		cmd.append(post);
 		RigSerial->failed(0);
 
+		set_trace(1, "power ON");
 		if (waitFB("Power ON")) {
-			isett("power_on()");
+			seth();
 			xcvr_is_on = true;
 			cmd = pre_to; cmd += '\x19'; cmd += '\x00';
 			get_trace(1, "getID()");
@@ -343,7 +364,7 @@ void RIG_IC7300::set_xcvr_auto_on()
 			return;
 		}
 
-		isett("power_on()");
+		set_trace(1, "power_ON failed");
 		RigSerial->failed(1);
 		xcvr_is_on = false;
 		return;
@@ -357,7 +378,9 @@ void RIG_IC7300::set_xcvr_auto_off()
 	cmd.append(pre_to);
 	cmd += '\x18'; cmd += '\x00';
 	cmd.append(post);
+	set_trace(1, "set xcvr auto OFF");
 	waitFB("Power OFF", 200);
+	seth();
 }
 
 bool RIG_IC7300::check ()
@@ -388,7 +411,7 @@ unsigned long int RIG_IC7300::get_vfoA ()
 
 	get_trace(1, "get_vfoA()");
 	ret = waitFOR(12, "get vfo A");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -405,7 +428,7 @@ unsigned long int RIG_IC7300::get_vfoA ()
 
 void RIG_IC7300::set_vfoA (unsigned long int freq)
 {
-	set_trace(1, "set_vfoA()");
+//	set_trace(1, "set_vfoA()");
 	A.freq = freq;
 
 	cmd.assign(pre_to).append("\x25");
@@ -414,10 +437,10 @@ void RIG_IC7300::set_vfoA (unsigned long int freq)
 
 	cmd.append( to_bcd_be( freq, 10) );
 	cmd.append( post );
+
+	set_trace(1, "set_vfoA");
 	waitFB("set vfo A");
-
-	isett("set_vfoA");
-
+	seth();
 }
 
 unsigned long int RIG_IC7300::get_vfoB ()
@@ -439,7 +462,7 @@ unsigned long int RIG_IC7300::get_vfoB ()
 
 	get_trace(1, "get_vfoB()");
 	ret = waitFOR(12, "get vfo B");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -456,7 +479,7 @@ unsigned long int RIG_IC7300::get_vfoB ()
 
 void RIG_IC7300::set_vfoB (unsigned long int freq)
 {
-	set_trace(1, "set_vfoB()");
+//	set_trace(1, "set_vfoB()");
 	B.freq = freq;
 
 	cmd.assign(pre_to).append("\x25");
@@ -465,9 +488,10 @@ void RIG_IC7300::set_vfoB (unsigned long int freq)
 
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append( post );
-	waitFB("set vfo B");
 
-	isett("set_vfoB");
+	set_trace(1, "set_vfoB");
+	waitFB("set vfo B");
+	seth();
 }
 
 // expecting
@@ -504,7 +528,7 @@ int RIG_IC7300::get_modeA()
 
 	get_trace(1, "get_modeA()");
 	ret = waitFOR(10, "get mode A");
-	igett("");
+	geth();
 
 	if (ret) {
 		p = replystr.rfind(resp);
@@ -531,7 +555,7 @@ int RIG_IC7300::get_modeA()
 
 end_wait_modeA:
 
-	get_trace(4, "get mode A[", IC7300modes_[A.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
+	get_trace(4, "get mode A [", IC7300modes_[A.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
 
 	if (A.imode == CW7300 || A.imode == CWR7300) {
 		cmd.assign(pre_to).append("\x1A\x05");
@@ -542,13 +566,18 @@ end_wait_modeA:
 
 		get_trace(1, "get_CW_sideband");
 		ret = waitFOR(10, "get CW sideband");
-		igett("");
+		geth();
 
 		if (ret) {
 			p = replystr.rfind(resp);
 			CW_sense = replystr[p+8];
-			if (CW_sense) IC7300_mode_type[A.imode] = 'U';
-			else IC7300_mode_type[A.imode] = 'L';
+			if (CW_sense) {
+				IC7300_mode_type[CW7300] = 'U';
+				IC7300_mode_type[CWR7300] = 'L';
+			} else {
+				IC7300_mode_type[CW7300] = 'L';
+				IC7300_mode_type[CWR7300] = 'U';
+			}
 		}
 	}
 
@@ -574,9 +603,10 @@ void RIG_IC7300::set_modeA(int val)
 		cmd += '\x00';
 	cmd += mode_filterA[A.imode];		// filter
 	cmd.append( post );
-	waitFB("set mode A");
 
-	set_trace(4, "set mode A[", IC7300modes_[A.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(1, "set mode A");
+	waitFB("set mode A");
+	seth();
 }
 
 int RIG_IC7300::get_modeB()
@@ -596,7 +626,7 @@ int RIG_IC7300::get_modeB()
 
 	get_trace(1, "get_modeB()");
 	ret = waitFOR(10, "get mode B");
-	igett("");
+	geth();
 
 	if (ret) {
 		p = replystr.rfind(resp);
@@ -621,12 +651,11 @@ int RIG_IC7300::get_modeB()
 
 end_wait_modeB:
 
-	get_trace(4, "get mode B[", IC7300modes_[B.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
+	get_trace(4, "get mode B [", IC7300modes_[B.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
 
 	if (B.filter > 0 && B.filter < 4)
 		mode_filterB[B.imode] = B.filter;
 
-	get_trace(4, "get mode A[", IC7300modes_[B.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
 	if (B.imode == CW7300 || B.imode == CWR7300) {
 		cmd.assign(pre_to).append("\x1A\x05");
 		cmd += '\x00'; cmd += '\x53';
@@ -636,13 +665,18 @@ end_wait_modeB:
 
 		get_trace(1, "get_CW_sideband");
 		ret = waitFOR(10, "get CW sideband");
-		igett("");
+		geth();
 
 		if (ret) {
 			p = replystr.rfind(resp);
 			CW_sense = replystr[p+8];
-			if (CW_sense) IC7300_mode_type[B.imode] = 'U';
-			else IC7300_mode_type[B.imode] = 'L';
+			if (CW_sense) {
+				IC7300_mode_type[CW7300] = 'U';
+				IC7300_mode_type[CWR7300] = 'L';
+			} else {
+				IC7300_mode_type[CW7300] = 'L';
+				IC7300_mode_type[CWR7300] = 'U';
+			}
 		}
 	}
 
@@ -665,9 +699,10 @@ void RIG_IC7300::set_modeB(int val)
 		cmd += '\x00';
 	cmd += mode_filterB[B.imode];		// filter
 	cmd.append( post );
-	waitFB("set mode B");
 
-	set_trace(4, "set mode B[", IC7300modes_[B.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(1, "set mode B");
+	waitFB("set mode B");
+	seth();
 }
 
 int RIG_IC7300::get_FILT(int mode)
@@ -692,9 +727,10 @@ void RIG_IC7300::set_FILT(int filter)
 		else cmd += '\x00';
 		cmd += filter;						// filter
 		cmd.append( post );
-		waitFB("set mode/filter B");
 
-		set_trace(4, "set mode/filter B[", IC7300modes_[B.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
+		set_trace(1, "set mode/filter B");
+		waitFB("set mode/filter B");
+		seth();
 	} else {
 		A.filter = filter;
 		mode_filterA[A.imode] = filter;
@@ -706,9 +742,11 @@ void RIG_IC7300::set_FILT(int filter)
 		else cmd += '\x00';
 		cmd += filter;						// filter
 		cmd.append( post );
-		waitFB("set mode/filter A");
 
-		set_trace(4, "set mode/filter A[", IC7300modes_[A.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
+		set_trace(1, "set mode/filter A");
+		waitFB("set mode/filter A");
+		seth();
+
 	}
 }
 
@@ -788,15 +826,16 @@ bool RIG_IC7300::can_split()
 
 void RIG_IC7300::set_split(bool val)
 {
-	set_trace(1, "set_split()");
+//	set_trace(1, "set_split()");
 	split = val;
 	cmd = pre_to;
 	cmd += 0x0F;
 	cmd += val ? 0x01 : 0x00;
 	cmd.append(post);
-	waitFB(val ? "set split ON" : "set split OFF");
 
-	isett("set_split");
+	set_trace(1, "set_split");
+	waitFB(val ? "set split ON" : "set split OFF");
+	seth();
 }
 
 int RIG_IC7300::get_split()
@@ -808,7 +847,7 @@ int RIG_IC7300::get_split()
 
 	get_trace(1, "get_split()");
 	ret = waitFOR(7, "get split");
-	igett("");
+	geth();
 
 	if (ret) {
 		string resp = pre_fm;
@@ -836,7 +875,7 @@ int RIG_IC7300::get_bwA()
 
 	get_trace(1, "get_bwA()");
 	ret = waitFOR(8, "get_bwA");
-	igett("");
+	geth();
 
 	if (ret) {
 		string resp = pre_fm;
@@ -857,7 +896,7 @@ int RIG_IC7300::get_bwA()
 
 void RIG_IC7300::set_bwA(int val)
 {
-	set_trace(1, "set_bwA()");
+//	set_trace(1, "set_bwA()");
 
 	if (A.imode == 3 || A.imode == 11) return; // FM, FM-D
 
@@ -868,10 +907,11 @@ void RIG_IC7300::set_bwA(int val)
 	cmd.append("\x1a\x03");
 	cmd.append(to_bcd(A.iBW, 2));
 	cmd.append(post);
+	set_trace(1, "set bw A");
 	waitFB("set bwA");
+	seth();
 
 	mode_bwA[A.imode] = val;
-	isett("set_bwA");
 
 	if (useB) selectB();
 }
@@ -889,7 +929,7 @@ int RIG_IC7300::get_bwB()
 
 	get_trace(1, "get_bwA()");
 	ret = waitFOR(8, "get_bwB");
-	igett("");
+	geth();
 
 	if (ret) {
 		string resp = pre_fm;
@@ -910,7 +950,7 @@ int RIG_IC7300::get_bwB()
 
 void RIG_IC7300::set_bwB(int val)
 {
-	set_trace(1, "set_bwB()");
+//	set_trace(1, "set_bwB()");
 	if (B.imode == 3 || B.imode == 11) return; // FM, FM-D
 	B.iBW = val;
 
@@ -920,10 +960,11 @@ void RIG_IC7300::set_bwB(int val)
 	cmd.append("\x1a\x03");
 	cmd.append(to_bcd(B.iBW, 2));
 	cmd.append(post);
+	set_trace(1, "set bw B");
 	waitFB("set bwB");
+	seth();
 
 	mode_bwB[B.imode] = val;
-	isett("set_bwB");
 
 	if (!useB) selectA();
 }
@@ -1012,7 +1053,7 @@ int RIG_IC7300::get_mic_gain()
 
 	get_trace(1, "get_mic_gain()");
 	ret = waitFOR(9, "get mic");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -1028,7 +1069,9 @@ void RIG_IC7300::set_mic_gain(int val)
 	cmd.append("\x14\x0B");
 	cmd.append(bcd255(val));
 	cmd.append( post );
+	set_trace(1, "set mic gain");
 	waitFB("set mic gain");
+	seth();
 }
 
 void RIG_IC7300::get_mic_gain_min_max_step(int &min, int &max, int &step)
@@ -1046,7 +1089,9 @@ void RIG_IC7300::set_compression(int on, int val)
 	if (on) cmd += '\x01';
 	else cmd += '\x00';
 	cmd.append(post);
+	set_trace(1, "set comp on/off");
 	waitFB("set Comp ON/OFF");
+	seth();
 
 	if (val < 0) return;
 	if (val > 10) return;
@@ -1054,7 +1099,9 @@ void RIG_IC7300::set_compression(int on, int val)
 	cmd.assign(pre_to).append("\x14\x0E");
 	cmd.append(to_bcd(comp_level[val], 3));
 	cmd.append( post );
+	set_trace(1, "set comp");
 	waitFB("set comp");
+	seth();
 }
 
 void RIG_IC7300::get_compression(int &on, int &val)
@@ -1066,7 +1113,7 @@ void RIG_IC7300::get_compression(int &on, int &val)
 
 	get_trace(1, "get comp on/off");
 	ret = waitFOR(8, "get comp on/off");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.find(resp);
@@ -1079,7 +1126,7 @@ void RIG_IC7300::get_compression(int &on, int &val)
 
 	get_trace(1, "get_compression");
 	ret = waitFOR(9, "get comp level");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.find(resp);
@@ -1097,12 +1144,16 @@ void RIG_IC7300::set_vox_onoff()
 	if (progStatus.vox_onoff) {
 		cmd.assign(pre_to).append("\x16\x46\x01");
 		cmd.append( post );
+		set_trace(1, "set vox on");
 		waitFB("set vox ON");
+		seth();
 	} else {
 		cmd.assign(pre_to).append("\x16\x46");
 		cmd += '\x00';
 		cmd.append( post );
+		set_trace(1, "set vox off");
 		waitFB("set vox OFF");
+		seth();
 	}
 }
 
@@ -1119,7 +1170,9 @@ void RIG_IC7300::set_vox_gain()
 	cmd.assign(pre_to).append("\x14\x16");
 	cmd.append(to_bcd(vox_gain, 3));
 	cmd.append( post );
+	set_trace(1, "set vox gain");
 	waitFB("SET vox gain");
+	seth();
 }
 
 // Xcvr values range 0...255 step 1
@@ -1135,7 +1188,9 @@ void RIG_IC7300::set_vox_anti()
 	cmd.assign(pre_to).append("\x14\x17");
 	cmd.append(to_bcd(vox_anti, 3));
 	cmd.append( post );
+	set_trace(1, "set anti vox");
 	waitFB("SET anti-vox");
+	seth();
 }
 
 // VOX hang 0.0 - 2.0, step 0.1
@@ -1150,7 +1205,9 @@ void RIG_IC7300::set_vox_hang()
 	cmd.assign(pre_to).append("\x1A\x05\x01\x91");
 	cmd.append(to_bcd(progStatus.vox_hang, 2));
 	cmd.append( post );
+	set_trace(1, "set vox hang");
 	waitFB("SET vox hang");
+	seth();
 }
 
 //----------------------------------------------------------------------
@@ -1169,7 +1226,9 @@ void RIG_IC7300::set_cw_wpm()
 	cmd.assign(pre_to).append("\x14\x0C");
 	cmd.append(to_bcd(iwpm, 3));
 	cmd.append( post );
+	set_trace(1, "set cw wpm");
 	waitFB("SET cw wpm");
+	seth();
 }
 
 void RIG_IC7300::set_break_in()
@@ -1187,7 +1246,9 @@ void RIG_IC7300::set_break_in()
 		default: cmd += '\x00'; break_in_label("BK-IN");
 	}
 	cmd.append(post);
+	set_trace(1, "set QSK");
 	waitFB("SET break-in");
+	seth();
 }
 
 int RIG_IC7300::get_break_in()
@@ -1198,7 +1259,7 @@ int RIG_IC7300::get_break_in()
 
 	get_trace(1, "get_break_in()");
 	ret = waitFOR(8, "get break in");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -1225,7 +1286,9 @@ void RIG_IC7300::set_cw_qsk()
 	cmd.assign(pre_to).append("\x14\x0F");
 	cmd.append(to_bcd(qsk, 3));
 	cmd.append(post);
+	set_trace(1, "set cw QSK delay");
 	waitFB("Set cw qsk delay");
+	seth();
 }
 
 void RIG_IC7300::get_cw_spot_tone_min_max_step(int &min, int &max, int &step)
@@ -1241,7 +1304,9 @@ void RIG_IC7300::set_cw_spot_tone()
 
 	cmd.append(to_bcd(n, 3));
 	cmd.append( post );
+	set_trace(1, "set cw spot tone");
 	waitFB("SET cw spot tone");
+	seth();
 }
 
 void RIG_IC7300::set_cw_vol()
@@ -1252,7 +1317,9 @@ void RIG_IC7300::set_cw_vol()
 	cmd += '\x24';
 	cmd.append(to_bcd((int)(progStatus.cw_vol * 2.55), 3));
 	cmd.append( post );
+	set_trace(1, "set cw sideband volume");
 	waitFB("SET cw sidetone volume");
+	seth();
 }
 
 // Tranceiver PTT on/off
@@ -1263,7 +1330,9 @@ void RIG_IC7300::set_PTT_control(int val)
 	cmd += '\x00';
 	cmd += (unsigned char) val;
 	cmd.append( post );
+	set_trace(1, "set PTT");
 	waitFB("set ptt");
+	seth();
 	ptt_ = val;
 }
 
@@ -1277,7 +1346,7 @@ int RIG_IC7300::get_PTT()
 
 	get_trace(1, "get_PTT()");
 	ret = waitFOR(8, "get PTT");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -1294,7 +1363,9 @@ void RIG_IC7300::set_volume_control(int val)
 	cmd.append("\x14\x01");
 	cmd.append(bcd255(val));
 	cmd.append( post );
+	set_trace(1, "set volume control");
 	waitFB("set vol");
+	seth();
 }
 
 /*
@@ -1317,7 +1388,7 @@ int RIG_IC7300::get_volume_control()
 
 	get_trace(1, "get_volume_control()");
 	ret = waitFOR(9, "get vol");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -1338,8 +1409,9 @@ void RIG_IC7300::set_power_control(double val)
 	cmd.append("\x14\x0A");
 	cmd.append(bcd255(val));
 	cmd.append( post );
+	set_trace(1, "set power control");
 	waitFB("set power");
-	set_trace(2, "set power control ", str2hex(replystr.c_str(), replystr.length()));
+	seth();
 
 }
 
@@ -1354,7 +1426,7 @@ int RIG_IC7300::get_power_control()
 
 	get_trace(1, "get_power_control()");
 	ret = waitFOR(9, "get power");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -1381,7 +1453,7 @@ int RIG_IC7300::get_smeter()
 
 	get_trace(1, "get_smeter()");
 	ret = waitFOR(9, "get smeter");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -1424,7 +1496,7 @@ int RIG_IC7300::get_power_out(void)
 
 	get_trace(1, "get_power_out()");
 	ret = waitFOR(9, "get power out");
-	igett("");
+	geth();
 
 	if (ret) {
 		get_trace(2, "get power out ", str2hex(replystr.c_str(), replystr.length()));
@@ -1472,7 +1544,7 @@ int RIG_IC7300::get_swr(void)
 
 	get_trace(1, "get_swr()");
 	ret = waitFOR(9, "get swr");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -1506,7 +1578,7 @@ int RIG_IC7300::get_alc(void)
 
 	get_trace(1, "get_alc");
 	ret = waitFOR(9, "get alc");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -1525,7 +1597,9 @@ void RIG_IC7300::set_rf_gain(int val)
 	cmd.append("\x14\x02");
 	cmd.append(bcd255(val));
 	cmd.append( post );
+	set_trace(1, "set rf gain");
 	waitFB("set RF");
+	seth();
 }
 
 int RIG_IC7300::get_rf_gain()
@@ -1539,7 +1613,7 @@ int RIG_IC7300::get_rf_gain()
 
 	get_trace(1, "get_rf_gain");
 	ret = waitFOR(9, "get RF");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -1568,6 +1642,7 @@ int RIG_IC7300::next_preamp()
 
 void RIG_IC7300::set_preamp(int val)
 {
+	PREAMBLE
 	if (val) {
 		atten_level = 0;
 		atten_label("ATT", false);
@@ -1596,7 +1671,7 @@ void RIG_IC7300::set_preamp(int val)
 	waitFB(	(preamp_level == 0) ? "set Preamp OFF" :
 			(preamp_level == 1) ? "set Preamp Level 1" :
 			"set Preamp Level 2");
-	isett("");
+	seth();
 }
 
 int RIG_IC7300::get_preamp()
@@ -1610,7 +1685,7 @@ int RIG_IC7300::get_preamp()
 
 	get_trace(1, "get_preamp()");
 	ret = waitFOR(8, "get Preamp Level");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -1647,7 +1722,7 @@ void RIG_IC7300::set_attenuator(int val)
 	cmd.append( post );
 	set_trace(1, "set attenuator");
 	waitFB("set att");
-	isett("");
+	seth();
 }
 
 int RIG_IC7300::next_attenuator()
@@ -1666,7 +1741,7 @@ int RIG_IC7300::get_attenuator()
 
 	get_trace(1, "get_attenuator()");
 	ret = waitFOR(7, "get ATT");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -1689,7 +1764,9 @@ void RIG_IC7300::set_noise(bool val)
 	cmd.append("\x16\x22");
 	cmd += val ? 1 : 0;
 	cmd.append(post);
+	set_trace(1, "set noise");
 	waitFB("set noise");
+	seth();
 }
 
 int RIG_IC7300::get_noise()
@@ -1704,7 +1781,7 @@ int RIG_IC7300::get_noise()
 
 	get_trace(1, "get_noice()");
 	ret = waitFOR(8, "get noise");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -1721,7 +1798,9 @@ void RIG_IC7300::set_nb_level(int val)
 	cmd.append("\x14\x12");
 	cmd.append(bcd255(val));
 	cmd.append( post );
+	set_trace(1, "set nb level");
 	waitFB("set NB level");
+	seth();
 }
 
 int  RIG_IC7300::get_nb_level()
@@ -1736,7 +1815,7 @@ int  RIG_IC7300::get_nb_level()
 
 	get_trace(1, "get_nb_level()");
 	ret = waitFOR(9, "get NB level");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -1752,7 +1831,9 @@ void RIG_IC7300::set_noise_reduction(int val)
 	cmd.append("\x16\x40");
 	cmd += val ? 1 : 0;
 	cmd.append(post);
+	set_trace(1, "set noise reduction");
 	waitFB("set NR");
+	seth();
 }
 
 int RIG_IC7300::get_noise_reduction()
@@ -1766,7 +1847,7 @@ int RIG_IC7300::get_noise_reduction()
 
 	get_trace(1, "get_noise_reduction()");
 	ret = waitFOR(8, "get NR");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -1800,7 +1881,9 @@ void RIG_IC7300::set_noise_reduction_val(int val)
 	val += 8;
 	cmd.append(to_bcd(val, 3));
 	cmd.append(post);
+	set_trace(1, "set noise reduction val");
 	waitFB("set NRval");
+	seth();
 }
 
 int RIG_IC7300::get_noise_reduction_val()
@@ -1815,7 +1898,7 @@ int RIG_IC7300::get_noise_reduction_val()
 
 	get_trace(1, "get_noise_reduction_val()");
 	ret = waitFOR(9, "get NRval");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -1834,7 +1917,9 @@ void RIG_IC7300::set_squelch(int val)
 	cmd.append("\x14\x03");
 	cmd.append(bcd255(val));
 	cmd.append( post );
+	set_trace(1, "set squelch");
 	waitFB("set Sqlch");
+	seth();
 }
 
 #include <iostream>
@@ -1850,7 +1935,7 @@ int  RIG_IC7300::get_squelch()
 
 	get_trace(1, "get_squelch()");
 	ret = waitFOR(9, "get squelch");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -1867,7 +1952,9 @@ void RIG_IC7300::set_auto_notch(int val)
 	cmd += '\x41';
 	cmd += (unsigned char)val;
 	cmd.append( post );
+	set_trace(1, "set auto notch");
 	waitFB("set AN");
+	seth();
 }
 
 int RIG_IC7300::get_auto_notch()
@@ -1881,7 +1968,7 @@ int RIG_IC7300::get_auto_notch()
 
 	get_trace(1, "get_auto_notch()");
 	ret = waitFOR(8, "get AN");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -1931,15 +2018,17 @@ void RIG_IC7300::set_notch(bool on, int freq)
 	cmd.append("\x16\x48");
 	cmd += on ? '\x01' : '\x00';
 	cmd.append(post);
+	set_trace(1, "set_notch");
 	waitFB("set notch");
-	set_trace(2, "set_notch() ", str2hex(cmd.c_str(), cmd.length()));
+	seth();
 
 	cmd = pre_to;
 	cmd.append("\x14\x0D");
 	cmd.append(to_bcd(hexval,3));
 	cmd.append(post);
+	set_trace(1, "set notch value");
 	waitFB("set notch val");
-	set_trace(2, "set_notch_val() ", str2hex(cmd.c_str(), cmd.length()));
+	seth();
 
 	get_notch(hexval);
 }
@@ -1958,7 +2047,7 @@ bool RIG_IC7300::get_notch(int &val)
 
 	get_trace(1, "get_notch()");
 	ret = waitFOR(8, "get notch");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -1973,7 +2062,7 @@ bool RIG_IC7300::get_notch(int &val)
 
 		get_trace(1, "notch val");
 		ret = waitFOR(9, "notch val");
-		igett("");
+		geth();
 
 		if (ret) {
 			size_t p = replystr.rfind(resp);
@@ -2030,7 +2119,7 @@ int  RIG_IC7300::get_agc()
 
 	get_trace(1, "get_agc");
 	ret = waitFOR(8, "get AGC");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.find(pre_fm);
@@ -2048,7 +2137,9 @@ int RIG_IC7300::incr_agc()
 	cmd.append("\x16\x12");
 	cmd += agcval;
 	cmd.append(post);
+	set_trace(1, "set AGC");
 	waitFB("set AGC");
+	seth();
 	return agcval;
 }
 
@@ -2079,13 +2170,17 @@ void RIG_IC7300::set_if_shift(int val)
 	cmd.append("\x14\x07");
 	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
+	set_trace(1, "set IF on/off");
 	waitFB("set IF on/off");
+	seth();
 
 	cmd = pre_to;
 	cmd.append("\x14\x08");
 	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
+	set_trace(1, "set IF val");
 	waitFB("set IF val");
+	seth();
 }
 
 bool RIG_IC7300::get_if_shift(int &val) {
@@ -2102,7 +2197,7 @@ void RIG_IC7300::get_if_min_max_step(int &min, int &max, int &step)
 
 void RIG_IC7300::set_pbt_inner(int val)
 {
-	set_trace(1, "set_pbt_inner()");
+//	set_trace(1, "set_pbt_inner()");
 	int shift = 128 + val * 128 / 50;
 	if (shift < 0) shift = 0;
 	if (shift > 255) shift = 255;
@@ -2111,13 +2206,14 @@ void RIG_IC7300::set_pbt_inner(int val)
 	cmd.append("\x14\x07");
 	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
-	isett("set_pbt_inner()");
+	set_trace(1, "set_pbt_inner()");
 	waitFB("set PBT inner");
+	seth();
 }
 
 void RIG_IC7300::set_pbt_outer(int val)
 {
-	set_trace(1, "set_pbt_outer()");
+//	set_trace(1, "set_pbt_outer()");
 	int shift = 128 + val * 128 / 50;
 	if (shift < 0) shift = 0;
 	if (shift > 255) shift = 255;
@@ -2126,8 +2222,9 @@ void RIG_IC7300::set_pbt_outer(int val)
 	cmd.append("\x14\x08");
 	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
-	isett("set_pbt_outer()");
+	set_trace(1, "set_pbt_outer()");
 	waitFB("set PBT outer");
+	seth();
 }
 
 int RIG_IC7300::get_pbt_inner()
@@ -2142,7 +2239,7 @@ int RIG_IC7300::get_pbt_inner()
 
 	get_trace(1, "get_pbt_inner()");
 	ret = waitFOR(9, "get pbt inner");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -2166,7 +2263,7 @@ int RIG_IC7300::get_pbt_outer()
 
 	get_trace(1, "get_pbt_outer");
 	ret = waitFOR(9, "get pbt outer");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -2187,7 +2284,9 @@ void RIG_IC7300::setVfoAdj(double v)
 	cmd += '\x58';
 	cmd.append(bcd255(int(v)));
 	cmd.append(post);
+	set_trace(1, "set VFO adjust");
 	waitFB("SET vfo adjust");
+	seth();
 }
 
 double RIG_IC7300::getVfoAdj()
@@ -2200,7 +2299,7 @@ double RIG_IC7300::getVfoAdj()
 
 	get_trace(1, "getVFOadj");
 	ret = waitFOR(11, "get vfo adj");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.find(pre_fm);
@@ -2245,7 +2344,7 @@ void RIG_IC7300::get_band_selection(int v)
 
 	get_trace(1, "get_band_selection()");
 	ret = waitFOR(23, "get band stack");
-	igett("");
+	geth();
 
 	if (ret) {
 		size_t p = replystr.rfind(pre_fm);
@@ -2279,7 +2378,7 @@ void RIG_IC7300::get_band_selection(int v)
 
 void RIG_IC7300::set_band_selection(int v)
 {
-	set_trace(1, "set_band_selection()");
+//	set_trace(1, "set_band_selection()");
 	unsigned long int freq = (useB ? B.freq : A.freq);
 	int fil = (useB ? B.filter : A.filter);
 	int mode = (useB ? B.imode : A.imode);
@@ -2298,8 +2397,9 @@ void RIG_IC7300::set_band_selection(int v)
 	cmd.append(to_bcd(PL_tones[tTONE], 6));
 	cmd.append(to_bcd(PL_tones[rTONE], 6));
 	cmd.append(post);
+	set_trace(1, "set_band_selection");
 	waitFB("set_band_selection");
-	isett("set_band_selection");
+	seth();
 }
 
 /*

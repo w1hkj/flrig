@@ -55,6 +55,10 @@ public:
 	int  get_attenuator();
 	void set_preamp(int val);
 	int  get_preamp();
+	int  next_preamp() { 
+		if (preamp_level) return 0;
+		return 1;
+	}
 
 	void set_volume_control(int val);
 	int  get_volume_control();

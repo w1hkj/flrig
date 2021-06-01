@@ -267,10 +267,10 @@ void read_vfo()
 		read_K3_vfo();
 		return;
 	}
-	if (xcvr_name == rig_KX3.name_) {
-		read_KX3_vfo();
-		return;
-	}
+//	if (xcvr_name == rig_KX3.name_) {
+//		read_KX3_vfo();
+//		return;
+//	}
 
 //	read_vfoAorB();
 	if (selrig->has_getvfoAorB) {
@@ -371,10 +371,10 @@ void read_mode()
 		read_K3_mode();
 		return;
 	}
-	if (xcvr_name == rig_KX3.name_) {
-		read_KX3_mode();
-		return;
-	}
+//	if (xcvr_name == rig_KX3.name_) {
+//		read_KX3_mode();
+//		return;
+//	}
 
 	int nu_mode;
 	int nu_BW;
@@ -468,10 +468,10 @@ void read_bandwidth()
 		read_K3_bw();
 		return;
 	}
-	if (xcvr_name == rig_KX3.name_) {
-		read_KX3_bw();
-		return;
-	}
+//	if (xcvr_name == rig_KX3.name_) {
+//		read_KX3_bw();
+//		return;
+//	}
 
 	trace(1,"read_bandwidth()");
 	int nu_BW;
@@ -667,10 +667,8 @@ void read_preamp()
 	if (selrig->has_preamp_control) {
 		trace(1,"read_preamp_att()  1");
 		val = selrig->get_preamp();
-		if (val != progStatus.preamp) {
-			vfo->preamp = progStatus.preamp = val;
-			Fl::awake(update_preamp, (void*)0);
-		}
+		vfo->preamp = progStatus.preamp = val;
+		Fl::awake(update_preamp, (void*)0);
 	}
 }
 
@@ -680,10 +678,8 @@ void read_att()
 	if (selrig->has_attenuator_control) {
 		trace(1,"read_preamp_att()  2");
 		val = selrig->get_attenuator();
-		if (val != progStatus.attenuator) {
-			vfo->attenuator = progStatus.attenuator = val;
-			Fl::awake(update_attenuator, (void*)0);
-		}
+		vfo->attenuator = progStatus.attenuator = val;
+		Fl::awake(update_attenuator, (void*)0);
 	}
 }
 
@@ -829,11 +825,14 @@ void read_ifshift()
 		return;
 		}
 	if (!selrig->has_ifshift_control) return;
-	{
-		trace(1,"read_if_shift()");
-		on = selrig->get_if_shift(val);
-	}
-	if ((on != progStatus.shift) || (val != progStatus.shift_val)) {
+
+	trace(1,"read_if_shift()");
+	on = selrig->get_if_shift(val);
+
+	if (xcvr_name == rig_KX3.name_) {
+		vfo->shift_val = progStatus.shift_val = val;
+		Fl::awake(update_ifshift, (void*)0);
+	} else if ((on != progStatus.shift) || (val != progStatus.shift_val)) {
 		vfo->if_shift = progStatus.shift = on;
 		vfo->shift_val = progStatus.shift_val = val;
 		Fl::awake(update_ifshift, (void*)0);
@@ -1960,20 +1959,21 @@ void buildlist() {
 // flrig front panel changed
 
 int movFreqA() {
-	XCVR_STATE nuvfo = vfoA;
-	nuvfo.freq = FreqDispA->value();
-	nuvfo.src = UI;
-	guard_lock que_lock(&mutex_srvc_reqs, "movFreqA");
-	srvc_reqs.push(VFOQUEUE(vA, nuvfo));
+	guard_lock serial(&mutex_serial);
+	vfoA.freq = FreqDispA->value();
+	selrig->set_vfoA(vfoA.freq);
 	return 1;
 }
 
 int movFreqB() {
-	XCVR_STATE nuvfo = vfoB;
-	nuvfo.freq = FreqDispB->value();
-	nuvfo.src = UI;
-	guard_lock que_lock(&mutex_srvc_reqs, "movFreqB");
-	srvc_reqs.push(VFOQUEUE(vB, nuvfo));
+//	if (xcvr_name == rig_KX3.name_ && !progStatus.split  ) {
+//		FreqDispB->value(vfoB.freq);
+//		FreqDispB->redraw();
+//		return 1;
+//	}
+	guard_lock serial(&mutex_serial);
+	vfoB.freq = FreqDispB->value();
+	selrig->set_vfoB(vfoB.freq);
 	return 1;
 }
 
@@ -2091,9 +2091,9 @@ void execute_A2B()
 	if (xcvr_name == rig_K3.name_) {
 		K3_A2B();
 	} else if (xcvr_name == rig_KX3.name_) {
-		KX3_A2B();
+		cb_KX3_A2B();
 	} else if (xcvr_name == rig_K2.name_) {
-		trace(1,"cbA2B() 1");
+		trace(1,"execute A2B() 1");
 		vfoB = vfoA;
 		selrig->set_vfoB(vfoB.freq);
 		selrig->get_vfoB();
@@ -2106,7 +2106,7 @@ void execute_A2B()
 		vfoB = vfoA;
 		vfo = &vfoA;
 	} else if (selrig->has_a2b) {
-		trace(1,"cbA2B() 2");
+		trace(1,"execute A2B() 2");
 		selrig->A2B();
 		if (useB) {
 			vfoA = vfoB;
@@ -2352,16 +2352,16 @@ void cbAttenuator()
 	guard_lock serial_lock(&mutex_serial);
 	trace(1, "cbAttenuator()");
 
-	int chk = selrig->get_attenuator();
+//	int chk = selrig->get_attenuator();
 	progStatus.attenuator = selrig->next_attenuator();
 	selrig->set_attenuator (progStatus.attenuator);
-	MilliSleep(50);
-	for (int n = 0; n < 100; n++) {
-		chk = selrig->get_attenuator();
-		if (chk == progStatus.attenuator) break;
-		MilliSleep(progStatus.comm_wait);
-		Fl::awake();
-	}
+//	MilliSleep(50);
+//	for (int n = 0; n < 100; n++) {
+//		chk = selrig->get_attenuator();
+//		if (chk == progStatus.attenuator) break;
+//		MilliSleep(progStatus.comm_wait);
+//		Fl::awake();
+//	}
 	return;
 }
 
@@ -2376,16 +2376,16 @@ void cbPreamp()
 	guard_lock serial_lock(&mutex_serial);
 	trace(1, "cbPreamp()");
 
-	int chk = selrig->get_preamp();
+//	int chk = selrig->get_preamp();
 	progStatus.preamp = selrig->next_preamp();
 	selrig->set_preamp (progStatus.preamp);
-	MilliSleep(5 + progStatus.comm_wait);
-	for (int n = 0; n < 100; n++) {
-		chk = selrig->get_preamp();
-		if (chk == progStatus.preamp) break;
-		MilliSleep(progStatus.comm_wait);
-		Fl::awake();
-	}
+//	MilliSleep(5 + progStatus.comm_wait);
+//	for (int n = 0; n < 100; n++) {
+//		chk = selrig->get_preamp();
+//		if (chk == progStatus.preamp) break;
+//		MilliSleep(progStatus.comm_wait);
+//		Fl::awake();
+//	}
 	return;
 }
 
@@ -3660,6 +3660,7 @@ void adjust_small_ui()
 	sldrVOLUME->hide();
 	sldrRFGAIN->hide();
 	btnIFsh->hide();
+	btn_KX3_IFsh->hide();
 	sldrIFSHIFT->hide();
 	btnLOCK->hide();
 	btnCLRPBT->hide();
@@ -3752,9 +3753,19 @@ void adjust_small_ui()
 		}
 		if (selrig->has_ifshift_control) {
 			y += 20;
-			btnIFsh->position( 2, y);
-			btnIFsh->show();
-			btnIFsh->redraw();
+			if (xcvr_name == rig_KX3.name_) {
+				btn_KX3_IFsh->position( 2, y );
+				btn_KX3_IFsh->show();
+				btn_KX3_IFsh->redraw();
+				btnIFsh->hide();
+				btnIFsh->redraw();
+			} else {
+				btnIFsh->position( 2, y);
+				btnIFsh->show();
+				btnIFsh->redraw();
+				btn_KX3_IFsh->hide();
+				btn_KX3_IFsh->redraw();
+			}
 			sldrIFSHIFT->resize( 54, y, 368, 18 );
 			sldrIFSHIFT->show();
 			sldrIFSHIFT->redraw();
@@ -3967,6 +3978,7 @@ void adjust_xig_wide()
 	grp_row2a->resize(xig_group->x(), xig_group->y(), xig_group->w(), xig_group->h());
 	grp_row2a->hide();
 	grp_row2b->remove(btnIFsh);
+	grp_row2b->remove(btn_KX3_IFsh);
 	grp_row2b->remove(sldrIFSHIFT);
 	grp_row2b->resize(xig_group->x(), xig_group->y(), xig_group->w(), xig_group->h());
 	grp_row2b->hide();
@@ -4005,7 +4017,10 @@ void adjust_wide_ui()
 	sldrVOLUME->show();
 	sldrRFGAIN->show();
 	if (selrig->has_ifshift_control) {
-		btnIFsh->show();
+		if (xcvr_name != rig_KX3.name_)
+			btnIFsh->show();
+		else
+			btn_KX3_IFsh->show();
 		sldrIFSHIFT->show();
 	}
 	if (selrig->has_pbt_controls) {
@@ -4105,7 +4120,10 @@ void adjust_touch_ui()
 	if (spnrRFGAIN) spnrRFGAIN->show();
 	if (sldrRFGAIN) sldrRFGAIN->show();
 
-	btnIFsh->show();
+	if (xcvr_name != rig_KX3.name_)
+		btnIFsh->show();
+	else
+		btn_KX3_IFsh->show();
 	if (spnrIFSHIFT) spnrIFSHIFT->show();
 	if (sldrIFSHIFT) sldrIFSHIFT->show();
 
@@ -5240,7 +5258,10 @@ void init_if_shift_control()
 	if (spnrIFSHIFT) spnrIFSHIFT->hide();
 
 	if (selrig->has_ifshift_control) {
-		btnIFsh->show();
+		if (xcvr_name != rig_KX3.name_)
+			btnIFsh->show();
+		else
+			btn_KX3_IFsh->show();
 		sldrIFSHIFT->show();
 		if (spnrIFSHIFT) spnrIFSHIFT->show();
 		int min, max, step;
@@ -5255,12 +5276,15 @@ void init_if_shift_control()
 		if (spnrIFSHIFT) spnrIFSHIFT->redraw();
 		switch (progStatus.UIsize) {
 			case small_ui :
-				btnIFsh->show();
+				if (xcvr_name != rig_KX3.name_)
+					btnIFsh->show();
+				else
+					btn_KX3_IFsh->show();
 				if (sldrIFSHIFT) sldrIFSHIFT->show();
 				if (spnrIFSHIFT) spnrIFSHIFT->show();
 				break;
 			case wide_ui : case touch_ui : default :
-				btnIFsh->activate();
+				if (xcvr_name != rig_KX3.name_) btnIFsh->activate();
 				if (sldrIFSHIFT) sldrIFSHIFT->activate();
 				if (spnrIFSHIFT) spnrIFSHIFT->activate();
 				break;
@@ -5526,6 +5550,18 @@ void init_preamp_control()
 				break;
 			case wide_ui : case touch_ui : default :
 			btnPreamp->activate();
+		}
+		if (xcvr_name == rig_IC9700.name_) {
+			btnPreamp->tooltip("\
+Internal/External preamp\n\
+P0/E0 off/off\n\
+P1/E0  on/off\n\
+P0/E1 off/on\n\
+P1/E1  on/on");
+			btnPreamp->label("P0/E0");
+			btnPreamp->redraw_label();
+		} else {
+			btnPreamp->tooltip("On/Off/Level");
 		}
 	} else {
 		switch (progStatus.UIsize) {
@@ -5904,18 +5940,26 @@ void init_K3_KX3_special()
 	if (xcvr_name == rig_K3.name_) {
 		btnB->hide();
 		btnA->hide();
+		btnAswapB->hide();
 		btn_KX3_swapAB->hide();
 		btn_K3_swapAB->show();
+		btn_K3_A2B->show();
 	} else if (xcvr_name == rig_KX3.name_) {
 		btnB->hide();
 		btnA->hide();
+		btnAswapB->hide();
 		btn_K3_swapAB->hide();
+		btn_K3_A2B->hide();
 		btn_KX3_swapAB->show();
+		btn_KX3_A2B->show();
 	} else {
 		btn_K3_swapAB->hide();
+		btn_K3_A2B->hide();
 		btn_KX3_swapAB->hide();
+		btn_KX3_A2B->hide();
 		btnB->show();
 		btnA->show();
+		btnAswapB->show();
 	}
 }
 
@@ -6031,18 +6075,24 @@ void initRig()
 		init_TS990_special();
 		init_K3_KX3_special();
 
-		btnAswapB->show();
-
-	}  // enable the serial thread
-
+		if (selrig->has_power_control) {
+			if (progStatus.use_rig_data)
+				progStatus.power_level = selrig->get_power_control();
+			else
+				selrig->set_power_control(progStatus.power_level);
+		}
+	}
 
 	bypass_serial_thread_loop = false;
 
 	grpInitializing->hide();
+	grpInitializing->redraw();
 
 	adjust_control_positions();
 
 	main_group->show();
+	main_group->redraw();
+
 	mainwindow->damage();
 	mainwindow->redraw();
 	Fl::flush();
@@ -6051,12 +6101,6 @@ void initRig()
 	box_xcvr_connect->color(FL_GREEN);
 	box_xcvr_connect->redraw();
 
-	if (selrig->has_power_control) {
-		if (progStatus.use_rig_data)
-			progStatus.power_level = selrig->get_power_control();
-		else
-			selrig->set_power_control(progStatus.power_level);
-	}
 	return;
 
 failed:

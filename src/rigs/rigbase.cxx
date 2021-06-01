@@ -413,13 +413,13 @@ int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 	string wait_str = " ";
 	wait_str[0] = ch;
 
-snprintf(szt, sizeof(szt), "wait_char( %s, %d, %d, %s, %d )",
-		wait_str.c_str(),
-		(int)n,
-		timeout,
-		sz,
-		pr);
-get_trace(1, szt);
+//snprintf(szt, sizeof(szt), "wait_char( %s, %d, %d, %s, %d )",
+//		wait_str.c_str(),
+//		(int)n,
+//		timeout,
+//		sz,
+//		pr);
+//get_trace(1, szt);
 
 	int delay =  (n + cmd.length()) * 11000.0 / RigSerial->Baud();
 	int retnbr = 0;
@@ -441,35 +441,35 @@ get_trace(1, szt);
 
 	RigSerial->FlushBuffer();
 
-snprintf(szt, sizeof(szt), "WriteBuffer( %s, %d )", cmd.c_str(), (int)cmd.length());
-get_trace(1, szt);
+//snprintf(szt, sizeof(szt), "WriteBuffer( %s, %d )", cmd.c_str(), (int)cmd.length());
+//get_trace(1, szt);
 	RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
 
-snprintf(szt, sizeof(szt), "MilliSleep( %d msec)", delay );
-get_trace(1, szt);
+//snprintf(szt, sizeof(szt), "MilliSleep( %d msec)", delay );
+//get_trace(1, szt);
 	MilliSleep(delay);
 
 	size_t tout1 = zmsec();//todmsec();
 	size_t tout2 = tout1;
+	size_t test = timeout;
 	std::string tempstr;
 	int nret;
-	int tdiff = timeout;
-snprintf(szt, sizeof(szt), "tdiff: %d", tdiff);
-get_trace(1, szt);
-	while (tdiff > 0) {
+
+	while ( (tout2 - tout1) < test) {
 		tempstr.clear();
 		nret = RigSerial->ReadBuffer(tempstr, n - retnbr, wait_str);
 		replystr.append(tempstr);
 		retnbr += nret;
 
-snprintf(szt, sizeof(szt), "tdiff: [%d] %s", tdiff, replystr.c_str());
-get_trace(1, szt);
-		if (replystr.find(wait_str) != std::string::npos)
-			break;
 		tout2 = zmsec();//todmsec();
 		if (tout2 < tout1) tout1 = tout2;
-		tdiff = timeout - (tout2 - tout1);
+
+		if (replystr.find(wait_str) != std::string::npos)
+			break;
 	}
+
+	snprintf(szt, sizeof(szt), "[%d msec] %s", (int)(tout2 - tout1), (replystr.length() ? replystr.c_str() : "NIL") );
+	get_trace(1, szt);
 
 	LOG_DEBUG ("%s: read %d bytes, %s", sz, retnbr, replystr.c_str());
 	return retnbr;

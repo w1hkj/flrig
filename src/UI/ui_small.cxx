@@ -69,27 +69,11 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	g->box(FL_FLAT_BOX);
 
 	FreqDispA = new cFreqControl(1, 24, 210, 35, _("10"));
-//	FreqDispA->box(FL_DOWN_BOX);
-//	FreqDispA->color(FL_BACKGROUND_COLOR);
-//	FreqDispA->selection_color(FL_BACKGROUND_COLOR);
-//	FreqDispA->labeltype(FL_NORMAL_LABEL);
-//	FreqDispA->labelfont(0);
-//	FreqDispA->labelsize(14);
-//	FreqDispA->labelcolor(FL_FOREGROUND_COLOR);
-//	FreqDispA->align(Fl_Align(FL_ALIGN_CENTER));
 	FreqDispA->when(FL_WHEN_CHANGED);
 	FreqDispA->SetONOFFCOLOR (FL_YELLOW, FL_BLACK);
 	FreqDispA->setCallBack(movFreqA);
 
 	FreqDispB = new cFreqControl(213, 24, 210, 35, _("10"));
-//	FreqDispB->box(FL_DOWN_BOX);
-//	FreqDispB->color(FL_BACKGROUND_COLOR);
-//	FreqDispB->selection_color(FL_BACKGROUND_COLOR);
-//	FreqDispB->labeltype(FL_NORMAL_LABEL);
-//	FreqDispB->labelfont(0);
-//	FreqDispB->labelsize(14);
-//	FreqDispB->labelcolor(FL_FOREGROUND_COLOR);
-//	FreqDispB->align(Fl_Align(FL_ALIGN_CENTER));
 	FreqDispB->when(FL_WHEN_CHANGED);
 	FreqDispB->SetONOFFCOLOR (FL_YELLOW, FL_BLACK);
 	FreqDispB->setCallBack(movFreqB);
@@ -134,7 +118,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	sldrRFGAIN->selection_color(FL_BACKGROUND_COLOR);
 	sldrRFGAIN->labeltype(FL_NORMAL_LABEL);
 	sldrRFGAIN->labelfont(0);
-	sldrRFGAIN->labelsize(14);
+	sldrRFGAIN->labelsize(12);
 	sldrRFGAIN->labelcolor(FL_FOREGROUND_COLOR);
 	sldrRFGAIN->maximum(100);
 	sldrRFGAIN->step(1);
@@ -153,7 +137,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	sldrSQUELCH->selection_color(FL_BACKGROUND_COLOR);
 	sldrSQUELCH->labeltype(FL_NORMAL_LABEL);
 	sldrSQUELCH->labelfont(0);
-	sldrSQUELCH->labelsize(14);
+	sldrSQUELCH->labelsize(12);
 	sldrSQUELCH->labelcolor(FL_FOREGROUND_COLOR);
 	sldrSQUELCH->maximum(100);
 	sldrSQUELCH->step(1);
@@ -202,7 +186,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	sldrNOTCH->selection_color(FL_BACKGROUND_COLOR);
 	sldrNOTCH->labeltype(FL_NORMAL_LABEL);
 	sldrNOTCH->labelfont(0);
-	sldrNOTCH->labelsize(14);
+	sldrNOTCH->labelsize(12);
 	sldrNOTCH->labelcolor(FL_FOREGROUND_COLOR);
 	sldrNOTCH->minimum(-1000);
 	sldrNOTCH->maximum(1000);
@@ -271,6 +255,13 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	btnIFsh->labelsize(12);
 	btnIFsh->callback((Fl_Callback*)cb_btnIFsh);
 
+	btn_KX3_IFsh = new Fl_Button(2, 265, 50, 18, _("Cntr"));
+	btn_KX3_IFsh->tooltip(_("Center IF shift"));
+	btn_KX3_IFsh->down_box(FL_THIN_DOWN_BOX);
+	btn_KX3_IFsh->labelsize(12);
+	btn_KX3_IFsh->callback((Fl_Callback*)cb_KX3_IFsh);
+	btn_KX3_IFsh->hide();
+
 	sldrIFSHIFT = new Fl_Wheel_Value_Slider(54, 265, 156, 18);
 	sldrIFSHIFT->tooltip(_("Adjust IF Shift"));
 	sldrIFSHIFT->type(5);
@@ -306,7 +297,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	sldrMICGAIN->selection_color(FL_BACKGROUND_COLOR);
 	sldrMICGAIN->labeltype(FL_NORMAL_LABEL);
 	sldrMICGAIN->labelfont(0);
-	sldrMICGAIN->labelsize(14);
+	sldrMICGAIN->labelsize(12);
 	sldrMICGAIN->labelcolor(FL_FOREGROUND_COLOR);
 	sldrMICGAIN->maximum(100);
 	sldrMICGAIN->step(1);
@@ -329,7 +320,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	sldrPOWER->selection_color(FL_BACKGROUND_COLOR);
 	sldrPOWER->labeltype(FL_NORMAL_LABEL);
 	sldrPOWER->labelfont(0);
-	sldrPOWER->labelsize(14);
+	sldrPOWER->labelsize(12);
 	sldrPOWER->labelcolor(FL_FOREGROUND_COLOR);
 	sldrPOWER->maximum(100);
 	sldrPOWER->step(1);
@@ -354,27 +345,41 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	btnB->callback((Fl_Callback*)cb_btnB);
 	btnB->value(useB);
 
-	labelMEMORY = new Fl_Box(212, 62, 105, 20, _("MEMORY"));
-	labelMEMORY->box(FL_DOWN_BOX);
-	labelMEMORY->color(FL_YELLOW);
-	labelMEMORY->align(FL_ALIGN_CENTER);
-	labelMEMORY->hide();
-
-	btn_K3_swapAB = new Fl_Button(265, 62, 52, 20, _("A/B"));
-	btn_K3_swapAB->tooltip(_("Swap A/B"));
-	btn_K3_swapAB->down_box(FL_DOWN_BOX);
-	btn_K3_swapAB->labelsize(12);
-	btn_K3_swapAB->callback((Fl_Callback*)cb_btn_K3_swapAB);
-	btn_K3_swapAB->hide();
-
-	btn_KX3_swapAB = new Fl_Button(265, 62, 52, 20, _("A/B"));
+	btn_KX3_swapAB = new Fl_Button(212, 62, 52, 20, _("A / B"));
 	btn_KX3_swapAB->tooltip(_("Swap A/B"));
 	btn_KX3_swapAB->down_box(FL_DOWN_BOX);
 	btn_KX3_swapAB->labelsize(12);
 	btn_KX3_swapAB->callback((Fl_Callback*)cb_btn_KX3_swapAB);
 	btn_KX3_swapAB->hide();
 
-	btnAswapB = new Fl_Button(318, 62, 52, 20, _("A<->B"));
+	btn_KX3_A2B = new Fl_Button(265, 62, 52, 20, _("A->B"));
+	btn_KX3_A2B->tooltip(_("Copy A to B"));
+	btn_KX3_A2B->down_box(FL_DOWN_BOX);
+	btn_KX3_A2B->labelsize(12);
+	btn_KX3_A2B->callback((Fl_Callback*)cb_KX3_A2B);
+	btn_KX3_A2B->hide();
+
+	btn_K3_swapAB = new Fl_Button(212, 62, 52, 20, _("A / B"));
+	btn_K3_swapAB->tooltip(_("Swap Vfo A / Vfo B"));
+	btn_K3_swapAB->down_box(FL_DOWN_BOX);
+	btn_K3_swapAB->labelsize(12);
+	btn_K3_swapAB->callback((Fl_Callback*)cb_btn_K3_swapAB);
+	btn_K3_swapAB->hide();
+
+	btn_K3_A2B = new Fl_Button(265, 62, 52, 20, _("A -> B"));
+	btn_K3_A2B->tooltip(_("Copy A to B"));
+	btn_K3_A2B->down_box(FL_DOWN_BOX);
+	btn_K3_A2B->labelsize(12);
+	btn_K3_A2B->callback((Fl_Callback*)K3_A2B);
+	btn_K3_A2B->hide();
+
+	labelMEMORY = new Fl_Box(212, 62, 105, 20, _("MEMORY"));
+	labelMEMORY->box(FL_DOWN_BOX);
+	labelMEMORY->color(FL_YELLOW);
+	labelMEMORY->align(FL_ALIGN_CENTER);
+	labelMEMORY->hide();
+
+	btnAswapB = new Fl_Button(318, 62, 52, 20, _("A / B"));
 	btnAswapB->tooltip(_("Left click:Swap A/B\nRight click:Copy A to B"));
 	btnAswapB->down_box(FL_DOWN_BOX);
 	btnAswapB->labelsize(12);
@@ -527,7 +532,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			sldrRcvSignal->selection_color(FL_BACKGROUND_COLOR);
 			sldrRcvSignal->labeltype(FL_NORMAL_LABEL);
 			sldrRcvSignal->labelfont(0);
-			sldrRcvSignal->labelsize(14);
+			sldrRcvSignal->labelsize(12);
 			sldrRcvSignal->labelcolor(FL_FOREGROUND_COLOR);
 			sldrRcvSignal->align(Fl_Align(FL_ALIGN_CENTER));
 			sldrRcvSignal->when(FL_WHEN_CHANGED);
@@ -541,7 +546,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			sldrALC->selection_color(FL_BACKGROUND_COLOR);
 			sldrALC->labeltype(FL_NORMAL_LABEL);
 			sldrALC->labelfont(0);
-			sldrALC->labelsize(14);
+			sldrALC->labelsize(12);
 			sldrALC->labelcolor(FL_FOREGROUND_COLOR);
 			sldrALC->align(Fl_Align(FL_ALIGN_CENTER));
 			sldrALC->when(FL_WHEN_CHANGED);
@@ -555,7 +560,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			sldrSWR->selection_color(FL_BACKGROUND_COLOR);
 			sldrSWR->labeltype(FL_NORMAL_LABEL);
 			sldrSWR->labelfont(0);
-			sldrSWR->labelsize(14);
+			sldrSWR->labelsize(12);
 			sldrSWR->labelcolor(FL_FOREGROUND_COLOR);
 			sldrSWR->align(Fl_Align(FL_ALIGN_CENTER));
 			sldrSWR->when(FL_WHEN_CHANGED);
@@ -569,7 +574,7 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 			sldrFwdPwr->selection_color(FL_BACKGROUND_COLOR);
 			sldrFwdPwr->labeltype(FL_NORMAL_LABEL);
 			sldrFwdPwr->labelfont(0);
-			sldrFwdPwr->labelsize(14);
+			sldrFwdPwr->labelsize(12);
 			sldrFwdPwr->labelcolor(FL_FOREGROUND_COLOR);
 			sldrFwdPwr->align(Fl_Align(FL_ALIGN_CENTER));
 			sldrFwdPwr->when(FL_WHEN_CHANGED);
@@ -846,7 +851,7 @@ Fl_Double_Window *tabs_window()
 			cbo_tt550_nb_level->selection_color(FL_BACKGROUND_COLOR);
 			cbo_tt550_nb_level->labeltype(FL_NORMAL_LABEL);
 			cbo_tt550_nb_level->labelfont(0);
-			cbo_tt550_nb_level->labelsize(14);
+			cbo_tt550_nb_level->labelsize(12);
 			cbo_tt550_nb_level->labelcolor(FL_FOREGROUND_COLOR);
 			cbo_tt550_nb_level->callback((Fl_Callback*)cb_cbo_tt550_nb_level);
 			cbo_tt550_nb_level->align(FL_ALIGN_BOTTOM | FL_ALIGN_CENTER);
@@ -865,7 +870,7 @@ Fl_Double_Window *tabs_window()
 			cbo_tt550_agc_level->selection_color(FL_BACKGROUND_COLOR);
 			cbo_tt550_agc_level->labeltype(FL_NORMAL_LABEL);
 			cbo_tt550_agc_level->labelfont(0);
-			cbo_tt550_agc_level->labelsize(14);
+			cbo_tt550_agc_level->labelsize(12);
 			cbo_tt550_agc_level->labelcolor(FL_FOREGROUND_COLOR);
 			cbo_tt550_agc_level->callback((Fl_Callback*)cb_cbo_tt550_agc_level);
 			cbo_tt550_agc_level->align(FL_ALIGN_BOTTOM | FL_ALIGN_CENTER);
@@ -1555,7 +1560,7 @@ Fl_Double_Window *tabs_window()
 			sldr_nb_level->selection_color(FL_BACKGROUND_COLOR);
 			sldr_nb_level->labeltype(FL_NORMAL_LABEL);
 			sldr_nb_level->labelfont(0);
-			sldr_nb_level->labelsize(14);
+			sldr_nb_level->labelsize(12);
 			sldr_nb_level->labelcolor(FL_FOREGROUND_COLOR);
 			sldr_nb_level->minimum(0);
 			sldr_nb_level->maximum(0);
@@ -1573,7 +1578,7 @@ Fl_Double_Window *tabs_window()
 //			cbo_agc_level->selection_color(FL_BACKGROUND_COLOR);
 //			cbo_agc_level->labeltype(FL_NORMAL_LABEL);
 //			cbo_agc_level->labelfont(0);
-//			cbo_agc_level->labelsize(14);
+//			cbo_agc_level->labelsize(12);
 //			cbo_agc_level->labelcolor(FL_FOREGROUND_COLOR);
 //			cbo_agc_level->callback((Fl_Callback*)cb_cbo_agc_level);
 //			cbo_agc_level->align(Fl_Align(FL_ALIGN_BOTTOM));
@@ -1748,7 +1753,7 @@ Fl_Double_Window *tabs_window()
 			ic7610_digi_sel_val->selection_color(FL_BACKGROUND_COLOR);
 			ic7610_digi_sel_val->labeltype(FL_NORMAL_LABEL);
 			ic7610_digi_sel_val->labelfont(0);
-			ic7610_digi_sel_val->labelsize(14);
+			ic7610_digi_sel_val->labelsize(12);
 			ic7610_digi_sel_val->labelcolor(FL_FOREGROUND_COLOR);
 			ic7610_digi_sel_val->minimum(0);
 			ic7610_digi_sel_val->maximum(255);
@@ -1854,7 +1859,7 @@ Fl_Double_Window* Small_rig_window() {
 		progress->maximum(100);
 		progress->minimum(0);
 		progress->labelcolor(FL_DARK_RED);
-		progress->labelsize(14);
+		progress->labelsize(12);
 		progress->align(Fl_Align(FL_ALIGN_TOP));
 		progress->selection_color(FL_GREEN);
 

@@ -31,16 +31,21 @@ const char modenbr[] =
 static const char KX3_mode_type[] =
 	{ 'L', 'U', 'L', 'U', 'U', 'U', 'U', 'L' };
 
+#define KX3_BWS 45
+
 static const char *KX3_widths[] = {
    "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
   "550",  "600",  "650",  "700",  "750",  "800",  "850",  "900",  "950", "1000",
  "1100", "1200", "1300", "1400", "1500", "1600", "1700", "1800", "1900", "2000",
- "2200", "2400", "2600", "2800", "3000", "3200", "3400", "3600", "4000", NULL};
+ "2100", "2200", "2300", "2400", "2500", "2600", "2700", "2800", "2900", "3000",
+ "3200", "3400", "3600", "3800", "4000", NULL};
+
 static int KX3_bw_vals[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
 21,22,23,24,25,26,27,28,29,30,
-31,32,33,34,35,36,37,38, 39,40, WVALS_LIMIT};
+31,32,33,34,35,36,37,38,39,40, 
+41,42,43,44,45, WVALS_LIMIT};
 
 static int def_mode_width[] = { 34, 34, 15, 37, 37, 34, 15, 34 };
 
@@ -48,7 +53,7 @@ static GUI k3_widgets[]= {
 	{ (Fl_Widget *)btnVol, 2, 125,  50 },
 	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },
 	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },
-	{ (Fl_Widget *)btnIFsh, 214, 105,  50 },
+	{ (Fl_Widget *)btn_KX3_IFsh, 214, 105,  50 },
 	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
 	{ (Fl_Widget *)sldrMICGAIN, 266, 125, 156 },
 	{ (Fl_Widget *)sldrPOWER, 266, 145, 156 },
@@ -91,19 +96,20 @@ RIG_KX3::RIG_KX3() {
 	has_mode_control =
 	has_ptt_control =
 	has_noise_control =
+	has_noise_reduction =
 	has_attenuator_control =
 	has_smeter =
 	has_power_out =
 	has_split =
 	has_ifshift_control =
+	has_swr_control = 
 	has_preamp_control = true;
 
 	has_notch_control =
-	has_tune_control =
-	has_swr_control = false;
+	has_tune_control =false;
 
-	if_shift_min = 400;
-	if_shift_max = 2600;
+	if_shift_min = 1280;
+	if_shift_max = 1700;
 	if_shift_step = 10;
 	if_shift_mid = 1500;
 
@@ -124,70 +130,89 @@ int  RIG_KX3::def_bandwidth(int m)
 }
 
 static int isok = false;
-extern bool stdout_trace;
+
+static void init_trace()
+{
+	debug::level = debug::DEBUG_LEVEL;
+
+	progStatus.gettrace   = 
+	progStatus.settrace   = 
+	progStatus.serialtrace =
+	progStatus.rigtrace    =
+	progStatus.xmltrace    =
+	progStatus.trace       = false;
+
+//	progStatus.gettrace   = true;
+//	progStatus.settrace   = true;
+//	progStatus.serialtrace = true;
+//	progStatus.rigtrace    = true;
+//	progStatus.xmltrace    = true;
+//	progStatus.trace       = true;
+
+
+}
 
 void RIG_KX3::initialize()
 {
-	debug::level = debug::DEBUG_LEVEL;
-	progStatus.gettrace = 1;
-	progStatus.settrace = 1;
-	stdout_trace = true;
+	init_trace();
+
+	RigSerial->Timeout(50);
 
 	LOG_INFO("KX3");
 	k3_widgets[0].W = btnVol;
 	k3_widgets[1].W = sldrVOLUME;
 	k3_widgets[2].W = sldrRFGAIN;
-	k3_widgets[3].W = btnIFsh;
+	k3_widgets[3].W = btn_KX3_IFsh;
 	k3_widgets[4].W = sldrIFSHIFT;
 	k3_widgets[5].W = sldrMICGAIN;
 	k3_widgets[6].W = sldrPOWER;
 
-	cmd = "AI0;"; // disable auto-info
+	check();
 
-	set_trace(1, "disable auto info");
-	sendCommand(cmd);
-	sett("");
-	showresp(INFO, ASC, "disable auto-info", cmd, replystr);
+	if (!isok) return;
 
 	cmd = "K31;"; // KX3 extended mode
-
 	set_trace(1, "KX3 extended mode");
-	sendCommand(cmd);
+	sendCommand(cmd, 0, 50);
 	sett("");
 	showresp(INFO, ASC, "KX3 extended mode", cmd, replystr);
 
-	get_vfoA();
-	if (isok) {
-		get_modeA();
-		get_bwA();
-
-		get_vfoB();
-		get_modeB();
-		get_bwB();
-	}
-
-	set_split(false); // normal ops
-
+	cmd = "AI0;"; // disable auto-info
+	set_trace(1, "disable auto info");
+	sendCommand(cmd, 0, 50);
+	sett("");
+	showresp(INFO, ASC, "disable auto-info", cmd, replystr);
 }
 
 void RIG_KX3::shutdown()
 {
 }
 
+// from programming notes:
+// vfo change to also incurs a band change will disable CAT responses for up
+// to 500 msec (UGH)
+// use check after all vfo changes
+
 bool RIG_KX3::check ()
 {
-	cmd = "FA;";
-	get_trace(1, "check read vfoA");
+	static char sztemp[50];
+isok=true;
+	if (isok) return true;
 
-	int ret = 0, wait = 5;
+// try reading vfoA
+	int ret = 0, wait = 10;
 
-	while ( (ret = wait_char(';', 14, 100, "check read vfoA", ASC) < 14) && wait > 0) {
+	while ( ( ret < 14) && (wait > 0) ) {
+		snprintf(sztemp, sizeof(sztemp), "check() %d", 11 - wait);
+		get_trace(1, sztemp);
 		cmd = "FA;";
+		ret = wait_char(';', 14, 600, sztemp, ASC);
+		gett("");
 		wait--;
 	}
 
-	gett("");
 	isok = true;
+
 	if (ret < 14) isok = false;
 
 	return isok;
@@ -211,7 +236,6 @@ unsigned long int RIG_KX3::get_vfoA ()
 	for (size_t n = 2; n < 13; n++)
 		f = f*10 + replystr[p + n] - '0';
 	freqA = f;
-	isok = true;
 
 	return freqA;
 }
@@ -225,9 +249,10 @@ void RIG_KX3::set_vfoA (unsigned long int freq)
 		freq /= 10;
 	}
 	set_trace(1, "set vfoA");
-	sendCommand(cmd);
+	sendCommand(cmd, 0, 50);
 	sett("");
 	showresp(INFO, ASC, "set vfo A", cmd, replystr);
+	check();
 }
 
 unsigned long int RIG_KX3::get_vfoB ()
@@ -250,10 +275,6 @@ unsigned long int RIG_KX3::get_vfoB ()
 
 void RIG_KX3::set_vfoB (unsigned long int freq)
 {
-	if (split_on == false) {
-		LOG_INFO("split on");
-		return;
-	}
 	freqB = freq;
 	cmd = "FB00000000000;";
 	for (int i = 12; i > 1; i--) {
@@ -262,23 +283,24 @@ void RIG_KX3::set_vfoB (unsigned long int freq)
 	}
 
 	set_trace(1, "set vfoB");
-	sendCommand(cmd);
+	sendCommand(cmd, 0, 50);
 	sett("");
 	showresp(INFO, ASC, "set vfo B", cmd, replystr);
+
+	check();
 }
 
 // Volume control
 void RIG_KX3::set_volume_control(int val)
 {
-	int ivol = (int)(val * 2.55);
 	cmd = "AG000;";
 	for (int i = 4; i > 1; i--) {
-		cmd[i] += ivol % 10;
-		ivol /= 10;
+		cmd[i] += val % 10;
+		val /= 10;
 	}
 
 	set_trace(1, "set volume control");
-	sendCommand(cmd);
+	sendCommand(cmd, 0, 50);
 	showresp(INFO, ASC, "set vol", cmd, replystr);
 	sett("");
 
@@ -298,32 +320,7 @@ int RIG_KX3::get_volume_control()
 
 	replystr[p + 5] = 0;
 	int v = atoi(&replystr[p + 2]);
-	return (int)(v / 2.55);
-}
-
-void RIG_KX3::set_pbt_values(int val)
-{
-	switch (val) {
-		case 0 :
-		case 1 :
-		case 3 :
-		case 4 :
-			if_shift_min = 400; if_shift_max = 2600;
-			if_shift_step = 10; if_shift_mid = 1500;
-			break;
-		case 2 :
-		case 6 :
-			if_shift_min = 300; if_shift_max = 1300;
-			if_shift_step = 10; if_shift_mid = 800;
-			break;
-		case 5 :
-		case 7 :
-			if_shift_min = 100; if_shift_max = 2100;
-			if_shift_step = 10; if_shift_mid = 1500;
-			break;
-	}
-	progStatus.shift_val = if_shift_mid;
-	Fl::awake(adjust_if_shift_control, (void *)0);
+	return v;
 }
 
 /*
@@ -419,11 +416,9 @@ void RIG_KX3::set_modeA(int val)
 	cmd[2] = modenbr[val];
 
 	set_trace(1, "set modeA");
-	sendCommand(cmd);
+	sendCommand(cmd, 0, 50);
 	sett("");
 	showresp(INFO, ASC, "set mode A", cmd, replystr);
-
-	set_pbt_values(val);
 }
 
 int RIG_KX3::get_modeA()
@@ -439,26 +434,20 @@ int RIG_KX3::get_modeA()
 	if (p == string::npos) return modeA;
 	int md = replystr[p + 2] - '1';
 	if (md == 8) md--;
-	if (md != modeA) set_pbt_values(md);
 	return (modeA = md);
 }
 
 void RIG_KX3::set_modeB(int val)
 {
-	if (split_on == false) {
-		LOG_INFO("split on");
-		return;
-	}
 	modeB = val;
 	cmd = "MD$0;";
 	cmd[3] = modenbr[val];
 
 	set_trace(1, "set modeB");
-	sendCommand(cmd);
+	sendCommand(cmd, 0, 50);
 	sett("");
 
 	showresp(INFO, ASC, "set mode B", cmd, replystr);
-	set_pbt_values(val);
 }
 
 int RIG_KX3::get_modeB()
@@ -474,7 +463,6 @@ int RIG_KX3::get_modeB()
 	if (p == string::npos) return modeB;
 	int md = replystr[p + 3] - '1';
 	if (md == 8) md--;
-	if (md != modeB) set_pbt_values(md);
 	return (modeB = md);
 }
 
@@ -486,8 +474,9 @@ int RIG_KX3::get_modetype(int n)
 void RIG_KX3::set_preamp(int val)
 {
 	set_trace(1, "set preamp");
-	if (val) sendCommand("PA1;", 0);
-	else	 sendCommand("PA0;", 0);
+	if (val) cmd = "PA1;";
+	else     cmd = "PA0;";
+	sendCommand(cmd, 0, 50);
 	sett("");
 }
 
@@ -505,12 +494,19 @@ int RIG_KX3::get_preamp()
 	return (replystr[p + 2] == '1' ? 1 : 0);
 }
 
+int RIG_KX3::next_preamp()
+{
+	if (progStatus.preamp) return 0;
+	return 1;
+}
+
 //
 void RIG_KX3::set_attenuator(int val)
 {
 	set_trace(1, "set attenuator");
-	if (val) sendCommand("RA01;", 0);
-	else	 sendCommand("RA00;", 0);
+	if (val) cmd = "RA01;";
+	else     cmd = "RA00;";
+	sendCommand(cmd, 0, 50);
 	sett("");
 }
 
@@ -519,13 +515,19 @@ int RIG_KX3::get_attenuator()
 	cmd = "RA;";
 
 	get_trace(1, "get attenuator");
-	int ret = wait_char(';', 5, KX3_WAIT_TIME, "set ATT", ASC);
+	int ret = wait_char(';', 5, KX3_WAIT_TIME, "get ATT", ASC);
 	gett("");
 
 	if (ret < 5) return progStatus.attenuator;
 	size_t p = replystr.rfind("RA");
 	if (p == string::npos) return 0;
 	return (replystr[p + 3] == '1' ? 1 : 0);
+}
+
+int RIG_KX3::next_attenuator()
+{
+	if (progStatus.attenuator) return 0;
+	return 1;
 }
 
 /*
@@ -542,20 +544,18 @@ int RIG_KX3::get_attenuator()
 
 void RIG_KX3::get_pc_min_max_step(double &min, double &max, double &step)
 {
-	min = 0; max = 100; step = 1;
+	min = 0; max = 15; step = 1;
 }
+
+static std::string pwr = "000;001;002;003;004;005;006;007;008;009;010;011;012;013;014;015;";
 
 void RIG_KX3::set_power_control(double val)
 {
 	int ival = val;
-	cmd = "PC000;";
-	for (int i = 4; i > 1; i--) {
-		cmd[i] += ival % 10;
-		ival /= 10;
-	}
-
+	cmd = "PC";
+	cmd.append(pwr.substr(ival * 4, 4));
 	set_trace(1, "set power control");
-	sendCommand(cmd);
+	sendCommand(cmd, 0, 50);
 	showresp(INFO, ASC, "set power ctrl", cmd, replystr);
 	sett("");
 }
@@ -569,9 +569,12 @@ int RIG_KX3::get_power_control()
 	gett("");
 
 	if (ret < 6) return progStatus.power_level;
+
 	size_t p = replystr.rfind("PC");
 	if (p == string::npos) return progStatus.power_level;
-	return fm_decimal(replystr.substr(p+2), 3);
+	size_t val = pwr.find(replystr.substr(p+2, 4));
+	if (val != std::string::npos) val /= 4;
+	return val;
 }
 
 /*
@@ -593,29 +596,29 @@ int RIG_KX3::power_scale()
 
 int RIG_KX3::get_power_out()
 {
-	// test for KXPA100 presence
 	int ret = 0;
 	size_t p = 0;
 	int mtr = 0;
 
-	cmd = "^OP;";
-
-	get_trace(1, "test KXPA");
-	ret = wait_char(';', 5, KX3_WAIT_TIME, "test KXPA", ASC);
-	gett("");
-
-	if (ret >= 4) {
-		powerScale = 1;
-		if (replystr.find("^OP1;") != string::npos) {
-			cmd = "^PF;";
-			ret = wait_char(';', 8, KX3_WAIT_TIME, "get KXPA power out", ASC);
-			if (ret >= 8) {
-				p = replystr.rfind("^PF");
-				if (p == string::npos) return 0;
-				replystr[p + 7] = 0;
-				mtr = atoi(&replystr[p+3]);
-				if (mtr > 0) return mtr/10;
+	if (progStatus.kxpa) {		// test for KXPA-100 on line
+		cmd = "^OP;";
+		get_trace(1, "test KXPA");
+		ret = wait_char(';', 5, KX3_WAIT_TIME, "test KXPA", ASC);
+		gett("");
+		if (ret >= 4) {
+			powerScale = 1;
+			if (replystr.find("^OP1;") != string::npos) {
+				cmd = "^PF;";
+				ret = wait_char(';', 8, KX3_WAIT_TIME, "get KXPA power out", ASC);
+				if (ret >= 8) {
+					p = replystr.rfind("^PF");
+					if (p == string::npos) return 0;
+					replystr[p + 7] = 0;
+					mtr = atoi(&replystr[p+3]);
+					if (mtr > 0) return mtr/10;
+				}
 			}
+			return 0;
 		}
 	}
 
@@ -626,19 +629,22 @@ int RIG_KX3::get_power_out()
 	gett("");
 
 	if (ret < 6) return 0;
+
 	p = replystr.rfind("PO");
 	if (p == string::npos) return 0;
 	replystr[p + 5] = 0;
 	mtr = atoi(&replystr[p + 2]); 
-	powerScale = 10; // scales to 0 to 120 W 
-
+// mtr is power is tenths
+	powerScale = 10;
 	return mtr;
 }
 
 // Transceiver rf control
 void RIG_KX3::set_rf_gain(int val)
 {
-	int ival = val;
+	int ival = 250 + val;
+	if (ival < 190) ival = 190;
+	if (ival > 250) ival = 250;
 	cmd = "RG000;";
 	for (int i = 4; i > 1; i--) {
 		cmd[i] += ival % 10;
@@ -646,7 +652,7 @@ void RIG_KX3::set_rf_gain(int val)
 	}
 
 	set_trace(1, "set rf gain");
-	sendCommand(cmd);
+	sendCommand(cmd, 0, 50);
 	sett("");
 	showresp(INFO, ASC, "set rfgain ctrl", cmd, replystr);
 }
@@ -665,12 +671,15 @@ int RIG_KX3::get_rf_gain()
 
 	replystr[p + 5] = 0;
 	int v = atoi(&replystr[p + 2]);
+	v -= 250;
+	if (v < -60) v = -60;
+	if (v > 0) v = 0;
 	return v;
 }
 
 void RIG_KX3::get_rf_min_max_step(int &min, int &max, int &step)
 {
-   min = 0; max = 250; step = 1;
+   min = -60; max = 0; step = 1;
 }
 
 // Transceiver mic control
@@ -684,7 +693,7 @@ void RIG_KX3::set_mic_gain(int val)
 	}
 
 	set_trace(1, "set mic gain");
-	sendCommand(cmd);
+	sendCommand(cmd, 0, 50);
 	sett("");
 	showresp(INFO, ASC, "set mic ctrl", cmd, replystr);
 }
@@ -715,8 +724,9 @@ void RIG_KX3::get_mic_min_max_step(int &min, int &max, int &step)
 void RIG_KX3::set_PTT_control(int val)
 {
 	set_trace(1, "set PTT");
-	if (val) sendCommand("TX;", 0);
-	else	 sendCommand("RX;", 0);
+	if (val) cmd = "TX;";
+	else     cmd = "RX;";
+	sendCommand(cmd, 0, 50);
 	sett("");
 	ptt_ = val;
 }
@@ -761,8 +771,9 @@ int RIG_KX3::get_smeter()
 void RIG_KX3::set_noise(bool on)
 {
 	set_trace(1, "set noise blanker");
-	if (on) sendCommand("NB1;", 0);
-	else	sendCommand("NB0;", 0);
+	if (on) cmd = "NB1;";
+	else    cmd = "NB0;";
+	sendCommand(cmd, 0, 50);
 	sett("");
 }
 
@@ -783,19 +794,24 @@ int RIG_KX3::get_noise()
 // BW $ (Filter Bandwidth and Number; GET/SET)
 // KX3 Extended SET/RSP format (K31): BWxxxx; where xxxx is 0-9999, the bandwidth in 10-Hz units. May be
 // quantized and/or range limited based on the present operating mode.
+// BW00050 => BW0005;
+// 50 - 1000 in 50 Hz increments
+// 1000 - 3000 in 100 Hz increments
+// 3000 - 4000 in 200 Hz increments
+
+static string KX3_bws = "\
+005;010;015;020;025;030;035;040;045;050;\
+055;060;065;070;075;080;085;090;095;100;\
+110;120;130;140;150;160;170;180;190;200;\
+210;220;230;240;250;260;270;280;290;300;\
+320;340;360;380;400;";
 
 void RIG_KX3::set_bwA(int val)
 {
-	cmd = "BW0000;";
-	bwA = val;
-	val = atoi(KX3_widths[val]);
-	val /= 10; cmd[5] += val % 10;
-	val /= 10; cmd[4] += val % 10;
-	val /= 10; cmd[3] += val % 10;
-	val /= 10; cmd[2] += val % 10;
+	cmd.assign("BW0").append(KX3_bws.substr(val*4, 4));
 
-	set_trace(1, "set bwA");
-	sendCommand(cmd);
+	set_trace(2, "set bwA", KX3_widths[val]);
+	sendCommand(cmd, 0, 50);
 	sett("");
 	showresp(INFO, ASC, "set bw A", cmd, replystr);
 }
@@ -809,54 +825,50 @@ int RIG_KX3::get_bwA()
 	gett("");
 
 	if (ret < 7) return bwA;
-	size_t p = replystr.rfind("FW");
-	if (p == string::npos) return bwA;
-	int bw = 0;
-	for (int i = 2; i < 6; i++) bw = bw * 10 + replystr[p+i] - '0';
-	bw *= 10;
-	for (bwA = 0; bwA < 36; bwA++)
-		if (bw <= atoi(KX3_widths[bwA])) break;
-	return bwA;
+	string bw = replystr.substr( replystr.length() - 4, 4 );
 
+	size_t p = 0;
+	while (p < KX3_bws.length()) {
+		if (bw <= KX3_bws.substr(p, 4)) break;
+		p += 4;
+	}
+	if ((bw < KX3_bws.substr(p,4)) && bw[2] < '5') p -= 4;
+	if (p < 0) p = 0;
+	if (p < KX3_bws.length()) bwA = p / 4;
+
+	return bwA;
 }
 
 void RIG_KX3::set_bwB(int val)
 {
-	if (split_on == false) {
-		LOG_INFO("split on");
-		return;
-	}
+	cmd.assign("BW0").append(KX3_bws.substr(val*4, 4));
 
-	cmd = "BW$0000;";
-	bwA = val;
-	val = atoi(KX3_widths[val]);
-	val /= 10; cmd[6] += val % 10;
-	val /= 10; cmd[5] += val % 10;
-	val /= 10; cmd[4] += val % 10;
-	val /= 10; cmd[3] += val % 10;
-
-	set_trace(1, "set bwB");
-	sendCommand(cmd);
+	set_trace(2, "set bwB", KX3_widths[val]);
+	sendCommand(cmd, 0, 50);
 	sett("");
 	showresp(INFO, ASC, "set bw B", cmd, replystr);
 }
 
 int RIG_KX3::get_bwB()
 {
-	cmd = "BW$;";
+	cmd = "BW;";
 
-	get_trace(1, "get bwB");
-	int ret = wait_char(';', 8, KX3_WAIT_TIME, "get bandwidth B", ASC);
+	get_trace(1, "get bwA");
+	int ret = wait_char(';', 7, KX3_WAIT_TIME, "get bandwidth B", ASC);
 	gett("");
 
-	if (ret < 8) return bwB;
-	size_t p = replystr.rfind("FW$");
-	if (p == string::npos) return bwB;
-	int bw = 0;
-	for (int i = 3; i < 7; i++) bw = bw * 10 + replystr[p+i] - '0';
-	bw *= 10;
-	for (bwB = 0; bwB < 36; bwB++)
-		if (bw <= atoi(KX3_widths[bwB])) break;
+	if (ret < 7) return bwB;
+	string bw = replystr.substr( replystr.length() - 4, 4 );
+
+	size_t p = 0;
+	while (p < KX3_bws.length()) {
+		if (bw <= KX3_bws.substr(p, 4)) break;
+		p += 4;
+	}
+	if ((bw < KX3_bws.substr(p,4)) && bw[2] < '5') p -= 4;
+	if (p < 0) p = 0;
+	if (p < KX3_bws.length()) bwB = p / 4;
+
 	return bwB;
 }
 
@@ -870,11 +882,11 @@ void RIG_KX3::set_split(bool val)
 	set_trace(1, "set split");
 	if (val) {
 		cmd = "FT1;";
-		sendCommand(cmd);
+		sendCommand(cmd, 0, 50);
 		showresp(INFO, ASC, "set split ON", cmd, replystr);
 	} else {
 		cmd = "FR0;";
-		sendCommand(cmd);
+		sendCommand(cmd, 0, 50);
 		showresp(INFO, ASC, "set split OFF", cmd, replystr);
 	}
 	sett("");
@@ -906,6 +918,9 @@ int RIG_KX3::get_split()
 
 void RIG_KX3::set_if_shift(int val)
 {
+	if (val < if_shift_min) val = 1500;
+	if (val > if_shift_max) val = 1500;
+
 	cmd = "IS 0000;";
 	cmd[6] += val % 10; val /= 10;
 	cmd[5] += val % 10; val /= 10;
@@ -913,7 +928,7 @@ void RIG_KX3::set_if_shift(int val)
 	cmd[3] += val % 10;
 
 	set_trace(1, "set if shift");
-	sendCommand(cmd);
+	sendCommand(cmd, 0, 50);
 	sett("");
 	showresp(INFO, ASC, "set if shift", cmd, replystr);
 }
@@ -923,18 +938,30 @@ bool RIG_KX3::get_if_shift(int &val)
 	cmd = "IS;";
 
 	get_trace(1, "get if shift");
-	int ret = wait_char(';', 8, KX3_WAIT_TIME, "get IF shift", ASC);
+	wait_char(';', 8, KX3_WAIT_TIME, "get IF shift", ASC);
 	gett("");
 
 	val = progStatus.shift_val;
-	if (ret < 8) return progStatus.shift;
+
+	if (replystr.length() < 8) return 1;
+
+	int sh_val = 0;
+
 	size_t p = replystr.rfind("IS ");
-	if (p == string::npos) return progStatus.shift;
-	sscanf(&replystr[p + 3], "%d", &progStatus.shift_val);
-	val = progStatus.shift_val;
-	if (val == if_shift_mid) progStatus.shift = false;
-	else progStatus.shift = true;
-	return progStatus.shift;
+	if (p == string::npos)
+		return progStatus.shift;
+
+	sh_val = (((replystr[p+3] - '0') * 10 + 
+			   (replystr[p+4] - '0') ) * 10 + 
+			   (replystr[p+5] - '0')  ) * 10 + 
+			   (replystr[p+6] - '0');
+
+	val = progStatus.shift_val = sh_val;
+
+	if (sh_val < if_shift_min) sh_val = if_shift_min;
+	if (sh_val > if_shift_max) sh_val = if_shift_max;
+
+	return 1;
 }
 
 void RIG_KX3::get_if_min_max_step(int &min, int &max, int &step)
@@ -946,8 +973,8 @@ void  RIG_KX3::get_if_mid()
 {
 	cmd = "IS 9999;";
 
-	sett("set center pbt");
-	sendCommand(cmd);
+	set_trace(1, "set center pbt");
+	sendCommand(cmd, 0, 50);
 	sett("");
 	showresp(INFO, ASC, "center pbt", cmd, replystr);
 
@@ -960,4 +987,25 @@ void  RIG_KX3::get_if_mid()
 	size_t p = replystr.rfind("IS ");
 	if (p == string::npos) return;
 	sscanf(&replystr[p + 3], "%d", &if_shift_mid);
+}
+
+int RIG_KX3::get_swr()
+{
+	cmd = "SW;";
+
+	get_trace(1, "get swr");
+	int ret = wait_char(';', 6, KX3_WAIT_TIME, "get Smeter", ASC);
+	gett("");
+
+	if (ret < 6) return 0;
+
+	size_t p = replystr.rfind("SW");
+	if (p == string::npos) return 0;
+
+	int mtr = fm_decimal(replystr.substr(p+2), 3);
+	if (mtr <= 30) mtr = (int) (50.0 * (mtr - 10) / 20.0);
+	else mtr = (int)(50 + 50 * (mtr - 30) / 70);
+
+	return mtr;
+
 }

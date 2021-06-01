@@ -417,11 +417,19 @@ int tune_;
 	virtual int  get_tune() { return tune_; }
 
 	virtual void set_attenuator(int val) {atten_level = val;}
-	virtual int  next_attenuator() { atten_level = !atten_level; return atten_level; }
+	virtual int  next_attenuator() { 
+		if (atten_level == 0) atten_level = 1;
+		else atten_level = 0;
+		return atten_level;
+	}
 	virtual int  get_attenuator() {return atten_level;}
 
 	virtual void set_preamp(int val) {preamp_level = val;}
-	virtual int  next_preamp() { preamp_level = !preamp_level; return preamp_level; }
+	virtual int  next_preamp() { 
+		if (preamp_level == 0) preamp_level = 1;
+		else preamp_level = 0;
+		return preamp_level;
+	}
 	virtual int  get_preamp() {return preamp_level;}
 
 // CTCSS tones / offset

@@ -366,6 +366,13 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		btnA->callback((Fl_Callback*)cb_btnA);
 		btnA->value(!useB);
 
+		btn_KX3_swapAB = new Fl_Button(xpos, ypos, 49, 49, _("A / B"));
+		btn_KX3_swapAB->tooltip(_("Swap A/B"));
+		btn_KX3_swapAB->down_box(FL_DOWN_BOX);
+		btn_KX3_swapAB->labelsize(16);
+		btn_KX3_swapAB->callback((Fl_Callback*)cb_btn_KX3_swapAB);
+		btn_KX3_swapAB->hide();
+
 		btnB = new Fl_Light_Button(xpos, ypos+51, 49, 49, _("B"));
 		btnB->tooltip(_("vfo B"));
 		btnB->down_box(FL_THIN_DOWN_BOX);
@@ -373,7 +380,23 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		btnB->callback((Fl_Callback*)cb_btnB);
 		btnB->value(useB);
 
-		labelMEMORY = new Fl_Box(xpos, ypos, 49, 100, _("MEM\nORY"));
+		btn_KX3_A2B = new Fl_Button(xpos, ypos+51, 49, 49, _("A -> B"));
+		btn_KX3_A2B->tooltip(_("Copy A to B"));
+		btn_KX3_A2B->down_box(FL_DOWN_BOX);
+		btn_KX3_A2B->labelsize(16);
+		btn_KX3_A2B->callback((Fl_Callback*)cb_KX3_A2B);
+		btn_KX3_A2B->hide();
+
+		btn_K3_A2B = new Fl_Button(
+			btn_KX3_A2B->x(), btn_KX3_A2B->y(),
+			btn_KX3_A2B->w(), btn_KX3_A2B->h(), _("A -> B"));
+		btn_K3_A2B->tooltip(_("Copy A to B"));
+		btn_K3_A2B->down_box(FL_DOWN_BOX);
+		btn_K3_A2B->labelsize(12);
+		btn_K3_A2B->callback((Fl_Callback*)K3_A2B);
+		btn_K3_A2B->hide();
+
+		labelMEMORY = new Fl_Box(xpos, ypos, 49, 100, _("MEMORY"));
 		labelMEMORY->box(FL_DOWN_BOX);
 		labelMEMORY->color(FL_YELLOW);
 		labelMEMORY->align(FL_ALIGN_CENTER);
@@ -523,6 +546,13 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 			btnIFsh->down_box(FL_THIN_DOWN_BOX);
 			btnIFsh->labelsize(16);
 			btnIFsh->callback((Fl_Callback*)cb_btnIFsh);
+
+			btn_KX3_IFsh = new Fl_Button(xpos, ypos, cw, ch / 3 - 1, _("Cntr"));
+			btn_KX3_IFsh->tooltip(_("Center IF shift"));
+			btn_KX3_IFsh->down_box(FL_THIN_DOWN_BOX);
+			btn_KX3_IFsh->labelsize(16);
+			btn_KX3_IFsh->callback((Fl_Callback*)cb_KX3_IFsh);
+			btn_KX3_IFsh->hide();
 
 			btnNR = new Fl_Light_Button(xpos, ypos + ch * 2 / 3, cw, ch / 3 - 1, _("NR"));
 			btnNR->tooltip(_("Noise Reduction On/Off"));
@@ -743,26 +773,19 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		btnAutoNotch->callback((Fl_Callback*)cb_btnAutoNotch);
 
 		xpos += btnAutoNotch->w() + 2;
-		btnAswapB = new Fl_Button(xpos, ypos, bw, bh, _("A/B"));
-		btnAswapB->tooltip(_("Swap A B\nRight-click; Copy A to B"));
+		btnAswapB = new Fl_Button(xpos, ypos, bw, bh, _("A / B"));
+		btnAswapB->tooltip(_("Left click: Swap A/B\nRight click: Copy A to B"));
 		btnAswapB->down_box(FL_DOWN_BOX);
 		btnAswapB->labelsize(16);
 		btnAswapB->callback((Fl_Callback*)cb_btnAswapB);
 
 		xpos += btnAswapB->w() + 2;
-		btn_K3_swapAB = new Fl_Button(xpos, ypos, bw, bh, _("A/B"));
-		btn_K3_swapAB->tooltip(_("Swap A/B"));
+		btn_K3_swapAB = new Fl_Button(xpos, ypos, bw, bh, _("A / B"));
+		btn_K3_swapAB->tooltip(_("Left click: Swap A/B\nRight click: Copy A to B"));
 		btn_K3_swapAB->down_box(FL_DOWN_BOX);
 		btn_K3_swapAB->labelsize(16);
 		btn_K3_swapAB->callback((Fl_Callback*)cb_btn_K3_swapAB);
 		btn_K3_swapAB->hide();
-
-		btn_KX3_swapAB = new Fl_Button(xpos, ypos, bw, bh, _("A/B"));
-		btn_KX3_swapAB->tooltip(_("Swap A/B"));
-		btn_KX3_swapAB->down_box(FL_DOWN_BOX);
-		btn_KX3_swapAB->labelsize(16);
-		btn_KX3_swapAB->callback((Fl_Callback*)cb_btn_KX3_swapAB);
-		btn_KX3_swapAB->hide();
 
 		xpos += btn_K3_swapAB->w() + 2;
 		btnSplit = new Fl_Light_Button(xpos, ypos, bw, bh, _("Split"));

@@ -1246,9 +1246,8 @@ int  RIG_IC9700::agc_val()
 void RIG_IC9700::set_attenuator(int val)
 {
 	if (val) {
-		atten_label("20 dB", true);
+		atten_label("10 dB", true);
 		atten_level = 1;
-		set_preamp(0);
 	} else {
 		atten_label("ATT", false);
 		atten_level = 0;
@@ -1256,7 +1255,7 @@ void RIG_IC9700::set_attenuator(int val)
 
 	cmd = pre_to;
 	cmd += '\x11';
-	cmd += atten_level ? '\x20' : '\x00';
+	cmd += atten_level ? '\x10' : '\x00';
 	cmd.append( post );
 	waitFB("set att");
 	stringstream ss;
@@ -1286,7 +1285,7 @@ int RIG_IC9700::get_attenuator()
 				atten_level = 0;
 				return 0;
 			} else {
-				atten_label("20 dB", true);
+				atten_label("10 dB", true);
 				atten_level = 1;
 				return 1;
 			}
@@ -1301,8 +1300,9 @@ int RIG_IC9700::next_preamp()
 	switch (preamp_level) {
 		case 0: return 1;
 		case 1: return 2;
+		case 2: return 3;
 		default:
-		case 2: return 0;
+		case 3: return 0;
 	}
 	return 0;
 }
@@ -1313,15 +1313,24 @@ void RIG_IC9700::set_preamp(int val)
 	cmd += '\x16';
 	cmd += '\x02';
 
-	if (val == 0) {
-		preamp_label("Pre", false);
-		preamp_level = 0;
-	} else if (val == 1) {
-		preamp_label("Pre 1", true);
-		preamp_level = 1;
-	} else {
-		preamp_label("Pre 2", true);
-		preamp_level = 2;
+	switch (val) {
+		default:
+		case 0 :
+			preamp_label("P0/E0", false);
+			preamp_level = 0;
+			break;
+		case 1 :
+			preamp_label("P1/E0", true);
+			preamp_level = 1;
+			break;
+		case 2 :
+			preamp_label("P0/E1", true);
+			preamp_level = 2;
+			break;
+		case 3 :
+			preamp_label("P1/E1", true);
+			preamp_level = 3;
+			break;
 	}
 	cmd += preamp_level;
 
@@ -1331,9 +1340,6 @@ void RIG_IC9700::set_preamp(int val)
 	stringstream ss;
 	ss << "set_preamp(" << val << ") " << str2hex(replystr.data(), replystr.length());
 	set_trace(1, ss.str().c_str());
-
-	if (val)
-		set_attenuator(0);
 
 }
 
@@ -1348,15 +1354,24 @@ int RIG_IC9700::get_preamp()
 	if (waitFOR(8, "get Pre")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			if (replystr[p+6] == 0x01) {
-				preamp_label("Pre 1", true);
-				preamp_level = 1;
-			} else if (replystr[p+6] == 0x02) {
-				preamp_label("Pre 2", true);
-				preamp_level = 2;
-			} else {
-				preamp_label("Pre", false);
+			switch (replystr[p+6]) {
+			default:
+			case 0 :
+				preamp_label("P0/E0", false);
 				preamp_level = 0;
+				break;
+			case 1 :
+				preamp_label("P1/E0", true);
+				preamp_level = 1;
+				break;
+			case 2 :
+				preamp_label("P0/E1", true);
+				preamp_level = 2;
+				break;
+			case 3 :
+				preamp_label("P1/E1", true);
+				preamp_level = 3;
+				break;
 			}
 		}
 	}

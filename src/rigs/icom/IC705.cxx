@@ -527,8 +527,13 @@ end_wait_modeA:
 		if (waitFOR(10, "get CW sideband")) {
 			p = replystr.rfind(resp);
 			CW_sense = replystr[p+8];
-			if (CW_sense) IC705_mode_type[A.imode] = 'U';
-			else IC705_mode_type[A.imode] = 'L';
+			if (CW_sense) {
+				IC705_mode_type[CW705] = 'U';
+				IC705_mode_type[CWR705] = 'L';
+			} else {
+				IC705_mode_type[CW705] = 'L';
+				IC705_mode_type[CWR705] = 'U';
+			}
 		}
 		get_trace(2, "get CW sideband ", str2hex(replystr.c_str(), replystr.length()));
 	}
@@ -613,8 +618,13 @@ end_wait_modeB:
 		if (waitFOR(10, "get CW sideband")) {
 			p = replystr.rfind(resp);
 			CW_sense = replystr[p+8];
-			if (CW_sense) IC705_mode_type[B.imode] = 'U';
-			else IC705_mode_type[B.imode] = 'L';
+			if (CW_sense) {
+				IC705_mode_type[CW705] = 'U';
+				IC705_mode_type[CWR705] = 'L';
+			} else {
+				IC705_mode_type[CW705] = 'L';
+				IC705_mode_type[CWR705] = 'U';
+			}
 		}
 		get_trace(2, "get CW sideband ", str2hex(replystr.c_str(), replystr.length()));
 	}

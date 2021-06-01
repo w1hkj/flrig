@@ -140,10 +140,13 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz, unsigned long timeout)
 
 		size_t tout1 = zmsec();
 		size_t tout2 = tout1;
+		size_t pcheck = std::string::npos;
+		size_t peor = std::string::npos;
+
 		std::string tempstr;
 		int nret;
-		int tdiff = timeout;
-		while (tdiff > 0) {
+
+		while ((tout2 - tout1) < timeout) {
 			tempstr.clear();
 			nret = RigSerial->ReadBuffer(tempstr, n + cmd.length(), check, eor);
 			replystr.append(tempstr);
@@ -151,13 +154,16 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz, unsigned long timeout)
 
 			if (replystr.rfind(bad) != std::string::npos)
 				return false;
-			if (replystr.rfind(check) != std::string::npos && 
-				replystr.rfind(eor) != std::string::npos)
+			pcheck = replystr.rfind(check);
+			peor = replystr.rfind(eor);
+
+			if ((pcheck != std::string::npos) && 
+				(peor != std::string::npos) &&
+				(peor > pcheck) )
 				return true;
 
 			tout2 = zmsec();
 			if (tout2 < tout1) tout1 = tout2;
-			tdiff = timeout - (tout2 - tout1);
 		}
 
 	}

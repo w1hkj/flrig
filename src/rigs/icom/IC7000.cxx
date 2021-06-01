@@ -163,6 +163,8 @@ RIG_IC7000::RIG_IC7000() {
 	B.imode = 1;
 	B.iBW = 28;
 
+	preamp_level = 0;
+
 	restore_mbw = false;
 
 	has_ifshift_control = false;
@@ -508,13 +510,15 @@ void RIG_IC7000::set_attenuator(int val)
 
 void RIG_IC7000::set_preamp(int val)
 {
+	preamp_level = val;
 	cmd = pre_to;
 	cmd += '\x16';
 	cmd += '\x02';
-	cmd += val ? 0x01 : 0x00;
+	cmd += val ? '\x01' : '\x00';
 	cmd.append( post );
+	set_trace(1, "set preamp");
 	waitFB("set preamp");
-	isett("set_preamp()");
+	isett("");
 }
 
 int RIG_IC7000::get_preamp()
@@ -531,9 +535,9 @@ int RIG_IC7000::get_preamp()
 	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			return replystr[p+6] ? 1 : 0;
+			preamp_level = replystr[p+6] ? 1 : 0;
 	}
-	return progStatus.preamp;
+	return preamp_level;
 }
 
 void RIG_IC7000::set_auto_notch(int val)

@@ -100,7 +100,7 @@ void KX3_set_split(int val)
 
 extern char *print(XCVR_STATE data);
 
-void KX3_A2B()
+void cb_KX3_A2B()
 {
 	guard_lock serial_lock(&mutex_serial);
 	vfoB = vfoA;
@@ -115,24 +115,31 @@ void cb_KX3_swapAB()
 {
 	guard_lock serial_lock(&mutex_serial);
 
-	XCVR_STATE temp = vfoA;
-	vfoA = vfoB;
-	vfoB = temp;
+	XCVR_STATE nuB = vfoA, nuA = vfoB;
+
+	selrig->set_vfoB(nuB.freq);
+	selrig->set_bwB(nuB.iBW);
+	selrig->set_modeB(nuB.imode);
+
+	selrig->set_vfoA(nuA.freq);
+	selrig->set_bwA(nuA.iBW);
+	selrig->set_modeA(nuA.imode);
+
+	vfoA = nuA;
+	vfoB = nuB;
 	vfo = &vfoA;
 
-	selrig->set_vfoB(vfoB.freq);
-	selrig->set_bwB(vfoB.iBW);
-	selrig->set_modeB(vfoB.imode);
-
-	selrig->set_vfoA(vfoA.freq);
-	selrig->set_bwA(vfoA.iBW);
-	selrig->set_modeA(vfoA.imode);
-
+	FreqDispA->value(vfoA.freq);
 	opBW->index(vfoA.iBW);
 	opMODE->index(vfoA.imode);
-	FreqDispA->value(vfoA.freq);
 
 	FreqDispB->value(vfoB.freq);
 
 	Fl::focus(FreqDispA);
+}
+
+void cb_KX3_IFsh()
+{
+	guard_lock serial_lock(&mutex_serial);
+	selrig->set_if_shift(9999);
 }

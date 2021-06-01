@@ -51,3 +51,11 @@ extern void make_trace_window();
 	(str2hex(replystr.c_str(), replystr.length())) )
 
 #endif
+
+#define seth() set_trace(2, \
+	(str2hex(cmd.c_str(), cmd.length())), \
+	(str2hex(replystr.c_str(), replystr.length())) )
+
+#define geth() get_trace(2, \
+	(str2hex(cmd.c_str(), cmd.length())), \
+	(str2hex(replystr.c_str(), replystr.length())) )

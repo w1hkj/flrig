@@ -205,6 +205,7 @@ RIG_TS480SAT::RIG_TS480SAT() {
 	_noise_reduction_level = 0;
 	_nrval1 = 2;
 	_nrval2 = 4;
+	preamp_level = atten_level = 0;
 }
 
 const char * RIG_TS480SAT::get_bwname_(int n, int md) 
@@ -717,20 +718,24 @@ void RIG_TS480SAT::set_attenuator(int val)
 	if (val)	cmd = "RA01;";
 	else		cmd = "RA00;";
 	LOG_WARN("%s", cmd.c_str());
+	set_trace(1, "set attenuator");
 	sendCommand(cmd);
-	sett("attenuator");
+	sett("");
+	atten_level = val;
 }
 
 int RIG_TS480SAT::get_attenuator()
 {
 	cmd = "RA;";
-	if (wait_char(';', 7, 100, "get attenuator", ASC) < 7) return progStatus.attenuator;
+	get_trace(1, "get_attenuator");
+	int ret = wait_char(';', 7, 100, "get attenuator", ASC);
+	gett("");
+	if (ret < 7) return atten_level;
 
 	size_t p = replystr.rfind("RA");
-	gett("attenuator");
-	if (p == string::npos) return progStatus.attenuator;
-	if (replystr[p+3] == '1') return 1;
-	return 0;
+	if (p != std::string::npos)
+		atten_level = (replystr[p+3] == '1');
+	return atten_level;
 }
 
 void RIG_TS480SAT::set_preamp(int val)
@@ -738,20 +743,24 @@ void RIG_TS480SAT::set_preamp(int val)
 	if (val)	cmd = "PA1;";
 	else		cmd = "PA0;";
 	LOG_WARN("%s", cmd.c_str());
+	set_trace(1, "set preamp");
 	sendCommand(cmd);
-	sett("preamp");
+	sett("");
+	preamp_level = val;
 }
 
 int RIG_TS480SAT::get_preamp()
 {
 	cmd = "PA;";
-	if (wait_char(';', 5, 100, "get preamp", ASC) < 5) return progStatus.preamp;
+	get_trace(1, "get_preamp");
+	int ret = wait_char(';', 5, 100, "get preamp", ASC);
+	gett("");
+	if (ret < 5) return preamp_level;
 
 	size_t p = replystr.rfind("PA");
-	gett("preamp");
-	if (p == string::npos) return progStatus.preamp;
-	if (replystr[p+2] == '1') return 1;
-	return 0;
+	if (p != string::npos)
+		preamp_level = (replystr[p+2] == '1');
+	return preamp_level;
 }
 
 void RIG_TS480SAT::set_if_shift(int val)

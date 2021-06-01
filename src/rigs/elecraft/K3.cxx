@@ -187,6 +187,7 @@ void RIG_K3::shutdown()
 
 bool RIG_K3::check ()
 {
+	return true;
 	cmd = "FA;";
 	get_trace(1, "check vfoA");
 	int ret = wait_char(';', 14, 2000, "check", ASC);
@@ -224,7 +225,6 @@ void RIG_K3::set_vfoA (unsigned long int freq)
 	}
 	set_trace(1, "set vfoA");
 	sendCommand(cmd);
-//	showresp(INFO, ASC, "set vfo A", cmd, replystr);
 	sett("");
 }
 
@@ -248,10 +248,6 @@ unsigned long int RIG_K3::get_vfoB ()
 
 void RIG_K3::set_vfoB (unsigned long int freq)
 {
-	if (split_on == false) {
-		LOG_INFO("split on");
-		return;
-	}
 	freqB = freq;
 	cmd = "FB00000000000;";
 	for (int i = 12; i > 1; i--) {
@@ -261,7 +257,6 @@ void RIG_K3::set_vfoB (unsigned long int freq)
 	set_trace(1, "set vfoB");
 	sendCommand(cmd);
 	sett("");
-//	showresp(INFO, ASC, "set vfo B", cmd, replystr);
 }
 
 // Volume control
@@ -276,7 +271,6 @@ void RIG_K3::set_volume_control(int val)
 	set_trace(1, "set volume");
 	sendCommand(cmd);
 	sett("");
-//	showresp(INFO, ASC, "set vol", cmd, replystr);
 }
 
 int RIG_K3::get_volume_control()
@@ -328,7 +322,6 @@ void RIG_K3::set_modeA(int val)
 	set_trace(1, "set modeA");
 	sendCommand(cmd);
 	sett("");
-//	showresp(INFO, ASC, "set mode A", cmd, replystr);
 
 	set_pbt_values(val);
 }
@@ -360,7 +353,6 @@ void RIG_K3::set_modeB(int val)
 	cmd[3] = modenbr[val];
 	set_trace(1, "set modeB");
 	sendCommand(cmd);
-//	showresp(INFO, ASC, "set mode B", cmd, replystr);
 	sett("");
 
 	set_pbt_values(val);
@@ -475,7 +467,6 @@ void RIG_K3::set_rf_gain(int val)
 	set_trace(1, "set rf gain");
 	sendCommand(cmd);
 	sett("");
-//	showresp(INFO, ASC, "set rfgain ctrl", cmd, replystr);
 }
 
 int RIG_K3::get_rf_gain()
@@ -510,7 +501,6 @@ void RIG_K3::set_mic_gain(int val)
 	}
 	set_trace(1, "set mic gain");
 	sendCommand(cmd);
-//	showresp(INFO, ASC, "set mic ctrl", cmd, replystr);
 	sett("");
 }
 
@@ -612,7 +602,6 @@ void RIG_K3::set_bwA(int val)
 	set_trace(1, "set bwA");
 	sendCommand(cmd);
 	sett("");
-//	showresp(INFO, ASC, "set bw A", cmd, replystr);
 }
 
 int RIG_K3::get_bwA()
@@ -651,7 +640,6 @@ void RIG_K3::set_bwB(int val)
 	set_trace(1, "set bwB");
 	sendCommand(cmd);
 	sett("");
-//	showresp(INFO, ASC, "set bw B", cmd, replystr);
 }
 
 int RIG_K3::get_bwB()
@@ -699,11 +687,9 @@ void RIG_K3::set_split(bool val)
 	if (val) {
 		cmd = "FT1;";
 		sendCommand(cmd);
-//		showresp(INFO, ASC, "set split ON", cmd, replystr);
 	} else {
 		cmd = "FR0;";
 		sendCommand(cmd);
-//		showresp(INFO, ASC, "set split OFF", cmd, replystr);
 	}
 	sett("");
 
@@ -749,7 +735,6 @@ void RIG_K3::set_if_shift(int val)
 	set_trace(1, "set if shift");
 	sendCommand(cmd);
 	sett("");
-//	showresp(INFO, ASC, "set if shift", cmd, replystr);
 }
 
 bool RIG_K3::get_if_shift(int &val)

@@ -39,12 +39,16 @@ public:
 	void set_vfoA(unsigned long int);
 	unsigned long int get_vfoB();
 	void set_vfoB(unsigned long int);
-	void set_volume_control(int val);
-	int  get_volume_control();
 	void set_modeA(int val);
 	int  get_modeA();
 	void set_modeB(int val);
 	int  get_modeB();
+
+	void set_volume_control(int val);
+	int  get_volume_control();
+	void get_vol_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 60; step = 1; }
+
 
 	void set_power_control(double val);
 	int  get_power_control();
@@ -64,10 +68,15 @@ public:
 	void get_if_mid();
 
 	void set_PTT_control(int val);
+
 	void set_attenuator(int val);
 	int  get_attenuator();
+	int  next_attenuator();
+
 	void set_preamp(int val);
 	int  get_preamp();
+	int  next_preamp();
+
 	int  get_smeter();
 	void set_noise(bool on);
 	int  get_noise();
@@ -88,8 +97,6 @@ public:
 
 	void shutdown();
 
-	void set_pbt_values(int val);
-
 	int power_scale();
 
 private:
@@ -100,10 +107,10 @@ private:
 	int  if_max;
 
 	bool  split_on;
-/*
+
 	int  get_swr();
-	void tune_rig();
-*/
+//	void tune_rig();
+
 };
 
 #endif

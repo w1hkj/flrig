@@ -106,7 +106,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 			sldrRcvSignal->selection_color(FL_BACKGROUND_COLOR);
 			sldrRcvSignal->labeltype(FL_NORMAL_LABEL);
 			sldrRcvSignal->labelfont(0);
-			sldrRcvSignal->labelsize(14);
+			sldrRcvSignal->labelsize(12);
 			sldrRcvSignal->labelcolor(FL_FOREGROUND_COLOR);
 			sldrRcvSignal->align(Fl_Align(FL_ALIGN_CENTER));
 			sldrRcvSignal->when(FL_WHEN_CHANGED);
@@ -120,7 +120,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 			sldrALC->selection_color(FL_BACKGROUND_COLOR);
 			sldrALC->labeltype(FL_NORMAL_LABEL);
 			sldrALC->labelfont(0);
-			sldrALC->labelsize(14);
+			sldrALC->labelsize(12);
 			sldrALC->labelcolor(FL_FOREGROUND_COLOR);
 			sldrALC->align(Fl_Align(FL_ALIGN_CENTER));
 			sldrALC->when(FL_WHEN_CHANGED);
@@ -134,7 +134,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 			sldrSWR->selection_color(FL_BACKGROUND_COLOR);
 			sldrSWR->labeltype(FL_NORMAL_LABEL);
 			sldrSWR->labelfont(0);
-			sldrSWR->labelsize(14);
+			sldrSWR->labelsize(12);
 			sldrSWR->labelcolor(FL_FOREGROUND_COLOR);
 			sldrSWR->align(Fl_Align(FL_ALIGN_CENTER));
 			sldrSWR->when(FL_WHEN_CHANGED);
@@ -148,7 +148,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 			sldrFwdPwr->selection_color(FL_BACKGROUND_COLOR);
 			sldrFwdPwr->labeltype(FL_NORMAL_LABEL);
 			sldrFwdPwr->labelfont(0);
-			sldrFwdPwr->labelsize(14);
+			sldrFwdPwr->labelsize(12);
 			sldrFwdPwr->labelcolor(FL_FOREGROUND_COLOR);
 			sldrFwdPwr->align(Fl_Align(FL_ALIGN_CENTER));
 			sldrFwdPwr->when(FL_WHEN_CHANGED);
@@ -211,6 +211,15 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				btnA->callback((Fl_Callback*)cb_btnA);
 				btnA->value(!useB);
 
+				btn_KX3_swapAB = new Fl_Button(
+					grp_row0a->x(), grp_row0a->y(), 
+					3 * halfwidth, grp_row0a->h(), _("A / B"));
+				btn_KX3_swapAB->tooltip(_("Swap A/B"));
+				btn_KX3_swapAB->down_box(FL_DOWN_BOX);
+				btn_KX3_swapAB->labelsize(12);
+				btn_KX3_swapAB->callback((Fl_Callback*)cb_btn_KX3_swapAB);
+				btn_KX3_swapAB->hide();
+
 				btnB = new Fl_Light_Button(
 					btnA->x() + btnA->w() + 2, btnA->y(),
 					btnA->w(), btnA->h(), _("vfoB"));
@@ -219,6 +228,24 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				btnB->labelsize(12);
 				btnB->callback((Fl_Callback*)cb_btnB);
 				btnB->value(useB);
+
+				btn_KX3_A2B = new Fl_Button(
+					btnA->x() + btnA->w() + 2, btnA->y(),
+					btnA->w(), btnA->h(), _("A -> B"));
+				btn_KX3_A2B->tooltip(_("Copy A to B"));
+				btn_KX3_A2B->down_box(FL_DOWN_BOX);
+				btn_KX3_A2B->labelsize(12);
+				btn_KX3_A2B->callback((Fl_Callback*)cb_KX3_A2B);
+				btn_KX3_A2B->hide();
+
+				btn_K3_A2B = new Fl_Button(
+					btn_KX3_A2B->x(), btn_KX3_A2B->y(),
+					btn_KX3_A2B->w(), btn_KX3_A2B->h(), _("A -> B"));
+				btn_K3_A2B->tooltip(_("Copy A to B"));
+				btn_K3_A2B->down_box(FL_DOWN_BOX);
+				btn_K3_A2B->labelsize(12);
+				btn_K3_A2B->callback((Fl_Callback*)K3_A2B);
+				btn_K3_A2B->hide();
 
 				btn_tune_on_off = new Fl_Light_Button(
 					btnB->x() + btnB->w() + 2, btnA->y(),
@@ -402,28 +429,19 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				btnAswapB = new Fl_Button(
 					btnA->x(), ypos,
 					btnA->w(), 20, _("A / B"));
-				btnAswapB->tooltip(_("Swap A B\nRight-click; Copy A to B"));
+				btnAswapB->tooltip(_("Left click: Swap A/B\nRight click: Copy A to B"));
 				btnAswapB->down_box(FL_DOWN_BOX);
 				btnAswapB->labelsize(12);
 				btnAswapB->callback((Fl_Callback*)cb_btnAswapB);
 
 				btn_K3_swapAB = new Fl_Button(
 					btnA->x(), ypos,
-					btnA->w(), btnAswapB->h(), _("A/B"));
-				btn_K3_swapAB->tooltip(_("Swap A/B"));
+					btnA->w(), btnAswapB->h(), _("A / B"));
+				btn_K3_swapAB->tooltip(_("Left click: Swap A/B\nRight click: Copy A to B"));
 				btn_K3_swapAB->down_box(FL_DOWN_BOX);
 				btn_K3_swapAB->labelsize(12);
 				btn_K3_swapAB->callback((Fl_Callback*)cb_btn_K3_swapAB);
 				btn_K3_swapAB->hide();
-
-				btn_KX3_swapAB = new Fl_Button(
-					btnA->x(), ypos,
-					btnA->w(), btnAswapB->h(), _("A/B"));
-				btn_KX3_swapAB->tooltip(_("Swap A/B"));
-				btn_KX3_swapAB->down_box(FL_DOWN_BOX);
-				btn_KX3_swapAB->labelsize(12);
-				btn_KX3_swapAB->callback((Fl_Callback*)cb_btn_KX3_swapAB);
-				btn_KX3_swapAB->hide();
 
 				labelMEMORY = new Fl_Box(
 					btnA->x(), ypos,
@@ -477,7 +495,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				sldrSQUELCH->selection_color(FL_BACKGROUND_COLOR);
 				sldrSQUELCH->labeltype(FL_NORMAL_LABEL);
 				sldrSQUELCH->labelfont(0);
-				sldrSQUELCH->labelsize(14);
+				sldrSQUELCH->labelsize(12);
 				sldrSQUELCH->labelcolor(FL_FOREGROUND_COLOR);
 				sldrSQUELCH->maximum(100);
 				sldrSQUELCH->step(1);
@@ -508,7 +526,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				sldrMICGAIN->selection_color(FL_BACKGROUND_COLOR);
 				sldrMICGAIN->labeltype(FL_NORMAL_LABEL);
 				sldrMICGAIN->labelfont(0);
-				sldrMICGAIN->labelsize(14);
+				sldrMICGAIN->labelsize(12);
 				sldrMICGAIN->labelcolor(FL_FOREGROUND_COLOR);
 				sldrMICGAIN->maximum(100);
 				sldrMICGAIN->step(1);
@@ -535,7 +553,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				sldrPOWER->selection_color(FL_BACKGROUND_COLOR);
 				sldrPOWER->labeltype(FL_NORMAL_LABEL);
 				sldrPOWER->labelfont(0);
-				sldrPOWER->labelsize(14);
+				sldrPOWER->labelsize(12);
 				sldrPOWER->labelcolor(FL_FOREGROUND_COLOR);
 				sldrPOWER->maximum(100);
 				sldrPOWER->step(1);
@@ -561,6 +579,15 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				btnIFsh->down_box(FL_THIN_DOWN_BOX);
 				btnIFsh->labelsize(12);
 				btnIFsh->callback((Fl_Callback*)cb_btnIFsh);
+
+				btn_KX3_IFsh = new Fl_Button(
+					grp_row2b->x() + 2, grp_row2b->y(),
+					50, 18, _("Cntr"));
+				btn_KX3_IFsh->tooltip(_("Center IF shift"));
+				btn_KX3_IFsh->down_box(FL_THIN_DOWN_BOX);
+				btn_KX3_IFsh->labelsize(12);
+				btn_KX3_IFsh->callback((Fl_Callback*)cb_KX3_IFsh);
+				btn_KX3_IFsh->hide();
 
 				sldrIFSHIFT = new Fl_Wheel_Value_Slider(
 					grp_row2b->x() + 54, grp_row2b->y(),
@@ -659,7 +686,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				sldrNOTCH->selection_color(FL_BACKGROUND_COLOR);
 				sldrNOTCH->labeltype(FL_NORMAL_LABEL);
 				sldrNOTCH->labelfont(0);
-				sldrNOTCH->labelsize(14);
+				sldrNOTCH->labelsize(12);
 				sldrNOTCH->labelcolor(FL_FOREGROUND_COLOR);
 				sldrNOTCH->minimum(-1000);
 				sldrNOTCH->maximum(1000);
@@ -696,7 +723,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				sldrRFGAIN->selection_color(FL_BACKGROUND_COLOR);
 				sldrRFGAIN->labeltype(FL_NORMAL_LABEL);
 				sldrRFGAIN->labelfont(0);
-				sldrRFGAIN->labelsize(14);
+				sldrRFGAIN->labelsize(12);
 				sldrRFGAIN->labelcolor(FL_FOREGROUND_COLOR);
 				sldrRFGAIN->maximum(100);
 				sldrRFGAIN->step(1);
@@ -865,7 +892,7 @@ Fl_Double_Window* Wide_rig_window() {
 		progress->maximum(100);
 		progress->minimum(0);
 		progress->labelcolor(FL_RED);
-		progress->labelsize(14);
+		progress->labelsize(12);
 		progress->align(Fl_Align(FL_ALIGN_TOP));
 		progress->selection_color(FL_GREEN);
 
