@@ -18,51 +18,86 @@
 // aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
-#include "yaesu/FT1000MP.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "status.h"
+#include "trace.h"
+
+#include "yaesu/FT1000MP.h"
 
 static const char FT1000MPname_[] = "FT-1000MP";
 
 static const char *FT1000MP_modes[] = {
-	"LSB",					// 0
-	"USB", 					// 1
-	"CW-U",   "CW-L", 		// 2, 2+
-	"AM",     "AM-syn",		// 3, 3+
-	"FM", 					// 4
-	"RTTY-L", "RTTY-U",		// 5, 5+
-	"PKT-L",  "PKT-FM",		// 6, 6+
-	NULL};
+	"LSB",    "USB",
+	"CW-U",   "CW-L",
+	"AM",     "AM-syn",
+	"FM",     "FM-W",
+	"RTTY-L", "RTTY-U",
+	"PKT-L",  "PKT-U",
+	"PKT-FM", NULL
+};
+
+static const char FT1000MP_setmode[] = {
+	0x00, 0x01,
+	0x02, 0x03,
+	0x04, 0x05,
+	0x06, 0X07,
+	0x08, 0x09,
+	0x0A, 0x0A,
+	0x0B
+};
 
 static const int FT1000MP_def_bw[] = {
-6, 6, 18, 18, 0, 0, 0, 18, 18, 6, 6 };
+	 6,  6, 
+	18, 18,
+	 0,  0,
+	 0,  0,
+	18, 18,
+	 6,  6,
+	 0
+};
 
 static const char FT1000MP_mode_type[] = {
-	'L', 
-	'U', 
+	'L', 'U', 
 	'U', 'L', 
 	'U', 'U', 
-	'U',
+	'U', 'U',
 	'L', 'U', 
-	'L', 'U' };
+	'L', 'U'
+};
 
-static const char FT1000MP_mode[] = {
-	0,
-	1,
-	2, 2,
-	3, 3,
-	4,
-	5, 5,
-	6, 6 };
+struct mode_pair { char a; char b;};
 
-static const char FT1000MP_alt_mode[] = {
-	0,			// 0
-	0,			// 1
-	0,	1,		// 2
-	0,	1,		// 3
-	0,			// 4
-	0,	1,		// 5
-	0,	1 };	// 6
+static const mode_pair FT1000MP_mode[] = {
+{ '\x00', '\x00' }, // LSB
+{ '\x01', '\x00' }, // USB
+{ '\x02', '\x00' }, // CW-U
+{ '\x02', '\x80' }, // CW-L
+{ '\x03', '\x00' }, // AM
+{ '\x03', '\x80' }, // AM-syn
+{ '\x04', '\x00' }, // FM
+{ '\x07', '\x00' }, // FM-W
+{ '\x05', '\x00' }, // RTTY-L
+{ '\x05', '\x80' }, // RTTY-U
+{ '\x06', '\x00' }, // PKT-L
+{ '\x86', '\x00' }, // PKT-U
+{ '\x06', '\x80' }, // PKT-FM
+{ '\xFF', '\xFF' }  // end of list
+};
+
+//LSB    : 11 01 57 81 80 00 00 00 11 20 11 31 91 11 11 00
+//USB    : 11 01 57 81 80 00 00 01 11 20 11 31 91 11 11 00
+//CW-L   : 11 01 57 81 80 00 00 02 91 20 11 11 91 11 11 00
+//CW-U   : 11 01 57 81 80 00 00 02 11 20 11 91 91 11 11 00
+//RTTY-L : 11 01 57 81 80 00 00 05 11 20 11 11 91 11 11 00
+//RTTY-U : 11 01 57 81 80 00 00 05 91 20 11 11 11 11 11 00
+//PKT-FM : 11 01 57 81 80 00 00 06 91 20 11 31 11 11 11 00
+//         11 01 57 81 80 00 00 06 91 20 11 11 91 11 11 00
+//PKT-L  : 11 01 57 81 80 00 00 06 11 20 11 31 11 91 11 00
+//         11 01 57 81 80 00 00 06 11 20 11 11 91 91 11 00
+//PKT-U  : 11 01 57 81 80 00 00 86 11 20 11 31 11 91 11 00
+//         11 01 57 81 80 00 00 86 11 20 11 11 91 11 11 00
 
 static const char *FT1000MP_widths[] = {
 "---/6.0", "---/2.4", "---/2.0", "---/500", "---/250",
@@ -119,6 +154,19 @@ RIG_FT1000MP::RIG_FT1000MP() {
 	precision = 10;
 	ndigits = 7;
 
+	progStatus.gettrace   = 
+	progStatus.settrace   = 
+	progStatus.serialtrace =
+	progStatus.rigtrace    =
+	progStatus.xmltrace    =
+	progStatus.trace       = false;
+
+	progStatus.gettrace   = true;
+//	progStatus.settrace   = true;
+//	progStatus.serialtrace = true;
+//	progStatus.rigtrace    = true;
+//	progStatus.xmltrace    = true;
+//	progStatus.trace       = true;
 };
 
 void RIG_FT1000MP::init_cmd()
@@ -134,6 +182,7 @@ void RIG_FT1000MP::initialize()
 	sendCommand(cmd,0);
 LOG_INFO("%s", str2hex(cmd.c_str(), 5));
 //	selectA();
+
 }
 
 /*
@@ -159,6 +208,28 @@ CW-U   : 08 00 57 75 10 00 00 02 11 00 11 91 81 81 11 0A 08 00 57 72 60 00 00 00
 LSB    : 08 00 57 71 00 00 00 00 11 00 11 11 81 81 11 0A 08 00 57 72 60 00 00 00 30 00 30 91 11 11 11 48
 RTTY-L : 08 00 57 63 B8 00 00 05 11 00 11 11 11 81 11 0A 08 00 57 72 60 00 00 00 30 00 30 91 11 11 11 48
 RTTY-U : 08 00 57 7E 48 00 00 05 91 00 11 11 91 81 11 0A 08 00 57 72 60 00 00 00 30 00 30 91 11 11 11 48
+
+Data captured by Peter, PA1POS
+
+Query 0x00 0x00 0x00 0x02 0x10
+                             |  |  |
+LSB    : 11 01 57 81 80 00 00 00 11 20 11 31 91 11 11 00
+USB    : 11 01 57 81 80 00 00 01 11 20 11 31 91 11 11 00
+CW-L   : 11 01 57 81 80 00 00 02 91 20 11 11 91 11 11 00
+CW-U   : 11 01 57 81 80 00 00 02 11 20 11 91 91 11 11 00
+RTTY-L : 11 01 57 81 80 00 00 05 11 20 11 11 91 11 11 00
+RTTY-U : 11 01 57 81 80 00 00 05 91 20 11 11 11 11 11 00
+PKT-FM : 11 01 57 81 80 00 00 06 91 20 11 31 11 11 11 00
+         11 01 57 81 80 00 00 06 91 20 11 11 91 11 11 00
+PKT-L  : 11 01 57 81 80 00 00 06 11 20 11 31 11 91 11 00
+         11 01 57 81 80 00 00 06 11 20 11 11 91 91 11 00
+PKT-U  : 11 01 57 81 80 00 00 86 11 20 11 31 11 91 11 00
+         11 01 57 81 80 00 00 86 11 20 11 11 91 11 11 00
+                                  |______________________ IF SELECTOR (BW)
+                               |_________________________ MODE
+                         |__|____________________________ CLARIFIER OFFSET
+             |__|__|__|__________________________________ FREQ
+          |______________________________________________ BAND
 
 Bandwidth changes (in LSB MODE) 
 8.215 filter is in thru mode
@@ -203,6 +274,21 @@ RTTY-U : 00000101 10010001
 500    : 01000011
 250    : 01000100
 */
+/*
+const std::string LSBstr   = { '\x08', '\x00', '\x57', '\x71', '\x00', '\x00', '\x00', '\x00', '\x11', '\x00', '\x11', '\x01', '\x81', '\x81', '\x11', '\x0A', '\x08', '\x00', '\x57', '\x72', '\x60', '\x00', '\x00', '\x00', '\x30', '\x00', '\x30', '\x91', '\x11', '\x11', '\x11', '\x48' };
+const std::string USBstr   = { '\x08', '\x00', '\x57', '\x71', '\x00', '\x00', '\x00', '\x01', '\x11', '\x00', '\x11', '\x01', '\x81', '\x81', '\x11', '\x0A', '\x08', '\x00', '\x57', '\x72', '\x60', '\x00', '\x00', '\x00', '\x30', '\x00', '\x30', '\x91', '\x11', '\x11', '\x11', '\x48' };
+const std::string CWUstr   = { '\x08', '\x00', '\x57', '\x71', '\x00', '\x00', '\x00', '\x02', '\x11', '\x00', '\x11', '\x01', '\x81', '\x81', '\x11', '\x0A', '\x08', '\x00', '\x57', '\x72', '\x60', '\x00', '\x00', '\x00', '\x30', '\x00', '\x30', '\x91', '\x11', '\x11', '\x11', '\x48' };
+const std::string CWLstr   = { '\x08', '\x00', '\x57', '\x71', '\x00', '\x00', '\x00', '\x02', '\x91', '\x00', '\x11', '\x01', '\x81', '\x81', '\x11', '\x0A', '\x08', '\x00', '\x57', '\x72', '\x60', '\x00', '\x00', '\x00', '\x30', '\x00', '\x30', '\x91', '\x11', '\x11', '\x11', '\x48' };
+const std::string AMIstr   = { '\x08', '\x00', '\x57', '\x71', '\x00', '\x00', '\x00', '\x03', '\x11', '\x00', '\x11', '\x01', '\x81', '\x81', '\x11', '\x0A', '\x08', '\x00', '\x57', '\x72', '\x60', '\x00', '\x00', '\x00', '\x30', '\x00', '\x30', '\x91', '\x11', '\x11', '\x11', '\x48' };
+const std::string AMSstr   = { '\x08', '\x00', '\x57', '\x71', '\x00', '\x00', '\x00', '\x03', '\x91', '\x00', '\x11', '\x01', '\x81', '\x81', '\x11', '\x0A', '\x08', '\x00', '\x57', '\x72', '\x60', '\x00', '\x00', '\x00', '\x30', '\x00', '\x30', '\x91', '\x11', '\x11', '\x11', '\x48' };
+const std::string FMstr    = { '\x08', '\x00', '\x57', '\x71', '\x00', '\x00', '\x00', '\x04', '\x11', '\x00', '\x11', '\x01', '\x81', '\x81', '\x11', '\x0A', '\x08', '\x00', '\x57', '\x72', '\x60', '\x00', '\x00', '\x00', '\x30', '\x00', '\x30', '\x91', '\x11', '\x11', '\x11', '\x48' };
+const std::string FMWstr   = { '\x08', '\x00', '\x57', '\x71', '\x00', '\x00', '\x00', '\x07', '\x11', '\x00', '\x11', '\x01', '\x81', '\x81', '\x11', '\x0A', '\x08', '\x00', '\x57', '\x72', '\x60', '\x00', '\x00', '\x00', '\x30', '\x00', '\x30', '\x91', '\x11', '\x11', '\x11', '\x48' };
+const std::string RTTYLstr = { '\x08', '\x00', '\x57', '\x71', '\x00', '\x00', '\x00', '\x05', '\x11', '\x00', '\x11', '\x01', '\x81', '\x81', '\x11', '\x0A', '\x08', '\x00', '\x57', '\x72', '\x60', '\x00', '\x00', '\x00', '\x30', '\x00', '\x30', '\x91', '\x11', '\x11', '\x11', '\x48' };
+const std::string RTTYUstr = { '\x08', '\x00', '\x57', '\x71', '\x00', '\x00', '\x00', '\x05', '\x91', '\x00', '\x11', '\x01', '\x81', '\x81', '\x11', '\x0A', '\x08', '\x00', '\x57', '\x72', '\x60', '\x00', '\x00', '\x00', '\x30', '\x00', '\x30', '\x91', '\x11', '\x11', '\x11', '\x48' };
+const std::string PKLstr   = { '\x08', '\x00', '\x57', '\x71', '\x00', '\x00', '\x00', '\x06', '\x11', '\x00', '\x11', '\x01', '\x81', '\x81', '\x11', '\x0A', '\x08', '\x00', '\x57', '\x72', '\x60', '\x00', '\x00', '\x00', '\x30', '\x00', '\x30', '\x91', '\x11', '\x11', '\x11', '\x48' };
+const std::string PKUstr   = { '\x08', '\x00', '\x57', '\x71', '\x00', '\x00', '\x00', '\x86', '\x11', '\x00', '\x11', '\x01', '\x81', '\x81', '\x11', '\x0A', '\x08', '\x00', '\x57', '\x72', '\x60', '\x00', '\x00', '\x00', '\x30', '\x00', '\x30', '\x91', '\x11', '\x11', '\x11', '\x48' };
+const std::string PKFstr   = { '\x08', '\x00', '\x57', '\x71', '\x00', '\x00', '\x00', '\x06', '\x91', '\x00', '\x11', '\x01', '\x81', '\x81', '\x11', '\x0A', '\x08', '\x00', '\x57', '\x72', '\x60', '\x00', '\x00', '\x00', '\x30', '\x00', '\x30', '\x91', '\x11', '\x11', '\x11', '\x48' };
+const std::string BOGUSstr = { '\x08', '\x00', '\x57', '\x71', '\x00', '\x00', '\x00', '\x24', '\x99', '\x00', '\x11', '\x01', '\x81', '\x81', '\x11', '\x0A', '\x08', '\x00', '\x57', '\x72', '\x60', '\x00', '\x00', '\x00', '\x30', '\x00', '\x30', '\x91', '\x11', '\x11', '\x11', '\x48' };
 
 const unsigned char data1[] = {
 0x08, 0x00, 0x57, 0x71, 0x00, 0x00, 0x00, 0x00, 0x43, 0x00, 0x00, 0x01, 0x81, 0x81, 0x11, 0x0A,
@@ -220,51 +306,89 @@ const unsigned char amsync[] = {
 0x08, 0x00, 0x57, 0x67, 0x01, 0x00, 0x00, 0x03, 0x80, 0x00, 0x11, 0x11, 0x91, 0x91, 0x11, 0x08,
 0x08, 0x00, 0x57, 0x67, 0x02, 0x00, 0x00, 0x01, 0x11, 0x00, 0x11, 0x91, 0x11, 0x11, 0x11, 0xFA
 };
+*/
 
 bool RIG_FT1000MP::check()
 {
+//	return true;
 	init_cmd();
 	cmd[3] = 0x03;
 	cmd[4] = 0x10;
+
+	get_trace(1, "check");
 	int ret = waitN(32, 100, "check", ASC);
+	geth();
+
 	if (ret >= 32) return true;
 	return false;
 }
 
+int tmd = 0;
+
 bool RIG_FT1000MP::get_info(void)
 {
 	int ret = 0;
-	int alt = 0;
 	int md = 0;
-	int i;
 	init_cmd();
 	cmd[3] = 0x03;  // read both vfo's
 	cmd[4] = 0x10;
+/*
+switch (tmd) {
+	default:
+	case 0: replystr = LSBstr; break;
+	case 1: replystr = USBstr; break;
+	case 2: replystr = CWUstr; break;
+	case 3: replystr = CWLstr; break;
+	case 4: replystr = AMIstr; break;
+	case 5: replystr = AMSstr; break;
+	case 6: replystr = FMstr; break;
+	case 7: replystr = FMWstr; break;
+	case 8: replystr = RTTYLstr; break;
+	case 9: replystr = RTTYUstr; break;
+	case 10: replystr = PKLstr; break;
+	case 11: replystr = PKUstr; break;
+	case 12: replystr = PKFstr; break;
+	case 13: replystr = BOGUSstr; break;
+}
+std::cout << "set " << FT1000MP_modes[tmd];
+if (++tmd == 13) tmd = 0;
+ret = replystr.length();
+*/
 	ret = waitN(32, 100, "get info", ASC);
-
+	getthex("info");
 	std::string p;
 	if (ret >= 32) {
 		p = replystr.substr(replystr.length() - 32);
 
 		// vfo A data string
 		A.freq = ((((((p[1]<<8) + p[2])<<8) + p[3])<<8) + p[4])*10/16;
-		md = p[7] & 0x07;
-		alt = p[8] & 0x80;
-		for (i = 0; i < 11; i++) if (FT1000MP_mode[i] == md) break;
-		if (i == 11) i = 0;
-		A.imode = i + ((alt == 128) ? 1 : 0);
+
+		for (md = 0; md < 14; md++) {
+			if ( ((FT1000MP_mode[md].a & 0xFF) == (p[7] & 0xFF)) &&
+				 ((FT1000MP_mode[md].b & 0xFF) == (p[8] & 0x80)))
+				break;
+		}
+		if (md == 13) md = 0;
+		A.imode = md;
+std::cout << ", get " << FT1000MP_modes[A.imode] << std::endl;
+
 		A.iBW = 5*((p[8] & 0x70) >> 4) + (p[8] & 0x07);
 		if (A.iBW > 24) A.iBW = 24;
 
 		p += 16; // vfo B data string
 		B.freq = ((((((p[1]<<8) + p[2])<<8) + p[3])<<8) + p[4])*10/16;
-		md = p[7] & 0x07;
-		alt = p[8] & 0x80;
-		for (i = 0; i < 11; i++) if (FT1000MP_mode[i] == md) break;
-		if (i == 11) i = 0;
-		B.imode = i + ((alt == 128) ? 1 : 0);
+
+		for (md = 0; md < 14; md++) {
+			if ( ((FT1000MP_mode[md].a & 0xFF) == (p[7] & 0xFF)) &&
+				 ((FT1000MP_mode[md].b & 0xFF) == (p[8] & 0x80)))
+				break;
+		}
+		if (md == 13) md = 0;
+		B.imode = md;
+
 		B.iBW = 5*((p[8] & 0x70) >> 4) + (p[8] & 0x07);
 		if (B.iBW > 24) B.iBW = 24;
+
 		return true;
 	}
 	return false;
