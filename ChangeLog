@@ -1,10 +1,56 @@
+2021-05-10  dave-w1hkj  <w1hkj@bellsouth.net>
 
+	364f983f: Version 1.4.0
+	21b058cc: Locked passband tuning
+	7c486508: cw-dtr
+	657595f4: KX3/OS-X serial
+	5c1ce79a: TS480xx
+	91a4de0b: tod monotonicity
+	765a465d: terminal debug
+	3d25986e: kx3 tests
+	bf9e7966: k2
+	b7401023: ic7000
+	9a3fef1d: notch
+	1c49d1f9: IC serial
+	b12202ed: K2/K3/KX3
+	d72ffde4: File Organize
+	35e1900e: paradigm shift
+	75572d67: serial comms
 
-=Version 1.3.54=
+2021-04-25  Mike Black  <mdblack98@yahoo.com>
 
-2021-02-03  David Freese  <w1hkj@bellsouth.net>
+	dc7f959d: PowerSDR update
 
-	eb8160e3: PowerSDR
+2021-04-20  dave-w1hkj  <w1hkj@bellsouth.net>
+
+	24f13e30: Kenwood Xcvr trace
+	6e160cfc: IC7100/7300
+	27a32791: Serial Port Timeouts
+	2e4dce87: xml server
+	fde4188e: Duplicate RTS/DTR buttons
+	9d48c4f8: Polling Config
+	7d1afdc6: FT817BB test-mods
+	9c72109a: Icom Performance
+	53cd60d0: FT817/8
+	23749888: CW via xmlrpc command
+	78dee1b8: Paradigm shift
+
+2021-03-25  Dominik-DB1RUF  <w1hkj@bellsouth.net>
+
+	99b73865: TMD710
+
+2021-03-18  dave-w1hkj  <w1hkj@bellsouth.net>
+
+	741a0a1b: Documentation
+
+2021-02-28  David Freese  <w1hkj@bellsouth.net>
+
+	7214971e: Tx Queue
+	8baafe3b: FT450/D
+	9474d18e: macOS Info.plist
+	7d64b622: K2 update
+	f69953a0: Version 1.3.54
+	1ce2f82f: PowerSDR
 	8b81927c: TS2000
 	c892e431: hcomm INVALID HANDLE VALUE
 	30868e5f: External close command
@@ -26,10 +72,7 @@
 	9529d8b7: xmlrpcpp tracing
 	f3e06222: TOD clock
 	9bb871cb: Icom sliders
-
-
-=Version 1.3.53=
-
+	967438a7: Version 1.3.53
 	99b40176: xmlrpc server
 	76ca5673: OpenBSD
 
@@ -60,10 +103,7 @@
 
 	f14bc01b: CPU optimization
 	ccba8018: Font Browser
-
-
-=Version 1.3.52=
-
+	1933aab2: Version 1.3.52
 	066021b0: Documentation Update
 	9d812b37: FT450/D
 	4fe02df2: FT991A
@@ -98,10 +138,7 @@
 	7f6c96aa: clockid_t
 	63b1e96d: PTT polling
 	bf1889ea: FT891
-
-
-=Version 1.3.51=
-
+	bbd47173: Version 1.3.51
 	64e64bb9: Doc Update
 	b896906e: FT991A power
 	194069ca: signed / unsigned comparison
@@ -121,10 +158,7 @@
 	7c318526: Xiegu-5105
 	5b880882: Linux serial devices
 	733de1b4: m4-fix
-
-
-=Version 1.3.50=
-
+	e9c47f1f: Version 1.3.50
 	199a41b2: MacOS cu serial ports
 	dff192f4: CW sense
 	35850889: Icom Manual Notch
@@ -146,10 +180,7 @@
 	2477bad9: mkappbundle
 	7e25a370: Yaesu tuner
 	653da1d8: Commands
-
-
-=Version 1.3.49=
-
+	fba244ee: Version 1.3.49
 	8d825c34: Config
 	48f0469d: MilliSleep
 	5426fc7e: FT991A
@@ -162,23 +193,14 @@
 	32897fe2: Increase User commands
 	ecad1f9b: IC9700
 	4c615197: FT857/897
-
-
-=Version 1.3.48=
-
+	78a01576: Version 1.3.48
 	6caa13a3: IC 746/756
 	c3f2d957: FT857D/897D
 	c97a8350: FT450D
-
-
-=Version 1.3.47=
-
+	398620c7: Version 1.3.47
 	0f66d98b: IC7600/IC7851
 	27713b62: FTdx101D
-
-
-=Version 1.3.46=
-
+	bb6598c8: Version 1.3.46
 	d594e377: KX3
 	91baa81d: ic7200 test
 	083cd44a: FTdx101D
@@ -199,9 +221,9 @@
 
 	a55ef90b: Fix FT-450 split
 
+2019-06-04  David Freese  <w1hkj@bellsouth.net>
 
-=Version 1.3.45=
-
+	dc1f20b6: Version 1.3.45
 
 2019-06-04  Douglas de la Torre  <zennix2014@zennix.com>
 
@@ -217,32 +239,20 @@
 	df344e6e: Combos
 	cfbd7555: RPC::XML methods
 	b09782b5: CW ops
-
-
-=Version 1.3.44=
-
+	0fdbb808: Version 1.3.44
 	5435e3de: IC mode type
-
-
-=Version 1.3.43=
-
+	3599ca9c: Version 1.3.43
 	afe22574: Start/Stop Progress
 	f9cd7e45: Trace start/exit
 	1ecc06f8: New xmlrpc functions
 	1c2aa3fa: TS890S
 	b7288a4b: Icom filter table
-
-
-=Version 1.3.42=
-
+	b86c587f: Version 1.3.42
 	855104a3: FT1000 debugging
 	d915248c: FLTK 1.4 test
 	1f54f123: FTdx3000
 	ff835b69: Parse -psn
-
-
-=Version 1.3.41=
-
+	d2511b59: Version 1.3.41
 	dadd32c2: FT991
 	af73be7a: IC7300 noise blanker
 	ba55a05e: TS-950
@@ -275,10 +285,7 @@
 	37ee48fd: xml_io
 	60af6943: IC7100
 	b7ad209f: IC735
-
-
-=Version 1.3.40=
-
+	455614c4: Version 1.3.40
 	d0e59a3e: FT950 comp
 	35e4c75c: NONE testing
 	17bb6928: Yaesu mods
@@ -349,10 +356,7 @@
 	60dcf2ed: xmlrpc swap/split
 	f6e55f79: Yaesu ID
 	47a8dc09: Mode change
-
-
-=Version 1.3.39=
-
+	18cf8478: Version 1.3.39
 	fa86d2e6: Memory delete
 	93e5e532: IC706MKG
 	cfc78d0f: OS X build script
@@ -360,18 +364,12 @@
 	bb7ddc3c: civ tests
 	61f49f2e: restore ab
 	22b57ebf: TT550
-
-
-=Version 1.3.38=
-
+	6d4ed307: Version 1.3.38
 	afe3bbe2: xml server
 	bc0b5dbd: IC7100 / 9100
 	782310c3: sliders
 	8facc1a5: Icom Split query
-
-
-=Version 1.3.37=
-
+	d84235d6: Version 1.3.37
 	318525f3: TS990 / xmlrpc server mods
 	6ae502c8: IC7200 filter width
 	ab52166e: Rotate log
@@ -391,10 +389,7 @@
 	5c2d2a0a: Value by VFO
 	7f2cd8b7: UI wide power button
 	a16b2c92: Comp Level
-
-
-=Version 1.3.36=
-
+	f79cc3df: Version 1.3.36
 	fc880845: IC 9100
 	cc62a5a2: K2
 
@@ -405,17 +400,11 @@
 2017-10-14  David Freese  <w1hkj@bellsouth.net>
 
 	62363787: KH6TY
-
-
-=Version 1.3.35=
-
+	28e3837a: Version 1.3.35
 	e10e7fee: FTdX5000 mods
 	5d71f8d5: mingw-mods
 	07d1a434: xml inhibit
-
-
-=Version 1.3.34=
-
+	c641d68d: Version 1.3.34
 	a2d2dd4f: doc update
 	e9628ee1: Save/Restore
 	9213bfc6: flrig shell
@@ -433,21 +422,15 @@
 
 	661374fa: IC7100
 
-
-=Version 1.3.33=
-
-
 2017-07-21  David Freese  <iam_w1hkj@w1hkj.com>
 
+	4a5d4b98: Version 1.3.33
 	8443bbe5: IC7200 power scale
 	f7ec5394: IC7300 VFO B
 	1c241bb7: IC7200 small controls
 	15887f64: ATT control
 	fe6697a9: WIN COMM port
-
-
-=Version 1.3.32=
-
+	aef71c34: Version 1.3.32
 
 2017-06-20  Ernst Schroeder DJ7HS  <ernst.schroeder@web.de>
 
@@ -460,25 +443,16 @@
 	a19a94ac: Break-in Label
 	b3c8c2cf: INSTALL
 	8d552a0b: aor5k
-
-
-=Version 1.3.31=
-
+	595c19b6: Version 1.3.31
 	7f14db7c: Documentation update
 	9c1a0f3b: IC735
 	a5a453ad: FT817 CW MODE
 	4deacd69: FT-891
 	c3e63719: IC7200 Initial BW
 	67ed0189: TS850
-
-
-=Version 1.3.30=
-
+	f9835c3c: Version 1.3.30
 	fd596a87: FT857/897 base class
-
-
-=Version 1.3.29=
-
+	490e0e51: Version 1.3.29
 	8a18cbb6: TS990 update
 	8f150ffe: FT817
 	4f4b560d: Xcvr Init
@@ -504,22 +478,16 @@
 
 	df4e2969: PCR1000 update
 
-
-=Version 1.3.28=
-
-
 2017-01-20  David Freese  <iam_w1hkj@w1hkj.com>
 
+	b05b0018: Version 1.3.28
 	5add320a: Multiple xmlrpc servers
 	cf1b1bb8: Separate PTT
 	07bf4b5d: K2 comments
 	c5edf8e5: User defined command buttons
 	71e5aac2: ic7300 update
 	5960bd98: IC9100 update
-
-
-=Version 1.3.27=
-
+	30127838: Version 1.3.27
 	4d24585e: New controls
 	f86e7d1a: TS480SAT extras
 	c404c8a1: Xmlrpcpp source director
@@ -543,15 +511,9 @@
 
 	c3c68d94: IC756 volume range
 	765519d6: C11 errors
-
-
-=Version 1.3.26=
-
+	14889b57: Version 1.3.26
 	8547731a: IC7200 update
-
-
-=Version 1.3.25=
-
+	36cd83d2: Version 1.3.25
 	52a21b60: FT900 update
 	acf388b2: IC7300
 	50b07b38: FT950
@@ -560,10 +522,7 @@
 	8b73bbb0: IC7200 update
 	23604a65: IC7000 exchange vfos
 	db07bd27: key_fldigi
-
-
-=Version 1.3.24=
-
+	49c6984b: Version 1.3.24
 	29f82e62: K3 KX3 mods
 	c1645f08: xmlserver update
 	69ae54af: FTdx9000
@@ -574,10 +533,7 @@
 	1d29d8aa: TS2000
 	7cb82930: FT900
 	f511fd9c: IC7100 data mode detect
-
-
-=Version 1.3.23=
-
+	441a3cc9: Version 1.3.23
 	424c33ba: FT817 FT857D FT897D
 	86cc66f5: xmlrpc server
 	b4bd89b8: FT900
@@ -594,26 +550,17 @@
 
 	74450a43: BUILD_{DATE,USER,HOST}
 
+2015-04-24  David Freese  <iam_w1hkj@w1hkj.com>
 
-=Version 1.3.22=
-
-
-2015-04-17  David Freese  <iam_w1hkj@w1hkj.com>
-
+	145171f7: Version 1.3.22
 	f7f87cb4: xmlrpcpp
 	48a04fb3: xml server
 	e6b132d4: K3/KX3 bandwidth
-
-
-=Version 1.3.21=
-
+	3600ea8c: Version 1.3.21
 	b02f0956: KX3
 	45dc5450: K3 update
 	1f086c2c: FSF address
-
-
-=Version 1.3.20=
-
+	67cf68db: Version 1.3.20
 	399b37b1: TT550 update
 	6739d81d: fix ab
 	ad9bc7ef: Rig server
@@ -621,10 +568,7 @@
 	179392e1: ts2000 update
 	418fe193: FT950
 	962b96cc: xmlrpc timing
-
-
-=Version 1.3.19=
-
+	a39befe0: Version 1.3.19
 	08b5c442: xmlrpc error handling
 	4aad9304: Kenwood transceivers
 	f8f01c85: TS450S
@@ -633,10 +577,7 @@
 	998fe5db: Yaesu
 	ef3ee289: Kenwood
 	967734b8: TS870S
-
-
-=Version 1.3.18=
-
+	257eca4a: Version 1.3.18
 	cb03871f: fltk 1.3.3
 	d488690a: TS2000
 	83691fce: Docs
@@ -644,10 +585,7 @@
 	696b8248: FT950 Osc adjust
 	ed5a6eac: FT100D
 	bc3fd658: File versus Files
-
-
-=Version 1.3.17=
-
+	c3f008b2: Version 1.3.17
 	b5721aa2: Documentation update
 	506125ac: FT450D Notch
 	1d38b34d: IC-9100 update
@@ -663,12 +601,9 @@
 
 	4bf4a58e: doxygen documentation
 
+2014-06-07  David Freese  <w1hkj@w1hkj.com>
 
-=Version 1.3.16=
-
-
-2014-06-06  David Freese  <w1hkj@w1hkj.com>
-
+	5c87a331: Version 1.3.16
 	ca9bbce5: Socket i/o
 	0e8e450b: FTdx1200 mode
 
@@ -698,10 +633,7 @@
 	e9d7a8ee: ComboBox/ListBox
 	cfa02f2f: IC756
 	45efe8ab: License Declaration
-
-
-=Version 1.3.15=
-
+	46c06f9b: Version 1.3.15
 	3422195e: 64 bit void pointer
 	fa317c3f: tty search
 	7732b22b: TT566
@@ -713,18 +645,12 @@
 	c13a20e4: Notch controls
 	86f1d0b1: 7600 split
 	9f08704d: Restore debug
-
-
-=Version 1.3.14=
-
+	93f241b6: Version 1.3.14
 	7f0b9b7c: IC7100 mods
 	9b1c856b: Restore read_bandwidth
 	d592682f: Default event log level
 	224cde7b: vfprintf bug on 64 bit Linux systems
-
-
-=Version 1.3.13=
-
+	81759f01: Version 1.3.13
 	a8b451f9: default debug level
 	f8b1bf70: Compile cleanup
 	8ccb54ee: Debug level switch
@@ -734,24 +660,15 @@
 	86dc11bc: FT5000
 	c53c0a8f: MXE build
 	899e226d: TT588 VfoB
-
-
-=Version 1.3.12=
-
+	68bf434b: Version 1.3.12
 	a50060bf: Build bin
 	79aa597f: FT-990
 	3c886856: Serial by-id
 	c6e97483: FT950
 	f04eed94: TS870 split
-
-
-=Version 1.3.11=
-
+	64c072e6: Version 1.3.11
 	6aae7e61: fltk m4 script
-
-
-=Version 1.3.10=
-
+	5898db1a: Version 1.3.10
 	5d5e7396: X11 Package check
 	a6d99d42: FT747GX
 
@@ -759,9 +676,9 @@
 
 	42a12bbe: PCR1000
 
+2012-12-06  David Freese  <w1hkj@w1hkj.com>
 
-=Version 1.3.09=
-
+	753fd8b6: Version 1.3.09
 
 2012-12-03  Dave Freese (none)  <dave@compaq>
 
@@ -772,38 +689,20 @@
 	d0e137b5: NBEMSapps folder
 	d76049e5: IC746Pro NR/Split
 	77bf1123: Combo box update
-
-
-=Version 1.3.08=
-
+	8f55d4d6: Version 1.3.08
 	d7a3b460: IC7600 bw tables
-
-
-=Version 1.3.07=
-
+	05b1bca0: Version 1.3.07
 	426c50de: IC746/756 family
 	46b114db: IC9100
 	50351e59: IC735 update
-
-
-=Version 1.3.06=
-
+	f5128a6a: Version 1.3.06
 	13050042: PCR1000
-
-
-=Version 1.3.05=
-
+	314fe963: Version 1.3.05
 	b6a1cdb8: FT450 - TS570
-
-
-=Version 1.3.04=
-
+	97ee8eb8: Version 1.3.04
 	71f1a09b: PCR1000
 	ec35a89d: TS570 series
-
-
-=Version 1.3.03=
-
+	90f45e61: Version 1.3.03
 
 2012-06-04  Terry Embry  <ftembry@users.berlios.de>
 
@@ -812,10 +711,7 @@
 2012-06-04  David Freese  <w1hkj@w1hkj.com>
 
 	a2de5bfe: Font Initialization
-
-
-=Version 1.3.02=
-
+	660e2eb9: Version 1.3.02
 
 2012-05-31  Brian Miezejewski K5HFI  <fmcane@gmail.com>
 
@@ -828,10 +724,7 @@
 2012-05-07  David Freese  <w1hkj@w1hkj.com>
 
 	6e5c31de: Kenwood transceivers
-
-
-=Version 1.3.01=
-
+	24cc8a7c: Version 1.3.01
 	8aae5bc5: Xcvr setup
 	d9a461b7: FT950 pkt bandwidth
 
@@ -866,10 +759,7 @@
 
 	e8363f27: New User Interface
 	2f894b8e: BW control color
-
-
-=Version 1.1.13=
-
+	c2c61e35: Version 1.1.13
 	20fa6147: TT516
 
 2012-04-11  Terry Embry  <ftembry@users.berlios.de>
@@ -897,9 +787,9 @@
 
 	ad0e0230: IC7600
 
+2012-03-27  David Freese  <w1hkj@w1hkj.com>
 
-=Version 1.2.12=
-
+	999eea6a: Version 1.2.12
 
 2012-03-26  Dave (G8KBV)  <dave@g8kbv.demon.co.uk>
 
@@ -908,15 +798,9 @@
 2012-03-25  David Freese  <w1hkj@w1hkj.com>
 
 	e772a4df: xml_io 64 bit compiler
-
-
-=Version 1.2.11=
-
+	f3656a48: Version 1.2.11
 	3c715ec0: Fix fldigi compatibility
-
-
-=Version 1.2.10=
-
+	990d2fc4: Version 1.2.10
 	6c8e5203: FT950 ALC
 
 2012-03-23  Terry Embry  <ftembry@users.berlios.de>
@@ -981,12 +865,9 @@
 
 	6599ae2b: Freq List Alpha Tag - About Change
 
-
-=Version 1.2.9=
-
-
 2012-02-20  David Freese  <w1hkj@w1hkj.com>
 
+	5c6d3e40: Version 1.2.9
 	0b5bbba1: Freq list alpha tag
 	808e8646: TS2000 Noise Blanker
 
@@ -1002,8 +883,11 @@
 
 	ad07190e: Rigbase value initialization
 
+2012-02-17  David Freese  <w1hkj@w1hkj.com>
 
-=Version 1.2.8=
+	810c59af: Version 1.2.8
+
+2012-02-17  Terry Embry  <ftembry@users.berlios.de>
 
 	d6c88cc9: Service A/B
 	2721d1de: On line test
@@ -1017,8 +901,11 @@
 
 	80712bc8: Saved BW
 
+2012-02-04  David Freese  <w1hkj@w1hkj.com>
 
-=Version 1.2.7=
+	d3ad95e2: Version 1.2.7
+
+2012-02-04  Terry Embry  <ftembry@users.berlios.de>
 
 	db19ce70: FT2000 mic input
 	fbd12d25: FT950 60m
@@ -1042,10 +929,7 @@
 2012-01-03  David Freese  <w1hkj@w1hkj.com>
 
 	42099227: Desktop generic name
-
-
-=Version 1.2.6=
-
+	52d3c73e: Version 1.2.6
 	8e2982ba: Lstep for timing controls
 
 2012-01-02  Terry Embry  <ftembry@users.berlios.de>
@@ -1068,10 +952,7 @@
 	706b6c06: IC7600 additions
 	55a4f582: IC703 controls
 	eee8a628: Power meter scales
-
-
-=Version 1.2.5=
-
+	b3fb5613: Version 1.2.5
 	e8402b8d: Polling intervals
 
 2011-12-20  Terry Embry  <ftembry@users.berlios.de>
@@ -1090,8 +971,11 @@
 	a04ea4d3: Volume mute
 	d35a8784: Bandchange race fix
 
+2011-12-17  David Freese  <w1hkj@w1hkj.com>
 
-=Version 1.2.4=
+	2f7415de: Version 1.2.4
+
+2011-12-17  Terry Embry  <ftembry@users.berlios.de>
 
 	2843ca74: FT950 Mic Gain
 	25a229ce: FT5000 mods
@@ -1126,67 +1010,78 @@
 
 	45997d92: Vox On Dataport
 	8bddd77d: Pwr Metering
-
-
-=Version 1.2.3=
-
+	af541df4: Version 1.2.3
 	9b03699d: UI minimize
 	8538d05c: TS480
-
-
-=Version 1.2.2=
-
+	ba3c9ec6: Version 1.2.2
 	b3ae9638: TS590S
-
-
-=Version 1.2.1=
-
+	18d51cc9: Version 1.2.1
 	b8efca57: TS590 SH/SL/IS mod
 	efad166c: TS590S sh/sl
+	21526e9c: Version 1.2.0AJ
 	1d06f83c: key fldigi
+	afb57392: Version 1.2.0AI
 	65f3fbdc: FT5000
+	84b14a73: Version 1.2.0AH
 	364c5f82: TS480 center/width
+	6da4d58a: Version 1.2.0AG
 	5c173d5c: TS480 fixes
+	8f7c484a: Version 1.2.0AF
 	d0b764e0: TS480 DataPort select
 	a5bada18: TS480 Mic/RF/Shift
 	78434b3f: TS590/480 series
+	dbb185db: Version 1.2.0AE
 	06766bf3: TS480 menu_045
+	4fdc42cf: Version 1.2.0AD
 	93aefad7: IC703
+	2f2d24e8: Version 1.2.0AC
 	6a1f7e36: TS480 metering
+	9aca7f2d: Version 1.2.0AB
 	627beb69: Volume restore
 	45696b33: IC7000 read notch
+	0a0c2794: Version 1.2.0AA
 	4fccae4d: K2 smeter/pout
 	aab7579e: K2 split
-
-
-=Version 1.2.0=
-
+	a38fab1a: Version 1.2.0
+	c383257a: Version 1.1.3DK
 	9d02acff: K2 get split
+	71ebbf3b: Version 1.1.3DJ
 	29953d76: K2 ptt/vfo-select
+	f34424f4: Version 1.1.3DI
 	12942c59: K2 low/high power
 	9114a673: TS2000 swr/po
 	d7d549cd: FT950 manual notch
+	00caf4b7: Version 1.1.3DH
 	5367c5dd: TS2000 set volume
+	af9bbbfe: Version 1.1.3DG
 	66cbe4b9: TS2000 queries, AM
 	431ca8f8: TS2000 defaults
+	49ed7a89: Version 1.1.3DF
 	f082550e: Deprecate d3572dc
+	b8ba5d29: Version 1.1.3DE
 	654f07fe: FT950 Manual Notch
 	d3572dc3: TS2000 BC string
+	d1548f8b: Version 1.1.3DD
 	2270d84f: T2000 MBC
 	ccbe9381: TS590S SL/SH/FW corrections
 	a971b725: K3 power control
 	27bf2702: FT950 manual notch
+	b92174dd: Version 1.1.3DC
 	f098dc36: TS2000 fixes
 	e21d24f5: TS480 series
 	ff95d7f6: TS590S
+	9b9d3ba8: Version 1.1.3DB
 	455e6508: TS480 series
 	8913e9ef: TS2000
 	93d08c60: DSP lo/hi cut controls
+	a57f344b: Version 1.1.3DA
 	66b3b139: FT450 Notch
 	7a6b96d6: FT950 Manual Notch
 	dc28189c: TS480 HX/SAT
+	220729a7: Version 1.1.3CZ
 	e77ff212: K3 power control query
 	aaedcf87: Copyright
+	a7217eae: Version 1.1.3CY
 	51310a97: K2 A/B
 
 2011-06-10  Rich Newsom  <wa4sxz@cox.net>
@@ -1197,8 +1092,10 @@
 
 	7253b0b1: FT450/950
 	0ada8a5b: TT588 RADIO/REMOTE
+	647f8d18: Version 1.1.3CX
 	22507e28: FT950 bandwidth
 	8d70315a: IC7xxx xcvrs
+	c451e677: Version 1.1.3CW
 	46c3fd13: FT450 extras
 	9d550ba0: FT847 read freq/mode
 	41b12511: FT950 extra controls
@@ -1206,6 +1103,7 @@
 	7365f303: FT950 AF/RF
 	dff9047c: FT950 split
 	869dedb1: rig_io DEBUG
+	713df69f: Version 1.1.3CV
 	ee2ec215: Variable polling
 	e4f81559: FT847
 	6e98ae02: K3 PTT
@@ -1213,6 +1111,7 @@
 	cc0d3472: Debug mods
 	8c0e9961: FT857/897
 	6a9f177f: Xcvr Extras
+	d592e351: Version 1.1.3CU
 	33ed8c36: IC746/756 PRO series
 	a8dddc8a: TT550 controls
 	1b82bc30: Queue mutex
@@ -1229,6 +1128,7 @@
 	b07e66f0: DTR/RTS PTT
 	e44a2d45: FT950 update
 	2925b806: Connect indicators
+	cacaee58: Version 1.1.3CT
 	56daafa2: K3 rfgain limits
 	8c30bdb1: FT100D
 	1f23cf3b: TT588 get data
@@ -1237,34 +1137,44 @@
 	e143e58b: FT100D get info
 	15690a56: XMLRPC address/port
 	ccabe29c: ICbase WARN
+	5e378a45: Version 1.1.3CS
 	c7dd9b44: K3 if-shift / mic gain
 	78fc39d0: TS570 duplicate statement
+	86362f95: Version 1.1.3CR
 	3fb4cf7a: Initialize Notch/IF_shift
 	3c6bfc3b: FT950 update
 	654171a6: TT588 Orion-II
 	4b9f92f4: TT566 update
+	22ac11c4: Version 1.1.3CQ
 	a3a26185: FT100D update
 	a7c16ec9: TT588 update
+	c5c09e54: Version 1.1.3CP
 	9ae9a2af: IC756PRO3 split
 	974d78c6: FT100D bug fix
 	b1c536ed: TT588 if shift range
+	713969e2: Version 1.1.3CO
 	e1438284: K3 read options
 	a47b8926: IC7000
 	aa77fff5: IC756PRO3
 	284a765f: Memory List
+	09a75de5: Version 1.1.3CN
 	27eb3d18: TT588 additions
 	d51a394b: PTT for Voice
 	60bad67b: TS480HX events
 	00bd636d: IC706MKIIG set mode/bandwidth
 	d3c9e8e7: IC7000 bug fixes
+	38cacbdd: Version 1.1.3CM
 	5fae4735: FT100D event levels
 	befcb950: Polling bug
 	e4c0edf9: TT550 events
+	fd9d7a37: Version 1.1.3CL
 	bf34ec10: IC756 A2B
 	90a32a6f: K3 revert
+	2e691f09: Version 1.1.3CK
 	2a68d6fc: IC718 split
 	a8fdef64: IC7000 missing controls
 	32f31545: IC756 Series
+	7aeffd8c: Version 1.1.3CJ
 	7c52305e: Yaeusu series
 	d5a3a0af: IC series
 	9fb9fe8d: K3 command query
@@ -1272,39 +1182,49 @@
 	f003d7d6: K3 alt_vfo
 	5958e0ca: TT550 A/B
 	a695ac36: IC7000 erroneous code bug
+	491e2ce1: Version 1.1.3CI
 	ba798967: TT550 control panel
 	a70a812e: TS570 IF shift
 	78253b35: IC746PRO
 	807ad160: K3 controls
 	bf04b821: Debugging
+	065b0e4d: Version 1.1.3CH
 	67240d96: Alt Vfo Adjust
 	8a7e5824: K3 delayed response
 	755a91f2: FT920
+	2cf30248: Version 1.1.3CG
 	c5be00bc: IC746 series
+	4da3ed0e: Version 1.1.3CF
 	bbd87b76: Xcvr DEAD
 	344433a0: Poll split
 	50b81010: K3 get split
 	cb6c3e52: KENWOOD split
 	109c9119: K3 initialization
 	3b39099c: TS450S vfoB
+	e160173e: Version 1.1.3CE
 	5c75da9f: TS590s showresp
 	e97c2a6e: IC7000 notch calibration
 	02d1ed56: Icom Notch conversion
+	0fcc4f0f: Version 1.1.3CD
 	e15db3c1: TS590S vol control
 	45818630: Split
 	68f35a1b: IC7200 mic gain
 	66f3cb46: TT599 shutdown
 	8d79846c: TS570 metering
+	611c6097: Version 1.1.3CC
 	81864044: IC7000 Notch/IF shift
 	cbce8e93: Control polling
 	3fec9744: TT599 get power
+	079e27f1: Version 1.1.3CB
 	1c3053af: TS570 bug fixes
 	00ef8a56: IC7000 bug fixes
 	bdfcca02: Get power control
+	54a9d12c: Version 1.1.3CA
 	63277a44: ICOM response
 	bb40e213: TT599 Pwr-Swr
 	03238774: Freq List
 	78e77607: IC718
+	4ccce7e9: Version 1.1.3C9
 	dfa146b0: FT920
 	980ad5eb: IC7000 bug fix
 	4a74378a: IC xcvr family
@@ -1317,22 +1237,27 @@
 
 2011-04-23  David Freese  <w1hkj@w1hkj.com>
 
+	35409404: Version 1.1.3C8
 	170a5a7c: Polling
 	abf4489e: TS480HX
 	d77da927: IC7000
 	361e4376: IC7200
 	5b2e35ed: IC718
+	095d202e: Version 1.1.3C7
 	57ace2fa: IC7000
 	3ddd26de: Event Log
 	bc487a97: K3 split
 	a2dcfe8b: IC7200 metering
+	d061f7f7: Version 1.1.3C6
 	baf9feac: Keep - Restore
 	ad5116af: K3 bandwidth control
 	ab173446: Color Dialog
 	3221cdbd: A-B Select force display value
 	10e4b230: Compile Warning
+	d6fe486b: Version 1.1.3C5
 	bd5755f1: K3
 	0f224508: Select A/B
+	c5dba58b: Version 1.1.3C4
 	fd99d188: Select A/B
 	b11057ed: RAY152
 	c7dff8d6: TS480HX/SAT
@@ -1351,10 +1276,7 @@
 	f9204b60: TT588
 	5ff58ace: TT550 Auto Notch
 	ef7b1ce8: TT550 smeter
-
-
-=Version 1.1.3=
-
+	e93110a6: Version 1.1.3
 	7fad31fe: IC7200 Vfo B
 	adfb0914: TT550
 	0c7b089e: IC7600 RTTY fault
@@ -1362,24 +1284,15 @@
 	ffd29d74: IC7200 7600 TT550
 	c0c38211: FT100D ABA init
 	c38b844a: TS590S s/pwr meter
-
-
-=Version 1.1.2=
-
+	5ce6d56a: Version 1.1.2
 	b54df4aa: TS480HX/SAT update
 	3444ca3c: TT550 noise reduction
 	4465b454: Meters / Colors
 	4c5b9467: Serial thread timing
 	95ca6ce3: TS590S smeter
-
-
-=Version 1.1.1=
-
+	60ea6d28: Version 1.1.1
 	145649f9: TS590S update
-
-
-=Version 1.1.0=
-
+	37538146: Version 1.1.0
 	82580861: TT550 update
 	0a5bdc13: TT538 vfob
 	2c5ade44: TS590S vfo read-write
@@ -1405,21 +1318,16 @@
 	b1fe8c61: Button A/B
 	268f4fb8: ICOM select race
 	867f0d01: RAY152 - vfo
-
-
-=Version 1.0.1.1=
-
+	b32168f9: Version 1.0.1.1
 	80633b64: FT1000MP vfo precision
 	78c36974: TT516 update
 	beaff060: Raytheon 152
 	de3bebda: TS590S
 	fbf17df2: FT1000MP mods
 	7432862c: IC746 family
-
-
-=Version 1.0.1=
-
+	07d47893: Version 1.0.1
 	f960a7d8: TT599 cleanup
+	b47dbc2c: Version 1.0.0bY
 
 2011-01-31  Terry Embry, KJ4EED  <mrtembry@yahoo.com>
 
@@ -1431,38 +1339,53 @@
 	ae0347bd: IC7600 IC746 FT450
 	9cb6b9d1: Orion-II smeter
 	d2a5697a: Eagle CWU-smeter
+	5ea9cc0b: Version 1.0.0bX
 	e78c7fb8: Orion-II Smeter
 	0f1eea49: Exception handling
 	c10115c6: TS450S init
+	e0c0bbf9: Version 1.0.0bW
 	01d6148a: Orion-II
 	72b812de: Eagle split
 	55d653bb: Eagle-Orion-II
 	ff67b97d: Eagle-Orion getBW fix
 	a9ab74c3: Home Dir
+	a6de27e0: Version 1.0.0bV
 	346c3c01: ft450 tests
 	04c86fdb: Que processing
+	9549dd49: Version 1.0.0bU
 	43e4eadb: 64 bit recast
 	535ba2f6: TT566-TT599 correction
+	27812acb: Version 1.0.0bT
 	61b6ebaf: Orion-II TT566
 	997229c0: TT599-Eagle
+	0a8342ea: Version 1.0.0bS
 	e3a31247: TT 535 Delta-II
 	9ef17a00: TT516 dual vfo
 	397984aa: A B vfo select
+	c12a4bfc: Version 1.0.0bR
 	ffebee96: IC706 mode type
 	8a07b426: IC7200 digi mode
+	1d9c27fa: Version 1.0.0bQ
 	4e7d1f36: H/W PTT control
 	4022e579: ICOM dual vfo
 	4ec4702f: Parse Args
+	a34205b3: Version 1.0.0bQ
 	92d90b9b: Dual VFO mod
+	950b1647: Version 1.0.0bP
 	61ea3d2b: VFO A-B
 	3d64fc01: K2 Update
+	322a3cc4: Version 1.0.0bO
 	68ae4e4f: Rig Ordering
+	d28cacc9: Version 1.0.0bN
 	699c4203: IC703
 	626d3b09: Config Dir
+	f7a1e489: Version 1.0.0bM
 	c1027a81: TS480 HX/SAT
 	9b8479be: Combo Widget
+	58e4d8bd: Version 1.0.0bL
 	bc9b4c32: TS480 HX/SAT
 	054e92ad: TS450 update
+	9d72cd8f: Version 1.0.0bK
 
 2010-07-30  Frank Tomesh, AB2ZO  <fjt@ka1gl.net>
 
@@ -1470,15 +1393,21 @@
 
 2010-07-17  David Freese  <w1hkj@w1hkj.com>
 
+	08f48daf: Version 1.0.0bJ
 	6e82feff: Echo suppression
+	db0834c9: Version 1.0.0bI
 	d57238d6: IC703 bug fixes
+	895a85b5: Version 1.0.0bH
 	9a6e9c4e: IC703-CIV
+	ff679907: Version 1.0.0bG
 	1d5dc71a: IC7200 update
 	7b3adae3: IC718 update
 	7cacc8ad: TT550 Auto Tuner
 	66541812: RTS-DTR ptt
 	80911629: TT-538 Po/SWR
+	8a68ac91: Version 1.0.0bF
 	66f7861d: Menu update
+	77baab65: Version 1.0.0bE
 	b567f0f4: Restore Xcvr
 	a58d4f60: FT817 mods
 	eda4e7ec: Fluid source
@@ -1502,20 +1431,26 @@
 
 	3f5e11e3: IC718 rf gain
 	52f8e178: Added rigpanel.fl
+	33b77d63: Version 1.0.0bD
 	04ef71f5: IC7200 Data mode
 	cf066d30: IC718 corrections
+	c67a7971: Version 1.0.0bC
 	5df3c55f: ICOM update
 	b0b0afc6: Freq Control Widget
 	9d9864bc: IC7200 changes
 	195fcd9d: IC718
 	526150bd: K3 mode
+	d5a86492: Version 1.0.0bB
 	a2a004da: IC7200
 	70f138e4: K3 bug fixes
+	05cd9742: Version 1.0.0bA
 	8ff9611a: Build static distribution
 	90250eea: K3 mods
 	3f7ac252: Exec during config
+	52de9938: Version 1.0.0b9
 	5c111ded: SWR enable
 	b36ef3c6: Power - 7600
+	102278bf: Version 1.0.0b8
 
 2010-04-13  Andrew Hart, VE3NVK  <andylhart@gmail.com>
 
@@ -1524,14 +1459,17 @@
 2010-03-29  David Freese  <w1hkj@w1hkj.com>
 
 	3fbeee1a: FT1000 series
+	1e93a0c7: Version 1.0.0b7
 	fa215e25: OS X serial device
 	e2a1ff09: FT1000 FT1000MV update
 	fe2bc28d: TT550 AM mod
 	80799331: DLL dependency
 	462bc397: IC7000 mods
+	bcf84994: Version 1.0.0b6
 	e087a07d: TT550 bug fixes
 	713b0a77: TT-538 gain table
 	c324e279: IC746 / Pro Disassociation
+	204b6d8c: Version 1.0.0b5
 	37f96601: FT1000MV
 	018b3446: FT1000
 	5c232a5c: FT450 Volume range
@@ -1539,22 +1477,38 @@
 	a59c478c: TS2000 Mic Gain
 	b2400476: IC-746 BW
 	20c32530: Split Operation
+	97221f43: Version 1.0.0b4
 	5b17be26: TT-550 update
+	7f401314: Version 1.0.0b3
 	f8b355b9: K2 serial baud rate
 	8ee433c8: Pegasus TT550 mic gain
+	003bb0cc: Version 1.0.0b2
 	2792b742: On Line Help link
+	9b365454: Version 1.0.0b1
+	03144154: Version 0.9.99R
 	3c372e6b: Omni-VII TT588
 	568ff590: Jupiter-TT538 update
+	a6820847: Version 0.9.99Q
 	ae6a40a8: TS570 update
 	ae2ccbdb: FT450 update
+	13bf35f1: Version 0.9.99P
 	5a807eda: Jupiter update
+	01c4434d: Version 0.9.99O
 	800af3a4: Jupiter-TT538 update
+	0fdeef54: Version 1.0.0b01
+	20047a63: Version 0.9.99N
 	ecbe0a55: TT550 Vfo Adjust
+	164433ed: Version 0.9.99M
 	c018a65e: TT550 new mode
+	bf8edef2: Version 0.9.99L
 	4d56b12b: XMLRPC sync delay
+	85aa859a: Version 0.9.99K
 	881c3ed2: OS X missing include
+	cfcda3ff: Version 0.9.99J
 	f7dbe5df: WIN32 build fix
+	3a332876: Version 0.9.99I
 	61f1e714: Status File Change
+	06744614: Version 0.9.99H
 	13291947: Serial Port Discovery
 	33730965: TT-570 update
 	8a0f254c: TT-538 update
@@ -1572,41 +1526,36 @@
 
 2010-01-17  David Freese  <w1hkj@w1hkj.com>
 
+	cb73ffe6: Version 0.9.99G
 	4e275fe1: Use defaults fix
 	658c4621: TS2000 fix
+	b9279df9: Version 0.9.99F
 	d5170940: Use rig data
 	1b13be12: TT550 noise blanker addition
+	f723ca6f: Version 0.9.99E
 	02a60779: TT538 / TT550 additional controls
 	edc73ce1: TT538 / TT550
+	a6d7eb1e: Version 0.9.99D
 	8ecf733a: FT450 Preamp Read
 	5ff0ca1a: TT550 work
+	1728d0b6: Version 0.9.99C
 	c9a92062: Jupiter-Pegasus DTR line
 	ca14ecdb: FT767 transceiver
+	f2df2ba7: Version 0.9.99B
 	88db85e4: XML_IO Race Condition
 	8b336f51: FT100D fix
 	98fc2e9d: XMLRPC mod
+	b1a1061e: Version 0.9.99A
 	681d3cae: Mode-Bandwidth Annunciation
 	bdbc63ab: FT-857D update
-
-
-=Version 0.9.98=
-
+	8b7687c3: Version 0.9.98
 	84f04dda: FT-857D get_mode correction
-
-
-=Version 0.9.97=
-
+	e1377830: Version 0.9.97
 	2a4f12a1: Socket not available checks
-
-
-=Version 0.9.96=
-
+	8ccc07d2: Version 0.9.96
 	8017748c: Improve transceiver response
 	848b9807: Exception handler
-
-
-=Version 0.9.95=
-
+	5c49dea6: Version 0.9.95
 
 2009-12-05  Stelios Bounanos  <vcs@enotty.net>
 
@@ -1617,33 +1566,21 @@
 	ab5c7e5c: Thread conflict fix
 	f0acfb47: Socket allocation
 	a5f326a9: Mem Leak Fix
-
-
-=Version 0.9.94=
-
+	9e9795d2: Version 0.9.94
 	0b301f0e: FT857D mod
 	b5ef8e31: Window Decoration
 	09ec7ef5: OSX Build mods
-
-
-=Version 0.9.93=
-
+	4fd62cf6: Version 0.9.93
 
 2009-11-27  Stelios Bounanos  <vcs@enotty.net>
 
 	0a75d3d1: Disable win32 snprintf workaround
 
-
-=Version 0.9.92=
-
-
 2009-11-26  David Freese  <w1hkj@w1hkj.com>
 
+	ebd8568a: Version 0.9.92
 	e126caa4: No Curl Mod
-
-
-=Version 0.9.91=
-
+	be23b2f2: Version 0.9.91
 	f902afcb: Dependencies
 	bd30e7a6: Build fixes
 
@@ -1653,6 +1590,6 @@
 	7cb8e32e: Fix resource include
 	818bb9d6: Add pthreads-w32 build flags
 
+2009-11-23  David Freese  <w1hkj@w1hkj.com>
 
-=Version 0.9.9=
-
+	90ee9b1e: Version 0.9.9
