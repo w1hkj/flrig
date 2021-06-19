@@ -4192,6 +4192,11 @@ void adjust_touch_ui()
 
 void adjust_control_positions()
 {
+	if (!selrig->has_smeter)
+		grpMeters->deactivate();
+	else
+		grpMeters->activate();
+
 	switch (progStatus.UIsize) {
 		case small_ui :
 			adjust_small_ui();
