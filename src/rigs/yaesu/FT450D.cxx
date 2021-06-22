@@ -333,8 +333,9 @@ int RIG_FT450D::get_split()
 // tx vfo
 	cmd = rsp = "FT";
 	cmd.append(";");
+	get_trace(1, "get_split()");
 	wait_char(';',4, FL450D_WAIT_TIME, "get split tx vfo", ASC);
-	gett("get_split");
+	gett("");
 
 	p = replystr.rfind(rsp);
 	if (p == string::npos) return false;
@@ -363,8 +364,9 @@ int RIG_FT450D::get_smeter()
 {
 	cmd = rsp = "SM0";
 	cmd += ';';
+	get_trace(1, "get_smeter()");
 	wait_char(';',7, FL450D_WAIT_TIME, "get smeter", ASC); // sets replystr via rigbase
-	gett("get_smeter");
+	gett("");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -397,9 +399,9 @@ int RIG_FT450D::get_swr()
 {
 	cmd = rsp = "RM6";
 	cmd += ';';
+	get_trace(1, "get_swr()");
 	wait_char(';',7, FL450D_WAIT_TIME, "get swr", ASC);
-
-	gett("get_swr");
+	gett("");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -412,8 +414,9 @@ int RIG_FT450D::get_alc()
 {
 	cmd = rsp = "RM4";
 	cmd += ';';
+	get_trace(1, "get_alc()");
 	wait_char(';',7, FL450D_WAIT_TIME, "get alc", ASC);
-	gett("get_alc");
+	gett("");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
@@ -426,15 +429,15 @@ int RIG_FT450D::get_alc()
 int RIG_FT450D::get_power_out()
 {
 	cmd = rsp = "RM5";
-	sendCommand(cmd.append(";"));
+	cmd.append(";");
+	get_trace(1, "get_power_out()");
 	wait_char(';',7, FL450D_WAIT_TIME, "get pout", ASC);
-
-	gett("get_power_out");
+	gett("");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
-	double mtr = (double)(atoi(&replystr[p+3]));
+	double mtr = atoi(&replystr[p+3]);
 
 // following conversion iaw data measured by Terry, KJ4EED
 	mtr = (.06 * mtr) + (.002 * mtr * mtr);
@@ -446,9 +449,9 @@ int RIG_FT450D::get_power_control()
 {
 	cmd = rsp = "PC";
 	cmd += ';';
+	get_trace(1, "get_power_control()");
 	wait_char(';',6, FL450D_WAIT_TIME, "get power", ASC);
-
-	gett("get_power_control");
+	gett("");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return progStatus.power_level;
