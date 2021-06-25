@@ -1574,13 +1574,11 @@ void * serial_thread_loop(void *d)
 			serviceQUE();
 		}
 
-		get_trace(1, "serial thread loop:");
-
 		{	guard_lock lk(&mutex_serial);
 			check_ptt();
 		}
 
-		if (PTT) {
+		if (PTT || cwio_process == SEND || cwio_process == CALIBRATE) {
 			if (isRX) {
 				isRX = false;
 				Fl::awake(updateSmeter, 0);

@@ -1499,7 +1499,6 @@ int RIG_IC7300::get_power_out(void)
 	geth();
 
 	if (ret) {
-		get_trace(2, "get power out ", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			mtr = hex2val(replystr.substr(p+6, 2));

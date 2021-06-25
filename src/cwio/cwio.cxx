@@ -53,7 +53,6 @@ static pthread_cond_t  cwio_cond;
 static pthread_mutex_t cwio_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t cwio_text_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-enum { NONE, START, ADD, SEND, END, TERMINATE, CALIBRATE };
 int cwio_process = NONE;
 bool cwio_thread_running = false;
 
@@ -65,12 +64,12 @@ void send_cwkey(char c)
 	static double twd = 0;
 	Cserial *port = cwio_serial;
 
-	if (progStatus.cwioSHARED == 1) {
-		port = RigSerial; // sharing CAT port
-		bypass_serial_thread_loop = true;
+	switch (progStatus.cwioSHARED) {
+		case 1: port = RigSerial; break;
+		case 2: port = AuxSerial; break;
+		case 3: port = SepSerial; break;
+		default: port = cwio_serial;
 	}
-	if (progStatus.cwioSHARED == 2) port = AuxSerial; // sharing AUX port
-	if (progStatus.cwioSHARED == 3) port = SepSerial; // sharing SEP port
 
 	if (!port) 
 		goto exit_send_cwkey;
@@ -120,9 +119,6 @@ void send_cwkey(char c)
 	}
 
 exit_send_cwkey:
-	if (progStatus.cwioSHARED == 1) {
-		bypass_serial_thread_loop = false;
-	}
 	return;
 }
 

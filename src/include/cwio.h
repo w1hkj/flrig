@@ -30,12 +30,15 @@
 #include "serial.h"
 #include "threads.h"
 
+enum { NONE, START, ADD, SEND, END, TERMINATE, CALIBRATE };
+
 extern Fl_Double_Window *cwio_keyer_dialog;
 extern Fl_Double_Window *cwio_editor;
 extern Fl_Double_Window *cwio_configure;
 
 extern pthread_mutex_t cwio_text_mutex;
 extern string cwio_text;
+extern int cwio_process;
 
 extern Cserial *cwio_serial;
 extern Cmorse  *morse;
