@@ -1,6 +1,8 @@
 // ----------------------------------------------------------------------------
-// Copyright (C) 2014
+// Copyright (C) 2021
 //              David Freese, W1HKJ
+// Code updates by
+//              Harry McGavran, W5PNY
 //
 // This file is part of flrig.
 //
@@ -527,10 +529,12 @@ int  RIG_TT566::get_power_out()
 	size_t p = respstr.rfind(TT566rspPOUT);
 	if (p == string::npos) return 0;
 	sscanf(&respstr[p + strlen(TT566rspPOUT)], "%d", &fwdpwr);
+        fwdpwr += fwdpwr/2;
 	size_t n = 4;
 	while ( respstr[p + n] != 'R' && n < respstr.length()) n++;
 	if (n < respstr.length()) n++;
 	sscanf(&respstr[p + n], "%d", &refpwr);
+        refpwr += refpwr/2;
 	return fwdpwr;
 }
 
