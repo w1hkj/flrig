@@ -1243,7 +1243,7 @@ void RIG_FT991A::get_vox_hang()
 
 void RIG_FT991A::set_vox_on_dataport()
 {
-	cmd = "EX1140;";
+	cmd = "EX1420;";
 	if (progStatus.vox_on_dataport) cmd[5] = '1';
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET vox on data port", cmd, replystr);
