@@ -794,6 +794,7 @@ void RIG_FT891::set_modeA(int val)
 	sett("");
 	showresp(WARN, ASC, "SET mode A", cmd, replystr);
 
+	set_sideband(modeA);
 }
 
 int RIG_FT891::get_modeA()
@@ -851,6 +852,8 @@ void RIG_FT891::set_modeB(int val)
 	sendCommand(cmd);
 	sett("");
 	showresp(WARN, ASC, "SET mode B", cmd, replystr);
+
+	set_sideband(modeB);
 }
 
 int RIG_FT891::get_modeB()
