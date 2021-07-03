@@ -468,8 +468,8 @@ int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 			break;
 	}
 
-	snprintf(szt, sizeof(szt), "[%d msec] %s", (int)(tout2 - tout1), (replystr.length() ? replystr.c_str() : "NIL") );
-	get_trace(1, szt);
+//	snprintf(szt, sizeof(szt), "[%d msec] %s", (int)(tout2 - tout1), (replystr.length() ? replystr.c_str() : "NIL") );
+//	get_trace(1, szt);
 
 	LOG_DEBUG ("%s: read %d bytes, %s", sz, retnbr, replystr.c_str());
 	return retnbr;

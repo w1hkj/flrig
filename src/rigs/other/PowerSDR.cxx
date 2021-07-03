@@ -34,13 +34,13 @@ static const char PowerSDR_mode_type[] = { 'L', 'U', 'U', 'L', 'U', 'U', 'U', 'U
 static const char *PowerSDR_empty[] = { NULL, NULL };
 //------------------------------------------------------------------------
 static const char *PowerSDR_USBwidths[] = {
-"1000", "1800", "2100", "2400", "2700",
-"2900", "3300", "3800", "4400", "5000",
-"Var1", "Var2", "Wideband", NULL };
+" 5000", " 4400", " 3800", " 3300", " 2900",
+" 2700", " 2400", " 2100", " 1800", " 1000",
+" Var1", " Var2", NULL };
 static const char *PowerSDR_CAT_USB[] = {
-"ZZFI09;", "ZZFI08;", "ZZFI07;", "ZZFI06;", "ZZFI05;",
-"ZZFI04;", "ZZFI03;", "ZZFI02;", "ZZFI01;", "ZZFI00;",
-"ZZFI10;", "ZZFI11;", "ZZFI12;", NULL };
+"ZZFI00;", "ZZFI01;", "ZZFI02;", "ZZFI03;", "ZZFI04;",
+"ZZFI05;", "ZZFI06;", "ZZFI07;", "ZZFI08;", "ZZFI09;",
+"ZZFI10;", "ZZFI11;", NULL };
 //static const char *PowerSDR_SH_tooltip = "hi cut";
 //static const char *PowerSDR_SSB_btn_SH_label = "H";
 //------------------------------------------------------------------------
@@ -50,33 +50,49 @@ static const char *PowerSDR_WIDEwidths[] = {
 //"ZZFI12;" };
 //------------------------------------------------------------------------
 static const char *PowerSDR_DIGwidths[] = {
-"75", "150", "300", "600", "800",
-"1000", "1500", "2000", "2500", "3000",
-"Var1", "Var2", NULL };
+" 3000", " 2500", " 2000", " 1500", " 1000",
+"  800", "  600", "  300", "  150", "   75",
+" Var1", " Var2", NULL };
 static const char *PowerSDR_CAT_DIG[] = {
-"ZZFI09;", "ZZFI08;", "ZZFI07;", "ZZFI06;", "ZZFI05;",
-"ZZFI04;", "ZZFI03;", "ZZFI02;", "ZZFI01;", "ZZFI00;",
+"ZZFI00;", "ZZFI01;", "ZZFI02;", "ZZFI03;", "ZZFI04;",
+"ZZFI05;", "ZZFI06;", "ZZFI07;", "ZZFI08;", "ZZFI09;",
 "ZZFI10;", "ZZFI11;", NULL };
 //------------------------------------------------------------------------------
 static const char *PowerSDR_AMwidths[] = {
-"2400", "2900", "3100", "4000" "5200",
-"6600", "8000", "10000", "12000", "16000",
+"16000", "12000", "10000", " 8000", " 6600",
+" 5200", " 4000", " 3100", " 2900", " 2400",
 "Var1", "Var2", NULL };
 static const char *PowerSDR_CAT_AM[] = {
-"ZZFI09;", "ZZFI08;", "ZZFI07;", "ZZFI06;", "ZZFI05;",
-"ZZFI04;", "ZZFI03;", "ZZFI02", "ZZFI01;", "ZZFI00;",
+"ZZFI00;", "ZZFI01;", "ZZFI02;", "ZZFI03;", "ZZFI04;",
+"ZZFI05;", "ZZFI06;", "ZZFI07;", "ZZFI08;", "ZZFI09;",
 "ZZFI10;", "ZZFI11;", NULL };
 //------------------------------------------------------------------------------
 static const char *PowerSDR_CWwidths[] = {
-"25", "50", "100", "150", "250",
-"400", "500", "600", "800", "1000",
-"Var1", "Var2", NULL};
+" 1000", "  800", "  750", "  600", "  500",
+"  400", "  250", "  100", "   50", "   25",
+" Var1", " Var2", NULL};
 static const char *PowerSDR_CAT_CW[] = {
-"ZZFI09;", "ZZFI08;", "ZZFI07;", "ZZFI06;", "ZZFI05;",
-"ZZFI04;", "ZZFI03;", "ZZFI02;", "ZZFI01;", "ZZFI00;",
-"ZZFI10;", "ZZFI11", NULL };
+"ZZFI00;", "ZZFI01;", "ZZFI02;", "ZZFI03;", "ZZFI04;",
+"ZZFI05;", "ZZFI06;", "ZZFI07;", "ZZFI08;", "ZZFI09;",
+"ZZFI10;", "ZZFI11;", NULL };
 //------------------------------------------------------------------------------
 
+static char *varwidths[] = {
+	new char[6],
+	new char[6],
+	new char[6],
+	new char[6],
+	new char[6],
+	new char[6],
+	new char[6],
+	new char[6],
+	new char[6],
+	new char[6],
+	new char[6],
+	new char[6],
+	NULL };
+
+//------------------------------------------------------------------------------
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 }, // 0
 	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 }, // 1
@@ -107,6 +123,9 @@ void RIG_PowerSDR::initialize()
 	rig_widgets[8].W = sldrMICGAIN;
 	rig_widgets[9].W = sldrPOWER;
 
+	for (int i = 0; i < 12; i++)
+		strcpy(varwidths[i], PowerSDR_USBwidths[i]);
+
 // get current noise reduction values for NR1 and NR2
 	string current_nr;
 	cmd = "ZZNR;";
@@ -117,10 +136,10 @@ void RIG_PowerSDR::initialize()
 		_nrval1 = atoi(&replystr[p+2]);
 	cmd = "ZZNS;";
 	wait_char(';', 6, 100, "read current NR", ASC);
-    int nrval2=0;
+	int nrval2=0;
 	if (p != string::npos)
 		nrval2 = atoi(&replystr[p+2]);
-    if (nrval2 == 1) _nrval1 = 2;
+	if (nrval2 == 1) _nrval1 = 2;
 }
 
 void RIG_PowerSDR::shutdown()
@@ -258,16 +277,17 @@ void RIG_PowerSDR::set_power_control(double val)
 
 int RIG_PowerSDR::get_power_out()
 {
-	int mtr = 0;
+	float mtr = 0.0;
 
 	cmd = "ZZRM5;";
 	get_trace(1, "get_power_out");
-	ret = wait_char(';', 8, 100, "get power", ASC);
+	ret = wait_char(';', 11, 100, "get power", ASC);
 	gett("");
-	if (ret < 8) return mtr;
-	sscanf(&replystr[0],"ZZRM5%d", &mtr);
+	if (ret < 11) return 0;
 
-	return mtr;
+	sscanf(&replystr[0],"ZZRM5%f", &mtr);
+
+	return (int)(10 * mtr);
 }
 
 
@@ -301,7 +321,7 @@ int RIG_PowerSDR::get_swr()
 {
 	double mtr = 0;
 
-    if (get_tune() != 0) return 0; // swr only works when tuning
+	if (get_tune() != 0) return 0; // swr only works when tuning
 	cmd = "ZZRM8;";
 	get_trace(1, "get_swr");
 	ret = wait_char(';', 8, 100, "get SWR", ASC);
@@ -356,46 +376,46 @@ ZZPA7 does nothing
 
 int  RIG_PowerSDR::next_preamp()
 {   
-    // strange sequence for ANAN 7000DLE MKII
-    switch(preamp_level)
-    {
-        case 0: preamp_level = 1;break;
-        case 1: preamp_level = 2;break;
-        case 7: preamp_level = 3;break;
-        case 3: preamp_level = 4;break;
-        case 4: preamp_level = 5;break;
-        case 5: preamp_level = 6;break;
-        default:
-        case 6: preamp_level = 0;break;
-    }
-    return preamp_level;
+	// strange sequence for ANAN 7000DLE MKII
+	switch(preamp_level)
+	{
+		case 0: preamp_level = 1;break;
+		case 1: preamp_level = 2;break;
+		case 7: preamp_level = 3;break;
+		case 3: preamp_level = 4;break;
+		case 4: preamp_level = 5;break;
+		case 5: preamp_level = 6;break;
+		default:
+		case 6: preamp_level = 0;break;
+	}
+	return preamp_level;
 }
 
 void RIG_PowerSDR::set_preamp(int val)
 {
 	preamp_level = val;
 	cmd = "ZZPA";
-    cmd.append(to_decimal(val, 1)).append(";");
+	cmd.append(to_decimal(val, 1)).append(";");
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set PRE", cmd, "");
 	sett("preamp");
-        case 7: preamp_level = 0;break;
-    if (val == 0) {
-        preamp_label("Pre", false);
-        preamp_level = 0;
-    } else if (val == 1) {
-        preamp_label("Pre 1", true);
-        preamp_level = 1;
-    } else if (val == 7) {
-        preamp_label("Pre 2", true);
-        preamp_level = 2;
-    }
+		case 7: preamp_level = 0;break;
+	if (val == 0) {
+		preamp_label("Pre", false);
+		preamp_level = 0;
+	} else if (val == 1) {
+		preamp_label("Pre 1", true);
+		preamp_level = 1;
+	} else if (val == 7) {
+		preamp_label("Pre 2", true);
+		preamp_level = 2;
+	}
 
 }
 
 int RIG_PowerSDR::get_preamp()
 {
-    int preamp_level;
+	int preamp_level;
 	cmd = "ZZPA;";
 	stringstream str;
 	sendCommand(cmd);
@@ -404,13 +424,13 @@ int RIG_PowerSDR::get_preamp()
 	gett("");
 	if (ret == 6) {
 		size_t p = replystr.rfind("PA");
-	    str << "ZZPA #2 replystr=" << replystr << ", p=" << p;
-	    trace(2, "get_preamp", replystr.c_str());
+		str << "ZZPA #2 replystr=" << replystr << ", p=" << p;
+		trace(2, "get_preamp", replystr.c_str());
 		if (p != string::npos && (p+2 < replystr.length())) {
-            preamp_level = fm_decimal(replystr.substr(p+2),1);
-            // need to map 7 to 2 to keep FLRig cbPreamp happy
-            // when ZZPA2; is sent ZZPA7; comes back
-            if (preamp_level == 7) preamp_level = 2; 
+			preamp_level = fm_decimal(replystr.substr(p+2),1);
+			// need to map 7 to 2 to keep FLRig cbPreamp happy
+			// when ZZPA2; is sent ZZPA7; comes back
+			if (preamp_level == 7) preamp_level = 2; 
 		}
 	}
 	else preamp_level = 0;
@@ -421,63 +441,78 @@ int RIG_PowerSDR::get_preamp()
 int RIG_PowerSDR::set_widths(int val)
 {
 	int bw = get_bwA();
-	stringstream str;
-	str << bw;
-	trace(2, "set_widths bw=", str.str().c_str());
+
+	cmd = "ZZMN";
+	cmd += PowerSDR_mode_chr[val];
+	cmd += ';';
+
+	set_trace(1, "bandwidths:");
+	wait_char(';', 187, 100, "bandwidths", 187);
+	sett("");
+	size_t p = replystr.rfind("ZZMN");
+	if (p != std::string::npos) p += 6;
+
+	bool fill_widths = false;
 	switch (val) {
 	case LSB: case USB:
 		bandwidths_ = PowerSDR_USBwidths;
 		dsp_SL = PowerSDR_empty;
 		dsp_SH = PowerSDR_empty;
-		//dsp_SL = PowerSDR_SL;
-		//SL_tooltip = PowerSDR_SL_tooltip;
-		//SL_label   = PowerSDR_SSB_btn_SL_label;
-		//dsp_SH = PowerSDR_SH;
-		//SH_tooltip = PowerSDR_SH_tooltip;
-		//SH_label   = PowerSDR_SSB_btn_SH_label;
-		//bw = 0;
+		fill_widths = true;
 		break;
 	case DIGU: case DIGL:
 		bandwidths_ = PowerSDR_DIGwidths;
 		dsp_SL = PowerSDR_empty;
 		dsp_SH = PowerSDR_empty;
-		//bw = 9;
+		fill_widths = true;
 		break;
 	case FM: case SPEC: case DRM:
 		bandwidths_ = PowerSDR_WIDEwidths;
 		dsp_SL = PowerSDR_empty;
 		dsp_SH = PowerSDR_empty;
-		//bw = 0;
 		break;
 	case CWL: case CWU:
 		bandwidths_ = PowerSDR_CWwidths;
 		dsp_SL = PowerSDR_empty;
 		dsp_SH = PowerSDR_empty;
-		//bw = 7;
+		fill_widths = true;
 		break;
 	case AM: case SAM: case DSB: default:
 		bandwidths_ = PowerSDR_AMwidths;
 		dsp_SL = PowerSDR_empty;
 		dsp_SH = PowerSDR_empty;
-		//bw = 12;
+		fill_widths = true;
 		break;
+	}
+	if (fill_widths) {
+		if (p != std::string::npos) {
+			std::string tocopy;
+			for (int i = 0; i < 12; i++) {
+				tocopy = replystr.substr(p, 5);
+				while (tocopy.length() && tocopy[0] == ' ') tocopy.erase(0,1);
+				strcpy(varwidths[i], tocopy.c_str());
+				p += 15;
+			}
+		}
+		bandwidths_ = (const char**)(varwidths);
 	}
 	return bw;
 }
 
 const char **RIG_PowerSDR::bwtable(int val)
 {
-	if (val == LSB || val == USB)
-		return PowerSDR_USBwidths;
-	else if (val == FM || val == DRM || val == SPEC)
-		return PowerSDR_WIDEwidths;
-	else if (val == DIGU || val == DIGL)
-		return PowerSDR_DIGwidths;
-	else if (val == CWU || val == CWL)
-		return PowerSDR_CWwidths;
-	else if (val == AM || val == SAM || val == DSB)
-		return PowerSDR_AMwidths;
-	return NULL;
+	return bandwidths_;
+//	if (val == LSB || val == USB)
+//		return PowerSDR_USBwidths;
+//	else if (val == FM || val == DRM || val == SPEC)
+//		return PowerSDR_WIDEwidths;
+//	else if (val == DIGU || val == DIGL)
+//		return PowerSDR_DIGwidths;
+//	else if (val == CWU || val == CWL)
+//		return PowerSDR_CWwidths;
+//	else if (val == AM || val == SAM || val == DSB)
+//		return PowerSDR_AMwidths;
+//	return NULL;
 }
 
 #if 0
@@ -532,9 +567,10 @@ int RIG_PowerSDR::get_modeA()
 		if (p != string::npos) {
 			int md;
 			sscanf(&replystr[p+2],"%d",&md);
-
-			A.imode = md;
-			A.iBW = set_widths(A.imode);
+			if (A.imode != md) {
+				A.imode = md;
+				A.iBW = set_widths(A.imode);
+			}
 		}
 	}
 	_currmode = A.imode;
@@ -569,8 +605,10 @@ int RIG_PowerSDR::get_modeB()
 		if (p != string::npos) {
 			int md=0;
 			sscanf(&replystr[p+2],"%d",&md);
-			B.imode = md;
-			B.iBW = set_widths(B.imode);
+			if (B.imode != md) {
+				B.imode = md;
+				B.iBW = set_widths(B.imode);
+			}
 		}
 	}
 	_currmode = B.imode;
@@ -726,7 +764,7 @@ int RIG_PowerSDR::get_bwB() // same as A
 	stringstream str;
 	str << "B.iBW = " << B.iBW;
 	trace(2, __func__, str.str().c_str());
-    vfoB.iBW = B.iBW;
+	vfoB.iBW = B.iBW;
 	progStatus.iBW_B = B.iBW;
 	return B.iBW;
 }
@@ -935,109 +973,153 @@ int RIG_PowerSDR::get_tune()
 
 void RIG_PowerSDR::set_rf_gain(int val)
 {
-    cmd = "ZZAR+";
-    cmd.append(to_decimal(val, 3)).append(";");
-    sendCommand(cmd);
-    showresp(WARN, ASC, "set rf gain", cmd, "");
-    sett("RFgain");
+	cmd = "ZZAR";
+	if (val < 0) cmd += '-';
+	else cmd += '+';
+	cmd.append(to_decimal(abs(val), 3)).append(";");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set rf gain", cmd, "");
+	sett("RFgain");
 }
 
 int  RIG_PowerSDR::get_rf_gain()
 {
-    cmd = "ZZAR;";
-    int rfg = 100;
-    get_trace(1, "get_rf_gain");
-    ret = wait_char(';', 8, 100, "get rf gain", ASC);
-    gett("");
-    if (ret == 8) {
-        size_t p = replystr.rfind("AR");
-        if (p != string::npos)
-            rfg = fm_decimal(replystr.substr(p+3) ,3);
-    }
-    return rfg;
+	cmd = "ZZAR;";
+	int rfg = 120;
+	char sign;
+	get_trace(1, "get_rf_gain");
+	ret = wait_char(';', 9, 100, "get rf gain", ASC);
+	gett("");
+	if (ret == 9) {
+		size_t p = replystr.rfind("ZZAR");
+		if (p != string::npos) {
+			sscanf(replystr.c_str(),"ZZAR%c%d", &sign, &rfg);
+			if (sign == '-') rfg *= -1;
+		}
+	}
+	return rfg;
+}
+
+void RIG_PowerSDR::get_rf_min_max_step(int &min, int &max, int &step)
+{
+	min = -20;
+	max = 120;
+	step = 1;
 }
 
 void RIG_PowerSDR::set_mic_gain(int val)
 {
-    cmd = "ZZMG";
-    if (val < 0) cmd += "-";
-    else cmd += "+";
-    cmd.append(to_decimal(abs(val),2)).append(";");
-    sendCommand(cmd);
-    showresp(WARN, ASC, "set mic", cmd, "");
-    sett("MICgain");
+	cmd = "ZZMG";
+	if (val < 0) cmd += "-";
+	else cmd += "+";
+	cmd.append(to_decimal(abs(val),2)).append(";");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set mic", cmd, "");
+	sett("MICgain");
 }
 
 int RIG_PowerSDR::get_mic_gain()
 {
-    int mgain = 0;
-    cmd = "ZZMG;";
-    get_trace(1, "get_mic_gain");
-    ret = wait_char(';', 8, 100, "get mic", ASC);
-    gett("");
-    if (ret == 8) {
-        size_t p = replystr.rfind("MG");
-        if (p != string::npos) {
-            sscanf(replystr.c_str(),"ZZMG%d",&mgain);
-        }
-    }
-    return mgain;
+	int mgain = 0;
+	cmd = "ZZMG;";
+	get_trace(1, "get_mic_gain");
+	ret = wait_char(';', 8, 100, "get mic", ASC);
+	gett("");
+	if (ret == 8) {
+		size_t p = replystr.rfind("MG");
+		if (p != string::npos) {
+			sscanf(replystr.c_str(),"ZZMG%d",&mgain);
+		}
+	}
+	return mgain;
 }
 
 void RIG_PowerSDR::get_mic_min_max_step(int &min, int &max, int &step)
 {
-    min = -40;
-    max = 10;
-    step = 1;
+	min = -40;
+	max = 10;
+	step = 1;
 }
 
 
 // Transceiver PTT on/off
 void RIG_PowerSDR::set_PTT_control(int val)
 {
-    if (val) sendCommand("ZZTX1;");
-    else     sendCommand("ZZTX0;");
-    ptt_ = val;
+	if (val) sendCommand("ZZTX1;");
+	else     sendCommand("ZZTX0;");
+	ptt_ = val;
 }
 
 int RIG_PowerSDR::get_PTT()
 {
-    cmd = "ZZTX;";
-    get_trace(1, "get_PTT");
-    ret = wait_char(';', 6, 100, "get PTT", ASC);
-    gett("");
-    if (ret < 6) return ptt_;
-    ptt_ = (replystr[4] == '1');
-    return ptt_;
+	cmd = "ZZTX;";
+	get_trace(1, "get_PTT");
+	ret = wait_char(';', 6, 100, "get PTT", ASC);
+	gett("");
+	if (ret < 6) return ptt_;
+	ptt_ = (replystr[4] == '1');
+	return ptt_;
 }
 
 bool RIG_PowerSDR::tuning()
 {
-    cmd = "ZZTU;";
-    if (wait_char(';', 6, 100, "tuning?", ASC) == 6) {
-        if (replystr[4] == '1') return true;
-    }
-    return false;
+	cmd = "ZZTU;";
+	if (wait_char(';', 6, 100, "tuning?", ASC) == 6) {
+		if (replystr[4] == '1') return true;
+	}
+	return false;
 }
 
 void RIG_PowerSDR::set_split(bool val)
 {
-    if (val) {
-        cmd = "ZZSP1;";
-        sendCommand(cmd);
-    } else {
-        cmd = "ZZSP0;";
-    }
+	if (val) {
+		cmd = "ZZSP1;";
+		sendCommand(cmd);
+	} else {
+		cmd = "ZZSP0;";
+	}
 }
 
 int RIG_PowerSDR::get_split()
 {
-    cmd = "ZZSP;";
-    get_trace(1, "get_split");
-    ret = wait_char(';', 6, 100, "get split", ASC);
-    gett("");
-    if (ret < 6) return ptt_;
-    split = (replystr[4] == '1');
-    return split;
+	cmd = "ZZSP;";
+	get_trace(1, "get_split");
+	ret = wait_char(';', 6, 100, "get split", ASC);
+	gett("");
+	if (ret < 6) return split;
+	split = (replystr[4] == '1');
+	return split;
+}
+
+void RIG_PowerSDR::set_squelch(int val)
+{
+	cmd = "ZZSQ";
+	cmd.append(to_decimal(abs(val),3)).append(";");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set mic", cmd, "");
+	sett("Squelch");
+}
+
+int  RIG_PowerSDR::get_squelch()
+{
+	int sq = 0;
+	cmd = "ZZSQ;";
+	get_trace(1, "get_squelch");
+	ret = wait_char(';', 8, 100, "get squelch", ASC);
+	gett("");
+	if (ret == 8) {
+		size_t p = replystr.rfind("ZZSQ");
+		if (p != string::npos) {
+			sscanf(replystr.c_str(),"ZZSQ%d",&sq);
+		}
+	}
+	return (-sq);
+}
+
+void RIG_PowerSDR::get_squelch_min_max_step(int &min, int &max, int &step)
+{
+	min = -160;
+	max = 0;
+	step = 4;
 }
 

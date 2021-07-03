@@ -109,10 +109,14 @@ enum PowerSDRMODES { LSB, USB, DSB, CWL, CWU, FM, AM, DIGU, SPEC, DIGL, SAM, DRM
 	void set_mic_gain(int val);
 	int  get_mic_gain();
 	void get_mic_min_max_step(int &min, int &max, int &step);
+
 	void set_rf_gain(int val);
 	int  get_rf_gain();
-	void get_rf_min_max_step(int &min, int &max, int &step) {
-		min = 0; max = 100; step = 1; }
+	void get_rf_min_max_step(int &min, int &max, int &step);
+
+	void set_squelch(int val);
+	int  get_squelch();
+	void get_squelch_min_max_step(int &min, int &max, int &step);
 
 	bool tuning();
 
