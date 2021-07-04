@@ -176,6 +176,7 @@ flrig_SOURCES += \
 	rigs/kenwood/TS990.cxx \
 	rigs/kenwood/TS2000.cxx \
 	rigs/other/AOR5K.cxx \
+	rigs/other/FLEX1500.cxx \
 	rigs/other/PCR1000.cxx \
 	rigs/other/PowerSDR.cxx \
 	rigs/other/RAY152.cxx \
@@ -317,6 +318,7 @@ EXTRA_DIST = \
 	include/elecraft/KX3.h \
 	include/KX3_ui.h \
 	include/mingw.h \
+	include/other/FLEX1500.h \
 	include/other/PCR1000.h \
 	include/other/RAY152.h \
 	include/other/PowerSDR.h \

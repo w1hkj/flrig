@@ -72,6 +72,7 @@
 #include "other/PCR1000.h"
 #include "other/RAY152.h"
 #include "other/TMD710.h"
+#include "other/FLEX1500.h"
 #include "other/PowerSDR.h"
 #include "tentec/TT516.h"
 #include "tentec/DELTA-II.h"
@@ -205,6 +206,6 @@ extern RIG_AOR5K		rig_AOR5K;		// 88
 extern RIG_XI5105		rig_XI5105;		// 89
 extern RIG_Xiegu_G90	rig_XIG90;		// 90
 extern RIG_PowerSDR		rig_PowerSDR;	// 91
-
+extern RIG_FLEX1500		rig_FLEX1500;	// 92
 
 #endif
