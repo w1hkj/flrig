@@ -1668,8 +1668,16 @@ public:
 
 		guard_lock serial(&mutex_serial);
 
-		selrig->set_vfoA(freq);
-		vfoA.freq = freq;
+		if (!selrig->can_change_alt_vfo  && useB) {
+			selrig->selectA();
+			vfoA.freq = freq;
+			selrig->set_vfoA(vfoA.freq);
+			selrig->selectB();
+		} else {
+			vfoA.freq = freq;
+			selrig->set_vfoA(vfoA.freq);
+		}
+
 		Fl::awake(setFreqDispA, (void *)freq);
 
 	}
@@ -1690,8 +1698,16 @@ public:
 
 		guard_lock serial(&mutex_serial);
 
-		selrig->set_vfoA(freq);
-		vfoA.freq = selrig->get_vfoA();
+		if (!selrig->can_change_alt_vfo  && useB) {
+			selrig->selectA();
+			selrig->set_vfoA(freq);
+			vfoA.freq = selrig->get_vfoA();
+			selrig->selectB();
+		} else {
+			selrig->set_vfoA(freq);
+			vfoA.freq = selrig->get_vfoA();
+		}
+
 		Fl::awake(setFreqDispA, (void *)vfoA.freq);
 	}
 	std::string help() { return std::string("rig.set_verify_vfo NNNNNNNN (Hz)"); }
@@ -1711,8 +1727,16 @@ public:
 
 		guard_lock serial(&mutex_serial);
 
-		selrig->set_vfoA(freq);
-		vfoA.freq = freq;
+		if (!selrig->can_change_alt_vfo  && useB) {
+			selrig->selectA();
+			vfoA.freq = freq;
+			selrig->set_vfoA(vfoA.freq);
+			selrig->selectB();
+		} else {
+			vfoA.freq = freq;
+			selrig->set_vfoA(vfoA.freq);
+		}
+
 		Fl::awake(setFreqDispA, (void *)freq);
 	}
 	std::string help() { return std::string("deprecated; use rig.set_vfoA"); }
@@ -1736,8 +1760,16 @@ public:
 
 		guard_lock serial(&mutex_serial);
 
-		selrig->set_vfoB(freq);
-		vfoB.freq = freq;
+		if (!selrig->can_change_alt_vfo  && !useB) {
+			selrig->selectB();
+			selrig->set_vfoB(freq);
+			vfoB.freq = freq;
+			selrig->selectA();
+		} else {
+			selrig->set_vfoB(freq);
+			vfoB.freq = freq;
+		}
+
 		Fl::awake(setFreqDispB, (void *)freq);
 	}
 	std::string help() { return std::string("rig.set_vfo NNNNNNNN (Hz)"); }
@@ -1757,8 +1789,16 @@ public:
 
 		guard_lock serial(&mutex_serial);
 
-		selrig->set_vfoB(freq);
-		vfoB.freq = selrig->get_vfoB();
+		if (!selrig->can_change_alt_vfo  && !useB) {
+			selrig->selectB();
+			selrig->set_vfoB(freq);
+			vfoB.freq = selrig->get_vfoB();
+			selrig->selectA();
+		} else {
+			selrig->set_vfoB(freq);
+			vfoB.freq = selrig->get_vfoB();
+		}
+
 		Fl::awake(setFreqDispB, (void *)vfoB.freq);
 	}
 	std::string help() { return std::string("rig.set_verify_vfo NNNNNNNN (Hz)"); }
@@ -1777,8 +1817,17 @@ public:
 		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
 
 		guard_lock serial(&mutex_serial);
-		selrig->set_vfoB(freq);
-		vfoB.freq = freq;
+
+		if (!selrig->can_change_alt_vfo  && !useB) {
+			selrig->selectB();
+			selrig->set_vfoB(freq);
+			vfoB.freq = freq;
+			selrig->selectA();
+		} else {
+			selrig->set_vfoB(freq);
+			vfoB.freq = freq;
+		}
+
 		Fl::awake(setFreqDispB, (void *)freq);
 	}
 	std::string help() { return std::string("deprecated; use rig.set_vfoB"); }

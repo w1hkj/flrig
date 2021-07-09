@@ -1961,8 +1961,17 @@ void buildlist() {
 
 int movFreqA() {
 	guard_lock serial(&mutex_serial);
-	vfoA.freq = FreqDispA->value();
-	selrig->set_vfoA(vfoA.freq);
+
+	if (!selrig->can_change_alt_vfo  && useB) {
+		selrig->selectA();
+		vfoA.freq = FreqDispA->value();
+		selrig->set_vfoA(vfoA.freq);
+		selrig->selectB();
+	} else {
+		vfoA.freq = FreqDispA->value();
+		selrig->set_vfoA(vfoA.freq);
+	}
+
 	return 1;
 }
 
@@ -1973,8 +1982,15 @@ int movFreqB() {
 //		return 1;
 //	}
 	guard_lock serial(&mutex_serial);
-	vfoB.freq = FreqDispB->value();
-	selrig->set_vfoB(vfoB.freq);
+	if (!selrig->can_change_alt_vfo  && !useB) {
+		selrig->selectB();
+		vfoB.freq = FreqDispB->value();
+		selrig->set_vfoB(vfoB.freq);
+		selrig->selectA();
+	} else {
+		vfoB.freq = FreqDispB->value();
+		selrig->set_vfoB(vfoB.freq);
+	}
 	return 1;
 }
 
