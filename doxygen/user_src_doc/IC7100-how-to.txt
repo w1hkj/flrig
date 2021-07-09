@@ -1,0 +1,138 @@
+/**
+\page ic7100_how_to_page IC-7100 How-to
+
+\tableofcontents
+
+\section ic7100_setup IC 7100 menu setup
+
+Press the transceiver SET button then the on screen item: then Connectors.
+
+Make sure the settings for these items are as follows:
+
+<ul>
+<li>USB Audio SQL - OFF</li>
+<li>ACC/USB Output Select - AF</li>
+<li>ACC/USB AF Level - 50%</li>
+<li>ACC/USB IF Level - 50%</li>
+<li>ACC MOD Level - 20%</li>
+<li>DATA MOD Level - 100%</li>
+<li>USB MOD Level - 10%</li>
+<li>DATA OFF MOD - MIC, ACC</li>
+<li>DATA MOD - USB</li>
+<li>CI-V<ul>
+	<li>Baud Rate - 19,200</li>
+	<li>Address - 88h</li>
+	<li>Transceive - OFF</li>
+	<li>Output (for ANT) - OFF</li>
+	<li>USB Port - Unlink from REMOTE</li>
+	</ul></li>
+<li>FUNCTION<ul>
+	<li>Monitor - ON</li>
+	<li>Monitor Level - 50%</li>
+	<li>Beep Level - 50%</li>
+	<li>CW Normal Side - USB</li>
+	</ul></li>
+</ul>
+
+\section sflrig_setup flrig setup
+
+You should have already installed the driver for the built-in sound card in the 7100.
+
+Connect the transceiver to the computer with a USB A-Male to B-Male cable and turn on the radio.
+
+\subsection ssflrig_install Install flrig.
+
+For Windows flrig will install to it's own folders and should be 
+installed in the normal application folder where other applications are installed.  
+Putting them in other folders can causes permissions issues sometimes on 
+Windows 10. For Mac and Linux install them as you would any other application.  
+
+With the radio on and the USB cable connected and no other communications program running, Start
+flrig.
+
+It will come up with just a basic display. 
+
+<center>
+\image latex flrig-none.png "Initial Flrig Dialog" width=4.0in
+\image html flrig-none.png "Initial Flrig Dialog"
+</center>
+
+Go to the menu Config/Setup/Transceiver.
+
+<center>
+\image latex ic7100-xcvr.png "Select IC7100" width=4.0in
+\image html  ic7100-xcvr.png "Select IC7100"
+</center>
+
+Choose the 7100 from the Rig dropdown list. That will select the default settings 
+which will be good for starters. Note: The RTS +12v and DTR +12v boxes do not 
+need to be selected.
+
+Select the Serial Port to use
+<ul>
+<li>Windows - select the correct COM port</li>
+<li>Mac/Linux - Select the SilconLabs driver from the dropdown list.</li>
+</ul>
+
+If the device does not appear in the list then click the SerPort button to 
+repopulate the list. It if still isn't in the list then the driver is not loading 
+for some reason like the radio is not on or connected or the driver has not been 
+installed properly so that needs to be rectified before going on. If you're using 
+MacOS High Sierra or a later version of MacOS you may need to authorize the driver 
+install in Security & Privacy setup in System Preferences after runing the install 
+program. There will be a message on the General page if it has been blocked.
+Windows
+
+Open the device manager and determine to which com port the serial driver from 
+Silcon Labs is assigned and choose that from the drop down list. Verify that the 
+Baud rate in flrig matches the baud rate selected in the rig. It's better to choose a 
+fixed baud rate than Auto. Now, click the Init button. It should go from red to black 
+lettering. If it does not go to black lettering then verify all of the above again, 
+especially baud rate.
+
+\subsection ss7100-restore Restore xcvr parameters
+
+Select the restore tab
+
+<center>
+\image latex ic7100-restore.png "Restore IC7100 Settings" width=4.0in
+\image html  ic7100-restore.png "Restore IC7100 Settings"
+</center>
+
+and choose whether you want flrig to save and restore all the radio’s parameters on 
+startup and exit or whether you want it to open with the same settings as the rig is 
+currently using. If Use xcvr data is checked flrig will start up with the same settings 
+as the rig currently is using.
+
+\subsection ss7100-poll Select the Poll tab
+
+<center>
+\image latex ic7100-poll.png "IC7100 Polling Settings" width=4.0in
+\image html  ic7100-poll.png "IC7100 Polling Settings"
+</center>
+
+and select to poll all of the parameters. You can play with these values later if you wish. 
+The larger the number the slower the response time to button pushes etc, but also the less 
+load on the system so there is a balance. A very fast machine can use all ones, but there 
+is normally no need to add the additional load to your system for that.
+
+Flrig now should have control of the rig so changing frequency in flrig will changed the 
+frequency on the rig and visa versa. The buttons and sliders should do as they are labeled.
+
+<center>
+\image latex ic7100-main.png "IC7100 Main Dialog" width=4.0in
+\image html  ic7100-main.png "IC7100 Main Dialog"
+</center>
+
+I would recommend before you move on that you go to the Config/UI menu and select Tooltips. 
+They are a great help to the new user to figure out what each control does as not all are 
+labeled. You can choose 4 different UI’s from the narrow one with small sliders (I use this 
+one – see above screen shot of flrig), to a narrow one with large sliders, to a wide version 
+or a touch version. Now close flrig and restart it to be sure all is well . Everything should 
+be working and you should be able to change frequency on the radio and flrig should follow.
+
+\ref ic7100_how_to_page "Page Top"
+
+\ref sFlrigDesc "Return to Main Page"
+
+*/

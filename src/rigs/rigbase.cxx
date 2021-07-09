@@ -134,7 +134,7 @@ rigbase::rigbase()
 	has_a2b = false;
 	has_vfoAB = false;
 
-	data_type = BINARY;
+	data_type = DT_BINARY;
 
 	A.freq = 14070000L;
 	A.imode = 1;

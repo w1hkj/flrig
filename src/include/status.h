@@ -77,6 +77,10 @@ struct status {
 	bool	sep_dtrplus;
 	bool	sep_SCU_17;
 
+	string	cmedia_device;
+	string	cmedia_gpio_line;
+	bool	cmedia_ptt;
+
 	bool	disable_CW_ptt;
 
 	int		CIV;

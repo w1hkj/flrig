@@ -40,6 +40,7 @@
 #include <FL/Fl_Radio_Light_Button.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Return_Button.H>
+#include <FL/Fl_Round_Button.H>
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Browser.H>
 #include <FL/Fl_Input.H>
@@ -501,7 +502,7 @@ extern Fl_Int_Input *txtCIV;
 extern Fl_Button *btnCIVdefault;
 extern Fl_Check_Button *btnUSBaudio;
 extern Fl_Check_Button *btn_key_fldigi;
-extern Fl_Group *tabPTT;
+extern Fl_Group *tabPTTGEN;
 extern Fl_ComboBox *selectSepPTTPort;
 extern Fl_Check_Button *btnSep_SCU_17;
 extern Fl_Check_Button *btnSepRTSptt;
@@ -591,5 +592,12 @@ extern Fl_Check_Button *btnRestoreNR;
 extern Fl_Check_Button *btnRestoreCompOnOff;
 extern Fl_Check_Button *btnRestoreCompLevel;
 extern Fl_Check_Button *btnUseRigData;
+
+extern Fl_Group *tabCMEDIA;
+extern Fl_Round_Button *btn_use_cmedia_PTT;
+extern Fl_ComboBox *inp_cmedia_dev;
+extern Fl_ComboBox *inp_cmedia_GPIO_line;
+extern Fl_Button *btn_init_cmedia_PTT;
+extern Fl_Button *btn_test_cmedia;
 
 #endif

@@ -54,6 +54,7 @@
 #include "cwio.h"
 #include "xml_server.h"
 #include "gpio_ptt.h"
+#include "cmedia.h"
 
 void initTabs();
 
@@ -1086,6 +1087,8 @@ void check_ptt()
 		check = SepSerial->getPTT();
 	} else if (progStatus.gpio_ptt) {
 		check = get_gpio();
+	} else if (progStatus.cmedia_ptt) {
+		check = get_cmedia();
 	}
 
 	if (check != PTT) {
@@ -2885,6 +2888,8 @@ int chkptt()
 		return SepSerial->getPTT();
 	} else if (progStatus.gpio_ptt) {
 		return get_gpio();
+	} else if (progStatus.cmedia_ptt) {
+		return get_cmedia();
 	}
 	return 0;
 }
@@ -6243,6 +6248,8 @@ void initStatusConfigDialog()
 	if (progStatus.use_tcpip) {
 		box_xcvr_connect->color(FL_BACKGROUND2_COLOR);
 		box_xcvr_connect->redraw();
+	} else if (progStatus.cmedia_ptt) {
+		open_cmedia(progStatus.cmedia_device);
 	} else {
 		if (!startXcvrSerial()) {
 			if (progStatus.xcvr_serial_port.compare("NONE") == 0) {

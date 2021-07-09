@@ -30,7 +30,7 @@ $X_CFLAGS -pipe -Wall -fexceptions $OPT_CFLAGS $DEBUG_CFLAGS $PTW32_CFLAGS"
 # LDFLAGS
   FLRIG_BUILD_LDFLAGS=
 # LDADD
-  FLRIG_BUILD_LDADD="$FLTK_LIBS $X_LIBS $EXTRA_LIBS $PTW32_LIBS $FLXMLRPC_LIBS"
+  FLRIG_BUILD_LDADD="$FLTK_LIBS $X_LIBS $EXTRA_LIBS $PTW32_LIBS $FLXMLRPC_LIBS $LIBUDEV_LIBS"
 
   if test "x$ac_cv_debug" = "xyes"; then
       FLRIG_BUILD_CXXFLAGS="$FLRIG_BUILD_CXXFLAGS -UNDEBUG"
@@ -40,6 +40,16 @@ $X_CFLAGS -pipe -Wall -fexceptions $OPT_CFLAGS $DEBUG_CFLAGS $PTW32_CFLAGS"
   fi
   if test "x$target_mingw32" = "xyes"; then
       FLRIG_BUILD_LDFLAGS="-mthreads $FLRIG_BUILD_LDFLAGS"
+  fi
+
+# UDEV SUPPORT
+  if test "x$target_darwin" = "xyes"; then
+    FLRIG_BUILD_LDADD="$FLRIG_BUILD_LDADD -framework IOKit -framework CoreFoundation"
+  else if test "x$target_mingw32" = "xyes"; then
+      FLRIG_BUILD_LDADD="$FLRIG_BUILD_LDADD -lsetupapi -lhid"
+    else
+      FLRIG_BUILD_LDADD="$FLRIG_BUILD_LDADD -ludev"
+    fi
   fi
 
   AC_SUBST([FLRIG_BUILD_CPPFLAGS])

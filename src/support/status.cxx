@@ -89,6 +89,10 @@ status progStatus = {
 	false,		// bool	sep_dtrplus;
 	false,		// bool	sep_SCU_17;
 
+	"NONE",		// string	cmedia_device
+	"GPIO-3",	// string	cmedia_gpio_line
+	false,		// bool	cmedia_ptt
+
 	false,		// bool	disable_CW_ptt;
 
 	0,			// int	CIV;
@@ -573,6 +577,10 @@ void status::saveLastState()
 	spref.set("set_dtrplus", sep_dtrplus);
 
 	spref.set("xmlport", xmlport.c_str());
+
+	spref.set("cmedia_device", cmedia_device.c_str());
+	spref.set("cmedia_gpio_line", cmedia_gpio_line.c_str());
+	spref.set("cmedia_ptt", cmedia_ptt);
 
 	spref.set("poll_smeter", poll_smeter);
 	spref.set("poll_frequency", poll_frequency);
@@ -1132,6 +1140,12 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("xmlport", defbuffer, "12345", 499);
 		xmlport = defbuffer;
 		::xmlport = atoi(xmlport.c_str());
+
+		spref.get("cmedia_device", defbuffer, "NONE", 499);
+		cmedia_device = defbuffer;
+		spref.get("cmedia_gpio_line", defbuffer, "GPIO-3", 499);
+		cmedia_gpio_line = defbuffer;
+		spref.get("cmedia_ptt", i, cmedia_ptt); cmedia_ptt = i;
 
 		spref.get("poll_smeter", poll_smeter, poll_smeter);
 		spref.get("poll_frequency", poll_frequency, poll_frequency);

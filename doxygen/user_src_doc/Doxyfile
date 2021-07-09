@@ -35,9 +35,17 @@ GENERATE_XML         = NO
 HTML_COLORSTYLE_SAT  = 0
 HTML_FOOTER          =
 HTML_HEADER          =
-IMAGE_PATH           = ../images ../images/ft-991a ../images/ic-7100 ../images/tt550 \
-                       ../images/config ../images/cw-keyer ../images/debugging \
-                       ../images/menus ../images/transceivers ../images/ui
+IMAGE_PATH           = ../images \
+                       ../images/ft-991a \
+                       ../images/ic-7100 \
+                       ../images/ic-7300 \
+                       ../images/tt550 \
+                       ../images/config \
+                       ../images/cw-keyer \
+                       ../images/debugging \
+                       ../images/menus \
+                       ../images/transceivers \
+                       ../images/ui
 INPUT                = index.txt \
                        config_fonts_colors.txt \
                        elecraft_rigs.txt \
@@ -49,6 +57,8 @@ INPUT                = index.txt \
                        prefs_file.txt \
                        xmlrpc_cmds.txt \
                        FT991A-how-to.txt \
+                       IC7100-how-to.txt \
+                       IC7300-how-to.txt \
                        IC7600-how-to.txt \
                        cw_keyer.txt \
                        TT550-ops.txt

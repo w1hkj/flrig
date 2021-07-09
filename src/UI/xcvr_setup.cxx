@@ -22,6 +22,7 @@
 #include <string>
 
 #include "dialogs.h"
+#include "cmedia.h"
 #include "rigs.h"
 #include "trace.h"
 #include "xml_server.h"
@@ -62,7 +63,7 @@ Fl_Group *tabTCPIP = (Fl_Group *)0;
 	Fl_Counter *cntRetryAfter = (Fl_Counter *)0;
 	Fl_Counter *cntDropsAllowed = (Fl_Counter *)0;
 
-Fl_Group *tabPTT = (Fl_Group *)0;
+Fl_Group *tabPTTGEN = (Fl_Group *)0;
 	Fl_ComboBox *selectSepPTTPort = (Fl_ComboBox *)0;
 	Fl_Check_Button *btnSep_SCU_17 = (Fl_Check_Button *)0;
 	Fl_Check_Button *btnSepRTSptt = (Fl_Check_Button *)0;
@@ -1337,8 +1338,8 @@ Fl_Group *createTCPIP(int X, int Y, int W, int H, const char *label)
 
 Fl_Group *createPTT(int X, int Y, int W, int H, const char *label)
 {
-	Fl_Group *tabPTT = new Fl_Group(X, Y, W, H, label);
-	tabPTT->hide();
+	Fl_Group *tab = new Fl_Group(X, Y, W, H, label);
+	tab->hide();
 
 	Fl_Group *grp_CW_ptt = new Fl_Group(X + 2, Y + 20, W - 4, 30, 
 		_("CW mode PTT"));
@@ -1458,9 +1459,9 @@ _("PTT control on Separate Serial Port"));
 
 	grp_ptt->end();
 
-	tabPTT->end();
+	tab->end();
 
-	return tabPTT;
+	return tab;
 }
 
 Fl_Group *createAUX(int X, int Y, int W, int H, const char *label)
@@ -2138,8 +2139,146 @@ Fl_Group *createRestore(int X, int Y, int W, int H, const char *label)
 	btnUseRigData->value(progStatus.use_rig_data == 1);
 
 	tabRESTORE->end();
+
+	init_hids();
+
 	return tabRESTORE;
 }
+
+//----------------------------------------------------------------------
+
+Fl_Group *tabCMEDIA=(Fl_Group *)0;
+	Fl_Round_Button *btn_use_cmedia_PTT=(Fl_Round_Button *)0;
+	Fl_ComboBox *inp_cmedia_dev=(Fl_ComboBox *)0;
+	Fl_ComboBox *inp_cmedia_GPIO_line=(Fl_ComboBox *)0;
+	Fl_Button *btn_refresh_cmedia=(Fl_Button *)0;
+	Fl_Button *btn_init_cmedia_PTT=(Fl_Button *)0;
+	Fl_Button *btn_test_cmedia=(Fl_Button *)0;
+
+static void cb_btn_use_cmedia(Fl_Round_Button* o, void*) {
+	if (o->value()) {
+		progStatus.cmedia_ptt = true;
+
+		btn_init_cmedia_PTT->labelcolor(FL_RED);
+		btn_init_cmedia_PTT->redraw();
+
+		btncatptt->value(0);
+		btnrtsptt->value(0);
+		btndtrptt->value(0);
+
+		btnSepRTSptt->value(0);
+		btnSepDTRptt->value(0);
+
+		progStatus.comm_catptt = false;
+		progStatus.comm_rtsptt = false;
+		progStatus.comm_dtrptt = false;
+
+		progStatus.sep_dtrptt = false;
+		progStatus.sep_rtsptt = false;
+
+	} else {
+		progStatus.cmedia_ptt = false;
+		close_cmedia();
+	}
+}
+
+static void cb_inp_cmedia_dev(Fl_ComboBox* o, void*) {
+	close_cmedia();
+	progStatus.cmedia_device = o->value();
+	btn_init_cmedia_PTT->labelcolor(FL_RED);
+	btn_init_cmedia_PTT->redraw();
+}
+
+static void cb_inp_cmedia_GPIO_line(Fl_ComboBox* o, void*) {
+  progStatus.cmedia_gpio_line = o->value();
+}
+
+static void cb_btn_init_cmedia_PTT(Fl_Button* o, void*) {
+	open_cmedia(progStatus.cmedia_device);
+	o->labelcolor(FL_FOREGROUND_COLOR);
+}
+
+static void cb_btn_refresh_cmedia(Fl_Button* o, void*) {
+	init_hids();
+}
+
+static void cb_btn_test_cmedia(Fl_Button*, void*) {
+  test_hid_ptt();
+}
+
+Fl_Group *createCmediaTab(int X, int Y, int W, int H, const char *label)
+{
+	Fl_Group *tab = new Fl_Group(X, Y, W, H, label);
+
+	tab->hide();
+
+	Fl_Box *bx  = new Fl_Box(X + 2, Y + 2, W - 4, H / 2 - 2, _(
+"C-Media audio codecs used in DRA Series have 8 user controllable GPIO pins. \
+GPIO signal line 3 (pin 13) is used for PTT control.\n\
+On Linux: add a file named cmedia.rules to /etc/udev/rules.d/ containing:\n\
+\n\
+KERNEL==\"hidraw*\", \\\n\
+        SUBSYSTEM==\"hidraw\", MODE=\"0664\", GROUP=\"plugdev\""));
+		bx->box(FL_FLAT_BOX);
+		bx->align(Fl_Align(132|FL_ALIGN_INSIDE));
+		bx->labelfont(0);
+		bx->labelsize(13);
+
+	btn_use_cmedia_PTT = new Fl_Round_Button(X + 10, Y + H/2 + 5, 100, 20, _("Use C-Media PTT"));
+		btn_use_cmedia_PTT->down_box(FL_DOWN_BOX);
+		btn_use_cmedia_PTT->selection_color((Fl_Color)1);
+		btn_use_cmedia_PTT->value(progStatus.cmedia_ptt);
+		btn_use_cmedia_PTT->callback((Fl_Callback*)cb_btn_use_cmedia);
+
+	inp_cmedia_dev = new Fl_ComboBox(X + 10, Y + H/2 + 50, 350, 20, _("C-Media device"));
+		inp_cmedia_dev->box(FL_DOWN_BOX);
+		inp_cmedia_dev->color(FL_BACKGROUND2_COLOR);
+		inp_cmedia_dev->selection_color(FL_BACKGROUND_COLOR);
+		inp_cmedia_dev->labeltype(FL_NORMAL_LABEL);
+		inp_cmedia_dev->labelfont(0);
+		inp_cmedia_dev->labelsize(13);
+		inp_cmedia_dev->labelcolor(FL_FOREGROUND_COLOR);
+		inp_cmedia_dev->callback((Fl_Callback*)cb_inp_cmedia_dev);
+		inp_cmedia_dev->align(Fl_Align(FL_ALIGN_TOP_LEFT));
+		inp_cmedia_dev->when(FL_WHEN_RELEASE);
+		inp_cmedia_dev->labelsize(FL_NORMAL_SIZE);
+		inp_cmedia_dev->value(progStatus.cmedia_device.c_str());
+		inp_cmedia_dev->end();
+
+	inp_cmedia_GPIO_line = new Fl_ComboBox(X + 10, Y + H/2 + 95, 350, 20, _("GPIO line"));
+		inp_cmedia_GPIO_line->box(FL_DOWN_BOX);
+		inp_cmedia_GPIO_line->color(FL_BACKGROUND2_COLOR);
+		inp_cmedia_GPIO_line->selection_color(FL_BACKGROUND_COLOR);
+		inp_cmedia_GPIO_line->labeltype(FL_NORMAL_LABEL);
+		inp_cmedia_GPIO_line->labelfont(0);
+		inp_cmedia_GPIO_line->labelsize(13);
+		inp_cmedia_GPIO_line->labelcolor(FL_FOREGROUND_COLOR);
+		inp_cmedia_GPIO_line->callback((Fl_Callback*)cb_inp_cmedia_GPIO_line);
+		inp_cmedia_GPIO_line->align(Fl_Align(FL_ALIGN_TOP_LEFT));
+		inp_cmedia_GPIO_line->when(FL_WHEN_RELEASE);
+		inp_cmedia_GPIO_line->labelsize(FL_NORMAL_SIZE);
+		inp_cmedia_GPIO_line->value(progStatus.cmedia_gpio_line.c_str());
+		inp_cmedia_GPIO_line->add("GPIO-1|GPIO-2|GPIO-3|GPIO-4");
+		inp_cmedia_GPIO_line->end();
+
+	btn_refresh_cmedia = new Fl_Button(X + W - 80, Y + H/2 + 5, 70, 20, _("Refresh"));
+		btn_refresh_cmedia->tooltip(_("Refresh the list of Cmedia devices"));
+		btn_refresh_cmedia->callback((Fl_Callback*)cb_btn_refresh_cmedia);
+
+	btn_init_cmedia_PTT = new Fl_Button(X + W - 80, Y + H/2 + 50, 70, 20, _("Select"));
+		btn_init_cmedia_PTT->tooltip(_("Select device & Initialize the H/W PTT interface"));
+		btn_init_cmedia_PTT->callback((Fl_Callback*)cb_btn_init_cmedia_PTT);
+
+	btn_test_cmedia = new Fl_Button(X + W - 80, Y + H/2 + 95, 70, 20, _("TEST"));
+		btn_test_cmedia->tooltip(_("Toggles PTT line 20x; check DRA ptt LED"));
+		btn_test_cmedia->callback((Fl_Callback*)cb_btn_test_cmedia);
+
+	tab->end();
+
+	return tab;
+}
+
+//----------------------------------------------------------------------
 
 #include "gpio.cxx"
 
@@ -2160,9 +2299,10 @@ void cleartabs()
 	tabXCVR->hide();
 	tabTRACE->hide();
 	tabTCPIP->hide();
-	tabPTT->hide();
+	tabPTTGEN->hide();
 	tabAUX->hide();
 	tabGPIO->hide();
+	tabCMEDIA->hide();
 	tabPOLLING->hide();
 	tabSNDCMD->hide();
 	tabCOMMANDS->hide();
@@ -2207,7 +2347,7 @@ extern Fl_Double_Window *dlgXcvrConfig;
 
 Fl_Double_Window* XcvrDialog() {
 
-	int W = 625, H = 240;
+	int W = 675, H = 260;
 
 	Fl_Double_Window* w = new Fl_Double_Window(W, H, _("Configuration"));
 	w->size_range(W, H, W, H);
@@ -2215,7 +2355,7 @@ Fl_Double_Window* XcvrDialog() {
 	int xtree = 2;
 	int ytree = 2;
 	int htree = H - 2*ytree;
-	int wtree = 130;
+	int wtree = 180;
 	int wtabs = W - wtree - 2 * xtree;
 	int xtabs = xtree + wtree;
 
@@ -2225,40 +2365,39 @@ Fl_Double_Window* XcvrDialog() {
 	tab_tree->root_label(_("Configure"));
 	tab_tree->selectmode(FL_TREE_SELECT_SINGLE);
 	tab_tree->connectorstyle(FL_TREE_CONNECTOR_DOTTED);
-	tab_tree->connectorwidth(17); // default is 17
+	tab_tree->connectorwidth(14); // default is 17
 
-	tabXCVR  = createXCVR(xtabs, ytree, wtabs, htree, _("Xcvr"));
+	tabXCVR     = createXCVR(xtabs, ytree, wtabs, htree, _("Xcvr"));
+	tabCMEDIA   = createCmediaTab(xtabs, ytree, wtabs, htree, ("PTT-Cmedia"));
+	tabGPIO     = createGPIO(xtabs, ytree, wtabs, htree, _("PTT-GPIO"));
+	tabPTTGEN   = createPTT(xtabs, ytree, wtabs, htree, _("PTT-Generic"));
+	tabTCPIP    = createTCPIP(xtabs, ytree, wtabs, htree, _("TCPIP"));
+	tabAUX      = createAUX(xtabs, ytree, wtabs, htree, _("Auxiliary"));
+	tabSERVER   = createSERVER(xtabs, ytree, wtabs, htree, _("Server"));
+	tabPOLLING  = createPOLLING(xtabs, ytree, wtabs, htree, _("Poll"));
+	tabRESTORE  = createRestore(xtabs, ytree, wtabs, htree, _("Restore"));
+	tabCOMMANDS = createCOMMANDS(xtabs, ytree, wtabs, htree, _("Cmds"));
+	tabSNDCMD   = createSNDCMD(xtabs, ytree, wtabs, htree, _("Send"));
+	tabTRACE    = createTRACE(xtabs, ytree, wtabs, htree, _("Trace"));
+
+	tab_tree->begin();
+
 	add_tree_item(tabXCVR);
 
-	tabTRACE    = createTRACE(xtabs, ytree, wtabs, htree, _("Trace"));
-	add_tree_item(tabTRACE);
-
-	tabTCPIP    = createTCPIP(xtabs, ytree, wtabs, htree, _("TCPIP"));
-	add_tree_item(tabTCPIP);
-
-	tabPTT      = createPTT(xtabs, ytree, wtabs, htree, _("PTT"));
-	add_tree_item(tabPTT);
-
-	tabGPIO     = createGPIO(xtabs, ytree, wtabs, htree, _("GPIO"));
+	add_tree_item(tabPTTGEN);
+	add_tree_item(tabCMEDIA);
 	add_tree_item(tabGPIO);
 
-	tabAUX      = createAUX(xtabs, ytree, wtabs, htree, _("Auxiliary"));
+	add_tree_item(tabTCPIP);
 	add_tree_item(tabAUX);
-
-	tabSERVER   = createSERVER(xtabs, ytree, wtabs, htree, _("Server"));
 	add_tree_item(tabSERVER);
-
-	tabPOLLING  = createPOLLING(xtabs, ytree, wtabs, htree, _("Poll"));
 	add_tree_item(tabPOLLING);
-
-	tabSNDCMD   = createSNDCMD(xtabs, ytree, wtabs, htree, _("Send"));
-	add_tree_item(tabSNDCMD);
-
-	tabCOMMANDS = createCOMMANDS(xtabs, ytree, wtabs, htree, _("Cmds"));
-	add_tree_item(tabCOMMANDS);
-
-	tabRESTORE  = createRestore(xtabs, ytree, wtabs, htree, _("Restore"));
 	add_tree_item(tabRESTORE);
+	add_tree_item(tabCOMMANDS);
+	add_tree_item(tabSNDCMD);
+	add_tree_item(tabTRACE);
+
+	tab_tree->end();
 
 w->end();
 

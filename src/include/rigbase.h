@@ -37,7 +37,7 @@ using namespace std;
 
 enum {onA, onB};
 enum {UI, XML, SRVR, RIG};
-enum {BINARY, STRING};
+enum {DT_BINARY, DT_STRING};
 
 struct XCVR_STATE {
 	unsigned long int freq;

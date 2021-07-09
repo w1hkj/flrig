@@ -85,7 +85,7 @@ static void cb_btn_use_gpio(Fl_Check_Button* btn, void *)
 
 Fl_Group *createGPIO(int X, int Y, int W, int H, const char *label)
 {
-	tabGPIO = new Fl_Group(X, Y, W, H, label);
+	Fl_Group *tab = new Fl_Group(X, Y, W, H, label);
 
 	size_t w = (W - 20)/4;
 	size_t h = 18;
@@ -165,7 +165,7 @@ Fl_Group *createGPIO(int X, int Y, int W, int H, const char *label)
 	cnt_gpio_pulse_width->align(Fl_Align(FL_ALIGN_RIGHT));
 	cnt_gpio_pulse_width->value(progStatus.gpio_pulse_width);
 
-	tabGPIO->end();
+	tab->end();
 
-  return tabGPIO;
+  return tab;
 }

@@ -36,6 +36,7 @@
 #include "support.h"
 
 #include "gpio_ptt.h"
+#include "cmedia.h"
 
 using namespace std;
 
@@ -84,6 +85,8 @@ void rigPTT(bool on)
 		SepSerial->SetPTT(on);
 	} else if (progStatus.gpio_ptt) {
 		set_gpio(on);
+	} else if (progStatus.cmedia_ptt) {
+		set_cmedia(on);
 	} else {
 		LOG_DEBUG("No PTT i/o connected");
 	}
@@ -108,8 +111,10 @@ bool rigPTT()
 	} 
 	else if (progStatus.gpio_ptt) {
 		return get_gpio();
-	} 
-	else {
+	}
+	else if (progStatus.cmedia_ptt) {
+		return get_cmedia();
+	} else {
 		LOG_DEBUG("No PTT i/o connected");
 	}
 	return false;

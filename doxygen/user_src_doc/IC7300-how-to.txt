@@ -1,0 +1,136 @@
+/**
+\page ic7300_how_to_page IC-7300 How-to
+
+\tableofcontents
+
+\section ic7300_setup IC 7300 menu setup
+
+Press the transceiver MENU button then the on screen items: Set , then Connectors.
+
+Make sure the settings for these items are as follows:
+
+<ul>
+<li>USB SEND - Off</li>
+<li>USB Serial function - CI-V</li>
+<li>Data Mod - USB</li>
+<li>Data Off Mod - Mic, ACC or just Mic if you wish. This applies only when the rig is not in data mode.</li>
+<li>USB MOD Level - I have mine set at 28% so you might try this for starters. This is the input level control for the TX sound from the computer. How to fine tune it will be explained later.</li>
+<li>ACC/USB AF Beep/Speech level - Off</li>
+<li>ACC/USB AF SQL - Off</li>
+<li>ACC/USB AF Output level - I have mine set at 80%. This is the built-in soundcard in the radio output level that goes into fldigi on receive. Too much and you overdrive fldigi and decoding suffers, too little and you may miss weak signals though fldigi does very well with very weak signals. Something to play with to make it work best for you. See the fldigi manual on setting up the sound levels.</li>
+<li>ACC/USB Output Select - AF</li>
+</ul>
+
+Once the above are set then touch the CI-V line on screen to get a list of items to set especially for
+CAT control. Many of these are ok at default, but verify the ones listed below:
+
+<ul>
+<li>CI-V address - 94h</li>
+<li>CI-V Transceive - Off</li>
+<li>CI-V USB Port - Unlink from REMOTE</li>
+<li>CI-V USB Baud Rate - 19,200. I use 115,200, but use 19,200 for starters as that is what flrig defaults to. Response will be a bit quicker with higher rates, but it will do well at 19,200 also.</li>
+<li>CI-V USB Echo Back – On</li>
+</ul>
+
+\section sflrig_setup flrig setup
+
+You should have already installed the driver for the built-in sound card in the 7300.
+
+Connect the transceiver to the computer with a USB A-Male to B-Male cable and turn on the radio.
+
+\subsection ssflrig_install Install flrig.
+
+For Windows flrig will install to it's own folders and should be 
+installed in the normal application folder where other applications are installed.  
+Putting them in other folders can causes permissions issues sometimes on 
+Windows 10. For Mac and Linux install them as you would any other application.  
+
+With the radio on and the USB cable connected and no other communications program running, Start
+flrig.
+
+It will come up with just a basic display. 
+
+<center>
+\image latex flrig-none.png "Initial Flrig Dialog" width=4.0in
+\image html flrig-none.png "Initial Flrig Dialog"
+</center>
+
+Go to the menu Config/Setup/Transceiver.
+
+<center>
+\image latex ic7300-xcvr.png "Select IC7300" width=4.0in
+\image html  ic7300-xcvr.png "Select IC7300"
+</center>
+
+Choose the 7300 from the Rig dropdown list. That will select the default settings 
+which will be good for starters. Note: The RTS +12v and DTR +12v boxes do not 
+need to be selected.
+
+Select the Serial Port to use
+<ul>
+<li>Windows - select the correct COM port</li>
+<li>Mac/Linux - Select the SilconLabs driver from the dropdown list.</li>
+</ul>
+
+If the device does not appear in the list then click the SerPort button to 
+repopulate the list. It if still isn't in the list then the driver is not loading 
+for some reason like the radio is not on or connected or the driver has not been 
+installed properly so that needs to be rectified before going on. If you're using 
+MacOS High Sierra or a later version of MacOS you may need to authorize the driver 
+install in Security & Privacy setup in System Preferences after runing the install 
+program. There will be a message on the General page if it has been blocked.
+Windows
+
+Open the device manager and determine to which com port the serial driver from 
+Silcon Labs is assigned and choose that from the drop down list. Verify that the 
+Baud rate in flrig matches the baud rate selected in the rig. It's better to choose a 
+fixed baud rate than Auto. Now, click the Init button. It should go from red to black 
+lettering. If it does not go to black lettering then verify all of the above again, 
+especially baud rate.
+
+\subsection ss7300-restore Restore xcvr parameters
+
+Select the restore tab
+
+<center>
+\image latex ic7300-restore.png "Restore IC7300 Settings" width=4.0in
+\image html  ic7300-restore.png "Restore IC7300 Settings"
+</center>
+
+and choose whether you want flrig to save and restore all the radio’s parameters on 
+startup and exit or whether you want it to open with the same settings as the rig is 
+currently using. If Use xcvr data is checked flrig will start up with the same settings 
+as the rig currently is using.
+
+\subsetion ss7300-poll Select the Poll tab
+
+<center>
+\image latex ic7300-poll.png "IC7300 Polling Settings" width=4.0in
+\image html  ic7300-poll.png "IC7300 Polling Settings"
+</center>
+
+and select to poll all of the parameters. You can play with these values later if you wish. 
+The larger the number the slower the response time to button pushes etc, but also the less 
+load on the system so there is a balance. A very fast machine can use all ones, but there 
+is normally no need to add the additional load to your system for that.
+
+Flrig now should have control of the rig so changing frequency in flrig will changed the 
+frequency on the rig and visa versa. The buttons and sliders should do as they are labeled.
+
+<center>
+\image latex ic-7300-main.png "IC7300 Main Dialog" width=4.0in
+\image html  ic-7300-main.png "IC7300 Main Dialog"
+</center>
+
+I would recommend before you move on that you go to the Config/UI menu and select Tooltips. 
+They are a great help to the new user to figure out what each control does as not all are 
+labeled. You can choose 4 different UI’s from the narrow one with small sliders (I use this 
+one – see above screen shot of flrig), to a narrow one with large sliders, to a wide version 
+or a touch version. Now close flrig and restart it to be sure all is well . Everything should 
+be working and you should be able to change frequency on the radio and flrig should follow.
+
+\ref ic7300_how_to_page "Page Top"
+
+\ref sFlrigDesc "Return to Main Page"
+
+*/

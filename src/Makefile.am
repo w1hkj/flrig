@@ -124,6 +124,8 @@ flrig_SOURCES += \
 	cwio/cwio.cxx \
 	cwio/morse.cxx \
 	cwio/cwioUI.cxx \
+	cmedia/cmedia.cxx \
+	cmedia/hid.cxx \
 	graphics/pixmaps.cxx \
 	graphics/icons.cxx \
 	graphics/images.cxx \
@@ -254,6 +256,9 @@ flrig_SOURCES += \
 EXTRA_DIST = \
 	config.h \
 	flrig_icon.cxx \
+	cmedia/hid_lin.cxx \
+	cmedia/hid_mac.cxx \
+	cmedia/hid_win.cxx \
 	UI/ui_bitmaps.cxx \
 	UI/gpio.cxx \
 	UI/ui_wide.cxx \
@@ -264,6 +269,11 @@ EXTRA_DIST = \
 	UI/xcvr_setup.cxx \
 	UI/meters_setup.cxx \
 	UI/power_meter_setup.cxx \
+	include/cmedia.h \
+	include/hid_lin.h \
+	include/hid_mac.h \
+	include/hid_win.h \
+	include/hidapi.h \
 	include/cwio.h \
 	include/cwioUI.h \
 	include/gpio.h \
@@ -286,6 +296,9 @@ EXTRA_DIST = \
 	include/other/AOR5K.h \
 	include/generic.h \
 	include/gettext.h \
+	include/hidapi.h \
+	include/hid_mac.h \
+	include/hid_win.h \
 	include/icom/ICbase.h \
 	include/icom/IC703.h \
 	include/icom/IC705.h \

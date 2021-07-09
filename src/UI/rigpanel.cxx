@@ -444,6 +444,10 @@ static void cb_mnuTCPIP(Fl_Menu_*, void*) {
 	open_tcpip_tab();
 }
 
+static void cb_mnuCMEDIA(Fl_Menu_*, void*) {
+	open_cmedia_tab();
+}
+
 static void cb_keyer(Fl_Menu_*, void*) {
 	if (cwio_keyer_dialog == 0)
 		cwio_keyer_dialog = cwio_window();

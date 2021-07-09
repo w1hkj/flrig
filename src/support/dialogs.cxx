@@ -484,14 +484,19 @@ void open_tcpip_tab()
 	select_tab(_("TCPIP"));
 }
 
+void open_cmedia_tab()
+{
+	select_tab(_("PTT-Cmedia"));
+}
+
 void open_ptt_tab()
 {
-	select_tab(_("PTT"));
+	select_tab(_("PTT-Generic"));
 }
 
 void open_gpio_tab()
 {
-	select_tab(_("GPIO"));
+	select_tab(_("PTT-GPIO"));
 }
 
 void open_aux_tab()

@@ -87,9 +87,9 @@ static void log_level(int level, string s, string data)
 	strftime(sztm, sizeof(sztm), "%H:%M:%S", local);
 
 	string s1;
-	s1 = selrig->data_type == BINARY ? str2hex(data.c_str(), data.length()) : data;
+	s1 = selrig->data_type == DT_BINARY ? str2hex(data.c_str(), data.length()) : data;
 
-	if (selrig->data_type == STRING) {
+	if (selrig->data_type == DT_STRING) {
 		s1 = data;
 		size_t p;
 		while((p = s1.find('\r')) != string::npos)

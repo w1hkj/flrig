@@ -141,8 +141,8 @@ your particular h/w.
 \subsection ssPTT Configure PTT
 
 <center>
-\image latex config/ptt.png "I/O Ports - PTT" width=4.9in
-\image html config/ptt.png "I/O Ports - PTT"
+\image latex config/PTT-generic.png "I/O Ports - PTT" width=4.9in
+\image html config/PTT-generic.png "I/O Ports - PTT"
 </center>
 <br>
 
@@ -160,6 +160,184 @@ serial port.
 Your PTT h/w control may also make use of a second serial port.  If that port
 is the secondary serial port of the SCU-17 then you must also enable the "Serial Port is SCU-17 auxiliary"
 control.
+
+\subsection ssCMEDIA Configure CMEDIA PTT
+
+<center>
+\image latex config/PTT-cmedia.png "Cmedia PTT control" width = 4.9in
+\image html  config/PTT-cmedia.png "Cmedia PTT control"
+</center>
+
+Cmedia audio codec chips are used in a number of inexpensive USB audio thumbnail devices.  
+It is also used in the DRA@ series of sound card adapters.  The DRA is a radio optimized 
+sound card used to connect a two-way radio to a computer for digital communications. 
+The DRA-Series digital radio adapter is used for Packet Radio or other digital programs 
+and applications like VARA-FM, VARA-HF, SoundModem or fldigi. 
+
+All RA Series radio adapters include GPIO support.  The Cmedia device supports 4 unbuffered 
+input/output lines, GPIO-1 ... GPIO4.  GPIO-3 is used to drive a fully buffered and deadman 
+protected PTT circuit.  All DRA Series radio adapters include a Heartbeat Monitor. When the 
+Cmedia device is reading or writing audio data, the HeartBeat status LED (HB) flashing. If 
+everything is okay, (HB LED is flashing) a Blue LED called "COMM OK" illuminates. If the HB 
+LED stops flashing because the radio adapter or the computer/appliance has failed, or the 
+software has stopped reading or writing audio data, the Blue COMM OK LED goes out. The Blue 
+LED indicates the health status of the system, and illuminates when everything is okay.
+
+The PTT line on any DRA Series radio adapter is interrupted with the failure of this health 
+status. This function will kill the PTT line the audio stream is interrupted.  This will 
+occur if fldigi and similar modem program is not reading/writing audio data.
+
+The circuitry was designed to operate correctly no matter if the Heartbeat has stuck in the 
+on or off state. 
+
+The PTT type, the device and the GPIO line must be selected.
+If multiple C-Media devices are discovered they will enumerate as C-Media-A, C-Media-B, etc.  
+You must test the selected interface as it is not possible to know which is the correct one 
+for the DRA interface.  Pressing the TEST button will cause the PTT line to rapidly toggle 
+for a period of 2 seconds.  This will cause the RED PTT led to flash and the transceiver PTT 
+to toggle on and off.
+
+\subsection ssGPIO Use Pi GPIO PTT
+
+<center>
+\image latex config/PTT-gpio.png "GPIO PTT control" width = 4.9in
+\image html  config/PTT-gpio.png "GPIO PTT control"
+</center>
+
+The Pi series of miniature computers offer a large array of possibilities for
+controlling devices.  It has a array of General Purpose Input Output, gpio, 
+lines of a 40 pin in-line header.  17 of these gpio lines can be used for
+things like push-to-talk.  There are several add on boards for the Pi3 and Pi4,
+such as the NW Digital Radio UDRC-II, that has a full interface for digital
+operations, including PTT and audio codecs.
+
+Access to hardware ports is always limited to the user who either is root 
+or has root privileges.  setuid and setgid (short for set user ID upon 
+execution, and set group ID upon execution, respectively) are Linux
+access rights flags that allow users to run an executable with the 
+permissions of the executable's owner or group respectively and to change 
+behaviour in directories. They are often used to allow users on a computer 
+system to run programs with temporarily elevated privileges in order to 
+perform a specific task. While the assumed user id or group id privileges 
+provided are not always elevated, at a minimum they are specific.
+
+It is possible to give full gpio access and control privileges by elevating
+flrig with setuid root.  But this is not advisable as flrig is also
+granted access to both serial and network services.  There is a way to
+provide the access via a second program that does have the elevated privilege
+
+This is a copy of material at 
+
+\verbatim
+https://projects.drogon.net/raspberry-pi/wiringpi/download-and-install/
+\endverbatim
+
+for installing WiringPi which includes a really nice utility called gpio.
+
+To obtain WiringPi using GIT:
+
+\verbatim
+$ git clone git://git.drogon.net/wiringPi
+\endverbatim
+
+If you have already used the clone operation for the first time, then
+
+\verbatim
+$ cd wiringPi
+$ git pull origin
+\endverbatim
+
+Will fetch an updated version then you can re-run the build script below.
+
+To build/install there is a simplified script:
+
+\verbatim
+$ cd wiringPi
+$ ./build
+\endverbatim
+
+The build script will compile and install it all for you.  It does 
+use the sudo command at one point, so you may wish to inspect the script 
+before running it.
+
+<b>Test wiringPi's installation</b>
+
+run the gpio command to check the installation:
+
+\verbatim
+$ gpio -v
+$ gpio readall
+\endverbatim
+
+That should give you some confidence that it’s working OK.
+
+WiringPi is released under the GNU Lesser Public License version 3.
+
+flrig uses the gpio program for initializing the gpio port, which also
+happens to the change the privilege of the temporary sys file for setting
+the port state.
+
+<b>Read the man document for gpio</b>
+\verbatim
+GPIO is  a  swiss  army knife of a command line tool to allow the user 
+easy access to the GPIO pins on the Raspberry Pi and the SPI A/D and D/A 
+converters on  the  Gertboard.  It's designed for simple testing and 
+diagnostic purposes, but can be used in shell scripts for general if 
+somewhat slow control of the GPIO pins.
+
+It can also control the IO's on the PiFace IO board and load the SPI and 
+I2C  kernel  modules if required.
+
+Additionally, it can be used to set the exports in the /sys/class/gpio 
+system directory to allow subsequent programs to use the /sys/class/gpio 
+interface without needing to  be run as root."
+
+After installing gpio on your Pi you can set the gpio port on flrig's
+GPIO configuration tab.  The UDRC-II for example uses pin 16, BCM # 23,
+for push to talk.  It has an LED indicator on the board to show when PTT
+has been enabled.  For this board you select "BCM 23" and select the
+corresponding "= 1 (on)" check box.
+\endverbatim
+
+During start up flrig uses the gpio program to set up the gpio pins with
+the command 
+\verbatim
+$ gpio export NN out
+\endverbatim
+This is the command to export a GPIO pin in the /sys/class/gpio directory. 
+Note  that  the  pin number  is  the  BCM_GPIO number.  'out' sets the pin
+to be an output control, and 'in' an input control.
+
+Once a GPIO pin has been exported, the gpio program changes the  ownership  of  the
+<br>
+
+/sys/class/gpiogpioX/value
+<br>
+
+and if present in later kernels, the
+<br>
+
+/sys/class/gpio/gpioX/edge
+<br>
+
+pseudo files to that of the user running the  gpio  program. This means 
+that you can have a small script of gpio exports to setup the gpio
+pins as your program requires without the need to run anything as root,
+or with the sudo command.
+
+During shutdown flrog uses the gpio program to disable access to the gpio
+pins used with PTT by invoking the command
+<br>
+
+gpio unexport NN.
+<br>
+
+You can check that this is working correctly from a terminal window using the
+command
+\verbatim
+$ gpio readall
+\endverbatim
+
 
 \subsection ssAUX Configure auxiliary ports
 <center>
@@ -529,8 +707,12 @@ each instance with the correct interface parameters.
 \section stransceiver_how_to Transceiver How-To
 \subsection sFT991a FT 991A
 \ref ft991a_how_to_page
+\subsection sIC7100 IC 7100
+\ref ic7100_how_to_page
+\subsection sIC7300 IC 7300
+\ref ic7300_how_to_page
 \subsection sIC7600 IC 7600
-Andy's (VE3NVK / G8VTV) \ref ic7600_how_to_page
+\ref ic7600_how_to_page
 \subsection sTT550 TT 550
 The TenTec Pegasus, TT-550 is a computer only transceiver.  FLRIG controls
 all aspects of this transceiver.
