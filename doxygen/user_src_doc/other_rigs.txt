@@ -10,6 +10,16 @@
 \image latex transceivers/RAY152.png "RAY 152" width=3.75in
 \image html transceivers/RAY152.png "RAY 152"
 </center>
+\anchor o_PowerSDR
+<center>
+\image latex transceivers/PowerSDR.png "Power SDR" width=3.75in
+\image html transceivers/PowerSDR.png "Power SDR"
+</center>
+\anchor o_Flex1500
+<center>
+\image latex transceivers/Flex1500.png "Flex 1500" width=3.75in
+\image html transceivers/Flex1500.png "Flex 1500"
+</center>
 \anchor o_Xiegu-5105
 <center>
 \image latex transceivers/Xiegu-5105.png "Xiegu-5105" width=3.75in

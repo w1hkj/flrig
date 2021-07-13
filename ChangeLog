@@ -1,13 +1,63 @@
-2021-05-10  dave-w1hkj  <w1hkj@bellsouth.net>
+2021-07-13  dave-w1hkj  <w1hkj@bellsouth.net>
 
-	364f983f: Version 1.4.0
-	21b058cc: Locked passband tuning
-	7c486508: cw-dtr
-	657595f4: KX3/OS-X serial
-	5c1ce79a: TS480xx
-	91a4de0b: tod monotonicity
-	765a465d: terminal debug
-	3d25986e: kx3 tests
+	f41a778f: Version 1.4.1
+	deb5ca89: Vfo A/B
+	be485f43: cmedia ptt
+	4929722f: G90 update
+	eb873ce9: FLEX1500
+	75ff0b6b: PowerSDR
+	85a3435d: ft891 modes again
+
+2021-06-29  Ed KD8YQQ  <ed@ebrady.net>
+
+	ca065b25: FT991A
+
+2021-06-25  dave-w1hkj  <w1hkj@bellsouth.net>
+
+	2b286bba: CWIO
+
+2021-06-25  Harry McGavran  <w5pny@w5pny.com>
+
+	805bdfc4: Orion-II
+
+2021-06-22  dave-w1hkj  <w1hkj@bellsouth.net>
+
+	93079829: FT450/D
+	33f44f1e: FT891
+	fa7c02f6: TS440
+	e226084c: Version 1.4.0
+	7c9e34b0: FT1000MP
+	9cec58ab: Widget Labels/Hints
+	ed75a287: Elecraft/Icom/Kenwood
+
+2021-05-27  Mike Black  <mdblack98@yahoo.com>
+
+	e15fa1ad: PowerSDR Split
+
+2021-05-15  dave-w1hkj  <w1hkj@bellsouth.net>
+
+	aa0fd217: FTdx1200
+	b68e84b2: cwio bug
+	bf308313: FT857/897 mods
+	77403f03: IC7300 split
+	91cfa43c: FT817/818
+
+2021-05-11  Mike Black  <mdblack98@yahoo.com>
+
+	6c4ddbe1: PowerSDR
+	501f2060: Socket i/o
+	3ccc73ce: XmlRpcClient
+
+2021-05-11  dave-w1hkj  <w1hkj@bellsouth.net>
+
+	1b38784c: Code cleanup
+	b05c2301: Locked passband tuning
+	2848ce02: cw-dtr
+	a0950c10: KX3/OS-X serial
+	c95f6436: TS480xx
+	2fcff9c2: tod monotonicity
+	d6cb2cc1: terminal debug
+	160a444e: kx3 tests
 	bf9e7966: k2
 	b7401023: ic7000
 	9a3fef1d: notch

@@ -19,7 +19,7 @@
 
 /*!
 
-\mainpage FLRIG Users Manual - Version 1.4.0
+\mainpage FLRIG Users Manual - Version 1.4.1
 
 \tableofcontents
 
@@ -78,12 +78,12 @@ additional libraries or definition files are required.
 |:-----------------:|:------------------------------------:|:-----------------------------:|:-----------------------:|:------------------------------:|:-------------------------------:|
 |\ref ek_k2_a "K2"  |\ref icom_703_a "IC-703"              |\ref kwd_ts140_a "TS 140"      |\ref tt_516_a   "TT 516" |\ref yaesu_100d_a "FT 100D"     |\ref o_pcr1000_a "PCR 1000"      |
 |\ref ek_k3_a "K3"  |\ref icom_706mk2g_a "IC 706 MK IIG"   |\ref kwd_ts450s_a "TS 450"     |\ref tt_535_a   "TT 535" |\ref yaesu_450_a "FT-450"       |\ref o_ray152_a  "RAY 152"       |
-|\ref ek_kx3_a "KX3"|\ref icom_718_a "IC-718"              |\ref kwd_ts480hx_a "TS 480HX"  |\ref tt_538_a   "TT 538" |\ref yaesu_450d_a "FT-450D"     |\ref o_Xiegu-5105 "Xiegu 5105"   |
-|<br>               |\ref icom_728_a "IC 728"              |\ref kwd_ts480sat_a "TS 480SAT"|\ref tt_550_a   "TT 550" |\ref yaesu_747gx_a "FT 747GX"   |\ref o_Xiegu-G90 "Xiegu G90"     |
-|<br>               |\ref icom_735_a "IC 735"              |\ref kwd_ts570_a   "TS 570"    |\ref tt_omni6_a "TT 563" |\ref yaesu_767_a  "FT 767"      |<br>                             |
+|\ref ek_kx3_a "KX3"|\ref icom_718_a "IC-718"              |\ref kwd_ts480hx_a "TS 480HX"  |\ref tt_538_a   "TT 538" |\ref yaesu_450d_a "FT-450D"     |<br>                             |
+|<br>               |\ref icom_728_a "IC 728"              |\ref kwd_ts480sat_a "TS 480SAT"|\ref tt_550_a   "TT 550" |\ref yaesu_747gx_a "FT 747GX"   |\ref o_PowerSDR  "PowerSDR"      |
+|<br>               |\ref icom_735_a "IC 735"              |\ref kwd_ts570_a   "TS 570"    |\ref tt_omni6_a "TT 563" |\ref yaesu_767_a  "FT 767"      |\ref o_Flex1500 "Flex 1500"      |
 |<br>               |\ref icom_746_a "IC 746"              |\ref kwd_ts590s_a  "TS 590S"   |\ref tt_566_a   "TT 566" |\ref yaesu_817_a "FT 817"       |<br>                             |
-|<br>               |\ref icom_746pro_a "IC 746 Pro"       |\ref kwd_ts590sg_a  "TS 590SG" |\ref tt_omni7_a "TT 588" |\ref yaesu_847_a "FT 847"       |<br>                             |
-|<br>               |\ref icom_756pro2_a "IC 756 Pro II"   |\ref kwd_ts990_a   "TS 990"    |\ref tt_599_a   "TT 599" |\ref yaesu_857d_a "FT 857D"     |<br>                             |
+|<br>               |\ref icom_746pro_a "IC 746 Pro"       |\ref kwd_ts590sg_a  "TS 590SG" |\ref tt_omni7_a "TT 588" |\ref yaesu_847_a "FT 847"       |\ref o_Xiegu-5105 "Xiegu 5105"   |
+|<br>               |\ref icom_756pro2_a "IC 756 Pro II"   |\ref kwd_ts990_a   "TS 990"    |\ref tt_599_a   "TT 599" |\ref yaesu_857d_a "FT 857D"     |\ref o_Xiegu-G90 "Xiegu G90"     |
 |<br>               |\ref icom_756pro3_a "IC 756 Pro III"  |\ref kwd_ts2000_a  "TS 2000"   |<br>                     |\ref yaesu_897d_a "FT 897D"     |<br>                             |
 |<br>               |\ref icom_910h_a "IC 910H"            |<br>                           |<br>                     |\ref yaesu_950_a "FT-950"       |<br>                             |
 |<br>               |\ref icom_7000_a "IC 7000"            |<br>                           |<br>                     |\ref yaesu_991 "FT-991"         |<br>                             |
