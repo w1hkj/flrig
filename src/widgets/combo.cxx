@@ -176,7 +176,7 @@ void Fl_PopBrowser::popshow (int x, int y)
 
 	popbrwsr->topline (i);
 
-	keystrokes.empty();
+	keystrokes.clear();
 	popbrwsr->show();
 	show();
 	for (const Fl_Widget* o = popbrwsr; o; o = o->parent())

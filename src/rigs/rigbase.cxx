@@ -19,7 +19,6 @@
 // ----------------------------------------------------------------------------
 
 #include <iostream>
-#include <strstream>
 
 #include "rigbase.h"
 #include "util.h"
@@ -404,22 +403,12 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 
 }
 
-static char szt[100];
-
 int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 {
 	guard_lock reply_lock(&mutex_replystr);
 
 	string wait_str = " ";
 	wait_str[0] = ch;
-
-//snprintf(szt, sizeof(szt), "wait_char( %s, %d, %d, %s, %d )",
-//		wait_str.c_str(),
-//		(int)n,
-//		timeout,
-//		sz,
-//		pr);
-//get_trace(1, szt);
 
 	int delay =  (n + cmd.length()) * 11000.0 / RigSerial->Baud();
 	int retnbr = 0;
