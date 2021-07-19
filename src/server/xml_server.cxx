@@ -1180,13 +1180,17 @@ public:
 	rig_get_smeter(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_smeter", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-//		if (!xcvr_online || !selrig->has_smeter)
-//			result = (int)(0);
-//		else {
-			result = (int)mval;
-//			guard_lock serial_lock(&mutex_serial);
-//			result = (int)(selrig->get_smeter());
-//		}
+		if (!xcvr_online || !selrig->has_smeter)
+			result = "0";//(int)(0);
+		else {
+			guard_lock serial_lock(&mutex_serial);
+			int val = selrig->get_smeter();
+
+			char szMeter[20];
+			snprintf(szMeter, sizeof(szMeter), "%d", val);
+			std::string result_string = szMeter;
+			result = result_string;
+		}
 	}
 
 	std::string help() { return std::string("returns S-meter reading"); }
@@ -1228,9 +1232,13 @@ public:
 		if (!xcvr_online || !selrig->has_power_out)
 			result = (int)(0);
 		else {
-			result = (int)pwrval;
-//			guard_lock serial_lock(&mutex_serial);
-//			result = (int)selrig->get_power_out();
+			guard_lock serial_lock(&mutex_serial);
+			int val = selrig->get_power_out();
+			char szmeter[20];
+			snprintf(szmeter, sizeof(szmeter), "%d", val);
+			std::string result_string = szmeter;
+			result = result_string;
+
 		}
 	}
 
@@ -2692,7 +2700,7 @@ struct MLIST {
 	{ "rig.get_notch",    "i:n", "return notch value" },
 	{ "rig.get_ptt",      "i:n", "return PTT state" },
 	{ "rig.get_power",    "i:n", "return power level control value" },
-	{ "rig.get_pwrmeter", "i:n", "return PWR out" },
+	{ "rig.get_pwrmeter", "s:n", "return PWR out" },
 	{ "rig.get_pwrmeter_scale", "s:n", "return scale for power meter" },
 	{ "rig.get_pwrmax",   "s:n", "return maximum power available" },
 	{ "rig.get_swrmeter", "s:n", "return SWR out" },
@@ -2794,7 +2802,7 @@ void * xml_thread_loop(void *d)
 
 void start_server(int port)
 {
-	XmlRpc::setVerbosity(progStatus.rpc_level);
+//	XmlRpc::setVerbosity(progStatus.rpc_level);
 
 // Create the server socket on the specified port
 	rig_server.bindAndListen(port);
