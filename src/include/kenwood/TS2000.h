@@ -34,18 +34,18 @@ enum TS2000MODES { LSB, USB, CW, FM, AM, FSK, CWR, FSKR, DIGI };
 	void initialize();
 	void shutdown();
 
-//	unsigned long int get_vfoA();
-//	void set_vfoA(unsigned long int);
-//	unsigned long int get_vfoB();
-//	void set_vfoB(unsigned long int);
+	unsigned long int get_vfoA();
+	void set_vfoA(unsigned long int);
+	unsigned long int get_vfoB();
+	void set_vfoB(unsigned long int);
 
-//	void selectA();
-//	void selectB();
+	void selectA();
+	void selectB();
 
-//	bool can_split() { return true;}
-//	void set_split(bool val);
-//	int  get_split();
-//	bool twovfos() {return true;}
+	bool can_split() { return true;}
+	void set_split(bool val);
+	int  get_split();
+	bool twovfos() {return true;}
 
 //	void set_PTT_control(int val);
 //	int  get_PTT();

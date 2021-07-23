@@ -1074,10 +1074,10 @@ void RIG_PowerSDR::set_split(bool val)
 {
 	if (val) {
 		cmd = "ZZSP1;";
-		sendCommand(cmd);
 	} else {
 		cmd = "ZZSP0;";
 	}
+	sendCommand(cmd);
 }
 
 int RIG_PowerSDR::get_split()

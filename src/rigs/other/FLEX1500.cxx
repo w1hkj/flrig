@@ -1067,10 +1067,10 @@ void RIG_FLEX1500::set_split(bool val)
 {
 	if (val) {
 		cmd = "ZZSP1;";
-		sendCommand(cmd);
 	} else {
 		cmd = "ZZSP0;";
 	}
+	sendCommand(cmd);
 }
 
 int RIG_FLEX1500::get_split()

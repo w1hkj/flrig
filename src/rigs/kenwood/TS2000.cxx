@@ -929,3 +929,113 @@ int  RIG_TS2000::get_noise_reduction_val()
 
 	return val;
 }
+
+
+//====================== vfo controls
+
+void RIG_TS2000::selectA()
+{
+	cmd = "FR0;FT0;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "Rx on A, Tx on A", cmd, "");
+}
+
+void RIG_TS2000::selectB()
+{
+	cmd = "FR1;FT1;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "Rx on B, Tx on B", cmd, "");
+}
+
+unsigned long int RIG_TS2000::get_vfoA ()
+{
+	cmd = "FA;";
+	if (wait_char(';', 14, 100, "get vfo A", ASC) < 14) return A.freq;
+
+	size_t p = replystr.rfind("FA");
+	if (p != string::npos && (p + 12 < replystr.length())) {
+		int f = 0;
+		for (size_t n = 2; n < 13; n++)
+			f = f*10 + replystr[p+n] - '0';
+		A.freq = f;
+	}
+	return A.freq;
+}
+
+void RIG_TS2000::set_vfoA (unsigned long int freq)
+{
+	A.freq = freq;
+	cmd = "FA00000000000;";
+	for (int i = 12; i > 1; i--) {
+		cmd[i] += freq % 10;
+		freq /= 10;
+	}
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set vfo A", cmd, "");
+}
+
+unsigned long int RIG_TS2000::get_vfoB ()
+{
+	cmd = "FB;";
+	if (wait_char(';', 14, 100, "get vfo B", ASC) < 14) return B.freq;
+
+	size_t p = replystr.rfind("FB");
+	if (p != string::npos && (p + 12 < replystr.length())) {
+		int f = 0;
+		for (size_t n = 2; n < 13; n++)
+			f = f*10 + replystr[p+n] - '0';
+		B.freq = f;
+	}
+	return B.freq;
+}
+
+void RIG_TS2000::set_vfoB (unsigned long int freq)
+{
+	B.freq = freq;
+	cmd = "FB00000000000;";
+	for (int i = 12; i > 1; i--) {
+		cmd[i] += freq % 10;
+		freq /= 10;
+	}
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set vfo B", cmd, "");
+}
+
+void RIG_TS2000::set_split(bool val) 
+{
+	split = val;
+	if (useB) {
+		if (val) {
+			cmd = "FR1;FT0;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on B, Tx on A", cmd, "");
+		} else {
+			cmd = "FR1;FT1;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on B, Tx on B", cmd, "");
+		}
+	} else {
+		if (val) {
+			cmd = "FR0;FT1;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on A, Tx on B", cmd, "");
+		} else {
+			cmd = "FR0;FT0;";
+			sendCommand(cmd);
+			showresp(WARN, ASC, "Rx on A, Tx on A", cmd, "");
+		}
+	}
+}
+
+int RIG_TS2000::get_split()
+{
+		cmd = "IF;";
+		get_trace(1, "get split INFO");
+		int ret = wait_char(';', 38, 100, "get split INFO", ASC);
+		gett("");
+		if (ret >= 38) {
+			return (split = (replystr[32] == '1'));
+		}
+		return 0;
+}
+
