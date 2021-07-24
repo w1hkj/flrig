@@ -1132,7 +1132,7 @@ public:
 		if (!xcvr_online) return;
 
 		wait();
-		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_bwA");
+		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_bwB");
 
 		int BW = vfoB.iBW;
 		int mode = vfoB.imode;
@@ -1181,7 +1181,7 @@ public:
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 		if (!xcvr_online || !selrig->has_smeter)
-			result = "0";//(int)(0);
+			result = "0";
 		else {
 			guard_lock serial_lock(&mutex_serial);
 			int val = selrig->get_smeter();
@@ -1196,6 +1196,58 @@ public:
 	std::string help() { return std::string("returns S-meter reading"); }
 
 } rig_get_smeter(&rig_server);
+
+class rig_get_DBM : public XmlRpcServerMethod {
+public:
+	rig_get_DBM(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_DBM", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online || !selrig->has_smeter)
+			result = "0";
+		else {
+			guard_lock serial_lock(&mutex_serial);
+			int val = selrig->get_smeter();
+			if (val > 50) val = round(-73.0 + (val - 50.0) * 6.0 / 5.0);
+			else          val = round(-127.0 + val * 54.0 / 50.0);
+
+			char szMeter[20];
+			snprintf(szMeter, sizeof(szMeter), "%d", val);
+			std::string result_string = szMeter;
+			result = result_string;
+		}
+	}
+
+	std::string help() { return std::string("returns S-meter in dBm"); }
+
+} rig_get_DBM(&rig_server);
+
+class rig_get_Sunits : public XmlRpcServerMethod {
+public:
+	rig_get_Sunits(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_Sunits", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online || !selrig->has_smeter)
+			result = "0";
+		else {
+			guard_lock serial_lock(&mutex_serial);
+			int val = selrig->get_smeter();
+
+			char szMeter[20];
+			if (val > 50) {
+				val = round((val - 50.0) * 6.0 / 5.0);
+				snprintf(szMeter, sizeof(szMeter), "S9 + %ddB", val);
+			} else {
+				val = round(val * 9.0 / 50.0);
+				snprintf(szMeter, sizeof(szMeter), "S %d", val);
+			}
+			std::string result_string = szMeter;
+			result = result_string;
+		}
+	}
+
+	std::string help() { return std::string("returns S-meter in S units 0...9...+60"); }
+
+} rig_get_Sunits(&rig_server);
 
 class rig_get_pwrmeter_scale : public XmlRpcServerMethod {
 public:
@@ -2705,6 +2757,8 @@ struct MLIST {
 	{ "rig.get_pwrmax",   "s:n", "return maximum power available" },
 	{ "rig.get_swrmeter", "s:n", "return SWR out" },
 	{ "rig.get_smeter",   "s:n", "return Smeter" },
+	{ "rig.get_DBM",      "s:n", "return Smeter in dBm" },
+	{ "rig.get_Sunits",   "s:n", "return Smeter in S units" },
 	{ "rig.get_split",    "i:n", "return split state" },
 	{ "rig.get_update",   "s:n", "return update to info" },
 	{ "rig.get_vfo",      "s:n", "return current VFO in Hz" },
