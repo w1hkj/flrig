@@ -45,9 +45,9 @@ static const char *FLEX1500_CAT_USB[] = {
 //static const char *FLEX1500_SSB_btn_SH_label = "H";
 //------------------------------------------------------------------------
 static const char *FLEX1500_WIDEwidths[] = {
-"Wideband" };
-//static const char *FLEX1500_CAT_WIDE[] = {
-//"ZZFI12;" };
+"Wideband", NULL };
+static const char *FLEX1500_CAT_WIDE[] = {
+"ZZFI12;" };
 //------------------------------------------------------------------------
 static const char *FLEX1500_DIGwidths[] = {
 " 3000", " 2500", " 2000", " 1500", " 1000",
@@ -228,18 +228,23 @@ const char * RIG_FLEX1500::get_bwname_(int n, int md)
 	str << "n=" << n << ", md=" << md;
 	trace(2, __func__, str.str().c_str());
 	if (md == USB || md == LSB) {
-		snprintf(bwname, sizeof(bwname), "%s", FLEX1500_USBwidths[n]);
+		if (FLEX1500_USBwidths[n] != NULL)
+			snprintf(bwname, sizeof(bwname), "%s", FLEX1500_USBwidths[n]);
 	}
 	else if (md == FM || md == DRM || md == SPEC) {
-		snprintf(bwname, sizeof(bwname), "%s", FLEX1500_WIDEwidths[n]);
+		if (FLEX1500_WIDEwidths[n] != NULL)
+			snprintf(bwname, sizeof(bwname), "%s", FLEX1500_WIDEwidths[n]);
 	}
 	else if (md == DIGU || md == DIGL) {
-		snprintf(bwname, sizeof(bwname), "%s", FLEX1500_DIGwidths[n]);
+		if (FLEX1500_DIGwidths[n] != NULL)
+			snprintf(bwname, sizeof(bwname), "%s", FLEX1500_DIGwidths[n]);
 	}
 	else if (md == CWU || md == CWL) {
-		snprintf(bwname, sizeof(bwname), "%s", FLEX1500_CWwidths[n]);
+		if (FLEX1500_CWwidths[n] != NULL)
+			snprintf(bwname, sizeof(bwname), "%s", FLEX1500_CWwidths[n]);
 	} else {
-		snprintf(bwname, sizeof(bwname), "%s", FLEX1500_AMwidths[n]);
+		if (FLEX1500_AMwidths[n] != NULL)
+			snprintf(bwname, sizeof(bwname), "%s", FLEX1500_AMwidths[n]);
 	}
 	return bwname;
 }
@@ -495,17 +500,6 @@ int RIG_FLEX1500::set_widths(int val)
 const char **RIG_FLEX1500::bwtable(int val)
 {
 	return bandwidths_;
-//	if (val == LSB || val == USB)
-//		return FLEX1500_USBwidths;
-//	else if (val == FM || val == DRM || val == SPEC)
-//		return FLEX1500_WIDEwidths;
-//	else if (val == DIGU || val == DIGL)
-//		return FLEX1500_DIGwidths;
-//	else if (val == CWU || val == CWL)
-//		return FLEX1500_CWwidths;
-//	else if (val == AM || val == SAM || val == DSB)
-//		return FLEX1500_AMwidths;
-//	return NULL;
 }
 
 #if 0

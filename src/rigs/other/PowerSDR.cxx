@@ -45,9 +45,9 @@ static const char *PowerSDR_CAT_USB[] = {
 //static const char *PowerSDR_SSB_btn_SH_label = "H";
 //------------------------------------------------------------------------
 static const char *PowerSDR_WIDEwidths[] = {
-"Wideband" };
-//static const char *PowerSDR_CAT_WIDE[] = {
-//"ZZFI12;" };
+"Wideband", NULL };
+static const char *PowerSDR_CAT_WIDE[] = {
+"ZZFI12;", NULL };
 //------------------------------------------------------------------------
 static const char *PowerSDR_DIGwidths[] = {
 " 3000", " 2500", " 2000", " 1500", " 1000",
@@ -222,23 +222,28 @@ static int ret = 0;
 
 const char * RIG_PowerSDR::get_bwname_(int n, int md)
 {
-	static char bwname[20];
+	static char bwname[20] = "unknown";
 	stringstream str;
 	str << "n=" << n << ", md=" << md;
 	trace(2, __func__, str.str().c_str());
 	if (md == USB || md == LSB) {
-		snprintf(bwname, sizeof(bwname), "%s", PowerSDR_USBwidths[n]);
+		if (PowerSDR_USBwidths[n] != NULL)
+			snprintf(bwname, sizeof(bwname), "%s", PowerSDR_USBwidths[n]);
 	}
 	else if (md == FM || md == DRM || md == SPEC) {
-		snprintf(bwname, sizeof(bwname), "%s", PowerSDR_WIDEwidths[n]);
+		if (PowerSDR_WIDEwidths[n] != NULL)
+			snprintf(bwname, sizeof(bwname), "%s", PowerSDR_WIDEwidths[n]);
 	}
 	else if (md == DIGU || md == DIGL) {
-		snprintf(bwname, sizeof(bwname), "%s", PowerSDR_DIGwidths[n]);
+		if (PowerSDR_DIGwidths[n] != NULL)
+			snprintf(bwname, sizeof(bwname), "%s", PowerSDR_DIGwidths[n]);
 	}
 	else if (md == CWU || md == CWL) {
-		snprintf(bwname, sizeof(bwname), "%s", PowerSDR_CWwidths[n]);
+		if (PowerSDR_CWwidths[n] != NULL)
+			snprintf(bwname, sizeof(bwname), "%s", PowerSDR_CWwidths[n]);
 	} else {
-		snprintf(bwname, sizeof(bwname), "%s", PowerSDR_AMwidths[n]);
+		if (PowerSDR_AMwidths[n] != NULL)
+			snprintf(bwname, sizeof(bwname), "%s", PowerSDR_AMwidths[n]);
 	}
 	return bwname;
 }
@@ -502,17 +507,6 @@ int RIG_PowerSDR::set_widths(int val)
 const char **RIG_PowerSDR::bwtable(int val)
 {
 	return bandwidths_;
-//	if (val == LSB || val == USB)
-//		return PowerSDR_USBwidths;
-//	else if (val == FM || val == DRM || val == SPEC)
-//		return PowerSDR_WIDEwidths;
-//	else if (val == DIGU || val == DIGL)
-//		return PowerSDR_DIGwidths;
-//	else if (val == CWU || val == CWL)
-//		return PowerSDR_CWwidths;
-//	else if (val == AM || val == SAM || val == DSB)
-//		return PowerSDR_AMwidths;
-//	return NULL;
 }
 
 #if 0
