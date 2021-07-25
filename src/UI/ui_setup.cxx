@@ -338,6 +338,7 @@ Fl_Double_Window* DisplayDialog() {
 		mnuScheme->add("base");
 		mnuScheme->add("gtk+");
 		mnuScheme->add("plastic");
+		mnuScheme->add("gleam");
 		mnuScheme->value(mnuScheme->find_item(progStatus.ui_scheme.c_str()));
 
 		pref_sys_foreground = new Fl_Button(

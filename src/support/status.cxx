@@ -1781,6 +1781,7 @@ void status::UI_laststate()
 	if (btnNOISE)			btnNOISE->selection_color(btn_lt_color);
 	if (btnAutoNotch)		btnAutoNotch->selection_color(btn_lt_color);
 	if (btnTune)			btnTune->selection_color(btn_lt_color);
+	if (btn_tune_on_off)	btn_tune_on_off->selection_color(btn_lt_color);
 	if (btnPTT)				btnPTT->selection_color(btn_lt_color);
 	if (btnLOCK)			btnLOCK->selection_color(btn_lt_color);
 	if (btnAuxRTS)			btnAuxRTS->selection_color(btn_lt_color);
@@ -1792,6 +1793,7 @@ void status::UI_laststate()
 	if (btn_tt550_vox)		btn_tt550_vox->selection_color(btn_lt_color);
 	if (btn_tt550_CompON)	btn_tt550_CompON->selection_color(btn_lt_color);
 	if (btnAGC)				btnAGC->selection_color(btn_lt_color);
+	if (btnPOWER)			btnPOWER->selection_color(btn_lt_color);
 
 	Fl_Color bg_slider = fl_rgb_color(slider_red, slider_green, slider_blue);
 	Fl_Color btn_slider = fl_rgb_color(slider_btn_red, slider_btn_green, slider_btn_blue);
