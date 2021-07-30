@@ -32,8 +32,9 @@
 #include "XmlRpcValue.h"
 #include "XmlRpcUtil.h"
 
-namespace XmlRpc {
+#define HAS_XMLRPC_CLIENT_ID 1
 
+namespace XmlRpc {
 
   //! An interface allowing custom handling of error message reporting.
   class XmlRpcErrorHandler {

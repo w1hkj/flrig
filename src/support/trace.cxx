@@ -134,6 +134,8 @@ void trace(int n, ...) // all args of type const char *
 	Fl::awake(update_tracetext);
 }
 
+#include "XmlRpc.h"
+
 void xml_trace(int n, ...) // all args of type const char *
 {
 	if (!progStatus.xmltrace) return;
@@ -145,7 +147,11 @@ void xml_trace(int n, ...) // all args of type const char *
 	stringstream s;
 	va_list vl;
 	va_start(vl, n);
-	s << ztime() << " : " << va_arg(vl, const char *);
+	s << ztime();
+#ifdef HAS_XMLRPC_CLIENT_ID
+	s << " [" << XmlRpc::client_id << "]";
+#endif
+	s << " : " << va_arg(vl, const char *);
 	for (int i = 1; i < n; i++)
 		s << " " << va_arg(vl, const char *);
 	va_end(vl);

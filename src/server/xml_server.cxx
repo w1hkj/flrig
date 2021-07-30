@@ -312,9 +312,12 @@ public:
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 
-		wait();
-		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_split");
-		result = progStatus.split;
+		guard_lock serial(&mutex_serial);
+
+		int split_state = selrig->get_split();
+		progStatus.split = split_state;
+		result = split_state;
+xml_trace(2, "rig_get_split ", (split_state ? "ON" : "OFF"));
 	}
 
 	std::string help() { return std::string("returns state of split"); }
@@ -1282,7 +1285,7 @@ public:
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 		if (!xcvr_online || !selrig->has_power_out)
-			result = (int)(0);
+			result = "0";
 		else {
 			guard_lock serial_lock(&mutex_serial);
 			int val = selrig->get_power_out();
@@ -1304,10 +1307,14 @@ public:
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 		if (!xcvr_online || !selrig->has_swr_control)
-			result = (int)(0);
+			result = "0";
 		else {
 			guard_lock serial_lock(&mutex_serial);
-			result = (int)(selrig->get_swr());
+			int val = selrig->get_swr();
+			char szmeter[20];
+			snprintf(szmeter, sizeof(szmeter), "%d", val);
+			std::string result_string = szmeter;
+			result = result_string;
 		}
 	}
 
@@ -1590,15 +1597,18 @@ public:
 			return;
 		}
 		int state = int(params[0]);
-
-		guard_lock lock(&mutex_srvc_reqs, "xml rig_set_split");
-
-		VFOQUEUE xcvr_split;
-		if (state) xcvr_split.change = sON;
-		else       xcvr_split.change = sOFF;
-		xml_trace(1, (state ? "rig_set_split ON" : "rig_set_split OFF"));
-		srvc_reqs.push(xcvr_split);
-
+		{
+			guard_lock lock(&mutex_srvc_reqs, "xml rig_set_verify_split");
+			VFOQUEUE xcvr_split;
+			if (state) xcvr_split.change = sON;
+			else       xcvr_split.change = sOFF;
+			xml_trace(1, (state ? "rig_set_verify_split ON" : "rig_set_verify_split OFF"));
+			srvc_reqs.push(xcvr_split);
+		}
+		for (int i = 0; i < 50; i++) {
+			if (progStatus.split == state) return;
+			MilliSleep(10);
+		}
 	}
 
 	std::string help() { return std::string("executes vfo split"); }
@@ -1615,15 +1625,18 @@ public:
 			return;
 		}
 		int state = int(params[0]);
-
-		guard_lock lock(&mutex_srvc_reqs, "xml rig_set_verify_split");
-
-		VFOQUEUE xcvr_split;
-		if (state) xcvr_split.change = sON;
-		else       xcvr_split.change = sOFF;
-		xml_trace(1, (state ? "rig_set_verify_split ON" : "rig_set_verify_split OFF"));
-		srvc_reqs.push(xcvr_split);
-
+		{
+			guard_lock lock(&mutex_srvc_reqs, "xml rig_set_verify_split");
+			VFOQUEUE xcvr_split;
+			if (state) xcvr_split.change = sON;
+			else       xcvr_split.change = sOFF;
+			xml_trace(1, (state ? "rig_set_verify_split ON" : "rig_set_verify_split OFF"));
+			srvc_reqs.push(xcvr_split);
+		}
+		for (int i = 0; i < 50; i++) {
+			if (progStatus.split == state) return;
+			MilliSleep(10);
+		}
 	}
 
 	std::string help() { return std::string("sets & verifies vfo split"); }
