@@ -1,5 +1,5 @@
 // ----------------------------------------------------------------------------
-// Copyright (C) 2014
+// Copyright (C) 2021
 //              David Freese, W1HKJ
 //
 // This file is part of flrig.
@@ -73,13 +73,18 @@ void RIG_TS570::initialize()
 	rig_widgets[6].W = sldrSQUELCH;
 	rig_widgets[7].W = sldrMICGAIN;
 
-	cmd = "FR0;"; sendCommand(cmd);
-	showresp(WARN, ASC, "Rx on A", cmd, "");
-	cmd = "AC001;"; sendCommand(cmd);
-	showresp(WARN, ASC, "Thru - tune ON", cmd, "");
-	get_preamp();
-	get_attenuator();
-	is_TS570S = get_ts570id();
+//	progStatus.gettrace = progStatus.settrace = true;
+
+	is_TS570 = get_ts570id();
+
+	if (is_TS570) {
+		cmd = "FR0;"; sendCommand(cmd);
+		showresp(WARN, ASC, "Rx on A", cmd, "");
+		cmd = "AC001;"; sendCommand(cmd);
+		showresp(WARN, ASC, "Thru - tune ON", cmd, "");
+		get_preamp();
+		get_attenuator();
+	}
 }
 
 RIG_TS570::RIG_TS570() {
@@ -127,7 +132,7 @@ RIG_TS570::RIG_TS570() {
 	has_preamp_control =
 	has_mode_control =
 	has_bandwidth_control =
-	has_rf_control = 
+	has_rf_control =
 	has_sql_control =
 	has_ptt_control = true;
 
@@ -136,15 +141,34 @@ RIG_TS570::RIG_TS570() {
 
 }
 
+// Test for connection to a TS590nn transceiver
+// repeat test 20 times to provide autobaud detection
+// in the event an adapter is expecting to detect the pc baud rate
+//
+// TS590 identifier strings:
+// TS590D: ID017;
+// TS590S: ID018;
+
 bool RIG_TS570::get_ts570id()
 {
+	int ret;
+	size_t p;
 	cmd = "ID;";
-	if (wait_char(';', 6, 100, "get ID", ASC) < 6) return false;
-
-	size_t p = replystr.rfind("ID");
-	if (p == string::npos) return false;
-	if (replystr[p + 3] == '1' && 
-		replystr[p + 4] == '8')  return true;
+	for (int i = 0; i < 20; i++) {
+		get_trace(1, "get_ts570id()");
+		ret = wait_char(';', 6, 100, "get_ID()", ASC);
+		gett("");
+		if (ret < 6) {
+			MilliSleep(10);
+			Fl::awake();
+			continue;
+		}
+		p = replystr.rfind("ID");  // expect either ID017; or ID018;
+		if (replystr.substr(p, 6) == "ID017;" ||
+			replystr.substr(p, 6) == "ID018;" )
+			return true;
+	}
+	LOG_ERROR("get_ts570id() failed");
 	return false;
 }
 
@@ -162,7 +186,7 @@ void RIG_TS570::selectB()
 	showresp(WARN, ASC, "select B", cmd, "");
 }
 
-void RIG_TS570::set_split(bool val) 
+void RIG_TS570::set_split(bool val)
 {
 	split = val;
 	if (useB) {
@@ -191,10 +215,12 @@ void RIG_TS570::set_split(bool val)
 
 int RIG_TS570::get_split()
 {
-//	cmd = "IF;";
-//	if (wait_char(';', 38, 100, "get IF", ASC) < 38) return split;
+	cmd = "IF;";
+	get_trace(1, "get_split()");
+	int n = wait_char(';', 38, 100, "get IF", ASC);
+	gett("");
 
-	check_ifstr();
+	if (n < 38) return split;
 	size_t p = replystr.rfind("IF");
 	if (p == string::npos) return split;
 	split = replystr[p+32] ? true : false;
@@ -203,20 +229,20 @@ int RIG_TS570::get_split()
 
 bool RIG_TS570::check ()
 {
-	cmd = "FA;";
-	int ret = wait_char(';', 14, 100, "check", ASC);
-	if (ret < 14) return false;
-	return true;
+	return is_TS570;
 }
 
 unsigned long int RIG_TS570::get_vfoA ()
 {
 	cmd = "FA;";
-	if (wait_char(';', 14, 100, "get vfoA", ASC) < 14) return A.freq;
+	get_trace(1, "get_vfoA()");
+	int n = wait_char(';', 14, 100, "get vfoA", ASC);
+	gett("");
 
+	if (n < 14) return A.freq;
 	size_t p = replystr.rfind("FA");
 	if (p == string::npos) return A.freq;
-	
+
 	int f = 0;
 	for (size_t n = 2; n < 13; n++)
 		f = f*10 + replystr[p + n] - '0';
@@ -239,11 +265,15 @@ void RIG_TS570::set_vfoA (unsigned long int freq)
 unsigned long int RIG_TS570::get_vfoB ()
 {
 	cmd = "FB;";
-	if (wait_char(';', 14, 100, "get vfoB", ASC) < 14) return freqB;
 
+	get_trace(1, "get_vfoB()");
+	int n = wait_char(';', 14, 100, "get vfoB", ASC);
+	gett("");
+
+	if (n < 14) return freqB;
 	size_t p = replystr.rfind("FB");
 	if (p == string::npos) return freqB;
-	
+
 	int f = 0;
 	for (size_t n = 2; n < 13; n++)
 		f = f*10 + replystr[p + n] - '0';
@@ -264,17 +294,37 @@ void RIG_TS570::set_vfoB (unsigned long int freq)
 }
 
 // SM cmd 0 ... 100 (rig values 0 ... 15)
+//S meter   Response       
+//  0       SM0000;
+//  3       SM0003;
+//  5       SM0005;
+//  7       SM0007;
+//  9       SM0009;
+//+20       SM0011;
+//+40       SM0013;
+
 int RIG_TS570::get_smeter()
 {
 	cmd = "SM;";
-	if (wait_char(';', 7, 100, "get smeter", ASC) < 7) return 0;
 
+	get_trace(1, "get_smeter()");
+	int n = wait_char(';', 6, 100, "get smeter", ASC);
+	gett("");
+
+	if (n < 6) return 0;
 	size_t p = replystr.rfind("SM");
 	if (p == string::npos) return -1;
 
-	replystr[p + 6] = 0;
+	size_t len = replystr.length();
+	replystr[len - 1] = 0;
+
 	int mtr = atoi(&replystr[p + 2]);
-	mtr = (mtr * 100) / 15;
+	if (mtr <= 9)
+		mtr = mtr * 50 / 9;
+	else
+		mtr = 50 + (mtr - 9) * 50 / 6;
+	if (mtr > 100) mtr = 100;
+
 	return mtr;
 }
 
@@ -283,11 +333,15 @@ int RIG_TS570::get_swr()
 {
 	sendCommand("RM1;"); // select measurement #1
 	cmd = "RM;"; // select measurement '1' (swr) and read meter
-	if (wait_char(';', 8, 100, "get swr", ASC) < 8) return 0;
 
+	get_trace(1, "get_swr()");
+	int n = wait_char(';', 8, 100, "get swr", ASC);
+	gett("");
+
+	if (n < 8) return 0;
 	size_t p = replystr.rfind("RM1");
 	if (p == string::npos) return 0;
-	
+
 	replystr[p + 7] = 0;
 	int mtr = atoi(&replystr[p + 3]);
 	mtr = (mtr * 100) / 15;
@@ -298,11 +352,15 @@ int RIG_TS570::get_swr()
 int RIG_TS570::get_power_out()
 {
 	cmd = "SM;";
-	if (wait_char(';', 7, 100, "get pwr out", ASC) < 7) return 0;
 
+	get_trace(1, "get_power_out()");
+	int n = wait_char(';', 7, 100, "get pwr out", ASC);
+	gett("");
+
+	if (n < 7) return 0;
 	size_t p = replystr.rfind("SM");
 	if (p == string::npos) return 0;
-	
+
 	replystr[p + 6] = 0;
 	int mtr = atoi(&replystr[p + 2]);
 	mtr = (int)(0.34 + (((0.035*mtr - 0.407)*mtr + 5.074)*mtr));
@@ -327,11 +385,15 @@ void RIG_TS570::set_power_control(double val)
 int RIG_TS570::get_power_control()
 {
 	cmd = "PC;";
-	if (wait_char(';', 6, 100, "get pwr ctl", ASC) < 6) return 0;
 
+	get_trace(1, "get_power_control()");
+	int n = wait_char(';', 6, 100, "get pwr ctl", ASC);
+	gett("");
+
+	if (n < 6) return 0;
 	size_t p = replystr.rfind("PC");
 	if (p == string::npos) return 0;
-	
+
 	replystr[p + 5] = 0;
 	int mtr = atoi(&replystr[p + 2]);
 	return mtr;
@@ -341,11 +403,15 @@ int RIG_TS570::get_power_control()
 int RIG_TS570::get_volume_control()
 {
 	cmd = "AG;";
-	if (wait_char(';', 6, 100, "get vol", ASC) < 6) return 0;
 
+	get_trace(1, "get_volume_control()");
+	int n = wait_char(';', 6, 100, "get vol", ASC);
+	gett("");
+
+	if (n < 6) return 0;
 	size_t p = replystr.rfind("AG");
 	if (p == string::npos) return 0;
-	
+
 	replystr[p + 5] = 0;
 	int val = atoi(&replystr[p + 2]);
 	return (int)(val / 2.55);
@@ -382,12 +448,16 @@ void RIG_TS570::set_attenuator(int val)
 int RIG_TS570::get_attenuator()
 {
 	cmd = "RA;";
-	if (wait_char(';', 5, 100, "get att", ASC) < 5) return att_on;
 
+	get_trace(1, "get_attenuator()");
+	int n = wait_char(';', 5, 100, "get att", ASC);
+	gett("");
+
+	if (n < 5) return att_on;
 	size_t p = replystr.rfind("RA");
 	if (p == string::npos) return att_on;
 
-	if (replystr[p + 2] == '0' && 
+	if (replystr[p + 2] == '0' &&
 		replystr[p + 3] == '0')
 		att_on = 0;
 	else
@@ -407,8 +477,12 @@ void RIG_TS570::set_preamp(int val)
 int RIG_TS570::get_preamp()
 {
 	cmd = "PA;";
-	if (wait_char(';', 4, 100, "get pre", ASC) < 4 ) return preamp_on;
 
+	get_trace(1, "get_preamp()");
+	int n = wait_char(';', 4, 100, "get pre", ASC);
+	gett("");
+
+	if (n < 4 ) return preamp_on;
 	size_t p = replystr.rfind("PA");
 	if (p == string::npos) return preamp_on;
 
@@ -482,8 +556,12 @@ void RIG_TS570::set_modeA(int val)
 int RIG_TS570::get_modeA()
 {
 	cmd = "MD;";
-	if (wait_char(';', 4, 100, "get modeA", ASC) < 4) return A.imode;
 
+	get_trace(1, "get_modeA()");
+	int n = wait_char(';', 4, 100, "get modeA", ASC);
+	gett("");
+
+	if (n < 4) return A.imode;
 	size_t p = replystr.rfind("MD");
 	if (p == string::npos) return A.imode;
 
@@ -509,8 +587,12 @@ void RIG_TS570::set_modeB(int val)
 int RIG_TS570::get_modeB()
 {
 	cmd = "MD;";
-	if (wait_char(';', 4, 100, "get modeB", ASC) < 4) return B.imode;
 
+	get_trace(1, "get_modeB()");
+	int n = wait_char(';', 4, 100, "get modeB", ASC);
+	gett("");
+
+	if (n < 4) return B.imode;
 	size_t p = replystr.rfind("MD");
 	if (p == string::npos) return B.imode;
 
@@ -597,8 +679,12 @@ int RIG_TS570::get_bwA()
 	int i;
 
 	cmd = "FW;";
-	if (wait_char(';', 7, 100, "get bwA", ASC) < 7) return A.iBW;
 
+	get_trace(1, "get_bwA()");
+	int n = wait_char(';', 7, 100, "get bwA", ASC);
+	gett("");
+
+	if (n < 7) return A.iBW;
 	size_t p = replystr.rfind("FW");
 	if (p == string::npos) return A.iBW;
 
@@ -668,8 +754,12 @@ int RIG_TS570::get_bwB()
 	int i;
 
 	cmd = "FW;";
-	if (wait_char(';', 7, 100, "get bwB", ASC) < 7) return B.iBW;
 
+	get_trace(1, "get_bwB()");
+	int n = wait_char(';', 7, 100, "get bwB", ASC);
+	gett("");
+
+	if (n < 7) return B.iBW;
 	size_t p = replystr.rfind("FW");
 	if (p == string::npos) return B.iBW;
 
@@ -726,8 +816,12 @@ void RIG_TS570::set_mic_gain(int val)
 int RIG_TS570::get_mic_gain()
 {
 	cmd = "MG;";
-	if (wait_char(';', 6, 100, "get mic", ASC) < 6) return 0;
 
+	get_trace(1, "get_mic_gain()");
+	int n = wait_char(';', 6, 100, "get mic", ASC);
+	gett("");
+
+	if (n < 6) return 0;
 	size_t p = replystr.rfind("MG");
 	if (p == string::npos) return 0;
 
@@ -756,8 +850,12 @@ void RIG_TS570::set_noise(bool b)
 int  RIG_TS570::get_noise()
 {
 	cmd = "NB;";
-	if (wait_char(';', 4, 100, "get NB", ASC) < 4) return 0;
 
+	get_trace(1, "get_noise()");
+	int n = wait_char(';', 4, 100, "get NB", ASC);
+	gett("");
+
+	if (n < 4) return 0;
 	size_t p = replystr.rfind("NB");
 	if (p == string::npos) return 0;
 
@@ -783,18 +881,24 @@ void RIG_TS570::set_if_shift(int val)
 
 bool RIG_TS570::get_if_shift(int &val)
 {
-	size_t p = 0;
 	cmd = "IS;";
-	if (wait_char(';', 8, 100, "get IFsh", ASC) >= 8) {
-		p = replystr.rfind("IS");
-		if (p == string::npos) return false;
-		replystr[p + 7] = 0;
-		val = atoi(&replystr[p + 3]);
-		if (replystr[p+2] == '-') val = -val;
-		return true;
-	}
+
+	get_trace(1, "get_if_shift()");
+	int n = wait_char(';', 8, 100, "get IFsh", ASC);
+	gett("");
+
 	val = 0;
-	return false;
+	if (n < 8) {
+		return false;
+	}
+	size_t p = replystr.rfind("IS");
+	if (p == string::npos) {
+		return false;
+	}
+	replystr[p + 7] = 0;
+	val = atoi(&replystr[p + 3]);
+	if (replystr[p+2] == '-') val = -val;
+	return true;
 }
 
 void RIG_TS570::get_if_min_max_step(int &min, int &max, int &step)
@@ -804,7 +908,7 @@ void RIG_TS570::get_if_min_max_step(int &min, int &max, int &step)
 	step = 100;
 }
 
-void RIG_TS570::set_rf_gain(int val)	
+void RIG_TS570::set_rf_gain(int val)
 {
 	cmd = "RG";
 	cmd.append(to_decimal(val,3)).append(";");
@@ -816,8 +920,12 @@ int  RIG_TS570::get_rf_gain()
 {
 	int val = progStatus.rfgain;
 	cmd = "RG;";
-	if (wait_char(';', 6, 100, "get rf gain", ASC) < 6) return val;
 
+	get_trace(1, "get_rf_gain()");
+	int n = wait_char(';', 6, 100, "get rf gain", ASC);
+	gett("");
+
+	if (n < 6) return val;
 	size_t p = replystr.rfind("RG");
 	if (p != string::npos)
 		val = fm_decimal(replystr.substr(p+2), 3);
@@ -840,8 +948,12 @@ void RIG_TS570::set_squelch(int val)
 int  RIG_TS570::get_squelch()
 {
 	cmd = "SQ;";
-	if (wait_char(';', 6, 100, "get squelch", ASC) < 6) return 0;
 
+	get_trace(1, "get_squelch()");
+	int n = wait_char(';', 6, 100, "get squelch", ASC);
+	gett("");
+
+	if (n < 6) return 0;
 	size_t p = replystr.rfind("SQ");
 
 	if (p == string::npos) return 0;
@@ -886,17 +998,18 @@ void RIG_TS570::set_PTT_control(int val)
 			l => tone off /on
 			m => tone number
 			X => unused characters
-		 
+
 ========================================================================
-*/ 
+*/
 
 int RIG_TS570::get_PTT()
 {
-//	cmd = "IF;";
-//	int ret = wait_char(';', 38, 100, "get VFO", ASC);
+	cmd = "IF;";
+	get_trace(1, "get_split()");
+	int n = wait_char(';', 38, 100, "get IF", ASC);
+	gett("");
 
-	int ret = check_ifstr();
-	if (ret < 38) return ptt_;
+	if (n < 38) return ptt_;
 	ptt_ = (replystr[28] == '1');
 	return ptt_;
 }

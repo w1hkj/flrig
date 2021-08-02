@@ -1,5 +1,5 @@
 // ----------------------------------------------------------------------------
-// Copyright (C) 2014
+// Copyright (C) 2021
 //              David Freese, W1HKJ
 //
 // This file is part of flrig.
@@ -28,7 +28,7 @@ private:
 	bool beatcancel_on;
 	bool preamp_on;
 	bool att_on;
-	bool is_TS570S;
+	bool is_TS570;
 public:
 	RIG_TS570();
 	~RIG_TS570(){}
