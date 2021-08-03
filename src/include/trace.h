@@ -37,6 +37,9 @@ extern void rpc_trace(int n, ...); // trace transceiver class methods
 
 extern void make_trace_window();
 
+#define getr(s)  get_trace(1, s);
+#define setr(s)  set_trace(1, s);
+
 #define gett(str) get_trace(3, str, cmd.c_str(), replystr.c_str())
 #define sett(str) set_trace(3, str, cmd.c_str(), replystr.c_str())
 
@@ -50,17 +53,12 @@ extern void make_trace_window();
 	(str2hex(cmd.c_str(), cmd.length())), \
 	(str2hex(replystr.c_str(), replystr.length())) )
 
-#endif
-
 #define seth() set_trace(2, \
 	(str2hex(cmd.c_str(), cmd.length())), \
 	(str2hex(replystr.c_str(), replystr.length())) )
 
-/*
-#define geth() get_trace(2, \
-	(str2hex(cmd.c_str(), cmd.length())), \
-	(str2hex(replystr.c_str(), replystr.length())) )
-*/
-
 #define geth() get_trace(1, \
 	(str2hex(replystr.c_str(), replystr.length())) )
+
+#endif
+
