@@ -1,6 +1,17 @@
-2021-07-13  dave-w1hkj  <w1hkj@bellsouth.net>
+2021-08-04  dave-w1hkj  <w1hkj@bellsouth.net>
 
-	f41a778f: Version 1.4.1
+	ba16efed: Version 1.4.2
+	ff406f02: FT1000MP
+	f1453c97: TS570
+	3aa0487d: Multiple xmlrpc client conflicts
+	f710230e: Lighted buttons
+	3ab7defa: PowerSDR/1500
+	ccf6a3f7: Smeter in dbm
+	9ef65471: Split set/get
+	b39f49c4: get meter
+	0ea13616: openSUSE tumbleweed
+	75615bbb: Images
+	341830d0: Version 1.4.1
 	deb5ca89: Vfo A/B
 	be485f43: cmedia ptt
 	4929722f: G90 update

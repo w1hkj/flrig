@@ -12,7 +12,7 @@ dnl major and minor must be integers; patch may
 dnl contain other characters or be empty
 m4_define(FLRIG_MAJOR,  [1])
 m4_define(FLRIG_MINOR,  [4])
-m4_define(FLRIG_PATCH,  [.1])
+m4_define(FLRIG_PATCH,  [.2])
 
 AC_INIT([FLRIG], FLRIG_MAJOR.FLRIG_MINOR[]FLRIG_PATCH, [w1hkj AT w1hkj DOT com])
 
@@ -113,7 +113,7 @@ fi
 # Define USE_FLXMLRPC in config.h
 # Substitute FLXMLRPC_CFLAGS and FLXMLRPC_LIBS in Makefile
 
-AC_FLRIG_PKG_CHECK([flxmlrpc], [flxmlrpc >= 1.0.0], 
+AC_FLRIG_PKG_CHECK([flxmlrpc], [flxmlrpc >= 1.0.1], 
   [yes], [yes], [use external flxmlrpc library @<:@autodetect@:>@],
   [ENABLE_FLXMLRPC])
 
