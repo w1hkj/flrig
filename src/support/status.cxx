@@ -1021,6 +1021,8 @@ void status::saveLastState()
 	spref.set("gpio_on", gpio_on);
 	spref.set("gpio_pulse_width", gpio_pulse_width);
 
+	spref.set("kxpa", kxpa);
+
 	spref.set("cwioWPM", cwioWPM);
 	spref.set("cwio_comp", cwio_comp);
 	spref.set("cwioKEYLINE", cwioKEYLINE);
@@ -1668,6 +1670,8 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("enable_gpio", enable_gpio, enable_gpio);
 		spref.get("gpio_on", gpio_on, gpio_on);
 		spref.get("gpio_pulse_width", gpio_pulse_width, gpio_pulse_width);
+
+		spref.get("kxpa", kxpa, kxpa);
 
 		spref.get("cwioWPM", cwioWPM, cwioWPM);
 		spref.get("cwio_comp", cwio_comp, cwio_comp);

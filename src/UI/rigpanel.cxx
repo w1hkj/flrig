@@ -263,6 +263,9 @@ Fl_Check_Button *btn_ext_tuner = (Fl_Check_Button *)0;
 Fl_Check_Button *btn_xcvr_auto_on = (Fl_Check_Button *)0;
 Fl_Check_Button *btn_xcvr_auto_off = (Fl_Check_Button *)0;
 
+Fl_Group  *kx3_extras = (Fl_Group *)0;
+Fl_Check_Button *kxpa_enabled = (Fl_Check_Button *)0;
+
 Fl_Group  *genericUser_1 = (Fl_Group *)0;
 Fl_Button *btnUser1 = (Fl_Button*)0;
 Fl_Button *btnUser2 = (Fl_Button*)0;
@@ -840,6 +843,10 @@ static void cb_btn_xcvr_auto_on(Fl_Check_Button* o, void*) {
 
 static void cb_btn_xcvr_auto_off(Fl_Check_Button* o, void*) {
 	progStatus.xcvr_auto_off = o->value();
+}
+
+static void cb_kxpa_enabled(Fl_Check_Button* o, void *) {
+	progStatus.kxpa = o->value();
 }
 
 static void cb_btnUser( Fl_Button * o, void *d) {

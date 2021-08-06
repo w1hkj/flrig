@@ -544,16 +544,22 @@ int RIG_KX3::next_attenuator()
 
 void RIG_KX3::get_pc_min_max_step(double &min, double &max, double &step)
 {
-	min = 0; max = 15; step = 1;
+	if (progStatus.kxpa == 1) {
+		min = 0; max = 100; step = 1;
+	} else {
+		min = 0; max = 15; step = 1;
+	}
 }
-
-static std::string pwr = "000;001;002;003;004;005;006;007;008;009;010;011;012;013;014;015;";
 
 void RIG_KX3::set_power_control(double val)
 {
 	int ival = val;
-	cmd = "PC";
-	cmd.append(pwr.substr(ival * 4, 4));
+	cmd = "PC000;";
+	cmd[4] += ival % 10;
+	ival /= 10;
+	cmd[3] += ival % 10;
+	ival /= 10;
+	cmd[2] += ival % 10;
 	set_trace(1, "set power control");
 	sendCommand(cmd, 0, 50);
 	showresp(INFO, ASC, "set power ctrl", cmd, replystr);
@@ -571,10 +577,11 @@ int RIG_KX3::get_power_control()
 	if (ret < 6) return progStatus.power_level;
 
 	size_t p = replystr.rfind("PC");
-	if (p == string::npos) return progStatus.power_level;
-	size_t val = pwr.find(replystr.substr(p+2, 4));
-	if (val != std::string::npos) val /= 4;
-	return val;
+	if (p == string::npos)
+		return progStatus.power_level;
+
+	replystr[p+5] = 0;
+	return atoi(&replystr[p+2]);
 }
 
 /*

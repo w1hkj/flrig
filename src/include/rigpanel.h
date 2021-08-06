@@ -258,6 +258,9 @@ extern Fl_Light_Button *ic7610dual_watch;
 extern Fl_Light_Button *ic7610digi_sel_on_off;
 extern Fl_Wheel_Value_Slider *ic7610_digi_sel_val;
 
+extern Fl_Group  *kx3_extras;
+extern Fl_Check_Button *kxpa_enabled;
+
 extern Fl_Group  *genericUser_1;
 extern Fl_Button *btnUser1;
 extern Fl_Button *btnUser2;
