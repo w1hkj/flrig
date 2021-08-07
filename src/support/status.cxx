@@ -473,7 +473,7 @@ status progStatus = {
 	0,			// int	gpio_pulse_width;
 
 // KXPA 100 presence
-	0,			// int kxpa on line = 1
+//	0,			// int kxpa on line = 1
 
 // cwio parameters
 	20,			// int    cwioWPM;
@@ -1021,7 +1021,7 @@ void status::saveLastState()
 	spref.set("gpio_on", gpio_on);
 	spref.set("gpio_pulse_width", gpio_pulse_width);
 
-	spref.set("kxpa", kxpa);
+//	spref.set("kxpa", kxpa);
 
 	spref.set("cwioWPM", cwioWPM);
 	spref.set("cwio_comp", cwio_comp);
@@ -1671,7 +1671,7 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("gpio_on", gpio_on, gpio_on);
 		spref.get("gpio_pulse_width", gpio_pulse_width, gpio_pulse_width);
 
-		spref.get("kxpa", kxpa, kxpa);
+//		spref.get("kxpa", kxpa, kxpa);
 
 		spref.get("cwioWPM", cwioWPM, cwioWPM);
 		spref.get("cwio_comp", cwio_comp, cwio_comp);

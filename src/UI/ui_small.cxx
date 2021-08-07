@@ -1649,12 +1649,11 @@ Fl_Double_Window *tabs_window()
 
 		genericMisc->end();
 
-		kx3_extras = new Fl_Group(0, 24, small_mainW, gph - 24, _("KX3"));
-			kxpa_enabled = new Fl_Check_Button( 15, kx3_extras->y() + 12, 18, 18, _("KXPA100 ON"));
-			kxpa_enabled->callback((Fl_Callback*)cb_kxpa_enabled);
-			kxpa_enabled->value(progStatus.kxpa);
-
-		kx3_extras->end();
+//		kx3_extras = new Fl_Group(0, 24, small_mainW, gph - 24, _("KX3"));
+//			kxpa_enabled = new Fl_Check_Button( 15, kx3_extras->y() + 12, 18, 18, _("KXPA100 ON"));
+//			kxpa_enabled->callback((Fl_Callback*)cb_kxpa_enabled);
+//			kxpa_enabled->value(progStatus.kxpa);
+//		kx3_extras->end();
 
 		genericUser_1 = new Fl_Group(0, 24, small_mainW, gph - 24, _("Cmds A"));
 			btnUser1 = new Fl_Button(5, genericUser_1->y() + 12, 100, 20, "USER 1");

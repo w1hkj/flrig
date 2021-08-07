@@ -111,6 +111,7 @@ private:
 	int  get_swr();
 //	void tune_rig();
 
+	void get_options();
 };
 
 #endif

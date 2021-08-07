@@ -142,14 +142,70 @@ static void init_trace()
 	progStatus.xmltrace    =
 	progStatus.trace       = false;
 
-//	progStatus.gettrace   = true;
-//	progStatus.settrace   = true;
+	progStatus.gettrace   = true;
+	progStatus.settrace   = true;
 //	progStatus.serialtrace = true;
 //	progStatus.rigtrace    = true;
 //	progStatus.xmltrace    = true;
 //	progStatus.trace       = true;
 
 
+}
+
+/*
+ * OM (Option Module; GET)
+
+OM APF---TBXI0n;
+    |
+0123456789012345
+0.........1.....
+
+A = ATU
+P = external 100W PA
+F = roofing filter
+T = external 100W ATU
+B = internal NiMH battery charger/real-time clock
+X = KX3-2M or KX3-4M transverter module
+I = KXIO2 RTC I/O module
+0n = product identifer
+     1 - KX2
+     2 - KX3
+*/
+static struct KX3_OPTIONS {
+	bool ATU;
+	bool KXPA;
+	bool ROOF;
+	bool KXPA_ATU;
+	bool NICAD;
+	bool TXVRT;
+	bool RTC;
+	int  PROD;
+} options = { 
+	false,
+	false,
+	false,
+	false,
+	false,
+	false,
+	false,
+	0 };
+
+void RIG_KX3::get_options()
+{
+	cmd = "OM;";
+	get_trace(1, "get options");
+	int ret = wait_char(';', 16, KX3_WAIT_TIME, "get options", ASC);
+	gett("");
+	if (ret < 16)
+		return;
+	options.ATU  = (replystr[3] == 'A');
+	options.KXPA = (replystr[4] == 'P');
+	options.ROOF = (replystr[5] == 'F');
+	options.KXPA_ATU = (replystr[9] == 'T');
+	options.NICAD = (replystr[10] == 'B');
+	options.TXVRT = (replystr[11] == 'X');
+	options.RTC = (replystr[12] == 'I');
+	options.PROD = (replystr[14] - '0');
 }
 
 void RIG_KX3::initialize()
@@ -182,6 +238,7 @@ void RIG_KX3::initialize()
 	sendCommand(cmd, 0, 50);
 	sett("");
 	showresp(INFO, ASC, "disable auto-info", cmd, replystr);
+
 }
 
 void RIG_KX3::shutdown()
@@ -196,7 +253,7 @@ void RIG_KX3::shutdown()
 bool RIG_KX3::check ()
 {
 	static char sztemp[50];
-isok=true;
+
 	if (isok) return true;
 
 // try reading vfoA
@@ -544,8 +601,9 @@ int RIG_KX3::next_attenuator()
 
 void RIG_KX3::get_pc_min_max_step(double &min, double &max, double &step)
 {
-	if (progStatus.kxpa == 1) {
-		min = 0; max = 100; step = 1;
+	get_options();
+	if (options.KXPA) {
+		min = 0; max = 110; step = 1;
 	} else {
 		min = 0; max = 15; step = 1;
 	}
@@ -607,12 +665,12 @@ int RIG_KX3::get_power_out()
 	size_t p = 0;
 	int mtr = 0;
 
-	if (progStatus.kxpa) {		// test for KXPA-100 on line
+	if (options.KXPA) {
 		cmd = "^OP;";
 		get_trace(1, "test KXPA");
 		ret = wait_char(';', 5, KX3_WAIT_TIME, "test KXPA", ASC);
 		gett("");
-		if (ret >= 4) {
+		if (ret >= 5) {
 			powerScale = 1;
 			if (replystr.find("^OP1;") != string::npos) {
 				cmd = "^PF;";

@@ -1522,12 +1522,11 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 			genericAux->end();
 			genericAux->hide();
 
-			kx3_extras = new Fl_Group(xpos, ypos+tabh, W, tabb, _("KX3"));
-				kxpa_enabled = new Fl_Check_Button( 15, by, 24, 24, _("KXPA100 ON"));
-				kxpa_enabled->callback((Fl_Callback*)cb_kxpa_enabled);
-				kxpa_enabled->value(progStatus.kxpa);
-
-			kx3_extras->end();
+//			kx3_extras = new Fl_Group(xpos, ypos+tabh, W, tabb, _("KX3"));
+//				kxpa_enabled = new Fl_Check_Button( 15, by, 24, 24, _("KXPA100 ON"));
+//				kxpa_enabled->callback((Fl_Callback*)cb_kxpa_enabled);
+//				kxpa_enabled->value(progStatus.kxpa);
+//			kx3_extras->end();
 
 			genericUser_1 = new Fl_Group(xpos, ypos+tabh, W, tabb, _("Cmd A"));
 				genericUser_1->hide();

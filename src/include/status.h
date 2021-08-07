@@ -458,7 +458,7 @@ struct status {
 	int		gpio_pulse_width;
 
 // KXPA 100 presence
-	int		kxpa;
+//	int		kxpa;
 
 // cwio parameters
 	int		cwioWPM;

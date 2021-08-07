@@ -4350,7 +4350,7 @@ void init_Generic_Tabs()
 		hidden_tabs->remove(genericUser_1);
 		hidden_tabs->remove(genericUser_2);
 		hidden_tabs->remove(genericUser_3);
-		hidden_tabs->remove(kx3_extras);
+//		hidden_tabs->remove(kx3_extras);
 		hidden_tabs->remove(tab7610);
 
 		hidden_tabs->add(tab_yaesu_bands);
@@ -4368,7 +4368,7 @@ void init_Generic_Tabs()
 		hidden_tabs->add(genericUser_1);
 		hidden_tabs->add(genericUser_2);
 		hidden_tabs->add(genericUser_3);
-		hidden_tabs->add(kx3_extras);
+//		hidden_tabs->add(kx3_extras);
 		hidden_tabs->add(tab7610);
 	} else {
 		tabsGeneric->remove(tab_yaesu_bands);
@@ -4386,7 +4386,7 @@ void init_Generic_Tabs()
 		tabsGeneric->remove(genericUser_1);
 		tabsGeneric->remove(genericUser_2);
 		tabsGeneric->remove(genericUser_3);
-		tabsGeneric->remove(kx3_extras);
+//		tabsGeneric->remove(kx3_extras);
 		tabsGeneric->remove(tab7610);
 	}
 
@@ -4657,11 +4657,11 @@ void init_Generic_Tabs()
 	genericUser_3->redraw();
 	genericUser_3->show();
 
-	if (selrig->name_ == rig_KX3.name_) {
-		tabsGeneric->add(kx3_extras);
-		kx3_extras->redraw();
-		kx3_extras->show();
-	}
+//	if (selrig->name_ == rig_KX3.name_) {
+//		tabsGeneric->add(kx3_extras);
+//		kx3_extras->redraw();
+//		kx3_extras->show();
+//	}
 
 	if (selrig->name_ == rig_IC7610.name_) {
 
