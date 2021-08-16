@@ -234,6 +234,9 @@ RIG_IC9700::RIG_IC9700() {
 
 	has_band_selection = true;
 
+	can_change_alt_vfo = true;
+	has_a2b = true;
+
 	precision = 1;
 	ndigits = 10;
 
@@ -339,68 +342,106 @@ bool RIG_IC9700::check ()
 	return ok;
 }
 
+static int ret = 0;
+
 unsigned long int RIG_IC9700::get_vfoA ()
 {
-	if (useB) return A.freq;
-	string resp = pre_fm;
-	resp += '\x03';
-	cmd = pre_to;
-	cmd += '\x03';
-	cmd.append( post );
-	if (waitFOR(11, "get vfo A")) {
+	string resp;
+
+	cmd.assign(pre_to).append("\x25");
+	resp.assign(pre_fm).append("\x25");
+
+	if (useB) {
+		cmd  += '\x01';
+		resp += '\x01';
+	} else {
+		cmd  += '\x00';
+		resp += '\x00';
+	}
+
+	cmd.append(post);
+
+	get_trace(1, "get_vfoA()");
+	ret = waitFOR(12, "get vfo A");
+	geth();
+
+	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			if (replystr[p+5] == -1)
+			if (replystr[p+6] == -1)
 				A.freq = 0;
 			else
-				A.freq = fm_bcd_be(replystr.substr(p+5), 10);
+				A.freq = fm_bcd_be(replystr.substr(p+6), 10);
 		}
 	}
-	get_trace(2, "get_vfoA()", str2hex(replystr.c_str(), replystr.length()));
+
 	return A.freq;
 }
 
 void RIG_IC9700::set_vfoA (unsigned long int freq)
 {
 	A.freq = freq;
-	cmd = pre_to;
-	cmd += '\x05';
-	cmd.append( to_bcd_be( freq, 10 ) );
+
+	cmd.assign(pre_to).append("\x25");
+	if (useB) cmd += '\x01';
+	else      cmd += '\x00';
+
+	cmd.append( to_bcd_be( freq, 10) );
 	cmd.append( post );
+
+	set_trace(1, "set_vfoA");
 	waitFB("set vfo A");
-	set_trace(2, "set_vfoA()", str2hex(replystr.c_str(), replystr.length()));
+	seth();
 }
 
 unsigned long int RIG_IC9700::get_vfoB ()
 {
-	if (!useB) return B.freq;
-	string resp = pre_fm;
-	resp += '\x03';
-	cmd = pre_to;
-	cmd += '\x03';
-	cmd.append( post );
-	if (waitFOR(11, "get vfo B")) {
+	string resp;
+
+	cmd.assign(pre_to).append("\x25");
+	resp.assign(pre_fm).append("\x25");
+
+	if (useB) {
+		cmd  += '\x00';
+		resp += '\x00';
+	} else {
+		cmd  += '\x01';
+		resp += '\x01';
+	}
+
+	cmd.append(post);
+
+	get_trace(1, "get_vfoB()");
+	ret = waitFOR(12, "get vfo B");
+	geth();
+
+	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			if (replystr[p+5] == -1)
+			if (replystr[p+6] == -1)
 				A.freq = 0;
 			else
-				B.freq = fm_bcd_be(replystr.substr(p+5), 10);
+				B.freq = fm_bcd_be(replystr.substr(p+6), 10);
 		}
 	}
-	get_trace(2, "get_vfoB()", str2hex(replystr.c_str(), replystr.length()));
+
 	return B.freq;
 }
 
 void RIG_IC9700::set_vfoB (unsigned long int freq)
 {
 	B.freq = freq;
-	cmd = pre_to;
-	cmd += '\x05';
+
+	cmd.assign(pre_to).append("\x25");
+	if (useB) cmd += '\x00';
+	else      cmd += '\x01';
+
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append( post );
+
+	set_trace(1, "set_vfoB");
 	waitFB("set vfo B");
-	set_trace(2, "set_vfoB()", str2hex(replystr.c_str(), replystr.length()));
+	seth();
 }
 
 void RIG_IC9700::set_modeA(int val)

@@ -77,15 +77,24 @@ const char *IC7610modes_[] = {
 	"LSB-D1", "USB-D1", "AM-D1", "FM-D1",
 	"LSB-D2", "USB-D2", "AM-D2", "FM-D2",
 	"LSB-D3", "USB-D3", "AM-D3", "FM-D3",
-	NULL};
+	NULL
+};
 
 const char IC7610_mode_type[] = {
-	'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U',
-	'L', 'U', 'U', 'U' };
+	'L', 'U', 'U', 'U', 'L',
+	'U', 'L', 'U', 'U', 'L',
+	'L', 'U', 'U', 'U',
+	'L', 'U', 'U', 'U',
+	'L', 'U', 'U', 'U',
+};
 
 const char IC7610_mode_nbr[] = {
-	0x00, 0x01, 0x02, 0x05, 0x03, 0x07, 0x04, 0x08, 0x12, 0x13,
-	0x00, 0x01, 0x02, 0x05 };
+	0x00, 0x01, 0x02, 0x05, 0x03, // lsb, usb, am, fm, cw
+	0x07, 0x04, 0x08, 0x12, 0x13, // cw-r, tty, tty-r, psk, psk-r
+	0x00, 0x01, 0x02, 0x05,       // lsb-d1, usb-d1, am-d1, fm-d1
+	0x00, 0x01, 0x02, 0x05,       // lsb-d2, usb-d2, am-d2, fm-2d
+	0x00, 0x01, 0x02, 0x05,       // lsb-d3, usb-d3, am-d3, fm-3d
+};
 
 const char *IC7610_ssb_bws[] = {
 "50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
@@ -200,11 +209,11 @@ RIG_IC7610::RIG_IC7610() {
 	widgets = IC7610_widgets;
 
 	def_freq = A.freq = 14070000;
-	def_mode = A.imode = 9;
+	def_mode = A.imode = 11;
 	def_bw = A.iBW = 34;
 
 	B.freq = 7070000;
-	B.imode = 9;
+	B.imode = 11;
 	B.iBW = 34;
 
 	has_extras = true;
@@ -287,7 +296,7 @@ void RIG_IC7610::selectA()
 	cmd.append(post);
 	waitFB("select A");
 
-	set_trace(2, "selectA() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "selectA() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_IC7610::selectB()
@@ -297,7 +306,7 @@ void RIG_IC7610::selectB()
 	cmd.append(post);
 	waitFB("select B");
 
-	set_trace(2, "selectB() ",str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "selectB() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 //======================================================================
@@ -405,7 +414,7 @@ void RIG_IC7610::set_vfoA (unsigned long int freq)
 	cmd.append( post );
 	waitFB("set vfo A");
 
-	set_trace(2, "set_vfoA() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_vfoA() ", str2hex(cmd.c_str(), cmd.length()));
 
 }
 
@@ -445,7 +454,7 @@ void RIG_IC7610::set_vfoB (unsigned long int freq)
 	cmd.append( post );
 	waitFB("set vfo B");
 
-	set_trace(2, "set_vfoB() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_vfoB() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 // expecting
@@ -539,7 +548,7 @@ void RIG_IC7610::set_modeA(int val)
 		"set mode A[",
 		IC7610modes_[A.imode], 
 		"] ", 
-		str2hex(replystr.c_str(), replystr.length()));
+		str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7610::get_modeB()
@@ -613,7 +622,7 @@ void RIG_IC7610::set_modeB(int val)
 		"set mode B[",
 		IC7610modes_[B.imode], 
 		"] ", 
-		str2hex(replystr.c_str(), replystr.length()));
+		str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7610::get_FILT(int mode)
@@ -647,7 +656,7 @@ void RIG_IC7610::set_FILT(int filter)
 			"set mode/filter B[",
 			IC7610modes_[B.imode], 
 			"] ", 
-			str2hex(replystr.c_str(), replystr.length()));
+			str2hex(cmd.c_str(), cmd.length()));
 	} else {
 		A.filter = filter;
 		mode_filterA[A.imode] = filter;
@@ -670,7 +679,7 @@ void RIG_IC7610::set_FILT(int filter)
 		set_trace(4, "set mode/filter A[",
 			IC7610modes_[A.imode], 
 			"] ", 
-			str2hex(replystr.c_str(), replystr.length()));
+			str2hex(cmd.c_str(), cmd.length()));
 	}
 }
 
@@ -745,7 +754,7 @@ void RIG_IC7610::set_split(bool val)
 	cmd.append(post);
 	waitFB(val ? "set split ON" : "set split OFF");
 
-	set_trace(2, "set_split() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_split() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7610::get_split()
@@ -771,7 +780,8 @@ int RIG_IC7610::get_split()
 
 int RIG_IC7610::get_bwA()
 {
-	if (A.imode == 3 || A.imode == 11) return 0; // FM, FM-D
+	if (A.imode == 3 || 
+		A.imode == 13 || A.imode == 17 || A.imode == 21) return 0; // FM, FM-D
 
 	if (useB) selectA();
 
@@ -801,7 +811,8 @@ int RIG_IC7610::get_bwA()
 void RIG_IC7610::set_bwA(int val)
 {
 
-	if (A.imode == 3 || A.imode == 11) return; // FM, FM-D
+	if (A.imode == 3 || 
+		A.imode == 13 || A.imode == 17 || A.imode == 21) return; // FM, FM-D
 
 	A.iBW = val;
 	if (useB) selectA();
@@ -813,14 +824,15 @@ void RIG_IC7610::set_bwA(int val)
 	waitFB("set bwA");
 
 	mode_bwA[A.imode] = val;
-	set_trace(2, "set_bwA() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_bwA() ", str2hex(cmd.c_str(), cmd.length()));
 
 	if (useB) selectB();
 }
 
 int RIG_IC7610::get_bwB()
 {
-	if (B.imode == 3 || B.imode == 11) return 0; // FM, FM-D
+	if (B.imode == 3 || 
+		B.imode == 13 || B.imode == 17 || B.imode == 21) return 0; // FM, FM-D
 
 	if (!useB) selectB();
 
@@ -849,7 +861,9 @@ int RIG_IC7610::get_bwB()
 
 void RIG_IC7610::set_bwB(int val)
 {
-	if (B.imode == 3 || B.imode == 11) return; // FM, FM-D
+	if (B.imode == 3 || 
+		B.imode == 13 || B.imode == 17 || B.imode == 21) return; // FM, FM-D
+
 	B.iBW = val;
 
 	if (!useB) selectB();
@@ -861,7 +875,7 @@ void RIG_IC7610::set_bwB(int val)
 	waitFB("set bwB");
 
 	mode_bwB[B.imode] = val;
-	set_trace(2, "set_bwB() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_bwB() ", str2hex(cmd.c_str(), cmd.length()));
 
 	if (!useB) selectA();
 }
@@ -970,7 +984,7 @@ void RIG_IC7610::set_mic_gain(int val)
 	cmd.append(bcd255(val));
 	cmd.append( post );
 	waitFB("set mic gain");
-	set_trace(2, "set_mic_gain() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_mic_gain() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_IC7610::get_mic_gain_min_max_step(int &min, int &max, int &step)
@@ -989,7 +1003,7 @@ void RIG_IC7610::set_compression(int on, int val)
 	else cmd += '\x00';
 	cmd.append(post);
 	waitFB("set Comp ON/OFF");
-	set_trace(2, "set_compression on/off ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_compression on/off ", str2hex(cmd.c_str(), cmd.length()));
 
 	if (val < 0) return;
 	if (val > 10) return;
@@ -998,7 +1012,7 @@ void RIG_IC7610::set_compression(int on, int val)
 	cmd.append(to_bcd(comp_level[val], 3));
 	cmd.append( post );
 	waitFB("set comp");
-	set_trace(2, "set_compression_level ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_compression_level ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_IC7610::get_compression(int &on, int &val)
@@ -1043,7 +1057,7 @@ void RIG_IC7610::set_vox_onoff()
 		cmd.append( post );
 		waitFB("set vox OFF");
 	}
-	set_trace(2, "set_vox_on/off ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_vox_on/off ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 // Xcvr values range 0...255 step 1
@@ -1060,7 +1074,7 @@ void RIG_IC7610::set_vox_gain()
 	cmd.append(to_bcd(vox_gain, 3));
 	cmd.append( post );
 	waitFB("SET vox gain");
-	set_trace(2, "set_vox_gain() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_vox_gain() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 // Xcvr values range 0...255 step 1
@@ -1077,7 +1091,7 @@ void RIG_IC7610::set_vox_anti()
 	cmd.append(to_bcd(vox_anti, 3));
 	cmd.append( post );
 	waitFB("SET anti-vox");
-	set_trace(2, "set_vox_anti() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_vox_anti() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 // VOX hang 0.0 - 2.0, step 0.1
@@ -1093,7 +1107,7 @@ void RIG_IC7610::set_vox_hang()
 	cmd.append(to_bcd(progStatus.vox_hang, 2));
 	cmd.append( post );
 	waitFB("SET vox hang");
-	set_trace(2, "set_vox_hang() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_vox_hang() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 //----------------------------------------------------------------------
@@ -1113,7 +1127,7 @@ void RIG_IC7610::set_cw_wpm()
 	cmd.append(to_bcd(iwpm, 3));
 	cmd.append( post );
 	waitFB("SET cw wpm");
-	set_trace(2, "set_cw_wpm() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_cw_wpm() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_IC7610::set_break_in()
@@ -1132,7 +1146,7 @@ void RIG_IC7610::set_break_in()
 	}
 	cmd.append(post);
 	waitFB("SET break-in");
-	set_trace(2, "set_break_in() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_break_in() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7610::get_break_in()
@@ -1167,7 +1181,7 @@ void RIG_IC7610::set_cw_qsk()
 	cmd.append(to_bcd(qsk, 3));
 	cmd.append(post);
 	waitFB("Set cw qsk delay");
-	set_trace(2, "set_cw_qsk() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_cw_qsk() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_IC7610::get_cw_spot_tone_min_max_step(int &min, int &max, int &step)
@@ -1184,7 +1198,7 @@ void RIG_IC7610::set_cw_spot_tone()
 	cmd.append(to_bcd(n, 3));
 	cmd.append( post );
 	waitFB("SET cw spot tone");
-	set_trace(2, "set_cw_spot_tone() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_cw_spot_tone() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_IC7610::set_cw_vol()
@@ -1196,7 +1210,7 @@ void RIG_IC7610::set_cw_vol()
 	cmd.append(to_bcd((int)(progStatus.cw_vol * 2.55), 3));
 	cmd.append( post );
 	waitFB("SET cw sidetone volume");
-	set_trace(2, "set_cw_vol() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_cw_vol() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 // Tranceiver PTT on/off
@@ -1209,7 +1223,7 @@ void RIG_IC7610::set_PTT_control(int val)
 	cmd.append( post );
 	waitFB("set ptt");
 	ptt_ = val;
-	set_trace(2, "set_PTT_control() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_PTT_control() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7610::get_PTT()
@@ -1236,7 +1250,7 @@ void RIG_IC7610::set_volume_control(int val)
 	cmd.append(bcd255(val));
 	cmd.append( post );
 	waitFB("set vol");
-	set_trace(2, "set_volume_control() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_volume_control() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 /*
@@ -1277,7 +1291,7 @@ void RIG_IC7610::set_power_control(double val)
 	cmd.append(bcd255(val));
 	cmd.append( post );
 	waitFB("set power");
-	set_trace(2, "set_power_control() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_power_control() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7610::get_power_control()
@@ -1438,7 +1452,7 @@ void RIG_IC7610::set_rf_gain(int val)
 	cmd.append(bcd255(val));
 	cmd.append( post );
 	waitFB("set RF");
-	set_trace(2, "set_rf_gain() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_rf_gain() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7610::get_rf_gain()
@@ -1497,7 +1511,7 @@ void RIG_IC7610::set_preamp(int val)
 	waitFB(	(preamp_level == 0) ? "set Preamp OFF" :
 			(preamp_level == 1) ? "set Preamp Level 1" :
 			"set Preamp Level 2");
-	set_trace(2, "set_preamp() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_preamp() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7610::get_preamp()
@@ -1533,7 +1547,7 @@ void RIG_IC7610::set_noise(bool val)
 	cmd += val ? 1 : 0;
 	cmd.append(post);
 	waitFB("set noise");
-	set_trace(2, "set_noise() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_noise() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7610::get_noise()
@@ -1562,7 +1576,7 @@ void RIG_IC7610::set_nb_level(int val)
 	cmd.append(bcd255(val));
 	cmd.append( post );
 	waitFB("set NB level");
-	set_trace(2, "set_nb_level() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_nb_level() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int  RIG_IC7610::get_nb_level()
@@ -1590,7 +1604,7 @@ void RIG_IC7610::set_noise_reduction(int val)
 	cmd += val ? 1 : 0;
 	cmd.append(post);
 	waitFB("set NR");
-	set_trace(2, "set_noise_reduction() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_noise_reduction() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7610::get_noise_reduction()
@@ -1635,7 +1649,7 @@ void RIG_IC7610::set_noise_reduction_val(int val)
 	cmd.append(to_bcd(val, 3));
 	cmd.append(post);
 	waitFB("set NRval");
-	set_trace(2, "set_noise_reduction_val() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_noise_reduction_val() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7610::get_noise_reduction_val()
@@ -1666,7 +1680,7 @@ void RIG_IC7610::set_squelch(int val)
 	cmd.append(bcd255(val));
 	cmd.append( post );
 	waitFB("set Sqlch");
-	set_trace(2, "set_squelch() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_squelch() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int  RIG_IC7610::get_squelch()
@@ -1695,7 +1709,7 @@ void RIG_IC7610::set_auto_notch(int val)
 	cmd += (unsigned char)val;
 	cmd.append( post );
 	waitFB("set AN");
-	set_trace(2, "set_auto_notch() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_auto_notch() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7610::get_auto_notch()
@@ -1735,14 +1749,14 @@ void RIG_IC7610::set_notch(bool on, int val)
 		cmd.append(post);
 		waitFB("set notch");
 		IC7610_notchon = on;
-		set_trace(2, "set_notch_on/off() ", str2hex(replystr.c_str(), replystr.length()));
+		set_trace(2, "set_notch_on/off() ", str2hex(cmd.c_str(), cmd.length()));
 	}
 	cmd = pre_to;
 	cmd.append("\x14\x0D");
 	cmd.append(to_bcd(notch,3));
 	cmd.append(post);
 	waitFB("set notch val");
-	set_trace(2, "set_notch_val() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_notch_val() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 bool RIG_IC7610::get_notch(int &val)
@@ -1811,7 +1825,7 @@ int RIG_IC7610::incr_agc()
 	cmd += agcval;
 	cmd.append(post);
 	waitFB("set AGC");
-	set_trace(2, "set_agc() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_agc() ", str2hex(cmd.c_str(), cmd.length()));
 	return agcval;
 }
 
@@ -1843,14 +1857,14 @@ void RIG_IC7610::set_if_shift(int val)
 	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
 	waitFB("set IF on/off");
-	set_trace(2, "set_IF_shift_on/off() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_IF_shift_on/off() ", str2hex(cmd.c_str(), cmd.length()));
 
 	cmd = pre_to;
 	cmd.append("\x14\x08");
 	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
 	waitFB("set IF val");
-	set_trace(2, "set_IF_shift_val() ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_IF_shift_val() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 bool RIG_IC7610::get_if_shift(int &val) {
@@ -1876,7 +1890,7 @@ void RIG_IC7610::set_pbt_inner(int val)
 	cmd.append(to_bcd(shift, 3));
 	cmd.append(post);
 	waitFB("set PBT inner");
-	set_trace(4, "set_pbt_inner(", val, ") ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(4, "set_pbt_inner(", val, ") ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_IC7610::set_pbt_outer(int val)
@@ -1946,7 +1960,7 @@ void RIG_IC7610::setVfoAdj(double v)
 	cmd.append(to_bcd(v, 4));
 	cmd.append(post);
 	waitFB("SET vfo adjust");
-	set_trace(2, "set_vfo_adjust()", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_vfo_adjust()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 double RIG_IC7610::getVfoAdj()
@@ -1973,7 +1987,7 @@ void RIG_IC7610::set_digi_sel(bool b)
 	else   cmd += '\x00';
 	cmd.append(post);
 	waitFB("set_digi_sel");
-	set_trace(2, "set_digi_sel()", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_digi_sel()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7610::get_digi_sel()
@@ -1997,7 +2011,7 @@ void RIG_IC7610::set_digi_val(int v)
 	cmd.append(to_bcd(v, 3));
 	cmd.append(post);
 	waitFB("set_digi_val");
-	set_trace(2, "set_digi_val()", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_digi_val()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7610::get_digi_val()
@@ -2025,7 +2039,7 @@ void RIG_IC7610::set_dual_watch(bool b)
 	else   cmd += '\x00';
 	cmd.append(post);
 	waitFB("set_dual_watch");
-	set_trace(2, "set_dual_watch()", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_dual_watch()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7610::get_dual_watch()
@@ -2061,7 +2075,7 @@ void RIG_IC7610::set_index_att(int v)
 	cmd += attval[v];
 	cmd.append(post);
 	waitFB("SET attenuator");
-	set_trace(2, "set_index_att()", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_index_att()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7610::get_attenuator()
@@ -2122,7 +2136,7 @@ void RIG_IC7610::get_band_selection(int v)
 	cmd.append( post );
 
 	if (waitFOR(23, "get band stack")) {
-		set_trace(2, "get band stack", str2hex(replystr.c_str(), replystr.length()));
+		get_trace(2, "get band stack", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(pre_fm);
 		if (p != string::npos) {
 			unsigned long int bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
@@ -2165,7 +2179,7 @@ void RIG_IC7610::get_band_selection(int v)
 			}
 		}
 	} else
-		set_trace(2, "get band stack", str2hex(replystr.c_str(), replystr.length()));
+		get_trace(2, "get band stack", str2hex(replystr.c_str(), replystr.length()));
 }
 
 void RIG_IC7610::set_band_selection(int v)
@@ -2189,7 +2203,7 @@ void RIG_IC7610::set_band_selection(int v)
 	cmd.append(to_bcd(PL_tones[rTONE], 6));
 	cmd.append(post);
 	waitFB("set_band_selection");
-	set_trace(2, "set_band_selection()", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(2, "set_band_selection()", str2hex(cmd.c_str(), cmd.length()));
 
 	cmd.assign(pre_to);
 	cmd.append("\x1A\x01");
@@ -2200,3 +2214,5 @@ void RIG_IC7610::set_band_selection(int v)
 	waitFOR(23, "get band stack");
 }
 
+#undef NUM_FILTERS
+#undef NUM_MODES

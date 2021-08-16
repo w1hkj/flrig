@@ -23,15 +23,30 @@
 bool IC7851_DEBUG = true;
 
 //=============================================================================
-// IC-7851
+// IC-_7851
 
 const char IC7851name_[] = "IC-7851";
 
+#define NUM_FILTERS 3
+#define NUM_MODES  16
+
 enum {
-	LSB7851, USB7851, AM7851, CW7851, RTTY7851,
-	FM7851,  CWR7851, RTTYR7851, PSK7851, PSKR7851,
-	LSBD17851, LSBD27851, LSBD37851, 
-	USBD17851, USBD27851, USBD37851 };
+	LSB_7851, USB_7851, AM_7851, CW_7851, RTTY_7851,
+	FM_7851,  CWR_7851, RTTYR_7851, PSK_7851, PSKR_7851,
+	LSBD1_7851, LSBD2_7851, LSBD3_7851, 
+	USBD1_7851, USBD2_7851, USBD3_7851 };
+
+static int mode_filterA[NUM_MODES] = {
+	1,1,1,1,1,
+	1,1,1,1,1,
+	1,1,1,
+	1,1,1};
+
+static int mode_filterB[NUM_MODES] = {
+	1,1,1,1,1,
+	1,1,1,1,1,
+	1,1,1,
+	1,1,1};
 
 const char *IC7851modes_[] = {
 	"LSB", "USB", "AM", "CW", "RTTY",
@@ -40,12 +55,14 @@ const char *IC7851modes_[] = {
 	"USB-D1", "USB-D2", "USB-D3", NULL};
 
 const char IC7851_mode_type[] = {
-	'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U', 'U', 'L', 
+	'L', 'U', 'U', 'U', 'L',
+	'U', 'L', 'U', 'U', 'L', 
 	'L', 'L', 'L',
 	'U', 'U', 'U' };
 
 const char IC7851_mode_nbr[] = {
-	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07, 0x08, 0x12, 0x13, 
+	0x00, 0x01, 0x02, 0x03, 0x04,
+	0x05, 0x07, 0x08, 0x12, 0x13, 
 	0x00, 0x00, 0x00,
 	0x01, 0x01, 0x01 };
 
@@ -57,25 +74,25 @@ const char *IC7851_ssb_bws[] = {
 "3600", NULL };
 
 static int IC7851_bw_vals_SSB[] = {
- 1, 2, 3, 4, 5, 6, 7, 8, 9,10,
-11,12,13,14,15,16,17,18,19,20,
-21,22,23,24,25,26,27,28,29,30,
-31,32,33,34,35,36,37,38,39,40,
-41, WVALS_LIMIT};
+ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+10,11,12,13,14,15,16,17,18,19,
+20,21,22,23,24,25,26,27,28,29,
+30,31,32,33,34,35,36,37,38,39,
+40, WVALS_LIMIT};
 
 const char *IC7851_am_bws[] = {
 "200",   "400",  "600",  "800", "1000", "1200", "1400", "1600", "1800", "2000",
 "2200", "2400", "2600", "2800", "3000", "3200", "3400", "3600", "3800", "4000",
 "4200", "4400", "4600", "4800", "5000", "5200", "5400", "5600", "5800", "6000",
-"6200", "6400", "6600", "6800", "7000", "7851", "7400", "7851", "7851", "8000",
+"6200", "6400", "6600", "6800", "7000", "_7851", "7400", "_7851", "_7851", "8000",
 "8200", "8400", "8600", "8800", "9000", "9200", "9400", "9600", "9800", "10000", NULL };
 
 static int IC7851_bw_vals_AM[] = {
- 1, 2, 3, 4, 5, 6, 7, 8, 9,10,
-11,12,13,14,15,16,17,18,19,20,
-21,22,23,24,25,26,27,28,29,30,
-31,32,33,34,35,36,37,38,39,40,
-41,42,43,44,45,46,47,48,49,50,
+ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+10,11,12,13,14,15,16,17,18,19,
+20,21,22,23,24,25,26,27,28,29,
+30,31,32,33,34,35,36,37,38,39,
+40,41,42,43,44,45,46,47,48,49,
 WVALS_LIMIT};
 
 const char *IC7851_fm_bws[] = { "FIXED", NULL };
@@ -192,6 +209,9 @@ RIG_IC7851::RIG_IC7851() {
 
 	has_xcvr_auto_on_off = true;
 
+	can_change_alt_vfo = true;
+	has_a2b = true;
+
 	precision = 1;
 	ndigits = 8;
 
@@ -264,64 +284,106 @@ bool RIG_IC7851::check ()
 	return ok;
 }
 
+static int ret = 0;
+
 unsigned long int RIG_IC7851::get_vfoA ()
 {
-	if (useB) return A.freq;
-	string resp = pre_fm;
-	resp += '\x03';
-	cmd = pre_to;
-	cmd += '\x03';
-	cmd.append( post );
-	if (waitFOR(11, "get vfo A")) {
+	string resp;
+
+	cmd.assign(pre_to).append("\x25");
+	resp.assign(pre_fm).append("\x25");
+
+	if (useB) {
+		cmd  += '\x01';
+		resp += '\x01';
+	} else {
+		cmd  += '\x00';
+		resp += '\x00';
+	}
+
+	cmd.append(post);
+
+	get_trace(1, "get_vfoA()");
+	ret = waitFOR(12, "get vfo A");
+	geth();
+
+	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			if (replystr[p+5] == -1)
+			if (replystr[p+6] == -1)
 				A.freq = 0;
 			else
-				A.freq = fm_bcd_be(replystr.substr(p+5), 10);
+				A.freq = fm_bcd_be(replystr.substr(p+6), 10);
 		}
 	}
+
 	return A.freq;
 }
 
 void RIG_IC7851::set_vfoA (unsigned long int freq)
 {
 	A.freq = freq;
-	cmd = pre_to;
-	cmd += '\x05';
-	cmd.append( to_bcd_be( freq, 10 ) );
+
+	cmd.assign(pre_to).append("\x25");
+	if (useB) cmd += '\x01';
+	else      cmd += '\x00';
+
+	cmd.append( to_bcd_be( freq, 10) );
 	cmd.append( post );
+
+	set_trace(1, "set_vfoA");
 	waitFB("set vfo A");
+	seth();
 }
 
 unsigned long int RIG_IC7851::get_vfoB ()
 {
-	if (!useB) return B.freq;
-	string resp = pre_fm;
-	resp += '\x03';
-	cmd = pre_to;
-	cmd += '\x03';
-	cmd.append( post );
-	if (waitFOR(11, "get vfo B")) {
+	string resp;
+
+	cmd.assign(pre_to).append("\x25");
+	resp.assign(pre_fm).append("\x25");
+
+	if (useB) {
+		cmd  += '\x00';
+		resp += '\x00';
+	} else {
+		cmd  += '\x01';
+		resp += '\x01';
+	}
+
+	cmd.append(post);
+
+	get_trace(1, "get_vfoB()");
+	ret = waitFOR(12, "get vfo B");
+	geth();
+
+	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
-			if (replystr[p+5] == -1)
+			if (replystr[p+6] == -1)
 				A.freq = 0;
 			else
-				B.freq = fm_bcd_be(replystr.substr(p+5), 10);
+				B.freq = fm_bcd_be(replystr.substr(p+6), 10);
 		}
 	}
+
 	return B.freq;
 }
 
 void RIG_IC7851::set_vfoB (unsigned long int freq)
 {
 	B.freq = freq;
-	cmd = pre_to;
-	cmd += '\x05';
+
+	cmd.assign(pre_to).append("\x25");
+	if (useB) cmd += '\x00';
+	else      cmd += '\x01';
+
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append( post );
+
+	set_trace(1, "set_vfoB");
 	waitFB("set vfo B");
+	seth();
 }
 
 bool RIG_IC7851::can_split()
@@ -360,121 +422,164 @@ int RIG_IC7851::get_split()
 void RIG_IC7851::set_modeA(int val)
 {
 	A.imode = val;
-	cmd = pre_to;
-	cmd += '\x06';
-	cmd += IC7851_mode_nbr[val];
+	cmd.assign(pre_to);
+	cmd += '\x26';
+	cmd += '\x00';
+	cmd += IC7851_mode_nbr[A.imode];	// operating mode
+	if (A.imode >= LSBD3_7851)
+		cmd += '\x03';					// data mode D1
+	else if (A.imode >= LSBD2_7851)
+		cmd += '\x02';					// data mode D2
+	else if (A.imode >= LSBD3_7851)
+		cmd += '\x01';					// data mode D1
+	else
+		cmd += '\x00';
+	cmd += mode_filterA[A.imode];		// filter
 	cmd.append( post );
-	waitFB("set modeA");
+	waitFB("set mode A");
 
-// digital set / clear
-	if (val >= 10) {
-		cmd = pre_to;
-		cmd.append("\x1A\x06");
-		switch (val) {
-			case 10 : case 13 : cmd.append("\x01\x01"); break;
-			case 11 : case 14 : cmd.append("\x02\x01"); break;
-			case 12 : case 15 : cmd.append("\x03\x01"); break;
-		}
-		cmd.append( post);
-		waitFB("set digital mode ON/OFF");
-	}
+	set_trace(4, 
+		"set mode A[",
+		IC7851modes_[A.imode], 
+		"] ", 
+		str2hex(cmd.c_str(), cmd.length()));
 }
+
+//  0  1  2  3  4  5  6  7  8  9
+// FE FE E0 94 26 NN NN NN NN FD
+//                |  |  |  |
+//                |  |  |  |__filter setting, 01, 02, 03
+//                |  |  |_____data mode, 00 - off, 01 - data mode 1
+//                |  |  |_____02 - data mode 2, 03 - data mode 3
+//                |  |________Mode 00 - LSB
+//                |                01 - USB
+//                |                02 - AM
+//                |                03 - CW
+//                |                04 - RTTY
+//                |                05 - FM
+//                |                07 - CW-R
+//                |                08 - RTTY-R
+//                |___________selected vfo, 00 - active, 01 - inactive
 
 int RIG_IC7851::get_modeA()
 {
 	int md = 0;
-	string resp;
 	size_t p;
-	cmd.assign(pre_to).append("\x04").append(post);
-	if (waitFOR(8, "get mode A")) {
-		resp.assign(pre_fm).append("\x04");
+
+	string resp;
+	resp.assign(pre_fm).append("\x26");
+
+	cmd.assign(pre_to).append("\x26");
+	cmd += '\x00';
+	cmd.append(post);
+
+	if (waitFOR(10, "get mode A")) {
 		p = replystr.rfind(resp);
+		if (p == string::npos)
+			goto end_wait_modeA;
 
-		if (p == string::npos) return A.imode;
+		if (replystr[p+6] == -1) { A.imode = A.filter = 0; return A.imode; }
 
-		if (replystr[p+5] == -1) { A.imode = 0; return A.imode; }
-
-		for (md = 0; md < 10; md++) {
-			if (replystr[p+5] == IC7851_mode_nbr[md]) {
+		for (md = 0; md < LSBD1_7851; md++) {
+			if (replystr[p+6] == IC7851_mode_nbr[md]) {
 				A.imode = md;
+				if (replystr[p+7] == 0x01 && A.imode < 4)
+					A.imode += 10;
+				if (replystr[p+7] == 0x02 && A.imode < 4)
+					A.imode += 14;
+				if (replystr[p+7] == 0x03 && A.imode < 4)
+					A.imode += 18;
+				if (A.imode > 21)
+					A.imode = 1;
+				break;
 			}
-		}
-		if (A.imode < 2) {
-			cmd.assign(pre_to).append("\x1A\x06").append(post);
-			if (waitFOR(9, "data mode?")) {
-				resp.assign(pre_fm).append("\x1A\x06");
-				p = replystr.rfind(resp);
-				if (p == string::npos) return A.imode;
-				int dmode = replystr[p+6];
-				if(dmode != 0) {
-					if (A.imode == 0) A.imode = 9 + dmode;
-					else if (A.imode == 1) A.imode = 12 + dmode;
-				}
-			}
+			A.filter = replystr[p+8];
 		}
 	}
-	if (A.imode > 15) A.imode = 0;
+
+end_wait_modeA:
+	get_trace(4, 
+		"get mode A[",
+		IC7851modes_[A.imode], 
+		"] ", 
+		str2hex(replystr.c_str(), replystr.length()));
+
+	mode_filterA[A.imode] = A.filter;
+
 	return A.imode;
 }
 
 void RIG_IC7851::set_modeB(int val)
 {
 	B.imode = val;
-	cmd.assign(pre_to).append("\x06");
-	cmd += IC7851_mode_nbr[val];
+	cmd.assign(pre_to);
+	cmd += '\x26';
+	cmd += '\x00';
+	cmd += IC7851_mode_nbr[B.imode];	// operating mode
+	if (B.imode >= LSBD3_7851)
+		cmd += '\x03';					// data mode D1
+	else if (B.imode >= LSBD2_7851)
+		cmd += '\x02';					// data mode D2
+	else if (B.imode >= LSBD3_7851)
+		cmd += '\x01';					// data mode D1
+	else
+		cmd += '\x00';
+	cmd += mode_filterB[B.imode];		// filter
 	cmd.append( post );
-	waitFB("set modeB");
+	waitFB("set mode B");
 
-// digital set / clear
-	if (val >= 10) {
-		cmd = pre_to;
-		cmd.append("\x1A\x06");
-		switch (val) {
-			case 10 : case 13 : cmd.append("\x01\x01"); break;
-			case 11 : case 14 : cmd.append("\x02\x01"); break;
-			case 12 : case 15 : cmd.append("\x03\x01"); break;
-		}
-		cmd.append( post);
-		waitFB("set digital mode ON/OFF");
-	}
+	set_trace(4, 
+		"set mode B[",
+		IC7851modes_[B.imode], 
+		"] ", 
+		str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_IC7851::get_modeB()
 {
 	int md = 0;
-	string resp;
 	size_t p;
-	cmd.assign(pre_to).append("\x04").append(post);
 
-	if (waitFOR(8, "get mode B")) {
-		resp.assign(pre_fm).append("\x04");
+	string resp;
+	resp.assign(pre_fm).append("\x26");
+
+	cmd.assign(pre_to).append("\x26");
+	cmd += '\x00';
+	cmd.append(post);
+
+	if (waitFOR(10, "get mode B")) {
 		p = replystr.rfind(resp);
+		if (p == string::npos)
+			goto end_wait_modeB;
 
-		if (p == string::npos) return B.imode;
+		if (replystr[p+6] == -1) { B.imode = B.filter = 0; return B.imode; }
 
-		if (replystr[p+5] == -1) { B.imode = 0; return B.imode; }
-
-		for (md = 0; md < 10; md++) 
-			if (replystr[p+5] == IC7851_mode_nbr[md])
+		for (md = 0; md < LSBD1_7851; md++) {
+			if (replystr[p+6] == IC7851_mode_nbr[md]) {
+				B.imode = md;
+				if (replystr[p+7] == 0x01 && B.imode < 4)
+					B.imode += 10;
+				if (replystr[p+7] == 0x02 && B.imode < 4)
+					B.imode += 14;
+				if (replystr[p+7] == 0x03 && B.imode < 4)
+					B.imode += 18;
+				if (B.imode > 21)
+					B.imode = 1;
 				break;
-
-		if (md == 10) md = 0;
-		B.imode = md;
-		if (B.imode < 2) {
-			cmd.assign(pre_to).append("\x1A\x06").append(post);
-			if (waitFOR(9, "data mode?")) {
-				resp.assign(pre_fm).append("\x1A\x06");
-				p = replystr.rfind(resp);
-				if (p == string::npos) return B.imode;
-				int dmode = replystr[p+6];
-				if(dmode != 0) {
-					if (B.imode == 0) B.imode = 9 + dmode;
-					else if (B.imode == 1) B.imode = 12 + dmode;
-				}
 			}
+			B.filter = replystr[p+8];
 		}
 	}
-	if (B.imode > 15) B.imode = 0;
+
+end_wait_modeB:
+	get_trace(4, 
+		"get mode B[",
+		IC7851modes_[B.imode], 
+		"] ", 
+		str2hex(replystr.c_str(), replystr.length()));
+
+	mode_filterB[B.imode] = B.filter;
+
 	return B.imode;
 }
 
@@ -1129,16 +1234,16 @@ void RIG_IC7851::set_notch(bool on, int freq)
 	int hexval;
 	switch (vfo->imode) {
 		default:
-		case USB7851: case USBD17851: case USBD27851: case USBD37851: case RTTYR7851:
+		case USB_7851: case USBD1_7851: case USBD2_7851: case USBD3_7851: case RTTYR_7851:
 			hexval = freq - 1500;
 			break;
-		case LSB7851: case LSBD17851: case LSBD27851: case LSBD37851: case RTTY7851:
+		case LSB_7851: case LSBD1_7851: case LSBD2_7851: case LSBD3_7851: case RTTY_7851:
 			hexval = 1500 - freq;
 			break;
-		case CW7851:
+		case CW_7851:
 			hexval = progStatus.cw_spot_tone - freq;
 			break;
-		case CWR7851:
+		case CWR_7851:
 			hexval = freq - progStatus.cw_spot_tone;
 			break;
 	}
@@ -1190,16 +1295,16 @@ bool RIG_IC7851::get_notch(int &val)
 				val *= 20;
 				switch (vfo->imode) {
 					default:
-					case USB7851: case USBD17851: case USBD27851: case USBD37851: case RTTYR7851:
+					case USB_7851: case USBD1_7851: case USBD2_7851: case USBD3_7851: case RTTYR_7851:
 						val = 1500 + val;
 						break;
-					case LSB: case LSBD17851: case LSBD27851: case LSBD37851: case RTTY7851:
+					case LSB: case LSBD1_7851: case LSBD2_7851: case LSBD3_7851: case RTTY_7851:
 						val = 1500 - val;
 						break;
-					case CW7851:
+					case CW_7851:
 						val = progStatus.cw_spot_tone - val;
 						break;
-					case CWR7851:
+					case CWR_7851:
 						val = progStatus.cw_spot_tone + val;
 						break;
 				}
@@ -1213,10 +1318,10 @@ void RIG_IC7851::get_notch_min_max_step(int &min, int &max, int &step)
 {
 	switch (vfo->imode) {
 		default:
-		case USB7851: case USBD17851: case USBD27851: case USBD37851: case RTTYR7851:
-		case LSB7851: case LSBD17851: case LSBD27851: case LSBD37851: case RTTY7851:
+		case USB_7851: case USBD1_7851: case USBD2_7851: case USBD3_7851: case RTTYR_7851:
+		case LSB_7851: case LSBD1_7851: case LSBD2_7851: case LSBD3_7851: case RTTY_7851:
 			min = 0; max = 3000; step = 20; break;
-		case CW7851: case CWR7851:
+		case CW_7851: case CWR_7851:
 			min = progStatus.cw_spot_tone - 500;
 			max = progStatus.cw_spot_tone + 500;
 			step = 20;
@@ -1224,3 +1329,5 @@ void RIG_IC7851::get_notch_min_max_step(int &min, int &max, int &step)
 	}
 }
 
+#undef NUM_FILTERS
+#undef NUM_MODES
