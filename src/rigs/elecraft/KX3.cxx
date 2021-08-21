@@ -24,6 +24,8 @@
 
 const char KX3name_[] = "KX3";
 
+enum {KX3_LSB, KX3_USB, KX3_CW, KX3_FM, KX3_AM, KX3_DATA, KX3_CWR, KX3_DATAR};
+
 const char *KX3modes_[] =
 	{ "LSB", "USB", "CW", "FM", "AM", "DATA", "CW-R", "DATA-R", NULL};
 const char modenbr[] =
@@ -198,6 +200,7 @@ void RIG_KX3::get_options()
 	gett("");
 	if (ret < 16)
 		return;
+
 	options.ATU  = (replystr[3] == 'A');
 	options.KXPA = (replystr[4] == 'P');
 	options.ROOF = (replystr[5] == 'F');
@@ -699,7 +702,7 @@ int RIG_KX3::get_power_out()
 	if (p == string::npos) return 0;
 	replystr[p + 5] = 0;
 	mtr = atoi(&replystr[p + 2]); 
-// mtr is power is tenths
+// mtr is power in tenths
 	powerScale = 10;
 	return mtr;
 }
@@ -794,6 +797,53 @@ void RIG_KX3::set_PTT_control(int val)
 	sendCommand(cmd, 0, 50);
 	sett("");
 	ptt_ = val;
+}
+
+/*
+ * IF (Transceiver Information; GET only)
+ *   RSP format: IF[f]*****+yyyyrx*00tmvspbd1*;
+ *   where the fields are defined as follows:
+ *     [f]    Operating frequency, excluding any RIT/XIT offset
+ *            (11 digits; see FA command format)
+ *      *     represents a space (BLANK, or ASCII 0x20)
+ *      +     either "+" or "-" (sign of RIT/XIT offset)
+ *      yyyy  RIT/XIT offset in Hz (range is -9999 to +9999 Hz when
+ *            computer-controlled)
+ *      r     1 if RIT is on, 0 if off
+ *      x     1 if XIT is on, 0 if off
+ *      t     1 if the K3 is in transmit mode, 0 if receive
+ *      m     operating mode (see MD command)
+ *      v     receive-mode VFO selection, 0 for VFO A, 1 for VFO B
+ *      s     1 if scan is in progress, 0 otherwise
+ *      p     1 if the transceiver is in split mode, 0 otherwise
+ *      b     Basic RSP format: always 0;
+ *            K2 Extended RSP format (K22):
+ *            1 if present IF response is due to a band change; 0 otherwise
+ *      d     Basic RSP format: always 0;
+ *            K3 Extended RSP format (K31):
+ *      1     DATA sub-mode, if applicable
+ *              (0=DATA A, 1=AFSK A, 2= FSK D, 3=PSK D)
+ * The fixed-value fields (space, 0, and 1) are provided for syntactic
+ * compatibility with existing software.
+ *
+ * 01234567890123456789012345678901234567
+ * 0         1         2         3      7
+ * IF00014070000*****+yyyyrx*00tmvspbd1*;
+ *   |         |               |   |  |_____ [35] data submode 
+ *   |         |               |   |________ [32] split on = '1', off = '0'
+ *   |         |               |____________ [28] PTT state; 1 = TX, 0 = RX 
+ *   |---------|____________________________ [02...12] vfo a/b
+*/
+
+int RIG_KX3::get_PTT()
+{
+	cmd = "IF;";
+	get_trace(1, "get PTT");
+	int ret = wait_char(';', 38, KX3_WAIT_TIME, "get split", ASC);
+	gett("");
+	if (ret < 38) return ptt_;
+	size_t p = replystr.rfind("IF");
+	return ptt_ = (replystr[p+28] == '1');
 }
 
 // BG (Bargraph Read; GET only)
@@ -1029,11 +1079,6 @@ bool RIG_KX3::get_if_shift(int &val)
 	return 1;
 }
 
-void RIG_KX3::get_if_min_max_step(int &min, int &max, int &step)
-{
-	min = if_shift_min; max = if_shift_max; step = if_shift_step;
-}
-
 void  RIG_KX3::get_if_mid()
 {
 	cmd = "IS 9999;";
@@ -1052,6 +1097,37 @@ void  RIG_KX3::get_if_mid()
 	size_t p = replystr.rfind("IS ");
 	if (p == string::npos) return;
 	sscanf(&replystr[p + 3], "%d", &if_shift_mid);
+}
+
+// KX3_LSB, KX3_USB, KX3_CW, KX3_FM, KX3_AM, KX3_DATA, KX3_CWR, KX3_DATAR
+void RIG_KX3::get_if_min_max_step(int &min, int &max, int &step)
+{
+	int md = modeA;
+	if (inuse == onB) md = modeB;
+	switch (md) {
+		case KX3_CW: case KX3_CWR:
+			if_shift_min = 330;
+			if_shift_max = 770;
+			if_shift_step = 10;
+			break;
+		case KX3_LSB:
+		case KX3_USB:
+		case KX3_DATA:
+		case KX3_DATAR:
+			if_shift_min = 1280;
+			if_shift_max = 1700;
+			if_shift_step = 10;
+			break;
+		default:
+			if_shift_min = 1500;
+			if_shift_max = 1500;
+			if_shift_step = 10;
+			break;
+	}
+	min = if_shift_min;
+	max = if_shift_max;
+	step = if_shift_step;
+	get_if_mid();
 }
 
 int RIG_KX3::get_swr()

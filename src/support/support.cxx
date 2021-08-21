@@ -324,12 +324,27 @@ void read_vfo()
 	}
 }
 
+void update_ifshift(void *d);
+
 void updateUI(void *)
 {
 	setModeControl(NULL);
 	setBWControl(NULL);
 	updateBandwidthControl(NULL);
 	highlight_vfo(NULL);
+
+	int min, max, step;
+	selrig->get_if_min_max_step(min, max, step);
+	if (sldrIFSHIFT) sldrIFSHIFT->minimum(min);
+	if (sldrIFSHIFT) sldrIFSHIFT->maximum(max);
+	if (sldrIFSHIFT) sldrIFSHIFT->step(step);
+	if (sldrIFSHIFT) sldrIFSHIFT->redraw();
+	if (spnrIFSHIFT) spnrIFSHIFT->minimum(min);
+	if (spnrIFSHIFT) spnrIFSHIFT->maximum(max);
+	if (spnrIFSHIFT) spnrIFSHIFT->step(step);
+	if (spnrIFSHIFT) spnrIFSHIFT->redraw();
+	update_ifshift((void *)0);
+
 }
 
 void setModeControl(void *)
@@ -392,6 +407,7 @@ void read_mode()
 			}
 			Fl::awake(setModeControl);
 			set_bandwidth_control();
+			Fl::awake(updateUI);
 		}
 		Fl::awake(setFILTER);
 		if (selrig->can_change_alt_vfo) {
@@ -411,6 +427,7 @@ void read_mode()
 			}
 			Fl::awake(setModeControl);
 			set_bandwidth_control();
+			Fl::awake(updateUI);
 		}
 		Fl::awake(setFILTER);
 		if (selrig->can_change_alt_vfo) {
@@ -910,57 +927,54 @@ void read_notch()
 }
 
 // power_control
+
 void update_power_control(void *d)
 {
+	double min, max, step;
+
 	set_power_controlImage(progStatus.power_level);
+
+	if (xcvr_name == rig_K2.name_ || xcvr_name == rig_KX3.name_) {
+		guard_lock serial(&mutex_serial);
+		selrig->get_pc_min_max_step(min, max, step);
+
+		if (sldrPOWER) {
+			sldrPOWER->minimum(min);
+			sldrPOWER->maximum(max);
+			sldrPOWER->step(step);
+		}
+
+		if (spnrPOWER) {
+			spnrPOWER->minimum(min);
+			spnrPOWER->maximum(max);
+			spnrPOWER->step(step);
+		}
+	}
+
 	if (sldrPOWER) {
 		sldrPOWER->value(progStatus.power_level);
 		sldrPOWER->redraw();
 	}
+
 	if (spnrPOWER) {
 		spnrPOWER->value(progStatus.power_level);
 		spnrPOWER->redraw();
-	}
-	if (xcvr_name == rig_K2.name_) {
-		double min, max, step;
-		selrig->get_pc_min_max_step(min, max, step);
-		if (sldrPOWER) sldrPOWER->minimum(min);
-		if (sldrPOWER) sldrPOWER->maximum(max);
-		if (sldrPOWER) sldrPOWER->step(step);
-		if (sldrPOWER) sldrPOWER->redraw();
-		if (spnrPOWER) spnrPOWER->minimum(min);
-		if (spnrPOWER) spnrPOWER->maximum(max);
-		if (spnrPOWER) spnrPOWER->step(step);
-		if (spnrPOWER) spnrPOWER->redraw();
 	}
 }
 
 void read_power_control()
 {
-	int val;
 	if (inhibit_power > 0) {
 		inhibit_power--;
 		return;
 	}
 	if (!selrig->has_power_control) return;
-	{
-		trace(1,"read_power_control()");
-		val = selrig->get_power_control();
-	}
-	if (val != progStatus.power_level  ||  val != vfo->power_control  ||  (sldrPOWER && val != sldrPOWER->value()) ) {
-		stringstream s;
-		s << "read_power_control(), UPDATE progStatus.power_level=" << progStatus.power_level << ", vfo->power_control=" << vfo->power_control << ", radio power=" << val << ", sldrPOWER->value()=" << (sldrPOWER ? sldrPOWER->value() : -1);
-		trace(1, s.str().c_str());
 
-		vfo->power_control = progStatus.power_level = val;
-		Fl::awake(update_power_control, (void*)0);
-	}
-	//else
-	//{
-	//	stringstream s;
-	//	s << "read_power_control(), CURRENT progStatus.power_level=" << progStatus.power_level << ", vfo->power_control=" << vfo->power_control << ", read power=" << val << ", sldrPOWER->value()=" << (sldrPOWER ? sldrPOWER->value() : -1);
-	//	trace(1, s.str().c_str());
-	//}
+	trace(1,"read_power_control()");
+	vfo->power_control = progStatus.power_level = selrig->get_power_control();
+
+	Fl::awake(update_power_control, (void*)0);
+
 }
 
 // mic gain
@@ -1075,7 +1089,7 @@ void check_ptt()
 {
 	int check = 0;
 
-	if (progStatus.comm_catptt) {
+	if (selrig->has_ptt_control || progStatus.comm_catptt) {
 		check = selrig->get_PTT();
 	} else if (progStatus.comm_dtrptt) {
 		check = RigSerial->getPTT();
@@ -1130,18 +1144,21 @@ POLL_PAIR RX_poll_pairs[] = {
 	{&progStatus.poll_break_in, check_break_in, "break-in"},
 	{NULL, NULL}
 };
+// moved to main polling loop
 //	{&progStatus.poll_ptt, check_ptt},
 //	{&progStatus.poll_smeter, read_smeter},
 //	{&progStatus.poll_vfoAorB, read_vfoAorB},
 //	{&progStatus.poll_frequency, read_vfo},
 
 POLL_PAIR TX_poll_pairs[] = {
+	{&progStatus.poll_power_control, read_power_control, "power"},
 	{&progStatus.poll_pout, read_power_out, "pout"},
 	{&progStatus.poll_swr, read_swr, "swr"},
 	{&progStatus.poll_alc, read_alc, "alc"},
 	{&progStatus.poll_split, read_split, "split"},
 	{NULL, NULL}
 };
+// moved to main polling loop
 //	{&progStatus.poll_ptt, check_ptt},
 
 POLL_PAIR *poll_parameters;
@@ -1373,6 +1390,7 @@ void serviceA(XCVR_STATE nuvals)
 			if (vfoA.imode != nuvals.imode) {
 				selrig->set_modeA(nuvals.imode);
 				selrig->get_modeA();
+				Fl::awake(updateUI);
 			}
 			if (vfoA.iBW != nuvals.iBW) {
 				selrig->set_bwA(nuvals.iBW);
@@ -1462,6 +1480,7 @@ void serviceB(XCVR_STATE nuvals)
 			if (vfoB.imode != nuvals.imode) {
 				selrig->set_modeB(nuvals.imode);
 				selrig->get_modeB();
+				Fl::awake(updateUI);
 			}
 			if (vfoB.iBW != nuvals.iBW) {
 				selrig->set_bwB(nuvals.iBW);
@@ -5275,6 +5294,7 @@ void set_init_if_shift_control()
 {
 	if (!selrig->has_ifshift_control)
 		return;
+
 	if (progStatus.use_rig_data) {
 		progStatus.shift = selrig->get_if_shift(progStatus.shift_val);
 		btnIFsh->value(progStatus.shift);

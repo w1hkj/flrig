@@ -44,6 +44,9 @@ public:
 	void set_modeB(int val);
 	int  get_modeB();
 
+	void selectA() { inuse = onA;}
+	void selectB() { inuse = onB;}
+
 	void set_volume_control(int val);
 	int  get_volume_control();
 	void get_vol_min_max_step(int &min, int &max, int &step) {
@@ -68,6 +71,7 @@ public:
 	void get_if_mid();
 
 	void set_PTT_control(int val);
+	int  get_PTT();
 
 	void set_attenuator(int val);
 	int  get_attenuator();
