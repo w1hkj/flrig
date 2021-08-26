@@ -6293,10 +6293,12 @@ void initStatusConfigDialog()
 	if (progStatus.use_tcpip) {
 		box_xcvr_connect->color(FL_BACKGROUND2_COLOR);
 		box_xcvr_connect->redraw();
-	} else if (progStatus.cmedia_ptt) {
-		open_cmedia(progStatus.cmedia_device);
 	} else {
-		if (!startXcvrSerial()) {
+		if (startXcvrSerial()) {
+			selectCommPort->value(progStatus.xcvr_serial_port.c_str());
+			box_xcvr_connect->color(FL_GREEN);
+			box_xcvr_connect->redraw();
+		} else {
 			if (progStatus.xcvr_serial_port.compare("NONE") == 0) {
 				LOG_WARN("No comm port ... test mode");
 			} else {
@@ -6312,26 +6314,25 @@ Press 'Init' button.", progStatus.xcvr_serial_port.c_str());
 			}
 			box_xcvr_connect->color(FL_BACKGROUND2_COLOR);
 			box_xcvr_connect->redraw();
-		} else {
-			selectCommPort->value(progStatus.xcvr_serial_port.c_str());
-			box_xcvr_connect->color(FL_GREEN);
-			box_xcvr_connect->redraw();
 		}
-		if (!startAuxSerial()) {
-			if (progStatus.aux_serial_port.compare("NONE") != 0) {
+		if ( progStatus.aux_serial_port != "NONE") {
+			if (!startAuxSerial()) {
 				LOG_WARN("Cannot open %s", progStatus.aux_serial_port.c_str());
 				progStatus.aux_serial_port = "NONE";
 				selectAuxPort->value(progStatus.aux_serial_port.c_str());
 			}
 		}
-		if (!startSepSerial()) {
-			if (progStatus.sep_serial_port.compare("NONE") != 0) {
+		if ( progStatus.sep_serial_port != "NONE") {
+			if (!startSepSerial()) {
 				LOG_WARN("Cannot open %s", progStatus.sep_serial_port.c_str());
 				progStatus.sep_serial_port = "NONE";
 				selectSepPTTPort->value(progStatus.sep_serial_port.c_str());
 			}
 		}
 	}
+
+	if (progStatus.cmedia_ptt)
+		open_cmedia(progStatus.cmedia_device);
 
 	init_title();
 

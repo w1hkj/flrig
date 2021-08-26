@@ -119,8 +119,6 @@ Serial port:\n\
 
 bool startAuxSerial()
 {
-	if (progStatus.aux_serial_port == "NONE") return false;
-
 	AuxSerial->Device(progStatus.aux_serial_port);
 	AuxSerial->Baud(BaudRate(progStatus.comm_baudrate));
 	AuxSerial->Stopbits(progStatus.stopbits);
@@ -136,8 +134,6 @@ bool startAuxSerial()
 
 bool startSepSerial()
 {
-	if (progStatus.sep_serial_port == "NONE") return false;
-
 	SepSerial->Device(progStatus.sep_serial_port);
 	SepSerial->Baud(BaudRate(progStatus.comm_baudrate));
 
