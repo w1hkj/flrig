@@ -564,7 +564,10 @@ int RIG_FT991A::get_PTT()
 
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return ptt_;
-	ptt_ =  (replystr[p+2] != '0' ? 1 : 0);
+	switch (replystr[p+2]) {
+		default: case '0' : ptt_ = false; break;
+		case '1': case '2': ptt_ = true; break;
+	}
 	return ptt_;
 }
 

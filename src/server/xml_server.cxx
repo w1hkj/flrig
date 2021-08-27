@@ -237,12 +237,12 @@ public:
 
 		if (selrig->has_smeter && !btnPTT->value()) {
 			static char szval[10];
-			snprintf(szval, sizeof(szval), "S:%d\n", (int)mval);
+			snprintf(szval, sizeof(szval), "S:%f.0\n", smtrval);
 			info.append(szval);
 		}
 		if (selrig->has_power_out && btnPTT->value()) {
 			static char szval[10];
-			snprintf(szval, sizeof(szval), "P:%d\n", (int)pwrval);
+			snprintf(szval, sizeof(szval), "P:%f.0\n", pwrval);
 			info.append(szval);
 		}
 

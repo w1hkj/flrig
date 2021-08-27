@@ -1141,12 +1141,14 @@ int RIG_TT550::get_smeter()
 		fval = sval/256.0;
 		sval = (int)(fval * 100.0 / 18.0);
 		if (sval > 100) sval = 0;
-		Fl::awake(updateFwdPwr, (void*)0);
+		smtrval = sval;
+		Fl::awake(updateSmeter);
 	}
 
 	else if (replystr[0] == 'T' && len > 3) {
 		fp = (unsigned char)replystr[1];
-		Fl::awake(updateFwdPwr, reinterpret_cast<void*>(fp));
+		pwrval = fp;
+		Fl::awake(updateFwdPwr);
 	}
 
 	return sval;

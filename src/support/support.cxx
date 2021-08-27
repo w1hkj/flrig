@@ -109,6 +109,13 @@ int meter_image = SWR_IMAGE;
 
 bool xcvr_online = false;
 
+// meter values passed to display functions
+
+double smtrval = 0;
+double pwrval = 0;
+double swrval = 0;
+double alcval = 0;
+
 //======================================================================
 // slider change processing
 //======================================================================
@@ -516,7 +523,6 @@ void read_bandwidth()
 }
 
 // read current signal level
-int mval = 0;
 void read_smeter()
 {
 	if (!selrig->has_smeter) return;
@@ -526,8 +532,8 @@ void read_smeter()
 		sig = selrig->get_smeter();
 	}
 	if (sig == -1) return;
-	mval = sig;
-	Fl::awake(updateSmeter, reinterpret_cast<void*>(sig));
+	smtrval = sig;
+	Fl::awake(updateSmeter);
 }
 
 int tunerval = 0;
@@ -551,7 +557,6 @@ void read_tuner()
 }
 
 // read power out
-int pwrval = 0;
 void read_power_out()
 {
 	if (!selrig->has_power_out) return;
@@ -562,11 +567,10 @@ void read_power_out()
 	}
 	if (sig == -1) return;
 	pwrval = sig;
-	Fl::awake(updateFwdPwr, reinterpret_cast<void*>(sig));
+	Fl::awake(updateFwdPwr);
 }
 
 // read swr
-int swrval = 0;
 void read_swr()
 {
 	if ((meter_image != SWR_IMAGE) ||
@@ -578,7 +582,7 @@ void read_swr()
 	}
 	if (sig == -1) return;
 	swrval = sig;
-	Fl::awake(updateSWR, reinterpret_cast<void*>(sig));
+	Fl::awake(updateSWR);
 }
 
 // alc
@@ -591,8 +595,9 @@ void read_alc()
 		trace(1,"read_alc()");
 		sig = selrig->get_alc();
 	}
-	if (sig > -1)
-		Fl::awake(updateALC, reinterpret_cast<void*>(sig));
+	if (sig < 0) return;
+	alcval = sig;
+	Fl::awake(updateALC);
 }
 
 // notch
@@ -1603,7 +1608,8 @@ void * serial_thread_loop(void *d)
 		if (PTT || cwio_process == SEND || cwio_process == CALIBRATE) {
 			if (isRX) {
 				isRX = false;
-				Fl::awake(updateSmeter, 0);
+				smtrval = 0;
+				Fl::awake(updateSmeter);
 			}
 			{	guard_lock lk(&mutex_serial);
 				while (1) {
@@ -3063,33 +3069,31 @@ void setRFGAINControl(void* d)
 	if (spnrRFGAIN) spnrRFGAIN->value(progStatus.rfgain);
 }
 
-void updateALC(void * d)
+void updateALC(void *)
 {
 	if (meter_image != ALC_IMAGE) return;
-	double data = (long)d;
 	sldrRcvSignal->hide();
 	sldrSWR->hide();
 	sldrALC->show();
-	sldrALC->value(data);
+	sldrALC->value(alcval);
 	sldrALC->redraw();
 }
 
-void updateSWR(void * d)
+void updateSWR(void *)
 {
 	if (meter_image != SWR_IMAGE) return;
-	double data = (long)d;
 	if (selrig->has_swr_control) {
 		sldrRcvSignal->hide();
 		sldrALC->hide();
 		sldrSWR->show();
 	}
-	sldrSWR->value(data);
+	sldrSWR->value(swrval);
 	sldrSWR->redraw();
 }
 
-void updateFwdPwr(void *d)
+void updateFwdPwr(void *)
 {
-	double power = (long)d;
+	double power = pwrval;
 	if (!sldrFwdPwr->visible()) {
 		sldrFwdPwr->show();
 	}
@@ -3123,12 +3127,12 @@ void updateRFgain(void *d)
 
 void zeroXmtMeters(void *d)
 {
+	pwrval = 0; updateFwdPwr();
+	alcval = 0; updateALC();
+	swrval = 0; updateSWR();
 	sldrFwdPwr->clear();
 	sldrALC->clear();
 	sldrSWR->clear();
-	updateFwdPwr(0);
-	updateALC(0);
-	updateSWR(0);
 }
 
 void setFreqDispA(void *d)
@@ -3145,16 +3149,15 @@ void setFreqDispB(void *d)
 	FreqDispB->redraw();
 }
 
-void updateSmeter(void *d) // 0 to 100;
+void updateSmeter(void *)
 {
-	double smeter = (long)d;
 	if (!sldrRcvSignal->visible()) {
 		sldrRcvSignal->show();
 		sldrFwdPwr->hide();
 		sldrALC->hide();
 		sldrSWR->hide();
 	}
-	sldrRcvSignal->value(smeter);
+	sldrRcvSignal->value(smtrval);
 	sldrRcvSignal->redraw();
 }
 

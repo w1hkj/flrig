@@ -323,17 +323,18 @@ extern void serial_timer(void *);
 
 extern void init_xmlrpc();
 
-extern void setFreqDispA(void *d);
-extern void setFreqDispB(void *d);
-extern void updateSmeter(void *d);
-extern void updateFwdPwr(void *d);
-extern void updateALC(void *d);
-extern void updateSWR(void *d);
-extern void updateSquelch(void *d);
-extern void updateRFgain(void *d);
-extern void zeroXmtMeters(void *d);
+extern void setFreqDispA(void *d = 0);
+extern void setFreqDispB(void *d = 0);
+extern void updateSmeter(void *d = 0);
+extern void updateFwdPwr(void *d = 0);
+extern void updateALC(void *d = 0);
+extern void updateSWR(void *d = 0);
+extern void updateSquelch(void *d = 0);
+extern void updateRFgain(void *d = 0);
+extern void zeroXmtMeters(void *d = 0);
 extern void set_power_controlImage(double);
-extern void update_UI_PTT(void *d = NULL);
+
+extern void update_UI_PTT(void *d = 0);
 
 extern void cb_send_command(string cmd, Fl_Output *resp = 0);
 extern const string lt_trim(const string& pString, const string& pWhitespace = " \"\t");
@@ -345,9 +346,10 @@ extern bool rig_notch;
 extern int rig_notch_val;
 extern void update_notch(void *d);
 
-extern int mval;
-extern int pwrval;
-extern int swrval;
+extern double smtrval;
+extern double pwrval;
+extern double swrval;
+extern double alcval;
 
 extern queue<VFOQUEUE> srvc_reqs;
 
