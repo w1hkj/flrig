@@ -119,6 +119,9 @@ Fl_Group *tabPOLLING = (Fl_Group *)0;
 	Fl_Check_Button *poll_ops = (Fl_Check_Button *)0;
 	Fl_Check_Button *poll_all = (Fl_Check_Button *)0;
 
+	Fl_Check_Button *disable_polling = (Fl_Check_Button *)0;
+	Fl_Check_Button *disable_xmlrpc = (Fl_Check_Button *)0;
+
 Fl_Group *tabSNDCMD = (Fl_Group *)0;
 	Fl_Input2 *txt_command = (Fl_Input2 *)0;
 	Fl_Button *btn_icom_pre = (Fl_Button *)0;
@@ -1729,6 +1732,14 @@ Fl_Group *createPOLLING(int X, int Y, int W, int H, const char *label)
 		poll_all->value(progStatus.poll_all);
 
 	xcvr_grp9->end();
+
+	disable_xmlrpc = new Fl_Check_Button(X + 10, Y + 230, 18, 18, _("Disable XmlRpc Server"));
+	disable_xmlrpc->tooltip(_("Use for testing ONLY!"));
+	disable_xmlrpc->value(0);
+
+	disable_polling = new Fl_Check_Button(X + 280, Y + 230, 18, 18, _("Disable Polling"));
+	disable_polling->tooltip(_("Use for testing ONLY!"));
+	disable_polling->value(0);
 
 	tabPOLLING->end();
 

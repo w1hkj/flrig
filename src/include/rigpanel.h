@@ -546,6 +546,8 @@ extern Fl_Check_Button *poll_break_in;
 extern Fl_Button *btnClearAddControls;
 extern Fl_Check_Button *poll_all;
 extern Fl_Button *btnSetAllAdd;
+extern Fl_Check_Button *disable_polling;
+extern Fl_Check_Button *disable_xmlrpc;
 extern Fl_Group *tabSndCmd;
 
 extern Fl_Input2 *txt_command;

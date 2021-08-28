@@ -1588,7 +1588,7 @@ void * serial_thread_loop(void *d)
 			break;
 		}
 
-		if (bypass_serial_thread_loop) {
+		if (bypass_serial_thread_loop || disable_polling->value()) {
 			goto serial_bypass_loop;
 		}
 
