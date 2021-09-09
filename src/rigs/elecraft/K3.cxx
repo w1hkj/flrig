@@ -452,6 +452,22 @@ int RIG_K3::get_power_control()
 
 void RIG_K3::get_pc_min_max_step(double &min, double &max, double &step)
 {
+	cmd = "OM;"; // request options to get power level
+	get_trace(1, "get options/pc_pwr_level");
+	int ret = wait_char(';', 16, K3_WAIT_TIME, "Options", ASC);
+	gett("");
+
+	if (ret) {
+		if (replystr.find("P") == string::npos) {
+			minpwr = 0;
+			maxpwr = 12;
+			steppwr = 1;
+		} else {
+			minpwr = 0;
+			maxpwr = 106;
+			steppwr = 1;
+		}
+	}
    min = minpwr; max = maxpwr; step = steppwr;
 }
 
