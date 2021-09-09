@@ -685,8 +685,7 @@ int RIG_KX3::get_power_out()
 					mtr = atoi(&replystr[p+3]);
 					if (mtr > 0) return mtr/10;
 				}
-			}
-			return 0;
+			} // in standby mode, fall through to read power out on KX3
 		}
 	}
 
@@ -877,8 +876,9 @@ int RIG_KX3::get_smeter()
 	if (p == string::npos) return 0;
 
 	int mtr = fm_decimal(replystr.substr(p+2), 4);
-	if (mtr <= 6) mtr = (int) (50.0 * mtr / 6.0);
-	else mtr = (int)(50 + (mtr - 6.0) * 50.0 / 9.0);
+// use extended format conversion
+	if (mtr <= 9) mtr = (int) (50.0 * mtr / 9.0);
+	else mtr = (int)(50 + (mtr - 9.0) * 50.0 / 12.0);
 
 	return mtr;
 }
@@ -1130,8 +1130,38 @@ void RIG_KX3::get_if_min_max_step(int &min, int &max, int &step)
 	get_if_mid();
 }
 
+// ^OP; return ^OPn;  5 characters
+//      ^OP1; signifies that KXPA100 is on-line and active
+// SW; return SWnnn;  6 characters
+// ^SW; return ^SWnnn;  7 characters (don't believe the programmer's guide!)
 int RIG_KX3::get_swr()
 {
+	if (options.KXPA) {
+		cmd = "^OP;";
+		get_trace(1, "test KXPA");
+		int ret = wait_char(';', 5, KX3_WAIT_TIME, "test KXPA", ASC);
+		gett("");
+		if (ret >= 5) {
+			powerScale = 1;
+			if (replystr.find("^OP1;") != string::npos) {
+				cmd = "^SW;";
+				get_trace(1, "get KXPA SWR");
+				ret = wait_char(';', 7, KX3_WAIT_TIME, "get KXPA SWR reading", ASC);
+				gett("");
+				if (ret >= 7) {
+					size_t p = replystr.rfind("^SW");
+					if (p != string::npos) {
+						replystr[p + 6] = 0;
+						int mtr = fm_decimal(replystr.substr(p+3), 3);
+						if (mtr <= 30) mtr = (int) (50.0 * (mtr - 10) / 20.0);
+						else mtr = (int)(50 + 50 * (mtr - 30) / 70);
+						return mtr;
+					}
+				}
+			} // in standby mode or not present, fall through to read SWR on KX3
+		}
+	}
+
 	cmd = "SW;";
 
 	get_trace(1, "get swr");

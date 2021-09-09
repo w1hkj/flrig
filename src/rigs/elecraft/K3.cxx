@@ -560,8 +560,10 @@ int RIG_K3::get_smeter()
 
 	int mtr = fm_decimal(replystr.substr(p+2), 4);
 
-	if (mtr <= 6) mtr = (int) (50.0 * mtr / 6.0);
-	else mtr = (int)(50 + (mtr - 6.0) * 50.0 / 9.0);
+// use extended format conversion
+	if (mtr <= 9) mtr = (int) (50.0 * mtr / 9.0);
+	else mtr = (int)(50 + (mtr - 9.0) * 50.0 / 12.0);
+
 	return mtr;
 }
 
