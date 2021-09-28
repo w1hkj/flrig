@@ -369,7 +369,7 @@ int RIG_FT450::get_power_out()
 	return (int)mtr;
 }
 
-int RIG_FT450::get_power_control()
+double RIG_FT450::get_power_control()
 {
 	cmd = rsp = "PC";
 	cmd += ';';

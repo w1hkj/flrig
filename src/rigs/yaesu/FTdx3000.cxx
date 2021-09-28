@@ -471,7 +471,7 @@ int RIG_FTdx3000::get_alc()
 }
 
 // Transceiver power level
-int RIG_FTdx3000::get_power_control()
+double RIG_FTdx3000::get_power_control()
 {
 	cmd = rsp = "PC";
 	cmd += ';';

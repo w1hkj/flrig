@@ -661,7 +661,7 @@ int RIG_TT588::get_split()
 }
 
 /*
-int  RIG_TT588::get_power_control(void)
+double  RIG_TT588::get_power_control(void)
 {
 	cmd = TT588getPOWER;
 	int ret = waitN(7, 100, "get pc");

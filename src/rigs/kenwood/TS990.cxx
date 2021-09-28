@@ -926,7 +926,7 @@ void RIG_TS990::set_power_control(double val)
 // Power control setting
 //==============================================================================
 // response: PCppp;
-int RIG_TS990::get_power_control()
+double RIG_TS990::get_power_control()
 {
 	ts990debug("get_power_control()");
 

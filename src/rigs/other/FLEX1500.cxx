@@ -293,7 +293,7 @@ void RIG_FLEX1500::set_power_control(double val)
 //	return (int)(10 * mtr);
 //}
 
-int RIG_FLEX1500::get_power_control()
+double RIG_FLEX1500::get_power_control()
 {
 	int pctrl = 0;
 	cmd = "PC;";

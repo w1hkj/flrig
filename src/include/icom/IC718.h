@@ -75,7 +75,7 @@ public:
 	int  get_rf_gain();
 	void set_squelch(int val);
 	void set_power_control(double val);
-	int  get_power_control();
+	double get_power_control();
 
 	void set_mic_gain(int val);
 	int  get_mic_gain();

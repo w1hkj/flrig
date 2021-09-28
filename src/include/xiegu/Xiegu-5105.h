@@ -80,7 +80,7 @@ public:
 	int  get_rf_gain();
 	void set_squelch(int val);
 	void set_power_control(double val);
-	int  get_power_control();
+	double get_power_control();
 
 	void set_mXiegu-5105_gain(int val);
 	int  get_mXiegu-5105_gain();

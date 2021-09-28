@@ -578,7 +578,7 @@ void RIG_ICF8101::set_power_control(double val)
 
 // reply FE FE E0 8A 1A 05 03 07 00 XX FD
 
-int RIG_ICF8101::get_power_control()
+double RIG_ICF8101::get_power_control()
 {
 	string cstr = "\x1A\x05\x03\x07";
 	string resp = pre_fm;

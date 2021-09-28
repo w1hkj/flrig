@@ -916,7 +916,7 @@ void RIG_IC9100::set_power_control(double val)
 	set_trace(2, "set_power_control()", str2hex(replystr.c_str(), replystr.length()));
 }
 
-int RIG_IC9100::get_power_control()
+double RIG_IC9100::get_power_control()
 {
 	int val = progStatus.power_level;
 	string cstr = "\x14\x0A";

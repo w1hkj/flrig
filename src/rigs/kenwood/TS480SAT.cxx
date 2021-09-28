@@ -699,7 +699,7 @@ void RIG_TS480SAT::set_power_control(double val)
 	sett("power control");
 }
 
-int RIG_TS480SAT::get_power_control()
+double RIG_TS480SAT::get_power_control()
 {
 	int val = progStatus.power_level;
 	cmd = "PC;";

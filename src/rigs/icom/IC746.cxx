@@ -1266,7 +1266,7 @@ void RIG_IC746PRO::set_power_control(double val)
 	waitFB("set power");
 }
 
-int RIG_IC746PRO::get_power_control()
+double RIG_IC746PRO::get_power_control()
 {
 	string cstr = "\x14\x0A";
 	string resp = pre_fm;

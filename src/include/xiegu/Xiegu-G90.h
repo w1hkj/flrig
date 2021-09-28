@@ -116,7 +116,7 @@ public:
 //	int  get_PTT();
 
 	void set_power_control(double val);
-	int  get_power_control();
+	double get_power_control();
 	void get_pc_min_max_step(double &min, double &max, double &step);
 
 	void set_volume_control(int val);

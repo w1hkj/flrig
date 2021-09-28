@@ -1584,7 +1584,7 @@ void RIG_TT550::set_power_control(double val)
 	set_trace(1, s.str().c_str());
 }
 
-int RIG_TT550::get_power_control()
+double RIG_TT550::get_power_control()
 {
 	return progStatus.power_level;
 }

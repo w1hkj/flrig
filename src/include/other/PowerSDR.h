@@ -73,7 +73,7 @@ enum PowerSDRMODES { LSB, USB, DSB, CWL, CWU, FM, AM, DIGU, SPEC, DIGL, SAM, DRM
 //	void select_swr();
 //	void select_alc();
 	int  get_power_out();
-	int  get_power_control();
+	double get_power_control();
 //	void set_volume_control(int val);
 //	int  get_volume_control();
 	void set_power_control(double val);

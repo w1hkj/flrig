@@ -382,7 +382,7 @@ void RIG_TS570::set_power_control(double val)
 	showresp(WARN, ASC, "set pwr", cmd, "");
 }
 
-int RIG_TS570::get_power_control()
+double RIG_TS570::get_power_control()
 {
 	cmd = "PC;";
 

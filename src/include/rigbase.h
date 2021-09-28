@@ -47,7 +47,7 @@ struct XCVR_STATE {
 	int  src;
 
 	int		split;
-	int		power_control;
+	double	power_control;
 	int		volume_control;
 	int		attenuator;
 	int		preamp;
@@ -400,7 +400,7 @@ public:
 
 int po_, po_val;
 int pmax;
-	virtual int  get_power_control(void) {return po_;}
+	virtual double get_power_control(void) {return po_;}
 	virtual void set_power_control(double val) {po_ = val;}
 	virtual void get_pc_min_max_step(double &min, double &max, double &step) {
 		min = 0; pmax = max = 100; step = 1; }

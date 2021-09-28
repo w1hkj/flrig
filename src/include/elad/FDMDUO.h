@@ -75,9 +75,9 @@ public:
 		min = 0; max = 100; step = 1;
 	}
 	void set_power_control(double val);
-	int  get_power_control();
+	double get_power_control();
 	void get_pc_min_max_step(double &min, double &max, double &step) {
-		min = 0; max = 50; step = 1; }
+		min = 0.1; max = 5.0; step = 0.1; }
 
 	void set_noise(bool b);
 	int  get_noise();

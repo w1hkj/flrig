@@ -640,7 +640,7 @@ int RIG_FDMDUO::def_bandwidth(int val)
 void RIG_FDMDUO::set_power_control(double val)
 {
 	char szval[8];
-	snprintf(szval, sizeof(szval), "TQ%04d;", (int)(val * 100));
+	snprintf(szval, sizeof(szval), "TQ%04d;", (int)(val * 1000));
 	cmd = szval;
 	set_trace(1, "set power control ");
 	sendCommand(cmd);
@@ -648,9 +648,9 @@ void RIG_FDMDUO::set_power_control(double val)
 	LOG_WARN("%s", cmd.c_str());
 }
 
-int RIG_FDMDUO::get_power_control()
+double RIG_FDMDUO::get_power_control()
 {
-	int val = progStatus.power_level;
+	double val = progStatus.power_level;
 	cmd = "TQ;";
 	get_trace(1, "get_power_control");
 	ret = wait_char(';', 7, 100, "get Power control", ASC);
@@ -662,7 +662,7 @@ int RIG_FDMDUO::get_power_control()
 
 	val = atoi(&replystr[p + 2]);
 
-	return val / 100.0;
+	return val / 1000.0;
 }
 
 void RIG_FDMDUO::set_attenuator(int val)

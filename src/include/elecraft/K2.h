@@ -68,7 +68,7 @@ public:
 	int  get_PTT();
 
 	void get_pc_min_max_step(double &min, double &max, double &step);
-	int  get_power_control();
+	double get_power_control();
 	void set_power_control(double val);
 	int  get_smeter();
 	int  get_power_out();

@@ -446,7 +446,7 @@ void RIG_XI5105::set_power_control(double val)
 	waitFB("set power");
 }
 
-int RIG_XI5105::get_power_control()
+double RIG_XI5105::get_power_control()
 {
 	string cstr = "\x14\x0A";
 	string resp = pre_fm;

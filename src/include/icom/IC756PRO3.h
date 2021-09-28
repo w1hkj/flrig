@@ -94,7 +94,7 @@ public:
 	int  get_rf_gain();
 	
 	void set_power_control(double val);
-	int  get_power_control();
+	double get_power_control();
 
 	void set_split(bool val);
 	int  get_split();

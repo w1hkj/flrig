@@ -323,7 +323,7 @@ void RIG_TS890S::set_power_control(double val)
 	sendCommand(cmd, 0);
 }
 
-int RIG_TS890S::get_power_control()
+double RIG_TS890S::get_power_control()
 {
 	cmd = "PC;";
 	if (wait_char(';', 6, 100, "get pwr ctrl", ASC) < 6) return 0;

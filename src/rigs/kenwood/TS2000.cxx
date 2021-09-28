@@ -309,7 +309,7 @@ int RIG_TS2000::get_power_out()
 	return poutmtr;
 }
 
-int RIG_TS2000::get_power_control()
+double RIG_TS2000::get_power_control()
 {
 	int pctrl = 0;
 	cmd = "PC;";

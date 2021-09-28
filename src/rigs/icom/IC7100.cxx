@@ -1262,7 +1262,7 @@ void RIG_IC7100::set_power_control(double val)
 	seth();
 }
 
-int RIG_IC7100::get_power_control()
+double RIG_IC7100::get_power_control()
 {
 	int val = progStatus.power_level;
 	string cstr = "\x14\x0A";

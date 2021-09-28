@@ -66,7 +66,7 @@ public:
 	void get_vol_min_max_step(int &min, int &max, int &step);
 
 	void set_power_control(double val);
-	int  get_power_control();
+	double get_power_control();
 	void get_pc_min_max_step(double &min, double &max, double &step);
 
 	void set_rf_gain(int val);

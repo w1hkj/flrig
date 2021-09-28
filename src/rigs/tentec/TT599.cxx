@@ -336,7 +336,7 @@ void RIG_TT599::set_preamp(int val)
 // *RMAF - fast *RMAM - medium *RMAS - slow
 //}
 
-int  RIG_TT599::get_power_control(void)
+double  RIG_TT599::get_power_control(void)
 {
 	size_t p;
 	cmd = "?TP\r";

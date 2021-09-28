@@ -54,7 +54,7 @@ public:
 
 
 	void set_power_control(double val);
-	int  get_power_control();
+	double get_power_control();
 	void get_pc_min_max_step(double &, double &, double &);
 
 	void set_rf_gain(int val);

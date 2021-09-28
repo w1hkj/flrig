@@ -627,7 +627,7 @@ void RIG_KX3::set_power_control(double val)
 	sett("");
 }
 
-int RIG_KX3::get_power_control()
+double RIG_KX3::get_power_control()
 {
 	cmd = "PC;";
 

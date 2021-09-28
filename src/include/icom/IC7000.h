@@ -68,7 +68,7 @@ public:
 	void set_squelch(int val);
 	int  get_squelch();
 	void set_power_control(double val);
-	int  get_power_control();
+	double get_power_control();
 	int  get_auto_notch();
 	void set_auto_notch(int v);
 	int  get_smeter();

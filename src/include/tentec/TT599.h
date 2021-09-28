@@ -59,7 +59,7 @@ public:
 	int  get_modetype(int n);
 	void set_preamp(int);
 	int  get_preamp();
-	int  get_power_control(void);
+	double get_power_control(void);
 	void set_power_control(double val);
 	void set_auto_notch(int v);
 	int  get_auto_notch();

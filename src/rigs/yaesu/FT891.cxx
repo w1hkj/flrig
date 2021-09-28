@@ -451,7 +451,7 @@ int RIG_FT891::get_power_out()
 }
 
 // Transceiver power level
-int RIG_FT891::get_power_control()
+double RIG_FT891::get_power_control()
 {
 	cmd = rsp = "PC";
 	cmd += ';';

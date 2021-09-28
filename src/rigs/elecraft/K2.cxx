@@ -506,7 +506,7 @@ int RIG_K2::get_power_out()
 	return mtr;
 }
 
-int RIG_K2::get_power_control()
+double RIG_K2::get_power_control()
 {
 	rsp = cmd = "PC";  // extended mode for get power
 	cmd += ';';

@@ -314,7 +314,7 @@ void RIG_TS590S::set_power_control(double val)
 	sendCommand(cmd, 0);
 }
 
-int RIG_TS590S::get_power_control()
+double RIG_TS590S::get_power_control()
 {
 	cmd = "PC;";
 	get_trace(1, "get_power_control");

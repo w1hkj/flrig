@@ -466,7 +466,7 @@ void RIG_TS870S::set_power_control(double val)
 }
 
 //----------------------------------------------------------------------
-int RIG_TS870S::get_power_control()
+double RIG_TS870S::get_power_control()
 {
 	cmd = "PC;";
 	if (wait_char(';', 6, 100, "get pwr ctrl", ASC) < 6) return 0;

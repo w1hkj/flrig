@@ -93,7 +93,7 @@ public:
 	int  get_swr();
 	int  get_power_out();
 
-//	int  get_power_control(void);
+//	double get_power_control(void);
 //	void set_power_control(double val);
 //	void get_pc_min_max_step(double &min, double &max, double &step) {
 //		min = 0; max = 100; step = 1; }

@@ -73,7 +73,7 @@ public:
 	void setVfoAdj(double v);
 	int  get_swr();
 	int  get_power_out();
-//	int  get_power_control();
+//	double get_power_control();
 //	void set_power_control(double val);
 	void set_PTT_control(int val);
 //	void tune_rig();

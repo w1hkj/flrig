@@ -76,7 +76,7 @@ public:
 	virtual int  get_swr();
 	virtual int  get_alc();
 	virtual int  get_power_out();
-	virtual int  get_power_control();
+	virtual double get_power_control();
 	virtual void set_power_control(double val);
 	virtual void get_pc_min_max_step(double &min, double &max, double &step) {
 		min = 5; pmax = max = 100; step = 1; }
@@ -151,7 +151,7 @@ public:
 	void get_pc_min_max_step(double &min, double &max, double &step) {
 		min = 5; pmax = max = 200; step = 1; }
 	int  get_power_out();
-	int  get_power_control();
+	double get_power_control();
 	void set_power_control(double val);
 };
 

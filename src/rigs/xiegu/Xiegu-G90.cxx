@@ -638,7 +638,7 @@ void RIG_Xiegu_G90::set_power_control(double val)
 	isett("");
 }
 
-int RIG_Xiegu_G90::get_power_control()
+double RIG_Xiegu_G90::get_power_control()
 {
 	int val = pwrtbl[int(progStatus.power_level) - 1].mtr;
 

@@ -345,7 +345,7 @@ int RIG_TMD710::get_PTT()
 }
 
 // Transceiver power level
-int RIG_TMD710::get_power_control()
+double RIG_TMD710::get_power_control()
 {
 	char seite[2];
 	cmd = "PC ";

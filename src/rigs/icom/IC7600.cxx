@@ -853,7 +853,7 @@ void RIG_IC7600::set_power_control(double value)
 	waitFB("set power");
 }
 
-int RIG_IC7600::get_power_control()
+double RIG_IC7600::get_power_control()
 {
 	int val = progStatus.power_level;
 	string cstr = "\x14\x0A";

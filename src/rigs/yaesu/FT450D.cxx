@@ -445,7 +445,7 @@ int RIG_FT450D::get_power_out()
 	return (int)ceil(mtr);
 }
 
-int RIG_FT450D::get_power_control()
+double RIG_FT450D::get_power_control()
 {
 	cmd = rsp = "PC";
 	cmd += ';';

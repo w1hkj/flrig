@@ -478,7 +478,7 @@ int RIG_FTdx9000::get_power_out()
 	return (int)pwr;
 }
 
-int RIG_FTdx9000::get_power_control()
+double RIG_FTdx9000::get_power_control()
 {
 	cmd = rsp = "PC";
 	cmd += ';';

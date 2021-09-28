@@ -439,7 +439,7 @@ int RIG_TT566::get_modetype(int n)
 	return RIG_TT566_mode_type[n];
 }
 
-int  RIG_TT566::get_power_control(void)
+double RIG_TT566::get_power_control(void)
 {
 	cmd = TT566getPWR;
 	sendCommand(cmd, strlen(TT566rspPWR)+4);

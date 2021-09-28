@@ -93,7 +93,7 @@ enum TS590MODES { LSB, USB, CW, FM, AM, FSK, CWR, FSKR, LSBD, USBD, FMD };
 	virtual void select_alc();
 
 //	virtual int  get_power_out();
-//	virtual int  get_power_control();
+//	virtual double get_power_control();
 	virtual void set_volume_control(int val);
 	virtual int  get_volume_control();
 //	virtual void set_power_control(double val);

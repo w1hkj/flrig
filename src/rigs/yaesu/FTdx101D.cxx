@@ -514,7 +514,7 @@ int RIG_FTdx101D::get_alc()
 }
 
 // Transceiver power level
-int RIG_FTdx101D::get_power_control()
+double RIG_FTdx101D::get_power_control()
 {
 	cmd = rsp = "PC";
 	cmd += ';';
@@ -1462,7 +1462,7 @@ int RIG_FTdx101MP::get_power_out()
 	return (int)pwr;
 }
 
-int RIG_FTdx101MP::get_power_control()
+double RIG_FTdx101MP::get_power_control()
 {
 	cmd = rsp = "PC";
 	cmd += ';';

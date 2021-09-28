@@ -150,7 +150,7 @@ public:
 	int  get_pbt_outer();
 
 	virtual void set_power_control(double val);
-	virtual int  get_power_control();
+	virtual double get_power_control();
 
 	virtual void set_split(bool val);
 	virtual int  get_split();

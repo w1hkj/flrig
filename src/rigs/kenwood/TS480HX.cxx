@@ -720,7 +720,7 @@ void RIG_TS480HX::set_power_control(double val)
 	sendCommand(cmd);
 }
 
-int RIG_TS480HX::get_power_control()
+double RIG_TS480HX::get_power_control()
 {
 	int val = progStatus.power_level;
 	cmd = "PC;";

@@ -198,7 +198,7 @@ Data Source: %s\n\
   mode ........... %d [%s]\n\
   filter ......... %s\n\
   bwt index ...... %2d, [%s] [%s]\n\
-  split .......... %4d, power_control . %4d, volume_control  %4d\n\
+  split .......... %4d, power_control . %4.1f, volume_control  %4d\n\
   attenuator ..... %4d, preamp ........ %4d, rf gain ....... %4d\n\
   if_shift ....... %4d, shift val ..... %4d\n\
   auto notch ..... %4d, notch ......... %4d, notch value ... %4d\n\
@@ -2877,7 +2877,7 @@ void setPower()
 	str << "setPower(), ev=" << ev << ", inhibit_power=" << inhibit_power;
 	trace(1, str.str().c_str());
 
-	int set = 0;
+	double set = 0;
 
 	if (spnrPOWER) set = progStatus.power_level = spnrPOWER->value();
 	if (sldrPOWER) set = progStatus.power_level = sldrPOWER->value();

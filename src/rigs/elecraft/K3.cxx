@@ -437,7 +437,7 @@ void RIG_K3::set_power_control(double val)
 	sett("");
 }
 
-int RIG_K3::get_power_control()
+double RIG_K3::get_power_control()
 {
 	cmd = "PC;";
 	get_trace(1, "get power control");

@@ -69,7 +69,7 @@ public:
 	int  get_smeter();
 	int  get_swr();
 	int  get_power_out();
-	int  get_power_control();
+	double get_power_control();
 	void set_volume_control(int val);
 	int  get_volume_control();
 	void set_power_control(double val);

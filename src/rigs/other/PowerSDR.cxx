@@ -296,7 +296,7 @@ int RIG_PowerSDR::get_power_out()
 }
 
 
-int RIG_PowerSDR::get_power_control()
+double RIG_PowerSDR::get_power_control()
 {
 	int pctrl = 0;
 	cmd = "PC;";

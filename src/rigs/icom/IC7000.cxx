@@ -714,7 +714,7 @@ void RIG_IC7000::set_power_control(double val)
 	isett("set_power_control()");
 }
 
-int RIG_IC7000::get_power_control()
+double RIG_IC7000::get_power_control()
 {
 	string cstr = "\x14\x0A";
 	string resp = pre_fm;

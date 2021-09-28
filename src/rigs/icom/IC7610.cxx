@@ -1294,7 +1294,7 @@ void RIG_IC7610::set_power_control(double val)
 	set_trace(2, "set_power_control() ", str2hex(cmd.c_str(), cmd.length()));
 }
 
-int RIG_IC7610::get_power_control()
+double RIG_IC7610::get_power_control()
 {
 	int val = progStatus.power_level;
 	string cstr = "\x14\x0A";

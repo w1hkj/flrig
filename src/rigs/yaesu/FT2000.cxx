@@ -312,7 +312,7 @@ int RIG_FT2000::get_power_out()
 	return (int)mtr;
 }
 
-int RIG_FT2000::get_power_control()
+double RIG_FT2000::get_power_control()
 {
 	cmd = "PC;";
 	int ret = wait_char(';', 6, 100, "get pwr ctl", ASC);

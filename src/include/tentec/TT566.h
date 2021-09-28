@@ -62,7 +62,7 @@ public:
 	void set_noise(bool);
 	int  get_noise();
 
-	int  get_power_control(void);
+	double get_power_control(void);
 	void set_power_control(double val);
 	void set_auto_notch(int v);
 	int  get_auto_notch();
