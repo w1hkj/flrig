@@ -132,6 +132,7 @@ flrig_SOURCES += \
 	main.cxx \
 	rigs/rigbase.cxx \
 	rigs/rigs.cxx \
+	rigs/elad/FDMDUO.cxx \
 	rigs/icom/ICbase.cxx \
 	rigs/icom/IC703.cxx \
 	rigs/icom/IC705.cxx \
@@ -299,6 +300,7 @@ EXTRA_DIST = \
 	include/hidapi.h \
 	include/hid_mac.h \
 	include/hid_win.h \
+	include/elad/FDMDUO.h \
 	include/icom/ICbase.h \
 	include/icom/IC703.h \
 	include/icom/IC705.h \
