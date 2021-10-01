@@ -466,6 +466,7 @@ struct status {
 	int		cwioSHARED;
 	int		cwioPTT;
 	int		cwioCONNECTED;
+	int		cwioINVERTED;
 	double	cwio_comp;
 	string	cwioPORT;
 	string	cwio_msgs[12];

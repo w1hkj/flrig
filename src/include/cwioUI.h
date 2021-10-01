@@ -49,5 +49,6 @@ extern Fl_Spinner *cntr_cwioPTT;
 extern Fl_Light_Button *btn_cw_dtr_calibrate;
 #include <FL/Fl_Counter.H>
 extern Fl_Counter *cnt_cwio_comp;
+extern Fl_Check_Button *btn_cwioINVERTED;
 Fl_Double_Window* cwio_config_dialog();
 #endif

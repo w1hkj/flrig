@@ -481,6 +481,7 @@ status progStatus = {
 	0,			// int    cwioSHARED; 0 = NONE, 1 = CAT, 2 = AUX, 3 = SEP
 	0,			// int    cwioPTT; 1 - use PTT, 0 - use Brea-in
 	0,			// int    cwioCONNECTED; 1 - connected state; 0 - unconnected state
+	0,			// int    cwioINVERTED; 1 - DTR/RTS (-) keying; 
 	0,			// double cwio_comp;
 	"",			// string cwioPORT;
 
@@ -1029,6 +1030,7 @@ void status::saveLastState()
 	spref.set("cwioSHARED", cwioSHARED);
 	spref.set("cwioPTT", cwioPTT);
 	spref.set("cwioCONNECTED", cwioCONNECTED);
+	spref.set("cwioINVERTED", cwioINVERTED);
 	spref.set("cwioPORT", cwioPORT.c_str());
 	char setbuff[20];
 	for (int n = 0; n < 12; n++) {
@@ -1679,6 +1681,7 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("cwioSHARED", cwioSHARED, cwioSHARED);
 		spref.get("cwioPTT", cwioPTT, cwioPTT);
 		spref.get("cwioCONNECTED", cwioCONNECTED, cwioCONNECTED);
+		spref.get("cwioINVERTED", cwioINVERTED, cwioINVERTED);
 		spref.get("cwioPORT", defbuffer, "NONE", 499);
 		cwioPORT = defbuffer;
 		char getbuff[20];

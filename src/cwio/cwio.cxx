@@ -98,9 +98,9 @@ void send_cwkey(char c)
 			goto exit_send_cwkey;
 		}
 		if (progStatus.cwioKEYLINE == 2) {
-			port->setDTR(1);
+			port->setDTR(progStatus.cwioINVERTED ? 0 : 1);
 		} else if (progStatus.cwioKEYLINE == 1) {
-			port->setRTS(1);
+			port->setRTS(progStatus.cwioINVERTED ? 0 : 1);
 		}
 		if (code[n] == '.')
 			MilliSleep(tc);
@@ -108,9 +108,9 @@ void send_cwkey(char c)
 			MilliSleep(tch);
 
 		if (progStatus.cwioKEYLINE == 2) {
-			port->setDTR(0);
+			port->setDTR(progStatus.cwioINVERTED ? 1 : 0);
 		} else if (progStatus.cwioKEYLINE == 1) {
-			port->setRTS(0);
+			port->setRTS(progStatus.cwioINVERTED ? 1 : 0);
 		}
 		if (n == code.length() -1)
 			MilliSleep(tch);
@@ -122,10 +122,28 @@ exit_send_cwkey:
 	return;
 }
 
+void reset_cwioport()
+{
+	Cserial *port = cwio_serial;
+	switch (progStatus.cwioSHARED) {
+		case 1: port = RigSerial; break;
+		case 2: port = AuxSerial; break;
+		case 3: port = SepSerial; break;
+		default: port = cwio_serial;
+	}
+	if (progStatus.cwioKEYLINE == 2) {
+		port->setDTR(progStatus.cwioINVERTED ? 1 : 0);
+	} else if (progStatus.cwioKEYLINE == 1) {
+		port->setRTS(progStatus.cwioINVERTED ? 1 : 0);
+	}
+}
+
 int open_cwkey()
 {
-	if (progStatus.cwioSHARED)
+	if (progStatus.cwioSHARED) {
+		reset_cwioport();
 		return 1;
+	}
 	if (!cwio_serial)
 		cwio_serial = new Cserial;
 
@@ -138,8 +156,7 @@ int open_cwkey()
 	}
 	LOG_INFO("Opened %s for CW keyline control", cwio_serial->Device().c_str());
 
-	cwio_serial->RTS(false);
-	cwio_serial->DTR(false);
+	reset_cwioport();
 
 	return 1;
 }

@@ -46,6 +46,7 @@ extern Cmorse  *morse;
 extern void send_cwkey(int c);
 extern int  open_cwkey();
 extern void close_cwkey();
+extern void reset_cwioport();
 
 extern int  start_cwio_thread();
 extern void stop_cwio_thread();

@@ -412,7 +412,7 @@ morse->init();} open
         label VE
         callback {int c = o->index();
 progStatus.VE[0] = ps[c];
-morse->init();} open selected
+morse->init();} open
         xywh {570 199 60 22} box DOWN_BOX color 7 align 4
         code0 {o->add(szProsigns);}
         code1 {o->value(progStatus.VE.c_str()); o->labelsize(FL_NORMAL_SIZE);}
@@ -566,6 +566,14 @@ progStatus.cwioSHARED = 0;}
         tooltip {Timing compensation} xywh {368 41 100 24} align 4 minimum 0 maximum 10
         code0 {o->value(progStatus.cwio_comp);}
         code1 {o->lstep(1.0);}
+      }
+      Fl_Check_Button btn_cwioINVERTED {
+        label Inverted
+        callback {progStatus.cwioINVERTED = o->value();
+reset_cwioport();} selected
+        tooltip {DTR/RTS signaling is inverted
+(-) keying} xywh {208 46 23 15} down_box DOWN_BOX align 4
+        code0 {o->value(progStatus.cwioINVERTED);}
       }
     }
   }

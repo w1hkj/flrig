@@ -306,7 +306,6 @@ static void cb_edit_msgb(Fl_Input2*, void*) {
 
 Fl_ListBox *listbox_BT=(Fl_ListBox *)0;
 
-#include <iostream>
 static void cb_listbox_BT(Fl_ListBox* o, void*) {
   int c = o->index();
 progStatus.BT[0] = ps[c];
@@ -728,7 +727,6 @@ Fl_Double_Window* make_message_editor() {
     } // Fl_Tabs* o
     { Fl_Group* o = new Fl_Group(534, 0, 101, 224);
       o->box(FL_ENGRAVED_FRAME);
-
       { Fl_ListBox* o = listbox_BT = new Fl_ListBox(570, 6, 60, 22, _("BT"));
         listbox_BT->box(FL_DOWN_BOX);
         listbox_BT->color(FL_BACKGROUND2_COLOR);
@@ -741,8 +739,7 @@ Fl_Double_Window* make_message_editor() {
         listbox_BT->align(Fl_Align(FL_ALIGN_LEFT));
         listbox_BT->when(FL_WHEN_RELEASE);
         o->add(szProsigns);
-        o->value(progStatus.BT.c_str());
-        o->labelsize(FL_NORMAL_SIZE);
+        o->value(progStatus.BT.c_str()); o->labelsize(FL_NORMAL_SIZE);
         listbox_BT->end();
       } // Fl_ListBox* listbox_BT
       { Fl_ListBox* o = listbox_AA = new Fl_ListBox(570, 30, 60, 22, _("AA"));
@@ -996,6 +993,13 @@ static void cb_cnt_cwio_comp(Fl_Counter* o, void*) {
   progStatus.cwio_comp = int(o->value());
 }
 
+Fl_Check_Button *btn_cwioINVERTED=(Fl_Check_Button *)0;
+
+static void cb_btn_cwioINVERTED(Fl_Check_Button* o, void*) {
+  progStatus.cwioINVERTED = o->value();
+reset_cwioport();
+}
+
 Fl_Double_Window* cwio_config_dialog() {
   Fl_Double_Window* w;
   { Fl_Double_Window* o = new Fl_Double_Window(670, 100, _("CW Configuration"));
@@ -1078,6 +1082,13 @@ Fl_Double_Window* cwio_config_dialog() {
         o->value(progStatus.cwio_comp);
         o->lstep(1.0);
       } // Fl_Counter* cnt_cwio_comp
+      { Fl_Check_Button* o = btn_cwioINVERTED = new Fl_Check_Button(208, 46, 23, 15, _("Inverted"));
+        btn_cwioINVERTED->tooltip(_("DTR/RTS signaling is inverted\n(-) keying"));
+        btn_cwioINVERTED->down_box(FL_DOWN_BOX);
+        btn_cwioINVERTED->callback((Fl_Callback*)cb_btn_cwioINVERTED);
+        btn_cwioINVERTED->align(Fl_Align(FL_ALIGN_LEFT));
+        o->value(progStatus.cwioINVERTED);
+      } // Fl_Check_Button* btn_cwioINVERTED
       o->end();
     } // Fl_Group* o
     o->end();
