@@ -274,7 +274,7 @@ RTTY-U : 00000101 10010001
 250    : 01000100
 */
 /*
-const std::string LSBstr   = { '\x08', '\x00', '\x15', '\xBE', '\x68', '\x00', '\x00', '\x00', '\x11', '\x00', '\x11', '\x01', '\x81', '\x81', '\x11', '\x0A', '\x08', '\x00', '\x57', '\x72', '\x60', '\x00', '\x00', '\x00', '\x30', '\x00', '\x30', '\x91', '\x11', '\x11', '\x11', '\x48' };
+const std::string LSBstr   = { '\x08', '\x00', '\x50', '\x42', '\x01', '\x00', '\x00', '\x00', '\x11', '\x00', '\x11', '\x01', '\x81', '\x81', '\x11', '\x0A', '\x08', '\x00', '\x57', '\x72', '\x60', '\x00', '\x00', '\x00', '\x30', '\x00', '\x30', '\x91', '\x11', '\x11', '\x11', '\x48' };
 const std::string USBstr   = { '\x08', '\x00', '\x57', '\x71', '\x00', '\x00', '\x00', '\x01', '\x11', '\x00', '\x11', '\x01', '\x81', '\x81', '\x11', '\x0A', '\x08', '\x00', '\x57', '\x72', '\x60', '\x00', '\x00', '\x00', '\x30', '\x00', '\x30', '\x91', '\x11', '\x11', '\x11', '\x48' };
 const std::string CWUstr   = { '\x08', '\x00', '\x57', '\x71', '\x00', '\x00', '\x00', '\x02', '\x11', '\x00', '\x11', '\x01', '\x81', '\x81', '\x11', '\x0A', '\x08', '\x00', '\x57', '\x72', '\x60', '\x00', '\x00', '\x00', '\x30', '\x00', '\x30', '\x91', '\x11', '\x11', '\x11', '\x48' };
 const std::string CWLstr   = { '\x08', '\x00', '\x57', '\x71', '\x00', '\x00', '\x00', '\x02', '\x91', '\x00', '\x11', '\x01', '\x81', '\x81', '\x11', '\x0A', '\x08', '\x00', '\x57', '\x72', '\x60', '\x00', '\x00', '\x00', '\x30', '\x00', '\x30', '\x91', '\x11', '\x11', '\x11', '\x48' };
@@ -288,7 +288,8 @@ const std::string PKLstr   = { '\x08', '\x00', '\x57', '\x71', '\x00', '\x00', '
 const std::string PKUstr   = { '\x08', '\x00', '\x57', '\x71', '\x00', '\x00', '\x00', '\x86', '\x11', '\x00', '\x11', '\x01', '\x81', '\x81', '\x11', '\x0A', '\x08', '\x00', '\x57', '\x72', '\x60', '\x00', '\x00', '\x00', '\x30', '\x00', '\x30', '\x91', '\x11', '\x11', '\x11', '\x48' };
 const std::string PKFstr   = { '\x08', '\x00', '\x57', '\x71', '\x00', '\x00', '\x00', '\x06', '\x91', '\x00', '\x11', '\x01', '\x81', '\x81', '\x11', '\x0A', '\x08', '\x00', '\x57', '\x72', '\x60', '\x00', '\x00', '\x00', '\x30', '\x00', '\x30', '\x91', '\x11', '\x11', '\x11', '\x48' };
 const std::string BOGUSstr = { '\x08', '\x00', '\x57', '\x71', '\x00', '\x00', '\x00', '\x24', '\x99', '\x00', '\x11', '\x01', '\x81', '\x81', '\x11', '\x0A', '\x08', '\x00', '\x57', '\x72', '\x60', '\x00', '\x00', '\x00', '\x30', '\x00', '\x30', '\x91', '\x11', '\x11', '\x11', '\x48' };
-
+*/
+/*
 const std::string data1 = {
 0x08, 0x00, 0x57, 0x71, 0x00, 0x00, 0x00, 0x00, 0x43, 0x00, 0x00, 0x01, 0x81, 0x81, 0x11, 0x0A,
 0x08, 0x00, 0x57, 0x72, 0x60, 0x00, 0x00, 0x00, 0x30, 0x00, 0x30, 0x91, 0x11, 0x11, 0x11, 0x48
@@ -325,8 +326,20 @@ const std::string amsync[] = {
 08 00 55 73 04 00 00 06 11 00 11 B3 33
 0B 00 AA E6 0A 00 00 02 B3 00 11 B4 11
 11 01 55 CC 02 00 00 02 B3 00 22 33 11
-  
+
+3.500.00
+08 00 55 73 0E 00 00 01 00 00 11 B3 33
+7.000.00
+0B 00 AA E6 0C 00 00 02 B3 00 11 B3 33
+14.000.00
+11 01 55 CC 06 00 00 02 B3 00 11 B3 33
+
+const unsigned int testints[] = {\
+0x08,0x00,0x55,0x73,0x0E,0x00,0x00,0x01,0x00,0x00,0x11,0xB3,0x33,0x91,0x11,0x08,\
+0x08,0x01,0x55,0xCC,0x06,0x00,0x00,0x01,0x11,0x00,0x11,0x91,0x11,0x11,0x11,0x00 };
 */
+
+char testret[32];
  
 bool RIG_FT1000MP::check()
 {
@@ -344,6 +357,20 @@ bool RIG_FT1000MP::check()
 
 int tmd = 0;
 
+inline int hex2freq(std::string hex)
+{
+	int freq = 0;
+	freq = ((hex[3] >> 4) & 0x0F)*10 + (hex[3] & 0x0F);
+	freq *= 100;
+	freq += ((hex[2] >> 4) & 0x0F)*10 + (hex[2] & 0x0F);
+	freq *= 100;
+	freq += ((hex[1] >> 4) & 0x0F)*10 + (hex[1] & 0x0F);
+	freq *= 100;
+	freq += ((hex[0] >> 4) & 0x0F)*10 + (hex[0] & 0x0F);
+	freq *= 10;
+	return freq;
+}
+
 bool RIG_FT1000MP::get_info(void)
 {
 	int ret = 0;
@@ -356,37 +383,34 @@ bool RIG_FT1000MP::get_info(void)
 	ret = waitN(32, 100, "get info", ASC);
 	geth();
 
-	std::string p;
 	if (ret >= 32) {
-		p = replystr.substr(replystr.length() - 32);
+		size_t p = replystr.length() - 32;
 
 		// vfo A data string
-		A.freq = (((((((p[1] & 0x7F)<<8 + (p[2] & 0xFF))<<8) + (p[3] & 0xFF))<<8) + (p[4] & 0xF0)) >> 4) * 10;
+		A.freq = hex2freq(replystr.substr(p + 1, 4));
 
 		for (md = 0; md < 14; md++) {
-			if ( ((FT1000MP_mode[md].a & 0xFF) == (p[7] & 0xFF)) &&
-				 ((FT1000MP_mode[md].b & 0xFF) == (p[8] & 0x80)))
+			if ( ((FT1000MP_mode[md].a & 0xFF) == (replystr[p + 7] & 0xFF)) &&
+				 ((FT1000MP_mode[md].b & 0xFF) == (replystr[p + 8] & 0x80)))
 				break;
 		}
 		if (md == 13) md = 0;
 		A.imode = md;
 
-		A.iBW = 5*((p[8] & 0x70) >> 4) + (p[8] & 0x07);
+		A.iBW = 5*((replystr[p + 8] & 0x70) >> 4) + (replystr[p + 8] & 0x07);
 		if (A.iBW > 24) A.iBW = 24;
 
-		p.erase(0,16);; // vfo B data string
-
-		B.freq = (((((((p[1] & 0x7F)<<8 + (p[2] & 0xFF))<<8) + (p[3] & 0xFF))<<8) + (p[4] & 0xF0)) >> 4) * 10;
+		B.freq = hex2freq(replystr.substr(p + 17, 4));
 
 		for (md = 0; md < 14; md++) {
-			if ( ((FT1000MP_mode[md].a & 0xFF) == (p[7] & 0xFF)) &&
-				 ((FT1000MP_mode[md].b & 0xFF) == (p[8] & 0x80)))
+			if ( ((FT1000MP_mode[md].a & 0xFF) == (replystr[p + 23] & 0xFF)) &&
+				 ((FT1000MP_mode[md].b & 0xFF) == (replystr[p + 24] & 0x80)))
 				break;
 		}
 		if (md == 13) md = 0;
 		B.imode = md;
 
-		B.iBW = 5*((p[8] & 0x70) >> 4) + (p[8] & 0x07);
+		B.iBW = 5*((replystr[p + 24] & 0x70) >> 4) + (replystr[p + 24] & 0x07);
 		if (B.iBW > 24) B.iBW = 24;
 
 		return true;
@@ -419,7 +443,6 @@ void RIG_FT1000MP::set_vfoA (unsigned long int freq)
 	setr("set vfo A");
 	sendCommand(cmd, 0);
 	seth();
-LOG_DEBUG("%s", str2hex(cmd.c_str(), cmd.length()));
 }
 
 void RIG_FT1000MP::set_vfoB (unsigned long int freq)
@@ -435,7 +458,6 @@ void RIG_FT1000MP::set_vfoB (unsigned long int freq)
 	setr("set vfo B");
 	sendCommand(cmd, 0);
 	seth();
-LOG_DEBUG("%s", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int RIG_FT1000MP::get_modeA()
@@ -458,7 +480,6 @@ void RIG_FT1000MP::set_modeA(int val)
 	setr("set mode A");
 	sendCommand(cmd, 0);
 	seth();
-LOG_DEBUG("%s, %s", FT1000MP_modes[A.imode], str2hex(cmd.c_str(),5));
 	get_info();
 }
 
@@ -472,7 +493,6 @@ void RIG_FT1000MP::set_modeB(int val)
 	setr("set mode B");
 	sendCommand(cmd, 0);
 	seth();
-LOG_DEBUG("%s, %s", FT1000MP_modes[B.imode], str2hex(cmd.c_str(),5));
 	get_info();
 }
 
@@ -506,13 +526,12 @@ void RIG_FT1000MP::set_bwA(int val)
 	setr("set bw A 1st IF");
 	sendCommand(cmd, 0);
 	seth();
-LOG_DEBUG("%s, %s", FT1000MP_widths[A.iBW], str2hex(cmd.c_str(), 5));
+
 	cmd[0] = 0x02; // 2nd IF
 	cmd[3] = second_if;
 	setr("set bw A 2nd IF");
 	sendCommand(cmd, 0);
 	seth();
-LOG_DEBUG("%s, %s", FT1000MP_widths[A.iBW], str2hex(cmd.c_str(), 5));
 }
 
 int RIG_FT1000MP::get_bwB()
@@ -539,13 +558,12 @@ void RIG_FT1000MP::set_bwB(int val)
 	setr("set bw B 1st IF");
 	sendCommand(cmd, 0);
 	seth();
-LOG_DEBUG("%s, %s", FT1000MP_widths[B.iBW], str2hex(cmd.c_str(), 5));
+
 	cmd[0] = 0x02; // 2nd IF
 	cmd[3] = second_if;
 	setr("set bw B 2nd IF");
 	sendCommand(cmd, 0);
 	seth();
-LOG_DEBUG("%s, %s", FT1000MP_widths[B.iBW], str2hex(cmd.c_str(), 5));
 }
 
 int  RIG_FT1000MP::def_bandwidth(int m)
@@ -565,7 +583,6 @@ void RIG_FT1000MP::selectA()
 	setr("select A");
 	sendCommand(cmd, 0);
 	seth();
-LOG_DEBUG("%s", str2hex(cmd.c_str(), 5));
 }
 
 void RIG_FT1000MP::selectB()
@@ -576,7 +593,6 @@ void RIG_FT1000MP::selectB()
 	setr("select B");
 	sendCommand(cmd, 0);
 	seth();
-LOG_DEBUG("%s", str2hex(cmd.c_str(), 5));
 }
 
 void RIG_FT1000MP::set_split(bool val)
@@ -588,7 +604,6 @@ void RIG_FT1000MP::set_split(bool val)
 	setr("set split");
 	sendCommand(cmd, 0);
 	seth();
-LOG_DEBUG("%s", str2hex(cmd.c_str(), 5));
 }
 
 
@@ -602,7 +617,6 @@ void RIG_FT1000MP::set_PTT_control(int val)
 	setr("set PTT");
 	sendCommand(cmd, 0);
 	seth();
-LOG_DEBUG("%s", str2hex(cmd.c_str(), 5));
 	ptt_ = val;
 }
 
@@ -613,7 +627,6 @@ void RIG_FT1000MP::tune_rig()
 	setr("tune");
 	sendCommand(cmd,0);
 	seth();
-	LOG_DEBUG("%s", str2hex(cmd.c_str(), 5));
 }
 
 // used to turn tuner ON/OFF
@@ -626,7 +639,6 @@ void RIG_FT1000MP::set_auto_notch(int v)
 	setr("tuner on/off");
 	sendCommand(cmd,0);
 	seth();
-	LOG_DEBUG("%s", str2hex(cmd.c_str(), 5));
 }
 
 int RIG_FT1000MP::get_auto_notch()
@@ -656,7 +668,6 @@ int  RIG_FT1000MP::get_power_out(void)
 	else if (pwr <= 130) {pwr /= 130; pwr = 50 * pwr * pwr; }
 	else {pwr /= 177; pwr = 100 * pwr * pwr; }
 
-	LOG_DEBUG("%s => %d", str2hex(replystr.c_str(), 1), (int)pwr);
 	return (int)pwr;
 }
 
@@ -677,8 +688,6 @@ int  RIG_FT1000MP::get_smeter(void)
 	if (val <= 15) val = 5;
 	else if (val <=154) val = 5 + 45 * (val - 15) / (154 - 15);
 	else val = 50 + 50 * (val - 154.0) / (255.0 - 154.0);
-
-	LOG_DEBUG("%s => %d",str2hex(replystr.c_str(), 1), (int)val);
 
 	return (int)val;
 }
@@ -702,8 +711,6 @@ int  RIG_FT1000MP::get_swr(void)
 	if (val < 0) val = 0;
 	if (val > 100) val = 100;
 
-	LOG_DEBUG("%s => %d",str2hex(replystr.c_str(), 1), (int)val);
-
 	return (int)val;
 }
 
@@ -721,7 +728,6 @@ int  RIG_FT1000MP::get_alc(void)
 	if (ret < 5) return 0;
 
 	val = (unsigned char)(replystr[ret-5]);
-	LOG_DEBUG("%s => %d",str2hex(replystr.c_str(), 1), val);
 
 	return val * 100 / 255;
 }
