@@ -219,6 +219,7 @@ flrig_SOURCES += \
 	rigs/yaesu/FT1000MP.cxx \
 	rigs/yaesu/FT2000.cxx \
 	rigs/yaesu/FTdx101D.cxx \
+	rigs/yaesu/FTdx10.cxx \
 	rigs/yaesu/FTdx1200.cxx \
 	rigs/yaesu/FTdx3000.cxx \
 	rigs/yaesu/FT5000.cxx \
@@ -409,6 +410,7 @@ EXTRA_DIST = \
 	include/yaesu/FT1000.h \
 	include/yaesu/FT1000MP.h \
 	include/yaesu/FT2000.h \
+	include/yaesu/FTdx10.h \
 	include/yaesu/FTdx101D.h \
 	include/yaesu/FTdx1200.h \
 	include/yaesu/FTdx3000.h \
