@@ -56,6 +56,24 @@ pthread_mutex_t cwio_text_mutex = PTHREAD_MUTEX_INITIALIZER;
 int cwio_process = NONE;
 bool cwio_thread_running = false;
 
+void millisleep(int msecs)
+{	struct timespec tv = { msecs / 1000, (msecs % 1000) * 1000000 };
+	nanosleep(&tv, &tv);
+}
+
+double now()
+{
+	static struct timeval t;
+	gettimeofday(&t, NULL);
+	return t.tv_sec * 1e3 + t.tv_usec / 1e3;
+}
+
+void accu_sleep(double msecs) {
+	double end = now() + msecs;
+	if (msecs > 2) millisleep(round(msecs) - 2);
+	while (now() <= end);
+}
+
 void send_cwkey(char c)
 {
 	static std::string code = "";
@@ -82,13 +100,16 @@ void send_cwkey(char c)
 	twd = 4 * tc;
 
 	if ((progStatus.cwio_comp > 0) && (progStatus.cwio_comp < tc)) {
-		tc = round (tc - progStatus.cwio_comp);
-		tch = round (tch - 3 * progStatus.cwio_comp);
-		twd = round (twd - 4 * progStatus.cwio_comp);
+//		tc = round (tc - progStatus.cwio_comp);
+//		tch = round (tch - 3 * progStatus.cwio_comp);
+//		twd = round (twd - 4 * progStatus.cwio_comp);
+		tc = tc - progStatus.cwio_comp;
+		tch = tch - 3 * progStatus.cwio_comp;
+		twd = twd - 4 * progStatus.cwio_comp;
 	}
 
 	if (c == ' ' || c == 0x0a) {
-		MilliSleep(twd);
+		accu_sleep(twd);
 		goto exit_send_cwkey;
 	}
 
@@ -103,9 +124,9 @@ void send_cwkey(char c)
 			port->setRTS(progStatus.cwioINVERTED ? 0 : 1);
 		}
 		if (code[n] == '.')
-			MilliSleep(tc);
+			accu_sleep(tc);
 		else
-			MilliSleep(tch);
+			accu_sleep(tch);
 
 		if (progStatus.cwioKEYLINE == 2) {
 			port->setDTR(progStatus.cwioINVERTED ? 1 : 0);
@@ -113,9 +134,9 @@ void send_cwkey(char c)
 			port->setRTS(progStatus.cwioINVERTED ? 1 : 0);
 		}
 		if (n == code.length() -1)
-			MilliSleep(tch);
+			accu_sleep(tch);
 		else
-			MilliSleep(tc);
+			accu_sleep(tc);
 	}
 
 exit_send_cwkey:
@@ -181,7 +202,7 @@ void sending_text()
 	char c = 0;
 	if (progStatus.cwioPTT) {
 		doPTT(1);
-		MilliSleep(progStatus.cwioPTT);
+		accu_sleep(progStatus.cwioPTT);
 	}
 	while (cwio_process == SEND) {
 		c = 0;
@@ -200,11 +221,11 @@ void sending_text()
 			}
 		}
 		if (c) send_cwkey(c);
-		else MilliSleep(5);
+		else accu_sleep(5);
 	}
 	if (progStatus.cwioPTT) {
 		doPTT(0);
-		MilliSleep(progStatus.cwioPTT);
+		accu_sleep(progStatus.cwioPTT);
 	}
 }
 
@@ -296,7 +317,7 @@ int start_cwio_thread()
 
 	LOG_INFO("started cwio thread");
 
-	MilliSleep(10); // Give the CPU time to set 'cwio_thread_running'
+	accu_sleep(10); // Give the CPU time to set 'cwio_thread_running'
 	return 0;
 }
 
@@ -307,11 +328,11 @@ void stop_cwio_thread()
 	cwio_process = END;
 	btn_cwioSEND->value(0);
 
-	MilliSleep(4 * 1200 / progStatus.cwioWPM);
+	accu_sleep(4 * 1200 / progStatus.cwioWPM);
 
 	cwio_process = TERMINATE;
 	pthread_cond_signal(&cwio_cond);
-	MilliSleep(50);
+	accu_sleep(50);
 
 	pthread_join(cwio_pthread, NULL);
 
@@ -447,7 +468,7 @@ void calibrate_cwio()
 	btn_cwioSEND->value(0);
 
 	cwio_process = END;
-	MilliSleep(50);
+	accu_sleep(50);
 
 	cwio_process = CALIBRATE;
 	pthread_cond_signal(&cwio_cond);
