@@ -295,6 +295,9 @@ void Cserial::setDTR(bool b)
 ///////////////////////////////////////////////////////
 void Cserial::ClosePort()
 {
+char msg[50];
+snprintf(msg, sizeof(msg),"ClosePort(): fd = %d", fd);
+	ser_trace(1, msg);
 	if (fd < 0) return;
 	int myfd = fd;
 	fd = -1;
@@ -309,10 +312,11 @@ void Cserial::ClosePort()
 // omitting the ioctl(TIOCMSET) would also resolve the problem).
 // Kamal Mostafa <kamal@whence.com>
 
-	origstatus &= ~(TIOCM_RTS|TIOCM_DTR);
-	ioctl(myfd, TIOCMSET, &origstatus);
-	tcsetattr (myfd, TCSANOW, &oldtio);
+//	origstatus &= ~(TIOCM_RTS|TIOCM_DTR);
+//	ioctl(myfd, TIOCMSET, &origstatus);
+//	tcsetattr (myfd, TCSANOW, &oldtio);
 	close(myfd);
+ser_trace(1,"serial port closed");
 	fd = -1;
 	failed_ = false;
 	return;

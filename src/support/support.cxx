@@ -184,20 +184,52 @@ string print_ab()
 	return s;
 }
 
-char *print(XCVR_STATE &data)
+const char *print(XCVR_STATE &data)
 {
+	static std::string prstr;
 	static char str[1024];
 	const char **bwt = selrig->bwtable(data.imode);
 	const char **dsplo = selrig->lotable(data.imode);
 	const char **dsphi = selrig->hitable(data.imode);
+
+	str[0] = 0;
+	prstr.clear();
 	snprintf(
-		str, sizeof(str),
-		"\
+		str, sizeof(str), "\
 Data Source: %s\n\
   freq ........... %ld\n\
-  mode ........... %d [%s]\n\
+  mode ........... %d [%s]\n",
+		data.src == XML ? "XML" : data.src == UI ? "UI" :
+			data.src == SRVR ? "SRVR" : "RIG",
+		data.freq,
+		data.imode,
+		selrig->modes_ ? selrig->modes_[data.imode] : "modes n/a");
+	prstr.assign(str);
+	str[0] = 0;
+	if (selrig->has_FILTER) {
+		if (bwt && dsplo && dsphi) {
+			snprintf(str, sizeof(str), "\
   filter ......... %s\n\
-  bwt index ...... %2d, [%s] [%s]\n\
+  bwt index ...... %2d, [%s] [%s]\n",
+			selrig->FILT(selrig->get_FILT(data.imode)),
+			data.iBW,
+			(data.iBW > 256 && selrig->has_dsp_controls) ?
+				(dsplo ? dsplo[data.iBW & 0x7F] : "??") : (bwt ? bwt[data.iBW] : "n/a"),
+			(data.iBW > 256 && selrig->has_dsp_controls) ?
+				(dsphi ? dsphi[(data.iBW >> 8) & 0x7F] : "??") : ""
+			);
+		} else if (bwt) {
+			snprintf(str, sizeof(str), "\
+  filter ......... %s\n\
+  bwt index ...... %2d, [%s]\n",
+			selrig->FILT(selrig->get_FILT(data.imode)),
+			data.iBW,
+			bwt[data.iBW] );
+		}
+		prstr.append(str);
+		str[0] = 0;
+	}
+	snprintf( str, sizeof(str), "\
   split .......... %4d, power_control . %4.1f, volume_control  %4d\n\
   attenuator ..... %4d, preamp ........ %4d, rf gain ....... %4d\n\
   if_shift ....... %4d, shift val ..... %4d\n\
@@ -205,17 +237,6 @@ Data Source: %s\n\
   noise .......... %4d, nr ............ %4d, nr val ........ %4d\n\
   mic gain ....... %4d, agc level ..... %4d, squelch ....... %4d\n\
   compression .... %4d, compON ........ %4d",
-		data.src == XML ? "XML" : data.src == UI ? "UI" :
-			data.src == SRVR ? "SRVR" : "RIG",
-		data.freq,
-		data.imode,
-		selrig->modes_ ? selrig->modes_[data.imode] : "modes n/a",
-		selrig->has_FILTER ? selrig->FILT(selrig->get_FILT(data.imode)) : "n/a",
-		data.iBW,
-		(data.iBW > 256 && selrig->has_dsp_controls) ?
-			(dsplo ? dsplo[data.iBW & 0x7F] : "??") : (bwt ? bwt[data.iBW] : "n/a"),
-		(data.iBW > 256 && selrig->has_dsp_controls) ?
-			(dsphi ? dsphi[(data.iBW >> 8) & 0x7F] : "??") : "",
 		data.split,
 		data.power_control,
 		data.volume_control,
@@ -236,7 +257,8 @@ Data Source: %s\n\
 		data.compression,
 		data.compON
 	);
-	return str;
+	prstr.append(str);
+	return prstr.c_str();
 }
 
 void read_info()
@@ -1612,7 +1634,7 @@ void * serial_thread_loop(void *d)
 				Fl::awake(updateSmeter);
 			}
 			{	guard_lock lk(&mutex_serial);
-				while (1) {
+				while (!bypass_serial_thread_loop) {
 					if (*(tx_polling->poll)) {
 						(tx_polling->pollfunc)();
 						++tx_polling;
@@ -1644,7 +1666,7 @@ void * serial_thread_loop(void *d)
 			if (progStatus.byte_interval) MilliSleep(progStatus.byte_interval);
 
 			{	guard_lock lk(&mutex_serial);
-				if (progStatus.poll_smeter) {
+				if (!bypass_serial_thread_loop && progStatus.poll_smeter) {
 					read_smeter();
 				}
 			}
@@ -1652,7 +1674,7 @@ void * serial_thread_loop(void *d)
 			if (progStatus.byte_interval) MilliSleep(progStatus.byte_interval);
 
 			{	guard_lock lk(&mutex_serial);
-				while (1) {
+				while (!bypass_serial_thread_loop) {
 					if (*(rx_polling->poll)) {
 						(rx_polling->pollfunc)();
 						++rx_polling;
@@ -6105,9 +6127,13 @@ void initRig()
 			progress->redraw_label();
 			update_progress(0);
 		}
+trace(1, "selrig->initialize()");
 		selrig->initialize();
-
-		if (!selrig->check()) goto failed;
+trace(1, "selrig->check()");
+		if (!selrig->check()) {
+trace(1, "FAILED");
+			goto failed;
+		}
 
 		FreqDispA->set_precision(selrig->precision);
 		FreqDispA->set_ndigits(selrig->ndigits);

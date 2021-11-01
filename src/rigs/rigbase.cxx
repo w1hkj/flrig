@@ -429,13 +429,13 @@ int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 	}
 
 	RigSerial->FlushBuffer();
-
-//snprintf(szt, sizeof(szt), "WriteBuffer( %s, %d )", cmd.c_str(), (int)cmd.length());
-//get_trace(1, szt);
+char szt[200];
+snprintf(szt, sizeof(szt), "WriteBuffer( %s, %d )", cmd.c_str(), (int)cmd.length());
+trace(1, szt);
 	RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
 
-//snprintf(szt, sizeof(szt), "MilliSleep( %d msec)", delay );
-//get_trace(1, szt);
+snprintf(szt, sizeof(szt), "MilliSleep( %d msec)", delay );
+trace(1, szt);
 	MilliSleep(delay);
 
 	size_t tout1 = zmsec();//todmsec();
@@ -457,8 +457,8 @@ int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 			break;
 	}
 
-//	snprintf(szt, sizeof(szt), "[%d msec] %s", (int)(tout2 - tout1), (replystr.length() ? replystr.c_str() : "NIL") );
-//	get_trace(1, szt);
+snprintf(szt, sizeof(szt), "[%d msec] %s", (int)(tout2 - tout1), (replystr.length() ? replystr.c_str() : "NIL") );
+trace(1, szt);
 
 	LOG_DEBUG ("%s: read %d bytes, %s", sz, retnbr, replystr.c_str());
 	return retnbr;

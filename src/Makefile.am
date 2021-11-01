@@ -161,6 +161,7 @@ flrig_SOURCES += \
 	rigs/elecraft/K2.cxx \
 	rigs/elecraft/K3.cxx \
 	rigs/elecraft/KX3.cxx \
+	rigs/lab599/TX500.cxx \
 	rigs/kenwood/KENWOOD.cxx \
 	rigs/kenwood/TS140.cxx \
 	rigs/kenwood/TS440.cxx \
@@ -353,6 +354,7 @@ EXTRA_DIST = \
 	include/support.h \
 	include/threads.h \
 	include/trace.h \
+	include/lab599/TX500.h \
 	include/kenwood/KENWOOD.h \
 	include/kenwood/TS140.h \
 	include/kenwood/TS440.h \

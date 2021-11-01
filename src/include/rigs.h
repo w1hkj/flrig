@@ -53,6 +53,7 @@
 #include "elecraft/K2.h"
 #include "elecraft/K3.h"
 #include "elecraft/KX3.h"
+#include "lab599/TX500.h"
 #include "kenwood/TS140.h"
 #include "kenwood/TS440.h"
 #include "kenwood/TS450S.h"
@@ -211,5 +212,6 @@ extern RIG_XI5105		rig_XI5105;		// 91
 extern RIG_Xiegu_G90	rig_XIG90;		// 92
 extern RIG_PowerSDR		rig_PowerSDR;	// 93
 extern RIG_FLEX1500		rig_FLEX1500;	// 94
+extern RIG_TX500		rig_TX500;		// 95
 
 #endif

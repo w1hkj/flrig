@@ -853,10 +853,11 @@ static void cb_init_ser_port(Fl_Return_Button*, void*) {
 	closeRig();               // local serial comm connection
 
 	{ guard_lock gl_serial(&mutex_serial);
-		RigSerial->ClosePort();
 		bypass_serial_thread_loop = true;
+trace(1, "close serial port");
+		RigSerial->ClosePort();
 	}
-
+trace(1, "clear frequency list");
 	clearList();
 	saveFreqList();
 	selrig = rigs[selectRig->index()];
@@ -880,10 +881,11 @@ static void cb_init_ser_port(Fl_Return_Button*, void*) {
 	progStatus.imode_B  = progStatus.imode_A  = selrig->def_mode;
 	progStatus.iBW_B    = progStatus.iBW_A    = selrig->def_bw;
 	progStatus.freq_B   = progStatus.freq_A   = selrig->def_freq;
-
+trace(1, "initialize title bar");
 	init_title();
-
+trace(1, "start tranceiver serial port");
 	if (!startXcvrSerial()) {
+trace(1, "FAILED");
 		if (progStatus.xcvr_serial_port.compare("NONE") == 0) {
 			LOG_WARN("No comm port ... test mode");
 		} else {
@@ -891,7 +893,7 @@ static void cb_init_ser_port(Fl_Return_Button*, void*) {
 //			selectCommPort->value(progStatus.xcvr_serial_port.c_str());
 		}
 	}
-
+trace(1, "initialize transceiver");
 	initRig();
 
 	btn_init_ser_port->labelcolor(FL_BLACK);
