@@ -152,6 +152,8 @@ public:
 	void set_band_selection(int v);
 	void get_band_selection(int v);
 
+	void sync_date(char *dt);
+	void sync_clock(char *tm);
 };
 
 #endif

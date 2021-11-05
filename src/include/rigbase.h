@@ -284,6 +284,8 @@ public:
 
 	bool has_get_info;
 
+	bool can_synch_clock;
+
 // Icom Xcvr 
 	bool ICOMrig;
 	bool ICOMmainsub;
@@ -668,6 +670,14 @@ int vfo_;
 	}
 	virtual int power_max() {
 		return pmax;
+	}
+
+// date/time synchronize
+	virtual void sync_date(char *dt) {
+		printf("Synchronize date to: %s\n", dt);
+	}
+	virtual void sync_clock(char *tm) {
+		printf("Sychronize time to: %s\n", tm);
 	}
 };
 

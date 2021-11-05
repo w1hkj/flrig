@@ -1553,7 +1553,7 @@ Fl_Double_Window *tabs_window()
 		genericRx = new Fl_Group(0, 24, small_mainW, gph - 24, _("RX"));
 			genericRx->hide();
 
-			sldr_nb_level = new Fl_Wheel_Value_Slider(5, 40, 200, 20, _("NB level"));
+			sldr_nb_level = new Fl_Wheel_Value_Slider(5, 35, 100, 22, _("NB level"));
 			sldr_nb_level->tooltip(_("Noise Blanker level"));
 			sldr_nb_level->type(5);
 			sldr_nb_level->box(FL_THIN_DOWN_BOX);
@@ -1567,85 +1567,92 @@ Fl_Double_Window *tabs_window()
 			sldr_nb_level->maximum(0);
 			sldr_nb_level->step(1);
 			sldr_nb_level->callback((Fl_Callback*)cb_sldr_nb_level);
-			sldr_nb_level->align(Fl_Align(FL_ALIGN_BOTTOM));
+			sldr_nb_level->align(FL_ALIGN_BOTTOM);
 			sldr_nb_level->when(FL_WHEN_CHANGED);
 
 			sldr_nb_level->value(progStatus.nb_level);
 
-//			cbo_agc_level = new Fl_ComboBox(123, 40, 80, 22, _("AGC"));
-//			cbo_agc_level->tooltip(_("AGC level"));
-//			cbo_agc_level->box(FL_DOWN_BOX);
-//			cbo_agc_level->color(FL_BACKGROUND_COLOR);
-//			cbo_agc_level->selection_color(FL_BACKGROUND_COLOR);
-//			cbo_agc_level->labeltype(FL_NORMAL_LABEL);
-//			cbo_agc_level->labelfont(0);
-//			cbo_agc_level->labelsize(12);
-//			cbo_agc_level->labelcolor(FL_FOREGROUND_COLOR);
-//			cbo_agc_level->callback((Fl_Callback*)cb_cbo_agc_level);
-//			cbo_agc_level->align(Fl_Align(FL_ALIGN_BOTTOM));
-//			cbo_agc_level->when(FL_WHEN_CHANGED);
-//			cbo_agc_level->end();
-
-			spnr_bpf_center = new Hspinner(234, 40, 96, 22, _("BPF Center Freq"));
-			spnr_bpf_center->tooltip(_("Bandpass Filter Center Freq"));
+			spnr_bpf_center = new Hspinner(115, 35, 120, 22, _("BPF Cntr"));
+			spnr_bpf_center->tooltip(_("Bandpass Filter Center Freq in Hz"));
 			spnr_bpf_center->type(1);
 			spnr_bpf_center->minimum(600);
 			spnr_bpf_center->maximum(2500);
 			spnr_bpf_center->step(10);
 			spnr_bpf_center->value(1500);
 			spnr_bpf_center->callback((Fl_Callback*)cb_spnr_bpf_center);
-			spnr_bpf_center->align(Fl_Align(34));
+			spnr_bpf_center->align(FL_ALIGN_BOTTOM);
 			spnr_bpf_center->value(progStatus.bpf_center);
 
-			btn_use_bpf_center = new Fl_Check_Button(361, 40, 50, 15, _("On"));
+			btn_use_bpf_center = new Fl_Check_Button(120, 72, 50, 15, _("BPF On"));
 			btn_use_bpf_center->tooltip(_("Use Filter Center Freq Adj"));
 			btn_use_bpf_center->down_box(FL_DOWN_BOX);
 			btn_use_bpf_center->value(1);
+			btn_use_bpf_center->align(FL_ALIGN_RIGHT);
 			btn_use_bpf_center->callback((Fl_Callback*)cb_btn_use_bpf_center);
 			btn_use_bpf_center->value(progStatus.use_bpf_center);
+
+			spnr_vfo_adj = new Hspinner(245, 35, 80, 22, _("Vfo Adj"));
+			spnr_vfo_adj->type(1);
+			spnr_vfo_adj->callback((Fl_Callback*)cb_spnr_vfo_adj);
+			spnr_vfo_adj->align(FL_ALIGN_BOTTOM);
+			spnr_vfo_adj->step(1);
+			spnr_vfo_adj->value(progStatus.vfo_adj);
+
+			spnr_line_out = new Hspinner(335, 35, 80, 22, _("line out"));
+			spnr_line_out->type(1);
+			spnr_line_out->minimum(0);
+			spnr_line_out->maximum(100);
+			spnr_line_out->step(1);
+			spnr_line_out->value(20);
+			spnr_line_out->align(FL_ALIGN_BOTTOM);
+			spnr_line_out->callback((Fl_Callback*)cb_spnr_line_out);
+			spnr_line_out->value(progStatus.line_out);
 
 		genericRx->end();
 
 		genericMisc = new Fl_Group(0, 24, small_mainW, gph - 24, _("Misc"));
 			genericMisc->hide();
 
-			spnr_vfo_adj = new Hspinner(24, 40, 96, 22, _("Vfo Adj"));
-			spnr_vfo_adj->type(1);
-			spnr_vfo_adj->callback((Fl_Callback*)cb_spnr_vfo_adj);
-			spnr_vfo_adj->align(Fl_Align(34));
-			spnr_vfo_adj->step(1);
-			spnr_vfo_adj->value(progStatus.vfo_adj);
-
-			spnr_line_out = new Hspinner(146, 40, 70, 22, _("line out"));
-			spnr_line_out->type(1);
-			spnr_line_out->minimum(0);
-			spnr_line_out->maximum(100);
-			spnr_line_out->step(1);
-			spnr_line_out->value(20);
-			spnr_line_out->align(Fl_Align(34));
-			spnr_line_out->callback((Fl_Callback*)cb_spnr_line_out);
-			spnr_line_out->value(progStatus.line_out);
-
-			btnSpecial = new Fl_Light_Button(242, 30, 74, 20, _("Special"));
+			btnSpecial = new Fl_Light_Button(5, 35, 75, 22, _("Special"));
 			btnSpecial->callback((Fl_Callback*)cb_btnSpecial);
 
-			btn_ext_tuner = new Fl_Check_Button(242, 60, 74, 15, _("Ext tuner"));
+			btn_ext_tuner = new Fl_Check_Button(5, 60, 75, 22, _("Ext tuner"));
 			btn_ext_tuner->tooltip(_("use external auto tuner"));
 			btn_ext_tuner->down_box(FL_DOWN_BOX);
 			btn_ext_tuner->callback((Fl_Callback*)cb_btn_ext_tuner);
 			btn_ext_tuner->value(progStatus.external_tuner);
 
-			btn_xcvr_auto_on = new Fl_Check_Button(325, 38, 95, 15, _("Rig autOn"));
+			btn_xcvr_auto_on = new Fl_Check_Button(100, 35, 100, 22, _("Rig auto On"));
 			btn_xcvr_auto_on->tooltip(_("Auto Turn Rig On with Flrig startup"));
 			btn_xcvr_auto_on->down_box(FL_DOWN_BOX);
 			btn_xcvr_auto_on->callback((Fl_Callback*)cb_btn_xcvr_auto_on);
 			btn_xcvr_auto_on->value(progStatus.xcvr_auto_on);
 
-			btn_xcvr_auto_off = new Fl_Check_Button(325, 60, 95, 15, _("Rig autOff"));
+			btn_xcvr_auto_off = new Fl_Check_Button(100, 60, 100, 22, _("Rig auto Off"));
 			btn_xcvr_auto_off->tooltip(_("Auto Turn Rig Off with Flrig exit"));
 			btn_xcvr_auto_off->down_box(FL_DOWN_BOX);
 			btn_xcvr_auto_off->callback((Fl_Callback*)cb_btn_xcvr_auto_off);
 			btn_xcvr_auto_off->value(progStatus.xcvr_auto_off);
+
+			btn_xcvr_synch_clock = new Fl_Check_Button(215, 35, 100, 22, _("Sync Clk"));
+			btn_xcvr_synch_clock->tooltip(_("Synchronize xcvr clock to PC"));
+			btn_xcvr_synch_clock->down_box(FL_DOWN_BOX);
+			btn_xcvr_synch_clock->callback((Fl_Callback*)cb_btn_xcvr_synch_clock);
+			btn_xcvr_synch_clock->value(progStatus.sync_clock);
+
+			btn_xcvr_synch_gmt = new Fl_Check_Button(215, 60, 100, 22, _("Use GMT"));
+			btn_xcvr_synch_gmt->tooltip(_("Synchronize to Greenwich Mean Time"));
+			btn_xcvr_synch_gmt->down_box(FL_DOWN_BOX);
+			btn_xcvr_synch_gmt->callback((Fl_Callback*)cb_btn_xcvr_synch_gmt);
+			btn_xcvr_synch_gmt->value(progStatus.sync_gmt);
+
+			btn_xcvr_synch_now = new Fl_Button(320, 35, 90, 22, _("Sync Now"));
+			btn_xcvr_synch_now->tooltip(_("Force clock synch at next minute"));
+			btn_xcvr_synch_now->callback((Fl_Callback*)cb_btn_xcvr_synch_now);
+
+			txt_xcvr_synch = new Fl_Output(320, 60, 90, 22, "");
+			txt_xcvr_synch->value("");
+			txt_xcvr_synch->align(FL_ALIGN_CENTER);
 
 		genericMisc->end();
 

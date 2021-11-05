@@ -319,6 +319,11 @@ extern Fl_Light_Button *btnSpecial;
 extern Fl_Check_Button *btn_ext_tuner;
 extern Fl_Check_Button *btn_xcvr_auto_on;
 extern Fl_Check_Button *btn_xcvr_auto_off;
+extern Fl_Check_Button *btn_xcvr_synch_clock;
+extern Fl_Check_Button *btn_xcvr_synch_gmt;
+extern Fl_Button *btn_xcvr_synch_now;
+extern Fl_Output *txt_xcvr_synch;
+
 extern Fl_Group *genericRXB;
 extern Hspinner *cntRIT;
 extern Hspinner *cntXIT;

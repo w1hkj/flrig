@@ -202,6 +202,8 @@ RIG_IC7600::RIG_IC7600() {
 
 	has_band_selection = true;
 
+	can_synch_clock = true;
+
 	precision = 1;
 	ndigits = 8;
 	filA = filB = 1;
@@ -1536,5 +1538,53 @@ void RIG_IC7600::set_band_selection(int v)
 	cmd.append( post );
 
 	waitFOR(23, "get band stack");
+}
+
+// ---------------------------------------------------------------------
+// set date and time
+// 1A 05 00 95 HH MM : set time
+// 1A 05 00 94 YY YY MM DD : set date
+// ---------------------------------------------------------------------
+// dt formated as YYYYMMDD
+// ---------------------------------------------------------------------
+void RIG_IC7600::sync_date(char *dt)
+{
+	cmd.clear();
+	cmd.append(pre_to);
+	cmd += '\x1A'; cmd += '\x05';
+	cmd += '\x00'; cmd += '\x53';
+	unsigned char val;
+	val = ((dt[0] - '0') << 4) + (dt[1] - '0');
+	cmd += (val & 0xFF);
+	val = ((dt[2] - '0') << 4) + (dt[3] - '0');
+	cmd += (val & 0xFF);
+	val = ((dt[4] - '0') << 4) + (dt[5] - '0');
+	cmd += (val & 0xFF);
+	val = ((dt[6] - '0') << 4) + (dt[7] - '0');
+	cmd += (val & 0xFF);
+	cmd.append(post);
+	set_trace(1, "set xcvr clock");
+	waitFB("set xcvr clock", 200);
+	seth();
+}
+
+// ---------------------------------------------------------------------
+// tm formated as HH:MM:SS
+// ---------------------------------------------------------------------
+void RIG_IC7600::sync_clock(char *tm)
+{
+	cmd.clear();
+	cmd.append(pre_to);
+	cmd += '\x1A'; cmd += '\x05';
+	cmd += '\x00'; cmd += '\x54';
+	unsigned char val;
+	val = ((tm[0] - '0') << 4) + (tm[1] - '0');
+	cmd += (val & 0xFF);
+	val = ((tm[3] - '0') << 4) + (tm[4] - '0');
+	cmd += (val & 0xFF);
+	cmd.append(post);
+	set_trace(1, "set xcvr clock");
+	waitFB("set xcvr clock", 200);
+	seth();
 }
 

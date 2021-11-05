@@ -25,6 +25,7 @@
 
 class RIG_FTdx1200 : public rigbase {
 private:
+
 	bool notch_on;
 	int  m_60m_indx;
 public:
@@ -152,6 +153,7 @@ public:
 	double getVfoAdj();
 	void get_vfoadj_min_max_step(int &min, int &max, int &step);
 
+	void sync_clock(char *tm);
 };
 
 

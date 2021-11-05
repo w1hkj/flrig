@@ -21,6 +21,9 @@
 // ----------------------------------------------------------------------------
 
 #include <config.h>
+#include <iostream>
+#include <string>
+#include <FL/Fl.H>
 
 #include "timeops.h"
 
@@ -137,7 +140,6 @@ bool operator==(const struct timeval &t0, const struct timeval &t1)
 {
 	return t0.tv_sec == t1.tv_sec && t0.tv_usec == t1.tv_usec;
 }
-
 
 #ifndef HAVE_GMTIME_R
 #include <string.h>

@@ -183,6 +183,9 @@ struct status {
 	int		pwr_peak;
 	int		pwr_scale;
 
+	bool	sync_clock;
+	bool	sync_gmt;
+
 // ic7610 special controls
 	bool	digi_sel_on_off;
 	int		digi_sel_val;
@@ -348,6 +351,30 @@ struct status {
    string	label24;
    string	command24;
    string	shftcmd24;
+
+   string	label_on_start1;
+   string	cmd_on_start1;
+
+   string	label_on_start2;
+   string	cmd_on_start2;
+
+   string	label_on_start3;
+   string	cmd_on_start3;
+
+   string	label_on_start4;
+   string	cmd_on_start4;
+
+   string	label_on_exit1;
+   string	cmd_on_exit1;
+
+   string	label_on_exit2;
+   string	cmd_on_exit2;
+
+   string	label_on_exit3;
+   string	cmd_on_exit3;
+
+   string	label_on_exit4;
+   string	cmd_on_exit4;
 
 // =========================
 	int		bg_red;

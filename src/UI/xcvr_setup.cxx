@@ -158,6 +158,7 @@ Fl_Group *tabCOMMANDS = (Fl_Group *)0;
 	Fl_Group *tabCmds4 = (Fl_Group *)0;
 	Fl_Group *tabCmds5 = (Fl_Group *)0;
 	Fl_Group *tabCmds6 = (Fl_Group *)0;
+	Fl_Group *tabCmds_on_start_exit = (Fl_Group *)0;
 
 	Fl_Box *bx1a = (Fl_Box *)0;
 	Fl_Box *bx1b = (Fl_Box *)0;
@@ -246,6 +247,23 @@ Fl_Group *tabCOMMANDS = (Fl_Group *)0;
 	Fl_Input2 * shftcmdtext22 = (Fl_Input2 *)0;
 	Fl_Input2 * shftcmdtext23 = (Fl_Input2 *)0;
 	Fl_Input2 * shftcmdtext24 = (Fl_Input2 *)0;
+
+	Fl_Input2 * start_exit_label1 = (Fl_Input2 *)0;
+	Fl_Input2 * start_exit_text1  = (Fl_Input2 *)0;
+	Fl_Input2 * start_exit_label2 = (Fl_Input2 *)0;
+	Fl_Input2 * start_exit_text2  = (Fl_Input2 *)0;
+	Fl_Input2 * start_exit_label3 = (Fl_Input2 *)0;
+	Fl_Input2 * start_exit_text3  = (Fl_Input2 *)0;
+	Fl_Input2 * start_exit_label4 = (Fl_Input2 *)0;
+	Fl_Input2 * start_exit_text4  = (Fl_Input2 *)0;
+	Fl_Input2 * start_exit_label5 = (Fl_Input2 *)0;
+	Fl_Input2 * start_exit_text5  = (Fl_Input2 *)0;
+	Fl_Input2 * start_exit_label6 = (Fl_Input2 *)0;
+	Fl_Input2 * start_exit_text6  = (Fl_Input2 *)0;
+	Fl_Input2 * start_exit_label7 = (Fl_Input2 *)0;
+	Fl_Input2 * start_exit_text7  = (Fl_Input2 *)0;
+	Fl_Input2 * start_exit_label8 = (Fl_Input2 *)0;
+	Fl_Input2 * start_exit_text8  = (Fl_Input2 *)0;
 
 	Fl_Output * cmdResponse = (Fl_Output *)0;
 
@@ -828,6 +846,33 @@ static void cb_shftcmdtext(Fl_Input2 *o, void *d) {
 	  &progStatus.shftcmd23, &progStatus.shftcmd24 };
 	if (val < 0) val = 0;
 	if (val > 23) val = 23;
+
+	*cmd[val] = o->value();
+}
+
+static void cb_se_label(Fl_Input2 *o, void *d) {
+	size_t val = reinterpret_cast<size_t>(d);
+	std::string *labels[] =
+	{ &progStatus.label_on_start1, &progStatus.label_on_start2,
+	  &progStatus.label_on_start3, &progStatus.label_on_start4,
+	  &progStatus.label_on_exit1,  &progStatus.label_on_exit2,
+	  &progStatus.label_on_exit3,  &progStatus.label_on_exit4,
+	};
+	if (val < 0) val = 0;
+	if (val > 8) val = 8;
+	*labels[val] = o->value();
+}
+
+static void cb_se_text(Fl_Input2 *o, void *d) {
+	size_t val = reinterpret_cast<size_t>(d);
+	std::string *cmd[] =
+	{ &progStatus.cmd_on_start1, &progStatus.cmd_on_start2,
+	  &progStatus.cmd_on_start3, &progStatus.cmd_on_start4,
+	  &progStatus.cmd_on_exit1,  &progStatus.cmd_on_exit2,
+	  &progStatus.cmd_on_exit3,  &progStatus.cmd_on_exit4,
+	};
+	if (val < 0) val = 0;
+	if (val > 8) val = 8;
 
 	*cmd[val] = o->value();
 }
@@ -1842,6 +1887,30 @@ Fl_Group *createCOMMANDS(int X, int Y, int W, int H, const char *label)
 		&progStatus.shftcmd21, &progStatus.shftcmd22, &progStatus.shftcmd23, &progStatus.shftcmd24
 		};
 
+	Fl_Input2 *start_exit_label[] = {
+		start_exit_label1,  start_exit_label2,  start_exit_label3,  start_exit_label4,
+		start_exit_label5,  start_exit_label6,  start_exit_label7,  start_exit_label8
+		};
+
+	Fl_Input2 *start_exit_text[] = {
+		start_exit_text1,  start_exit_text2,  start_exit_text3,  start_exit_text4,
+		start_exit_text5,  start_exit_text6,  start_exit_text7,  start_exit_text8,
+		};
+
+	std::string *se_label[] = {
+		&progStatus.label_on_start1,  &progStatus.label_on_start2,
+		&progStatus.label_on_start3,  &progStatus.label_on_start4,
+		&progStatus.label_on_exit1,   &progStatus.label_on_exit2,
+		&progStatus.label_on_exit3,   &progStatus.label_on_exit4
+	};
+
+	std::string *se_cmd[] = {
+		&progStatus.cmd_on_start1,  &progStatus.cmd_on_start2,
+		&progStatus.cmd_on_start3,  &progStatus.cmd_on_start4,
+		&progStatus.cmd_on_exit1,   &progStatus.cmd_on_exit2,
+		&progStatus.cmd_on_exit3,   &progStatus.cmd_on_exit4
+	};
+
 	static const char *lbl[24] = {
 		"1", "2", "3", "4", "5", "6", "7", "8",
 		"9", "10", "11", "12", "13", "14", "15", "16",
@@ -2022,6 +2091,35 @@ Fl_Group *createCOMMANDS(int X, int Y, int W, int H, const char *label)
 		}
 
 	tabCmds6->end();
+
+	tabCmds_on_start_exit = new Fl_Group(X, Y + 20, W, H - 50, _("Start/Exit"));
+
+		Fl_Box *start_labels = new Fl_Box(X + 23, Y + 26, 75, 16, "Label");
+		start_labels->box(FL_FLAT_BOX);
+		start_labels->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+
+		Fl_Box *start_commands = new Fl_Box(X + 80, Y + 26, W - 80 - 2, 16, "Command");
+		start_commands->box(FL_FLAT_BOX);
+		start_commands->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE);
+
+		for (int n = 0; n < 8; n++) {
+			start_exit_label[n] = new Fl_Input2(
+				X + 27, Y + 46 + n * 20, 
+				80, 20,
+				n < 4 ? "St" : "Ex");
+			start_exit_label[n]->align(FL_ALIGN_LEFT);
+			start_exit_label[n]->value(se_label[n]->c_str());
+			start_exit_label[n]->callback((Fl_Callback*)cb_se_label, (void *)long(n));
+
+			start_exit_text[n] = new Fl_Input2(
+					X + 110, start_exit_label[n]->y(),
+					W - 110 - 2, 20, "");
+			start_exit_text[n]->align(FL_ALIGN_LEFT);
+			start_exit_text[n]->value(se_cmd[n]->c_str());
+			start_exit_text[n]->callback((Fl_Callback*)cb_se_text, (void *)long(n));
+		}
+
+	tabCmds_on_start_exit->end();
 
 	tabCmds->end();
 
@@ -2389,7 +2487,7 @@ Fl_Double_Window* XcvrDialog() {
 	tabSERVER   = createSERVER(xtabs, ytree, wtabs, htree, _("Server"));
 	tabPOLLING  = createPOLLING(xtabs, ytree, wtabs, htree, _("Poll"));
 	tabRESTORE  = createRestore(xtabs, ytree, wtabs, htree, _("Restore"));
-	tabCOMMANDS = createCOMMANDS(xtabs, ytree, wtabs, htree, _("Cmds"));
+	tabCOMMANDS = createCOMMANDS(xtabs, ytree, wtabs, htree, _("Commands"));
 	tabSNDCMD   = createSNDCMD(xtabs, ytree, wtabs, htree, _("Send"));
 	tabTRACE    = createTRACE(xtabs, ytree, wtabs, htree, _("Trace"));
 

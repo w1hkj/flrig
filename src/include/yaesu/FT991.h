@@ -152,6 +152,9 @@ public:
 	double getVfoAdj();
 	void get_vfoadj_min_max_step(int &min, int &max, int &step);
 
+	void sync_date(char *dt);
+	void sync_clock(char *tm);
+
 };
 
 

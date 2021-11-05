@@ -257,6 +257,8 @@ extern void enable_yaesu_bandselect(int btn_num, bool enable = true);
 
 extern void break_in_label(const char *);
 
+extern void synchronize_now();
+
 // Display Dialog
 extern void cbUSBaudio();
 extern void cbCIVdefault();

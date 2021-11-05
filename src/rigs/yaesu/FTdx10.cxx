@@ -1432,3 +1432,33 @@ int  RIG_FTdx10::get_noise_reduction()
 	return val;
 }
 
+// ---------------------------------------------------------------------
+// set date and time
+// ---------------------------------------------------------------------
+// dt formated as YYYYMMDD
+// ---------------------------------------------------------------------
+void RIG_FTdx10::sync_date(char *dt)
+{
+	cmd.assign("DT0");
+	cmd.append(dt);
+	cmd += ';';
+	sendCommand(cmd);
+	showresp(WARN, ASC, "sync_date", cmd, replystr);
+	sett("sync_date");
+}
+
+// ---------------------------------------------------------------------
+// tm formated as HH:MM:SS
+// ---------------------------------------------------------------------
+void RIG_FTdx10::sync_clock(char *tm)
+{
+	cmd.assign("DT1");
+	cmd += tm[0]; cmd += tm[1];
+	cmd += tm[3]; cmd += tm[4];
+	cmd += tm[6]; cmd += tm[7];
+	cmd += ';';
+	sendCommand(cmd);
+	showresp(WARN, ASC, "sync_time", cmd, replystr);
+	sett("sync_time");
+}
+

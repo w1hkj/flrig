@@ -130,6 +130,8 @@ rigbase::rigbase()
 	ICOMrig = false;
 	ICOMmainsub = false;
 
+	can_synch_clock = false;
+
 	has_a2b = false;
 	has_vfoAB = false;
 

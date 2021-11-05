@@ -1360,20 +1360,6 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				sldr_nb_level->when(FL_WHEN_CHANGED);
 				sldr_nb_level->value(progStatus.nb_level);
 
-//				cbo_agc_level = new Fl_ComboBox(xpos+244, by, 80, bh, _("AGC"));
-//				cbo_agc_level->tooltip(_("AGC level"));
-//				cbo_agc_level->box(FL_DOWN_BOX);
-//				cbo_agc_level->color(FL_BACKGROUND_COLOR);
-//				cbo_agc_level->selection_color(FL_BACKGROUND_COLOR);
-//				cbo_agc_level->labeltype(FL_NORMAL_LABEL);
-//				cbo_agc_level->labelfont(0);
-//				cbo_agc_level->labelsize(14);
-//				cbo_agc_level->labelcolor(FL_FOREGROUND_COLOR);
-//				cbo_agc_level->callback((Fl_Callback*)cb_cbo_agc_level);
-//				cbo_agc_level->align(Fl_Align(FL_ALIGN_LEFT));
-//				cbo_agc_level->when(FL_WHEN_CHANGED);
-//				cbo_agc_level->end();
-
 				spnr_bpf_center = new Hspinner(xpos+474, by, 5*bh, bh, _("BPF Center Freq"));
 				spnr_bpf_center->tooltip(_("Bandpass Filter Center Freq"));
 				spnr_bpf_center->type(FL_INT_INPUT);
@@ -1399,7 +1385,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 			genericMisc = new Fl_Group(xpos, ypos+tabh, W, tabb, _("Misc"));
 				genericMisc->hide();
 
-				spnr_vfo_adj = new Hspinner(xpos+100, by, 5*bh, bh, _("Vfo Adj"));
+				spnr_vfo_adj = new Hspinner(xpos + 20, by, 4*bh, bh, _("Vfo Adj"));
 				spnr_vfo_adj->type(FL_INT_INPUT);
 				spnr_vfo_adj->callback((Fl_Callback*)cb_spnr_vfo_adj);
 				spnr_vfo_adj->value(progStatus.vfo_adj);
@@ -1407,8 +1393,8 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 
 				spnr_line_out = new Hspinner(
 					spnr_vfo_adj->x() +
-					spnr_vfo_adj->w() + 8,
-					by, 5*bh, bh, _("line out"));
+					spnr_vfo_adj->w() + 5,
+					by, 4*bh, bh, _("line out"));
 				spnr_line_out->type(FL_INT_INPUT);
 				spnr_line_out->minimum(0);
 				spnr_line_out->maximum(100);
@@ -1420,14 +1406,14 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 
 				btnSpecial = new Fl_Light_Button(
 					spnr_line_out->x() +
-					spnr_line_out->w() + 8,
-					by, 74, bh, _("Special"));
+					spnr_line_out->w() +5,
+					by, 80, bh, _("Special"));
 				btnSpecial->callback((Fl_Callback*)cb_btnSpecial);
 
 				btn_ext_tuner = new Fl_Check_Button(
 					btnSpecial->x() +
-					btnSpecial->w() + 8,
-					by, 95, bh, 
+					btnSpecial->w() + 5,
+					by, 100, bh, 
 					_("Ext tuner"));
 				btn_ext_tuner->tooltip(_("use external auto tuner"));
 				btn_ext_tuner->down_box(FL_DOWN_BOX);
@@ -1435,9 +1421,8 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				btn_ext_tuner->value(progStatus.external_tuner);
 
 				btn_xcvr_auto_on = new Fl_Check_Button(
-					btn_ext_tuner->x() +
-					btn_ext_tuner->w() + 8,
-					by, 95, bh, 
+					btn_ext_tuner->x() + btn_ext_tuner->w() + 5, by,
+					100, bh, 
 					_("Rig autOn"));
 				btn_xcvr_auto_on->tooltip(_("Auto Turn Rig On with Flrig startup"));
 				btn_xcvr_auto_on->down_box(FL_DOWN_BOX);
@@ -1445,13 +1430,40 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 				btn_xcvr_auto_on->value(progStatus.xcvr_auto_on);
 
 				btn_xcvr_auto_off = new Fl_Check_Button(
-					btn_xcvr_auto_on->x() +
-					btn_xcvr_auto_on->w() + 15,
-					by, 95, bh, _("Rig autOff"));
+					btn_xcvr_auto_on->x(), by + bh, 
+					100, bh, _("Rig autOff"));
 				btn_xcvr_auto_off->tooltip(_("Auto Turn Rig Off with Flrig exit"));
 				btn_xcvr_auto_off->down_box(FL_DOWN_BOX);
 				btn_xcvr_auto_off->callback((Fl_Callback*)cb_btn_xcvr_auto_off);
 				btn_xcvr_auto_off->value(progStatus.xcvr_auto_off);
+
+				btn_xcvr_synch_clock = new Fl_Check_Button(
+					btn_xcvr_auto_on->x() + btn_xcvr_auto_on->w() + 5, by,
+					90, bh, _("Sync Clk"));
+				btn_xcvr_synch_clock->tooltip(_("Synchronize xcvr clock to PC"));
+				btn_xcvr_synch_clock->down_box(FL_DOWN_BOX);
+				btn_xcvr_synch_clock->callback((Fl_Callback*)cb_btn_xcvr_synch_clock);
+				btn_xcvr_synch_clock->value(progStatus.sync_clock);
+
+				btn_xcvr_synch_gmt = new Fl_Check_Button(
+					btn_xcvr_synch_clock->x(), by + bh + 2, 
+					90, bh, _("Use GMT"));
+				btn_xcvr_synch_gmt->tooltip(_("Synchronize to Greenwich Mean Time"));
+				btn_xcvr_synch_gmt->down_box(FL_DOWN_BOX);
+				btn_xcvr_synch_gmt->callback((Fl_Callback*)cb_btn_xcvr_synch_gmt);
+				btn_xcvr_synch_gmt->value(progStatus.sync_gmt);
+
+				btn_xcvr_synch_now = new Fl_Button(
+					btn_xcvr_synch_gmt->x() + btn_xcvr_synch_gmt->w() + 5, by,
+					100, bh, _("Sync Now"));
+				btn_xcvr_synch_now->tooltip(_("Force clock synch at next minute"));
+				btn_xcvr_synch_now->callback((Fl_Callback*)cb_btn_xcvr_synch_now);
+
+				txt_xcvr_synch = new Fl_Output(
+					btn_xcvr_synch_now->x(), by + bh + 2,
+					100, bh, "");
+				txt_xcvr_synch->value("");
+				txt_xcvr_synch->align(FL_ALIGN_CENTER);
 
 			genericMisc->end();
 

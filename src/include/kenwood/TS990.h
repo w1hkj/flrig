@@ -197,6 +197,8 @@ public:
 
 	const char * get_bwname_(int bw, int md);
 
+	void sync_date(char *dt);
+	void sync_clock(char *tm);
 };
 
 #endif

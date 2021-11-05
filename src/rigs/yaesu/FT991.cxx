@@ -177,7 +177,9 @@ RIG_FT991::RIG_FT991() {
 	has_preamp_control =
 	has_ifshift_control =
 	has_ptt_control =
-	has_tune_control = true;
+	has_tune_control =
+	can_synch_clock = true;
+
 
 // derived specific
 	atten_level = 1;
@@ -1411,5 +1413,35 @@ int RIG_FT991::get_break_in()
 //		get_qsk_delay();
 	}
 	return progStatus.break_in;
+}
+
+// ---------------------------------------------------------------------
+// set date and time
+// ---------------------------------------------------------------------
+// dt formated as YYYYMMDD
+// ---------------------------------------------------------------------
+void RIG_FT991::sync_date(char *dt)
+{
+	cmd.assign("DT0");
+	cmd.append(dt);
+	cmd += ';';
+	sendCommand(cmd);
+	showresp(WARN, ASC, "sync_date", cmd, replystr);
+	sett("sync_date");
+}
+
+// ---------------------------------------------------------------------
+// tm formated as HH:MM:SS
+// ---------------------------------------------------------------------
+void RIG_FT991::sync_clock(char *tm)
+{
+	cmd.assign("DT1");
+	cmd += tm[0]; cmd += tm[1];
+	cmd += tm[3]; cmd += tm[4];
+	cmd += tm[6]; cmd += tm[7];
+	cmd += ';';
+	sendCommand(cmd);
+	showresp(WARN, ASC, "sync_time", cmd, replystr);
+	sett("sync_time");
 }
 

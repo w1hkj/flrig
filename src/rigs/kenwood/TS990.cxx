@@ -407,7 +407,8 @@ RIG_TS990::RIG_TS990() {
 	has_mode_control =
 	has_bandwidth_control =
 	has_ifshift_control =
-	has_ptt_control = true;
+	has_ptt_control =
+	can_synch_clock = true;
 
 	rxtxa = true;
 
@@ -3103,5 +3104,42 @@ void RIG_TS990::set_monitor( bool b)
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set Tx Monitor OFF", cmd, "");
 	}
+}
+
+// ---------------------------------------------------------------------
+// set date and time
+// ---------------------------------------------------------------------
+// dt formated as YYYYMMDD
+// ---------------------------------------------------------------------
+static std::string datestr;
+static std::string timestr;
+
+void RIG_TS990::sync_date(char *dt)
+{
+	datestr.clear();
+	datestr += dt[2];
+	datestr += dt[3];
+	datestr += dt[4];
+	datestr += dt[5];
+	datestr += dt[6];
+	datestr += dt[7];
+	cmd.assign("CK0");
+	cmd.append(datestr).append(timestr).append(";");
+
+	sendCommand(cmd);
+	showresp(WARN, ASC, "sync_date", cmd, replystr);
+	sett("sync_date");
+}
+
+// ---------------------------------------------------------------------
+// tm formated as HH:MM:SS
+// ---------------------------------------------------------------------
+void RIG_TS990::sync_clock(char *tm)
+{
+	timestr.clear();
+	timestr += tm[0];
+	timestr += tm[1];
+	timestr += tm[3];
+	timestr += tm[4];
 }
 

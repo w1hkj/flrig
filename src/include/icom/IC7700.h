@@ -100,6 +100,9 @@ public:
 	void set_notch(bool on, int val);
 	void get_notch_min_max_step(int &min, int &max, int &step);
 
+	void sync_date(char *dt);
+	void sync_clock(char *tm);
+
 };
 
 #endif

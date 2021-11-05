@@ -1633,3 +1633,21 @@ bool RIG_FTdx1200::set_cw_APF()
 		return false;
 }
 */
+
+// ---------------------------------------------------------------------
+// set date and time
+// ---------------------------------------------------------------------
+// tm formated as HH:MM:SS
+// ---------------------------------------------------------------------
+void RIG_FTdx1200::sync_clock(char *tm)
+{
+	cmd.assign("DT1");
+	cmd += tm[0]; cmd += tm[1];
+	cmd += tm[3]; cmd += tm[4];
+	cmd += tm[6]; cmd += tm[7];
+	cmd += ';';
+	sendCommand(cmd);
+	showresp(WARN, ASC, "sync_time", cmd, replystr);
+	sett("sync_time");
+}
+

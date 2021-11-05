@@ -196,6 +196,9 @@ status progStatus = {
 	5,			// int pwr_peak;
 	4,			// int pwr_scale ==> Autoselect
 
+	1,			// bool sync_clock
+	1,			// bool sync_gmt
+
 // ic7610 special controls
 	false,		// bool	digi_sel_on_off;
 	0,			// int	digi_sel_val;
@@ -361,6 +364,24 @@ status progStatus = {
 	"cmd 24",		// string	label24;
 	"",				// string	command24;
 	"",				// string	shftcmd24;
+
+	"1",			// string	label_on_start1;
+	"",				// string	cmd_on_start1;
+	"2",			// string	label_on_start2;
+	"",				// string	cmd_on_start2;
+	"3",			// string	label_on_start3;
+	"",				// string	cmd_on_start3;
+	"4",			// string	label_on_start4;
+	"",				// string	cmd_on_start4;
+
+	"1",			// string	label_on_exit1;
+	"",				// string	cmd_on_exit1;
+	"2",			// string	label_on_exit2;
+	"",				// string	cmd_on_exit2;
+	"3",			// string	label_on_exit3;
+	"",				// string	cmd_on_exit3;
+	"4",			// string	label_on_exit4;
+	"",				// string	cmd_on_exit4;
 
 // =========================
 
@@ -675,6 +696,9 @@ void status::saveLastState()
 	spref.set("pwr_peak", pwr_peak);
 	spref.set("pwr_scale", pwr_scale);
 
+	spref.set("sync_clock", sync_clock);
+	spref.set("sync_gmt", sync_gmt);
+
 	spref.set("digi_sel_on_off", digi_sel_on_off);
 	spref.set("digi_sel_val", digi_sel_val);
 	spref.set("dual_watch", dual_watch);
@@ -874,6 +898,30 @@ void status::saveLastState()
 	spref.set("label24", label24.c_str());
 	spref.set("command24", command24.c_str());
 	spref.set("shftcmd24", shftcmd24.c_str());
+
+	spref.set("st_label1", label_on_start1.c_str());
+	spref.set("st_cmd1", cmd_on_start1.c_str());
+
+	spref.set("st_label2", label_on_start2.c_str());
+	spref.set("st_cmd2", cmd_on_start2.c_str());
+
+	spref.set("st_label3", label_on_start3.c_str());
+	spref.set("st_cmd3", cmd_on_start3.c_str());
+
+	spref.set("st_label4", label_on_start4.c_str());
+	spref.set("st_cmd4", cmd_on_start4.c_str());
+
+	spref.set("ex_label1", label_on_exit1.c_str());
+	spref.set("ex_cmd1", cmd_on_exit1.c_str());
+
+	spref.set("ex_label2", label_on_exit2.c_str());
+	spref.set("ex_cmd2", cmd_on_exit2.c_str());
+
+	spref.set("ex_label3", label_on_exit3.c_str());
+	spref.set("ex_cmd3", cmd_on_exit3.c_str());
+
+	spref.set("ex_label4", label_on_exit4.c_str());
+	spref.set("ex_cmd4", cmd_on_exit4.c_str());
 
 	spref.set("fg_red", fg_red);
 	spref.set("fg_green", fg_green);
@@ -1246,6 +1294,9 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("pwr_peak", pwr_peak, pwr_peak);
 		spref.get("pwr_scale", pwr_scale, pwr_scale);
 
+		if (spref.get("sync_clock", i, sync_clock)) sync_clock = i;
+		if (spref.get("sync_gmt", i, sync_gmt)) sync_gmt = i;
+
 		if (spref.get("digi_sel_on_off", i, i)) digi_sel_on_off = i;
 		spref.get("digi_sel_val", digi_sel_val, digi_sel_val);
 
@@ -1518,6 +1569,46 @@ bool status::loadXcvrState(string xcvr)
 		command24 = defbuffer;
 		spref.get("shftcmd24", defbuffer, shftcmd24.c_str(), 499);
 		shftcmd24 = defbuffer;
+
+		spref.get("st_label1", defbuffer, label_on_start1.c_str(), 499);
+		label_on_start1 = defbuffer;
+		spref.get("st_cmd1", defbuffer, cmd_on_start1.c_str(), 499);
+		cmd_on_start1 = defbuffer;
+
+		spref.get("st_label2", defbuffer, label_on_start2.c_str(), 499);
+		label_on_start2 = defbuffer;
+		spref.get("st_cmd2", defbuffer, cmd_on_start2.c_str(), 499);
+		cmd_on_start2 = defbuffer;
+
+		spref.get("st_label3", defbuffer, label_on_start3.c_str(), 499);
+		label_on_start3 = defbuffer;
+		spref.get("st_cmd3", defbuffer, cmd_on_start3.c_str(), 499);
+		cmd_on_start3 = defbuffer;
+
+		spref.get("st_label4", defbuffer, label_on_start4.c_str(), 499);
+		label_on_start4 = defbuffer;
+		spref.get("st_cmd4", defbuffer, cmd_on_start4.c_str(), 499);
+		cmd_on_start4 = defbuffer;
+
+		spref.get("ex_label1", defbuffer, label_on_exit1.c_str(), 499);
+		label_on_exit1 = defbuffer;
+		spref.get("ex_cmd1", defbuffer, cmd_on_exit1.c_str(), 499);
+		cmd_on_exit1 = defbuffer;
+
+		spref.get("ex_label2", defbuffer, label_on_exit2.c_str(), 499);
+		label_on_exit2 = defbuffer;
+		spref.get("ex_cmd2", defbuffer, cmd_on_exit2.c_str(), 499);
+		cmd_on_exit2 = defbuffer;
+
+		spref.get("ex_label3", defbuffer, label_on_exit3.c_str(), 499);
+		label_on_exit3 = defbuffer;
+		spref.get("ex_cmd3", defbuffer, cmd_on_exit3.c_str(), 499);
+		cmd_on_exit3 = defbuffer;
+
+		spref.get("ex_label4", defbuffer, label_on_exit4.c_str(), 499);
+		label_on_exit4 = defbuffer;
+		spref.get("ex_cmd4", defbuffer, cmd_on_exit4.c_str(), 499);
+		cmd_on_exit4 = defbuffer;
 
 		spref.get("fg_red", fg_red, fg_red);
 		spref.get("fg_green", fg_green, fg_green);

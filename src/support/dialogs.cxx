@@ -466,7 +466,7 @@ void open_trace_tab()
 
 void open_commands_tab()
 {
-	select_tab(_("Cmds"));
+	select_tab(_("Commands"));
 }
 
 void open_restore_tab()

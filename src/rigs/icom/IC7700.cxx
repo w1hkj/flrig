@@ -173,6 +173,8 @@ RIG_IC7700::RIG_IC7700() {
 
 	has_band_selection = true;
 
+	can_synch_clock = true;
+
 	precision = 1;
 	ndigits = 9;
 
@@ -940,5 +942,53 @@ void RIG_IC7700::get_notch_min_max_step(int &min, int &max, int &step)
 			step = 20;
 			break;
 	}
+}
+
+// ---------------------------------------------------------------------
+// set date and time
+// 1A 05 00 95 HH MM : set time
+// 1A 05 00 94 YY YY MM DD : set date
+// ---------------------------------------------------------------------
+// dt formated as YYYYMMDD
+// ---------------------------------------------------------------------
+void RIG_IC7700::sync_date(char *dt)
+{
+	cmd.clear();
+	cmd.append(pre_to);
+	cmd += '\x1A'; cmd += '\x05';
+	cmd += '\x00'; cmd += '\x58';
+	unsigned char val;
+	val = ((dt[0] - '0') << 4) + (dt[1] - '0');
+	cmd += (val & 0xFF);
+	val = ((dt[2] - '0') << 4) + (dt[3] - '0');
+	cmd += (val & 0xFF);
+	val = ((dt[4] - '0') << 4) + (dt[5] - '0');
+	cmd += (val & 0xFF);
+	val = ((dt[6] - '0') << 4) + (dt[7] - '0');
+	cmd += (val & 0xFF);
+	cmd.append(post);
+	set_trace(1, "set xcvr clock");
+	waitFB("set xcvr clock", 200);
+	seth();
+}
+
+// ---------------------------------------------------------------------
+// tm formated as HH:MM:SS
+// ---------------------------------------------------------------------
+void RIG_IC7700::sync_clock(char *tm)
+{
+	cmd.clear();
+	cmd.append(pre_to);
+	cmd += '\x1A'; cmd += '\x05';
+	cmd += '\x00'; cmd += '\x59';
+	unsigned char val;
+	val = ((tm[0] - '0') << 4) + (tm[1] - '0');
+	cmd += (val & 0xFF);
+	val = ((tm[3] - '0') << 4) + (tm[4] - '0');
+	cmd += (val & 0xFF);
+	cmd.append(post);
+	set_trace(1, "set xcvr clock");
+	waitFB("set xcvr clock", 200);
+	seth();
 }
 

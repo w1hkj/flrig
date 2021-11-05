@@ -262,6 +262,10 @@ Fl_Light_Button *btnSpecial = (Fl_Light_Button *)0;
 Fl_Check_Button *btn_ext_tuner = (Fl_Check_Button *)0;
 Fl_Check_Button *btn_xcvr_auto_on = (Fl_Check_Button *)0;
 Fl_Check_Button *btn_xcvr_auto_off = (Fl_Check_Button *)0;
+Fl_Check_Button *btn_xcvr_synch_clock = (Fl_Check_Button *)0;
+Fl_Check_Button *btn_xcvr_synch_gmt = (Fl_Check_Button *)0;
+Fl_Button *btn_xcvr_synch_now = (Fl_Button *)0;
+Fl_Output *txt_xcvr_synch = (Fl_Output *)0;
 
 //Fl_Group  *kx3_extras = (Fl_Group *)0;
 //Fl_Check_Button *kxpa_enabled = (Fl_Check_Button *)0;
@@ -843,6 +847,18 @@ static void cb_btn_xcvr_auto_on(Fl_Check_Button* o, void*) {
 
 static void cb_btn_xcvr_auto_off(Fl_Check_Button* o, void*) {
 	progStatus.xcvr_auto_off = o->value();
+}
+
+static void cb_btn_xcvr_synch_clock( Fl_Check_Button* o, void*) {
+	progStatus.sync_clock = o->value();
+}
+
+static void cb_btn_xcvr_synch_gmt( Fl_Check_Button* o, void*) {
+	progStatus.sync_gmt = o->value();
+}
+
+static void cb_btn_xcvr_synch_now( Fl_Button *o, void *) {
+	synchronize_now();
 }
 
 //static void cb_kxpa_enabled(Fl_Check_Button* o, void *) {

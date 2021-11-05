@@ -3285,6 +3285,74 @@ void restore_rig_vals_(XCVR_STATE &xcvrvfo)
 
 }
 
+void send_st_ex_command(std::string command)
+{
+	string cmd = "";
+	if (command.find("x") != string::npos) { // hex strings
+		size_t p = 0;
+		unsigned int val;
+		while (( p = command.find("x", p)) != string::npos) {
+			sscanf(&command[p+1], "%x", &val);
+			cmd += (unsigned char) val;
+			p += 3;
+		}
+	} else
+		cmd = command;
+	sendCommand(cmd, 0);
+}
+
+#include "timeops.h"
+void synchronize(void *) 
+{
+	time_t now;
+	time(&now);
+	struct tm *tm_time;
+	static char sztm[20];
+
+	if (progStatus.sync_gmt) {
+		tm_time = gmtime(&now);
+		strftime(sztm, sizeof(sztm), "%H:%M:%S Z", tm_time);
+	} else {
+		tm_time = localtime(&now);
+		strftime(sztm, sizeof(sztm), "%H:%M:%S", tm_time);
+	}
+
+	if (strncmp(&sztm[6], "00", 2) == 0) {
+		guard_lock serial_lock(&mutex_serial);
+		static char szdate[20];
+		strftime(szdate, sizeof(szdate), "%Y%m%d", tm_time);
+		selrig->sync_clock(sztm);
+		selrig->sync_date(szdate);
+		txt_xcvr_synch->value("--SYNC'D--");
+		return;
+	}
+	txt_xcvr_synch->value(sztm);
+	Fl::repeat_timeout(0.05, synchronize);
+}
+
+void synchronize_now() {
+	Fl::remove_timeout(synchronize);
+	Fl::add_timeout(0, synchronize);
+}
+
+void start_commands()
+{
+	if (!progStatus.cmd_on_start1.empty()) send_st_ex_command(progStatus.cmd_on_start1);
+	if (!progStatus.cmd_on_start2.empty()) send_st_ex_command(progStatus.cmd_on_start2);
+	if (!progStatus.cmd_on_start3.empty()) send_st_ex_command(progStatus.cmd_on_start3);
+	if (!progStatus.cmd_on_start4.empty()) send_st_ex_command(progStatus.cmd_on_start4);
+	if (progStatus.sync_clock && selrig->can_synch_clock)
+		Fl::add_timeout(0, synchronize);
+}
+
+void exit_commands()
+{
+	if (!progStatus.cmd_on_exit1.empty()) send_st_ex_command(progStatus.cmd_on_exit1);
+	if (!progStatus.cmd_on_exit2.empty()) send_st_ex_command(progStatus.cmd_on_exit2);
+	if (!progStatus.cmd_on_exit3.empty()) send_st_ex_command(progStatus.cmd_on_exit3);
+	if (!progStatus.cmd_on_exit4.empty()) send_st_ex_command(progStatus.cmd_on_exit4);
+}
+
 void restore_rig_vals()
 {
 	if (progStatus.start_stop_trace) ss_trace(true);
@@ -3333,6 +3401,8 @@ void restore_rig_vals()
 	trace(2, "Restored xcvr A:\n", print(xcvr_vfoA));
 
 	if (progStatus.start_stop_trace) ss_trace(false);
+
+	exit_commands();
 
 }
 
@@ -4631,13 +4701,15 @@ void init_Generic_Tabs()
 		else
 			sldr_nb_level->hide();
 
+		spnr_bpf_center->show();
+		btn_use_bpf_center->show();
 		if (selrig->has_bpf_center) {
 			spnr_bpf_center->value(progStatus.bpf_center);
-			spnr_bpf_center->show();
-			btn_use_bpf_center->show();
+			spnr_bpf_center->activate();
+			btn_use_bpf_center->activate();
 		} else {
-			spnr_bpf_center->hide();
-			btn_use_bpf_center->hide();
+			spnr_bpf_center->deactivate();
+			btn_use_bpf_center->deactivate();
 		}
 		tabsGeneric->add(genericRx);
 		genericRx->redraw();
@@ -4660,24 +4732,46 @@ void init_Generic_Tabs()
 		} else
 			spnr_vfo_adj->hide();
 
+		spnr_line_out->show();
 		if (selrig->has_line_out)
-			spnr_line_out->show();
+			spnr_line_out->activate();
 		else
-			spnr_line_out->hide();
+			spnr_line_out->deactivate();
 
+		btn_xcvr_auto_on->show();
+		btn_xcvr_auto_off->show();
 		if (selrig->has_xcvr_auto_on_off) {
 			btn_xcvr_auto_on->value(progStatus.xcvr_auto_on);
 			btn_xcvr_auto_off->value(progStatus.xcvr_auto_off);
-			btn_xcvr_auto_on->show();
-			btn_xcvr_auto_off->show();
+			btn_xcvr_auto_on->activate();
+			btn_xcvr_auto_off->activate();
 		} else {
-			btn_xcvr_auto_on->hide();
-			btn_xcvr_auto_off->hide();
+			btn_xcvr_auto_on->deactivate();
+			btn_xcvr_auto_off->deactivate();
 		}
+
+		btn_xcvr_synch_clock->show();
+		btn_xcvr_synch_gmt->show();
+		btn_xcvr_synch_now->show();
+		txt_xcvr_synch->show();
+		if (selrig->can_synch_clock) {
+			btn_xcvr_synch_clock->activate();
+			btn_xcvr_synch_gmt->activate();
+			btn_xcvr_synch_now->activate();
+			txt_xcvr_synch->activate();
+		} else {
+			btn_xcvr_synch_clock->deactivate();
+			btn_xcvr_synch_gmt->deactivate();
+			btn_xcvr_synch_now->deactivate();
+			txt_xcvr_synch->deactivate();
+		}
+
 		tabsGeneric->add(genericMisc);
 		genericMisc->redraw();
 		genericMisc->show();
+
 	}
+
 
 	btnAuxDTR->hide();
 	btnAuxRTS->hide();
@@ -4719,7 +4813,8 @@ void init_Generic_Tabs()
 	tabsGeneric->redraw();
 	tabsGeneric->show();
 
-	tabs_dialog->init_sizes();
+	if (progStatus.UIsize != touch_ui)
+		tabs_dialog->init_sizes();
 
 	poll_frequency->activate(); poll_frequency->value(progStatus.poll_frequency);
 	poll_mode->activate(); poll_mode->value(progStatus.poll_mode);
@@ -5861,18 +5956,20 @@ void set_init_break_in()
 
 void init_special_controls()
 {
+	btnSpecial->show();
 	if (selrig->has_special)
-		btnSpecial->show();
+		btnSpecial->activate();
 	else
-		btnSpecial->hide();
+		btnSpecial->deactivate();
 }
 
 void init_external_tuner()
 {
+	btn_ext_tuner->show();
 	if (selrig->has_ext_tuner)
-		btn_ext_tuner->show();
+		btn_ext_tuner->activate();
 	else
-		btn_ext_tuner->hide();
+		btn_ext_tuner->deactivate();
 }
 
 void init_CIV()
@@ -6197,6 +6294,8 @@ trace(1, "FAILED");
 	xcvr_online = true;
 	box_xcvr_connect->color(FL_GREEN);
 	box_xcvr_connect->redraw();
+
+	start_commands();
 
 	return;
 

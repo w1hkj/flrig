@@ -176,6 +176,8 @@ public:
 	void set_xcvr_auto_on();
 	void set_xcvr_auto_off();
 
+	void sync_date(char *dt);
+	void sync_clock(char *tm);
 };
 
 #endif
