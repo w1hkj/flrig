@@ -2331,11 +2331,17 @@ void RIG_IC7300::setVfoAdj(double v)
 	cmd.append("\x1A\x05");
 	cmd += '\x00';
 	cmd += '\x58';
-	cmd.append(bcd255(int(v)));
+	int vint = roundf(v * 2.55);
+	cmd += (vint / 100);
+	vint %= 100;
+	cmd += ((vint % 10) + ((vint / 10) << 4));
 	cmd.append(post);
 	set_trace(1, "set VFO adjust");
 	waitFB("SET vfo adjust");
 	seth();
+
+	MilliSleep(100);
+	getVfoAdj();
 }
 
 double RIG_IC7300::getVfoAdj()
@@ -2353,10 +2359,18 @@ double RIG_IC7300::getVfoAdj()
 	if (ret) {
 		size_t p = replystr.find(pre_fm);
 		if (p != string::npos) {
-			vfo_ = num100(replystr.substr(p+8));
+			vfo_ = 100 * (replystr[p+8] & 0x0F) + 10 * ((replystr[p+9] & 0xF0) >> 4) + (replystr[p+9] & 0x0F);
+			vfo_ /= 2.55;
 		}
 	}
 	return vfo_;
+}
+
+void RIG_IC7300::get_vfoadj_min_max_step(double &min, double &max, double &step)
+{
+	min = 0; 
+	max = 100; 
+	step = 0.3922;
 }
 
 // Read/Write band stack registers

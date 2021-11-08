@@ -1382,7 +1382,7 @@ Fl_Double_Window *tabs_window()
 
 			spnr_cw_wpm = new Hspinner(
 				4, 40,
-				85, 22, _("wpm"), 16);
+				85, 22, _("wpm"), 18);
 			spnr_cw_wpm->type(1);
 			spnr_cw_wpm->minimum(5);
 			spnr_cw_wpm->maximum(80);
@@ -1395,7 +1395,7 @@ Fl_Double_Window *tabs_window()
 
 			spnr_cw_weight = new Hspinner(
 				spnr_cw_wpm->x() + spnr_cw_wpm->w() + 4, 40,
-				85, 22, _("Weight"), 16);
+				85, 22, _("Weight"), 18);
 			spnr_cw_weight->type(1);
 			spnr_cw_weight->minimum(2.5);
 			spnr_cw_weight->maximum(4.5);
@@ -1409,7 +1409,7 @@ Fl_Double_Window *tabs_window()
 
 			spnr_cw_spot_tone= new Hspinner(
 				spnr_cw_weight->w() + spnr_cw_weight->x() + 4, 40,
-				85, 22, _("Spot tone"), 16);
+				85, 22, _("Spot tone"), 18);
 			spnr_cw_spot_tone->tooltip(_("Spot volume"));
 			spnr_cw_spot_tone->type(1);
 			spnr_cw_spot_tone->minimum(50);
@@ -1450,7 +1450,7 @@ Fl_Double_Window *tabs_window()
 
 			spnr_cw_qsk = new Hspinner(
 				btnBreakIn->x() + btnBreakIn->w() + 4, 40,
-				85, 22, _("Bk-in Dly"), 16);
+				85, 22, _("Bk-in Dly"), 18);
 			spnr_cw_qsk->tooltip(_("msec"));
 			spnr_cw_qsk->type(1);
 			spnr_cw_qsk->minimum(0);
@@ -1463,7 +1463,7 @@ Fl_Double_Window *tabs_window()
 
 			spnr_cw_delay = new Hspinner(
 				spnr_cw_qsk->x() + spnr_cw_qsk->w() + 4, 40,
-				120, 22, _("QSK delay"), 16);
+				120, 22, _("QSK delay"), 18);
 			spnr_cw_delay->tooltip(_("msec"));
 			spnr_cw_delay->type(0);
 			spnr_cw_delay->minimum(30);
@@ -1480,7 +1480,7 @@ Fl_Double_Window *tabs_window()
 
 			spnr_vox_gain = new Hspinner(
 				4, 40,
-				80, 22, _("gain"), 16);
+				80, 22, _("gain"), 18);
 			spnr_vox_gain->type(1);
 			spnr_vox_gain->minimum(0);
 			spnr_vox_gain->maximum(100);
@@ -1492,7 +1492,7 @@ Fl_Double_Window *tabs_window()
 
 			spnr_anti_vox = new Hspinner(
 				spnr_vox_gain->x() + spnr_vox_gain->w() + 10, 40,
-				80, 22, _("anti"), 16);
+				80, 22, _("anti"), 18);
 			spnr_anti_vox->type(1);
 			spnr_anti_vox->minimum(0);
 			spnr_anti_vox->maximum(100);
@@ -1504,7 +1504,7 @@ Fl_Double_Window *tabs_window()
 
 			spnr_vox_hang = new Hspinner(
 				spnr_anti_vox->x() + spnr_anti_vox->w() + 10, 40,
-				80, 22, _("hang"), 16);
+				80, 22, _("hang"), 18);
 			spnr_vox_hang->type(1);
 			spnr_vox_hang->minimum(0);
 			spnr_vox_hang->maximum(100);
@@ -1539,7 +1539,7 @@ Fl_Double_Window *tabs_window()
 			btnCompON->value(progStatus.compON);
 			btnCompON->tooltip(_("Compression on/off"));
 
-			spnr_compression = new Hspinner(138, 40, 70, 22, _("Comp"));
+			spnr_compression = new Hspinner(138, 40, 70, 22, _("Comp"), 18);
 			spnr_compression->type(1);
 			spnr_compression->minimum(0);
 			spnr_compression->maximum(100);
@@ -1572,7 +1572,7 @@ Fl_Double_Window *tabs_window()
 
 			sldr_nb_level->value(progStatus.nb_level);
 
-			spnr_bpf_center = new Hspinner(115, 35, 120, 22, _("BPF Cntr"));
+			spnr_bpf_center = new Hspinner(115, 35, 90, 22, _("BPF Cntr"), 18);
 			spnr_bpf_center->tooltip(_("Bandpass Filter Center Freq in Hz"));
 			spnr_bpf_center->type(1);
 			spnr_bpf_center->minimum(600);
@@ -1591,14 +1591,15 @@ Fl_Double_Window *tabs_window()
 			btn_use_bpf_center->callback((Fl_Callback*)cb_btn_use_bpf_center);
 			btn_use_bpf_center->value(progStatus.use_bpf_center);
 
-			spnr_vfo_adj = new Hspinner(245, 35, 80, 22, _("Vfo Adj"));
-			spnr_vfo_adj->type(1);
+			spnr_vfo_adj = new Hspinner(210, 35, 100, 22, _("Vfo Adj"), 18);
+			spnr_vfo_adj->type(FL_FLOAT_INPUT);
 			spnr_vfo_adj->callback((Fl_Callback*)cb_spnr_vfo_adj);
 			spnr_vfo_adj->align(FL_ALIGN_BOTTOM);
-			spnr_vfo_adj->step(1);
+			spnr_vfo_adj->step(0.1);
+			spnr_vfo_adj->format("%.1f");
 			spnr_vfo_adj->value(progStatus.vfo_adj);
 
-			spnr_line_out = new Hspinner(335, 35, 80, 22, _("line out"));
+			spnr_line_out = new Hspinner(335, 35, 80, 22, _("line out"), 18);
 			spnr_line_out->type(1);
 			spnr_line_out->minimum(0);
 			spnr_line_out->maximum(100);

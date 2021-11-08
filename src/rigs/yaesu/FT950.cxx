@@ -355,7 +355,7 @@ double RIG_FT950::getVfoAdj()
 	return (double)(atoi(&replystr[p+5]));
 }
 
-void RIG_FT950::get_vfoadj_min_max_step(int &min, int &max, int &step)
+void RIG_FT950::get_vfoadj_min_max_step(double &min, double &max, double &step)
 {
 	min = -25;
 	max = 25;

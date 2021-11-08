@@ -1385,8 +1385,8 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 			genericMisc = new Fl_Group(xpos, ypos+tabh, W, tabb, _("Misc"));
 				genericMisc->hide();
 
-				spnr_vfo_adj = new Hspinner(xpos + 20, by, 4*bh, bh, _("Vfo Adj"));
-				spnr_vfo_adj->type(FL_INT_INPUT);
+				spnr_vfo_adj = new Hspinner(xpos + 20, by, 5*bh, bh, _("Vfo Adj"), bh/2);
+				spnr_vfo_adj->type(FL_FLOAT_INPUT);
 				spnr_vfo_adj->callback((Fl_Callback*)cb_spnr_vfo_adj);
 				spnr_vfo_adj->value(progStatus.vfo_adj);
 				spnr_vfo_adj->align(FL_ALIGN_CENTER | FL_ALIGN_BOTTOM);

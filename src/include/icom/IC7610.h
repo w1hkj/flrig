@@ -180,7 +180,7 @@ public:
 
 	void setVfoAdj(double v);
 	double getVfoAdj();
-	void get_vfoadj_min_max_step(int &min, int &max, int &step) {
+	void get_vfoadj_min_max_step(double &min, double &max, double &step) {
 		min = 0; max = 511; step = 1; }
 
 	void set_digi_sel(bool);

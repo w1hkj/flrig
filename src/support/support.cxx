@@ -4721,7 +4721,7 @@ void init_Generic_Tabs()
 		selrig->has_xcvr_auto_on_off ) {
 
 		if (selrig->has_vfo_adj) {
-			int min, max, step;
+			double min, max, step;
 			selrig->get_vfoadj_min_max_step(min, max, step);
 			spnr_vfo_adj->minimum(min);
 			spnr_vfo_adj->maximum(max);

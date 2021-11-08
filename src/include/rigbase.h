@@ -535,10 +535,10 @@ int bfo_;
 	virtual void get_BFO_min_max_step(int &min, int &max, int &step) {
 		min = -100; max = 100; step = 1; }
 
-int vfo_;
+double vfo_;
 	virtual void setVfoAdj(double v) {vfo_ = v;}
 	virtual double getVfoAdj() {return vfo_;}
-	virtual void get_vfoadj_min_max_step(int &min, int &max, int &step) {
+	virtual void get_vfoadj_min_max_step(double &min, double &max, double &step) {
 		min = -100; max = 100; step = 1; }
 
 	virtual void set_line_out() {}
