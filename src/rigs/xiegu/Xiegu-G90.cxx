@@ -50,7 +50,7 @@ const char *Xiegu_G90modes_[] = {
 "LSB", "USB", "AM", "CW", "CW-R", NULL};
 
 static char Xiegu_G90_mode_type[] = {
-	'L', 'U', 'U', 'L', 'L', 'U' };
+	'L', 'U', 'U', 'L', 'U', 'L' };
 
 const char Xiegu_G90_mode_nbr[] = {
 	0x00, // Select the LSB mode
@@ -695,8 +695,12 @@ int RIG_Xiegu_G90::get_power_out(void)
 			if (replystr[p + 7] == '\xFD') {
 				mtr = hexval(replystr[p + 6]);
 			} else {
-				mtr = 100 * hexval(replystr[p + 6]) + hexval(replystr[p + 7]);
+				mtr = 100 * hexval(replystr[p + 7]) + hexval(replystr[p + 6]);
 			}
+//int p6 = hexval(replystr[p+6]);
+//int p7 = hexval(replystr[p+7]);
+//std::cout << "power out: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+//std::cout << "pout vals: " << p6 << ", " << p7 << ", " << 100*p7+p6 << std::endl;
 			if (mtr < 0) mtr = 0;
 			if (mtr > 213) mtr = 213;
 		}
@@ -887,8 +891,10 @@ int RIG_Xiegu_G90::get_swr()
 			if (replystr[p + 7] == '\xFD') {
 				mtr = hexval(replystr[p + 6]);
 			} else {
-				mtr = 100 * hexval(replystr[p + 6]) + hexval(replystr[p + 7]);
+				mtr = 100 * hexval(replystr[p + 7]) + hexval(replystr[p + 6]);
 			}
+std::cout << "SWR: " << str2hex(replystr.c_str(), replystr.length()) << std::endl;
+std::cout << "meter: " << mtr << " --> ";
 			size_t i = 0;
 			for (i = 0; i < sizeof(swrtbl) / sizeof(meterpair) - 1; i++)
 				if (mtr >= swrtbl[i].mtr && mtr < swrtbl[i+1].mtr)
@@ -898,6 +904,7 @@ int RIG_Xiegu_G90::get_swr()
 			mtr = (int)ceil(smtrtbl[i].val + 
 				(smtrtbl[i+1].val - smtrtbl[i].val)*(mtr - smtrtbl[i].mtr)/(smtrtbl[i+1].mtr - smtrtbl[i].mtr));
 			if (mtr > 100) mtr = 100;
+std::cout << mtr << std::endl;
 		}
 	}
 	return mtr;
