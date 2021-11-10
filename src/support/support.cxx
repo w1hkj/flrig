@@ -1339,6 +1339,16 @@ void serviceQUE()
 				rig_trace(1, "execute A2B()");
 				execute_A2B();
 				break;
+			case FA2FB:
+				trace(1, "execute FA2FB");
+				rig_trace(1, "execute FA2FB");
+				execute_FA2FB();
+				break;
+			case FB2FA:
+				trace(1, "execute FB2FA");
+				rig_trace(1, "execute FB2FA");
+				execute_FB2FA();
+				break;
 			default:
 				trace(2, "default ", printXCVR_STATE(nuvals.vfo).c_str());
 				if (useB) serviceB(nuvals.vfo);
@@ -2137,16 +2147,28 @@ void execute_swapAB()
 void cbAswapB()
 {
 	guard_lock lock(&mutex_srvc_reqs, "cbAswapB");
-	if (Fl::event_button() == FL_RIGHT_MOUSE) {
+	if ((Fl::event_state() & FL_SHIFT) == FL_SHIFT) {
 		VFOQUEUE xcvr;
-		xcvr.change = A2B;
-		trace(1, "cb Active->Inactive vfo");
+		xcvr.change = FA2FB;
+		trace(1, "cb VfoA freq -> VfoB freq");
+		srvc_reqs.push(xcvr);
+	} else if ((Fl::event_state() & FL_CTRL) == FL_CTRL) {
+		VFOQUEUE xcvr;
+		xcvr.change = FB2FA;
+		trace(1, "cb VfoB freq -> VfoA freq");
 		srvc_reqs.push(xcvr);
 	} else {
-		VFOQUEUE xcvr;
-		xcvr.change = SWAP;
-		trace(1, "cb SWAP");
-		srvc_reqs.push(xcvr);
+		if (Fl::event_button() == FL_RIGHT_MOUSE) {
+			VFOQUEUE xcvr;
+			xcvr.change = A2B;
+			trace(1, "cb Active->Inactive vfo");
+			srvc_reqs.push(xcvr);
+		} else {
+			VFOQUEUE xcvr;
+			xcvr.change = SWAP;
+			trace(1, "cb SWAP");
+			srvc_reqs.push(xcvr);
+		}
 	}
 }
 
@@ -2208,6 +2230,22 @@ void execute_A2B()
 			FreqDispB->value(vfoB.freq);
 		}
 	}
+	Fl::awake(updateUI);
+}
+
+void execute_FA2FB()
+{
+	vfoB.freq = vfoA.freq;
+	selrig->set_vfoB(vfoB.freq);
+	FreqDispB->value(vfoB.freq);
+	Fl::awake(updateUI);
+}
+
+void execute_FB2FA()
+{
+	vfoA.freq = vfoB.freq;
+	selrig->set_vfoA(vfoA.freq);
+	FreqDispA->value(vfoA.freq);
 	Fl::awake(updateUI);
 }
 

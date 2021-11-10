@@ -122,6 +122,8 @@ extern void highlight_vfo(void *);
 extern void cb_set_split(int);
 extern void execute_swapAB();
 extern void execute_A2B();
+extern void execute_FA2FB();
+extern void execute_FB2FA();
 extern void cbAswapB();
 extern void cbRIT();
 extern void cbXIT();

@@ -111,17 +111,19 @@ struct XCVR_STATE {
 };
 
 enum {
-	vA,   // apply to vfoA
-	vB,   // apply to vfoB
-	vX,   // apply to current vfo
-	sA,  // select vfoA
-	sB,  // select vfoB
-	ON,  // ptt ON
-	OFF, // ptt OFF
-	sON, // split ON
-	sOFF, // split OFF
-	A2B,  // active to inactive vfo
-	SWAP  // swap vfo's
+	vA,    // apply to vfoA
+	vB,    // apply to vfoB
+	vX,    // apply to current vfo
+	sA,    // select vfoA
+	sB,    // select vfoB
+	ON,    // ptt ON
+	OFF,   // ptt OFF
+	sON,   // split ON
+	sOFF,  // split OFF
+	A2B,   // active to inactive vfo
+	SWAP,  // swap vfo's
+	FA2FB, // frequency vfoA -> vfoB
+	FB2FA  // frequency vfoA -> vfoB
 };
 
 struct VFOQUEUE {

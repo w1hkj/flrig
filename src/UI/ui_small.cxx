@@ -381,7 +381,12 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	labelMEMORY->hide();
 
 	btnAswapB = new Fl_Button(318, 62, 52, 20, _("A / B"));
-	btnAswapB->tooltip(_("Left click:Swap A/B\nRight click:Copy A to B"));
+	btnAswapB->tooltip(_("\
+Left click:Swap A/B\n\
+Right click:Copy A to B\n\
+SHIFT click: FreqA -> FreqB\n\
+CTRL  click: FreqB -> FreqA\
+"));
 	btnAswapB->down_box(FL_DOWN_BOX);
 	btnAswapB->labelsize(12);
 	btnAswapB->callback((Fl_Callback*)cb_btnAswapB);

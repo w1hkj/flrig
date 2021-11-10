@@ -775,7 +775,12 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 
 		xpos += btnAutoNotch->w() + 2;
 		btnAswapB = new Fl_Button(xpos, ypos, bw, bh, _("A / B"));
-		btnAswapB->tooltip(_("Left click: Swap A/B\nRight click: Copy A to B"));
+		btnAswapB->tooltip(_("\
+Left click:Swap A/B\n\
+Right click:Copy A to B\n\
+SHIFT click: FreqA -> FreqB\n\
+CTRL  click: FreqB -> FreqA\
+"));
 		btnAswapB->down_box(FL_DOWN_BOX);
 		btnAswapB->labelsize(16);
 		btnAswapB->callback((Fl_Callback*)cb_btnAswapB);
