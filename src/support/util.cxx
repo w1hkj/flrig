@@ -19,7 +19,10 @@
 // ----------------------------------------------------------------------------
 
 #include <string.h>
+#include <cerrno>
 #include <time.h>
+#include <sys/time.h>
+
 #include "util.h"
 #ifdef __MINGW32__
 #  include "compat.h"
@@ -277,5 +280,36 @@ void MilliSleep(long msecs)
 	tv.tv_sec = msecs / 1000;
 	tv.tv_nsec = (msecs - tv.tv_sec * 1000) * 1000000L;
 	nanosleep(&tv, NULL);
+}
+
+// return current tick time in seconds
+double fsk_now()
+{
+	static struct timeval t1;
+	gettimeofday(&t1, NULL);
+	return t1.tv_sec + t1.tv_usec / 1e6;
+}
+
+// sub millisecond accurate sleep function
+// sleep_time in seconds
+int accu_sleep (double sleep_time)
+{
+	struct timespec tv;
+	double end_at = fsk_now() + sleep_time;
+	double delay = sleep_time - 0.1e-3;
+	tv.tv_sec = (time_t) delay;
+	tv.tv_nsec = (long) ((delay - tv.tv_sec) * 1e+9);
+	int rval = 0;
+	while (1) {
+		rval = nanosleep (&tv, &tv);
+		if (rval == 0)
+			break;
+		else if (errno == EINTR)
+			continue;
+		else 
+			return rval;
+	}
+	while (fsk_now() < end_at);
+	return 0;
 }
 

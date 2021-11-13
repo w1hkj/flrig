@@ -61,19 +61,6 @@ void millisleep(int msecs)
 	nanosleep(&tv, &tv);
 }
 
-double now()
-{
-	static struct timeval t;
-	gettimeofday(&t, NULL);
-	return t.tv_sec * 1e3 + t.tv_usec / 1e3;
-}
-
-void accu_sleep(double msecs) {
-	double end = now() + msecs;
-	if (msecs > 2) millisleep(round(msecs) - 2);
-	while (now() <= end);
-}
-
 void send_cwkey(char c)
 {
 	static std::string code = "";
@@ -95,14 +82,11 @@ void send_cwkey(char c)
 	if (!port->IsOpen()) 
 		goto exit_send_cwkey;
 
-	tc = 1200.0 / progStatus.cwioWPM;
+	tc = 1.2 / progStatus.cwioWPM;
 	tch = 3 * tc;
 	twd = 4 * tc;
 
 	if ((progStatus.cwio_comp > 0) && (progStatus.cwio_comp < tc)) {
-//		tc = round (tc - progStatus.cwio_comp);
-//		tch = round (tch - 3 * progStatus.cwio_comp);
-//		twd = round (twd - 4 * progStatus.cwio_comp);
 		tc = tc - progStatus.cwio_comp;
 		tch = tch - 3 * progStatus.cwio_comp;
 		twd = twd - 4 * progStatus.cwio_comp;
@@ -202,7 +186,7 @@ void sending_text()
 	char c = 0;
 	if (progStatus.cwioPTT) {
 		doPTT(1);
-		accu_sleep(progStatus.cwioPTT);
+		accu_sleep(progStatus.cwioPTT / 1000.0);
 	}
 	while (cwio_process == SEND) {
 		c = 0;
@@ -221,11 +205,11 @@ void sending_text()
 			}
 		}
 		if (c) send_cwkey(c);
-		else accu_sleep(5);
+		else accu_sleep(0.005);
 	}
 	if (progStatus.cwioPTT) {
 		doPTT(0);
-		accu_sleep(progStatus.cwioPTT);
+		accu_sleep(progStatus.cwioPTT / 1000.0);
 	}
 }
 
@@ -317,7 +301,7 @@ int start_cwio_thread()
 
 	LOG_INFO("started cwio thread");
 
-	accu_sleep(10); // Give the CPU time to set 'cwio_thread_running'
+	accu_sleep(0.010); // Give the CPU time to set 'cwio_thread_running'
 	return 0;
 }
 
@@ -328,11 +312,11 @@ void stop_cwio_thread()
 	cwio_process = END;
 	btn_cwioSEND->value(0);
 
-	accu_sleep(4 * 1200 / progStatus.cwioWPM);
+	accu_sleep( 4.8 / progStatus.cwioWPM);
 
 	cwio_process = TERMINATE;
 	pthread_cond_signal(&cwio_cond);
-	accu_sleep(50);
+	accu_sleep(0.050);
 
 	pthread_join(cwio_pthread, NULL);
 
@@ -468,7 +452,7 @@ void calibrate_cwio()
 	btn_cwioSEND->value(0);
 
 	cwio_process = END;
-	accu_sleep(50);
+	accu_sleep(0.050);
 
 	cwio_process = CALIBRATE;
 	pthread_cond_signal(&cwio_cond);
@@ -477,5 +461,18 @@ void calibrate_cwio()
 
 void open_cwio_config()
 {
+	if (progStatus.cwioSHARED == 1) {
+		btn_cwioCAT->value(1); btn_cwioCAT->activate();
+		btn_cwioAUX->value(0); btn_cwioAUX->deactivate();
+		btn_cwioSEP->value(0); btn_cwioSEP->deactivate();
+		select_cwioPORT->value("NONE"); select_cwioPORT->deactivate();
+		btn_cwioCONNECT->value(0); btn_cwioCONNECT->deactivate();
+	} else {
+		btn_cwioCAT->activate();
+		btn_cwioAUX->activate();
+		btn_cwioSEP->activate();
+		select_cwioPORT->activate();
+		btn_cwioCONNECT->activate();
+	}
 	cwio_configure->show();
 }

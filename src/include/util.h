@@ -147,6 +147,16 @@ void restore_signals(void);
 
 void MilliSleep(long msecs);
 
+// return current tick time in seconds
+double fsk_now();
+
+// sub millisecond accurate sleep function
+// sleep_time in seconds
+// returns 0 if no error
+// nanosleep return value if error
+
+int accu_sleep (double sleep_time);
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

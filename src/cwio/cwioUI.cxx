@@ -396,7 +396,7 @@ static void cb_btn_done_edit(Fl_Button*, void*) {
 
 Fl_Double_Window* make_message_editor() {
   Fl_Double_Window* w;
-  { Fl_Double_Window* o = new Fl_Double_Window(640, 345, _("Message Editor"));
+  { Fl_Double_Window* o = new Fl_Double_Window(640, 344, _("Message Editor"));
     w = o; if (w) {/* empty */}
     { Fl_Tabs* o = new Fl_Tabs(0, 0, 530, 345);
       o->align(Fl_Align(FL_ALIGN_TOP|FL_ALIGN_INSIDE));
@@ -929,11 +929,13 @@ static void cb_btn_cwioCAT(Fl_Check_Button* o, void*) {
   btn_cwioAUX->value(0); btn_cwioAUX->deactivate();
   btn_cwioSEP->value(0); btn_cwioSEP->deactivate();
   btn_cwioCONNECT->value(0); btn_cwioCONNECT->deactivate();
+  select_cwioPORT->value("NONE"); select_cwioPORT->deactivate();
 }else {
   progStatus.cwioSHARED = 0;
   btn_cwioCONNECT->activate();
   btn_cwioAUX->activate();
   btn_cwioSEP->activate();
+  select_cwioPORT->activate();
 };
 }
 
@@ -945,11 +947,13 @@ static void cb_btn_cwioAUX(Fl_Check_Button* o, void*) {
   btn_cwioCAT->value(0); btn_cwioCAT->deactivate();
   btn_cwioSEP->value(0); btn_cwioSEP->deactivate();
   btn_cwioCONNECT->value(0); btn_cwioCONNECT->deactivate();
+  select_cwioPORT->value("NONE"); select_cwioPORT->deactivate();
 }else {
   progStatus.cwioSHARED = 0;
   btn_cwioCONNECT->activate();
   btn_cwioCAT->activate();
   btn_cwioSEP->activate();
+  select_cwioPORT->activate();
 };
 }
 
@@ -961,11 +965,13 @@ static void cb_btn_cwioSEP(Fl_Check_Button* o, void*) {
   btn_cwioAUX->value(0); btn_cwioAUX->deactivate();
   btn_cwioCAT->value(0); btn_cwioCAT->deactivate();
   btn_cwioCONNECT->value(0); btn_cwioCONNECT->deactivate();
+  select_cwioPORT->value("NONE"); select_cwioPORT->deactivate();
 }else {
   progStatus.cwioSHARED = 0;
   btn_cwioCONNECT->activate();
   btn_cwioAUX->activate();
   btn_cwioCAT->activate();
+  select_cwioPORT->activate();
 };
 }
 
