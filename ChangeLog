@@ -1,6 +1,29 @@
-2021-08-04  dave-w1hkj  <w1hkj@bellsouth.net>
+2021-11-13  dave-w1hkj  <w1hkj@bellsouth.net>
 
-	ba16efed: Version 1.4.2
+	faf5a092: Version 1.4.3
+	715fc26f: cwio accu_sleep
+	b688d273: A2B freq only
+	2add8453: g90 cw/power/swr
+	d273ea8b: vfo adjust
+	3188549f: start/exit set clock
+	5ef0451c: TX500
+	615476b3: cw generator
+	19372d4c: FTdx10
+	03991093: ftdx101d
+	c9b2914c: FT1000MP
+	d5559bc5: cw invert
+	c5ac441b: elad
+	b0cc398f: Power control
+	9b52112d: K3 power level
+	51787304: K3/KX3/KXPA metering
+	ec294b69: Disable Polling
+	2bacd24c: Transmit meters
+	678db606: cmedia/serial port
+	3f320170: KX3 ptt/if-shift
+	a9ebebae: IC7851/9610/9700
+	af4b4eb5: kx3_options
+	c668f84d: kx3 extras
+	7940dad8: Version 1.4.2
 	ff406f02: FT1000MP
 	f1453c97: TS570
 	3aa0487d: Multiple xmlrpc client conflicts

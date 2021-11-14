@@ -85,9 +85,9 @@ additional libraries or definition files are required.
 |<br>               |\ref icom_746pro_a "IC 746 Pro"       |\ref kwd_ts590sg_a  "TS 590SG" |\ref tt_omni7_a "TT 588" |\ref yaesu_847_a "FT 847"       |\ref o_Xiegu-5105 "Xiegu 5105"   |
 |<br>               |\ref icom_756pro2_a "IC 756 Pro II"   |\ref kwd_ts990_a   "TS 990"    |\ref tt_599_a   "TT 599" |\ref yaesu_857d_a "FT 857D"     |\ref o_Xiegu-G90 "Xiegu G90"     |
 |<br>               |\ref icom_756pro3_a "IC 756 Pro III"  |\ref kwd_ts2000_a  "TS 2000"   |<br>                     |\ref yaesu_897d_a "FT 897D"     |<br>                             |
-|<br>               |\ref icom_910h_a "IC 910H"            |<br>                           |<br>                     |\ref yaesu_950_a "FT-950"       |<br>                             |
+|<br>               |\ref icom_910h_a "IC 910H"            |<br>                           |<br>                     |\ref yaesu_950_a "FT-950"       |<br> o_FDMDUO "FDM-DUO"          |
 |<br>               |\ref icom_7000_a "IC 7000"            |<br>                           |<br>                     |\ref yaesu_991 "FT-991"         |<br>                             |
-|<br>               |\ref icom_7100_a "IC 7100"            |<br>                           |<br>                     |\ref yaesu_991A "FT-991A"       |<br>                             |
+|<br>               |\ref icom_7100_a "IC 7100"            |<br>                           |<br>                     |\ref yaesu_991A "FT-991A"       |<br> o_TX500 "TX500"             |
 |<br>               |\ref icom_7200_a "IC 7200"            |<br>                           |<br>                     |\ref yaesu_1000mp_a "FT-1000MP" |<br>                             |
 |<br>               |\ref icom_7300_a "IC 7300"            |<br>                           |<br>                     |\ref yaesu_2000_a "FT 2000"     |<br>                             |
 |<br>               |\ref icom_7410_a "IC 7410"            |<br>                           |<br>                     |\ref yaesu_1200dx_a "FTdx1200"  |<br>                             |

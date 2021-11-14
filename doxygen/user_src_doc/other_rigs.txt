@@ -30,6 +30,16 @@
 \image latex transceivers/Xiegu-G90.png "Xiegu-G90" width=3.75in
 \image html transceivers/Xiegu-G90.png "Xiegu-G90"
 </center>
+\anchor o_FDMDUO
+<center>
+\image latex transceivers/FDMDUO.png "FDM-DUO" width=3.75in
+\image html transceivers/FDMDUO.png "FDM-DUO"
+</center>
+\anchor o_TX500
+<center>
+\image latex transceivers/TX500.png "Lab599 TX500" width=3.75in
+\image html transceivers/TX500.png "Lab599 TX500"
+</center>
 \ref other_rigs "Page Top"
 \ref sFlrigDesc "Return to Main Page"
 */

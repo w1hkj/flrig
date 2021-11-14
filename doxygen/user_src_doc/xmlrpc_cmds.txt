@@ -1,57 +1,85 @@
 /**
 \page xmlrpc_commands  flrig XmlRpc Command Structures
 <pre>
-main.set_frequency  d:d  set current VFO in Hz
-main.get_version    s:n  returns version string
-rig.get_AB          s:n  returns vfo in use A or B
-rig.get_bw          s:n  return BW of current VFO
-rig.get_bws         s:n  return table of BW values
-rig.get_bwA         s:n  return BW of vfo A
-rig.get_bwB         s:n  return BW of vfo B
-rig.get_info        s:n  return an info string
-rig.get_mode        s:n  return MODE of current VFO
-rig.get_modeA       s:n  return MODE of current VFO A
-rig.get_modeB       s:n  return MODE of current VFO B
-rig.get_modes       s:n  return table of MODE values
-rig.get_sideband    s:n  return sideband (U/L)
-rig.get_notch       s:n  return notch value
-rig.get_ptt         s:n  return PTT state
-rig.get_power       s:n  return power level control value
-rig.get_pwrmeter    s:n  return PWR out
-rig.get_smeter      s:n  return Smeter
-rig.get_split       s:n  return split state
-rig.get_update      s:n  return update to info
-rig.get_vfo         s:n  return current VFO in Hz
-rig.get_vfoA        s:n  return vfo A in Hz
-rig.get_vfoB        s:n  return vfo B in Hz
-rig.get_xcvr        s:n  returns name of transceiver
-rig.get_volume      s:n  returns volume control value
-rig.get_rfgain      s:n  returns rf gain control value
-rig.get_micgain     s:n  returns mic gain control value
-rig.set_AB          s:s  set VFO A/B
-rig.set_bw          i:i  set BW iaw BW table
-rig.set_bandwidth   i:i  set bandwidth to nearest requested value
-rig.set_BW          i:i  set L/U pair
-rig.set_frequency   d:d  set current VFO in Hz
-rig.set_mode        i:i  set MODE iaw MODE table
-rig.set_modeA       i:i  set MODE A iaw MODE table
-rig.set_modeB       i:i  set MODE B iaw MODE table
-rig.set_notch       d:d  set NOTCH value in Hz
-rig.set_power       i:i  set power control level, watts
-rig.set_ptt         i:i  set PTT 1/0 (on/off)
-rig.set_vfo         d:d  set current VFO in Hz
-rig.set_vfoA        d:d  set vfo A in Hz
-rig.set_vfoB        d:d  set vfo B in Hz
-rig.set_split       i:i  set split 1/0 (on/off)
-rig.set_volume      i:i  sets volume control
-rig.set_rfgain      i:i  sets rf gain control
-rig.set_micgain     i:i  sets mic gain control
-rig.swap            i:i  execute vfo swap
-rig.cat_string      s:s  execute CAT string
-rig.shutdown        i:i  shutdown xcvr & flrig
-rig.cwio_wpm        i:i  set cwio WPM
-rig.cwio_text       s:s  send text via cwio interface
-rig.cwio_send       i:i  cwio transmit 1/0 (on/off)
+main.set_frequency        d:d  set current VFO in Hz
+main.get_version          s:n  returns version string
+rig.get_AB                s:n  returns vfo in use A or B
+rig.get_bw                A:n  return BW of current VFO
+rig.get_bws               A:n  return table of BW values
+rig.get_bwA               A:n  return BW of vfo A
+rig.get_bwB               A:n  return BW of vfo B
+rig.get_info              s:n  return an info string
+rig.get_mode              s:n  return MODE of current VFO
+rig.get_modeA             s:n  return MODE of current VFO A
+rig.get_modeB             s:n  return MODE of current VFO B
+rig.get_modes             A:n  return table of MODE values
+rig.get_sideband          s:n  return sideband (U/L)
+rig.get_notch             i:n  return notch value
+rig.get_ptt               i:n  return PTT state
+rig.get_power             i:n  return power level control value
+rig.get_pwrmeter          s:n  return PWR out
+rig.get_pwrmeter_scale    s:n  return scale for power meter
+rig.get_pwrmax            s:n  return maximum power available
+rig.get_swrmeter          s:n  return SWR out
+rig.get_smeter            s:n  return Smeter
+rig.get_DBM               s:n  return Smeter in dBm
+rig.get_Sunits            s:n  return Smeter in S units
+rig.get_split             i:n  return split state
+rig.get_update            s:n  return update to info
+rig.get_vfo               s:n  return current VFO in Hz
+rig.get_vfoA              s:n  return vfo A in Hz
+rig.get_vfoB              s:n  return vfo B in Hz
+rig.get_xcvr              s:n  returns name of transceiver
+rig.get_volume            i:n  returns volume control value
+rig.get_rfgain            i:n  returns rf gain control value
+rig.get_micgain           i:n  returns mic gain control value
+rig.set_AB                n:s  set VFO A/B
+rig.set_bw                i:i  set BW iaw BW table
+rig.set_bandwidth         i:i  set bandwidth to nearest requested value
+rig.set_BW                i:i  set L/U pair
+rig.set_frequency         d:d  set current VFO in Hz
+rig.set_mode              i:s  set MODE iaw MODE table
+rig.set_modeA             i:s  set MODE A iaw MODE table
+rig.set_modeB             i:s  set MODE B iaw MODE table
+rig.set_notch             n:i  set NOTCH value in Hz
+rig.set_power             n:i  set power control level, watts
+rig.set_ptt               n:i  set PTT 1/0 (on/off)
+rig.set_vfo               d:d  set current VFO in Hz
+rig.set_vfoA              d:d  set vfo A in Hz
+rig.set_vfoB              d:d  set vfo B in Hz
+rig.set_split             n:i  set split 1/0 (on/off)
+rig.set_volume            n:i  set volume control
+rig.set_rfgain            n:i  set rf gain control
+rig.set_micgain           n:i  set mic gain control
+rig.set_ptt_fast          n:i  deprecated; use set_ptt
+rig.set_vfoA_fast         d:d  deprecated; use set_vfoA
+rig.set_vfoB_fast         d:d  deprecated; use set_vfoB
+rig.set_verify_AB         n:s  set & verify VFO A/B
+rig.set_verify_bw         i:i  set & verify BW iaw BW table
+rig.set_verify_bandwidth  i:i  set & verify bandwidth to nearest requested value
+rig.set_verify_BW         i:i  set & verify L/U pair
+rig.set_verify_frequency  d:d  set & verify current VFO in Hz
+rig.set_verify_mode       i:s  set & verify MODE iaw MODE table
+rig.set_verify_modeA      i:s  set & verify MODE A iaw MODE table
+rig.set_verify_modeB      i:s  set & verify MODE B iaw MODE table
+rig.set_verify_notch      n:i  set & verify NOTCH value in Hz
+rig.set_verify_power      n:i  set & verify power control level, watts
+rig.set_verify_ptt        n:i  set & verify PTT 1/0 (on/off)
+rig.set_verify_vfoA       d:d  set & verify vfo A in Hz
+rig.set_verify_vfoB       d:d  set & verify vfo B in Hz
+rig.set_verify_split      n:i  set & verify split 1/0 (on/off)
+rig.set_verify_volume     n:i  set & verify volume control
+rig.set_verify_rfgain     n:i  set & verify rf gain control
+rig.set_verify_micgain    n:i  set & verify mic gain control
+rig.swap                  n:n  execute vfo swap
+rig.tune                  n:n  enable transceiver tune function
+rig.cat_string            s:s  execute CAT string
+rig.cat_priority          s:s  priority CAT string
+rig.shutdown              i:n  shutdown xcvr & flrig
+rig.cwio_wpm              n:i  set cwio WPM
+rig.cwio_text             i:s  send text via cwio interface
+rig.cwio_char             n:i  send char via cwio interface
+rig.cwio_send             n:i  cwio transmit 1/0 (on/off)
 </pre>
 
 The xmlrpc command structure can be accessed using the menu item help/xml-help.
