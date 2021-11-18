@@ -4756,7 +4756,8 @@ void init_Generic_Tabs()
 
 	if (selrig->has_vfo_adj ||
 		selrig->has_line_out ||
-		selrig->has_xcvr_auto_on_off ) {
+		selrig->has_xcvr_auto_on_off ||
+		selrig->can_synch_clock ) {
 
 		if (selrig->has_vfo_adj) {
 			double min, max, step;

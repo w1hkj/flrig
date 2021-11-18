@@ -204,6 +204,11 @@ RIG_IC7800::RIG_IC7800() {
 // IC7800 unique commands
 //======================================================================
 
+bool RIG_IC7800::check()
+{
+	return true;
+}
+
 void RIG_IC7800::selectA()
 {
 	cmd = pre_to;
@@ -994,7 +999,7 @@ void RIG_IC7800::sync_date(char *dt)
 	cmd.clear();
 	cmd.append(pre_to);
 	cmd += '\x1A'; cmd += '\x05';
-	cmd += '\x00'; cmd += '\x95';
+	cmd += '\x00'; cmd += '\x59';
 	unsigned char val;
 	val = ((dt[0] - '0') << 4) + (dt[1] - '0');
 	cmd += (val & 0xFF);
@@ -1018,7 +1023,7 @@ void RIG_IC7800::sync_clock(char *tm)
 	cmd.clear();
 	cmd.append(pre_to);
 	cmd += '\x1A'; cmd += '\x05';
-	cmd += '\x00'; cmd += '\x96';
+	cmd += '\x00'; cmd += '\x60';
 	unsigned char val;
 	val = ((tm[0] - '0') << 4) + (tm[1] - '0');
 	cmd += (val & 0xFF);
