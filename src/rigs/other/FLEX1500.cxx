@@ -46,8 +46,8 @@ static const char *FLEX1500_CAT_USB[] = {
 //------------------------------------------------------------------------
 static const char *FLEX1500_WIDEwidths[] = {
 "Wideband", NULL };
-static const char *FLEX1500_CAT_WIDE[] = {
-"ZZFI12;" };
+//static const char *FLEX1500_CAT_WIDE[] = {
+//"ZZFI12;" };
 //------------------------------------------------------------------------
 static const char *FLEX1500_DIGwidths[] = {
 " 3000", " 2500", " 2000", " 1500", " 1000",

@@ -2716,17 +2716,17 @@ public:
 // Set cwio transmit on (1) or off (0)
 //------------------------------------------------------------------------------
 
-static void set_cwio_send_button(void *val)
-{
-	if (val == (void *)1) {
-		btn_cwioSEND->value(1);
-	} else {
-		btn_cwioSEND->value(0);
-		guard_lock lck(&cwio_text_mutex);
-		cwio_text.clear();
-	}
-	btn_cwioSEND->redraw();
-}
+//static void set_cwio_send_button(void *val)
+//{
+//	if (val == (void *)1) {
+//		btn_cwioSEND->value(1);
+//	} else {
+//		btn_cwioSEND->value(0);
+//		guard_lock lck(&cwio_text_mutex);
+//		cwio_text.clear();
+//	}
+//	btn_cwioSEND->redraw();
+//}
 
 /*
 class rig_set_verify_cwio_send : public XmlRpcServerMethod {

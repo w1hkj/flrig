@@ -46,8 +46,8 @@ static const char *PowerSDR_CAT_USB[] = {
 //------------------------------------------------------------------------
 static const char *PowerSDR_WIDEwidths[] = {
 "Wideband", NULL };
-static const char *PowerSDR_CAT_WIDE[] = {
-"ZZFI12;", NULL };
+//static const char *PowerSDR_CAT_WIDE[] = {
+//"ZZFI12;", NULL };
 //------------------------------------------------------------------------
 static const char *PowerSDR_DIGwidths[] = {
 " 3000", " 2500", " 2000", " 1500", " 1000",
