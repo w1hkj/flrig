@@ -30,6 +30,7 @@
 #include <fstream>
 #include <cstdlib>
 
+#include <errno.h>
 #include <time.h>
 #include <sys/time.h>
 
@@ -42,6 +43,8 @@
 #include "tod_clock.h"
 #include "cwio.h"
 #include "cwioUI.h"
+
+//#define CWIO_DEBUG
 
 using namespace std;
 
@@ -56,13 +59,60 @@ pthread_mutex_t cwio_text_mutex = PTHREAD_MUTEX_INITIALIZER;
 int cwio_process = NONE;
 bool cwio_thread_running = false;
 
-void millisleep(int msecs)
-{	struct timespec tv = { msecs / 1000, (msecs % 1000) * 1000000 };
-	nanosleep(&tv, &tv);
+// return current tick time in seconds
+double cw_now()
+{
+	static struct timeval t1;
+	gettimeofday(&t1, NULL);
+	return t1.tv_sec + t1.tv_usec / 1e6;
+}
+
+// sub millisecond accurate sleep function
+// sleep_time in seconds
+#ifdef CWIO_DEBUG
+FILE *fcwio = (FILE *)0;
+#endif
+
+int cw_sleep (double sleep_time)
+{
+	struct timespec tv;
+	double start_at = cw_now();
+	double end_at = start_at + sleep_time;
+	double delay = sleep_time - 0.005;
+	tv.tv_sec = (time_t) delay;
+	tv.tv_nsec = (long) ((delay - tv.tv_sec) * 1e+9);
+	int rval = 0;
+#ifdef __WIN32__
+	timeBeginPeriod(1);
+	end_at -= 0.0005;
+#endif
+	while (1) {
+		rval = nanosleep (&tv, &tv);
+		if (rval == 0)
+			break;
+		else if (errno == EINTR)
+			continue;
+		else 
+			return rval;
+	}
+	while (cw_now() < end_at);
+#ifdef __WIN32__
+	timeEndPeriod(1);
+#endif
+
+#ifdef CWIO_DEBUG
+	if (fcwio)
+		fprintf(fcwio, "%f\n", cw_now() - start_at - sleep_time);
+#endif
+	return 0;
 }
 
 void send_cwkey(char c)
 {
+#ifdef CWIO_DEBUG
+	if (!fcwio) fcwio = fopen("cwio_timing.txt", "a");
+#endif
+
 	static std::string code = "";
 	static double tc = 0;
 	static double tch = 0;
@@ -93,7 +143,7 @@ void send_cwkey(char c)
 	}
 
 	if (c == ' ' || c == 0x0a) {
-		accu_sleep(twd);
+		cw_sleep(twd);
 		goto exit_send_cwkey;
 	}
 
@@ -108,9 +158,9 @@ void send_cwkey(char c)
 			port->setRTS(progStatus.cwioINVERTED ? 0 : 1);
 		}
 		if (code[n] == '.')
-			accu_sleep(tc);
+			cw_sleep(tc);
 		else
-			accu_sleep(tch);
+			cw_sleep(tch);
 
 		if (progStatus.cwioKEYLINE == 2) {
 			port->setDTR(progStatus.cwioINVERTED ? 1 : 0);
@@ -118,9 +168,9 @@ void send_cwkey(char c)
 			port->setRTS(progStatus.cwioINVERTED ? 1 : 0);
 		}
 		if (n == code.length() -1)
-			accu_sleep(tch);
+			cw_sleep(tch);
 		else
-			accu_sleep(tc);
+			cw_sleep(tc);
 	}
 
 exit_send_cwkey:
@@ -181,12 +231,17 @@ void update_txt_to_send(void *)
 	txt_to_send->redraw();
 }
 
+void terminate_sending(void *)
+{
+	btn_cwioSEND->value(0);
+}
+
 void sending_text()
 {
 	char c = 0;
 	if (progStatus.cwioPTT) {
 		doPTT(1);
-		accu_sleep(progStatus.cwioPTT / 1000.0);
+		cw_sleep(progStatus.cwioPTT / 1000.0);
 	}
 	while (cwio_process == SEND) {
 		c = 0;
@@ -204,12 +259,18 @@ void sending_text()
 				Fl::awake(update_txt_to_send);
 			}
 		}
+		if (c == ']') {
+			cwio_process = END;
+			cw_sleep(0.005);
+			Fl::awake(terminate_sending);
+			return;
+		}
 		if (c) send_cwkey(c);
-		else accu_sleep(0.005);
+		else cw_sleep(0.005);
 	}
 	if (progStatus.cwioPTT) {
 		doPTT(0);
-		accu_sleep(progStatus.cwioPTT / 1000.0);
+		cw_sleep(progStatus.cwioPTT / 1000.0);
 	}
 }
 
@@ -301,7 +362,7 @@ int start_cwio_thread()
 
 	LOG_INFO("started cwio thread");
 
-	accu_sleep(0.010); // Give the CPU time to set 'cwio_thread_running'
+	cw_sleep(0.010); // Give the CPU time to set 'cwio_thread_running'
 	return 0;
 }
 
@@ -312,11 +373,11 @@ void stop_cwio_thread()
 	cwio_process = END;
 	btn_cwioSEND->value(0);
 
-	accu_sleep( 4.8 / progStatus.cwioWPM);
+	cw_sleep( 4.8 / progStatus.cwioWPM);
 
 	cwio_process = TERMINATE;
 	pthread_cond_signal(&cwio_cond);
-	accu_sleep(0.050);
+	cw_sleep(0.050);
 
 	pthread_join(cwio_pthread, NULL);
 
@@ -354,6 +415,10 @@ void add_cwio(string txt)
 	new_text.append(txt);
 	txt_to_send->value(new_text.c_str());
 	txt_to_send->redraw();
+	if (txt[0] == '[') {
+		send_text(true);
+		btn_cwioSEND->value(1);
+	}
 }
 
 void send_text(bool state)
@@ -452,7 +517,7 @@ void calibrate_cwio()
 	btn_cwioSEND->value(0);
 
 	cwio_process = END;
-	accu_sleep(0.050);
+	cw_sleep(0.050);
 
 	cwio_process = CALIBRATE;
 	pthread_cond_signal(&cwio_cond);
