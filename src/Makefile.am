@@ -126,6 +126,8 @@ flrig_SOURCES += \
 	cwio/cwioUI.cxx \
 	cmedia/cmedia.cxx \
 	cmedia/hid.cxx \
+	fskio/fsk.cxx \
+	fskio/fskioUI.cxx \
 	graphics/pixmaps.cxx \
 	graphics/icons.cxx \
 	graphics/images.cxx \
@@ -279,6 +281,8 @@ EXTRA_DIST = \
 	include/hidapi.h \
 	include/cwio.h \
 	include/cwioUI.h \
+	include/fsk.h \
+	include/fskioUI.h \
 	include/gpio.h \
 	include/gpio_ptt.h \
 	include/morse.h \
@@ -427,7 +431,9 @@ EXTRA_DIST = \
 	images/P200.xbm \
 	images/P200log.xbm \
 	images/S60.xbm \
-	images/SWR.xbm
+	images/SWR.xbm \
+	cwio/cwioUI.fl \
+	fskio/fskioUI.fl
 
 # Additional non-source files that are distributed
 # Additional source files that support non-Linux cross compilation

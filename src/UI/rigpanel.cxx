@@ -32,6 +32,8 @@
 #include "ui.h"
 #include "cwioUI.h"
 #include "cwio.h"
+#include "fsk.h"
+#include "fskioUI.h"
 
 Fl_Light_Button *btnPOWER = (Fl_Light_Button *)0;
 
@@ -455,7 +457,7 @@ static void cb_mnuCMEDIA(Fl_Menu_*, void*) {
 	open_cmedia_tab();
 }
 
-static void cb_keyer(Fl_Menu_*, void*) {
+static void cb_CWkeyer(Fl_Menu_*, void*) {
 	if (cwio_keyer_dialog == 0)
 		cwio_keyer_dialog = cwio_window();
 	for (int n = 0; n < 12; n++) {
@@ -463,6 +465,16 @@ static void cb_keyer(Fl_Menu_*, void*) {
 		btn_msg[n]->redraw_label();
 	}
 	cwio_keyer_dialog->show();
+}
+
+static void cb_FSKkeyer(Fl_Menu_*, void*) {
+	if (FSK_keyer_dialog == 0)
+		FSK_keyer_dialog = fskio_window();
+	for (int n = 0; n < 12; n++) {
+		FSK_btn_msg[n]->label(progStatus.FSK_labels[n].c_str());
+		FSK_btn_msg[n]->redraw_label();
+	}
+	FSK_keyer_dialog->show();
 }
 
 //static void cb_mnuXMLRPC(Fl_Menu_*, void*) {

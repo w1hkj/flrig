@@ -52,6 +52,8 @@
 #include "tod_clock.h"
 #include "trace.h"
 #include "cwio.h"
+#include "fsk.h"
+#include "fskioUI.h"
 #include "xml_server.h"
 #include "gpio_ptt.h"
 #include "cmedia.h"
@@ -2999,17 +3001,16 @@ void doPTT(int on)
 {
 	guard_lock serlck(&mutex_serial);
 
-	int set = btnPTT->value();
-	int chk = 0;
-	chk = chkptt();
-	rigPTT(set);
-	MilliSleep(50);
+	int chk = chkptt();
+	if (chk == on) return;
+	rigPTT(on);
+	MilliSleep(progStatus.comm_wait);
 	for (int n = 0; n < 100; n++) {
-		chk = chkptt();
-		if (set == chk) break;
+		if (on == chkptt()) break;
 		MilliSleep(progStatus.comm_wait);
 		Fl::awake();
 	}
+	btnPTT->value(on);
 	return;
 }
 
@@ -3775,9 +3776,15 @@ void cbExit()
 
 	if (tracewindow) tracewindow->hide();
 	if (tabs_dialog) tabs_dialog->hide();
+
 	if (cwio_keyer_dialog) cwio_keyer_dialog->hide();
 	if (cwio_editor) cwio_editor->hide();
 	if (cwio_configure) cwio_configure->hide();
+
+	if (FSK_keyer_dialog) FSK_keyer_dialog->hide();
+	if (FSK_editor) FSK_editor->hide();
+	if (FSK_configure) FSK_configure->hide();
+
 }
 
 void cbALC_SWR()

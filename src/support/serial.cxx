@@ -56,7 +56,7 @@ Cserial::Cserial() {
 	dtrptt =
 	rtscts = 
 	serptt = false;
-	status = 0;
+	state = 0;
 	stopbits = 2;
 	fd = -1;
 	failed_ = 0;
@@ -180,21 +180,21 @@ bool Cserial::OpenPort()  {
 
 	tcsetattr (fd, TCSANOW, &newtio);
 
-	ioctl(fd, TIOCMGET, &status);
-	origstatus = status;
+	ioctl(fd, TIOCMGET, &state);
+	origstate = state;
 
 	if (dtr)
-		status |= TIOCM_DTR;		// set the DTR bit
+		state |= TIOCM_DTR;		// set the DTR bit
 	else
-		status &= ~TIOCM_DTR;	   // clear the DTR bit
+		state &= ~TIOCM_DTR;	   // clear the DTR bit
 
 	if (rtscts == false) {		  // rts OK for ptt if RTSCTS not used
 		if (rts)
-			status |= TIOCM_RTS;		// set the RTS bit
+			state |= TIOCM_RTS;		// set the RTS bit
 		else
-			status &= ~TIOCM_RTS;	   // clear the RTS bit
+			state &= ~TIOCM_RTS;	   // clear the RTS bit
 	}
-	ioctl(fd, TIOCMSET, &status);
+	ioctl(fd, TIOCMSET, &state);
 
 	FlushBuffer();
 
@@ -232,45 +232,49 @@ void Cserial::SetPTT(bool ON)
 	}
 
 	if (dtrptt || rtsptt) {
-		ioctl(fd, TIOCMGET, &status);
+		ioctl(fd, TIOCMGET, &state);
 		if (ON) {								  // ptt enabled
-			if (dtrptt && dtr)  status &= ~TIOCM_DTR;	 // toggle low
-			if (dtrptt && !dtr) status |= TIOCM_DTR;	  // toggle high
+			if (dtrptt && dtr)  state &= ~TIOCM_DTR;	 // toggle low
+			if (dtrptt && !dtr) state |= TIOCM_DTR;	  // toggle high
 			if (!rtscts) {
-				if (rtsptt && rts)  status &= ~TIOCM_RTS; // toggle low
-				if (rtsptt && !rts) status |= TIOCM_RTS;  // toggle high
+				if (rtsptt && rts)  state &= ~TIOCM_RTS; // toggle low
+				if (rtsptt && !rts) state |= TIOCM_RTS;  // toggle high
 			}
 		} else {										  // ptt disabled
-			if (dtrptt && dtr)  status |= TIOCM_DTR;	  // toggle high
-			if (dtrptt && !dtr) status &= ~TIOCM_DTR;	 // toggle low
+			if (dtrptt && dtr)  state |= TIOCM_DTR;	  // toggle high
+			if (dtrptt && !dtr) state &= ~TIOCM_DTR;	 // toggle low
 			if (!rtscts) {
-				if (rtsptt && rts)  status |= TIOCM_RTS;  // toggle high
-				if (rtsptt && !rts) status &= ~TIOCM_RTS; // toggle low
+				if (rtsptt && rts)  state |= TIOCM_RTS;  // toggle high
+				if (rtsptt && !rts) state &= ~TIOCM_RTS; // toggle low
 			}
 		}
-		LOG_INFO("PTT %d, DTRptt %d, DTR %d, RTSptt %d, RTS %d, RTSCTS %d, status %2X",
-			  ON, dtrptt, dtr, rtsptt, rts, rtscts, status);
+		LOG_INFO("PTT %d, DTRptt %d, DTR %d, RTSptt %d, RTS %d, RTSCTS %d, state %2X",
+			  ON, dtrptt, dtr, rtsptt, rts, rtscts, state);
 		if (progStatus.serialtrace) {
-			snprintf(traceinfo, sizeof(traceinfo),"PTT %d, DTRptt %d, DTR %d, RTSptt %d, RTS %d, RTSCTS %d, status %2X",
-				ON, dtrptt, dtr, rtsptt, rts, rtscts, status);
+			snprintf(traceinfo, sizeof(traceinfo),"PTT %d, DTRptt %d, DTR %d, RTSptt %d, RTS %d, RTSCTS %d, state %2X",
+				ON, dtrptt, dtr, rtsptt, rts, rtscts, state);
 			ser_trace(1, traceinfo);
 		}
-		ioctl(fd, TIOCMSET, &status);
+std::cout << "set ptt ioctl " << std::hex << state << std::endl;
+		ioctl(fd, TIOCMSET, &state);
 	}
 	serptt = ON;
 }
 
 void Cserial::setRTS(bool b)
 {
-	if (fd < 0)
+	if (fd < 0) {
 		return;
+	}
 
-	ioctl(fd, TIOCMGET, &status);
+	ioctl(fd, TIOCMGET, &state);
 	if (b == true) 
-		status |= TIOCM_RTS;  // toggle high
+		state |= TIOCM_RTS;  // toggle high
 	else 
-		status &= ~TIOCM_RTS; // toggle low
-	ioctl(fd, TIOCMSET, &status);
+		state &= ~TIOCM_RTS; // toggle low
+
+	if (ioctl(fd, TIOCMSET, &state) == -1)
+		std::cout << "set RTS ioctl error: " << errno << std::endl;
 
 }
 
@@ -279,12 +283,13 @@ void Cserial::setDTR(bool b)
 	if (fd < 0)
 		return;
 
-	ioctl(fd, TIOCMGET, &status);
+	ioctl(fd, TIOCMGET, &state);
 	if (b == true)
-		status |= TIOCM_DTR;	  // toggle high
+		state |= TIOCM_DTR;	  // toggle high
 	else
-		status &= ~TIOCM_DTR;	 // toggle low
-	ioctl(fd, TIOCMSET, &status);
+		state &= ~TIOCM_DTR;	 // toggle low
+	if (ioctl(fd, TIOCMSET, &state) == -1)
+		std::cout << "set DTR ioctl error: " << errno << std::endl;
 
 }
 
@@ -303,17 +308,17 @@ snprintf(msg, sizeof(msg),"ClosePort(): fd = %d", fd);
 	fd = -1;
 
 // Some serial drivers force RTS and DTR high immediately upon
-// opening the port, so our origstatus will indicate those bits
+// opening the port, so our origstate will indicate those bits
 // high (though the lines weren't actually high before we opened).
-// But then when we "restore" RTS and DTR from origstatus here
+// But then when we "restore" RTS and DTR from origstate here
 // it can result in PTT activation upon program exit!  To avoid
 // this possibility, we ignore the apparentl initial settings, and
 // instead force RTS and DTR low before closing the port.  (Just
 // omitting the ioctl(TIOCMSET) would also resolve the problem).
 // Kamal Mostafa <kamal@whence.com>
 
-//	origstatus &= ~(TIOCM_RTS|TIOCM_DTR);
-//	ioctl(myfd, TIOCMSET, &origstatus);
+//	origstate &= ~(TIOCM_RTS|TIOCM_DTR);
+//	ioctl(myfd, TIOCMSET, &origstate);
 //	tcsetattr (myfd, TCSANOW, &oldtio);
 	close(myfd);
 ser_trace(1,"serial port closed");

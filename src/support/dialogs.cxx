@@ -52,6 +52,7 @@
 #include "rigpanel.h"
 #include "gettext.h"
 #include "cwioUI.h"
+#include "fskioUI.h"
 
 using namespace std;
 
@@ -77,6 +78,7 @@ void clear_combos()
 	selectAuxPort->add("NONE");
 	selectSepPTTPort->add("NONE");
 	select_cwioPORT->add("NONE");
+	select_fskioPORT->add("NONE");
 }
 
 void add_combos(char *port)
@@ -85,6 +87,7 @@ void add_combos(char *port)
 	selectAuxPort->add(port);
 	selectSepPTTPort->add(port);
 	select_cwioPORT->add(port);
+	select_fskioPORT->add(port);
 }
 
 void set_combo_value()
@@ -93,6 +96,7 @@ void set_combo_value()
 	selectAuxPort->value(progStatus.aux_serial_port.c_str());
 	selectSepPTTPort->value(progStatus.sep_serial_port.c_str());
 	select_cwioPORT->value(progStatus.cwioPORT.c_str());
+	select_fskioPORT->value(progStatus.FSK_PORT.c_str());
 }
 
 //======================================================================

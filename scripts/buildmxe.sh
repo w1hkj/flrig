@@ -6,7 +6,7 @@
   --with-ptw32=$PREFIX/i686-w64-mingw32.static \
   --with-libiconv-prefix=$PREFIX/iconv \
   --enable-static \
-  PTW32_LIBS="-lpthread -lpcreposix -lpcre" \
+  PTW32_LIBS="-lpthread -lpcreposix -lpcre -lwinmm" \
   FLTK_CONFIG=$PREFIX/i686-w64-mingw32.static/bin/fltk-config
 
 make -j 8

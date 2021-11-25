@@ -81,6 +81,8 @@
 #include "icons.h"
 #include "cwio.h"
 #include "cwioUI.h"
+#include "fsk.h"
+#include "fskioUI.h"
 #include "serial.h"
 
 #include "flrig_icon.cxx"
@@ -92,6 +94,10 @@ Fl_Double_Window *tabs_dialog = (Fl_Double_Window *)0;
 Fl_Double_Window *cwio_keyer_dialog = (Fl_Double_Window *)0;
 Fl_Double_Window *cwio_editor = (Fl_Double_Window *)0;
 Fl_Double_Window *cwio_configure = (Fl_Double_Window *)0;
+Fl_Double_Window *FSK_keyer_dialog = (Fl_Double_Window *)0;
+Fl_Double_Window *FSK_editor = (Fl_Double_Window *)0;
+Fl_Double_Window *FSK_configure = (Fl_Double_Window *)0;
+
 
 string HomeDir;
 string RigHomeDir;
@@ -258,6 +264,7 @@ void exit_main(Fl_Widget *w)
 #if SERIAL_DEBUG
 	fclose(serlog);
 #endif
+
 }
 
 void expand_controls(void*)
@@ -400,6 +407,7 @@ int main (int argc, char *argv[])
 	AuxSerial	= new Cserial;
 	cwio_serial	= new Cserial();
 	morse		= new Cmorse();
+	FSK_serial	= new Cserial();
 
 	try {
 		std::string fname = RigHomeDir;
@@ -447,6 +455,10 @@ int main (int argc, char *argv[])
 	cwio_configure = cwio_config_dialog();
 	morse->init();
 
+	FSK_keyer_dialog = fskio_window();
+	FSK_editor = FSK_make_message_editor();
+	FSK_configure = fskio_config_dialog();
+
 	fntbrowser = new Font_Browser;
 	dlgMemoryDialog = Memory_Dialog();
 	dlgDisplayConfig = DisplayDialog();
@@ -467,6 +479,8 @@ int main (int argc, char *argv[])
 //	start_server(xmlport);
 	if (start_cwio_thread() != 0)
 		return 1;
+	if (FSK_start_thread() != 0)
+		return 1;
 
 	if (progStatus.cwioCONNECTED) {
 		if (!open_cwkey()) {
@@ -484,6 +498,24 @@ int main (int argc, char *argv[])
 		}
 	}
 
+	if (progStatus.FSK_CONNECTED) {
+		if (!FSK_open_port()) {
+			btn_fskioCONNECT->value(0);
+			btn_fskioCAT->activate();
+			btn_fskioAUX->activate();
+			btn_fskioSEP->activate();
+			btn_fskioSHARED->activate();
+			progStatus.FSK_CONNECTED = 0;
+		} else {
+			btn_fskioCONNECT->value(1);
+			btn_fskioCAT->deactivate();
+			btn_fskioAUX->deactivate();
+			btn_fskioSEP->deactivate();
+			btn_fskioSHARED->deactivate();
+			progStatus.FSK_CONNECTED = 1;
+		}
+	}
+
 	createXcvrDialog();
 
 	btnALC_SWR->image(image_swr);
@@ -495,7 +527,7 @@ int main (int argc, char *argv[])
 	switch (progStatus.UIsize) {
 		case small_ui :
 			mainwindow->resize(
-				progStatus.mainX, progStatus.mainY, 
+				progStatus.mainX, progStatus.mainY,
 				mainwindow->w(), 150);//mainwindow->h());
 				grpInitializing->size(mainwindow->w(), mainwindow->h() - grpInitializing->y());
 				grpInitializing->redraw();
@@ -504,12 +536,12 @@ int main (int argc, char *argv[])
 			break;
 		case wide_ui :
 			mainwindow->resize(
-				progStatus.mainX, progStatus.mainY, 
+				progStatus.mainX, progStatus.mainY,
 				progStatus.mainW, btnVol->y() + btnVol->h() + 2);
 			break;
 		case touch_ui :
 			mainwindow->resize(
-				progStatus.mainX, progStatus.mainY, 
+				progStatus.mainX, progStatus.mainY,
 				progStatus.mainW, TOUCH_MAINH);
 		default :
 			break;
@@ -588,7 +620,7 @@ int parse_args(int argc, char **argv, int& idx)
 		std::cout << helpstr << std::endl;
 #endif
 		exit(0);
-	} 
+	}
 	if (strcasecmp("--version", argv[idx]) == 0) {
 		std::string ver = "Version: ";
 		ver.append(VERSION).append("\n");

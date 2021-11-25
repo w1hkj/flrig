@@ -107,7 +107,7 @@ private:
 	struct	termios oldtio, newtio;
 	int		timeout;
 	int		retries;
-	int		status, origstatus;
+	int		state, origstate;
 	bool	dtr;
 	bool	dtrptt;
 	bool	rts;

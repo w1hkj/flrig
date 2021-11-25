@@ -23,6 +23,8 @@
 #include <time.h>
 #include <sys/time.h>
 
+#include "timeops.h"
+
 #include "util.h"
 #ifdef __MINGW32__
 #  include "compat.h"
@@ -296,7 +298,7 @@ int accu_sleep (double sleep_time)
 {
 	struct timespec tv;
 	double end_at = fsk_now() + sleep_time;
-	double delay = sleep_time - 0.1e-3;
+	double delay = sleep_time - 0.005;
 	tv.tv_sec = (time_t) delay;
 	tv.tv_nsec = (long) ((delay - tv.tv_sec) * 1e+9);
 	int rval = 0;

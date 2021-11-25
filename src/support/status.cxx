@@ -499,7 +499,7 @@ status progStatus = {
 // cwio parameters
 	20,			// int    cwioWPM;
 	2,			// int    cwioKEYLINE; 1 == RTS, 2 == DTR
-	0,			// int    cwioSHARED; 0 = NONE, 1 = CAT, 2 = AUX, 3 = SEP
+	0,			// int    cwioSHARED; 0 = NONE, 1 = CAT, 2 = AUX, 3 = SEP, 4 = CWIO
 	0,			// int    cwioPTT; 1 - use PTT, 0 - use Brea-in
 	0,			// int    cwioCONNECTED; 1 - connected state; 0 - unconnected state
 	0,			// int    cwioINVERTED; 1 - DTR/RTS (-) keying; 
@@ -520,6 +520,20 @@ status progStatus = {
 	"&",		// string	INT;
 	"{",		// string	HM;
 	"}",		// string	VE;
+
+// FSK_ parameters
+	1,			// int		FSK_KEYLINE; 1 == RTS, 2 == DTR
+	0,			// int		FSK_SHARED; 0 = NONE, 1 = CAT, 2 = AUX, 3 = SEP
+	0,			// int		FSK_PTT; 1 - use PTT, 0 - use Brea-in
+	0,			// int		FSK_CONNECTED; 1 - connected state; 0 - unconnected state
+	0,			// int		FSK_INVERTED; reverse keying; 
+	1,			// int		FSK_STOPBITS; 1 - 1.5; 0 - 2
+	"",			// string	FSK_PORT;
+
+	"","","","","","",
+	"","","","","","",					// string	FSK_msgs[12];
+	"m2","m2","m3","m4","m4","m6",
+	"m7","m8","m9","m10","m11","m12"	// string	FSK_labels[12];
 
 };
 
@@ -1080,13 +1094,13 @@ void status::saveLastState()
 	spref.set("cwioCONNECTED", cwioCONNECTED);
 	spref.set("cwioINVERTED", cwioINVERTED);
 	spref.set("cwioPORT", cwioPORT.c_str());
+
 	char setbuff[20];
 	for (int n = 0; n < 12; n++) {
 		snprintf(setbuff, sizeof(setbuff), "cwiolabel[%d]", n);
 		spref.set(setbuff, cwio_labels[n].c_str());
 		snprintf(setbuff, sizeof(setbuff), "cwiomessage[%d]", n);
 		spref.set(setbuff, cwio_msgs[n].c_str());
-	
 	}
 
 	spref.set("BT", BT.c_str());
@@ -1098,6 +1112,21 @@ void status::saveLastState()
 	spref.set("INT", INT.c_str());
 	spref.set("HM", HM.c_str());
 	spref.set("VE", VE.c_str());
+
+	spref.set("FSK_KEYLINE", FSK_KEYLINE);
+	spref.set("FSK_SHARED", FSK_SHARED);
+	spref.set("FSK_PTT", FSK_PTT);
+	spref.set("FSK_CONNECTED", FSK_CONNECTED);
+	spref.set("FSK_INVERTED", FSK_INVERTED);
+	spref.set("FSK_STOPBITS", FSK_STOPBITS);
+	spref.set("FSK_PORT", FSK_PORT.c_str());
+
+	for (int n = 0; n < 12; n++) {
+		snprintf(setbuff, sizeof(setbuff), "fskiolabel[%d]", n);
+		spref.set(setbuff, FSK_labels[n].c_str());
+		snprintf(setbuff, sizeof(setbuff), "fskiomessage[%d]", n);
+		spref.set(setbuff, FSK_msgs[n].c_str());
+	}
 
 }
 
@@ -1804,6 +1833,24 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("VE", defbuffer, VE.c_str(), 499);
 		VE = defbuffer;
 
+		spref.get("FSK_KEYLINE", FSK_KEYLINE, FSK_KEYLINE);
+		spref.get("FSK_SHARED", FSK_SHARED, FSK_SHARED);
+		spref.get("FSK_PTT", FSK_PTT, FSK_PTT);
+		spref.get("FSK_CONNECTED", FSK_CONNECTED, FSK_CONNECTED);
+		spref.get("FSK_INVERTED", FSK_INVERTED, FSK_INVERTED);
+		spref.get("FSK_STOPBITS", FSK_STOPBITS, FSK_STOPBITS);
+		spref.get("FSK_PORT", defbuffer, "NONE", 499);
+		FSK_PORT = defbuffer;
+
+		for (int n = 0; n < 12; n++) {
+			snprintf(getbuff, sizeof(getbuff), "fskiolabel[%d]", n);
+			spref.get(getbuff, defbuffer, "", 499);
+			FSK_labels[n] = defbuffer;
+			snprintf(getbuff, sizeof(getbuff), "fskiomessage[%d]", n);
+			spref.get(getbuff, defbuffer, "", 499);
+			FSK_msgs[n] = defbuffer;
+		}
+
 		return true; 
 	}
 	return false;
@@ -2158,8 +2205,8 @@ static bool srigtrace;
 static bool ssettrace;
 static bool sgettrace;
 
-void ss_trace(bool on) {
-
+void ss_trace(bool on)
+{
 	if (on) {
 		strace = progStatus.trace;
 		srigtrace = progStatus.rigtrace;

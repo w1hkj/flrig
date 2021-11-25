@@ -509,6 +509,17 @@ struct status {
 	string	HM;
 	string	VE;
 
+// FSK_ parameters
+	int		FSK_KEYLINE;
+	int		FSK_SHARED;
+	int		FSK_PTT;
+	int		FSK_CONNECTED;
+	int		FSK_INVERTED;
+	int		FSK_STOPBITS;
+	string	FSK_PORT;
+	string	FSK_msgs[12];
+	string	FSK_labels[12];
+
 	void saveLastState();
 	void loadLastState();
 	bool loadXcvrState(string);

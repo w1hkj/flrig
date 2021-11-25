@@ -1,0 +1,502 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0305
+i18n_type 1
+i18n_include "gettext.h"
+i18n_function _
+header_name {.h}
+code_name {.cxx}
+decl {\#include "fsk.h"} {private local
+}
+
+Function {fskio_window()} {open
+} {
+  Fl_Window {} {
+    label {FSK keying} open
+    xywh {610 38 670 130} type Double resizable
+    code0 {\#include "status.h"}
+    code1 {\#include "fsk.h"}
+    code2 {\#include "ValueSlider.h"} visible
+  } {
+    Fl_Input FSK_txt_to_send {
+      callback {FSK_control_function_keys();}
+      xywh {2 2 666 68} type Multiline align 16 when 1 resizable
+      class Fl_Input2
+    }
+    Fl_Group {} {open
+      xywh {0 70 670 60}
+    } {
+      Fl_Button btn_fskio_config {
+        label Config
+        callback {FSK_open_config();}
+        tooltip {Open FSK configuration dialog} xywh {390 73 60 22}
+      }
+      Fl_Button btn_fskio_clear {
+        label Clear
+        callback {FSK_clear_text();}
+        tooltip {Clear transmit text} xywh {473 73 60 22}
+      }
+      Fl_Light_Button btn_fskioSEND {
+        label {Xmt / Rcv}
+        callback {FSK_send_text(o->value());}
+        tooltip {Send / Pause sending characters} xywh {557 73 105 22}
+      }
+      Fl_Group {} {
+        xywh {2 98 220 30} box ENGRAVED_BOX
+      } {
+        Fl_Button {FSK_btn_msg[0]} {
+          label {F 1}
+          callback {FSK_exec_msg(0);}
+          tooltip {Action - Function Key Left click
+Edit - Control left click} xywh {5 102 50 22}
+        }
+        Fl_Button {FSK_btn_msg[1]} {
+          label {F 2}
+          callback {FSK_exec_msg(1);}
+          tooltip {Action - Function Key Left click
+Edit - Control left click} xywh {59 102 50 22}
+        }
+        Fl_Button {FSK_btn_msg[2]} {
+          label {F 3}
+          callback {FSK_exec_msg(2);}
+          tooltip {Action - Function Key Left click
+Edit - Control left click} xywh {113 102 50 22}
+        }
+        Fl_Button {FSK_btn_msg[3]} {
+          label {F 4}
+          callback {FSK_exec_msg(3);}
+          tooltip {Action - Function Key Left click
+Edit - Control left click} xywh {168 102 50 22}
+        }
+      }
+      Fl_Group {} {
+        xywh {225 98 220 30} box ENGRAVED_BOX
+      } {
+        Fl_Button {FSK_btn_msg[4]} {
+          label {F 5}
+          callback {FSK_exec_msg(4);}
+          tooltip {Action - Function Key Left click
+Edit - Control left click} xywh {229 102 50 22}
+        }
+        Fl_Button {FSK_btn_msg[5]} {
+          label {F 6}
+          callback {FSK_exec_msg(5);}
+          tooltip {Action - Function Key Left click
+Edit - Control left click} xywh {283 102 50 22}
+        }
+        Fl_Button {FSK_btn_msg[6]} {
+          label {F 7}
+          callback {FSK_exec_msg(6);}
+          tooltip {Action - Function Key Left click
+Edit - Control left click} xywh {337 102 50 22}
+        }
+        Fl_Button {FSK_btn_msg[7]} {
+          label {F 8}
+          callback {FSK_exec_msg(7);}
+          tooltip {Action - Function Key Left click
+Edit - Control left click} xywh {391 102 50 22}
+        }
+      }
+      Fl_Group {} {
+        xywh {448 98 220 30} box ENGRAVED_BOX
+      } {
+        Fl_Button {FSK_btn_msg[8]} {
+          label {F 9}
+          callback {FSK_exec_msg(8);}
+          tooltip {Action - Function Key Left click
+Edit - Control left click} xywh {451 102 50 22}
+        }
+        Fl_Button {FSK_btn_msg[9]} {
+          label {F 10}
+          callback {FSK_exec_msg(9);}
+          tooltip {Action - Function Key Left click
+Edit - Control left click} xywh {505 102 50 22}
+        }
+        Fl_Button {FSK_btn_msg[10]} {
+          label {F 11}
+          callback {FSK_exec_msg(10);}
+          tooltip {Action - Function Key Left click
+Edit - Control left click} xywh {559 102 50 22}
+        }
+        Fl_Button {FSK_btn_msg[11]} {
+          label {F 12}
+          callback {FSK_exec_msg(11);}
+          tooltip {Action - Function Key Left click
+Edit - Control left click} xywh {614 102 50 22}
+        }
+      }
+    }
+  }
+}
+
+Function {FSK_make_message_editor()} {open
+} {
+  Fl_Window {} {
+    label {FSK Message Editor} open
+    xywh {613 338 670 344} type Double hide resizable
+  } {
+    Fl_Tabs {} {open
+      xywh {0 0 570 345} align 17
+    } {
+      Fl_Group {} {
+        label {F1-F4} open
+        xywh {0 25 570 320} hide
+      } {
+        Fl_Box {} {
+          label Label
+          xywh {22 30 84 20}
+        }
+        Fl_Box {} {
+          label {Message Text}
+          xywh {211 30 223 20}
+        }
+        Fl_Input {FSK_edit_label[0]} {
+          label F1
+          callback {FSK_label_cb(1);}
+          xywh {5 74 80 22} align 5
+          code0 {\#include "flinput2.h"}
+          class Fl_Input2
+        }
+        Fl_Input {FSK_edit_msg[0]} {
+          callback {FSK_msg_cb(1);}
+          xywh {90 55 475 65} type Multiline
+          class Fl_Input2
+        }
+        Fl_Input {FSK_edit_label[1]} {
+          label F2
+          callback {FSK_label_cb(2);}
+          xywh {5 144 80 22} align 5
+          class Fl_Input2
+        }
+        Fl_Input {FSK_edit_msg[1]} {
+          callback {FSK_msg_cb(2);}
+          xywh {90 125 475 65} type Multiline
+          class Fl_Input2
+        }
+        Fl_Input {FSK_edit_label[2]} {
+          label F3
+          callback {FSK_label_cb(3);}
+          xywh {5 214 80 22} align 5
+          class Fl_Input2
+        }
+        Fl_Input {FSK_edit_msg[2]} {
+          callback {FSK_msg_cb(3);}
+          xywh {90 195 475 65} type Multiline
+          class Fl_Input2
+        }
+        Fl_Input {FSK_edit_label[3]} {
+          label F4
+          callback {FSK_label_cb(4);}
+          xywh {5 284 80 22} align 5
+          class Fl_Input2
+        }
+        Fl_Input {FSK_edit_msg[3]} {
+          callback {FSK_msg_cb(4);}
+          xywh {90 265 475 65} type Multiline
+          class Fl_Input2
+        }
+      }
+      Fl_Group {} {
+        label {F5-f8} open
+        xywh {0 25 570 320} hide
+      } {
+        Fl_Box {} {
+          label Label
+          xywh {24 30 90 20}
+        }
+        Fl_Box {} {
+          label {Message Text}
+          xywh {227 30 240 20}
+        }
+        Fl_Input {FSK_edit_label[4]} {
+          label F5
+          callback {FSK_label_cb(5);}
+          xywh {5 74 80 22} align 5
+          class Fl_Input2
+        }
+        Fl_Input {FSK_edit_msg[4]} {
+          callback {FSK_msg_cb(5);}
+          xywh {90 55 475 65} type Multiline
+          class Fl_Input2
+        }
+        Fl_Input {FSK_edit_label[5]} {
+          label F6
+          callback {FSK_label_cb(6);}
+          xywh {5 144 80 22} align 5
+          class Fl_Input2
+        }
+        Fl_Input {FSK_edit_msg[5]} {
+          callback {FSK_msg_cb(6);}
+          xywh {90 125 475 65} type Multiline
+          class Fl_Input2
+        }
+        Fl_Input {FSK_edit_label[6]} {
+          label F7
+          callback {FSK_label_cb(7);}
+          xywh {5 214 80 22} align 5
+          class Fl_Input2
+        }
+        Fl_Input {FSK_edit_msg[6]} {
+          callback {FSK_msg_cb(7);}
+          xywh {90 195 475 65} type Multiline
+          class Fl_Input2
+        }
+        Fl_Input {FSK_edit_label[7]} {
+          label F8
+          callback {FSK_label_cb(8);}
+          xywh {5 284 80 22} align 5
+          class Fl_Input2
+        }
+        Fl_Input {FSK_edit_msg[7]} {
+          callback {FSK_msg_cb(8);}
+          xywh {90 265 475 65} type Multiline
+          class Fl_Input2
+        }
+      }
+      Fl_Group {} {
+        label {F9-F12} open
+        xywh {0 25 570 320}
+      } {
+        Fl_Box {} {
+          label Label
+          xywh {24 30 90 20}
+        }
+        Fl_Box {} {
+          label {Message Text}
+          xywh {227 30 240 20}
+        }
+        Fl_Input {FSK_edit_label[8]} {
+          label F9
+          callback {FSK_label_cb(9);}
+          xywh {5 73 80 22} align 5
+          class Fl_Input2
+        }
+        Fl_Input {FSK_edit_msg[8]} {
+          callback {FSK_msg_cb(9);}
+          xywh {90 55 475 65} type Multiline
+          class Fl_Input2
+        }
+        Fl_Input {FSK_edit_label[9]} {
+          label F10
+          callback {FSK_label_cb(10);}
+          xywh {5 143 80 22} align 5
+          class Fl_Input2
+        }
+        Fl_Input {FSK_edit_msg[9]} {
+          callback {FSK_msg_cb(10);}
+          xywh {90 125 475 65} type Multiline
+          class Fl_Input2
+        }
+        Fl_Input {FSK_edit_label[10]} {
+          label F11
+          callback {FSK_label_cb(11);}
+          xywh {5 213 80 22} align 5
+          class Fl_Input2
+        }
+        Fl_Input {FSK_edit_msg[10]} {
+          callback {FSK_msg_cb(11);}
+          xywh {90 195 475 65} type Multiline
+          class Fl_Input2
+        }
+        Fl_Input {FSK_edit_label[11]} {
+          label F12
+          callback {FSK_label_cb(12);}
+          xywh {5 283 80 22} align 5
+          class Fl_Input2
+        }
+        Fl_Input {FSK_edit_msg[11]} {
+          callback {FSK_msg_cb(12);}
+          xywh {90 265 475 65} type Multiline
+          class Fl_Input2
+        }
+      }
+    }
+    Fl_Group {} {open
+      xywh {575 27 90 43} box ENGRAVED_FRAME
+    } {
+      Fl_Box {} {
+        label {'[' Send}
+        xywh {579 29 82 20}
+      }
+      Fl_Box {} {
+        label {']' Recv}
+        xywh {579 49 82 20}
+      }
+    }
+    Fl_Button FSK_btn_cancel_edit {
+      label Cancel
+      callback {FSK_cancel_edit();}
+      tooltip {Exit editor, discard changes} xywh {575 88 90 22}
+    }
+    Fl_Button FSK_btn_apply_edit {
+      label Apply
+      callback {FSK_apply_edit();}
+      tooltip {Apply current changes to function keys} xywh {575 114 90 22}
+    }
+    Fl_Button FSK_btn_FSK_done_edit {
+      label Close
+      callback {FSK_done_edit();}
+      tooltip {Apply changes and close editor} xywh {575 141 90 22}
+    }
+  }
+}
+
+Function {fskio_config_dialog()} {open
+} {
+  Fl_Window {} {
+    label {FSK Configuration} open
+    xywh {610 200 670 100} type Double visible
+  } {
+    Fl_Group {} {open selected
+      xywh {2 3 666 100} box ENGRAVED_FRAME
+    } {
+      Fl_Group select_fskioPORT {
+        label {Ser. Port}
+        callback {progStatus.FSK_PORT = o->value();} open
+        tooltip {FSKIO serial port} xywh {73 73 496 23} box DOWN_BOX color 53 align 4
+        code0 {\#include "combo.h"}
+        code1 {o->value(progStatus.FSK_PORT.c_str());}
+        class Fl_ComboBox
+      } {}
+      Fl_Light_Button btn_fskioCONNECT {
+        label Connect
+        callback {if (o->value() == 0) {
+  FSK_close_port();
+  btn_fskioCAT->activate();
+  btn_fskioAUX->activate();
+  btn_fskioSEP->activate();
+  progStatus.FSK_CONNECTED = 0;
+}
+else if (!FSK_open_port()) {
+  o->value(0);
+  btn_fskioCAT->activate();
+  btn_fskioAUX->activate();
+  btn_fskioSEP->activate();
+  progStatus.FSK_CONNECTED = 0;
+} else {
+  btn_fskioCAT->value(0); btn_fskioCAT->deactivate();
+  btn_fskioAUX->value(0); btn_fskioAUX->deactivate();
+  btn_fskioSEP->value(0); btn_fskioSEP->deactivate();
+  progStatus.FSK_CONNECTED = 1;
+}
+FSK_open_port();
+progStatus.FSK_SHARED = FSK_USES_FSK;}
+        xywh {578 73 80 23}
+        code0 {o->value(progStatus.FSK_CONNECTED);}
+      }
+      Fl_Check_Button btn_fskioCAT {
+        label {Use CAT}
+        callback {if (o->value()) {
+  progStatus.FSK_SHARED = FSK_USES_CAT;
+  btn_fskioAUX->value(0); btn_fskioAUX->deactivate();
+  btn_fskioSEP->value(0); btn_fskioSEP->deactivate();
+  btn_fskioCONNECT->value(0); btn_fskioCONNECT->deactivate();
+  btn_fskioSHARED->value(0); btn_fskioSHARED->deactivate();
+  select_fskioPORT->value("NONE"); select_fskioPORT->deactivate();
+}else {
+  progStatus.FSK_SHARED = FSK_USES_FSK;
+  btn_fskioCONNECT->activate();
+  btn_fskioAUX->activate();
+  btn_fskioCAT->activate();
+  btn_fskioSEP->activate();
+  btn_fskioSHARED->activate();
+  select_fskioPORT->activate();
+}}
+        tooltip {Use DTR/RTS on CAT serial port} xywh {111 15 23 15} down_box DOWN_BOX align 4
+        code0 {o->value(progStatus.FSK_SHARED == FSK_USES_CAT);}
+      }
+      Fl_Check_Button btn_fskioAUX {
+        label {Use AUX}
+        callback {if (o->value()) {
+  progStatus.FSK_SHARED = FSK_USES_AUX;
+  btn_fskioCAT->value(0); btn_fskioCAT->deactivate();
+  btn_fskioSEP->value(0); btn_fskioSEP->deactivate();
+  btn_fskioCONNECT->value(0); btn_fskioCONNECT->deactivate();
+  btn_fskioSHARED->value(0); btn_fskioSHARED->deactivate();
+  select_fskioPORT->value("NONE"); select_fskioPORT->deactivate();
+}else {
+  progStatus.FSK_SHARED = FSK_USES_FSK;
+  btn_fskioCONNECT->activate();
+  btn_fskioAUX->activate();
+  btn_fskioCAT->activate();
+  btn_fskioSEP->activate();
+  btn_fskioSHARED->activate();
+  select_fskioPORT->activate();
+}}
+        tooltip {Use DTR/RTS on Auxiliary serial port} xywh {112 46 23 15} down_box DOWN_BOX align 4
+        code0 {o->value(progStatus.FSK_SHARED == FSK_USES_AUX);}
+      }
+      Fl_Check_Button btn_fskioSEP {
+        label {Use SEP}
+        callback {if (o->value()) {
+  progStatus.FSK_SHARED = FSK_USES_SEP;
+  btn_fskioAUX->value(0); btn_fskioAUX->deactivate();
+  btn_fskioCAT->value(0); btn_fskioCAT->deactivate();
+  btn_fskioCONNECT->value(0); btn_fskioCONNECT->deactivate();
+  btn_fskioSHARED->value(0); btn_fskioSHARED->deactivate();
+  select_fskioPORT->value("NONE"); select_fskioPORT->deactivate();
+}else {
+  progStatus.FSK_SHARED = FSK_USES_FSK;
+  btn_fskioCONNECT->activate();
+  btn_fskioAUX->activate();
+  btn_fskioCAT->activate();
+  btn_fskioSEP->activate();
+  btn_fskioSHARED->activate();
+  select_fskioPORT->activate();
+}}
+        tooltip {Use DTR/RTS Separate serial port} xywh {245 15 23 15} down_box DOWN_BOX align 4
+        code0 {o->value(progStatus.FSK_SHARED == FSK_USES_SEP);}
+      }
+      Fl_Check_Button btn_fskioSHARED {
+        label {CWIO shared}
+        callback {if (o->value()) {
+  progStatus.FSK_SHARED = FSK_USES_CWIO;
+  btn_fskioAUX->value(0); btn_fskioAUX->deactivate();
+  btn_fskioCAT->value(0); btn_fskioCAT->deactivate();
+  btn_fskioSEP->value(0); btn_fskioSEP->deactivate();
+  btn_fskioCONNECT->value(0); btn_fskioCONNECT->deactivate();
+  select_fskioPORT->value("NONE"); select_fskioPORT->deactivate();
+}else {
+  progStatus.FSK_SHARED = FSK_USES_FSK;
+  btn_fskioCONNECT->activate();
+  btn_fskioAUX->activate();
+  btn_fskioCAT->activate();
+  btn_fskioSEP->activate();
+  btn_fskioSHARED->activate();
+  select_fskioPORT->activate();
+}}
+        tooltip {Use DTR/RTS cwio shared port} xywh {245 46 23 15} down_box DOWN_BOX align 4
+        code0 {o->value(progStatus.FSK_SHARED == FSK_USES_CWIO);}
+      }
+      Fl_Check_Button btn_fskioINVERTED {
+        label Inverted
+        callback {progStatus.FSK_INVERTED = o->value();}
+        tooltip {DTR/RTS signaling is inverted
+(-) keying} xywh {376 15 23 15} down_box DOWN_BOX align 4
+        code0 {o->value(progStatus.FSK_INVERTED);}
+      }
+      Fl_Check_Button btn_fskioSTOPBITS {
+        label {1.5 stop bits}
+        callback {progStatus.FSK_STOPBITS = o->value();}
+        tooltip {Enabled - 1.5 stop bits
+Disable - 2 stop bits} xywh {376 46 23 15} down_box DOWN_BOX align 4
+        code0 {o->value(progStatus.FSK_STOPBITS);}
+      }
+      Fl_Group listbox_fskioKEYLINE {
+        label {FSK Keyline}
+        callback {progStatus.FSK_KEYLINE = o->index();}
+        tooltip {Select either DTR or RTS for keyline} xywh {593 41 65 24} box DOWN_BOX color 7 align 4
+        code0 {\#include "combo.h"}
+        code1 {o->add("None|RTS|DTR");}
+        code2 {o->index(progStatus.FSK_KEYLINE);}
+        class Fl_ListBox
+      } {}
+      Fl_Spinner cntr_fskioPTT {
+        label {PTT delay}
+        callback {progStatus.FSK_PTT = o->value();}
+        tooltip {PTT delay before keydown
+0 = Break-in} xywh {608 10 50 25} minimum 0 value 0
+        code0 {o->value(progStatus.FSK_PTT);}
+      }
+    }
+  }
+}

@@ -2694,6 +2694,25 @@ public:
 } rig_cwio_text(&rig_server);
 
 //------------------------------------------------------------------------------
+// Set fskio transmit string
+//------------------------------------------------------------------------------
+
+extern void FSK_add(string);
+static string fskio_text;
+
+class rig_fskio_text : public XmlRpcServerMethod {
+public:
+	rig_fskio_text(XmlRpcServer* s) : XmlRpcServerMethod("rig.fskio_text", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		std::string s = (string)params[0];
+		FSK_add(s);
+	}
+
+	std::string help() { return std::string("sends text using cwio DTR/RTS keying"); }
+
+} rig_fskio_text(&rig_server);
+
 // Set cwio transmit on (1) or off (0)
 //------------------------------------------------------------------------------
 
@@ -2709,6 +2728,7 @@ static void set_cwio_send_button(void *val)
 	btn_cwioSEND->redraw();
 }
 
+/*
 class rig_set_verify_cwio_send : public XmlRpcServerMethod {
 public:
 	rig_set_verify_cwio_send(XmlRpcServer* s) : XmlRpcServerMethod("rig.cwio_send", s) {}
@@ -2722,6 +2742,8 @@ public:
 	std::string help() { return std::string("sets cwio transmit on (1) or off (0)"); }
 
 } rig_set_verify_cwio_send(&rig_server);
+*/
+
 //------------------------------------------------------------------------------
 
 
@@ -2830,8 +2852,9 @@ struct MLIST {
 	{ "rig.shutdown",     "i:n", "shutdown xcvr & flrig" },
 	{ "rig.cwio_wpm",     "n:i", "set cwio WPM" },
 	{ "rig.cwio_text",    "i:s", "send text via cwio interface" },
-	{ "rig.cwio_char",    "n:i", "send char via cwio interface" },
-	{ "rig.cwio_send",    "n:i", "cwio transmit 1/0 (on/off)"}
+//	{ "rig.cwio_char",    "n:i", "send char via cwio interface" },
+//	{ "rig.cwio_send",    "n:i", "cwio transmit 1/0 (on/off)"},
+	{ "rig.fskio_text",   "i:s", "send text via fskio interface" }
 };
 
 class rig_list_methods : public XmlRpcServerMethod {

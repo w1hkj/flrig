@@ -56,7 +56,7 @@ if test "x$ac_cv_want_ptw32" != "xno"; then
     ac_cv_want_ptw32="yes"
 else
     if test "x$target_mingw32" = "xyes"; then
-    PTW32_LIBS="-lpthread -lwsock32 -lws2_32"
+    PTW32_LIBS="-lpthread -lwsock32 -lws2_32 -lwinmm"
     fi
 fi
 
