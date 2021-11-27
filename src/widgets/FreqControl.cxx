@@ -313,10 +313,10 @@ void cFreqControl::SetOFFCOLOR (uchar r, uchar g, uchar b)
 
 	for (int n = 0; n < nD; n++) {
 		Digit[n]->labelcolor(ONCOLOR);
-		Digit[n]->color(FL_RED);//OFFCOLOR);
+		Digit[n]->color(OFFCOLOR);
 	}
 	decbx->labelcolor(ONCOLOR);
-	decbx->color(FL_BLUE);//OFFCOLOR);
+	decbx->color(OFFCOLOR);
 	decbx->redraw();
 	decbx->redraw_label();
 	hfill->color(OFFCOLOR);
@@ -342,15 +342,15 @@ void cFreqControl::restore_colors()
 	colors_reversed = false;
 	for (int n = 0; n < nD; n++) {
 		Digit[n]->labelcolor(ONCOLOR);
-		Digit[n]->color(FL_RED);//OFFCOLOR);
+		Digit[n]->color(OFFCOLOR);
 		Digit[n]->redraw();
 		Digit[n]->redraw_label();
 	}
 	decbx->labelcolor(ONCOLOR);
-	decbx->color(FL_BLUE);//OFFCOLOR);
+	decbx->color(OFFCOLOR);
 	decbx->redraw();
 	decbx->redraw_label();
-//	color(OFFCOLOR);
+	color(OFFCOLOR);
 	redraw();
 }
 
