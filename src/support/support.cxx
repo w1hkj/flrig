@@ -1601,11 +1601,12 @@ void serial_failed(void *)
 	box_xcvr_connect->redraw();
 
 	fl_alert2(_("\
-Serial communications failure!\n\n\
-  . Check serial (COM) port connection.\n\
-  . Open menu Config/Setup/Transceiver.\n\
-  . Press 'Ser Port' button, reselect port.\n\
-  . Press 'Init' button."));
+Transceiver not responding!\n\n\
+Check serial (COM) port connection\n\
+Open menu Config/Setup/Transceiver\n\
+Press 'Update' button, reselect port\n\
+Check that Baud matches transceiver baud\n\n\
+Press 'Init' button."));
 }
 
 void * serial_thread_loop(void *d)
@@ -6370,7 +6371,8 @@ failed:
 Transceiver not responding!\n\n\
 Check serial (COM) port connection\n\
 Open menu Config/Setup/Transceiver\n\
-Press 'Ser Port' button, reselect port\n\
+Press 'Update' button, reselect port\n\
+Check that Baud matches transceiver baud\n\n\
 Press 'Init' button."));
 
 	return;
@@ -6489,7 +6491,7 @@ void initStatusConfigDialog()
 Cannot open %s!\n\n\
 Check serial (COM) port connection\n\
 Open menu Config/Setup/Transceiver\n\
-Press 'Ser Port' button, reselect port\n\
+Press 'Update' button, reselect port\n\n\
 Press 'Init' button.", progStatus.xcvr_serial_port.c_str());
 				LOG_WARN("Cannot open %s", progStatus.xcvr_serial_port.c_str());
 				progStatus.xcvr_serial_port = "NONE";
