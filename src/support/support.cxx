@@ -961,8 +961,6 @@ void update_power_control(void *d)
 {
 	double min, max, step;
 
-	set_power_controlImage(progStatus.power_level);
-
 	if (xcvr_name == rig_K2.name_ || xcvr_name == rig_KX3.name_) {
 		guard_lock serial(&mutex_serial);
 		selrig->get_pc_min_max_step(min, max, step);
