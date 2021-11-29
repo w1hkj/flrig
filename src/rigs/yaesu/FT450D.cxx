@@ -426,6 +426,25 @@ int RIG_FT450D::get_alc()
 }
 
 
+// Power out calculated using three zones, by Brian VE3IBW
+// The FT450D power meter seems to have three zones with 
+// different slopes per zone as opposed to a singular curved
+// line.  The zones equate to the major meter graduations
+// on the FT-450D.  The slopes were calculated by measuring  
+// power output into a 100W dummy load:
+//		zone 1:  0 - 10W  --> Slope = 7.4; Intercept = 0
+//		zone 2: 10 - 50W  --> Slope = 2.2; Intercept = 54
+//		zone 1: 50 - 100W --> Slope = 1.5; Intercept = 91
+
+struct pwrpair {int mtr; double pwr;};
+
+static pwrpair pwrtbl[] = { 
+  {0, 0.0},
+  {74, 10.0},
+  {164, 50.0},
+  {238, 100.0}
+};
+
 int RIG_FT450D::get_power_out()
 {
 	cmd = rsp = "RM5";
@@ -437,12 +456,21 @@ int RIG_FT450D::get_power_out()
 	size_t p = replystr.rfind(rsp);
 	if (p == string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
-	double mtr = atoi(&replystr[p+3]);
+	int    mtr = atoi(&replystr[p+3]);
+	if (mtr < 0) mtr = 0;
+	if (mtr > 238) mtr = 238;
 
-// following conversion iaw data measured by Terry, KJ4EED
-	mtr = (.06 * mtr) + (.002 * mtr * mtr);
+	size_t i = 0;
+	for (i = 0; i < sizeof(pwrtbl) / sizeof(pwrpair) - 1; i++)
+		if (mtr >= pwrtbl[i].mtr && mtr < pwrtbl[i+1].mtr)
+			break;
 
-	return (int)ceil(mtr);
+	double pwr = floor (
+					pwrtbl[i].pwr + 
+					(pwrtbl[i+1].pwr - pwrtbl[i].pwr) * (mtr - pwrtbl[i].mtr) / (pwrtbl[i+1].mtr - pwrtbl[i].mtr)
+				);
+	if (pwr > 100) pwr = 100;
+	return (int)pwr;
 }
 
 double RIG_FT450D::get_power_control()
