@@ -45,7 +45,8 @@ IMAGE_PATH           = ../images \
                        ../images/debugging \
                        ../images/menus \
                        ../images/transceivers \
-                       ../images/ui
+                       ../images/ui \
+                       ../images/fskio-keyer
 INPUT                = index.txt \
                        config_fonts_colors.txt \
                        elecraft_rigs.txt \

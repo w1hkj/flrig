@@ -42,20 +42,33 @@ ratio can be resized horizontally.  The narrow aspect ratios are fixed
 in width and height.
 
 <center>
-\image latex IC7100-ui-small.png "" width=6in
-\image html IC7100-ui-small.png ""
+\image latex images/ic-7300/ui_small.png "" width=4in
+\image html images/ic-7300/ui_small.png ""
 </center>
 <br>
 
 <center>
-\image latex IC7100-ui-narrow.png "" width=4.3in
-\image html IC7100-ui-narrow.png ""
+<table>
+<tr>
+<td>
+<center>
+\image latex images/ic-7300/ic-7300-main-extras.png "With embedded extras tab" width=4in
+\image html images/ic-7300/ic-7300-main-extras.png "With embedded extras tab"
+</center>
+</td>
+<td>
+<center>
+\image latex images/ic-7300/ic-7300-main-extras-dialog.png "Separate extras tab dialog" width=4in
+\image html images/ic-7300/ic-7300-main-extras-dialog.png "Separate extras tab dialog"
+</center>
+</td>
+</tr>
+</table>
 </center>
 <br>
-
 <center>
-\image latex IC7100-ui-wide.png "" width=4.3in
-\image html IC7100-ui-wide.png ""
+\image latex images/ic-7300/ui_wide.png "" width=6in
+\image html images/ic-7300/ui_wide.png ""
 </center>
 <br>
 
@@ -85,9 +98,9 @@ additional libraries or definition files are required.
 |<br>               |\ref icom_746pro_a "IC 746 Pro"       |\ref kwd_ts590sg_a  "TS 590SG" |\ref tt_omni7_a "TT 588" |\ref yaesu_847_a "FT 847"       |\ref o_Xiegu-5105 "Xiegu 5105"   |
 |<br>               |\ref icom_756pro2_a "IC 756 Pro II"   |\ref kwd_ts990_a   "TS 990"    |\ref tt_599_a   "TT 599" |\ref yaesu_857d_a "FT 857D"     |\ref o_Xiegu-G90 "Xiegu G90"     |
 |<br>               |\ref icom_756pro3_a "IC 756 Pro III"  |\ref kwd_ts2000_a  "TS 2000"   |<br>                     |\ref yaesu_897d_a "FT 897D"     |<br>                             |
-|<br>               |\ref icom_910h_a "IC 910H"            |<br>                           |<br>                     |\ref yaesu_950_a "FT-950"       |<br> o_FDMDUO "FDM-DUO"          |
+|<br>               |\ref icom_910h_a "IC 910H"            |<br>                           |<br>                     |\ref yaesu_950_a "FT-950"       |\ref o_FDMDUO "FDM-DUO"          |
 |<br>               |\ref icom_7000_a "IC 7000"            |<br>                           |<br>                     |\ref yaesu_991 "FT-991"         |<br>                             |
-|<br>               |\ref icom_7100_a "IC 7100"            |<br>                           |<br>                     |\ref yaesu_991A "FT-991A"       |<br> o_TX500 "TX500"             |
+|<br>               |\ref icom_7100_a "IC 7100"            |<br>                           |<br>                     |\ref yaesu_991A "FT-991A"       |\ref o_TX500 "TX500"             |
 |<br>               |\ref icom_7200_a "IC 7200"            |<br>                           |<br>                     |\ref yaesu_1000mp_a "FT-1000MP" |<br>                             |
 |<br>               |\ref icom_7300_a "IC 7300"            |<br>                           |<br>                     |\ref yaesu_2000_a "FT 2000"     |<br>                             |
 |<br>               |\ref icom_7410_a "IC 7410"            |<br>                           |<br>                     |\ref yaesu_1200dx_a "FTdx1200"  |<br>                             |
@@ -116,11 +129,16 @@ Each of the menu items will open the configuration dialog to the respecive tab:
 <ul>
 	<li><b>Transceiver</b> - select transceiver and configure serial i/o parameters</li>
 	<li><b>tcpip</b> - configure interface to a remote tcpip/serial controlled transceiver</li>
-	<li><b>PTT</b> - configure PTT</li>
+	<li><b>PTT - CMedia</b> - configure PTT using Cmedia codec pin 13</li>
+	<li><b>PTT - Generic</b> - configure PTT using serial port CAT, DTR or RTS</li>
+	<li><b>PTT - GPIO</b> - configure PTT using GPIO port, Pi hardware platform</li>
 	<li><b>AUX</b> - configure separate auxiliary serial ports (if used)</li>
+	<li><b>Server</b> - change XmlRpc server port designation</li>
 	<li><b>Polling</b> - select and configure transceiver parameters to poll</li>
-	<li><b>Trace</b> - select and display program execution paths</li>
+	<li><b>Commands</b> - add/delete/modify user created CAT commands</li>
+	<li><b>Send command</b> - edit/send single CAT command</li>
 	<li><b>Restore</b> - select and configure transceiver parameters to read and restore</li>
+	<li><b>Trace</b> - select and display program execution paths</li>
 </ul>
 <br>
 
@@ -720,11 +738,18 @@ all aspects of this transceiver.
 
 \section scw_keyer CW Keyer
 
-Open the keyer dialog with the main dialog menu item "Keyer"
+Open the keyer dialog
 
 <center>
-\image latex cw-keyer/cwkeyer.png width=2.0in
-\image html  cw-keyer/cwkeyer.png
+\image latex cw-keyer/cwkeyer.png "" width=2.0in
+\image html  cw-keyer/cwkeyer.png ""
+</center>
+
+ with the main dialog menu item "Keyer/CW keyer"
+ 
+ <center>
+\image latex menus/keyer_menu.png "" width = 2.0in
+\image html  menus/keyer_menu.png ""
 </center>
 
 <ul>
@@ -732,22 +757,27 @@ Open the keyer dialog with the main dialog menu item "Keyer"
 <li>Clear - clears the text in the transmit buffer</li>
 <li>transmit text will marquee to the left as each character is transmitted</li>
 <li>Send/Pause button toggles sending text.</li>
-<li>macro buttons / function keys load transmit buffer with canned message</li>
+<li>macro buttons / function keys load transmit buffer with canned message
+<ul>
+<li>left click to load macro contents into transmit buffer</li>
+<li>control left click to open macro editor dialog</li>
+</ul>
+</li>
 <li>the transmit text buffer must have keyboard focus for character entry.  left click on the entry area to gain keyboard focus.</li>
 </ul>
 
 Tip for the function / macro buttons: 
 
 <center>
-\image latex cw-keyer/cwkeyer_tooltip.png width=2.0in
-\image html  cw-keyer/cwkeyer_tooltip.png
+\image latex cw-keyer/cwkeyer_tooltip.png "" width=2.0in
+\image html  cw-keyer/cwkeyer_tooltip.png ""
 </center>
 
 Control-left-click opens:
 
 <center>
-\image latex cw-keyer/cwkeyer_editor.png width=2.0in
-\image html  cw-keyer/cwkeyer_editor.png
+\image latex cw-keyer/cwkeyer_editor.png "" width=2.0in
+\image html  cw-keyer/cwkeyer_editor.png ""
 </center>
 
 A CQ macro with start/stop (ptt enable/disable): <pre>[CQ CQ DE W1HKJ K]</pre>
@@ -757,8 +787,8 @@ Prosign characters can be configured by the user.  The macros and prosign assign
 Config opens:
 
 <center>
-\image latex cw-keyer/cwkeyer_config.png width=2.0in
-\image html  cw-keyer/cwkeyer_config.png
+\image latex cw-keyer/cwkeyer_config.png "" width=5.0in
+\image html  cw-keyer/cwkeyer_config.png ""
 </center>
 
 The DTR/RTS port can be either
@@ -776,6 +806,55 @@ can be adjusted by user.</li>
 PTT delay is in milliseconds.  Enter a non-zero value to enable a delay 
 between the PTT-on and the first CW keyline closure.  The same delay will 
 be applied to the last CW keyline closure and PTT-off.
+
+\section sfskio_keyer FSK Keyer
+
+Open the FSK keyer dialog
+
+<center>
+\image latex fskio-keyer/fskio_dialog.png "" width=5.0in
+\image html  fskio-keyer/fskio_dialog.png ""
+</center>
+
+ with the main dialog menu item "Keyer/FSK keyer"
+ 
+ <center>
+\image latex menus/keyer_menu.png "" width = 2.0in
+\image html  menus/keyer_menu.png ""
+</center>
+
+Config opens:
+
+<center>
+\image latex fskio-keyer/fskio_config.png "" width=5.0in
+\image html  fskio-keyer/fskio_config.png ""
+</center>
+
+The DTR/RTS port can be either
+<ul>
+<li>shared with the CAT port</li>
+<li>shared with the AUX port</li>
+<li>shared with the SEP port</li>
+<li>shared port with CWIO (if separate)</li>
+<li>a unique serial port configured on this dialog</li>
+<li>Inverted - enable if interface requires a Mark/Space reversed signal level</li>
+<li>select either DTR or RTS for the keyline as required by h/w, 
+selection must not conflict with CW keyline</li>
+</ul>
+
+PTT delay is in milliseconds.  Enter a non-zero value to enable a delay 
+between the PTT-on and the first FSK keyline closure.  The same delay will 
+be applied to the last FSK keyline closure and PTT-off.
+
+Control-left-click opens:
+
+<center>
+\image latex fskio-keyer/fskio_editor.png "" width=5.0in
+\image html  fskio-keyer/fskio_editor.png ""
+</center>
+
+An RY macro with start/stop (ptt enable/disable):
+<pre>[RYRYRYRYRYRYRYRYRYRYRYRYRYRYRYRYRYRYRYRYRYRYRYRY DE W1HKJ K]</pre>
 
 \ref cw_keyer
 
