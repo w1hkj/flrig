@@ -18,6 +18,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
+#include "Fl_SigBar.h"
+
 Fl_Wheel_Value_Slider *sldr_smeter_avg=(Fl_Wheel_Value_Slider *)0;
 Fl_Wheel_Value_Slider *sldr_smeter_peak=(Fl_Wheel_Value_Slider *)0;
 Fl_Wheel_Value_Slider *sldr_pout_avg=(Fl_Wheel_Value_Slider *)0;
@@ -57,7 +59,7 @@ Fl_Double_Window* MetersDialog() {
 	sldr_smeter_avg->labelsize(14);
 	sldr_smeter_avg->labelcolor(FL_FOREGROUND_COLOR);
 	sldr_smeter_avg->minimum(1);
-	sldr_smeter_avg->maximum(10);
+	sldr_smeter_avg->maximum(SIGBAR_ARRAY_SIZE);
 	sldr_smeter_avg->step(1);
 	sldr_smeter_avg->value(5);
 	sldr_smeter_avg->textsize(12);
@@ -78,7 +80,7 @@ Fl_Double_Window* MetersDialog() {
 	sldr_smeter_peak->labelsize(14);
 	sldr_smeter_peak->labelcolor(FL_FOREGROUND_COLOR);
 	sldr_smeter_peak->minimum(1);
-	sldr_smeter_peak->maximum(10);
+	sldr_smeter_peak->maximum(SIGBAR_ARRAY_SIZE);
 	sldr_smeter_peak->step(1);
 	sldr_smeter_peak->value(5);
 	sldr_smeter_peak->textsize(12);
@@ -99,7 +101,7 @@ Fl_Double_Window* MetersDialog() {
 	sldr_pout_avg->labelsize(14);
 	sldr_pout_avg->labelcolor(FL_FOREGROUND_COLOR);
 	sldr_pout_avg->minimum(1);
-	sldr_pout_avg->maximum(10);
+	sldr_pout_avg->maximum(SIGBAR_ARRAY_SIZE);
 	sldr_pout_avg->step(1);
 	sldr_pout_avg->value(5);
 	sldr_pout_avg->textsize(12);
@@ -120,7 +122,7 @@ Fl_Double_Window* MetersDialog() {
 	sldr_pout_peak->labelsize(14);
 	sldr_pout_peak->labelcolor(FL_FOREGROUND_COLOR);
 	sldr_pout_peak->minimum(1);
-	sldr_pout_peak->maximum(10);
+	sldr_pout_peak->maximum(SIGBAR_ARRAY_SIZE);
 	sldr_pout_peak->step(1);
 	sldr_pout_peak->value(5);
 	sldr_pout_peak->textsize(12);

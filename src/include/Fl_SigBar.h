@@ -27,10 +27,13 @@
 // SigBar class...
 //
 
+#define SIGBAR_ARRAY_SIZE 20
+
 class Fl_SigBar : public Fl_Widget
 {
-	float value_, peakv_, minimum_, maximum_,
-		peak_[10], vals_[10];
+protected:
+	double value_, peakv_, minimum_, maximum_;
+	double vals_[SIGBAR_ARRAY_SIZE];
 	int aging_, avg_;
 	bool horiz;
 	Fl_Color pkcolor;
@@ -43,34 +46,31 @@ public:
 
 	Fl_SigBar(int x, int y, int w, int h, const char *l = 0);
 
-	void	maximum(float v) { maximum_ = v; redraw(); }
-	float	maximum() const { return (maximum_); }
+	void	maximum(double v) { maximum_ = v; redraw(); }
+	double	maximum() const { return (maximum_); }
 
-	void	minimum(float v) { minimum_ = v; redraw(); }
-	float	minimum() const { return (minimum_); }
+	void	minimum(double v) { minimum_ = v; redraw(); }
+	double	minimum() const { return (minimum_); }
 
-	void	value(float v);
-	float	value() const { return (value_); }
+	void	value(double v);
+	double	value() const { return (value_); }
+	double	peak() const { return peakv_;};
   
 	void aging (int n) { 
-		if (n <= 10 && n > 0) aging_ = n;
-		else aging_ = 5;
-		for (int i = 0; i < aging_; i++) peak_[i] = peakv_;
+		if (n <= SIGBAR_ARRAY_SIZE && n > 0) aging_ = n;
+		else aging_ = SIGBAR_ARRAY_SIZE / 2;
 	}
 
 	void avg (int n) {
-		if (n <= 10 && n > 0) avg_ = n;
-		else avg_ = 5;
-		for (int i = 0; i < avg_; i++) vals_[i] = value_ / avg_;
+		if (n <= SIGBAR_ARRAY_SIZE && n > 0) avg_ = n;
+		else avg_ = SIGBAR_ARRAY_SIZE / 2;
 	}
 
 	void clear () {
-		for (int i = 0; i < 10; i++) vals_[i] = peak_[i] = 0;
+		for (int i = 0; i < SIGBAR_ARRAY_SIZE; i++) 
+			vals_[i] = 0;
 		peakv_ = value_ = 0;
 	}
-
-	void peak(float);
-	float peak() { return peakv_;};
 
 	void PeakColor(Fl_Color c) { pkcolor = c; };
 	Fl_Color PeakColor() { return pkcolor; }

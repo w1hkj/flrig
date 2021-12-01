@@ -3784,6 +3784,8 @@ void cbExit()
 	if (FSK_editor) FSK_editor->hide();
 	if (FSK_configure) FSK_configure->hide();
 
+	if (meter_filters) meter_filters->hide();
+	if (meter_scale_dialog) meter_scale_dialog->hide();
 }
 
 void cbALC_SWR()

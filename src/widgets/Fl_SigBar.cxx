@@ -32,6 +32,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <iostream>
 
 #include <FL/Fl.H>
 #include <FL/fl_draw.H>
@@ -123,29 +124,25 @@ Fl_SigBar::Fl_SigBar(int X, int Y, int W, int H, const char* l)
 	horiz = true;
 	pkcolor = FL_RED;
 	clear();
-	avg_ = 5;
-	aging_ = 5;
+	aging_ = avg_ = SIGBAR_ARRAY_SIZE / 2;
 }
 
-void Fl_SigBar::peak( float v)
+void Fl_SigBar::value( double v )
 {
 	peakv_ = v;
+	value_ = 0;
+	for (int i = 1; i < SIGBAR_ARRAY_SIZE; i++) {
+		vals_[i-1] = vals_[i];
+	}
+	vals_[SIGBAR_ARRAY_SIZE - 1] = v;
 
-	for (int i = 1; i < aging_; i++)
-		if (peakv_ < (peak_[i-1] = peak_[i])) 
-			peakv_ = peak_[i];
+	for (int i = SIGBAR_ARRAY_SIZE - avg_; i < SIGBAR_ARRAY_SIZE; i++)
+		value_ += vals_[i];
+	value_ /= avg_;
 
-	peak_[aging_ - 1] = v;
+	for (int i = SIGBAR_ARRAY_SIZE - aging_; i < SIGBAR_ARRAY_SIZE; i++)
+		if (peakv_ < vals_[i]) peakv_ = vals_[i];
 
-}
-
-void Fl_SigBar::value(float v)
-{
-//	value_ -= vals_[0];
-//	for (int i = 1; i < avg_; i++) vals_[i-1] = vals_[i];
-//	value_ += (vals_[avg_- 1] = v / avg_); 
-//	peak(value_);
-	peak(value_ = v);
 };
 
 //
