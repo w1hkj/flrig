@@ -54,6 +54,9 @@ Fl_Button *btn_lighted_default=(Fl_Button *)0;
 Fl_Check_Button *chk_hrd_button = (Fl_Check_Button *)0;
 Fl_Check_Button *chk_sliders_button = (Fl_Check_Button *)0;
 
+Fl_Button *btn_tab_color = (Fl_Button *)0;
+Fl_Button *btn_tab_defcolor = (Fl_Button *)0;
+
 static void cb_btn_ui(Fl_Radio_Light_Button* o, void*) {
 	if (o == btn_wide_ui) progStatus.UIsize = wide_ui;
 	else if (o == btn_narrow_ui) progStatus.UIsize = small_ui;
@@ -149,6 +152,15 @@ static void cb_hrd_button(Fl_Check_Button*, void*) {
 static void cb_sliders_button(Fl_Check_Button*, void*) {
 	cb_change_sliders_button();
 }
+
+static void cb_btn_tab_color(Fl_Button *, void*) {
+	cb_tab_colors();
+}
+
+static void cb_btn_tab_defcolor(Fl_Button *, void*) {
+	cb_tab_defaults();
+}
+
 
 Fl_Double_Window* DisplayDialog() {
 	Fl_Double_Window* w = new Fl_Double_Window(424, 280, _("Flrig User Interface"));
@@ -371,7 +383,7 @@ Fl_Double_Window* DisplayDialog() {
 
 	Fl_Group* su_grp5 = new Fl_Group(
 		su_grp3->x() + su_grp3->w() + 2, su_grp3->y(),
-		134, 88);
+		134, 80);
 		su_grp5->box(FL_ENGRAVED_FRAME);
 
 		sldrColors = new Fl_Wheel_Value_Slider(
@@ -395,22 +407,22 @@ Fl_Double_Window* DisplayDialog() {
         sldrColors->reverse(true);
 
 		pref_slider_background = new Fl_Button(
-			sldrColors->x(), sldrColors->y() + sldrColors->h() + 5,
-			60, 22, _("Bngd"));
+			sldrColors->x(), sldrColors->y() + sldrColors->h() + 4,
+			60, 20, _("Bngd"));
 		pref_slider_background->tooltip(_("Background - normal"));
 		pref_slider_background->callback((Fl_Callback*)cb_pref_slider_background);
 
 		pref_slider_select = new Fl_Button(
 			pref_slider_background->x() + pref_slider_background->w() + 3, 
 			pref_slider_background->y(),
-			60, 22, _("Button"));
+			60, 20, _("Button"));
 		pref_slider_select->tooltip(_("Background - normal"));
 		pref_slider_select->callback((Fl_Callback*)cb_pref_slider_select);
 
 		prefslider_defaults = new Fl_Button(
 			pref_slider_background->x() + pref_slider_background->w()/2, 
 			pref_slider_select->y() + pref_slider_select->h() + 4,
-			60, 22, _("Default"));
+			60, 20, _("Default"));
 		prefslider_defaults->tooltip(_("Background - selected"));
 		prefslider_defaults->callback((Fl_Callback*)cb_prefslider_defaults);
 
@@ -435,21 +447,37 @@ Fl_Double_Window* DisplayDialog() {
 	btnOkDisplayDialog->callback((Fl_Callback*)cb_btnOkDisplayDialog);
 
 	Fl_Group* su_grp6 = new Fl_Group(
-		su_grp5->x(), su_grp5->y() + su_grp5->h(), 134, 45);
+		su_grp5->x(), su_grp5->y() + su_grp5->h(), 134, 28);
 		su_grp6->box(FL_ENGRAVED_FRAME);
 
 		btn_lighted = new Fl_Light_Button(
-			su_grp6->x() + 5, su_grp6->y() + 10, 
-			60, 22, _("Lt Btn"));
+			su_grp6->x() + 5, su_grp6->y() + 4, 
+			60, 20, _("Lt Btn"));
 		btn_lighted->callback((Fl_Callback*)cb_btn_lighted);
 
 		btn_lighted_default = new Fl_Button(
 			btn_lighted->x() + btn_lighted->w() + 2, btn_lighted->y(), 
-			60, 22, _("Default"));
+			60, 20, _("Default"));
 		btn_lighted_default->tooltip(_("Background - selected"));
 		btn_lighted_default->callback((Fl_Callback*)cb_btn_lighted_default);
 
 	su_grp6->end();
+
+	Fl_Group* su_grp7 = new Fl_Group(
+		su_grp6->x(), su_grp6->y() + su_grp6->h(), su_grp6->w(), 28);
+		su_grp7->box(FL_ENGRAVED_FRAME);
+
+		btn_tab_color = new Fl_Button(
+			su_grp7->x() + 5, su_grp7->y() + 4, 60, 20, _("Tab Clr"));
+		btn_tab_color->color(
+			fl_rgb_color(progStatus.tab_red, progStatus.tab_green, progStatus.tab_blue));
+		btn_tab_color->callback((Fl_Callback *)cb_btn_tab_color);
+
+		btn_tab_defcolor = new Fl_Button(
+			btn_tab_color->x() + btn_tab_color->w() + 5, btn_tab_color->y(), 60, 20, _("Def Clr"));
+		btn_tab_defcolor->callback((Fl_Callback *)cb_btn_tab_defcolor);
+
+	su_grp7->end();
 
 	w->end();
 

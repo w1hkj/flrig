@@ -61,6 +61,7 @@ Fl_Menu_Item *mnuExit = (Fl_Menu_Item *)0;
 Fl_Menu_Item *mnuConfig = (Fl_Menu_Item *)0;
 Fl_Menu_Item *mnuTooltips = (Fl_Menu_Item *)0;
 Fl_Menu_Item *mnuSchema = (Fl_Menu_Item *)0;
+Fl_Menu_Item *mnuEmbedTabs = (Fl_Menu_Item *)0;
 Fl_Menu_Item *mnuColorConfig = (Fl_Menu_Item *)0;
 Fl_Menu_Item *mnu_meter_filtering = (Fl_Menu_Item *)0;
 Fl_Menu_Item *mnuConfigXcvr = (Fl_Menu_Item *)0;
@@ -372,6 +373,8 @@ Fl_Group *grpInitializing = (Fl_Group *)0;
 
 Fl_Progress *progress=(Fl_Progress *)0;
 
+Fl_Group *g_extras = (Fl_Group *)0;
+
 #define RIGHT_OF(widget) (widget->x() + widget->w())
 
 #include "ui_bitmaps.cxx"
@@ -399,8 +402,34 @@ static void cb_mnuTooltips(Fl_Menu_*, void*) {
 }
 
 static void cb_mnuSchema(Fl_Menu_*, void*) {
+	int state = progStatus.show_tabs;
+	if (progStatus.embed_tabs && progStatus.show_tabs)
+		show_controls();
+	if (!progStatus.embed_tabs && tabs_dialog->visible())
+		tabs_dialog->hide();
 	progStatus.schema = !progStatus.schema;
 	adjust_control_positions();
+	if (state != progStatus.show_tabs)
+		show_controls();
+}
+
+static void cb_mnu_embed_tabs(Fl_Menu_*, void*) {
+
+	if (tabs_dialog && !progStatus.embed_tabs && tabs_dialog->visible()) {
+		tabs_dialog->hide();
+		show_controls();
+		progStatus.embed_tabs = true;
+		show_controls();
+	} else if (tabs_dialog && !progStatus.embed_tabs && !tabs_dialog->visible()) {
+		progStatus.embed_tabs = true;
+	} else if (progStatus.embed_tabs && progStatus.show_tabs) {
+		show_controls(); // close controls
+		progStatus.embed_tabs = false;
+		show_controls();
+	} else if (progStatus.embed_tabs && !progStatus.show_tabs) {
+		progStatus.embed_tabs = false;
+	}
+		
 }
 
 static void cb_mnuColorConfig(Fl_Menu_*, void*) {

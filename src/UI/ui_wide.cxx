@@ -21,6 +21,8 @@
 Fl_Group *gwide = (Fl_Group *)0;
 Fl_Group *grp_row1b1b = (Fl_Group *)0;
 
+Fl_Group *tabs = (Fl_Group *)0;
+
 Fl_Menu_Item menu_wide_menu[] = {
  {_("&File"), 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
  {_("E&xit"), 0,  (Fl_Callback*)cb_mnuExit, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
@@ -42,6 +44,7 @@ Fl_Menu_Item menu_wide_menu[] = {
  {0,0,0,0,0,0,0,0,0},
  {_("UI"), 0, 0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Meter filtering"), 0,  (Fl_Callback*)cb_mnu_meter_filtering, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("Embed tabs"), 0, (Fl_Callback*)cb_mnu_embed_tabs, 0, 130, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Tooltips"), 0,  (Fl_Callback*)cb_mnuTooltips, 0, 130, FL_NORMAL_LABEL, 0, 14, 0},
  {_("User Interface"), 0,  (Fl_Callback*)cb_mnuColorConfig, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
@@ -65,7 +68,7 @@ Fl_Menu_Item menu_wide_menu[] = {
 
 Fl_Group *wide_main_group(int X, int Y, int W, int H)
 {
-	Fl_Group *g = new Fl_Group(X, Y, WIDE_MAINW, WIDE_MAINH);
+	Fl_Group *g = new Fl_Group(X, Y, W, H);
 	g->box(FL_FLAT_BOX);
 
 	int xpos = X + 2;
@@ -846,10 +849,11 @@ CTRL  click: FreqB -> FreqA\
 
 Fl_Double_Window* Wide_rig_window() {
 	int mainW = WIDE_MAINW;
+	int menuH = WIDE_MENUH;
 	int mainH = WIDE_MAINH;
-	int menuH = 22;
+	int tabsH = WIDE_TABSH;
 
-	Fl_Double_Window* w = new Fl_Double_Window(mainW, mainH, _("Flrig"));
+	Fl_Double_Window* w = new Fl_Double_Window(mainW, menuH + mainH + tabsH, _("Flrig"));
 	w->align(Fl_Align(FL_ALIGN_CLIP|FL_ALIGN_INSIDE));
 
 	grp_menu = new Fl_Group(0, 0, mainW, menuH);
@@ -862,6 +866,12 @@ Fl_Double_Window* Wide_rig_window() {
 		if (mnu) {
 			progStatus.tooltips ? mnu->set() : mnu->clear();
 			mnuTooltips = mnu;
+		}
+
+		mnu = getMenuItem(_("Embed tabs"), menu_wide_menu);
+		if (mnu) {
+			progStatus.embed_tabs ? mnu->set() : mnu->clear();
+			mnuEmbedTabs = mnu;
 		}
 
 		Fl_Group *mnu_box = new Fl_Group(mainW - 64, 0, 64, menuH);
@@ -887,10 +897,16 @@ Fl_Double_Window* Wide_rig_window() {
 
 	grp_menu->end();
 
-	main_group = wide_main_group(0, menuH, mainW, mainH - menuH);
+	main_group = wide_main_group(0, menuH, mainW, mainH);
+	main_group->end();
 	main_group->hide();
 
-	grpInitializing = new Fl_Group(0, 0, mainW, mainH, "");
+	tabs = new Fl_Group(0, menuH + mainH, mainW, tabsH);
+	tabs->box(FL_FLAT_BOX);
+	tabs->end();
+
+//	grpInitializing = new Fl_Group(0, 0, mainW, mainH, "");
+	grpInitializing = new Fl_Group(0, menuH, mainW, mainH + tabsH, "");
 
 		grpInitializing->box(FL_FLAT_BOX);
 		grpInitializing->color(FL_LIGHT2);
@@ -909,13 +925,19 @@ Fl_Double_Window* Wide_rig_window() {
 
 	grpInitializing->show();
 
-	w->resizable(main_group);
-
-	w->size(WIDE_MAINW, WIDE_MAINH);
-
-	w->size_range(WIDE_MAINW, WIDE_MAINH, 0, WIDE_MAINH);
+	w->resizable(tabs);
 
 	w->end();
+
+std::cout << "Initial sizes" << std::endl;
+std::cout << "window:     " << w->x() << ", " << w->y() << ", " <<
+		w->w() << ", " << w->h() << std::endl;
+std::cout << "menu group: " << grp_menu->x() << ", " << grp_menu->y() << ", " <<
+		grp_menu->w() << ", " << grp_menu->h() << std::endl;
+std::cout << "main group: " << main_group->x() << ", " << main_group->y() << ", " <<
+		main_group->w() << ", " << main_group->h() << std::endl;
+std::cout << "tabs:   " << tabs->x() << ", " << tabs->y() << ", " <<
+	tabs->w() << ", " << tabs->h() << std::endl << std::endl;
 
 	return w;
 }

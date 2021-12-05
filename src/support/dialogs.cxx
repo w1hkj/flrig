@@ -588,6 +588,9 @@ static uchar btn_slider_red, btn_slider_green, btn_slider_blue;
 Fl_Color btn_lt_color;
 static uchar btn_lt_color_red, btn_lt_color_green, btn_lt_color_blue;
 
+Fl_Color tab_color;
+static uchar tab_red, tab_green, tab_blue;
+
 void cb_lighted_button()
 {
 	uchar r = btn_lt_color_red, g = btn_lt_color_green, b = btn_lt_color_blue;
@@ -876,6 +879,56 @@ void cbSWRMeterColor()
 	}
 }
 
+void cb_tab_defaults()
+{
+	tab_red = 230;
+	tab_green = 230;
+	tab_blue = 230;
+
+	tab_color = fl_rgb_color( tab_red, tab_green, tab_blue);
+
+	btn_tab_color->color(tab_color);
+	btn_tab_color->redraw();
+
+	if (tabsGeneric) {
+		tabsGeneric->selection_color(tab_color);
+		tabsGeneric->redraw();
+	}
+	if (tabs550) {
+		tabs550->selection_color(tab_color);
+		tabs550->redraw();
+	}
+	if (tabCmds) {
+		tabCmds->selection_color(tab_color);
+		tabCmds->redraw();
+	}
+
+}
+
+void cb_tab_colors()
+{
+	uchar r = tab_red, g = tab_green, b = tab_blue;
+	if (fl_color_chooser("TAB color", r, g, b)) {
+		tab_red = r; tab_green = g; tab_blue = b;
+		tab_color = fl_rgb_color(r, g, b);
+		btn_tab_color->color(tab_color);
+		btn_tab_color->redraw();
+
+		if (tabsGeneric) {
+			tabsGeneric->selection_color(tab_color);
+			tabsGeneric->redraw();
+		}
+		if (tabs550) {
+			tabs550->selection_color(tab_color);
+			tabs550->redraw();
+		}
+		if (tabCmds) {
+			tabCmds->selection_color(tab_color);
+			tabCmds->redraw();
+		}
+	}
+}
+
 void setColors()
 {
 	progStatus.swrRed = swrRed;
@@ -929,6 +982,10 @@ void setColors()
 	progStatus.lighted_btn_red = btn_lt_color_red;
 	progStatus.lighted_btn_green = btn_lt_color_green;
 	progStatus.lighted_btn_blue = btn_lt_color_blue;
+
+	progStatus.tab_red = tab_red;
+	progStatus.tab_green = tab_green;
+	progStatus.tab_blue = tab_blue;
 
 	if (useB) {
 		FreqDispB->SetONOFFCOLOR( fl_rgb_color(fg_red, fg_green, fg_blue), bgclr);
@@ -1094,6 +1151,10 @@ void setDisplayColors()
 	btn_slider_green = progStatus.slider_btn_green;
 	btn_slider_blue = progStatus.slider_btn_blue;
 
+	tab_red = progStatus.tab_red;
+	tab_green = progStatus.tab_green;
+	tab_blue = progStatus.tab_blue;
+
 	sldrColors->color(fl_rgb_color(bg_slider_red, bg_slider_green, bg_slider_blue));
 	sldrColors->selection_color(fl_rgb_color(btn_slider_red, btn_slider_green, btn_slider_blue));
 
@@ -1165,7 +1226,7 @@ void openMemoryDialog()
 void show_controls()
 {
 	switch (progStatus.UIsize) {
-		case touch_ui : 
+		case touch_ui : {
 			if (selrig->name_ == rig_TT550.name_) {
 				tabs550->show();
 				tabsGeneric->hide();
@@ -1177,7 +1238,8 @@ void show_controls()
 			}
 			mainwindow->redraw();
 			break;
-		case wide_ui :
+		}
+		case wide_ui : {
 			if (selrig->name_ == rig_TT550.name_) {
 				tabsGeneric->hide();
 				tabs550->show();
@@ -1187,17 +1249,77 @@ void show_controls()
 				tabsGeneric->show();
 				tabsGeneric->redraw();
 			}
-			if (tabs_dialog->visible())
-				tabs_dialog->hide();
-			else {
-				tabs_dialog->resize(
-					mainwindow->x(), mainwindow->y() + mainwindow->decorated_h(),
-					mainwindow->w(), tabs_dialog->h());
-				tabs_dialog->show();
-				tabs_dialog->redraw();
+			Fl_Widget * vtab = (Fl_Widget *)0;
+			if (tabsGeneric) {
+				Fl_Widget * const *vtabs = tabsGeneric->array();
+				int ntabs = tabsGeneric->children();
+				for (int n = 0; n < ntabs; n++)
+					if (progStatus.visible_tab == vtabs[n]->label()) {
+						vtab = vtabs[n];
+						break;
+					}
+			}
+			if (progStatus.embed_tabs) { // embedded
+				int X = mainwindow->x(),
+					Y = mainwindow->y(),
+					W = mainwindow->w(),
+					H = mainwindow->h();
+				if ((progStatus.show_tabs && !progStatus.first_use) ||
+					(!progStatus.show_tabs && progStatus.first_use)) {
+
+					H = WIDE_MAINH + WIDE_MENUH;
+					mainwindow->resize( X, Y, W, H );
+					mainwindow->size_range(WIDE_MAINW, H, 0, H);
+
+					tabs->hide();
+					progStatus.show_tabs = false;
+					mainwindow->redraw();
+				} else { 
+					H = WIDE_MENUH + WIDE_MAINH + WIDE_TABSH;
+
+					mainwindow->resize( X, Y, W, H);
+					mainwindow->size_range(WIDE_MAINW, H, 0, H);
+
+					tabs->add(grpTABS);
+					grpTABS->resize(
+						tabs->x(), tabs->y(),
+						tabs->w(), tabs->h());
+					grpTABS->show();
+					tabs->show();
+					progStatus.show_tabs = true;
+
+					if (vtab != (Fl_Widget *)0) tabsGeneric->value(vtab);
+					mainwindow->redraw();
+				}
+			} else {
+				if ((progStatus.show_tabs && !progStatus.first_use) || (!progStatus.show_tabs && progStatus.first_use)) {
+					tabs_dialog->hide();
+					progStatus.show_tabs = false;
+				} else if ((!progStatus.show_tabs && !progStatus.first_use) || (progStatus.show_tabs && progStatus.first_use)) {
+					static int X, Y, W, H, dH;
+					X = mainwindow->x();
+					Y = mainwindow->y();
+					W = mainwindow->w();
+					H = WIDE_MAINH + WIDE_MENUH;
+
+					dH = mainwindow->decorated_h();
+					tabs_dialog->resize( X, Y + dH, W, tabs_dialog->h() );
+					grpTABS->resize(0, 0, W, tabs_dialog->h());
+					if (vtab != (Fl_Widget *)0) tabsGeneric->value(vtab);
+					tabs_dialog->add(grpTABS);
+					tabs_dialog->show();
+					tabs_dialog->redraw();
+					progStatus.show_tabs = true;
+
+					mainwindow->resize( X, Y, W, H);
+					mainwindow->size_range(WIDE_MAINW, H, 0, H);
+
+					mainwindow->redraw();
+				}
 			}
 			break;
-		case small_ui :
+		}
+		case small_ui : {
 			if (selrig->name_ == rig_TT550.name_) {
 				tabsGeneric->hide();
 				tabs550->show();
@@ -1207,18 +1329,78 @@ void show_controls()
 				tabsGeneric->show();
 				tabsGeneric->redraw();
 			}
-			if (tabs_dialog->visible())
-				tabs_dialog->hide();
-			else {
-				tabs_dialog->position(
-					mainwindow->x(), mainwindow->y() + mainwindow->decorated_h());
-				tabs_dialog->show();
-				tabs_dialog->redraw();
+			Fl_Widget * vtab = (Fl_Widget *)0;
+			if (tabsGeneric) {
+				Fl_Widget * const *vtabs = tabsGeneric->array();
+				int ntabs = tabsGeneric->children();
+				for (int n = 0; n < ntabs; n++)
+					if (progStatus.visible_tab == vtabs[n]->label()) {
+						vtab = vtabs[n];
+						break;
+					}
+			}
+			if (progStatus.embed_tabs) { // embedded
+				static int X = mainwindow->x(),
+						   Y = mainwindow->y(),
+						   W = mainwindow->w(),
+						   H = mainwindow->h();
+				if ((progStatus.show_tabs && !progStatus.first_use) || (!progStatus.show_tabs && progStatus.first_use)) {
+					tabs_dialog->add(grpTABS);
+					grpTABS->resize(tabs_dialog->x(), tabs_dialog->y(), tabs_dialog->w(), tabs_dialog->h());
+					mainwindow->resize(mainwindow->x(), mainwindow->y(), W, H);
+					progStatus.show_tabs = false;
+				} else if (!progStatus.show_tabs && !progStatus.first_use) {
+					X = mainwindow->x();
+					Y = mainwindow->y();
+					W = mainwindow->w();
+					H = mainwindow->h();
+					mainwindow->resize(X, Y, W, H + grpTABS->h());
+					grpTABS->resize(0, H, W, grpTABS->h());
+					mainwindow->add(grpTABS);
+					if (vtab != (Fl_Widget *)0) tabsGeneric->value(vtab);
+					grpTABS->show();
+					progStatus.show_tabs = true;
+
+				} else if (progStatus.show_tabs && progStatus.first_use) {
+					X = mainwindow->x();
+					Y = mainwindow->y();
+					W = mainwindow->w();
+					H = mainwindow->h();
+					mainwindow->resize(X, Y, W, H + grpTABS->h());
+					grpTABS->resize(0, H, W, grpTABS->h());
+					mainwindow->add(grpTABS);
+					if (vtab != (Fl_Widget *)0) tabsGeneric->value(vtab);
+
+					grpTABS->show();
+
+					progStatus.show_tabs = true;
+
+				}
+			} else {
+				if ((progStatus.show_tabs && !progStatus.first_use) || (!progStatus.show_tabs && progStatus.first_use)) {
+					tabs_dialog->hide();
+					progStatus.show_tabs = false;
+				} else if ((!progStatus.show_tabs && !progStatus.first_use) || (progStatus.show_tabs && progStatus.first_use)) {
+					static int X, Y, W, dH;
+					X = progStatus.mainX;
+					Y = progStatus.mainY;
+					W = progStatus.mainW;
+					dH = mainwindow->decorated_h();
+					tabs_dialog->resize( X, Y + dH, W, tabs_dialog->h() );
+					grpTABS->resize(0, 0, W, tabs_dialog->h());
+					if (vtab != (Fl_Widget *)0) tabsGeneric->value(vtab);
+					tabs_dialog->add(grpTABS);
+					tabs_dialog->show();
+					tabs_dialog->redraw();
+					progStatus.show_tabs = true;
+				}
 			}
 			break;
+		}
 		default :
 			break;
 	}
+	progStatus.first_use = false;
 }
 
 // a replica of the default color map used by Fltk

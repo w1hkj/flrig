@@ -303,6 +303,9 @@ extern void cb_change_hrd_button();
 extern void cb_change_sliders_button();
 extern void set_sliders_when();
 
+extern void cb_tab_defaults();
+extern void cb_tab_colors();
+
 // ic7610 functions
 
 extern void digi_sel_on_off();

@@ -42,6 +42,7 @@ Fl_Menu_Item menu_small_menu[] = {
  {_("UI"), 0, 0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Meter filtering"), 0,  (Fl_Callback*)cb_mnu_meter_filtering, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Small sliders"), 0,  (Fl_Callback*)cb_mnuSchema, 0, 130, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("Embed tabs"), 0, (Fl_Callback*)cb_mnu_embed_tabs, 0, 130, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Tooltips"), 0,  (Fl_Callback*)cb_mnuTooltips, 0, 130, FL_NORMAL_LABEL, 0, 14, 0},
  {_("User Interface"), 0,  (Fl_Callback*)cb_mnuColorConfig, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
@@ -1051,7 +1052,7 @@ Fl_Double_Window *tabs_window()
 	tabs550->end();
 
 	tabsGeneric = new Fl_Tabs(0, 0, small_mainW, gph);
-		tabsGeneric->selection_color(FL_LIGHT1);
+//		tabsGeneric->selection_color(FL_LIGHT1);
 
 		tab_yaesu_bands = new Fl_Group(0, 24, small_mainW, gph - 24, _("Band"));
 			btn_yaesu_select_1 = new Fl_Button(4, 40, 60, 18, _("1.8"));
@@ -1814,6 +1815,13 @@ Fl_Double_Window *tabs_window()
 	w->end();
 	w->resizable(grpTABS);
 	w->size_range (small_mainW, gph, 0, gph);
+
+	Fl_Color clr = fl_rgb_color( progStatus.tab_red, progStatus.tab_green, progStatus.tab_blue);
+	tabsGeneric->selection_color(clr);
+	tabsGeneric->redraw();
+	tabs550->selection_color(clr);
+	tabs550->redraw();
+
 	return w;
 }
 
@@ -1837,6 +1845,12 @@ Fl_Double_Window* Small_rig_window() {
 		if (mnu) {
 			progStatus.schema ? mnu->set() : mnu->clear();
 			mnuSchema = mnu;
+		}
+
+		mnu = getMenuItem(_("Embed tabs"), menu_small_menu);
+		if (mnu) {
+			progStatus.embed_tabs ? mnu->set() : mnu->clear();
+			mnuEmbedTabs = mnu;
 		}
 
 		Fl_Group *mnu_box = new Fl_Group(small_mainW-64, 0, 64, small_menuH);

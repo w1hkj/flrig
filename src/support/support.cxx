@@ -4066,10 +4066,14 @@ void adjust_small_ui()
 		Fl_Tooltip::enable(0);
 	}
 
+	if (mnuEmbedTabs) {
+		if (progStatus.embed_tabs) mnuEmbedTabs->set();
+		else mnuEmbedTabs->clear();
+	}
+
 	mainwindow->redraw();
 
-	if (tabs_dialog && tabs_dialog->visible())
-		tabs_dialog->position(mainwindow->x(), mainwindow->y() + mainwindow->h() + 26);
+	show_controls();
 
 }
 
@@ -4180,8 +4184,7 @@ void adjust_xig_wide()
 
 	mainwindow->redraw();
 
-	if (tabs_dialog && tabs_dialog->visible())
-		tabs_dialog->position(mainwindow->x(), mainwindow->y() + mainwindow->h() + 26);
+	show_controls();
 
 	return;
 }
@@ -4283,6 +4286,9 @@ void adjust_wide_ui()
 	}
 
 	mainwindow->redraw();
+
+	show_controls();
+
 }
 
 void adjust_touch_ui()
@@ -6334,8 +6340,11 @@ trace(1, "FAILED");
 	main_group->redraw();
 
 	mainwindow->damage();
+	mainwindow->show();
 	mainwindow->redraw();
+
 	Fl::flush();
+	MilliSleep(50);
 
 	xcvr_online = true;
 	box_xcvr_connect->color(FL_GREEN);

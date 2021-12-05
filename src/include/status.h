@@ -141,6 +141,11 @@ struct status {
 	int		squelch;
 
 	int		schema;
+	int		embed_tabs;
+	int		show_tabs;
+	bool    first_use;
+	std::string visible_tab;
+
 	bool	hrd_buttons;
 	int		sliders_button;
 
@@ -424,6 +429,10 @@ struct status {
 	int		lighted_btn_red;
 	int		lighted_btn_green;
 	int		lighted_btn_blue;
+
+	int		tab_red;
+	int		tab_green;
+	int		tab_blue;
 
 	Fl_Font	fontnbr;
 

@@ -386,6 +386,7 @@ extern Fl_Menu_Item *mnuRestoreData;
 extern Fl_Menu_Item *mnuKeepData;
 extern Fl_Menu_Item *mnuTooltips;
 extern Fl_Menu_Item *mnuSchema;
+extern Fl_Menu_Item *mnuEmbedTabs;
 extern Fl_Menu_Item *mnuColorConfig;
 extern Fl_Menu_Item *mnu_meter_filtering;
 extern Fl_Menu_Item *mnuConfigXcvr;
@@ -433,6 +434,8 @@ extern Fl_Return_Button *btnOkDisplayDialog;
 extern Fl_Light_Button *btn_lighted;
 extern Fl_Button *btn_lighted_default;
 
+extern Fl_Button *btn_tab_color;
+
 extern Fl_Button *btnAddFreq;
 extern Fl_Button *btnPickFreq;
 extern Fl_Button *btnDelFreq;
@@ -442,8 +445,6 @@ extern Fl_Browser2 *FreqSelect;
 
 extern Fl_Input *inAlphaTag;
 
-extern Fl_Tabs *tabsConfig;
-extern Fl_Group *tabPrimary;
 extern Fl_ComboBox *selectRig;
 
 extern Fl_Group *tabCommands;
@@ -609,5 +610,7 @@ extern Fl_ComboBox *inp_cmedia_dev;
 extern Fl_ComboBox *inp_cmedia_GPIO_line;
 extern Fl_Button *btn_init_cmedia_PTT;
 extern Fl_Button *btn_test_cmedia;
+
+extern Fl_Group *tabs;
 
 #endif

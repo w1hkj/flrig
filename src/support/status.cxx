@@ -153,6 +153,10 @@ status progStatus = {
 	10,			// int  squelch;
 
 	0,			// int  schema;
+	0,			// int	embed_tabs;
+	0,			// int	show_tabs;
+	true,       // bool first_use;			true only during program start
+	"",			// std::string visible_tab;
 	true,		// bool hrd_buttons
 	FL_WHEN_CHANGED,	// int sliders_button
 
@@ -433,6 +437,10 @@ status progStatus = {
 	255,		// int		lighted_btn_green;
 	0,			// int		lighted_btn_blue;
 
+	230,		// int		tab_red;
+	230,		// int		tab_green;
+	230,		// int		tab_blue;
+
 	FL_COURIER,	// Fl_Font fontnbr;
 
 	false,		// bool	 tooltips;
@@ -555,11 +563,20 @@ void status::saveLastState()
 		memH = dlgMemoryDialog->h();
 	}
 
-	if (mX >= 0 && mX >= 0) {
+	if (mX >= 0 && mY >= 0) {
 		mainX = mX;
 		mainY = mY;
-		if (UIsize == touch_ui || UIsize == wide_ui) { mainW = mW; mainH = mH; }
+		if (UIsize == wide_ui) {
+			if (mW < WIDE_MAINW)
+				mW = WIDE_MAINW;
+			mH = WIDE_MAINH;
+		}
+		mainW = mW;
+		mainH = mH;
 	}
+
+	if (tabsGeneric)
+		visible_tab = (tabsGeneric->value())->label();
 
 	Fl_Preferences spref(RigHomeDir.c_str(), "w1hkj.com", xcvr_name.c_str());
 
@@ -703,6 +720,9 @@ void status::saveLastState()
 	spref.set("no_txqsy", no_txqsy);
 
 	spref.set("schema", schema);
+	spref.set("embed_tabs", embed_tabs);
+	spref.set("show_tabs", show_tabs);
+	spref.set("visible_tab", visible_tab.c_str());
 
 	spref.set("rx_avg", rx_avg);
 	spref.set("rx_peak", rx_peak);
@@ -985,6 +1005,10 @@ void status::saveLastState()
 	spref.set("lighted_btn_green", lighted_btn_green);
 	spref.set("lighted_btn_blue", lighted_btn_blue);
 
+	spref.set("tab_red", tab_red);
+	spref.set("tab_green", tab_green);
+	spref.set("tab_blue", tab_blue);
+
 	spref.set("fontnbr", fontnbr);
 
 	spref.set("tooltips", tooltips);
@@ -1145,6 +1169,12 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("mainh", mainH, mainH);
 		spref.get("uisize", UIsize, UIsize);
 
+		if (UIsize == wide_ui) {
+			if (mainW < WIDE_MAINW)
+				mainW = WIDE_MAINW;
+			mainH = WIDE_MAINH;
+		}
+
 		spref.get("memx", memX, memX);
 		spref.get("memy", memY, memY);
 		spref.get("memw", memW, memW);
@@ -1157,9 +1187,7 @@ bool status::loadXcvrState(string xcvr)
 			UIsize = current_ui_size;
 		}
 		current_ui_size = UIsize;
-		if (UIsize == wide_ui) {
-			mainW = progStatus.mainW;//WIDE_MAINW;
-		}
+
 		if (UIsize == small_ui) {
 			mainW = SMALL_MAINW;
 		}
@@ -1316,6 +1344,11 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("no_txqsy", no_txqsy, no_txqsy);
 
 		spref.get("schema", schema, schema);
+		spref.get("embed_tabs", embed_tabs, embed_tabs);
+		spref.get("show_tabs", show_tabs, show_tabs);
+
+		spref.get("visible_tab", defbuffer, visible_tab.c_str(), 499);
+		visible_tab = defbuffer;
 
 		spref.get("rx_avg", rx_avg, rx_avg);
 		spref.get("rx_peak", rx_peak, rx_peak);
@@ -1687,6 +1720,10 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("lighted_btn_green", lighted_btn_green, lighted_btn_green);
 		spref.get("lighted_btn_blue", lighted_btn_blue, lighted_btn_blue);
 
+		spref.get("tab_red", tab_red, tab_red);
+		spref.get("tab_green", tab_green, tab_green);
+		spref.get("tab_blue", tab_blue, tab_blue);
+
 		i = (int)fontnbr;
 		spref.get("fontnbr", i, i); fontnbr = (Fl_Font)i;
 		i = 0;
@@ -1850,6 +1887,11 @@ bool status::loadXcvrState(string xcvr)
 			spref.get(getbuff, defbuffer, "", 499);
 			FSK_msgs[n] = defbuffer;
 		}
+
+//std::cout << "LOAD STATUS\nx: " << mainX << ", y: " << mainY << ", w: " << mainW << " h: " << mainH << std::endl;
+//std::cout << "embed tabs: " << embed_tabs << std::endl;
+//std::cout << "show tabs : " << show_tabs << std::endl;
+//std::cout << "show controls: " << show_controls << std::endl << std::endl;
 
 		return true; 
 	}
