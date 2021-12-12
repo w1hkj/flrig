@@ -831,6 +831,7 @@ void RIG_IC756PRO::set_modeA(int val)
 	cmd += val;
 	cmd += mode_filterA[A.imode];
 	cmd.append( post );
+	waitFB("set mode A");
 }
 
 int RIG_IC756PRO::get_modeA()
@@ -874,6 +875,7 @@ void RIG_IC756PRO::set_modeB(int val)
 	cmd += val;
 	cmd += mode_filterB[B.imode];
 	cmd.append( post );
+	waitFB("set mode B");
 }
 
 int RIG_IC756PRO::get_modeB()
