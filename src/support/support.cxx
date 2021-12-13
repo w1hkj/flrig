@@ -6414,12 +6414,33 @@ void initRig()
 		}
 trace(1, "selrig->initialize()");
 		selrig->initialize();
-trace(1, "selrig->check()");
-		if (!selrig->check()) {
-trace(1, "FAILED");
-			goto failed;
-		}
 
+trace(1, "selrig->check()");
+#ifdef NDEBUG
+		if (!selrig->check()) {
+			trace(1, "FAILED");
+			bypass_serial_thread_loop = true;
+
+			xcvr_online = false;
+			adjust_control_positions();
+			grpInitializing->hide();
+			main_group->show();
+			mainwindow->redraw();
+
+			box_xcvr_connect->color(FL_BACKGROUND2_COLOR);
+			box_xcvr_connect->redraw();
+
+			fl_alert2(_("\
+Transceiver not responding!\n\n\
+Check serial (COM) port connection\n\
+Open menu Config/Setup/Transceiver\n\
+Press 'Update' button, reselect port\n\
+Check that Baud matches transceiver baud\n\n\
+Press 'Init' button."));
+
+			return;
+		}
+#endif
 		FreqDispA->set_precision(selrig->precision);
 		FreqDispA->set_ndigits(selrig->ndigits);
 		FreqDispB->set_precision(selrig->precision);
@@ -6490,27 +6511,6 @@ trace(1, "FAILED");
 
 	return;
 
-failed:
-	bypass_serial_thread_loop = true;
-
-	xcvr_online = false;
-	adjust_control_positions();
-	grpInitializing->hide();
-	main_group->show();
-	mainwindow->redraw();
-
-	box_xcvr_connect->color(FL_BACKGROUND2_COLOR);
-	box_xcvr_connect->redraw();
-
-	fl_alert2(_("\
-Transceiver not responding!\n\n\
-Check serial (COM) port connection\n\
-Open menu Config/Setup/Transceiver\n\
-Press 'Update' button, reselect port\n\
-Check that Baud matches transceiver baud\n\n\
-Press 'Init' button."));
-
-	return;
 }
 
 void init_title()
