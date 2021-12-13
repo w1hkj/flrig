@@ -930,7 +930,6 @@ Fl_Double_Window* Wide_rig_window() {
 	tabs->box(FL_FLAT_BOX);
 	tabs->end();
 
-//	grpInitializing = new Fl_Group(0, 0, mainW, mainH, "");
 	grpInitializing = new Fl_Group(0, menuH, mainW, mainH + tabsH, "");
 
 		grpInitializing->box(FL_FLAT_BOX);
@@ -953,16 +952,6 @@ Fl_Double_Window* Wide_rig_window() {
 	w->resizable(tabs);
 
 	w->end();
-
-std::cout << "Initial sizes" << std::endl;
-std::cout << "window:     " << w->x() << ", " << w->y() << ", " <<
-		w->w() << ", " << w->h() << std::endl;
-std::cout << "menu group: " << grp_menu->x() << ", " << grp_menu->y() << ", " <<
-		grp_menu->w() << ", " << grp_menu->h() << std::endl;
-std::cout << "main group: " << main_group->x() << ", " << main_group->y() << ", " <<
-		main_group->w() << ", " << main_group->h() << std::endl;
-std::cout << "tabs:   " << tabs->x() << ", " << tabs->y() << ", " <<
-	tabs->w() << ", " << tabs->h() << std::endl << std::endl;
 
 	return w;
 }
