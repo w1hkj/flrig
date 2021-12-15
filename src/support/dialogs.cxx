@@ -493,6 +493,11 @@ void open_cmedia_tab()
 	select_tab(_("PTT-Cmedia"));
 }
 
+void open_tmate2_tab()
+{
+	select_tab(_("TMATE-2"));
+}
+
 void open_ptt_tab()
 {
 	select_tab(_("PTT-Generic"));

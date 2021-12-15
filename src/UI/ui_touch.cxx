@@ -41,6 +41,7 @@ Fl_Menu_Item touch_menu[] = {
  {_("PTT-Generic"), 0, (Fl_Callback*)cb_mnuPTT, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("PTT-GPIO"), 0, (Fl_Callback*)cb_mnuGPIO, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("AUX"), 0, (Fl_Callback*)cb_mnuAUX, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("TMATE-2"), 0, (Fl_Callback*)cb_mnuTMATE2, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Server"), 0, (Fl_Callback*)cb_mnuSERVER, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Polling"), 0, (Fl_Callback*)cb_Polling, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Commands"), 0, (Fl_Callback*)cb_mnuCommands, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},

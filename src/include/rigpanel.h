@@ -611,6 +611,10 @@ extern Fl_ComboBox *inp_cmedia_GPIO_line;
 extern Fl_Button *btn_init_cmedia_PTT;
 extern Fl_Button *btn_test_cmedia;
 
+extern Fl_Group *tabTMATE2;
+extern Fl_ComboBox *cbo_tmate2_freq_step;
+extern Fl_ComboBox *cbo_tmate2_dev;
+
 extern Fl_Group *tabs;
 
 #endif

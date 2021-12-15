@@ -57,6 +57,7 @@
 #include "xml_server.h"
 #include "gpio_ptt.h"
 #include "cmedia.h"
+#include "tmate2.h"
 
 void initTabs();
 
@@ -6523,6 +6524,8 @@ Press 'Init' button.", progStatus.xcvr_serial_port.c_str());
 
 	initRig();
 
+	if (progStatus.tmate2_connected)
+		tmate2_open();
 }
 
 void initRigCombo()

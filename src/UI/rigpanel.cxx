@@ -483,6 +483,10 @@ static void cb_mnuCMEDIA(Fl_Menu_*, void*) {
 	open_cmedia_tab();
 }
 
+static void cb_mnuTMATE2(Fl_Menu_*, void*) {
+	open_tmate2_tab();
+}
+
 static void cb_CWkeyer(Fl_Menu_*, void*) {
 	if (cwio_keyer_dialog == 0)
 		cwio_keyer_dialog = cwio_window();

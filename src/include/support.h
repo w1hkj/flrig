@@ -247,6 +247,7 @@ extern void open_ptt_tab();
 extern void open_gpio_tab();
 extern void open_aux_tab();
 extern void open_server_tab();
+extern void open_tmate2_tab();
 
 extern void cb_close_TT550_setup();
 extern void cbUseRepeatButtons(bool on);

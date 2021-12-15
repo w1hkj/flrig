@@ -126,6 +126,7 @@ flrig_SOURCES += \
 	cwio/cwioUI.cxx \
 	cmedia/cmedia.cxx \
 	cmedia/hid.cxx \
+	cmedia/tmate2.cxx \
 	fskio/fsk.cxx \
 	fskio/fskioUI.cxx \
 	graphics/pixmaps.cxx \
@@ -279,6 +280,7 @@ EXTRA_DIST = \
 	include/hid_mac.h \
 	include/hid_win.h \
 	include/hidapi.h \
+	include/tmate2.h \
 	include/cwio.h \
 	include/cwioUI.h \
 	include/fsk.h \

@@ -81,6 +81,10 @@ struct status {
 	string	cmedia_gpio_line;
 	bool	cmedia_ptt;
 
+	string	tmate2_device;
+	string	tmate2_freq_step;
+	bool	tmate2_connected;
+
 	bool	disable_CW_ptt;
 
 	int		CIV;

@@ -23,6 +23,7 @@
 
 #include "dialogs.h"
 #include "cmedia.h"
+#include "tmate2.h"
 #include "rigs.h"
 #include "trace.h"
 #include "xml_server.h"
@@ -2252,6 +2253,7 @@ Fl_Group *createRestore(int X, int Y, int W, int H, const char *label)
 	tabRESTORE->end();
 
 	init_hids();
+	tmate2_init_hids();
 
 	return tabRESTORE;
 }
@@ -2391,6 +2393,95 @@ KERNEL==\"hidraw*\", \\\n\
 
 //----------------------------------------------------------------------
 
+Fl_Group *tabTMATE2 = (Fl_Group *)0;
+	Fl_ComboBox *cbo_tmate2_dev = (Fl_ComboBox *)0;
+	Fl_ComboBox *cbo_tmate2_freq_step = (Fl_ComboBox *)0;
+	Fl_Button *btn_refresh_tmate2 = (Fl_Button *)0;
+	Fl_Button *btn_init_tmate2 = (Fl_Button *)0;
+
+static void cb_cbo_tmate2_dev(Fl_ComboBox* o, void*) {
+	tmate2_close();
+	progStatus.tmate2_device = o->value();
+	btn_init_tmate2->labelcolor(FL_RED);
+	btn_init_tmate2->redraw();
+}
+
+static void cb_cbo_tmate2_freq_step(Fl_ComboBox* o, void*) {
+  progStatus.tmate2_freq_step = o->value();
+}
+
+static void cb_btn_refresh_tmate2(Fl_Button* o, void*) {
+	tmate2_init_hids();
+}
+
+static void cb_btn_init_tmate2(Fl_Button* o, void*) {
+	tmate2_open();
+	o->labelcolor(FL_FOREGROUND_COLOR);
+}
+
+Fl_Group *createTMATE2Tab(int X, int Y, int W, int H, const char *label)
+{
+	Fl_Group *tab = new Fl_Group(X, Y, W, H, label);
+
+	tab->hide();
+
+	Fl_Box *bx  = new Fl_Box(X + 2, Y + 2, W - 4, H / 2 - 2, _(
+"TMATE-2 interface units use hid i/o.\n\
+Gn Linux: add a file named tmate2.rules to /etc/udev/rules.d/ containing:\n\
+\n\
+KERNEL==\"hidraw*\", \\\n\
+SUBSYSTEM==\"hidraw\", MODE=\"0664\", GROUP=\"plugdev\""));
+		bx->box(FL_FLAT_BOX);
+		bx->align(Fl_Align(132|FL_ALIGN_INSIDE));
+		bx->labelfont(0);
+		bx->labelsize(13);
+
+	cbo_tmate2_dev = new Fl_ComboBox(X + 10, Y + H/2 + 50, 350, 20, _("Elad TMATE-2"));
+		cbo_tmate2_dev->box(FL_DOWN_BOX);
+		cbo_tmate2_dev->color(FL_BACKGROUND2_COLOR);
+		cbo_tmate2_dev->selection_color(FL_BACKGROUND_COLOR);
+		cbo_tmate2_dev->labeltype(FL_NORMAL_LABEL);
+		cbo_tmate2_dev->labelfont(0);
+		cbo_tmate2_dev->labelsize(13);
+		cbo_tmate2_dev->labelcolor(FL_FOREGROUND_COLOR);
+		cbo_tmate2_dev->callback((Fl_Callback*)cb_cbo_tmate2_dev);
+		cbo_tmate2_dev->align(Fl_Align(FL_ALIGN_TOP_LEFT));
+		cbo_tmate2_dev->when(FL_WHEN_RELEASE);
+		cbo_tmate2_dev->labelsize(FL_NORMAL_SIZE);
+		cbo_tmate2_dev->value(progStatus.tmate2_device.c_str());
+		cbo_tmate2_dev->end();
+
+	cbo_tmate2_freq_step = new Fl_ComboBox(X + 10, Y + H/2 + 95, 350, 20, _("Transceiver frequency tune step in Hz"));
+		cbo_tmate2_freq_step->box(FL_DOWN_BOX);
+		cbo_tmate2_freq_step->color(FL_BACKGROUND2_COLOR);
+		cbo_tmate2_freq_step->selection_color(FL_BACKGROUND_COLOR);
+		cbo_tmate2_freq_step->labeltype(FL_NORMAL_LABEL);
+		cbo_tmate2_freq_step->labelfont(0);
+		cbo_tmate2_freq_step->labelsize(13);
+		cbo_tmate2_freq_step->labelcolor(FL_FOREGROUND_COLOR);
+		cbo_tmate2_freq_step->callback((Fl_Callback*)cb_cbo_tmate2_freq_step);
+		cbo_tmate2_freq_step->align(Fl_Align(FL_ALIGN_TOP_LEFT));
+		cbo_tmate2_freq_step->when(FL_WHEN_RELEASE);
+		cbo_tmate2_freq_step->labelsize(FL_NORMAL_SIZE);
+		cbo_tmate2_freq_step->add("1|100|500|1000|2500|5000|6250|10000|12500|15000|20000|25000|30000|50000|100000|125000|200000");
+		cbo_tmate2_freq_step->value(progStatus.tmate2_freq_step.c_str());
+		cbo_tmate2_freq_step->end();
+
+	btn_refresh_tmate2 = new Fl_Button(X + W - 80, Y + H/2 + 5, 70, 20, _("Refresh"));
+		btn_refresh_tmate2->tooltip(_("Refresh the list of hid devices"));
+		btn_refresh_tmate2->callback((Fl_Callback*)cb_btn_refresh_tmate2);
+
+	btn_init_tmate2 = new Fl_Button(X + W - 80, Y + H/2 + 50, 70, 20, _("Select"));
+		btn_init_tmate2->tooltip(_("Select device & Initialize the interface"));
+		btn_init_tmate2->callback((Fl_Callback*)cb_btn_init_tmate2);
+
+	tab->end();
+
+	return tab;
+}
+
+//----------------------------------------------------------------------
+
 #include "gpio.cxx"
 
 #include <vector>
@@ -2480,6 +2571,7 @@ Fl_Double_Window* XcvrDialog() {
 
 	tabXCVR     = createXCVR(xtabs, ytree, wtabs, htree, _("Xcvr"));
 	tabCMEDIA   = createCmediaTab(xtabs, ytree, wtabs, htree, ("PTT-Cmedia"));
+	tabTMATE2   = createTMATE2Tab(xtabs, ytree, wtabs, htree, ("TMATE-2"));
 	tabGPIO     = createGPIO(xtabs, ytree, wtabs, htree, _("PTT-GPIO"));
 	tabPTTGEN   = createPTT(xtabs, ytree, wtabs, htree, _("PTT-Generic"));
 	tabTCPIP    = createTCPIP(xtabs, ytree, wtabs, htree, _("TCPIP"));
@@ -2497,7 +2589,7 @@ Fl_Double_Window* XcvrDialog() {
 
 	add_tree_item(tabPTTGEN);
 	add_tree_item(tabCMEDIA);
-	add_tree_item(tabGPIO);
+	add_tree_item(tabTMATE2);
 
 	add_tree_item(tabTCPIP);
 	add_tree_item(tabAUX);

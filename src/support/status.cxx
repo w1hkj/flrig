@@ -93,6 +93,10 @@ status progStatus = {
 	"GPIO-3",	// string	cmedia_gpio_line
 	false,		// bool	cmedia_ptt
 
+	"NONE",		// string	tmate2_devide
+	"5000",		// string	tmate2_freq_step
+	false,		// bool		tmate2_connected
+
 	false,		// bool	disable_CW_ptt;
 
 	0,			// int	CIV;
@@ -634,6 +638,10 @@ void status::saveLastState()
 	spref.set("cmedia_device", cmedia_device.c_str());
 	spref.set("cmedia_gpio_line", cmedia_gpio_line.c_str());
 	spref.set("cmedia_ptt", cmedia_ptt);
+
+	spref.set("tmate2_device", tmate2_device.c_str());
+	spref.set("tmate2_freq_step", tmate2_freq_step.c_str());
+	spref.set("tmate2_connected", tmate2_connected);
 
 	spref.set("poll_smeter", poll_smeter);
 	spref.set("poll_frequency", poll_frequency);
@@ -1255,6 +1263,12 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("cmedia_gpio_line", defbuffer, "GPIO-3", 499);
 		cmedia_gpio_line = defbuffer;
 		spref.get("cmedia_ptt", i, cmedia_ptt); cmedia_ptt = i;
+
+		spref.get("tmate2_device", defbuffer, "NONE", 499);
+		tmate2_device = defbuffer;
+		spref.get("tmate2_freq_step", defbuffer, "5000", 499);
+		tmate2_freq_step = defbuffer;
+		spref.get("tmate2_connected", i, tmate2_connected); tmate2_connected = i;
 
 		spref.get("poll_smeter", poll_smeter, poll_smeter);
 		spref.get("poll_frequency", poll_frequency, poll_frequency);
