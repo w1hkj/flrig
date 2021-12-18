@@ -64,11 +64,11 @@ static int mode_bwB[NUM_MODES] = {
 static const char *szfilter[NUM_FILTERS] = {"1", "2", "3"};
 
 enum { 
-m7610LSB, m7610USB, m7610AM, m7610FM, m7610CW,
-m7610CWR, m7610RTTY, m7610RTTYR, m7610PSK, m7610PSKR,
-m7610LSBD1, m7610USBD1, m7610AMD1, m7610FMD1,
-m7610LSBD2, m7610USBD2, m7610AMD2, m7610FMD2,
-m7610LSBD3, m7610USBD3, m7610AMD3, m7610FM3D
+m7610LSB, m7610USB, m7610AM, m7610FM, m7610CW,				// 0..4
+m7610CWR, m7610RTTY, m7610RTTYR, m7610PSK, m7610PSKR,		// 5..9
+m7610LSBD1, m7610USBD1, m7610AMD1, m7610FMD1,				// 10..13
+m7610LSBD2, m7610USBD2, m7610AMD2, m7610FMD2,				// 14..17
+m7610LSBD3, m7610USBD3, m7610AMD3, m7610FMD3				// 18..21
 };
 
 const char *IC7610modes_[] = {
@@ -2156,6 +2156,13 @@ int RIG_IC7610::get_attenuator()
 // FE FE E0 94 1A 01 06 01 70 99 08 18 00 01 03 10 00 08 85 00 08 85 FD
 //
 // band 6; freq 0018,089,970; USB; data mode; t 88.5; r 88.5
+// enum { 
+// m7610LSB, m7610USB, m7610AM, m7610FM, m7610CW,				// 0..4
+// m7610CWR, m7610RTTY, m7610RTTYR, m7610PSK, m7610PSKR,		// 5..9
+// m7610LSBD1, m7610USBD1, m7610AMD1, m7610FMD1,				// 10..13
+// m7610LSBD2, m7610USBD2, m7610AMD2, m7610FMD2,				// 14..17
+// m7610LSBD3, m7610USBD3, m7610AMD3, m7610FMD3					// 18..21
+// };
 
 void RIG_IC7610::get_band_selection(int v)
 {
@@ -2182,22 +2189,28 @@ void RIG_IC7610::get_band_selection(int v)
 			for (index = 0; index < sizeof(PL_tones) / sizeof(*PL_tones); index++)
 				if (tone == PL_tones[index]) break;
 			rTONE = index;
-			if ((bandmode == 0) && banddata) 
-				bandmode = ((banddata == 0x10) ? 10 : 
-							(banddata == 0x20) ? 14 :
-							(banddata == 0x30) ? 18 : 0);
-			if ((bandmode == 1) && banddata)
-				bandmode = ((banddata == 0x10) ? 11 : 
-							(banddata == 0x20) ? 15 :
-							(banddata == 0x30) ? 19 : 1);
-			if ((bandmode == 2) && banddata)
-				bandmode = ((banddata == 0x10) ? 12 : 
-							(banddata == 0x20) ? 16 :
-							(banddata == 0x30) ? 20 : 2);
-			if ((bandmode == 3) && banddata)
-				bandmode = ((banddata == 0x10) ? 13 : 
-							(banddata == 0x20) ? 17 :
-							(banddata == 0x30) ? 21 : 3);
+
+// change bandmode selection based on mode / data
+			switch (bandmode) {
+				case 0: bandmode = ((banddata == 0x10) ? m7610LSBD1 : 
+						(banddata == 0x20) ? m7610LSBD2 :
+						(banddata == 0x30) ? m7610LSBD3 : m7610LSB);
+						break;
+				case 1: bandmode = ((banddata == 0x10) ? m7610USBD1 : 
+						(banddata == 0x20) ? m7610USBD2 :
+						(banddata == 0x30) ? m7610USBD3 : m7610USB);
+						break;
+				case 2: bandmode = ((banddata == 0x10) ? m7610AMD1 : 
+						(banddata == 0x20) ? m7610AMD2 :
+						(banddata == 0x30) ? m7610AMD3 : m7610AM);
+						break;
+				case 3: bandmode = ((banddata == 0x10) ? m7610FMD1 : 
+						(banddata == 0x20) ? m7610FMD2 :
+						(banddata == 0x30) ? m7610FMD3 : m7610FM);
+						break;
+				default:
+						break;
+			}
 			if (useB) {
 				set_vfoB(bandfreq);
 				set_modeB(bandmode);
@@ -2225,7 +2238,7 @@ void RIG_IC7610::set_band_selection(int v)
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd += mode;
 	cmd += fil;
-	if (mode >= m7610LSBD1 && mode <= m7610FM3D )
+	if (mode >= m7610LSBD1 && mode <= m7610FMD3 )
 		cmd += '\x10';
 	else
 		cmd += '\x00';

@@ -232,6 +232,7 @@ void popbrwsr_cb (Fl_Widget *v, long d)
 	return;
 }
 
+#include <iostream>
 
 void Fl_ComboBox::fl_popbrwsr(Fl_Widget *p)
 {
@@ -302,12 +303,9 @@ Fl_ComboBox::~Fl_ComboBox()
 
 int Fl_ComboBox::handle(int event)
 {
-	if (event == FL_KEYDOWN) {
-		int  kbd = Fl::event_key();
-		if (kbd == FL_Down) {
-			fl_popbrwsr (this);
-			return 1;
-		}
+	if (event == FL_PUSH) {
+		fl_popbrwsr (this);
+		return 1;
 	}
 	return Fl_Group::handle(event);
 }

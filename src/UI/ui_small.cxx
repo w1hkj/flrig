@@ -1697,7 +1697,7 @@ Fl_Double_Window *tabs_window()
 //			kxpa_enabled->value(progStatus.kxpa);
 //		kx3_extras->end();
 
-		genericUser_1 = new Fl_Group(0, 24, small_mainW, gph - 24, _("Cmds A"));
+		genericUser_1 = new Fl_Group(0, 24, small_mainW, gph - 24, _("A"));
 			btnUser1 = new Fl_Button(5, genericUser_1->y() + 12, 100, 20, "USER 1");
 			btnUser1->callback((Fl_Callback*)cb_btnUser, (void*)1);
 
@@ -1779,22 +1779,12 @@ Fl_Double_Window *tabs_window()
 		genericUser_3->end();
 
 		tab7610 = new Fl_Group(0, 24, small_mainW, gph - 24, _("IC7610"));
-			ic7610att = new Fl_ComboBox(5, tab7610->y() + 10, 70, 20, "Att level");
-			ic7610att->add("OFF|3db|6db|9db|12db|15db|18db|21db|24db|27db|30db|33db|36db|39db|42db|45db|");
-			ic7610att->align(FL_ALIGN_RIGHT);
-			ic7610att->index(progStatus.index_ic7610att);
-			ic7610att->readonly();
-			ic7610att->callback((Fl_Callback *)cb_ic7610_att);
 
-			ic7610dual_watch = new Fl_Light_Button(150, tab7610->y() + 10, 120, 20, "Dual Watch");
-			ic7610dual_watch->value(progStatus.dual_watch);
-			ic7610dual_watch->callback((Fl_Callback *)cb_dual_watch);
-
-			ic7610digi_sel_on_off = new Fl_Light_Button(5, tab7610->y() + 35, 70, 20, "Digi-Sel");
+			ic7610digi_sel_on_off = new Fl_Light_Button(5, tab7610->y() + 10, 70, 22, "Digi-Sel");
 			ic7610digi_sel_on_off->value(progStatus.digi_sel_on_off);
 			ic7610digi_sel_on_off->callback((Fl_Callback *)cb_digi_sel_on_off);
 
-			ic7610_digi_sel_val = new Fl_Wheel_Value_Slider(80, tab7610->y() + 35, small_mainW - 85, 20, "");
+			ic7610_digi_sel_val = new Fl_Wheel_Value_Slider(80, tab7610->y() + 10, small_mainW - 85, 22, "");
 			ic7610_digi_sel_val->tooltip(_("Digi-Sel value"));
 			ic7610_digi_sel_val->type(5);
 			ic7610_digi_sel_val->box(FL_THIN_DOWN_BOX);
@@ -1811,6 +1801,20 @@ Fl_Double_Window *tabs_window()
 			ic7610_digi_sel_val->align(Fl_Align(FL_ALIGN_BOTTOM));
 			ic7610_digi_sel_val->when(FL_WHEN_CHANGED);
 			ic7610_digi_sel_val->value(progStatus.digi_sel_val);
+
+			ic7610att = new Fl_ComboBox(5, tab7610->y() + 40, 80, 22, "Att level");
+			ic7610att->add("OFF|3db|6db|9db|12db|15db|18db|21db|24db|27db|30db|33db|36db|39db|42db|45db");
+			ic7610att->box(FL_NO_BOX);
+			ic7610att->color(FL_BACKGROUND2_COLOR);
+			ic7610att->selection_color(FL_BACKGROUND_COLOR);
+			ic7610att->align(FL_ALIGN_RIGHT);
+			ic7610att->index(progStatus.index_ic7610att);
+			ic7610att->readonly();
+			ic7610att->callback((Fl_Callback *)cb_ic7610_att);
+
+			ic7610dual_watch = new Fl_Light_Button(150, tab7610->y() + 40, 120, 22, "Dual Watch");
+			ic7610dual_watch->value(progStatus.dual_watch);
+			ic7610dual_watch->callback((Fl_Callback *)cb_dual_watch);
 
 		tab7610->end();
 

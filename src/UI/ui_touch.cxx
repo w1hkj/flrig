@@ -1660,23 +1660,24 @@ CTRL  click: FreqB -> FreqA\
 
 			genericUser_3->end();
 
+			by += 10;
 			tab7610 = new Fl_Group(xpos, ypos+tabh, W, tabb, _("IC7610"));
-				ic7610att = new Fl_ComboBox(5, by, 120, 50, "Att level");
+				ic7610att = new Fl_ComboBox(5, by, 120, 30, "Att level");
 				ic7610att->add("OFF|3db|6db|9db|12db|15db|18db|21db|24db|27db|30db|33db|36db|39db|42db|45db|");
 				ic7610att->align(FL_ALIGN_RIGHT);
 				ic7610att->index(progStatus.index_ic7610att);
 				ic7610att->readonly();
 				ic7610att->callback((Fl_Callback *)cb_ic7610_att);
 
-				ic7610dual_watch = new Fl_Light_Button(210, by, 100, 50, "Dual Watch");
+				ic7610dual_watch = new Fl_Light_Button(210, by, 100, 30, "Dual Watch");
 				ic7610dual_watch->value(progStatus.dual_watch);
 				ic7610dual_watch->callback((Fl_Callback *)cb_dual_watch);
 
-				ic7610digi_sel_on_off = new Fl_Light_Button(320, by, 100, 50, "Digi-Sel");
+				ic7610digi_sel_on_off = new Fl_Light_Button(320, by, 100, 30, "Digi-Sel");
 				ic7610digi_sel_on_off->value(progStatus.digi_sel_on_off);
 				ic7610digi_sel_on_off->callback((Fl_Callback *)cb_digi_sel_on_off);
 
-				ic7610_digi_sel_val = new Fl_Wheel_Value_Slider(430, by, W - 440, 50, "");
+				ic7610_digi_sel_val = new Fl_Wheel_Value_Slider(430, by, W - 440, 30, "");
 				ic7610_digi_sel_val->tooltip(_("Digi-Sel value"));
 				ic7610_digi_sel_val->type(5);
 				ic7610_digi_sel_val->box(FL_THIN_DOWN_BOX);
