@@ -6548,7 +6548,7 @@ void initConfigDialog()
 		btnrtsplus2->value( srig->comm_rtsplus );
 		btndtrplus2->value( srig->comm_dtrplus );
 
-		if (selrig->CIV) {
+		if (srig->CIV) {
 			char hexstr[8];
 			snprintf(hexstr, sizeof(hexstr), "0x%02X", srig->CIV);
 			txtCIV->value(hexstr);
