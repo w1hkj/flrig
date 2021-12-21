@@ -262,7 +262,8 @@ int  RIG_FT817::get_power_out()
 	cmd[4] = 0xBD;
 	int ret = waitN(2, 100, "get PWR/SWR/ALC");
 	getthex("get_power_out");
-	if (ret != 2) return 0;
+
+	if (ret < 2) return 0;
 
 	int fwdpwr = (replystr[0] & 0xF0) >> 4;
 	swr = (replystr[1] & 0xF0) >> 4;

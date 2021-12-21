@@ -338,9 +338,11 @@ int RIG_FT100D::get_power_out()
 	init_cmd();
 	cmd[4] = 0xF7;
 	int ret = waitN(9, 100, "P-out");
+
 	if (ret < 9) return 0;
-	fwdpwr = replystr[ret - 9 + 1] / 2.56;
-	refpwr = replystr[ret - 9 + 2] / 2.56;
+	fwdpwr = (100 * (replystr[ret - 9 + 1] & 0xFF) / 256);
+	refpwr = (100 * (replystr[ret - 9 + 2] & 0xFF) / 256);
+
 	return (int) fwdpwr;
 }
 

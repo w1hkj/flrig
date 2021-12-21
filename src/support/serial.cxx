@@ -209,11 +209,11 @@ bool Cserial::OpenPort()  {
 ///////////////////////////////////////////////////////
 
 bool Cserial::RTSptt(){
-	return rtsptt;
+	return serptt;
 }
 
 bool Cserial::DTRptt(){
-	return dtrptt;
+	return serptt;
 }
 
 bool Cserial::getPTT() {
@@ -255,7 +255,6 @@ void Cserial::SetPTT(bool ON)
 				ON, dtrptt, dtr, rtsptt, rts, rtscts, state);
 			ser_trace(1, traceinfo);
 		}
-std::cout << "set ptt ioctl " << std::hex << state << std::endl;
 		ioctl(fd, TIOCMSET, &state);
 	}
 	serptt = ON;
@@ -274,7 +273,7 @@ void Cserial::setRTS(bool b)
 		state &= ~TIOCM_RTS; // toggle low
 
 	if (ioctl(fd, TIOCMSET, &state) == -1)
-		std::cout << "set RTS ioctl error: " << errno << std::endl;
+		LOG_ERROR("set RTS ioctl error: %d", errno);
 
 }
 
@@ -289,7 +288,7 @@ void Cserial::setDTR(bool b)
 	else
 		state &= ~TIOCM_DTR;	 // toggle low
 	if (ioctl(fd, TIOCMSET, &state) == -1)
-		std::cout << "set DTR ioctl error: " << errno << std::endl;
+		LOG_ERROR("set DTR ioctl error: %d", errno);
 
 }
 

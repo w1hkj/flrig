@@ -1129,7 +1129,7 @@ void check_ptt()
 {
 	int check = 0;
 
-	if (selrig->has_ptt_control || progStatus.comm_catptt) {
+	if (selrig->has_ptt_control && progStatus.comm_catptt) {
 		check = selrig->get_PTT();
 	} else if (progStatus.comm_dtrptt) {
 		check = RigSerial->getPTT();
@@ -1144,7 +1144,6 @@ void check_ptt()
 	} else if (progStatus.cmedia_ptt) {
 		check = get_cmedia();
 	}
-
 	if (check != PTT) {
 		PTT = check;
 		Fl::awake(set_ptt, (void *)PTT);
@@ -3049,14 +3048,17 @@ void doPTT(int on)
 
 	int chk = chkptt();
 	if (chk == on) return;
+
 	rigPTT(on);
+	btnPTT->value(on);
+	PTT = on;
+
 	MilliSleep(progStatus.comm_wait);
 	for (int n = 0; n < 100; n++) {
 		if (on == chkptt()) break;
 		MilliSleep(progStatus.comm_wait);
 		Fl::awake();
 	}
-	btnPTT->value(on);
 	return;
 }
 
