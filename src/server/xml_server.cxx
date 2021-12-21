@@ -613,6 +613,34 @@ public:
 
 } rig_set_verify_rfgain(&rig_server);
 
+class rig_mod_rfg : public XmlRpcServerMethod {
+public:
+	rig_mod_rfg(XmlRpcServer* s) : XmlRpcServerMethod("rig.mod_rfg", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online || disable_xmlrpc->value()) {
+			result = 0;
+			return;
+		}
+
+		int min, max, step;
+		selrig->get_rf_min_max_step(min, max, step);
+
+		int change = (int)(params[0]);
+		progStatus.rfgain += change;
+		if (progStatus.rfgain > max) progStatus.rfgain = max;
+		if (progStatus.rfgain < min) progStatus.rfgain = min;
+
+		guard_lock serial_lock(&mutex_serial, "xml rig_mod_rfgain");
+		selrig->set_rf_gain(progStatus.rfgain);
+		xml_trace(1, "rig_mod_rfgain");
+		Fl::awake(setRFGAINControl, static_cast<void *>(0));
+	}
+
+	std::string help() { return std::string("modify rfgain +/- NNN units"); }
+
+} rig_mod_rfg(&rig_server);
+
 //------------------------------------------------------------------------------
 // Get micgain value
 //------------------------------------------------------------------------------
@@ -774,6 +802,33 @@ public:
 	std::string help() { return std::string("sets & verifies volume value"); }
 
 } rig_set_verify_volume(&rig_server);
+
+class rig_mod_vol : public XmlRpcServerMethod {
+public:
+	rig_mod_vol(XmlRpcServer* s) : XmlRpcServerMethod("rig.mod_vol", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online || disable_xmlrpc->value()) {
+			result = 0;
+			return;
+		}
+		int min, max, step;
+		selrig->get_vol_min_max_step(min, max, step);
+
+		static int change = (int)(params[0]);
+		progStatus.volume += change;
+		if (progStatus.volume > max) progStatus.volume = max;
+		if (progStatus.volume < min) progStatus.volume = min;
+
+		guard_lock serial_lock(&mutex_serial, "xml rig_mod_volume");
+		selrig->set_volume_control(progStatus.volume);
+		xml_trace(1, "rig_mod_volume");
+		Fl::awake(setVolumeControl, static_cast<void *>(0));
+	}
+
+	std::string help() { return std::string("modify volume +/- NNN"); }
+
+} rig_mod_vol(&rig_server);
 
 //------------------------------------------------------------------------------
 // Request list of modes
@@ -1403,6 +1458,32 @@ public:
 
 } rig_get_power(&rig_server);
 
+class rig_mod_power : public XmlRpcServerMethod {
+public:
+	rig_mod_power(XmlRpcServer* s) : XmlRpcServerMethod("rig.mod_pwr", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online || disable_xmlrpc->value()) {
+			result = 0;
+			return;
+		}
+		double min, max, step;
+		selrig->get_pc_min_max_step(min, max, step);
+
+		int power_change = (int)(params[0]);
+
+		guard_lock lock(&mutex_serial);
+		progStatus.power_level += power_change;
+		if (progStatus.power_level > max) progStatus.power_level = max;
+		if (progStatus.power_level < min) progStatus.power_level = min;
+
+		selrig->set_power_control(progStatus.power_level);
+		Fl::awake(update_power_control, (void*)0);
+	}
+
+	std::string help() { return std::string("mods power level in watts"); }
+
+} rig_mod_power(&rig_server);
 
 //------------------------------------------------------------------------------
 // Enable tune
@@ -1751,7 +1832,7 @@ public:
 			selrig->set_vfoA(vfoA.freq);
 		}
 
-		Fl::awake(setFreqDispA, (void *)freq);
+		Fl::awake(setFreqDispA, (void *)vfoA.freq);
 
 	}
 	std::string help() { return std::string("rig.set_vfo NNNNNNNN (Hz)"); }
@@ -1810,11 +1891,41 @@ public:
 			selrig->set_vfoA(vfoA.freq);
 		}
 
-		Fl::awake(setFreqDispA, (void *)freq);
+		Fl::awake(setFreqDispA, (void *)vfoA.freq);
 	}
 	std::string help() { return std::string("deprecated; use rig.set_vfoA"); }
 
 } rig_set_vfoA_fast(&rig_server);
+
+class rig_mod_vfoA : public XmlRpcServerMethod {
+public:
+	rig_mod_vfoA(XmlRpcServer* s) : XmlRpcServerMethod("rig.mod_vfoA", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online || disable_xmlrpc->value()) {
+			result = 0;
+			return;
+		}
+		signed long int freq = static_cast<signed long int>((double)params[0]);
+
+		guard_lock serial(&mutex_serial);
+
+		if (!selrig->can_change_alt_vfo  && useB) {
+			selrig->selectA();
+			vfoA.freq += freq;
+			selrig->set_vfoA(vfoA.freq);
+			selrig->selectB();
+		} else {
+			vfoA.freq += freq;
+			selrig->set_vfoA(vfoA.freq);
+		}
+
+		Fl::awake(setFreqDispA, (void *)vfoA.freq);
+
+	}
+	std::string help() { return std::string("rig.mod_vfo +/- NNN (Hz)"); }
+
+} rig_mod_vfoA(&rig_server);
 
 //------------------------------------------------------------------------------
 // Set vfo B frequency
@@ -1843,7 +1954,7 @@ public:
 			vfoB.freq = freq;
 		}
 
-		Fl::awake(setFreqDispB, (void *)freq);
+		Fl::awake(setFreqDispB, (void *)vfoB.freq);
 	}
 	std::string help() { return std::string("rig.set_vfo NNNNNNNN (Hz)"); }
 
@@ -1901,11 +2012,122 @@ public:
 			vfoB.freq = freq;
 		}
 
-		Fl::awake(setFreqDispB, (void *)freq);
+		Fl::awake(setFreqDispB, (void *)vfoB.freq);
 	}
 	std::string help() { return std::string("deprecated; use rig.set_vfoB"); }
 
 } rig_set_vfoB_fast(&rig_server);
+
+class rig_mod_vfoB : public XmlRpcServerMethod {
+public:
+	rig_mod_vfoB(XmlRpcServer* s) : XmlRpcServerMethod("rig.mod_vfoB", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online || disable_xmlrpc->value()) {
+			result = 0;
+			return;
+		}
+		signed long int freq = static_cast<signed long int>((double)params[0]);
+
+		guard_lock serial(&mutex_serial);
+
+		if (!selrig->can_change_alt_vfo  && !useB) {
+			selrig->selectB();
+			selrig->set_vfoB(vfoB.freq);
+			vfoB.freq += freq;
+			selrig->selectA();
+		} else {
+			selrig->set_vfoB(vfoB.freq);
+			vfoB.freq += freq;
+		}
+
+		Fl::awake(setFreqDispB, (void *)vfoB.freq);
+
+	}
+	std::string help() { return std::string("rig.mod_vfoB +/- NNN (Hz)"); }
+
+} rig_mod_vfoB(&rig_server);
+
+//------------------------------------------------------------------------------
+// Set vfoB to vfoA freq/mode
+//------------------------------------------------------------------------------
+
+class rig_vfoA2B : public XmlRpcServerMethod {
+public:
+	rig_vfoA2B (XmlRpcServer* s) : XmlRpcServerMethod("rig.vfoA2B", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online || disable_xmlrpc->value()) {
+			result = 0;
+			return;
+		}
+
+		guard_lock serial(&mutex_serial);
+
+		vfoB.freq = vfoA.freq;
+		vfoB.imode = vfoA.imode;
+
+		selrig->set_vfoB(vfoB.freq);
+		selrig->set_modeB(vfoB.imode);
+
+		Fl::awake(setFreqDispB, (void *)vfoB.freq);
+
+	}
+	std::string help() { return std::string("sets vfoB to vfoA freq/mode"); }
+
+} rig_vfoA2B(&rig_server);
+
+//------------------------------------------------------------------------------
+// Set freq B to freq A
+//------------------------------------------------------------------------------
+
+class rig_freqA2B : public XmlRpcServerMethod {
+public:
+	rig_freqA2B (XmlRpcServer* s) : XmlRpcServerMethod("rig.freqA2B", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online || disable_xmlrpc->value()) {
+			result = 0;
+			return;
+		}
+
+		guard_lock serial(&mutex_serial);
+
+		vfoB.freq = vfoA.freq;
+
+		selrig->set_vfoB(vfoB.freq);
+
+		Fl::awake(setFreqDispB, (void *)vfoB.freq);
+
+	}
+	std::string help() { return std::string("sets freqB to freqA"); }
+
+} rig_freqA2B(&rig_server);
+
+//------------------------------------------------------------------------------
+// Set mode A to mode B
+//------------------------------------------------------------------------------
+
+class rig_modeA2B : public XmlRpcServerMethod {
+public:
+	rig_modeA2B (XmlRpcServer* s) : XmlRpcServerMethod("rig.modeA2B", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online || disable_xmlrpc->value()) {
+			result = 0;
+			return;
+		}
+
+		guard_lock serial(&mutex_serial);
+
+		vfoB.imode = vfoA.imode;
+
+		selrig->set_modeB(vfoB.imode);
+
+	}
+	std::string help() { return std::string("sets modeA to modeB"); }
+
+} rig_modeA2B(&rig_server);
 
 //------------------------------------------------------------------------------
 // Set active vfo frequency
@@ -1926,11 +2148,11 @@ public:
 		if (useB) {
 			selrig->set_vfoB(freq);
 			vfoB.freq = freq;
-			Fl::awake(setFreqDispB, (void *)freq);
+			Fl::awake(setFreqDispB, (void *)vfoB.freq);
 		}else {
 			selrig->set_vfoA(freq);
 			vfoA.freq = freq;
-			Fl::awake(setFreqDispA, (void *)freq);
+			Fl::awake(setFreqDispA, (void *)vfoA.freq);
 		}
 
 	}
@@ -1981,11 +2203,11 @@ public:
 		if (useB) {
 			selrig->set_vfoB(freq);
 			vfoB.freq = freq;
-			Fl::awake(setFreqDispB, (void *)freq);
+			Fl::awake(setFreqDispB, (void *)vfoB.freq);
 		}else {
 			selrig->set_vfoA(freq);
 			vfoA.freq = freq;
-			Fl::awake(setFreqDispA, (void *)freq);
+			Fl::awake(setFreqDispA, (void *)vfoA.freq);
 		}
 
 	}
@@ -2008,11 +2230,11 @@ public:
 		if (useB) {
 			selrig->set_vfoB(freq);
 			vfoB.freq = freq;
-			Fl::awake(setFreqDispB, (void *)freq);
+			Fl::awake(setFreqDispB, (void *)vfoB.freq);
 		}else {
 			selrig->set_vfoA(freq);
 			vfoA.freq = freq;
-			Fl::awake(setFreqDispA, (void *)freq);
+			Fl::awake(setFreqDispA, (void *)vfoA.freq);
 		}
 
 		result = 1;
@@ -2489,6 +2711,13 @@ public:
 		int bw = (int)params[0];
 		guard_lock que_lock ( &mutex_srvc_reqs, "xml rig_set_BW" );
 
+		const char **widths = selrig->bandwidths_;
+		int n = 0;
+		while (widths[n]) { n++; }
+		if (bw >= n || bw < 0) {
+			result = 0;
+			return;
+		}
 		XCVR_STATE nuvals;
 		if (useB) {
 			nuvals.freq = vfoB.freq;
@@ -2522,6 +2751,14 @@ public:
 		int bw = (int)params[0];
 		guard_lock que_lock ( &mutex_srvc_reqs, "xml rig_set_BW" );
 
+		const char **widths = selrig->bandwidths_;
+		int n = 0;
+		while (widths[n]) { n++; }
+		if (bw >= n || bw < 0) {
+			result = 0;
+			return;
+		}
+
 		XCVR_STATE nuvals;
 		int retbw;
 		nuvals.iBW = bw;
@@ -2544,6 +2781,65 @@ public:
 } rig_set_verify_BW(&rig_server);
 
 static std::string retstr = "";
+
+class rig_mod_bw: public XmlRpcServerMethod {
+public:
+	rig_mod_bw(XmlRpcServer* s) : XmlRpcServerMethod("rig.mod_bw", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online || disable_xmlrpc->value()) {
+			result = 0;
+			return;
+		}
+		XCVR_STATE nuvals;
+		int bwch = (int)params[0];
+
+		guard_lock lock(&mutex_srvc_reqs, "xml rig_mod_bandwidth");
+
+		if (useB) {
+			nuvals.freq  = vfoB.freq;
+			nuvals.imode = vfoB.imode;
+			nuvals.iBW   = vfoB.iBW;
+		} else {
+			nuvals.freq  = vfoA.freq;
+			nuvals.imode = vfoA.imode;
+			nuvals.iBW   = vfoA.iBW;
+		}
+
+		const char **widths = selrig->bandwidths_;
+		int n = 0;
+		while (widths[n]) { n++; }
+
+		int bw = atol(widths[nuvals.iBW]) + bwch;
+		if (bw <= 0 || bw > atol(widths[n-1])) {
+			result = 0;
+			return;
+		}
+
+		int i = 0;
+		while (	widths[i] && atol(widths[i]) < bw) {
+			i++;
+		}
+		if (!widths[i]) i--;
+		bw = atol(widths[i]);
+
+		ostringstream s;
+		s << "nearest bandwidth " << widths[i];
+		xml_trace(2,"Set to ", s.str().c_str());
+
+		nuvals.iBW = i;
+		if (useB) {
+			serviceB(nuvals);
+		} else {
+			serviceA(nuvals);
+		}
+
+	}
+	std::string help() { return std::string("modify bw to nearest requested"); }
+
+} rig_mod_bw(&rig_server);
+
+//----------------------------------------------------------------------
 
 class rig_cat_string : public XmlRpcServerMethod {
 public:
@@ -2670,6 +2966,20 @@ public:
 	std::string help() { return std::string("sets DTR/RTS WPM rate"); }
 
 } rig_cwio_get_wpm(&rig_server);
+
+class rig_cwio_mod_wpm : public XmlRpcServerMethod {
+public:
+	rig_cwio_mod_wpm(XmlRpcServer* s) : XmlRpcServerMethod("rig.mod_cwio_wpm", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		int change = int(params[0]);
+		cwio_wpm += change;
+		Fl::awake(set_cwio_wpm);
+	}
+
+	std::string help() { return std::string("modify DTR/RTS WPM rate +/- NNN wpm"); }
+
+} rig_cwio_mod_wpm(&rig_server);
 
 
 //------------------------------------------------------------------------------
@@ -2850,11 +3160,23 @@ struct MLIST {
 	{ "rig.cat_string",   "s:s", "execute CAT string" },
 	{ "rig.cat_priority", "s:s", "priority CAT string" },
 	{ "rig.shutdown",     "i:n", "shutdown xcvr & flrig" },
-	{ "rig.cwio_wpm",     "n:i", "set cwio WPM" },
+	{ "rig.cwio_set_wpm", "n:i", "set cwio WPM" },
 	{ "rig.cwio_text",    "i:s", "send text via cwio interface" },
 //	{ "rig.cwio_char",    "n:i", "send char via cwio interface" },
 //	{ "rig.cwio_send",    "n:i", "cwio transmit 1/0 (on/off)"},
-	{ "rig.fskio_text",   "i:s", "send text via fskio interface" }
+	{ "rig.fskio_text",   "i:s", "send text via fskio interface" },
+
+	{ "rig.mod_vfoA",     "d:d", "modify vfo A +/- NNN Hz" },
+	{ "rig.mod_vfoB",     "d:d", "modify vfo B +/- NNN Hz" },
+	{ "rig.mod_vol",      "n:i", "modify volume control +/- NNN %" },
+	{ "rig.mod_pwr",      "n:i", "modify power control level +/- NNN watts" },
+	{ "rig.mod_rfg",      "n:i", "modify rf gain by +/- NNN units" },
+	{ "rig.mod_cwio_wpm", "n:i", "modify cwio WPM by +/- NNN wpm" },
+	{ "rig.mod_bw",       "i:i", "modify bandwidth +- to nearest new value" },
+	{ "rig.vfoA2B",       "n:n", "set vfo B to vfo A freq/mode" },
+	{ "rig.freqA2B",      "n:n", "set freq B to freq A" },
+	{ "rig.modeA2B",      "n:n", "set mode B to mode A" }
+
 };
 
 class rig_list_methods : public XmlRpcServerMethod {
