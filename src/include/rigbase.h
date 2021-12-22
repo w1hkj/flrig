@@ -288,6 +288,8 @@ public:
 
 	bool can_synch_clock;
 
+	bool has_voltmeter;
+
 // Icom Xcvr 
 	bool ICOMrig;
 	bool ICOMmainsub;
@@ -401,6 +403,8 @@ public:
 	virtual void select_swr() {}
 	virtual void select_alc() {}
 	virtual int  get_power_out(void) {return -1;}
+
+	virtual double  get_voltmeter(void) { return -1; }
 
 int po_, po_val;
 int pmax;

@@ -245,6 +245,7 @@ flrig_SOURCES += \
 	UI/K3_ui.cxx \
 	UI/KX3_ui.cxx \
 	UI/rigpanel.cxx \
+	UI/meters_dialog.cxx \
 	widgets/combo.cxx \
 	widgets/Fl_SigBar.cxx \
 	widgets/flbrowser2.cxx \
@@ -434,6 +435,7 @@ EXTRA_DIST = \
 	images/P200log.xbm \
 	images/S60.xbm \
 	images/SWR.xbm \
+	images/volts.xbm \
 	cwio/cwioUI.fl \
 	fskio/fskioUI.fl
 

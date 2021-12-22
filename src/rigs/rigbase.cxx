@@ -76,7 +76,7 @@ rigbase::rigbase()
 	has_dsp_controls =
 	has_micgain_control =
 	has_mic_line_control =
-	has_auto_notch = 
+	has_auto_notch =
 	has_notch_control =
 	has_noise_control =
 	has_noise_reduction_control =
@@ -92,11 +92,11 @@ rigbase::rigbase()
 	has_alc_control =
 	has_agc_control =
 	has_rf_control =
-	has_sql_control = 
+	has_sql_control =
 	has_data_port =
 	restore_mbw =
 
-	has_extras = 
+	has_extras =
 	has_nb_level =
 	has_agc_level =
 	has_cw_wpm =
@@ -117,7 +117,7 @@ rigbase::rigbase()
 	has_compON =
 	use_line_in =
 	has_bpf_center =
-	has_special =  
+	has_special =
 	has_ext_tuner =
 	has_smeter =
 	has_power_out =
@@ -125,8 +125,9 @@ rigbase::rigbase()
 //	has_split =
 	has_split_AB =
 	has_band_selection =
-	has_get_info = 
-	has_getvfoAorB = 
+	has_get_info =
+	has_getvfoAorB =
+	has_voltmeter =
 	ICOMrig = false;
 	ICOMmainsub = false;
 
@@ -160,7 +161,7 @@ rigbase::rigbase()
 	def_bw = 0;
 	bpf_center = 0;
 	pbt = 0;
-	
+
 	ptt_ = tune_ = 0;
 
 	rTONE = tTONE = 8;
@@ -472,7 +473,7 @@ trace(1, szt);
 // AI  - for FTdx9000
 // wait - wait nnn milliseconds before declaring transceiver DOA
 //        default 200 msec
-// retry - number of retries, default 
+// retry - number of retries, default
 bool rigbase::id_OK(string ID, int wait)
 {
 	guard_lock reply_lock(&mutex_replystr);
@@ -488,7 +489,7 @@ bool rigbase::id_OK(string ID, int wait)
 		for (int cnt = 0; cnt < wait / 10; cnt++) {
 
 			replystr.clear();
-//			retnbr = 
+//			retnbr =
 			RigSerial->ReadBuffer(replystr, 10, ID, ";");
 
 			if (replystr.rfind(ID)) {
@@ -512,12 +513,12 @@ void rigbase::sendOK(string cmd)
 		sendCommand(cmd);
 }
 
-void rigbase::set_split(bool val) 
+void rigbase::set_split(bool val)
 {
 	split = val;
 }
 
-int  rigbase::get_split() 
+int  rigbase::get_split()
 {
 	return split;
 }

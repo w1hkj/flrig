@@ -199,6 +199,9 @@ RIG_IC7100::RIG_IC7100() {
 	widgets = IC7100_widgets;
 
 	has_smeter = true;
+
+	has_voltmeter = true;
+
 	has_power_out = true;
 	has_swr_control = true;
 	has_alc_control = true;
@@ -1451,6 +1454,34 @@ int RIG_IC7100::get_smeter()
 	}
 	return mtr;
 }
+
+double RIG_IC7100::get_voltmeter()
+{
+	string cstr = "\x15\x15";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+
+	int mtr = 0;
+	double val = 0;
+
+	get_trace(1, "get_voltmeter()");
+	ret = waitFOR(9, "get voltmeter");
+	geth();
+
+	if (ret) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			mtr = fm_bcd(replystr.substr(p+6), 3);
+			val = (2.0 * mtr / 77.0) + 9.82;
+			return val;
+		}
+	}
+	return -1;
+}
+
 
 static meterpair pwrtbl[] = { 
 {0, 0.0},

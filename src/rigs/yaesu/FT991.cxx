@@ -149,6 +149,7 @@ RIG_FT991::RIG_FT991() {
 	has_vox_on_dataport =
 
 	has_vfo_adj =
+	has_voltmeter =
 
 	has_cw_wpm =
 	has_cw_keyer =
@@ -451,6 +452,28 @@ int RIG_FT991::get_alc()
 	if (p + 6 >= replystr.length()) return 0;
 	int mtr = atoi(&replystr[p+3]);
 	return (int)ceil(mtr / 2.56);
+}
+
+double RIG_FT991::get_voltmeter()
+{
+	cmd = "RM8;";
+	string resp = "RM";
+
+	int mtr = 0;
+	double val = 0;
+
+	get_trace(1, "get_voltmeter()");
+	wait_char(';',7, FL991_WAIT_TIME, "get vdd", ASC);
+	gett("get vdd");
+
+	size_t p = replystr.rfind(resp);
+	if (p != string::npos) {
+		mtr = atoi(&replystr[p+3]);
+		val = (7.0 * mtr / 98.0) + 0.14;
+		return val;
+	}
+
+	return -1;
 }
 
 int RIG_FT991::get_power_out()

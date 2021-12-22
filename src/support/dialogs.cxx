@@ -571,6 +571,7 @@ uchar smeterRed, smeterGreen, smeterBlue;
 uchar peakRed, peakGreen, peakBlue;
 uchar pwrRed, pwrGreen, pwrBlue;
 uchar swrRed, swrGreen, swrBlue;
+uchar voltRed, voltGreen, voltBlue;
 
 Fl_Color bgclr;
 Fl_Color fgclr;
@@ -773,13 +774,18 @@ void cbBacklightColor()
 		bg_red = r; bg_green = g; bg_blue = b;
 		bgclr = fl_rgb_color(r, g, b);
 		lblTest->color(bgclr);
+
 		sldrRcvSignalColor->color( fl_rgb_color (smeterRed, smeterGreen, smeterBlue), bgclr );
 		sldrPWRcolor->color(fl_rgb_color (pwrRed, pwrGreen, pwrBlue), bgclr);
 		sldrSWRcolor->color(fl_rgb_color (swrRed, swrGreen, swrBlue), bgclr);
+		sldrVoltcolor->color(fl_rgb_color (voltRed, voltGreen, voltBlue), bgclr);
+
 		scaleSmeterColor->color(bgclr);
 		scalePWRcolor->color(bgclr);
 		scaleSWRcolor->color(bgclr);
+		scaleVoltcolor->color(bgclr);
 		grpMeterColor->color(bgclr);
+
 		dlgDisplayConfig->redraw();
 	}
 }
@@ -791,9 +797,12 @@ void cbPrefForeground()
 		fg_red = r; fg_green = g; fg_blue = b;
 		fgclr = fl_rgb_color(r, g, b);
 		lblTest->labelcolor(fgclr);
+
 		scaleSmeterColor->labelcolor(fgclr);
 		scalePWRcolor->labelcolor(fgclr);
 		scaleSWRcolor->labelcolor(fgclr);
+		scaleVoltcolor->labelcolor(fgclr);
+
 		grpMeterColor->labelcolor(fgclr);
 		dlgDisplayConfig->redraw();
 	}
@@ -811,13 +820,16 @@ void default_meters()
 		scaleSmeterColor->color(bgclr);
 		scalePWRcolor->color(bgclr);
 		scaleSWRcolor->color(bgclr);
+		scaleVoltcolor->color(bgclr);
 		grpMeterColor->color(bgclr);
+
 	fg_red = 0; fg_green = 0; fg_blue = 0;
 	fgclr = (Fl_Color)0;
 		lblTest->labelcolor(fgclr);
 		scaleSmeterColor->labelcolor(fgclr);
 		scalePWRcolor->labelcolor(fgclr);
 		scaleSWRcolor->labelcolor(fgclr);
+		scaleVoltcolor->labelcolor(fgclr);
 		grpMeterColor->labelcolor(fgclr);
 	smeterRed = 0; smeterGreen = 180; smeterBlue = 0;
 		c = fl_rgb_color (smeterRed, smeterGreen, smeterBlue);
@@ -827,12 +839,18 @@ void default_meters()
 		sldrRcvSignalColor->PeakColor(c);
 		sldrPWRcolor->PeakColor(c);
 		sldrSWRcolor->PeakColor(c);
+		sldrVoltcolor->PeakColor(bgclr);
 	pwrRed = 180; pwrGreen = 0; pwrBlue = 0;
 		c = fl_rgb_color( pwrRed, pwrGreen, pwrBlue );
 		sldrPWRcolor->color(c, bgclr);
 	swrRed = 148; swrGreen = 0; swrBlue = 148;
 		c = fl_rgb_color(swrRed, swrGreen, swrBlue);
 		sldrSWRcolor->color(c, bgclr);
+	voltRed = 0; voltGreen = 0; voltBlue = 128;
+	voltRed = 0; voltGreen = 0; voltBlue = 255;
+		c = fl_rgb_color(voltRed, voltGreen, voltBlue);
+		sldrVoltcolor->color(c, bgclr);
+
 	dlgDisplayConfig->redraw();
 }
 
@@ -863,7 +881,7 @@ void cbPeakMeterColor()
 void cbPwrMeterColor()
 {
 	uchar r = pwrRed, g = pwrGreen, b = pwrBlue;
-	if (fl_color_chooser("Power color", r, g, b)) {
+	if (fl_color_chooser("Power meter color", r, g, b)) {
 		pwrRed = r; pwrGreen = g; pwrBlue = b;
 		sldrPWRcolor->color(
 			fl_rgb_color (r, g, b),
@@ -875,10 +893,22 @@ void cbPwrMeterColor()
 void cbSWRMeterColor()
 {
 	uchar r = swrRed, g = swrGreen, b = swrBlue;
-	if (fl_color_chooser("Power color", r, g, b)) {
+	if (fl_color_chooser("SWR meter color", r, g, b)) {
 		swrRed = r; swrGreen = g; swrBlue = b;
 		sldrSWRcolor->color(
 			fl_rgb_color (swrRed, swrGreen, swrBlue),
+			bgclr );
+		dlgDisplayConfig->redraw();
+	}
+}
+
+void cbVoltMeterColor()
+{
+	uchar r = voltRed, g = voltGreen, b = voltBlue;
+	if (fl_color_chooser("Volt meter color", r, g, b)) {
+		voltRed = r; voltGreen = g; voltBlue = b;
+		sldrVoltcolor->color(
+			fl_rgb_color (voltRed, voltGreen, voltBlue),
 			bgclr );
 		dlgDisplayConfig->redraw();
 	}
@@ -952,6 +982,10 @@ void setColors()
 	progStatus.peakGreen = peakGreen;
 	progStatus.peakBlue = peakBlue;
 
+	progStatus.voltRed = voltRed;
+	progStatus.voltGreen = voltGreen;
+	progStatus.voltBlue = voltBlue;
+
 	progStatus.fg_red = fg_red;
 	progStatus.fg_green = fg_green;
 	progStatus.fg_blue = fg_blue;
@@ -1010,22 +1044,42 @@ void setColors()
 
 	scaleSmeter->color(bgclr);
 	scaleSmeter->labelcolor(fgclr);
+	mtr_SMETER->color(bgclr);
+	mtr_SMETER->labelcolor(fgclr);
+
 
 	scalePower->color(bgclr);
 	scalePower->labelcolor(fgclr);
+	mtr_PWR->color(bgclr);
+	mtr_PWR->labelcolor(fgclr);
+
+	scaleVoltage->color(bgclr);
+	scaleVoltage->labelcolor(fgclr);
+	scaleVoltage->redraw();
+	mtr_VOLTS->color(bgclr);
+	mtr_VOLTS->labelcolor(fgclr);
 
 	btnALC_SWR->color(bgclr);
 	btnALC_SWR->labelcolor(fgclr);
 	btnALC_SWR->redraw();
+	mtr_SWR->color(bgclr);
+	mtr_SWR->labelcolor(fgclr);
 
 	sldrFwdPwr->color(fl_rgb_color (pwrRed, pwrGreen, pwrBlue), bgclr);
 	sldrFwdPwr->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
+
+	sldrVoltage->color(fl_rgb_color (voltRed, voltGreen, voltBlue), bgclr);
+	sldrVoltage->PeakColor(bgclr);//fl_rgb_color (voltRed, voltGreen, voltBlue));
+	sldrVoltage->redraw();
 
 	sldrRcvSignal->color(fl_rgb_color (smeterRed, smeterGreen, smeterBlue), bgclr);
 	sldrRcvSignal->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
 
 	sldrALC->color(fl_rgb_color (swrRed, swrGreen, swrBlue), bgclr);
 	sldrALC->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
+
+	mtr_ALC->color(bgclr);
+	mtr_ALC->labelcolor(fgclr);
 
 	sldrSWR->color(fl_rgb_color (swrRed, swrGreen, swrBlue), bgclr);
 	sldrSWR->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
@@ -1125,6 +1179,10 @@ void setDisplayColors()
 	peakGreen = progStatus.peakGreen;
 	peakBlue = progStatus.peakBlue;
 
+	voltRed = progStatus.voltRed;
+	voltGreen = progStatus.voltGreen;
+	voltBlue = progStatus.voltBlue;
+
 	fg_red = progStatus.fg_red;
 	fg_green = progStatus.fg_green;
 	fg_blue = progStatus.fg_blue;
@@ -1176,6 +1234,8 @@ void setDisplayColors()
 	scalePWRcolor->labelcolor(fgclr);
 	scaleSWRcolor->color(bgclr);
 	scaleSWRcolor->labelcolor(fgclr);
+	scaleVoltcolor->color(bgclr);
+	scaleVoltcolor->labelcolor(fgclr);
 	grpMeterColor->color(bgclr);
 	grpMeterColor->labelcolor(fgclr);
 
@@ -1188,18 +1248,25 @@ void setDisplayColors()
 	sldrSWRcolor->color(
 		fl_rgb_color (swrRed, swrGreen, swrBlue),
 		bgclr );
+	sldrVoltcolor->color(
+		fl_rgb_color (voltRed, voltGreen, voltBlue),
+		bgclr );
 
 	sldrRcvSignalColor->minimum(0);
 	sldrRcvSignalColor->maximum(100);
-	sldrRcvSignalColor->value(25);
+	sldrRcvSignalColor->value(45);
 
 	sldrPWRcolor->minimum(0);
 	sldrPWRcolor->maximum(100);
-	sldrPWRcolor->value(25);
+	sldrPWRcolor->value(80);
 
 	sldrSWRcolor->minimum(0);
 	sldrSWRcolor->maximum(100);
 	sldrSWRcolor->value(25);
+
+	sldrVoltcolor->minimum(0);
+	sldrVoltcolor->maximum(100);
+	sldrVoltcolor->value(55);
 
 	btn_lt_color = fl_rgb_color( btn_lt_color_red, btn_lt_color_green, btn_lt_color_blue);
 	btn_slider = fl_rgb_color( btn_slider_red, btn_slider_green, btn_slider_blue);

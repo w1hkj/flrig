@@ -198,10 +198,10 @@ status progStatus = {
 	0,			// int  split;
 	0,			// int  no_txqsy
 
-	5,			// int rx_avg;
-	5,			// int rx_peak;
-	5,			// int pwr_avg;
-	5,			// int pwr_peak;
+	1,			// int rx_avg;
+	4,			// int rx_peak;
+	1,			// int pwr_avg;
+	4,			// int pwr_peak;
 	4,			// int pwr_scale ==> Autoselect
 
 	1,			// bool sync_clock
@@ -416,6 +416,10 @@ status progStatus = {
 	255,		// int	peakRed;
 	0,			// int	peakGreen;
 	0,			// int	peakBlue;
+
+	0,			// int	voltRed;
+	0,			// int	voltGreen;
+	255,		// int	voltBlue;
 
 	0,			// int	fg_sys_red;
 	0,			// int	fg_sys_green;
@@ -988,6 +992,10 @@ void status::saveLastState()
 	spref.set("peak_red", peakRed);
 	spref.set("peak_green", peakGreen);
 	spref.set("peak_blue", peakBlue);
+
+	spref.set("volt_red", voltRed);
+	spref.set("volt_green", voltGreen);
+	spref.set("volt_blue", voltBlue);
 
 	spref.set("fg_sys_red", fg_sys_red);
 	spref.set("fg_sys_green", fg_sys_green);
@@ -1710,6 +1718,10 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("peak_green", peakGreen, peakGreen);
 		spref.get("peak_blue", peakBlue, peakBlue);
 
+		spref.get("volt_red", voltRed, voltRed);
+		spref.get("volt_green", voltGreen, voltGreen);
+		spref.get("volt_blue", voltBlue, voltBlue);
+
 		spref.get("fg_sys_red", fg_sys_red, fg_sys_red);
 		spref.get("fg_sys_green", fg_sys_green, fg_sys_green);
 		spref.get("fg_sys_blue", fg_sys_blue, fg_sys_blue);
@@ -1962,6 +1974,41 @@ void status::UI_laststate()
 
 	sldrSWR->color(fl_rgb_color (swrRed, swrGreen, swrBlue), bgclr);
 	sldrSWR->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
+
+	sldrVoltage->color(fl_rgb_color (voltRed, voltGreen, voltBlue), bgclr);
+	sldrVoltage->PeakColor(bgclr);
+
+	scaleVoltage->color(bgclr);
+	scaleVoltage->labelcolor(fgclr);
+
+	mtr_SMETER->color(bgclr);
+	mtr_SMETER->labelcolor(fgclr);
+	sigbar_SMETER->color(fl_rgb_color (smeterRed, smeterGreen, smeterBlue), bgclr);
+	sigbar_SMETER->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
+
+	mtr_PWR->color(bgclr);
+	mtr_PWR->labelcolor(fgclr);
+	sigbar_PWR->color(fl_rgb_color (pwrRed, pwrGreen, pwrBlue), bgclr);
+	sigbar_PWR->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
+
+	mtr_SWR->color(bgclr);
+	mtr_SWR->labelcolor(fgclr);
+	sigbar_SWR->color(fl_rgb_color (swrRed, swrGreen, swrBlue), bgclr);
+	sigbar_SWR->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
+
+	mtr_ALC->color(bgclr);
+	mtr_ALC->labelcolor(fgclr);
+	sigbar_ALC->color(fl_rgb_color (swrRed, swrGreen, swrBlue), bgclr);
+	sigbar_ALC->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
+
+	mtr_VOLTS->color(bgclr);
+	mtr_VOLTS->labelcolor(fgclr);
+	sigbar_VOLTS->color(fl_rgb_color (voltRed, voltGreen, voltBlue), bgclr);
+	sigbar_VOLTS->PeakColor(bgclr);
+
+// set scale for both voltage display
+	sldrVoltage->minimum (6); sldrVoltage->maximum (16);
+	sigbar_VOLTS->minimum (6); sigbar_VOLTS->maximum (16);
 
 	if (UIsize != small_ui)
 		meter_fill_box->color(bgclr);

@@ -210,6 +210,7 @@ RIG_IC7300::RIG_IC7300() {
 	has_bandwidth_control = true;
 
 	has_smeter = true;
+	has_voltmeter = true;
 
 	has_power_out = true;
 	has_swr_control = true;
@@ -1515,6 +1516,33 @@ int RIG_IC7300::get_smeter()
 		}
 	}
 	return mtr;
+}
+
+double RIG_IC7300::get_voltmeter()
+{
+	string cstr = "\x15\x15";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+
+	int mtr = 0;
+	double val = 0;
+
+	get_trace(1, "get_voltmeter()");
+	ret = waitFOR(9, "get voltmeter");
+	geth();
+
+	if (ret) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			mtr = fm_bcd(replystr.substr(p+6), 3);
+			val = 0.026 * mtr + 9.782;
+			return val;
+		}
+	}
+	return -1;
 }
 
 struct pwrpair {int mtr; float pwr;};

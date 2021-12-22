@@ -410,6 +410,10 @@ struct status {
 	int		peakGreen;
 	int		peakBlue;
 
+	int		voltRed;
+	int		voltGreen;
+	int		voltBlue;
+
 	int		fg_sys_red;
 	int		fg_sys_green;
 	int		fg_sys_blue;

@@ -200,6 +200,7 @@ RIG_FTdx101D::RIG_FTdx101D() {
 	has_smeter =
 	has_swr_control =
 	has_alc_control =
+	has_voltmeter =
 	has_power_out =
 	has_power_control =
 	has_volume_control =
@@ -1523,5 +1524,29 @@ void RIG_FTdx101MP::set_power_control(double val)
 	}
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET power", cmd, replystr);
+}
+
+double RIG_FTdx101D::get_voltmeter()
+{
+// RM8155000;
+	cmd = "RM8;";
+	string resp = "RM";
+
+	int mtr = 0;
+	double val = 0;
+
+	get_trace(1, "get_voltmeter()");
+	wait_char(';',10, 100, "get vdd", ASC);
+	gett("get_voltmeter");
+
+	size_t p = replystr.rfind(resp);
+	if (p != string::npos) {
+		replystr[6] = 0;
+		mtr = atoi(&replystr[p+3]);
+		val = 0.066 * mtr + 0.78;
+		return val;
+	}
+
+	return -1;
 }
 

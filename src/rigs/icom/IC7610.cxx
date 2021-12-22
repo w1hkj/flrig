@@ -239,6 +239,8 @@ RIG_IC7610::RIG_IC7610() {
 
 	has_smeter = true;
 
+	has_voltmeter = true;
+
 	has_power_out = true;
 	has_swr_control = true;
 	has_alc_control = true;
@@ -1335,6 +1337,33 @@ int RIG_IC7610::get_smeter()
 		}
 	}
 	return mtr;
+}
+
+double RIG_IC7610::get_voltmeter()
+{
+	string cstr = "\x15\x15";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+
+	int mtr = 0;
+	double val = 0;
+
+	get_trace(1, "get_voltmeter()");
+	int ret = waitFOR(9, "get voltmeter");
+	geth();
+
+	if (ret) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			mtr = fm_bcd(replystr.substr(p+6), 3);
+			val = 6.0 * mtr / 61.0 - 5.0;
+			return val;
+		}
+	}
+	return -1;
 }
 
 struct pwrpair {int mtr; float pwr;};

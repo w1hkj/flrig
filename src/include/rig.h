@@ -53,6 +53,7 @@ extern Fl_Double_Window *mainwindow;
 extern Fl_Double_Window *tabs_dialog;
 extern Fl_Double_Window *meter_filters;
 extern Fl_Double_Window *meter_scale_dialog;
+extern Fl_Double_Window* meters_dialog;
 
 extern string HomeDir;
 extern string RigHomeDir;

@@ -137,6 +137,8 @@ public:
 	int  get_swr();
 	int  get_power_out();
 
+	double get_voltmeter(void);
+
 	int  get_auto_notch();
 	void set_auto_notch(int val);
 

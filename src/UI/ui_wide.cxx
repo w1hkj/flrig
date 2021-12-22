@@ -44,7 +44,9 @@ Fl_Menu_Item menu_wide_menu[] = {
  {_("Trace"), 0, (Fl_Callback*)cb_mnuTrace, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
  {_("UI"), 0, 0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("Meters dialog"), 0, (Fl_Callback*)cb_mnu_show_meters, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Meter filtering"), 0,  (Fl_Callback*)cb_mnu_meter_filtering, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("Power meter scale"), 0, (Fl_Callback*)cb_mnu_power_meter_scale, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Embed tabs"), 0, (Fl_Callback*)cb_mnu_embed_tabs, 0, 130, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Tooltips"), 0,  (Fl_Callback*)cb_mnuTooltips, 0, 130, FL_NORMAL_LABEL, 0, 14, 0},
  {_("User Interface"), 0,  (Fl_Callback*)cb_mnuColorConfig, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
@@ -171,6 +173,28 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 			scalePower->color((Fl_Color)246);
 			scalePower->image(image_P100);
 			scalePower->callback((Fl_Callback*)cb_scalePower);
+
+			sldrVoltage = new Fl_SigBar(xpos+2, ypos+29, 200, 6);
+			sldrVoltage->box(FL_FLAT_BOX);
+			sldrVoltage->color(FL_BACKGROUND_COLOR);
+			sldrVoltage->selection_color(FL_BACKGROUND_COLOR);
+			sldrVoltage->labeltype(FL_NORMAL_LABEL);
+			sldrVoltage->labelfont(0);
+			sldrVoltage->labelsize(12);
+			sldrVoltage->labelcolor(FL_FOREGROUND_COLOR);
+			sldrVoltage->align(Fl_Align(FL_ALIGN_CENTER));
+			sldrVoltage->when(FL_WHEN_CHANGED);
+			sldrVoltage->hide();
+			sldrVoltage->minimum(0);
+			sldrVoltage->maximum(100);
+
+			scaleVoltage = new Fl_Box(xpos+1, ypos+36, 206, 20);
+			scaleVoltage->box(FL_FLAT_BOX);
+			scaleVoltage->image(image_voltmeter);
+			scaleVoltage->tooltip(_("DC power"));
+
+			sldrVoltage->hide();
+			scaleVoltage->hide();
 
 			meter_fill_box = new Fl_Box(xpos+207, ypos, 0, 60);
 			meter_fill_box->box(FL_FLAT_BOX);

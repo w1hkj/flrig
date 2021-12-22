@@ -70,6 +70,7 @@ extern Fl_Double_Window* Wide_rig_window();
 extern Fl_Double_Window* Small_rig_window();
 extern Fl_Double_Window* touch_rig_window();
 extern Fl_Double_Window* tabs_window();
+extern Fl_Double_Window* win_meters();
 
 extern void select_power_meter_scales();
 
@@ -86,6 +87,9 @@ extern Fl_SigBar *sldrSWR;
 extern Fl_SigBar *sldrFwdPwr;
 extern Fl_Button *scalePower;
 extern Fl_Box *meter_fill_box;
+
+extern Fl_SigBar *sldrVoltage;
+extern Fl_Box *scaleVoltage;
 
 extern cFreqControl *FreqDispA;
 extern cFreqControl *FreqDispB;
@@ -414,6 +418,8 @@ extern Fl_SigBar *sldrSWRcolor;
 extern Fl_Box *scaleSWRcolor;
 extern Fl_SigBar *sldrPWRcolor;
 extern Fl_Box *scalePWRcolor;
+extern Fl_SigBar *sldrVoltcolor;
+extern Fl_Box *scaleVoltcolor;
 extern Fl_Button *btMeterColor;
 extern Fl_Button *btnSWRColor;
 extern Fl_Button *btnPwrColor;

@@ -200,6 +200,8 @@ RIG_IC9700::RIG_IC9700() {
 
 	has_smeter = true;
 
+	has_voltmeter = true;
+
 	has_power_out = true;
 	has_swr_control = true;
 	has_alc_control = true;
@@ -1067,6 +1069,33 @@ int RIG_IC9700::get_smeter()
 	}
 	get_trace(2, "get_smeter()", str2hex(replystr.c_str(), replystr.length()));
 	return mtr;
+}
+
+double RIG_IC9700::get_voltmeter()
+{
+	string cstr = "\x15\x15";
+	string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+
+	int mtr = 0;
+	double val = 0;
+
+	get_trace(1, "get_voltmeter()");
+	int ret = waitFOR(9, "get voltmeter");
+	geth();
+
+	if (ret) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos) {
+			mtr = fm_bcd(replystr.substr(p+6), 3);
+			val = 6.0 * mtr / 228.0 + 9.7;
+			return val;
+		}
+	}
+	return -1;
 }
 
 int RIG_IC9700::get_power_out()

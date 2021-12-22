@@ -287,6 +287,7 @@ extern void cbPwrMeterColor();
 extern void cbSWRMeterColor();
 extern void cbPeakMeterColor();
 extern void cbBacklightColor();
+extern void cbVoltMeterColor();
 
 extern void cb_sys_defaults();
 extern void cb_sys_foreground();
@@ -337,6 +338,7 @@ extern void updateSmeter(void *d = 0);
 extern void updateFwdPwr(void *d = 0);
 extern void updateALC(void *d = 0);
 extern void updateSWR(void *d = 0);
+extern void updateVmeter(void *d = 0);
 extern void updateSquelch(void *d = 0);
 extern void updateRFgain(void *d = 0);
 extern void zeroXmtMeters(void *d = 0);
@@ -383,5 +385,17 @@ extern void select_tab(const char *);
 extern void update_progress(int);
 
 extern bool xcvr_online;
+
+extern Fl_Box *mtr_SMETER;
+extern Fl_Box *mtr_PWR;
+extern Fl_Box *mtr_SWR;
+extern Fl_Box *mtr_ALC;
+extern Fl_Box *mtr_VOLTS;
+
+extern Fl_SigBar *sigbar_SMETER;
+extern Fl_SigBar *sigbar_PWR;
+extern Fl_SigBar *sigbar_SWR;
+extern Fl_SigBar *sigbar_ALC;
+extern Fl_SigBar *sigbar_VOLTS;
 
 #endif

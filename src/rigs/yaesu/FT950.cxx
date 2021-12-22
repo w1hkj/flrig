@@ -168,6 +168,8 @@ RIG_FT950::RIG_FT950() {
 	has_smeter =
 	has_alc_control =
 	has_swr_control =
+	has_voltmeter =
+
 	has_power_out =
 	has_power_control =
 	has_volume_control =
@@ -501,6 +503,29 @@ int RIG_FT950::get_alc()
 	if (p + 6 >= replystr.length()) return 0;
 	int mtr = atoi(&replystr[p+3]);
 	return (int)ceil(mtr / 2.56);
+}
+
+// y = (2.2/31.0) * x + 0.17
+double RIG_FT950::get_voltmeter()
+{
+	cmd = "RM8;";
+	string resp = "RM";
+
+	int mtr = 0;
+	double val = 0;
+
+	get_trace(1, "get_voltmeter()");
+	wait_char(';',7, FL950_WAIT_TIME, "get vdd", ASC);
+	gett("get_voltmeter");
+
+	size_t p = replystr.rfind(resp);
+	if (p != string::npos) {
+		mtr = atoi(&replystr[p+3]);
+		val = (2.2 * mtr / 31.0) + 0.17;
+		return val;
+	}
+
+	return -1;
 }
 
 int RIG_FT950::get_power_out()

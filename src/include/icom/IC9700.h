@@ -110,6 +110,8 @@ public:
 	int get_swr();
 	int get_alc();
 
+	double get_voltmeter(void);
+
 	int  get_agc();
 	int  incr_agc();
 	const char *agc_label();

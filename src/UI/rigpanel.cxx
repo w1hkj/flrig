@@ -227,12 +227,19 @@ Fl_Wheel_Value_Slider *sldr_nb_level = (Fl_Wheel_Value_Slider *)0;
 Hspinner *spnr_bpf_center = (Hspinner *)0;
 
 Fl_Button *btnALC_SWR = (Fl_Button *)0;
-Fl_SigBar *sldrRcvSignal=(Fl_SigBar *)0;
-Fl_SigBar *sldrALC=(Fl_SigBar *)0;
-Fl_SigBar *sldrSWR=(Fl_SigBar *)0;
-Fl_SigBar *sldrFwdPwr=(Fl_SigBar *)0;
+
+Fl_SigBar *sldrRcvSignal = (Fl_SigBar *)0;
+Fl_SigBar *sldrALC = (Fl_SigBar *)0;
+Fl_SigBar *sldrSWR = (Fl_SigBar *)0;
+
+Fl_SigBar *sldrFwdPwr = (Fl_SigBar *)0;
 Fl_Button *scalePower = (Fl_Button *)0;
-Fl_Box *meter_fill_box=(Fl_Box *)0;
+
+Fl_SigBar *sldrVoltage = (Fl_SigBar *)0;
+Fl_Box    *scaleVoltage = (Fl_Box *)0;
+
+Fl_Box    *meter_fill_box=(Fl_Box *)0;
+
 cFreqControl *FreqDispA=(cFreqControl *)0;
 cFreqControl *FreqDispB=(cFreqControl *)0;
 Fl_Group *grp_row0a = (Fl_Group *)0;
@@ -433,6 +440,12 @@ static void cb_mnuColorConfig(Fl_Menu_*, void*) {
 	setDisplayColors();
 }
 
+static void cb_mnu_show_meters(Fl_Menu_ *, void *) {
+	if (meters_dialog)
+		meters_dialog = win_meters();
+	meters_dialog->show();
+}
+
 static void cb_mnu_meter_filtering(Fl_Menu_*, void*) {
 	if (!meter_filters)
 		meter_filters = MetersDialog();
@@ -546,6 +559,10 @@ static void cb_btnAGC(Fl_Button*, void*) {
 static void cb_scalePower(Fl_Button*, void*) {
 	if (Fl::event_button() == FL_RIGHT_MOUSE)
 		select_power_meter_scales();
+}
+
+static void cb_mnu_power_meter_scale(Fl_Menu_ *, void *) {
+	select_power_meter_scales();
 }
 
 extern bool useB;

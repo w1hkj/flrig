@@ -18,39 +18,42 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
-Fl_Radio_Light_Button *btn_wide_ui=(Fl_Radio_Light_Button *)0;
-Fl_Radio_Light_Button *btn_narrow_ui=(Fl_Radio_Light_Button *)0;
-Fl_Radio_Light_Button *btn_touch_ui=(Fl_Radio_Light_Button *)0;
+Fl_Radio_Light_Button *btn_wide_ui = (Fl_Radio_Light_Button *)0;
+Fl_Radio_Light_Button *btn_narrow_ui = (Fl_Radio_Light_Button *)0;
+Fl_Radio_Light_Button *btn_touch_ui = (Fl_Radio_Light_Button *)0;
 
-Fl_Box *lblTest=(Fl_Box *)0;
-Fl_Button *prefFont=(Fl_Button *)0;
-Fl_Button *prefForeground=(Fl_Button *)0;
-Fl_Button *btnBacklight=(Fl_Button *)0;
-Fl_Group *grpMeterColor=(Fl_Group *)0;
-Fl_Box *scaleSmeterColor=(Fl_Box *)0;
-Fl_SigBar *sldrRcvSignalColor=(Fl_SigBar *)0;
-Fl_SigBar *sldrSWRcolor=(Fl_SigBar *)0;
-Fl_Box *scaleSWRcolor=(Fl_Box *)0;
-Fl_SigBar *sldrPWRcolor=(Fl_SigBar *)0;
-Fl_Box *scalePWRcolor=(Fl_Box *)0;
-Fl_Button *btMeterColor=(Fl_Button *)0;
-Fl_Button *btnSWRColor=(Fl_Button *)0;
-Fl_Button *btnPwrColor=(Fl_Button *)0;
-Fl_Button *btnPeakColor=(Fl_Button *)0;
-Fl_Choice *mnuScheme=(Fl_Choice *)0;
-Fl_Button *pref_sys_foreground=(Fl_Button *)0;
-Fl_Button *pref_sys_background=(Fl_Button *)0;
-Fl_Button *prefsys_background2=(Fl_Button *)0;
-Fl_Button *prefsys_defaults=(Fl_Button *)0;
-Fl_Wheel_Value_Slider *sldrColors=(Fl_Wheel_Value_Slider *)0;
-Fl_Button *pref_slider_background=(Fl_Button *)0;
-Fl_Button *pref_slider_select=(Fl_Button *)0;
-Fl_Button *prefslider_defaults=(Fl_Button *)0;
-Fl_Button *btnReset=(Fl_Button *)0;
-Fl_Button *btnCancel=(Fl_Button *)0;
-Fl_Return_Button *btnOkDisplayDialog=(Fl_Return_Button *)0;
-Fl_Light_Button *btn_lighted=(Fl_Light_Button *)0;
-Fl_Button *btn_lighted_default=(Fl_Button *)0;
+Fl_Box *lblTest = (Fl_Box *)0;
+Fl_Button *prefFont = (Fl_Button *)0;
+Fl_Button *prefForeground = (Fl_Button *)0;
+Fl_Button *btnBacklight = (Fl_Button *)0;
+Fl_Group *grpMeterColor = (Fl_Group *)0;
+Fl_Box *scaleSmeterColor = (Fl_Box *)0;
+Fl_SigBar *sldrRcvSignalColor = (Fl_SigBar *)0;
+Fl_SigBar *sldrSWRcolor = (Fl_SigBar *)0;
+Fl_Box *scaleSWRcolor = (Fl_Box *)0;
+Fl_SigBar *sldrPWRcolor = (Fl_SigBar *)0;
+Fl_Box *scalePWRcolor = (Fl_Box *)0;
+Fl_SigBar *sldrVoltcolor = (Fl_SigBar *)0;
+Fl_Box *scaleVoltcolor = (Fl_Box *)0;
+Fl_Button *btMeterColor = (Fl_Button *)0;
+Fl_Button *btnSWRColor = (Fl_Button *)0;
+Fl_Button *btnPwrColor = (Fl_Button *)0;
+Fl_Button *btnPeakColor = (Fl_Button *)0;
+Fl_Button *btnVoltsColor = (Fl_Button *)0;
+Fl_Choice *mnuScheme = (Fl_Choice *)0;
+Fl_Button *pref_sys_foreground = (Fl_Button *)0;
+Fl_Button *pref_sys_background = (Fl_Button *)0;
+Fl_Button *prefsys_background2 = (Fl_Button *)0;
+Fl_Button *prefsys_defaults = (Fl_Button *)0;
+Fl_Wheel_Value_Slider *sldrColors = (Fl_Wheel_Value_Slider *)0;
+Fl_Button *pref_slider_background = (Fl_Button *)0;
+Fl_Button *pref_slider_select = (Fl_Button *)0;
+Fl_Button *prefslider_defaults = (Fl_Button *)0;
+Fl_Button *btnReset = (Fl_Button *)0;
+Fl_Button *btnCancel = (Fl_Button *)0;
+Fl_Return_Button *btnOkDisplayDialog = (Fl_Return_Button *)0;
+Fl_Light_Button *btn_lighted = (Fl_Light_Button *)0;
+Fl_Button *btn_lighted_default = (Fl_Button *)0;
 Fl_Check_Button *chk_hrd_button = (Fl_Check_Button *)0;
 Fl_Check_Button *chk_sliders_button = (Fl_Check_Button *)0;
 
@@ -90,6 +93,10 @@ static void cb_btnPwrColor(Fl_Button*, void*) {
 
 static void cb_btnPeakColor(Fl_Button*, void*) {
 	cbPeakMeterColor();
+}
+
+static void cb_btnVoltColor(Fl_Button*, void*) {
+	cbVoltMeterColor();
 }
 
 static void cb_mnuScheme(Fl_Choice* o, void*) {
@@ -242,75 +249,110 @@ Fl_Double_Window* DisplayDialog() {
 	su_grp2->end();
 
 	Fl_Group* su_grp3 = new Fl_Group(
-		2, su_grp2->y() + su_grp2->h(), 284, 107);
+		0, su_grp2->y() + su_grp2->h(), 284, 135);
 
-		Fl_Group* su_grp3a = new Fl_Group(
-			5, su_grp3->y() + 5, 210, 100);
-			su_grp3a->box(FL_DOWN_BOX);
+		grpMeterColor = new Fl_Group(
+			4, su_grp3->y() + 2, 210, 110);
+			grpMeterColor->box(FL_DOWN_BOX);
+			grpMeterColor->color(scaleSmeter->color());
 
-			grpMeterColor = new Fl_Group(
-				7, su_grp3a->y() + 2, 206, 96);
-				grpMeterColor->box(FL_FLAT_BOX);
+			scaleSmeterColor = new Fl_Box(
+				grpMeterColor->x() + 2, grpMeterColor->y(),
+				205, 20);
+			scaleSmeterColor->box(FL_FLAT_BOX);
+			scaleSmeterColor->image(image_S60);
+			scaleSmeterColor->color(scaleSmeter->color());
 
-				scaleSmeterColor = new Fl_Box(
-					8, grpMeterColor->y(), 205, 20);
-				scaleSmeterColor->box(FL_FLAT_BOX);
-				scaleSmeterColor->image(image_S60);
-				scaleSmeterColor->color(scaleSmeter->color());
+			sldrRcvSignalColor = new Fl_SigBar(
+				grpMeterColor->x() + 4, scaleSmeterColor->y() + 20,
+				200, 4);
+			sldrRcvSignalColor->box(FL_FLAT_BOX);
+			sldrRcvSignalColor->color(FL_BACKGROUND_COLOR);
+			sldrRcvSignalColor->selection_color(FL_BACKGROUND_COLOR);
+			sldrRcvSignalColor->labeltype(FL_NORMAL_LABEL);
+			sldrRcvSignalColor->labelfont(0);
+			sldrRcvSignalColor->labelsize(14);
+			sldrRcvSignalColor->labelcolor(FL_FOREGROUND_COLOR);
+			sldrRcvSignalColor->align(Fl_Align(FL_ALIGN_CENTER));
+			sldrRcvSignalColor->when(FL_WHEN_RELEASE);
+			sldrRcvSignalColor->minimum(0);
+			sldrRcvSignalColor->maximum(100);
+			sldrRcvSignalColor->avg(1);
+			sldrRcvSignalColor->value(25);
 
-				sldrRcvSignalColor = new Fl_SigBar(
-					10, grpMeterColor->y() + 20, 200, 6);
-				sldrRcvSignalColor->box(FL_FLAT_BOX);
-				sldrRcvSignalColor->color(FL_BACKGROUND_COLOR);
-				sldrRcvSignalColor->selection_color(FL_BACKGROUND_COLOR);
-				sldrRcvSignalColor->labeltype(FL_NORMAL_LABEL);
-				sldrRcvSignalColor->labelfont(0);
-				sldrRcvSignalColor->labelsize(14);
-				sldrRcvSignalColor->labelcolor(FL_FOREGROUND_COLOR);
-				sldrRcvSignalColor->align(Fl_Align(FL_ALIGN_CENTER));
-				sldrRcvSignalColor->when(FL_WHEN_RELEASE);
+			scaleSWRcolor = new Fl_Box(
+				grpMeterColor->x() + 2, sldrRcvSignalColor->y() + 6,
+				205, 20);
+			scaleSWRcolor->box(FL_FLAT_BOX);
+			scaleSWRcolor->image(image_SWR);
+			scaleSWRcolor->color(scaleSmeter->color());
 
-				sldrSWRcolor = new Fl_SigBar(
-					10, grpMeterColor->y() + 51, 200, 6);
-				sldrSWRcolor->box(FL_FLAT_BOX);
-				sldrSWRcolor->color(FL_BACKGROUND_COLOR);
-				sldrSWRcolor->selection_color(FL_BACKGROUND_COLOR);
-				sldrSWRcolor->labeltype(FL_NORMAL_LABEL);
-				sldrSWRcolor->labelfont(0);
-				sldrSWRcolor->labelsize(14);
-				sldrSWRcolor->labelcolor(FL_FOREGROUND_COLOR);
-				sldrSWRcolor->align(Fl_Align(FL_ALIGN_CENTER));
-				sldrSWRcolor->when(FL_WHEN_RELEASE);
-				sldrSWRcolor->minimum(0);
-				sldrSWRcolor->maximum(100);
+			sldrSWRcolor = new Fl_SigBar(
+				grpMeterColor->x() + 4, scaleSWRcolor->y() + 20,
+				200, 4);
+			sldrSWRcolor->box(FL_FLAT_BOX);
+			sldrSWRcolor->color(FL_BACKGROUND_COLOR);
+			sldrSWRcolor->selection_color(FL_BACKGROUND_COLOR);
+			sldrSWRcolor->labeltype(FL_NORMAL_LABEL);
+			sldrSWRcolor->labelfont(0);
+			sldrSWRcolor->labelsize(14);
+			sldrSWRcolor->labelcolor(FL_FOREGROUND_COLOR);
+			sldrSWRcolor->align(Fl_Align(FL_ALIGN_CENTER));
+			sldrSWRcolor->when(FL_WHEN_RELEASE);
+			sldrSWRcolor->minimum(0);
+			sldrSWRcolor->maximum(100);
+			sldrSWRcolor->avg(1);
+			sldrSWRcolor->value(30);
 
-				scaleSWRcolor = new Fl_Box(
-					8, grpMeterColor->y() + 31, 205, 20);
-				scaleSWRcolor->box(FL_FLAT_BOX);
-				scaleSWRcolor->image(image_SWR);
+			sldrPWRcolor = new Fl_SigBar(
+				grpMeterColor->x() + 4, sldrSWRcolor->y() + 6,
+				200, 4);
+			sldrPWRcolor->box(FL_FLAT_BOX);
+			sldrPWRcolor->color(FL_BACKGROUND_COLOR);
+			sldrPWRcolor->selection_color(FL_BACKGROUND_COLOR);
+			sldrPWRcolor->labeltype(FL_NORMAL_LABEL);
+			sldrPWRcolor->labelfont(0);
+			sldrPWRcolor->labelsize(14);
+			sldrPWRcolor->labelcolor(FL_FOREGROUND_COLOR);
+			sldrPWRcolor->align(Fl_Align(FL_ALIGN_CENTER));
+			sldrPWRcolor->when(FL_WHEN_RELEASE);
+			sldrPWRcolor->minimum(0);
+			sldrPWRcolor->maximum(100);
+			sldrPWRcolor->avg(1);
+			sldrPWRcolor->value(40);
 
-				sldrPWRcolor = new Fl_SigBar(
-					8, grpMeterColor->y() + 68, 200, 6);
-				sldrPWRcolor->box(FL_FLAT_BOX);
-				sldrPWRcolor->color(FL_BACKGROUND_COLOR);
-				sldrPWRcolor->selection_color(FL_BACKGROUND_COLOR);
-				sldrPWRcolor->labeltype(FL_NORMAL_LABEL);
-				sldrPWRcolor->labelfont(0);
-				sldrPWRcolor->labelsize(14);
-				sldrPWRcolor->labelcolor(FL_FOREGROUND_COLOR);
-				sldrPWRcolor->align(Fl_Align(FL_ALIGN_CENTER));
-				sldrPWRcolor->when(FL_WHEN_RELEASE);
-				sldrPWRcolor->minimum(0);
-				sldrPWRcolor->maximum(100);
+			scalePWRcolor = new Fl_Box(
+				grpMeterColor->x() + 2, sldrPWRcolor->y() + 6,
+				205, 20);
+			scalePWRcolor->box(FL_FLAT_BOX);
+			scalePWRcolor->image(image_P100);
+			scalePWRcolor->color(scaleSmeter->color());
 
-				scalePWRcolor = new Fl_Box(
-					8, grpMeterColor->y() + 74, 205, 20);
-				scalePWRcolor->box(FL_FLAT_BOX);
-				scalePWRcolor->image(image_P100);
+			sldrVoltcolor = new Fl_SigBar(
+				grpMeterColor->x() + 4, scalePWRcolor->y() + 20,
+				200, 4);
+			sldrVoltcolor->box(FL_FLAT_BOX);
+			sldrVoltcolor->color(FL_BACKGROUND_COLOR);
+			sldrVoltcolor->selection_color(FL_BACKGROUND_COLOR);
+			sldrVoltcolor->labeltype(FL_NORMAL_LABEL);
+			sldrVoltcolor->labelfont(0);
+			sldrVoltcolor->labelsize(14);
+			sldrVoltcolor->labelcolor(FL_FOREGROUND_COLOR);
+			sldrVoltcolor->align(Fl_Align(FL_ALIGN_CENTER));
+			sldrVoltcolor->when(FL_WHEN_RELEASE);
+			sldrVoltcolor->minimum(0);
+			sldrVoltcolor->maximum(100);
+			sldrVoltcolor->avg(1);
+			sldrVoltcolor->value(55);
 
-			grpMeterColor->end();
+			scaleVoltcolor = new Fl_Box(
+				grpMeterColor->x() + 2, sldrVoltcolor->y() + 6,
+				205, 20);
+			scaleVoltcolor->box(FL_FLAT_BOX);
+			scaleVoltcolor->image(image_voltmeter);
+			scaleVoltcolor->color(scaleSmeter->color());
 
-		su_grp3a->end();
+		grpMeterColor->end();
 
 		btMeterColor = new Fl_Button(
 			grpMeterColor->x() + grpMeterColor->w() + 5, grpMeterColor->y(), 
@@ -331,6 +373,11 @@ Fl_Double_Window* DisplayDialog() {
 			btnPwrColor->x(), btnPwrColor->y() + btnPwrColor->h() + 4,
 			60, 22, _("Peak"));
 		btnPeakColor->callback((Fl_Callback*)cb_btnPeakColor);
+
+		btnVoltsColor = new Fl_Button(
+			btnPwrColor->x(), btnPeakColor->y() + btnPwrColor->h() + 4,
+			60, 22, _("Volts"));
+		btnVoltsColor->callback((Fl_Callback*)cb_btnVoltColor);
 
 	su_grp3->end();
 
@@ -429,20 +476,20 @@ Fl_Double_Window* DisplayDialog() {
 	su_grp5->end();
 
 	btnReset = new Fl_Button(
-		25, su_grp3a->y() + su_grp3a->h() + 5,
-		60, 22, _("Reset"));
+		grpMeterColor->x() + 2, grpMeterColor->y() + grpMeterColor->h() + 3,
+		60, 20, _("Reset"));
 	btnReset->tooltip(_("Restore all flrig defaults"));
 	btnReset->callback((Fl_Callback*)cb_btnReset);
 
 	btnCancel = new Fl_Button(
-		113, btnReset->y(), 
-		60, 22, _("Cancel"));
+		btnReset->x() + btnReset->w() + 4, btnReset->y(), 
+		60, 20, _("Cancel"));
 	btnCancel->tooltip(_("Discard current changes"));
 	btnCancel->callback((Fl_Callback*)cb_btnCancel);
 
 	btnOkDisplayDialog = new Fl_Return_Button(
-		201, btnReset->y(), 
-		60, 22, _("OK"));
+		btnCancel->x() + btnCancel->w() + 4, btnReset->y(), 
+		60, 20, _("OK"));
 	btnOkDisplayDialog->tooltip(_("Save Current Changes"));
 	btnOkDisplayDialog->callback((Fl_Callback*)cb_btnOkDisplayDialog);
 

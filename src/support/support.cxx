@@ -118,6 +118,7 @@ double smtrval = 0;
 double pwrval = 0;
 double swrval = 0;
 double alcval = 0;
+double vmtrval = 0;
 
 //======================================================================
 // slider change processing
@@ -559,6 +560,17 @@ void read_smeter()
 	if (sig == -1) return;
 	smtrval = sig;
 	Fl::awake(updateSmeter);
+}
+
+void read_voltmeter()
+{
+	double sig;
+	{
+		trace(1, "read voltage");
+		sig = selrig->get_voltmeter();
+	}
+	vmtrval = sig;
+	Fl::awake(updateVmeter);
 }
 
 int tunerval = 0;
@@ -1152,6 +1164,7 @@ struct POLL_PAIR {
 };
 
 POLL_PAIR RX_poll_pairs[] = {
+	{&progStatus.poll_mode, read_voltmeter, "voltage"},
 	{&progStatus.poll_mode, read_mode, "mode"},
 	{&progStatus.poll_bandwidth, read_bandwidth, "bw"},
 	{&progStatus.poll_tuner, read_tuner, "tuner"},
@@ -1183,6 +1196,7 @@ POLL_PAIR TX_poll_pairs[] = {
 	{&progStatus.poll_pout, read_power_out, "pout"},
 	{&progStatus.poll_swr, read_swr, "swr"},
 	{&progStatus.poll_alc, read_alc, "alc"},
+	{&progStatus.poll_mode, read_voltmeter, "voltage"},
 	{&progStatus.poll_split, read_split, "split"},
 	{NULL, NULL}
 };
@@ -1643,6 +1657,7 @@ void * serial_thread_loop(void *d)
 			if (isRX) {
 				isRX = false;
 				smtrval = 0;
+				Fl::awake(update_UI_PTT);
 				Fl::awake(updateSmeter);
 			}
 			{	guard_lock lk(&mutex_serial);
@@ -1666,6 +1681,7 @@ void * serial_thread_loop(void *d)
 		} else {
 			if (!isRX) {
 				isRX = true;
+				Fl::awake(update_UI_PTT);
 				Fl::awake(zeroXmtMeters, 0);
 			}
 
@@ -2886,6 +2902,12 @@ void set_power_controlImage(double pwr)
 			sldrFwdPwr->maximum(5.0);
 			sldrFwdPwr->minimum(0.0);
 			scalePower->redraw();
+
+			mtr_PWR->image(image_p5);
+			mtr_PWR->redraw();
+			sigbar_PWR->maximum(5.0);
+			sigbar_PWR->minimum(0.0);
+			sigbar_PWR->redraw();
 		}
 	}
 	else if (progStatus.pwr_scale == 1 || (progStatus.pwr_scale == 5 && pwr <= 25.0)) {
@@ -2895,6 +2917,12 @@ void set_power_controlImage(double pwr)
 			sldrFwdPwr->maximum(25.0);
 			sldrFwdPwr->minimum(0.0);
 			scalePower->redraw();
+
+			mtr_PWR->image(image_p25);
+			mtr_PWR->redraw();
+			sigbar_PWR->maximum(25.0);
+			sigbar_PWR->minimum(0.0);
+			sigbar_PWR->redraw();
 		}
 	}
 	else if (progStatus.pwr_scale == 2 || (progStatus.pwr_scale == 5 && pwr <= 50.0)) {
@@ -2904,6 +2932,12 @@ void set_power_controlImage(double pwr)
 			sldrFwdPwr->maximum(50.0);
 			sldrFwdPwr->minimum(0.0);
 			scalePower->redraw();
+
+			mtr_PWR->image(image_p50);
+			mtr_PWR->redraw();
+			sigbar_PWR->maximum(50.0);
+			sigbar_PWR->minimum(0.0);
+			sigbar_PWR->redraw();
 		}
 	}
 	else if (progStatus.pwr_scale == 3 || (progStatus.pwr_scale == 5 && pwr <= 100.0)) {
@@ -2913,6 +2947,12 @@ void set_power_controlImage(double pwr)
 			sldrFwdPwr->maximum(100.0);
 			sldrFwdPwr->minimum(0.0);
 			scalePower->redraw();
+
+			mtr_PWR->image(image_p100);
+			mtr_PWR->redraw();
+			sigbar_PWR->maximum(100.0);
+			sigbar_PWR->minimum(0.0);
+			sigbar_PWR->redraw();
 		}
 	}
 	else if (progStatus.pwr_scale == 4 || (pwr > 100.0)) {
@@ -2922,6 +2962,12 @@ void set_power_controlImage(double pwr)
 			sldrFwdPwr->maximum(200.0);
 			sldrFwdPwr->minimum(0.0);
 			scalePower->redraw();
+
+			mtr_PWR->image(image_p200);
+			mtr_PWR->redraw();
+			sigbar_PWR->maximum(200.0);
+			sigbar_PWR->minimum(0.0);
+			sigbar_PWR->redraw();
 		}
 	}
 	return;
@@ -3132,6 +3178,9 @@ void setRFGAINControl(void* d)
 
 void updateALC(void *)
 {
+	sigbar_ALC->value(alcval);
+	sigbar_ALC->redraw();
+
 	if (meter_image != ALC_IMAGE) return;
 	sldrRcvSignal->hide();
 	sldrSWR->hide();
@@ -3142,6 +3191,9 @@ void updateALC(void *)
 
 void updateSWR(void *)
 {
+	sigbar_SWR->value(swrval);
+	sigbar_SWR->redraw();
+
 	if (meter_image != SWR_IMAGE) return;
 	if (selrig->has_swr_control) {
 		sldrRcvSignal->hide();
@@ -3155,15 +3207,23 @@ void updateSWR(void *)
 void updateFwdPwr(void *)
 {
 	double power = pwrval;
-	if (!sldrFwdPwr->visible()) {
-		sldrFwdPwr->show();
-	}
-	power /= selrig->power_scale();
-	sldrFwdPwr->value(power);
 
-	sldrFwdPwr->redraw();
+	power /= selrig->power_scale();
+
 	if (selrig->has_power_control)
 		set_power_controlImage(power);
+
+	sldrVoltage->hide();
+	scaleVoltage->hide();
+	sldrFwdPwr->show();
+	scalePower->show();
+
+	sldrFwdPwr->value(power);
+	sldrFwdPwr->redraw();
+
+	sigbar_PWR->value(power);
+	sigbar_PWR->redraw();
+
 }
 
 void updateSquelch(void *d)
@@ -3220,6 +3280,46 @@ void updateSmeter(void *)
 	}
 	sldrRcvSignal->value(smtrval);
 	sldrRcvSignal->redraw();
+	sigbar_SMETER->value(smtrval);
+	sigbar_SMETER->redraw();
+}
+
+void updateVmeter(void *)
+{
+	if (!PTT) {
+		if (selrig->has_voltmeter) {
+			sldrFwdPwr->hide();
+			scalePower->hide();
+			sldrVoltage->show();
+			scaleVoltage->show();
+		}
+	} else if (!selrig->has_voltmeter) {
+		sldrVoltage->hide();
+		scaleVoltage->hide();
+		sldrFwdPwr->show();
+		scalePower->show();
+		return;
+	} else {
+		if (!PTT) {
+			sldrFwdPwr->hide();
+			scalePower->hide();
+			sldrVoltage->show();
+			scaleVoltage->show();
+		} else {
+			sldrVoltage->hide();
+			scaleVoltage->hide();
+			sldrFwdPwr->show();
+			scalePower->show();
+			return;
+		}
+	}
+	if (vmtrval == -1) return;
+
+	sldrVoltage->value(vmtrval);
+	sldrVoltage->redraw();
+
+	sigbar_VOLTS->value(vmtrval);
+	sigbar_VOLTS->redraw();
 }
 
 void saveFreqList()
@@ -3692,6 +3792,9 @@ void close_UI()
 		dlgXcvrConfig->hide();
 	if (dlgMemoryDialog && dlgMemoryDialog->visible())
 		dlgMemoryDialog->hide();
+
+	if (meters_dialog && meters_dialog->visible())
+		meters_dialog->hide();
 
 	debug::stop();
 
@@ -6227,6 +6330,37 @@ void initRig()
 	sldrRcvSignal->avg(progStatus.rx_avg);
 	sldrFwdPwr->aging(progStatus.pwr_peak);
 	sldrFwdPwr->avg(progStatus.pwr_avg);
+	sldrSWR->aging(progStatus.pwr_peak);
+	sldrSWR->avg(progStatus.pwr_avg);
+	sldrALC->aging(progStatus.pwr_peak);
+	sldrALC->avg(progStatus.pwr_avg);
+
+	sldrVoltage->aging(1);
+	sldrVoltage->avg(1);
+
+	sigbar_SMETER->aging(progStatus.rx_peak);
+	sigbar_SMETER->avg(progStatus.rx_avg);
+	sigbar_PWR->aging(progStatus.pwr_peak);
+	sigbar_PWR->avg(progStatus.pwr_avg);
+	sigbar_SWR->aging(progStatus.pwr_peak);
+	sigbar_SWR->avg(progStatus.pwr_avg);
+	sigbar_ALC->aging(progStatus.pwr_peak);
+	sigbar_ALC->avg(progStatus.pwr_avg);
+
+	sigbar_VOLTS->aging(1);
+	sigbar_VOLTS->avg(1);
+
+	if (selrig->has_voltmeter) {
+		sldrVoltage->show();
+		scaleVoltage->show();
+		sldrFwdPwr->hide();
+		scalePower->hide();
+	} else {
+		sldrVoltage->hide();
+		scaleVoltage->hide();
+		sldrFwdPwr->show();
+		scalePower->show();
+	}
 
 	if (progStatus.use_tcpip) {
 		try {

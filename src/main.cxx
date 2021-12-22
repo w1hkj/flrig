@@ -100,6 +100,7 @@ Fl_Double_Window *FSK_configure = (Fl_Double_Window *)0;
 
 Fl_Double_Window *meter_scale_dialog = (Fl_Double_Window *)0;
 Fl_Double_Window *meter_filters = (Fl_Double_Window *)0;
+Fl_Double_Window *meters_dialog = (Fl_Double_Window *)0;
 
 string HomeDir;
 string RigHomeDir;
@@ -449,6 +450,8 @@ int main (int argc, char *argv[])
 			tabs_dialog->hide();
 	}
 	mainwindow->callback(exit_main);
+
+	meters_dialog = win_meters();
 
 	progStatus.UI_laststate();
 
