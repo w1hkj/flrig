@@ -2106,8 +2106,6 @@ void RIG_IC7300::set_notch(bool on, int freq)
 	set_trace(1, "set notch value");
 	waitFB("set notch val");
 	seth();
-
-	get_notch(hexval);
 }
 
 bool RIG_IC7300::get_notch(int &val)
@@ -2128,8 +2126,12 @@ bool RIG_IC7300::get_notch(int &val)
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
-			on = replystr[p + 6];
+
+		if (p == string::npos) {
+			return 0;
+		}
+		on = replystr[p + 6];
+
 		cmd = pre_to;
 		resp = pre_fm;
 		cstr = "\x14\x0D";
@@ -2143,7 +2145,9 @@ bool RIG_IC7300::get_notch(int &val)
 
 		if (ret) {
 			size_t p = replystr.rfind(resp);
-			if (p != string::npos) {
+			if (p == string::npos) {
+				return 0;
+			} else {
 				val = (int)ceil(fm_bcd(replystr.substr(p+6),3));
 				val -= 128;
 				val *= 20;
@@ -2190,16 +2194,19 @@ void RIG_IC7300::get_notch_min_max_step(int &min, int &max, int &step)
 static int agcval = 3;
 int  RIG_IC7300::get_agc()
 {
+	std::string cstr = "\x16\x12";
 	cmd = pre_to;
-	cmd.append("\x16\x12");
+	cmd.append(cstr);
 	cmd.append(post);
 
+	std::string retstr = pre_fm;
+	retstr.append(cstr);
 	get_trace(1, "get_agc");
 	ret = waitFOR(8, "get AGC");
 	geth();
 
 	if (ret) {
-		size_t p = replystr.find(pre_fm);
+		size_t p = replystr.find(retstr);
 		if (p != string::npos)
 			agcval = replystr[p+6]; // 1 == off, 2 = FAST, 3 = MED, 4 = SLOW
 	}
@@ -2427,8 +2434,11 @@ void RIG_IC7300::get_vfoadj_min_max_step(double &min, double &max, double &step)
 
 void RIG_IC7300::get_band_selection(int v)
 {
+	std::string cstr = "\x1A\x01";
+	std::string retstr = pre_fm;
+	retstr.append(cstr);
 	cmd.assign(pre_to);
-	cmd.append("\x1A\x01");
+	cmd.append(cstr);
 	cmd += to_bcd_be( v, 2 );
 	cmd += '\x01';
 	cmd.append( post );
@@ -2438,7 +2448,7 @@ void RIG_IC7300::get_band_selection(int v)
 	geth();
 
 	if (ret) {
-		size_t p = replystr.rfind(pre_fm);
+		size_t p = replystr.rfind(retstr);
 		if (p != string::npos) {
 			unsigned long int bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
 			int bandmode = replystr[p+13];

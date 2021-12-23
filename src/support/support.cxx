@@ -1648,7 +1648,8 @@ void * serial_thread_loop(void *d)
 			serviceQUE();
 		}
 
-		{	guard_lock lk(&mutex_serial);
+		if (progStatus.poll_ptt) {
+			guard_lock lk(&mutex_serial);
 			check_ptt();
 		}
 
@@ -1686,7 +1687,8 @@ void * serial_thread_loop(void *d)
 
 			if (progStatus.byte_interval) MilliSleep(progStatus.byte_interval);
 
-			{	guard_lock lk(&mutex_serial);
+			if (progStatus.poll_frequency) {
+				guard_lock lk(&mutex_serial);
 				read_vfo();
 			}
 
@@ -2534,13 +2536,15 @@ void cbbtnNotch()
 	progStatus.notch = btnNotch->value();
 
 	selrig->set_notch(progStatus.notch, progStatus.notch_val);
-return;
+
 //	int on, val = progStatus.notch_val;
 
 //	on = selrig->get_notch(val);
 
+	MilliSleep(progStatus.comm_wait);
+
 	while ((selrig->get_notch(val) != progStatus.notch) && (cnt++ < 10)) {
-//		MilliSleep(progStatus.comm_wait);
+		MilliSleep(progStatus.comm_wait);
 //		on = ;
 		Fl::awake();
 	}
