@@ -420,6 +420,7 @@ status progStatus = {
 	0,			// int	voltRed;
 	0,			// int	voltGreen;
 	255,		// int	voltBlue;
+	0,			// int	display_voltmeter;
 
 	0,			// int	fg_sys_red;
 	0,			// int	fg_sys_green;
@@ -996,6 +997,7 @@ void status::saveLastState()
 	spref.set("volt_red", voltRed);
 	spref.set("volt_green", voltGreen);
 	spref.set("volt_blue", voltBlue);
+	spref.set("display_voltmeter", display_voltmeter);
 
 	spref.set("fg_sys_red", fg_sys_red);
 	spref.set("fg_sys_green", fg_sys_green);
@@ -1721,6 +1723,7 @@ bool status::loadXcvrState(string xcvr)
 		spref.get("volt_red", voltRed, voltRed);
 		spref.get("volt_green", voltGreen, voltGreen);
 		spref.get("volt_blue", voltBlue, voltBlue);
+		spref.get("display_voltmeter", display_voltmeter, display_voltmeter);
 
 		spref.get("fg_sys_red", fg_sys_red, fg_sys_red);
 		spref.get("fg_sys_green", fg_sys_green, fg_sys_green);

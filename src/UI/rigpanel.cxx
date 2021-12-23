@@ -57,6 +57,7 @@ Fl_Menu_Bar *wide_menu=(Fl_Menu_Bar *)0;
 Fl_Menu_Item *mnuExit = (Fl_Menu_Item *)0;
 Fl_Menu_Item *mnuConfig = (Fl_Menu_Item *)0;
 Fl_Menu_Item *mnuTooltips = (Fl_Menu_Item *)0;
+Fl_Menu_Item *mnuVoltmeter = (Fl_Menu_Item *)0;
 Fl_Menu_Item *mnuSchema = (Fl_Menu_Item *)0;
 Fl_Menu_Item *mnuEmbedTabs = (Fl_Menu_Item *)0;
 Fl_Menu_Item *mnuColorConfig = (Fl_Menu_Item *)0;
@@ -403,6 +404,11 @@ static void cb_mnuExit(Fl_Menu_*, void*) {
 
 static void cb_mnuTooltips(Fl_Menu_*, void*) {
 	progStatus.tooltips = ! progStatus.tooltips;
+}
+
+static void cb_mnuVoltmeter(Fl_Menu_*, void*) {
+	progStatus.display_voltmeter = !progStatus.display_voltmeter;
+	updateVmeter(NULL);
 }
 
 static void cb_mnuSchema(Fl_Menu_*, void*) {

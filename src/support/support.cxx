@@ -3288,31 +3288,22 @@ void updateSmeter(void *)
 
 void updateVmeter(void *)
 {
-	if (!PTT) {
-		if (selrig->has_voltmeter) {
-			sldrFwdPwr->hide();
-			scalePower->hide();
-			sldrVoltage->show();
-			scaleVoltage->show();
-		}
-	} else if (!selrig->has_voltmeter) {
+	if (!progStatus.display_voltmeter || !selrig->has_voltmeter) {
 		sldrVoltage->hide();
 		scaleVoltage->hide();
 		sldrFwdPwr->show();
 		scalePower->show();
-		return;
 	} else {
-		if (!PTT) {
-			sldrFwdPwr->hide();
-			scalePower->hide();
-			sldrVoltage->show();
-			scaleVoltage->show();
-		} else {
+		if (PTT) {
 			sldrVoltage->hide();
 			scaleVoltage->hide();
 			sldrFwdPwr->show();
 			scalePower->show();
-			return;
+		} else {
+			sldrFwdPwr->hide();
+			scalePower->hide();
+			sldrVoltage->show();
+			scaleVoltage->show();
 		}
 	}
 	if (vmtrval == -1) return;
@@ -4173,6 +4164,13 @@ void adjust_small_ui()
 		Fl_Tooltip::enable(0);
 	}
 
+	if (mnuVoltmeter) {
+		if (progStatus.display_voltmeter)
+			mnuVoltmeter->set();
+		else
+			mnuVoltmeter->clear();
+	}
+
 	if (mnuEmbedTabs) {
 		if (progStatus.embed_tabs) mnuEmbedTabs->set();
 		else mnuEmbedTabs->clear();
@@ -4289,6 +4287,13 @@ void adjust_xig_wide()
 		Fl_Tooltip::enable(0);
 	}
 
+	if (mnuVoltmeter) {
+		if (progStatus.display_voltmeter)
+			mnuVoltmeter->set();
+		else
+			mnuVoltmeter->clear();
+	}
+
 	mainwindow->redraw();
 
 	show_controls();
@@ -4392,6 +4397,13 @@ void adjust_wide_ui()
 		Fl_Tooltip::enable(0);
 	}
 
+	if (mnuVoltmeter) {
+		if (progStatus.display_voltmeter)
+			mnuVoltmeter->set();
+		else
+			mnuVoltmeter->clear();
+	}
+
 	mainwindow->redraw();
 
 	show_controls();
@@ -4474,6 +4486,13 @@ void adjust_touch_ui()
 	} else {
 		if (mnuTooltips) mnuTooltips->clear();
 		Fl_Tooltip::enable(0);
+	}
+
+	if (mnuVoltmeter) {
+		if (progStatus.display_voltmeter)
+			mnuVoltmeter->set();
+		else
+			mnuVoltmeter->clear();
 	}
 
 	mainwindow->init_sizes();

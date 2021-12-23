@@ -47,6 +47,7 @@ Fl_Menu_Item menu_small_menu[] = {
  {_("Small sliders"), 0,  (Fl_Callback*)cb_mnuSchema, 0, 130, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Embed tabs"), 0, (Fl_Callback*)cb_mnu_embed_tabs, 0, 130, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Tooltips"), 0,  (Fl_Callback*)cb_mnuTooltips, 0, 130, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("Voltmeter"), 0, (Fl_Callback*)cb_mnuVoltmeter, 0, 130, FL_NORMAL_LABEL, 0, 14, 0},
  {_("User Interface"), 0,  (Fl_Callback*)cb_mnuColorConfig, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
  {0,0,0,0,0,0,0,0,0},
@@ -1868,6 +1869,12 @@ Fl_Double_Window* Small_rig_window() {
 		if (mnu) {
 			progStatus.tooltips ? mnu->set() : mnu->clear();
 			mnuTooltips = mnu;
+		}
+
+		mnu = getMenuItem(_("Voltmeter"), menu_small_menu);
+		if (mnu) {
+			progStatus.display_voltmeter ? mnu->set() : mnu->clear();
+			mnuVoltmeter = mnu;
 		}
 
 		mnu = getMenuItem(_("Small sliders"), menu_small_menu);

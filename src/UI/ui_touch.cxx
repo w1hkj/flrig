@@ -54,6 +54,7 @@ Fl_Menu_Item touch_menu[] = {
  {_("Meter filtering"), 0,  (Fl_Callback*)cb_mnu_meter_filtering, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Power meter scale"), 0, (Fl_Callback*)cb_mnu_power_meter_scale, 0, 128, FL_NORMAL_LABEL, 0, 14, 0},
  {_("Tooltips"), 0,  (Fl_Callback*)cb_mnuTooltips, 0, 130, FL_NORMAL_LABEL, 0, 14, 0},
+ {_("Voltmeter"), 0, (Fl_Callback*)cb_mnuVoltmeter, 0, 130, FL_NORMAL_LABEL, 0, 14, 0},
  {_("User Interface"), 0,  (Fl_Callback*)cb_mnuColorConfig, 0, 0, FL_NORMAL_LABEL, 0, 14, 0},
  {0,0,0,0,0,0,0,0,0},
  {0,0,0,0,0,0,0,0,0},
@@ -2128,6 +2129,12 @@ Fl_Double_Window* touch_rig_window() {
 		if (mnu) {
 			progStatus.tooltips ? mnu->set() : mnu->clear();
 			mnuTooltips = mnu;
+		}
+
+		mnu = getMenuItem(_("Voltmeter"), touch_menu);
+		if (mnu) {
+			progStatus.display_voltmeter ? mnu->set() : mnu->clear();
+			mnuVoltmeter = mnu;
 		}
 
 		touch_menubar->menu(touch_menu);

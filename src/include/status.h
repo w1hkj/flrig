@@ -413,6 +413,7 @@ struct status {
 	int		voltRed;
 	int		voltGreen;
 	int		voltBlue;
+	int		display_voltmeter;
 
 	int		fg_sys_red;
 	int		fg_sys_green;

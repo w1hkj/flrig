@@ -389,6 +389,7 @@ extern Fl_Menu_Item *mnuConfig;
 extern Fl_Menu_Item *mnuRestoreData;
 extern Fl_Menu_Item *mnuKeepData;
 extern Fl_Menu_Item *mnuTooltips;
+extern Fl_Menu_Item *mnuVoltmeter;
 extern Fl_Menu_Item *mnuSchema;
 extern Fl_Menu_Item *mnuEmbedTabs;
 extern Fl_Menu_Item *mnuColorConfig;
