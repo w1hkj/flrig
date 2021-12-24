@@ -1,5 +1,5 @@
-// ----------------------------------------------------------------------------
-// Copyright (C) 2014
+// ---------------------------------------------------------------------
+// Copyright (C) 2021
 //              David Freese, W1HKJ
 //
 // This file is part of flrig.
@@ -15,8 +15,67 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
-// ----------------------------------------------------------------------------
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// ---------------------------------------------------------------------
+
+/* =====================================================================
+TX500 CAT controls reverse engineering:
+
+1. frequency
+2. mode; set: FSK==>DIG, FSK-R==>DIG; get DIG always returns USB as mode
+3. PTT
+4. attenuator
+5. preamp
+6. identification; returns ID019;
+7. power on/off status; PS; returns PS0; but transceiver is ON
+8. SM0; always returns SM00002;
+
+Factory response to request for list of supported CAT commands:
+
+ID;		identifier, response 019;
+AI;		auto information; default OFF
+RX;		receiver function status; NO RESPONSE
+IF;		information string; type response:
+		IF0000703437000000+000000000020000000;
+FA;		get/set frequency vfo A; FA00007034370;
+FB;		get/set frequency vfo B; FB00014070000;
+FR;		RX vfo: FR0; vfoA, FR1; vfoB
+FT;		TX vfo: FT0; vfoA, FT1; vfoB
+FN;		UNKNOWN COMMAND
+MD;		mode: MD6 sets DIG, but xcvr responds with USB
+PA;		PA01; preamp OFF, PA11; preamp ON
+RA;		RA0000; attenuator OFF, RA0100; attenuator ON
+
+IF; response 
+0.........1.........2.........3.......
+01234567890123456789012345678901234567
+|         |         |         |
+IF0000703501000000+000000000030000000;
+  |_________||___||_____|||||||||||||______ active VFO frequency 11 digits
+            ||___||_____|||||||||||||______ always zero
+                 ||_____|||||||||||||______ +/- RIT/XIT frequency
+                         ||||||||||||______ RIT on/off
+                          |||||||||||______ XIT on/off
+                           ||||||||||______ memory channel
+                             ||||||||______ 0 RX, 1 TX
+                              |||||||______ mode, related to MD command
+                               ||||||______ related to FR/FT commands
+                                |||||______ scan status
+                                 ||||______ simplex/split
+                                  |||______ CTSS on/off, always zero
+                                  |||______ CTSS frequency, always zero
+                                    |______ always zero
+
+IF0000703437000000+000000000010000000;   LSB
+IF0000703437000000+000000000020000000;   USB
+IF0000703501000000+000000000030000000;   CW
+IF0000703437000000+000000000040000000;   FM
+IF0000703437000000+000000000050000000;   AM
+IF0000703437000000+000000000020000000;   FSK (DIG)
+IF0000703373000000+000000000070000000;   CW-R
+IF0000703437000000+000000000020000000;   FSK-R (DIG)
+
+======================================================================*/
 
 #include "lab599/TX500.h"
 #include "support.h"
@@ -30,7 +89,7 @@ static const char TX500_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7' };
 static const char TX500_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'U', 'L' };
 
 static const char *TX500_empty[] = { "N/A", NULL };
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------
 
 static GUI rig_widgets[]= {
 //	{ (Fl_Widget *)btnVol,        2, 125,  50 }, // 0
@@ -109,33 +168,6 @@ RIG_TX500::RIG_TX500() {
 }
 
 static int ret = 0;
-
-// Transceiver power level
-void RIG_TX500::set_power_control(double val)
-{
-	int ival = (int)val;
-	cmd = "PC";
-	cmd.append(to_decimal(ival, 3)).append(";");
-	sendCommand(cmd);
-	showresp(WARN, ASC, "set pwr ctrl", cmd, "");
-	sett("pwr control");
-}
-
-double RIG_TX500::get_power_control()
-{
-	int pctrl = 0;
-	cmd = "PC;";
-	get_trace(1, "get_power_contro");
-	ret = wait_char(';', 6, 100, "get pout", ASC);
-	gett("");
-	if (ret >= 6) {
-		size_t p = replystr.rfind("PC");
-		if (p != string::npos) {
-			pctrl = fm_decimal(replystr.substr(p+2), 3);
-		}
-	}
-	return pctrl;
-}
 
 void RIG_TX500::set_attenuator(int val)
 {
@@ -417,6 +449,9 @@ int RIG_TX500::get_smeter()
 }
 
 /*
+
+Kenwood CAT commands NOT IMPLEMENTED IN TX500
+---------------------------------------------
 static const char *TX500_SL[] = {
  "0",   "50", "100", "200", "300",
 "400",  "500", "600", "700", "800",
@@ -427,7 +462,7 @@ static const char *TX500_CAT_SL[] = {
 "SL10;", "SL11;" };
 static const char *TX500_SL_tooltip = "lo cut";
 static const char *TX500_SSB_btn_SL_label = "L";
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------
 static const char *TX500_SH[] = {
 "1400", "1600", "1800", "2000", "2200",
 "2400", "2600", "2800", "3000", "3400",
@@ -438,12 +473,12 @@ static const char *TX500_CAT_SH[] = {
 "SH10;", "SH11;" };
 static const char *TX500_SH_tooltip = "hi cut";
 static const char *TX500_SSB_btn_SH_label = "H";
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------
 static const char *TX500_AM_SL[] = {
 "0", "100", "200", "500", NULL };
 static const char *TX500_AM_SH[] = {
 "2500", "3000", "4000", "5000" };
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------
 static const char *TX500_CWwidths[] = {
 "50", "80", "100", "150", "200",
 "300", "400", "500", "600", "1000",
@@ -452,12 +487,12 @@ static const char *TX500_CWbw[] = {
 "FW0050;", "FW0080;", "FW0100;", "FW0150;", "FW0200;",
 "FW0300;", "FW0400;", "FW0500;", "FW0600;", "FW1000;",
 "FW2000;" };
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------
 static const char *TX500_FSKwidths[] = {
 "250", "500", "1000", "1500", NULL};
 static const char *TX500_FSKbw[] = {
 "FW0250;", "FW0500;", "FW1000;", "FW1500;" };
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------
 */
 
 /*
@@ -985,6 +1020,33 @@ int RIG_TX500::get_power_out()
 		}
 	}
 	return poutmtr;
+}
+
+// Transceiver power level
+void RIG_TX500::set_power_control(double val)
+{
+	int ival = (int)val;
+	cmd = "PC";
+	cmd.append(to_decimal(ival, 3)).append(";");
+	sendCommand(cmd);
+	showresp(WARN, ASC, "set pwr ctrl", cmd, "");
+	sett("pwr control");
+}
+
+double RIG_TX500::get_power_control()
+{
+	int pctrl = 0;
+	cmd = "PC;";
+	get_trace(1, "get_power_contro");
+	ret = wait_char(';', 6, 100, "get pout", ASC);
+	gett("");
+	if (ret >= 6) {
+		size_t p = replystr.rfind("PC");
+		if (p != string::npos) {
+			pctrl = fm_decimal(replystr.substr(p+2), 3);
+		}
+	}
+	return pctrl;
 }
 
 */

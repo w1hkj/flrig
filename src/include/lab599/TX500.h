@@ -52,12 +52,6 @@ enum TX500MODES { LSB, USB, CW, FM, AM, DIG, CWR };
 	void set_modeB(int val);
 	int  get_modeB();
 
-	double get_power_control();
-
-	void set_power_control(double val);
-	void get_pc_min_max_step(double &min, double &max, double &step) {
-		min = 5; pmax = max = 100; step = 1; }
-
 	void set_attenuator(int val);
 	int  get_attenuator();
 	void set_preamp(int val);
@@ -69,6 +63,12 @@ enum TX500MODES { LSB, USB, CW, FM, AM, DIG, CWR };
 
 //	void initialize();
 //	void shutdown();
+
+//	double get_power_control();
+
+//	void set_power_control(double val);
+//	void get_pc_min_max_step(double &min, double &max, double &step) {
+//		min = 5; pmax = max = 100; step = 1; }
 
 //	int  get_power_out();
 
