@@ -1,6 +1,36 @@
-2021-11-13  dave-w1hkj  <w1hkj@bellsouth.net>
+2021-12-24  dave-w1hkj  <w1hkj@bellsouth.net>
 
-	faf5a092: Version 1.4.3
+	7cdd4905: Version 1.4.4
+	a7994ad9: TX500 update
+	be98a622: IC7300 response strings
+	c136601f: voltmeter menu item
+	fb3a2bef: Volt meter
+	4fbd313b: FT 817/100D
+	7383a942: XmlRpc modify exchange
+	60f86c60: Initial xcvr selection
+	46dd5836: ic-7610
+	4ceec858: tmate2
+	1b5081f4: UI debug
+	8e7f3e95: wide ui
+	209c96ea: IC756 pro
+	fe691c90: embedded/dialog tabs
+	95a69fa3: Signal Bar
+	db82396f: Documentation
+
+2021-11-29  Brian Waterworth  <brian.waterworth@gmail.com>
+
+	54ea1c07: FT450D power out
+
+2021-11-28  dave-w1hkj  <w1hkj@bellsouth.net>
+
+	c4c16004: Power Meter Autoscale
+	536df7b1: fl_alert messages
+	d35abcbc: FreqControl
+	24eff108: fsk
+	07806773: cwio-timing
+	0b77439e: code cleanup
+	4a1e6432: IC7800 time set
+	2e02298b: Version 1.4.3
 	715fc26f: cwio accu_sleep
 	b688d273: A2B freq only
 	2add8453: g90 cw/power/swr

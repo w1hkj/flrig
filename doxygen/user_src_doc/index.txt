@@ -19,7 +19,7 @@
 
 /*!
 
-\mainpage FLRIG Users Manual - Version 1.4.1
+\mainpage FLRIG Users Manual - Version 1.4.3
 
 \tableofcontents
 
