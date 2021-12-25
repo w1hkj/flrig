@@ -1660,6 +1660,13 @@ void * serial_thread_loop(void *d)
 				Fl::awake(update_UI_PTT);
 				Fl::awake(updateSmeter);
 			}
+			if (progStatus.byte_interval) MilliSleep(progStatus.byte_interval);
+
+			if (progStatus.poll_frequency) {
+				guard_lock lk(&mutex_serial);
+				read_vfo();
+			}
+
 			{	guard_lock lk(&mutex_serial);
 				while (!bypass_serial_thread_loop) {
 					if (*(tx_polling->poll)) {
