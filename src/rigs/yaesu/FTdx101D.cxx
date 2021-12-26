@@ -300,7 +300,7 @@ bool RIG_FTdx101D::check ()
 	int ret = wait_char(';', 12 , 100, "check", ASC);
 
 	gett("check()");
-return true;
+
 	if (ret >= 12) return true;
 	return false;
 }

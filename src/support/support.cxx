@@ -6008,7 +6008,7 @@ void init_noise_control()
 
 void init_split_control()
 {
-	if (selrig->has_split) {
+	if (selrig->has_split || selrig->has_split_AB) {
 		btnSplit->show();
 		btnSplit->activate();
 	} else {
@@ -6448,7 +6448,6 @@ trace(1, "selrig->initialize()");
 		selrig->initialize();
 
 trace(1, "selrig->check()");
-#ifdef NDEBUG
 		if (!selrig->check()) {
 			trace(1, "FAILED");
 			bypass_serial_thread_loop = true;
@@ -6461,7 +6460,7 @@ trace(1, "selrig->check()");
 
 			box_xcvr_connect->color(FL_BACKGROUND2_COLOR);
 			box_xcvr_connect->redraw();
-
+#ifdef NDEBUG
 			fl_alert2(_("\
 Transceiver not responding!\n\n\
 Check serial (COM) port connection\n\
@@ -6471,8 +6470,9 @@ Check that Baud matches transceiver baud\n\n\
 Press 'Init' button."));
 
 			return;
-		}
 #endif
+		}
+
 		FreqDispA->set_precision(selrig->precision);
 		FreqDispA->set_ndigits(selrig->ndigits);
 		FreqDispB->set_precision(selrig->precision);
