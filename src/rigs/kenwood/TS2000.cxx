@@ -1029,13 +1029,31 @@ void RIG_TS2000::set_split(bool val)
 
 int RIG_TS2000::get_split()
 {
-		cmd = "IF;";
-		get_trace(1, "get split INFO");
-		int ret = wait_char(';', 38, 100, "get split INFO", ASC);
-		gett("");
-		if (ret >= 38) {
-			return (split = (replystr[32] == '1'));
-		}
-		return 0;
+	size_t p;
+	int split = 0;
+	char rx = 0, tx = 0;
+// tx vfo
+	cmd = rsp = "FT";
+	cmd.append(";");
+	if (wait_char(';', 4, 100, "get split tx vfo", ASC) == 4) {
+		p = replystr.rfind(rsp);
+		if (p == string::npos) return split;
+		tx = replystr[p+2];
+	}
+// rx vfo
+	cmd = rsp = "FR";
+	cmd.append(";");
+	if (wait_char(';', 4, 100, "get split rx vfo", ASC) == 4) {
+		p = replystr.rfind(rsp);
+		if (p == string::npos) return split;
+		rx = replystr[p+2];
+	}
+
+	if (tx == '0' && rx == '0') split = 0;
+	else if (tx == '1' && rx == '0') split = 1;
+	else if (tx == '0' && rx == '1') split = 2;
+	else if (tx == '1' && rx == '1') split = 3;
+
+	return split;
 }
 
