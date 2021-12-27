@@ -61,6 +61,9 @@ enum TX500MODES { LSB, USB, CW, FM, AM, DIG, CWR };
 
 	int  get_smeter();
 
+	void set_PTT_control(int val);
+	int  get_PTT();
+
 //	void initialize();
 //	void shutdown();
 
@@ -73,7 +76,6 @@ enum TX500MODES { LSB, USB, CW, FM, AM, DIG, CWR };
 //	int  get_power_out();
 
 //	void set_PTT_control(int val);
-//	int  get_PTT();
 
 //	void set_bwA(int val);
 //	int  get_bwA();

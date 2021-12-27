@@ -332,10 +332,7 @@ unsigned long int RIG_TX500::get_vfoA ()
 
 	size_t p = replystr.rfind("FA");
 	if (p != string::npos && (p + 12 < replystr.length())) {
-		int f = 0;
-		for (size_t n = 2; n < 13; n++)
-			f = f*10 + replystr[p+n] - '0';
-		A.freq = f;
+		A.freq = atol(&replystr[ p + 2]);
 	}
 	return A.freq;
 }
@@ -363,10 +360,7 @@ unsigned long int RIG_TX500::get_vfoB ()
 
 	size_t p = replystr.rfind("FB");
 	if (p != string::npos && (p + 12 < replystr.length())) {
-		int f = 0;
-		for (size_t n = 2; n < 13; n++)
-			f = f*10 + replystr[p+n] - '0';
-		B.freq = f;
+		B.freq = atol(&replystr[ p + 2 ]);
 	}
 	return B.freq;
 }
@@ -437,16 +431,39 @@ int RIG_TX500::get_smeter()
 	get_trace(1, "get_smeter");
 	ret = wait_char(';', 8, 100, "get smeter", ASC);
 	gett("");
-
 	if (ret == 8) {
 		size_t p = replystr.rfind("SM");
 		if (p != string::npos) {
-			smtr = fm_decimal(replystr.substr(p+3),4);
+			smtr = atol(&replystr[p + 4]);
 			smtr = (smtr * 100) / 30;
 		}
 	}
 	return smtr;
 }
+
+void RIG_TX500::set_PTT_control(int val)
+{
+	ptt_ = val;
+	if (val) cmd = "TX;";
+	else     cmd = "RX;";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "PTT", cmd, "");
+}
+
+//IF0000702800000000+000000000130000000;
+//IF0000702800000000+000000000030000000;
+//01234567890123456789012345678
+int  RIG_TX500::get_PTT()
+{
+	cmd = "IF;";
+	ret = wait_char(';', 38, 100, "get PTT", ASC);
+	gett("");
+	if (ret >= 38) {
+		ptt_ = replystr[28] == '1';
+	}
+	return ptt_;
+}
+
 
 /*
 
