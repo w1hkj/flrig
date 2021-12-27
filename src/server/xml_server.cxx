@@ -140,7 +140,7 @@ static void freq_mode_bw()
 
 	tempbw.assign("L:").append((BW > 256 && selrig->has_dsp_controls) ?
 						(dsplo ? dsplo[BW & 0x7F] : "") :
-						(bwt ? bwt[BW] : "")).append("\n");
+						(bwt && bwt[BW]) ? bwt[BW] : "" ).append("\n");
 	tempbw.append("U:").append((BW > 256 && selrig->has_dsp_controls) ?
 						(dsphi ? dsphi[(BW >> 8) & 0x7F] : "") :
 						"").append("\n");

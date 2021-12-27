@@ -6297,6 +6297,8 @@ void init_VFOs()
 
 
 		vfo = &vfoA;
+		selrig->set_modeA(vfo->imode);
+		selrig->set_bwA(vfo->iBW);
 		setModeControl((void *)0);
 		update_progress(progress->value() + 4);
 		updateBandwidthControl();
@@ -6447,6 +6449,7 @@ void initRig()
 trace(1, "selrig->initialize()");
 		selrig->initialize();
 
+#ifdef NDEBUG
 trace(1, "selrig->check()");
 		if (!selrig->check()) {
 			trace(1, "FAILED");
@@ -6460,7 +6463,6 @@ trace(1, "selrig->check()");
 
 			box_xcvr_connect->color(FL_BACKGROUND2_COLOR);
 			box_xcvr_connect->redraw();
-#ifdef NDEBUG
 			fl_alert2(_("\
 Transceiver not responding!\n\n\
 Check serial (COM) port connection\n\
@@ -6468,10 +6470,9 @@ Open menu Config/Setup/Transceiver\n\
 Press 'Update' button, reselect port\n\
 Check that Baud matches transceiver baud\n\n\
 Press 'Init' button."));
-
 			return;
-#endif
 		}
+#endif
 
 		FreqDispA->set_precision(selrig->precision);
 		FreqDispA->set_ndigits(selrig->ndigits);
