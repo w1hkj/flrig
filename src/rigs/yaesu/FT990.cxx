@@ -148,6 +148,7 @@ void RIG_FT990::set_split(bool val)
 		showresp(WARN, HEX, "set split ON", cmd, replystr);
 	else
 		showresp(WARN, HEX, "set split OFF", cmd, replystr);
+	setthex("set split On/OFF");
 }
 
 bool RIG_FT990::check()
@@ -274,7 +275,7 @@ void RIG_FT990::set_vfoA (unsigned long int freq)
 	if (current_vfo == onB) selectA();
 
 	A.freq = freq;
-	freq /=10; // 100D does not support 1 Hz resolution
+	freq /=10;
 	cmd = to_bcd_be(freq, 8);
 	cmd += 0x0A;
 	sendCommand(cmd);
@@ -407,6 +408,7 @@ void RIG_FT990::set_PTT_control(int val)
 	else
 		showresp(WARN, HEX, "set PTT OFF", cmd, replystr);
 	ptt_ = val;
+	setthex("set PTT On/Off");
 }
 
 void RIG_FT990::tune_rig(int)

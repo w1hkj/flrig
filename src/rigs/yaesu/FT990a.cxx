@@ -150,6 +150,7 @@ void RIG_FT990A::set_split(bool val)
 		showresp(WARN, HEX, "set split ON", cmd, "");
 	else
 		showresp(WARN, HEX, "set split OFF", cmd, "");
+	setthex("split A/B");
 }
 
 bool RIG_FT990A::check()
@@ -409,6 +410,7 @@ void RIG_FT990A::set_PTT_control(int val)
 	else
 		showresp(WARN, HEX, "set PTT OFF", cmd, "");
 	ptt_ = val;
+	setthex("set PTT On/Off");
 }
 
 void RIG_FT990A::tune_rig(int)
@@ -450,6 +452,8 @@ int RIG_FT990A::get_power_out()
 	init_cmd();
 	cmd[4] = 0xF7;
 	int ret = waitN(5, 100, "Power out");
+	getthex("get power out");
+
 	if (ret < 5) return 0;
 	int sval = (unsigned char)replystr[0];
 	if (sval < 90) sval = 90;
