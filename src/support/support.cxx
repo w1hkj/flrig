@@ -2112,6 +2112,14 @@ void execute_swapAB()
 				// Restore mode, then frequency and bandwidth after swap.
 				yaesu891UpdateB(&vfoB);
 			}
+		} else if (selrig->name_ == rig_FTdx10.name_ ) {
+			XCVR_STATE temp = vfoB;
+			vfoB = vfoA;
+			vfoA = temp;
+			if (useB)
+				vfo = &vfoB;
+			else
+				vfo = &vfoA;
 		} else {
 			XCVR_STATE temp = vfoB;
 			vfoB = vfoA;
