@@ -55,9 +55,9 @@ public:
 	void B2A();
 	void swapAB();
 
-//	bool can_split();
-//	void set_split(bool val);
-//	int  get_split();
+	bool can_split();
+	void set_split(bool val);
+	int  get_split();
 
 	int get_sideband(int md);
 	void set_sideband(int md);

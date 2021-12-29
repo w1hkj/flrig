@@ -125,7 +125,7 @@ RIG_FT891::RIG_FT891() {
 	has_a2b =
 	has_ext_tuner =
 	has_xcvr_auto_on_off =
-//	has_split =
+	has_split =
 //	has_split_AB =
 	has_noise_reduction =
 	has_noise_reduction_control =
@@ -385,6 +385,38 @@ void RIG_FT891::swapAB()
 	sendCommand(cmd);
 	sett("");
 	showresp(WARN, ASC, "vfo A<>B", cmd, replystr);
+}
+
+bool RIG_FT891::can_split()
+{
+	return true;
+}
+
+void RIG_FT891::set_split(bool val)
+{
+	split = val;
+	if (val) {
+		cmd = "ST1;";
+		sendCommand(cmd);
+		sett("Split ON");
+	} else {
+		cmd = "ST0;";
+		sendCommand(cmd);
+		sett("Split OFF");
+	}
+}
+
+int RIG_FT891::get_split()
+{
+	cmd = rsp = "ST";
+	cmd += ";";
+	wait_char(';', 4, 100, "Get split", ASC);
+	gett("get split()");
+	size_t p = replystr.rfind(rsp);
+	if (p == string::npos) return 0;
+	int split = replystr[p+2] - '0';
+
+	return (split > 0);
 }
 
 int RIG_FT891::get_smeter()
