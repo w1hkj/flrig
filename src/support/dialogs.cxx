@@ -1454,10 +1454,11 @@ void show_controls()
 					progStatus.show_tabs = false;
 				} else if ((!progStatus.show_tabs && !progStatus.first_use) || (progStatus.show_tabs && progStatus.first_use)) {
 					static int X, Y, W, dH;
-					X = progStatus.mainX;
-					Y = progStatus.mainY;
-					W = progStatus.mainW;
+					X = mainwindow->x(); //progStatus.mainX;
+					Y = mainwindow->y(); //progStatus.mainY;
+					W = mainwindow->w(); //progStatus.mainW;
 					dH = mainwindow->decorated_h();
+
 					tabs_dialog->resize( X, Y + dH, W, tabs_dialog->h() );
 					grpTABS->resize(0, 0, W, tabs_dialog->h());
 					if (vtab != (Fl_Widget *)0) tabsGeneric->value(vtab);

@@ -271,6 +271,7 @@ void read_info()
 	selrig->get_info();
 }
 
+/*
 void update_vfoAorB(void *d)
 {
 	if (xcvr_name == rig_FT817.name_ || 
@@ -294,6 +295,7 @@ void update_vfoAorB(void *d)
 	}
 	updateUI((void*)0);
 }
+*/
 
 void read_vfo()
 {
@@ -301,12 +303,14 @@ void read_vfo()
 		read_K3_vfo();
 		return;
 	}
+
 //	if (xcvr_name == rig_KX3.name_) {
 //		read_KX3_vfo();
 //		return;
 //	}
 
 //	read_vfoAorB();
+/*
 	if (selrig->has_getvfoAorB) {
 		int val = selrig->get_vfoAorB();
 		if (val != useB) {
@@ -314,10 +318,14 @@ void read_vfo()
 			Fl::awake(update_vfoAorB, reinterpret_cast<void*>(val));
 		}
 	}
-
+*/
 // transceiver changed ?
 	trace(1,"read_vfo()");
 	unsigned long int  freq;
+
+	int current_vfo = selrig->inuse;
+	if (current_vfo != selrig->get_vfoAorB())
+		Fl::awake(updateUI);
 
 	if (selrig->has_get_info)
 		selrig->get_info();
@@ -338,6 +346,7 @@ void read_vfo()
 				Fl::awake(setFreqDispB, (void *)vfoB.freq);
 			}
 		}
+
 	} else { // vfo-B
 		trace(2, "vfoB active", "get vfo B");
 		freq = selrig->get_vfoB();
@@ -355,6 +364,7 @@ void read_vfo()
 			}
 		}
 	}
+
 }
 
 void update_ifshift(void *d);
@@ -2293,18 +2303,18 @@ void highlight_vfo(void *d)
 	if (useB) {
 		FreqDispA->SetONOFFCOLOR( norm_fg, dim_bg );
 		FreqDispB->SetONOFFCOLOR( norm_fg, norm_bg );
-		btnA->value(0);
-		btnB->value(1);
+//		btnA->value(0);
+//		btnB->value(1);
 	} else {
 		FreqDispA->SetONOFFCOLOR( norm_fg, norm_bg );
 		FreqDispB->SetONOFFCOLOR( norm_fg, dim_bg);
-		btnA->value(1);
-		btnB->value(0);
+//		btnA->value(1);
+//		btnB->value(0);
 	}
 	FreqDispA->redraw();
 	FreqDispB->redraw();
-	btnA->redraw();
-	btnB->redraw();
+//	btnA->redraw();
+//	btnB->redraw();
 	Fl::check();
 }
 
@@ -4195,9 +4205,8 @@ void adjust_small_ui()
 		else mnuEmbedTabs->clear();
 	}
 
+	mainwindow->damage();
 	mainwindow->redraw();
-
-	show_controls();
 
 }
 
@@ -4315,8 +4324,6 @@ void adjust_xig_wide()
 
 	mainwindow->redraw();
 
-	show_controls();
-
 	return;
 }
 
@@ -4424,9 +4431,6 @@ void adjust_wide_ui()
 	}
 
 	mainwindow->redraw();
-
-	show_controls();
-
 }
 
 void adjust_touch_ui()
@@ -6280,7 +6284,6 @@ void init_VFOs()
 			FreqDispA->value(vfoA.freq);
 			trace(2, "A: ", printXCVR_STATE(vfoA).c_str());
 
-
 			useB = true;
 			selrig->selectB();			// third select call
 			vfoB.freq = selrig->get_vfoB();
@@ -6346,6 +6349,7 @@ void init_K3_KX3_special()
 		btn_K3_A2B->hide();
 		btn_KX3_swapAB->hide();
 		btn_KX3_A2B->hide();
+		labelMEMORY->hide();
 		btnB->show();
 		btnA->show();
 		btnAswapB->show();
@@ -6469,6 +6473,8 @@ trace(1, "selrig->check()");
 			main_group->show();
 			mainwindow->redraw();
 
+			show_controls();
+
 			box_xcvr_connect->color(FL_BACKGROUND2_COLOR);
 			box_xcvr_connect->redraw();
 			fl_alert2(_("\
@@ -6542,7 +6548,10 @@ Press 'Init' button."));
 	mainwindow->redraw();
 
 	Fl::flush();
+
 	MilliSleep(50);
+
+	show_controls();
 
 	xcvr_online = true;
 	box_xcvr_connect->color(FL_GREEN);

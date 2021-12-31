@@ -734,6 +734,8 @@ void status::saveLastState()
 
 	spref.set("schema", schema);
 	spref.set("embed_tabs", embed_tabs);
+	if (!embed_tabs)
+		show_tabs = tabs_dialog->visible();
 	spref.set("show_tabs", show_tabs);
 	spref.set("visible_tab", visible_tab.c_str());
 
