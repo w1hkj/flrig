@@ -276,7 +276,7 @@ bool RIG_IC9100::check ()
 
 unsigned long int RIG_IC9100::get_vfoA ()
 {
-	if (useB) return A.freq;
+	if (inuse == onB) return A.freq;
 	string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
@@ -308,7 +308,7 @@ void RIG_IC9100::set_vfoA (unsigned long int freq)
 
 unsigned long int RIG_IC9100::get_vfoB ()
 {
-	if (!useB) return B.freq;
+	if (inuse == onA) return B.freq;
 	string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
@@ -1725,7 +1725,7 @@ void RIG_IC9100::get_band_selection(int v)
 			if ((bandmode == 1) && banddata) bandmode = 10;
 			if ((bandmode == 2) && banddata) bandmode = 11;
 			if ((bandmode == 3) && banddata) bandmode = 12;
-			if (useB) {
+			if (inuse == onB) {
 				set_vfoB(bandfreq);
 				set_modeB(bandmode);
 				set_FILT(bandfilter);
@@ -1741,8 +1741,8 @@ void RIG_IC9100::get_band_selection(int v)
 
 void RIG_IC9100::set_band_selection(int v)
 {
-	unsigned long int freq = (useB ? B.freq : A.freq);
-	int mode = (useB ? B.imode : A.imode);
+	unsigned long int freq = (inuse == onB ? B.freq : A.freq);
+	int mode = (inuse == onB ? B.imode : A.imode);
 
 	cmd.assign(pre_to);
 	cmd.append("\x1A\x01");

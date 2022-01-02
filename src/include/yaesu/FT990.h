@@ -60,12 +60,15 @@ public:
 	void set_bwB(int val);
 	int  get_bwB();
 
+	int  get_vfoAorB();
+
 	int  def_bandwidth(int m);
 
 	void selectA();
 	void selectB();
 
 	void set_PTT_control(int val);
+	void tune_rig(int);
 	int  get_smeter();
 	int  get_swr();
 	int  get_power_out();

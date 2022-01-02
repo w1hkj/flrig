@@ -206,6 +206,7 @@ void RIG_FT450D::selectA()
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select vfo A", cmd, replystr);
 	sett("selectA");
+	inuse = onA;
 }
 
 void RIG_FT450D::selectB()
@@ -214,6 +215,7 @@ void RIG_FT450D::selectB()
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select vfo B", cmd, replystr);
 	sett("selectB");
+	inuse = onB;
 }
 
 void RIG_FT450D::A2B()
@@ -255,7 +257,8 @@ unsigned long int RIG_FT450D::get_vfoA ()
 
 void RIG_FT450D::set_vfoA (unsigned long int freq)
 {
-	if (useB) selectA();
+	int current_vfo = inuse;
+	if (current_vfo == onB) selectA();
 	freqA = freq;
 	cmd = "FA00000000;";
 	for (int i = 9; i > 1; i--) {
@@ -265,7 +268,7 @@ void RIG_FT450D::set_vfoA (unsigned long int freq)
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET vfo A", cmd, replystr);
 	sett("set_vfoA");
-	if (useB) selectB();
+	if (current_vfo == onB) selectB();
 }
 
 unsigned long int RIG_FT450D::get_vfoB ()
@@ -287,7 +290,8 @@ unsigned long int RIG_FT450D::get_vfoB ()
 
 void RIG_FT450D::set_vfoB (unsigned long int freq)
 {
-	if (!useB) selectB();
+	int current_vfo = inuse;
+	if (current_vfo == onA) selectB();
 	freqB = freq;
 	cmd = "FB00000000;";
 	for (int i = 9; i > 1; i--) {
@@ -297,7 +301,7 @@ void RIG_FT450D::set_vfoB (unsigned long int freq)
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET vfo B", cmd, replystr);
 	sett("set_vfoB");
-	if (!useB) selectA();
+	if (current_vfo == onA) selectA();
 }
 
 int RIG_FT450D::get_vfoAorB()
@@ -313,7 +317,7 @@ int RIG_FT450D::get_vfoAorB()
 
 void RIG_FT450D::set_split(bool on)
 {
-	if (useB) {
+	if (inuse == onB) {
 		if (on) cmd = "FT0;";
 		else cmd = "FT1;";
 	} else {
@@ -341,7 +345,7 @@ int RIG_FT450D::get_split()
 	if (p == string::npos) return false;
 	tx = replystr[p+2];
 
-	if (useB)
+	if (inuse == onB)
 		split = (tx == '0');
 	else
 		split = (tx == '1');
@@ -695,7 +699,7 @@ int RIG_FT450D::adjust_bandwidth(int val)
 int RIG_FT450D::def_bandwidth(int m)
 {
 	int bw = adjust_bandwidth(m);
-	if (useB) {
+	if (inuse == onB) {
 		if (mode_bwB[m] == -1)
 			mode_bwB[m] = bw;
 		return mode_bwB[m];

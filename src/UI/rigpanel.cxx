@@ -571,11 +571,9 @@ static void cb_mnu_power_meter_scale(Fl_Menu_ *, void *) {
 	select_power_meter_scales();
 }
 
-extern bool useB;
-
 static void cb_btnA(Fl_Light_Button*, void*) {
 	if (Fl::event_button() == FL_RIGHT_MOUSE) {
-		if (!useB) {
+		if (selrig->inuse == onA) {
 			addFreq();
 			btnA->value(1);
 			btnB->value(0);
@@ -584,7 +582,7 @@ static void cb_btnA(Fl_Light_Button*, void*) {
 			btnB->value(1);
 		}
 	} else {
-		if (useB) {
+		if (selrig->inuse == onB) {
 			cb_selectA();
 		} else {
 			if (FreqDispA->is_reversed_colors()) {
@@ -615,7 +613,7 @@ static void cb_btn_KX3_swapAB(Fl_Button*, void*) {
 
 static void cb_btnB(Fl_Light_Button*, void*) {
 	if (Fl::event_button() == FL_RIGHT_MOUSE) {
-		if (useB) {
+		if (selrig->inuse == onB) {
 			addFreq();
 			btnB->value(1);
 			btnA->value(0);
@@ -624,7 +622,7 @@ static void cb_btnB(Fl_Light_Button*, void*) {
 			btnA->value(1);
 		}
 	} else {
-		if (!useB) {
+		if (selrig->inuse == onA) {
 			cb_selectB();
 		} else { 
 			if (FreqDispB->is_reversed_colors()) {

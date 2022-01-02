@@ -227,6 +227,7 @@ void RIG_IC7600::selectA()
 	cmd.assign(pre_to).append("\x07\xD0").append(post);
 	set_trace(2, "selectA()", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("select A");
+	inuse = onA;
 }
 
 void RIG_IC7600::selectB()
@@ -234,6 +235,7 @@ void RIG_IC7600::selectB()
 	cmd.assign(pre_to).append("\x07\xD1").append(post);
 	set_trace(2, "selectB()", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("select B");
+	inuse = onB;
 }
 
 bool RIG_IC7600::check ()
@@ -250,7 +252,7 @@ bool RIG_IC7600::check ()
 
 unsigned long int RIG_IC7600::get_vfoA ()
 {
-	if (useB) return A.freq;
+	if (inuse == onB) return A.freq;
 	string resp;
 	cmd.assign(pre_to).append("\x03").append( post );
 	if (waitFOR(11, "get vfo A")) {
@@ -279,7 +281,7 @@ void RIG_IC7600::set_vfoA (unsigned long int freq)
 
 unsigned long int RIG_IC7600::get_vfoB ()
 {
-	if (!useB) return B.freq;
+	if (inuse == onA) return B.freq;
 	string resp = pre_fm;
 	cmd.assign(pre_to).append("\x03").append(post);
 	if (waitFOR(11, "get vfo B")) {
@@ -1437,7 +1439,7 @@ int RIG_IC7600::get_pbt_outer()
 
 const char *RIG_IC7600::FILT(int &val)
 {
-	if (useB) {
+	if (inuse == onB) {
 		if (filB < 0) filB = 0;
 		if (filB > 3) filB = 3;
 		val = filB;
@@ -1453,7 +1455,7 @@ const char *RIG_IC7600::FILT(int &val)
 
 const char *RIG_IC7600::nextFILT()
 {
-	if (useB) {
+	if (inuse == onB) {
 		filB++;
 		if (filB > 3) filB = 1;
 		set_modeB(B.imode);
@@ -1523,7 +1525,7 @@ void RIG_IC7600::get_band_selection(int v)
 				bandmode = ((banddata == 0x10) ? 13 : 
 							(banddata == 0x20) ? 14 :
 							(banddata == 0x30) ? 15 : 0);
-			if (useB) {
+			if (inuse == onB) {
 				set_vfoB(bandfreq);
 				set_modeB(bandmode);
 				set_FILT(bandfilter);
@@ -1539,9 +1541,9 @@ void RIG_IC7600::get_band_selection(int v)
 
 void RIG_IC7600::set_band_selection(int v)
 {
-	unsigned long int freq = (useB ? B.freq : A.freq);
-	int fil = (useB ? filB : filA);
-	int mode = (useB ? B.imode : A.imode);
+	unsigned long int freq = (inuse == onB ? B.freq : A.freq);
+	int fil = (inuse == onB ? filB : filA);
+	int mode = (inuse == onB ? B.imode : A.imode);
 
 	cmd.assign(pre_to);
 	cmd.append("\x1A\x01");

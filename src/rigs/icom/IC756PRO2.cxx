@@ -187,6 +187,7 @@ void RIG_IC756PRO2::selectA()
 	cmd.append(post);
 	waitFB("sel A");
 	set_trace(2, "selectA()", str2hex(cmd.c_str(), cmd.length()));
+	inuse = onA;
 }
 
 void RIG_IC756PRO2::selectB()
@@ -197,6 +198,7 @@ void RIG_IC756PRO2::selectB()
 	cmd.append(post);
 	waitFB("sel B");
 	set_trace(2, "selectB()", str2hex(cmd.c_str(), cmd.length()));
+	inuse = onB;
 }
 
 bool RIG_IC756PRO2::check ()
@@ -213,7 +215,7 @@ bool RIG_IC756PRO2::check ()
 
 unsigned long int RIG_IC756PRO2::get_vfoA ()
 {
-	if (useB) return A.freq;
+	if (inuse == onB) return A.freq;
 	string cstr = "\x03";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -246,7 +248,7 @@ void RIG_IC756PRO2::set_vfoA (unsigned long int freq)
 
 unsigned long int RIG_IC756PRO2::get_vfoB ()
 {
-	if (!useB) return B.freq;
+	if (inuse == onA) return B.freq;
 	string cstr = "\x03";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -1128,7 +1130,7 @@ int RIG_IC756PRO2::get_preamp()
 
 const char *RIG_IC756PRO2::FILT(int &val)
 {
-	if (useB) {
+	if (inuse == onB) {
 		val = filB;
 		return(szfilter[filB - 1]);
 	}
@@ -1140,7 +1142,7 @@ const char *RIG_IC756PRO2::FILT(int &val)
 
 const char *RIG_IC756PRO2::nextFILT()
 {
-	if (useB) {
+	if (inuse == onB) {
 		filB++;
 		if (filB > 3) filB = 1;
 		set_modeB(B.imode);
@@ -1203,7 +1205,7 @@ void RIG_IC756PRO2::get_band_selection(int v)
 			for (index = 0; index < sizeof(PL_tones) / sizeof(*PL_tones); index++)
 				if (tone == PL_tones[index]) break;
 			rTONE = index;
-			if (useB) {
+			if (inuse == onB) {
 				set_vfoB(bandfreq);
 				set_modeB(bandmode);
 				set_FILT(bandfilter);
@@ -1219,9 +1221,9 @@ void RIG_IC756PRO2::get_band_selection(int v)
 
 void RIG_IC756PRO2::set_band_selection(int v)
 {
-	unsigned long int freq = (useB ? B.freq : A.freq);
-	int fil = (useB ? filB : filA);
-	int mode = (useB ? B.imode : A.imode);
+	unsigned long int freq = (inuse == onB ? B.freq : A.freq);
+	int fil = (inuse == onB ? filB : filA);
+	int mode = (inuse == onB ? B.imode : A.imode);
 
 	cmd.assign(pre_to);
 	cmd.append("\x1A\x01");

@@ -56,7 +56,6 @@ extern XCVR_STATE vfoA;
 extern XCVR_STATE vfoB;
 //extern XCVR_STATE xmlvfo;
 
-extern bool useB;
 extern bool PTT;
 extern bool localptt;
 

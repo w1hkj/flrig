@@ -177,6 +177,7 @@ void RIG_TS570::selectA()
 	cmd = "FR0;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select A", cmd, "");
+	inuse = onA;
 }
 
 void RIG_TS570::selectB()
@@ -184,12 +185,13 @@ void RIG_TS570::selectB()
 	cmd = "FR1;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select B", cmd, "");
+	inuse = onB;
 }
 
 void RIG_TS570::set_split(bool val)
 {
 	split = val;
-	if (useB) {
+	if (inuse == onB) {
 		if (val) {
 			cmd = "FR1;FT0;";
 			sendCommand(cmd);

@@ -188,12 +188,14 @@ void RIG_FT2000::selectA()
 {
 	cmd = "VS0;";
 	sendCommand(cmd);
+	inuse = onA;
 }
 
 void RIG_FT2000::selectB()
 {
 	cmd = "VS1;";
 	sendCommand(cmd);
+	inuse = onB;
 }
 
 bool RIG_FT2000::check ()
@@ -638,7 +640,7 @@ int RIG_FT2000::adjust_bandwidth(int m)
 int RIG_FT2000::def_bandwidth(int m)
 {
 	int bw = adjust_bandwidth(m);
-	if (useB) {
+	if (inuse == onB) {
 		if (mode_bwB[m] == -1)
 			mode_bwB[m] = bw;
 		return mode_bwB[m];

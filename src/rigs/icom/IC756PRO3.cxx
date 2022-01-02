@@ -193,6 +193,7 @@ void RIG_IC756PRO3::selectA()
 	cmd += '\xB0';
 	cmd.append(post);
 	waitFB("sel A");
+	inuse = onA;
 }
 
 void RIG_IC756PRO3::selectB()
@@ -202,6 +203,7 @@ void RIG_IC756PRO3::selectB()
 	cmd += '\xB1';
 	cmd.append(post);
 	waitFB("sel B");
+	inuse = onB;
 }
 
 bool RIG_IC756PRO3::check ()
@@ -218,7 +220,7 @@ bool RIG_IC756PRO3::check ()
 
 unsigned long int RIG_IC756PRO3::get_vfoA ()
 {
-	if (useB) return A.freq;
+	if (inuse == onB) return A.freq;
 	string cstr = "\x03";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -249,7 +251,7 @@ void RIG_IC756PRO3::set_vfoA (unsigned long int freq)
 
 unsigned long int RIG_IC756PRO3::get_vfoB ()
 {
-	if (!useB) return B.freq;
+	if (inuse == onA) return B.freq;
 	string cstr = "\x03";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -1177,7 +1179,7 @@ int RIG_IC756PRO3::get_auto_notch()
 
 const char *RIG_IC756PRO3::FILT(int &val)
 {
-	if (useB) {
+	if (inuse == onB) {
 		val = filB;
 		return(szfilter[filB - 1]);
 	}
@@ -1189,7 +1191,7 @@ const char *RIG_IC756PRO3::FILT(int &val)
 
 const char *RIG_IC756PRO3::nextFILT()
 {
-	if (useB) {
+	if (inuse == onB) {
 		filB++;
 		if (filB > 3) filB = 1;
 		set_modeB(B.imode);
@@ -1252,7 +1254,7 @@ void RIG_IC756PRO3::get_band_selection(int v)
 			for (index = 0; index < sizeof(PL_tones) / sizeof(*PL_tones); index++)
 				if (tone == PL_tones[index]) break;
 			rTONE = index;
-			if (useB) {
+			if (inuse == onB) {
 				set_vfoB(bandfreq);
 				set_modeB(bandmode);
 				set_FILT(bandfilter);
@@ -1268,9 +1270,9 @@ void RIG_IC756PRO3::get_band_selection(int v)
 
 void RIG_IC756PRO3::set_band_selection(int v)
 {
-	unsigned long int freq = (useB ? B.freq : A.freq);
-	int fil = (useB ? filB : filA);
-	int mode = (useB ? B.imode : A.imode);
+	unsigned long int freq = (inuse == onB ? B.freq : A.freq);
+	int fil = (inuse == onB ? filB : filA);
+	int mode = (inuse == onB ? B.imode : A.imode);
 
 	cmd.assign(pre_to);
 	cmd.append("\x1A\x01");

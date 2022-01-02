@@ -85,7 +85,7 @@ void RIG_FT757GX2::selectA() {
 	cmd[4] = 0x05;
 	sendCommand(cmd);
 	showresp(INFO, HEX, "select A", cmd, replystr);
-	inuse = 0;
+	inuse = onA;
 }
 
 void RIG_FT757GX2::selectB() {
@@ -94,7 +94,7 @@ void RIG_FT757GX2::selectB() {
 	cmd[4] = 0x05;
 	sendCommand(cmd);
 	showresp(INFO, HEX, "select B", cmd, replystr);
-	inuse = 1;
+	inuse = onB;
 }
 
 int RIG_FT757GX2::get_vfoAorB() {

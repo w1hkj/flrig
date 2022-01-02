@@ -138,6 +138,7 @@ void RIG_IC746::selectA()
 	cmd += '\x00';
 	cmd.append(post);
 	waitFB("sel A");
+	inuse = onA;
 }
 
 void RIG_IC746::selectB()
@@ -147,6 +148,7 @@ void RIG_IC746::selectB()
 	cmd += '\x01';
 	cmd.append(post);
 	waitFB("sel B");
+	inuse = onB;
 }
 
 bool RIG_IC746::check ()
@@ -163,7 +165,7 @@ bool RIG_IC746::check ()
 
 unsigned long int RIG_IC746::get_vfoA ()
 {
-	if (useB) return A.freq;
+	if (inuse == onB) return A.freq;
 	string cstr = "\x03";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -194,7 +196,7 @@ void RIG_IC746::set_vfoA (unsigned long int freq)
 
 unsigned long int RIG_IC746::get_vfoB ()
 {
-	if (!useB) return B.freq;
+	if (inuse == onA) return B.freq;
 	string cstr = "\x03";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -1522,7 +1524,7 @@ void RIG_IC746PRO::get_band_selection(int v)
 			for (index = 0; index < sizeof(PL_tones) / sizeof(*PL_tones); index++)
 				if (tone == PL_tones[index]) break;
 			rTONE = index;
-			if (useB) {
+			if (inuse == onB) {
 				set_vfoB(bandfreq);
 				set_modeB(bandmode);
 				set_FILT(bandfilter);
@@ -1538,9 +1540,9 @@ void RIG_IC746PRO::get_band_selection(int v)
 
 void RIG_IC746PRO::set_band_selection(int v)
 {
-	unsigned long int freq = (useB ? B.freq : A.freq);
-	int fil = (useB ? filB : filA);
-	int mode = (useB ? B.imode : A.imode);
+	unsigned long int freq = (inuse == onB ? B.freq : A.freq);
+	int fil = (inuse == onB ? filB : filA);
+	int mode = (inuse == onB ? B.imode : A.imode);
 
 	cmd.assign(pre_to);
 	cmd.append("\x1A\x01");

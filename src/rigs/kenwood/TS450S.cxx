@@ -319,6 +319,7 @@ void RIG_TS450S::selectA()
 	sendCommand(cmd);
 	cmd = "FT0;";
 	sendCommand(cmd);
+	inuse = onA;
 }
 
 void RIG_TS450S::selectB()
@@ -328,6 +329,7 @@ void RIG_TS450S::selectB()
 	sendCommand(cmd);
 	cmd = "FT1;";
 	sendCommand(cmd);
+	inuse = onB;
 }
 
 bool RIG_TS450S::can_split()

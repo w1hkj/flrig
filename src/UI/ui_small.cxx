@@ -345,14 +345,14 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 	btnA->down_box(FL_THIN_DOWN_BOX);
 	btnA->labelsize(12);
 	btnA->callback((Fl_Callback*)cb_btnA);
-	btnA->value(!useB);
+	btnA->value(1);
 
 	btnB = new Fl_Light_Button(265, 62, 52, 20, _("vfoB"));
 	btnB->tooltip(_("Rx-B / Tx-B"));
 	btnB->down_box(FL_THIN_DOWN_BOX);
 	btnB->labelsize(12);
 	btnB->callback((Fl_Callback*)cb_btnB);
-	btnB->value(useB);
+	btnB->value(0);
 
 	btn_KX3_swapAB = new Fl_Button(212, 62, 52, 20, _("A / B"));
 	btn_KX3_swapAB->tooltip(_("Swap A/B"));

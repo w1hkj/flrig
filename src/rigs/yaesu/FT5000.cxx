@@ -333,6 +333,7 @@ void RIG_FT5000::selectA()
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select A", cmd, replystr);
 	sett("selectA");
+	inuse = onA;
 }
 
 void RIG_FT5000::selectB()
@@ -341,6 +342,7 @@ void RIG_FT5000::selectB()
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select B", cmd, replystr);
 	sett("selectB");
+	inuse = onB;
 }
 
 void RIG_FT5000::A2B()
@@ -360,7 +362,6 @@ void RIG_FT5000::set_split(bool val)
 {
 	split = val;
 	if (val) {
-		useB = false;
 		cmd = "FR2;";
 		sendCommand(cmd);
 		showresp(WARN, ASC, "Rx on A", cmd, replystr);
@@ -760,7 +761,7 @@ int RIG_FT5000::adjust_bandwidth(int val)
 int RIG_FT5000::def_bandwidth(int m)
 {
 	int bw = adjust_bandwidth(m);
-	if (useB) {
+	if (inuse == onB) {
 		if (mode_bwB[m] == -1)
 			mode_bwB[m] = bw;
 		return mode_bwB[m];

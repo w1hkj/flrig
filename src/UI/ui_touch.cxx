@@ -394,7 +394,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		btnA->down_box(FL_THIN_DOWN_BOX);
 		btnA->labelsize(16);;
 		btnA->callback((Fl_Callback*)cb_btnA);
-		btnA->value(!useB);
+		btnA->value(1);
 
 		btn_KX3_swapAB = new Fl_Button(xpos, ypos, 49, 49, _("A / B"));
 		btn_KX3_swapAB->tooltip(_("Swap A/B"));
@@ -408,7 +408,7 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		btnB->down_box(FL_THIN_DOWN_BOX);
 		btnB->labelsize(16);
 		btnB->callback((Fl_Callback*)cb_btnB);
-		btnB->value(useB);
+		btnB->value(0);
 
 		btn_KX3_A2B = new Fl_Button(xpos, ypos+51, 49, 49, _("A -> B"));
 		btn_KX3_A2B->tooltip(_("Copy A to B"));

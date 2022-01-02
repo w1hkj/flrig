@@ -114,6 +114,7 @@ void RIG_FT736R::selectA()
 	set_vfo(A.freq);
 	MilliSleep(200);
 	set_mode(A.imode);
+	inuse = onA;
 }
 
 void RIG_FT736R::selectB()
@@ -122,6 +123,7 @@ void RIG_FT736R::selectB()
 	set_vfo(B.freq);
 	MilliSleep(200);
 	set_mode(B.imode);
+	inuse = onB;
 }
 
 

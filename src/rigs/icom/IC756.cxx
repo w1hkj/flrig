@@ -345,13 +345,23 @@ void RIG_IC756PRO::swapAB()
 	cmd.append(post);
 	waitFB("Exchange main/sub");
 
-	selectA();
-	get_modeA();
-	get_bwA();
-	selectB();
-	get_modeB();
-	get_bwB();
-	if (!useB) selectA();
+	int current_vfo = inuse;
+
+	if (current_vfo == onA) {
+		selectB();
+		get_modeB();
+		get_bwB();
+		selectA();
+		get_modeA();
+		get_bwA();
+	} else {
+		selectA();
+		get_modeA();
+		get_bwA();
+		selectB();
+		get_modeB();
+		get_bwB();
+	}
 }
 
 void RIG_IC756PRO::A2B()
@@ -361,10 +371,11 @@ void RIG_IC756PRO::A2B()
 	cmd.append(post);
 	waitFB("Equalize main/sub");
 
+	int current_vfo = inuse;
 	selectB();
 	get_modeB();
 	get_bwB();
-	if (!useB) selectA();
+	if (current_vfo == onA) selectA();
 }
 
 void RIG_IC756PRO::selectA()
@@ -374,6 +385,7 @@ void RIG_IC756PRO::selectA()
 	cmd += '\xD0';
 	cmd.append(post);
 	waitFB("sel A");
+	inuse = onA;
 }
 
 void RIG_IC756PRO::selectB()
@@ -383,6 +395,7 @@ void RIG_IC756PRO::selectB()
 	cmd += '\xD1';
 	cmd.append(post);
 	waitFB("sel B");
+	inuse = onB;
 }
 
 bool RIG_IC756PRO::check ()
@@ -399,7 +412,7 @@ bool RIG_IC756PRO::check ()
 
 unsigned long int RIG_IC756PRO::get_vfoA ()
 {
-	if (useB) return A.freq;
+	if (inuse == onB) return A.freq;
 	string cstr = "\x03";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -430,7 +443,7 @@ void RIG_IC756PRO::set_vfoA (unsigned long int freq)
 
 unsigned long int RIG_IC756PRO::get_vfoB ()
 {
-	if (!useB) return B.freq;
+	if (inuse == onA) return B.freq;
 	string cstr = "\x03";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -909,13 +922,13 @@ int RIG_IC756PRO::get_modeB()
 
 int RIG_IC756PRO::adjust_bandwidth(int m)
 {
-	if (useB) return B.iBW;
+	if (inuse == onB) return B.iBW;
 	return A.iBW;
 }
 
 int RIG_IC756PRO::def_bandwidth(int m)
 {
-	if (useB) return B.iBW;
+	if (inuse == onB) return B.iBW;
 	return A.iBW;
 }
 
@@ -1175,7 +1188,7 @@ const char *RIG_IC756PRO::FILT(int val)
 
 int RIG_IC756PRO::get_FILT(int mode)
 {
-	if (useB) return mode_filterB[mode];
+	if (inuse == onB) return mode_filterB[mode];
 	return mode_filterA[mode];
 }
 
@@ -1184,7 +1197,7 @@ void RIG_IC756PRO::set_FILT(int filter)
 	if (filter < 1 || filter > 3)
 		return;
 
-	if (useB) {
+	if (inuse == onB) {
 		B.filter = filter;
 		int val = B.imode;
 		mode_filterB[val - 1] = filter;
@@ -1220,7 +1233,7 @@ void RIG_IC756PRO::set_FILT(int filter)
 
 const char *RIG_IC756PRO::nextFILT()
 {
-	if (useB) {
+	if (inuse == onB) {
 		B.filter++;
 		if (B.filter > 3) B.filter = 1;
 
@@ -1461,7 +1474,7 @@ void RIG_IC756PRO::get_band_selection(int v)
 			for (index = 0; index < sizeof(PL_tones) / sizeof(*PL_tones); index++)
 				if (tone == PL_tones[index]) break;
 			rTONE = index;
-			if (useB) {
+			if (inuse == onB) {
 				set_vfoB(bandfreq);
 				set_modeB(bandmode);
 				set_FILT(bandfilter);
@@ -1477,9 +1490,9 @@ void RIG_IC756PRO::get_band_selection(int v)
 
 void RIG_IC756PRO::set_band_selection(int v)
 {
-	unsigned long int freq = (useB ? B.freq : A.freq);
-	int fil = (useB ? filB : filA);
-	int mode = (useB ? B.imode : A.imode);
+	unsigned long int freq = (inuse == onB ? B.freq : A.freq);
+	int fil = (inuse == onB ? filB : filA);
+	int mode = (inuse == onB ? B.imode : A.imode);
 
 	cmd.assign(pre_to);
 	cmd.append("\x1A\x01");

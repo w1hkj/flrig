@@ -100,6 +100,7 @@ void RIG_FT100D::selectA()
 	cmd[4] = 0x05;
 	sendCommand(cmd);
 	showresp(WARN, HEX, "select A", cmd, replystr);
+	inuse = onA;
 }
 
 void RIG_FT100D::selectB()
@@ -109,6 +110,7 @@ void RIG_FT100D::selectB()
 	cmd[4] = 0x05;
 	sendCommand(cmd);
 	showresp(WARN, HEX, "select B", cmd, replystr);
+	inuse = onB;
 }
 
 void RIG_FT100D::set_split(bool val)
@@ -165,11 +167,11 @@ bool RIG_FT100D::get_info()
 		memmode = ((replystr[p+1] & 0x40) == 0x40);
 		vfobmode = ((replystr[p+1] & 0x24) == 0x24);
 		if (memmode) return false;
-		if (vfobmode && !useB) {
-			useB = true;
+		if (vfobmode && inuse == onA) {
+			inuse = onB;
 			Fl::awake(highlight_vfo, (void *)0);
-		} else if (!vfobmode && useB) {
-			useB = false;
+		} else if (!vfobmode && inuse == onB) {
+			inuse = onA;
 			Fl::awake(highlight_vfo, (void *)0);
 		}
 	}
@@ -189,7 +191,7 @@ bool RIG_FT100D::get_info()
 		if (pmode > 7) pmode = 7;
 		pbw = (replystr[5] >> 4) & 0x03;
 		pbw = 3 - pbw;
-		if (useB) {
+		if (inuse == onB) {
 			B.freq = pfreq; B.imode = pmode; B.iBW = pbw;
 		} else {
 			A.freq = pfreq; A.imode = pmode; A.iBW = pbw;

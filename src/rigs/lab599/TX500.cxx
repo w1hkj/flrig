@@ -182,9 +182,8 @@ void RIG_TX500::set_attenuator(int val)
 int RIG_TX500::get_attenuator()
 {
 	cmd = "RA;";
-	get_trace(1, "get_attenuator");
 	ret = wait_char(';', 7, 100, "get ATT", ASC);
-	gett("");
+	gett("get_attenuator");
 	if (ret >= 7) {
 		size_t p = replystr.rfind("RA");
 		if (p != string::npos && (p+3 < replystr.length())) {
@@ -210,9 +209,8 @@ void RIG_TX500::set_preamp(int val)
 int RIG_TX500::get_preamp()
 {
 	cmd = "PA;";
-	get_trace(1, "get_preamp");
 	ret = wait_char(';', 5, 100, "get PRE", ASC);
-	gett("");
+	gett("get_preamp");
 	if (ret >= 5) {
 		size_t p = replystr.rfind("PA");
 		if (p != string::npos && (p+2 < replystr.length())) {
@@ -240,9 +238,8 @@ void RIG_TX500::set_modeA(int val)
 int RIG_TX500::get_modeA()
 {
 	cmd = "MD;";
-	get_trace(1, "get_modeA");
 	ret = wait_char(';', 4, 100, "get mode A", ASC);
-	gett("");
+	gett("get_modeA");
 	if (ret == 4) {
 		size_t p = replystr.rfind("MD");
 		if (p != string::npos) {
@@ -271,9 +268,8 @@ void RIG_TX500::set_modeB(int val)
 int RIG_TX500::get_modeB()
 {
 	cmd = "MD;";
-	get_trace(1, "get_modeB");
 	ret = wait_char(';', 4, 100, "get mode B", ASC);
-	gett("");
+	gett("get_modeB");
 	if (ret == 4) {
 		size_t p = replystr.rfind("MD");
 		if (p != string::npos) {
@@ -293,19 +289,17 @@ bool RIG_TX500::check()
 {
 	MilliSleep(200);  // needed for restart.  TX500  has mechanical relays
 	cmd = "ID;";
-	gett("check ID");
 	if (wait_char(';', 6, 500, "get ID", ASC) < 6) {
 trace(1, "check ID FAILED");
 		return false;
 	}
-	gett("");
+	gett("check ID");
 	cmd = "FA;";
-	gett("check vfoA");
 	if (wait_char(';', 14, 500, "get vfo A", ASC) < 14) {
 trace(1, "check FA FAILED");
 		return false;
 	}
-	gett(""); 
+	gett("check vfoA");
 	return true;
 }
 
@@ -314,6 +308,7 @@ void RIG_TX500::selectA()
 	cmd = "FR0;FT0;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "Rx on A, Tx on A", cmd, "");
+	inuse = onA;
 }
 
 void RIG_TX500::selectB()
@@ -321,14 +316,14 @@ void RIG_TX500::selectB()
 	cmd = "FR1;FT1;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "Rx on B, Tx on B", cmd, "");
+	inuse = onB;
 }
 
 unsigned long int RIG_TX500::get_vfoA ()
 {
 	cmd = "FA;";
-	gett("get_vfoA");
 	if (wait_char(';', 14, 100, "get vfo A", ASC) < 14) return A.freq;
-	gett("");
+	gett("get_vfoA");
 
 	size_t p = replystr.rfind("FA");
 	if (p != string::npos && (p + 12 < replystr.length())) {
@@ -354,9 +349,8 @@ void RIG_TX500::set_vfoA (unsigned long int freq)
 unsigned long int RIG_TX500::get_vfoB ()
 {
 	cmd = "FB;";
-	gett("get_vfoB");
 	if (wait_char(';', 14, 100, "get vfo B", ASC) < 14) return B.freq;
-	gett("");
+	gett("get_vfoB");
 
 	size_t p = replystr.rfind("FB");
 	if (p != string::npos && (p + 12 < replystr.length())) {
@@ -382,7 +376,7 @@ void RIG_TX500::set_vfoB (unsigned long int freq)
 void RIG_TX500::set_split(bool val) 
 {
 	split = val;
-	if (useB) {
+	if (inuse == onB) {
 		if (val) {
 			cmd = "FR1;FT0;";
 			sendCommand(cmd);
@@ -428,9 +422,8 @@ int RIG_TX500::get_smeter()
 	int smtr = 0;
 	cmd = "SM0;";
 
-	get_trace(1, "get_smeter");
 	ret = wait_char(';', 8, 100, "get smeter", ASC);
-	gett("");
+	gett("get_smeter");
 	if (ret == 8) {
 		size_t p = replystr.rfind("SM");
 		if (p != string::npos) {
@@ -457,7 +450,7 @@ int  RIG_TX500::get_PTT()
 {
 	cmd = "IF;";
 	ret = wait_char(';', 38, 100, "get PTT", ASC);
-	gett("");
+	gett("get PTT");
 	if (ret >= 38) {
 		ptt_ = replystr[28] == '1';
 	}

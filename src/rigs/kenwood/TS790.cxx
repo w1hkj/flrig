@@ -228,6 +228,7 @@ void RIG_TS790::selectA()
 	showresp(WARN, ASC, "select A", "", "");
 	cmd = "FN0;";
 	sendCommand(cmd);
+	inuse = onA;
 }
 
 void RIG_TS790::selectB()
@@ -235,6 +236,7 @@ void RIG_TS790::selectB()
 	showresp(WARN, ASC, "select B", "", "");
 	cmd = "FN1;";
 	sendCommand(cmd);
+	inuse = onB;
 }
 
 // Tranceiver PTT on/off

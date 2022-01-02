@@ -229,6 +229,7 @@ void RIG_TS440::selectA()
 	sendCommand(cmd);
 	sett("");
 	showresp(WARN, ASC, "select A", "", "");
+	inuse = onA;
 }
 
 void RIG_TS440::selectB()
@@ -238,6 +239,7 @@ void RIG_TS440::selectB()
 	sendCommand(cmd);
 	sett("");
 	showresp(WARN, ASC, "select A", "", "");
+	inuse = onB;
 }
 
 int RIG_TS440::get_PTT()

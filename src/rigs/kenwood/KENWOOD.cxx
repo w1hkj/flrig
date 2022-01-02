@@ -38,6 +38,7 @@ void KENWOOD::selectA()
 		sendCommand(cmd);
 		showresp(WARN, ASC, "Tx on B", cmd, "");
 	}
+	inuse = onA;
 }
 
 void KENWOOD::selectB()
@@ -54,13 +55,14 @@ void KENWOOD::selectB()
 		sendCommand(cmd);
 		showresp(WARN, ASC, "Tx on A", cmd, "");
 	}
+	inuse = onB;
 }
 
 void KENWOOD::set_split(bool val) 
 {
 	split = val;
 
-	if (useB) {
+	if (inuse == onB) {
 		if (val) {
 			cmd = "FR1;FT0;";
 			sendCommand(cmd);

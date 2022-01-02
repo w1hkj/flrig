@@ -938,6 +938,7 @@ void RIG_TS2000::selectA()
 	cmd = "FR0;FT0;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "Rx on A, Tx on A", cmd, "");
+	inuse = onA;
 }
 
 void RIG_TS2000::selectB()
@@ -945,6 +946,7 @@ void RIG_TS2000::selectB()
 	cmd = "FR1;FT1;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "Rx on B, Tx on B", cmd, "");
+	inuse = onB;
 }
 
 unsigned long int RIG_TS2000::get_vfoA ()
@@ -1004,7 +1006,7 @@ void RIG_TS2000::set_vfoB (unsigned long int freq)
 void RIG_TS2000::set_split(bool val) 
 {
 	split = val;
-	if (useB) {
+	if (inuse == onB) {
 		if (val) {
 			cmd = "FR1;FT0;";
 			sendCommand(cmd);

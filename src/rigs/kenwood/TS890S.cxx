@@ -1234,6 +1234,7 @@ void RIG_TS890S::selectA()
 	sendCommand(cmd, 0);
 	showresp(WARN, ASC, "Tx A", cmd, "");
 	rxtxa = true;
+	inuse = onA;
 }
 
 void RIG_TS890S::selectB()
@@ -1245,12 +1246,13 @@ void RIG_TS890S::selectB()
 	sendCommand(cmd, 0);
 	showresp(WARN, ASC, "Tx B", cmd, "");
 	rxtxa = false;
+	inuse = onB;
 }
 
 void RIG_TS890S::set_split(bool val) 
 {
 	split = val;
-	if (useB) {
+	if (inuse == onB) {
 		if (val) {
 			cmd = "FR1;FT0;";
 			sendCommand(cmd);

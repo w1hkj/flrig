@@ -250,7 +250,8 @@ void RIG_TS870S::selectA()
 	cmd = "FR0;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "Rx/Tx A", cmd, "");
-	vfo = 0;
+//	vfo = 0;
+	inuse = onA;
 }
 
 //----------------------------------------------------------------------
@@ -259,7 +260,8 @@ void RIG_TS870S::selectB()
 	cmd = "FR1;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "Rx/Tx B", cmd, "");
-	vfo = 1;
+//	vfo = 1;
+	inuse = onB;
 }
 
 // revert to use KENWOOD generic get set for split operation
@@ -281,14 +283,14 @@ void RIG_TS870S::set_split(bool val)
 
 // '0' = VFO-A, '1' = VFO-B, '2' = Memory.
 	switch (replystr[p+2]) {
-		case '0' : useB = false; break;
-		case '1' : useB = true; break;
+		case '0' : inuse = onA; break;
+		case '1' : inuse = onB; break;
 		case '2' :
 		default  : return;  // do nothing the xcvr is in memory mode
 	}
 
 	split = val;
-	if (useB) {
+	if (inuse == onB) {
 		if (val) {
 			cmd = "FR1;FT0;";
 			sendCommand(cmd);

@@ -528,12 +528,12 @@ void RIG_TT550::set_split(bool val)
 {
 	split = val;
 	if (split) {
-		if (!useB)
+		if (inuse == onA)
 			set_vfoTX(freqB);
 		else
 			set_vfoTX(freqA);
 	} else {
-		if (!useB)
+		if (inuse == onA)
 			set_vfoTX(freqA);
 		else
 			set_vfoTX(freqB);
@@ -552,7 +552,7 @@ void RIG_TT550::set_vfo(unsigned long int freq)
 void RIG_TT550::set_vfoA (unsigned long int freq)
 {
 	freqA = freq;
-	if (!useB)
+	if (inuse == onA)
 		set_vfo(freq);
 }
 
@@ -568,7 +568,7 @@ bool RIG_TT550::check()
 
 unsigned long int RIG_TT550::get_vfoA ()
 {
-	if (!useB) {
+	if (inuse == onA) {
 		freqA += enc_change;
 		enc_change = 0;
 	}
@@ -578,13 +578,13 @@ unsigned long int RIG_TT550::get_vfoA ()
 void RIG_TT550::set_vfoB (unsigned long int freq)
 {
 	freqB = freq;
-	if (useB)
+	if (inuse == onB)
 		set_vfo(freqB);
 }
 
 unsigned long int RIG_TT550::get_vfoB ()
 {
-	if (useB) {
+	if (inuse == onB) {
 		freqB += enc_change;
 		enc_change = 0;
 	}
@@ -663,7 +663,7 @@ void RIG_TT550::set_modeA(int val)
 void RIG_TT550::set_modeB(int val)
 {
 	modeB = val;
-	if (useB)
+	if (inuse == onB)
 		set_mode(val);
 }
 
@@ -678,7 +678,7 @@ static void tt550_tune_off(void *)
 {
 	selrig->set_PTT_control(0);
 	selrig->set_power_control(progStatus.power_level);
-	if (useB)
+	if (selrig->inuse == onB)
 		selrig->set_modeB(ret_mode);
 	else
 		selrig->set_modeA(ret_mode);
@@ -687,7 +687,7 @@ static void tt550_tune_off(void *)
 void RIG_TT550::tune_rig(int val)
 {
 	set_PTT_control(0);
-	if (!useB) {
+	if (inuse == onA) {
 		ret_mode = modeA;
 		set_modeA(TT550_CW_MODE);
 	}
@@ -738,7 +738,7 @@ void RIG_TT550::set_bw(int val)
 	s2 << "Set TX bandwidth " << val << " " << noctl(cmd);
 	set_trace(1, s2.str().c_str());
 
-	set_vfo(!useB ? freqA : freqB);
+	set_vfo(inuse == onA ? freqA : freqB);
 }
 
 void RIG_TT550::set_bwA(int val)
@@ -755,7 +755,7 @@ int RIG_TT550::get_bwA()
 void RIG_TT550::set_bwB(int val)
 {
 	bwB = val;
-	if (useB)
+	if (inuse == onB)
 		set_bw(val);
 }
 
@@ -780,7 +780,7 @@ void RIG_TT550::set_if_shift(int val)
 {
 	pbt = val;
 	if (pbt) PbtActive = true;
-	set_vfoRX(!useB ? freqA : freqB);
+	set_vfoRX(inuse == onA ? freqA : freqB);
 }
 
 bool RIG_TT550::get_if_shift(int &val)
@@ -858,6 +858,7 @@ void RIG_TT550::selectA()
 	set_bwA (vfoA.iBW);
 	set_vfoRX(freqA);
 	set_vfoTX(freqA);
+	inuse = onA;
 }
 
 void RIG_TT550::selectB()
@@ -870,6 +871,7 @@ void RIG_TT550::selectB()
 	set_bwB (vfoB.iBW);
 	set_vfoRX(freqB);
 	set_vfoTX(freqB);
+	inuse = onB;
 }
 
 void RIG_TT550::process_freq_entry(char c)
@@ -908,7 +910,7 @@ void RIG_TT550::process_freq_entry(char c)
 		freq = (unsigned long int) ffreq;
 		if (freq < 50000) freq *= 1000;
 		Fl::awake(hide_encA, NULL);
-		if (!useB) {
+		if (inuse == onA) {
 			freqA = freq;
 		} else {
 			freqB = freq;
@@ -966,7 +968,7 @@ static BANDS ibands[] = {
 void RIG_TT550::fkey_band_plus()
 {
 	VFOQUEUE qvfo;
-	if (useB) qvfo.vfo = vfoB;
+	if (inuse == onB) qvfo.vfo = vfoB;
 	else      qvfo.vfo = vfoA;
 	for (size_t i = 1; i < sizeof(ibands) / sizeof(BANDS); i++) {
 		if (qvfo.vfo.freq < ibands[i].lo) {
@@ -977,7 +979,7 @@ void RIG_TT550::fkey_band_plus()
 	qvfo.vfo.src = UI;
 	qvfo.vfo.iBW = 255;
 	qvfo.vfo.imode = -1;
-	if (useB) qvfo.change = vB;
+	if (inuse == onB) qvfo.change = vB;
 	else      qvfo.change = vA;
 	srvc_reqs.push(qvfo);
 }
@@ -985,7 +987,7 @@ void RIG_TT550::fkey_band_plus()
 void RIG_TT550::fkey_band_minus()
 {
 	VFOQUEUE qvfo;
-	if (useB) qvfo.vfo = vfoB;
+	if (inuse == onB) qvfo.vfo = vfoB;
 	else      qvfo.vfo = vfoA;
 	for (size_t i = sizeof(ibands) / sizeof(BANDS) - 2; i >= 0; i--) {
 		if (qvfo.vfo.freq > ibands[i].hi) {
@@ -996,7 +998,7 @@ void RIG_TT550::fkey_band_minus()
 	qvfo.vfo.src = UI;
 	qvfo.vfo.iBW = 255;
 	qvfo.vfo.imode = -1;
-	if (useB) qvfo.change = vB;
+	if (inuse == onB) qvfo.change = vB;
 	else      qvfo.change = vA;
 	srvc_reqs.push(qvfo);
 }
@@ -1203,7 +1205,7 @@ int RIG_TT550::get_power_out()
 void RIG_TT550::setBfo(int val)
 {
 	progStatus.bfo_freq = Bfo = val;
-	if (useB) {
+	if (inuse == onB) {
 		set_vfoRX(freqB);
 		set_vfoTX(freqB);
 	} else if (split) {
@@ -1223,14 +1225,14 @@ int RIG_TT550::getBfo()
 void RIG_TT550::setVfoAdj(double v)
 {
 	VfoAdj = v;
-	set_vfoRX(!useB ? freqA : freqB);
+	set_vfoRX(inuse == onA ? freqA : freqB);
 }
 
 void RIG_TT550::setRit(int val)
 {
 	progStatus.rit_freq = RitFreq = val;
 	if (RitFreq) RitActive = true;
-	if (useB) {
+	if (inuse == onB) {
 		set_vfoRX(freqB);
 		set_vfoTX(freqB);
 	} else if (split) {
@@ -1251,7 +1253,7 @@ void RIG_TT550::setXit(int val)
 {
 	progStatus.xit_freq = XitFreq = val;
 	if (XitFreq) XitActive = true;
-	if (useB) {
+	if (inuse == onB) {
 		set_vfoRX(freqB);
 		set_vfoTX(freqB);
 	} else if (split) {

@@ -79,8 +79,8 @@ void RIG_FT817::selectA()
 	cmd[4] = 0x81;
 	sendCommand(cmd);
 	setthex("Select VFO A");
-
 	check();
+	inuse = onA;
 }
 
 void RIG_FT817::selectB()
@@ -89,8 +89,8 @@ void RIG_FT817::selectB()
 	cmd[4] = 0x81;
 	sendCommand(cmd);
 	setthex("Select VFO B");
-
 	check();
+	inuse = onB;
 }
 
 bool RIG_FT817::check ()

@@ -97,14 +97,16 @@ int RIG_FT817BB::get_vfoAorB()
 		ret = waitN(2, 100, "get active VFO", HEX);
 	}
 	if (i == 10) {
-		return -1;
+		return inuse;
 	}
 	getthex("get active VFO");
 
 	ft817BB_memory_mode = ((replystr[0] & 0x80) == 0x00);
 	Fl::awake(memory_label);
 
-	return replystr[0] & 0x01;
+	inuse = replystr[0] & 0x01;
+
+	return inuse;
 }
 
 void RIG_FT817BB::selectA()
@@ -117,7 +119,8 @@ void RIG_FT817BB::selectA()
 	showresp(INFO, HEX, "select VFO A", cmd, replystr);
 	setthex("Select VFO A");
 
-	if (get_vfoAorB() == 0)
+	get_vfoAorB();
+	if (inuse == onA)
 		sett("selectA() SUCCESS");
 	else
 		sett("selectA() FAILED");
@@ -133,7 +136,8 @@ void RIG_FT817BB::selectB()
 	showresp(INFO, HEX, "select VFO B", cmd, replystr);
 	setthex("Select VFO B");
 
-	if (get_vfoAorB() == 1)
+	get_vfoAorB();
+	if (inuse == onB)
 		sett("selectB() SUCCESS");
 	else
 		sett("selectB() FAILED");

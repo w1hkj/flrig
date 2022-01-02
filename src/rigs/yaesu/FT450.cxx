@@ -200,12 +200,14 @@ void RIG_FT450::selectA()
 {
 	cmd = "VS0;";
 	sendCommand(cmd);
+	inuse = onA;
 }
 
 void RIG_FT450::selectB()
 {
 	cmd = "VS1;";
 	sendCommand(cmd);
+	inuse = onB;
 }
 
 void RIG_FT450::A2B()
@@ -619,7 +621,7 @@ int RIG_FT450::adjust_bandwidth(int val)
 int RIG_FT450::def_bandwidth(int m)
 {
 	int bw = adjust_bandwidth(m);
-	if (useB) {
+	if (inuse == onB) {
 		if (mode_bwB[m] == -1)
 			mode_bwB[m] = bw;
 		return mode_bwB[m];

@@ -374,8 +374,8 @@ void RIG_FT950::selectA()
 	cmd = "FR0;FT2;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select A", cmd, replystr);
-
 	rig_trace(4, "selectA()", cmd.c_str(), " => ", replystr.c_str());
+	inuse = onA;
 }
 
 void RIG_FT950::selectB()
@@ -383,8 +383,8 @@ void RIG_FT950::selectB()
 	cmd = "FR4;FT3;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select B", cmd, replystr);
-
 	rig_trace(4, "selectB()", cmd.c_str(), " => ", replystr.c_str());
+	inuse = onB;
 }
 
 void RIG_FT950::A2B()
@@ -392,7 +392,6 @@ void RIG_FT950::A2B()
 	cmd = "AB;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "vfo A --> B", cmd, replystr);
-
 	rig_trace(4, "A2B()", cmd.c_str(), " => ", replystr.c_str());
 }
 
@@ -404,7 +403,7 @@ bool RIG_FT950::can_split()
 void RIG_FT950::set_split(bool val)
 {
 	split = val;
-	if (useB) {
+	if (inuse == onB) {
 		if (val) {
 			cmd = "FR4;FT2;";
 			sendCommand(cmd);
@@ -663,12 +662,12 @@ void RIG_FT950::tune_rig(int)
 		if (extun_on == false) {
 			if (btnPTT->value() == true) return;
 			if (get_split() == 1 || get_split() == 2) return;	// no split extune
-			useB ? rmd = modeB : rmd = modeA;
-			useB ? rbw = bwB : rbw = bwA;
-			useB ? rfreq = freqB : rfreq = freqA;
-			useB ? set_modeB(mAM_N) : set_modeA(mAM_N);
-//			useB ? set_modeB(mFM_N) : set_modeA(mFM_N);
-			useB ? set_vfoB(rfreq) : set_vfoA(rfreq);
+			inuse == onB ? rmd = modeB : rmd = modeA;
+			inuse == onB ? rbw = bwB : rbw = bwA;
+			inuse == onB ? rfreq = freqB : rfreq = freqA;
+			inuse == onB ? set_modeB(mAM_N) : set_modeA(mAM_N);
+//			inuse == onB ? set_modeB(mFM_N) : set_modeA(mFM_N);
+			inuse == onB ? set_vfoB(rfreq) : set_vfoA(rfreq);
 			rpwr = get_power_control();
 			set_power_control(10);
 			sendCommand("EX0360000;");	// AM mic off
@@ -683,9 +682,9 @@ void RIG_FT950::tune_rig(int)
 			sendCommand("EX0361000;");	// AM mic default
 //			sendCommand("EX0560050;");	// FM mic default
 			set_power_control(rpwr);
-			useB ? set_modeB(rmd) : set_modeA(rmd);
-			useB ? set_bwB(rbw) : set_bwA(rbw);
-			useB ? set_vfoB(rfreq) : set_vfoA(rfreq);
+			inuse == onB ? set_modeB(rmd) : set_modeA(rmd);
+			inuse == onB ? set_bwB(rbw) : set_bwA(rbw);
+			inuse == onB ? set_vfoB(rfreq) : set_vfoA(rfreq);
 		}
 	}
 }
@@ -833,7 +832,7 @@ int RIG_FT950::adjust_bandwidth(int val)
 int RIG_FT950::def_bandwidth(int m)
 {
 	int bw = adjust_bandwidth(m);
-	if (useB) {
+	if (inuse == onB) {
 		if (mode_bwB[m] == -1)
 			mode_bwB[m] = bw;
 		return mode_bwB[m];

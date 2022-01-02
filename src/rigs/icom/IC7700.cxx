@@ -202,6 +202,7 @@ void RIG_IC7700::selectA()
 	cmd.append(post);
 	waitFB("select A");
 	isett("selectA");
+	inuse = onA;
 }
 
 void RIG_IC7700::selectB()
@@ -212,6 +213,7 @@ void RIG_IC7700::selectB()
 	cmd.append(post);
 	waitFB("select B");
 	isett("selectB");
+	inuse = onB;
 }
 
 void RIG_IC7700::set_modeA(int val)
@@ -717,7 +719,7 @@ int RIG_IC7700::get_pbt_outer()
 
 const char *RIG_IC7700::FILT(int &val)
 {
-	if (useB) {
+	if (inuse == onB) {
 		if (filB < 0) filB = 0;
 		if (filB > 3) filB = 3;
 		val = filB;
@@ -733,7 +735,7 @@ const char *RIG_IC7700::FILT(int &val)
 
 const char *RIG_IC7700::nextFILT()
 {
-	if (useB) {
+	if (inuse == onB) {
 		filB++;
 		if (filB > 3) filB = 1;
 		set_modeB(B.imode);
@@ -799,7 +801,7 @@ void RIG_IC7700::get_band_selection(int v)
 			if ((bandmode == 1) && banddata) bandmode = 11;
 			if ((bandmode == 2) && banddata) bandmode = 12;
 			if ((bandmode == 3) && banddata) bandmode = 13;
-			if (useB) {
+			if (inuse == onB) {
 				set_vfoB(bandfreq);
 				set_modeB(bandmode);
 				set_FILT(bandfilter);
@@ -815,9 +817,9 @@ void RIG_IC7700::get_band_selection(int v)
 
 void RIG_IC7700::set_band_selection(int v)
 {
-	unsigned long int freq = (useB ? B.freq : A.freq);
-	int fil = (useB ? filB : filA);
-	int mode = (useB ? B.imode : A.imode);
+	unsigned long int freq = (inuse == onB ? B.freq : A.freq);
+	int fil = (inuse == onB ? filB : filA);
+	int mode = (inuse == onB ? B.imode : A.imode);
 
 	cmd.assign(pre_to);
 	cmd.append("\x1A\x01");

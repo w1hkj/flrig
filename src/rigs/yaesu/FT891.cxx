@@ -339,6 +339,7 @@ void RIG_FT891::selectA()
 	sendCommand(cmd);
 	sett("");
 	showresp(WARN, ASC, "select A", cmd, replystr);
+	inuse = onA;
 }
 
 void RIG_FT891::selectB()
@@ -352,6 +353,7 @@ void RIG_FT891::selectB()
 	sendCommand(cmd);
 	sett("");
 	showresp(WARN, ASC, "select B", cmd, replystr);
+	inuse = onB;
 }
 
 
@@ -810,7 +812,7 @@ void RIG_FT891::set_modeA(int val)
 {
 	modeA = val;
 
-	if (!rigbase::isOnA()) {
+	if (inuse == onB) {
 		LOG_WARN("set_modeA, but on B.  Call selectA() first.");
 		return;
 	}
@@ -831,7 +833,7 @@ void RIG_FT891::set_modeA(int val)
 
 int RIG_FT891::get_modeA()
 {
-	if (!rigbase::isOnA()) {
+	if (inuse == onB) {
 		//LOG_WARN("get_modeA, but on B.  Call selectA() first.");
 		return modeA;
 	}
@@ -869,7 +871,7 @@ void RIG_FT891::set_modeB(int val)
 {
 	modeB = val;
 
-	if (!rigbase::isOnB()) {
+	if (inuse == onB) {
 		LOG_WARN("set_modeB, but on A.  Call selectB() first.");
 		return;
 	}
@@ -890,7 +892,7 @@ void RIG_FT891::set_modeB(int val)
 
 int RIG_FT891::get_modeB()
 {
-	if (!rigbase::isOnB()) {
+	if (inuse == onA) {
 		//LOG_WARN("set_modeB, but on A.  Call selectB() first.");
 		return modeB;
 	}
@@ -927,7 +929,7 @@ void RIG_FT891::set_bwA(int val)
 {
 	bwA = val;
 
-	if (!rigbase::isOnA()) {
+	if (inuse == onB) {
 		LOG_WARN("set_bwA, but on B.  Call selectA() first.");
 		return;
 	}
@@ -956,7 +958,7 @@ void RIG_FT891::set_bwA(int val)
 int RIG_FT891::get_bwA()
 {
 	size_t p;
-	if (!rigbase::isOnA()) {
+	if (inuse == onB) {
 		//LOG_WARN("get_bwA, but on B.  Call selectA() first.");
 		return bwA;
 	}
@@ -996,7 +998,7 @@ void RIG_FT891::set_bwB(int val)
 {
 	bwB = val;
 
-	if (!rigbase::isOnB()) {
+	if (inuse == onA) {
 		LOG_WARN("set_bwB, but on A.  Call selectB() first.");
 		return;
 	}
@@ -1025,7 +1027,7 @@ void RIG_FT891::set_bwB(int val)
 int RIG_FT891::get_bwB()
 {
 	size_t p;
-	if (!rigbase::isOnB()) {
+	if (inuse == onA) {
 		//LOG_WARN("get_bwB, but on A.  Call selectB() first.");
 		return bwB;
 	}

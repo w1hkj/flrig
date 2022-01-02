@@ -231,6 +231,7 @@ void RIG_TT516::selectA()
 	sendCommand(cmd);
 	inuse = onA;
 	set_bwA(A.iBW);
+	inuse = onA;
 	return;
 }
 
@@ -241,6 +242,7 @@ void RIG_TT516::selectB()
 	sendCommand(cmd);
 	inuse = onB;
 	set_bwB(B.iBW);
+	inuse = onB;
 	return;
 }
 

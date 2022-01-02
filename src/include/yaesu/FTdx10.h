@@ -41,6 +41,8 @@ public:
 	virtual unsigned long int get_vfoB();
 	virtual void set_vfoB(unsigned long int);
 
+	virtual int get_vfoAorB();
+
 	virtual bool twovfos();
 	virtual void selectA();
 	virtual void selectB();

@@ -370,8 +370,6 @@ bool RIG_IC7100::check ()
 
 static int ret = 0;
 
-static bool IC7100onA = true;
-
 void RIG_IC7100::selectA()
 {
 	cmd = pre_to;
@@ -381,7 +379,7 @@ void RIG_IC7100::selectA()
 	set_trace(1, "selectA()");
 	waitFB("select A");
 	seth();
-	IC7100onA = true;
+	inuse = onA;
 }
 
 void RIG_IC7100::selectB()
@@ -393,12 +391,12 @@ void RIG_IC7100::selectB()
 	set_trace(1, "selectB()");
 	waitFB("select B");
 	seth();
-	IC7100onA = false;
+	inuse = onB;
 }
 
 unsigned long int RIG_IC7100::get_vfoA ()
 {
-	if (useB) return A.freq;
+	if (inuse == onB) return A.freq;
 	string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
@@ -435,7 +433,7 @@ void RIG_IC7100::set_vfoA (unsigned long int freq)
 
 unsigned long int RIG_IC7100::get_vfoB ()
 {
-	if (!useB) return B.freq;
+	if (inuse == onA) return B.freq;
 	string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
@@ -1020,7 +1018,7 @@ int RIG_IC7100::get_attenuator()
 
 int RIG_IC7100::next_preamp()
 {
-	if (IC7100onA) {
+	if (inuse == onA) {
 		if (A.freq > 100000000) {
 			if (preamp_level) return 0;
 			return 1;
@@ -1058,8 +1056,8 @@ void RIG_IC7100::set_preamp(int val)
 	cmd += '\x02';
 
 	preamp_level = val;
-	if (IC7100onA && A.freq > 100000000 && val > 1) val = 1;
-	if (!IC7100onA && B.freq > 100000000 && val > 1) val = 1;
+	if (inuse == onA && A.freq > 100000000 && val > 1) val = 1;
+	if (inuse == onB && B.freq > 100000000 && val > 1) val = 1;
 	switch (val) {
 		case 1: 
 			preamp_label("Pre 1", true);
@@ -1295,10 +1293,10 @@ void RIG_IC7100::get_pc_min_max_step(double &min, double &max, double &step)
 
 void RIG_IC7100::set_rf_gain(int val)
 {
-	if (IC7100onA && (A.imode == DV7100 ||
+	if (inuse == onA && (A.imode == DV7100 ||
 		A.imode == FM7100 || A.imode == WFM7100 || A.imode == FMD7100))
 		return;
-	if (!IC7100onA && (A.imode == DV7100 ||
+	if (inuse == onB && (A.imode == DV7100 ||
 		A.imode == FM7100 || A.imode == WFM7100 || A.imode == FMD7100))
 		return;
 
@@ -1313,10 +1311,10 @@ void RIG_IC7100::set_rf_gain(int val)
 
 int RIG_IC7100::get_rf_gain()
 {
-	if (IC7100onA && (A.imode == DV7100 ||
+	if (inuse == onA && (A.imode == DV7100 ||
 		A.imode == FM7100 || A.imode == WFM7100 || A.imode == FMD7100))
 		return progStatus.rfgain;
-	if (!IC7100onA && (A.imode == DV7100 ||
+	if (inuse == onB && (A.imode == DV7100 ||
 		A.imode == FM7100 || A.imode == WFM7100 || A.imode == FMD7100))
 		return progStatus.rfgain;
 
@@ -2045,7 +2043,7 @@ void RIG_IC7100::get_band_selection(int v)
 					break;
 				}
 			}
-			if (useB) {
+			if (inuse == onB) {
 				set_vfoB(bandfreq);
 				set_modeB(bandmode);
 				set_FILT(bandfilter);
@@ -2060,9 +2058,9 @@ void RIG_IC7100::get_band_selection(int v)
 
 void RIG_IC7100::set_band_selection(int v)
 {
-	unsigned long int freq = (useB ? B.freq : A.freq);
-	int fil = (useB ? B.filter : A.filter);
-	int mode = (useB ? B.imode : A.imode);
+	unsigned long int freq = (inuse == onB ? B.freq : A.freq);
+	int fil = (inuse == onB ? B.filter : A.filter);
+	int mode = (inuse == onB ? B.imode : A.imode);
 
 	cmd.assign(pre_to);
 	cmd.append("\x1A\x01");
@@ -2127,7 +2125,7 @@ double RIG_IC7100::getVfoAdj()
 
 int RIG_IC7100::get_FILT(int mode)
 {
-	if (useB) return mode_filterB[mode];
+	if (inuse == onB) return mode_filterB[mode];
 	return mode_filterA[mode];
 }
 
@@ -2136,7 +2134,7 @@ void RIG_IC7100::set_FILT(int filter)
 	if (filter < 1 || filter > 3)
 		return;
 
-	if (useB) {
+	if (inuse == onB) {
 		B.filter = filter;
 		mode_filterB[B.imode] = filter;
 
@@ -2197,7 +2195,7 @@ const char *RIG_IC7100::FILT(int val)
 const char *RIG_IC7100::nextFILT()
 {
 	int val = A.filter;
-	if (useB) val = B.filter;
+	if (inuse == onB) val = B.filter;
 	val++;
 	if (val > 3) val = 1;
 	set_FILT(val);

@@ -317,9 +317,9 @@ void RIG_IC9700::selectA()
 	cmd += '\x07';
 	cmd += '\xD0';
 	cmd.append(post);
-
 	waitFB("select A");
 	set_trace(2, "selectA()", str2hex(replystr.c_str(), replystr.length()));
+	inuse = onA;
 }
 
 void RIG_IC9700::selectB()
@@ -330,6 +330,7 @@ void RIG_IC9700::selectB()
 	cmd.append(post);
 	waitFB("select B");
 	set_trace(2, "selectB()", str2hex(replystr.c_str(), replystr.length()));
+	inuse = onB;
 }
 
 bool RIG_IC9700::check ()
@@ -353,7 +354,7 @@ unsigned long int RIG_IC9700::get_vfoA ()
 	cmd.assign(pre_to).append("\x25");
 	resp.assign(pre_fm).append("\x25");
 
-	if (useB) {
+	if (inuse == onB) {
 		cmd  += '\x01';
 		resp += '\x01';
 	} else {
@@ -385,7 +386,7 @@ void RIG_IC9700::set_vfoA (unsigned long int freq)
 	A.freq = freq;
 
 	cmd.assign(pre_to).append("\x25");
-	if (useB) cmd += '\x01';
+	if (inuse == onB) cmd += '\x01';
 	else      cmd += '\x00';
 
 	cmd.append( to_bcd_be( freq, 10) );
@@ -403,7 +404,7 @@ unsigned long int RIG_IC9700::get_vfoB ()
 	cmd.assign(pre_to).append("\x25");
 	resp.assign(pre_fm).append("\x25");
 
-	if (useB) {
+	if (inuse == onB) {
 		cmd  += '\x00';
 		resp += '\x00';
 	} else {
@@ -435,7 +436,7 @@ void RIG_IC9700::set_vfoB (unsigned long int freq)
 	B.freq = freq;
 
 	cmd.assign(pre_to).append("\x25");
-	if (useB) cmd += '\x00';
+	if (inuse == onB) cmd += '\x00';
 	else      cmd += '\x01';
 
 	cmd.append( to_bcd_be( freq, 10 ) );
@@ -1803,7 +1804,7 @@ void RIG_IC9700::get_band_selection(int v)
 			if ((bandmode == 1) && banddata) bandmode = 10;
 			if ((bandmode == 2) && banddata) bandmode = 11;
 			if ((bandmode == 3) && banddata) bandmode = 12;
-			if (useB) {
+			if (inuse == onB) {
 				set_vfoB(bandfreq);
 				set_modeB(bandmode);
 				set_FILT(bandfilter);
@@ -1819,8 +1820,8 @@ void RIG_IC9700::get_band_selection(int v)
 
 void RIG_IC9700::set_band_selection(int v)
 {
-	unsigned long int freq = (useB ? B.freq : A.freq);
-	int mode = (useB ? B.imode : A.imode);
+	unsigned long int freq = (inuse == onB ? B.freq : A.freq);
+	int mode = (inuse == onB ? B.imode : A.imode);
 
 	cmd.assign(pre_to);
 	cmd.append("\x1A\x01");

@@ -128,10 +128,10 @@ static void freq_mode_bw()
 	static char szval[20];
 
 	snprintf(szval, sizeof(szval), "%d", freq);
-	tempfreq.assign("F").append(useB ? "B:" : "A:").append(szval).append("\n");
+	tempfreq.assign("F").append((selrig->inuse == onB) ? "B:" : "A:").append(szval).append("\n");
 
-	BW = useB ? vfoB.iBW : vfoA.iBW;
-	mode = useB ? vfoB.imode : vfoA.imode;
+	BW = (selrig->inuse == onB) ? vfoB.iBW : vfoA.iBW;
+	mode = (selrig->inuse == onB) ? vfoB.imode : vfoA.imode;
 	const char **bwt = selrig->bwtable(mode);
 	const char **dsplo = selrig->lotable(mode);
 	const char **dsphi = selrig->hitable(mode);
@@ -347,7 +347,7 @@ public:
 			if (progStatus.split && PTT) freq = vfoB.freq;
 			else freq = vfoA.freq;
 		} else {
-			if (useB)
+			if (selrig->inuse == onB)
 				freq = vfoB.freq;
 			else
 				freq = vfoA.freq;
@@ -439,8 +439,8 @@ public:
 
 		wait();
 		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_AB");
-		xml_trace(2, "rig_get_AB: " , (useB ? "B" : "A"));
-		result = useB ? "B" : "A";
+		xml_trace(2, "rig_get_AB: " , ((selrig->inuse == onB) ? "B" : "A"));
+		result = (selrig->inuse == onB) ? "B" : "A";
 	}
 
 	std::string help() { return std::string("returns vfo in use A or B"); }
@@ -919,7 +919,7 @@ public:
 
 		std::string result_string = "none";
 		if (selrig->modes_) result_string = selrig->modes_[mode];
-		xml_trace(2, "mode on ", (useB ? "B " : "A "), result_string.c_str());
+		xml_trace(2, "mode on ", ((selrig->inuse == onB) ? "B " : "A "), result_string.c_str());
 		result = result_string;
 
 	}
@@ -1012,7 +1012,7 @@ public :
 		wait();
 		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_bws");
 
-		int mode = useB ? vfoB.imode : vfoA.imode;
+		int mode = (selrig->inuse == onB) ? vfoB.imode : vfoA.imode;
 		const char **bwt = selrig->bwtable(mode);
 		const char **dsplo = selrig->lotable(mode);
 		const char **dsphi = selrig->hitable(mode);
@@ -1074,8 +1074,8 @@ public:
 		wait();
 		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_bw");
 
-		int BW = useB ? vfoB.iBW : vfoA.iBW;
-		int mode = useB ? vfoB.imode : vfoA.imode;
+		int BW = (selrig->inuse == onB) ? vfoB.iBW : vfoA.iBW;
+		int mode = (selrig->inuse == onB) ? vfoB.imode : vfoA.imode;
 
 		const char **bwt = selrig->bwtable(mode);
 		const char **dsplo = selrig->lotable(mode);
@@ -1108,7 +1108,7 @@ public:
 			if (dsphi) result[1] = dsphi[SH];
 		}
 		std::string s1 = result[0], s2 = result[1];
-		xml_trace( 5, "bandwidth on ", (useB ? "B " : "A "), s1.c_str(), " | ", s2.c_str());
+		xml_trace( 5, "bandwidth on ", ((selrig->inuse == onB) ? "B " : "A "), s1.c_str(), " | ", s2.c_str());
 	}
 
 	std::string help() { return std::string("returns current bw L/U value"); }
@@ -1823,7 +1823,7 @@ public:
 
 		guard_lock serial(&mutex_serial);
 
-		if (!selrig->can_change_alt_vfo  && useB) {
+		if (!selrig->can_change_alt_vfo  && (selrig->inuse == onB)) {
 			selrig->selectA();
 			vfoA.freq = freq;
 			selrig->set_vfoA(vfoA.freq);
@@ -1853,7 +1853,7 @@ public:
 
 		guard_lock serial(&mutex_serial);
 
-		if (!selrig->can_change_alt_vfo  && useB) {
+		if (!selrig->can_change_alt_vfo  && (selrig->inuse == onB)) {
 			selrig->selectA();
 			selrig->set_vfoA(freq);
 			vfoA.freq = selrig->get_vfoA();
@@ -1882,7 +1882,7 @@ public:
 
 		guard_lock serial(&mutex_serial);
 
-		if (!selrig->can_change_alt_vfo  && useB) {
+		if (!selrig->can_change_alt_vfo  && (selrig->inuse == onB)) {
 			selrig->selectA();
 			vfoA.freq = freq;
 			selrig->set_vfoA(vfoA.freq);
@@ -1911,7 +1911,7 @@ public:
 
 		guard_lock serial(&mutex_serial);
 
-		if (!selrig->can_change_alt_vfo  && useB) {
+		if (!selrig->can_change_alt_vfo  && (selrig->inuse == onB)) {
 			selrig->selectA();
 			vfoA.freq += freq;
 			selrig->set_vfoA(vfoA.freq);
@@ -1945,7 +1945,7 @@ public:
 
 		guard_lock serial(&mutex_serial);
 
-		if (!selrig->can_change_alt_vfo  && !useB) {
+		if (!selrig->can_change_alt_vfo  && (selrig->inuse == onA)) {
 			selrig->selectB();
 			selrig->set_vfoB(freq);
 			vfoB.freq = freq;
@@ -1974,7 +1974,7 @@ public:
 
 		guard_lock serial(&mutex_serial);
 
-		if (!selrig->can_change_alt_vfo  && !useB) {
+		if (!selrig->can_change_alt_vfo  && (selrig->inuse == onA)) {
 			selrig->selectB();
 			selrig->set_vfoB(freq);
 			vfoB.freq = selrig->get_vfoB();
@@ -2003,7 +2003,7 @@ public:
 
 		guard_lock serial(&mutex_serial);
 
-		if (!selrig->can_change_alt_vfo  && !useB) {
+		if (!selrig->can_change_alt_vfo  && (selrig->inuse == onA)) {
 			selrig->selectB();
 			selrig->set_vfoB(freq);
 			vfoB.freq = freq;
@@ -2032,7 +2032,7 @@ public:
 
 		guard_lock serial(&mutex_serial);
 
-		if (!selrig->can_change_alt_vfo  && !useB) {
+		if (!selrig->can_change_alt_vfo  && (selrig->inuse == onA)) {
 			selrig->selectB();
 			selrig->set_vfoB(vfoB.freq);
 			vfoB.freq += freq;
@@ -2146,7 +2146,7 @@ public:
 		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
 
 		guard_lock serial(&mutex_serial);
-		if (useB) {
+		if (selrig->inuse == onB) {
 			selrig->set_vfoB(freq);
 			vfoB.freq = freq;
 			Fl::awake(setFreqDispB, (void *)vfoB.freq);
@@ -2173,7 +2173,7 @@ public:
 		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
 
 		guard_lock serial(&mutex_serial);
-		if (useB) {
+		if (selrig->inuse == onB) {
 			selrig->set_vfoB(freq);
 			vfoB.freq = selrig->get_vfoB();
 			Fl::awake(setFreqDispB, (void *)vfoB.freq);
@@ -2201,7 +2201,7 @@ public:
 		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
 
 		guard_lock serial(&mutex_serial);
-		if (useB) {
+		if (selrig->inuse == onB) {
 			selrig->set_vfoB(freq);
 			vfoB.freq = freq;
 			Fl::awake(setFreqDispB, (void *)vfoB.freq);
@@ -2228,7 +2228,7 @@ public:
 		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
 
 		guard_lock serial(&mutex_serial);
-		if (useB) {
+		if (selrig->inuse == onB) {
 			selrig->set_vfoB(freq);
 			vfoB.freq = freq;
 			Fl::awake(setFreqDispB, (void *)vfoB.freq);
@@ -2256,7 +2256,7 @@ public:
 		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
 
 		guard_lock serial(&mutex_serial);
-		if (useB) {
+		if (selrig->inuse == onB) {
 			selrig->set_vfoB(freq);
 			vfoB.freq = selrig->get_vfoB();
 			Fl::awake(setFreqDispB, (void *)vfoB.freq);
@@ -2304,7 +2304,7 @@ public:
 				nuvals.imode = i;
 				nuvals.iBW = selrig->def_bandwidth(i);
 				guard_lock serial_lock(&mutex_serial);
-				if (useB) {
+				if (selrig->inuse == onB) {
 					serviceB(nuvals);
 				} else {
 					serviceA(nuvals);
@@ -2349,7 +2349,7 @@ public:
 				nuvals.imode = i;
 				nuvals.iBW = selrig->def_bandwidth(i);
 				guard_lock serial_lock(&mutex_serial);
-				if (useB) {
+				if (selrig->inuse == onB) {
 					serviceB(nuvals);
 					result = (i == selrig->get_modeB());
 				} else {
@@ -2573,7 +2573,7 @@ public:
 
 		XCVR_STATE nuvals;
 		nuvals.iBW = i;
-		if (useB) {
+		if (selrig->inuse == onB) {
 			nuvals.freq = vfoB.freq;
 			nuvals.imode = vfoB.imode;
 			serviceB(nuvals);
@@ -2616,7 +2616,7 @@ public:
 		XCVR_STATE nuvals;
 		int retbw;
 		nuvals.iBW = i;
-		if (useB) {
+		if (selrig->inuse == onB) {
 			nuvals.freq = vfoB.freq;
 			nuvals.imode = vfoB.imode;
 			serviceB(nuvals);
@@ -2649,7 +2649,7 @@ public:
 		guard_lock que_lock ( &mutex_srvc_reqs, "xml rig_set_bw" );
 		XCVR_STATE nuvals;
 		nuvals.iBW = bw;
-		if (useB) {
+		if (selrig->inuse == onB) {
 			nuvals.freq = vfoB.freq;
 			nuvals.imode = vfoB.imode;
 			serviceB(nuvals);
@@ -2681,7 +2681,7 @@ public:
 		XCVR_STATE nuvals;
 		int retbw;
 		nuvals.iBW = bw;
-		if (useB) {
+		if (selrig->inuse == onB) {
 			nuvals.freq = vfoB.freq;
 			nuvals.imode = vfoB.imode;
 			serviceB(nuvals);
@@ -2720,7 +2720,7 @@ public:
 			return;
 		}
 		XCVR_STATE nuvals;
-		if (useB) {
+		if (selrig->inuse == onB) {
 			nuvals.freq = vfoB.freq;
 			nuvals.imode = vfoB.imode;
 			nuvals.iBW = bw;
@@ -2763,7 +2763,7 @@ public:
 		XCVR_STATE nuvals;
 		int retbw;
 		nuvals.iBW = bw;
-		if (useB) {
+		if (selrig->inuse == onB) {
 			nuvals.freq = vfoB.freq;
 			nuvals.imode = vfoB.imode;
 			serviceB(nuvals);
@@ -2797,7 +2797,7 @@ public:
 
 		guard_lock lock(&mutex_srvc_reqs, "xml rig_mod_bandwidth");
 
-		if (useB) {
+		if (selrig->inuse == onB) {
 			nuvals.freq  = vfoB.freq;
 			nuvals.imode = vfoB.imode;
 			nuvals.iBW   = vfoB.iBW;
@@ -2829,7 +2829,7 @@ public:
 		xml_trace(2,"Set to ", s.str().c_str());
 
 		nuvals.iBW = i;
-		if (useB) {
+		if (selrig->inuse == onB) {
 			serviceB(nuvals);
 		} else {
 			serviceA(nuvals);

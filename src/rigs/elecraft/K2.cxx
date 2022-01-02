@@ -194,7 +194,7 @@ bool RIG_K2::get_info()
 	if (ret < 38) return false;
 	size_t p = replystr.find(rsp);
 	ptt_ = (replystr[p+28] == '1');
-	useB = (replystr[p+30] == '1');
+	inuse = (replystr[p+30] == '1') ? onB : onA;
 	K2split = replystr[p+32]-'0';
 	return true;
 }
@@ -208,6 +208,7 @@ void RIG_K2::selectA()
 
 	K2split = false;
 	showresp(WARN, ASC, "select A", cmd, replystr);
+	inuse = onA;
 }
 
 void RIG_K2::selectB()
@@ -219,6 +220,7 @@ void RIG_K2::selectB()
 
 	K2split = false;
 	showresp(WARN, ASC, "select B", cmd, replystr);
+	inuse = onB;
 }
 
 bool RIG_K2::can_split()
@@ -229,7 +231,7 @@ bool RIG_K2::can_split()
 void RIG_K2::set_split(bool val)
 {
 	if (val) {
-		if (useB)
+		if (inuse == onB)
 			cmd = "FR1;FT0;";
 		else
 			cmd = "FR0;FT1;";
@@ -238,7 +240,7 @@ void RIG_K2::set_split(bool val)
 		sett("");
 		showresp(WARN, ASC, "set split ON", cmd, replystr);
 	} else {
-		if (useB)
+		if (inuse == onB)
 			cmd = "FR1;FT1;";
 		else
 			cmd = "FR0;FT0;";

@@ -350,6 +350,7 @@ void RIG_TS940S::selectA()
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select VFO A", cmd, "");
 	set_trace(2, "selectA()", replystr.c_str());
+	inuse = onA;
 }
 
 void RIG_TS940S::selectB()
@@ -359,4 +360,5 @@ void RIG_TS940S::selectB()
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select VFO B", cmd, "");
 	set_trace(2, "selectB()", replystr.c_str());
+	inuse = onB;
 }

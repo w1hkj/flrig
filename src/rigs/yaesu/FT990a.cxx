@@ -22,31 +22,38 @@
 #include "rig.h"
 
 static const char FT990Aname_[] = "FT-990A";
+
+enum {
+FT990A_LSB, FT990A_USB, FT990A_CW1, FT990A_CW2,
+FT990A_AM1, FT990A_AM2, FT990A_FM1, FT990A_FM2,
+FT990A_TTYL, FT990A_TTYU, FT990A_PKTL, FT990A_PKTU
+};
+
 static const char *FT990Amodes_[] =
 { "LSB", "USB", "CW2.4", "CW500",
-  "AM2.4", "FM",
+  "AM6.0", "AM2.4", "FM(1)", "FM(2)",
   "RTTY(L)", "RTTY(U)", "PKT(L)", "PKT(FM)", NULL};
 
 static const int FT990A_def_bw[] = {
 0, 0, 0, 2,
-0, 0, 
+4, 0, 0, 0,
 0, 0, 0, 0 };
 
 static const int FT990A_mode_val[] = {
 0, 1, 2, 3,
-4, 5, 6,
+4, 5, 6, 7,
 8, 9, 10, 11 };
 
 static const char FT990A_mode_type[] = {
 'L', 'U', 'L', 'L',
-'U', 'U',
+'U', 'U', 'U', 'U',
 'L', 'U', 'L', 'U' };
 
 static const char *FT990Awidths_[] =
 { "2400", "2000", "500", "250", NULL};
 
 static int FT990A_bw_vals[] = {
-1,2,3,4,WVALS_LIMIT};
+0,1,2,3,WVALS_LIMIT};
 
 static const int FT990A_bw_val[] =
 { 0, 1, 2, 3 };
@@ -84,7 +91,8 @@ RIG_FT990A::RIG_FT990A() {
 	has_swr_control =
 	has_mode_control =
 	has_bandwidth_control =
-	has_ptt_control = true;
+	has_ptt_control =
+	has_tune_control = true;
 
 }
 
@@ -116,6 +124,8 @@ void RIG_FT990A::selectA()
 	cmd[4] = 0x05;
 	sendCommand(cmd);
 	showresp(WARN, HEX, "select A", cmd, "");
+	setthex("select A");
+	inuse = onA;
 }
 
 void RIG_FT990A::selectB()
@@ -125,6 +135,8 @@ void RIG_FT990A::selectB()
 	cmd[4] = 0x05;
 	sendCommand(cmd);
 	showresp(WARN, HEX, "select B", cmd, "");
+	setthex("select B");
+	inuse = onB;
 }
 
 void RIG_FT990A::set_split(bool val)
@@ -145,48 +157,87 @@ bool RIG_FT990A::check()
 	init_cmd();
 	cmd[3] = 0x00;
 	cmd[4] = 0xFA;
-	int ret = waitN(5, 100, "check");
+	int ret = waitN(5, 100, "check", HEX);
 	if (ret >= 5) return true;
 	return false;
 }
 
-bool RIG_FT990A::get_info()
+int  RIG_FT990A::get_vfoAorB()
 {
-	bool memmode = false, vfobmode = false;
-	int pfreq, pmode, pbw;
+	bool memmode = false;
+	int  vfobmode = onA;
 	init_cmd();
 	cmd[3] = 0x00;
 	cmd[4] = 0xFA;
-	int ret = waitN(5, 100, "Read flags");
+	int ret = waitN(5, 100, "Read flags", HEX);
+	getthex("read flags");
 
 	if (ret >= 5) {
 		size_t p = ret - 5;
 		memmode = ((replystr[p+1] & 0x10) == 0x10);
-		vfobmode = ((replystr[p] & 0x02) == 0x02);
-		if (memmode) return false;
-		if (vfobmode && !useB) {
-			useB = true;
-			Fl::awake(highlight_vfo, (void *)0);
-		} else if (!vfobmode && useB) {
-			useB = false;
-			Fl::awake(highlight_vfo, (void *)0);
-		}
+		vfobmode = ((replystr[p] & 0x02) == 0x02) ? onB : onA;
+
+		if (memmode)
+			return inuse;
+
+		inuse = vfobmode;
 	}
+	return inuse;
+}
+
+bool RIG_FT990A::get_info()
+{
+	int pmode, pbw;
 
 	init_cmd();
-	cmd[4] = 0x10; // update info
-	cmd[0] = 0x02; // 1 16 byte sequences for current VFO / MEM
-	ret = waitN(16, 100, "Read info");
+	cmd[3] = 0x03;  // read 32 bytes of data for status of both vfos
+	cmd[4] = 0x10;
+	int ret = waitN(32, 100, "get info", ASC);
+	getthex("Get info");
 
-	if (ret >= 16) {
-		size_t p = ret - 16;
-		// current VFO / MEM
-		pfreq = 0;
-		for (size_t n = 1; n < 5; n++)
-			pfreq = pfreq * 256 + (unsigned char)replystr[p + n];
-		pfreq = pfreq * 1.25; // 100D resolution is 1.25 Hz / bit for read
+	if (ret >= 32) {
+		size_t da = ret - 32;
+		size_t db = ret - 16;
 
-		int rmode = replystr[p + 7] & 0x07;
+		// vfo A data string
+		A.freq = (replystr[da + 1] & 0xFF);
+		A.freq <<= 8;
+		A.freq += (replystr[da + 2]) & 0xFF;
+		A.freq <<= 8;
+		A.freq += (replystr[da + 3] & 0xFF);
+		A.freq *= 10;
+
+		int rmode = replystr[da + 7] & 0x07;
+		switch (rmode) {
+			case 0 : pmode = 0; break; // LSB
+			case 1 : pmode = 1; break; // USB
+			case 2 : pmode = 2; break; // CW
+			case 3 : pmode = 5; break; // AM
+			case 4 : pmode = 6; break; // FM
+			case 5 : pmode = 8; break; // RTTY
+			case 6 : pmode = 9; break; // PKT
+			default : pmode = 1; break;
+		}
+		int rpbw = replystr[da + 8];
+		pbw = rpbw & 0x05;
+		if (pbw > 4) pbw = 4;
+		if ((rpbw & 0x80) == 0x80) {
+			if (pmode == 10) pmode = 11;
+			if (pmode == 8) pmode = 9;
+		}
+		if (pmode == 6) pbw = 0;
+		A.imode = pmode;
+		A.iBW = pbw;
+
+		// vfo B data string
+		B.freq = (replystr[db + 1] & 0xFF);
+		B.freq <<= 8;
+		B.freq += (replystr[db + 2]) & 0xFF;
+		B.freq <<= 8;
+		B.freq += (replystr[db + 3] & 0xFF);
+		B.freq *= 10;
+
+		rmode = replystr[db + 7] & 0x07;
 		switch (rmode) {
 			case 0 : pmode = 0; break; // LSB
 			case 1 : pmode = 1; break; // USB
@@ -198,7 +249,7 @@ bool RIG_FT990A::get_info()
 			default : pmode = 1; break;
 		}
 
-		int rpbw = replystr[p + 8];
+		rpbw = replystr[db + 8];
 		pbw = rpbw & 0x05;
 		if (pbw > 4) pbw = 4;
 		if ((rpbw & 0x80) == 0x80) {
@@ -206,12 +257,9 @@ bool RIG_FT990A::get_info()
 			if (pmode == 8) pmode = 9;
 		}
 		if (pmode == 6) pbw = 0;
-		if (useB) {
-			B.freq = pfreq; B.imode = pmode; B.iBW = pbw;
-		} else {
-			A.freq = pfreq; A.imode = pmode; A.iBW = pbw;
-		}
-LOG_WARN("Vfo %c = %d, BW %s", vfobmode ? 'B' : 'A', pfreq, FT990Awidths_[pbw]);
+		B.imode = pmode;
+		B.iBW = pbw;
+
 		return true;
 	}
 	return false;
@@ -224,12 +272,18 @@ unsigned long int RIG_FT990A::get_vfoA ()
 
 void RIG_FT990A::set_vfoA (unsigned long int freq)
 {
+	int current_vfo = inuse;
+	if (current_vfo == onB) selectA();
+
 	A.freq = freq;
 	freq /=10;
 	cmd = to_bcd_be(freq, 8);
 	cmd += 0x0A;
 	sendCommand(cmd);
-	showresp(WARN, HEX, "set freq A", cmd, "");
+	showresp(WARN, HEX, "set freq A", cmd, replystr);
+	setthex("Set freq A");
+
+	if (current_vfo == onB) selectB();
 }
 
 int RIG_FT990A::get_modeA()
@@ -239,22 +293,34 @@ int RIG_FT990A::get_modeA()
 
 void RIG_FT990A::set_modeA(int val)
 {
+	int current_vfo = inuse;
+	if (current_vfo == onB) selectA();
+
 	A.imode = val;
 	init_cmd();
 	cmd[3] = FT990A_mode_val[val];
 	cmd[4] = 0x0C;
 	sendCommand(cmd);
 	showresp(WARN, HEX, "set mode A", cmd, "");
+	setthex("set mode A");
+
+	if (current_vfo == onB) selectB();
 }
 
 void RIG_FT990A::set_bwA (int val)
 {
+	int current_vfo = inuse;
+	if (current_vfo == onB) selectA();
+
 	A.iBW = val;
 	init_cmd();
 	cmd[3] = FT990A_bw_val[val];
 	cmd[4] = 0x8C;
 	sendCommand(cmd);
 	showresp(WARN, HEX, "set BW A", cmd, "");
+	setthex("set BW A");
+
+	if (current_vfo == onB) selectB();
 }
 
 
@@ -270,22 +336,34 @@ unsigned long int RIG_FT990A::get_vfoB()
 
 void RIG_FT990A::set_vfoB(unsigned long int freq)
 {
+	int current_vfo = inuse;
+	if (current_vfo == onA) selectB();
+
 	B.freq = freq;
 	freq /=10;
 	cmd = to_bcd_be(freq, 8);
 	cmd += 0x0A;
 	sendCommand(cmd);
-	showresp(WARN, HEX, "set freq B", cmd, "");
+//	showresp(WARN, HEX, "set freq B", cmd, replystr);
+	setthex("Set freq B");
+
+	if (current_vfo == onA) selectA();
 }
 
 void RIG_FT990A::set_modeB(int val)
 {
+	int current_vfo = inuse;
+	if (current_vfo == onA) selectB();
+
 	B.imode = val;
 	init_cmd();
 	cmd[3] = FT990A_mode_val[val];
 	cmd[4] = 0x0C;
 	sendCommand(cmd);
 	showresp(WARN, HEX, "set mode B", cmd, "");
+	setthex("set mode B");
+
+	if (current_vfo == onA) selectA();
 }
 
 int  RIG_FT990A::get_modeB()
@@ -295,12 +373,18 @@ int  RIG_FT990A::get_modeB()
 
 void RIG_FT990A::set_bwB(int val)
 {
+	int current_vfo = inuse;
+	if (current_vfo == onA) selectB();
+
 	B.iBW = val;
 	init_cmd();
 	cmd[3] = FT990A_bw_val[val];
 	cmd[4] = 0x8C;
 	sendCommand(cmd);
 	showresp(WARN, HEX, "set bw B", cmd, "");
+	setthex("set BW B");
+
+	if (current_vfo == onA) selectA();
 }
 
 int  RIG_FT990A::get_bwB()
@@ -327,18 +411,33 @@ void RIG_FT990A::set_PTT_control(int val)
 	ptt_ = val;
 }
 
-int RIG_FT990A::get_smeter()
+void RIG_FT990A::tune_rig(int)
 {
 	init_cmd();
+	cmd[4] = 0x82; // initiate tuner cycle
+	sendCommand(cmd,0);
+	setthex("Tune xcvr");
+}
+
+int RIG_FT990A::get_smeter()
+{
+	float val = 0;
+	init_cmd();
+	//cmd[0] = 0x00;
 	cmd[4] = 0xF7;
-	int ret = waitN(5, 100, "S-meter");
+	int ret = waitN(5, 100, "get smeter", HEX);
 	if (ret < 5) return 0;
-	int sval = (unsigned char)replystr[0];
-	if (sval < 90) sval = 90;
-	if (sval > 200) sval = 200;
-	if (sval < 120) sval = 250 - 5 * sval / 3;
-	else sval = 125 - 5 * sval / 8;
-	return sval;
+
+	val = (unsigned char)(replystr[ret-5]);
+	if (val <= 15) val = 5;
+	else if (val <=154) val = 5 + 80 * (val - 15) / (154 - 15);
+	else val = 50 + 50 * (val - 154.0) / (255.0 - 154.0);
+
+	char szmeter[5];
+	snprintf(szmeter, sizeof(szmeter), "%d", (int)val);
+	get_trace(3, "Smeter", str2hex(replystr.c_str(), 1), szmeter);
+
+	return (int)val;
 }
 
 int RIG_FT990A::get_swr()

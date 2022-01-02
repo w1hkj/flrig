@@ -82,9 +82,6 @@ enum {VOL, MIC, PWR, SQL, IFSH, NOTCH, RFGAIN, NR, NB };
 
 queue<VFOQUEUE> srvc_reqs;
 
-bool useB = false;
-bool changed_vfo = false;
-
 const char **old_bws = NULL;
 
 // Add alpha-tag to XCVR_STATE;
@@ -271,31 +268,22 @@ void read_info()
 	selrig->get_info();
 }
 
-/*
 void update_vfoAorB(void *d)
 {
-	if (xcvr_name == rig_FT817.name_ || 
-		xcvr_name == rig_FT817BB.name_ ||
-		xcvr_name == rig_FT818ND.name_ ||
-		xcvr_name == rig_FT857D.name_ ||
-		xcvr_name == rig_FT897D.name_ ) {
-		trace(1,"FT8xxx, update_vfoAorB()");
-		if (useB) {
-			vfoB.src = RIG;
-			vfoB.freq = selrig->get_vfoB();
-			vfoB.imode = selrig->get_modeB();
-			vfoB.iBW = selrig->get_bwB();
-		} else {
-			vfoA.src = RIG;
-			vfoA.freq = selrig->get_vfoA();
-			vfoA.imode = selrig->get_modeA();
-			vfoA.iBW = selrig->get_bwA();
-		}
-		return;
+	trace(1,"update_vfoAorB()");
+	if (selrig->inuse == onB) {
+		vfoB.src = RIG;
+		vfoB.freq = selrig->get_vfoB();
+		vfoB.imode = selrig->get_modeB();
+		vfoB.iBW = selrig->get_bwB();
+	} else {
+		vfoA.src = RIG;
+		vfoA.freq = selrig->get_vfoA();
+		vfoA.imode = selrig->get_modeA();
+		vfoA.iBW = selrig->get_bwA();
 	}
 	updateUI((void*)0);
 }
-*/
 
 void read_vfo()
 {
@@ -309,16 +297,6 @@ void read_vfo()
 //		return;
 //	}
 
-//	read_vfoAorB();
-/*
-	if (selrig->has_getvfoAorB) {
-		int val = selrig->get_vfoAorB();
-		if (val != useB) {
-			useB = val;
-			Fl::awake(update_vfoAorB, reinterpret_cast<void*>(val));
-		}
-	}
-*/
 // transceiver changed ?
 	trace(1,"read_vfo()");
 	unsigned long int  freq;
@@ -330,7 +308,7 @@ void read_vfo()
 	if (selrig->has_get_info)
 		selrig->get_info();
 
-	if (!useB) { // vfo-A
+	if (selrig->inuse == onA) { // vfo-A
 		trace(2, "vfoA active", "get vfo A");
 		freq = selrig->get_vfoA();
 		if (freq != vfoA.freq) {
@@ -346,7 +324,6 @@ void read_vfo()
 				Fl::awake(setFreqDispB, (void *)vfoB.freq);
 			}
 		}
-
 	} else { // vfo-B
 		trace(2, "vfoB active", "get vfo B");
 		freq = selrig->get_vfoB();
@@ -414,12 +391,12 @@ void setModeControl(void *)
 void setFILTER(void *)
 {
 	if (selrig->has_FILTER) {
-		if (useB)
+		if (selrig->inuse == onB)
 			btnFILT->label(selrig->FILT(vfoB.filter));
 		else
 			btnFILT->label(selrig->FILT(vfoA.filter));
 		btnFILT->redraw_label();
-trace(3, "Filter", (useB ? "B" : "A"), btnFILT->label());
+trace(3, "Filter", (selrig->inuse == onB ? "B" : "A"), btnFILT->label());
 	}
 }
 
@@ -437,7 +414,7 @@ void read_mode()
 
 	int nu_mode;
 	int nu_BW;
-	if (!useB) {
+	if (selrig->inuse == onA) {
 		trace(2, "read_mode", "vfoA active");
 		nu_mode = selrig->get_modeA();
 		vfoA.filter = selrig->get_FILT(nu_mode);
@@ -536,7 +513,7 @@ void read_bandwidth()
 
 	trace(1,"read_bandwidth()");
 	int nu_BW;
-	if (!useB) {
+	if (selrig->inuse == onA) {
 		trace(2, "vfoA active", "get_bwA()");
 		nu_BW = selrig->get_bwA();
 		if (nu_BW != vfoA.iBW) {
@@ -763,19 +740,15 @@ void update_split(void *d)
 		xcvr_name == rig_TS2000.name_ || xcvr_name == rig_TS990.name_) {
 		switch (progStatus.split) {
 			case 0: btnSplit->value(0);
-					useB = false;
 					highlight_vfo(NULL);
 					break;
 			case 1: btnSplit->value(1);
-					useB = false;
 					highlight_vfo(NULL);
 					break;
 			case 2:	btnSplit->value(1);
-					useB = true;
 					highlight_vfo(NULL);
 					break;
 			case 3: btnSplit->value(0);
-					useB = true;
 					highlight_vfo(NULL);
 					break;
 		}
@@ -1195,9 +1168,9 @@ POLL_PAIR RX_poll_pairs[] = {
 	{NULL, NULL}
 };
 // moved to main polling loop
+//	{&progStatus.poll_vfoAorB, read_vfoAorB},
 //	{&progStatus.poll_ptt, check_ptt},
 //	{&progStatus.poll_smeter, read_smeter},
-//	{&progStatus.poll_vfoAorB, read_vfoAorB},
 //	{&progStatus.poll_frequency, read_vfo},
 
 POLL_PAIR TX_poll_pairs[] = {
@@ -1262,7 +1235,7 @@ void serviceQUE()
 		}
 
 		if (nuvals.change == ON || nuvals.change == OFF) { // PTT processing
-			if (selrig->ICOMmainsub && useB) {  // disallowed operation
+			if (selrig->ICOMmainsub && selrig->inuse == onB) {  // disallowed operation
 				Fl::awake(update_UI_PTT);
 				return;
 			}
@@ -1295,7 +1268,7 @@ void serviceQUE()
 
 		switch (nuvals.change) {
 			case vX:
-				if (useB)
+				if (selrig->inuse == onB)
 					serviceB(nuvals.vfo);
 				else
 					serviceA(nuvals.vfo);
@@ -1308,7 +1281,6 @@ void serviceQUE()
 				break;
 			case sA: // select A
 			{
-				useB = false;
 				selrig->selectA();
 				vfo = &vfoA;
 				if (selrig->name_ == rig_FT891.name_) {
@@ -1322,7 +1294,6 @@ void serviceQUE()
 				break;
 			case sB: // select B
 			{
-				useB = true;
 				selrig->selectB();
 				vfo = &vfoB;
 				if (selrig->name_ == rig_FT891.name_) {
@@ -1346,7 +1317,6 @@ void serviceQUE()
 					progStatus.split = on;
 					Fl::awake(update_split, (void *)0);
 					if (selrig->ICOMmainsub) {
-						useB = false;
 						selrig->selectA();
 						vfo = &vfoA;
 					}
@@ -1375,7 +1345,7 @@ void serviceQUE()
 				break;
 			default:
 				trace(2, "default ", printXCVR_STATE(nuvals.vfo).c_str());
-				if (useB) serviceB(nuvals.vfo);
+				if (selrig->inuse == onB) serviceB(nuvals.vfo);
 				else serviceA(nuvals.vfo);
 				break;
 		}
@@ -1416,11 +1386,12 @@ void find_bandwidth(XCVR_STATE &nuvals)
 
 void serviceA(XCVR_STATE nuvals)
 {
+	bool A_changed;
 	if (nuvals.freq == 0) nuvals.freq = vfoA.freq;
 	if (nuvals.imode == -1) nuvals.imode = vfoA.imode;
 	if (nuvals.iBW == 255) nuvals.iBW = vfoA.iBW;
 
-	if (useB) {
+	if (selrig->inuse == onB) {
 		if (selrig->can_change_alt_vfo) {
 			trace(2, "B active, set alt vfo A", printXCVR_STATE(nuvals).c_str());
 			rig_trace(2, "B active, set alt vfo A", printXCVR_STATE(nuvals).c_str());
@@ -1437,35 +1408,39 @@ void serviceA(XCVR_STATE nuvals)
 			if (vfoA.iBW != nuvals.iBW) {
 				selrig->set_bwA(nuvals.iBW);
 				selrig->get_bwA();
+				A_changed = true;
 			}
 			if (vfoA.freq != nuvals.freq) {
 				selrig->set_vfoA(nuvals.freq);
 				selrig->get_vfoA();
+				A_changed = true;
 			}
 			vfoA = nuvals;
 		} else if (xcvr_name != rig_TT550.name_) {
 			trace(2, "B active, set vfo A", printXCVR_STATE(nuvals).c_str());
 			rig_trace(2, "B active, set vfo A", printXCVR_STATE(nuvals).c_str());
-			useB = false;
 			selrig->selectA();
 			if (vfoA.imode != nuvals.imode) {
 				selrig->set_modeA(nuvals.imode);
 				selrig->get_modeA();
-				Fl::awake(updateUI);
+				A_changed = true;
+//				Fl::awake(updateUI);
 			}
 			if (vfoA.iBW != nuvals.iBW) {
 				selrig->set_bwA(nuvals.iBW);
 				selrig->get_bwA();
+				A_changed = true;
 			}
 			if (vfoA.freq != nuvals.freq) {
 				selrig->set_vfoA(nuvals.freq);
 				selrig->get_vfoA();
+				A_changed = true;
 			}
-			useB = true;
 			selrig->selectB();
 			vfoA = nuvals;
 		}
-		Fl::awake(setFreqDispA, (void *)nuvals.freq);
+		if (A_changed)
+			Fl::awake(setFreqDispA);
 		return;
 	}
 
@@ -1495,24 +1470,28 @@ void serviceA(XCVR_STATE nuvals)
 	if (vfoA.iBW != nuvals.iBW) {
 		selrig->set_bwA(vfoA.iBW = nuvals.iBW);
 		selrig->get_bwA();
+		A_changed = true;
 	}
 	if (vfoA.freq != nuvals.freq) {
 		trace(1, "change vfoA frequency");
 		selrig->set_vfoA(vfoA.freq = nuvals.freq);
 		selrig->get_vfoA();
+		A_changed = true;
 }
 	vfo = &vfoA;
 
-	Fl::awake(setFreqDispA, (void *)vfoA.freq);
+	if (A_changed)
+		Fl::awake(setFreqDispA);
 }
 
 void serviceB(XCVR_STATE nuvals)
 {
+	bool B_changed;
 	if (nuvals.freq == 0) nuvals.freq = vfoB.freq;
 	if (nuvals.imode == -1) nuvals.imode = vfoB.imode;
 	if (nuvals.iBW == 255) nuvals.iBW = vfoB.iBW;
 
-	if (!useB) {
+	if (selrig->inuse == onA) {
 		if (selrig->can_change_alt_vfo) {
 			trace(2, "A active, set alt vfo B", printXCVR_STATE(nuvals).c_str());
 			if (vfoB.imode != nuvals.imode) {
@@ -1528,34 +1507,37 @@ void serviceB(XCVR_STATE nuvals)
 			if (vfoB.iBW != nuvals.iBW) {
 				selrig->set_bwB(nuvals.iBW);
 				selrig->get_bwB();
+				B_changed = true;
 			}
 			if (vfoB.freq != nuvals.freq) {
 				selrig->set_vfoB(nuvals.freq);
 				selrig->get_vfoB();
+				B_changed = true;
 			}
 			vfoB = nuvals;
 		} else if (xcvr_name != rig_TT550.name_) {
 			trace(2, "A active, set vfo B", printXCVR_STATE(nuvals).c_str());
-			useB = true;
 			selrig->selectB();
 			if (vfoB.imode != nuvals.imode) {
 				selrig->set_modeB(nuvals.imode);
 				selrig->get_modeB();
-				Fl::awake(updateUI);
+				B_changed = true;
 			}
 			if (vfoB.iBW != nuvals.iBW) {
 				selrig->set_bwB(nuvals.iBW);
 				selrig->get_bwB();
+				B_changed = true;
 			}
 			if (vfoB.freq != nuvals.freq) {
 				selrig->set_vfoB(nuvals.freq);
 				selrig->get_vfoB();
+				B_changed = true;
 			}
-			useB = false;
 			selrig->selectA();
 			vfoB = nuvals;
 		}
-		Fl::awake(setFreqDispB, (void *)nuvals.freq);
+		if (B_changed)
+			Fl::awake(setFreqDispB);
 		return;
 	}
 
@@ -1577,15 +1559,18 @@ void serviceB(XCVR_STATE nuvals)
 	if (vfoB.iBW != nuvals.iBW) {
 		selrig->set_bwB(vfoB.iBW = nuvals.iBW);
 		selrig->get_bwB();
+		B_changed = true;
 	}
 	if (vfoB.freq != nuvals.freq) {
 		selrig->set_vfoB(vfoB.freq = nuvals.freq);
 		selrig->get_vfoB();
+		B_changed = true;
 	}
 
 	vfo = &vfoB;
 
-	Fl::awake(setFreqDispB, (void *)vfoB.freq);
+	if (B_changed)
+		Fl::awake(setFreqDispB);
 
 }
 
@@ -1750,7 +1735,7 @@ void setBW()
 	fm.src = UI;
 	fm.iBW = opBW->index();
 	guard_lock que_lock( &mutex_srvc_reqs, "setBW" );
-	srvc_reqs.push( VFOQUEUE((useB ? vB : vA), fm));
+	srvc_reqs.push( VFOQUEUE((selrig->inuse == onB ? vB : vA), fm));
 }
 
 void setDSP()
@@ -1759,7 +1744,7 @@ void setDSP()
 	fm.src = UI;
 	fm.iBW = ((opDSP_hi->index() << 8) | 0x8000) | (opDSP_lo->index() & 0xFF) ;
 	guard_lock que_lock( & mutex_srvc_reqs, "setDSP" );
-	srvc_reqs.push ( VFOQUEUE((useB ? vB : vA), fm));
+	srvc_reqs.push ( VFOQUEUE((selrig->inuse == onB ? vB : vA), fm));
 }
 
 void selectDSP()
@@ -1802,7 +1787,7 @@ void set_bandwidth_control()
 		i--;
 		if (vfo->iBW > i) vfo->iBW = selrig->def_bandwidth(vfo->imode);
 	}
-	useB ? vfoB.iBW = vfo->iBW : vfoA.iBW = vfo->iBW;
+	selrig->inuse == onB ? vfoB.iBW = vfo->iBW : vfoA.iBW = vfo->iBW;
 	Fl::awake(updateBandwidthControl);
 }
 
@@ -1852,7 +1837,7 @@ void updateBandwidthControl(void *d)
 					btnFILT->show();
 					btnFILT->label(
 						selrig->FILT(
-							useB ? vfoB.filter : vfoA.filter));
+							selrig->inuse == onB ? vfoB.filter : vfoA.filter));
 					btnFILT->redraw_label();
 					opBW->resize(opDSP_lo->x(), opDSP_lo->y(), opDSP_lo->w(), opDSP_lo->h());
 					opBW->redraw();
@@ -1883,11 +1868,11 @@ void setMode()
 	fm.src = UI;
 	if (selrig->has_FILTER) {
 		fm.filter = selrig->get_FILT(fm.imode);
-		if (useB) fm.filter = selrig->get_FILT(fm.imode);
+		if (selrig->inuse == onB) fm.filter = selrig->get_FILT(fm.imode);
 	}
 
 	guard_lock que_lock( &mutex_srvc_reqs, "setMode" );
-	srvc_reqs.push(VFOQUEUE( (useB ? vB : vA), fm));
+	srvc_reqs.push(VFOQUEUE( (selrig->inuse == onB ? vB : vA), fm));
 }
 
 void sortList() {
@@ -2055,7 +2040,7 @@ void buildlist() {
 int movFreqA() {
 	guard_lock serial(&mutex_serial);
 
-	if (!selrig->can_change_alt_vfo  && useB) {
+	if (!selrig->can_change_alt_vfo  && selrig->inuse == onB) {
 		selrig->selectA();
 		vfoA.freq = FreqDispA->value();
 		selrig->set_vfoA(vfoA.freq);
@@ -2075,7 +2060,7 @@ int movFreqB() {
 //		return 1;
 //	}
 	guard_lock serial(&mutex_serial);
-	if (!selrig->can_change_alt_vfo  && !useB) {
+	if (!selrig->can_change_alt_vfo  && selrig->inuse == onA) {
 		selrig->selectB();
 		vfoB.freq = FreqDispB->value();
 		selrig->set_vfoB(vfoB.freq);
@@ -2097,27 +2082,24 @@ void execute_swapAB()
 			vfoB = temp;
 			selrig->selectA();
 			vfo = &vfoA;
-			useB = false;
 		} else if (selrig->ICOMrig) {
-			if (useB) {
-				useB = false;
+			if (selrig->inuse == onB) {
 				selrig->selectA();
 				vfo = &vfoA;
 			} else {
-				useB = true;
 				selrig->selectB();
 				vfo = &vfoB;
 			}
 		} else if (selrig->name_ == rig_FT891.name_) {
 			// No need for extra select, as swapAB accomplishes this
-			if (useB) {
-				useB = false;
+			if (selrig->inuse == onB) {
+				selrig->selectA();
 				vfo = &vfoA;
 				// Restore mode, then frequency and bandwidth after swap.
 				yaesu891UpdateA(&vfoA);
 			}
 			else {
-				useB = true;
+				selrig->selectB();
 				vfo = &vfoB;
 				// Restore mode, then frequency and bandwidth after swap.
 				yaesu891UpdateB(&vfoB);
@@ -2126,7 +2108,7 @@ void execute_swapAB()
 			XCVR_STATE temp = vfoB;
 			vfoB = vfoA;
 			vfoA = temp;
-			if (useB)
+			if (selrig->inuse == onB)
 				vfo = &vfoB;
 			else
 				vfo = &vfoA;
@@ -2134,7 +2116,7 @@ void execute_swapAB()
 			XCVR_STATE temp = vfoB;
 			vfoB = vfoA;
 			vfoA = temp;
-			if (useB) {
+			if (selrig->inuse == onB) {
 				selrig->selectB();
 				vfo = &vfoB;
 			} else {
@@ -2143,7 +2125,7 @@ void execute_swapAB()
 			}
 		}
 	} else {
-		if (useB) {
+		if (selrig->inuse == onB) {
 			XCVR_STATE vfotemp = vfoA;
 			selrig->selectA();
 			vfoA = vfoB;
@@ -2230,7 +2212,6 @@ void execute_A2B()
 		FreqDispB->value(vfoB.freq);
 	}
 	if (selrig->ICOMmainsub) {
-		useB = false;
 		selrig->selectA();
 		selrig->A2B();
 		vfoB = vfoA;
@@ -2238,7 +2219,7 @@ void execute_A2B()
 	} else if (selrig->has_a2b) {
 		trace(1,"execute A2B() 2");
 		selrig->A2B();
-		if (useB) {
+		if (selrig->inuse == onB) {
 			vfoA = vfoB;
 			FreqDispA->value(vfoA.freq);
 		} else {
@@ -2246,7 +2227,7 @@ void execute_A2B()
 			FreqDispB->value(vfoB.freq);
 		}
 	} else {
-		if (useB) {
+		if (selrig->inuse == onB) {
 			vfoA = vfoB;
 			if (selrig->name_ == rig_FT891.name_) {
 				yaesu891UpdateA(&vfoA);
@@ -2300,21 +2281,21 @@ void highlight_vfo(void *d)
 	Fl_Color dim_bg = fl_color_average( norm_bg, FL_BLACK, 0.75);
 	FreqDispA->value(vfoA.freq);
 	FreqDispB->value(vfoB.freq);
-	if (useB) {
+	if (selrig->inuse == onB) {
 		FreqDispA->SetONOFFCOLOR( norm_fg, dim_bg );
 		FreqDispB->SetONOFFCOLOR( norm_fg, norm_bg );
-//		btnA->value(0);
-//		btnB->value(1);
+		btnA->value(0);
+		btnB->value(1);
 	} else {
 		FreqDispA->SetONOFFCOLOR( norm_fg, norm_bg );
 		FreqDispB->SetONOFFCOLOR( norm_fg, dim_bg);
-//		btnA->value(1);
-//		btnB->value(0);
+		btnA->value(1);
+		btnB->value(0);
 	}
 	FreqDispA->redraw();
 	FreqDispB->redraw();
-//	btnA->redraw();
-//	btnB->redraw();
+	btnA->redraw();
+	btnB->redraw();
 	Fl::check();
 }
 
@@ -2360,7 +2341,7 @@ void selectFreq() {
 	fm.imode = oplist[n].imode;
 	fm.iBW   = oplist[n].iBW;
 	fm.src   = UI;
-	if (!useB) {
+	if (selrig->inuse == onA) {
 		FreqDispA->value(fm.freq);
 		guard_lock que_lock(&mutex_srvc_reqs, "selectFreq on A");
 		srvc_reqs.push(VFOQUEUE(vA, fm));
@@ -2430,7 +2411,7 @@ void delFreq() {
 }
 
 void addFreq() {
-	if (useB) {
+	if (selrig->inuse == onB) {
 		long freq = FreqDispB->value();
 		if (!freq) return;
 		int mode = opMODE->index();
@@ -3289,15 +3270,13 @@ void zeroXmtMeters(void *d)
 
 void setFreqDispA(void *d)
 {
-	long f = (long)d;
-	FreqDispA->value(f);
+	FreqDispA->value(vfoA.freq);
 	FreqDispA->redraw();
 }
 
 void setFreqDispB(void *d)
 {
-	long f = (long)d;
-	FreqDispB->value(f);
+	FreqDispB->value(vfoB.freq);
 	FreqDispB->redraw();
 }
 
@@ -3523,8 +3502,7 @@ void restore_rig_vals()
 	guard_lock serial_lock(&mutex_serial);
 	trace(1, "restore_rig_vals()");
 
-	if (!useB) {
-		useB = true;
+	if (selrig->inuse == onA) {
 		selrig->selectB();
 	}
 
@@ -3543,7 +3521,6 @@ void restore_rig_vals()
 
 	trace(2, "Restored xcvr B:\n", print(xcvr_vfoB));
 
-	useB = false;
 	selrig->selectA();
 
 	if (progStatus.restore_mode) {
@@ -3761,21 +3738,17 @@ void read_rig_vals()
 	if (selrig->name_ == rig_FT891.name_) {
 		// The FT-891 loses width WDH on A/B changes.  It also starts
 		// with VFOA active, so no selectA() before reading VFOA values.
-		useB = false;
+//		selrig->selectA();
 		read_vfoA_vals();
-		useB = true;
 		selrig->selectB();		// first select call
 		read_vfoB_vals();
 
 		// Restore VFOA mode, then freq and bandwidth
-		useB = false;
 		selrig->selectA();		// second select call
 		yaesu891UpdateA(&xcvr_vfoA);
 	} else {
-		useB = true;
 		selrig->selectB();		// first select call to FT897D
 		read_vfoB_vals();
-		useB = false;
 		selrig->selectA();		// second select call
 		read_vfoA_vals();
 	}
@@ -5078,7 +5051,6 @@ void initTabs()
 
 void init_TT550()
 {
-	useB = false;
 	selrig->selectA();
 
 	vfoB.freq = progStatus.freq_B;
@@ -5141,15 +5113,16 @@ void init_generic_rig()
 
 	if (selrig->has_getvfoAorB) {
 
-		int ret = selrig->get_vfoAorB();
-		int retry = 10;
-		while (ret == -1 && retry--) {
-			MilliSleep(50);
-			ret = selrig->get_vfoAorB();
-		}
-		if (ret == -1) ret = 0;
+		selrig->get_vfoAorB();
 
-		useB = ret;
+//		int ret = selrig->get_vfoAorB();
+//		int retry = 10;
+//		while (ret == -1 && retry--) {
+//			MilliSleep(50);
+//			ret = selrig->get_vfoAorB();
+//		}
+//		if (ret == -1) ret = 0;
+//		selrig->inuse = ret;
 
 		read_rig_vals();
 		if (progStatus.use_rig_data) {
@@ -5157,8 +5130,8 @@ void init_generic_rig()
 			vfoB = xcvr_vfoB;
 		}
 
-		if (useB) {
-			selrig->selectB();
+		if (selrig->inuse == onB) {
+//			selrig->selectB();
 			vfo = &vfoB;
 		} else {
 			vfo = &vfoA;
@@ -5174,7 +5147,7 @@ void init_generic_rig()
 	progStatus.compON = xcvr_vfoA.compON;
 	progStatus.compression = xcvr_vfoA.compression;
 
-	vfo = &vfoA;
+//	vfo = &vfoA;
 
 	rigmodes_.clear();
 	opMODE->clear();
@@ -6207,20 +6180,16 @@ void init_VFOs()
 		xcvr_name == rig_FT818ND.name_ ||
 		xcvr_name == rig_FT857D.name_ ||
 		xcvr_name == rig_FT897D.name_ ) {
-		if (useB) {
-			selrig->selectA();
-			useB = false;
-		}
+
+		selrig->selectA();
 		vfoA.freq = selrig->get_vfoA();
 		FreqDispA->value(vfoA.freq);
 
 		selrig->selectB();
-		useB = true;
 		vfoB.freq = selrig->get_vfoB();
 		FreqDispB->value(vfoB.freq);
 
 		selrig->selectA();
-		useB = false;
 		updateBandwidthControl();
 		highlight_vfo(NULL);
 		return;
@@ -6235,7 +6204,6 @@ void init_VFOs()
 		if (vfoB.iBW == -1)
 			vfoB.iBW = selrig->def_bandwidth(vfoB.imode);
 
-		useB = true;
 		selrig->selectB();
 
 		selrig->set_modeB(vfoB.imode);
@@ -6254,7 +6222,6 @@ void init_VFOs()
 		if (vfoA.iBW == -1)
 			vfoA.iBW = selrig->def_bandwidth(vfoA.imode);
 
-		useB = false;
 		selrig->selectA();
 
 		selrig->set_modeA(vfoA.imode);
@@ -6274,7 +6241,7 @@ void init_VFOs()
 	else {
 		// Capture VFOA mode and bandwidth, since it will be lost in VFO switch
 		if (selrig->name_ == rig_FT891.name_) {
-			useB = false;
+			selrig->selectA();
 			vfoA.freq = selrig->get_vfoA();
 			update_progress(progress->value() + 4);
 			vfoA.imode = selrig->get_modeA();
@@ -6284,7 +6251,6 @@ void init_VFOs()
 			FreqDispA->value(vfoA.freq);
 			trace(2, "A: ", printXCVR_STATE(vfoA).c_str());
 
-			useB = true;
 			selrig->selectB();			// third select call
 			vfoB.freq = selrig->get_vfoB();
 			update_progress(progress->value() + 4);
@@ -6296,7 +6262,6 @@ void init_VFOs()
 			trace(2, "B: ", printXCVR_STATE(vfoB).c_str());
 
 			// Restore radio VFOA mode, then freq and bandwidth
-			useB = false;
 			selrig->selectA();			// fourth select call
 			yaesu891UpdateA(&vfoA);
 		} else {
@@ -7373,7 +7338,7 @@ void cbBandSelect(int band)
 	selrig->get_band_selection(band);
 
 // get freqmdbw
-	if (!useB) {
+	if (selrig->inuse == onA) {
 		vfoA.freq = selrig->get_vfoA();
 		if (selrig->has_mode_control)
 			vfoA.imode = selrig->get_modeA();
@@ -7400,7 +7365,7 @@ void cbBandSelect(int band)
 		set_bandwidth_control();
 		setBWControl(NULL);
 	}
-	if (!useB) { FreqDispA->value(vfo->freq); FreqDispA->redraw(); }
+	if (selrig->inuse == onA) { FreqDispA->value(vfo->freq); FreqDispA->redraw(); }
 	else       { FreqDispB->value(vfo->freq); FreqDispB->redraw(); }
 
 	if (selrig->CIV && (selrig->name_ != rig_IC7200.name_)) {

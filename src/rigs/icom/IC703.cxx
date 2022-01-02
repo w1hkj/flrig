@@ -150,7 +150,6 @@ bool RIG_IC703::check ()
 
 unsigned long int RIG_IC703::get_vfoA ()
 {
-	if (useB) return A.freq;
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );

@@ -232,6 +232,7 @@ void RIG_IC7851::selectA()
 	cmd.append(post);
 	sendICcommand(cmd, 6);
 	waitFB("Select A");
+	inuse = onA;
 }
 
 void RIG_IC7851::selectB()
@@ -241,6 +242,7 @@ void RIG_IC7851::selectB()
 	cmd.append(post);
 	sendICcommand(cmd, 6);
 	waitFB("Select B");
+	inuse = onB;
 }
 
 void RIG_IC7851::set_xcvr_auto_on()
@@ -296,7 +298,7 @@ unsigned long int RIG_IC7851::get_vfoA ()
 	cmd.assign(pre_to).append("\x25");
 	resp.assign(pre_fm).append("\x25");
 
-	if (useB) {
+	if (inuse == onA) {
 		cmd  += '\x01';
 		resp += '\x01';
 	} else {
@@ -328,7 +330,7 @@ void RIG_IC7851::set_vfoA (unsigned long int freq)
 	A.freq = freq;
 
 	cmd.assign(pre_to).append("\x25");
-	if (useB) cmd += '\x01';
+	if (inuse == onA) cmd += '\x01';
 	else      cmd += '\x00';
 
 	cmd.append( to_bcd_be( freq, 10) );
@@ -346,7 +348,7 @@ unsigned long int RIG_IC7851::get_vfoB ()
 	cmd.assign(pre_to).append("\x25");
 	resp.assign(pre_fm).append("\x25");
 
-	if (useB) {
+	if (inuse == onA) {
 		cmd  += '\x00';
 		resp += '\x00';
 	} else {
@@ -378,7 +380,7 @@ void RIG_IC7851::set_vfoB (unsigned long int freq)
 	B.freq = freq;
 
 	cmd.assign(pre_to).append("\x25");
-	if (useB) cmd += '\x00';
+	if (inuse == onA) cmd += '\x00';
 	else      cmd += '\x01';
 
 	cmd.append( to_bcd_be( freq, 10 ) );
@@ -1190,7 +1192,7 @@ void RIG_IC7851::get_band_selection(int v)
 				bandmode = ((banddata == 0x10) ? 13 : 
 							(banddata == 0x20) ? 14 :
 							(banddata == 0x30) ? 15 : 1);
-			if (useB) {
+			if (inuse == onA) {
 				set_vfoB(bandfreq);
 				set_modeB(bandmode);
 				set_FILT(bandfilter);
@@ -1206,8 +1208,8 @@ void RIG_IC7851::get_band_selection(int v)
 
 void RIG_IC7851::set_band_selection(int v)
 {
-	unsigned long int freq = (useB ? B.freq : A.freq);
-	int mode = (useB ? B.imode : A.imode);
+	unsigned long int freq = (inuse == onB ? B.freq : A.freq);
+	int mode = (inuse == onB ? B.imode : A.imode);
 
 	cmd.assign(pre_to);
 	cmd.append("\x1A\x01");

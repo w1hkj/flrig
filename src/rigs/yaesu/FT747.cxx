@@ -73,6 +73,7 @@ void RIG_FT747::selectA()
 	cmd[4] = 0x05;
 	sendCommand(cmd);
 	showresp(INFO, HEX, "select A", cmd, replystr);
+	inuse = onA;
 }
 
 void RIG_FT747::selectB()
@@ -82,6 +83,7 @@ void RIG_FT747::selectB()
 	cmd[4] = 0x05;
 	sendCommand(cmd);
 	showresp(INFO, HEX, "select B", cmd, replystr);
+	inuse = onB;
 }
 
 void RIG_FT747::set_split(bool val)

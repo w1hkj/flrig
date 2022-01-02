@@ -95,6 +95,7 @@ void RIG_FT900::selectA()
 	cmd[4] = 0x05;
 	sendCommand(cmd);
 	showresp(WARN, HEX, "select vfo A", cmd, replystr);
+	inuse = onA;
 }
 
 void RIG_FT900::selectB()
@@ -104,6 +105,7 @@ void RIG_FT900::selectB()
 	cmd[4] = 0x05;
 	sendCommand(cmd);
 	showresp(WARN, HEX, "select vfo B", cmd, replystr);
+	inuse = onB;
 }
 
 void RIG_FT900::set_split(bool val)
@@ -147,7 +149,7 @@ int  RIG_FT900::get_vfoAorB()
 //	sendCommand(cmd);
 //	showresp(WARN, HEX, "copy active vfo to background vfo", cmd, replystr);
 
-//	if (!useB) {
+//	if (inuse == onA) {
 //		queA.push(vfoB);
 //		B = vfoA;
 //	} else {
@@ -321,7 +323,7 @@ void RIG_FT900::set_PTT_control(int val)
 {
 // make sure no other vfo except either vfoA or vfoB is used for transmit
      if (val) {	
-          if (!useB) {	    
+          if (inuse == onA) {	    
                selectA();
           } else {
                selectB();
@@ -330,13 +332,13 @@ void RIG_FT900::set_PTT_control(int val)
 // make sure that in case of split the transmit mode is shown correctly 
      if (splitison) {
           if (val) {
-               if (!useB) {
+               if (inuse == onA) {
                     vfo = &vfoB;
                } else {
                     vfo = &vfoA;
                }
           } else {
-               if (!useB) {
+               if (inuse == onA) {
                     vfo = &vfoA;
                } else {
                     vfo = &vfoB;

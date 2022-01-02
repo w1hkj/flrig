@@ -105,6 +105,7 @@ void RIG_IC706MKIIG::selectA()
 	cmd += '\x00';
 	cmd.append(post);
 	waitFB("select A");
+	inuse = onA;
 }
 
 void RIG_IC706MKIIG::selectB()
@@ -114,6 +115,7 @@ void RIG_IC706MKIIG::selectB()
 	cmd += '\x01';
 	cmd.append(post);
 	waitFB("select B");
+	inuse = onB;
 }
 
 bool RIG_IC706MKIIG::check ()
@@ -130,7 +132,7 @@ bool RIG_IC706MKIIG::check ()
 
 unsigned long int RIG_IC706MKIIG::get_vfoA ()
 {
-	if (useB) return A.freq;
+	if (inuse == onB) return A.freq;
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
@@ -160,7 +162,7 @@ void RIG_IC706MKIIG::set_vfoA (unsigned long int freq)
 
 unsigned long int RIG_IC706MKIIG::get_vfoB ()
 {
-	if (!useB) return B.freq;
+	if (inuse == onA) return B.freq;
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );

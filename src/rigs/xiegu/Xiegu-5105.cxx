@@ -126,6 +126,7 @@ void RIG_XI5105::selectA()
 	cmd += '\x00';
 	cmd.append(post);
 	waitFB("sel A");
+	inuse = onA;
 set_trace(2, "selectA()", str2hex(cmd.c_str(), cmd.length()));
 }
 
@@ -135,8 +136,9 @@ void RIG_XI5105::selectB()
 	cmd += '\x07';
 	cmd += '\x01';
 	cmd.append(post);
-set_trace(2, "selectB()", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("sel B");
+	inuse = onB;
+set_trace(2, "selectB()", str2hex(cmd.c_str(), cmd.length()));
 }
 
 bool RIG_XI5105::check ()
@@ -155,7 +157,7 @@ set_trace(2, "check()", str2hex(replystr.c_str(), replystr.length()));
 
 unsigned long int RIG_XI5105::get_vfoA ()
 {
-	if (useB) return A.freq;
+	if (inuse == onB) return A.freq;
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
@@ -182,7 +184,7 @@ set_trace(2, "set_vfoA()", str2hex(cmd.c_str(), cmd.length()));
 
 unsigned long int RIG_XI5105::get_vfoB ()
 {
-	if (!useB) return B.freq;
+	if (inuse == onA) return B.freq;
 	string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;

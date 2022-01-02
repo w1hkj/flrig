@@ -298,8 +298,8 @@ void RIG_IC7610::selectA()
 	cmd += '\xD0';
 	cmd.append(post);
 	waitFB("select A");
-
 	set_trace(2, "selectA() ", str2hex(cmd.c_str(), cmd.length()));
+	inuse = onA;
 }
 
 void RIG_IC7610::selectB()
@@ -308,8 +308,8 @@ void RIG_IC7610::selectB()
 	cmd += '\xD1';
 	cmd.append(post);
 	waitFB("select B");
-
 	set_trace(2, "selectB() ", str2hex(cmd.c_str(), cmd.length()));
+	inuse = onB;
 }
 
 //======================================================================
@@ -630,13 +630,13 @@ void RIG_IC7610::set_modeB(int val)
 
 int RIG_IC7610::get_FILT(int mode)
 {
-	if (useB) return mode_filterB[mode];
+	if (inuse == onB) return mode_filterB[mode];
 	return mode_filterA[mode];
 }
 
 void RIG_IC7610::set_FILT(int filter)
 {
-	if (useB) {
+	if (inuse == onB) {
 		B.filter = filter;
 		mode_filterB[B.imode] = filter;
 		cmd.assign(pre_to);
@@ -696,7 +696,7 @@ const char *RIG_IC7610::FILT(int val)
 const char * RIG_IC7610::nextFILT()
 {
 	int val = A.filter;
-	if (useB) val = B.filter;
+	if (inuse == onB) val = B.filter;
 	val++;
 	if (val > 3) val = 1;
 	set_FILT(val);
@@ -786,7 +786,8 @@ int RIG_IC7610::get_bwA()
 	if (A.imode == 3 || 
 		A.imode == 13 || A.imode == 17 || A.imode == 21) return 0; // FM, FM-D
 
-	if (useB) selectA();
+	int current_vfo = inuse;
+	if (current_vfo == onB) selectA();
 
 	cmd = pre_to;
 	cmd.append("\x1a\x03");
@@ -804,7 +805,7 @@ int RIG_IC7610::get_bwA()
 		mode_bwA[A.imode] = bwval;
 	}
 
-	if (useB) selectB();
+	if (current_vfo == onB) selectB();
 
 	get_trace(2, "get_bwA() ", str2hex(replystr.c_str(), replystr.length()));
 
@@ -818,7 +819,8 @@ void RIG_IC7610::set_bwA(int val)
 		A.imode == 13 || A.imode == 17 || A.imode == 21) return; // FM, FM-D
 
 	A.iBW = val;
-	if (useB) selectA();
+	int current_vfo = inuse;
+	if (current_vfo == onB) selectA();
 
 	cmd = pre_to;
 	cmd.append("\x1a\x03");
@@ -829,7 +831,7 @@ void RIG_IC7610::set_bwA(int val)
 	mode_bwA[A.imode] = val;
 	set_trace(2, "set_bwA() ", str2hex(cmd.c_str(), cmd.length()));
 
-	if (useB) selectB();
+	if (current_vfo == onB) selectB();
 }
 
 int RIG_IC7610::get_bwB()
@@ -837,7 +839,8 @@ int RIG_IC7610::get_bwB()
 	if (B.imode == 3 || 
 		B.imode == 13 || B.imode == 17 || B.imode == 21) return 0; // FM, FM-D
 
-	if (!useB) selectB();
+	int current_vfo = inuse;
+	if (current_vfo == onA) selectB();
 
 	cmd = pre_to;
 	cmd.append("\x1a\x03");
@@ -855,7 +858,7 @@ int RIG_IC7610::get_bwB()
 		mode_bwB[B.imode] = bwval;
 	}
 
-	if (!useB) selectA();
+	if (current_vfo == onA) selectA();
 
 	get_trace(2, "get_bwB() ", str2hex(replystr.c_str(), replystr.length()));
 
@@ -869,7 +872,8 @@ void RIG_IC7610::set_bwB(int val)
 
 	B.iBW = val;
 
-	if (!useB) selectB();
+	int current_vfo = inuse;
+	if (current_vfo == onA) selectB();
 
 	cmd = pre_to;
 	cmd.append("\x1a\x03");
@@ -880,7 +884,7 @@ void RIG_IC7610::set_bwB(int val)
 	mode_bwB[B.imode] = val;
 	set_trace(2, "set_bwB() ", str2hex(cmd.c_str(), cmd.length()));
 
-	if (!useB) selectA();
+	if (current_vfo == onA) selectA();
 }
 
 // LSB  USB  AM   FM   CW  CW-R  RTTY  RTTY-R  PSK   PSK-R
@@ -952,7 +956,7 @@ const char ** RIG_IC7610::bwtable(int m)
 int RIG_IC7610::def_bandwidth(int m)
 {
 	int bw = adjust_bandwidth(m);
-	if (useB) {
+	if (inuse == onB) {
 		if (mode_bwB[m] == -1)
 			mode_bwB[m] = bw;
 		return mode_bwB[m];
@@ -2211,7 +2215,7 @@ void RIG_IC7610::get_band_selection(int v)
 				default:
 						break;
 			}
-			if (useB) {
+			if (inuse == onB) {
 				set_vfoB(bandfreq);
 				set_modeB(bandmode);
 				set_FILT(bandfilter);
@@ -2227,9 +2231,9 @@ void RIG_IC7610::get_band_selection(int v)
 
 void RIG_IC7610::set_band_selection(int v)
 {
-	unsigned long int freq = (useB ? B.freq : A.freq);
-	int fil = (useB ? filB : filA);
-	int mode = (useB ? B.imode : A.imode);
+	unsigned long int freq = (inuse == onB ? B.freq : A.freq);
+	int fil = (inuse == onB ? filB : filA);
+	int mode = (inuse == onB ? B.imode : A.imode);
 
 	cmd.assign(pre_to);
 	cmd.append("\x1A\x01");

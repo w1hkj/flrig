@@ -88,7 +88,7 @@ bool RIG_IC735::check ()
 
 unsigned long int RIG_IC735::get_vfoA ()
 {
-	if (useB) return A.freq;
+	if (inuse == onB) return A.freq;
 	string cstr = "\x03";
 	string resp = pre_fm;
 	resp.append(cstr);
@@ -119,7 +119,7 @@ void RIG_IC735::set_vfoA (unsigned long int freq)
 
 unsigned long int RIG_IC735::get_vfoB ()
 {
-	if (!useB) return B.freq;
+	if (inuse == onA) return B.freq;
 	string cstr = "\x03";
 	string resp = pre_fm;
 	resp.append(cstr);

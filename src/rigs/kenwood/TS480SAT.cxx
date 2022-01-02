@@ -1018,6 +1018,7 @@ void RIG_TS480SAT::selectA()
 	cmd = "FR0;FT0;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "Rx on A, Tx on A", cmd, "");
+	inuse = onA;
 }
 
 void RIG_TS480SAT::selectB()
@@ -1025,12 +1026,13 @@ void RIG_TS480SAT::selectB()
 	cmd = "FR1;FT1;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "Rx on B, Tx on B", cmd, "");
+	inuse = onB;
 }
 
 void RIG_TS480SAT::set_split(bool val) 
 {
 	split = val;
-	if (useB) {
+	if (inuse == onB) {
 		if (val) {
 			cmd = "FR1;FT0;";
 			sendCommand(cmd);

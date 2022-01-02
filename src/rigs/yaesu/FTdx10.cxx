@@ -154,6 +154,8 @@ void RIG_FTdx10::initialize()
 	sendCommand(cmd);
 	showresp(WARN, ASC, "Auto Info OFF", cmd, replystr);
 	sett("Auto Info OFF");
+
+	get_vfoAorB();
 }
 
 RIG_FTdx10::RIG_FTdx10() {
@@ -229,6 +231,8 @@ RIG_FTdx10::RIG_FTdx10() {
 	preamp_level = 0;
 	notch_on = false;
 	m_60m_indx = 0;
+
+	inuse = onA;
 
 	precision = 1;
 	ndigits = 8;
@@ -379,12 +383,27 @@ bool RIG_FTdx10::twovfos()
 	return true;
 }
 
+int RIG_FTdx10::get_vfoAorB()
+{
+	cmd = "VS;";
+	rsp = "VS";
+	wait_char(';', 4, 100, "get vfoAorB()", ASC);
+	gett("get vfoAorB()");
+	size_t p = replystr.rfind(rsp);
+	inuse = onA;
+	if (p != string::npos)
+		inuse = (replystr[p + 2] == '1') ? onB : onA;
+	return inuse;
+}
+
+
 void RIG_FTdx10::selectA()
 {
 	cmd = "VS0;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select A", cmd, replystr);
 	sett("selectA()");
+	inuse = onA;
 }
 
 void RIG_FTdx10::selectB()
@@ -393,6 +412,7 @@ void RIG_FTdx10::selectB()
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select B", cmd, replystr);
 	sett("selectB()");
+	inuse = onB;
 }
 
 void RIG_FTdx10::A2B()
@@ -424,7 +444,7 @@ void RIG_FTdx10::set_split(bool val)
 
 int RIG_FTdx10::get_split()
 {
-	cmd = rsp = "ST";
+	cmd = rsp = "FT";
 	cmd += ";";
 	wait_char(';', 4, 100, "Get split", ASC);
 	gett("get split()");
@@ -783,7 +803,7 @@ int RIG_FTdx10::adjust_bandwidth(int val)
 int RIG_FTdx10::def_bandwidth(int m)
 {
 	int bw = adjust_bandwidth(m);
-	if (useB) {
+	if (inuse == onB) {
 		if (mode_bwB[m] == -1)
 			mode_bwB[m] = bw;
 		return mode_bwB[m];
@@ -1016,7 +1036,7 @@ int RIG_FTdx10::get_modetype(int n)
 
 void RIG_FTdx10::set_if_shift(int val)
 {
-	if (useB)
+	if (inuse == onB)
 		cmd = "IS10+0000;";
 	else
 		cmd = "IS00+0000;";
@@ -1034,7 +1054,7 @@ void RIG_FTdx10::set_if_shift(int val)
 
 bool RIG_FTdx10::get_if_shift(int &val)
 {
-	if (useB)
+	if (inuse == onB)
 		cmd = rsp = "IS1";
 	else
 		cmd = rsp = "IS0";
@@ -1063,7 +1083,7 @@ void RIG_FTdx10::set_notch(bool on, int val)
      {
 	if (on && !notch_on) {
 		notch_on = true;
-		if (useB)
+		if (inuse == onB)
 			cmd = "BP10001;";
 		else
 			cmd = "BP00001;";
@@ -1071,7 +1091,7 @@ void RIG_FTdx10::set_notch(bool on, int val)
 		showresp(WARN, ASC, "SET notch on", cmd, replystr);
 
 
-		if (useB)
+		if (inuse == onB)
 			cmd = "BP11000;";
 		else
 			cmd = "BP01000;";
@@ -1084,7 +1104,7 @@ void RIG_FTdx10::set_notch(bool on, int val)
 		showresp(WARN, ASC, "SET notch freq", cmd, replystr);
 	} else if (!on && notch_on) {
 		notch_on = false;
-		if (useB)
+		if (inuse == onB)
 			cmd = "BP10000;";
 		else
 			cmd = "BP00000;";
@@ -1098,7 +1118,7 @@ void RIG_FTdx10::set_notch(bool on, int val)
 bool  RIG_FTdx10::get_notch(int &val)
 {
 	bool ison = false;
-	if (useB) 
+	if (inuse == onB) 
 		cmd = rsp = "BP10";
 	else
 		cmd = rsp = "BP00";
@@ -1137,7 +1157,7 @@ void RIG_FTdx10::get_notch_min_max_step(int &min, int &max, int &step)
 
 void RIG_FTdx10::set_auto_notch(int v)
 {
-	if (useB)
+	if (inuse == onB)
 		cmd = "BC10;";
 	else
 		cmd = "BC00;";
@@ -1148,7 +1168,7 @@ void RIG_FTdx10::set_auto_notch(int v)
 
 int  RIG_FTdx10::get_auto_notch()
 {
-	if (useB)
+	if (inuse == onB)
 		cmd = "BC1;";
 	else
 		cmd = "BC0;";
@@ -1166,7 +1186,7 @@ int FTdx10_blanker_level = 0;
 
 void RIG_FTdx10::set_noise(bool b)
 {
-	if (useB)
+	if (inuse == onB)
 		cmd = "NB10;";
 	else
 		cmd = "NB00;";
@@ -1183,7 +1203,7 @@ void RIG_FTdx10::set_noise(bool b)
 
 int RIG_FTdx10::get_noise()
 {
-	if (useB)
+	if (inuse == onB)
 		cmd = rsp = "NB1";
 	else
 		cmd = rsp = "NB0";

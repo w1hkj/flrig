@@ -329,6 +329,7 @@ void RIG_FT991A::selectA()
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select A", cmd, replystr);
 	sett("selectA");
+	inuse = onA;
 }
 
 void RIG_FT991A::selectB()
@@ -337,6 +338,7 @@ void RIG_FT991A::selectB()
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select B", cmd, replystr);
 	sett("selectB");
+	inuse = onB;
 }
 
 void RIG_FT991A::A2B()
@@ -371,7 +373,7 @@ bool RIG_FT991A::can_split()
 void RIG_FT991A::set_split(bool val)
 {
 	split = val;
-	if (useB) {
+	if (inuse == onB) {
 		if (val) {
 			cmd = "FT2;";
 			sendCommand(cmd);

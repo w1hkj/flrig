@@ -207,8 +207,6 @@ bool RIG_Xiegu_G90::check ()
 	return ok;
 }
 
-static bool Xiegu_G90onA = true;
-
 void RIG_Xiegu_G90::selectA()
 {
 	cmd = pre_to;
@@ -218,7 +216,7 @@ void RIG_Xiegu_G90::selectA()
 	set_trace(1, "selectA()");
 	waitFB("select A");
 	isett("");
-	Xiegu_G90onA = true;
+	inuse = onA;
 }
 
 void RIG_Xiegu_G90::selectB()
@@ -230,12 +228,12 @@ void RIG_Xiegu_G90::selectB()
 	set_trace(1, "selectB()");
 	waitFB("select B");
 	isett("");
-	Xiegu_G90onA = false;
+	inuse = onB;
 }
 
 unsigned long int RIG_Xiegu_G90::get_vfoA ()
 {
-	if (useB) return A.freq;
+	if (inuse == onB) return A.freq;
 	string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
@@ -269,7 +267,7 @@ void RIG_Xiegu_G90::set_vfoA (unsigned long int freq)
 
 unsigned long int RIG_Xiegu_G90::get_vfoB ()
 {
-	if (!useB) return B.freq;
+	if (inuse == onA) return B.freq;
 	string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
@@ -958,7 +956,7 @@ void RIG_Xiegu_G90::get_band_selection(int v)
 	}
 	if (bandmode < 0) bandmode = 0;
 	if (bandmode > 4) bandmode = 0;
-	if (useB) {
+	if (inuse == onB) {
 		set_vfoB(bandfreq);
 		set_modeB(bandmode);
 	} else {

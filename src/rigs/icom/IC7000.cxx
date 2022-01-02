@@ -214,6 +214,7 @@ void RIG_IC7000::selectA()
 	cmd += '\x00';
 	cmd.append(post);
 	waitFB("sel A");
+	inuse = onA;
 }
 
 void RIG_IC7000::selectB()
@@ -223,6 +224,7 @@ void RIG_IC7000::selectB()
 	cmd += '\x01';
 	cmd.append(post);
 	waitFB("sel B");
+	inuse = onB;
 }
 
 bool RIG_IC7000::check ()
@@ -240,7 +242,7 @@ bool RIG_IC7000::check ()
 
 unsigned long int RIG_IC7000::get_vfoA ()
 {
-	if (useB) return A.freq;
+	if (inuse == onB) return A.freq;
 	string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
@@ -274,7 +276,7 @@ void RIG_IC7000::set_vfoA (unsigned long int freq)
 
 unsigned long int RIG_IC7000::get_vfoB ()
 {
-	if (!useB) return B.freq;
+	if (inuse == onA) return B.freq;
 	string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
@@ -1145,7 +1147,7 @@ void RIG_IC7000::get_band_selection(int v)
 			unsigned long int bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
 			int bandmode = replystr[p+13];
 			int bandfilter = replystr[p+14];
-			if (useB) {
+			if (inuse == onB) {
 				set_vfoB(bandfreq);
 				set_modeB(bandmode);
 				set_FILT(bandfilter);
@@ -1160,9 +1162,9 @@ void RIG_IC7000::get_band_selection(int v)
 
 void RIG_IC7000::set_band_selection(int v)
 {
-	unsigned long int freq = (useB ? B.freq : A.freq);
-	int fil = (useB ? filB : filA);
-	int mode = (useB ? B.imode : A.imode);
+	unsigned long int freq = (inuse == onB ? B.freq : A.freq);
+	int fil = (inuse == onB ? filB : filA);
+	int mode = (inuse == onB ? B.imode : A.imode);
 
 	cmd.assign(pre_to);
 	cmd.append("\x1A\x01");

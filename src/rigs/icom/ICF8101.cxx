@@ -277,7 +277,7 @@ bool RIG_ICF8101::check ()
 
 unsigned long int RIG_ICF8101::get_vfoA ()
 {
-	if (useB) return A.freq;
+	if (inuse == onB) return A.freq;
 	string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
@@ -306,7 +306,7 @@ void RIG_ICF8101::set_vfoA (unsigned long int freq)
 
 unsigned long int RIG_ICF8101::get_vfoB ()
 {
-	if (!useB) return B.freq;
+	if (inuse == onA) return B.freq;
 	string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
@@ -1040,7 +1040,7 @@ int RIG_ICF8101::adjust_bandwidth(int m)
 int RIG_ICF8101::def_bandwidth(int m)
 {
 	int bw = adjust_bandwidth(m);
-	if (useB) {
+	if (inuse == onB) {
 		if (mode_bwB[m] == -1)
 			mode_bwB[m] = bw;
 		return mode_bwB[m];

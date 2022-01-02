@@ -242,7 +242,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				btnA->down_box(FL_THIN_DOWN_BOX);
 				btnA->labelsize(12);
 				btnA->callback((Fl_Callback*)cb_btnA);
-				btnA->value(!useB);
+				btnA->value(1);
 
 				btn_KX3_swapAB = new Fl_Button(
 					grp_row0a->x(), grp_row0a->y(), 
@@ -260,7 +260,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				btnB->down_box(FL_THIN_DOWN_BOX);
 				btnB->labelsize(12);
 				btnB->callback((Fl_Callback*)cb_btnB);
-				btnB->value(useB);
+				btnB->value(0);
 
 				btn_KX3_A2B = new Fl_Button(
 					btnA->x() + btnA->w() + 2, btnA->y(),

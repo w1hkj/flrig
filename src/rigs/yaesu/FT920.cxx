@@ -97,6 +97,7 @@ void RIG_FT920::selectA()
 	cmd[4] = 0x05;
 	sendCommand(cmd);
 	showresp(WARN, HEX, "select A", cmd, replystr);
+	inuse = onA;
 }
 
 void RIG_FT920::selectB()
@@ -106,6 +107,7 @@ void RIG_FT920::selectB()
 	cmd[4] = 0x05;
 	sendCommand(cmd);
 	showresp(WARN, HEX, "select B", cmd, replystr);
+	inuse = onB;
 }
 
 void RIG_FT920::set_split(bool val)

@@ -1051,6 +1051,7 @@ void RIG_TS480HX::selectA()
 	cmd = "FR0;FT0;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "Rx on A, Tx on A", cmd, "");
+	inuse = onA;
 }
 
 void RIG_TS480HX::selectB()
@@ -1058,12 +1059,13 @@ void RIG_TS480HX::selectB()
 	cmd = "FR1;FT1;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "Rx on B, Tx on B", cmd, "");
+	inuse = onB;
 }
 
 void RIG_TS480HX::set_split(bool val) 
 {
 	split = val;
-	if (useB) {
+	if (inuse == onB) {
 		if (val) {
 			cmd = "FR1;FT0;";
 			sendCommand(cmd);

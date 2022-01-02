@@ -93,7 +93,7 @@ bool RIG_FT857D::check ()
 
 unsigned long int RIG_FT857D::get_vfoA ()
 {
-//	if (useB) return freqA;
+	if (inuse == onB) return freqA;
 	init_cmd();
 	cmd[4] = 0x03;
 	int ret = waitN(5, 100, "get vfo A", HEX);
@@ -123,7 +123,7 @@ void RIG_FT857D::set_vfoA (unsigned long int freq)
 
 unsigned long int RIG_FT857D::get_vfoB ()
 {
-//	if (!useB) return freqB;
+	if (inuse == onA) return freqB;
 	init_cmd();
 	cmd[4] = 0x03;
 	int ret = waitN(5, 100, "get vfo B", HEX);
@@ -237,6 +237,7 @@ void RIG_FT857D::selectA()
 	sendCommand(cmd);
 	setthex("Select VFO A");
 	check();
+	inuse = onA;
 }
 
 void RIG_FT857D::selectB()
@@ -246,6 +247,7 @@ void RIG_FT857D::selectB()
 	sendCommand(cmd);
 	setthex("Select VFO B");
 	check();
+	inuse = onB;
 }
 
 void RIG_FT857D::set_split(bool val)
@@ -296,7 +298,7 @@ void RIG_FT857D::set_band_selection(int v)
 		case 11: freq = progStatus.f2;  mode = progStatus.m2;   break; // 2 meters
 		case 12: freq = progStatus.f70; mode = progStatus.m70;  break; // 70 cent'
 	}
-	if (useB) {
+	if (inuse == onB) {
 		set_modeB(mode);
 		set_vfoB(freq);
 	} else {

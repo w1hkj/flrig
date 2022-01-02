@@ -118,7 +118,7 @@ bool RIG_FT847::check ()
 
 unsigned long int RIG_FT847::get_vfoA ()
 {
-	if (useB) return A.freq;
+	if (inuse == onB) return A.freq;
 	if (get_info()) {
 		A.freq = afreq;
 		A.imode = amode;
@@ -156,7 +156,7 @@ void RIG_FT847::set_modeA(int val)
 
 unsigned long int RIG_FT847::get_vfoB()
 {
-	if (!useB) return B.freq;
+	if (inuse == onA) return B.freq;
 	if (get_info()) {
 		B.freq = afreq;
 		B.imode = amode;

@@ -431,6 +431,7 @@ void RIG_TS990::selectA()
 	sendCommand(cmd);
 	showresp(INFO, ASC, "Rx A, Tx A", cmd, "");
 	rxtxa = true;
+	inuse = onA;
 }
 
 void RIG_TS990::selectB()
@@ -446,6 +447,7 @@ void RIG_TS990::selectB()
 	sendCommand(cmd);
 	showresp(INFO, ASC, "Rx B, Tx B", cmd, "");
 	rxtxa = false;
+	inuse = onB;
 }
 
 //==============================================================================
@@ -472,7 +474,7 @@ void RIG_TS990::set_attenuator(int val)
 	ts990debug("set_attenuator(int val)");
 
 	atten_level = val;
-	if (useB) {
+	if (inuse == onB) {
 		if (atten_level == 1) {			// If attenuator level = 0 (off)
 			cmd = "RA11;";				// this is the command...
 			atten_label("Att 6", true);	// show it in the button...
@@ -517,7 +519,7 @@ int RIG_TS990::get_attenuator() {
 
 	ts990debug("get_attenuator()");
 
-	if (useB) {
+	if (inuse == onB) {
 		cmd = "RA1;";
 		if (wait_char(';', 5, 100, "get Att B", ASC) < 5) return att_on;
 
@@ -586,7 +588,7 @@ void RIG_TS990::set_preamp(int val)
 {
 	ts990debug("set_preamp(int val)");
 
-	if (useB) {
+	if (inuse == onB) {
 		preamp_level = val;
 		if (val) cmd = "PA11;";
 		else     cmd = "PA10;";
@@ -604,7 +606,7 @@ int RIG_TS990::get_preamp()
 {
 	ts990debug("get_preamp()");
 
-	if (useB) {
+	if (inuse == onB) {
 		cmd = "PA1;";
 		if (wait_char(';', 5, TS990_WAIT, "get preamp", ASC) < 5) return 0;
 
@@ -639,7 +641,7 @@ void RIG_TS990::set_split(bool val)
 	ts990debug("set_split(bool val)");
 
 	split = val;
-	if (useB) {
+	if (inuse == onB) {
 		if (val) {
 			cmd = "MV10;TB0;";
 			sendCommand(cmd);
@@ -805,7 +807,7 @@ int RIG_TS990::get_smeter()
 {
 	ts990debug("get_smeter()");
 
-	if (useB) cmd = "SM1;";
+	if (inuse == onB) cmd = "SM1;";
 	else      cmd = "SM0;";
 
 	int mtr = 0;
@@ -833,7 +835,7 @@ int RIG_TS990::get_power_out()
 	{  0,  7, 15, 23, 29,  34,  40,  46,  51,  58 };
 	static float val[] =
 	{  0, 10, 25, 50, 75, 100, 125, 150, 175, 200 };
-	if (useB) cmd = "SM1;";
+	if (inuse == onB) cmd = "SM1;";
 	else      cmd = "SM0;";
 
 	int mtr = 0;
@@ -950,7 +952,7 @@ int RIG_TS990::get_volume_control()
 {
 	ts990debug("get_volume_control()");
 
-	if (useB) {
+	if (inuse == onB) {
 
 	cmd = "AG1;";
 	if (wait_char(';', 7, TS990_WAIT, "get vol ctrl", ASC) < 7) return 0;
@@ -981,7 +983,7 @@ void RIG_TS990::set_volume_control(int val)
 {
 	ts990debug("set_volume_control(int val)");
 
-	if (useB) {
+	if (inuse == onB) {
 
 	int ivol = (int)(val * 2.55);
 	cmd = "AG1000;";
@@ -1283,7 +1285,7 @@ int RIG_TS990::set_widths(int val)
 	ts990debug("set_widths(int val)");
 
 	int bw = 0;
-	if (useB) bw = B.iBW;
+	if (inuse == onB) bw = B.iBW;
 	else bw = A.iBW;
 
 	read_menu_0607();
@@ -1516,61 +1518,61 @@ int RIG_TS990::adjust_bandwidth(int val)
 	int retval = 0;
 	switch (val) {
 		case LSB: case USB:
-			if (useB)
+			if (inuse == onB)
 				retval = menu_0607 ? B_default_SH_WI : B_default_HI_LO;
 			else
 				retval = menu_0607 ? A_default_SH_WI : A_default_HI_LO;
 			break;
 		case LSBD1: case USBD1:
-			if (useB)
+			if (inuse == onB)
 				retval = menu_0608 ? B_default_SH_WI_D1 : B_default_HI_LO;
 			else
 				retval = menu_0608 ? A_default_SH_WI_D1 : A_default_HI_LO;
 			break;
 		case LSBD2: case USBD2:
-			if (useB)
+			if (inuse == onB)
 				retval = menu_0608 ? B_default_SH_WI_D2 : B_default_HI_LO;
 			else
 				retval = menu_0608 ? A_default_SH_WI_D2 : A_default_HI_LO;
 			break;
 		case LSBD3: case USBD3:
-			if (useB)
+			if (inuse == onB)
 				retval = menu_0608 ? B_default_SH_WI_D3 : B_default_HI_LO;
 			else
 				retval = menu_0608 ? A_default_SH_WI_D3 : A_default_HI_LO;
 			break;
 		case FM:
-			retval = (useB ? B_default_FM : A_default_FM);
+			retval = (inuse == onB ? B_default_FM : A_default_FM);
 			break;
 		case FMD1:
-			retval = (useB ? B_default_FM_D1 : A_default_FM_D1);
+			retval = (inuse == onB ? B_default_FM_D1 : A_default_FM_D1);
 			break;
 		case FMD2:
-			retval = (useB ? B_default_FM_D2 : A_default_FM_D2);;
+			retval = (inuse == onB ? B_default_FM_D2 : A_default_FM_D2);;
 			break;
 		case FMD3:
-			retval = (useB ? B_default_FM_D3 : A_default_FM_D3);
+			retval = (inuse == onB ? B_default_FM_D3 : A_default_FM_D3);
 			break;
 		case AM:
-			retval = (useB ? B_default_AM : A_default_AM);
+			retval = (inuse == onB ? B_default_AM : A_default_AM);
 			break;
 		case AMD1:
-			retval = (useB ? B_default_AM_D1 : A_default_AM_D1);
+			retval = (inuse == onB ? B_default_AM_D1 : A_default_AM_D1);
 			break;
 		case AMD2:
-			retval = (useB ? B_default_AM_D2 : A_default_AM_D2);
+			retval = (inuse == onB ? B_default_AM_D2 : A_default_AM_D2);
 			break;
 		case AMD3:
-			retval = (useB ? B_default_AM_D3 : A_default_AM_D3);
+			retval = (inuse == onB ? B_default_AM_D3 : A_default_AM_D3);
 			break;
 		case CW: case CWR:
-			retval = (useB ? B_default_CW : A_default_CW);
+			retval = (inuse == onB ? B_default_CW : A_default_CW);
 			break;
 		case FSK: case FSKR:
-			retval = (useB ? B_default_FSK : A_default_FSK);
+			retval = (inuse == onB ? B_default_FSK : A_default_FSK);
 			break;
 		case PSK: case PSKR:
-			retval = (useB ? B_default_PSK : A_default_PSK);
+			retval = (inuse == onB ? B_default_PSK : A_default_PSK);
 			break;
 		}
 	return retval;
@@ -2628,7 +2630,7 @@ void RIG_TS990::set_noise(bool val) //Now Setting AGC
 {
 	ts990debug("set_noise(bool val)");
 
-	if (useB) {
+	if (inuse == onB) {
 		if (nb_level == 2) {
 			nb_level = 3;
 			nb_label("AGC F", false);
@@ -2671,7 +2673,7 @@ int  RIG_TS990::get_agc()
 	ts990debug("get_agc()");
 
 	int val = 0;
-	if (useB) {
+	if (inuse == onB) {
 		cmd = "GC1;";
 		if (wait_char(';', 5, 100, "get AGC", ASC) < 5) return val;
 
@@ -2709,7 +2711,7 @@ void RIG_TS990::set_squelch(int val)
 
 	val *= 255;
 	val /= 100;
-	if (useB) {
+	if (inuse == onB) {
 		cmd = "SQ1";
 		cmd.append(to_decimal(abs(val),3)).append(";");
 		sendCommand(cmd);
@@ -2728,7 +2730,7 @@ int  RIG_TS990::get_squelch()
 	ts990debug("get_squelch()");
 
 	int val = 0;
-	if (useB) {
+	if (inuse == onB) {
 		cmd = "SQ1;";
 		if (wait_char(';', 7, TS990_WAIT, "get squelch", ASC) >= 7) {
 			size_t p = replystr.rfind("SQ1");
@@ -2763,7 +2765,7 @@ void RIG_TS990::set_rf_gain(int val)
 
 	val *= 255;
 	val /= 100;
-	if (useB) {
+	if (inuse == onB) {
 		cmd = "RG1";
 		cmd.append(to_decimal(val,3)).append(";");
 		sendCommand(cmd);
@@ -2785,7 +2787,7 @@ int  RIG_TS990::get_rf_gain()
 	ts990debug("get_rf_gain()");
 
 	int val = progStatus.rfgain;
-	if (useB) {
+	if (inuse == onB) {
 		cmd = "RG1;";
 		if (wait_char(';', 7, TS990_WAIT, "get rf gain", ASC) < 7) return val;
 
@@ -2824,7 +2826,7 @@ void RIG_TS990::set_noise_reduction(int val)
 {
 	ts990debug("set_noise_reduction(int val)");
 
-	if (useB) {
+	if (inuse == onB) {
 		cmd.assign("NR1").append(val ? "1" : "0" ).append(";");
 		sendCommand(cmd);
 		showresp(INFO, ASC, "SET noise reduction", cmd, "");
@@ -2844,7 +2846,7 @@ int  RIG_TS990::get_noise_reduction()
 	ts990debug("get_noise_reduction()");
 
 	int val = 0;
-	if (useB) {
+	if (inuse == onB) {
 		cmd = rsp = "NR1";
 		cmd.append(";");
 		if (wait_char(';', 5, TS990_WAIT, "GET noise reduction", ASC) < 5) return val;
@@ -2873,7 +2875,7 @@ void RIG_TS990::set_noise_reduction_val(int val)
 {
 	ts990debug("set_noise_reduction_val(int val)");
 
-	if (useB) {
+	if (inuse == onB) {
 		cmd.assign("RL11").append(to_decimal(val, 2)).append(";");
 		sendCommand(cmd);
 		showresp(INFO, ASC, "SET_noise_reduction_val", cmd, "");
@@ -2893,7 +2895,7 @@ int  RIG_TS990::get_noise_reduction_val()
 	ts990debug("get_noise_reduction_val()");
 
 	int val = 0;
-	if (useB) {
+	if (inuse == onB) {
 		if (!nr_on) return val;
 		cmd = rsp = "RL11";
 		cmd.append(";");
@@ -2917,7 +2919,7 @@ void RIG_TS990::set_auto_notch(int v)
 {
 	ts990debug("set_auto_notch(int v)");
 
-	if (useB) {
+	if (inuse == onB) {
 		cmd.assign("NT1").append(v ? "1" : "0" ).append(";");
 		sendCommand(cmd);
 		showresp(INFO, ASC, "SET Auto Notch", cmd, "");
@@ -2933,7 +2935,7 @@ int  RIG_TS990::get_auto_notch()
 	ts990debug("get_auto_notch()");
 
 	int val = 0;
-	if (useB) {
+	if (inuse == onB) {
 		cmd = "NT1;";
 		if (wait_char(';', 5, TS990_WAIT, "get auto notch", ASC) < 5) return val;
 		size_t p = replystr.rfind("NT");
@@ -2953,7 +2955,7 @@ void RIG_TS990::set_notch(bool on, int val)
 {
 	ts990debug("set_notch(bool on, int val)");
 
-	if (useB) {
+	if (inuse == onB) {
 		if (on) {
 			cmd.assign("NT12;");
 			sendCommand(cmd);
@@ -2994,7 +2996,7 @@ bool  RIG_TS990::get_notch(int &val)
 {
 	ts990debug("get_notch(int &val)");
 
-	if (useB) {
+	if (inuse == onB) {
 		cmd = "NT1;";
 		if (wait_char(';', 5, TS990_WAIT, "get notch state", ASC) < 5) return 0;
 		size_t p = replystr.rfind("NT");

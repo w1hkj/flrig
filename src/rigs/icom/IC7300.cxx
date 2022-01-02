@@ -254,6 +254,8 @@ RIG_IC7300::RIG_IC7300() {
 	can_change_alt_vfo = true;
 	has_a2b = true;
 
+	inuse = onA;
+
 	can_synch_clock = true;
 
 	CW_sense = 0; // CW is LSB
@@ -289,6 +291,7 @@ void RIG_IC7300::selectA()
 	set_trace(1, "select A");
 	waitFB("select A");
 	seth();
+	inuse = onA;
 }
 
 void RIG_IC7300::selectB()
@@ -300,6 +303,7 @@ void RIG_IC7300::selectB()
 	set_trace(1, "select B");
 	waitFB("select B");
 	seth();
+	inuse = onB;
 }
 
 //======================================================================
@@ -451,7 +455,7 @@ unsigned long int RIG_IC7300::get_vfoA ()
 	cmd.assign(pre_to).append("\x25");
 	resp.assign(pre_fm).append("\x25");
 
-	if (useB) {
+	if (inuse == onB) {
 		cmd  += '\x01';
 		resp += '\x01';
 	} else {
@@ -484,7 +488,7 @@ void RIG_IC7300::set_vfoA (unsigned long int freq)
 	A.freq = freq;
 
 	cmd.assign(pre_to).append("\x25");
-	if (useB) cmd += '\x01';
+	if (inuse == onB) cmd += '\x01';
 	else      cmd += '\x00';
 
 	cmd.append( to_bcd_be( freq, 10) );
@@ -502,7 +506,7 @@ unsigned long int RIG_IC7300::get_vfoB ()
 	cmd.assign(pre_to).append("\x25");
 	resp.assign(pre_fm).append("\x25");
 
-	if (useB) {
+	if (inuse == onB) {
 		cmd  += '\x00';
 		resp += '\x00';
 	} else {
@@ -535,7 +539,7 @@ void RIG_IC7300::set_vfoB (unsigned long int freq)
 	B.freq = freq;
 
 	cmd.assign(pre_to).append("\x25");
-	if (useB) cmd += '\x00';
+	if (inuse == onB) cmd += '\x00';
 	else      cmd += '\x01';
 
 	cmd.append( to_bcd_be( freq, 10 ) );
@@ -571,7 +575,7 @@ int RIG_IC7300::get_modeA()
 	cmd.assign(pre_to).append("\x26");
 	resp.assign(pre_fm).append("\x26");
 
-	if (useB)
+	if (inuse == onB)
 		cmd += '\x01';
 	else
 		cmd += '\x00';
@@ -644,7 +648,7 @@ void RIG_IC7300::set_modeA(int val)
 	A.imode = val;
 	cmd.assign(pre_to);
 	cmd += '\x26';
-	if (useB)
+	if (inuse == onB)
 		cmd += '\x01';					// unselected vfo
 	else
 		cmd += '\x00';					// selected vfo
@@ -670,7 +674,7 @@ int RIG_IC7300::get_modeB()
 	cmd.assign(pre_to).append("\x26");
 	resp.assign(pre_fm).append("\x26");
 
-	if (useB)
+	if (inuse == onB)
 		cmd += '\x00';   // active vfo
 	else
 		cmd += '\x01';   // inactive vfo
@@ -740,7 +744,7 @@ void RIG_IC7300::set_modeB(int val)
 	B.imode = val;
 	cmd.assign(pre_to);
 	cmd += '\x26';
-	if (useB)
+	if (inuse == onB)
 		cmd += '\x00';					// selected vfo
 	else
 		cmd += '\x01';					// unselected vfo
@@ -759,7 +763,7 @@ void RIG_IC7300::set_modeB(int val)
 
 int RIG_IC7300::get_FILT(int mode)
 {
-	if (useB) return mode_filterB[mode];
+	if (inuse == onB) return mode_filterB[mode];
 	return mode_filterA[mode];
 }
 
@@ -768,7 +772,7 @@ void RIG_IC7300::set_FILT(int filter)
 	if (filter < 1 || filter > 3)
 		return;
 
-	if (useB) {
+	if (inuse == onB) {
 		B.filter = filter;
 		mode_filterB[B.imode] = filter;
 		cmd.assign(pre_to);
@@ -812,7 +816,7 @@ const char *RIG_IC7300::FILT(int val)
 const char * RIG_IC7300::nextFILT()
 {
 	int val = A.filter;
-	if (useB) val = B.filter;
+	if (inuse == onB) val = B.filter;
 	val++;
 	if (val > 3) val = 1;
 	set_FILT(val);
@@ -918,7 +922,8 @@ int RIG_IC7300::get_bwA()
 {
 	if (A.imode == 3 || A.imode == 11) return 0; // FM, FM-D
 
-	if (useB) selectA();
+	int current_vfo = inuse;
+	if (current_vfo == onB) selectA();
 
 	cmd = pre_to;
 	cmd.append("\x1a\x03");
@@ -941,7 +946,7 @@ int RIG_IC7300::get_bwA()
 		mode_bwA[A.imode] = bwval;
 	}
 
-	if (useB) selectB();
+	if (current_vfo == onB) selectB();
 
 	return A.iBW;
 }
@@ -953,7 +958,9 @@ void RIG_IC7300::set_bwA(int val)
 	if (A.imode == 3 || A.imode == 11) return; // FM, FM-D
 
 	A.iBW = val;
-	if (useB) selectA();
+
+	int current_vfo = inuse;
+	if (current_vfo == onB) selectA();
 
 	cmd = pre_to;
 	cmd.append("\x1a\x03");
@@ -965,14 +972,15 @@ void RIG_IC7300::set_bwA(int val)
 
 	mode_bwA[A.imode] = val;
 
-	if (useB) selectB();
+	if (current_vfo == onB) selectB();
 }
 
 int RIG_IC7300::get_bwB()
 {
 	if (B.imode == 3 || B.imode == 11) return 0; // FM, FM-D
 
-	if (!useB) selectB();
+	int current_vfo = inuse;
+	if (current_vfo == onA) selectB();
 
 	cmd = pre_to;
 	cmd.append("\x1a\x03");
@@ -995,7 +1003,7 @@ int RIG_IC7300::get_bwB()
 		mode_bwB[B.imode] = bwval;
 	}
 
-	if (!useB) selectA();
+	if (current_vfo == onA) selectA();
 
 	return B.iBW;
 }
@@ -1006,7 +1014,8 @@ void RIG_IC7300::set_bwB(int val)
 	if (B.imode == 3 || B.imode == 11) return; // FM, FM-D
 	B.iBW = val;
 
-	if (!useB) selectB();
+	int current_vfo = inuse;
+	if (current_vfo == onA) selectB();
 
 	cmd = pre_to;
 	cmd.append("\x1a\x03");
@@ -1018,7 +1027,7 @@ void RIG_IC7300::set_bwB(int val)
 
 	mode_bwB[B.imode] = val;
 
-	if (!useB) selectA();
+	if (current_vfo == onA) selectA();
 }
 
 // LSB  USB  AM   FM   CW  CW-R  RTTY  RTTY-R  LSB-D  USB-D  AM-D  FM-D
@@ -1083,7 +1092,7 @@ const char ** RIG_IC7300::bwtable(int m)
 int RIG_IC7300::def_bandwidth(int m)
 {
 	int bw = adjust_bandwidth(m);
-	if (useB) {
+	if (inuse == onB) {
 		if (mode_bwB[m] == -1)
 			mode_bwB[m] = bw;
 		return mode_bwB[m];
@@ -2464,7 +2473,7 @@ void RIG_IC7300::get_band_selection(int v)
 			for (index = 0; index < sizeof(PL_tones) / sizeof(*PL_tones); index++)
 				if (tone == PL_tones[index]) break;
 			rTONE = index;
-			if (useB) {
+			if (inuse == onB) {
 				set_vfoB(bandfreq);
 				set_modeB(bandmode);
 				set_FILT(bandfilter);
@@ -2480,9 +2489,9 @@ void RIG_IC7300::get_band_selection(int v)
 void RIG_IC7300::set_band_selection(int v)
 {
 //	set_trace(1, "set_band_selection()");
-	unsigned long int freq = (useB ? B.freq : A.freq);
-	int fil = (useB ? B.filter : A.filter);
-	int mode = (useB ? B.imode : A.imode);
+	unsigned long int freq = (inuse == onB ? B.freq : A.freq);
+	int fil = (inuse == onB ? B.filter : A.filter);
+	int mode = (inuse == onB ? B.imode : A.imode);
 
 	cmd.assign(pre_to);
 	cmd.append("\x1A\x01");

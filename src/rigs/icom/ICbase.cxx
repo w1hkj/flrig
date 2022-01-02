@@ -209,7 +209,7 @@ void RIG_ICOM::A2B()
 	cmd += 0x07; cmd += 0xA0;
 	ICtrace("A2B", cmd);
 	cmd.append(post);
-	if (useB) filA = filB;
+	if (inuse == onB) filA = filB;
 	else      filB = filA;
 	waitFB("Equalize vfos");
 	ICtrace("A2B", replystr);

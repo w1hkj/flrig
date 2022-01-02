@@ -1026,7 +1026,7 @@ void setColors()
 	progStatus.tab_green = tab_green;
 	progStatus.tab_blue = tab_blue;
 
-	if (useB) {
+	if (selrig->inuse == onB) {
 		FreqDispB->SetONOFFCOLOR( fl_rgb_color(fg_red, fg_green, fg_blue), bgclr);
 		FreqDispA->SetONOFFCOLOR(
 			fl_rgb_color(fg_red, fg_green, fg_blue),

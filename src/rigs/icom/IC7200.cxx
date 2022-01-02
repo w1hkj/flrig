@@ -297,7 +297,7 @@ bool RIG_IC7200::check ()
 
 unsigned long int RIG_IC7200::get_vfoA ()
 {
-	if (useB) return A.freq;
+	if (inuse == onB) return A.freq;
 	string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
@@ -333,7 +333,7 @@ void RIG_IC7200::set_vfoA (unsigned long int freq)
 
 unsigned long int RIG_IC7200::get_vfoB ()
 {
-	if (!useB) return B.freq;
+	if (inuse == onA) return B.freq;
 	string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
@@ -1156,7 +1156,7 @@ int RIG_IC7200::get_modetype(int n)
 
 int RIG_IC7200::get_FILT(int mode)
 {
-	if (useB) return mode_filterB[mode];
+	if (inuse == onB) return mode_filterB[mode];
 	return mode_filterA[mode];
 }
 
@@ -1165,7 +1165,7 @@ void RIG_IC7200::set_FILT(int filter)
 	if (filter < 1 || filter > 3)
 		return;
 
-	if (useB) {
+	if (inuse == onB) {
 		B.filter = filter;
 		mode_filterB[B.imode] = filter;
 
@@ -1227,7 +1227,7 @@ const char *RIG_IC7200::FILT(int val)
 const char *RIG_IC7200::nextFILT()
 {
 	int val = A.filter;
-	if (useB) val = B.filter;
+	if (inuse == onB) val = B.filter;
 	val++;
 	if (val > 3) val = 1;
 	set_FILT(val);
@@ -1321,7 +1321,7 @@ int RIG_IC7200::adjust_bandwidth(int m)
 int RIG_IC7200::def_bandwidth(int m)
 {
 	int bw = adjust_bandwidth(m);
-	if (useB) {
+	if (inuse == onB) {
 		if (mode_bwB[m] == -1)
 			mode_bwB[m] = bw;
 		return mode_bwB[m];
@@ -1952,7 +1952,7 @@ void RIG_IC7200::get_band_selection(int v)
 			int bandfilter = ans[p+14];
 			int banddata = ans[p+15] & 0x10;
 			if ((bandmode == 0 || bandmode == 1) && banddata) bandmode += 7;
-			if (useB) {
+			if (inuse == onB) {
 				set_vfoB(bandfreq);
 				set_modeB(bandmode);
 				set_FILT(bandfilter);
@@ -1968,9 +1968,9 @@ void RIG_IC7200::get_band_selection(int v)
 
 void RIG_IC7200::set_band_selection(int v)
 {
-	unsigned long int freq = (useB ? B.freq : A.freq);
-	int mode = (useB ? B.imode : A.imode);
-	int fil = (useB ? B.filter : A.filter);
+	unsigned long int freq = (inuse == onB ? B.freq : A.freq);
+	int mode = (inuse == onB ? B.imode : A.imode);
+	int fil = (inuse == onB ? B.filter : A.filter);
 
 	cmd.assign(pre_to);
 	cmd.append("\x1A\x01");

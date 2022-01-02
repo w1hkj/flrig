@@ -356,6 +356,7 @@ void RIG_FTdx9000::selectA()
 	cmd = "FR0;FT2;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select A", cmd, replystr);
+	inuse = onA;
 }
 
 void RIG_FTdx9000::selectB()
@@ -363,6 +364,7 @@ void RIG_FTdx9000::selectB()
 	cmd = "FR3;FT3;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "select B", cmd, replystr);
+	inuse = onB;
 }
 
 void RIG_FTdx9000::A2B()
@@ -381,7 +383,6 @@ void RIG_FTdx9000::set_split(bool val)
 {
 	split = val;
 	if (val) {
-		useB = false;
 		cmd = "FR0;";
 		sendCommand(cmd);
 		showresp(WARN, ASC, "Rx on A", cmd, replystr);
@@ -725,7 +726,7 @@ int RIG_FTdx9000::adjust_bandwidth(int val)
 int RIG_FTdx9000::def_bandwidth(int m)
 {
 	int bw = adjust_bandwidth(m);
-	if (useB) {
+	if (inuse == onB) {
 		if (mode_bwB[m] == -1)
 			mode_bwB[m] = bw;
 		return mode_bwB[m];
@@ -986,7 +987,7 @@ void RIG_FTdx9000::set_if_shift(int val)
 
 bool RIG_FTdx9000::get_if_shift(int &val)
 {
-	if (useB)
+	if (inuse == onB)
 		cmd = rsp = "IS1";
 	else
 		cmd = rsp = "IS0";

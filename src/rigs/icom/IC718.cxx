@@ -142,7 +142,7 @@ bool RIG_IC718::check ()
 
 unsigned long int RIG_IC718::get_vfoA ()
 {
-	if (useB) return A.freq;
+	if (inuse == onB) return A.freq;
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
@@ -172,7 +172,7 @@ void RIG_IC718::set_vfoA (unsigned long int freq)
 
 unsigned long int RIG_IC718::get_vfoB ()
 {
-	if (!useB) return B.freq;
+	if (inuse == onA) return B.freq;
 	string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;

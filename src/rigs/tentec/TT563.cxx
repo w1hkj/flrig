@@ -155,7 +155,7 @@ bool RIG_TT563::check ()
 
 unsigned long int RIG_TT563::get_vfoA ()
 {
-	if (useB) return A.freq;
+	if (inuse == onB) return A.freq;
 	string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
@@ -183,7 +183,7 @@ void RIG_TT563::set_vfoA (unsigned long int freq)
 
 unsigned long int RIG_TT563::get_vfoB ()
 {
-	if (!useB) return B.freq;
+	if (inuse == onA) return B.freq;
 	string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
@@ -211,7 +211,7 @@ void RIG_TT563::set_vfoB (unsigned long int freq)
 
 int  RIG_TT563::get_vfoAorB()
 {
-	int ret = useB;
+	int ret = inuse == onB;
 	cmd = pre_to;
 	cmd += '\x17';
 	cmd.append(post);

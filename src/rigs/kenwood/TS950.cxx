@@ -459,6 +459,7 @@ void RIG_TS950::selectA()
 	sendCommand(cmd);
 	sett("Tx on A");
 	MilliSleep(100);
+	inuse = onA;
 }
 
 void RIG_TS950::selectB()
@@ -471,6 +472,7 @@ void RIG_TS950::selectB()
 	sendCommand(cmd);
 	sett("Tx on B");
 	MilliSleep(100);
+	inuse = onB;
 }
 
 bool RIG_TS950::can_split()
@@ -480,7 +482,7 @@ bool RIG_TS950::can_split()
 
 void RIG_TS950::set_split(bool val)
 {
-	if (useB) {
+	if (inuse == onB) {
 		if (val) {
 			cmd = "FR1;"; sendCommand(cmd); sett("Rx on B"); MilliSleep(100);
 			cmd = "FT0;"; sendCommand(cmd); sett("Tx on A"); MilliSleep(100);
