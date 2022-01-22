@@ -78,6 +78,12 @@ static void btn_label(void *p)
 	b->redraw();
 }
 
+static inline void minmax(int min, int max, int &val)
+{
+	if (val > max) val = max;
+	if (val < min) val = min;
+}
+
 static GUI Xiegu_G90_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },	//0
 	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },	//1
@@ -160,8 +166,10 @@ RIG_Xiegu_G90::RIG_Xiegu_G90() {
 	has_extras = 
 	has_cw_wpm = 
 	has_cw_vol = 
+	has_cw_spot_tone = 
 	has_band_selection = 
 	has_compON = 
+	has_tune_control = 
 	has_nb_level = true;
 // false
 	CW_sense =
@@ -175,7 +183,6 @@ RIG_Xiegu_G90::RIG_Xiegu_G90() {
 	has_noise_reduction_control = 
 	has_auto_notch = 
 	has_notch_control = 
-	has_cw_spot_tone = 
 	has_cw_qsk = 
 	has_vox_onoff = 
 	has_vox_gain = 
@@ -184,7 +191,6 @@ RIG_Xiegu_G90::RIG_Xiegu_G90() {
 	has_compression = 
 	has_vfo_adj = 
 	restore_mbw = 
-	has_tune_control = 
 	has_xcvr_auto_on_off = false;
 
 };
@@ -1015,7 +1021,7 @@ int RIG_Xiegu_G90::incr_agc()
 	return agcval;
 }
 
-static const char *agcstrs[] = {"AGC", "FST", "SLO","AUT"};
+static const char *agcstrs[] = {"AGC-O", "AGC-F", "AGC-M","AGC-S"};
 const char *RIG_Xiegu_G90::agc_label()
 {
 	return agcstrs[agcval];
@@ -1026,4 +1032,52 @@ int RIG_Xiegu_G90::agc_val()
 	return (agcval);
 }
 
+void RIG_Xiegu_G90::set_cw_spot_tone()
+{
+	cmd.assign(pre_to).append("\x14\x09"); // values 0=300Hz 255=900Hz
+	int n = round((progStatus.cw_spot_tone - 300) * 255.0 / 600.0 + 0.5);
+	minmax(0, 255, n);
+
+	cmd.append(to_bcd(n, 3));
+	cmd.append( post );
+	set_trace(1, "set cw spot tone");
+	waitFB("SET cw spot tone");
+	seth();
+}
+
+void RIG_Xiegu_G90::tune_rig(int how)
+{
+	cmd = pre_to;
+	cmd.append("\x1c\x01");
+	switch (how) {
+		default:
+		case 0:
+			cmd += '\x00'; // off
+			break;
+		case 1:
+			cmd += '\x01'; // ON
+			break;
+		case 2:
+			cmd += '\x02'; // start tuning
+			break;
+	}
+	cmd.append( post );
+	waitFB("tune rig");
+	ICtrace("tune rig", replystr);
+}
+
+int RIG_Xiegu_G90::get_tune()
+{
+	string resp;
+	string cstr = "\x1C\x01";
+	cmd.assign(pre_to).append(cstr).append(post);
+	resp.assign(pre_fm).append(cstr);
+	int val = tune_;
+	if (waitFOR(8, "get TUNE")) {
+		size_t p = replystr.rfind(resp);
+		if (p != string::npos)
+			val = replystr[p + 6];
+	}
+	return (tune_ = val);
+}
 

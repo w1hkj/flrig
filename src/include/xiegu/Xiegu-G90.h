@@ -96,12 +96,13 @@ public:
 //	void get_cw_qsk_min_max_step(double &min, double &max, double &step) {
 //		min = 2.0; max = 13.0; step = 0.1; }
 
-//	void get_cw_spot_tone_min_max_step(int &min, int &max, int &step) {
-//		min = 300; max = 900; step = 5; }
+	void set_cw_spot_tone();
+	void get_cw_spot_tone_min_max_step(int &min, int &max, int &step) {
+		min = 300; max = 900; step = 5; }
 
 	void set_cw_wpm();
 //	void set_cw_qsk();
-//	void set_cw_spot_tone();
+
 //	void set_cw_vol();
 
 //	const char **bwtable(int m);
@@ -172,6 +173,10 @@ public:
 	const char *agc_label();
 	int  agc_val();
 	int power_scale();
+
+	void tune_rig(int how);
+	int  get_tune();
+
 };
 
 #endif
