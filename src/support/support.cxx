@@ -2904,7 +2904,7 @@ static int img = -1;
 
 void set_power_controlImage(double pwr)
 {
-	if (progStatus.pwr_scale == 0 || (progStatus.pwr_scale == 5 && pwr <= 5.0)) {
+	if ((progStatus.pwr_scale == 8 && pwr <= 5.0) || (progStatus.pwr_scale == 0)) {
 		if (img != 1) {
 			img = 1;
 			scalePower->image(image_p5);
@@ -2919,9 +2919,54 @@ void set_power_controlImage(double pwr)
 			sigbar_PWR->redraw();
 		}
 	}
-	else if (progStatus.pwr_scale == 1 || (progStatus.pwr_scale == 5 && pwr <= 25.0)) {
+	else if ((progStatus.pwr_scale == 8 && pwr <= 10.0) || (progStatus.pwr_scale == 1)) {
 		if (img != 2) {
 			img = 2;
+			scalePower->image(image_p10);
+			sldrFwdPwr->maximum(10.0);
+			sldrFwdPwr->minimum(0.0);
+			scalePower->redraw();
+
+			mtr_PWR->image(image_p10);
+			mtr_PWR->redraw();
+			sigbar_PWR->maximum(10.0);
+			sigbar_PWR->minimum(0.0);
+			sigbar_PWR->redraw();
+		}
+	}
+	else if ((progStatus.pwr_scale == 8 && pwr <= 15.0) || (progStatus.pwr_scale == 2)) {
+		if (img != 3) {
+			img = 3;
+			scalePower->image(image_p15);
+			sldrFwdPwr->maximum(16.666);
+			sldrFwdPwr->minimum(0.0);
+			scalePower->redraw();
+
+			mtr_PWR->image(image_p15);
+			mtr_PWR->redraw();
+			sigbar_PWR->maximum(16.666);
+			sigbar_PWR->minimum(0.0);
+			sigbar_PWR->redraw();
+		}
+	}
+	else if ((progStatus.pwr_scale == 8 && pwr <= 20.0) || (progStatus.pwr_scale == 3)) {
+		if (img != 4) {
+			img = 4;
+			scalePower->image(image_p20);
+			sldrFwdPwr->maximum(20.0);
+			sldrFwdPwr->minimum(0.0);
+			scalePower->redraw();
+
+			mtr_PWR->image(image_p20);
+			mtr_PWR->redraw();
+			sigbar_PWR->maximum(20.0);
+			sigbar_PWR->minimum(0.0);
+			sigbar_PWR->redraw();
+		}
+	}
+	else if ((progStatus.pwr_scale == 8 && pwr <= 25.0) || (progStatus.pwr_scale == 4)) {
+		if (img != 5) {
+			img = 5;
 			scalePower->image(image_p25);
 			sldrFwdPwr->maximum(25.0);
 			sldrFwdPwr->minimum(0.0);
@@ -2934,9 +2979,9 @@ void set_power_controlImage(double pwr)
 			sigbar_PWR->redraw();
 		}
 	}
-	else if (progStatus.pwr_scale == 2 || (progStatus.pwr_scale == 5 && pwr <= 50.0)) {
-		if (img != 3) {
-			img = 3;
+	else if ((progStatus.pwr_scale == 8 && pwr <= 50.0) || (progStatus.pwr_scale == 5)) {
+		if (img != 6) {
+			img = 6;
 			scalePower->image(image_p50);
 			sldrFwdPwr->maximum(50.0);
 			sldrFwdPwr->minimum(0.0);
@@ -2949,9 +2994,9 @@ void set_power_controlImage(double pwr)
 			sigbar_PWR->redraw();
 		}
 	}
-	else if (progStatus.pwr_scale == 3 || (progStatus.pwr_scale == 5 && pwr <= 100.0)) {
-		if (img != 4) {
-			img = 4;
+	else if ((progStatus.pwr_scale == 8 && pwr <= 100.0) || (progStatus.pwr_scale == 6)) {
+		if (img != 6) {
+			img = 6;
 			scalePower->image(image_p100);
 			sldrFwdPwr->maximum(100.0);
 			sldrFwdPwr->minimum(0.0);
@@ -2964,9 +3009,9 @@ void set_power_controlImage(double pwr)
 			sigbar_PWR->redraw();
 		}
 	}
-	else if (progStatus.pwr_scale == 4 || (pwr > 100.0)) {
-		if (img != 5) {
-			img = 5;
+	else if ((progStatus.pwr_scale == 8 && pwr > 100.0) || (progStatus.pwr_scale == 7)) {
+		if (img != 8) {
+			img = 8;
 			scalePower->image(image_p200);
 			sldrFwdPwr->maximum(200.0);
 			sldrFwdPwr->minimum(0.0);
@@ -2981,6 +3026,8 @@ void set_power_controlImage(double pwr)
 	}
 	return;
 }
+
+void set_init_power_control();
 
 void setPower()
 {
@@ -3016,6 +3063,7 @@ void setPower()
 
 	guard_lock lock(&mutex_serial);
 	selrig->set_power_control(set);
+	set_init_power_control();
 }
 
 void cbTune()

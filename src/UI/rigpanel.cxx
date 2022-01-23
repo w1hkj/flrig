@@ -386,6 +386,9 @@ Fl_Group *g_extras = (Fl_Group *)0;
 
 static const char *mtr_scales[] = {
 "5 watt",
+"10 watt",
+"15 watt",
+"20 watt",
 "25 watt",
 "50 watt",
 "100 watt",

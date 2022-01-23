@@ -430,6 +430,9 @@ EXTRA_DIST = \
 	include/combo.h \
 	images/alc.xbm \
 	images/P5.xbm \
+	images/P10.xbm \
+	images/P15.xbm \
+	images/P20.xbm \
 	images/P25.xbm \
 	images/P50.xbm \
 	images/P100.xbm \
