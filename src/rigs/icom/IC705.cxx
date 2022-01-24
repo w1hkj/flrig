@@ -1287,7 +1287,7 @@ void RIG_IC705::set_power_control(double val)
 {
 	cmd = pre_to;
 	cmd.append("\x14\x0A");
-	cmd.append(bcd255(val));
+	cmd.append(bcd255(val * 10));
 	cmd.append( post );
 	set_trace(2, "set_power_control()", str2hex(cmd.c_str(), cmd.length()));
 	waitFB("set power");
@@ -1304,7 +1304,7 @@ double RIG_IC705::get_power_control()
 	if (waitFOR(9, "get power")) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos)
-			val = num100(replystr.substr(p+6));
+			val = num100(replystr.substr(p+6)) / 10;
 	}
 	get_trace(2, "get_power_control()", str2hex(replystr.c_str(), replystr.length()));
 	return val;
@@ -1312,7 +1312,7 @@ double RIG_IC705::get_power_control()
 
 void RIG_IC705::get_pc_min_max_step(double &min, double &max, double &step)
 {
-	min = 0; max = 100; step = 1.0;
+	min = 0; max = 10.0; step = 0.1;
 }
 
 int RIG_IC705::get_smeter()
@@ -1366,18 +1366,20 @@ struct pwrpair {int mtr; float pwr;};
 
 static pwrpair pwrtbl[] = {
 	{0,   0.0},
-	{21,  0.4},
-	{43,  0.8},
-	{65,  1.3},
-	{83,  1.7},
-	{95,  2.1},
-	{105, 2.5},
-	{114, 2.9},
-	{124, 3.3},
-	{143, 4.2},
-	{183, 6.3},
-	{213, 8.3},
-	{255, 10.0 } };
+	{26,  0.5},
+	{52,  1.0},
+	{80,  2.0},
+	{104, 3.0},
+	{122, 4.0},
+	{143, 5.0},
+	{158, 6.0},
+	{174, 7.0},
+	{191, 8.0},
+	{210, 9.0},
+	{228, 10.0},
+	{245, 11.0},
+	{255, 11.6}
+};
 
 int RIG_IC705::get_power_out(void)
 {
@@ -1388,7 +1390,11 @@ int RIG_IC705::get_power_out(void)
 	cmd.append(cstr);
 	cmd.append( post );
 	int mtr= 0;
-	if (waitFOR(9, "get power out")) {
+
+	int ret = waitFOR(9, "get power out");
+	igett("get power out");
+
+	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != string::npos) {
 			mtr = fm_bcd(replystr.substr(p+6), 3);
