@@ -59,6 +59,10 @@ pthread_mutex_t cwio_text_mutex = PTHREAD_MUTEX_INITIALIZER;
 int cwio_process = NONE;
 bool cwio_thread_running = false;
 
+static string new_text;
+static string cwio_text;
+
+
 // return current tick time in seconds
 double cw_now()
 {
@@ -405,8 +409,6 @@ void stop_cwio_thread()
 
 }
 
-static string new_text;
-
 void add_cwio(string txt)
 {
 	if (!cwio_thread_running) return;
@@ -431,6 +433,12 @@ void send_text(bool state)
 	} else {
 		cwio_process = NONE;
 	}
+}
+
+void cwio_new_text(std::string txt)
+{
+	cwio_text.append(txt);
+	send_text(true);
 }
 
 void cwio_clear_text()

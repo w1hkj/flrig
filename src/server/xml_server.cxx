@@ -2987,9 +2987,6 @@ public:
 // Set cwio transmit string
 //------------------------------------------------------------------------------
 
-extern void add_cwio(string);
-string cwio_text;
-
 class rig_cwio_text : public XmlRpcServerMethod {
 public:
 	rig_cwio_text(XmlRpcServer* s) : XmlRpcServerMethod("rig.cwio_text", s) {}
@@ -2997,7 +2994,7 @@ public:
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 		std::string s = (string)params[0];
 		guard_lock lck(&cwio_text_mutex);
-		cwio_text.append(s);
+		add_cwio(s);
 	}
 
 	std::string help() { return std::string("sends text using cwio DTR/RTS keying"); }

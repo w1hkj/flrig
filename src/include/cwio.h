@@ -37,7 +37,6 @@ extern Fl_Double_Window *cwio_editor;
 extern Fl_Double_Window *cwio_configure;
 
 extern pthread_mutex_t cwio_text_mutex;
-extern string cwio_text;
 extern int cwio_process;
 
 extern Cserial *cwio_serial;
@@ -66,5 +65,7 @@ extern void control_function_keys();
 
 extern void calibrate_cwio();
 extern void open_cwio_config();
+
+extern void add_cwio(string);
 
 #endif
