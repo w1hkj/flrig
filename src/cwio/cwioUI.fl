@@ -34,7 +34,7 @@ Function {cwio_window()} {open
       Fl_Value_Slider sldr_cwioWPM {
         label {char WPM}
         callback {progStatus.cwioWPM = (int)o->value();}
-        tooltip {My transmit CW WPM} xywh {4 74 300 20} type {Horz Knob} color 246 selection_color 4 align 8 minimum 5 maximum 50 step 1 value 20 textsize 14
+        tooltip {My transmit CW WPM} xywh {4 74 225 20} type {Horz Knob} color 246 selection_color 4 align 8 minimum 5 maximum 50 step 1 value 20 textsize 14
         code0 {\#include "flslider2.h"}
         code1 {o->value(progStatus.cwioWPM);}
         class Fl_Value_Slider2
@@ -42,12 +42,17 @@ Function {cwio_window()} {open
       Fl_Button btn_cwio_config {
         label Config
         callback {open_cwio_config();}
-        tooltip {Clear transmit text} xywh {390 73 60 22}
+        tooltip {Clear transmit text} xywh {317 73 60 22}
       }
       Fl_Button btn_cwio_clear {
         label Clear
         callback {cwio_clear_text();}
-        tooltip {Clear transmit text} xywh {473 73 60 22}
+        tooltip {Clear transmit text} xywh {400 73 60 22}
+      }
+      Fl_Light_Button btn_cwioKEY {
+        label KEY
+        callback {cwio_key (o->value());} selected
+        tooltip {Key Down / Up} xywh {483 73 50 22}
       }
       Fl_Light_Button btn_cwioSEND {
         label {Send/Pause}
@@ -455,7 +460,7 @@ Function {cwio_config_dialog()} {open
     label {CW Configuration} open
     xywh {611 208 670 100} type Double visible
   } {
-    Fl_Group {} {open selected
+    Fl_Group {} {open
       xywh {2 3 666 100} box ENGRAVED_FRAME
     } {
       Fl_Group select_cwioPORT {

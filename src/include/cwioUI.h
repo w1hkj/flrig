@@ -15,6 +15,7 @@ extern Fl_Value_Slider2 *sldr_cwioWPM;
 extern Fl_Button *btn_cwio_config;
 extern Fl_Button *btn_cwio_clear;
 #include <FL/Fl_Light_Button.H>
+extern Fl_Light_Button *btn_cwioKEY;
 extern Fl_Light_Button *btn_cwioSEND;
 extern Fl_Button *btn_msg[12];
 Fl_Double_Window* cwio_window();

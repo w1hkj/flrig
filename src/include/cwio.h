@@ -67,5 +67,6 @@ extern void calibrate_cwio();
 extern void open_cwio_config();
 
 extern void add_cwio(string);
+extern void cwio_key(bool state);
 
 #endif

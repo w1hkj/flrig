@@ -30,6 +30,12 @@ static void cb_btn_cwio_clear(Fl_Button*, void*) {
   cwio_clear_text();
 }
 
+Fl_Light_Button *btn_cwioKEY=(Fl_Light_Button *)0;
+
+static void cb_btn_cwioKEY(Fl_Light_Button* o, void*) {
+  cwio_key (o->value());
+}
+
 Fl_Light_Button *btn_cwioSEND=(Fl_Light_Button *)0;
 
 static void cb_btn_cwioSEND(Fl_Light_Button* o, void*) {
@@ -105,7 +111,7 @@ Fl_Double_Window* cwio_window() {
       Fl_Group::current()->resizable(txt_to_send);
     } // Fl_Input2* txt_to_send
     { Fl_Group* o = new Fl_Group(0, 70, 670, 60);
-      { Fl_Value_Slider2* o = sldr_cwioWPM = new Fl_Value_Slider2(4, 74, 300, 20, _("char WPM"));
+      { Fl_Value_Slider2* o = sldr_cwioWPM = new Fl_Value_Slider2(4, 74, 225, 20, _("char WPM"));
         sldr_cwioWPM->tooltip(_("My transmit CW WPM"));
         sldr_cwioWPM->type(5);
         sldr_cwioWPM->box(FL_DOWN_BOX);
@@ -125,14 +131,18 @@ Fl_Double_Window* cwio_window() {
         sldr_cwioWPM->when(FL_WHEN_CHANGED);
         o->value(progStatus.cwioWPM);
       } // Fl_Value_Slider2* sldr_cwioWPM
-      { btn_cwio_config = new Fl_Button(390, 73, 60, 22, _("Config"));
+      { btn_cwio_config = new Fl_Button(317, 73, 60, 22, _("Config"));
         btn_cwio_config->tooltip(_("Clear transmit text"));
         btn_cwio_config->callback((Fl_Callback*)cb_btn_cwio_config);
       } // Fl_Button* btn_cwio_config
-      { btn_cwio_clear = new Fl_Button(473, 73, 60, 22, _("Clear"));
+      { btn_cwio_clear = new Fl_Button(400, 73, 60, 22, _("Clear"));
         btn_cwio_clear->tooltip(_("Clear transmit text"));
         btn_cwio_clear->callback((Fl_Callback*)cb_btn_cwio_clear);
       } // Fl_Button* btn_cwio_clear
+      { btn_cwioKEY = new Fl_Light_Button(483, 73, 50, 22, _("KEY"));
+        btn_cwioKEY->tooltip(_("Key Down / Up"));
+        btn_cwioKEY->callback((Fl_Callback*)cb_btn_cwioKEY);
+      } // Fl_Light_Button* btn_cwioKEY
       { btn_cwioSEND = new Fl_Light_Button(557, 73, 105, 22, _("Send/Pause"));
         btn_cwioSEND->tooltip(_("Send / Pause sending characters"));
         btn_cwioSEND->callback((Fl_Callback*)cb_btn_cwioSEND);

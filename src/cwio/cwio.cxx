@@ -111,6 +111,35 @@ int cw_sleep (double sleep_time)
 	return 0;
 }
 
+void cwio_key(bool state)
+{
+	Cserial *port = cwio_serial;
+
+	switch (progStatus.cwioSHARED) {
+		case 1: port = RigSerial; break;
+		case 2: port = AuxSerial; break;
+		case 3: port = SepSerial; break;
+		default: port = cwio_serial;
+	}
+
+	if (!port)
+		return;
+
+	if (!port->IsOpen())
+		return;
+
+	if (progStatus.cwioPTT)
+		doPTT(state);
+
+	if (progStatus.cwioKEYLINE == 2) {
+			port->setDTR(progStatus.cwioINVERTED ? !state : state);
+	} else if (progStatus.cwioKEYLINE == 1) {
+		port->setRTS(progStatus.cwioINVERTED ? !state : state);
+	}
+
+	return;
+}
+
 void send_cwkey(char c)
 {
 #ifdef CWIO_DEBUG
