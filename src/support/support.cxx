@@ -6224,21 +6224,47 @@ void init_VFOs()
 	if (selrig->name_ == rig_TT550.name_) return;
 
 	if (xcvr_name == rig_FT817.name_ || 
-		xcvr_name == rig_FT817BB.name_ ||
+//		xcvr_name == rig_FT817BB.name_ ||
 		xcvr_name == rig_FT818ND.name_ ||
 		xcvr_name == rig_FT857D.name_ ||
 		xcvr_name == rig_FT897D.name_ ) {
 
-		selrig->selectA();
-		vfoA.freq = selrig->get_vfoA();
-		FreqDispA->value(vfoA.freq);
+//		selrig->selectA();
+//		vfoA.freq = selrig->get_vfoA();
+//		FreqDispA->value(vfoA.freq);
 
 		selrig->selectB();
 		vfoB.freq = selrig->get_vfoB();
 		FreqDispB->value(vfoB.freq);
 
 		selrig->selectA();
+		vfoA.freq = selrig->get_vfoA();
+		FreqDispA->value(vfoA.freq);
 		updateBandwidthControl();
+		highlight_vfo(NULL);
+		return;
+	}
+
+	if (xcvr_name == rig_FT817BB.name_) {
+		if (selrig->get_vfoAorB() == onA) {
+			selrig->selectB();
+			vfoB.freq = selrig->get_vfoB();
+			FreqDispB->value(vfoB.freq);
+
+			selrig->selectA();
+			vfoA.freq = selrig->get_vfoA();
+			FreqDispA->value(vfoA.freq);
+			updateBandwidthControl();
+		} else {
+			selrig->selectA();
+			vfoA.freq = selrig->get_vfoA();
+			FreqDispA->value(vfoA.freq);
+
+			selrig->selectB();
+			vfoB.freq = selrig->get_vfoB();
+			FreqDispB->value(vfoB.freq);
+			updateBandwidthControl();
+		}
 		highlight_vfo(NULL);
 		return;
 	}
