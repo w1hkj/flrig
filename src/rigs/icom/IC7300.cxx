@@ -465,9 +465,8 @@ unsigned long int RIG_IC7300::get_vfoA ()
 
 	cmd.append(post);
 
-	get_trace(1, "get_vfoA()");
 	ret = waitFOR(12, "get vfo A");
-	geth();
+//	igett("vfo A");
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -516,9 +515,8 @@ unsigned long int RIG_IC7300::get_vfoB ()
 
 	cmd.append(post);
 
-	get_trace(1, "get_vfoB()");
 	ret = waitFOR(12, "get vfo B");
-	geth();
+//	igett("vfo B");
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -582,9 +580,8 @@ int RIG_IC7300::get_modeA()
 
 	cmd.append(post);
 
-	get_trace(1, "get_modeA()");
 	ret = waitFOR(10, "get mode A");
-	geth();
+	igett("mode A");
 
 	if (ret) {
 		p = replystr.rfind(resp);
@@ -680,9 +677,8 @@ int RIG_IC7300::get_modeB()
 		cmd += '\x01';   // inactive vfo
 	cmd.append(post);
 
-	get_trace(1, "get_modeB()");
 	ret = waitFOR(10, "get mode B");
-	geth();
+	igett("mode B");
 
 	if (ret) {
 		p = replystr.rfind(resp);
@@ -901,9 +897,8 @@ int RIG_IC7300::get_split()
 	cmd.append("\x0F");
 	cmd.append( post );
 
-	get_trace(1, "get_split()");
 	ret = waitFOR(7, "get split");
-	geth();
+	igett("split");
 
 	if (ret) {
 		string resp = pre_fm;
@@ -930,9 +925,8 @@ int RIG_IC7300::get_bwA()
 	cmd.append(post);
 	int bwval = A.iBW;
 
-	get_trace(1, "get_bwA()");
 	ret = waitFOR(8, "get_bwA");
-	geth();
+	igett("bw A");
 
 	if (ret) {
 		string resp = pre_fm;
@@ -987,9 +981,8 @@ int RIG_IC7300::get_bwB()
 	cmd.append(post);
 	int bwval = B.iBW;
 
-	get_trace(1, "get_bwA()");
 	ret = waitFOR(8, "get_bwB");
-	geth();
+	igett("bw B");
 
 	if (ret) {
 		string resp = pre_fm;
@@ -1112,9 +1105,8 @@ int RIG_IC7300::get_mic_gain()
 	cmd.append(cstr);
 	cmd.append(post);
 
-	get_trace(1, "get_mic_gain()");
 	ret = waitFOR(9, "get mic");
-	geth();
+	igett("mic");
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -1405,9 +1397,8 @@ int RIG_IC7300::get_PTT()
 	resp += '\x1c'; resp += '\x00';
 	cmd.append(post);
 
-	get_trace(1, "get_PTT()");
 	ret = waitFOR(8, "get PTT");
-	geth();
+//	igett("ptt");
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -1470,9 +1461,10 @@ void RIG_IC7300::set_power_control(double val)
 	cmd.append("\x14\x0A");
 	cmd.append(bcd255(val));
 	cmd.append( post );
-	set_trace(1, "set power control");
+
 	waitFB("set power");
-	seth();
+
+	isett("set pwr");
 
 }
 
@@ -1485,9 +1477,8 @@ double RIG_IC7300::get_power_control()
 	cmd.append(cstr).append(post);
 	resp.append(cstr);
 
-	get_trace(1, "get_power_control()");
 	ret = waitFOR(9, "get power");
-	geth();
+//	igett("power control");
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -1539,9 +1530,8 @@ double RIG_IC7300::get_voltmeter()
 	int mtr = 0;
 	double val = 0;
 
-	get_trace(1, "get_voltmeter()");
 	ret = waitFOR(9, "get voltmeter");
-	geth();
+	igett("voltmeter");
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -1557,19 +1547,32 @@ double RIG_IC7300::get_voltmeter()
 struct pwrpair {int mtr; float pwr;};
 
 static pwrpair pwrtbl[] = { 
-	{0, 0.0},
-	{21, 5.0},
-	{43,10.0}, 
-	{65, 15.0},
-	{83, 20.0}, 
-	{95, 25.0}, 
-	{105, 30.0},
-	{114, 35.0}, 
-	{124, 40.0}, 
-	{143, 50.0}, 
-	{183, 75.0},
-	{213, 100.0},
-	{255, 120.0 } };
+{0, 0},
+{2, 0.5},
+{3, 1.1},
+{4, 1.7},
+{6, 2.2},
+{12, 3},
+{15, 3.6},
+{21, 5},
+{25, 5.6},
+{31, 7},
+{34, 7.9},
+{40, 9.6},
+{42, 9.9},
+{43, 10},
+{46, 11},
+{49, 12},
+{65, 15},
+{83, 20},
+{95, 25},
+{105, 30},
+{118, 35},
+{126, 40},
+{143, 50},
+{183, 75},
+{220, 100},
+{255, 120} };
 
 int RIG_IC7300::get_power_out(void)
 {
@@ -1582,9 +1585,8 @@ int RIG_IC7300::get_power_out(void)
 	int mtr= 0;
 	int val = 0;
 
-	get_trace(1, "get_power_out()");
 	ret = waitFOR(9, "get power out");
-	geth();
+	igett("power out");
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -1629,9 +1631,8 @@ int RIG_IC7300::get_swr(void)
 	cmd.append( post );
 	int mtr= -1;
 
-	get_trace(1, "get_swr()");
 	ret = waitFOR(9, "get swr");
-	geth();
+	igett("swr");
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
@@ -1663,9 +1664,8 @@ int RIG_IC7300::get_alc(void)
 	cmd.append( post );
 	int mtr= -1;
 
-	get_trace(1, "get_alc");
 	ret = waitFOR(9, "get alc");
-	geth();
+	igett("alc");
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
