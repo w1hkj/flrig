@@ -3166,6 +3166,21 @@ void redrawAGC()
 		btnAGC->redraw();
 	}
 
+	if (xcvr_name == rig_FT991A.name_) {
+		switch (val) {
+			case 0 : btnAGC->selection_color(FL_BACKGROUND_COLOR);  // off
+					 break;
+			case 1 : btnAGC->selection_color(FL_RED); // fast
+					 break;
+			case 2 : btnAGC->selection_color(FL_YELLOW); // medium
+					 break;
+			case 3 : btnAGC->selection_color(FL_GREEN); // slow
+					 break;
+			case 4 : btnAGC->selection_color(FL_WHITE); // auto
+		}
+		btnAGC->redraw();
+	}
+
 	int rignbr = 0;
 	if (xcvr_name == rig_IC7200.name_) rignbr = 1;
 	if (xcvr_name == rig_IC7300.name_) rignbr = 2;

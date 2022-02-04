@@ -2213,11 +2213,10 @@ int  RIG_IC7300::get_agc()
 	get_trace(1, "get_agc");
 	ret = waitFOR(8, "get AGC");
 	geth();
-
 	if (ret) {
 		size_t p = replystr.find(retstr);
 		if (p != string::npos)
-			agcval = replystr[p+6]; // 1 == off, 2 = FAST, 3 = MED, 4 = SLOW
+			agcval = replystr[p+6]; // 1 == FAST, 2 = MED, 3 = SLOW
 	}
 	return agcval;
 }

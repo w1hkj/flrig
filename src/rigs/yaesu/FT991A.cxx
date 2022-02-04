@@ -94,6 +94,7 @@ static const int FT991A_wvals_NN[] = {0, 1, WVALS_LIMIT};
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
 	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
+	{ (Fl_Widget *)btnAGC,        2, 145,  50 },
 	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },
 	{ (Fl_Widget *)btnIFsh,     214, 105,  50 },
 	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
@@ -164,6 +165,7 @@ RIG_FT991A::RIG_FT991A() {
 	has_smeter =
 	has_alc_control =
 	has_swr_control =
+	has_agc_control =
 	has_voltmeter =
 	has_power_out =
 	has_power_control =
@@ -197,15 +199,16 @@ void RIG_FT991A::initialize()
 {
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
-	rig_widgets[2].W = sldrRFGAIN;
-	rig_widgets[3].W = btnIFsh;
-	rig_widgets[4].W = sldrIFSHIFT;
-	rig_widgets[5].W = btnNotch;
-	rig_widgets[6].W = sldrNOTCH;
-	rig_widgets[7].W = sldrMICGAIN;
-	rig_widgets[8].W = sldrPOWER;
-	rig_widgets[9].W = btnNR;
-	rig_widgets[10].W = sldrNR;
+	rig_widgets[2].W = btnAGC;
+	rig_widgets[3].W = sldrRFGAIN;
+	rig_widgets[4].W = btnIFsh;
+	rig_widgets[5].W = sldrIFSHIFT;
+	rig_widgets[6].W = btnNotch;
+	rig_widgets[7].W = sldrNOTCH;
+	rig_widgets[8].W = sldrMICGAIN;
+	rig_widgets[9].W = sldrPOWER;
+	rig_widgets[10].W = btnNR;
+	rig_widgets[11].W = sldrNR;
 
 // set progStatus defaults
 	if (progStatus.notch_val < 10) progStatus.notch_val = 1500;
@@ -1552,3 +1555,50 @@ void RIG_FT991A::sync_clock(char *tm)
 	sett("sync_time");
 }
 
+static int agcval = 0;
+int  RIG_FT991A::get_agc()
+{
+    cmd = "GT0;";
+    wait_char(';', 6, FL991A_WAIT_TIME, "get agc", ASC);
+    gett("get_agc");
+    size_t p = replystr.rfind("GT");
+    if (p == std::string::npos) return agcval;
+
+    switch (replystr[3]) {
+        default:
+        case '0': agcval = 0; break;
+        case '1': agcval = 1; break;
+        case '2': agcval = 2; break;
+        case '3': agcval = 3; break;
+        case '4': case 5:
+        case '6': agcval = 4; break;
+    }
+    return agcval;
+}
+
+int RIG_FT991A::incr_agc()
+{
+static const char ch[] = {'0', '1', '2', '3', '4'};
+	agcval++;
+	if (agcval > 3) agcval = 0;
+	cmd = "GT00;";
+	cmd[3] = ch[agcval];
+
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET agc", cmd, replystr);
+	sett("set_agc");
+
+	return agcval;
+}
+
+
+static const char *agcstrs[] = {"AGC", "FST", "MED", "SLO", "AUT"};
+const char *RIG_FT991A::agc_label()
+{
+	return agcstrs[agcval];
+}
+
+int  RIG_FT991A::agc_val()
+{
+	return (agcval);
+}

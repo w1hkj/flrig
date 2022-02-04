@@ -74,6 +74,11 @@ public:
 	int  get_swr();
 	int  get_alc();
 
+	int  get_agc();
+	int  incr_agc();
+	const char *agc_label();
+	int  agc_val();
+
 	double  get_voltmeter(void);
 
 	int  get_power_out();
