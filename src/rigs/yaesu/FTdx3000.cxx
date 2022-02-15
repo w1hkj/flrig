@@ -226,7 +226,7 @@ void RIG_FTdx3000::get_band_selection(int v)
 	sett("get band");
 
 	size_t p = replystr.rfind("IF");
-	if (p == string::npos) return;
+	if (p == std::string::npos) return;
 	if (replystr[p+21] != '0') {	// vfo 60M memory mode
 		inc_60m = true;
 	}
@@ -273,7 +273,7 @@ unsigned long int RIG_FTdx3000::get_vfoA ()
 	gett("get_vfoA()");
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return freqA;
+	if (p == std::string::npos) return freqA;
 	int f = 0;
 	for (size_t n = 2; n < 10; n++)
 		f = f*10 + replystr[p+n] - '0';
@@ -302,7 +302,7 @@ unsigned long int RIG_FTdx3000::get_vfoB ()
 	gett("get_vfoB()");
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return freqB;
+	if (p == std::string::npos) return freqB;
 	int f = 0;
 	for (size_t n = 2; n < 10; n++)
 		f = f*10 + replystr[p+n] - '0';
@@ -393,7 +393,7 @@ int RIG_FTdx3000::get_smeter()
 	gett("get_smeter()");
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
 	int mtr = atoi(&replystr[p+3]);
 	mtr = mtr * 100.0 / 256.0;
@@ -409,7 +409,7 @@ int RIG_FTdx3000::get_swr()
 	gett("get_swr()");
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
 	int mtr = atoi(&replystr[p+3]);
 	return mtr / 2.56;
@@ -440,7 +440,7 @@ int RIG_FTdx3000::get_power_out()
 	gett("get_power_out()");
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
 	int mtr = atoi(&replystr[p+3]);
 	size_t i = 0;
@@ -465,7 +465,7 @@ int RIG_FTdx3000::get_alc()
 	gett("get_alc");
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
 	int mtr = atoi(&replystr[p+3]);
 	return (int)ceil(mtr / 2.56);
@@ -481,7 +481,7 @@ double RIG_FTdx3000::get_power_control()
 	gett("get_power_control()");
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return progStatus.power_level;
+	if (p == std::string::npos) return progStatus.power_level;
 	if (p + 5 >= replystr.length()) return progStatus.power_level;
 
 	int mtr = atoi(&replystr[p+2]);
@@ -510,7 +510,7 @@ int RIG_FTdx3000::get_volume_control()
 	gett("get_volume_control()");
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return progStatus.volume;
+	if (p == std::string::npos) return progStatus.volume;
 	if (p + 6 >= replystr.length()) return progStatus.volume;
 	int val = atoi(&replystr[p+3]) * 100 / 250;
 	if (val > 100) val = 100;
@@ -547,7 +547,7 @@ int RIG_FTdx3000::get_PTT()
 	gett("get_PTT()");
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return ptt_;
+	if (p == std::string::npos) return ptt_;
 	ptt_ =  (replystr[p+2] != '0' ? 1 : 0);
 	return ptt_;
 }
@@ -581,7 +581,7 @@ int RIG_FTdx3000::get_tune()
 	rig_trace(2, "get_tuner status()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	int val = replystr[p+4] - '0';
 	return !(val < 2);
 }
@@ -625,7 +625,7 @@ int RIG_FTdx3000::get_attenuator()
 	gett("get_attenuator()");
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return progStatus.attenuator;
+	if (p == std::string::npos) return progStatus.attenuator;
 	if (p + 3 >= replystr.length()) return progStatus.attenuator;
 	atten_level = replystr[p+3] - '0';
 	if (atten_level == 1) {
@@ -677,7 +677,7 @@ int RIG_FTdx3000::get_preamp()
 	gett("get_preamp()");
 
 	size_t p = replystr.rfind(rsp);
-	if (p != string::npos)
+	if (p != std::string::npos)
 		preamp_level = replystr[p+3] - '0';
 	if (preamp_level == 1) {
 		preamp_label("Amp 1", true);
@@ -775,7 +775,7 @@ int RIG_FTdx3000::get_modeA()
 	gett("get_modeA()");
 
 	size_t p = replystr.rfind(rsp);
-	if (p != string::npos) {
+	if (p != std::string::npos) {
 		if (p + 3 < replystr.length()) {
 			int md = replystr[p+3];
 			if (md <= '9') md = md - '1';
@@ -816,7 +816,7 @@ int RIG_FTdx3000::get_modeB()
 	gett("get_modeB()");
 
 	size_t p = replystr.rfind(rsp);
-	if (p != string::npos) {
+	if (p != std::string::npos) {
 		if (p + 3 < replystr.length()) {
 			int md = replystr[p+3];
 			if (md <= '9') md = md - '1';
@@ -865,7 +865,7 @@ int RIG_FTdx3000::get_bwA()
 	gett("get_bwA()");
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return bwA;
+	if (p == std::string::npos) return bwA;
 	if (p + 5 >= replystr.length()) return bwA;
 
 	replystr[p+5] = 0;
@@ -921,7 +921,7 @@ int RIG_FTdx3000::get_bwB()
 	gett("get_bwB()");
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return bwB;
+	if (p == std::string::npos) return bwB;
 	if (p + 5 >= replystr.length()) return bwB;
 	
 	replystr[p+5] = 0;
@@ -941,7 +941,7 @@ int RIG_FTdx3000::get_bwB()
 
 std::string RIG_FTdx3000::get_BANDWIDTHS()
 {
-	stringstream s;
+	std::stringstream s;
 	for (int i = 0; i < NUM_MODES; i++)
 		s << mode_bwA[i] << " ";
 	for (int i = 0; i < NUM_MODES; i++)
@@ -951,7 +951,7 @@ std::string RIG_FTdx3000::get_BANDWIDTHS()
 
 void RIG_FTdx3000::set_BANDWIDTHS(std::string s)
 {
-	stringstream strm;
+	std::stringstream strm;
 	strm << s;
 	for (int i = 0; i < NUM_MODES; i++)
 		strm >> mode_bwA[i];
@@ -989,7 +989,7 @@ bool RIG_FTdx3000::get_if_shift(int &val)
 
 	size_t p = replystr.rfind(rsp);
 	val = progStatus.shift_val;
-	if (p == string::npos) return progStatus.shift;
+	if (p == std::string::npos) return progStatus.shift;
 	val = atoi(&replystr[p+4]);
 	if (replystr[p+3] == '-') val = -val;
 	return (val != 0);
@@ -1032,7 +1032,7 @@ bool  RIG_FTdx3000::get_notch(int &val)
 	cmd += ';';
 	wait_char(';', 8, 100, "get notch on/off", ASC);
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return ison;
+	if (p == std::string::npos) return ison;
 
 	gett("get_notch()");
 
@@ -1047,7 +1047,7 @@ bool  RIG_FTdx3000::get_notch(int &val)
 	gett("get_notch_val()");
 
 	p = replystr.rfind(rsp);
-	if (p == string::npos)
+	if (p == std::string::npos)
 		val = 10;
 	else
 		val = fm_decimal(replystr.substr(p+4), 3) * 10;
@@ -1078,7 +1078,7 @@ int  RIG_FTdx3000::get_auto_notch()
 	gett("get_auto_notch()");
 
 	size_t p = replystr.rfind("BC0");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	if (replystr[p+3] == '1') return 1;
 	return 0;
 }
@@ -1112,7 +1112,7 @@ int RIG_FTdx3000::get_noise()
 	gett("get_noise()");
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return FTdx3000_blanker_level;
+	if (p == std::string::npos) return FTdx3000_blanker_level;
 
 	FTdx3000_blanker_level = replystr[p+3] - '0';
 	if (FTdx3000_blanker_level == 1) {
@@ -1148,7 +1148,7 @@ int RIG_FTdx3000::get_mic_gain()
 	gett("get_mic_gain()");
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return progStatus.mic_gain;
+	if (p == std::string::npos) return progStatus.mic_gain;
 	int val = atoi(&replystr[p+2]);
 	return val * 100 / 255;
 }
@@ -1182,7 +1182,7 @@ int  RIG_FTdx3000::get_rf_gain()
 	gett("get_rf_gain()");
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return progStatus.rfgain;
+	if (p == std::string::npos) return progStatus.rfgain;
 	for (int i = 3; i < 6; i++) {
 		rfval *= 10;
 		rfval += replystr[p+i] - '0';

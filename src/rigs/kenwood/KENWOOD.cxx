@@ -140,7 +140,7 @@ unsigned long int KENWOOD::get_vfoA ()
 	gett("");
 	if (ret == 14) {
 		size_t p = replystr.rfind("FA");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			int f = 0;
 			for (size_t n = 2; n < 13; n++)
 				f = f*10 + replystr[p+n] - '0';
@@ -171,7 +171,7 @@ unsigned long int KENWOOD::get_vfoB ()
 	gett("");
 	if (ret == 14) {
 		size_t p = replystr.rfind("FB");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			int f = 0;
 			for (size_t n = 2; n < 13; n++)
 				f = f*10 + replystr[p+n] - '0';
@@ -317,7 +317,7 @@ int KENWOOD::get_volume_control()
 	gett("");
 	if (ret == 7) {
 		size_t p = replystr.rfind("AG");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			volctrl = fm_decimal(replystr.substr(p+3),3);
 			volctrl = (int)(volctrl / 2.55);
 		}
@@ -369,7 +369,7 @@ int  KENWOOD::get_rf_gain()
 	gett("");
 	if (ret == 6) {
 		size_t p = replystr.rfind("RG");
-		if (p != string::npos)
+		if (p != std::string::npos)
 			rfg = fm_decimal(replystr.substr(p+2) ,3) * 100 / 255;
 	}
 	return rfg;
@@ -401,7 +401,7 @@ int KENWOOD::get_mic_gain()
 	gett("");
 	if (ret == 6) {
 		size_t p = replystr.rfind("MG");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			mgain = fm_decimal(replystr.substr(p+2), 3);
 		}
 	}
@@ -435,7 +435,7 @@ int KENWOOD::get_noise()
 	gett("");
 	if (ret == 4) {
 		size_t p = replystr.rfind("NB");
-		if (p == string::npos) response = 0;
+		if (p == std::string::npos) response = 0;
 		if (replystr[p+2] == '0') response = 0;
 	}
 	return response;
@@ -459,7 +459,7 @@ int  KENWOOD::get_squelch()
 	gett("");
 	if (ret >= 7) {
 		size_t p = replystr.rfind("SQ0");
-		if (p == string::npos) return val;
+		if (p == std::string::npos) return val;
 		replystr[p + 6] = 0;
 		val = atoi(&replystr[p + 3]);
 	}
@@ -498,7 +498,7 @@ bool KENWOOD::get_if_shift(int &val)
 		gett("");
 		if (ret == 8) {
 			size_t p = replystr.rfind("IS");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				val = fm_decimal(replystr.substr(p+3), 4);
 			} else
 				val = progStatus.shift_val;

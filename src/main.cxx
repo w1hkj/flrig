@@ -102,11 +102,11 @@ Fl_Double_Window *meter_scale_dialog = (Fl_Double_Window *)0;
 Fl_Double_Window *meter_filters = (Fl_Double_Window *)0;
 Fl_Double_Window *meters_dialog = (Fl_Double_Window *)0;
 
-string HomeDir;
-string RigHomeDir;
-string TempDir;
-string defFileName;
-string title;
+std::string HomeDir;
+std::string RigHomeDir;
+std::string TempDir;
+std::string defFileName;
+std::string title;
 
 pthread_t *serial_thread = 0;
 pthread_t *digi_thread = 0;
@@ -136,7 +136,7 @@ int xmlport = 12345;
 //----------------------------------------------------------------------
 void about()
 {
-	string msg = "\
+	std::string msg = "\
 %s\n\
 Version %s\n\
 copyright W1HKJ  <w1hkj@@w1hkj.com>\n\
@@ -185,7 +185,7 @@ void visit_URL(void* arg)
 	// be done with the returned HINSTANCE is to cast it to an
 	// int and compare it with the value 32 or one of the error
 	// codes below." (Error codes omitted to preserve sanity).
-	if ((int)ShellExecute(NULL, "open", url, NULL, NULL, SW_SHOWNORMAL) <= 32)
+	if ((size_t)ShellExecute(NULL, "open", url, NULL, NULL, SW_SHOWNORMAL) <= 32)
 		fl_alert(_("Could not open url:\n%s\n"), url);
 #endif
 }
@@ -237,7 +237,7 @@ void make_pixmap(Pixmap *xpm, const char **data)
 static void checkdirectories(void)
 {
 	struct {
-		string& dir;
+		std::string& dir;
 		const char* suffix;
 		void (*new_dir_func)(void);
 	} dirs[] = {
@@ -250,7 +250,7 @@ static void checkdirectories(void)
 			dirs[i].dir.assign(RigHomeDir).append(dirs[i].suffix).append("/");
 
 		if ((r = mkdir(dirs[i].dir.c_str(), 0777)) == -1 && errno != EEXIST) {
-			cerr << _("Could not make directory") << ' ' << dirs[i].dir
+			std::cerr << _("Could not make directory") << ' ' << dirs[i].dir
 				 << ": " << strerror(errno) << '\n';
 			exit(EXIT_FAILURE);
 		}
@@ -335,7 +335,7 @@ void rotate_log(std::string filename)
 	rename(f1.c_str(), f2.c_str());
 	rename(filename.c_str(), f1.c_str());
 
-	ofstream tfile(filename.c_str());
+	std::ofstream tfile(filename.c_str());
 	tfile << "flrig " << VERSION << std::endl << std::endl;
 	tfile.close();
 
@@ -359,13 +359,13 @@ int main (int argc, char *argv[])
 	Fl::set_fonts(0);
 
 	char dirbuf[FL_PATH_MAX + 1];
-	string appdir = argv[0];
+	std::string appdir = argv[0];
 	size_t p;
 #ifdef __WIN32__
 	p = appdir.rfind("flrig.exe");
-	if (p != string::npos) appdir.erase(p);
+	if (p != std::string::npos) appdir.erase(p);
 	p = appdir.find("FL_APPS\\");
-	if (p != string::npos) {
+	if (p != std::string::npos) {
 		HomeDir.assign(appdir.substr(0, p + 8));
 		RigHomeDir.assign(HomeDir).append("flrig.files\\");
 	} else if (RigHomeDir.empty()) {
@@ -378,7 +378,7 @@ int main (int argc, char *argv[])
 		if (p != std::string::npos)
 			appdir.erase(p);
 		p = appdir.find("FL_APPS/");
-		if (p != string::npos)
+		if (p != std::string::npos)
 			RigHomeDir = appdir.substr(0, p + 8);
 		if (RigHomeDir.empty()) {
 			fl_filename_expand(dirbuf, FL_PATH_MAX, "$HOME/");
@@ -386,7 +386,7 @@ int main (int argc, char *argv[])
 		}
 
 		DIR *isdir = 0;
-		string test_dir;
+		std::string test_dir;
 		test_dir.assign(HomeDir).append("flrig.files/");
 		isdir = opendir(test_dir.c_str());
 		if (isdir) {
@@ -419,13 +419,13 @@ int main (int argc, char *argv[])
 		debug::start(fname.c_str());
 		time_t t = time(NULL);
 		LOG(debug::INFO_LEVEL, debug::LOG_OTHER, _("%s log started on %s"), PACKAGE_STRING, ctime(&t));
-		string trace_fname = RigHomeDir;
+		std::string trace_fname = RigHomeDir;
 		trace_fname.append("trace.txt");
 		rotate_log(trace_fname);
 
 	}
 	catch (const char* error) {
-		cerr << error << '\n';
+		std::cerr << error << '\n';
 		debug::stop();
 		exit(1);
 	}
@@ -643,7 +643,7 @@ int parse_args(int argc, char **argv, int& idx)
 		exit(0);
 	}
 	if (strcasecmp("--debug-level", argv[idx]) == 0) {
-		string level = argv[idx + 1];
+		std::string level = argv[idx + 1];
 		switch (level[0]) {
 			case '0': debug::level = debug::QUIET_LEVEL; break;
 			case '1': debug::level = debug::ERROR_LEVEL; break;

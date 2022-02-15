@@ -148,7 +148,7 @@ static GUI rig_widgets[]= {
 	{ (Fl_Widget *)NULL,          0,   0,   0 }
 };
 
-static string menu003;
+static std::string menu003;
 
 void RIG_TS590S::initialize()
 {
@@ -292,7 +292,7 @@ int RIG_TS590S::get_power_out()
 	if (ret < 8) return mtr;
 
 	size_t p = replystr.rfind("SM0");
-	if (p == string::npos) return mtr;
+	if (p == std::string::npos) return mtr;
 
 	mtr = atoi(&replystr[p + 3]);
 	mtr *= 50;
@@ -323,7 +323,7 @@ double RIG_TS590S::get_power_control()
 	if (ret < 6) return 0;
 
 	size_t p = replystr.rfind("PC");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	int mtr = 0;
 	replystr[p + 5] = 0;
 	mtr = atoi(&replystr[p + 2]);
@@ -347,7 +347,7 @@ int RIG_TS590S::get_attenuator()
 	if (ret < 7) return 0;
 
 	size_t p = replystr.rfind("RA");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	if (replystr[p + 2] == '0' && 
 		replystr[p + 3] == '0')
@@ -375,7 +375,7 @@ int RIG_TS590S::get_preamp()
 	if (ret < 5) return 0;
 
 	size_t p = replystr.rfind("PA");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	if (replystr[p  + 2] == '1') 
 		preamp_level = 1;
@@ -420,7 +420,7 @@ int RIG_TS590S::get_modeA()
 	if (ret < 4) return A.imode;
 
 	size_t p = replystr.rfind("MD");
-	if (p == string::npos) return A.imode;
+	if (p == std::string::npos) return A.imode;
 
 	switch (replystr[p + 2]) {
 		case '1' : md = LSB; break;
@@ -442,7 +442,7 @@ int RIG_TS590S::get_modeA()
 		if (ret < 4) return A.imode;
 
 		p = replystr.rfind("DA");
-		if (p == string::npos) return A.imode;
+		if (p == std::string::npos) return A.imode;
 		if (replystr[p + 2] == '1') {
 			data_mode = true;
 			if (md == LSB) md = LSBD;
@@ -488,7 +488,7 @@ int RIG_TS590S::get_modeB()
 	if (ret < 4) return B.imode;
 
 	size_t p = replystr.rfind("MD");
-	if (p == string::npos) return B.imode;
+	if (p == std::string::npos) return B.imode;
 
 	switch (replystr[p + 2]) {
 		case '1' : md = LSB; break;
@@ -510,7 +510,7 @@ int RIG_TS590S::get_modeB()
 		if (ret < 4) return B.imode;
 
 		p = replystr.rfind("DA");
-		if (p == string::npos) return B.imode;
+		if (p == std::string::npos) return B.imode;
 		if (replystr[p + 2] == '1') {
 			data_mode = true;
 			if (md == LSB) md = LSBD;
@@ -756,7 +756,7 @@ int RIG_TS590S::get_bwA()
 		gett("");
 		if (ret == 7) {
 			p = replystr.rfind("FW");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; i < 14; i++)
 					if (replystr.find(TS590S_CWbw[i]) == p)
 						break;
@@ -773,7 +773,7 @@ int RIG_TS590S::get_bwA()
 		gett("");
 		if (ret == 7 ) {
 			p = replystr.rfind("FW");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; i < 4; i++)
 					if (replystr.find(TS590S_FSKbw[i]) == p)
 						break;
@@ -792,7 +792,7 @@ int RIG_TS590S::get_bwA()
 		gett("");
 		if (ret == 5) {
 			p = replystr.rfind("SL");
-			if (p == string::npos) break;
+			if (p == std::string::npos) break;
 			lo = fm_decimal(replystr.substr(2), 2);
 			cmd = "SH;";
 			get_trace(1, "get_upper");
@@ -800,7 +800,7 @@ int RIG_TS590S::get_bwA()
 			gett("");
 			if (ret == 5) {
 				p = replystr.rfind("SH");
-				if (p == string::npos) break;
+				if (p == std::string::npos) break;
 				hi = fm_decimal(replystr.substr(2), 2);
 				A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
 			}
@@ -816,7 +816,7 @@ int RIG_TS590S::get_bwA()
 		gett("");
 		if (ret == 5) {
 			p = replystr.rfind("SL");
-			if (p == string::npos) break;
+			if (p == std::string::npos) break;
 			hi = fm_decimal(replystr.substr(2), 2);
 			cmd = "SH;";
 			get_trace(1, "get_shift");
@@ -824,7 +824,7 @@ int RIG_TS590S::get_bwA()
 			gett("");
 			if (ret == 5) {
 				p = replystr.rfind("SH");
-				if (p == string::npos) break;
+				if (p == std::string::npos) break;
 				lo = fm_decimal(replystr.substr(2), 2);
 				A.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
 			}
@@ -847,7 +847,7 @@ int RIG_TS590S::get_bwB()
 		gett("");
 		if (ret == 7) {
 			p = replystr.rfind("FW");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; i < 14; i++)
 					if (replystr.find(TS590S_CWbw[i]) == p)
 						break;
@@ -864,7 +864,7 @@ int RIG_TS590S::get_bwB()
 		gett("");
 		if (ret == 7) {
 			p = replystr.rfind("FW");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; i < 4; i++)
 					if (replystr.find(TS590S_FSKbw[i]) == p)
 						break;
@@ -883,7 +883,7 @@ int RIG_TS590S::get_bwB()
 		gett("");
 		if (ret == 5) {
 			p = replystr.rfind("SL");
-			if (p == string::npos) break;
+			if (p == std::string::npos) break;
 			lo = fm_decimal(replystr.substr(2), 2);
 			cmd = "SH;";
 			get_trace(1, "get_upper");
@@ -891,7 +891,7 @@ int RIG_TS590S::get_bwB()
 			gett("");
 			if (ret == 5) {
 				p = replystr.rfind("SH");
-				if (p == string::npos) break;
+				if (p == std::string::npos) break;
 				hi = fm_decimal(replystr.substr(2), 2);
 				B.iBW = ((hi << 8) | (lo & 0x7F)) | 0x8000;
 			}
@@ -907,7 +907,7 @@ int RIG_TS590S::get_bwB()
 		gett("");
 		if (ret == 5) {
 			p = replystr.rfind("SL");
-			if (p == string::npos) break;
+			if (p == std::string::npos) break;
 			hi = fm_decimal(replystr.substr(2), 2);
 			cmd = "SH;";
 			get_trace(1, "get_shift");
@@ -915,7 +915,7 @@ int RIG_TS590S::get_bwB()
 			gett("");
 			if (ret == 5 ) {
 				p = replystr.rfind("SH");
-				if (p == string::npos) break;
+				if (p == std::string::npos) break;
 				lo = fm_decimal(replystr.substr(2), 2);
 				B.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
 			}
@@ -954,7 +954,7 @@ bool RIG_TS590S::get_if_shift(int &val)
 		gett("");
 		if (ret == 8) {
 			size_t p = replystr.rfind("IS");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				val = fm_decimal(replystr.substr(p+3), 4);
 			} else
 				val = progStatus.shift_val;
@@ -1008,7 +1008,7 @@ int  RIG_TS590S::get_noise_reduction()
 	gett("");
 	if (ret == 4 ) {
 		size_t p = replystr.rfind(rsp);
-		if (p == string::npos) return noise_reduction_level;
+		if (p == std::string::npos) return noise_reduction_level;
 		noise_reduction_level = replystr[p+2] - '0';
 
 		if (noise_reduction_level == 1) {
@@ -1041,7 +1041,7 @@ int  RIG_TS590S::get_noise_reduction_val()
 	gett("");
 	if (ret == 5) {
 		size_t p = replystr.rfind(rsp);
-		if (p == string::npos) return progStatus.noise_reduction_val;
+		if (p == std::string::npos) return progStatus.noise_reduction_val;
 		val = atoi(&replystr[p+2]);
 	}
 	return val;
@@ -1062,7 +1062,7 @@ int  RIG_TS590S::get_auto_notch()
 	gett("");
 	if ( ret == 5) {
 		size_t p = replystr.rfind("NT");
-		if (p == string::npos) return 0;
+		if (p == std::string::npos) return 0;
 		if (replystr[p+2] == '1') return 1;
 	}
 	return 0;
@@ -1094,13 +1094,13 @@ bool  RIG_TS590S::get_notch(int &val)
 	gett("");
 	if ( ret == 5) {
 		size_t p = replystr.rfind("NT");
-		if (p == string::npos)
+		if (p == std::string::npos)
 			return 0;
 		if (replystr[p+2] == '2') {
 			cmd.assign("BP;");
 			if (wait_char(';', 6, 100, "get notch freq", ASC) == 6) {
 				size_t p = replystr.rfind("BP");
-				if (p != string::npos)
+				if (p != std::string::npos)
 					val = (int)((atoi(&replystr[p+2]) * 2700.0 / 128.0) + 300.0);
 				return 1;
 			}
@@ -1142,7 +1142,7 @@ int RIG_TS590S::get_noise()
 	gett("");
 	if ( ret == 4) {
 		size_t p = replystr.rfind("NB");
-		if (p == string::npos) return 0;
+		if (p == std::string::npos) return 0;
 		if (replystr[p+2] == '0') return 0;
 		nb_level = replystr[p+2] - '0';
 		if (nb_level == 0) {
@@ -1167,7 +1167,7 @@ int RIG_TS590S::get_smeter()
 	if (ret < 8) return 0;
 
 	size_t p = replystr.find("SM0");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	replystr[p + 7] = 0;
 	mtr = atoi(&replystr[p + 3]);
@@ -1197,7 +1197,7 @@ int  RIG_TS590S::get_rf_gain()
 	get_trace(1, "get_rf_gain");
 	if (wait_char(';', 6, 100, "get rfgain", ASC) == 6) {
 		size_t p = replystr.rfind(rsp);
-		if (p == string::npos) return progStatus.rfgain;
+		if (p == std::string::npos) return progStatus.rfgain;
 		for (int i = 2; i < 5; i++) {
 			rfval *= 10;
 			rfval += replystr[p+i] - '0';
@@ -1303,7 +1303,7 @@ int RIG_TS590S::get_split()
 	cmd.append(";");
 	if (wait_char(';', 4, 100, "get split tx vfo", ASC) == 4) {
 		p = replystr.rfind(rsp);
-		if (p == string::npos) return split;
+		if (p == std::string::npos) return split;
 		tx = replystr[p+2];
 	}
 // rx vfo
@@ -1311,7 +1311,7 @@ int RIG_TS590S::get_split()
 	cmd.append(";");
 	if (wait_char(';', 4, 100, "get split rx vfo", ASC) == 4) {
 		p = replystr.rfind(rsp);
-		if (p == string::npos) return split;
+		if (p == std::string::npos) return split;
 		rx = replystr[p+2];
 // split test
 		split = (tx == '1' ? 2 : 0) + (rx == '1' ? 1 : 0);
@@ -1326,7 +1326,7 @@ unsigned long int RIG_TS590S::get_vfoA ()
 	if (wait_char(';', 14, 100, "get vfoA", ASC) < 14) return A.freq;
 
 	size_t p = replystr.rfind("FA");
-	if (p == string::npos) return A.freq;
+	if (p == std::string::npos) return A.freq;
 
 	unsigned long int f = 0L;
 	unsigned long int mul = 1L;
@@ -1356,7 +1356,7 @@ unsigned long int RIG_TS590S::get_vfoB ()
 	if (wait_char(';', 14, 100, "get vfoB", ASC) < 14) return B.freq;
 
 	size_t p = replystr.rfind("FB");
-	if (p == string::npos) return B.freq;
+	if (p == std::string::npos) return B.freq;
 
 	unsigned long int f = 0L;
 	unsigned long int mul = 1L;
@@ -1388,7 +1388,7 @@ int RIG_TS590S::get_volume_control()
 	if (wait_char(';', 7, 100, "get vol ctrl", ASC) < 7) return 0;
 
 	size_t p = replystr.rfind("AG");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	replystr[p + 6] = 0;
 	int val = atoi(&replystr[p + 3]);
@@ -1425,7 +1425,7 @@ int RIG_TS590S::get_swr(void)
 	if (wait_char(';', 8, 100, "get swr/alc", ASC) < 8) return 0;
 
 	size_t p = replystr.find("RM3");
-	if (p != string::npos) {
+	if (p != std::string::npos) {
 		replystr[p + 7] = 0;
 		alc_val = atoi(&replystr[p + 3]);
 		alc_val *= 100;
@@ -1435,7 +1435,7 @@ int RIG_TS590S::get_swr(void)
 	}
 
 	p = replystr.find("RM1");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	replystr[p + 7] = 0;
 	mtr = atoi(&replystr[p + 3]);
@@ -1456,7 +1456,7 @@ int RIG_TS590S::get_alc(void)
 	if (wait_char(';', 8, 100, "get alc", ASC) < 8) return 0;
 
 	size_t p = replystr.find("RM3");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	replystr[p + 7] = 0;
 	alc_val = atoi(&replystr[p + 3]);
@@ -1483,7 +1483,7 @@ int RIG_TS590S::get_mic_gain()
 	cmd = "MG;";
 	if (wait_char(';', 6, 100, "get mic ctrl", ASC) >= 6) {
 		size_t p = replystr.rfind("MG");
-		if (p == string::npos) return val;
+		if (p == std::string::npos) return val;
 		replystr[p + 5] = 0;
 		val = atoi(&replystr[p + 2]);
 	}
@@ -1511,7 +1511,7 @@ int  RIG_TS590S::get_squelch()
 	cmd = "SQ0;";
 	if (wait_char(';', 7, 100, "get squelch", ASC) >= 7) {
 		size_t p = replystr.rfind("SQ0");
-		if (p == string::npos) return val;
+		if (p == std::string::npos) return val;
 		replystr[p + 6] = 0;
 		val = atoi(&replystr[p + 3]);
 	}

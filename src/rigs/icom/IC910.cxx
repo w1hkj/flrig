@@ -206,8 +206,8 @@ void RIG_IC910H::set_vox_hang()
 
 int RIG_IC910H::get_smeter()
 {
-	string cstr = "\x16\x02";
-	string resp = pre_fm;
+	std::string cstr = "\x16\x02";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
@@ -215,7 +215,7 @@ int RIG_IC910H::get_smeter()
 	int mtr= -1;
 	if (waitFOR(9, "get smeter")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			mtr = fm_bcd(replystr.substr(p+6), 3);
 			mtr = (int)(mtr /2.55);
 			if (mtr > 100) mtr = 100;
@@ -253,15 +253,15 @@ void RIG_IC910H::set_pbt_outer(int val)
 int RIG_IC910H::get_pbt_inner()
 {
 	int val = 0;
-	string cstr = "\x14\x07";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x07";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(9, "get pbt inner")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			val = num100(replystr.substr(p+6));
 			val -= 50;
 		}
@@ -273,15 +273,15 @@ int RIG_IC910H::get_pbt_inner()
 int RIG_IC910H::get_pbt_outer()
 {
 	int val = 0;
-	string cstr = "\x14\x08";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x08";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(9, "get pbt inner")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			val = num100(replystr.substr(p+6));
 			val -= 50;
 		}

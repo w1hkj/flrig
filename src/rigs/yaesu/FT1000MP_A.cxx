@@ -379,7 +379,7 @@ bool RIG_FT1000MP_A::get_info(void)
 
 		size_t p = replystr.length() - 32;
 
-		// vfo A data string
+		// vfo A data std::string
 		A.freq = (replystr[p + 1] & 0x7F) << 8;
 		A.freq = (A.freq + (replystr[p + 2] & 0xFF)) << 8;
 		A.freq = (A.freq + (replystr[p + 3] & 0xFF)) <<8;

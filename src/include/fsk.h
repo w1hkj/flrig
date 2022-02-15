@@ -25,7 +25,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include <string.h>
 #include <time.h>
 #include <sys/time.h>
 
@@ -153,7 +152,7 @@ extern Fl_Double_Window *FSK_editor;
 extern Fl_Double_Window *FSK_configure;
 
 extern pthread_mutex_t FSK_text_mutex;
-extern string FSK_text;
+extern std::string FSK_text;
 extern int FSK_process;
 
 extern Cserial *FSK_serial;

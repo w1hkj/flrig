@@ -275,7 +275,7 @@ unsigned long int RIG_TT566::get_vfoA ()
 	showresp(WARN, ASC, "get vfo A", cmd, respstr);
 	if (ret < (int)strlen(TT566rspFREQa)+9) return A.freq;
 	size_t p = respstr.rfind(TT566rspFREQa);
-	if (p == string::npos) return A.freq;
+	if (p == std::string::npos) return A.freq;
 	int f = 0;
 	sscanf(&respstr[p + strlen(TT566rspFREQa)], "%d", &f);
 	A.freq = f;
@@ -300,7 +300,7 @@ unsigned long int RIG_TT566::get_vfoB ()
 	showresp(WARN, ASC, "get vfo A", cmd, respstr);
 	if (ret < (int)strlen(TT566rspFREQb)+9) return B.freq;
 	size_t p = respstr.rfind(TT566rspFREQb);
-	if (p == string::npos) return B.freq;
+	if (p == std::string::npos) return B.freq;
 	int f = 0;
 	sscanf(&respstr[p + strlen(TT566rspFREQb)], "%d", &f);
 	B.freq = f;
@@ -386,7 +386,7 @@ int RIG_TT566::get_bwA()
 	cmd = TT566getBWa;
 	int ret = sendCommand(cmd, strlen(TT566rspBWa)+5);
 	if (ret >= 8) {
-		string bwstr = "";
+		std::string bwstr = "";
 		if (respstr.length() == 9) bwstr = respstr.substr(ret - 9 + 4, 4);
 		if (respstr.length() == 8) bwstr = respstr.substr(ret - 8 + 4, 3);
 		if (respstr.empty()) return A.iBW;
@@ -417,7 +417,7 @@ int RIG_TT566::get_bwB()
 	cmd = TT566getBWb;
 	int ret = sendCommand(cmd, strlen(TT566rspBWb)+5);
 	if (ret >= 8) {
-		string bwstr = "";
+		std::string bwstr = "";
 		if (respstr.length() == 9) bwstr = respstr.substr(ret - 9 + 4, 4);
 		if (respstr.length() == 8) bwstr = respstr.substr(ret - 8 + 4, 3);
 		if (respstr.empty()) return B.iBW;
@@ -444,7 +444,7 @@ double RIG_TT566::get_power_control(void)
 	cmd = TT566getPWR;
 	sendCommand(cmd, strlen(TT566rspPWR)+4);
 	size_t p = respstr.rfind(TT566rspPWR);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	int pwr;
 	sscanf(&respstr[p + strlen(TT566rspPWR)], "%d", &pwr);
 	return pwr;
@@ -485,7 +485,7 @@ int  RIG_TT566::get_smeter()
 	showresp(WARN, ASC, "get smeter", cmd, respstr);
         if ((cur_modeA != LCW) && (cur_modeA != UCW)) {
 	    if (ret != (int)strlen(TT566rspSMETER)+8) {
-                if (respstr.rfind(TT566rspPOUT) != string::npos) {
+                if (respstr.rfind(TT566rspPOUT) != std::string::npos) {
                     ptt_ = 1;
                     PTT = true;
                     Fl::awake(update_UI_PTT);
@@ -494,7 +494,7 @@ int  RIG_TT566::get_smeter()
             }
         }
 	size_t p = respstr.rfind(TT566rspSMETER);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	sscanf(&respstr[p + strlen(TT566rspSMETER)], "%d", &dbm);
 	return 5 * dbm / 9; // 90 = S9 --> 50% of full scale of flrig display
 }
@@ -518,7 +518,7 @@ int  RIG_TT566::get_power_out()
 	showresp(WARN, ASC, "get pout", cmd, respstr);
         if ((cur_modeA != LCW) && (cur_modeA != UCW)) {
 	    if (ret != (int)strlen(TT566rspPOUT)+12) {
-                 if (respstr.rfind(TT566rspSMETER) != string::npos) {
+                 if (respstr.rfind(TT566rspSMETER) != std::string::npos) {
                          ptt_ = 0;
                          PTT = false;
                          Fl::awake(update_UI_PTT);
@@ -527,7 +527,7 @@ int  RIG_TT566::get_power_out()
             }
         } 
 	size_t p = respstr.rfind(TT566rspPOUT);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	sscanf(&respstr[p + strlen(TT566rspPOUT)], "%d", &fwdpwr);
         fwdpwr += fwdpwr/2;
 	size_t n = 4;
@@ -606,7 +606,7 @@ bool RIG_TT566::get_if_shift(int &val)
 	cmd = TT566getPBTa;
 	sendCommand(cmd, strlen(TT566rspPBTa)+6);
 	size_t p = respstr.rfind(TT566rspPBTa);
-	if (p == string::npos) return false;
+	if (p == std::string::npos) return false;
 	sscanf(&respstr[p + 4], "%d", &retval);
 	val = retval;
 	if (val) return true;
@@ -631,7 +631,7 @@ int  RIG_TT566::get_rf_gain()
 	sendCommand(cmd, strlen(TT566rspRFGa)+4);
 	showresp(WARN, ASC, "get rfgain", cmd, respstr);
 	size_t p = respstr.rfind(TT566rspRFGa);
-	if (p == string::npos) return retval;
+	if (p == std::string::npos) return retval;
 	sscanf(&respstr[p + strlen(TT566rspRFGa)], "%d", &retval);
 	return retval;
 }
@@ -672,7 +672,7 @@ int RIG_TT566::get_attenuator()
 	int val = atten_level;
 	if (ret >= 3) {
 		size_t p = respstr.rfind(TT566rspATTa);
-		if (p != string::npos) val = (respstr[p + strlen(TT566rspATTa)] - '0');
+		if (p != std::string::npos) val = (respstr[p + strlen(TT566rspATTa)] - '0');
 	}
 	if (atten_level != val) atten_level = val;
 	switch (atten_level) {

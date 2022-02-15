@@ -55,7 +55,7 @@ private:
 
 	std::string pending;
 
-	void showASCII(string, string);
+	void showASCII(std::string, std::string);
 
 	void set_vfoRX(unsigned long int freq);
 	void set_vfoTX(unsigned long int freq);

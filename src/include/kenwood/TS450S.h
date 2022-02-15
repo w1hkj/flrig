@@ -36,7 +36,7 @@ public:
 	void initialize();
 	void shutdown () {}
 
-	bool sendTScommand(string, int, bool);
+	bool sendTScommand(std::string, int, bool);
 
 	bool check();
 

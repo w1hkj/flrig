@@ -158,7 +158,7 @@ void RIG_K3::initialize()
 	gett("");
 
 	if (ret) {
-		if (replystr.find("P") == string::npos) {
+		if (replystr.find("P") == std::string::npos) {
 			minpwr = 0;
 			maxpwr = 12;
 			steppwr = 1;
@@ -206,7 +206,7 @@ unsigned long int RIG_K3::get_vfoA ()
 
 	if (ret < 14) return freqA;
 	size_t p = replystr.rfind("FA");
-	if (p == string::npos) return freqA;
+	if (p == std::string::npos) return freqA;
 
 	unsigned long int f = 0;
 	for (size_t n = 2; n < 13; n++)
@@ -237,7 +237,7 @@ unsigned long int RIG_K3::get_vfoB ()
 
 	if (ret < 14) return freqB;
 	size_t p = replystr.rfind("FB");
-	if (p == string::npos) return freqB;
+	if (p == std::string::npos) return freqB;
 
 	unsigned long int f = 0;
 	for (size_t n = 2; n < 13; n++)
@@ -282,7 +282,7 @@ int RIG_K3::get_volume_control()
 
 	if (ret < 6) return progStatus.volume;
 	size_t p = replystr.rfind("AG");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	replystr[p + 5] = 0;
 	int v = atoi(&replystr[p + 2]);
@@ -335,7 +335,7 @@ int RIG_K3::get_modeA()
 
 	if (ret < 4) return modeA;
 	size_t p = replystr.rfind("MD");
-	if (p == string::npos) return modeA;
+	if (p == std::string::npos) return modeA;
 	int md = replystr[p + 2] - '1';
 	if (md == 8) md--;
 	if (md != modeA) set_pbt_values(md);
@@ -367,7 +367,7 @@ int RIG_K3::get_modeB()
 
 	if (ret < 4) return modeB;
 	size_t p = replystr.rfind("MD$");
-	if (p == string::npos) return modeB;
+	if (p == std::string::npos) return modeB;
 	int md = replystr[p + 3] - '1';
 	if (md == 8) md--;
 	if (md != modeB) set_pbt_values(md);
@@ -396,7 +396,7 @@ int RIG_K3::get_preamp()
 
 	if (ret < 4) return progStatus.preamp;
 	size_t p = replystr.rfind("PA");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	return (replystr[p + 2] == '1' ? 1 : 0);
 }
 
@@ -418,7 +418,7 @@ int RIG_K3::get_attenuator()
 
 	if (ret < 5) return progStatus.attenuator;
 	size_t p = replystr.rfind("RA");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	return (replystr[p + 3] == '1' ? 1 : 0);
 }
 
@@ -446,7 +446,7 @@ double RIG_K3::get_power_control()
 
 	if (ret < 6) return progStatus.power_level;
 	size_t p = replystr.rfind("PC");
-	if (p == string::npos) return progStatus.power_level;
+	if (p == std::string::npos) return progStatus.power_level;
 	return fm_decimal(replystr.substr(p+2), 3);
 }
 
@@ -458,7 +458,7 @@ void RIG_K3::get_pc_min_max_step(double &min, double &max, double &step)
 	gett("");
 
 	if (ret) {
-		if (replystr.find("P") == string::npos) {
+		if (replystr.find("P") == std::string::npos) {
 			minpwr = 0;
 			maxpwr = 12;
 			steppwr = 1;
@@ -494,7 +494,7 @@ int RIG_K3::get_rf_gain()
 
 	if (ret < 6) return progStatus.rfgain;
 	size_t p = replystr.rfind("RG");
-	if (p == string::npos) return progStatus.rfgain;
+	if (p == std::string::npos) return progStatus.rfgain;
 
 	replystr[p + 5] = 0;
 	int v = atoi(&replystr[p + 2]);
@@ -529,7 +529,7 @@ int RIG_K3::get_mic_gain()
 
 	if (ret < 6) return progStatus.mic_gain;
 	size_t p = replystr.rfind("MG");
-	if (p == string::npos) return progStatus.mic_gain;
+	if (p == std::string::npos) return progStatus.mic_gain;
 
 	replystr[p + 5] = 0;
 	int v = atoi(&replystr[p + 2]);
@@ -572,7 +572,7 @@ int RIG_K3::get_smeter()
 
 	if (ret < 7) return 0;
 	size_t p = replystr.rfind("SM");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	int mtr = fm_decimal(replystr.substr(p+2), 4);
 
@@ -598,7 +598,7 @@ int RIG_K3::get_noise()
 
 	if (ret < 4) return progStatus.noise;
 	size_t p = replystr.rfind("NB");
-	if (p == string::npos) return progStatus.noise;
+	if (p == std::string::npos) return progStatus.noise;
 	return (replystr[p+2] == '1' ? 1 : 0);
 }
 
@@ -631,7 +631,7 @@ int RIG_K3::get_bwA()
 
 	if (ret < 7) return bwA;
 	size_t p = replystr.rfind("FW");
-	if (p == string::npos) return bwA;
+	if (p == std::string::npos) return bwA;
 	int bw = 0;
 	for (int i = 2; i < 6; i++) bw = bw * 10 + replystr[p+i] - '0';
 	bw *= 10;
@@ -669,7 +669,7 @@ int RIG_K3::get_bwB()
 
 	if (ret < 8) return bwB;
 	size_t p = replystr.rfind("FW$");
-	if (p == string::npos) return bwB;
+	if (p == std::string::npos) return bwB;
 	int bw = 0;
 	for (int i = 3; i < 7; i++) bw = bw * 10 + replystr[p+i] - '0';
 	bw *= 10;
@@ -687,7 +687,7 @@ int RIG_K3::get_power_out()
 
 	if (ret < 5) return 0;
 	size_t p = replystr.rfind("BG");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	replystr[p + 4] = 0;
 	int mtr = atoi(&replystr[p + 2]) * 10;
 	if (mtr > 100) mtr = 100;
@@ -737,7 +737,7 @@ int RIG_K3::get_split()
 
 	if (ret < 38) return split_on;
 	size_t p = replystr.rfind("IF");
-	if (p == string::npos) return split_on;
+	if (p == std::string::npos) return split_on;
 	split_on = replystr[p+32] - '0';
 	return split_on;
 }
@@ -765,7 +765,7 @@ bool RIG_K3::get_if_shift(int &val)
 	val = progStatus.shift_val;
 	if (ret < 8) return progStatus.shift;
 	size_t p = replystr.rfind("IS ");
-	if (p == string::npos) return progStatus.shift;
+	if (p == std::string::npos) return progStatus.shift;
 	sscanf(&replystr[p + 3], "%d", &progStatus.shift_val);
 	val = progStatus.shift_val;
 	if (val == if_shift_mid) progStatus.shift = false;
@@ -793,6 +793,6 @@ void  RIG_K3::get_if_mid()
 
 	if (ret < 8) return;
 	size_t p = replystr.rfind("IS ");
-	if (p == string::npos) return;
+	if (p == std::string::npos) return;
 	sscanf(&replystr[p + 3], "%d", &if_shift_mid);
 }

@@ -290,7 +290,7 @@ unsigned long int RIG_KX3::get_vfoA ()
 	if (ret < 14) return freqA;
 
 	size_t p = replystr.rfind("FA");
-	if (p == string::npos) return freqA;
+	if (p == std::string::npos) return freqA;
 
 	unsigned long int f = 0;
 	for (size_t n = 2; n < 13; n++)
@@ -324,7 +324,7 @@ unsigned long int RIG_KX3::get_vfoB ()
 
 	if (ret < 14) return freqB;
 	size_t p = replystr.rfind("FB");
-	if (p == string::npos) return freqB;
+	if (p == std::string::npos) return freqB;
 
 	unsigned long int f = 0;
 	for (size_t n = 2; n < 13; n++)
@@ -376,7 +376,7 @@ int RIG_KX3::get_volume_control()
 
 	if (ret < 6) return progStatus.volume;
 	size_t p = replystr.rfind("AG");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	replystr[p + 5] = 0;
 	int v = atoi(&replystr[p + 2]);
@@ -491,7 +491,7 @@ int RIG_KX3::get_modeA()
 
 	if (ret < 4) return modeA;
 	size_t p = replystr.rfind("MD");
-	if (p == string::npos) return modeA;
+	if (p == std::string::npos) return modeA;
 	int md = replystr[p + 2] - '1';
 	if (md == 8) md--;
 	return (modeA = md);
@@ -520,7 +520,7 @@ int RIG_KX3::get_modeB()
 
 	if (ret < 4) return modeB;
 	size_t p = replystr.rfind("MD$");
-	if (p == string::npos) return modeB;
+	if (p == std::string::npos) return modeB;
 	int md = replystr[p + 3] - '1';
 	if (md == 8) md--;
 	return (modeB = md);
@@ -550,7 +550,7 @@ int RIG_KX3::get_preamp()
 
 	if (ret < 4) return progStatus.preamp;
 	size_t p = replystr.rfind("PA");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	return (replystr[p + 2] == '1' ? 1 : 0);
 }
 
@@ -580,7 +580,7 @@ int RIG_KX3::get_attenuator()
 
 	if (ret < 5) return progStatus.attenuator;
 	size_t p = replystr.rfind("RA");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	return (replystr[p + 3] == '1' ? 1 : 0);
 }
 
@@ -638,7 +638,7 @@ double RIG_KX3::get_power_control()
 	if (ret < 6) return progStatus.power_level;
 
 	size_t p = replystr.rfind("PC");
-	if (p == string::npos)
+	if (p == std::string::npos)
 		return progStatus.power_level;
 
 	replystr[p+5] = 0;
@@ -675,12 +675,12 @@ int RIG_KX3::get_power_out()
 		gett("");
 		if (ret >= 5) {
 			powerScale = 1;
-			if (replystr.find("^OP1;") != string::npos) {
+			if (replystr.find("^OP1;") != std::string::npos) {
 				cmd = "^PF;";
 				ret = wait_char(';', 8, KX3_WAIT_TIME, "get KXPA power out", ASC);
 				if (ret >= 8) {
 					p = replystr.rfind("^PF");
-					if (p == string::npos) return 0;
+					if (p == std::string::npos) return 0;
 					replystr[p + 7] = 0;
 					mtr = atoi(&replystr[p+3]);
 					if (mtr > 0) return mtr/10;
@@ -698,7 +698,7 @@ int RIG_KX3::get_power_out()
 	if (ret < 6) return 0;
 
 	p = replystr.rfind("PO");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	replystr[p + 5] = 0;
 	mtr = atoi(&replystr[p + 2]); 
 // mtr is power in tenths
@@ -734,7 +734,7 @@ int RIG_KX3::get_rf_gain()
 
 	if (ret < 6) return progStatus.rfgain;
 	size_t p = replystr.rfind("RG");
-	if (p == string::npos) return progStatus.rfgain;
+	if (p == std::string::npos) return progStatus.rfgain;
 
 	replystr[p + 5] = 0;
 	int v = atoi(&replystr[p + 2]);
@@ -775,7 +775,7 @@ int RIG_KX3::get_mic_gain()
 
 	if (ret < 6) return progStatus.mic_gain;
 	size_t p = replystr.rfind("MG");
-	if (p == string::npos) return progStatus.mic_gain;
+	if (p == std::string::npos) return progStatus.mic_gain;
 
 	replystr[p + 5] = 0;
 	int v = atoi(&replystr[p + 2]);
@@ -873,7 +873,7 @@ int RIG_KX3::get_smeter()
 	if (ret < 7) return 0;
 
 	size_t p = replystr.rfind("SM");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	int mtr = fm_decimal(replystr.substr(p+2), 4);
 // use extended format conversion
@@ -902,7 +902,7 @@ int RIG_KX3::get_noise()
 
 	if (ret < 4) return progStatus.noise;
 	size_t p = replystr.rfind("NB");
-	if (p == string::npos) return progStatus.noise;
+	if (p == std::string::npos) return progStatus.noise;
 	return (replystr[p+2] == '1' ? 1 : 0);
 }
 
@@ -914,7 +914,7 @@ int RIG_KX3::get_noise()
 // 1000 - 3000 in 100 Hz increments
 // 3000 - 4000 in 200 Hz increments
 
-static string KX3_bws = "\
+static std::string KX3_bws = "\
 005;010;015;020;025;030;035;040;045;050;\
 055;060;065;070;075;080;085;090;095;100;\
 110;120;130;140;150;160;170;180;190;200;\
@@ -940,7 +940,7 @@ int RIG_KX3::get_bwA()
 	gett("");
 
 	if (ret < 7) return bwA;
-	string bw = replystr.substr( replystr.length() - 4, 4 );
+	std::string bw = replystr.substr( replystr.length() - 4, 4 );
 
 	size_t p = 0;
 	while (p < KX3_bws.length()) {
@@ -973,7 +973,7 @@ int RIG_KX3::get_bwB()
 	gett("");
 
 	if (ret < 7) return bwB;
-	string bw = replystr.substr( replystr.length() - 4, 4 );
+	std::string bw = replystr.substr( replystr.length() - 4, 4 );
 
 	size_t p = 0;
 	while (p < KX3_bws.length()) {
@@ -1026,7 +1026,7 @@ int RIG_KX3::get_split()
 
 	if (ret < 38) return split_on;
 	size_t p = replystr.rfind("IF");
-	if (p == string::npos) return split_on;
+	if (p == std::string::npos) return split_on;
 	split_on = replystr[p+32] - '0';
 	return split_on;
 }
@@ -1063,7 +1063,7 @@ bool RIG_KX3::get_if_shift(int &val)
 	int sh_val = 0;
 
 	size_t p = replystr.rfind("IS ");
-	if (p == string::npos)
+	if (p == std::string::npos)
 		return progStatus.shift;
 
 	sh_val = (((replystr[p+3] - '0') * 10 + 
@@ -1095,7 +1095,7 @@ void  RIG_KX3::get_if_mid()
 
 	if (ret < 8) return;
 	size_t p = replystr.rfind("IS ");
-	if (p == string::npos) return;
+	if (p == std::string::npos) return;
 	sscanf(&replystr[p + 3], "%d", &if_shift_mid);
 }
 
@@ -1143,14 +1143,14 @@ int RIG_KX3::get_swr()
 		gett("");
 		if (ret >= 5) {
 			powerScale = 1;
-			if (replystr.find("^OP1;") != string::npos) {
+			if (replystr.find("^OP1;") != std::string::npos) {
 				cmd = "^SW;";
 				get_trace(1, "get KXPA SWR");
 				ret = wait_char(';', 7, KX3_WAIT_TIME, "get KXPA SWR reading", ASC);
 				gett("");
 				if (ret >= 7) {
 					size_t p = replystr.rfind("^SW");
-					if (p != string::npos) {
+					if (p != std::string::npos) {
 						replystr[p + 6] = 0;
 						int mtr = fm_decimal(replystr.substr(p+3), 3);
 						if (mtr <= 30) mtr = (int) (50.0 * (mtr - 10) / 20.0);
@@ -1171,7 +1171,7 @@ int RIG_KX3::get_swr()
 	if (ret < 6) return 0;
 
 	size_t p = replystr.rfind("SW");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	int mtr = fm_decimal(replystr.substr(p+2), 3);
 	if (mtr <= 30) mtr = (int) (50.0 * (mtr - 10) / 20.0);

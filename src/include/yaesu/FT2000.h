@@ -86,7 +86,7 @@ public:
 	void set_break_in();
 	int  get_break_in();
 
-	bool sendFTcommand(string, int, bool);
+	bool sendFTcommand(std::string, int, bool);
 	const char **bwtable(int);
 
 	void set_BANDWIDTHS(std::string s);

@@ -138,7 +138,7 @@ RIG_IC703::RIG_IC703() {
 
 bool RIG_IC703::check ()
 {
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
 	cmd += '\x03';
@@ -153,11 +153,11 @@ unsigned long int RIG_IC703::get_vfoA ()
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x03';
 	if (waitFOR(11, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			if (replystr[p+5] == -1)
 				A.freq = 0;
 			else
@@ -203,11 +203,11 @@ int RIG_IC703::get_modeA()
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x04';
 	if (waitFOR(8, "get mode A")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 
 			modeA = replystr[p+5];
 			if (modeA == -1) { modeA = 0; return modeA; }
@@ -222,7 +222,7 @@ int RIG_IC703::get_modeA()
 				resp.append("\x1A\x04");
 				if (waitFOR(8, "data mode?")) {
 					p = replystr.rfind(resp);
-					if (p != string::npos)
+					if (p != std::string::npos)
 						if (replystr[p+6])
 							modeA += 8;
 				}
@@ -262,11 +262,11 @@ int RIG_IC703::get_attenuator()
 	cmd = pre_to;
 	cmd += '\x11';
 	cmd.append( post );
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x11';
 	if (waitFOR(7, "get att")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			return replystr[p+6] == '\x20' ? 1 : 0;
 	}
 	return 0;
@@ -306,12 +306,12 @@ int RIG_IC703::get_preamp()
 	cmd += '\x16';
 	cmd += '\x02';
 	cmd.append( post );
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x16';
 	resp += '\x02';
 	if (waitFOR(8, "get preamp")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			if (replystr[p+6] == 0x01) {
 				preamp_label("Pre 1", true);
 				preamp_level = 1;
@@ -331,11 +331,11 @@ int RIG_IC703::get_smeter()
 {
 	cmd = pre_to;
 	cmd.append("\x15\x02").append(post);
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp.append("\x15\x02");
 	if (waitFOR(9, "get smeter")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p+6), 3) * 100 / 255);
 	}
 	return -1;
@@ -345,11 +345,11 @@ int RIG_IC703::get_power_out()
 {
 	cmd = pre_to;
 	cmd.append("\x15\x11").append(post);
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp.append("\x15\x11");
 	if (waitFOR(9, "get power")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p+6), 3) * 100 / 255);
 	}
 	return 0;
@@ -359,11 +359,11 @@ int RIG_IC703::get_swr()
 {
 	cmd = pre_to;
 	cmd.append("\x15\x12").append(post);
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp.append("\x15\x12");
 	if (waitFOR(9, "get swr")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p+6), 3) * 100 / 255);
 	}
 	return -1;
@@ -371,8 +371,8 @@ int RIG_IC703::get_swr()
 
 int RIG_IC703::get_alc()
 {
-	string cstr = "\x15\x13";
-	string resp = pre_fm;
+	std::string cstr = "\x15\x13";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
@@ -380,7 +380,7 @@ int RIG_IC703::get_alc()
 	int mtr= -1;
 	if (waitFOR(9, "get alc")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			mtr = fm_bcd(replystr.substr(p+6), 3);
 			mtr = (int)ceil(mtr /2.55);
 			if (mtr > 100) mtr = 100;
@@ -413,15 +413,15 @@ void RIG_IC703::set_volume_control(int val)
 
 int RIG_IC703::get_volume_control()
 {
-	string cstr = "\x14\x01";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x01";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(9, "get vol")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p + 6),3) * 100 / 255);
 	}
 	return progStatus.volume;
@@ -444,15 +444,15 @@ void RIG_IC703::set_noise(bool val)
 
 int RIG_IC703::get_noise()
 {
-	string cstr = "\x16\x22";
-	string resp = pre_fm;
+	std::string cstr = "\x16\x22";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(9, "get noise")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			return (replystr[p+6] ? 1 : 0);
 	}
 	return progStatus.noise;
@@ -469,15 +469,15 @@ void RIG_IC703::set_noise_reduction(int val)
 
 int RIG_IC703::get_noise_reduction()
 {
-	string cstr = "\x16\x40";
-	string resp = pre_fm;
+	std::string cstr = "\x16\x40";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(9, "get NR")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			return (replystr[p+6] ? 1 : 0);
 	}
 	return progStatus.noise_reduction;
@@ -495,15 +495,15 @@ void RIG_IC703::set_noise_reduction_val(int val)
 
 int RIG_IC703::get_noise_reduction_val()
 {
-	string cstr = "\x14\x06";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x06";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(9, "get NR val")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p+6),3) / 2.55);
 	}
 	return progStatus.noise_reduction_val;
@@ -511,15 +511,15 @@ int RIG_IC703::get_noise_reduction_val()
 
 int RIG_IC703::get_mic_gain()
 {
-	string cstr = "\x14\x0B";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x0B";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(9, "get mic")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p+6),3) / 2.55);
 	}
 	return 0;
@@ -551,8 +551,8 @@ void RIG_IC703::set_if_shift(int val)
 
 bool  RIG_IC703::get_if_shift(int &val)
 {
-	string cstr = "\x14\x07";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x07";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
@@ -560,7 +560,7 @@ bool  RIG_IC703::get_if_shift(int &val)
 	val = progStatus.shift_val;
 	if (waitFOR(9, "get if-shift")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			val = (int)ceil(fm_bcd(replystr.substr(p+6), 3) / 2.55 - 50);
 	}
 	return (progStatus.shift = (val != 0));
@@ -585,15 +585,15 @@ void RIG_IC703::set_squelch(int val)
 
 int  RIG_IC703::get_squelch()
 {
-	string cstr = "\x14\x03";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x03";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(9, "get sql")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p+6), 3) / 2.55);
 	}
 	return progStatus.squelch;
@@ -611,14 +611,14 @@ void RIG_IC703::set_rf_gain(int val)
 
 int RIG_IC703::get_rf_gain()
 {
-	string cstr = "\x14\x02";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x02";
+	std::string resp = pre_fm;
 	cmd = pre_to;
 	cmd.append(cstr).append(post);
 	resp.append(cstr);
 	if (waitFOR(9, "get rfgain")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p + 6),3) / 2.55);
 	}
 	return progStatus.rfgain;
@@ -635,14 +635,14 @@ void RIG_IC703::set_power_control(double val)
 
 double RIG_IC703::get_power_control()
 {
-	string cstr = "\x14\x0A";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x0A";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr).append(post);
 	if (waitFOR(9, "get power")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p + 6),3) / 2.55);
 	}
 	return progStatus.power_level;
@@ -786,15 +786,15 @@ void RIG_IC703::set_pbt_outer(int val)
 int RIG_IC703::get_pbt_inner()
 {
 	int val = 0;
-	string cstr = "\x14\x07";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x07";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(9, "get pbt inner")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			val = num100(replystr.substr(p+6));
 			val -= 50;
 		}
@@ -806,15 +806,15 @@ int RIG_IC703::get_pbt_inner()
 int RIG_IC703::get_pbt_outer()
 {
 	int val = 0;
-	string cstr = "\x14\x08";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x08";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(9, "get pbt outer")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			val = num100(replystr.substr(p+6));
 			val -= 50;
 		}

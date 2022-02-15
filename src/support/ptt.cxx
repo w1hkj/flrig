@@ -38,8 +38,6 @@
 #include "gpio_ptt.h"
 #include "cmedia.h"
 
-using namespace std;
-
 // used for transceivers with a single vfo, called only by rigPTT
 static XCVR_STATE fake_vfo;
 

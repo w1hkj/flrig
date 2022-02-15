@@ -60,7 +60,7 @@ RIG_IC728::RIG_IC728() {
 
 bool RIG_IC728::check ()
 {
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
 	cmd += '\x03';
@@ -72,15 +72,15 @@ bool RIG_IC728::check ()
 
 unsigned long int RIG_IC728::get_vfoA ()
 {
-	string cstr = "\x03";
-	string resp = pre_fm;
+	std::string cstr = "\x03";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(10, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			if (replystr[p+5] == -1)
 				A.freq = 0;
 			else

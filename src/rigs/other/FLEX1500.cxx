@@ -108,7 +108,7 @@ static GUI rig_widgets[]= {
 };
 
 // mid range on loudness
-static string menu012 = "EX01200004";
+static std::string menu012 = "EX01200004";
 
 void RIG_FLEX1500::initialize()
 {
@@ -127,17 +127,17 @@ void RIG_FLEX1500::initialize()
 		strcpy(varwidths[i], FLEX1500_USBwidths[i]);
 
 // get current noise reduction values for NR1 and NR2
-	string current_nr;
+	std::string current_nr;
 	cmd = "ZZNR;";
 	wait_char(';', 6, 100, "read current NR", ASC);
 	gett("get ZZNR");
 	size_t p = replystr.rfind("RL");
-	if (p != string::npos)
+	if (p != std::string::npos)
 		_nrval1 = atoi(&replystr[p+2]);
 	cmd = "ZZNS;";
 	wait_char(';', 6, 100, "read current NR", ASC);
 	int nrval2=0;
-	if (p != string::npos)
+	if (p != std::string::npos)
 		nrval2 = atoi(&replystr[p+2]);
 	if (nrval2 == 1) _nrval1 = 2;
 }
@@ -224,7 +224,7 @@ static int ret = 0;
 const char * RIG_FLEX1500::get_bwname_(int n, int md)
 {
 	static char bwname[20];
-	stringstream str;
+	std::stringstream str;
 	str << "n=" << n << ", md=" << md;
 	trace(2, __func__, str.str().c_str());
 	if (md == USB || md == LSB) {
@@ -261,7 +261,7 @@ int RIG_FLEX1500::get_smeter()
 	gett("");
 	if (ret == 9) {
 		size_t p = replystr.rfind("SM");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			smtr = fm_decimal(replystr.substr(p+3),3);
 			smtr = -54 + smtr/(256.0/100.0); // in S-Units
 			smtr = (smtr + 54);
@@ -302,7 +302,7 @@ double RIG_FLEX1500::get_power_control()
 	gett("");
 	if (ret == 6) {
 		size_t p = replystr.rfind("PC");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			pctrl = fm_decimal(replystr.substr(p+2), 3);
 		}
 	}
@@ -415,7 +415,7 @@ int RIG_FLEX1500::get_preamp()
 {
 	int preamp_level;
 	cmd = "ZZPA;";
-	stringstream str;
+	std::stringstream str;
 	sendCommand(cmd);
 	get_trace(1, "get_preamp");
 	ret = wait_char(';', 6, 100, "get PRE", ASC);
@@ -424,7 +424,7 @@ int RIG_FLEX1500::get_preamp()
 		size_t p = replystr.rfind("PA");
 		str << "ZZPA #2 replystr=" << replystr << ", p=" << p;
 		trace(2, "get_preamp", replystr.c_str());
-		if (p != string::npos && (p+2 < replystr.length())) {
+		if (p != std::string::npos && (p+2 < replystr.length())) {
 			preamp_level = fm_decimal(replystr.substr(p+2),1);
 			// need to map 7 to 2 to keep FLRig cbPreamp happy
 			// when ZZPA2; is sent ZZPA7; comes back
@@ -551,7 +551,7 @@ int RIG_FLEX1500::get_modeA()
 	gett("");
 	if (ret == 7) {
 		size_t p = replystr.rfind("MD");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			int md;
 			sscanf(&replystr[p+2],"%d",&md);
 			if (A.imode != md) {
@@ -589,7 +589,7 @@ int RIG_FLEX1500::get_modeB()
 	gett("");
 	if (ret == 7) {
 		size_t p = replystr.rfind("MD");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			int md=0;
 			sscanf(&replystr[p+2],"%d",&md);
 			if (B.imode != md) {
@@ -618,7 +618,7 @@ int RIG_FLEX1500::def_bandwidth(int val)
 
 void RIG_FLEX1500::set_bwA(int val)
 {
-	stringstream str;
+	std::stringstream str;
 	if (A.imode == FM || A.imode == DRM || A.imode == SPEC) return; // mode is fixed
 	else if (A.imode == LSB || A.imode == USB) {
 		A.iBW = val;
@@ -630,7 +630,7 @@ void RIG_FLEX1500::set_bwA(int val)
 	}
 	else if (A.imode == DIGU || A.imode == DIGL) {
 		A.iBW = val;
-	stringstream str;
+	std::stringstream str;
 	str << "val =" << val ;
 	trace(2, __func__, str.str().c_str());
 		if (val >= (int)(sizeof(FLEX1500_CAT_DIG)/sizeof(*FLEX1500_CAT_DIG))) return;
@@ -661,7 +661,7 @@ int RIG_FLEX1500::get_bwA()
 {
 	size_t i = 0;
 	size_t p;
-	stringstream str;
+	std::stringstream str;
 	str << "get_bwA" ;
 	A.iBW = 0;
 	trace(2, __func__, str.str().c_str());
@@ -676,7 +676,7 @@ int RIG_FLEX1500::get_bwA()
 		gett("");
 		if (ret == 7) {
 			p = replystr.rfind("ZZFI");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; FLEX1500_CAT_USB[i] != NULL; i++)
 				{
 					if (replystr.find(FLEX1500_CAT_USB[i]) == p)
@@ -693,7 +693,7 @@ int RIG_FLEX1500::get_bwA()
 		gett("");
 		if (ret == 7) {
 			p = replystr.rfind("ZZFI");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; FLEX1500_CAT_CW[i] != NULL; i++)
 					if (replystr.find(FLEX1500_CAT_CW[i]) == p)
 						break;
@@ -722,7 +722,7 @@ int RIG_FLEX1500::get_bwA()
 		gett("");
 		if (ret == 7) {
 			p = replystr.rfind("ZZFI");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; FLEX1500_CAT_AM[i] != NULL; i++)
 					if (replystr.find(FLEX1500_CAT_AM[i]) == p)
 						break;
@@ -739,7 +739,7 @@ void RIG_FLEX1500::set_bwB(int val)
 {
 	set_bwA(val);
 	B.iBW = val;
-	stringstream str;
+	std::stringstream str;
 	str << "B.iBW = " << B.iBW;
 	trace(2, __func__, str.str().c_str());
 	return;
@@ -748,7 +748,7 @@ void RIG_FLEX1500::set_bwB(int val)
 int RIG_FLEX1500::get_bwB() // same as A
 {
 	B.iBW =  get_bwA();
-	stringstream str;
+	std::stringstream str;
 	str << "B.iBW = " << B.iBW;
 	trace(2, __func__, str.str().c_str());
 	vfoB.iBW = B.iBW;
@@ -794,7 +794,7 @@ bool  RIG_FLEX1500::get_notch(int &val)
 	gett("");
 	if (ret == 4) {
 		size_t p = replystr.rfind("BC");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			if (replystr[p+2] == '2') {
 				ison = true;
 				cmd = "BP;";
@@ -803,7 +803,7 @@ bool  RIG_FLEX1500::get_notch(int &val)
 				gett("");
 				if (ret == 6) {
 					p = replystr.rfind("BP");
-					if (p != string::npos)
+					if (p != std::string::npos)
 						val = 200 + 50 * fm_decimal(replystr.substr(p+2),3);
 				}
 			}
@@ -836,7 +836,7 @@ int  RIG_FLEX1500::get_auto_notch()
 	gett("");
 	if (ret == 4) {
 		size_t p = replystr.rfind("NT");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			anotch = (replystr[p+2] == '1');
 		}
 	}
@@ -874,7 +874,7 @@ int  RIG_FLEX1500::get_noise_reduction()
 	gett("");
 	if (ret == 6) {
 		size_t p = replystr.rfind(rsp);
-		if (p == string::npos) return _noise_reduction_level;
+		if (p == std::string::npos) return _noise_reduction_level;
 		_noise_reduction_level = replystr[p+4] - '0';
 	}
 
@@ -912,7 +912,7 @@ int  RIG_FLEX1500::get_noise_reduction_val()
 	gett("");
 	if (ret == 5) {
 		size_t p = replystr.rfind(rsp);
-		if (p == string::npos) {
+		if (p == std::string::npos) {
 			nrval = (_noise_reduction_level == 1 ? _nrval1 : _nrval2);
 			return nrval;
 		}
@@ -927,7 +927,7 @@ int  RIG_FLEX1500::get_noise_reduction_val()
 void RIG_FLEX1500::tune_rig(int val)
 {
 
-	stringstream str;
+	std::stringstream str;
 	str << "val=" << val;
 	trace(2, __func__, str.str().c_str());
 	switch (val) {
@@ -953,7 +953,7 @@ int RIG_FLEX1500::get_tune()
 	gett("");
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	int val = replystr[p+4] - '0';
 	return val;
 }
@@ -979,7 +979,7 @@ int  RIG_FLEX1500::get_rf_gain()
 	gett("");
 	if (ret == 9) {
 		size_t p = replystr.rfind("ZZAR");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			sscanf(replystr.c_str(),"ZZAR%c%d", &sign, &rfg);
 			if (sign == '-') rfg *= -1;
 		}
@@ -1014,7 +1014,7 @@ int RIG_FLEX1500::get_mic_gain()
 	gett("");
 	if (ret == 8) {
 		size_t p = replystr.rfind("MG");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			sscanf(replystr.c_str(),"ZZMG%d",&mgain);
 		}
 	}
@@ -1096,7 +1096,7 @@ int  RIG_FLEX1500::get_squelch()
 	gett("");
 	if (ret == 8) {
 		size_t p = replystr.rfind("ZZSQ");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			sscanf(replystr.c_str(),"ZZSQ%d",&sq);
 		}
 	}

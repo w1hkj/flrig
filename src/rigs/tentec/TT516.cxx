@@ -27,7 +27,7 @@
  *	to the number of data bytes plus two.
  *
  *	For example:
- *		A request for the present receiver filter bandwidth is the the string:
+ *		A request for the present receiver filter bandwidth is the the std::string:
  *			"?W\r" which is 3 bytes in length
  *		The response from the Argonaut V will be:
  *			"Wn\rG\r" which is 5 bytes in length, where n is an unsigned char (byte)
@@ -305,7 +305,7 @@ int RIG_TT516::get_modeA()
 	if (ret < 6) return A.imode;
 	if (replystr[ret - 2] != 'G') return A.imode;
 	size_t p = replystr.rfind("M");
-	if (p == string::npos) return A.imode;
+	if (p == std::string::npos) return A.imode;
 
 	A.imode = replystr[p+1] - '0';
 
@@ -328,7 +328,7 @@ int RIG_TT516::get_modeB()
 	if (ret < 6) return B.imode;
 	if (replystr[ret - 2] != 'G') return B.imode;
 	size_t p = replystr.rfind("M");
-	if (p == string::npos) return B.imode;
+	if (p == std::string::npos) return B.imode;
 
 	B.imode = replystr[p+2] - '0';
 
@@ -343,7 +343,7 @@ int RIG_TT516::get_bwA()
 		if (ret < 5) return A.iBW;
 		if (replystr[ret - 2] != 'G') return A.iBW;
 		size_t p = replystr.rfind("W");
-		if (p == string::npos) return A.iBW;
+		if (p == std::string::npos) return A.iBW;
 		A.iBW = (unsigned char)replystr[p+1];
 	}
 	return A.iBW;
@@ -367,7 +367,7 @@ int RIG_TT516::get_bwB()
 		if (ret < 5) return B.iBW;
 		if (replystr[ret - 2] != 'G') return B.iBW;
 		size_t p = replystr.rfind("W");
-		if (p == string::npos) return B.iBW;
+		if (p == std::string::npos) return B.iBW;
 		B.iBW = (unsigned char)replystr[p+1];
 	}
 	return B.iBW;
@@ -420,7 +420,7 @@ int RIG_TT516::get_attenuator()
 	int ret = sendCommand(cmd);
 	if (ret < 5) return 0;
 	size_t p = replystr.rfind("J");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	if (replystr[p+1] == '1')
 		return 1;
 	return 0;
@@ -443,7 +443,7 @@ int RIG_TT516::get_smeter()
 	int ret = sendCommand(cmd);
 	if (ret < 6) return 0;
 	size_t p = replystr.rfind("S");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	sig = (50.0 / 9.0) * ((unsigned char)replystr[p+1] + (unsigned char)replystr[p+2] / 256.0);
 
@@ -467,14 +467,14 @@ int RIG_TT516::get_power_out()
 	int ret = sendCommand(cmd);
 	if (ret < 5) return fwdpwr;
 	size_t p = replystr.rfind("F");
-	if (p == string::npos) return fwdpwr;
+	if (p == std::string::npos) return fwdpwr;
 
 	fwdv = 1.0 * (unsigned char)replystr[p+1];
 	cmd = TT516getREFPWR;
 	ret = sendCommand(cmd);
 	if (ret < 5) return fwdpwr;
 	p = replystr.rfind("R");
-	if (p == string::npos) return fwdpwr;
+	if (p == std::string::npos) return fwdpwr;
 
 	refv = 1.0 * (unsigned char)replystr[p+1];
 

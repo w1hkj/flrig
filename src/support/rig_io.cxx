@@ -37,8 +37,6 @@
 
 #include "socket_io.h"
 
-using namespace std;
-
 extern bool test;
 
 const char *nuline = "\n";
@@ -156,12 +154,12 @@ bool startSepSerial()
 // progress dialog:
 // guard_lock reply_lock(&mutex_replystr); 
 //
-void assignReplyStr(string val)
+void assignReplyStr(std::string val)
 {
 	selrig->replystr = val;
 }
 
-string respstr;
+std::string respstr;
 #define RXBUFFSIZE 100
 
 int readResponse(std::string req1, std::string req2)
@@ -177,7 +175,7 @@ int readResponse(std::string req1, std::string req2)
 	return numread;
 }
 
-int sendCommand (string s, int nread, int wait)
+int sendCommand (std::string s, int nread, int wait)
 {
 	int numwrite = (int)s.size();
 
@@ -239,9 +237,9 @@ static void show_timeout(void *)
 }
 
 bool waitCommand(
-				string command,
+				std::string command,
 				int nread,
-				string info,
+				std::string info,
 				int msec,
 				char term,
 				int how,
@@ -285,14 +283,14 @@ bool waitCommand(
 		Fl::awake();
 	}
 // additional wait for xcvr processing
-	string returned = "";
+	std::string returned = "";
 	static char sztemp[100];
 	int waited = 0;
 	while (waited < msec) {
 		if (readResponse())
 			returned.append(respstr);
 		if (	((int)returned.length() >= nread) || 
-				(returned.find(term) != string::npos) ) {
+				(returned.find(term) != std::string::npos) ) {
 			assignReplyStr(returned);
 			waited = zmsec() - tod_start;
 			snprintf(sztemp, sizeof(sztemp), "%s rcvd in %d msec", info.c_str(), waited);
@@ -338,7 +336,7 @@ int waitResponse(int timeout)
 	return n;
 }
 
-void showresp(int level, int how, string s, string tx, string rx) 
+void showresp(int level, int how, std::string s, std::string tx, std::string rx) 
 {
 	time_t now;
 	time(&now);
@@ -346,17 +344,17 @@ void showresp(int level, int how, string s, string tx, string rx)
 	char sztm[20];
 	strftime(sztm, sizeof(sztm), "%H:%M:%S", local);
 
-	string s1 = how == HEX ? str2hex(tx.c_str(), tx.length()) : tx;
-	string s2 = how == HEX ? str2hex(rx.c_str(), rx.length()) : rx;
+	std::string s1 = how == HEX ? str2hex(tx.c_str(), tx.length()) : tx;
+	std::string s2 = how == HEX ? str2hex(rx.c_str(), rx.length()) : rx;
 	if (how == ASC) {
 		size_t p;
-		while((p = s1.find('\r')) != string::npos)
+		while((p = s1.find('\r')) != std::string::npos)
 			s1.replace(p, 1, "<cr>");
-		while((p = s1.find('\n')) != string::npos)
+		while((p = s1.find('\n')) != std::string::npos)
 			s1.replace(p, 1, "<lf>");
-		while((p = s2.find('\r')) != string::npos)
+		while((p = s2.find('\r')) != std::string::npos)
 			s2.replace(p, 1, "<cr>");
-		while((p = s2.find('\n')) != string::npos)
+		while((p = s2.find('\n')) != std::string::npos)
 			s2.replace(p, 1, "<lf>");
 	}
 

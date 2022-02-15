@@ -140,7 +140,7 @@ static char TT550getFWDREF[]		= "?S\r";	// T<0..255><0..255>
 
 static char TT550setAMCARRIER[]		= "R \r";	// enables AM mode transmit
 
-static string xcvrstream = "";
+static std::string xcvrstream = "";
 
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
@@ -235,20 +235,20 @@ static std::string ctlvals[] = {
 
 static std::string noctl(std::string cmd)
 {
-	stringstream s;
+	std::stringstream s;
 	unsigned int c;
 	s << cmd[0];
 	for (size_t n = 1; n < cmd.length(); n++) {
 		c = cmd[n] & 0xFF;
 		if (c < 0x10) s << " " << ctlvals[c];
-		else s << " x" << hex << c;
+		else s << " x" << std::hex << c;
 	}
 	return s.str();
 }
 
-static const char* info(string s)
+static const char* info(std::string s)
 {
-	static string infostr;
+	static std::string infostr;
 	infostr.assign(s);
 	if (infostr[infostr.length()-1] == '\r')
 		infostr.replace(infostr.length()-1, 1, "<0d>");
@@ -257,7 +257,7 @@ static const char* info(string s)
 	return infostr.c_str();
 }
 
-void RIG_TT550::showASCII(string s1, string s)
+void RIG_TT550::showASCII(std::string s1, std::string s)
 {
 	while (s[0] == ' ' || s[0] == '\r' || s[0] == '\n') s.erase(0,1);
 	for (size_t i = 0; i < s.length(); i++) {
@@ -280,7 +280,7 @@ void RIG_TT550::initialize()
 
 	sendCommand(TT550restart, 14);
 
-	if (replystr.find("RADIO") == string::npos) {
+	if (replystr.find("RADIO") == std::string::npos) {
 		showASCII("Power up", "DSP START");
 		sendCommand(TT550init); // put into radio mode
 	}
@@ -451,7 +451,7 @@ void RIG_TT550::set_vfoRX(unsigned long int freq)
 	cmd += '\r';
 	sendCommand(cmd, 0);
 
-	stringstream s;
+	std::stringstream s;
 	s << "Rx freq = " << freq << " / adjusted to " << lFreq << ", " << noctl(cmd);
 	set_trace(2, "set vfoRX", s.str().c_str());
 
@@ -518,7 +518,7 @@ void RIG_TT550::set_vfoTX(unsigned long int freq)
 	cmd += '\r';
 	sendCommand(cmd, 0);
 
-	stringstream s;
+	std::stringstream s;
 	s << "Tx freq = " << freq << " / adjusted to " << lFreq << ", " << noctl(cmd);
 	set_trace(2, "set vfoTX", s.str().c_str());
 
@@ -608,7 +608,7 @@ void RIG_TT550::set_PTT_control(int val)
 	else     cmd = TT550setRCV;
 	sendCommand(cmd, 0);
 
-	stringstream s;
+	std::stringstream s;
 	s << "set PTT " << (val ? "ON " : "OFF ") << noctl(cmd);
 
 	set_trace(1, s.str().c_str());
@@ -629,7 +629,7 @@ void RIG_TT550::set_mode(int val)
 		cmd[1] = cmd[2] = TT550mode_chr[val];
 		sendCommand(cmd, 0);
 
-		stringstream s;
+		std::stringstream s;
 		s << "Set Mode " << noctl(cmd);
 		set_trace(1, s.str().c_str());
 
@@ -645,7 +645,7 @@ void RIG_TT550::set_mode(int val)
 		cmd[1] = cmd[2] = TT550mode_chr[val];
 		sendCommand(cmd, 0);
 
-		stringstream s;
+		std::stringstream s;
 		s << "Set Mode " << noctl(cmd);
 		set_trace(1, s.str().c_str());
 
@@ -726,7 +726,7 @@ void RIG_TT550::set_bw(int val)
 	cmd[1] = rxbw;
 	sendCommand(cmd, 0);
 
-	stringstream s;
+	std::stringstream s;
 	s << "Set RX bandwidth " << val << " " << noctl(cmd);
 	set_trace(1, s.str().c_str());
 
@@ -734,7 +734,7 @@ void RIG_TT550::set_bw(int val)
 	cmd[1] = txbw;
 	sendCommand(cmd, 0);
 
-	stringstream s2;
+	std::stringstream s2;
 	s2 << "Set TX bandwidth " << val << " " << noctl(cmd);
 	set_trace(1, s2.str().c_str());
 
@@ -805,7 +805,7 @@ void RIG_TT550::set_attenuator(int val)
 	else     cmd[1] = '0';
 	sendCommand(cmd, 0);
 
-	stringstream s;
+	std::stringstream s;
 	s << "Set attenuator " << noctl(cmd);
 	set_trace(1, s.str().c_str());
 
@@ -823,7 +823,7 @@ void RIG_TT550::set_volume_control(int val)
 	cmd[1] = 0xFF & ((val * 255) / 100);
 	sendCommand(cmd, 0);
 
-	stringstream s;
+	std::stringstream s;
 	s << "Set volume " << noctl(cmd);
 	set_trace(1, s.str().c_str());
 }
@@ -920,11 +920,11 @@ void RIG_TT550::process_freq_entry(char c)
 	}
 }
 
-//static const char *tt550_fkey_strings[] = {"None","Clear","CW++","CW--","Band++","Band--","Step++","Step--"};
+//static const char *tt550_fkey_std::strings[] = {"None","Clear","CW++","CW--","Band++","Band--","Step++","Step--"};
 
 void RIG_TT550::fkey_clear()
 {
-//	LOG_INFO("%s", tt550_fkey_strings[1]);
+//	LOG_INFO("%s", tt550_fkey_std::strings[1]);
 	xcvrstream.clear();
 	keypad_timeout = 0;
 	Fl::awake(hide_encA, NULL);
@@ -932,7 +932,7 @@ void RIG_TT550::fkey_clear()
 
 void RIG_TT550::fkey_cw_plus()
 {
-//	LOG_INFO("%s", tt550_fkey_strings[2]);
+//	LOG_INFO("%s", tt550_fkey_std::strings[2]);
 	if (progStatus.tt550_cw_wpm >= 80) return;
 	progStatus.tt550_cw_wpm++;
 	spnr_tt550_cw_wpm->value(progStatus.tt550_cw_wpm);
@@ -1074,7 +1074,7 @@ void RIG_TT550::get_302()
 			Fl::awake(hide_encA, NULL);
 		}
 	}
-// reading any pending encoder / keyboard strings
+// reading any pending encoder / keyboard std::strings
 	size_t p = 0;
 	int encval = 0;
 	int encode = 0;
@@ -1169,7 +1169,7 @@ int RIG_TT550::get_power_out()
 
 	if (ret < 4) return fwdpwr;
 	size_t p = replystr.rfind("T");
-	if (p == string::npos) return fwdpwr;
+	if (p == std::string::npos) return fwdpwr;
 
     for (int i = 0; i < FPLEN - 1; i++) {
 		fp[i] = fp[i+1];
@@ -1195,7 +1195,7 @@ int RIG_TT550::get_power_out()
 		if (iswr > 100) iswr = 100;
 	}
 
-	stringstream s;
+	std::stringstream s;
 	s << "Get pwr: fwc " << fwdpwr << ", refpwr" << refpwr << ", swr " << swr;
 	set_trace(1, s.str().c_str());
 
@@ -1278,7 +1278,7 @@ void RIG_TT550::set_rf_gain(int val)
 	RFgain = val;
 	sendCommand(cmd, 0);
 
-	stringstream s;
+	std::stringstream s;
 	s << "Set rf gain " << val << ", " << noctl(cmd);
 	set_trace(1, s.str().c_str());
 
@@ -1303,7 +1303,7 @@ void RIG_TT550::set_line_out()
 	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
 	sendCommand(cmd, 0);
 
-	stringstream s;
+	std::stringstream s;
 	s << "Set line out " << progStatus.tt550_line_out << ", " << noctl(cmd);
 	set_trace(1, s.str().c_str());
 }
@@ -1318,7 +1318,7 @@ void RIG_TT550::set_agc_level()
 	}
 	sendCommand(cmd, 0);
 
-	stringstream s;
+	std::stringstream s;
 	s << "Set agc level " << progStatus.tt550_agc_level << ", " << noctl(cmd);
 	set_trace(1, s.str().c_str());
 }
@@ -1338,7 +1338,7 @@ void RIG_TT550::set_cw_wpm()
 	cmd[6] = 0xFF & spcfactor;
 	sendCommand(cmd, 0);
 
-	stringstream s;
+	std::stringstream s;
 	s << "Set CW wpm " << progStatus.tt550_cw_wpm << ", " << noctl(cmd);
 	set_trace(1, s.str().c_str());
 }
@@ -1351,7 +1351,7 @@ void RIG_TT550::set_cw_vol()
 	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
 	sendCommand(cmd, 0);
 
-	stringstream s;
+	std::stringstream s;
 	s << "Set CW volume " << progStatus.tt550_cw_vol << ", " << noctl(cmd);
 	set_trace(1, s.str().c_str());
 }
@@ -1365,7 +1365,7 @@ bool RIG_TT550::set_cw_spot()
 	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
 	sendCommand(cmd, 0);
 
-	stringstream s;
+	std::stringstream s;
 	s << "Set CW spot " << progStatus.tt550_cw_spot << ", " << noctl(cmd);
 	set_trace(1, s.str().c_str());
 
@@ -1412,7 +1412,7 @@ void RIG_TT550::enable_keyer()
 		cmd = TT550setKEYER_OFF;
 	sendCommand(cmd, 0);
 
-	stringstream s;
+	std::stringstream s;
 	s << "Set enable keyer " << (progStatus.tt550_enable_keyer ? "ON" : "OFF") << ", " << noctl(cmd);
 	set_trace(1, s.str().c_str());
 }
@@ -1424,7 +1424,7 @@ void RIG_TT550::set_vox_onoff()
 	cmd[1] = progStatus.vox_onoff ? '1' : '0';
 	sendCommand(cmd, 0);
 
-	stringstream s;
+	std::stringstream s;
 	s << "Set vox " << (progStatus.vox_onoff ? "ON" : "OFF") << ", " << noctl(cmd);
 	set_trace(1, s.str().c_str());
 }
@@ -1436,7 +1436,7 @@ void RIG_TT550::set_vox_gain()
 	if (cmd[2] == 0x0D) cmd[2] = 0x0E;
 	sendCommand(cmd, 0);
 
-	stringstream s;
+	std::stringstream s;
 	s << "Set vox gain " << progStatus.tt550_vox_gain << ", " << noctl(cmd);
 	set_trace(1, s.str().c_str());
 }
@@ -1448,7 +1448,7 @@ void RIG_TT550::set_vox_anti()
 	if (cmd[2] == 0x0D) cmd[2] = 0x0E;
 	sendCommand(cmd, 0);
 
-	stringstream s;
+	std::stringstream s;
 	s << "Set vox anti " << progStatus.tt550_vox_anti << ", " << noctl(cmd);
 	set_trace(1, s.str().c_str());
 }
@@ -1460,7 +1460,7 @@ void RIG_TT550::set_vox_hang()
 	if (cmd[2] == 0x0D) cmd[2] = 0x0E;
 	sendCommand(cmd, 0);
 
-	stringstream s;
+	std::stringstream s;
 	s << "Set vox hang " << progStatus.tt550_vox_hang << ", " << noctl(cmd);
 	set_trace(1, s.str().c_str());
 }
@@ -1471,7 +1471,7 @@ void RIG_TT550::set_aux_hang()
 	cmd[2] = 0;
 	sendCommand(cmd, 0);
 
-	stringstream s;
+	std::stringstream s;
 	s << "Set aux hang " << noctl(cmd);
 	set_trace(1, s.str().c_str());
 }
@@ -1483,7 +1483,7 @@ void RIG_TT550::set_compression(int on, int val)
 	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
 	sendCommand(cmd, 0);
 
-	stringstream s;
+	std::stringstream s;
 	s << "Set compression " << progStatus.tt550_compression << ", " << noctl(cmd);
 	set_trace(1, s.str().c_str());
 }
@@ -1500,7 +1500,7 @@ void RIG_TT550::set_auto_notch(int v)
 		cmd[2] = '0';
 	sendCommand(cmd, 0);
 
-	stringstream s;
+	std::stringstream s;
 	s << "Set auto notch " << noctl(cmd);
 	set_trace(1, s.str().c_str());
 }
@@ -1516,7 +1516,7 @@ void RIG_TT550::set_noise_reduction(int b)
 	cmd[2] = auto_notch ? '1' : '0';
 	sendCommand(cmd, 0);
 
-	stringstream s;
+	std::stringstream s;
 	s << "Set noise reduction " << noctl(cmd);
 	set_trace(1, s.str().c_str());
 }
@@ -1530,7 +1530,7 @@ void RIG_TT550::set_mic_gain(int v)
 		cmd[3] = (unsigned char) v;
 		sendCommand(cmd, 0);
 
-		stringstream s;
+		std::stringstream s;
 		s << "Set mic gain " << noctl(cmd);
 		set_trace(1, s.str().c_str());
 
@@ -1550,7 +1550,7 @@ void RIG_TT550::set_mic_line(int v)
 		cmd[3] = 0;//(unsigned char) v;
 		sendCommand(cmd, 0);
 
-		stringstream s;
+		std::stringstream s;
 		s << "Set mic line " << noctl(cmd);
 		set_trace(1, s.str().c_str());
 	}
@@ -1581,7 +1581,7 @@ void RIG_TT550::set_power_control(double val)
 	cmd[1] = ival;
 	sendCommand(cmd, 0);
 
-	stringstream s;
+	std::stringstream s;
 	s << "Set power control " << noctl(cmd);
 	set_trace(1, s.str().c_str());
 }
@@ -1598,7 +1598,7 @@ void RIG_TT550::set_mon_vol()
 	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
 	sendCommand(cmd, 0);
 
-	stringstream s;
+	std::stringstream s;
 	s << "Set mon volume " << progStatus.tt550_mon_vol << ", " << noctl(cmd);
 	set_trace(1, s.str().c_str());
 }
@@ -1610,7 +1610,7 @@ void RIG_TT550::set_squelch_level()
 	if (cmd[1] == 0x0D) cmd[1] = 0x0E;
 	sendCommand(cmd, 0);
 
-	stringstream s;
+	std::stringstream s;
 	s << "Set squelch level " << progStatus.tt550_squelch_level << ", " << noctl(cmd);
 	set_trace(1, s.str().c_str());
 }
@@ -1621,7 +1621,7 @@ void RIG_TT550::set_nb_level()
 	cmd[1] = progStatus.tt550_nb_level;
 	sendCommand(cmd, 0);
 
-	stringstream s;
+	std::stringstream s;
 	s << "Set nb level " << progStatus.tt550_nb_level << ", " << noctl(cmd);
 	set_trace(1, s.str().c_str());
 }
@@ -1846,7 +1846,7 @@ void RIG_TT550::at11_loZ()
 }
 
 //======================================================================
-// data strings captured from TenTec Windows control program for Pegasus
+// data std::strings captured from TenTec Windows control program for Pegasus
 //======================================================================
 
 /*

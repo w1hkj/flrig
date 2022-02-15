@@ -54,7 +54,7 @@ public:
 
 	bool get_info();
 
-	bool snd_cmd(string cmd, size_t n);
+	bool snd_cmd(std::string cmd, size_t n);
 
 // FT757GX2 does not support PTT via CAT.
 //	void set_PTT_control(int val);

@@ -56,9 +56,6 @@
 #  define AI_NUMERICSERV 0
 #endif
 
-
-using namespace std;
-
 //
 // utility functions
 //
@@ -211,7 +208,7 @@ Address::Address(const char* host, int port, const char* proto_name)
 	if (node.empty() && port == 0)
 		return;
 
-	ostringstream s;
+	std::ostringstream s;
 	s << port;
 	service = s.str();
 
@@ -308,12 +305,12 @@ void Address::lookup(const char* proto_name)
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = (proto == IPPROTO_TCP ? SOCK_STREAM : SOCK_DGRAM);
 
-	if (service.find_first_not_of("0123456789") == string::npos)
+	if (service.find_first_not_of("0123456789") == std::string::npos)
 		hints.ai_flags |= AI_NUMERICSERV;
 
 	int r;
 	if ((r = getaddrinfo(node.empty() ? NULL : node.c_str(), service.c_str(), &hints, &info)) < 0) {
-string errstr = "getaddrinfo: ";
+std::string errstr = "getaddrinfo: ";
 errstr.append(node).append(" : ").append(service);
 		throw SocketException(r, errstr.c_str());
 	}
@@ -328,7 +325,7 @@ errstr.append(node).append(" : ").append(service);
 
 	if ((hp = gethostbyname(node.c_str())) == NULL) {
 #ifdef __WIN32__
-string errstr = "gethostbyname: ";
+std::string errstr = "gethostbyname: ";
 errstr.append(node).append(" not found");
 		throw SocketException(0, errstr.c_str());
 #else
@@ -341,8 +338,8 @@ errstr.append(node).append(" not found");
 	int port;
 	struct servent* sp;
 	if ((sp = getservbyname(service.c_str(), NULL)) == NULL) {
-		// if a service name string could not be looked up by name, it must be numeric
-		if (service.find_first_not_of("0123456789") != string::npos) {
+		// if a service name std::string could not be looked up by name, it must be numeric
+		if (service.find_first_not_of("0123456789") != std::string::npos) {
 			throw SocketException("Unknown service name");
 		}
 		port = htons(atoi(service.c_str()));
@@ -413,9 +410,9 @@ const addr_info_t* Address::get(size_t n) const
 }
 
 ///
-/// Returns the string representation of an address
+/// Returns the std::string representation of an address
 ///
-string Address::get_str(const addr_info_t* addr)
+std::string Address::get_str(const addr_info_t* addr)
 {
 	if (!addr)
 		return "";
@@ -426,14 +423,14 @@ string Address::get_str(const addr_info_t* addr)
 	if (getnameinfo(addr->ai_addr, sizeof(struct sockaddr_storage),
 			host, sizeof(host), port, sizeof(port),
 			NI_NUMERICHOST | NI_NUMERICSERV) == 0)
-		return string("[").append(host).append("]:").append(port);
+		return std::string("[").append(host).append("]:").append(port);
 	else
 		return "";
 #else
 	char* host, port[8];
 	host = inet_ntoa(((struct sockaddr_in*)addr->ai_addr)->sin_addr);
 	snprintf(port, sizeof(port), "%u", htons(((struct sockaddr_in*)addr->ai_addr)->sin_port));
-	return string("[").append(host).append("]:").append(port);
+	return std::string("[").append(host).append("]:").append(port);
 #endif
 }
 
@@ -700,14 +697,14 @@ size_t Socket::send(const void* buf, size_t len)
 }
 
 ///
-/// Sends a string
+/// Sends a std::string
 ///
 /// @param buf
 ///
 /// @return The amount of data that was sent. This may be less than len
 ///         if the socket is non-blocking.
 ///
-size_t Socket::send(const string& buf)
+size_t Socket::send(const std::string& buf)
 {
 	return send(buf.data(), buf.length());
 }
@@ -742,13 +739,13 @@ size_t Socket::recv(void* buf, size_t len)
 }
 
 ///
-/// Receives all available data and appends it to a string.
+/// Receives all available data and appends it to a std::string.
 ///
 /// @arg buf
 ///
 /// @return The amount of data that was received.
 ///
-size_t Socket::recv(string& buf)
+size_t Socket::recv(std::string& buf)
 {
 	size_t n = 0;
 	ssize_t r;
@@ -822,7 +819,7 @@ void Socket::set_timeout(const struct timeval& t)
 void Socket::set_timeout(double t)
 {
 	timeout.tv_sec = (time_t)floor(t);
-	timeout.tv_usec = (suseconds_t)((t - timeout.tv_sec) * 1e6);
+	timeout.tv_usec = (size_t)((t - timeout.tv_sec) * 1e6);
 }
 
 ///

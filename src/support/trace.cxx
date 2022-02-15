@@ -53,14 +53,12 @@
 
 #include "tod_clock.h"
 
-using namespace std;
-
 Fl_Double_Window*	tracewindow = (Fl_Double_Window *)0;
 Fl_Text_Display*	tracedisplay = (Fl_Text_Display *)0;
 Fl_Text_Buffer*		tracebuffer = (Fl_Text_Buffer*)0;
 Fl_Button*			btn_cleartrace = (Fl_Button*)0;
 
-vector<string> tracestrings;
+std::vector<std::string> tracestrings;
 
 bool stdout_trace = false;
 
@@ -83,9 +81,9 @@ void make_trace_window() {
 
 static void write_trace_file(std::string s)
 {
-	string trace_fname = RigHomeDir;
+	std::string trace_fname = RigHomeDir;
 	trace_fname.append("trace.txt");
-	fstream tfile(trace_fname.c_str(), ios::app);
+	std::fstream tfile(trace_fname.c_str(), std::ios::app);
 	if (tfile)
 		tfile << s;
 	tfile.close();
@@ -112,7 +110,7 @@ void trace(int n, ...) // all args of type const char *
 
 	if (!n) return;
 
-	stringstream s;
+	std::stringstream s;
 	va_list vl;
 	va_start(vl, n);
 	s << ztime() << " : " << va_arg(vl, const char *);
@@ -144,7 +142,7 @@ void xml_trace(int n, ...) // all args of type const char *
 
 	if (!n) return;
 
-	stringstream s;
+	std::stringstream s;
 	va_list vl;
 	va_start(vl, n);
 	s << ztime();
@@ -172,7 +170,7 @@ void xml_trace(int n, ...) // all args of type const char *
 
 void rig_trace(int n, ...) // all args of type const char *
 {
-	stringstream s;
+	std::stringstream s;
 	va_list vl;
 	va_start(vl, n);
 	s << ztime() << " : " << va_arg(vl, const char *);
@@ -200,7 +198,7 @@ void rig_trace(int n, ...) // all args of type const char *
 
 void set_trace(int n, ...) // all args of type const char *
 {
-	stringstream s;
+	std::stringstream s;
 	va_list vl;
 	va_start(vl, n);
 	s << ztime() << " : " << va_arg(vl, const char *);
@@ -228,7 +226,7 @@ void set_trace(int n, ...) // all args of type const char *
 
 void get_trace(int n, ...) // all args of type const char *
 {
-	stringstream s;
+	std::stringstream s;
 	va_list vl;
 	va_start(vl, n);
 	s << ztime() << " : " << va_arg(vl, const char *);
@@ -257,7 +255,7 @@ void get_trace(int n, ...) // all args of type const char *
 
 void rpc_trace(int n, ...) // all args of type const char *
 {
-	stringstream s;
+	std::stringstream s;
 	va_list vl;
 	va_start(vl, n);
 	s << ztime() << " : " << va_arg(vl, const char *);
@@ -325,7 +323,7 @@ void rpc_trace(int n, ...) // all args of type const char *
 
 void ser_trace(int n, ...) // all args of type const char *
 {
-	stringstream s;
+	std::stringstream s;
 	va_list vl;
 	va_start(vl, n);
 	s << ztime() << " : " << va_arg(vl, const char *);

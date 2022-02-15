@@ -202,7 +202,7 @@ RIG_Xiegu_G90::RIG_Xiegu_G90() {
 bool RIG_Xiegu_G90::check ()
 {
 	bool ok = false;
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
 	cmd += '\x03';
@@ -240,7 +240,7 @@ void RIG_Xiegu_G90::selectB()
 unsigned long int RIG_Xiegu_G90::get_vfoA ()
 {
 	if (inuse == onB) return A.freq;
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
 	cmd += '\x03';
@@ -249,7 +249,7 @@ unsigned long int RIG_Xiegu_G90::get_vfoA ()
 	if (waitFOR(11, "get vfo A")) {
 		igett("");
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			if (replystr[p+5] == -1)
 				A.freq = 0;
 			else
@@ -274,7 +274,7 @@ void RIG_Xiegu_G90::set_vfoA (unsigned long int freq)
 unsigned long int RIG_Xiegu_G90::get_vfoB ()
 {
 	if (inuse == onA) return B.freq;
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
 	cmd += '\x03';
@@ -283,7 +283,7 @@ unsigned long int RIG_Xiegu_G90::get_vfoB ()
 	if (waitFOR(11, "get vfo B")) {
 		igett("");
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			if (replystr[p+5] == -1)
 				A.freq = 0;
 			else
@@ -331,10 +331,10 @@ int RIG_Xiegu_G90::get_split()
 	get_trace(1, "get split");
 	if (waitFOR(7, "get split")) {
 		igett("");
-		string resp = pre_fm;
+		std::string resp = pre_fm;
 		resp.append("\x0F");
 		size_t p = replystr.find(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			read_split = replystr[p+5];
 		if (read_split != 0xFA) // fail byte
 			split = read_split;
@@ -376,7 +376,7 @@ int RIG_Xiegu_G90::get_modeA()
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x04';
 
 	get_trace(1, "get modeA");
@@ -427,7 +427,7 @@ int RIG_Xiegu_G90::get_modeB()
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x04';
 
 	get_trace(1, "get modeB");
@@ -481,7 +481,7 @@ int RIG_Xiegu_G90::get_attenuator()
 	cmd = pre_to;
 	cmd += '\x11';
 	cmd.append( post );
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x11';
 	get_trace(1, "get ATT");
 	if (waitFOR(7, "get ATT")) {
@@ -523,8 +523,8 @@ void RIG_Xiegu_G90::set_preamp(int val)
 
 int RIG_Xiegu_G90::get_preamp()
 {
-	string cstr = "\x16\x02";
-	string resp = pre_fm;
+	std::string cstr = "\x16\x02";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
@@ -533,7 +533,7 @@ int RIG_Xiegu_G90::get_preamp()
 	if (waitFOR(8, "get Preamp Level")) {
 		igett("");
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			preamp_level = replystr[p+6];
 		if (preamp_level == 1) {
 			preamp_label("PRE", true);
@@ -646,8 +646,8 @@ double RIG_Xiegu_G90::get_power_control()
 {
 	int val = pwrtbl[int(progStatus.power_level) - 1].mtr;
 
-	string cstr = "\x14\x0A";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x0A";
+	std::string resp = pre_fm;
 	cmd = pre_to;
 	cmd.append(cstr).append(post);
 	resp.append(cstr);
@@ -655,7 +655,7 @@ double RIG_Xiegu_G90::get_power_control()
 	if (waitFOR(9, "get power")) {
 		igett("");
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			if (replystr[p + 7] == '\xFD') {
 				val = hexval(replystr[p + 6]);
 			} else {
@@ -683,8 +683,8 @@ void RIG_Xiegu_G90::get_pc_min_max_step(double &min, double &max, double &step)
 
 int RIG_Xiegu_G90::get_power_out(void)
 {
-	string cstr = "\x15\x11";
-	string resp = pre_fm;
+	std::string cstr = "\x15\x11";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
@@ -694,7 +694,7 @@ int RIG_Xiegu_G90::get_power_out(void)
 	if (waitFOR(9, "get power out")) {
 		igett("");
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			// Power is 10 * output in watts, as BCD
 			if (replystr[p + 7] == '\xFD') {
 				mtr = hexval(replystr[p + 6]);
@@ -734,8 +734,8 @@ void RIG_Xiegu_G90::set_volume_control(int val)
 int RIG_Xiegu_G90::get_volume_control()
 {
 	int val = progStatus.volume;
-	string cstr = "\x14\x01";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x01";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
@@ -744,7 +744,7 @@ int RIG_Xiegu_G90::get_volume_control()
 	if (waitFOR(9, "get vol")) {
 		igett("");
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			if (replystr[p + 7] == '\xFD') {
 				val = hexval(replystr[p + 6]);
 			} else {
@@ -784,8 +784,8 @@ S9  FE FE 88 E0 14 03 FD FE FE E0 88 14 03 02 55 FD
 int  RIG_Xiegu_G90::get_squelch()
 {
 	int val = progStatus.squelch;
-	string cstr = "\x14\x03";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x03";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
@@ -794,7 +794,7 @@ int  RIG_Xiegu_G90::get_squelch()
 	if (waitFOR(9, "get squelch")) {
 		igett("");
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			if (replystr[p + 7] == '\xFD') {
 				val = hexval(replystr[p + 6]);
 			} else {
@@ -835,8 +835,8 @@ static meterpair smtrtbl[] = {
 
 int RIG_Xiegu_G90::get_smeter()
 {
-	string cstr = "\x15\x02";
-	string resp = pre_fm;
+	std::string cstr = "\x15\x02";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
@@ -846,7 +846,7 @@ int RIG_Xiegu_G90::get_smeter()
 	if (waitFOR(8, "get smeter")) {
 		igett("");
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			if (replystr[p + 7] == '\xFD') {
 				mtr = hexval(replystr[p + 6]);
 			} else {
@@ -880,8 +880,8 @@ static meterpair swrtbl[] = {
 
 int RIG_Xiegu_G90::get_swr()
 {
-	string cstr = "\x15\x12";
-	string resp = pre_fm;
+	std::string cstr = "\x15\x12";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
@@ -891,7 +891,7 @@ int RIG_Xiegu_G90::get_swr()
 	if (waitFOR(9, "get SWR")) {
 		igett("");
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			if (replystr[p + 7] == '\xFD') {
 				mtr = hexval(replystr[p + 6]);
 			} else {
@@ -927,8 +927,8 @@ void RIG_Xiegu_G90::set_noise(bool val)
 
 int RIG_Xiegu_G90::get_noise()
 {
-	string cstr = "\x16\x22";
-	string resp = pre_fm;
+	std::string cstr = "\x16\x22";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
@@ -937,7 +937,7 @@ int RIG_Xiegu_G90::get_noise()
 	if (waitFOR(8, "get noise")) {
 		igett("");
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			return (replystr[p+6] ? 1 : 0);
 	}
 	return progStatus.noise;
@@ -1001,7 +1001,7 @@ int  RIG_Xiegu_G90::get_agc()
 	if (waitFOR(8, "get AGC")) {
 		igett("");
 		size_t p = replystr.find(pre_fm);
-		if (p == string::npos) return agcval;
+		if (p == std::string::npos) return agcval;
 		return (agcval = replystr[p + 6]); // 1 = off, 2 = FAST, 3 = SLOW 4 = AUTO
 	}
 	return agcval;
@@ -1068,14 +1068,14 @@ void RIG_Xiegu_G90::tune_rig(int how)
 
 int RIG_Xiegu_G90::get_tune()
 {
-	string resp;
-	string cstr = "\x1C\x01";
+	std::string resp;
+	std::string cstr = "\x1C\x01";
 	cmd.assign(pre_to).append(cstr).append(post);
 	resp.assign(pre_fm).append(cstr);
 	int val = tune_;
 	if (waitFOR(8, "get TUNE")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			val = replystr[p + 6];
 	}
 	return (tune_ = val);

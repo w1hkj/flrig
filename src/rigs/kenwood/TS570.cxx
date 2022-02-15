@@ -145,7 +145,7 @@ RIG_TS570::RIG_TS570() {
 // repeat test 20 times to provide autobaud detection
 // in the event an adapter is expecting to detect the pc baud rate
 //
-// TS590 identifier strings:
+// TS590 identifier std::strings:
 // TS590D: ID017;
 // TS590S: ID018;
 
@@ -224,7 +224,7 @@ int RIG_TS570::get_split()
 
 	if (n < 38) return split;
 	size_t p = replystr.rfind("IF");
-	if (p == string::npos) return split;
+	if (p == std::string::npos) return split;
 	split = replystr[p+32] ? true : false;
 	return split;
 }
@@ -243,7 +243,7 @@ unsigned long int RIG_TS570::get_vfoA ()
 
 	if (n < 14) return A.freq;
 	size_t p = replystr.rfind("FA");
-	if (p == string::npos) return A.freq;
+	if (p == std::string::npos) return A.freq;
 
 	int f = 0;
 	for (size_t n = 2; n < 13; n++)
@@ -274,7 +274,7 @@ unsigned long int RIG_TS570::get_vfoB ()
 
 	if (n < 14) return freqB;
 	size_t p = replystr.rfind("FB");
-	if (p == string::npos) return freqB;
+	if (p == std::string::npos) return freqB;
 
 	int f = 0;
 	for (size_t n = 2; n < 13; n++)
@@ -315,7 +315,7 @@ int RIG_TS570::get_smeter()
 
 	if (n < 6) return 0;
 	size_t p = replystr.rfind("SM");
-	if (p == string::npos) return -1;
+	if (p == std::string::npos) return -1;
 
 	size_t len = replystr.length();
 	replystr[len - 1] = 0;
@@ -342,7 +342,7 @@ int RIG_TS570::get_swr()
 
 	if (n < 8) return 0;
 	size_t p = replystr.rfind("RM1");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	replystr[p + 7] = 0;
 	int mtr = atoi(&replystr[p + 3]);
@@ -361,7 +361,7 @@ int RIG_TS570::get_power_out()
 
 	if (n < 7) return 0;
 	size_t p = replystr.rfind("SM");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	replystr[p + 6] = 0;
 	int mtr = atoi(&replystr[p + 2]);
@@ -394,7 +394,7 @@ double RIG_TS570::get_power_control()
 
 	if (n < 6) return 0;
 	size_t p = replystr.rfind("PC");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	replystr[p + 5] = 0;
 	int mtr = atoi(&replystr[p + 2]);
@@ -412,7 +412,7 @@ int RIG_TS570::get_volume_control()
 
 	if (n < 6) return 0;
 	size_t p = replystr.rfind("AG");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	replystr[p + 5] = 0;
 	int val = atoi(&replystr[p + 2]);
@@ -457,7 +457,7 @@ int RIG_TS570::get_attenuator()
 
 	if (n < 5) return att_on;
 	size_t p = replystr.rfind("RA");
-	if (p == string::npos) return att_on;
+	if (p == std::string::npos) return att_on;
 
 	if (replystr[p + 2] == '0' &&
 		replystr[p + 3] == '0')
@@ -486,7 +486,7 @@ int RIG_TS570::get_preamp()
 
 	if (n < 4 ) return preamp_on;
 	size_t p = replystr.rfind("PA");
-	if (p == string::npos) return preamp_on;
+	if (p == std::string::npos) return preamp_on;
 
 	if (replystr[p + 2] == '1')
 		preamp_on = 1;
@@ -565,7 +565,7 @@ int RIG_TS570::get_modeA()
 
 	if (n < 4) return A.imode;
 	size_t p = replystr.rfind("MD");
-	if (p == string::npos) return A.imode;
+	if (p == std::string::npos) return A.imode;
 
 	int md = replystr[p + 2];
 	md = md - '1';
@@ -596,7 +596,7 @@ int RIG_TS570::get_modeB()
 
 	if (n < 4) return B.imode;
 	size_t p = replystr.rfind("MD");
-	if (p == string::npos) return B.imode;
+	if (p == std::string::npos) return B.imode;
 
 	int md = replystr[p + 2];
 	md = md - '1';
@@ -688,9 +688,9 @@ int RIG_TS570::get_bwA()
 
 	if (n < 7) return A.iBW;
 	size_t p = replystr.rfind("FW");
-	if (p == string::npos) return A.iBW;
+	if (p == std::string::npos) return A.iBW;
 
-	string test = replystr.substr(p, 7);
+	std::string test = replystr.substr(p, 7);
 
 	switch (A.imode) {
 	case 0:
@@ -763,9 +763,9 @@ int RIG_TS570::get_bwB()
 
 	if (n < 7) return B.iBW;
 	size_t p = replystr.rfind("FW");
-	if (p == string::npos) return B.iBW;
+	if (p == std::string::npos) return B.iBW;
 
-	string test = replystr.substr(p,7);
+	std::string test = replystr.substr(p,7);
 
 	switch (B.imode) {
 	case 0:
@@ -825,7 +825,7 @@ int RIG_TS570::get_mic_gain()
 
 	if (n < 6) return 0;
 	size_t p = replystr.rfind("MG");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	replystr[p + 5] = 0;
 	int val = atoi(&replystr[p + 2]);
@@ -859,7 +859,7 @@ int  RIG_TS570::get_noise()
 
 	if (n < 4) return 0;
 	size_t p = replystr.rfind("NB");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	return (replystr[p + 2] == '1');
 }
@@ -894,7 +894,7 @@ bool RIG_TS570::get_if_shift(int &val)
 		return false;
 	}
 	size_t p = replystr.rfind("IS");
-	if (p == string::npos) {
+	if (p == std::string::npos) {
 		return false;
 	}
 	replystr[p + 7] = 0;
@@ -929,7 +929,7 @@ int  RIG_TS570::get_rf_gain()
 
 	if (n < 6) return val;
 	size_t p = replystr.rfind("RG");
-	if (p != string::npos)
+	if (p != std::string::npos)
 		val = fm_decimal(replystr.substr(p+2), 3);
 	return val;
 }
@@ -958,7 +958,7 @@ int  RIG_TS570::get_squelch()
 	if (n < 6) return 0;
 	size_t p = replystr.rfind("SQ");
 
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	replystr[p + 5] = 0;
 	return atoi(&replystr[p + 2]);

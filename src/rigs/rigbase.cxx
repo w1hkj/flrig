@@ -179,11 +179,11 @@ rigbase::rigbase()
 	preamp_level = 0;
 }
 
-string rigbase::to_bcd_be(unsigned long int freq, int len)
+std::string rigbase::to_bcd_be(unsigned long int freq, int len)
 {
 	unsigned char a;
 	int numchars = len / 2;
-	string bcd = "";
+	std::string bcd = "";
 	if (len & 1) numchars ++;
 	for (int i = 0; i < numchars; i++) {
 		a = 0;
@@ -196,17 +196,17 @@ string rigbase::to_bcd_be(unsigned long int freq, int len)
 	return bcd;
 }
 
-string rigbase::to_bcd(unsigned long int freq, int len)
+std::string rigbase::to_bcd(unsigned long int freq, int len)
 {
-	string bcd_be = to_bcd_be(freq, len);
-	string bcd = "";
+	std::string bcd_be = to_bcd_be(freq, len);
+	std::string bcd = "";
 	int bcdlen = bcd_be.size();
 	for (int i = bcdlen - 1; i >= 0; i--)
 		bcd += bcd_be[i];
 	return bcd;
 }
 
-unsigned long int rigbase::fm_bcd (string bcd, int len)
+unsigned long int rigbase::fm_bcd (std::string bcd, int len)
 {
 	int i;
 	unsigned long int f = 0;
@@ -222,7 +222,7 @@ unsigned long int rigbase::fm_bcd (string bcd, int len)
 }
 
 
-unsigned long int rigbase::fm_bcd_be(string bcd, int len)
+unsigned long int rigbase::fm_bcd_be(std::string bcd, int len)
 {
 	char temp;
 	int numchars = len/2;
@@ -235,9 +235,9 @@ unsigned long int rigbase::fm_bcd_be(string bcd, int len)
 	return fm_bcd(bcd, len);
 }
 
-string rigbase::to_binary_be(unsigned long int freq, int len)
+std::string rigbase::to_binary_be(unsigned long int freq, int len)
 {
-	static string bin = "";
+	static std::string bin = "";
 	for (int i = 0; i < len; i++) {
 		bin += freq & 0xFF;
 		freq >>= 8;
@@ -245,17 +245,17 @@ string rigbase::to_binary_be(unsigned long int freq, int len)
 	return bin;
 }
 
-string rigbase::to_binary(unsigned long int freq, int len)
+std::string rigbase::to_binary(unsigned long int freq, int len)
 {
-	static string bin = "";
-	string bin_be = to_binary_be(freq, len);
+	static std::string bin = "";
+	std::string bin_be = to_binary_be(freq, len);
 	int binlen = bin_be.size();
 	for (int i = binlen - 1; i >= 0; i--)
 		bin += bin_be[i];
 	return bin;
 }
 
-unsigned long int rigbase::fm_binary(string binary, int len)
+unsigned long int rigbase::fm_binary(std::string binary, int len)
 {
 	int i;
 	unsigned long int f = 0;
@@ -266,7 +266,7 @@ unsigned long int rigbase::fm_binary(string binary, int len)
 	return f;
 }
 
-unsigned long int rigbase::fm_binary_be(string binary_be, int len)
+unsigned long int rigbase::fm_binary_be(std::string binary_be, int len)
 {
 	unsigned char temp;
 	int numchars = len/2;
@@ -279,9 +279,9 @@ unsigned long int rigbase::fm_binary_be(string binary_be, int len)
 	return fm_binary(binary_be, len);
 }
 
-string rigbase::to_decimal_be(unsigned long int d, int len)
+std::string rigbase::to_decimal_be(unsigned long int d, int len)
 {
-	static string sdec_be;
+	static std::string sdec_be;
 	sdec_be.clear();
 	for (int i = 0; i < len; i++) {
 		sdec_be += (char)((d % 10) + '0');
@@ -290,18 +290,18 @@ string rigbase::to_decimal_be(unsigned long int d, int len)
 	return sdec_be;
 }
 
-string rigbase::to_decimal(unsigned long int d, int len)
+std::string rigbase::to_decimal(unsigned long int d, int len)
 {
-	static string sdec;
+	static std::string sdec;
 	sdec.clear();
-	string sdec_be = to_decimal_be(d, len);
+	std::string sdec_be = to_decimal_be(d, len);
 	int bcdlen = sdec_be.size();
 	for (int i = bcdlen - 1; i >= 0; i--)
 		sdec += sdec_be[i];
 	return sdec;
 }
 
-unsigned long int rigbase::fm_decimal(string decimal, int len)
+unsigned long int rigbase::fm_decimal(std::string decimal, int len)
 {
 	unsigned long int d = 0;
 	for (int i = 0; i < len; i++) {
@@ -311,7 +311,7 @@ unsigned long int rigbase::fm_decimal(string decimal, int len)
 	return d;
 }
 
-unsigned long int rigbase::fm_decimal_be(string decimal_be, int len)
+unsigned long int rigbase::fm_decimal_be(std::string decimal_be, int len)
 {
 	unsigned char temp;
 	int numchars = len/2;
@@ -341,12 +341,12 @@ static int set100[] =
  204,207,210,212,215,217,220,222,225,227,
  230,233,235,238,240,243,245,248,250,253,255};
 
-string rigbase::bcd255(int val)
+std::string rigbase::bcd255(int val)
 {
 	return to_bcd(set100[(int)(val)], 3);
 }
 
-int rigbase::num100(string bcd)
+int rigbase::num100(std::string bcd)
 {
 	int val = fm_bcd(bcd, 3);
 	for (int n = 0; n < 101; n++) {
@@ -364,7 +364,7 @@ int rigbase::hexval(int hex)
 	return val;
 }
 
-int rigbase::hex2val(string hexstr)
+int rigbase::hex2val(std::string hexstr)
 {
 	return 100 * hexval(hexstr[0]) + hexval(hexstr[1]);
 }
@@ -410,7 +410,7 @@ int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 {
 	guard_lock reply_lock(&mutex_replystr);
 
-	string wait_str = " ";
+	std::string wait_str = " ";
 	wait_str[0] = ch;
 
 	int delay =  (n + cmd.length()) * 11000.0 / RigSerial->Baud();
@@ -474,7 +474,7 @@ trace(1, szt);
 // wait - wait nnn milliseconds before declaring transceiver DOA
 //        default 200 msec
 // retry - number of retries, default
-bool rigbase::id_OK(string ID, int wait)
+bool rigbase::id_OK(std::string ID, int wait)
 {
 	guard_lock reply_lock(&mutex_replystr);
 
@@ -503,7 +503,7 @@ bool rigbase::id_OK(string ID, int wait)
 	return false;
 }
 
-void rigbase::sendOK(string cmd)
+void rigbase::sendOK(std::string cmd)
 {
 	if (IDstr.empty()) {
 		sendCommand(cmd);

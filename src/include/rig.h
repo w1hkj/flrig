@@ -55,16 +55,16 @@ extern Fl_Double_Window *meter_filters;
 extern Fl_Double_Window *meter_scale_dialog;
 extern Fl_Double_Window* meters_dialog;
 
-extern string HomeDir;
-extern string RigHomeDir;
-extern string TempDir;
-extern string rigfile;
-extern string pttfile;
+extern std::string HomeDir;
+extern std::string RigHomeDir;
+extern std::string TempDir;
+extern std::string rigfile;
+extern std::string pttfile;
 
 extern int    xmlport;
 
-extern string defFileName;
-extern string title;
+extern std::string defFileName;
+extern std::string title;
 
 extern pthread_t *serial_thread;
 extern pthread_t *digi_thread;

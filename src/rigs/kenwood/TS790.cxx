@@ -95,7 +95,7 @@ unsigned long int RIG_TS790::get_vfoA ()
 	if (ret < 14) return freqA;
 
 	size_t p = replystr.rfind("FA");
-	if (p == string::npos) return freqA;
+	if (p == std::string::npos) return freqA;
 
 	int f = 0;
 	for (size_t n = 2; n < 13; n++)
@@ -123,7 +123,7 @@ unsigned long int RIG_TS790::get_vfoB ()
 	if (ret < 14) return freqB;
 
 	size_t p = replystr.rfind("FB");
-	if (p == string::npos) return freqB;
+	if (p == std::string::npos) return freqB;
 
 	int f = 0;
 	for (size_t n = 2; n < 13; n++)
@@ -152,7 +152,7 @@ int RIG_TS790::get_smeter()
 	if (ret < 7) return 0;
 
 	size_t p = replystr.rfind("SM");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	int mtr = 0;
 	for (size_t n = 2; n < 6; n++)
@@ -180,7 +180,7 @@ int RIG_TS790::get_modeA()
 	int ret = check_ifstr();
 	if (ret < 38) return split;
 	size_t p = replystr.rfind("IF");
-	if (p == string::npos) return modeA;
+	if (p == std::string::npos) return modeA;
 	int resp = replystr[p+29]; // 1, 2, 3, 4, 7
 	for (int i = 0; i < 5; i++)
 		if (resp == TS790_mode_chr[i]) {
@@ -208,7 +208,7 @@ int RIG_TS790::get_modeB()
 	int ret = check_ifstr();
 	if (ret < 38) return split;
 	size_t p = replystr.rfind("IF");
-	if (p == string::npos) return modeA;
+	if (p == std::string::npos) return modeA;
 	int resp = replystr[p+29]; // 1, 2, 3, 4, 7
 	for (int i = 0; i < 5; i++)
 		if (resp == TS790_mode_chr[i]) {
@@ -311,14 +311,14 @@ int RIG_TS790::get_split()
 	int ret = check_ifstr();
 	if (ret < 38) return split;
 	size_t p = replystr.rfind("IF");
-	if (p == string::npos) return split;
+	if (p == std::string::npos) return split;
 	split = (replystr[p+32] == 1);
 	return split;
 }
 
 
 /*
-static string bw_str = "FL001001;";
+static std::string bw_str = "FL001001;";
 
 void RIG_TS790::set_bwA(int val)
 {
@@ -337,7 +337,7 @@ int RIG_TS790::get_bwA()
 	if (ret < 9) return bwA;
 	bw_str = replystr;
 	size_t p = replystr.rfind("FL");
-	if (p == string::npos) return bwA;
+	if (p == std::string::npos) return bwA;
 
 	replystr[p + 8] = 0;
 	int bw = 0;
@@ -366,7 +366,7 @@ int RIG_TS790::get_bwB()
 	if (ret < 9) return bwB;
 	bw_str = replystr;
 	size_t p = replystr.rfind("FL");
-	if (p == string::npos) return bwB;
+	if (p == std::string::npos) return bwB;
 
 	replystr[p + 8] = 0;
 	int bw = 0;
@@ -404,7 +404,7 @@ int RIG_TS790::get_swr()
 	if (ret < 8) return 0;
 
 	size_t p = replystr.rfind("RM");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	int mtr = 0;
 	for (size_t n = 3; n < 7; n++)
@@ -423,7 +423,7 @@ int RIG_TS790::get_alc()
 	if (ret < 8) return 0;
 
 	size_t p = replystr.rfind("RM");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	int mtr = 0;
 	for (size_t n = 3; n < 7; n++)

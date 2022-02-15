@@ -86,7 +86,7 @@ public:
 //	void set_mic_gain(int val);
 //	int  get_mic_gain();
 //	void get_mic_min_max_step(int &min, int &max, int &step);
-	void checkresponse(string s);
+	void checkresponse(std::string s);
 	void shutdown();
 
 	int  adjust_bandwidth(int m);

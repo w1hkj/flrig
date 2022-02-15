@@ -64,7 +64,7 @@
 
 int ChangeSpeedEvalTime_ms = 500;
 
-static map<std::string, std::string> paths;
+static std::map<std::string, std::string> paths;
 static hid_device *tm2_dev = (hid_device *)0;
 
 //this is used for writing to USB it contains settings, LED and LCD symbols

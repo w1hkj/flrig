@@ -279,7 +279,7 @@ void RIG_IC7851::set_xcvr_auto_off()
 
 bool RIG_IC7851::check ()
 {
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
 	cmd += '\x03';
@@ -293,7 +293,7 @@ static int ret = 0;
 
 unsigned long int RIG_IC7851::get_vfoA ()
 {
-	string resp;
+	std::string resp;
 
 	cmd.assign(pre_to).append("\x25");
 	resp.assign(pre_fm).append("\x25");
@@ -314,7 +314,7 @@ unsigned long int RIG_IC7851::get_vfoA ()
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			if (replystr[p+6] == -1)
 				A.freq = 0;
 			else
@@ -343,7 +343,7 @@ void RIG_IC7851::set_vfoA (unsigned long int freq)
 
 unsigned long int RIG_IC7851::get_vfoB ()
 {
-	string resp;
+	std::string resp;
 
 	cmd.assign(pre_to).append("\x25");
 	resp.assign(pre_fm).append("\x25");
@@ -364,7 +364,7 @@ unsigned long int RIG_IC7851::get_vfoB ()
 
 	if (ret) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			if (replystr[p+6] == -1)
 				A.freq = 0;
 			else
@@ -413,10 +413,10 @@ int RIG_IC7851::get_split()
 	cmd.append("\x0F");
 	cmd.append( post );
 	if (waitFOR(7, "get split")) {
-		string resp = pre_fm;
+		std::string resp = pre_fm;
 		resp.append("\x0F");
 		size_t p = replystr.find(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			read_split = replystr[p+5];
 		if (read_split != 0xFA) // fail byte
 			split = read_split;
@@ -471,7 +471,7 @@ int RIG_IC7851::get_modeA()
 	int md = 0;
 	size_t p;
 
-	string resp;
+	std::string resp;
 	resp.assign(pre_fm).append("\x26");
 
 	cmd.assign(pre_to).append("\x26");
@@ -480,7 +480,7 @@ int RIG_IC7851::get_modeA()
 
 	if (waitFOR(10, "get mode A")) {
 		p = replystr.rfind(resp);
-		if (p == string::npos)
+		if (p == std::string::npos)
 			goto end_wait_modeA;
 
 		if (replystr[p+6] == -1) { A.imode = A.filter = 0; return A.imode; }
@@ -545,7 +545,7 @@ int RIG_IC7851::get_modeB()
 	int md = 0;
 	size_t p;
 
-	string resp;
+	std::string resp;
 	resp.assign(pre_fm).append("\x26");
 
 	cmd.assign(pre_to).append("\x26");
@@ -554,7 +554,7 @@ int RIG_IC7851::get_modeB()
 
 	if (waitFOR(10, "get mode B")) {
 		p = replystr.rfind(resp);
-		if (p == string::npos)
+		if (p == std::string::npos)
 			goto end_wait_modeB;
 
 		if (replystr[p+6] == -1) { B.imode = B.filter = 0; return B.imode; }
@@ -853,7 +853,7 @@ void RIG_IC7851::set_cw_wpm()
 //	cmd.append("\x14\x0C");
 //	if (waitFOR(9, "get WPM")) {
 //		size_t p = replystr.rfind(resp);
-//		if (p != string::npos) {
+//		if (p != std::string::npos) {
 //			wpm = replystr[p + 6];
 //			
 //	}
@@ -919,12 +919,12 @@ int RIG_IC7851::get_PTT()
 {
 	cmd = pre_to;
 	cmd += '\x1c'; cmd += '\x00';
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x1c'; resp += '\x00';
 	cmd.append(post);
 	if (waitFOR(8, "get PTT")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			ptt_ = replystr[p + 6];
 	}
 	return ptt_;
@@ -948,15 +948,15 @@ void RIG_IC7851::set_volume_control(int val)
 int RIG_IC7851::get_volume_control()
 {
 	int val = progStatus.volume;
-	string cstr = "\x14\x01";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x01";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(9, "get vol")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			val = num100(replystr.substr(p+6));
 	}
 	return val;
@@ -969,8 +969,8 @@ void RIG_IC7851::get_vol_min_max_step(int &min, int &max, int &step)
 
 int RIG_IC7851::get_smeter()
 {
-	string cstr = "\x15\x02";
-	string resp = pre_fm;
+	std::string cstr = "\x15\x02";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
@@ -978,7 +978,7 @@ int RIG_IC7851::get_smeter()
 	int mtr= -1;
 	if (waitFOR(9, "get smeter")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			mtr = fm_bcd(replystr.substr(p+6), 3);
 			mtr = (int)ceil(mtr /2.55);
 			if (mtr > 100) mtr = 100;
@@ -1003,8 +1003,8 @@ static pwrpair pwrtbl[] = {
 
 int RIG_IC7851::get_power_out(void)
 {
-	string cstr = "\x15\x11";
-	string resp = pre_fm;
+	std::string cstr = "\x15\x11";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
@@ -1012,7 +1012,7 @@ int RIG_IC7851::get_power_out(void)
 	int mtr= 0;
 	if (waitFOR(9, "get power out")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			mtr = fm_bcd(replystr.substr(p+6), 3);
 			size_t i = 0;
 			for (i = 0; i < sizeof(pwrtbl) / sizeof(pwrpair) - 1; i++)
@@ -1031,8 +1031,8 @@ int RIG_IC7851::get_power_out(void)
 
 int RIG_IC7851::get_swr(void) 
 {
-	string cstr = "\x15\x12";
-	string resp = pre_fm;
+	std::string cstr = "\x15\x12";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
@@ -1040,7 +1040,7 @@ int RIG_IC7851::get_swr(void)
 	int mtr= -1;
 	if (waitFOR(9, "get swr")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			mtr = fm_bcd(replystr.substr(p+6), 3);
 			mtr = (int)ceil(mtr /2.55);
 			if (mtr > 100) mtr = 100;
@@ -1051,8 +1051,8 @@ int RIG_IC7851::get_swr(void)
 
 int RIG_IC7851::get_alc(void)
 {
-	string cstr = "\x15\x13";
-	string resp = pre_fm;
+	std::string cstr = "\x15\x13";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
@@ -1060,7 +1060,7 @@ int RIG_IC7851::get_alc(void)
 	int mtr= -1;
 	if (waitFOR(9, "get alc")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			mtr = fm_bcd(replystr.substr(p+6), 3);
 			mtr = (int)ceil(mtr /2.55);
 			if (mtr > 100) mtr = 100;
@@ -1098,15 +1098,15 @@ void RIG_IC7851::set_pbt_outer(int val)
 int RIG_IC7851::get_pbt_inner()
 {
 	int val = 0;
-	string cstr = "\x14\x07";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x07";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(9, "get pbt inner")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			val = num100(replystr.substr(p+6));
 			val -= 50;
 		}
@@ -1118,15 +1118,15 @@ int RIG_IC7851::get_pbt_inner()
 int RIG_IC7851::get_pbt_outer()
 {
 	int val = 0;
-	string cstr = "\x14\x08";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x08";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(9, "get pbt outer")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			val = num100(replystr.substr(p+6));
 			val -= 50;
 		}
@@ -1170,7 +1170,7 @@ void RIG_IC7851::get_band_selection(int v)
 	if (waitFOR(23, "get band stack")) {
 		set_trace(2, "get band stack", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(pre_fm);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			unsigned long int bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
 			int bandmode = replystr[p+13];
 			int bandfilter = replystr[p+14];
@@ -1276,15 +1276,15 @@ bool RIG_IC7851::get_notch(int &val)
 	bool on = false;
 	val = 1500;
 
-	string cstr = "\x16\x48";
-	string resp = pre_fm;
+	std::string cstr = "\x16\x48";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(8, "get notch")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			on = replystr[p + 6];
 		cmd = pre_to;
 		resp = pre_fm;
@@ -1294,7 +1294,7 @@ bool RIG_IC7851::get_notch(int &val)
 		cmd.append(post);
 		if (waitFOR(9, "notch val")) {
 			size_t p = replystr.rfind(resp);
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				val = (int)ceil(fm_bcd(replystr.substr(p+6),3));
 				val -= 128;
 				val *= 20;

@@ -66,7 +66,7 @@ extern void control_function_keys();
 extern void calibrate_cwio();
 extern void open_cwio_config();
 
-extern void add_cwio(string);
+extern void add_cwio(std::string);
 extern void cwio_key(bool state);
 
 #endif

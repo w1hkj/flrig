@@ -253,10 +253,10 @@ int RIG_IC7800::get_split()
 	cmd.append("\x0F");
 	cmd.append( post );
 	if (waitFOR(7, "get split")) {
-		string resp = pre_fm;
+		std::string resp = pre_fm;
 		resp.append("\x0F");
 		size_t p = replystr.find(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			read_split = replystr[p+5];
 		if (read_split != 0xFA) // fail byte
 			split = read_split;
@@ -298,7 +298,7 @@ int RIG_IC7800::get_modeA()
 	if (sendICcommand (cmd, 8 )) {
 
 		size_t p = replystr.rfind(pre_fm);
-		if (p == string::npos) return A.imode;
+		if (p == std::string::npos) return A.imode;
 
 		if (replystr[p+5] == -1) {A.imode = 0; return A.imode; }
 
@@ -354,7 +354,7 @@ int RIG_IC7800::get_modeB()
 	cmd.append(post);
 	if (sendICcommand (cmd, 8 )) {
 		size_t p = replystr.rfind(pre_fm);
-		if (p == string::npos) return A.imode;
+		if (p == std::string::npos) return A.imode;
 
 		if (replystr[p+5] == -1) {B.imode = 0; return B.imode; }
 
@@ -685,12 +685,12 @@ int RIG_IC7800::get_PTT()
 {
 	cmd = pre_to;
 	cmd += '\x1c'; cmd += '\x00';
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x1c'; resp += '\x00';
 	cmd.append(post);
 	if (waitFOR(8, "get PTT")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			ptt_ = replystr[p + 6];
 	}
 	return ptt_;
@@ -725,15 +725,15 @@ void RIG_IC7800::set_pbt_outer(int val)
 int RIG_IC7800::get_pbt_inner()
 {
 	int val = 0;
-	string cstr = "\x14\x07";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x07";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(9, "get pbt inner")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			val = num100(replystr.substr(p+6));
 			val -= 50;
 		}
@@ -745,15 +745,15 @@ int RIG_IC7800::get_pbt_inner()
 int RIG_IC7800::get_pbt_outer()
 {
 	int val = 0;
-	string cstr = "\x14\x08";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x08";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(9, "get pbt outer")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			val = num100(replystr.substr(p+6));
 			val -= 50;
 		}
@@ -828,7 +828,7 @@ void RIG_IC7800::get_band_selection(int v)
 	if (waitFOR(23, "get band stack")) {
 		set_trace(2, "get band stack", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(pre_fm);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			unsigned long int bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
 			int bandmode = replystr[p+13];
 			int bandfilter = replystr[p+14];
@@ -932,15 +932,15 @@ bool RIG_IC7800::get_notch(int &val)
 	bool on = false;
 	val = 1500;
 
-	string cstr = "\x16\x48";
-	string resp = pre_fm;
+	std::string cstr = "\x16\x48";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(8, "get notch")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			on = replystr[p + 6];
 		cmd = pre_to;
 		resp = pre_fm;
@@ -950,7 +950,7 @@ bool RIG_IC7800::get_notch(int &val)
 		cmd.append(post);
 		if (waitFOR(9, "notch val")) {
 			size_t p = replystr.rfind(resp);
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				val = (int)ceil(fm_bcd(replystr.substr(p+6),3));
 				val -= 128;
 				val *= 20;

@@ -92,7 +92,7 @@ struct timeval operator+(const struct timeval &t0, const double &t)
 {
         struct timeval r;
         r.tv_sec = t0.tv_sec + static_cast<time_t>(t);
-        r.tv_usec = t0.tv_usec + static_cast<suseconds_t>((t - static_cast<time_t>(t)) * 1e9);
+        r.tv_usec = t0.tv_usec + static_cast<long>((t - static_cast<time_t>(t)) * 1e9);
         if (r.tv_usec > 1000000) {
                 r.tv_usec -= 1000000;
                 r.tv_sec++;

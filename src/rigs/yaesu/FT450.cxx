@@ -238,7 +238,7 @@ unsigned long int RIG_FT450::get_vfoA ()
 	rig_trace(2, "get_vfoA()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return freqA;
+	if (p == std::string::npos) return freqA;
 	int f = 0;
 	for (size_t n = 2; n < 10; n++)
 		f = f*10 + replystr[p+n] - '0';
@@ -267,7 +267,7 @@ unsigned long int RIG_FT450::get_vfoB ()
 	rig_trace(2, "get_vfoB()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return freqB;
+	if (p == std::string::npos) return freqB;
 	int f = 0;
 	for (size_t n = 2; n < 10; n++)
 		f = f*10 + replystr[p+n] - '0';
@@ -306,7 +306,7 @@ int RIG_FT450::get_split()
 	wait_char(';',4, 100, "get split tx vfo", ASC);
 
 	p = replystr.rfind(rsp);
-	if (p == string::npos) return false;
+	if (p == std::string::npos) return false;
 	tx = replystr[p+2] - '0';
 
 	split = (tx == 1 ? 2 : 0);
@@ -323,7 +323,7 @@ int RIG_FT450::get_smeter()
 	rig_trace(2, "get_smeter()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	replystr[p+6] = 0;
 	int mtr = atoi(&replystr[p+3]);
 	mtr = mtr * 100.0 / 256.0;
@@ -348,7 +348,7 @@ int RIG_FT450::get_swr()
 	rig_trace(2, "get_swr()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	replystr[p+6] = 0;
 	int mtr = atoi(&replystr[p+3]);
 	return mtr / 2.55;
@@ -364,7 +364,7 @@ int RIG_FT450::get_power_out()
 	rig_trace(2, "get_power_out()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	replystr[p+6] = 0;
 	double mtr = (double)(atoi(&replystr[p+3]));
 	mtr = -6.6263535 + .11813178 * mtr + .0013607405 * mtr * mtr;
@@ -380,7 +380,7 @@ double RIG_FT450::get_power_control()
 	rig_trace(2, "get_power_control()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	replystr[p+5] = 0;
 	int mtr = atoi(&replystr[p+2]);
 	return mtr;
@@ -408,7 +408,7 @@ int RIG_FT450::get_volume_control()
 	rig_trace(2, "get_volume_control()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return progStatus.volume;
+	if (p == std::string::npos) return progStatus.volume;
 	if (p + 6 >= replystr.length()) return progStatus.volume;
 	int val = atoi(&replystr[p+3]) * 100 / 250;
 	if (val > 100) val = 100;
@@ -450,7 +450,7 @@ int RIG_FT450::get_PTT()
 	rig_trace(2, "get_PTT()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return ptt_;
+	if (p == std::string::npos) return ptt_;
 	ptt_ =  (replystr[p+2] != '0' ? 1 : 0);
 	return ptt_;
 }
@@ -483,7 +483,7 @@ int RIG_FT450::get_tune()
 	rig_trace(2, "get_tuner status()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	int val = replystr[p+4] - '0';
 	return (val > 0);
 }
@@ -505,7 +505,7 @@ int RIG_FT450::get_attenuator()
 	rig_trace(2, "get_attenuator()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	return (replystr[p+3] == '3' ? 1 : 0);
 }
 
@@ -526,7 +526,7 @@ int RIG_FT450::get_preamp()
 	rig_trace(2, "get_preamp()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	return (replystr[p+3] == '1' ? 1 : 0);
 }
 
@@ -578,7 +578,7 @@ int RIG_FT450::get_modeA()
 	rig_trace(2, "get_modeA()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return modeA;
+	if (p == std::string::npos) return modeA;
 	int md = replystr[p+3];
 	if (md <= '9') md = md - '1';
 	else md = 9 + md - 'B';
@@ -654,8 +654,8 @@ int RIG_FT450::get_bwA()
 	rig_trace(2, "get_bwA()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return bwA;
-	string bws = replystr.substr(p+3,2);
+	if (p == std::string::npos) return bwA;
+	std::string bws = replystr.substr(p+3,2);
 	if (bws == "00") bwA = 0;
 	else if (bws == "16") bwA = 1;
 	else if (bws == "31") bwA = 2;
@@ -691,7 +691,7 @@ int RIG_FT450::get_modeB()
 	rig_trace(2, "get_modeB()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return modeB;
+	if (p == std::string::npos) return modeB;
 	int md = replystr[p+3];
 	if (md <= '9') md = md - '1';
 	else md = 9 + md - 'B';
@@ -722,8 +722,8 @@ int RIG_FT450::get_bwB()
 	rig_trace(2, "get_bwB()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return bwB;
-	string bws = replystr.substr(p+3,2);
+	if (p == std::string::npos) return bwB;
+	std::string bws = replystr.substr(p+3,2);
 	if (bws == "00") bwB = 0;
 	else if (bws == "16") bwB = 1;
 	else if (bws == "31") bwB = 2;
@@ -733,7 +733,7 @@ int RIG_FT450::get_bwB()
 
 std::string RIG_FT450::get_BANDWIDTHS()
 {
-	stringstream s;
+	std::stringstream s;
 	for (int i = 0; i < NUM_MODES; i++)
 		s << mode_bwA[i] << " ";
 	for (int i = 0; i < NUM_MODES; i++)
@@ -743,7 +743,7 @@ std::string RIG_FT450::get_BANDWIDTHS()
 
 void RIG_FT450::set_BANDWIDTHS(std::string s)
 {
-	stringstream strm;
+	std::stringstream strm;
 	strm << s;
 	for (int i = 0; i < NUM_MODES; i++)
 		strm >> mode_bwA[i];
@@ -779,7 +779,7 @@ bool RIG_FT450::get_if_shift(int &val)
 
 	size_t p = replystr.rfind(rsp);
 	val = progStatus.shift_val;
-	if (p == string::npos) return progStatus.shift;
+	if (p == std::string::npos) return progStatus.shift;
 	val = atoi(&replystr[p+4]);
 	if (replystr[p+3] == '-') val = -val;
 	return (val != 0);
@@ -828,7 +828,7 @@ bool  RIG_FT450::get_notch(int &val)
 
 	size_t p = replystr.rfind(rsp);
 	val = progStatus.notch_val = 0; // disabled default slider position
-	if (p == string::npos) return ison;
+	if (p == std::string::npos) return ison;
 
 	if (replystr[p+6] == '1') { // manual notch enabled
 		ison = true;
@@ -840,7 +840,7 @@ bool  RIG_FT450::get_notch(int &val)
 		rig_trace(2, "get_notch_val()", replystr.c_str());
 
 		p = replystr.rfind(rsp);
-		if (p == string::npos) return ison;
+		if (p == std::string::npos) return ison;
 		val = atoi(&replystr[p+4]);
 		val = (val - 200) * 10;
 	}
@@ -911,7 +911,7 @@ int RIG_FT450::get_mic_gain()
 	gett("get_mic_gain");
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return mg;
+	if (p == std::string::npos) return mg;
 	replystr[p+5] = 0;
 	int val = atoi(&replystr[p+2]);
 	if (val < 86) return 1;
@@ -1030,7 +1030,7 @@ int  RIG_FT450::get_noise_reduction_val()
 	rig_trace(2, "get_noise_reduction_val()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return val;
+	if (p == std::string::npos) return val;
 	val = atoi(&replystr[p+3]);
 	return val;
 }
@@ -1050,7 +1050,7 @@ int  RIG_FT450::get_noise_reduction()
 	cmd.append(";");
 	waitN(5, 100, "GET noise reduction", ASC);
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	val = replystr[p+3] - '0';
 	return val;
 }
@@ -1087,7 +1087,7 @@ int  RIG_FT450::get_rf_gain()
 	gett("get_rf_gain");
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return progStatus.rfgain;
+	if (p == std::string::npos) return progStatus.rfgain;
 	// Parse the RF value from the position returned by rfind for the response.
 	// Valid values are 0-255.
 	int rfval =
@@ -1174,7 +1174,7 @@ void RIG_FT450::get_band_selection(int v)
 	set_trace(2, "get band", replystr.c_str());
 
 	size_t p = replystr.rfind("IF");
-	if (p == string::npos) return;
+	if (p == std::string::npos) return;
 	if (replystr[p+21] != '0') {	// vfo 60M memory mode
 		inc_60m = true;
 	}

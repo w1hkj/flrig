@@ -31,7 +31,7 @@ void gpioEXEC(std::string execstr)
 		LOG_PERROR("pipe");
 		return;
 	}
-	pid_t pid;
+	int pid;
 	switch (pid = fork()) {
 		case -1:
 			LOG_PERROR("fork");
@@ -79,7 +79,7 @@ static const char *gpio_name[] = {
 void export_gpio(int bcm)
 {
 	if (bcm < 0 || bcm > 16) return;
-	string exec_str = "gpio export ";
+	std::string exec_str = "gpio export ";
 	exec_str.append(gpio_name[bcm]).append(" out");
 	gpioEXEC(exec_str);
 	LOG_INFO("%s", exec_str.c_str());
@@ -88,7 +88,7 @@ void export_gpio(int bcm)
 void unexport_gpio(int bcm)
 {
 	if (bcm < 0 || bcm > 16) return;
-	string exec_str = "gpio unexport ";
+	std::string exec_str = "gpio unexport ";
 	exec_str.append(gpio_name[bcm]);
 	gpioEXEC(exec_str);
 	LOG_INFO("%s", exec_str.c_str());
@@ -123,8 +123,8 @@ void set_gpio(bool ptt)
 #define VALUE_MAX 30
 	static const char s_values_str[] = "01";
 
-	string portname = "/sys/class/gpio/gpio";
-	string ctrlport;
+	std::string portname = "/sys/class/gpio/gpio";
+	std::string ctrlport;
 	enabled = false;
 	int val = 0;
 	int fd;

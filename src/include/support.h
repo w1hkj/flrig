@@ -345,8 +345,8 @@ extern void set_power_controlImage(double);
 
 extern void update_UI_PTT(void *d = 0);
 
-extern void cb_send_command(string cmd, Fl_Output *resp = 0);
-extern const string lt_trim(const string& pString, const string& pWhitespace = " \"\t");
+extern void cb_send_command(std::string cmd, Fl_Output *resp = 0);
+extern const std::string lt_trim(const std::string& pString, const std::string& pWhitespace = " \"\t");
 extern void editAlphaTag();
 
 extern void adjust_control_positions();
@@ -360,12 +360,12 @@ extern double pwrval;
 extern double swrval;
 extern double alcval;
 
-extern queue<VFOQUEUE> srvc_reqs;
+extern std::queue<VFOQUEUE> srvc_reqs;
 
 extern void trace(int n, ...); // all args of type const char *
 extern void trace1(int n, ...); // all args of type const char *
 
-extern string printXCVR_STATE(XCVR_STATE &data);
+extern std::string printXCVR_STATE(XCVR_STATE &data);
 
 extern Fl_Group *tabXCVR;
 extern Fl_Group *tabTRACE;

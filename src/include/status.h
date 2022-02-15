@@ -27,8 +27,6 @@
 
 #include "rig.h"
 
-using namespace std;
-
 #define FPLEN 20 // used in tt550 power sample
 
 struct status {
@@ -47,7 +45,7 @@ struct status {
 	int		ddX;
 	int		ddY;
 
-	string	xcvr_serial_port;
+	std::string	xcvr_serial_port;
 	int		comm_baudrate;
 	int		stopbits;
 	int		comm_retries;
@@ -63,26 +61,26 @@ struct status {
 	int		serloop_timing;
 	int		byte_interval;
 
-	string	aux_serial_port;
+	std::string	aux_serial_port;
 	bool	aux_SCU_17;
 	bool	aux_rts;
 	bool	aux_dtr;
 
-	string	xmlport;
+	std::string	xmlport;
 
-	string	sep_serial_port;
+	std::string	sep_serial_port;
 	bool	sep_rtsptt;
 	bool	sep_dtrptt;
 	bool	sep_rtsplus;
 	bool	sep_dtrplus;
 	bool	sep_SCU_17;
 
-	string	cmedia_device;
-	string	cmedia_gpio_line;
+	std::string	cmedia_device;
+	std::string	cmedia_gpio_line;
 	bool	cmedia_ptt;
 
-	string	tmate2_device;
-	string	tmate2_freq_step;
+	std::string	tmate2_device;
+	std::string	tmate2_freq_step;
 	bool	tmate2_connected;
 
 	bool	disable_CW_ptt;
@@ -280,110 +278,110 @@ struct status {
 
 // IC706MKIIG filters
 	bool	use706filters;
-	string	ssb_cw_wide;		//FL-103
-	string	ssb_cw_normal;		//FL-272
-	string	ssb_cw_narrow;		//FL-232
+	std::string	ssb_cw_wide;		//FL-103
+	std::string	ssb_cw_normal;		//FL-272
+	std::string	ssb_cw_narrow;		//FL-232
 
 // =========================
 // User command buttons
-   string	label1;
-   string	command1;
-   string	shftcmd1;
-   string	label2;
-   string	command2;
-   string	shftcmd2;
-   string	label3;
-   string	command3;
-   string	shftcmd3;
-   string	label4;
-   string	command4;
-   string	shftcmd4;
-   string	label5;
-   string	command5;
-   string	shftcmd5;
-   string	label6;
-   string	command6;
-   string	shftcmd6;
-   string	label7;
-   string	command7;
-   string	shftcmd7;
-   string	label8;
-   string	command8;
-   string	shftcmd8;
+   std::string	label1;
+   std::string	command1;
+   std::string	shftcmd1;
+   std::string	label2;
+   std::string	command2;
+   std::string	shftcmd2;
+   std::string	label3;
+   std::string	command3;
+   std::string	shftcmd3;
+   std::string	label4;
+   std::string	command4;
+   std::string	shftcmd4;
+   std::string	label5;
+   std::string	command5;
+   std::string	shftcmd5;
+   std::string	label6;
+   std::string	command6;
+   std::string	shftcmd6;
+   std::string	label7;
+   std::string	command7;
+   std::string	shftcmd7;
+   std::string	label8;
+   std::string	command8;
+   std::string	shftcmd8;
 
-   string	label9;
-   string	command9;
-   string	shftcmd9;
-   string	label10;
-   string	command10;
-   string	shftcmd10;
-   string	label11;
-   string	command11;
-   string	shftcmd11;
-   string	label12;
-   string	command12;
-   string	shftcmd12;
-   string	label13;
-   string	command13;
-   string	shftcmd13;
-   string	label14;
-   string	command14;
-   string	shftcmd14;
-   string	label15;
-   string	command15;
-   string	shftcmd15;
-   string	label16;
-   string	command16;
-   string	shftcmd16;
+   std::string	label9;
+   std::string	command9;
+   std::string	shftcmd9;
+   std::string	label10;
+   std::string	command10;
+   std::string	shftcmd10;
+   std::string	label11;
+   std::string	command11;
+   std::string	shftcmd11;
+   std::string	label12;
+   std::string	command12;
+   std::string	shftcmd12;
+   std::string	label13;
+   std::string	command13;
+   std::string	shftcmd13;
+   std::string	label14;
+   std::string	command14;
+   std::string	shftcmd14;
+   std::string	label15;
+   std::string	command15;
+   std::string	shftcmd15;
+   std::string	label16;
+   std::string	command16;
+   std::string	shftcmd16;
 
-   string	label17;
-   string	command17;
-   string	shftcmd17;
-   string	label18;
-   string	command18;
-   string	shftcmd18;
-   string	label19;
-   string	command19;
-   string	shftcmd19;
-   string	label20;
-   string	command20;
-   string	shftcmd20;
-   string	label21;
-   string	command21;
-   string	shftcmd21;
-   string	label22;
-   string	command22;
-   string	shftcmd22;
-   string	label23;
-   string	command23;
-   string	shftcmd23;
-   string	label24;
-   string	command24;
-   string	shftcmd24;
+   std::string	label17;
+   std::string	command17;
+   std::string	shftcmd17;
+   std::string	label18;
+   std::string	command18;
+   std::string	shftcmd18;
+   std::string	label19;
+   std::string	command19;
+   std::string	shftcmd19;
+   std::string	label20;
+   std::string	command20;
+   std::string	shftcmd20;
+   std::string	label21;
+   std::string	command21;
+   std::string	shftcmd21;
+   std::string	label22;
+   std::string	command22;
+   std::string	shftcmd22;
+   std::string	label23;
+   std::string	command23;
+   std::string	shftcmd23;
+   std::string	label24;
+   std::string	command24;
+   std::string	shftcmd24;
 
-   string	label_on_start1;
-   string	cmd_on_start1;
+   std::string	label_on_start1;
+   std::string	cmd_on_start1;
 
-   string	label_on_start2;
-   string	cmd_on_start2;
+   std::string	label_on_start2;
+   std::string	cmd_on_start2;
 
-   string	label_on_start3;
-   string	cmd_on_start3;
+   std::string	label_on_start3;
+   std::string	cmd_on_start3;
 
-   string	label_on_start4;
-   string	cmd_on_start4;
+   std::string	label_on_start4;
+   std::string	cmd_on_start4;
 
-   string	label_on_exit1;
-   string	cmd_on_exit1;
+   std::string	label_on_exit1;
+   std::string	cmd_on_exit1;
 
-   string	label_on_exit2;
-   string	cmd_on_exit2;
+   std::string	label_on_exit2;
+   std::string	cmd_on_exit2;
 
-   string	label_on_exit3;
-   string	cmd_on_exit3;
+   std::string	label_on_exit3;
+   std::string	cmd_on_exit3;
 
-   string	label_on_exit4;
-   string	cmd_on_exit4;
+   std::string	label_on_exit4;
+   std::string	cmd_on_exit4;
 
 // =========================
 	int		bg_red;
@@ -447,13 +445,13 @@ struct status {
 
 	bool	tooltips;
 
-	string	ui_scheme;
+	std::string	ui_scheme;
 
-//	string	server_port;
-//	string	server_addr;
+//	std::string	server_port;
+//	std::string	server_addr;
 
-	string	tcpip_port;
-	string	tcpip_addr;
+	std::string	tcpip_port;
+	std::string	tcpip_addr;
 	int		tcpip_ping_delay;
 	int		tcpip_reconnect_after;
 	int		tcpip_drops_allowed;
@@ -513,19 +511,19 @@ struct status {
 	int		cwioCONNECTED;
 	int		cwioINVERTED;
 	double	cwio_comp;
-	string	cwioPORT;
-	string	cwio_msgs[12];
-	string	cwio_labels[12];
+	std::string	cwioPORT;
+	std::string	cwio_msgs[12];
+	std::string	cwio_labels[12];
 
-	string	BT;
-	string	AA;
-	string	AS;
-	string	AR;
-	string	KN;
-	string	SK;
-	string	INT;
-	string	HM;
-	string	VE;
+	std::string	BT;
+	std::string	AA;
+	std::string	AS;
+	std::string	AR;
+	std::string	KN;
+	std::string	SK;
+	std::string	INT;
+	std::string	HM;
+	std::string	VE;
 
 // FSK_ parameters
 	int		FSK_KEYLINE;
@@ -534,20 +532,20 @@ struct status {
 	int		FSK_CONNECTED;
 	int		FSK_INVERTED;
 	int		FSK_STOPBITS;
-	string	FSK_PORT;
-	string	FSK_msgs[12];
-	string	FSK_labels[12];
+	std::string	FSK_PORT;
+	std::string	FSK_msgs[12];
+	std::string	FSK_labels[12];
 
 	void saveLastState();
 	void loadLastState();
-	bool loadXcvrState(string);
+	bool loadXcvrState(std::string);
 	void UI_laststate();
 
 	std::string info();
 };
 
 extern status progStatus;
-extern string xcvr_name;
+extern std::string xcvr_name;
 
 extern void ss_trace(bool on);
 

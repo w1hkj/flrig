@@ -52,12 +52,12 @@
 #include "support.h"
 
 //----------------------------------------------------------------------
-inline string str(string s) 
+inline std::string str(std::string s) 
 {
 	size_t p;
-	while((p = s.find('\r')) != string::npos)
+	while((p = s.find('\r')) != std::string::npos)
 		s.replace(p, 1, "<cr>");
-	while((p = s.find('\n')) != string::npos)
+	while((p = s.find('\n')) != std::string::npos)
 		s.replace(p, 1, "<lf>");
 	return s;
 }
@@ -80,7 +80,7 @@ static int PCR1000_bw_vals[] = {1,2,3,4,5,WVALS_LIMIT};
 
 //----------------------------------------------------------------------
 
-// Array used for the conversion of hex values to a character string
+// Array used for the conversion of hex values to a character std::string
 const char RIG_PCR1000::hex_chars[] = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F' } ;
 
 //----------------------------------------------------------------------
@@ -568,8 +568,8 @@ IS REQUIRED after the Command
 Note that no G0XX is returned in autoupdate mode
  
 Some responses from the PCR1000 have an added character at the end
-of the response string. It is usually a duplicate of the last
-character of the string and can be discarded. (A bug, I suppose)
+of the response std::string. It is usually a duplicate of the last
+character of the std::string and can be discarded. (A bug, I suppose)
  
 DTR and RTS set high by software.
  
@@ -904,7 +904,7 @@ A rough indication of the number of packets needed for a given sample
 size is (Number of samples)/16 plus 1. If the number is ODD then add
 1 more packet.
  
-Sample in order sent (This is a continous string):
+Sample in order sent (This is a continous std::string):
 NE1600000000000000000000030180FA61F14
 NE1701F2B0C0F7E030C2B85088E080F2B4314
 NE1801B8E181830085FEC6603083001143003

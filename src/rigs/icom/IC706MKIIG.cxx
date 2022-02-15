@@ -24,7 +24,7 @@
 // IC-706MKIIG
 //
 
-// optional filter strings
+// optional filter std::strings
 // "EMPTY", "NARR", "NORM", "WIDE", "MED",
 // "FL-101", "FL-232", "FL-100", "FL-223", "FL-272", "FL-103", "FL-94"
 
@@ -120,7 +120,7 @@ void RIG_IC706MKIIG::selectB()
 
 bool RIG_IC706MKIIG::check ()
 {
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
 	cmd += '\x03';
@@ -136,11 +136,11 @@ unsigned long int RIG_IC706MKIIG::get_vfoA ()
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x03';
 	if (waitFOR(11, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			if (replystr[p+5] == -1)
 				A.freq = 0;
 			else
@@ -166,11 +166,11 @@ unsigned long int RIG_IC706MKIIG::get_vfoB ()
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x03';
 	if (waitFOR(11, "get vfo B")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			if (replystr[p+5] == -1)
 				A.freq = 0;
 			else
@@ -240,11 +240,11 @@ int RIG_IC706MKIIG::get_modeA()
 	cmd = pre_to;
 	cmd += 0x04;
 	cmd.append(post);
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += 0x04;
 	if (waitFOR(8, "get mode A")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			modeA = replystr[p+5];
 			filter_nbr = replystr[p+6] - 1;
 		}
@@ -344,11 +344,11 @@ int RIG_IC706MKIIG::get_smeter()
 	cmd = pre_to;
 	cmd.append("\x15\x02");
 	cmd.append( post );
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp.append("\x15\x02");
 	if (waitFOR(9, "get smeter")) { // SHOULD BE 10 bytes
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p+6), 3) / 2.55);
 	}
 	return -1;

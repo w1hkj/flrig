@@ -172,7 +172,7 @@ public:
 	std::string hid_get_product_string();
 	std::string hid_get_serial_number_string();
 
-	int  hid_get_indexed_string(int string_index, std::string string, size_t maxlen);
+	int  hid_get_indexed_string(int string_index, std::string str, size_t maxlen);
 
 	const char * hid_error();
 

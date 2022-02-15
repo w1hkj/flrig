@@ -388,7 +388,7 @@ bool RIG_FT1000MP::get_info(void)
 	if (ret >= 32) {
 		size_t p = replystr.length() - 32;
 
-		// vfo A data string
+		// vfo A data std::string
 		A.freq = hex2freq(replystr.substr(p + 1, 4));
 
 		for (md = 0; md < 14; md++) {

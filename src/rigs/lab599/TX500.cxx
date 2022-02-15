@@ -35,7 +35,7 @@ Factory response to request for list of supported CAT commands:
 ID;		identifier, response 019;
 AI;		auto information; default OFF
 RX;		receiver function status; NO RESPONSE
-IF;		information string; type response:
+IF;		information std::string; type response:
 		IF0000703437000000+000000000020000000;
 FA;		get/set frequency vfo A; FA00007034370;
 FB;		get/set frequency vfo B; FB00014070000;
@@ -186,7 +186,7 @@ int RIG_TX500::get_attenuator()
 	gett("get_attenuator");
 	if (ret >= 7) {
 		size_t p = replystr.rfind("RA");
-		if (p != string::npos && (p+3 < replystr.length())) {
+		if (p != std::string::npos && (p+3 < replystr.length())) {
 			if (replystr[p+2] == '0' && replystr[p+3] == '0')
 				atten_level = 0;
 			else
@@ -213,7 +213,7 @@ int RIG_TX500::get_preamp()
 	gett("get_preamp");
 	if (ret >= 5) {
 		size_t p = replystr.rfind("PA");
-		if (p != string::npos && (p+2 < replystr.length())) {
+		if (p != std::string::npos && (p+2 < replystr.length())) {
 			if (replystr[p+2] == '1')
 				preamp_level = 1;
 			else
@@ -242,7 +242,7 @@ int RIG_TX500::get_modeA()
 	gett("get_modeA");
 	if (ret == 4) {
 		size_t p = replystr.rfind("MD");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			int md = replystr[p+2];
 			md = md - '1';
 			if (md == 8) md = 7;
@@ -272,7 +272,7 @@ int RIG_TX500::get_modeB()
 	gett("get_modeB");
 	if (ret == 4) {
 		size_t p = replystr.rfind("MD");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			int md = replystr[p+2];
 			md = md - '1';
 			if (md == 8) md = 7;
@@ -326,7 +326,7 @@ unsigned long int RIG_TX500::get_vfoA ()
 	gett("get_vfoA");
 
 	size_t p = replystr.rfind("FA");
-	if (p != string::npos && (p + 12 < replystr.length())) {
+	if (p != std::string::npos && (p + 12 < replystr.length())) {
 		A.freq = atol(&replystr[ p + 2]);
 	}
 	return A.freq;
@@ -353,7 +353,7 @@ unsigned long int RIG_TX500::get_vfoB ()
 	gett("get_vfoB");
 
 	size_t p = replystr.rfind("FB");
-	if (p != string::npos && (p + 12 < replystr.length())) {
+	if (p != std::string::npos && (p + 12 < replystr.length())) {
 		B.freq = atol(&replystr[ p + 2 ]);
 	}
 	return B.freq;
@@ -426,7 +426,7 @@ int RIG_TX500::get_smeter()
 	gett("get_smeter");
 	if (ret == 8) {
 		size_t p = replystr.rfind("SM");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			smtr = atol(&replystr[p + 4]);
 			smtr = (smtr * 100) / 30;
 		}
@@ -683,7 +683,7 @@ int RIG_TX500::get_bwA()
 		gett("");
 		if (ret == 5) {
 			p = replystr.rfind("SL");
-			if (p != string::npos)
+			if (p != std::string::npos)
 				lo = fm_decimal(replystr.substr(2), 2);
 		}
 		cmd = "SH;";
@@ -692,7 +692,7 @@ int RIG_TX500::get_bwA()
 		gett("");
 		if (ret == 5) {
 			p = replystr.rfind("SH");
-			if (p != string::npos)
+			if (p != std::string::npos)
 				hi = fm_decimal(replystr.substr(2), 2);
 			A.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
 		}
@@ -703,7 +703,7 @@ int RIG_TX500::get_bwA()
 		gett("");
 		if (ret == 7) {
 			p = replystr.rfind("FW");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; i < sizeof(TX500_CWbw)/sizeof(*TX500_CWbw); i++)
 					if (replystr.find(TX500_CWbw[i]) == p)
 						break;
@@ -717,7 +717,7 @@ int RIG_TX500::get_bwA()
 		gett("");
 		if (ret == 7) {
 			p = replystr.rfind("FW");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; i < sizeof(TX500_FSKbw)/sizeof(*TX500_FSKbw); i++)
 					if (replystr.find(TX500_FSKbw[i]) == p)
 						break;
@@ -782,7 +782,7 @@ int RIG_TX500::get_bwB()
 		gett("");
 		if (ret == 5) {
 			p = replystr.rfind("SL");
-			if (p != string::npos)
+			if (p != std::string::npos)
 				lo = fm_decimal(replystr.substr(2), 2);
 		}
 		cmd = "SH;";
@@ -791,7 +791,7 @@ int RIG_TX500::get_bwB()
 		gett("");
 		if (ret == 5) {
 			p = replystr.rfind("SH");
-			if (p != string::npos)
+			if (p != std::string::npos)
 				hi = fm_decimal(replystr.substr(2), 2);
 			B.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
 		}
@@ -802,7 +802,7 @@ int RIG_TX500::get_bwB()
 		gett("");
 		if (ret == 7) {
 			p = replystr.rfind("FW");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; i < sizeof(TX500_CWbw)/sizeof(*TX500_CWbw); i++)
 					if (replystr.find(TX500_CWbw[i]) == p)
 						break;
@@ -816,7 +816,7 @@ int RIG_TX500::get_bwB()
 		gett("");
 		if (ret == 7) {
 			p = replystr.rfind("FW");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; i < sizeof(TX500_FSKbw)/sizeof(*TX500_FSKbw); i++)
 					if (replystr.find(TX500_FSKbw[i]) == p)
 						break;
@@ -868,7 +868,7 @@ bool  RIG_TX500::get_notch(int &val)
 
 	if (ret == 4) {
 		size_t p = replystr.rfind("BC");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			if (replystr[p+2] == '2') {
 				ison = true;
 				cmd = "BP;";
@@ -880,7 +880,7 @@ bool  RIG_TX500::get_notch(int &val)
 				if (ret == 6) {
 					gett("notch val");
 					p = replystr.rfind("BP");
-					if (p != string::npos)
+					if (p != std::string::npos)
 						val = 200 + 50 * fm_decimal(replystr.substr(p+2),3);
 				}
 			}
@@ -915,7 +915,7 @@ int  RIG_TX500::get_auto_notch()
 
 	if (ret == 4) {
 		size_t p = replystr.rfind("NT");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			anotch = (replystr[p+2] == '1');
 		}
 	}
@@ -954,7 +954,7 @@ int  RIG_TX500::get_noise_reduction()
 
 	if (ret == 4) {
 		size_t p = replystr.rfind(rsp);
-		if (p == string::npos) return _noise_reduction_level;
+		if (p == std::string::npos) return _noise_reduction_level;
 		_noise_reduction_level = replystr[p+2] - '0';
 	}
 	if (replystr == "?;") {
@@ -998,7 +998,7 @@ int  RIG_TX500::get_noise_reduction_val()
 
 	if (ret == 5) {
 		size_t p = replystr.rfind(rsp);
-		if (p == string::npos) {
+		if (p == std::string::npos) {
 			nrval = (_noise_reduction_level == 1 ? _nrval1 : _nrval2);
 			return nrval;
 		}
@@ -1020,7 +1020,7 @@ int RIG_TX500::get_power_out()
 	gett("");
 	if (ret == 8) {
 		size_t p = replystr.rfind("SM0");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			poutmtr = fm_decimal(replystr.substr(p+3),4);
 			if (poutmtr <= 6) poutmtr = poutmtr * 2;
 			else if (poutmtr <= 11) poutmtr = 11 + (poutmtr - 6)*(26 - 11)/(11 - 6);
@@ -1052,7 +1052,7 @@ double RIG_TX500::get_power_control()
 	gett("");
 	if (ret >= 6) {
 		size_t p = replystr.rfind("PC");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			pctrl = fm_decimal(replystr.substr(p+2), 3);
 		}
 	}

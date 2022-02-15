@@ -419,7 +419,7 @@ int  FSK_start_thread() {
 	try {
 		fsk_instance = new FSK;
 	} catch (const char *error) {
-		cerr << error << '\n';
+		std::cerr << error << '\n';
 		debug::stop();
 		return 1;
 	}
@@ -429,9 +429,9 @@ int  FSK_start_thread() {
 void FSK_stop_thread() {
 }
 
-static string FSK_new_text;
+static std::string FSK_new_text;
 
-void FSK_add(string txt)
+void FSK_add(std::string txt)
 {
 	guard_lock lck(&fskio_text_mutex);
 	FSK_new_text = FSK_txt_to_send->value();

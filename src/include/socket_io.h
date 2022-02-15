@@ -33,14 +33,12 @@
 #  include <arpa/inet.h>
 #endif
 
-using namespace std;
-
 extern Socket *tcpip;
 extern Address *remote_addr;
 
 void connect_to_remote();
 void disconnect_from_remote();
-void send_to_remote(string cmd_string, int pace = 0);
-int  read_from_remote(string &str);
+void send_to_remote(std::string cmd_string, int pace = 0);
+int  read_from_remote(std::string &str);
 
 #endif

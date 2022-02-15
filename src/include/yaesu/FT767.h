@@ -34,7 +34,7 @@ public:
 	void set_vfoA(unsigned long int);
 	void set_modeA(int val);
 	int  get_modeA();
-	bool snd_cmd(string cmd, size_t n);
+	bool snd_cmd(std::string cmd, size_t n);
 
 private:
 	void init_cmd();

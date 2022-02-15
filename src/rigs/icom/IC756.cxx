@@ -171,15 +171,15 @@ void RIG_IC756::set_pbt_outer(int val)
 int RIG_IC756::get_pbt_inner()
 {
 	int val = 0;
-	string cstr = "\x14\x07";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x07";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(9, "get pbt inner")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			val = num100(replystr.substr(p+6));
 			val -= 50;
 		}
@@ -191,15 +191,15 @@ int RIG_IC756::get_pbt_inner()
 int RIG_IC756::get_pbt_outer()
 {
 	int val = 0;
-	string cstr = "\x14\x08";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x08";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(9, "get pbt outer")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			val = num100(replystr.substr(p+6));
 			val -= 50;
 		}
@@ -400,7 +400,7 @@ void RIG_IC756PRO::selectB()
 
 bool RIG_IC756PRO::check ()
 {
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
 	cmd += '\x03';
@@ -413,15 +413,15 @@ bool RIG_IC756PRO::check ()
 unsigned long int RIG_IC756PRO::get_vfoA ()
 {
 	if (inuse == onB) return A.freq;
-	string cstr = "\x03";
-	string resp = pre_fm;
+	std::string cstr = "\x03";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(11, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			if (replystr[p+5] == -1)
 				A.freq = 0;
 			else
@@ -444,15 +444,15 @@ void RIG_IC756PRO::set_vfoA (unsigned long int freq)
 unsigned long int RIG_IC756PRO::get_vfoB ()
 {
 	if (inuse == onA) return B.freq;
-	string cstr = "\x03";
-	string resp = pre_fm;
+	std::string cstr = "\x03";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(11, "get vfo B")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			if (replystr[p+5] == -1)
 				A.freq = 0;
 			else
@@ -474,15 +474,15 @@ void RIG_IC756PRO::set_vfoB (unsigned long int freq)
 
 int RIG_IC756PRO::get_smeter()
 {
-	string cstr = "\x15\x02";
-	string resp = pre_fm;
+	std::string cstr = "\x15\x02";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(9, "get smeter")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p+6), 3) / 2.55);
 	}
 	return 0;
@@ -502,15 +502,15 @@ void RIG_IC756PRO::set_volume_control(int val)
 
 int RIG_IC756PRO::get_volume_control()
 {
-	string cstr = "\x14\x01";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x01";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(9, "get vol")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			return ((int)ceil(fm_bcd(replystr.substr(p+6),3) * 100 / 255));
 	}
 	return progStatus.volume;
@@ -539,12 +539,12 @@ int RIG_IC756PRO::get_PTT()
 {
 	cmd = pre_to;
 	cmd += '\x1c'; cmd += '\x00';
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x1c'; resp += '\x00';
 	cmd.append(post);
 	if (waitFOR(8, "get PTT")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			ptt_ = replystr[p + 6];
 	}
 	return ptt_;
@@ -562,15 +562,15 @@ void RIG_IC756PRO::set_noise(bool val)
 
 int RIG_IC756PRO::get_noise()
 {
-	string cstr = "\x16\x22";
-	string resp = pre_fm;
+	std::string cstr = "\x16\x22";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(8, "get noise")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			return (replystr[p+6] ? 1 : 0);
 	}
 	return 0;
@@ -587,15 +587,15 @@ void RIG_IC756PRO::set_noise_reduction(int val)
 
 int RIG_IC756PRO::get_noise_reduction()
 {
-	string cstr = "\x16\x40";
-	string resp = pre_fm;
+	std::string cstr = "\x16\x40";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(8, "get NR")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			return (replystr[p+6] ? 1 : 0);
 	}
 	return progStatus.noise_reduction;
@@ -616,15 +616,15 @@ void RIG_IC756PRO::set_noise_reduction_val(int val)
 int RIG_IC756PRO::get_noise_reduction_val()
 {
 	int val = progStatus.noise_reduction_val;
-	string cstr = "\x14\x06";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x06";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(9, "get NRval")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			val = fm_bcd(replystr.substr(p+6), 3);
 			if (val == 255) val = 16;
 			else val = val/ 16;
@@ -715,15 +715,15 @@ void RIG_IC756PRO::set_pbt_outer(int val)
 int RIG_IC756PRO::get_pbt_inner()
 {
 	int val = 0;
-	string cstr = "\x14\x07";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x07";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(9, "get pbt inner")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			val = num100(replystr.substr(p+6));
 			val -= 50;
 		}
@@ -735,15 +735,15 @@ int RIG_IC756PRO::get_pbt_inner()
 int RIG_IC756PRO::get_pbt_outer()
 {
 	int val = 0;
-	string cstr = "\x14\x08";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x08";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(9, "get pbt outer")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			val = num100(replystr.substr(p+6));
 			val -= 50;
 		}
@@ -774,16 +774,16 @@ void RIG_IC756PRO::set_power_control(double val)
 
 double RIG_IC756PRO::get_power_control()
 {
-	string cstr = "\x14\x0A";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x0A";
+	std::string resp = pre_fm;
 	cmd = pre_to;
 	cmd.append(cstr).append(post);
 	resp.append(cstr);
 	int val = progStatus.power_level;
-	string retstr = "ret str";
+	std::string retstr = "ret str";
 	if (waitFOR(9, "get power")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			val = num100(replystr.substr(p+6));
 			retstr = str2hex(replystr.substr(p).c_str(), 9);
 		}
@@ -803,14 +803,14 @@ void RIG_IC756PRO::set_rf_gain(int val)
 int RIG_IC756PRO::get_rf_gain()
 {
 	int val = progStatus.rfgain;
-	string cstr = "\x14\x02";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x02";
+	std::string resp = pre_fm;
 	cmd = pre_to;
 	cmd.append(cstr).append(post);
 	resp.append(cstr);
 	if (waitFOR(9, "get RF")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			val = num100(replystr.substr(p + 6));
 	}
 	return val;
@@ -852,15 +852,15 @@ int RIG_IC756PRO::get_modeA()
 	int md = A.imode;
 	int mf = mode_filterA[A.imode];
 
-	string cstr = "\x04";
-	string resp = pre_fm;
+	std::string cstr = "\x04";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(8, "get mode A")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			if (replystr[p+5] == -1) { A.imode = mf = 0; }
 			else {
 				md = replystr[p+5];
@@ -896,15 +896,15 @@ int RIG_IC756PRO::get_modeB()
 	int md = B.imode;
 	int mf = mode_filterB[B.imode];
 
-	string cstr = "\x04";
-	string resp = pre_fm;
+	std::string cstr = "\x04";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(8, "get mode B")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			if (replystr[p+5] == -1) { B.imode = mf = 0; }
 			else {
 				md = replystr[p+5];
@@ -1010,15 +1010,15 @@ bool RIG_IC756PRO::get_notch(int &val)
 	bool on = false;
 	val = 0;
 
-	string cstr = "\x16\x48";
-	string resp = pre_fm;
+	std::string cstr = "\x16\x48";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(8, "get notch")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			on = replystr[p + 6] ? 1 : 0;
 		cmd = pre_to;
 		resp = pre_fm;
@@ -1028,7 +1028,7 @@ bool RIG_IC756PRO::get_notch(int &val)
 		cmd.append(post);
 		if (waitFOR(9, "get notch val")) {
 			size_t p = replystr.rfind(resp);
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				val = fm_bcd(replystr.substr(p+6),3);
 				val = (val - 53) * 20;
 				if (val < 0) val = 0;
@@ -1098,15 +1098,15 @@ void RIG_IC756PRO::set_attenuator(int val)
 
 int RIG_IC756PRO::get_attenuator()
 {
-	string cstr = "\x11";
-	string resp = pre_fm;
+	std::string cstr = "\x11";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(7, "get att")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			if (replystr[p+5] == 0x06) {
 				atten_level = 1;
 				atten_label("6 dB", true);
@@ -1155,15 +1155,15 @@ void RIG_IC756PRO::set_preamp(int val)
 
 int RIG_IC756PRO::get_preamp()
 {
-	string cstr = "\x16\x02";
-	string resp = pre_fm;
+	std::string cstr = "\x16\x02";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(8, "get preamp")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			if (replystr[p+6] == 0x01) {
 				preamp_label("Pre 1", true);
 				preamp_level = 1;
@@ -1252,7 +1252,7 @@ const char *RIG_IC756PRO::nextFILT()
 
 void RIG_IC756PRO::set_FILTERS(std::string s)
 {
-	stringstream strm;
+	std::stringstream strm;
 	strm << s;
 	for (int i = 0; i < NUM_MODES; i++)
 		strm >> mode_filterA[i];
@@ -1274,7 +1274,7 @@ std::string RIG_IC756PRO::get_FILTERS()
 		if (mode_filterB[i] < 1) mode_filterB[i] = 1;
 		if (mode_filterB[i] > 3) mode_filterB[i] = 3;
 	}
-	stringstream s;
+	std::stringstream s;
 	for (int i = 0; i < NUM_MODES; i++)
 		s << mode_filterA[i] << " ";
 	for (int i = 0; i < NUM_MODES; i++)
@@ -1320,7 +1320,7 @@ int RIG_IC756PRO::get_break_in()
 	resp.assign(pre_fm);
 	if (waitFOR(8, "get break in")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			progStatus.break_in = replystr[p+6];
 			if (progStatus.break_in == 0) break_in_label("qsk");
 			else  break_in_label("QSK ON");
@@ -1391,7 +1391,7 @@ void RIG_IC756PRO::get_compression(int &on, int &val)
 
 	if (waitFOR(8, "get comp on/off")) {
 		size_t p = replystr.find(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			on = (replystr[p+6] == 0x01);
 	}
 
@@ -1401,7 +1401,7 @@ void RIG_IC756PRO::get_compression(int &on, int &val)
 	if (waitFOR(9, "get comp level")) {
 		size_t p = replystr.find(resp);
 		int level = 0;
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			level = fm_bcd(replystr.substr(p+6), 3);
 			for (val = 0; val < 11; val++)
 				if (level <= comp_level[val]) break;
@@ -1461,7 +1461,7 @@ void RIG_IC756PRO::get_band_selection(int v)
 	if (waitFOR(23, "get band stack")) {
 		set_trace(2, "get band stack", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(pre_fm);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			unsigned long int bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
 			int bandmode = replystr[p+13];
 			int bandfilter = replystr[p+14];

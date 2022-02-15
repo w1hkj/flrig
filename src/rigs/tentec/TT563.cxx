@@ -143,7 +143,7 @@ int RIG_TT563::get_split()
 
 bool RIG_TT563::check ()
 {
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
 	cmd += '\x03';
@@ -156,14 +156,14 @@ bool RIG_TT563::check ()
 unsigned long int RIG_TT563::get_vfoA ()
 {
 	if (inuse == onB) return A.freq;
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
 	if (waitFOR(11, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
 	get_trace(2, "get_vfoA()", str2hex(replystr.c_str(), replystr.length()));
@@ -184,14 +184,14 @@ void RIG_TT563::set_vfoA (unsigned long int freq)
 unsigned long int RIG_TT563::get_vfoB ()
 {
 	if (inuse == onA) return B.freq;
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
 	if (waitFOR(11, "get vfo B")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
 	get_trace(2, "get_vfoB()", str2hex(replystr.c_str(), replystr.length()));
@@ -216,12 +216,12 @@ int  RIG_TT563::get_vfoAorB()
 	cmd += '\x17';
 	cmd.append(post);
 
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x17';
 
 	if (waitFOR(6, "get_PTT()")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			ret = ((replystr[p+4] & 0x02) == 0x02);
 		}
 	}
@@ -249,12 +249,12 @@ int RIG_TT563::get_PTT()
 	cmd += '\x17';
 	cmd.append(post);
 
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x17';
 
 	if (waitFOR(6, "get_PTT()")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			ret = ((replystr[p+4] & 0x04) == 0x04);
 		}
 	}
@@ -281,12 +281,12 @@ int RIG_TT563::get_modeA()
 	cmd += '\x04';
 	cmd.append(post);
 
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x04';
 
 	if (waitFOR(7, "get modeA")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			A.imode = replystr[p+5];
 		}
 	}
@@ -312,12 +312,12 @@ int RIG_TT563::get_modeB()
 	cmd += '\x04';
 	cmd.append(post);
 
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x04';
 
 	if (waitFOR(7, "get mode")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			B.imode = replystr[p+5];
 		}
 	}

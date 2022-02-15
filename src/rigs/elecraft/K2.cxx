@@ -270,7 +270,7 @@ unsigned long int RIG_K2::get_vfoA ()
 
 	if (ret < 14) return freqA;
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return freqA;
+	if (p == std::string::npos) return freqA;
 	unsigned long int f = 0;
 	for (size_t n = 2; n < 13; n++)
 		f = f*10 + replystr[p + n] - '0';
@@ -302,7 +302,7 @@ unsigned long int RIG_K2::get_vfoB()
 
 	if (ret < 14) return freqB;
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return freqB;
+	if (p == std::string::npos) return freqB;
 	unsigned long int f = 0;
 	for (size_t n = 2; n < 13; n++)
 		f = f*10 + replystr[p + n] - '0';
@@ -353,7 +353,7 @@ int RIG_K2::get_modeA()
 
 	if (ret < 4) return 0;
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	for (int i = 0; i < K2_num_modes; i++) {
 		if (replystr.substr(p) == K2_mode_str[i]) {
 			modeA = i;
@@ -383,7 +383,7 @@ int  RIG_K2::get_modeB()
 
 	if (ret < 4) return 0;
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	for (int i = 0; i < K2_num_modes; i++) {
 		if (replystr.substr(p) == K2_mode_str[i]) {
 			modeB = i;
@@ -424,7 +424,7 @@ int RIG_K2::get_bwA()
 
 	if (ret < 9) return 0;
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	bwA = replystr[p + 6] - '1';
 	return bwA;
 }
@@ -455,7 +455,7 @@ int  RIG_K2::get_bwB()
 
 	if (ret < 9) return 0;
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	bwB = replystr[p + 6] - '1';
 	return bwB;
 }
@@ -478,7 +478,7 @@ int RIG_K2::get_smeter()
 
 	if (ret < 5) return 0;
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	int mtr = 10 * (replystr[p + 2] - '0') 
 			+ replystr[p + 3] - '0';   //assemble two chars into 2 digit int
 	if (mtr > 10) {                    //if int greater than 10 (bar mode)
@@ -498,7 +498,7 @@ int RIG_K2::get_power_out()
 
 	if (ret < 5) return 0;
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	int mtr = 10 * (replystr[p + 2] - '0') 
 			+ replystr[p + 3] - '0';   //assemble two chars into 2 digit int
 	if (mtr > 10) {                           //if int greater than 10 (bar mode)
@@ -518,7 +518,7 @@ double RIG_K2::get_power_control()
 
 	if (ret < 7) return progStatus.power_level;
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	hipower = (replystr[p+5] == '1');
 	int mtr = fm_decimal(replystr.substr(p+4), 3);
 	if (!hipower) mtr /= 10;
@@ -528,7 +528,7 @@ double RIG_K2::get_power_control()
 void RIG_K2::set_power_control(double val)
 {
     int ival = (int)val;
-	cmd = "PC";                    //init the cmd string
+	cmd = "PC";                    //init the cmd std::string
 	if (val > 15) {
 		hipower = true;
 		cmd[5] = '1';
@@ -599,7 +599,7 @@ int RIG_K2::get_attenuator()
 
 	if (ret < 5) return 0;
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	return (replystr[p + 3] == '1' ? 1 : 0);
 }
 
@@ -623,7 +623,7 @@ int RIG_K2::get_preamp()
 
 	if (ret < 4) return 0;
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	return (replystr[p + 2] == '1' ? 1 : 0);
 }
 

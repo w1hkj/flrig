@@ -27,7 +27,7 @@
  *	to the number of data bytes plus two.
  *
  *	For example:
- *		A request for the present receiver filter bandwidth is the the string:
+ *		A request for the present receiver filter bandwidth is the the std::string:
  *			"?W\r" which is 3 bytes in length
  *		The response from the Argonaut V will be:
  *			"Wn\rG\r" which is 5 bytes in length, where n is an unsigned char (byte)
@@ -171,7 +171,7 @@ RIG_TT538::RIG_TT538() {
 #define sTT(s) set_trace(3, s, str2hex(cmd.c_str(), cmd.length()), str2hex(replystr.c_str(), replystr.length()))
 #define gTT(s) get_trace(3, s, str2hex(cmd.c_str(), cmd.length()), str2hex(replystr.c_str(), replystr.length()))
 
-void RIG_TT538::checkresponse(string s)
+void RIG_TT538::checkresponse(std::string s)
 {
 	if (RigSerial->IsOpen() == false)
 		return;
@@ -213,7 +213,7 @@ unsigned long int RIG_TT538::get_vfoA ()
 
 	if (ret < 6) return (unsigned long int)(freqA / (1 + VfoAdj/1e6) + 0.5);
 	size_t p = replystr.rfind("A");
-	if (p == string::npos) return (unsigned long int)(freqA / (1 + VfoAdj/1e6) + 0.5);
+	if (p == std::string::npos) return (unsigned long int)(freqA / (1 + VfoAdj/1e6) + 0.5);
 	
 	int f = 0;
 	for (size_t n = 1; n < 5; n++)
@@ -248,7 +248,7 @@ unsigned long int RIG_TT538::get_vfoB ()
 
 	if (ret < 6) return (unsigned long int)(freqB / (1 + VfoAdj/1e6) + 0.5);
 	size_t p = replystr.rfind("B");
-	if (p == string::npos) return (unsigned long int)(freqB / (1 + VfoAdj/1e6) + 0.5);
+	if (p == std::string::npos) return (unsigned long int)(freqB / (1 + VfoAdj/1e6) + 0.5);
 
 	int f = 0;
 	for (size_t n = 1; n < 5; n++)
@@ -298,7 +298,7 @@ int RIG_TT538::get_modeA()
 
 	if (ret < 4) return modeA;
 	size_t p = replystr.rfind("M");
-	if (p == string::npos) return modeA;
+	if (p == std::string::npos) return modeA;
 	modeA = replystr[p+1] - '0';
 	return modeA;
 }
@@ -327,7 +327,7 @@ int RIG_TT538::get_bwA()
 
 	if (ret < 3) return bwA;
 	size_t p = replystr.rfind("W");
-	if (p == string::npos) return bwA;
+	if (p == std::string::npos) return bwA;
 	bwA = 38 - (unsigned char)replystr[p + 1];
 	return bwA;
 }
@@ -357,7 +357,7 @@ void RIG_TT538::set_if_shift(int val)
 
 	if (ret < 4) return;
 	size_t p = replystr.rfind("P");
-	if (p == string::npos) return;
+	if (p == std::string::npos) return;
 	if (replystr[p+1] != cmd[2] || replystr[p+2] != cmd[3]) {
 		sendCommand(cmd);
 		sTT("set if shift");
@@ -397,7 +397,7 @@ int RIG_TT538::get_attenuator()
 
 	if (ret < 3) return 0;
 	size_t p = replystr.rfind("J");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	if (replystr[p+1] == '1')
 		return 1;
 	return 0;
@@ -412,7 +412,7 @@ int RIG_TT538::get_smeter()
 
 	if (ret < 6) return 0;
 	size_t p = replystr.rfind("S");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	int sval;
 	replystr[p+5] = 0;
@@ -455,7 +455,7 @@ int RIG_TT538::get_volume_control()
 
 	if (ret < 3) return 0;
 	size_t p = replystr.rfind("U");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	return  pot2val(replystr[p+1] & 0x7F);
 }
@@ -502,7 +502,7 @@ int RIG_TT538::get_power_out()
 
 	if (ret < 4) return fwdpwr;
 	size_t p = replystr.rfind("T");
-	if (p == string::npos) return fwdpwr;
+	if (p == std::string::npos) return fwdpwr;
 
 	fwdpwr = 0.8*fwdpwr + 0.2*(unsigned char)replystr[p+1];
 	refpwr = 0.8*refpwr + 0.2*(unsigned char)replystr[p+2];

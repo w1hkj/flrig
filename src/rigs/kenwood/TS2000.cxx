@@ -88,7 +88,7 @@ static GUI rig_widgets[]= {
 };
 
 // mid range on loudness
-static string menu012 = "EX01200004";
+static std::string menu012 = "EX01200004";
 
 void RIG_TS2000::initialize()
 {
@@ -121,7 +121,7 @@ void RIG_TS2000::initialize()
 //	sendCommand(cmd);
 
 // get current noise reduction values for NR1 and NR2
-	string current_nr;
+	std::string current_nr;
 	cmd = "NR;";
 	if (wait_char(';', 4, 100, "read current NR", ASC) == 4)
 		current_nr = replystr;
@@ -133,7 +133,7 @@ void RIG_TS2000::initialize()
 	cmd = "RL;";
 	if (wait_char(';', 5, 100, "GET noise reduction val", ASC) == 5) {
 		size_t p = replystr.rfind("RL");
-		if (p != string::npos)
+		if (p != std::string::npos)
 			_nrval1 = atoi(&replystr[p+2]);
 	}
 	cmd = "NR2;";
@@ -143,7 +143,7 @@ void RIG_TS2000::initialize()
 	cmd = "RL;";
 	if (wait_char(';', 5, 100, "GET noise reduction val", ASC) == 5) {
 		size_t p = replystr.rfind("RL");
-		if (p != string::npos)
+		if (p != std::string::npos)
 			_nrval2 = atoi(&replystr[p+2]);
 	}
 
@@ -266,7 +266,7 @@ int RIG_TS2000::get_smeter()
 	gett("");
 	if (ret == 8) {
 		size_t p = replystr.rfind("SM");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			smtr = fm_decimal(replystr.substr(p+3),4);
 			if (rxona)
 				smtr = (smtr * 100) / 30;
@@ -297,7 +297,7 @@ int RIG_TS2000::get_power_out()
 	gett("");
 	if (ret == 8) {
 		size_t p = replystr.rfind("SM0");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			poutmtr = fm_decimal(replystr.substr(p+3),4);
 			if (poutmtr <= 6) poutmtr = poutmtr * 2;
 			else if (poutmtr <= 11) poutmtr = 11 + (poutmtr - 6)*(26 - 11)/(11 - 6);
@@ -318,7 +318,7 @@ double RIG_TS2000::get_power_control()
 	gett("");
 	if (ret == 6) {
 		size_t p = replystr.rfind("PC");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			pctrl = fm_decimal(replystr.substr(p+2), 3);
 		}
 	}
@@ -343,7 +343,7 @@ int RIG_TS2000::get_attenuator()
 	gett("");
 	if (ret == 7) {
 		size_t p = replystr.rfind("RA");
-		if (p != string::npos && (p+3 < replystr.length())) {
+		if (p != std::string::npos && (p+3 < replystr.length())) {
 			if (replystr[p+2] == '0' && replystr[p+3] == '0')
 				att_level = 0;
 			else
@@ -371,7 +371,7 @@ int RIG_TS2000::get_preamp()
 	gett("");
 	if (ret == 5) {
 		size_t p = replystr.rfind("PA");
-		if (p != string::npos && (p+2 < replystr.length())) {
+		if (p != std::string::npos && (p+2 < replystr.length())) {
 			if (replystr[p+2] == '1')
 				preamp_level = 1;
 			else
@@ -474,7 +474,7 @@ int RIG_TS2000::get_modeA()
 	gett("");
 	if (ret == 4) {
 		size_t p = replystr.rfind("MD");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			int md = replystr[p+2];
 			md = md - '1';
 			if (md == 8) md = 7;
@@ -509,7 +509,7 @@ int RIG_TS2000::get_modeB()
 	gett("");
 	if (ret == 4) {
 		size_t p = replystr.rfind("MD");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			int md = replystr[p+2];
 			md = md - '1';
 			if (md == 8) md = 7;
@@ -596,7 +596,7 @@ int RIG_TS2000::get_bwA()
 		gett("");
 		if (ret == 5) {
 			p = replystr.rfind("SL");
-			if (p != string::npos)
+			if (p != std::string::npos)
 				lo = fm_decimal(replystr.substr(2), 2);
 		}
 		cmd = "SH;";
@@ -605,7 +605,7 @@ int RIG_TS2000::get_bwA()
 		gett("");
 		if (ret == 5) {
 			p = replystr.rfind("SH");
-			if (p != string::npos)
+			if (p != std::string::npos)
 				hi = fm_decimal(replystr.substr(2), 2);
 			A.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
 		}
@@ -616,7 +616,7 @@ int RIG_TS2000::get_bwA()
 		gett("");
 		if (ret == 7) {
 			p = replystr.rfind("FW");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; i < sizeof(TS2000_CWbw)/sizeof(*TS2000_CWbw); i++)
 					if (replystr.find(TS2000_CWbw[i]) == p)
 						break;
@@ -630,7 +630,7 @@ int RIG_TS2000::get_bwA()
 		gett("");
 		if (ret == 7) {
 			p = replystr.rfind("FW");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; i < sizeof(TS2000_FSKbw)/sizeof(*TS2000_FSKbw); i++)
 					if (replystr.find(TS2000_FSKbw[i]) == p)
 						break;
@@ -695,7 +695,7 @@ int RIG_TS2000::get_bwB()
 		gett("");
 		if (ret == 5) {
 			p = replystr.rfind("SL");
-			if (p != string::npos)
+			if (p != std::string::npos)
 				lo = fm_decimal(replystr.substr(2), 2);
 		}
 		cmd = "SH;";
@@ -704,7 +704,7 @@ int RIG_TS2000::get_bwB()
 		gett("");
 		if (ret == 5) {
 			p = replystr.rfind("SH");
-			if (p != string::npos)
+			if (p != std::string::npos)
 				hi = fm_decimal(replystr.substr(2), 2);
 			B.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
 		}
@@ -715,7 +715,7 @@ int RIG_TS2000::get_bwB()
 		gett("");
 		if (ret == 7) {
 			p = replystr.rfind("FW");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; i < sizeof(TS2000_CWbw)/sizeof(*TS2000_CWbw); i++)
 					if (replystr.find(TS2000_CWbw[i]) == p)
 						break;
@@ -729,7 +729,7 @@ int RIG_TS2000::get_bwB()
 		gett("");
 		if (ret == 7) {
 			p = replystr.rfind("FW");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; i < sizeof(TS2000_FSKbw)/sizeof(*TS2000_FSKbw); i++)
 					if (replystr.find(TS2000_FSKbw[i]) == p)
 						break;
@@ -787,7 +787,7 @@ bool  RIG_TS2000::get_notch(int &val)
 
 	if (ret == 4) {
 		size_t p = replystr.rfind("BC");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			if (replystr[p+2] == '2') {
 				ison = true;
 				cmd = "BP;";
@@ -799,7 +799,7 @@ bool  RIG_TS2000::get_notch(int &val)
 				if (ret == 6) {
 					gett("notch val");
 					p = replystr.rfind("BP");
-					if (p != string::npos)
+					if (p != std::string::npos)
 						val = 200 + 50 * fm_decimal(replystr.substr(p+2),3);
 				}
 			}
@@ -834,7 +834,7 @@ int  RIG_TS2000::get_auto_notch()
 
 	if (ret == 4) {
 		size_t p = replystr.rfind("NT");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			anotch = (replystr[p+2] == '1');
 		}
 	}
@@ -873,7 +873,7 @@ int  RIG_TS2000::get_noise_reduction()
 
 	if (ret == 4) {
 		size_t p = replystr.rfind(rsp);
-		if (p == string::npos) return _noise_reduction_level;
+		if (p == std::string::npos) return _noise_reduction_level;
 		_noise_reduction_level = replystr[p+2] - '0';
 	}
 	if (replystr == "?;") {
@@ -917,7 +917,7 @@ int  RIG_TS2000::get_noise_reduction_val()
 
 	if (ret == 5) {
 		size_t p = replystr.rfind(rsp);
-		if (p == string::npos) {
+		if (p == std::string::npos) {
 			nrval = (_noise_reduction_level == 1 ? _nrval1 : _nrval2);
 			return nrval;
 		}
@@ -955,7 +955,7 @@ unsigned long int RIG_TS2000::get_vfoA ()
 	if (wait_char(';', 14, 100, "get vfo A", ASC) < 14) return A.freq;
 
 	size_t p = replystr.rfind("FA");
-	if (p != string::npos && (p + 12 < replystr.length())) {
+	if (p != std::string::npos && (p + 12 < replystr.length())) {
 		int f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replystr[p+n] - '0';
@@ -982,7 +982,7 @@ unsigned long int RIG_TS2000::get_vfoB ()
 	if (wait_char(';', 14, 100, "get vfo B", ASC) < 14) return B.freq;
 
 	size_t p = replystr.rfind("FB");
-	if (p != string::npos && (p + 12 < replystr.length())) {
+	if (p != std::string::npos && (p + 12 < replystr.length())) {
 		int f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replystr[p+n] - '0';
@@ -1039,7 +1039,7 @@ int RIG_TS2000::get_split()
 	cmd.append(";");
 	if (wait_char(';', 4, 100, "get split tx vfo", ASC) == 4) {
 		p = replystr.rfind(rsp);
-		if (p == string::npos) return split;
+		if (p == std::string::npos) return split;
 		tx = replystr[p+2];
 	}
 // rx vfo
@@ -1047,7 +1047,7 @@ int RIG_TS2000::get_split()
 	cmd.append(";");
 	if (wait_char(';', 4, 100, "get split rx vfo", ASC) == 4) {
 		p = replystr.rfind(rsp);
-		if (p == string::npos) return split;
+		if (p == std::string::npos) return split;
 		rx = replystr[p+2];
 	}
 

@@ -46,8 +46,6 @@
 
 //#define CWIO_DEBUG
 
-using namespace std;
-
 Cserial *cwio_serial = 0;
 Cmorse  *morse = 0;
 
@@ -59,8 +57,8 @@ pthread_mutex_t cwio_text_mutex = PTHREAD_MUTEX_INITIALIZER;
 int cwio_process = NONE;
 bool cwio_thread_running = false;
 
-static string new_text;
-static string cwio_text;
+static std::string new_text;
+static std::string cwio_text;
 
 
 // return current tick time in seconds
@@ -256,7 +254,7 @@ void close_cwkey()
 	}
 }
 
-static string snd;
+static std::string snd;
 
 void update_txt_to_send(void *)
 {
@@ -438,7 +436,7 @@ void stop_cwio_thread()
 
 }
 
-void add_cwio(string txt)
+void add_cwio(std::string txt)
 {
 	if (!cwio_thread_running) return;
 

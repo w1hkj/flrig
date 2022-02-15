@@ -182,7 +182,7 @@ bool RIG_FT1000::get_info()
 	if (ret >= 32) {
 		d = replystr.substr(replystr.length() - 32);
 
-		// vfo A data string
+		// vfo A data std::string
 		A.freq = ((((d[1]<<8) + d[2])<<8) + d[3]) *10;
 		md = d[7] & 0x07;
 		alt = d[8] & 0x80;
@@ -211,7 +211,7 @@ bool RIG_FT1000::get_info()
 		if (A.imode == 11 && A.iBW == 0) {A.iBW  = 4; }
 
 
-		d += 16; // vfo B data string
+		d += 16; // vfo B data std::string
 		B.freq = ((((d[1]<<8) + d[2])<<8) + d[3]) *10;
 		md = d[7] & 0x07;
 		alt = d[8] & 0x80;

@@ -187,7 +187,7 @@ public:
 	void set_auto_notch(int v);
 	int  get_auto_notch();
 
-	bool sendTScommand(string, int, bool);
+	bool sendTScommand(std::string, int, bool);
 
 	void set_monitor(bool);
 

@@ -237,7 +237,7 @@ int RIG_IC7410::get_modeA()
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x04';
 	if (waitFOR(8, "get mode A")) {
 		size_t p = replystr.rfind(resp);
@@ -294,7 +294,7 @@ int RIG_IC7410::get_modeB()
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x04';
 	if (waitFOR(8, "get mode B")) {
 		size_t p = replystr.rfind(resp);
@@ -332,7 +332,7 @@ int RIG_IC7410::get_bwA()
 	cmd = pre_to;
 	cmd.append("\x1a\x03");
 	cmd.append(post);
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp.append("\x1a\x03");
 	if (waitFOR(8, "get bw A")) {
 		size_t p = replystr.rfind(resp);
@@ -357,7 +357,7 @@ int RIG_IC7410::get_bwB()
 	cmd = pre_to;
 	cmd.append("\x1a\x03");
 	cmd.append(post);
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp.append("\x1a\x03");
 	if (waitFOR(8, "get bw B")) {
 		size_t p = replystr.rfind(resp);
@@ -466,7 +466,7 @@ int RIG_IC7410::get_attenuator()
 	cmd = pre_to;
 	cmd += '\x11';
 	cmd.append( post );
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x11';
 	if (waitFOR(7, "get attenuator")) {
 		size_t p = replystr.rfind(resp);
@@ -602,12 +602,12 @@ int RIG_IC7410::get_PTT()
 {
 	cmd = pre_to;
 	cmd += '\x1c'; cmd += '\x00';
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x1c'; resp += '\x00';
 	cmd.append(post);
 	if (waitFOR(8, "get PTT")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			ptt_ = replystr[p + 6];
 	}
 	return ptt_;
@@ -642,15 +642,15 @@ void RIG_IC7410::set_pbt_outer(int val)
 int RIG_IC7410::get_pbt_inner()
 {
 	int val = 0;
-	string cstr = "\x14\x07";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x07";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(9, "get pbt inner")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			val = num100(replystr.substr(p+6));
 			val -= 50;
 		}
@@ -662,15 +662,15 @@ int RIG_IC7410::get_pbt_inner()
 int RIG_IC7410::get_pbt_outer()
 {
 	int val = 0;
-	string cstr = "\x14\x08";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x08";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(9, "get pbt outer")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			val = num100(replystr.substr(p+6));
 			val -= 50;
 		}
@@ -745,7 +745,7 @@ void RIG_IC7410::get_band_selection(int v)
 	if (waitFOR(23, "get band stack")) {
 		set_trace(2, "get band stack", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(pre_fm);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			unsigned long int bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
 			int bandmode = replystr[p+13];
 			int bandfilter = replystr[p+14];

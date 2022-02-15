@@ -22,6 +22,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <string>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdlib.h>
@@ -61,8 +62,6 @@
 
 void initTabs();
 
-using namespace std;
-
 rigbase *selrig = rigs[0];
 
 extern bool test;
@@ -80,7 +79,7 @@ XCVR_STATE xcvr_vfoA, xcvr_vfoB;
 
 enum {VOL, MIC, PWR, SQL, IFSH, NOTCH, RFGAIN, NR, NB };
 
-queue<VFOQUEUE> srvc_reqs;
+std::queue<VFOQUEUE> srvc_reqs;
 
 const char **old_bws = NULL;
 
@@ -95,8 +94,8 @@ struct ATAG_XCVR_STATE {
 ATAG_XCVR_STATE oplist[LISTSIZE];
 
 int  numinlist = 0;
-vector<string> rigmodes_;
-vector<string> rigbws_;
+std::vector<std::string> rigmodes_;
+std::vector<std::string> rigbws_;
 
 Cserial *RigSerial;
 Cserial *AuxSerial;
@@ -150,9 +149,9 @@ bool PTT = false;
 
 int  powerlevel = 0;
 
-string printXCVR_STATE(XCVR_STATE &data)
+std::string printXCVR_STATE(XCVR_STATE &data)
 {
-	stringstream str;
+	std::stringstream str;
 	const char **bwt = selrig->bwtable(data.imode);
 	const char **dsplo = selrig->lotable(data.imode);
 	const char **dsphi = selrig->hitable(data.imode);
@@ -175,7 +174,7 @@ string printXCVR_STATE(XCVR_STATE &data)
 	return str.str();
 }
 
-string print_ab()
+std::string print_ab()
 {
 	std::string s;
 	s.assign("VFO-A: ");
@@ -313,7 +312,7 @@ void read_vfo()
 		freq = selrig->get_vfoA();
 		if (freq != vfoA.freq) {
 			vfoA.freq = freq;
-			Fl::awake(setFreqDispA, (void *)vfoA.freq);
+			Fl::awake(setFreqDispA);
 			vfo = &vfoA;
 		}
 		if ( selrig->twovfos() ) {
@@ -321,7 +320,7 @@ void read_vfo()
 			freq = selrig->get_vfoB();
 			if (freq != vfoB.freq) {
 				vfoB.freq = freq;
-				Fl::awake(setFreqDispB, (void *)vfoB.freq);
+				Fl::awake(setFreqDispB);
 			}
 		}
 	} else { // vfo-B
@@ -329,7 +328,7 @@ void read_vfo()
 		freq = selrig->get_vfoB();
 		if (freq != vfoB.freq) {
 			vfoB.freq = freq;
-			Fl::awake(setFreqDispB, (void *)vfoB.freq);
+			Fl::awake(setFreqDispB);
 			vfo = &vfoB;
 		}
 		if ( selrig->twovfos() ) {
@@ -337,7 +336,7 @@ void read_vfo()
 			freq = selrig->get_vfoA();
 			if (freq != vfoA.freq) {
 				vfoA.freq = freq;
-				Fl::awake(setFreqDispA, (void *)vfoA.freq);
+				Fl::awake(setFreqDispA);
 			}
 		}
 	}
@@ -517,7 +516,7 @@ void read_bandwidth()
 		trace(2, "vfoA active", "get_bwA()");
 		nu_BW = selrig->get_bwA();
 		if (nu_BW != vfoA.iBW) {
-			stringstream s;
+			std::stringstream s;
 			s << "Bandwidth A change. nu_BW=" << nu_BW << ", vfoA.iBW=" << vfoA.iBW << ", vfo->iBW=" << vfo->iBW;
 			trace(1, s.str().c_str());
 			vfoA.iBW = vfo->iBW = nu_BW;
@@ -526,7 +525,7 @@ void read_bandwidth()
 		trace(2, "vfoB active", "get_bwB()");
 		nu_BW = selrig->get_bwB();
 		if (nu_BW != vfoB.iBW) {
-			stringstream s;
+			std::stringstream s;
 			s << "Bandwidth B change. nu_BW=" << nu_BW << ", vfoB.iBW=" << vfoB.iBW << ", vfo->iBW=" << vfo->iBW;
 			trace(1, s.str().c_str());
 			vfoB.iBW = vfo->iBW = nu_BW;
@@ -573,7 +572,7 @@ void read_tuner()
 
 	tunerval = selrig->get_tune();
 	if (tunerval != btn_tune_on_off->value()) {
-		stringstream s;
+		std::stringstream s;
 		s << "tuner state: " << tunerval;
 		trace(1, s.str().c_str());
 		Fl::awake(update_UI_TUNER);
@@ -764,7 +763,7 @@ void read_split()
 		val = selrig->get_split();
 		vfo->split = progStatus.split = val;
 		Fl::awake(update_split, (void*)0);
-		ostringstream s;
+		std::ostringstream s;
 		s << "read_split() " << (val ? "ON" : "OFF");
 		trace(1, s.str().c_str());
 	} else {
@@ -1224,7 +1223,7 @@ void serviceQUE()
 	guard_lock que_lock(&mutex_srvc_reqs, "serviceQUE");
 	guard_lock serial(&mutex_serial);
 
-	queue<VFOQUEUE> pending; // creates an empty queue
+	std::queue<VFOQUEUE> pending; // creates an empty queue
 
 	VFOQUEUE nuvals;
 
@@ -1250,7 +1249,7 @@ void serviceQUE()
 					MilliSleep(10);
 					get = rigPTT();
 				}
-				stringstream s;
+				std::stringstream s;
 				s << "ptt returned " << get << " in " << cnt * 10 << " msec";
 				trace(1, s.str().c_str());
 				Fl::awake(update_UI_PTT);
@@ -1950,7 +1949,7 @@ void addtoList(int val, int imode, int iBW) {
 }
 
 void readFile() {
-	ifstream iList(defFileName.c_str());
+	std::ifstream iList(defFileName.c_str());
 	if (!iList) {
 		fl_message ("Could not open %s", defFileName.c_str());
 		return;
@@ -1975,7 +1974,7 @@ void readFile() {
 }
 
 void readTagFile() {
-	ifstream iList(defFileName.c_str());
+	std::ifstream iList(defFileName.c_str());
 	if (!iList) {
 		fl_message ("Could not open %s", defFileName.c_str());
 		return;
@@ -1983,7 +1982,7 @@ void readTagFile() {
 	clearList();
 	int i = 0, mode, bw;
 	long freq;
-	string atag;
+	std::string atag;
 	char ca[ATAGSIZE + 60];
 	while (!iList.eof()) {
 		freq = 0L; mode = -1;
@@ -2008,7 +2007,7 @@ void readTagFile() {
 }
 
 void buildlist() {
-	string tmpFN, orgFN;
+	std::string tmpFN, orgFN;
 // check for new Memory-Alpha-Tag file
 	defFileName = RigHomeDir;
 	defFileName.append(selrig->name_);
@@ -2494,7 +2493,7 @@ void cbAttenuator()
 
 void setAttControl(void *d)
 {
-	int val = (long)d;
+	size_t val = reinterpret_cast<size_t>(d);
 	btnAttenuator->value(val);
 }
 
@@ -2518,7 +2517,7 @@ void cbPreamp()
 
 void setPreampControl(void *d)
 {
-	int val = (long)d;
+	size_t val = reinterpret_cast<size_t>(d);
 	btnPreamp->value(val);
 }
 
@@ -2618,7 +2617,7 @@ void setIFshiftButton(void *d)
 
 void setIFshiftControl(void *d)
 {
-	int val = (long)d;
+	int val = *(reinterpret_cast<int *>(d));
 	if (sldrIFSHIFT) {
 		if (sldrIFSHIFT->value() != val)
 			sldrIFSHIFT->value(val);
@@ -2876,7 +2875,7 @@ void setMicGain()
 		inhibit_mic = 1;
 		return;
 	}
-	stringstream str;
+	std::stringstream str;
 	str << "setMicGain(), ev=" << ev << ", inhibit_mic=" << inhibit_mic;
 	trace(1, str.str().c_str());
 
@@ -3037,7 +3036,7 @@ void setPower()
 		inhibit_power = 1;
 		return;
 	}
-	stringstream str;
+	std::stringstream str;
 	str << "setPower(), ev=" << ev << ", inhibit_power=" << inhibit_power;
 	trace(1, str.str().c_str());
 
@@ -3303,20 +3302,20 @@ void updateFwdPwr(void *)
 
 void updateSquelch(void *d)
 {
-	if (sldrSQUELCH) sldrSQUELCH->value((long)d);
+	if (sldrSQUELCH) sldrSQUELCH->value(reinterpret_cast<size_t>(d));
 	if (sldrSQUELCH) sldrSQUELCH->redraw();
-	if (spnrSQUELCH) spnrSQUELCH->value((long)d);
+	if (spnrSQUELCH) spnrSQUELCH->value(reinterpret_cast<size_t>(d));
 	if (spnrSQUELCH) spnrSQUELCH->redraw();
 }
 
 void updateRFgain(void *d)
 {
 	if (spnrRFGAIN) {
-		spnrRFGAIN->value((long)d);
+		spnrRFGAIN->value(reinterpret_cast<size_t>(d));
 		spnrRFGAIN->redraw();
 	}
 	if (sldrRFGAIN) {
-		sldrRFGAIN->value((long)d);
+		sldrRFGAIN->value(reinterpret_cast<size_t>(d));
 		sldrRFGAIN->redraw();
 	}
 }
@@ -3388,20 +3387,20 @@ void updateVmeter(void *)
 
 void saveFreqList()
 {
-	string atag;
+	std::string atag;
 
 	if (!numinlist) return;
 
 	rotate_log(defFileName);
 
-	ofstream oList(defFileName.c_str());
+	std::ofstream oList(defFileName.c_str());
 	if (!oList) {
 		fl_message ("Could not write to %s", defFileName.c_str());
 		return;
 	}
 	for (int i = 0; i < numinlist; i++) {
 		atag = oplist[i].alpha_tag;
-		oList << oplist[i].freq << " " << oplist[i].imode << " " << oplist[i].iBW << " \"" << atag.c_str() << "\"" << endl;
+		oList << oplist[i].freq << " " << oplist[i].imode << " " << oplist[i].iBW << " \"" << atag.c_str() << "\"" << std::endl;
 
 	}
 	oList.close();
@@ -3490,11 +3489,11 @@ void restore_rig_vals_(XCVR_STATE &xcvrvfo)
 
 void send_st_ex_command(std::string command)
 {
-	string cmd = "";
-	if (command.find("x") != string::npos) { // hex strings
+	std::string cmd = "";
+	if (command.find("x") != std::string::npos) { // hex std::strings
 		size_t p = 0;
 		unsigned int val;
-		while (( p = command.find("x", p)) != string::npos) {
+		while (( p = command.find("x", p)) != std::string::npos) {
 			sscanf(&command[p+1], "%x", &val);
 			cmd += (unsigned char) val;
 			p += 3;
@@ -7490,21 +7489,21 @@ void enable_yaesu_bandselect(int btn_num, bool enable)
 }
 
 // trim leading and trailing whitspace and double quote
-const string lt_trim(const string& pString, const string& pWhitespace)
+const std::string lt_trim(const std::string& pstring, const std::string& pWhitespace)
 {
 	size_t beginStr, endStr, range;
-	beginStr = pString.find_first_not_of(pWhitespace);
-	if (beginStr == string::npos) return "";	// no content
-	endStr = pString.find_last_not_of(pWhitespace);
+	beginStr = pstring.find_first_not_of(pWhitespace);
+	if (beginStr == std::string::npos) return "";	// no content
+	endStr = pstring.find_last_not_of(pWhitespace);
 	range = endStr - beginStr + 1;
 
-	return pString.substr(beginStr, range);
+	return pstring.substr(beginStr, range);
 }
 
 void editAlphaTag()
 {
 	int indx;
-	string atag;
+	std::string atag;
 	if (FreqSelect->value() < 1) {
 		inAlphaTag->value("");
 		return;	// no memory selected

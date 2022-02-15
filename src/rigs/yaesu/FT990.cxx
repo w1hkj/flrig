@@ -198,7 +198,7 @@ bool RIG_FT990::get_info()
 		size_t da = ret - 32;
 		size_t db = ret - 16;
 
-		// vfo A data string
+		// vfo A data std::string
 		A.freq = (replystr[da + 1] & 0xFF);
 		A.freq <<= 8;
 		A.freq += (replystr[da + 2]) & 0xFF;
@@ -228,7 +228,7 @@ bool RIG_FT990::get_info()
 		A.imode = pmode;
 		A.iBW = pbw;
 
-		// vfo B data string
+		// vfo B data std::string
 		B.freq = (replystr[db + 1] & 0xFF);
 		B.freq <<= 8;
 		B.freq += (replystr[db + 2]) & 0xFF;

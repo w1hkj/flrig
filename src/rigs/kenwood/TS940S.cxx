@@ -142,7 +142,7 @@ unsigned long int RIG_TS940S::get_vfoA ()
 	get_trace(2, "get_vfoA()", replystr.c_str());
 
 	size_t p = replystr.rfind("FA");
-	if (p != string::npos && (p + 12 < replystr.length())) {
+	if (p != std::string::npos && (p + 12 < replystr.length())) {
 		int f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replystr[p+n] - '0';
@@ -172,7 +172,7 @@ unsigned long int RIG_TS940S::get_vfoB ()
 	get_trace(2, "get_vfoB()", replystr.c_str());
 
 	size_t p = replystr.rfind("FB");
-	if (p != string::npos && (p + 12 < replystr.length())) {
+	if (p != std::string::npos && (p + 12 < replystr.length())) {
 		int f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replystr[p+n] - '0';

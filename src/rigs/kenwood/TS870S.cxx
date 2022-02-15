@@ -279,7 +279,7 @@ void RIG_TS870S::set_split(bool val)
 
 	size_t p = replystr.rfind("FR");
 // if bad data, change nothing.
-	if (p == string::npos) return;
+	if (p == std::string::npos) return;
 
 // '0' = VFO-A, '1' = VFO-B, '2' = Memory.
 	switch (replystr[p+2]) {
@@ -328,7 +328,7 @@ int RIG_TS870S::get_split()
 	cmd.append(";");
 	if (wait_char(';', 4, 100, "get split tx vfo", ASC) == 4) {
 		p = replystr.rfind(rsp);
-		if (p == string::npos) return split;
+		if (p == std::string::npos) return split;
 		tx = replystr[p+2];
 	}
 // rx vfo
@@ -336,7 +336,7 @@ int RIG_TS870S::get_split()
 	cmd.append(";");
 	if (wait_char(';', 4, 100, "get split rx vfo", ASC) == 4) {
 		p = replystr.rfind(rsp);
-		if (p == string::npos) return split;
+		if (p == std::string::npos) return split;
 		rx = replystr[p+2];
 // split test
         if (tx != rx) split = 1; // change submitted by G8KBV
@@ -360,7 +360,7 @@ unsigned long int RIG_TS870S::get_vfoA ()
 	if (wait_char(';', 14, 100, "get vfoA", ASC) < 14) return A.freq;
 
 	size_t p = replystr.rfind("FA");
-	if (p == string::npos) return A.freq;
+	if (p == std::string::npos) return A.freq;
 
 	unsigned long int f = 0L;
 	unsigned long int mul = 1L;
@@ -392,7 +392,7 @@ unsigned long int RIG_TS870S::get_vfoB ()
 	if (wait_char(';', 14, 100, "get vfoB", ASC) < 14) return B.freq;
 
 	size_t p = replystr.rfind("FB");
-	if (p == string::npos) return B.freq;
+	if (p == std::string::npos) return B.freq;
 
 	unsigned long int f = 0L;
 	unsigned long int mul = 1L;
@@ -424,7 +424,7 @@ int RIG_TS870S::get_smeter() {
 	if (wait_char(';', 7, 100, "get smeter", ASC) < 7) return 0;
 
 	size_t p = replystr.rfind("SM");
-	if (p == string::npos) return -1;
+	if (p == std::string::npos) return -1;
 
 	replystr[p + 6] = 0;
 	int mtr = atoi(&replystr[p + 2]);
@@ -440,7 +440,7 @@ int RIG_TS870S::get_power_out()
 	if (wait_char(';', 7, 100, "get output power", ASC) < 7) return mtr;
 
 	size_t p = replystr.rfind("SM");
-	if (p == string::npos) return mtr;
+	if (p == std::string::npos) return mtr;
 
 	replystr[p + 6] = 0;
 	mtr = atoi(&replystr[p + 2]);
@@ -474,7 +474,7 @@ double RIG_TS870S::get_power_control()
 	if (wait_char(';', 6, 100, "get pwr ctrl", ASC) < 6) return 0;
 
 	size_t p = replystr.rfind("PC");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	int mtr = 0;
 	replystr[p + 5] = 0;
 	mtr = atoi(&replystr[p + 2]);
@@ -490,7 +490,7 @@ int RIG_TS870S::get_volume_control()
 	if (wait_char(';', 6, 100, "get vol ctrl", ASC) < 6) return 0;
 
 	size_t p = replystr.rfind("AG");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	replystr[p + 5] = 0; // change the ';' into a 'null'
 	int val = atoi(&replystr[p + 2]);
@@ -587,7 +587,7 @@ int RIG_TS870S::get_attenuator() {
 	if (wait_char(';', 5, 100, "get att", ASC) < 5) return att_on;
 
 	size_t p = replystr.rfind("RA");
-	if (p == string::npos) return att_on;
+	if (p == std::string::npos) return att_on;
 
 	if (replystr[p + 2] == '0' && replystr[p + 3] == '0') {
 		att_on = 0;						// Attenuator is OFF
@@ -618,8 +618,8 @@ bool RIG_TS870S::get_TS870Sid() {
 	cmd = "ID;";
 	if (wait_char(';', 6, 100, "get ID", ASC) < 6) return false;
 
-	size_t p = replystr.rfind("ID");			// String "ID015;"
-	if (p == string::npos) return false;		// Bytes   012345
+	size_t p = replystr.rfind("ID");			// std::string "ID015;"
+	if (p == std::string::npos) return false;		// Bytes   012345
 	if 	(replystr[p + 2] == '0' &&				// wbx2
 		 replystr[p + 3] == '1' &&
 		 replystr[p + 4] == '5')  return true;	// wbx
@@ -649,7 +649,7 @@ int RIG_TS870S::get_modeA()
 	if (wait_char(';', 4, 100, "get mode A", ASC) < 4) return A.imode;
 
 	size_t p = replystr.rfind("MD");
-	if (p == string::npos) return A.imode;
+	if (p == std::string::npos) return A.imode;
 
 	switch (replystr[p + 2]) {
 		case '1' : md = tsLSB;  break;
@@ -691,7 +691,7 @@ int RIG_TS870S::get_modeB()
 	if (wait_char(';', 4, 100, "get mode B", ASC) < 4) return B.imode;
 
 	size_t p = replystr.rfind("MD");
-	if (p == string::npos) return B.imode;
+	if (p == std::string::npos) return B.imode;
 
 	switch (replystr[p + 2]) {
 		case '1' : md = tsLSB;  break;
@@ -977,9 +977,9 @@ int RIG_TS870S::get_bwA() {
 		if (wait_char(';', 7, 100, "get CW width", ASC) < 7) return A.iBW;
 
 		p = replystr.rfind("FW");
-		if (p != string::npos) { // If 'FW' found then scan the known responces to find out what we got.
-			for (i = 0; TS870S_FMbw[i] != NULL; i++) // bump array index counter, till string match or end.
-				if (replystr.find(TS870S_FMbw[i]) == p) break; 	// Found returned data, in string array.
+		if (p != std::string::npos) { // If 'FW' found then scan the known responces to find out what we got.
+			for (i = 0; TS870S_FMbw[i] != NULL; i++) // bump array index counter, till std::string match or end.
+				if (replystr.find(TS870S_FMbw[i]) == p) break; 	// Found returned data, in std::string array.
 
 			if (TS870S_FMbw[i] != NULL) A.iBW = i; // if we didn't hit the end, return the array index value.
 			else A.iBW = 1; // Default.
@@ -991,9 +991,9 @@ int RIG_TS870S::get_bwA() {
 		if (wait_char(';', 7, 100, "get CW width", ASC) < 7) return A.iBW;
 
 		p = replystr.rfind("FW");
-		if (p != string::npos) { // If 'FW' found then scan the known responces to find out what we got.
-			for (i = 0; TS870S_CWbw[i] != NULL; i++) // bump array index counter, till string match or end.
-				if (replystr.find(TS870S_CWbw[i]) == p) break; 	// Found returned data, in string array.
+		if (p != std::string::npos) { // If 'FW' found then scan the known responces to find out what we got.
+			for (i = 0; TS870S_CWbw[i] != NULL; i++) // bump array index counter, till std::string match or end.
+				if (replystr.find(TS870S_CWbw[i]) == p) break; 	// Found returned data, in std::string array.
 
 			if (TS870S_CWbw[i] != NULL) A.iBW = i; // if we didn't hit the end, return the array index value.
 			else A.iBW = 1; // Default.
@@ -1005,9 +1005,9 @@ int RIG_TS870S::get_bwA() {
 		if (wait_char(';', 7, 100, "get FSK width", ASC) < 7) return A.iBW;
 
 		p = replystr.rfind("FW");
-		if (p != string::npos) { // If 'FW' found then scan the known responces to find out what we got.
-			for (i = 0; TS870S_FSKbw[i] != NULL; i++) // bump array index counter, till string match or end.
-				if (replystr.find(TS870S_FSKbw[i]) == p) break; 	// Found returned data, in string array.
+		if (p != std::string::npos) { // If 'FW' found then scan the known responces to find out what we got.
+			for (i = 0; TS870S_FSKbw[i] != NULL; i++) // bump array index counter, till std::string match or end.
+				if (replystr.find(TS870S_FSKbw[i]) == p) break; 	// Found returned data, in std::string array.
 
 			if (TS870S_FSKbw[i] != NULL) A.iBW = i; // if we didn't hit the end, return the array index value.
 			else A.iBW = 1; // Default.
@@ -1024,9 +1024,9 @@ int RIG_TS870S::get_bwA() {
 		if (wait_char(';', 5, 100, "get lower", ASC) < 5) return A.iBW;
 
 		p = replystr.rfind("FW");
-		if (p != string::npos) { // If 'FW' found then scan the known responces to find out what we got.
-			for (i = 0; TS870S_CAT_am_SL[i] != NULL; i++) // bump array index counter, till string match or end.
-				if (replystr.find(TS870S_CAT_am_SL[i]) == p) break; 	// Found returned data, in string array.
+		if (p != std::string::npos) { // If 'FW' found then scan the known responces to find out what we got.
+			for (i = 0; TS870S_CAT_am_SL[i] != NULL; i++) // bump array index counter, till std::string match or end.
+				if (replystr.find(TS870S_CAT_am_SL[i]) == p) break; 	// Found returned data, in std::string array.
 
 			if (TS870S_CAT_am_SL[i] != NULL) lo = i; // if we didn't hit the end, return the array index value.
 			else lo = 1; // Default.
@@ -1035,9 +1035,9 @@ int RIG_TS870S::get_bwA() {
 		cmd = "IS;";
 		if (wait_char(';', 5, 100, "get upper", ASC) == 5) {
 			p = replystr.rfind("IS ");
-			if (p != string::npos) {
-				for (i = 0; TS870S_CAT_am_SH[i] != NULL; i++) // bump array index counter, till string match or end.
-					if (replystr.find(TS870S_CAT_am_SH[i]) == p) break; 	// Found returned data, in string array.
+			if (p != std::string::npos) {
+				for (i = 0; TS870S_CAT_am_SH[i] != NULL; i++) // bump array index counter, till std::string match or end.
+					if (replystr.find(TS870S_CAT_am_SH[i]) == p) break; 	// Found returned data, in std::string array.
 
 				if (TS870S_CAT_am_SH[i] != NULL) hi = i; // if we didn't hit the end, return the array index value.
 				else hi = 1; // Default.
@@ -1056,9 +1056,9 @@ int RIG_TS870S::get_bwA() {
 		if (wait_char(';', 5, 100, "get lower", ASC) < 5) return A.iBW;
 
 		p = replystr.rfind("FW");
-		if (p != string::npos) { // If 'FW' found then scan the known responces to find out what we got.
-			for (i = 0; TS870S_CAT_ssb_SL[i] != NULL; i++) // bump array index counter, till string match or end.
-				if (replystr.find(TS870S_CAT_ssb_SL[i]) == p) break; 	// Found returned data, in string array.
+		if (p != std::string::npos) { // If 'FW' found then scan the known responces to find out what we got.
+			for (i = 0; TS870S_CAT_ssb_SL[i] != NULL; i++) // bump array index counter, till std::string match or end.
+				if (replystr.find(TS870S_CAT_ssb_SL[i]) == p) break; 	// Found returned data, in std::string array.
 
 			if (TS870S_CAT_ssb_SL[i] != NULL) lo = i; // if we didn't hit the end, return the array index value.
 			else lo = 1; // Default.
@@ -1069,9 +1069,9 @@ int RIG_TS870S::get_bwA() {
 
 		p = replystr.rfind("IS ");
 
-		if (p != string::npos) {
-			for (i = 0; TS870S_CAT_ssb_SH[i] != NULL; i++) // bump array index counter, till string match or end.
-				if (replystr.find(TS870S_CAT_ssb_SH[i]) == p) break; 	// Found returned data, in string array.
+		if (p != std::string::npos) {
+			for (i = 0; TS870S_CAT_ssb_SH[i] != NULL; i++) // bump array index counter, till std::string match or end.
+				if (replystr.find(TS870S_CAT_ssb_SH[i]) == p) break; 	// Found returned data, in std::string array.
 
 			if (TS870S_CAT_ssb_SH[i] != NULL) hi = i; // if we didn't hit the end, return the array index value.
 			else hi = 1; // Default.
@@ -1092,9 +1092,9 @@ int RIG_TS870S::get_bwB()
 		if (wait_char(';', 7, 100, "get CW width", ASC) < 7) return B.iBW;
 
 		p = replystr.rfind("FW");
-		if (p != string::npos) { // If 'FW' found then scan the known responces to find out what we got.
-			for (i = 0; TS870S_FMbw[i] != NULL; i++) // bump array index counter, till string match or end.
-				if (replystr.find(TS870S_FMbw[i]) == p) break; 	// Found returned data, in string array.
+		if (p != std::string::npos) { // If 'FW' found then scan the known responces to find out what we got.
+			for (i = 0; TS870S_FMbw[i] != NULL; i++) // bump array index counter, till std::string match or end.
+				if (replystr.find(TS870S_FMbw[i]) == p) break; 	// Found returned data, in std::string array.
 
 			if (TS870S_FMbw[i] != NULL) B.iBW = i; // if we didn't hit the end, return the array index value.
 			else B.iBW = 1; // Default.
@@ -1106,9 +1106,9 @@ int RIG_TS870S::get_bwB()
 		if (wait_char(';', 7, 100, "get CW width", ASC) < 7) return B.iBW;
 
 		p = replystr.rfind("FW");
-		if (p != string::npos) { // If 'FW' found then scan the known responces to find out what we got.
-			for (i = 0; TS870S_CWbw[i] != NULL; i++) // bump array index counter, till string match or end.
-				if (replystr.find(TS870S_CWbw[i]) == p) break; 	// Found returned data, in string array.
+		if (p != std::string::npos) { // If 'FW' found then scan the known responces to find out what we got.
+			for (i = 0; TS870S_CWbw[i] != NULL; i++) // bump array index counter, till std::string match or end.
+				if (replystr.find(TS870S_CWbw[i]) == p) break; 	// Found returned data, in std::string array.
 
 			if (TS870S_CWbw[i] != NULL) B.iBW = i; // if we didn't hit the end, return the array index value.
 			else B.iBW = 1; // Default.
@@ -1120,9 +1120,9 @@ int RIG_TS870S::get_bwB()
 		if (wait_char(';', 7, 100, "get FSK width", ASC) < 7) return B.iBW;
 
 		p = replystr.rfind("FW");
-		if (p != string::npos) { // If 'FW' found then scan the known responces to find out what we got.
-			for (i = 0; TS870S_FSKbw[i] != NULL; i++) // bumb array index counter, till string match or end.
-				if (replystr.find(TS870S_FSKbw[i]) == p) break; 	// Found returned data, in string array.
+		if (p != std::string::npos) { // If 'FW' found then scan the known responces to find out what we got.
+			for (i = 0; TS870S_FSKbw[i] != NULL; i++) // bumb array index counter, till std::string match or end.
+				if (replystr.find(TS870S_FSKbw[i]) == p) break; 	// Found returned data, in std::string array.
 
 			if (TS870S_FSKbw[i] != NULL) B.iBW = i; // if we didn't hit the end, return the array index value.
 			else B.iBW = 1; // Default.
@@ -1137,9 +1137,9 @@ int RIG_TS870S::get_bwB()
 		if (wait_char(';', 5, 100, "get lower", ASC) < 5) return B.iBW;
 
 		p = replystr.rfind("FW");
-		if (p != string::npos) { // If 'FW' found then scan the known responces to find out what we got.
-			for (i = 0; TS870S_CAT_am_SL[i] != NULL; i++) // bump array index counter, till string match or end.
-				if (replystr.find(TS870S_CAT_am_SL[i]) == p) break; 	// Found returned data, in string array.
+		if (p != std::string::npos) { // If 'FW' found then scan the known responces to find out what we got.
+			for (i = 0; TS870S_CAT_am_SL[i] != NULL; i++) // bump array index counter, till std::string match or end.
+				if (replystr.find(TS870S_CAT_am_SL[i]) == p) break; 	// Found returned data, in std::string array.
 
 			if (TS870S_CAT_am_SL[i] != NULL) lo = i; // if we didn't hit the end, return the array index value.
 			else lo = 1; // Default.
@@ -1149,9 +1149,9 @@ int RIG_TS870S::get_bwB()
 		if (wait_char(';', 5, 100, "get upper", ASC) < 5) return B.iBW;
 
 		p = replystr.rfind("IS ");
-		if (p != string::npos) {
-			for (i = 0; TS870S_CAT_am_SH[i] != NULL; i++) // bump array index counter, till string match or end.
-				if (replystr.find(TS870S_CAT_am_SH[i]) == p) break; 	// Found returned data, in string array.
+		if (p != std::string::npos) {
+			for (i = 0; TS870S_CAT_am_SH[i] != NULL; i++) // bump array index counter, till std::string match or end.
+				if (replystr.find(TS870S_CAT_am_SH[i]) == p) break; 	// Found returned data, in std::string array.
 
 			if (TS870S_CAT_am_SH[i] != NULL) hi = i; // if we didn't hit the end, return the array index value.
 			else hi = 1; // Default.
@@ -1168,9 +1168,9 @@ int RIG_TS870S::get_bwB()
 		if (wait_char(';', 5, 100, "get lower", ASC) < 5) return  B.iBW;
 
 		p = replystr.rfind("FW");
-		if (p != string::npos) { // If 'FW' found then scan the known responces to find out what we got.
-			for (i = 0; TS870S_CAT_ssb_SL[i] != NULL; i++) // bump array index counter, till string match or end.
-				if (replystr.find(TS870S_CAT_ssb_SL[i]) == p) break; 	// Found returned data, in string array.
+		if (p != std::string::npos) { // If 'FW' found then scan the known responces to find out what we got.
+			for (i = 0; TS870S_CAT_ssb_SL[i] != NULL; i++) // bump array index counter, till std::string match or end.
+				if (replystr.find(TS870S_CAT_ssb_SL[i]) == p) break; 	// Found returned data, in std::string array.
 
 			if (TS870S_CAT_ssb_SL[i] != NULL) lo = i; // if we didn't hit the end, return the array index value.
 			else lo = 1; // Default.
@@ -1180,9 +1180,9 @@ int RIG_TS870S::get_bwB()
 		if (wait_char(';', 5, 100, "get upper", ASC)  < 5) return B.iBW;
 
 		p = replystr.rfind("IS ");
-		if (p != string::npos) {
-			for (i = 0; TS870S_CAT_ssb_SH[i] != NULL; i++) // bump array index counter, till string match or end.
-				if (replystr.find(TS870S_CAT_ssb_SH[i]) == p) break; 	// Found returned data, in string array.
+		if (p != std::string::npos) {
+			for (i = 0; TS870S_CAT_ssb_SH[i] != NULL; i++) // bump array index counter, till std::string match or end.
+				if (replystr.find(TS870S_CAT_ssb_SH[i]) == p) break; 	// Found returned data, in std::string array.
 
 			if (TS870S_CAT_ssb_SH[i] != NULL) hi = i; // if we didn't hit the end, return the array index value.
 			else hi = 1; // Default.
@@ -1218,7 +1218,7 @@ int RIG_TS870S::get_mic_gain()
 	cmd = "MG;";
 	if (wait_char(';', 6, 100, "get mic ctrl", ASC) >= 6) {
 		size_t p = replystr.rfind("MG");
-		if (p == string::npos) return val;
+		if (p == std::string::npos) return val;
 		replystr[p + 5] = 0;
 		val = atoi(&replystr[p + 2]);
 	}
@@ -1250,7 +1250,7 @@ int  RIG_TS870S::get_noise()
 	if (wait_char(';', 4, 100, "get NB", ASC) < 4) return 0;
 
 	size_t p = replystr.rfind("NB");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	return (replystr[p + 2] == '1'); // true if 1
 }
@@ -1283,7 +1283,7 @@ bool RIG_TS870S::get_if_shift(int &val)
 			return false;
 		}
 		size_t p = replystr.rfind("IS");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			val = fm_decimal(replystr.substr(p+3), 4);
 		} else
 			val = progStatus.shift_val;

@@ -144,7 +144,7 @@ unsigned long int RIG_TT599::get_vfoA ()
 	size_t p;
 	cmd = "?AF\r";
 	if ( waitCommand( cmd, 12, "get vfoA") ) {
-		if ((p = replystr.rfind("@AF")) != string::npos)
+		if ((p = replystr.rfind("@AF")) != std::string::npos)
 			freqA =  atol(&replystr[p+3]);
 	}
 	return freqA;
@@ -165,7 +165,7 @@ unsigned long int RIG_TT599::get_vfoB ()
 	size_t p;
 	cmd = "?BF\r";
 	if ( waitCommand( cmd, 12, "get vfoB") ) {
-		if ((p = replystr.rfind("@BF")) != string::npos)
+		if ((p = replystr.rfind("@BF")) != std::string::npos)
 			freqB =  atol(&replystr[p+3]);
 	}
 	return freqB;
@@ -193,7 +193,7 @@ int RIG_TT599::get_modeA()
 	size_t p;
 	cmd = "?RMM\r";
 	if ( waitCommand( cmd, 6, "get modeA") ) {
-		if ((p = replystr.rfind("@RMM")) != string::npos) {
+		if ((p = replystr.rfind("@RMM")) != std::string::npos) {
 			modeA = 0;
 			while (RIG_TT599mchar_[modeA] != replystr[p+4]) {
 				modeA++;
@@ -222,7 +222,7 @@ int RIG_TT599::get_modeB()
 	size_t p;
 	cmd = "?RMM\r";
 	if ( waitCommand( cmd, 6, "get modeB") ) {
-		if ((p = replystr.rfind("@RMM")) != string::npos) {
+		if ((p = replystr.rfind("@RMM")) != std::string::npos) {
 			modeB = 0;
 			while (RIG_TT599mchar_[modeB] != replystr[p+4]) {
 				modeB++;
@@ -252,8 +252,8 @@ int RIG_TT599::get_bwA()
 	size_t p;
 	cmd = "?RMF\r";
 	if ( waitCommand( cmd, 12, "get bwA") ) {
-		if ((p = replystr.rfind("@RMF")) != string::npos) {
-			if ( p != string::npos)
+		if ((p = replystr.rfind("@RMF")) != std::string::npos) {
+			if ( p != std::string::npos)
 				w = atol(&replystr[p+4]);
 			bwA = 0;
 			while ( (RIG_TT599w[bwA] < w)  &&
@@ -278,8 +278,8 @@ int RIG_TT599::get_bwB()
 	size_t p;
 	cmd = "?RMF\r";
 	if ( waitCommand( cmd, 12, "get bwB") ) {
-		if ((p = replystr.rfind("@RMF")) != string::npos) {
-			if ( p != string::npos)
+		if ((p = replystr.rfind("@RMF")) != std::string::npos) {
+			if ( p != std::string::npos)
 				w = atol(&replystr[p+4]);
 			bwB = 0;
 			while ( (RIG_TT599w[bwB] < w)  &&
@@ -318,7 +318,7 @@ int RIG_TT599::get_preamp()
 	size_t p;
 	cmd = "?RME\r";
 	if ( waitCommand( cmd, 6, "get preamp") ) {
-		if ((p = replystr.rfind("@RME")) != string::npos)
+		if ((p = replystr.rfind("@RME")) != std::string::npos)
 			return replystr[p+4] - '0';
 	}
 	return 0;
@@ -341,7 +341,7 @@ double  RIG_TT599::get_power_control(void)
 	size_t p;
 	cmd = "?TP\r";
 	if ( waitCommand( cmd, 6, "get power control") ) {
-		if ((p = replystr.rfind("@TP")) != string::npos) {
+		if ((p = replystr.rfind("@TP")) != std::string::npos) {
 			int pwr = atol(&replystr[p+3]);
 			return pwr;
 		}
@@ -364,7 +364,7 @@ int  RIG_TT599::get_auto_notch()
 	cmd = "?RMNA\r";
 	sendCommand(cmd);
 	if ( waitCommand( cmd, 7, "get auto notch") ) {
-		if (replystr.rfind("@RMNA1") == string::npos) return 0;
+		if (replystr.rfind("@RMNA1") == std::string::npos) return 0;
 	}
 	return 1;
 }
@@ -381,7 +381,7 @@ int  RIG_TT599::get_attenuator()
 	size_t p;
 	cmd = "?RMT\r";
 	if ( waitCommand( cmd, 6, "get attenuator") ) {
-		if ((p = replystr.rfind("@RMT1")) != string::npos) return 1;
+		if ((p = replystr.rfind("@RMT1")) != std::string::npos) return 1;
 	}
 	return 0;
 }
@@ -400,7 +400,7 @@ int  RIG_TT599::get_smeter()
 	int dbm = 0;
 	cmd = "?S\r";
 	if ( waitCommand( cmd, 20, "get smeter") ) {
-		if ((p = replystr.rfind("@SRM")) != string::npos) dbm = atoi(&replystr[p+4]);
+		if ((p = replystr.rfind("@SRM")) != std::string::npos) dbm = atoi(&replystr[p+4]);
 	}
 	return 5 * dbm / 6;
 }
@@ -422,10 +422,10 @@ int  RIG_TT599::get_power_out()
 	fwdpwr = 0; refpwr = 0;
 	cmd = "?S\r";
 	if ( waitCommand( cmd, 20, "get smeter") ) {
-		if ((p = replystr.rfind ("@STF")) != string::npos) {
+		if ((p = replystr.rfind ("@STF")) != std::string::npos) {
 			fwdpwr = atol(&replystr[p+4]);
 			p = replystr.find("R", p+4);
-			if (p != string::npos)
+			if (p != std::string::npos)
 				refpwr = atol(&replystr[p+1]);
 		}
 	}
@@ -437,7 +437,7 @@ int RIG_TT599::get_split()
 	cmd = "?KV\r";
 	if ( waitCommand( cmd, 7, "get split") ) {
 		size_t p = replystr.find("@KVAA");
-		if ((p != string::npos) && (replystr[p+5] == 'B')) split = 1;
+		if ((p != std::string::npos) && (replystr[p+5] == 'B')) split = 1;
 		else split = 0;
 	}
 	return split;
@@ -458,7 +458,7 @@ int  RIG_TT599::get_noise_reduction_val()
 
 	if ( waitCommand( cmd, 7, "get noise_reduction_value") ) {
 		size_t p = replystr.rfind("@RMNN");
-		if (p == string::npos) return val;
+		if (p == std::string::npos) return val;
 		val = atol(&replystr[p+5]);
 	}
 	return val;

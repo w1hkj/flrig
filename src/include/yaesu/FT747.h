@@ -49,7 +49,7 @@ public:
 
 	bool get_info();
 
-	bool snd_cmd(string cmd, size_t n);
+	bool snd_cmd(std::string cmd, size_t n);
 
 	void set_PTT_control(int val);
 	int  get_PTT_control();

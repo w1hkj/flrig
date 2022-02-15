@@ -126,8 +126,8 @@ private:
 	int fcHeight;
 	int W;
 
-	void DecFreq(int n);
-	void IncFreq(int n);
+	void DecFreq(size_t n);
+	void IncFreq(size_t n);
 	int (*cbFunc)();
 	static void freq_input_cb(Fl_Widget* input, void* arg);
 protected:

@@ -42,8 +42,8 @@
 #include "rigs.h"
 #include "KX3_ui.h"
 
-extern queue<XCVR_STATE> queA;
-extern queue<XCVR_STATE> queB;
+extern std::queue<XCVR_STATE> queA;
+extern std::queue<XCVR_STATE> queB;
 
 void read_KX3_vfo()
 {
@@ -51,13 +51,13 @@ void read_KX3_vfo()
 	freq = selrig->get_vfoA();
 	if (freq != vfoA.freq) {
 		vfoA.freq = freq;
-		Fl::awake(setFreqDispA, (void *)vfoA.freq);
+		Fl::awake(setFreqDispA);
 		vfo = &vfoA;
 	}
 	freq = selrig->get_vfoB();
 	if (freq != vfoB.freq) {
 		vfoB.freq = freq;
-		Fl::awake(setFreqDispB, (void *)vfoB.freq);
+		Fl::awake(setFreqDispB);
 	}
 }
 

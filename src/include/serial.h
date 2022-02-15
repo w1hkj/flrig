@@ -27,8 +27,6 @@
 
 #include <string>
 
-using namespace std;
-
 #ifndef __WIN32__
 
 #include <termios.h>
@@ -40,7 +38,7 @@ public:
 
 //Methods
 	bool OpenPort();
-	bool CheckPort(string);
+	bool CheckPort(std::string);
 
 	bool IsOpen() { return fd < 0 ? 0 : 1; };
 	void ClosePort();
@@ -141,7 +139,7 @@ public:
 //Methods
 	bool OpenPort();
 	bool IsOpen();
-	bool CheckPort(string);
+	bool CheckPort(std::string);
 	void ClosePort();
 	bool ConfigurePort(DWORD BaudRate,BYTE ByteSize,DWORD fParity,BYTE  Parity,BYTE StopBits);
 

@@ -220,7 +220,7 @@ unsigned long int RIG_TT588::get_vfoA ()
          the wf to change freq. up and down.)
         */
 		size_t p = replystr.rfind("A");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			int f = 0;
 			for (size_t n = 1; n < 5; n++)
 				f = f*256 + (unsigned char)replystr[n];
@@ -251,7 +251,7 @@ unsigned long int RIG_TT588::get_vfoB()
 	int ret = waitN(6, 100, "get vfo B");
 	if (ret >= 6) {
 		size_t p = replystr.rfind("B");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			int f = 0;
 			for (size_t n = 1; n < 5; n++)
 				f = f*256 + (unsigned char)replystr[n];
@@ -307,7 +307,7 @@ int RIG_TT588::get_modeA()
 	int ret = waitN(4, 100, "get mode A");
 	if (ret < 4) return modeA;
 	size_t p = replystr.rfind("M");
-	if (p == string::npos) return modeA;
+	if (p == std::string::npos) return modeA;
 	modeA = replystr[p + 1] - '0';
 	return modeA;
 }
@@ -318,7 +318,7 @@ int RIG_TT588::get_modeB()
 	int ret = waitN(4, 100, "get mode B");
 	if (ret < 4) return modeB;
 	size_t p = replystr.rfind("M");
-	if (p == string::npos) return modeB;
+	if (p == std::string::npos) return modeB;
 	modeB = replystr[p + 2] - '0';
 	return modeB;
 }
@@ -354,7 +354,7 @@ int RIG_TT588::get_bwA()
 	int ret = waitN(3, 100, "get BW A");
 	if (ret < 3) return 37 - bwA;
 	size_t p = replystr.rfind("W");
-	if (p == string::npos) return 37 - bwA;
+	if (p == std::string::npos) return 37 - bwA;
 	bwA = (int)(replystr[p + 1] & 0x7F);
 	return 37 - bwA;
 }
@@ -365,7 +365,7 @@ int RIG_TT588::get_bwB()
 	int ret = waitN(3, 100, "get BW B");
 	if (ret < 3) return 37 - bwB;
 	size_t p = replystr.rfind("W");
-	if (p == string::npos) return 37 - bwB;
+	if (p == std::string::npos) return 37 - bwB;
 	bwB = (int)(replystr[p + 1] & 0x7F);
 	return 37 - bwB;
 }
@@ -406,7 +406,7 @@ bool RIG_TT588::get_if_shift(int &val)
 	val = pbt;
 	if (ret >= 4) {
 		size_t p = replystr.rfind("P");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			val = ((replystr[p + 1] & 0xFF) << 8) | (replystr[p+2] & 0xFF);
 			if (val > 0x7FFF) val -= 0x10000;
 		}
@@ -456,7 +456,7 @@ int RIG_TT588::get_attenuator()
 	int val = atten_level;
 	if (ret >= 3) {
 		size_t p = replystr.rfind("J");
-		if (p != string::npos) val = (replystr[p + 1] - '0');
+		if (p != std::string::npos) val = (replystr[p + 1] - '0');
 	}
 	if (atten_level != val) atten_level = val;
 	switch (atten_level) {
@@ -476,7 +476,7 @@ int RIG_TT588::get_smeter()
 	int ret = waitN(6, 100, "get smeter");
 	if (ret < 6) return sval;
 	size_t p = replystr.rfind("S");
-	if (p == string::npos) return sval;
+	if (p == std::string::npos) return sval;
 
 	sscanf(&replystr[p + 1], "%4x", &sval);
 	fval = sval/256.0;
@@ -491,7 +491,7 @@ int RIG_TT588::get_volume_control()
 	int ret = waitN(3, 100, "get vol");
 	if (ret < 3) return progStatus.volume;
 	size_t p = replystr.rfind("U");
-	if (p == string::npos) return progStatus.volume;
+	if (p == std::string::npos) return progStatus.volume;
 
 	return (int)((replystr[p + 1] & 0x7F) / 1.27);
 }
@@ -518,7 +518,7 @@ int  RIG_TT588::get_rf_gain()
 	int ret = waitN(3, 100, "get rfgain");
 	if (ret < 3) return 100;
 	size_t p = replystr.rfind("I");
-	if (p == string::npos) return 100;
+	if (p == std::string::npos) return 100;
 	return (int)((replystr[p+1] & 0x7F) / 1.27);
 }
 
@@ -544,7 +544,7 @@ int RIG_TT588::get_power_out()
 	int ret = waitN(4, 100, "get pout");
 	if (ret < 4) return 0;
 	size_t p = replystr.rfind("F");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	fwdpwr = replystr[p + 1] & 0x7F;
 	refpwr = replystr[p + 2] & 0x7F;
     // it looks like it never returns reflected power < 1
@@ -576,7 +576,7 @@ int  RIG_TT588::get_squelch()
 	int ret = waitN(3, 100, "get sql");
 	if (ret < 3) return 0;
 	size_t p = replystr.rfind("H");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	return (int)((replystr[p+1] & 0x7F) / 1.27);
 }
 
@@ -601,7 +601,7 @@ int  RIG_TT588::get_noise()
 	int ret = waitN(5, 100, "get NB");
 	if (ret < 5) return nb_;
 	size_t p = replystr.rfind("K");
-	if (p == string::npos) return nb_;
+	if (p == std::string::npos) return nb_;
 	int val = replystr[p+1];
 	if (nb_ != val) nb_ = val;
 	static char nblabel[] = "NB ";
@@ -633,7 +633,7 @@ int  RIG_TT588::get_auto_notch()
 	int val = an_;
 	if (ret >= 5) {
 		size_t p = replystr.rfind("K");
-		if (p != string::npos) val = replystr[p+3];
+		if (p != std::string::npos) val = replystr[p+3];
 	}
 	if (an_ != val) an_ = val;
 	static char anlabel[] = "AN ";

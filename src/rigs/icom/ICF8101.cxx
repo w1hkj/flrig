@@ -265,7 +265,7 @@ void RIG_ICF8101::selectB()
 
 bool RIG_ICF8101::check ()
 {
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
 	cmd += '\x03';
@@ -278,14 +278,14 @@ bool RIG_ICF8101::check ()
 unsigned long int RIG_ICF8101::get_vfoA ()
 {
 	if (inuse == onB) return A.freq;
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
 	if (waitFOR(11, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
 	get_trace(2, "get_vfoA()", str2hex(replystr.c_str(), replystr.length()));
@@ -307,14 +307,14 @@ void RIG_ICF8101::set_vfoA (unsigned long int freq)
 unsigned long int RIG_ICF8101::get_vfoB ()
 {
 	if (inuse == onA) return B.freq;
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
 	if (waitFOR(11, "get vfo B")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
 	get_trace(2, "get_vfoB()", str2hex(replystr.c_str(), replystr.length()));
@@ -357,12 +357,12 @@ int RIG_ICF8101::get_PTT()
 {
 	cmd = pre_to;
 	cmd.append("\x1A\x37");
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp.append("\x1A\x37");
 	cmd.append(post);
 	if (waitFOR(9, "get PTT")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			ptt_ = (replystr[p + 7] == 0x02);
 	}
 	return ptt_;
@@ -370,7 +370,7 @@ int RIG_ICF8101::get_PTT()
 
 // Volume control val 0 ... 100
 struct VOL_TBL {
-	string catval;
+	std::string catval;
 	int vol;
 } vol_tbl[] = {
 {"\x00\x00", 0},
@@ -403,15 +403,15 @@ void RIG_ICF8101::set_volume_control(int val)
 int RIG_ICF8101::get_volume_control()
 {
 	int val = progStatus.volume;
-	string cstr = "\x14\x01";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x01";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(9, "get vol")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			resp = resp.substr(6, 2);
 			if (resp[0] == '\x00' && resp[1] == '\x00') {
 				val = 0;
@@ -455,8 +455,8 @@ static smtr_map sm_map[] = {
 
 int RIG_ICF8101::get_smeter()
 {
-	string cstr = "\x1A\x08";
-	string resp = pre_fm;
+	std::string cstr = "\x1A\x08";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
@@ -467,7 +467,7 @@ int RIG_ICF8101::get_smeter()
 	else if (n == 1) n = 0;
 	if (waitFOR(9, "get smeter")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			int val = fm_bcd(replystr.substr(p+6), 3);
 			if (val <= sm_map[0].sig[n]) mtr = 0;
 			else {
@@ -499,8 +499,8 @@ static mtr_map pwr_map[] = {
 
 int RIG_ICF8101::get_power_out(void)
 {
-	string cstr = "\x15\x11";
-	string resp = pre_fm;
+	std::string cstr = "\x15\x11";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
@@ -508,7 +508,7 @@ int RIG_ICF8101::get_power_out(void)
 	int mtr = 0;
 	if (waitFOR(9, "get power out")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			int val = fm_bcd(replystr.substr(p+6), 3);
 			size_t i = 0;
 			if (val < 0) val = 0;
@@ -531,7 +531,7 @@ int  RIG_ICF8101::get_agc()
 	cmd.append(post);
 	if (waitFOR(11, "get AGC")) {
 		size_t p = replystr.find(pre_fm);
-		if (p == string::npos) return agcval;
+		if (p == std::string::npos) return agcval;
 		return (agcval = replystr[p+9]); // 0 = off, 1 = FAST, 2 = SLOW, 3 = AUTO
 	}
 	return agcval;
@@ -580,15 +580,15 @@ void RIG_ICF8101::set_power_control(double val)
 
 double RIG_ICF8101::get_power_control()
 {
-	string cstr = "\x1A\x05\x03\x07";
-	string resp = pre_fm;
+	std::string cstr = "\x1A\x05\x03\x07";
+	std::string resp = pre_fm;
 	cmd = pre_to;
 	cmd.append(cstr).append(post);
 	resp.append(cstr);
 	int val = progStatus.power_level;
 	if (waitFOR(11, "get power")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			val = replystr[p+9];
 	}
 	return (progStatus.power_level = val);
@@ -596,8 +596,8 @@ double RIG_ICF8101::get_power_control()
 
 int RIG_ICF8101::get_mic_gain()
 {
-	string cstr = "\x1A\x05\x03\x11";
-	string resp = pre_fm;
+	std::string cstr = "\x1A\x05\x03\x11";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
@@ -605,7 +605,7 @@ int RIG_ICF8101::get_mic_gain()
 	int val = progStatus.mic_gain;
 	if (waitFOR(11, "get mic")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			val = replystr[p+9];
 			if (val == '\x0A') val = 10;
 		}
@@ -630,7 +630,7 @@ int RIG_ICF8101::get_modeA()
 	int md = A.imode;
 	int val = 0;
 
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp.append("\x1A\x34");
 	cmd = pre_to;
 	cmd.append("\x1A\x34");
@@ -638,7 +638,7 @@ int RIG_ICF8101::get_modeA()
 
 	if (waitFOR(9, "get mode A")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			val = replystr[p + 7];
 			for (int i = 0; i < NUM_MODES; i++)
 				if (val == mdval[i]) {
@@ -669,7 +669,7 @@ int RIG_ICF8101::get_modeB()
 	int md = B.imode;
 	int val = 0;
 
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp.append("\x1A\x34");
 	cmd = pre_to;
 	cmd.append("\x1A\x34");
@@ -677,7 +677,7 @@ int RIG_ICF8101::get_modeB()
 
 	if (waitFOR(9, "get mode B")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			val = replystr[p + 7];
 			for (int i = 0; i < NUM_MODES; i++)
 				if (val == mdval[i]) {
@@ -729,9 +729,9 @@ void RIG_ICF8101::set_split(bool val)
 // F8101 does not respond to get split CAT command
 int RIG_ICF8101::get_split()
 {
-	string cstr = "\x1A\x05\x03\x17";
+	std::string cstr = "\x1A\x05\x03\x17";
 	cstr += '\x00';
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp.append(cstr);
 
 	cmd = pre_to;
@@ -741,7 +741,7 @@ int RIG_ICF8101::get_split()
 	int mtr= -1;
 	if (waitFOR(11, "get split")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			mtr = replystr[p+9];
 			if (mtr == 0x01) split = 1;
 		}
@@ -764,15 +764,15 @@ void RIG_ICF8101::set_noise(bool val)
 int RIG_ICF8101::get_noise()
 {
 	int val = progStatus.noise;
-	string cstr = "\x1A\x05\x03\x01";
-	string resp = pre_fm;
+	std::string cstr = "\x1A\x05\x03\x01";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(11, "get noise blanker")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			val = replystr[p+9];
 		}
 	}
@@ -794,15 +794,15 @@ void RIG_ICF8101::set_nb_level(int val)
 int  RIG_ICF8101::get_nb_level()
 {
 	int val = progStatus.nb_level;
-	string cstr = "\x1A\x05\x03\x02";
-	string resp = pre_fm;
+	std::string cstr = "\x1A\x05\x03\x02";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(11, "get NB level")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			for (int i = 0; i < 16; i++) {
 				if (replystr[p+9] == bcdval[i]) {
 					val = i;
@@ -849,15 +849,15 @@ void RIG_ICF8101::set_preamp(int val)
 
 int RIG_ICF8101::get_preamp()
 {
-	string cstr = "\x1A\x05\x03\x05";
-	string resp = pre_fm;
+	std::string cstr = "\x1A\x05\x03\x05";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(11, "get Pre")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			switch (replystr[p+9]) {
 			case 0:
 				preamp_label("PRE", false);
@@ -911,7 +911,7 @@ void RIG_ICF8101::get_compression(int &on, int &val)
 	cmd.append(post);
 	if (waitFOR(11, "get comp on/off")) {
 		size_t p = replystr.find(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			on = (replystr[p+9] == 0x01);
 	}
 	get_trace(2, "get_speech_comp_on_off()", str2hex(replystr.c_str(), replystr.length()));
@@ -921,7 +921,7 @@ void RIG_ICF8101::get_compression(int &on, int &val)
 
 	if (waitFOR(11, "get compression level")) {
 		size_t p = replystr.find(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			for (int i = 0; i < 11; i++) {
 				if (replystr[p+9] == bcdval[i]) {
 					val = i;
@@ -992,7 +992,7 @@ void RIG_ICF8101::get_compression(int &on, int &val)
 
 std::string RIG_ICF8101::get_BANDWIDTHS()
 {
-	stringstream s;
+	std::stringstream s;
 	for (int i = 0; i < NUM_MODES; i++)
 		s << mode_bwA[i] << " ";
 	for (int i = 0; i < NUM_MODES; i++)
@@ -1002,7 +1002,7 @@ std::string RIG_ICF8101::get_BANDWIDTHS()
 
 void RIG_ICF8101::set_BANDWIDTHS(std::string s)
 {
-	stringstream strm;
+	std::stringstream strm;
 	strm << s;
 	for (int i = 0; i < NUM_MODES; i++)
 		strm >> mode_bwA[i];
@@ -1157,7 +1157,7 @@ void RIG_ICF8101::set_bwB(int val)
 int  RIG_ICF8101::get_BW(int m)
 {
 	cmd = pre_to;
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	switch (m) {
 		case F81_AM:
 			cmd.append("\x1A\x05\x10\x02");
@@ -1209,7 +1209,7 @@ int  RIG_ICF8101::get_BW(int m)
 	if (waitFOR(11, "get BW")) {
 		get_trace(2, "get_bwA()", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			bwval = replystr[p+9];
 			const char *vals = ICF8101_CW_SSB_width_vals;
 			int n = NUM_CW_SSB_WIDTHS;

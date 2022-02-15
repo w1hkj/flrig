@@ -50,9 +50,9 @@
 #include "cwioUI.h"
 #include "ptt.h"
 
+// The server
 using namespace XmlRpc;
 
-// The server
 XmlRpcServer rig_server;
 
 //------------------------------------------------------------------------------
@@ -66,7 +66,7 @@ public:
 		result = FLRIG_VERSION;
 	}
 
-	std::string help() { return std::string("returns program version string"); }
+	std::string help() { return std::string("returns program version std::string"); }
 
 } main_get_version(&rig_server);
 
@@ -91,37 +91,37 @@ public:
 //------------------------------------------------------------------------------
 // Request for info
 //------------------------------------------------------------------------------
-string uname;
-string ufreq;
-string umode;
-string unotch;
-string ubw;
-string utx;
-string urfg;
-string uvol;
-string umic;
+std::string uname;
+std::string ufreq;
+std::string umode;
+std::string unotch;
+std::string ubw;
+std::string utx;
+std::string urfg;
+std::string uvol;
+std::string umic;
 
-static string sname()
+static std::string sname()
 {
-	string temp;
+	std::string temp;
 	temp.assign("R:").append(selrig->name_).append("\n");
 	return temp;
 }
 
-static string stx()
+static std::string stx()
 {
-	string temp;
+	std::string temp;
 	temp.assign("T:").append(btnPTT->value() ? "X" : "R").append("\n");
 	return temp;
 }
 
-static string tempfreq;
-static string tempmode;
-static string tempbw;
+static std::string tempfreq;
+static std::string tempmode;
+static std::string tempbw;
 
 static void freq_mode_bw()
 {
-	string temp;
+	std::string temp;
 	int freq = 0;
 	int mode = 0;
 	int BW = 0;
@@ -146,18 +146,18 @@ static void freq_mode_bw()
 						"").append("\n");
 }
 
-static string snotch()
+static std::string snotch()
 {
-	string temp;
+	std::string temp;
 	static char szval[20];
 	snprintf(szval, sizeof(szval), "%d", (int)(progStatus.notch_val));
 	temp.assign("N:").append(szval).append("\n");
 	return temp;
 }
 
-static string svol()
+static std::string svol()
 {
-	string temp;
+	std::string temp;
 	static char szval[20];
 	int volval = 0;
 	if (spnrVOLUME) volval = spnrVOLUME->value();
@@ -167,9 +167,9 @@ static string svol()
 	return temp;
 }
 
-static string srfg()
+static std::string srfg()
 {
-	string temp;
+	std::string temp;
 	static char szval[20];
 	int rfgval = 0;
 	if (spnrRFGAIN) rfgval = spnrRFGAIN->value();
@@ -179,9 +179,9 @@ static string srfg()
 	return temp;
 }
 
-static string smic()
+static std::string smic()
 {
-	string temp;
+	std::string temp;
 	static char szval[20];
 	int micval = 0;
 	if (sldrMICGAIN) micval = sldrMICGAIN->value();
@@ -196,7 +196,7 @@ public:
 	rig_get_info(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_info", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		string info = "";
+		std::string info = "";
 
 		if (!xcvr_online || disable_xmlrpc->value()) {
 			result = info;
@@ -218,7 +218,7 @@ public:
 
 	}
 
-	std::string help() { return std::string("returns all info in single string"); }
+	std::string help() { return std::string("returns all info in single std::string"); }
 
 } rig_get_info(&rig_server);
 
@@ -227,8 +227,8 @@ public:
 	rig_get_update(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_update", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		string info;  info.clear();
-		string temp;  temp.clear();
+		std::string info;  info.clear();
+		std::string temp;  temp.clear();
 
 		if (!xcvr_online || disable_xmlrpc->value()) {
 			result = info;
@@ -264,7 +264,7 @@ public:
 
 	}
 
-	std::string help() { return std::string("returns all updates in single string"); }
+	std::string help() { return std::string("returns all updates in single std::string"); }
 
 } rig_get_update(&rig_server);
 
@@ -380,7 +380,7 @@ public:
 		guard_lock serial(&mutex_serial);
 
 		vfoA.freq = selrig->get_vfoA();
-		Fl::awake(setFreqDispA, (void *)vfoA.freq);
+		Fl::awake(setFreqDispA);
 
 		static char szfreq[20];
 		snprintf(szfreq, sizeof(szfreq), "%d", (int)vfoA.freq);
@@ -409,7 +409,7 @@ public:
 		guard_lock serial(&mutex_serial);
 
 		vfoB.freq = selrig->get_vfoB();
-		Fl::awake(setFreqDispB, (void *)vfoB.freq);
+		Fl::awake(setFreqDispB);
 
 		static char szfreq[20];
 		snprintf(szfreq, sizeof(szfreq), "%d", (int)vfoB.freq);
@@ -1384,8 +1384,8 @@ public:
 #include <queue>
 #include "rigbase.h"
 
-extern queue<VFOQUEUE> srvc_reqs;
-extern queue<bool> quePTT;
+extern std::queue<VFOQUEUE> srvc_reqs;
+extern std::queue<bool> quePTT;
 
 extern XCVR_STATE vfoA;
 extern XCVR_STATE vfoB;
@@ -1393,7 +1393,7 @@ extern XCVR_STATE vfoB;
 std::string print(int f, int m, int b)
 {
 	static std::ostringstream p;
-	p.seekp(ios::beg);
+	p.seekp(std::ios::beg);
 	if (b > 65536) b /= 65536;
 	p << "freq: " << f << ", imode: " << m << ", bw " << b;
 	return p.str();
@@ -1536,7 +1536,7 @@ public:
 				get = rigPTT();
 			}
 			PTT = get;
-			stringstream s;
+			std::stringstream s;
 			s << "ptt returned " << get << " in " << cnt * 10 << " msec";
 			xml_trace(1, s.str().c_str());
 			Fl::awake(update_UI_PTT);
@@ -1833,7 +1833,7 @@ public:
 			selrig->set_vfoA(vfoA.freq);
 		}
 
-		Fl::awake(setFreqDispA, (void *)vfoA.freq);
+		Fl::awake(setFreqDispA);
 
 	}
 	std::string help() { return std::string("rig.set_vfo NNNNNNNN (Hz)"); }
@@ -1863,7 +1863,7 @@ public:
 			vfoA.freq = selrig->get_vfoA();
 		}
 
-		Fl::awake(setFreqDispA, (void *)vfoA.freq);
+		Fl::awake(setFreqDispA);
 	}
 	std::string help() { return std::string("rig.set_verify_vfo NNNNNNNN (Hz)"); }
 
@@ -1892,7 +1892,7 @@ public:
 			selrig->set_vfoA(vfoA.freq);
 		}
 
-		Fl::awake(setFreqDispA, (void *)vfoA.freq);
+		Fl::awake(setFreqDispA);
 	}
 	std::string help() { return std::string("deprecated; use rig.set_vfoA"); }
 
@@ -1921,7 +1921,7 @@ public:
 			selrig->set_vfoA(vfoA.freq);
 		}
 
-		Fl::awake(setFreqDispA, (void *)vfoA.freq);
+		Fl::awake(setFreqDispA);
 
 	}
 	std::string help() { return std::string("rig.mod_vfo +/- NNN (Hz)"); }
@@ -1955,7 +1955,7 @@ public:
 			vfoB.freq = freq;
 		}
 
-		Fl::awake(setFreqDispB, (void *)vfoB.freq);
+		Fl::awake(setFreqDispB);
 	}
 	std::string help() { return std::string("rig.set_vfo NNNNNNNN (Hz)"); }
 
@@ -1984,7 +1984,7 @@ public:
 			vfoB.freq = selrig->get_vfoB();
 		}
 
-		Fl::awake(setFreqDispB, (void *)vfoB.freq);
+		Fl::awake(setFreqDispB);
 	}
 	std::string help() { return std::string("rig.set_verify_vfo NNNNNNNN (Hz)"); }
 
@@ -2013,7 +2013,7 @@ public:
 			vfoB.freq = freq;
 		}
 
-		Fl::awake(setFreqDispB, (void *)vfoB.freq);
+		Fl::awake(setFreqDispB);
 	}
 	std::string help() { return std::string("deprecated; use rig.set_vfoB"); }
 
@@ -2042,7 +2042,7 @@ public:
 			vfoB.freq += freq;
 		}
 
-		Fl::awake(setFreqDispB, (void *)vfoB.freq);
+		Fl::awake(setFreqDispB);
 
 	}
 	std::string help() { return std::string("rig.mod_vfoB +/- NNN (Hz)"); }
@@ -2071,7 +2071,7 @@ public:
 		selrig->set_vfoB(vfoB.freq);
 		selrig->set_modeB(vfoB.imode);
 
-		Fl::awake(setFreqDispB, (void *)vfoB.freq);
+		Fl::awake(setFreqDispB);
 
 	}
 	std::string help() { return std::string("sets vfoB to vfoA freq/mode"); }
@@ -2098,7 +2098,7 @@ public:
 
 		selrig->set_vfoB(vfoB.freq);
 
-		Fl::awake(setFreqDispB, (void *)vfoB.freq);
+		Fl::awake(setFreqDispB);
 
 	}
 	std::string help() { return std::string("sets freqB to freqA"); }
@@ -2149,11 +2149,11 @@ public:
 		if (selrig->inuse == onB) {
 			selrig->set_vfoB(freq);
 			vfoB.freq = freq;
-			Fl::awake(setFreqDispB, (void *)vfoB.freq);
+			Fl::awake(setFreqDispB);
 		}else {
 			selrig->set_vfoA(freq);
 			vfoA.freq = freq;
-			Fl::awake(setFreqDispA, (void *)vfoA.freq);
+			Fl::awake(setFreqDispA);
 		}
 
 	}
@@ -2176,11 +2176,11 @@ public:
 		if (selrig->inuse == onB) {
 			selrig->set_vfoB(freq);
 			vfoB.freq = selrig->get_vfoB();
-			Fl::awake(setFreqDispB, (void *)vfoB.freq);
+			Fl::awake(setFreqDispB);
 		}else {
 			selrig->set_vfoA(freq);
 			vfoA.freq = selrig->get_vfoA();
-			Fl::awake(setFreqDispA, (void *)vfoA.freq);
+			Fl::awake(setFreqDispA);
 		}
 
 	}
@@ -2204,11 +2204,11 @@ public:
 		if (selrig->inuse == onB) {
 			selrig->set_vfoB(freq);
 			vfoB.freq = freq;
-			Fl::awake(setFreqDispB, (void *)vfoB.freq);
+			Fl::awake(setFreqDispB);
 		}else {
 			selrig->set_vfoA(freq);
 			vfoA.freq = freq;
-			Fl::awake(setFreqDispA, (void *)vfoA.freq);
+			Fl::awake(setFreqDispA);
 		}
 
 	}
@@ -2231,11 +2231,11 @@ public:
 		if (selrig->inuse == onB) {
 			selrig->set_vfoB(freq);
 			vfoB.freq = freq;
-			Fl::awake(setFreqDispB, (void *)vfoB.freq);
+			Fl::awake(setFreqDispB);
 		}else {
 			selrig->set_vfoA(freq);
 			vfoA.freq = freq;
-			Fl::awake(setFreqDispA, (void *)vfoA.freq);
+			Fl::awake(setFreqDispA);
 		}
 
 		result = 1;
@@ -2259,11 +2259,11 @@ public:
 		if (selrig->inuse == onB) {
 			selrig->set_vfoB(freq);
 			vfoB.freq = selrig->get_vfoB();
-			Fl::awake(setFreqDispB, (void *)vfoB.freq);
+			Fl::awake(setFreqDispB);
 		}else {
 			selrig->set_vfoA(freq);
 			vfoA.freq = selrig->get_vfoA();
-			Fl::awake(setFreqDispA, (void *)vfoA.freq);
+			Fl::awake(setFreqDispA);
 		}
 
 		result = 1;
@@ -2291,7 +2291,7 @@ public:
 		nuvals.imode = -1;
 		nuvals.iBW = 255;
 
-		std::string numode = (string)params[0];
+		std::string numode = (std::string)params[0];
 		int i = 0;
 
 		if (!selrig->modes_) {
@@ -2337,7 +2337,7 @@ public:
 		nuvals.imode = -1;
 		nuvals.iBW = 255;
 
-		std::string numode = (string)params[0];
+		std::string numode = (std::string)params[0];
 		int i = 0;
 
 		if (!selrig->modes_) {
@@ -2389,7 +2389,7 @@ public:
 		nuvals.imode = -1;
 		nuvals.iBW = 255;
 
-		std::string numode = (string)params[0];
+		std::string numode = (std::string)params[0];
 		int i = 0;
 
 		if (!selrig->modes_) {
@@ -2431,7 +2431,7 @@ public:
 		nuvals.imode = -1;
 		nuvals.iBW = 255;
 
-		std::string numode = (string)params[0];
+		std::string numode = (std::string)params[0];
 		int i = 0;
 
 		if (!selrig->modes_) {
@@ -2476,7 +2476,7 @@ public:
 		nuvals.imode = -1;
 		nuvals.iBW = 255;
 
-		std::string numode = (string)params[0];
+		std::string numode = (std::string)params[0];
 		int i = 0;
 
 		if (!selrig->modes_) {
@@ -2517,7 +2517,7 @@ public:
 		nuvals.imode = -1;
 		nuvals.iBW = 255;
 
-		std::string numode = (string)params[0];
+		std::string numode = (std::string)params[0];
 		int i = 0;
 
 		if (!selrig->modes_) {
@@ -2567,7 +2567,7 @@ public:
 		if (!selrig->bandwidths_[i]) i--;
 		bw = atol(selrig->bandwidths_[i]);
 
-		ostringstream s;
+		std::ostringstream s;
 		s << "nearest bandwidth " << selrig->bandwidths_[i];
 		xml_trace(2,"Set to ", s.str().c_str());
 
@@ -2609,7 +2609,7 @@ public:
 		if (!selrig->bandwidths_[i]) i--;
 		bw = atol(selrig->bandwidths_[i]);
 
-		ostringstream s;
+		std::ostringstream s;
 		s << "nearest bandwidth " << selrig->bandwidths_[i];
 		xml_trace(2,"Set to ", s.str().c_str());
 
@@ -2673,7 +2673,7 @@ public:
 			result = 0;
 			return;
 		}
-		string bwstr = params;
+		std::string bwstr = params;
 
 		int bw = (int)params[0];
 		guard_lock que_lock ( &mutex_srvc_reqs, "xml rig_set_verify_bw" );
@@ -2707,7 +2707,7 @@ public:
 			result = 0;
 			return;
 		}
-		string bwstr = params;
+		std::string bwstr = params;
 
 		int bw = (int)params[0];
 		guard_lock que_lock ( &mutex_srvc_reqs, "xml rig_set_BW" );
@@ -2747,7 +2747,7 @@ public:
 			result = 0;
 			return;
 		}
-		string bwstr = params;
+		std::string bwstr = params;
 
 		int bw = (int)params[0];
 		guard_lock que_lock ( &mutex_srvc_reqs, "xml rig_set_BW" );
@@ -2824,7 +2824,7 @@ public:
 		if (!widths[i]) i--;
 		bw = atol(widths[i]);
 
-		ostringstream s;
+		std::ostringstream s;
 		s << "nearest bandwidth " << widths[i];
 		xml_trace(2,"Set to ", s.str().c_str());
 
@@ -2856,11 +2856,11 @@ public:
 		if (command.empty()) return;
 
 		std::string cmd = "";
-		if (command.find("x") != string::npos) { // hex strings
+		if (command.find("x") != std::string::npos) { // hex std::strings
 			size_t p = 0;
 			unsigned int val;
 			usehex = true;
-			while (( p = command.find("x", p)) != string::npos) {
+			while (( p = command.find("x", p)) != std::string::npos) {
 				sscanf(&command[p+1], "%x", &val);
 				cmd += (unsigned char) val;
 				p += 3;
@@ -2888,7 +2888,7 @@ public:
 		xml_trace(2, "xmlrpc command:", command.c_str());
 	}
 
-	std::string help() { return std::string("sends xmlrpc CAT string to xcvr"); }
+	std::string help() { return std::string("sends xmlrpc CAT std::string to xcvr"); }
 
 } rig_cat_string(&rig_server);
 
@@ -2905,10 +2905,10 @@ public:
 		if (command.empty()) return;
 
 		std::string cmd = "";
-		if (command.find("x") != string::npos) { // hex strings
+		if (command.find("x") != std::string::npos) { // hex std::strings
 			size_t p = 0;
 			unsigned int val;
-			while (( p = command.find("x", p)) != string::npos) {
+			while (( p = command.find("x", p)) != std::string::npos) {
 				sscanf(&command[p+1], "%x", &val);
 				cmd += (unsigned char) val;
 				p += 3;
@@ -2925,7 +2925,7 @@ public:
 		return;
 	}
 
-	std::string help() { return std::string("sends xmlrpc priority CAT string to xcvr"); }
+	std::string help() { return std::string("sends xmlrpc priority CAT std::string to xcvr"); }
 
 } rig_cat_priority(&rig_server);
 
@@ -2984,7 +2984,7 @@ public:
 
 
 //------------------------------------------------------------------------------
-// Set cwio transmit string
+// Set cwio transmit std::string
 //------------------------------------------------------------------------------
 
 class rig_cwio_text : public XmlRpcServerMethod {
@@ -2992,7 +2992,7 @@ public:
 	rig_cwio_text(XmlRpcServer* s) : XmlRpcServerMethod("rig.cwio_text", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		std::string s = (string)params[0];
+		std::string s = (std::string)params[0];
 		guard_lock lck(&cwio_text_mutex);
 		add_cwio(s);
 	}
@@ -3002,18 +3002,18 @@ public:
 } rig_cwio_text(&rig_server);
 
 //------------------------------------------------------------------------------
-// Set fskio transmit string
+// Set fskio transmit std::string
 //------------------------------------------------------------------------------
 
-extern void FSK_add(string);
-static string fskio_text;
+extern void FSK_add(std::string);
+static std::string fskio_text;
 
 class rig_fskio_text : public XmlRpcServerMethod {
 public:
 	rig_fskio_text(XmlRpcServer* s) : XmlRpcServerMethod("rig.fskio_text", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		std::string s = (string)params[0];
+		std::string s = (std::string)params[0];
 		FSK_add(s);
 	}
 
@@ -3077,16 +3077,16 @@ public:
 
 
 struct MLIST {
-	string name; string signature; string help;
+	std::string name; std::string signature; std::string help;
 } mlist[] = {
 	{ "main.set_frequency", "d:d", "set current VFO in Hz" },
-	{ "main.get_version", "s:n", "returns version string" },
+	{ "main.get_version", "s:n", "returns version std::string" },
 	{ "rig.get_AB",       "s:n", "returns vfo in use A or B" },
 	{ "rig.get_bw",       "A:n", "return BW of current VFO" },
 	{ "rig.get_bws",      "A:n", "return table of BW values" },
 	{ "rig.get_bwA",      "A:n", "return BW of vfo A" },
 	{ "rig.get_bwB",      "A:n", "return BW of vfo B" },
-	{ "rig.get_info",     "s:n", "return an info string" },
+	{ "rig.get_info",     "s:n", "return an info std::string" },
 	{ "rig.get_mode",     "s:n", "return MODE of current VFO" },
 	{ "rig.get_modeA",    "s:n", "return MODE of current VFO A" },
 	{ "rig.get_modeB",    "s:n", "return MODE of current VFO B" },
@@ -3155,8 +3155,8 @@ struct MLIST {
 
 	{ "rig.swap",         "n:n", "execute vfo swap" },
 	{ "rig.tune",         "n:n", "enable transceiver tune function"},
-	{ "rig.cat_string",   "s:s", "execute CAT string" },
-	{ "rig.cat_priority", "s:s", "priority CAT string" },
+	{ "rig.cat_string",   "s:s", "execute CAT std::string" },
+	{ "rig.cat_priority", "s:s", "priority CAT std::string" },
 	{ "rig.shutdown",     "i:n", "shutdown xcvr & flrig" },
 	{ "rig.cwio_set_wpm", "n:i", "set cwio WPM" },
 	{ "rig.cwio_text",    "i:s", "send text via cwio interface" },
@@ -3182,7 +3182,7 @@ public:
 	rig_list_methods(XmlRpcServer *s) : XmlRpcServerMethod("rig.list_methods", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		vector<XmlRpcValue> methods;
+		std::vector<XmlRpcValue> methods;
 		for (size_t n = 0; n < sizeof(mlist) / sizeof(*mlist); ++n) {
 			XmlRpcValue::ValueStruct item;
 			item["name"]      = mlist[n].name;
@@ -3239,9 +3239,9 @@ void set_server_port(int port)
 
 std::string print_xmlhelp()
 {
-	static string pstr;
+	static std::string pstr;
 	pstr.clear();
-	string line;
+	std::string line;
 	size_t f1_len = 0;
 	for (size_t n = 0; n < sizeof(mlist) / sizeof(*mlist); ++n) {
 		if (mlist[n].name.length() > f1_len) f1_len = mlist[n].name.length();

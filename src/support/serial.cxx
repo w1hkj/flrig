@@ -43,8 +43,6 @@ char traceinfo[500];
 
 #include <memory>
 
-using namespace std;
-
 Cserial::Cserial() {
 	device = "/dev/ttyS0";
 	baud = 1200;
@@ -70,9 +68,9 @@ Cserial::~Cserial() {
 // Function name	: Cserial::OpenPort
 // Description	  : Opens the port specified by strPortName
 // Return type	  : bool
-// Argument		 : c_string strPortName
+// Argument		 : c_std::string strPortName
 ///////////////////////////////////////////////////////
-bool Cserial::CheckPort(string dev)  {
+bool Cserial::CheckPort(std::string dev)  {
 	int testfd = open( dev.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
 	if (testfd < 0)
 		return false;
@@ -84,7 +82,7 @@ bool Cserial::CheckPort(string dev)  {
 // Function name	: Cserial::OpenPort
 // Description	  : Opens the port specified by strPortName
 // Return type	  : bool
-// Argument		 : c_string strPortName
+// Argument		 : c_std::string strPortName
 ///////////////////////////////////////////////////////
 bool Cserial::OpenPort()  {
 
@@ -351,7 +349,7 @@ bool  Cserial::IOselect ()
 // Function name	: Cserial::ReadBuffer
 // Description	  : Reads upto nchars from the selected port
 // Return type	  : # characters received
-// Argument		 : pointer to buffer; # chars to read; string terminator
+// Argument		 : pointer to buffer; # chars to read; std::string terminator
 ///////////////////////////////////////////////////////
 int  Cserial::ReadBuffer (std::string &buf, int nchars, std::string find1, std::string find2)
 {
@@ -437,7 +435,7 @@ int  Cserial::ReadBuffer (std::string &buf, int nchars, std::string find1, std::
 
 ///////////////////////////////////////////////////////
 // Function name	: Cserial::WriteBuffer
-// Description	  : Writes a string to the selected port
+// Description	  : Writes a std::string to the selected port
 // Return type	  : bool
 // Argument		 : BYTE by
 ///////////////////////////////////////////////////////
@@ -483,17 +481,15 @@ void Cserial::FlushBuffer()
 
 #else // __WIN32__
 
-using namespace std;
-
 ///////////////////////////////////////////////////////
 // Function name	: Cserial::CheckPort
 // Description	  : Checks the port specified by strPortName
 // Return type	  : bool
-// Argument		 : c_string strPortName
+// Argument		 : c_std::string strPortName
 ///////////////////////////////////////////////////////
-bool Cserial::CheckPort(string dev)  {
+bool Cserial::CheckPort(std::string dev)  {
 	static HANDLE hTest;
-	string COMportname = "//./";
+	std::string COMportname = "//./";
 
 	COMportname.append(dev);
 
@@ -515,7 +511,7 @@ bool Cserial::CheckPort(string dev)  {
 // Function name	: Cserial::OpenPort
 // Description	  : Opens the port specified by strPortName
 // Return type	  : bool
-// Argument		 : CString strPortName
+// Argument		 : Cstd::string strPortName
 ///////////////////////////////////////////////////////
 bool Cserial::OpenPort()
 {
@@ -523,7 +519,7 @@ bool Cserial::OpenPort()
 
 	if (IsOpen()) ClosePort();
 
-	string COMportname = "//./";
+	std::string COMportname = "//./";
 	COMportname.append(device);
 
 	hComm = CreateFile(COMportname.c_str(),
@@ -535,12 +531,12 @@ bool Cserial::OpenPort()
 			  0);
 
 	if (hComm == INVALID_HANDLE_VALUE) {
-		LOG_ERROR("Open Comm port %s ; hComm = %d", COMportname.c_str(), (int)hComm);
+		LOG_ERROR("Open Comm port %s ; hComm = %llu", COMportname.c_str(), (size_t)hComm);
 
 		if (progStatus.serialtrace) {
 			snprintf(traceinfo, sizeof(traceinfo), 
-				"INVALID_HANDLE_VALUE: Open Comm port %s ; hComm = %d\n", 
-				COMportname.c_str(), (int)hComm);
+				"INVALID_HANDLE_VALUE: Open Comm port %s ; hComm = %llu\n", 
+				COMportname.c_str(), (size_t)hComm);
 			ser_trace(1, traceinfo);
 		}
 
@@ -549,8 +545,8 @@ bool Cserial::OpenPort()
 
 	if (progStatus.serialtrace) {
 		snprintf(traceinfo, sizeof(traceinfo), 
-			"Open Comm port %s ; hComm = %d\n", 
-			COMportname.c_str(), (int)hComm);
+			"Open Comm port %s ; hComm = %llu\n", 
+			COMportname.c_str(), (size_t)hComm);
 		ser_trace(1, traceinfo);
 		}
 
@@ -748,7 +744,7 @@ bool Cserial::WriteByte(char by)
 
 ///////////////////////////////////////////////////////
 // Function name	: Cserial::WriteBuffer
-// Description	  : Writes a string to the selected port
+// Description	  : Writes a std::string to the selected port
 // Return type	  : bool
 // Argument		 : BYTE by
 ///////////////////////////////////////////////////////
@@ -1031,7 +1027,7 @@ DCB.fOutxDsrFlow    %d\n",
 
 	if (progStatus.serialtrace) {
 		long err = GetLastError();
-		snprintf(traceinfo, sizeof(traceinfo), "SetCommState handle %d, returned %d, error = %d\n", (int)hComm, bPortReady, (int)err);
+		snprintf(traceinfo, sizeof(traceinfo), "SetCommState handle %llu, returned %d, error = %d\n", (size_t)hComm, bPortReady, (int)err);
 		ser_trace(1, traceinfo);
 	}
 

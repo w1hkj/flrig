@@ -48,15 +48,15 @@ void RIG_ICOM::checkresponse()
 
 	if (!RigSerial->IsOpen()) return;
 
-	if (replystr.rfind(ok) != string::npos)
+	if (replystr.rfind(ok) != std::string::npos)
 		return;
 
-	string s1 = str2hex(cmd.c_str(), cmd.length());
-	string s2 = str2hex(replystr.c_str(), replystr.length());
+	std::string s1 = str2hex(cmd.c_str(), cmd.length());
+	std::string s2 = str2hex(replystr.c_str(), replystr.length());
 	LOG_ERROR("\nsent  %s\nreply %s", s1.c_str(), s2.c_str());
 }
 
-bool RIG_ICOM::sendICcommand(string cmd, int nbr)
+bool RIG_ICOM::sendICcommand(std::string cmd, int nbr)
 {
 	guard_lock reply_lock(&mutex_replystr);
 
@@ -75,14 +75,14 @@ bool RIG_ICOM::sendICcommand(string cmd, int nbr)
 	if (ret > nbr) respstr.erase(0, ret - nbr);
 
 // look for preamble at beginning
-	if (respstr.rfind(pre_fm) == string::npos)  {
+	if (respstr.rfind(pre_fm) == std::string::npos)  {
 		LOG_ERROR("preamble: %s not in %s", pre_fm.c_str(), cmd.c_str());
 		replystr.clear();
 		return false;
 	}
 
 // look for postamble
-	if (respstr.rfind(post) == string::npos) {
+	if (respstr.rfind(post) == std::string::npos) {
 		LOG_ERROR("postample: %s not at end of %s", post.c_str(), cmd.c_str());
 		replystr.clear();
 		return false;
@@ -91,7 +91,7 @@ bool RIG_ICOM::sendICcommand(string cmd, int nbr)
 	return true;
 }
 
-void RIG_ICOM::delayCommand(string cmd, int wait)
+void RIG_ICOM::delayCommand(std::string cmd, int wait)
 {
 	int oldwait = progStatus.comm_wait;
 	progStatus.comm_wait += wait;
@@ -101,9 +101,9 @@ void RIG_ICOM::delayCommand(string cmd, int wait)
 
 #include <fstream>
 
-void RIG_ICOM::ICtrace(string cmd, string hexstr) 
+void RIG_ICOM::ICtrace(std::string cmd, std::string hexstr) 
 {
-	string s1 = str2hex(hexstr.c_str(), hexstr.length());
+	std::string s1 = str2hex(hexstr.c_str(), hexstr.length());
 	rig_trace(2, cmd.c_str(), s1.c_str());
 }
 
@@ -111,9 +111,9 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz, unsigned long timeout)
 {
 	static char sztemp[200];
 	memset(sztemp, 0, 200);
-	string check = "1234";
-	string eor   = "\xFD";
-	string bad   = "\xFA\xFD";
+	std::string check = "1234";
+	std::string eor   = "\xFD";
+	std::string bad   = "\xFA\xFD";
 
 	check[0] = cmd[0];
 	check[1] = cmd[1];
@@ -238,14 +238,14 @@ void RIG_ICOM::tune_rig(int how)
 
 int RIG_ICOM::get_tune()
 {
-	string resp;
-	string cstr = "\x1C\x01";
+	std::string resp;
+	std::string cstr = "\x1C\x01";
 	cmd.assign(pre_to).append(cstr).append(post);
 	resp.assign(pre_fm).append(cstr);
 	int val = tune_;
 	if (waitFOR(8, "get TUNE")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			val = replystr[p + 6];
 	}
 	return (tune_ = val);

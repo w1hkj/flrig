@@ -229,7 +229,7 @@ unsigned long int RIG_AOR5K::get_vfoA ()
 	int ret = wait_char('\r', 34, AOR5K_WAIT_TIME, "get vfo A", ASC);
 	if (ret < 34) return freqA;
 	size_t p = replystr.rfind("RF");
-	if (p == string::npos) return freqA;
+	if (p == std::string::npos) return freqA;
 	if (p < 3) return freqA;
 	if (replystr[p-2] =='E') {
 		// VFO A is active. Instead of A we use E
@@ -258,7 +258,7 @@ unsigned long int RIG_AOR5K::get_vfoB ()
 	int ret = wait_char('\r', 34, AOR5K_WAIT_TIME, "get vfo B", ASC);
 	if (ret < 34) return freqB;
 	size_t p = replystr.rfind("RF");
-	if (p == string::npos) return freqB;
+	if (p == std::string::npos) return freqB;
 	if (p < 3) return freqB;
 	if (replystr[p-2] == 'B') {
 		// VFO B active
@@ -298,7 +298,7 @@ int RIG_AOR5K::get_volume_control()
 	int ret = wait_char('\r', 5, AOR5K_WAIT_TIME, "get volume", ASC);
 	if (ret < 5) return progStatus.volume;
 	size_t p = replystr.rfind("VL");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 
 	replystr[p + 5] = 0;
 	int v = atoi(&replystr[p + 2]);
@@ -327,7 +327,7 @@ int RIG_AOR5K::get_modeA()
 	int ret = wait_char('\r', 4, AOR5K_WAIT_TIME, "get mode A", ASC);
 	if (ret < 4) return modeA;
 	size_t p = replystr.rfind("MD");
-	if (p == string::npos) return modeA;
+	if (p == std::string::npos) return modeA;
 	int md = replystr[p + 2] - '0';
 	if (md > 8) md=0;
 	return (modeA = md);
@@ -392,7 +392,7 @@ int RIG_AOR5K::get_attenuator()
 	int ret = wait_char('\r', 4, AOR5K_WAIT_TIME, "get ATT", ASC);
 	if (ret < 4) return atten_level;
 	size_t p = replystr.rfind("AT");
-	if (p == string::npos) return atten_level;
+	if (p == std::string::npos) return atten_level;
 	
 	if (replystr[p+2] == '1')
 		atten_level = 22;
@@ -414,7 +414,7 @@ int RIG_AOR5K::get_smeter()
 	int ret = wait_char('\r', 7, AOR5K_WAIT_TIME, "get Smeter", ASC);
 	if (ret < 6) return 0;
 	size_t p = replystr.rfind("LM");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	
 	replystr[p+5] ='\0';	
 
@@ -439,7 +439,7 @@ int RIG_AOR5K::get_noise()
 	int ret = wait_char('\r', 4, AOR5K_WAIT_TIME, "get Noise Blanker", ASC);
 	if (ret < 4) return progStatus.noise;
 	size_t p = replystr.rfind("NB");
-	if (p == string::npos) return progStatus.noise;
+	if (p == std::string::npos) return progStatus.noise;
 	return (replystr[p+2] == '1' ? 1 : 0);
 }
 
@@ -462,7 +462,7 @@ int RIG_AOR5K::get_bwA()
 	int ret = wait_char('\r', 4, AOR5K_WAIT_TIME, "get bandwidth A", ASC);
 	if (ret < 4) return bwA;
 	size_t p = replystr.rfind("BW");
-	if (p == string::npos) return bwA;
+	if (p == std::string::npos) return bwA;
 	return (bwA = replystr[p+2] - '0');
 }
 
@@ -483,7 +483,7 @@ int RIG_AOR5K::get_agc() {
 	int ret = wait_char('\r', 4, AOR5K_WAIT_TIME, "get AGC", ASC);
 	if (ret < 4) return agcval;
 	size_t p = replystr.rfind("AC");
-	if (p == string::npos) return agcval;
+	if (p == std::string::npos) return agcval;
 	int agci = replystr[p+2] - '0';
 	switch (agci) {
 		case 0: agcval = 1; break;

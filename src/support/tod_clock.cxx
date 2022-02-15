@@ -46,8 +46,6 @@
 #include "tod_clock.h"
 #include "timeops.h"
 
-using namespace std;
-
 size_t zmsec()
 {
 	static struct timeval tv;
@@ -63,7 +61,9 @@ char *ztime()
 	static struct timeval tv;
 
 	gettimeofday(&tv, NULL);
-	gmtime_r(&tv.tv_sec, &tim);
+	time_t tval = tv.tv_sec;
+
+	gmtime_r(&tval, &tim);
 
 	snprintf(exttime, sizeof(exttime),
 		"%02d:%02d:%02d.%03d",

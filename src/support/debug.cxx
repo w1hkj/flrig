@@ -50,8 +50,6 @@
 #include "support.h"
 #include "trace.h"
 
-using namespace std;
-
 #define MAX_LINES 65536
 
 pthread_mutex_t debug_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -63,7 +61,7 @@ static bool tty;
 
 static Fl_Double_Window*	window = (Fl_Double_Window *)0;
 static Fl_Browser*			btext = (Fl_Browser *)0;
-static string buffer;
+static std::string buffer;
 
 debug* debug::inst = 0;
 debug::level_e debug::level = debug::ERROR_LEVEL;
@@ -120,7 +118,7 @@ void debug::stop(void)
 
 static char fmt[1024];
 static char sztemp[8096];
-static string estr = "";
+static std::string estr = "";
 
 void debug::log(level_e level, const char* func, const char* srcf, int line, const char* format, ...)
 {
@@ -194,7 +192,7 @@ void debug::sync_text(void* arg)
 
 	size_t p0 = 0, p1 = estr.find('\n');
 	std::string insrt;
-	while (p1 != string::npos) {
+	while (p1 != std::string::npos) {
 		insrt = estr.substr(p0, p1-p0);
 		btext->insert(1, insrt.c_str());
 		buffer.append(insrt.append("\n"));

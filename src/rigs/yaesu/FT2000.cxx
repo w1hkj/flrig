@@ -158,7 +158,7 @@ void RIG_FT2000::get_band_selection(int v)
 	set_trace(2, "get band", replystr.c_str());
 
 	size_t p = replystr.rfind("IF");
-	if (p == string::npos) return;
+	if (p == std::string::npos) return;
 	if (replystr[p+21] != '0') {	// vfo 60M memory mode
 		inc_60m = true;
 	}
@@ -218,7 +218,7 @@ unsigned long int RIG_FT2000::get_vfoA ()
 
 	if (ret < 11) return freqA;
 	size_t p = replystr.rfind("FA");
-	if (p == string::npos) return freqA;
+	if (p == std::string::npos) return freqA;
 	int f = 0;
 	for (size_t n = 2; n < 10; n++)
 		f = f*10 + replystr[p + n] - '0';
@@ -247,7 +247,7 @@ unsigned long int RIG_FT2000::get_vfoB ()
 
 	if (ret < 11) return freqB;
 	size_t p = replystr.rfind("FA");
-	if (p == string::npos) return freqB;
+	if (p == std::string::npos) return freqB;
 	int f = 0;
 	for (size_t n = 2; n < 10; n++)
 		f = f*10 + replystr[p + n] - '0';
@@ -276,7 +276,7 @@ int RIG_FT2000::get_smeter()
 
 	if (ret < 7) return 0;
 	size_t p = replystr.rfind("SM");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	replystr[p + 6] = 0;
 	int mtr = atoi(&replystr[p + 3]);
 	mtr = mtr * 100.0 / 256.0;
@@ -292,7 +292,7 @@ int RIG_FT2000::get_swr()
 
 	if (ret < 7) return 0;
 	size_t p = replystr.rfind("RM");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	replystr[p + 6] = 0;
 	int mtr = atoi(&replystr[p + 3]);
 	return mtr / 2.56;
@@ -307,7 +307,7 @@ int RIG_FT2000::get_power_out()
 
 	if (ret < 7) return 0;
 	size_t p = replystr.rfind("RM");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	replystr[p + 6] = 0;
 	double mtr = (double)(atoi(&replystr[p + 3]));
 	mtr = -6.6263535 + .11813178 * mtr + .0013607405 * mtr * mtr;
@@ -323,7 +323,7 @@ double RIG_FT2000::get_power_control()
 
 	if (ret < 6) return 0;
 	size_t p = replystr.rfind("PC");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	replystr[p + 5] = 0;
 	int mtr = atoi(&replystr[p + 2]);
 	return mtr;
@@ -339,7 +339,7 @@ int RIG_FT2000::get_volume_control()
 
 	if (ret < 7) return 0;
 	size_t p = replystr.rfind("AG");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	replystr[p + 6] = 0;
 	int val = atoi(&replystr[p + 3]);
 	return (int)(val / 2.55);
@@ -385,7 +385,7 @@ int RIG_FT2000::get_PTT()
 	rig_trace(2, "get_PTT()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return ptt_;
+	if (p == std::string::npos) return ptt_;
 	ptt_ =  (replystr[p+2] != '0' ? 1 : 0);
 	return ptt_;
 }
@@ -418,7 +418,7 @@ int RIG_FT2000::get_tune()
 	rig_trace(2, "get_tuner status()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	int val = replystr[p+4] - '0';
 	return !(val < 2);
 }
@@ -470,7 +470,7 @@ int RIG_FT2000::get_attenuator()
 		return 0;
 	}
 	size_t p = replystr.rfind("RA");
-	if (p == string::npos) {
+	if (p == std::string::npos) {
 		atten_label("Att", false);
 		atten_level = 0;
 		return 0;
@@ -540,7 +540,7 @@ int RIG_FT2000::get_preamp()
 		return 0;
 	}
 	size_t p = replystr.rfind("PA");
-	if (p == string::npos) {
+	if (p == std::string::npos) {
 		preamp_label("Pre", false);
 		preamp_level = 0;
 		return 0;
@@ -582,7 +582,7 @@ int RIG_FT2000::get_modeA()
 
 	if (ret < 5) return modeA;
 	size_t p = replystr.rfind("MD");
-	if (p == string::npos) return modeA;
+	if (p == std::string::npos) return modeA;
 	modeA = replystr[p + 3] - '1';
 	return modeA;
 }
@@ -605,7 +605,7 @@ int RIG_FT2000::get_modeB()
 
 	if (ret < 5) return modeB;
 	size_t p = replystr.rfind("MD");
-	if (p == string::npos) return modeB;
+	if (p == std::string::npos) return modeB;
 	modeB = replystr[p + 3] - '1';
 	return modeB;
 }
@@ -774,7 +774,7 @@ int RIG_FT2000::get_bwB()
 
 std::string RIG_FT2000::get_BANDWIDTHS()
 {
-	stringstream s;
+	std::stringstream s;
 	for (int i = 0; i < NUM_MODES; i++)
 		s << mode_bwA[i] << " ";
 	for (int i = 0; i < NUM_MODES; i++)
@@ -784,7 +784,7 @@ std::string RIG_FT2000::get_BANDWIDTHS()
 
 void RIG_FT2000::set_BANDWIDTHS(std::string s)
 {
-	stringstream strm;
+	std::stringstream strm;
 	strm << s;
 	for (int i = 0; i < NUM_MODES; i++)
 		strm >> mode_bwA[i];
@@ -819,7 +819,7 @@ bool RIG_FT2000::get_if_shift(int &val)
 
 	if (ret < 9) return false;
 	size_t p = replystr.rfind("IS");
-	if (p == string::npos) return false;
+	if (p == std::string::npos) return false;
 
 	replystr[p + 8] = 0;
 	val = atoi(&replystr[p + 3]);
@@ -874,7 +874,7 @@ bool  RIG_FT2000::get_notch(int &val)
 
 	if (ret < 8) return ison;
 	size_t p = replystr.rfind("BP");
-	if (p == string::npos) return ison;
+	if (p == std::string::npos) return ison;
 
 	if (replystr[p + 6] == '1') {
 		ison = true;
@@ -885,7 +885,7 @@ bool  RIG_FT2000::get_notch(int &val)
 
 		if (ret < 8) return ison;
 		p = replystr.rfind("BP");
-		if (p == string::npos) return ison;
+		if (p == std::string::npos) return ison;
 		replystr[p + 7] = 0;
 		val = atoi(&replystr[p + 4]);
 		val -= 200;
@@ -932,7 +932,7 @@ int RIG_FT2000::get_mic_gain()
 	rig_trace(2, "get_mic_gain()", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return progStatus.mic_gain;
+	if (p == std::string::npos) return progStatus.mic_gain;
 	int val = atoi(&replystr[p+2]);
 	val = (int)(val / 2.50);
 	if (val > 100) val = 100;

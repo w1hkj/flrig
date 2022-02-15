@@ -215,7 +215,7 @@ int RIG_FDMDUO::get_smeter()
 	if (ret < 8) return 0;
 
 	size_t p = replystr.rfind("SM");
-	if (p == string::npos)
+	if (p == std::string::npos)
 		return mtr;
 	mtr = 100 * atoi(&replystr[p + 3]) / 22;
 	return mtr;
@@ -231,7 +231,7 @@ int RIG_FDMDUO::get_power_out()
 	if (ret < 10) return mtr;
 
 	size_t p = replystr.rfind("FP");
-	if (p != string::npos) {
+	if (p != std::string::npos) {
 		mtr = atoi(&replystr[p + 3]); // value is 0 to 6000; 0 to 6.0
 	}
 	return mtr;
@@ -336,7 +336,7 @@ int RIG_FDMDUO::get_modeA()
 	if (ret < 4) return A.imode;
 
 	size_t p = replystr.rfind("MD");
-	if (p != string::npos && (p + 2 < replystr.length())) {
+	if (p != std::string::npos && (p + 2 < replystr.length())) {
 		int md = replystr[p+2];
 		md = md - '1';
 		if (md == 6) md = 5;
@@ -370,7 +370,7 @@ int RIG_FDMDUO::get_modeB()
 	if (ret < 4) return B.imode;
 
 	size_t p = replystr.rfind("MD");
-	if (p != string::npos && (p + 2 < replystr.length())) {
+	if (p != std::string::npos && (p + 2 < replystr.length())) {
 		int md = replystr[p+2];
 		md = md - '1';
 		if (md == 6) md = 5;
@@ -442,7 +442,7 @@ int RIG_FDMDUO::get_bwA()
 		gett("");
 		if (ret >= 6) {
 			p = replystr.rfind("RF");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; i < duoCWvals; i++)
 					if (FDMDUO_CWvals[i] == replystr.substr(p))
 						break;
@@ -456,7 +456,7 @@ int RIG_FDMDUO::get_bwA()
 		gett("");
 		if (ret >= 6) {
 			p = replystr.rfind("RF");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; i < duoCWvals; i++)
 					if (FDMDUO_CWRvals[i] == replystr.substr(p))
 						break;
@@ -470,7 +470,7 @@ int RIG_FDMDUO::get_bwA()
 		gett("");
 		if (ret >= 6) {
 			p = replystr.rfind("RF");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; i < duoAMvals; i++)
 					if (FDMDUO_AMvals[i] == replystr.substr(p))
 						break;
@@ -484,7 +484,7 @@ int RIG_FDMDUO::get_bwA()
 		gett("");
 		if (ret >= 6) {
 			p = replystr.rfind("RF");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; i < duoFMvals; i++)
 					if (FDMDUO_FMvals[i] == replystr.substr(p))
 						break;
@@ -551,7 +551,7 @@ int RIG_FDMDUO::get_bwB()
 		gett("");
 		if (ret >= 6) {
 			p = replystr.rfind("RF");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; i < duoCWvals; i++)
 					if (FDMDUO_CWvals[i] == replystr.substr(p))
 						break;
@@ -565,7 +565,7 @@ int RIG_FDMDUO::get_bwB()
 		gett("");
 		if (ret >= 6) {
 			p = replystr.rfind("RF");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; i < duoCWvals; i++)
 					if (FDMDUO_CWRvals[i] == replystr.substr(p))
 						break;
@@ -579,7 +579,7 @@ int RIG_FDMDUO::get_bwB()
 		gett("");
 		if (ret >= 6) {
 			p = replystr.rfind("RF");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; i < duoAMvals; i++)
 					if (FDMDUO_AMvals[i] == replystr.substr(p))
 						break;
@@ -593,7 +593,7 @@ int RIG_FDMDUO::get_bwB()
 		gett("");
 		if (ret >= 6) {
 			p = replystr.rfind("RF");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; i < duoFMvals; i++)
 					if (FDMDUO_FMvals[i] == replystr.substr(p))
 						break;
@@ -658,7 +658,7 @@ double RIG_FDMDUO::get_power_control()
 	if (ret < 7) return val;
 
 	size_t p = replystr.rfind("TQ");
-	if (p == string::npos) return val;
+	if (p == std::string::npos) return val;
 
 	val = atoi(&replystr[p + 2]);
 
@@ -710,7 +710,7 @@ int RIG_FDMDUO::get_preamp()
 	if (ret < 5) return preamp_level;
 
 	size_t p = replystr.rfind("PA");
-	if (p != string::npos)
+	if (p != std::string::npos)
 		preamp_level = (replystr[p+2] == '1');
 	return preamp_level;
 }
@@ -861,7 +861,7 @@ unsigned long int RIG_FDMDUO::get_vfoA ()
 	if (ret < 14) return A.freq;
 
 	size_t p = replystr.rfind("FA");
-	if (p != string::npos && (p + 12 < replystr.length())) {
+	if (p != std::string::npos && (p + 12 < replystr.length())) {
 		int f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replystr[p+n] - '0';
@@ -893,7 +893,7 @@ unsigned long int RIG_FDMDUO::get_vfoB ()
 	if (ret < 14) return A.freq;
 
 	size_t p = replystr.rfind("FB");
-	if (p != string::npos && (p + 12 < replystr.length())) {
+	if (p != std::string::npos && (p + 12 < replystr.length())) {
 		int f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replystr[p+n] - '0';
@@ -930,7 +930,7 @@ int  RIG_FDMDUO::get_squelch()
 	cmd = "SQ0;";
 	if (wait_char(';', 7, 20, "get squelch", ASC) >= 7) {
 		size_t p = replystr.rfind("SQ0");
-		if (p == string::npos) return val;
+		if (p == std::string::npos) return val;
 		sscanf(&replystr[3], "%d", &val);
 	}
 	return val;
@@ -957,7 +957,7 @@ int  RIG_FDMDUO::get_mic_gain()
 	if (wait_char(';', 6, 100, "get mic gain", ASC) < 6) return val;
 
 	size_t p = replystr.rfind("MG");
-	if (p != string::npos)
+	if (p != std::string::npos)
 		val = fm_decimal(replystr.substr(p+2), 3);
 	return val;
 }

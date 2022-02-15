@@ -45,8 +45,8 @@ public:
 	}
 	virtual ~RIG_ICOM() {}
 	void checkresponse();
-	bool sendICcommand(string str, int nbr);
-	void delayCommand(string cmd, int wait);
+	bool sendICcommand(std::string str, int nbr);
+	void delayCommand(std::string cmd, int wait);
 	bool  waitFB(const char *sz, int timeout = 500);
 	bool  waitFOR(size_t n, const char *sz, unsigned long timeout = 500);
 	void adjustCIV(uchar adr);
@@ -54,7 +54,7 @@ public:
 	virtual void swapAB();
 	virtual void A2B();
 
-	void ICtrace(string cmd, string hexstr);
+	void ICtrace(std::string cmd, std::string hexstr);
 
 	virtual int get_modetype(int n) {
 		return _mode_type[n];

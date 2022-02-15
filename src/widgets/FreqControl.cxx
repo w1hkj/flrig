@@ -38,7 +38,7 @@
 const char *cFreqControl::Label[10] = {
 	"0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
-void cFreqControl::IncFreq (int nbr) {
+void cFreqControl::IncFreq (size_t nbr) {
 	double v = val;
 	v += mult[nbr] * precision;
 	if (v <= maxVal) {
@@ -48,7 +48,7 @@ void cFreqControl::IncFreq (int nbr) {
 	do_callback();
 }
 
-void cFreqControl::DecFreq (int nbr) {
+void cFreqControl::DecFreq (size_t nbr) {
 	unsigned long int v = 1;
 	v = val - mult[nbr] * precision;
 	if (v >= minVal)
@@ -61,7 +61,7 @@ void cbSelectDigit (Fl_Widget *btn, void * nbr)
 {
 
 	Fl_Button *b = (Fl_Button *)btn;
-	int Nbr = (int)(reinterpret_cast<long> (nbr));
+	size_t Nbr = reinterpret_cast<size_t> (nbr);
 
 	cFreqControl *fc = (cFreqControl *)b->parent();
 	if (fc->hrd_buttons) {

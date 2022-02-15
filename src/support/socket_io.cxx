@@ -67,18 +67,16 @@
 #  include <arpa/inet.h>
 #endif
 
-using namespace std;
-
 Socket *tcpip = (Socket *)0;
 Address *remote_addr = (Address *)0;
 
 static bool exit_socket_loop = false;
 
-static string rxbuffer;
+static std::string rxbuffer;
 pthread_t *rcv_socket_thread = 0;
 pthread_mutex_t mutex_rcv_socket = PTHREAD_MUTEX_INITIALIZER;
 
-static void log_level(int level, string s, string data) 
+static void log_level(int level, std::string s, std::string data) 
 {
 	time_t now;
 	time(&now);
@@ -86,15 +84,15 @@ static void log_level(int level, string s, string data)
 	char sztm[20];
 	strftime(sztm, sizeof(sztm), "%H:%M:%S", local);
 
-	string s1;
+	std::string s1;
 	s1 = selrig->data_type == DT_BINARY ? str2hex(data.c_str(), data.length()) : data;
 
 	if (selrig->data_type == DT_STRING) {
 		s1 = data;
 		size_t p;
-		while((p = s1.find('\r')) != string::npos)
+		while((p = s1.find('\r')) != std::string::npos)
 			s1.replace(p, 1, "<cr>");
-		while((p = s1.find('\n')) != string::npos)
+		while((p = s1.find('\n')) != std::string::npos)
 			s1.replace(p, 1, "<lf>");
 	} else
 		s1 = str2hex(data.c_str(), data.length());
@@ -254,7 +252,7 @@ void disconnect_from_remote()
 int retry_after = 0;
 int drop_count = 0;
 
-void send_to_remote(string cmd_string, int pace)
+void send_to_remote(std::string cmd_string, int pace)
 {
 	if (retry_after > 0) {
 		retry_after -= progStatus.serloop_timing;
@@ -290,7 +288,7 @@ LOG_QUIET("Retry connect in %d seconds", progStatus.tcpip_reconnect_after);
 	return;
 }
 
-int read_from_remote(string &str)
+int read_from_remote(std::string &str)
 {
 	if (!tcpip || tcpip->fd() == -1) return 0;
 

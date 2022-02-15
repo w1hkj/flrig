@@ -33,8 +33,6 @@
 
 #include "rigpanel.h"
 
-using namespace std;
-
 enum {onA, onB};
 enum {UI, XML, SRVR, RIG};
 enum {DT_BINARY, DT_STRING};
@@ -138,14 +136,14 @@ struct GUI {
 	int			x;
 	int			y;
 	int			w;
-	string		label;
-	string		hint;
+	std::string		label;
+	std::string		hint;
 };
 
 class rigbase {
 #define WVALS_LIMIT -1
 public:
-	string name_;
+	std::string name_;
 	const char ** modes_;
 	const char ** bandwidths_;
 	const char ** dsp_SL;
@@ -293,11 +291,11 @@ public:
 // Icom Xcvr 
 	bool ICOMrig;
 	bool ICOMmainsub;
-	string pre_to;
-	string pre_fm;
-	string post;
-	string ok;
-	string bad;
+	std::string pre_to;
+	std::string pre_fm;
+	std::string post;
+	std::string ok;
+	std::string bad;
 
 	int filA;
 	int filB;
@@ -313,21 +311,21 @@ public:
 	std::string replystr;
 
 protected:
-	string cmd; // command string
-	string rsp; // expected response string (header etc)
+	std::string cmd; // command string
+	std::string rsp; // expected response string (header etc)
 
-	string to_bcd_be(unsigned long int freq, int len);
-	string to_bcd(unsigned long int freq, int len);
-	unsigned long int fm_bcd (string bcd, int len);
-	unsigned long int fm_bcd_be(string bcd, int len);
-	string to_binary_be(unsigned long int freq, int len);
-	string to_binary(unsigned long int freq, int len);
-	unsigned long int fm_binary(string binary, int len);
-	unsigned long int fm_binary_be(string binary_be, int len);
-	string to_decimal_be(unsigned long int d, int len);
-	string to_decimal(unsigned long int d, int len);
-	unsigned long int fm_decimal(string decimal, int len);
-	unsigned long int fm_decimal_be(string decimal_be, int len);
+	std::string to_bcd_be(unsigned long int freq, int len);
+	std::string to_bcd(unsigned long int freq, int len);
+	unsigned long int fm_bcd (std::string bcd, int len);
+	unsigned long int fm_bcd_be(std::string bcd, int len);
+	std::string to_binary_be(unsigned long int freq, int len);
+	std::string to_binary(unsigned long int freq, int len);
+	unsigned long int fm_binary(std::string binary, int len);
+	unsigned long int fm_binary_be(std::string binary_be, int len);
+	std::string to_decimal_be(unsigned long int d, int len);
+	std::string to_decimal(unsigned long int d, int len);
+	unsigned long int fm_decimal(std::string decimal, int len);
+	unsigned long int fm_decimal_be(std::string decimal_be, int len);
 
 public:
 	rigbase();
@@ -608,25 +606,25 @@ double vfo_;
 
 	virtual void read_stream() {}
 
-	virtual int  parse_vfoA(string){return 0;}
-	virtual int  parse_vfoB(string){return 0;}
-	virtual int  parse_modeA(string){return 0;}
-	virtual int  parse_modeB(string){return 0;}
-	virtual int  parse_bwA(string){return 0;}
-	virtual int  parse_bwB(string){return 0;}
-	virtual int  parse_volume_control(string){return 0;}
-	virtual int  parse_power_control(string){return 0;}
-	virtual int  parse_rf_gain(string){return 0;}
-	virtual int  parse_mic_gain(string){return 0;}
-	virtual int  parse_attenuator(string){return 0;}
-	virtual int  parse_preamp(string){return 0;}
-	virtual int  parse_smeter(string){return 0;}
-	virtual int  parse_(string){return 0;}
-	virtual int  parse_noise(string){return 0;}
-	virtual int  parse_power_out(string){return 0;}
-	virtual int  parse_swr(string){return 0;}
-	virtual int  parse_alc(string){return 0;}
-	virtual int  parse_split(string){return 0;}
+	virtual int  parse_vfoA(std::string){return 0;}
+	virtual int  parse_vfoB(std::string){return 0;}
+	virtual int  parse_modeA(std::string){return 0;}
+	virtual int  parse_modeB(std::string){return 0;}
+	virtual int  parse_bwA(std::string){return 0;}
+	virtual int  parse_bwB(std::string){return 0;}
+	virtual int  parse_volume_control(std::string){return 0;}
+	virtual int  parse_power_control(std::string){return 0;}
+	virtual int  parse_rf_gain(std::string){return 0;}
+	virtual int  parse_mic_gain(std::string){return 0;}
+	virtual int  parse_attenuator(std::string){return 0;}
+	virtual int  parse_preamp(std::string){return 0;}
+	virtual int  parse_smeter(std::string){return 0;}
+	virtual int  parse_(std::string){return 0;}
+	virtual int  parse_noise(std::string){return 0;}
+	virtual int  parse_power_out(std::string){return 0;}
+	virtual int  parse_swr(std::string){return 0;}
+	virtual int  parse_alc(std::string){return 0;}
+	virtual int  parse_split(std::string){return 0;}
 
 	int waitN(size_t n, int timeout, const char *, int pr = HEX);
 	int wait_char(int ch, size_t n, int timeout, const char *, int pr = HEX);
@@ -659,10 +657,10 @@ double vfo_;
 	virtual void at11_loZ() {}
 	virtual void at11_hiZ() {}
 
-	string bcd255(int val);
-	int    num100(string bcd);
+	std::string bcd255(int val);
+	int    num100(std::string bcd);
 	int    hexval(int hex);
-	int    hex2val(string hexval);
+	int    hex2val(std::string hexval);
 
 // Yaesu force ID response before sending command
 	std::string IDstr;

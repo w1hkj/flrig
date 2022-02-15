@@ -39,7 +39,7 @@
 #include "ui.h"
 #include "debug.h"
 
-string xcvr_name = "NONE";
+std::string xcvr_name = "NONE";
 
 int current_ui_size = -1;
 
@@ -59,7 +59,7 @@ status progStatus = {
 	20,			// int ddX;
 	20,			// int ddY;
 
-	"NONE",		// string xcvr_serial_port;
+	"NONE",		// std::string xcvr_serial_port;
 	0,			// int comm_baudrate;
 	2,			// int stopbits;
 	2,			// int comm_retries;
@@ -75,26 +75,26 @@ status progStatus = {
 	200,		// int  serloop_timing;
 	0,			// int  byte_interval;
 
-	"NONE",		// string aux_serial_port;
+	"NONE",		// std::string aux_serial_port;
 	false,		// bool aux_SCU_17;
 	false,		// bool aux_rts;
 	false,		// bool aux_dtr;
 
-	"12345",	// string xmlport;
+	"12345",	// std::string xmlport;
 
-	"NONE",		// string	sep_serial_port;
+	"NONE",		// std::string	sep_serial_port;
 	false,		// bool	sep_rtsptt;
 	false,		// bool	sep_dtrptt;
 	false,		// bool	sep_rtsplus;
 	false,		// bool	sep_dtrplus;
 	false,		// bool	sep_SCU_17;
 
-	"NONE",		// string	cmedia_device
-	"GPIO-3",	// string	cmedia_gpio_line
+	"NONE",		// std::string	cmedia_device
+	"GPIO-3",	// std::string	cmedia_gpio_line
 	false,		// bool	cmedia_ptt
 
-	"NONE",		// string	tmate2_devide
-	"5000",		// string	tmate2_freq_step
+	"NONE",		// std::string	tmate2_devide
+	"5000",		// std::string	tmate2_freq_step
 	false,		// bool		tmate2_connected
 
 	false,		// bool	disable_CW_ptt;
@@ -290,106 +290,106 @@ status progStatus = {
 // =========================
 // IC706MKIIG filters
 	false,		// bool		use706filters
-	"EMPTY",	// string	ssb_cw_wide;
-	"NORMAL",	// string	ssb_cw_normal;
-	"EMPTY",	// string	ssb_cw_narrow;
-// optional filter strings
+	"EMPTY",	// std::string	ssb_cw_wide;
+	"NORMAL",	// std::string	ssb_cw_normal;
+	"EMPTY",	// std::string	ssb_cw_narrow;
+// optional filter std::strings
 // "EMPTY", "NARR", "NORM", "WIDE", "MED",
 // "FL-101", "FL-232", "FL-100", "FL-223", "FL-103"
 
 // =========================
-	"cmd 1",		// string	label1;
-	"",				// string	command1;
-	"",				// string	shftcmd1;
-	"cmd 2",		// string	label2;
-	"",				// string	command2;
-	"",				// string	shftcmd2;
-	"cmd 3",		// string	label3;
-	"",				// string	command3;
-	"",				// string	shftcmd3;
-	"cmd 4",		// string	label4;
-	"", 			// string	command4;
-	"",				// string	shftcmd4;
-	"cmd 5",		// string	label5;
-	"",				// string	command5;
-	"",				// string	shftcmd5;
-	"cmd 6",		// string	label6;
-	"",				// string	command6;
-	"",				// string	shftcmd6;
-	"cmd 7",		// string	label7;
-	"",				// string	command7;
-	"",				// string	shftcmd7;
-	"cmd 8",		// string	label8;
-	"",				// string	command8;
-	"",				// string	shftcmd8;
+	"cmd 1",		// std::string	label1;
+	"",				// std::string	command1;
+	"",				// std::string	shftcmd1;
+	"cmd 2",		// std::string	label2;
+	"",				// std::string	command2;
+	"",				// std::string	shftcmd2;
+	"cmd 3",		// std::string	label3;
+	"",				// std::string	command3;
+	"",				// std::string	shftcmd3;
+	"cmd 4",		// std::string	label4;
+	"", 			// std::string	command4;
+	"",				// std::string	shftcmd4;
+	"cmd 5",		// std::string	label5;
+	"",				// std::string	command5;
+	"",				// std::string	shftcmd5;
+	"cmd 6",		// std::string	label6;
+	"",				// std::string	command6;
+	"",				// std::string	shftcmd6;
+	"cmd 7",		// std::string	label7;
+	"",				// std::string	command7;
+	"",				// std::string	shftcmd7;
+	"cmd 8",		// std::string	label8;
+	"",				// std::string	command8;
+	"",				// std::string	shftcmd8;
 
-	"cmd 9",		// string	label9;
-	"",				// string	command9;
-	"",				// string	shftcmd9;
-	"cmd 10",		// string	label10;
-	"",				// string	command10;
-	"",				// string	shftcmd10;
-	"cmd 11",		// string	label11;
-	"",				// string	command11;
-	"",				// string	shftcmd11;
-	"cmd 12",		// string	label12;
-	"",				// string	command12;
-	"",				// string	shftcmd12;
-	"cmd 13",		// string	label13;
-	"",				// string	command13;
-	"",				// string	shftcmd13;
-	"cmd 14",		// string	label14;
-	"",				// string	command14;
-	"",				// string	shftcmd14;
-	"cmd 15",		// string	label15;
-	"",				// string	command15;
-	"",				// string	shftcmd15;
-	"cmd 16",		// string	label16;
-	"",				// string	command16;
-	"",				// string	shftcmd16;
+	"cmd 9",		// std::string	label9;
+	"",				// std::string	command9;
+	"",				// std::string	shftcmd9;
+	"cmd 10",		// std::string	label10;
+	"",				// std::string	command10;
+	"",				// std::string	shftcmd10;
+	"cmd 11",		// std::string	label11;
+	"",				// std::string	command11;
+	"",				// std::string	shftcmd11;
+	"cmd 12",		// std::string	label12;
+	"",				// std::string	command12;
+	"",				// std::string	shftcmd12;
+	"cmd 13",		// std::string	label13;
+	"",				// std::string	command13;
+	"",				// std::string	shftcmd13;
+	"cmd 14",		// std::string	label14;
+	"",				// std::string	command14;
+	"",				// std::string	shftcmd14;
+	"cmd 15",		// std::string	label15;
+	"",				// std::string	command15;
+	"",				// std::string	shftcmd15;
+	"cmd 16",		// std::string	label16;
+	"",				// std::string	command16;
+	"",				// std::string	shftcmd16;
 
-	"cmd 17",		// string	label17;
-	"",				// string	command17;
-	"",				// string	shftcmd17;
-	"cmd 18",		// string	label18;
-	"",				// string	command18;
-	"",				// string	shftcmd18;
-	"cmd 19",		// string	label19;
-	"",				// string	command19;
-	"",				// string	shftcmd19;
-	"cmd 20",		// string	label20;
-	"",				// string	command20;
-	"",				// string	shftcmd20;
-	"cmd 21",		// string	label21;
-	"",				// string	command21;
-	"",				// string	shftcmd21;
-	"cmd 22",		// string	label22;
-	"",				// string	command22;
-	"",				// string	shftcmd22;
-	"cmd 23",		// string	label23;
-	"",				// string	command23;
-	"",				// string	shftcmd23;
-	"cmd 24",		// string	label24;
-	"",				// string	command24;
-	"",				// string	shftcmd24;
+	"cmd 17",		// std::string	label17;
+	"",				// std::string	command17;
+	"",				// std::string	shftcmd17;
+	"cmd 18",		// std::string	label18;
+	"",				// std::string	command18;
+	"",				// std::string	shftcmd18;
+	"cmd 19",		// std::string	label19;
+	"",				// std::string	command19;
+	"",				// std::string	shftcmd19;
+	"cmd 20",		// std::string	label20;
+	"",				// std::string	command20;
+	"",				// std::string	shftcmd20;
+	"cmd 21",		// std::string	label21;
+	"",				// std::string	command21;
+	"",				// std::string	shftcmd21;
+	"cmd 22",		// std::string	label22;
+	"",				// std::string	command22;
+	"",				// std::string	shftcmd22;
+	"cmd 23",		// std::string	label23;
+	"",				// std::string	command23;
+	"",				// std::string	shftcmd23;
+	"cmd 24",		// std::string	label24;
+	"",				// std::string	command24;
+	"",				// std::string	shftcmd24;
 
-	"1",			// string	label_on_start1;
-	"",				// string	cmd_on_start1;
-	"2",			// string	label_on_start2;
-	"",				// string	cmd_on_start2;
-	"3",			// string	label_on_start3;
-	"",				// string	cmd_on_start3;
-	"4",			// string	label_on_start4;
-	"",				// string	cmd_on_start4;
+	"1",			// std::string	label_on_start1;
+	"",				// std::string	cmd_on_start1;
+	"2",			// std::string	label_on_start2;
+	"",				// std::string	cmd_on_start2;
+	"3",			// std::string	label_on_start3;
+	"",				// std::string	cmd_on_start3;
+	"4",			// std::string	label_on_start4;
+	"",				// std::string	cmd_on_start4;
 
-	"1",			// string	label_on_exit1;
-	"",				// string	cmd_on_exit1;
-	"2",			// string	label_on_exit2;
-	"",				// string	cmd_on_exit2;
-	"3",			// string	label_on_exit3;
-	"",				// string	cmd_on_exit3;
-	"4",			// string	label_on_exit4;
-	"",				// string	cmd_on_exit4;
+	"1",			// std::string	label_on_exit1;
+	"",				// std::string	cmd_on_exit1;
+	"2",			// std::string	label_on_exit2;
+	"",				// std::string	cmd_on_exit2;
+	"3",			// std::string	label_on_exit3;
+	"",				// std::string	cmd_on_exit3;
+	"4",			// std::string	label_on_exit4;
+	"",				// std::string	cmd_on_exit4;
 
 // =========================
 
@@ -454,13 +454,13 @@ status progStatus = {
 
 	false,		// bool	 tooltips;
 
-	"gtk+",		// string ui_scheme
+	"gtk+",		// std::string ui_scheme
 
-//	"7362",		// string server_port
-//	"127.0.0.1",// string server_address
+//	"7362",		// std::string server_port
+//	"127.0.0.1",// std::string server_address
 
-	"4001",		// string tcpip_port
-	"127.0.0.1",// string tcpip_address
+	"4001",		// std::string tcpip_port
+	"127.0.0.1",// std::string tcpip_address
 	50,			// int tcpip_ping_delay
 	10,			// int tcpip_reconnect_after in seconds
 	10,			// int tcpip_drops_allowed;
@@ -521,22 +521,22 @@ status progStatus = {
 	0,			// int    cwioCONNECTED; 1 - connected state; 0 - unconnected state
 	0,			// int    cwioINVERTED; 1 - DTR/RTS (-) keying; 
 	0,			// double cwio_comp;
-	"",			// string cwioPORT;
+	"",			// std::string cwioPORT;
 
 	"","","","","","",
-	"","","","","","",					// string	cwio_msgs[12];
+	"","","","","","",					// std::string	cwio_msgs[12];
 	"m2","m2","m3","m4","m4","m6",
-	"m7","m8","m9","m10","m11","m12",	// string	cwio_labels[12];
+	"m7","m8","m9","m10","m11","m12",	// std::string	cwio_labels[12];
 
-	"=",		// string	BT;
-	"~",		// string	AA;
-	"<",		// string	AS;
-	">",		// string	AR;
-	"%",		// string	KN;
-	"+",		// string	SK;
-	"&",		// string	INT;
-	"{",		// string	HM;
-	"}",		// string	VE;
+	"=",		// std::string	BT;
+	"~",		// std::string	AA;
+	"<",		// std::string	AS;
+	">",		// std::string	AR;
+	"%",		// std::string	KN;
+	"+",		// std::string	SK;
+	"&",		// std::string	INT;
+	"{",		// std::string	HM;
+	"}",		// std::string	VE;
 
 // FSK_ parameters
 	1,			// int		FSK_KEYLINE; 1 == RTS, 2 == DTR
@@ -545,12 +545,12 @@ status progStatus = {
 	0,			// int		FSK_CONNECTED; 1 - connected state; 0 - unconnected state
 	0,			// int		FSK_INVERTED; reverse keying; 
 	1,			// int		FSK_STOPBITS; 1 - 1.5; 0 - 2
-	"",			// string	FSK_PORT;
+	"",			// std::string	FSK_PORT;
 
 	"","","","","","",
-	"","","","","","",					// string	FSK_msgs[12];
+	"","","","","","",					// std::string	FSK_msgs[12];
 	"m2","m2","m3","m4","m4","m6",
-	"m7","m8","m9","m10","m11","m12"	// string	FSK_labels[12];
+	"m7","m8","m9","m10","m11","m12"	// std::string	FSK_labels[12];
 
 };
 
@@ -1174,7 +1174,7 @@ void status::saveLastState()
 
 }
 
-bool status::loadXcvrState(string xcvr)
+bool status::loadXcvrState(std::string xcvr)
 {
 	Fl_Preferences spref(RigHomeDir.c_str(), "w1hkj.com", xcvr.c_str());
 
@@ -2135,7 +2135,7 @@ void status::UI_laststate()
 	Fl::scheme(ui_scheme.c_str());
 }
 
-string status::info()
+std::string status::info()
 {
 	std::stringstream info;
 	static std::string retinfo;

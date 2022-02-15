@@ -54,8 +54,6 @@
 #include "cwioUI.h"
 #include "fskioUI.h"
 
-using namespace std;
-
 Fl_Double_Window *dlgDisplayConfig = NULL;
 Fl_Double_Window *dlgXcvrConfig = NULL;
 Fl_Double_Window *dlgMemoryDialog = NULL;
@@ -1745,17 +1743,17 @@ Fl_Color flrig_def_color(int n)
 }
 
 
-void cb_send_command(string command, Fl_Output *resp)
+void cb_send_command(std::string command, Fl_Output *resp)
 {
 	if (command.empty()) return;
 	bool usehex = false;
 	if (command.empty()) return;
-	string cmd = "";
-	if (command.find("x") != string::npos) { // hex strings
+	std::string cmd = "";
+	if (command.find("x") != std::string::npos) { // hex std::strings
 		size_t p = 0;
 		usehex = true;
 		unsigned int val;
-		while (( p = command.find("x", p)) != string::npos) {
+		while (( p = command.find("x", p)) != std::string::npos) {
 			sscanf(&command[p+1], "%x", &val);
 			cmd += (unsigned char) val;
 			p += 3;

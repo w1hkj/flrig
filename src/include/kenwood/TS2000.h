@@ -115,7 +115,7 @@ enum TS2000MODES { LSB, USB, CW, FM, AM, FSK, CWR, FSKR, DIGI };
 
 //	bool tuning();
 
-//	bool sendTScommand(string, int, bool);
+//	bool sendTScommand(std::string, int, bool);
 
 	const char **bwtable(int);
 	const char **lotable(int);

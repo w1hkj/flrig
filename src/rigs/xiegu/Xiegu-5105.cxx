@@ -161,11 +161,11 @@ unsigned long int RIG_XI5105::get_vfoA ()
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x03';
 	if (waitFOR(11, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
 	return A.freq;
@@ -185,14 +185,14 @@ set_trace(2, "set_vfoA()", str2hex(cmd.c_str(), cmd.length()));
 unsigned long int RIG_XI5105::get_vfoB ()
 {
 	if (inuse == onA) return B.freq;
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x03';
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
 	if (waitFOR(11, "get vfo B")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
 	return B.freq;
@@ -239,11 +239,11 @@ int RIG_XI5105::get_volume_control()
 	cmd = pre_to;
 	cmd.append("\x14\x01");
 	cmd.append( post );
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp.append("\x14\x01");
 	if (waitFOR(9, "get vol")) {
 		size_t p = replystr.rfind(resp);
-		if ( p != string::npos)
+		if ( p != std::string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p+6),3) * 100 / 255);
 	}
 	return 0;
@@ -259,13 +259,13 @@ int RIG_XI5105::get_smeter()
 	cmd = pre_to;
 	cmd.append("\x15\x02");
 	cmd.append( post );
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp.append("\x15\x02");
 	int mtr = 0;
 	if (waitFOR(9, "get smeter")) {
 get_trace(2, "get_smeter()", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			mtr = replystr[p+7] * 100 + replystr[p+6];
 			mtr = (int)ceil(mtr /2.55);
 			if (mtr < 0) mtr = 0;
@@ -300,11 +300,11 @@ int RIG_XI5105::get_noise()
 	cmd = pre_to;
 	cmd.append("\x16\x22");
 	cmd.append(post);
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp.append("\x16\x22");
 	if (waitFOR(8, "get noise")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			return (replystr[p+6] ? 1 : 0);
 	}
 	return 0;
@@ -333,11 +333,11 @@ int RIG_XI5105::get_noise_reduction()
 	cmd = pre_to;
 	cmd.append("\x16\x40");
 	cmd.append(post);
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp.append("\x16\x40");
 	if (waitFOR(8, "get nr")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			return (replystr[p+6] ? 1 : 0);
 	}
 	return 0;
@@ -356,15 +356,15 @@ void RIG_XI5105::set_noise_reduction_val(int val)
 int RIG_XI5105::get_noise_reduction_val()
 {
 	int val = 0;
-	string cstr = "\x14\x06";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x06";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(9, "get NRval")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			val = fm_bcd(replystr.substr(p+6), 3);
 		val = (val - 8) / 16;
 	}
@@ -387,12 +387,12 @@ int RIG_XI5105::get_preamp()
 	cmd += '\x16';
 	cmd += '\x02';
 	cmd.append( post );
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x16';
 	resp += '\x02';
 	if (waitFOR(8, "get pre")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			if (replystr[p+6] == 0x01) {
 				preamp_label("Pre", true);
 				return 1;
@@ -419,11 +419,11 @@ int RIG_XI5105::get_rf_gain()
 {
 	cmd = pre_to;
 	cmd.append("\x14\x02").append(post);
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	cmd.append("\x14\x02");
 	if (waitFOR(9, "get rfg")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p+6),3) * 100 / 255);
 	}
 	return 0;
@@ -450,14 +450,14 @@ void RIG_XI5105::set_power_control(double val)
 
 double RIG_XI5105::get_power_control()
 {
-	string cstr = "\x14\x0A";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x0A";
+	std::string resp = pre_fm;
 	cmd = pre_to;
 	cmd.append(cstr).append(post);
 	resp.append(cstr);
 	if (waitFOR(9, "get power")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p + 6),3) * 100 / 255);
 	}
 	return progStatus.power_level;
@@ -475,15 +475,15 @@ void RIG_XI5105::set_mic_gain(int val)
 
 int RIG_XI5105::get_mic_gain()
 {
-	string cstr = "\x14\x0B";
-	string resp = pre_fm;
+	std::string cstr = "\x14\x0B";
+	std::string resp = pre_fm;
 	resp.append(cstr);
 	cmd = pre_to;
 	cmd.append(cstr);
 	cmd.append(post);
 	if (waitFOR(9, "get mic")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			return (int)ceil(fm_bcd(replystr.substr(p+6),3) / 2.55);
 	}
 	return 0;
@@ -513,11 +513,11 @@ int RIG_XI5105::get_modeA()
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x04';
 	if (waitFOR(8, "get modeA")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			modeA = replystr[p+5];
 			if (modeA > 6) modeA -= 2;
 			filter_nbr = replystr[p+6];
@@ -542,11 +542,11 @@ int RIG_XI5105::get_modeB()
 	cmd = pre_to;
 	cmd += '\x04';
 	cmd.append(post);
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x04';
 	if (waitFOR(8, "get modeB")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			modeB = replystr[p+5];
 			if (modeB > 6) modeB -= 2;
 			filter_nbr = replystr[p+6];
@@ -599,12 +599,12 @@ int RIG_XI5105::get_auto_notch()
 	cmd += '\x16';
 	cmd += '\x41';
 	cmd.append( post );
-	string resp = pre_fm;
+	std::string resp = pre_fm;
 	resp += '\x16';
 	resp += '\x41';
 	if (waitFOR(8, "get AN")) {
 		size_t p = replystr.rfind(resp);
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			if (replystr[6] == 0x01) {
 				auto_notch_label("AN", true);
 				return 1;
@@ -668,10 +668,10 @@ int RIG_XI5105::get_split()
 	cmd.append("\x0F");
 	cmd.append( post );
 	if (waitFOR(7, "get split")) {
-		string resp = pre_fm;
+		std::string resp = pre_fm;
 		resp.append("\x0F");
 		size_t p = replystr.find(resp);
-		if (p != string::npos)
+		if (p != std::string::npos)
 			read_split = replystr[p+5];
 		if (read_split != 0xFA) // fail byte
 			split = read_split;

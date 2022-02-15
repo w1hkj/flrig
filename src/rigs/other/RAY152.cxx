@@ -81,14 +81,14 @@ RIG_RAY152::RIG_RAY152() {
 };
 
 
-static void nocr( string & s)
+static void nocr( std::string & s)
 {
 	for (size_t i = 0; i < s.length(); i++)
 		if (s[i] == '\r') s[i] = ' ';
 }
 
 /*
-Data string returned by the 'O' command
+Data std::string returned by the 'O' command
 		3	A*\r         AGC ON/OFF
 		5	C***\r       Memory channel #
 		5	D+/-**\r     Clarifier frequency
@@ -116,7 +116,7 @@ void RIG_RAY152::get_data()
 {
 	int ret = sendCommand("O\r");
 	if (ret < 66) return;
-// test string
+// test std::string
 //replystr = "A1\rC000\rD-05\rFT1407000\rFR1407000\rI0000\rM1\rN1\rP0\rQ000\rR100\rV128\rZ1\r";
 
 	if (dumpdata)
@@ -126,40 +126,40 @@ void RIG_RAY152::get_data()
 	size_t pos;
 
 	pos = replystr.find("FR"); // receive frequency
-	if (pos != string::npos) {
+	if (pos != std::string::npos) {
 		int freq;
 		sscanf(&replystr[pos + 2], "%d", &freq);
 		A.freq = 100 * freq;
 	}
 
 	pos = replystr.find("M"); // mode
-	if (pos != string::npos)
+	if (pos != std::string::npos)
 		A.imode = replystr[pos + 1] - '1';
 
 	pos = replystr.find("D");
-	if (pos != string::npos) {
+	if (pos != std::string::npos) {
 		sscanf(&replystr[pos + 1], "%d", &RitFreq);
 		RitFreq *= 10;
 	}
 
 	pos = replystr.find("\rR");
-	if (pos != string::npos)
+	if (pos != std::string::npos)
 		sscanf(&replystr[pos + 2], "%d", &rfg);
 
 	pos = replystr.find("V");
-	if (pos != string::npos) {
+	if (pos != std::string::npos) {
 		sscanf(&replystr[pos + 1], "%d", &vol);
 		vol *= 100;
 		vol /= 255;
 	}
 
 	pos = replystr.find("Q");
-	if (pos != string::npos) {
+	if (pos != std::string::npos) {
 		sscanf(&replystr[pos + 1], "%d", &squelch);
 	}
 
 	pos = replystr.find("N");
-	if (pos != string::npos) {
+	if (pos != std::string::npos) {
 		if (replystr[pos + 1] > '0') {
 			nb_set = replystr[pos+1];
 			nb = 1;
@@ -172,7 +172,7 @@ void RIG_RAY152::get_data()
 
 // RAY152 usurps the autonotch button for AGC control
 	pos = replystr.find("A");
-	if (pos != string::npos)
+	if (pos != std::string::npos)
 		agc = replystr[1] == '1' ? 1 : 0;
 
 }
@@ -289,7 +289,7 @@ int RIG_RAY152::get_modetype(int n)
 void RIG_RAY152::set_volume_control(int val)
 {
 	vol = val;
-	string cmd = "V000\r";
+	std::string cmd = "V000\r";
 	val *= 255;
 	val /= 100;
 	cmd[3] += val % 10; val /= 10;
@@ -314,7 +314,7 @@ int RIG_RAY152::get_smeter(void)
 {
 	cmd = "U\r";
 	int ret = sendCommand(cmd);
-	string s = replystr;
+	std::string s = replystr;
 	nocr(s);
 LOG_WARN("%s", s.c_str());
 	if (ret < 5) return 0;

@@ -49,8 +49,6 @@
 extern "C" {
 #endif
 
-typedef int pid_t;
-typedef long suseconds_t;
 #define hstrerror strerror
 
 #ifndef SIGUSR2

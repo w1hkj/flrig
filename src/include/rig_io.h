@@ -29,8 +29,6 @@
 enum { QUIET, ERR, WARN, INFO, DEBUG };
 enum { ASC, HEX };
 
-using namespace std;
-
 enum MODES {LSB, USB, CW};
 
 enum BAUDS {
@@ -44,21 +42,21 @@ extern bool startAuxSerial();
 extern bool startSepSerial();
 
 extern int readResponse(std::string req1 = "", std::string req2 = "");
-extern int sendCommand(string s, int nread = 0, int wait = 0);
+extern int sendCommand(std::string s, int nread = 0, int wait = 0);
 extern int waitResponse(int);
 extern bool waitCommand(
-				string command,
+				std::string command,
 				int nread,
-				string info = "",
+				std::string info = "",
 				int msec = 200,
 				char term = 0x0d, // carriage return
 				int how = ASC,
 				int level = INFO );
 
 extern char replybuff[];
-//extern string replystr;
-extern string respstr;
 
-extern void showresp(int level, int how, string s, string tx, string rx);
+extern std::string respstr;
+
+extern void showresp(int level, int how, std::string s, std::string tx, std::string rx);
 
 #endif

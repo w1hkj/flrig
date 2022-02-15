@@ -106,7 +106,7 @@ static GUI rig_widgets[]= {
 	{ (Fl_Widget *)NULL,          0,   0,   0 }
 };
 
-static string menu012 = "EX01200004";
+static std::string menu012 = "EX01200004";
 
 void RIG_TS480SAT::initialize()
 {
@@ -231,7 +231,7 @@ void RIG_TS480SAT::check_menu_45()
 	cmd = "EX0450000;";
 	if (wait_char(';', 11, 100, "Check menu item 45", ASC) >= 11) {
 		size_t p = replystr.rfind("EX045");
-		if (p != string::npos)
+		if (p != std::string::npos)
 			menu_45 = (replystr[p+9] == '1');
 	}
 
@@ -272,7 +272,7 @@ int RIG_TS480SAT::get_smeter()
 	if (wait_char(';', 8, 100, "get Smeter", ASC) < 8) return 0;
 
 	size_t p = replystr.rfind("SM");
-	if (p != string::npos)
+	if (p != std::string::npos)
 		mtr = 5 * atoi(&replystr[p + 3]);
 	gett("get smeter");
 	return mtr;
@@ -296,7 +296,7 @@ int RIG_TS480SAT::get_power_out()
 	if (wait_char(';', 8, 100, "get power", ASC) < 8) return mtr;
 
 	size_t p = replystr.rfind("SM");
-	if (p != string::npos) {
+	if (p != std::string::npos) {
 		mtr = atoi(&replystr[p + 3]);
 		size_t i = 0; // outside of the if/else for scope reasons
 		if (mtr < 0) mtr = 0;
@@ -325,10 +325,10 @@ int RIG_TS480SAT::get_swr()
 	if (wait_char(';', 8, 100, "get SWR/ALC", ASC) < 8) return (int)mtr;
 
 	size_t p = replystr.rfind("RM1");
-	if (p != string::npos)
+	if (p != std::string::npos)
 		mtr = 66 * atoi(&replystr[p+3]) / 10;
 	p = replystr.rfind("RM3");
-	if (p != string::npos)
+	if (p != std::string::npos)
 		alc = 66 * atoi(&replystr[p+3]) / 10;
 	else
 		alc = 0;
@@ -445,7 +445,7 @@ int RIG_TS480SAT::get_modeA()
 	if (wait_char(';', 4, 100, "get modeA", ASC) < 4) return A.imode;
 
 	size_t p = replystr.rfind("MD");
-	if (p != string::npos && (p + 2 < replystr.length())) {
+	if (p != std::string::npos && (p + 2 < replystr.length())) {
 		int md = replystr[p+2];
 		md = md - '1';
 		if (md == 8) md = 7;
@@ -478,7 +478,7 @@ int RIG_TS480SAT::get_modeB()
 	if (wait_char(';', 4, 100, "get modeB", ASC) < 4) return B.imode;
 
 	size_t p = replystr.rfind("MD");
-	if (p != string::npos && (p + 2 < replystr.length())) {
+	if (p != std::string::npos && (p + 2 < replystr.length())) {
 		int md = replystr[p+2];
 		md = md - '1';
 		if (md == 8) md = 7;
@@ -543,13 +543,13 @@ int RIG_TS480SAT::get_bwA()
 		cmd = "SL;";
 		if (wait_char(';', 5, 100, "get SL", ASC) == 5) {
 			p = replystr.rfind("SL");
-			if (p != string::npos)
+			if (p != std::string::npos)
 				lo = fm_decimal(replystr.substr(p+2), 2);
 		}
 		cmd = "SH;";
 		if (wait_char(';', 5, 100, "get SH", ASC) == 5) {
 			p = replystr.rfind("SH");
-			if (p != string::npos)
+			if (p != std::string::npos)
 				hi = fm_decimal(replystr.substr(p+2), 2);
 			A.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
 		}
@@ -557,7 +557,7 @@ int RIG_TS480SAT::get_bwA()
 		cmd = "FW;";
 		if (wait_char(';', 7, 100, "get FW", ASC) == 7) {
 			p = replystr.rfind("FW");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; i < 11; i++)
 					if (replystr.find(TS480SAT_CWbw[i]) == p)
 						break;
@@ -569,7 +569,7 @@ int RIG_TS480SAT::get_bwA()
 		cmd = "FW;";
 		if (wait_char(';', 7, 100, "get FW", ASC) == 7) {
 			p = replystr.rfind("FW");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; i < 4; i++)
 					if (replystr.find(TS480SAT_FSKbw[i]) == p)
 						break;
@@ -628,13 +628,13 @@ int RIG_TS480SAT::get_bwB()
 		cmd = "SL;";
 		if (wait_char(';', 5, 100, "get SL", ASC) == 5) {
 			p = replystr.rfind("SL");
-			if (p != string::npos)
+			if (p != std::string::npos)
 				lo = fm_decimal(replystr.substr(p+2), 2);
 		}
 		cmd = "SH;";
 		if (wait_char(';', 5, 100, "get SH", ASC) == 5) {
 			p = replystr.rfind("SH");
-			if (p != string::npos)
+			if (p != std::string::npos)
 				hi = fm_decimal(replystr.substr(p+2), 2);
 			B.iBW = ((hi << 8) | (lo & 0xFF)) | 0x8000;
 		}
@@ -642,7 +642,7 @@ int RIG_TS480SAT::get_bwB()
 		cmd = "FW;";
 		if (wait_char(';', 7, 100, "get FW", ASC) == 7) {
 			p = replystr.rfind("FW");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; i < 11; i++)
 					if (replystr.find(TS480SAT_CWbw[i]) == p)
 						break;
@@ -654,7 +654,7 @@ int RIG_TS480SAT::get_bwB()
 		cmd = "FW;";
 		if (wait_char(';', 7, 100, "get FW", ASC) == 7) {
 			p = replystr.rfind("FW");
-			if (p != string::npos) {
+			if (p != std::string::npos) {
 				for (i = 0; i < 4; i++)
 					if (replystr.find(TS480SAT_FSKbw[i]) == p)
 						break;
@@ -706,7 +706,7 @@ double RIG_TS480SAT::get_power_control()
 	if (wait_char(';', 6, 100, "get Power control", ASC) < 6) return val;
 
 	size_t p = replystr.rfind("PC");
-	if (p == string::npos) return val;
+	if (p == std::string::npos) return val;
 
 	val = atoi(&replystr[p + 2]);
 	gett("power control");
@@ -758,7 +758,7 @@ int RIG_TS480SAT::get_preamp()
 	if (ret < 5) return preamp_level;
 
 	size_t p = replystr.rfind("PA");
-	if (p != string::npos)
+	if (p != std::string::npos)
 		preamp_level = (replystr[p+2] == '1');
 	return preamp_level;
 }
@@ -779,7 +779,7 @@ bool RIG_TS480SAT::get_if_shift(int &val)
 	if (wait_char(';', 8, 100, "get IF shift", ASC) == 8) {
 		size_t p = replystr.rfind("IS");
 		gett("if shift");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			val = fm_decimal(replystr.substr(p+3), 4);
 			if (replystr[p+2] == '-') val *= -1;
 			return (val != 0);
@@ -825,7 +825,7 @@ int  RIG_TS480SAT::get_noise_reduction()
 	cmd.append(";");
 	if (wait_char(';', 4, 100, "GET noise reduction", ASC) == 4) {
 		size_t p = replystr.rfind(rsp);
-		if (p == string::npos) return _noise_reduction_level;
+		if (p == std::string::npos) return _noise_reduction_level;
 		_noise_reduction_level = replystr[p+2] - '0';
 	}
 
@@ -861,7 +861,7 @@ int  RIG_TS480SAT::get_noise_reduction_val()
 	cmd.append(";");
 	if (wait_char(';', 5, 100, "GET noise reduction val", ASC) == 5) {
 		size_t p = replystr.rfind(rsp);
-		if (p == string::npos) {
+		if (p == std::string::npos) {
 			nrval = (_noise_reduction_level == 1 ? _nrval1 : _nrval2);
 			return nrval;
 		}
@@ -880,7 +880,7 @@ int  RIG_TS480SAT::get_agc()
 	wait_char(';', 6, 100, "GET agc val", ASC);
 	size_t p = replystr.rfind("GT");
 	gett("agc");
-	if (p == string::npos) return agcval;
+	if (p == std::string::npos) return agcval;
 	if (replystr[4] == ' ') return 0;
 	agcval = replystr[4] - '0' + 1; // '0' == off, '1' = fast, '2' = slow
 
@@ -931,7 +931,7 @@ int  RIG_TS480SAT::get_auto_notch()
 		int anotch = 0;
 		size_t p = replystr.rfind("BC");
 		gett("auto notch");
-		if (p != string::npos) {
+		if (p != std::string::npos) {
 			anotch = (replystr[p+2] == '1');
 			return anotch;
 		}
@@ -957,7 +957,7 @@ int RIG_TS480SAT::get_noise()
 	if (wait_char(';', 4, 100, "get Noise Blanker", ASC) == 4) {
 		size_t p = replystr.rfind("NB");
 		gett("noise");
-		if (p == string::npos) return 0;
+		if (p == std::string::npos) return 0;
 		if (replystr[p+2] == '0') return 0;
 	}
 	return 1;
@@ -1002,7 +1002,7 @@ int  RIG_TS480SAT::get_rf_gain()
 	if (wait_char(';', 6, 100, "get rf gain", ASC) < 6) return val;
 
 	size_t p = replystr.rfind("RG");
-	if (p != string::npos)
+	if (p != std::string::npos)
 		val = fm_decimal(replystr.substr(p+2), 3);
 	gett("rf gain");
 	return val;
@@ -1070,7 +1070,7 @@ int RIG_TS480SAT::get_split()
 	cmd.append(";");
 	if (wait_char(';', 4, 100, "get split tx vfo", ASC) == 4) {
 		p = replystr.rfind(rsp);
-		if (p == string::npos) return split;
+		if (p == std::string::npos) return split;
 		tx = replystr[p+2];
 	}
 // rx vfo
@@ -1078,7 +1078,7 @@ int RIG_TS480SAT::get_split()
 	cmd.append(";");
 	if (wait_char(';', 4, 100, "get split rx vfo", ASC) == 4) {
 		p = replystr.rfind(rsp);
-		if (p == string::npos) return split;
+		if (p == std::string::npos) return split;
 		rx = replystr[p+2];
 	}
 
@@ -1097,7 +1097,7 @@ unsigned long int RIG_TS480SAT::get_vfoA ()
 	if (wait_char(';', 14, 100, "get vfo A", ASC) < 14) return A.freq;
 
 	size_t p = replystr.rfind("FA");
-	if (p != string::npos && (p + 12 < replystr.length())) {
+	if (p != std::string::npos && (p + 12 < replystr.length())) {
 		int f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replystr[p+n] - '0';
@@ -1124,7 +1124,7 @@ unsigned long int RIG_TS480SAT::get_vfoB ()
 	if (wait_char(';', 14, 100, "get vfo B", ASC) < 14) return B.freq;
 
 	size_t p = replystr.rfind("FB");
-	if (p != string::npos && (p + 12 < replystr.length())) {
+	if (p != std::string::npos && (p + 12 < replystr.length())) {
 		int f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replystr[p+n] - '0';
@@ -1160,7 +1160,7 @@ int  RIG_TS480SAT::get_squelch()
 	cmd = "SQ0;";
 		if (wait_char(';', 7, 20, "get squelch", ASC) >= 7) {
 			size_t p = replystr.rfind("SQ0");
-			if (p == string::npos) return val;
+			if (p == std::string::npos) return val;
 			replystr[p + 6] = 0;
 			val = atoi(&replystr[p + 3]);
 	}
@@ -1187,7 +1187,7 @@ int  RIG_TS480SAT::get_mic_gain()
 	if (wait_char(';', 6, 100, "get mic gain", ASC) < 6) return val;
 
 	size_t p = replystr.rfind("MG");
-	if (p != string::npos)
+	if (p != std::string::npos)
 		val = fm_decimal(replystr.substr(p+2), 3);
 	return val;
 }
@@ -1216,7 +1216,7 @@ int RIG_TS480SAT::get_volume_control()
 	if (wait_char(';', 7, 100, "get vol", ASC) < 7) return val;
 
 	size_t p = replystr.rfind("AG");
-	if (p == string::npos) return val;
+	if (p == std::string::npos) return val;
 	replystr[p + 6] = 0;
 	val = atoi(&replystr[p + 3]);
 	val = val * 100 / 255;

@@ -233,7 +233,7 @@ void RIG_FT950::initialize()
 	cmd = "MR118;";
 	wait_char(';', 27, FL950_WAIT_TIME, "Read UK 60m Channel Mem", ASC);
 	size_t p = replystr.rfind("MR");
-	if (p == string::npos) {
+	if (p == std::string::npos) {
 		Channels_60m = US_60m_chan;
 		label_60m    = US_60m_label;
 		op_yaesu_select60->clear();
@@ -276,7 +276,7 @@ unsigned long int RIG_FT950::get_vfoA ()
 	rig_trace(4, "get_vfoA()", cmd.c_str(), " => ", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return freqA;
+	if (p == std::string::npos) return freqA;
 	int f = 0;
 	for (size_t n = 2; n < 10; n++)
 		f = f*10 + replystr[p+n] - '0';
@@ -308,7 +308,7 @@ unsigned long int RIG_FT950::get_vfoB ()
 	rig_trace(4, "get_vfoB()", cmd.c_str(), " => ", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return freqB;
+	if (p == std::string::npos) return freqB;
 	int f = 0;
 	for (size_t n = 2; n < 10; n++)
 		f = f*10 + replystr[p+n] - '0';
@@ -353,7 +353,7 @@ double RIG_FT950::getVfoAdj()
 	rig_trace(4, "get_VfoAdj()", cmd.c_str(), " => ", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	return (double)(atoi(&replystr[p+5]));
 }
 
@@ -444,7 +444,7 @@ int RIG_FT950::get_split()
 	rig_trace(4, "get_split()", cmd.c_str(), " => ", replystr.c_str());
 
 	p = replystr.rfind(rsp);
-	if (p == string::npos) return false;
+	if (p == std::string::npos) return false;
 	tx = replystr[p+2] - '0';
 
 // rx vfo
@@ -455,7 +455,7 @@ int RIG_FT950::get_split()
 	rig_trace(4, "get_split()", cmd.c_str(), " => ", replystr.c_str());
 
 	p = replystr.rfind(rsp);
-	if (p == string::npos) return false;
+	if (p == std::string::npos) return false;
 	rx = replystr[p+2] - '0';
 
 	split = (tx == 1 ? 2 : 0) + (rx >= 4 ? 1 : 0);
@@ -471,7 +471,7 @@ int RIG_FT950::get_smeter()
 	wait_char(';',7, FL950_WAIT_TIME, "get smeter", ASC);
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
 	int mtr = atoi(&replystr[p+3]);
 	mtr = mtr * 100.0 / 256.0;
@@ -485,7 +485,7 @@ int RIG_FT950::get_swr()
 	wait_char(';',7, FL950_WAIT_TIME, "get swr", ASC);
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
 	int mtr = atoi(&replystr[p+3]);
 	return (int)ceil(mtr / 2.56);
@@ -498,7 +498,7 @@ int RIG_FT950::get_alc()
 	wait_char(';',7, FL950_WAIT_TIME, "get alc", ASC);
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
 	int mtr = atoi(&replystr[p+3]);
 	return (int)ceil(mtr / 2.56);
@@ -508,7 +508,7 @@ int RIG_FT950::get_alc()
 double RIG_FT950::get_voltmeter()
 {
 	cmd = "RM8;";
-	string resp = "RM";
+	std::string resp = "RM";
 
 	int mtr = 0;
 	double val = 0;
@@ -518,7 +518,7 @@ double RIG_FT950::get_voltmeter()
 	gett("get_voltmeter");
 
 	size_t p = replystr.rfind(resp);
-	if (p != string::npos) {
+	if (p != std::string::npos) {
 		mtr = atoi(&replystr[p+3]);
 		val = (2.2 * mtr / 31.0) + 0.17;
 		return val;
@@ -534,7 +534,7 @@ int RIG_FT950::get_power_out()
 	wait_char(';',7, FL950_WAIT_TIME, "get pout", ASC);
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
 	double mtr = (double)(atoi(&replystr[p+3]));
 
@@ -552,7 +552,7 @@ double RIG_FT950::get_power_control()
 	wait_char(';',6, FL950_WAIT_TIME, "get power", ASC);
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return progStatus.power_level;
+	if (p == std::string::npos) return progStatus.power_level;
 	if (p + 5 >= replystr.length()) return progStatus.power_level;
 
 	int mtr = atoi(&replystr[p+2]);
@@ -580,7 +580,7 @@ int RIG_FT950::get_volume_control()
 	wait_char(';',7, FL950_WAIT_TIME, "get vol", ASC);
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return progStatus.volume;
+	if (p == std::string::npos) return progStatus.volume;
 	if (p + 6 >= replystr.length()) return progStatus.volume;
 	int val = round(atoi(&replystr[p+3]) / 2.55);
 	if (val > 100) val = 100;
@@ -620,7 +620,7 @@ int RIG_FT950::get_PTT()
 	waitN(4, 100, "get PTT", ASC);
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return ptt_;
+	if (p == std::string::npos) return ptt_;
 	ptt_ =  (replystr[p+2] != '0' ? 1 : 0);
 	return ptt_;
 }
@@ -648,7 +648,7 @@ void RIG_FT950::tune_rig(int)
 	cmd.append(";");
 	wait_char(';',6, FL950_WAIT_TIME, "is Int. Tuner Enabled", ASC);
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return;
+	if (p == std::string::npos) return;
 	if ((p + 5) >= replystr.length()) return;
 	if (replystr[p+4] == '0') {
 		use_int_tuner = false;
@@ -728,7 +728,7 @@ int RIG_FT950::get_attenuator()
 	wait_char(';',5, FL950_WAIT_TIME, "get att", ASC);
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return progStatus.attenuator;
+	if (p == std::string::npos) return progStatus.attenuator;
 	if (p + 3 >= replystr.length()) return progStatus.attenuator;
 	atten_level = replystr[p+3] - '0';
 	if (atten_level == 1) {
@@ -780,7 +780,7 @@ int RIG_FT950::get_preamp()
 	wait_char(';',5, FL950_WAIT_TIME, "get pre", ASC);
 
 	size_t p = replystr.rfind(rsp);
-	if (p != string::npos)
+	if (p != std::string::npos)
 		preamp_level = replystr[p+3] - '0';
 	if (preamp_level == 1) {
 		preamp_label("Amp 1", true);
@@ -896,7 +896,7 @@ int RIG_FT950::get_modeA()
 	rig_trace(4, "get_modeA()", cmd.c_str(), " => ", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
-	if (p != string::npos) {
+	if (p != std::string::npos) {
 		if (p + 3 < replystr.length()) {
 			int md = replystr[p+3];
 			if (md <= '9') md = md - '1';
@@ -943,7 +943,7 @@ int RIG_FT950::get_modeB()
 	rig_trace(4, "get_modeB()", cmd.c_str(), " => ", replystr.c_str());
 
 	size_t p = replystr.rfind(rsp);
-	if (p != string::npos) {
+	if (p != std::string::npos) {
 		if (p + 3 < replystr.length()) {
 			int md = replystr[p+3];
 			if (md <= '9') md = md - '1';
@@ -1005,7 +1005,7 @@ int RIG_FT950::get_bwA()
 		rig_trace(4, "get_bwA()", cmd.c_str(), " => ", replystr.c_str());
 
 		p = replystr.rfind(rsp);
-		if (p == string::npos) { bwA = 0; return bwA; }
+		if (p == std::string::npos) { bwA = 0; return bwA; }
 		if (p + 4 >= replystr.length()) { bwA = 0; return bwA; }
 		if (replystr[p+3] == '1') bwA = 1;	// narrow on
 		else bwA = 0;
@@ -1018,7 +1018,7 @@ int RIG_FT950::get_bwA()
 	rig_trace(4, "get_bwA()", cmd.c_str(), " => ", replystr.c_str());
 
 	p = replystr.rfind(rsp);
-	if (p == string::npos) return bwA;
+	if (p == std::string::npos) return bwA;
 	if (p + 5 >= replystr.length()) return bwA;
 
 	replystr[p+5] = 0;
@@ -1086,7 +1086,7 @@ int RIG_FT950::get_bwB()
 		rig_trace(4, "get_bwB()", cmd.c_str(), " => ", replystr.c_str());
 
 		p = replystr.rfind(rsp);
-		if (p == string::npos) { bwB = 0; return bwB; }
+		if (p == std::string::npos) { bwB = 0; return bwB; }
 		if (p + 4 >= replystr.length()) { bwB = 0; return bwB; }
 		if (replystr[p+3] == '1') bwB = 1;	// narrow on
 		else bwB = 0;
@@ -1099,7 +1099,7 @@ int RIG_FT950::get_bwB()
 	rig_trace(4, "get_bwB()", cmd.c_str(), " => ", replystr.c_str());
 
 	p = replystr.rfind(rsp);
-	if (p == string::npos) return bwB;
+	if (p == std::string::npos) return bwB;
 	if (p + 5 >= replystr.length()) return bwB;
 
 	replystr[p+5] = 0;
@@ -1119,7 +1119,7 @@ int RIG_FT950::get_bwB()
 
 std::string RIG_FT950::get_BANDWIDTHS()
 {
-	stringstream s;
+	std::stringstream s;
 	for (int i = 0; i < NUM_MODES; i++)
 		s << mode_bwA[i] << " ";
 	for (int i = 0; i < NUM_MODES; i++)
@@ -1129,7 +1129,7 @@ std::string RIG_FT950::get_BANDWIDTHS()
 
 void RIG_FT950::set_BANDWIDTHS(std::string s)
 {
-	stringstream strm;
+	std::stringstream strm;
 	strm << s;
 	for (int i = 0; i < NUM_MODES; i++)
 		strm >> mode_bwA[i];
@@ -1166,7 +1166,7 @@ bool RIG_FT950::get_if_shift(int &val)
 
 	size_t p = replystr.rfind(rsp);
 	val = progStatus.shift_val;
-	if (p == string::npos) return progStatus.shift;
+	if (p == std::string::npos) return progStatus.shift;
 	val = atoi(&replystr[p+4]);
 	if (replystr[p+3] == '-') val = -val;
 	return (val != 0);
@@ -1222,7 +1222,7 @@ bool  RIG_FT950::get_notch(int &val)
 	wait_char(';',8, FL950_WAIT_TIME, "get notch on/off", ASC);
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return ison;
+	if (p == std::string::npos) return ison;
 
 	if (replystr[p+6] == '1') { // manual notch enabled
 		ison = true;
@@ -1231,7 +1231,7 @@ bool  RIG_FT950::get_notch(int &val)
 		cmd += ';';
 		wait_char(';',8, FL950_WAIT_TIME, "get notch val", ASC);
 		p = replystr.rfind(rsp);
-		if (p == string::npos)
+		if (p == std::string::npos)
 			val = 10;
 		else
 			val = fm_decimal(replystr.substr(p+4),3) * 10;
@@ -1258,7 +1258,7 @@ int  RIG_FT950::get_auto_notch()
 	cmd = "BC0;";
 	wait_char(';',5, FL950_WAIT_TIME, "get auto notch", ASC);
 	size_t p = replystr.rfind("BC0");
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	if (replystr[p+3] == '1') return 1;
 	return 0;
 }
@@ -1293,7 +1293,7 @@ int RIG_FT950::get_noise()
 	wait_char(';',5, FL950_WAIT_TIME, "get NB", ASC);
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return FT950_blanker_level;
+	if (p == std::string::npos) return FT950_blanker_level;
 
 	FT950_blanker_level = replystr[p+3] - '0';
 	if (FT950_blanker_level == 1) {
@@ -1330,7 +1330,7 @@ int RIG_FT950::get_mic_gain()
 	wait_char(';',6, FL950_WAIT_TIME, "get mic", ASC);
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return progStatus.mic_gain;
+	if (p == std::string::npos) return progStatus.mic_gain;
 	int val = atoi(&replystr[p+2]);
 	val = (int)(val / 2.50);
 	if (val > 100) val = 100;
@@ -1371,7 +1371,7 @@ int  RIG_FT950::get_rf_gain()
 	wait_char(';',7, FL950_WAIT_TIME, "get rfgain", ASC);
 
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return progStatus.rfgain;
+	if (p == std::string::npos) return progStatus.rfgain;
 	for (int i = 3; i < 6; i++) {
 		rfval *= 10;
 		rfval += replystr[p+i] - '0';
@@ -1497,7 +1497,7 @@ void RIG_FT950::get_band_selection(int v)
 	cmd = "IF;";
 	wait_char(';',27, FL950_WAIT_TIME, "get vfo mode in get_band_selection", ASC);
 	size_t p = replystr.rfind("IF");
-	if (p == string::npos) return;
+	if (p == std::string::npos) return;
 	if ((p + 26) >= replystr.length()) return;
 	if (replystr[p+21] != '0') {	// vfo 60M memory mode
 		chan_mem_on = true;
@@ -1540,7 +1540,7 @@ int  RIG_FT950::get_noise_reduction_val()
 	cmd.append(";");
 	wait_char(';',6, FL950_WAIT_TIME, "GET noise reduction val", ASC);
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return val;
+	if (p == std::string::npos) return val;
 	val = atoi(&replystr[p+3]);
 	return val;
 }
@@ -1560,7 +1560,7 @@ int  RIG_FT950::get_noise_reduction()
 	cmd.append(";");
 	wait_char(';',5, FL950_WAIT_TIME, "GET noise reduction", ASC);
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) return 0;
+	if (p == std::string::npos) return 0;
 	val = replystr[p+3] - '0';
 	return val;
 }
@@ -1573,7 +1573,7 @@ void RIG_FT950::set_xcvr_auto_on()
 	cmd.append(";");
 	wait_char(';',4, FL950_WAIT_TIME, "Test: Is Rig ON", ASC);
 	size_t p = replystr.rfind(rsp);
-	if (p == string::npos) {	// rig is off, power on
+	if (p == std::string::npos) {	// rig is off, power on
 		cmd = "PS1;";
 		sendCommand(cmd);
 		for (int i = 0; i < 1500; i += 100) {
@@ -1619,13 +1619,13 @@ void RIG_FT950::get_compression( int &on, int &val )
 	cmd.assign("PL;");
 	wait_char(';', 6, FL950_WAIT_TIME, "GET compression value", ASC);
 	size_t p = replystr.rfind("PL");
-	if (p == string::npos) return;
+	if (p == std::string::npos) return;
 	val = fm_decimal(replystr.substr(p+3),2);
 
 	cmd.assign("PR;");
 	wait_char(';', 4, FL950_WAIT_TIME, "GET compression on/off", ASC);
 	p = replystr.rfind("PR");
-	if (p == string::npos) return;
+	if (p == std::string::npos) return;
 	on = (replystr[p+2] == '1');
 }
 
