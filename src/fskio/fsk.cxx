@@ -367,8 +367,8 @@ if (!ftiming) {
 			send_baudot(chr_out & 0x1F);
 		}
 	} else
-//		MilliSleep(10);
-		sleep(BITLEN);
+		MilliSleep(BITLEN*1000L);
+//		sleep(BITLEN);
 	return 0;
 }
 
