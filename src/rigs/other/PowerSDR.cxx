@@ -201,7 +201,7 @@ RIG_PowerSDR::RIG_PowerSDR() {
 	has_mode_control =
 	has_bandwidth_control =
 	has_sql_control =
-	has_ptt_control = 
+	has_ptt_control =
 	has_extras = true;
 
 	rxona = true;
@@ -282,17 +282,17 @@ void RIG_PowerSDR::set_power_control(double val)
 
 int RIG_PowerSDR::get_power_out()
 {
-	float mtr = 0.0;
+	int mtr = 0;
 
 	cmd = "ZZRM5;";
 	get_trace(1, "get_power_out");
 	ret = wait_char(';', 11, 100, "get power", ASC);
 	gett("");
-	if (ret < 11) return 0;
+	if (ret < 9) return 0;
 
-	sscanf(&replystr[0],"ZZRM5%f", &mtr);
+	sscanf(&replystr[0],"ZZRM5%d", &mtr);
 
-	return (int)(10 * mtr);
+	return mtr;
 }
 
 
@@ -380,7 +380,7 @@ ZZPA7 does nothing
 */
 
 int  RIG_PowerSDR::next_preamp()
-{   
+{
 	// strange sequence for ANAN 7000DLE MKII
 	switch(preamp_level)
 	{
@@ -435,7 +435,7 @@ int RIG_PowerSDR::get_preamp()
 			preamp_level = fm_decimal(replystr.substr(p+2),1);
 			// need to map 7 to 2 to keep FLRig cbPreamp happy
 			// when ZZPA2; is sent ZZPA7; comes back
-			if (preamp_level == 7) preamp_level = 2; 
+			if (preamp_level == 7) preamp_level = 2;
 		}
 	}
 	else preamp_level = 0;
@@ -676,7 +676,7 @@ int RIG_PowerSDR::get_bwA()
 		A.iBW = 0;
 		gett("get_bwA Wideband");
 	}
-	else if (A.imode == LSB || A.imode == USB) {  
+	else if (A.imode == LSB || A.imode == USB) {
 		cmd = "ZZFI;";
 		get_trace(1, "get_bw SSB");
 		ret = wait_char(';', 7, 100, "get ZZFI", ASC);
@@ -692,7 +692,7 @@ int RIG_PowerSDR::get_bwA()
 				A.iBW = i;
 			}
 		}
-	} 
+	}
 	else if (A.imode == CWL || A.imode == CWU) {
 		cmd = "ZZFI;";
 		get_trace(1, "get_bw CW");
@@ -707,7 +707,7 @@ int RIG_PowerSDR::get_bwA()
 				A.iBW = i;
 			}
 		}
-	} 
+	}
 	else if (A.imode == DIGU || A.imode == DIGL) {
 		cmd = "ZZFI;";
 		get_trace(1, "get_bw DIGI");
