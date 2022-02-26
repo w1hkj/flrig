@@ -43,22 +43,29 @@ extern void make_trace_window();
 #define gett(str) get_trace(3, str, cmd.c_str(), replystr.c_str())
 #define sett(str) set_trace(3, str, cmd.c_str(), replystr.c_str())
 
-#define getthex(str) get_trace(3, \
-	str, \
-	(str2hex(cmd.c_str(), cmd.length())), \
-	(str2hex(replystr.c_str(), replystr.length())) )
+#define getthex(str) { \
+	std::string hex1 = str2hex(cmd.c_str(), cmd.length()); \
+	std::string hex2 = str2hex(replystr.c_str(), replystr.length()); \
+	get_trace(3, str, hex1.c_str(), hex2.c_str()); \
+}
 
-#define setthex(str) set_trace(3, \
-	str, \
-	(str2hex(cmd.c_str(), cmd.length())), \
-	(str2hex(replystr.c_str(), replystr.length())) )
+#define setthex(str) { \
+	std::string hex1 = str2hex(cmd.c_str(), cmd.length()); \
+	std::string hex2 = str2hex(replystr.c_str(), replystr.length()); \
+	set_trace(3, str, hex1.c_str(), hex2.c_str()); \
+}
 
-#define seth() set_trace(2, \
-	(str2hex(cmd.c_str(), cmd.length())), \
-	(str2hex(replystr.c_str(), replystr.length())) )
+#define seth() { \
+	std::string hex1 = str2hex(cmd.c_str(), cmd.length()); \
+	std::string hex2 = str2hex(replystr.c_str(), replystr.length()); \
+	set_trace(3, hex1.c_str(), " : ", hex2.c_str()); \
+}
 
-#define geth() get_trace(1, \
-	(str2hex(replystr.c_str(), replystr.length())) )
+#define geth() { \
+	std::string hex1 = str2hex(cmd.c_str(), cmd.length()); \
+	std::string hex2 = str2hex(replystr.c_str(), replystr.length()); \
+	set_trace(3, hex1.c_str(), " : ", hex2.c_str()); \
+}
 
 #endif
 
