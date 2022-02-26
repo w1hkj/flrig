@@ -5031,12 +5031,6 @@ void init_Generic_Tabs()
 	genericUser_3->redraw();
 	genericUser_3->show();
 
-//	if (selrig->name_ == rig_KX3.name_) {
-//		tabsGeneric->add(kx3_extras);
-//		kx3_extras->redraw();
-//		kx3_extras->show();
-//	}
-
 	if (selrig->name_ == rig_IC7610.name_) {
 
 		tabsGeneric->add(tab7610);
@@ -5168,6 +5162,166 @@ void init_TT550()
 	}
 }
 
+void init_VFOs()
+{
+	if (selrig->name_ == rig_TT550.name_) return;
+
+	if (xcvr_name == rig_FT817.name_ || 
+		xcvr_name == rig_FT818ND.name_ ||
+		xcvr_name == rig_FT857D.name_ ||
+		xcvr_name == rig_FT897D.name_ ) {
+
+		// transceiver should be on VFO A before starting flrig
+		selrig->selectB();
+		vfoB.freq = selrig->get_vfoB();
+		FreqDispB->value(vfoB.freq);
+		vfoB.imode = selrig->get_modeB();
+
+		selrig->selectA();
+		vfoA.freq = selrig->get_vfoA();
+		FreqDispA->value(vfoA.freq);
+		vfoA.imode = selrig->get_modeA();
+
+		updateBandwidthControl();
+		setModeControl((void *)0);
+
+		highlight_vfo(NULL);
+
+		return;
+	} // Yaesu FT817, FT817ND, FT818ND, FT857D, FT897D transceivers
+
+	if (xcvr_name == rig_FT817BB.name_) {
+		if (selrig->get_vfoAorB() == onA) {
+			selrig->selectB();
+			vfoB.freq = selrig->get_vfoB();
+			FreqDispB->value(vfoB.freq);
+			vfoB.imode = selrig->get_modeB();
+
+			selrig->selectA();
+			vfoA.freq = selrig->get_vfoA();
+			FreqDispA->value(vfoA.freq);
+			vfoA.imode = selrig->get_modeA();
+
+			updateBandwidthControl();
+		} else {
+			selrig->selectA();
+			vfoA.freq = selrig->get_vfoA();
+			FreqDispA->value(vfoA.freq);
+			vfoA.imode = selrig->get_modeA();
+
+			selrig->selectB();
+			vfoB.freq = selrig->get_vfoB();
+			FreqDispB->value(vfoB.freq);
+			vfoB.imode = selrig->get_modeB();
+
+			updateBandwidthControl();
+		}
+
+		setModeControl((void *)0);
+
+		highlight_vfo(NULL);
+
+		return;
+	} // FT817BB transceiver
+
+	if (!progStatus.use_rig_data) {
+
+		vfoB.freq = progStatus.freq_B;
+		vfoB.imode = progStatus.imode_B;
+		vfoB.iBW = progStatus.iBW_B;
+
+		if (vfoB.iBW == -1)
+			vfoB.iBW = selrig->def_bandwidth(vfoB.imode);
+
+		selrig->selectB();
+
+		selrig->set_modeB(vfoB.imode);
+		selrig->set_bwB(vfoB.iBW);
+		selrig->set_vfoB(vfoB.freq);
+		FreqDispB->value(vfoB.freq);
+
+		update_progress(progress->value() + 4);
+
+		trace(2, "init_VFOs() vfoB ", printXCVR_STATE(vfoB).c_str());
+
+		vfoA.freq = progStatus.freq_A;
+		vfoA.imode = progStatus.imode_A;
+		vfoA.iBW = progStatus.iBW_A;
+
+		if (vfoA.iBW == -1)
+			vfoA.iBW = selrig->def_bandwidth(vfoA.imode);
+
+		selrig->selectA();
+
+		selrig->set_modeA(vfoA.imode);
+		selrig->set_bwA(vfoA.iBW);
+		selrig->set_vfoA(vfoA.freq);
+		FreqDispA->value( vfoA.freq );
+
+		update_progress(progress->value() + 4);
+
+		vfo = &vfoA;
+		updateBandwidthControl();
+		highlight_vfo((void *)0);
+
+		trace(2, "init_VFOs() vfoA ", printXCVR_STATE(vfoA).c_str());
+
+	} else {
+
+		// Capture VFOA mode and bandwidth, since it will be lost in VFO switch
+		if (selrig->name_ == rig_FT891.name_) {
+			selrig->selectA();
+			vfoA.freq = selrig->get_vfoA();
+			update_progress(progress->value() + 4);
+			vfoA.imode = selrig->get_modeA();
+
+			update_progress(progress->value() + 4);
+
+			vfoA.iBW = selrig->get_bwA();
+			update_progress(progress->value() + 4);
+			FreqDispA->value(vfoA.freq);
+			trace(2, "A: ", printXCVR_STATE(vfoA).c_str());
+
+			selrig->selectB();			// third select call
+			vfoB.freq = selrig->get_vfoB();
+			update_progress(progress->value() + 4);
+			vfoB.imode = selrig->get_modeB();
+
+			update_progress(progress->value() + 4);
+
+			vfoB.iBW = selrig->get_bwB();
+			update_progress(progress->value() + 4);
+			FreqDispB->value(vfoB.freq);
+			trace(2, "B: ", printXCVR_STATE(vfoB).c_str());
+
+			// Restore radio VFOA mode, then freq and bandwidth
+			selrig->selectA();			// fourth select call
+			yaesu891UpdateA(&vfoA);
+		} else {
+			vfoB = xcvr_vfoB;
+			vfoA = xcvr_vfoA;
+			FreqDispB->value(vfoB.freq);
+			FreqDispA->value(vfoA.freq);
+		}
+
+
+		vfo = &vfoA;
+		selrig->set_modeA(vfo->imode);
+		selrig->set_bwA(vfo->iBW);
+		setModeControl((void *)0);
+
+		update_progress(progress->value() + 4);
+
+		updateBandwidthControl();
+
+		update_progress(progress->value() + 4);
+
+		highlight_vfo((void *)0);
+	}
+
+	selrig->set_split(0);		// initialization set split call
+}
+
 void init_generic_rig()
 {
 	if (progStatus.CIV > 0)
@@ -5206,6 +5360,8 @@ void init_generic_rig()
 			vfoB = xcvr_vfoB;
 		}
 	}
+	init_VFOs();
+
 	progStatus.compON = xcvr_vfoA.compON;
 	progStatus.compression = xcvr_vfoA.compression;
 
@@ -6231,146 +6387,6 @@ void init_CIV()
 		btnUSBaudio->value(false);
 		btnUSBaudio->deactivate();
 	}
-}
-
-void init_VFOs()
-{
-	if (selrig->name_ == rig_TT550.name_) return;
-
-	if (xcvr_name == rig_FT817.name_ || 
-//		xcvr_name == rig_FT817BB.name_ ||
-		xcvr_name == rig_FT818ND.name_ ||
-		xcvr_name == rig_FT857D.name_ ||
-		xcvr_name == rig_FT897D.name_ ) {
-
-//		selrig->selectA();
-//		vfoA.freq = selrig->get_vfoA();
-//		FreqDispA->value(vfoA.freq);
-
-		selrig->selectB();
-		vfoB.freq = selrig->get_vfoB();
-		FreqDispB->value(vfoB.freq);
-
-		selrig->selectA();
-		vfoA.freq = selrig->get_vfoA();
-		FreqDispA->value(vfoA.freq);
-		updateBandwidthControl();
-		highlight_vfo(NULL);
-		return;
-	}
-
-	if (xcvr_name == rig_FT817BB.name_) {
-		if (selrig->get_vfoAorB() == onA) {
-			selrig->selectB();
-			vfoB.freq = selrig->get_vfoB();
-			FreqDispB->value(vfoB.freq);
-
-			selrig->selectA();
-			vfoA.freq = selrig->get_vfoA();
-			FreqDispA->value(vfoA.freq);
-			updateBandwidthControl();
-		} else {
-			selrig->selectA();
-			vfoA.freq = selrig->get_vfoA();
-			FreqDispA->value(vfoA.freq);
-
-			selrig->selectB();
-			vfoB.freq = selrig->get_vfoB();
-			FreqDispB->value(vfoB.freq);
-			updateBandwidthControl();
-		}
-		highlight_vfo(NULL);
-		return;
-	}
-
-	if (!progStatus.use_rig_data) {
-
-		vfoB.freq = progStatus.freq_B;
-		vfoB.imode = progStatus.imode_B;
-		vfoB.iBW = progStatus.iBW_B;
-
-		if (vfoB.iBW == -1)
-			vfoB.iBW = selrig->def_bandwidth(vfoB.imode);
-
-		selrig->selectB();
-
-		selrig->set_modeB(vfoB.imode);
-		selrig->set_bwB(vfoB.iBW);
-		selrig->set_vfoB(vfoB.freq);
-		FreqDispB->value(vfoB.freq);
-
-		update_progress(progress->value() + 4);
-
-		trace(2, "init_VFOs() vfoB ", printXCVR_STATE(vfoB).c_str());
-
-		vfoA.freq = progStatus.freq_A;
-		vfoA.imode = progStatus.imode_A;
-		vfoA.iBW = progStatus.iBW_A;
-
-		if (vfoA.iBW == -1)
-			vfoA.iBW = selrig->def_bandwidth(vfoA.imode);
-
-		selrig->selectA();
-
-		selrig->set_modeA(vfoA.imode);
-		selrig->set_bwA(vfoA.iBW);
-		selrig->set_vfoA(vfoA.freq);
-		FreqDispA->value( vfoA.freq );
-
-		update_progress(progress->value() + 4);
-
-		vfo = &vfoA;
-		updateBandwidthControl();
-		highlight_vfo((void *)0);
-
-		trace(2, "init_VFOs() vfoA ", printXCVR_STATE(vfoA).c_str());
-
-	}
-	else {
-		// Capture VFOA mode and bandwidth, since it will be lost in VFO switch
-		if (selrig->name_ == rig_FT891.name_) {
-			selrig->selectA();
-			vfoA.freq = selrig->get_vfoA();
-			update_progress(progress->value() + 4);
-			vfoA.imode = selrig->get_modeA();
-			update_progress(progress->value() + 4);
-			vfoA.iBW = selrig->get_bwA();
-			update_progress(progress->value() + 4);
-			FreqDispA->value(vfoA.freq);
-			trace(2, "A: ", printXCVR_STATE(vfoA).c_str());
-
-			selrig->selectB();			// third select call
-			vfoB.freq = selrig->get_vfoB();
-			update_progress(progress->value() + 4);
-			vfoB.imode = selrig->get_modeB();
-			update_progress(progress->value() + 4);
-			vfoB.iBW = selrig->get_bwB();
-			update_progress(progress->value() + 4);
-			FreqDispB->value(vfoB.freq);
-			trace(2, "B: ", printXCVR_STATE(vfoB).c_str());
-
-			// Restore radio VFOA mode, then freq and bandwidth
-			selrig->selectA();			// fourth select call
-			yaesu891UpdateA(&vfoA);
-		} else {
-			vfoB = xcvr_vfoB;
-			vfoA = xcvr_vfoA;
-			FreqDispB->value(vfoB.freq);
-			FreqDispA->value(vfoA.freq);
-		}
-
-
-		vfo = &vfoA;
-		selrig->set_modeA(vfo->imode);
-		selrig->set_bwA(vfo->iBW);
-		setModeControl((void *)0);
-		update_progress(progress->value() + 4);
-		updateBandwidthControl();
-		update_progress(progress->value() + 4);
-		highlight_vfo((void *)0);
-	}
-
-	selrig->set_split(0);		// initialization set split call
 }
 
 void init_TS990_special()
