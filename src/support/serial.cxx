@@ -23,10 +23,11 @@
 #include <iostream>
 #include <errno.h>
 
-#include "serial.h"
 #include "debug.h"
-
 #include "rig.h"
+#include "serial.h"
+#include "status.h"
+#include "trace.h"
 
 LOG_FILE_SOURCE(debug::LOG_RIGCONTROL);
 

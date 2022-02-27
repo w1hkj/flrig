@@ -22,6 +22,8 @@
 #include "elecraft/KX3.h"
 #include "status.h"
 
+#include "support.h"
+
 const char KX3name_[] = "KX3";
 
 enum {KX3_LSB, KX3_USB, KX3_CW, KX3_FM, KX3_AM, KX3_DATA, KX3_CWR, KX3_DATAR};

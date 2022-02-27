@@ -26,6 +26,8 @@
 #include "yaesu/FT450D.h"
 #include "rig.h"
 
+#include "support.h"
+
 #define FL450D_WAIT_TIME 200
 
 static const char FT450Dname_[] = "FT-450D";

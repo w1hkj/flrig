@@ -29,6 +29,7 @@
 #include <fstream>
 #include <cstring>
 #include <ctime>
+#include <math.h>
 #include <sys/stat.h>
 #include <stdio.h>
 #include <errno.h>
@@ -44,7 +45,9 @@
 #include <FL/Fl_Help_Dialog.H>
 #include <FL/Fl_Menu_Item.H>
 #include <FL/Fl_File_Icon.H>
-#include <math.h>
+#include <FL/x.H>
+#include <FL/Fl_Pixmap.H>
+#include <FL/Fl_Image.H>
 
 #include "config.h"
 
@@ -56,10 +59,7 @@
 
 #include "socket_io.h"
 #include "socket.h"
-
-#include <FL/x.H>
-#include <FL/Fl_Pixmap.H>
-#include <FL/Fl_Image.H>
+#include "support.h"
 
 #ifdef WIN32
 #  include <winsock2.h>

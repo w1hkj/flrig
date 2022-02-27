@@ -21,8 +21,10 @@
 #include <sstream>
 
 #include "icom/ICF8101.h"
-#include "support.h"
+#include "status.h"
 #include "trace.h"
+
+#include "support.h"
 
 //=============================================================================
 // IC-F8101

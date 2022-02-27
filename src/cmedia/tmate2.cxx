@@ -53,6 +53,7 @@
 #include "threads.h"
 #include "debug.h"
 #include "util.h"
+#include "support.h"
 #include "status.h"
 
 #include "hidapi.h"

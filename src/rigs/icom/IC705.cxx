@@ -27,9 +27,11 @@
 #include <iostream>
 
 #include "icom/IC705.h"
-#include "support.h"
+#include "status.h"
 #include "trace.h"
 #include "tod_clock.h"
+
+#include "support.h"
 
 //=============================================================================
 // IC-705

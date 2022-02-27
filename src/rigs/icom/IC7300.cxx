@@ -27,8 +27,10 @@
 #include <iostream>
 
 #include "icom/IC7300.h"
-#include "support.h"
+#include "status.h"
 #include "trace.h"
+
+#include "support.h"
 
 //=============================================================================
 // IC-7300

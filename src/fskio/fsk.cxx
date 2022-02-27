@@ -27,6 +27,7 @@
 #include "fskioUI.h"
 #include "serial.h"
 #include "support.h"
+#include "status.h"
 #include "util.h"
 
 #ifdef __WIN32__

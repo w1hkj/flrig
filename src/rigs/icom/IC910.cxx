@@ -20,6 +20,8 @@
 
 #include "icom/IC910.h"
 
+#include "support.h"
+
 const char IC910Hname_[] = "IC-910H";
 const char *IC910Hmodes_[] = {
 		"LSB", "USB", "AM", "CW", "FM", NULL};

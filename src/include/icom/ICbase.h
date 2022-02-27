@@ -23,7 +23,7 @@
 
 #include "rigbase.h"
 #include "debug.h"
-#include "support.h"
+#include "status.h"
 
 // set/get tracing
 #define isett(s) set_trace(2, s, str2hex(cmd.c_str(), cmd.length()));

@@ -20,6 +20,8 @@
 
 #include "icom/IC7700.h"
 #include "debug.h"
+#include "status.h"
+
 #include "support.h"
 
 //=============================================================================

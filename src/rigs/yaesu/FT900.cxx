@@ -28,6 +28,8 @@
 #include "yaesu/FT900.h"
 #include "status.h"
 
+#include "support.h"
+
 const char FT900name_[] = "FT-900";
 
 const char *FT900modes_[] = {

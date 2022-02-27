@@ -25,6 +25,22 @@
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Text_Buffer.H>
 
+#include <cstdio>
+
+#define WITH_TRACE
+
+#ifdef WITH_TRACE
+#define TRACED(name, ...) name(__VA_ARGS__) { \
+      static unsigned trace_calls_##name = 0; \
+      ++trace_calls_##name; \
+      std::printf("[%3u] %s\n", trace_calls_##name, #name );
+#else
+#  define TRACED(name, ...) name(__VA_ARGS__) {
+#endif
+
+//usage
+//int TRACED(add, int a, int b)
+
 extern Fl_Double_Window*	tracewindow;
 
 extern void trace(int n, ...); // all args of type const char *

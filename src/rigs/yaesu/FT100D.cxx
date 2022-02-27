@@ -21,6 +21,8 @@
 #include "yaesu/FT100D.h"
 #include "rig.h"
 
+#include "support.h"
+
 static const char FT100Dname_[] = "FT-100D";
 static const char *FT100Dmodes_[] = 
 { "LSB", "USB", "CW", "CW-R", "AM", "DIG", "FM", "W-FM", NULL};

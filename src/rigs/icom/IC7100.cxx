@@ -24,6 +24,8 @@
 #include <sstream>
 
 #include "tod_clock.h"
+#include "status.h"
+
 #include "support.h"
 
 //=============================================================================

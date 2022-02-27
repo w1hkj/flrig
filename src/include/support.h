@@ -21,23 +21,37 @@
 #ifndef SUPPORT_H
 #define SUPPORT_H
 
-#include <fstream>
-#include <vector>
-#include <queue>
-#include <string>
-
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdarg.h>
+#include <fcntl.h>
 #include <math.h>
+
 #ifndef WIN32
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <sys/shm.h>
 #endif
 
+#include <string>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+
+#include <vector>
+#include <queue>
+
 #include <FL/Fl.H>
+#include <FL/Enumerations.H>
+#include <FL/Fl_Tree.H>
+#include <FL/Fl_Text_Display.H>
+#include <FL/Fl_Text_Buffer.H>
 #include <FL/fl_draw.H>
 #include <FL/fl_show_colormap.H>
 #include <FL/fl_ask.H>
-#include <FL/Fl_Tree.H>
 
 #include "rig.h"
 #include "rigbase.h"
@@ -46,15 +60,36 @@
 #include "serial.h"
 #include "status.h"
 
+#include "icons.h"
+#include "debug.h"
+#include "gettext.h"
+#include "dialogs.h"
+#include "rigbase.h"
+#include "ptt.h"
+#include "ui.h"
+#include "tod_clock.h"
+#include "rig.h"
+#include "rigs.h"
+#include "K3_ui.h"
+#include "KX3_ui.h"
+#include "rigpanel.h"
+#include "trace.h"
+#include "cwio.h"
+#include "fsk.h"
+#include "fskioUI.h"
+#include "rig_io.h"
+#include "socket_io.h"
+#include "xml_server.h"
+#include "gpio_ptt.h"
+#include "cmedia.h"
+#include "tmate2.h"
+
 #define LISTSIZE 200
 #define ATAGSIZE 128 //21
 
 extern bool flrig_abort;
 
-extern XCVR_STATE *vfo;
-extern XCVR_STATE vfoA;
-extern XCVR_STATE vfoB;
-//extern XCVR_STATE xmlvfo;
+extern XCVR_STATE *vfo, vfoA, vfoB, xcvr_vfoA, xcvr_vfoB;
 
 extern bool PTT;
 extern bool localptt;
@@ -72,6 +107,16 @@ extern std::vector<std::string> rigmodes_;
 extern std::vector<std::string> rigbws_;
 
 extern rigbase *selrig;
+
+extern const char **old_bws;
+
+extern std::string printXCVR_STATE(XCVR_STATE &data);
+extern std::string print_ab();
+extern const char *print(XCVR_STATE &data);
+
+extern void yaesu891UpdateA(XCVR_STATE * newVfo);
+extern void yaesu891UpdateB(XCVR_STATE * newVfo);
+extern void redrawAGC();
 
 extern void serviceA(XCVR_STATE nuvals);
 extern void serviceB(XCVR_STATE nuvals);
@@ -226,11 +271,7 @@ extern void loadConfig();
 extern void saveConfig();
 extern void loadState();
 extern void saveState();
-extern void initRig();
-extern void init_title();
-extern void initConfigDialog();
-extern void initStatusConfigDialog();
-extern void initRigCombo();
+
 extern void createXcvrDialog();
 extern void open_poll_tab();
 extern void open_trace_tab();
@@ -343,13 +384,9 @@ extern void updateRFgain(void *d = 0);
 extern void zeroXmtMeters(void *d = 0);
 extern void set_power_controlImage(double);
 
-extern void update_UI_PTT(void *d = 0);
-
 extern void cb_send_command(std::string cmd, Fl_Output *resp = 0);
 extern const std::string lt_trim(const std::string& pString, const std::string& pWhitespace = " \"\t");
 extern void editAlphaTag();
-
-extern void adjust_control_positions();
 
 extern bool rig_notch;
 extern int rig_notch_val;
@@ -396,5 +433,80 @@ extern Fl_SigBar *sigbar_PWR;
 extern Fl_SigBar *sigbar_SWR;
 extern Fl_SigBar *sigbar_ALC;
 extern Fl_SigBar *sigbar_VOLTS;
+
+// user interface support functions
+extern void adjust_small_ui();
+extern void adjust_xig_wide();
+extern void adjust_wide_ui();
+extern void adjust_touch_ui();
+extern void update_UI_PTT(void *d = 0);
+extern void adjust_control_positions();
+extern void init_Generic_Tabs();
+extern void initTabs();
+extern void init_rit();
+extern void init_xit();
+extern void init_bfo();
+extern void init_dsp_controls();
+extern void init_volume_control();
+extern void set_init_volume_control();
+extern void init_rf_control();
+extern void set_init_rf_gain();
+extern void init_sql_control();
+extern void set_init_sql_control();
+extern void set_init_noise_reduction_control();
+extern void set_init_if_shift_control();
+extern void init_if_shift_control();
+extern void init_notch_control();
+extern void set_init_notch_control();
+extern void init_micgain_control();
+extern void set_init_micgain_control();
+extern void init_power_control();
+extern void set_init_power_control();
+extern void init_attenuator_control();
+extern void set_init_attenuator_control();
+extern void init_agc_control();
+extern void init_preamp_control();
+extern void set_init_preamp_control();
+extern void init_noise_control();
+extern void init_split_control();
+extern void set_init_noise_control();
+extern void init_tune_control();
+extern void init_ptt_control();
+extern void init_auto_notch();
+extern void set_init_auto_notch();
+extern void init_swr_control();
+extern void set_init_compression_control();
+extern void set_init_break_in();
+extern void init_special_controls();
+extern void init_external_tuner();
+extern void init_CIV();
+extern void init_TS990_special();
+extern void init_K3_KX3_special();
+
+extern void initRig();
+extern void initRigCombo();
+extern void init_title();
+extern void initConfigDialog();
+extern void initStatusConfigDialog();
+
+extern void start_commands();
+extern void exit_commands();
+
+// Xcvr initialization functions
+extern void init_xcvr();
+extern void init_generic_rig();
+extern void enable_xcvr_ui();
+extern void vfo_startup_data(XCVR_STATE &xcvrvfo);
+extern void vfoA_startup_data();
+extern void vfoB_startup_data();
+extern void rig_startup_data();
+
+// Xcvr restore functions
+extern void restore_rig_vals_(XCVR_STATE &xcvrvfo);
+extern void restore_xcvr_vals();
+
+// TT550 initialization functions
+extern void init_TT550_tabs();
+extern void init_TT550();
 
 #endif

@@ -239,6 +239,11 @@ flrig_SOURCES += \
 	support/socket_io.cxx \
 	support/status.cxx \
 	support/support.cxx \
+	support/read_rig.cxx \
+	support/restore_rig.cxx \
+	support/init_rig.cxx \
+	support/TT550_support.cxx \
+	support/init_user_interface.cxx \
 	support/threads.cxx \
 	support/timeops.cxx \
 	support/trace.cxx \

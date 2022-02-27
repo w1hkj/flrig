@@ -22,6 +22,8 @@
 #include <sstream>
 
 #include "debug.h"
+#include "status.h"
+
 #include "support.h"
 
 //======================================================================

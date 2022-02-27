@@ -1,3 +1,4 @@
+
 // ---------------------------------------------------------------------
 // cwio.cxx  --  morse code modem
 //
@@ -43,6 +44,8 @@
 #include "tod_clock.h"
 #include "cwio.h"
 #include "cwioUI.h"
+#include "support.h"
+#include "status.h"
 
 //#define CWIO_DEBUG
 

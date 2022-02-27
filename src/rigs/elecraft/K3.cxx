@@ -21,6 +21,8 @@
 #include "elecraft/K3.h"
 #include "status.h"
 
+#include "support.h"
+
 const char K3name_[] = "K3";
 
 const char *K3modes_[] =

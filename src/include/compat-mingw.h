@@ -82,6 +82,7 @@ int nanosleep (const struct timespec *req, struct timespec *rem);
 int socketpair(int family, int type, int protocol, int *sv);
 
 /* uname */
+/*
 #define UTSNAME_MAX_ 257
 struct utsname
 {
@@ -92,6 +93,7 @@ struct utsname
 	char machine[UTSNAME_MAX_];
 };
 int uname(struct utsname *name);
+*/
 
 /* getrusage */
 #define RUSAGE_SELF	 0

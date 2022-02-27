@@ -22,6 +22,8 @@
 
 #include "gpio_ptt.h"
 
+#include "support.h"
+
 //-------------------- gpio port PTT --------------------//
 #ifndef __MINGW32__
 void gpioEXEC(std::string execstr)

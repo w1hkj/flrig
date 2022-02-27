@@ -22,7 +22,6 @@
 
 #include "icom/ICbase.h"
 #include "debug.h"
-#include "support.h"
 #include "icons.h"
 #include "tod_clock.h"
 #include "trace.h"
@@ -30,6 +29,7 @@
 #include "threads.h"
 #include "socket_io.h"
 #include "serial.h"
+#include "support.h"
 
 pthread_mutex_t command_mutex = PTHREAD_MUTEX_INITIALIZER;
 

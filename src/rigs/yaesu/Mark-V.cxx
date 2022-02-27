@@ -20,6 +20,8 @@
 
 #include "yaesu/MARK_V.h"
 
+#include "support.h"
+
 static const char MARK_Vname_[] = "Mark-V";
 
 static const char *MARK_Vmodes_[] = {

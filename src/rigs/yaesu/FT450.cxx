@@ -24,6 +24,8 @@
 #include "yaesu/FT450.h"
 #include "rig.h"
 
+#include "support.h"
+
 static const char FT450name_[] = "FT-450";
 
 #undef  NUM_MODES

@@ -20,6 +20,8 @@
 
 #include "icom/IC756PRO3.h"
 #include "debug.h"
+#include "status.h"
+
 #include "support.h"
 
 //=============================================================================

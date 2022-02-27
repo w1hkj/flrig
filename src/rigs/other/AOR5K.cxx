@@ -23,6 +23,8 @@
 #include "other/AOR5K.h"
 #include "status.h"
 
+#include "support.h"
+
 const char AOR5Kname_[] = "AOR-5000";
 
 const char *AOR5Kmodes_[] = 

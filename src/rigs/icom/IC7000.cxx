@@ -18,10 +18,13 @@
 // aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
-#include "icom/IC7000.h"
-#include "debug.h"
 #include <stdio.h>
 #include <iostream>
+
+#include "icom/IC7000.h"
+#include "debug.h"
+
+#include "support.h"
 
 //=============================================================================
 // IC-7000

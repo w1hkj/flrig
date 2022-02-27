@@ -20,6 +20,8 @@
 
 #include "icom/IC756PRO2.h"
 #include "debug.h"
+#include "status.h"
+
 #include "support.h"
 
 const char IC756PRO2name_[] = "IC-756PRO-II";
