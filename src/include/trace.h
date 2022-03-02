@@ -26,18 +26,9 @@
 #include <FL/Fl_Text_Buffer.H>
 
 #include <cstdio>
+#include <string.h>
 
-#define WITH_TRACE
-
-#ifdef WITH_TRACE
-#define TRACED(name, ...) name(__VA_ARGS__) { \
-      static unsigned trace_calls_##name = 0; \
-      ++trace_calls_##name; \
-      std::printf("[%3u] %s\n", trace_calls_##name, #name );
-#else
-#  define TRACED(name, ...) name(__VA_ARGS__) {
-#endif
-
+//#define WITH_TRACED
 //usage
 //int TRACED(add, int a, int b)
 
@@ -56,32 +47,42 @@ extern void make_trace_window();
 #define getr(s)  get_trace(1, s);
 #define setr(s)  set_trace(1, s);
 
-#define gett(str) get_trace(3, str, cmd.c_str(), replystr.c_str())
-#define sett(str) set_trace(3, str, cmd.c_str(), replystr.c_str())
+#define gett(str) get_trace(5, str, "S: ", cmd.c_str(), " R: ", replystr.c_str())
+#define sett(str) get_trace(5, str, "S: ", cmd.c_str(), " R: ", replystr.c_str())
 
 #define getthex(str) { \
 	std::string hex1 = str2hex(cmd.c_str(), cmd.length()); \
 	std::string hex2 = str2hex(replystr.c_str(), replystr.length()); \
-	get_trace(3, str, hex1.c_str(), hex2.c_str()); \
+	get_trace(5, str, "S: ", hex1.c_str(), " R: ", hex2.c_str()); \
 }
 
 #define setthex(str) { \
 	std::string hex1 = str2hex(cmd.c_str(), cmd.length()); \
 	std::string hex2 = str2hex(replystr.c_str(), replystr.length()); \
-	set_trace(3, str, hex1.c_str(), hex2.c_str()); \
+	get_trace(5, str, "S: ", hex1.c_str(), " R: ", hex2.c_str()); \
 }
 
 #define seth() { \
 	std::string hex1 = str2hex(cmd.c_str(), cmd.length()); \
 	std::string hex2 = str2hex(replystr.c_str(), replystr.length()); \
-	set_trace(3, hex1.c_str(), " : ", hex2.c_str()); \
+	get_trace(4, "S: ", hex1.c_str(), " R: ", hex2.c_str()); \
 }
 
 #define geth() { \
 	std::string hex1 = str2hex(cmd.c_str(), cmd.length()); \
 	std::string hex2 = str2hex(replystr.c_str(), replystr.length()); \
-	set_trace(3, hex1.c_str(), " : ", hex2.c_str()); \
+	get_trace(4, "S: ", hex1.c_str(), " R: ", hex2.c_str()); \
 }
 
 #endif
 
+#ifdef WITH_TRACED
+#define TRACED(name, ...) name(__VA_ARGS__) { \
+      static char tmsg[50]; \
+      static unsigned trace_calls_##name = 0; \
+      ++trace_calls_##name; \
+      snprintf(tmsg, sizeof(tmsg), "[%2u] %s", trace_calls_##name, #name ); \
+      get_trace(1, tmsg);
+#else
+#  define TRACED(name, ...) name(__VA_ARGS__) {
+#endif
