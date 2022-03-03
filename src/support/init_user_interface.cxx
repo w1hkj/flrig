@@ -712,7 +712,9 @@ void TRACED(init_Generic_Tabs)
 	}
 
 	if (selrig->has_band_selection) {
-		if (selrig->ICOMrig || selrig->name_ == rig_XIG90.name_) {
+		if (selrig->ICOMrig ||
+			selrig->name_ == rig_XIG90.name_ ||
+			selrig->name_ == rig_X6100.name_ ) {
 			tabsGeneric->add(tab_icom_bands);
 			tab_icom_bands->redraw();
 			tab_icom_bands->show();

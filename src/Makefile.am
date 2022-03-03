@@ -198,6 +198,7 @@ flrig_SOURCES += \
 	rigs/tentec/TT599.cxx \
 	rigs/xiegu/Xiegu-5105.cxx \
 	rigs/xiegu/Xiegu-G90.cxx \
+	rigs/xiegu/X6100.cxx \
 	rigs/yaesu/FT100D.cxx \
 	rigs/yaesu/FT450.cxx \
 	rigs/yaesu/FT450D.cxx \
@@ -401,6 +402,7 @@ EXTRA_DIST = \
 	include/xml_server.h \
 	include/xiegu/Xiegu-5105.h \
 	include/xiegu/Xiegu-G90.h \
+	include/xiegu/X6100.h \
 	include/yaesu/FT100D.h \
 	include/yaesu/FT450.h \
 	include/yaesu/FT450D.h \

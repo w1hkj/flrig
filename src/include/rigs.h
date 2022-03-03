@@ -84,8 +84,6 @@
 #include "tentec/TT566.h"
 #include "tentec/TT588.h"
 #include "tentec/TT599.h"
-#include "xiegu/Xiegu-5105.h"
-#include "xiegu/Xiegu-G90.h"
 #include "yaesu/FT100D.h"
 #include "yaesu/FT450.h"
 #include "yaesu/FT450D.h"
@@ -117,6 +115,9 @@
 #include "yaesu/FTdx3000.h"
 #include "yaesu/FTdx9000.h"
 #include "yaesu/FT5000.h"
+#include "xiegu/Xiegu-5105.h"
+#include "xiegu/Xiegu-G90.h"
+#include "xiegu/X6100.h"
 
 extern rigbase			rig_null;		// 0
 extern RIG_FDMDUO		rig_FDMDUO;		// 1
@@ -212,8 +213,9 @@ extern RIG_TT599		rig_TT599;		// 80
 extern RIG_AOR5K		rig_AOR5K;		// 91
 extern RIG_XI5105		rig_XI5105;		// 92
 extern RIG_Xiegu_G90	rig_XIG90;		// 93
-extern RIG_PowerSDR		rig_PowerSDR;	// 94
-extern RIG_FLEX1500		rig_FLEX1500;	// 95
-extern RIG_TX500		rig_TX500;		// 96
+extern RIG_X6100		rig_X6100;		// 94
+extern RIG_PowerSDR		rig_PowerSDR;	// 95
+extern RIG_FLEX1500		rig_FLEX1500;	// 96
+extern RIG_TX500		rig_TX500;		// 97
 
 #endif

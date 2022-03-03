@@ -122,6 +122,7 @@ RIG_TT588		rig_TT588;
 RIG_TT599		rig_TT599;
 RIG_XI5105		rig_XI5105;
 RIG_Xiegu_G90	rig_XIG90;
+RIG_X6100		rig_X6100;
 RIG_PowerSDR	rig_PowerSDR;
 RIG_FLEX1500	rig_FLEX1500;
 RIG_TX500		rig_TX500;
@@ -221,9 +222,10 @@ rigbase *rigs[] = {
 	&rig_AOR5K,		// 91
 	&rig_XI5105,	// 92
 	&rig_XIG90,		// 93
-	&rig_PowerSDR,	// 94
-	&rig_FLEX1500,	// 95
-	&rig_TX500,		// 96
+	&rig_X6100,		// 94
+	&rig_PowerSDR,	// 95
+	&rig_FLEX1500,	// 96
+	&rig_TX500,		// 97
 
 	NULL
 };
