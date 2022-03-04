@@ -307,7 +307,7 @@ bool waitCommand(
 	assignReplyStr(returned);
 	waited = zmsec() - tod_start;
 	snprintf(sztemp, sizeof(sztemp), "%s TIMED OUT in %d ms", command.c_str(), waited);
-	showresp(ERR, HEX, sztemp, command, returned);
+	showresp(ERR, how, sztemp, command, returned);
 	if (waitcount > 4 && !timeout_alert) {
 		timeout_alert = true;
 		snprintf(sztimeout_alert, sizeof(sztimeout_alert), 

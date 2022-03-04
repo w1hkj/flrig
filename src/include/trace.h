@@ -51,30 +51,42 @@ extern void make_trace_window();
 #define sett(str) get_trace(5, str, "S: ", cmd.c_str(), " R: ", replystr.c_str())
 
 #define getthex(str) { \
-	std::string hex1 = str2hex(cmd.c_str(), cmd.length()); \
-	std::string hex2 = str2hex(replystr.c_str(), replystr.length()); \
+	static std::string hex1 = str2hex(cmd.c_str(), cmd.length()); \
+	static std::string hex2 = str2hex(replystr.c_str(), replystr.length()); \
 	get_trace(5, str, "S: ", hex1.c_str(), " R: ", hex2.c_str()); \
 }
 
 #define setthex(str) { \
-	std::string hex1 = str2hex(cmd.c_str(), cmd.length()); \
-	std::string hex2 = str2hex(replystr.c_str(), replystr.length()); \
+	static std::string hex1 = str2hex(cmd.c_str(), cmd.length()); \
+	static std::string hex2 = str2hex(replystr.c_str(), replystr.length()); \
 	get_trace(5, str, "S: ", hex1.c_str(), " R: ", hex2.c_str()); \
 }
 
 #define seth() { \
-	std::string hex1 = str2hex(cmd.c_str(), cmd.length()); \
-	std::string hex2 = str2hex(replystr.c_str(), replystr.length()); \
+	static std::string hex1 = str2hex(cmd.c_str(), cmd.length()); \
+	static std::string hex2 = str2hex(replystr.c_str(), replystr.length()); \
 	get_trace(4, "S: ", hex1.c_str(), " R: ", hex2.c_str()); \
 }
 
 #define geth() { \
-	std::string hex1 = str2hex(cmd.c_str(), cmd.length()); \
-	std::string hex2 = str2hex(replystr.c_str(), replystr.length()); \
+	static std::string hex1 = str2hex(cmd.c_str(), cmd.length()); \
+	static std::string hex2 = str2hex(replystr.c_str(), replystr.length()); \
 	get_trace(4, "S: ", hex1.c_str(), " R: ", hex2.c_str()); \
 }
 
-#endif
+#define getcr(str) { \
+	static std::string s1 = cmd; \
+	static std::string s2 = replystr; \
+	if (s1[s1.length() - 1] == '\r') s1.replace(s1.length() -1, 1, "<cr>"); \
+	if (s2[s2.length() - 1] == '\r') s2.replace(s2.length() -1, 1, "<cr>"); \
+	get_trace(5, str, " S: ", s1.c_str(), " R: ", s2.c_str()); \
+}
+
+#define setcr(str) { \
+	static std::string s1 = cmd; \
+	if (s1[s1.length() - 1] == '\r') s1.replace(s1.length() -1, 1, "<cr>"); \
+	get_trace(3, str, " S: ", s1.c_str()); \
+}
 
 #ifdef WITH_TRACED
 #define TRACED(name, ...) name(__VA_ARGS__) { \
@@ -85,4 +97,6 @@ extern void make_trace_window();
       get_trace(1, tmsg);
 #else
 #  define TRACED(name, ...) name(__VA_ARGS__) {
+#endif
+
 #endif

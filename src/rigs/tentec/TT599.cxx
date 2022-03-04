@@ -20,6 +20,8 @@
 
 #include "tentec/TT599.h"
 
+#include "trace.h"
+
 //=============================================================================
 // TT-599
 
@@ -133,8 +135,10 @@ void RIG_TT599::shutdown()
 
 bool RIG_TT599::check ()
 {
+	return true;
 	cmd = "?AF\r";
 	int ret = waitCommand( cmd, 12, "check");
+	getcr("check");
 	if (ret < 12) return false;
 	return true;
 }
@@ -147,6 +151,7 @@ unsigned long int RIG_TT599::get_vfoA ()
 		if ((p = replystr.rfind("@AF")) != std::string::npos)
 			freqA =  atol(&replystr[p+3]);
 	}
+	getcr("get vfoA");
 	return freqA;
 }
 
@@ -157,6 +162,7 @@ void RIG_TT599::set_vfoA (unsigned long int freq)
 	cmd.append( to_decimal( freq, 8 ) );
 	cmd += '\r';
 	sendCommand(cmd);
+	setcr("set vfoA");
 	get_vfoA();
 }
 
@@ -168,6 +174,7 @@ unsigned long int RIG_TT599::get_vfoB ()
 		if ((p = replystr.rfind("@BF")) != std::string::npos)
 			freqB =  atol(&replystr[p+3]);
 	}
+	getcr("get vfoB");
 	return freqB;
 }
 
@@ -178,6 +185,7 @@ void RIG_TT599::set_vfoB (unsigned long int freq)
 	cmd.append( to_decimal( freq, 8 ) );
 	cmd += '\r';
 	sendCommand(cmd);
+	setcr("set vfoB");
 	get_vfoB();
 }
 
@@ -185,6 +193,7 @@ void RIG_TT599::set_PTT_control(int val)
 {
 	cmd = val ? "*TK\r" : "*TU\r";
 	sendCommand(cmd);
+	setcr("set PTT");
 	wait(200);
 }
 
@@ -204,6 +213,7 @@ int RIG_TT599::get_modeA()
 			}
 		}
 	}
+	getcr("get modeA");
 	return modeA;
 }
 
@@ -214,6 +224,7 @@ void RIG_TT599::set_modeA(int md)
 	cmd += RIG_TT599mchar_[md];
 	cmd += '\r';
 	sendCommand(cmd);
+	setcr("set modeA");
 	get_modeA();
 }
 
@@ -233,6 +244,7 @@ int RIG_TT599::get_modeB()
 			}
 		}
 	}
+	getcr("get modeB");
 	return modeB;
 }
 
@@ -243,6 +255,7 @@ void RIG_TT599::set_modeB(int md)
 	cmd += RIG_TT599mchar_[md];
 	cmd += '\r';
 	sendCommand(cmd);
+	setcr("set modeB");
 	get_modeB();
 }
 
@@ -260,6 +273,7 @@ int RIG_TT599::get_bwA()
 					(RIG_TT599w[bwA + 1] != 0) ) bwA++;
 		}
 	}
+	getcr("get bwA");
 	return bwA;
 }
 
@@ -269,6 +283,7 @@ void RIG_TT599::set_bwA(int bw)
 	cmd.append(RIG_TT599widths[bw]);
 	cmd += '\r';
 	sendCommand(cmd);
+	setcr("set bwA");
 	get_bwA();
 }
 
@@ -286,6 +301,7 @@ int RIG_TT599::get_bwB()
 					(RIG_TT599w[bwB + 1] != 0) ) bwB++;
 		}
 	}
+	getcr("get bwB");
 	return bwB;
 }
 
@@ -295,6 +311,7 @@ void RIG_TT599::set_bwB(int bw)
 	cmd.append(RIG_TT599widths[bw]);
 	cmd += '\r';
 	sendCommand(cmd);
+	setcr("set bwB");
 	get_bwB();
 }
 
@@ -317,17 +334,20 @@ int RIG_TT599::get_preamp()
 {
 	size_t p;
 	cmd = "?RME\r";
+	int pre = 0;
 	if ( waitCommand( cmd, 6, "get preamp") ) {
 		if ((p = replystr.rfind("@RME")) != std::string::npos)
-			return replystr[p+4] - '0';
+			pre =  (replystr[p+4] & 0xFF) - '0';
 	}
-	return 0;
+	getcr("get preamp");
+	return pre;
 }
 
 void RIG_TT599::set_preamp(int val)
 {
 	cmd = val ? "*RME1\r" : "*RME0\r";
 	sendCommand(cmd);
+	setcr("set preamp");
 	get_preamp();
 }
 
@@ -340,13 +360,14 @@ double  RIG_TT599::get_power_control(void)
 {
 	size_t p;
 	cmd = "?TP\r";
+	double pwr = progStatus.power_level;
 	if ( waitCommand( cmd, 6, "get power control") ) {
 		if ((p = replystr.rfind("@TP")) != std::string::npos) {
-			int pwr = atol(&replystr[p+3]);
-			return pwr;
+			pwr = atof(&replystr[p+3]);
 		}
 	}
-	return progStatus.power_level;
+	getcr("get power control");
+	return pwr;
 }
 
 void RIG_TT599::set_power_control(double val) 
@@ -356,6 +377,7 @@ void RIG_TT599::set_power_control(double val)
 	cmd.assign("*TP");
 	cmd.append(szPwr).append("\r");
 	sendCommand(cmd);
+	setcr("set power control");
 	get_power_control();
 }
 
@@ -364,8 +386,10 @@ int  RIG_TT599::get_auto_notch()
 	cmd = "?RMNA\r";
 	sendCommand(cmd);
 	if ( waitCommand( cmd, 7, "get auto notch") ) {
+		getcr("get auto notch");
 		if (replystr.rfind("@RMNA1") == std::string::npos) return 0;
-	}
+	} else
+		getcr("get auto notch FAILED");
 	return 1;
 }
 
@@ -373,6 +397,7 @@ void RIG_TT599::set_auto_notch(int v)
 {
 	cmd = v ? "*RMNA1\r" : "*RMNA0\r";
 	sendCommand(cmd);
+	setcr("set auto notch");
 	get_auto_notch();
 }
 
@@ -381,8 +406,10 @@ int  RIG_TT599::get_attenuator()
 	size_t p;
 	cmd = "?RMT\r";
 	if ( waitCommand( cmd, 6, "get attenuator") ) {
+		getcr("get attenuator");
 		if ((p = replystr.rfind("@RMT1")) != std::string::npos) return 1;
-	}
+	} else
+		getcr("get attenuator FAILED");
 	return 0;
 }
 
@@ -390,6 +417,7 @@ void RIG_TT599::set_attenuator(int val)
 {
 	cmd = val ? "*RMT1\r" : "*RMT0\r";
 	sendCommand(cmd);
+	setcr("set attenuator");
 	get_attenuator();
 }
 
@@ -402,6 +430,7 @@ int  RIG_TT599::get_smeter()
 	if ( waitCommand( cmd, 20, "get smeter") ) {
 		if ((p = replystr.rfind("@SRM")) != std::string::npos) dbm = atoi(&replystr[p+4]);
 	}
+	getcr("get smeter");
 	return 5 * dbm / 6;
 }
 
@@ -412,6 +441,7 @@ int  RIG_TT599::get_swr()
 	swr *= 25.0;
 	if (swr < 0) swr = 0;
 	if (swr > 100) swr = 100;
+	getcr("get swr");
 	return (int)swr;
 
 }
@@ -429,6 +459,7 @@ int  RIG_TT599::get_power_out()
 				refpwr = atol(&replystr[p+1]);
 		}
 	}
+	getcr("get power out");
 	return fwdpwr;
 }
 
@@ -440,6 +471,7 @@ int RIG_TT599::get_split()
 		if ((p != std::string::npos) && (replystr[p+5] == 'B')) split = 1;
 		else split = 0;
 	}
+	getcr("get split");
 	return split;
 }
 
@@ -448,6 +480,7 @@ void  RIG_TT599:: set_split(bool val)
 	split = val;
 	cmd = val ? "*KVAAB\r" : "*KVAAA\r";
 	sendCommand(cmd);
+	setcr("set split");
 	get_split();
 }
 
@@ -457,10 +490,12 @@ int  RIG_TT599::get_noise_reduction_val()
 	cmd.assign("?RMNN\r");
 
 	if ( waitCommand( cmd, 7, "get noise_reduction_value") ) {
+		getcr("get noise reduction");
 		size_t p = replystr.rfind("@RMNN");
 		if (p == std::string::npos) return val;
 		val = atol(&replystr[p+5]);
-	}
+	} else
+		getcr("get noise reduction FAILED");
 	return val;
 }
 
@@ -470,5 +505,6 @@ void RIG_TT599::set_noise_reduction_val(int val)
 	cmd += ('0' + val);
 	cmd.append("\r");
 	sendCommand(cmd);
+	setcr("set noise reduction");
 	get_noise_reduction_val();
 }
