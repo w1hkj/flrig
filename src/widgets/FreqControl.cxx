@@ -228,6 +228,7 @@ cFreqControl::cFreqControl(int x, int y, int w, int h, const char *lbl) : Fl_Gro
 
 	set_ndigits(nD);
 
+	active = true;
 }
 
 cFreqControl::~cFreqControl()
@@ -373,6 +374,7 @@ void cFreqControl::reverse_colors()
 
 int cFreqControl::handle(int event)
 {
+	if (!active) return 0;
 	int d;
 	switch (event) {
 	case FL_KEYBOARD:

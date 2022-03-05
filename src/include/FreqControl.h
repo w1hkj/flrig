@@ -98,6 +98,10 @@ public:
 
 	void set_ndigits(int val);
 
+	void activate() { active = true; }
+	void deactivate() { active = false; }
+	bool isactive() { return active; }
+
 private:
 	Fl_Repeat_Button	*Digit[MAX_DIGITS];
 	Fl_Float_Input		*finp;

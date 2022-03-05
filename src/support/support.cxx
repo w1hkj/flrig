@@ -421,7 +421,6 @@ void read_mode()
 		nu_mode = selrig->get_modeA();
 		if (nu_mode != opMODE->index()) { //vfoA.imode) {
 			vfoA.imode = vfo->imode = nu_mode;
-			vfoA.filter = selrig->get_FILT(nu_mode);
 			selrig->adjust_bandwidth(vfo->imode);
 			nu_BW = selrig->get_bwA();
 			vfoA.iBW = vfo->iBW = nu_BW;
@@ -429,17 +428,18 @@ void read_mode()
 			Fl::awake(setModeControl);
 			set_bandwidth_control();
 			Fl::awake(updateUI);
-			Fl::awake(setFILTER);
 		}
 		if (selrig->can_change_alt_vfo) {
 			vfoB.imode = selrig->get_modeB();
 			vfoB.filter = selrig->get_FILT(vfoB.imode);
 		}
+
+		vfoA.filter = selrig->get_FILT(nu_mode);
+		Fl::awake(setFILTER);
 	} else {
 		trace(2, "read_mode", "vfoB active");
 		nu_mode = selrig->get_modeB();
 		if (nu_mode != opMODE->index()) { //vfoB.imode) {
-			vfoB.filter = selrig->get_FILT(nu_mode);
 			vfoB.imode = vfo->imode = nu_mode;
 			selrig->adjust_bandwidth(vfo->imode);
 			nu_BW = selrig->get_bwB();
@@ -448,13 +448,15 @@ void read_mode()
 			Fl::awake(setModeControl);
 			set_bandwidth_control();
 			Fl::awake(updateUI);
-			Fl::awake(setFILTER);
 		}
 
 		if (selrig->can_change_alt_vfo) {
 			vfoA.imode = selrig->get_modeA();
 			vfoA.filter = selrig->get_FILT(vfoA.imode);
 		}
+
+		vfoB.filter = selrig->get_FILT(nu_mode);
+		Fl::awake(setFILTER);
 	}
 }
 
@@ -2287,11 +2289,21 @@ void highlight_vfo(void *d)
 		FreqDispB->SetONOFFCOLOR( norm_fg, norm_bg );
 		btnA->value(0);
 		btnB->value(1);
+		FreqDispB->activate();
+		if (selrig->can_change_alt_vfo)
+			FreqDispA->activate();
+		else
+			FreqDispA->deactivate();
 	} else {
 		FreqDispA->SetONOFFCOLOR( norm_fg, norm_bg );
 		FreqDispB->SetONOFFCOLOR( norm_fg, dim_bg);
 		btnA->value(1);
 		btnB->value(0);
+		FreqDispA->activate();
+		if (selrig->can_change_alt_vfo)
+			FreqDispB->activate();
+		else
+			FreqDispB->deactivate();
 	}
 	FreqDispA->redraw();
 	FreqDispB->redraw();

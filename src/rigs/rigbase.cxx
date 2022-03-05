@@ -130,12 +130,10 @@ rigbase::rigbase()
 	has_get_info =
 	has_getvfoAorB =
 	has_voltmeter =
-	ICOMrig = false;
-	ICOMmainsub = false;
-
-	can_synch_clock = false;
-
-	has_a2b = false;
+	ICOMrig =
+	ICOMmainsub =
+	can_synch_clock =
+	has_a2b =
 	has_vfoAB = false;
 
 	data_type = DT_BINARY;
