@@ -208,10 +208,13 @@ cFreqControl::cFreqControl(int x, int y, int w, int h, const char *lbl) : Fl_Gro
 
 	cbFunc = NULL;
 
-	finp = new Fl_Float_Input(0, 0, 24, 24);
+//	finp = new Fl_Float_Input(0, 0, 24, 24);
+	finp = new Fl_Float_Input(X, Y, W, H);
 	finp->callback(freq_input_cb, this);
 	finp->when(FL_WHEN_CHANGED);
-	remove(finp);
+	finp->textsize(H - 4);
+	finp->hide();
+//	remove(finp);
 
 	end();
 
@@ -375,73 +378,75 @@ void cFreqControl::reverse_colors()
 int cFreqControl::handle(int event)
 {
 	if (!active) return 0;
+
+	if (Fl::belowmouse() == this) Fl::focus(this);
+
 	int d;
 	switch (event) {
 	case FL_KEYBOARD:
-		switch (d = Fl::event_key()) {
-		case FL_Page_Up:
-			if (Fl::event_shift()) IncFreq(1);
-			else IncFreq(0);
-			return 1;
-			break;
-		case FL_Page_Down:
-			if (Fl::event_shift()) DecFreq(1);
-			else DecFreq(0);
-			return 1;
-			break;
-		case FL_Right:
-			if (Fl::event_shift()) IncFreq(4);
-			else IncFreq(2);
-			return 1;
-			break;
-		case FL_Left:
-			if (Fl::event_shift()) DecFreq(4);
-			else DecFreq(2);
-			return 1;
-			break;
-		case FL_Up:
-			if (Fl::event_shift()) IncFreq(5);
-			else IncFreq(3);
-			return 1;
-			break;
-		case FL_Down:
-			if (Fl::event_shift()) DecFreq(5);
-			else DecFreq(3);
-			return 1;
-			break;
-		default:
-			if (Fl::event_ctrl()) {
-				if (Fl::event_key() == 'v') {
-					finp->handle(event);
-					Fl::remove_timeout((Fl_Timeout_Handler)blink_point, decbx);
-					return 1;
-				}
+		d = Fl::event_key();
+		if (finp->visible()) {
+			if (d == FL_Escape) {
+				fcval = 0;
+				finp->hide();
+				return 1;
 			}
-			if (Fl::has_timeout((Fl_Timeout_Handler)blink_point, decbx)) {
-				if (d == FL_Escape) {
-					Fl::remove_timeout((Fl_Timeout_Handler)blink_point, decbx);
-					val = oldval;
+			if (d == FL_Enter || d == FL_KP_Enter) {
+				if (fcval) {
+					val = fcval;
 					updatevalue();
-					return 1;
+					do_callback();
 				}
-				else if (d == FL_Enter || d == FL_KP_Enter) { // append
-					finp->position(finp->size());
-					finp->replace(finp->position(), finp->mark(), "\n", 1);
-				}
-			}
-			else {
-				int ch = Fl::event_text()[0];
-				if (ch < '0' || ch > '9') return Fl_Group::handle(event);
-				Fl::add_timeout(0.0, (Fl_Timeout_Handler)blink_point, decbx);
-				finp->static_value("");
-				oldval = val;
+				finp->hide();
+				Fl::focus(this);
+				return 1;
 			}
 			return finp->handle(event);
 		}
-		val += d;
-		updatevalue();
-		do_callback();
-		break;
+		switch (d) {
+			case FL_Page_Up:
+				if (Fl::event_shift()) IncFreq(1);
+				else IncFreq(0);
+				return 1;
+				break;
+			case FL_Page_Down:
+				if (Fl::event_shift()) DecFreq(1);
+				else DecFreq(0);
+				return 1;
+				break;
+			case FL_Right:
+				if (Fl::event_shift()) IncFreq(4);
+				else IncFreq(2);
+				return 1;
+				break;
+			case FL_Left:
+				if (Fl::event_shift()) DecFreq(4);
+				else DecFreq(2);
+				return 1;
+				break;
+			case FL_Up:
+				if (Fl::event_shift()) IncFreq(5);
+				else IncFreq(3);
+				return 1;
+				break;
+			case FL_Down:
+				if (Fl::event_shift()) DecFreq(5);
+				else DecFreq(3);
+				return 1;
+				break;
+			default:
+				{
+					int ch = Fl::event_text()[0];
+					if ((ch >= '0' && ch <= '9') || ch == '.') {
+						finp->value("");
+						fcval = 0;
+						finp->show();
+						return finp->handle(event);
+					}
+				}
+				return 0;
+				break;
+		}
 	case FL_MOUSEWHEEL:
 		if ( !((d = Fl::event_dy()) || (d = Fl::event_dx())) )
 			return 1;
@@ -457,25 +462,14 @@ int cFreqControl::handle(int event)
 		return Fl_Group::handle(event); // in turn calls the digit[] callback
 
 	}
-	return Fl_Group::handle(event);
+	return 0;
 }
 
 void cFreqControl::freq_input_cb(Fl_Widget*, void* arg)
 {
 	cFreqControl* fc = reinterpret_cast<cFreqControl*>(arg);
-	double val = strtod(fc->finp->value(), NULL);
-	unsigned long int lval;
-	val *= 1e3;
-	val += 0.5;
-	lval = (unsigned long int)val;
-	if (lval <= fc->maxVal) {
-		fc->val = (long)val;
-		fc->updatevalue();
-		if (fc->finp->index(fc->finp->size() - 1) == '\n' && val > 0.0) {
-			Fl::remove_timeout((Fl_Timeout_Handler)blink_point, fc->decbx);
-			fc->do_callback();
-		}
-	}
+	float val = strtof(fc->finp->value(), NULL);
+	fc->fcval = (unsigned long int)(val * 1000);
 }
 
 static void restore_color(void* w)

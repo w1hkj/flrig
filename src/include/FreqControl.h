@@ -136,6 +136,7 @@ private:
 	static void freq_input_cb(Fl_Widget* input, void* arg);
 protected:
 	unsigned long int val, oldval;
+	unsigned long fcval;
 	int  precision;
 	int  dpoint;
 	bool hrd_buttons;
