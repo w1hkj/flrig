@@ -1697,6 +1697,9 @@ CTRL  click: FreqB -> FreqA\
 				ic7610_digi_sel_val->value(progStatus.digi_sel_val);
 
 			tab7610->end();
+
+			tabsGeneric->callback((Fl_Callback *)cb_tabsGeneric);
+
 		tabsGeneric->end();
 
 		xpos = X;

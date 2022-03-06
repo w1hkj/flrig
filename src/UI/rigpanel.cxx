@@ -1220,6 +1220,10 @@ static void cb_tt550_Nsamples(Fl_Simple_Counter *, void *) {
 	progStatus.tt550_Nsamples =  tt550_Nsamples->value();
 }
 
+static void cb_tabsGeneric(Fl_Widget *, void *) {
+	progStatus.visible_tab = (tabsGeneric->value())->label();
+}
+
 Fl_Menu_Item *getMenuItem(const char *caption, Fl_Menu_Item* menu = 0)
 {
 	if (menu == 0) {

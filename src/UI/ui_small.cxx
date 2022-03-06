@@ -1838,7 +1838,10 @@ Fl_Double_Window *tabs_window()
 		genericAux->end();
 		genericAux->hide();
 
-	tabsGeneric->resizable(genericUser_3);
+		tabsGeneric->resizable(genericUser_3);
+
+		tabsGeneric->callback((Fl_Callback *)cb_tabsGeneric);
+
 	tabsGeneric->end();
 
 	grpTABS->end();
