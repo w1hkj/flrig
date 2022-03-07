@@ -300,12 +300,14 @@ void read_vfo()
 	trace(1,"read_vfo()");
 	unsigned long int  freq;
 
-	int current_vfo = selrig->inuse;
+	static int current_vfo = onNIL;
+	int chkvfo = selrig->get_vfoAorB();
+	if (current_vfo != chkvfo) {
+		current_vfo = chkvfo;
+		Fl::awake(updateUI);
+	}
 	if (current_vfo == onNIL)
 		return;
-
-//	if (current_vfo != selrig->get_vfoAorB())
-//		Fl::awake(updateUI);
 
 	if (selrig->has_get_info)
 		selrig->get_info();
@@ -1143,54 +1145,6 @@ void check_break_in()
 		selrig->get_break_in();
 }
 
-struct POLL_PAIR {
-	int *poll;
-	void (*pollfunc)();
-	std::string name;
-};
-
-POLL_PAIR RX_poll_pairs[] = {
-	{&progStatus.poll_mode, read_voltmeter, "voltage"},
-	{&progStatus.poll_mode, read_mode, "mode"},
-	{&progStatus.poll_bandwidth, read_bandwidth, "bw"},
-	{&progStatus.poll_tuner, read_tuner, "tuner"},
-	{&progStatus.poll_volume, read_volume, "volume"},
-	{&progStatus.poll_auto_notch, read_auto_notch, "auto notch"},
-	{&progStatus.poll_notch, read_notch, "notch"},
-	{&progStatus.poll_ifshift, read_ifshift, "if shift"},
-	{&progStatus.poll_power_control, read_power_control, "power"},
-	{&progStatus.poll_pre_att, read_preamp, "preamp"},
-	{&progStatus.poll_pre_att, read_att, "atten"},
-	{&progStatus.poll_micgain, read_mic_gain, "mic gain"},
-	{&progStatus.poll_squelch, read_squelch, "squelch"},
-	{&progStatus.poll_rfgain, read_rfgain, "rfgain"},
-	{&progStatus.poll_split, read_split, "split"},
-	{&progStatus.poll_nr, read_nr, "noise reduction"},
-	{&progStatus.poll_noise, read_noise, "noise"},
-	{&progStatus.poll_compression, read_compression, "compression"},
-	{&progStatus.poll_break_in, check_break_in, "break-in"},
-	{NULL, NULL}
-};
-// moved to main polling loop
-//	{&progStatus.poll_vfoAorB, read_vfoAorB},
-//	{&progStatus.poll_ptt, check_ptt},
-//	{&progStatus.poll_smeter, read_smeter},
-//	{&progStatus.poll_frequency, read_vfo},
-
-POLL_PAIR TX_poll_pairs[] = {
-	{&progStatus.poll_power_control, read_power_control, "power"},
-	{&progStatus.poll_pout, read_power_out, "pout"},
-	{&progStatus.poll_swr, read_swr, "swr"},
-	{&progStatus.poll_alc, read_alc, "alc"},
-	{&progStatus.poll_mode, read_voltmeter, "voltage"},
-	{&progStatus.poll_split, read_split, "split"},
-	{NULL, NULL}
-};
-// moved to main polling loop
-//	{&progStatus.poll_ptt, check_ptt},
-
-POLL_PAIR *poll_parameters;
-
 //static bool resetrcv = true;
 //static bool resetxmt = true;
 
@@ -1620,9 +1574,65 @@ Check that Baud matches transceiver baud\n\n\
 Press 'Init' button."));
 }
 
+struct POLL_PAIR {
+	int *poll;
+	void (*pollfunc)();
+	std::string name;
+};
+
+POLL_PAIR RX_poll_group_1[] = {
+	{&progStatus.poll_smeter, read_smeter, "SMETER"},
+	{&progStatus.poll_frequency, read_vfo, "FREQ"},
+	{NULL, NULL}
+};
+
+POLL_PAIR RX_poll_group_2[] = {
+	{&progStatus.poll_mode, read_mode, "MODE"},
+	{&progStatus.poll_bandwidth, read_bandwidth, "BW"},
+//	{&progStatus.poll_vfoAorB, read_vfoAorB, "A/B"},
+	{NULL, NULL}
+};
+
+POLL_PAIR RX_poll_group_3[] = {
+	{&progStatus.poll_mode, read_voltmeter, "voltage"},
+	{&progStatus.poll_tuner, read_tuner, "tuner"},
+	{&progStatus.poll_volume, read_volume, "volume"},
+	{&progStatus.poll_auto_notch, read_auto_notch, "auto notch"},
+	{&progStatus.poll_notch, read_notch, "notch"},
+	{&progStatus.poll_ifshift, read_ifshift, "if shift"},
+	{&progStatus.poll_power_control, read_power_control, "power"},
+	{&progStatus.poll_pre_att, read_preamp, "preamp"},
+	{&progStatus.poll_pre_att, read_att, "atten"},
+	{&progStatus.poll_micgain, read_mic_gain, "mic gain"},
+	{&progStatus.poll_squelch, read_squelch, "squelch"},
+	{&progStatus.poll_rfgain, read_rfgain, "rfgain"},
+	{&progStatus.poll_split, read_split, "split"},
+	{&progStatus.poll_nr, read_nr, "noise reduction"},
+	{&progStatus.poll_noise, read_noise, "noise"},
+	{&progStatus.poll_compression, read_compression, "compression"},
+	{&progStatus.poll_break_in, check_break_in, "break-in"},
+	{NULL, NULL}
+};
+// moved to main polling loop
+//	{&progStatus.poll_ptt, check_ptt},
+
+POLL_PAIR TX_poll_pairs[] = {
+	{&progStatus.poll_power_control, read_power_control, "power"},
+	{&progStatus.poll_pout, read_power_out, "pout"},
+	{&progStatus.poll_swr, read_swr, "swr"},
+	{&progStatus.poll_alc, read_alc, "alc"},
+	{&progStatus.poll_mode, read_voltmeter, "voltage"},
+	{&progStatus.poll_split, read_split, "split"},
+	{NULL, NULL}
+};
+// moved to main polling loop
+//	{&progStatus.poll_ptt, check_ptt},
+
 void * serial_thread_loop(void *d)
 {
-	POLL_PAIR *rx_polling = &RX_poll_pairs[0];
+	POLL_PAIR *rx_poll_group_1 = &RX_poll_group_1[0];
+	POLL_PAIR *rx_poll_group_2 = &RX_poll_group_2[0];
+	POLL_PAIR *rx_poll_group_3 = &RX_poll_group_3[0];
 	POLL_PAIR *tx_polling = &TX_poll_pairs[0];
 	bool isRX = false;
 
@@ -1652,6 +1662,8 @@ void * serial_thread_loop(void *d)
 			check_ptt();
 		}
 
+		if (progStatus.byte_interval) MilliSleep(progStatus.byte_interval);
+
 		if (PTT || cwio_process == SEND || cwio_process == CALIBRATE) {
 			if (isRX) {
 				isRX = false;
@@ -1659,12 +1671,14 @@ void * serial_thread_loop(void *d)
 				Fl::awake(update_UI_PTT);
 				Fl::awake(updateSmeter);
 			}
-			if (progStatus.byte_interval) MilliSleep(progStatus.byte_interval);
 
 			if (progStatus.poll_frequency) {
 				guard_lock lk(&mutex_serial);
 				read_vfo();
 			}
+
+			if (progStatus.byte_interval)
+				MilliSleep(progStatus.byte_interval);
 
 			{	guard_lock lk(&mutex_serial);
 				while (!bypass_serial_thread_loop) {
@@ -1691,36 +1705,39 @@ void * serial_thread_loop(void *d)
 				Fl::awake(zeroXmtMeters, 0);
 			}
 
-			if (progStatus.byte_interval) MilliSleep(progStatus.byte_interval);
-
-			if (progStatus.poll_frequency) {
-				guard_lock lk(&mutex_serial);
-				read_vfo();
-			}
-
-			if (progStatus.byte_interval) MilliSleep(progStatus.byte_interval);
-
-			{	guard_lock lk(&mutex_serial);
-				if (!bypass_serial_thread_loop && progStatus.poll_smeter) {
-					read_smeter();
+			if (!bypass_serial_thread_loop) {
+				{	guard_lock lk(&mutex_serial);
+					while (rx_poll_group_1->poll != NULL) {
+						(rx_poll_group_1->pollfunc)();
+						if (progStatus.byte_interval)
+							MilliSleep(progStatus.byte_interval);
+						++rx_poll_group_1;
+					}
+					rx_poll_group_1 = &RX_poll_group_1[0];
 				}
 			}
 
-			if (progStatus.byte_interval) MilliSleep(progStatus.byte_interval);
+			if (!bypass_serial_thread_loop) {
+				{	guard_lock lk(&mutex_serial);
+					if (*(rx_poll_group_2->poll))
+						(rx_poll_group_2->pollfunc)();
+					++rx_poll_group_2;
+					if (rx_poll_group_2->poll == NULL)
+						rx_poll_group_2 = &RX_poll_group_2[0];
+				}
+			}
 
-			{	guard_lock lk(&mutex_serial);
-				while (!bypass_serial_thread_loop) {
-					if (*(rx_polling->poll)) {
-						(rx_polling->pollfunc)();
-						++rx_polling;
-						if (rx_polling->poll == NULL)
-							rx_polling = &RX_poll_pairs[0];
-						break;
+			if (progStatus.byte_interval)
+				MilliSleep(progStatus.byte_interval);
+
+			if (!bypass_serial_thread_loop) {
+				{	guard_lock lk(&mutex_serial);
+					if (*(rx_poll_group_3->poll)) {
+						(rx_poll_group_3->pollfunc)();
 					}
-					++rx_polling;
-					if (rx_polling->poll == NULL) {
-						rx_polling = &RX_poll_pairs[0];
-						break;
+					++rx_poll_group_3;
+					if (rx_poll_group_3->poll == NULL) {
+						rx_poll_group_3 = &RX_poll_group_3[0];
 					}
 				}
 			}
