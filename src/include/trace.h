@@ -28,7 +28,7 @@
 #include <cstdio>
 #include <string.h>
 
-//#define WITH_TRACED
+#define WITH_TRACED
 //usage
 //int TRACED(add, int a, int b)
 

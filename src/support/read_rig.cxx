@@ -161,7 +161,7 @@ void TRACED(vfoA_startup_data)
 
 	vfo_startup_data(xcvr_vfoA);
 
-	trace(2, "Xcvr vfo A:\n", print(xcvr_vfoA));
+	rig_trace(2, "Xcvr vfo A:\n", print(xcvr_vfoA));
 }
 
 void TRACED(vfoB_startup_data) 
@@ -179,7 +179,7 @@ void TRACED(vfoB_startup_data)
 
 	vfo_startup_data(xcvr_vfoB);
 
-	trace(2, "Xcvr vfo B:\n", print(xcvr_vfoB));
+	rig_trace(2, "Xcvr vfo B:\n", print(xcvr_vfoB));
 }
 
 void TRACED(rig_startup_data)

@@ -26,18 +26,38 @@
 #include "yaesu/FT857D.h"
 #include "support.h"
 
+#include "trace.h"
+
 static const char FT857Dname_[] = "FT-857D";
-static const char FT897Dname_[] = "FT-897D";
 
 static const char *FT857Dmodes_[] = {
-		"LSB", "USB", "CW", "CW-R", "AM", "FM", "DIG", "PKT", NULL};
-static const int FT857D_mode_val[] =  { 0, 1, 2, 3, 4, 8, 0x0A, 0x0C };
-static const char FT857D_mode_type[] = { 'L', 'U', 'U', 'L', 'U', 'U', 'U', 'U' };
+		"LSB", "USB", "CW", "CW-R", "AM", "FM", "FM-N", "DIG", "PKT", NULL};
+static const int FT857D_mode_val[] =  { 0x00, 0x01, 0x02, 0x03, 0x04, 0x08, 0X88, 0x0A, 0x0C };
+static const char FT857D_mode_type[] = { 'L', 'U', 'U', 'L', 'U', 'U', 'U', 'U', 'U' };
+
+
+static const char FT897Dname_[] = "FT-897D";
+
+static const char *FT897Dmodes_[] = {
+		"LSB", "USB", "CW", "CW-R", "AM", "FM", "FM-N", "DIG", "PKT", NULL};
+static const int FT897D_mode_val[] =  { 0x00, 0x01, 0x02, 0x03, 0x04, 0x08, 0x88, 0x0A, 0x0C };
+static const char FT897D_mode_type[] = { 'L', 'U', 'U', 'L', 'U', 'U', 'U', 'U', 'U' };
+// note:
+// 897D returns 0xFC for 9600 baud pkt, 0x0C for 1200 pkt
+// ONLY accepts 0x0C for PKT mode selection ... go figure
+
+static int num_modes = 9;
+static const int *mode_vals;
+static const char *mode_type;
 
 RIG_FT857D::RIG_FT857D() {
 // base class values
 	name_ = FT857Dname_;
 	modes_ = FT857Dmodes_;
+	num_modes = 9;
+	mode_vals = FT857D_mode_val;
+	mode_type = FT857D_mode_type;
+
 	comm_baudrate = BR4800;
 	stopbits = 2;
 	comm_retries = 2;
@@ -57,8 +77,7 @@ RIG_FT857D::RIG_FT857D() {
 	has_split_AB =
 	has_smeter =
 	has_power_out =
-	has_mode_control = true;
-
+	has_mode_control = 
 	has_band_selection = true;
 
 	precision = 10;
@@ -68,7 +87,17 @@ RIG_FT857D::RIG_FT857D() {
 
 RIG_FT897D::RIG_FT897D() {
 	name_ = FT897Dname_;
+	modes_ = FT897Dmodes_;
+	mode_vals = FT897D_mode_val;
+	mode_type = FT897D_mode_type;
+
+	num_modes = 9;
 };
+
+static void settle(int n)
+{
+	for (int i = 0; i < n/50; i++) {MilliSleep(50); Fl::awake();}
+}
 
 void RIG_FT857D::init_cmd()
 {
@@ -86,6 +115,7 @@ bool RIG_FT857D::check ()
 		cmd[4] = 0x03;
 		wait--;
 	}
+	getthex("check");
 	if (ret < 5) return false;
 	return true;
 
@@ -96,17 +126,25 @@ unsigned long int RIG_FT857D::get_vfoA ()
 	if (inuse == onB) return freqA;
 	init_cmd();
 	cmd[4] = 0x03;
+	getr("get vfoA");
 	int ret = waitN(5, 100, "get vfo A", HEX);
-	getthex("get_vfoA");
+	getthex("  : ");
 	if (ret == 5) {
 		freqA = fm_bcd(replystr, 8) * 10;
-		int mode = replystr[4];
-		for (int i = 0; i < 8; i++)
-			if (FT857D_mode_val[i] == mode) {
+		int mode = replystr[4] & 0xFF;
+		for (int i = 0; i < num_modes; i++) {
+			if (i == (num_modes - 1)) mode &= 0x0F;
+			if (mode_vals[i] == mode) {
 				modeA = i;
 				break;
 			}
+		}
 	}
+
+	static char msg[50];
+	snprintf(msg, sizeof(msg), "get vfoA: %lu, %s", freqA, modes_[modeA]);
+	getr(msg);
+
 	return freqA;
 }
 
@@ -118,6 +156,7 @@ void RIG_FT857D::set_vfoA (unsigned long int freq)
 	cmd += 0x01;
 	replystr.clear();
 	sendCommand(cmd, 0, 50);
+	settle(200);
 	setthex("set_vfoA");
 }
 
@@ -126,17 +165,25 @@ unsigned long int RIG_FT857D::get_vfoB ()
 	if (inuse == onA) return freqB;
 	init_cmd();
 	cmd[4] = 0x03;
+	getr("get vfoB");
 	int ret = waitN(5, 100, "get vfo B", HEX);
-	getthex("get_vfoB");
+	getthex("  : ");
 	if (ret == 5) {
 		freqB = fm_bcd(replystr, 8) * 10;
-		int mode = replystr[4];
-		for (int i = 0; i < 8; i++)
-			if (FT857D_mode_val[i] == mode) {
+		int mode = replystr[4] & 0xFF;
+		for (int i = 0; i < num_modes; i++) {
+			if (i == (num_modes - 1)) mode &= 0x0F;
+			if (mode_vals[i] == mode) {
 				modeB = i;
 				break;
 			}
+		}
 	}
+
+	static char msg[50];
+	snprintf(msg, sizeof(msg), "get vfoB: %lu, %s", freqA, modes_[modeB]);
+	getr(msg);
+
 	return freqB;
 }
 
@@ -148,34 +195,38 @@ void RIG_FT857D::set_vfoB (unsigned long int freq)
 	cmd += 0x01;
 	replystr.clear();
 	sendCommand(cmd, 0, 50);
+	settle(200);
 	setthex("set_vfoB");
 }
 
 int RIG_FT857D::get_modeA()
 {
 // read by get_vfoA
+	getr("get modeA");
 	return modeA;
 }
 
 int RIG_FT857D::get_modeB()
 {
 // read by get_vfoB
+	getr("get modeB");
 	return modeB;
 }
 
 int RIG_FT857D::get_modetype(int n)
 {
-	return FT857D_mode_type[n];
+	return mode_type[n];
 }
 
 void RIG_FT857D::set_modeA(int val)
 {
 	modeA = val;
 	init_cmd();
-	cmd[0] = FT857D_mode_val[val];
+	cmd[0] = mode_vals[val];
 	cmd[4] = 0x07;
 	replystr.clear();
 	sendCommand(cmd, 0, 50);
+	settle(200);
 	setthex("set_modeA");
 }
 
@@ -183,10 +234,11 @@ void RIG_FT857D::set_modeB(int val)
 {
 	modeB = val;
 	init_cmd();
-	cmd[0] = FT857D_mode_val[val];
+	cmd[0] = mode_vals[val];
 	cmd[4] = 0x07;
 	replystr.clear();
 	sendCommand(cmd, 0, 50);
+	settle(200);
 	setthex("set_modeB");
 }
 
@@ -209,6 +261,7 @@ int  RIG_FT857D::get_power_out(void)
 	init_cmd();
 	cmd[4] = 0xF7;
 	int ret = waitN(1, 100, "get pout", HEX);
+	getthex("get pout");
 	if (ret == 1) {
 		int fwdpwr = replystr[0] & 0x0F;
 		fwdpwr = fwdpwr * 100 / 15;
@@ -222,6 +275,7 @@ int  RIG_FT857D::get_smeter(void)
 	init_cmd();
 	cmd[4] = 0xE7;
 	int ret = waitN(1, 100, "get smeter", HEX);
+	getthex("get smeter");
 	if (ret == 1) {
 		int sval = replystr[0] & 0x0F;
 		sval = (sval-1) * 100 / 15;
@@ -270,7 +324,6 @@ void RIG_FT857D::set_split(bool val)
 extern bool PTT;
 int  RIG_FT857D::get_split()
 {
-	if (!PTT) return split;
 	init_cmd();
 	cmd[4] = 0xF7; // get transmit status
 	int ret = waitN(1, 100, "get TX status");
@@ -314,6 +367,7 @@ void RIG_FT857D::set_tones(int tx, int rx)
 	cmd.append(to_bcd(rx, 4));
 	cmd += 0x0B;
 	sendCommand(cmd, 0, 50);
+	setthex("set tones");
 }
 
 // 0 - simplex, 1 - minus, 2 - plus
@@ -324,10 +378,12 @@ void RIG_FT857D::set_offset(int indx, int offset)
 	cmd.append("   ");
 	cmd += 0x09;
 	sendCommand(cmd, 0, 50);
+	setthex("set offset 1");
 
 	offset *= 100;
 	cmd.clear();
 	cmd.assign(to_bcd(offset - (offset % 100), 8));
 	cmd += 0xF9;
 	sendCommand(cmd, 0, 50);
+	setthex("set offset 2");
 }

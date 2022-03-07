@@ -1920,7 +1920,8 @@ bool status::loadXcvrState(std::string xcvr)
 		}
 
 // testing 817
-		gettrace = settrace = trace = true;
+		gettrace = settrace = rigtrace = true;
+		trace = false;
 
 		return true; 
 	}

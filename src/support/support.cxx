@@ -417,7 +417,7 @@ void read_mode()
 	int nu_mode;
 	int nu_BW;
 	if (selrig->inuse == onA) {
-		trace(2, "read_mode", "vfoA active");
+		rig_trace(2, "read_mode", "vfoA active");
 		nu_mode = selrig->get_modeA();
 		if (nu_mode != opMODE->index()) { //vfoA.imode) {
 			vfoA.imode = vfo->imode = nu_mode;
@@ -437,7 +437,7 @@ void read_mode()
 		vfoA.filter = selrig->get_FILT(nu_mode);
 		Fl::awake(setFILTER);
 	} else {
-		trace(2, "read_mode", "vfoB active");
+		rig_trace(2, "read_mode", "vfoB active");
 		nu_mode = selrig->get_modeB();
 		if (nu_mode != opMODE->index()) { //vfoB.imode) {
 			vfoB.imode = vfo->imode = nu_mode;
@@ -554,6 +554,7 @@ void read_smeter()
 
 void read_voltmeter()
 {
+	if (!selrig->has_voltmeter) return;
 	double sig;
 	{
 		trace(1, "read voltage");
