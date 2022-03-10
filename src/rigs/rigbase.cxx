@@ -28,6 +28,8 @@
 #include "socket_io.h"
 #include "tod_clock.h"
 
+#include "rigs.h"
+
 const char *szNORIG = "NONE";
 const char *szNOMODES[] = {"LSB", "USB", NULL};
 const char *szNOBWS[] = {"NONE", NULL};
@@ -389,12 +391,18 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 		return retnbr;
 	}
 
+	if (this->name_ == rig_FT817.name_ ||
+		this->name_ == rig_FT817BB.name_ ||
+		this->name_ == rig_FT818ND.name_ )
+		delay += progStatus.comm_wait;
+
 	if(!RigSerial->IsOpen()) {
 		LOG_DEBUG("TEST %s", sz);
 		return 0;
 	}
 
 	RigSerial->FlushBuffer();
+
 	RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
 
 	MilliSleep(delay);
@@ -432,13 +440,9 @@ int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 	}
 
 	RigSerial->FlushBuffer();
-char szt[200];
-snprintf(szt, sizeof(szt), "WriteBuffer( %s, %d )", cmd.c_str(), (int)cmd.length());
-trace(1, szt);
+
 	RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
 
-snprintf(szt, sizeof(szt), "MilliSleep( %d msec)", delay );
-trace(1, szt);
 	MilliSleep(delay);
 
 	size_t tout1 = zmsec();//todmsec();
@@ -459,9 +463,6 @@ trace(1, szt);
 		if (replystr.find(wait_str) != std::string::npos)
 			break;
 	}
-
-snprintf(szt, sizeof(szt), "[%d msec] %s", (int)(tout2 - tout1), (replystr.length() ? replystr.c_str() : "NIL") );
-trace(1, szt);
 
 	LOG_DEBUG ("%s: read %d bytes, %s", sz, retnbr, replystr.c_str());
 	return retnbr;

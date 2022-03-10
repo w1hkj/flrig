@@ -59,7 +59,6 @@ RIG_FT817BB::RIG_FT817BB() {
 	has_swr_control =
 	has_alc_control =
 	has_getvfoAorB =
-	has_vfoAB = 
 	has_smeter =
 	has_power_out =
 	has_ptt_control =
@@ -68,12 +67,19 @@ RIG_FT817BB::RIG_FT817BB() {
 	precision = 10;
 	ndigits = 8;
 
+	inuse = onNIL;
+}
+
+static void settle(int n)
+{
+	for (int i = 0; i < n/50; i++) {MilliSleep(50); Fl::awake();}
 }
 
 void RIG_FT817BB::init_cmd()
 {
 	cmd = "00000";
 	for (size_t i = 0; i < 5; i++) cmd[i] = 0;
+	MilliSleep(20); // slows down the CAT strings enough to give the poor ol' 817 time to catch it's breath
 }
 
 static bool ft817BB_memory_mode = false;
@@ -91,116 +97,112 @@ int RIG_FT817BB::get_vfoAorB()
 	init_cmd();
 	cmd[1] = 0x55;
 	cmd[4] = 0xBB;
-	int ret = waitN(2, 100, "get active VFO", HEX);
+	getr("get_vfoAorB()");
+	int ret = waitN(2, 100, "get A/B", HEX);
 	int i = 0;
 	while (ret != 2 && i++ < 10) {
-		ret = waitN(2, 100, "get active VFO", HEX);
+		ret = waitN(2, 100, "get A/B", HEX);
 	}
 	if (i == 10) {
 		return inuse;
 	}
-	getthex("get active VFO");
+	getthex("get A/B");
 
-	ft817BB_memory_mode = ((replystr[0] & 0x80) == 0x00);
+	int tbyte = replystr[0] & 0xFF;
+
+	ft817BB_memory_mode = ( (tbyte & 0x80) == 0x00);
 	Fl::awake(memory_label);
 
-	inuse = replystr[0] & 0x01;
+	tbyte &= 0x01;
 
+	if (tbyte == 0x01)
+		inuse = onB;
+	else
+		inuse = onA;
+
+	get_trace(2, (inuse ? "vfoB" : "vfoA"), " in use");
 	return inuse;
 }
 
 void RIG_FT817BB::selectA()
 {
-	if (get_vfoAorB() == 0) return;
-	if (ft817BB_memory_mode) return;
+setr("selectA()");
+	if (inuse == onA) return;
 	init_cmd();
 	cmd[4] = 0x81;
 	sendCommand(cmd);
-	showresp(INFO, HEX, "select VFO A", cmd, replystr);
-	setthex("Select VFO A");
-
+setr("cmd: selectA()");
 	get_vfoAorB();
-	if (inuse == onA)
-		sett("selectA() SUCCESS");
-	else
-		sett("selectA() FAILED");
 }
 
 void RIG_FT817BB::selectB()
 {
-	if (get_vfoAorB() == 1) return;
-	if (ft817BB_memory_mode) return;
+setr("selectB()");
+	if (inuse == onB) return;
 	init_cmd();
 	cmd[4] = 0x81;
 	sendCommand(cmd);
-	showresp(INFO, HEX, "select VFO B", cmd, replystr);
-	setthex("Select VFO B");
-
+setr("cmd selectB()");
 	get_vfoAorB();
-	if (inuse == onB)
-		sett("selectB() SUCCESS");
-	else
-		sett("selectB() FAILED");
 }
 
 bool RIG_FT817BB::check ()
 {
-	int wait = 5, ret = 0;
-	init_cmd();
-	cmd[4] = 0x03; // get vfo
-	while ((ret = waitN(5, 100, "check")) < 5 && wait > 0) {
-		init_cmd();
-		cmd[4] = 0x03;
-		wait--;
-	}
-	if (ret < 5) return false;
+	get_vfoAorB();
+	if (inuse == onNIL)
+		return false;
 	return true;
 }
 
 unsigned long int RIG_FT817BB::get_vfoA ()
 {
-	if (get_vfoAorB() != 0) return freqA;
-	if (ft817BB_memory_mode) return freqA;
+	if (inuse == onB) return freqA;
+
 	init_cmd();
 	cmd[4] = 0x03;
-	int ret = waitN(5, 100, "get vfoA");
-	getthex("get_vfoA");
+	int ret = 0;
+	int repeat = 5;
+	do {
+		ret = waitN(5, 100, "get vfoA");
+		getthex("get_vfoA");
+		MilliSleep(100);
+	} while (ret < 5 && repeat--);
+
 	if (ret < 5) {
+		gett("get vfoA FAILED");
 		return freqA;
 	}
+
 	freqA = fm_bcd(replystr, 8) * 10;
+
+	int mode = (replystr[4] & 0x0F);
+	int i = 0;
+	for (; i < 8; i++)
+		if (FT817BB_mode_val[i] == mode) {
+			modeA = i;
+			break;
+		}
+	static char msg[50];
+	snprintf(msg, sizeof(msg), "get vfoA: %lu, %s", freqA, FT817BBmodes_[i]);
+	getr(msg);
+
 	return freqA;
 }
 
 void RIG_FT817BB::set_vfoA (unsigned long int freq)
 {
-	if (get_vfoAorB() != 0) return;
-	if (ft817BB_memory_mode) return;
-	freqA = freq;
-	freq /=10; // 817BB does not support 1 Hz resolution
+	if (inuse == onB || ft817BB_memory_mode)
+		return;
+	freq /=10; // 817 does not support 1 Hz resolution
 	cmd = to_bcd(freq, 8);
 	cmd += 0x01;
 	sendCommand(cmd);
+	settle(150);
 	setthex("set_vfoA");
 }
 
 int RIG_FT817BB::get_modeA()
 {
-	if (get_vfoAorB() != 0) return modeA;
-	if (ft817BB_memory_mode) return modeA;
-	init_cmd();
-	cmd[4] = 0x03;
-	int ret = waitN(5, 100, "get mode A");
-	getthex("get_modeA");
-	if (ret < 5) {
-		return modeA;
-	}
-	int mode = replystr[4];
-	for (int i = 0; i < 8; i++)
-		if (FT817BB_mode_val[i] == mode) {
-			modeA = i;
-			break;
-		}
 	return modeA;
 }
 
@@ -211,77 +213,98 @@ int RIG_FT817BB::get_modetype(int n)
 
 void RIG_FT817BB::set_modeA(int val)
 {
-	if (ft817BB_memory_mode) return;
-	if (get_vfoAorB() != 0) return;
-
+	if (inuse == onB || ft817BB_memory_mode)
+		return;
 	init_cmd();
 	cmd[0] = FT817BB_mode_val[val];
 	cmd[4] = 0x07;
 	sendCommand(cmd);
 	setthex("set_modeA");
 
-	check();
+	settle(150);
+
+	get_vfoA();
+	int n = 0;
+	while (modeA != val && n++ < 10) {
+		MilliSleep(50);
+		get_vfoB();
+	}
+	if (n == 10) LOG_ERROR("set_modeA failed");
 }
 
 // VFO B ===============================================================
 unsigned long int RIG_FT817BB::get_vfoB ()
 {
-	if (get_vfoAorB() != 1) return freqB;
-	if (ft817BB_memory_mode) return freqB;
+	if (inuse == onA) return freqB;
+
 	init_cmd();
 	cmd[4] = 0x03;
-	int ret = waitN(5, 100, "get vfoB");
-	getthex("get_vfoB");
+	int ret = 0;
+	int repeat = 5;
+	do {
+		ret = waitN(5, 100, "get vfoB");
+		getthex("get_vfoB");
+		MilliSleep(100);
+	} while (ret < 5 && repeat--);
+
 	if (ret < 5) {
-		LOG_ERROR("get_vfoB failed");
+		gett("get vfoB FAILED");
 		return freqB;
 	}
+
 	freqB = fm_bcd(replystr, 8) * 10;
+
+	int mode = (replystr[4] & 0x0F);
+	int i = 0;
+	for ( ; i < 8; i++ )
+		if (FT817BB_mode_val[i] == mode) {
+			modeB = i;
+			break;
+		}
+	static char msg[50];
+	snprintf(msg, sizeof(msg), "get vfoB: %lu, %s", freqB, FT817BBmodes_[i]);
+	getr(msg);
+
 	return freqB;
 }
 
 void RIG_FT817BB::set_vfoB (unsigned long int freq)
 {
-	if (get_vfoAorB() != 1) return;
-	if (ft817BB_memory_mode) return;
+	if (inuse == onA || ft817BB_memory_mode)
+		return;
 	freqB = freq;
 	freq /=10; // 817BB does not support 1 Hz resolution
 	cmd = to_bcd(freq, 8);
 	cmd += 0x01;
 	sendCommand(cmd);
+	settle(150);
 	setthex("set_vfoB");
 }
 
 int RIG_FT817BB::get_modeB()
 {
-	if (get_vfoAorB() != 1) return modeB;
-	if (ft817BB_memory_mode) return modeB;
-	init_cmd();
-	cmd[4] = 0x03;
-	int ret = waitN(5, 100, "get mode B");
-	getthex("get_modeB");
-	if (ret < 5) {
-		return modeB;
-	}
-	int mode = replystr[4];
-	for (int i = 0; i < 8; i++)
-		if (FT817BB_mode_val[i] == mode) {
-			modeB = i;
-			break;
-		}
 	return modeB;
 }
 
 void RIG_FT817BB::set_modeB(int val)
 {
-	if (get_vfoAorB() != 1) return;
+	if (inuse == onA || ft817BB_memory_mode)
+		return;
 	init_cmd();
 	cmd[0] = FT817BB_mode_val[val];
 	cmd[4] = 0x07;
 	sendCommand(cmd);
 	setthex("set_modeB");
 
-	check();
+	settle(150);
+
+	get_vfoB();
+	int n = 0;
+	while (modeB != val && n++ < 10) {
+		MilliSleep(50);
+		get_vfoB();
+	}
+	if (n == 10) LOG_ERROR("set_modeB failed");
 }
 
 //======================================================================

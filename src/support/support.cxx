@@ -301,8 +301,11 @@ void read_vfo()
 	unsigned long int  freq;
 
 	int current_vfo = selrig->inuse;
-	if (current_vfo != selrig->get_vfoAorB())
-		Fl::awake(updateUI);
+	if (current_vfo == onNIL)
+		return;
+
+//	if (current_vfo != selrig->get_vfoAorB())
+//		Fl::awake(updateUI);
 
 	if (selrig->has_get_info)
 		selrig->get_info();
@@ -369,6 +372,7 @@ void updateUI(void *)
 void TRACED(setModeControl, void *)
 
 	opMODE->index(vfo->imode);
+	opMODE->redraw();
 
 // enables/disables the IF shift control, depending on the mode.
 // the IF Shift function, is ONLY valid in CW modes, with the 870S.
@@ -415,19 +419,18 @@ void read_mode()
 	if (selrig->inuse == onA) {
 		trace(2, "read_mode", "vfoA active");
 		nu_mode = selrig->get_modeA();
-		vfoA.filter = selrig->get_FILT(nu_mode);
-		if (nu_mode != vfoA.imode) {
-			{
-				vfoA.imode = vfo->imode = nu_mode;
-				selrig->adjust_bandwidth(vfo->imode);
-				nu_BW = selrig->get_bwA();
-				vfoA.iBW = vfo->iBW = nu_BW;
-			}
+		if (nu_mode != opMODE->index()) { //vfoA.imode) {
+			vfoA.imode = vfo->imode = nu_mode;
+			vfoA.filter = selrig->get_FILT(nu_mode);
+			selrig->adjust_bandwidth(vfo->imode);
+			nu_BW = selrig->get_bwA();
+			vfoA.iBW = vfo->iBW = nu_BW;
+
 			Fl::awake(setModeControl);
 			set_bandwidth_control();
 			Fl::awake(updateUI);
+			Fl::awake(setFILTER);
 		}
-		Fl::awake(setFILTER);
 		if (selrig->can_change_alt_vfo) {
 			vfoB.imode = selrig->get_modeB();
 			vfoB.filter = selrig->get_FILT(vfoB.imode);
@@ -435,19 +438,19 @@ void read_mode()
 	} else {
 		trace(2, "read_mode", "vfoB active");
 		nu_mode = selrig->get_modeB();
-		vfoB.filter = selrig->get_FILT(nu_mode);
-		if (nu_mode != vfoB.imode) {
-			{
-				vfoB.imode = vfo->imode = nu_mode;
-				selrig->adjust_bandwidth(vfo->imode);
-				nu_BW = selrig->get_bwB();
-				vfoB.iBW = vfo->iBW = nu_BW;
-			}
+		if (nu_mode != opMODE->index()) { //vfoB.imode) {
+			vfoB.filter = selrig->get_FILT(nu_mode);
+			vfoB.imode = vfo->imode = nu_mode;
+			selrig->adjust_bandwidth(vfo->imode);
+			nu_BW = selrig->get_bwB();
+			vfoB.iBW = vfo->iBW = nu_BW;
+
 			Fl::awake(setModeControl);
 			set_bandwidth_control();
 			Fl::awake(updateUI);
+			Fl::awake(setFILTER);
 		}
-		Fl::awake(setFILTER);
+
 		if (selrig->can_change_alt_vfo) {
 			vfoA.imode = selrig->get_modeA();
 			vfoA.filter = selrig->get_FILT(vfoA.imode);
@@ -2127,8 +2130,8 @@ void execute_swapAB()
 			XCVR_STATE vfotemp = vfoA;
 			selrig->selectA();
 			vfoA = vfoB;
-			selrig->set_vfoA(vfoA.freq);
 			selrig->set_modeA(vfoA.imode);
+			selrig->set_vfoA(vfoA.freq);
 			selrig->set_bwA(vfoA.iBW);
 			selrig->get_vfoA();
 			selrig->get_modeA();
@@ -2136,8 +2139,8 @@ void execute_swapAB()
 
 			selrig->selectB();
 			vfoB = vfotemp;
-			selrig->set_vfoB(vfoB.freq);
 			selrig->set_modeB(vfoB.imode);
+			selrig->set_vfoB(vfoB.freq);
 			selrig->set_bwB(vfoB.iBW);
 			selrig->get_vfoB();
 			selrig->get_modeB();
@@ -2147,8 +2150,8 @@ void execute_swapAB()
 			XCVR_STATE vfotemp = vfoB;
 			selrig->selectB();
 			vfoB = vfoA;
-			selrig->set_vfoB(vfoB.freq);
 			selrig->set_modeB(vfoB.imode);
+			selrig->set_vfoB(vfoB.freq);
 			selrig->set_bwB(vfoB.iBW);
 			selrig->get_vfoB();
 			selrig->get_modeB();
@@ -2156,8 +2159,8 @@ void execute_swapAB()
 
 			selrig->selectA();
 			vfoA = vfotemp;
-			selrig->set_vfoA(vfoA.freq);
 			selrig->set_modeA(vfoA.imode);
+			selrig->set_vfoA(vfoA.freq);
 			selrig->set_bwA(vfoA.iBW);
 			selrig->get_vfoA();
 			selrig->get_modeA();

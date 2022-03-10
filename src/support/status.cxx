@@ -1919,10 +1919,8 @@ bool status::loadXcvrState(std::string xcvr)
 			FSK_msgs[n] = defbuffer;
 		}
 
-//std::cout << "LOAD STATUS\nx: " << mainX << ", y: " << mainY << ", w: " << mainW << " h: " << mainH << std::endl;
-//std::cout << "embed tabs: " << embed_tabs << std::endl;
-//std::cout << "show tabs : " << show_tabs << std::endl;
-//std::cout << "show controls: " << show_controls << std::endl << std::endl;
+// testing 817
+		gettrace = settrace = trace = true;
 
 		return true; 
 	}

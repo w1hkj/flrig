@@ -84,7 +84,7 @@ void TRACED(restore_xcvr_vals)
 
 	update_progress(0);
 
-	guard_lock serial_lock(&mutex_serial);
+	guard_lock serial_lock(&mutex_serial, "restore_xcvr_vals");
 	trace(1, "restore_xcvr_vals()");
 
 	if (selrig->inuse == onA) {

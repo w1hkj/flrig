@@ -55,7 +55,6 @@ RIG_FT818ND::RIG_FT818ND() {
 	has_split_AB =
 	has_swr_control =
 	has_alc_control =
-	has_vfoAB = 
 	has_smeter =
 	has_power_out =
 	has_ptt_control =
@@ -64,88 +63,94 @@ RIG_FT818ND::RIG_FT818ND() {
 	precision = 10;
 	ndigits = 8;
 
+	inuse = onNIL;
+}
+
+static void settle(int n)
+{
+	for (int i = 0; i < n/50; i++) {MilliSleep(50); Fl::awake();}
 }
 
 void RIG_FT818ND::init_cmd()
 {
 	cmd = "00000";
 	for (size_t i = 0; i < 5; i++) cmd[i] = 0;
+	MilliSleep(20); // slows down the CAT strings enough to give the poor ol' 818 time to catch it's breath
 }
 
 void RIG_FT818ND::selectA()
 {
+	if (inuse == onA) return;
 	init_cmd();
-
 	cmd[4] = 0x81;
 	sendCommand(cmd);
-	setthex("Select VFO A");
-	check();
 	inuse = onA;
+	get_vfoA();
 }
 
 void RIG_FT818ND::selectB()
 {
+	if (inuse == onB) return;
 	init_cmd();
 	cmd[4] = 0x81;
-
 	sendCommand(cmd);
-	setthex("Select VFO B");
-	check();
 	inuse = onB;
+	get_vfoB();
 }
 
 bool RIG_FT818ND::check ()
 {
-	int wait = 5, ret = 0;
-	init_cmd();
-	cmd[4] = 0x03; // get vfo
-	while ((ret = waitN(5, 100, "check")) < 5 && wait > 0) {
-		init_cmd();
-		cmd[4] = 0x03;
-		wait--;
-	}
-	if (ret < 5) return false;
 	return true;
 }
 
 unsigned long int RIG_FT818ND::get_vfoA ()
 {
+	if (inuse == onB) return freqA;
+
 	init_cmd();
 	cmd[4] = 0x03;
-	int ret = waitN(5, 100, "get vfoA");
-	getthex("get_vfoA");
+	int ret = 0;
+	int repeat = 5;
+	do {
+		ret = waitN(5, 100, "get vfoA");
+		getthex("get_vfoA");
+		MilliSleep(100);
+	} while (ret < 5 && repeat--);
+
 	if (ret < 5) {
+		gett("get vfoA FAILED");
 		return freqA;
 	}
+
 	freqA = fm_bcd(replystr, 8) * 10;
+
+	int mode = (replystr[4] & 0x0F);
+	int i = 0;
+	for ( ; i < 8; i++)
+		if (FT818ND_mode_val[i] == mode) {
+			modeA = i;
+			break;
+		}
+	static char msg[50];
+	snprintf(msg, sizeof(msg), "get vfoA: %lu, %s", freqA, FT818NDmodes_[i]);
+	gett(msg);
+
 	return freqA;
 }
 
 void RIG_FT818ND::set_vfoA (unsigned long int freq)
 {
 	freqA = freq;
-	freq /=10; // 817 does not support 1 Hz resolution
+	freq /=10; // 818 does not support 1 Hz resolution
 	cmd = to_bcd(freq, 8);
 	cmd += 0x01;
 	sendCommand(cmd);
+	settle(150);
 	setthex("set_vfoA");
 }
 
 int RIG_FT818ND::get_modeA()
 {
-	init_cmd();
-	cmd[4] = 0x03;
-	int ret = waitN(5, 100, "get mode A");
-	getthex("get_modeA");
-	if (ret < 5) {
-		return modeA;
-	}
-	int mode = replystr[4];
-	for (int i = 0; i < 8; i++)
-		if (FT818ND_mode_val[i] == mode) {
-			modeA = i;
-			break;
-		}
 	return modeA;
 }
 
@@ -162,12 +167,13 @@ void RIG_FT818ND::set_modeA(int val)
 	sendCommand(cmd);
 	setthex("set_modeA");
 
-	MilliSleep(100);
-	get_modeA();
+	settle(150);
+
+	get_vfoA();
 	int n = 0;
 	while (modeA != val && n++ < 10) {
-		MilliSleep(20);
-		get_modeA();
+		MilliSleep(50);
+		get_vfoA();
 	}
 	if (n == 10) LOG_ERROR("set_modeA failed");
 }
@@ -175,15 +181,36 @@ void RIG_FT818ND::set_modeA(int val)
 // VFO B ===============================================================
 unsigned long int RIG_FT818ND::get_vfoB ()
 {
+	if (inuse == onA) return freqB;
+
 	init_cmd();
 	cmd[4] = 0x03;
-	int ret = waitN(5, 100, "get vfoB");
-	getthex("get_vfoB");
+	int ret = 0;
+	int repeat = 5;
+	do {
+		ret = waitN(5, 100, "get vfoB");
+		getthex("get_vfoB");
+		MilliSleep(100);
+	} while (ret < 5 && repeat--);
+
 	if (ret < 5) {
-		LOG_ERROR("get_vfoB failed");
+		gett("get vfoB FAILED");
 		return freqB;
 	}
+
 	freqB = fm_bcd(replystr, 8) * 10;
+
+	int mode = (replystr[4] & 0x0F);
+	int i = 0;
+	for ( ; i < 8; i++)
+		if (FT818ND_mode_val[i] == mode) {
+			modeB = i;
+			break;
+		}
+	static char msg[50];
+	snprintf(msg, sizeof(msg), "get vfoB: %lu, %s", freqB, FT818NDmodes_[i]);
+	gett(msg);
+
 	return freqB;
 }
 
@@ -194,25 +221,12 @@ void RIG_FT818ND::set_vfoB (unsigned long int freq)
 	cmd = to_bcd(freq, 8);
 	cmd += 0x01;
 	sendCommand(cmd);
+	settle(150);
 	setthex("set_vfoB");
 }
 
 int RIG_FT818ND::get_modeB()
 {
-	init_cmd();
-	cmd[4] = 0x03;
-	int ret = waitN(5, 100, "get mode B");
-	getthex("get_modeB");
-	if (ret < 5) {
-		LOG_ERROR("get mode B failed");
-		return modeB;
-	}
-	int mode = replystr[4];
-	for (int i = 0; i < 8; i++)
-		if (FT818ND_mode_val[i] == mode) {
-			modeB = i;
-			break;
-		}
 	return modeB;
 }
 
@@ -224,12 +238,13 @@ void RIG_FT818ND::set_modeB(int val)
 	sendCommand(cmd);
 	setthex("set_modeB");
 
-MilliSleep(100);
-	get_modeB();
+	settle(150);
+
+	get_vfoB();
 	int n = 0;
 	while (modeB != val && n++ < 10) {
-		MilliSleep(20);
-		get_modeB();
+		MilliSleep(50);
+		get_vfoB();
 	}
 	if (n == 10) LOG_ERROR("set_modeB failed");
 }

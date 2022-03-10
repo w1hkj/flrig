@@ -422,6 +422,7 @@ int  Cserial::ReadBuffer (std::string &buf, int nchars, std::string find1, std::
 				return nread;
 			}
 		} else if (nread >= nchars) {
+			hex = true;
 			snprintf(traceinfo, sizeof(traceinfo), "%d / %d: %s", nread, nchars, 
 				(hex ? str2hex(buf.c_str(), buf.length()) : buf.c_str()) );
 			if (progStatus.serialtrace) ser_trace(1, traceinfo);;
@@ -710,6 +711,7 @@ int  Cserial::ReadBuffer (std::string &buf, int nchars, std::string find1, std::
 	}
 
 	if (progStatus.serialtrace) {
+		hex = true;
 		snprintf(traceinfo, sizeof(traceinfo), "ReadBuffer: (%d): %s\n", nchars, 
 			(hex ? str2hex(buf.c_str(), buf.length()) : buf.c_str()) );
 		ser_trace(1, traceinfo);

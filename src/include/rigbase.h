@@ -33,7 +33,7 @@
 
 #include "rigpanel.h"
 
-enum {onA, onB};
+enum {onNIL, onA, onB};
 enum {UI, XML, SRVR, RIG};
 enum {DT_BINARY, DT_STRING};
 
