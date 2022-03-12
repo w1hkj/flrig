@@ -441,6 +441,8 @@ int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 
 	RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
 
+	if (this->name_ == rig_TT566.name_) delay += progStatus.comm_wait;
+
 	MilliSleep(delay);
 
 	size_t tout1 = zmsec();//todmsec();

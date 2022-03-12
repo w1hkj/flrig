@@ -431,12 +431,12 @@ void read_mode()
 			set_bandwidth_control();
 			Fl::awake(updateUI);
 		}
-		if (selrig->can_change_alt_vfo) {
+		if (selrig->twovfos()) {
 			vfoB.imode = selrig->get_modeB();
 			vfoB.filter = selrig->get_FILT(vfoB.imode);
 		}
 
-		vfoA.filter = selrig->get_FILT(nu_mode);
+		vfoA.filter = selrig->get_FILT(vfoA.imode);
 		Fl::awake(setFILTER);
 	} else {
 		rig_trace(2, "read_mode", "vfoB active");
@@ -452,12 +452,12 @@ void read_mode()
 			Fl::awake(updateUI);
 		}
 
-		if (selrig->can_change_alt_vfo) {
+		if (selrig->twovfos()) {
 			vfoA.imode = selrig->get_modeA();
 			vfoA.filter = selrig->get_FILT(vfoA.imode);
 		}
 
-		vfoB.filter = selrig->get_FILT(nu_mode);
+		vfoB.filter = selrig->get_FILT(vfoA.imode);
 		Fl::awake(setFILTER);
 	}
 }
@@ -1118,21 +1118,21 @@ void check_ptt()
 {
 	int check = 0;
 
-	if (selrig->has_ptt_control && progStatus.comm_catptt) {
-		check = selrig->get_PTT();
-	} else if (progStatus.comm_dtrptt) {
+	if (progStatus.comm_dtrptt)
 		check = RigSerial->getPTT();
-	} else if (progStatus.comm_rtsptt) {
+	else if (progStatus.comm_rtsptt)
 		check = RigSerial->getPTT();
-	} else if (SepSerial->IsOpen() && progStatus.sep_dtrptt) {
+	else if (SepSerial->IsOpen() && progStatus.sep_dtrptt)
 		check = SepSerial->getPTT();
-	} else if (SepSerial->IsOpen() && progStatus.sep_rtsptt) {
+	else if (SepSerial->IsOpen() && progStatus.sep_rtsptt)
 		check = SepSerial->getPTT();
-	} else if (progStatus.gpio_ptt) {
+	else if (progStatus.gpio_ptt)
 		check = get_gpio();
-	} else if (progStatus.cmedia_ptt) {
+	else if (progStatus.cmedia_ptt)
 		check = get_cmedia();
-	}
+	else  // comm_catptt or external h/w PTT
+		check = selrig->get_PTT();
+
 	if (check != PTT) {
 		PTT = check;
 		Fl::awake(set_ptt, (void *)PTT);

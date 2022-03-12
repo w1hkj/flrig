@@ -50,7 +50,7 @@ public:
 	int  get_bwB();
 
 	void set_PTT_control(int val);
-        int  get_PTT();
+	int  get_PTT();
 
 	int  get_modetype(int n);
 	void set_preamp(int);
@@ -64,6 +64,8 @@ public:
 
 	double get_power_control(void);
 	void set_power_control(double val);
+	void get_pc_min_max_step(double &min, double &max, double &step);
+
 	void set_auto_notch(int v);
 	int  get_auto_notch();
 

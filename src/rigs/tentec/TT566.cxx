@@ -31,8 +31,6 @@
 #define LCW 3
 #define UCW 2
 
-extern bool PTT;
-
 static int cur_modeA = 0;
 static int cur_modeB = 0;
 
@@ -81,6 +79,38 @@ static char TT566setVOLa[]		= "*UM";
 static char TT566getVOLa[]		= "?UM\r";
 static char TT566rspVOLa[]		= "@UM";
 
+static char TT566setRFGa[]		= "*RMG";
+static char TT566getRFGa[]		= "?RMG\r";
+static char TT566rspRFGa[]		= "@RMG";
+
+static char TT566setATTa[]		= "*RMT";
+static char TT566getATTa[]		= "?RMT\r";
+static char TT566rspATTa[]		= "@RMT";
+
+static char TT566setANa[]		= "*RMNA";
+
+static char TT566setNBa[]		= "*RMNB";
+static char TT566getNBa[]		= "?RMNB\r";
+static char TT566rspNBa[]		= "@RMNB";
+
+static char TT566setMIC[]		= "*TM";
+static char TT566getMIC[]		= "?TM\r";
+static char TT566rspMIC[]		= "@TM";
+
+static char TT566setPWR[]		= "*TP";
+static char TT566getPWR[]		= "?TP\r";
+static char TT566rspPWR[]		= "@TP";
+
+static char TT566getSMETER[]	= "?S\r";
+static char TT566rspSMETER[]	= "@SRM";
+static char TT566rspPOUT[]		= "@STF";
+
+static char TT566setPREAMP[]	= "*RME"; // ONLY AVAILABLE ON PRIMARY RX
+static char TT566getPREAMP[]	= "?RME\r";
+static char TT566rspPREAMP[]	= "@RME";
+
+static char TT566setPTT[]		= "*T";
+
 //static char TT566setVOLb[]		= "*US";
 //static char TT566getVOLb[]		= "?US\r";
 //static char TT566rspVOLb[]		= "@US";
@@ -101,17 +131,9 @@ static char TT566rspVOLa[]		= "@UM";
 //static char TT566getAGCb[]		= "?RSA\r";
 //static char TT566rspAGCb[]		= "@RSA";
 
-static char TT566setRFGa[]		= "*RMG";
-static char TT566getRFGa[]		= "?RMG\r";
-static char TT566rspRFGa[]		= "@RMG";
-
 //static char TT566setRFGb[]		= "*RSG";
 //static char TT566getRFGb[]		= "?RSG\r";
 //static char TT566rspRFGb[]		= "@RSG";
-
-static char TT566setATTa[]		= "*RMT";
-static char TT566getATTa[]		= "?RMT\r";
-static char TT566rspATTa[]		= "@RMT";
 
 //static char TT566setATTb[]		= "*RST";
 //static char TT566getATTb[]		= "?RST\r";
@@ -125,29 +147,13 @@ static char TT566rspATTa[]		= "@RMT";
 //static char TT566getSQLb[]		= "?RSS\r";
 //static char TT566rspSQLb[]		= "@RSS";
 
-static char TT566setANa[]		= "*RMNA";
-static char TT566getANa[]		= "?RMNA\r";
-static char TT566rspANa[]		= "@RMNA";
-
 //static char TT566setANb[]		= "*RSNA";
 //static char TT566getANb[]		= "?RSNA\r";
 //static char TT566rspANb[]		= "@RSNA";
 
-static char TT566setNBa[]		= "*RMNB";
-static char TT566getNBa[]		= "?RMNB\r";
-static char TT566rspNBa[]		= "@RMNB";
-
 //static char TT566setNBb[]		= "*RSNB";
 //static char TT566getNBb[]		= "?RSNB\r";
 //static char TT566rspNBb[]		= "@RSNB";
-
-static char TT566setMIC[]		= "*TM";
-static char TT566getMIC[]		= "?TM\r";
-static char TT566rspMIC[]		= "@TM";
-
-static char TT566setPWR[]		= "*TP";
-static char TT566getPWR[]		= "?TP\r";
-static char TT566rspPWR[]		= "@TP";
 
 //static char TT566setTBW[]		= "*TF";
 //static char TT566getTBW[]		= "?TF\r";
@@ -156,16 +162,6 @@ static char TT566rspPWR[]		= "@TP";
 //static char TT566setTUNE[]		= "*TT";
 //static char TT566getTUNE[]		= "?TT\r";
 //static char TT566rspTUNE[]		= "@TT";
-
-static char TT566getSMETER[]	= "?S\r";
-static char TT566rspSMETER[]	= "@SRM";
-
-static char TT566getPOUT[]		= "?S\r";
-static char TT566rspPOUT[]		= "@STF";
-
-static char TT566setPREAMP[]	= "*RME"; // ONLY AVAILABLE ON PRIMARY RX
-static char TT566getPREAMP[]	= "?RME\r";
-static char TT566rspPREAMP[]	= "@RME";
 
 //static char TT566setRITa[]		= "*RMR";
 //static char TT566getRITa[]		= "?RMR\r";
@@ -178,8 +174,6 @@ static char TT566rspPREAMP[]	= "@RME";
 //static char TT566setXIT[]		= "*RMX"; // ONLY AVAILABLE ON PRIMARY RX
 //static char TT566getXIT[]		= "?RMX\r";
 //static char TT566rspXIT[]		= "@RMX";
-
-static char TT566setPTT[]		= "*T";
 
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
@@ -207,7 +201,7 @@ RIG_TT566::RIG_TT566() {
 	comm_rtscts = true;
 	comm_rtsplus = false;
 	comm_dtrplus = true;
-	comm_catptt = false;
+	comm_catptt = true;
 	comm_rtsptt = false;
 	comm_dtrptt = false;
 	def_mode = modeB = modeA = A.imode = B.imode = 1;
@@ -219,7 +213,6 @@ RIG_TT566::RIG_TT566() {
 
 //	has_ifshift_control =
 //	has_agc_level =
-//	has_attenuator_control =
 
 	can_change_alt_vfo =
 	has_smeter =
@@ -262,24 +255,31 @@ int  RIG_TT566::adjust_bandwidth(int m)
 	return 19;
 }
 
+#define waitcr(n) wait_char('\r', n, 100, "", ASC)
+
 bool RIG_TT566::check ()
 {
 	cmd = TT566getFREQa;
-	int ret = waitN(8, 100, "check");
-	if (ret < 8) return false;
+//	replystr = "@AF14070050\r";
+	waitcr(12);
+	getcr("check vfo A");
+	size_t p = replystr.rfind(TT566rspFREQa);
+	if (p == std::string::npos) return false;
 	return true;
 }
 
 unsigned long int RIG_TT566::get_vfoA ()
 {
 	cmd = TT566getFREQa; 
-	int ret = sendCommand(cmd, strlen(TT566rspFREQa)+9);
-	showresp(WARN, ASC, "get vfo A", cmd, respstr);
-	if (ret < (int)strlen(TT566rspFREQa)+9) return A.freq;
-	size_t p = respstr.rfind(TT566rspFREQa);
+//	replystr = "@AF14070050\r";
+	waitcr(12);
+	getcr("get vfo A");
+
+	size_t p = replystr.rfind(TT566rspFREQa);
 	if (p == std::string::npos) return A.freq;
+
 	int f = 0;
-	sscanf(&respstr[p + strlen(TT566rspFREQa)], "%d", &f);
+	sscanf(&replystr[p + strlen(TT566rspFREQa)], "%d", &f);
 	A.freq = f;
 	return A.freq;
 }
@@ -291,20 +291,22 @@ void RIG_TT566::set_vfoA (unsigned long int freq)
 	cmd.append(to_decimal(freq, 8));
 	cmd += '\r';
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set vfo A", cmd, respstr);
+	setcr("set vfo A");
 	return;
 }
 
 unsigned long int RIG_TT566::get_vfoB ()
 {
 	cmd = TT566getFREQb;
-	int ret = sendCommand(cmd, strlen(TT566rspFREQb)+9);
-	showresp(WARN, ASC, "get vfo A", cmd, respstr);
-	if (ret < (int)strlen(TT566rspFREQb)+9) return B.freq;
-	size_t p = respstr.rfind(TT566rspFREQb);
+//	replystr = "@BF7070000\r";
+	waitcr(12);
+	getcr("get vfo B");
+
+	size_t p = replystr.rfind(TT566rspFREQb);
 	if (p == std::string::npos) return B.freq;
+
 	int f = 0;
-	sscanf(&respstr[p + strlen(TT566rspFREQb)], "%d", &f);
+	sscanf(&replystr[p + strlen(TT566rspFREQb)], "%d", &f);
 	B.freq = f;
 	return B.freq;
 }
@@ -316,60 +318,61 @@ void RIG_TT566::set_vfoB (unsigned long int freq)
 	cmd.append(to_decimal(freq, 8));
 	cmd += '\r';
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set vfo B", cmd, respstr);
+	setcr("set vfo B");
 	return;
-}
-
-void RIG_TT566::set_PTT_control(int val)
-{
-        ptt_ = val;
-	cmd = TT566setPTT;
-	cmd += val ? "K\r" : "U\r";
-	sendCommand(cmd);
-	showresp(WARN, ASC, "set ptt", cmd, respstr);
 }
 
 void RIG_TT566::set_modeA(int md)
 {
 	A.imode = md;
-        cur_modeA = A.imode;
+		cur_modeA = A.imode;
 	cmd = TT566setMODEa;
 	cmd += '0' + md;
 	cmd += '\r';
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set mode A", cmd, respstr);
+	setcr("set mode A");
 }
 
 int RIG_TT566::get_modeA()
 {
 	cmd = TT566getMODEa;
-	int ret = sendCommand (cmd, strlen(TT566rspMODEa)+2);
-	if (ret >= 6) {
-		A.imode = respstr[ret - 6 + 4] - '0';
-	}
-        cur_modeA = A.imode;
+//	replystr = "@RMM3\r";
+	waitcr(6);
+	getcr("get mode A");
+
+	size_t p = replystr.rfind(TT566rspMODEa);
+	if (p == std::string::npos) return A.imode;
+
+	A.imode = replystr[p + strlen(TT566rspMODEa)] - '0';
+	cur_modeA = A.imode;
+
 	return A.imode;
 }
 
 void RIG_TT566::set_modeB(int md)
 {
 	B.imode = md;
-        cur_modeB = B.imode;
+		cur_modeB = B.imode;
 	cmd = TT566setMODEb;
 	cmd += '0' + md;
 	cmd += '\r';
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set mode B", cmd, respstr);
+	setcr("set mode B");
 }
 
 int RIG_TT566::get_modeB()
 {
 	cmd = TT566getMODEb;
-	int ret = sendCommand (cmd, strlen(TT566rspMODEb)+2);
-	if (ret >= 6) {
-		B.imode = respstr[ret - 6 + 4] - '0';
-	}
-        cur_modeB = B.imode;
+//	replystr = "@RSM2\r";
+	waitcr(6);
+	getcr("get mode B");
+
+	size_t p = replystr.rfind(TT566rspMODEb);
+	if (p == std::string::npos) return B.imode;
+
+	B.imode = replystr[p + strlen(TT566rspMODEb)] - '0';
+	cur_modeB = B.imode;
+
 	return B.imode;
 }
 
@@ -380,27 +383,33 @@ void RIG_TT566::set_bwA(int bw)
 	cmd.append(RIG_TT566widths[bw]);
 	cmd += '\r';
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set bw A", cmd, respstr);
+	setcr("set bw A");
 }
 
 int RIG_TT566::get_bwA()
 {
 	cmd = TT566getBWa;
-	int ret = sendCommand(cmd, strlen(TT566rspBWa)+5);
-	if (ret >= 8) {
-		std::string bwstr = "";
-		if (respstr.length() == 9) bwstr = respstr.substr(ret - 9 + 4, 4);
-		if (respstr.length() == 8) bwstr = respstr.substr(ret - 8 + 4, 3);
-		if (respstr.empty()) return A.iBW;
-		int i = 0;
-		while( RIG_TT566widths[i] != NULL) {
-			if (bwstr == RIG_TT566widths[i]) {
-				A.iBW = i;
-				break;
-			}
-			i++;
+//	replystr = "@RMF3000\r";
+	waitcr(9);
+	getcr("get bw A");
+
+	size_t p = replystr.rfind(TT566rspBWa);
+	if (p == std::string::npos) return A.iBW;
+
+	std::string bwstr = replystr.substr(p + strlen(TT566rspBWa));
+	if (bwstr[bwstr.length() - 1] == '\r') bwstr.erase(bwstr.length() - 1);
+
+	if (replystr.empty()) return A.iBW;
+
+	int i = 0;
+	while( RIG_TT566widths[i] != NULL) {
+		if (bwstr == RIG_TT566widths[i]) {
+			A.iBW = i;
+			break;
 		}
+		i++;
 	}
+
 	return A.iBW;
 }
 
@@ -411,27 +420,32 @@ void RIG_TT566::set_bwB(int bw)
 	cmd.append(RIG_TT566widths[bw]);
 	cmd += '\r';
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set bw B", cmd, respstr);
+	setcr("set bw B");
 }
 
 int RIG_TT566::get_bwB()
 {
 	cmd = TT566getBWb;
-	int ret = sendCommand(cmd, strlen(TT566rspBWb)+5);
-	if (ret >= 8) {
-		std::string bwstr = "";
-		if (respstr.length() == 9) bwstr = respstr.substr(ret - 9 + 4, 4);
-		if (respstr.length() == 8) bwstr = respstr.substr(ret - 8 + 4, 3);
-		if (respstr.empty()) return B.iBW;
-		int i = 0;
-		while( RIG_TT566widths[i] != NULL) {
-			if (bwstr == RIG_TT566widths[i]) {
-				B.iBW = i;
-				break;
-			}
-			i++;
+//	replystr = "@RSF500\r";
+	waitcr(9);
+	getcr("get bw B");
+
+	size_t p = replystr.rfind(TT566rspBWb);
+	if (p == std::string::npos) return B.iBW;
+
+	std::string bwstr = replystr.substr(p + strlen(TT566rspBWb));
+	if (bwstr[bwstr.length() - 1] == '\r') bwstr.erase(bwstr.length() - 1);
+	if (replystr.empty()) return B.iBW;
+
+	int i = 0;
+	while( RIG_TT566widths[i] != NULL) {
+		if (bwstr == RIG_TT566widths[i]) {
+			B.iBW = i;
+			break;
 		}
+		i++;
 	}
+
 	return B.iBW;
 }
 
@@ -444,11 +458,17 @@ int RIG_TT566::get_modetype(int n)
 double RIG_TT566::get_power_control(void)
 {
 	cmd = TT566getPWR;
-	sendCommand(cmd, strlen(TT566rspPWR)+4);
-	size_t p = respstr.rfind(TT566rspPWR);
+//	replystr = "";
+	waitcr(9);
+	getcr("get power control");
+
+	size_t p = replystr.rfind(TT566rspPWR);
+
 	if (p == std::string::npos) return 0;
+
 	int pwr;
-	sscanf(&respstr[p + strlen(TT566rspPWR)], "%d", &pwr);
+	sscanf(replystr.substr(p + strlen(TT566rspPWR)).c_str(), "%d", &pwr);
+
 	return pwr;
 }
 
@@ -458,114 +478,138 @@ void RIG_TT566::set_power_control(double val)
 	cmd.append(to_decimal(val,3));
 	cmd += '\r';
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set power", cmd, respstr);
+	setcr("set power control");
 }
+
+void RIG_TT566::get_pc_min_max_step(double &min, double &max, double &step)
+{
+	min = 0; max = 100; step = 1;
+}
+
+static int auto_notch_state = 0;
 
 void RIG_TT566::set_auto_notch(int v)
 {
 	cmd = TT566setANa;
 	cmd += v ? "1\r" : "0\r";
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set AN", cmd, respstr);
+	auto_notch_state = v;
+	setcr("set auto notch");
 }
 
 int  RIG_TT566::get_auto_notch()
 {
-	cmd = TT566getANa;
-	int ret = sendCommand(cmd, strlen(TT566rspANa)+2);
-	if (ret >= 7)
-		return respstr[ret - 7 + 5] - '0';
-	return 0;
+	return auto_notch_state;
 }
 
+void RIG_TT566::set_PTT_control(int val)
+{
+	ptt_ = val;
+	cmd = TT566setPTT;
+	cmd += val ? "K\r" : "U\r";
+	sendCommand(cmd);
+	setcr("set PTT");
+}
 
+static std::string pmeter = "";
+
+int RIG_TT566::get_PTT()
+{
+	cmd = TT566getSMETER;
+	waitcr(12);
+	getcr("get PTT");
+
+	pmeter = replystr;
+	if (pmeter.rfind(TT566rspPOUT) != std::string::npos) {
+		ptt_ = true;
+	} else
+		ptt_ = false;
+	return ptt_;
+}
+
+// @SRM064S017
 int  RIG_TT566::get_smeter()
 {
 	int dbm = 0;
-	cmd = TT566getSMETER;
-	int ret = sendCommand(cmd, strlen(TT566rspSMETER)+12);
-	showresp(WARN, ASC, "get smeter", cmd, respstr);
-        if ((cur_modeA != LCW) && (cur_modeA != UCW)) {
-	    if (ret != (int)strlen(TT566rspSMETER)+8) {
-                if (respstr.rfind(TT566rspPOUT) != std::string::npos) {
-                    ptt_ = 1;
-                    PTT = true;
-                    Fl::awake(update_UI_PTT);
-                 }
-                 return 0;
-            }
-        }
-	size_t p = respstr.rfind(TT566rspSMETER);
-	if (p == std::string::npos) return 0;
-	sscanf(&respstr[p + strlen(TT566rspSMETER)], "%d", &dbm);
+	size_t p = pmeter.rfind(TT566rspSMETER);
+	if (p == std::string::npos) {
+		cmd = TT566getSMETER;
+		waitcr(12);
+		getcr("get smeter");
+		pmeter = replystr;
+		p = pmeter.rfind(TT566rspSMETER);
+	} else {
+		get_trace(2, "get_smeter", pmeter.c_str());
+	}
+
+	if (p != std::string::npos)
+		sscanf(pmeter.substr(p + strlen(TT566rspSMETER)).c_str(), "%d", &dbm);
+
+	pmeter.clear();
+
 	return 5 * dbm / 9; // 90 = S9 --> 50% of full scale of flrig display
+}
+
+static float swr = 1.0;
+
+int  RIG_TT566::get_power_out()
+{
+	getr("get power out");
+
+	size_t p = pmeter.rfind(TT566rspPOUT);
+	if (p == std::string::npos) {
+		cmd = TT566getSMETER;
+		waitcr(12);
+		getcr("get smeter");
+		pmeter = replystr;
+		p = pmeter.rfind(TT566rspPOUT);
+	} else {
+		get_trace(2, "get_power_out", pmeter.c_str());
+	}
+
+	if (p != std::string::npos)
+		sscanf(pmeter.substr(p + strlen(TT566rspPOUT)).c_str(), "%dR%dS%f", &fwdpwr, &refpwr, &swr);
+
+	pmeter.clear();
+
+	return 3 * fwdpwr / 2;
 }
 
 int  RIG_TT566::get_swr()
 {
+	if (fwdpwr == 0) return 0;
+
 	float swr = (sqrtf(fwdpwr) + sqrtf(refpwr))/(sqrt(fwdpwr) - sqrt(refpwr) + .0001);
-	swr -= 1.0;
-	swr *= 25.0;
+	swr = (swr - 1.0)*25;
 	if (swr < 0) swr = 0;
 	if (swr > 100) swr = 100;
 	return (int)swr;
-
-}
-
-int  RIG_TT566::get_power_out()
-{
-	cmd = TT566getPOUT;
-	fwdpwr = 0; refpwr = 0;
-	int ret = sendCommand(cmd, strlen(TT566rspPOUT)+12);
-	showresp(WARN, ASC, "get pout", cmd, respstr);
-        if ((cur_modeA != LCW) && (cur_modeA != UCW)) {
-	    if (ret != (int)strlen(TT566rspPOUT)+12) {
-                 if (respstr.rfind(TT566rspSMETER) != std::string::npos) {
-                         ptt_ = 0;
-                         PTT = false;
-                         Fl::awake(update_UI_PTT);
-                 }
-                 return 0;
-            }
-        } 
-	size_t p = respstr.rfind(TT566rspPOUT);
-	if (p == std::string::npos) return 0;
-	sscanf(&respstr[p + strlen(TT566rspPOUT)], "%d", &fwdpwr);
-        fwdpwr += fwdpwr/2;
-	size_t n = 4;
-	while ( respstr[p + n] != 'R' && n < respstr.length()) n++;
-	if (n < respstr.length()) n++;
-	sscanf(&respstr[p + n], "%d", &refpwr);
-        refpwr += refpwr/2;
-	return fwdpwr;
-}
-
-int RIG_TT566::get_PTT()
-{
-        return ptt_;
 }
 
 int RIG_TT566::get_volume_control()
 {
 	cmd = TT566getVOLa;
-	int ret = sendCommand(cmd, strlen(TT566rspVOLa)+4);
-	showresp(WARN, ASC, "get vol", cmd, respstr);
-	if (ret < (int)strlen(TT566rspVOLa)+4) return 0;
+//	replystr = "";
+	waitcr(9);
+	getcr("get volume control");
+
 	int val = 0;
-	size_t p = respstr.rfind(TT566rspVOLa);
-	sscanf(&respstr[p + strlen(TT566rspVOLa)], "%d", &val);
-        val = (100*val)/255;
+	size_t p = replystr.rfind(TT566rspVOLa);
+	if (p == std::string::npos) return 0;
+
+	sscanf(replystr.substr(p + strlen(TT566rspVOLa)).c_str(), "%d", &val);
+	val = (100*val)/255;
 	return val;
 }
 
 void RIG_TT566::set_volume_control(int val)
 {
-        val = (255*val)/100;
+	val = (255*val)/100;
 	cmd = TT566setVOLa;
 	cmd.append(to_decimal(val,3));
 	cmd += '\r';
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set vol", cmd, respstr);
+	setcr("set volume control");
 }
 
 void RIG_TT566::set_mic_gain(int val)
@@ -574,22 +618,23 @@ void RIG_TT566::set_mic_gain(int val)
 	cmd.append(to_decimal(val,3));
 	cmd += '\r';
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set mic", cmd, respstr);
+	setcr("set mic gain");
 }
 
 int  RIG_TT566::get_mic_gain()
 {
 	cmd = TT566getMIC;
-	int ret = sendCommand(cmd, strlen(TT566rspMIC)+4);
-	showresp(WARN, ASC, "get mic", cmd, respstr);
-	if (ret < (int)strlen(TT566rspMIC)+4) return 0;
+//	replystr = "";
+	waitcr(9);
+	getcr("get mic gain");
+
 	int val = 0;
-	size_t p = respstr.rfind(TT566rspMIC);
-	sscanf(&respstr[p + strlen(TT566rspMIC)], "%d", &val);
+	size_t p = replystr.rfind(TT566rspMIC);
+	if (p == std::string::npos) return 0;
+
+	sscanf(replystr.substr(p + strlen(TT566rspMIC)).c_str(), "%d", &val);
 	return val;
 }
-
-
 
 /*
 void RIG_TT566::set_if_shift(int val)
@@ -607,9 +652,9 @@ bool RIG_TT566::get_if_shift(int &val)
 	int retval = 0;
 	cmd = TT566getPBTa;
 	sendCommand(cmd, strlen(TT566rspPBTa)+6);
-	size_t p = respstr.rfind(TT566rspPBTa);
+	size_t p = replystr.rfind(TT566rspPBTa);
 	if (p == std::string::npos) return false;
-	sscanf(&respstr[p + 4], "%d", &retval);
+	sscanf(&replystr[p + 4], "%d", &retval);
 	val = retval;
 	if (val) return true;
 	return false;
@@ -623,18 +668,21 @@ void RIG_TT566::set_rf_gain(int val)
 	snprintf(sznum, sizeof(sznum), "%d\r", val);
 	cmd.append(sznum);
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set rfgain", cmd, respstr);
+	setcr("set rf gain");
 }
 
 int  RIG_TT566::get_rf_gain()
 {
 	cmd = TT566getRFGa;
+//	replystr = "";
+	waitcr(9);
+	getcr("get rf gain");
+
+	size_t p = replystr.rfind(TT566rspRFGa);
+	if (p == std::string::npos) return 0;
+
 	int retval = 0;
-	sendCommand(cmd, strlen(TT566rspRFGa)+4);
-	showresp(WARN, ASC, "get rfgain", cmd, respstr);
-	size_t p = respstr.rfind(TT566rspRFGa);
-	if (p == std::string::npos) return retval;
-	sscanf(&respstr[p + strlen(TT566rspRFGa)], "%d", &retval);
+	sscanf(replystr.substr(p + strlen(TT566rspRFGa)).c_str(), "%d", &retval);
 	return retval;
 }
 
@@ -662,20 +710,23 @@ void RIG_TT566::set_attenuator(int val)
 	}
 	cmd += '\r';
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set att A", cmd, respstr);
+	setcr("set attenuator");
 }
 
 
 int RIG_TT566::get_attenuator()
 {
 	cmd = TT566getATTa;
-	int ret = sendCommand(cmd, strlen(TT566rspATTa)+2);
-	showresp(WARN, ASC, "get att A", cmd, respstr);
+//	replystr = "";
+	waitcr(7);
+
 	int val = atten_level;
-	if (ret >= 3) {
-		size_t p = respstr.rfind(TT566rspATTa);
-		if (p != std::string::npos) val = (respstr[p + strlen(TT566rspATTa)] - '0');
-	}
+
+	size_t p = replystr.rfind(TT566rspATTa);
+	if (p == std::string::npos) return val;
+
+	val = (replystr[p + strlen(TT566rspATTa)] - '0');
+
 	if (atten_level != val) atten_level = val;
 	switch (atten_level) {
 		case 0: atten_label("0 dB", false); break;
@@ -691,16 +742,19 @@ void RIG_TT566::set_preamp(int val)
 	cmd = TT566setPREAMP;
 	cmd += val ? "1\r" : "0\r";
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set pre", cmd, respstr);
+	setcr("set preamp");
 }
 
 int RIG_TT566::get_preamp()
 {
 	cmd = TT566getPREAMP;
-	int ret = sendCommand(cmd, strlen(TT566rspPREAMP)+2);
-	if (ret >= 6)
-		return respstr[ret - 6 + 4] - '0';
-	return 0;
+//	replystr = "";
+	waitcr(7);
+
+	size_t p = replystr.rfind(TT566rspPREAMP);
+	if (p == std::string::npos) return 0;
+
+	return replystr[p + strlen(TT566rspPREAMP)] - '0';
 }
 
 void RIG_TT566::set_noise(bool val)
@@ -708,15 +762,18 @@ void RIG_TT566::set_noise(bool val)
 	cmd = TT566setNBa;
 	cmd += val ? "1\r" : "0\r";
 	sendCommand(cmd);
-	showresp(WARN, ASC, "set NB", cmd, respstr);
+	setcr("set noise");
 }
 
 int  RIG_TT566::get_noise()
 {
 	cmd = TT566getNBa;
-	int ret = sendCommand(cmd, strlen(TT566rspNBa)+2);
-	if (ret >= 6)
-		return respstr[ret - 6 + 4] - '0';
-	return 0;
+//	replystr = "";
+	waitcr(7);
+
+	size_t p = replystr.rfind(TT566rspNBa);
+	if (p == std::string::npos) return 0;
+
+	return replystr[p + strlen(TT566rspNBa)] - '0';
 }
 

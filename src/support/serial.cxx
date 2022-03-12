@@ -416,8 +416,11 @@ int  Cserial::ReadBuffer (std::string &buf, int nchars, std::string find1, std::
 		} else if (find1.length()) {
 			p1 = buf.rfind(find1);
 			if (p1 != std::string::npos) {
-				snprintf(traceinfo, sizeof(traceinfo), "s1   : %s",
-					(hex ? str2hex(buf.c_str(), buf.length()) : buf.c_str()) );
+				std::string srx = buf;
+				if (srx[srx.length() - 1] == '\r') srx.replace(srx.length() -1, 1, "<cr>");
+				snprintf(traceinfo, sizeof(traceinfo), "s1  [%d](%d): %s",
+					buf.length(), nread,
+					(hex ? str2hex(srx.c_str(), srx.length()) : srx.c_str()) );
 				if (progStatus.serialtrace) ser_trace(1, traceinfo);
 				return nread;
 			}
