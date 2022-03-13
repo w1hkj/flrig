@@ -1112,29 +1112,34 @@ void read_squelch()
 	}
 }
 
-void set_ptt(void *);
+void set_ptt(void *d)
+{
+	if (d == (void*)0) {
+		btnPTT->value(0);
+		sldrSWR->hide();
+		sldrSWR->redraw();
+		sldrRcvSignal->show();
+		sldrRcvSignal->redraw();
+		btnALC_SWR->hide();
+		scaleSmeter->show();
+	} else {
+		btnPTT->value(1);
+		sldrRcvSignal->hide();
+		sldrRcvSignal->redraw();
+		scaleSmeter->hide();
+		sldrSWR->show();
+		sldrSWR->redraw();
+		btnALC_SWR->image(meter_image == SWR_IMAGE ? image_swr : image_alc);
+		btnALC_SWR->redraw();
+		btnALC_SWR->show();
+	}
+}
 
 void check_ptt()
 {
-	int check = 0;
-
-	if (progStatus.comm_dtrptt)
-		check = RigSerial->getPTT();
-	else if (progStatus.comm_rtsptt)
-		check = RigSerial->getPTT();
-	else if (SepSerial->IsOpen() && progStatus.sep_dtrptt)
-		check = SepSerial->getPTT();
-	else if (SepSerial->IsOpen() && progStatus.sep_rtsptt)
-		check = SepSerial->getPTT();
-	else if (progStatus.gpio_ptt)
-		check = get_gpio();
-	else if (progStatus.cmedia_ptt)
-		check = get_cmedia();
-	else  // comm_catptt or external h/w PTT
-		check = selrig->get_PTT();
-
-	if (check != PTT) {
-		PTT = check;
+	int chk = ptt_state();
+	if (chk != PTT) {
+		PTT = chk;
 		Fl::awake(set_ptt, (void *)PTT);
 	}
 }
@@ -1202,11 +1207,11 @@ void serviceQUE()
 			else trace(1,"ptt OFF");
 			rigPTT(PTT);
 			{
-				bool get = rigPTT();
+				bool get = ptt_state();
 				int cnt = 0;
 				while ((get != PTT) && (cnt++ < 100)) {
 					MilliSleep(10);
-					get = rigPTT();
+					get = ptt_state();
 				}
 				std::stringstream s;
 				s << "ptt returned " << get << " in " << cnt * 10 << " msec";
@@ -1532,29 +1537,6 @@ void serviceB(XCVR_STATE nuvals)
 
 }
 
-void set_ptt(void *d)
-{
-	if (d == (void*)0) {
-		btnPTT->value(0);
-		sldrSWR->hide();
-		sldrSWR->redraw();
-		sldrRcvSignal->show();
-		sldrRcvSignal->redraw();
-		btnALC_SWR->hide();
-		scaleSmeter->show();
-	} else {
-		btnPTT->value(1);
-		sldrRcvSignal->hide();
-		sldrRcvSignal->redraw();
-		scaleSmeter->hide();
-		sldrSWR->show();
-		sldrSWR->redraw();
-		btnALC_SWR->image(meter_image == SWR_IMAGE ? image_swr : image_alc);
-		btnALC_SWR->redraw();
-		btnALC_SWR->show();
-	}
-}
-
 #define MAX_FAILURES 5
 
 void serial_failed(void *)
@@ -1613,8 +1595,6 @@ POLL_PAIR RX_poll_group_3[] = {
 	{&progStatus.poll_break_in, check_break_in, "break-in"},
 	{NULL, NULL}
 };
-// moved to main polling loop
-//	{&progStatus.poll_ptt, check_ptt},
 
 POLL_PAIR TX_poll_pairs[] = {
 	{&progStatus.poll_power_control, read_power_control, "power"},
@@ -1625,8 +1605,6 @@ POLL_PAIR TX_poll_pairs[] = {
 	{&progStatus.poll_split, read_split, "split"},
 	{NULL, NULL}
 };
-// moved to main polling loop
-//	{&progStatus.poll_ptt, check_ptt},
 
 void * serial_thread_loop(void *d)
 {
@@ -3133,14 +3111,16 @@ int chkptt()
 
 void doPTT(int on)
 {
+std::cout << "doPTT(" << on << ")\n";
+
 	guard_lock serlck(&mutex_serial);
 
-	int chk = chkptt();
-	if (chk == on) return;
+//	int chk = chkptt();
+//	if (chk == on) return;
 
+	PTT = on;
 	rigPTT(on);
 	btnPTT->value(on);
-	PTT = on;
 
 	MilliSleep(progStatus.comm_wait);
 	for (int n = 0; n < 100; n++) {

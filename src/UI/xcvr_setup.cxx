@@ -42,9 +42,11 @@ Fl_Group *tabXCVR = (Fl_Group *)0;
 	Fl_Check_Button *btnTwoStopBit = (Fl_Check_Button *)0;
 	Fl_Check_Button *btnOneStopBit = (Fl_Check_Button *)0;
 	Fl_Check_Button *btnRigCatEcho = (Fl_Check_Button *)0;
-	Fl_Check_Button *btncatptt = (Fl_Check_Button *)0;
-	Fl_Check_Button *btnrtsptt = (Fl_Check_Button *)0;
-	Fl_Check_Button *btndtrptt = (Fl_Check_Button *)0;
+
+	Fl_ListBox *lbox_catptt = (Fl_ListBox *)0;
+	Fl_ListBox *lbox_rtsptt = (Fl_ListBox *)0;
+	Fl_ListBox *lbox_dtrptt = (Fl_ListBox *)0;
+
 	Fl_Check_Button *chkrtscts = (Fl_Check_Button *)0;
 	Fl_Check_Button *btnrtsplus1 = (Fl_Check_Button *)0;
 	Fl_Check_Button *btndtrplus1 = (Fl_Check_Button *)0;
@@ -67,9 +69,11 @@ Fl_Group *tabTCPIP = (Fl_Group *)0;
 Fl_Group *tabPTTGEN = (Fl_Group *)0;
 	Fl_ComboBox *selectSepPTTPort = (Fl_ComboBox *)0;
 	Fl_Check_Button *btnSep_SCU_17 = (Fl_Check_Button *)0;
-	Fl_Check_Button *btnSepRTSptt = (Fl_Check_Button *)0;
+
+	Fl_ListBox *lbox_sep_rtsptt = (Fl_ListBox *)0;
 	Fl_Check_Button *btnSepRTSplus = (Fl_Check_Button *)0;
-	Fl_Check_Button *btnSepDTRptt = (Fl_Check_Button *)0;
+
+	Fl_ListBox *lbox_sep_dtrptt = (Fl_ListBox *)0;
 	Fl_Check_Button *btnSepDTRplus = (Fl_Check_Button *)0;
 
 Fl_Group *tabGPIO = (Fl_Group *)0;
@@ -449,11 +453,9 @@ static void cb_cntDropsAllowed(Fl_Counter* o, void *) {
 	progStatus.tcpip_drops_allowed = o->value();
 }
 
-static void cb_btncatptt(Fl_Check_Button* o, void*) {
-	if (o->value()== 1) {
-		btnrtsptt->value(0);
-		btndtrptt->value(0);
-	}
+static void cb_lbox_catptt(Fl_ListBox* o, void*) {
+	progStatus.comm_catptt = o->index();
+
 	btn_init_ser_port->labelcolor(FL_RED);
 	btn_init_ser_port->redraw_label();
 
@@ -461,9 +463,9 @@ static void cb_btncatptt(Fl_Check_Button* o, void*) {
 	btn2_init_ser_port->redraw_label();
 }
 
-static void cb_btnrtsptt(Fl_Check_Button* o, void*) {
-	if (o->value() == 1)
-		btncatptt->value(0);
+static void cb_lbox_rtsptt(Fl_ListBox* o, void*) {
+	progStatus.comm_rtsptt = o->index();
+
 	btn_init_ser_port->labelcolor(FL_RED);
 	btn_init_ser_port->redraw_label();
 
@@ -471,9 +473,9 @@ static void cb_btnrtsptt(Fl_Check_Button* o, void*) {
 	btn2_init_ser_port->redraw_label();
 }
 
-static void cb_btndtrptt(Fl_Check_Button* o, void*) {
-	if (o->value() == 1)
-		btncatptt->value(0);
+static void cb_lbox_dtrptt(Fl_ListBox* o, void*) {
+	progStatus.comm_dtrptt = o->index();
+
 	btn_init_ser_port->labelcolor(FL_RED);
 	btn_init_ser_port->redraw_label();
 
@@ -530,7 +532,8 @@ static void cb_selectSepPTTPort(Fl_ComboBox*, void*) {
 	btnOkSepSerial->redraw_label();
 }
 
-static void cb_btnSepRTSptt(Fl_Check_Button* o, void*) {
+static void cb_lbox_sep_rtsptt(Fl_ListBox* o, void*) {
+	progStatus.sep_rtsptt = o->index();
 	btnOkSepSerial->labelcolor(FL_RED);
 	btnOkSepSerial->redraw_label();
 }
@@ -540,7 +543,8 @@ static void cb_btnSepRTSplus(Fl_Check_Button*, void*) {
 	btnOkSepSerial->redraw_label();
 }
 
-static void cb_btnSepDTRptt(Fl_Check_Button* o, void*) {
+static void cb_lbox_sep_dtrptt(Fl_ListBox* o, void*) {
+	progStatus.sep_dtrptt = o->index();
 	btnOkSepSerial->labelcolor(FL_RED);
 	btnOkSepSerial->redraw_label();
 }
@@ -917,9 +921,11 @@ trace(1, "clear frequency list");
 	progStatus.comm_timeout = (int)cntRigCatTimeout->value();
 	progStatus.comm_wait = (int)cntRigCatWait->value();
 	progStatus.comm_echo = btnRigCatEcho->value();
-	progStatus.comm_rtsptt = btnrtsptt->value();
-	progStatus.comm_catptt = btncatptt->value();
-	progStatus.comm_dtrptt = btndtrptt->value();
+
+	progStatus.comm_rtsptt = lbox_rtsptt->index();
+	progStatus.comm_catptt = lbox_catptt->index();
+	progStatus.comm_dtrptt = lbox_dtrptt->index();
+
 	progStatus.comm_rtscts = chkrtscts->value();
 	progStatus.comm_rtsplus = btnrtsplus1->value();
 	progStatus.comm_dtrplus = btndtrplus1->value();
@@ -962,9 +968,10 @@ static void cb_btnOkSepSerial(Fl_Button*, void*) {
 	progStatus.sep_SCU_17 = btnSep_SCU_17->value();
 
 	progStatus.sep_dtrplus = btnSepDTRplus->value();
-	progStatus.sep_dtrptt = btnSepDTRptt->value();
+	progStatus.sep_dtrptt = lbox_sep_dtrptt->index();
+
 	progStatus.sep_rtsplus = btnSepRTSplus->value();
-	progStatus.sep_rtsptt = btnSepRTSptt->value();
+	progStatus.sep_rtsptt = lbox_sep_rtsptt->index();
 
 	if (!startSepSerial()) {
 		if (progStatus.sep_serial_port.compare("NONE") != 0) {
@@ -1407,45 +1414,52 @@ Fl_Group *createPTT(int X, int Y, int W, int H, const char *label)
 
 	Fl_Group *grp_catptt = new Fl_Group (
 		grp_CW_ptt->x(), grp_CW_ptt->y() + grp_CW_ptt->h() + 20,
-		grp_CW_ptt->w(), 60, _("CAT Port PTT options"));
-	grp_catptt->box(FL_ENGRAVED_BOX);
-	grp_catptt->align(Fl_Align(FL_ALIGN_TOP_LEFT));
+		grp_CW_ptt->w(), 60, _("PTT on CAT Serial Port"));
 
-		int incr = (grp_CW_ptt->w() - 10) / 4;
+		grp_catptt->box(FL_ENGRAVED_BOX);
+		grp_catptt->align(Fl_Align(FL_ALIGN_TOP_LEFT));
 
-		btncatptt = new Fl_Check_Button(
-			grp_catptt->x() + 10, grp_catptt->y() + 5, 100, 22, _("PTT via CAT"));
-		btncatptt->tooltip(_("PTT is a CAT command (not hardware)"));
-		btncatptt->callback((Fl_Callback*)cb_btncatptt);
-		btncatptt->value(progStatus.comm_catptt);
+		int incr = (grp_CW_ptt->w() - 10) / 3.5;
 
-		btnrtsptt = new Fl_Check_Button(
-			btncatptt->x() + incr, grp_catptt->y() + 5, 100, 22, _("PTT via RTS"));
-		btnrtsptt->tooltip(_("RTS is ptt line"));
-		btnrtsptt->callback((Fl_Callback*)cb_btnrtsptt);
-		btnrtsptt->value(progStatus.comm_rtsptt);
+		lbox_catptt = new Fl_ListBox(
+			grp_catptt->x() + 5, grp_catptt->y() + 8, 90, 22, _("CAT"));
+		lbox_catptt->tooltip(_("PTT is a CAT command (not hardware)"));
+		lbox_catptt->callback((Fl_Callback*)cb_lbox_catptt);
+		lbox_catptt->add("OFF|BOTH|SET|GET");
+		lbox_catptt->index(progStatus.comm_catptt);
+		lbox_catptt->align(FL_ALIGN_RIGHT);
 
-		btndtrptt = new Fl_Check_Button(
-			btnrtsptt->x() + incr, grp_catptt->y() + 5, 100, 22, _("PTT via DTR"));
-		btndtrptt->tooltip(_("DTR is ptt line"));
-		btndtrptt->callback((Fl_Callback*)cb_btndtrptt);
-		btndtrptt->value(progStatus.comm_dtrptt);
+		lbox_rtsptt = new Fl_ListBox(
+			lbox_catptt->x() + incr, grp_catptt->y() + 8, 90, 22, _("RTS"));
+		lbox_rtsptt->tooltip(_("RTS is ptt line"));
+		lbox_rtsptt->callback((Fl_Callback*)cb_lbox_rtsptt);
+		lbox_rtsptt->add("OFF|BOTH|SET|GET");
+		lbox_rtsptt->index(progStatus.comm_rtsptt);
+		lbox_rtsptt->align(FL_ALIGN_RIGHT);
+
+		lbox_dtrptt = new Fl_ListBox(
+			lbox_rtsptt->x() + incr, grp_catptt->y() + 8, 90, 22, _("DTR"));
+		lbox_dtrptt->tooltip(_("DTR is ptt line"));
+		lbox_dtrptt->callback((Fl_Callback*)cb_lbox_dtrptt);
+		lbox_dtrptt->add("OFF|BOTH|SET|GET");
+		lbox_dtrptt->index(progStatus.comm_dtrptt);
+		lbox_dtrptt->align(FL_ALIGN_RIGHT);
+
+		btn2_init_ser_port = new Fl_Button(
+			lbox_dtrptt->x() + incr, lbox_dtrptt->y(), 50, 24, _("Init"));
+		btn2_init_ser_port->callback((Fl_Callback*)cb_init_ser_port);
 
 		btnrtsplus2 = new Fl_Check_Button(
-			btnrtsptt->x(), btnrtsptt->y() + 24, 102, 21, _("RTS +12 v"));
+			lbox_rtsptt->x(), lbox_rtsptt->y() + 24, 100, 21, _("RTS +12 v"));
 		btnrtsplus2->tooltip(_("Initial state of RTS"));
 		btnrtsplus2->callback((Fl_Callback*)cb_btnrtsplus);
 		btnrtsplus2->value(progStatus.comm_rtsplus);
 
 		btndtrplus2 = new Fl_Check_Button(
-			btndtrptt->x(), btndtrptt->y() + 24, 100, 21, _("DTR +12 v"));
+			lbox_dtrptt->x(), lbox_dtrptt->y() + 24, 100, 21, _("DTR +12 v"));
 		btndtrplus2->tooltip(_("Initial state of DTR"));
 		btndtrplus2->callback((Fl_Callback*)cb_btndtrplus);
 		btndtrplus2->value(progStatus.comm_dtrplus);
-
-		btn2_init_ser_port = new Fl_Button(
-			btndtrptt->x() + incr, btndtrplus2->y(), 50, 24, _("Init"));
-		btn2_init_ser_port->callback((Fl_Callback*)cb_init_ser_port);
 
 	grp_catptt->end();
 
@@ -1457,9 +1471,9 @@ _("PTT control on Separate Serial Port"));
 		grp_ptt->align(Fl_Align(FL_ALIGN_TOP_LEFT));
 
 		selectSepPTTPort = new Fl_ComboBox(
-			grp_catptt->x() + 50, grp_ptt->y() + 8,
+			grp_catptt->x() + 50, grp_ptt->y() + 10,
 			grp_ptt->w() - 54, 22, _("Port"));
-		selectSepPTTPort->tooltip(_("Separate PTT serial port"));
+		selectSepPTTPort->tooltip(_("PTT on Separate Serial Port"));
 		selectSepPTTPort->box(FL_DOWN_BOX);
 		selectSepPTTPort->color(FL_BACKGROUND2_COLOR);
 		selectSepPTTPort->selection_color(FL_BACKGROUND_COLOR);
@@ -1473,40 +1487,44 @@ _("PTT control on Separate Serial Port"));
 		selectSepPTTPort->end();
 
 		btnSep_SCU_17 = new Fl_Check_Button(
-			selectSepPTTPort->x(), selectSepPTTPort->y() + 24,
+			selectSepPTTPort->x(), selectSepPTTPort->y() + 28,
 			128, 22, _("SCU-17"));
 		btnSep_SCU_17->tooltip(_("Port is SCU-17 auxilliary\nSet stop bits to ZERO"));
 		btnSep_SCU_17->callback((Fl_Callback*)cb_btnSep_SCU_17);
 		btnSep_SCU_17->value(progStatus.sep_SCU_17);
 
-		btnSepRTSptt = new Fl_Check_Button(
-			btnrtsptt->x(), selectSepPTTPort->y() + 24, 125, 22, _("PTT via RTS"));
-		btnSepRTSptt->tooltip(_("RTS is ptt line"));
-		btnSepRTSptt->callback((Fl_Callback*)cb_btnSepRTSptt);
-		btnSepRTSptt->value(progStatus.sep_rtsptt);
+		lbox_sep_rtsptt = new Fl_ListBox(
+			lbox_rtsptt->x(), selectSepPTTPort->y() + 30, 90, 22, _("RTS"));
+		lbox_sep_rtsptt->tooltip(_("RTS is ptt line"));
+		lbox_sep_rtsptt->callback((Fl_Callback*)cb_lbox_sep_rtsptt);
+		lbox_sep_rtsptt->add("OFF|BOTH|SET|GET");
+		lbox_sep_rtsptt->index(progStatus.sep_rtsptt);
+		lbox_sep_rtsptt->align(FL_ALIGN_RIGHT);
 
-		btnSepDTRptt = new Fl_Check_Button(
-			btndtrptt->x(), btnSepRTSptt->y(), 125, 22, _("PTT via DTR"));
-		btnSepDTRptt->tooltip(_("DTR is ptt line"));
-		btnSepDTRptt->callback((Fl_Callback*)cb_btnSepDTRptt);
-		btnSepDTRptt->value(progStatus.sep_dtrptt);
+		lbox_sep_dtrptt = new Fl_ListBox(
+			lbox_dtrptt->x(), lbox_sep_rtsptt->y(), 90, 22, _("DTR"));
+		lbox_sep_dtrptt->tooltip(_("DTR is ptt line"));
+		lbox_sep_dtrptt->callback((Fl_Callback*)cb_lbox_sep_dtrptt);
+		lbox_sep_dtrptt->add("OFF|BOTH|SET|GET");
+		lbox_sep_dtrptt->index(progStatus.sep_dtrptt);
+		lbox_sep_dtrptt->align(FL_ALIGN_RIGHT);
+
+		btnOkSepSerial = new Fl_Button(
+			lbox_sep_dtrptt->x() + incr, lbox_sep_dtrptt->y(),
+			50, 24, _("Init"));
+		btnOkSepSerial->callback((Fl_Callback*)cb_btnOkSepSerial);
 
 		btnSepRTSplus = new Fl_Check_Button(
-			btnrtsptt->x(), btnSepRTSptt->y() + 24, 125, 22, _("RTS +12 v"));
+			lbox_rtsptt->x(), lbox_sep_rtsptt->y() + 24, 125, 22, _("RTS +12 v"));
 		btnSepRTSplus->tooltip(_("Initial state of RTS"));
 		btnSepRTSplus->callback((Fl_Callback*)cb_btnSepRTSplus);
 		btnSepRTSplus->value(progStatus.sep_rtsplus);
 
 		btnSepDTRplus = new Fl_Check_Button(
-			btndtrptt->x(), btnSepRTSplus->y(), 125, 22, _("DTR +12 v"));
+			lbox_dtrptt->x(), btnSepRTSplus->y(), 125, 22, _("DTR +12 v"));
 		btnSepDTRplus->tooltip(_("Initial state of DTR"));
 		btnSepDTRplus->callback((Fl_Callback*)cb_btnSepDTRplus);
 		btnSepDTRplus->value(progStatus.sep_dtrplus);
-
-		btnOkSepSerial = new Fl_Button(
-			btnSepDTRptt->x() + incr, btnSepDTRplus->y(),
-			50, 22, _("Init"));
-		btnOkSepSerial->callback((Fl_Callback*)cb_btnOkSepSerial);
 
 	grp_ptt->end();
 
@@ -2261,7 +2279,9 @@ Fl_Group *createRestore(int X, int Y, int W, int H, const char *label)
 //----------------------------------------------------------------------
 
 Fl_Group *tabCMEDIA=(Fl_Group *)0;
+
 	Fl_Round_Button *btn_use_cmedia_PTT=(Fl_Round_Button *)0;
+
 	Fl_ComboBox *inp_cmedia_dev=(Fl_ComboBox *)0;
 	Fl_ComboBox *inp_cmedia_GPIO_line=(Fl_ComboBox *)0;
 	Fl_Button *btn_refresh_cmedia=(Fl_Button *)0;
@@ -2270,27 +2290,27 @@ Fl_Group *tabCMEDIA=(Fl_Group *)0;
 
 static void cb_btn_use_cmedia(Fl_Round_Button* o, void*) {
 	if (o->value()) {
-		progStatus.cmedia_ptt = true;
+		progStatus.cmedia_ptt = PTT_BOTH;
 
 		btn_init_cmedia_PTT->labelcolor(FL_RED);
 		btn_init_cmedia_PTT->redraw();
 
-		btncatptt->value(0);
-		btnrtsptt->value(0);
-		btndtrptt->value(0);
+		lbox_catptt->index(PTT_NONE);
+		lbox_rtsptt->index(PTT_NONE);
+		lbox_dtrptt->index(PTT_NONE);
 
-		btnSepRTSptt->value(0);
-		btnSepDTRptt->value(0);
+		lbox_sep_rtsptt->index(PTT_NONE);
+		lbox_sep_dtrptt->index(PTT_NONE);
 
-		progStatus.comm_catptt = false;
-		progStatus.comm_rtsptt = false;
-		progStatus.comm_dtrptt = false;
+		progStatus.comm_catptt = PTT_NONE;
+		progStatus.comm_rtsptt = PTT_NONE;
+		progStatus.comm_dtrptt = PTT_NONE;
 
-		progStatus.sep_dtrptt = false;
-		progStatus.sep_rtsptt = false;
+		progStatus.sep_dtrptt = PTT_NONE;
+		progStatus.sep_rtsptt = PTT_NONE;
 
 	} else {
-		progStatus.cmedia_ptt = false;
+		progStatus.cmedia_ptt = PTT_NONE;
 		close_cmedia();
 	}
 }

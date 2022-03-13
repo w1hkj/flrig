@@ -69,52 +69,38 @@ void rigPTT(bool on)
 
 	std::string smode = "";
 	if (selrig->modes_) smode = selrig->modes_[vfo->imode];
-	if ((smode.find("CW") != std::string::npos) && progStatus.disable_CW_ptt) {
+	if ((smode.find("CW") != std::string::npos) && progStatus.disable_CW_ptt)
 		return;
-	}
 
-// PTT priority: CAT; serial; separate serial; GPIO
+	if (progStatus.comm_catptt == PTT_BOTH || progStatus.comm_catptt == PTT_SET)		selrig->set_PTT_control(on);
+	else if (progStatus.comm_dtrptt == PTT_BOTH || progStatus.comm_dtrptt == PTT_SET)	RigSerial->SetPTT(on);
+	else if (progStatus.comm_rtsptt == PTT_BOTH || progStatus.comm_rtsptt == PTT_SET)	RigSerial->SetPTT(on);
 
-	if (progStatus.comm_catptt) {
-		selrig->set_PTT_control(on);
-	} else if (progStatus.comm_dtrptt || progStatus.comm_rtsptt) {
-		RigSerial->SetPTT(on);
-	} else if (SepSerial->IsOpen() && (progStatus.sep_dtrptt || progStatus.sep_rtsptt) ) {
-		SepSerial->SetPTT(on);
-	} else if (progStatus.gpio_ptt) {
-		set_gpio(on);
-	} else if (progStatus.cmedia_ptt) {
-		set_cmedia(on);
-	} else {
+	else if (SepSerial->IsOpen() && 
+		(progStatus.sep_dtrptt == PTT_BOTH || progStatus.sep_dtrptt == PTT_SET))		SepSerial->SetPTT(on);
+	else if (SepSerial->IsOpen() && 
+		(progStatus.sep_rtsptt == PTT_BOTH || progStatus.sep_rtsptt == PTT_SET))		SepSerial->SetPTT(on);
+	else if (progStatus.gpio_ptt == PTT_BOTH || progStatus.gpio_ptt == PTT_SET)			set_gpio(on);
+	else if (progStatus.cmedia_ptt == PTT_BOTH || progStatus.cmedia_ptt == PTT_SET)		set_cmedia(on);
+	else
 		LOG_DEBUG("No PTT i/o connected");
-	}
 }
 
-bool rigPTT()
+bool ptt_state()
 {
-	if (progStatus.comm_catptt) {
-		return selrig->get_PTT();
-	} 
-	else if (progStatus.comm_dtrptt) {
-		return RigSerial->DTRptt();
-	} 
-	else if (progStatus.comm_rtsptt) {
-		return RigSerial->RTSptt();
-	} 
-	else if (SepSerial->IsOpen()) {
-		if (progStatus.sep_dtrptt)
-			return RigSerial->DTRptt();
-		else if (progStatus.sep_rtsptt)
-			return SepSerial->RTSptt();
-	} 
-	else if (progStatus.gpio_ptt) {
-		return get_gpio();
-	}
-	else if (progStatus.cmedia_ptt) {
-		return get_cmedia();
-	} else {
-		LOG_DEBUG("No PTT i/o connected");
-	}
+	if (progStatus.comm_catptt == PTT_BOTH || progStatus.comm_catptt == PTT_GET)		return selrig->get_PTT();
+	else if (progStatus.comm_dtrptt == PTT_BOTH || progStatus.comm_dtrptt == PTT_GET)	return selrig->get_PTT();
+	else if (progStatus.comm_rtsptt == PTT_BOTH || progStatus.comm_rtsptt == PTT_GET)	return selrig->get_PTT();
+
+	else if (SepSerial->IsOpen() && 
+		(progStatus.sep_dtrptt == PTT_BOTH || progStatus.sep_dtrptt == PTT_GET))		return SepSerial->getPTT();
+	else if (SepSerial->IsOpen() && 
+		(progStatus.sep_rtsptt == PTT_BOTH || progStatus.sep_rtsptt == PTT_GET))		return SepSerial->getPTT();
+
+	else if (progStatus.gpio_ptt == PTT_BOTH || progStatus.gpio_ptt == PTT_GET)			return get_gpio();
+	else if (progStatus.cmedia_ptt == PTT_BOTH || progStatus.cmedia_ptt == PTT_GET)		return get_cmedia();
+
+	LOG_DEBUG("No PTT i/o connected");
 	return false;
 }
 

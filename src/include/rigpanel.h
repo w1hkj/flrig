@@ -506,9 +506,10 @@ extern Fl_Input *server_addr;
 
 extern Fl_Int_Input *server_port;
 
-extern Fl_Check_Button *btncatptt;
-extern Fl_Check_Button *btnrtsptt;
-extern Fl_Check_Button *btndtrptt;
+extern Fl_ListBox *lbox_catptt;
+extern Fl_ListBox *lbox_rtsptt;
+extern Fl_ListBox *lbox_dtrptt;
+
 extern Fl_Check_Button *chkrtscts;
 extern Fl_Check_Button *btnrtsplus1;
 extern Fl_Check_Button *btndtrplus1;
@@ -521,9 +522,9 @@ extern Fl_Check_Button *btn_key_fldigi;
 extern Fl_Group *tabPTTGEN;
 extern Fl_ComboBox *selectSepPTTPort;
 extern Fl_Check_Button *btnSep_SCU_17;
-extern Fl_Check_Button *btnSepRTSptt;
+extern Fl_ListBox *lbox_sep_rtsptt;
 extern Fl_Check_Button *btnSepRTSplus;
-extern Fl_Check_Button *btnSepDTRptt;
+extern Fl_ListBox *lbox_sep_dtrptt;
 extern Fl_Check_Button *btnSepDTRplus;
 extern Fl_Group *tabAux;
 extern Fl_ComboBox *selectAuxPort;

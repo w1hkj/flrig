@@ -515,10 +515,11 @@ CTRL  click: FreqB -> FreqA\
 	btnTune->tooltip(_("Manual Tune"));
 	btnTune->callback((Fl_Callback*)cb_btnTune);
 
-	btnPTT = new Fl_Light_Button(362, 325, 60, 18, _("PTT"));
+	btnPTT = new Fl_Light_Button(
+		btnTune->x() + btnTune->w() + 4,
+		btnTune->y(), 60, 18, _("PTT"));
+//	362, 325, 60, 18, _("PTT"));
 	btnPTT->tooltip(_("Xmt On/Off"));
-	btnPTT->down_box(FL_THIN_DOWN_BOX);
-	btnPTT->labelsize(12);
 	btnPTT->callback((Fl_Callback*)cb_btnPTT);
 
 	Fl_Group* sm_grp1 = new Fl_Group(1, 62, 210, 60);

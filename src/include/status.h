@@ -52,9 +52,11 @@ struct status {
 	int		comm_wait;
 	int		comm_timeout;
 	bool	comm_echo;
-	bool	comm_catptt;
-	bool	comm_rtsptt;
-	bool	comm_dtrptt;
+
+	int		comm_catptt;
+	int		comm_rtsptt;
+	int		comm_dtrptt;
+
 	bool	comm_rtscts;
 	bool	comm_rtsplus;
 	bool	comm_dtrplus;
@@ -69,15 +71,17 @@ struct status {
 	std::string	xmlport;
 
 	std::string	sep_serial_port;
-	bool	sep_rtsptt;
-	bool	sep_dtrptt;
+
+	int		sep_rtsptt;
+	int		sep_dtrptt;
+
 	bool	sep_rtsplus;
 	bool	sep_dtrplus;
 	bool	sep_SCU_17;
 
 	std::string	cmedia_device;
 	std::string	cmedia_gpio_line;
-	bool	cmedia_ptt;
+	int		cmedia_ptt;
 
 	std::string	tmate2_device;
 	std::string	tmate2_freq_step;
@@ -495,7 +499,7 @@ struct status {
 	int		memfontsize;
 
 // gpio parameters
-	bool	gpio_ptt;
+	int		gpio_ptt;
 	int		enable_gpio;
 	int		gpio_on;
 	int		gpio_pulse_width;

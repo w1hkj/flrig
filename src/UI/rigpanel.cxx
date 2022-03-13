@@ -706,7 +706,8 @@ static void cb_btnSplit(Fl_Light_Button* o, void*) {
 }
 
 extern void doPTT(int);
-static void cb_btnPTT(Fl_Light_Button *b, void*) {
+static void cb_btnPTT(Fl_Light_Button *b, void*)
+{
 	doPTT(b->value());
 }
 

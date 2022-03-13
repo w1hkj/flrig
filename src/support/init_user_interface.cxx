@@ -19,6 +19,7 @@
 // ----------------------------------------------------------------------------
 
 #include "support.h"
+#include "ptt.h"
 
 void TRACED(update_UI_PTT, void *d)
 
@@ -1941,8 +1942,10 @@ void TRACED(init_tune_control)
 void TRACED(init_ptt_control)
 
 	if (selrig->has_ptt_control ||
-		progStatus.comm_dtrptt || progStatus.comm_rtsptt ||
-		progStatus.sep_dtrptt || progStatus.sep_rtsptt) {
+		progStatus.comm_dtrptt == PTT_BOTH || progStatus.comm_dtrptt == PTT_SET ||
+		progStatus.comm_rtsptt == PTT_BOTH || progStatus.comm_rtsptt == PTT_SET ||
+		progStatus.sep_dtrptt  == PTT_BOTH || progStatus.sep_dtrptt  == PTT_SET ||
+		progStatus.sep_rtsptt  == PTT_BOTH || progStatus.sep_rtsptt  == PTT_SET) {
 		btnPTT->activate();
 	} else {
 		btnPTT->deactivate();
@@ -2335,9 +2338,12 @@ void TRACED(initConfigDialog)
 		query_interval->value( srig->serloop_timing );
 
 		btnRigCatEcho->value( srig->comm_echo );
-		btncatptt->value( srig->comm_catptt );
-		btnrtsptt->value( srig->comm_rtsptt );
-		btndtrptt->value( srig->comm_dtrptt );
+
+
+		lbox_catptt->index( srig->comm_catptt );
+		lbox_rtsptt->index( srig->comm_rtsptt );
+		lbox_dtrptt->index( srig->comm_dtrptt );
+
 		chkrtscts->value( srig->comm_rtscts );
 		btnrtsplus1->value( srig->comm_rtsplus );
 		btndtrplus1->value( srig->comm_dtrplus );
@@ -2392,9 +2398,10 @@ void TRACED(initStatusConfigDialog)
 	query_interval->value( progStatus.serloop_timing );
 	byte_interval->value( progStatus.byte_interval );
 
-	btncatptt->value( progStatus.comm_catptt );
-	btnrtsptt->value( progStatus.comm_rtsptt );
-	btndtrptt->value( progStatus.comm_dtrptt );
+	lbox_catptt->index( progStatus.comm_catptt );
+	lbox_rtsptt->index( progStatus.comm_rtsptt );
+	lbox_dtrptt->index( progStatus.comm_dtrptt );
+
 	chkrtscts->value( progStatus.comm_rtscts );
 	btnrtsplus1->value( progStatus.comm_rtsplus );
 	btndtrplus1->value( progStatus.comm_dtrplus );
@@ -2402,9 +2409,10 @@ void TRACED(initStatusConfigDialog)
 	btndtrplus2->value( progStatus.comm_dtrplus );
 
 	btnSepDTRplus->value(progStatus.sep_dtrplus);
-	btnSepDTRptt->value(progStatus.sep_dtrptt);
+	lbox_sep_dtrptt->index(progStatus.sep_dtrptt);
+
 	btnSepRTSplus->value(progStatus.sep_rtsplus);
-	btnSepRTSptt->value(progStatus.sep_rtsptt);
+	lbox_sep_rtsptt->index(progStatus.sep_rtsptt);
 
 	if (progStatus.use_tcpip) {
 		box_xcvr_connect->color(FL_BACKGROUND2_COLOR);

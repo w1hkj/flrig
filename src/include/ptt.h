@@ -27,7 +27,9 @@
 
 #include <math.h>
 
+enum {PTT_NONE, PTT_BOTH, PTT_SET, PTT_GET};
+
 extern void rigPTT(bool);
-extern bool rigPTT();
+extern bool ptt_state();
 
 #endif

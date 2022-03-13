@@ -66,9 +66,11 @@ status progStatus = {
 	5,			// int comm_wait;
 	50,			// int comm_timeout;
 	false,		// bool comm_echo;
-	false,		// bool comm_catptt;
-	false,		// bool comm_rtsptt;
-	false,		// bool comm_dtrptt;
+
+	0,			// bool comm_catptt;
+	0,			// bool comm_rtsptt;
+	0,			// bool comm_dtrptt;
+
 	false,		// bool comm_rtscts;
 	false,		// bool comm_rtsplus;
 	false,		// bool comm_dtrplus;
@@ -83,15 +85,18 @@ status progStatus = {
 	"12345",	// std::string xmlport;
 
 	"NONE",		// std::string	sep_serial_port;
-	false,		// bool	sep_rtsptt;
-	false,		// bool	sep_dtrptt;
+
+	0,			// bool	sep_rtsptt;
+	0,			// bool	sep_dtrptt;
+
 	false,		// bool	sep_rtsplus;
 	false,		// bool	sep_dtrplus;
 	false,		// bool	sep_SCU_17;
 
 	"NONE",		// std::string	cmedia_device
 	"GPIO-3",	// std::string	cmedia_gpio_line
-	false,		// bool	cmedia_ptt
+
+	0,			// bool	cmedia_ptt
 
 	"NONE",		// std::string	tmate2_devide
 	"5000",		// std::string	tmate2_freq_step

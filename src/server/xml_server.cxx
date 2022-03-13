@@ -1529,11 +1529,11 @@ public:
 		xml_trace(1, (PTT ? "rig_set_verify_ptt ON" : "rig_set_verify_ptt OFF"));
 		rigPTT(PTT);
 		{
-			bool get = rigPTT();
+			bool get = ptt_state();
 			int cnt = 0;
 			while ((get != PTT) && (cnt++ < 100)) {
 				MilliSleep(10);
-				get = rigPTT();
+				get = ptt_state();
 			}
 			PTT = get;
 			std::stringstream s;

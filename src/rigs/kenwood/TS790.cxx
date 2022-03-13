@@ -240,15 +240,12 @@ void RIG_TS790::selectB()
 }
 
 // Tranceiver PTT on/off
-static int ptt_state = 0;
-
 void RIG_TS790::set_PTT_control(int val)
 {
 	showresp(WARN, ASC, "PTT", val ? "on" : "off", "");
 	if (val) cmd = "TX;";
 	else	 cmd = "RX;";
 	sendCommand(cmd);
-	ptt_state = val;
 }
 
 /*
