@@ -133,6 +133,8 @@ bool EXPAND_CONTROLS = false;
 
 int xmlport = 12345;
 
+bool testmode = false;
+
 //----------------------------------------------------------------------
 void about()
 {
@@ -616,7 +618,8 @@ int parse_args(int argc, char **argv, int& idx)
   --trace\n\
   --xml-help\n\
   --xml-trace\n\
-  --exp (expand menu tab controls)";
+  --exp (expand menu tab controls)\n\
+  --test\n";
 
 	if (strcasecmp("--help", argv[idx]) == 0) {
 #ifdef __WIN32__
@@ -641,6 +644,11 @@ int parse_args(int argc, char **argv, int& idx)
 		std::string help = print_xmlhelp();
 		std::cout << help;
 		exit(0);
+	}
+	if (strcasecmp("--test", argv[idx]) == 0) {
+		testmode = true;
+		idx++;
+		return 1;
 	}
 	if (strcasecmp("--debug-level", argv[idx]) == 0) {
 		std::string level = argv[idx + 1];

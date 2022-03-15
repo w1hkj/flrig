@@ -21,6 +21,8 @@
 #include "support.h"
 #include "ptt.h"
 
+extern bool testmode;
+
 void TRACED(update_UI_PTT, void *d)
 
 	btnPTT->value(PTT);
@@ -2210,8 +2212,8 @@ void TRACED(initRig)
 trace(1, "selrig->initialize()");
 		selrig->initialize();
 
-#ifdef NDEBUG
-trace(1, "selrig->check()");
+if (!testmode) {
+	trace(1, "selrig->check()");
 		if (!selrig->check()) {
 			trace(1, "FAILED");
 			bypass_serial_thread_loop = true;
@@ -2235,7 +2237,7 @@ Check that Baud matches transceiver baud\n\n\
 Press 'Init' button."));
 			return;
 		}
-#endif
+	}
 
 		FreqDispA->set_precision(selrig->precision);
 		FreqDispA->set_ndigits(selrig->ndigits);
