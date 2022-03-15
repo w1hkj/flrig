@@ -1338,9 +1338,6 @@ void show_controls()
 				if ((progStatus.show_tabs && !progStatus.first_use) ||
 					(!progStatus.show_tabs && progStatus.first_use)) {
 
-					if (tabsGeneric)
-						progStatus.visible_tab = (tabsGeneric->value())->label();
-
 					H = WIDE_MAINH + WIDE_MENUH;
 					mainwindow->resize( X, Y, W, H );
 					mainwindow->size_range(WIDE_MAINW, H, 0, H);
@@ -1362,16 +1359,12 @@ void show_controls()
 					tabs->show();
 					progStatus.show_tabs = true;
 
-					if (vtab != (Fl_Widget *)0) tabsGeneric->value(vtab);
 					mainwindow->redraw();
 				}
 			} else {
 				if ((progStatus.show_tabs && !progStatus.first_use) || (!progStatus.show_tabs && progStatus.first_use)) {
 
 					tabs_dialog->hide();
-
-					if (tabsGeneric)
-						progStatus.visible_tab = (tabsGeneric->value())->label();
 
 					progStatus.show_tabs = false;
 
@@ -1386,7 +1379,7 @@ void show_controls()
 					dH = mainwindow->decorated_h();
 					tabs_dialog->resize( X, Y + dH, W, tabs_dialog->h() );
 					grpTABS->resize(0, 0, W, tabs_dialog->h());
-					if (vtab != (Fl_Widget *)0) tabsGeneric->value(vtab);
+
 					tabs_dialog->add(grpTABS);
 					tabs_dialog->show();
 					tabs_dialog->redraw();
@@ -1410,16 +1403,6 @@ void show_controls()
 				tabsGeneric->show();
 				tabsGeneric->redraw();
 			}
-//			Fl_Widget * vtab = (Fl_Widget *)0;
-//			if (tabsGeneric) {
-//				Fl_Widget * const *vtabs = tabsGeneric->array();
-//				int ntabs = tabsGeneric->children();
-//				for (int n = 0; n < ntabs; n++)
-//					if (progStatus.visible_tab == vtabs[n]->label()) {
-//						vtab = vtabs[n];
-//						break;
-//					}
-//			}
 			if (progStatus.embed_tabs) { // embedded
 				static int X = mainwindow->x(),
 						   Y = mainwindow->y(),
@@ -1427,9 +1410,6 @@ void show_controls()
 						   H = mainwindow->h();
 				if ((progStatus.show_tabs && !progStatus.first_use) || (!progStatus.show_tabs && progStatus.first_use)) {
 					tabs_dialog->add(grpTABS);
-
-					if (tabsGeneric)
-						progStatus.visible_tab = (tabsGeneric->value())->label();
 
 					grpTABS->resize(tabs_dialog->x(), tabs_dialog->y(), tabs_dialog->w(), tabs_dialog->h());
 					mainwindow->resize(mainwindow->x(), mainwindow->y(), W, H);
@@ -1442,7 +1422,7 @@ void show_controls()
 					mainwindow->resize(X, Y, W, H + grpTABS->h());
 					grpTABS->resize(0, H, W, grpTABS->h());
 					mainwindow->add(grpTABS);
-					if (vtab != (Fl_Widget *)0) tabsGeneric->value(vtab);
+
 					grpTABS->show();
 					progStatus.show_tabs = true;
 
@@ -1454,7 +1434,6 @@ void show_controls()
 					mainwindow->resize(X, Y, W, H + grpTABS->h());
 					grpTABS->resize(0, H, W, grpTABS->h());
 					mainwindow->add(grpTABS);
-					if (vtab != (Fl_Widget *)0) tabsGeneric->value(vtab);
 
 					grpTABS->show();
 
@@ -1464,9 +1443,6 @@ void show_controls()
 			} else {
 				if ((progStatus.show_tabs && !progStatus.first_use) || (!progStatus.show_tabs && progStatus.first_use)) {
 					tabs_dialog->hide();
-
-					if (tabsGeneric)
-						progStatus.visible_tab = (tabsGeneric->value())->label();
 
 					progStatus.show_tabs = false;
 				} else if ((!progStatus.show_tabs && !progStatus.first_use) || (progStatus.show_tabs && progStatus.first_use)) {
@@ -1490,6 +1466,14 @@ void show_controls()
 		default :
 			break;
 	}
+
+	if (tabsGeneric) {
+		if (vtab != (Fl_Widget *)0)
+			tabsGeneric->value(vtab);
+		else
+			progStatus.visible_tab = (tabsGeneric->value())->label();
+	}
+
 	progStatus.first_use = false;
 }
 
