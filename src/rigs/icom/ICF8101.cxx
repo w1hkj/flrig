@@ -249,8 +249,9 @@ void RIG_ICF8101::selectA()
 	cmd += '\x07';
 	cmd += '\x00';
 	cmd.append(post);
-	set_trace(2, "selectA()", str2hex(cmd.c_str(), cmd.length()));
+	set_trace(1, "SELECT");
 	waitFB("select A");
+	setthex("select A");
 	inuse = onA;
 }
 
@@ -260,8 +261,9 @@ void RIG_ICF8101::selectB()
 	cmd += '\x07';
 	cmd += '\x01';
 	cmd.append(post);
-	set_trace(2, "selectB()", str2hex(cmd.c_str(), cmd.length()));
+	set_trace(1, "SELECT");
 	waitFB("select B");
+	setthex("select B");
 	inuse = onB;
 }
 
@@ -272,8 +274,9 @@ bool RIG_ICF8101::check ()
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
+	get_trace(1,"CHECK");
 	bool ok = waitFOR(11, "check vfo");
-	get_trace(2, "check()", str2hex(replystr.c_str(), replystr.length()));
+	getthex("check");
 	return ok;
 }
 
@@ -285,12 +288,13 @@ unsigned long int RIG_ICF8101::get_vfoA ()
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
+	get_trace(1, "GET VFO");
 	if (waitFOR(11, "get vfo A")) {
 		size_t p = replystr.rfind(resp);
 		if (p != std::string::npos)
 			A.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
-	get_trace(2, "get_vfoA()", str2hex(replystr.c_str(), replystr.length()));
+	getthex("get vfoA");
 	return A.freq;
 }
 
@@ -302,8 +306,9 @@ void RIG_ICF8101::set_vfoA (unsigned long int freq)
 	cmd += '\x35';
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append( post );
-	set_trace(2, "set_vfoA()", str2hex(cmd.c_str(), cmd.length()));
+	set_trace(1, "SET VFO");
 	waitFB("set vfo A");
+	setthex("set vfoA");
 }
 
 unsigned long int RIG_ICF8101::get_vfoB ()
@@ -314,12 +319,13 @@ unsigned long int RIG_ICF8101::get_vfoB ()
 	cmd = pre_to;
 	cmd += '\x03';
 	cmd.append( post );
+	get_trace(1, "GET VFO");
 	if (waitFOR(11, "get vfo B")) {
 		size_t p = replystr.rfind(resp);
 		if (p != std::string::npos)
 			B.freq = fm_bcd_be(replystr.substr(p+5), 10);
 	}
-	get_trace(2, "get_vfoB()", str2hex(replystr.c_str(), replystr.length()));
+	getthex("get vfoB");
 	return B.freq;
 }
 
@@ -331,8 +337,9 @@ void RIG_ICF8101::set_vfoB (unsigned long int freq)
 	cmd += '\x35';
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append( post );
-	set_trace(2, "set_vfoB()", str2hex(cmd.c_str(), cmd.length()));
+	set_trace(1,"SET VFO");
 	waitFB("set vfo B");
+	setthex("set vfoB");
 }
 
 // Tranceiver PTT on/off
@@ -345,12 +352,13 @@ void RIG_ICF8101::set_PTT_control(int val)
 	cmd += '\x00';
 	cmd += (val ? '\x02' : '\x00');
 	cmd.append( post );
+	set_trace(1, "SET PTT");
 	if (val) {
 		waitFB("set ptt ON");
-		set_trace(2, "set_PTT(ON)", str2hex(cmd.c_str(), cmd.length()));
+		setthex("set PTT ON");
 	} else {
 		waitFB("set ptt OFF");
-		set_trace(2, "set_PTT(OFF)", str2hex(cmd.c_str(), cmd.length()));
+		setthex("set_PTT OFF");
 	}
 	ptt_ = val;
 }
@@ -362,7 +370,9 @@ int RIG_ICF8101::get_PTT()
 	std::string resp = pre_fm;
 	resp.append("\x1A\x37");
 	cmd.append(post);
+	get_trace(1, "GET PTT");
 	if (waitFOR(9, "get PTT")) {
+		getthex("get PTT");
 		size_t p = replystr.rfind(resp);
 		if (p != std::string::npos)
 			ptt_ = (replystr[p + 7] == 0x02);
@@ -399,7 +409,7 @@ void RIG_ICF8101::set_volume_control(int val)
 		cmd.append(vol_tbl[val].catval);
 	cmd.append( post );
 	waitFB("set vol");
-	set_trace(2, "set_volume_control()", str2hex(cmd.c_str(), cmd.length()));
+	setthex("set vol");
 }
 
 int RIG_ICF8101::get_volume_control()
@@ -427,7 +437,7 @@ int RIG_ICF8101::get_volume_control()
 			}
 		}
 	}
-	get_trace(2, "get_volume_control()", str2hex(replystr.c_str(), replystr.length()));
+	getthex("get vol");
 	return val;
 }
 
