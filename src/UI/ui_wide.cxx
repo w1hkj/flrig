@@ -21,7 +21,7 @@
 Fl_Group *gwide = (Fl_Group *)0;
 Fl_Group *grp_row1b1b = (Fl_Group *)0;
 
-Fl_Group *tabs = (Fl_Group *)0;
+//Fl_Group *tabs = (Fl_Group *)0;
 
 Fl_Menu_Item menu_wide_menu[] = {
  {_("&File"), 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0},

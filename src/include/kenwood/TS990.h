@@ -138,12 +138,12 @@ public:
 	void set_power_control(double val);
 	double get_power_control(void);
 	void get_pc_min_max_step(double &min, double &max, double &step) {
-		min = 0; pmax = max = 200; step = 1; }
+		min = 5; pmax = max = 200; step = 5; }
 	int  get_power_out();
 
 	void set_PTT_control(int val);
 	int  get_PTT();
-	void tune_rig();
+	void tune_rig(int how);
 
 	int  next_attenuator();
 	void set_attenuator(int val);
@@ -199,6 +199,9 @@ public:
 
 	void sync_date(char *dt);
 	void sync_clock(char *tm);
+
+	void set_xcvr_auto_on();
+	void set_xcvr_auto_off();
 };
 
 #endif

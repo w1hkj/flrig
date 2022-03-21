@@ -125,6 +125,8 @@ Fl_Group *grpTABS = (Fl_Group *)0;
 
 Fl_Group *hidden_tabs = (Fl_Group *)0;
 
+Fl_Group *tabs = (Fl_Group *)0;
+
 Fl_Tabs *tabsGeneric=(Fl_Tabs *)0;
 
 Fl_Group *tab_yaesu_bands = (Fl_Group *)0;

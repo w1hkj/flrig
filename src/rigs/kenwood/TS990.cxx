@@ -30,17 +30,6 @@
 #include <fstream>
 #include <sstream>
 
-void ts990debug(std::string s)
-{
-	std::ofstream dbgfile;
-	if (s.empty())
-		dbgfile.open(std::string(RigHomeDir).append("ts990_debug.txt").c_str());
-	else
-		dbgfile.open(std::string(RigHomeDir).append("ts990_debug.txt").c_str(), std::ios::app);
-	dbgfile << s << std::endl;
-	dbgfile.close();
-}
-
 #define TS990_WAIT 50
 
 static const char TS990name_[] = "TS-990";
@@ -252,14 +241,14 @@ static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
 	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
 	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 },
+	{ (Fl_Widget *)btnNR,         2, 165,  50 },
+	{ (Fl_Widget *)sldrNR,       54, 165, 156 },
 	{ (Fl_Widget *)btnIFsh,     214, 105,  50 },
 	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
 	{ (Fl_Widget *)btnNotch,    214, 125,  50 },
 	{ (Fl_Widget *)sldrNOTCH,   266, 125, 156 },
 	{ (Fl_Widget *)sldrMICGAIN, 266, 145, 156 },
 	{ (Fl_Widget *)sldrPOWER,   266, 165, 156 },
-	{ (Fl_Widget *)btnNR,         2, 165,  50 },
-	{ (Fl_Widget *)sldrNR,       54, 165, 156 },
 	{ (Fl_Widget *)NULL,          0,   0,   0 }
 };
 
@@ -267,20 +256,17 @@ static std::string menu_0001;
 
 void RIG_TS990::initialize()
 {
-	ts990debug("");
-	ts990debug("initialize()");
-
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = sldrRFGAIN;
-	rig_widgets[3].W = btnIFsh;
-	rig_widgets[4].W = sldrIFSHIFT;
-	rig_widgets[5].W = btnNotch;
-	rig_widgets[6].W = sldrNOTCH;
-	rig_widgets[7].W = sldrMICGAIN;
-	rig_widgets[8].W = sldrPOWER;
-	rig_widgets[9].W = btnNR;
-	rig_widgets[10].W = sldrNR;
+	rig_widgets[3].W = btnNR;
+	rig_widgets[4].W = sldrNR;
+	rig_widgets[5].W = btnIFsh;
+	rig_widgets[6].W = sldrIFSHIFT;
+	rig_widgets[7].W = btnNotch;
+	rig_widgets[8].W = sldrNOTCH;
+	rig_widgets[9].W = sldrMICGAIN;
+	rig_widgets[10].W = sldrPOWER;
 
 	cmd = "AC000;";
 	sendCommand(cmd);
@@ -408,7 +394,9 @@ RIG_TS990::RIG_TS990() {
 	has_bandwidth_control =
 	has_ifshift_control =
 	has_ptt_control =
-	can_synch_clock = true;
+	has_xcvr_auto_on_off = 
+	can_synch_clock = 
+	true;
 
 	rxtxa = true;
 
@@ -420,7 +408,7 @@ RIG_TS990::RIG_TS990() {
 
 void RIG_TS990::selectA()
 {
-	ts990debug("selectA()");
+	gett("selectA()");
 
 	cmd = "CB0;";
 	sendCommand(cmd);
@@ -436,7 +424,7 @@ void RIG_TS990::selectA()
 
 void RIG_TS990::selectB()
 {
-	ts990debug("selectB()");
+	gett("selectB()");
 
 	cmd = "CB1;";
 	sendCommand(cmd);
@@ -458,7 +446,7 @@ void RIG_TS990::selectB()
 
 int  RIG_TS990::next_attenuator()
 {
-	ts990debug("next_attenuator()");
+	gett("next_attenuator()");
 
 	switch (atten_level) {
 		case 0: return 1;
@@ -471,7 +459,7 @@ int  RIG_TS990::next_attenuator()
 
 void RIG_TS990::set_attenuator(int val)
 {
-	ts990debug("set_attenuator(int val)");
+	sett("set_attenuator(int val)");
 
 	atten_level = val;
 	if (inuse == onB) {
@@ -517,7 +505,7 @@ void RIG_TS990::set_attenuator(int val)
 //==============================================================================
 int RIG_TS990::get_attenuator() {
 
-	ts990debug("get_attenuator()");
+	gett("get_attenuator()");
 
 	if (inuse == onB) {
 		cmd = "RA1;";
@@ -578,7 +566,7 @@ int RIG_TS990::get_attenuator() {
 
 int  RIG_TS990::next_preamp()
 {
-	ts990debug("next_preamp()");
+	gett("next_preamp()");
 
 	if (preamp_level) return 0;
 	return 1;
@@ -586,7 +574,7 @@ int  RIG_TS990::next_preamp()
 
 void RIG_TS990::set_preamp(int val)
 {
-	ts990debug("set_preamp(int val)");
+	sett("set_preamp(int val)");
 
 	if (inuse == onB) {
 		preamp_level = val;
@@ -604,7 +592,7 @@ void RIG_TS990::set_preamp(int val)
 
 int RIG_TS990::get_preamp()
 {
-	ts990debug("get_preamp()");
+	gett("get_preamp()");
 
 	if (inuse == onB) {
 		cmd = "PA1;";
@@ -638,7 +626,7 @@ int RIG_TS990::get_preamp()
 
 void RIG_TS990::set_split(bool val)
 {
-	ts990debug("set_split(bool val)");
+	sett("set_split(bool val)");
 
 	split = val;
 	if (inuse == onB) {
@@ -666,7 +654,7 @@ void RIG_TS990::set_split(bool val)
 
 int RIG_TS990::get_split()
 {
-	ts990debug("get_split()");
+	gett("get_split()");
 
 	size_t p;
 	int split = 0;
@@ -695,7 +683,7 @@ int RIG_TS990::get_split()
 //==============================================================================
 const char * RIG_TS990::get_bwname_(int n, int md)
 {
-	ts990debug("get_bwname_(int n, int md)");
+	gett("get_bwname_(int n, int md)");
 
 	static char bwname[20];
 	if (n > 256) {
@@ -732,7 +720,7 @@ bool RIG_TS990::check ()
 
 unsigned long int RIG_TS990::get_vfoA ()
 {
-	ts990debug("get_vfoA()");
+	gett("get_vfoA()");
 
 	cmd = "FA;";
 	if (wait_char(';', 14, TS990_WAIT, "get vfoA", ASC) < 14) return A.freq;
@@ -752,7 +740,7 @@ unsigned long int RIG_TS990::get_vfoA ()
 
 void RIG_TS990::set_vfoA (unsigned long int freq)
 {
-	ts990debug("set_vfoA(unsigned long int freq)");
+	sett("set_vfoA(unsigned long int freq)");
 
 	A.freq = freq;
 	cmd = "FA00000000000;";
@@ -766,7 +754,7 @@ void RIG_TS990::set_vfoA (unsigned long int freq)
 
 unsigned long int RIG_TS990::get_vfoB ()
 {
-	ts990debug("get_vfoB()");
+	gett("get_vfoB()");
 
 	cmd = "FB;";
 	if (wait_char(';', 14, TS990_WAIT, "get vfoB", ASC) < 14) return B.freq;
@@ -787,7 +775,7 @@ unsigned long int RIG_TS990::get_vfoB ()
 
 void RIG_TS990::set_vfoB (unsigned long int freq)
 {
-	ts990debug("set_vfoB(unsigned long int freq)");
+	sett("set_vfoB(unsigned long int freq)");
 
 	B.freq = freq;
 	cmd = "FB00000000000;";
@@ -805,7 +793,7 @@ void RIG_TS990::set_vfoB (unsigned long int freq)
 // response SMbmmmm;
 int RIG_TS990::get_smeter()
 {
-	ts990debug("get_smeter()");
+	gett("get_smeter()");
 
 	if (inuse == onB) cmd = "SM1;";
 	else      cmd = "SM0;";
@@ -829,7 +817,7 @@ int RIG_TS990::get_smeter()
 // response SMbmmmm;
 int RIG_TS990::get_power_out()
 {
-	ts990debug("get_power_out()");
+	gett("get_power_out()");
 
 	static int meter[] = 
 	{  0,  7, 15, 23, 29,  34,  40,  46,  51,  58 };
@@ -859,7 +847,7 @@ int RIG_TS990::get_power_out()
 // response RMbmmmm;
 int RIG_TS990::get_swr(void)
 {
-	ts990debug("get_swr(void)");
+	gett("get_swr(void)");
 
 	int mtr = 0;
 
@@ -888,7 +876,7 @@ int RIG_TS990::get_swr(void)
 // response RMbmmmm;
 int RIG_TS990::get_alc(void)
 {
-	ts990debug("get_alc(void)");
+	gett("get_alc(void)");
 
 	cmd = "RM11;";
 	sendCommand(cmd);
@@ -914,7 +902,7 @@ int RIG_TS990::get_alc(void)
 
 void RIG_TS990::set_power_control(double val)
 {
-	ts990debug("set_poer_control(double val)");
+	sett("set_power_control(double val)");
 
 	int ival = (int)val;
 	cmd = "PC000;";
@@ -931,7 +919,7 @@ void RIG_TS990::set_power_control(double val)
 // response: PCppp;
 double RIG_TS990::get_power_control()
 {
-	ts990debug("get_power_control()");
+	gett("get_power_control()");
 
 	cmd = "PC;";
 	if (wait_char(';', 6, TS990_WAIT, "get pwr ctrl", ASC) < 6) return 0;
@@ -950,7 +938,7 @@ double RIG_TS990::get_power_control()
 // response AGbmmm;
 int RIG_TS990::get_volume_control()
 {
-	ts990debug("get_volume_control()");
+	gett("get_volume_control()");
 
 	if (inuse == onB) {
 
@@ -981,7 +969,7 @@ int RIG_TS990::get_volume_control()
 
 void RIG_TS990::set_volume_control(int val)
 {
-	ts990debug("set_volume_control(int val)");
+	sett("set_volume_control(int val)");
 
 	if (inuse == onB) {
 
@@ -1011,7 +999,7 @@ void RIG_TS990::set_volume_control(int val)
 
 void RIG_TS990::set_PTT_control(int val)
 {
-	ts990debug("set_PTT_control(int val)");
+	sett("set_PTT_control(int val)");
 
 	if (val) {
 		if (data_mode)
@@ -1033,11 +1021,14 @@ int RIG_TS990::get_PTT()
 // Transceiver Tune
 //==============================================================================
 
-void RIG_TS990::tune_rig()
+void RIG_TS990::tune_rig(int how)
 {
-	ts990debug("tune_rig()");
-
-	cmd = "AC111;";
+	switch (how) {
+		case 0: cmd = "AC110;"; break;
+		case 1: cmd = "AC111;"; break;
+		case 2: cmd = "AC112;"; break;
+	}
+	sett("tune_rig()");
 	sendCommand(cmd);
 }
 
@@ -1049,7 +1040,7 @@ void RIG_TS990::set_modeA(int val)
 {
 	std::stringstream ss;
 	ss << "set_modeA(" << val << ") " << TS990modes_[val];
-	ts990debug(ss.str());
+	gett(ss.str().c_str());
 
 	A.imode = val;
 	cmd = "OM0";
@@ -1096,12 +1087,12 @@ int RIG_TS990::get_modeA()
 		default : md = A.imode;
 	}
 
-	ts990debug("get_modeA()");
+	gett("get_modeA()");
 
 	if (md != A.imode) {
 		std::stringstream ss;
 		ss << "get_modeB(" <<  md << ") " << TS990modes_[md];
-		ts990debug(ss.str());
+		gett(ss.str().c_str());
 
 		LOG_INFO("get mode A: %s", TS990modes_[md]);
 		A.imode = md;
@@ -1115,7 +1106,7 @@ void RIG_TS990::set_modeB(int val)
 {
 	std::stringstream ss;
 	ss << "set_modeB(" << val << ") " << TS990modes_[val];
-	ts990debug(ss.str());
+	gett(ss.str().c_str());
 
 	B.imode = val;
 	cmd = "OM1";
@@ -1162,12 +1153,12 @@ int RIG_TS990::get_modeB()
 		default : md = B.imode;
 	}
 
-	ts990debug("get_modeb()");
+	gett("get_modeb()");
 
 	if (md != B.imode) {
 		std::stringstream ss;
 		ss << "get_modeB(" <<  md << ") " << TS990modes_[md];
-		ts990debug(ss.str());
+		gett(ss.str().c_str());
 
 		B.imode = md;
 		set_widths(md);
@@ -1182,7 +1173,7 @@ int RIG_TS990::get_modeB()
 
 void RIG_TS990::set_mic_gain(int val)
 {
-	ts990debug("set_mic_gain(int val)");
+	sett("set_mic_gain(int val)");
 
 	cmd = "MG000;";
 	val *= 255;
@@ -1200,7 +1191,7 @@ void RIG_TS990::set_mic_gain(int val)
 // response MGggg;
 int RIG_TS990::get_mic_gain()
 {
-	ts990debug("get_mic_gain()");
+	gett("get_mic_gain()");
 
 	int val = 0;
 	cmd = "MG;";
@@ -1217,7 +1208,7 @@ int RIG_TS990::get_mic_gain()
 
 void RIG_TS990::get_mic_min_max_step(int &min, int &max, int &step)
 {
-	ts990debug("get_mic_max_step(int &min, int &max, int &step)");
+	gett("get_mic_max_step(int &min, int &max, int &step)");
 
 	min = 0;
 	max = 100;
@@ -1230,7 +1221,7 @@ void RIG_TS990::get_mic_min_max_step(int &min, int &max, int &step)
 
 void RIG_TS990::read_menu_0607()
 {
-	ts990debug("read_menu_0607()");
+	gett("read_menu_0607()");
 
 	save_menu_0607 = true;//false;
 	cmd = "EX00607;"; sendCommand(cmd);
@@ -1243,7 +1234,7 @@ void RIG_TS990::read_menu_0607()
 
 void RIG_TS990::read_menu_0608()
 {
-	ts990debug("read_menu_0608()");
+	gett("read_menu_0608()");
 
 	save_menu_0608 = true;//false;
 	cmd = "EX00608;"; sendCommand(cmd);
@@ -1256,7 +1247,7 @@ void RIG_TS990::read_menu_0608()
 
 void RIG_TS990::set_menu_0607(int val)
 {
-	ts990debug("set_menu_0607()");
+	sett("set_menu_0607()");
 
 	menu_0607 = val;
 	cmd = "EX00607 00";
@@ -1267,7 +1258,7 @@ void RIG_TS990::set_menu_0607(int val)
 
 void RIG_TS990::set_menu_0608(int val)
 {
-	ts990debug("set_menu_0608()");
+	sett("set_menu_0608()");
 
 	menu_0608 = val;
 	cmd = "EX00608 00";
@@ -1282,7 +1273,7 @@ void RIG_TS990::set_menu_0608(int val)
 
 int RIG_TS990::set_widths(int val)
 {
-	ts990debug("set_widths(int val)");
+	sett("set_widths(int val)");
 
 	int bw = 0;
 	if (inuse == onB) bw = B.iBW;
@@ -1386,7 +1377,7 @@ const char **RIG_TS990::bwtable(int m)
 {
 	std::stringstream ss;
 	ss << "bwtable( " << m << " )";
-	ts990debug(ss.str());
+	gett(ss.str().c_str());
 
 
 	const char **filter = TS990_filt_SH;
@@ -1421,7 +1412,7 @@ const char **RIG_TS990::bwtable(int m)
 			break;
 	}
 	ss << "filter address: " << filter;
-	ts990debug(ss.str());
+	gett(ss.str().c_str());
 	return filter;
 }
 
@@ -1429,7 +1420,7 @@ const char **RIG_TS990::lotable(int m)
 {
 	std::stringstream ss;
 	ss << "lotable( " << m << " )";
-	ts990debug(ss.str());
+	gett(ss.str().c_str());
 
 	const char **filter = TS990_filt_SL;
 	switch (m) {
@@ -1463,7 +1454,7 @@ const char **RIG_TS990::lotable(int m)
 			break;
 	}
 	ss << "filter address: " << filter;
-	ts990debug(ss.str());
+	gett(ss.str().c_str());
 	return filter;
 }
 
@@ -1471,7 +1462,7 @@ const char **RIG_TS990::hitable(int m)
 {
 	std::stringstream ss;
 	ss << "hitable( " << m << " )";
-	ts990debug(ss.str());
+	sett(ss.str().c_str());
 
 	const char **filter = TS990_filt_SH;
 	switch (m) {
@@ -1505,7 +1496,8 @@ const char **RIG_TS990::hitable(int m)
 			break;
 	}
 	ss << "filter address: " << filter;
-	ts990debug(ss.str());
+	sett(ss.str().c_str());
+
 	return filter;
 }
 
@@ -1513,7 +1505,7 @@ int RIG_TS990::adjust_bandwidth(int val)
 {
 	std::stringstream ss;
 	ss << "adust_bandwidth( " << val << " )";
-	ts990debug(ss.str());
+	sett(ss.str().c_str());
 
 	int retval = 0;
 	switch (val) {
@@ -1580,8 +1572,6 @@ int RIG_TS990::adjust_bandwidth(int val)
 
 int RIG_TS990::def_bandwidth(int val)
 {
-	ts990debug("def_bandwidth(int val)");
-
 	read_menu_0607();
 	read_menu_0608();
 	return adjust_bandwidth(val);
@@ -1599,7 +1589,7 @@ void RIG_TS990::set_bwA(int val)
 
 	std::stringstream ss;
 	ss << "set_bwA( " << SH << "/" << SL << " )";
-	ts990debug(ss.str());
+	sett(ss.str().c_str());
 
 	switch (A.imode) {
 	case LSB: case USB:
@@ -1755,7 +1745,7 @@ void RIG_TS990::set_bwB(int val)
 
 	std::stringstream ss;
 	ss << "set_bwB( " << SH << "/" << SL << " )";
-	ts990debug(ss.str());
+	sett(ss.str().c_str());
 
 	switch (B.imode) {
 	case LSB: case USB:
@@ -2255,7 +2245,7 @@ read_menu_0608();
 
 	std::stringstream ss;
 	ss << "mode: " << TS990modes_[A.imode] << ", get_bwA( " << SH << "/" << SL << " )";
-	ts990debug(ss.str());
+	sett(ss.str().c_str());
 
 	return A.iBW;
 }
@@ -2614,22 +2604,18 @@ read_menu_0608();
 
 	std::stringstream ss;
 	ss << "mode: " << TS990modes_[B.imode] << ", get_bwB( " << SH << "/" << SL << " )";
-	ts990debug(ss.str());
+	sett(ss.str().c_str());
 
 	return B.iBW;
 }
 
 int RIG_TS990::get_modetype(int n)
 {
-	ts990debug("get_modetype(int n)");
-
 	return TS990_mode_type[n];
 }
 
 void RIG_TS990::set_noise(bool val) //Now Setting AGC
 {
-	ts990debug("set_noise(bool val)");
-
 	if (inuse == onB) {
 		if (nb_level == 2) {
 			nb_level = 3;
@@ -2665,18 +2651,17 @@ void RIG_TS990::set_noise(bool val) //Now Setting AGC
 			sendCommand(cmd);
 		}
 	}
+	sett("set noise val");
 }
 
 //----------------------------------------------------------------------
 int  RIG_TS990::get_agc()
 {
-	ts990debug("get_agc()");
-
 	int val = 0;
 	if (inuse == onB) {
 		cmd = "GC1;";
 		if (wait_char(';', 5, 100, "get AGC", ASC) < 5) return val;
-
+		gett("get agc");
 		size_t p = replystr.rfind("GC");
 		if (p == std::string::npos) return val;
 		if (replystr[p + 3] == '1' ) {
@@ -2689,7 +2674,7 @@ int  RIG_TS990::get_agc()
 	} else {
 		cmd = "GC0;";
 		if (wait_char(';', 5, 100, "get AGC", ASC) < 5) return val;
-
+		gett("get agc");
 		size_t p = replystr.rfind("GC");
 		if (p == std::string::npos) return val;
 		if (replystr[p + 3] == '1' ) {
@@ -2707,8 +2692,6 @@ int  RIG_TS990::get_agc()
 
 void RIG_TS990::set_squelch(int val)
 {
-	ts990debug("set_squelch(int val)");
-
 	val *= 255;
 	val /= 100;
 	if (inuse == onB) {
@@ -2716,23 +2699,24 @@ void RIG_TS990::set_squelch(int val)
 		cmd.append(to_decimal(abs(val),3)).append(";");
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set squelch", cmd, "");
+		sett("set squelch");
 	} else {
 		cmd = "SQ0";
 		cmd.append(to_decimal(abs(val),3)).append(";");
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set squelch", cmd, "");
+		sett("set squelch");
 	}
 }
 
 //response SQbmmm;
 int  RIG_TS990::get_squelch()
 {
-	ts990debug("get_squelch()");
-
 	int val = 0;
 	if (inuse == onB) {
 		cmd = "SQ1;";
 		if (wait_char(';', 7, TS990_WAIT, "get squelch", ASC) >= 7) {
+			gett("get squelch");
 			size_t p = replystr.rfind("SQ1");
 			if (p == std::string::npos) return val;
 			replystr[p + 6] = 0;
@@ -2741,6 +2725,7 @@ int  RIG_TS990::get_squelch()
 	} else {
 		cmd = "SQ0;";
 		if (wait_char(';', 7, TS990_WAIT, "get squelch", ASC) >= 7) {
+			gett("get squelch");
 			size_t p = replystr.rfind("SQ0");
 			if (p == std::string::npos) return val;
 			replystr[p + 6] = 0;
@@ -2754,15 +2739,11 @@ int  RIG_TS990::get_squelch()
 
 void RIG_TS990::get_squelch_min_max_step(int &min, int &max, int &step)
 {
-	ts990debug("get_squelch_min_max_step(int &min, int &max, int &step)");
-
 	min = 0; max = 100; step = 1;
 }
 
 void RIG_TS990::set_rf_gain(int val)
 {
-	ts990debug("set_rf_gain(int val)");
-
 	val *= 255;
 	val /= 100;
 	if (inuse == onB) {
@@ -2770,11 +2751,13 @@ void RIG_TS990::set_rf_gain(int val)
 		cmd.append(to_decimal(val,3)).append(";");
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set rf gain", cmd, "");
+		sett("set rf gain");
 	} else {
 		cmd = "RG0";
 		cmd.append(to_decimal(val,3)).append(";");
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set rf gain", cmd, "");
+		sett("set rf gain");
 	}
 }
 
@@ -2784,13 +2767,11 @@ void RIG_TS990::set_rf_gain(int val)
 // response RGbmmm;
 int  RIG_TS990::get_rf_gain()
 {
-	ts990debug("get_rf_gain()");
-
 	int val = progStatus.rfgain;
 	if (inuse == onB) {
 		cmd = "RG1;";
 		if (wait_char(';', 7, TS990_WAIT, "get rf gain", ASC) < 7) return val;
-
+		gett("get rf gain");
 		size_t p = replystr.rfind("RG");
 		if (p != std::string::npos) {
 			val = fm_decimal(replystr.substr(p+3), 3);
@@ -2800,7 +2781,7 @@ int  RIG_TS990::get_rf_gain()
 	} else {
 		cmd = "RG0;";
 		if (wait_char(';', 7, TS990_WAIT, "get rf gain", ASC) < 7) return val;
-
+		gett("get rf gain");
 		size_t p = replystr.rfind("RG");
 		if (p != std::string::npos) {
 			val = fm_decimal(replystr.substr(p+3), 3);
@@ -2813,8 +2794,6 @@ int  RIG_TS990::get_rf_gain()
 
 void RIG_TS990::get_rf_min_max_step(int &min, int &max, int &step)
 {
-	ts990debug("get_rf_min_max_step(int &min, int &max, int &step)");
-
 	min = 0;
 	max = 100;
 	step = 1;
@@ -2824,18 +2803,18 @@ static bool nr_on = false;
 
 void RIG_TS990::set_noise_reduction(int val)
 {
-	ts990debug("set_noise_reduction(int val)");
-
 	if (inuse == onB) {
 		cmd.assign("NR1").append(val ? "1" : "0" ).append(";");
 		sendCommand(cmd);
 		showresp(INFO, ASC, "SET noise reduction", cmd, "");
+		sett("set noise red'");
 		if (val) nr_on = true;
 		else nr_on = false;
 	} else {
 		cmd.assign("NR0").append(val ? "1" : "0" ).append(";");
 		sendCommand(cmd);
 		showresp(INFO, ASC, "SET noise reduction", cmd, "");
+		sett("set noise red'");
 		if (val) nr_on = true;
 		else nr_on = false;
 	}
@@ -2843,14 +2822,12 @@ void RIG_TS990::set_noise_reduction(int val)
 
 int  RIG_TS990::get_noise_reduction()
 {
-	ts990debug("get_noise_reduction()");
-
 	int val = 0;
 	if (inuse == onB) {
 		cmd = rsp = "NR1";
 		cmd.append(";");
 		if (wait_char(';', 5, TS990_WAIT, "GET noise reduction", ASC) < 5) return val;
-
+		gett("get noise red'");
 		size_t p = replystr.rfind(rsp);
 		if (p == std::string::npos) return val;
 		val = replystr[p+3] - '0';
@@ -2861,7 +2838,7 @@ int  RIG_TS990::get_noise_reduction()
 		cmd = rsp = "NR0";
 		cmd.append(";");
 		if (wait_char(';', 5, TS990_WAIT, "GET noise reduction", ASC) < 5) return val;
-
+		gett("get noise red'");
 		size_t p = replystr.rfind(rsp);
 		if (p == std::string::npos) return val;
 		val = replystr[p+3] - '0';
@@ -2873,16 +2850,18 @@ int  RIG_TS990::get_noise_reduction()
 
 void RIG_TS990::set_noise_reduction_val(int val)
 {
-	ts990debug("set_noise_reduction_val(int val)");
+	sett("set_noise_reduction_val(int val)");
 
 	if (inuse == onB) {
 		cmd.assign("RL11").append(to_decimal(val, 2)).append(";");
 		sendCommand(cmd);
 		showresp(INFO, ASC, "SET_noise_reduction_val", cmd, "");
+		sett("set noixe red' val");
 	} else {
 		cmd.assign("RL10").append(to_decimal(val, 2)).append(";");
 		sendCommand(cmd);
 		showresp(INFO, ASC, "SET_noise_reduction_val", cmd, "");
+		sett("set noixe red' val");
 	}
 }
 
@@ -2892,14 +2871,13 @@ void RIG_TS990::set_noise_reduction_val(int val)
 // response RL1bmm;  RL2bmm;
 int  RIG_TS990::get_noise_reduction_val()
 {
-	ts990debug("get_noise_reduction_val()");
-
 	int val = 0;
 	if (inuse == onB) {
 		if (!nr_on) return val;
 		cmd = rsp = "RL11";
 		cmd.append(";");
 		if (wait_char(';', 7, TS990_WAIT, "GET noise reduction val", ASC) < 7) return val;
+		gett("get noise red' val");
 		size_t p = replystr.rfind(rsp);
 		if (p == std::string::npos) return val;
 		val = fm_decimal(replystr.substr(p+4), 2);
@@ -2908,6 +2886,7 @@ int  RIG_TS990::get_noise_reduction_val()
 		cmd = rsp = "RL10";
 		cmd.append(";");
 		if (wait_char(';', 7, TS990_WAIT, "GET noise reduction val", ASC) < 7) return val;
+		gett("get noise red' val");
 		size_t p = replystr.rfind(rsp);
 		if (p == std::string::npos) return val;
 		val = fm_decimal(replystr.substr(p+4), 2);
@@ -2917,33 +2896,33 @@ int  RIG_TS990::get_noise_reduction_val()
 
 void RIG_TS990::set_auto_notch(int v)
 {
-	ts990debug("set_auto_notch(int v)");
-
 	if (inuse == onB) {
 		cmd.assign("NT1").append(v ? "1" : "0" ).append(";");
 		sendCommand(cmd);
 		showresp(INFO, ASC, "SET Auto Notch", cmd, "");
+		sett("set auto notch");
 	} else {
 		cmd.assign("NT0").append(v ? "1" : "0" ).append(";");
 		sendCommand(cmd);
 		showresp(INFO, ASC, "SET Auto Notch", cmd, "");
+		sett("set auto notch");
 	}
 }
 
 int  RIG_TS990::get_auto_notch()
 {
-	ts990debug("get_auto_notch()");
-
 	int val = 0;
 	if (inuse == onB) {
 		cmd = "NT1;";
 		if (wait_char(';', 5, TS990_WAIT, "get auto notch", ASC) < 5) return val;
+		gett("get auto notch");
 		size_t p = replystr.rfind("NT");
 		if (p == std::string::npos) return val;
 		if (replystr[p+3] == '1') val = 1;
 	} else {
 		cmd = "NT0;";
 		if (wait_char(';', 5, TS990_WAIT, "get auto notch", ASC) < 5) return val;
+		gett("get auto notch");
 		size_t p = replystr.rfind("NT");
 		if (p == std::string::npos) return val;
 		if (replystr[p+3] == '1') val = 1;
@@ -2953,37 +2932,41 @@ int  RIG_TS990::get_auto_notch()
 
 void RIG_TS990::set_notch(bool on, int val)
 {
-	ts990debug("set_notch(bool on, int val)");
-
 	if (inuse == onB) {
 		if (on) {
 			cmd.assign("NT12;");
 			sendCommand(cmd);
 			showresp(INFO, ASC, "Set notch ON", cmd, "");
+			sett("set notch on");
 			int bp = (int)(val * 127.0 / 3000);
 			if (bp == 0) bp = 1;
 			cmd.assign("BP1").append(to_decimal(bp, 3)).append(";");
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set notch freq", cmd, "");
+			sett("set notch freq");
 		} else {
 			cmd.assign("NT10;");
 			sendCommand(cmd);
 			showresp(INFO, ASC, "Set notch OFF", cmd, "");
+			sett("set notch off");
 		}
 	} else {
 		if (on) {
 			cmd.assign("NT02;");
 			sendCommand(cmd);
 			showresp(INFO, ASC, "Set notch ON", cmd, "");
+			sett("set notch on");
 			int bp = (int)(val * 127.0 / 3000);
 			if (bp == 0) bp = 1;
 			cmd.assign("BP0").append(to_decimal(bp, 3)).append(";");
 			sendCommand(cmd);
 			showresp(INFO, ASC, "set notch freq", cmd, "");
+			sett("set notch freq");
 		} else {
 			cmd.assign("NT00;");
 			sendCommand(cmd);
 			showresp(INFO, ASC, "Set notch OFF", cmd, "");
+			sett("set notch off");
 		}
 	}
 }
@@ -2994,17 +2977,17 @@ void RIG_TS990::set_notch(bool on, int val)
 // response NTbn;  NTbn;  BPbnnn;
 bool  RIG_TS990::get_notch(int &val)
 {
-	ts990debug("get_notch(int &val)");
-
 	if (inuse == onB) {
 		cmd = "NT1;";
 		if (wait_char(';', 5, TS990_WAIT, "get notch state", ASC) < 5) return 0;
+		gett("get notch state");
 		size_t p = replystr.rfind("NT");
 		if (p == std::string::npos)
 			return 0;
 		if (replystr[p+3] == '2') {
 			cmd.assign("BP1;");
 			if (wait_char(';', 7, TS990_WAIT, "get notch freq", ASC) < 7) return 0;
+			gett("get notch freq");
 			size_t p = replystr.rfind("BP1");
 			if (p != std::string::npos)
 				val = (int)(fm_decimal(replystr.substr(p+3), 3) * 3000 / 127.0);
@@ -3014,12 +2997,14 @@ bool  RIG_TS990::get_notch(int &val)
 	} else {
 		cmd = "NT0;";
 		if (wait_char(';', 5, TS990_WAIT, "get notch state", ASC) < 5) return 0;
+		gett("get notch state");
 		size_t p = replystr.rfind("NT");
 		if (p == std::string::npos)
 			return 0;
 		if (replystr[p+3] == '2') {
 			cmd.assign("BP0;");
 			if (wait_char(';', 7, TS990_WAIT, "get notch freq", ASC) < 7) return 0;
+			gett("get notch freq");
 			size_t p = replystr.rfind("BP0");
 			if (p != std::string::npos)
 				val = (int)(fm_decimal(replystr.substr(p+3), 3) * 3000.0 / 127.0);
@@ -3032,8 +3017,6 @@ bool  RIG_TS990::get_notch(int &val)
 
 void RIG_TS990::get_notch_min_max_step(int &min, int &max, int &step)
 {
-	ts990debug("get_notch_min_max_step(int &min, int &max, int &step)");
-
 	min = 20;
 	max = 3000;
 	step = 10;
@@ -3047,8 +3030,6 @@ void RIG_TS990::get_notch_min_max_step(int &min, int &max, int &step)
 
 void RIG_TS990::set_if_shift(int val)
 {
-	ts990debug("set_monitor_level(int val)");
-
 	progStatus.shift_val = val;
 	val *= 255;
 	val /= 100;
@@ -3056,13 +3037,12 @@ void RIG_TS990::set_if_shift(int val)
 	cmd.append(to_decimal(val,3)).append(";");
 	sendCommand(cmd);
 	showresp(INFO, ASC, "set Mon Level", cmd, "");
+	sett("set monitor level");
 }
 
 //response MLsss;
 bool RIG_TS990::get_if_shift(int &val)
 {
-	ts990debug("get_monitor_level(int &val)");
-
 	cmd = "ML;";
 	if (wait_char(';', 6, TS990_WAIT, "get Mon Level", ASC) == 6) {
 		size_t p = replystr.rfind("ML");
@@ -3072,6 +3052,7 @@ bool RIG_TS990::get_if_shift(int &val)
 			val /= 100;
 		}
 	}
+	gett("get_if_shift");
 
 	bool on = false;
 	cmd = "MO0;";
@@ -3080,13 +3061,12 @@ bool RIG_TS990::get_if_shift(int &val)
 		if (p != std::string::npos)
 			on = (replystr[p+3] == '1');
 	}
+	gett("get TX monitor on/off");
 	return on;
 }
 
 void RIG_TS990::get_if_min_max_step(int &min, int &max, int &step)
 {
-	ts990debug("get_mon_min_max_step(int &min, int &max, int &step)");
-
 	if_shift_min = min = 0;
 	if_shift_max = max = 100;
 	if_shift_step = step = 1;
@@ -3095,8 +3075,6 @@ void RIG_TS990::get_if_min_max_step(int &min, int &max, int &step)
 
 void RIG_TS990::set_monitor( bool b)
 {
-	ts990debug("set_monitor( bool b)");
-
 	if (b) {
 		cmd = "MO01;";
 		sendCommand(cmd);
@@ -3106,6 +3084,7 @@ void RIG_TS990::set_monitor( bool b)
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set Tx Monitor OFF", cmd, "");
 	}
+	sett("set_monitor");
 }
 
 // ---------------------------------------------------------------------
@@ -3143,5 +3122,26 @@ void RIG_TS990::sync_clock(char *tm)
 	timestr += tm[1];
 	timestr += tm[3];
 	timestr += tm[4];
+	sett("sync_clock");
 }
 
+void RIG_TS990::set_xcvr_auto_on()
+{
+// send dummy data
+	cmd = "UP;DN;UP;DN;UP;DN;";
+	sendCommand(cmd);
+	for (int i = 0; i < 22; i ++) {
+		MilliSleep(50);
+		Fl::awake();
+	}
+	cmd = "PS1;";
+	sendCommand(cmd);
+	sett("set xcvr ON");
+}
+
+void RIG_TS990::set_xcvr_auto_off()
+{
+	cmd = "PS0;";
+	sendCommand(cmd);
+	sett("set xcvr OFF");
+}

@@ -684,6 +684,7 @@ Fl_Double_Window *tabs_window()
 	grpTABS = new Fl_Group(0, 0, small_mainW, gph);
 
 	tabs550 = new Fl_Tabs(0, 0, small_mainW, gph);
+{
 		tabs550->selection_color(FL_LIGHT1);
 		tabs550->hide();
 
@@ -1077,11 +1078,11 @@ Fl_Double_Window *tabs_window()
 			tt550_Nsamples->callback((Fl_Callback*)cb_tt550_Nsamples);
 		tt550_AT->end();
 	tabs550->end();
-
+}
 	tabsGeneric = new Fl_Tabs(0, 0, small_mainW, gph);
-//		tabsGeneric->selection_color(FL_LIGHT1);
-
+{
 		tab_yaesu_bands = new Fl_Group(0, 24, small_mainW, gph - 24, _("Band"));
+{
 			btn_yaesu_select_1 = new Fl_Button(4, 40, 60, 18, _("1.8"));
 			btn_yaesu_select_1->tooltip(_("160m Band"));
 			btn_yaesu_select_1->color((Fl_Color)246);
@@ -1154,8 +1155,9 @@ Fl_Double_Window *tabs_window()
 			op_yaesu_select60->end();
 
 		tab_yaesu_bands->end();
-
+}
 		tab_ft991_bands = new Fl_Group(0, 24, small_mainW, gph - 24, _("Band"));
+{
 			btn_ft991_select_1 = new Fl_Button(4, 30, 60, 18, _("1.8"));
 			btn_ft991_select_1->tooltip(_("Left click - get"));
 			btn_ft991_select_1->color((Fl_Color)246);
@@ -1234,8 +1236,9 @@ Fl_Double_Window *tabs_window()
 			choice_ft991_rTONE->hide();
 
 		tab_ft991_bands->end();
-
+}
 		tab_FT8n_bands = new Fl_Group(0, 24, small_mainW, gph - 24, _("Band"));
+{
 		static const char setsave[] = _("Left click - set\nRight click - save");
 			btn_FT8n_select_1 = new Fl_Button(4, 30, 60, 18, _("1.8"));
 			btn_FT8n_select_1->tooltip(setsave);
@@ -1298,9 +1301,9 @@ Fl_Double_Window *tabs_window()
 			btn_FT8n_select_12->callback((Fl_Callback*)cb_btn_band_select, (void *)12);
 
 		tab_FT8n_bands->end();
-
+}
 		tab_FT8n_CTCSS = new Fl_Group(0, 24, small_mainW, gph - 24, _("CTCSS"));
-
+{
 			choice_FT8n_tTONE = new Fl_PL_tone(70, 34, 75, 18, _("Tone X:"));
 			choice_FT8n_tTONE->align((Fl_Align)FL_ALIGN_LEFT);
 			choice_FT8n_tTONE->value(8);
@@ -1332,8 +1335,9 @@ Fl_Double_Window *tabs_window()
 			setOFFSET->callback((Fl_Callback*)cb_offset, 0);
 
 		tab_FT8n_CTCSS->end();
-
+}
 		tab_icom_bands = new Fl_Group(0, 24, small_mainW, gph - 24, _("Band"));
+{
 			btn_icom_select_1 = new Fl_Button(4, 30, 60, 18, _("1.8"));
 			btn_icom_select_1->tooltip(_("Left click - get\nRight click - set"));
 			btn_icom_select_1->color((Fl_Color)246);
@@ -1410,8 +1414,9 @@ Fl_Double_Window *tabs_window()
 			choice_rTONE->end();
 
 		tab_icom_bands->end();
-
+}
 		genericCW = new Fl_Group(0, 24, small_mainW, gph - 24, _("CW"));
+{
 			genericCW->color(FL_LIGHT1);
 			genericCW->selection_color(FL_LIGHT1);
 			genericCW->hide();
@@ -1472,8 +1477,9 @@ Fl_Double_Window *tabs_window()
 			btn_enable_keyer->value(progStatus.enable_keyer);
 
 		genericCW->end();
-
+}
 		genericQSK = new Fl_Group(0, 24, small_mainW, gph - 24, _("QSK"));
+{
 			genericQSK->color(FL_LIGHT1);
 			genericQSK->selection_color(FL_LIGHT1);
 			genericQSK->hide();
@@ -1510,8 +1516,9 @@ Fl_Double_Window *tabs_window()
 			spnr_cw_delay->align(FL_ALIGN_BOTTOM | FL_ALIGN_CENTER);
 
 		genericQSK->end();
-
+}
 		genericVOX = new Fl_Group(0, 24, small_mainW, gph - 24, _("Vox"));
+{
 			genericVOX->hide();
 
 			spnr_vox_gain = new Hspinner(
@@ -1566,8 +1573,9 @@ Fl_Double_Window *tabs_window()
 			btn_vox_on_dataport->value(progStatus.vox_on_dataport);
 
 		genericVOX->end();
-
+}
 		genericSpeech = new Fl_Group(0, 24, small_mainW, gph - 24, _("Spch"));
+{
 			genericSpeech->hide();
 
 			btnCompON = new Fl_Light_Button(215, 40, 100, 22, _("On"));
@@ -1585,8 +1593,9 @@ Fl_Double_Window *tabs_window()
 			spnr_compression->value(progStatus.compression);
 
 		genericSpeech->end();
-
+}
 		genericRx = new Fl_Group(0, 24, small_mainW, gph - 24, _("RX"));
+{
 			genericRx->hide();
 
 			sldr_nb_level = new Fl_Wheel_Value_Slider(5, 35, 100, 22, _("NB level"));
@@ -1646,8 +1655,9 @@ Fl_Double_Window *tabs_window()
 			spnr_line_out->value(progStatus.line_out);
 
 		genericRx->end();
-
+}
 		genericMisc = new Fl_Group(0, 24, small_mainW, gph - 24, _("Misc"));
+{
 			genericMisc->hide();
 
 			btnSpecial = new Fl_Light_Button(5, 35, 75, 22, _("Special"));
@@ -1692,14 +1702,16 @@ Fl_Double_Window *tabs_window()
 			txt_xcvr_synch->align(FL_ALIGN_CENTER);
 
 		genericMisc->end();
-
+}
 //		kx3_extras = new Fl_Group(0, 24, small_mainW, gph - 24, _("KX3"));
+{
 //			kxpa_enabled = new Fl_Check_Button( 15, kx3_extras->y() + 12, 18, 18, _("KXPA100 ON"));
 //			kxpa_enabled->callback((Fl_Callback*)cb_kxpa_enabled);
 //			kxpa_enabled->value(progStatus.kxpa);
 //		kx3_extras->end();
-
+}
 		genericUser_1 = new Fl_Group(0, 24, small_mainW, gph - 24, _("A"));
+{
 			btnUser1 = new Fl_Button(5, genericUser_1->y() + 12, 100, 20, "USER 1");
 			btnUser1->callback((Fl_Callback*)cb_btnUser, (void*)1);
 
@@ -1725,8 +1737,9 @@ Fl_Double_Window *tabs_window()
 			btnUser8->callback((Fl_Callback*)cb_btnUser, (void*)8);
 
 		genericUser_1->end();
-
+}
 		genericUser_2 = new Fl_Group(0, 24, small_mainW, gph - 24, _("B"));
+{
 			btnUser9 = new Fl_Button(5, genericUser_2->y() + 12, 100, 20, "USER 9");
 			btnUser9->callback((Fl_Callback*)cb_btnUser, (void*)9);
 
@@ -1752,8 +1765,9 @@ Fl_Double_Window *tabs_window()
 			btnUser16->callback((Fl_Callback*)cb_btnUser, (void*)16);
 
 		genericUser_2->end();
-
+}
 		genericUser_3 = new Fl_Group(0, 24, small_mainW, gph - 24, _("C"));
+{
 			btnUser17 = new Fl_Button(5, genericUser_3->y() + 12, 100, 20, "USER 17");
 			btnUser17->callback((Fl_Callback*)cb_btnUser, (void*)17);
 
@@ -1779,9 +1793,9 @@ Fl_Double_Window *tabs_window()
 			btnUser24->callback((Fl_Callback*)cb_btnUser, (void*)24);
 
 		genericUser_3->end();
-
+}
 		tab7610 = new Fl_Group(0, 24, small_mainW, gph - 24, _("IC7610"));
-
+{
 			ic7610digi_sel_on_off = new Fl_Light_Button(5, tab7610->y() + 10, 70, 22, "Digi-Sel");
 			ic7610digi_sel_on_off->value(progStatus.digi_sel_on_off);
 			ic7610digi_sel_on_off->callback((Fl_Callback *)cb_digi_sel_on_off);
@@ -1819,9 +1833,9 @@ Fl_Double_Window *tabs_window()
 			ic7610dual_watch->callback((Fl_Callback *)cb_dual_watch);
 
 		tab7610->end();
-
+}
 		genericAux = new Fl_Group(0, 24, small_mainW, gph - 24, _("Aux"));
-
+{
 			btnAuxRTS = new Fl_Light_Button(5, genericAux->y() + 10, 60, 18, _("RTS"));
 			btnAuxRTS->tooltip(_("RTS control pin"));
 			btnAuxRTS->down_box(FL_THIN_DOWN_BOX);
@@ -1838,14 +1852,15 @@ Fl_Double_Window *tabs_window()
 
 		genericAux->end();
 		genericAux->hide();
-
+}
 		tabsGeneric->resizable(genericUser_3);
 
 		tabsGeneric->callback((Fl_Callback *)cb_tabsGeneric);
 
 	tabsGeneric->end();
-
+}
 	grpTABS->end();
+
 	w->end();
 	w->resizable(grpTABS);
 	w->size_range (small_mainW, gph, 0, gph);
@@ -1941,10 +1956,10 @@ Fl_Double_Window* Small_rig_window() {
 		progress->selection_color(FL_GREEN);
 
 		filler = new Fl_Box(
-			0, small_mainH - 5,
+			0, small_mainH - 4,
 			small_mainW, 4);
 		filler->box(FL_FLAT_BOX);
-		filler->color(FL_LIGHT2);
+		filler->color(FL_GREEN);
 
 		grpInitializing->end();
 	grpInitializing->resizable(filler);

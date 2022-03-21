@@ -1299,11 +1299,12 @@ void show_controls()
 	if (tabsGeneric && !progStatus.visible_tab.empty()) {
 		Fl_Widget * const *vtabs = tabsGeneric->array();
 		int ntabs = tabsGeneric->children();
-		for (int n = 0; n < ntabs; n++)
+		for (int n = 0; n < ntabs; n++) {
 			if (progStatus.visible_tab == vtabs[n]->label()) {
 				vtab = vtabs[n];
-				break;
 			}
+			vtabs[n]->redraw();
+		}
 	}
 
 	switch (progStatus.UIsize) {
@@ -1398,6 +1399,7 @@ void show_controls()
 				tabsGeneric->hide();
 				tabs550->show();
 				tabs550->redraw();
+				break;
 			} else {
 				tabs550->hide();
 				tabsGeneric->show();
@@ -1425,20 +1427,21 @@ void show_controls()
 
 					grpTABS->show();
 					progStatus.show_tabs = true;
-
 				} else if (progStatus.show_tabs && progStatus.first_use) {
+
 					X = mainwindow->x();
 					Y = mainwindow->y();
 					W = mainwindow->w();
 					H = mainwindow->h();
+
 					mainwindow->resize(X, Y, W, H + grpTABS->h());
 					grpTABS->resize(0, H, W, grpTABS->h());
 					mainwindow->add(grpTABS);
 
 					grpTABS->show();
-
+					grpTABS->redraw();
+					mainwindow->redraw();
 					progStatus.show_tabs = true;
-
 				}
 			} else {
 				if ((progStatus.show_tabs && !progStatus.first_use) || (!progStatus.show_tabs && progStatus.first_use)) {

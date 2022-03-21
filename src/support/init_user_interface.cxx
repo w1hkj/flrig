@@ -291,7 +291,6 @@ void TRACED(adjust_small_ui)
 
 	mainwindow->damage();
 	mainwindow->redraw();
-
 }
 
 void TRACED(adjust_xig_wide)
@@ -963,21 +962,21 @@ void TRACED(init_Generic_Tabs)
 			btn_xcvr_auto_off->deactivate();
 		}
 
-		btn_xcvr_synch_clock->show();
-		btn_xcvr_synch_gmt->show();
-		btn_xcvr_synch_now->show();
-		txt_xcvr_synch->show();
 		if (selrig->can_synch_clock) {
-			btn_xcvr_synch_clock->activate();
-			btn_xcvr_synch_gmt->activate();
-			btn_xcvr_synch_now->activate();
-			txt_xcvr_synch->activate();
+			btn_xcvr_synch_clock->show();
+			btn_xcvr_synch_gmt->show();
+			btn_xcvr_synch_now->show();
+			txt_xcvr_synch->show();
 		} else {
-			btn_xcvr_synch_clock->deactivate();
-			btn_xcvr_synch_gmt->deactivate();
-			btn_xcvr_synch_now->deactivate();
-			txt_xcvr_synch->deactivate();
+			btn_xcvr_synch_clock->hide();
+			btn_xcvr_synch_gmt->hide();
+			btn_xcvr_synch_now->hide();
+			txt_xcvr_synch->hide();
 		}
+		btn_xcvr_synch_clock->redraw();
+		btn_xcvr_synch_gmt->redraw();
+		btn_xcvr_synch_now->redraw();
+		txt_xcvr_synch->redraw();
 
 		tabsGeneric->add(genericMisc);
 		genericMisc->redraw();
@@ -1848,7 +1847,9 @@ void TRACED(init_noise_control)
 	if (selrig->has_noise_control) {
 		if (xcvr_name == rig_TS990.name_) {
 			btnNOISE->label("AGC"); //Set TS990 AGC Label
+			btnNOISE->tooltip("TS990 AGC control");
 			btnNR->label("NR1"); //Set TS990 NR Button
+			btnNR->tooltip("TS990 noise reduction control");
 		}
 		if (selrig->name_ == rig_FT891.name_) {
 			// On the FT-891, the usual definitions of NB and NR buttons
@@ -2075,6 +2076,9 @@ void TRACED(init_TS990_special)
 
 	if (xcvr_name == rig_TS990.name_) { // Setup TS990 Mon Button
 		btnIFsh->label("MON");
+		btnIFsh->tooltip("\
+Turn TX monitor on/off\n\
+Slider controls TX monitor level");
 	}
 }
 
@@ -2291,6 +2295,11 @@ Press 'Init' button."));
 
 	adjust_control_positions();
 
+	if (selrig->name_ == rig_TS990.name_)  // UI tab issue pending real fix
+		progStatus.show_tabs = false;
+
+	show_controls();
+
 	main_group->show();
 	main_group->redraw();
 
@@ -2299,10 +2308,6 @@ Press 'Init' button."));
 	mainwindow->redraw();
 
 	Fl::flush();
-
-	MilliSleep(50);
-
-	show_controls();
 
 	xcvr_online = true;
 	box_xcvr_connect->color(FL_GREEN);
