@@ -3111,8 +3111,6 @@ int chkptt()
 
 void doPTT(int on)
 {
-std::cout << "doPTT(" << on << ")\n";
-
 	guard_lock serlck(&mutex_serial);
 
 //	int chk = chkptt();

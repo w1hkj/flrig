@@ -362,8 +362,7 @@ int  Cserial::ReadBuffer (std::string &buf, int nchars, std::string find1, std::
 	int retnum = 0, nread = 0;
 	static char tempbuf[201];
 	int tries = 10;
-	bool hex = false;
-	std::string s1, s2;
+
 	size_t p1, p2;
 
 	fd_set rfds;
@@ -375,29 +374,33 @@ int  Cserial::ReadBuffer (std::string &buf, int nchars, std::string find1, std::
 	tv.tv_sec = timeout/1000;
 	tv.tv_usec = (timeout % 1000) * 1000;
 
-	if (find1.length()) {
-		if (find1.find('\xFE') != std::string::npos) {
-			hex = true;
-			s1 = str2hex(find1.c_str(), find1.length());
-		} else
-			s1 = find1;
-	}
-	if (find2.length()) {
-		if (find2.find('\xFD') != std::string::npos) {
-			hex = true;
-			s2 = str2hex(find2.c_str(), find2.length());
-		} else
-			s2 = find2;
-	}
-
-	while (--tries) {
-
+	while ((tries > 0 ) && (nread < nchars)) {
+		{
+			char tc[50];
+			snprintf(tc, sizeof(tc), "ReadBuffer try # %d", 11 - tries);
+			ser_trace(1, tc);
+		}
 		if (select (FD_SETSIZE, &rfds, (fd_set *)0, (fd_set *)0, &tv) > 0) {
 			if (FD_ISSET( fd, &rfds) ) {
+
 				memset(tempbuf, 0, 201);
-				if ((retnum = read (fd, tempbuf, 200)) > 0) {
+				retnum = read (fd, tempbuf, 200);
+
+				if (retnum > 0) {
 					buf.append(tempbuf, retnum);
 					nread = buf.length();
+				} else if (progStatus.serialtrace)  {
+					char traceinfo[100];
+					snprintf(traceinfo, sizeof(traceinfo), "read(fd %d, tempbuf, 200) error: %s", fd,
+						(errno == EAGAIN ? "EAGAIN" :
+						errno == EWOULDBLOCK ? "EWOULDBLOCK" :
+						errno == EBADF ? "EBADF" :
+						errno == EFAULT? "EFAULT" :
+						errno == EINTR ? "EINTR" :
+						errno == EINVAL ? "EINVAL" :
+						errno == EIO ? "EIO" :
+						errno == EISDIR ? "EISDRI" : "OTHER"));
+						set_trace(1, traceinfo);
 				}
 			}
 		}
@@ -408,32 +411,39 @@ int  Cserial::ReadBuffer (std::string &buf, int nchars, std::string find1, std::
 			if (p1 != std::string::npos &&
 				p2 != std::string::npos &&
 				p2 > p1) {
-				snprintf(traceinfo, sizeof(traceinfo), "s1/s2: %s",
-					(hex ? str2hex(buf.c_str(), buf.length()) : buf.c_str()) );
-				if (progStatus.serialtrace) ser_trace(1, traceinfo);
-				return nread;
+				if (progStatus.serialtrace) {
+					char traceinfo[100];
+					snprintf(traceinfo, sizeof(traceinfo), "Buffer: %s",
+						str2hex(buf.c_str(), buf.length()) );
+					ser_trace(1, traceinfo);
+				}
 			}
-		} else if (find1.length()) {
-			p1 = buf.rfind(find1);
-			if (p1 != std::string::npos) {
-				std::string srx = buf;
-				if (srx[srx.length() - 1] == '\r') srx.replace(srx.length() -1, 1, "<cr>");
-				snprintf(traceinfo, sizeof(traceinfo), "s1  [%d](%d): %s",
-					buf.length(), nread,
-					(hex ? str2hex(srx.c_str(), srx.length()) : srx.c_str()) );
-				if (progStatus.serialtrace) ser_trace(1, traceinfo);
-				return nread;
-			}
-		} else if (nread >= nchars) {
-			hex = true;
-			snprintf(traceinfo, sizeof(traceinfo), "%d / %d: %s", nread, nchars, 
-				(hex ? str2hex(buf.c_str(), buf.length()) : buf.c_str()) );
-			if (progStatus.serialtrace) ser_trace(1, traceinfo);;
 			return nread;
 		}
+
+		else if (find1.length()) {
+			p1 = buf.rfind(find1);
+			if (p1 != std::string::npos) {
+				if (progStatus.serialtrace) {
+					char traceinfo[100];
+					std::string srx = buf;
+					if (srx[srx.length() - 1] == '\r') srx.replace(srx.length() -1, 1, "<cr>");
+					snprintf(traceinfo, sizeof(traceinfo), "Buffer: %s",
+						str2hex(buf.c_str(), buf.length()) );
+					ser_trace(1, traceinfo);
+				}
+				return nread;
+			}
+		}
+		tries--;
 	}
-	if (progStatus.serialtrace)
-		ser_trace(2, "FAILED: ", (hex ? str2hex(buf.c_str(), buf.length()) : buf.c_str()) );
+
+	if (progStatus.serialtrace) {
+		char traceinfo[100];
+		snprintf(traceinfo, sizeof(traceinfo), "Buffer: %s",
+			str2hex(buf.c_str(), buf.length()) );
+		ser_trace(1, traceinfo);
+	}
 
 	return nread;
 }

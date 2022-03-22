@@ -30,6 +30,7 @@
 #include <fcntl.h>
 
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Light_Button.H>
 
 #include "icons.h"
 #include "support.h"
@@ -57,10 +58,18 @@ Fl_Double_Window*	tracewindow = (Fl_Double_Window *)0;
 Fl_Text_Display*	tracedisplay = (Fl_Text_Display *)0;
 Fl_Text_Buffer*		tracebuffer = (Fl_Text_Buffer*)0;
 Fl_Button*			btn_cleartrace = (Fl_Button*)0;
+Fl_Light_Button*	btn_pausetrace = (Fl_Light_Button*)0;
 
 std::vector<std::string> tracestrings;
 
 bool stdout_trace = false;
+
+bool pausetrace = false;
+
+static void cb_pausetrace(Fl_Light_Button *o, void *)
+{
+	pausetrace = o->value();
+}
 
 static void cb_cleartrace(Fl_Button *, void *)
 {
@@ -74,6 +83,8 @@ void make_trace_window() {
 	tracedisplay->buffer(tracebuffer);
 	tracedisplay->textfont(FL_SCREEN);
 	tracedisplay->wrap_mode(Fl_Text_Display::WRAP_NONE, 100);
+	btn_pausetrace = new Fl_Light_Button(430, 275, 80, 20, _("Pause"));
+	btn_pausetrace->callback((Fl_Callback *)cb_pausetrace);
 	btn_cleartrace = new Fl_Button(515, 275, 80, 20, _("Clear"));
 	btn_cleartrace->callback((Fl_Callback *)cb_cleartrace);
 	tracewindow->resizable(tracedisplay);
@@ -94,10 +105,12 @@ static void update_tracetext(void *)
 	guard_lock tt(&mutex_trace);
 
 	if (tracewindow->visible()) {
-		if (tracedisplay->buffer()->length() > 100000)
-			tracedisplay->buffer()->text("");
-		for (size_t n = 0; n < tracestrings.size(); n++)
-			tracedisplay->insert(tracestrings[n].c_str());
+		if (!pausetrace) {
+			if (tracedisplay->buffer()->length() > 100000)
+				tracedisplay->buffer()->text("");
+			for (size_t n = 0; n < tracestrings.size(); n++)
+				tracedisplay->insert(tracestrings[n].c_str());
+		}
 	}
     tracestrings.clear();
 }

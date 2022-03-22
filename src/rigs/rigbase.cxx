@@ -385,7 +385,8 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 		send_to_remote(cmd, progStatus.byte_interval);
 		MilliSleep(delay + progStatus.tcpip_ping_delay);
 		retnbr = read_from_remote(replystr);
-		LOG_DEBUG ("%s: read %d bytes, %s", sz, retnbr, replystr.c_str());
+		LOG_DEBUG ("%s: read %d bytes, %s", sz, retnbr, 
+			(pr == HEX ? str2hex(replystr.c_str(), replystr.length()): replystr.c_str()));
 		return retnbr;
 	}
 
@@ -407,7 +408,8 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 
 	retnbr = RigSerial->ReadBuffer(replystr, n);
 
-	LOG_DEBUG ("%s: read %d bytes, %s", sz, retnbr, replystr.c_str());
+	LOG_DEBUG ("%s: read %d bytes, %s", sz, retnbr,
+			(pr == HEX ? str2hex(replystr.c_str(), replystr.length()): replystr.c_str()));
 	return retnbr;
 
 }

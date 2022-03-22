@@ -113,7 +113,7 @@ unsigned long int RIG_FT817::get_vfoA()
 	int ret = 0;
 	int repeat = 5;
 	do {
-		ret = waitN(5, 100, "get vfoA");
+		ret = waitN(5, 100, "get vfoA", HEX);
 		getthex("get_vfoA");
 		MilliSleep(100);
 	} while (ret < 5 && repeat--);
@@ -188,7 +188,7 @@ unsigned long int RIG_FT817::get_vfoB ()
 	int ret = 0;
 	int repeat = 5;
 	do {
-		ret = waitN(5, 100, "get vfoB");
+		ret = waitN(5, 100, "get vfoB", HEX);
 		getthex("get_vfoB");
 		MilliSleep(100);
 	} while (ret < 5 && repeat--);
@@ -292,7 +292,7 @@ int  RIG_FT817::get_power_out()
 {
 	init_cmd();
 	cmd[4] = 0xBD;
-	int ret = waitN(2, 100, "get PWR/SWR/ALC");
+	int ret = waitN(2, 100, "get PWR/SWR/ALC", HEX);
 	getthex("get_power_out");
 
 	if (ret < 2) return 0;
@@ -320,7 +320,7 @@ int  RIG_FT817::get_smeter()
 {
 	init_cmd();
 	cmd[4] = 0xE7;
-	int ret = waitN(1, 100, "get smeter");
+	int ret = waitN(1, 100, "get smeter", HEX);
 	getthex("get_smeter");
 	if (!ret) return 0;
 	int sval = replystr[0] & 0x0F;
@@ -346,7 +346,7 @@ int  RIG_FT817::get_split()
 	if (!PTT) return split;
 	init_cmd();
 	cmd[4] = 0xF7; // get transmit status
-	int ret = waitN(1, 100, "get TX status");
+	int ret = waitN(1, 100, "get TX status", HEX);
 	getthex("get_split");
 	if (ret == 0) return 0;
 	split = (replystr[0] & 0x20) == 0x20;

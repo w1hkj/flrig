@@ -31,7 +31,7 @@
 #define WITH_TRACED
 //usage
 //int TRACED(add, int a, int b)
-
+// opening brace is part of the macro
 extern Fl_Double_Window*	tracewindow;
 
 extern void trace(int n, ...); // all args of type const char *
@@ -51,41 +51,64 @@ extern void make_trace_window();
 #define sett(str) get_trace(5, str, "S: ", cmd.c_str(), " R: ", replystr.c_str())
 
 #define getthex(str) { \
-	static std::string hex1 = str2hex(cmd.c_str(), cmd.length()); \
-	static std::string hex2 = str2hex(replystr.c_str(), replystr.length()); \
+	static std::string hex1; \
+	hex1 = str2hex(cmd.c_str(), cmd.length()); \
+	static std::string hex2; \
+	hex2 = str2hex(replystr.c_str(), replystr.length()); \
 	get_trace(5, str, "S: ", hex1.c_str(), " R: ", hex2.c_str()); \
 }
 
 #define setthex(str) { \
-	static std::string hex1 = str2hex(cmd.c_str(), cmd.length()); \
-	static std::string hex2 = str2hex(replystr.c_str(), replystr.length()); \
+	static std::string hex1; \
+	hex1 = str2hex(cmd.c_str(), cmd.length()); \
+	static std::string hex2; \
+	hex2 = str2hex(replystr.c_str(), replystr.length()); \
 	get_trace(5, str, "S: ", hex1.c_str(), " R: ", hex2.c_str()); \
 }
 
 #define seth() { \
-	static std::string hex1 = str2hex(cmd.c_str(), cmd.length()); \
-	static std::string hex2 = str2hex(replystr.c_str(), replystr.length()); \
+	static std::string hex1; \
+	hex1 = str2hex(cmd.c_str(), cmd.length()); \
+	static std::string hex2; \
+	hex2 = str2hex(replystr.c_str(), replystr.length()); \
 	get_trace(4, "S: ", hex1.c_str(), " R: ", hex2.c_str()); \
 }
 
 #define geth() { \
-	static std::string hex1 = str2hex(cmd.c_str(), cmd.length()); \
-	static std::string hex2 = str2hex(replystr.c_str(), replystr.length()); \
+	static std::string hex1; \
+	hex1 = str2hex(cmd.c_str(), cmd.length()); \
+	static std::string hex2; \
+	hex2 = str2hex(replystr.c_str(), replystr.length()); \
 	get_trace(4, "S: ", hex1.c_str(), " R: ", hex2.c_str()); \
 }
 
 #define getcr(str) { \
-	static std::string s1 = cmd; \
-	static std::string s2 = replystr; \
-	if (s1[s1.length() - 1] == '\r') s1.replace(s1.length() -1, 1, "<cr>"); \
-	if (s2[s2.length() - 1] == '\r') s2.replace(s2.length() -1, 1, "<cr>"); \
-	get_trace(5, str, " S: ", s1.c_str(), " R: ", s2.c_str()); \
+	static std::string s1; \
+	s1 = cmd; \
+	static std::string s2; \
+	s2 = replystr; \
+	size_t n = 0; \
+	while (n < s1.length()) { \
+		if (s1[n] == '\r') s1.replace(n, 1, "<cr>"); \
+		n++; \
+	} \
+	n = 0; \
+	while (n < s2.length()) { \
+		if (s2[n] == '\r') s2.replace(n, 1, "<cr>"); \
+		n++; \
+	} \
+	get_trace(5, str, "  ", s1.c_str(), " / ", s2.c_str()); \
 }
 
 #define setcr(str) { \
-	static std::string s1 = cmd; \
-	if (s1[s1.length() - 1] == '\r') s1.replace(s1.length() -1, 1, "<cr>"); \
-	get_trace(3, str, " S: ", s1.c_str()); \
+	static std::string s1; \
+	s1 = cmd; \
+	size_t n = 0; \
+	while (n < s1.length()) { \
+		if (s1[n] == '\r') s1.replace(n, 1, "<cr>"); \
+		n++; \
+	} \
+	get_trace(3, str, "  ", s1.c_str()); \
 }
 
 #ifdef WITH_TRACED
