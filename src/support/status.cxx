@@ -526,6 +526,7 @@ status progStatus = {
 	0,			// int    cwioCONNECTED; 1 - connected state; 0 - unconnected state
 	0,			// int    cwioINVERTED; 1 - DTR/RTS (-) keying; 
 	0,			// double cwio_comp;
+	0,			// double cwio_keycorr;
 	"",			// std::string cwioPORT;
 
 	"","","","","","",
@@ -1137,6 +1138,7 @@ void status::saveLastState()
 
 	spref.set("cwioWPM", cwioWPM);
 	spref.set("cwio_comp", cwio_comp);
+	spref.set("cwio_keycorr", cwio_keycorr);
 	spref.set("cwioKEYLINE", cwioKEYLINE);
 	spref.set("cwioSHARED", cwioSHARED);
 	spref.set("cwioPTT", cwioPTT);
@@ -1870,6 +1872,7 @@ bool status::loadXcvrState(std::string xcvr)
 
 		spref.get("cwioWPM", cwioWPM, cwioWPM);
 		spref.get("cwio_comp", cwio_comp, cwio_comp);
+		spref.get("cwio_keycorr", cwio_keycorr, cwio_keycorr);
 		spref.get("cwioKEYLINE", cwioKEYLINE, cwioKEYLINE);
 		spref.get("cwioSHARED", cwioSHARED, cwioSHARED);
 		spref.get("cwioPTT", cwioPTT, cwioPTT);

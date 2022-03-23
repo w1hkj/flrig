@@ -122,7 +122,7 @@ Fl_Double_Window* cwio_window() {
         sldr_cwioWPM->labelsize(14);
         sldr_cwioWPM->labelcolor(FL_FOREGROUND_COLOR);
         sldr_cwioWPM->minimum(5);
-        sldr_cwioWPM->maximum(50);
+        sldr_cwioWPM->maximum(100);
         sldr_cwioWPM->step(1);
         sldr_cwioWPM->value(20);
         sldr_cwioWPM->textsize(14);
@@ -997,23 +997,29 @@ static void cb_cntr_cwioPTT(Fl_Spinner* o, void*) {
   progStatus.cwioPTT = o->value();
 }
 
+Fl_Check_Button *btn_cwioINVERTED=(Fl_Check_Button *)0;
+
+static void cb_btn_cwioINVERTED(Fl_Check_Button* o, void*) {
+  progStatus.cwioINVERTED = o->value();
+reset_cwioport();
+}
+
+Fl_Counter *cnt_cwio_comp=(Fl_Counter *)0;
+
+static void cb_cnt_cwio_comp(Fl_Counter* o, void*) {
+  progStatus.cwio_comp = o->value();
+}
+
 Fl_Light_Button *btn_cw_dtr_calibrate=(Fl_Light_Button *)0;
 
 static void cb_btn_cw_dtr_calibrate(Fl_Light_Button*, void*) {
   calibrate_cwio();
 }
 
-Fl_Counter *cnt_cwio_comp=(Fl_Counter *)0;
+Fl_Counter *cnt_cwio_keycorr=(Fl_Counter *)0;
 
-static void cb_cnt_cwio_comp(Fl_Counter* o, void*) {
-  progStatus.cwio_comp = int(o->value());
-}
-
-Fl_Check_Button *btn_cwioINVERTED=(Fl_Check_Button *)0;
-
-static void cb_btn_cwioINVERTED(Fl_Check_Button* o, void*) {
-  progStatus.cwioINVERTED = o->value();
-reset_cwioport();
+static void cb_cnt_cwio_keycorr(Fl_Counter* o, void*) {
+  progStatus.cwio_keycorr = o->value();
 }
 
 Fl_Double_Window* cwio_config_dialog() {
@@ -1041,28 +1047,28 @@ Fl_Double_Window* cwio_config_dialog() {
         btn_cwioCONNECT->callback((Fl_Callback*)cb_btn_cwioCONNECT);
         o->value(progStatus.cwioCONNECTED);
       } // Fl_Light_Button* btn_cwioCONNECT
-      { Fl_Check_Button* o = btn_cwioCAT = new Fl_Check_Button(111, 15, 23, 15, _("Use CAT"));
+      { Fl_Check_Button* o = btn_cwioCAT = new Fl_Check_Button(74, 15, 23, 15, _("Use CAT"));
         btn_cwioCAT->tooltip(_("Use DTR/RTS on CAT serial port"));
         btn_cwioCAT->down_box(FL_DOWN_BOX);
         btn_cwioCAT->callback((Fl_Callback*)cb_btn_cwioCAT);
         btn_cwioCAT->align(Fl_Align(FL_ALIGN_LEFT));
         o->value(progStatus.cwioSHARED == 1);
       } // Fl_Check_Button* btn_cwioCAT
-      { Fl_Check_Button* o = btn_cwioAUX = new Fl_Check_Button(112, 46, 23, 15, _("Use AUX"));
+      { Fl_Check_Button* o = btn_cwioAUX = new Fl_Check_Button(75, 46, 23, 15, _("Use AUX"));
         btn_cwioAUX->tooltip(_("Use DTR/RTS on Auxiliary serial port"));
         btn_cwioAUX->down_box(FL_DOWN_BOX);
         btn_cwioAUX->callback((Fl_Callback*)cb_btn_cwioAUX);
         btn_cwioAUX->align(Fl_Align(FL_ALIGN_LEFT));
         o->value(progStatus.cwioSHARED == 2);
       } // Fl_Check_Button* btn_cwioAUX
-      { Fl_Check_Button* o = btn_cwioSEP = new Fl_Check_Button(208, 15, 23, 15, _("Use SEP"));
+      { Fl_Check_Button* o = btn_cwioSEP = new Fl_Check_Button(160, 15, 23, 15, _("Use SEP"));
         btn_cwioSEP->tooltip(_("Use DTR/RTS Separate serial port"));
         btn_cwioSEP->down_box(FL_DOWN_BOX);
         btn_cwioSEP->callback((Fl_Callback*)cb_btn_cwioSEP);
         btn_cwioSEP->align(Fl_Align(FL_ALIGN_LEFT));
         o->value(progStatus.cwioSHARED == 3);
       } // Fl_Check_Button* btn_cwioSEP
-      { Fl_ListBox* o = listbox_cwioKEYLINE = new Fl_ListBox(593, 41, 65, 24, _("CW Keyline"));
+      { Fl_ListBox* o = listbox_cwioKEYLINE = new Fl_ListBox(593, 41, 65, 24, _("Keyline"));
         listbox_cwioKEYLINE->tooltip(_("Select either DTR or RTS for keyline"));
         listbox_cwioKEYLINE->box(FL_DOWN_BOX);
         listbox_cwioKEYLINE->color(FL_BACKGROUND2_COLOR);
@@ -1085,26 +1091,36 @@ Fl_Double_Window* cwio_config_dialog() {
         cntr_cwioPTT->callback((Fl_Callback*)cb_cntr_cwioPTT);
         o->value(progStatus.cwioPTT);
       } // Fl_Spinner* cntr_cwioPTT
-      { btn_cw_dtr_calibrate = new Fl_Light_Button(384, 10, 84, 24, _("Calibrate"));
-        btn_cw_dtr_calibrate->selection_color((Fl_Color)6);
-        btn_cw_dtr_calibrate->callback((Fl_Callback*)cb_btn_cw_dtr_calibrate);
-      } // Fl_Light_Button* btn_cw_dtr_calibrate
-      { Fl_Counter* o = cnt_cwio_comp = new Fl_Counter(368, 41, 100, 24, _("Comp (msec)"));
-        cnt_cwio_comp->tooltip(_("Timing compensation"));
-        cnt_cwio_comp->minimum(0);
-        cnt_cwio_comp->maximum(10);
-        cnt_cwio_comp->callback((Fl_Callback*)cb_cnt_cwio_comp);
-        cnt_cwio_comp->align(Fl_Align(FL_ALIGN_LEFT));
-        o->value(progStatus.cwio_comp);
-        o->lstep(1.0);
-      } // Fl_Counter* cnt_cwio_comp
-      { Fl_Check_Button* o = btn_cwioINVERTED = new Fl_Check_Button(208, 46, 23, 15, _("Inverted"));
+      { Fl_Check_Button* o = btn_cwioINVERTED = new Fl_Check_Button(160, 46, 23, 15, _("Inverted"));
         btn_cwioINVERTED->tooltip(_("DTR/RTS signaling is inverted\n(-) keying"));
         btn_cwioINVERTED->down_box(FL_DOWN_BOX);
         btn_cwioINVERTED->callback((Fl_Callback*)cb_btn_cwioINVERTED);
         btn_cwioINVERTED->align(Fl_Align(FL_ALIGN_LEFT));
         o->value(progStatus.cwioINVERTED);
       } // Fl_Check_Button* btn_cwioINVERTED
+      { Fl_Counter* o = cnt_cwio_comp = new Fl_Counter(190, 10, 125, 24, _("WPM Comp msec"));
+        cnt_cwio_comp->tooltip(_("Timing compensation"));
+        cnt_cwio_comp->minimum(0);
+        cnt_cwio_comp->maximum(10);
+        cnt_cwio_comp->callback((Fl_Callback*)cb_cnt_cwio_comp);
+        cnt_cwio_comp->align(Fl_Align(FL_ALIGN_RIGHT));
+        o->value(progStatus.cwio_comp);
+        o->lstep(1.0);
+      } // Fl_Counter* cnt_cwio_comp
+      { btn_cw_dtr_calibrate = new Fl_Light_Button(444, 10, 84, 24, _("Calibrate"));
+        btn_cw_dtr_calibrate->selection_color((Fl_Color)6);
+        btn_cw_dtr_calibrate->callback((Fl_Callback*)cb_btn_cw_dtr_calibrate);
+      } // Fl_Light_Button* btn_cw_dtr_calibrate
+      { Fl_Counter* o = cnt_cwio_keycorr = new Fl_Counter(190, 41, 125, 24, _("Xcvr comp msec"));
+        cnt_cwio_keycorr->tooltip(_("Compensate for xcvr keying distortion"));
+        cnt_cwio_keycorr->minimum(-10);
+        cnt_cwio_keycorr->maximum(10);
+        cnt_cwio_keycorr->step(0.01);
+        cnt_cwio_keycorr->callback((Fl_Callback*)cb_cnt_cwio_keycorr);
+        cnt_cwio_keycorr->align(Fl_Align(FL_ALIGN_RIGHT));
+        o->value(progStatus.cwio_keycorr);
+        o->lstep(0.10);
+      } // Fl_Counter* cnt_cwio_keycorr
       o->end();
     } // Fl_Group* o
     o->end();

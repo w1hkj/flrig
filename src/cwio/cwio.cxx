@@ -151,6 +151,7 @@ void send_cwkey(char c)
 	static double tc = 0;
 	static double tch = 0;
 	static double twd = 0;
+	static double xcvr_corr = 0;
 	Cserial *port = cwio_serial;
 
 	switch (progStatus.cwioSHARED) {
@@ -176,6 +177,10 @@ void send_cwkey(char c)
 		twd = twd - 4 * progStatus.cwio_comp;
 	}
 
+	xcvr_corr = progStatus.cwio_keycorr * 1e-3;
+	if (xcvr_corr < -tc / 2) xcvr_corr = - tc / 2;
+	else if (xcvr_corr > tc / 2) xcvr_corr = tc / 2;
+
 	if (c == ' ' || c == 0x0a) {
 		cw_sleep(twd);
 		goto exit_send_cwkey;
@@ -192,7 +197,7 @@ void send_cwkey(char c)
 			port->setRTS(progStatus.cwioINVERTED ? 0 : 1);
 		}
 		if (code[n] == '.')
-			cw_sleep(tc);
+			cw_sleep(tc + xcvr_corr);
 		else
 			cw_sleep(tch);
 
@@ -204,7 +209,7 @@ void send_cwkey(char c)
 		if (n == code.length() -1)
 			cw_sleep(tch);
 		else
-			cw_sleep(tc);
+			cw_sleep(tc - xcvr_corr);
 	}
 
 exit_send_cwkey:

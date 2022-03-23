@@ -47,9 +47,10 @@ extern Fl_Check_Button *btn_cwioSEP;
 extern Fl_ListBox *listbox_cwioKEYLINE;
 #include <FL/Fl_Spinner.H>
 extern Fl_Spinner *cntr_cwioPTT;
-extern Fl_Light_Button *btn_cw_dtr_calibrate;
+extern Fl_Check_Button *btn_cwioINVERTED;
 #include <FL/Fl_Counter.H>
 extern Fl_Counter *cnt_cwio_comp;
-extern Fl_Check_Button *btn_cwioINVERTED;
+extern Fl_Light_Button *btn_cw_dtr_calibrate;
+extern Fl_Counter *cnt_cwio_keycorr;
 Fl_Double_Window* cwio_config_dialog();
 #endif

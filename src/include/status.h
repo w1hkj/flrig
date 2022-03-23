@@ -515,7 +515,9 @@ struct status {
 	int		cwioCONNECTED;
 	int		cwioINVERTED;
 	double	cwio_comp;
+	double	cwio_keycorr;
 	std::string	cwioPORT;
+
 	std::string	cwio_msgs[12];
 	std::string	cwio_labels[12];
 
