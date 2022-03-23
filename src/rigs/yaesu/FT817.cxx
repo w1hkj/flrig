@@ -66,17 +66,12 @@ RIG_FT817::RIG_FT817() {
 	inuse = onNIL;
 }
 
-static void settle(int n)
-{
-	for (int i = 0; i < n/50; i++) {MilliSleep(50); Fl::awake();}
-}
-
 void RIG_FT817::init_cmd()
 {
 	cmd = "00000";
 	replystr = "00000";
 	for (size_t i = 0; i < 5; i++) cmd[i] = replystr[i] = 0;
-	MilliSleep(20); // slows down the CAT strings enough to give the poor ol' 817 time to catch it's breath
+	MilliSleep(5);  // Needed for the old slow '817
 }
 
 void RIG_FT817::selectA()
@@ -146,7 +141,6 @@ void RIG_FT817::set_vfoA (unsigned long int freq)
 	cmd = to_bcd(freq, 8);
 	cmd += 0x01;
 	sendCommand(cmd);
-	settle(150);
 	setthex("set_vfoA");
 }
 
@@ -167,8 +161,6 @@ void RIG_FT817::set_modeA(int val)
 	cmd[4] = 0x07;
 	sendCommand(cmd);
 	setthex("set_modeA");
-
-	settle(150);
 
 	get_vfoA();
 	int n = 0;
@@ -221,7 +213,6 @@ void RIG_FT817::set_vfoB (unsigned long int freq)
 	cmd = to_bcd(freq, 8);
 	cmd += 0x01;
 	sendCommand(cmd);
-	settle(150);
 	setthex("set_vfoB");
 }
 
@@ -237,8 +228,6 @@ void RIG_FT817::set_modeB(int val)
 	cmd[4] = 0x07;
 	sendCommand(cmd);
 	setthex("set_modeB");
-
-	settle(150);
 
 	get_vfoB();
 	int n = 0;

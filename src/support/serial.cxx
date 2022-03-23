@@ -98,6 +98,8 @@ bool Cserial::OpenPort()  {
 		ser_trace(1, traceinfo);
 	}
 
+	MilliSleep(5); // K0OG
+
 // save current port settings
 	tcflush (fd, TCIFLUSH);
 
@@ -566,6 +568,9 @@ bool Cserial::OpenPort()
 		}
 
 	ConfigurePort( baud, 8, false, NOPARITY, stopbits);
+
+	MilliSleep(5); // K0OG
+
 	FlushBuffer();
 	failed_ = false;
 

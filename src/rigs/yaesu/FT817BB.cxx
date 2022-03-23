@@ -79,7 +79,7 @@ void RIG_FT817BB::init_cmd()
 {
 	cmd = "00000";
 	for (size_t i = 0; i < 5; i++) cmd[i] = 0;
-	MilliSleep(20); // slows down the CAT strings enough to give the poor ol' 817 time to catch it's breath
+	MilliSleep(5);
 }
 
 static bool ft817BB_memory_mode = false;

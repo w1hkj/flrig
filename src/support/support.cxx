@@ -1137,6 +1137,11 @@ void set_ptt(void *d)
 
 void check_ptt()
 {
+	if (selrig->name_ == rig_FT817.name_ ||
+		selrig->name_ == rig_FT817BB.name_ ||
+		selrig->name_ == rig_FT818ND.name_ ) {
+		return;
+	}
 	int chk = ptt_state();
 	if (chk != PTT) {
 		PTT = chk;
@@ -1153,8 +1158,8 @@ void check_break_in()
 //static bool resetrcv = true;
 //static bool resetxmt = true;
 
-// On the Yaesu FT-891, the mode must be set before VFO, since mode
-// changes can shift frequency.
+// On early model Yaesu transceivers, the mode must be set before VFO,
+// since mode changes can shift frequency.
 //
 // For example, might set freq to 7123.000, but then change mode from USB
 // to DATA-U.  This mode shift would change the VFO to  7123.700, instead
