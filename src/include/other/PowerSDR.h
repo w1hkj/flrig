@@ -96,6 +96,8 @@ enum PowerSDRMODES { LSB, USB, DSB, CWL, CWU, FM, AM, DIGU, SPEC, DIGL, SAM, DRM
 	void set_auto_notch(int v);
 	int  get_auto_notch();
 
+	void set_noise(bool on);
+	int get_noise();
 	void set_noise_reduction_val(int val);
 	int  get_noise_reduction_val();
 	void set_noise_reduction(int val);

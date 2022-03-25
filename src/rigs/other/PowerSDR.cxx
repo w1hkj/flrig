@@ -850,6 +850,25 @@ int  RIG_PowerSDR::get_auto_notch()
 	return anotch;
 }
 
+void RIG_PowerSDR::set_noise(bool on)
+{
+    if (on)
+       cmd = "ZZNA1;";
+    else
+       cmd = "ZZNA0;";
+    wait_char('\r', 1, 100, "set Noise Blanker", ASC);
+}
+
+int RIG_PowerSDR::get_noise()
+{
+    cmd = "ZZNA;";
+    int ret = wait_char(';', 6, 100, "get Noise Blanker", ASC);
+    if (ret < 6) return progStatus.noise;
+    size_t p = replystr.rfind("NA");
+    if (p == std::string::npos) return progStatus.noise;
+    return (replystr[p+2] == '1' ? 1 : 0);
+}
+
 void RIG_PowerSDR::set_noise_reduction(int val)
 {
 	if (val == -1) {
