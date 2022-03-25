@@ -1,6 +1,65 @@
-2021-12-24  dave-w1hkj  <w1hkj@bellsouth.net>
+2022-03-25  dave-w1hkj  <w1hkj@bellsouth.net>
 
-	7cdd4905: Version 1.4.4
+	da52823a: Version 1.4.5
+
+2022-03-25  Black Michael  <mdblack98@yahoo.com>
+
+	745a55f9: PowerSDR
+
+2022-03-23  dave-w1hkj  <w1hkj@bellsouth.net>
+
+	db77a6c1: cwio xcvr compensation
+	63ab1da3: FT817 startup
+	52a1e5a3: trace mod
+	8d0a23c2: Serial Trace
+	b6ce40b9: TS990
+	c8b4fbc8: IC F8101
+	f7bb8b2c: testmode
+	15d8025d: visible tab
+	4d7e2f87: Variable PTT
+	cbd1758d: TT566
+	5744c28f: FT817mod
+	a059301c: RX polling
+	351a5a5a: FT 857/897/D
+	8442cb1d: TABS tracking
+	05ff6c50: freq control
+	109ddb49: TT Eagle
+	53183eb5: vfo AB
+	1df769ad: Xiegu X6100
+	104a9d6f: traced
+	ff699399: Source structure
+	f78f4b95: Start up values
+	2b00f166: setthex
+	baee9877: fskio idle
+	e69c257e: Power SDR
+	1957addc: namespace std
+	d5a45aca: AGC controls
+	029edeb1: IC705 update
+	3e2ead62: FT 817
+	d209e151: 7300 power table
+	916234ab: CW keydown
+	b85adab7: cwio fskio
+	3bb8fde3: 10 W Power scale
+	c968af13: FT1000MP-MKV
+	1e75dcfa: G90 update
+	757d9e3c: xmlrpc mod vol
+	a85b09d0: VFO in use
+	a7cda5b2: tab visible
+
+2021-12-29  Kenji Rikitake  <kenji.rikitake@acm.org>
+
+	9ec25e94: FT-891 split
+
+2021-12-28  dave-w1hkj  <w1hkj@bellsouth.net>
+
+	09d3cef4: FT990/A
+	906fe833: FTdx10
+	3adf15ba: TX500
+	bf399908: Start up failure
+	aac53a14: TS2000 split
+	1f235a46: FTdx101D split
+	e5da29b4: TX vfo
+	047aadbd: Version 1.4.4
 	a7994ad9: TX500 update
 	be98a622: IC7300 response strings
 	c136601f: voltmeter menu item

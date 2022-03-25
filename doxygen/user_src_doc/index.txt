@@ -19,7 +19,7 @@
 
 /*!
 
-\mainpage FLRIG Users Manual - Version 1.4.3
+\mainpage FLRIG Users Manual - Version 1.4.5
 
 \tableofcontents
 
@@ -797,11 +797,26 @@ The DTR/RTS port can be either
 <li>shared with the SEP port</li>
 <li>shared with the AUX port</li>
 <li>a unique serial port configured on this dialog</li>
-<li>select either DTR or RTS for the keyline as required by h/w</li>
-<li>Calibrate button sends standard "PARIS " word, WPM times.  Program 
-measures actual time to transmit and sets compensation value.  Comp(msec) 
-can be adjusted by user.</li>
 </ul>
+
+Select either DTR or RTS for the keyline as required by h/w.
+
+Calibrate button sends standard "PARIS " word, WPM times.  Program 
+measures actual time to transmit and sets compensation value.  WPM Comp msec 
+can be adjusted by user.
+
+Xcvr comp msec is used to increase or decrease each key down interval by 
+the specified time interval.  
+
+<center>
+\image latex flrig-24wpm.png "7300 CW DTR/RTS keying @ 24 WPM" width=6.0in
+\image html  flrig-24wpm.png "7300 CW DTR/RTS keying @ 24 WPM"
+</center>
+
+The effect of a -2 msec Xcvr comp adjustment is clearly seen and easily heard.  
+It is especially important to correct weight errors introduced by the transceiver 
+keying circuits when operating QRQ (high speed CW).  At 80 wpm 2 msec is a significant
+part of the target dit interval of 15 msec.
 
 PTT delay is in milliseconds.  Enter a non-zero value to enable a delay 
 between the PTT-on and the first CW keyline closure.  The same delay will 

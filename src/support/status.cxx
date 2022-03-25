@@ -1927,10 +1927,6 @@ bool status::loadXcvrState(std::string xcvr)
 			FSK_msgs[n] = defbuffer;
 		}
 
-// testing 817
-		gettrace = settrace = serialtrace = true;
-		rigtrace = trace = false;
-
 		return true; 
 	}
 	return false;
