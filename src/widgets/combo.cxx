@@ -303,10 +303,10 @@ Fl_ComboBox::~Fl_ComboBox()
 
 int Fl_ComboBox::handle(int event)
 {
-	if (event == FL_PUSH) {
-		fl_popbrwsr (this);
-		return 1;
-	}
+//	if (event == FL_PUSH) {
+//		fl_popbrwsr (this);
+//		return 1;
+//	}
 	return Fl_Group::handle(event);
 }
 
