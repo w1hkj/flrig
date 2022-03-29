@@ -314,7 +314,12 @@ int RIG_FT450D::get_vfoAorB()
 	wait_char(';', 4, FL450D_WAIT_TIME, "get vfo A/B", ASC);
 	gett("get vfo A/B");
 	p = replystr.rfind(rsp);
-	return (replystr[p+2] == '1');
+	if (p == std::string::npos) return onNIL;
+	if (replystr[p+2] == '1')
+		inuse = onB;
+	else
+		inuse = onA;
+	return inuse;
 }
 
 void RIG_FT450D::set_split(bool on)

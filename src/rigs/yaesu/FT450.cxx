@@ -235,9 +235,9 @@ unsigned long int RIG_FT450::get_vfoA ()
 {
 	cmd = rsp = "FA";
 	cmd += ';';
-	waitN(11, 100, "get vfo A", ASC);
+	wait_char(';',11, 200, "get vfo A", ASC);
 
-	rig_trace(2, "get_vfoA()", replystr.c_str());
+	gett("get_vfoA");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return freqA;
@@ -264,9 +264,9 @@ unsigned long int RIG_FT450::get_vfoB ()
 {
 	cmd = rsp = "FB";
 	cmd += ';';
-	waitN(11, 100, "get vfo B", ASC);
+	wait_char(';',11, 200, "get vfo B", ASC);
 
-	rig_trace(2, "get_vfoB()", replystr.c_str());
+	gett("get_vfoB");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return freqB;
@@ -287,6 +287,22 @@ void RIG_FT450::set_vfoB (unsigned long int freq)
 	}
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET vfo B", cmd, replystr);
+}
+
+int RIG_FT450::get_vfoAorB()
+{
+	size_t p;
+	cmd = rsp = "VS";
+	cmd.append(";");
+	wait_char(';', 4, 200, "get vfo A/B", ASC);
+	gett("get vfo A/B");
+	p = replystr.rfind(rsp);
+	if (p == std::string::npos) return onNIL;
+	if (replystr[p+2] == '1')
+		inuse = onB;
+	else
+		inuse = onA;
+	return inuse;
 }
 
 void RIG_FT450::set_split(bool on)
@@ -320,9 +336,10 @@ int RIG_FT450::get_smeter()
 {
 	cmd = rsp = "SM0";
 	cmd += ';';
-	waitN(7, 100, "get smeter", ASC);
 
-	rig_trace(2, "get_smeter()", replystr.c_str());
+	get_trace(1, "get_smeter()");
+	wait_char(';',7, 200, "get smeter", ASC); // sets replystr via rigbase
+	gett("");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return 0;
@@ -502,9 +519,9 @@ int RIG_FT450::get_attenuator()
 {
 	cmd = rsp = "RA0";
 	cmd += ';';
-	waitN(5, 100, "get att", ASC);
 
-	rig_trace(2, "get_attenuator()", replystr.c_str());
+	wait_char(';', 5, 200, "get att", ASC);
+	gett("get_attenuator");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return 0;
@@ -523,9 +540,9 @@ int RIG_FT450::get_preamp()
 {
 	cmd = rsp = "PA0";
 	cmd += ';';
-	waitN(5, 100, "get pre", ASC);
 
-	rig_trace(2, "get_preamp()", replystr.c_str());
+	wait_char(';', 5, 200, "get pre", ASC);
+	gett("get_preamp");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return 0;
@@ -575,9 +592,9 @@ int RIG_FT450::get_modeA()
 {
 	cmd = rsp = "MD0";
 	cmd += ';';
-	waitN(5, 100, "get mode A", ASC);
 
-	rig_trace(2, "get_modeA()", replystr.c_str());
+	wait_char(';', 5, 200, "get mode A", ASC);
+	gett("get_modeA");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return modeA;
@@ -651,9 +668,9 @@ int RIG_FT450::get_bwA()
 {
 	cmd = rsp = "SH0";
 	cmd += ';';
-	waitN(6, 100, "get bw A", ASC);
 
-	rig_trace(2, "get_bwA()", replystr.c_str());
+	wait_char(';', 6, 200, "get bw A", ASC);
+	gett("get_bwA");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return bwA;
@@ -688,9 +705,9 @@ int RIG_FT450::get_modeB()
 {
 	cmd = rsp = "MD0";
 	cmd += ';';
-	waitN(5, 100, "get mode B", ASC);
 
-	rig_trace(2, "get_modeB()", replystr.c_str());
+	wait_char(';', 5, 200, "get mode B", ASC);
+	gett("get_modeB");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return modeB;
@@ -719,9 +736,9 @@ int RIG_FT450::get_bwB()
 {
 	cmd = rsp = "SH0";
 	cmd += ';';
-	waitN(6, 100, "get bw B", ASC);
 
-	rig_trace(2, "get_bwB()", replystr.c_str());
+	wait_char(';', 6, 200, "get bw B", ASC);
+	gett("get_bwB");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return bwB;
@@ -1027,9 +1044,9 @@ int  RIG_FT450::get_noise_reduction_val()
 	int val = 1;
 	cmd = rsp = "RL0";
 	cmd.append(";");
-	waitN(6, 100, "GET noise reduction val", ASC);
 
-	rig_trace(2, "get_noise_reduction_val()", replystr.c_str());
+	wait_char(';', 6, 200, "GET noise reduction level", ASC);
+	gett("get_noise_reduction_val");
 
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return val;
@@ -1050,7 +1067,10 @@ int  RIG_FT450::get_noise_reduction()
 	int val;
 	cmd = rsp = "NR0";
 	cmd.append(";");
-	waitN(5, 100, "GET noise reduction", ASC);
+
+	wait_char(';', 5, 200, "GET noise reduction", ASC);
+	gett("get_noise_reduction");
+
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return 0;
 	val = replystr[p+3] - '0';
