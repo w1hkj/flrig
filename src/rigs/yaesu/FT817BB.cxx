@@ -36,14 +36,24 @@ static const char *FT817BBmodes_[] = {
 static const int FT817BB_mode_val[] =  { 0, 1, 2, 3, 4, 8, 0x0A, 0x0C };
 static const char FT817BB_mode_type[] = { 'L', 'U', 'U', 'L', 'U', 'U', 'U', 'U' };
 
+/*
+PARAMETER DEFAULT SUGGESTED
+========= ======= =========
+Retries      2        4
+Timeout     50       50
+Cmds         5       10
+Poll int   200      333
+Byte int     0        1
+*/
+
 RIG_FT817BB::RIG_FT817BB() {
 // base class values	
 	name_ = FT817BBname_;
 	modes_ = FT817BBmodes_;
 	comm_baudrate = BR4800;
 	stopbits = 2;
-	comm_retries = 2;
-	comm_wait = 5;
+	comm_retries = 4;
+	comm_wait = 10;
 	comm_timeout = 50;
 	comm_rtscts = false;
 	comm_rtsplus = false;

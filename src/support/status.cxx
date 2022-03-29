@@ -74,8 +74,8 @@ status progStatus = {
 	false,		// bool comm_rtscts;
 	false,		// bool comm_rtsplus;
 	false,		// bool comm_dtrplus;
-	200,		// int  serloop_timing;
-	0,			// int  byte_interval;
+	500,		// int  serloop_timing;
+	1,			// int  byte_interval;
 
 	"NONE",		// std::string aux_serial_port;
 	false,		// bool aux_SCU_17;

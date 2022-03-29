@@ -39,8 +39,8 @@ RIG_FT818ND::RIG_FT818ND() {
 	modes_ = FT818NDmodes_;
 	comm_baudrate = BR4800;
 	stopbits = 2;
-	comm_retries = 2;
-	comm_wait = 5;
+	comm_retries = 4;
+	comm_wait = 10;
 	comm_timeout = 50;
 	comm_rtscts = false;
 	comm_rtsplus = false;
