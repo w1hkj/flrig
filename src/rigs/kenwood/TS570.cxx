@@ -225,7 +225,7 @@ int RIG_TS570::get_split()
 	if (n < 38) return split;
 	size_t p = replystr.rfind("IF");
 	if (p == std::string::npos) return split;
-	split = replystr[p+32] ? true : false;
+	split = replystr[p+32]=='1' ? true : false;
 	return split;
 }
 
