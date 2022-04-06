@@ -141,6 +141,9 @@ void TRACED(vfo_startup_data, XCVR_STATE &xcvrvfo)
 	if (selrig->has_rf_control)
 		xcvrvfo.rf_gain = selrig->get_rf_gain();
 
+	if (selrig->has_compression)
+		selrig->get_compression (xcvrvfo.compON, xcvrvfo.compression);
+
 	update_progress(progress->value() + 4);
 
 }

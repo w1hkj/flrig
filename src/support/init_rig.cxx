@@ -222,6 +222,8 @@ void TRACED(init_generic_rig)
 
 	progStatus.compON = xcvr_vfoA.compON;
 	progStatus.compression = xcvr_vfoA.compression;
+	if (selrig->has_compression)
+		update_compression(NULL);
 
 //	vfo = &vfoA;
 
