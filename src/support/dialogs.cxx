@@ -81,6 +81,11 @@ void clear_combos()
 
 void add_combos(char *port)
 {
+	if (progStatus.serialtrace) {
+		static char sztr[100];
+		snprintf(sztr, sizeof(sztr), "Discovered %s", port);
+		ser_trace(1, sztr);
+	}
 	selectCommPort->add(port);
 	selectAuxPort->add(port);
 	selectSepPTTPort->add(port);

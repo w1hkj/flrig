@@ -1799,6 +1799,17 @@ bool status::loadXcvrState(std::string xcvr)
 		if (spref.get("startstoptrace", i, start_stop_trace)) start_stop_trace = i;
 		if (spref.get("rpctrace", i, rpctrace)) rpctrace = i;
 
+#ifndef NDEBUG
+		trace =
+		rigtrace =
+		settrace =
+		debugtrace =
+		xmltrace =
+		rpctrace =
+		serialtrace =
+		gettrace = true;
+#endif
+
 		spref.get("rpc_level", rpc_level, rpc_level);
 
 		spref.get("f160", f160, f160); spref.get("m160", m160, m160);
@@ -2315,6 +2326,7 @@ static bool strace;
 static bool srigtrace;
 static bool ssettrace;
 static bool sgettrace;
+static bool sstrace;
 
 void ss_trace(bool on)
 {
@@ -2323,16 +2335,19 @@ void ss_trace(bool on)
 		srigtrace = progStatus.rigtrace;
 		ssettrace = progStatus.settrace;
 		sgettrace = progStatus.gettrace;
+		sstrace   = progStatus.serialtrace;
 
 		progStatus.trace =
 		progStatus.rigtrace =
 		progStatus.settrace =
+		progStatus.serialtrace =
 		progStatus.gettrace = true;
 	} else {
 		progStatus.trace = strace;
 		progStatus.rigtrace = srigtrace;
 		progStatus.settrace = ssettrace;
 		progStatus.gettrace = sgettrace;
+		progStatus.serialtrace = sstrace;
 	}
 }
 

@@ -73,8 +73,11 @@ Cserial::~Cserial() {
 ///////////////////////////////////////////////////////
 bool Cserial::CheckPort(std::string dev)  {
 	int testfd = open( dev.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
-	if (testfd < 0)
+	if (testfd < 0) {
+		snprintf(traceinfo, sizeof(traceinfo), "%s checkPort() FAILED", dev.c_str());
+		ser_trace(1, traceinfo);
 		return false;
+	}
 	close(fd);
 	return true;
 }
@@ -89,7 +92,8 @@ bool Cserial::OpenPort()  {
 
 	if (IsOpen()) ClosePort();
 	if ((fd = open( device.c_str(), O_RDWR | O_NOCTTY | O_NDELAY )) < 0) {
-		ser_trace(1, "OpenPort() FAILED");
+		snprintf(traceinfo, sizeof(traceinfo), "%s OpenPort() FAILED", device.c_str());
+		ser_trace(1, traceinfo);
 		return false;
 	}
 
@@ -273,9 +277,12 @@ void Cserial::setRTS(bool b)
 	else 
 		state &= ~TIOCM_RTS; // toggle low
 
-	if (ioctl(fd, TIOCMSET, &state) == -1)
-		LOG_ERROR("set RTS ioctl error: %d", errno);
-
+	if (ioctl(fd, TIOCMSET, &state) == -1) {
+		char errstr[50];
+		snprintf(errstr, sizeof(errstr), "set RTS ioctl error: %d", errno);
+		LOG_ERROR("%s", errstr);
+		ser_trace(1, errstr);
+	}
 }
 
 void Cserial::setDTR(bool b)
@@ -288,8 +295,12 @@ void Cserial::setDTR(bool b)
 		state |= TIOCM_DTR;	  // toggle high
 	else
 		state &= ~TIOCM_DTR;	 // toggle low
-	if (ioctl(fd, TIOCMSET, &state) == -1)
-		LOG_ERROR("set DTR ioctl error: %d", errno);
+	if (ioctl(fd, TIOCMSET, &state) == -1) {
+		char errstr[50];
+		snprintf(errstr, sizeof(errstr), "set DTR ioctl error: %d", errno);
+		LOG_ERROR("%s", errstr);
+		ser_trace(1, errstr);
+	}
 
 }
 
@@ -300,8 +311,8 @@ void Cserial::setDTR(bool b)
 ///////////////////////////////////////////////////////
 void Cserial::ClosePort()
 {
-char msg[50];
-snprintf(msg, sizeof(msg),"ClosePort(): fd = %d", fd);
+	char msg[50];
+	snprintf(msg, sizeof(msg),"ClosePort(): fd = %d", fd);
 	ser_trace(1, msg);
 	if (fd < 0) return;
 	int myfd = fd;
@@ -321,7 +332,7 @@ snprintf(msg, sizeof(msg),"ClosePort(): fd = %d", fd);
 //	ioctl(myfd, TIOCMSET, &origstate);
 //	tcsetattr (myfd, TCSANOW, &oldtio);
 	close(myfd);
-ser_trace(1,"serial port closed");
+	ser_trace(1,"serial port closed");
 	fd = -1;
 	failed_ = false;
 	return;
@@ -459,7 +470,7 @@ int  Cserial::ReadBuffer (std::string &buf, int nchars, std::string find1, std::
 int Cserial::WriteBuffer(const char *buff, int n)
 {
 	if (fd < 0) {
-ser_trace(1, "WriteBuffer(...) fd < 0");
+		ser_trace(1, "WriteBuffer(...) fd < 0");
 		return 0;
 	}
 	int ret = write (fd, buff, n);
