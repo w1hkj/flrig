@@ -25,6 +25,9 @@
 #include "debug.h"
 #include "support.h"
 
+// Set this to enable my updates
+// These relate to how the rig behaves when in split mode.
+
 enum mFTdx3000 {
   mLSB, mUSB, mCW, mFM, mAM, mRTTY_L, mCW_R, mPKT_L, mRTTY_U, mPKT_FM, mFM_N, mPKT_U, mAM_N };
 // mLSB, mUSB, mCW, mFM, mAM, mRTTY_L, mCW_R, mPKT_L, mRTTY_U, mPKT_FM, mFM_N, mPKT_U, mAM_N
@@ -183,9 +186,8 @@ RIG_FTdx3000::RIG_FTdx3000() {
 	has_cw_qsk =
 	has_cw_weight =
 	has_cw_break_in =
-
-	has_split_AB =
-
+	has_split =
+	has_split_AB = 
 	can_change_alt_vfo =
 	has_smeter =
 	has_swr_control =
@@ -790,12 +792,12 @@ int RIG_FTdx3000::get_modeA()
 void RIG_FTdx3000::set_modeB(int val)
 {
 	modeB = val;
-	cmd = "MD0";
+	// Need to swap the vfos for the MD command to work on VFO B
+	cmd = "SV;MD0";
 	cmd += FTdx3000_mode_chr[val];
-	cmd += ';';
+	cmd += ";SV;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET mode B", cmd, replystr);
-	adjust_bandwidth(modeA);
 	if (val == mCW || val == mCW_R) return;
 	if (progStatus.spot_onoff) {
 		progStatus.spot_onoff = false;
@@ -809,22 +811,23 @@ void RIG_FTdx3000::set_modeB(int val)
 
 int RIG_FTdx3000::get_modeB()
 {
-	cmd = rsp = "MD0";
+	// Use Opposite Information command to read VFO B mode
+	int n = 20;
+	cmd = rsp = "OI";
 	cmd += ';';
-	wait_char(';', 5, 100, "get mode B", ASC);
-
+	wait_char(';', 27, 100, "get mode B", ASC);
 	gett("get_modeB()");
 
 	size_t p = replystr.rfind(rsp);
 	if (p != std::string::npos) {
-		if (p + 3 < replystr.length()) {
-			int md = replystr[p+3];
+		// JBA - n tells us where to start in the response
+		if (p + n < replystr.length()) {
+			int md = replystr[p+n];
 			if (md <= '9') md = md - '1';
 			else md = 9 + md - 'A';
 			modeB = md;
 		}
 	}
-	adjust_bandwidth(modeB);
 	return modeB;
 }
 

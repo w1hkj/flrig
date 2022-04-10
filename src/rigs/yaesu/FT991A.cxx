@@ -823,12 +823,12 @@ int RIG_FT991A::get_modeA()
 void RIG_FT991A::set_modeB(int val)
 {
 	modeB = val;
-	cmd = "MD0";
+	// Need to swap the vfos for the MD command to work on VFO B
+	cmd = "SV;MD0";
 	cmd += FT991A_mode_chr[val];
-	cmd += ';';
+	cmd += ";SV;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "SET mode B", cmd, replystr);
-	adjust_bandwidth(modeB);
 	if (val == mCW || val == mCW_R) return;
 	if (progStatus.spot_onoff) {
 		progStatus.spot_onoff = false;
@@ -843,21 +843,23 @@ void RIG_FT991A::set_modeB(int val)
 
 int RIG_FT991A::get_modeB()
 {
-	cmd = rsp = "MD0";
+	// Use Opposite Information command to read VFO B mode
+	int n = 21;
+	cmd = rsp = "OI";
 	cmd += ';';
-	wait_char(';',5, FL991A_WAIT_TIME, "get mode B", ASC);
+	wait_char(';',28, FL991A_WAIT_TIME, "get mode B", ASC);
 	gett("get_modeB");
 
 	size_t p = replystr.rfind(rsp);
 	if (p != std::string::npos) {
-		if (p + 3 < replystr.length()) {
-			int md = replystr[p+3];
+		// JBA - n tells us where to start in the response
+		if (p + n < replystr.length()) {
+			int md = replystr[p+n];
 			if (md <= '9') md = md - '1';
 			else md = 9 + md - 'A';
 			modeB = md;
 		}
 	}
-	adjust_bandwidth(modeB);
 	return modeB;
 }
 
