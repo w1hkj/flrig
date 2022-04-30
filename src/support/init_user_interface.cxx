@@ -2338,7 +2338,6 @@ void TRACED(initConfigDialog)
 	xcvr_name = srig->name_;
 
 	if (!progStatus.loadXcvrState(xcvr_name) ) {
-
 		selectCommPort->index(0);
 		mnuBaudrate->index( srig->comm_baudrate );
 		btnOneStopBit->value( srig->stopbits == 1 );
@@ -2382,6 +2381,7 @@ void TRACED(initConfigDialog)
 			btnUSBaudio->value(false);
 			btnUSBaudio->deactivate();
 		}
+
 	} else {
 		initStatusConfigDialog();
 		trace(1, progStatus.info().c_str());
@@ -2481,8 +2481,10 @@ void TRACED(initRigCombo)
 
 	selectRig->clear();
 	int i = 0;
-	while (rigs[i] != NULL)
-		selectRig->add(rigs[i++]->name_.c_str());
+	while (rigs[i] != NULL) {
+		selectRig->add(rigs[i]->name_.c_str());
+		i++;
+	}
 
 	selectRig->index(0);
 }

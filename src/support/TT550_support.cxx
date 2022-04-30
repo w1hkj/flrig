@@ -167,14 +167,12 @@ void init_TT550()
 	opMODE->activate();
 	opMODE->index(vfoA.imode);
 
-	rigbws_.clear();
 	opBW->show();
 	opBW->clear();
 	old_bws = selrig->bandwidths_;
 	for (int i = 0; selrig->bandwidths_[i] != NULL; i++) {
-		rigbws_.push_back(selrig->bandwidths_[i]);
-			opBW->add(selrig->bandwidths_[i]);
-		}
+		opBW->add(selrig->bandwidths_[i]);
+	}
 	opBW->activate();
 	opBW->index(vfoA.iBW);
 

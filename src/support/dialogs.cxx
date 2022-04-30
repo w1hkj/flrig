@@ -193,6 +193,16 @@ void init_port_combos()
 	}
 	globfree(&gbuf);
 
+	glob("/dev/tnt*", 0, NULL, &gbuf);
+	for (size_t j = 0; j < gbuf.gl_pathc; j++) {
+		if ( !(stat(gbuf.gl_pathv[j], &st) == 0 && S_ISCHR(st.st_mode)) ||
+		     strstr(gbuf.gl_pathv[j], "modem") )
+			continue;
+		LOG_QUIET("Found serial port %s", gbuf.gl_pathv[j]);
+		add_combos(gbuf.gl_pathv[j]);
+	}
+	globfree(&gbuf);
+
 	if (getcwd(cwd, sizeof(cwd)) == NULL) goto out;
 
 	if (chdir("/sys/class/tty") == -1) goto check_cuse;
@@ -498,7 +508,7 @@ void open_send_command_tab()
 
 void open_tcpip_tab()
 {
-	select_tab(_("TCPIP"));
+	select_tab(_("TCPIP & TCI"));
 }
 
 void open_cmedia_tab()
@@ -521,9 +531,9 @@ void open_gpio_tab()
 	select_tab(_("PTT-GPIO"));
 }
 
-void open_aux_tab()
+void open_other_tab()
 {
-	select_tab(_("Aux"));
+	select_tab(_("Other"));
 }
 
 void open_server_tab()

@@ -135,6 +135,8 @@ struct status {
 	bool	spkr_on;
 	int		volume;
 	double	power_level;
+	double	power_limit;
+	bool	enable_power_limit;
 	int		mic_gain;
 	bool	notch;
 	int		notch_val;
@@ -461,6 +463,9 @@ struct status {
 	int		tcpip_drops_allowed;
 	bool	use_tcpip;
 
+	std::string	tci_port;
+	std::string	tci_addr;
+
 	bool	xcvr_auto_on;
 	bool	xcvr_auto_off;
 
@@ -474,6 +479,7 @@ struct status {
 	bool	xmltrace;
 	bool	rpctrace;
 	bool	serialtrace;
+	bool	tcitrace;
 	bool	start_stop_trace;
 	int		rpc_level;
 

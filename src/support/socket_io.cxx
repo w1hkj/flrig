@@ -119,8 +119,9 @@ static void log_level(int level, std::string s, std::string data)
 void *rcv_socket_loop(void *)
 {
 	for (;;) {
-		MilliSleep(5);
-		{ guard_lock socket_lock(&mutex_rcv_socket);
+		MilliSleep(500);//5);
+		{
+			guard_lock socket_lock(&mutex_rcv_socket);
 			if (exit_socket_loop) break;
 			if (tcpip && tcpip->fd() != -1) { 
 				try {
@@ -151,12 +152,20 @@ void connect_to_remote()
 {
 	try {
 		if (remote_addr) delete remote_addr;
-		remote_addr = new Address(progStatus.tcpip_addr.c_str(), progStatus.tcpip_port.c_str());
+// test for SunSDR2 TCI interface
+		remote_addr = new Address("localhost", "40001");
+//		remote_addr = new Address(progStatus.tcpip_addr.c_str(), progStatus.tcpip_port.c_str());
 		LOG_QUIET("Created new remote_addr @ %p", remote_addr);
+
+std::cout << "Created new remote address @ " << remote_addr << std::endl;
+
 		if (!tcpip) {
 			guard_lock socket_lock(&mutex_rcv_socket);
 			tcpip = new Socket(*remote_addr);
 			LOG_QUIET("Created new socket @ %p", tcpip);
+
+std::cout << "Created new socket @ " << tcpip << std::endl;
+
 			tcpip->set_timeout(0.001);
 			tcpip->connect();
 			tcpip->set_nonblocking(true);
@@ -170,11 +179,14 @@ void connect_to_remote()
 			tcpip_menu_box->redraw();
 		}
 		if (tcpip->fd() == -1) {
-			guard_lock socket_lock(&mutex_rcv_socket);
+//			guard_lock socket_lock(&mutex_rcv_socket);
 			try {
 				tcpip->connect(*remote_addr);
 				tcpip->set_nonblocking(true);
 				LOG_QUIET("Connected to %d", tcpip->fd());
+
+std::cout << "Connected to " << tcpip->fd() << std::endl;
+tcpip->send("START;", 6);
 				tcpip_box->show();
 				box_tcpip_connect->color(FL_GREEN);
 				box_tcpip_connect->redraw();
@@ -184,6 +196,9 @@ void connect_to_remote()
 				tcpip_menu_box->redraw();
 			} catch (const SocketException & e) {
 				LOG_ERROR("Error: %d, %s", e.error(), e.what());
+
+std::cout << "Connect error " << e.error() << ", " << e.what() << std::endl;
+
 				delete remote_addr;
 				remote_addr = 0;
 				delete tcpip;
@@ -204,6 +219,9 @@ void connect_to_remote()
 				exit(EXIT_FAILURE);
 			}
 			LOG_QUIET("%s", "Socket receive thread started");
+
+std::cout << "Socket receive thread started" << std::endl;
+
 		}
 	}
 	catch (const SocketException& e) {
@@ -227,7 +245,7 @@ void disconnect_from_remote()
 	if (!tcpip || tcpip->fd() == -1) return;
 
 	{
-		guard_lock socket_lock(&mutex_rcv_socket);
+//		guard_lock socket_lock(&mutex_rcv_socket);
 		tcpip->close();
 		delete tcpip;
 		tcpip = 0;
@@ -265,17 +283,26 @@ void send_to_remote(std::string cmd_string, int pace)
 			connect_to_remote();
 		} catch (...) {
 LOG_QUIET("Retry connect in %d seconds", progStatus.tcpip_reconnect_after);
+
+std::cout << "Retry connect to remote in " << progStatus.tcpip_reconnect_after << " seconds" << std::endl;
+
 			retry_after = 1000 * progStatus.tcpip_reconnect_after;
 			return;
 		}
 	}
 
 	try {
-		guard_lock send_lock(&mutex_rcv_socket);
-		size_t len = cmd_string.length();
-		for (size_t i = 0; i < len; i += 1024)
-			tcpip->send(&cmd_string[i], len - i > 1024 ? 1024 : len - i);
+//		guard_lock send_lock(&mutex_rcv_socket);
+//		size_t len = cmd_string.length();
+
+std::cout << "send_to_remote( \"" << cmd_string << "\" )" << std::endl;
+
+		tcpip->send(cmd_string);//.c_str(), len);
+
+//		for (size_t i = 0; i < len; i += 1024)
+//			tcpip->send(&cmd_string[i], len - i > 1024 ? 1024 : len - i);
 		log_level(WARN, "send to remote", cmd_string);
+
 		drop_count = 0;
 	} catch (const SocketException& e) {
 		LOG_ERROR("Error: %d, %s", e.error(), e.what());
@@ -292,13 +319,15 @@ int read_from_remote(std::string &str)
 {
 	if (!tcpip || tcpip->fd() == -1) return 0;
 
-	guard_lock socket_lock(&mutex_rcv_socket);
+{	guard_lock socket_lock(&mutex_rcv_socket);
 	str = rxbuffer;
 	rxbuffer.clear();
-	if (!str.empty())
-		log_level(WARN, "receive from remote", str);
-	else
-		log_level(WARN, "receive from remote", "no data");
+}
+	char szc[200];
+	snprintf(szc, sizeof(szc), "read_from_remote() : %s", str.c_str());
+std::cout << szc << std::endl;
+
+	log_level(WARN, "%s", szc);
 
 	return str.length();
 }

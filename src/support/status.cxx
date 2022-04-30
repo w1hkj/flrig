@@ -149,7 +149,9 @@ status progStatus = {
 
 	false,		// bool spkr_on;
 	20,			// int  volume;
-	0,			// int  power_level;
+	0,			// double  power_level;
+	100,		// double power_limit;
+	false,		// bool enable_power_limit
 	10,			// int  mic_gain;
 	false,		// bool notch;
 	0,			// int  notch_val;
@@ -469,8 +471,10 @@ status progStatus = {
 	50,			// int tcpip_ping_delay
 	10,			// int tcpip_reconnect_after in seconds
 	10,			// int tcpip_drops_allowed;
-
 	false,		// bool use_tcpip
+
+	"40001",	// std::string tci_port
+	"127.0.0.1",// std::string tci address
 
 	false,		// bool xcvr auto on
 	false,		// bool xcvr auto off
@@ -485,6 +489,7 @@ status progStatus = {
 	false,		// bool	xmltrace;
 	false,		// bool	rpctrace;
 	false,		// bool	serialtrace;
+	false,		// bool tcitrace;
 	false,		// bool	start_stop_trace;
 	0,			// int	rpc_level;
 
@@ -724,6 +729,8 @@ void status::saveLastState()
 	spref.set("bool_spkr_on", spkr_on);
 	spref.set("int_volume", volume);
 	spref.set("dbl_power", power_level);
+	spref.set("power_limit", power_limit);
+	spref.set("enable_power_limit", enable_power_limit);
 	spref.set("int_mic", mic_gain);
 	spref.set("bool_notch", notch);
 	spref.set("int_notch", notch_val);
@@ -1051,6 +1058,9 @@ void status::saveLastState()
 	spref.set("tcpip_drops_allowed", tcpip_drops_allowed);
 	spref.set("use_tcpip", use_tcpip);
 
+	spref.set("tci_port", tci_port.c_str());
+	spref.set("tci_addr", tci_addr.c_str());
+
 	spref.set("xcvr_auto_on", xcvr_auto_on);
 	spref.set("xcvr_auto_off", xcvr_auto_off);
 
@@ -1065,6 +1075,8 @@ void status::saveLastState()
 	spref.set("rpctrace", rpctrace);
 	spref.set("serialtrace", serialtrace);
 	spref.set("startstoptrace", start_stop_trace);
+	spref.set("tcitrace", tcitrace);
+
 	spref.set("rpc_level", rpc_level);
 
 	spref.set("f160", f160); spref.set("m160", m160);
@@ -1362,6 +1374,8 @@ bool status::loadXcvrState(std::string xcvr)
 		if (spref.get("bool_spkr_on", i, i)) spkr_on = i;
 		spref.get("int_volume", volume, volume);
 		spref.get("dbl_power", power_level, power_level);
+		spref.get("power_limit", power_limit, power_limit);
+		if (spref.get("enable_power_limit", i, i)) enable_power_limit = i;
 		spref.get("int_mic", mic_gain, mic_gain);
 		if (spref.get("bool_notch", i, i)) notch = i;
 		spref.get("int_notch", notch_val, notch_val);
@@ -1784,6 +1798,11 @@ bool status::loadXcvrState(std::string xcvr)
 		spref.get("tcpip_drops_allowed", tcpip_drops_allowed, tcpip_drops_allowed);
 		if (spref.get("use_tcpip", i, i)) use_tcpip = i;
 
+		spref.get("tci_port", defbuffer, "40001", 499);
+		tci_port = defbuffer;
+		spref.get("tci_addr", defbuffer, "127.0.0.1", 499);
+		tci_addr = defbuffer;
+
 		if (spref.get("xcvr_auto_on", i, i)) xcvr_auto_on = i;
 		if (spref.get("xcvr_auto_off", i, i)) xcvr_auto_off = i;
 
@@ -1798,6 +1817,7 @@ bool status::loadXcvrState(std::string xcvr)
 		if (spref.get("serialtrace", i, serialtrace)) serialtrace = i;
 		if (spref.get("startstoptrace", i, start_stop_trace)) start_stop_trace = i;
 		if (spref.get("rpctrace", i, rpctrace)) rpctrace = i;
+		if (spref.get("tcitrace", i, tcitrace)) tcitrace = i;
 
 #ifndef NDEBUG
 		trace =
@@ -1807,7 +1827,8 @@ bool status::loadXcvrState(std::string xcvr)
 		xmltrace =
 		rpctrace =
 		serialtrace =
-		gettrace = true;
+		gettrace = 
+		tcitrace = true;
 #endif
 
 		spref.get("rpc_level", rpc_level, rpc_level);
@@ -2223,6 +2244,8 @@ std::string status::info()
 	info << "bool_spkr_on       : " << spkr_on << "\n";
 	info << "int_volume         : " << volume << "\n";
 	info << "dbl_power          : " << power_level << "\n";
+	info << "dbl_power_limit %  : " << power_limit << "\n";
+	info << "enable power limit:  " << enable_power_limit << "\n";
 	info << "int_mic            : " << mic_gain << "\n";
 	info << "bool_notch         : " << notch << "\n";
 	info << "int_notch          : " << notch_val << "\n";
@@ -2327,6 +2350,7 @@ static bool srigtrace;
 static bool ssettrace;
 static bool sgettrace;
 static bool sstrace;
+static bool stcitrace;
 
 void ss_trace(bool on)
 {
@@ -2336,18 +2360,21 @@ void ss_trace(bool on)
 		ssettrace = progStatus.settrace;
 		sgettrace = progStatus.gettrace;
 		sstrace   = progStatus.serialtrace;
+		stcitrace = progStatus.tcitrace;
 
 		progStatus.trace =
 		progStatus.rigtrace =
 		progStatus.settrace =
 		progStatus.serialtrace =
-		progStatus.gettrace = true;
+		progStatus.gettrace = 
+		progStatus.tcitrace = true;
 	} else {
 		progStatus.trace = strace;
 		progStatus.rigtrace = srigtrace;
 		progStatus.settrace = ssettrace;
 		progStatus.gettrace = sgettrace;
 		progStatus.serialtrace = sstrace;
+		progStatus.tcitrace = stcitrace;
 	}
 }
 

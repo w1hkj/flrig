@@ -65,6 +65,8 @@ Fl_Group *tabTCPIP = (Fl_Group *)0;
 	Fl_Counter *inp_tcpip_ping_delay = (Fl_Counter *)0;
 	Fl_Counter *cntRetryAfter = (Fl_Counter *)0;
 	Fl_Counter *cntDropsAllowed = (Fl_Counter *)0;
+	Fl_Input2 *inp_tci_address = (Fl_Input2 *)0;
+	Fl_Input2 *inp_tci_port = (Fl_Input2 *)0;
 
 Fl_Group *tabPTTGEN = (Fl_Group *)0;
 	Fl_ComboBox *selectSepPTTPort = (Fl_ComboBox *)0;
@@ -81,9 +83,12 @@ Fl_Group *tabGPIO = (Fl_Group *)0;
 	Fl_Check_Button *btn_gpio_on[17];
 	Fl_Counter *cnt_gpio_pulse_width;
 
-Fl_Group *tabAUX = (Fl_Group *)0;
+Fl_Group *tabOTHER = (Fl_Group *)0;
 	Fl_ComboBox *selectAuxPort = (Fl_ComboBox *)0;
 	Fl_Check_Button *btnAux_SCU_17 = (Fl_Check_Button *)0;
+
+	Fl_Counter *cnt_power_limit = (Fl_Counter *)0;
+	Fl_Check_Button *btn_enable_power_limit = (Fl_Check_Button *)0;
 
 Fl_Group *tabSERVER = (Fl_Group *)0;
 	Fl_Box *server_text = (Fl_Box *)0;
@@ -339,13 +344,13 @@ static void cb_btn_viewtrace(Fl_Button *, void *) {
 }
 
 static void cb_selectRig(Fl_ComboBox*, void*) {
+	initConfigDialog();
+
 	btn_init_ser_port->labelcolor(FL_RED);
 	btn_init_ser_port->redraw_label();
 
 	btn2_init_ser_port->labelcolor(FL_RED);
 	btn2_init_ser_port->redraw_label();
-
-	initConfigDialog();
 }
 
 static void cb_cntRigCatRetries(Fl_Counter* o, void*) {
@@ -451,6 +456,14 @@ static void cb_cntRetryAfter(Fl_Counter* o, void *) {
 
 static void cb_cntDropsAllowed(Fl_Counter* o, void *) {
 	progStatus.tcpip_drops_allowed = o->value();
+}
+
+static void cb_tci_addr(Fl_Input2* o, void*) {
+	progStatus.tci_addr = o->value();
+}
+
+static void cb_tci_port(Fl_Input2* o, void*) {
+	progStatus.tci_port = o->value();
 }
 
 static void cb_lbox_catptt(Fl_ListBox* o, void*) {
@@ -567,6 +580,18 @@ static void cb_selectAuxPort(Fl_ComboBox*, void*) {
 static void cb_btnAux_SCU_17(Fl_Check_Button*, void*) {
 	btnOkAuxSerial->labelcolor(FL_RED);
 	btnOkAuxSerial->redraw_label();
+}
+
+static void cb_power_limit(Fl_Counter*, void*) {
+	progStatus.power_limit = cnt_power_limit->value();
+	if (progStatus.enable_power_limit)
+		execute_setPower();
+};
+
+static void cb_enable_power_limit(Fl_Check_Button*, void *) {
+	progStatus.enable_power_limit = btn_enable_power_limit->value();
+	if (progStatus.enable_power_limit)
+		execute_setPower();
 }
 
 static void cb_disable_CW_ptt(Fl_Check_Button *btn, void*) {
@@ -723,22 +748,22 @@ static void cb_btnSetAdd(Fl_Button*, void*) {
 	poll_ptt->value(progStatus.poll_all);
 	poll_break_in->value(progStatus.poll_all);
 
-	progStatus.poll_volume = 
-	progStatus.poll_micgain = 
-	progStatus.poll_rfgain = 
-	progStatus.poll_power_control = 
-	progStatus.poll_ifshift = 
-	progStatus.poll_notch = 
-	progStatus.poll_auto_notch = 
-	progStatus.poll_pre_att = 
-	progStatus.poll_squelch = 
-	progStatus.poll_split = 
-	progStatus.poll_noise = 
-	progStatus.poll_nr = 
-	progStatus.poll_compression = 
-	progStatus.poll_tuner = 
-	progStatus.poll_ptt = 
-	progStatus.poll_break_in = 
+	progStatus.poll_volume =
+	progStatus.poll_micgain =
+	progStatus.poll_rfgain =
+	progStatus.poll_power_control =
+	progStatus.poll_ifshift =
+	progStatus.poll_notch =
+	progStatus.poll_auto_notch =
+	progStatus.poll_pre_att =
+	progStatus.poll_squelch =
+	progStatus.poll_split =
+	progStatus.poll_noise =
+	progStatus.poll_nr =
+	progStatus.poll_compression =
+	progStatus.poll_tuner =
+	progStatus.poll_ptt =
+	progStatus.poll_break_in =
 		progStatus.poll_all;
 }
 
@@ -754,7 +779,7 @@ static std::string str2hex(std::string str)
 	size_t len = str.length();
 
 	if (!len) return "";
- 
+
 	hexbuf.clear();
 	for (size_t i = 0; i < len; i++) {
 		hexbuf += 'x';
@@ -883,6 +908,12 @@ static void cb_se_text(Fl_Input2 *o, void *d) {
 }
 
 static void cb_init_ser_port(Fl_Return_Button*, void*) {
+
+	if (selrig->io_class == TCI) {
+		initRig();
+		return;
+	}
+
 	std::string p1 = selectCommPort->value();
 	std::string p2 = selectAuxPort->value();
 	std::string p3 = selectSepPTTPort->value();
@@ -1212,7 +1243,7 @@ Fl_Group *createXCVR(int X, int Y, int W, int H, const char *label)
 		byte_interval->lstep(10);
 
 		Fl_Group* xcvr_grp4 = new Fl_Group(
-			xcvr_grp1->x() + 2, xcvr_grp1->y() + xcvr_grp1->h() - 38, 
+			xcvr_grp1->x() + 2, xcvr_grp1->y() + xcvr_grp1->h() - 38,
 			150, 36);
 		xcvr_grp4->box(FL_ENGRAVED_FRAME);
 		xcvr_grp4->align(Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE));
@@ -1336,58 +1367,80 @@ Fl_Group *createTCPIP(int X, int Y, int W, int H, const char *label)
 	Fl_Group * tabTCPIP = new Fl_Group(X, Y, W, H, label);
 		tabTCPIP->hide();
 
-		inp_tcpip_addr = new Fl_Input2(X + 120, Y + 20, 300, 22, _("TCPIP address:"));
-		inp_tcpip_addr->tooltip(_("remote tcpip server address"));
-		inp_tcpip_addr->callback((Fl_Callback*)cb_tcpip_addr);
-		inp_tcpip_addr->value(progStatus.tcpip_addr.c_str());
+		Fl_Group *tcpip_grp1 = new Fl_Group(X + 5, Y + 5, W - 10, 140, _("Remote flrig"));
+		tcpip_grp1->box(FL_ENGRAVED_BOX);
+		tcpip_grp1->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
 
-		inp_tcpip_port = new Fl_Input2(X + 120, Y + 44, 100, 22, _("TCPIP port:"));
-		inp_tcpip_port->tooltip(_("remote tcpip server port"));
-		inp_tcpip_port->type(2);
-		inp_tcpip_port->callback((Fl_Callback*)cb_tcpip_port);
-		inp_tcpip_port->value(progStatus.tcpip_port.c_str());
+			inp_tcpip_addr = new Fl_Input2(X + 120, Y + 30, W - 140, 22, _("TCPIP address:"));
+			inp_tcpip_addr->tooltip(_("remote tcpip server address"));
+			inp_tcpip_addr->callback((Fl_Callback*)cb_tcpip_addr);
+			inp_tcpip_addr->value(progStatus.tcpip_addr.c_str());
 
-		inp_tcpip_ping_delay = new Fl_Counter(X + 120, Y + 70, 100, 22, _("Ping delay"));
-		inp_tcpip_ping_delay->tooltip(_("enter round trip ping delay"));
-		inp_tcpip_ping_delay->callback((Fl_Callback*)cb_tcpip_ping_delay);
-		inp_tcpip_ping_delay->minimum(0);
-		inp_tcpip_ping_delay->maximum(500);
-		inp_tcpip_ping_delay->step(5);
-		inp_tcpip_ping_delay->lstep(20);
-		inp_tcpip_ping_delay->value(progStatus.tcpip_ping_delay);
-		inp_tcpip_ping_delay->align(Fl_Align(FL_ALIGN_LEFT));
+			inp_tcpip_port = new Fl_Input2(X + 120, Y + 60, 100, 22, _("TCPIP port:"));
+			inp_tcpip_port->tooltip(_("remote tcpip server port"));
+			inp_tcpip_port->type(2);
+			inp_tcpip_port->callback((Fl_Callback*)cb_tcpip_port);
+			inp_tcpip_port->value(progStatus.tcpip_port.c_str());
 
-		chk_use_tcpip = new Fl_Check_Button(X + 120, Y + 95, 18, 18, _("Use tcpip"));
-		chk_use_tcpip->tooltip(_("Rig control via tcpip"));
-		chk_use_tcpip->callback((Fl_Callback*)cb_use_tcpip);
-		chk_use_tcpip->value(progStatus.use_tcpip);
-		chk_use_tcpip->align(Fl_Align(FL_ALIGN_LEFT));
+			inp_tcpip_ping_delay = new Fl_Counter(X + 120, Y + 85, 100, 22, _("Ping delay"));
+			inp_tcpip_ping_delay->tooltip(_("enter round trip ping delay"));
+			inp_tcpip_ping_delay->callback((Fl_Callback*)cb_tcpip_ping_delay);
+			inp_tcpip_ping_delay->minimum(0);
+			inp_tcpip_ping_delay->maximum(500);
+			inp_tcpip_ping_delay->step(5);
+			inp_tcpip_ping_delay->lstep(20);
+			inp_tcpip_ping_delay->value(progStatus.tcpip_ping_delay);
+			inp_tcpip_ping_delay->align(Fl_Align(FL_ALIGN_LEFT));
 
-		box_tcpip_connect = new Fl_Box(X + 120, Y + 120, 18, 18, _("Connected"));
-		box_tcpip_connect->tooltip(_("Lit when connected to remote tcpip"));
-		box_tcpip_connect->box(FL_DIAMOND_DOWN_BOX);
-		box_tcpip_connect->color(FL_LIGHT1);
-		box_tcpip_connect->align(Fl_Align(FL_ALIGN_RIGHT));
+			chk_use_tcpip = new Fl_Check_Button(X + 120, Y + 110, 18, 18, _("Use tcpip"));
+			chk_use_tcpip->tooltip(_("Rig control via tcpip"));
+			chk_use_tcpip->callback((Fl_Callback*)cb_use_tcpip);
+			chk_use_tcpip->value(progStatus.use_tcpip);
+			chk_use_tcpip->align(Fl_Align(FL_ALIGN_LEFT));
 
-		cntRetryAfter = new Fl_Counter(X + 120, Y + 145, 100, 20, _("Retry (secs)"));
-		cntRetryAfter->tooltip(_("Retry connection if lost"));
-		cntRetryAfter->minimum(1);
-		cntRetryAfter->maximum(120);
-		cntRetryAfter->step(1);
-		cntRetryAfter->lstep(10);
-		cntRetryAfter->callback((Fl_Callback*)cb_cntRetryAfter);
-		cntRetryAfter->align(Fl_Align(FL_ALIGN_LEFT));
-		cntRetryAfter->value(progStatus.tcpip_reconnect_after);
+			box_tcpip_connect = new Fl_Box(X + 200, Y + 110, 18, 18, _("Connected"));
+			box_tcpip_connect->tooltip(_("Lit when connected to remote tcpip"));
+			box_tcpip_connect->box(FL_DIAMOND_DOWN_BOX);
+			box_tcpip_connect->color(FL_LIGHT1);
+			box_tcpip_connect->align(Fl_Align(FL_ALIGN_RIGHT));
 
-		cntDropsAllowed = new Fl_Counter(X + 120, Y + 170, 100, 20, _("Allowed drops"));
-		cntDropsAllowed->tooltip(_("# tcpip drop-outs before connection declared down"));
-		cntDropsAllowed->minimum(1);
-		cntDropsAllowed->maximum(25);
-		cntDropsAllowed->step(1);
-		cntDropsAllowed->lstep(5);
-		cntDropsAllowed->callback((Fl_Callback*)cb_cntDropsAllowed);
-		cntDropsAllowed->align(Fl_Align(FL_ALIGN_LEFT));
-		cntDropsAllowed->value(progStatus.tcpip_drops_allowed);
+			cntRetryAfter = new Fl_Counter(X + W - 120, Y + 60, 100, 20, _("Retry (secs)"));
+			cntRetryAfter->tooltip(_("Retry connection if lost"));
+			cntRetryAfter->minimum(1);
+			cntRetryAfter->maximum(120);
+			cntRetryAfter->step(1);
+			cntRetryAfter->lstep(10);
+			cntRetryAfter->callback((Fl_Callback*)cb_cntRetryAfter);
+			cntRetryAfter->align(Fl_Align(FL_ALIGN_LEFT));
+			cntRetryAfter->value(progStatus.tcpip_reconnect_after);
+
+			cntDropsAllowed = new Fl_Counter(cntRetryAfter->x(), Y + 80, 100, 20, _("Allowed drops"));
+			cntDropsAllowed->tooltip(_("# tcpip drop-outs before connection declared down"));
+			cntDropsAllowed->minimum(1);
+			cntDropsAllowed->maximum(25);
+			cntDropsAllowed->step(1);
+			cntDropsAllowed->lstep(5);
+			cntDropsAllowed->callback((Fl_Callback*)cb_cntDropsAllowed);
+			cntDropsAllowed->align(Fl_Align(FL_ALIGN_LEFT));
+			cntDropsAllowed->value(progStatus.tcpip_drops_allowed);
+		tcpip_grp1->end();
+
+		Fl_Group *tcpip_grp2 = new Fl_Group(X + 5, Y + 150, W - 10, 90, _("TCI interface"));
+		tcpip_grp2->box(FL_ENGRAVED_BOX);
+		tcpip_grp2->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
+
+			inp_tci_address = new Fl_Input2(X + 120, Y + 175, W - 140, 22, _("TCI address:"));
+			inp_tci_address->tooltip(_("local/remote TCI server address"));
+			inp_tci_address->callback((Fl_Callback*)cb_tci_addr);
+			inp_tci_address->value(progStatus.tci_addr.c_str());
+
+			inp_tci_port = new Fl_Input2(inp_tci_address->x(), inp_tci_address->y() + 25, 100, 22, _("TCI port:"));
+			inp_tci_port->tooltip(_("local/remote TCI server port"));
+			inp_tci_port->type(2);
+			inp_tci_port->callback((Fl_Callback*)cb_tci_port);
+			inp_tci_port->value(progStatus.tci_port.c_str());
+
+		tcpip_grp2->end();
 
 	tabTCPIP->end();
 
@@ -1399,7 +1452,7 @@ Fl_Group *createPTT(int X, int Y, int W, int H, const char *label)
 	Fl_Group *tab = new Fl_Group(X, Y, W, H, label);
 	tab->hide();
 
-	Fl_Group *grp_CW_ptt = new Fl_Group(X + 2, Y + 20, W - 4, 30, 
+	Fl_Group *grp_CW_ptt = new Fl_Group(X + 2, Y + 20, W - 4, 30,
 		_("CW mode PTT"));
 		grp_CW_ptt->box(FL_ENGRAVED_BOX);
 		grp_CW_ptt->align(Fl_Align(FL_ALIGN_TOP_LEFT));
@@ -1408,7 +1461,7 @@ Fl_Group *createPTT(int X, int Y, int W, int H, const char *label)
 			grp_CW_ptt->x() + 10, grp_CW_ptt->y() + 4, 200, 22,
 			_("disable PTT in CW mode"));
 			btn_disable_CW_ptt->value(progStatus.disable_CW_ptt);
-			btn_disable_CW_ptt->callback((Fl_Callback*)cb_disable_CW_ptt); 
+			btn_disable_CW_ptt->callback((Fl_Callback*)cb_disable_CW_ptt);
 
 	grp_CW_ptt->end();
 
@@ -1535,38 +1588,67 @@ _("PTT control on Separate Serial Port"));
 
 Fl_Group *createAUX(int X, int Y, int W, int H, const char *label)
 {
-	Fl_Group * tabAUX = new Fl_Group(X, Y, W, H, label);
-	tabAUX->hide();
+	Fl_Group * tabOTHER = new Fl_Group(X, Y, W, H, label);
+	tabOTHER->hide();
 
-	selectAuxPort = new Fl_ComboBox(X + 130, Y + 60, 240, 22, _("Aux"));
-	selectAuxPort->tooltip(_("Aux control port"));
-	selectAuxPort->box(FL_DOWN_BOX);
-	selectAuxPort->color(FL_BACKGROUND2_COLOR);
-	selectAuxPort->selection_color(FL_BACKGROUND_COLOR);
-	selectAuxPort->labeltype(FL_NORMAL_LABEL);
-	selectAuxPort->labelfont(0);
-	selectAuxPort->labelsize(14);
-	selectAuxPort->labelcolor(FL_FOREGROUND_COLOR);
-	selectAuxPort->callback((Fl_Callback*)cb_selectAuxPort);
-	selectAuxPort->align(Fl_Align(FL_ALIGN_LEFT));
-	selectAuxPort->when(FL_WHEN_RELEASE);
-	selectAuxPort->end();
+	Fl_Group *other_grp1 = new Fl_Group(X+5, Y+5, W-10, (H-10) / 2, "Auxiliary Port");
+	other_grp1->box(FL_ENGRAVED_BOX);
+	other_grp1->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
 
-	btnAux_SCU_17 = new Fl_Check_Button(X + 130, Y + 100, 128, 22, _("  SCU-17 auxiliary\n  Yaesu 2nd USB port"));
-	btnAux_SCU_17->tooltip(_("Set stop bits to ZERO"));
-	btnAux_SCU_17->callback((Fl_Callback*)cb_btnAux_SCU_17);
-	btnAux_SCU_17->value(progStatus.aux_SCU_17);
-
-	Fl_Box *bxsep = new Fl_Box(X + 55, Y + 10, 400, 40,
+		Fl_Box *bxsep = new Fl_Box(X + 70, Y + 10, W-140, 45,
 _("Use only if your setup requires a separate\nSerial Port for a special Control Signals"));
-	bxsep->box(FL_FLAT_BOX);
+		bxsep->box(FL_FLAT_BOX);
 
-	btnOkAuxSerial = new Fl_Button(X + W - 60, Y + H - 30, 50, 24, _("Init"));
-	btnOkAuxSerial->callback((Fl_Callback*)cb_btnOkAuxSerial);
+		selectAuxPort = new Fl_ComboBox(X + 130, Y + 60, 240, 22, _("Aux"));
+		selectAuxPort->tooltip(_("Aux control port"));
+		selectAuxPort->box(FL_DOWN_BOX);
+		selectAuxPort->color(FL_BACKGROUND2_COLOR);
+		selectAuxPort->selection_color(FL_BACKGROUND_COLOR);
+		selectAuxPort->labeltype(FL_NORMAL_LABEL);
+		selectAuxPort->labelfont(0);
+		selectAuxPort->labelsize(14);
+		selectAuxPort->labelcolor(FL_FOREGROUND_COLOR);
+		selectAuxPort->callback((Fl_Callback*)cb_selectAuxPort);
+		selectAuxPort->align(Fl_Align(FL_ALIGN_LEFT));
+		selectAuxPort->when(FL_WHEN_RELEASE);
+		selectAuxPort->end();
 
-	tabAUX->end();
+		btnAux_SCU_17 = new Fl_Check_Button(X + 130, Y + 90, 128, 22, _("  SCU-17 auxiliary\n  Yaesu 2nd USB port"));
+		btnAux_SCU_17->tooltip(_("Set stop bits to ZERO"));
+		btnAux_SCU_17->callback((Fl_Callback*)cb_btnAux_SCU_17);
+		btnAux_SCU_17->value(progStatus.aux_SCU_17);
 
-	return tabAUX;
+		btnOkAuxSerial = new Fl_Button(X + W - 70, Y + (H - 10) / 2 - 30, 50, 24, _("Init"));
+		btnOkAuxSerial->callback((Fl_Callback*)cb_btnOkAuxSerial);
+
+	other_grp1->end();
+
+	Fl_Group *other_grp2 = new Fl_Group(X+5, Y + (H-10)/2 + 10, W-10, H/2 - 15, _("Power limit"));
+	other_grp2->box(FL_ENGRAVED_BOX);
+	other_grp2->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
+
+		cnt_power_limit = new Fl_Counter(
+			X+ (W-150)/2, other_grp2->y() + 20,
+			150, 24,
+			_("Limit power to % of full"));
+		cnt_power_limit->step(1);
+		cnt_power_limit->minimum(0);
+		cnt_power_limit->maximum(100);
+		cnt_power_limit->lstep(10);
+		cnt_power_limit->value(progStatus.power_limit);
+		cnt_power_limit->callback((Fl_Callback*)cb_power_limit);
+
+		btn_enable_power_limit = new Fl_Check_Button(
+			cnt_power_limit->x(), cnt_power_limit->y() + 45,
+			50, 22,
+			_("Enable power limit"));
+		btn_enable_power_limit->callback((Fl_Callback*)cb_enable_power_limit);
+		btn_enable_power_limit->value(progStatus.enable_power_limit);
+
+	other_grp2->end();
+	tabOTHER->end();
+
+	return tabOTHER;
 }
 
 Fl_Group *createSERVER(int X, int Y, int W, int H, const char *label)
@@ -1869,7 +1951,7 @@ Fl_Group *createCOMMANDS(int X, int Y, int W, int H, const char *label)
 		cmdlbl17, cmdlbl18, cmdlbl19, cmdlbl20,
 		cmdlbl21, cmdlbl22, cmdlbl23, cmdlbl24
 		};
- 
+
 	Fl_Input2 *cmdtexts[] = {
 		cmdtext1,  cmdtext2,  cmdtext3,  cmdtext4,
 		cmdtext5,  cmdtext6,  cmdtext7,  cmdtext8,
@@ -1878,7 +1960,7 @@ Fl_Group *createCOMMANDS(int X, int Y, int W, int H, const char *label)
 		cmdtext17, cmdtext18, cmdtext19, cmdtext20,
 		cmdtext21, cmdtext22, cmdtext23, cmdtext24
 		};
- 
+
 	Fl_Input2 *shftcmdtexts[] = {
 		shftcmdtext1,  shftcmdtext2,  shftcmdtext3,  shftcmdtext4,
 		shftcmdtext5,  shftcmdtext6,  shftcmdtext7,  shftcmdtext8,
@@ -1887,8 +1969,8 @@ Fl_Group *createCOMMANDS(int X, int Y, int W, int H, const char *label)
 		shftcmdtext17, shftcmdtext18, shftcmdtext19, shftcmdtext20,
 		shftcmdtext21, shftcmdtext22, shftcmdtext23, shftcmdtext24
 		};
- 
-	std::string *cmd[] = { 
+
+	std::string *cmd[] = {
 		&progStatus.command1,  &progStatus.command2,  &progStatus.command3,  &progStatus.command4,
 		&progStatus.command5,  &progStatus.command6,  &progStatus.command7,  &progStatus.command8,
 		&progStatus.command9,  &progStatus.command10, &progStatus.command11, &progStatus.command12,
@@ -1897,7 +1979,7 @@ Fl_Group *createCOMMANDS(int X, int Y, int W, int H, const char *label)
 		&progStatus.command21, &progStatus.command22, &progStatus.command23, &progStatus.command24
 		};
 
-	std::string *shftcmd[] = { 
+	std::string *shftcmd[] = {
 		&progStatus.shftcmd1,  &progStatus.shftcmd2,  &progStatus.shftcmd3,  &progStatus.shftcmd4,
 		&progStatus.shftcmd5,  &progStatus.shftcmd6,  &progStatus.shftcmd7,  &progStatus.shftcmd8,
 		&progStatus.shftcmd9,  &progStatus.shftcmd10, &progStatus.shftcmd11, &progStatus.shftcmd12,
@@ -2123,7 +2205,7 @@ Fl_Group *createCOMMANDS(int X, int Y, int W, int H, const char *label)
 
 		for (int n = 0; n < 8; n++) {
 			start_exit_label[n] = new Fl_Input2(
-				X + 27, Y + 46 + n * 20, 
+				X + 27, Y + 46 + n * 20,
 				80, 20,
 				n < 4 ? "St" : "Ex");
 			start_exit_label[n]->align(FL_ALIGN_LEFT);
@@ -2156,7 +2238,7 @@ Fl_Group *createRestore(int X, int Y, int W, int H, const char *label)
 
 	tabRESTORE->hide();
 
-	Fl_Box *restore_box = new Fl_Box(X + 8, Y + 5, 455, 30, 
+	Fl_Box *restore_box = new Fl_Box(X + 8, Y + 5, 455, 30,
 		_("Read / Restore these parameters"));
 	restore_box->box(FL_ENGRAVED_FRAME);
 
@@ -2506,8 +2588,8 @@ SUBSYSTEM==\"hidraw\", MODE=\"0664\", GROUP=\"plugdev\""));
 
 #include <vector>
 
-std::vector< Fl_Group* > config_pages; 
-static Fl_Group *current = 0; 
+std::vector< Fl_Group* > config_pages;
+static Fl_Group *current = 0;
 Fl_Tree *tab_tree;
 
 void add_tree_item(Fl_Group *g) {
@@ -2522,7 +2604,7 @@ void cleartabs()
 	tabTRACE->hide();
 	tabTCPIP->hide();
 	tabPTTGEN->hide();
-	tabAUX->hide();
+	tabOTHER->hide();
 	tabGPIO->hide();
 	tabCMEDIA->hide();
 	tabPOLLING->hide();
@@ -2594,8 +2676,8 @@ Fl_Double_Window* XcvrDialog() {
 	tabTMATE2   = createTMATE2Tab(xtabs, ytree, wtabs, htree, ("TMATE-2"));
 	tabGPIO     = createGPIO(xtabs, ytree, wtabs, htree, _("PTT-GPIO"));
 	tabPTTGEN   = createPTT(xtabs, ytree, wtabs, htree, _("PTT-Generic"));
-	tabTCPIP    = createTCPIP(xtabs, ytree, wtabs, htree, _("TCPIP"));
-	tabAUX      = createAUX(xtabs, ytree, wtabs, htree, _("Auxiliary"));
+	tabTCPIP    = createTCPIP(xtabs, ytree, wtabs, htree, _("TCPIP & TCI"));
+	tabOTHER      = createAUX(xtabs, ytree, wtabs, htree, _("Other"));
 	tabSERVER   = createSERVER(xtabs, ytree, wtabs, htree, _("Server"));
 	tabPOLLING  = createPOLLING(xtabs, ytree, wtabs, htree, _("Poll"));
 	tabRESTORE  = createRestore(xtabs, ytree, wtabs, htree, _("Restore"));
@@ -2612,7 +2694,7 @@ Fl_Double_Window* XcvrDialog() {
 	add_tree_item(tabTMATE2);
 
 	add_tree_item(tabTCPIP);
-	add_tree_item(tabAUX);
+	add_tree_item(tabOTHER);
 	add_tree_item(tabSERVER);
 	add_tree_item(tabPOLLING);
 	add_tree_item(tabRESTORE);

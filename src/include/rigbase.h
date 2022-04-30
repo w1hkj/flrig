@@ -36,6 +36,7 @@
 enum {onNIL, onA, onB};
 enum {UI, XML, SRVR, RIG};
 enum {DT_BINARY, DT_STRING};
+enum {SERIAL, TCPIP, TCI};
 
 struct XCVR_STATE {
 	unsigned long int freq;
@@ -156,6 +157,7 @@ public:
 
 	GUI *widgets;
 
+	int  io_class;
 	int  comm_baudrate;
 	int  stopbits;
 	int  comm_retries;

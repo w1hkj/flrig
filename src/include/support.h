@@ -104,7 +104,6 @@ extern bool modes_changed;
 extern bool bandwidths_changed;
 
 extern std::vector<std::string> rigmodes_;
-extern std::vector<std::string> rigbws_;
 
 extern rigbase *selrig;
 
@@ -252,6 +251,7 @@ extern void setCLRPBT();
 extern void setVolume();
 extern void setMicGain();
 extern void cbbtnMicLine();
+extern void execute_setPower();
 extern void setPower();
 extern void setRFGAIN();
 extern void setSQUELCH();
@@ -286,7 +286,7 @@ extern void open_tcpip_tab();
 extern void open_cmedia_tab();
 extern void open_ptt_tab();
 extern void open_gpio_tab();
-extern void open_aux_tab();
+extern void open_other_tab();
 extern void open_server_tab();
 extern void open_tmate2_tab();
 
@@ -409,7 +409,7 @@ extern Fl_Group *tabXCVR;
 extern Fl_Group *tabTRACE;
 extern Fl_Group *tabTCPIP;
 extern Fl_Group *tabPTT;
-extern Fl_Group *tabAUX;
+extern Fl_Group *tabOTHER;
 extern Fl_Group *tabPOLLING;
 extern Fl_Group *tabSNDCMD;
 extern Fl_Group *tabCOMMANDS;

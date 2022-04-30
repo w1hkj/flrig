@@ -676,6 +676,7 @@ void Socket::connect(const Address& addr)
 /// @return The amount of data that was sent. This may be less than len
 ///         if the socket is non-blocking.
 ///
+#include <iostream>
 size_t Socket::send(const void* buf, size_t len)
 {
 	// if we have a nonblocking socket and a nonzero timeout,
@@ -685,9 +686,9 @@ size_t Socket::send(const void* buf, size_t len)
 			return 0;
 
 	ssize_t r = ::send(sockfd, (const char*)buf, len, 0);
-	if (r == 0)
+	if (r == 0) {
 		shutdown(sockfd, SHUT_WR);
-	else if (r == -1) {
+	} else if (r == -1) {
 		if (errno != EAGAIN)
 			throw SocketException(errno, "send");
 		r = 0;
@@ -704,7 +705,7 @@ size_t Socket::send(const void* buf, size_t len)
 /// @return The amount of data that was sent. This may be less than len
 ///         if the socket is non-blocking.
 ///
-size_t Socket::send(const std::string& buf)
+size_t Socket::send(const std::string buf) //const std::string& buf)
 {
 	return send(buf.data(), buf.length());
 }

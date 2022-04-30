@@ -543,8 +543,8 @@ static void cb_mnuGPIO(Fl_Menu_*, void*) {
 	open_gpio_tab();
 }
 
-static void cb_mnuAUX(Fl_Menu_*, void *) {
-	open_aux_tab();
+static void cb_mnuOTHER(Fl_Menu_*, void *) {
+	open_other_tab();
 }
 
 static void cb_mnuSERVER(Fl_Menu_*, void*) {

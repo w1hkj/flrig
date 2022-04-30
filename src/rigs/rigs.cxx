@@ -127,6 +127,8 @@ RIG_PowerSDR	rig_PowerSDR;
 RIG_FLEX1500	rig_FLEX1500;
 RIG_TX500		rig_TX500;
 RIG_QCXP		rig_QCXP;
+RIG_SDR2_PRO	rig_sdr2;
+RIG_TCI_SDR		rig_tcisdr;
 
 rigbase *rigs[] = {
 	&rig_null,		// 0
@@ -228,6 +230,8 @@ rigbase *rigs[] = {
 	&rig_FLEX1500,	// 96
 	&rig_TX500,		// 97
 	&rig_QCXP,		// 98
+	&rig_sdr2,		// 99
+	&rig_tcisdr,	// 100
 
 	NULL
 };

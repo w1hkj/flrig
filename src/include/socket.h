@@ -138,7 +138,7 @@ public:
 
 	// Data Transimission
 	size_t send(const void* buf, size_t len);
-	size_t send(const std::string& buf);
+	size_t send(const std::string);//& buf);
 
 	size_t recv(void* buf, size_t len);
 	size_t recv(std::string& buf);

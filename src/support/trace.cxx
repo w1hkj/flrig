@@ -113,6 +113,10 @@ static void update_tracetext(void *)
 			tracedisplay->insert(tracestring.c_str());
 		}
 	}
+	if (stdout_trace) {
+		std::cout << tracestring;
+		return;
+	}
     tracestring.clear();
 }
 
@@ -132,11 +136,6 @@ void trace(int n, ...) // all args of type const char *
 		s << " " << va_arg(vl, const char *);
 	va_end(vl);
 	s << "\n";
-
-	if (stdout_trace) {
-		std::cout << s.str();
-		return;
-	}
 
 	write_trace_file(s.str());
 
@@ -168,11 +167,6 @@ void xml_trace(int n, ...) // all args of type const char *
 	va_end(vl);
 	s << "\n";
 
-	if (stdout_trace) {
-		std::cout << s.str();
-		return;
-	}
-
 	write_trace_file(s.str());
 
 	guard_lock tt(&mutex_trace);
@@ -190,11 +184,6 @@ void rig_trace(int n, ...) // all args of type const char *
 		s << " " << va_arg(vl, const char *);
 	va_end(vl);
 	s << "\n";
-
-	if (stdout_trace) {
-		std::cout << s.str();
-		return;
-	}
 
 	if (!progStatus.rigtrace) return;
 	if (!tracewindow) make_trace_window();
@@ -218,11 +207,6 @@ void set_trace(int n, ...) // all args of type const char *
 	va_end(vl);
 	s << "\n";
 
-	if (stdout_trace) {
-		std::cout << s.str();
-		return;
-	}
-
 	if (!progStatus.settrace) return;
 	if (!tracewindow) make_trace_window();
 	if (!n) return;
@@ -244,11 +228,6 @@ void get_trace(int n, ...) // all args of type const char *
 		s << " " << va_arg(vl, const char *);
 	va_end(vl);
 	s << "\n";
-
-	if (stdout_trace) {
-		std::cout << s.str();
-		return;
-	}
 
 	if (!progStatus.gettrace) return;
 	if (!tracewindow) make_trace_window();
@@ -312,11 +291,6 @@ void rpc_trace(int n, ...) // all args of type const char *
 
 	if (str[str.length()-1] != '\n') str += '\n';
 
-	if (stdout_trace) {
-		std::cout << s.str();
-		return;
-	}
-
 	if (!tracewindow) make_trace_window();
 	if (!progStatus.rpctrace) return;
 	if (!n) return;
@@ -339,12 +313,90 @@ void ser_trace(int n, ...) // all args of type const char *
 	va_end(vl);
 	s << "\n";
 
-	if (stdout_trace) {
-		std::cout << s.str();
-		return;
+	if (!progStatus.serialtrace) return;
+	if (!tracewindow) make_trace_window();
+	if (!n) return;
+
+	write_trace_file(s.str());
+
+	guard_lock tt(&mutex_trace);
+	tracestring.append(s.str());
+	Fl::awake(update_tracetext);
+}
+
+void deb_trace(int n, ...) // all args of type const char *
+{
+	std::stringstream s;
+	va_list vl;
+	va_start(vl, n);
+	s << ztime() << " : " << va_arg(vl, const char *);
+	for (int i = 1; i < n; i++)
+		s << " " << va_arg(vl, const char *);
+	va_end(vl);
+	std::string str = s.str();
+	size_t p = str.find("\r\n");
+	while (p != std::string::npos) {
+		str.replace(p, 2, "\n");
+		p = str.find("\r\n");
+	}
+	p = str.find("\r");
+	while (p != std::string::npos) {
+		str.replace(p, 1, "\n");
+		p = str.find("\r");
+	}
+	p = str.find("\t");
+	while (p != std::string::npos) {
+		str.erase(p, 1);
+		p = str.find("\t");
 	}
 
-	if (!progStatus.serialtrace) return;
+	int indent = 0;
+	p = str.find("<");
+	while (p != std::string::npos) {
+		if (str[p+1] != '/') {
+			str.insert(p, "\n");
+			str.insert(p+1, indent, ' ');
+			indent += 2;
+		} else {
+			str.insert(p, "\n");
+			indent -= 2;
+			str.insert(p+1, indent, ' ');
+		}
+		if (indent < 0) indent = 0;
+		p = str.find(">", p);
+		p = str.find("<", p);
+	}
+
+	p = str.find("\n\n");
+	while (p != std::string::npos) {
+		str.erase(p,1);
+		p = str.find("\n\n");
+	}
+
+	if (str[str.length()-1] != '\n') str += '\n';
+
+	if (!tracewindow) make_trace_window();
+	if (!n) return;
+
+	write_trace_file(s.str());
+
+	guard_lock tt(&mutex_trace);
+	tracestring.append(s.str());
+	Fl::awake(update_tracetext);
+}
+
+void tci_trace(int n, ...) // all args of type const char *
+{
+	std::stringstream s;
+	va_list vl;
+	va_start(vl, n);
+	s << ztime() << " : " << va_arg(vl, const char *);
+	for (int i = 1; i < n; i++)
+		s << " " << va_arg(vl, const char *);
+	va_end(vl);
+	s << "\n";
+
+	if (!progStatus.tcitrace) return;
 	if (!tracewindow) make_trace_window();
 	if (!n) return;
 

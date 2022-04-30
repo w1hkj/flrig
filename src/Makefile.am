@@ -188,6 +188,8 @@ flrig_SOURCES += \
 	rigs/other/PowerSDR.cxx \
 	rigs/other/QCXplus.cxx \
 	rigs/other/RAY152.cxx \
+	rigs/other/sunsdr2.cxx \
+	rigs/other/tcisdr.cxx \
 	rigs/other/TMD710.cxx \
 	rigs/tentec/TT516.cxx \
 	rigs/tentec/DELTA-II.cxx \
@@ -250,6 +252,8 @@ flrig_SOURCES += \
 	support/timeops.cxx \
 	support/trace.cxx \
 	support/util.cxx \
+	wc/tci_io.cxx \
+	wc/WSclient.cxx \
 	UI/K3_ui.cxx \
 	UI/KX3_ui.cxx \
 	UI/rigpanel.cxx \
@@ -312,6 +316,8 @@ EXTRA_DIST = \
 	include/FreqControl.h \
 	include/hspinner.h \
 	include/other/AOR5K.h \
+	include/other/sunsdr2.h \
+	include/other/tcisdr.h \
 	include/generic.h \
 	include/gettext.h \
 	include/hidapi.h \
@@ -396,6 +402,8 @@ EXTRA_DIST = \
 	include/tentec/TT566.h \
 	include/tentec/TT588.h \
 	include/tentec/TT599.h \
+	include/tci_io.h \
+	include/WSclient.h \
 	include/timeops.h \
 	include/tod_clock.h \
 	include/ui.h \

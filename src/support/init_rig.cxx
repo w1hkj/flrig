@@ -59,7 +59,6 @@ void TRACED(init_xcvr)
 			vfoA.freq = selrig->get_vfoA();
 			FreqDispA->value(vfoA.freq);
 			vfoA.imode = selrig->get_modeA();
-
 			updateBandwidthControl();
 		} else {
 			selrig->selectA();
@@ -71,7 +70,6 @@ void TRACED(init_xcvr)
 			vfoB.freq = selrig->get_vfoB();
 			FreqDispB->value(vfoB.freq);
 			vfoB.imode = selrig->get_modeB();
-
 			updateBandwidthControl();
 		}
 
@@ -242,13 +240,11 @@ void TRACED(init_generic_rig)
 		opMODE->deactivate();
 	}
 
-	rigbws_.clear();
 	opBW->show();
 	opBW->clear();
 	if (selrig->has_bandwidth_control) {
 		old_bws = selrig->bandwidths_;
 		for (int i = 0; selrig->bandwidths_[i] != NULL; i++) {
-			rigbws_.push_back(selrig->bandwidths_[i]);
 			opBW->add(selrig->bandwidths_[i]);
 		}
 		opBW->activate();

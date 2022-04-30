@@ -30,9 +30,9 @@
 #include <FL/Fl_Return_Button.H>
 #include <FL/Fl_Box.H>
 
-#define FL_COMBO_UNIQUE 1
-#define FL_COMBO_UNIQUE_NOCASE 2
-#define FL_COMBO_LIST_INCR 100
+#define FL_COMBO_UNIQUE 0x04
+#define FL_COMBO_UNIQUE_NOCASE 0x08
+#define FL_COMBO_LIST_INCR 99 //100
 
 class Fl_ComboBox;
 

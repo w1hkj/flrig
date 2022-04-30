@@ -55,6 +55,8 @@ rigbase::rigbase()
 	SH_label = szbtnlabel;
 	bw_vals_ = &ibw_val;
 
+	io_class = SERIAL;
+
 	widgets = basewidgets;
 
 	serloop_timing = 200; // msec, 5x / second

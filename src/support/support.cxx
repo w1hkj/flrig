@@ -95,7 +95,6 @@ ATAG_XCVR_STATE oplist[LISTSIZE];
 
 int  numinlist = 0;
 std::vector<std::string> rigmodes_;
-std::vector<std::string> rigbws_;
 
 Cserial *RigSerial;
 Cserial *AuxSerial;
@@ -267,8 +266,7 @@ void read_info()
 	selrig->get_info();
 }
 
-void update_vfoAorB(void *d)
-{
+void TRACED(update_vfoAorB, void *d)
 	trace(1,"update_vfoAorB()");
 	if (selrig->inuse == onB) {
 		vfoB.src = RIG;
@@ -350,11 +348,13 @@ void read_vfo()
 
 void update_ifshift(void *d);
 
-void updateUI(void *)
-{
+void TRACED(updateUI, void *)
 	setModeControl(NULL);
+
+//	updateBandwidthControl(NULL);
+
 	setBWControl(NULL);
-	updateBandwidthControl(NULL);
+
 	highlight_vfo(NULL);
 
 	int min, max, step;
@@ -465,24 +465,19 @@ void read_mode()
 void setBWControl(void *)
 {
 	if (selrig->has_dsp_controls) {
-		if (opDSP_lo->isbusy() || opDSP_hi->isbusy())
-			return;
 		if (vfo->iBW > 256) {
-			opBW->index(0);
 			opBW->hide();
+			opDSP_hi->index((vfo->iBW >> 8) & 0x7F);
+			opDSP_lo->index(vfo->iBW & 0xFF);
 			if (opDSP_lo->visible()) {
-				opDSP_hi->index((vfo->iBW >> 8) & 0x7F);
-				opDSP_hi->hide();
-				opDSP_lo->index(vfo->iBW & 0xFF);
-				opDSP_lo->show();
+				opDSP_lo->redraw();
+				btnDSP->label(selrig->SL_label);
 			} else {
-				opDSP_hi->index((vfo->iBW >> 8) & 0x7F);
-				opDSP_lo->index(vfo->iBW & 0xFF);
-				opDSP_lo->hide();
-				opDSP_hi->show();
+				opDSP_hi->redraw();
+				btnDSP->label(selrig->SH_label);
 			}
-			btnDSP->label(selrig->SL_label);
 			btnDSP->redraw_label();
+			btnDSP->redraw();
 			btnDSP->show();
 		} else {
 			opDSP_lo->index(0);
@@ -492,21 +487,20 @@ void setBWControl(void *)
 			btnDSP->hide();
 			opBW->index(vfo->iBW);
 			opBW->show();
+			opBW->redraw();
 		}
 	}
 	else {
-		if (opBW->isbusy())
-			return;
 		opDSP_lo->hide();
 		opDSP_hi->hide();
 		btnDSP->hide();
 		opBW->index(vfo->iBW);
 		opBW->show();
+		opBW->redraw();
 	}
 }
 
-void read_bandwidth()
-{
+void TRACED(read_bandwidth)
 	if (xcvr_name == rig_K3.name_) {
 		read_K3_bw();
 		return;
@@ -1392,7 +1386,7 @@ void serviceA(XCVR_STATE nuvals)
 				selrig->set_modeA(nuvals.imode);
 				selrig->get_modeA();
 				A_changed = true;
-//				Fl::awake(updateUI);
+				Fl::awake(updateUI);
 			}
 			if (vfoA.iBW != nuvals.iBW) {
 				selrig->set_bwA(nuvals.iBW);
@@ -1414,7 +1408,7 @@ void serviceA(XCVR_STATE nuvals)
 
 	trace(2, "service VFO A", printXCVR_STATE(nuvals).c_str());
 
-	if ((nuvals.imode != -1) && (vfoA.imode != nuvals.imode)) {
+	if ((nuvals.imode != -1) ) {//&& (vfoA.imode != nuvals.imode)) {
 		if (selrig->name_ == rig_FT891.name_) {
 			// Mode change on ft891 can change frequency, so set all values
 			yaesu891UpdateA(&nuvals);
@@ -1427,8 +1421,7 @@ void serviceA(XCVR_STATE nuvals)
 			selrig->set_modeA(vfoA.imode = nuvals.imode);
 			selrig->get_modeA();
 			set_bandwidth_control();
-			selrig->set_bwA(vfoA.iBW);
-			selrig->get_bwA();
+			vfoA.iBW = selrig->get_bwA();
 			if (m1.find("CW") != std::string::npos ||
 				m2.find("CW") != std::string::npos)
 				vfoA.freq = nuvals.freq = selrig->get_vfoA();
@@ -1518,8 +1511,7 @@ void serviceB(XCVR_STATE nuvals)
 		selrig->set_modeB(vfoB.imode = nuvals.imode);
 		selrig->get_modeB();
 		set_bandwidth_control();
-		selrig->set_bwB(vfoB.iBW);
-		selrig->get_bwB();
+		vfoB.iBW = selrig->get_bwB();
 		if (m1.find("CW") != std::string::npos ||
 			m2.find("CW") != std::string::npos)
 			vfoB.freq = nuvals.freq = selrig->get_vfoB();
@@ -1826,68 +1818,68 @@ void set_bandwidth_control()
 		i--;
 		if (vfo->iBW > i) vfo->iBW = selrig->def_bandwidth(vfo->imode);
 	}
-	selrig->inuse == onB ? vfoB.iBW = vfo->iBW : vfoA.iBW = vfo->iBW;
+	if (selrig->inuse == onB)
+		vfoB.iBW = vfo->iBW = selrig->get_bwB();
+	else
+		vfoA.iBW = vfo->iBW = selrig->get_bwA();
+
 	Fl::awake(updateBandwidthControl);
 }
 
 void updateBandwidthControl(void *d)
 {
-	if (selrig->has_bandwidth_control) {
-		if (selrig->adjust_bandwidth(vfo->imode) != -1) {
-			opBW->clear();
-			rigbws_.clear();
-			for (int i = 0; selrig->bandwidths_[i] != NULL; i++) {
-				rigbws_.push_back(selrig->bandwidths_[i]);
-				opBW->add(selrig->bandwidths_[i]);
-			}
-
-			if (selrig->has_dsp_controls) {
-				opDSP_lo->clear();
-				opDSP_hi->clear();
-				for (int i = 0; selrig->dsp_SL[i] != NULL; i++)
-					opDSP_lo->add(selrig->dsp_SL[i]);
-				for (int i = 0; selrig->dsp_SH[i] != NULL; i++)
-					opDSP_hi->add(selrig->dsp_SH[i]);
-				if (vfo->iBW > 256) {
-					opBW->index(0);
-					opBW->hide();
-					opBW->hide();
-					opDSP_lo->index(vfo->iBW & 0xFF);
-					opDSP_lo->hide();
-					opDSP_hi->index((vfo->iBW >> 8) & 0x7F);
-					btnDSP->label(selrig->SL_label);
-					opDSP_lo->show();
-					btnDSP->show();
-					btnFILT->hide();
-				} else {
-					opDSP_lo->hide();
-					opDSP_hi->hide();
-					btnDSP->hide();
-					btnFILT->hide();
-					opBW->index(vfo->iBW);
-					opBW->show();
-				}
-			} else {  // no DSP control so update BW control, hide DSP
-				opDSP_lo->hide();
-				opDSP_hi->hide();
-				btnDSP->hide();
-				opBW->index(vfo->iBW);
-				if (selrig->has_FILTER) {
-					btnFILT->show();
-					btnFILT->label(
-						selrig->FILT(
-							selrig->inuse == onB ? vfoB.filter : vfoA.filter));
-					btnFILT->redraw_label();
-					opBW->resize(opDSP_lo->x(), opDSP_lo->y(), opDSP_lo->w(), opDSP_lo->h());
-					opBW->redraw();
-				}
-				opBW->show();
-			}
-			// Allow BW to receive rig updates as value is changed there, without needing
-			// to click the dropdown first
-			opBW->isbusy(false);
+	if (selrig->has_dsp_controls) {
+		if (vfo->iBW > 256) {
+			opDSP_lo->clear();
+			opDSP_hi->clear();
+			for (int i = 0; selrig->dsp_SL[i] != NULL; i++)
+				opDSP_lo->add(selrig->dsp_SL[i]);
+			for (int i = 0; selrig->dsp_SH[i] != NULL; i++)
+				opDSP_hi->add(selrig->dsp_SH[i]);
+//			opBW->index(0);
+			opBW->hide();
+			opBW->hide();
+			opDSP_lo->index(vfo->iBW & 0xFF);
+			opDSP_lo->hide();
+			opDSP_hi->index((vfo->iBW >> 8) & 0x7F);
+			btnDSP->label(selrig->SL_label);
+			opDSP_lo->show();
+			btnDSP->show();
+			btnFILT->hide();
+		} else {
+			opDSP_lo->hide();
+			opDSP_hi->hide();
+			btnDSP->hide();
+			btnFILT->hide();
+//			opBW->index(vfo->iBW);
+			opBW->show();
 		}
-	} else { // no BW, no DSP controls
+	}
+	else if (selrig->has_bandwidth_control) {
+		opDSP_lo->hide();
+		opDSP_hi->hide();
+		btnDSP->hide();
+		opBW->clear();
+		selrig->bwtable(vfo->imode);
+		for (int i = 0; selrig->bandwidths_[i] != NULL; i++)
+			opBW->add(selrig->bandwidths_[i]);
+		opBW->index(vfo->iBW);
+		opBW->redraw();
+		if (selrig->has_FILTER) {
+			btnFILT->show();
+			btnFILT->label(
+				selrig->FILT(
+					selrig->inuse == onB ? vfoB.filter : vfoA.filter));
+			btnFILT->redraw_label();
+			opBW->resize(opDSP_lo->x(), opDSP_lo->y(), opDSP_lo->w(), opDSP_lo->h());
+			opBW->redraw();
+		}
+		opBW->show();
+// Allow BW to receive rig updates as value is changed there, without needing
+// to click the dropdown first
+		opBW->isbusy(false);
+	}
+	else { // no BW, no DSP controls
 		opBW->index(0);
 		opBW->hide();
 		btnFILT->hide();
@@ -3080,26 +3072,17 @@ void set_power_controlImage(double pwr)
 
 void set_init_power_control();
 
-void setPower()
+void execute_setPower()
 {
-	int ev = Fl::event();
-	if (ev == FL_LEAVE || ev == FL_ENTER) return;
-	if (ev == FL_DRAG || ev == FL_PUSH) {
-		inhibit_power = 1;
-		return;
-	}
-	std::stringstream str;
-	str << "setPower(), ev=" << ev << ", inhibit_power=" << inhibit_power;
-	trace(1, str.str().c_str());
-
 	double set = 0;
 
 	if (spnrPOWER) set = progStatus.power_level = spnrPOWER->value();
 	if (sldrPOWER) set = progStatus.power_level = sldrPOWER->value();
 
+	double min, max, step;
+	selrig->get_pc_min_max_step(min, max, step);
+
 	if (xcvr_name == rig_K2.name_) {
-		double min, max, step;
-		selrig->get_pc_min_max_step(min, max, step);
 		if (spnrPOWER) spnrPOWER->minimum(min);
 		if (spnrPOWER) spnrPOWER->maximum(max);
 		if (spnrPOWER) spnrPOWER->step(step);
@@ -3112,9 +3095,29 @@ void setPower()
 		if (sldrPOWER) sldrPOWER->redraw();
 	}
 
+	if (progStatus.enable_power_limit && (set > progStatus.power_limit * max / 100)) {
+		set = progStatus.power_limit * max / 100;
+		if (spnrPOWER) spnrPOWER->value(set);
+		if (sldrPOWER) sldrPOWER->value(set);
+	}
+
 	guard_lock lock(&mutex_serial);
 	selrig->set_power_control(set);
 	set_init_power_control();
+}
+
+void setPower()
+{
+	int ev = Fl::event();
+	if (ev == FL_LEAVE || ev == FL_ENTER) return;
+	if (ev == FL_DRAG || ev == FL_PUSH) {
+		inhibit_power = 1;
+		return;
+	}
+	std::stringstream str;
+	str << "setPower(), ev=" << ev << ", inhibit_power=" << inhibit_power;
+	trace(1, str.str().c_str());
+	execute_setPower();
 }
 
 void cbTune()
@@ -3583,7 +3586,11 @@ void TRACED(close_UI)
 void TRACED(closeRig)
 
 	trace(1, "closeRig()");
-	if (xcvr_online) {
+	if (selrig->io_class == TCI) {
+		restore_xcvr_vals();
+		selrig->shutdown();
+	}
+	else if (xcvr_online) {
 		restore_xcvr_vals();
 		selrig->shutdown();
 	}

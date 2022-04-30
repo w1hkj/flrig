@@ -28,7 +28,7 @@
 #include <cstdio>
 #include <string.h>
 
-#define WITH_TRACED
+//#define WITH_TRACED
 //usage
 //int TRACED(add, int a, int b)
 // opening brace is part of the macro
@@ -41,6 +41,8 @@ extern void get_trace(int n, ...); // trace get methods
 extern void set_trace(int n, ...); // trace set methods
 extern void ser_trace(int n, ...); // trace serial methods
 extern void rpc_trace(int n, ...); // trace transceiver class methods
+extern void deb_trace(int n, ...); // trace debug statements
+extern void tci_trace(int n, ...);
 
 extern void make_trace_window();
 
