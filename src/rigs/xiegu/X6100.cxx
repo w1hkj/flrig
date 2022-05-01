@@ -1003,37 +1003,6 @@ void RIG_X6100::set_compression(int on, int val)
 	}
 }
 
-// Tranceiver PTT on/off
-void RIG_X6100::set_PTT_control(int val)
-{
-	cmd = pre_to;
-	cmd += '\x1c';
-	cmd += '\x00';
-	cmd += (unsigned char) val;
-	cmd.append( post );
-	waitFB("set ptt");
-	isett("set PTT");
-	ptt_ = val;
-}
-
-int RIG_X6100::get_PTT()
-{
-	cmd = pre_to;
-	cmd += '\x1c'; cmd += '\x00';
-	std::string resp = pre_fm;
-	resp += '\x1c'; resp += '\x00';
-	cmd.append(post);
-	get_trace(1, "get PTT");
-	ret = waitFOR(8, "get PTT");
-	igett("");
-	if (ret) {
-		size_t p = replystr.rfind(resp);
-		if (p != std::string::npos)
-			ptt_ = replystr[p + 6];
-	}
-	return ptt_;
-}
-
 void RIG_X6100::set_pbt_inner(int val)
 {
 	int shift = 128 + val * 128 / 50;
@@ -1215,3 +1184,71 @@ const char ** RIG_X6100::bwtable(int m)
 	}
 	return table;
 }
+
+// Tranceiver PTT on/off
+void RIG_X6100::set_PTT_control(int val)
+{
+	cmd = pre_to;
+	cmd += '\x1c';
+	cmd += '\x00';
+	cmd += (unsigned char) val;
+	cmd.append( post );
+	set_trace(1, "set PTT");
+	waitFB("set ptt");
+	isett("");
+	ptt_ = val;
+}
+
+int RIG_X6100::get_PTT()
+{
+	cmd = pre_to;
+	cmd += '\x1c'; cmd += '\x00';
+	std::string resp = pre_fm;
+	resp += '\x1c'; resp += '\x00';
+	cmd.append(post);
+	get_trace(1,"get_PTT()");
+	if (waitFOR(8, "get PTT")) {
+		igett("");
+		size_t p = replystr.rfind(resp);
+		if (p != std::string::npos)
+			ptt_ = replystr[p + 6];
+	}
+	return ptt_;
+}
+
+void RIG_X6100::tune_rig(int how)
+{
+	cmd = pre_to;
+	cmd.append("\x1c\x01");
+	switch (how) {
+		default:
+		case 0:
+			cmd += '\x00'; // off
+			break;
+		case 1:
+			cmd += '\x01'; // ON
+			break;
+		case 2:
+			cmd += '\x02'; // start tuning
+			break;
+	}
+	cmd.append( post );
+	waitFB("tune rig");
+	isett("tune rig");
+}
+
+int RIG_X6100::get_tune()
+{
+	std::string resp;
+	std::string cstr = "\x1C\x01";
+	cmd.assign(pre_to).append(cstr).append(post);
+	resp.assign(pre_fm).append(cstr);
+	int val = tune_;
+	if (waitFOR(8, "get TUNE")) {
+		size_t p = replystr.rfind(resp);
+		if (p != std::string::npos)
+			val = replystr[p + 6];
+	}
+	return (tune_ = val);
+}
+

@@ -112,6 +112,9 @@ public:
 	void set_PTT_control(int val);
 	int  get_PTT();
 
+	void tune_rig(int how);
+	int  get_tune();
+
 	void set_band_selection(int v);
 	void get_band_selection(int v);
 	const char ** bwtable(int m);

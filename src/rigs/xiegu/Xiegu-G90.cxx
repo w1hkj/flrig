@@ -358,6 +358,23 @@ void RIG_Xiegu_G90::set_PTT_control(int val)
 	ptt_ = val;
 }
 
+int RIG_Xiegu_G90::get_PTT()
+{
+	cmd = pre_to;
+	cmd += '\x1c'; cmd += '\x00';
+	std::string resp = pre_fm;
+	resp += '\x1c'; resp += '\x00';
+	cmd.append(post);
+	get_trace(1,"get_PTT()");
+	if (waitFOR(8, "get PTT")) {
+		igett("");
+		size_t p = replystr.rfind(resp);
+		if (p != std::string::npos)
+			ptt_ = replystr[p + 6];
+	}
+	return ptt_;
+}
+
 void RIG_Xiegu_G90::set_modeA(int val)
 {
 	A.imode = val;

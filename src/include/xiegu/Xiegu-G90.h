@@ -114,7 +114,7 @@ public:
 	int get_split();
 
 	void set_PTT_control(int val);
-//	int  get_PTT();
+	int  get_PTT();
 
 	void set_power_control(double val);
 	double get_power_control();
