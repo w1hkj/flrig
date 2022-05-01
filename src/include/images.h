@@ -34,6 +34,7 @@ extern Fl_Bitmap image_p200;
 extern Fl_Bitmap image_p200log;
 
 extern Fl_Bitmap image_voltmeter;
+extern Fl_Bitmap image_volts50;
 
 extern Fl_Bitmap image_smeter;
 extern Fl_Bitmap image_swr;

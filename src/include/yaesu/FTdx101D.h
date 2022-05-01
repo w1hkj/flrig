@@ -76,7 +76,7 @@ public:
 	virtual int  get_swr();
 	virtual int  get_alc();
 
-	double  get_voltmeter(void);
+	virtual double  get_voltmeter(void);
 
 	virtual int  get_power_out();
 	virtual double get_power_control();
@@ -159,6 +159,7 @@ public:
 	int  get_power_out();
 	double get_power_control();
 	void set_power_control(double val);
+	double  get_voltmeter(void);
 };
 
 #endif

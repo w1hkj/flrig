@@ -2317,6 +2317,22 @@ Press 'Init' button."));
 	box_xcvr_connect->color(FL_GREEN);
 	box_xcvr_connect->redraw();
 
+	if (selrig->name_ == rig_FTdx101MP.name_) {
+		sldrVoltage->minimum (47); sldrVoltage->maximum (52);
+		sigbar_VOLTS->minimum (47); sigbar_VOLTS->maximum (52);
+		scaleVoltage->image(image_volts50);
+		scaleVoltage->redraw_label();
+		mtr_VOLTS->image(image_volts50);
+		mtr_VOLTS->redraw_label();
+	} else {
+		sldrVoltage->minimum (6); sldrVoltage->maximum (16);
+		sigbar_VOLTS->minimum (6); sigbar_VOLTS->maximum (16);
+		scaleVoltage->image(image_voltmeter);
+		scaleVoltage->redraw_label();
+		mtr_VOLTS->image(image_voltmeter);
+		mtr_VOLTS->redraw_label();
+	}
+
 	start_commands();
 
 	return;

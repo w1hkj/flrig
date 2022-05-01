@@ -37,6 +37,7 @@
 #include "images/P200log.xbm"
 
 #include "images/volts.xbm"
+#include "images/volts50.xbm"
 
 #include "images/S60.xbm"
 #include "images/SWR.xbm"
@@ -53,6 +54,7 @@ Fl_Bitmap image_p200(P200_bits, P200_width, P200_height);
 Fl_Bitmap image_p200log(P200log_bits, P200log_width, P200log_height);
 
 Fl_Bitmap image_voltmeter(volts_bits, volts_width, volts_height);
+Fl_Bitmap image_volts50(volts50_bits, volts50_width, volts50_height);
 
 Fl_Bitmap image_smeter(S60_bits, S60_width, S60_height);
 Fl_Bitmap image_swr(SWR_bits, SWR_width, SWR_height);

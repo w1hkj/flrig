@@ -1448,6 +1448,30 @@ void RIG_FTdx101D::sync_clock(char *tm)
 	sett("sync_time");
 }
 
+double RIG_FTdx101D::get_voltmeter()
+{
+// RM8155000;
+	cmd = "RM8;";
+	std::string resp = "RM";
+
+	int mtr = 0;
+	double val = 0;
+
+	get_trace(1, "get_voltmeter()");
+	wait_char(';',10, 100, "get vdd", ASC);
+	gett("get_voltmeter");
+
+	size_t p = replystr.rfind(resp);
+	if (p != std::string::npos) {
+		replystr[6] = 0;
+		mtr = atoi(&replystr[p+3]);
+		val = 0.066 * mtr + 0.78;
+		return val;
+	}
+
+	return -1;
+}
+
 //======================================================================
 // FTdx101MP
 //======================================================================
@@ -1528,7 +1552,7 @@ void RIG_FTdx101MP::set_power_control(double val)
 	showresp(WARN, ASC, "SET power", cmd, replystr);
 }
 
-double RIG_FTdx101D::get_voltmeter()
+double RIG_FTdx101MP::get_voltmeter()
 {
 // RM8155000;
 	cmd = "RM8;";
@@ -1545,7 +1569,9 @@ double RIG_FTdx101D::get_voltmeter()
 	if (p != std::string::npos) {
 		replystr[6] = 0;
 		mtr = atoi(&replystr[p+3]);
-		val = 0.066 * mtr + 0.78;
+		val = 50 * mtr / 196;
+		if (val < 47) val = 47;
+		if (val > 52) val = 52;
 		return val;
 	}
 
