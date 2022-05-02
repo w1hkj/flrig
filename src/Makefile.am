@@ -459,6 +459,8 @@ EXTRA_DIST = \
 	images/SWR.xbm \
 	images/volts.xbm \
 	images/volts50.xbm \
+	images/idd25.xbm \
+	images/idd50.xbm \
 	cwio/cwioUI.fl \
 	fskio/fskioUI.fl
 

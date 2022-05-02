@@ -79,9 +79,10 @@ extern Fl_Output *txt_encA;
 extern Fl_Group *grpMeters;
 extern Fl_Box *scaleSmeter;
 
-extern Fl_Button *btnALC_SWR;
+extern Fl_Button *btnALC_IDD_SWR;
 
 extern Fl_SigBar *sldrRcvSignal;
+extern Fl_SigBar *sldrIDD;
 extern Fl_SigBar *sldrALC;
 extern Fl_SigBar *sldrSWR;
 extern Fl_SigBar *sldrFwdPwr;

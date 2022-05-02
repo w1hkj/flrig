@@ -229,10 +229,11 @@ Fl_Wheel_Value_Slider *sldr_nb_level = (Fl_Wheel_Value_Slider *)0;
 //Fl_ComboBox *cbo_agc_level = (Fl_ComboBox *)0;
 Hspinner *spnr_bpf_center = (Hspinner *)0;
 
-Fl_Button *btnALC_SWR = (Fl_Button *)0;
+Fl_Button *btnALC_IDD_SWR = (Fl_Button *)0;
 
 Fl_SigBar *sldrRcvSignal = (Fl_SigBar *)0;
 Fl_SigBar *sldrALC = (Fl_SigBar *)0;
+Fl_SigBar *sldrIDD = (Fl_SigBar *)0;
 Fl_SigBar *sldrSWR = (Fl_SigBar *)0;
 
 Fl_SigBar *sldrFwdPwr = (Fl_SigBar *)0;
@@ -452,7 +453,7 @@ static void cb_mnuColorConfig(Fl_Menu_*, void*) {
 }
 
 static void cb_mnu_show_meters(Fl_Menu_ *, void *) {
-	if (meters_dialog)
+	if (!meters_dialog)
 		meters_dialog = win_meters();
 	meters_dialog->show();
 }
@@ -559,8 +560,8 @@ static void cb_mnuAbout(Fl_Menu_*, void*) {
 	about();
 }
 
-static void cb_btnALC_SWR(Fl_Button*, void*) {
-	cbALC_SWR();
+static void cb_btnALC_IDD_SWR(Fl_Button*, void*) {
+	cbALC_IDD_SWR();
 }
 
 static void cb_btnAGC(Fl_Button*, void*) {

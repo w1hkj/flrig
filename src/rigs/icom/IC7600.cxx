@@ -178,6 +178,7 @@ RIG_IC7600::RIG_IC7600() {
 	has_power_out =
 	has_swr_control =
 	has_alc_control =
+	has_idd_control =
 	has_sql_control = true;
 
 	has_power_control = true;
@@ -899,6 +900,31 @@ int RIG_IC7600::get_smeter()
 			mtr = fm_bcd(replystr.substr(p+6), 3);
 			mtr = (int)ceil(mtr /2.41);
 			if (mtr > 100) mtr = 100;
+		}
+	}
+	return mtr;
+}
+
+double RIG_IC7600::get_idd(void)
+{
+	get_trace(1, "get_idd()");
+	std::string cstr = "\x15\x16";
+	std::string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+	double mtr= 0;
+
+	int ret = waitFOR(9, "get idd");
+	igett("");
+
+	if (ret) {
+		size_t p = replystr.rfind(resp);
+		if (p != std::string::npos) {
+			mtr = fm_bcd(replystr.substr(p+6), 3);
+			mtr = 25.0 * mtr / 241.0;
+			if (mtr > 25) mtr = 25;
 		}
 	}
 	return mtr;

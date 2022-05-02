@@ -157,6 +157,9 @@ RIG_IC7700::RIG_IC7700() {
 
 	has_extras =
 
+	has_voltmeter =
+	has_idd_control =
+
 	has_cw_wpm =
 	has_cw_spot_tone =
 	has_cw_qsk =
@@ -994,5 +997,56 @@ void RIG_IC7700::sync_clock(char *tm)
 	set_trace(1, "set xcvr clock");
 	waitFB("set xcvr clock", 200);
 	seth();
+}
+
+double RIG_IC7700::get_idd(void)
+{
+	get_trace(1, "get_idd()");
+	std::string cstr = "\x15\x16";
+	std::string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+	double mtr= 0;
+
+	int ret = waitFOR(9, "get idd");
+	igett("");
+
+	if (ret) {
+		size_t p = replystr.rfind(resp);
+		if (p != std::string::npos) {
+			mtr = fm_bcd(replystr.substr(p+6), 3);
+			mtr = 25.0 * mtr / 241.0;
+			if (mtr > 25) mtr = 25;
+		}
+	}
+	return mtr;
+}
+
+double RIG_IC7700::get_voltmeter()
+{
+	std::string cstr = "\x15\x15";
+	std::string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+
+	int mtr = 0;
+	double val = 0;
+
+	int ret = waitFOR(9, "get voltmeter");
+	igett("voltmeter");
+
+	if (ret) {
+		size_t p = replystr.rfind(resp);
+		if (p != std::string::npos) {
+			mtr = fm_bcd(replystr.substr(p+6), 3);
+			val = 0.026 * mtr + 9.782;
+			return val;
+		}
+	}
+	return -1;
 }
 

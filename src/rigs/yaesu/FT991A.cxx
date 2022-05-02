@@ -166,6 +166,7 @@ RIG_FT991A::RIG_FT991A() {
 	has_alc_control =
 	has_swr_control =
 	has_agc_control =
+	has_idd_control =
 	has_voltmeter =
 	has_power_out =
 	has_power_control =
@@ -485,17 +486,32 @@ double RIG_FT991A::get_voltmeter()
 	double val = 0;
 
 	get_trace(1, "get_voltmeter()");
-	wait_char(';',7, FL991A_WAIT_TIME, "get vdd", ASC);
-	gett("get vdd");
+	wait_char(';',7, 100, "get vdd", ASC);
+	gett("get_voltmeter");
 
 	size_t p = replystr.rfind(resp);
 	if (p != std::string::npos) {
 		mtr = atoi(&replystr[p+3]);
-		val = (7.0 * mtr / 98.0) + 0.14;
+		val = 13.8 * mtr / 190;
 		return val;
 	}
 
 	return -1;
+}
+
+double RIG_FT991A::get_idd()
+{
+	cmd = rsp = "RM7";
+	cmd += ';';
+	wait_char(';',10, 100, "get alc", ASC);
+	gett("get_idd");
+
+	size_t p = replystr.rfind(rsp);
+	if (p == std::string::npos) return 0;
+	if (p + 9 >= replystr.length()) return 0;
+	replystr[6] = '\x00';
+	double mtr = atoi(&replystr[p+3]);
+	return mtr / 10.0;
 }
 
 int RIG_FT991A::get_power_out()

@@ -102,14 +102,14 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 			scaleSmeter->image(image_S60);
 			scaleSmeter->tooltip(_("S units meter"));
 
-			btnALC_SWR = new Fl_Button(xpos+1, ypos+1, 206, 20);
-			btnALC_SWR->tooltip(_("Press SWR / ALC"));
-			btnALC_SWR->box(FL_FLAT_BOX);
-			btnALC_SWR->down_box(FL_FLAT_BOX);
-			btnALC_SWR->color((Fl_Color)246);
-			btnALC_SWR->image(image_SWR);
-			btnALC_SWR->callback((Fl_Callback*)cb_btnALC_SWR);
-			btnALC_SWR->hide();
+			btnALC_IDD_SWR = new Fl_Button(xpos+1, ypos+1, 206, 20);
+			btnALC_IDD_SWR->tooltip(_("Press SWR / ALC"));
+			btnALC_IDD_SWR->box(FL_FLAT_BOX);
+			btnALC_IDD_SWR->down_box(FL_FLAT_BOX);
+			btnALC_IDD_SWR->color((Fl_Color)246);
+			btnALC_IDD_SWR->image(image_SWR);
+			btnALC_IDD_SWR->callback((Fl_Callback*)cb_btnALC_IDD_SWR);
+			btnALC_IDD_SWR->hide();
 
 			sldrRcvSignal = new Fl_SigBar(xpos+2, ypos+22, 200, 6);
 			sldrRcvSignal->box(FL_FLAT_BOX);
@@ -138,6 +138,20 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 			sldrALC->hide();
 			sldrALC->minimum(0);
 			sldrALC->maximum(100);
+
+			sldrIDD = new Fl_SigBar(xpos+3, ypos+22, 200, 6);
+			sldrIDD->box(FL_FLAT_BOX);
+			sldrIDD->color(FL_BACKGROUND_COLOR);
+			sldrIDD->selection_color(FL_BACKGROUND_COLOR);
+			sldrIDD->labeltype(FL_NORMAL_LABEL);
+			sldrIDD->labelfont(0);
+			sldrIDD->labelsize(12);
+			sldrIDD->labelcolor(FL_FOREGROUND_COLOR);
+			sldrIDD->align(Fl_Align(FL_ALIGN_CENTER));
+			sldrIDD->when(FL_WHEN_CHANGED);
+			sldrIDD->hide();
+			sldrIDD->minimum(0);
+			sldrIDD->maximum(25);;
 
 			sldrSWR = new Fl_SigBar(xpos+2, ypos+22, 200, 6);
 			sldrSWR->box(FL_FLAT_BOX);

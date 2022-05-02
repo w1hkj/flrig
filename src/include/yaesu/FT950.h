@@ -75,10 +75,13 @@ public:
 	int  get_swr();
 	int  get_alc();
 
-	double  get_voltmeter(void);
-
 	int  get_power_out();
+
+	double get_idd();
+	double get_voltmeter();
+
 	double get_power_control();
+
 	void set_volume_control(int val);
 	void set_power_control(double val);
 	void get_pc_min_max_step(double &min, double &max, double &step) {

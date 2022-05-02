@@ -200,7 +200,10 @@ RIG_FTdx101D::RIG_FTdx101D() {
 	has_smeter =
 	has_swr_control =
 	has_alc_control =
+
+	has_idd_control =
 	has_voltmeter =
+
 	has_power_out =
 	has_power_control =
 	has_volume_control =
@@ -1447,7 +1450,7 @@ void RIG_FTdx101D::sync_clock(char *tm)
 	showresp(WARN, ASC, "sync_time", cmd, replystr);
 	sett("sync_time");
 }
-
+  
 double RIG_FTdx101D::get_voltmeter()
 {
 // RM8155000;
@@ -1470,6 +1473,21 @@ double RIG_FTdx101D::get_voltmeter()
 	}
 
 	return -1;
+}
+
+double RIG_FTdx101D::get_idd()
+{
+	cmd = rsp = "RM7";
+	cmd += ';';
+	wait_char(';',10, 100, "get alc", ASC);
+	gett("get_idd");
+
+	size_t p = replystr.rfind(rsp);
+	if (p == std::string::npos) return 0;
+	if (p + 9 >= replystr.length()) return 0;
+	replystr[6] = '\x00';
+	double mtr = atoi(&replystr[p+3]);
+	return mtr / 10.0;
 }
 
 //======================================================================

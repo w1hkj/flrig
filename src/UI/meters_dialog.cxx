@@ -29,16 +29,18 @@ Fl_Box *mtr_SMETER = (Fl_Box *)0;
 Fl_Box *mtr_PWR    = (Fl_Box *)0;
 Fl_Box *mtr_SWR    = (Fl_Box *)0;
 Fl_Box *mtr_ALC    = (Fl_Box *)0;
+Fl_Box *mtr_IDD    = (Fl_Box *)0;
 Fl_Box *mtr_VOLTS  = (Fl_Box *)0;
 
 Fl_SigBar *sigbar_SMETER = (Fl_SigBar *)0;
 Fl_SigBar *sigbar_PWR    = (Fl_SigBar *)0;
 Fl_SigBar *sigbar_SWR    = (Fl_SigBar *)0;
 Fl_SigBar *sigbar_ALC    = (Fl_SigBar *)0;
+Fl_SigBar *sigbar_IDD    = (Fl_SigBar *)0;
 Fl_SigBar *sigbar_VOLTS  = (Fl_SigBar *)0;
 
 Fl_Double_Window* win_meters() {
-	Fl_Double_Window* w = new Fl_Double_Window(210, 150, _("Meters"));
+	Fl_Double_Window* w = new Fl_Double_Window(210, 190, _("Meters"));
 
 	Fl_Color bgclr = fl_rgb_color(progStatus.bg_red, progStatus.bg_green, progStatus.bg_blue);
 	Fl_Color fgclr = fl_rgb_color(progStatus.fg_red, progStatus.fg_green, progStatus.fg_blue);
@@ -138,7 +140,30 @@ Fl_Double_Window* win_meters() {
 	sigbar_ALC->PeakColor(fl_rgb_color(progStatus.peakRed, progStatus.peakGreen, progStatus.peakBlue));
 	sigbar_ALC->show();
 
-	sigbar_VOLTS = new Fl_SigBar(5, sigbar_ALC->y() + sigbar_ALC->h() + 2, 200, 6);
+	mtr_IDD = new Fl_Box(2, sigbar_ALC->y() + sigbar_ALC->h() + 2, 206, 20);
+	mtr_IDD->box(FL_FLAT_BOX);
+	mtr_IDD->image(image_idd25);
+	mtr_IDD->color(bgclr);
+	mtr_IDD->labelcolor(fgclr);
+
+	sigbar_IDD = new Fl_SigBar(5, mtr_IDD->y() + mtr_IDD->h() + 2, 200, 6);
+	sigbar_IDD->box(FL_FLAT_BOX);
+	sigbar_IDD->color(FL_BACKGROUND_COLOR);
+	sigbar_IDD->selection_color(FL_BACKGROUND_COLOR);
+	sigbar_IDD->labeltype(FL_NORMAL_LABEL);
+	sigbar_IDD->labelfont(0);
+	sigbar_IDD->labelsize(12);
+	sigbar_IDD->labelcolor(FL_FOREGROUND_COLOR);
+	sigbar_IDD->align(Fl_Align(FL_ALIGN_CENTER));
+	sigbar_IDD->when(FL_WHEN_CHANGED);
+	sigbar_IDD->hide();
+	sigbar_IDD->minimum(0);
+	sigbar_IDD->maximum(25);
+	sigbar_IDD->color(fl_rgb_color (progStatus.swrRed, progStatus.swrGreen, progStatus.swrBlue), bgclr);
+	sigbar_IDD->PeakColor(fl_rgb_color(progStatus.peakRed, progStatus.peakGreen, progStatus.peakBlue));
+	sigbar_IDD->show();
+
+	sigbar_VOLTS = new Fl_SigBar(5, sigbar_IDD->y() + sigbar_IDD->h() + 2, 200, 6);
 	sigbar_VOLTS->box(FL_FLAT_BOX);
 	sigbar_VOLTS->color(FL_BACKGROUND_COLOR);
 	sigbar_VOLTS->selection_color(FL_BACKGROUND_COLOR);
@@ -169,6 +194,8 @@ Fl_Double_Window* win_meters() {
 	sigbar_SWR->avg(progStatus.pwr_avg);
 	sigbar_ALC->aging(progStatus.pwr_peak);
 	sigbar_ALC->avg(progStatus.pwr_avg);
+	sigbar_IDD->aging(1);
+	sigbar_IDD->avg(1);
 	sigbar_VOLTS->aging(1);
 	sigbar_VOLTS->avg(1);
 

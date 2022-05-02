@@ -94,6 +94,9 @@ public:
 
 	void get_band_selection(int v);
 
+	virtual double get_idd();
+	virtual double get_voltmeter(void);
+
 };
 
 

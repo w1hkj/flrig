@@ -135,6 +135,7 @@ public:
 	int  get_swr(void);
 	int  get_alc(void);
 
+	double get_idd(void);
 	double get_voltmeter(void);
 
 	void set_power_control(double val);

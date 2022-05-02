@@ -27,11 +27,11 @@ void TRACED(update_UI_PTT, void *d)
 
 	btnPTT->value(PTT);
 	if (!PTT) {
-		btnALC_SWR->hide();
+		btnALC_IDD_SWR->hide();
 		scaleSmeter->show();
 		sldrRcvSignal->clear();
 	} else {
-		btnALC_SWR->show();
+		btnALC_IDD_SWR->show();
 		scaleSmeter->hide();
 		sldrFwdPwr->clear();
 		sldrALC->clear();
@@ -2003,9 +2003,9 @@ void TRACED(set_init_auto_notch)
 void TRACED(init_swr_control)
 
 	if (selrig->has_swr_control)
-		btnALC_SWR->activate();
+		btnALC_IDD_SWR->activate();
 	else {
-		btnALC_SWR->deactivate();
+		btnALC_IDD_SWR->deactivate();
 	}
 }
 
@@ -2137,6 +2137,8 @@ void TRACED(initRig)
 	sldrSWR->avg(progStatus.pwr_avg);
 	sldrALC->aging(progStatus.pwr_peak);
 	sldrALC->avg(progStatus.pwr_avg);
+	sldrIDD->aging(progStatus.pwr_peak);
+	sldrIDD->avg(progStatus.pwr_avg);
 
 	sldrVoltage->aging(1);
 	sldrVoltage->avg(1);
@@ -2149,6 +2151,8 @@ void TRACED(initRig)
 	sigbar_SWR->avg(progStatus.pwr_avg);
 	sigbar_ALC->aging(progStatus.pwr_peak);
 	sigbar_ALC->avg(progStatus.pwr_avg);
+	sigbar_IDD->aging(progStatus.pwr_peak);
+	sigbar_IDD->avg(progStatus.pwr_avg);
 
 	sigbar_VOLTS->aging(1);
 	sigbar_VOLTS->avg(1);
@@ -2317,21 +2321,25 @@ Press 'Init' button."));
 	box_xcvr_connect->color(FL_GREEN);
 	box_xcvr_connect->redraw();
 
-	if (selrig->name_ == rig_FTdx101MP.name_) {
+	if (selrig->name_ == rig_FTdx101MP.name_ ||
+		selrig->name_ == rig_IC7851.name_ ) {
 		sldrVoltage->minimum (47); sldrVoltage->maximum (52);
 		sigbar_VOLTS->minimum (47); sigbar_VOLTS->maximum (52);
 		scaleVoltage->image(image_volts50);
-		scaleVoltage->redraw_label();
 		mtr_VOLTS->image(image_volts50);
-		mtr_VOLTS->redraw_label();
 	} else {
 		sldrVoltage->minimum (6); sldrVoltage->maximum (16);
 		sigbar_VOLTS->minimum (6); sigbar_VOLTS->maximum (16);
 		scaleVoltage->image(image_voltmeter);
-		scaleVoltage->redraw_label();
 		mtr_VOLTS->image(image_voltmeter);
-		mtr_VOLTS->redraw_label();
 	}
+	scaleVoltage->redraw_label();
+	mtr_VOLTS->redraw_label();
+
+	sldrIDD->maximum(25);
+	sldrIDD->minimum(0);
+	sigbar_IDD->maximum(25);
+	sigbar_IDD->minimum(0);
 
 	start_commands();
 

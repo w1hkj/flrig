@@ -207,6 +207,7 @@ RIG_IC7100::RIG_IC7100() {
 	has_power_out = true;
 	has_swr_control = true;
 	has_alc_control = true;
+	has_idd_control = true;
 
 	has_split = true;
 	has_split_AB = true;
@@ -1482,6 +1483,30 @@ double RIG_IC7100::get_voltmeter()
 	return -1;
 }
 
+double RIG_IC7100::get_idd(void)
+{
+	get_trace(1, "get_idd()");
+	std::string cstr = "\x15\x16";
+	std::string resp = pre_fm;
+	resp.append(cstr);
+	cmd = pre_to;
+	cmd.append(cstr);
+	cmd.append( post );
+	double mtr= 0;
+
+	ret = waitFOR(9, "get idd");
+	igett("");
+
+	if (ret) {
+		size_t p = replystr.rfind(resp);
+		if (p != std::string::npos) {
+			mtr = fm_bcd(replystr.substr(p+6), 3);
+			mtr = 25.0 * mtr / 241.0;
+			if (mtr > 25) mtr = 25;
+		}
+	}
+	return mtr;
+}
 
 static meterpair pwrtbl[] = { 
 {0, 0.0},

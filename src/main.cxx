@@ -525,10 +525,12 @@ int main (int argc, char *argv[])
 
 	createXcvrDialog();
 
-	btnALC_SWR->image(image_swr);
+	btnALC_IDD_SWR->image(image_swr);
+	meter_image = SWR_IMAGE;
 	sldrRcvSignal->clear();
 	sldrFwdPwr->clear();
 	sldrALC->clear();
+	sldrIDD->clear();
 	sldrSWR->clear();
 
 	switch (progStatus.UIsize) {

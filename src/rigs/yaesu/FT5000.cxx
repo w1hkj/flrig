@@ -185,6 +185,10 @@ RIG_FT5000::RIG_FT5000() {
 	can_change_alt_vfo =
 	has_smeter =
 	has_swr_control =
+
+	has_idd_control =
+	has_voltmeter =
+
 	has_power_out =
 	has_power_control =
 	has_volume_control =
@@ -1376,6 +1380,44 @@ int RIG_FT5000::get_break_in()
 	}
 	return progStatus.break_in;
 }
+
+double RIG_FT5000::get_voltmeter()
+{
+	cmd = "RM8;";
+	std::string resp = "RM";
+
+	int mtr = 0;
+	double val = 0;
+
+	get_trace(1, "get_voltmeter()");
+	wait_char(';',7, 100, "get vdd", ASC);
+	gett("get_voltmeter");
+
+	size_t p = replystr.rfind(resp);
+	if (p != std::string::npos) {
+		mtr = atoi(&replystr[p+3]);
+		val = 13.8 * mtr / 190;
+		return val;
+	}
+
+	return -1;
+}
+
+double RIG_FT5000::get_idd()
+{
+	cmd = rsp = "RM7";
+	cmd += ';';
+	wait_char(';',10, 100, "get alc", ASC);
+	gett("get_idd");
+
+	size_t p = replystr.rfind(rsp);
+	if (p == std::string::npos) return 0;
+	if (p + 9 >= replystr.length()) return 0;
+	replystr[6] = '\x00';
+	double mtr = atoi(&replystr[p+3]);
+	return mtr / 10.0;
+}
+
 
 /*
 void RIG_FT5000::set_cw_spot_tone()

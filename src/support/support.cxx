@@ -102,7 +102,6 @@ Cserial *SepSerial;
 
 bool using_buttons = false;
 
-enum { SWR_IMAGE, ALC_IMAGE };
 int meter_image = SWR_IMAGE;
 
 bool xcvr_online = false;
@@ -113,6 +112,7 @@ double smtrval = 0;
 double pwrval = 0;
 double swrval = 0;
 double alcval = 0;
+double iddval = 0;
 double vmtrval = 0;
 
 //======================================================================
@@ -624,6 +624,21 @@ void read_alc()
 	Fl::awake(updateALC);
 }
 
+// IDD
+void read_idd()
+{
+	if ((meter_image != IDD_IMAGE) ||
+		!selrig->has_idd_control) return;
+	double sig;
+	{
+		trace(1,"read_idd()");
+		sig = selrig->get_idd();
+	}
+	if (sig < 0) return;
+	iddval = sig;
+	Fl::awake(updateIDD);
+}
+
 // notch
 void update_auto_notch(void *d)
 {
@@ -1114,7 +1129,7 @@ void set_ptt(void *d)
 		sldrSWR->redraw();
 		sldrRcvSignal->show();
 		sldrRcvSignal->redraw();
-		btnALC_SWR->hide();
+		btnALC_IDD_SWR->hide();
 		scaleSmeter->show();
 	} else {
 		btnPTT->value(1);
@@ -1123,9 +1138,9 @@ void set_ptt(void *d)
 		scaleSmeter->hide();
 		sldrSWR->show();
 		sldrSWR->redraw();
-		btnALC_SWR->image(meter_image == SWR_IMAGE ? image_swr : image_alc);
-		btnALC_SWR->redraw();
-		btnALC_SWR->show();
+		btnALC_IDD_SWR->image(meter_image == SWR_IMAGE ? image_swr : image_alc);
+		btnALC_IDD_SWR->redraw();
+		btnALC_IDD_SWR->show();
 	}
 }
 
@@ -1598,6 +1613,7 @@ POLL_PAIR TX_poll_pairs[] = {
 	{&progStatus.poll_pout, read_power_out, "pout"},
 	{&progStatus.poll_swr, read_swr, "swr"},
 	{&progStatus.poll_alc, read_alc, "alc"},
+	{&progStatus.poll_alc, read_idd, "idd"},
 	{&progStatus.poll_mode, read_voltmeter, "voltage"},
 	{&progStatus.poll_split, read_split, "split"},
 	{NULL, NULL}
@@ -1688,21 +1704,14 @@ void * serial_thread_loop(void *d)
 				MilliSleep(progStatus.byte_interval);
 
 			{	guard_lock lk(&mutex_serial);
-				while (!bypass_serial_thread_loop) {
+				if (!bypass_serial_thread_loop) {
+					if (tx_polling->poll == NULL)
+						tx_polling = &TX_poll_pairs[0];
 					if (*(tx_polling->poll)) {
 						(tx_polling->pollfunc)();
-						++tx_polling;
-						if (tx_polling->poll == NULL)
-							tx_polling = &TX_poll_pairs[0];
-						break;
 					}
 					++tx_polling;
-					if (tx_polling->poll == NULL) {
-						tx_polling = &TX_poll_pairs[0];
-						break;
-					}
 				}
-
 			}
 
 		} else {
@@ -3305,14 +3314,30 @@ void setRFGAINControl(void* d)
 	if (spnrRFGAIN) spnrRFGAIN->value(progStatus.rfgain);
 }
 
+void updateIDD(void *)
+{
+	sigbar_IDD->value(iddval);
+	sigbar_IDD->redraw();
+
+	if (meter_image != IDD_IMAGE) return;
+	sldrRcvSignal->hide();
+	sldrSWR->hide();
+	sldrALC->hide();
+	sldrIDD->show();
+	sldrIDD->value(iddval);
+	sldrIDD->redraw();
+}
+
 void updateALC(void *)
 {
+std::cout << "ALC: " << alcval << std::endl;
 	sigbar_ALC->value(alcval);
 	sigbar_ALC->redraw();
 
 	if (meter_image != ALC_IMAGE) return;
 	sldrRcvSignal->hide();
 	sldrSWR->hide();
+	sldrIDD->hide();
 	sldrALC->show();
 	sldrALC->value(alcval);
 	sldrALC->redraw();
@@ -3320,6 +3345,7 @@ void updateALC(void *)
 
 void updateSWR(void *)
 {
+std::cout << "SWR: " << swrval << std::endl;
 	sigbar_SWR->value(swrval);
 	sigbar_SWR->redraw();
 
@@ -3327,6 +3353,7 @@ void updateSWR(void *)
 	if (selrig->has_swr_control) {
 		sldrRcvSignal->hide();
 		sldrALC->hide();
+		sldrIDD->hide();
 		sldrSWR->show();
 	}
 	sldrSWR->value(swrval);
@@ -3678,29 +3705,47 @@ void TRACED(cbExit)
 	if (meter_scale_dialog) meter_scale_dialog->hide();
 }
 
-void cbALC_SWR()
+void cbALC_IDD_SWR()
 {
-	if (!selrig->has_alc_control) return;
-	if (meter_image == SWR_IMAGE) {
-		btnALC_SWR->image(image_alc);
-		meter_image = ALC_IMAGE;
-		sldrALC->show();
-		{
-			guard_lock serial_lock(&mutex_serial);
-			trace(1, "cbALC_SWR()  1");
-			selrig->select_alc();
-		}
-	} else {
-		btnALC_SWR->image(image_swr);
-		meter_image = SWR_IMAGE;
-		sldrSWR->show();
-		{
-			guard_lock serial_lock(&mutex_serial);
-			trace(1, "cbALC_SWR()  2");
-			selrig->select_swr();
-		}
+	switch (meter_image) {
+		case ALC_IMAGE:
+			if (selrig->has_idd_control) {
+				btnALC_IDD_SWR->image(image_idd25);
+				meter_image = IDD_IMAGE;
+				sldrIDD->show();
+				{
+					guard_lock serial_lock(&mutex_serial);
+					trace(1, "cbALC_IDD_SWR()  2");
+					selrig->select_idd();
+				}
+				break;
+			}
+		case IDD_IMAGE:
+			if (selrig->has_swr_control) {
+				btnALC_IDD_SWR->image(image_swr);
+				meter_image = SWR_IMAGE;
+				sldrSWR->show();
+				{
+					guard_lock serial_lock(&mutex_serial);
+					trace(1, "cbALC_IDD_SWR()  2");
+					selrig->select_swr();
+				}
+				break;
+			}
+		case SWR_IMAGE:
+		default:
+			if (selrig->has_alc_control) {
+				btnALC_IDD_SWR->image(image_alc);
+				meter_image = ALC_IMAGE;
+				sldrALC->show();
+				{
+					guard_lock serial_lock(&mutex_serial);
+					trace(1, "cbALC_IDD_SWR()  1");
+					selrig->select_alc();
+				}
+			}
 	}
-	btnALC_SWR->redraw();
+	btnALC_IDD_SWR->redraw();
 }
 
 // trim leading and trailing whitspace and double quote

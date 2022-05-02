@@ -2000,8 +2000,8 @@ void status::UI_laststate()
 	scaleSmeter->labelcolor(fgclr);
 	scalePower->color(bgclr);
 	scalePower->labelcolor(fgclr);
-	btnALC_SWR->color(bgclr);
-	btnALC_SWR->labelcolor(fgclr);
+	btnALC_IDD_SWR->color(bgclr);
+	btnALC_IDD_SWR->labelcolor(fgclr);
 
 	sldrFwdPwr->color(fl_rgb_color (pwrRed, pwrGreen, pwrBlue), bgclr);
 	sldrFwdPwr->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
@@ -2014,6 +2014,9 @@ void status::UI_laststate()
 
 	sldrSWR->color(fl_rgb_color (swrRed, swrGreen, swrBlue), bgclr);
 	sldrSWR->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
+
+	sldrIDD->color(fl_rgb_color (swrRed, swrGreen, swrBlue), bgclr);
+	sldrIDD->PeakColor(fl_rgb_color (peakRed, peakGreen, peakBlue));
 
 	sldrVoltage->color(fl_rgb_color (voltRed, voltGreen, voltBlue), bgclr);
 	sldrVoltage->PeakColor(bgclr);

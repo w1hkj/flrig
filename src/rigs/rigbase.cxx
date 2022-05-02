@@ -94,6 +94,7 @@ rigbase::rigbase()
 	has_tune_control =
 	has_swr_control =
 	has_alc_control =
+	has_idd_control =
 	has_agc_control =
 	has_rf_control =
 	has_sql_control =

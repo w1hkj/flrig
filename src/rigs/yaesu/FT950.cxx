@@ -168,6 +168,8 @@ RIG_FT950::RIG_FT950() {
 	has_smeter =
 	has_alc_control =
 	has_swr_control =
+
+	has_idd_control =
 	has_voltmeter =
 
 	has_power_out =
@@ -488,7 +490,7 @@ int RIG_FT950::get_swr()
 	if (p == std::string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
 	int mtr = atoi(&replystr[p+3]);
-	return (int)ceil(mtr / 2.56);
+	return (int)ceil(mtr / 2.55);
 }
 
 int RIG_FT950::get_alc()
@@ -501,10 +503,9 @@ int RIG_FT950::get_alc()
 	if (p == std::string::npos) return 0;
 	if (p + 6 >= replystr.length()) return 0;
 	int mtr = atoi(&replystr[p+3]);
-	return (int)ceil(mtr / 2.56);
+	return (int)ceil(mtr / 2.55);
 }
 
-// y = (2.2/31.0) * x + 0.17
 double RIG_FT950::get_voltmeter()
 {
 	cmd = "RM8;";
@@ -514,17 +515,32 @@ double RIG_FT950::get_voltmeter()
 	double val = 0;
 
 	get_trace(1, "get_voltmeter()");
-	wait_char(';',7, FL950_WAIT_TIME, "get vdd", ASC);
+	wait_char(';',7, 100, "get vdd", ASC);
 	gett("get_voltmeter");
 
 	size_t p = replystr.rfind(resp);
 	if (p != std::string::npos) {
 		mtr = atoi(&replystr[p+3]);
-		val = (2.2 * mtr / 31.0) + 0.17;
+		val = 13.8 * mtr / 190;
 		return val;
 	}
 
 	return -1;
+}
+
+double RIG_FT950::get_idd()
+{
+	cmd = rsp = "RM7";
+	cmd += ';';
+	wait_char(';',10, 100, "get alc", ASC);
+	gett("get_idd");
+
+	size_t p = replystr.rfind(rsp);
+	if (p == std::string::npos) return 0;
+	if (p + 9 >= replystr.length()) return 0;
+	replystr[6] = '\x00';
+	double mtr = atoi(&replystr[p+3]);
+	return mtr / 10.0;
 }
 
 int RIG_FT950::get_power_out()

@@ -79,7 +79,8 @@ public:
 	const char *agc_label();
 	int  agc_val();
 
-	double  get_voltmeter(void);
+	double get_idd();
+	double get_voltmeter();
 
 	int  get_power_out();
 	double get_power_control();

@@ -76,6 +76,7 @@ public:
 	virtual int  get_swr();
 	virtual int  get_alc();
 
+	virtual double get_idd();
 	virtual double  get_voltmeter(void);
 
 	virtual int  get_power_out();

@@ -87,6 +87,9 @@
 #define LISTSIZE 200
 #define ATAGSIZE 128 //21
 
+enum { SWR_IMAGE, ALC_IMAGE, IDD_IMAGE };
+extern int meter_image;
+
 extern bool flrig_abort;
 
 extern XCVR_STATE *vfo, vfoA, vfoB, xcvr_vfoA, xcvr_vfoB;
@@ -260,7 +263,7 @@ extern void cbTune();
 extern void cb_tune_on_off();
 extern void doPTT(int);
 //extern void cbSmeter();
-extern void cbALC_SWR();
+extern void cbALC_IDD_SWR();
 //extern void cbPWR();
 extern void cbMute();
 extern void cbAGC();
@@ -379,6 +382,7 @@ extern void updateSmeter(void *d = 0);
 extern void updateFwdPwr(void *d = 0);
 extern void updateALC(void *d = 0);
 extern void updateSWR(void *d = 0);
+extern void updateIDD(void *d = 0);
 extern void updateVmeter(void *d = 0);
 extern void updateSquelch(void *d = 0);
 extern void updateRFgain(void *d = 0);
@@ -427,12 +431,14 @@ extern Fl_Box *mtr_SMETER;
 extern Fl_Box *mtr_PWR;
 extern Fl_Box *mtr_SWR;
 extern Fl_Box *mtr_ALC;
+extern Fl_Box *mtr_IDD;
 extern Fl_Box *mtr_VOLTS;
 
 extern Fl_SigBar *sigbar_SMETER;
 extern Fl_SigBar *sigbar_PWR;
 extern Fl_SigBar *sigbar_SWR;
 extern Fl_SigBar *sigbar_ALC;
+extern Fl_SigBar *sigbar_IDD;
 extern Fl_SigBar *sigbar_VOLTS;
 
 // user interface support functions

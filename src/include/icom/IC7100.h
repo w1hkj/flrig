@@ -136,6 +136,7 @@ public:
 	int  get_alc();
 	int  get_swr();
 	int  get_power_out();
+	double get_idd(void);
 
 	double get_voltmeter(void);
 

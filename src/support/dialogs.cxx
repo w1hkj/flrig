@@ -1082,9 +1082,9 @@ void setColors()
 	mtr_VOLTS->color(bgclr);
 	mtr_VOLTS->labelcolor(fgclr);
 
-	btnALC_SWR->color(bgclr);
-	btnALC_SWR->labelcolor(fgclr);
-	btnALC_SWR->redraw();
+	btnALC_IDD_SWR->color(bgclr);
+	btnALC_IDD_SWR->labelcolor(fgclr);
+	btnALC_IDD_SWR->redraw();
 	mtr_SWR->color(bgclr);
 	mtr_SWR->labelcolor(fgclr);
 
@@ -1101,8 +1101,17 @@ void setColors()
 	sldrALC->color(fl_rgb_color (swrRed, swrGreen, swrBlue), bgclr);
 	sldrALC->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
 
+	sldrIDD->color(fl_rgb_color (swrRed, swrGreen, swrBlue), bgclr);
+	sldrIDD->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
+
 	mtr_ALC->color(bgclr);
 	mtr_ALC->labelcolor(fgclr);
+
+	sldrIDD->color(fl_rgb_color (swrRed, swrGreen, swrBlue), bgclr);
+	sldrIDD->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));
+
+	mtr_IDD->color(bgclr);
+	mtr_IDD->labelcolor(fgclr);
 
 	sldrSWR->color(fl_rgb_color (swrRed, swrGreen, swrBlue), bgclr);
 	sldrSWR->PeakColor(fl_rgb_color(peakRed, peakGreen, peakBlue));

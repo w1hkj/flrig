@@ -244,6 +244,7 @@ public:
 	bool has_tune_control;
 	bool has_swr_control;
 	bool has_alc_control;
+	bool has_idd_control;
 	bool has_agc_control;
 	bool has_rf_control;
 	bool has_sql_control;
@@ -400,8 +401,11 @@ public:
 	virtual int  get_smeter(void) {return -1;}
 	virtual int  get_swr(void) {return -1;}
 	virtual int  get_alc(void) {return -1;}
+	virtual double get_idd(void) {return 0;}
+
 	virtual void select_swr() {}
 	virtual void select_alc() {}
+	virtual void select_idd() {}
 	virtual int  get_power_out(void) {return -1;}
 
 	virtual double  get_voltmeter(void) { return -1; }

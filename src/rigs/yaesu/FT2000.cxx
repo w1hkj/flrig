@@ -137,8 +137,11 @@ RIG_FT2000::RIG_FT2000() {
 	has_ptt_control =
 	has_tune_control =
 	has_cw_break_in =
-	has_swr_control = true;
-	
+	has_swr_control = 
+
+	has_idd_control =
+	has_voltmeter = true;
+
 // derived specific
 	notch_on = false;
 
@@ -973,4 +976,41 @@ int RIG_FT2000::get_break_in()
 //		get_qsk_delay();
 	}
 	return progStatus.break_in;
+}
+
+double RIG_FT2000::get_voltmeter()
+{
+	cmd = "RM8;";
+	std::string resp = "RM";
+
+	int mtr = 0;
+	double val = 0;
+
+	get_trace(1, "get_voltmeter()");
+	wait_char(';',7, 100, "get vdd", ASC);
+	gett("get_voltmeter");
+
+	size_t p = replystr.rfind(resp);
+	if (p != std::string::npos) {
+		mtr = atoi(&replystr[p+3]);
+		val = 10 * mtr / 170;
+		return val;
+	}
+
+	return -1;
+}
+
+double RIG_FT2000::get_idd()
+{
+	cmd = rsp = "RM7";
+	cmd += ';';
+	wait_char(';',10, 100, "get alc", ASC);
+	gett("get_idd");
+
+	size_t p = replystr.rfind(rsp);
+	if (p == std::string::npos) return 0;
+	if (p + 9 >= replystr.length()) return 0;
+	replystr[6] = '\x00';
+	double mtr = atoi(&replystr[p+3]);
+	return mtr / 10.0;
 }
