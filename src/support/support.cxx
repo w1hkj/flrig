@@ -3330,7 +3330,6 @@ void updateIDD(void *)
 
 void updateALC(void *)
 {
-std::cout << "ALC: " << alcval << std::endl;
 	sigbar_ALC->value(alcval);
 	sigbar_ALC->redraw();
 
@@ -3345,7 +3344,6 @@ std::cout << "ALC: " << alcval << std::endl;
 
 void updateSWR(void *)
 {
-std::cout << "SWR: " << swrval << std::endl;
 	sigbar_SWR->value(swrval);
 	sigbar_SWR->redraw();
 

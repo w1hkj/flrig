@@ -523,12 +523,12 @@ int RIG_FTdx10::get_power_out()
 			break;
 	if (mtr < 0) mtr = 0;
 	if (mtr > 205) mtr = 205;
-	int pwr = (int)ceil(pwrtbl[i].pwr + 
+	double pwr = (int)ceil(pwrtbl[i].pwr + 
 			  (pwrtbl[i+1].pwr - pwrtbl[i].pwr)*(mtr - pwrtbl[i].mtr) / (pwrtbl[i+1].mtr - pwrtbl[i].mtr));
 
 	if (pwr > 100) pwr = 100;
 
-	return (int)pwr;
+	return pwr;
 }
 
 int RIG_FTdx10::get_alc()
