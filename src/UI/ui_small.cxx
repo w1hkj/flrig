@@ -406,6 +406,11 @@ CTRL  click: FreqB -> FreqA\
 	btnSplit->callback((Fl_Callback*)cb_btnSplit);
 	btnSplit->value(progStatus.split);
 
+	btnCENTER = new Fl_Button(212, 84, 18, 18, _("W"));
+	btnCENTER->callback((Fl_Callback*)cb_btnCENTER);
+	btnCENTER->tooltip(_("Center/Wid"));
+	btnCENTER->hide();
+
 	opBW = new Fl_ComboBox(212, 84, 105, 18, _("Bandwidth"));
 	opBW->tooltip(_("Select Transceiver Bandwidth"));
 	opBW->box(FL_NO_BOX);
@@ -420,6 +425,22 @@ CTRL  click: FreqB -> FreqA\
 	opBW->when(FL_WHEN_RELEASE);
 	opBW->readonly();
 	opBW->end();
+
+	opCENTER = new Fl_ComboBox(231, 84, 86, 18, "");
+	opCENTER->tooltip(_("Center Frequency"));
+	opCENTER->box(FL_FLAT_BOX);
+	opCENTER->color(FL_BACKGROUND2_COLOR);
+	opCENTER->selection_color(FL_BACKGROUND_COLOR);
+	opCENTER->labeltype(FL_NORMAL_LABEL);
+	opCENTER->labelfont(0);
+	opCENTER->labelsize(12);
+	opCENTER->labelcolor(FL_FOREGROUND_COLOR);
+	opCENTER->callback((Fl_Callback*)cb_opCENTER);
+	opCENTER->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
+	opCENTER->when(FL_WHEN_RELEASE);
+	opCENTER->readonly();
+	opCENTER->hide();
+	opCENTER->end();
 
 	btnDSP = new Fl_Button(212, 84, 18, 18, _("L"));
 	btnDSP->callback((Fl_Callback*)cb_btnDSP);

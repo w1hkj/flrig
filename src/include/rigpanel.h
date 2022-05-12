@@ -110,11 +110,13 @@ extern Fl_Button *btn_show_controls;
 extern Fl_Group *grp_row1;
 extern Fl_Group *grp_row1a;
 
+extern Fl_ComboBox *opCENTER;
 extern Fl_ComboBox *opBW;
 extern Fl_Button *btnDSP;
 extern Fl_ComboBox *opDSP_lo;
 extern Fl_ComboBox *opDSP_hi;
 extern Fl_Button *btnFILT;
+extern Fl_Button *btnCENTER;
 extern Fl_ComboBox *opMODE;
 extern Fl_Group *grp_row1b;
 extern Fl_Group *grp_row1b1;

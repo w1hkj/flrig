@@ -25,6 +25,12 @@
 
 #include "tci_io.h"
 
+extern int tci_centers[];
+extern int tci_center;
+extern int tci_nbr_centers;
+extern const char *TCI_centers[];
+extern void tci_adjust_widths();
+
 class RIG_TCI_SDR : public rigbase {
 private:
 	bool preamp_on;

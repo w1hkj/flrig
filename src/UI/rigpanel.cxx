@@ -257,9 +257,11 @@ Fl_Group *grp_row1 = (Fl_Group *)0;
 Fl_Group *grp_row1a = (Fl_Group *)0;
 Fl_ComboBox *opBW = (Fl_ComboBox *)0;
 Fl_ComboBox *opDSP_lo = (Fl_ComboBox *)0;
+Fl_ComboBox *opCENTER = (Fl_ComboBox *)0;
 Fl_Button *btnDSP = (Fl_Button *)0;
 Fl_ComboBox *opDSP_hi = (Fl_ComboBox *)0;
 Fl_Button *btnFILT= (Fl_Button*)0;
+Fl_Button *btnCENTER = (Fl_Button*)0;
 Fl_ComboBox *opMODE = (Fl_ComboBox *)0;
 Fl_Group *grp_row1b = (Fl_Group *)0;
 Fl_Group *grp_row1b1 = (Fl_Group *)0;
@@ -662,6 +664,17 @@ static void cb_btn_show_controls(Fl_Button*, void*) {
 
 static void cb_btnFILT(Fl_Button *, void *) {
 	selectFILT();
+}
+
+static void cb_btnCENTER(Fl_Button *, void *) {
+	selectCENTER();
+}
+
+static void cb_opCENTER(Fl_ComboBox*, void*) {
+	progStatus.tci_center = tci_center = opCENTER->index();
+	tci_adjust_widths();
+	if (onA) selrig->set_bwA(vfoA.iBW);
+	else     selrig->set_bwB(vfoB.iBW);
 }
 
 static void cb_opBW(Fl_ComboBox*, void*) {

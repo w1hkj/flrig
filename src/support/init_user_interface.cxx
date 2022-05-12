@@ -1213,6 +1213,19 @@ void TRACED(init_dsp_controls)
 		opDSP_hi->hide();
 		btnFILT->hide();
 		opBW->show();
+		if (selrig->name_ == rig_tcisdr.name_) {
+			opCENTER->clear();
+			for (int i = 0; i < tci_nbr_centers; i++)
+				opCENTER->add(TCI_centers[i]);
+			opCENTER->show();
+			opCENTER->index(progStatus.tci_center);
+		}
+//		switch (progStatus.UIsize) {
+//			case small_ui :
+//				opCENTER->resize(opBW->x(), opBW->y() + opBW->h() + 2, opCENTER->w(), opCENTER->h());
+//				break;
+//			case wide_ui : case touch_ui : default : break;
+//		}
 	}
 }
 

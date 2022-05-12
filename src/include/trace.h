@@ -29,9 +29,11 @@
 #include <string.h>
 
 //#define WITH_TRACED
+// compile using ./configure "CXXFLAGS=-DWITH_TRACED"
 //usage
 //int TRACED(add, int a, int b)
 // opening brace is part of the macro
+
 extern Fl_Double_Window*	tracewindow;
 
 extern void trace(int n, ...); // all args of type const char *

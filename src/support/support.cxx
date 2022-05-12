@@ -462,8 +462,7 @@ void read_mode()
 	}
 }
 
-void setBWControl(void *)
-{
+void TRACED(setBWControl, void *)
 	if (selrig->has_dsp_controls) {
 		if (vfo->iBW > 256) {
 			opBW->hide();
@@ -489,8 +488,19 @@ void setBWControl(void *)
 			opBW->show();
 			opBW->redraw();
 		}
-	}
-	else {
+	} else if (selrig->name_ == rig_tcisdr.name_) {
+		std::string smode = opMODE->value();
+		if (smode == "USB" || smode == "LSB") {
+			btnCENTER->activate();
+			btnCENTER->redraw();
+		} else {
+			btnCENTER->label("W");
+			btnCENTER->redraw_label();
+			btnCENTER->deactivate();
+			opBW->show();
+			opCENTER->hide();
+		}
+	} else {
 		opDSP_lo->hide();
 		opDSP_hi->hide();
 		btnDSP->hide();
@@ -520,6 +530,7 @@ void TRACED(read_bandwidth)
 			s << "Bandwidth A change. nu_BW=" << nu_BW << ", vfoA.iBW=" << vfoA.iBW << ", vfo->iBW=" << vfo->iBW;
 			trace(1, s.str().c_str());
 			vfoA.iBW = vfo->iBW = nu_BW;
+			Fl::awake(setBWControl);
 		}
 	} else {
 		trace(2, "vfoB active", "get_bwB()");
@@ -529,9 +540,9 @@ void TRACED(read_bandwidth)
 			s << "Bandwidth B change. nu_BW=" << nu_BW << ", vfoB.iBW=" << vfoB.iBW << ", vfo->iBW=" << vfo->iBW;
 			trace(1, s.str().c_str());
 			vfoB.iBW = vfo->iBW = nu_BW;
+			Fl::awake(setBWControl);
 		}
 	}
-	Fl::awake(setBWControl);
 }
 
 // read current signal level
@@ -1422,7 +1433,7 @@ void serviceA(XCVR_STATE nuvals)
 	}
 
 	trace(2, "service VFO A", printXCVR_STATE(nuvals).c_str());
-
+tci_trace(2, "State 1", printXCVR_STATE(vfoA).c_str());
 	if ((nuvals.imode != -1) ) {//&& (vfoA.imode != nuvals.imode)) {
 		if (selrig->name_ == rig_FT891.name_) {
 			// Mode change on ft891 can change frequency, so set all values
@@ -1441,7 +1452,6 @@ void serviceA(XCVR_STATE nuvals)
 				m2.find("CW") != std::string::npos)
 				vfoA.freq = nuvals.freq = selrig->get_vfoA();
 		}
-
 	}
 	if (vfoA.iBW != nuvals.iBW) {
 		selrig->set_bwA(vfoA.iBW = nuvals.iBW);
@@ -1453,9 +1463,9 @@ void serviceA(XCVR_STATE nuvals)
 		selrig->set_vfoA(vfoA.freq = nuvals.freq);
 		selrig->get_vfoA();
 		A_changed = true;
-}
+	}
 	vfo = &vfoA;
-
+tci_trace(2, "State 2", printXCVR_STATE(vfoA).c_str());
 	if (A_changed)
 		Fl::awake(setFreqDispA);
 }
@@ -1809,6 +1819,22 @@ void selectFILT()
 	btnFILT->redraw_label();
 }
 
+void selectCENTER()
+{
+	if (btnCENTER->label()[0] == 'C') {
+		btnCENTER->label("W");
+		opBW->show();
+		opCENTER->hide();
+	} else {
+		btnCENTER->label("C");
+		opBW->hide();
+		opCENTER->show();
+	}
+	opBW->redraw();
+	opCENTER->redraw();
+	btnCENTER->redraw_label();
+}
+
 // set_bandwidth_control updates iBW and then posts the call for
 // the UI thread to updateBandwidthControl
 // changes to the UI cannot come from any thread other than the
@@ -1882,11 +1908,20 @@ void updateBandwidthControl(void *d)
 			btnFILT->redraw_label();
 			opBW->resize(opDSP_lo->x(), opDSP_lo->y(), opDSP_lo->w(), opDSP_lo->h());
 			opBW->redraw();
-		}
-		opBW->show();
+		} else if (selrig->name_ == rig_tcisdr.name_) {
+			btnCENTER->show();
+			opBW->resize(opCENTER->x(), opCENTER->y(), opCENTER->w(), opCENTER->h());
+			opBW->redraw();
+			opBW->show();
+			opBW->redraw();
+			opCENTER->hide();
+			opCENTER->redraw();
+		} else {
+			opBW->show();
 // Allow BW to receive rig updates as value is changed there, without needing
 // to click the dropdown first
-		opBW->isbusy(false);
+			opBW->isbusy(false);
+		}
 	}
 	else { // no BW, no DSP controls
 		opBW->index(0);

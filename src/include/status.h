@@ -466,6 +466,8 @@ struct status {
 	std::string	tci_port;
 	std::string	tci_addr;
 
+	int		tci_center;
+
 	bool	xcvr_auto_on;
 	bool	xcvr_auto_off;
 

@@ -396,7 +396,7 @@ void tci_trace(int n, ...) // all args of type const char *
 	va_end(vl);
 	s << "\n";
 
-	if (!progStatus.tcitrace) return;
+//	if (!progStatus.tcitrace) return;
 	if (!tracewindow) make_trace_window();
 	if (!n) return;
 

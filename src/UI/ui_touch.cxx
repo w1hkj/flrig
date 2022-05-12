@@ -301,6 +301,11 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		ypos += 62;
 		Fl_Group *grpcombos = new Fl_Group(xpos, ypos, 208, 35);
 
+		btnCENTER = new Fl_Button(xpos, ypos, 30, 35, _("W"));
+		btnCENTER->callback((Fl_Callback*)cb_btnCENTER);
+		btnCENTER->tooltip(_("Center/Width"));
+		btnCENTER->hide();
+
 		opBW = new Fl_ComboBox(xpos, ypos, 115, 35, "");
 		opBW->tooltip(_("Select Transceiver Bandwidth"));
 		opBW->box(FL_FLAT_BOX);
@@ -317,6 +322,24 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		opBW->when(FL_WHEN_RELEASE);
 		opBW->readonly();
 		opBW->end();
+
+		opCENTER = new Fl_ComboBox(xpos+30, ypos, opBW->w() - 30, 35, "");
+		opCENTER->tooltip(_("Center frequency"));
+		opCENTER->box(FL_FLAT_BOX);
+		opCENTER->color(FL_BACKGROUND2_COLOR);
+		opCENTER->selection_color(FL_BACKGROUND_COLOR);
+		opCENTER->labeltype(FL_NORMAL_LABEL);
+		opCENTER->labelfont(0);
+		opCENTER->labelsize(12);
+		opCENTER->textfont(0);
+		opCENTER->textsize(14);;
+		opCENTER->labelcolor(FL_FOREGROUND_COLOR);
+		opCENTER->callback((Fl_Callback*)cb_opCENTER);
+		opCENTER->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
+		opCENTER->when(FL_WHEN_RELEASE);
+		opCENTER->readonly();
+		opCENTER->hide();
+		opCENTER->end();
 
 		opMODE = new Fl_ComboBox(xpos + opBW->w() + 2, ypos, 208 - opBW->w() - 2, 35, "");
 		opMODE->tooltip(_("Select transceiver operating mode"));

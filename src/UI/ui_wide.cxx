@@ -331,7 +331,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				int w1a = (grpMeters->w() - 2) / 2;
 
 				opBW = new Fl_ComboBox(
-					xpos, ypos, w1a, 20, _("Bandwidth"));
+					xpos, ypos, w1a, 20, "");
 				opBW->tooltip(_("Select Transceiver Bandwidth"));
 				opBW->box(FL_FLAT_BOX);
 				opBW->color(FL_BACKGROUND2_COLOR);
@@ -345,6 +345,32 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				opBW->when(FL_WHEN_RELEASE);
 				opBW->readonly();
 				opBW->end();
+
+				btnFILT = new Fl_Button(xpos, ypos, 20, 20, _("1"));
+				btnFILT->callback((Fl_Callback*)cb_btnFILT);
+				btnFILT->tooltip(_("Select filter"));
+				btnFILT->hide();
+
+				btnCENTER = new Fl_Button(xpos, ypos, 20, 20, _("W"));
+				btnCENTER->callback((Fl_Callback*)cb_btnCENTER);
+				btnCENTER->tooltip(_("Center/Wid"));
+				btnCENTER->hide();
+
+				opCENTER = new Fl_ComboBox(xpos + 20, ypos, w1a - 20, 20, "");
+				opCENTER->tooltip(_("Center frequency"));
+				opCENTER->box(FL_FLAT_BOX);
+				opCENTER->color(FL_BACKGROUND2_COLOR);
+				opCENTER->selection_color(FL_BACKGROUND_COLOR);
+				opCENTER->labeltype(FL_NORMAL_LABEL);
+				opCENTER->labelfont(0);
+				opCENTER->labelsize(12);
+				opCENTER->labelcolor(FL_FOREGROUND_COLOR);
+				opCENTER->callback((Fl_Callback*)cb_opCENTER);
+				opCENTER->align(Fl_Align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE));
+				opCENTER->when(FL_WHEN_RELEASE);
+				opCENTER->hide();
+				opCENTER->readonly();
+				opCENTER->end();
 
 				btnDSP = new Fl_Button(xpos, ypos, 20, 20, _("L"));
 				btnDSP->callback((Fl_Callback*)cb_btnDSP);
@@ -381,11 +407,6 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				opDSP_hi->hide();
 				opDSP_hi->readonly();
 				opDSP_hi->end();
-
-				btnFILT = new Fl_Button(btnDSP->x(), btnDSP->y(), 20, 20, _("1"));
-				btnFILT->callback((Fl_Callback*)cb_btnFILT);
-				btnFILT->tooltip(_("Select filter"));
-				btnFILT->hide();
 
 				opMODE = new Fl_ComboBox(
 					opBW->x() + opBW->w() + 2, ypos, 

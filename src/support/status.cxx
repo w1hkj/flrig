@@ -475,6 +475,7 @@ status progStatus = {
 
 	"40001",	// std::string tci_port
 	"127.0.0.1",// std::string tci address
+	10,			// int  tci_center;
 
 	false,		// bool xcvr auto on
 	false,		// bool xcvr auto off
@@ -747,7 +748,7 @@ void status::saveLastState()
 
 	spref.set("schema", schema);
 	spref.set("embed_tabs", embed_tabs);
-	if (!embed_tabs)
+	if (!embed_tabs && tabs_dialog)
 		show_tabs = tabs_dialog->visible();
 	spref.set("show_tabs", show_tabs);
 	spref.set("visible_tab", visible_tab.c_str());
@@ -1060,6 +1061,7 @@ void status::saveLastState()
 
 	spref.set("tci_port", tci_port.c_str());
 	spref.set("tci_addr", tci_addr.c_str());
+	spref.set("tci_center", tci_center);
 
 	spref.set("xcvr_auto_on", xcvr_auto_on);
 	spref.set("xcvr_auto_off", xcvr_auto_off);
@@ -1802,6 +1804,7 @@ bool status::loadXcvrState(std::string xcvr)
 		tci_port = defbuffer;
 		spref.get("tci_addr", defbuffer, "127.0.0.1", 499);
 		tci_addr = defbuffer;
+		spref.get("tci_center", tci_center, tci_center);
 
 		if (spref.get("xcvr_auto_on", i, i)) xcvr_auto_on = i;
 		if (spref.get("xcvr_auto_off", i, i)) xcvr_auto_off = i;
