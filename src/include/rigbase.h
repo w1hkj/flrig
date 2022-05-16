@@ -683,6 +683,9 @@ double vfo_;
 	virtual void sync_clock(char *tm) {
 		printf("Sychronize time to: %s\n", tm);
 	}
+
+// QCX+ menu system
+	virtual std::string read_menu(int, int);
 };
 
 extern rigbase *rigs[];

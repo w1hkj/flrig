@@ -186,6 +186,7 @@ flrig_SOURCES += \
 	rigs/other/FLEX1500.cxx \
 	rigs/other/PCR1000.cxx \
 	rigs/other/PowerSDR.cxx \
+	rigs/other/QCXplus.cxx \
 	rigs/other/RAY152.cxx \
 	rigs/other/TMD710.cxx \
 	rigs/tentec/TT516.cxx \
@@ -351,6 +352,7 @@ EXTRA_DIST = \
 	include/mingw.h \
 	include/other/FLEX1500.h \
 	include/other/PCR1000.h \
+	include/other/QCXplus.h \
 	include/other/RAY152.h \
 	include/other/PowerSDR.h \
 	include/other/TMD710.h \

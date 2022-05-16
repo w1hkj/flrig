@@ -118,6 +118,7 @@
 #include "xiegu/Xiegu-5105.h"
 #include "xiegu/Xiegu-G90.h"
 #include "xiegu/X6100.h"
+#include "other/QCXplus.h"
 
 extern rigbase			rig_null;		// 0
 extern RIG_FDMDUO		rig_FDMDUO;		// 1
@@ -217,5 +218,6 @@ extern RIG_X6100		rig_X6100;		// 94
 extern RIG_PowerSDR		rig_PowerSDR;	// 95
 extern RIG_FLEX1500		rig_FLEX1500;	// 96
 extern RIG_TX500		rig_TX500;		// 97
+extern RIG_QCXP			rig_QCXP;		// 98
 
 #endif

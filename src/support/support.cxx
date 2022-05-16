@@ -1611,6 +1611,38 @@ POLL_PAIR TX_poll_pairs[] = {
 	{NULL, NULL}
 };
 
+static int menu1 = 0, menu2 = 1;
+static FILE *qcx_menus = (FILE *)0;
+
+void read_menu()
+{
+	if (menu1 == 0) return;
+	std::string menu_item;
+	if (menu1 < 8) {
+		menu_item = selrig->read_menu(menu1, menu2);
+		if (!menu_item.empty()) {
+			if (qcx_menus)
+				fprintf(qcx_menus, "%s\n", menu_item.c_str());
+			++menu2;
+		} else {
+			menu2 = 1;
+			++menu1;
+		}
+		return;
+	}
+	if (qcx_menus)
+		fclose(qcx_menus);
+	qcx_menus = 0;
+}
+
+void read_menus()
+{
+	std::string qcx_menu_file;
+	qcx_menu_file.assign(RigHomeDir).append("qcx_menus.txt");
+	qcx_menus = fopen(qcx_menu_file.c_str(), "w");
+	menu1 = menu2 = 1;
+}
+
 void * serial_thread_loop(void *d)
 {
 	POLL_PAIR *rx_poll_group_1 = &RX_poll_group_1[0];
@@ -1714,6 +1746,9 @@ void * serial_thread_loop(void *d)
 				MilliSleep(progStatus.byte_interval);
 
 			if (!bypass_serial_thread_loop) {
+
+				if (menu1 < 9) read_menu();
+
 				{	guard_lock lk(&mutex_serial);
 					if (*(rx_poll_group_3->poll)) {
 						(rx_poll_group_3->pollfunc)();
@@ -2194,10 +2229,12 @@ void cbAswapB()
 			trace(1, "cb Active->Inactive vfo");
 			srvc_reqs.push(xcvr);
 		} else {
-			VFOQUEUE xcvr;
-			xcvr.change = SWAP;
-			trace(1, "cb SWAP");
-			srvc_reqs.push(xcvr);
+			guard_lock lock2(&mutex_serial, "cbAswsapB");
+			execute_swapAB();
+//			VFOQUEUE xcvr;
+//			xcvr.change = SWAP;
+//			trace(1, "cb SWAP");
+//			srvc_reqs.push(xcvr);
 		}
 	}
 }

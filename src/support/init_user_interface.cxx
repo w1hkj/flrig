@@ -2111,6 +2111,8 @@ void TRACED(init_K3_KX3_special)
 	}
 }
 
+extern void read_menus();
+
 void TRACED(initRig)
 
 	xcvr_online = false;
@@ -2215,6 +2217,8 @@ void TRACED(initRig)
 		}
 trace(1, "selrig->initialize()");
 		selrig->initialize();
+
+		if (selrig->name_ == rig_QCXP.name_) read_menus();
 
 if (!testmode) {
 	trace(1, "selrig->check()");

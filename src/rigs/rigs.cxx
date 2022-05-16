@@ -126,6 +126,7 @@ RIG_X6100		rig_X6100;
 RIG_PowerSDR	rig_PowerSDR;
 RIG_FLEX1500	rig_FLEX1500;
 RIG_TX500		rig_TX500;
+RIG_QCXP		rig_QCXP;
 
 rigbase *rigs[] = {
 	&rig_null,		// 0
@@ -226,6 +227,7 @@ rigbase *rigs[] = {
 	&rig_PowerSDR,	// 95
 	&rig_FLEX1500,	// 96
 	&rig_TX500,		// 97
+	&rig_QCXP,		// 98
 
 	NULL
 };
