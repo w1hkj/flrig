@@ -546,16 +546,24 @@ struct status {
 	int		FSK_CONNECTED;
 	int		FSK_INVERTED;
 	int		FSK_STOPBITS;
+	int		fsk_idles;
 	std::string	FSK_PORT;
 	std::string	FSK_msgs[12];
 	std::string	FSK_labels[12];
 
 // CW logbook parameters
-	std::string log_name;
-	int  log_cut_numbers;
-	int  log_leading_zeros;
-	int  log_dupcheck;
-	int  qso_nbr;
+	std::string cw_log_name;
+	int  cw_log_cut_numbers;
+	int  cw_log_leading_zeros;
+	int  cw_log_dupcheck;
+	int  cw_log_nbr;
+
+// FSK logbook parameters
+	std::string fsk_log_name;
+	int  fsk_log_cut_numbers;
+	int  fsk_log_leading_zeros;
+	int  fsk_log_dupcheck;
+	int  fsk_log_nbr;
 
 	void saveLastState();
 	void loadLastState();

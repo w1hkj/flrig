@@ -5,10 +5,10 @@ i18n_include "gettext.h"
 i18n_function _
 header_name {.h}
 code_name {.cxx}
-decl {\#include "dialogs.h"} {selected private local
+decl {\#include "dialogs.h"} {private local
 }
 
-decl {\#include <FL/Fl_Double_Window.H>} {selected public global
+decl {\#include <FL/Fl_Double_Window.H>} {public global
 }
 
 decl {Fl_Double_Window *cwlog_viewer;} {public local
@@ -647,11 +647,11 @@ Function {new_cwlogbook_dialog()} {open
     label {Flrig CW Log} open
     xywh {529 314 670 284} type Double visible
   } {
-    Fl_Menu_Bar {} {open
+    Fl_Menu_Bar CWlog_menubar {open
       xywh {0 0 670 20}
     } {
-      Submenu {} {
-        label Files open
+      Submenu CWlog_files {
+        label Files open selected
         xywh {0 0 70 21}
       } {
         MenuItem cwlog_menu_open {
@@ -716,10 +716,10 @@ Function {new_cwlogbook_dialog()} {open
         code0 {//->value(progStatus.cwlogfile_name);}
       }
     }
-    Fl_Group grp_qso_data {open
+    Fl_Group cw_grp_qso_data {open
       xywh {2 52 560 30} box ENGRAVED_BOX
     } {
-      Fl_Input qso_op_freq {
+      Fl_Input cw_freq {
         label Freq
         tooltip Frequency xywh {43 56 120 22}
         class Fl_Input2
@@ -744,13 +744,13 @@ Function {new_cwlogbook_dialog()} {open
         callback {cwlog_delete_entry();}
         tooltip {Delete Entry} xywh {492 56 60 22} hide
       }
-      Fl_Input qso_date {
+      Fl_Input cw_qso_date {
         label Dt
         tooltip {QSO call
 Query flcwlog if connected} xywh {193 56 85 22}
         class Fl_Input2
       }
-      Fl_Input qso_time {
+      Fl_Input cw_qso_time {
         label {Tm:}
         xywh {313 56 55 22}
         class Fl_Input2
@@ -759,12 +759,12 @@ Query flcwlog if connected} xywh {193 56 85 22}
     Fl_Group {} {open
       xywh {565 52 103 62} box ENGRAVED_BOX
     } {
-      Fl_Input qso_rst_out {
+      Fl_Input cw_rst_out {
         label RSTout
         tooltip {Send RST} xywh {622 56 40 22}
         class Fl_Input2
       }
-      Fl_Input qso_rst_in {
+      Fl_Input cw_rst_in {
         label {RST in}
         tooltip {Send RST} xywh {624 87 40 22}
         class Fl_Input2
@@ -773,23 +773,23 @@ Query flcwlog if connected} xywh {193 56 85 22}
     Fl_Group {} {open
       xywh {2 84 560 30} box ENGRAVED_FRAME
     } {
-      Fl_Input qso_exchange_in {
+      Fl_Input cw_xchg_in {
         label Xch
         tooltip {Input exchange} xywh {313 87 150 22}
         class Fl_Input2
       }
-      Fl_Counter qso_nbr {
+      Fl_Counter cw_log_nbr {
         label {\#:}
-        callback {progStatus.qso_nbr = o->value();}
+        callback {progStatus.cw_log_nbr = o->value();}
         tooltip {QSO number (out)} xywh {491 87 70 22} type Simple align 4 step 1
-        code0 {o->value(progStatus.qso_nbr);}
+        code0 {o->value(progStatus.cw_log_nbr);}
       }
-      Fl_Input qso_op_name {
+      Fl_Input cw_op_name {
         label Nm
         xywh {193 88 85 22}
         class Fl_Input2
       }
-      Fl_Input qso_op_call {
+      Fl_Input cw_op_call {
         label Call
         tooltip {QSO call
 Query flcwlog if connected} xywh {43 88 120 22}
@@ -802,44 +802,44 @@ Query flcwlog if connected} xywh {43 88 120 22}
       Fl_Group {} {open
         xywh {2 116 668 22}
       } {
-        Fl_Button btn_cwlog_datetime {
+        Fl_Button btn_cw_datetime {
           label Date
           callback {cwlog_sort_by_datetime();}
           xywh {2 116 80 22} box BORDER_BOX color 51
         }
-        Fl_Button btn_time {
+        Fl_Button btn_cw_time {
           label Time
           callback {cwlog_sort_by_datetime();}
           xywh {81 116 45 22} box BORDER_BOX color 51
         }
-        Fl_Button btn_freq {
+        Fl_Button btn_cw_freq {
           label Freq
           callback {cwlog_sort_by_freq();}
           xywh {126 116 70 22} box BORDER_BOX color 51
         }
-        Fl_Button btn_call {
+        Fl_Button btn_cw_call {
           label Call
           callback {cwlog_sort_by_call();}
           xywh {196 116 75 22} box BORDER_BOX color 51
         }
-        Fl_Button btn_name {
+        Fl_Button btn_cw_name {
           label Name
           xywh {271 116 75 22} box BORDER_BOX color 51
         }
-        Fl_Button btn_in {
+        Fl_Button btn_cw_in {
           label In
           xywh {346 116 40 22} box BORDER_BOX color 51
         }
-        Fl_Button btn_out {
+        Fl_Button btn_cw_out {
           label Out
           xywh {386 116 40 22} box BORDER_BOX color 51
         }
-        Fl_Button btn_sent_nbr {
+        Fl_Button btn_cw_sent_nbr {
           label Nbr
           callback {cwlog_sort_by_nbr();}
           xywh {426 116 55 22} box BORDER_BOX color 51
         }
-        Fl_Button btn_exchange {
+        Fl_Button btn_cw_xchg {
           label Exchange
           xywh {481 116 185 22} box BORDER_BOX color 51 resizable
         }

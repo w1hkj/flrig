@@ -1,4 +1,4 @@
-// ----------------------------------------------------------------------------
+ // ----------------------------------------------------------------------------
 // fsk.cxx  --  FSK signal generator
 //
 // Copyright (C) 2021
@@ -23,7 +23,6 @@
 #include <config.h>
 
 #include "fsk.h"
-#include "cwio.h"
 #include "fskioUI.h"
 #include "serial.h"
 #include "support.h"
@@ -33,8 +32,6 @@
 #ifdef __WIN32__
 #include "compat.h"
 #endif
-
-//#define FSK_DEBUG
 
 extern int errno;
 
@@ -98,6 +95,8 @@ pthread_mutex_t fskio_text_mutex = PTHREAD_MUTEX_INITIALIZER;
 Cserial *FSK_serial = (Cserial *)0;
 FSK *fsk_instance = (FSK *)0;
 
+static std::string FSK_new_text;
+
 FSK::FSK()
 {
 	str_buff.clear();
@@ -109,7 +108,7 @@ FSK::FSK()
 	shift      = 0;
 	shift_state  = FSK_FIGURES;
 	_shift_on_space = false;
-	idles = 3;
+	idles = progStatus.fsk_idles;
 
 	BITLEN = 0.022;
 
@@ -173,21 +172,24 @@ void btn_fskioSEND_OFF(void *v)
 bool FSK::sending() {
 	{
 		guard_lock lck(&fskio_text_mutex);
-		str_buff = FSK_txt_to_send->value();
+		if (!FSK_new_text.empty()) {
+			str_buff.append(FSK_new_text);
+			FSK_new_text.clear();
+		}
 	}
 	if (str_buff[0] == '[') {
 		str_buff.erase(0,1);
 		Fl::awake(update_fsk_txt_to_send, this);
 		Fl::awake(btn_fskioSEND_ON, this);
-		FSK_send_text(1);
-		idles = 3;
-		return 0;
+		FSK_send_text(true);
+		idles = progStatus.fsk_idles;
+		return true;
 	} else if (str_buff[0] == ']') {
 		str_buff.clear();
 		Fl::awake(update_fsk_txt_to_send, this);
 		Fl::awake(btn_fskioSEND_OFF, this);
-		FSK_send_text(0);
-		return 0;
+		FSK_send_text(false);
+		return false;
 	}
 	return btn_fskioSEND->value();
 }
@@ -272,10 +274,6 @@ int FSK::sleep (double sleep_time)
 	return 0;
 }
 
-#ifdef FSK_DEBUG
-FILE *ftiming = (FILE *)0;
-#endif
-
 void FSK::send_baudot(int ch)
 {
 	double t1;
@@ -286,80 +284,46 @@ void FSK::send_baudot(int ch)
 	fsk_out(FSK_SPACE);
 	sleep(BITLEN - (now() - t1));
 
-#ifdef FSK_DEBUG
-	fprintf(ftiming, "%f, %f, %f\n", BITLEN, now() - t1, now() - t1 - BITLEN);
-#endif
 	t1 = now();
 	fsk_out((ch & 0x01) == 0x01 ? FSK_MARK : FSK_SPACE);
 	sleep(BITLEN - (now() - t1));
 
-#ifdef FSK_DEBUG
-	fprintf(ftiming, "%f, %f, %f\n", BITLEN, now() - t1, now() - t1 - BITLEN);
-#endif
 	t1 = now();
 	fsk_out((ch & 0x02) == 0x02 ? FSK_MARK : FSK_SPACE);
 	sleep(BITLEN - (now() - t1));
 
-#ifdef FSK_DEBUG
-	fprintf(ftiming, "%f, %f, %f\n", BITLEN, now() - t1, now() - t1 - BITLEN);
-#endif
 	t1 = now();
 	fsk_out((ch & 0x04) == 0x04 ? FSK_MARK : FSK_SPACE);
 	sleep(BITLEN - (now() - t1));
 
-#ifdef FSK_DEBUG
-	fprintf(ftiming, "%f, %f, %f\n", BITLEN, now() - t1, now() - t1 - BITLEN);
-#endif
 	t1 = now();
 	fsk_out((ch & 0x08) == 0x08 ? FSK_MARK : FSK_SPACE);
 	sleep(BITLEN - (now() - t1));
 
-#ifdef FSK_DEBUG
-	fprintf(ftiming, "%f, %f, %f\n", BITLEN, now() - t1, now() - t1 - BITLEN);
-#endif
 	t1 = now();
 	fsk_out((ch & 0x10) == 0x10 ? FSK_MARK : FSK_SPACE);
 	sleep(BITLEN - (now() - t1));
 
-#ifdef FSK_DEBUG
-	fprintf(ftiming, "%f, %f, %f\n", BITLEN, now() - t1, now() - t1 - BITLEN);
-#endif
 	t1 = now();
 	fsk_out(FSK_MARK);
 	sleep(BITLEN * (progStatus.FSK_STOPBITS ? 1.5 : 2.0) - (now() - t1) );
 
-#ifdef FSK_DEBUG
-	fprintf(ftiming, "%f, %f, %f\n",
-		BITLEN * 1.5,
-		now() - t1,
-		now() - t1 - BITLEN * (progStatus.FSK_STOPBITS ? 1.5 : 2.0));
-#endif
 }
 
 
 int FSK::callback_method()
 {
-#ifdef FSK_DEBUG
-if (!ftiming) {
-	ftiming = fopen("timing.txt", "w");
-}
-#endif
-
 	if (sending()) {
 		if (str_buff.empty() || idles) {
-//std::cout << "LTRS" << std::endl;
 			send_baudot(LTRS);
 			if (idles) idles--;
 		} else {
-//std::cout << char(str_buff[0]) << std::endl;
 			chr_out = baudot_enc(str_buff[0]);
 			if ((chr_out & 0x300) != shift_state) {
 				shift_state = chr_out & 0x300;
 				if (shift_state == FSK_LETTERS) {
-//std::cout << "LTRS" << std::endl;
 					send_baudot(LTRS);
 				} else {
-//std::cout << "FIGS" << std::endl;
 					send_baudot(FIGS);
 				}
 			}
@@ -368,8 +332,7 @@ if (!ftiming) {
 			send_baudot(chr_out & 0x1F);
 		}
 	} else
-		MilliSleep(BITLEN*1000L);
-//		sleep(BITLEN);
+		MilliSleep(BITLEN*100L);
 	return 0;
 }
 
@@ -430,15 +393,10 @@ int  FSK_start_thread() {
 void FSK_stop_thread() {
 }
 
-static std::string FSK_new_text;
-
 void FSK_add(std::string txt)
 {
 	guard_lock lck(&fskio_text_mutex);
-	FSK_new_text = FSK_txt_to_send->value();
 	FSK_new_text.append(txt);
-	FSK_txt_to_send->value(FSK_new_text.c_str());
-	FSK_txt_to_send->redraw();
 }
 
 int FSK_process = 0; // RX state
@@ -452,6 +410,8 @@ void FSK_send_text(bool state) // state == 1 (xmt), 0 (rcv)
 
 void FSK_clear_text()
 {
+	guard_lock lck(&fskio_text_mutex);
+	if (fsk_instance) fsk_instance->str_buff.clear();
 	FSK_txt_to_send->value("");
 }
 

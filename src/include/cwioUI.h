@@ -65,43 +65,45 @@ extern Fl_Check_Button *btn_cwioINVERTED;
 extern Fl_Counter *cnt_cwio_keycorr;
 Fl_Double_Window* new_cwio_config_dialog();
 #include <FL/Fl_Menu_Bar.H>
+extern Fl_Menu_Bar *CWlog_menubar;
 #include <FL/Fl_Output.H>
 extern Fl_Output *txt_cwlog_file;
-extern Fl_Group *grp_qso_data;
-extern Fl_Input2 *qso_op_freq;
+extern Fl_Group *cw_grp_qso_data;
+extern Fl_Input2 *cw_freq;
 extern Fl_Button *btn_cwlog_clear_qso;
 extern Fl_Button *btn_cwlog_save_qso;
 extern Fl_Button *btn_cwlog_edit_entry;
 extern Fl_Button *btn_cwlog_delete_entry;
-extern Fl_Input2 *qso_date;
-extern Fl_Input2 *qso_time;
-extern Fl_Input2 *qso_rst_out;
-extern Fl_Input2 *qso_rst_in;
-extern Fl_Input2 *qso_exchange_in;
-extern Fl_Counter *qso_nbr;
-extern Fl_Input2 *qso_op_name;
-extern Fl_Input2 *qso_op_call;
-extern Fl_Button *btn_cwlog_datetime;
-extern Fl_Button *btn_time;
-extern Fl_Button *btn_freq;
-extern Fl_Button *btn_call;
-extern Fl_Button *btn_name;
-extern Fl_Button *btn_in;
-extern Fl_Button *btn_out;
-extern Fl_Button *btn_sent_nbr;
-extern Fl_Button *btn_exchange;
+extern Fl_Input2 *cw_qso_date;
+extern Fl_Input2 *cw_qso_time;
+extern Fl_Input2 *cw_rst_out;
+extern Fl_Input2 *cw_rst_in;
+extern Fl_Input2 *cw_xchg_in;
+extern Fl_Counter *cw_log_nbr;
+extern Fl_Input2 *cw_op_name;
+extern Fl_Input2 *cw_op_call;
+extern Fl_Button *btn_cw_datetime;
+extern Fl_Button *btn_cw_time;
+extern Fl_Button *btn_cw_freq;
+extern Fl_Button *btn_cw_call;
+extern Fl_Button *btn_cw_name;
+extern Fl_Button *btn_cw_in;
+extern Fl_Button *btn_cw_out;
+extern Fl_Button *btn_cw_sent_nbr;
+extern Fl_Button *btn_cw_xchg;
 #include <FL/Fl_Browser.H>
 extern Fl_Browser *brwsr_cwlog_entries;
 Fl_Double_Window* new_cwlogbook_dialog();
-extern unsigned char menu__i18n_done;
-extern Fl_Menu_Item menu_[];
-#define cwlog_menu_open (menu_+1)
-#define cwlog_menu_new (menu_+2)
-#define cwlog_menu_save (menu_+3)
-#define cwlog_menu_save_as (menu_+4)
-#define cwlog_menu_export_adif (menu_+5)
-#define cwlog_menu_import_adif (menu_+6)
-#define cwlog_menu_dupcheck (menu_+9)
-#define cwlog_menu_leading_zeros (menu_+10)
-#define cwlog_menu_cut_numbers (menu_+11)
+extern unsigned char menu_CWlog_menubar_i18n_done;
+extern Fl_Menu_Item menu_CWlog_menubar[];
+#define CWlog_files (menu_CWlog_menubar+0)
+#define cwlog_menu_open (menu_CWlog_menubar+1)
+#define cwlog_menu_new (menu_CWlog_menubar+2)
+#define cwlog_menu_save (menu_CWlog_menubar+3)
+#define cwlog_menu_save_as (menu_CWlog_menubar+4)
+#define cwlog_menu_export_adif (menu_CWlog_menubar+5)
+#define cwlog_menu_import_adif (menu_CWlog_menubar+6)
+#define cwlog_menu_dupcheck (menu_CWlog_menubar+9)
+#define cwlog_menu_leading_zeros (menu_CWlog_menubar+10)
+#define cwlog_menu_cut_numbers (menu_CWlog_menubar+11)
 #endif

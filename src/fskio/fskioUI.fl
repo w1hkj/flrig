@@ -1,11 +1,20 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0305
+version 1.0308
 i18n_type 1
 i18n_include "gettext.h"
 i18n_function _
 header_name {.h}
 code_name {.cxx}
 decl {\#include "fsk.h"} {private local
+}
+
+decl {\#include "fsklog.h"} {private local
+}
+
+decl {\#include <FL/Fl_Double_Window.H>} {public global
+}
+
+decl {Fl_Double_Window *fsklog_viewer;} {public local
 }
 
 Function {fskio_window()} {open
@@ -346,7 +355,7 @@ Function {fskio_config_dialog()} {open
     label {FSK Configuration} open
     xywh {610 200 670 100} type Double visible
   } {
-    Fl_Group {} {open selected
+    Fl_Group {} {open
       xywh {2 3 666 100} box ENGRAVED_FRAME
     } {
       Fl_Group select_fskioPORT {
@@ -401,7 +410,7 @@ progStatus.FSK_SHARED = FSK_USES_FSK;}
   btn_fskioSHARED->activate();
   select_fskioPORT->activate();
 }}
-        tooltip {Use DTR/RTS on CAT serial port} xywh {111 15 23 15} down_box DOWN_BOX align 4
+        tooltip {Use DTR/RTS on CAT serial port} xywh {87 15 23 15} down_box DOWN_BOX align 4
         code0 {o->value(progStatus.FSK_SHARED == FSK_USES_CAT);}
       }
       Fl_Check_Button btn_fskioAUX {
@@ -422,7 +431,7 @@ progStatus.FSK_SHARED = FSK_USES_FSK;}
   btn_fskioSHARED->activate();
   select_fskioPORT->activate();
 }}
-        tooltip {Use DTR/RTS on Auxiliary serial port} xywh {112 46 23 15} down_box DOWN_BOX align 4
+        tooltip {Use DTR/RTS on Auxiliary serial port} xywh {88 46 23 15} down_box DOWN_BOX align 4
         code0 {o->value(progStatus.FSK_SHARED == FSK_USES_AUX);}
       }
       Fl_Check_Button btn_fskioSEP {
@@ -443,7 +452,7 @@ progStatus.FSK_SHARED = FSK_USES_FSK;}
   btn_fskioSHARED->activate();
   select_fskioPORT->activate();
 }}
-        tooltip {Use DTR/RTS Separate serial port} xywh {245 15 23 15} down_box DOWN_BOX align 4
+        tooltip {Use DTR/RTS Separate serial port} xywh {212 15 23 15} down_box DOWN_BOX align 4
         code0 {o->value(progStatus.FSK_SHARED == FSK_USES_SEP);}
       }
       Fl_Check_Button btn_fskioSHARED {
@@ -464,21 +473,21 @@ progStatus.FSK_SHARED = FSK_USES_FSK;}
   btn_fskioSHARED->activate();
   select_fskioPORT->activate();
 }}
-        tooltip {Use DTR/RTS cwio shared port} xywh {245 46 23 15} down_box DOWN_BOX align 4
+        tooltip {Use DTR/RTS fskio shared port} xywh {212 46 23 15} down_box DOWN_BOX align 4
         code0 {o->value(progStatus.FSK_SHARED == FSK_USES_CWIO);}
       }
       Fl_Check_Button btn_fskioINVERTED {
         label Inverted
         callback {progStatus.FSK_INVERTED = o->value();}
         tooltip {DTR/RTS signaling is inverted
-(-) keying} xywh {376 15 23 15} down_box DOWN_BOX align 4
+(-) keying} xywh {339 15 23 15} down_box DOWN_BOX align 4
         code0 {o->value(progStatus.FSK_INVERTED);}
       }
       Fl_Check_Button btn_fskioSTOPBITS {
         label {1.5 stop bits}
         callback {progStatus.FSK_STOPBITS = o->value();}
         tooltip {Enabled - 1.5 stop bits
-Disable - 2 stop bits} xywh {376 46 23 15} down_box DOWN_BOX align 4
+Disable - 2 stop bits} xywh {339 46 23 15} down_box DOWN_BOX align 4
         code0 {o->value(progStatus.FSK_STOPBITS);}
       }
       Fl_Group listbox_fskioKEYLINE {
@@ -496,6 +505,227 @@ Disable - 2 stop bits} xywh {376 46 23 15} down_box DOWN_BOX align 4
         tooltip {PTT delay before keydown
 0 = Break-in} xywh {608 10 50 25} minimum 0 value 0
         code0 {o->value(progStatus.FSK_PTT);}
+      }
+      Fl_Counter fsk_idles {
+        label {Start Idles}
+        callback {progStatus.fsk_idles = o->value();}
+        tooltip {Transmit \# <LTRS> after PTT on} xywh {400 11 80 21} type Simple minimum 0 maximum 20 step 1
+        code0 {o->value(progStatus.fsk_idles);}
+      }
+    }
+  }
+}
+
+Function {new_fsklogbook_dialog()} {open
+} {
+  Fl_Window {} {
+    label {Flrig RTTY Log} open
+    xywh {610 351 670 284} type Double visible
+  } {
+    Fl_Menu_Bar FSKlog_menubar {open selected
+      xywh {0 0 670 20}
+    } {
+      Submenu FSKlog_menu {
+        label Files open
+        xywh {0 0 70 21}
+      } {
+        MenuItem fsklog_fsk_menu_open {
+          label Open
+          callback {fsklog_open();}
+          xywh {0 0 36 21}
+        }
+        MenuItem fsklog_fsk_menu_new {
+          label New
+          callback {fsklog_new();}
+          xywh {0 0 36 21}
+        }
+        MenuItem fsklog_fsk_menu_save {
+          label Save
+          callback {fsklog_save();}
+          xywh {0 0 36 21}
+        }
+        MenuItem fsklog_fsk_menu_save_as {
+          label {Save As}
+          callback {fsklog_save_as();}
+          xywh {0 0 36 21} divider
+        }
+        MenuItem fsklog_fsk_menu_export_adif {
+          label {Export ADIF}
+          callback {fsklog_export_adif();}
+          xywh {0 0 36 21}
+        }
+        MenuItem fsklog_fsk_menu_import_adif {
+          label {Import ADIF}
+          callback {fsklog_import_adif();}
+          xywh {0 0 36 21}
+        }
+      }
+      Submenu {} {
+        label Config open
+        xywh {0 0 70 21}
+      } {
+        MenuItem fsklog_fsk_menu_dupcheck {
+          label {Dup check}
+          callback {//fsklog.dupcheck = o->value();}
+          xywh {0 0 36 21} type Toggle
+        }
+        MenuItem fsklog_fsk_menu_leading_zeros {
+          label {Leading zeros}
+          callback {//fsklog.dupcheck = o->value();}
+          xywh {0 0 36 21} type Toggle
+        }
+        MenuItem fsklog_fsk_menu_cut_numbers {
+          label {Cut numbers}
+          callback {//fsklog.cut_nbrs = o->value();}
+          xywh {0 0 36 21} type Toggle
+        }
+      }
+    }
+    Fl_Group {} {open
+      xywh {2 22 668 29} box ENGRAVED_FRAME
+    } {
+      Fl_Output txt_fsklog_file {
+        label {Log File:}
+        callback {//progStatus.fsklogfile_name = o->value();}
+        xywh {75 26 590 22}
+        code0 {//->value(progStatus.fsklogfile_name);}
+      }
+    }
+    Fl_Group fsk_grp_qso_data {open
+      xywh {2 52 560 30} box ENGRAVED_BOX
+    } {
+      Fl_Input fsk_op_freq {
+        label Freq
+        tooltip Frequency xywh {43 56 120 22}
+        class Fl_Input2
+      }
+      Fl_Button btn_fsklog_clear_qso {
+        label Clear
+        callback {fsklog_clear_qso();}
+        tooltip {Clear fsklog entries} xywh {380 56 60 22}
+      }
+      Fl_Button btn_fsklog_save_qso {
+        label Save
+        callback {fsklog_save_qso();}
+        tooltip {Save QSO data to fsklog file} xywh {440 56 60 22}
+      }
+      Fl_Button btn_fsklog_edit_entry {
+        label Edit
+        callback {fsklog_edit_entry();}
+        tooltip {Delete Entry} xywh {501 56 60 22}
+      }
+      Fl_Button btn_fsklog_delete_entry {
+        label Delete
+        callback {fsklog_delete_entry();}
+        tooltip {Delete Entry} xywh {492 56 60 22} hide
+      }
+      Fl_Input fsk_date {
+        label Dt
+        tooltip {QSO call
+Query flfsklog if connected} xywh {193 56 85 22}
+        class Fl_Input2
+      }
+      Fl_Input fsk_time {
+        label {Tm:}
+        xywh {313 56 55 22}
+        class Fl_Input2
+      }
+    }
+    Fl_Group {} {open
+      xywh {565 52 103 62} box ENGRAVED_BOX
+    } {
+      Fl_Input fsk_rst_out {
+        label RSTout
+        tooltip {Send RST} xywh {622 56 40 22}
+        class Fl_Input2
+      }
+      Fl_Input fsk_rst_in {
+        label {RST in}
+        tooltip {Send RST} xywh {624 87 40 22}
+        class Fl_Input2
+      }
+    }
+    Fl_Group {} {open
+      xywh {2 84 560 30} box ENGRAVED_FRAME
+    } {
+      Fl_Input fsk_xchg_in {
+        label Xch
+        tooltip {Input exchange} xywh {313 87 150 22}
+        class Fl_Input2
+      }
+      Fl_Counter cntr_fsk_log_nbr {
+        label {\#:}
+        callback {progStatus.fsk_log_nbr = o->value();}
+        tooltip {QSO number (out)} xywh {491 87 70 22} type Simple align 4 step 1
+        code0 {o->value(progStatus.fsk_log_nbr);}
+      }
+      Fl_Input fsk_op_name {
+        label Nm
+        xywh {193 88 85 22}
+        class Fl_Input2
+      }
+      Fl_Input fsk_op_call {
+        label Call
+        tooltip {QSO call
+Query flfsklog if connected} xywh {43 88 120 22}
+        class Fl_Input2
+      }
+    }
+    Fl_Group {} {open
+      xywh {2 113 674 170}
+    } {
+      Fl_Group {} {open
+        xywh {2 116 668 22}
+      } {
+        Fl_Button btn_fsk_datetime {
+          label Date
+          callback {fsklog_sort_by_datetime();}
+          xywh {2 116 80 22} box BORDER_BOX color 51
+        }
+        Fl_Button btn_fsk_time {
+          label Time
+          callback {fsklog_sort_by_datetime();}
+          xywh {81 116 45 22} box BORDER_BOX color 51
+        }
+        Fl_Button btn_fsk_freq {
+          label Freq
+          callback {fsklog_sort_by_freq();}
+          xywh {126 116 70 22} box BORDER_BOX color 51
+        }
+        Fl_Button btn_fsk_call {
+          label Call
+          callback {fsklog_sort_by_call();}
+          xywh {196 116 75 22} box BORDER_BOX color 51
+        }
+        Fl_Button btn_fsk_name {
+          label Name
+          xywh {271 116 75 22} box BORDER_BOX color 51
+        }
+        Fl_Button btn_fsk_in {
+          label In
+          xywh {346 116 40 22} box BORDER_BOX color 51
+        }
+        Fl_Button btn_fsk_out {
+          label Out
+          xywh {386 116 40 22} box BORDER_BOX color 51
+        }
+        Fl_Button btn_fsk_sent_nbr {
+          label Nbr
+          callback {fsklog_sort_by_nbr();}
+          xywh {426 116 55 22} box BORDER_BOX color 51
+        }
+        Fl_Button btn_fsk_exchange {
+          label Exchange
+          xywh {481 116 185 22} box BORDER_BOX color 51 resizable
+        }
+      }
+      Fl_Browser brwsr_fsklog_entries {
+        callback {if (!fsklog_editing) fsklog_edit_entry();}
+        xywh {2 140 666 141} type Hold selection_color 230 resizable
+        code0 {static int widths[]={80,45,70,75,75,40,40,55,0};}
+        code1 {o->column_widths(widths);}
+        code2 {o->column_char('\\t');}
+        code3 {o->has_scrollbar(Fl_Browser_::VERTICAL_ALWAYS);}
       }
     }
   }

@@ -1990,14 +1990,14 @@ void cwlog_sort_by_nbr() {
 
 void cwlog_clear_qso()
 {
-	qso_date->value("");
-	qso_time->value("");
-	qso_op_freq->value("");
-	qso_op_call->value("");
-	qso_op_name->value("");
-	qso_rst_in->value("");
-	qso_rst_out->value("");
-	qso_exchange_in->value("");
+	cw_qso_date->value("");
+	cw_qso_time->value("");
+	cw_freq->value("");
+	cw_op_call->value("");
+	cw_op_name->value("");
+	cw_rst_in->value("");
+	cw_rst_out->value("");
+	cw_xchg_in->value("");
 
 	if (cwlog_editing)
 		cwlog_set_edit(false);
@@ -2010,15 +2010,15 @@ void cwlog_save_qso()
 	if (cwlog_editing) {
 		snprintf(line, sizeof(line),
 			"%s\t%s\t%s\t%s\t%s\t%s\t%s\t%05d\t%s",
-			qso_date->value(),
-			qso_time->value(),
-			qso_op_freq->value(),
-			qso_op_call->value(),
-			qso_op_name->value(),
-			qso_rst_in->value(),
-			qso_rst_out->value(),
-			(int)qso_nbr->value(),
-			qso_exchange_in->value());
+			cw_qso_date->value(),
+			cw_qso_time->value(),
+			cw_freq->value(),
+			cw_op_call->value(),
+			cw_op_name->value(),
+			cw_rst_in->value(),
+			cw_rst_out->value(),
+			(int)cw_log_nbr->value(),
+			cw_xchg_in->value());
 		brwsr_cwlog_entries->insert(cwlog_edit_nbr, line);
 		brwsr_cwlog_entries->remove(cwlog_edit_nbr + 1);
 		brwsr_cwlog_entries->select(cwlog_edit_nbr);
@@ -2026,15 +2026,15 @@ void cwlog_save_qso()
 	} else {
 		snprintf(line, sizeof(line),
 			"%s\t%s\t%s\t%s\t%s\t%s\t%s\t%05d\t%s",
-			qso_date->value(),
-			qso_time->value(),
-			qso_op_freq->value(),
-			qso_op_call->value(),
-			qso_op_name->value(),
-			qso_rst_in->value(),
-			qso_rst_out->value(),
-			(int)qso_nbr->value(),
-			qso_exchange_in->value());
+			cw_qso_date->value(),
+			cw_qso_time->value(),
+			cw_freq->value(),
+			cw_op_call->value(),
+			cw_op_name->value(),
+			cw_rst_in->value(),
+			cw_rst_out->value(),
+			(int)cw_log_nbr->value(),
+			cw_xchg_in->value());
 		brwsr_cwlog_entries->add(line);
 	}
 	cwlog_changed = true;
@@ -2064,39 +2064,39 @@ void cwlog_edit_entry()
 	std::string entry = brwsr_cwlog_entries->text(cwlog_edit_nbr);
 
 	ptr = entry.find('\t');
-	qso_date->value(entry.substr(0, ptr).c_str());
+	cw_qso_date->value(entry.substr(0, ptr).c_str());
 	entry.erase(0, ptr+1);
 
 	ptr = entry.find('\t');
-	qso_time->value(entry.substr(0,ptr).c_str());
+	cw_qso_time->value(entry.substr(0,ptr).c_str());
 	entry.erase(0, ptr+1);
 
 	ptr = entry.find('\t');
-	qso_op_freq->value(entry.substr(0,ptr).c_str());
+	cw_freq->value(entry.substr(0,ptr).c_str());
 	entry.erase(0, ptr+1);
 
 	ptr = entry.find('\t');
-	qso_op_call->value(entry.substr(0,ptr).c_str());
+	cw_op_call->value(entry.substr(0,ptr).c_str());
 	entry.erase(0, ptr+1);
 
 	ptr = entry.find('\t');
-	qso_op_name->value(entry.substr(0,ptr).c_str());
+	cw_op_name->value(entry.substr(0,ptr).c_str());
 	entry.erase(0, ptr+1);
 
 	ptr = entry.find('\t');
-	qso_rst_in->value(entry.substr(0,ptr).c_str());
+	cw_rst_in->value(entry.substr(0,ptr).c_str());
 	entry.erase(0, ptr+1);
 
 	ptr = entry.find('\t');
-	qso_rst_out->value(entry.substr(0,ptr).c_str());
+	cw_rst_out->value(entry.substr(0,ptr).c_str());
 	entry.erase(0, ptr+1);
 
 	ptr = entry.find('\t');
-	qso_nbr->value(atoi(entry.substr(0,ptr).c_str()));
+	cw_log_nbr->value(atoi(entry.substr(0,ptr).c_str()));
 	entry.erase(0, ptr+1);
 
 	ptr = entry.find('\t');
-	qso_exchange_in->value(entry.substr(0,ptr).c_str());
+	cw_xchg_in->value(entry.substr(0,ptr).c_str());
 	entry.erase(0, ptr+1);
 
 	cwlog_set_edit(true);
@@ -2106,8 +2106,8 @@ void cwlog_view()
 {
 	if (!cwlog_viewer) { 
 		cwlog_viewer = new_cwlogbook_dialog();
-		if (!progStatus.log_name.empty()) {
-			txt_cwlog_file->value(progStatus.log_name.c_str());
+		if (!progStatus.cw_log_name.empty()) {
+			txt_cwlog_file->value(progStatus.cw_log_name.c_str());
 			cwlog_load();
 		} else
 			cwlog_open();
@@ -2117,11 +2117,11 @@ void cwlog_view()
 
 void cwlog_save()
 {
-	if (progStatus.log_name.empty())
+	if (progStatus.cw_log_name.empty())
 		return;
-	std::ofstream oLog(progStatus.log_name.c_str());
+	std::ofstream oLog(progStatus.cw_log_name.c_str());
 	if (!oLog) {
-		fl_message ("Could not write to %s", progStatus.log_name.c_str());
+		fl_message ("Could not write to %s", progStatus.cw_log_name.c_str());
 		return;
 	}
 	size_t n = brwsr_cwlog_entries->size();
@@ -2137,7 +2137,7 @@ void cwlog_save()
 
 void cwlog_load()
 {
-	std::ifstream iLog(progStatus.log_name.c_str());
+	std::ifstream iLog(progStatus.cw_log_name.c_str());
 	if (!iLog) return;
 	brwsr_cwlog_entries->clear();
 	char line[256];
@@ -2164,7 +2164,7 @@ void cwlog_save_as()
 	fnfc.filter("CW Log\t*.txt");
 // default directory to use
 	fnfc.directory(RigHomeDir.c_str());
-	fnfc.preset_file(progStatus.log_name.c_str());
+	fnfc.preset_file(progStatus.cw_log_name.c_str());
 // Show native chooser
 	switch ( fnfc.show() ) {
 		case -1:
@@ -2173,8 +2173,8 @@ void cwlog_save_as()
 		case 1: 
 			return; // CANCEL
 		default:
-			progStatus.log_name = fnfc.filename();
-			txt_cwlog_file->value(progStatus.log_name.c_str());
+			progStatus.cw_log_name = fnfc.filename();
+			txt_cwlog_file->value(progStatus.cw_log_name.c_str());
 	}
 	cwlog_save();
 }
@@ -2199,8 +2199,8 @@ void cwlog_open()
 		case 1: 
 			return; // CANCEL
 		default:
-			progStatus.log_name = fnfc.filename();
-			txt_cwlog_file->value(progStatus.log_name.c_str());
+			progStatus.cw_log_name = fnfc.filename();
+			txt_cwlog_file->value(progStatus.cw_log_name.c_str());
 			txt_cwlog_file->redraw();
 			cwlog_load();
 	}
@@ -2212,8 +2212,8 @@ void cwlog_new()
 		cwlog_save();
 	brwsr_cwlog_entries->clear();
 	brwsr_cwlog_entries->redraw();
-	progStatus.log_name.clear();
-	txt_cwlog_file->value(progStatus.log_name.c_str());
+	progStatus.cw_log_name.clear();
+	txt_cwlog_file->value(progStatus.cw_log_name.c_str());
 	txt_cwlog_file->redraw();
 
 	Fl_Native_File_Chooser fnfc;
@@ -2232,8 +2232,8 @@ void cwlog_new()
 		case 1: 
 			return; // CANCEL
 		default:
-			progStatus.log_name = fnfc.filename();
-			txt_cwlog_file->value(progStatus.log_name.c_str());
+			progStatus.cw_log_name = fnfc.filename();
+			txt_cwlog_file->value(progStatus.cw_log_name.c_str());
 	}
 }
 
@@ -2272,12 +2272,12 @@ void cwlog_export_adif()
 	}
 
 	std::string logline,
-				qso_date, qso_time,
-				qso_op_freq,
-				qso_op_call,
-				qso_op_name,
-				qso_rst_in, qso_rst_out,
-				qso_nbr,
+				cw_qso_date, cw_qso_time,
+				cw_freq,
+				cw_op_call,
+				cw_op_name,
+				cw_rst_in, cw_rst_out,
+				cw_log_nbr,
 				qso_notes;
 
 	size_t ptr = std::string::npos;
@@ -2287,48 +2287,48 @@ void cwlog_export_adif()
 		if (logline.empty()) continue;
 
 		ptr = logline.find('\t');
-		qso_date = logline.substr(0, ptr);
+		cw_qso_date = logline.substr(0, ptr);
 		logline.erase(0, ptr+1);
 
 		ptr = logline.find('\t');
-		qso_time = logline.substr(0, ptr);
+		cw_qso_time = logline.substr(0, ptr);
 		logline.erase(0, ptr+1);
 
 		ptr = logline.find('\t');
-		qso_op_freq = logline.substr(0, ptr);
+		cw_freq = logline.substr(0, ptr);
 		logline.erase(0, ptr+1);
 
 		ptr = logline.find('\t');
-		qso_op_call = logline.substr(0, ptr);
+		cw_op_call = logline.substr(0, ptr);
 		logline.erase(0, ptr+1);
 
 		ptr = logline.find('\t');
-		qso_op_name = logline.substr(0, ptr);
+		cw_op_name = logline.substr(0, ptr);
 		logline.erase(0, ptr+1);
 
 		ptr = logline.find('\t');
-		qso_rst_in = logline.substr(0, ptr);
+		cw_rst_in = logline.substr(0, ptr);
 		logline.erase(0, ptr+1);
 
 		ptr = logline.find('\t');
-		qso_rst_out = logline.substr(0, ptr);
+		cw_rst_out = logline.substr(0, ptr);
 		logline.erase(0, ptr+1);
 
 		ptr = logline.find('\t');
-		qso_nbr = logline.substr(0, ptr);
+		cw_log_nbr = logline.substr(0, ptr);
 		logline.erase(0, ptr+1);
 
 		qso_notes = logline;
 
-		oExport << "<QSO_DATE:" << qso_date.length() << ">" << qso_date
-				<< "<TIME_ON:" << qso_time.length() << ">" << qso_time
-				<< "<FREQ:" << qso_op_freq.length() << ">" << qso_op_freq
+		oExport << "<QSO_DATE:" << cw_qso_date.length() << ">" << cw_qso_date
+				<< "<TIME_ON:" << cw_qso_time.length() << ">" << cw_qso_time
+				<< "<FREQ:" << cw_freq.length() << ">" << cw_freq
 				<< "<MODE:2>CW"
-				<< "<CALL:" << qso_op_call.length() << ">" << qso_op_call
-				<< "<NAME:" << qso_op_name.length() << ">" << qso_op_name
-				<< "<RST_RCVD:" << qso_rst_in.length() << ">" << qso_rst_in
-				<< "<RST_SENT:" << qso_rst_out.length() << ">" << qso_rst_out
-				<< "<STX:" << qso_nbr.length() << ">" << qso_nbr
+				<< "<CALL:" << cw_op_call.length() << ">" << cw_op_call
+				<< "<NAME:" << cw_op_name.length() << ">" << cw_op_name
+				<< "<RST_RCVD:" << cw_rst_in.length() << ">" << cw_rst_in
+				<< "<RST_SENT:" << cw_rst_out.length() << ">" << cw_rst_out
+				<< "<STX:" << cw_log_nbr.length() << ">" << cw_log_nbr
 				<< "<NOTES:" << qso_notes.length() << ">" << qso_notes
 				<< "<EOR>" << std::endl;
 	}

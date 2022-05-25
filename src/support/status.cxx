@@ -557,6 +557,7 @@ status progStatus = {
 	0,			// int		FSK_CONNECTED; 1 - connected state; 0 - unconnected state
 	0,			// int		FSK_INVERTED; reverse keying; 
 	1,			// int		FSK_STOPBITS; 1 - 1.5; 0 - 2
+	8,			// int		fsk_idles
 	"",			// std::string	FSK_PORT;
 
 	"","","","","","",
@@ -565,11 +566,18 @@ status progStatus = {
 	"m7","m8","m9","m10","m11","m12",	// std::string	FSK_labels[12];
 
 // CW logbook parameters
-	"",			// std::string log_name;
-	0,			// int log_cut_numbers;
-	0,			// int log_leading_zeros;
-	1,			// int log_dupcheck;
-	0			// int log_nbr;
+	"",			// std::string cw_log_name;
+	0,			// int cw_log_cut_numbers;
+	0,			// int cw_log_leading_zeros;
+	1,			// int cw_log_dupcheck;
+	0,			// int cw_log_nbr;
+
+// RTTY logbook parameters
+	"",			// std::string fsk_log_name;
+	0,			// int fsk_log_cut_numbers;
+	0,			// int fsk_log_leading_zeros;
+	1,			// int fsk_log_dupcheck;
+	0,			// int fsk_log_nbr
 
 };
 
@@ -1191,6 +1199,7 @@ void status::saveLastState()
 	spref.set("FSK_CONNECTED", FSK_CONNECTED);
 	spref.set("FSK_INVERTED", FSK_INVERTED);
 	spref.set("FSK_STOPBITS", FSK_STOPBITS);
+	spref.set("FSK_IDLES", fsk_idles);
 	spref.set("FSK_PORT", FSK_PORT.c_str());
 
 	for (int n = 0; n < 12; n++) {
@@ -1201,11 +1210,19 @@ void status::saveLastState()
 	}
 
 // CW logbook parameters
-	spref.set("LOG_NAME", log_name.c_str());
-	spref.set("CUT_NUMBERS", log_cut_numbers);
-	spref.set("LEADING_ZEROS", log_leading_zeros);
-	spref.set("DUPCHECK", log_dupcheck);
-	spref.set("QSO_NBR", qso_nbr);
+	spref.set("CW_LOG_NAME", cw_log_name.c_str());
+	spref.set("CW_CUT_NUMBERS", cw_log_cut_numbers);
+	spref.set("CW_LEADING_ZEROS", cw_log_leading_zeros);
+	spref.set("CW_DUPCHECK", cw_log_dupcheck);
+	spref.set("CW_LOG_NBR", cw_log_nbr);
+
+
+// FSK logbook parameters
+	spref.set("FSK_LOG_NAME", fsk_log_name.c_str());
+	spref.set("FSK_CUT_NUMBERS", fsk_log_cut_numbers);
+	spref.set("FSK_LEADING_ZEROS", fsk_log_leading_zeros);
+	spref.set("FSK_DUPCHECK", fsk_log_dupcheck);
+	spref.set("FSK_LOG_NBR", fsk_log_nbr);
 
 }
 
@@ -1964,16 +1981,25 @@ bool status::loadXcvrState(std::string xcvr)
 		spref.get("FSK_CONNECTED", FSK_CONNECTED, FSK_CONNECTED);
 		spref.get("FSK_INVERTED", FSK_INVERTED, FSK_INVERTED);
 		spref.get("FSK_STOPBITS", FSK_STOPBITS, FSK_STOPBITS);
+		spref.get("FSK_IDLES", fsk_idles, fsk_idles);
 		spref.get("FSK_PORT", defbuffer, "NONE", 499);
 		FSK_PORT = defbuffer;
 
 // CW logbook parameters
-		spref.get("LOG_NAME", defbuffer, "", 499);
-			log_name = defbuffer;
-		spref.get("CUT_NUMBERS", log_cut_numbers, log_cut_numbers);
-		spref.get("LEADING_ZEROS", log_leading_zeros, log_leading_zeros);
-		spref.get("DUPCHECK", log_dupcheck, log_dupcheck);
-		spref.get("QSO_NBR", qso_nbr, qso_nbr);
+		spref.get("CW_LOG_NAME", defbuffer, "", 499);
+			cw_log_name = defbuffer;
+		spref.get("CW_CUT_NUMBERS", cw_log_cut_numbers, cw_log_cut_numbers);
+		spref.get("CW_LEADING_ZEROS", cw_log_leading_zeros, cw_log_leading_zeros);
+		spref.get("CW_DUPCHECK", cw_log_dupcheck, cw_log_dupcheck);
+		spref.get("CW_LOG_NBR", cw_log_nbr, cw_log_nbr);
+
+// FSK logbook parameters
+		spref.get("FSK_LOG_NAME", defbuffer, "", 499);
+			fsk_log_name = defbuffer;
+		spref.get("FSK_CUT_NUMBERS",fsk_log_cut_numbers, fsk_log_cut_numbers);
+		spref.get("FSK_LEADING_ZEROS", fsk_log_leading_zeros, fsk_log_leading_zeros);
+		spref.get("FSK_DUPCHECK", fsk_log_dupcheck, fsk_log_dupcheck);
+		spref.get("FSK_LOG_NBR", fsk_log_nbr, fsk_log_nbr);
 
 		for (int n = 0; n < 12; n++) {
 			snprintf(getbuff, sizeof(getbuff), "fskiolabel[%d]", n);

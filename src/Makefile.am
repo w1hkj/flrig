@@ -129,6 +129,8 @@ flrig_SOURCES += \
 	cmedia/tmate2.cxx \
 	fskio/fsk.cxx \
 	fskio/fskioUI.cxx \
+	log/cwlog.cxx \
+	log/fsklog.cxx \
 	graphics/pixmaps.cxx \
 	graphics/icons.cxx \
 	graphics/images.cxx \
@@ -295,9 +297,11 @@ EXTRA_DIST = \
 	include/hidapi.h \
 	include/tmate2.h \
 	include/cwio.h \
+	include/cwlog.h \
 	include/cwioUI.h \
 	include/fsk.h \
 	include/fskioUI.h \
+	include/fsklog.h \
 	include/gpio.h \
 	include/gpio_ptt.h \
 	include/morse.h \

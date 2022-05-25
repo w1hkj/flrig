@@ -1176,6 +1176,8 @@ Fl_Double_Window* new_cwio_config_dialog() {
   return w;
 }
 
+Fl_Menu_Bar *CWlog_menubar=(Fl_Menu_Bar *)0;
+
 static void cb_cwlog_menu_open(Fl_Menu_*, void*) {
   cwlog_open();
 }
@@ -1212,8 +1214,8 @@ static void cb_cwlog_menu_cut_numbers(Fl_Menu_* o, void*) {
   //cwlog.cut_nbrs = o->value();
 }
 
-unsigned char menu__i18n_done = 0;
-Fl_Menu_Item menu_[] = {
+unsigned char menu_CWlog_menubar_i18n_done = 0;
+Fl_Menu_Item menu_CWlog_menubar[] = {
  {"Files", 0,  0, 0, 64, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
  {"Open", 0,  (Fl_Callback*)cb_cwlog_menu_open, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
  {"New", 0,  (Fl_Callback*)cb_cwlog_menu_new, 0, 0, (uchar)FL_NORMAL_LABEL, 0, 14, 0},
@@ -1236,9 +1238,9 @@ static void cb_txt_cwlog_file(Fl_Output* o, void*) {
   //progStatus.cwlogfile_name = o->value();
 }
 
-Fl_Group *grp_qso_data=(Fl_Group *)0;
+Fl_Group *cw_grp_qso_data=(Fl_Group *)0;
 
-Fl_Input2 *qso_op_freq=(Fl_Input2 *)0;
+Fl_Input2 *cw_freq=(Fl_Input2 *)0;
 
 Fl_Button *btn_cwlog_clear_qso=(Fl_Button *)0;
 
@@ -1264,63 +1266,63 @@ static void cb_btn_cwlog_delete_entry(Fl_Button*, void*) {
   cwlog_delete_entry();
 }
 
-Fl_Input2 *qso_date=(Fl_Input2 *)0;
+Fl_Input2 *cw_qso_date=(Fl_Input2 *)0;
 
-Fl_Input2 *qso_time=(Fl_Input2 *)0;
+Fl_Input2 *cw_qso_time=(Fl_Input2 *)0;
 
-Fl_Input2 *qso_rst_out=(Fl_Input2 *)0;
+Fl_Input2 *cw_rst_out=(Fl_Input2 *)0;
 
-Fl_Input2 *qso_rst_in=(Fl_Input2 *)0;
+Fl_Input2 *cw_rst_in=(Fl_Input2 *)0;
 
-Fl_Input2 *qso_exchange_in=(Fl_Input2 *)0;
+Fl_Input2 *cw_xchg_in=(Fl_Input2 *)0;
 
-Fl_Counter *qso_nbr=(Fl_Counter *)0;
+Fl_Counter *cw_log_nbr=(Fl_Counter *)0;
 
-static void cb_qso_nbr(Fl_Counter* o, void*) {
-  progStatus.qso_nbr = o->value();
+static void cb_cw_log_nbr(Fl_Counter* o, void*) {
+  progStatus.cw_log_nbr = o->value();
 }
 
-Fl_Input2 *qso_op_name=(Fl_Input2 *)0;
+Fl_Input2 *cw_op_name=(Fl_Input2 *)0;
 
-Fl_Input2 *qso_op_call=(Fl_Input2 *)0;
+Fl_Input2 *cw_op_call=(Fl_Input2 *)0;
 
-Fl_Button *btn_cwlog_datetime=(Fl_Button *)0;
+Fl_Button *btn_cw_datetime=(Fl_Button *)0;
 
-static void cb_btn_cwlog_datetime(Fl_Button*, void*) {
+static void cb_btn_cw_datetime(Fl_Button*, void*) {
   cwlog_sort_by_datetime();
 }
 
-Fl_Button *btn_time=(Fl_Button *)0;
+Fl_Button *btn_cw_time=(Fl_Button *)0;
 
-static void cb_btn_time(Fl_Button*, void*) {
+static void cb_btn_cw_time(Fl_Button*, void*) {
   cwlog_sort_by_datetime();
 }
 
-Fl_Button *btn_freq=(Fl_Button *)0;
+Fl_Button *btn_cw_freq=(Fl_Button *)0;
 
-static void cb_btn_freq(Fl_Button*, void*) {
+static void cb_btn_cw_freq(Fl_Button*, void*) {
   cwlog_sort_by_freq();
 }
 
-Fl_Button *btn_call=(Fl_Button *)0;
+Fl_Button *btn_cw_call=(Fl_Button *)0;
 
-static void cb_btn_call(Fl_Button*, void*) {
+static void cb_btn_cw_call(Fl_Button*, void*) {
   cwlog_sort_by_call();
 }
 
-Fl_Button *btn_name=(Fl_Button *)0;
+Fl_Button *btn_cw_name=(Fl_Button *)0;
 
-Fl_Button *btn_in=(Fl_Button *)0;
+Fl_Button *btn_cw_in=(Fl_Button *)0;
 
-Fl_Button *btn_out=(Fl_Button *)0;
+Fl_Button *btn_cw_out=(Fl_Button *)0;
 
-Fl_Button *btn_sent_nbr=(Fl_Button *)0;
+Fl_Button *btn_cw_sent_nbr=(Fl_Button *)0;
 
-static void cb_btn_sent_nbr(Fl_Button*, void*) {
+static void cb_btn_cw_sent_nbr(Fl_Button*, void*) {
   cwlog_sort_by_nbr();
 }
 
-Fl_Button *btn_exchange=(Fl_Button *)0;
+Fl_Button *btn_cw_xchg=(Fl_Button *)0;
 
 Fl_Browser *brwsr_cwlog_entries=(Fl_Browser *)0;
 
@@ -1332,16 +1334,16 @@ Fl_Double_Window* new_cwlogbook_dialog() {
   Fl_Double_Window* w;
   { Fl_Double_Window* o = new Fl_Double_Window(670, 284, _("Flrig CW Log"));
     w = o; if (w) {/* empty */}
-    { Fl_Menu_Bar* o = new Fl_Menu_Bar(0, 0, 670, 20);
-      if (!menu__i18n_done) {
+    { CWlog_menubar = new Fl_Menu_Bar(0, 0, 670, 20);
+      if (!menu_CWlog_menubar_i18n_done) {
         int i=0;
         for ( ; i<12; i++)
-          if (menu_[i].label())
-            menu_[i].label(_(menu_[i].label()));
-        menu__i18n_done = 1;
+          if (menu_CWlog_menubar[i].label())
+            menu_CWlog_menubar[i].label(_(menu_CWlog_menubar[i].label()));
+        menu_CWlog_menubar_i18n_done = 1;
       }
-      o->menu(menu_);
-    } // Fl_Menu_Bar* o
+      CWlog_menubar->menu(menu_CWlog_menubar);
+    } // Fl_Menu_Bar* CWlog_menubar
     { Fl_Group* o = new Fl_Group(2, 22, 668, 29);
       o->box(FL_ENGRAVED_FRAME);
       { txt_cwlog_file = new Fl_Output(75, 26, 590, 22, _("Log File:"));
@@ -1350,20 +1352,20 @@ Fl_Double_Window* new_cwlogbook_dialog() {
       } // Fl_Output* txt_cwlog_file
       o->end();
     } // Fl_Group* o
-    { grp_qso_data = new Fl_Group(2, 52, 560, 30);
-      grp_qso_data->box(FL_ENGRAVED_BOX);
-      { qso_op_freq = new Fl_Input2(43, 56, 120, 22, _("Freq"));
-        qso_op_freq->tooltip(_("Frequency"));
-        qso_op_freq->box(FL_DOWN_BOX);
-        qso_op_freq->color(FL_BACKGROUND2_COLOR);
-        qso_op_freq->selection_color(FL_SELECTION_COLOR);
-        qso_op_freq->labeltype(FL_NORMAL_LABEL);
-        qso_op_freq->labelfont(0);
-        qso_op_freq->labelsize(14);
-        qso_op_freq->labelcolor(FL_FOREGROUND_COLOR);
-        qso_op_freq->align(Fl_Align(FL_ALIGN_LEFT));
-        qso_op_freq->when(FL_WHEN_RELEASE);
-      } // Fl_Input2* qso_op_freq
+    { cw_grp_qso_data = new Fl_Group(2, 52, 560, 30);
+      cw_grp_qso_data->box(FL_ENGRAVED_BOX);
+      { cw_freq = new Fl_Input2(43, 56, 120, 22, _("Freq"));
+        cw_freq->tooltip(_("Frequency"));
+        cw_freq->box(FL_DOWN_BOX);
+        cw_freq->color(FL_BACKGROUND2_COLOR);
+        cw_freq->selection_color(FL_SELECTION_COLOR);
+        cw_freq->labeltype(FL_NORMAL_LABEL);
+        cw_freq->labelfont(0);
+        cw_freq->labelsize(14);
+        cw_freq->labelcolor(FL_FOREGROUND_COLOR);
+        cw_freq->align(Fl_Align(FL_ALIGN_LEFT));
+        cw_freq->when(FL_WHEN_RELEASE);
+      } // Fl_Input2* cw_freq
       { btn_cwlog_clear_qso = new Fl_Button(380, 56, 60, 22, _("Clear"));
         btn_cwlog_clear_qso->tooltip(_("Clear cwlog entries"));
         btn_cwlog_clear_qso->callback((Fl_Callback*)cb_btn_cwlog_clear_qso);
@@ -1381,150 +1383,150 @@ Fl_Double_Window* new_cwlogbook_dialog() {
         btn_cwlog_delete_entry->callback((Fl_Callback*)cb_btn_cwlog_delete_entry);
         btn_cwlog_delete_entry->hide();
       } // Fl_Button* btn_cwlog_delete_entry
-      { qso_date = new Fl_Input2(193, 56, 85, 22, _("Dt"));
-        qso_date->tooltip(_("QSO call\nQuery flcwlog if connected"));
-        qso_date->box(FL_DOWN_BOX);
-        qso_date->color(FL_BACKGROUND2_COLOR);
-        qso_date->selection_color(FL_SELECTION_COLOR);
-        qso_date->labeltype(FL_NORMAL_LABEL);
-        qso_date->labelfont(0);
-        qso_date->labelsize(14);
-        qso_date->labelcolor(FL_FOREGROUND_COLOR);
-        qso_date->align(Fl_Align(FL_ALIGN_LEFT));
-        qso_date->when(FL_WHEN_RELEASE);
-      } // Fl_Input2* qso_date
-      { qso_time = new Fl_Input2(313, 56, 55, 22, _("Tm:"));
-        qso_time->box(FL_DOWN_BOX);
-        qso_time->color(FL_BACKGROUND2_COLOR);
-        qso_time->selection_color(FL_SELECTION_COLOR);
-        qso_time->labeltype(FL_NORMAL_LABEL);
-        qso_time->labelfont(0);
-        qso_time->labelsize(14);
-        qso_time->labelcolor(FL_FOREGROUND_COLOR);
-        qso_time->align(Fl_Align(FL_ALIGN_LEFT));
-        qso_time->when(FL_WHEN_RELEASE);
-      } // Fl_Input2* qso_time
-      grp_qso_data->end();
-    } // Fl_Group* grp_qso_data
+      { cw_qso_date = new Fl_Input2(193, 56, 85, 22, _("Dt"));
+        cw_qso_date->tooltip(_("QSO call\nQuery flcwlog if connected"));
+        cw_qso_date->box(FL_DOWN_BOX);
+        cw_qso_date->color(FL_BACKGROUND2_COLOR);
+        cw_qso_date->selection_color(FL_SELECTION_COLOR);
+        cw_qso_date->labeltype(FL_NORMAL_LABEL);
+        cw_qso_date->labelfont(0);
+        cw_qso_date->labelsize(14);
+        cw_qso_date->labelcolor(FL_FOREGROUND_COLOR);
+        cw_qso_date->align(Fl_Align(FL_ALIGN_LEFT));
+        cw_qso_date->when(FL_WHEN_RELEASE);
+      } // Fl_Input2* cw_qso_date
+      { cw_qso_time = new Fl_Input2(313, 56, 55, 22, _("Tm:"));
+        cw_qso_time->box(FL_DOWN_BOX);
+        cw_qso_time->color(FL_BACKGROUND2_COLOR);
+        cw_qso_time->selection_color(FL_SELECTION_COLOR);
+        cw_qso_time->labeltype(FL_NORMAL_LABEL);
+        cw_qso_time->labelfont(0);
+        cw_qso_time->labelsize(14);
+        cw_qso_time->labelcolor(FL_FOREGROUND_COLOR);
+        cw_qso_time->align(Fl_Align(FL_ALIGN_LEFT));
+        cw_qso_time->when(FL_WHEN_RELEASE);
+      } // Fl_Input2* cw_qso_time
+      cw_grp_qso_data->end();
+    } // Fl_Group* cw_grp_qso_data
     { Fl_Group* o = new Fl_Group(565, 52, 103, 62);
       o->box(FL_ENGRAVED_BOX);
-      { qso_rst_out = new Fl_Input2(622, 56, 40, 22, _("RSTout"));
-        qso_rst_out->tooltip(_("Send RST"));
-        qso_rst_out->box(FL_DOWN_BOX);
-        qso_rst_out->color(FL_BACKGROUND2_COLOR);
-        qso_rst_out->selection_color(FL_SELECTION_COLOR);
-        qso_rst_out->labeltype(FL_NORMAL_LABEL);
-        qso_rst_out->labelfont(0);
-        qso_rst_out->labelsize(14);
-        qso_rst_out->labelcolor(FL_FOREGROUND_COLOR);
-        qso_rst_out->align(Fl_Align(FL_ALIGN_LEFT));
-        qso_rst_out->when(FL_WHEN_RELEASE);
-      } // Fl_Input2* qso_rst_out
-      { qso_rst_in = new Fl_Input2(624, 87, 40, 22, _("RST in"));
-        qso_rst_in->tooltip(_("Send RST"));
-        qso_rst_in->box(FL_DOWN_BOX);
-        qso_rst_in->color(FL_BACKGROUND2_COLOR);
-        qso_rst_in->selection_color(FL_SELECTION_COLOR);
-        qso_rst_in->labeltype(FL_NORMAL_LABEL);
-        qso_rst_in->labelfont(0);
-        qso_rst_in->labelsize(14);
-        qso_rst_in->labelcolor(FL_FOREGROUND_COLOR);
-        qso_rst_in->align(Fl_Align(FL_ALIGN_LEFT));
-        qso_rst_in->when(FL_WHEN_RELEASE);
-      } // Fl_Input2* qso_rst_in
+      { cw_rst_out = new Fl_Input2(622, 56, 40, 22, _("RSTout"));
+        cw_rst_out->tooltip(_("Send RST"));
+        cw_rst_out->box(FL_DOWN_BOX);
+        cw_rst_out->color(FL_BACKGROUND2_COLOR);
+        cw_rst_out->selection_color(FL_SELECTION_COLOR);
+        cw_rst_out->labeltype(FL_NORMAL_LABEL);
+        cw_rst_out->labelfont(0);
+        cw_rst_out->labelsize(14);
+        cw_rst_out->labelcolor(FL_FOREGROUND_COLOR);
+        cw_rst_out->align(Fl_Align(FL_ALIGN_LEFT));
+        cw_rst_out->when(FL_WHEN_RELEASE);
+      } // Fl_Input2* cw_rst_out
+      { cw_rst_in = new Fl_Input2(624, 87, 40, 22, _("RST in"));
+        cw_rst_in->tooltip(_("Send RST"));
+        cw_rst_in->box(FL_DOWN_BOX);
+        cw_rst_in->color(FL_BACKGROUND2_COLOR);
+        cw_rst_in->selection_color(FL_SELECTION_COLOR);
+        cw_rst_in->labeltype(FL_NORMAL_LABEL);
+        cw_rst_in->labelfont(0);
+        cw_rst_in->labelsize(14);
+        cw_rst_in->labelcolor(FL_FOREGROUND_COLOR);
+        cw_rst_in->align(Fl_Align(FL_ALIGN_LEFT));
+        cw_rst_in->when(FL_WHEN_RELEASE);
+      } // Fl_Input2* cw_rst_in
       o->end();
     } // Fl_Group* o
     { Fl_Group* o = new Fl_Group(2, 84, 560, 30);
       o->box(FL_ENGRAVED_FRAME);
-      { qso_exchange_in = new Fl_Input2(313, 87, 150, 22, _("Xch"));
-        qso_exchange_in->tooltip(_("Input exchange"));
-        qso_exchange_in->box(FL_DOWN_BOX);
-        qso_exchange_in->color(FL_BACKGROUND2_COLOR);
-        qso_exchange_in->selection_color(FL_SELECTION_COLOR);
-        qso_exchange_in->labeltype(FL_NORMAL_LABEL);
-        qso_exchange_in->labelfont(0);
-        qso_exchange_in->labelsize(14);
-        qso_exchange_in->labelcolor(FL_FOREGROUND_COLOR);
-        qso_exchange_in->align(Fl_Align(FL_ALIGN_LEFT));
-        qso_exchange_in->when(FL_WHEN_RELEASE);
-      } // Fl_Input2* qso_exchange_in
-      { Fl_Counter* o = qso_nbr = new Fl_Counter(491, 87, 70, 22, _("#:"));
-        qso_nbr->tooltip(_("QSO number (out)"));
-        qso_nbr->type(1);
-        qso_nbr->step(1);
-        qso_nbr->callback((Fl_Callback*)cb_qso_nbr);
-        qso_nbr->align(Fl_Align(FL_ALIGN_LEFT));
-        o->value(progStatus.qso_nbr);
-      } // Fl_Counter* qso_nbr
-      { qso_op_name = new Fl_Input2(193, 88, 85, 22, _("Nm"));
-        qso_op_name->box(FL_DOWN_BOX);
-        qso_op_name->color(FL_BACKGROUND2_COLOR);
-        qso_op_name->selection_color(FL_SELECTION_COLOR);
-        qso_op_name->labeltype(FL_NORMAL_LABEL);
-        qso_op_name->labelfont(0);
-        qso_op_name->labelsize(14);
-        qso_op_name->labelcolor(FL_FOREGROUND_COLOR);
-        qso_op_name->align(Fl_Align(FL_ALIGN_LEFT));
-        qso_op_name->when(FL_WHEN_RELEASE);
-      } // Fl_Input2* qso_op_name
-      { qso_op_call = new Fl_Input2(43, 88, 120, 22, _("Call"));
-        qso_op_call->tooltip(_("QSO call\nQuery flcwlog if connected"));
-        qso_op_call->box(FL_DOWN_BOX);
-        qso_op_call->color(FL_BACKGROUND2_COLOR);
-        qso_op_call->selection_color(FL_SELECTION_COLOR);
-        qso_op_call->labeltype(FL_NORMAL_LABEL);
-        qso_op_call->labelfont(0);
-        qso_op_call->labelsize(14);
-        qso_op_call->labelcolor(FL_FOREGROUND_COLOR);
-        qso_op_call->align(Fl_Align(FL_ALIGN_LEFT));
-        qso_op_call->when(FL_WHEN_RELEASE);
-      } // Fl_Input2* qso_op_call
+      { cw_xchg_in = new Fl_Input2(313, 87, 150, 22, _("Xch"));
+        cw_xchg_in->tooltip(_("Input exchange"));
+        cw_xchg_in->box(FL_DOWN_BOX);
+        cw_xchg_in->color(FL_BACKGROUND2_COLOR);
+        cw_xchg_in->selection_color(FL_SELECTION_COLOR);
+        cw_xchg_in->labeltype(FL_NORMAL_LABEL);
+        cw_xchg_in->labelfont(0);
+        cw_xchg_in->labelsize(14);
+        cw_xchg_in->labelcolor(FL_FOREGROUND_COLOR);
+        cw_xchg_in->align(Fl_Align(FL_ALIGN_LEFT));
+        cw_xchg_in->when(FL_WHEN_RELEASE);
+      } // Fl_Input2* cw_xchg_in
+      { Fl_Counter* o = cw_log_nbr = new Fl_Counter(491, 87, 70, 22, _("#:"));
+        cw_log_nbr->tooltip(_("QSO number (out)"));
+        cw_log_nbr->type(1);
+        cw_log_nbr->step(1);
+        cw_log_nbr->callback((Fl_Callback*)cb_cw_log_nbr);
+        cw_log_nbr->align(Fl_Align(FL_ALIGN_LEFT));
+        o->value(progStatus.cw_log_nbr);
+      } // Fl_Counter* cw_log_nbr
+      { cw_op_name = new Fl_Input2(193, 88, 85, 22, _("Nm"));
+        cw_op_name->box(FL_DOWN_BOX);
+        cw_op_name->color(FL_BACKGROUND2_COLOR);
+        cw_op_name->selection_color(FL_SELECTION_COLOR);
+        cw_op_name->labeltype(FL_NORMAL_LABEL);
+        cw_op_name->labelfont(0);
+        cw_op_name->labelsize(14);
+        cw_op_name->labelcolor(FL_FOREGROUND_COLOR);
+        cw_op_name->align(Fl_Align(FL_ALIGN_LEFT));
+        cw_op_name->when(FL_WHEN_RELEASE);
+      } // Fl_Input2* cw_op_name
+      { cw_op_call = new Fl_Input2(43, 88, 120, 22, _("Call"));
+        cw_op_call->tooltip(_("QSO call\nQuery flcwlog if connected"));
+        cw_op_call->box(FL_DOWN_BOX);
+        cw_op_call->color(FL_BACKGROUND2_COLOR);
+        cw_op_call->selection_color(FL_SELECTION_COLOR);
+        cw_op_call->labeltype(FL_NORMAL_LABEL);
+        cw_op_call->labelfont(0);
+        cw_op_call->labelsize(14);
+        cw_op_call->labelcolor(FL_FOREGROUND_COLOR);
+        cw_op_call->align(Fl_Align(FL_ALIGN_LEFT));
+        cw_op_call->when(FL_WHEN_RELEASE);
+      } // Fl_Input2* cw_op_call
       o->end();
     } // Fl_Group* o
     { Fl_Group* o = new Fl_Group(2, 113, 674, 170);
       { Fl_Group* o = new Fl_Group(2, 116, 668, 22);
-        { btn_cwlog_datetime = new Fl_Button(2, 116, 80, 22, _("Date"));
-          btn_cwlog_datetime->box(FL_BORDER_BOX);
-          btn_cwlog_datetime->color((Fl_Color)51);
-          btn_cwlog_datetime->callback((Fl_Callback*)cb_btn_cwlog_datetime);
-        } // Fl_Button* btn_cwlog_datetime
-        { btn_time = new Fl_Button(81, 116, 45, 22, _("Time"));
-          btn_time->box(FL_BORDER_BOX);
-          btn_time->color((Fl_Color)51);
-          btn_time->callback((Fl_Callback*)cb_btn_time);
-        } // Fl_Button* btn_time
-        { btn_freq = new Fl_Button(126, 116, 70, 22, _("Freq"));
-          btn_freq->box(FL_BORDER_BOX);
-          btn_freq->color((Fl_Color)51);
-          btn_freq->callback((Fl_Callback*)cb_btn_freq);
-        } // Fl_Button* btn_freq
-        { btn_call = new Fl_Button(196, 116, 75, 22, _("Call"));
-          btn_call->box(FL_BORDER_BOX);
-          btn_call->color((Fl_Color)51);
-          btn_call->callback((Fl_Callback*)cb_btn_call);
-        } // Fl_Button* btn_call
-        { btn_name = new Fl_Button(271, 116, 75, 22, _("Name"));
-          btn_name->box(FL_BORDER_BOX);
-          btn_name->color((Fl_Color)51);
-        } // Fl_Button* btn_name
-        { btn_in = new Fl_Button(346, 116, 40, 22, _("In"));
-          btn_in->box(FL_BORDER_BOX);
-          btn_in->color((Fl_Color)51);
-        } // Fl_Button* btn_in
-        { btn_out = new Fl_Button(386, 116, 40, 22, _("Out"));
-          btn_out->box(FL_BORDER_BOX);
-          btn_out->color((Fl_Color)51);
-        } // Fl_Button* btn_out
-        { btn_sent_nbr = new Fl_Button(426, 116, 55, 22, _("Nbr"));
-          btn_sent_nbr->box(FL_BORDER_BOX);
-          btn_sent_nbr->color((Fl_Color)51);
-          btn_sent_nbr->callback((Fl_Callback*)cb_btn_sent_nbr);
-        } // Fl_Button* btn_sent_nbr
-        { btn_exchange = new Fl_Button(481, 116, 185, 22, _("Exchange"));
-          btn_exchange->box(FL_BORDER_BOX);
-          btn_exchange->color((Fl_Color)51);
-          Fl_Group::current()->resizable(btn_exchange);
-        } // Fl_Button* btn_exchange
+        { btn_cw_datetime = new Fl_Button(2, 116, 80, 22, _("Date"));
+          btn_cw_datetime->box(FL_BORDER_BOX);
+          btn_cw_datetime->color((Fl_Color)51);
+          btn_cw_datetime->callback((Fl_Callback*)cb_btn_cw_datetime);
+        } // Fl_Button* btn_cw_datetime
+        { btn_cw_time = new Fl_Button(81, 116, 45, 22, _("Time"));
+          btn_cw_time->box(FL_BORDER_BOX);
+          btn_cw_time->color((Fl_Color)51);
+          btn_cw_time->callback((Fl_Callback*)cb_btn_cw_time);
+        } // Fl_Button* btn_cw_time
+        { btn_cw_freq = new Fl_Button(126, 116, 70, 22, _("Freq"));
+          btn_cw_freq->box(FL_BORDER_BOX);
+          btn_cw_freq->color((Fl_Color)51);
+          btn_cw_freq->callback((Fl_Callback*)cb_btn_cw_freq);
+        } // Fl_Button* btn_cw_freq
+        { btn_cw_call = new Fl_Button(196, 116, 75, 22, _("Call"));
+          btn_cw_call->box(FL_BORDER_BOX);
+          btn_cw_call->color((Fl_Color)51);
+          btn_cw_call->callback((Fl_Callback*)cb_btn_cw_call);
+        } // Fl_Button* btn_cw_call
+        { btn_cw_name = new Fl_Button(271, 116, 75, 22, _("Name"));
+          btn_cw_name->box(FL_BORDER_BOX);
+          btn_cw_name->color((Fl_Color)51);
+        } // Fl_Button* btn_cw_name
+        { btn_cw_in = new Fl_Button(346, 116, 40, 22, _("In"));
+          btn_cw_in->box(FL_BORDER_BOX);
+          btn_cw_in->color((Fl_Color)51);
+        } // Fl_Button* btn_cw_in
+        { btn_cw_out = new Fl_Button(386, 116, 40, 22, _("Out"));
+          btn_cw_out->box(FL_BORDER_BOX);
+          btn_cw_out->color((Fl_Color)51);
+        } // Fl_Button* btn_cw_out
+        { btn_cw_sent_nbr = new Fl_Button(426, 116, 55, 22, _("Nbr"));
+          btn_cw_sent_nbr->box(FL_BORDER_BOX);
+          btn_cw_sent_nbr->color((Fl_Color)51);
+          btn_cw_sent_nbr->callback((Fl_Callback*)cb_btn_cw_sent_nbr);
+        } // Fl_Button* btn_cw_sent_nbr
+        { btn_cw_xchg = new Fl_Button(481, 116, 185, 22, _("Exchange"));
+          btn_cw_xchg->box(FL_BORDER_BOX);
+          btn_cw_xchg->color((Fl_Color)51);
+          Fl_Group::current()->resizable(btn_cw_xchg);
+        } // Fl_Button* btn_cw_xchg
         o->end();
       } // Fl_Group* o
       { Fl_Browser* o = brwsr_cwlog_entries = new Fl_Browser(2, 140, 666, 141);

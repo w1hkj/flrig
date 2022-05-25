@@ -450,40 +450,47 @@ void add_cwio(std::string txt)
 
 // expand special character pairs
 	size_t p;
-	while (((p = txt.find("~C")) != std::string::npos) || ((p = txt.find("~c")) != std::string::npos))
-		txt.replace(p, 2, qso_op_call->value());
-	while (((p = txt.find("~N")) != std::string::npos) || ((p = txt.find("~n")) != std::string::npos))
-		txt.replace(p, 2, qso_op_name->value());
-	while (((p = txt.find("~R")) != std::string::npos) || ((p = txt.find("~r")) != std::string::npos))
-		txt.replace(p, 2, qso_rst_out->value());
-	while ((p = txt.find("~#")) != std::string::npos) {
-		char sznum[10];
-		if (cwlog_menu_leading_zeros->value())
-			snprintf(sznum, sizeof(sznum), "%0d", progStatus.qso_nbr);
-		else
-			snprintf(sznum, sizeof(sznum), "%d", progStatus.qso_nbr);
-		if (cwlog_menu_cut_numbers->value()) {
-			for (size_t i = 1; i < strlen(sznum); i++) {
-				if (sznum[i] == '0') sznum[i] = 'T';
-				if (sznum[i] == '9') sznum[i] = 'N';
+	if (cw_op_call) {
+		while (((p = txt.find("~C")) != std::string::npos) || ((p = txt.find("~c")) != std::string::npos))
+			txt.replace(p, 2, cw_op_call->value());
+	}
+	if (cw_op_name) {
+		while (((p = txt.find("~N")) != std::string::npos) || ((p = txt.find("~n")) != std::string::npos))
+			txt.replace(p, 2, cw_op_name->value());
+	}
+	if (cw_rst_out){
+		while (((p = txt.find("~R")) != std::string::npos) || ((p = txt.find("~r")) != std::string::npos))
+			txt.replace(p, 2, cw_rst_out->value());
+	}
+	if (cw_log_nbr) {
+		while ((p = txt.find("~#")) != std::string::npos) {
+			char sznum[10];
+			if (cwlog_menu_leading_zeros->value())
+				snprintf(sznum, sizeof(sznum), "%0d", progStatus.cw_log_nbr);
+			else
+				snprintf(sznum, sizeof(sznum), "%d", progStatus.cw_log_nbr);
+			if (cwlog_menu_cut_numbers->value()) {
+				for (size_t i = 1; i < strlen(sznum); i++) {
+					if (sznum[i] == '0') sznum[i] = 'T';
+					if (sznum[i] == '9') sznum[i] = 'N';
+				}
 			}
+			txt.replace(p, 2, sznum);
 		}
-		txt.replace(p, 2, sznum);
+		while ((p = txt.find("~+")) != std::string::npos) {
+			txt.replace(p, 2, "");
+			progStatus.cw_log_nbr++;
+			if (cw_log_nbr)
+				cw_log_nbr->value(progStatus.cw_log_nbr);
+		}
+		while ((p = txt.find("~-")) != std::string::npos) {
+			txt.replace(p, 2, "");
+			progStatus.cw_log_nbr--;
+			if (progStatus.cw_log_nbr < 0) progStatus.cw_log_nbr = 0;
+			if (cw_log_nbr)
+				cw_log_nbr->value(progStatus.cw_log_nbr);
+		}
 	}
-	while ((p = txt.find("~+")) != std::string::npos) {
-		txt.replace(p, 2, "");
-		progStatus.qso_nbr++;
-		if (qso_nbr)
-			qso_nbr->value(progStatus.qso_nbr);
-	}
-	while ((p = txt.find("~-")) != std::string::npos) {
-		txt.replace(p, 2, "");
-		progStatus.qso_nbr--;
-		if (progStatus.qso_nbr < 0) progStatus.qso_nbr = 0;
-		if (qso_nbr)
-			qso_nbr->value(progStatus.qso_nbr);
-	}
-
 	new_text = txt_to_send->value();
 	new_text.append(txt);
 

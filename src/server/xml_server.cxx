@@ -1547,6 +1547,8 @@ public:
 
 } rig_set_verify_ptt(&rig_server);
 
+bool ptt_pending = false;
+
 class rig_set_ptt : public XmlRpcServerMethod {
 public:
 	rig_set_ptt(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_ptt", s) {}
@@ -1561,6 +1563,10 @@ public:
 
 		PTT = int(params[0]);
 		xml_trace(1, (PTT ? "rig_ptt ON" : "rig_ptt OFF"));
+		if (ptt_pending) {
+			ptt_pending = false;
+			return;
+		}
 		rigPTT(PTT);
 		Fl::awake(update_UI_PTT);
 	}
@@ -3014,10 +3020,11 @@ public:
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 		std::string s = (std::string)params[0];
+		if (s.find(']') != std::string::npos) ptt_pending = true;
 		FSK_add(s);
 	}
 
-	std::string help() { return std::string("sends text using cwio DTR/RTS keying"); }
+	std::string help() { return std::string("sends text using fskio DTR/RTS keying"); }
 
 } rig_fskio_text(&rig_server);
 
