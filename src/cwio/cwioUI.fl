@@ -1,10 +1,19 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0305
+version 1.0308
 i18n_type 1
 i18n_include "gettext.h"
 i18n_function _
 header_name {.h}
 code_name {.cxx}
+decl {\#include "dialogs.h"} {selected private local
+}
+
+decl {\#include <FL/Fl_Double_Window.H>} {selected public global
+}
+
+decl {Fl_Double_Window *cwlog_viewer;} {public local
+}
+
 decl {\#include "cwio.h"} {private local
 }
 
@@ -14,11 +23,10 @@ decl {const char ps[] = "~%&+={}<>@";} {private local
 decl {const char szProsigns[] = "~|%|&|+|=|{|}|<|>|@";} {private local
 }
 
-Function {cwio_window()} {open
-} {
+Function {new_cwio_dialog()} {} {
   Fl_Window {} {
     label {CW keying} open
-    xywh {610 38 670 130} type Double resizable
+    xywh {530 24 670 126} type Double resizable
     code0 {\#include "status.h"}
     code1 {\#include "cwio.h"}
     code2 {\#include "ValueSlider.h"} visible
@@ -26,15 +34,16 @@ Function {cwio_window()} {open
     Fl_Input txt_to_send {
       callback {control_function_keys();}
       xywh {2 2 666 68} type Multiline align 16 when 1 resizable
+      code0 {\#include "flinput2.h"}
       class Fl_Input2
     }
     Fl_Group {} {open
-      xywh {0 70 670 60}
+      xywh {0 72 670 88}
     } {
       Fl_Value_Slider sldr_cwioWPM {
-        label {char WPM}
-        callback {progStatus.cwioWPM = (int)o->value();} selected
-        tooltip {My transmit CW WPM} xywh {4 74 225 20} type {Horz Knob} color 246 selection_color 4 align 8 minimum 5 maximum 100 step 1 value 20 textsize 14
+        label WPM
+        callback {progStatus.cwioWPM = (int)o->value();}
+        tooltip {My transmit CW WPM} xywh {4 74 240 20} type {Horz Knob} color 246 selection_color 4 align 8 minimum 5 maximum 100 step 1 value 20 textsize 14
         code0 {\#include "flslider2.h"}
         code1 {o->value(progStatus.cwioWPM);}
         class Fl_Value_Slider2
@@ -42,17 +51,17 @@ Function {cwio_window()} {open
       Fl_Button btn_cwio_config {
         label Config
         callback {open_cwio_config();}
-        tooltip {Clear transmit text} xywh {317 73 60 22}
+        tooltip {Clear transmit text} xywh {374 73 60 22}
       }
       Fl_Button btn_cwio_clear {
         label Clear
         callback {cwio_clear_text();}
-        tooltip {Clear transmit text} xywh {400 73 60 22}
+        tooltip {Clear transmit text} xywh {439 73 60 22}
       }
       Fl_Light_Button btn_cwioKEY {
         label KEY
         callback {cwio_key (o->value());}
-        tooltip {Key Down / Up} xywh {483 73 50 22}
+        tooltip {Key Down / Up} xywh {503 73 50 22}
       }
       Fl_Light_Button btn_cwioSEND {
         label {Send/Pause}
@@ -143,22 +152,26 @@ Edit - Control left click} xywh {559 102 50 22}
 Edit - Control left click} xywh {614 102 50 22}
         }
       }
+      Fl_Button btn_view_cwlog {
+        label {View Log}
+        callback {cwlog_view();}
+        tooltip {View cwlogbook} xywh {294 73 75 22}
+      }
     }
   }
 }
 
-Function {make_message_editor()} {open
-} {
+Function {new_message_editor()} {} {
   Fl_Window {} {
     label {Message Editor} open
-    xywh {613 338 640 344} type Double hide resizable
+    xywh {516 585 670 382} type Double hide resizable
   } {
     Fl_Tabs {} {open
-      xywh {0 0 530 345} align 17
+      xywh {0 0 565 345} align 17
     } {
       Fl_Group {} {
-        label {F1-F4}
-        xywh {0 25 530 320}
+        label {F1-F4} open
+        xywh {0 25 565 320}
       } {
         Fl_Box {} {
           label Label
@@ -177,7 +190,7 @@ Function {make_message_editor()} {open
         }
         Fl_Input {edit_msg[0]} {
           callback {msg_cb(1);}
-          xywh {90 55 435 65} type Multiline
+          xywh {90 55 470 65} type Multiline
           class Fl_Input2
         }
         Fl_Input {edit_label[1]} {
@@ -188,7 +201,7 @@ Function {make_message_editor()} {open
         }
         Fl_Input {edit_msg[1]} {
           callback {msg_cb(2);}
-          xywh {90 125 435 65} type Multiline
+          xywh {90 125 470 65} type Multiline
           class Fl_Input2
         }
         Fl_Input {edit_label[2]} {
@@ -199,7 +212,7 @@ Function {make_message_editor()} {open
         }
         Fl_Input {edit_msg[2]} {
           callback {msg_cb(3);}
-          xywh {90 195 435 65} type Multiline
+          xywh {90 195 470 65} type Multiline
           class Fl_Input2
         }
         Fl_Input {edit_label[3]} {
@@ -210,13 +223,13 @@ Function {make_message_editor()} {open
         }
         Fl_Input {edit_msg[3]} {
           callback {msg_cb(4);}
-          xywh {90 265 435 65} type Multiline
+          xywh {90 265 470 65} type Multiline
           class Fl_Input2
         }
       }
       Fl_Group {} {
-        label {F5-f8}
-        xywh {0 25 530 320} hide
+        label {F5-f8} open
+        xywh {0 25 565 320} hide
       } {
         Fl_Box {} {
           label Label
@@ -234,7 +247,7 @@ Function {make_message_editor()} {open
         }
         Fl_Input {edit_msg[4]} {
           callback {msg_cb(5);}
-          xywh {90 55 435 65} type Multiline
+          xywh {90 55 470 65} type Multiline
           class Fl_Input2
         }
         Fl_Input {edit_label[5]} {
@@ -245,7 +258,7 @@ Function {make_message_editor()} {open
         }
         Fl_Input {edit_msg[5]} {
           callback {msg_cb(6);}
-          xywh {90 125 435 65} type Multiline
+          xywh {90 125 470 65} type Multiline
           class Fl_Input2
         }
         Fl_Input {edit_label[6]} {
@@ -256,7 +269,7 @@ Function {make_message_editor()} {open
         }
         Fl_Input {edit_msg[6]} {
           callback {msg_cb(7);}
-          xywh {90 195 435 65} type Multiline
+          xywh {90 195 470 65} type Multiline
           class Fl_Input2
         }
         Fl_Input {edit_label[7]} {
@@ -267,13 +280,13 @@ Function {make_message_editor()} {open
         }
         Fl_Input {edit_msg[7]} {
           callback {msg_cb(8);}
-          xywh {90 265 435 65} type Multiline
+          xywh {90 265 470 65} type Multiline
           class Fl_Input2
         }
       }
       Fl_Group {} {
-        label {F9-F12}
-        xywh {0 25 530 320} hide
+        label {F9-F12} open
+        xywh {0 25 565 320} hide
       } {
         Fl_Box {} {
           label Label
@@ -291,7 +304,7 @@ Function {make_message_editor()} {open
         }
         Fl_Input {edit_msg[8]} {
           callback {msg_cb(9);}
-          xywh {90 55 435 65} type Multiline
+          xywh {90 55 470 65} type Multiline
           class Fl_Input2
         }
         Fl_Input {edit_label[9]} {
@@ -302,7 +315,7 @@ Function {make_message_editor()} {open
         }
         Fl_Input {edit_msg[9]} {
           callback {msg_cb(10);}
-          xywh {90 125 435 65} type Multiline
+          xywh {90 125 470 65} type Multiline
           class Fl_Input2
         }
         Fl_Input {edit_label[10]} {
@@ -313,7 +326,7 @@ Function {make_message_editor()} {open
         }
         Fl_Input {edit_msg[10]} {
           callback {msg_cb(11);}
-          xywh {90 195 435 65} type Multiline
+          xywh {90 195 470 65} type Multiline
           class Fl_Input2
         }
         Fl_Input {edit_label[11]} {
@@ -324,20 +337,20 @@ Function {make_message_editor()} {open
         }
         Fl_Input {edit_msg[11]} {
           callback {msg_cb(12);}
-          xywh {90 265 435 65} type Multiline
+          xywh {90 265 470 65} type Multiline
           class Fl_Input2
         }
       }
     }
     Fl_Group {} {open
-      xywh {534 0 101 224} box ENGRAVED_FRAME
+      xywh {567 0 101 224} box ENGRAVED_FRAME
     } {
       Fl_Group listbox_BT {
         label BT
         callback {int c = o->index();
 progStatus.BT[0] = ps[c];
 morse->init();} open
-        xywh {570 6 60 22} box DOWN_BOX color 7 align 4
+        xywh {600 6 60 22} box DOWN_BOX color 7 align 4
         code0 {o->add(szProsigns);}
         code1 {o->value(progStatus.BT.c_str()); o->labelsize(FL_NORMAL_SIZE);}
         code2 {\#include "combo.h"}
@@ -348,7 +361,7 @@ morse->init();} open
         callback {int c = o->index();
 progStatus.AA[0] = ps[c];
 morse->init();} open
-        xywh {570 30 60 22} box DOWN_BOX color 7 align 4
+        xywh {600 30 60 22} box DOWN_BOX color 7 align 4
         code0 {o->add(szProsigns);}
         code1 {o->value(progStatus.AA.c_str()); o->labelsize(FL_NORMAL_SIZE);}
         class Fl_ListBox
@@ -358,7 +371,7 @@ morse->init();} open
         callback {int c = o->index();
 progStatus.AS[0] = ps[c];
 morse->init();} open
-        xywh {570 54 60 22} box DOWN_BOX color 7 align 4
+        xywh {600 54 60 22} box DOWN_BOX color 7 align 4
         code0 {o->add(szProsigns);}
         code1 {o->value(progStatus.AS.c_str()); o->labelsize(FL_NORMAL_SIZE);}
         class Fl_ListBox
@@ -368,7 +381,7 @@ morse->init();} open
         callback {int c = o->index();
 progStatus.AR[0] = ps[c];
 morse->init();} open
-        xywh {570 78 60 22} box DOWN_BOX color 7 align 4
+        xywh {600 78 60 22} box DOWN_BOX color 7 align 4
         code0 {o->add(szProsigns);}
         code1 {o->value(progStatus.AR.c_str()); o->labelsize(FL_NORMAL_SIZE);}
         class Fl_ListBox
@@ -378,7 +391,7 @@ morse->init();} open
         callback {int c = o->index();
 progStatus.SK[0] = ps[c];
 morse->init();} open
-        xywh {570 102 60 22} box DOWN_BOX color 7 align 4
+        xywh {600 102 60 22} box DOWN_BOX color 7 align 4
         code0 {o->add(szProsigns);}
         code1 {o->value(progStatus.SK.c_str()); o->labelsize(FL_NORMAL_SIZE);}
         class Fl_ListBox
@@ -388,7 +401,7 @@ morse->init();} open
         callback {int c = o->index();
 progStatus.KN[0] = ps[c];
 morse->init();} open
-        xywh {570 126 60 22} box DOWN_BOX color 7 align 4
+        xywh {600 126 60 22} box DOWN_BOX color 7 align 4
         code0 {o->add(szProsigns);}
         code1 {o->value(progStatus.KN.c_str()); o->labelsize(FL_NORMAL_SIZE);}
         class Fl_ListBox
@@ -398,7 +411,7 @@ morse->init();} open
         callback {int c = o->index();
 progStatus.INT[0] = ps[c];
 morse->init();} open
-        xywh {570 150 60 22} box DOWN_BOX color 7 align 4
+        xywh {600 150 60 22} box DOWN_BOX color 7 align 4
         code0 {o->add(szProsigns);}
         code1 {o->value(progStatus.INT.c_str()); o->labelsize(FL_NORMAL_SIZE);}
         class Fl_ListBox
@@ -408,7 +421,7 @@ morse->init();} open
         callback {int c = o->index();
 progStatus.HM[0] = ps[c];
 morse->init();} open
-        xywh {570 174 60 22} box DOWN_BOX color 7 align 4
+        xywh {600 174 60 22} box DOWN_BOX color 7 align 4
         code0 {o->add(szProsigns);}
         code1 {o->value(progStatus.HM.c_str()); o->labelsize(FL_NORMAL_SIZE);}
         class Fl_ListBox
@@ -418,55 +431,86 @@ morse->init();} open
         callback {int c = o->index();
 progStatus.VE[0] = ps[c];
 morse->init();} open
-        xywh {570 199 60 22} box DOWN_BOX color 7 align 4
+        xywh {600 199 60 22} box DOWN_BOX color 7 align 4
         code0 {o->add(szProsigns);}
         code1 {o->value(progStatus.VE.c_str()); o->labelsize(FL_NORMAL_SIZE);}
         class Fl_ListBox
       } {}
     }
     Fl_Group {} {open
-      xywh {534 222 90 43} box ENGRAVED_FRAME
+      xywh {567 222 113 157} box ENGRAVED_FRAME
     } {
-      Fl_Box {} {
-        label {'[' Send}
-        xywh {538 224 82 20}
+      Fl_Button btn_start_xmt {
+        label {[  TX}
+        xywh {575 227 85 20}
       }
-      Fl_Box {} {
-        label {']' Recv}
-        xywh {538 244 82 20}
+      Fl_Button btn_end_xmt {
+        label {]  RX}
+        xywh {575 258 85 20}
+      }
+      Fl_Button btn_append_call {
+        label {~C  CALL}
+        xywh {575 290 85 20}
+      }
+      Fl_Button btn_append_name {
+        label {~N NAME}
+        xywh {575 322 85 20}
+      }
+      Fl_Button btn_append_rst {
+        label {~R RSTout}
+        xywh {575 354 85 20}
       }
     }
     Fl_Button btn_cancel_edit {
       label Cancel
       callback {cancel_edit();}
-      tooltip {Exit editor, discard changes} xywh {546 268 65 22}
+      tooltip {Exit editor, discard changes} xywh {10 352 65 22}
     }
     Fl_Button btn_apply_edit {
       label Apply
       callback {apply_edit();}
-      tooltip {Apply current changes to function keys} xywh {546 294 65 22}
+      tooltip {Apply current changes to function keys} xywh {84 352 65 22}
     }
     Fl_Button btn_done_edit {
       label Close
       callback {done_edit();}
-      tooltip {Apply changes and close editor} xywh {546 321 65 22}
+      tooltip {Apply changes and close editor} xywh {158 352 65 22}
+    }
+    Fl_Group {} {open
+      xywh {24 24 15 15}
+    } {}
+    Fl_Group {} {open
+      xywh {279 350 282 29} box ENGRAVED_BOX
+    } {
+      Fl_Button btn_append_contest_nbr {
+        label {~\# Cntst \#}
+        xywh {286 354 85 20}
+      }
+      Fl_Button btn_append_decr {
+        label {~- Decr'}
+        xywh {376 354 85 20}
+      }
+      Fl_Button btn_append_incr {
+        label {~+ Incr'}
+        xywh {466 354 85 20}
+      }
     }
   }
 }
 
-Function {cwio_config_dialog()} {open
+Function {new_cwio_config_dialog()} {open
 } {
   Fl_Window {} {
     label {CW Configuration} open
-    xywh {611 208 670 100} type Double visible
+    xywh {530 184 670 100} type Double visible
   } {
     Fl_Group {} {open
-      xywh {2 3 666 100} box ENGRAVED_FRAME
+      xywh {1 0 668 98} box ENGRAVED_FRAME
     } {
       Fl_Group select_cwioPORT {
         label {Ser. Port}
         callback {progStatus.cwioPORT = o->value();} open
-        tooltip {CWIO serial port} xywh {73 73 496 23} box DOWN_BOX color 53 align 4
+        tooltip {CWIO serial port} xywh {73 69 496 23} box DOWN_BOX color 53 align 4
         code0 {\#include "combo.h"}
         code1 {o->value(progStatus.cwioPORT.c_str());}
         class Fl_ComboBox
@@ -493,7 +537,7 @@ else if (!open_cwkey()) {
   progStatus.cwioCONNECTED = 1;
 }
 progStatus.cwioSHARED = 0;}
-        xywh {578 73 80 23}
+        xywh {578 69 80 23}
         code0 {o->value(progStatus.cwioCONNECTED);}
       }
       Fl_Check_Button btn_cwioCAT {
@@ -511,7 +555,7 @@ progStatus.cwioSHARED = 0;}
   btn_cwioSEP->activate();
   select_cwioPORT->activate();
 }}
-        tooltip {Use DTR/RTS on CAT serial port} xywh {74 15 23 15} down_box DOWN_BOX align 4
+        tooltip {Use DTR/RTS on CAT serial port} xywh {70 15 18 15} down_box DOWN_BOX align 4
         code0 {o->value(progStatus.cwioSHARED == 1);}
       }
       Fl_Check_Button btn_cwioAUX {
@@ -529,7 +573,7 @@ progStatus.cwioSHARED = 0;}
   btn_cwioSEP->activate();
   select_cwioPORT->activate();
 }}
-        tooltip {Use DTR/RTS on Auxiliary serial port} xywh {75 46 23 15} down_box DOWN_BOX align 4
+        tooltip {Use DTR/RTS on Auxiliary serial port} xywh {71 46 18 15} down_box DOWN_BOX align 4
         code0 {o->value(progStatus.cwioSHARED == 2);}
       }
       Fl_Check_Button btn_cwioSEP {
@@ -547,7 +591,7 @@ progStatus.cwioSHARED = 0;}
   btn_cwioCAT->activate();
   select_cwioPORT->activate();
 }}
-        tooltip {Use DTR/RTS Separate serial port} xywh {160 15 23 15} down_box DOWN_BOX align 4
+        tooltip {Use DTR/RTS Separate serial port} xywh {160 15 18 15} down_box DOWN_BOX align 4
         code0 {o->value(progStatus.cwioSHARED == 3);}
       }
       Fl_Group listbox_cwioKEYLINE {
@@ -566,32 +610,247 @@ progStatus.cwioSHARED = 0;}
 0 = Break-in} xywh {608 10 50 25} minimum 0 value 0
         code0 {o->value(progStatus.cwioPTT);}
       }
+      Fl_Light_Button btn_cw_dtr_calibrate {
+        label {Calib'}
+        callback {calibrate_cwio();}
+        tooltip {Calibrate WPM timing} xywh {235 8 56 24} selection_color 6
+      }
+      Fl_Counter cnt_cwio_comp {
+        label {WPM Comp}
+        callback {progStatus.cwio_comp = int(o->value());}
+        tooltip {Timing compensation msec} xywh {400 8 130 24} align 4 minimum 0 maximum 10
+        code0 {o->value(progStatus.cwio_comp);}
+        code1 {o->lstep(1.0);}
+      }
       Fl_Check_Button btn_cwioINVERTED {
         label Inverted
         callback {progStatus.cwioINVERTED = o->value();
 reset_cwioport();}
         tooltip {DTR/RTS signaling is inverted
-(-) keying} xywh {160 46 23 15} down_box DOWN_BOX align 4
+(-) keying} xywh {160 46 18 15} down_box DOWN_BOX align 4
         code0 {o->value(progStatus.cwioINVERTED);}
       }
-      Fl_Counter cnt_cwio_comp {
-        label {WPM Comp msec}
-        callback {progStatus.cwio_comp = o->value();}
-        tooltip {Timing compensation} xywh {190 10 125 24} align 8 minimum 0 maximum 10
-        code0 {o->value(progStatus.cwio_comp);}
-        code1 {o->lstep(1.0);}
-      }
-      Fl_Light_Button btn_cw_dtr_calibrate {
-        label Calibrate
-        callback {calibrate_cwio();}
-        xywh {444 10 84 24} selection_color 6
-      }
       Fl_Counter cnt_cwio_keycorr {
-        label {Xcvr comp msec}
+        label {Xcvr Comp}
         callback {progStatus.cwio_keycorr = o->value();}
-        tooltip {Compensate for xcvr keying distortion} xywh {190 41 125 24} align 8 minimum -10 maximum 10 step 0.01
+        tooltip {Compensate for xcv delays (msec)} xywh {400 41 130 24} align 4 minimum -10 maximum 10 step 0.01
         code0 {o->value(progStatus.cwio_keycorr);}
         code1 {o->lstep(0.10);}
+      }
+    }
+  }
+}
+
+Function {new_cwlogbook_dialog()} {open
+} {
+  Fl_Window {} {
+    label {Flrig CW Log} open
+    xywh {529 314 670 284} type Double visible
+  } {
+    Fl_Menu_Bar {} {open
+      xywh {0 0 670 20}
+    } {
+      Submenu {} {
+        label Files open
+        xywh {0 0 70 21}
+      } {
+        MenuItem cwlog_menu_open {
+          label Open
+          callback {cwlog_open();}
+          xywh {0 0 36 21}
+        }
+        MenuItem cwlog_menu_new {
+          label New
+          callback {cwlog_new();}
+          xywh {0 0 36 21}
+        }
+        MenuItem cwlog_menu_save {
+          label Save
+          callback {cwlog_save();}
+          xywh {0 0 36 21}
+        }
+        MenuItem cwlog_menu_save_as {
+          label {Save As}
+          callback {cwlog_save_as();}
+          xywh {0 0 36 21} divider
+        }
+        MenuItem cwlog_menu_export_adif {
+          label {Export ADIF}
+          callback {cwlog_export_adif();}
+          xywh {0 0 36 21}
+        }
+        MenuItem cwlog_menu_import_adif {
+          label {Import ADIF}
+          callback {cwlog_import_adif();}
+          xywh {0 0 36 21}
+        }
+      }
+      Submenu {} {
+        label Config open
+        xywh {0 0 70 21}
+      } {
+        MenuItem cwlog_menu_dupcheck {
+          label {Dup check}
+          callback {//cwlog.dupcheck = o->value();}
+          xywh {0 0 36 21} type Toggle
+        }
+        MenuItem cwlog_menu_leading_zeros {
+          label {Leading zeros}
+          callback {//cwlog.dupcheck = o->value();}
+          xywh {0 0 36 21} type Toggle
+        }
+        MenuItem cwlog_menu_cut_numbers {
+          label {Cut numbers}
+          callback {//cwlog.cut_nbrs = o->value();}
+          xywh {0 0 36 21} type Toggle
+        }
+      }
+    }
+    Fl_Group {} {open
+      xywh {2 22 668 29} box ENGRAVED_FRAME
+    } {
+      Fl_Output txt_cwlog_file {
+        label {Log File:}
+        callback {//progStatus.cwlogfile_name = o->value();}
+        xywh {75 26 590 22}
+        code0 {//->value(progStatus.cwlogfile_name);}
+      }
+    }
+    Fl_Group grp_qso_data {open
+      xywh {2 52 560 30} box ENGRAVED_BOX
+    } {
+      Fl_Input qso_op_freq {
+        label Freq
+        tooltip Frequency xywh {43 56 120 22}
+        class Fl_Input2
+      }
+      Fl_Button btn_cwlog_clear_qso {
+        label Clear
+        callback {cwlog_clear_qso();}
+        tooltip {Clear cwlog entries} xywh {380 56 60 22}
+      }
+      Fl_Button btn_cwlog_save_qso {
+        label Save
+        callback {cwlog_save_qso();}
+        tooltip {Save QSO data to cwlog file} xywh {440 56 60 22}
+      }
+      Fl_Button btn_cwlog_edit_entry {
+        label Edit
+        callback {cwlog_edit_entry();}
+        tooltip {Delete Entry} xywh {501 56 60 22}
+      }
+      Fl_Button btn_cwlog_delete_entry {
+        label Delete
+        callback {cwlog_delete_entry();}
+        tooltip {Delete Entry} xywh {492 56 60 22} hide
+      }
+      Fl_Input qso_date {
+        label Dt
+        tooltip {QSO call
+Query flcwlog if connected} xywh {193 56 85 22}
+        class Fl_Input2
+      }
+      Fl_Input qso_time {
+        label {Tm:}
+        xywh {313 56 55 22}
+        class Fl_Input2
+      }
+    }
+    Fl_Group {} {open
+      xywh {565 52 103 62} box ENGRAVED_BOX
+    } {
+      Fl_Input qso_rst_out {
+        label RSTout
+        tooltip {Send RST} xywh {622 56 40 22}
+        class Fl_Input2
+      }
+      Fl_Input qso_rst_in {
+        label {RST in}
+        tooltip {Send RST} xywh {624 87 40 22}
+        class Fl_Input2
+      }
+    }
+    Fl_Group {} {open
+      xywh {2 84 560 30} box ENGRAVED_FRAME
+    } {
+      Fl_Input qso_exchange_in {
+        label Xch
+        tooltip {Input exchange} xywh {313 87 150 22}
+        class Fl_Input2
+      }
+      Fl_Counter qso_nbr {
+        label {\#:}
+        callback {progStatus.qso_nbr = o->value();}
+        tooltip {QSO number (out)} xywh {491 87 70 22} type Simple align 4 step 1
+        code0 {o->value(progStatus.qso_nbr);}
+      }
+      Fl_Input qso_op_name {
+        label Nm
+        xywh {193 88 85 22}
+        class Fl_Input2
+      }
+      Fl_Input qso_op_call {
+        label Call
+        tooltip {QSO call
+Query flcwlog if connected} xywh {43 88 120 22}
+        class Fl_Input2
+      }
+    }
+    Fl_Group {} {open
+      xywh {2 113 674 170}
+    } {
+      Fl_Group {} {open
+        xywh {2 116 668 22}
+      } {
+        Fl_Button btn_cwlog_datetime {
+          label Date
+          callback {cwlog_sort_by_datetime();}
+          xywh {2 116 80 22} box BORDER_BOX color 51
+        }
+        Fl_Button btn_time {
+          label Time
+          callback {cwlog_sort_by_datetime();}
+          xywh {81 116 45 22} box BORDER_BOX color 51
+        }
+        Fl_Button btn_freq {
+          label Freq
+          callback {cwlog_sort_by_freq();}
+          xywh {126 116 70 22} box BORDER_BOX color 51
+        }
+        Fl_Button btn_call {
+          label Call
+          callback {cwlog_sort_by_call();}
+          xywh {196 116 75 22} box BORDER_BOX color 51
+        }
+        Fl_Button btn_name {
+          label Name
+          xywh {271 116 75 22} box BORDER_BOX color 51
+        }
+        Fl_Button btn_in {
+          label In
+          xywh {346 116 40 22} box BORDER_BOX color 51
+        }
+        Fl_Button btn_out {
+          label Out
+          xywh {386 116 40 22} box BORDER_BOX color 51
+        }
+        Fl_Button btn_sent_nbr {
+          label Nbr
+          callback {cwlog_sort_by_nbr();}
+          xywh {426 116 55 22} box BORDER_BOX color 51
+        }
+        Fl_Button btn_exchange {
+          label Exchange
+          xywh {481 116 185 22} box BORDER_BOX color 51 resizable
+        }
+      }
+      Fl_Browser brwsr_cwlog_entries {
+        callback {if (!cwlog_editing) cwlog_edit_entry();}
+        xywh {2 140 666 141} type Hold selection_color 230 resizable
+        code0 {static int widths[]={80,45,70,75,75,40,40,55,0};}
+        code1 {o->column_widths(widths);}
+        code2 {o->column_char('\\t');}
+        code3 {o->has_scrollbar(Fl_Browser_::VERTICAL_ALWAYS);}
       }
     }
   }

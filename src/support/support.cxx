@@ -53,6 +53,7 @@
 #include "tod_clock.h"
 #include "trace.h"
 #include "cwio.h"
+#include "cwioUI.h"
 #include "fsk.h"
 #include "fskioUI.h"
 #include "xml_server.h"
@@ -3628,19 +3629,27 @@ void TRACED(close_UI)
 	// close down the serial port
 	RigSerial->ClosePort();
 
-	if (dlgDisplayConfig && dlgDisplayConfig->visible())
-		dlgDisplayConfig->hide();
-	if (dlgXcvrConfig && dlgXcvrConfig->visible())
-		dlgXcvrConfig->hide();
-	if (dlgMemoryDialog && dlgMemoryDialog->visible())
-		dlgMemoryDialog->hide();
-
-	if (meters_dialog && meters_dialog->visible())
-		meters_dialog->hide();
-
 	debug::stop();
 
-	mainwindow->hide();
+	Fl_Double_Window *widgets[] = {
+		dlgDisplayConfig,
+		dlgXcvrConfig,
+		dlgMemoryDialog,
+		meters_dialog,
+		tracewindow,
+		cwio_keyer_dialog,
+		cwio_editor,
+		cwio_configure,
+		cwlog_viewer,
+		FSK_keyer_dialog,
+		FSK_editor,
+		FSK_configure,
+		meter_filters,
+		meter_scale_dialog,
+		mainwindow };
+	for (size_t n = 0; n < sizeof(widgets) / sizeof(*widgets); n++) {
+		if (widgets[n]) widgets[n]->hide();
+	}
 }
 
 void TRACED(closeRig)
@@ -3688,6 +3697,8 @@ void TRACED(cbExit)
 
 	saveFreqList();
 
+	cwlog_close();
+
 	if (spnrPOWER) progStatus.power_level = spnrPOWER->value();
 	if (spnrVOLUME) progStatus.volume = spnrVOLUME->value();
 	if (spnrRFGAIN) progStatus.rfgain = spnrRFGAIN->value();
@@ -3723,19 +3734,6 @@ void TRACED(cbExit)
 
 	close_UI();
 
-	if (tracewindow) tracewindow->hide();
-	if (tabs_dialog) tabs_dialog->hide();
-
-	if (cwio_keyer_dialog) cwio_keyer_dialog->hide();
-	if (cwio_editor) cwio_editor->hide();
-	if (cwio_configure) cwio_configure->hide();
-
-	if (FSK_keyer_dialog) FSK_keyer_dialog->hide();
-	if (FSK_editor) FSK_editor->hide();
-	if (FSK_configure) FSK_configure->hide();
-
-	if (meter_filters) meter_filters->hide();
-	if (meter_scale_dialog) meter_scale_dialog->hide();
 }
 
 void cbALC_IDD_SWR()

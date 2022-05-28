@@ -457,9 +457,9 @@ int main (int argc, char *argv[])
 
 	progStatus.UI_laststate();
 
-	cwio_keyer_dialog = cwio_window();
-	cwio_editor = make_message_editor();
-	cwio_configure = cwio_config_dialog();
+	cwio_keyer_dialog = new_cwio_dialog();
+	cwio_editor = new_message_editor();
+	cwio_configure = new_cwio_config_dialog();
 	morse->init();
 
 	FSK_keyer_dialog = fskio_window();

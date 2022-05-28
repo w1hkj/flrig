@@ -550,6 +550,13 @@ struct status {
 	std::string	FSK_msgs[12];
 	std::string	FSK_labels[12];
 
+// CW logbook parameters
+	std::string log_name;
+	int  log_cut_numbers;
+	int  log_leading_zeros;
+	int  log_dupcheck;
+	int  qso_nbr;
+
 	void saveLastState();
 	void loadLastState();
 	bool loadXcvrState(std::string);

@@ -516,7 +516,7 @@ static void cb_mnuTMATE2(Fl_Menu_*, void*) {
 
 static void cb_CWkeyer(Fl_Menu_*, void*) {
 	if (cwio_keyer_dialog == 0)
-		cwio_keyer_dialog = cwio_window();
+		cwio_keyer_dialog = new_cwio_dialog();
 	for (int n = 0; n < 12; n++) {
 		btn_msg[n]->label(progStatus.cwio_labels[n].c_str());
 		btn_msg[n]->redraw_label();

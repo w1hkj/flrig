@@ -21,8 +21,11 @@
 #include <FL/Fl.H>
 #include <FL/x.H>
 #include <FL/fl_draw.H>
+#include <FL/Fl_Native_File_Chooser.H>
+
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -1824,3 +1827,599 @@ void cb_send_command(std::string command, Fl_Output *resp)
 		resp->redraw();
 	}
 }
+
+// =====================================================================
+// logbook support code
+// =====================================================================
+bool cwlog_editing = false;
+int  cwlog_edit_nbr = 0;
+
+bool cwlog_changed = false;
+bool cwlog_is_open = false;
+
+void cwlog_set_edit(bool on)
+{
+	cwlog_editing = on;
+	if (on) {
+		btn_cwlog_edit_entry->label("Delete");
+		btn_cwlog_edit_entry->redraw_label();
+		btn_cwlog_clear_qso->label("Cancel");
+		btn_cwlog_clear_qso->redraw_label();
+	} else {
+		btn_cwlog_edit_entry->label("Edit");
+		btn_cwlog_edit_entry->redraw_label();
+		btn_cwlog_clear_qso->label("Clear");
+		btn_cwlog_clear_qso->redraw_label();
+	}
+}
+
+bool cwlog_compare( int &dir, int fld, std::string &s1, std::string &s2) {
+	size_t p1 = 0, p2 = 0;
+	for (int n = 0; n < fld; n++) {
+		p1 = s1.find('\t', p1 + 1);
+		p2 = s2.find('\t', p2 + 1);
+	}
+	if (dir == 1) return (s2.substr(p2) < s1.substr(p1));
+	return (s2.substr(p2) > s1.substr(p1));
+}
+
+bool cwlog_freq_compare( int &dir, int fld, std::string &s1, std::string &s2) {
+	size_t p1 = 0, p2 = 0;
+	for (int n = 0; n < fld; n++) {
+		p1 = s1.find('\t', p1 + 1);
+		p2 = s2.find('\t', p2 + 1);
+	}
+	float f1 = atof(s1.substr(p1).c_str());
+	float f2 = atof(s2.substr(p2).c_str());
+
+	if (dir == 1) return (f2 < f1);
+	return (f2 > f1);
+}
+
+static int dtdir = 1;
+static int dtpos = 0;
+void cwlog_sort_by_datetime() {
+	if (cwlog_editing) return;
+	size_t nbr = brwsr_cwlog_entries->size();
+	if (nbr == 0) return;
+	std::string entries[nbr];
+	for (size_t n = 0; n < nbr; n++) entries[n] = brwsr_cwlog_entries->text(n+1);
+	std::string temp;
+	if (nbr > 1) {
+		for (size_t n = 0; n < nbr - 1; n++) {
+			for (size_t j = n + 1; j < nbr; j++) {
+				if (cwlog_compare (dtdir, dtpos, entries[n], entries[j])) {
+					temp = entries[j];
+					entries[j] = entries[n];
+					entries[n] = temp;
+				}
+			}
+		}
+	}
+	brwsr_cwlog_entries->clear();
+	for (size_t i = 0; i < nbr; i++)
+		brwsr_cwlog_entries->add(entries[i].c_str());
+	brwsr_cwlog_entries->redraw();
+	if (dtdir == 1) dtdir = -1;
+	else dtdir = 1;
+}
+
+static int freqdir = 1;
+static int freqpos = 2;
+void cwlog_sort_by_freq() {
+	if (cwlog_editing) return;
+	size_t nbr = brwsr_cwlog_entries->size();
+	if (nbr == 0) return;
+	std::string entries[nbr];
+	for (size_t n = 0; n < nbr; n++) entries[n] = brwsr_cwlog_entries->text(n+1);
+	std::string temp;
+	if (nbr > 1) {
+		for (size_t n = 0; n < nbr - 1; n++) {
+			for (size_t j = n + 1; j < nbr; j++) {
+				if (cwlog_freq_compare (freqdir, freqpos, entries[n], entries[j])) {
+					temp = entries[j];
+					entries[j] = entries[n];
+					entries[n] = temp;
+				}
+			}
+		}
+	}
+	brwsr_cwlog_entries->clear();
+	for (size_t i = 0; i < nbr; i++)
+		brwsr_cwlog_entries->add(entries[i].c_str());
+	brwsr_cwlog_entries->redraw();
+	if (freqdir == 1) freqdir = -1;
+	else freqdir = 1;
+}
+
+static int calldir = 1;
+static int callpos = 3;
+void cwlog_sort_by_call() {
+	if (cwlog_editing) return;
+	size_t nbr = brwsr_cwlog_entries->size();
+	if (nbr == 0) return;
+	std::string entries[nbr];
+	for (size_t n = 0; n < nbr; n++) entries[n] = brwsr_cwlog_entries->text(n+1);
+	std::string temp;
+	if (nbr > 1) {
+		for (size_t n = 0; n < nbr - 1; n++) {
+			for (size_t j = n + 1; j < nbr; j++) {
+				if (cwlog_compare (calldir, callpos, entries[n], entries[j])) {
+					temp = entries[j];
+					entries[j] = entries[n];
+					entries[n] = temp;
+				}
+			}
+		}
+	}
+	brwsr_cwlog_entries->clear();
+	for (size_t i = 0; i < nbr; i++)
+		brwsr_cwlog_entries->add(entries[i].c_str());
+	brwsr_cwlog_entries->redraw();
+	if (calldir == 1) calldir = -1;
+	else calldir = 1;
+}
+
+static int nbrdir = 1;
+static int nbrpos = 7;
+void cwlog_sort_by_nbr() {
+	if (cwlog_editing) return;
+	size_t nbr = brwsr_cwlog_entries->size();
+	if (nbr == 0) return;
+	std::string entries[nbr];
+	for (size_t n = 0; n < nbr; n++) entries[n] = brwsr_cwlog_entries->text(n+1);
+	std::string temp;
+	if (nbr > 1) {
+		for (size_t n = 0; n < nbr - 2; n++) {
+			for (size_t j = n + 1; j < nbr - 1; j++) {
+				if (cwlog_compare (nbrdir, nbrpos, entries[n], entries[j])) {
+					temp = entries[j];
+					entries[j] = entries[n];
+					entries[n] = temp;
+				}
+			}
+		}
+	}
+	brwsr_cwlog_entries->clear();
+	for (size_t i = 0; i < nbr; i++)
+		brwsr_cwlog_entries->add(entries[i].c_str());
+	brwsr_cwlog_entries->redraw();
+	if (nbrdir == 1) nbrdir = -1;
+	else nbrdir = 1;
+}
+
+void cwlog_clear_qso()
+{
+	qso_date->value("");
+	qso_time->value("");
+	qso_op_freq->value("");
+	qso_op_call->value("");
+	qso_op_name->value("");
+	qso_rst_in->value("");
+	qso_rst_out->value("");
+	qso_exchange_in->value("");
+
+	if (cwlog_editing)
+		cwlog_set_edit(false);
+
+}
+
+void cwlog_save_qso()
+{
+	char line[256];
+	if (cwlog_editing) {
+		snprintf(line, sizeof(line),
+			"%s\t%s\t%s\t%s\t%s\t%s\t%s\t%05d\t%s",
+			qso_date->value(),
+			qso_time->value(),
+			qso_op_freq->value(),
+			qso_op_call->value(),
+			qso_op_name->value(),
+			qso_rst_in->value(),
+			qso_rst_out->value(),
+			(int)qso_nbr->value(),
+			qso_exchange_in->value());
+		brwsr_cwlog_entries->insert(cwlog_edit_nbr, line);
+		brwsr_cwlog_entries->remove(cwlog_edit_nbr + 1);
+		brwsr_cwlog_entries->select(cwlog_edit_nbr);
+		cwlog_set_edit(false);
+	} else {
+		snprintf(line, sizeof(line),
+			"%s\t%s\t%s\t%s\t%s\t%s\t%s\t%05d\t%s",
+			qso_date->value(),
+			qso_time->value(),
+			qso_op_freq->value(),
+			qso_op_call->value(),
+			qso_op_name->value(),
+			qso_rst_in->value(),
+			qso_rst_out->value(),
+			(int)qso_nbr->value(),
+			qso_exchange_in->value());
+		brwsr_cwlog_entries->add(line);
+	}
+	cwlog_changed = true;
+}
+
+void cwlog_delete_entry()
+{
+	brwsr_cwlog_entries->remove(cwlog_edit_nbr);
+	brwsr_cwlog_entries->select(cwlog_edit_nbr, false);
+	brwsr_cwlog_entries->redraw();
+	cwlog_clear_qso();
+	cwlog_changed = true;
+}
+
+void cwlog_edit_entry()
+{
+	if (cwlog_editing) {
+		cwlog_delete_entry();
+		return;
+	}
+
+	cwlog_edit_nbr = brwsr_cwlog_entries->value();
+	if (!cwlog_edit_nbr) return;
+
+	cwlog_clear_qso();
+	size_t ptr = 0;
+	std::string entry = brwsr_cwlog_entries->text(cwlog_edit_nbr);
+
+	ptr = entry.find('\t');
+	qso_date->value(entry.substr(0, ptr).c_str());
+	entry.erase(0, ptr+1);
+
+	ptr = entry.find('\t');
+	qso_time->value(entry.substr(0,ptr).c_str());
+	entry.erase(0, ptr+1);
+
+	ptr = entry.find('\t');
+	qso_op_freq->value(entry.substr(0,ptr).c_str());
+	entry.erase(0, ptr+1);
+
+	ptr = entry.find('\t');
+	qso_op_call->value(entry.substr(0,ptr).c_str());
+	entry.erase(0, ptr+1);
+
+	ptr = entry.find('\t');
+	qso_op_name->value(entry.substr(0,ptr).c_str());
+	entry.erase(0, ptr+1);
+
+	ptr = entry.find('\t');
+	qso_rst_in->value(entry.substr(0,ptr).c_str());
+	entry.erase(0, ptr+1);
+
+	ptr = entry.find('\t');
+	qso_rst_out->value(entry.substr(0,ptr).c_str());
+	entry.erase(0, ptr+1);
+
+	ptr = entry.find('\t');
+	qso_nbr->value(atoi(entry.substr(0,ptr).c_str()));
+	entry.erase(0, ptr+1);
+
+	ptr = entry.find('\t');
+	qso_exchange_in->value(entry.substr(0,ptr).c_str());
+	entry.erase(0, ptr+1);
+
+	cwlog_set_edit(true);
+}
+
+void cwlog_view()
+{
+	if (!cwlog_viewer) { 
+		cwlog_viewer = new_cwlogbook_dialog();
+		if (!progStatus.log_name.empty()) {
+			txt_cwlog_file->value(progStatus.log_name.c_str());
+			cwlog_load();
+		} else
+			cwlog_open();
+	}
+	cwlog_viewer->show();
+}
+
+void cwlog_save()
+{
+	if (progStatus.log_name.empty())
+		return;
+	std::ofstream oLog(progStatus.log_name.c_str());
+	if (!oLog) {
+		fl_message ("Could not write to %s", progStatus.log_name.c_str());
+		return;
+	}
+	size_t n = brwsr_cwlog_entries->size();
+	std::string oline;
+	for (size_t i = 1; i <= n; i++) {
+		oline = brwsr_cwlog_entries->text(i);
+		if (oline.empty()) continue;
+		oLog << oline << std::endl;
+	}
+	oLog.close();
+	cwlog_changed = false;
+}
+
+void cwlog_load()
+{
+	std::ifstream iLog(progStatus.log_name.c_str());
+	if (!iLog) return;
+	brwsr_cwlog_entries->clear();
+	char line[256];
+	std::string sline;
+	while (!iLog.eof()) {
+		memset(line, 0, 256);
+		iLog.getline(line, 256);
+		sline = line;
+		if (!sline.empty())
+			brwsr_cwlog_entries->add(sline.c_str());
+	}
+	iLog.close();
+	brwsr_cwlog_entries->redraw();
+	cwlog_is_open = true;
+}
+
+void cwlog_save_as()
+{
+// Create and post the local native file chooser
+	Fl_Native_File_Chooser fnfc;
+	fnfc.title("Save As log file");
+	fnfc.type(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
+	fnfc.options(Fl_Native_File_Chooser::SAVEAS_CONFIRM);
+	fnfc.filter("CW Log\t*.txt");
+// default directory to use
+	fnfc.directory(RigHomeDir.c_str());
+	fnfc.preset_file(progStatus.log_name.c_str());
+// Show native chooser
+	switch ( fnfc.show() ) {
+		case -1:
+			fl_message ("ERROR: %s", fnfc.errmsg());
+			return; // ERROR
+		case 1: 
+			return; // CANCEL
+		default:
+			progStatus.log_name = fnfc.filename();
+			txt_cwlog_file->value(progStatus.log_name.c_str());
+	}
+	cwlog_save();
+}
+
+void cwlog_open()
+{
+	if (cwlog_is_open && cwlog_changed)
+		cwlog_save();
+
+// Create and post the local native file chooser
+	Fl_Native_File_Chooser fnfc;
+	fnfc.title("Select log file");
+	fnfc.type(Fl_Native_File_Chooser::BROWSE_FILE);
+	fnfc.filter("CW Log\t*.txt");
+// default directory to use
+	fnfc.directory(RigHomeDir.c_str());
+// Show native chooser
+	switch ( fnfc.show() ) {
+		case -1:
+			fl_message ("ERROR: %s", fnfc.errmsg());
+			return; // ERROR
+		case 1: 
+			return; // CANCEL
+		default:
+			progStatus.log_name = fnfc.filename();
+			txt_cwlog_file->value(progStatus.log_name.c_str());
+			txt_cwlog_file->redraw();
+			cwlog_load();
+	}
+}
+
+void cwlog_new()
+{
+	if (cwlog_is_open && cwlog_changed)
+		cwlog_save();
+	brwsr_cwlog_entries->clear();
+	brwsr_cwlog_entries->redraw();
+	progStatus.log_name.clear();
+	txt_cwlog_file->value(progStatus.log_name.c_str());
+	txt_cwlog_file->redraw();
+
+	Fl_Native_File_Chooser fnfc;
+	fnfc.title("Create new log file");
+	fnfc.type(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
+	fnfc.options(Fl_Native_File_Chooser::SAVEAS_CONFIRM);
+	fnfc.filter("CW Log\t*.txt");
+// default directory to use
+	fnfc.directory(RigHomeDir.c_str());
+	fnfc.preset_file("cwlog.txt");
+// Show native chooser
+	switch ( fnfc.show() ) {
+		case -1:
+			fl_message ("ERROR: %s", fnfc.errmsg());
+			return; // ERROR
+		case 1: 
+			return; // CANCEL
+		default:
+			progStatus.log_name = fnfc.filename();
+			txt_cwlog_file->value(progStatus.log_name.c_str());
+	}
+}
+
+void cwlog_close()
+{
+	if (cwlog_is_open && cwlog_changed)
+		cwlog_save();
+}
+
+void cwlog_export_adif()
+{
+// Create and post the local native file chooser
+	Fl_Native_File_Chooser fnfc;
+	fnfc.title("Export to ADIF file");
+	fnfc.type(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
+	fnfc.options(Fl_Native_File_Chooser::SAVEAS_CONFIRM);
+	fnfc.filter("ADIF Log\t*.{adi,adif}");
+// default directory to use
+	fnfc.directory(RigHomeDir.c_str());
+// Show native chooser
+	switch ( fnfc.show() ) {
+		case -1:
+			fl_message ("ERROR: %s", fnfc.errmsg());
+			return; // ERROR
+		case 1: 
+			return; // CANCEL
+		default:
+			break;
+	}
+
+	std::string export_fname = fnfc.filename();
+	std::ofstream oExport(export_fname.c_str());
+	if (!oExport) {
+		fl_message ("Could not write to %s", export_fname.c_str());
+		return;
+	}
+
+	std::string logline,
+				qso_date, qso_time,
+				qso_op_freq,
+				qso_op_call,
+				qso_op_name,
+				qso_rst_in, qso_rst_out,
+				qso_nbr,
+				qso_notes;
+
+	size_t ptr = std::string::npos;
+	size_t n = brwsr_cwlog_entries->size();
+	for (size_t i = 1; i <= n; i++) {
+		logline = brwsr_cwlog_entries->text(i);
+		if (logline.empty()) continue;
+
+		ptr = logline.find('\t');
+		qso_date = logline.substr(0, ptr);
+		logline.erase(0, ptr+1);
+
+		ptr = logline.find('\t');
+		qso_time = logline.substr(0, ptr);
+		logline.erase(0, ptr+1);
+
+		ptr = logline.find('\t');
+		qso_op_freq = logline.substr(0, ptr);
+		logline.erase(0, ptr+1);
+
+		ptr = logline.find('\t');
+		qso_op_call = logline.substr(0, ptr);
+		logline.erase(0, ptr+1);
+
+		ptr = logline.find('\t');
+		qso_op_name = logline.substr(0, ptr);
+		logline.erase(0, ptr+1);
+
+		ptr = logline.find('\t');
+		qso_rst_in = logline.substr(0, ptr);
+		logline.erase(0, ptr+1);
+
+		ptr = logline.find('\t');
+		qso_rst_out = logline.substr(0, ptr);
+		logline.erase(0, ptr+1);
+
+		ptr = logline.find('\t');
+		qso_nbr = logline.substr(0, ptr);
+		logline.erase(0, ptr+1);
+
+		qso_notes = logline;
+
+		oExport << "<QSO_DATE:" << qso_date.length() << ">" << qso_date
+				<< "<TIME_ON:" << qso_time.length() << ">" << qso_time
+				<< "<FREQ:" << qso_op_freq.length() << ">" << qso_op_freq
+				<< "<MODE:2>CW"
+				<< "<CALL:" << qso_op_call.length() << ">" << qso_op_call
+				<< "<NAME:" << qso_op_name.length() << ">" << qso_op_name
+				<< "<RST_RCVD:" << qso_rst_in.length() << ">" << qso_rst_in
+				<< "<RST_SENT:" << qso_rst_out.length() << ">" << qso_rst_out
+				<< "<STX:" << qso_nbr.length() << ">" << qso_nbr
+				<< "<NOTES:" << qso_notes.length() << ">" << qso_notes
+				<< "<EOR>" << std::endl;
+	}
+	oExport.close();
+}
+
+std::string cwlog_adif_extract( std::string FIELD, std::string line)
+{
+	size_t p1, p2;
+	p1 = line.find(FIELD);
+	if (p1 != std::string::npos)  {
+		p1 = line.find(">", p1);
+		if (p1 != std::string::npos) {
+			p1++;
+			p2 = line.find("<", p1);
+			if (p2 != std::string::npos)
+				return line.substr(p1, p2 - p1);
+		}
+	}
+	return "";
+}
+
+void cwlog_import_adif()
+{
+	std::string import_fname;
+	Fl_Native_File_Chooser fnfc;
+	fnfc.title("Import from ADIF file");
+	fnfc.type(Fl_Native_File_Chooser::BROWSE_FILE);
+	fnfc.filter("ADIF Log\t*.{adi,adif}");
+// default directory to use
+	fnfc.directory(RigHomeDir.c_str());
+// Show native chooser
+	switch ( fnfc.show() ) {
+		case -1:
+			fl_message ("ERROR: %s", fnfc.errmsg());
+			return; // ERROR
+		case 1: 
+			return; // CANCEL
+		default:
+			break;
+	}
+	import_fname = fnfc.filename();
+	std::ifstream iImport(import_fname.c_str());
+	if (!iImport) return;
+
+// current log
+	size_t n = brwsr_cwlog_entries->size();
+	size_t p;
+	std::string fulllog;
+	std::string teststr;
+	for (size_t i = 1; i <= n; i++) {
+		fulllog.append(brwsr_cwlog_entries->text(i)).append("\n");
+	}
+
+	char buff[512];
+	std::string line, ldate, ltime, lfreq, lcall, lname, lrst_in, lrst_out, lnbr, lnotes, lbrwsr;
+	while (!iImport.eof()) {
+		iImport.getline(buff, 512);
+		line = buff;
+		if (cwlog_adif_extract("MODE", line) == "CW") {
+			ldate = cwlog_adif_extract("QSO_DATE", line);
+			ltime = cwlog_adif_extract("TIME_ON", line).substr(0,4);
+			lfreq = cwlog_adif_extract("FREQ", line);
+			lcall = cwlog_adif_extract("CALL", line);
+			lname = cwlog_adif_extract("NAME", line);
+			lrst_in = cwlog_adif_extract("RST_RCVD", line);
+			lrst_out = cwlog_adif_extract("RST_SENT", line);
+			lnbr = cwlog_adif_extract("STX", line);
+			lnotes = cwlog_adif_extract("NOTES", line);
+			lbrwsr.assign(ldate).append("\t");
+			lbrwsr.append(ltime).append("\t");
+			lbrwsr.append(lfreq).append("\t");
+			lbrwsr.append(lcall).append("\t");
+			teststr = lbrwsr;
+			lbrwsr.append(lname).append("\t");
+			lbrwsr.append(lrst_in).append("\t");
+			lbrwsr.append(lrst_out).append("\t");
+			lbrwsr.append(lnbr).append("\t");
+			lbrwsr.append(lnotes);
+			p = lbrwsr.find("\n");
+			if (p != std::string::npos)
+				lbrwsr.erase(p);
+			if (fulllog.find(teststr) == std::string::npos &&
+				!ldate.empty() &&
+				!ltime.empty()) {
+				fulllog.append(lbrwsr).append("\n");
+				brwsr_cwlog_entries->add(lbrwsr.c_str());
+			}
+		}
+	}
+	cwlog_changed = true;
+	iImport.close();
+}
+

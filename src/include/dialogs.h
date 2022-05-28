@@ -35,4 +35,29 @@ extern Font_Browser     *fntbrowser;
 
 extern void init_port_combos();
 
+extern bool cwlog_editing;
+
+extern void cwlog_sort_by_call();
+extern void cwlog_sort_by_datetime();
+extern void cwlog_sort_by_nbr();
+extern void cwlog_sort_by_freq();
+
+extern void cwlog_clear_qso();
+extern void cwlog_save_qso();
+
+extern void cwlog_edit_entry();
+extern void cwlog_delete_entry();
+extern void cwlog_view();
+
+extern void cwlog_close();
+extern void cwlog_open();
+extern void cwlog_new();
+
+extern void cwlog_load();
+extern void cwlog_save();
+extern void cwlog_save_as();
+
+extern void cwlog_export_adif();
+extern void cwlog_import_adif();
+
 #endif // __DIALOGS_H__

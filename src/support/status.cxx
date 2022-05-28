@@ -562,7 +562,14 @@ status progStatus = {
 	"","","","","","",
 	"","","","","","",					// std::string	FSK_msgs[12];
 	"m2","m2","m3","m4","m4","m6",
-	"m7","m8","m9","m10","m11","m12"	// std::string	FSK_labels[12];
+	"m7","m8","m9","m10","m11","m12",	// std::string	FSK_labels[12];
+
+// CW logbook parameters
+	"",			// std::string log_name;
+	0,			// int log_cut_numbers;
+	0,			// int log_leading_zeros;
+	1,			// int log_dupcheck;
+	0			// int log_nbr;
 
 };
 
@@ -1192,6 +1199,13 @@ void status::saveLastState()
 		snprintf(setbuff, sizeof(setbuff), "fskiomessage[%d]", n);
 		spref.set(setbuff, FSK_msgs[n].c_str());
 	}
+
+// CW logbook parameters
+	spref.set("LOG_NAME", log_name.c_str());
+	spref.set("CUT_NUMBERS", log_cut_numbers);
+	spref.set("LEADING_ZEROS", log_leading_zeros);
+	spref.set("DUPCHECK", log_dupcheck);
+	spref.set("QSO_NBR", qso_nbr);
 
 }
 
@@ -1952,6 +1966,14 @@ bool status::loadXcvrState(std::string xcvr)
 		spref.get("FSK_STOPBITS", FSK_STOPBITS, FSK_STOPBITS);
 		spref.get("FSK_PORT", defbuffer, "NONE", 499);
 		FSK_PORT = defbuffer;
+
+// CW logbook parameters
+		spref.get("LOG_NAME", defbuffer, "", 499);
+			log_name = defbuffer;
+		spref.get("CUT_NUMBERS", log_cut_numbers, log_cut_numbers);
+		spref.get("LEADING_ZEROS", log_leading_zeros, log_leading_zeros);
+		spref.get("DUPCHECK", log_dupcheck, log_dupcheck);
+		spref.get("QSO_NBR", qso_nbr, qso_nbr);
 
 		for (int n = 0; n < 12; n++) {
 			snprintf(getbuff, sizeof(getbuff), "fskiolabel[%d]", n);
