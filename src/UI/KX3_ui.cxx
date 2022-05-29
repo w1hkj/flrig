@@ -98,8 +98,6 @@ void KX3_set_split(int val)
 	selrig->set_split(val);
 }
 
-extern char *print(XCVR_STATE data);
-
 void cb_KX3_A2B()
 {
 	guard_lock serial_lock(&mutex_serial);

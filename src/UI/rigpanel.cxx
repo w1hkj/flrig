@@ -412,6 +412,10 @@ static void cb_mnuExit(Fl_Menu_*, void*) {
 
 static void cb_mnuTooltips(Fl_Menu_*, void*) {
 	progStatus.tooltips = ! progStatus.tooltips;
+	if (progStatus.tooltips)
+		Fl_Tooltip::enable();
+	else
+		Fl_Tooltip::disable();
 }
 
 static void cb_mnuVoltmeter(Fl_Menu_*, void*) {

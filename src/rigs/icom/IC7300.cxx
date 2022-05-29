@@ -313,6 +313,11 @@ void RIG_IC7300::selectB()
 // IC7300 unique commands
 //======================================================================
 
+bool RIG_IC7300::canswap()
+{
+	return false;//true;
+}
+
 void RIG_IC7300::swapAB()
 {
 	cmd = pre_to;
@@ -1033,28 +1038,28 @@ int RIG_IC7300::adjust_bandwidth(int m)
 {
 	int bw = 0;
 	switch (m) {
-		case 2: case 10: // AM, AM-D
+		case AM7300: case AMD7300: // AM, AM-D
 			bandwidths_ = IC7300_am_bws;
 			bw_vals_ = IC7300_bw_vals_AM;
 			bw = 19;
 			break;
-		case 3: case 11: // FM, FM-D
+		case FM7300: case FMD7300: // FM, FM-D
 			bandwidths_ = IC7300_fm_bws;
 			bw_vals_ = IC7300_bw_vals_FM;
 			bw = 0;
 			break;
-		case 6: case 7: // RTTY, RTTY-R
+		case RTTY7300: case RTTYR7300: // RTTY, RTTY-R
 			bandwidths_ = IC7300_rtty_bws;
 			bw_vals_ = IC7300_bw_vals_RTTY;
 			bw = 12;
 			break;
-		case 4: case 5: // CW, CW -R
+		case CW7300: case CWR7300: // CW, CW -R
 			bandwidths_ = IC7300_ssb_bws;
 			bw_vals_ = IC7300_bw_vals_SSB;
 			bw = 12;
 			break;
-		case 0: case 1: // LSB, USB
-		case 8: case 9: // LSB-D, USB-D
+		case LSB7300: case USB7300: // LSB, USB
+		case LSBD7300: case USBD7300: // LSB-D, USB-D
 		default:
 			bandwidths_ = IC7300_ssb_bws;
 			bw_vals_ = IC7300_bw_vals_SSB;
@@ -1067,18 +1072,18 @@ const char ** RIG_IC7300::bwtable(int m)
 {
 	const char **table;
 	switch (m) {
-		case 2: case 10: // AM, AM-D
+		case AM7300: case AMD7300: // AM, AM-D
 			table = IC7300_am_bws;
 			break;
-		case 3: case 11: // FM, FM-D
+		case FM7300: case FMD7300: // FM, FM-D
 			table = IC7300_fm_bws;
 			break;
-		case 6: case 7: // RTTY, RTTY-R
+		case RTTY7300: case RTTYR7300: // RTTY, RTTY-R
 			table = IC7300_rtty_bws;
 			break;
-		case 4: case 5: // CW, CW -R
-		case 0: case 1: // LSB, USB
-		case 8: case 9: // LSB-D, USB-D
+		case CW7300: case CWR7300: // CW, CW -R
+		case LSB7300: case USB7300: // LSB, USB
+		case LSBD7300: case USBD7300: // LSB-D, USB-D
 		default:
 			table = IC7300_ssb_bws;
 	}

@@ -149,28 +149,28 @@ bool PTT = false;
 
 int  powerlevel = 0;
 
-std::string printXCVR_STATE(XCVR_STATE &data)
+std::string printXCVR_STATE(XCVR_STATE data)
 {
 	std::stringstream str;
-	const char **bwt = selrig->bwtable(data.imode);
-	const char **dsplo = selrig->lotable(data.imode);
-	const char **dsphi = selrig->hitable(data.imode);
-	str << data.freq << ", ";
-	str <<
-		(selrig->modes_ ? selrig->modes_[data.imode] : "modes n/a");
-	if (data.iBW > 256 && selrig->has_dsp_controls) {
-		str << ", " <<
-		(dsplo ? dsplo[data.iBW & 0x7F] : "??");
-	} else if (bwt) {
-		str << ", " << bwt[data.iBW];
+	str << data.freq;
+
+	if (selrig->modes_) {
+		str << ", " << selrig->modes_[data.imode];
+		if (selrig->has_dsp_controls) {
+			const char **dsplo = selrig->lotable(data.imode);
+			const char **dsphi = selrig->hitable(data.imode);
+			if (data.iBW > 256) {
+				str << ", " << (dsplo ? dsplo[data.iBW & 0x7F] : "??");
+				str << ", " << (dsphi ? dsphi[(data.iBW >> 8) & 0x7F] : "??");
+			}
+		}
+		const char **bwt = selrig->bwtable(data.imode);
+		if (bwt)
+			str << ", " << bwt[data.iBW];
+		else
+			str << ", n/a";
 	} else
-		str << ", n/a";
-
-	if (data.iBW > 256 && selrig->has_dsp_controls) {
-		str << ", " <<
-		(dsphi ? dsphi[(data.iBW >> 8) & 0x7F] : "??");
-	}
-
+		str << ", modes n/a";
 	return str.str();
 }
 
@@ -184,7 +184,7 @@ std::string print_ab()
 	return s;
 }
 
-const char *print(XCVR_STATE &data)
+const char *print(XCVR_STATE data)
 {
 	static std::string prstr;
 	static char str[1024];
@@ -350,9 +350,10 @@ void read_vfo()
 void update_ifshift(void *d);
 
 void TRACED(updateUI, void *)
+
 	setModeControl(NULL);
 
-//	updateBandwidthControl(NULL);
+	updateBandwidthControl(NULL);
 
 	setBWControl(NULL);
 
@@ -1276,7 +1277,6 @@ void serviceQUE()
 					// Restore mode, then freq and bandwidth after select
 					yaesu891UpdateA(&vfoA);
 				}
-				trace(2, "case sA ", printXCVR_STATE(vfoA).c_str());
 				rig_trace(2, "case sA ", printXCVR_STATE(vfoA).c_str());
 				Fl::awake(updateUI);
 			}
@@ -1289,7 +1289,6 @@ void serviceQUE()
 					// Restore mode, then freq and bandwidth after select
 					yaesu891UpdateB(&vfoB);
 				}
-				trace(2, "case sB ", printXCVR_STATE(vfoB).c_str());
 				rig_trace(2, "case sB ", printXCVR_STATE(vfoB).c_str());
 				Fl::awake(updateUI);
 			}
@@ -1896,7 +1895,7 @@ void updateBandwidthControl(void *d)
 		opDSP_hi->hide();
 		btnDSP->hide();
 		opBW->clear();
-		selrig->bwtable(vfo->imode);
+		selrig->bandwidths_ = selrig->bwtable(vfo->imode);
 		for (int i = 0; selrig->bandwidths_[i] != NULL; i++)
 			opBW->add(selrig->bandwidths_[i]);
 		opBW->index(vfo->iBW);
@@ -2267,11 +2266,11 @@ void cbAswapB()
 			srvc_reqs.push(xcvr);
 		} else {
 			guard_lock lock2(&mutex_serial, "cbAswsapB");
-			execute_swapAB();
-//			VFOQUEUE xcvr;
-//			xcvr.change = SWAP;
-//			trace(1, "cb SWAP");
-//			srvc_reqs.push(xcvr);
+//			execute_swapAB();
+			VFOQUEUE xcvr;
+			xcvr.change = SWAP;
+			trace(1, "cb SWAP");
+			srvc_reqs.push(xcvr);
 		}
 	}
 }

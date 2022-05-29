@@ -55,7 +55,7 @@ public:
 	void set_split(bool);
 	int  get_split();
 
-	bool canswap() { return true; }
+	bool canswap();
 	void swapAB();
 
 	void set_bwA(int val);

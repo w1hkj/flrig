@@ -112,9 +112,9 @@ extern rigbase *selrig;
 
 extern const char **old_bws;
 
-extern std::string printXCVR_STATE(XCVR_STATE &data);
+extern std::string printXCVR_STATE(XCVR_STATE data);
 extern std::string print_ab();
-extern const char *print(XCVR_STATE &data);
+extern const char *print(XCVR_STATE data);
 
 extern void yaesu891UpdateA(XCVR_STATE * newVfo);
 extern void yaesu891UpdateB(XCVR_STATE * newVfo);
@@ -407,8 +407,6 @@ extern std::queue<VFOQUEUE> srvc_reqs;
 
 extern void trace(int n, ...); // all args of type const char *
 extern void trace1(int n, ...); // all args of type const char *
-
-extern std::string printXCVR_STATE(XCVR_STATE &data);
 
 extern Fl_Group *tabXCVR;
 extern Fl_Group *tabTRACE;
