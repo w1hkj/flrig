@@ -27,6 +27,13 @@
 //=============================================================================
 // IC-9700
 
+// JBA - Enable this for Sub band to be treated as VFO B if rig is in dualwatch.
+// By doing this, the flrig gui control the two freqs shown in the rig display (my preference).
+// Otherwise, flrig controls VFOs of Main Band only. 
+// Bottom line is I'm not exactly sure how flrig should behave if rig is in dualwatch
+// nor do I know how flrig treats other rigs with two receivers.
+#define DUALWATCH_SUB_AS_B
+
 const char IC9700name_[] = "IC-9700";
 
 static int nummodes = 9;
@@ -315,24 +322,62 @@ void RIG_IC9700::set_xcvr_auto_off()
 
 void RIG_IC9700::selectA()
 {
-	cmd = pre_to;
-	cmd += '\x07';
-	cmd += '\xD0';
-	cmd.append(post);
-	waitFB("select A");
-	set_trace(2, "selectA()", str2hex(replystr.c_str(), replystr.length()));
-	inuse = onA;
+  // JBA - select Main Band if rig is in sat mode and VFO A if it is not
+  // This is a change from version 1.4.5
+#ifdef DUALWATCH_SUB_AS_B
+  int sat_mode = get_sat_mode() + get_dualwatch();
+#else
+  int sat_mode = get_sat_mode();
+#endif
+  
+  cmd = pre_to;
+  cmd += '\x07';
+  if( sat_mode )
+    cmd += '\xD0';          // Select Main band
+  else
+    cmd += '\x00';          // Select VFO A
+  cmd.append(post);
+  waitFB("select A");
+  set_trace(2, "selectA()", str2hex(replystr.c_str(), replystr.length()));
+  inuse = onA;
+
+#if 0
+  // Just some debug info - not needed
+  //std::cout << "SELECT A - cmd   =" << str2hex(cmd.c_str(),cmd.length()) << "\n";
+  //std::cout << "SELECT A - reply =" << str2hex(replystr.c_str(),replystr.length()) << std::endl;
+  std::cout << "SELECT A - sat_mode =" << sat_mode << std::endl;
+#endif
+        
 }
 
 void RIG_IC9700::selectB()
 {
-	cmd = pre_to;
-	cmd += '\x07';
-	cmd += '\xD1';
-	cmd.append(post);
-	waitFB("select B");
-	set_trace(2, "selectB()", str2hex(replystr.c_str(), replystr.length()));
-	inuse = onB;
+  // JBA - select Sub Band if rig is in sat mode and VFO B if it is not
+  // This is a change from version 1.4.5
+#ifdef DUALWATCH_SUB_AS_B
+  int sat_mode = get_sat_mode() + get_dualwatch();
+#else
+  int sat_mode = get_sat_mode();
+#endif
+  
+  cmd = pre_to;
+  cmd += '\x07';
+  if( sat_mode )
+    cmd += '\xD1';          // Select Sub band
+  else
+    cmd += '\x01';          // Select VFO A 
+  cmd.append(post);
+  waitFB("select B");
+  set_trace(2, "selectB()", str2hex(replystr.c_str(), replystr.length()));
+  inuse = onB;
+  
+#if 0
+  // Just some debug info - not needed
+  //std::cout << "SELECT B - cmd   =" << str2hex(cmd.c_str(),cmd.length()) << "\n";
+  //std::cout << "SELECT B - reply =" << str2hex(replystr.c_str(),replystr.length()) << std::endl;
+  std::cout << "SELECT B - sat_mode =" << sat_mode << std::endl;
+#endif
+        
 }
 
 bool RIG_IC9700::check ()
@@ -351,6 +396,38 @@ static int ret = 0;
 
 unsigned long int RIG_IC9700::get_vfoA ()
 {
+#ifdef DUALWATCH_SUB_AS_B
+  int sat_mode = get_sat_mode() + get_dualwatch();
+#else
+  int sat_mode = get_sat_mode();
+#endif
+  
+  if( sat_mode ){
+      
+      // Rig is in satellite mode - command 0x25 doesn't work in sat mode
+      // See pg 23 of IC9700 CIV manual
+      if (inuse == onB)
+        return A.freq;
+      std::string resp = pre_fm;
+      resp += '\x03';
+      cmd = pre_to;
+      cmd += '\x03';
+      cmd.append( post );
+      if (waitFOR(11, "get vfo A")) {
+        size_t p = replystr.rfind(resp);
+        if (p != std::string::npos) {
+          if (replystr[p+5] == -1)
+            A.freq = 0;
+          else
+            A.freq = fm_bcd_be(replystr.substr(p+5), 10);
+	}
+      }
+      get_trace(2, "get_vfoA()", str2hex(replystr.c_str(), replystr.length()));
+        
+  } else {
+    
+      // Rig is not in satellite mode
+      // The 0x25 command only affects the Main Band VFOs
 	std::string resp;
 
 	cmd.assign(pre_to).append("\x25");
@@ -380,13 +457,41 @@ unsigned long int RIG_IC9700::get_vfoA ()
 		}
 	}
 
+  }
+
+#if 0
+  // Just some debug info - not needed
+  // std::cout << "GET_VFO A - cmd   =" << cmd << "\n";
+  // std::cout << "GET_VFO A - reply =" << replystr << std::endl;
+  std::cout << "GET_VFO A - freq =" << A.freq << "\t" << (inuse==onB) << std::endl;
+#endif
+        
 	return A.freq;
 }
 
 void RIG_IC9700::set_vfoA (unsigned long int freq)
 {
-	A.freq = freq;
+  A.freq = freq;
 
+#ifdef DUALWATCH_SUB_AS_B
+  int sat_mode = get_sat_mode() + get_dualwatch();
+#else
+  int sat_mode = get_sat_mode();
+#endif
+    
+  if( sat_mode ){
+      
+      // Rig is in satellite mode - command 0x25 doesn't work in sat mode
+      cmd = pre_to;
+      cmd += '\x05';
+      cmd.append( to_bcd_be( freq, 10 ) );
+      cmd.append( post );
+      waitFB("set vfo A");
+      set_trace(2, "set_vfoA()", str2hex(replystr.c_str(), replystr.length()));
+        
+  } else {
+    
+      // Rig is not in satellite mode 
 	cmd.assign(pre_to).append("\x25");
 	if (inuse == onB) cmd += '\x01';
 	else      cmd += '\x00';
@@ -397,10 +502,41 @@ void RIG_IC9700::set_vfoA (unsigned long int freq)
 	set_trace(1, "set_vfoA");
 	waitFB("set vfo A");
 	seth();
+      
+  }
 }
 
 unsigned long int RIG_IC9700::get_vfoB ()
 {
+#ifdef DUALWATCH_SUB_AS_B
+  int sat_mode = get_sat_mode() + get_dualwatch();
+#else
+  int sat_mode = get_sat_mode();
+#endif
+    
+  if( sat_mode ){
+      
+      // Rig is in satellite mode - command 0x25 doesn't work in sat mode
+      if (inuse != onB) return B.freq;
+      std::string resp = pre_fm;
+      resp += '\x03';
+      cmd = pre_to;
+      cmd += '\x03';
+      cmd.append( post );
+      if (waitFOR(11, "get vfo B")) {
+        size_t p = replystr.rfind(resp);
+        if (p != std::string::npos) {
+          if (replystr[p+5] == -1)
+            A.freq = 0;
+          else
+            B.freq = fm_bcd_be(replystr.substr(p+5), 10);
+	}
+      }
+      get_trace(2, "get_vfoB()", str2hex(replystr.c_str(), replystr.length()));
+        
+  } else {
+
+      // Rig is not in satellite mode 
 	std::string resp;
 
 	cmd.assign(pre_to).append("\x25");
@@ -430,13 +566,41 @@ unsigned long int RIG_IC9700::get_vfoB ()
 		}
 	}
 
+  }
+
+#if 0
+  // Just some debug info - not needed
+  // std::cout << "GET_VFO B - cmd   =" << cmd << "\n";
+  // std::cout << "GET_VFO B - reply =" << replystr << std::endl;
+  std::cout << "GET_VFO B - freq =" << A.freq << "\t" << (inuse==onB) << std::endl;
+#endif
+        
 	return B.freq;
 }
 
 void RIG_IC9700::set_vfoB (unsigned long int freq)
 {
-	B.freq = freq;
+  B.freq = freq;
 
+#ifdef DUALWATCH_SUB_AS_B
+  int sat_mode = get_sat_mode() + get_dualwatch();
+#else
+  int sat_mode = get_sat_mode();
+#endif
+    
+  if( sat_mode ){
+    
+      // Rig is in satellite mode - command 0x25 doesn't work in sat mode
+      cmd = pre_to;
+      cmd += '\x05';
+      cmd.append( to_bcd_be( freq, 10 ) );
+      cmd.append( post );
+      waitFB("set vfo B");
+      set_trace(2, "set_vfoB()", str2hex(replystr.c_str(), replystr.length()));
+        
+  } else {
+
+      // Rig is not in satellite mode 
 	cmd.assign(pre_to).append("\x25");
 	if (inuse == onB) cmd += '\x00';
 	else      cmd += '\x01';
@@ -447,6 +611,9 @@ void RIG_IC9700::set_vfoB (unsigned long int freq)
 	set_trace(1, "set_vfoB");
 	waitFB("set vfo B");
 	seth();
+
+  }
+  
 }
 
 void RIG_IC9700::set_modeA(int val)
@@ -1847,3 +2014,75 @@ void RIG_IC9700::set_band_selection(int v)
 
 	waitFOR(23, "get band stack");
 }
+
+
+// JBA - routine to determine if rig is in satellite mode
+// Be sure to call this before forming another command as
+// the variable cmd is common to all of these routines.
+int RIG_IC9700::get_sat_mode()
+{
+  int ret;
+  int iret=-1;
+  std::string resp;
+
+  // Read sat mode
+  cmd = pre_to;
+  cmd.append("\x16\x5a");
+  cmd.append(post);
+  resp = pre_fm;
+  resp.append("\x16\x5a");
+  ret = waitFOR(8, "get_sat_mode");
+  get_trace(2, "get_sat_mode()", str2hex(replystr.c_str(), replystr.length()));
+
+  if (ret) {
+    size_t p = replystr.rfind(resp);
+    iret = fm_bcd(replystr.substr(p+6), 2);
+  }
+
+#if 0
+  // Just some debug info - not needed
+  std::cout << "GET SAT MODE - cmd   =" << str2hex(cmd.c_str(),cmd.length()) << "\n";
+  std::cout << "GET SAT MODE - reply =" << str2hex(replystr.c_str(),replystr.length()) << "\n";
+  std::cout << "GET_SAT_MODE - iret =" << iret << std::endl;
+#endif
+
+  return iret;
+}
+
+
+
+// JBA - routine to determine if rig is in dualwatch mode.
+// Be sure to call this before forming another command as
+// the variable cmd is common to all of these routines.
+int RIG_IC9700::get_dualwatch()
+{
+  int ret;
+  int iret=-1;
+  std::string resp;
+
+  // Read sat mode
+  cmd = pre_to;
+  cmd.append("\x16\x59");
+  cmd.append(post);
+  resp = pre_fm;
+  resp.append("\x16\x59");
+  ret = waitFOR(8, "get_dualwatch");
+  get_trace(2, "get_dualwatch()", str2hex(replystr.c_str(), replystr.length()));
+
+  if (ret) {
+    size_t p = replystr.rfind(resp);
+    iret = fm_bcd(replystr.substr(p+6), 2);
+  }
+
+#if 0
+  // Just some debug info - not needed
+  std::cout << "GET DUAL WATCH - cmd   =" << str2hex(cmd.c_str(),cmd.length()) << "\n";
+  std::cout << "GET DUAL WATCH - reply =" << str2hex(replystr.c_str(),replystr.length()) << "\n";
+  std::cout << "GET DAUL WATCH - iret =" << iret << std::endl;
+#endif
+
+  return iret;
+}
+
+
+

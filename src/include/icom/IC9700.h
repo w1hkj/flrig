@@ -47,11 +47,16 @@ public:
 	void set_modeB(int val);
 	int  get_modeB();
 
+        // JBA
+	int  get_sat_mode();
+	int  get_dualwatch();
+
 	void set_bwA(int val);
 	int  get_bwA();
 
 	void set_bwB(int val);
 	int  get_bwB();
+
 
 	int  adjust_bandwidth(int m);
 	int  def_bandwidth(int m);
