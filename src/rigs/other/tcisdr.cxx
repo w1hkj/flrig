@@ -36,14 +36,19 @@ static const char *TCI_modes[] = {
 static const char TCI_mode_type[] = {
 'U', 'U', 'U', 'L', 'U', 'U', 'U', 'L', 'U', 'U', 'U' };
 
+// pairs set up for a nominal 700 Hz CW note
+// default is 800 Hz bandwidth
 static const char *TCI_CWwidths[] = {
  "50", "100",  "250",  "400", "500",
-"650", "800", "1000", "1200", NULL};
+"650", "800", "1000", "1500", "2000",
+"3000", "4000", NULL};
 static std::string TCI_CWpairs[] = {
   "-25,25;",   "-50,50;", "-125,125;", "-200,200;", "-250,250;",
-"-325,325;", "-400,400;", "-500,500;", "-600,600;", ""};
-static int tci_nbr_cw = 9;
+"-325,325;", "-400,400;", "-500,500;", " -600,900;", "-600,1400;",
+"-600,2400;", "-600, 3400;" };
+static int tci_nbr_cw = 12;
 static int tci_def_cw = 6;
+static int tci_cw_tone = 0;
 
 static const char *TCI_AMwidths[] = {
 "3000", "3500", "4000", "5000", "6000",
@@ -81,7 +86,7 @@ const char *TCI_centers[] = {
  "500", "550", "600", "650", "700", "750", "800", "900", "1000",
 "1250", "1500", "1750", "2000", "2250", "2500", NULL };
 int tci_nbr_centers = 15;
-int tci_center = 10;
+int tci_center = -1; //1500 Hz default
 
 static const char *TCI_USBwidths[] = {
  "100",  "200",  "400", "800", "1000", 
@@ -139,35 +144,53 @@ static int agcval = 1;
 
 void tci_adjust_widths()
 {
-	char szpairs[50];
+	char szpairs[20];
 	int  width;
 	int  lo, hi;
-	int  tci_freq = tci_centers[tci_center];
+	int  tci_freq;
 
-	for (int i = 0; i < tci_nbr_usb; i++ ) {
-		width = atol(TCI_USBwidths[i])/2;
-		lo = tci_freq - width;
-		hi = tci_freq + width;
-		if (lo < 0) {
-			hi -= lo;
-			lo = 0;
+	if (tci_center != progStatus.tci_center) {
+		tci_freq = tci_centers[tci_center];
+
+		for (int i = 0; i < tci_nbr_usb; i++ ) {
+			width = atol(TCI_USBwidths[i])/2;
+			lo = tci_freq - width;
+			hi = tci_freq + width;
+			if (lo < 0) {
+				hi -= lo;
+				lo = 0;
+			}
+			snprintf(szpairs, sizeof(szpairs), "%d,%d;", lo, hi);
+			TCI_USBpairs[i] = szpairs;
 		}
-		snprintf(szpairs, sizeof(szpairs), "%d,%d;", lo, hi);
-		TCI_USBpairs[i] = szpairs;
+
+		for (int i = 0; i < tci_nbr_lsb; i++ ) {
+			width = atol(TCI_LSBwidths[i])/2;
+			lo = -(tci_freq + width);
+			hi = -(tci_freq - width);
+			if (hi > 0) {
+				lo -= hi;
+				hi = 0;
+			}
+			snprintf(szpairs, sizeof(szpairs), "%d,%d;", lo, hi);
+			TCI_LSBpairs[i] = szpairs;
+		}
 	}
 
-	for (int i = 0; i < tci_nbr_lsb; i++ ) {
-		width = atol(TCI_LSBwidths[i])/2;
-		lo = -(tci_freq + width);
-		hi = -(tci_freq - width);
-		if (hi > 0) {
-			lo -= hi;
-			hi = 0;
+	if (tci_cw_tone != progStatus.cw_spot_tone) {
+		tci_cw_tone = progStatus.cw_spot_tone;
+		for (int i = 0; i < 11; i++) {
+			width = atol(TCI_CWwidths[i]);
+			lo = - width / 2;
+			hi = width / 2;
+			if (width/2 > tci_cw_tone) {
+				lo = -(tci_cw_tone - 100);
+				hi = width + 100 - tci_cw_tone;
+			}
+			snprintf(szpairs, sizeof(szpairs), "%d,%d;", lo, hi);
+			TCI_CWpairs[i] = szpairs;
 		}
-		snprintf(szpairs, sizeof(szpairs), "%d,%d;", lo, hi);
-		TCI_LSBpairs[i] = szpairs;
 	}
-
 }
 
 int match( std::string &needle, const char **haystack)
@@ -438,6 +461,7 @@ int RIG_TCI_SDR::get_modetype(int n)
 
 void RIG_TCI_SDR::set_bwA(int val)
 {
+	tci_adjust_widths();
 	std::string tcicmd = "rx_filter_band:0,";
 	std::string pairs;
 	switch (A.imode) {
@@ -491,6 +515,7 @@ int RIG_TCI_SDR::get_bwA()
 
 void RIG_TCI_SDR::set_bwB(int val)
 {
+	tci_adjust_widths();
 	std::string tcicmd = "rx_filter_band:0,";
 	std::string pairs;
 	switch (B.imode) {
