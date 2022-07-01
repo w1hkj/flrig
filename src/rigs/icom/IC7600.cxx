@@ -1,6 +1,7 @@
 // ----------------------------------------------------------------------------
-// Copyright (C) 2014
+// Copyright (C) 2014-2022
 //              David Freese, W1HKJ
+//              Andrew Hart, VE3NVK  (ALH)
 //
 // This file is part of flrig.
 //
@@ -1050,7 +1051,7 @@ void RIG_IC7600::get_rf_min_max_step(double &min, double &max, double &step)
 {
 	min = 0; max = 100; step = 1;
 }
-
+// ALH inserted code from the IC7100 to get the preamp to switch correctly
 int RIG_IC7600::next_preamp()
 {
 	switch (preamp_level) {
@@ -1067,25 +1068,29 @@ void RIG_IC7600::set_preamp(int val)
 	cmd += '\x16';
 	cmd += '\x02';
 
-	if (preamp_level == 1) {
+	preamp_level = val;
+	switch (val) { 
+		case 1: 
 		preamp_label("Amp 1", true);
-		cmd += '\x01';
-	} else if (preamp_level == 2) {
+			break;
+		case 2:
 		preamp_label("Amp 2", true);
-		cmd += '\x02';
-	} else if (preamp_level == 0) {
-		preamp_label("OFF", false);
-		cmd += '\x00';
+			break;
+		case 0:
+		default:
+			preamp_label("Pre", false);
 	}
 
+	cmd += (unsigned char)preamp_level;
 	cmd.append( post );
+	waitFB(	(preamp_level == 0) ? "set Preamp OFF" :
+			(preamp_level == 1) ? "set Preamp Level 1" :
+			"set Preamp Level 2");
 	set_trace(2, "set_preamp()", str2hex(cmd.c_str(), cmd.length()));
-	waitFB("set Pre");
 }
 
 int RIG_IC7600::get_preamp()
 {
-	preamp_level = progStatus.preamp;
 	std::string cstr = "\x16\x02";
 	std::string resp = pre_fm;
 	resp.append(cstr);
@@ -1093,7 +1098,6 @@ int RIG_IC7600::get_preamp()
 	cmd.append(cstr);
 	cmd.append( post );
 	if (waitFOR(8, "get Pre")) {
-		get_trace(2, "get_preamp()", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(resp);
 		if (p != std::string::npos) {
 			preamp_level = replystr[p+6];
@@ -1107,8 +1111,9 @@ int RIG_IC7600::get_preamp()
 			}
 		}
 	}
+	get_trace(2, "get_preamp() ", str2hex(replystr.c_str(), replystr.length()));
 	return preamp_level;
-}
+}	// ALH end of changed code for the preamp.
 
 int  RIG_IC7600::next_attenuator()
 {
