@@ -409,14 +409,24 @@ void RIG_FT817BB::set_split(bool val)
 extern bool PTT;
 int  RIG_FT817BB::get_split()
 {
-	if (!PTT) return split;
-	init_cmd();
-	cmd[4] = 0xF7; // get transmit status
-	int ret = waitN(1, 100, "get TX status");
-	getthex("get_split");
-	if (ret == 0) return 0;
-	split = (replystr[0] & 0x20) == 0x20;
-	return split;
+    init_cmd();
+    if (PTT) {
+        cmd[4] = 0xF7; // get transmit status
+        int ret = waitN(1, 100, "get TX status");
+        getthex("get_split");
+        if (ret != 0)
+            split = (replystr[0] & 0x20) == 0x20;
+        return split;
+    }
+
+// read eeprom address 007A
+    cmd[1] = 0x7A;
+    cmd[4] = 0xBB;
+    int ret = waitN(1, 100, "get eeprom @ 007A");
+    getthex("get eeprom data @ 007A");
+    if (ret != 0)
+        split = ((replystr[0] & 0x80) == 0x80);
+    return split;
 }
 
 int RIG_FT817BB::power_scale()

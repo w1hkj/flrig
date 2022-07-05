@@ -325,11 +325,22 @@ extern bool PTT;
 int  RIG_FT857D::get_split()
 {
 	init_cmd();
-	cmd[4] = 0xF7; // get transmit status
-	int ret = waitN(1, 100, "get TX status");
-	getthex("get_split");
-	if (ret == 0) return 0;
-	split = (replystr[0] & 0x20) == 0x20;
+	if (PTT) {
+		cmd[4] = 0xF7; // get transmit status
+		int ret = waitN(1, 100, "get TX status");
+		getthex("get_split");
+		if (ret != 0)
+			split = (replystr[0] & 0x20) == 0x20;
+		return split;
+	}
+
+// read eeprom address 008D
+	cmd[1] = 0x8D;
+	cmd[4] = 0xBB;
+	int ret = waitN(1, 100, "get eeprom @ 008D");
+	getthex("get eeprom data @ 008D");
+	if (ret != 0) 
+		split = ((replystr[0] & 0x80) == 0x80);
 	return split;
 }
 
