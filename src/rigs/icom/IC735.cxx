@@ -25,10 +25,12 @@
 //
 const char IC735name_[] = "IC-735";
 const char *IC735modes_[] = { "LSB", "USB", "AM", "CW", "RTTY", "FM", NULL};
+const char IC735_mode_type[] = { 'L', 'U', 'U', 'L', 'L', 'U' };
 
 RIG_IC735::RIG_IC735() {
 	name_ = IC735name_;
 	modes_ = IC735modes_;
+	_mode_type = IC735_mode_type;
 	comm_baudrate = BR1200;
 	stopbits = 2;
 	comm_retries = 2;
