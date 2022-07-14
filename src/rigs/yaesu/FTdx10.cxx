@@ -1229,7 +1229,6 @@ int RIG_FTdx10::get_noise()
 void RIG_FTdx10::set_mic_gain(int val)
 {
 	cmd = "MG000;";
-	val = (int)(val * 255 / 100); // convert to 0 .. 255
 	for (int i = 3; i > 0; i--) {
 		cmd[1+i] += val % 10;
 		val /= 10;
@@ -1249,7 +1248,7 @@ int RIG_FTdx10::get_mic_gain()
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return progStatus.mic_gain;
 	int val = atoi(&replystr[p+2]);
-	return val * 100 / 255;
+	return val;
 }
 
 void RIG_FTdx10::get_mic_min_max_step(int &min, int &max, int &step)
