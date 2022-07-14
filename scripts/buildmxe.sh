@@ -7,8 +7,7 @@
   --with-libiconv-prefix=$PREFIX/iconv \
   --enable-static \
   PTW32_LIBS="-lpthread -lpcreposix -lpcre -lwinmm" \
-  FLTK_CONFIG=$PREFIX/i686-w64-mingw32.static/bin/fltk-config \
-  CXXFLAGS="-std=c++11 -std=gnu++11" 
+  FLTK_CONFIG=$PREFIX/i686-w64-mingw32.static/bin/fltk-config
 
 make -j 8
 $PREFIX/bin/i686-w64-mingw32.static-strip src/flrig.exe

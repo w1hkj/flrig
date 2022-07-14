@@ -6,13 +6,13 @@
 
 AC_COPYRIGHT([Copyright (C) 2009 Dave Freese, W1HKJ (w1hkj AT w1hkj DOT com)])
 
-AC_PREREQ([2.63])
+AC_PREREQ([2.64])
 
 dnl major and minor must be integers; patch may
 dnl contain other characters or be empty
 m4_define(FLRIG_MAJOR,  [1])
 m4_define(FLRIG_MINOR,  [4])
-m4_define(FLRIG_PATCH,  [.5])
+m4_define(FLRIG_PATCH,  [.5.30])
 
 AC_INIT([FLRIG], FLRIG_MAJOR.FLRIG_MINOR[]FLRIG_PATCH, [w1hkj AT w1hkj DOT com])
 
