@@ -20,6 +20,14 @@
 \image latex transceivers/Flex1500.png "Flex 1500" width=3.75in
 \image html transceivers/Flex1500.png "Flex 1500"
 </center>
+\anchor o_QCXplus
+<center>
+\image latex transceivers/QCXplus.png "QCX+" width=3.75in
+\image html transceivers/QCXplus.png "QCX+"
+\anchor o_SunSDR2
+<center>
+\image latex transceivers/SunSDR2.png "SunSDR2 Pro" width=5.0in
+\image html transceivers/SunSDR2.png "SunSDR2 Pro"
 \anchor o_Xiegu-5105
 <center>
 \image latex transceivers/Xiegu-5105.png "Xiegu-5105" width=3.75in

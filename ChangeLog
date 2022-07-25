@@ -1,6 +1,42 @@
-2022-03-25  dave-w1hkj  <w1hkj@bellsouth.net>
+2022-07-25  dave-w1hkj  <w1hkj@bellsouth.net>
 
-	da52823a: Version 1.4.5
+	cf2a0a25: Version 1.4.6
+	f84403b6: IC9700 satellite support
+	8de27635: Yaesu microphone gain
+	69af2938: Icom mode_type
+	8f8c1569: Yaesu split
+	bba23c7d: SunSDR2 CW bandwidths
+
+2022-07-01  Andrew Hart  <andylhart@gmail.com>
+
+	b6c69cdc: IC7600 mods
+
+2022-05-29  dave-w1hkj  <w1hkj@bellsouth.net>
+
+	f841d124: 7300 FM CW
+	b5555ab1: CW keyer enhancements
+	0abb7fc8: fsk fixes
+	d19ce45e: QCX+
+	3a999275: SunSDR2 tci bandwidth
+	f7fd5260: FTdx10 Power out
+	f14dba5b: Vd / Idd metering
+	09dae3d7: FT101DxMP voltage scale
+	c281d657: X6100 / G90
+	65064a3b: SunSDR2
+	c0a410fc: Serial trace
+
+2022-04-10  Joe Attili (AA2IL)  <joeattili@gmail.com>
+
+	e1321823: FT991A/FTdx3000 mods
+
+2022-04-06  dave-w1hkj  <w1hkj@bellsouth.net>
+
+	f4bd6b94: Compression
+	b5e81e4f: TS570 Split
+	fb320437: pts ports
+	7a4f1123: FT450/D
+	e0f35f78: FT817 defaults
+	e299604d: Version 1.4.5
 
 2022-03-25  Black Michael  <mdblack98@yahoo.com>
 
