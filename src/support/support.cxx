@@ -1448,9 +1448,6 @@ tci_trace(2, "State 1", printXCVR_STATE(vfoA).c_str());
 			selrig->get_modeA();
 			set_bandwidth_control();
 			vfoA.iBW = selrig->get_bwA();
-			if (m1.find("CW") != std::string::npos ||
-				m2.find("CW") != std::string::npos)
-				vfoA.freq = nuvals.freq = selrig->get_vfoA();
 		}
 	}
 	if (vfoA.iBW != nuvals.iBW) {
@@ -1537,9 +1534,6 @@ void serviceB(XCVR_STATE nuvals)
 		selrig->get_modeB();
 		set_bandwidth_control();
 		vfoB.iBW = selrig->get_bwB();
-		if (m1.find("CW") != std::string::npos ||
-			m2.find("CW") != std::string::npos)
-			vfoB.freq = nuvals.freq = selrig->get_vfoB();
 	}
 	if (vfoB.iBW != nuvals.iBW) {
 		selrig->set_bwB(vfoB.iBW = nuvals.iBW);
