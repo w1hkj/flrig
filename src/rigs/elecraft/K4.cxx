@@ -532,7 +532,6 @@ double RIG_K4::get_power_control()
 	if (p == std::string::npos) return progStatus.power_level;
 	int level = fm_decimal(replystr.substr(p+2), 3);
 	if (replystr[5] == 'L') return level / 10.0;
-        pmeter.clear();
 	return level;
 }
 
