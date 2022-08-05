@@ -316,9 +316,9 @@ const char *RIG_K4::agc_label()
 int  RIG_K4::get_agc()
 {
 	cmd = "GT;";
-	wait_char(';', 6, 100, "get AGC", ASC);
+	wait_char(';', 4, 100, "get AGC", ASC);
 	gett("get agc");
-	size_t p = replystr.rfind("GT$");
+	size_t p = replystr.rfind("GT");
 	if (p == std::string::npos) return agcval;
 	switch (replystr[p+2]) {
 		default:
@@ -579,7 +579,7 @@ int RIG_K4::get_rf_gain()
 {
 	cmd = "RG;";
 	get_trace(1, "get rf gain");
-	wait_char(';', 7, K4_WAIT_TIME, "get RF gain", ASC);
+	wait_char(';', 6, K4_WAIT_TIME, "get RF gain", ASC);
 	gett("");
 
 	size_t p = replystr.rfind("RG-");
@@ -587,6 +587,8 @@ int RIG_K4::get_rf_gain()
 
 	replystr[p + 5] = 0;
 	int v = atoi(&replystr[p + 3]);
+//	progStatus.rfgain = v;
+//	Fl::awake(updateRFgain, (void*)0);
 	return v;
 }
 
