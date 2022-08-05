@@ -774,7 +774,7 @@ int RIG_K4::get_bwB()
 
 int RIG_K4::get_power_out()
 {
-	cmd = "PCX;"; // responds BGnn; 0 < nn < 10
+	cmd = "PCX;";
 	get_trace(1, "get power out");
 	wait_char(';', 7, K4_WAIT_TIME, "get power out", ASC);
 	gett("");
