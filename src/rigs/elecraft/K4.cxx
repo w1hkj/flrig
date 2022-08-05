@@ -59,8 +59,6 @@ static GUI k4_widgets[]= {
 	{ (Fl_Widget *)NULL, 0, 0, 0 }
 };
 
-static int powerScale = 1;
-
 int RIG_K4::power_scale()
 {
 	return powerScale;
@@ -530,17 +528,15 @@ void RIG_K4::set_power_control(double val)
 
 double RIG_K4::get_power_control()
 {
-	cmd = "PC;";
+	cmd = "PCX;";
 	get_trace(1, "get power control");
-	wait_char(';', 7, K4_WAIT_TIME, "get power level", ASC);
+	wait_char(';', 8, K4_WAIT_TIME, "get power level", ASC);
 	gett("");
 
-	size_t p = replystr.rfind("PC");
+	size_t p = replystr.rfind("PCX");
 	if (p == std::string::npos) return progStatus.power_level;
-	int level = fm_decimal(replystr.substr(p+2), 3);
-//	if (replystr[5] == 'L') return level / 10.0;
-        if (replystr[5] == 'L') powerScale = 10;
-        else powerScale = 1;
+	int level = fm_decimal(replystr.substr(p+3), 4);
+	if (replystr[5] == 'L') return level / 10.0;
 	return level;
 }
 
@@ -778,16 +774,19 @@ int RIG_K4::get_bwB()
 
 int RIG_K4::get_power_out()
 {
-	cmd = "BG;"; // responds BGnn; 0 < nn < 10
+	cmd = "PCX;"; // responds BGnn; 0 < nn < 10
 	get_trace(1, "get power out");
-	wait_char(';', 5, K4_WAIT_TIME, "get power out", ASC);
+	wait_char(';', 7, K4_WAIT_TIME, "get power out", ASC);
 	gett("");
 
-	size_t p = replystr.rfind("BG");
+	size_t p = replystr.rfind("PC");
 	if (p == std::string::npos) return 0;
-	replystr[p + 4] = 0;
-	int mtr = atoi(&replystr[p + 2]) * 10;
-	if (mtr > 100) mtr = 100;
+        if ( replystr[6] == 'L') powerScale = 10;
+		else powerScale = 1;
+	replystr[p + 6] = 0;
+	int mtr = atoi(&replystr[p + 2]);
+//	if (mtr > 100) mtr = 100;
+// printf("Power = %d\n", mtr);
 	return mtr;
 }
 
