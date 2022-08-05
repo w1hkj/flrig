@@ -858,11 +858,12 @@ void RIG_K4::set_pbt_values(int val)
 
 void RIG_K4::set_if_shift(int val)
 {
-	cmd = "IS 0000;";
-	cmd[6] += val % 10; val /= 10;
+	cmd = "IS0000;";
+        val /= 10;
 	cmd[5] += val % 10; val /= 10;
 	cmd[4] += val % 10; val /= 10;
-	cmd[3] += val % 10;
+	cmd[3] += val % 10; val /= 10;
+	cmd[2] += val % 10;
 
 	set_trace(1, "set if shift");
 	sendCommand(cmd);
@@ -873,12 +874,12 @@ bool RIG_K4::get_if_shift(int &val)
 {
 	cmd = "IS;";
 	get_trace(1, "get if shift");
-	wait_char(';', 8, K4_WAIT_TIME, "get IF shift", ASC);
+	wait_char(';', 7, K4_WAIT_TIME, "get IF shift", ASC);
 	gett("");
 
-	val = progStatus.shift_val;
+	val = progStatus.shift_val*10;
 
-	size_t p = replystr.rfind("IS ");
+	size_t p = replystr.rfind("IS");
 	if (p == std::string::npos) return progStatus.shift;
 	sscanf(&replystr[p + 3], "%d", &progStatus.shift_val);
 	val = progStatus.shift_val;
