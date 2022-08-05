@@ -59,6 +59,13 @@ static GUI k4_widgets[]= {
 	{ (Fl_Widget *)NULL, 0, 0, 0 }
 };
 
+static int powerScale = 1;
+
+int RIG_K4::power_scale()
+{
+	return powerScale;
+}
+
 RIG_K4::RIG_K4() {
 // base class values
 	name_ = K4name_;
@@ -531,7 +538,9 @@ double RIG_K4::get_power_control()
 	size_t p = replystr.rfind("PC");
 	if (p == std::string::npos) return progStatus.power_level;
 	int level = fm_decimal(replystr.substr(p+2), 3);
-	if (replystr[5] == 'L') return level / 10.0;
+//	if (replystr[5] == 'L') return level / 10.0;
+        if (replystr[5] == 'L') powerScale = 10;
+        else powerScale = 1;
 	return level;
 }
 
