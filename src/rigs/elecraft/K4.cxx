@@ -94,7 +94,7 @@ RIG_K4::RIG_K4() {
 
 	has_split_AB =
 	has_micgain_control =
-	has_rf_control =
+	has_rf_control = true;
 	has_bandwidth_control =
 	has_power_control =
 	has_volume_control =
@@ -582,13 +582,11 @@ int RIG_K4::get_rf_gain()
 	wait_char(';', 6, K4_WAIT_TIME, "get RF gain", ASC);
 	gett("");
 
-	size_t p = replystr.rfind("RG-");
+	size_t p = replystr.rfind("RG");
 	if (p == std::string::npos) return progStatus.rfgain;
 
 	replystr[p + 5] = 0;
-	int v = atoi(&replystr[p + 3]);
-//	progStatus.rfgain = v;
-//	Fl::awake(updateRFgain, (void*)0);
+	int v = atoi(&replystr[p + 2]);
 	return v;
 }
 
