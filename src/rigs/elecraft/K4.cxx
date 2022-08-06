@@ -394,8 +394,8 @@ int RIG_K4::get_modeB()
 	wait_char(';', 4, K4_WAIT_TIME, "get mode B", ASC);
 	gett("");
 
-	size_t p = replystr.rfind("MD");
-	if (replystr[p+2] == '0' || replystr[p+2] == '8') return modeB;
+	size_t p = replystr.rfind("MD$");
+	if (replystr[p+3] == '0' || replystr[p+3] == '8') return modeB;
 	if (p == std::string::npos) return modeB;
 
 	int md = replystr[p + 3] - '1';
@@ -703,7 +703,7 @@ int RIG_K4::get_noise()
 
 void RIG_K4::set_bwA(int val)
 {
-	cmd = "BW$";
+	cmd = "BW";
 	bwA = val;
 	std::string w = K4_widths[val];
 	w.erase(w.length() - 1);
@@ -717,15 +717,15 @@ void RIG_K4::set_bwA(int val)
 
 int RIG_K4::get_bwA()
 {
-	cmd = "BW$;";
+	cmd = "BW;";
 	get_trace(1, "get bwA");
-	wait_char(';', 8, K4_WAIT_TIME, "get bandwidth A", ASC);
+	wait_char(';', 7, K4_WAIT_TIME, "get bandwidth A", ASC);
 	gett("");
 
-	size_t p = replystr.rfind("BW$");
+	size_t p = replystr.rfind("BW");
 	if (p == std::string::npos) return bwA;
 
-	std::string w = replystr.substr(3);
+	std::string w = replystr.substr(2);
 	w[w.length() -1] = '0';
 	while (w[0] == '0') w.erase(0, 1);
 
@@ -754,7 +754,7 @@ void RIG_K4::set_bwB(int val)
 int RIG_K4::get_bwB()
 {
 	cmd = "BW$;";
-	get_trace(1, "get bwA");
+	get_trace(1, "get bwB");
 	wait_char(';', 8, K4_WAIT_TIME, "get bandwidth B", ASC);
 	gett("");
 
