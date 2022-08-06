@@ -32,6 +32,8 @@ public:
 
 	bool check();
 
+	int power_scale();
+
 	unsigned long int get_vfoA();
 	void set_vfoA(unsigned long int);
 	unsigned long int get_vfoB();
