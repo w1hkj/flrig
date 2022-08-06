@@ -567,7 +567,8 @@ void RIG_K4::get_pc_min_max_step(double &min, double &max, double &step)
 		maxpwr = 110.0;
 		steppwr = 1.0;
 	}
-   min = minpwr; max = maxpwr; step = steppwr;
+
+	min = minpwr; max = maxpwr; step = steppwr;
 }
 
 // Transceiver rf control
