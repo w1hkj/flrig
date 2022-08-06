@@ -514,11 +514,19 @@ void RIG_K4::set_power_control(double val)
 {
 	int ival = val;
 	cmd = "PC000";
-	for (int i = 4; i > 1; i--) {
-		cmd[i] += ival % 10;
-		ival /= 10;
+        if (ival > 10) {
+		for (int i = 4; i > 1; i--) {
+			cmd[i] += ival % 10;
+			ival /= 10;
+		}
+	} else {
+		for (int i = 3; i > 1; i--) {
+			cmd[i] += ival % 10;
+			ival /= 10;
+		}
 	}
-	if (max_power == 110) cmd.append("H;");
+
+	if ((int)val > 10) cmd.append("H;");
 	else cmd.append("L;");
 	set_trace(1, "set power control");
 	sendCommand(cmd);
