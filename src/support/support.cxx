@@ -49,6 +49,7 @@
 #include "rigs.h"
 #include "K3_ui.h"
 #include "KX3_ui.h"
+#include "K4_ui.h"
 #include "rigpanel.h"
 #include "tod_clock.h"
 #include "trace.h"
@@ -985,7 +986,7 @@ void update_power_control(void *d)
 {
 	double min, max, step;
 
-	if (xcvr_name == rig_K2.name_ || xcvr_name == rig_KX3.name_) {
+	if (xcvr_name == rig_K2.name_ || xcvr_name == rig_KX3.name_ || xcvr_name == rig_K4.name_) {
 		guard_lock serial(&mutex_serial);
 		selrig->get_pc_min_max_step(min, max, step);
 
