@@ -35,7 +35,7 @@ private:
 	int  active_bandwidth;
 	bool rxtxa;
 public:
-enum TS590MODES { LSB, USB, CW, FM, AM, FSK, CWR, FSKR, LSBD, USBD, FMD };
+enum TS590SMODES { LSB, USB, CW, FM, AM, FSK, CWR, FSKR, LSBD, USBD, FMD, AMD };
 	RIG_TS590S();
 	~RIG_TS590S(){}
 	

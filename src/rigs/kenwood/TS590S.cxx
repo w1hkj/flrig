@@ -28,14 +28,14 @@ static const char TS590Sname_[] = "TS-590S";
 
 static const char *TS590Smodes_[] = {
 "LSB", "USB",  "CW", "FM", "AM", "FSK", "CW-R", "FSK-R", 
-"LSB-D", "USB-D", "FM-D", NULL};
+"LSB-D", "USB-D", "FM-D", "AM-D", NULL};
 
 static const char TS590S_mode_chr[] =  { 
 '1', '2', '3', '4', '5', '6', '7', '9',
-'1', '2', '4' };
+'1', '2', '4', '5' };
 static const char TS590S_mode_type[] = { 
 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'U', 
-'L', 'U', 'U' };
+'L', 'U', 'U', 'U' };
 
 //----------------------------------------------------------------------
 static const char *TS590S_empty[] = { "N/A", NULL };
@@ -270,10 +270,10 @@ const char * RIG_TS590S::get_bwname_(int n, int md)
 		int lo = n & 0xFF;
 		snprintf(bwname, sizeof(bwname), "%s/%s",
 			(md == LSB || md == USB || md == FM) ? TS590S_SSB_SL[lo] :
-			(md == AM) ? TS590S_AM_SL[lo] :
+			(md == AM || md == AMD) ? TS590S_AM_SL[lo] :
 			TS590S_DATA_width[lo],
 			(md == LSB || md == USB || md == FM) ? TS590S_SSB_SH[hi] :
-			(md == AM) ? TS590S_AM_SH[hi] :
+			(md == AM || md == AMD) ? TS590S_AM_SH[hi] :
 			TS590S_DATA_shift[hi] );
 	} else {
 		snprintf(bwname, sizeof(bwname), "%s",
@@ -395,17 +395,20 @@ void RIG_TS590S::set_modeA(int val)
 	cmd += TS590S_mode_chr[val];
 	cmd += ';';
 	sendCommand(cmd, 0);
+	set_trace(2, "set_mode A", cmd.c_str());
 	showresp(ERR, ASC, "set mode A", cmd, "");
-	if ( val == LSBD || val == USBD || val == FMD) {
+	if ( val == LSBD || val == USBD || val == FMD || val == AMD) {
 		data_mode = true;
 		cmd = "DA1;";
 		sendCommand(cmd, 0);
 		showresp(WARN, ASC, "set data A", cmd, "");
-	} else if (val == LSB || val == USB || val == FM) {
+		set_trace(2, "set data mode", cmd.c_str());
+	} else if (val == LSB || val == USB || val == FM || val == AM) {
 		data_mode = false;
 		cmd = "DA0;";
 		sendCommand(cmd, 0);
 		showresp(WARN, ASC, "set data A", cmd, "");
+		set_trace(2, "set data mode", cmd.c_str());
 	}
 	set_widths(val);
 }
@@ -434,9 +437,9 @@ int RIG_TS590S::get_modeA()
 		default : md = A.imode;
 	}
 
-	if (md == LSB || md == USB || md == FM) {
+	if (md == LSB || md == USB || md == FM || md == AM) {
 		cmd = "DA;";
-		get_trace(1, "get_dataB");
+		get_trace(1, "get_dataA");
 		ret = wait_char(';', 4, 100, "get data A", ASC);
 		gett("");
 		if (ret < 4) return A.imode;
@@ -448,6 +451,7 @@ int RIG_TS590S::get_modeA()
 			if (md == LSB) md = LSBD;
 			else if (md == USB) md = USBD;
 			else if (md == FM) md = FMD;
+			else if (md == AM) md = AMD;
 		}
 	}
 	if (md != A.imode) {
@@ -465,12 +469,12 @@ void RIG_TS590S::set_modeB(int val)
 	cmd += ';';
 	sendCommand(cmd, 0);
 	showresp(WARN, ASC, "set mode B", cmd, "");
-	if ( val == LSBD || val == USBD || val == FMD) {
+	if ( val == LSBD || val == USBD || val == FMD || val == AMD) {
 		data_mode = true;
 		cmd = "DA1;";
 		sendCommand(cmd, 0);
 		showresp(WARN, ASC, "set data B", cmd, "");
-	} else if (val == LSB || val == USB || val == FM) {
+	} else if (val == LSB || val == USB || val == FM || val == AM) {
 		cmd = "DA0;";
 		sendCommand(cmd, 0);
 		showresp(WARN, ASC, "set data B", cmd, "");
@@ -502,7 +506,7 @@ int RIG_TS590S::get_modeB()
 		default : md = B.imode;
 	}
 
-	if (md == LSB || md == USB || md == FM) {
+	if (md == LSB || md == USB || md == FM || md == AM) {
 		cmd = "DA;";
 		get_trace(1, "get_dataB");
 		ret = wait_char(';', 4, 100, "get dataB", ASC);
@@ -516,6 +520,7 @@ int RIG_TS590S::get_modeB()
 			if (md == LSB) md = LSBD;
 			else if (md == USB) md = USBD;
 			else if (md == FM) md = FMD;
+			else if (md == AM) md = AMD;
 		}
 	}
 	if (md != B.imode) {
@@ -551,7 +556,7 @@ int RIG_TS590S::set_widths(int val)
 		dsp_SL = TS590S_empty;
 		dsp_SH = TS590S_empty;
 		bw = 1;
-	} else if (val == AM) {
+	} else if (val == AM || val == AMD) {
 		bandwidths_ = TS590S_AM_SH;
 		dsp_SL = TS590S_AM_SL;
 		dsp_SH = TS590S_AM_SH;
@@ -583,7 +588,7 @@ const char **RIG_TS590S::bwtable(int m)
 		return TS590S_CWwidths;
 	else if (m == FSK || m == FSKR)
 		return TS590S_FSKwidths;
-	else if (m == AM)
+	else if (m == AM || m == AMD)
 		return TS590S_AM_SH;
 	else
 		return TS590S_DATA_width;
@@ -593,7 +598,7 @@ const char **RIG_TS590S::lotable(int m)
 {
 	if (m == LSB || m == USB || m == FM || m == FMD)
 		return TS590S_SSB_SL;
-	else if (m == AM)
+	else if (m == AM || m == AMD)
 		return TS590S_AM_SL;
 	else if (m == LSBD || m == USBD)
 		return TS590S_DATA_shift;
@@ -605,7 +610,7 @@ const char **RIG_TS590S::hitable(int m)
 {
 	if (m == LSB || m == USB || m == FM || m == FMD)
 		return TS590S_SSB_SH;
-	else if (m == AM)
+	else if (m == AM || m == AMD)
 		return TS590S_AM_SH;
 	else if (m == LSBD || m == USBD)
 		return TS590S_DATA_width;
@@ -659,7 +664,7 @@ void RIG_TS590S::set_bwA(int val)
 		return;
 	}
 // AM
-	if (A.imode == AM) {
+	if (A.imode == AM || A.imode == AMD) {
 		if (val < 256) return;
 		A.iBW = val;
 		cmd = TS590S_CAT_am_SL[A.iBW & 0x7F];
@@ -713,7 +718,7 @@ void RIG_TS590S::set_bwB(int val)
 		showresp(WARN, ASC, "set width", cmd, "");
 		return;
 	}
-	if (B.imode == AM) {
+	if (B.imode == AM || B.imode == AMD) {
 		if (val < 256) return;
 		B.iBW = val;
 		cmd = TS590S_AM_SL[B.iBW & 0x7F];
