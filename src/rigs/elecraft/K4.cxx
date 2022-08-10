@@ -846,7 +846,7 @@ int RIG_K4::get_split()
 
 void RIG_K4::set_pbt_values(int val)
 {
-	switch (progStatus.imode_A) {
+	switch (val) {
 		case 0 :
 		case 1 :
 		case 3 :
