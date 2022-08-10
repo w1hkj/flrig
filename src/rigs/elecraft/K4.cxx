@@ -116,7 +116,7 @@ RIG_K4::RIG_K4() {
 	if_shift_min = 300;
 	if_shift_max = 3000;
 	if_shift_step = 10;
-	if_shift_mid = 1500;
+	if_shift_mid = 300;
 
 	precision = 1;
 	ndigits = 8;
@@ -852,17 +852,17 @@ void RIG_K4::set_pbt_values(int val)
 		case 3 :
 		case 4 :
 			if_shift_min = 300; if_shift_max = 3000;
-			if_shift_step = 10; if_shift_mid = 1500;
+			if_shift_step = 10; if_shift_mid = 300;
 			break;
 		case 2 :
 		case 6 :
 			if_shift_min = 300; if_shift_max = 2000;
-			if_shift_step = 10; if_shift_mid = 1000;
+			if_shift_step = 10; if_shift_mid = 300;
 			break;
 		case 5 :
 		case 7 :
 			if_shift_min = 300; if_shift_max = 3000;
-			if_shift_step = 10; if_shift_mid = 1500;
+			if_shift_step = 10; if_shift_mid = 300;
 			break;
 	}
 
