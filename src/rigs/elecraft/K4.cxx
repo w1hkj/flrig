@@ -113,8 +113,8 @@ RIG_K4::RIG_K4() {
 	has_tune_control =
 	has_swr_control = false;
 
-	if_shift_min = 400;
-	if_shift_max = 2600;
+	if_shift_min = 300;
+	if_shift_max = 3000;
 	if_shift_step = 10;
 	if_shift_mid = 1500;
 
@@ -722,6 +722,8 @@ void RIG_K4::set_bwA(int val)
 	set_trace(1, "set bwA");
 	sendCommand(cmd);
 	sett("");
+	set_pbt_values(val);
+
 }
 
 int RIG_K4::get_bwA()
@@ -758,6 +760,8 @@ void RIG_K4::set_bwB(int val)
 	set_trace(1, "set bwB");
 	sendCommand(cmd);
 	sett("");
+	set_pbt_values(val);
+
 }
 
 int RIG_K4::get_bwB()
@@ -842,25 +846,26 @@ int RIG_K4::get_split()
 
 void RIG_K4::set_pbt_values(int val)
 {
-	switch (val) {
+	switch (progStatus.imode_A) {
 		case 0 :
 		case 1 :
 		case 3 :
 		case 4 :
-			if_shift_min = 400; if_shift_max = 2600;
+			if_shift_min = 300; if_shift_max = 3000;
 			if_shift_step = 10; if_shift_mid = 1500;
 			break;
 		case 2 :
 		case 6 :
-			if_shift_min = 300; if_shift_max = 1300;
-			if_shift_step = 10; if_shift_mid = 800;
+			if_shift_min = 300; if_shift_max = 2000;
+			if_shift_step = 10; if_shift_mid = 1000;
 			break;
 		case 5 :
 		case 7 :
-			if_shift_min = 100; if_shift_max = 2100;
-			if_shift_step = 10; if_shift_mid = 1000;
+			if_shift_min = 300; if_shift_max = 3000;
+			if_shift_step = 10; if_shift_mid = 1500;
 			break;
 	}
+
 	progStatus.shift_val = if_shift_mid;
 	Fl::awake(adjust_if_shift_control, (void *)0);
 }
@@ -886,12 +891,10 @@ bool RIG_K4::get_if_shift(int &val)
 	wait_char(';', 7, K4_WAIT_TIME, "get IF shift", ASC);
 	gett("");
 
-	val = progStatus.shift_val*10;
-
 	size_t p = replystr.rfind("IS");
 	if (p == std::string::npos) return progStatus.shift;
 	sscanf(&replystr[p + 3], "%d", &progStatus.shift_val);
-	val = progStatus.shift_val;
+	val = progStatus.shift_val*10;
 	if (val == if_shift_mid) progStatus.shift = false;
 	else progStatus.shift = true;
 	return progStatus.shift;
@@ -904,12 +907,6 @@ void RIG_K4::get_if_min_max_step(int &min, int &max, int &step)
 
 void  RIG_K4::get_if_mid()
 {
-	cmd = "IS 9999;";
-	set_trace(1, "set if mid");
-	sendCommand(cmd);
-	sett("");
-	showresp(INFO, ASC, "center pbt", cmd, replystr);
-
 	cmd = "IS;";
 	get_trace(1, "get center pbt");
 	wait_char(';', 8, 500, "get PBT center", ASC);
