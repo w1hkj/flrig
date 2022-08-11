@@ -24,6 +24,8 @@
 #include "rigbase.h"
 
 class RIG_K4 : public rigbase {
+protected:
+	bool K4split;
 public:
 	RIG_K4();
 	~RIG_K4(){}
@@ -86,7 +88,9 @@ public:
 	void set_bwB(int val);
 	int  get_bwB();
 	int  get_power_out();
-
+        void selectA();
+        void selectB();
+	
 	int  get_agc();
 	void set_agc_level(int);
 	const char *agc_label();

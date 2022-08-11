@@ -872,13 +872,21 @@ void RIG_K4::set_pbt_values(int val)
 
 void RIG_K4::set_if_shift(int val)
 {
-	cmd = "IS0000;";
-        val /= 10;
-	cmd[5] += val % 10; val /= 10;
-	cmd[4] += val % 10; val /= 10;
-	cmd[3] += val % 10; val /= 10;
-	cmd[2] += val % 10;
-
+        if (isOnA()) {
+		cmd = "IS0000;";
+        	val /= 10;
+		cmd[5] += val % 10; val /= 10;
+		cmd[4] += val % 10; val /= 10;
+		cmd[3] += val % 10; val /= 10;
+		cmd[2] += val % 10;
+	} else {
+		cmd = "IS$0000;";
+        	val /= 10;
+		cmd[6] += val % 10; val /= 10;
+		cmd[5] += val % 10; val /= 10;
+		cmd[4] += val % 10; val /= 10;
+		cmd[3] += val % 10;
+	}
 	set_trace(1, "set if shift");
 	sendCommand(cmd);
 	sett("");
@@ -886,15 +894,25 @@ void RIG_K4::set_if_shift(int val)
 
 bool RIG_K4::get_if_shift(int &val)
 {
-	cmd = "IS;";
-	get_trace(1, "get if shift");
-	wait_char(';', 7, K4_WAIT_TIME, "get IF shift", ASC);
-	gett("");
-
-	size_t p = replystr.rfind("IS");
-	if (p == std::string::npos) return progStatus.shift;
-	sscanf(&replystr[p + 3], "%d", &progStatus.shift_val);
-	val = progStatus.shift_val*10;
+	if (isOnA()) {
+		cmd = "IS;";
+		get_trace(1, "get if shift");
+		wait_char(';', 7, K4_WAIT_TIME, "get IF shift", ASC);
+		gett("");
+		size_t p = replystr.rfind("IS");
+		if (p == std::string::npos) return progStatus.shift;
+		sscanf(&replystr[p + 3], "%d", &progStatus.shift_val);
+		val = progStatus.shift_val*10;
+	} else {
+		cmd = "IS$;";
+		get_trace(1, "get if shift");
+		wait_char(';', 8, K4_WAIT_TIME, "get IF shift", ASC);
+		gett("");
+		size_t p = replystr.rfind("IS$");
+		if (p == std::string::npos) return progStatus.shift;
+		sscanf(&replystr[p + 4], "%d", &progStatus.shift_val);
+		val = progStatus.shift_val*10;
+	}
 	if (val == if_shift_mid) progStatus.shift = false;
 	else progStatus.shift = true;
 	return progStatus.shift;
@@ -916,3 +934,32 @@ void  RIG_K4::get_if_mid()
 	if (p == std::string::npos) return;
 	sscanf(&replystr[p + 3], "%d", &if_shift_mid);
 }
+
+void RIG_K4::selectA()
+{
+        if (!isOnA()) {
+	        cmd = "SW83;SW44;";
+	        set_trace(1, "selectA");
+	        sendCommand(cmd);
+	        sett("");
+
+	        K4split = false;
+	        showresp(WARN, ASC, "select A", cmd, replystr);
+	        inuse = onA;
+	}
+}
+
+void RIG_K4::selectB()
+{
+	if (!isOnB()) {
+	        cmd = "SW83;SW44;";
+		set_trace(1, "selectB");
+	        sendCommand(cmd);
+	        sett("");
+
+	        K4split = false;
+	        showresp(WARN, ASC, "select B", cmd, replystr);
+	        inuse = onB;
+	}
+}
+
