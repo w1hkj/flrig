@@ -329,8 +329,8 @@ void RIG_K4::get_vol_min_max_step(double &min, double &max, double &step)
 
 
 //----------------------------------------------------------------------
-static const char *agcstrs[] = {"AGC", "AGC-S", "AGC-F"};
-static int agcval = 0;
+static const char *agcstrs[] = {"AGC", "AG-S", "AG-F"};
+static int agcval = 1;
 
 const char *RIG_K4::agc_label()
 {
@@ -378,9 +378,9 @@ void  RIG_K4::set_agc_level(int val)
 		cmd = "GT0;";
 		switch (val) {
 			default:
-			case '0': break;
-			case '1': nb_label("AGC S", true); cmd[2] = '1'; break;
-			case '2': nb_label("AGC F", true); cmd[2] = '2'; break;
+			case '0': nb_label("AGC", false); cmd[2] = '0'; break;
+			case '1': nb_label("AG-S", true); cmd[2] = '1'; break;
+			case '2': nb_label("AG-F", true); cmd[2] = '2'; break;
 		}
 		set_trace(1, "set agc");
 		sendCommand(cmd);
@@ -390,9 +390,9 @@ void  RIG_K4::set_agc_level(int val)
 		cmd = "GT$0;";
 		switch (val) {
 			default:
-			case '0': break;
-			case '1': nb_label("AGC S", true); cmd[3] = '1'; break;
-			case '2': nb_label("AGC F", true); cmd[3] = '2'; break;
+			case '0': nb_label("AGC", false); cmd[3] = '0'; break;
+			case '1': nb_label("AG-S", true); cmd[3] = '1'; break;
+			case '2': nb_label("AG-F", true); cmd[3] = '2'; break;
 		}
 		set_trace(1, "set agc");
 		sendCommand(cmd);
@@ -404,8 +404,8 @@ void  RIG_K4::set_agc_level(int val)
 int RIG_K4::incr_agc()
 {
 	static const char ch[] = {'0', '1', '2'};
-	static int agcvalA = 0;
-        static int agcvalB = 0;
+	static int agcvalA = 1;
+        static int agcvalB = 1;
 
 	if (isOnA()) {
 	        agcvalA++;
@@ -416,6 +416,7 @@ int RIG_K4::incr_agc()
 	        sendCommand(cmd);
 	        showresp(WARN, ASC, "SET agc", cmd, replystr);
 	        sett("set_agc");
+		agcval = agcvalA;
 		return agcvalA;
 	} else {
 	        agcvalB++;
@@ -426,6 +427,7 @@ int RIG_K4::incr_agc()
 	        sendCommand(cmd);
 	        showresp(WARN, ASC, "SET agc", cmd, replystr);
 	        sett("set_agc");
+		agcval = agcvalB;
 		return agcvalB;
 	}
 }
