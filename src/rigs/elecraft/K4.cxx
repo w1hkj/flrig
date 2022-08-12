@@ -96,14 +96,14 @@ RIG_K4::RIG_K4() {
 	has_micgain_control =
 	has_rf_control = true;
 	has_bandwidth_control =
-	has_power_control =
+	has_power_control = true;
 	has_volume_control =
 	has_mode_control =
 	has_ptt_control =
 	has_noise_control =
 	has_attenuator_control =
 	has_smeter =
-	has_power_out =
+	has_power_out = true;
 	has_split =
 	has_ifshift_control =
 	has_preamp_control = true;
@@ -147,6 +147,8 @@ void RIG_K4::initialize()
 	k4_widgets[4].W = sldrIFSHIFT;
 	k4_widgets[5].W = sldrMICGAIN;
 	k4_widgets[6].W = sldrPOWER;
+
+	powerScale = 1;
 
 	cmd = "AI0;"; // disable auto-info
 	set_trace(1, "disable auto info");
@@ -536,16 +538,20 @@ void RIG_K4::set_power_control(double val)
 
 double RIG_K4::get_power_control()
 {
-	cmd = "PCX;";
-	get_trace(1, "get power control");
-	wait_char(';', 8, K4_WAIT_TIME, "get power level", ASC);
-	gett("");
+        cmd = "PCX;";
+        get_trace(1, "get power control");
+        wait_char(';', 8, K4_WAIT_TIME, "get power level", ASC);
+        gett("");
 
-	size_t p = replystr.rfind("PCX");
-	if (p == std::string::npos) return progStatus.power_level;
-	int level = fm_decimal(replystr.substr(p+3), 4);
-	if (replystr[5] == 'L') return level / 10.0;
-	return level;
+        size_t p = replystr.rfind("PCX");
+        if (p == std::string::npos) return progStatus.power_level;
+        int level = fm_decimal(replystr.substr(p+3), 4);
+        if (replystr[5] == 'L') {
+                powerScale = 10;
+                return level / 10.0;
+        }
+        powerScale = 1;
+        return level;
 }
 
 void RIG_K4::get_pc_min_max_step(double &min, double &max, double &step)
@@ -787,20 +793,15 @@ int RIG_K4::get_bwB()
 
 int RIG_K4::get_power_out()
 {
-	cmd = "PCX;";
-	get_trace(1, "get power out");
-	wait_char(';', 7, K4_WAIT_TIME, "get power out", ASC);
-	gett("");
+        cmd = "TM;";
+        get_trace(1, "get power out");
+        wait_char(';', 15, K4_WAIT_TIME, "get power out", ASC);
+        gett("");
 
-	size_t p = replystr.rfind("PC");
-	if (p == std::string::npos) return 0;
-        if ( replystr[6] == 'L') powerScale = 10;
-		else powerScale = 1;
-	replystr[p + 6] = 0;
-	int mtr = atoi(&replystr[p + 2]);
-//	if (mtr > 100) mtr = 100;
-// printf("Power = %d\n", mtr);
-	return mtr;
+        size_t p = replystr.rfind("TM");
+        if (p == std::string::npos) return progStatus.power_level;
+        int level = fm_decimal(replystr.substr(p+8), 3);
+        return level;
 }
 
 bool RIG_K4::can_split()
@@ -943,7 +944,7 @@ void RIG_K4::selectA()
 	        sendCommand(cmd);
 	        sett("");
 
-	        K4split = false;
+//	        K4split = false;
 	        showresp(WARN, ASC, "select A", cmd, replystr);
 	        inuse = onA;
 	}
@@ -957,7 +958,7 @@ void RIG_K4::selectB()
 	        sendCommand(cmd);
 	        sett("");
 
-	        K4split = false;
+//	        K4split = false;
 	        showresp(WARN, ASC, "select B", cmd, replystr);
 	        inuse = onB;
 	}
