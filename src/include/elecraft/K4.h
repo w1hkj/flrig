@@ -92,6 +92,7 @@ public:
         void selectB();
 	
 	int  get_agc();
+	int  incr_agc();
 	void set_agc_level(int);
 	const char *agc_label();
 

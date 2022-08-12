@@ -273,27 +273,52 @@ void RIG_K4::set_vfoB (unsigned long int freq)
 // Volume control
 void RIG_K4::set_volume_control(int val)
 {
-	cmd = "AG000;";
-	cmd[4] += val % 10; val /= 10;
-	cmd[3] += val % 10; val /= 10;
-	cmd[2] += val % 10;
+	if (isOnA()) {
+		cmd = "AG000;";
+		cmd[4] += val % 10; val /= 10;
+		cmd[3] += val % 10; val /= 10;
+		cmd[2] += val % 10;
 
-	set_trace(1, "set volume");
-	sendCommand(cmd);
-	sett("");
+		set_trace(1, "set volume");
+		sendCommand(cmd);
+		sett("");
+	} else {
+		cmd = "AG$000;";
+		cmd[5] += val % 10; val /= 10;
+		cmd[4] += val % 10; val /= 10;
+		cmd[3] += val % 10;
+
+		set_trace(1, "set volume");
+		sendCommand(cmd);
+		sett("");
+	}
 }
 
 int RIG_K4::get_volume_control()
 {
-	cmd = "AG;";
-	get_trace(1, "get volume control");
-	wait_char(';', 7, K4_WAIT_TIME, "get volume", ASC);
-	gett("");
+	int v;
 
-	size_t p = replystr.rfind("AG");
-	if (p == std::string::npos) return 0;
+	if (isOnA()) {
+		cmd = "AG;";
+		get_trace(1, "get volume control");
+		wait_char(';', 7, K4_WAIT_TIME, "get volume", ASC);
+		gett("");
 
-	int v = atoi(&replystr[p + 3]);
+		size_t p = replystr.rfind("AG");
+		if (p == std::string::npos) return 0;
+
+		v = atoi(&replystr[p + 3]);
+	} else {
+		cmd = "AG$;";
+		get_trace(1, "get volume control");
+		wait_char(';', 8, K4_WAIT_TIME, "get volume", ASC);
+		gett("");
+
+		size_t p = replystr.rfind("AG$");
+		if (p == std::string::npos) return 0;
+
+		v = atoi(&replystr[p + 4]);
+	}
 	return v;
 }
 
@@ -317,16 +342,30 @@ const char *RIG_K4::agc_label()
 
 int  RIG_K4::get_agc()
 {
-	cmd = "GT;";
-	wait_char(';', 4, 100, "get AGC", ASC);
-	gett("get agc");
-	size_t p = replystr.rfind("GT");
-	if (p == std::string::npos) return agcval;
-	switch (replystr[p+2]) {
-		default:
-		case '0': agcval = 0; break;
-		case '1': agcval = 1; break;
-		case '2': agcval = 2; break;
+	if (isOnA()) {
+		cmd = "GT;";
+		wait_char(';', 4, 100, "get AGC", ASC);
+		gett("get agc");
+		size_t p = replystr.rfind("GT");
+		if (p == std::string::npos) return agcval;
+		switch (replystr[p+2]) {
+			default:
+			case '0': agcval = 0; break;
+			case '1': agcval = 1; break;
+			case '2': agcval = 2; break;
+		}
+	} else {
+		cmd = "GT$;";
+		wait_char(';', 5, 100, "get AGC", ASC);
+		gett("get agc");
+		size_t p = replystr.rfind("GT");
+		if (p == std::string::npos) return agcval;
+		switch (replystr[p+3]) {
+			default:
+			case '0': agcval = 0; break;
+			case '1': agcval = 1; break;
+			case '2': agcval = 2; break;
+		}
 	}
 	return agcval;
 }
@@ -334,18 +373,61 @@ int  RIG_K4::get_agc()
 
 void  RIG_K4::set_agc_level(int val)
 {
-	agcval = val;
-	cmd = "GT0;";
-	switch (val) {
-		default:
-		case '0': break;
-		case '1': nb_label("AGC S", true); cmd[2] = '1'; break;
-		case '2': nb_label("AGC F", true); cmd[2] = '2'; break;
+	if (isOnA()) {
+		agcval = val;
+		cmd = "GT0;";
+		switch (val) {
+			default:
+			case '0': break;
+			case '1': nb_label("AGC S", true); cmd[2] = '1'; break;
+			case '2': nb_label("AGC F", true); cmd[2] = '2'; break;
+		}
+		set_trace(1, "set agc");
+		sendCommand(cmd);
+		sett("");
+	} else {
+		agcval = val;
+		cmd = "GT$0;";
+		switch (val) {
+			default:
+			case '0': break;
+			case '1': nb_label("AGC S", true); cmd[3] = '1'; break;
+			case '2': nb_label("AGC F", true); cmd[3] = '2'; break;
+		}
+		set_trace(1, "set agc");
+		sendCommand(cmd);
+		sett("");
 	}
-	set_trace(1, "set agc");
-	sendCommand(cmd);
-	sett("");
 	return;
+}
+
+int RIG_K4::incr_agc()
+{
+	static const char ch[] = {'0', '1', '2'};
+	static int agcvalA = 0;
+        static int agcvalB = 0;
+
+	if (isOnA()) {
+	        agcvalA++;
+	        if (agcvalA > 2) agcvalA = 0;
+	        cmd = "GT0;";
+	     	cmd[2] = ch[agcvalA];
+
+	        sendCommand(cmd);
+	        showresp(WARN, ASC, "SET agc", cmd, replystr);
+	        sett("set_agc");
+		return agcvalA;
+	} else {
+	        agcvalB++;
+	        if (agcvalB > 2) agcvalB = 0;
+	        cmd = "GT$0;";
+	     	cmd[3] = ch[agcvalB];
+
+	        sendCommand(cmd);
+	        showresp(WARN, ASC, "SET agc", cmd, replystr);
+	        sett("set_agc");
+		return agcvalB;
+	}
 }
 
 void RIG_K4::set_modeA(int val)
@@ -580,28 +662,54 @@ void RIG_K4::get_pc_min_max_step(double &min, double &max, double &step)
 // Transceiver rf control
 void RIG_K4::set_rf_gain(int val)
 {
-	int ival = abs(val);
-	cmd = "RG-00;";
-	cmd[3] += ival / 10;
-	cmd[4] += ival % 10;
+	if (isOnA()) {
+		int ival = abs(val);
+		cmd = "RG-00;";
+		cmd[3] += ival / 10;
+		cmd[4] += ival % 10;
 
-	set_trace(1, "set rf gain");
-	sendCommand(cmd);
-	sett("");
+		set_trace(1, "set rf gain");
+		sendCommand(cmd);
+		sett("");
+	} else {
+		int ival = abs(val);
+		cmd = "RG$-00;";
+		cmd[4] += ival / 10;
+		cmd[5] += ival % 10;
+
+		set_trace(1, "set rf gain");
+		sendCommand(cmd);
+		sett("");
+	}
 }
 
 int RIG_K4::get_rf_gain()
 {
-	cmd = "RG;";
-	get_trace(1, "get rf gain");
-	wait_char(';', 6, K4_WAIT_TIME, "get RF gain", ASC);
-	gett("");
+	int v;
 
-	size_t p = replystr.rfind("RG");
-	if (p == std::string::npos) return progStatus.rfgain;
+	if (isOnA()) {
+		cmd = "RG;";
+		get_trace(1, "get rf gain");
+		wait_char(';', 6, K4_WAIT_TIME, "get RF gain", ASC);
+		gett("");
 
-	replystr[p + 5] = 0;
-	int v = atoi(&replystr[p + 2]);
+		size_t p = replystr.rfind("RG");
+		if (p == std::string::npos) return progStatus.rfgain;
+
+		replystr[p + 5] = 0;
+		v = atoi(&replystr[p + 2]);
+	} else {
+		cmd = "RG$;";
+		get_trace(1, "get rf gain");
+		wait_char(';', 7, K4_WAIT_TIME, "get RF gain", ASC);
+		gett("");
+
+		size_t p = replystr.rfind("RG$");
+		if (p == std::string::npos) return progStatus.rfgain;
+
+		replystr[p + 6] = 0;
+		v = atoi(&replystr[p + 3]);
+	}
 	return v;
 }
 
