@@ -97,25 +97,26 @@ RIG_K4::RIG_K4() {
 
 	can_change_alt_vfo =
 
-	has_split_AB =
+	has_split_AB = true;
 	has_micgain_control =
 	has_rf_control = true;
 	has_bandwidth_control =
 	has_power_control = true;
 	has_volume_control =
 	has_mode_control =
-	has_ptt_control =
+	has_ptt_control = true;
 	has_noise_control =
-	has_attenuator_control =
-	has_smeter =
+	has_attenuator_control = true;
+	has_smeter = true;
 	has_power_out = true;
-	has_split =
+	has_split = true;
 	has_ifshift_control =
 	has_preamp_control = true;
 	has_agc_control = true;
 
 	has_notch_control =
 	has_tune_control =
+
 	has_swr_control = false;
 
 	if_shift_min = 300;
@@ -523,21 +524,39 @@ n = 3 (12-6 m only: 10 dB regular preamp + 20 dB LNA)
 void RIG_K4::set_preamp(int val)
 {
 	set_trace(1, "set preamp");
-	if (val) sendCommand("PA1;", 0);
-	else	 sendCommand("PA0;", 0);
+	if (isOnA()) {
+		if (val) sendCommand("PA1;", 0);
+		else	 sendCommand("PA0;", 0);
+	} else {
+		if (val) sendCommand("PA$1;", 0);
+		else	 sendCommand("PA$0;", 0);
+	}
 	sett("");
 }
 
 int RIG_K4::get_preamp()
 {
-	cmd = "PA;";
-	get_trace(1, "get_preamp");
-	wait_char(';', 4, K4_WAIT_TIME, "get preamp", ASC);
-	gett("");
+	if (isOnA()) {
+		cmd = "PA;";
+		get_trace(1, "get_preamp");
+		wait_char(';', 4, K4_WAIT_TIME, "get preamp", ASC);
+		gett("");
 
-	size_t p = replystr.rfind("PA");
-	if (p == std::string::npos) return progStatus.preamp;
-	return progStatus.preamp = (replystr[p + 2] == '1' ? 1 : 0);
+		size_t p = replystr.rfind("PA");
+
+		if (p == std::string::npos) return progStatus.preamp;
+		return progStatus.preamp = (replystr[p + 3] == '1' ? 1 : 0);
+	} else {
+		cmd = "PA$;";
+		get_trace(1, "get_preamp");
+		wait_char(';', 5, K4_WAIT_TIME, "get preamp", ASC);
+		gett("");
+
+		size_t p = replystr.rfind("PA$");
+
+		if (p == std::string::npos) return progStatus.preamp;
+		return progStatus.preamp = (replystr[p + 4] == '1' ? 1 : 0);
+	}
 }
 
 
@@ -558,7 +577,10 @@ void K4_atten_label(int val)
 
 int RIG_K4::next_attenuator()
 {
-	return 0;
+        if (atten_level < 8) atten_level++;
+        else atten_level = 0;
+
+	return atten_level;
 }
 
 /*
@@ -568,7 +590,8 @@ void RIG_K4::set_attenuator(int val)
 {
 	sett("set_attenuator(int val)");
 
-	cmd = "RA";
+	if (isOnA()) cmd = "RA";
+	else cmd = "RA$";
 	switch (val) {
 		case 0: cmd.append("000;"); break;
 		case 1: cmd.append("031;");break;
@@ -578,6 +601,7 @@ void RIG_K4::set_attenuator(int val)
 		case 5: cmd.append("151;"); break;
 		case 6: cmd.append("181;"); break;
 		case 7: cmd.append("211;"); break;
+		case 8: cmd.append("000;"); break;
 	}
 	set_trace(1, "set attenuator");
 	sendCommand(cmd);
@@ -587,16 +611,27 @@ void RIG_K4::set_attenuator(int val)
 
 int RIG_K4::get_attenuator()
 {
-	cmd = "RA;";
-	get_trace(1, "get attenuator");
-	wait_char(';', 5, K4_WAIT_TIME, "set ATT", ASC);
-	gett("");
-
-	size_t p = replystr.rfind("RA");
-	if (p == std::string::npos) return 0;
-
 	int val;
-	val = (replystr[p+2] - '0')*10 + replystr[p+3] - '0';
+	
+	if (isOnA()) {
+		cmd = "RA;";
+		get_trace(1, "get attenuator");
+		wait_char(';', 5, K4_WAIT_TIME, "set ATT", ASC);
+		gett("");
+
+		size_t p = replystr.rfind("RA");
+		if (p == std::string::npos) return 0;
+		val = (replystr[p+2] - '0')*10 + replystr[p+3] - '0';
+	} else {
+		cmd = "RA$;";
+		get_trace(1, "get attenuator");
+		wait_char(';', 6, K4_WAIT_TIME, "set ATT", ASC);
+		gett("");
+
+		size_t p = replystr.rfind("RA$");
+		if (p == std::string::npos) return 0;
+		val = (replystr[p+3] - '0')*10 + replystr[p+3] - '0';
+	}
 
 	switch (val) {
 		default:
@@ -609,6 +644,7 @@ int RIG_K4::get_attenuator()
 		case 18: atten_level = 6; break;
 		case 21: atten_level = 7; break;
 	}
+	
 	K4_atten_label(atten_level);
 	return atten_level;
 }
