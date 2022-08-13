@@ -354,11 +354,11 @@ int  RIG_K4::get_agc()
 		if (p == std::string::npos) return agcvalA;
 		switch (replystr[p+2]) {
 			default:
-			case '0': agcvalA = 0; break;
-			case '1': agcvalA = 1; break;
-			case '2': agcvalA = 2; break;
-		agcval=agcvalA;
+			case '0': nb_label("AGC", false); agcvalA = 0; break;
+			case '1': nb_label("AG-S", true); agcvalA = 1; break;
+			case '2': nb_label("AG-F", true); agcvalA = 2; break;
 		}
+		agcval=agcvalA;
 	} else {
 		cmd = "GT$;";
 		wait_char(';', 5, 100, "get AGC", ASC);
@@ -367,13 +367,12 @@ int  RIG_K4::get_agc()
 		if (p == std::string::npos) return agcvalB;
 		switch (replystr[p+3]) {
 			default:
-			case '0': agcvalB = 0; break;
-			case '1': agcvalB = 1; break;
-			case '2': agcvalB = 2; break;
-		agcval=agcvalB;
+			case '0': nb_label("AGC", false); agcvalB = 0; break;
+			case '1': nb_label("AG-S", true); agcvalB = 1; break;
+			case '2': nb_label("AG-F", true); agcvalB = 2; break;
 		}
+		agcval=agcvalB;
 	}
-
 	if (agcval == 0) agcvalA = agcvalB = 0;
 
 	return agcval;
