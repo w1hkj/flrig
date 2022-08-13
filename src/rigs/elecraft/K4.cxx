@@ -59,6 +59,11 @@ static GUI k4_widgets[]= {
 	{ (Fl_Widget *)NULL, 0, 0, 0 }
 };
 
+static int agcval = 1;
+static int agcvalA = 1;
+static int agcvalB = 1;
+
+
 int RIG_K4::power_scale()
 {
 	return powerScale;
@@ -330,7 +335,6 @@ void RIG_K4::get_vol_min_max_step(double &min, double &max, double &step)
 
 //----------------------------------------------------------------------
 static const char *agcstrs[] = {"AGC", "AG-S", "AG-F"};
-static int agcval = 1;
 
 const char *RIG_K4::agc_label()
 {
@@ -347,26 +351,31 @@ int  RIG_K4::get_agc()
 		wait_char(';', 4, 100, "get AGC", ASC);
 		gett("get agc");
 		size_t p = replystr.rfind("GT");
-		if (p == std::string::npos) return agcval;
+		if (p == std::string::npos) return agcvalA;
 		switch (replystr[p+2]) {
 			default:
-			case '0': agcval = 0; break;
-			case '1': agcval = 1; break;
-			case '2': agcval = 2; break;
+			case '0': agcvalA = 0; break;
+			case '1': agcvalA = 1; break;
+			case '2': agcvalA = 2; break;
+		agcval=agcvalA;
 		}
 	} else {
 		cmd = "GT$;";
 		wait_char(';', 5, 100, "get AGC", ASC);
 		gett("get agc");
 		size_t p = replystr.rfind("GT");
-		if (p == std::string::npos) return agcval;
+		if (p == std::string::npos) return agcvalB;
 		switch (replystr[p+3]) {
 			default:
-			case '0': agcval = 0; break;
-			case '1': agcval = 1; break;
-			case '2': agcval = 2; break;
+			case '0': agcvalB = 0; break;
+			case '1': agcvalB = 1; break;
+			case '2': agcvalB = 2; break;
+		agcval=agcvalB;
 		}
 	}
+
+	if (agcval == 0) agcvalA = agcvalB = 0;
+
 	return agcval;
 }
 
@@ -374,7 +383,7 @@ int  RIG_K4::get_agc()
 void  RIG_K4::set_agc_level(int val)
 {
 	if (isOnA()) {
-		agcval = val;
+		agcvalA = val;
 		cmd = "GT0;";
 		switch (val) {
 			default:
@@ -386,7 +395,7 @@ void  RIG_K4::set_agc_level(int val)
 		sendCommand(cmd);
 		sett("");
 	} else {
-		agcval = val;
+		agcvalB = val;
 		cmd = "GT$0;";
 		switch (val) {
 			default:
@@ -401,15 +410,25 @@ void  RIG_K4::set_agc_level(int val)
 	return;
 }
 
+
+// K4 agc control is WEIRD. Turning off AGC on either A or B
+// results it AGC OFF for BOTH. 
+// Turning on AGC Fast for either one turns on AGC Slow for the other one.
+//   when starting from OFF, but if the Other is ON then it's fast or slow
+//   setting remains.
+// Turning on AGC SLow for either one Turns on AGC Slow for the other one.
+// This is gross...
+
+// Make the AGC button toggle between off and Slow.  Set fast with
+//   on screen menus.
+
 int RIG_K4::incr_agc()
 {
 	static const char ch[] = {'0', '1', '2'};
-	static int agcvalA = 1;
-        static int agcvalB = 1;
 
 	if (isOnA()) {
 	        agcvalA++;
-	        if (agcvalA > 2) agcvalA = 0;
+	        if (agcvalA > 1) agcvalA = agcvalB = 0;
 	        cmd = "GT0;";
 	     	cmd[2] = ch[agcvalA];
 
@@ -420,7 +439,7 @@ int RIG_K4::incr_agc()
 		return agcvalA;
 	} else {
 	        agcvalB++;
-	        if (agcvalB > 2) agcvalB = 0;
+	        if (agcvalB > 1) agcvalA = agcvalB = 0;
 	        cmd = "GT$0;";
 	     	cmd[3] = ch[agcvalB];
 
