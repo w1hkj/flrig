@@ -521,21 +521,38 @@ n = 1 (10 dB regular preamp)
 n = 2 (160-15 m: 18 dB regular preamp; 12-6 m: 20 dB LNA)
 n = 3 (12-6 m only: 10 dB regular preamp + 20 dB LNA)
 */
+void K4_preamp_label(int val)
+{
+	switch (val) {
+		default:
+		case 0: preamp_label("Pre", false); break;
+		case 1: preamp_label("Pre1", true); break;
+		case 2: preamp_label("Pre2", true); break;
+//		case 3: preamp_label("Pre3", true); break;
+	}
+}
+
 void RIG_K4::set_preamp(int val)
 {
 	set_trace(1, "set preamp");
-	if (isOnA()) {
-		if (val) sendCommand("PA1;", 0);
-		else	 sendCommand("PA0;", 0);
-	} else {
-		if (val) sendCommand("PA$1;", 0);
-		else	 sendCommand("PA$0;", 0);
+	if (isOnA()) cmd = "PA";
+	else cmd = "PA$";
+	switch (val) {
+		case 0: cmd.append("00;"); preamp_label("Pre", false); break;
+		case 1: cmd.append("11;"); preamp_label("Pre1", true); break;
+		case 2: cmd.append("21;"); preamp_label("Pre2", true); break;
+//		case 3: cmd.append("31;"); preamp_label("Pre3", true); break;
 	}
+	preamp_level = val;
+	sendCommand(cmd);
 	sett("");
+	K4_preamp_label(val);
 }
 
 int RIG_K4::get_preamp()
 {
+	int val;
+
 	if (isOnA()) {
 		cmd = "PA;";
 		get_trace(1, "get_preamp");
@@ -545,7 +562,7 @@ int RIG_K4::get_preamp()
 		size_t p = replystr.rfind("PA");
 
 		if (p == std::string::npos) return progStatus.preamp;
-		return progStatus.preamp = (replystr[p + 3] == '1' ? 1 : 0);
+		val = progStatus.preamp = (replystr[p + 2] - '0');
 	} else {
 		cmd = "PA$;";
 		get_trace(1, "get_preamp");
@@ -555,8 +572,12 @@ int RIG_K4::get_preamp()
 		size_t p = replystr.rfind("PA$");
 
 		if (p == std::string::npos) return progStatus.preamp;
-		return progStatus.preamp = (replystr[p + 4] == '1' ? 1 : 0);
+		val = progStatus.preamp = (replystr[p + 3] - '0');
 	}
+
+	preamp_level = val;
+	K4_preamp_label(val);
+	return val;
 }
 
 
@@ -581,6 +602,14 @@ int RIG_K4::next_attenuator()
         else atten_level = 0;
 
 	return atten_level;
+}
+
+int RIG_K4::next_preamp()
+{
+	if (preamp_level < 2) preamp_level++;
+	else preamp_level = 0;
+
+	return preamp_level;
 }
 
 /*

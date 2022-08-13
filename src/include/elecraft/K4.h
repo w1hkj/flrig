@@ -77,6 +77,7 @@ public:
 
 	void set_preamp(int val);
 	int  get_preamp();
+	int  next_preamp();
 
 	int  get_smeter();
 
