@@ -411,16 +411,16 @@ void  RIG_K4::set_agc_level(int val)
 }
 
 
-// K4 agc control is WEIRD. Turning off AGC on either A or B
-// results it AGC OFF for BOTH. 
-// Turning on AGC Fast for either one turns on AGC Slow for the other one.
-//   when starting from OFF, but if the Other is ON then it's fast or slow
-//   setting remains.
+// Turning off AGC on either A or B results in AGC OFF for BOTH receivers. 
+//
+// Turning on AGC Fast for either one turns on AGC Slow for the 
+//   other one when starting from OFF, but if the Other is ON then 
+//   it's fast or slow setting remains.
+//
 // Turning on AGC SLow for either one Turns on AGC Slow for the other one.
-// This is gross...
-
-// Make the AGC button toggle between off and Slow.  Set fast with
-//   on screen menus.
+//
+// Make the AGC button toggle between off and Slow.  To set fast use
+//   on screen menus to avoid needing a second AGC button.
 
 int RIG_K4::incr_agc()
 {
