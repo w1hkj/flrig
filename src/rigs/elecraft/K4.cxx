@@ -417,7 +417,8 @@ void  RIG_K4::set_agc_level(int val)
 //   other one when starting from OFF, but if the Other is ON then 
 //   it's fast or slow setting remains.
 //
-// Turning on AGC SLow for either one Turns on AGC Slow for the other one.
+// Turning on AGC Slow from the OFF state for either one turns
+//   on AGC Slow for the other one.
 //
 // Make the AGC button toggle between off and Slow.  To set fast use
 //   on screen menus to avoid needing a second AGC button.
