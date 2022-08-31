@@ -1210,6 +1210,26 @@ void yaesu891UpdateB(XCVR_STATE * newVfo)
 	selrig->get_bwB();
 }
 
+void FTdx10_UpdateA(XCVR_STATE * newVfo)
+{
+	selrig->set_modeA(newVfo->imode);
+	selrig->set_vfoA(newVfo->freq);
+	selrig->set_bwA(newVfo->iBW);
+	selrig->get_modeA();
+	selrig->get_vfoA();
+	selrig->get_bwA();
+}
+
+void FTdx10_UpdateB(XCVR_STATE * newVfo)
+{
+	selrig->set_modeB(newVfo->imode);
+	selrig->set_vfoB(newVfo->freq);
+	selrig->set_bwB(newVfo->iBW);
+	selrig->get_modeB();
+	selrig->get_vfoB();
+	selrig->get_bwB();
+}
+
 void serviceQUE()
 {
 	guard_lock que_lock(&mutex_srvc_reqs, "serviceQUE");
@@ -1278,6 +1298,9 @@ void serviceQUE()
 					// Restore mode, then freq and bandwidth after select
 					yaesu891UpdateA(&vfoA);
 				}
+				if (selrig->name_ == rig_FTdx10.name_) {
+					FTdx10_UpdateA(&vfoA);
+				}
 				rig_trace(2, "case sA ", printXCVR_STATE(vfoA).c_str());
 				Fl::awake(updateUI);
 			}
@@ -1289,6 +1312,9 @@ void serviceQUE()
 				if (selrig->name_ == rig_FT891.name_) {
 					// Restore mode, then freq and bandwidth after select
 					yaesu891UpdateB(&vfoB);
+				}
+				if (selrig->name_ == rig_FTdx10.name_) {
+					FTdx10_UpdateB(&vfoB);
 				}
 				rig_trace(2, "case sB ", printXCVR_STATE(vfoB).c_str());
 				Fl::awake(updateUI);
