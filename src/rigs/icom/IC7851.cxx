@@ -304,11 +304,11 @@ unsigned long int RIG_IC7851::get_vfoA ()
 	resp.assign(pre_fm).append("\x25");
 
 	if (inuse == onA) {
-		cmd  += '\x01';
-		resp += '\x01';
-	} else {
 		cmd  += '\x00';
 		resp += '\x00';
+	} else {
+		cmd  += '\x01';
+		resp += '\x01';
 	}
 
 	cmd.append(post);
@@ -335,8 +335,8 @@ void RIG_IC7851::set_vfoA (unsigned long int freq)
 	A.freq = freq;
 
 	cmd.assign(pre_to).append("\x25");
-	if (inuse == onA) cmd += '\x01';
-	else      cmd += '\x00';
+	if (inuse == onA) cmd += '\x00';
+	else      cmd += '\x01';
 
 	cmd.append( to_bcd_be( freq, 10) );
 	cmd.append( post );
@@ -354,11 +354,11 @@ unsigned long int RIG_IC7851::get_vfoB ()
 	resp.assign(pre_fm).append("\x25");
 
 	if (inuse == onA) {
-		cmd  += '\x00';
-		resp += '\x00';
-	} else {
 		cmd  += '\x01';
 		resp += '\x01';
+	} else {
+		cmd  += '\x00';
+		resp += '\x00';
 	}
 
 	cmd.append(post);
@@ -385,8 +385,8 @@ void RIG_IC7851::set_vfoB (unsigned long int freq)
 	B.freq = freq;
 
 	cmd.assign(pre_to).append("\x25");
-	if (inuse == onA) cmd += '\x00';
-	else      cmd += '\x01';
+	if (inuse == onA) cmd += '\x01';
+	else      cmd += '\x00';
 
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append( post );
@@ -434,7 +434,13 @@ void RIG_IC7851::set_modeA(int val)
 	A.imode = val;
 	cmd.assign(pre_to);
 	cmd += '\x26';
-	cmd += '\x00';
+
+	if (inuse == onA) {
+		cmd  += '\x00';
+	} else {
+		cmd  += '\x01';
+	}
+
 	cmd += IC7851_mode_nbr[A.imode];	// operating mode
 	if (A.imode >= LSBD3_7851)
 		cmd += '\x03';					// data mode D1
@@ -480,7 +486,13 @@ int RIG_IC7851::get_modeA()
 	resp.assign(pre_fm).append("\x26");
 
 	cmd.assign(pre_to).append("\x26");
-	cmd += '\x00';
+	if (inuse == onA) {
+		cmd  += '\x00';
+		resp += '\x00';
+	} else {
+		cmd  += '\x01';
+		resp += '\x01';
+	}
 	cmd.append(post);
 
 	if (waitFOR(10, "get mode A")) {
@@ -524,7 +536,12 @@ void RIG_IC7851::set_modeB(int val)
 	B.imode = val;
 	cmd.assign(pre_to);
 	cmd += '\x26';
-	cmd += '\x00';
+	if (inuse == onA) {
+		cmd  += '\x01';
+	} else {
+		cmd  += '\x00';
+	}
+
 	cmd += IC7851_mode_nbr[B.imode];	// operating mode
 	if (B.imode >= LSBD3_7851)
 		cmd += '\x03';					// data mode D1
@@ -554,7 +571,15 @@ int RIG_IC7851::get_modeB()
 	resp.assign(pre_fm).append("\x26");
 
 	cmd.assign(pre_to).append("\x26");
-	cmd += '\x00';
+
+	if (inuse == onA) {
+		cmd  += '\x01';
+		resp += '\x01';
+	} else {
+		cmd  += '\x00';
+		resp += '\x00';
+	}
+
 	cmd.append(post);
 
 	if (waitFOR(10, "get mode B")) {
