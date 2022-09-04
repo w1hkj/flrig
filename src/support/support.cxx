@@ -1755,7 +1755,8 @@ void * serial_thread_loop(void *d)
 			if (!bypass_serial_thread_loop) {
 				{	guard_lock lk(&mutex_serial);
 					while (rx_poll_group_1->poll != NULL) {
-						(rx_poll_group_1->pollfunc)();
+						if (*(rx_poll_group_1->poll))
+							(rx_poll_group_1->pollfunc)();
 						if (progStatus.byte_interval)
 							MilliSleep(progStatus.byte_interval);
 						++rx_poll_group_1;
