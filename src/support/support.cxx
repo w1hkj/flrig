@@ -164,12 +164,13 @@ std::string printXCVR_STATE(XCVR_STATE data)
 				str << ", " << (dsplo ? dsplo[data.iBW & 0x7F] : "??");
 				str << ", " << (dsphi ? dsphi[(data.iBW >> 8) & 0x7F] : "??");
 			}
+		} else {
+			const char **bwt = selrig->bwtable(data.imode);
+			if (bwt)
+				str << ", " << bwt[data.iBW];
+			else
+				str << ", n/a";
 		}
-		const char **bwt = selrig->bwtable(data.imode);
-		if (bwt)
-			str << ", " << bwt[data.iBW];
-		else
-			str << ", n/a";
 	} else
 		str << ", modes n/a";
 	return str.str();
