@@ -974,11 +974,13 @@ void read_notch()
 		on = selrig->get_notch(val);
 	}
 
-	if ((on != progStatus.notch) || (val != progStatus.notch_val)) {
-		vfo->notch_val = progStatus.notch_val = val;
+	if (on != progStatus.notch)
 		vfo->notch = progStatus.notch = on;
-		Fl::awake(update_notch, (void*)0);
-	}
+
+	if (val != progStatus.notch_val)
+		vfo->notch_val = progStatus.notch_val = val;
+
+	Fl::awake(update_notch, (void*)0);
 }
 
 // power_control

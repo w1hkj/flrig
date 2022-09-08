@@ -1077,10 +1077,7 @@ void RIG_FTdx10::set_if_shift(int val)
 
 bool RIG_FTdx10::get_if_shift(int &val)
 {
-	if (inuse == onB)
-		cmd = rsp = "IS1";
-	else
-		cmd = rsp = "IS0";
+	cmd = rsp = "IS0";
 	cmd += ';';
 	wait_char(';', 10, 100, "get if shift", ASC);
 
@@ -1110,39 +1107,47 @@ b: Manual NOTCH ON/OFF, 1/0
 
 cde: 001 - 320, (NOTCH Frequency : x 10 Hz )
 */
-static std::string notch_str = "BP00000;";
+static std::string notch_str_on  = "BP00001;";
+static std::string notch_str_off = "BP00000;";
+static std::string notch_str_val = "BP01000;";
+static int notch_val = 1500;
+
 void RIG_FTdx10::set_notch(bool on, int val)
 {
-	if (on) {
+	if (notch_val != val) {
+		cmd = notch_str_on;
+		sendCommand(cmd);
+		showresp(WARN, ASC, "SET notch ON", cmd, replystr);
+		set_trace(3,"set_notch ON", cmd.c_str(), replystr.c_str());
 // set notch frequency
+		notch_val = val;
 		val /= 10;
-		for (int i = 3; i > 0; i--) {
-			notch_str[3 + i] += val % 10;
-			val /=10;
+		for (int i = 0; i < 3; i++) {
+			notch_str_val[6 - i] = '0' + (val % 10);
+			val /= 10;
 		}
-		cmd = notch_str;
+		cmd = notch_str_val;
 // set notch ON
-		cmd[3] = '1';
 		sendCommand(cmd);
 		showresp(WARN, ASC, "SET notch val", cmd, replystr);
 		set_trace(3,"set_notch val", cmd.c_str(), replystr.c_str());
-	} else {
-// set notch OFF
-		cmd = notch_str;
-		sendCommand(cmd);
-		set_trace(3,"set_notch off", cmd.c_str(), replystr.c_str());
-		showresp(WARN, ASC, "SET notch off", cmd, replystr);
 	}
+	if (on)
+		cmd = notch_str_on;
+	else
+		cmd = notch_str_off;
+	sendCommand(cmd);
+	set_trace(3,"set_notch OFF", cmd.c_str(), replystr.c_str());
+	showresp(WARN, ASC, "SET notch OFF", cmd, replystr);
+
 }
 
 bool  RIG_FTdx10::get_notch(int &val)
 {
 	bool ison = false;
-	if (inuse == onB) 
-		cmd = rsp = "BP10";
-	else
-		cmd = rsp = "BP00";
-	cmd += ';';
+
+	cmd = "BP00;";
+	rsp = "BP";
 	wait_char(';', 8, 100, "get notch on/off", ASC);
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return ison;
@@ -1153,8 +1158,8 @@ bool  RIG_FTdx10::get_notch(int &val)
 		ison = true;
 
 	val = progStatus.notch_val;
-	cmd = rsp = "BP01";
-	cmd += ';';
+	cmd = "BP01;";
+	rsp = "BP";
 	wait_char(';', 8, 100, "get notch val", ASC);
 
 	gett("get_notch_val()");
@@ -1188,10 +1193,7 @@ void RIG_FTdx10::set_auto_notch(int v)
 
 int  RIG_FTdx10::get_auto_notch()
 {
-	if (inuse == onB)
-		cmd = "BC1;";
-	else
-		cmd = "BC0;";
+	cmd = "BC0;";
 	wait_char(';', 5, 100, "get auto notch", ASC);
 
 	gett("get_auto_notch()");
@@ -1223,10 +1225,7 @@ void RIG_FTdx10::set_noise(bool b)
 
 int RIG_FTdx10::get_noise()
 {
-	if (inuse == onB)
-		cmd = rsp = "NB1";
-	else
-		cmd = rsp = "NB0";
+	cmd = rsp = "NB0";
 	cmd += ';';
 	wait_char(';', 5, 100, "get NB", ASC);
 
