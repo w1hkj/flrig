@@ -193,6 +193,7 @@ flrig_SOURCES += \
 	rigs/other/RAY152.cxx \
 	rigs/other/sunsdr2.cxx \
 	rigs/other/tcisdr.cxx \
+	rigs/other/trusdx.cxx \
 	rigs/other/TMD710.cxx \
 	rigs/tentec/TT516.cxx \
 	rigs/tentec/DELTA-II.cxx \
@@ -324,6 +325,7 @@ EXTRA_DIST = \
 	include/other/AOR5K.h \
 	include/other/sunsdr2.h \
 	include/other/tcisdr.h \
+	include/other/trusdx.h \
 	include/generic.h \
 	include/gettext.h \
 	include/hidapi.h \

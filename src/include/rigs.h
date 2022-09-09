@@ -122,6 +122,7 @@
 #include "other/QCXplus.h"
 #include "other/sunsdr2.h"
 #include "other/tcisdr.h"
+#include "other/trusdx.h"
 
 extern rigbase			rig_null;		// 0
 extern RIG_FDMDUO		rig_FDMDUO;		// 1
@@ -225,5 +226,6 @@ extern RIG_TX500		rig_TX500;		// 98
 extern RIG_QCXP			rig_QCXP;		// 99
 extern RIG_SDR2_PRO		rig_sdr2;		// 100
 extern RIG_TCI_SDR		rig_tcisdr;		// 101
+extern RIG_TRUSDX		rig_trusdx;		// 102
 
 #endif
