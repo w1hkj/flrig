@@ -1912,9 +1912,6 @@ void updateBandwidthControl(void *d)
 			opCENTER->redraw();
 		} else {
 			opBW->show();
-// Allow BW to receive rig updates as value is changed there, without needing
-// to click the dropdown first
-			opBW->isbusy(false);
 		}
 	}
 	else { // no BW, no DSP controls
