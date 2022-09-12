@@ -76,6 +76,7 @@ class Fl_ComboBox : public Fl_Group  {
   friend int DataCompare (const void *, const void *);
   friend class Fl_PopBrowser;
   friend void val_callback(Fl_Widget *, void *);
+enum {ALPHA_SORT, SERIAL_SORT};
 
 	Fl_Button		*btn;
 	Fl_Box			*valbox;
@@ -87,7 +88,7 @@ class Fl_ComboBox : public Fl_Group  {
 	int				listtype;
 	int				numrows_;
 	int				type_;
-
+	int				sort_type;
 	int				width;
 	int				height;
 	void			*retdata;
@@ -119,6 +120,8 @@ public:
 		}
 	}
 	void sort ();
+	void sort_by_serial () {sort_type = SERIAL_SORT;}
+	void sort_by_alpha () {sort_type = ALPHA_SORT;}
 	int  index ();
 	void index (int i);
 	int  find_index(const char *str);
