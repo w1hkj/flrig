@@ -22,7 +22,7 @@
 
 #include <string>
 
-#include <FL/Fl_Window.H>
+#include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Select_Browser.H>
@@ -30,9 +30,9 @@
 #include <FL/Fl_Return_Button.H>
 #include <FL/Fl_Box.H>
 
-#define FL_COMBO_UNIQUE 0x04
-#define FL_COMBO_UNIQUE_NOCASE 0x08
-#define FL_COMBO_LIST_INCR 99 //100
+#define FL_COMBO_UNIQUE 1
+#define FL_COMBO_UNIQUE_NOCASE 2
+#define FL_COMBO_LIST_INCR 100
 
 class Fl_ComboBox;
 
@@ -43,7 +43,7 @@ struct datambr {
   void *d;
 };
 
-class Fl_PopBrowser : public Fl_Window {
+class Fl_PopBrowser : public Fl_Double_Window {
 
 friend void popbrwsr_cb(Fl_Widget *, long);
 
@@ -65,6 +65,8 @@ public:
 	int  handle (int);
 	void clear_kbd() { keystrokes.clear(); }
 
+	Fl_Select_Browser *sb() { return popbrwsr; }
+
 	Fl_ComboBox *parentCB;
 	Fl_Widget *parentWindow;
 
@@ -73,6 +75,7 @@ public:
 class Fl_ComboBox : public Fl_Group  {
   friend int DataCompare (const void *, const void *);
   friend class Fl_PopBrowser;
+  friend void val_callback(Fl_Widget *, void *);
 
 	Fl_Button		*btn;
 	Fl_Box			*valbox;
@@ -84,7 +87,6 @@ class Fl_ComboBox : public Fl_Group  {
 	int				listtype;
 	int				numrows_;
 	int				type_;
-	bool			isbusy_;
 
 	int				width;
 	int				height;
@@ -100,18 +102,26 @@ public:
 	~Fl_ComboBox();
 
 	const char *value ();
-	void value (const char *);
+	void value (std::string);
 	void put_value( const char *);
 	void fl_popbrwsr(Fl_Widget *);
-	bool isbusy() { return isbusy_; }
-	void isbusy(bool b) { isbusy_ = b; }
 
 	void type (int = 0);
 	void add (const char *s, void *d = 0);
 	void clear ();
+	void clear_entry() {
+		if (type_ == LISTBOX) {
+			valbox->label("");
+			valbox->redraw_label();
+		} else {
+			val->value("");
+			val->redraw();
+		}
+	}
 	void sort ();
 	int  index ();
 	void index (int i);
+	int  find_index(const char *str);
 	void *data ();
 	void textfont (int);
 	void textsize (uchar);
@@ -122,6 +132,7 @@ public:
 	void numrows(int n) { numrows_ = n; }
 	int  lsize() { return listsize; }
 	void set_focus() { Fl::focus(btn); };
+	void position(int n);
 	void labelfont(Fl_Font fnt) { Fl_Group::labelfont(fnt); }
 	Fl_Font labelfont() { return Fl_Group::labelfont(); }
 	void labelsize(Fl_Fontsize n) { Fl_Group::labelsize(n); }
