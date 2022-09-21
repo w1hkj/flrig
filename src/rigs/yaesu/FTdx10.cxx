@@ -149,7 +149,7 @@ void RIG_FTdx10::initialize()
 	rig_widgets[8].W = sldrPOWER;
 	rig_widgets[9].W = btnNR;
 	rig_widgets[10].W = sldrNR;
-
+return;
 	cmd = "AI0;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "Auto Info OFF", cmd, replystr);
@@ -245,27 +245,48 @@ RIG_FTdx10::RIG_FTdx10() {
 
 void RIG_FTdx10::set_xcvr_auto_on()
 {
-// send dummy data request for ID (see pg 12 CAT reference book)
 	cmd = "ID;";
-	sendCommand(cmd);
-	wait_char(';', 7, 100, "get vfo A", ASC);
-	if (replystr.find("ID") != std::string::npos) return;
+	wait_char(';', 7 , 100, "check", ASC);
+//std::cout << "check: " << replystr << std::endl;
+	if (replystr.find("ID") != std::string::npos)
+		return;
+
+//std::cout << "Xcvr not ON ... power ON cycle" << std::endl;
+
+// wait 1.2 seconds
+	for (int i = 0; i < 12; i++) {
+		MilliSleep(100);
+		update_progress(i * 10);
+		Fl::awake();
+	}
 
 	cmd = "PS1;";
-	sendCommand(cmd);
-// wait 2 seconds
-	for (int i = 0; i < 20; i++) {
-		MilliSleep(100);
-		update_progress(i * 2);
+//	std::cout << "power ON" << std::endl;
+	RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
+
+	update_progress(0);
+
+// wait 7 seconds
+//	std::cout << "wait 10 seconds" << std::endl;
+	for (int i = 0; i < 140; i++) {
+		MilliSleep(50);
+		update_progress(i);
 		Fl::awake();
 	}
 	update_progress(0);
-// wait for power on status
-	cmd = "PS1;";
-	sendCommand(cmd);
 
+//	std::cout << "restart serial port" << std::endl;
+
+	RigSerial->OpenPort();
 	cmd = "PS;";
-	wait_char(';', 4, 5000, "Xcvr ON?", ASC);
+	wait_char(';', 4, 100, "closed/reopened port", ASC);
+	if (replystr.find("PS1;") == std::string::npos) {
+//		std::cout << "Reply to reopen port: " << replystr << std::endl;
+		exit(3);
+	}
+
+	return;
+
 }
 
 void RIG_FTdx10::set_xcvr_auto_off()
@@ -315,16 +336,16 @@ void RIG_FTdx10::get_band_selection(int v)
 
 bool RIG_FTdx10::check ()
 {
-	cmd = rsp = "ID";
-	cmd += ';';
-	int ret = wait_char(';', 7 , 100, "check", ASC);
-
-	gett("check()");
 #ifdef TESTING
 return true;
 #endif
-	if (ret >= 7) return true;
-	return false;
+	cmd = "ID;";
+	wait_char(';', 7 , 500, "check", ASC);
+//std::cout << "check: " << replystr << std::endl;
+
+	if (replystr.find("ID") == std::string::npos)
+		return false;
+	return true;
 }
 
 unsigned long int RIG_FTdx10::get_vfoA ()
@@ -662,7 +683,7 @@ int RIG_FTdx10::get_tune()
 {
 	cmd = rsp = "AC";
 	cmd += ';';
-	waitN(5, 100, "get tune", ASC);
+	wait_char(';', 5, 100, "get tune", ASC);
 
 	rig_trace(2, "get_tuner status()", replystr.c_str());
 
