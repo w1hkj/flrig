@@ -52,7 +52,7 @@ extern void make_trace_window();
 #define setr(s)  set_trace(1, s);
 
 #define gett(str) get_trace(5, str, "S: ", cmd.c_str(), " R: ", replystr.c_str())
-#define sett(str) get_trace(5, str, "S: ", cmd.c_str(), " R: ", replystr.c_str())
+#define sett(str) set_trace(5, str, "S: ", cmd.c_str(), " R: ", replystr.c_str())
 
 #define getthex(str) { \
 	static std::string hex1; \
