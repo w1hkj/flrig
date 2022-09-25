@@ -3667,6 +3667,7 @@ void TRACED(close_UI)
 		FSK_configure,
 		meter_filters,
 		meter_scale_dialog,
+		tabs_dialog,
 		mainwindow };
 	for (size_t n = 0; n < sizeof(widgets) / sizeof(*widgets); n++) {
 		if (widgets[n]) widgets[n]->hide();
