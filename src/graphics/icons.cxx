@@ -253,7 +253,8 @@ void set_message_icon(const char** pixmap)
 	Fl_Widget* msg = fl_message_icon();
 	msg->label("");
 	msg->align(FL_ALIGN_TOP_LEFT | FL_ALIGN_INSIDE);
-	msg->color(msg->parent()->color());
+	if (msg->parent() != NULL)
+		msg->color(msg->parent()->color());
 	msg->box(FL_NO_BOX);
 	msg->image(msg_icon = new Fl_Pixmap(pixmap));
 }
