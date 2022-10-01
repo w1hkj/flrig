@@ -1719,8 +1719,6 @@ void * serial_thread_loop(void *d)
 			check_ptt();
 		}
 
-		if (progStatus.serial_write_delay) MilliSleep(progStatus.serial_write_delay);
-
 		if (PTT || cwio_process == SEND || cwio_process == CALIBRATE) {
 			if (isRX) {
 				isRX = false;
@@ -1733,9 +1731,6 @@ void * serial_thread_loop(void *d)
 				guard_lock lk(&mutex_serial);
 				read_vfo();
 			}
-
-			if (progStatus.serial_write_delay)
-				MilliSleep(progStatus.serial_write_delay);
 
 			{	guard_lock lk(&mutex_serial);
 				if (!bypass_serial_thread_loop) {
@@ -1760,8 +1755,6 @@ void * serial_thread_loop(void *d)
 					while (rx_poll_group_1->poll != NULL) {
 						if (*(rx_poll_group_1->poll))
 							(rx_poll_group_1->pollfunc)();
-						if (progStatus.serial_write_delay)
-							MilliSleep(progStatus.serial_write_delay);
 						++rx_poll_group_1;
 					}
 					rx_poll_group_1 = &RX_poll_group_1[0];
@@ -1777,9 +1770,6 @@ void * serial_thread_loop(void *d)
 						rx_poll_group_2 = &RX_poll_group_2[0];
 				}
 			}
-
-			if (progStatus.serial_write_delay)
-				MilliSleep(progStatus.serial_write_delay);
 
 			if (!bypass_serial_thread_loop) {
 
