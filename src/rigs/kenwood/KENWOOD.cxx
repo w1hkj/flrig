@@ -111,24 +111,13 @@ void KENWOOD::set_split(bool val)
 ========================================================================
 */ 
 
-int KENWOOD::get_split()
-{
-	check_ifstr();
-//	cmd = "IF;";
-//	get_trace(1, "get_split");
-//	ret = wait_char(';', 38, 100, "get split", ASC);
-//	gett("");
-	if (ret < 38) return 0;
-	return (replystr[32] == '1');
-}
-
 bool KENWOOD::check()
 {
 	cmd = "FA;";
 	get_trace(1, "check()");
 	ret = wait_char(';', 14, 100, "check", ASC);
 	gett("");
-//	if (ret < 14) return false;
+	if (ret < 14) return false;
 	return true;
 }
 
@@ -222,26 +211,23 @@ void KENWOOD::set_vfoB (unsigned long int freq)
 
 size_t KENWOOD::check_ifstr()
 {
-	size_t now = zmsec();
-	if ((lastmsec == 0) || now < lastmsec || (now - lastmsec) > 200) {
-		lastmsec = now;
-		cmd = "IF;";
-		get_trace(1, "get_PTT");
-		wait_char(';', 38, 100, "get VFO", ASC);
-		gett("");
-		ifstring = replystr;
-	} else
-		replystr = ifstring;
+	cmd = "IF;";
+	get_trace(1, "check IF response");
+	wait_char(';', 38, 100, "check IF response", ASC);
+	gett("");
 	return replystr.length();
+}
+
+int KENWOOD::get_split()
+{
+	ret = check_ifstr();
+	if (ret < 38) return 0;
+	return (replystr[32] == '1');
 }
 
 int KENWOOD::get_PTT()
 {
-	check_ifstr();
-//	cmd = "IF;";
-//	get_trace(1, "get_PTT");
-//	ret = wait_char(';', 38, 100, "get VFO", ASC);
-//	gett("");
+	ret = check_ifstr();
 	if (ret < 38) return ptt_;
 	ptt_ = (replystr[28] == '1');
 	return ptt_;

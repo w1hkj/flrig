@@ -1827,13 +1827,15 @@ void selectDSP()
 	if (btnDSP->label()[0] == selrig->SL_label[0]) {
 		btnDSP->label(selrig->SH_label);
 		btnDSP->redraw_label();
-		opDSP_hi->show();
 		opDSP_lo->hide();
+		opDSP_hi->show();
+		opDSP_hi->redraw();
 	} else {
 		btnDSP->label(selrig->SL_label);
 		btnDSP->redraw_label();
-		opDSP_lo->show();
 		opDSP_hi->hide();
+		opDSP_lo->show();
+		opDSP_lo->redraw();
 	}
 }
 

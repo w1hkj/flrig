@@ -1024,7 +1024,7 @@ int RIG_TS870S::get_bwA() {
 		// High byte is hi cut index (not MSB though.) Low byte is lo cuttoff index.
 
 		cmd = "FW;"; // Read Low cuttoff. Returns a two digit code as 'FLxxxx;' in 10Hz increments.
-		if (wait_char(';', 5, 100, "get lower", ASC) < 5) return A.iBW;
+		if (wait_char(';', 7, 100, "get lower", ASC) < 5) return A.iBW;
 
 		p = replystr.rfind("FW");
 		if (p != std::string::npos) { // If 'FW' found then scan the known responces to find out what we got.
@@ -1036,7 +1036,7 @@ int RIG_TS870S::get_bwA() {
 		}
 
 		cmd = "IS;";
-		if (wait_char(';', 5, 100, "get upper", ASC) == 5) {
+		if (wait_char(';', 8, 100, "get upper", ASC) == 5) {
 			p = replystr.rfind("IS ");
 			if (p != std::string::npos) {
 				for (i = 0; TS870S_CAT_am_SH[i] != NULL; i++) // bump array index counter, till std::string match or end.
@@ -1056,7 +1056,7 @@ int RIG_TS870S::get_bwA() {
 		int lo = A.iBW & 0x7F, hi = (A.iBW >> 8) & 0x7F; // Same trick as above...
 
 		cmd = "FW;"; // Read Low cuttoff. Returns a two digit code as 'FLxxxx;' in 10Hz increments.
-		if (wait_char(';', 5, 100, "get lower", ASC) < 5) return A.iBW;
+		if (wait_char(';', 7, 100, "get lower", ASC) < 5) return A.iBW;
 
 		p = replystr.rfind("FW");
 		if (p != std::string::npos) { // If 'FW' found then scan the known responces to find out what we got.
@@ -1068,7 +1068,7 @@ int RIG_TS870S::get_bwA() {
 		}
 
 		cmd = "IS;";
-		if (wait_char(';', 5, 100, "get upper", ASC) < 5) return A.iBW;
+		if (wait_char(';', 8, 100, "get upper", ASC) < 5) return A.iBW;
 
 		p = replystr.rfind("IS ");
 
@@ -1137,7 +1137,7 @@ int RIG_TS870S::get_bwB()
 		int lo = B.iBW & 0x7F, hi = (B.iBW >> 8) & 0x7F;
 
 		cmd = "FW;"; // Read Low cuttoff. Returns a two digit code as 'FLxxxx;' in 10Hz increments.
-		if (wait_char(';', 5, 100, "get lower", ASC) < 5) return B.iBW;
+		if (wait_char(';', 7, 100, "get lower", ASC) < 5) return B.iBW;
 
 		p = replystr.rfind("FW");
 		if (p != std::string::npos) { // If 'FW' found then scan the known responces to find out what we got.
@@ -1149,7 +1149,7 @@ int RIG_TS870S::get_bwB()
 		}
 
 		cmd = "IS;";
-		if (wait_char(';', 5, 100, "get upper", ASC) < 5) return B.iBW;
+		if (wait_char(';', 8, 100, "get upper", ASC) < 5) return B.iBW;
 
 		p = replystr.rfind("IS ");
 		if (p != std::string::npos) {
@@ -1168,7 +1168,7 @@ int RIG_TS870S::get_bwB()
 		int lo = B.iBW & 0x7F, hi = (B.iBW >> 8) & 0x7F;
 
 		cmd = "FW;"; // Read Low cuttoff. Returns a two digit code as 'FLxxxx;' in 10Hz increments.
-		if (wait_char(';', 5, 100, "get lower", ASC) < 5) return  B.iBW;
+		if (wait_char(';', 7, 100, "get lower", ASC) < 5) return  B.iBW;
 
 		p = replystr.rfind("FW");
 		if (p != std::string::npos) { // If 'FW' found then scan the known responces to find out what we got.
@@ -1180,7 +1180,7 @@ int RIG_TS870S::get_bwB()
 		}
 
 		cmd = "IS;";
-		if (wait_char(';', 5, 100, "get upper", ASC)  < 5) return B.iBW;
+		if (wait_char(';', 8, 100, "get upper", ASC)  < 5) return B.iBW;
 
 		p = replystr.rfind("IS ");
 		if (p != std::string::npos) {
