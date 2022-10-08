@@ -33,17 +33,20 @@ RIG_FT767::RIG_FT767() {
 // base class values
 	name_ = FT767name_;
 	modes_ = FT767modes_;
-	comm_baudrate = BR4800;
+	serial_baudrate = BR4800;
 	stopbits = 2;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts = false;
-	comm_rtsplus = false;
-	comm_dtrplus = true;
-	comm_catptt = false;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+	
+	serial_write_delay = 50;
+	serial_post_write_delay = 5;
+
+	serial_timeout = 50;
+	serial_rtscts = false;
+	serial_rtsplus = false;
+	serial_dtrplus = true;
+	serial_catptt = false;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 	modeA = 1;
 	bwA = 0;
 	has_mode_control = true;

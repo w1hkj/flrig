@@ -47,19 +47,22 @@ RIG_FT736R::RIG_FT736R() {
 	name_ = FT736Rname_;
 	modes_ = FT736Rmodes_;
 
-	comm_baudrate = BR4800;
+	serial_baudrate = BR4800;
 	stopbits = 2;
-	comm_retries = 2;
-	comm_wait = 50;
-	comm_timeout = 200;
-	comm_rtscts = false;
-	comm_rtsplus = false;
-	comm_dtrplus = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+	
+	serial_write_delay = 5;
+	serial_post_write_delay = 50;
+
+	serial_timeout = 200;
+	serial_rtscts = false;
+	serial_rtsplus = false;
+	serial_dtrplus = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 	serloop_timing = 500;
 
-	comm_catptt = true;
+	serial_catptt = true;
 
 	A.freq = 144070000L;
 	A.imode = 1;

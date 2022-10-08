@@ -46,17 +46,20 @@ RIG_FT920::RIG_FT920() {
 	bandwidths_ = FT920widths_;
 	bw_vals_ = FT920_bw_val;
 
-	comm_baudrate = BR4800;
+	serial_baudrate = BR4800;
 	stopbits = 2;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts = false;
-	comm_rtsplus = false;
-	comm_dtrplus = true;
-	comm_catptt = false;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+
+	serial_write_delay = 0;
+	serial_post_write_delay = 80;
+
+	serial_timeout = 50;
+	serial_rtscts = false;
+	serial_rtsplus = false;
+	serial_dtrplus = true;
+	serial_catptt = false;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 	afreq = bfreq = A.freq = B.freq = 14070000;
 	amode = bmode = A.imode = B.imode = 1;
 	aBW = bBW = A.iBW = B.iBW = 0;

@@ -46,7 +46,6 @@ public:
 	virtual ~RIG_ICOM() {}
 	void checkresponse();
 	bool sendICcommand(std::string str, int nbr);
-	void delayCommand(std::string cmd, int wait);
 	bool  waitFB(const char *sz, int timeout = 500);
 	bool  waitFOR(size_t n, const char *sz, unsigned long timeout = 500);
 	void adjustCIV(uchar adr);

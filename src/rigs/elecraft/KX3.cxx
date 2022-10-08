@@ -70,20 +70,23 @@ RIG_KX3::RIG_KX3() {
 	modes_ = KX3modes_;
 	bandwidths_ = KX3_widths;
 	bw_vals_ = KX3_bw_vals;
-	comm_baudrate = BR38400;
+	serial_baudrate = BR38400;
 
 	widgets = k3_widgets;
 
 	stopbits = 1;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts = false;
-	comm_rtsplus = false;
-	comm_dtrplus = false;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
+	serial_timeout = 50;
+	serial_rtscts = false;
+	serial_rtsplus = false;
+	serial_dtrplus = false;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 
 	def_freq = freqA = freqB = 14070000;
 	def_mode = modeA = modeB = 1;

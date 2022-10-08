@@ -144,6 +144,9 @@ RIG_IC7800::RIG_IC7800() {
 	_mode_type = IC7800_mode_type;
 	adjustCIV(defaultCIV);
 
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
 	widgets = IC7800_widgets;
 
 	has_extras =

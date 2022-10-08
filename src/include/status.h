@@ -46,22 +46,24 @@ struct status {
 	int		ddY;
 
 	std::string	xcvr_serial_port;
-	int		comm_baudrate;
+	int		serial_baudrate;
 	int		stopbits;
-	int		comm_retries;
-	int		comm_wait;
-	int		comm_timeout;
-	bool	comm_echo;
 
-	int		comm_catptt;
-	int		comm_rtsptt;
-	int		comm_dtrptt;
+	int		serial_retries;
+	int		serial_write_delay;
+	int		serial_post_write_delay;
+	int		serial_timeout;
 
-	bool	comm_rtscts;
-	bool	comm_rtsplus;
-	bool	comm_dtrplus;
+	bool	serial_echo;
+
+	int		serial_catptt;
+	int		serial_rtsptt;
+	int		serial_dtrptt;
+
+	bool	serial_rtscts;
+	bool	serial_rtsplus;
+	bool	serial_dtrplus;
 	int		serloop_timing;
-	int		byte_interval;
 
 	std::string	aux_serial_port;
 	bool	aux_SCU_17;

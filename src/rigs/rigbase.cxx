@@ -27,6 +27,7 @@
 #include "support.h"
 #include "socket_io.h"
 #include "tod_clock.h"
+#include "serial.h"
 
 #include "rigs.h"
 
@@ -59,16 +60,19 @@ rigbase::rigbase()
 
 	widgets = basewidgets;
 
-	serloop_timing = 200; // msec, 5x / second
-
 	stopbits = 2;
+
+	serial_write_delay = 0;
+	serial_post_write_delay = 0;
+
+	serloop_timing = 200; // msec, 5x / second
 
 	CIV = 0;
 	defaultCIV = 0;
 	USBaudio = false;
 
 	has_xcvr_auto_on_off =
-	comm_echo =
+	serial_echo =
 	has_vfo_adj =
 	has_rit =
 	has_xit =
@@ -379,24 +383,18 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 {
 	guard_lock reply_lock(&mutex_replystr);
 
-	int delay =  (n + cmd.length()) * 11000.0 / RigSerial->Baud();
-	int retnbr = 0;
+	size_t retnbr = 0;
 
 	replystr.clear();
 
 	if (progStatus.use_tcpip) {
-		send_to_remote(cmd, progStatus.byte_interval);
-		MilliSleep(delay + progStatus.tcpip_ping_delay);
+		send_to_remote(cmd);
+		MilliSleep(progStatus.tcpip_ping_delay);
 		retnbr = read_from_remote(replystr);
-		LOG_DEBUG ("%s: read %d bytes, %s", sz, retnbr, 
+		LOG_DEBUG ("%s: read %lu bytes, %s", sz, retnbr,
 			(pr == HEX ? str2hex(replystr.c_str(), replystr.length()): replystr.c_str()));
-		return retnbr;
+		return (int)retnbr;
 	}
-
-	if (this->name_ == rig_FT817.name_ ||
-		this->name_ == rig_FT817BB.name_ ||
-		this->name_ == rig_FT818ND.name_ )
-		delay += progStatus.comm_wait;
 
 	if(!RigSerial->IsOpen()) {
 		LOG_DEBUG("TEST %s", sz);
@@ -407,12 +405,35 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 
 	RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
 
-	MilliSleep(delay);
+	size_t tstart = zmsec();
+	size_t tout = tstart + progStatus.serial_timeout; // minimum of 100 msec
+	std::string tempstr;
+	size_t nret;
 
-	retnbr = RigSerial->ReadBuffer(replystr, n);
+	do {
+		tempstr.clear();
+		nret = RigSerial->ReadBuffer(tempstr, n - retnbr);
+		if (nret) {
+			for (size_t nc = 0; nc < nret; nc++)
+				replystr += tempstr[nc];
+			retnbr += nret;
+			tout = zmsec() + progStatus.serial_timeout;
+		}
+		if (retnbr >= n)
+			break;
+		MilliSleep(1);
+	} while  ( zmsec() < tout );
 
-	LOG_DEBUG ("%s: read %d bytes, %s", sz, retnbr,
-			(pr == HEX ? str2hex(replystr.c_str(), replystr.length()): replystr.c_str()));
+	static char ctrace[1000];
+	memset(ctrace, 0, 1000);
+	snprintf( ctrace, sizeof(ctrace), "%s: read %lu bytes in %d msec, %s", 
+		sz, retnbr,
+		(int)(zmsec() - tstart),
+		(pr == HEX ? str2hex(replystr.c_str(), replystr.length()): replystr.c_str()) );
+
+	if (SERIALDEBUG)
+		ser_trace(1, ctrace);
+
 	return retnbr;
 
 }
@@ -424,16 +445,15 @@ int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 	std::string wait_str = " ";
 	wait_str[0] = ch;
 
-	int delay =  (n + cmd.length()) * 11000.0 / RigSerial->Baud();
-	int retnbr = 0;
+	size_t retnbr = 0;
 
 	replystr.clear();
 
 	if (progStatus.use_tcpip) {
-		send_to_remote(cmd, progStatus.byte_interval);
-		MilliSleep(delay + progStatus.tcpip_ping_delay);
+		send_to_remote(cmd);
+		MilliSleep(progStatus.tcpip_ping_delay);
 		retnbr = read_from_remote(replystr);
-		LOG_DEBUG ("%s: read %d bytes, %s", sz, retnbr, replystr.c_str());
+		LOG_DEBUG ("%s: read %lu bytes, %s", sz, retnbr, replystr.c_str());
 		return retnbr;
 	}
 
@@ -446,30 +466,111 @@ int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 
 	RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
 
-	if (this->name_ == rig_TT566.name_) delay += progStatus.comm_wait;
-
-	MilliSleep(delay);
-
-	size_t tout1 = zmsec();//todmsec();
-	size_t tout2 = tout1;
-	size_t test = timeout;
+	size_t tstart = zmsec();
+	size_t tout = tstart + progStatus.serial_timeout;
 	std::string tempstr;
-	int nret;
+	size_t nret;
 
-	while ( (tout2 - tout1) < test) {
+	do  {
 		tempstr.clear();
 		nret = RigSerial->ReadBuffer(tempstr, n - retnbr, wait_str);
-		replystr.append(tempstr);
-		retnbr += nret;
-
-		tout2 = zmsec();//todmsec();
-		if (tout2 < tout1) tout1 = tout2;
+		if (nret) {
+			for (size_t nc = 0; nc < nret; nc++)
+				replystr += tempstr[nc];
+			retnbr += nret;
+			tout = zmsec() + progStatus.serial_timeout;
+		}
+		if (retnbr >= n)
+			break;
 
 		if (replystr.find(wait_str) != std::string::npos)
 			break;
+
+		MilliSleep(1);
+	} while ( zmsec() < tout );
+
+	static char ctrace[1000];
+	memset(ctrace, 0, 1000);
+	snprintf( ctrace, sizeof(ctrace), "%s: read %lu bytes in %d msec, %s", 
+		sz, retnbr,
+		(int)(zmsec() - tstart),
+		(pr == HEX ? str2hex(replystr.c_str(), replystr.length()): replystr.c_str()) );
+
+	if (SERIALDEBUG)
+		ser_trace(1, ctrace);
+
+	LOG_DEBUG ("%s", ctrace);
+
+	return retnbr;
+}
+
+int rigbase::wait_crlf(std::string cmd, std::string sz, int nr, int timeout, int pr)
+{
+	guard_lock reply_lock(&mutex_replystr);
+
+	char crlf[3] = "\r\n";
+
+	int retnbr = 0;
+
+	replystr.clear();
+
+	if (progStatus.use_tcpip) {
+		send_to_remote(cmd);
+		MilliSleep(progStatus.tcpip_ping_delay);
+		retnbr = read_from_remote(replystr);
+		LOG_DEBUG ("%s: read %d bytes, %s", sz.c_str(), retnbr, replystr.c_str());
+		return retnbr;
 	}
 
-	LOG_DEBUG ("%s: read %d bytes, %s", sz, retnbr, replystr.c_str());
+	if(!RigSerial->IsOpen()) {
+		LOG_DEBUG("TEST %s", sz.c_str());
+		return 0;
+	}
+
+	RigSerial->FlushBuffer();
+
+	RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
+
+	size_t tstart = zmsec();
+	size_t tout = zmsec() + timeout + progStatus.serial_timeout;
+	std::string tempstr;
+	int nret;
+
+	do {
+		tempstr.clear();
+		nret = RigSerial->ReadBuffer(tempstr, nr - retnbr, crlf);
+		if (nret) {
+			replystr.append(tempstr);
+			retnbr += nret;
+			tout = zmsec() + timeout + progStatus.serial_timeout;
+		}
+
+		if (replystr.find(crlf) != std::string::npos)
+			break;
+
+		if (retnbr >= nr) break;
+
+		MilliSleep(1);
+	} while ( zmsec() < tout );
+
+	static char ctrace[1000];
+	memset(ctrace, 0, 1000);
+	std::string srx = replystr;
+	if (srx[0] == '\n') srx.replace(0,1,"<lf>");
+	size_t psrx = srx.find("\r\n");
+	if (psrx != std::string::npos)
+		srx.replace(psrx, 2, "<cr><lf>");
+
+	snprintf( ctrace, sizeof(ctrace), "%s: read %d bytes in %d msec, %s", 
+		sz.c_str(), retnbr,
+		(int)(zmsec() - tstart),
+		srx.c_str());
+
+	if (SERIALDEBUG)
+		ser_trace(1, ctrace);
+
+	LOG_DEBUG ("%s", ctrace);
+
 	return retnbr;
 }
 
@@ -484,27 +585,34 @@ bool rigbase::id_OK(std::string ID, int wait)
 {
 	guard_lock reply_lock(&mutex_replystr);
 
-//	int retnbr = 0;
-
-	for (int n = 0; n < progStatus.comm_retries; n++) {
+	std::string buff;
+	int retn = 0;
+	size_t tout = 0;
+	for (int n = 0; n < progStatus.serial_retries; n++) {
 
 		RigSerial->FlushBuffer();
 		RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
-		MilliSleep(50);
 
-		for (int cnt = 0; cnt < wait / 10; cnt++) {
+		replystr.clear();
+		tout = zmsec() + wait;
 
-			replystr.clear();
-//			retnbr =
-			RigSerial->ReadBuffer(replystr, 10, ID, ";");
+		do {
+			MilliSleep(50);
+			buff.clear();
 
+			retn = RigSerial->ReadBuffer(buff, 10, ID, ";");
+			if (retn) {
+				replystr.append(buff);
+				tout = zmsec() + wait;
+			}
 			if (replystr.rfind(ID)) {
 				return true;
 			}
-			MilliSleep(10);
 			Fl::awake();
-		}
+
+		} while (zmsec() < tout);
 	}
+
 	replystr.clear();
 	return false;
 }

@@ -270,7 +270,7 @@ void disconnect_from_remote()
 int retry_after = 0;
 int drop_count = 0;
 
-void send_to_remote(std::string cmd_string, int pace)
+void send_to_remote(std::string cmd_string)
 {
 	if (retry_after > 0) {
 		retry_after -= progStatus.serloop_timing;
@@ -282,26 +282,16 @@ void send_to_remote(std::string cmd_string, int pace)
 		try {
 			connect_to_remote();
 		} catch (...) {
-LOG_QUIET("Retry connect in %d seconds", progStatus.tcpip_reconnect_after);
-
-std::cout << "Retry connect to remote in " << progStatus.tcpip_reconnect_after << " seconds" << std::endl;
-
+			LOG_QUIET("Retry connect in %d seconds", progStatus.tcpip_reconnect_after);
 			retry_after = 1000 * progStatus.tcpip_reconnect_after;
 			return;
 		}
 	}
 
 	try {
-//		guard_lock send_lock(&mutex_rcv_socket);
-//		size_t len = cmd_string.length();
+		tcpip->send(cmd_string);
 
-std::cout << "send_to_remote( \"" << cmd_string << "\" )" << std::endl;
-
-		tcpip->send(cmd_string);//.c_str(), len);
-
-//		for (size_t i = 0; i < len; i += 1024)
-//			tcpip->send(&cmd_string[i], len - i > 1024 ? 1024 : len - i);
-		log_level(WARN, "send to remote", cmd_string);
+		LOG_WARN("send to remote: %s", cmd_string.c_str());
 
 		drop_count = 0;
 	} catch (const SocketException& e) {
@@ -325,9 +315,8 @@ int read_from_remote(std::string &str)
 }
 	char szc[200];
 	snprintf(szc, sizeof(szc), "read_from_remote() : %s", str.c_str());
-std::cout << szc << std::endl;
 
-	log_level(WARN, "%s", szc);
+	LOG_WARN("%s", szc);
 
 	return str.length();
 }

@@ -53,6 +53,13 @@ size_t zmsec()
 	return (tv.tv_sec * 1000L + (tv.tv_usec / 1000L));
 }
 
+size_t zusec()
+{
+	static struct timeval tv;
+	gettimeofday(&tv, NULL);
+	return (tv.tv_sec * 1000000L + tv.tv_usec);
+}
+
 char *ztime()
 {
 	static char exttime[13];

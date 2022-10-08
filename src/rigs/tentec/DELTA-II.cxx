@@ -33,18 +33,21 @@ static const char RIG_TT535_mode_type[] = {'L', 'U', 'U', 'L', 'U'};
 RIG_TT535::RIG_TT535() {
 	name_ = RIG_TT535name_;
 	modes_ = RIG_TT535modes_;
-	comm_baudrate = BR1200;
+	serial_baudrate = BR1200;
 	stopbits = 1;
-	comm_retries = 2;
-	comm_wait = 10;
-	comm_timeout = 50;
-	comm_echo = true;
-	comm_rtscts = false;
-	comm_rtsplus = false;
-	comm_dtrplus = true;
-	comm_catptt = false;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
+	serial_timeout = 50;
+	serial_echo = true;
+	serial_rtscts = false;
+	serial_rtsplus = false;
+	serial_dtrplus = true;
+	serial_catptt = false;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 	modeA = 1;
 	bwA = 0;
 

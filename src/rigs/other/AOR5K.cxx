@@ -71,20 +71,23 @@ RIG_AOR5K::RIG_AOR5K() {
 	SH_tooltip = AOR5K_SH_label;
 	SH_label = AOR5K_SH_label;
 
-	comm_baudrate = BR9600;
+	serial_baudrate = BR9600;
 
 	widgets = aor5k_widgets;
 
 	stopbits = 2;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts = false;
-	comm_rtsplus = false;
-	comm_dtrplus = false;
-	comm_catptt = false;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
+	serial_timeout = 50;
+	serial_rtscts = false;
+	serial_rtsplus = false;
+	serial_dtrplus = false;
+	serial_catptt = false;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 
 	def_freq = freqA = freqB = 14070000;
 	def_mode = modeA = modeB = 1;

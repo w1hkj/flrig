@@ -91,14 +91,6 @@ bool RIG_ICOM::sendICcommand(std::string cmd, int nbr)
 	return true;
 }
 
-void RIG_ICOM::delayCommand(std::string cmd, int wait)
-{
-	int oldwait = progStatus.comm_wait;
-	progStatus.comm_wait += wait;
-	sendCommand(cmd);
-	progStatus.comm_wait = oldwait;
-}
-
 #include <fstream>
 
 void RIG_ICOM::ICtrace(std::string cmd, std::string hexstr) 
@@ -120,14 +112,14 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz, unsigned long timeout)
 	check[2] = cmd[3];
 	check[3] = cmd[2];
 
-	int delay =  n * 11000.0 / RigSerial->Baud();
+//	int delay =  n * 11000.0 / RigSerial->Baud();
 	int retnbr = 0;
 
 	replystr.clear();
 
 	if (progStatus.use_tcpip) {
-		send_to_remote(cmd, progStatus.byte_interval);
-		MilliSleep(delay + progStatus.tcpip_ping_delay);
+		send_to_remote(cmd);
+		MilliSleep(progStatus.tcpip_ping_delay);
 		retnbr = read_from_remote(replystr);
 		LOG_DEBUG ("%s: read %d bytes, %s", sz, retnbr, replystr.c_str());
 	} else {
@@ -138,17 +130,21 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz, unsigned long timeout)
 		RigSerial->FlushBuffer();
 		RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
 
-		size_t tout1 = zmsec();
-		size_t tout2 = tout1;
+		size_t tstart = zmsec();
+		size_t tout = tstart + timeout;
 		size_t pcheck = std::string::npos;
 		size_t peor = std::string::npos;
 
 		std::string tempstr;
 		int nret;
 
-		while ((tout2 - tout1) < timeout) {
+		while ( zmsec() < tout ) {
 			tempstr.clear();
-			nret = RigSerial->ReadBuffer(tempstr, n + cmd.length(), check, eor);
+			nret = RigSerial->ReadBuffer(
+				tempstr, 
+				n + (progStatus.serial_echo ? cmd.length() : 0), 
+				check, 
+				eor);
 			replystr.append(tempstr);
 			retnbr += nret;
 
@@ -161,9 +157,7 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz, unsigned long timeout)
 				(peor != std::string::npos) &&
 				(peor > pcheck) )
 				return true;
-
-			tout2 = zmsec();
-			if (tout2 < tout1) tout1 = tout2;
+			MilliSleep(1);
 		}
 
 	}

@@ -156,6 +156,9 @@ RIG_IC7000::RIG_IC7000() {
 	bandwidths_ = IC7000_SSB_CWwidths;
 	bw_vals_ = IC7000_bw_vals_SSB;
 
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
 	_mode_type = IC7000_mode_type;
 	widgets = IC7000_widgets;
 

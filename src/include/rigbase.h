@@ -158,19 +158,22 @@ public:
 	GUI *widgets;
 
 	int  io_class;
-	int  comm_baudrate;
+	int  serial_baudrate;
 	int  stopbits;
-	int  comm_retries;
-	int  comm_wait;
-	int  comm_timeout;
-	bool comm_echo;
-	bool comm_rtscts;
-	bool comm_rtsplus;
-	bool comm_dtrplus;
-	bool comm_catptt;
-	bool comm_rtsptt;
-	bool comm_dtrptt;
+	bool serial_echo;
+	bool serial_rtscts;
+	bool serial_rtsplus;
+	bool serial_dtrplus;
+	bool serial_catptt;
+	bool serial_rtsptt;
+	bool serial_dtrptt;
+	int  serial_retries;
+
+	int  serial_write_delay;
+	int  serial_post_write_delay;
+	int  serial_timeout;
 	int  serloop_timing;
+
 	int  CIV;
 	int  defaultCIV;
 	bool USBaudio;
@@ -634,6 +637,7 @@ double vfo_;
 
 	int waitN(size_t n, int timeout, const char *, int pr = HEX);
 	int wait_char(int ch, size_t n, int timeout, const char *, int pr = HEX);
+	int wait_crlf(std::string, std::string, int nr = 20, int timeout = 100, int pr = ASC);
 
 // IC-7610
 	virtual void set_digi_sel(bool) {}

@@ -354,17 +354,20 @@ RIG_TS990::RIG_TS990() {
 
 	widgets = rig_widgets;
 
-	comm_baudrate = BR115200;
+	serial_baudrate = BR115200;
 	stopbits = 1;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts = true;
-	comm_rtsplus = false;
-	comm_dtrplus = false;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
+	serial_timeout = 50;
+	serial_rtscts = true;
+	serial_rtsplus = false;
+	serial_dtrplus = false;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 
 	can_change_alt_vfo = true;
 

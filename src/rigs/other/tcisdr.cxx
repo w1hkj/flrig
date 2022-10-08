@@ -249,17 +249,20 @@ RIG_TCI_SDR::RIG_TCI_SDR() {
 
 	widgets = rig_widgets;
 
-	comm_baudrate = BR115200;
+	serial_baudrate = BR115200;
 	stopbits = 1;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts = false;
-	comm_rtsplus = false;
-	comm_dtrplus = false;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
+	serial_timeout = 50;
+	serial_rtscts = false;
+	serial_rtsplus = false;
+	serial_dtrplus = false;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 
 	A.freq  =  7070000;
 	A.imode = TCI_CW;

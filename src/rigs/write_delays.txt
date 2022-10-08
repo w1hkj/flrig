@@ -1,0 +1,34 @@
+Transceiver     Write Delay     Post Write Delay    In Use W1HKJ
+
+FT1000D             0                   5
+FT1000MP            5                   5
+FT100-D             0                  25
+FT2000              0                   5
+FT450               0                   5
+FT600               5                 200
+FT747               5                   5
+FT757GX            50                   5
+FT767GX            50                   5
+FT817               1                   0
+FT818               1                   0
+FT840              50                   5
+FT847              50                  50
+FT857               0                   0
+FT890              50                   5
+FT891               0                  50
+FT897               5                   0
+FT900               5                  50
+FT920               0                  80
+FT950               0                  50
+FT980              80                   5
+FT990              50                   5
+FT990v12           50                   5
+FT991               0                  25
+Ftdx10              0                   5               0 /  0
+Ftdx101             0                   5
+Ftdx1200            0                   5
+Ftdx3000            0                   5
+Ftdx5000            0                   5
+Ftdx9000            0                   5
+
+PCR1000            12                   2               0 / 0

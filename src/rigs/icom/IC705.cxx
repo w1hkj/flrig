@@ -167,18 +167,19 @@ RIG_IC705::RIG_IC705() {
 
 	_mode_type = IC705_mode_type;
 
-	comm_baudrate = BR19200;
+	serial_baudrate = BR19200;
 	stopbits = 1;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_echo = true;
-	comm_rtscts = false;
-	comm_rtsplus = true;
-	comm_dtrplus = true;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+	serial_timeout = 50;
+	serial_echo = true;
+	serial_rtscts = false;
+	serial_rtsplus = true;
+	serial_dtrplus = true;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 
 	widgets = IC705_widgets;
 
@@ -313,8 +314,8 @@ void RIG_IC705::set_xcvr_auto_on()
 	if (waitFOR(8, "get ID") == false) {
 		cmd.clear();
 		int fes[] = { 2, 2, 2, 3, 7, 13, 25, 50, 75, 150, 150, 150 };
-		if (progStatus.comm_baudrate >= 0 && progStatus.comm_baudrate <= 11) {
-			cmd.append( fes[progStatus.comm_baudrate], '\xFE');
+		if (progStatus.serial_baudrate >= 0 && progStatus.serial_baudrate <= 11) {
+			cmd.append( fes[progStatus.serial_baudrate], '\xFE');
 		}
 		RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
 

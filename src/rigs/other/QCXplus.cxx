@@ -46,17 +46,20 @@ RIG_QCXP::RIG_QCXP() {
 
 	widgets = rig_widgets;
 
-	comm_baudrate = BR38400;
+	serial_baudrate = BR38400;
 	stopbits = 1;
-	comm_retries = 1;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts  = false;
-	comm_rtsplus = false;
-	comm_dtrplus = false;
-	comm_catptt  = false;
-	comm_rtsptt  = false;
-	comm_dtrptt  = false;
+	serial_retries = 1;
+
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
+	serial_timeout = 50;
+	serial_rtscts  = false;
+	serial_rtsplus = false;
+	serial_dtrplus = false;
+	serial_catptt  = false;
+	serial_rtsptt  = false;
+	serial_dtrptt  = false;
 	B.imode = A.imode = 1;
 	B.iBW = A.iBW = 0x8A03;
 	A.freq = 7040000;

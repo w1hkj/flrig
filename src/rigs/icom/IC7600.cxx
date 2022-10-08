@@ -140,6 +140,9 @@ RIG_IC7600::RIG_IC7600() {
 	bandwidths_ = IC7600_ssb_bws;
 	bw_vals_ = IC7600_bw_vals_SSB;
 
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
 	_mode_type = IC7600_mode_type;
 
 	widgets = IC7600_widgets;

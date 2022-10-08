@@ -33,17 +33,20 @@ RIG_TS440::RIG_TS440() {
 	name_ = TS440name_;
 	modes_ = TS440modes_;
 	_mode_type = TS440_mode_type;
-	comm_baudrate = BR4800;
+	serial_baudrate = BR4800;
 	stopbits = 2;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts = true;
-	comm_rtsplus = false;
-	comm_dtrplus = false;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
+	serial_timeout = 50;
+	serial_rtscts = true;
+	serial_rtsplus = false;
+	serial_dtrplus = false;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 	modeB = modeA = def_mode = 1;
 	bwB = bwA = def_bw = 1;
 	freqA = def_freq = 14070000;

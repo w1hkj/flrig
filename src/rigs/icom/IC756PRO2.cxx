@@ -116,6 +116,9 @@ RIG_IC756PRO2::RIG_IC756PRO2() {
 	bandwidths_ = IC756PRO2_SSBwidths;
 	bw_vals_ = IC756PRO2_bw_vals_SSB;
 
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
 	_mode_type = IC756PRO2_mode_type;
 
 	widgets = IC756PRO2_widgets;

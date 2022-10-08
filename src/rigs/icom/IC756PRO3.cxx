@@ -118,6 +118,9 @@ RIG_IC756PRO3::RIG_IC756PRO3() {
 	bandwidths_ = IC756PRO3_SSBwidths;
 	bw_vals_ = IC756PRO3_bw_vals_SSB;
 
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
 	_mode_type = IC756PRO3_mode_type;
 	atten_level = 3; // will force initializing to 0 dB
 	preamp_level = 2; // will force initializaing to 0 dB

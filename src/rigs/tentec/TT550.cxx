@@ -162,17 +162,20 @@ RIG_TT550::RIG_TT550() {
 
 	widgets = rig_widgets;
 
-	comm_baudrate = BR57600;
+	serial_baudrate = BR57600;
 	stopbits = 1;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts = true;
-	comm_rtsplus = false;
-	comm_dtrplus = true;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
+	serial_timeout = 50;
+	serial_rtscts = true;
+	serial_rtsplus = false;
+	serial_dtrplus = true;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 	serloop_timing = 100;
 
 	def_mode = modeA = modeB = 1;

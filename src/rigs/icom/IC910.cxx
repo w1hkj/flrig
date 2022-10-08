@@ -74,6 +74,9 @@ RIG_IC910H::RIG_IC910H() {
 	bandwidths_ = IC910H_widths;
 	bw_vals_ = IC910H_bw_val;
 
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
 	widgets = IC910_widgets;
 
 	def_freq = 1296070000L;

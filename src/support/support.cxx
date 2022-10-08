@@ -1719,7 +1719,7 @@ void * serial_thread_loop(void *d)
 			check_ptt();
 		}
 
-		if (progStatus.byte_interval) MilliSleep(progStatus.byte_interval);
+		if (progStatus.serial_write_delay) MilliSleep(progStatus.serial_write_delay);
 
 		if (PTT || cwio_process == SEND || cwio_process == CALIBRATE) {
 			if (isRX) {
@@ -1734,8 +1734,8 @@ void * serial_thread_loop(void *d)
 				read_vfo();
 			}
 
-			if (progStatus.byte_interval)
-				MilliSleep(progStatus.byte_interval);
+			if (progStatus.serial_write_delay)
+				MilliSleep(progStatus.serial_write_delay);
 
 			{	guard_lock lk(&mutex_serial);
 				if (!bypass_serial_thread_loop) {
@@ -1760,8 +1760,8 @@ void * serial_thread_loop(void *d)
 					while (rx_poll_group_1->poll != NULL) {
 						if (*(rx_poll_group_1->poll))
 							(rx_poll_group_1->pollfunc)();
-						if (progStatus.byte_interval)
-							MilliSleep(progStatus.byte_interval);
+						if (progStatus.serial_write_delay)
+							MilliSleep(progStatus.serial_write_delay);
 						++rx_poll_group_1;
 					}
 					rx_poll_group_1 = &RX_poll_group_1[0];
@@ -1778,8 +1778,8 @@ void * serial_thread_loop(void *d)
 				}
 			}
 
-			if (progStatus.byte_interval)
-				MilliSleep(progStatus.byte_interval);
+			if (progStatus.serial_write_delay)
+				MilliSleep(progStatus.serial_write_delay);
 
 			if (!bypass_serial_thread_loop) {
 
@@ -2595,7 +2595,7 @@ void cbAttenuator()
 //	for (int n = 0; n < 100; n++) {
 //		chk = selrig->get_attenuator();
 //		if (chk == progStatus.attenuator) break;
-//		MilliSleep(progStatus.comm_wait);
+//		MilliSleep(progStatus.serial_post_write_delay);
 //		Fl::awake();
 //	}
 	return;
@@ -2615,11 +2615,11 @@ void cbPreamp()
 //	int chk = selrig->get_preamp();
 	progStatus.preamp = selrig->next_preamp();
 	selrig->set_preamp (progStatus.preamp);
-//	MilliSleep(5 + progStatus.comm_wait);
+//	MilliSleep(5 + progStatus.serial_post_write_delay);
 //	for (int n = 0; n < 100; n++) {
 //		chk = selrig->get_preamp();
 //		if (chk == progStatus.preamp) break;
-//		MilliSleep(progStatus.comm_wait);
+//		MilliSleep(progStatus.serial_post_write_delay);
 //		Fl::awake();
 //	}
 	return;
@@ -2656,10 +2656,10 @@ void cbbtnNotch()
 
 //	on = selrig->get_notch(val);
 
-	MilliSleep(progStatus.comm_wait);
+	MilliSleep(progStatus.serial_post_write_delay);
 
 	while ((selrig->get_notch(val) != progStatus.notch) && (cnt++ < 10)) {
-		MilliSleep(progStatus.comm_wait);
+		MilliSleep(progStatus.serial_post_write_delay);
 //		on = ;
 		Fl::awake();
 	}
@@ -2793,7 +2793,7 @@ void cbIFsh()
 	int val, on;
 	on = selrig->get_if_shift(val);
 	while ((on != btn) && (cnt++ < 10)) {
-		MilliSleep(progStatus.comm_wait);
+		MilliSleep(progStatus.serial_post_write_delay);
 		on = selrig->get_if_shift(val);
 		Fl::awake();
 	}
@@ -2970,7 +2970,7 @@ void cbMute()
 	MilliSleep(50);
 	get = selrig->get_volume_control();
 	while (get != set && cnt++ < 10) {
-		MilliSleep(progStatus.comm_wait);
+		MilliSleep(progStatus.serial_post_write_delay);
 		get = selrig->get_volume_control();
 		Fl::awake();
 	}
@@ -3202,11 +3202,11 @@ void cb_tune_on_off()
 
 int chkptt()
 {
-	if (progStatus.comm_catptt) {
+	if (progStatus.serial_catptt) {
 		return selrig->get_PTT();
-	} else if (progStatus.comm_dtrptt) {
+	} else if (progStatus.serial_dtrptt) {
 		return RigSerial->getPTT();
-	} else if (progStatus.comm_rtsptt) {
+	} else if (progStatus.serial_rtsptt) {
 		return RigSerial->getPTT();
 	} else if (SepSerial->IsOpen() && progStatus.sep_dtrptt) {
 		return SepSerial->getPTT();
@@ -3231,10 +3231,10 @@ void doPTT(int on)
 	rigPTT(on);
 	btnPTT->value(on);
 
-	MilliSleep(progStatus.comm_wait);
+	MilliSleep(progStatus.serial_post_write_delay);
 	for (int n = 0; n < 100; n++) {
 		if (on == chkptt()) break;
-		MilliSleep(progStatus.comm_wait);
+		MilliSleep(progStatus.serial_post_write_delay);
 		Fl::awake();
 	}
 	return;
@@ -3555,7 +3555,7 @@ void TRACED(setPTT, void *d)
 	for (int n = 0; n < 100; n++) {
 		chk = chkptt();
 		if (set == chk) break;
-		MilliSleep(progStatus.comm_wait);
+		MilliSleep(progStatus.serial_post_write_delay);
 	}
 	return;
 }
@@ -4085,7 +4085,7 @@ void cbNoise()
 	MilliSleep(50);
 	get = selrig->get_noise();
 	while ((get != btn) && (cnt++ < 10)) {
-		MilliSleep(progStatus.comm_wait);
+		MilliSleep(progStatus.serial_post_write_delay);
 		get = selrig->get_noise();
 		Fl::awake();
 	}
@@ -4154,7 +4154,7 @@ void cbNR()
 
 		get = selrig->get_noise_reduction();
 		while ((get != btn) && (cnt++ < 10)) {
-			MilliSleep(progStatus.comm_wait);
+			MilliSleep(progStatus.serial_post_write_delay);
 			get = selrig->get_noise_reduction();
 			Fl::awake();
 		}
@@ -4164,7 +4164,7 @@ void cbNR()
 		get = selrig->get_noise_reduction_val();
 		cnt = 0;
 		while ((get != set) && (cnt++ < 10)) {
-			MilliSleep(progStatus.comm_wait);
+			MilliSleep(progStatus.serial_post_write_delay);
 			get = selrig->get_noise_reduction_val();
 			Fl::awake();
 		}

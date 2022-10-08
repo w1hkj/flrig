@@ -165,17 +165,20 @@ RIG_TS870S::RIG_TS870S() {
 
 	widgets = rig_widgets;
 
-	comm_baudrate = BR57600;
+	serial_baudrate = BR57600;
 	stopbits = 1;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts = true;
-	comm_rtsplus = false;
-	comm_dtrplus = false;
-	comm_catptt = true;
-	comm_rtsptt = false;    // ditto (used for hardware handshake)
-	comm_dtrptt = false;    // ditto
+	serial_retries = 2;
+
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
+	serial_timeout = 50;
+	serial_rtscts = true;
+	serial_rtsplus = false;
+	serial_dtrplus = false;
+	serial_catptt = true;
+	serial_rtsptt = false;    // ditto (used for hardware handshake)
+	serial_dtrptt = false;    // ditto
 
 //	Defaults.
 	B.imode = A.imode = USB;

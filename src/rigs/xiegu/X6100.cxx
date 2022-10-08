@@ -147,6 +147,9 @@ RIG_X6100::RIG_X6100() {
 	bandwidths_ = X6100_SSB_CWwidths;
 	bw_vals_ = X6100_bw_vals_SSB;
 
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
 	_mode_type = X6100_mode_type;
 	widgets = X6100_widgets;
 

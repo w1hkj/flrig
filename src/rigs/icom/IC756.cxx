@@ -96,18 +96,19 @@ RIG_IC756::RIG_IC756() {
 
 	widgets = IC756_widgets;
 
-	comm_baudrate = BR19200;
+	serial_baudrate = BR19200;
 	stopbits = 1;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_echo = true;
-	comm_rtscts = false;
-	comm_rtsplus = false;
-	comm_dtrplus = true;
-	comm_catptt = false;
-	comm_rtsptt = true;
-	comm_dtrptt = false;
+	serial_retries = 2;
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+	serial_timeout = 50;
+	serial_echo = true;
+	serial_rtscts = false;
+	serial_rtsplus = false;
+	serial_dtrplus = true;
+	serial_catptt = false;
+	serial_rtsptt = true;
+	serial_dtrptt = false;
 
 	def_freq = freqB = freqA = B.freq = A.freq = 14070000L;
 	def_mode = B.imode = A.imode = 1;

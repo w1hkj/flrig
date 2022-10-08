@@ -60,22 +60,24 @@ status progStatus = {
 	20,			// int ddY;
 
 	"NONE",		// std::string xcvr_serial_port;
-	0,			// int comm_baudrate;
+	0,			// int serial_baudrate;
 	2,			// int stopbits;
-	2,			// int comm_retries;
-	5,			// int comm_wait;
-	50,			// int comm_timeout;
-	false,		// bool comm_echo;
 
-	0,			// bool comm_catptt;
-	0,			// bool comm_rtsptt;
-	0,			// bool comm_dtrptt;
+	2,			// int serial_retries;
+	0,			// int serial_write_delay;
+	0,			// int serial_post_write_delay
+	50,			// int serial_timeout;
 
-	false,		// bool comm_rtscts;
-	false,		// bool comm_rtsplus;
-	false,		// bool comm_dtrplus;
+	false,		// bool serial_echo;
+
+	0,			// bool serial_catptt;
+	0,			// bool serial_rtsptt;
+	0,			// bool serial_dtrptt;
+
+	false,		// bool serial_rtscts;
+	false,		// bool serial_rtsplus;
+	false,		// bool serial_dtrplus;
 	500,		// int  serloop_timing;
-	1,			// int  byte_interval;
 
 	"NONE",		// std::string aux_serial_port;
 	false,		// bool aux_SCU_17;
@@ -634,21 +636,21 @@ void status::saveLastState()
 	spref.set("ddy", ddY);
 
 	spref.set("xcvr_serial_port", xcvr_serial_port.c_str());
-	spref.set("comm_baudrate", comm_baudrate);
-	spref.set("comm_stopbits", stopbits);
-	spref.set("comm_retries", comm_retries);
-	spref.set("comm_wait", comm_wait);
-	spref.set("comm_timeout", comm_timeout);
+	spref.set("serial_baudrate", serial_baudrate);
+	spref.set("serial_stopbits", stopbits);
+	spref.set("serial_retries", serial_retries);
+	spref.set("serial_write_delay", serial_write_delay);
+	spref.set("serial_post_write_delay", serial_post_write_delay);
+	spref.set("serial_timeout", serial_timeout);
 	spref.set("serloop_timing", serloop_timing);
-	spref.set("byte_interval", byte_interval);
 
-	spref.set("comm_echo", comm_echo);
-	spref.set("ptt_via_cat", comm_catptt);
-	spref.set("ptt_via_rts", comm_rtsptt);
-	spref.set("ptt_via_dtr", comm_dtrptt);
-	spref.set("rts_cts_flow", comm_rtscts);
-	spref.set("rts_plus", comm_rtsplus);
-	spref.set("dtr_plus", comm_dtrplus);
+	spref.set("serial_echo", serial_echo);
+	spref.set("ptt_via_cat", serial_catptt);
+	spref.set("ptt_via_rts", serial_rtsptt);
+	spref.set("ptt_via_dtr", serial_dtrptt);
+	spref.set("rts_cts_flow", serial_rtscts);
+	spref.set("rts_plus", serial_rtsplus);
+	spref.set("dtr_plus", serial_dtrplus);
 
 	spref.set("disable_CW_ptt", disable_CW_ptt);
 
@@ -1282,22 +1284,37 @@ bool status::loadXcvrState(std::string xcvr)
 			i++;
 		}
 
-		spref.get("comm_baudrate", comm_baudrate, comm_baudrate);
+// original for existing prefs file
+		spref.get("comm_baudrate", serial_baudrate, serial_baudrate);
 		spref.get("comm_stopbits", stopbits, stopbits);
-		spref.get("comm_retries", comm_retries, comm_retries);
-		spref.get("comm_wait", comm_wait, comm_wait);
-		spref.get("comm_timeout", comm_timeout, comm_timeout);
+		spref.get("comm_retries", serial_retries, serial_retries);
+		spref.get("comm_wait", serial_post_write_delay, serial_post_write_delay);
+		spref.get("comm_timeout", serial_timeout, serial_timeout);
+		spref.get("byte_interval", serial_write_delay, serial_write_delay);
+
+		{
+			int testbaud = -1;
+			spref.get("serial_baudrate", testbaud, testbaud);
+			if (testbaud > -1) {
+				spref.get("serial_baudrate", serial_baudrate, serial_baudrate);
+				spref.get("serial_stopbits", stopbits, stopbits);
+				spref.get("serial_retries", serial_retries, serial_retries);
+				spref.get("serial_write_delay", serial_write_delay, serial_write_delay);
+				spref.get("serial_post_write_delay", serial_post_write_delay, serial_post_write_delay);
+				spref.get("serial_timeout", serial_timeout, serial_timeout);
+			}
+		}
+
 		spref.get("serloop_timing", serloop_timing, serloop_timing);
 		if (serloop_timing < 10) serloop_timing = 10; // minimum loop delay of 10 msec
-		spref.get("byte_interval", byte_interval, byte_interval);
 
-		if (spref.get("comm_echo", i, i)) comm_echo = i;
-		if (spref.get("ptt_via_cat", i, i)) comm_catptt = i;
-		if (spref.get("ptt_via_rts", i, i)) comm_rtsptt = i;
-		if (spref.get("ptt_via_dtr", i, i)) comm_dtrptt = i;
-		if (spref.get("rts_cts_flow", i, i)) comm_rtscts = i;
-		if (spref.get("rts_plus", i, i)) comm_rtsplus = i;
-		if (spref.get("dtr_plus", i, i)) comm_dtrplus = i;
+		if (spref.get("serial_echo", i, i)) serial_echo = i;
+		if (spref.get("ptt_via_cat", i, i)) serial_catptt = i;
+		if (spref.get("ptt_via_rts", i, i)) serial_rtsptt = i;
+		if (spref.get("ptt_via_dtr", i, i)) serial_dtrptt = i;
+		if (spref.get("rts_cts_flow", i, i)) serial_rtscts = i;
+		if (spref.get("rts_plus", i, i)) serial_rtsplus = i;
+		if (spref.get("dtr_plus", i, i)) serial_dtrplus = i;
 
 		if (spref.get("disable_CW_ptt", i, i)) disable_CW_ptt = i;
 
@@ -2231,21 +2248,21 @@ std::string status::info()
 
 	info << "status::info()\n============== Prefs File Contents =============\n\n";
 	info << "xcvr_serial_port   : " << xcvr_serial_port << "\n";
-	info << "comm_baudrate      : " << comm_baudrate << "\n";
-	info << "comm_stopbits      : " << stopbits << "\n";
-	info << "comm_retries       : " << comm_retries << "\n";
-	info << "comm_wait          : " << comm_wait << "\n";
-	info << "comm_timeout       : " << comm_timeout << "\n";
-	info << "serloop_timing     : " << serloop_timing << "\n";
-	info << "byte_interval      : " << byte_interval << "\n";
+	info << "baudrate           : " << serial_baudrate << "\n";
+	info << "stopbits           : " << stopbits << "\n";
+	info << "retries            : " << serial_retries << "\n";
+	info << "write_delay        : " << serial_write_delay << "\n";
+	info << "post_write_delay   : " << serial_post_write_delay << "\n";
+	info << "timeout            : " << serial_timeout << "\n";
+	info << "query interval:    : " << serloop_timing << "\n";
 	info << "\n";
-	info << "comm_echo          : " << comm_echo << "\n";
-	info << "ptt_via_cat        : " << comm_catptt << "\n";
-	info << "ptt_via_rts        : " << comm_rtsptt << "\n";
-	info << "ptt_via_dtr        : " << comm_dtrptt << "\n";
-	info << "rts_cts_flow       : " << comm_rtscts << "\n";
-	info << "rts_plus           : " << comm_rtsplus << "\n";
-	info << "dtr_plus           : " << comm_dtrplus << "\n";
+	info << "serial_echo          : " << serial_echo << "\n";
+	info << "ptt_via_cat        : " << serial_catptt << "\n";
+	info << "ptt_via_rts        : " << serial_rtsptt << "\n";
+	info << "ptt_via_dtr        : " << serial_dtrptt << "\n";
+	info << "rts_cts_flow       : " << serial_rtscts << "\n";
+	info << "rts_plus           : " << serial_rtsplus << "\n";
+	info << "dtr_plus           : " << serial_dtrplus << "\n";
 	info << "civadr             : " << CIV << "\n";
 	info << "usbaudio           : " << USBaudio << "\n";
 	info << "\n";

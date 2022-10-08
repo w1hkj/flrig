@@ -37,17 +37,20 @@ static const char FT818ND_mode_type[] = { 'L', 'U', 'U', 'L', 'U', 'U', 'U', 'U'
 RIG_FT818ND::RIG_FT818ND() {
 	name_ = FT818NDname_;
 	modes_ = FT818NDmodes_;
-	comm_baudrate = BR4800;
+	serial_baudrate = BR4800;
 	stopbits = 2;
-	comm_retries = 4;
-	comm_wait = 10;
-	comm_timeout = 50;
-	comm_rtscts = false;
-	comm_rtsplus = false;
-	comm_dtrplus = true;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 4;
+	
+	serial_write_delay = 1;
+	serial_post_write_delay = 0;
+
+	serial_timeout = 50;
+	serial_rtscts = false;
+	serial_rtsplus = false;
+	serial_dtrplus = true;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 	modeA = 1;
 	bwA = 0;
 

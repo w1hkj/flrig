@@ -48,17 +48,20 @@ RIG_FT900::RIG_FT900() {
 	name_ = FT900name_;
 	modes_ = FT900modes_;
 	bandwidths_ = FT900widths_;
-	comm_baudrate = BR4800;
+	serial_baudrate = BR4800;
 	stopbits = 2;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts = false;
-	comm_rtsplus = false;
-	comm_dtrplus = false;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+
+	serial_write_delay = 5;
+	serial_post_write_delay = 50;
+
+	serial_timeout = 50;
+	serial_rtscts = false;
+	serial_rtsplus = false;
+	serial_dtrplus = false;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 
 	afreq = bfreq = A.freq = B.freq = 14070000;
 	amode = bmode = A.imode = B.imode = 1;

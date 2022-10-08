@@ -187,16 +187,17 @@ RIG_IC7100::RIG_IC7100() {
 	_mode_type = IC7100_mode_type;
 	adjustCIV(defaultCIV);
 
-	comm_retries = 2;
-	comm_wait = 20;
-	comm_timeout = 2;
-	comm_echo = true;
-	comm_rtscts = false;
-	comm_rtsplus = true;
-	comm_dtrplus = true;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+	serial_timeout = 2;
+	serial_echo = true;
+	serial_rtscts = false;
+	serial_rtsplus = true;
+	serial_dtrplus = true;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 
 	widgets = IC7100_widgets;
 
@@ -302,10 +303,10 @@ static bool xcvr_is_on = false;
 
 void RIG_IC7100::set_xcvr_auto_on()
 {
-	int nr = progStatus.comm_baudrate == 6 ? 25 :
-			 progStatus.comm_baudrate == 5 ? 13 :
-			 progStatus.comm_baudrate == 4 ? 7 :
-			 progStatus.comm_baudrate == 3 ? 3 : 2;
+	int nr = progStatus.serial_baudrate == 6 ? 25 :
+			 progStatus.serial_baudrate == 5 ? 13 :
+			 progStatus.serial_baudrate == 4 ? 7 :
+			 progStatus.serial_baudrate == 3 ? 3 : 2;
 
 	cmd.assign(pre_to);
 	cmd += '\x19'; cmd += '\x00';

@@ -47,17 +47,20 @@ RIG_FT100D::RIG_FT100D() {
 	bandwidths_ = FT100Dwidths_;
 	bw_vals_ = FT100D_bw_val;
 
-	comm_baudrate = BR4800;
+	serial_baudrate = BR4800;
 	stopbits = 2;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 100;
-	comm_rtscts = false;
-	comm_rtsplus = false;
-	comm_dtrplus = true;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+	
+	serial_write_delay = 0;
+	serial_post_write_delay = 5;
+
+	serial_timeout = 100;
+	serial_rtscts = false;
+	serial_rtsplus = false;
+	serial_dtrplus = true;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 	afreq = bfreq = A.freq = B.freq = 14070000;
 	amode = bmode = A.imode = B.imode = 1;
 	aBW = bBW = A.iBW = B.iBW = 2;

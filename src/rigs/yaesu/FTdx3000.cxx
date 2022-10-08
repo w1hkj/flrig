@@ -152,17 +152,20 @@ RIG_FTdx3000::RIG_FTdx3000() {
 
 	widgets = rig_widgets;
 
-	comm_baudrate = BR38400;
+	serial_baudrate = BR38400;
 	stopbits = 1;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts = true;
-	comm_rtsplus = false;
-	comm_dtrplus = false;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+
+	serial_write_delay = 1;
+	serial_post_write_delay = 5;
+
+	serial_timeout = 50;
+	serial_rtscts = true;
+	serial_rtsplus = false;
+	serial_dtrplus = false;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 
 	A.imode = B.imode = modeB = modeA = def_mode = 1;
 	A.iBW = B.iBW = bwA = bwB = def_bw = 19;

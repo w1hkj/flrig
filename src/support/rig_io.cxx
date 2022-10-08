@@ -66,15 +66,15 @@ bool startXcvrSerial()
 	}
 
 	RigSerial->Device(progStatus.xcvr_serial_port);
-	RigSerial->Baud(BaudRate(progStatus.comm_baudrate));
+	RigSerial->Baud(BaudRate(progStatus.serial_baudrate));
 	RigSerial->Stopbits(progStatus.stopbits);
-	RigSerial->Retries(progStatus.comm_retries);
-	RigSerial->Timeout(progStatus.comm_timeout);
-	RigSerial->RTSptt(progStatus.comm_rtsptt);
-	RigSerial->DTRptt(progStatus.comm_dtrptt);
-	RigSerial->RTSCTS(progStatus.comm_rtscts);
-	RigSerial->RTS(progStatus.comm_rtsplus);
-	RigSerial->DTR(progStatus.comm_dtrplus);
+	RigSerial->Retries(progStatus.serial_retries);
+	RigSerial->Timeout(progStatus.serial_timeout);
+	RigSerial->RTSptt(progStatus.serial_rtsptt);
+	RigSerial->DTRptt(progStatus.serial_dtrptt);
+	RigSerial->RTSCTS(progStatus.serial_rtscts);
+	RigSerial->RTS(progStatus.serial_rtsplus);
+	RigSerial->DTR(progStatus.serial_dtrplus);
 
 	if (!RigSerial->OpenPort()) {
 		LOG_ERROR("Cannot access %s", progStatus.xcvr_serial_port.c_str());
@@ -95,17 +95,17 @@ Serial port:\n\
     RTS+     : %d\n\
     DTR+     : %d\n",
 			progStatus.xcvr_serial_port.c_str(),
-			progStatus.comm_baudrate,
+			progStatus.serial_baudrate,
 			progStatus.stopbits,
-			progStatus.comm_retries,
-			progStatus.comm_timeout,
+			progStatus.serial_retries,
+			progStatus.serial_timeout,
 			progStatus.serloop_timing,
-			progStatus.comm_rtscts,
-			progStatus.comm_catptt,
-			progStatus.comm_rtsptt,
-			progStatus.comm_dtrptt,
-			progStatus.comm_rtsplus,
-			progStatus.comm_dtrplus );
+			progStatus.serial_rtscts,
+			progStatus.serial_catptt,
+			progStatus.serial_rtsptt,
+			progStatus.serial_dtrptt,
+			progStatus.serial_rtsplus,
+			progStatus.serial_dtrplus );
 	}
 
 	RigSerial->FlushBuffer();
@@ -118,10 +118,10 @@ Serial port:\n\
 bool startAuxSerial()
 {
 	AuxSerial->Device(progStatus.aux_serial_port);
-	AuxSerial->Baud(BaudRate(progStatus.comm_baudrate));
+	AuxSerial->Baud(BaudRate(progStatus.serial_baudrate));
 	AuxSerial->Stopbits(progStatus.stopbits);
-	AuxSerial->Retries(progStatus.comm_retries);
-	AuxSerial->Timeout(progStatus.comm_timeout);
+	AuxSerial->Retries(progStatus.serial_retries);
+	AuxSerial->Timeout(progStatus.serial_timeout);
 
 	if (!AuxSerial->OpenPort()) {
 		LOG_ERROR("Cannot access %s", progStatus.aux_serial_port.c_str());
@@ -133,7 +133,7 @@ bool startAuxSerial()
 bool startSepSerial()
 {
 	SepSerial->Device(progStatus.sep_serial_port);
-	SepSerial->Baud(BaudRate(progStatus.comm_baudrate));
+	SepSerial->Baud(BaudRate(progStatus.serial_baudrate));
 
 	SepSerial->RTSCTS(false);
 	SepSerial->RTS(progStatus.sep_rtsplus);
@@ -187,10 +187,10 @@ int sendCommand (std::string s, int nread, int wait)
 
 	if (progStatus.use_tcpip) {
 		readResponse();
-		send_to_remote(s, progStatus.byte_interval);
+		send_to_remote(s);
 		int timeout = 
-			progStatus.comm_wait + progStatus.tcpip_ping_delay +
-			(int)((nread + progStatus.comm_echo ? numwrite : 0)*11000.0/RigSerial->Baud() );
+			progStatus.tcpip_ping_delay +
+			(int)((nread + progStatus.serial_echo ? numwrite : 0)*11000.0/RigSerial->Baud() );
 		while (timeout > 0) {
 			if (timeout > 10) MilliSleep(10);
 			else MilliSleep(timeout);
@@ -212,9 +212,7 @@ int sendCommand (std::string s, int nread, int wait)
 	RigSerial->FlushBuffer();
 	RigSerial->WriteBuffer(s.c_str(), numwrite);
 
-	int timeout = progStatus.comm_wait + 
-		(int)((nread + progStatus.comm_echo ? numwrite : 0)*11000.0/RigSerial->Baud());
-	timeout += wait;
+	int timeout = wait;
 	while (timeout > 0) {
 		if (timeout > 10) MilliSleep(10);
 		else MilliSleep(timeout);
@@ -252,7 +250,7 @@ bool waitCommand(
 		LOG_DEBUG("cmd:%3d, %s", numwrite, how == ASC ? command.c_str() : str2hex(command.data(), numwrite));
 
 	if (progStatus.use_tcpip) {
-		send_to_remote(command, progStatus.byte_interval);
+		send_to_remote(command);
 		if (nread == 0) return 0;
 	} else {
 		if (RigSerial->IsOpen() == false) {
@@ -274,7 +272,7 @@ bool waitCommand(
 	int tod_start = zmsec();
 
 // minimimum time to wait for a response
-	int timeout = (int)((nread + progStatus.comm_echo ? numwrite : 0)*11000.0/RigSerial->Baud()
+	int timeout = (int)((nread + progStatus.serial_echo ? numwrite : 0)*11000.0/RigSerial->Baud()
 		+ progStatus.use_tcpip ? progStatus.tcpip_ping_delay : 0);
 	while (timeout > 0) {
 		if (timeout > 10) MilliSleep(10);

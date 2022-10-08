@@ -46,18 +46,21 @@ RIG_RAY152::RIG_RAY152() {
 
 	widgets = rig_widgets;
 
-	comm_baudrate = BR1200;
+	serial_baudrate = BR1200;
 	stopbits = 1;
-	comm_retries = 2;
-	comm_wait = 10;
-	comm_timeout = 50;
-	comm_echo = true;
-	comm_rtscts = false;
-	comm_rtsplus = false;
-	comm_dtrplus = true;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
+	serial_timeout = 50;
+	serial_echo = true;
+	serial_rtscts = false;
+	serial_rtsplus = false;
+	serial_dtrplus = true;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 
 	A.freq = 14070000;
 	A.imode = 0;

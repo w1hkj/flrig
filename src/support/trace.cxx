@@ -62,7 +62,7 @@ Fl_Light_Button*	btn_pausetrace = (Fl_Light_Button*)0;
 
 std::string tracestring;
 
-bool stdout_trace = false;
+bool stdout_trace = false;//true;
 
 bool pausetrace = false;
 
@@ -115,6 +115,8 @@ static void update_tracetext(void *)
 	}
 	if (stdout_trace) {
 		std::cout << tracestring;
+		if (tracestring.find('\n') == std::string::npos) std::cout << std::endl;
+		std::cout.flush();
 		return;
 	}
     tracestring.clear();
@@ -302,7 +304,7 @@ void rpc_trace(int n, ...) // all args of type const char *
 
 void ser_trace(int n, ...) // all args of type const char *
 {
-	if (!progStatus.serialtrace) return;
+//	if (!progStatus.serialtrace) return;
 	if (!tracewindow) make_trace_window();
 	if (!n) return;
 
