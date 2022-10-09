@@ -2798,9 +2798,11 @@ void setINNER()
 
 	guard_lock lock(&mutex_serial);
 	selrig->set_pbt_inner(progStatus.pbt_inner);
-	selrig->set_pbt_outer(progStatus.pbt_outer);
 	selrig->get_pbt_inner();
-	selrig->get_pbt_outer();
+	if (progStatus.pbt_lock) {
+		selrig->set_pbt_outer(progStatus.pbt_outer);
+		selrig->get_pbt_outer();
+	}
 }
 
 void setOUTER()
@@ -2821,9 +2823,11 @@ void setOUTER()
 
 	guard_lock lock(&mutex_serial);
 	selrig->set_pbt_outer(progStatus.pbt_outer);
-	selrig->set_pbt_inner(progStatus.pbt_inner);
 	selrig->get_pbt_outer();
-	selrig->get_pbt_inner();
+	if (progStatus.pbt_lock) {
+		selrig->set_pbt_inner(progStatus.pbt_inner);
+		selrig->get_pbt_inner();
+	}
 }
 
 void setCLRPBT()
