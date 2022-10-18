@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #ifndef _TS590S_H
@@ -35,17 +35,17 @@ private:
 	int  active_bandwidth;
 	bool rxtxa;
 public:
-enum TS590MODES { LSB, USB, CW, FM, AM, FSK, CWR, FSKR, LSBD, USBD, FMD };
+enum TS590SMODES { LSB, USB, CW, FM, AM, FSK, CWR, FSKR, LSBD, USBD, FMD, AMD };
 	RIG_TS590S();
 	~RIG_TS590S(){}
 	
 	void initialize();
 	void shutdown();
 
-//	unsigned long int get_vfoA();
-//	void set_vfoA(unsigned long int);
-//	unsigned long int get_vfoB();
-//	void set_vfoB(unsigned long int);
+//	unsigned long long get_vfoA();
+//	void set_vfoA(unsigned long long);
+//	unsigned long long get_vfoB();
+//	void set_vfoB(unsigned long long);
 
 //	void selectA();
 //	void selectB();

@@ -75,7 +75,7 @@ guard_lock::guard_lock(pthread_mutex_t* m, std::string h) : mutex(m) {
 guard_lock::~guard_lock(void) {
 	if (!how.empty()) {
 		std::string szlock;
-		szlock.assign("unlock ").append(name(mutex)).append(" : ").append(how).append("\n");
+		szlock.assign("unlock ").append(name(mutex)).append(" : ").append(how);
 		trace(1, szlock.c_str());
 	}
 	pthread_mutex_unlock(mutex);

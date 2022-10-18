@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "yaesu/FT991.h"
@@ -115,21 +115,24 @@ RIG_FT991::RIG_FT991() {
 
 	widgets = rig_widgets;
 
-	comm_baudrate = BR38400;
+	serial_baudrate = BR38400;
 	stopbits = 1;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts = true;
-	comm_rtsplus = false;
-	comm_dtrplus = false;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+
+	serial_write_delay = 0;
+	serial_post_write_delay = 25;
+
+	serial_timeout = 50;
+	serial_rtscts = true;
+	serial_rtsplus = false;
+	serial_dtrplus = false;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 
 	A.imode = B.imode = modeB = modeA = def_mode = 1;
 	A.iBW = B.iBW = bwA = bwB = def_bw = 12;
-	A.freq = B.freq = freqA = freqB = def_freq = 14070000;
+	A.freq = B.freq = freqA = freqB = def_freq = 14070000ULL;
 
 	has_compON =
 	has_compression =
@@ -226,7 +229,7 @@ void RIG_FT991::initialize()
 // Disable Auto Information mode
 	sendCommand("AI0;");
 
-// "MRnnn;" if valid, returns last channel used, "mrlll...;", aunsigned long int with channel nnn info.
+// "MRnnn;" if valid, returns last channel used, "mrlll...;", along with channel nnn info.
 	cmd = "MR118;";
 	wait_char(';', 27, FL991_WAIT_TIME, "Read UK 60m Channel Mem", ASC);
 	size_t p = replystr.rfind("MR");
@@ -263,7 +266,7 @@ bool RIG_FT991::check ()
 	return false;
 }
 
-unsigned long int RIG_FT991::get_vfoA ()
+unsigned long long RIG_FT991::get_vfoA ()
 {
 	cmd = rsp = "FA";
 	cmd += ';';
@@ -272,14 +275,14 @@ unsigned long int RIG_FT991::get_vfoA ()
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return freqA;
 	p += 2;
-	int f = 0;
+	unsigned long long f = 0;
 	for (int n = 0; n < ndigits; n++)
 		f = f * 10 + replystr[p + n] - '0';
 	freqA = f;
 	return freqA;
 }
 
-void RIG_FT991::set_vfoA (unsigned long int freq)
+void RIG_FT991::set_vfoA (unsigned long long freq)
 {
 	freqA = freq;
 	cmd = "FA000000000;";
@@ -291,7 +294,7 @@ void RIG_FT991::set_vfoA (unsigned long int freq)
 	showresp(WARN, ASC, "SET vfo A", cmd, replystr);
 }
 
-unsigned long int RIG_FT991::get_vfoB ()
+unsigned long long RIG_FT991::get_vfoB ()
 {
 	cmd = rsp = "FB";
 	cmd += ';';
@@ -300,7 +303,7 @@ unsigned long int RIG_FT991::get_vfoB ()
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return freqB;
 	p += 2;
-	int f = 0;
+	unsigned long long f = 0;
 	for (int n = 0; n < ndigits; n++)
 		f = f * 10 + replystr[p + n] - '0';
 	freqB = f;
@@ -308,7 +311,7 @@ unsigned long int RIG_FT991::get_vfoB ()
 }
 
 
-void RIG_FT991::set_vfoB (unsigned long int freq)
+void RIG_FT991::set_vfoB (unsigned long long freq)
 {
 	freqB = freq;
 	cmd = "FB000000000;";

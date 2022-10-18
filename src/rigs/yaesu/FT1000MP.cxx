@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <stdio.h>
@@ -117,22 +117,25 @@ RIG_FT1000MP::RIG_FT1000MP() {
 	bandwidths_ = FT1000MP_widths;
 	bw_vals_ = FT1000MP_bw_vals;
 
-	comm_baudrate = BR4800;
+	serial_baudrate = BR4800;
 	stopbits = 2;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
+	serial_retries = 2;
+
+	serial_write_delay = 5;
+	serial_post_write_delay = 5;
+
+	serial_timeout = 50;
 	serloop_timing = 200;
-	comm_rtscts = true;
-	comm_rtsplus = false;
-	comm_dtrplus = true;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
-	A.freq = 14070000;
+	serial_rtscts = true;
+	serial_rtsplus = false;
+	serial_dtrplus = true;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
+	A.freq = 14070000ULL;
 	A.imode = 1;
 	A.iBW = 1;
-	B.freq = 3580000;
+	B.freq = 3580000ULL;
 	B.imode = 1;
 	B.iBW = 1;
 	precision = 10;
@@ -389,7 +392,7 @@ bool RIG_FT1000MP::get_info(void)
 		size_t p = replystr.length() - 32;
 
 		// vfo A data std::string
-		A.freq = hex2freq(replystr.substr(p + 1, 4));
+		A.freq = (unsigned long long)hex2freq(replystr.substr(p + 1, 4));
 
 		for (md = 0; md < 14; md++) {
 			if ( ((FT1000MP_mode[md].a & 0xFF) == (replystr[p + 7] & 0xFF)) &&
@@ -402,7 +405,7 @@ bool RIG_FT1000MP::get_info(void)
 		A.iBW = 5*((replystr[p + 8] & 0x70) >> 4) + (replystr[p + 8] & 0x07);
 		if (A.iBW > 24) A.iBW = 24;
 
-		B.freq = hex2freq(replystr.substr(p + 17, 4));
+		B.freq = (unsigned long long)hex2freq(replystr.substr(p + 17, 4));
 
 		for (md = 0; md < 14; md++) {
 			if ( ((FT1000MP_mode[md].a & 0xFF) == (replystr[p + 23] & 0xFF)) &&
@@ -420,19 +423,19 @@ bool RIG_FT1000MP::get_info(void)
 	return false;
 }
 
-unsigned long int RIG_FT1000MP::get_vfoA ()
+unsigned long long RIG_FT1000MP::get_vfoA ()
 {
 	get_info();
 	return A.freq;
 }
 
-unsigned long int RIG_FT1000MP::get_vfoB ()
+unsigned long long RIG_FT1000MP::get_vfoB ()
 {
 	get_info();
 	return B.freq;
 }
 
-void RIG_FT1000MP::set_vfoA (unsigned long int freq)
+void RIG_FT1000MP::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	init_cmd();
@@ -447,7 +450,7 @@ void RIG_FT1000MP::set_vfoA (unsigned long int freq)
 	seth();
 }
 
-void RIG_FT1000MP::set_vfoB (unsigned long int freq)
+void RIG_FT1000MP::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
 	init_cmd();

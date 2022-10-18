@@ -23,6 +23,7 @@
 #define TOD_H_
 
 extern size_t zmsec();
+extern size_t zusec();
 extern char *ztime();
 
 #endif // TOD_H_

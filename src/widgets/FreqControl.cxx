@@ -20,48 +20,58 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
-#include <FL/Fl_Float_Input.H>
 #include <FL/fl_draw.H>
-#include <FL/Fl_Box.H>
-#include <iostream>
+#include <FL/names.h>
 
 #include <cstdlib>
-#include <cmath>
-#include <stdio.h>
+#include <iostream>
+#include <string>
+#include <string.h>
 
 #include "FreqControl.h"
-#include "util.h"
 #include "gettext.h"
 
-#include "status.h"
+std::string old_input_buffer;  // Hold contents of Fl_Float_Input widget prior to change in case of need to revert
 
 const char *cFreqControl::Label[10] = {
 	"0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
-void cFreqControl::IncFreq (size_t nbr) {
-	double v = val;
-	v += mult[nbr] * precision;
-	if (v <= maxVal) {
-		val += mult[nbr] * precision;
-		updatevalue();
-	}
-	do_callback();
+
+static void blink_point(Fl_Widget* w)
+{
+	w->label(*w->label() ? "" : ".");
+	Fl::repeat_timeout(0.5, (Fl_Timeout_Handler)blink_point, w);
 }
 
-void cFreqControl::DecFreq (size_t nbr) {
-	unsigned long int v = 1;
-	v = val - mult[nbr] * precision;
-	if (v >= minVal)
+
+void cFreqControl::IncFreq (int nbr) {
+	unsigned long long v = val;
+	v += mult[nbr] * precision;
+	if (v <= maxVal) {
 		val = v;
-	updatevalue();
-	do_callback();
+		updatevalue();
+		numeric_entry_mode(false);
+		do_callback();
+	}
+}
+
+void cFreqControl::DecFreq (int nbr) {
+	unsigned long long requested_decrement = mult[nbr] * precision;
+	if (requested_decrement > val) {	// Handle case where user clicks low (decrement) on
+										// high value blank digit leading to underflow
+		return;
+	} else {
+		val -= requested_decrement;
+		updatevalue();
+		numeric_entry_mode(false);
+		do_callback();
+	}
 }
 
 void cbSelectDigit (Fl_Widget *btn, void * nbr)
 {
-
 	Fl_Button *b = (Fl_Button *)btn;
-	size_t Nbr = reinterpret_cast<size_t> (nbr);
+	int Nbr = reinterpret_cast<intptr_t> (nbr);
 
 	cFreqControl *fc = (cFreqControl *)b->parent();
 	if (fc->hrd_buttons) {
@@ -80,186 +90,227 @@ void cbSelectDigit (Fl_Widget *btn, void * nbr)
 	fc->redraw();
 }
 
+
 void cFreqControl::set_ndigits(int nbr)
 {
-	int H = Digit[0]->h();
-	int W = Digit[0]->w();
-	int ht = H;
+	// If number of digits change, remove/delete prior constructs if any
+	// and create desired number.
 
-	fl_font(font_number, ht);
-	int fh = fl_height();
-	int fw = fl_width("0");
+	if (nbr > MAX_DIGITS) nbr = MAX_DIGITS;
+	if (nbr < MIN_DIGITS) nbr = MIN_DIGITS;
 
-	while ( ht && ((fh >= H) || (fw >= W))) {
-		if (--ht <= 1) break;
-		fl_font(font_number, ht);
+	if (nD && nbr != nD) {
+		for (int n = 0; n < nD; n++) {
+			this->remove(Digit[n]);
+			delete Digit[n];
+		}
+	}
+
+	if (nbr != nD) {
+		for (int n = 0; n < nbr; n++) {
+			Digit[n] = new Fl_Repeat_Button(0, 0, 1, 1, " ");
+			Digit[n]->box(Digit_box_type);
+			Digit[n]->labelcolor(LBLCOLOR);
+			Digit[n]->color(BGCOLOR, SELCOLOR);
+			Digit[n]->align(FL_ALIGN_INSIDE);
+			Digit[n]->callback(cbSelectDigit, reinterpret_cast<void*>(n));
+			this->add(Digit[n]);
+		}
+	}
+
+	nD = nbr;
+
+	// Usable space inside FreqControl box border
+	X = this->x() + bdr_x;
+	Y = this->y() + bdr_y;
+	W = this->w() - 2 * bdr_x;
+	H = this->h() - 2 * bdr_y;
+
+	// While we allow user to select a font, we pay no attention
+	// to the user's selection of font size; we size the font
+	// to fill the available height in the Fl_Repeat_Button box,
+	// constrained by the maximum width allowable per digit.
+
+	fs = H;
+	fl_font(font_number, fs);
+
+	fw = fl_width("0");  // Assumes the '0' numeral is the widest
+	fh = fl_height();
+
+	while ( fs && ((fh - fl_descent() >= H) || ((nD + 0.5) * fw >= W))) {
+		if (--fs <= 1) break;
+		fl_font(font_number, fs);
 		fh = fl_height();
 		fw = fl_width("0");
 	}
+	dw = fw;
+	pw = dw / 2;
 
-	Fl_Boxtype B = FL_FLAT_BOX;
-	int xpos = Digit[0]->x() + W;
-	int ypos = Digit[0]->y();
+	// Number display will be right-justified in available space.
+
+	//	Working from right to left:
+	//		Right-of-decimal Repeat Buttons (digits)
+	//		Decimal box
+	//		Left-of-decimal Repeat Buttons (digits)
+	//		Fill box
+
+	int xpos = X + W;
 	for (int n = 0; n < dpoint; n++) {
-		xpos -= W;
-		Digit[n]->box(B);
+		xpos -= dw;
+		Digit[n]->resize (xpos, Y, dw, H);
 		Digit[n]->labelfont(font_number);
-		Digit[n]->labelsize(fh);
-		Digit[n]->position(xpos, ypos);
-		Digit[n]->redraw_label();
-		Digit[n]->redraw();
-		Digit[n]->callback(cbSelectDigit, reinterpret_cast<void*>(n));
+		Digit[n]->labelsize(fs);
 	}
 
-	xpos -= W / 2;
-	decbx->position(xpos, ypos);
+	xpos -= pw;
+	decbx->resize(xpos, Y, pw, H);
 	decbx->labelfont(font_number);
-	decbx->labelsize(fh);
-	decbx->redraw_label();
-	decbx->redraw();
+	decbx->labelsize(fs);
 
 	for (int n = dpoint; n < nD; n++) {
-		xpos -= W;
-		Digit[n]->box(B);
+		xpos -= dw;
+		Digit[n]->resize(xpos, Y, dw, H);
 		Digit[n]->labelfont(font_number);
-		Digit[n]->labelsize(fh);
-		Digit[n]->position(xpos, ypos);
-		Digit[n]->redraw_label();
-		Digit[n]->redraw();
-		Digit[n]->callback(cbSelectDigit, reinterpret_cast<void*>(n));
+		Digit[n]->labelsize(fs);
 	}
 
-	font_size = ht;
+	hfill->resize(X, Y, xpos - X, H);
+
+	redraw();
+
+	// Compute max freq value
+
+	double fmaxval_hz, fmaxval_khz;
+	minVal = 0;
+	fmaxval_hz = (pow(10.0, nD) - 1) * precision;
+	unsigned long long UMAX = maximum();//(unsigned long int)(pow(2.0, 32) - 1);
+	if (fmaxval_hz > UMAX) fmaxval_hz = UMAX;
+	maxVal = fmaxval_hz;
+	fmaxval_khz = (fmaxval_hz / 1000);  // For tooltip use; not used elsewhere
+
+	const char* freq_steps[] = {
+		"1", "10", "100", "1k", "10k", "100k", "1M", "10M", "100M", "1G", "10G", "100G"};
+
+	static char tt[1000];
+	snprintf(tt, sizeof(tt), "Set Frequency: (Max val: %.3f kHz)\n\
+  * Enter frequency with number keys or Keypad\n\
+	  (decimal point blinks once entry has started)\n\
+	  ENTER to confirm and send to rig;\n\
+	  BSP/Ctrl-BSP erase last digit/all digits entered;\n\
+	  ESC to abort and revert to initial value\n\
+  * Following actions send frequency to rig instantly\n\
+	  Mousewheel over digit\n\
+	  R/L arrow +/- %s; w/SHIFT %s; w/CTRL %s\n\
+	  U/D arrow +/- %s; w/SHIFT %s; w/CTRL %s\n\
+	  Pg U/D    +/- %s; w/SHIFT %s; w/CTRL %s\n\
+	  L/R mouse click (hold for rpt) in top/bot half of digit\n\
+	  Ctrl-v: paste from clipboard\n\
+	  MM click: paste from selection",
+	  fmaxval_khz,
+	  freq_steps[3-dpoint], freq_steps[4-dpoint], freq_steps[5-dpoint],
+	  freq_steps[6-dpoint], freq_steps[7-dpoint], freq_steps[8-dpoint],
+	  freq_steps[9-dpoint], freq_steps[10-dpoint], freq_steps[11-dpoint]);
+	tooltip(tt);
 }
 
-cFreqControl::cFreqControl(int x, int y, int w, int h, const char *lbl) : Fl_Group(x,y,w,h,"")
-{
-	font_number = FL_COURIER;
 
-	ONCOLOR = FL_YELLOW;
-	OFFCOLOR = FL_BLACK;
-	SELCOLOR = fl_rgb_color(100, 100, 100);
-	ILLUMCOLOR = FL_GREEN;
-	oldval = val = 0;
-	precision = 1;
-	dpoint = 3;
 
-	nD = atol(lbl);
-	if (nD > MAX_DIGITS) nD = MAX_DIGITS;
-	if (nD < MIN_DIGITS) nD = MIN_DIGITS;
+cFreqControl::cFreqControl(int x, int y, int w, int h, const char *lbl):
+			  Fl_Group(x,y,w,h,"") {
 
-	minVal = 0;
-	maxVal = 
-		(nD == 1 ? 9L :
-		(nD == 2 ? 99L :
-		(nD == 3 ? 999L :
-		(nD == 4 ? 9999L :
-		(nD == 5 ? 99999L :
-		(nD == 6 ? 999999L :
-		(nD == 7 ? 9999999L :
-		(nD == 8 ? 99999999L :
-		(nD == 9 ? 999999999L :
-		1410065407L )))))))));
+	end();	// End automatic child widget addition to Group parent;
+			// child widgets will be added explicitly as appropriate.
 
+	font_number = FL_HELVETICA; // Font will be overridden with stored preference
+
+	BGCOLOR = REVLBLCOLOR = fl_rgb_color ( 255, 253, 222); // Light yellow;
+	LBLCOLOR = REVBGCOLOR = FL_BLACK;
+	SELCOLOR = fl_rgb_color ( 100, 100, 100);  // Light gray
+
+	oldval = val = 0;	// Hz
+	precision = 1;		// Hz; Resolution of Frequency Control display; internal resolution always 1 Hz
+	dpoint = 3;			// Number of digits to the right of decimal
+
+	nD = 0;				// Number of digits to display
+
+	// FreqControl box type and box border thicknesses
 	box(FL_DOWN_BOX);
-	bdr = Fl::box_dy(box());
+	color(BGCOLOR);
+	bdr_x = Fl::box_dx(box());
+	bdr_y = Fl::box_dy(box());
 
-	Fl_Boxtype B = FL_FLAT_BOX;
+	// Repeat Button, decimal, and fill boxes
+	Digit_box_type = FL_FLAT_BOX;
 
-	int H = h - 2 * bdr;
-	int W = w - 2 * bdr;
-	int X = x + bdr;
-	int Y = y + bdr;
-	int wb = trunc(W / (nD + 0.5));
-	int fill = W - wb * (nD + 0.5);
-
-	hfill = new Fl_Box(X, Y, fill, H, "");
-	hfill->box(FL_FLAT_BOX);
-	hfill->labelcolor(ONCOLOR);
-	hfill->color(ONCOLOR);
-
-	for (int n = 0; n < 3; n++) {
-		Digit[n] = new Fl_Repeat_Button ( X + W - (n + 1) * wb, Y, wb, H, " ");
-		Digit[n]->box(B); 
-		Digit[n]->labelcolor(ONCOLOR);
-		Digit[n]->color(OFFCOLOR, SELCOLOR);
-		Digit[n]->align(FL_ALIGN_INSIDE);
-		Digit[n]->callback(cbSelectDigit, reinterpret_cast<void*>(n));
-	}
-
-	decbx = new Fl_Box(X + W - 3*wb - wb/2, Y, wb / 2, H, ".");
-	decbx->box(B);
-	decbx->color(ONCOLOR);
-	decbx->labelcolor(ONCOLOR);
+	// "Box" for decimal point - Created once; position and size will change as necessary
+	decbx = new Fl_Box(0, 0, 1, 1, ".");
+	decbx->box(Digit_box_type);
+	decbx->color(BGCOLOR);
+	decbx->labelcolor(LBLCOLOR);
 	decbx->align(FL_ALIGN_INSIDE);
+	add(decbx);
 
-	for (int n = 3; n < nD; n++) {
-		Digit[n] = new Fl_Repeat_Button ( X + W - wb/2 - 3 * wb  - (n - 2) * wb, Y, wb, H, " ");
-		Digit[n]->box(B); 
-		Digit[n]->labelcolor(ONCOLOR);
-		Digit[n]->color(OFFCOLOR, SELCOLOR);
-		Digit[n]->align(FL_ALIGN_INSIDE);
-		Digit[n]->callback(cbSelectDigit, reinterpret_cast<void*>(n));
-	}
+	// "Box" to fill empty space to the left of most significant digit - Created once; position and size will change as necessary
+	hfill = new Fl_Box(0, 0, 1, 1, "");
+	hfill->box(Digit_box_type);
+	hfill->labelcolor(LBLCOLOR);
+	hfill->color(BGCOLOR);
+	add(hfill);
 
 	mult[0] = 1;
-	for (int n = 1; n < nD; n++ )
+	for (int n = 1; n < MAX_DIGITS; n++ )
 		mult[n] = 10 * mult[n-1];
+
+	// Create Repeat Buttons; size and position widgets
+	set_ndigits(atoi(lbl));
 
 	cbFunc = NULL;
 
-//	finp = new Fl_Float_Input(0, 0, 24, 24);
-	finp = new Fl_Float_Input(X, Y, W, H);
+	// Hidden widget used for managing text input and paste actions
+	finp = new Fl_Float_Input(0, 0, 24,24);
 	finp->callback(freq_input_cb, this);
-	finp->when(FL_WHEN_CHANGED);
-	finp->textsize(H - 4);
+	finp->when(FL_WHEN_CHANGED | FL_WHEN_NOT_CHANGED);
 	finp->hide();
-//	remove(finp);
 
-	end();
-
-	precision = 1;
+	// true - either mouse button upper half of digit to inc; lower half to dec
+	// false - Left mouse button increments; right mouse button decrements
 	hrd_buttons = true;
+
 	colors_reversed = false;
-
-	minVal = 0;
-	maxVal = (unsigned long int)(pow(10.0, nD) - 1) * precision;
-	double fmaxval = maxVal / 1000.0;
-	static char tt[100];
-	snprintf(tt, sizeof(tt), "Enter frequency (max %.3f) or\nLeft/Right/Up/Down/Pg_Up/Pg_Down", fmaxval);
-	tooltip(tt);
-
-	set_ndigits(nD);
-
-	active = true;
+	active = true;					// Frequency Control will accept changes
+	numeric_entry_active = false;	// User is NOT in the process of entering numbers by keyboard
 }
 
 cFreqControl::~cFreqControl()
 {
-	for (int i = 0; i < nD; i++) {
-		delete Digit[i];
-	}
+	delete decbx;
+	delete hfill;
 	delete finp;
+	if (nD > 0) {
+		for (int i = 0; i < nD; i++) {
+			delete Digit[i];
+		}
+	}
 }
 
 
 void cFreqControl::updatevalue()
 {
-	unsigned long int v = val / precision;
+	unsigned long long v = val / precision;
 	int i;
-	if (likely(v > 0L)) {
+	if (v > 0ULL) {
 		for (i = 0; i < nD; i++) {
-			Digit[i]->label(v == 0 ? "" : Label[v % 10]);
+			Digit[i]->label((v == 0 && i > dpoint) ? "" : Label[v % 10]);
 			v /= 10;
 		}
 	}
 	else {
-		for (i = 0; i < 4; i++)
+		for (i = 0; i < (dpoint + 1); i++)
 			Digit[i]->label("0");
 		for (; i < nD; i++)
 			Digit[i]->label("");
 	}
-	decbx->label(".");
+
 	redraw();
 }
 
@@ -268,209 +319,302 @@ void cFreqControl::font(Fl_Font fnt)
 	font_number = fnt;
 	set_ndigits(nD);
 	updatevalue();
-	redraw();
 }
 
-void cFreqControl::SetONOFFCOLOR( Fl_Color ONcolor, Fl_Color OFFcolor)
+void cFreqControl::SetCOLORS( Fl_Color LBLcolor, Fl_Color BGcolor)
 {
-	OFFCOLOR = REVONCOLOR = OFFcolor;
-	ONCOLOR = REVOFFCOLOR = ONcolor;
+	if (Fl_Widget::contains(Fl::belowmouse())) return; //DST  Temporary ? work-around for inoportune calls from highlight_vfo
 
-	for (int n = 0; n < nD; n++) {
-		Digit[n]->labelcolor(ONCOLOR);
-		Digit[n]->color(OFFCOLOR);
-		Digit[n]->redraw();
-		Digit[n]->redraw_label();
-	}
-	decbx->labelcolor(ONCOLOR);
-	decbx->color(OFFCOLOR);
-	decbx->redraw();
-	decbx->redraw_label();
-	hfill->color(OFFCOLOR);
-	color(OFFCOLOR);
-	redraw();
+	LBLCOLOR = REVBGCOLOR = LBLcolor;
+	BGCOLOR = REVLBLCOLOR = BGcolor;
+	UpdateCOLORS(LBLCOLOR, BGCOLOR);
 }
 
-void cFreqControl::SetONCOLOR (uchar r, uchar g, uchar b) 
+void cFreqControl::SetBGCOLOR (uchar r, uchar g, uchar b)
 {
-	ONCOLOR = fl_rgb_color (r, g, b);
-	REVOFFCOLOR = ONCOLOR;
-	for (int n = 0; n < nD; n++) {
-		Digit[n]->labelcolor(ONCOLOR);
-		Digit[n]->color(OFFCOLOR);
-		Digit[n]->redraw();
-		Digit[n]->redraw_label();
-	}
-	decbx->labelcolor(ONCOLOR);
-	decbx->color(OFFCOLOR);
-	decbx->redraw();
-	decbx->redraw_label();
-	hfill->color(OFFCOLOR);
-	color(OFFCOLOR);
-	redraw();
+	BGCOLOR = fl_rgb_color (r, g, b);
+	REVLBLCOLOR = BGCOLOR;
+	UpdateCOLORS(LBLCOLOR, BGCOLOR);
 }
 
-void cFreqControl::SetOFFCOLOR (uchar r, uchar g, uchar b) 
+void cFreqControl::SetLBLCOLOR (uchar r, uchar g, uchar b)
 {
-	OFFCOLOR = fl_rgb_color (r, g, b);
-	REVONCOLOR = OFFCOLOR;
-
-	for (int n = 0; n < nD; n++) {
-		Digit[n]->labelcolor(ONCOLOR);
-		Digit[n]->color(OFFCOLOR);
-	}
-	decbx->labelcolor(ONCOLOR);
-	decbx->color(OFFCOLOR);
-	decbx->redraw();
-	decbx->redraw_label();
-	hfill->color(OFFCOLOR);
-	color(OFFCOLOR);
-	redraw();
-}
-
-static void blink_point(Fl_Widget* w)
-{
-	w->label(*w->label() ? "" : ".");
-	Fl::add_timeout(0.2, (Fl_Timeout_Handler)blink_point, w);
-}
-
-void cFreqControl::value(unsigned long int lv)
-{
-	oldval = val = lv;
-	Fl::remove_timeout((Fl_Timeout_Handler)blink_point, decbx);
-	updatevalue();
+	LBLCOLOR = fl_rgb_color (r, g, b);
+	REVBGCOLOR = LBLCOLOR;
+	UpdateCOLORS(LBLCOLOR, BGCOLOR);
 }
 
 void cFreqControl::restore_colors()
 {
 	colors_reversed = false;
-	for (int n = 0; n < nD; n++) {
-		Digit[n]->labelcolor(ONCOLOR);
-		Digit[n]->color(OFFCOLOR);
-		Digit[n]->redraw();
-		Digit[n]->redraw_label();
-	}
-	decbx->labelcolor(ONCOLOR);
-	decbx->color(OFFCOLOR);
-	decbx->redraw();
-	decbx->redraw_label();
-	color(OFFCOLOR);
-	redraw();
+	UpdateCOLORS(LBLCOLOR, BGCOLOR);
 }
 
 void cFreqControl::reverse_colors()
 {
 	colors_reversed = true;
+	UpdateCOLORS(REVLBLCOLOR, REVBGCOLOR);
+}
+
+void cFreqControl::UpdateCOLORS(Fl_Color lbl, Fl_Color bg) {
 	for (int n = 0; n < nD; n++) {
-		Digit[n]->labelcolor(REVONCOLOR);
-		Digit[n]->color(REVOFFCOLOR);
-		Digit[n]->redraw();
-		Digit[n]->redraw_label();
+		Digit[n]->labelcolor(lbl);
+		Digit[n]->color(bg);
 	}
-	decbx->labelcolor(REVONCOLOR);
-	decbx->color(REVOFFCOLOR);
+	decbx->labelcolor(lbl);
+	decbx->color(bg);
 	decbx->redraw();
 	decbx->redraw_label();
-	color(REVOFFCOLOR);
+	hfill->labelcolor(lbl);
+	hfill->color(bg);
+	hfill->redraw();
+	hfill->redraw_label();
+
+	color(bg);
 	redraw();
+}
+
+
+void cFreqControl::value(unsigned long long lv)
+{
+	if (numeric_entry_mode()) return;	// Don't allow third party to assign a value while user is entering via keyboard.
+	if (lv > maxVal) return;			// Assume this is an erroneous entry and reject it.
+	oldval = val = lv;
+	numeric_entry_mode(false);
+	updatevalue();
+}
+
+unsigned long long cFreqControl::maximum(void)
+{
+	return 9999999999ULL;  // Extreme frequency limit intended for non-rig control microwave case
+}
+
+void cFreqControl::cancel_kb_entry(void)
+{
+	val = oldval;
+	numeric_entry_mode(false);
+	updatevalue();
 }
 
 int cFreqControl::handle(int event)
 {
+	// std::cerr << "handle: with event: " << fl_eventnames[event] << std::endl;  // Use for debugging event processing
+
 	if (!active) return 0;
 
-	if (Fl::belowmouse() == this) Fl::focus(this);
-
-	int d;
-	switch (event) {
-	case FL_KEYBOARD:
-		d = Fl::event_key();
-		if (finp->visible()) {
-			if (d == FL_Escape) {
-				fcval = 0;
-				finp->hide();
-				return 1;
-			}
-			if (d == FL_Enter || d == FL_KP_Enter) {
-				if (fcval) {
-					val = fcval;
-					updatevalue();
-					do_callback();
-				}
-				finp->hide();
-				Fl::focus(this);
-				return 1;
-			}
-			return finp->handle(event);
+	if (Fl::belowmouse() == this) { // The FC or one of its child widgets returned '1' in response to FL_ENTER
+		if (this != Fl::focus()) {  // Take focus and reverse colors
+			Fl::focus(this);
+			reverse_colors();
 		}
-		switch (d) {
-			case FL_Page_Up:
-				if (Fl::event_shift()) IncFreq(1);
+	}
+
+	switch (event) {
+
+	case FL_ENTER:
+		return 1;	// Become the belowmouse widget; used as indicator FC should take focus
+		//NOTREACHED
+
+	case FL_LEAVE:
+		if (numeric_entry_mode())
+			cancel_kb_entry();
+		restore_colors();
+		Fl::focus(0);
+		return 1;
+		//NOTREACHED
+
+	case FL_FOCUS:	// The FC normally gets focus via Fl::focus(this) which does not generate a FOCUS event
+					// but a middle-mouse-button Paste returns 1 to consume the MM event and that leads to
+					// a FOCUS event; we already have focus but we have to accept the offer so it doesn't
+					// go to another widget.
+		if (Fl::event_inside(this)) {
+			reverse_colors();
+			return 1;
+		} else return 0;
+		//NOTREACHED
+
+	case FL_KEYBOARD:
+		switch (Fl::event_key()) {
+			case FL_Right:
+				if (Fl::event_ctrl()) IncFreq(2);
+				else if (Fl::event_shift()) IncFreq(1);
 				else IncFreq(0);
 				return 1;
-				break;
-			case FL_Page_Down:
-				if (Fl::event_shift()) DecFreq(1);
+				//NOTREACHED
+			case FL_Left:
+				if (Fl::event_ctrl()) DecFreq(2);
+				else if (Fl::event_shift()) DecFreq(1);
 				else DecFreq(0);
 				return 1;
-				break;
-			case FL_Right:
-				if (Fl::event_shift()) IncFreq(4);
-				else IncFreq(2);
-				return 1;
-				break;
-			case FL_Left:
-				if (Fl::event_shift()) DecFreq(4);
-				else DecFreq(2);
-				return 1;
-				break;
+				//NOTREACHED
 			case FL_Up:
-				if (Fl::event_shift()) IncFreq(5);
+				if (Fl::event_ctrl()) IncFreq(5);
+				else if (Fl::event_shift()) IncFreq(4);
 				else IncFreq(3);
 				return 1;
-				break;
+				//NOTREACHED
 			case FL_Down:
-				if (Fl::event_shift()) DecFreq(5);
+				if (Fl::event_ctrl()) DecFreq(5);
+				else if (Fl::event_shift()) DecFreq(4);
 				else DecFreq(3);
 				return 1;
-				break;
-			default:
-				{
-					int ch = Fl::event_text()[0];
-					if ((ch >= '0' && ch <= '9') || ch == '.') {
-						finp->value("");
-						fcval = 0;
-						finp->show();
-						return finp->handle(event);
+				//NOTREACHED
+			case FL_Page_Up:
+				if (Fl::event_ctrl()) IncFreq(8);
+				else if (Fl::event_shift()) IncFreq(7);
+				else IncFreq(6);
+				return 1;
+				//NOTREACHED
+			case FL_Page_Down:
+				if (Fl::event_ctrl()) DecFreq(8);
+				else if (Fl::event_shift()) DecFreq(7);
+				else DecFreq(6);
+				return 1;
+				//NOTREACHED
+			case FL_BackSpace:
+				if (numeric_entry_mode()) {
+					return finp->handle(event);
+				} else return 0;
+			case FL_Enter: case FL_KP_Enter:
+				if (numeric_entry_mode()) {
+					finp->do_callback();
+					numeric_entry_mode(false);
+					do_callback();
+				}
+				return 1;
+				//NOTREACHED
+			case FL_Escape:
+				if (numeric_entry_mode())
+					cancel_kb_entry();
+				return 1;
+				//NOTREACHED
+			case 'v':
+				if (Fl::event_command()) { // FL_CTRL or OSX FL_META
+					if (numeric_entry_mode()) {				// Ignore Ctrl-v while in numeric entry mode
+						return 1;
+					} else {
+						old_input_buffer = finp->value();	// Protect against paste value > max allowed
+						Fl::paste(*(this->finp), 1);		// 1 = Paste from clipboard
+						do_callback();
+				}
+				}
+				return 1;
+				//NOTREACHED
+		default:
+			// Keyboard entry processing
+
+			// Accept numbers and decimal point only
+			int ch = Fl::event_text()[0];
+			if ((ch < '0' || ch > '9') && ch != '.' && ch != 'e' && ch!= 'E') return 1;
+
+			if (!numeric_entry_mode()) {
+				// User has begun entering a frequency
+				numeric_entry_mode(true);	// A blinking decimal point signifies user is in numeric frequency entry mode
+				finp->static_value("");
+				oldval = val;
+			}
+
+			old_input_buffer = finp->value();	// Allow restoral of old Fl_Float_Input string value
+												// if user entry > max allowed; pre-checks don't cover all cases.
+
+			// If decimal already entered, limit additional digits to those being displayed.
+			const char *p = strchr(finp->value(), '.');
+			if (p) {
+				if (strlen(p) <= (size_t) dpoint) {
+					return finp->handle(event);
+				} else {
+					return 1;
+				}
+			}
+
+			// Ignore excess digits left of decimal
+			size_t inp_len = strlen(finp->value());
+			if ((inp_len == (unsigned long) (nD - dpoint)) && (Fl::event_text()[0] != '.')) return 1;
+
+			// Otherwise, accept entry
+			return finp->handle(event);
+
+		}// End FL_KEYBOARD event processing
+		//NOTREACHED
+
+	case FL_MOUSEWHEEL:
+		if (this->contains(Fl::focus())) {
+			if (numeric_entry_mode()) {	// Ignore mousewheel in numeric entry mode
+				return 1;
+			} else {
+				int d;
+				if ( !((d = Fl::event_dy()) || (d = Fl::event_dx())) )
+					return 1;
+
+				for (int i = 0; i < nD; i++) {
+					if (Fl::event_inside(Digit[i])) {
+						d > 0 ? DecFreq(i) : IncFreq(i);
+						return 1;
 					}
 				}
-				return 0;
-				break;
-		}
-	case FL_MOUSEWHEEL:
-		if ( !((d = Fl::event_dy()) || (d = Fl::event_dx())) )
-			return 1;
-
-		for (int i = 0; i < nD; i++) {
-			if (Fl::event_inside(Digit[i])) {
-				d > 0 ? DecFreq(i) : IncFreq(i);
-				return 1;
 			}
 		}
-		break;
-	case FL_PUSH:
-		return Fl_Group::handle(event); // in turn calls the digit[] callback
+		return 1;  // Discard mousewheel action outside FreqControl or inside FreqControl but not over digit
+		//NOTREACHED
 
+	case FL_PUSH:
+		if (numeric_entry_mode()) {				// Ignore mouse click in numeric entry mode
+				return 1;
+		} else {
+			if (Fl::event_button() == FL_MIDDLE_MOUSE) {
+				Fl::paste(*(this->finp), 0);	// Send FL_PASTE to the Fl_Float_Input widget; its parent
+												// Fl_Input_::handle checks for valid floating point entry.
+												// 0 = Paste from selection, not clipboard
+				do_callback();
+				return 1;	// Consume event; side effect is to prompt an FL_FOCUS event even though we already have focus.
+			} else {
+				return Fl_Group::handle(event);	// The appropriate Repeat Button will handle the event
+			}
+		}
+		//NOTREACHED
+
+	default:
+		return Fl_Group::handle(event);
 	}
-	return 0;
 }
+
+// Hidden Fl_Float_Input widget's callback called on keyboard number entry and on PASTE and ENTER actions.
+//
+// Compute the integer Hz representation of the Fl_Float_Input widget string value
+// and update the values shown on the Repeat Button labels.
 
 void cFreqControl::freq_input_cb(Fl_Widget*, void* arg)
 {
 	cFreqControl* fc = reinterpret_cast<cFreqControl*>(arg);
-	float val = strtof(fc->finp->value(), NULL);
-	fc->fcval = (unsigned long int)(val * 1000);
+	double finp_val = strtod(fc->finp->value(), NULL);
+
+	finp_val *= 1000;  // Frequency string is in kHz - convert here to Hz used internally by FreqControl
+	finp_val += 0.5;
+	unsigned long long lval = (unsigned long long) finp_val;
+
+	if (lval <= fc->maxVal) {
+		fc->val = lval;
+		fc->updatevalue();
+	} else { // Need to revert entry because we overran our max value
+		fc->finp->value(old_input_buffer.c_str());
+	}
 }
+
+
+void cFreqControl::numeric_entry_mode(bool flag) {
+	if (flag) {
+		numeric_entry_active = true;
+		Fl::add_timeout(0.0, (Fl_Timeout_Handler)blink_point, decbx);
+	} else {
+		numeric_entry_active = false;
+		Fl::remove_timeout((Fl_Timeout_Handler)blink_point, decbx);
+		// Ensure we have a visible decimal point after completion of keyboard entry;
+		// might otherwise be blank due to uncertain ending state of 'blink_point' function.
+		decbx->label(".");
+		decbx->redraw_label();
+	}
+}
+
 
 static void restore_color(void* w)
 {
@@ -487,28 +631,7 @@ void cFreqControl::visual_beep()
 void cFreqControl::resize(int x, int y, int w, int h)
 {
 	Fl_Group::resize(x,y,w,h);
+
 	set_ndigits(nD);
-	updatevalue();
-	redraw();
-return;
-	int wf1 = (w - nD * fcWidth - pw - 2*bdr) / 2;
-	int wf2 = w - nD * fcWidth - pw - 2*bdr - wf1;
-
-	int xpos = x + w - bdr - wf2;
-	int ypos = y + bdr;
-	for (int n = 0; n < dpoint; n++) {
-		xpos -= fcWidth;
-		Digit[n]->resize(xpos, ypos, fcWidth, fcHeight);
-	}
-
-	xpos -= pw;
-	decbx->resize(xpos, ypos, pw, fcHeight);
-
-	for (int n = dpoint; n < nD; n++) {
-		xpos -= fcWidth;
-		Digit[n]->resize(xpos, ypos, fcWidth, fcHeight);
-	}
-
-	Fl_Group::redraw();
+	return;
 }
-

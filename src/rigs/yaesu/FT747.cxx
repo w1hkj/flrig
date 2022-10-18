@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <stdio.h>
@@ -36,17 +36,20 @@ RIG_FT747::RIG_FT747() {
 // base class values
 	name_ = FT747name_;
 	modes_ = FT747modes_;
-	comm_baudrate = BR4800;
+	serial_baudrate = BR4800;
 	stopbits = 2;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts = false;
-	comm_rtsplus = false;
-	comm_dtrplus = true;
-	comm_catptt = false;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+	
+	serial_write_delay = 5;
+	serial_post_write_delay = 5;
+
+	serial_timeout = 50;
+	serial_rtscts = false;
+	serial_rtsplus = false;
+	serial_dtrplus = true;
+	serial_catptt = false;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 	modeA = 1;
 	bwA = 0;
 
@@ -111,7 +114,7 @@ bool RIG_FT747::check()
 
 bool RIG_FT747::get_info()
 {
-	unsigned long int afreq = A.freq, bfreq = B.freq;
+	unsigned long long afreq = A.freq, bfreq = B.freq;
 	int amode = A.imode;
 	init_cmd();
 	cmd[4] = 0x10;
@@ -168,12 +171,12 @@ bool RIG_FT747::get_info()
 	return false;
 }
 
-unsigned long int RIG_FT747::get_vfoA ()
+unsigned long long RIG_FT747::get_vfoA ()
 {
 	return A.freq;
 }
 
-void RIG_FT747::set_vfoA (unsigned long int freq)
+void RIG_FT747::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	freq /=10; // 747 does not support 1 Hz resolution
@@ -198,12 +201,12 @@ void RIG_FT747::set_modeA(int val)
 	sendCommand(cmd);
 }
 
-unsigned long int RIG_FT747::get_vfoB ()
+unsigned long long RIG_FT747::get_vfoB ()
 {
 	return B.freq;
 }
 
-void RIG_FT747::set_vfoB (unsigned long int freq)
+void RIG_FT747::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
 	freq /=10;

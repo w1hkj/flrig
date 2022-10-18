@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "icom/IC7851.h"
@@ -155,18 +155,19 @@ RIG_IC7851::RIG_IC7851() {
 	_mode_type = IC7851_mode_type;
 	adjustCIV(defaultCIV);
 
-	comm_baudrate = BR19200;
+	serial_baudrate = BR19200;
 	stopbits = 1;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_echo = true;
-	comm_rtscts = false;
-	comm_rtsplus = true;
-	comm_dtrplus = true;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+	serial_timeout = 50;
+	serial_echo = true;
+	serial_rtscts = false;
+	serial_rtsplus = true;
+	serial_dtrplus = true;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 
 	widgets = IC7851_widgets;
 
@@ -258,8 +259,8 @@ void RIG_IC7851::set_xcvr_auto_on()
 	if (waitFOR(8, "get ID", 100) == false) {
 		cmd.clear();
 		int fes[] = { 2, 2, 2, 3, 7, 13, 25, 50, 75, 150, 150, 150 };
-		if (progStatus.comm_baudrate >= 0 && progStatus.comm_baudrate <= 11) {
-			cmd.append( fes[progStatus.comm_baudrate], '\xFE');
+		if (progStatus.serial_baudrate >= 0 && progStatus.serial_baudrate <= 11) {
+			cmd.append( fes[progStatus.serial_baudrate], '\xFE');
 		}
 		cmd.append(pre_to);
 		cmd += '\x18'; cmd += '\x01';
@@ -296,7 +297,7 @@ bool RIG_IC7851::check ()
 
 static int ret = 0;
 
-unsigned long int RIG_IC7851::get_vfoA ()
+unsigned long long RIG_IC7851::get_vfoA ()
 {
 	std::string resp;
 
@@ -304,11 +305,11 @@ unsigned long int RIG_IC7851::get_vfoA ()
 	resp.assign(pre_fm).append("\x25");
 
 	if (inuse == onA) {
-		cmd  += '\x01';
-		resp += '\x01';
-	} else {
 		cmd  += '\x00';
 		resp += '\x00';
+	} else {
+		cmd  += '\x01';
+		resp += '\x01';
 	}
 
 	cmd.append(post);
@@ -330,13 +331,13 @@ unsigned long int RIG_IC7851::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_IC7851::set_vfoA (unsigned long int freq)
+void RIG_IC7851::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 
 	cmd.assign(pre_to).append("\x25");
-	if (inuse == onA) cmd += '\x01';
-	else      cmd += '\x00';
+	if (inuse == onA) cmd += '\x00';
+	else      cmd += '\x01';
 
 	cmd.append( to_bcd_be( freq, 10) );
 	cmd.append( post );
@@ -346,7 +347,7 @@ void RIG_IC7851::set_vfoA (unsigned long int freq)
 	seth();
 }
 
-unsigned long int RIG_IC7851::get_vfoB ()
+unsigned long long RIG_IC7851::get_vfoB ()
 {
 	std::string resp;
 
@@ -354,11 +355,11 @@ unsigned long int RIG_IC7851::get_vfoB ()
 	resp.assign(pre_fm).append("\x25");
 
 	if (inuse == onA) {
-		cmd  += '\x00';
-		resp += '\x00';
-	} else {
 		cmd  += '\x01';
 		resp += '\x01';
+	} else {
+		cmd  += '\x00';
+		resp += '\x00';
 	}
 
 	cmd.append(post);
@@ -380,13 +381,13 @@ unsigned long int RIG_IC7851::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_IC7851::set_vfoB (unsigned long int freq)
+void RIG_IC7851::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
 
 	cmd.assign(pre_to).append("\x25");
-	if (inuse == onA) cmd += '\x00';
-	else      cmd += '\x01';
+	if (inuse == onA) cmd += '\x01';
+	else      cmd += '\x00';
 
 	cmd.append( to_bcd_be( freq, 10 ) );
 	cmd.append( post );
@@ -434,7 +435,13 @@ void RIG_IC7851::set_modeA(int val)
 	A.imode = val;
 	cmd.assign(pre_to);
 	cmd += '\x26';
-	cmd += '\x00';
+
+	if (inuse == onA) {
+		cmd  += '\x00';
+	} else {
+		cmd  += '\x01';
+	}
+
 	cmd += IC7851_mode_nbr[A.imode];	// operating mode
 	if (A.imode >= LSBD3_7851)
 		cmd += '\x03';					// data mode D1
@@ -480,7 +487,13 @@ int RIG_IC7851::get_modeA()
 	resp.assign(pre_fm).append("\x26");
 
 	cmd.assign(pre_to).append("\x26");
-	cmd += '\x00';
+	if (inuse == onA) {
+		cmd  += '\x00';
+		resp += '\x00';
+	} else {
+		cmd  += '\x01';
+		resp += '\x01';
+	}
 	cmd.append(post);
 
 	if (waitFOR(10, "get mode A")) {
@@ -524,7 +537,12 @@ void RIG_IC7851::set_modeB(int val)
 	B.imode = val;
 	cmd.assign(pre_to);
 	cmd += '\x26';
-	cmd += '\x00';
+	if (inuse == onA) {
+		cmd  += '\x01';
+	} else {
+		cmd  += '\x00';
+	}
+
 	cmd += IC7851_mode_nbr[B.imode];	// operating mode
 	if (B.imode >= LSBD3_7851)
 		cmd += '\x03';					// data mode D1
@@ -554,7 +572,15 @@ int RIG_IC7851::get_modeB()
 	resp.assign(pre_fm).append("\x26");
 
 	cmd.assign(pre_to).append("\x26");
-	cmd += '\x00';
+
+	if (inuse == onA) {
+		cmd  += '\x01';
+		resp += '\x01';
+	} else {
+		cmd  += '\x00';
+		resp += '\x00';
+	}
+
 	cmd.append(post);
 
 	if (waitFOR(10, "get mode B")) {
@@ -1176,7 +1202,7 @@ void RIG_IC7851::get_band_selection(int v)
 		set_trace(2, "get band stack", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(pre_fm);
 		if (p != std::string::npos) {
-			unsigned long int bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
+			unsigned long long bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
 			int bandmode = replystr[p+13];
 			int bandfilter = replystr[p+14];
 			int banddata = replystr[p+15] & 0x10;
@@ -1213,7 +1239,7 @@ void RIG_IC7851::get_band_selection(int v)
 
 void RIG_IC7851::set_band_selection(int v)
 {
-	unsigned long int freq = (inuse == onB ? B.freq : A.freq);
+	unsigned long long freq = (inuse == onB ? B.freq : A.freq);
 	int mode = (inuse == onB ? B.imode : A.imode);
 
 	cmd.assign(pre_to);

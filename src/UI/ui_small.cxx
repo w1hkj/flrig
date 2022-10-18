@@ -79,13 +79,11 @@ Fl_Group *small_main_group(int X, int Y, int W, int H)
 
 	FreqDispA = new cFreqControl(1, 24, 210, 35, _("10"));
 	FreqDispA->when(FL_WHEN_CHANGED);
-	FreqDispA->SetONOFFCOLOR (FL_YELLOW, FL_BLACK);
-	FreqDispA->setCallBack(movFreqA);
+	FreqDispA->callback((Fl_Callback*)movFreqA);
 
 	FreqDispB = new cFreqControl(213, 24, 210, 35, _("10"));
 	FreqDispB->when(FL_WHEN_CHANGED);
-	FreqDispB->SetONOFFCOLOR (FL_YELLOW, FL_BLACK);
-	FreqDispB->setCallBack(movFreqB);
+	FreqDispB->callback((Fl_Callback*)movFreqB);
 
 	btnVol = new Fl_Light_Button(2, 125, 50, 18, _("Vol"));
 	btnVol->tooltip(_("Speaker on/off"));

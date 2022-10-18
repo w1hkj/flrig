@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <stdlib.h>
@@ -102,22 +102,25 @@ RIG_FT450D::RIG_FT450D() {
 
 	widgets = rig_widgets;
 
-	comm_baudrate = BR38400;
+	serial_baudrate = BR38400;
 	stopbits = 1;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts = true;
-	comm_rtsplus = false;
-	comm_dtrplus = false;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+	
+	serial_write_delay = 0;
+	serial_post_write_delay = 5;
+
+	serial_timeout = 50;
+	serial_rtscts = true;
+	serial_rtsplus = false;
+	serial_dtrplus = false;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 	modeA = 1;
 	bwA = 2;
 	def_mode = 10;
 	def_bw = 2;
-	def_freq = 14070000;
+	def_freq = 14070000ULL;
 
 	precision = 10;
 	ndigits = 8;
@@ -240,7 +243,7 @@ bool RIG_FT450D::check()
 	return false;
 }
 
-unsigned long int RIG_FT450D::get_vfoA ()
+unsigned long long RIG_FT450D::get_vfoA ()
 {
 	cmd = rsp = "FA";
 	cmd += ';';
@@ -250,14 +253,14 @@ unsigned long int RIG_FT450D::get_vfoA ()
 
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return freqA;
-	int f = 0;
+	unsigned long long f = 0;
 	for (size_t n = 2; n < 10; n++)
 		f = f*10 + replystr[p+n] - '0';
 	freqA = f;
 	return freqA;
 }
 
-void RIG_FT450D::set_vfoA (unsigned long int freq)
+void RIG_FT450D::set_vfoA (unsigned long long freq)
 {
 	int current_vfo = inuse;
 	if (current_vfo == onB) selectA();
@@ -273,7 +276,7 @@ void RIG_FT450D::set_vfoA (unsigned long int freq)
 	if (current_vfo == onB) selectB();
 }
 
-unsigned long int RIG_FT450D::get_vfoB ()
+unsigned long long RIG_FT450D::get_vfoB ()
 {
 	cmd = rsp = "FB";
 	cmd += ';';
@@ -283,14 +286,14 @@ unsigned long int RIG_FT450D::get_vfoB ()
 
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return freqB;
-	int f = 0;
+	unsigned long long f = 0;
 	for (size_t n = 2; n < 10; n++)
 		f = f*10 + replystr[p+n] - '0';
 	freqB = f;
 	return freqB;
 }
 
-void RIG_FT450D::set_vfoB (unsigned long int freq)
+void RIG_FT450D::set_vfoB (unsigned long long freq)
 {
 	int current_vfo = inuse;
 	if (current_vfo == onA) selectB();

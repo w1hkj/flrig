@@ -16,7 +16,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "other/PowerSDR.h"
@@ -164,20 +164,23 @@ RIG_PowerSDR::RIG_PowerSDR() {
 
 	widgets = rig_widgets;
 
-	comm_baudrate = BR4800;
+	serial_baudrate = BR4800;
 	stopbits = 2;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts = true;
-	comm_rtsplus = false;
-	comm_dtrplus = false;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
+	serial_timeout = 50;
+	serial_rtscts = true;
+	serial_rtsplus = false;
+	serial_dtrplus = false;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 	B.imode = A.imode = 1;
 	B.iBW = A.iBW = 0x8803;
-	B.freq = A.freq = 14070000;
+	B.freq = A.freq = 14070000ULL;
 	can_change_alt_vfo = true;
 
 	//has_dsp_controls = true;
@@ -452,10 +455,8 @@ int RIG_PowerSDR::set_widths(int val)
 	cmd += ';';
 
 	set_trace(1, "bandwidths:");
-	wait_char(';', 187, 100, "bandwidths", 187);
+	wait_char(';', 187, 1000, "bandwidths", 187);
 	sett("");
-	size_t p = replystr.rfind("ZZMN");
-	if (p != std::string::npos) p += 6;
 
 	bool fill_widths = false;
 	switch (val) {
@@ -489,18 +490,29 @@ int RIG_PowerSDR::set_widths(int val)
 		fill_widths = true;
 		break;
 	}
-	if (fill_widths) {
-		if (p != std::string::npos) {
-			std::string tocopy;
-			for (int i = 0; i < 12; i++) {
-				tocopy = replystr.substr(p, 5);
-				while (tocopy.length() && tocopy[0] == ' ') tocopy.erase(0,1);
-				strcpy(varwidths[i], tocopy.c_str());
-				p += 15;
-			}
-		}
-		bandwidths_ = (const char**)(varwidths);
+
+	if (!fill_widths)
+		return bw;
+
+	size_t p = replystr.rfind("ZZMN");
+
+	if (p == std::string::npos)
+		return bw;
+
+	if (replystr.length() < 187)
+		return bw;
+
+	p += 6;
+
+	std::string tocopy;
+	for (int i = 0; i < 12; i++) {
+		tocopy = replystr.substr(p, 5);
+		while (tocopy.length() && tocopy[0] == ' ') tocopy.erase(0,1);
+		strcpy(varwidths[i], tocopy.c_str());
+		p += 15;
 	}
+	bandwidths_ = (const char**)(varwidths);
+
 	return bw;
 }
 
@@ -592,7 +604,7 @@ int RIG_PowerSDR::get_modeB()
 	if (tuning()) return B.imode;
 	cmd = "ZZMD;";
 	get_trace(1, "get_modeB");
-	ret = wait_char(';', 4, 100, "get mode B", ASC);
+	ret = wait_char(';', 7, 100, "get mode B", ASC);
 	gett("");
 	if (ret == 7) {
 		size_t p = replystr.rfind("MD");

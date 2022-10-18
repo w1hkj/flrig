@@ -93,6 +93,7 @@ RIG_ICF8101		rig_ICF8101;
 RIG_K2			rig_K2;
 RIG_K3			rig_K3;
 RIG_KX3			rig_KX3;
+RIG_K4			rig_K4;
 RIG_PCR1000		rig_PCR1000;
 RIG_RAY152		rig_RAY152;
 RIG_TMD710		rig_TMD710;
@@ -129,6 +130,7 @@ RIG_TX500		rig_TX500;
 RIG_QCXP		rig_QCXP;
 RIG_SDR2_PRO	rig_sdr2;
 RIG_TCI_SDR		rig_tcisdr;
+RIG_TRUSDX		rig_trusdx;
 
 rigbase *rigs[] = {
 	&rig_null,		// 0
@@ -195,45 +197,47 @@ rigbase *rigs[] = {
 	&rig_K2,		// 61
 	&rig_K3,		// 62
 	&rig_KX3,		// 63
-	&rig_PCR1000,	// 64
-	&rig_RAY152,	// 65
-	&rig_TMD710,	// 66
-	&rig_TS140,		// 67
-	&rig_TS440,		// 68
-	&rig_TS450S,	// 69
-	&rig_TS480HX,	// 60
-	&rig_TS480SAT,	// 71
-	&rig_TS570,		// 72
-	&rig_TS590S,	// 73
-	&rig_TS590SG,	// 74
-	&rig_TS790,		// 75
-	&rig_TS850,		// 76
-	&rig_TS870S,	// 77
-	&rig_TS890S,	// 78
-	&rig_TS940S,	// 79
-	&rig_TS950,		// 70
-	&rig_TS990,		// 81
-	&rig_TS2000,	// 82
-	&rig_TT516,		// 83
-	&rig_TT535,		// 84
-	&rig_TT538,		// 85
-	&rig_TT550,		// 86
-	&rig_TT563,		// 87
-	&rig_TT566,		// 88
-	&rig_TT588,		// 89
-	&rig_TT599,		// 80
-	&rig_AOR5K,		// 91
-	&rig_XI5105,	// 92
-	&rig_XIG90,		// 93
-	&rig_X6100,		// 94
-	&rig_PowerSDR,	// 95
-	&rig_FLEX1500,	// 96
-	&rig_TX500,		// 97
-	&rig_QCXP,		// 98
-	&rig_sdr2,		// 99
-	&rig_tcisdr,	// 100
-
+	&rig_K4,		// 64
+	&rig_PCR1000,	// 65
+	&rig_RAY152,	// 66
+	&rig_TMD710,	// 67
+	&rig_TS140,		// 68
+	&rig_TS440,		// 69
+	&rig_TS450S,	// 70
+	&rig_TS480HX,	// 71
+	&rig_TS480SAT,	// 72
+	&rig_TS570,		// 73
+	&rig_TS590S,	// 74
+	&rig_TS590SG,	// 75
+	&rig_TS790,		// 76
+	&rig_TS850,		// 77
+	&rig_TS870S,	// 78
+	&rig_TS890S,	// 79
+	&rig_TS940S,	// 80
+	&rig_TS950,		// 81
+	&rig_TS990,		// 82
+	&rig_TS2000,	// 83
+	&rig_TT516,		// 84
+	&rig_TT535,		// 85
+	&rig_TT538,		// 86
+	&rig_TT550,		// 87
+	&rig_TT563,		// 88
+	&rig_TT566,		// 89
+	&rig_TT588,		// 90
+	&rig_TT599,		// 91
+	&rig_AOR5K,		// 92
+	&rig_XI5105,	// 93
+	&rig_XIG90,		// 94
+	&rig_X6100,		// 95
+	&rig_PowerSDR,	// 96
+	&rig_FLEX1500,	// 97
+	&rig_TX500,		// 98
+	&rig_QCXP,		// 99
+	&rig_sdr2,		// 100
+	&rig_tcisdr,	// 101
+	&rig_trusdx,	// 102
 	NULL
+
 };
 
 //=============================================================================

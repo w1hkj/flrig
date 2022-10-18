@@ -18,7 +18,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
-#include "yaesu/MARK_V.h"
+#include "yaesu/Mark-V.h"
 
 #include "support.h"
 
@@ -38,17 +38,20 @@ RIG_MARK_V::RIG_MARK_V() {
 // base class values
 	name_ = MARK_Vname_;
 	modes_ = MARK_Vmodes_;
-	comm_baudrate = BR4800;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
+	serial_baudrate = BR4800;
+	serial_retries = 2;
+
+	serial_write_delay = 5;
+	serial_post_write_delay = 5;
+
+	serial_timeout = 50;
 	serloop_timing = 1000; // every 1 seconds
-	comm_rtscts = false;
-	comm_rtsplus = false;
-	comm_dtrplus = true;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_rtscts = false;
+	serial_rtsplus = false;
+	serial_dtrplus = true;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 	modeA = 1;
 	bwA = 0;
 
@@ -70,7 +73,7 @@ void RIG_MARK_V::init_cmd()
 	for (size_t i = 0; i < 5; i++) cmd[i] = 0;
 }
 
-long RIG_MARK_V::get_vfoA ()
+unsigned long long RIG_MARK_V::get_vfoA ()
 {
 	init_cmd();
 	cmd[3] = 2; 
@@ -86,7 +89,7 @@ long RIG_MARK_V::get_vfoA ()
 	return freqA;
 }
 
-void RIG_MARK_V::set_vfoA (long freq)
+void RIG_MARK_V::set_vfoA (unsigned long long freq)
 {
 	freqA = freq;
 	freq /=10; // 1000MP does not support 1 Hz resolution
@@ -134,7 +137,7 @@ int  RIG_MARK_V::get_power_out(void)
 {
 	int val = 0;
 	init_cmd();
-	cmd[00] = cmd[01] = cmd[02] = cmd[03] = 0x80H;
+	cmd[00] = cmd[01] = cmd[02] = cmd[03] = 0x80;
 	cmd[4] = 0xF7;
 	if (waitN(1, 100, "get pwr out", HEX) >= 1)
 		val = replybuff[0] && 0x0F;

@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #ifndef _SUNSDR2_H
@@ -38,10 +38,10 @@ public:
 	void initialize();
 	void shutdown();
 
-	unsigned long int get_vfoA();
-	void set_vfoA(unsigned long int);
-	unsigned long int get_vfoB();
-	void set_vfoB(unsigned long int);
+	unsigned long long get_vfoA();
+	void set_vfoA(unsigned long long);
+	unsigned long long get_vfoB();
+	void set_vfoB(unsigned long long);
 
 	void selectA();
 	void selectB();

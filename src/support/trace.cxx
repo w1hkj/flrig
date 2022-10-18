@@ -62,7 +62,7 @@ Fl_Light_Button*	btn_pausetrace = (Fl_Light_Button*)0;
 
 std::string tracestring;
 
-bool stdout_trace = false;
+bool stdout_trace = false;//true;
 
 bool pausetrace = false;
 
@@ -115,6 +115,8 @@ static void update_tracetext(void *)
 	}
 	if (stdout_trace) {
 		std::cout << tracestring;
+		if (tracestring.find('\n') == std::string::npos) std::cout << std::endl;
+		std::cout.flush();
 		return;
 	}
     tracestring.clear();
@@ -123,9 +125,7 @@ static void update_tracetext(void *)
 void trace(int n, ...) // all args of type const char *
 {
 	if (!progStatus.trace) return;
-
 	if (!tracewindow) make_trace_window();
-
 	if (!n) return;
 
 	std::stringstream s;
@@ -149,9 +149,7 @@ void trace(int n, ...) // all args of type const char *
 void xml_trace(int n, ...) // all args of type const char *
 {
 	if (!progStatus.xmltrace) return;
-
 	if (!tracewindow) make_trace_window();
-
 	if (!n) return;
 
 	std::stringstream s;
@@ -176,6 +174,10 @@ void xml_trace(int n, ...) // all args of type const char *
 
 void rig_trace(int n, ...) // all args of type const char *
 {
+	if (!progStatus.rigtrace) return;
+	if (!n) return;
+	if (!tracewindow) make_trace_window();
+
 	std::stringstream s;
 	va_list vl;
 	va_start(vl, n);
@@ -184,10 +186,6 @@ void rig_trace(int n, ...) // all args of type const char *
 		s << " " << va_arg(vl, const char *);
 	va_end(vl);
 	s << "\n";
-
-	if (!progStatus.rigtrace) return;
-	if (!tracewindow) make_trace_window();
-	if (!n) return;
 
 	write_trace_file(s.str());
 
@@ -198,6 +196,10 @@ void rig_trace(int n, ...) // all args of type const char *
 
 void set_trace(int n, ...) // all args of type const char *
 {
+	if (!progStatus.settrace) return;
+	if (!tracewindow) make_trace_window();
+	if (!n) return;
+
 	std::stringstream s;
 	va_list vl;
 	va_start(vl, n);
@@ -206,10 +208,6 @@ void set_trace(int n, ...) // all args of type const char *
 		s << " " << va_arg(vl, const char *);
 	va_end(vl);
 	s << "\n";
-
-	if (!progStatus.settrace) return;
-	if (!tracewindow) make_trace_window();
-	if (!n) return;
 
 	write_trace_file(s.str());
 
@@ -220,6 +218,10 @@ void set_trace(int n, ...) // all args of type const char *
 
 void get_trace(int n, ...) // all args of type const char *
 {
+	if (!progStatus.gettrace) return;
+	if (!tracewindow) make_trace_window();
+	if (!n) return;
+
 	std::stringstream s;
 	va_list vl;
 	va_start(vl, n);
@@ -228,10 +230,6 @@ void get_trace(int n, ...) // all args of type const char *
 		s << " " << va_arg(vl, const char *);
 	va_end(vl);
 	s << "\n";
-
-	if (!progStatus.gettrace) return;
-	if (!tracewindow) make_trace_window();
-	if (!n) return;
 
 	write_trace_file(s.str());
 
@@ -242,6 +240,8 @@ void get_trace(int n, ...) // all args of type const char *
 
 void rpc_trace(int n, ...) // all args of type const char *
 {
+	if (!n) return;
+
 	std::stringstream s;
 	va_list vl;
 	va_start(vl, n);
@@ -304,6 +304,10 @@ void rpc_trace(int n, ...) // all args of type const char *
 
 void ser_trace(int n, ...) // all args of type const char *
 {
+//	if (!progStatus.serialtrace) return;
+	if (!tracewindow) make_trace_window();
+	if (!n) return;
+
 	std::stringstream s;
 	va_list vl;
 	va_start(vl, n);
@@ -312,10 +316,6 @@ void ser_trace(int n, ...) // all args of type const char *
 		s << " " << va_arg(vl, const char *);
 	va_end(vl);
 	s << "\n";
-
-	if (!progStatus.serialtrace) return;
-	if (!tracewindow) make_trace_window();
-	if (!n) return;
 
 	write_trace_file(s.str());
 
@@ -326,6 +326,9 @@ void ser_trace(int n, ...) // all args of type const char *
 
 void deb_trace(int n, ...) // all args of type const char *
 {
+	if (!n) return;
+	if (!tracewindow) make_trace_window();
+
 	std::stringstream s;
 	va_list vl;
 	va_start(vl, n);
@@ -375,9 +378,6 @@ void deb_trace(int n, ...) // all args of type const char *
 
 	if (str[str.length()-1] != '\n') str += '\n';
 
-	if (!tracewindow) make_trace_window();
-	if (!n) return;
-
 	write_trace_file(s.str());
 
 	guard_lock tt(&mutex_trace);
@@ -387,6 +387,10 @@ void deb_trace(int n, ...) // all args of type const char *
 
 void tci_trace(int n, ...) // all args of type const char *
 {
+//	if (!progStatus.tcitrace) return;
+	if (!n) return;
+	if (!tracewindow) make_trace_window();
+
 	std::stringstream s;
 	va_list vl;
 	va_start(vl, n);
@@ -395,10 +399,6 @@ void tci_trace(int n, ...) // all args of type const char *
 		s << " " << va_arg(vl, const char *);
 	va_end(vl);
 	s << "\n";
-
-//	if (!progStatus.tcitrace) return;
-	if (!tracewindow) make_trace_window();
-	if (!n) return;
 
 	write_trace_file(s.str());
 

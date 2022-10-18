@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "icom/IC718.h"
@@ -52,18 +52,19 @@ RIG_IC718::RIG_IC718() {
 	bw_vals_ = IC718_bw_vals;
 	widgets = IC718_widgetsdgets;
 
-	comm_baudrate = BR9600;
+	serial_baudrate = BR9600;
 	stopbits = 1;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_echo = true;
-	comm_rtscts = false;
-	comm_rtsplus = true;
-	comm_dtrplus = true;
-	comm_catptt = false;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+	serial_timeout = 50;
+	serial_echo = true;
+	serial_rtscts = false;
+	serial_rtsplus = true;
+	serial_dtrplus = true;
+	serial_catptt = false;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 	modeA = 1;
 	bwA = 0;
 	filter_nbr = 1;
@@ -142,7 +143,7 @@ bool RIG_IC718::check ()
 	return ok;
 }
 
-unsigned long int RIG_IC718::get_vfoA ()
+unsigned long long RIG_IC718::get_vfoA ()
 {
 	if (inuse == onB) return A.freq;
 	cmd = pre_to;
@@ -162,7 +163,7 @@ unsigned long int RIG_IC718::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_IC718::set_vfoA (unsigned long int freq)
+void RIG_IC718::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	cmd = pre_to;
@@ -172,7 +173,7 @@ void RIG_IC718::set_vfoA (unsigned long int freq)
 	waitFB("set vfo A");
 }
 
-unsigned long int RIG_IC718::get_vfoB ()
+unsigned long long RIG_IC718::get_vfoB ()
 {
 	if (inuse == onA) return B.freq;
 	std::string resp = pre_fm;
@@ -192,7 +193,7 @@ unsigned long int RIG_IC718::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_IC718::set_vfoB (unsigned long int freq)
+void RIG_IC718::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
 	cmd = pre_to;

@@ -27,6 +27,8 @@
 
 #include <string>
 
+extern bool SERIALDEBUG;
+
 #ifndef __WIN32__
 
 #include <termios.h>
@@ -46,7 +48,9 @@ public:
 	void Device (std::string dev) { device = dev;};
 	std::string Device() { return device;};
 
-	void Baud(int b) { baud = b;};
+	void set_attributes();
+
+	void Baud(int b) { baud = b; set_attributes(); };
 	int  Baud() { return baud;};
 
 	void Timeout(int tm) { timeout = tm;}
@@ -55,27 +59,27 @@ public:
 	void Retries(int r) { retries = r;}
 	int  Retries() { return retries;}
 
-	void RTS(bool r){rts = r;}
+	void RTS(bool r){rts = r; set_attributes(); }
 	bool RTS(){return rts;}
 	void setRTS(bool r);
 
 	void RTSptt(bool b){rtsptt = b;}
 	bool RTSptt();
 
-	void DTR(bool d){ dtr = d; }
+	void DTR(bool d){ dtr = d; set_attributes(); }
 	bool DTR(){return dtr;}
 	void setDTR(bool d);
 
-	void DTRptt(bool b){dtrptt = b;}
+	void DTRptt(bool b){ dtrptt = b; }
 	bool DTRptt();
 
-	void RTSCTS(bool b){rtscts = b;}
+	void RTSCTS(bool b){ rtscts = b; set_attributes(); }
 	bool RTSCTS(){return rtscts;}
 
 	void SetPTT(bool b);
 	bool getPTT();
 
-	void Stopbits(int n) {stopbits = (n == 1 ? 1 : 2);}
+	void Stopbits(int n) { stopbits = (n == 1 ? 1 : 2); set_attributes(); }
 	int  Stopbits() { return stopbits;}
 
 	int  ReadBuffer (std::string &buffer, int nbr, std::string find1 = "", std::string find2 = "");
@@ -165,32 +169,32 @@ public:
 	void Device (std::string dev) { device = dev;};
 	std::string Device() { return device;};
 
-	void Baud(int b) { baud = b;};
+	void Baud(int b) { baud = b; ConfigurePort( baud, 8, false, NOPARITY, stopbits); }
 	int  Baud() { return baud;};
 
 	void Retries(int r) { retries = r;}
 	int  Retries() { return retries;}
 
-	void RTS(bool r){rts = r;}
+	void RTS(bool r){rts = r;  ConfigurePort( baud, 8, false, NOPARITY, stopbits); }
 	bool RTS(){return rts;}
 	void setRTS(bool b);
 
 	void RTSptt(bool b){rtsptt = b;}
 	bool RTSptt();
 
-	void DTR(bool d){dtr = d;}
+	void DTR(bool d){dtr = d;  ConfigurePort( baud, 8, false, NOPARITY, stopbits); }
 	bool DTR(){return dtr;}
 	void setDTR(bool b);
 
 	void DTRptt(bool b){dtrptt = b;}
 	bool DTRptt();
 
-	void RTSCTS(bool b){rtscts = b;}
+	void RTSCTS(bool b){rtscts = b;  ConfigurePort( baud, 8, false, NOPARITY, stopbits); }
 	bool RTSCTS(){return rtscts;}
 	void SetPTT(bool b);
 	bool getPTT();
 
-	void Stopbits(int n) {stopbits = (n == 1 ? 1 : 2);}
+	void Stopbits(int n) {stopbits = (n == 1 ? 1 : 2);  ConfigurePort( baud, 8, false, NOPARITY, stopbits); }
 	int  Stopbits() { return stopbits;}
 
 	int  failed() { return failed_; }

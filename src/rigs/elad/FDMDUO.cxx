@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "elad/FDMDUO.h"
@@ -118,20 +118,19 @@ RIG_FDMDUO::RIG_FDMDUO() {
 
 	widgets = rig_widgets;
 
-	comm_baudrate = BR57600;
+	serial_baudrate = BR57600;
 	stopbits = 1;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts = true;
-	comm_rtsplus = false;
-	comm_dtrplus = false;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+	serial_timeout = 50;
+	serial_rtscts = true;
+	serial_rtsplus = false;
+	serial_dtrplus = false;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 	B.imode = A.imode = 1;
 	B.iBW = A.iBW = 0x8A03;
-	B.freq = A.freq = 14070000;
+	B.freq = A.freq = 14070000ULL;
 
 	can_change_alt_vfo = true;
 
@@ -850,7 +849,7 @@ int RIG_FDMDUO::get_split()
 	return 0;
 }
 
-unsigned long int RIG_FDMDUO::get_vfoA ()
+unsigned long long RIG_FDMDUO::get_vfoA ()
 {
 	cmd = "FA;";
 
@@ -862,7 +861,7 @@ unsigned long int RIG_FDMDUO::get_vfoA ()
 
 	size_t p = replystr.rfind("FA");
 	if (p != std::string::npos && (p + 12 < replystr.length())) {
-		int f = 0;
+		unsigned long long f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replystr[p+n] - '0';
 		A.freq = f;
@@ -870,7 +869,7 @@ unsigned long int RIG_FDMDUO::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_FDMDUO::set_vfoA (unsigned long int freq)
+void RIG_FDMDUO::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	cmd = "FA00000000000;";
@@ -882,7 +881,7 @@ void RIG_FDMDUO::set_vfoA (unsigned long int freq)
 	showresp(WARN, ASC, "set vfo A", cmd, "");
 }
 
-unsigned long int RIG_FDMDUO::get_vfoB ()
+unsigned long long RIG_FDMDUO::get_vfoB ()
 {
 	cmd = "FB;";
 
@@ -894,7 +893,7 @@ unsigned long int RIG_FDMDUO::get_vfoB ()
 
 	size_t p = replystr.rfind("FB");
 	if (p != std::string::npos && (p + 12 < replystr.length())) {
-		int f = 0;
+		unsigned long long f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replystr[p+n] - '0';
 		B.freq = f;
@@ -902,7 +901,7 @@ unsigned long int RIG_FDMDUO::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_FDMDUO::set_vfoB (unsigned long int freq)
+void RIG_FDMDUO::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
 	cmd = "FB00000000000;";

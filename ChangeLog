@@ -1,6 +1,38 @@
-2022-08-02  dave-w1hkj  <w1hkj@bellsouth.net>
+2022-10-08  dave-w1hkj  <w1hkj@bellsouth.net>
 
-	65ce872d8: Version 1.4.7
+	9ab083b1d: alpha
+	9ad2763e9: serial-mods
+	9daa203c8: KENWOOD
+	4d1694526: byte interval
+	1e45615df: PowerSDR bug
+	2fa13a65c: pcr1000 mod
+	5b3a875c9: message icon
+	73f0e34a1: Extras
+	e8c71a379: Trace macros
+	343b3c789: FTdx10 autostart
+	da22b23c0: combo
+
+2022-09-12  Dave Tillman  <blennie96@verizon.net>
+
+	87288b21f: User Interface - Combobox fixes
+
+2022-09-09  dave-w1hkj  <w1hkj@bellsouth.net>
+
+	8c12a0605: (tr)uSDX
+	a5668525f: ftdx10 notch
+	c7d97c4a7: seg fault fix
+	1a2321a82: Smeter/Freq poll
+	c57049128: FTdx10
+	11c76b7ed: IC7851
+
+2022-08-15  w5pny  <w5pny@w5pny.com>
+
+	13c4be934: Add K4 transceiver
+
+2022-08-06  dave-w1hkj  <w1hkj@bellsouth.net>
+
+	f0056a551: TS 590 S/SG AM data mode
+	f7e797e02: Version 1.4.7
 	b1387f6b7: Missing images
 	1c28e5130: Memory manager
 	eb41b42da: Version 1.4.6

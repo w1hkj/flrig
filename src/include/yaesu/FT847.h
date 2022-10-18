@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #ifndef FT847_H
@@ -26,7 +26,8 @@
 class RIG_FT847 : public rigbase {
 private:
 	double fwdpwr;
-	int afreq, amode, aBW;
+	int amode, aBW;
+	unsigned long long afreq;
 
 public:
 	RIG_FT847();
@@ -41,13 +42,13 @@ public:
 
 	bool check();
 
-	unsigned long int get_vfoA();
-	void set_vfoA(unsigned long int);
+	unsigned long long get_vfoA();
+	void set_vfoA(unsigned long long);
 	void set_modeA(int val);
 	int  get_modeA();
 
-	unsigned long int get_vfoB();
-	void set_vfoB(unsigned long int);
+	unsigned long long get_vfoB();
+	void set_vfoB(unsigned long long);
 	void set_modeB(int val);
 	int  get_modeB();
 	int  get_modetype(int n);

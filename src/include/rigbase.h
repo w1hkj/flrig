@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #ifndef _RIG_BASE_H
@@ -39,7 +39,7 @@ enum {DT_BINARY, DT_STRING};
 enum {SERIAL, TCPIP, TCI};
 
 struct XCVR_STATE {
-	unsigned long int freq;
+	unsigned long long freq;
 	int  imode;
 	int  iBW;
 	int  filter;
@@ -94,7 +94,7 @@ struct XCVR_STATE {
 		compression = 0;
 		compON = 0;
 	}
-	XCVR_STATE(int a, int b, int c, int d) {
+	XCVR_STATE(unsigned long long a, int b, int c, int d) {
 		XCVR_STATE();
 		freq = a;
 		imode = b;
@@ -158,19 +158,22 @@ public:
 	GUI *widgets;
 
 	int  io_class;
-	int  comm_baudrate;
+	int  serial_baudrate;
 	int  stopbits;
-	int  comm_retries;
-	int  comm_wait;
-	int  comm_timeout;
-	bool comm_echo;
-	bool comm_rtscts;
-	bool comm_rtsplus;
-	bool comm_dtrplus;
-	bool comm_catptt;
-	bool comm_rtsptt;
-	bool comm_dtrptt;
+	bool serial_echo;
+	bool serial_rtscts;
+	bool serial_rtsplus;
+	bool serial_dtrplus;
+	bool serial_catptt;
+	bool serial_rtsptt;
+	bool serial_dtrptt;
+	int  serial_retries;
+
+	int  serial_write_delay;
+	int  serial_post_write_delay;
+	int  serial_timeout;
 	int  serloop_timing;
+
 	int  CIV;
 	int  defaultCIV;
 	bool USBaudio;
@@ -181,10 +184,10 @@ public:
 
 	int  modeA;
 	int  bwA;
-	unsigned long int freqA;
+	unsigned long long freqA;
 	int  modeB;
 	int  bwB;
-	unsigned long int freqB;
+	unsigned long long freqB;
 	int  precision;
 	int  ndigits;
 	bool can_change_alt_vfo;
@@ -192,7 +195,7 @@ public:
 
 	int  def_mode;
 	int  def_bw;
-	unsigned long int def_freq;
+	unsigned long long def_freq;
 	int  max_power;
 	int  last_bw;
 	int  bpf_center;
@@ -317,18 +320,18 @@ protected:
 	std::string cmd; // command string
 	std::string rsp; // expected response string (header etc)
 
-	std::string to_bcd_be(unsigned long int freq, int len);
-	std::string to_bcd(unsigned long int freq, int len);
-	unsigned long int fm_bcd (std::string bcd, int len);
-	unsigned long int fm_bcd_be(std::string bcd, int len);
-	std::string to_binary_be(unsigned long int freq, int len);
-	std::string to_binary(unsigned long int freq, int len);
-	unsigned long int fm_binary(std::string binary, int len);
-	unsigned long int fm_binary_be(std::string binary_be, int len);
-	std::string to_decimal_be(unsigned long int d, int len);
-	std::string to_decimal(unsigned long int d, int len);
-	unsigned long int fm_decimal(std::string decimal, int len);
-	unsigned long int fm_decimal_be(std::string decimal_be, int len);
+	std::string to_bcd_be(unsigned long long freq, int len);
+	std::string to_bcd(unsigned long long freq, int len);
+	unsigned long long fm_bcd (std::string bcd, int len);
+	unsigned long long fm_bcd_be(std::string bcd, int len);
+	std::string to_binary_be(unsigned long long freq, int len);
+	std::string to_binary(unsigned long long freq, int len);
+	unsigned long long fm_binary(std::string binary, int len);
+	unsigned long long fm_binary_be(std::string binary_be, int len);
+	std::string to_decimal_be(unsigned long long d, int len);
+	std::string to_decimal(unsigned long long d, int len);
+	unsigned long long fm_decimal(std::string decimal, int len);
+	unsigned long long fm_decimal_be(std::string decimal_be, int len);
 
 public:
 	rigbase();
@@ -343,10 +346,10 @@ public:
 	virtual void set_data_port() {}
 
 	virtual bool get_info(void) {return false;}
-	virtual unsigned long int get_vfoA(void) {return A.freq;}
-	virtual void set_vfoA(unsigned long int f) {A.freq = f;}
-	virtual unsigned long int get_vfoB(void) {return B.freq;}
-	virtual void set_vfoB(unsigned long int f) {B.freq = f; set_vfoA(f);}
+	virtual unsigned long long get_vfoA(void) {return A.freq;}
+	virtual void set_vfoA(unsigned long long f) {A.freq = f;}
+	virtual unsigned long long get_vfoB(void) {return B.freq;}
+	virtual void set_vfoB(unsigned long long f) {B.freq = f; set_vfoA(f);}
 
 	virtual void set_modeA(int val) {A.imode = val;}
 	virtual int  get_modeA() {return A.imode;}
@@ -634,6 +637,7 @@ double vfo_;
 
 	int waitN(size_t n, int timeout, const char *, int pr = HEX);
 	int wait_char(int ch, size_t n, int timeout, const char *, int pr = HEX);
+	int wait_crlf(std::string, std::string, int nr = 20, int timeout = 100, int pr = ASC);
 
 // IC-7610
 	virtual void set_digi_sel(bool) {}

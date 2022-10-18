@@ -617,6 +617,7 @@ int parse_args(int argc, char **argv, int& idx)
   --version\n\
   --config-dir [fully qualified pathname to <DIR>]\n\
   --debug-level N (0..4)\n\
+  --serial-debug \n\
   --trace\n\
   --xml-help\n\
   --xml-trace\n\
@@ -663,6 +664,11 @@ int parse_args(int argc, char **argv, int& idx)
 			default : debug::level = debug::WARN_LEVEL;
 		}
 		idx += 2;
+		return 1;
+	}
+	if (strcasecmp("--serial-debug", argv[idx]) == 0) {
+		SERIALDEBUG = 1;
+		idx++;
 		return 1;
 	}
 	if (strcasecmp("--config-dir", argv[idx]) == 0) {

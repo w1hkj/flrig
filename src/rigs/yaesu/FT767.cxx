@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <stdio.h>
@@ -33,17 +33,20 @@ RIG_FT767::RIG_FT767() {
 // base class values
 	name_ = FT767name_;
 	modes_ = FT767modes_;
-	comm_baudrate = BR4800;
+	serial_baudrate = BR4800;
 	stopbits = 2;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts = false;
-	comm_rtsplus = false;
-	comm_dtrplus = true;
-	comm_catptt = false;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+	
+	serial_write_delay = 50;
+	serial_post_write_delay = 5;
+
+	serial_timeout = 50;
+	serial_rtscts = false;
+	serial_rtsplus = false;
+	serial_dtrplus = true;
+	serial_catptt = false;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 	modeA = 1;
 	bwA = 0;
 	has_mode_control = true;
@@ -68,7 +71,7 @@ bool RIG_FT767::check()
 	return false;
 }
 
-unsigned long int RIG_FT767::get_vfoA ()
+unsigned long long RIG_FT767::get_vfoA ()
 {
 	init_cmd();
 	cmd[4] = 0x01; // CHECK command
@@ -80,7 +83,7 @@ unsigned long int RIG_FT767::get_vfoA ()
 	return freqA;
 }
 
-void RIG_FT767::set_vfoA (unsigned long int freq)
+void RIG_FT767::set_vfoA (unsigned long long freq)
 {
 	freqA = freq;
 	freq /=10; // 767 does not support 1 Hz resolution

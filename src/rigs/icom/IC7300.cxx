@@ -19,7 +19,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <string>
@@ -167,26 +167,27 @@ RIG_IC7300::RIG_IC7300() {
 
 	_mode_type = IC7300_mode_type;
 
-	comm_baudrate = BR115200;
+	serial_baudrate = BR115200;
 	stopbits = 1;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_echo = true;
-	comm_rtscts = false;
-	comm_rtsplus = false;
-	comm_dtrplus = false;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+	serial_timeout = 50;
+	serial_echo = true;
+	serial_rtscts = false;
+	serial_rtsplus = false;
+	serial_dtrplus = false;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 
 	widgets = IC7300_widgets;
 
-	def_freq = A.freq = 14070000;
+	def_freq = A.freq = 14070000ULL;
 	def_mode = A.imode = 9;
 	def_bw = A.iBW = 34;
 
-	B.freq = 7070000;
+	B.freq = 7070000ULL;
 	B.imode = 9;
 	B.iBW = 34;
 
@@ -348,8 +349,8 @@ void RIG_IC7300::set_xcvr_auto_on()
 	if (waitFOR(8, "get ID") == false) {
 		cmd.clear();
 		int fes[] = { 2, 2, 2, 3, 7, 13, 25, 50, 75, 150, 150, 150 };
-		if (progStatus.comm_baudrate >= 0 && progStatus.comm_baudrate <= 11) {
-			cmd.append( fes[progStatus.comm_baudrate], '\xFE');
+		if (progStatus.serial_baudrate >= 0 && progStatus.serial_baudrate <= 11) {
+			cmd.append( fes[progStatus.serial_baudrate], '\xFE');
 		}
 		RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
 
@@ -456,7 +457,7 @@ bool RIG_IC7300::check ()
 	return (xcvr_is_on = waitFOR(8, "get ID"));
 }
 
-unsigned long int RIG_IC7300::get_vfoA ()
+unsigned long long RIG_IC7300::get_vfoA ()
 {
 	std::string resp;
 
@@ -489,7 +490,7 @@ unsigned long int RIG_IC7300::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_IC7300::set_vfoA (unsigned long int freq)
+void RIG_IC7300::set_vfoA (unsigned long long freq)
 {
 //	set_trace(1, "set_vfoA()");
 	A.freq = freq;
@@ -506,7 +507,7 @@ void RIG_IC7300::set_vfoA (unsigned long int freq)
 	seth();
 }
 
-unsigned long int RIG_IC7300::get_vfoB ()
+unsigned long long RIG_IC7300::get_vfoB ()
 {
 	std::string resp;
 
@@ -539,7 +540,7 @@ unsigned long int RIG_IC7300::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_IC7300::set_vfoB (unsigned long int freq)
+void RIG_IC7300::set_vfoB (unsigned long long freq)
 {
 //	set_trace(1, "set_vfoB()");
 	B.freq = freq;
@@ -2491,7 +2492,7 @@ void RIG_IC7300::get_band_selection(int v)
 	if (ret) {
 		size_t p = replystr.rfind(retstr);
 		if (p != std::string::npos) {
-			unsigned long int bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
+			unsigned long long bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
 			int bandmode = replystr[p+13];
 			int bandfilter = replystr[p+14];
 			int banddata = replystr[p+15] & 0x10;
@@ -2521,7 +2522,7 @@ void RIG_IC7300::get_band_selection(int v)
 void RIG_IC7300::set_band_selection(int v)
 {
 //	set_trace(1, "set_band_selection()");
-	unsigned long int freq = (inuse == onB ? B.freq : A.freq);
+	unsigned long long freq = (inuse == onB ? B.freq : A.freq);
 	int fil = (inuse == onB ? B.filter : A.filter);
 	int mode = (inuse == onB ? B.imode : A.imode);
 

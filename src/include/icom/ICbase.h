@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #ifndef _ICbase_H
@@ -46,7 +46,6 @@ public:
 	virtual ~RIG_ICOM() {}
 	void checkresponse();
 	bool sendICcommand(std::string str, int nbr);
-	void delayCommand(std::string cmd, int wait);
 	bool  waitFB(const char *sz, int timeout = 500);
 	bool  waitFOR(size_t n, const char *sz, unsigned long timeout = 500);
 	void adjustCIV(uchar adr);

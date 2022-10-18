@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "yaesu/FT847.h"
@@ -47,18 +47,21 @@ RIG_FT847::RIG_FT847() {
 	name_ = FT847name_;
 	modes_ = FT847modes_;
 //	bandwidths_ = FT847widths_;
-	comm_baudrate = BR9600;
+	serial_baudrate = BR9600;
 	stopbits = 2;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts = false;
-	comm_rtsplus = false;
-	comm_dtrplus = true;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
-	afreq = A.freq = B.freq = 14070000;
+	serial_retries = 2;
+	
+	serial_write_delay = 50;
+	serial_post_write_delay = 00;
+
+	serial_timeout = 50;
+	serial_rtscts = false;
+	serial_rtsplus = false;
+	serial_dtrplus = true;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
+	afreq = A.freq = B.freq = 14070000ULL;
 	amode = A.imode = B.imode = 1;
 
 	precision = 10;
@@ -116,7 +119,7 @@ bool RIG_FT847::check ()
 	return false;
 }
 
-unsigned long int RIG_FT847::get_vfoA ()
+unsigned long long RIG_FT847::get_vfoA ()
 {
 	if (inuse == onB) return A.freq;
 	if (get_info()) {
@@ -127,7 +130,7 @@ unsigned long int RIG_FT847::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_FT847::set_vfoA (unsigned long int freq)
+void RIG_FT847::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	freq /=10; // 847 does not support 1 Hz resolution
@@ -154,7 +157,7 @@ void RIG_FT847::set_modeA(int val)
 	showresp(WARN, HEX, "set mode A", cmd, replystr);
 }
 
-unsigned long int RIG_FT847::get_vfoB()
+unsigned long long RIG_FT847::get_vfoB()
 {
 	if (inuse == onA) return B.freq;
 	if (get_info()) {
@@ -165,7 +168,7 @@ unsigned long int RIG_FT847::get_vfoB()
 	return B.freq;
 }
 
-void RIG_FT847::set_vfoB(unsigned long int freq)
+void RIG_FT847::set_vfoB(unsigned long long freq)
 {
 	B.freq = freq;
 	freq /=10; // 847 does not support 1 Hz resolution

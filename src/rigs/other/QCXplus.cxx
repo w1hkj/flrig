@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "other/QCXplus.h"
@@ -46,21 +46,24 @@ RIG_QCXP::RIG_QCXP() {
 
 	widgets = rig_widgets;
 
-	comm_baudrate = BR38400;
+	serial_baudrate = BR38400;
 	stopbits = 1;
-	comm_retries = 1;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts  = false;
-	comm_rtsplus = false;
-	comm_dtrplus = false;
-	comm_catptt  = false;
-	comm_rtsptt  = false;
-	comm_dtrptt  = false;
+	serial_retries = 1;
+
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
+	serial_timeout = 50;
+	serial_rtscts  = false;
+	serial_rtsplus = false;
+	serial_dtrplus = false;
+	serial_catptt  = false;
+	serial_rtsptt  = false;
+	serial_dtrptt  = false;
 	B.imode = A.imode = 1;
 	B.iBW = A.iBW = 0x8A03;
-	A.freq = 7040000;
-	B.freq = 7025000;
+	A.freq = 7040000ULL;
+	B.freq = 7025000ULL;
 
 	has_extras = false;
 
@@ -291,7 +294,7 @@ int RIG_QCXP::get_split()
 	return split;
 }
 
-unsigned long int RIG_QCXP::get_vfoA ()
+unsigned long long RIG_QCXP::get_vfoA ()
 {
 	cmd = "FA;";
 	get_trace(1, "get_vfoA()");
@@ -300,7 +303,7 @@ unsigned long int RIG_QCXP::get_vfoA ()
 
 	size_t p = replystr.rfind("FA");
 	if (p != std::string::npos && (p + 12 < replystr.length())) {
-		int f = 0;
+		unsigned long long f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replystr[p+n] - '0';
 		A.freq = f;
@@ -308,7 +311,7 @@ unsigned long int RIG_QCXP::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_QCXP::set_vfoA (unsigned long int freq)
+void RIG_QCXP::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	cmd = "FA00000000000;";
@@ -320,7 +323,7 @@ void RIG_QCXP::set_vfoA (unsigned long int freq)
 	showresp(WARN, ASC, "set vfo A", cmd, "");
 }
 
-unsigned long int RIG_QCXP::get_vfoB ()
+unsigned long long RIG_QCXP::get_vfoB ()
 {
 	cmd = "FB;";
 	get_trace(1, "get_vfoB()");
@@ -329,7 +332,7 @@ unsigned long int RIG_QCXP::get_vfoB ()
 
 	size_t p = replystr.rfind("FB");
 	if (p != std::string::npos && (p + 12 < replystr.length())) {
-		int f = 0;
+		unsigned long long f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replystr[p+n] - '0';
 		B.freq = f;
@@ -337,7 +340,7 @@ unsigned long int RIG_QCXP::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_QCXP::set_vfoB (unsigned long int freq)
+void RIG_QCXP::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
 	cmd = "FB00000000000;";

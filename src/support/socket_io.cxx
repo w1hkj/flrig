@@ -76,46 +76,6 @@ static std::string rxbuffer;
 pthread_t *rcv_socket_thread = 0;
 pthread_mutex_t mutex_rcv_socket = PTHREAD_MUTEX_INITIALIZER;
 
-static void log_level(int level, std::string s, std::string data) 
-{
-	time_t now;
-	time(&now);
-	struct tm *local = localtime(&now);
-	char sztm[20];
-	strftime(sztm, sizeof(sztm), "%H:%M:%S", local);
-
-	std::string s1;
-	s1 = selrig->data_type == DT_BINARY ? str2hex(data.c_str(), data.length()) : data;
-
-	if (selrig->data_type == DT_STRING) {
-		s1 = data;
-		size_t p;
-		while((p = s1.find('\r')) != std::string::npos)
-			s1.replace(p, 1, "<cr>");
-		while((p = s1.find('\n')) != std::string::npos)
-			s1.replace(p, 1, "<lf>");
-	} else
-		s1 = str2hex(data.c_str(), data.length());
-
-
-	switch (level) {
-	case QUIET:
-		LOG_QUIET("%s: %s : %s", sztm, s.c_str(), s1.c_str());
-		break; 
-	case ERR:
-		LOG_ERROR("%s: %s : %s", sztm, s.c_str(), s1.c_str());
-		break;
-	case WARN:
-		LOG_WARN("%s: %s : %s", sztm, s.c_str(), s1.c_str());
-		break;
-	case INFO:
-		LOG_INFO("%s: %s : %s", sztm, s.c_str(), s1.c_str());
-		break;
-	default:
-		LOG_DEBUG("%s: %s : %s", sztm, s.c_str(), s1.c_str());
-	}
-}
-
 void *rcv_socket_loop(void *)
 {
 	for (;;) {
@@ -152,19 +112,14 @@ void connect_to_remote()
 {
 	try {
 		if (remote_addr) delete remote_addr;
-// test for SunSDR2 TCI interface
-		remote_addr = new Address("localhost", "40001");
-//		remote_addr = new Address(progStatus.tcpip_addr.c_str(), progStatus.tcpip_port.c_str());
-		LOG_QUIET("Created new remote_addr @ %p", remote_addr);
 
-std::cout << "Created new remote address @ " << remote_addr << std::endl;
+		remote_addr = new Address(progStatus.tcpip_addr.c_str(), progStatus.tcpip_port.c_str());
+		LOG_QUIET("Created new remote_addr @ %p", remote_addr);
 
 		if (!tcpip) {
 			guard_lock socket_lock(&mutex_rcv_socket);
 			tcpip = new Socket(*remote_addr);
 			LOG_QUIET("Created new socket @ %p", tcpip);
-
-std::cout << "Created new socket @ " << tcpip << std::endl;
 
 			tcpip->set_timeout(0.001);
 			tcpip->connect();
@@ -179,14 +134,12 @@ std::cout << "Created new socket @ " << tcpip << std::endl;
 			tcpip_menu_box->redraw();
 		}
 		if (tcpip->fd() == -1) {
-//			guard_lock socket_lock(&mutex_rcv_socket);
+
 			try {
 				tcpip->connect(*remote_addr);
 				tcpip->set_nonblocking(true);
 				LOG_QUIET("Connected to %d", tcpip->fd());
 
-std::cout << "Connected to " << tcpip->fd() << std::endl;
-tcpip->send("START;", 6);
 				tcpip_box->show();
 				box_tcpip_connect->color(FL_GREEN);
 				box_tcpip_connect->redraw();
@@ -196,8 +149,6 @@ tcpip->send("START;", 6);
 				tcpip_menu_box->redraw();
 			} catch (const SocketException & e) {
 				LOG_ERROR("Error: %d, %s", e.error(), e.what());
-
-std::cout << "Connect error " << e.error() << ", " << e.what() << std::endl;
 
 				delete remote_addr;
 				remote_addr = 0;
@@ -219,9 +170,6 @@ std::cout << "Connect error " << e.error() << ", " << e.what() << std::endl;
 				exit(EXIT_FAILURE);
 			}
 			LOG_QUIET("%s", "Socket receive thread started");
-
-std::cout << "Socket receive thread started" << std::endl;
-
 		}
 	}
 	catch (const SocketException& e) {
@@ -244,17 +192,15 @@ void disconnect_from_remote()
 {
 	if (!tcpip || tcpip->fd() == -1) return;
 
-	{
-//		guard_lock socket_lock(&mutex_rcv_socket);
-		tcpip->close();
-		delete tcpip;
-		tcpip = 0;
-		LOG_QUIET("%s", "Deleted tcpip socket instance");
-		delete remote_addr;
-		remote_addr = 0;
-		LOG_QUIET("%s", "Deleted socket address instance");
-		exit_socket_loop = true;
-	}
+	tcpip->close();
+	delete tcpip;
+	tcpip = 0;
+	LOG_QUIET("%s", "Deleted tcpip socket instance");
+	delete remote_addr;
+	remote_addr = 0;
+	LOG_QUIET("%s", "Deleted socket address instance");
+	exit_socket_loop = true;
+
 	pthread_join(*rcv_socket_thread, NULL);
 	rcv_socket_thread = NULL;
 	LOG_QUIET("%s", "Exited from socket read thread");
@@ -270,7 +216,7 @@ void disconnect_from_remote()
 int retry_after = 0;
 int drop_count = 0;
 
-void send_to_remote(std::string cmd_string, int pace)
+void send_to_remote(std::string cmd_string)
 {
 	if (retry_after > 0) {
 		retry_after -= progStatus.serloop_timing;
@@ -282,26 +228,16 @@ void send_to_remote(std::string cmd_string, int pace)
 		try {
 			connect_to_remote();
 		} catch (...) {
-LOG_QUIET("Retry connect in %d seconds", progStatus.tcpip_reconnect_after);
-
-std::cout << "Retry connect to remote in " << progStatus.tcpip_reconnect_after << " seconds" << std::endl;
-
+			LOG_QUIET("Retry connect in %d seconds", progStatus.tcpip_reconnect_after);
 			retry_after = 1000 * progStatus.tcpip_reconnect_after;
 			return;
 		}
 	}
 
 	try {
-//		guard_lock send_lock(&mutex_rcv_socket);
-//		size_t len = cmd_string.length();
+		tcpip->send(cmd_string);
 
-std::cout << "send_to_remote( \"" << cmd_string << "\" )" << std::endl;
-
-		tcpip->send(cmd_string);//.c_str(), len);
-
-//		for (size_t i = 0; i < len; i += 1024)
-//			tcpip->send(&cmd_string[i], len - i > 1024 ? 1024 : len - i);
-		log_level(WARN, "send to remote", cmd_string);
+		LOG_WARN("send to remote: %s", cmd_string.c_str());
 
 		drop_count = 0;
 	} catch (const SocketException& e) {
@@ -319,15 +255,14 @@ int read_from_remote(std::string &str)
 {
 	if (!tcpip || tcpip->fd() == -1) return 0;
 
-{	guard_lock socket_lock(&mutex_rcv_socket);
-	str = rxbuffer;
-	rxbuffer.clear();
-}
+	{	guard_lock socket_lock(&mutex_rcv_socket);
+		str = rxbuffer;
+		rxbuffer.clear();
+	}
 	char szc[200];
 	snprintf(szc, sizeof(szc), "read_from_remote() : %s", str.c_str());
-std::cout << szc << std::endl;
 
-	log_level(WARN, "%s", szc);
+	LOG_WARN("%s", szc);
 
 	return str.length();
 }

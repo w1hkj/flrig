@@ -32,6 +32,7 @@
 
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Text_Buffer.H>
+#include <FL/Fl_Widget.H>
 #include <FL/Enumerations.H>
 
 #include "icons.h"
@@ -49,6 +50,7 @@
 #include "rigs.h"
 #include "K3_ui.h"
 #include "KX3_ui.h"
+#include "K4_ui.h"
 #include "rigpanel.h"
 #include "tod_clock.h"
 #include "trace.h"
@@ -86,7 +88,7 @@ const char **old_bws = NULL;
 
 // Add alpha-tag to XCVR_STATE;
 struct ATAG_XCVR_STATE {
-	long freq;
+	unsigned long long freq;
 	int  imode;
 	int  iBW;
 	int  src;
@@ -163,12 +165,13 @@ std::string printXCVR_STATE(XCVR_STATE data)
 				str << ", " << (dsplo ? dsplo[data.iBW & 0x7F] : "??");
 				str << ", " << (dsphi ? dsphi[(data.iBW >> 8) & 0x7F] : "??");
 			}
+		} else {
+			const char **bwt = selrig->bwtable(data.imode);
+			if (bwt)
+				str << ", " << bwt[data.iBW];
+			else
+				str << ", n/a";
 		}
-		const char **bwt = selrig->bwtable(data.imode);
-		if (bwt)
-			str << ", " << bwt[data.iBW];
-		else
-			str << ", n/a";
 	} else
 		str << ", modes n/a";
 	return str.str();
@@ -197,7 +200,7 @@ const char *print(XCVR_STATE data)
 	snprintf(
 		str, sizeof(str), "\
 Data Source: %s\n\
-  freq ........... %ld\n\
+  freq ........... %llu\n\
   mode ........... %d [%s]\n",
 		data.src == XML ? "XML" : data.src == UI ? "UI" :
 			data.src == SRVR ? "SRVR" : "RIG",
@@ -972,11 +975,13 @@ void read_notch()
 		on = selrig->get_notch(val);
 	}
 
-	if ((on != progStatus.notch) || (val != progStatus.notch_val)) {
-		vfo->notch_val = progStatus.notch_val = val;
+	if (on != progStatus.notch)
 		vfo->notch = progStatus.notch = on;
-		Fl::awake(update_notch, (void*)0);
-	}
+
+	if (val != progStatus.notch_val)
+		vfo->notch_val = progStatus.notch_val = val;
+
+	Fl::awake(update_notch, (void*)0);
 }
 
 // power_control
@@ -985,7 +990,7 @@ void update_power_control(void *d)
 {
 	double min, max, step;
 
-	if (xcvr_name == rig_K2.name_ || xcvr_name == rig_KX3.name_) {
+	if (xcvr_name == rig_K2.name_ || xcvr_name == rig_KX3.name_ || xcvr_name == rig_K4.name_) {
 		guard_lock serial(&mutex_serial);
 		selrig->get_pc_min_max_step(min, max, step);
 
@@ -1209,6 +1214,26 @@ void yaesu891UpdateB(XCVR_STATE * newVfo)
 	selrig->get_bwB();
 }
 
+void FTdx10_UpdateA(XCVR_STATE * newVfo)
+{
+	selrig->set_modeA(newVfo->imode);
+	selrig->set_vfoA(newVfo->freq);
+	selrig->set_bwA(newVfo->iBW);
+	selrig->get_modeA();
+	selrig->get_vfoA();
+	selrig->get_bwA();
+}
+
+void FTdx10_UpdateB(XCVR_STATE * newVfo)
+{
+	selrig->set_modeB(newVfo->imode);
+	selrig->set_vfoB(newVfo->freq);
+	selrig->set_bwB(newVfo->iBW);
+	selrig->get_modeB();
+	selrig->get_vfoB();
+	selrig->get_bwB();
+}
+
 void serviceQUE()
 {
 	guard_lock que_lock(&mutex_srvc_reqs, "serviceQUE");
@@ -1277,6 +1302,9 @@ void serviceQUE()
 					// Restore mode, then freq and bandwidth after select
 					yaesu891UpdateA(&vfoA);
 				}
+				if (selrig->name_ == rig_FTdx10.name_) {
+					FTdx10_UpdateA(&vfoA);
+				}
 				rig_trace(2, "case sA ", printXCVR_STATE(vfoA).c_str());
 				Fl::awake(updateUI);
 			}
@@ -1288,6 +1316,9 @@ void serviceQUE()
 				if (selrig->name_ == rig_FT891.name_) {
 					// Restore mode, then freq and bandwidth after select
 					yaesu891UpdateB(&vfoB);
+				}
+				if (selrig->name_ == rig_FTdx10.name_) {
+					FTdx10_UpdateB(&vfoB);
 				}
 				rig_trace(2, "case sB ", printXCVR_STATE(vfoB).c_str());
 				Fl::awake(updateUI);
@@ -1689,8 +1720,6 @@ void * serial_thread_loop(void *d)
 			check_ptt();
 		}
 
-		if (progStatus.byte_interval) MilliSleep(progStatus.byte_interval);
-
 		if (PTT || cwio_process == SEND || cwio_process == CALIBRATE) {
 			if (isRX) {
 				isRX = false;
@@ -1703,9 +1732,6 @@ void * serial_thread_loop(void *d)
 				guard_lock lk(&mutex_serial);
 				read_vfo();
 			}
-
-			if (progStatus.byte_interval)
-				MilliSleep(progStatus.byte_interval);
 
 			{	guard_lock lk(&mutex_serial);
 				if (!bypass_serial_thread_loop) {
@@ -1728,9 +1754,8 @@ void * serial_thread_loop(void *d)
 			if (!bypass_serial_thread_loop) {
 				{	guard_lock lk(&mutex_serial);
 					while (rx_poll_group_1->poll != NULL) {
-						(rx_poll_group_1->pollfunc)();
-						if (progStatus.byte_interval)
-							MilliSleep(progStatus.byte_interval);
+						if (*(rx_poll_group_1->poll))
+							(rx_poll_group_1->pollfunc)();
 						++rx_poll_group_1;
 					}
 					rx_poll_group_1 = &RX_poll_group_1[0];
@@ -1746,9 +1771,6 @@ void * serial_thread_loop(void *d)
 						rx_poll_group_2 = &RX_poll_group_2[0];
 				}
 			}
-
-			if (progStatus.byte_interval)
-				MilliSleep(progStatus.byte_interval);
 
 			if (!bypass_serial_thread_loop) {
 
@@ -1796,13 +1818,15 @@ void selectDSP()
 	if (btnDSP->label()[0] == selrig->SL_label[0]) {
 		btnDSP->label(selrig->SH_label);
 		btnDSP->redraw_label();
-		opDSP_hi->show();
 		opDSP_lo->hide();
+		opDSP_hi->show();
+		opDSP_hi->redraw();
 	} else {
 		btnDSP->label(selrig->SL_label);
 		btnDSP->redraw_label();
-		opDSP_lo->show();
 		opDSP_hi->hide();
+		opDSP_lo->show();
+		opDSP_lo->redraw();
 	}
 }
 
@@ -2005,7 +2029,7 @@ void updateSelect() {
 	inAlphaTag->value("");
 }
 
-void addtoList(int val, int imode, int iBW) {
+void addtoList(unsigned long long val, int imode, int iBW) {
 	if (numinlist < LISTSIZE) {
 		oplist[numinlist].imode = imode;
 		oplist[numinlist].freq = val;
@@ -2023,9 +2047,9 @@ void readFile() {
 	}
 	clearList();
 	int i = 0, mode, bw;
-	long freq;
+	unsigned long long freq;
 	while (!iList.eof()) {
-		freq = 0L; mode = -1;
+		freq = 0ULL; mode = -1;
 		iList >> freq >> mode >> bw;
 		if (freq && (mode > -1)) {
 			oplist[i].freq = freq;
@@ -2048,11 +2072,11 @@ void readTagFile() {
 	}
 	clearList();
 	int i = 0, mode, bw;
-	long freq;
+	unsigned long long freq;
 	std::string atag;
 	char ca[ATAGSIZE + 60];
 	while (!iList.eof()) {
-		freq = 0L; mode = -1;
+		freq = 0ULL; mode = -1;
 		atag.clear();
 		memset(ca, 0, sizeof(ca));
 		iList >> freq >> mode >> bw;
@@ -2103,7 +2127,7 @@ void buildlist() {
 
 // flrig front panel changed
 
-int movFreqA() {
+void movFreqA(Fl_Widget *, void *) {
 	guard_lock serial(&mutex_serial);
 
 	if (!selrig->can_change_alt_vfo  && selrig->inuse == onB) {
@@ -2115,11 +2139,9 @@ int movFreqA() {
 		vfoA.freq = FreqDispA->value();
 		selrig->set_vfoA(vfoA.freq);
 	}
-
-	return 1;
 }
 
-int movFreqB() {
+void movFreqB(Fl_Widget *, void *) {
 //	if (xcvr_name == rig_KX3.name_ && !progStatus.split  ) {
 //		FreqDispB->value(vfoB.freq);
 //		FreqDispB->redraw();
@@ -2135,7 +2157,6 @@ int movFreqB() {
 		vfoB.freq = FreqDispB->value();
 		selrig->set_vfoB(vfoB.freq);
 	}
-	return 1;
 }
 
 void execute_swapAB()
@@ -2350,8 +2371,8 @@ void highlight_vfo(void *d)
 	FreqDispA->value(vfoA.freq);
 	FreqDispB->value(vfoB.freq);
 	if (selrig->inuse == onB) {
-		FreqDispA->SetONOFFCOLOR( norm_fg, dim_bg );
-		FreqDispB->SetONOFFCOLOR( norm_fg, norm_bg );
+		FreqDispA->SetCOLORS( norm_fg, dim_bg );
+		FreqDispB->SetCOLORS( norm_fg, norm_bg );
 		btnA->value(0);
 		btnB->value(1);
 		FreqDispB->activate();
@@ -2360,8 +2381,8 @@ void highlight_vfo(void *d)
 		else
 			FreqDispA->deactivate();
 	} else {
-		FreqDispA->SetONOFFCOLOR( norm_fg, norm_bg );
-		FreqDispB->SetONOFFCOLOR( norm_fg, dim_bg);
+		FreqDispA->SetCOLORS( norm_fg, norm_bg );
+		FreqDispB->SetCOLORS( norm_fg, dim_bg);
 		btnA->value(1);
 		btnB->value(0);
 		FreqDispA->activate();
@@ -2410,7 +2431,7 @@ void setUpper()
 }
 
 void selectFreq() {
-	long n = FreqSelect->value();
+	int n = FreqSelect->value(); // This is the number of the selected line; not the line's value.
 	if (!n) return;
 
 	n--;
@@ -2490,7 +2511,7 @@ void delFreq() {
 
 void addFreq() {
 	if (selrig->inuse == onB) {
-		long freq = FreqDispB->value();
+		unsigned long long freq = FreqDispB->value();
 		if (!freq) return;
 		int mode = opMODE->index();
 		int bw;
@@ -2508,7 +2529,7 @@ void addFreq() {
 		updateSelect();
 		FreqDispB->visual_beep();
 	} else {
-		long freq = FreqDispA->value();
+		unsigned long long freq = FreqDispA->value();
 		if (!freq) return;
 		int mode = opMODE->index();
 		int bw;
@@ -2564,7 +2585,7 @@ void cbAttenuator()
 //	for (int n = 0; n < 100; n++) {
 //		chk = selrig->get_attenuator();
 //		if (chk == progStatus.attenuator) break;
-//		MilliSleep(progStatus.comm_wait);
+//		MilliSleep(progStatus.serial_post_write_delay);
 //		Fl::awake();
 //	}
 	return;
@@ -2584,11 +2605,11 @@ void cbPreamp()
 //	int chk = selrig->get_preamp();
 	progStatus.preamp = selrig->next_preamp();
 	selrig->set_preamp (progStatus.preamp);
-//	MilliSleep(5 + progStatus.comm_wait);
+//	MilliSleep(5 + progStatus.serial_post_write_delay);
 //	for (int n = 0; n < 100; n++) {
 //		chk = selrig->get_preamp();
 //		if (chk == progStatus.preamp) break;
-//		MilliSleep(progStatus.comm_wait);
+//		MilliSleep(progStatus.serial_post_write_delay);
 //		Fl::awake();
 //	}
 	return;
@@ -2625,10 +2646,10 @@ void cbbtnNotch()
 
 //	on = selrig->get_notch(val);
 
-	MilliSleep(progStatus.comm_wait);
+	MilliSleep(progStatus.serial_post_write_delay);
 
 	while ((selrig->get_notch(val) != progStatus.notch) && (cnt++ < 10)) {
-		MilliSleep(progStatus.comm_wait);
+		MilliSleep(progStatus.serial_post_write_delay);
 //		on = ;
 		Fl::awake();
 	}
@@ -2762,7 +2783,7 @@ void cbIFsh()
 	int val, on;
 	on = selrig->get_if_shift(val);
 	while ((on != btn) && (cnt++ < 10)) {
-		MilliSleep(progStatus.comm_wait);
+		MilliSleep(progStatus.serial_post_write_delay);
 		on = selrig->get_if_shift(val);
 		Fl::awake();
 	}
@@ -2943,7 +2964,7 @@ void cbMute()
 	MilliSleep(50);
 	get = selrig->get_volume_control();
 	while (get != set && cnt++ < 10) {
-		MilliSleep(progStatus.comm_wait);
+		MilliSleep(progStatus.serial_post_write_delay);
 		get = selrig->get_volume_control();
 		Fl::awake();
 	}
@@ -3175,11 +3196,11 @@ void cb_tune_on_off()
 
 int chkptt()
 {
-	if (progStatus.comm_catptt) {
+	if (progStatus.serial_catptt) {
 		return selrig->get_PTT();
-	} else if (progStatus.comm_dtrptt) {
+	} else if (progStatus.serial_dtrptt) {
 		return RigSerial->getPTT();
-	} else if (progStatus.comm_rtsptt) {
+	} else if (progStatus.serial_rtsptt) {
 		return RigSerial->getPTT();
 	} else if (SepSerial->IsOpen() && progStatus.sep_dtrptt) {
 		return SepSerial->getPTT();
@@ -3204,10 +3225,10 @@ void doPTT(int on)
 	rigPTT(on);
 	btnPTT->value(on);
 
-	MilliSleep(progStatus.comm_wait);
+	MilliSleep(progStatus.serial_post_write_delay);
 	for (int n = 0; n < 100; n++) {
 		if (on == chkptt()) break;
-		MilliSleep(progStatus.comm_wait);
+		MilliSleep(progStatus.serial_post_write_delay);
 		Fl::awake();
 	}
 	return;
@@ -3528,7 +3549,7 @@ void TRACED(setPTT, void *d)
 	for (int n = 0; n < 100; n++) {
 		chk = chkptt();
 		if (set == chk) break;
-		MilliSleep(progStatus.comm_wait);
+		MilliSleep(progStatus.serial_post_write_delay);
 	}
 	return;
 }
@@ -3640,6 +3661,7 @@ void TRACED(close_UI)
 		FSK_configure,
 		meter_filters,
 		meter_scale_dialog,
+		tabs_dialog,
 		mainwindow };
 	for (size_t n = 0; n < sizeof(widgets) / sizeof(*widgets); n++) {
 		if (widgets[n]) widgets[n]->hide();
@@ -4057,7 +4079,7 @@ void cbNoise()
 	MilliSleep(50);
 	get = selrig->get_noise();
 	while ((get != btn) && (cnt++ < 10)) {
-		MilliSleep(progStatus.comm_wait);
+		MilliSleep(progStatus.serial_post_write_delay);
 		get = selrig->get_noise();
 		Fl::awake();
 	}
@@ -4126,7 +4148,7 @@ void cbNR()
 
 		get = selrig->get_noise_reduction();
 		while ((get != btn) && (cnt++ < 10)) {
-			MilliSleep(progStatus.comm_wait);
+			MilliSleep(progStatus.serial_post_write_delay);
 			get = selrig->get_noise_reduction();
 			Fl::awake();
 		}
@@ -4136,7 +4158,7 @@ void cbNR()
 		get = selrig->get_noise_reduction_val();
 		cnt = 0;
 		while ((get != set) && (cnt++ < 10)) {
-			MilliSleep(progStatus.comm_wait);
+			MilliSleep(progStatus.serial_post_write_delay);
 			get = selrig->get_noise_reduction_val();
 			Fl::awake();
 		}

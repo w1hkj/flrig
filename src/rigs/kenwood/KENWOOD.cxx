@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "kenwood/KENWOOD.h"
@@ -111,28 +111,17 @@ void KENWOOD::set_split(bool val)
 ========================================================================
 */ 
 
-int KENWOOD::get_split()
-{
-	check_ifstr();
-//	cmd = "IF;";
-//	get_trace(1, "get_split");
-//	ret = wait_char(';', 38, 100, "get split", ASC);
-//	gett("");
-	if (ret < 38) return 0;
-	return (replystr[32] == '1');
-}
-
 bool KENWOOD::check()
 {
 	cmd = "FA;";
 	get_trace(1, "check()");
 	ret = wait_char(';', 14, 100, "check", ASC);
 	gett("");
-//	if (ret < 14) return false;
+	if (ret < 14) return false;
 	return true;
 }
 
-unsigned long int KENWOOD::get_vfoA ()
+unsigned long long KENWOOD::get_vfoA ()
 {
 	cmd = "FA;";
 	get_trace(1, "get_vfoA");
@@ -141,7 +130,7 @@ unsigned long int KENWOOD::get_vfoA ()
 	if (ret == 14) {
 		size_t p = replystr.rfind("FA");
 		if (p != std::string::npos) {
-			int f = 0;
+			unsigned long long f = 0;
 			for (size_t n = 2; n < 13; n++)
 				f = f*10 + replystr[p+n] - '0';
 			A.freq = f;
@@ -150,7 +139,7 @@ unsigned long int KENWOOD::get_vfoA ()
 	return A.freq;
 }
 
-void KENWOOD::set_vfoA (unsigned long int freq)
+void KENWOOD::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	cmd = "FA00000000000;";
@@ -163,7 +152,7 @@ void KENWOOD::set_vfoA (unsigned long int freq)
 	sett("vfoA");
 }
 
-unsigned long int KENWOOD::get_vfoB ()
+unsigned long long KENWOOD::get_vfoB ()
 {
 	cmd = "FB;";
 	get_trace(1, "get_vfoB");
@@ -172,7 +161,7 @@ unsigned long int KENWOOD::get_vfoB ()
 	if (ret == 14) {
 		size_t p = replystr.rfind("FB");
 		if (p != std::string::npos) {
-			int f = 0;
+			unsigned long long f = 0;
 			for (size_t n = 2; n < 13; n++)
 				f = f*10 + replystr[p+n] - '0';
 			B.freq = f;
@@ -181,7 +170,7 @@ unsigned long int KENWOOD::get_vfoB ()
 	return B.freq;
 }
 
-void KENWOOD::set_vfoB (unsigned long int freq)
+void KENWOOD::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
 	cmd = "FB00000000000;";
@@ -222,26 +211,23 @@ void KENWOOD::set_vfoB (unsigned long int freq)
 
 size_t KENWOOD::check_ifstr()
 {
-	size_t now = zmsec();
-	if ((lastmsec == 0) || now < lastmsec || (now - lastmsec) > 200) {
-		lastmsec = now;
-		cmd = "IF;";
-		get_trace(1, "get_PTT");
-		wait_char(';', 38, 100, "get VFO", ASC);
-		gett("");
-		ifstring = replystr;
-	} else
-		replystr = ifstring;
+	cmd = "IF;";
+	get_trace(1, "check IF response");
+	wait_char(';', 38, 100, "check IF response", ASC);
+	gett("");
 	return replystr.length();
+}
+
+int KENWOOD::get_split()
+{
+	ret = check_ifstr();
+	if (ret < 38) return 0;
+	return (replystr[32] == '1');
 }
 
 int KENWOOD::get_PTT()
 {
-	check_ifstr();
-//	cmd = "IF;";
-//	get_trace(1, "get_PTT");
-//	ret = wait_char(';', 38, 100, "get VFO", ASC);
-//	gett("");
+	ret = check_ifstr();
 	if (ret < 38) return ptt_;
 	ptt_ = (replystr[28] == '1');
 	return ptt_;

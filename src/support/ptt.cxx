@@ -72,9 +72,9 @@ void rigPTT(bool on)
 	if ((smode.find("CW") != std::string::npos) && progStatus.disable_CW_ptt)
 		return;
 
-	if (progStatus.comm_catptt == PTT_BOTH || progStatus.comm_catptt == PTT_SET)		selrig->set_PTT_control(on);
-	else if (progStatus.comm_dtrptt == PTT_BOTH || progStatus.comm_dtrptt == PTT_SET)	RigSerial->SetPTT(on);
-	else if (progStatus.comm_rtsptt == PTT_BOTH || progStatus.comm_rtsptt == PTT_SET)	RigSerial->SetPTT(on);
+	if (progStatus.serial_catptt == PTT_BOTH || progStatus.serial_catptt == PTT_SET)		selrig->set_PTT_control(on);
+	else if (progStatus.serial_dtrptt == PTT_BOTH || progStatus.serial_dtrptt == PTT_SET)	RigSerial->SetPTT(on);
+	else if (progStatus.serial_rtsptt == PTT_BOTH || progStatus.serial_rtsptt == PTT_SET)	RigSerial->SetPTT(on);
 
 	else if (SepSerial->IsOpen() && 
 		(progStatus.sep_dtrptt == PTT_BOTH || progStatus.sep_dtrptt == PTT_SET))		SepSerial->SetPTT(on);
@@ -88,9 +88,9 @@ void rigPTT(bool on)
 
 bool ptt_state()
 {
-	if (progStatus.comm_catptt == PTT_BOTH || progStatus.comm_catptt == PTT_GET)		return selrig->get_PTT();
-	else if (progStatus.comm_dtrptt == PTT_BOTH || progStatus.comm_dtrptt == PTT_GET)	return selrig->get_PTT();
-	else if (progStatus.comm_rtsptt == PTT_BOTH || progStatus.comm_rtsptt == PTT_GET)	return selrig->get_PTT();
+	if (progStatus.serial_catptt == PTT_BOTH || progStatus.serial_catptt == PTT_GET)		return selrig->get_PTT();
+	else if (progStatus.serial_dtrptt == PTT_BOTH || progStatus.serial_dtrptt == PTT_GET)	return selrig->get_PTT();
+	else if (progStatus.serial_rtsptt == PTT_BOTH || progStatus.serial_rtsptt == PTT_GET)	return selrig->get_PTT();
 
 	else if (SepSerial->IsOpen() && 
 		(progStatus.sep_dtrptt == PTT_BOTH || progStatus.sep_dtrptt == PTT_GET))		return SepSerial->getPTT();

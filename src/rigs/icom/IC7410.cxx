@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "icom/IC7410.h"
@@ -136,16 +136,17 @@ RIG_IC7410::RIG_IC7410() {
 	_mode_type = IC7410_mode_type;
 	adjustCIV(defaultCIV);
 
-	comm_retries = 2;
-	comm_wait = 20;
-	comm_timeout = 50;
-	comm_echo = true;
-	comm_rtscts = false;
-	comm_rtsplus = true;
-	comm_dtrplus = true;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+	serial_timeout = 50;
+	serial_echo = true;
+	serial_rtscts = false;
+	serial_rtsplus = true;
+	serial_dtrplus = true;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 
 	widgets = IC7410_widgets;
 
@@ -177,11 +178,11 @@ RIG_IC7410::RIG_IC7410() {
 
 	filA = filB = 1;
 
-	def_freq = A.freq = 14070000;
+	def_freq = A.freq = 14070000ULL;
 	def_mode = A.imode = 1;
 	def_bw = A.iBW = 34;
 
-	B.freq = 7070000;
+	B.freq = 7070000ULL;
 	B.imode = 1;
 	B.iBW = 34;
 
@@ -748,7 +749,7 @@ void RIG_IC7410::get_band_selection(int v)
 		set_trace(2, "get band stack", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(pre_fm);
 		if (p != std::string::npos) {
-			unsigned long int bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
+			unsigned long long bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
 			int bandmode = replystr[p+13];
 			int bandfilter = replystr[p+14];
 			int banddata = replystr[p+15] & 0x10;
@@ -780,7 +781,7 @@ void RIG_IC7410::get_band_selection(int v)
 
 void RIG_IC7410::set_band_selection(int v)
 {
-	unsigned long int freq = (inuse == onB ? B.freq : A.freq);
+	unsigned long long freq = (inuse == onB ? B.freq : A.freq);
 	int fil = (inuse == onB ? filB : filA);
 	int mode = (inuse == onB ? B.imode : A.imode);
 

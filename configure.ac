@@ -6,25 +6,25 @@
 
 AC_COPYRIGHT([Copyright (C) 2009 Dave Freese, W1HKJ (w1hkj AT w1hkj DOT com)])
 
-AC_PREREQ([2.63])
+AC_PREREQ([2.71])
 
 dnl major and minor must be integers; patch may
 dnl contain other characters or be empty
 m4_define(FLRIG_MAJOR,  [1])
 m4_define(FLRIG_MINOR,  [4])
-m4_define(FLRIG_PATCH,  [.7])
+m4_define(FLRIG_PATCH,  [7.37])
 
-AC_INIT([FLRIG], FLRIG_MAJOR.FLRIG_MINOR[]FLRIG_PATCH, [w1hkj AT w1hkj DOT com])
+AC_INIT([FLRIG],[FLRIG_MAJOR.FLRIG_MINOR.FLRIG_PATCH],[w1hkj AT w1hkj DOT com])
 
 AC_SUBST([FLRIG_VERSION_MAJOR], [FLRIG_MAJOR])
 AC_SUBST([FLRIG_VERSION_MINOR], [FLRIG_MINOR])
 AC_SUBST([FLRIG_VERSION_PATCH], [FLRIG_PATCH])
-AC_SUBST([FLRIG_VERSION], [FLRIG_MAJOR.FLRIG_MINOR[]FLRIG_PATCH])
+AC_SUBST([FLRIG_VERSION], [FLRIG_MAJOR.FLRIG_MINOR.FLRIG_PATCH])
 
 AC_DEFINE([FLRIG_VERSION_MAJOR], [FLRIG_MAJOR], [major version number])
 AC_DEFINE([FLRIG_VERSION_MINOR], [FLRIG_MINOR], [minor version number])
 AC_DEFINE([FLRIG_VERSION_PATCH], ["FLRIG_PATCH"], [patch/alpha version string])
-AC_DEFINE([FLRIG_VERSION], ["FLRIG_MAJOR.FLRIG_MINOR[]FLRIG_PATCH"], [version string])
+AC_DEFINE([FLRIG_VERSION], ["FLRIG_MAJOR.FLRIG_MINOR.FLRIG_PATCH"], [version string])
 
 AC_SUBST([AC_CONFIG_ARGS], [$ac_configure_args])
 AC_CONFIG_AUX_DIR([build-aux])

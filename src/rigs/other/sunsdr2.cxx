@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "other/sunsdr2.h"
@@ -102,20 +102,23 @@ RIG_SDR2_PRO::RIG_SDR2_PRO() {
 
 	widgets = rig_widgets;
 
-	comm_baudrate = BR115200;
+	serial_baudrate = BR115200;
 	stopbits = 1;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts = false;
-	comm_rtsplus = false;
-	comm_dtrplus = false;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
+	serial_timeout = 50;
+	serial_rtscts = false;
+	serial_rtsplus = false;
+	serial_dtrplus = false;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 	B.imode = A.imode = 1;
 	B.iBW = A.iBW = 0x8A03;
-	B.freq = A.freq = 14070000;
+	B.freq = A.freq = 14070000ULL;
 
 	can_change_alt_vfo = true;
 
@@ -881,14 +884,14 @@ int RIG_SDR2_PRO::get_split()
 	return split;
 }
 
-unsigned long int RIG_SDR2_PRO::get_vfoA ()
+unsigned long long RIG_SDR2_PRO::get_vfoA ()
 {
 	cmd = "FA;";
 	if (wait_char(';', 14, 100, "get vfo A", ASC) < 14) return A.freq;
 
 	size_t p = replystr.rfind("FA");
 	if (p != std::string::npos && (p + 12 < replystr.length())) {
-		int f = 0;
+		unsigned long long f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replystr[p+n] - '0';
 		A.freq = f;
@@ -896,7 +899,7 @@ unsigned long int RIG_SDR2_PRO::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_SDR2_PRO::set_vfoA (unsigned long int freq)
+void RIG_SDR2_PRO::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	cmd = "FA00000000000;";
@@ -908,14 +911,14 @@ void RIG_SDR2_PRO::set_vfoA (unsigned long int freq)
 	showresp(WARN, ASC, "set vfo A", cmd, "");
 }
 
-unsigned long int RIG_SDR2_PRO::get_vfoB ()
+unsigned long long RIG_SDR2_PRO::get_vfoB ()
 {
 	cmd = "FB;";
 	if (wait_char(';', 14, 100, "get vfo B", ASC) < 14) return B.freq;
 
 	size_t p = replystr.rfind("FB");
 	if (p != std::string::npos && (p + 12 < replystr.length())) {
-		int f = 0;
+		unsigned long long f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replystr[p+n] - '0';
 		B.freq = f;
@@ -923,7 +926,7 @@ unsigned long int RIG_SDR2_PRO::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_SDR2_PRO::set_vfoB (unsigned long int freq)
+void RIG_SDR2_PRO::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
 	cmd = "FB00000000000;";

@@ -34,9 +34,11 @@ Fl_Group *tabXCVR = (Fl_Group *)0;
 	Fl_ComboBox *selectRig = (Fl_ComboBox *)0;
 	Fl_Counter *cntRigCatRetries = (Fl_Counter *)0;
 	Fl_Counter *cntRigCatTimeout = (Fl_Counter *)0;
-	Fl_Counter *cntRigCatWait = (Fl_Counter *)0;
+	Fl_Counter *cntPostWriteDelay = (Fl_Counter *)0;
 	Fl_Counter *query_interval = (Fl_Counter *)0;
-	Fl_Counter *byte_interval = (Fl_Counter *)0;
+	Fl_Counter *cntWriteDelay = (Fl_Counter *)0;
+	Fl_Light_Button *btnActivateDelays = (Fl_Light_Button *)0;
+
 	Fl_ComboBox *selectCommPort = (Fl_ComboBox *)0;
 	Fl_ComboBox *mnuBaudrate = (Fl_ComboBox *)0;
 	Fl_Check_Button *btnTwoStopBit = (Fl_Check_Button *)0;
@@ -354,23 +356,37 @@ static void cb_selectRig(Fl_ComboBox*, void*) {
 }
 
 static void cb_cntRigCatRetries(Fl_Counter* o, void*) {
-	progStatus.comm_retries = (int)o->value();
+	progStatus.serial_retries = (int)o->value();
 }
 
 static void cb_cntRigCatTimeout(Fl_Counter* o, void*) {
-	progStatus.comm_timeout = (int)o->value();
+	progStatus.serial_timeout = (int)o->value();
 }
 
-static void cb_cntRigCatWait(Fl_Counter* o, void*) {
-	progStatus.comm_wait = (int)o->value();
+static void cb_cntPostWriteDelay(Fl_Counter* o, void*) {
+	progStatus.serial_post_write_delay = (int)o->value();
 }
 
 static void cb_query_interval(Fl_Counter* o, void*) {
 	progStatus.serloop_timing = (int)o->value();
 }
 
-static void cb_byte_interval(Fl_Counter* o, void*) {
-	progStatus.byte_interval = (int)o->value();
+static void cb_cntWriteDelay(Fl_Counter* o, void*) {
+	progStatus.serial_write_delay = (int)o->value();
+}
+
+static void cbActivateDelays(Fl_Light_Button* o, void*) {
+	if (o->value()) {
+		cntRigCatRetries->activate();
+		cntRigCatTimeout->activate();
+		cntPostWriteDelay->activate();
+		cntWriteDelay->activate();
+	} else {
+		cntRigCatRetries->deactivate();
+		cntRigCatTimeout->deactivate();
+		cntPostWriteDelay->deactivate();
+		cntWriteDelay->deactivate();
+	}
 }
 
 static void cb_selectCommPort(Fl_ComboBox*, void*) {
@@ -467,7 +483,7 @@ static void cb_tci_port(Fl_Input2* o, void*) {
 }
 
 static void cb_lbox_catptt(Fl_ListBox* o, void*) {
-	progStatus.comm_catptt = o->index();
+	progStatus.serial_catptt = o->index();
 
 	btn_init_ser_port->labelcolor(FL_RED);
 	btn_init_ser_port->redraw_label();
@@ -477,7 +493,7 @@ static void cb_lbox_catptt(Fl_ListBox* o, void*) {
 }
 
 static void cb_lbox_rtsptt(Fl_ListBox* o, void*) {
-	progStatus.comm_rtsptt = o->index();
+	progStatus.serial_rtsptt = o->index();
 
 	btn_init_ser_port->labelcolor(FL_RED);
 	btn_init_ser_port->redraw_label();
@@ -487,7 +503,7 @@ static void cb_lbox_rtsptt(Fl_ListBox* o, void*) {
 }
 
 static void cb_lbox_dtrptt(Fl_ListBox* o, void*) {
-	progStatus.comm_dtrptt = o->index();
+	progStatus.serial_dtrptt = o->index();
 
 	btn_init_ser_port->labelcolor(FL_RED);
 	btn_init_ser_port->redraw_label();
@@ -946,20 +962,20 @@ trace(1, "clear frequency list");
 
 	progStatus.xcvr_serial_port = selectCommPort->value();
 
-	progStatus.comm_baudrate = mnuBaudrate->index();
+	progStatus.serial_baudrate = mnuBaudrate->index();
 	progStatus.stopbits = btnOneStopBit->value() ? 1 : 2;
-	progStatus.comm_retries = (int)cntRigCatRetries->value();
-	progStatus.comm_timeout = (int)cntRigCatTimeout->value();
-	progStatus.comm_wait = (int)cntRigCatWait->value();
-	progStatus.comm_echo = btnRigCatEcho->value();
+	progStatus.serial_retries = (int)cntRigCatRetries->value();
+	progStatus.serial_timeout = (int)cntRigCatTimeout->value();
+	progStatus.serial_post_write_delay = (int)cntPostWriteDelay->value();
+	progStatus.serial_echo = btnRigCatEcho->value();
 
-	progStatus.comm_rtsptt = lbox_rtsptt->index();
-	progStatus.comm_catptt = lbox_catptt->index();
-	progStatus.comm_dtrptt = lbox_dtrptt->index();
+	progStatus.serial_rtsptt = lbox_rtsptt->index();
+	progStatus.serial_catptt = lbox_catptt->index();
+	progStatus.serial_dtrptt = lbox_dtrptt->index();
 
-	progStatus.comm_rtscts = chkrtscts->value();
-	progStatus.comm_rtsplus = btnrtsplus1->value();
-	progStatus.comm_dtrplus = btndtrplus1->value();
+	progStatus.serial_rtscts = chkrtscts->value();
+	progStatus.serial_rtsplus = btnrtsplus1->value();
+	progStatus.serial_dtrplus = btndtrplus1->value();
 
 	progStatus.imode_B  = progStatus.imode_A  = selrig->def_mode;
 	progStatus.iBW_B    = progStatus.iBW_A    = selrig->def_bw;
@@ -1071,212 +1087,203 @@ Fl_Group *createXCVR(int X, int Y, int W, int H, const char *label)
 {
 	Fl_Group *tabXCVR = new Fl_Group(X, Y, W, H, label);
 
-	Fl_Group* xcvr_grp1 = new Fl_Group(X + 2, Y + 2, W - 4, 200);
-		xcvr_grp1->box(FL_ENGRAVED_FRAME);
+	selectRig = new Fl_ComboBox(
+		tabXCVR->x() + 60, tabXCVR->y() + 4,
+		tabXCVR->w() - 64, 22, _("Rig:"));
+	selectRig->tooltip(_("Select Transceiver"));
+	selectRig->box(FL_DOWN_BOX);
+	selectRig->color(FL_BACKGROUND2_COLOR);
+	selectRig->selection_color(FL_BACKGROUND_COLOR);
+	selectRig->labeltype(FL_NORMAL_LABEL);
+	selectRig->labelfont(0);
+	selectRig->labelsize(14);
+	selectRig->labelcolor(FL_FOREGROUND_COLOR);
+	selectRig->callback((Fl_Callback*)cb_selectRig);
+	selectRig->align(Fl_Align(FL_ALIGN_LEFT));
+	selectRig->readonly();
+	selectRig->when(FL_WHEN_RELEASE);
+	selectRig->end();
 
-		selectRig = new Fl_ComboBox(
-			xcvr_grp1->x() + 60, xcvr_grp1->y() + 4,
-			xcvr_grp1->w() - 64, 22, _("Rig:"));
-		selectRig->tooltip(_("Select Transceiver"));
-		selectRig->box(FL_DOWN_BOX);
-		selectRig->color(FL_BACKGROUND2_COLOR);
-		selectRig->selection_color(FL_BACKGROUND_COLOR);
-		selectRig->labeltype(FL_NORMAL_LABEL);
-		selectRig->labelfont(0);
-		selectRig->labelsize(14);
-		selectRig->labelcolor(FL_FOREGROUND_COLOR);
-		selectRig->callback((Fl_Callback*)cb_selectRig);
-		selectRig->align(Fl_Align(FL_ALIGN_LEFT));
-		selectRig->readonly();
-		selectRig->when(FL_WHEN_RELEASE);
-		selectRig->end();
+	Fl_Button *comports = new Fl_Button(
+		tabXCVR->x() + 4, selectRig->y() + 26,
+		52, 22, _("Update"));
+	comports->box(FL_THIN_UP_BOX);
+	comports->tooltip(_("Update serial port combo"));
+	comports->callback((Fl_Callback*)cb_comports);
+	comports->when(FL_WHEN_RELEASE);
 
-		Fl_Button *comports = new Fl_Button(
-			xcvr_grp1->x() + 4, selectRig->y() + 26,
-			52, 22, _("Update"));
-		comports->box(FL_THIN_UP_BOX);
-		comports->tooltip(_("Update serial port combo"));
-		comports->callback((Fl_Callback*)cb_comports);
-		comports->when(FL_WHEN_RELEASE);
+	selectCommPort = new Fl_ComboBox(
+		selectRig->x(), comports->y(),
+		selectRig->w(), 22, "");
+	selectCommPort->tooltip(_("Xcvr serial port"));
+	selectCommPort->box(FL_DOWN_BOX);
+	selectCommPort->color(FL_BACKGROUND2_COLOR);
+	selectCommPort->selection_color(FL_BACKGROUND_COLOR);
+	selectCommPort->labeltype(FL_NORMAL_LABEL);
+	selectCommPort->labelfont(0);
+	selectCommPort->labelsize(14);
+	selectCommPort->labelcolor(FL_FOREGROUND_COLOR);
+	selectCommPort->callback((Fl_Callback*)cb_selectCommPort);
+	selectCommPort->align(Fl_Align(FL_ALIGN_CENTER));
+	selectCommPort->when(FL_WHEN_RELEASE);
+	selectCommPort->end();
 
-		selectCommPort = new Fl_ComboBox(
-			selectRig->x(), comports->y(),
-			selectRig->w(), 22, "");
-		selectCommPort->tooltip(_("Xcvr serial port"));
-		selectCommPort->box(FL_DOWN_BOX);
-		selectCommPort->color(FL_BACKGROUND2_COLOR);
-		selectCommPort->selection_color(FL_BACKGROUND_COLOR);
-		selectCommPort->labeltype(FL_NORMAL_LABEL);
-		selectCommPort->labelfont(0);
-		selectCommPort->labelsize(14);
-		selectCommPort->labelcolor(FL_FOREGROUND_COLOR);
-		selectCommPort->callback((Fl_Callback*)cb_selectCommPort);
-		selectCommPort->align(Fl_Align(FL_ALIGN_CENTER));
-		selectCommPort->when(FL_WHEN_RELEASE);
-		selectCommPort->end();
+	mnuBaudrate = new Fl_ComboBox(
+		selectCommPort->x(), selectCommPort->y() + 26,
+		160, 22, _("Baud:"));
+	mnuBaudrate->tooltip(_("Xcvr baudrate"));
+	mnuBaudrate->box(FL_DOWN_BOX);
+	mnuBaudrate->color(FL_BACKGROUND2_COLOR);
+	mnuBaudrate->selection_color(FL_BACKGROUND_COLOR);
+	mnuBaudrate->labeltype(FL_NORMAL_LABEL);
+	mnuBaudrate->labelfont(0);
+	mnuBaudrate->labelsize(14);
+	mnuBaudrate->labelcolor(FL_FOREGROUND_COLOR);
+	mnuBaudrate->callback((Fl_Callback*)cb_mnuBaudrate);
+	mnuBaudrate->align(Fl_Align(FL_ALIGN_LEFT));
+	mnuBaudrate->readonly();
+	mnuBaudrate->when(FL_WHEN_RELEASE);
+	mnuBaudrate->end();
 
-		mnuBaudrate = new Fl_ComboBox(
-			selectCommPort->x(), selectCommPort->y() + 26,
-			160, 22, _("Baud:"));
-		mnuBaudrate->tooltip(_("Xcvr baudrate"));
-		mnuBaudrate->box(FL_DOWN_BOX);
-		mnuBaudrate->color(FL_BACKGROUND2_COLOR);
-		mnuBaudrate->selection_color(FL_BACKGROUND_COLOR);
-		mnuBaudrate->labeltype(FL_NORMAL_LABEL);
-		mnuBaudrate->labelfont(0);
-		mnuBaudrate->labelsize(14);
-		mnuBaudrate->labelcolor(FL_FOREGROUND_COLOR);
-		mnuBaudrate->callback((Fl_Callback*)cb_mnuBaudrate);
-		mnuBaudrate->align(Fl_Align(FL_ALIGN_LEFT));
-		mnuBaudrate->readonly();
-		mnuBaudrate->when(FL_WHEN_RELEASE);
-		mnuBaudrate->end();
+	btnOneStopBit = new Fl_Check_Button(
+		mnuBaudrate->x(), mnuBaudrate->y() + 26,
+		22, 22, _("1"));
+	btnOneStopBit->tooltip(_("One Stop Bit"));
+	btnOneStopBit->down_box(FL_DOWN_BOX);
+	btnOneStopBit->callback((Fl_Callback*)cb_btnOneStopBit);
+	btnOneStopBit->align(Fl_Align(FL_ALIGN_RIGHT));
+	btnOneStopBit->value(progStatus.stopbits == 1);
 
-		btnOneStopBit = new Fl_Check_Button(
-			mnuBaudrate->x(), mnuBaudrate->y() + 26,
-			22, 22, _("1"));
-		btnOneStopBit->tooltip(_("One Stop Bit"));
-		btnOneStopBit->down_box(FL_DOWN_BOX);
-		btnOneStopBit->callback((Fl_Callback*)cb_btnOneStopBit);
-		btnOneStopBit->align(Fl_Align(FL_ALIGN_RIGHT));
-		btnOneStopBit->value(progStatus.stopbits == 1);
+	btnTwoStopBit = new Fl_Check_Button(
+		btnOneStopBit->x() + 120, btnOneStopBit->y(),
+		22, 22, _("2 -StopBits"));
+	btnTwoStopBit->down_box(FL_DOWN_BOX);
+	btnTwoStopBit->callback((Fl_Callback*)cb_btnTwoStopBit);
+	btnTwoStopBit->align(Fl_Align(FL_ALIGN_RIGHT));
+	btnTwoStopBit->value(progStatus.stopbits == 2);
 
-		btnTwoStopBit = new Fl_Check_Button(
-			btnOneStopBit->x() + 120, btnOneStopBit->y(),
-			22, 22, _("2 -StopBits"));
-		btnTwoStopBit->down_box(FL_DOWN_BOX);
-		btnTwoStopBit->callback((Fl_Callback*)cb_btnTwoStopBit);
-		btnTwoStopBit->align(Fl_Align(FL_ALIGN_RIGHT));
-		btnTwoStopBit->value(progStatus.stopbits == 2);
+	btnRigCatEcho = new Fl_Check_Button(
+		btnOneStopBit->x(), btnOneStopBit->y() + 25,
+		22, 22, _("Echo "));
+	btnRigCatEcho->down_box(FL_DOWN_BOX);
+	btnRigCatEcho->callback((Fl_Callback*)cb_btnRigCatEcho);
+	btnRigCatEcho->align(Fl_Align(FL_ALIGN_RIGHT));
+	btnRigCatEcho->value(progStatus.serial_echo);
 
-		btnRigCatEcho = new Fl_Check_Button(
-			btnOneStopBit->x(), btnOneStopBit->y() + 25,
-			22, 22, _("Echo "));
-		btnRigCatEcho->down_box(FL_DOWN_BOX);
-		btnRigCatEcho->callback((Fl_Callback*)cb_btnRigCatEcho);
-		btnRigCatEcho->align(Fl_Align(FL_ALIGN_RIGHT));
-		btnRigCatEcho->value(progStatus.comm_echo);
+	chkrtscts = new Fl_Check_Button(
+		btnTwoStopBit->x(), btnRigCatEcho->y(),
+		22, 22, _("RTS/CTS"));
+	chkrtscts->tooltip(_("Xcvr uses RTS/CTS handshake"));
+	chkrtscts->down_box(FL_DOWN_BOX);
+	chkrtscts->callback((Fl_Callback*)cb_chkrtscts);
+	chkrtscts->value(progStatus.serial_rtscts);
 
-		chkrtscts = new Fl_Check_Button(
-			btnTwoStopBit->x(), btnRigCatEcho->y(),
-			22, 22, _("RTS/CTS"));
-		chkrtscts->tooltip(_("Xcvr uses RTS/CTS handshake"));
-		chkrtscts->down_box(FL_DOWN_BOX);
-		chkrtscts->callback((Fl_Callback*)cb_chkrtscts);
-		chkrtscts->value(progStatus.comm_rtscts);
+	btnrtsplus1 = new Fl_Check_Button(
+		btnRigCatEcho->x(), btnRigCatEcho->y() + 25, 22, 22, _("RTS +12 v"));
+	btnrtsplus1->tooltip(_("Initial state of RTS"));
+	btnrtsplus1->callback((Fl_Callback*)cb_btnrtsplus);
+	btnrtsplus1->value(progStatus.serial_rtsplus);
 
-		btnrtsplus1 = new Fl_Check_Button(
-			btnRigCatEcho->x(), btnRigCatEcho->y() + 25, 22, 22, _("RTS +12 v"));
-		btnrtsplus1->tooltip(_("Initial state of RTS"));
-		btnrtsplus1->callback((Fl_Callback*)cb_btnrtsplus);
-		btnrtsplus1->value(progStatus.comm_rtsplus);
+	btndtrplus1 = new Fl_Check_Button(
+		chkrtscts->x(), btnrtsplus1->y(), 22, 22, _("DTR +12 v"));
+	btndtrplus1->tooltip(_("Initial state of DTR"));
+	btndtrplus1->callback((Fl_Callback*)cb_btndtrplus);
+	btndtrplus1->value(progStatus.serial_dtrplus);
 
-		btndtrplus1 = new Fl_Check_Button(
-			chkrtscts->x(), btnrtsplus1->y(), 22, 22, _("DTR +12 v"));
-		btndtrplus1->tooltip(_("Initial state of DTR"));
-		btndtrplus1->callback((Fl_Callback*)cb_btndtrplus);
-		btndtrplus1->value(progStatus.comm_dtrplus);
+	cntRigCatRetries = new Fl_Counter(
+		tabXCVR->x() + tabXCVR->w() - 110 - 4, mnuBaudrate->y(),
+		110, 22, _("Retries"));
+	cntRigCatRetries->tooltip(_("Number of  times to resend\ncommand before giving up"));
+	cntRigCatRetries->minimum(1);
+	cntRigCatRetries->maximum(10);
+	cntRigCatRetries->step(1);
+	cntRigCatRetries->value(5);
+	cntRigCatRetries->callback((Fl_Callback*)cb_cntRigCatRetries);
+	cntRigCatRetries->align(Fl_Align(FL_ALIGN_LEFT));
+	cntRigCatRetries->value(progStatus.serial_retries);
+	cntRigCatRetries->lstep(10);
+	cntRigCatRetries->deactivate();
 
-		cntRigCatRetries = new Fl_Counter(
-			xcvr_grp1->x() + xcvr_grp1->w() - 110 - 4, mnuBaudrate->y(),
-			110, 22, _("Retries"));
-		cntRigCatRetries->tooltip(_("Number of  times to resend\ncommand before giving up"));
-		cntRigCatRetries->minimum(1);
-		cntRigCatRetries->maximum(10);
-		cntRigCatRetries->step(1);
-		cntRigCatRetries->value(5);
-		cntRigCatRetries->callback((Fl_Callback*)cb_cntRigCatRetries);
-		cntRigCatRetries->align(Fl_Align(FL_ALIGN_LEFT));
-		cntRigCatRetries->value(progStatus.comm_retries);
-		cntRigCatRetries->lstep(10);
+	cntRigCatTimeout = new Fl_Counter(
+		cntRigCatRetries->x(), cntRigCatRetries->y() + 26,
+		110, 22, _("Timeout"));
+	cntRigCatTimeout->tooltip(_("Serial port select timeout"));
+	cntRigCatTimeout->minimum(0);
+	cntRigCatTimeout->maximum(500);
+	cntRigCatTimeout->step(1);
+	cntRigCatTimeout->value(10);
+	cntRigCatTimeout->callback((Fl_Callback*)cb_cntRigCatTimeout);
+	cntRigCatTimeout->align(Fl_Align(FL_ALIGN_LEFT));
+	cntRigCatTimeout->value(progStatus.serial_timeout);
+	cntRigCatTimeout->lstep(10);
+	cntRigCatTimeout->deactivate();
 
-		cntRigCatTimeout = new Fl_Counter(
-			cntRigCatRetries->x(), btnOneStopBit->y(),
-			110, 22, _("Timeout"));
-		cntRigCatTimeout->tooltip(_("Serial port select timeout"));
-		cntRigCatTimeout->minimum(0);
-		cntRigCatTimeout->maximum(100);
-		cntRigCatTimeout->step(1);
-		cntRigCatTimeout->value(10);
-		cntRigCatTimeout->callback((Fl_Callback*)cb_cntRigCatTimeout);
-		cntRigCatTimeout->align(Fl_Align(FL_ALIGN_LEFT));
-		cntRigCatTimeout->value(progStatus.comm_timeout);
-		cntRigCatTimeout->lstep(10);
+	cntWriteDelay = new Fl_Counter(
+		cntRigCatRetries->x(), cntRigCatTimeout->y() + 26,
+		110, 22, _("Write delay"));
+	cntWriteDelay->tooltip(_("Wait msecs between serial bytes"));
+	cntWriteDelay->minimum(0);
+	cntWriteDelay->maximum(200);
+	cntWriteDelay->step(1);
+	cntWriteDelay->value(0);
+	cntWriteDelay->callback((Fl_Callback*)cb_cntWriteDelay);
+	cntWriteDelay->align(Fl_Align(FL_ALIGN_LEFT));
+	cntWriteDelay->value(progStatus.serial_write_delay);
+	cntWriteDelay->lstep(10);
+	cntWriteDelay->deactivate();
 
-		cntRigCatWait = new Fl_Counter(
-			cntRigCatRetries->x(), btnRigCatEcho->y(),
-			110, 22, _("Cmds"));
-		cntRigCatWait->tooltip(_("Wait millseconds between set/get commands"));
-		cntRigCatWait->minimum(0);
-		cntRigCatWait->maximum(100);
-		cntRigCatWait->step(1);
-		cntRigCatWait->value(5);
-		cntRigCatWait->callback((Fl_Callback*)cb_cntRigCatWait);
-		cntRigCatWait->align(Fl_Align(FL_ALIGN_LEFT));
-		cntRigCatWait->value(progStatus.comm_wait);
-		cntRigCatWait->lstep(10);
+	cntPostWriteDelay = new Fl_Counter(
+		cntRigCatRetries->x(), cntWriteDelay->y() + 26,
+		110, 22, _("Post delay"));
+	cntPostWriteDelay->tooltip(_("Wait msecs after last byte sent"));
+	cntPostWriteDelay->minimum(0);
+	cntPostWriteDelay->maximum(500);
+	cntPostWriteDelay->step(1);
+	cntPostWriteDelay->value(5);
+	cntPostWriteDelay->callback((Fl_Callback*)cb_cntPostWriteDelay);
+	cntPostWriteDelay->align(Fl_Align(FL_ALIGN_LEFT));
+	cntPostWriteDelay->value(progStatus.serial_post_write_delay);
+	cntPostWriteDelay->lstep(10);
+	cntPostWriteDelay->deactivate();
 
-		query_interval = new Fl_Counter(
-			cntRigCatRetries->x(), cntRigCatWait->y() + 26,
-			110, 22, _("Poll intvl"));
-		query_interval->tooltip(_("Polling interval in msec"));
-		query_interval->minimum(10);
-		query_interval->maximum(5000);
-		query_interval->step(1);
-		query_interval->value(50);
-		query_interval->callback((Fl_Callback*)cb_query_interval);
-		query_interval->align(Fl_Align(FL_ALIGN_LEFT));
-		query_interval->value(progStatus.serloop_timing);
-		query_interval->lstep(10);
+	query_interval = new Fl_Counter(
+		cntRigCatRetries->x(), cntPostWriteDelay->y() + 26,
+		110, 22, _("Poll intvl"));
+	query_interval->tooltip(_("Polling interval in msec"));
+	query_interval->minimum(10);
+	query_interval->maximum(5000);
+	query_interval->step(1);
+	query_interval->value(50);
+	query_interval->callback((Fl_Callback*)cb_query_interval);
+	query_interval->align(Fl_Align(FL_ALIGN_LEFT));
+	query_interval->value(progStatus.serloop_timing);
+	query_interval->lstep(10);
 
-		byte_interval = new Fl_Counter(
-			cntRigCatRetries->x(), query_interval->y() + 26,
-			110, 22, _("Byte intvl"));
-		byte_interval->tooltip(_("Inter-byte interval (msec)"));
-		byte_interval->minimum(0);
-		byte_interval->maximum(200);
-		byte_interval->step(1);
-		byte_interval->value(0);
-		byte_interval->callback((Fl_Callback*)cb_byte_interval);
-		byte_interval->align(Fl_Align(FL_ALIGN_LEFT));
-		byte_interval->value(progStatus.byte_interval);
-		byte_interval->lstep(10);
+	btnActivateDelays = new Fl_Light_Button(
+		query_interval->x(), query_interval->y() + 26,
+		110, 22, _("Activate"));
+	btnActivateDelays->tooltip(_("Activate timing controls"));
+	btnActivateDelays->value(0);
+	btnActivateDelays->callback((Fl_Callback*)cbActivateDelays);
 
-		Fl_Group* xcvr_grp4 = new Fl_Group(
-			xcvr_grp1->x() + 2, xcvr_grp1->y() + xcvr_grp1->h() - 38,
-			150, 36);
-		xcvr_grp4->box(FL_ENGRAVED_FRAME);
-		xcvr_grp4->align(Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE));
+	txtCIV = new Fl_Int_Input(
+		tabXCVR->x() + 6, tabXCVR->y() + 170,
+		58, 22, _("CI-V adr"));
+	txtCIV->tooltip(_("Enter hex value, ie: 0x5F"));
+	txtCIV->type(2);
+	txtCIV->callback((Fl_Callback*)cb_txtCIV);
+	txtCIV->align(Fl_Align(FL_ALIGN_RIGHT));
 
-			txtCIV = new Fl_Int_Input(
-				xcvr_grp4->x() + 4, xcvr_grp4->y() + 8,
-				58, 22, _("CI-V adr"));
-			txtCIV->tooltip(_("Enter hex value, ie: 0x5F"));
-			txtCIV->type(2);
-			txtCIV->callback((Fl_Callback*)cb_txtCIV);
-			txtCIV->align(Fl_Align(FL_ALIGN_RIGHT));
+	btnCIVdefault = new Fl_Button(
+		txtCIV->x() + txtCIV->w() + 4, txtCIV->y(),
+		70, 22, _("Default"));
+	btnCIVdefault->callback((Fl_Callback*)cb_btnCIVdefault);
 
-			btnCIVdefault = new Fl_Button(
-				txtCIV->x() + txtCIV->w() + 4, txtCIV->y(),
-				70, 22, _("Default"));
-			btnCIVdefault->callback((Fl_Callback*)cb_btnCIVdefault);
-
-		xcvr_grp4->end();
-
-	xcvr_grp1->end();
-
-	Fl_Group* xcvr_grp5 = new Fl_Group(
-		xcvr_grp1->x(), xcvr_grp1->y() + xcvr_grp1->h() + 2,
-		152, H - xcvr_grp1->y() - xcvr_grp1->h() - 4);
-	xcvr_grp5->box(FL_ENGRAVED_FRAME);
-
-		btnUSBaudio = new Fl_Check_Button(
-			xcvr_grp5->x() + 4, xcvr_grp5->y() + xcvr_grp5->h()  / 2 - 9,
-			100, 18, _("USB audio"));
-		btnUSBaudio->down_box(FL_DOWN_BOX);
-		btnUSBaudio->callback((Fl_Callback*)cb_btnUSBaudio);
-
-	xcvr_grp5->end();
+	btnUSBaudio = new Fl_Check_Button(
+		tabXCVR->x() + 6, btnCIVdefault->y() + 30,
+		100, 18, _("USB audio"));
+	btnUSBaudio->down_box(FL_DOWN_BOX);
+	btnUSBaudio->callback((Fl_Callback*)cb_btnUSBaudio);
 
 	box_xcvr_connect = new Fl_Box(
 		X + W - 90, Y + H - 27,
@@ -1479,7 +1486,7 @@ Fl_Group *createPTT(int X, int Y, int W, int H, const char *label)
 		lbox_catptt->tooltip(_("PTT is a CAT command (not hardware)"));
 		lbox_catptt->callback((Fl_Callback*)cb_lbox_catptt);
 		lbox_catptt->add("OFF|BOTH|SET|GET");
-		lbox_catptt->index(progStatus.comm_catptt);
+		lbox_catptt->index(progStatus.serial_catptt);
 		lbox_catptt->align(FL_ALIGN_RIGHT);
 
 		lbox_rtsptt = new Fl_ListBox(
@@ -1487,7 +1494,7 @@ Fl_Group *createPTT(int X, int Y, int W, int H, const char *label)
 		lbox_rtsptt->tooltip(_("RTS is ptt line"));
 		lbox_rtsptt->callback((Fl_Callback*)cb_lbox_rtsptt);
 		lbox_rtsptt->add("OFF|BOTH|SET|GET");
-		lbox_rtsptt->index(progStatus.comm_rtsptt);
+		lbox_rtsptt->index(progStatus.serial_rtsptt);
 		lbox_rtsptt->align(FL_ALIGN_RIGHT);
 
 		lbox_dtrptt = new Fl_ListBox(
@@ -1495,7 +1502,7 @@ Fl_Group *createPTT(int X, int Y, int W, int H, const char *label)
 		lbox_dtrptt->tooltip(_("DTR is ptt line"));
 		lbox_dtrptt->callback((Fl_Callback*)cb_lbox_dtrptt);
 		lbox_dtrptt->add("OFF|BOTH|SET|GET");
-		lbox_dtrptt->index(progStatus.comm_dtrptt);
+		lbox_dtrptt->index(progStatus.serial_dtrptt);
 		lbox_dtrptt->align(FL_ALIGN_RIGHT);
 
 		btn2_init_ser_port = new Fl_Button(
@@ -1506,13 +1513,13 @@ Fl_Group *createPTT(int X, int Y, int W, int H, const char *label)
 			lbox_rtsptt->x(), lbox_rtsptt->y() + 24, 100, 21, _("RTS +12 v"));
 		btnrtsplus2->tooltip(_("Initial state of RTS"));
 		btnrtsplus2->callback((Fl_Callback*)cb_btnrtsplus);
-		btnrtsplus2->value(progStatus.comm_rtsplus);
+		btnrtsplus2->value(progStatus.serial_rtsplus);
 
 		btndtrplus2 = new Fl_Check_Button(
 			lbox_dtrptt->x(), lbox_dtrptt->y() + 24, 100, 21, _("DTR +12 v"));
 		btndtrplus2->tooltip(_("Initial state of DTR"));
 		btndtrplus2->callback((Fl_Callback*)cb_btndtrplus);
-		btndtrplus2->value(progStatus.comm_dtrplus);
+		btndtrplus2->value(progStatus.serial_dtrplus);
 
 	grp_catptt->end();
 
@@ -2384,9 +2391,9 @@ static void cb_btn_use_cmedia(Fl_Round_Button* o, void*) {
 		lbox_sep_rtsptt->index(PTT_NONE);
 		lbox_sep_dtrptt->index(PTT_NONE);
 
-		progStatus.comm_catptt = PTT_NONE;
-		progStatus.comm_rtsptt = PTT_NONE;
-		progStatus.comm_dtrptt = PTT_NONE;
+		progStatus.serial_catptt = PTT_NONE;
+		progStatus.serial_rtsptt = PTT_NONE;
+		progStatus.serial_dtrptt = PTT_NONE;
 
 		progStatus.sep_dtrptt = PTT_NONE;
 		progStatus.sep_rtsptt = PTT_NONE;

@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 // comment out for distribution
@@ -149,11 +149,13 @@ void RIG_FTdx10::initialize()
 	rig_widgets[8].W = sldrPOWER;
 	rig_widgets[9].W = btnNR;
 	rig_widgets[10].W = sldrNR;
-
+return;
 	cmd = "AI0;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "Auto Info OFF", cmd, replystr);
 	sett("Auto Info OFF");
+
+	set_cw_spot();
 
 	get_vfoAorB();
 }
@@ -168,21 +170,24 @@ RIG_FTdx10::RIG_FTdx10() {
 
 	widgets = rig_widgets;
 
-	comm_baudrate = BR38400;
+	serial_baudrate = BR38400;
 	stopbits = 1;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts = true;
-	comm_rtsplus = false;
-	comm_dtrplus = false;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+
+	serial_write_delay = 0;
+	serial_post_write_delay = 0;
+
+	serial_timeout = 50;
+	serial_rtscts = true;
+	serial_rtsplus = false;
+	serial_dtrplus = false;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 
 	A.imode = B.imode = modeB = modeA = def_mode = 1;
 	A.iBW = B.iBW = bwA = bwB = def_bw = 0;
-	A.freq = B.freq = freqA = freqB = def_freq = 14070000;
+	A.freq = B.freq = freqA = freqB = def_freq = 14070000ULL;
 
 	notch_on = false;
 
@@ -234,6 +239,8 @@ RIG_FTdx10::RIG_FTdx10() {
 
 	inuse = onA;
 
+	can_synch_clock = true;
+
 	precision = 1;
 	ndigits = 8;
 
@@ -241,20 +248,48 @@ RIG_FTdx10::RIG_FTdx10() {
 
 void RIG_FTdx10::set_xcvr_auto_on()
 {
-// send dummy data request for ID (see pg 12 CAT reference book)
 	cmd = "ID;";
-	sendCommand(cmd);
-// wait 1 to 2 seconds
-	for (int i = 0; i < 1500; i += 100) {
+	wait_char(';', 7 , 100, "check", ASC);
+//std::cout << "check: " << replystr << std::endl;
+	if (replystr.find("ID") != std::string::npos)
+		return;
+
+//std::cout << "Xcvr not ON ... power ON cycle" << std::endl;
+
+// wait 1.2 seconds
+	for (int i = 0; i < 12; i++) {
 		MilliSleep(100);
-		update_progress(100 * i / 1500);
+		update_progress(i * 10);
 		Fl::awake();
 	}
+
 	cmd = "PS1;";
-	sendCommand(cmd);
-// wait for power on status
+//	std::cout << "power ON" << std::endl;
+	RigSerial->WriteBuffer(cmd.c_str(), cmd.length());
+
+	update_progress(0);
+
+// wait 7 seconds
+//	std::cout << "wait 10 seconds" << std::endl;
+	for (int i = 0; i < 140; i++) {
+		MilliSleep(50);
+		update_progress(i);
+		Fl::awake();
+	}
+	update_progress(0);
+
+//	std::cout << "restart serial port" << std::endl;
+
+	RigSerial->OpenPort();
 	cmd = "PS;";
-	waitN(4, 500, "Xcvr ON?", ASC);
+	wait_char(';', 4, 100, "closed/reopened port", ASC);
+	if (replystr.find("PS1;") == std::string::npos) {
+//		std::cout << "Reply to reopen port: " << replystr << std::endl;
+		exit(3);
+	}
+
+	return;
+
 }
 
 void RIG_FTdx10::set_xcvr_auto_off()
@@ -304,19 +339,19 @@ void RIG_FTdx10::get_band_selection(int v)
 
 bool RIG_FTdx10::check ()
 {
-	cmd = rsp = "ID";
-	cmd += ';';
-	int ret = wait_char(';', 7 , 100, "check", ASC);
-
-	gett("check()");
 #ifdef TESTING
 return true;
 #endif
-	if (ret >= 7) return true;
-	return false;
+	cmd = "ID;";
+	wait_char(';', 7 , 500, "check", ASC);
+//std::cout << "check: " << replystr << std::endl;
+
+	if (replystr.find("ID") == std::string::npos)
+		return false;
+	return true;
 }
 
-unsigned long int RIG_FTdx10::get_vfoA ()
+unsigned long long RIG_FTdx10::get_vfoA ()
 {
 	cmd = rsp = "FA";
 	cmd += ';';
@@ -326,14 +361,14 @@ unsigned long int RIG_FTdx10::get_vfoA ()
 //replystr = Avfo;
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return freqA;
-	int f = 0;
+	unsigned long long f = 0;
 	for (size_t n = 2; n < 11; n++)
 		f = f*10 + replystr[p+n] - '0';
 	freqA = f;
 	return freqA;
 }
 
-void RIG_FTdx10::set_vfoA (unsigned long int freq)
+void RIG_FTdx10::set_vfoA (unsigned long long freq)
 {
 	freqA = freq;
 	cmd = "FA000000000;";
@@ -346,7 +381,7 @@ void RIG_FTdx10::set_vfoA (unsigned long int freq)
 	sett("SET vfo A");
 }
 
-unsigned long int RIG_FTdx10::get_vfoB ()
+unsigned long long RIG_FTdx10::get_vfoB ()
 {
 	cmd = rsp = "FB";
 	cmd += ';';
@@ -356,7 +391,7 @@ unsigned long int RIG_FTdx10::get_vfoB ()
 //replystr = Bvfo;
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return freqB;
-	int f = 0;
+	unsigned long long f = 0;
 	for (size_t n = 2; n < 11; n++)
 		f = f*10 + replystr[p+n] - '0';
 	freqB = f;
@@ -364,7 +399,7 @@ unsigned long int RIG_FTdx10::get_vfoB ()
 }
 
 
-void RIG_FTdx10::set_vfoB (unsigned long int freq)
+void RIG_FTdx10::set_vfoB (unsigned long long freq)
 {
 	freqB = freq;
 	cmd = "FB000000000;";
@@ -651,7 +686,7 @@ int RIG_FTdx10::get_tune()
 {
 	cmd = rsp = "AC";
 	cmd += ';';
-	waitN(5, 100, "get tune", ASC);
+	wait_char(';', 5, 100, "get tune", ASC);
 
 	rig_trace(2, "get_tuner status()", replystr.c_str());
 
@@ -840,7 +875,10 @@ const char ** RIG_FTdx10::bwtable(int n)
 void RIG_FTdx10::set_modeA(int val)
 {
 	modeA = val;
-	cmd = "MD0";
+	if (inuse == onB)
+		cmd = rsp = "MD1";
+	else
+		cmd = rsp = "MD0";
 	cmd += FTdx10_mode_chr[val];
 	cmd += ';';
 	sendCommand(cmd);
@@ -850,7 +888,10 @@ void RIG_FTdx10::set_modeA(int val)
 
 int RIG_FTdx10::get_modeA()
 {
-	cmd = rsp = "MD0";
+	if (inuse == onB)
+		cmd = rsp = "MD1";
+	else
+		cmd = rsp = "MD0";
 	cmd += ';';
 	wait_char(';', 5, 100, "get mode A", ASC);
 
@@ -874,7 +915,10 @@ int RIG_FTdx10::get_modeA()
 void RIG_FTdx10::set_modeB(int val)
 {
 	modeB = val;
-	cmd = "MD1";
+	if (inuse == onA)
+		cmd = rsp = "MD1";
+	else
+		cmd = rsp = "MD0";
 	cmd += FTdx10_mode_chr[val];
 	cmd += ';';
 	sendCommand(cmd);
@@ -884,7 +928,10 @@ void RIG_FTdx10::set_modeB(int val)
 
 int RIG_FTdx10::get_modeB()
 {
-	cmd = rsp = "MD1";
+	if (inuse == onA)
+		cmd = rsp = "MD1";
+	else
+		cmd = rsp = "MD0";
 	cmd += ';';
 	wait_char(';', 5, 100, "get mode B", ASC);
 
@@ -966,7 +1013,7 @@ void RIG_FTdx10::set_bwB(int val)
 		return;
 	}
 	cmd.clear();
-	cmd.append("SH10");
+	cmd.append("SH00");
 	cmd += '0' + bw_indx / 10;
 	cmd += '0' + bw_indx % 10;
 	cmd += ';';
@@ -1054,10 +1101,7 @@ void RIG_FTdx10::set_if_shift(int val)
 
 bool RIG_FTdx10::get_if_shift(int &val)
 {
-	if (inuse == onB)
-		cmd = rsp = "IS1";
-	else
-		cmd = rsp = "IS0";
+	cmd = rsp = "IS0";
 	cmd += ';';
 	wait_char(';', 10, 100, "get if shift", ASC);
 
@@ -1079,50 +1123,55 @@ void RIG_FTdx10::get_if_min_max_step(int &min, int &max, int &step)
 	if_shift_mid = 0;
 }
 
+/*
+BPabcde;
+a: Fixed, '0'
+
+b: Manual NOTCH ON/OFF, 1/0
+
+cde: 001 - 320, (NOTCH Frequency : x 10 Hz )
+*/
+static std::string notch_str_on  = "BP00001;";
+static std::string notch_str_off = "BP00000;";
+static std::string notch_str_val = "BP01000;";
+static int notch_val = 1500;
+
 void RIG_FTdx10::set_notch(bool on, int val)
-     {
-	if (on && !notch_on) {
-		notch_on = true;
-		if (inuse == onB)
-			cmd = "BP10001;";
-		else
-			cmd = "BP00001;";
+{
+	if (notch_val != val) {
+		cmd = notch_str_on;
 		sendCommand(cmd);
-		showresp(WARN, ASC, "SET notch on", cmd, replystr);
-
-
-		if (inuse == onB)
-			cmd = "BP11000;";
-		else
-			cmd = "BP01000;";
+		showresp(WARN, ASC, "SET notch ON", cmd, replystr);
+		set_trace(3,"set_notch ON", cmd.c_str(), replystr.c_str());
+// set notch frequency
+		notch_val = val;
 		val /= 10;
-		for (int n = 6; n > 3; n--) {
-			cmd[n] = val % 10;
+		for (int i = 0; i < 3; i++) {
+			notch_str_val[6 - i] = '0' + (val % 10);
 			val /= 10;
 		}
+		cmd = notch_str_val;
+// set notch ON
 		sendCommand(cmd);
-		showresp(WARN, ASC, "SET notch freq", cmd, replystr);
-	} else if (!on && notch_on) {
-		notch_on = false;
-		if (inuse == onB)
-			cmd = "BP10000;";
-		else
-			cmd = "BP00000;";
-		sendCommand(cmd);
-		showresp(WARN, ASC, "SET notch off", cmd, replystr);
-		return;
+		showresp(WARN, ASC, "SET notch val", cmd, replystr);
+		set_trace(3,"set_notch val", cmd.c_str(), replystr.c_str());
 	}
+	if (on)
+		cmd = notch_str_on;
+	else
+		cmd = notch_str_off;
+	sendCommand(cmd);
+	set_trace(3,"set_notch OFF", cmd.c_str(), replystr.c_str());
+	showresp(WARN, ASC, "SET notch OFF", cmd, replystr);
 
 }
 
 bool  RIG_FTdx10::get_notch(int &val)
 {
 	bool ison = false;
-	if (inuse == onB) 
-		cmd = rsp = "BP10";
-	else
-		cmd = rsp = "BP00";
-	cmd += ';';
+
+	cmd = "BP00;";
+	rsp = "BP";
 	wait_char(';', 8, 100, "get notch on/off", ASC);
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return ison;
@@ -1133,8 +1182,8 @@ bool  RIG_FTdx10::get_notch(int &val)
 		ison = true;
 
 	val = progStatus.notch_val;
-	cmd = rsp = "BP01";
-	cmd += ';';
+	cmd = "BP01;";
+	rsp = "BP";
 	wait_char(';', 8, 100, "get notch val", ASC);
 
 	gett("get_notch_val()");
@@ -1168,10 +1217,7 @@ void RIG_FTdx10::set_auto_notch(int v)
 
 int  RIG_FTdx10::get_auto_notch()
 {
-	if (inuse == onB)
-		cmd = "BC1;";
-	else
-		cmd = "BC0;";
+	cmd = "BC0;";
 	wait_char(';', 5, 100, "get auto notch", ASC);
 
 	gett("get_auto_notch()");
@@ -1203,10 +1249,7 @@ void RIG_FTdx10::set_noise(bool b)
 
 int RIG_FTdx10::get_noise()
 {
-	if (inuse == onB)
-		cmd = rsp = "NB1";
-	else
-		cmd = rsp = "NB0";
+	cmd = rsp = "NB0";
 	cmd += ';';
 	wait_char(';', 5, 100, "get NB", ASC);
 

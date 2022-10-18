@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #ifndef _ICgeneric_H
@@ -30,7 +30,7 @@ public:
 
 	void initialize();
 
-	void set_vfoA(unsigned long int);
+	void set_vfoA(unsigned long long);
 	void set_compression(int, int);
 	void set_vox_onoff();
 	void set_vox_gain();

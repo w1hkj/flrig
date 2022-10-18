@@ -16,7 +16,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 /*
  * Note for anyone wishing to expand on the command set.
@@ -127,23 +127,26 @@ RIG_TT588::RIG_TT588() {
 
 	widgets = tt588_widgets;
 
-	comm_baudrate = BR57600;
+	serial_baudrate = BR57600;
 	stopbits = 1;
-	comm_retries = 2;
-	comm_wait = 20;
-	comm_timeout = 50;
-	comm_echo = false;
-	comm_rtscts = true;
-	comm_rtsplus = false;
-	comm_dtrplus = true;
-	comm_catptt = true;// false;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
+	serial_timeout = 50;
+	serial_echo = false;
+	serial_rtscts = true;
+	serial_rtsplus = false;
+	serial_dtrplus = true;
+	serial_catptt = true;// false;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 	serloop_timing = 200;
 
 	def_mode = modeB = modeA = A.imode = B.iBW = 1;
 	def_bw = bwB = bwA = A.iBW = B.iBW = 15;
-	def_freq = freqB = freqA = A.freq = B.freq = 14070000;
+	def_freq = freqB = freqA = A.freq = B.freq = 14070000ULL;
 	max_power = 100;
 	pbt = 0;
 	VfoAdj = progStatus.vfo_adj;
@@ -209,7 +212,7 @@ bool RIG_TT588::check ()
 	return true;
 }
 
-unsigned long int RIG_TT588::get_vfoA ()
+unsigned long long RIG_TT588::get_vfoA ()
 {
 	cmd = TT588getFREQA;
 	int ret = waitN(6, 100, "get vfo A");
@@ -221,20 +224,20 @@ unsigned long int RIG_TT588::get_vfoA ()
         */
 		size_t p = replystr.rfind("A");
 		if (p != std::string::npos) {
-			int f = 0;
+			unsigned long long f = 0;
 			for (size_t n = 1; n < 5; n++)
 				f = f*256 + (unsigned char)replystr[n];
 			freqA = f;
 		}
 	}
-	return (unsigned long int)(freqA - vfo_corr);
+	return (unsigned long long)(freqA - vfo_corr);
 }
 
-void RIG_TT588::set_vfoA (unsigned long int freq)
+void RIG_TT588::set_vfoA (unsigned long long freq)
 {
 	freqA = freq;
 	vfo_corr = (freq / 1e6) * VfoAdj + 0.5;
-	unsigned long int xfreq = freqA + vfo_corr;
+	unsigned long long xfreq = freqA + vfo_corr;
 	cmd = TT588setFREQA;
 	cmd[5] = xfreq & 0xff; xfreq = xfreq >> 8;
 	cmd[4] = xfreq & 0xff; xfreq = xfreq >> 8;
@@ -245,27 +248,27 @@ void RIG_TT588::set_vfoA (unsigned long int freq)
 	return ;
 }
 
-unsigned long int RIG_TT588::get_vfoB()
+unsigned long long RIG_TT588::get_vfoB()
 {
 	cmd = TT588getFREQB;
 	int ret = waitN(6, 100, "get vfo B");
 	if (ret >= 6) {
 		size_t p = replystr.rfind("B");
 		if (p != std::string::npos) {
-			int f = 0;
+			unsigned long long f = 0;
 			for (size_t n = 1; n < 5; n++)
 				f = f*256 + (unsigned char)replystr[n];
 			freqB = f;
 		}
 	}
-	return (unsigned long int)(freqB - vfo_corr);
+	return (unsigned long long)(freqB - vfo_corr);
 }
 
-void RIG_TT588::set_vfoB (unsigned long int freq)
+void RIG_TT588::set_vfoB (unsigned long long freq)
 {
 	freqB = freq;
 	vfo_corr = (freq / 1e6) * VfoAdj + 0.5;
-	unsigned long int xfreq = freqB + vfo_corr;
+	unsigned long long xfreq = freqB + vfo_corr;
 	cmd = TT588setFREQB;
 	cmd[5] = xfreq & 0xff; xfreq = xfreq >> 8;
 	cmd[4] = xfreq & 0xff; xfreq = xfreq >> 8;

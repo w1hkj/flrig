@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 // Additions by Kent Haase, VE4KEH
 //-----------------------------------------------------------------------------
@@ -56,20 +56,23 @@ RIG_K2::RIG_K2() {
 
 	widgets = k2_widgets;
 
-	comm_baudrate = BR4800;
+	serial_baudrate = BR4800;
 	stopbits = 2;
-	comm_retries = 3;
-	comm_wait = 50;
-	comm_timeout = 200;
-	comm_rtscts = false;
-	comm_rtsplus = false;
-	comm_dtrplus = false;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 3;
+
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
+	serial_timeout = 200;
+	serial_rtscts = false;
+	serial_rtsplus = false;
+	serial_dtrplus = false;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 	modeB = modeA = 1;
 	bwB = bwA = 0;
-	freqB = freqA = 14070000;
+	freqB = freqA = 14070000ULL;
 
 	has_split_AB =
 	has_get_info =
@@ -260,7 +263,7 @@ int RIG_K2::get_split()
 	return K2split;
 }
 
-unsigned long int RIG_K2::get_vfoA ()
+unsigned long long RIG_K2::get_vfoA ()
 {
 	rsp = cmd = "FA";
 	cmd += ';';
@@ -271,14 +274,14 @@ unsigned long int RIG_K2::get_vfoA ()
 	if (ret < 14) return freqA;
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return freqA;
-	unsigned long int f = 0;
+	unsigned long long f = 0;
 	for (size_t n = 2; n < 13; n++)
 		f = f*10 + replystr[p + n] - '0';
 	freqA = f;
 	return freqA;
 }
 
-void RIG_K2::set_vfoA (unsigned long int freq)
+void RIG_K2::set_vfoA (unsigned long long freq)
 {
 	freqA = freq;
 	cmd = "FA00000000000;";
@@ -292,7 +295,7 @@ void RIG_K2::set_vfoA (unsigned long int freq)
 	sett("");
 }
 
-unsigned long int RIG_K2::get_vfoB()
+unsigned long long RIG_K2::get_vfoB()
 {
 	rsp = cmd = "FB";
 	cmd += ';';
@@ -303,14 +306,14 @@ unsigned long int RIG_K2::get_vfoB()
 	if (ret < 14) return freqB;
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return freqB;
-	unsigned long int f = 0;
+	unsigned long long f = 0;
 	for (size_t n = 2; n < 13; n++)
 		f = f*10 + replystr[p + n] - '0';
 	freqB = f;
 	return freqB;
 }
 
-void RIG_K2::set_vfoB(unsigned long int freq)
+void RIG_K2::set_vfoB(unsigned long long freq)
 {
 	freqB = freq;
 	cmd = "FB00000000000;";

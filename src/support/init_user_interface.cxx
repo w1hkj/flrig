@@ -1958,8 +1958,8 @@ void TRACED(init_tune_control)
 void TRACED(init_ptt_control)
 
 	if (selrig->has_ptt_control ||
-		progStatus.comm_dtrptt == PTT_BOTH || progStatus.comm_dtrptt == PTT_SET ||
-		progStatus.comm_rtsptt == PTT_BOTH || progStatus.comm_rtsptt == PTT_SET ||
+		progStatus.serial_dtrptt == PTT_BOTH || progStatus.serial_dtrptt == PTT_SET ||
+		progStatus.serial_rtsptt == PTT_BOTH || progStatus.serial_rtsptt == PTT_SET ||
 		progStatus.sep_dtrptt  == PTT_BOTH || progStatus.sep_dtrptt  == PTT_SET ||
 		progStatus.sep_rtsptt  == PTT_BOTH || progStatus.sep_rtsptt  == PTT_SET) {
 		btnPTT->activate();
@@ -2376,26 +2376,27 @@ void TRACED(initConfigDialog)
 
 	if (!progStatus.loadXcvrState(xcvr_name) ) {
 		selectCommPort->index(0);
-		mnuBaudrate->index( srig->comm_baudrate );
+		mnuBaudrate->index( srig->serial_baudrate );
 		btnOneStopBit->value( srig->stopbits == 1 );
 		btnTwoStopBit->value( srig->stopbits == 2 );
-		cntRigCatRetries->value( srig->comm_retries );
-		cntRigCatTimeout->value( srig->comm_timeout );
-		cntRigCatWait->value( srig->comm_wait );
+		cntRigCatRetries->value( srig->serial_retries );
+		cntRigCatTimeout->value( srig->serial_timeout );
+		cntPostWriteDelay->value( srig->serial_post_write_delay );
+		cntWriteDelay->value( srig->serial_write_delay );
 		query_interval->value( srig->serloop_timing );
 
-		btnRigCatEcho->value( srig->comm_echo );
+		btnRigCatEcho->value( srig->serial_echo );
 
 
-		lbox_catptt->index( srig->comm_catptt );
-		lbox_rtsptt->index( srig->comm_rtsptt );
-		lbox_dtrptt->index( srig->comm_dtrptt );
+		lbox_catptt->index( srig->serial_catptt );
+		lbox_rtsptt->index( srig->serial_rtsptt );
+		lbox_dtrptt->index( srig->serial_dtrptt );
 
-		chkrtscts->value( srig->comm_rtscts );
-		btnrtsplus1->value( srig->comm_rtsplus );
-		btndtrplus1->value( srig->comm_dtrplus );
-		btnrtsplus2->value( srig->comm_rtsplus );
-		btndtrplus2->value( srig->comm_dtrplus );
+		chkrtscts->value( srig->serial_rtscts );
+		btnrtsplus1->value( srig->serial_rtsplus );
+		btndtrplus1->value( srig->serial_dtrplus );
+		btnrtsplus2->value( srig->serial_rtsplus );
+		btndtrplus2->value( srig->serial_dtrplus );
 
 		if (srig->CIV) {
 			char hexstr[8];
@@ -2431,7 +2432,7 @@ void TRACED(initStatusConfigDialog)
 
 	selectRig->value(xcvr_name.c_str());
 
-	mnuBaudrate->index( progStatus.comm_baudrate );
+	mnuBaudrate->index( progStatus.serial_baudrate );
 
 	selectCommPort->value( progStatus.xcvr_serial_port.c_str() );
 	selectAuxPort->value( progStatus.aux_serial_port.c_str() );
@@ -2439,22 +2440,22 @@ void TRACED(initStatusConfigDialog)
 	btnOneStopBit->value( progStatus.stopbits == 1 );
 	btnTwoStopBit->value( progStatus.stopbits == 2 );
 
-	cntRigCatRetries->value( progStatus.comm_retries );
-	cntRigCatTimeout->value( progStatus.comm_timeout );
-	cntRigCatWait->value( progStatus.comm_wait );
-	btnRigCatEcho->value( progStatus.comm_echo );
+	cntRigCatRetries->value( progStatus.serial_retries );
+	cntRigCatTimeout->value( progStatus.serial_timeout );
+	cntPostWriteDelay->value( progStatus.serial_post_write_delay );
+	btnRigCatEcho->value( progStatus.serial_echo );
 	query_interval->value( progStatus.serloop_timing );
-	byte_interval->value( progStatus.byte_interval );
+	cntWriteDelay->value( progStatus.serial_write_delay );
 
-	lbox_catptt->index( progStatus.comm_catptt );
-	lbox_rtsptt->index( progStatus.comm_rtsptt );
-	lbox_dtrptt->index( progStatus.comm_dtrptt );
+	lbox_catptt->index( progStatus.serial_catptt );
+	lbox_rtsptt->index( progStatus.serial_rtsptt );
+	lbox_dtrptt->index( progStatus.serial_dtrptt );
 
-	chkrtscts->value( progStatus.comm_rtscts );
-	btnrtsplus1->value( progStatus.comm_rtsplus );
-	btndtrplus1->value( progStatus.comm_dtrplus );
-	btnrtsplus2->value( progStatus.comm_rtsplus );
-	btndtrplus2->value( progStatus.comm_dtrplus );
+	chkrtscts->value( progStatus.serial_rtscts );
+	btnrtsplus1->value( progStatus.serial_rtsplus );
+	btndtrplus1->value( progStatus.serial_dtrplus );
+	btnrtsplus2->value( progStatus.serial_rtsplus );
+	btndtrplus2->value( progStatus.serial_dtrplus );
 
 	btnSepDTRplus->value(progStatus.sep_dtrplus);
 	lbox_sep_dtrptt->index(progStatus.sep_dtrptt);

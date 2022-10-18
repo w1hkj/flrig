@@ -17,7 +17,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "xiegu/Xiegu-G90.h"
@@ -124,16 +124,19 @@ RIG_Xiegu_G90::RIG_Xiegu_G90() {
 	_mode_type = Xiegu_G90_mode_type;
 	adjustCIV(defaultCIV);
 
-	comm_retries = 2;
-	comm_wait = 20;
-	comm_timeout = 50;
-	comm_echo = false;
-	comm_rtscts = false;
-	comm_rtsplus = true;
-	comm_dtrplus = true;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
+	serial_timeout = 50;
+	serial_echo = false;
+	serial_rtscts = false;
+	serial_rtsplus = true;
+	serial_dtrplus = true;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 
 	widgets = Xiegu_G90_widgets;
 
@@ -141,11 +144,11 @@ RIG_Xiegu_G90::RIG_Xiegu_G90() {
 	ndigits = 9;
 	A.filter = B.filter = 1;
 
-	def_freq = A.freq = 14070000;
+	def_freq = A.freq = 14070000ULL;
 	def_mode = A.imode = 1;
 	def_bw = A.iBW = 0;
 
-	B.freq = 7070000;
+	B.freq = 7070000ULL;
 	B.imode = 1;
 	B.iBW = 0;
 
@@ -239,7 +242,7 @@ void RIG_Xiegu_G90::selectB()
 	inuse = onB;
 }
 
-unsigned long int RIG_Xiegu_G90::get_vfoA ()
+unsigned long long RIG_Xiegu_G90::get_vfoA ()
 {
 	if (inuse == onB) return A.freq;
 	std::string resp = pre_fm;
@@ -261,7 +264,7 @@ unsigned long int RIG_Xiegu_G90::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_Xiegu_G90::set_vfoA (unsigned long int freq)
+void RIG_Xiegu_G90::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	cmd = pre_to;
@@ -273,7 +276,7 @@ void RIG_Xiegu_G90::set_vfoA (unsigned long int freq)
 	isett("");
 }
 
-unsigned long int RIG_Xiegu_G90::get_vfoB ()
+unsigned long long RIG_Xiegu_G90::get_vfoB ()
 {
 	if (inuse == onA) return B.freq;
 	std::string resp = pre_fm;
@@ -295,7 +298,7 @@ unsigned long int RIG_Xiegu_G90::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_Xiegu_G90::set_vfoB (unsigned long int freq)
+void RIG_Xiegu_G90::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
 	cmd = pre_to;
@@ -982,10 +985,10 @@ void RIG_Xiegu_G90::get_band_selection(int v)
 	if (bandmode < 0) bandmode = 0;
 	if (bandmode > 4) bandmode = 0;
 	if (inuse == onB) {
-		set_vfoB(bandfreq);
+		set_vfoB((unsigned long long)bandfreq);
 		set_modeB(bandmode);
 	} else {
-		set_vfoA(bandfreq);
+		set_vfoA((unsigned long long)bandfreq);
 		set_modeA(bandmode);
 		}
 	set_trace(1, "get band selection");
@@ -993,19 +996,23 @@ void RIG_Xiegu_G90::get_band_selection(int v)
 
 void RIG_Xiegu_G90::set_band_selection(int v)
 {
+	// Carrier freq needs to be unsigned long long because of potential
+	// microwave band use; however, the established HF amateur bands fit
+	// within an int and the fltk Fl_Preferences class doesn't support
+	// unsigned or long long so we store as int and use a mask to avoid compiler complaint.
 	switch (v) {
 		default:
-		case 1:  progStatus.f160 = vfo->freq; progStatus.m160 = vfo->imode; break;
-		case 2:  progStatus.f80 = vfo->freq;  progStatus.m80 = vfo->imode;  break;
-		case 3:  progStatus.f40 = vfo->freq;  progStatus.m40 = vfo->imode;  break;
-		case 4:  progStatus.f30 = vfo->freq;  progStatus.m30 = vfo->imode;  break;
-		case 5:  progStatus.f20 = vfo->freq;  progStatus.m20 = vfo->imode;  break;
-		case 6:  progStatus.f17 = vfo->freq;  progStatus.m17 = vfo->imode;  break;
-		case 7:  progStatus.f15 = vfo->freq;  progStatus.m15 = vfo->imode;  break;
-		case 8:  progStatus.f12 = vfo->freq;  progStatus.m12 = vfo->imode;  break;
-		case 9:  progStatus.f10 = vfo->freq;  progStatus.m10 = vfo->imode;  break;
-		case 10: progStatus.f6 = vfo->freq;   progStatus.m6 = vfo->imode;   break;
-		case 13: progStatus.fgen = vfo->freq; progStatus.mgen = vfo->imode; break;
+		case 1:  progStatus.f160 = (int)vfo->freq & 0x7FFFFFFF; progStatus.m160 = vfo->imode; break;
+		case 2:  progStatus.f80 =  (int)vfo->freq & 0x7FFFFFFF;  progStatus.m80 = vfo->imode;  break;
+		case 3:  progStatus.f40 =  (int)vfo->freq & 0x7FFFFFFF;  progStatus.m40 = vfo->imode;  break;
+		case 4:  progStatus.f30 =  (int)vfo->freq & 0x7FFFFFFF;  progStatus.m30 = vfo->imode;  break;
+		case 5:  progStatus.f20 =  (int)vfo->freq & 0x7FFFFFFF;  progStatus.m20 = vfo->imode;  break;
+		case 6:  progStatus.f17 =  (int)vfo->freq & 0x7FFFFFFF;  progStatus.m17 = vfo->imode;  break;
+		case 7:  progStatus.f15 =  (int)vfo->freq & 0x7FFFFFFF;  progStatus.m15 = vfo->imode;  break;
+		case 8:  progStatus.f12 =  (int)vfo->freq & 0x7FFFFFFF;  progStatus.m12 = vfo->imode;  break;
+		case 9:  progStatus.f10 =  (int)vfo->freq & 0x7FFFFFFF;  progStatus.m10 = vfo->imode;  break;
+		case 10: progStatus.f6 =   (int)vfo->freq & 0x7FFFFFFF;   progStatus.m6 = vfo->imode;   break;
+		case 13: progStatus.fgen = (int)vfo->freq & 0x7FFFFFFF; progStatus.mgen = vfo->imode; break;
 	}
 	set_trace(1, "set_band_selection()");
 }

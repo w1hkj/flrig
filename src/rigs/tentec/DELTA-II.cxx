@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 
@@ -33,18 +33,21 @@ static const char RIG_TT535_mode_type[] = {'L', 'U', 'U', 'L', 'U'};
 RIG_TT535::RIG_TT535() {
 	name_ = RIG_TT535name_;
 	modes_ = RIG_TT535modes_;
-	comm_baudrate = BR1200;
+	serial_baudrate = BR1200;
 	stopbits = 1;
-	comm_retries = 2;
-	comm_wait = 10;
-	comm_timeout = 50;
-	comm_echo = true;
-	comm_rtscts = false;
-	comm_rtsplus = false;
-	comm_dtrplus = true;
-	comm_catptt = false;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
+	serial_timeout = 50;
+	serial_echo = true;
+	serial_rtscts = false;
+	serial_rtsplus = false;
+	serial_dtrplus = true;
+	serial_catptt = false;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 	modeA = 1;
 	bwA = 0;
 
@@ -65,13 +68,13 @@ bool RIG_TT535::check()
 	return true;
 }
 
-unsigned long int RIG_TT535::get_vfoA ()
+unsigned long long RIG_TT535::get_vfoA ()
 {
 	return freqA;
 }
 
 
-void RIG_TT535::set_vfoA (unsigned long int freq)
+void RIG_TT535::set_vfoA (unsigned long long freq)
 {
 	freqA = freq;
 	cmd = pre_to;
@@ -83,7 +86,7 @@ void RIG_TT535::set_vfoA (unsigned long int freq)
 		checkresponse();
 }
 
-void RIG_TT535::set_vfoB (unsigned long int freq)
+void RIG_TT535::set_vfoB (unsigned long long freq)
 {
 	freqB = freq;
 	cmd = pre_to;
@@ -94,7 +97,7 @@ void RIG_TT535::set_vfoB (unsigned long int freq)
 		checkresponse();
 }
 
-unsigned long int RIG_TT535::get_vfoB ()
+unsigned long long RIG_TT535::get_vfoB ()
 {
 	return freqB;
 }

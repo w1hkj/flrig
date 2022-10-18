@@ -19,7 +19,7 @@
 
 /*!
 
-\mainpage FLRIG Users Manual - Version 1.4.6
+\mainpage FLRIG Users Manual - Version 1.4.7
 
 \tableofcontents
 
@@ -576,30 +576,129 @@ Select the User Interface menu item to configure various user preferences includ
 </center>
 <br>
 
-The frequency display is also a control.  Each numeric is sensitive to the mouse
-left/right buttons for up/down and to the mouse scroll wheel for rapidly
-changing value.  Click on upper half of the digit to increase frequency, and
-the lower half of the digit to decrease the frequency. Put the mouse over any of 
-the numeric segments and you can enter a new frequency using the keyboard 
-numeric keypad.  If you make an error simply enter a non-numeric key.  Set the 
-newly entered frequency by pressing the Enter key.
+The frequency display is also a control.  The control must have "focus" for the user
+to make changes.  The control has focus whenever the mouse cursor is over it.  The foreground and background
+colors reverse to indicate the control has focus.  Moving the cursor outside the control releases focus.
 
-To paste a frequency from the clipboard (kHz only), press control-V followed
-by the Enter key
+<br>
+<center>
+\image latex ui/frequency-control-focus.png "Frequency Control - vfoA has focus" width=4.6in
+\image html ui/frequency-control-focus.png "Frequency Control - vfoA has focus"
+</center>
+<br>
 
-Vfo-A and Vfo-B are separate controlS, A on the left, B on the right.
+The number of digits that may be entered and the number of decimal digits displayed
+are determined by hard-coded data for the rig selected if using rig control.  The intent
+is to match the actual rig display.
 
-Left click on the A->B button to swap vfos.  Right click on the A->B button
-to transfer vfoA to vfoB.
+If you select NONE for rig control, 7 digits to the left of the decimal and 3 digits
+to the right are displayed (display is in kHz).
 
-When the mouse pointer is over the frequency display you can also change
-frequency values using the arrow and page key buttons:
+In the rig control case, the maximum frequency is determined by the rig; in the NONE
+case, the maximum frequency is 9,999,999.999 kHz.
+
+The maximum frequency <B><I>based on the number of digits displayed</I></B> is given in the tooltip.
+
+Each digit is sensitive to the mouse.  Clicking the left or right button over
+the top half of a digit increments it while clicking over the lower half decrements it.
+Holding the mouse button down will cause the number to rapidly increase or decrease.  Alternatively,
+you can roll the mouse wheel with the pointer over a digit and it will scroll the digit.
+In all cases the numbers "roll over" - i.e., you can change the digit you point to
+and all digits to the left of it.
+
+Arrow and Page Up / Page Down Keys can be used to increment and decrement digits.
+Digits are numbered 0-9, right to left, with the digit's significance matching that of the rig's display.
+For example, if the rig's resolution is 1 Hz, D0's range is 0-9 Hz.
+<br>
+
+<center>
+<table style="width: 80%">
+	<tr>
+		<th>Keys</th>
+		<th>Normal</th>
+		<th>SHIFT + key</th>
+		<th>CTRL + key</th>
+	</tr>
+	<tr>
+		<td><center>right / left arrow</center></td>
+		<td><center>+/- D0</center></td>
+		<td><center>+/- D1</center></td>
+		<td><center>+/- D2</center></td>
+	<tr>
+		<td><center>up / down arrow</center></td>
+		<td><center>+/- D3</center></td>
+		<td><center>+/- D4</center></td>
+		<td><center>+/- D5</center></td>
+	</tr>
+	<tr>
+		<td><center>Page Up / Page Down</center></td>
+		<td><center>+/- D6</center></td>
+		<td><center>+/- D7</center></td>
+		<td><center>+/- D8</center></td>
+	</tr>
+</table>
+</center>
+<br>
+
+All of the foregoing change techniques result in immediate changes to the
+frequency of a controlled rig.
+
+There are two additional ways to set the frequency: <B>PASTE</B> and <B>direct keyboard entry</B>.  In
+both cases, make sure the flrig main window has focus (click in title bar) and then
+move the mouse cursor inside the Frequency Control window to
+give it focus (colors will reverse).
+
+You can paste from the clipboard (Ctrl-v)
+or from the Selection buffer (middle mouse button).  The selection must be from text within
+the application whereas the clipboard paste will paste values copied from any application.
+The value pasted is assumed to be numeric in units of kHz and can include a decimal point.
+If the value being pasted would exceed the maximum frequency allowed, the Paste action is silently ignored.
+The Paste action results in an immediate command to set the frequency on a controlled rig.
+
+Lastly, you may enter a frequency directly from the number keys or keypad of a keyboard.
+Enter the frequency in kHz, including decimal point if there are non-zero decimal components,
+using either the number keys or the keypad.  You may use any legal floating point format.
+For example:
 
 <ul>
-	<li>left / right arrow - increase / decrease 1 Hz</li>
-	<li>up / down arrow - increase / decrease 10 Hz</li>
-	<li>Page Up / Page Down - increase / decrease 100 Hz</li>
+<li>7070
+<li>14070.235
+<li>1.4e4
 </ul>
+
+
+When you press the first number, the decimal point in the display will blink to indicate
+you are in numeric entry mode.  While in numeric entry mode, all other entry modes are
+disabled (i.e., no mouse clicks, rolls, or pastes are possible).
+
+Continue to enter numbers, and optionally a decimal and more numbers.  The value does NOT
+get sent to a controlled rig until you press the ENTER key.  Pressing the ENTER key
+sends the value to the rig and exits the numeric entry mode.
+
+If you want to make changes as you are entering numbers, you can use the backspace key
+to delete undesired numbers digit by digit, or Ctrl-Backspace to clear all digits,
+and then resume entering numbers.
+
+If you attempt to enter more digits on either side of the decimal than there are
+digits available, the excess digit entries are ignored.
+
+If you want to abort the process you can press the ESC (escape) key or move the cursor
+out of the Frequency Control and the frequency will remain as it was; this exits numeric entry mode.
+
+Vfo-A and Vfo-B are separate controls, A on the left, B on the right.  If your radio has
+two VFOs, you can make one or the other active for transmission and reception by clicking
+on the corresponding button.  Note that many radios allow you to change the frequency of
+an inactive VFO through remote command, in which case you do not have to click on the
+corresponding button to set its frequency.
+
+Left click on the A/B button to swap several of the parameters of the VFOs (e.g., frequency,
+filter setting, mode) and change the active VFO to follow (so effectively your operation
+has not changed but you are using the other VFO).
+
+Shift-click to copy just the frequency from Vfo-A to Vfo-B, and Ctrl-Click
+to copy in the other direction.
+
+
 <br>
 
 <center>

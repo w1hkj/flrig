@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "yaesu/FT100D.h"
@@ -47,18 +47,21 @@ RIG_FT100D::RIG_FT100D() {
 	bandwidths_ = FT100Dwidths_;
 	bw_vals_ = FT100D_bw_val;
 
-	comm_baudrate = BR4800;
+	serial_baudrate = BR4800;
 	stopbits = 2;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 100;
-	comm_rtscts = false;
-	comm_rtsplus = false;
-	comm_dtrplus = true;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
-	afreq = bfreq = A.freq = B.freq = 14070000;
+	serial_retries = 2;
+	
+	serial_write_delay = 0;
+	serial_post_write_delay = 5;
+
+	serial_timeout = 100;
+	serial_rtscts = false;
+	serial_rtsplus = false;
+	serial_dtrplus = true;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
+	afreq = bfreq = A.freq = B.freq = 14070000ULL;
 	amode = bmode = A.imode = B.imode = 1;
 	aBW = bBW = A.iBW = B.iBW = 2;
 
@@ -194,21 +197,21 @@ bool RIG_FT100D::get_info()
 		pbw = (replystr[5] >> 4) & 0x03;
 		pbw = 3 - pbw;
 		if (inuse == onB) {
-			B.freq = pfreq; B.imode = pmode; B.iBW = pbw;
+			B.freq = (unsigned long long)pfreq; B.imode = pmode; B.iBW = pbw;
 		} else {
-			A.freq = pfreq; A.imode = pmode; A.iBW = pbw;
+			A.freq = (unsigned long long)pfreq; A.imode = pmode; A.iBW = pbw;
 		}
 		return true;
 	}
 	return false;
 }
 
-unsigned long int RIG_FT100D::get_vfoA ()
+unsigned long long RIG_FT100D::get_vfoA ()
 {
 	return A.freq;
 }
 
-void RIG_FT100D::set_vfoA (unsigned long int freq)
+void RIG_FT100D::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	freq /=10; // 100D does not support 1 Hz resolution
@@ -249,12 +252,12 @@ int RIG_FT100D::get_bwA()
 	return A.iBW;
 }
 
-unsigned long int RIG_FT100D::get_vfoB()
+unsigned long long RIG_FT100D::get_vfoB()
 {
 	return B.freq;
 }
 
-void RIG_FT100D::set_vfoB(unsigned long int freq)
+void RIG_FT100D::set_vfoB(unsigned long long freq)
 {
 	B.freq = freq;
 	freq /=10; // 100D does not support 1 Hz resolution

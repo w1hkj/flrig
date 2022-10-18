@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "tentec/TT599.h"
@@ -61,18 +61,21 @@ RIG_TT599::RIG_TT599() {
 
 	widgets = rig_widgets;
 
-	comm_baudrate = BR57600;
+	serial_baudrate = BR57600;
 	stopbits = 1;
-	comm_retries = 2;
-	comm_wait = 10;
-	comm_timeout = 50;
-	comm_echo = false;
-	comm_rtscts = true;
-	comm_rtsplus = false;
-	comm_dtrplus = true;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
+	serial_timeout = 50;
+	serial_echo = false;
+	serial_rtscts = true;
+	serial_rtsplus = false;
+	serial_dtrplus = true;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 	modeA = 1;
 	bwA = 16;
 	can_change_alt_vfo = true;
@@ -143,19 +146,19 @@ bool RIG_TT599::check ()
 	return true;
 }
 
-unsigned long int RIG_TT599::get_vfoA ()
+unsigned long long RIG_TT599::get_vfoA ()
 {
 	size_t p;
 	cmd = "?AF\r";
 	if ( waitCommand( cmd, 12, "get vfoA") ) {
 		if ((p = replystr.rfind("@AF")) != std::string::npos)
-			freqA =  atol(&replystr[p+3]);
+			freqA =  strtoull(&replystr[p+3], NULL, 10);
 	}
 	getcr("get vfoA");
 	return freqA;
 }
 
-void RIG_TT599::set_vfoA (unsigned long int freq)
+void RIG_TT599::set_vfoA (unsigned long long freq)
 {
 	freqA = freq;
 	cmd = "*AF";
@@ -166,19 +169,19 @@ void RIG_TT599::set_vfoA (unsigned long int freq)
 	get_vfoA();
 }
 
-unsigned long int RIG_TT599::get_vfoB ()
+unsigned long long RIG_TT599::get_vfoB ()
 {
 	size_t p;
 	cmd = "?BF\r";
 	if ( waitCommand( cmd, 12, "get vfoB") ) {
 		if ((p = replystr.rfind("@BF")) != std::string::npos)
-			freqB =  atol(&replystr[p+3]);
+			freqB = strtoull(&replystr[p+3], NULL, 10);
 	}
 	getcr("get vfoB");
 	return freqB;
 }
 
-void RIG_TT599::set_vfoB (unsigned long int freq)
+void RIG_TT599::set_vfoB (unsigned long long freq)
 {
 	freqB = freq;
 	cmd = "*BF";

@@ -38,7 +38,7 @@ extern Address *remote_addr;
 
 void connect_to_remote();
 void disconnect_from_remote();
-void send_to_remote(std::string cmd_string, int pace = 0);
+void send_to_remote(std::string cmd_string);
 int  read_from_remote(std::string &str);
 
 #endif

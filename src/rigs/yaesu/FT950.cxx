@@ -16,7 +16,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <iostream>
@@ -121,21 +121,24 @@ RIG_FT950::RIG_FT950() {
 
 	widgets = rig_widgets;
 
-	comm_baudrate = BR38400;
+	serial_baudrate = BR38400;
 	stopbits = 1;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts = true;
-	comm_rtsplus = false;
-	comm_dtrplus = false;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+
+	serial_write_delay = 0;
+	serial_post_write_delay = 50;
+
+	serial_timeout = 50;
+	serial_rtscts = true;
+	serial_rtsplus = false;
+	serial_dtrplus = false;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 
 	A.imode = B.imode = modeB = modeA = def_mode = 1;
 	A.iBW = B.iBW = bwA = bwB = def_bw = 12;
-	A.freq = B.freq = freqA = freqB = def_freq = 14070000;
+	A.freq = B.freq = freqA = freqB = def_freq = 14070000ULL;
 
 	has_compON =
 	has_compression =
@@ -231,7 +234,7 @@ void RIG_FT950::initialize()
 // Disable Auto Information mode
 	sendCommand("AI0;");
 
-// "MRnnn;" if valid, returns last channel used, "mrlll...;", aunsigned long int with channel nnn info.
+// "MRnnn;" if valid, returns last channel used, "mrlll...;", along with channel nnn info.
 	cmd = "MR118;";
 	wait_char(';', 27, FL950_WAIT_TIME, "Read UK 60m Channel Mem", ASC);
 	size_t p = replystr.rfind("MR");
@@ -269,7 +272,7 @@ bool RIG_FT950::check ()
 	return false;
 }
 
-unsigned long int RIG_FT950::get_vfoA ()
+unsigned long long RIG_FT950::get_vfoA ()
 {
 	cmd = rsp = "FA";
 	cmd += ';';
@@ -279,14 +282,14 @@ unsigned long int RIG_FT950::get_vfoA ()
 
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return freqA;
-	int f = 0;
+	unsigned long long f = 0;
 	for (size_t n = 2; n < 10; n++)
 		f = f*10 + replystr[p+n] - '0';
 	freqA = f;
 	return freqA;
 }
 
-void RIG_FT950::set_vfoA (unsigned long int freq)
+void RIG_FT950::set_vfoA (unsigned long long freq)
 {
 	freqA = freq;
 	cmd = "FA00000000;";
@@ -301,7 +304,7 @@ void RIG_FT950::set_vfoA (unsigned long int freq)
 
 }
 
-unsigned long int RIG_FT950::get_vfoB ()
+unsigned long long RIG_FT950::get_vfoB ()
 {
 	cmd = rsp = "FB";
 	cmd += ';';
@@ -311,14 +314,14 @@ unsigned long int RIG_FT950::get_vfoB ()
 
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return freqB;
-	int f = 0;
+	unsigned long long f = 0;
 	for (size_t n = 2; n < 10; n++)
 		f = f*10 + replystr[p+n] - '0';
 	freqB = f;
 	return freqB;
 }
 
-void RIG_FT950::set_vfoB (unsigned long int freq)
+void RIG_FT950::set_vfoB (unsigned long long freq)
 {
 	freqB = freq;
 	cmd = "FB00000000;";
@@ -655,7 +658,7 @@ void RIG_FT950::tune_rig(int)
 	static int rmd = modeA;
 	static int rbw = bwA;
 	static int rpwr = 100;
-	static unsigned long int rfreq = freqA;	// fix for menu 047 OFSt default
+	static unsigned long long rfreq = freqA;	// fix for menu 047 OFSt default
 	int use_int_tuner = true;
 
 //  On-The-Fly bandstack by bandstack int/ext tuner

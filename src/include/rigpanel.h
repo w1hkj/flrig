@@ -496,7 +496,8 @@ extern Fl_Input2 * cmdtext16;
 
 extern Fl_Counter *cntRigCatRetries;
 extern Fl_Counter *cntRigCatTimeout;
-extern Fl_Counter *cntRigCatWait;
+extern Fl_Counter *cntWriteDelay;;
+extern Fl_Counter *cntPostWriteDelay;
 extern Fl_Counter *query_interval;
 extern Fl_Counter *byte_interval;
 

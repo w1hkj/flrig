@@ -60,22 +60,24 @@ status progStatus = {
 	20,			// int ddY;
 
 	"NONE",		// std::string xcvr_serial_port;
-	0,			// int comm_baudrate;
+	0,			// int serial_baudrate;
 	2,			// int stopbits;
-	2,			// int comm_retries;
-	5,			// int comm_wait;
-	50,			// int comm_timeout;
-	false,		// bool comm_echo;
 
-	0,			// bool comm_catptt;
-	0,			// bool comm_rtsptt;
-	0,			// bool comm_dtrptt;
+	2,			// int serial_retries;
+	0,			// int serial_write_delay;
+	0,			// int serial_post_write_delay
+	50,			// int serial_timeout;
 
-	false,		// bool comm_rtscts;
-	false,		// bool comm_rtsplus;
-	false,		// bool comm_dtrplus;
+	false,		// bool serial_echo;
+
+	0,			// bool serial_catptt;
+	0,			// bool serial_rtsptt;
+	0,			// bool serial_dtrptt;
+
+	false,		// bool serial_rtscts;
+	false,		// bool serial_rtsplus;
+	false,		// bool serial_dtrplus;
 	500,		// int  serloop_timing;
-	1,			// int  byte_interval;
 
 	"NONE",		// std::string aux_serial_port;
 	false,		// bool aux_SCU_17;
@@ -634,21 +636,21 @@ void status::saveLastState()
 	spref.set("ddy", ddY);
 
 	spref.set("xcvr_serial_port", xcvr_serial_port.c_str());
-	spref.set("comm_baudrate", comm_baudrate);
-	spref.set("comm_stopbits", stopbits);
-	spref.set("comm_retries", comm_retries);
-	spref.set("comm_wait", comm_wait);
-	spref.set("comm_timeout", comm_timeout);
+	spref.set("serial_baudrate", serial_baudrate);
+	spref.set("serial_stopbits", stopbits);
+	spref.set("serial_retries", serial_retries);
+	spref.set("serial_write_delay", serial_write_delay);
+	spref.set("serial_post_write_delay", serial_post_write_delay);
+	spref.set("serial_timeout", serial_timeout);
 	spref.set("serloop_timing", serloop_timing);
-	spref.set("byte_interval", byte_interval);
 
-	spref.set("comm_echo", comm_echo);
-	spref.set("ptt_via_cat", comm_catptt);
-	spref.set("ptt_via_rts", comm_rtsptt);
-	spref.set("ptt_via_dtr", comm_dtrptt);
-	spref.set("rts_cts_flow", comm_rtscts);
-	spref.set("rts_plus", comm_rtsplus);
-	spref.set("dtr_plus", comm_dtrplus);
+	spref.set("serial_echo", serial_echo);
+	spref.set("ptt_via_cat", serial_catptt);
+	spref.set("ptt_via_rts", serial_rtsptt);
+	spref.set("ptt_via_dtr", serial_dtrptt);
+	spref.set("rts_cts_flow", serial_rtscts);
+	spref.set("rts_plus", serial_rtsplus);
+	spref.set("dtr_plus", serial_dtrplus);
 
 	spref.set("disable_CW_ptt", disable_CW_ptt);
 
@@ -1233,7 +1235,7 @@ bool status::loadXcvrState(std::string xcvr)
 	if (spref.entryExists("version")) {
 
 		int i;
-		char defbuffer[500];
+		char defbuffer[MAX_DEFBUFFER_SIZE];
 
 		spref.get("mainx", mainX, mainX);
 		spref.get("mainy", mainY, mainY);
@@ -1267,7 +1269,7 @@ bool status::loadXcvrState(std::string xcvr)
 			if (mainW < TOUCH_MAINW) mainW = TOUCH_MAINW;
 		}
 
-		spref.get("xcvr_serial_port", defbuffer, "NONE", 499);
+		spref.get("xcvr_serial_port", defbuffer, "NONE", MAX_DEFBUFFER_SIZE);
 		xcvr_serial_port = defbuffer;
 		if (xcvr_serial_port.find("tty") == 0)
 			xcvr_serial_port.insert(0, "/dev/");
@@ -1282,35 +1284,50 @@ bool status::loadXcvrState(std::string xcvr)
 			i++;
 		}
 
-		spref.get("comm_baudrate", comm_baudrate, comm_baudrate);
+// original for existing prefs file
+		spref.get("comm_baudrate", serial_baudrate, serial_baudrate);
 		spref.get("comm_stopbits", stopbits, stopbits);
-		spref.get("comm_retries", comm_retries, comm_retries);
-		spref.get("comm_wait", comm_wait, comm_wait);
-		spref.get("comm_timeout", comm_timeout, comm_timeout);
+		spref.get("comm_retries", serial_retries, serial_retries);
+		spref.get("comm_wait", serial_post_write_delay, serial_post_write_delay);
+		spref.get("comm_timeout", serial_timeout, serial_timeout);
+		spref.get("byte_interval", serial_write_delay, serial_write_delay);
+
+		{
+			int testbaud = -1;
+			spref.get("serial_baudrate", testbaud, testbaud);
+			if (testbaud > -1) {
+				spref.get("serial_baudrate", serial_baudrate, serial_baudrate);
+				spref.get("serial_stopbits", stopbits, stopbits);
+				spref.get("serial_retries", serial_retries, serial_retries);
+				spref.get("serial_write_delay", serial_write_delay, serial_write_delay);
+				spref.get("serial_post_write_delay", serial_post_write_delay, serial_post_write_delay);
+				spref.get("serial_timeout", serial_timeout, serial_timeout);
+			}
+		}
+
 		spref.get("serloop_timing", serloop_timing, serloop_timing);
 		if (serloop_timing < 10) serloop_timing = 10; // minimum loop delay of 10 msec
-		spref.get("byte_interval", byte_interval, byte_interval);
 
-		if (spref.get("comm_echo", i, i)) comm_echo = i;
-		if (spref.get("ptt_via_cat", i, i)) comm_catptt = i;
-		if (spref.get("ptt_via_rts", i, i)) comm_rtsptt = i;
-		if (spref.get("ptt_via_dtr", i, i)) comm_dtrptt = i;
-		if (spref.get("rts_cts_flow", i, i)) comm_rtscts = i;
-		if (spref.get("rts_plus", i, i)) comm_rtsplus = i;
-		if (spref.get("dtr_plus", i, i)) comm_dtrplus = i;
+		if (spref.get("serial_echo", i, i)) serial_echo = i;
+		if (spref.get("ptt_via_cat", i, i)) serial_catptt = i;
+		if (spref.get("ptt_via_rts", i, i)) serial_rtsptt = i;
+		if (spref.get("ptt_via_dtr", i, i)) serial_dtrptt = i;
+		if (spref.get("rts_cts_flow", i, i)) serial_rtscts = i;
+		if (spref.get("rts_plus", i, i)) serial_rtsplus = i;
+		if (spref.get("dtr_plus", i, i)) serial_dtrplus = i;
 
 		if (spref.get("disable_CW_ptt", i, i)) disable_CW_ptt = i;
 
 		spref.get("civadr", CIV, CIV);
 		if (spref.get("usbaudio", i, i)) USBaudio = i;
 
-		spref.get("aux_serial_port", defbuffer, "NONE", 499);
+		spref.get("aux_serial_port", defbuffer, "NONE", MAX_DEFBUFFER_SIZE);
 		aux_serial_port = defbuffer;
 
 		if (spref.get("aux_rts", i, i)) aux_rts = i;
 		if (spref.get("aux_dtr", i, i)) aux_dtr = i;
 
-		spref.get("sep_serial_port", defbuffer, "NONE", 499);
+		spref.get("sep_serial_port", defbuffer, "NONE", MAX_DEFBUFFER_SIZE);
 		sep_serial_port = defbuffer;
 
 		if (spref.get("sep_rtsptt", i, i)) sep_rtsptt = i;
@@ -1318,19 +1335,19 @@ bool status::loadXcvrState(std::string xcvr)
 		if (spref.get("sep_rtsplus", i, i)) sep_rtsplus = i;
 		if (spref.get("sep_dtrplus", i, i)) sep_dtrplus = i;
 
-		spref.get("xmlport", defbuffer, "12345", 499);
+		spref.get("xmlport", defbuffer, "12345", MAX_DEFBUFFER_SIZE);
 		xmlport = defbuffer;
 		::xmlport = atoi(xmlport.c_str());
 
-		spref.get("cmedia_device", defbuffer, "NONE", 499);
+		spref.get("cmedia_device", defbuffer, "NONE", MAX_DEFBUFFER_SIZE);
 		cmedia_device = defbuffer;
-		spref.get("cmedia_gpio_line", defbuffer, "GPIO-3", 499);
+		spref.get("cmedia_gpio_line", defbuffer, "GPIO-3", MAX_DEFBUFFER_SIZE);
 		cmedia_gpio_line = defbuffer;
 		spref.get("cmedia_ptt", i, cmedia_ptt); cmedia_ptt = i;
 
-		spref.get("tmate2_device", defbuffer, "NONE", 499);
+		spref.get("tmate2_device", defbuffer, "NONE", MAX_DEFBUFFER_SIZE);
 		tmate2_device = defbuffer;
-		spref.get("tmate2_freq_step", defbuffer, "5000", 499);
+		spref.get("tmate2_freq_step", defbuffer, "5000", MAX_DEFBUFFER_SIZE);
 		tmate2_freq_step = defbuffer;
 		spref.get("tmate2_connected", i, tmate2_connected); tmate2_connected = i;
 
@@ -1366,7 +1383,7 @@ bool status::loadXcvrState(std::string xcvr)
 		int freq_A_lower = 14070000;
 		spref.get("freq_A_u", freq_A_upper, freq_A_upper);
 		spref.get("freq_A_l", freq_A_lower, freq_A_lower);
-		freq_A = (unsigned long int)freq_A_upper * 1000000000 + freq_A_lower;
+		freq_A = (unsigned long long)freq_A_upper * 1000000000 + freq_A_lower;
 
 		spref.get("bw_B", iBW_B, iBW_B);
 		spref.get("mode_B", imode_B, imode_B);
@@ -1375,12 +1392,12 @@ bool status::loadXcvrState(std::string xcvr)
 		int freq_B_lower = 14070000;
 		spref.get("freq_B_u", freq_B_upper, freq_B_upper);
 		spref.get("freq_B_l", freq_B_lower, freq_B_lower);
-		freq_B = (unsigned long int)freq_B_upper * 1000000000 + freq_B_lower;
+		freq_B = (unsigned long long)freq_B_upper * 1000000000 + freq_B_lower;
 
-		spref.get("filters", defbuffer, "", 499);
+		spref.get("filters", defbuffer, "", MAX_DEFBUFFER_SIZE);
 		filters = defbuffer;
 
-		spref.get("bandwidths", defbuffer, "", 499);
+		spref.get("bandwidths", defbuffer, "", MAX_DEFBUFFER_SIZE);
 		bandwidths = defbuffer;
 
 		if (spref.get("use_rig_data", i, i)) use_rig_data = i;
@@ -1427,7 +1444,7 @@ bool status::loadXcvrState(std::string xcvr)
 		spref.get("embed_tabs", embed_tabs, embed_tabs);
 		spref.get("show_tabs", show_tabs, show_tabs);
 
-		spref.get("visible_tab", defbuffer, visible_tab.c_str(), 499);
+		spref.get("visible_tab", defbuffer, visible_tab.c_str(), MAX_DEFBUFFER_SIZE);
 		visible_tab = defbuffer;
 
 		spref.get("rx_avg", rx_avg, rx_avg);
@@ -1537,219 +1554,219 @@ bool status::loadXcvrState(std::string xcvr)
 		spref.get("use_bpf_center", i, i); use_bpf_center = i;
 
 		if (spref.get("use706filters", i, i)) use706filters = i;
-		spref.get("ssb_cw_wide", defbuffer, ssb_cw_wide.c_str(), 499);
+		spref.get("ssb_cw_wide", defbuffer, ssb_cw_wide.c_str(), MAX_DEFBUFFER_SIZE);
 		ssb_cw_wide = defbuffer;
-		spref.get("ssb_cw_normal", defbuffer, ssb_cw_normal.c_str(), 499);
+		spref.get("ssb_cw_normal", defbuffer, ssb_cw_normal.c_str(), MAX_DEFBUFFER_SIZE);
 		ssb_cw_normal = defbuffer;
-		spref.get("ssb_cw_narrow", defbuffer, ssb_cw_narrow.c_str(), 499);
+		spref.get("ssb_cw_narrow", defbuffer, ssb_cw_narrow.c_str(), MAX_DEFBUFFER_SIZE);
 		ssb_cw_narrow = defbuffer;
 
-		spref.get("label1", defbuffer,  label1.c_str(), 499);
+		spref.get("label1", defbuffer,  label1.c_str(), MAX_DEFBUFFER_SIZE);
 		label1 = defbuffer;
-		spref.get("command1", defbuffer, command1.c_str(), 499);
+		spref.get("command1", defbuffer, command1.c_str(), MAX_DEFBUFFER_SIZE);
 		command1 = defbuffer;
-		spref.get("shftcmd1", defbuffer, shftcmd1.c_str(), 499);
+		spref.get("shftcmd1", defbuffer, shftcmd1.c_str(), MAX_DEFBUFFER_SIZE);
 		shftcmd1 = defbuffer;
 
-		spref.get("label2", defbuffer, label2.c_str(), 499);
+		spref.get("label2", defbuffer, label2.c_str(), MAX_DEFBUFFER_SIZE);
 		label2 = defbuffer;
-		spref.get("command2", defbuffer, command2.c_str(), 499);
+		spref.get("command2", defbuffer, command2.c_str(), MAX_DEFBUFFER_SIZE);
 		command2 = defbuffer;
-		spref.get("shftcmd2", defbuffer, shftcmd2.c_str(), 499);
+		spref.get("shftcmd2", defbuffer, shftcmd2.c_str(), MAX_DEFBUFFER_SIZE);
 		shftcmd2 = defbuffer;
 
-		spref.get("label3", defbuffer, label3.c_str(), 499);
+		spref.get("label3", defbuffer, label3.c_str(), MAX_DEFBUFFER_SIZE);
 		label3 = defbuffer;
-		spref.get("command3", defbuffer, command3.c_str(), 499);
+		spref.get("command3", defbuffer, command3.c_str(), MAX_DEFBUFFER_SIZE);
 		command3 = defbuffer;
-		spref.get("shftcmd3", defbuffer, shftcmd3.c_str(), 499);
+		spref.get("shftcmd3", defbuffer, shftcmd3.c_str(), MAX_DEFBUFFER_SIZE);
 		shftcmd3 = defbuffer;
 
-		spref.get("label4", defbuffer, label4.c_str(), 499);
+		spref.get("label4", defbuffer, label4.c_str(), MAX_DEFBUFFER_SIZE);
 		label4 = defbuffer;
-		spref.get("command4", defbuffer, command4.c_str(), 499);
+		spref.get("command4", defbuffer, command4.c_str(), MAX_DEFBUFFER_SIZE);
 		command4 = defbuffer;
-		spref.get("shftcmd4", defbuffer, shftcmd4.c_str(), 499);
+		spref.get("shftcmd4", defbuffer, shftcmd4.c_str(), MAX_DEFBUFFER_SIZE);
 		shftcmd4 = defbuffer;
 
-		spref.get("label5", defbuffer, label5.c_str(), 499);
+		spref.get("label5", defbuffer, label5.c_str(), MAX_DEFBUFFER_SIZE);
 		label5 = defbuffer;
-		spref.get("command5", defbuffer, command5.c_str(), 499);
+		spref.get("command5", defbuffer, command5.c_str(), MAX_DEFBUFFER_SIZE);
 		command5 = defbuffer;
-		spref.get("shftcmd5", defbuffer, shftcmd5.c_str(), 499);
+		spref.get("shftcmd5", defbuffer, shftcmd5.c_str(), MAX_DEFBUFFER_SIZE);
 		shftcmd5 = defbuffer;
 
-		spref.get("label6", defbuffer, label6.c_str(), 499);
+		spref.get("label6", defbuffer, label6.c_str(), MAX_DEFBUFFER_SIZE);
 		label6 = defbuffer;
-		spref.get("command6", defbuffer, command6.c_str(), 499);
+		spref.get("command6", defbuffer, command6.c_str(), MAX_DEFBUFFER_SIZE);
 		command6 = defbuffer;
-		spref.get("shftcmd6", defbuffer, shftcmd6.c_str(), 499);
+		spref.get("shftcmd6", defbuffer, shftcmd6.c_str(), MAX_DEFBUFFER_SIZE);
 		shftcmd6 = defbuffer;
 
-		spref.get("label7", defbuffer, label7.c_str(), 499);
+		spref.get("label7", defbuffer, label7.c_str(), MAX_DEFBUFFER_SIZE);
 		label7 = defbuffer;
-		spref.get("command7", defbuffer, command7.c_str(), 499);
+		spref.get("command7", defbuffer, command7.c_str(), MAX_DEFBUFFER_SIZE);
 		command7 = defbuffer;
-		spref.get("shftcmd7", defbuffer, shftcmd7.c_str(), 499);
+		spref.get("shftcmd7", defbuffer, shftcmd7.c_str(), MAX_DEFBUFFER_SIZE);
 		shftcmd7 = defbuffer;
 
-		spref.get("label8", defbuffer, label8.c_str(), 499);
+		spref.get("label8", defbuffer, label8.c_str(), MAX_DEFBUFFER_SIZE);
 		label8 = defbuffer;
-		spref.get("command8", defbuffer, command8.c_str(), 499);
+		spref.get("command8", defbuffer, command8.c_str(), MAX_DEFBUFFER_SIZE);
 		command8 = defbuffer;
-		spref.get("shftcmd8", defbuffer, shftcmd8.c_str(), 499);
+		spref.get("shftcmd8", defbuffer, shftcmd8.c_str(), MAX_DEFBUFFER_SIZE);
 		shftcmd8 = defbuffer;
 
-		spref.get("label9", defbuffer,  label9.c_str(), 499);
+		spref.get("label9", defbuffer,  label9.c_str(), MAX_DEFBUFFER_SIZE);
 		label9 = defbuffer;
-		spref.get("command9", defbuffer, command9.c_str(), 499);
+		spref.get("command9", defbuffer, command9.c_str(), MAX_DEFBUFFER_SIZE);
 		command9 = defbuffer;
-		spref.get("shftcmd9", defbuffer, shftcmd9.c_str(), 499);
+		spref.get("shftcmd9", defbuffer, shftcmd9.c_str(), MAX_DEFBUFFER_SIZE);
 		shftcmd9 = defbuffer;
 
-		spref.get("label10", defbuffer, label10.c_str(), 499);
+		spref.get("label10", defbuffer, label10.c_str(), MAX_DEFBUFFER_SIZE);
 		label10 = defbuffer;
-		spref.get("command10", defbuffer, command10.c_str(), 499);
+		spref.get("command10", defbuffer, command10.c_str(), MAX_DEFBUFFER_SIZE);
 		command10 = defbuffer;
-		spref.get("shftcmd10", defbuffer, shftcmd10.c_str(), 499);
+		spref.get("shftcmd10", defbuffer, shftcmd10.c_str(), MAX_DEFBUFFER_SIZE);
 		shftcmd10 = defbuffer;
 
-		spref.get("label11", defbuffer, label11.c_str(), 499);
+		spref.get("label11", defbuffer, label11.c_str(), MAX_DEFBUFFER_SIZE);
 		label11 = defbuffer;
-		spref.get("command11", defbuffer, command11.c_str(), 499);
+		spref.get("command11", defbuffer, command11.c_str(), MAX_DEFBUFFER_SIZE);
 		command11 = defbuffer;
-		spref.get("shftcmd11", defbuffer, shftcmd11.c_str(), 499);
+		spref.get("shftcmd11", defbuffer, shftcmd11.c_str(), MAX_DEFBUFFER_SIZE);
 		shftcmd11 = defbuffer;
 
-		spref.get("label12", defbuffer, label12.c_str(), 499);
+		spref.get("label12", defbuffer, label12.c_str(), MAX_DEFBUFFER_SIZE);
 		label12 = defbuffer;
-		spref.get("command12", defbuffer, command12.c_str(), 499);
+		spref.get("command12", defbuffer, command12.c_str(), MAX_DEFBUFFER_SIZE);
 		command12 = defbuffer;
-		spref.get("shftcmd12", defbuffer, shftcmd12.c_str(), 499);
+		spref.get("shftcmd12", defbuffer, shftcmd12.c_str(), MAX_DEFBUFFER_SIZE);
 		shftcmd12 = defbuffer;
 
-		spref.get("label13", defbuffer, label13.c_str(), 499);
+		spref.get("label13", defbuffer, label13.c_str(), MAX_DEFBUFFER_SIZE);
 		label13 = defbuffer;
-		spref.get("command13", defbuffer, command13.c_str(), 499);
+		spref.get("command13", defbuffer, command13.c_str(), MAX_DEFBUFFER_SIZE);
 		command13 = defbuffer;
-		spref.get("shftcmd13", defbuffer, shftcmd13.c_str(), 499);
+		spref.get("shftcmd13", defbuffer, shftcmd13.c_str(), MAX_DEFBUFFER_SIZE);
 		shftcmd13 = defbuffer;
 
-		spref.get("label14", defbuffer, label14.c_str(), 499);
+		spref.get("label14", defbuffer, label14.c_str(), MAX_DEFBUFFER_SIZE);
 		label14 = defbuffer;
-		spref.get("command14", defbuffer, command14.c_str(), 499);
+		spref.get("command14", defbuffer, command14.c_str(), MAX_DEFBUFFER_SIZE);
 		command14 = defbuffer;
-		spref.get("shftcmd14", defbuffer, shftcmd14.c_str(), 499);
+		spref.get("shftcmd14", defbuffer, shftcmd14.c_str(), MAX_DEFBUFFER_SIZE);
 		shftcmd14 = defbuffer;
 
-		spref.get("label15", defbuffer, label15.c_str(), 499);
+		spref.get("label15", defbuffer, label15.c_str(), MAX_DEFBUFFER_SIZE);
 		label15 = defbuffer;
-		spref.get("command15", defbuffer, command15.c_str(), 499);
+		spref.get("command15", defbuffer, command15.c_str(), MAX_DEFBUFFER_SIZE);
 		command15 = defbuffer;
-		spref.get("shftcmd15", defbuffer, shftcmd15.c_str(), 499);
+		spref.get("shftcmd15", defbuffer, shftcmd15.c_str(), MAX_DEFBUFFER_SIZE);
 		shftcmd15 = defbuffer;
 
-		spref.get("label16", defbuffer, label16.c_str(), 499);
+		spref.get("label16", defbuffer, label16.c_str(), MAX_DEFBUFFER_SIZE);
 		label16 = defbuffer;
-		spref.get("command16", defbuffer, command16.c_str(), 499);
+		spref.get("command16", defbuffer, command16.c_str(), MAX_DEFBUFFER_SIZE);
 		command16 = defbuffer;
-		spref.get("shftcmd16", defbuffer, shftcmd16.c_str(), 499);
+		spref.get("shftcmd16", defbuffer, shftcmd16.c_str(), MAX_DEFBUFFER_SIZE);
 		shftcmd16 = defbuffer;
 
-		spref.get("label17", defbuffer,  label17.c_str(), 499);
+		spref.get("label17", defbuffer,  label17.c_str(), MAX_DEFBUFFER_SIZE);
 		label17 = defbuffer;
-		spref.get("command17", defbuffer, command17.c_str(), 499);
+		spref.get("command17", defbuffer, command17.c_str(), MAX_DEFBUFFER_SIZE);
 		command17 = defbuffer;
-		spref.get("shftcmd17", defbuffer, shftcmd17.c_str(), 499);
+		spref.get("shftcmd17", defbuffer, shftcmd17.c_str(), MAX_DEFBUFFER_SIZE);
 		shftcmd17 = defbuffer;
 
-		spref.get("label18", defbuffer, label18.c_str(), 499);
+		spref.get("label18", defbuffer, label18.c_str(), MAX_DEFBUFFER_SIZE);
 		label18 = defbuffer;
-		spref.get("command18", defbuffer, command18.c_str(), 499);
+		spref.get("command18", defbuffer, command18.c_str(), MAX_DEFBUFFER_SIZE);
 		command18 = defbuffer;
-		spref.get("shftcmd18", defbuffer, shftcmd18.c_str(), 499);
+		spref.get("shftcmd18", defbuffer, shftcmd18.c_str(), MAX_DEFBUFFER_SIZE);
 		shftcmd18 = defbuffer;
 
-		spref.get("label19", defbuffer, label19.c_str(), 499);
+		spref.get("label19", defbuffer, label19.c_str(), MAX_DEFBUFFER_SIZE);
 		label19 = defbuffer;
-		spref.get("command19", defbuffer, command19.c_str(), 499);
+		spref.get("command19", defbuffer, command19.c_str(), MAX_DEFBUFFER_SIZE);
 		command19 = defbuffer;
-		spref.get("shftcmd19", defbuffer, shftcmd11.c_str(), 499);
+		spref.get("shftcmd19", defbuffer, shftcmd11.c_str(), MAX_DEFBUFFER_SIZE);
 		shftcmd19 = defbuffer;
 
-		spref.get("label20", defbuffer, label20.c_str(), 499);
+		spref.get("label20", defbuffer, label20.c_str(), MAX_DEFBUFFER_SIZE);
 		label20 = defbuffer;
-		spref.get("command20", defbuffer, command20.c_str(), 499);
+		spref.get("command20", defbuffer, command20.c_str(), MAX_DEFBUFFER_SIZE);
 		command20 = defbuffer;
-		spref.get("shftcmd20", defbuffer, shftcmd20.c_str(), 499);
+		spref.get("shftcmd20", defbuffer, shftcmd20.c_str(), MAX_DEFBUFFER_SIZE);
 		shftcmd20 = defbuffer;
 
-		spref.get("label21", defbuffer, label21.c_str(), 499);
+		spref.get("label21", defbuffer, label21.c_str(), MAX_DEFBUFFER_SIZE);
 		label21 = defbuffer;
-		spref.get("command21", defbuffer, command21.c_str(), 499);
+		spref.get("command21", defbuffer, command21.c_str(), MAX_DEFBUFFER_SIZE);
 		command21 = defbuffer;
-		spref.get("shftcmd21", defbuffer, shftcmd21.c_str(), 499);
+		spref.get("shftcmd21", defbuffer, shftcmd21.c_str(), MAX_DEFBUFFER_SIZE);
 		shftcmd21 = defbuffer;
 
-		spref.get("label22", defbuffer, label22.c_str(), 499);
+		spref.get("label22", defbuffer, label22.c_str(), MAX_DEFBUFFER_SIZE);
 		label22 = defbuffer;
-		spref.get("command22", defbuffer, command22.c_str(), 499);
+		spref.get("command22", defbuffer, command22.c_str(), MAX_DEFBUFFER_SIZE);
 		command22 = defbuffer;
-		spref.get("shftcmd22", defbuffer, shftcmd22.c_str(), 499);
+		spref.get("shftcmd22", defbuffer, shftcmd22.c_str(), MAX_DEFBUFFER_SIZE);
 		shftcmd22 = defbuffer;
 
-		spref.get("label23", defbuffer, label23.c_str(), 499);
+		spref.get("label23", defbuffer, label23.c_str(), MAX_DEFBUFFER_SIZE);
 		label23 = defbuffer;
-		spref.get("command23", defbuffer, command23.c_str(), 499);
+		spref.get("command23", defbuffer, command23.c_str(), MAX_DEFBUFFER_SIZE);
 		command23 = defbuffer;
-		spref.get("shftcmd23", defbuffer, shftcmd23.c_str(), 499);
+		spref.get("shftcmd23", defbuffer, shftcmd23.c_str(), MAX_DEFBUFFER_SIZE);
 		shftcmd23 = defbuffer;
 
-		spref.get("label24", defbuffer, label24.c_str(), 499);
+		spref.get("label24", defbuffer, label24.c_str(), MAX_DEFBUFFER_SIZE);
 		label24 = defbuffer;
-		spref.get("command24", defbuffer, command24.c_str(), 499);
+		spref.get("command24", defbuffer, command24.c_str(), MAX_DEFBUFFER_SIZE);
 		command24 = defbuffer;
-		spref.get("shftcmd24", defbuffer, shftcmd24.c_str(), 499);
+		spref.get("shftcmd24", defbuffer, shftcmd24.c_str(), MAX_DEFBUFFER_SIZE);
 		shftcmd24 = defbuffer;
 
-		spref.get("st_label1", defbuffer, label_on_start1.c_str(), 499);
+		spref.get("st_label1", defbuffer, label_on_start1.c_str(), MAX_DEFBUFFER_SIZE);
 		label_on_start1 = defbuffer;
-		spref.get("st_cmd1", defbuffer, cmd_on_start1.c_str(), 499);
+		spref.get("st_cmd1", defbuffer, cmd_on_start1.c_str(), MAX_DEFBUFFER_SIZE);
 		cmd_on_start1 = defbuffer;
 
-		spref.get("st_label2", defbuffer, label_on_start2.c_str(), 499);
+		spref.get("st_label2", defbuffer, label_on_start2.c_str(), MAX_DEFBUFFER_SIZE);
 		label_on_start2 = defbuffer;
-		spref.get("st_cmd2", defbuffer, cmd_on_start2.c_str(), 499);
+		spref.get("st_cmd2", defbuffer, cmd_on_start2.c_str(), MAX_DEFBUFFER_SIZE);
 		cmd_on_start2 = defbuffer;
 
-		spref.get("st_label3", defbuffer, label_on_start3.c_str(), 499);
+		spref.get("st_label3", defbuffer, label_on_start3.c_str(), MAX_DEFBUFFER_SIZE);
 		label_on_start3 = defbuffer;
-		spref.get("st_cmd3", defbuffer, cmd_on_start3.c_str(), 499);
+		spref.get("st_cmd3", defbuffer, cmd_on_start3.c_str(), MAX_DEFBUFFER_SIZE);
 		cmd_on_start3 = defbuffer;
 
-		spref.get("st_label4", defbuffer, label_on_start4.c_str(), 499);
+		spref.get("st_label4", defbuffer, label_on_start4.c_str(), MAX_DEFBUFFER_SIZE);
 		label_on_start4 = defbuffer;
-		spref.get("st_cmd4", defbuffer, cmd_on_start4.c_str(), 499);
+		spref.get("st_cmd4", defbuffer, cmd_on_start4.c_str(), MAX_DEFBUFFER_SIZE);
 		cmd_on_start4 = defbuffer;
 
-		spref.get("ex_label1", defbuffer, label_on_exit1.c_str(), 499);
+		spref.get("ex_label1", defbuffer, label_on_exit1.c_str(), MAX_DEFBUFFER_SIZE);
 		label_on_exit1 = defbuffer;
-		spref.get("ex_cmd1", defbuffer, cmd_on_exit1.c_str(), 499);
+		spref.get("ex_cmd1", defbuffer, cmd_on_exit1.c_str(), MAX_DEFBUFFER_SIZE);
 		cmd_on_exit1 = defbuffer;
 
-		spref.get("ex_label2", defbuffer, label_on_exit2.c_str(), 499);
+		spref.get("ex_label2", defbuffer, label_on_exit2.c_str(), MAX_DEFBUFFER_SIZE);
 		label_on_exit2 = defbuffer;
-		spref.get("ex_cmd2", defbuffer, cmd_on_exit2.c_str(), 499);
+		spref.get("ex_cmd2", defbuffer, cmd_on_exit2.c_str(), MAX_DEFBUFFER_SIZE);
 		cmd_on_exit2 = defbuffer;
 
-		spref.get("ex_label3", defbuffer, label_on_exit3.c_str(), 499);
+		spref.get("ex_label3", defbuffer, label_on_exit3.c_str(), MAX_DEFBUFFER_SIZE);
 		label_on_exit3 = defbuffer;
-		spref.get("ex_cmd3", defbuffer, cmd_on_exit3.c_str(), 499);
+		spref.get("ex_cmd3", defbuffer, cmd_on_exit3.c_str(), MAX_DEFBUFFER_SIZE);
 		cmd_on_exit3 = defbuffer;
 
-		spref.get("ex_label4", defbuffer, label_on_exit4.c_str(), 499);
+		spref.get("ex_label4", defbuffer, label_on_exit4.c_str(), MAX_DEFBUFFER_SIZE);
 		label_on_exit4 = defbuffer;
-		spref.get("ex_cmd4", defbuffer, cmd_on_exit4.c_str(), 499);
+		spref.get("ex_cmd4", defbuffer, cmd_on_exit4.c_str(), MAX_DEFBUFFER_SIZE);
 		cmd_on_exit4 = defbuffer;
 
 		spref.get("fg_red", fg_red, fg_red);
@@ -1814,26 +1831,26 @@ bool status::loadXcvrState(std::string xcvr)
 		i = 0;
 		if (spref.get("tooltips", i, i)) tooltips = i;
 
-		spref.get("ui_scheme", defbuffer, "gtk+", 499);
+		spref.get("ui_scheme", defbuffer, "gtk+", MAX_DEFBUFFER_SIZE);
 		ui_scheme = defbuffer;
 
-//		spref.get("server_port", defbuffer, "7362", 499);
+//		spref.get("server_port", defbuffer, "7362", MAX_DEFBUFFER_SIZE);
 //		server_port = defbuffer;
-//		spref.get("server_addr", defbuffer, "127.0.0.1", 499);
+//		spref.get("server_addr", defbuffer, "127.0.0.1", MAX_DEFBUFFER_SIZE);
 //		server_addr = defbuffer;
 
-		spref.get("tcpip_port", defbuffer, "4001", 499);
+		spref.get("tcpip_port", defbuffer, "4001", MAX_DEFBUFFER_SIZE);
 		tcpip_port = defbuffer;
-		spref.get("tcpip_addr", defbuffer, "127.0.0.1", 499);
+		spref.get("tcpip_addr", defbuffer, "127.0.0.1", MAX_DEFBUFFER_SIZE);
 		tcpip_addr = defbuffer;
 		spref.get("tcpip_ping_delay", tcpip_ping_delay, tcpip_ping_delay);
 		spref.get("tcpip_tcpip_reconnect_after", tcpip_reconnect_after, tcpip_reconnect_after);
 		spref.get("tcpip_drops_allowed", tcpip_drops_allowed, tcpip_drops_allowed);
 		if (spref.get("use_tcpip", i, i)) use_tcpip = i;
 
-		spref.get("tci_port", defbuffer, "40001", 499);
+		spref.get("tci_port", defbuffer, "40001", MAX_DEFBUFFER_SIZE);
 		tci_port = defbuffer;
-		spref.get("tci_addr", defbuffer, "127.0.0.1", 499);
+		spref.get("tci_addr", defbuffer, "127.0.0.1", MAX_DEFBUFFER_SIZE);
 		tci_addr = defbuffer;
 		spref.get("tci_center", tci_center, tci_center);
 
@@ -1854,14 +1871,14 @@ bool status::loadXcvrState(std::string xcvr)
 		if (spref.get("tcitrace", i, tcitrace)) tcitrace = i;
 
 #ifndef NDEBUG
-		trace =
-		rigtrace =
-		settrace =
-		debugtrace =
-		xmltrace =
-		rpctrace =
-		serialtrace =
-		gettrace = 
+		trace = true;
+		rigtrace = true;
+		settrace = true;
+		debugtrace = true;
+		xmltrace = true;
+		rpctrace = true;
+		serialtrace = true;
+		gettrace = true;
 		tcitrace = true;
 #endif
 
@@ -1944,35 +1961,35 @@ bool status::loadXcvrState(std::string xcvr)
 		spref.get("cwioPTT", cwioPTT, cwioPTT);
 		spref.get("cwioCONNECTED", cwioCONNECTED, cwioCONNECTED);
 		spref.get("cwioINVERTED", cwioINVERTED, cwioINVERTED);
-		spref.get("cwioPORT", defbuffer, "NONE", 499);
+		spref.get("cwioPORT", defbuffer, "NONE", MAX_DEFBUFFER_SIZE);
 		cwioPORT = defbuffer;
 		char getbuff[20];
 		for (int n = 0; n < 12; n++) {
 			snprintf(getbuff, sizeof(getbuff), "cwiolabel[%d]", n);
-			spref.get(getbuff, defbuffer, "", 499);
+			spref.get(getbuff, defbuffer, "", MAX_DEFBUFFER_SIZE);
 			cwio_labels[n] = defbuffer;
 			snprintf(getbuff, sizeof(getbuff), "cwiomessage[%d]", n);
-			spref.get(getbuff, defbuffer, "", 499);
+			spref.get(getbuff, defbuffer, "", MAX_DEFBUFFER_SIZE);
 			cwio_msgs[n] = defbuffer;
 		}
 
-		spref.get("BT", defbuffer, BT.c_str(), 499);
+		spref.get("BT", defbuffer, BT.c_str(), MAX_DEFBUFFER_SIZE);
 		BT = defbuffer;
-		spref.get("AA", defbuffer, AA.c_str(), 499);
+		spref.get("AA", defbuffer, AA.c_str(), MAX_DEFBUFFER_SIZE);
 		AA = defbuffer;
-		spref.get("AS", defbuffer, AS.c_str(), 499);
+		spref.get("AS", defbuffer, AS.c_str(), MAX_DEFBUFFER_SIZE);
 		AS = defbuffer;
-		spref.get("AR", defbuffer, AR.c_str(), 499);
+		spref.get("AR", defbuffer, AR.c_str(), MAX_DEFBUFFER_SIZE);
 		AR = defbuffer;
-		spref.get("KN", defbuffer, KN.c_str(), 499);
+		spref.get("KN", defbuffer, KN.c_str(), MAX_DEFBUFFER_SIZE);
 		KN = defbuffer;
-		spref.get("SK", defbuffer, SK.c_str(), 499);
+		spref.get("SK", defbuffer, SK.c_str(), MAX_DEFBUFFER_SIZE);
 		SK = defbuffer;
-		spref.get("INT", defbuffer, INT.c_str(), 499);
+		spref.get("INT", defbuffer, INT.c_str(), MAX_DEFBUFFER_SIZE);
 		INT = defbuffer;
-		spref.get("HM", defbuffer, HM.c_str(), 499);
+		spref.get("HM", defbuffer, HM.c_str(), MAX_DEFBUFFER_SIZE);
 		HM = defbuffer;
-		spref.get("VE", defbuffer, VE.c_str(), 499);
+		spref.get("VE", defbuffer, VE.c_str(), MAX_DEFBUFFER_SIZE);
 		VE = defbuffer;
 
 		spref.get("FSK_KEYLINE", FSK_KEYLINE, FSK_KEYLINE);
@@ -1982,11 +1999,11 @@ bool status::loadXcvrState(std::string xcvr)
 		spref.get("FSK_INVERTED", FSK_INVERTED, FSK_INVERTED);
 		spref.get("FSK_STOPBITS", FSK_STOPBITS, FSK_STOPBITS);
 		spref.get("FSK_IDLES", fsk_idles, fsk_idles);
-		spref.get("FSK_PORT", defbuffer, "NONE", 499);
+		spref.get("FSK_PORT", defbuffer, "NONE", MAX_DEFBUFFER_SIZE);
 		FSK_PORT = defbuffer;
 
 // CW logbook parameters
-		spref.get("CW_LOG_NAME", defbuffer, "", 499);
+		spref.get("CW_LOG_NAME", defbuffer, "", MAX_DEFBUFFER_SIZE);
 			cw_log_name = defbuffer;
 		spref.get("CW_CUT_NUMBERS", cw_log_cut_numbers, cw_log_cut_numbers);
 		spref.get("CW_LEADING_ZEROS", cw_log_leading_zeros, cw_log_leading_zeros);
@@ -1994,7 +2011,7 @@ bool status::loadXcvrState(std::string xcvr)
 		spref.get("CW_LOG_NBR", cw_log_nbr, cw_log_nbr);
 
 // FSK logbook parameters
-		spref.get("FSK_LOG_NAME", defbuffer, "", 499);
+		spref.get("FSK_LOG_NAME", defbuffer, "", MAX_DEFBUFFER_SIZE);
 			fsk_log_name = defbuffer;
 		spref.get("FSK_CUT_NUMBERS",fsk_log_cut_numbers, fsk_log_cut_numbers);
 		spref.get("FSK_LEADING_ZEROS", fsk_log_leading_zeros, fsk_log_leading_zeros);
@@ -2003,10 +2020,10 @@ bool status::loadXcvrState(std::string xcvr)
 
 		for (int n = 0; n < 12; n++) {
 			snprintf(getbuff, sizeof(getbuff), "fskiolabel[%d]", n);
-			spref.get(getbuff, defbuffer, "", 499);
+			spref.get(getbuff, defbuffer, "", MAX_DEFBUFFER_SIZE);
 			FSK_labels[n] = defbuffer;
 			snprintf(getbuff, sizeof(getbuff), "fskiomessage[%d]", n);
-			spref.get(getbuff, defbuffer, "", 499);
+			spref.get(getbuff, defbuffer, "", MAX_DEFBUFFER_SIZE);
 			FSK_msgs[n] = defbuffer;
 		}
 
@@ -2019,13 +2036,13 @@ void status::loadLastState()
 {
 	Fl_Preferences xcvrpref(RigHomeDir.c_str(), "w1hkj.com", PACKAGE_TARNAME);
 	if (xcvrpref.entryExists("xcvr_name")) {
-		char defbuffer[200];
-		xcvrpref.get("xcvr_name", defbuffer, "NONE", 499);
+		char defbuffer[MAX_DEFBUFFER_SIZE];
+		xcvrpref.get("xcvr_name", defbuffer, "NONE", MAX_DEFBUFFER_SIZE);
 		xcvr_name = defbuffer;
 // for backward compatability
 	} else if (xcvrpref.entryExists("last_xcvr_used")) {
-		char defbuffer[200];
-		xcvrpref.get("last_xcvr_used", defbuffer, "NONE", 499);
+		char defbuffer[MAX_DEFBUFFER_SIZE];
+		xcvrpref.get("last_xcvr_used", defbuffer, "NONE", MAX_DEFBUFFER_SIZE);
 		xcvr_name = defbuffer;
 	}
 //	xcvrpref.get("xml_port", xmlport, xmlport);
@@ -2042,9 +2059,9 @@ void status::UI_laststate()
 	Fl::background2( bg2_sys_red, bg2_sys_green, bg2_sys_blue);
 	Fl::foreground( fg_sys_red, fg_sys_green, fg_sys_blue);
 
-	FreqDispA->SetONOFFCOLOR( fgclr, bgclr );
+	FreqDispA->SetCOLORS( fgclr, bgclr );
 	FreqDispA->font(fontnbr);
-	FreqDispB->SetONOFFCOLOR( fgclr, fl_color_average(bgclr, FL_BLACK, 0.87));
+	FreqDispB->SetCOLORS( fgclr, fl_color_average(bgclr, FL_BLACK, 0.87));
 	FreqDispB->font(fontnbr);
 
 	scaleSmeter->color(bgclr);
@@ -2231,21 +2248,21 @@ std::string status::info()
 
 	info << "status::info()\n============== Prefs File Contents =============\n\n";
 	info << "xcvr_serial_port   : " << xcvr_serial_port << "\n";
-	info << "comm_baudrate      : " << comm_baudrate << "\n";
-	info << "comm_stopbits      : " << stopbits << "\n";
-	info << "comm_retries       : " << comm_retries << "\n";
-	info << "comm_wait          : " << comm_wait << "\n";
-	info << "comm_timeout       : " << comm_timeout << "\n";
-	info << "serloop_timing     : " << serloop_timing << "\n";
-	info << "byte_interval      : " << byte_interval << "\n";
+	info << "baudrate           : " << serial_baudrate << "\n";
+	info << "stopbits           : " << stopbits << "\n";
+	info << "retries            : " << serial_retries << "\n";
+	info << "write_delay        : " << serial_write_delay << "\n";
+	info << "post_write_delay   : " << serial_post_write_delay << "\n";
+	info << "timeout            : " << serial_timeout << "\n";
+	info << "query interval:    : " << serloop_timing << "\n";
 	info << "\n";
-	info << "comm_echo          : " << comm_echo << "\n";
-	info << "ptt_via_cat        : " << comm_catptt << "\n";
-	info << "ptt_via_rts        : " << comm_rtsptt << "\n";
-	info << "ptt_via_dtr        : " << comm_dtrptt << "\n";
-	info << "rts_cts_flow       : " << comm_rtscts << "\n";
-	info << "rts_plus           : " << comm_rtsplus << "\n";
-	info << "dtr_plus           : " << comm_dtrplus << "\n";
+	info << "serial_echo          : " << serial_echo << "\n";
+	info << "ptt_via_cat        : " << serial_catptt << "\n";
+	info << "ptt_via_rts        : " << serial_rtsptt << "\n";
+	info << "ptt_via_dtr        : " << serial_dtrptt << "\n";
+	info << "rts_cts_flow       : " << serial_rtscts << "\n";
+	info << "rts_plus           : " << serial_rtsplus << "\n";
+	info << "dtr_plus           : " << serial_dtrplus << "\n";
 	info << "civadr             : " << CIV << "\n";
 	info << "usbaudio           : " << USBaudio << "\n";
 	info << "\n";

@@ -596,16 +596,7 @@ static void cb_btnA(Fl_Light_Button*, void*) {
 	} else {
 		if (selrig->inuse == onB) {
 			cb_selectA();
-		} else {
-			if (FreqDispA->is_reversed_colors()) {
-				FreqDispA->restore_colors();
-				Fl::focus(btnA);
-			} else {
-				FreqDispA->reverse_colors();
-				Fl::focus(FreqDispA);
-			}
 		}
-
 		btnA->value(1);
 		btnB->value(0);
 		if (progStatus.UIsize == touch_ui) {
@@ -636,14 +627,6 @@ static void cb_btnB(Fl_Light_Button*, void*) {
 	} else {
 		if (selrig->inuse == onA) {
 			cb_selectB();
-		} else { 
-			if (FreqDispB->is_reversed_colors()) {
-				FreqDispB->restore_colors();
-				Fl::focus(btnB);
-			} else {
-				FreqDispB->reverse_colors();
-				Fl::focus(FreqDispB);
-			}
 		}
 		btnB->value(1);
 		btnA->value(0);

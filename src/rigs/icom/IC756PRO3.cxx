@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "icom/IC756PRO3.h"
@@ -118,13 +118,16 @@ RIG_IC756PRO3::RIG_IC756PRO3() {
 	bandwidths_ = IC756PRO3_SSBwidths;
 	bw_vals_ = IC756PRO3_bw_vals_SSB;
 
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
 	_mode_type = IC756PRO3_mode_type;
 	atten_level = 3; // will force initializing to 0 dB
 	preamp_level = 2; // will force initializaing to 0 dB
 
 	widgets = IC756PRO3_widgets;
 
-	def_freq = freqA = freqB = A.freq = 14070000;
+	def_freq = freqA = freqB = A.freq = 14070000ULL;
 	def_mode = modeA = modeB = B.imode = 1;
 	def_bw = bwA = bwB = A.iBW = B.iBW = 32;
 
@@ -220,7 +223,7 @@ bool RIG_IC756PRO3::check ()
 	return ok;
 }
 
-unsigned long int RIG_IC756PRO3::get_vfoA ()
+unsigned long long RIG_IC756PRO3::get_vfoA ()
 {
 	if (inuse == onB) return A.freq;
 	std::string cstr = "\x03";
@@ -241,7 +244,7 @@ unsigned long int RIG_IC756PRO3::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_IC756PRO3::set_vfoA (unsigned long int freq)
+void RIG_IC756PRO3::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	cmd = pre_to;
@@ -251,7 +254,7 @@ void RIG_IC756PRO3::set_vfoA (unsigned long int freq)
 	waitFB("set vfo A");
 }
 
-unsigned long int RIG_IC756PRO3::get_vfoB ()
+unsigned long long RIG_IC756PRO3::get_vfoB ()
 {
 	if (inuse == onA) return B.freq;
 	std::string cstr = "\x03";
@@ -272,7 +275,7 @@ unsigned long int RIG_IC756PRO3::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_IC756PRO3::set_vfoB (unsigned long int freq)
+void RIG_IC756PRO3::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
 	cmd = pre_to;
@@ -1242,7 +1245,7 @@ void RIG_IC756PRO3::get_band_selection(int v)
 		set_trace(2, "get band stack", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(pre_fm);
 		if (p != std::string::npos) {
-			unsigned long int bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
+			unsigned long long bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
 			int bandmode = replystr[p+13];
 			int bandfilter = replystr[p+14];
 			int banddata = replystr[p+15] & 0x10;
@@ -1272,7 +1275,7 @@ void RIG_IC756PRO3::get_band_selection(int v)
 
 void RIG_IC756PRO3::set_band_selection(int v)
 {
-	unsigned long int freq = (inuse == onB ? B.freq : A.freq);
+	unsigned long long freq = (inuse == onB ? B.freq : A.freq);
 	int fil = (inuse == onB ? filB : filA);
 	int mode = (inuse == onB ? B.imode : A.imode);
 

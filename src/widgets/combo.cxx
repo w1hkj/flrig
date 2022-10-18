@@ -185,19 +185,21 @@ void Fl_PopBrowser::popshow (int x, int y)
 	if (i >= 0 && i < parentCB->listsize) {
 		for (i = 0; i < parentCB->listsize; i++) {
 			if (parentCB->type_ == COMBOBOX) {
-				if ((parentCB->listtype & FL_COMBO_UNIQUE_NOCASE) == FL_COMBO_UNIQUE_NOCASE)
+				if ((parentCB->listtype & FL_COMBO_UNIQUE_NOCASE) == FL_COMBO_UNIQUE_NOCASE) {
 					if (!strcasecmp(parentCB->val->value(), parentCB->datalist[i]->s))
 						break;
-				else // case sensitive test
+				} else { // case sensitive test
 					if (!strcmp(parentCB->val->value(), parentCB->datalist[i]->s))
 						break;
+					}
 			} else { // LISTBOX case
-				if ((parentCB->listtype & FL_COMBO_UNIQUE_NOCASE) == FL_COMBO_UNIQUE_NOCASE)
+				if ((parentCB->listtype & FL_COMBO_UNIQUE_NOCASE) == FL_COMBO_UNIQUE_NOCASE) {
 					if (!strcasecmp(parentCB->valbox->label(), parentCB->datalist[i]->s))
 						break;
-				else // case sensitive test
+				} else { // case sensitive test
 					if (!strcmp(parentCB->valbox->label(), parentCB->datalist[i]->s))
 						break;
+				}
 			}
 		}
 		if (i == parentCB->listsize)
@@ -329,6 +331,8 @@ Fl_ComboBox::Fl_ComboBox (int X,int Y,int W,int H, const char *lbl, int wtype)
 
 	idx = 0;
 
+	sort_type = ALPHA_SORT;
+
 	end();
 
 	numrows_ = 8;
@@ -435,7 +439,7 @@ void Fl_ComboBox::value( std::string s )
 				break;
 		}
 	}
-	if ( i < listsize) {
+	if (i < listsize) {
 		idx = i;
 		if (type_ == LISTBOX) {
 			valbox->label(datalist[idx]->s);
@@ -522,27 +526,31 @@ void Fl_ComboBox::add( const char *s, void * d)
 	size_t p = str.find("|");
 	bool found = false;
 	bool last_one = false;
+
+// test for composite list
 	if (p != std::string::npos) {
 		while (true) {
 			sinsert = str.substr(0, p);
 			found = false;
 			// test for in list
-			for (int i = 0; i < listsize; i++) {
-				if ((listtype & FL_COMBO_UNIQUE_NOCASE) == FL_COMBO_UNIQUE_NOCASE) {
-					if (strcasecmp (sinsert.c_str(), datalist[i]->s) == 0) {
-						found = true;
-						break;
-					}
-				} else // case sensitive test
-					if (strcmp (sinsert.c_str(), datalist[i]->s) == 0) {
-						found = true;
-						break;
-					}
+			if ((listtype == FL_COMBO_UNIQUE_NOCASE) || (listtype == FL_COMBO_UNIQUE)) { 
+				for (int i = 0; i < listsize; i++) {
+					if ((listtype & FL_COMBO_UNIQUE_NOCASE) == FL_COMBO_UNIQUE_NOCASE) {
+						if (strcasecmp (sinsert.c_str(), datalist[i]->s) == 0) {
+							found = true;
+							break;
+						}
+					} else // case sensitive test
+						if (strcmp (sinsert.c_str(), datalist[i]->s) == 0) {
+							found = true;
+							break;
+						}
+				}
 			}
 			// not in list, so add this entry
 			if (!found) insert(sinsert.c_str(), 0);
 
-			// if not the last item, erase entry in original string
+				// if not the last item, erase entry in original string
 			if (last_one) break;
 			str.erase(0, p+1);
 
@@ -556,17 +564,21 @@ void Fl_ComboBox::add( const char *s, void * d)
 	} else {
 		// Single entry case
 		// Still need to test a single entry to avoid duplication in the list
-		for (int i = 0; i < listsize; i++) {
-			if ((listtype & FL_COMBO_UNIQUE_NOCASE) == FL_COMBO_UNIQUE_NOCASE) {
-				if (strcasecmp (str.c_str(), datalist[i]->s) == 0) {
-					found = true;
-					break;
+		if ((listtype == FL_COMBO_UNIQUE_NOCASE) || (listtype == FL_COMBO_UNIQUE)) {
+			for (int i = 0; i < listsize; i++) {
+				if ((listtype & FL_COMBO_UNIQUE_NOCASE) == FL_COMBO_UNIQUE_NOCASE) {
+					if (strcasecmp (str.c_str(), datalist[i]->s) == 0) {
+						found = true;
+						break;
+					}
+				} else if ((listtype & FL_COMBO_UNIQUE) == FL_COMBO_UNIQUE) {
+				// case sensitive test
+					if (strcmp (str.c_str(), datalist[i]->s) == 0) {
+						found = true;
+						break;
+					}
 				}
-			} else // case sensitive test
-				if (strcmp (str.c_str(), datalist[i]->s) == 0) {
-					found = true;
-					break;
-				}
+			}
 		}
 		// Single entry - not in list, so add this entry
 		if (!found) insert(str.c_str(), 0);
@@ -585,17 +597,52 @@ void Fl_ComboBox::clear()
 	listsize = 0;
 }
 
-int DataCompare( const void *x1, const void *x2 )
+int SerialCompare( const void *x1, const void *x2 )
 {
-	int cmp;
 	datambr *X1, *X2;
 	X1 = *(datambr **)(x1);
 	X2 = *(datambr **)(x2);
-	cmp = strcasecmp (X1->s, X2->s);
-	if (cmp < 0)
-		return -1;
-	if (cmp > 0)
-		return 1;
+	std::string str1 = X1->s, str2 = X2->s;
+	if (str1.length() < str2.length()) return -1;
+	if (str1.length() > str2.length()) return 1;
+	if (str1 == str2) return 0;
+	if (str1 < str2) return -1;
+	return 1;
+}
+
+int AlphaCompare( const void *x1, const void *x2 )
+{
+	datambr *X1, *X2;
+	X1 = *(datambr **)(x1);
+	X2 = *(datambr **)(x2);
+	std::string str1 = X1->s;
+	std::string str2 = X2->s;
+	int len = str1.length();
+	if (len > str2.length()) len = str2.length();
+	for (size_t p = 0; p < len; p++) {
+		if (str1[p] < str2[p]) return -1;
+		if (str1[p] > str2[p]) return 1;
+	}
+	if (str1.length() < str2.length()) return -1;
+	if (str1.length() > str2.length()) return 1; 
+	return 0;
+}
+
+int UcaseCompare( const void *x1, const void *x2 )
+{
+	datambr *X1, *X2;
+	X1 = *(datambr **)(x1);
+	X2 = *(datambr **)(x2);
+	std::string str1 = X1->s;
+	std::string str2 = X2->s;
+	int len = str1.length();
+	if (len > str2.length()) len = str2.length();
+	for (size_t p = 0; p < len; p++) {
+		if (toupper(str1[p]) < toupper(str2[p])) return -1;
+		if (toupper(str1[p]) > toupper(str2[p])) return 1;
+	}
+	if (str1.length() < str2.length()) return -1;
+	if (str1.length() > str2.length()) return 1; 
 	return 0;
 }
 
@@ -604,7 +651,7 @@ void Fl_ComboBox::sort() {
 	qsort (&datalist[0],
 		 listsize,
 		 sizeof (datambr *),
-		 DataCompare);
+		 (sort_type == SERIAL_SORT ? SerialCompare : AlphaCompare));
 	for (int i = 0; i < listsize; i++)
 		Brwsr->add (datalist[i]->s, datalist[i]->d);
 }

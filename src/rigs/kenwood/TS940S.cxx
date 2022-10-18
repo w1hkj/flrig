@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "kenwood/TS940S.h"
@@ -31,17 +31,20 @@ RIG_TS940S::RIG_TS940S() {
 	name_ = TS940Sname_;
 	modes_ = TS940Smodes_;
 	bandwidths_ = NULL;
-	comm_baudrate = BR4800;
+	serial_baudrate = BR4800;
 	stopbits = 2;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts = false;
-	comm_rtsplus = false;
-	comm_dtrplus = false;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
+	serial_timeout = 50;
+	serial_rtscts = false;
+	serial_rtsplus = false;
+	serial_dtrplus = false;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 	modeA = 1;
 	bwA = 2;
 
@@ -134,7 +137,7 @@ int RIG_TS940S::getvfoAorB()
 }
 
 
-unsigned long int RIG_TS940S::get_vfoA ()
+unsigned long long RIG_TS940S::get_vfoA ()
 {
 	cmd = "FA;";
 	if (wait_char(';', 14, 100, "get vfo A", ASC) < 14) return A.freq;
@@ -143,7 +146,7 @@ unsigned long int RIG_TS940S::get_vfoA ()
 
 	size_t p = replystr.rfind("FA");
 	if (p != std::string::npos && (p + 12 < replystr.length())) {
-		int f = 0;
+		unsigned long long f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replystr[p+n] - '0';
 		A.freq = f;
@@ -151,7 +154,7 @@ unsigned long int RIG_TS940S::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_TS940S::set_vfoA (unsigned long int freq)
+void RIG_TS940S::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	cmd = "FA00000000000;";
@@ -164,7 +167,7 @@ void RIG_TS940S::set_vfoA (unsigned long int freq)
 	set_trace(2, "set_vfoA()", replystr.c_str());
 }
 
-unsigned long int RIG_TS940S::get_vfoB ()
+unsigned long long RIG_TS940S::get_vfoB ()
 {
 	cmd = "FB;";
 	if (wait_char(';', 14, 100, "get vfo B", ASC) < 14) return B.freq;
@@ -173,7 +176,7 @@ unsigned long int RIG_TS940S::get_vfoB ()
 
 	size_t p = replystr.rfind("FB");
 	if (p != std::string::npos && (p + 12 < replystr.length())) {
-		int f = 0;
+		unsigned long long f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replystr[p+n] - '0';
 		B.freq = f;
@@ -181,7 +184,7 @@ unsigned long int RIG_TS940S::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_TS940S::set_vfoB (unsigned long int freq)
+void RIG_TS940S::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
 	cmd = "FB00000000000;";

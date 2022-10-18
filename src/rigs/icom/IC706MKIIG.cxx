@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "icom/IC706MKIIG.h"
@@ -49,19 +49,20 @@ RIG_IC706MKIIG::RIG_IC706MKIIG() {
 	bandwidths_ = IC706MKIIG_ssb_cw_rtty_bws;
 	bw_vals_ = IC706MKIIG_vals_ssb_cw_rtty_bws;
 	_mode_type = IC706MKIIG_mode_type;
-	comm_baudrate = BR19200;
+	serial_baudrate = BR19200;
 	stopbits = 1;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_echo = true;
-	comm_rtscts = false;
-	comm_rtsplus = true;
-	comm_dtrplus = true;
-	comm_catptt = false;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
-	def_freq = freqA = freqB = A.freq = B.imode = 14070000;
+	serial_retries = 2;
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+	serial_timeout = 50;
+	serial_echo = true;
+	serial_rtscts = false;
+	serial_rtsplus = true;
+	serial_dtrplus = true;
+	serial_catptt = false;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
+	def_freq = freqA = freqB = A.freq = B.imode = 14070000ULL;
 	def_mode = modeA = modeB = A.imode = B.imode = 1;
 	def_bw = bwA = bwB = A.iBW = B.iBW = 0;
 	filter_nbr = 0;
@@ -130,7 +131,7 @@ bool RIG_IC706MKIIG::check ()
 	return ok;
 }
 
-unsigned long int RIG_IC706MKIIG::get_vfoA ()
+unsigned long long RIG_IC706MKIIG::get_vfoA ()
 {
 	if (inuse == onB) return A.freq;
 	cmd = pre_to;
@@ -150,7 +151,7 @@ unsigned long int RIG_IC706MKIIG::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_IC706MKIIG::set_vfoA (unsigned long int freq)
+void RIG_IC706MKIIG::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	cmd = pre_to;
@@ -160,7 +161,7 @@ void RIG_IC706MKIIG::set_vfoA (unsigned long int freq)
 	waitFB("set vfo A");
 }
 
-unsigned long int RIG_IC706MKIIG::get_vfoB ()
+unsigned long long RIG_IC706MKIIG::get_vfoB ()
 {
 	if (inuse == onA) return B.freq;
 	cmd = pre_to;
@@ -180,7 +181,7 @@ unsigned long int RIG_IC706MKIIG::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_IC706MKIIG::set_vfoB (unsigned long int freq)
+void RIG_IC706MKIIG::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
 	cmd = pre_to;

@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "yaesu/FT890.h"
@@ -40,19 +40,22 @@ RIG_FT890::RIG_FT890() {
 	bandwidths_ = FT890widths_;
 	bw_vals_ = FT890_bw_val;
 
-	comm_baudrate = BR4800;
+	serial_baudrate = BR4800;
 	stopbits = 2;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts = false;
-	comm_rtsplus = false;
-	comm_dtrplus = true;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+	
+	serial_write_delay = 50;
+	serial_post_write_delay = 5;
 
-	afreq = bfreq = A.freq = B.freq = 14070000;
+	serial_timeout = 50;
+	serial_rtscts = false;
+	serial_rtsplus = false;
+	serial_dtrplus = true;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
+
+	afreq = bfreq = A.freq = B.freq = 14070000ULL;
 	amode = bmode = A.imode = B.imode = 1;
 	aBW = bBW = A.iBW = B.iBW = 0;
 	precision = 10;
@@ -200,12 +203,12 @@ bool RIG_FT890::get_info()
 	return false;
 }
 
-unsigned long int RIG_FT890::get_vfoA ()
+unsigned long long RIG_FT890::get_vfoA ()
 {
 	return A.freq;
 }
 
-void RIG_FT890::set_vfoA (unsigned long int freq)
+void RIG_FT890::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	freq /=10; // 890 does not support 1 Hz resolution
@@ -230,12 +233,12 @@ void RIG_FT890::set_modeA(int val)
 	showresp(WARN, HEX, "set mode A", cmd, replystr);
 }
 
-unsigned long int RIG_FT890::get_vfoB()
+unsigned long long RIG_FT890::get_vfoB()
 {
 	return B.freq;
 }
 
-void RIG_FT890::set_vfoB(unsigned long int freq)
+void RIG_FT890::set_vfoB(unsigned long long freq)
 {
 	B.freq = freq;
 	freq /=10; // 890 does not support 1 Hz resolution

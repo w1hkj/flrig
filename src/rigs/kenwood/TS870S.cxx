@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 //
 // Changes for the TS-870S March 2012, Dave Baxter, G0WBX
@@ -165,22 +165,25 @@ RIG_TS870S::RIG_TS870S() {
 
 	widgets = rig_widgets;
 
-	comm_baudrate = BR57600;
+	serial_baudrate = BR57600;
 	stopbits = 1;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts = true;
-	comm_rtsplus = false;
-	comm_dtrplus = false;
-	comm_catptt = true;
-	comm_rtsptt = false;    // ditto (used for hardware handshake)
-	comm_dtrptt = false;    // ditto
+	serial_retries = 2;
+
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
+	serial_timeout = 50;
+	serial_rtscts = true;
+	serial_rtsplus = false;
+	serial_dtrplus = false;
+	serial_catptt = true;
+	serial_rtsptt = false;    // ditto (used for hardware handshake)
+	serial_dtrptt = false;    // ditto
 
 //	Defaults.
 	B.imode = A.imode = USB;
 	B.iBW = A.iBW = DEF_SL_SH;
-	B.freq = A.freq = 14070000;
+	B.freq = A.freq = 14070000ULL;
 	can_change_alt_vfo = true;
 
 	nb_level = 2;
@@ -354,7 +357,7 @@ bool RIG_TS870S::check ()
 	return true;
 }
 
-unsigned long int RIG_TS870S::get_vfoA ()
+unsigned long long RIG_TS870S::get_vfoA ()
 {
 	cmd = "FA;";
 	if (wait_char(';', 14, 100, "get vfoA", ASC) < 14) return A.freq;
@@ -362,8 +365,8 @@ unsigned long int RIG_TS870S::get_vfoA ()
 	size_t p = replystr.rfind("FA");
 	if (p == std::string::npos) return A.freq;
 
-	unsigned long int f = 0L;
-	unsigned long int mul = 1L;
+	unsigned long long f = 0ULL;
+	unsigned long long mul = 1ULL;
 	for (size_t n = 12; n > 1; n--) {
 		f += (replystr[p + n] - '0') * mul;
 		mul *= 10;
@@ -373,7 +376,7 @@ unsigned long int RIG_TS870S::get_vfoA ()
 }
 
 //----------------------------------------------------------------------
-void RIG_TS870S::set_vfoA (unsigned long int freq)
+void RIG_TS870S::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	cmd = "FA00000000000;";
@@ -386,7 +389,7 @@ void RIG_TS870S::set_vfoA (unsigned long int freq)
 }
 
 //----------------------------------------------------------------------
-unsigned long int RIG_TS870S::get_vfoB ()
+unsigned long long RIG_TS870S::get_vfoB ()
 {
 	cmd = "FB;";
 	if (wait_char(';', 14, 100, "get vfoB", ASC) < 14) return B.freq;
@@ -394,8 +397,8 @@ unsigned long int RIG_TS870S::get_vfoB ()
 	size_t p = replystr.rfind("FB");
 	if (p == std::string::npos) return B.freq;
 
-	unsigned long int f = 0L;
-	unsigned long int mul = 1L;
+	unsigned long long f = 0ULL;
+	unsigned long long mul = 1ULL;
 	for (size_t n = 12; n > 1; n--) {
 		f += (replystr[p + n] - '0') * mul;
 		mul *= 10;
@@ -406,7 +409,7 @@ unsigned long int RIG_TS870S::get_vfoB ()
 }
 
 //----------------------------------------------------------------------
-void RIG_TS870S::set_vfoB (unsigned long int freq)
+void RIG_TS870S::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
 	cmd = "FB00000000000;";
@@ -1021,7 +1024,7 @@ int RIG_TS870S::get_bwA() {
 		// High byte is hi cut index (not MSB though.) Low byte is lo cuttoff index.
 
 		cmd = "FW;"; // Read Low cuttoff. Returns a two digit code as 'FLxxxx;' in 10Hz increments.
-		if (wait_char(';', 5, 100, "get lower", ASC) < 5) return A.iBW;
+		if (wait_char(';', 7, 100, "get lower", ASC) < 5) return A.iBW;
 
 		p = replystr.rfind("FW");
 		if (p != std::string::npos) { // If 'FW' found then scan the known responces to find out what we got.
@@ -1033,7 +1036,7 @@ int RIG_TS870S::get_bwA() {
 		}
 
 		cmd = "IS;";
-		if (wait_char(';', 5, 100, "get upper", ASC) == 5) {
+		if (wait_char(';', 8, 100, "get upper", ASC) == 5) {
 			p = replystr.rfind("IS ");
 			if (p != std::string::npos) {
 				for (i = 0; TS870S_CAT_am_SH[i] != NULL; i++) // bump array index counter, till std::string match or end.
@@ -1053,7 +1056,7 @@ int RIG_TS870S::get_bwA() {
 		int lo = A.iBW & 0x7F, hi = (A.iBW >> 8) & 0x7F; // Same trick as above...
 
 		cmd = "FW;"; // Read Low cuttoff. Returns a two digit code as 'FLxxxx;' in 10Hz increments.
-		if (wait_char(';', 5, 100, "get lower", ASC) < 5) return A.iBW;
+		if (wait_char(';', 7, 100, "get lower", ASC) < 5) return A.iBW;
 
 		p = replystr.rfind("FW");
 		if (p != std::string::npos) { // If 'FW' found then scan the known responces to find out what we got.
@@ -1065,7 +1068,7 @@ int RIG_TS870S::get_bwA() {
 		}
 
 		cmd = "IS;";
-		if (wait_char(';', 5, 100, "get upper", ASC) < 5) return A.iBW;
+		if (wait_char(';', 8, 100, "get upper", ASC) < 5) return A.iBW;
 
 		p = replystr.rfind("IS ");
 
@@ -1134,7 +1137,7 @@ int RIG_TS870S::get_bwB()
 		int lo = B.iBW & 0x7F, hi = (B.iBW >> 8) & 0x7F;
 
 		cmd = "FW;"; // Read Low cuttoff. Returns a two digit code as 'FLxxxx;' in 10Hz increments.
-		if (wait_char(';', 5, 100, "get lower", ASC) < 5) return B.iBW;
+		if (wait_char(';', 7, 100, "get lower", ASC) < 5) return B.iBW;
 
 		p = replystr.rfind("FW");
 		if (p != std::string::npos) { // If 'FW' found then scan the known responces to find out what we got.
@@ -1146,7 +1149,7 @@ int RIG_TS870S::get_bwB()
 		}
 
 		cmd = "IS;";
-		if (wait_char(';', 5, 100, "get upper", ASC) < 5) return B.iBW;
+		if (wait_char(';', 8, 100, "get upper", ASC) < 5) return B.iBW;
 
 		p = replystr.rfind("IS ");
 		if (p != std::string::npos) {
@@ -1165,7 +1168,7 @@ int RIG_TS870S::get_bwB()
 		int lo = B.iBW & 0x7F, hi = (B.iBW >> 8) & 0x7F;
 
 		cmd = "FW;"; // Read Low cuttoff. Returns a two digit code as 'FLxxxx;' in 10Hz increments.
-		if (wait_char(';', 5, 100, "get lower", ASC) < 5) return  B.iBW;
+		if (wait_char(';', 7, 100, "get lower", ASC) < 5) return  B.iBW;
 
 		p = replystr.rfind("FW");
 		if (p != std::string::npos) { // If 'FW' found then scan the known responces to find out what we got.
@@ -1177,7 +1180,7 @@ int RIG_TS870S::get_bwB()
 		}
 
 		cmd = "IS;";
-		if (wait_char(';', 5, 100, "get upper", ASC)  < 5) return B.iBW;
+		if (wait_char(';', 8, 100, "get upper", ASC)  < 5) return B.iBW;
 
 		p = replystr.rfind("IS ");
 		if (p != std::string::npos) {

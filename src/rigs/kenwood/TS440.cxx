@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "kenwood/TS440.h"
@@ -33,21 +33,24 @@ RIG_TS440::RIG_TS440() {
 	name_ = TS440name_;
 	modes_ = TS440modes_;
 	_mode_type = TS440_mode_type;
-	comm_baudrate = BR4800;
+	serial_baudrate = BR4800;
 	stopbits = 2;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_rtscts = true;
-	comm_rtsplus = false;
-	comm_dtrplus = false;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
+	serial_timeout = 50;
+	serial_rtscts = true;
+	serial_rtsplus = false;
+	serial_dtrplus = false;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 	modeB = modeA = def_mode = 1;
 	bwB = bwA = def_bw = 1;
-	freqA = def_freq = 14070000;
-	freqB = 7070000;
+	freqA = def_freq = 14070000ULL;
+	freqB = 7070000ULL;
 	can_change_alt_vfo = true;
 
 	has_mode_control =
@@ -108,7 +111,7 @@ int RIG_TS440::get_IF()
 	return ret;
 }
 
-unsigned long int RIG_TS440::get_vfoA ()
+unsigned long long RIG_TS440::get_vfoA ()
 {
 	cmd = "FA;";
 
@@ -120,14 +123,14 @@ unsigned long int RIG_TS440::get_vfoA ()
 	size_t p = replystr.rfind("FA");
 	if (p == std::string::npos) return freqA;
 
-	int f = 0;
+	unsigned long long f = 0;
 	for (size_t n = 2; n < 13; n++)
 		f = f*10 + replystr[p + n] - '0';
 	freqA = f;
 	return freqA;
 }
 
-void RIG_TS440::set_vfoA (unsigned long int freq)
+void RIG_TS440::set_vfoA (unsigned long long freq)
 {
 	freqA = freq;
 	cmd = "FA00000000000;";
@@ -141,7 +144,7 @@ void RIG_TS440::set_vfoA (unsigned long int freq)
 	showresp(WARN, ASC, "set vfo A", cmd, "");
 }
 
-unsigned long int RIG_TS440::get_vfoB ()
+unsigned long long RIG_TS440::get_vfoB ()
 {
 	cmd = "FB;";
 	get_trace(1, "get vfoB");
@@ -152,14 +155,14 @@ unsigned long int RIG_TS440::get_vfoB ()
 	size_t p = replystr.rfind("FB");
 	if (p == std::string::npos) return freqB;
 
-	int f = 0;
+	unsigned long long f = 0;
 	for (size_t n = 2; n < 13; n++)
 		f = f*10 + replystr[p + n] - '0';
 	freqB = f;
 	return freqB;
 }
 
-void RIG_TS440::set_vfoB (unsigned long int freq)
+void RIG_TS440::set_vfoB (unsigned long long freq)
 {
 	freqB = freq;
 	cmd = "FB00000000000;";

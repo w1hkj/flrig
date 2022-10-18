@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <stdio.h>
@@ -147,13 +147,16 @@ RIG_X6100::RIG_X6100() {
 	bandwidths_ = X6100_SSB_CWwidths;
 	bw_vals_ = X6100_bw_vals_SSB;
 
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+
 	_mode_type = X6100_mode_type;
 	widgets = X6100_widgets;
 
-	def_freq = A.freq = 432399230;
+	def_freq = A.freq = 432399230ULL;
 	def_mode = A.imode = 1;
 	def_bw = A.iBW = 28;
-	B.freq = 432399230;
+	B.freq = 432399230ULL;
 	B.imode = 1;
 	B.iBW = 28;
 
@@ -234,7 +237,7 @@ bool RIG_X6100::check ()
 	return ok;
 }
 
-unsigned long int RIG_X6100::get_vfoA ()
+unsigned long long RIG_X6100::get_vfoA ()
 {
 	if (inuse == onB) return A.freq;
 	std::string resp = pre_fm;
@@ -257,7 +260,7 @@ unsigned long int RIG_X6100::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_X6100::set_vfoA (unsigned long int freq)
+void RIG_X6100::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	cmd = pre_to;
@@ -268,7 +271,7 @@ void RIG_X6100::set_vfoA (unsigned long int freq)
 	isett("set_vfoA()");
 }
 
-unsigned long int RIG_X6100::get_vfoB ()
+unsigned long long RIG_X6100::get_vfoB ()
 {
 	if (inuse == onA) return B.freq;
 	std::string resp = pre_fm;
@@ -291,7 +294,7 @@ unsigned long int RIG_X6100::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_X6100::set_vfoB (unsigned long int freq)
+void RIG_X6100::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
 	cmd = pre_to;
@@ -1112,7 +1115,7 @@ void RIG_X6100::get_band_selection(int v)
 	if (ret) {
 		size_t p = replystr.rfind(pre_fm);
 		if (p != std::string::npos) {
-			unsigned long int bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
+			unsigned long long bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
 			int bandmode = replystr[p+13];
 			int bandfilter = replystr[p+14];
 			if (inuse == onB) {
@@ -1130,7 +1133,7 @@ void RIG_X6100::get_band_selection(int v)
 
 void RIG_X6100::set_band_selection(int v)
 {
-	unsigned long int freq = (inuse == onB ? B.freq : A.freq);
+	unsigned long long freq = (inuse == onB ? B.freq : A.freq);
 	int fil = (inuse == onB ? filB : filA);
 	int mode = (inuse == onB ? B.imode : A.imode);
 

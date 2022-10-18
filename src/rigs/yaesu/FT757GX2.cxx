@@ -46,18 +46,23 @@ RIG_FT757GX2::RIG_FT757GX2() {
 // base class values
 	name_ = FT757GX2name_;
 	modes_ = FT757GX2modes_;
-	comm_baudrate = BR4800;
+	serial_baudrate = BR4800;
 	stopbits = 2;
-	comm_retries = 3;
-	comm_wait = 100;   // UI: "Cmds" : time between commands.  Rig logic will reset if no byte received for 100 ms.
-	comm_timeout = 200; // UI: "Retry intvl"
+
+	serial_retries = 3; // UI: "Retry intvl"
+
+	serial_write_delay = 50;
+	serial_post_write_delay = 5;
+
+	serial_timeout = 200;
 	serloop_timing = 500;  // UI: "Poll Interval"
-	comm_rtscts = false;
-	comm_rtsplus = false;
-	comm_dtrplus = true;
-	comm_catptt = false;
-	comm_rtsptt = true;
-	comm_dtrptt = false;
+
+	serial_rtscts = false;
+	serial_rtsplus = false;
+	serial_dtrplus = true;
+	serial_catptt = false;
+	serial_rtsptt = true;
+	serial_dtrptt = false;
 	modeA = 1;
 	bwA = 0;
 
@@ -172,11 +177,11 @@ bool RIG_FT757GX2::get_info() {
 	return false;
 }
 
-unsigned long int RIG_FT757GX2::get_vfoA () {
+unsigned long long RIG_FT757GX2::get_vfoA () {
 	return A.freq;
 }
 
-void RIG_FT757GX2::set_vfoA (unsigned long int freq) {
+void RIG_FT757GX2::set_vfoA (unsigned long long freq) {
 	if (inuse) return;  // B is in use, don't set it.
 	A.freq = freq;
 	freq /=10; // set with 10 Hz resolution
@@ -200,11 +205,11 @@ void RIG_FT757GX2::set_modeA(int val) {
 	sendCommand(cmd);
 }
 
-unsigned long int RIG_FT757GX2::get_vfoB () {
+unsigned long long RIG_FT757GX2::get_vfoB () {
 	return B.freq;
 }
 
-void RIG_FT757GX2::set_vfoB (unsigned long int freq) {  
+void RIG_FT757GX2::set_vfoB (unsigned long long freq) {
 	if (!inuse) return;  // inuse = A, so don't set.  
 	B.freq = freq;
 	freq /=10;

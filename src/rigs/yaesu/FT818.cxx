@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 #include <iostream>
 #include <sstream>
@@ -37,17 +37,20 @@ static const char FT818ND_mode_type[] = { 'L', 'U', 'U', 'L', 'U', 'U', 'U', 'U'
 RIG_FT818ND::RIG_FT818ND() {
 	name_ = FT818NDname_;
 	modes_ = FT818NDmodes_;
-	comm_baudrate = BR4800;
+	serial_baudrate = BR4800;
 	stopbits = 2;
-	comm_retries = 4;
-	comm_wait = 10;
-	comm_timeout = 50;
-	comm_rtscts = false;
-	comm_rtsplus = false;
-	comm_dtrplus = true;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 4;
+	
+	serial_write_delay = 1;
+	serial_post_write_delay = 0;
+
+	serial_timeout = 50;
+	serial_rtscts = false;
+	serial_rtsplus = false;
+	serial_dtrplus = true;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 	modeA = 1;
 	bwA = 0;
 
@@ -103,7 +106,7 @@ bool RIG_FT818ND::check ()
 	return true;
 }
 
-unsigned long int RIG_FT818ND::get_vfoA ()
+unsigned long long RIG_FT818ND::get_vfoA ()
 {
 	if (inuse == onB) return freqA;
 
@@ -132,13 +135,13 @@ unsigned long int RIG_FT818ND::get_vfoA ()
 			break;
 		}
 	static char msg[50];
-	snprintf(msg, sizeof(msg), "get vfoA: %lu, %s", freqA, FT818NDmodes_[i]);
+	snprintf(msg, sizeof(msg), "get vfoA: %llu, %s", freqA, FT818NDmodes_[i]);
 	gett(msg);
 
 	return freqA;
 }
 
-void RIG_FT818ND::set_vfoA (unsigned long int freq)
+void RIG_FT818ND::set_vfoA (unsigned long long freq)
 {
 	freqA = freq;
 	freq /=10; // 818 does not support 1 Hz resolution
@@ -179,7 +182,7 @@ void RIG_FT818ND::set_modeA(int val)
 }
 
 // VFO B ===============================================================
-unsigned long int RIG_FT818ND::get_vfoB ()
+unsigned long long RIG_FT818ND::get_vfoB ()
 {
 	if (inuse == onA) return freqB;
 
@@ -208,13 +211,13 @@ unsigned long int RIG_FT818ND::get_vfoB ()
 			break;
 		}
 	static char msg[50];
-	snprintf(msg, sizeof(msg), "get vfoB: %lu, %s", freqB, FT818NDmodes_[i]);
+	snprintf(msg, sizeof(msg), "get vfoB: %llu, %s", freqB, FT818NDmodes_[i]);
 	gett(msg);
 
 	return freqB;
 }
 
-void RIG_FT818ND::set_vfoB (unsigned long int freq)
+void RIG_FT818ND::set_vfoB (unsigned long long freq)
 {
 	freqB = freq;
 	freq /=10; // 817 does not support 1 Hz resolution

@@ -166,6 +166,7 @@ flrig_SOURCES += \
 	rigs/elecraft/K2.cxx \
 	rigs/elecraft/K3.cxx \
 	rigs/elecraft/KX3.cxx \
+	rigs/elecraft/K4.cxx \
 	rigs/lab599/TX500.cxx \
 	rigs/kenwood/KENWOOD.cxx \
 	rigs/kenwood/TS140.cxx \
@@ -192,6 +193,7 @@ flrig_SOURCES += \
 	rigs/other/RAY152.cxx \
 	rigs/other/sunsdr2.cxx \
 	rigs/other/tcisdr.cxx \
+	rigs/other/trusdx.cxx \
 	rigs/other/TMD710.cxx \
 	rigs/tentec/TT516.cxx \
 	rigs/tentec/DELTA-II.cxx \
@@ -258,6 +260,7 @@ flrig_SOURCES += \
 	wc/WSclient.cxx \
 	UI/K3_ui.cxx \
 	UI/KX3_ui.cxx \
+	UI/K4_ui.cxx \
 	UI/rigpanel.cxx \
 	UI/meters_dialog.cxx \
 	widgets/combo.cxx \
@@ -322,6 +325,7 @@ EXTRA_DIST = \
 	include/other/AOR5K.h \
 	include/other/sunsdr2.h \
 	include/other/tcisdr.h \
+	include/other/trusdx.h \
 	include/generic.h \
 	include/gettext.h \
 	include/hidapi.h \
@@ -356,9 +360,11 @@ EXTRA_DIST = \
 	include/images.h \
 	include/elecraft/K2.h \
 	include/elecraft/K3.h \
+	include/elecraft/K4.h \
 	include/K3_ui.h \
 	include/elecraft/KX3.h \
 	include/KX3_ui.h \
+	include/K4_ui.h \
 	include/mingw.h \
 	include/other/FLEX1500.h \
 	include/other/PCR1000.h \

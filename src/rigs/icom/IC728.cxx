@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "icom/IC728.h"
@@ -35,18 +35,19 @@ RIG_IC728::RIG_IC728() {
 	_mode_type = IC728_mode_type;
 	bandwidths_ = IC728_widths;
 	bw_vals_ = IC728_bw_vals;
-	comm_baudrate = BR1200;
+	serial_baudrate = BR1200;
 	stopbits = 2;
-	comm_retries = 2;
-	comm_wait = 5;
-	comm_timeout = 50;
-	comm_echo = true;
-	comm_rtscts = false;
-	comm_rtsplus = true;
-	comm_dtrplus = true;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+	serial_timeout = 50;
+	serial_echo = true;
+	serial_rtscts = false;
+	serial_rtsplus = true;
+	serial_dtrplus = true;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 	modeA = 1;
 	bwA = 0;
 
@@ -72,7 +73,7 @@ bool RIG_IC728::check ()
 	return ok;
 }
 
-unsigned long int RIG_IC728::get_vfoA ()
+unsigned long long RIG_IC728::get_vfoA ()
 {
 	std::string cstr = "\x03";
 	std::string resp = pre_fm;
@@ -92,7 +93,7 @@ unsigned long int RIG_IC728::get_vfoA ()
 	return freqA;
 }
 
-void RIG_IC728::set_vfoA (unsigned long int freq)
+void RIG_IC728::set_vfoA (unsigned long long freq)
 {
 	freqA = freq;
 	cmd = pre_to;

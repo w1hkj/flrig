@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "icom/IC7100.h"
@@ -187,16 +187,17 @@ RIG_IC7100::RIG_IC7100() {
 	_mode_type = IC7100_mode_type;
 	adjustCIV(defaultCIV);
 
-	comm_retries = 2;
-	comm_wait = 20;
-	comm_timeout = 2;
-	comm_echo = true;
-	comm_rtscts = false;
-	comm_rtsplus = true;
-	comm_dtrplus = true;
-	comm_catptt = true;
-	comm_rtsptt = false;
-	comm_dtrptt = false;
+	serial_retries = 2;
+//	serial_write_delay = 0;
+//	serial_post_write_delay = 0;
+	serial_timeout = 2;
+	serial_echo = true;
+	serial_rtscts = false;
+	serial_rtsplus = true;
+	serial_dtrplus = true;
+	serial_catptt = true;
+	serial_rtsptt = false;
+	serial_dtrptt = false;
 
 	widgets = IC7100_widgets;
 
@@ -268,11 +269,11 @@ RIG_IC7100::RIG_IC7100() {
 	ndigits = 9;
 	A.filter = B.filter = 1;
 
-	def_freq = A.freq = 14070000;
+	def_freq = A.freq = 14070000ULL;
 	def_mode = A.imode = 1;
 	def_bw = A.iBW = 34;
 
-	B.freq = 7070000;
+	B.freq = 7070000ULL;
 	B.imode = 1;
 	B.iBW = 34;
 
@@ -302,10 +303,10 @@ static bool xcvr_is_on = false;
 
 void RIG_IC7100::set_xcvr_auto_on()
 {
-	int nr = progStatus.comm_baudrate == 6 ? 25 :
-			 progStatus.comm_baudrate == 5 ? 13 :
-			 progStatus.comm_baudrate == 4 ? 7 :
-			 progStatus.comm_baudrate == 3 ? 3 : 2;
+	int nr = progStatus.serial_baudrate == 6 ? 25 :
+			 progStatus.serial_baudrate == 5 ? 13 :
+			 progStatus.serial_baudrate == 4 ? 7 :
+			 progStatus.serial_baudrate == 3 ? 3 : 2;
 
 	cmd.assign(pre_to);
 	cmd += '\x19'; cmd += '\x00';
@@ -397,7 +398,7 @@ void RIG_IC7100::selectB()
 	inuse = onB;
 }
 
-unsigned long int RIG_IC7100::get_vfoA ()
+unsigned long long RIG_IC7100::get_vfoA ()
 {
 	if (inuse == onB) return A.freq;
 	std::string resp = pre_fm;
@@ -422,7 +423,7 @@ unsigned long int RIG_IC7100::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_IC7100::set_vfoA (unsigned long int freq)
+void RIG_IC7100::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	cmd = pre_to;
@@ -434,7 +435,7 @@ void RIG_IC7100::set_vfoA (unsigned long int freq)
 	seth();
 }
 
-unsigned long int RIG_IC7100::get_vfoB ()
+unsigned long long RIG_IC7100::get_vfoB ()
 {
 	if (inuse == onA) return B.freq;
 	std::string resp = pre_fm;
@@ -459,7 +460,7 @@ unsigned long int RIG_IC7100::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_IC7100::set_vfoB (unsigned long int freq)
+void RIG_IC7100::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
 	cmd = pre_to;
@@ -2046,7 +2047,7 @@ void RIG_IC7100::get_band_selection(int v)
 	if (ret) {
 		size_t p = replystr.rfind(pre_fm);
 		if (p != std::string::npos) {
-			unsigned long int bandfreq = fm_bcd_be(replystr.substr(p + 8, 5), 10);
+			unsigned long long bandfreq = fm_bcd_be(replystr.substr(p + 8, 5), 10);
 			int bandmode = replystr[p+13];
 			int bandfilter = replystr[p+14];
 			int banddata = replystr[p+15] & 0x10;
@@ -2085,7 +2086,7 @@ void RIG_IC7100::get_band_selection(int v)
 
 void RIG_IC7100::set_band_selection(int v)
 {
-	unsigned long int freq = (inuse == onB ? B.freq : A.freq);
+	unsigned long long freq = (inuse == onB ? B.freq : A.freq);
 	int fil = (inuse == onB ? B.filter : A.filter);
 	int mode = (inuse == onB ? B.imode : A.imode);
 
