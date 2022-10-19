@@ -323,7 +323,7 @@ void cFreqControl::font(Fl_Font fnt)
 
 void cFreqControl::SetCOLORS( Fl_Color LBLcolor, Fl_Color BGcolor)
 {
-	if (Fl_Widget::contains(Fl::belowmouse())) return; //DST  Temporary ? work-around for inoportune calls from highlight_vfo
+	if (Fl_Widget::contains(Fl::belowmouse())) return; // Protect against calls from highlight_vfo while freq entry in progress
 
 	LBLCOLOR = REVBGCOLOR = LBLcolor;
 	BGCOLOR = REVLBLCOLOR = BGcolor;
@@ -394,16 +394,21 @@ void cFreqControl::cancel_kb_entry(void)
 	val = oldval;
 	numeric_entry_mode(false);
 	updatevalue();
+	do_callback();	// If user changes freq at rig while user is in the middle of keyboard freq entry,
+					// and user aborts freq entry, FC-displayed freq will revert to original value
+					// and the callback is needed to return the rig to the original value.
 }
 
 int cFreqControl::handle(int event)
 {
-	// std::cerr << "handle: with event: " << fl_eventnames[event] << std::endl;  // Use for debugging event processing
+// std::cerr << this << ": handle: with event: " << fl_eventnames[event] << std::endl;  // Use for debugging event processing
 
 	if (!active) return 0;
 
-	if (Fl::belowmouse() == this) { // The FC or one of its child widgets returned '1' in response to FL_ENTER
-		if (this != Fl::focus()) {  // Take focus and reverse colors
+	if (Fl::belowmouse() == this) {					// The FC or one of its child widgets returned '1' in response to FL_ENTER
+		if (Fl::focus() && this != Fl::focus()) {	// IF any widget in the the fl* app has app focus, take focus and reverse colors
+													// This is intended to ignore focus acquisition when the fl* app is not in focus
+													// and a user drags a mouse across an FC without intending to interact with flrig.
 			Fl::focus(this);
 			reverse_colors();
 		}
@@ -416,10 +421,11 @@ int cFreqControl::handle(int event)
 		//NOTREACHED
 
 	case FL_LEAVE:
+		if (!this->contains(Fl::focus())) return 1;  // Do nothing if we never had focus
 		if (numeric_entry_mode())
 			cancel_kb_entry();
 		restore_colors();
-		Fl::focus(0);
+		Fl::focus(Fl::first_window());
 		return 1;
 		//NOTREACHED
 
@@ -489,8 +495,8 @@ int cFreqControl::handle(int event)
 				return 1;
 				//NOTREACHED
 			case 'v':
-				if (Fl::event_command()) { // FL_CTRL or OSX FL_META
-					if (numeric_entry_mode()) {				// Ignore Ctrl-v while in numeric entry mode
+				if (Fl::event_command()) {					// FL_CTRL or OSX FL_META
+					if (numeric_entry_mode()) {				// Ignore Ctrl/Meta-v while in numeric entry mode
 						return 1;
 					} else {
 						old_input_buffer = finp->value();	// Protect against paste value > max allowed
