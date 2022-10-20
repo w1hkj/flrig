@@ -488,7 +488,8 @@ void TRACED(setBWControl, void *)
 			opBW->show();
 			opBW->redraw();
 		}
-	} else if (selrig->name_ == rig_tcisdr.name_) {
+	} else if (selrig->name_ == rig_tci_sundx.name_ ||
+			   selrig->name_ == rig_tci_sunpro.name_) {
 		std::string smode = opMODE->value();
 		if (smode == "USB" || smode == "LSB") {
 			btnCENTER->activate();
@@ -1928,7 +1929,8 @@ void TRACED ( updateBandwidthControl, void *d )
 			btnFILT->redraw_label();
 			opBW->resize(opDSP_lo->x(), opDSP_lo->y(), opDSP_lo->w(), opDSP_lo->h());
 			opBW->redraw();
-		} else if (selrig->name_ == rig_tcisdr.name_) {
+		} else if (selrig->name_ == rig_tci_sundx.name_ ||
+				   selrig->name_ == rig_tci_sunpro.name_) {
 			btnCENTER->show();
 			opBW->resize(opCENTER->x(), opCENTER->y(), opCENTER->w(), opCENTER->h());
 			opBW->redraw();

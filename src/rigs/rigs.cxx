@@ -129,7 +129,8 @@ RIG_FLEX1500	rig_FLEX1500;
 RIG_TX500		rig_TX500;
 RIG_QCXP		rig_QCXP;
 RIG_SDR2_PRO	rig_sdr2;
-RIG_TCI_SDR		rig_tcisdr;
+RIG_TCI_SUNDX	rig_tci_sundx;
+RIG_TCI_SUNPRO	rig_tci_sunpro;
 RIG_TRUSDX		rig_trusdx;
 
 rigbase *rigs[] = {
@@ -234,8 +235,9 @@ rigbase *rigs[] = {
 	&rig_TX500,		// 98
 	&rig_QCXP,		// 99
 	&rig_sdr2,		// 100
-	&rig_tcisdr,	// 101
-	&rig_trusdx,	// 102
+	&rig_tci_sundx,	// 101
+	&rig_tci_sunpro,// 102
+	&rig_trusdx,	// 103
 	NULL
 
 };

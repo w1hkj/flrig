@@ -211,7 +211,7 @@ static std::list<std::string> *send_list = (std::list<std::string> *)0;
 void *tci_loop(void *)
 {
 	while (tci_run && tci_running()) {
-		{
+		if (!send_list->empty()) {
 			guard_lock S(&send_mutex);
 			while (!send_list->empty()) {
 				send_txt = send_list->front();
@@ -219,12 +219,12 @@ void *tci_loop(void *)
 				if (send_txt.find("rx_smeter") == std::string::npos)
 					tci_trace(2, "SEND:", send_txt.c_str());
 				ws->send(send_txt);
-				MilliSleep(50);
+				MilliSleep(1);
 			}
 		}
 		ws->poll();
 		ws->dispatch(handle_message);
-		MilliSleep(10);
+		MilliSleep(5);
 	}
 	return NULL;
 }

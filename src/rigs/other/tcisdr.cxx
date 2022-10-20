@@ -21,7 +21,8 @@
 #include "other/tcisdr.h"
 #include "support.h"
 
-static const char SDR2_PROname_[] = "TciSDR";
+static const char TCI_SUNDX_name_[] = "SunSDR2-DX/TCI";
+static const char TCI_SUNPRO_name_[] = "SunSDR2-Pro/TCI";
 
 enum TCI_MODES {
 TCI_AM, TCI_SAM, TCI_DSB, TCI_LSB, TCI_USB,
@@ -239,7 +240,7 @@ bool RIG_TCI_SDR::check()
 
 RIG_TCI_SDR::RIG_TCI_SDR() {
 // base class values
-	name_ = SDR2_PROname_;
+	name_ = TCI_SUNDX_name_;
 	modes_ = TCI_modes;
 	_mode_type = TCI_mode_type;
 	bandwidths_ = TCI_USBwidths;
@@ -304,6 +305,7 @@ RIG_TCI_SDR::RIG_TCI_SDR() {
 	_nrval2 = 4;
 	preamp_level = atten_level = 0;
 
+	sdrtype = UNK;
 }
 
 const char * RIG_TCI_SDR::get_bwname_(int n, int md)
@@ -484,6 +486,7 @@ void RIG_TCI_SDR::set_bwA(int val)
 
 	tcicmd.append(pairs);
 	A.iBW = val;
+	slice_0.A.bw = pairs;
 
 	tci_send(tcicmd);
 }
@@ -537,6 +540,7 @@ void RIG_TCI_SDR::set_bwB(int val)
 	}
 	tcicmd.append(pairs);
 	B.iBW = val;
+	slice_0.B.bw = pairs;
 	tci_send(tcicmd);
 }
 
@@ -671,7 +675,7 @@ void RIG_TCI_SDR::set_PTT_control(int val)
 	} else
 		tcicmd = "TRX:0,false;";
 	tci_send(tcicmd);
-	ptt_ = val;
+	ptt_ = slice_0.ptt = val;
 }
 
 int RIG_TCI_SDR::get_PTT()
@@ -730,7 +734,7 @@ unsigned long long RIG_TCI_SDR::get_vfoA ()
 
 void RIG_TCI_SDR::set_vfoA (unsigned long long freq)
 {
-	A.freq = freq;
+	A.freq = slice_0.A.freq = freq;
 	char vfostr[20];
 	snprintf(vfostr, sizeof(vfostr), "vfo:0,0,%llu;", freq);
 	tci_send(vfostr);
@@ -744,7 +748,7 @@ unsigned long long RIG_TCI_SDR::get_vfoB ()
 
 void RIG_TCI_SDR::set_vfoB (unsigned long long freq)
 {
-	B.freq = freq;
+	B.freq = slice_0.B.freq = freq;
 	char vfostr[20];
 	snprintf(vfostr, sizeof(vfostr), "vfo:0,1,%llu;", freq);
 	tci_send(vfostr);
@@ -793,12 +797,18 @@ void RIG_TCI_SDR::get_mic_min_max_step(int &min, int &max, int &step)
 }
 */
 
+void RIG_TCI_SDR::set_volume_min_max_step(double &min, double &max, double &step)
+{
+	min = -60; max = 0; step = 1; // in dBm
+}
+
 void RIG_TCI_SDR::set_volume_control(int val)
 {
 	char szcmd[20];
 	val = ((val * 60)/100) - 60;
 	snprintf(szcmd, sizeof(szcmd), "volume:%d;", val);
 	tci_send(szcmd);
+	slice_0.vol = val;
 }
 
 int RIG_TCI_SDR::get_volume_control()
@@ -807,17 +817,30 @@ int RIG_TCI_SDR::get_volume_control()
 	return vol;
 }
 
+void RIG_TCI_SDR::get_pc_min_max_step(double &min, double &max, double &step)
+{
+	if (sdrtype == DX) {
+		min = 0; max = 100; step = 1; 
+	} else {
+		min = 0; max = 20; step = 0.1; 
+	}
+}
+
 void RIG_TCI_SDR::set_power_control(double val)
 {
 	char szcmd[20];
-	snprintf(szcmd, sizeof(szcmd), "drive:%d;", (int)(val * 5));
+	if (sdrtype == PRO)
+		val *= 5;
+	snprintf(szcmd, sizeof(szcmd), "drive:%d;", (int)(val));
 	tci_send(szcmd);
+	slice_0.pwr = val;
 }
 
 double RIG_TCI_SDR::get_power_control()
 {
 	double pwr = slice_0.pwr;
-	return pwr / 5.0;
+	if (sdrtype == PRO) pwr *= 0.2;
+	return pwr;
 }
 
 static bool tune_on = false;
@@ -829,4 +852,20 @@ void RIG_TCI_SDR::tune_rig()
 		(tune_on ? "true" : "false"));
 	tci_send(szcmd);
 }
+
+//======================================================================
+
+RIG_TCI_SUNPRO::RIG_TCI_SUNPRO() {
+	sdrtype = PRO;
+	name_ = TCI_SUNPRO_name_;
+};
+
+//======================================================================
+
+RIG_TCI_SUNDX::RIG_TCI_SUNDX() {
+	sdrtype = DX;
+	name_ = TCI_SUNDX_name_;
+};
+
+
 
