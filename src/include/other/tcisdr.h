@@ -31,6 +31,11 @@ extern int tci_nbr_centers;
 extern const char *TCI_centers[];
 extern void tci_adjust_widths();
 
+enum SDR2_TYPE { UNK, PRO, DX };
+
+// class RIG_TCI_SDR is never directly declared.  used as a base class for
+// RIG_TCI_SUNDX and RIG_TCI_SUNPRO
+
 class RIG_TCI_SDR : public rigbase {
 private:
 	bool preamp_on;
@@ -81,14 +86,11 @@ public:
 
 	void set_volume_control(int val);
 	int  get_volume_control();
-	void set_volume_min_max_step(double &min, double &max, double &step) {
-		min = -60; max = 0; step = 1; // in dBm
-	}
+	void set_volume_min_max_step(double &min, double &max, double &step);
 
 	void set_power_control(double val);
 	double get_power_control();
-	void get_pc_min_max_step(double &min, double &max, double &step) {
-		min = 0; max = 20; step = 0.1; }
+	void get_pc_min_max_step(double &min, double &max, double &step);
 
 //	void set_if_shift(int val);
 //	bool get_if_shift(int &val);
@@ -135,7 +137,17 @@ public:
 	const char **bwtable(int);
 	const char *get_bwname_(int bw, int md);
 
+	int		sdrtype;
 };
 
+class RIG_TCI_SUNPRO : public RIG_TCI_SDR {
+public:
+	RIG_TCI_SUNPRO();
+};
+
+class RIG_TCI_SUNDX : public RIG_TCI_SDR {
+public:
+	RIG_TCI_SUNDX();
+};
 
 #endif

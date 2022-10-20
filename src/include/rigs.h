@@ -225,7 +225,8 @@ extern RIG_FLEX1500		rig_FLEX1500;	// 97
 extern RIG_TX500		rig_TX500;		// 98
 extern RIG_QCXP			rig_QCXP;		// 99
 extern RIG_SDR2_PRO		rig_sdr2;		// 100
-extern RIG_TCI_SDR		rig_tcisdr;		// 101
-extern RIG_TRUSDX		rig_trusdx;		// 102
+extern RIG_TCI_SUNDX	rig_tci_sundx;	// 101
+extern RIG_TCI_SUNPRO	rig_tci_sunpro;	// 102
+extern RIG_TRUSDX		rig_trusdx;		// 103
 
 #endif

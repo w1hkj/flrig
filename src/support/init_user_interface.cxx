@@ -1214,7 +1214,8 @@ void TRACED(init_dsp_controls)
 		opDSP_hi->hide();
 		btnFILT->hide();
 		opBW->show();
-		if (selrig->name_ == rig_tcisdr.name_) {
+		if (selrig->name_ == rig_tci_sundx.name_ ||
+			selrig->name_ == rig_tci_sunpro.name_) {
 			opCENTER->clear();
 			for (int i = 0; i < tci_nbr_centers; i++)
 				opCENTER->add(TCI_centers[i]);
