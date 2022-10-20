@@ -816,7 +816,6 @@ public:
 		selrig->get_vol_min_max_step(min, max, step);
 
 		int change = (int)(params[0]);
-std::cout << "vol change: " << change << " --> " << (progStatus.volume + change) << std::endl;
 		progStatus.volume += change;
 		if (progStatus.volume > max) progStatus.volume = max;
 		if (progStatus.volume < min) progStatus.volume = min;

@@ -415,25 +415,25 @@ void read_mode()
 		read_K3_mode();
 		return;
 	}
-//	if (xcvr_name == rig_KX3.name_) {
-//		read_KX3_mode();
-//		return;
-//	}
 
 	int nu_mode;
 	int nu_BW;
+
 	if (selrig->inuse == onA) {
 		rig_trace(2, "read_mode", "vfoA active");
 		nu_mode = selrig->get_modeA();
 		if (nu_mode != opMODE->index()) { //vfoA.imode) {
 			vfoA.imode = vfo->imode = nu_mode;
 			selrig->adjust_bandwidth(vfo->imode);
+			Fl::awake(setModeControl);
+
 			nu_BW = selrig->get_bwA();
 			vfoA.iBW = vfo->iBW = nu_BW;
-
+			Fl::awake(setBWControl);
+		} else {
+			vfoA.imode = vfo->imode = nu_mode;
+			selrig->adjust_bandwidth(vfo->imode);
 			Fl::awake(setModeControl);
-			set_bandwidth_control();
-			Fl::awake(updateUI);
 		}
 		if (selrig->twovfos()) {
 			vfoB.imode = selrig->get_modeB();
@@ -448,12 +448,15 @@ void read_mode()
 		if (nu_mode != opMODE->index()) { //vfoB.imode) {
 			vfoB.imode = vfo->imode = nu_mode;
 			selrig->adjust_bandwidth(vfo->imode);
+			Fl::awake(setModeControl);
+
 			nu_BW = selrig->get_bwB();
 			vfoB.iBW = vfo->iBW = nu_BW;
-
+			Fl::awake(setBWControl);
+		} else {
+			vfoB.imode = vfo->imode = nu_mode;
+			selrig->adjust_bandwidth(vfo->imode);
 			Fl::awake(setModeControl);
-			set_bandwidth_control();
-			Fl::awake(updateUI);
 		}
 
 		if (selrig->twovfos()) {
@@ -497,12 +500,17 @@ void TRACED(setBWControl, void *)
 		if (smode == "USB" || smode == "LSB") {
 			btnCENTER->activate();
 			btnCENTER->redraw();
+			opBW->index(vfo->iBW);
+			opBW->show();
+			opBW->redraw();
 		} else {
 			btnCENTER->label("W");
 			btnCENTER->redraw_label();
 			btnCENTER->deactivate();
-			opBW->show();
 			opCENTER->hide();
+			opBW->index(vfo->iBW);
+			opBW->show();
+			opBW->redraw();
 		}
 	} else {
 		opDSP_lo->hide();
@@ -519,12 +527,9 @@ void TRACED(read_bandwidth)
 		read_K3_bw();
 		return;
 	}
-//	if (xcvr_name == rig_KX3.name_) {
-//		read_KX3_bw();
-//		return;
-//	}
 
 	trace(1,"read_bandwidth()");
+
 	int nu_BW;
 	if (selrig->inuse == onA) {
 		trace(2, "vfoA active", "get_bwA()");
@@ -535,6 +540,9 @@ void TRACED(read_bandwidth)
 			trace(1, s.str().c_str());
 			vfoA.iBW = vfo->iBW = nu_BW;
 			Fl::awake(setBWControl);
+		} else {
+			vfoA.iBW = vfo->iBW = nu_BW;
+			Fl::awake(setBWControl);
 		}
 	} else {
 		trace(2, "vfoB active", "get_bwB()");
@@ -543,6 +551,9 @@ void TRACED(read_bandwidth)
 			std::stringstream s;
 			s << "Bandwidth B change. nu_BW=" << nu_BW << ", vfoB.iBW=" << vfoB.iBW << ", vfo->iBW=" << vfo->iBW;
 			trace(1, s.str().c_str());
+			vfoB.iBW = vfo->iBW = nu_BW;
+			Fl::awake(setBWControl);
+		} else {
 			vfoB.iBW = vfo->iBW = nu_BW;
 			Fl::awake(setBWControl);
 		}
