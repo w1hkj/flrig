@@ -433,6 +433,7 @@ int RIG_IC7851::get_split()
 void RIG_IC7851::set_modeA(int val)
 {
 	A.imode = val;
+
 	cmd.assign(pre_to);
 	cmd += '\x26';
 
@@ -535,6 +536,7 @@ end_wait_modeA:
 void RIG_IC7851::set_modeB(int val)
 {
 	B.imode = val;
+
 	cmd.assign(pre_to);
 	cmd += '\x26';
 	if (inuse == onA) {

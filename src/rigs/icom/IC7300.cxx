@@ -316,7 +316,7 @@ void RIG_IC7300::selectB()
 
 bool RIG_IC7300::canswap()
 {
-	return false;//true;
+	return true;
 }
 
 void RIG_IC7300::swapAB()
