@@ -361,8 +361,6 @@ void TRACED(updateUI, void *)
 
 	updateBandwidthControl(NULL);
 
-	setBWControl(NULL);
-
 	highlight_vfo(NULL);
 
 	int min, max, step;
@@ -426,18 +424,15 @@ void read_mode()
 	if (selrig->inuse == onA) {
 		rig_trace(2, "read_mode", "vfoA active");
 		nu_mode = selrig->get_modeA();
-		if (nu_mode != opMODE->index()) { //vfoA.imode) {
+		if (nu_mode != opMODE->index()) {
 			vfoA.imode = vfo->imode = nu_mode;
 			selrig->adjust_bandwidth(vfo->imode);
 			Fl::awake(setModeControl);
-
-			nu_BW = selrig->get_bwA();
+		}
+		nu_BW = selrig->get_bwA();
+		if (vfoA.iBW != nu_BW) {
 			vfoA.iBW = vfo->iBW = nu_BW;
-			Fl::awake(setBWControl);
-		} else {
-			vfoA.imode = vfo->imode = nu_mode;
-			selrig->adjust_bandwidth(vfo->imode);
-			Fl::awake(setModeControl);
+			Fl::awake(updateBandwidthControl);
 		}
 		if (selrig->twovfos()) {
 			vfoB.imode = selrig->get_modeB();
@@ -449,18 +444,15 @@ void read_mode()
 	} else {
 		rig_trace(2, "read_mode", "vfoB active");
 		nu_mode = selrig->get_modeB();
-		if (nu_mode != opMODE->index()) { //vfoB.imode) {
+		if (nu_mode != opMODE->index()) {
 			vfoB.imode = vfo->imode = nu_mode;
 			selrig->adjust_bandwidth(vfo->imode);
 			Fl::awake(setModeControl);
-
-			nu_BW = selrig->get_bwB();
+		}
+		nu_BW = selrig->get_bwB();
+		if (vfoB.iBW != nu_BW) {
 			vfoB.iBW = vfo->iBW = nu_BW;
-			Fl::awake(setBWControl);
-		} else {
-			vfoB.imode = vfo->imode = nu_mode;
-			selrig->adjust_bandwidth(vfo->imode);
-			Fl::awake(setModeControl);
+			Fl::awake(updateBandwidthControl);
 		}
 
 		if (selrig->twovfos()) {
@@ -544,9 +536,6 @@ void TRACED(read_bandwidth)
 			trace(1, s.str().c_str());
 			vfoA.iBW = vfo->iBW = nu_BW;
 			Fl::awake(setBWControl);
-		} else {
-			vfoA.iBW = vfo->iBW = nu_BW;
-			Fl::awake(setBWControl);
 		}
 	} else {
 		trace(2, "vfoB active", "get_bwB()");
@@ -555,9 +544,6 @@ void TRACED(read_bandwidth)
 			std::stringstream s;
 			s << "Bandwidth B change. nu_BW=" << nu_BW << ", vfoB.iBW=" << vfoB.iBW << ", vfo->iBW=" << vfo->iBW;
 			trace(1, s.str().c_str());
-			vfoB.iBW = vfo->iBW = nu_BW;
-			Fl::awake(setBWControl);
-		} else {
 			vfoB.iBW = vfo->iBW = nu_BW;
 			Fl::awake(setBWControl);
 		}
@@ -1478,7 +1464,7 @@ void serviceA(XCVR_STATE nuvals)
 	}
 
 	trace(2, "service VFO A", printXCVR_STATE(nuvals).c_str());
-tci_trace(2, "State 1", printXCVR_STATE(vfoA).c_str());
+
 	if ((nuvals.imode != -1) ) {//&& (vfoA.imode != nuvals.imode)) {
 		if (selrig->name_ == rig_FT891.name_) {
 			// Mode change on ft891 can change frequency, so set all values
@@ -1507,7 +1493,7 @@ tci_trace(2, "State 1", printXCVR_STATE(vfoA).c_str());
 		A_changed = true;
 	}
 	vfo = &vfoA;
-tci_trace(2, "State 2", printXCVR_STATE(vfoA).c_str());
+
 	if (A_changed)
 		Fl::awake(setFreqDispA);
 }
@@ -1893,8 +1879,7 @@ void set_bandwidth_control()
 	Fl::awake(updateBandwidthControl);
 }
 
-void updateBandwidthControl(void *d)
-{
+void TRACED ( updateBandwidthControl, void *d )
 	if (selrig->has_dsp_controls) {
 		if (vfo->iBW > 256) {
 			opDSP_lo->clear();
@@ -1903,22 +1888,28 @@ void updateBandwidthControl(void *d)
 				opDSP_lo->add(selrig->dsp_SL[i]);
 			for (int i = 0; selrig->dsp_SH[i] != NULL; i++)
 				opDSP_hi->add(selrig->dsp_SH[i]);
-//			opBW->index(0);
 			opBW->hide();
 			opBW->hide();
 			opDSP_lo->index(vfo->iBW & 0xFF);
 			opDSP_lo->hide();
 			opDSP_hi->index((vfo->iBW >> 8) & 0x7F);
-			btnDSP->label(selrig->SL_label);
-			opDSP_lo->show();
+			btnDSP->label(selrig->SH_label);
+			opDSP_hi->show();
+			opDSP_hi->redraw();
 			btnDSP->show();
+			btnDSP->redraw();
 			btnFILT->hide();
 		} else {
 			opDSP_lo->hide();
 			opDSP_hi->hide();
 			btnDSP->hide();
 			btnFILT->hide();
-//			opBW->index(vfo->iBW);
+			opBW->clear();
+			selrig->bandwidths_ = selrig->bwtable(vfo->imode);
+			for (int i = 0; selrig->bandwidths_[i] != NULL; i++)
+				opBW->add(selrig->bandwidths_[i]);
+			opBW->index(vfo->iBW);
+			opBW->redraw();
 			opBW->show();
 		}
 	}
@@ -4517,7 +4508,7 @@ void cbBandSelect(int band)
 	}
 	if (selrig->has_bandwidth_control) {
 		set_bandwidth_control();
-		setBWControl(NULL);
+		updateBandwidthControl();
 	}
 	if (selrig->inuse == onA) { FreqDispA->value(vfo->freq); FreqDispA->redraw(); }
 	else       { FreqDispB->value(vfo->freq); FreqDispB->redraw(); }
