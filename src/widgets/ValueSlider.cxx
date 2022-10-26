@@ -58,10 +58,13 @@
 */
 int Fl_Wheel_Slider::handle(int event)
 {
+	if (!Fl::event_inside(this)) return 0;
+
 	if (event == FL_RELEASE) {// || event == FL_LEAVE) {
 		do_callback();
 		return 1;
 	}
+
 	if (event == FL_MOUSEWHEEL) {
 		int d;
 		if ( !((d = Fl::event_dy()) || (d = Fl::event_dx())) )
@@ -76,12 +79,12 @@ int Fl_Wheel_Slider::handle(int event)
 
 int Fl_Wheel_Value_Slider::handle(int event)
 {
+	if (!Fl::event_inside(this)) return 0;
+
 	if (event == FL_RELEASE) {// || event == FL_LEAVE) {
 		do_callback();
 		return 1;
 	}
-
-	if (!Fl::event_inside(this)) return 1;	// Stop the propagation of a homeless event
 
 	if (event == FL_MOUSEWHEEL) {
 		int d;
