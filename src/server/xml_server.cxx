@@ -338,7 +338,7 @@ public:
 		}
 
 		static char szfreq[20];
-		int freq;
+		unsigned long long freq;
 
 		wait();
 		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_vfo");
@@ -353,7 +353,7 @@ public:
 				freq = vfoA.freq;
 		}
 
-		snprintf(szfreq, sizeof(szfreq), "%d", freq);
+		snprintf(szfreq, sizeof(szfreq), "%llu", freq);
 		std::string result_string = szfreq;
 xml_trace(2, "rig_get_vfo ", szfreq);
 		result = result_string;
@@ -383,7 +383,7 @@ public:
 		Fl::awake(setFreqDispA);
 
 		static char szfreq[20];
-		snprintf(szfreq, sizeof(szfreq), "%d", (int)vfoA.freq);
+		snprintf(szfreq, sizeof(szfreq), "%llu", vfoA.freq);
 		std::string result_string = szfreq;
 xml_trace(2, "rig_get_vfoA", szfreq);
 
@@ -412,7 +412,7 @@ public:
 		Fl::awake(setFreqDispB);
 
 		static char szfreq[20];
-		snprintf(szfreq, sizeof(szfreq), "%d", (int)vfoB.freq);
+		snprintf(szfreq, sizeof(szfreq), "%llu", vfoB.freq);
 		std::string result_string = szfreq;
 xml_trace(2, "rig_get_vfoB", szfreq);
 
@@ -1390,7 +1390,7 @@ extern std::queue<bool> quePTT;
 extern XCVR_STATE vfoA;
 extern XCVR_STATE vfoB;
 
-std::string print(int f, int m, int b)
+std::string print(unsigned long long f, int m, int b)
 {
 	static std::ostringstream p;
 	p.seekp(std::ios::beg);
@@ -1825,7 +1825,7 @@ public:
 			result = 0;
 			return;
 		}
-		unsigned long int freq = static_cast<unsigned long int>((double)params[0]);
+		unsigned long long freq = static_cast<unsigned long long>((double)params[0]);
 
 		guard_lock serial(&mutex_serial);
 
@@ -1855,7 +1855,7 @@ public:
 			result = 0;
 			return;
 		}
-		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
+		unsigned long long freq = static_cast<unsigned long long>(double(params[0]));
 
 		guard_lock serial(&mutex_serial);
 
@@ -1884,7 +1884,7 @@ public:
 			result = 0;
 			return;
 		}
-		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
+		unsigned long long freq = static_cast<unsigned long long>(double(params[0]));
 
 		guard_lock serial(&mutex_serial);
 
@@ -1947,7 +1947,7 @@ public:
 			result = 0;
 			return;
 		}
-		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
+		unsigned long long freq = static_cast<unsigned long long>(double(params[0]));
 
 		guard_lock serial(&mutex_serial);
 
@@ -1976,7 +1976,7 @@ public:
 			result = 0;
 			return;
 		}
-		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
+		unsigned long long freq = static_cast<unsigned long long>(double(params[0]));
 
 		guard_lock serial(&mutex_serial);
 
@@ -2005,7 +2005,7 @@ public:
 			result = 0;
 			return;
 		}
-		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
+		unsigned long long freq = static_cast<unsigned long long>(double(params[0]));
 
 		guard_lock serial(&mutex_serial);
 
@@ -2149,7 +2149,7 @@ public:
 			result = 0;
 			return;
 		}
-		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
+		unsigned long long freq = static_cast<unsigned long long>(double(params[0]));
 
 		guard_lock serial(&mutex_serial);
 		if (selrig->inuse == onB) {
@@ -2176,7 +2176,7 @@ public:
 			result = 0;
 			return;
 		}
-		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
+		unsigned long long freq = static_cast<unsigned long long>(double(params[0]));
 
 		guard_lock serial(&mutex_serial);
 		if (selrig->inuse == onB) {
@@ -2204,7 +2204,7 @@ public:
 			result = 0;
 			return;
 		}
-		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
+		unsigned long long freq = static_cast<unsigned long long>(double(params[0]));
 
 		guard_lock serial(&mutex_serial);
 		if (selrig->inuse == onB) {
@@ -2231,7 +2231,7 @@ public:
 			result = 0;
 			return;
 		}
-		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
+		unsigned long long freq = static_cast<unsigned long long>(double(params[0]));
 
 		guard_lock serial(&mutex_serial);
 		if (selrig->inuse == onB) {
@@ -2259,7 +2259,7 @@ public:
 			result = 0;
 			return;
 		}
-		unsigned long int freq = static_cast<unsigned long int>(double(params[0]));
+		unsigned long long freq = static_cast<unsigned long long>(double(params[0]));
 
 		guard_lock serial(&mutex_serial);
 		if (selrig->inuse == onB) {
