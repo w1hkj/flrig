@@ -192,20 +192,24 @@ void cFreqControl::set_ndigits(int nbr)
 		"1", "10", "100", "1k", "10k", "100k", "1M", "10M", "100M", "1G", "10G", "100G"};
 
 	static char tt[1000];
+
 	snprintf(tt, sizeof(tt), "Set Frequency: (Max val: %.3f kHz)\n\
-  * Enter frequency with number keys or Keypad\n\
-	  (decimal point blinks once entry has started)\n\
-	  ENTER to confirm and send to rig;\n\
-	  BSP/Ctrl-BSP erase last digit/all digits entered;\n\
-	  ESC to abort and revert to initial value\n\
-  * Following actions send frequency to rig instantly\n\
-	  Mousewheel over digit\n\
-	  R/L arrow +/- %s; w/SHIFT %s; w/CTRL %s\n\
-	  U/D arrow +/- %s; w/SHIFT %s; w/CTRL %s\n\
-	  Pg U/D    +/- %s; w/SHIFT %s; w/CTRL %s\n\
-	  L/R mouse click (hold for rpt) in top/bot half of digit\n\
-	  Ctrl-v: paste from clipboard\n\
-	  MM click: paste from selection",
+  * Mousewheel over digit\n\
+  * MM click: paste from selection\n\
+  - or -\n\
+  * Click to set focus - colors reverse - then:\n\
+      R/L arrow +/- %s; w/SHIFT %s; w/CTRL %s\n\
+      U/D arrow +/- %s; w/SHIFT %s; w/CTRL %s\n\
+      Pg U/D    +/- %s; w/SHIFT %s; w/CTRL %s\n\
+      L/R mouse click (hold for rpt) in top/bot half of digit\n\
+      Ctrl/Meta-v: paste from clipboard\n\
+    ENTER, ESC, or click outside to release focus\n\
+    - or -\n\
+    * Enter frequency with number keys or Keypad\n\
+        (decimal point blinks once entry has started)\n\
+      ENTER to confirm and send to rig;\n\
+      BSP/Ctrl-BSP erase last digit/all digits entered;\n\
+      ESC to abort and revert to previous value",
 	  fmaxval_khz,
 	  freq_steps[3-dpoint], freq_steps[4-dpoint], freq_steps[5-dpoint],
 	  freq_steps[6-dpoint], freq_steps[7-dpoint], freq_steps[8-dpoint],
@@ -323,7 +327,8 @@ void cFreqControl::font(Fl_Font fnt)
 
 void cFreqControl::SetCOLORS( Fl_Color LBLcolor, Fl_Color BGcolor)
 {
-	if (Fl_Widget::contains(Fl::belowmouse())) return; // Protect against calls from highlight_vfo while freq entry in progress
+	if (this->contains(Fl::focus())) return;	// Protect against calls from highlight_vfo
+												// that would restore colors while freq entry in progress
 
 	LBLCOLOR = REVBGCOLOR = LBLcolor;
 	BGCOLOR = REVLBLCOLOR = BGcolor;
@@ -401,77 +406,92 @@ void cFreqControl::cancel_kb_entry(void)
 
 int cFreqControl::handle(int event)
 {
-// std::cerr << this << ": handle: with event: " << fl_eventnames[event] << std::endl;  // Use for debugging event processing
+	// std::cerr << this << ": " << time(NULL) << " :handle: with event: " << fl_eventnames[event] << ", Fl::focus(): " << Fl::focus() << std::endl;  // Use for debugging event processing
+	//	if (Fl::focus()) {
+	//		std::cerr << this << " The focus widget label: " << (Fl::focus()->label() ? Fl::focus()->label() : "no label") << std::endl;
+	//		std::cerr << this << " The focus widget tooltip: " << (Fl::focus()->tooltip() ? Fl::focus()->tooltip() : "no tooltip") << std::endl;
+	//	}
 
-	if (!active) return 0;
-
-	if (Fl::belowmouse() == this) {					// The FC or one of its child widgets returned '1' in response to FL_ENTER
-		if (Fl::focus() && this != Fl::focus()) {	// IF any widget in the the fl* app has app focus, take focus and reverse colors
-													// This is intended to ignore focus acquisition when the fl* app is not in focus
-													// and a user drags a mouse across an FC without intending to interact with flrig.
-			Fl::focus(this);
-			reverse_colors();
+	if (!active) {
+		if (event == FL_MOUSEWHEEL) {
+			return 1;	// Prevent MW action over us from propagating
+		} else {
+			return 0;
 		}
 	}
 
 	switch (event) {
 
-	case FL_ENTER:
-		return 1;	// Become the belowmouse widget; used as indicator FC should take focus
-		//NOTREACHED
+	case FL_FOCUS:
 
-	case FL_LEAVE:
-		if (!this->contains(Fl::focus())) return 1;  // Do nothing if we never had focus
-		if (numeric_entry_mode())
-			cancel_kb_entry();
-		restore_colors();
-		Fl::focus(Fl::first_window());
-		return 1;
-		//NOTREACHED
+		if (!Fl::focus()) return 0; // Reject a FOCUS event when no other widget has focus;
+									// fltk platform variation shim principally to address the
+									// click-outside-application-and-return case.
 
-	case FL_FOCUS:	// The FC normally gets focus via Fl::focus(this) which does not generate a FOCUS event
-					// but a middle-mouse-button Paste returns 1 to consume the MM event and that leads to
-					// a FOCUS event; we already have focus but we have to accept the offer so it doesn't
-					// go to another widget.
+		// Upon application start, fltk sends FL_FOCUS to each widget in creation order until one accepts it.
+		// Accept focus only if event is inside FC (this is the event triggering the FOCUS offer, which
+		// should be the button click in the FC).
+
 		if (Fl::event_inside(this)) {
 			reverse_colors();
+			return 1;	// Accept focus
+		}
+		return 0;
+		//NOTREACHED
+
+	case FL_UNFOCUS:
+		if (Fl::focus() != this && this->contains(Fl::focus())) {	// Repeat button took focus so cancel numeric entry
+			if (numeric_entry_mode())
+				cancel_kb_entry();
 			return 1;
-		} else return 0;
+		} else if (!this->contains(Fl::focus())) {			// Some other widget took focus; cancel numeric entry and restore colors.
+			if (numeric_entry_mode())
+				cancel_kb_entry();
+			if (colors_reversed) restore_colors();
+			return 1;
+		}
+		return 0;
 		//NOTREACHED
 
 	case FL_KEYBOARD:
 		switch (Fl::event_key()) {
 			case FL_Right:
+				if (numeric_entry_mode()) return 1;
 				if (Fl::event_ctrl()) IncFreq(2);
 				else if (Fl::event_shift()) IncFreq(1);
 				else IncFreq(0);
 				return 1;
 				//NOTREACHED
 			case FL_Left:
+				if (numeric_entry_mode()) return 1;
 				if (Fl::event_ctrl()) DecFreq(2);
 				else if (Fl::event_shift()) DecFreq(1);
 				else DecFreq(0);
 				return 1;
 				//NOTREACHED
 			case FL_Up:
+				if (numeric_entry_mode()) return 1;
 				if (Fl::event_ctrl()) IncFreq(5);
 				else if (Fl::event_shift()) IncFreq(4);
 				else IncFreq(3);
 				return 1;
 				//NOTREACHED
 			case FL_Down:
+				if (numeric_entry_mode()) return 1;
 				if (Fl::event_ctrl()) DecFreq(5);
 				else if (Fl::event_shift()) DecFreq(4);
 				else DecFreq(3);
 				return 1;
 				//NOTREACHED
 			case FL_Page_Up:
+				if (numeric_entry_mode()) return 1;
 				if (Fl::event_ctrl()) IncFreq(8);
 				else if (Fl::event_shift()) IncFreq(7);
 				else IncFreq(6);
 				return 1;
 				//NOTREACHED
 			case FL_Page_Down:
+				if (numeric_entry_mode()) return 1;
 				if (Fl::event_ctrl()) DecFreq(8);
 				else if (Fl::event_shift()) DecFreq(7);
 				else DecFreq(6);
@@ -481,17 +501,21 @@ int cFreqControl::handle(int event)
 				if (numeric_entry_mode()) {
 					return finp->handle(event);
 				} else return 0;
+				//NOTREACHED
 			case FL_Enter: case FL_KP_Enter:
 				if (numeric_entry_mode()) {
 					finp->do_callback();
 					numeric_entry_mode(false);
-					do_callback();
 				}
+				do_callback();
+				Fl::focus(Fl::first_window());
 				return 1;
 				//NOTREACHED
 			case FL_Escape:
 				if (numeric_entry_mode())
 					cancel_kb_entry();
+				do_callback();
+				Fl::focus(Fl::first_window());
 				return 1;
 				//NOTREACHED
 			case 'v':
@@ -502,26 +526,37 @@ int cFreqControl::handle(int event)
 						old_input_buffer = finp->value();	// Protect against paste value > max allowed
 						Fl::paste(*(this->finp), 1);		// 1 = Paste from clipboard
 						do_callback();
-				}
+					}
+					Fl::focus(Fl::first_window());
 				}
 				return 1;
 				//NOTREACHED
 		default:
 			// Keyboard entry processing
 
-			// Accept numbers and decimal point only
+			// Accept numbers, decimal point, and 'e' or 'E' to indicate exponential notation only
 			int ch = Fl::event_text()[0];
 			if ((ch < '0' || ch > '9') && ch != '.' && ch != 'e' && ch!= 'E') return 1;
 
 			if (!numeric_entry_mode()) {
 				// User has begun entering a frequency
-				numeric_entry_mode(true);	// A blinking decimal point signifies user is in numeric frequency entry mode
-				finp->static_value("");
-				oldval = val;
+				numeric_entry_mode(true);	// Set blinking decimal point to signify user is in numeric frequency entry mode
+				finp->static_value("");		// Clear Fl_Float_Input string contents
+				oldval = val;				// Preserve current FC-internal integer val in case restoral is needed
 			}
 
-			old_input_buffer = finp->value();	// Allow restoral of old Fl_Float_Input string value
+			old_input_buffer = finp->value();	// Preserve current Fl_Float_Input string value in case restoral is needed
 												// if user entry > max allowed; pre-checks don't cover all cases.
+
+			// If an exponent has been indicated ('e' or 'E' entered), allow one digit of exponent
+			const char *e;
+			if ((e = strchr(finp->value(), 'e')) || (e = strchr(finp->value(), 'E'))) {
+				if (strlen(e) == 1) {
+					return finp->handle(event);	// Allow entry of digit
+				} else {
+					return 1;
+				}
+			}
 
 			// If decimal already entered, limit additional digits to those being displayed.
 			const char *p = strchr(finp->value(), '.');
@@ -529,13 +564,18 @@ int cFreqControl::handle(int event)
 				if (strlen(p) <= (size_t) dpoint) {
 					return finp->handle(event);
 				} else {
-					return 1;
+					// Allow the entry of 'e' or 'E' following the max decimal digits
+					if (strlen(p) == (size_t) dpoint + 1 && (ch == 'e' || ch == 'E')) {
+						return finp->handle(event);
+					} else {
+						return 1;
+					}
 				}
 			}
 
 			// Ignore excess digits left of decimal
 			size_t inp_len = strlen(finp->value());
-			if ((inp_len == (unsigned long) (nD - dpoint)) && (Fl::event_text()[0] != '.')) return 1;
+			if ((inp_len == (unsigned long) (nD - dpoint)) && (ch != '.')) return 1;
 
 			// Otherwise, accept entry
 			return finp->handle(event);
@@ -544,8 +584,8 @@ int cFreqControl::handle(int event)
 		//NOTREACHED
 
 	case FL_MOUSEWHEEL:
-		if (this->contains(Fl::focus())) {
-			if (numeric_entry_mode()) {	// Ignore mousewheel in numeric entry mode
+		if (Fl::event_inside(this)) {			// Reject fltk's attempts to give us events that don't belong to us
+			if (numeric_entry_mode()) {			// Ignore mousewheel in numeric entry mode
 				return 1;
 			} else {
 				int d;
@@ -560,22 +600,33 @@ int cFreqControl::handle(int event)
 				}
 			}
 		}
-		return 1;  // Discard mousewheel action outside FreqControl or inside FreqControl but not over digit
+		return 1;  // Consume but ignore mousewheel action outside FreqControl or inside FreqControl but not over digit
 		//NOTREACHED
 
 	case FL_PUSH:
 		if (numeric_entry_mode()) {				// Ignore mouse click in numeric entry mode
 				return 1;
-		} else {
-			if (Fl::event_button() == FL_MIDDLE_MOUSE) {
+		}
+
+		switch (Fl::event_button()) {
+
+			case FL_MIDDLE_MOUSE:
 				Fl::paste(*(this->finp), 0);	// Send FL_PASTE to the Fl_Float_Input widget; its parent
 												// Fl_Input_::handle checks for valid floating point entry.
 												// 0 = Paste from selection, not clipboard
 				do_callback();
-				return 1;	// Consume event; side effect is to prompt an FL_FOCUS event even though we already have focus.
-			} else {
-				return Fl_Group::handle(event);	// The appropriate Repeat Button will handle the event
-			}
+				return 1;
+			//NOTREACHED
+
+			default:
+
+				if (!this->contains(Fl::focus())) {
+					take_focus();	// Signal interest in focus if we don't have it; will result in an FL_FOCUS event
+					return 1;
+				} else {
+					return Fl_Group::handle(event);	// The appropriate Repeat Button will handle the event
+				}
+				//NOTREACHED
 		}
 		//NOTREACHED
 
@@ -628,12 +679,22 @@ static void restore_color(void* w)
 	fc->restore_colors();
 }
 
-void cFreqControl::visual_beep()
+static void reverse_color(void* w)
 {
-	reverse_colors();
-	Fl::add_timeout(0.1, restore_color, this);
+	cFreqControl *fc = (cFreqControl *)w;
+	fc->reverse_colors();
 }
 
+void cFreqControl::visual_beep()
+{
+	if (this->colors_reversed) {
+		restore_color(this);
+		Fl::add_timeout(0.1, reverse_color, this);
+	} else {
+		reverse_colors();
+		Fl::add_timeout(0.1, restore_color, this);
+	}
+}
 void cFreqControl::resize(int x, int y, int w, int h)
 {
 	Fl_Group::resize(x,y,w,h);

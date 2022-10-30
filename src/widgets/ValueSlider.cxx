@@ -80,6 +80,9 @@ int Fl_Wheel_Value_Slider::handle(int event)
 		do_callback();
 		return 1;
 	}
+
+	if (!Fl::event_inside(this)) return 1;	// Stop the propagation of a homeless event
+
 	if (event == FL_MOUSEWHEEL) {
 		int d;
 		if ( !((d = Fl::event_dy()) || (d = Fl::event_dx())) )
