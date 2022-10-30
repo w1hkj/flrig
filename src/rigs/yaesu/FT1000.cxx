@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "yaesu/FT1000.h"
@@ -93,7 +93,7 @@ RIG_FT1000::RIG_FT1000() {
 	serial_catptt = true;
 	serial_rtsptt = false;
 	serial_dtrptt = false;
-	afreq = bfreq = A.freq = B.freq = 7100000;
+	afreq = bfreq = A.freq = B.freq = 7100000ULL;
 	//amode = bmode = A.imode = B.imode = 1;
 	aBW = bBW = A.iBW = B.iBW = 0;
 
@@ -249,7 +249,7 @@ bool RIG_FT1000::get_info()
 }
 
 
-unsigned long int RIG_FT1000::get_vfoA ()
+unsigned long long RIG_FT1000::get_vfoA ()
 {
 	return A.freq;
 }
@@ -267,7 +267,7 @@ int RIG_FT1000::get_bwA()
 }
 
 
-void RIG_FT1000::set_vfoA (unsigned long int freq)
+void RIG_FT1000::set_vfoA (unsigned long long freq)
 {
 
 	A.freq = freq;
@@ -312,7 +312,7 @@ void RIG_FT1000::set_bwA (int val)
 }
 
 
-unsigned long int RIG_FT1000::get_vfoB()
+unsigned long long RIG_FT1000::get_vfoB()
 {
 	return B.freq;
 }
@@ -330,7 +330,7 @@ int  RIG_FT1000::get_bwB()
 }
 
 
-void RIG_FT1000::set_vfoB(unsigned long int freq)
+void RIG_FT1000::set_vfoB(unsigned long long freq)
 {
 
 	B.freq = freq;

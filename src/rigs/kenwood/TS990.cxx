@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 /*
  * Copyright (c) 2014 Andy Burnett, G0HIX
@@ -334,7 +334,7 @@ RIG_TS990::RIG_TS990() {
 	name_ = TS990name_;
 	modes_ = TS990modes_;
 
-	B.freq = A.freq = 14107500;
+	B.freq = A.freq = 14107500ULL;
 
 	A.imode = USB;
 	A.iBW = A_default_HI_LO;
@@ -721,7 +721,7 @@ bool RIG_TS990::check ()
 	return true;
 }
 
-unsigned long int RIG_TS990::get_vfoA ()
+unsigned long long RIG_TS990::get_vfoA ()
 {
 	gett("get_vfoA()");
 
@@ -731,8 +731,8 @@ unsigned long int RIG_TS990::get_vfoA ()
 	size_t p = replystr.rfind("FA");
 	if (p == std::string::npos) return A.freq;
 
-	unsigned long int f = 0L;
-	unsigned long int mul = 1L;
+	unsigned long long f = 0ULL;
+	unsigned long long mul = 1ULL;
 	for (size_t n = 12; n > 1; n--) {
 		f += (replystr[p + n] - '0') * mul;
 		mul *= 10;
@@ -741,9 +741,9 @@ unsigned long int RIG_TS990::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_TS990::set_vfoA (unsigned long int freq)
+void RIG_TS990::set_vfoA (unsigned long long freq)
 {
-	sett("set_vfoA(unsigned long int freq)");
+	sett("set_vfoA(unsigned long long freq)");
 
 	A.freq = freq;
 	cmd = "FA00000000000;";
@@ -755,7 +755,7 @@ void RIG_TS990::set_vfoA (unsigned long int freq)
 	showresp(INFO, ASC, "set vfo A", cmd, "");
 }
 
-unsigned long int RIG_TS990::get_vfoB ()
+unsigned long long RIG_TS990::get_vfoB ()
 {
 	gett("get_vfoB()");
 
@@ -765,8 +765,8 @@ unsigned long int RIG_TS990::get_vfoB ()
 	size_t p = replystr.rfind("FB");
 	if (p == std::string::npos) return B.freq;
 
-	unsigned long int f = 0L;
-	unsigned long int mul = 1L;
+	unsigned long long f = 0ULL;
+	unsigned long long mul = 1ULL;
 	for (size_t n = 12; n > 1; n--) {
 		f += (replystr[p + n] - '0') * mul;
 		mul *= 10;
@@ -776,9 +776,9 @@ unsigned long int RIG_TS990::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_TS990::set_vfoB (unsigned long int freq)
+void RIG_TS990::set_vfoB (unsigned long long freq)
 {
-	sett("set_vfoB(unsigned long int freq)");
+	sett("set_vfoB(unsigned long long freq)");
 
 	B.freq = freq;
 	cmd = "FB00000000000;";

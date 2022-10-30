@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <sstream>
@@ -121,7 +121,7 @@ RIG_FT891::RIG_FT891() {
 
 	A.imode = B.imode = modeB = modeA = def_mode = 1;
 	A.iBW = B.iBW = bwA = bwB = def_bw = 12;
-	A.freq = B.freq = freqA = freqB = def_freq = 14070000;
+	A.freq = B.freq = freqA = freqB = def_freq = 14070000ULL;
 
 	has_compression =
 	has_compON =
@@ -235,7 +235,7 @@ bool RIG_FT891::check ()
 	return false;
 }
 
-unsigned long int RIG_FT891::get_vfoA ()
+unsigned long long RIG_FT891::get_vfoA ()
 {
 	// When VFOA is 'selected', radio has it actively loaded in FA, otherwise
 	// it is in FB
@@ -253,14 +253,14 @@ unsigned long int RIG_FT891::get_vfoA ()
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return freqA;
 	p += 2;
-	int f = 0;
+	unsigned long long f = 0;
 	for (int n = 0; n < ndigits; n++)
 		f = f * 10 + replystr[p + n] - '0';
 	freqA = f;
 	return freqA;
 }
 
-void RIG_FT891::set_vfoA (unsigned long int freq)
+void RIG_FT891::set_vfoA (unsigned long long freq)
 {
 	freqA = freq;
 	
@@ -283,7 +283,7 @@ void RIG_FT891::set_vfoA (unsigned long int freq)
 	showresp(WARN, ASC, "SET vfo A", cmd, replystr);
 }
 
-unsigned long int RIG_FT891::get_vfoB ()
+unsigned long long RIG_FT891::get_vfoB ()
 {
 	// When VFOB is 'selected', radio has it actively loaded in FA, otherwise
 	// it is in FB
@@ -300,7 +300,7 @@ unsigned long int RIG_FT891::get_vfoB ()
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return freqB;
 	p += 2;
-	int f = 0;
+	unsigned long long f = 0;
 	for (int n = 0; n < ndigits; n++)
 		f = f * 10 + replystr[p + n] - '0';
 	freqB = f;
@@ -308,7 +308,7 @@ unsigned long int RIG_FT891::get_vfoB ()
 }
 
 
-void RIG_FT891::set_vfoB (unsigned long int freq)
+void RIG_FT891::set_vfoB (unsigned long long freq)
 {
 	freqB = freq;
 	

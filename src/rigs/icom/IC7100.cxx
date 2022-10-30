@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "icom/IC7100.h"
@@ -269,11 +269,11 @@ RIG_IC7100::RIG_IC7100() {
 	ndigits = 9;
 	A.filter = B.filter = 1;
 
-	def_freq = A.freq = 14070000;
+	def_freq = A.freq = 14070000ULL;
 	def_mode = A.imode = 1;
 	def_bw = A.iBW = 34;
 
-	B.freq = 7070000;
+	B.freq = 7070000ULL;
 	B.imode = 1;
 	B.iBW = 34;
 
@@ -398,7 +398,7 @@ void RIG_IC7100::selectB()
 	inuse = onB;
 }
 
-unsigned long int RIG_IC7100::get_vfoA ()
+unsigned long long RIG_IC7100::get_vfoA ()
 {
 	if (inuse == onB) return A.freq;
 	std::string resp = pre_fm;
@@ -423,7 +423,7 @@ unsigned long int RIG_IC7100::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_IC7100::set_vfoA (unsigned long int freq)
+void RIG_IC7100::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	cmd = pre_to;
@@ -435,7 +435,7 @@ void RIG_IC7100::set_vfoA (unsigned long int freq)
 	seth();
 }
 
-unsigned long int RIG_IC7100::get_vfoB ()
+unsigned long long RIG_IC7100::get_vfoB ()
 {
 	if (inuse == onA) return B.freq;
 	std::string resp = pre_fm;
@@ -460,7 +460,7 @@ unsigned long int RIG_IC7100::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_IC7100::set_vfoB (unsigned long int freq)
+void RIG_IC7100::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
 	cmd = pre_to;
@@ -2047,7 +2047,7 @@ void RIG_IC7100::get_band_selection(int v)
 	if (ret) {
 		size_t p = replystr.rfind(pre_fm);
 		if (p != std::string::npos) {
-			unsigned long int bandfreq = fm_bcd_be(replystr.substr(p + 8, 5), 10);
+			unsigned long long bandfreq = fm_bcd_be(replystr.substr(p + 8, 5), 10);
 			int bandmode = replystr[p+13];
 			int bandfilter = replystr[p+14];
 			int banddata = replystr[p+15] & 0x10;
@@ -2086,7 +2086,7 @@ void RIG_IC7100::get_band_selection(int v)
 
 void RIG_IC7100::set_band_selection(int v)
 {
-	unsigned long int freq = (inuse == onB ? B.freq : A.freq);
+	unsigned long long freq = (inuse == onB ? B.freq : A.freq);
 	int fil = (inuse == onB ? B.filter : A.filter);
 	int mode = (inuse == onB ? B.imode : A.imode);
 

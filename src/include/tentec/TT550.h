@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #ifndef _TT550_H
@@ -57,8 +57,8 @@ private:
 
 	void showASCII(std::string, std::string);
 
-	void set_vfoRX(unsigned long int freq);
-	void set_vfoTX(unsigned long int freq);
+	void set_vfoRX(unsigned long long freq);
+	void set_vfoTX(unsigned long long freq);
 
 	void get_302();
 
@@ -83,11 +83,11 @@ public:
 
 	bool check();
 
-	void set_vfo(unsigned long int);
-	unsigned long int get_vfoA();
-	void set_vfoA(unsigned long int);
-	unsigned long int get_vfoB();
-	void set_vfoB(unsigned long int);
+	void set_vfo(unsigned long long);
+	unsigned long long get_vfoA();
+	void set_vfoA(unsigned long long);
+	unsigned long long get_vfoB();
+	void set_vfoB(unsigned long long);
 
 	void selectA();
 	void selectB();

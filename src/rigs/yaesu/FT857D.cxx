@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <stdio.h>
@@ -124,7 +124,7 @@ bool RIG_FT857D::check ()
 
 }
 
-unsigned long int RIG_FT857D::get_vfoA ()
+unsigned long long RIG_FT857D::get_vfoA ()
 {
 	if (inuse == onB) return freqA;
 	init_cmd();
@@ -145,13 +145,13 @@ unsigned long int RIG_FT857D::get_vfoA ()
 	}
 
 	static char msg[50];
-	snprintf(msg, sizeof(msg), "get vfoA: %lu, %s", freqA, modes_[modeA]);
+	snprintf(msg, sizeof(msg), "get vfoA: %llu, %s", freqA, modes_[modeA]);
 	getr(msg);
 
 	return freqA;
 }
 
-void RIG_FT857D::set_vfoA (unsigned long int freq)
+void RIG_FT857D::set_vfoA (unsigned long long freq)
 {
 	freqA = freq;
 	freq /=10; // 857D does not support 1 Hz resolution
@@ -163,7 +163,7 @@ void RIG_FT857D::set_vfoA (unsigned long int freq)
 	setthex("set_vfoA");
 }
 
-unsigned long int RIG_FT857D::get_vfoB ()
+unsigned long long RIG_FT857D::get_vfoB ()
 {
 	if (inuse == onA) return freqB;
 	init_cmd();
@@ -184,13 +184,13 @@ unsigned long int RIG_FT857D::get_vfoB ()
 	}
 
 	static char msg[50];
-	snprintf(msg, sizeof(msg), "get vfoB: %lu, %s", freqA, modes_[modeB]);
+	snprintf(msg, sizeof(msg), "get vfoB: %llu, %s", freqA, modes_[modeB]);
 	getr(msg);
 
 	return freqB;
 }
 
-void RIG_FT857D::set_vfoB (unsigned long int freq)
+void RIG_FT857D::set_vfoB (unsigned long long freq)
 {
 	freqB = freq;
 	freq /=10; // 857D does not support 1 Hz resolution
@@ -349,7 +349,7 @@ int  RIG_FT857D::get_split()
 
 void RIG_FT857D::set_band_selection(int v)
 {
-	unsigned long int freq = 14070000L;
+	unsigned long long freq = 14070000ULL;
 	int  mode = 0;
 	switch (v) {
 		case 1: freq = progStatus.f160; mode = progStatus.m160; break; // 160 meters

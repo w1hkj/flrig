@@ -49,6 +49,7 @@
 #include <FL/Fl_Tree.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Text_Buffer.H>
+#include <FL/Fl_Widget.H>
 #include <FL/fl_draw.H>
 #include <FL/fl_show_colormap.H>
 #include <FL/fl_ask.H>
@@ -159,8 +160,8 @@ extern void clearList();
 extern void saveFreqList();
 extern void readList();
 extern void selectFreq();
-extern int  movFreqA();
-extern int  movFreqB();
+extern void movFreqA(Fl_Widget *, void *);
+extern void movFreqB(Fl_Widget *, void *);
 extern void adjustFreqs();
 extern void cbABactive();
 extern void cbA2B();

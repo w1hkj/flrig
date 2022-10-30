@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "other/tcisdr.h"
@@ -264,11 +264,11 @@ RIG_TCI_SDR::RIG_TCI_SDR() {
 	serial_rtsptt = false;
 	serial_dtrptt = false;
 
-	A.freq  =  7070000;
+	A.freq  =  7070000ULL;
 	A.imode = TCI_CW;
 	A.iBW   = 6;
 
-	B.freq  = 14070000;
+	B.freq  = 14070000ULL;
 	B.imode = TCI_USB;
 	B.iBW   = 10;
 
@@ -722,31 +722,31 @@ int RIG_TCI_SDR::get_split()
 	return slice_0.split;
 }
 
-unsigned long int RIG_TCI_SDR::get_vfoA ()
+unsigned long long RIG_TCI_SDR::get_vfoA ()
 {
 	A.freq = slice_0.A.freq;
 	return A.freq;
 }
 
-void RIG_TCI_SDR::set_vfoA (unsigned long int freq)
+void RIG_TCI_SDR::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	char vfostr[20];
-	snprintf(vfostr, sizeof(vfostr), "vfo:0,0,%ld;", freq);
+	snprintf(vfostr, sizeof(vfostr), "vfo:0,0,%llu;", freq);
 	tci_send(vfostr);
 }
 
-unsigned long int RIG_TCI_SDR::get_vfoB ()
+unsigned long long RIG_TCI_SDR::get_vfoB ()
 {
 	B.freq = slice_0.B.freq;
 	return B.freq;
 }
 
-void RIG_TCI_SDR::set_vfoB (unsigned long int freq)
+void RIG_TCI_SDR::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
 	char vfostr[20];
-	snprintf(vfostr, sizeof(vfostr), "vfo:0,1,%ld;", freq);
+	snprintf(vfostr, sizeof(vfostr), "vfo:0,1,%llu;", freq);
 	tci_send(vfostr);
 }
 

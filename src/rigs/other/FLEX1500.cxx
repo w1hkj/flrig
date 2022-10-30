@@ -16,7 +16,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "other/FLEX1500.h"
@@ -180,7 +180,7 @@ RIG_FLEX1500::RIG_FLEX1500() {
 	serial_dtrptt = false;
 	B.imode = A.imode = 1;
 	B.iBW = A.iBW = 0x8803;
-	B.freq = A.freq = 14070000;
+	B.freq = A.freq = 14070000ULL;
 	can_change_alt_vfo = true;
 
 	has_dsp_controls =

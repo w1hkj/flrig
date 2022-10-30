@@ -1053,13 +1053,13 @@ void setColors()
 	progStatus.tab_blue = tab_blue;
 
 	if (selrig->inuse == onB) {
-		FreqDispB->SetONOFFCOLOR( fl_rgb_color(fg_red, fg_green, fg_blue), bgclr);
-		FreqDispA->SetONOFFCOLOR(
+		FreqDispB->SetCOLORS( fl_rgb_color(fg_red, fg_green, fg_blue), bgclr);
+		FreqDispA->SetCOLORS(
 			fl_rgb_color(fg_red, fg_green, fg_blue),
 			fl_color_average(bgclr, FL_BLACK, 0.87));
 	} else {
-		FreqDispA->SetONOFFCOLOR( fl_rgb_color(fg_red, fg_green, fg_blue), bgclr);
-		FreqDispB->SetONOFFCOLOR(
+		FreqDispA->SetCOLORS( fl_rgb_color(fg_red, fg_green, fg_blue), bgclr);
+		FreqDispB->SetCOLORS(
 			fl_rgb_color(fg_red, fg_green, fg_blue),
 			fl_color_average(bgclr, FL_BLACK, 0.87));
 	}

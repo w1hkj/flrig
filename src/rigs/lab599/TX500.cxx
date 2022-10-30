@@ -129,7 +129,7 @@ RIG_TX500::RIG_TX500() {
 	serial_dtrptt =  false;
 	B.imode = A.imode = 1;
 	B.iBW = A.iBW = 0x8803;
-	B.freq = A.freq = 14070000;
+	B.freq = A.freq = 14070000ULL;
 	can_change_alt_vfo = true;
 
 	has_power_out =
@@ -322,7 +322,7 @@ void RIG_TX500::selectB()
 	inuse = onB;
 }
 
-unsigned long int RIG_TX500::get_vfoA ()
+unsigned long long RIG_TX500::get_vfoA ()
 {
 	cmd = "FA;";
 	if (wait_char(';', 14, 100, "get vfo A", ASC) < 14) return A.freq;
@@ -330,12 +330,12 @@ unsigned long int RIG_TX500::get_vfoA ()
 
 	size_t p = replystr.rfind("FA");
 	if (p != std::string::npos && (p + 12 < replystr.length())) {
-		A.freq = atol(&replystr[ p + 2]);
+		A.freq = strtoull(&replystr[ p + 2], NULL, 10);
 	}
 	return A.freq;
 }
 
-void RIG_TX500::set_vfoA (unsigned long int freq)
+void RIG_TX500::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	cmd = "FA00000000000;";
@@ -349,7 +349,7 @@ void RIG_TX500::set_vfoA (unsigned long int freq)
 	showresp(WARN, ASC, "set vfo A", cmd, "");
 }
 
-unsigned long int RIG_TX500::get_vfoB ()
+unsigned long long RIG_TX500::get_vfoB ()
 {
 	cmd = "FB;";
 	if (wait_char(';', 14, 100, "get vfo B", ASC) < 14) return B.freq;
@@ -357,12 +357,12 @@ unsigned long int RIG_TX500::get_vfoB ()
 
 	size_t p = replystr.rfind("FB");
 	if (p != std::string::npos && (p + 12 < replystr.length())) {
-		B.freq = atol(&replystr[ p + 2 ]);
+		B.freq = strtoull(&replystr[ p + 2 ], NULL, 10);
 	}
 	return B.freq;
 }
 
-void RIG_TX500::set_vfoB (unsigned long int freq)
+void RIG_TX500::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
 	cmd = "FB00000000000;";

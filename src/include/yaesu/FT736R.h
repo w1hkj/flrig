@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #ifndef FT736R_H
@@ -32,11 +32,11 @@ public:
 	void initialize();
 	void shutdown();
 
-	unsigned long int get_vfoA();
-	unsigned long int get_vfoB();
+	unsigned long long get_vfoA();
+	unsigned long long get_vfoB();
 
-	void set_vfoA(unsigned long int);
-	void set_vfoB(unsigned long int);
+	void set_vfoA(unsigned long long);
+	void set_vfoB(unsigned long long);
 
 	int  get_modeA();
 	int  get_modeB();
@@ -56,7 +56,7 @@ public:
 
 private:
 	void init_cmd();
-	void set_vfo(unsigned long int);
+	void set_vfo(unsigned long long);
 	void set_mode(int);
 	void send();
 

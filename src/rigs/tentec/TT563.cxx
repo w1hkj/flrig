@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "tentec/TT563.h"
@@ -53,11 +53,11 @@ RIG_TT563::RIG_TT563() {
 	serial_rtsptt = false;
 	serial_dtrptt = false;
 
-	def_freq = A.freq = 14070000;
+	def_freq = A.freq = 14070000ULL;
 	def_mode = A.imode = 1;
 	def_bw = A.iBW = 1;
 
-	B.freq = 7070000;
+	B.freq = 7070000ULL;
 	B.imode = 1;
 	B.iBW = 1;
 
@@ -156,7 +156,7 @@ bool RIG_TT563::check ()
 	return ok;
 }
 
-unsigned long int RIG_TT563::get_vfoA ()
+unsigned long long RIG_TT563::get_vfoA ()
 {
 	if (inuse == onB) return A.freq;
 	std::string resp = pre_fm;
@@ -173,7 +173,7 @@ unsigned long int RIG_TT563::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_TT563::set_vfoA (unsigned long int freq)
+void RIG_TT563::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	cmd = pre_to;
@@ -184,7 +184,7 @@ void RIG_TT563::set_vfoA (unsigned long int freq)
 	waitFB("set vfo A");
 }
 
-unsigned long int RIG_TT563::get_vfoB ()
+unsigned long long RIG_TT563::get_vfoB ()
 {
 	if (inuse == onA) return B.freq;
 	std::string resp = pre_fm;
@@ -201,7 +201,7 @@ unsigned long int RIG_TT563::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_TT563::set_vfoB (unsigned long int freq)
+void RIG_TT563::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
 	cmd = pre_to;

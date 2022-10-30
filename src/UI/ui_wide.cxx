@@ -227,8 +227,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 		FreqDispA = new cFreqControl(
 			wd_grp1b->x(), wd_grp1b->y(), wd_grp1b->w(), wd_grp1b->h(), "10");
 			FreqDispA->when(FL_WHEN_CHANGED);
-			FreqDispA->SetONOFFCOLOR (FL_YELLOW, FL_BLACK);
-			FreqDispA->setCallBack(movFreqA);
+			FreqDispA->callback((Fl_Callback*)movFreqA);
 }
 		wd_grp1b->end();
 
@@ -240,8 +239,7 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 			FreqDispB = new cFreqControl(
 				wd_grp1c->x(), wd_grp1->y(), wd_grp1c->w(), 38, "10");
 			FreqDispB->when(FL_WHEN_CHANGED);
-			FreqDispB->SetONOFFCOLOR (FL_YELLOW, FL_BLACK);
-			FreqDispB->setCallBack(movFreqB);
+			FreqDispB->callback((Fl_Callback*)movFreqB);
 
 			grp_row0a = new Fl_Group(
 				wd_grp1c->x() + 2, wd_grp1c->y() + FreqDispB->h() + 2, 

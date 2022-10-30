@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 /*
  * Driver for PCR-1000 April 2012, Brian Miezejewski, k5hfi
@@ -134,11 +134,11 @@ RIG_PCR1000::RIG_PCR1000()
 //	Defaults.
 
 	A.imode = 2;
-	A.freq = 7025000L;
+	A.freq = 7025000ULL;
 	A.iBW = 0 ;
 
 	B.imode = 1;
-	B.freq = 7070000L;
+	B.freq = 7070000ULL;
 	B.iBW = 0 ;
 
 	sql 				= 127 ;		// Set squelch to a reasonable value
@@ -264,7 +264,7 @@ std::string RIG_PCR1000::strFreqModeBW(XCVR_STATE &freqMode)
 //                          |___________________________ command K0
 
 	// Set the frequency in the selected mode command
-	unsigned long int freq = freqMode.freq ;
+	unsigned long long freq = freqMode.freq ;
 	for( int pos = 11 ; pos > 1 ; pos--) {
 		freq_cmd[pos] = '0'+ (freq % 10) ;
 		freq /= 10;
@@ -288,7 +288,7 @@ std::string RIG_PCR1000::strFreqModeBW(XCVR_STATE &freqMode)
 
 //----------------------------------------------------------------------
 
-void RIG_PCR1000::set_vfoA (unsigned long int freq)
+void RIG_PCR1000::set_vfoA (unsigned long long freq)
 {
 	freqA = 
 	A.freq = freq;
@@ -296,7 +296,7 @@ void RIG_PCR1000::set_vfoA (unsigned long int freq)
 		wait_crlf(strFreqModeBW(A), "set_vfo  A");
 }
 
-unsigned long int RIG_PCR1000::get_vfoA ()
+unsigned long long RIG_PCR1000::get_vfoA ()
 {
 	return A.freq;
 }
@@ -304,7 +304,7 @@ unsigned long int RIG_PCR1000::get_vfoA ()
 
 //----------------------------------------------------------------------
 
-void RIG_PCR1000::set_vfoB (unsigned long int freq)
+void RIG_PCR1000::set_vfoB (unsigned long long freq)
 {
 	freqB = 
 	B.freq = freq;
@@ -312,7 +312,7 @@ void RIG_PCR1000::set_vfoB (unsigned long int freq)
 		wait_crlf(strFreqModeBW(B), "set_vfo  B");
 }
 
-unsigned long int RIG_PCR1000::get_vfoB ()
+unsigned long long RIG_PCR1000::get_vfoB ()
 {
 	return B.freq;
 }

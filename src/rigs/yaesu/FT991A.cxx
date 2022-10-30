@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 #include <iostream>
 
@@ -134,7 +134,7 @@ RIG_FT991A::RIG_FT991A() {
 
 	A.imode = B.imode = modeB = modeA = def_mode = 1;
 	A.iBW = B.iBW = bwA = bwB = def_bw = 12;
-	A.freq = B.freq = freqA = freqB = def_freq = 14070000;
+	A.freq = B.freq = freqA = freqB = def_freq = 14070000ULL;
 
 	has_compON =
 	has_compression =
@@ -232,7 +232,7 @@ void RIG_FT991A::initialize()
 // Disable Auto Information mode
 	sendCommand("AI0;");
 /*
-// "MRnnn;" if valid, returns last channel used, "mrlll...;", aunsigned long int with channel nnn info.
+// "MRnnn;" if valid, returns last channel used, "mrlll...;", along with channel nnn info.
 	cmd = "MR118;";
 	wait_char(';', 27, FL991A_WAIT_TIME, "Read UK 60m Channel Mem", ASC);
 	size_t p = replystr.rfind("MR");
@@ -269,7 +269,7 @@ bool RIG_FT991A::check ()
 	return false;
 }
 
-unsigned long int RIG_FT991A::get_vfoA ()
+unsigned long long RIG_FT991A::get_vfoA ()
 {
 	cmd = rsp = "FA";
 	cmd += ';';
@@ -279,14 +279,14 @@ unsigned long int RIG_FT991A::get_vfoA ()
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return freqA;
 	p += 2;
-	int f = 0;
+	unsigned long long f = 0;
 	for (int n = 0; n < ndigits; n++)
 		f = f * 10 + replystr[p + n] - '0';
 	freqA = f;
 	return freqA;
 }
 
-void RIG_FT991A::set_vfoA (unsigned long int freq)
+void RIG_FT991A::set_vfoA (unsigned long long freq)
 {
 	freqA = freq;
 	cmd = "FA000000000;";
@@ -299,7 +299,7 @@ void RIG_FT991A::set_vfoA (unsigned long int freq)
 	sett("set_vfoA");
 }
 
-unsigned long int RIG_FT991A::get_vfoB ()
+unsigned long long RIG_FT991A::get_vfoB ()
 {
 	cmd = rsp = "FB";
 	cmd += ';';
@@ -309,7 +309,7 @@ unsigned long int RIG_FT991A::get_vfoB ()
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return freqB;
 	p += 2;
-	int f = 0;
+	unsigned long long f = 0;
 	for (int n = 0; n < ndigits; n++)
 		f = f * 10 + replystr[p + n] - '0';
 	freqB = f;
@@ -317,7 +317,7 @@ unsigned long int RIG_FT991A::get_vfoB ()
 }
 
 
-void RIG_FT991A::set_vfoB (unsigned long int freq)
+void RIG_FT991A::set_vfoB (unsigned long long freq)
 {
 	freqB = freq;
 	cmd = "FB000000000;";

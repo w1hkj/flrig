@@ -19,7 +19,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <string>
@@ -183,11 +183,11 @@ RIG_IC7300::RIG_IC7300() {
 
 	widgets = IC7300_widgets;
 
-	def_freq = A.freq = 14070000;
+	def_freq = A.freq = 14070000ULL;
 	def_mode = A.imode = 9;
 	def_bw = A.iBW = 34;
 
-	B.freq = 7070000;
+	B.freq = 7070000ULL;
 	B.imode = 9;
 	B.iBW = 34;
 
@@ -457,7 +457,7 @@ bool RIG_IC7300::check ()
 	return (xcvr_is_on = waitFOR(8, "get ID"));
 }
 
-unsigned long int RIG_IC7300::get_vfoA ()
+unsigned long long RIG_IC7300::get_vfoA ()
 {
 	std::string resp;
 
@@ -490,7 +490,7 @@ unsigned long int RIG_IC7300::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_IC7300::set_vfoA (unsigned long int freq)
+void RIG_IC7300::set_vfoA (unsigned long long freq)
 {
 //	set_trace(1, "set_vfoA()");
 	A.freq = freq;
@@ -507,7 +507,7 @@ void RIG_IC7300::set_vfoA (unsigned long int freq)
 	seth();
 }
 
-unsigned long int RIG_IC7300::get_vfoB ()
+unsigned long long RIG_IC7300::get_vfoB ()
 {
 	std::string resp;
 
@@ -540,7 +540,7 @@ unsigned long int RIG_IC7300::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_IC7300::set_vfoB (unsigned long int freq)
+void RIG_IC7300::set_vfoB (unsigned long long freq)
 {
 //	set_trace(1, "set_vfoB()");
 	B.freq = freq;
@@ -2492,7 +2492,7 @@ void RIG_IC7300::get_band_selection(int v)
 	if (ret) {
 		size_t p = replystr.rfind(retstr);
 		if (p != std::string::npos) {
-			unsigned long int bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
+			unsigned long long bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
 			int bandmode = replystr[p+13];
 			int bandfilter = replystr[p+14];
 			int banddata = replystr[p+15] & 0x10;
@@ -2522,7 +2522,7 @@ void RIG_IC7300::get_band_selection(int v)
 void RIG_IC7300::set_band_selection(int v)
 {
 //	set_trace(1, "set_band_selection()");
-	unsigned long int freq = (inuse == onB ? B.freq : A.freq);
+	unsigned long long freq = (inuse == onB ? B.freq : A.freq);
 	int fil = (inuse == onB ? B.filter : A.filter);
 	int mode = (inuse == onB ? B.imode : A.imode);
 

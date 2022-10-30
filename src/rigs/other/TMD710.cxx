@@ -68,7 +68,7 @@ bool RIG_TMD710::check ()
 }
 
 // Works for TM-D710E
-unsigned long int RIG_TMD710::get_vfoA ()
+unsigned long long RIG_TMD710::get_vfoA ()
 {
 	cmd = "FO 0\r";
 	int ret = wait_char('\r', 49, 100, "get VFO", ASC);
@@ -76,12 +76,12 @@ unsigned long int RIG_TMD710::get_vfoA ()
 
 	gett("get_vfoA");
 	char frequency[11];
-	long int f = 0;
+	unsigned long long f = 0;
 	int p = 5;
 	int n = 0;
 	for (n = 0; n < 10; n++) frequency[n] = (replystr[p + n]);
 	frequency[10] = '\0';
-	f = atoi(frequency);
+	f = strtoull(frequency, NULL, 10);
 	freqA = f;
 
 	char mode[2];
@@ -223,7 +223,7 @@ unsigned long int RIG_TMD710::get_vfoA ()
 
 }
 
-unsigned long int RIG_TMD710::get_vfoB ()
+unsigned long long RIG_TMD710::get_vfoB ()
 {
 	cmd = "FO 1\r";
 	int ret = wait_char('\r', 49, 100, "get VFO", ASC);
@@ -231,12 +231,12 @@ unsigned long int RIG_TMD710::get_vfoB ()
 
 	gett("get_vfoB");
 	char frequency[11];
-	long int f = 0;
+	unsigned long long f = 0;
 	int p = 5;
 	int n = 0;
 	for (n = 0; n < 10; n++) frequency[n] = (replystr[p + n]);
 	frequency[10] = '\0';
-	f = atoi(frequency);
+	f = strtoull(frequency, NULL, 10);
 	freqB = f;
 
 	char mode[2];
@@ -246,14 +246,14 @@ unsigned long int RIG_TMD710::get_vfoB ()
 	return freqB;
 }
 
-void RIG_TMD710::set_vfoA (unsigned long int freq)
+void RIG_TMD710::set_vfoA (unsigned long long freq)
 {
 	cmd = "FO 0\r";
 	int ret = wait_char('\r', 49, 200, "get VFO A", ASC);
 	if (ret < 49) return;
 	cmd = replystr;
 	char frequency[11];
-	snprintf(frequency,11, "%010ld", freq);
+	snprintf(frequency,11, "%010llu", freq);
 	int n = 0;
 	int p = 5;
 	for (n = 0; n < 10; n++) (cmd[p + n])= frequency[n];
@@ -261,14 +261,14 @@ void RIG_TMD710::set_vfoA (unsigned long int freq)
 	return;
 }
 
-void RIG_TMD710::set_vfoB (unsigned long int freq)
+void RIG_TMD710::set_vfoB (unsigned long long freq)
 {
 	cmd = "FO 1\r";
 	int ret = wait_char('\r', 49, 200, "get VFO B", ASC);
 	if (ret < 49) return;
 	cmd = replystr;
 	char frequency[11];
-	snprintf(frequency,11, "%010ld", freq);
+	snprintf(frequency,11, "%010llu", freq);
 	int n = 0;
 	int p = 5;
 	for (n = 0; n < 10; n++) (cmd[p + n])= frequency[n];

@@ -414,14 +414,12 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		FreqDispA = new cFreqControl(xpos, ypos, 480, 100, _("10"));
 		FreqDispA->labeltype(FL_NORMAL_LABEL);
 		FreqDispA->when(FL_WHEN_CHANGED);
-		FreqDispA->SetONOFFCOLOR (FL_YELLOW, FL_BLACK);
-		FreqDispA->setCallBack(movFreqA);
+		FreqDispA->callback((Fl_Callback*)movFreqA);
 
 // FreqDispB hides behind FreqDispA
 		FreqDispB = new cFreqControl(xpos, ypos, 480, 100, _("10"));
 		FreqDispB->when(FL_WHEN_CHANGED);
-		FreqDispB->SetONOFFCOLOR (FL_YELLOW, FL_BLACK);
-		FreqDispB->setCallBack(movFreqB);
+		FreqDispB->callback((Fl_Callback*)movFreqB);
 		FreqDispB->hide();
 
 		xpos += FreqDispA->w() + 2;

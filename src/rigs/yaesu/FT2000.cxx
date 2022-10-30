@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <iostream>
@@ -121,7 +121,7 @@ RIG_FT2000::RIG_FT2000() {
 	bwA = 2;
 	def_mode = 1;
 	def_bw = 2;
-	def_freq = 14070000;
+	def_freq = 14070000ULL;
 
 	has_band_selection =
 	has_extras =
@@ -215,7 +215,7 @@ bool RIG_FT2000::check ()
 	return false;
 }
 
-unsigned long int RIG_FT2000::get_vfoA ()
+unsigned long long RIG_FT2000::get_vfoA ()
 {
 	cmd = "FA;";
 	int ret = wait_char(';', 11, 100, "get vfoA", ASC);
@@ -225,7 +225,7 @@ unsigned long int RIG_FT2000::get_vfoA ()
 	if (ret < 11) return freqA;
 	size_t p = replystr.rfind("FA");
 	if (p == std::string::npos) return freqA;
-	int f = 0;
+	unsigned long long f = 0;
 	for (size_t n = 2; n < 10; n++)
 		f = f*10 + replystr[p + n] - '0';
 	freqA = f;
@@ -233,7 +233,7 @@ unsigned long int RIG_FT2000::get_vfoA ()
 	return freqA;
 }
 
-void RIG_FT2000::set_vfoA (unsigned long int freq)
+void RIG_FT2000::set_vfoA (unsigned long long freq)
 {
 	freqA = freq;
 	cmd = "FA00000000;";
@@ -244,7 +244,7 @@ void RIG_FT2000::set_vfoA (unsigned long int freq)
 	sendCommand(cmd, 0);
 }
 
-unsigned long int RIG_FT2000::get_vfoB ()
+unsigned long long RIG_FT2000::get_vfoB ()
 {
 	cmd = "FB;";
 	int ret = wait_char(';', 11, 100, "get vfoB", ASC);
@@ -254,7 +254,7 @@ unsigned long int RIG_FT2000::get_vfoB ()
 	if (ret < 11) return freqB;
 	size_t p = replystr.rfind("FA");
 	if (p == std::string::npos) return freqB;
-	int f = 0;
+	unsigned long long f = 0;
 	for (size_t n = 2; n < 10; n++)
 		f = f*10 + replystr[p + n] - '0';
 	freqB = f;
@@ -262,7 +262,7 @@ unsigned long int RIG_FT2000::get_vfoB ()
 	return freqB;
 }
 
-void RIG_FT2000::set_vfoB (unsigned long int freq)
+void RIG_FT2000::set_vfoB (unsigned long long freq)
 {
 	freqB = freq;
 	cmd = "FB00000000;";

@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this pRIGram.  If not, see <http://www.gnu.org/licenses/>.
+// along with this pRIGram.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #ifndef _TRUSDX_H
@@ -35,8 +35,8 @@ public:
 	void shutdown();
 	bool check();
 
-	unsigned long int get_vfoA();
-	void set_vfoA(unsigned long int);
+	unsigned long long get_vfoA();
+	void set_vfoA(unsigned long long);
 
 	void set_modeA(int val);
 	int  get_modeA();

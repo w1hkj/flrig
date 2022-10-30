@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <sstream>
@@ -174,14 +174,14 @@ RIG_IC9700::RIG_IC9700() {
 	serial_rtsptt = false;
 	serial_dtrptt = false;
 
-	A.freq = 14070000;
+	A.freq = 14070000ULL;
 	A.imode = USB9700D;
 	A.iBW = 34;
-	B.freq = 7070000;
+	B.freq = 7070000ULL;
 	B.imode = USB9700D;
 	B.iBW = 34;
 
-	def_freq = 14070000L;
+	def_freq = 14070000ULL;
 	def_mode = USB9700D;
 	def_bw = 34;
 
@@ -384,7 +384,7 @@ bool RIG_IC9700::check ()
 
 static int ret = 0;
 
-unsigned long int RIG_IC9700::get_vfoA ()
+unsigned long long RIG_IC9700::get_vfoA ()
 {
 #ifdef DUALWATCH_SUB_AS_B
   int sat_mode = get_sat_mode() + get_dualwatch();
@@ -452,7 +452,7 @@ unsigned long int RIG_IC9700::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_IC9700::set_vfoA (unsigned long int freq)
+void RIG_IC9700::set_vfoA (unsigned long long freq)
 {
   A.freq = freq;
 
@@ -489,7 +489,7 @@ void RIG_IC9700::set_vfoA (unsigned long int freq)
   }
 }
 
-unsigned long int RIG_IC9700::get_vfoB ()
+unsigned long long RIG_IC9700::get_vfoB ()
 {
 #ifdef DUALWATCH_SUB_AS_B
   int sat_mode = get_sat_mode() + get_dualwatch();
@@ -554,7 +554,7 @@ unsigned long int RIG_IC9700::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_IC9700::set_vfoB (unsigned long int freq)
+void RIG_IC9700::set_vfoB (unsigned long long freq)
 {
   B.freq = freq;
 
@@ -1932,7 +1932,7 @@ void RIG_IC9700::get_band_selection(int v)
 		set_trace(2, "get band stack", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(pre_fm);
 		if (p != std::string::npos) {
-			unsigned long int bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
+			unsigned long long bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
 			int bandmode = replystr[p+13];
 			int bandfilter = replystr[p+14];
 			int banddata = replystr[p+15] & 0x10;
@@ -1965,7 +1965,7 @@ void RIG_IC9700::get_band_selection(int v)
 
 void RIG_IC9700::set_band_selection(int v)
 {
-	unsigned long int freq = (inuse == onB ? B.freq : A.freq);
+	unsigned long long freq = (inuse == onB ? B.freq : A.freq);
 	int mode = (inuse == onB ? B.imode : A.imode);
 
 	cmd.assign(pre_to);

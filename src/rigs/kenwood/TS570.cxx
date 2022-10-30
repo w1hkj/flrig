@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "kenwood/TS570.h"
@@ -111,10 +111,10 @@ RIG_TS570::RIG_TS570() {
 	serial_rtsptt = false;
 	serial_dtrptt = false;
 
-	A.freq = 14070000;
+	A.freq = 14070000ULL;
 	A.imode = 1;
 	A.iBW = 1;
-	B.freq = 7035000;
+	B.freq = 7035000ULL;
 	B.imode = 1;
 	B.iBW = 1;
 	can_change_alt_vfo = true;
@@ -237,7 +237,7 @@ bool RIG_TS570::check ()
 	return is_TS570;
 }
 
-unsigned long int RIG_TS570::get_vfoA ()
+unsigned long long RIG_TS570::get_vfoA ()
 {
 	cmd = "FA;";
 	get_trace(1, "get_vfoA()");
@@ -248,14 +248,14 @@ unsigned long int RIG_TS570::get_vfoA ()
 	size_t p = replystr.rfind("FA");
 	if (p == std::string::npos) return A.freq;
 
-	int f = 0;
+	unsigned long long f = 0;
 	for (size_t n = 2; n < 13; n++)
 		f = f*10 + replystr[p + n] - '0';
 	A.freq = f;
 	return A.freq;
 }
 
-void RIG_TS570::set_vfoA (unsigned long int freq)
+void RIG_TS570::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	cmd = "FA00000000000;";
@@ -267,7 +267,7 @@ void RIG_TS570::set_vfoA (unsigned long int freq)
 	showresp(WARN, ASC, "set vfoA", cmd, "");
 }
 
-unsigned long int RIG_TS570::get_vfoB ()
+unsigned long long RIG_TS570::get_vfoB ()
 {
 	cmd = "FB;";
 
@@ -279,14 +279,14 @@ unsigned long int RIG_TS570::get_vfoB ()
 	size_t p = replystr.rfind("FB");
 	if (p == std::string::npos) return freqB;
 
-	int f = 0;
+	unsigned long long f = 0;
 	for (size_t n = 2; n < 13; n++)
 		f = f*10 + replystr[p + n] - '0';
 	freqB = f;
 	return freqB;
 }
 
-void RIG_TS570::set_vfoB (unsigned long int freq)
+void RIG_TS570::set_vfoB (unsigned long long freq)
 {
 	freqB = freq;
 	cmd = "FB00000000000;";

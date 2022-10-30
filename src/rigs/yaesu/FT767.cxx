@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <stdio.h>
@@ -71,7 +71,7 @@ bool RIG_FT767::check()
 	return false;
 }
 
-unsigned long int RIG_FT767::get_vfoA ()
+unsigned long long RIG_FT767::get_vfoA ()
 {
 	init_cmd();
 	cmd[4] = 0x01; // CHECK command
@@ -83,7 +83,7 @@ unsigned long int RIG_FT767::get_vfoA ()
 	return freqA;
 }
 
-void RIG_FT767::set_vfoA (unsigned long int freq)
+void RIG_FT767::set_vfoA (unsigned long long freq)
 {
 	freqA = freq;
 	freq /=10; // 767 does not support 1 Hz resolution

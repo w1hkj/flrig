@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 #include <iostream>
 
@@ -88,7 +88,7 @@ RIG_KX3::RIG_KX3() {
 	serial_rtsptt = false;
 	serial_dtrptt = false;
 
-	def_freq = freqA = freqB = 14070000;
+	def_freq = freqA = freqB = 14070000ULL;
 	def_mode = modeA = modeB = 1;
 	def_bw = bwA = bwB = 34;
 
@@ -284,7 +284,7 @@ bool RIG_KX3::check ()
 
 }
 
-unsigned long int RIG_KX3::get_vfoA ()
+unsigned long long RIG_KX3::get_vfoA ()
 {
 	cmd = "FA;";
 
@@ -297,7 +297,7 @@ unsigned long int RIG_KX3::get_vfoA ()
 	size_t p = replystr.rfind("FA");
 	if (p == std::string::npos) return freqA;
 
-	unsigned long int f = 0;
+	unsigned long long f = 0;
 	for (size_t n = 2; n < 13; n++)
 		f = f*10 + replystr[p + n] - '0';
 	freqA = f;
@@ -305,7 +305,7 @@ unsigned long int RIG_KX3::get_vfoA ()
 	return freqA;
 }
 
-void RIG_KX3::set_vfoA (unsigned long int freq)
+void RIG_KX3::set_vfoA (unsigned long long freq)
 {
 	freqA = freq;
 	cmd = "FA00000000000;";
@@ -320,7 +320,7 @@ void RIG_KX3::set_vfoA (unsigned long int freq)
 	check();
 }
 
-unsigned long int RIG_KX3::get_vfoB ()
+unsigned long long RIG_KX3::get_vfoB ()
 {
 	cmd = "FB;";
 	get_trace(1, "get vfoB");
@@ -331,14 +331,14 @@ unsigned long int RIG_KX3::get_vfoB ()
 	size_t p = replystr.rfind("FB");
 	if (p == std::string::npos) return freqB;
 
-	unsigned long int f = 0;
+	unsigned long long f = 0;
 	for (size_t n = 2; n < 13; n++)
 		f = f*10 + replystr[p + n] - '0';
 	freqB = f;
 	return freqB;
 }
 
-void RIG_KX3::set_vfoB (unsigned long int freq)
+void RIG_KX3::set_vfoB (unsigned long long freq)
 {
 	freqB = freq;
 	cmd = "FB00000000000;";
@@ -426,7 +426,7 @@ int RIG_KX3::get_volume_control()
  *     1 (AFSK A),
  *     2 (FSK D),
  *     3 (PSK D). See MD for data normal/reverse considerations.
- *   In Diversity Mode (K3 only, accessed by sending DV1 or via a unsigned long int hold
+ *   In Diversity Mode (K3 only, accessed by sending DV1 or via a long hold
  *   of SUB), sending DTn matches the sub receiver’s mode to the main receiver’s.
  *   Notes:
  *     (1) Use DT only when the transceiver is in DATA mode; otherwise,

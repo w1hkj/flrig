@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "kenwood/KENWOOD.h"
@@ -121,7 +121,7 @@ bool KENWOOD::check()
 	return true;
 }
 
-unsigned long int KENWOOD::get_vfoA ()
+unsigned long long KENWOOD::get_vfoA ()
 {
 	cmd = "FA;";
 	get_trace(1, "get_vfoA");
@@ -130,7 +130,7 @@ unsigned long int KENWOOD::get_vfoA ()
 	if (ret == 14) {
 		size_t p = replystr.rfind("FA");
 		if (p != std::string::npos) {
-			int f = 0;
+			unsigned long long f = 0;
 			for (size_t n = 2; n < 13; n++)
 				f = f*10 + replystr[p+n] - '0';
 			A.freq = f;
@@ -139,7 +139,7 @@ unsigned long int KENWOOD::get_vfoA ()
 	return A.freq;
 }
 
-void KENWOOD::set_vfoA (unsigned long int freq)
+void KENWOOD::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	cmd = "FA00000000000;";
@@ -152,7 +152,7 @@ void KENWOOD::set_vfoA (unsigned long int freq)
 	sett("vfoA");
 }
 
-unsigned long int KENWOOD::get_vfoB ()
+unsigned long long KENWOOD::get_vfoB ()
 {
 	cmd = "FB;";
 	get_trace(1, "get_vfoB");
@@ -161,7 +161,7 @@ unsigned long int KENWOOD::get_vfoB ()
 	if (ret == 14) {
 		size_t p = replystr.rfind("FB");
 		if (p != std::string::npos) {
-			int f = 0;
+			unsigned long long f = 0;
 			for (size_t n = 2; n < 13; n++)
 				f = f*10 + replystr[p+n] - '0';
 			B.freq = f;
@@ -170,7 +170,7 @@ unsigned long int KENWOOD::get_vfoB ()
 	return B.freq;
 }
 
-void KENWOOD::set_vfoB (unsigned long int freq)
+void KENWOOD::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
 	cmd = "FB00000000000;";

@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "config.h"
@@ -217,7 +217,7 @@ RIG_TS590SG::RIG_TS590SG() {
 
 	B.imode = A.imode = USB;
 	B.iBW = A.iBW = DEF_SL_SH;
-	B.freq = A.freq = 14070000;
+	B.freq = A.freq = 14070000ULL;
 	can_change_alt_vfo = true;
 
 	nb_level = 2;

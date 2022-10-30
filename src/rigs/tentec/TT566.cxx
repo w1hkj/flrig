@@ -17,7 +17,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "tentec/TT566.h"
@@ -209,7 +209,7 @@ RIG_TT566::RIG_TT566() {
 	serial_dtrptt = false;
 	def_mode = modeB = modeA = A.imode = B.imode = 1;
 	def_bw = bwB = bwA = A.iBW = B.iBW = 19;
-	def_freq = freqB = freqA = A.freq = B.freq = 14070000;
+	def_freq = freqB = freqA = A.freq = B.freq = 14070000ULL;
 
 	max_power = 100;
 	atten_level = 0;
@@ -271,7 +271,7 @@ bool RIG_TT566::check ()
 	return true;
 }
 
-unsigned long int RIG_TT566::get_vfoA ()
+unsigned long long RIG_TT566::get_vfoA ()
 {
 	cmd = TT566getFREQa; 
 //	replystr = "@AF14070050\r";
@@ -281,13 +281,13 @@ unsigned long int RIG_TT566::get_vfoA ()
 	size_t p = replystr.rfind(TT566rspFREQa);
 	if (p == std::string::npos) return A.freq;
 
-	int f = 0;
-	sscanf(&replystr[p + strlen(TT566rspFREQa)], "%d", &f);
+	unsigned long long f = 0;
+	sscanf(&replystr[p + strlen(TT566rspFREQa)], "%llu", &f);
 	A.freq = f;
 	return A.freq;
 }
 
-void RIG_TT566::set_vfoA (unsigned long int freq)
+void RIG_TT566::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	cmd = TT566setFREQa;
@@ -298,7 +298,7 @@ void RIG_TT566::set_vfoA (unsigned long int freq)
 	return;
 }
 
-unsigned long int RIG_TT566::get_vfoB ()
+unsigned long long RIG_TT566::get_vfoB ()
 {
 	cmd = TT566getFREQb;
 //	replystr = "@BF7070000\r";
@@ -308,13 +308,13 @@ unsigned long int RIG_TT566::get_vfoB ()
 	size_t p = replystr.rfind(TT566rspFREQb);
 	if (p == std::string::npos) return B.freq;
 
-	int f = 0;
-	sscanf(&replystr[p + strlen(TT566rspFREQb)], "%d", &f);
+	unsigned long long f = 0;
+	sscanf(&replystr[p + strlen(TT566rspFREQb)], "%llu", &f);
 	B.freq = f;
 	return B.freq;
 }
 
-void RIG_TT566::set_vfoB (unsigned long int freq)
+void RIG_TT566::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
 	cmd = TT566setFREQb;

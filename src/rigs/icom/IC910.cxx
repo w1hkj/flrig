@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "icom/IC910.h"
@@ -121,19 +121,19 @@ RIG_IC910H::RIG_IC910H() {
 };
 
 // this looks like trouble
-void RIG_IC910H::set_vfoA (unsigned long int freq)
+void RIG_IC910H::set_vfoA (unsigned long long freq)
 {
-	unsigned long int nufreq;
-	if (freq > 1300000000L) nufreq = 1300000000L;
-	else if (freq > 450000000L && freq < 1240000000L && freqA <= 450000000L)
-		nufreq = 1240000000L;
-	else if (freq > 450000000L && freq < 1240000000L && freqA >= 1240000000L)
-		nufreq = 450000000L;
-	else if (freq > 148000000L && freq < 430000000L && freqA <= 148000000L)
-		nufreq = 430000000L;
-	else if (freq > 148000000L && freq < 430000000L && freqA >= 430000000L)
-		nufreq = 148000000L;
-	else if (freq < 144000000L) nufreq = 144000000L;
+	unsigned long long nufreq;
+	if (freq > 1300000000ULL) nufreq = 1300000000ULL;
+	else if (freq > 450000000ULL && freq < 1240000000ULL && freqA <= 450000000ULL)
+		nufreq = 1240000000ULL;
+	else if (freq > 450000000ULL && freq < 1240000000ULL && freqA >= 1240000000ULL)
+		nufreq = 450000000ULL;
+	else if (freq > 148000000ULL && freq < 430000000ULL && freqA <= 148000000ULL)
+		nufreq = 430000000ULL;
+	else if (freq > 148000000ULL && freq < 430000000ULL && freqA >= 430000000ULL)
+		nufreq = 148000000ULL;
+	else if (freq < 144000000ULL) nufreq = 144000000ULL;
 	else nufreq = freq;
 	freqA = nufreq;
 

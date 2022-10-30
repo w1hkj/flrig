@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 // AOR 5000 driver based on several other drivers as examples.
 //          Written 05/2017 by Mario Lorenz, dl5mlo@amsat-dl.org
@@ -89,7 +89,7 @@ RIG_AOR5K::RIG_AOR5K() {
 	serial_rtsptt = false;
 	serial_dtrptt = false;
 
-	def_freq = freqA = freqB = 14070000;
+	def_freq = freqA = freqB = 14070000ULL;
 	def_mode = modeA = modeB = 1;
 	def_bw = bwA = bwB = 1;
 
@@ -228,7 +228,7 @@ bool RIG_AOR5K::check()
 	return true;
 }
 
-unsigned long int RIG_AOR5K::get_vfoA ()
+unsigned long long RIG_AOR5K::get_vfoA ()
 {
 	cmd = "RX\r";
 	int ret = wait_char('\r', 34, AOR5K_WAIT_TIME, "get vfo A", ASC);
@@ -238,7 +238,7 @@ unsigned long int RIG_AOR5K::get_vfoA ()
 	if (p < 3) return freqA;
 	if (replystr[p-2] =='E') {
 		// VFO A is active. Instead of A we use E
-		unsigned long int f = 0;
+		unsigned long long f = 0;
 		for (size_t n = 2; n < 12; n++)
 			f = f*10 + replystr[p + n] - '0';
 		freqA = f;
@@ -246,7 +246,7 @@ unsigned long int RIG_AOR5K::get_vfoA ()
 	return freqA;
 }
 
-void RIG_AOR5K::set_vfoA (unsigned long int freq)
+void RIG_AOR5K::set_vfoA (unsigned long long freq)
 {
 	freqA = freq;
 	cmd = "VE0000000000\r";
@@ -257,7 +257,7 @@ void RIG_AOR5K::set_vfoA (unsigned long int freq)
 	wait_char('\r', 1, AOR5K_WAIT_TIME, "set VFO A", ASC);
 }
 
-unsigned long int RIG_AOR5K::get_vfoB ()
+unsigned long long RIG_AOR5K::get_vfoB ()
 {
 	cmd = "RX\r";
 	int ret = wait_char('\r', 34, AOR5K_WAIT_TIME, "get vfo B", ASC);
@@ -267,7 +267,7 @@ unsigned long int RIG_AOR5K::get_vfoB ()
 	if (p < 3) return freqB;
 	if (replystr[p-2] == 'B') {
 		// VFO B active
-		unsigned long int f = 0;
+		unsigned long long f = 0;
 		for (size_t n = 2; n < 12; n++)
 			f = f*10 + replystr[p + n] - '0';
 		freqB = f;
@@ -275,7 +275,7 @@ unsigned long int RIG_AOR5K::get_vfoB ()
 	return freqB;
 }
 
-void RIG_AOR5K::set_vfoB (unsigned long int freq)
+void RIG_AOR5K::set_vfoB (unsigned long long freq)
 {
 	freqB = freq;
 	cmd = "VB0000000000\r";

@@ -53,7 +53,7 @@ RIG_TRUSDX::RIG_TRUSDX() {
 	serial_dtrptt = false;
 
 	A.imode = 1;
-	A.freq = 14070000;
+	A.freq = 14070000ULL;
 
 	has_mode_control = true;
 	has_ptt_control = true;
@@ -124,7 +124,7 @@ void RIG_TRUSDX::get_IF()
 	return;
 }
 
-unsigned long int RIG_TRUSDX::get_vfoA ()
+unsigned long long RIG_TRUSDX::get_vfoA ()
 {
 	cmd = "FA;";
 	get_trace(1, "get_vfoA()");
@@ -133,7 +133,7 @@ unsigned long int RIG_TRUSDX::get_vfoA ()
 
 	size_t p = replystr.rfind("FA");
 	if (p != std::string::npos && (p + 12 < replystr.length())) {
-		int f = 0;
+		unsigned long long f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replystr[p+n] - '0';
 		A.freq = f;
@@ -141,7 +141,7 @@ unsigned long int RIG_TRUSDX::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_TRUSDX::set_vfoA (unsigned long int freq)
+void RIG_TRUSDX::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	set_trace(1, "set_vfoA(...)");

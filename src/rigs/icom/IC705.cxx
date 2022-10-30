@@ -19,7 +19,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <string>
@@ -183,11 +183,11 @@ RIG_IC705::RIG_IC705() {
 
 	widgets = IC705_widgets;
 
-	def_freq = A.freq = 14070000;
+	def_freq = A.freq = 14070000ULL;
 	def_mode = A.imode = 9;
 	def_bw = A.iBW = 34;
 
-	B.freq = 7070000;
+	B.freq = 7070000ULL;
 	B.imode = 9;
 	B.iBW = 34;
 
@@ -370,7 +370,7 @@ bool RIG_IC705::check ()
 	return ok;
 }
 
-unsigned long int RIG_IC705::get_vfoA ()
+unsigned long long RIG_IC705::get_vfoA ()
 {
 	std::string resp;
 
@@ -401,7 +401,7 @@ unsigned long int RIG_IC705::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_IC705::set_vfoA (unsigned long int freq)
+void RIG_IC705::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 
@@ -417,7 +417,7 @@ void RIG_IC705::set_vfoA (unsigned long int freq)
 
 }
 
-unsigned long int RIG_IC705::get_vfoB ()
+unsigned long long RIG_IC705::get_vfoB ()
 {
 	std::string resp;
 
@@ -448,7 +448,7 @@ unsigned long int RIG_IC705::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_IC705::set_vfoB (unsigned long int freq)
+void RIG_IC705::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
 
@@ -2226,7 +2226,7 @@ void RIG_IC705::set_band_selection(int v)
 		case 12: v = 14; break;
 		default: break;
 	}
-	unsigned long int freq = (inuse == onB ? B.freq : A.freq);
+	unsigned long long freq = (inuse == onB ? B.freq : A.freq);
 	int fil = (inuse == onB ? B.filter : A.filter);
 	int mode = (inuse == onB ? B.imode : A.imode);
 

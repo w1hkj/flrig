@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 // TenTec Pegasus computer controlled transceiver
@@ -180,7 +180,7 @@ RIG_TT550::RIG_TT550() {
 
 	def_mode = modeA = modeB = 1;
 	def_bw = bwA = bwB = 20;
-	def_freq = freqA = freqB = 14070000;
+	def_freq = freqA = freqB = 14070000ULL;
 	max_power = 100;
 	can_change_alt_vfo = true;
 
@@ -386,9 +386,9 @@ void RIG_TT550::shutdown()
 
 int DigiAdj = 0;
 
-void RIG_TT550::set_vfoRX(unsigned long int freq)
+void RIG_TT550::set_vfoRX(unsigned long long freq)
 {
-	int NVal = 0, FVal = 0;	// N value / finetune value
+	unsigned long long NVal = 0, FVal = 0;	// N value / finetune value
     int TBfo = 0;			// temporary BFO (Hz)
 	int IBfo = 0;			// Intermediate BFO Freq (Hz)
 
@@ -397,7 +397,7 @@ void RIG_TT550::set_vfoRX(unsigned long int freq)
 
 	int FiltAdj = (TT550_filter_width[def_bw])/2;		// filter bw (Hz)
 
-	unsigned long int lFreq = freq * (1 + VfoAdj * 1e-6);
+	unsigned long long lFreq = freq * (1 + VfoAdj * 1e-6);
 
 	lFreq += RitAdj;
 
@@ -460,16 +460,16 @@ void RIG_TT550::set_vfoRX(unsigned long int freq)
 
 }
 
-void RIG_TT550::set_vfoTX(unsigned long int freq)
+void RIG_TT550::set_vfoTX(unsigned long long freq)
 {
-	int NVal = 0, FVal = 0;	// N value / finetune value
+	unsigned long long NVal = 0, FVal = 0;	// N value / finetune value
     int TBfo = 0;			// temporary BFO
 	int IBfo = 1500;		// Intermediate BFO Freq
 	int bwBFO = 0;			// BFO based on selected bandwidth
 	int FilterBw = 0;		// Filter Bandwidth determined from table
 
 	int XitAdj;
-	unsigned long int lFreq = freq * (1 + VfoAdj * 1e-6);
+	unsigned long long lFreq = freq * (1 + VfoAdj * 1e-6);
 
 	lFreq += XitAdj = XitActive ? XitFreq : 0;
 
@@ -544,7 +544,7 @@ void RIG_TT550::set_split(bool val)
 	set_trace(2, "set split ", (val ? "ON" : "OFF"));
 }
 
-void RIG_TT550::set_vfo(unsigned long int freq)
+void RIG_TT550::set_vfo(unsigned long long freq)
 {
 	set_vfoRX(freq);
 	if (!split)
@@ -552,7 +552,7 @@ void RIG_TT550::set_vfo(unsigned long int freq)
 	xcvrstream.clear();
 }
 
-void RIG_TT550::set_vfoA (unsigned long int freq)
+void RIG_TT550::set_vfoA (unsigned long long freq)
 {
 	freqA = freq;
 	if (inuse == onA)
@@ -569,7 +569,7 @@ bool RIG_TT550::check()
 	return true;
 }
 
-unsigned long int RIG_TT550::get_vfoA ()
+unsigned long long RIG_TT550::get_vfoA ()
 {
 	if (inuse == onA) {
 		freqA += enc_change;
@@ -578,14 +578,14 @@ unsigned long int RIG_TT550::get_vfoA ()
 	return freqA;
 }
 
-void RIG_TT550::set_vfoB (unsigned long int freq)
+void RIG_TT550::set_vfoB (unsigned long long freq)
 {
 	freqB = freq;
 	if (inuse == onB)
 		set_vfo(freqB);
 }
 
-unsigned long int RIG_TT550::get_vfoB ()
+unsigned long long RIG_TT550::get_vfoB ()
 {
 	if (inuse == onB) {
 		freqB += enc_change;
@@ -880,8 +880,8 @@ void RIG_TT550::selectB()
 void RIG_TT550::process_freq_entry(char c)
 {
 	static bool have_decimal = false;
-	float ffreq = 0.0;
-	unsigned long int freq = 0;
+	double ffreq = 0.0;
+	unsigned long long freq = 0;
 	if (xcvrstream.empty()) have_decimal = false;
 	if (c != '\r') {
 		if ((c >= '0' && c <= '9') || c == '.') {
@@ -895,9 +895,9 @@ void RIG_TT550::process_freq_entry(char c)
 				return;
 			}
 			ffreq = 0;
-			sscanf(xcvrstream.c_str(), "%f", &ffreq);
+			sscanf(xcvrstream.c_str(), "%lf", &ffreq);
 			if (have_decimal) ffreq *= 1000;
-			freq = (unsigned long int) ffreq;
+			freq = (unsigned long long) ffreq;
 			if (!txt_encA->visible())
 				Fl::awake(show_encA, NULL);
 			Fl::awake(update_encA, (void*)xcvrstream.c_str());
@@ -908,9 +908,9 @@ void RIG_TT550::process_freq_entry(char c)
 		keypad_timeout = 0;
 		if (xcvrstream.empty()) return;
 		ffreq = 0;
-		sscanf(xcvrstream.c_str(), "%f", &ffreq);
+		sscanf(xcvrstream.c_str(), "%lf", &ffreq);
 		if (have_decimal) ffreq *= 1000;
-		freq = (unsigned long int) ffreq;
+		freq = (unsigned long long) ffreq;
 		if (freq < 50000) freq *= 1000;
 		Fl::awake(hide_encA, NULL);
 		if (inuse == onA) {
@@ -952,7 +952,7 @@ void RIG_TT550::fkey_cw_minus()
 	selrig->set_cw_wpm();
 }
 
-struct BANDS { unsigned int lo; unsigned int hi; unsigned int digi; };
+struct BANDS { unsigned long long lo; unsigned long long hi; unsigned long long digi; };
 
 static BANDS ibands[] = {
 { 0, 1800000, 28120000 },

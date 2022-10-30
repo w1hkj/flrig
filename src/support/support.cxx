@@ -32,6 +32,7 @@
 
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Text_Buffer.H>
+#include <FL/Fl_Widget.H>
 #include <FL/Enumerations.H>
 
 #include "icons.h"
@@ -87,7 +88,7 @@ const char **old_bws = NULL;
 
 // Add alpha-tag to XCVR_STATE;
 struct ATAG_XCVR_STATE {
-	long freq;
+	unsigned long long freq;
 	int  imode;
 	int  iBW;
 	int  src;
@@ -199,7 +200,7 @@ const char *print(XCVR_STATE data)
 	snprintf(
 		str, sizeof(str), "\
 Data Source: %s\n\
-  freq ........... %ld\n\
+  freq ........... %llu\n\
   mode ........... %d [%s]\n",
 		data.src == XML ? "XML" : data.src == UI ? "UI" :
 			data.src == SRVR ? "SRVR" : "RIG",
@@ -2039,7 +2040,7 @@ void updateSelect() {
 	inAlphaTag->value("");
 }
 
-void addtoList(int val, int imode, int iBW) {
+void addtoList(unsigned long long val, int imode, int iBW) {
 	if (numinlist < LISTSIZE) {
 		oplist[numinlist].imode = imode;
 		oplist[numinlist].freq = val;
@@ -2057,9 +2058,9 @@ void readFile() {
 	}
 	clearList();
 	int i = 0, mode, bw;
-	long freq;
+	unsigned long long freq;
 	while (!iList.eof()) {
-		freq = 0L; mode = -1;
+		freq = 0ULL; mode = -1;
 		iList >> freq >> mode >> bw;
 		if (freq && (mode > -1)) {
 			oplist[i].freq = freq;
@@ -2082,11 +2083,11 @@ void readTagFile() {
 	}
 	clearList();
 	int i = 0, mode, bw;
-	long freq;
+	unsigned long long freq;
 	std::string atag;
 	char ca[ATAGSIZE + 60];
 	while (!iList.eof()) {
-		freq = 0L; mode = -1;
+		freq = 0ULL; mode = -1;
 		atag.clear();
 		memset(ca, 0, sizeof(ca));
 		iList >> freq >> mode >> bw;
@@ -2137,7 +2138,7 @@ void buildlist() {
 
 // flrig front panel changed
 
-int movFreqA() {
+void movFreqA(Fl_Widget *, void *) {
 	guard_lock serial(&mutex_serial);
 
 	if (!selrig->can_change_alt_vfo  && selrig->inuse == onB) {
@@ -2149,11 +2150,9 @@ int movFreqA() {
 		vfoA.freq = FreqDispA->value();
 		selrig->set_vfoA(vfoA.freq);
 	}
-
-	return 1;
 }
 
-int movFreqB() {
+void movFreqB(Fl_Widget *, void *) {
 //	if (xcvr_name == rig_KX3.name_ && !progStatus.split  ) {
 //		FreqDispB->value(vfoB.freq);
 //		FreqDispB->redraw();
@@ -2169,7 +2168,6 @@ int movFreqB() {
 		vfoB.freq = FreqDispB->value();
 		selrig->set_vfoB(vfoB.freq);
 	}
-	return 1;
 }
 
 void execute_swapAB()
@@ -2384,8 +2382,8 @@ void highlight_vfo(void *d)
 	FreqDispA->value(vfoA.freq);
 	FreqDispB->value(vfoB.freq);
 	if (selrig->inuse == onB) {
-		FreqDispA->SetONOFFCOLOR( norm_fg, dim_bg );
-		FreqDispB->SetONOFFCOLOR( norm_fg, norm_bg );
+		FreqDispA->SetCOLORS( norm_fg, dim_bg );
+		FreqDispB->SetCOLORS( norm_fg, norm_bg );
 		btnA->value(0);
 		btnB->value(1);
 		FreqDispB->activate();
@@ -2394,8 +2392,8 @@ void highlight_vfo(void *d)
 		else
 			FreqDispA->deactivate();
 	} else {
-		FreqDispA->SetONOFFCOLOR( norm_fg, norm_bg );
-		FreqDispB->SetONOFFCOLOR( norm_fg, dim_bg);
+		FreqDispA->SetCOLORS( norm_fg, norm_bg );
+		FreqDispB->SetCOLORS( norm_fg, dim_bg);
 		btnA->value(1);
 		btnB->value(0);
 		FreqDispA->activate();
@@ -2444,7 +2442,7 @@ void setUpper()
 }
 
 void selectFreq() {
-	long n = FreqSelect->value();
+	int n = FreqSelect->value(); // This is the number of the selected line; not the line's value.
 	if (!n) return;
 
 	n--;
@@ -2524,7 +2522,7 @@ void delFreq() {
 
 void addFreq() {
 	if (selrig->inuse == onB) {
-		long freq = FreqDispB->value();
+		unsigned long long freq = FreqDispB->value();
 		if (!freq) return;
 		int mode = opMODE->index();
 		int bw;
@@ -2542,7 +2540,7 @@ void addFreq() {
 		updateSelect();
 		FreqDispB->visual_beep();
 	} else {
-		long freq = FreqDispA->value();
+		unsigned long long freq = FreqDispA->value();
 		if (!freq) return;
 		int mode = opMODE->index();
 		int bw;

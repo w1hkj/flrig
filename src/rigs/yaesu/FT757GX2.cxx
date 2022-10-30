@@ -177,11 +177,11 @@ bool RIG_FT757GX2::get_info() {
 	return false;
 }
 
-unsigned long int RIG_FT757GX2::get_vfoA () {
+unsigned long long RIG_FT757GX2::get_vfoA () {
 	return A.freq;
 }
 
-void RIG_FT757GX2::set_vfoA (unsigned long int freq) {
+void RIG_FT757GX2::set_vfoA (unsigned long long freq) {
 	if (inuse) return;  // B is in use, don't set it.
 	A.freq = freq;
 	freq /=10; // set with 10 Hz resolution
@@ -205,11 +205,11 @@ void RIG_FT757GX2::set_modeA(int val) {
 	sendCommand(cmd);
 }
 
-unsigned long int RIG_FT757GX2::get_vfoB () {
+unsigned long long RIG_FT757GX2::get_vfoB () {
 	return B.freq;
 }
 
-void RIG_FT757GX2::set_vfoB (unsigned long int freq) {  
+void RIG_FT757GX2::set_vfoB (unsigned long long freq) {
 	if (!inuse) return;  // inuse = A, so don't set.  
 	B.freq = freq;
 	freq /=10;

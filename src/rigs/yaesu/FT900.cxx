@@ -22,7 +22,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "yaesu/FT900.h"
@@ -63,7 +63,7 @@ RIG_FT900::RIG_FT900() {
 	serial_rtsptt = false;
 	serial_dtrptt = false;
 
-	afreq = bfreq = A.freq = B.freq = 14070000;
+	afreq = bfreq = A.freq = B.freq = 14070000ULL;
 	amode = bmode = A.imode = B.imode = 1;
 	aBW = bBW = A.iBW = B.iBW = 0;
 	precision = 10;
@@ -263,12 +263,12 @@ bool RIG_FT900::get_info()
 	return false;
 }
 
-unsigned long int RIG_FT900::get_vfoA ()
+unsigned long long RIG_FT900::get_vfoA ()
 {
 	return A.freq;
 }
 
-void RIG_FT900::set_vfoA (unsigned long int freq)
+void RIG_FT900::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	freq /=10; // FT-900 does not support 1 Hz resolution
@@ -293,12 +293,12 @@ void RIG_FT900::set_modeA(int val)
 	showresp(WARN, HEX, "set mode A", cmd, replystr);
 }
 
-unsigned long int RIG_FT900::get_vfoB()
+unsigned long long RIG_FT900::get_vfoB()
 {
 	return B.freq;
 }
 
-void RIG_FT900::set_vfoB(unsigned long int freq)
+void RIG_FT900::set_vfoB(unsigned long long freq)
 {
 	B.freq = freq;
 	freq /=10; // FT-900 does not support 1 Hz resolution

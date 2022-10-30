@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 #include <iostream>
 #include <sstream>
@@ -104,7 +104,7 @@ bool RIG_FT817::check ()
 	return true;
 }
 
-unsigned long int RIG_FT817::get_vfoA()
+unsigned long long RIG_FT817::get_vfoA()
 {
 	if (inuse == onB) return freqA;
 
@@ -133,13 +133,13 @@ unsigned long int RIG_FT817::get_vfoA()
 			break;
 		}
 	static char msg[50];
-	snprintf(msg, sizeof(msg), "get vfoA: %lu, %s", freqA, FT817modes_[i]);
+	snprintf(msg, sizeof(msg), "get vfoA: %llu, %s", freqA, FT817modes_[i]);
 	getr(msg);
 
 	return freqA;
 }
 
-void RIG_FT817::set_vfoA (unsigned long int freq)
+void RIG_FT817::set_vfoA (unsigned long long freq)
 {
 	freqA = freq;
 	freq /=10; // 817 does not support 1 Hz resolution
@@ -177,7 +177,7 @@ void RIG_FT817::set_modeA(int val)
 }
 
 // VFO B ===============================================================
-unsigned long int RIG_FT817::get_vfoB ()
+unsigned long long RIG_FT817::get_vfoB ()
 {
 	if (inuse == onA) return freqB;
 	init_cmd();
@@ -205,13 +205,13 @@ unsigned long int RIG_FT817::get_vfoB ()
 			break;
 		}
 	static char msg[50];
-	snprintf(msg, sizeof(msg), "get vfoB: %lu, %s", freqB, FT817modes_[i]);
+	snprintf(msg, sizeof(msg), "get vfoB: %llu, %s", freqB, FT817modes_[i]);
 	getr(msg);
 
 	return freqB;
 }
 
-void RIG_FT817::set_vfoB (unsigned long int freq)
+void RIG_FT817::set_vfoB (unsigned long long freq)
 {
 	freqB = freq;
 	freq /=10; // 817 does not support 1 Hz resolution

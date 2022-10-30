@@ -12,10 +12,10 @@ public:
 
 	bool check();
 
-	unsigned long int get_vfoA();
-	unsigned long int get_vfoB();
-	void set_vfoA(unsigned long int);
-	void set_vfoB(unsigned long int);
+	unsigned long long get_vfoA();
+	unsigned long long get_vfoB();
+	void set_vfoA(unsigned long long);
+	void set_vfoB(unsigned long long);
 	void set_modeA(int val);
 	void set_modeB(int val);
 	int  get_modeA();

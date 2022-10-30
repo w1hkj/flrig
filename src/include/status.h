@@ -28,6 +28,7 @@
 #include "rig.h"
 
 #define FPLEN 20 // used in tt550 power sample
+#define MAX_DEFBUFFER_SIZE 500
 
 struct status {
 	int		mainX;
@@ -124,10 +125,10 @@ struct status {
 
 	int		iBW_A;
 	int		imode_A;
-	unsigned long int	freq_A;
+	unsigned long long	freq_A;
 	int		iBW_B;
 	int		imode_B;
-	unsigned long int	freq_B;
+	unsigned long long	freq_B;
 
 	std::string filters;
 	std::string bandwidths;
@@ -489,20 +490,20 @@ struct status {
 
 // bands; defaults for FT857 / FT897 / Xiegu-G90
 // frequency, mode, txCTCSS, rxCTCSS, offset, offset_freq;
-	int		f160, m160, txT_160, rxT_160, offset_160, oF_160;
-	int		f80,  m80,  txT_80,  rxT_80,  offset_80,  oF_80;
-	int		f40,  m40,  txT_40,  rxT_40,  offset_40,  oF_40;
-	int		f30,  m30,  txT_30,  rxT_30,  offset_30,  oF_30;
-	int		f20,  m20,  txT_20,  rxT_20,  offset_20,  oF_20;
-	int		f17,  m17,  txT_17,  rxT_17,  offset_17,  oF_17;
-	int		f15,  m15,  txT_15,  rxT_15,  offset_15,  oF_15;
-	int		f12,  m12,  txT_12,  rxT_12,  offset_12,  oF_12;
-	int		f10,  m10,  txT_10,  rxT_10,  offset_10,  oF_10;
-	int		f6,    m6,  txT_6,   rxT_6,   offset_6,   oF_6;
-	int		f2,    m2,  txT_2,   rxT_2,   offset_2,   oF_2;
-	int		f70,  m70,  txT_70,  rxT_70,  offset_70,  oF_70;
-	int		f12G, m12G, txT_12G, rxT_12G, offset_12G, oF_12G;
-	int		fgen, mgen, txT_gen, rxT_gen, offset_gen, oF_gen;
+	int	f160, m160, txT_160, rxT_160, offset_160, oF_160;
+	int	f80,  m80,  txT_80,  rxT_80,  offset_80,  oF_80;
+	int	f40,  m40,  txT_40,  rxT_40,  offset_40,  oF_40;
+	int	f30,  m30,  txT_30,  rxT_30,  offset_30,  oF_30;
+	int	f20,  m20,  txT_20,  rxT_20,  offset_20,  oF_20;
+	int	f17,  m17,  txT_17,  rxT_17,  offset_17,  oF_17;
+	int	f15,  m15,  txT_15,  rxT_15,  offset_15,  oF_15;
+	int	f12,  m12,  txT_12,  rxT_12,  offset_12,  oF_12;
+	int	f10,  m10,  txT_10,  rxT_10,  offset_10,  oF_10;
+	int	f6,   m6,  txT_6,   rxT_6,   offset_6,   oF_6;
+	int	f2,   m2,  txT_2,   rxT_2,   offset_2,   oF_2;
+	int	f70,  m70,  txT_70,  rxT_70,  offset_70,  oF_70;
+	int	f12G, m12G, txT_12G, rxT_12G, offset_12G, oF_12G;
+	int	fgen, mgen, txT_gen, rxT_gen, offset_gen, oF_gen;
 
 // memory management
 	Fl_Font	memfontnbr;

@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #ifndef FT1000_H
@@ -27,8 +27,10 @@
 class RIG_FT1000 : public rigbase {
 private:
 
-	int afreq, amode, aBW;
-	int bfreq, bmode, bBW;
+	int amode, aBW;
+	int bmode, bBW;
+	unsigned long long afreq;
+	unsigned long long bfreq;
 
 	bool notch_on;
 //int  m_60m_indx;
@@ -47,10 +49,10 @@ public:
 
 	bool check();
 
-	unsigned long int get_vfoA();
+	unsigned long long get_vfoA();
 	int  get_modeA();
 	int  get_bwA();
-	void set_vfoA(unsigned long int);
+	void set_vfoA(unsigned long long);
 	void set_modeA(int val);
 	void set_bwA(int val);
 
@@ -62,10 +64,10 @@ public:
 	void set_split(bool val);
 	int  get_split();
 
-	unsigned long int get_vfoB();
+	unsigned long long get_vfoB();
 	int  get_modeB();
 	int  get_bwB();
-	void set_vfoB(unsigned long int);
+	void set_vfoB(unsigned long long);
 	void set_modeB(int val);
 	void set_bwB(int val);
 

@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 /*
@@ -124,7 +124,7 @@ RIG_TT516::RIG_TT516() {
 
 	def_mode = modeB = modeA = B.imode = A.imode = 1;
 	def_bw = bwB = bwA = B.iBW = A.iBW = 34;
-	def_freq = freqB = freqA = B.freq = A.freq = 14070000;
+	def_freq = freqB = freqA = B.freq = A.freq = 14070000ULL;
 
 	max_power = 25;
 	can_change_alt_vfo = true;
@@ -167,14 +167,14 @@ bool RIG_TT516::check ()
 	return true;
 }
 
-unsigned long int RIG_TT516::get_vfoA ()
+unsigned long long RIG_TT516::get_vfoA ()
 {
 	cmd = TT516getFREQA;
 	int ret = waitN(8, 150, "get vfo A", HEX);
 	if (ret != 8) return A.freq;
 	if (replystr[0] != 'A') return A.freq;
 	if (replystr[6] != 'G') return A.freq;
-	int f = 0;
+	unsigned long long f = 0;
 	for (size_t n = 1; n < 5; n++) {
 		f = f*256 + ((unsigned char)replystr[n] & 0xFF) ;
 		A.freq = f;
@@ -182,7 +182,7 @@ unsigned long int RIG_TT516::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_TT516::set_vfoA (unsigned long int freq)
+void RIG_TT516::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	cmd = TT516setFREQA;
@@ -196,7 +196,7 @@ void RIG_TT516::set_vfoA (unsigned long int freq)
 	return;
 }
 
-unsigned long int RIG_TT516::get_vfoB ()
+unsigned long long RIG_TT516::get_vfoB ()
 {
 	cmd = TT516getFREQB;
 	int ret = waitN(8, 150, "get vfo B", HEX);
@@ -204,7 +204,7 @@ unsigned long int RIG_TT516::get_vfoB ()
 	if (replystr[0] != 'B') return B.freq;
 	if (replystr[6] != 'G') return B.freq;
 
-	int f = 0;
+	unsigned long long f = 0;
 	for (size_t n = 1; n < 5; n++) {
 		f = f*256 + ((unsigned char)replystr[n] & 0xFF) ;
 		B.freq = f;
@@ -213,7 +213,7 @@ unsigned long int RIG_TT516::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_TT516::set_vfoB (unsigned long int freq)
+void RIG_TT516::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
 	cmd = TT516setFREQB;

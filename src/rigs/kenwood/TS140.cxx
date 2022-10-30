@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "kenwood/TS140.h"
@@ -117,7 +117,7 @@ bool RIG_TS140::check ()
 	return true;
 }
 
-unsigned long int RIG_TS140::get_vfoA ()
+unsigned long long RIG_TS140::get_vfoA ()
 {
 //	cmd = "IF;";
 //	int ret = wait_char(';', 38, 100, "get VFO", ASC);
@@ -125,14 +125,14 @@ unsigned long int RIG_TS140::get_vfoA ()
 	int ret = check_ifstr();
 	if (ret < 38) return freqA;
 
-	unsigned long int f = 0;
+	unsigned long long f = 0;
 	for (size_t n = 2; n < 13; n++)
 		f = f*10 + replystr[ret - 38 + n] - '0';
 	freqA = f;
 	return freqA;
 }
 
-void RIG_TS140::set_vfoA (unsigned long int freq)
+void RIG_TS140::set_vfoA (unsigned long long freq)
 {
 	freqA = freq;
 	cmd = "FA00000000000;";

@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "kenwood/TS2000.h"
@@ -196,7 +196,7 @@ RIG_TS2000::RIG_TS2000() {
 	serial_dtrptt = false;
 	B.imode = A.imode = 1;
 	B.iBW = A.iBW = 0x8803;
-	B.freq = A.freq = 14070000;
+	B.freq = A.freq = 14070000ULL;
 	can_change_alt_vfo = true;
 
 	has_power_out =
@@ -952,14 +952,14 @@ void RIG_TS2000::selectB()
 	inuse = onB;
 }
 
-unsigned long int RIG_TS2000::get_vfoA ()
+unsigned long long RIG_TS2000::get_vfoA ()
 {
 	cmd = "FA;";
 	if (wait_char(';', 14, 100, "get vfo A", ASC) < 14) return A.freq;
 
 	size_t p = replystr.rfind("FA");
 	if (p != std::string::npos && (p + 12 < replystr.length())) {
-		int f = 0;
+		unsigned long long f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replystr[p+n] - '0';
 		A.freq = f;
@@ -967,7 +967,7 @@ unsigned long int RIG_TS2000::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_TS2000::set_vfoA (unsigned long int freq)
+void RIG_TS2000::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	cmd = "FA00000000000;";
@@ -979,14 +979,14 @@ void RIG_TS2000::set_vfoA (unsigned long int freq)
 	showresp(WARN, ASC, "set vfo A", cmd, "");
 }
 
-unsigned long int RIG_TS2000::get_vfoB ()
+unsigned long long RIG_TS2000::get_vfoB ()
 {
 	cmd = "FB;";
 	if (wait_char(';', 14, 100, "get vfo B", ASC) < 14) return B.freq;
 
 	size_t p = replystr.rfind("FB");
 	if (p != std::string::npos && (p + 12 < replystr.length())) {
-		int f = 0;
+		unsigned long long f = 0;
 		for (size_t n = 2; n < 13; n++)
 			f = f*10 + replystr[p+n] - '0';
 		B.freq = f;
@@ -994,7 +994,7 @@ unsigned long int RIG_TS2000::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_TS2000::set_vfoB (unsigned long int freq)
+void RIG_TS2000::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
 	cmd = "FB00000000000;";

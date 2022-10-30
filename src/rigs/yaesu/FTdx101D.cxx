@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <iostream>
@@ -176,7 +176,7 @@ RIG_FTdx101D::RIG_FTdx101D() {
 
 	A.imode = B.imode = modeB = modeA = def_mode = 1;
 	A.iBW = B.iBW = bwA = bwB = def_bw = 0;
-	A.freq = B.freq = freqA = freqB = def_freq = 14070000;
+	A.freq = B.freq = freqA = freqB = def_freq = 14070000ULL;
 
 	notch_on = false;
 
@@ -311,7 +311,7 @@ bool RIG_FTdx101D::check ()
 	return false;
 }
 
-unsigned long int RIG_FTdx101D::get_vfoA ()
+unsigned long long RIG_FTdx101D::get_vfoA ()
 {
 	cmd = rsp = "FA";
 	cmd += ';';
@@ -321,14 +321,14 @@ unsigned long int RIG_FTdx101D::get_vfoA ()
 //replystr = Avfo;
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return freqA;
-	int f = 0;
+	unsigned long long f = 0;
 	for (size_t n = 2; n < 11; n++)
 		f = f*10 + replystr[p+n] - '0';
 	freqA = f;
 	return freqA;
 }
 
-void RIG_FTdx101D::set_vfoA (unsigned long int freq)
+void RIG_FTdx101D::set_vfoA (unsigned long long freq)
 {
 	freqA = freq;
 	cmd = "FA000000000;";
@@ -341,7 +341,7 @@ void RIG_FTdx101D::set_vfoA (unsigned long int freq)
 	sett("SET vfo A");
 }
 
-unsigned long int RIG_FTdx101D::get_vfoB ()
+unsigned long long RIG_FTdx101D::get_vfoB ()
 {
 	cmd = rsp = "FB";
 	cmd += ';';
@@ -351,7 +351,7 @@ unsigned long int RIG_FTdx101D::get_vfoB ()
 //replystr = Bvfo;
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return freqB;
-	int f = 0;
+	unsigned long long f = 0;
 	for (size_t n = 2; n < 11; n++)
 		f = f*10 + replystr[p+n] - '0';
 	freqB = f;
@@ -359,7 +359,7 @@ unsigned long int RIG_FTdx101D::get_vfoB ()
 }
 
 
-void RIG_FTdx101D::set_vfoB (unsigned long int freq)
+void RIG_FTdx101D::set_vfoB (unsigned long long freq)
 {
 	freqB = freq;
 	cmd = "FB000000000;";

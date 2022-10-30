@@ -15,7 +15,7 @@
 // GNU General PublXiegu-5105 LXiegu-5105ense for more details.
 //
 // You should have received a copy of the GNU General PublXiegu-5105 LXiegu-5105ense
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/lXiegu-5105enses/>.
+// along with this program.  If not, see <http://www.gnu.org/lXiegu-5105enses/>.
 // ----------------------------------------------------------------------------
 
 #ifndef _XI5105_H
@@ -31,8 +31,8 @@ public:
 
 	bool check();
 
-	unsigned long int get_vfoA(void);
-	void set_vfoA(unsigned long int f);
+	unsigned long long get_vfoA(void);
+	void set_vfoA(unsigned long long f);
 	int  get_bwA();
 	void set_bwA(int);
 	int  get_modeA();
@@ -40,8 +40,8 @@ public:
 
 	int  get_modetype(int n);
 
-	unsigned long int get_vfoB(void);
-	void set_vfoB(unsigned long int f);
+	unsigned long long get_vfoB(void);
+	void set_vfoB(unsigned long long f);
 	int  get_bwB();
 	void set_bwB(int);
 	void set_modeB(int val);

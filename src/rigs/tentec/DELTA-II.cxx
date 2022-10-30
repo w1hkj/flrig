@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 
@@ -68,13 +68,13 @@ bool RIG_TT535::check()
 	return true;
 }
 
-unsigned long int RIG_TT535::get_vfoA ()
+unsigned long long RIG_TT535::get_vfoA ()
 {
 	return freqA;
 }
 
 
-void RIG_TT535::set_vfoA (unsigned long int freq)
+void RIG_TT535::set_vfoA (unsigned long long freq)
 {
 	freqA = freq;
 	cmd = pre_to;
@@ -86,7 +86,7 @@ void RIG_TT535::set_vfoA (unsigned long int freq)
 		checkresponse();
 }
 
-void RIG_TT535::set_vfoB (unsigned long int freq)
+void RIG_TT535::set_vfoB (unsigned long long freq)
 {
 	freqB = freq;
 	cmd = pre_to;
@@ -97,7 +97,7 @@ void RIG_TT535::set_vfoB (unsigned long int freq)
 		checkresponse();
 }
 
-unsigned long int RIG_TT535::get_vfoB ()
+unsigned long long RIG_TT535::get_vfoB ()
 {
 	return freqB;
 }

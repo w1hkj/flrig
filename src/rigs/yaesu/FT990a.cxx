@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include "yaesu/FT990a.h"
@@ -78,7 +78,7 @@ RIG_FT990A::RIG_FT990A() {
 	serial_catptt = true;
 	serial_rtsptt = false;
 	serial_dtrptt = false;
-	afreq = bfreq = A.freq = B.freq = 14070000;
+	afreq = bfreq = A.freq = B.freq = 14070000ULL;
 	amode = bmode = A.imode = B.imode = 1;
 	aBW = bBW = A.iBW = B.iBW = 2;
 
@@ -269,12 +269,12 @@ bool RIG_FT990A::get_info()
 	return false;
 }
 
-unsigned long int RIG_FT990A::get_vfoA ()
+unsigned long long RIG_FT990A::get_vfoA ()
 {
 	return A.freq;
 }
 
-void RIG_FT990A::set_vfoA (unsigned long int freq)
+void RIG_FT990A::set_vfoA (unsigned long long freq)
 {
 	int current_vfo = inuse;
 	if (current_vfo == onB) selectA();
@@ -333,12 +333,12 @@ int RIG_FT990A::get_bwA()
 	return A.iBW;
 }
 
-unsigned long int RIG_FT990A::get_vfoB()
+unsigned long long RIG_FT990A::get_vfoB()
 {
 	return B.freq;
 }
 
-void RIG_FT990A::set_vfoB(unsigned long int freq)
+void RIG_FT990A::set_vfoB(unsigned long long freq)
 {
 	int current_vfo = inuse;
 	if (current_vfo == onA) selectB();

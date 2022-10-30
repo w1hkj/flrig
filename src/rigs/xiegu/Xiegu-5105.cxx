@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// aunsigned long int with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
 #include <iostream>
@@ -158,7 +158,7 @@ set_trace(2, "check()", str2hex(replystr.c_str(), replystr.length()));
 	return true;
 }
 
-unsigned long int RIG_XI5105::get_vfoA ()
+unsigned long long RIG_XI5105::get_vfoA ()
 {
 	if (inuse == onB) return A.freq;
 	cmd = pre_to;
@@ -174,7 +174,7 @@ unsigned long int RIG_XI5105::get_vfoA ()
 	return A.freq;
 }
 
-void RIG_XI5105::set_vfoA (unsigned long int freq)
+void RIG_XI5105::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
 	cmd = pre_to;
@@ -185,7 +185,7 @@ void RIG_XI5105::set_vfoA (unsigned long int freq)
 set_trace(2, "set_vfoA()", str2hex(cmd.c_str(), cmd.length()));
 }
 
-unsigned long int RIG_XI5105::get_vfoB ()
+unsigned long long RIG_XI5105::get_vfoB ()
 {
 	if (inuse == onA) return B.freq;
 	std::string resp = pre_fm;
@@ -201,7 +201,7 @@ unsigned long int RIG_XI5105::get_vfoB ()
 	return B.freq;
 }
 
-void RIG_XI5105::set_vfoB (unsigned long int freq)
+void RIG_XI5105::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
 	cmd = pre_to;
