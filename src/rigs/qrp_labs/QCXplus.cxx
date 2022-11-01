@@ -18,7 +18,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
-#include "other/QCXplus.h"
+#include "qrp_labs/QCXplus.h"
 #include "support.h"
 
 static const char QCXPname_[] = "QCX+";

@@ -667,37 +667,6 @@ CTRL  click: FreqB -> FreqA\
 
 	sm_grp1->end();
 
-	cntRIT = new Hspinner(213, 104, 54, 18, _("R"));
-	cntRIT->tooltip(_("RIT"));
-	cntRIT->type(FL_INT_INPUT);
-	cntRIT->labelsize(12);
-	cntRIT->minimum(-1000);
-	cntRIT->maximum(1000);
-	cntRIT->step(10);
-	cntRIT->callback((Fl_Callback*)cb_cntRIT);
-	cntRIT->align(Fl_Align(FL_ALIGN_RIGHT));
-
-	cntXIT = new Hspinner(283, 104, 54, 18, _("X"));
-	cntXIT->tooltip(_("XIT"));
-	cntXIT->type(FL_INT_INPUT);
-	cntXIT->labelsize(12);
-	cntXIT->minimum(-1000);
-	cntXIT->maximum(1000);
-	cntXIT->step(10);
-	cntXIT->callback((Fl_Callback*)cb_cntXIT);
-	cntXIT->align(Fl_Align(FL_ALIGN_RIGHT));
-
-	cntBFO = new Hspinner(355, 104, 54, 18, _("B"));
-	cntBFO->tooltip(_("BFO"));
-	cntBFO->type(FL_INT_INPUT);
-	cntBFO->labelsize(12);
-	cntBFO->minimum(0);
-	cntBFO->maximum(1000);
-	cntBFO->step(10);
-	cntBFO->value(600);
-	cntBFO->callback((Fl_Callback*)cb_cntBFO);
-	cntBFO->align(Fl_Align(FL_ALIGN_RIGHT));
-
 	g->end();
 
 	return g;
@@ -1867,6 +1836,48 @@ Fl_Double_Window *tabs_window()
 
 		tab7610->end();
 }
+
+		genericRXB = new Fl_Group(0, 24, small_mainW, gph - 24, _("RIT/XIT/BFO"));
+{
+			cntRIT = new Hspinner(5, genericRXB->y() + 10, 100, 24, _("Rit"));
+			cntRIT->tooltip(_("RIT"));
+			cntRIT->type(FL_INT_INPUT);
+			cntRIT->labelsize(12);
+			cntRIT->minimum(-1000);
+			cntRIT->maximum(1000);
+			cntRIT->step(10);
+			cntRIT->callback((Fl_Callback*)cb_cntRIT);
+			cntRIT->align(Fl_Align(FL_ALIGN_RIGHT));
+
+			cntXIT = new Hspinner(
+				cntRIT->x() + cntRIT->w() + 15,
+				cntRIT->y(), 100, 24, _("Xit"));
+			cntXIT->tooltip(_("XIT"));
+			cntXIT->type(FL_INT_INPUT);
+			cntXIT->labelsize(12);
+			cntXIT->minimum(-1000);
+			cntXIT->maximum(1000);
+			cntXIT->step(10);
+			cntXIT->callback((Fl_Callback*)cb_cntXIT);
+			cntXIT->align(Fl_Align(FL_ALIGN_RIGHT));
+
+			cntBFO = new Hspinner(
+				cntXIT->x() + cntXIT->w() + 15,
+				cntXIT->y(), 100, 24, _("Bfo"));
+			cntBFO->tooltip(_("BFO"));
+			cntBFO->type(FL_INT_INPUT);
+			cntBFO->labelsize(12);
+			cntBFO->minimum(0);
+			cntBFO->maximum(1000);
+			cntBFO->step(10);
+			cntBFO->value(600);
+			cntBFO->callback((Fl_Callback*)cb_cntBFO);
+			cntBFO->align(Fl_Align(FL_ALIGN_RIGHT));
+
+		genericRXB->end();
+		genericRXB->hide();
+}
+
 		genericAux = new Fl_Group(0, 24, small_mainW, gph - 24, _("Aux"));
 {
 			btnAuxRTS = new Fl_Light_Button(5, genericAux->y() + 10, 60, 18, _("RTS"));
