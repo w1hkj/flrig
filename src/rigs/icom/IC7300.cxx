@@ -2370,8 +2370,7 @@ int RIG_IC7300::get_pbt_inner()
 	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != std::string::npos) {
-			val = num100(replystr.substr(p+6));
-			val -= 50;
+			val = num100(replystr.substr(p+6)) - 50;
 		}
 	}
 	return val;
@@ -2394,8 +2393,7 @@ int RIG_IC7300::get_pbt_outer()
 	if (ret) {
 		size_t p = replystr.rfind(resp);
 		if (p != std::string::npos) {
-			val = num100(replystr.substr(p+6));
-			val -= 50;
+			val = num100(replystr.substr(p+6)) - 50;
 		}
 	}
 	return val;

@@ -434,7 +434,9 @@ void TRACED(adjust_wide_ui)
 		sldrINNER->show();
 		sldrOUTER->show();
 		sldrINNER->value(progStatus.pbt_inner);
+		sldrINNER->redraw();
 		sldrOUTER->value(progStatus.pbt_outer);
+		sldrOUTER->redraw();
 	}
 	btnNotch->show();
 	sldrNOTCH->show();
@@ -1584,7 +1586,9 @@ void TRACED(init_if_shift_control)
 		sldrINNER->show();
 		sldrOUTER->show();
 		sldrINNER->value(progStatus.pbt_inner);
+		sldrINNER->redraw();
 		sldrOUTER->value(progStatus.pbt_outer);
+		sldrOUTER->redraw();
 	}
 
 	if (xcvr_name == rig_TS870S.name_) {
