@@ -993,7 +993,7 @@ int RIG_PowerSDR::get_tune()
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return 0;
 	int val = replystr[p+4] - '0';
-	return val;
+	return (tune_ = val);
 }
 
 void RIG_PowerSDR::set_rf_gain(int val)
