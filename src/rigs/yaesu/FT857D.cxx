@@ -289,6 +289,22 @@ int  RIG_FT857D::get_smeter(void)
 
 void RIG_FT857D::selectA()
 {
+	bool isA = true;
+
+	init_cmd();
+	cmd[1] = 0x68;
+	cmd[4] = 0xBB;
+
+	int ret = waitN(1, 100, "get eeprom @ 0068");
+	getthex("get eeprom data @ 0068");
+	if (ret != 0)
+		isA = ((replystr[0] & 0x01) == 0);
+
+	if (isA) {
+		inuse = onA;
+		return;
+	}
+
 	init_cmd();
 	cmd[4] = 0x81;
 	sendCommand(cmd);
@@ -299,6 +315,22 @@ void RIG_FT857D::selectA()
 
 void RIG_FT857D::selectB()
 {
+	bool isB = true;
+
+	init_cmd();
+	cmd[1] = 0x68;
+	cmd[4] = 0xBB;
+
+	int ret = waitN(1, 100, "get eeprom @ 0068");
+	getthex("get eeprom data @ 0068");
+	if (ret != 0)
+		isB = ((replystr[0] & 0x01) == 0x01);
+
+	if (isB) {
+		inuse = onB;
+		return;
+	}
+
 	init_cmd();
 	cmd[4] = 0x81;
 	sendCommand(cmd);
