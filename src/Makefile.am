@@ -189,12 +189,13 @@ flrig_SOURCES += \
 	rigs/other/FLEX1500.cxx \
 	rigs/other/PCR1000.cxx \
 	rigs/other/PowerSDR.cxx \
-	rigs/other/QCXplus.cxx \
 	rigs/other/RAY152.cxx \
 	rigs/other/sunsdr2.cxx \
 	rigs/other/tcisdr.cxx \
 	rigs/other/trusdx.cxx \
 	rigs/other/TMD710.cxx \
+	rigs/qrp_labs/QCXplus.cxx \
+	rigs/qrp_labs/QDX.cxx \
 	rigs/tentec/TT516.cxx \
 	rigs/tentec/DELTA-II.cxx \
 	rigs/tentec/TT538.cxx \
@@ -368,12 +369,13 @@ EXTRA_DIST = \
 	include/mingw.h \
 	include/other/FLEX1500.h \
 	include/other/PCR1000.h \
-	include/other/QCXplus.h \
 	include/other/RAY152.h \
 	include/other/PowerSDR.h \
 	include/other/TMD710.h \
 	include/pl_tones.h \
 	include/ptt.h \
+	include/qrp_labs/QCXplus.h \
+	include/qrp_labs/QDX.h \
 	include/rig.h \
 	include/rigs.h \
 	include/rigbase.h \

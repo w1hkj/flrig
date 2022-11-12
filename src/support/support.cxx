@@ -66,7 +66,7 @@
 #include "cmedia.h"
 #include "tmate2.h"
 
-void initTabs();
+//void initTabs();
 
 rigbase *selrig = rigs[0];
 

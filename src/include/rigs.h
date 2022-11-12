@@ -119,10 +119,11 @@
 #include "xiegu/Xiegu-5105.h"
 #include "xiegu/Xiegu-G90.h"
 #include "xiegu/X6100.h"
-#include "other/QCXplus.h"
 #include "other/sunsdr2.h"
 #include "other/tcisdr.h"
 #include "other/trusdx.h"
+#include "qrp_labs/QCXplus.h"
+#include "qrp_labs/QDX.h"
 
 extern rigbase			rig_null;		// 0
 extern RIG_FDMDUO		rig_FDMDUO;		// 1
@@ -228,5 +229,6 @@ extern RIG_SDR2_PRO		rig_sdr2;		// 100
 extern RIG_TCI_SUNDX	rig_tci_sundx;	// 101
 extern RIG_TCI_SUNPRO	rig_tci_sunpro;	// 102
 extern RIG_TRUSDX		rig_trusdx;		// 103
+extern RIG_QDX			rig_qdx;		// 104
 
 #endif

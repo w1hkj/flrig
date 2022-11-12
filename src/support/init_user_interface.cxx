@@ -94,7 +94,7 @@ void TRACED(adjust_small_ui)
 		if (mnuSchema) mnuSchema->set();
 	} else {
 		if (mnuSchema) mnuSchema->clear();
-		y = cntRIT->y() + 2;
+		y = grpMeters->y() + grpMeters->h() - 18;
 		if (selrig->has_volume_control) {
 			y += 20;
 			btnVol->position( 2, y);
@@ -220,6 +220,7 @@ void TRACED(adjust_small_ui)
 	btnNOISE->redraw();
 
 	if (selrig->has_agc_control) {
+		btnAGC->resize(btnAGC->x(), sldrRFGAIN->y(), btnAGC->w(), btnAGC->h());
 		btnAGC->show();
 		sldrRFGAIN->label("");
 		sldrRFGAIN->redraw_label();
@@ -465,24 +466,7 @@ void TRACED(adjust_wide_ui)
 	} else {
 		tabs550->hide();
 
-		tabsGeneric->remove(genericAux);
-		genericAux->hide();
-		btnAuxDTR->hide();
-		btnAuxRTS->hide();
-		btnDataPort->hide();
-		if (progStatus.aux_serial_port != "NONE") {
-			btnAuxRTS->show();
-			btnAuxDTR->show();
-			tabsGeneric->add(genericAux);
-			genericAux->show();
-		}
 
-		tabsGeneric->remove(genericRXB);
-		if (selrig->has_rit || selrig->has_xit || selrig->has_bfo)
-			tabsGeneric->add(genericRXB);
-
-		tabsGeneric->redraw();
-		tabsGeneric->show();
 		if (selrig->has_agc_control) {
 			btnAGC->show();
 			sldrRFGAIN->label("");
@@ -584,8 +568,18 @@ void TRACED(adjust_touch_ui)
 		}
 
 		tabsGeneric->remove(genericRXB);
-		if (selrig->has_rit || selrig->has_xit || selrig->has_bfo)
+		genericRXB->hide();
+		if (selrig->has_rit || selrig->has_xit || selrig->has_bfo) {
+			if (selrig->has_rit) cntRIT->show();
+			else                 cntRIT->hide();
+			if (selrig->has_xit) cntXIT->show();
+			else                 cntXIT->hide();
+			if (selrig->has_bfo) cntBFO->show();
+			else                 cntBFO->hide();
 			tabsGeneric->add(genericRXB);
+			genericRXB->show();
+		}
+
 		tabsGeneric->show();
 	}
 
@@ -659,7 +653,6 @@ void TRACED(adjust_control_positions)
 }
 
 void TRACED(init_Generic_Tabs)
-
 	if (hidden_tabs) {
 		hidden_tabs->remove(tab_yaesu_bands);
 		hidden_tabs->remove(tab_ft991_bands);
@@ -673,6 +666,7 @@ void TRACED(init_Generic_Tabs)
 		hidden_tabs->remove(genericRx);
 		hidden_tabs->remove(genericMisc);
 		hidden_tabs->remove(genericAux);
+		hidden_tabs->remove(genericRXB);
 		hidden_tabs->remove(genericUser_1);
 		hidden_tabs->remove(genericUser_2);
 		hidden_tabs->remove(genericUser_3);
@@ -691,6 +685,7 @@ void TRACED(init_Generic_Tabs)
 		hidden_tabs->add(genericRx);
 		hidden_tabs->add(genericMisc);
 		hidden_tabs->add(genericAux);
+		hidden_tabs->add(genericRXB);
 		hidden_tabs->add(genericUser_1);
 		hidden_tabs->add(genericUser_2);
 		hidden_tabs->add(genericUser_3);
@@ -709,6 +704,7 @@ void TRACED(init_Generic_Tabs)
 		tabsGeneric->remove(genericRx);
 		tabsGeneric->remove(genericMisc);
 		tabsGeneric->remove(genericAux);
+		tabsGeneric->remove(genericRXB);
 		tabsGeneric->remove(genericUser_1);
 		tabsGeneric->remove(genericUser_2);
 		tabsGeneric->remove(genericUser_3);
@@ -908,32 +904,25 @@ void TRACED(init_Generic_Tabs)
 	}
 
 	if (selrig->has_nb_level ||
-		selrig->has_bpf_center ) {
+		selrig->has_bpf_center ||
+		selrig->has_vfo_adj ||
+		selrig->has_line_out ) {
 
 		if (selrig->has_nb_level)
 			sldr_nb_level->show();
 		else
 			sldr_nb_level->hide();
 
-		spnr_bpf_center->show();
-		btn_use_bpf_center->show();
 		if (selrig->has_bpf_center) {
 			spnr_bpf_center->value(progStatus.bpf_center);
 			spnr_bpf_center->activate();
 			btn_use_bpf_center->activate();
+			spnr_bpf_center->show();
+			btn_use_bpf_center->show();
 		} else {
-			spnr_bpf_center->deactivate();
-			btn_use_bpf_center->deactivate();
+			spnr_bpf_center->hide();
+			btn_use_bpf_center->hide();
 		}
-		tabsGeneric->add(genericRx);
-		genericRx->redraw();
-		genericRx->show();
-	}
-
-	if (selrig->has_vfo_adj ||
-		selrig->has_line_out ||
-		selrig->has_xcvr_auto_on_off ||
-		selrig->can_synch_clock ) {
 
 		if (selrig->has_vfo_adj) {
 			double min, max, step;
@@ -943,15 +932,27 @@ void TRACED(init_Generic_Tabs)
 			spnr_vfo_adj->step(step);
 			progStatus.vfo_adj = selrig->getVfoAdj();
 			spnr_vfo_adj->value(progStatus.vfo_adj);
+			spnr_vfo_adj->activate();
 			spnr_vfo_adj->show();
 		} else
 			spnr_vfo_adj->hide();
 
-		spnr_line_out->show();
-		if (selrig->has_line_out)
+		if (selrig->has_line_out) {
 			spnr_line_out->activate();
-		else
+			spnr_line_out->show();
+		} else {
 			spnr_line_out->deactivate();
+			spnr_line_out->hide();
+		}
+
+		tabsGeneric->add(genericRx);
+		genericRx->redraw();
+		genericRx->show();
+	}
+
+	if (selrig->has_line_out ||
+		selrig->has_xcvr_auto_on_off ||
+		selrig->can_synch_clock ) {
 
 		btn_xcvr_auto_on->show();
 		btn_xcvr_auto_off->show();
@@ -984,19 +985,37 @@ void TRACED(init_Generic_Tabs)
 		tabsGeneric->add(genericMisc);
 		genericMisc->redraw();
 		genericMisc->show();
-
 	}
 
-
+	tabsGeneric->remove(genericAux);
+	genericAux->hide();
 	btnAuxDTR->hide();
 	btnAuxRTS->hide();
 	btnDataPort->hide();
-
 	if (progStatus.aux_serial_port != "NONE") {
 		btnAuxRTS->show();
 		btnAuxDTR->show();
 		tabsGeneric->add(genericAux);
+		genericAux->show();
 	}
+
+	tabsGeneric->remove(genericRXB);
+	genericRXB->hide();
+	if (selrig->has_rit || selrig->has_xit || selrig->has_bfo) {
+		if (selrig->has_rit) cntRIT->show();
+		else                 cntRIT->hide();
+		if (selrig->has_xit) cntXIT->show();
+		else                 cntXIT->hide();
+		if (selrig->has_bfo) cntBFO->show();
+		else                 cntBFO->hide();
+		tabsGeneric->add(genericRXB);
+		genericRXB->show();
+	}
+	genericRXB->redraw();
+
+//	btnAuxDTR->hide();
+//	btnAuxRTS->hide();
+//	btnDataPort->hide();
 
 	tabsGeneric->add(genericUser_1);
 	genericUser_1->redraw();
@@ -1077,7 +1096,6 @@ void TRACED(init_Generic_Tabs)
 }
 
 void TRACED(initTabs)
-
 	if (xcvr_name == rig_TT550.name_)
 		init_TT550_tabs();
 	else
