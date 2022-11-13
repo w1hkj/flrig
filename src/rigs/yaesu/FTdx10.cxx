@@ -508,8 +508,7 @@ int RIG_FTdx10::get_smeter()
 
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return 0;
-	if (p + 6 >= replystr.length()) return 0;
-	int mtr = atoi(&replystr[p+3]);
+	int mtr = atoi(replystr.substr(p + 3, 3).c_str());
 	mtr = mtr * 100.0 / 256.0;
 	return mtr;
 }
@@ -524,9 +523,7 @@ int RIG_FTdx10::get_swr()
 
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return 0;
-	if (p + 6 >= replystr.length()) return 0;
-	replystr[p+6] = 0;
-	int mtr = atoi(&replystr[p+3]);
+	int mtr = atoi(replystr.substr(p + 3, 3).c_str());
 	return mtr / 2.56;
 }
 
@@ -549,9 +546,9 @@ int RIG_FTdx10::get_power_out()
 
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return 0;
- 	replystr.erase(p, p + rsp.length());
-	replystr.erase(3);
-	int mtr = atoi(replystr.c_str());
+
+	int mtr = atoi(replystr.substr(p + 3, 3).c_str());
+
 	size_t i = 0;
 	for (i = 0; i < sizeof(pwrtbl) / sizeof(pwrpair) - 1; i++)
 		if (mtr >= pwrtbl[i].mtr && mtr < pwrtbl[i+1].mtr)
@@ -575,9 +572,9 @@ int RIG_FTdx10::get_alc()
 
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return 0;
-	if (p + 9 >= replystr.length()) return 0;
-	replystr[6] = '\x00';
-	int mtr = atoi(&replystr[p+3]);
+
+	int mtr = atoi(replystr.substr(p + 3, 3).c_str());
+
 	return (int)ceil(mtr / 2.56);
 }
 
