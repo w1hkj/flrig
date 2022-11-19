@@ -32,17 +32,19 @@
 #ifndef HIDAPI_H__
 #define HIDAPI_H__
 
+#include "config.h"
+#include "compat.h" // Must precede all FL includes
+
 #include <string>
 #include <cstring>
 #include <wchar.h>
 
-#include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #ifdef __MINGW32__
 #include <ntdef.h>
-#include <winbase.h>
+#include <winbase.h> // Already included via compat.h -> winsock2.h -> windows.h -> winbase.h
 
 #  ifndef _NTDEF_
 typedef LONG NTSTATUS;

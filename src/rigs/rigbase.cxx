@@ -379,11 +379,11 @@ int rigbase::hex2val(std::string hexstr)
 
 //======================================================================
 
-int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
+int rigbase::waitN(int n, int timeout, const char *sz, int pr)
 {
 	guard_lock reply_lock(&mutex_replystr);
 
-	size_t retnbr = 0;
+	int retnbr = 0;
 
 	replystr.clear();
 
@@ -391,9 +391,9 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 		send_to_remote(cmd);
 		MilliSleep(progStatus.tcpip_ping_delay);
 		retnbr = read_from_remote(replystr);
-		LOG_DEBUG ("%s: read %lu bytes, %s", sz, retnbr,
+		LOG_DEBUG ("%s: read %d bytes, %s", sz, retnbr,
 			(pr == HEX ? str2hex(replystr.c_str(), replystr.length()): replystr.c_str()));
-		return (int)retnbr;
+		return retnbr;
 	}
 
 	if(!RigSerial->IsOpen()) {
@@ -408,13 +408,13 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 	size_t tstart = zmsec();
 	size_t tout = tstart + progStatus.serial_timeout; // minimum of 100 msec
 	std::string tempstr;
-	size_t nret;
+	int nret;
 
 	do {
 		tempstr.clear();
 		nret = RigSerial->ReadBuffer(tempstr, n - retnbr);
 		if (nret) {
-			for (size_t nc = 0; nc < nret; nc++)
+			for (int nc = 0; nc < nret; nc++)
 				replystr += tempstr[nc];
 			retnbr += nret;
 			tout = zmsec() + progStatus.serial_timeout;
@@ -426,7 +426,7 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 
 	static char ctrace[1000];
 	memset(ctrace, 0, 1000);
-	snprintf( ctrace, sizeof(ctrace), "%s: read %lu bytes in %d msec, %s", 
+	snprintf( ctrace, sizeof(ctrace), "%s: read %d bytes in %d msec, %s",
 		sz, retnbr,
 		(int)(zmsec() - tstart),
 		(pr == HEX ? str2hex(replystr.c_str(), replystr.length()): replystr.c_str()) );
@@ -438,14 +438,14 @@ int rigbase::waitN(size_t n, int timeout, const char *sz, int pr)
 
 }
 
-int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
+int rigbase::wait_char(int ch, int n, int timeout, const char *sz, int pr)
 {
 	guard_lock reply_lock(&mutex_replystr);
 
 	std::string wait_str = " ";
 	wait_str[0] = ch;
 
-	size_t retnbr = 0;
+	int retnbr = 0;
 
 	replystr.clear();
 
@@ -453,8 +453,8 @@ int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 		send_to_remote(cmd);
 		MilliSleep(progStatus.tcpip_ping_delay);
 		retnbr = read_from_remote(replystr);
-		LOG_DEBUG ("%s: read %lu bytes, %s", sz, retnbr, replystr.c_str());
-		return retnbr;
+		LOG_DEBUG ("%s: read %d bytes, %s", sz, retnbr, replystr.c_str());
+		return (int)retnbr;
 	}
 
 	if(!RigSerial->IsOpen()) {
@@ -469,13 +469,13 @@ int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 	size_t tstart = zmsec();
 	size_t tout = tstart + progStatus.serial_timeout;
 	std::string tempstr;
-	size_t nret;
+	int nret;
 
 	do  {
 		tempstr.clear();
 		nret = RigSerial->ReadBuffer(tempstr, n - retnbr, wait_str);
 		if (nret) {
-			for (size_t nc = 0; nc < nret; nc++)
+			for (int nc = 0; nc < nret; nc++)
 				replystr += tempstr[nc];
 			retnbr += nret;
 			tout = zmsec() + progStatus.serial_timeout;
@@ -491,7 +491,7 @@ int rigbase::wait_char(int ch, size_t n, int timeout, const char *sz, int pr)
 
 	static char ctrace[1000];
 	memset(ctrace, 0, 1000);
-	snprintf( ctrace, sizeof(ctrace), "%s: read %lu bytes in %d msec, %s", 
+	snprintf( ctrace, sizeof(ctrace), "%s: read %d bytes in %d msec, %s",
 		sz, retnbr,
 		(int)(zmsec() - tstart),
 		(pr == HEX ? str2hex(replystr.c_str(), replystr.length()): replystr.c_str()) );

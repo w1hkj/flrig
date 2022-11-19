@@ -21,6 +21,9 @@
 #ifndef _RIG_BASE_H
 #define _RIG_BASE_H
 
+#include "config.h"
+#include "compat.h" // Must precede all FL includes
+
 #include <string>
 #include <cmath>
 #include <cstdlib>
@@ -635,8 +638,8 @@ double vfo_;
 	virtual int  parse_alc(std::string){return 0;}
 	virtual int  parse_split(std::string){return 0;}
 
-	int waitN(size_t n, int timeout, const char *, int pr = HEX);
-	int wait_char(int ch, size_t n, int timeout, const char *, int pr = HEX);
+	int waitN(int n, int timeout, const char *, int pr = HEX);
+	int wait_char(int ch, int n, int timeout, const char *, int pr = HEX);
 	int wait_crlf(std::string, std::string, int nr = 20, int timeout = 100, int pr = ASC);
 
 // IC-7610

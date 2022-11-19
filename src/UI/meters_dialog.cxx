@@ -19,6 +19,7 @@
 // ----------------------------------------------------------------------------
 
 #include "config.h"
+#include "compat.h" // Must precede all FL includes
 
 #include "rigpanel.h"
 #include "gettext.h"

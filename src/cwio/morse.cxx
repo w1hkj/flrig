@@ -20,7 +20,7 @@
 // along with fldigi.  If not, see <http://www.gnu.org/licenses/>.
 // ---------------------------------------------------------------------
 
-#include <config.h>
+#include "config.h"
 #include <cstring>
 #include <iostream>
 

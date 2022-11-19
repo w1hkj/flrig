@@ -127,12 +127,12 @@ private:
 };
 
 //=============================================================================
-// MINGW serial port implemenation
+// MINGW serial port implementation
 //=============================================================================
 
 #else //__WIN32__
 
-#include <windows.h>
+#include "compat.h"
 
 class Cserial  {
 public:

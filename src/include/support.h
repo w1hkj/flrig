@@ -44,16 +44,6 @@
 #include <vector>
 #include <queue>
 
-#include <FL/Fl.H>
-#include <FL/Enumerations.H>
-#include <FL/Fl_Tree.H>
-#include <FL/Fl_Text_Display.H>
-#include <FL/Fl_Text_Buffer.H>
-#include <FL/Fl_Widget.H>
-#include <FL/fl_draw.H>
-#include <FL/fl_show_colormap.H>
-#include <FL/fl_ask.H>
-
 #include "rig.h"
 #include "rigbase.h"
 #include "rig_io.h"
@@ -84,6 +74,17 @@
 #include "gpio_ptt.h"
 #include "cmedia.h"
 #include "tmate2.h"
+
+#include <FL/Fl.H>
+#include <FL/Enumerations.H>
+#include <FL/Fl_Tree.H>
+#include <FL/Fl_Text_Display.H>
+#include <FL/Fl_Text_Buffer.H>
+#include <FL/Fl_Widget.H>
+#include <FL/fl_draw.H>
+#include <FL/fl_show_colormap.H>
+#include <FL/fl_ask.H>
+
 
 #define LISTSIZE 200
 #define ATAGSIZE 128 //21

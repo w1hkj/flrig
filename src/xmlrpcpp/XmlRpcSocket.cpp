@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
-#include <config.h>
+#include "config.h"
 
 #include "XmlRpcSocket.h"
 #include "XmlRpcUtil.h"

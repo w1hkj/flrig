@@ -21,7 +21,7 @@
 #ifndef FILESELECT_H
 #define FILESELECT_H
 
-#ifdef __WOE32__
+#ifdef __WIN32__
 #  define FSEL_THREAD 1
 #endif
 

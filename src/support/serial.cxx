@@ -934,7 +934,7 @@ doloop:
 
 	if (progStatus.serialtrace || SERIALDEBUG) {
 		hex = check_hex(buf.c_str(), buf.length());
-		snprintf(traceinfo, sizeof(traceinfo), "ReadBuffer TIMED OUT [%0.3f msec]: %s", (int)(zmsec() - start),
+		snprintf(traceinfo, sizeof(traceinfo), "ReadBuffer TIMED OUT [%0.3f msec]: %s", (zmsec() - start) * 1e-3,
 			(hex ? str2hex(buf.c_str(), buf.length()) : buf.c_str()) );
 		ser_trace(1, traceinfo);
 	}

@@ -23,6 +23,9 @@
 #ifndef _CWIO_H
 #define _CWIO_H
 
+#include "config.h"
+#include "compat.h" // Must precede all FL includes
+
 #include <string>
 #include <FL/Fl_Window.H>
 

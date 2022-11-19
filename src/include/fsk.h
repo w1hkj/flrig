@@ -20,6 +20,9 @@
 // along with fldigi.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
+#include "config.h"
+#include "compat.h" // Must precede all FL includes
+
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
@@ -34,11 +37,6 @@
 #include "serial.h"
 #include "threads.h"
 
-#ifdef __WIN32__
-#	include "compat.h"
-#	include <winbase.h>
-#	include <windows.h>
-#endif
 
 #ifndef FSK_H
 #define FSK_H

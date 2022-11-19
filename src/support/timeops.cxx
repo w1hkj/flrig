@@ -20,19 +20,13 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
-#include <config.h>
+#include "config.h"
 #include <iostream>
 #include <string>
 #include <FL/Fl.H>
 
 #include "timeops.h"
 
-#ifdef __MINGW32__
-#  include "compat.h"
-#  include "util.h"
-#else
-#  include "util.h"
-#endif
 
 struct timespec operator+(const struct timespec &t0, const double &t)
 {

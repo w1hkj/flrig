@@ -47,7 +47,6 @@
  */
 
 #include <string>
-#include <strstream>
 
 #include "config.h"
 #include "other/PCR1000.h"

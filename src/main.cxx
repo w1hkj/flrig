@@ -18,7 +18,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
+
 #include "config.h"
+#include "compat.h"
 
 #include <stdlib.h>
 #include <iostream>
@@ -47,7 +49,6 @@
 
 #ifdef WIN32
 #  include "flrigrc.h"
-#  include "compat.h"
 #  define dirent fl_dirent_no_thanks
 #endif
 
@@ -149,7 +150,7 @@ Developer:  Dave,  W1HKJ";
 void visit_URL(void* arg)
 {
 	const char* url = reinterpret_cast<const char *>(arg);
-#ifndef __WOE32__
+#ifndef __WIN32__
 	const char* browsers[] = {
 #  ifdef __APPLE__
 		getenv("FLDIGI_BROWSER"), // valid for any OS - set by user
@@ -557,7 +558,7 @@ int main (int argc, char *argv[])
 	}
 	mainwindow->xclass(KNAME);
 
-#if defined(__WOE32__)
+#if defined(__WIN32__)
 #  ifndef IDI_ICON
 #    define IDI_ICON 101
 #  endif

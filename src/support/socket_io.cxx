@@ -23,6 +23,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
+#include "config.h"
+#include "compat.h" // Must precede all FL includes
+
 #include <stdlib.h>
 #include <unistd.h>
 #include <iostream>
@@ -48,8 +51,6 @@
 #include <FL/x.H>
 #include <FL/Fl_Pixmap.H>
 #include <FL/Fl_Image.H>
-
-#include "config.h"
 
 #include "status.h"
 #include "debug.h"
@@ -264,5 +265,5 @@ int read_from_remote(std::string &str)
 
 	LOG_WARN("%s", szc);
 
-	return str.length();
+	return (int)str.length();
 }

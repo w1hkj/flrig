@@ -17,6 +17,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
+
+#include "config.h"
+#include "compat.h" // Must precede all FL includes
+
 #include <iostream>
 #include "gettext.h"
 #include "rigpanel.h"

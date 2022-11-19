@@ -20,7 +20,7 @@
 // along with fldigi.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
-#include <config.h>
+#include "config.h"
 
 #include "fsk.h"
 #include "fskioUI.h"
@@ -29,9 +29,6 @@
 #include "status.h"
 #include "util.h"
 
-#ifdef __WIN32__
-#include "compat.h"
-#endif
 
 extern int errno;
 

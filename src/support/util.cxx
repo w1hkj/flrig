@@ -18,6 +18,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ----------------------------------------------------------------------------
 
+#include "config.h"
+#include "compat.h"
+
 #include <string.h>
 #include <cerrno>
 #include <time.h>
@@ -26,9 +29,7 @@
 #include "timeops.h"
 
 #include "util.h"
-#ifdef __MINGW32__
-#  include "compat.h"
-#endif
+
 
 /* Return the smallest power of 2 not less than n */
 uint32_t ceil2(uint32_t n)

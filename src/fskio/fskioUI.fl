@@ -5,6 +5,12 @@ i18n_include "gettext.h"
 i18n_function _
 header_name {.h}
 code_name {.cxx}
+decl {\#include "config.h"} {private local
+}
+
+decl {\#include "compat.h"} {private local
+}
+
 decl {\#include "fsk.h"} {private local
 }
 
@@ -522,7 +528,7 @@ Function {new_fsklogbook_dialog()} {open
     label {Flrig RTTY Log} open
     xywh {610 351 670 284} type Double visible
   } {
-    Fl_Menu_Bar FSKlog_menubar {open selected
+    Fl_Menu_Bar FSKlog_menubar {open
       xywh {0 0 670 20}
     } {
       Submenu FSKlog_menu {

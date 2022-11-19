@@ -3,6 +3,8 @@
 #ifndef cwioUI_h
 #define cwioUI_h
 #include <FL/Fl.H>
+#include "config.h"
+#include "compat.h"
 #include <FL/Fl_Double_Window.H>
 extern Fl_Double_Window *cwlog_viewer; 
 #include <FL/Fl_Double_Window.H>

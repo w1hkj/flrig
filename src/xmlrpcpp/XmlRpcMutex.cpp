@@ -18,7 +18,7 @@
 #define XMLRPC_THREADS
 #if defined(XMLRPC_THREADS)
 
-#include <config.h>
+#include "config.h"
 
 #include "XmlRpcMutex.h"
 

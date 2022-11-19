@@ -30,12 +30,11 @@
 // ----------------------------------------------------------------------------
 
 
-#include <config.h>
+#include "config.h"
+#include "compat.h"
 
 #include <ctype.h>
-#include <winsock2.h>
 
-#include "compat.h"
 #include "util.h"
 
 /* default mode for stdin, stdout and stderr */

@@ -79,7 +79,7 @@ bool RIG_TRUSDX::check ()
 	get_trace(1, "check()");
 	ret = wait_char(';', 6, 100, "get ID", ASC);
 	gett("");
-	if (replystr.find("ID020;") != std::string::npos);
+	if (replystr.find("ID020;") != std::string::npos)
 		return true;
 	return false;
 }
@@ -117,7 +117,7 @@ void RIG_TRUSDX::get_IF()
 {
 	cmd = "IF;";
 	get_trace(1, "get_IF()");
-	int ret = wait_char(';', 38, 100, "get IF", ASC);
+	wait_char(';', 38, 100, "get IF", ASC);	// This function called for its side effect, not its return.
 	gett("");
 	size_t p = replystr.rfind("IF");
 	A.imode = replystr[p + 29] - '1';

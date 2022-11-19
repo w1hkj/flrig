@@ -617,7 +617,7 @@ int AlphaCompare( const void *x1, const void *x2 )
 	X2 = *(datambr **)(x2);
 	std::string str1 = X1->s;
 	std::string str2 = X2->s;
-	int len = str1.length();
+	size_t len = str1.length();
 	if (len > str2.length()) len = str2.length();
 	for (size_t p = 0; p < len; p++) {
 		if (str1[p] < str2[p]) return -1;
@@ -635,7 +635,7 @@ int UcaseCompare( const void *x1, const void *x2 )
 	X2 = *(datambr **)(x2);
 	std::string str1 = X1->s;
 	std::string str2 = X2->s;
-	int len = str1.length();
+	size_t len = str1.length();
 	if (len > str2.length()) len = str2.length();
 	for (size_t p = 0; p < len; p++) {
 		if (toupper(str1[p]) < toupper(str2[p])) return -1;

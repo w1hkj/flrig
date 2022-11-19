@@ -27,7 +27,7 @@
 #ifndef SOCKET_H_
 #define SOCKET_H_
 
-#include <config.h>
+#include "config.h"
 
 #include <sys/time.h>
 #ifndef __MINGW32__

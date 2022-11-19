@@ -25,10 +25,8 @@
 
 /*
 #ifdef __WIN32__
-#  include <windows.h>
+#  include <winsock2.h>
 //#  include "par_nt.h"
-#  include <winioctl.h>
-#  include <winbase.h>
 #endif
 */
 

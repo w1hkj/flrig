@@ -5,6 +5,12 @@ i18n_include "gettext.h"
 i18n_function _
 header_name {.h}
 code_name {.cxx}
+decl {\#include "config.h"} {private local
+}
+
+decl {\#include "compat.h"} {private local
+}
+
 decl {\#include "dialogs.h"} {private local
 }
 

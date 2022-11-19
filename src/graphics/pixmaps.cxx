@@ -17,7 +17,7 @@
 // Tango icons
 // ---------------------------------------------------------------------
 
-#include <config.h>
+#include "config.h"
 
 /* XPM */
 const char *address_book_icon[] = {

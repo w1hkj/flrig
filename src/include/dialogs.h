@@ -21,6 +21,9 @@
 #ifndef __DIALOGS_H__
 #define __DIALOGS_H__
 
+#include "config.h"
+#include "compat.h" // Must precede all FL includes
+
 #include <string>
 
 #include "font_browser.h"

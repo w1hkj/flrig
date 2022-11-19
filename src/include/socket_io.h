@@ -21,17 +21,17 @@
 #ifndef WRAP_H
 #define WRAP_H
 
+#ifdef WIN32
+#  include "compat.h"
+#else
+#  include <arpa/inet.h>
+#endif
+
 #include <string.h>
 #include <string>
 
 #include "threads.h"
 #include "socket.h"
-
-#ifdef WIN32
-#  include <winsock2.h>
-#else
-#  include <arpa/inet.h>
-#endif
 
 extern Socket *tcpip;
 extern Address *remote_addr;
