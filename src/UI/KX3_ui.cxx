@@ -47,7 +47,7 @@ extern std::queue<XCVR_STATE> queB;
 
 void read_KX3_vfo()
 {
-	unsigned long int freq;
+	unsigned long long freq;
 	freq = selrig->get_vfoA();
 	if (freq != vfoA.freq) {
 		vfoA.freq = freq;

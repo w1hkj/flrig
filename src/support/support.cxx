@@ -300,7 +300,7 @@ void read_vfo()
 
 // transceiver changed ?
 	trace(1,"read_vfo()");
-	unsigned long int  freq;
+	unsigned long long  freq;
 
 	static int current_vfo = onNIL;
 	int chkvfo = selrig->get_vfoAorB();

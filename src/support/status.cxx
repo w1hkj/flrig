@@ -139,10 +139,10 @@ status progStatus = {
 
 	-1,			// int  iBW_A;
 	1,			// int  imode_A;
-	14070000,	// unsigned long int freq_A;
+	14070000,	// unsigned long long freq_A;
 	-1,			// int  iBW_B;
 	1,			// int  imode_B;
-	7070000,	// unsigned long int freq_B;
+	7070000,	// unsigned long long freq_B;
 
 	"",			// std::string filters;
 	"",			// std::string bandwidths;
