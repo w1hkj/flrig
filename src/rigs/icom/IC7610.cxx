@@ -1352,7 +1352,7 @@ double RIG_IC7610::get_power_control()
 
 void RIG_IC7610::get_pc_min_max_step(double &min, double &max, double &step)
 {
-	min = 2; pmax = max = 100; step = 1;
+	min = 0; pmax = max = 100; step = 1;
 }
 
 int RIG_IC7610::get_smeter()
@@ -2238,9 +2238,9 @@ void RIG_IC7610::get_band_selection(int v)
 		size_t p = replystr.rfind(pre_fm);
 		if (p != std::string::npos) {
 			unsigned long long bandfreq = fm_bcd_be(replystr.substr(p+8, 5), 10);
-			int bandmode = replystr[p+13];
+			int bandmode = fm_bcd(replystr.substr(p+13, 1), 2);
 			int bandfilter = replystr[p+14];
-			int banddata = replystr[p+15] & 0x10;
+			int banddata = replystr[p+15] & 0xF0;
 			int tone = fm_bcd(replystr.substr(p+16, 3), 6);
 			size_t index = 0;
 			for (index = 0; index < sizeof(PL_tones) / sizeof(*PL_tones); index++)
@@ -2265,9 +2265,21 @@ void RIG_IC7610::get_band_selection(int v)
 						(banddata == 0x20) ? m7610AMD2 :
 						(banddata == 0x30) ? m7610AMD3 : m7610AM);
 						break;
-				case 3: bandmode = ((banddata == 0x10) ? m7610FMD1 : 
+				case 3: bandmode = m7610CW;
+						break;
+				case 4: bandmode = m7610RTTY;
+						break;
+				case 5: bandmode = ((banddata == 0x10) ? m7610FMD1 :
 						(banddata == 0x20) ? m7610FMD2 :
 						(banddata == 0x30) ? m7610FMD3 : m7610FM);
+						break;
+				case 7: bandmode = m7610CWR;
+						break;
+				case 8: bandmode = m7610RTTYR;
+						break;
+				case 12: bandmode = m7610PSK;
+						break;
+				case 13: bandmode = m7610PSKR;
 						break;
 				default:
 						break;
@@ -2289,33 +2301,31 @@ void RIG_IC7610::get_band_selection(int v)
 void RIG_IC7610::set_band_selection(int v)
 {
 	unsigned long long freq = (inuse == onB ? B.freq : A.freq);
-	int fil = (inuse == onB ? filB : filA);
+	int fil = (inuse == onB ? B.filter : A.filter);
 	int mode = (inuse == onB ? B.imode : A.imode);
 
 	cmd.assign(pre_to);
 	cmd.append("\x1A\x01");
 	cmd += to_bcd_be( v, 2 );
-	cmd += '\x01';
+	cmd += '\x01';	// Currently hardcoded to write to Register 1 - there is no UI support yet to specify other Registers
 	cmd.append( to_bcd_be( freq, 10 ) );
-	cmd += mode;
-	cmd += fil;
-	if (mode >= m7610LSBD1 && mode <= m7610FMD3 )
-		cmd += '\x10';
-	else
-		cmd += '\x00';
+	cmd += IC7610_mode_nbr[mode];
+	cmd.append( to_bcd_be( fil, 2 ) );
+
+
+	// No way in current UI for user to enable / disable either the TX tone or the RX squelch
+	// tone, so the second nibble of the next byte is always '0'.  Full capability would be:
+	// 0 = no tone; 1 = Repeater tone; 2 = T-SQL (Tone squelch - open receive on detection) tone
+	if (mode >= m7610LSBD1 && mode <= m7610FMD1 ) cmd += '\x10';
+	else if (mode >= m7610LSBD2 && mode <= m7610FMD2 ) cmd += '\x20';
+	else if (mode >= m7610LSBD3 && mode <= m7610FMD3 ) cmd += '\x30';
+	else cmd += '\x00';
 	cmd.append(to_bcd(PL_tones[tTONE], 6));
 	cmd.append(to_bcd(PL_tones[rTONE], 6));
 	cmd.append(post);
-	waitFB("set_band_selection");
 	set_trace(2, "set_band_selection()", str2hex(cmd.c_str(), cmd.length()));
+	waitFB("set_band_selection");
 
-	cmd.assign(pre_to);
-	cmd.append("\x1A\x01");
-	cmd += to_bcd_be( v, 2 );
-	cmd += '\x01';
-	cmd.append( post );
-
-	waitFOR(23, "get band stack");
 }
 
 // ---------------------------------------------------------------------

@@ -323,12 +323,12 @@ protected:
 	std::string cmd; // command string
 	std::string rsp; // expected response string (header etc)
 
-	std::string to_bcd_be(unsigned long long freq, int len);
-	std::string to_bcd(unsigned long long freq, int len);
+	std::string to_bcd_be(unsigned long long val, int len);
+	std::string to_bcd(unsigned long long val, int len);
 	unsigned long long fm_bcd (std::string bcd, int len);
 	unsigned long long fm_bcd_be(std::string bcd, int len);
-	std::string to_binary_be(unsigned long long freq, int len);
-	std::string to_binary(unsigned long long freq, int len);
+	std::string to_binary_be(unsigned long long val, int len);
+	std::string to_binary(unsigned long long val, int len);
 	unsigned long long fm_binary(std::string binary, int len);
 	unsigned long long fm_binary_be(std::string binary_be, int len);
 	std::string to_decimal_be(unsigned long long d, int len);

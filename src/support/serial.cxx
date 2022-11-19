@@ -580,10 +580,10 @@ int  Cserial::ReadBuffer (std::string &buf, int nchars, std::string find1, std::
 }
 
 ///////////////////////////////////////////////////////
-// Function name	: Cserial::WriteBuffer
-// Description	  : Writes a std::string to the selected port
-// Return type	  : bool
-// Argument		 : BYTE by
+// Function name  : Cserial::WriteBuffer
+// Description    : Writes a character buffer to the selected port
+// Return type    : ssize_t (signed long) - number of bytes written or -1 for failure
+// Arguments      : binary command string in character buffer; number of bytes to write
 ///////////////////////////////////////////////////////
 int Cserial::WriteBuffer(const char *buff, int n)
 {
@@ -593,7 +593,7 @@ int Cserial::WriteBuffer(const char *buff, int n)
 	}
 
 	if (progStatus.serialtrace || SERIALDEBUG) {
-		std::string sw = buff;
+		std::string sw = std::string(buff, (std::size_t) n);
 		size_t p = sw.rfind("\r\n");
 		if (p == (sw.length() - 2) ) {
 			sw.replace(p, 2, "<cr><lf>");
@@ -968,17 +968,17 @@ bool Cserial::WriteByte(char by)
 }
 
 ///////////////////////////////////////////////////////
-// Function name	: Cserial::WriteBuffer
-// Description	  : Writes a std::string to the selected port
-// Return type	  : bool
-// Argument		 : BYTE by
+// Function name  : Cserial::WriteBuffer
+// Description    : Writes a character buffer to the selected port
+// Return type    : ssize_t (signed long) - number of bytes written or -1 for failure
+// Arguments      : binary command string in character buffer; number of bytes to write
 ///////////////////////////////////////////////////////
 int Cserial::WriteBuffer(const char *buff, int n)
 {
 	if (hComm == INVALID_HANDLE_VALUE) return 0;
 
 	if (progStatus.serialtrace || SERIALDEBUG) {
-		std::string sw = buff;
+		std::string sw = std::string(buff, (std::size_t) n);
 		size_t p = sw.rfind("\r\n");
 		if (p == (sw.length() - 2) ) {
 			sw.replace(p, 2, "<cr><lf>");

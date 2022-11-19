@@ -107,6 +107,8 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz, unsigned long timeout)
 	std::string eor   = "\xFD";
 	std::string bad   = "\xFA\xFD";
 
+	// This code creates the preamble of the response from the preamble of the command
+	// by swapping the controller / radio addresses.
 	check[0] = cmd[0];
 	check[1] = cmd[1];
 	check[2] = cmd[3];
@@ -165,17 +167,15 @@ bool RIG_ICOM::waitFOR(size_t n, const char *sz, unsigned long timeout)
 	return false;
 }
 
-bool RIG_ICOM::waitFB(const char *sz, int timeout)
+// waitFB - This function sends the command in the 'cmd' member string (via 'waitFOR'),
+//          specifying the number of bytes in the expected resposne.  'waitFOR' already
+//          knows the construction of the response message so this seems superfluous.
+bool RIG_ICOM::waitFB(const char *sz, unsigned long timeout)
 {
 #if SERIAL_DEBUG
 fprintf(serlog, "waitFB\n");
 #endif
-
-	if (!waitFOR(6, sz, timeout))
-		return false;
-	if (replystr.rfind("\xFB\xFD") == std::string::npos)
-		return false;
-	return true;
+	return waitFOR(6, sz, timeout);
 }
 
 // exchange & equalize are available in these Icom xcvrs

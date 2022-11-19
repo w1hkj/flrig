@@ -383,11 +383,57 @@ if you are using the SCU-17 secondary serial port.
 </center>
 <br>
 
-Providing you transceiver supports the various meters and controls, you
+Providing your transceiver supports the various meters and controls, you
 can elect to poll these every time the poll cycle occurs.  Polling a value
-causes FLRIG to follow and well as control a particular transceiver function
+causes FLRIG to follow as well as control a particular transceiver function
 or control.  The polling cycle will slow down as you elect to poll more and
 more values.
+
+
+\subsection ssCommands User-Defined Commands
+
+<center>
+\image latex config/cmds.png "Defining Commands for Extra Controls A, B, C Tabs" width=4.9in
+\image html config/cmds.png "Defining Commands for Extra Controls A, B, C Tabs"
+</center>
+<br>
+
+flrig supports 24 unshifted and 24 shifted user-defined commands.  The commands are defined via
+the Configuration dialog "Commands" tab and are invoked via buttons on the A, B, and C tabs on the flrig
+extra controls dialog.  Refer to your rig's remote interface control documentation to learn how
+to construct a command.
+
+As shown in the Figure, the user provides text for the button label and an appropriate command string
+for their radio.  The command can be tested by clicking on the button in the extra controls dialog
+and examining the response in the Configuration dialog.  In the example, the unshifted command sets
+the frequency in use on the Main band of an Icom IC-7610 radio to the 80 meter CW range, and the
+shifted command sets it to the 40 meter CW range (these commands only affect frequency - not mode).
+In the label in this example, the '/' is used as a way to distinguish the unshifted/shifted functions.
+
+The command string must comply with the
+transceiver requirements.  If ASCII text is used, as with transceivers based
+on the Kenwood command set, you enter the string without spaces; e.g.,
+
+\verbatim
+FA;
+\endverbatim
+to read the A vfo .
+
+For binary strings, used in older Yaesu transceivers and all Icom CI-V type
+transceivers, you need to enter the string as space-delineated hex values;
+e.g.,
+
+\verbatim
+Yaesu:  x00 x00 x00 x01 x05
+
+Icom: xFE xFE x70 xE0 x1A x05 x00 x92 x00 xFD
+\endverbatim
+
+
+Additionally, the user can define commands that should be executed during program start-up or termination
+by making entries on the Start/Exit tab of the Commands configuration page.
+
+
 
 \subsection ssSENDING Send Command String
 
@@ -418,7 +464,7 @@ Yaesu:  x00 x00 x00 x01 x05
 Icom: xFE xFE x70 xE0 x1A x05 x00 x92 x00 xFD
 \endverbatim
 
-The buttone "ICOM pre" and "ICOM post" will insert the preamble and postamble
+The button "ICOM pre" and "ICOM post" will insert the preamble and postamble
 hex code sequences for the selected Icom transceiver.
 
 Press the SEND button to transfer the command to the transceiver.  The
@@ -540,12 +586,28 @@ that uses less vertical space.
 Additional control settings may be available depending on the transceiver
 being controlled.  These are in a drop-down area toggled by the arrow button
 to the left of the attenuator button on the small aspect ratio dialog view.
-These are the controls for the Yeasu FT991A.
+These are the controls for the Yaesu FT991A.
 
 <center>
 \image latex ft-991a/FT-991A-xtras-band.png "" width=4.25in
 \image html ft-991a/FT-991A-xtras-band.png ""
+</center>
 <br>
+Left-click on a Band button to QSY to that band.  Typically this will apply the settings saved in the top
+register in your rig's Band Stacking Registers for that band, if your rig supports BSR.
+This should provide similar functionality to physically pressing the rig's Band button.
+For example, on an Icom IC-7610, this will recall the frequency, mode, filter selection, and
+if FM mode, the tone frequencies last used on the selected band.
+
+Additionally, if your rig supports the functionality, right-clicking on a Band button
+will store current values in the top register for that Band.  You must right-click on the
+Band you are currently on.  Most, if not all, rigs will reject attempts to set
+frequency values outside of the ham band limits in the BSR for a given band.
+<br>
+<br>
+
+<center>
+
 \image latex ft-991a/FT-991A-xtras-cw.png "" width=4.25in
 \image html ft-991a/FT-991A-xtras-cw.png ""
 <br>

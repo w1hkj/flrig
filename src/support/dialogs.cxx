@@ -1793,7 +1793,7 @@ void cb_send_command(std::string command, Fl_Output *resp)
 {
 	if (command.empty()) return;
 	bool usehex = false;
-	if (command.empty()) return;
+
 	std::string cmd = "";
 	if (command.find("x") != std::string::npos) { // hex std::strings
 		size_t p = 0;
@@ -1816,7 +1816,7 @@ void cb_send_command(std::string command, Fl_Output *resp)
 	guard_lock lock1(&mutex_srvc_reqs);
 	guard_lock lock2(&mutex_serial);
 
-	sendCommand(cmd, 0);//cmd.length());
+	sendCommand(cmd);
 	set_trace(2, "command: ", command.c_str());
 	waitResponse(100);
 

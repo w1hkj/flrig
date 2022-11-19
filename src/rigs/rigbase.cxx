@@ -186,7 +186,7 @@ rigbase::rigbase()
 	preamp_level = 0;
 }
 
-std::string rigbase::to_bcd_be(unsigned long long freq, int len)
+std::string rigbase::to_bcd_be(unsigned long long val, int len)
 {
 	unsigned char a;
 	int numchars = len / 2;
@@ -194,18 +194,18 @@ std::string rigbase::to_bcd_be(unsigned long long freq, int len)
 	if (len & 1) numchars ++;
 	for (int i = 0; i < numchars; i++) {
 		a = 0;
-		a |= freq % 10;
-		freq /= 10;
-		a |= (freq % 10)<<4;
-		freq /= 10;
+		a |= val % 10;
+		val /= 10;
+		a |= (val % 10)<<4;
+		val /= 10;
 		bcd += a;
 	}
 	return bcd;
 }
 
-std::string rigbase::to_bcd(unsigned long long freq, int len)
+std::string rigbase::to_bcd(unsigned long long val, int len)
 {
-	std::string bcd_be = to_bcd_be(freq, len);
+	std::string bcd_be = to_bcd_be(val, len);
 	std::string bcd = "";
 	int bcdlen = bcd_be.size();
 	for (int i = bcdlen - 1; i >= 0; i--)
@@ -242,20 +242,20 @@ unsigned long long rigbase::fm_bcd_be(std::string bcd, int len)
 	return fm_bcd(bcd, len);
 }
 
-std::string rigbase::to_binary_be(unsigned long long freq, int len)
+std::string rigbase::to_binary_be(unsigned long long val, int len)
 {
 	static std::string bin = "";
 	for (int i = 0; i < len; i++) {
-		bin += freq & 0xFF;
-		freq >>= 8;
+		bin += val & 0xFF;
+		val >>= 8;
 	}
 	return bin;
 }
 
-std::string rigbase::to_binary(unsigned long long freq, int len)
+std::string rigbase::to_binary(unsigned long long val, int len)
 {
 	static std::string bin = "";
-	std::string bin_be = to_binary_be(freq, len);
+	std::string bin_be = to_binary_be(val, len);
 	int binlen = bin_be.size();
 	for (int i = binlen - 1; i >= 0; i--)
 		bin += bin_be[i];
