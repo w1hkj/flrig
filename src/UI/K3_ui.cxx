@@ -106,7 +106,6 @@ void K3_A2B()
 	selrig->set_bwB(vfoB.iBW);
 	selrig->set_modeB(vfoB.imode);
 	FreqDispB->value(vfoB.freq);
-	Fl::focus(FreqDispA);
 }
 
 void cb_K3_swapAB()
@@ -131,5 +130,4 @@ void cb_K3_swapAB()
 	FreqDispA->value(vfoA.freq);
 
 	vfo = &vfoA;
-	Fl::focus(FreqDispA);
 }
