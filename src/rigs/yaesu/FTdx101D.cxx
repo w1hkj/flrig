@@ -481,7 +481,8 @@ struct pwrpair {int mtr; float pwr;};
 int RIG_FTdx101D::get_power_out()
 {
 	static pwrpair pwrtbl[] = { 
-		{ 35,  5.0 },
+		{  0,  0.0 },
+		{ 27,  5.0 },
 		{ 94, 25.0 },
 		{147, 50.0 },
 		{176, 75.0 },
@@ -490,7 +491,7 @@ int RIG_FTdx101D::get_power_out()
 
 	cmd = rsp = "RM5";
 	sendCommand(cmd.append(";"));
-	wait_char(';', 7, 100, "get pout", ASC);
+	wait_char(';', 10, 100, "get pout", ASC);
 	gett("get_power_out()");
 
 	size_t p = replystr.rfind(rsp);
