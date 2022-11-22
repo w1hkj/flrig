@@ -266,10 +266,10 @@ int RIG_XI5105::get_smeter()
 	resp.append("\x15\x02");
 	int mtr = 0;
 	if (waitFOR(9, "get smeter")) {
-get_trace(2, "get_smeter()", str2hex(replystr.c_str(), replystr.length()));
+		get_trace(2, "get_smeter()", str2hex(replystr.c_str(), replystr.length()));
 		size_t p = replystr.rfind(resp);
 		if (p != std::string::npos) {
-			mtr = replystr[p+7] * 100 + replystr[p+6];
+			mtr = replystr[p+6] * 100 + replystr[p+7];
 			mtr = (int)ceil(mtr /2.55);
 			if (mtr < 0) mtr = 0;
 			if (mtr > 100) mtr = 100;
