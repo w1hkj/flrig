@@ -75,6 +75,7 @@ void RIG_TRUSDX::shutdown()
 
 bool RIG_TRUSDX::check ()
 {
+	MilliSleep(2000); // xcvr needs time to wake up
 	cmd = "ID;";
 	get_trace(1, "check()");
 	ret = wait_char(';', 6, 100, "get ID", ASC);
