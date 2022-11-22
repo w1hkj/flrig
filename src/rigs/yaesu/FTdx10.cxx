@@ -356,15 +356,16 @@ unsigned long long RIG_FTdx10::get_vfoA ()
 	cmd = rsp = "FA";
 	cmd += ';';
 	wait_char(';', 12, 100, "get vfo A", ASC);
-
 	gett("get_vfoA()");
-//replystr = Avfo;
+
+//replystr = "XXXFA014025500;";
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return freqA;
 	unsigned long long f = 0;
-	for (size_t n = 2; n < 11; n++)
-		f = f*10 + replystr[p+n] - '0';
-	freqA = f;
+	char scolon = 0;
+	int n = sscanf(&replystr[p + 2], "%lld%c", &f, &scolon);
+	if (n == 2)
+		freqA = f;
 	return freqA;
 }
 
@@ -386,15 +387,17 @@ unsigned long long RIG_FTdx10::get_vfoB ()
 	cmd = rsp = "FB";
 	cmd += ';';
 	wait_char(';', 12, 100, "get vfo B", ASC);
-
 	gett("get_vfoB()");
-//replystr = Bvfo;
+
+//	replystr = "YYYYYFB7300000;";
+
 	size_t p = replystr.rfind(rsp);
 	if (p == std::string::npos) return freqB;
 	unsigned long long f = 0;
-	for (size_t n = 2; n < 11; n++)
-		f = f*10 + replystr[p+n] - '0';
-	freqB = f;
+	char scolon = 0;
+	int n = sscanf(&replystr[p + 2], "%lld%c", &f, &scolon);
+	if (n == 2)
+		freqB = f;
 	return freqB;
 }
 
