@@ -35,6 +35,8 @@
 
 #ifdef __WIN32__
 	typedef unsigned char uint8_t;
+#else
+	#include <stdint.h>
 #endif
 
 namespace WSclient {
