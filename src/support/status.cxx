@@ -611,17 +611,15 @@ void status::saveLastState()
         metersY = meters_dialog->y();
     }
 
-	if (mX >= 0 && mY >= 0) {
-		mainX = mX;
-		mainY = mY;
-		if (UIsize == wide_ui) {
-			if (mW < WIDE_MAINW)
-				mW = WIDE_MAINW;
-			mH = WIDE_MAINH;
-		}
-		mainW = mW;
-		mainH = mH;
+	mainX = mX;
+	mainY = mY;
+	if (UIsize == wide_ui) {
+		if (mW < WIDE_MAINW)
+			mW = WIDE_MAINW;
+		mH = WIDE_MAINH;
 	}
+	mainW = mW;
+	mainH = mH;
 
 	if (tabsGeneric)
 		visible_tab = (tabsGeneric->value())->label();
