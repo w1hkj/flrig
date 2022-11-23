@@ -56,6 +56,10 @@ status progStatus = {
 	600,		// int memW;
 	164,		// int memH;
 
+    785,        // int metersX;
+    50,         // int metersy;
+    false,		// bool meters_dialog_visible;
+
 	20,			// int ddX;
 	20,			// int ddY;
 
@@ -600,6 +604,12 @@ void status::saveLastState()
 		memW = dlgMemoryDialog->w();
 		memH = dlgMemoryDialog->h();
 	}
+    
+    if (meters_dialog)
+    {
+        metersX = meters_dialog->x();
+        metersY = meters_dialog->y();
+    }
 
 	if (mX >= 0 && mY >= 0) {
 		mainX = mX;
@@ -631,6 +641,10 @@ void status::saveLastState()
 	spref.set("memy", memY);
 	spref.set("memw", memW);
 	spref.set("memh", memH);
+
+    spref.set("metersx", metersX);
+    spref.set("metersy", metersY);
+    spref.set("meters_dialog_visible", meters_dialog->shown());
 
 	spref.set("ddx", ddX);
 	spref.set("ddy", ddY);
@@ -1253,6 +1267,10 @@ bool status::loadXcvrState(std::string xcvr)
 		spref.get("memy", memY, memY);
 		spref.get("memw", memW, memW);
 		spref.get("memh", memH, memH);
+
+        spref.get("metersx", metersX, metersX);
+        spref.get("metersy", metersY, metersY);
+        spref.get("meters_dialog_visible", i, i); meters_dialog_visible = i;
 
 		spref.get("ddX", ddX, ddX);
 		spref.get("ddY", ddY, ddY);

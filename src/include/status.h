@@ -43,6 +43,10 @@ struct status {
 	int		memW;
 	int		memH;
 
+    int     metersX;
+    int     metersY;
+    bool	meters_dialog_visible;
+
 	int		ddX;
 	int		ddY;
 

@@ -458,6 +458,10 @@ int main (int argc, char *argv[])
 
 	progStatus.UI_laststate();
 
+	meters_dialog->resize(progStatus.metersX, progStatus.metersY, 210, 190);
+	if (progStatus.meters_dialog_visible)
+		meters_dialog->show();
+
 	cwio_keyer_dialog = new_cwio_dialog();
 	cwio_editor = new_message_editor();
 	cwio_configure = new_cwio_config_dialog();
