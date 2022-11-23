@@ -3208,9 +3208,13 @@ public:
 
 pthread_t *xml_thread = 0;
 
+static bool run_server = false;
+
 void * xml_thread_loop(void *d)
 {
+	run_server = true;
 	for(;;) {
+		if (!run_server) break;
 		rig_server.work(-1.0);
 	}
 	return NULL;
@@ -3236,6 +3240,7 @@ void start_server(int port)
 void exit_server()
 {
 	rig_server.exit();
+	run_server = false;
 }
 
 void set_server_port(int port)
