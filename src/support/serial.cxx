@@ -707,12 +707,15 @@ bool Cserial::OpenPort()
 			  0);
 
 	if (hComm == INVALID_HANDLE_VALUE) {
-		LOG_ERROR("Open Comm port %s ; hComm = %u", COMportname.c_str(), (size_t)hComm);
+		LOG_ERROR("Open Comm port %s ; hComm = %u", 
+			COMportname.c_str(),
+			(unsigned long long)hComm);
 
 		if (progStatus.serialtrace || SERIALDEBUG) {
 			snprintf(traceinfo, sizeof(traceinfo),
 				"INVALID_HANDLE_VALUE: Open Comm port %s ; hComm = %u\n",
-				COMportname.c_str(), (size_t)hComm);
+				COMportname.c_str(),
+				(unsigned long long)hComm);
 			ser_trace(1, traceinfo);
 		}
 
@@ -722,7 +725,8 @@ bool Cserial::OpenPort()
 	if (progStatus.serialtrace || SERIALDEBUG) {
 		snprintf(traceinfo, sizeof(traceinfo),
 			"Open Comm port %s ; hComm = %u\n",
-			COMportname.c_str(), (size_t)hComm);
+			COMportname.c_str(),
+			(unsigned long long)hComm);
 		ser_trace(1, traceinfo);
 		}
 
@@ -1277,7 +1281,9 @@ DCB.fOutxDsrFlow    %d\n",
 
 	if (progStatus.serialtrace || SERIALDEBUG) {
 		long err = GetLastError();
-		snprintf(traceinfo, sizeof(traceinfo), "SetCommState handle %u, returned %d, error = %d\n", (size_t)hComm, bPortReady, (int)err);
+		snprintf(traceinfo, sizeof(traceinfo),
+			"SetCommState handle %u, returned %d, error = %d\n",
+			(unsigned long long)hComm, bPortReady, (int)err);
 		ser_trace(1, traceinfo);
 	}
 
