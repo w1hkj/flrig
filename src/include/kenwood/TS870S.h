@@ -82,8 +82,15 @@ public:
 //	int  get_swr();
 	int  get_power_out();
 	double get_power_control();
+	
 	void set_volume_control(int val);
 	int  get_volume_control();
+
+	void set_squelch(int val);
+	int  get_squelch();
+	void get_squelch_min_max_step (int &min, int &max, int &step) {
+		min = 0; max = 100; step = 1; } 
+
 	void set_power_control(double val);
 	void set_PTT_control(int val);
 	void tune_rig();
@@ -103,6 +110,9 @@ public:
 
 	void set_noise(bool val);
 	int  get_noise();
+
+	void set_auto_notch(int v);
+	int  get_auto_notch();
 
 	void set_mic_gain(int val);
 	int  get_mic_gain();
