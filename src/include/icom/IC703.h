@@ -89,10 +89,6 @@ public:
 	void set_mic_gain(int val);
 	void get_mic_gain_min_max_step(int &min, int &max, int &step);
 
-	void set_if_shift(int val);
-	bool get_if_shift(int &val);
-	void get_if_min_max_step(int &min, int &max, int &step);
-
 	void set_pbt_inner(int val);
 	void set_pbt_outer(int val);
 

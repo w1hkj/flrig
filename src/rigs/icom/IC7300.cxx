@@ -975,6 +975,9 @@ void RIG_IC7300::set_bwA(int val)
 
 	mode_bwA[A.imode] = val;
 
+	set_pbt_inner(progStatus.pbt_inner);
+	set_pbt_outer(progStatus.pbt_outer);
+
 	if (current_vfo == onB) selectB();
 }
 
@@ -1028,6 +1031,9 @@ void RIG_IC7300::set_bwB(int val)
 	seth();
 
 	mode_bwB[B.imode] = val;
+
+	set_pbt_inner(progStatus.pbt_inner);
+	set_pbt_outer(progStatus.pbt_outer);
 
 	if (current_vfo == onA) selectA();
 }
@@ -2279,46 +2285,6 @@ const char *RIG_IC7300::agc_label()
 int  RIG_IC7300::agc_val()
 {
 	return (agcval);
-}
-
-void RIG_IC7300::set_if_shift(int val)
-{
-	int shift;
-	sh_ = val;
-	if (val == 0) sh_on_ = false;
-	else sh_on_ = true;
-
-	shift = 128 + val * 128 / 50;
-	if (shift < 0) shift = 0;
-	if (shift > 255) shift = 255;
-
-	cmd = pre_to;
-	cmd.append("\x14\x07");
-	cmd.append(to_bcd(shift, 3));
-	cmd.append(post);
-	set_trace(1, "set IF on/off");
-	waitFB("set IF on/off");
-	seth();
-
-	cmd = pre_to;
-	cmd.append("\x14\x08");
-	cmd.append(to_bcd(shift, 3));
-	cmd.append(post);
-	set_trace(1, "set IF val");
-	waitFB("set IF val");
-	seth();
-}
-
-bool RIG_IC7300::get_if_shift(int &val) {
-	val = sh_;
-	return sh_on_;
-}
-
-void RIG_IC7300::get_if_min_max_step(int &min, int &max, int &step)
-{
-	min = -50;
-	max = +50;
-	step = 1;
 }
 
 void RIG_IC7300::set_pbt_inner(int val)

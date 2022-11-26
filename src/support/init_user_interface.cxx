@@ -1607,6 +1607,8 @@ void TRACED(init_if_shift_control)
 		sldrINNER->redraw();
 		sldrOUTER->value(progStatus.pbt_outer);
 		sldrOUTER->redraw();
+		selrig->set_pbt_outer(progStatus.pbt_outer);
+		selrig->set_pbt_inner(progStatus.pbt_inner);
 	}
 
 	if (xcvr_name == rig_TS870S.name_) {

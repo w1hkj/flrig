@@ -67,7 +67,7 @@ extern void make_trace_window();
 	hex1 = str2hex(cmd.c_str(), cmd.length()); \
 	static std::string hex2; \
 	hex2 = str2hex(replystr.c_str(), replystr.length()); \
-	get_trace(5, str, "S: ", hex1.c_str(), " R: ", hex2.c_str()); \
+	set_trace(5, str, "S: ", hex1.c_str(), " R: ", hex2.c_str()); \
 }
 
 #define seth() { \
@@ -75,7 +75,7 @@ extern void make_trace_window();
 	hex1 = str2hex(cmd.c_str(), cmd.length()); \
 	static std::string hex2; \
 	hex2 = str2hex(replystr.c_str(), replystr.length()); \
-	get_trace(4, "S: ", hex1.c_str(), " R: ", hex2.c_str()); \
+	set_trace(4, "S: ", hex1.c_str(), " R: ", hex2.c_str()); \
 }
 
 #define geth() { \
@@ -112,7 +112,7 @@ extern void make_trace_window();
 		if (s1[n] == '\r') s1.replace(n, 1, "<cr>"); \
 		n++; \
 	} \
-	get_trace(3, str, "  ", s1.c_str()); \
+	set_trace(3, str, "  ", s1.c_str()); \
 }
 
 #ifdef WITH_TRACED

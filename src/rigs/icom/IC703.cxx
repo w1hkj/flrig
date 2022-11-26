@@ -102,7 +102,6 @@ RIG_IC703::RIG_IC703() {
 	has_noise_reduction =
 	has_noise_reduction_control =
 	has_noise_control =
-	has_ifshift_control =
 	has_pbt_controls =
 	has_micgain_control =
 	has_power_control =
@@ -542,37 +541,6 @@ void RIG_IC703::get_mic_gain_min_max_step(int &min, int &max, int &step)
 {
 	min = 0;
 	max = 100;
-	step = 1;
-}
-
-void RIG_IC703::set_if_shift(int val)
-{
-	int shift = (int)((val + 50) * 2.55 );
-	cmd.assign(pre_to).append("\x14\x04").append(to_bcd(shift, 3)).append(post);
-	waitFB("set if-shift");
-}
-
-bool  RIG_IC703::get_if_shift(int &val)
-{
-	std::string cstr = "\x14\x07";
-	std::string resp = pre_fm;
-	resp.append(cstr);
-	cmd = pre_to;
-	cmd.append(cstr);
-	cmd.append(post);
-	val = progStatus.shift_val;
-	if (waitFOR(9, "get if-shift")) {
-		size_t p = replystr.rfind(resp);
-		if (p != std::string::npos)
-			val = (int)ceil(fm_bcd(replystr.substr(p+6), 3) / 2.55 - 50);
-	}
-	return (progStatus.shift = (val != 0));
-}
-
-void RIG_IC703::get_if_min_max_step(int &min, int &max, int &step)
-{
-	min = -50;
-	max = +50;
 	step = 1;
 }
 

@@ -113,13 +113,17 @@ static void update_tracetext(void *)
 			tracedisplay->insert(tracestring.c_str());
 		}
 	}
+    tracestring.clear();
+}
+
+void write_tracetext()
+{
 	if (stdout_trace) {
 		std::cout << tracestring;
 		if (tracestring.find('\n') == std::string::npos) std::cout << std::endl;
 		std::cout.flush();
-		return;
 	}
-    tracestring.clear();
+	Fl::awake(update_tracetext);
 }
 
 void trace(int n, ...) // all args of type const char *
@@ -141,7 +145,7 @@ void trace(int n, ...) // all args of type const char *
 
 	guard_lock tt(&mutex_trace);
 	tracestring.append(s.str());
-	Fl::awake(update_tracetext);
+	write_tracetext();
 }
 
 #include "XmlRpc.h"
@@ -169,7 +173,7 @@ void xml_trace(int n, ...) // all args of type const char *
 
 	guard_lock tt(&mutex_trace);
 	tracestring.append(s.str());
-	Fl::awake(update_tracetext);
+	write_tracetext();
 }
 
 void rig_trace(int n, ...) // all args of type const char *
@@ -191,7 +195,7 @@ void rig_trace(int n, ...) // all args of type const char *
 
 	guard_lock tt(&mutex_trace);
 	tracestring.append(s.str());
-	Fl::awake(update_tracetext);
+	write_tracetext();
 }
 
 void set_trace(int n, ...) // all args of type const char *
@@ -213,7 +217,7 @@ void set_trace(int n, ...) // all args of type const char *
 
 	guard_lock tt(&mutex_trace);
 	tracestring.append(s.str());
-	Fl::awake(update_tracetext);
+	write_tracetext();
 }
 
 void get_trace(int n, ...) // all args of type const char *
@@ -235,7 +239,7 @@ void get_trace(int n, ...) // all args of type const char *
 
 	guard_lock tt(&mutex_trace);
 	tracestring.append(s.str());
-	Fl::awake(update_tracetext);
+	write_tracetext();
 }
 
 void rpc_trace(int n, ...) // all args of type const char *
@@ -299,7 +303,7 @@ void rpc_trace(int n, ...) // all args of type const char *
 
 	guard_lock tt(&mutex_trace);
 	tracestring.append(s.str());
-	Fl::awake(update_tracetext);
+	write_tracetext();
 }
 
 void ser_trace(int n, ...) // all args of type const char *
@@ -321,7 +325,7 @@ void ser_trace(int n, ...) // all args of type const char *
 
 	guard_lock tt(&mutex_trace);
 	tracestring.append(s.str());
-	Fl::awake(update_tracetext);
+	write_tracetext();
 }
 
 void deb_trace(int n, ...) // all args of type const char *
@@ -382,7 +386,7 @@ void deb_trace(int n, ...) // all args of type const char *
 
 	guard_lock tt(&mutex_trace);
 	tracestring.append(s.str());
-	Fl::awake(update_tracetext);
+	write_tracetext();
 }
 
 void tci_trace(int n, ...) // all args of type const char *
@@ -404,5 +408,5 @@ void tci_trace(int n, ...) // all args of type const char *
 
 	guard_lock tt(&mutex_trace);
 	tracestring.append(s.str());
-	Fl::awake(update_tracetext);
+	write_tracetext();
 }

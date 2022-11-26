@@ -175,7 +175,6 @@ RIG_IC7800::RIG_IC7800() {
 	has_notch_control =
 	has_attenuator_control =
 	has_preamp_control =
-	has_ifshift_control =
 	has_pbt_controls =
 	has_FILTER = 
 	has_ptt_control =

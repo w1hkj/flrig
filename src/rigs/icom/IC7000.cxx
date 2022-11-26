@@ -173,8 +173,6 @@ RIG_IC7000::RIG_IC7000() {
 
 	restore_mbw = false;
 
-	has_ifshift_control = false;
-
 	has_extras =
 	has_compON =
 	has_compression =

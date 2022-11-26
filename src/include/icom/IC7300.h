@@ -67,10 +67,6 @@ public:
 	int  adjust_bandwidth(int m);
 	int  def_bandwidth(int m);
 
-	void set_if_shift(int val);
-	void get_if_min_max_step(int &min, int &max, int &step);
-	bool get_if_shift(int &val);
-
 	void set_pbt_inner(int val);
 	void set_pbt_outer(int val);
 

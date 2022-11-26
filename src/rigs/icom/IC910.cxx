@@ -102,7 +102,6 @@ RIG_IC910H::RIG_IC910H() {
 	has_micgain_control =
 	has_attenuator_control =
 	has_preamp_control =
-	has_ifshift_control =
 	has_pbt_controls =
 	has_swr_control =
 	has_noise_control =

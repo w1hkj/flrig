@@ -217,7 +217,6 @@ RIG_IC7100::RIG_IC7100() {
 	has_bandwidth_control = true;
 
 	has_micgain_control = true;
-	has_ifshift_control = true;
 	has_pbt_controls = true;
 	has_FILTER = true;
 	has_power_control = true;
@@ -1765,36 +1764,6 @@ int RIG_IC7100::get_auto_notch()
 	return progStatus.auto_notch;
 }
 
-void RIG_IC7100::set_if_shift(int val)
-{
-	int shift;
-	sh_ = val;
-	if (val == 0) sh_on_ = false;
-	else sh_on_ = true;
-
-	shift = 128 + val * 128 / 50;
-	if (shift < 0) shift = 0;
-	if (shift > 255) shift = 255;
-
-	cmd = pre_to;
-	cmd.append("\x14\x07");
-	cmd.append(to_bcd(shift, 3));
-	cmd.append(post);
-	waitFB("set IF inner");
-
-	cmd = pre_to;
-	cmd.append("\x14\x08");
-	cmd.append(to_bcd(shift, 3));
-	cmd.append(post);
-	waitFB("set IF outer");
-}
-
-bool RIG_IC7100::get_if_shift(int &val)
-{
-	val = sh_;
-	return sh_on_;
-}
-
 void RIG_IC7100::set_pbt_inner(int val)
 {
 	int shift = 128 + val * 128 / 50;
@@ -1867,13 +1836,6 @@ int RIG_IC7100::get_pbt_outer()
 		}
 	}
 	return val;
-}
-
-void RIG_IC7100::get_if_min_max_step(int &min, int &max, int &step)
-{
-	min = -50;
-	max = +50;
-	step = 1;
 }
 
 void RIG_IC7100::set_noise(bool val)
