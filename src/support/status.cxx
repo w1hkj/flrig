@@ -1284,14 +1284,6 @@ bool status::loadXcvrState(std::string xcvr)
 			i++;
 		}
 
-// original for existing prefs file
-		spref.get("comm_baudrate", serial_baudrate, serial_baudrate);
-		spref.get("comm_stopbits", stopbits, stopbits);
-		spref.get("comm_retries", serial_retries, serial_retries);
-		spref.get("comm_wait", serial_post_write_delay, serial_post_write_delay);
-		spref.get("comm_timeout", serial_timeout, serial_timeout);
-		spref.get("byte_interval", serial_write_delay, serial_write_delay);
-
 		{
 			int testbaud = -1;
 			spref.get("serial_baudrate", testbaud, testbaud);

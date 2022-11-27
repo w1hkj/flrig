@@ -499,7 +499,6 @@ extern Fl_Counter *cntRigCatTimeout;
 extern Fl_Counter *cntWriteDelay;;
 extern Fl_Counter *cntPostWriteDelay;
 extern Fl_Counter *query_interval;
-extern Fl_Counter *byte_interval;
 
 extern Fl_ComboBox *selectCommPort;
 extern Fl_ComboBox *mnuBaudrate;

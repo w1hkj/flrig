@@ -122,7 +122,7 @@ RIG_FTdx1200::RIG_FTdx1200() {
 	stopbits = 1;
 	serial_retries = 2;
 
-	serial_write_delay = 0;
+	serial_write_delay = 5;
 	serial_post_write_delay = 5;
 
 	serial_timeout = 50;
@@ -267,12 +267,17 @@ bool RIG_FTdx1200::check ()
 {
 	cmd = "FA;";
 	rsp = "FA";
+	int tries = 10;
+	MilliSleep(200);
 	int ret = wait_char(';', 11, 100, "check", ASC);
-
 	get_trace(3, "check()", cmd.c_str(), replystr.c_str());
-
-	if (ret >= 11) return true;
-	return false;
+	while (ret < 11 && tries--) {
+		MilliSleep(200);
+		ret = wait_char(';', 11, 100, "check", ASC);
+		get_trace(3, "check()", cmd.c_str(), replystr.c_str());
+	}
+	if (ret < 11) return false;
+	return true;
 }
 
 unsigned long long RIG_FTdx1200::get_vfoA ()
