@@ -576,9 +576,39 @@ Select the User Interface menu item to configure various user preferences includ
 </center>
 <br>
 
-The frequency display is also a control.  The control must have "focus" for the user
-to make changes.  The control has focus whenever the mouse cursor is over it.  The foreground and background
-colors reverse to indicate the control has focus.  Moving the cursor outside the control releases focus.
+The frequency display is also a control; it displays frequency in kHz.  In
+addition to allowing you to set the rig frequency, it will track with changes
+made on the rig itself.
+
+The number of digits that may be entered and the number of decimal digits displayed
+are determined by hard-coded data for the rig selected if using rig control.  The intent
+is to match the actual rig display.
+
+If you select NONE for rig control, 7 digits to the left of the decimal and 3 digits
+to the right are displayed.
+
+In the rig control case, the maximum frequency is determined by the rig; in the NONE
+case, the maximum frequency is 9,999,999.999 kHz.
+
+The maximum frequency <B><I>based on the number of digits displayed</I></B> is given in the tooltip.
+Note that this may be greater than the maximum frequency possible for your rig.  If you attempt
+to set an unsupported frequency, the result depends on the rig.
+
+You can set the frequency two ways without the
+control being in "focus" and several more ways with it in focus.
+
+<B> With or without Focus </B>
+
+<ul>
+<li>Move the mouse cursor over a digit and roll the wheel
+<li>Highlight a numeric frequency in text in the application and
+then move the mouse cursor over the control and press the middle mouse button to paste selection
+</ul>
+
+<B> With Focus </B>
+
+Click (left mouse button) in the control to set focus.  The foreground and background
+colors reverse to indicate the control has focus.
 
 <br>
 <center>
@@ -587,22 +617,9 @@ colors reverse to indicate the control has focus.  Moving the cursor outside the
 </center>
 <br>
 
-The number of digits that may be entered and the number of decimal digits displayed
-are determined by hard-coded data for the rig selected if using rig control.  The intent
-is to match the actual rig display.
-
-If you select NONE for rig control, 7 digits to the left of the decimal and 3 digits
-to the right are displayed (display is in kHz).
-
-In the rig control case, the maximum frequency is determined by the rig; in the NONE
-case, the maximum frequency is 9,999,999.999 kHz.
-
-The maximum frequency <B><I>based on the number of digits displayed</I></B> is given in the tooltip.
-
 Each digit is sensitive to the mouse.  Clicking the left or right button over
 the top half of a digit increments it while clicking over the lower half decrements it.
-Holding the mouse button down will cause the number to rapidly increase or decrease.  Alternatively,
-you can roll the mouse wheel with the pointer over a digit and it will scroll the digit.
+Holding the mouse button down will cause the number to rapidly increase or decrease.
 In all cases the numbers "roll over" - i.e., you can change the digit you point to
 and all digits to the left of it.
 
@@ -643,17 +660,15 @@ For example, if the rig's resolution is 1 Hz, D0's range is 0-9 Hz.
 All of the foregoing change techniques result in immediate changes to the
 frequency of a controlled rig.
 
-There are two additional ways to set the frequency: <B>PASTE</B> and <B>direct keyboard entry</B>.  In
-both cases, make sure the flrig main window has focus (click in title bar) and then
-move the mouse cursor inside the Frequency Control window to
-give it focus (colors will reverse).
+There are two additional ways to set the frequency when the control has focus:
+<B>PASTE from clipboard</B> and <B>direct keyboard entry</B>.
 
-You can paste from the clipboard (Ctrl-v)
-or from the Selection buffer (middle mouse button).  The selection must be from text within
+You can paste from the clipboard (Ctrl/Meta-v) in addition to from the Selection buffer (middle mouse button).
+When pasting from a selection (highlighted number), the selection must be from text within
 the application whereas the clipboard paste will paste values copied from any application.
-The value pasted is assumed to be numeric in units of kHz and can include a decimal point.
+The value pasted is expected to be numeric in units of kHz and can include a decimal point.
 If the value being pasted would exceed the maximum frequency allowed, the Paste action is silently ignored.
-The Paste action results in an immediate command to set the frequency on a controlled rig.
+Paste actions result in an immediate command to set the frequency on a controlled rig.
 
 Lastly, you may enter a frequency directly from the number keys or keypad of a keyboard.
 Enter the frequency in kHz, including decimal point if there are non-zero decimal components,
@@ -663,7 +678,7 @@ For example:
 <ul>
 <li>7070
 <li>14070.235
-<li>1.4e4
+<li>14.07e3 (Remember that the numeric value is in kHz so this example is 14070 kHz or 14.070 MHz)
 </ul>
 
 
@@ -676,14 +691,17 @@ get sent to a controlled rig until you press the ENTER key.  Pressing the ENTER 
 sends the value to the rig and exits the numeric entry mode.
 
 If you want to make changes as you are entering numbers, you can use the backspace key
-to delete undesired numbers digit by digit, or Ctrl-Backspace to clear all digits,
-and then resume entering numbers.
+to delete undesired numbers digit by digit, or Ctrl/Meta-Backspace to clear all digits
+on the side of the decimal point you are currently entering; use Ctrl/Meta-Backspace again
+to clear the left of decimal numbers as well if you have already entered a digit to the
+right of the decimal point, and then resume entering numbers.
 
 If you attempt to enter more digits on either side of the decimal than there are
 digits available, the excess digit entries are ignored.
 
-If you want to abort the process you can press the ESC (escape) key or move the cursor
-out of the Frequency Control and the frequency will remain as it was; this exits numeric entry mode.
+If you want to abort the process you can press the ESC (escape) key or click outside
+the control in a widget that will take focus (like a text field) or outside the application
+and the frequency will remain as it was; this exits numeric entry mode.
 
 Vfo-A and Vfo-B are separate controls, A on the left, B on the right.  If your radio has
 two VFOs, you can make one or the other active for transmission and reception by clicking
