@@ -605,10 +605,48 @@ void TRACED(adjust_touch_ui)
 
 void TRACED(adjust_control_positions)
 
-	if (!selrig->has_smeter)
-		grpMeters->deactivate();
-	else
-		grpMeters->activate();
+	sldrRcvSignal->activate();
+	sigbar_SMETER->activate();
+
+	sldrALC->activate();
+	sigbar_ALC->activate();
+
+	sldrIDD->activate();
+	sigbar_IDD->activate();
+
+	sldrSWR->activate();
+	sigbar_SWR->activate();
+
+	sldrVoltage->activate();
+	sigbar_VOLTS->activate();
+
+	sldrFwdPwr->activate();
+	sigbar_PWR->activate();
+
+	if (!selrig->has_smeter) {
+		sldrRcvSignal->deactivate();
+		sigbar_SMETER->deactivate();
+	}
+	if (!selrig->has_alc_control) {
+		sldrALC->deactivate();
+		sigbar_ALC->deactivate();
+	}
+	if (!selrig->has_idd_control) {
+		sldrIDD->deactivate();
+		sigbar_IDD->deactivate();
+	}
+	if (!selrig->has_swr_control) {
+		sldrSWR->deactivate();
+		sigbar_SWR->deactivate();
+	}
+	if (!selrig->has_voltmeter) {
+		sldrVoltage->deactivate();
+		sigbar_VOLTS->deactivate();
+	}
+	if (!selrig->has_power_out) {
+		sldrFwdPwr->deactivate();
+		sigbar_PWR->deactivate();
+	}
 
 	switch (progStatus.UIsize) {
 		case small_ui :
