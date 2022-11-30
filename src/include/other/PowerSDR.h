@@ -86,6 +86,11 @@ enum PowerSDRMODES { LSB, USB, DSB, CWL, CWU, FM, AM, DIGU, SPEC, DIGL, SAM, DRM
 //	int  get_preamp();
 //  int next_preamp();
 
+	int  get_agc();
+	int  incr_agc();
+	int  agc_val();
+	const char *agc_label();
+
 //	void set_if_shift(int val);
 //	bool get_if_shift(int &val);
 	void get_if_min_max_step(int &min, int &max, int &step);
@@ -119,6 +124,9 @@ enum PowerSDRMODES { LSB, USB, DSB, CWL, CWU, FM, AM, DIGU, SPEC, DIGL, SAM, DRM
 	void set_squelch(int val);
 	int  get_squelch();
 	void get_squelch_min_max_step(int &min, int &max, int &step);
+
+    double get_voltmeter();
+    double get_idd();
 
 	bool tuning();
 

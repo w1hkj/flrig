@@ -96,14 +96,15 @@ static char *varwidths[] = {
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 }, // 0
 	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 }, // 1
-	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 }, // 2
-	{ (Fl_Widget *)btnIFsh,     214, 105,  50 }, // 3
-	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 }, // 4
-	{ (Fl_Widget *)btnNotch,    214, 125,  50 }, // 5
-	{ (Fl_Widget *)sldrNOTCH,   266, 125, 156 }, // 6
-	{ (Fl_Widget *)sldrSQUELCH, 266, 145, 156 }, // 7
-	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 }, // 8
-	{ (Fl_Widget *)sldrPOWER,    54, 165, 368 }, // 9
+	{ (Fl_Widget *)btnAGC,        2, 145,  50 }, // 2
+	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 }, // 3
+	{ (Fl_Widget *)btnIFsh,     214, 105,  50 }, // 4
+	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 }, // 5
+	{ (Fl_Widget *)btnNotch,    214, 125,  50 }, // 6
+	{ (Fl_Widget *)sldrNOTCH,   266, 125, 156 }, // 7
+	{ (Fl_Widget *)sldrSQUELCH, 266, 145, 156 }, // 8
+	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 }, // 9
+	{ (Fl_Widget *)sldrPOWER,    54, 165, 368 }, // 10
 	{ (Fl_Widget *)NULL,          0,   0,   0 }
 };
 
@@ -112,6 +113,10 @@ static std::string menu012 = "EX01200004";
 
 void RIG_PowerSDR::initialize()
 {
+	std::stringstream str;
+	str << "PowerSDR";
+	trace(2, __func__, str.str().c_str());
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = sldrRFGAIN;
@@ -184,9 +189,11 @@ RIG_PowerSDR::RIG_PowerSDR() {
 	can_change_alt_vfo = true;
 
 	//has_dsp_controls = true;
+    has_voltmeter = true;
 	has_power_out = true;
 	has_swr_control = true;
 	has_alc_control =
+	has_idd_control =
 	has_split =
 	has_split_AB =
 	has_rf_control =
@@ -205,6 +212,7 @@ RIG_PowerSDR::RIG_PowerSDR() {
 	has_bandwidth_control =
 	has_sql_control =
 	has_ptt_control =
+    has_agc_control =
 	has_extras = true;
 
 	rxona = true;
@@ -317,37 +325,45 @@ double RIG_PowerSDR::get_power_control()
 
 struct meterpair {float mtr; float val;};
 
+// Table entries below correspond to SWR readings of 1.1, 1.5, 2.0, 2.5, 3.0 and infinity.
+// Values are also tweaked to fit the display of the SWR meter.
+
+
 static meterpair swr_tbl[] = {
-	{ 1,   0  },
-	{ 1.5,  12.5  },
-	{ 2,  25 },
-	{ 3,  50 },
-	{ 20, 100 }
+    {1.0, 0},
+    {1.5, 10.5 },
+    {2.0, 23.0 },
+    {2.5, 35.0 },
+    {3.0, 48.0 },
+    {10.0, 100.0 } 
 };
 
 int RIG_PowerSDR::get_swr()
 {
 	double mtr = 0;
 
-	if (get_tune() != 0) return 0; // swr only works when tuning
 	cmd = "ZZRM8;";
 	get_trace(1, "get_swr");
-	ret = wait_char(';', 8, 100, "get SWR", ASC);
+	ret = wait_char(';', 13, 100, "get SWR", ASC);
 	gett("");
-	if (ret < 8) return (int)mtr;
+    // Response is ZZRM86.1 : 1; 
+    // What's the 2nd part?
 	if(sscanf(&replystr[0], "ZZRM8%lf", &mtr)!=1)
 	{
-		return 0;
+		return 3;
 	}
-	size_t i = 0;
-	for (i = 0; i < sizeof(swr_tbl) / sizeof(meterpair) - 1; i++)
-		if (mtr >= swr_tbl[i].mtr && mtr < swr_tbl[i+1].mtr)
-			break;
-	if (mtr > 19) mtr = 19;
-	mtr = (int)round(swr_tbl[i].val +
-		(swr_tbl[i+1].val - swr_tbl[i].val)*(mtr - swr_tbl[i].mtr)/(swr_tbl[i+1].mtr - swr_tbl[i].mtr));
-	if (mtr > 100) mtr = 100;
+    size_t i = 0;
+    for (i = 0; i < sizeof(swr_tbl) / sizeof(meterpair) - 1; i++)
+            if (mtr >= swr_tbl[i].mtr && mtr < swr_tbl[i+1].mtr)
+                    break;
+    if (mtr > 19) mtr = 19;
+    mtr = (int)round(swr_tbl[i].val +
+            (swr_tbl[i+1].val - swr_tbl[i].val)*(mtr - swr_tbl[i].mtr)/(swr_tbl[i+1].mtr - swr_tbl[i].mtr));
+    if (mtr > 100) mtr = 100;
 
+	std::stringstream str;
+	str << "swr mtr=" << mtr;
+	trace(2, __func__, str.str().c_str());
 	return mtr;
 }
 
@@ -356,10 +372,12 @@ int RIG_PowerSDR::get_alc()
 	double alc = 0;
 	cmd = "ZZRM4;";
 	get_trace(1, "get_alc");
-	ret = wait_char(';', 8, 100, "get ALC", ASC);
-	gett("");
-	if (ret < 8) return (int)alc;
+	ret = wait_char(';', 12, 100, "get ALC", ASC);
+    gett("alc");
+	showresp(WARN, ASC, "get alc", cmd, replystr);
 	if (sscanf(&replystr[0], "ZZRM4%lf", &alc) != 1) alc=0;
+    alc=fabs(alc)*2;
+    if (alc > 50) alc = 50;
 	return alc;
 }
 
@@ -641,7 +659,7 @@ void RIG_PowerSDR::set_bwA(int val)
 	if (A.imode == FM || A.imode == DRM || A.imode == SPEC) return; // mode is fixed
 	else if (A.imode == LSB || A.imode == USB) {
 		A.iBW = val;
-		if (val >= (int)(sizeof(PowerSDR_CAT_USB)/sizeof(*PowerSDR_CAT_USB))) return;
+		if (val >= (int)(sizeof(PowerSDR_CAT_USB)/sizeof(PowerSDR_CAT_USB[0]))-1) return;
 		cmd = PowerSDR_CAT_USB[val];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set_bwA USB", cmd, "");
@@ -652,7 +670,7 @@ void RIG_PowerSDR::set_bwA(int val)
 	std::stringstream str;
 	str << "val =" << val ;
 	trace(2, __func__, str.str().c_str());
-		if (val >= (int)(sizeof(PowerSDR_CAT_DIG)/sizeof(*PowerSDR_CAT_DIG))) return;
+	if (val >= (int)(sizeof(PowerSDR_CAT_DIG)/sizeof(PowerSDR_CAT_DIG[0]))-1) return;
 		cmd = PowerSDR_CAT_DIG[val];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set_bwA DIG", cmd, "");
@@ -660,7 +678,7 @@ void RIG_PowerSDR::set_bwA(int val)
 	}
 	else if (A.imode == CWU || A.imode == CWL) {
 		A.iBW = val;
-		if (val >= (int)(sizeof(PowerSDR_CAT_CW)/sizeof(*PowerSDR_CAT_CW))) return;
+		if (val >= (int)(sizeof(PowerSDR_CAT_CW)/sizeof(PowerSDR_CAT_CW[0]))-1) return;
 		cmd = PowerSDR_CAT_CW[val];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set_bwA CW", cmd, "");
@@ -668,7 +686,7 @@ void RIG_PowerSDR::set_bwA(int val)
 	}
 	else if (A.imode == AM || A.imode == SAM || A.imode == DSB) {
 		A.iBW = val;
-		if (val >= (int)(sizeof(PowerSDR_CAT_AM)/sizeof(*PowerSDR_CAT_AM))) return;
+		if (val >= (int)(sizeof(PowerSDR_CAT_AM)/sizeof(PowerSDR_CAT_AM[0]))-1) return;
 		cmd = PowerSDR_CAT_AM[val];
 		sendCommand(cmd);
 		showresp(WARN, ASC, "set_bwA AM", cmd, "");
@@ -868,7 +886,7 @@ void RIG_PowerSDR::set_noise(bool on)
        cmd = "ZZNA1;";
     else
        cmd = "ZZNA0;";
-    wait_char('\r', 1, 100, "set Noise Blanker", ASC);
+	sendCommand (cmd);
 }
 
 int RIG_PowerSDR::get_noise()
@@ -908,7 +926,7 @@ int  RIG_PowerSDR::get_noise_reduction()
 	cmd = rsp = "ZZNR";
 	cmd.append(";");
 	get_trace(1, "get_noise_reduction");
-	ret = wait_char(';', 4, 100, "GET noise reduction", ASC);
+	ret = wait_char(';', 6, 100, "GET noise reduction", ASC);
 	gett("");
 	if (ret == 6) {
 		size_t p = replystr.rfind(rsp);
@@ -1141,6 +1159,7 @@ int  RIG_PowerSDR::get_squelch()
 	return (-sq);
 }
 
+
 void RIG_PowerSDR::get_squelch_min_max_step(int &min, int &max, int &step)
 {
 	min = -160;
@@ -1148,3 +1167,103 @@ void RIG_PowerSDR::get_squelch_min_max_step(int &min, int &max, int &step)
 	step = 4;
 }
 
+static int agcval = 1;
+
+int  RIG_PowerSDR::get_agc()
+{
+	cmd = "GT;";
+	get_trace(1, "get_agc");
+	ret = wait_char(';', 6, 100, "GET agc val", ASC);
+	gett("");
+	size_t p = replystr.rfind("GT");
+	if (p == std::string::npos) return agcval;
+	if (replystr[4] == ' ') return 0;
+	agcval = replystr[4] - '0' + 1; // '0' == off, '1' = fast, '2' = slow
+	return agcval;
+}
+
+int RIG_PowerSDR::incr_agc()
+{
+	agcval++;
+	if (agcval > 6) agcval = 1;
+	cmd.assign("GT00");
+	cmd += (agcval + '0' - 1);
+	cmd += ";";
+	sendCommand(cmd);
+	showresp(WARN, ASC, "SET agc", cmd, replystr);
+	return agcval;
+}
+
+
+static const char *agcstrs[] = {"AGC", "FIXED", "LONG", "SLOW", "MED", "FAST", "CUSTOM"};
+
+const char *RIG_PowerSDR::agc_label()
+{
+	return agcstrs[agcval];
+}
+
+int RIG_PowerSDR::agc_val()
+{
+	return agcval;
+}
+
+double RIG_PowerSDR::get_voltmeter()
+{
+    static int timedout = 0;
+    double val;
+    trace(1, "get_voltmeter");
+    ret = 0;
+    if (!timedout)
+    {
+        cmd.assign("ZZRV;");
+        sendCommand(cmd);
+    	get_trace(1, "get_voltmeter");
+    	ret = wait_char(';', 8, 100, "GET agc val", ASC);
+    }
+    if (ret == 8)
+    {
+        sscanf(&replystr[0],"ZZRV%lf", &val);
+    }
+    else
+    {
+        timedout = 1;
+        val = 0;
+        replystr = "No Reply";
+        mtr_VOLTS->labelcolor(fl_rgb_color(200,200,200));
+        mtr_VOLTS->redraw();
+    }
+	showresp(WARN, ASC, "get voltmeter", cmd, replystr);
+    return val;
+}
+
+double RIG_PowerSDR::get_idd()
+{
+    static int timedout = 0;
+    double val;
+    trace(1, "get_idd");
+	std::stringstream str;
+	str << "get_idd#2";
+	trace(2, __func__, str.str().c_str());
+    ret = 0;
+    if (!timedout)
+    {
+        cmd.assign("ZZRV;");
+        sendCommand(cmd);
+	    get_trace(1, "get_voltmeter");
+	    ret = wait_char(';', 8, 100, "GET agc val", ASC);
+        gett("idd");
+    }
+    if (ret == 8)
+    {
+        sscanf(&replystr[0],"ZZRV%lf", &val);
+    }
+    else
+    {
+        timedout = 1;
+        val = 0;
+        mtr_IDD->labelcolor(fl_rgb_color(200,200,200));
+        mtr_IDD->redraw();
+    }
+	showresp(WARN, ASC, "get idd", cmd, replystr);
+    return val;
+}
