@@ -345,9 +345,9 @@ void RIG_QDX::setVfoAdj(double v)
 {
 	if (v > 1000) v = 1000;
 	if (v < -1000) v = -1000;
-	vfo_ = 25000000 + (int)v;
+	vfo_ = v;//25000000 + (int)v;
 	char cmdstr[12];
-	snprintf(cmdstr, sizeof(cmdstr), "Q0%8.0f;", vfo_); 
+	snprintf(cmdstr, sizeof(cmdstr), "Q0%08.0f;", vfo_ + 25000000);
 	cmd = cmdstr;
 	set_trace(1, "set TCXO ref freq");
 	sendCommand(cmd);
@@ -358,10 +358,11 @@ double RIG_QDX::getVfoAdj()
 {
 	cmd = "Q0;";
 	get_trace(1, "get TCXO ref freq");
-	ret = wait_char(';', 11, 100, "get TCXO ref freq", ASC);
+	ret = wait_char(';', 12, 100, "get TCXO ref freq", ASC);
 	if (ret < 11) return vfo_;
-	sscanf( (&replystr[2]), "%lf", &vfo_);
-	return vfo_;
+	int vfo;
+	sscanf( (&replystr[2]), "%d", &vfo);
+	return vfo_ = vfo - 25000000;
 }
 
 void RIG_QDX::get_vfoadj_min_max_step(double &min, double &max, double &step)

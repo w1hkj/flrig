@@ -1818,7 +1818,7 @@ void cb_send_command(std::string command, Fl_Output *resp)
 
 	sendCommand(cmd);
 	set_trace(2, "command: ", command.c_str());
-	waitResponse(100);
+	waitResponse(200);
 
 	std::string retstr = usehex ? 
 		str2hex(respstr.c_str(), respstr.length()) :
