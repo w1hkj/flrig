@@ -2845,6 +2845,168 @@ public:
 
 } rig_mod_bw(&rig_server);
 
+//------------------------------------------------------------------------------
+// Get active vfo inner/outer setting
+// returns NONE if not available
+// returns INNER/OUTTER otherwise
+//------------------------------------------------------------------------------
+
+class rig_get_pbt : public XmlRpcServerMethod {
+public:
+	rig_get_pbt(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_pbt", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+
+		result[0] = "NONE";
+		result[1] = "";
+
+		if (!xcvr_online || disable_xmlrpc->value() || !selrig->has_pbt_controls) return;
+
+		wait();
+		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_");
+
+		char inner[10];
+		char outer[10];
+		snprintf(inner, sizeof(inner), "%d", progStatus.pbt_inner);
+		snprintf(outer, sizeof(outer), "%d", progStatus.pbt_outer);
+
+		result[0] = inner;
+		result[1] = outer;
+
+		std::string s1 = result[0], s2 = result[1];
+		xml_trace( 5, "pbt ", ((selrig->inuse == onB) ? "B " : "A "), s1.c_str(), " | ", s2.c_str());
+	}
+
+	std::string help() { return std::string("returns current passband inner/outer values"); }
+
+} rig_get_pbt(&rig_server);
+
+class rig_get_pbt_inner : public XmlRpcServerMethod {
+public:
+	rig_get_pbt_inner(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_pbt_inner", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+
+		result[0] = "NONE";
+		result[1] = "";
+
+		if (!xcvr_online || disable_xmlrpc->value() || !selrig->has_pbt_controls) return;
+
+		wait();
+		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_");
+
+		char inner[10];
+		snprintf(inner, sizeof(inner), "%d", progStatus.pbt_inner);
+
+		result[0] = inner;
+
+		std::string s1 = result[0], s2 = result[1];
+		xml_trace( 5, "pbt inner", ((selrig->inuse == onB) ? "B " : "A "), s1.c_str(), " | ", s2.c_str());
+	}
+
+	std::string help() { return std::string("returns current passband inner values"); }
+
+} rig_get_pbt_inner(&rig_server);
+
+class rig_get_pbt_outer : public XmlRpcServerMethod {
+public:
+	rig_get_pbt_outer(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_pbt_outer", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+
+		result[0] = "NONE";
+		result[1] = "";
+
+		if (!xcvr_online || disable_xmlrpc->value() || !selrig->has_pbt_controls) return;
+
+		wait();
+		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_");
+
+		char outer[10];
+		snprintf(outer, sizeof(outer), "%d", progStatus.pbt_outer);
+
+		result[0] = outer;
+
+		std::string s1 = result[0], s2 = result[1];
+		xml_trace( 5, "pbt outer", ((selrig->inuse == onB) ? "B " : "A "), s1.c_str(), " | ", s2.c_str());
+	}
+
+	std::string help() { return std::string("returns current passband outer values"); }
+
+} rig_get_pbt_outer(&rig_server);
+
+class rig_set_pbt : public XmlRpcServerMethod {
+public:
+	rig_set_pbt(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_pbt", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online || disable_xmlrpc->value()  || !selrig->has_pbt_controls) {
+			result = 0;
+			return;
+		}
+
+		guard_lock serial_lock(&mutex_serial, "xml rig_set_pbt");
+
+		progStatus.pbt_inner = (int)(params[0]);
+		progStatus.pbt_outer = (int)(params[1]);
+
+		selrig->set_pbt_inner(progStatus.pbt_inner);
+		selrig->set_pbt_outer(progStatus.pbt_outer);
+
+		xml_trace(1, "rig_set_pbt");
+	}
+
+	std::string help() { return std::string("sets pbt value"); }
+
+} rig_set_pbt(&rig_server);
+
+class rig_set_pbt_inner : public XmlRpcServerMethod {
+public:
+	rig_set_pbt_inner(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_pbt_inner", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online || disable_xmlrpc->value()  || !selrig->has_pbt_controls) {
+			result = 0;
+			return;
+		}
+
+		guard_lock serial_lock(&mutex_serial, "xml rig_set_pbt_inner");
+
+		progStatus.pbt_inner = (int)(params[0]);
+
+		selrig->set_pbt_inner(progStatus.pbt_inner);
+
+		xml_trace(1, "rig_set_pbt_inner");
+	}
+
+	std::string help() { return std::string("sets pbt inner value"); }
+
+} rig_set_pbt_inner(&rig_server);
+
+class rig_set_pbt_outer : public XmlRpcServerMethod {
+public:
+	rig_set_pbt_outer(XmlRpcServer* s) : XmlRpcServerMethod("rig.set_pbt_outer", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online || disable_xmlrpc->value()  || !selrig->has_pbt_controls) {
+			result = 0;
+			return;
+		}
+
+		guard_lock serial_lock(&mutex_serial, "xml rig_set_pbt_outer");
+
+		progStatus.pbt_outer = (int)(params[0]);
+
+		selrig->set_pbt_outer(progStatus.pbt_outer);
+
+		xml_trace(1, "rig_set_pbt_outer");
+	}
+
+	std::string help() { return std::string("sets pbt outer value"); }
+
+} rig_set_pbt_outer(&rig_server);
+
+
 //----------------------------------------------------------------------
 
 class rig_cat_string : public XmlRpcServerMethod {
@@ -2987,7 +3149,6 @@ public:
 
 } rig_cwio_mod_wpm(&rig_server);
 
-
 //------------------------------------------------------------------------------
 // Set cwio transmit std::string
 //------------------------------------------------------------------------------
@@ -3092,6 +3253,9 @@ struct MLIST {
 	{ "rig.get_bws",      "A:n", "return table of BW values" },
 	{ "rig.get_bwA",      "A:n", "return BW of vfo A" },
 	{ "rig.get_bwB",      "A:n", "return BW of vfo B" },
+	{ "rig.get_pbt",      "A:n", "return passband tuning"},
+	{ "rig.get_pbt_inner","i:i", "return passband inner"},
+	{ "rig.get_pbt_outer","i:i", "return passband outer"},
 	{ "rig.get_info",     "s:n", "return an info std::string" },
 	{ "rig.get_mode",     "s:n", "return MODE of current VFO" },
 	{ "rig.get_modeA",    "s:n", "return MODE of current VFO A" },
@@ -3122,6 +3286,9 @@ struct MLIST {
 	{ "rig.set_bw",       "i:i", "set BW iaw BW table" },
 	{ "rig.set_bandwidth","i:i", "set bandwidth to nearest requested value" },
 	{ "rig.set_BW",       "i:i", "set L/U pair" },
+	{ "rig.set_pbt",      "i:A", "set pbt inner/outer" },
+	{ "rig.set_pbt_inner","i:i", "set pbt inner"},
+	{ "rig.set_pbt_outer","i:i", "set pbt outer"},
 	{ "rig.set_frequency","d:d", "set current VFO in Hz" },
 	{ "rig.set_mode",     "i:s", "set MODE iaw MODE table" },
 	{ "rig.set_modeA",    "i:s", "set MODE A iaw MODE table" },

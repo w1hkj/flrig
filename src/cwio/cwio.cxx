@@ -465,11 +465,11 @@ void add_cwio(std::string txt)
 	if (cw_log_nbr) {
 		while ((p = txt.find("~#")) != std::string::npos) {
 			char sznum[10];
-			if (cwlog_menu_leading_zeros->value())
-				snprintf(sznum, sizeof(sznum), "%0d", progStatus.cw_log_nbr);
+			if (progStatus.cw_log_leading_zeros)
+				snprintf(sznum, sizeof(sznum), "%04d", progStatus.cw_log_nbr);
 			else
 				snprintf(sznum, sizeof(sznum), "%d", progStatus.cw_log_nbr);
-			if (cwlog_menu_cut_numbers->value()) {
+			if (progStatus.cw_log_cut_numbers) {
 				for (size_t i = 1; i < strlen(sznum); i++) {
 					if (sznum[i] == '0') sznum[i] = 'T';
 					if (sznum[i] == '9') sznum[i] = 'N';
