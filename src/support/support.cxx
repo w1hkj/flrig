@@ -3415,16 +3415,17 @@ void updateFwdPwr(void *)
 	if (selrig->has_power_control)
 		set_power_controlImage(power);
 
-	sldrVoltage->hide();
-	scaleVoltage->hide();
-	sldrFwdPwr->show();
-	scalePower->show();
+	if (selrig->has_power_out) {
+		sldrVoltage->hide();
+		scaleVoltage->hide();
+		sldrFwdPwr->show();
+		scalePower->show();
 
-	sldrFwdPwr->value(power);
-	sldrFwdPwr->redraw();
-
-	sigbar_PWR->value(power);
-	sigbar_PWR->redraw();
+		sldrFwdPwr->value(power);
+		sldrFwdPwr->redraw();
+		sigbar_PWR->value(power);
+		sigbar_PWR->redraw();
+	}
 
 }
 
@@ -3489,19 +3490,25 @@ void updateVmeter(void *)
 	if (!progStatus.display_voltmeter || !selrig->has_voltmeter) {
 		sldrVoltage->hide();
 		scaleVoltage->hide();
-		sldrFwdPwr->show();
-		scalePower->show();
-	} else {
-		if (PTT) {
-			sldrVoltage->hide();
-			scaleVoltage->hide();
+		if (selrig->has_power_out) {
 			sldrFwdPwr->show();
 			scalePower->show();
+		}
+	} else {
+		if (PTT) {
+			if (selrig->has_power_out) {
+				sldrVoltage->hide();
+				scaleVoltage->hide();
+				sldrFwdPwr->show();
+				scalePower->show();
+			}
 		} else {
-			sldrFwdPwr->hide();
-			scalePower->hide();
-			sldrVoltage->show();
-			scaleVoltage->show();
+			if (selrig->has_power_out) {
+				sldrFwdPwr->hide();
+				scalePower->hide();
+				sldrVoltage->show();
+				scaleVoltage->show();
+			}
 		}
 	}
 	if (vmtrval == -1) return;

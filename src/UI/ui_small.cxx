@@ -541,18 +541,18 @@ CTRL  click: FreqB -> FreqA\
 	btnPTT->tooltip(_("Xmt On/Off"));
 	btnPTT->callback((Fl_Callback*)cb_btnPTT);
 
-	Fl_Group* sm_grp1 = new Fl_Group(1, 62, 210, 60);
+	sm_grp1 = new Fl_Group(1, 62, 210, 60);
 		sm_grp1->box(FL_DOWN_BOX);
 
-		grpMeters = new Fl_Group(3, 63, 206, 57);
+		grpMeters = new Fl_Group(sm_grp1->x() + 2, sm_grp1->y() + 2, sm_grp1->w() - 4, sm_grp1->h() - 4);
 		grpMeters->box(FL_FLAT_BOX);
 
-			scaleSmeter = new Fl_Box(3, 63, 206, 20);
+			scaleSmeter = new Fl_Box(grpMeters->x(), grpMeters->y(), grpMeters->w(), 20);
 			scaleSmeter->box(FL_FLAT_BOX);
 			scaleSmeter->image(image_S60);
 			scaleSmeter->tooltip(_("S units meter"));
 
-			btnALC_IDD_SWR = new Fl_Button(3, 63, 206, 20);
+			btnALC_IDD_SWR = new Fl_Button(grpMeters->x(), grpMeters->y(), grpMeters->w(), 20);
 			btnALC_IDD_SWR->tooltip(_("Press SWR / ALC"));
 			btnALC_IDD_SWR->box(FL_FLAT_BOX);
 			btnALC_IDD_SWR->down_box(FL_FLAT_BOX);

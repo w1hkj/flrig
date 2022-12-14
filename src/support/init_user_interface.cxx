@@ -70,6 +70,24 @@ void TRACED(adjust_small_ui)
 	btnAGC->hide();
 	sldrRFGAIN->redraw_label();
 
+
+	if (!selrig->has_power_out && !selrig->has_voltmeter) {
+		sm_grp1->resize(FreqDispA->x(), sm_grp1->y(), FreqDispA->w(), 40);
+		sm_grp1->color(fl_rgb_color(progStatus.bg_red, progStatus.bg_green, progStatus.bg_blue));
+		grpMeters->resize(sm_grp1->x()+ 2, sm_grp1->y() + 2, sm_grp1->w() - 4, sm_grp1->h() - 4);
+		scaleSmeter->resize(grpMeters->x(), grpMeters->y() + 6, grpMeters->w(), scaleSmeter->h());
+		sldrRcvSignal->resize(scaleSmeter->x() + 2, scaleSmeter->y() + scaleSmeter->h() + 6, scaleSmeter->w() - 4, sldrRcvSignal->h());
+		sldrALC->resize(sldrRcvSignal->x(), sldrRcvSignal->y(), sldrRcvSignal->w(), sldrRcvSignal->h());
+		sldrIDD->resize(sldrRcvSignal->x(), sldrRcvSignal->y(), sldrRcvSignal->w(), sldrRcvSignal->h());
+		sldrSWR->resize(sldrRcvSignal->x(), sldrRcvSignal->y(), sldrRcvSignal->w(), sldrRcvSignal->h());
+		grpMeters->redraw();
+		sm_grp1->redraw();
+		sldrRcvSignal->redraw();
+		sldrALC->redraw();
+		sldrIDD->redraw();
+		sldrSWR->redraw();
+	}
+
 	if (progStatus.schema == 1 && selrig->widgets[0].W != (Fl_Widget *)0) {
 		int i = 0;
 		while (selrig->widgets[i].W != NULL) {
@@ -645,7 +663,8 @@ void TRACED(adjust_control_positions)
 	}
 	if (!selrig->has_power_out) {
 		sldrFwdPwr->deactivate();
-		sigbar_PWR->deactivate();
+		sigbar_PWR->hide(); //deactivate();
+		scalePower->hide();
 	}
 
 	switch (progStatus.UIsize) {
@@ -2242,8 +2261,6 @@ void TRACED(initRig)
 	} else {
 		sldrVoltage->hide();
 		scaleVoltage->hide();
-		sldrFwdPwr->show();
-		scalePower->show();
 	}
 
 	if (progStatus.use_tcpip) {

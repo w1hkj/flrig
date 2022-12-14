@@ -78,6 +78,7 @@ Fl_Box *labelMEMORY = (Fl_Box *)0;
 
 Fl_Output *txt_encA=(Fl_Output *)0;
 
+Fl_Group *sm_grp1 = (Fl_Group *)0;
 Fl_Group *grpMeters = (Fl_Group *)0;
 Fl_Box *scaleSmeter=(Fl_Box *)0;
 

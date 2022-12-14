@@ -76,8 +76,9 @@ extern void select_power_meter_scales();
 
 extern Fl_Output *txt_encA;
 
+extern Fl_Group *sm_grp1;
 extern Fl_Group *grpMeters;
-extern Fl_Box *scaleSmeter;
+extern Fl_Box   *scaleSmeter;
 
 extern Fl_Button *btnALC_IDD_SWR;
 

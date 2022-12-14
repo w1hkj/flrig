@@ -98,8 +98,11 @@ const char 	RIG_PCR1000::get_smeter_command[] 	= 		"I1?\r\n" ;
 //----------------------------------------------------------------------
 
 static GUI rig_widgets[]= {
+	{ (Fl_Widget *)sldrSQUELCH,  54, 105, 156 },
+	{ (Fl_Widget *)btnIFsh,     214, 105,  50 },
+	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
-	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 },
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 368 },
 	{ (Fl_Widget *)NULL,          0,   0,   0 }
 };
 
@@ -182,8 +185,12 @@ bool RIG_PCR1000::check()
  */
 void RIG_PCR1000::initialize()
 {
-	rig_widgets[0].W = btnVol;
-	rig_widgets[1].W = sldrVOLUME;
+	rig_widgets[0].W = sldrSQUELCH;
+	rig_widgets[1].W = btnIFsh;
+	rig_widgets[2].W = sldrIFSHIFT;
+	rig_widgets[3].W = btnVol;
+	rig_widgets[4].W = sldrVOLUME;
+
 	modes_ = modes;
 	bandwidths_ = band_widths;
 	bw_vals_ = PCR1000_bw_vals;
