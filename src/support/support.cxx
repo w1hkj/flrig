@@ -527,28 +527,18 @@ void TRACED(read_bandwidth)
 
 	trace(1,"read_bandwidth()");
 
-	int nu_BW;
+	std::stringstream s;
 	if (selrig->inuse == onA) {
-		trace(2, "vfoA active", "get_bwA()");
-		nu_BW = selrig->get_bwA();
-		if (nu_BW != vfoA.iBW) {
-			std::stringstream s;
-			s << "Bandwidth A change. nu_BW=" << nu_BW << ", vfoA.iBW=" << vfoA.iBW << ", vfo->iBW=" << vfo->iBW;
-			trace(1, s.str().c_str());
-			vfoA.iBW = vfo->iBW = nu_BW;
-			Fl::awake(setBWControl);
-		}
+		s << "get_bwA(): ";
+		vfoA.iBW = vfo->iBW = selrig->get_bwA();
+		Fl::awake(setBWControl);
 	} else {
-		trace(2, "vfoB active", "get_bwB()");
-		nu_BW = selrig->get_bwB();
-		if (nu_BW != vfoB.iBW) {
-			std::stringstream s;
-			s << "Bandwidth B change. nu_BW=" << nu_BW << ", vfoB.iBW=" << vfoB.iBW << ", vfo->iBW=" << vfo->iBW;
-			trace(1, s.str().c_str());
-			vfoB.iBW = vfo->iBW = nu_BW;
-			Fl::awake(setBWControl);
-		}
+		s << "get_bwB(): ";
+		vfoB.iBW = vfo->iBW = selrig->get_bwB();
+		Fl::awake(setBWControl);
 	}
+	s << vfo->iBW;
+	trace(1, s.str().c_str());
 }
 
 // read current signal level
