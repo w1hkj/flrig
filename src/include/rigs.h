@@ -32,6 +32,7 @@
 #include "icom/IC728.h"
 #include "icom/IC735.h"
 #include "icom/IC746.h"
+#include "icom/IC751.h"
 #include "icom/IC756.h"
 #include "icom/IC756PRO2.h"
 #include "icom/IC756PRO3.h"
@@ -49,6 +50,7 @@
 #include "icom/IC9100.h"
 #include "icom/IC9700.h"
 #include "icom/ICF8101.h"
+#include "icom/ICR71.h"
 #include "elad/FDMDUO.h"
 #include "elecraft/K2.h"
 #include "elecraft/K3.h"
@@ -168,67 +170,69 @@ extern RIG_IC728		rig_IC728;		// 39
 extern RIG_IC735		rig_IC735;		// 30
 extern RIG_IC746		rig_IC746;		// 41
 extern RIG_IC746PRO     rig_IC746PRO;	// 42
-extern RIG_IC756		rig_IC756;		// 43
-extern RIG_IC756PRO     rig_IC756PRO;	// 44
-extern RIG_IC756PRO2	rig_IC756PRO2;	// 45
-extern RIG_IC756PRO3	rig_IC756PRO3;	// 46
-extern RIG_IC7000		rig_IC7000;		// 47
-extern RIG_IC7100		rig_IC7100;		// 48
-extern RIG_IC7200		rig_IC7200;		// 49
-extern RIG_IC7300		rig_IC7300;		// 40
-extern RIG_IC7410		rig_IC7410;		// 51
-extern RIG_IC7600		rig_IC7600;		// 52
-extern RIG_IC7610		rig_IC7610;		// 53
-extern RIG_IC7700		rig_IC7700;		// 54
-extern RIG_IC7800		rig_IC7800;		// 55
-extern RIG_IC7851		rig_IC7851;		// 56
-extern RIG_IC9100		rig_IC9100;		// 57
-extern RIG_IC9700		rig_IC9700;		// 58
-extern RIG_IC910H		rig_IC910H;		// 59
-extern RIG_ICF8101		rig_ICF8101;	// 50
-extern RIG_K2			rig_K2;			// 61
-extern RIG_K3			rig_K3;			// 62
-extern RIG_KX3			rig_KX3;		// 63
-extern RIG_K4			rig_K4;			// 64
-extern RIG_PCR1000		rig_PCR1000;	// 65
-extern RIG_RAY152		rig_RAY152;		// 66
-extern RIG_TMD710		rig_TMD710;		// 67
-extern RIG_TS440		rig_TS440;		// 68
-extern RIG_TS140		rig_TS140;		// 69
-extern RIG_TS450S		rig_TS450S;		// 70
-extern RIG_TS480HX		rig_TS480HX;	// 71
-extern RIG_TS480SAT	    rig_TS480SAT;	// 72
-extern RIG_TS570		rig_TS570;		// 73
-extern RIG_TS590S		rig_TS590S;		// 74
-extern RIG_TS590SG		rig_TS590SG;	// 75
-extern RIG_TS790		rig_TS790;		// 76
-extern RIG_TS850		rig_TS850;		// 77
-extern RIG_TS870S		rig_TS870S;		// 78
-extern RIG_TS890S		rig_TS890S;		// 79
-extern RIG_TS940S		rig_TS940S;		// 80
-extern RIG_TS950		rig_TS950;		// 71
-extern RIG_TS990		rig_TS990;		// 82
-extern RIG_TS2000		rig_TS2000;		// 83
-extern RIG_TT516		rig_TT516;		// 84
-extern RIG_TT535		rig_TT535;		// 85
-extern RIG_TT538		rig_TT538;		// 86
-extern RIG_TT550		rig_TT550;		// 87
-extern RIG_TT563		rig_TT563;		// 88
-extern RIG_TT566		rig_TT566;		// 89
-extern RIG_TT588		rig_TT588;		// 90
-extern RIG_TT599		rig_TT599;		// 81
-extern RIG_AOR5K		rig_AOR5K;		// 92
-extern RIG_XI5105		rig_XI5105;		// 93
-extern RIG_Xiegu_G90	rig_XIG90;		// 94
-extern RIG_X6100		rig_X6100;		// 95
-extern RIG_PowerSDR		rig_PowerSDR;	// 96
-extern RIG_FLEX1500		rig_FLEX1500;	// 97
-extern RIG_TX500		rig_TX500;		// 98
-extern RIG_QCXP			rig_QCXP;		// 99
-extern RIG_SDR2_PRO		rig_sdr2;		// 100
-extern RIG_TCI_SUNDX	rig_tci_sundx;	// 101
-extern RIG_TCI_SUNPRO	rig_tci_sunpro;	// 102
-extern RIG_TRUSDX		rig_trusdx;		// 103
-extern RIG_QDX			rig_qdx;		// 104
+extern RIG_IC751		rig_IC751;		// 43
+extern RIG_IC756		rig_IC756;		// 44
+extern RIG_IC756PRO     rig_IC756PRO;	// 45
+extern RIG_IC756PRO2	rig_IC756PRO2;	// 46
+extern RIG_IC756PRO3	rig_IC756PRO3;	// 47
+extern RIG_IC7000		rig_IC7000;		// 48
+extern RIG_IC7100		rig_IC7100;		// 49
+extern RIG_IC7200		rig_IC7200;		// 50
+extern RIG_IC7300		rig_IC7300;		// 51
+extern RIG_IC7410		rig_IC7410;		// 52
+extern RIG_IC7600		rig_IC7600;		// 53
+extern RIG_IC7610		rig_IC7610;		// 54
+extern RIG_IC7700		rig_IC7700;		// 55
+extern RIG_IC7800		rig_IC7800;		// 56
+extern RIG_IC7851		rig_IC7851;		// 57
+extern RIG_IC9100		rig_IC9100;		// 58
+extern RIG_IC9700		rig_IC9700;		// 59
+extern RIG_IC910H		rig_IC910H;		// 60
+extern RIG_ICF8101		rig_ICF8101;	// 61
+extern RIG_ICR71		rig_ICR71;		// 62
+extern RIG_K2			rig_K2;			// 63
+extern RIG_K3			rig_K3;			// 64
+extern RIG_KX3			rig_KX3;		// 65
+extern RIG_K4			rig_K4;			// 66
+extern RIG_PCR1000		rig_PCR1000;	// 67
+extern RIG_RAY152		rig_RAY152;		// 68
+extern RIG_TMD710		rig_TMD710;		// 69
+extern RIG_TS440		rig_TS440;		// 70
+extern RIG_TS140		rig_TS140;		// 71
+extern RIG_TS450S		rig_TS450S;		// 72
+extern RIG_TS480HX		rig_TS480HX;	// 73
+extern RIG_TS480SAT	    rig_TS480SAT;	// 74
+extern RIG_TS570		rig_TS570;		// 75
+extern RIG_TS590S		rig_TS590S;		// 76
+extern RIG_TS590SG		rig_TS590SG;	// 77
+extern RIG_TS790		rig_TS790;		// 78
+extern RIG_TS850		rig_TS850;		// 79
+extern RIG_TS870S		rig_TS870S;		// 80
+extern RIG_TS890S		rig_TS890S;		// 81
+extern RIG_TS940S		rig_TS940S;		// 82
+extern RIG_TS950		rig_TS950;		// 83
+extern RIG_TS990		rig_TS990;		// 84
+extern RIG_TS2000		rig_TS2000;		// 85
+extern RIG_TT516		rig_TT516;		// 86
+extern RIG_TT535		rig_TT535;		// 87
+extern RIG_TT538		rig_TT538;		// 88
+extern RIG_TT550		rig_TT550;		// 89
+extern RIG_TT563		rig_TT563;		// 90
+extern RIG_TT566		rig_TT566;		// 91
+extern RIG_TT588		rig_TT588;		// 92
+extern RIG_TT599		rig_TT599;		// 83
+extern RIG_AOR5K		rig_AOR5K;		// 94
+extern RIG_XI5105		rig_XI5105;		// 95
+extern RIG_Xiegu_G90	rig_XIG90;		// 96
+extern RIG_X6100		rig_X6100;		// 97
+extern RIG_PowerSDR		rig_PowerSDR;	// 98
+extern RIG_FLEX1500		rig_FLEX1500;	// 99
+extern RIG_TX500		rig_TX500;		// 100
+extern RIG_QCXP			rig_QCXP;		// 101
+extern RIG_SDR2_PRO		rig_sdr2;		// 102
+extern RIG_TCI_SUNDX	rig_tci_sundx;	// 103
+extern RIG_TCI_SUNPRO	rig_tci_sunpro;	// 104
+extern RIG_TRUSDX		rig_trusdx;		// 105
+extern RIG_QDX			rig_qdx;		// 106
 
 #endif

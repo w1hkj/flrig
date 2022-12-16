@@ -146,6 +146,7 @@ flrig_SOURCES += \
 	rigs/icom/IC728.cxx \
 	rigs/icom/IC735.cxx \
 	rigs/icom/IC746.cxx \
+	rigs/icom/IC751.cxx \
 	rigs/icom/IC756.cxx \
 	rigs/icom/IC756PRO2.cxx \
 	rigs/icom/IC756PRO3.cxx \
@@ -163,6 +164,7 @@ flrig_SOURCES += \
 	rigs/icom/IC9700.cxx \
 	rigs/icom/IC7700.cxx \
 	rigs/icom/ICF8101.cxx \
+	rigs/icom/ICR71.cxx \
 	rigs/elecraft/K2.cxx \
 	rigs/elecraft/K3.cxx \
 	rigs/elecraft/KX3.cxx \
@@ -341,6 +343,7 @@ EXTRA_DIST = \
 	include/icom/IC728.h \
 	include/icom/IC735.h \
 	include/icom/IC746.h \
+	include/icom/IC751.h \
 	include/icom/IC756.h \
 	include/icom/IC756PRO2.h \
 	include/icom/IC756PRO3.h \
@@ -358,6 +361,7 @@ EXTRA_DIST = \
 	include/icom/IC9100.h \
 	include/icom/IC9700.h \
 	include/icom/ICF8101.h \
+	include/icom/ICR71.h \
 	include/images.h \
 	include/elecraft/K2.h \
 	include/elecraft/K3.h \
