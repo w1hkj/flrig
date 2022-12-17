@@ -551,6 +551,7 @@ extern Fl_Check_Button *poll_micgain;
 extern Fl_Check_Button *poll_rfgain;
 extern Fl_Check_Button *poll_power_control;
 extern Fl_Check_Button *poll_ifshift;
+extern Fl_Check_Button *poll_pbt;
 extern Fl_Check_Button *poll_notch;
 extern Fl_Check_Button *poll_auto_notch;
 extern Fl_Check_Button *poll_pre_att;

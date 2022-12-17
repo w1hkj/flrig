@@ -2289,14 +2289,9 @@ int  RIG_IC7300::agc_val()
 
 void RIG_IC7300::set_pbt_inner(int val)
 {
-//	set_trace(1, "set_pbt_inner()");
-	int shift = 128 + val * 128 / 50;
-	if (shift < 0) shift = 0;
-	if (shift > 255) shift = 255;
-
 	cmd = pre_to;
 	cmd.append("\x14\x07");
-	cmd.append(to_bcd(shift, 3));
+	cmd.append(bcd255(val + 50));
 	cmd.append(post);
 	set_trace(1, "set_pbt_inner()");
 	waitFB("set PBT inner");
@@ -2305,14 +2300,9 @@ void RIG_IC7300::set_pbt_inner(int val)
 
 void RIG_IC7300::set_pbt_outer(int val)
 {
-//	set_trace(1, "set_pbt_outer()");
-	int shift = 128 + val * 128 / 50;
-	if (shift < 0) shift = 0;
-	if (shift > 255) shift = 255;
-
 	cmd = pre_to;
 	cmd.append("\x14\x08");
-	cmd.append(to_bcd(shift, 3));
+	cmd.append(bcd255(val + 50));
 	cmd.append(post);
 	set_trace(1, "set_pbt_outer()");
 	waitFB("set PBT outer");
@@ -2339,6 +2329,7 @@ int RIG_IC7300::get_pbt_inner()
 			val = num100(replystr.substr(p+6)) - 50;
 		}
 	}
+
 	return val;
 }
 

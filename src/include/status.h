@@ -107,6 +107,7 @@ struct status {
 	int		poll_auto_notch;
 	int		poll_notch;
 	int		poll_ifshift;
+	int		poll_pbt;
 	int		poll_power_control;
 	int		poll_pre_att;
 	int		poll_micgain;

@@ -869,10 +869,6 @@ void update_pbt(void *)
 
 void read_pbt()
 {
-	if (inhibit_pbt > 0) {
-		inhibit_pbt--;
-		return;
-	}
 	progStatus.pbt_inner = selrig->get_pbt_inner();
 	progStatus.pbt_outer = selrig->get_pbt_outer();
 	Fl::awake(update_pbt, (void*)0);
@@ -882,8 +878,6 @@ void read_ifshift()
 {
 	int on = 0;
 	int val = 0;
-	if (selrig->has_pbt_controls)
-		return read_pbt();
 
 	if (inhibit_shift > 0) {
 		inhibit_shift--;
@@ -1620,6 +1614,7 @@ POLL_PAIR RX_poll_group_3[] = {
 	{&progStatus.poll_auto_notch, read_auto_notch, "auto notch"},
 	{&progStatus.poll_notch, read_notch, "notch"},
 	{&progStatus.poll_ifshift, read_ifshift, "if shift"},
+	{&progStatus.poll_pbt, read_pbt, "pass band tunning"},
 	{&progStatus.poll_power_control, read_power_control, "power"},
 	{&progStatus.poll_pre_att, read_preamp, "preamp"},
 	{&progStatus.poll_pre_att, read_att, "atten"},
@@ -1766,7 +1761,7 @@ void * serial_thread_loop(void *d)
 				rx_poll_group_2 = &RX_poll_group_2[0];
 
 			while (rx_poll_group_3->poll != NULL) {
-				if (!bypass_serial_thread_loop) 
+				if (bypass_serial_thread_loop) 
 					break;
 				if (*(rx_poll_group_3->poll)) {
 					guard_lock lk(&mutex_serial);

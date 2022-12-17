@@ -121,6 +121,7 @@ status progStatus = {
 	1,			// bool	poll_auto_notch;
 	1,			// bool poll_notch;
 	1,			// bool	poll_ifshift;
+	1,			// bool poll_pbt;
 	1,			// bool	poll_power_control;
 	1,			// bool	poll_pre_att;
 	1,			// bool	poll_micgain;

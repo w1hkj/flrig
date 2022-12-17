@@ -110,6 +110,7 @@ Fl_Group *tabPOLLING = (Fl_Group *)0;
 	Fl_Check_Button *poll_rfgain = (Fl_Check_Button *)0;
 	Fl_Check_Button *poll_power_control = (Fl_Check_Button *)0;
 	Fl_Check_Button *poll_ifshift = (Fl_Check_Button *)0;
+	Fl_Check_Button *poll_pbt = (Fl_Check_Button *)0;
 	Fl_Check_Button *poll_notch = (Fl_Check_Button *)0;
 	Fl_Check_Button *poll_auto_notch = (Fl_Check_Button *)0;
 	Fl_Check_Button *poll_pre_att = (Fl_Check_Button *)0;
@@ -668,6 +669,10 @@ static void cb_poll_ifshift(Fl_Check_Button* o, void*) {
 	progStatus.poll_ifshift = o->value();
 }
 
+static void cb_poll_pbt(Fl_Check_Button* o, void*) {
+	progStatus.poll_pbt = o->value();
+}
+
 static void cb_poll_notch(Fl_Check_Button* o, void*) {
 	progStatus.poll_notch = o->value();
 }
@@ -752,6 +757,7 @@ static void cb_btnSetAdd(Fl_Button*, void*) {
 	poll_rfgain->value(progStatus.poll_all);
 	poll_power_control->value(progStatus.poll_all);
 	poll_ifshift->value(progStatus.poll_all);
+	poll_pbt->value(progStatus.poll_all);
 	poll_notch->value(progStatus.poll_all);
 	poll_auto_notch->value(progStatus.poll_all);
 	poll_pre_att->value(progStatus.poll_all);
@@ -769,6 +775,7 @@ static void cb_btnSetAdd(Fl_Button*, void*) {
 	progStatus.poll_rfgain =
 	progStatus.poll_power_control =
 	progStatus.poll_ifshift =
+	progStatus.poll_pbt = 
 	progStatus.poll_notch =
 	progStatus.poll_auto_notch =
 	progStatus.poll_pre_att =
@@ -1875,6 +1882,12 @@ Fl_Group *createPOLLING(int X, int Y, int W, int H, const char *label)
 		poll_break_in->callback((Fl_Callback*)cb_poll_break_in);
 		poll_break_in->align(Fl_Align(FL_ALIGN_RIGHT));
 		poll_break_in->value(progStatus.poll_break_in);
+
+		poll_pbt = new Fl_Check_Button(X + 280, Y + 190, 30, 20, _("PBT"));
+		poll_pbt->tooltip(_("Passband tuning"));
+		poll_pbt->callback((Fl_Callback*)cb_poll_pbt);
+		poll_pbt->align(Fl_Align(FL_ALIGN_RIGHT));
+		poll_pbt->value(progStatus.poll_pbt);
 
 		btnSetAdd = new Fl_Button(X + 370, Y + 190, 60, 20, _("Set all"));
 		btnSetAdd->callback((Fl_Callback*)cb_btnSetAdd);

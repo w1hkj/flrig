@@ -1133,11 +1133,13 @@ void TRACED(init_Generic_Tabs)
 	if (!selrig->has_auto_notch ||
 		xcvr_name == rig_FT1000MP.name_ )
 		{ poll_auto_notch->deactivate(); poll_auto_notch->value(0); }
-	if (!selrig->has_ifshift_control &&
-		!selrig->has_pbt_controls) { poll_ifshift->deactivate(); poll_ifshift->value(0); }
-	if (selrig->has_pbt_controls) {
-		poll_ifshift->label("pbt");
-		poll_ifshift->redraw_label();
+	if (!selrig->has_ifshift_control) {
+		poll_ifshift->deactivate();
+		poll_ifshift->value(0);
+	}
+	if (!selrig->has_pbt_controls) { 
+		poll_pbt->deactivate(); 
+		poll_pbt->value(0);
 	}
 	if (!selrig->has_power_control) { poll_power_control->deactivate(); poll_power_control->value(0); }
 	if (!selrig->has_preamp_control && !selrig->has_attenuator_control)
