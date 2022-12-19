@@ -1724,15 +1724,14 @@ void * serial_thread_loop(void *d)
 				read_vfo();
 			}
 
-			{	guard_lock lk(&mutex_serial);
-				if (!bypass_serial_thread_loop) {
-					if (tx_polling->poll == NULL)
-						tx_polling = &TX_poll_pairs[0];
-					if (*(tx_polling->poll)) {
-						(tx_polling->pollfunc)();
-					}
-					++tx_polling;
+			if (!bypass_serial_thread_loop) {
+				guard_lock lk(&mutex_serial);
+				if (tx_polling->poll == NULL)
+					tx_polling = &TX_poll_pairs[0];
+				if (*(tx_polling->poll)) {
+					(tx_polling->pollfunc)();
 				}
+				++tx_polling;
 			}
 
 		} else {
@@ -1742,41 +1741,47 @@ void * serial_thread_loop(void *d)
 				Fl::awake(zeroXmtMeters, 0);
 			}
 
-			if (!bypass_serial_thread_loop) {
-				{	guard_lock lk(&mutex_serial);
-					while (rx_poll_group_1->poll != NULL) {
-						if (*(rx_poll_group_1->poll))
-							(rx_poll_group_1->pollfunc)();
-						++rx_poll_group_1;
-					}
-					rx_poll_group_1 = &RX_poll_group_1[0];
+			while (rx_poll_group_1->poll != NULL) {
+				if (bypass_serial_thread_loop)
+					break;
+				if (*(rx_poll_group_1->poll)) {
+					guard_lock lk(&mutex_serial);
+					(rx_poll_group_1->pollfunc)();
 				}
+				++rx_poll_group_1;
+			}
+			if (rx_poll_group_1->poll == NULL)
+				rx_poll_group_1 = &RX_poll_group_1[0];
+
+			while (rx_poll_group_2->poll != NULL) {
+				if (bypass_serial_thread_loop)
+					break;
+				if (*(rx_poll_group_2->poll)) {
+					guard_lock lk(&mutex_serial);
+					(rx_poll_group_2->pollfunc)();
+				}
+				++rx_poll_group_2;
+			}
+			if (rx_poll_group_2->poll == NULL)
+				rx_poll_group_2 = &RX_poll_group_2[0];
+
+			while (rx_poll_group_3->poll != NULL) {
+				if (!bypass_serial_thread_loop) 
+					break;
+				if (*(rx_poll_group_3->poll)) {
+					guard_lock lk(&mutex_serial);
+					(rx_poll_group_3->pollfunc)();
+				}
+				++rx_poll_group_3;
+			}
+			if (rx_poll_group_3->poll == NULL)
+				rx_poll_group_3 = &RX_poll_group_3[0];
+
+			if (menu1 < 9  && selrig->name_ == rig_QCXP.name_) {
+				guard_lock lk(&mutex_serial);
+				read_menu();
 			}
 
-			if (!bypass_serial_thread_loop) {
-				{	guard_lock lk(&mutex_serial);
-					if (*(rx_poll_group_2->poll))
-						(rx_poll_group_2->pollfunc)();
-					++rx_poll_group_2;
-					if (rx_poll_group_2->poll == NULL)
-						rx_poll_group_2 = &RX_poll_group_2[0];
-				}
-			}
-
-			if (!bypass_serial_thread_loop) {
-
-				if (menu1 < 9) read_menu();
-
-				{	guard_lock lk(&mutex_serial);
-					if (*(rx_poll_group_3->poll)) {
-						(rx_poll_group_3->pollfunc)();
-					}
-					++rx_poll_group_3;
-					if (rx_poll_group_3->poll == NULL) {
-						rx_poll_group_3 = &RX_poll_group_3[0];
-					}
-				}
-			}
 		}
 serial_bypass_loop: ;
 	}
