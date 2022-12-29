@@ -981,7 +981,6 @@ void update_power_control(void *d)
 	double min, max, step;
 
 	if (xcvr_name == rig_K2.name_ || xcvr_name == rig_KX3.name_ || xcvr_name == rig_K4.name_) {
-		guard_lock serial(&mutex_serial);
 		selrig->get_pc_min_max_step(min, max, step);
 
 		if (sldrPOWER) {
@@ -2127,11 +2126,6 @@ void movFreqA(Fl_Widget *, void *) {
 }
 
 void movFreqB(Fl_Widget *, void *) {
-//	if (xcvr_name == rig_KX3.name_ && !progStatus.split  ) {
-//		FreqDispB->value(vfoB.freq);
-//		FreqDispB->redraw();
-//		return 1;
-//	}
 	guard_lock serial(&mutex_serial);
 	if (!selrig->can_change_alt_vfo  && selrig->inuse == onA) {
 		selrig->selectB();
@@ -2536,31 +2530,31 @@ void addFreq() {
 
 void cbRIT()
 {
-	guard_lock serial_lock(&mutex_serial);
 	trace(1, "cbRIT()");
-	if (selrig->has_rit  && cntRIT)
+	if (selrig->has_rit  && cntRIT) {
+		guard_lock serial_lock(&mutex_serial);
 		selrig->setRit((int)cntRIT->value());
+	}
 }
 
 void cbXIT()
 {
-	guard_lock serial_lock(&mutex_serial);
 	trace(1, "cbXIT()");
+	guard_lock serial_lock(&mutex_serial);
 	selrig->setXit((int)cntXIT->value());
 }
 
 void cbBFO()
 {
 	if (selrig->has_bfo) {
-		guard_lock serial_lock(&mutex_serial);
 		trace(1, "cbBFO()");
+		guard_lock serial_lock(&mutex_serial);
 		selrig->setBfo((int)cntBFO->value());
 	}
 }
 
 void cbAttenuator()
 {
-	guard_lock serial_lock(&mutex_serial);
 	trace(1, "cbAttenuator()");
 
 	selrig->set_attenuator ( progStatus.attenuator = selrig->next_attenuator() );
@@ -2581,7 +2575,6 @@ void setAttControl(void *d)
 
 void cbPreamp()
 {
-	guard_lock serial_lock(&mutex_serial);
 	trace(1, "cbPreamp()");
 
 	selrig->set_preamp ( progStatus.preamp = selrig->next_preamp() );
@@ -2611,25 +2604,18 @@ void cbAN()
 void cbbtnNotch()
 {
 	if (!selrig->has_notch_control) return;
-	guard_lock serial_lock(&mutex_serial);
-
-//	trace(1, "cbbtnNotch()");
 
 	int val = 0, cnt = 0;
-
 	progStatus.notch = btnNotch->value();
-
-	selrig->set_notch(progStatus.notch, progStatus.notch_val);
-
-//	int on, val = progStatus.notch_val;
-
-//	on = selrig->get_notch(val);
+	{
+		guard_lock serial_lock(&mutex_serial);
+		selrig->set_notch(progStatus.notch, progStatus.notch_val);
+	}
 
 	MilliSleep(progStatus.serial_post_write_delay);
 
 	while ((selrig->get_notch(val) != progStatus.notch) && (cnt++ < 10)) {
 		MilliSleep(progStatus.serial_post_write_delay);
-//		on = ;
 		Fl::awake();
 	}
 }
@@ -2643,14 +2629,13 @@ void setNotch()
 	int ev = Fl::event();
 	if (ev == FL_LEAVE || ev == FL_ENTER) return;
 
-	guard_lock lock( &mutex_serial);
-
 	if (sldrNOTCH) {
 		progStatus.notch_val = sldrNOTCH->value();
 	} else {
 		progStatus.notch_val = spnrNOTCH->value();
 	}
 
+	guard_lock lock( &mutex_serial);
 	selrig->set_notch(progStatus.notch, progStatus.notch_val);
 }
 
@@ -2913,11 +2898,9 @@ void setVolume() // UI call
 
 void setVolumeControl(void* d) // called by xml_server
 {
-	guard_lock serial_lock(&mutex_serial);
 	trace(1, "setVolumeControl()");
 	if (sldrVOLUME) sldrVOLUME->value(progStatus.volume);
 	if (spnrVOLUME) spnrVOLUME->value(progStatus.volume);
-	selrig->set_volume_control(progStatus.volume);
 }
 
 void cbMute()
@@ -2976,7 +2959,6 @@ void setMicGain()
 
 void setMicGainControl(void* d)
 {
-	guard_lock serial_lock(&mutex_serial);
 	trace(1, "setMicGainControl()");
 	if (sldrMICGAIN) sldrMICGAIN->value(progStatus.mic_gain);
 	if (spnrMICGAIN) spnrMICGAIN->value(progStatus.mic_gain);
@@ -3338,7 +3320,6 @@ void setRFGAIN()
 
 void setRFGAINControl(void* d)
 {
-	guard_lock serial_lock(&mutex_serial);
 	trace(1, "setRFGAINControl()");
 	if (sldrRFGAIN) sldrRFGAIN->value(progStatus.rfgain);
 	if (spnrRFGAIN) spnrRFGAIN->value(progStatus.rfgain);

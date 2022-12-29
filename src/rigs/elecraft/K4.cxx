@@ -431,25 +431,25 @@ int RIG_K4::incr_agc()
 	static const char ch[] = {'0', '1', '2'};
 
 	if (isOnA()) {
-	        agcvalA++;
-	        if (agcvalA > 1) agcvalA = agcvalB = 0;
-	        cmd = "GT0;";
-	     	cmd[2] = ch[agcvalA];
+			agcvalA++;
+			if (agcvalA > 1) agcvalA = agcvalB = 0;
+			cmd = "GT0;";
+		 	cmd[2] = ch[agcvalA];
 
-	        sendCommand(cmd);
-	        showresp(WARN, ASC, "SET agc", cmd, replystr);
-	        sett("set_agc");
+			sendCommand(cmd);
+			showresp(WARN, ASC, "SET agc", cmd, replystr);
+			sett("set_agc");
 		agcval = agcvalA;
 		return agcvalA;
 	} else {
-	        agcvalB++;
-	        if (agcvalB > 1) agcvalA = agcvalB = 0;
-	        cmd = "GT$0;";
-	     	cmd[3] = ch[agcvalB];
+			agcvalB++;
+			if (agcvalB > 1) agcvalA = agcvalB = 0;
+			cmd = "GT$0;";
+		 	cmd[3] = ch[agcvalB];
 
-	        sendCommand(cmd);
-	        showresp(WARN, ASC, "SET agc", cmd, replystr);
-	        sett("set_agc");
+			sendCommand(cmd);
+			showresp(WARN, ASC, "SET agc", cmd, replystr);
+			sett("set_agc");
 		agcval = agcvalB;
 		return agcvalB;
 	}
@@ -602,8 +602,8 @@ void K4_atten_label(int val)
 
 int RIG_K4::next_attenuator()
 {
-        if (atten_level < 8) atten_level++;
-        else atten_level = 0;
+		if (atten_level < 8) atten_level++;
+		else atten_level = 0;
 
 	return atten_level;
 }
@@ -687,7 +687,7 @@ void RIG_K4::set_power_control(double val)
 {
 	int ival = val;
 	cmd = "PC000";
-        if (ival > 10) {
+		if (ival > 10) {
 		for (int i = 4; i > 1; i--) {
 			cmd[i] += ival % 10;
 			ival /= 10;
@@ -709,42 +709,45 @@ void RIG_K4::set_power_control(double val)
 
 double RIG_K4::get_power_control()
 {
-        cmd = "PCX;";
-        get_trace(1, "get power control");
-        wait_char(';', 8, K4_WAIT_TIME, "get power level", ASC);
-        gett("");
-
-        size_t p = replystr.rfind("PCX");
-        if (p == std::string::npos) return progStatus.power_level;
-        int level = fm_decimal(replystr.substr(p+3), 4);
-        if (replystr[5] == 'L') {
-                powerScale = 10;
-                return level / 10.0;
-        }
-        powerScale = 1;
-        return level;
-}
-
-void RIG_K4::get_pc_min_max_step(double &min, double &max, double &step)
-{
 	cmd = "OM;"; // request options to get power level
 	get_trace(1, "get options/pc_pwr_level");
 	wait_char(';', 16, K4_WAIT_TIME, "Options", ASC);
 	gett("");
 
-	minpwr = 0.0; maxpwr = 100.0; steppwr = 1.0;
-	if (replystr.rfind("OM") == std::string::npos) return;
-
-	if (replystr.find("P") == std::string::npos) {
-		minpwr = 0.0;
-		maxpwr = 10.0;
-		steppwr = 0.1;
+	if (replystr.rfind("OM") != std::string::npos) { 
+		if (replystr.find("P") == std::string::npos) {
+			minpwr = 0.0;
+			maxpwr = 10.0;
+			steppwr = 0.1;
+		} else {
+			minpwr = 0.0;
+			maxpwr = 110.0;
+			steppwr = 1.0;
+		}
 	} else {
 		minpwr = 0.0;
-		maxpwr = 110.0;
+		maxpwr = 100.0;
 		steppwr = 1.0;
 	}
 
+	cmd = "PCX;";
+	get_trace(1, "get power control");
+	wait_char(';', 8, K4_WAIT_TIME, "get power level", ASC);
+	gett("");
+
+	size_t p = replystr.rfind("PCX");
+	if (p == std::string::npos) return progStatus.power_level;
+	int level = fm_decimal(replystr.substr(p+3), 4);
+	if (replystr[5] == 'L') {
+		powerScale = 10;
+		return level / 10.0;
+	}
+	powerScale = 1;
+	return level;
+}
+
+void RIG_K4::get_pc_min_max_step(double &min, double &max, double &step)
+{
 	min = minpwr; max = maxpwr; step = steppwr;
 }
 
@@ -861,11 +864,11 @@ int RIG_K4::get_PTT()
 	if (p == std::string::npos) return 0;
 
 	if (fm_decimal(replystr.substr(p+2), 1) == 1)
-           ptt_ = true;
-        else
-           ptt_ = false;
+		   ptt_ = true;
+		else
+		   ptt_ = false;
 
-        return ptt_;
+		return ptt_;
 }
 
 //SM $ (S-meter Read; GET only)
@@ -990,15 +993,15 @@ int RIG_K4::get_bwB()
 
 int RIG_K4::get_power_out()
 {
-        cmd = "TM;";
-        get_trace(1, "get power out");
-        wait_char(';', 15, K4_WAIT_TIME, "get power out", ASC);
-        gett("");
+		cmd = "TM;";
+		get_trace(1, "get power out");
+		wait_char(';', 15, K4_WAIT_TIME, "get power out", ASC);
+		gett("");
 
-        size_t p = replystr.rfind("TM");
-        if (p == std::string::npos) return progStatus.power_level;
-        int level = fm_decimal(replystr.substr(p+8), 3);
-        return level;
+		size_t p = replystr.rfind("TM");
+		if (p == std::string::npos) return progStatus.power_level;
+		int level = fm_decimal(replystr.substr(p+8), 3);
+		return level;
 }
 
 bool RIG_K4::can_split()
@@ -1070,16 +1073,16 @@ void RIG_K4::set_pbt_values(int val)
 
 void RIG_K4::set_if_shift(int val)
 {
-        if (isOnA()) {
+		if (isOnA()) {
 		cmd = "IS0000;";
-        	val /= 10;
+			val /= 10;
 		cmd[5] += val % 10; val /= 10;
 		cmd[4] += val % 10; val /= 10;
 		cmd[3] += val % 10; val /= 10;
 		cmd[2] += val % 10;
 	} else {
 		cmd = "IS$0000;";
-        	val /= 10;
+			val /= 10;
 		cmd[6] += val % 10; val /= 10;
 		cmd[5] += val % 10; val /= 10;
 		cmd[4] += val % 10; val /= 10;
@@ -1135,29 +1138,29 @@ void  RIG_K4::get_if_mid()
 
 void RIG_K4::selectA()
 {
-        if (!isOnA()) {
-	        cmd = "SW83;SW44;";
-	        set_trace(1, "selectA");
-	        sendCommand(cmd);
-	        sett("");
+		if (!isOnA()) {
+			cmd = "SW83;SW44;";
+			set_trace(1, "selectA");
+			sendCommand(cmd);
+			sett("");
 
 //	        K4split = false;
-	        showresp(WARN, ASC, "select A", cmd, replystr);
-	        inuse = onA;
+			showresp(WARN, ASC, "select A", cmd, replystr);
+			inuse = onA;
 	}
 }
 
 void RIG_K4::selectB()
 {
 	if (!isOnB()) {
-	        cmd = "SW83;SW44;";
+			cmd = "SW83;SW44;";
 		set_trace(1, "selectB");
-	        sendCommand(cmd);
-	        sett("");
+			sendCommand(cmd);
+			sett("");
 
 //	        K4split = false;
-	        showresp(WARN, ASC, "select B", cmd, replystr);
-	        inuse = onB;
+			showresp(WARN, ASC, "select B", cmd, replystr);
+			inuse = onB;
 	}
 }
 
