@@ -164,7 +164,7 @@ void Fl_PopBrowser::popshow (int x, int y)
 	while (nl > 1 && (yl + hl > hp)) { nl--; hl -= fh; }
 	while (nu > 1 && yu < 0) { nu--; yu += fh; hu -= fh; }
 
-	y = yl; height = hl;
+	y = yl; height = hl - 4;
 	if (nl < nu) {
 		y = yu;
 		height = hu;
@@ -206,7 +206,7 @@ void Fl_PopBrowser::popshow (int x, int y)
 			i = 0;
 	}
 
-	popbrwsr->select (i+1);
+	popbrwsr->select (i ? i : 1);//+1);
 
 	keystrokes.clear();
 
