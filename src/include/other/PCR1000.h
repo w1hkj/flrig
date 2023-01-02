@@ -22,6 +22,7 @@
 #define _PCR1000_H
 
 #include "rigbase.h"
+// #include "support.h"
 
 class RIG_PCR1000 : public rigbase {
 
@@ -36,8 +37,15 @@ private:
 	static char				check_power_command[];
 	static char				power_on_command[];
 	static char				power_off_command[];
+	static const char		agcontrol_off_command[];
+	static const char		agcontrol_on_command[];
+	static const char		an_off_command[];
+	static const char		an_on_command[];
 	static const char		att_off_command[];
 	static const char		att_on_command[];
+	static const char		nr_off_command[];
+	static const char		nr_on_command[];
+	static char		        nr_level_command[];
 	static const char		noise_off_command[];
 	static const char		noise_on_command[];
 
@@ -55,11 +63,17 @@ private:
 	int active_mode;
 	int sql;
 	int	if_shift;
+	int nr_level;
 	int	attenuator;
 	int	noise;
+	int	preamp;
+	int	auto_notch;
+	int noise_reduction;
+	int noise_reduction_level;
 
 	bool notch_on;
 	bool att_on;
+	bool nr_on;
 	bool is_PCR1000;
 
 // Set the frequency, mode, bandwidth in the current vfo
@@ -70,7 +84,10 @@ private:
 
 public:
 	RIG_PCR1000();
-	~RIG_PCR1000(){};
+	~RIG_PCR1000(){
+	
+
+};
 
 	void initialize();
 	void shutdown();
@@ -120,6 +137,25 @@ public:
 
 	void set_noise(bool on);
 	int  get_noise();
+	
+	void set_agccontrol(int val); // Modified for PCR-1000 AGC
+	int  get_agcontrol();
+
+	void set_preamp(int val); // Modified for PCR-1000 AGC
+	int  get_preamp();
+
+// Added for UT-106 Module DSP functions
+
+	void set_auto_notch(int val);
+	int  get_auto_notch();
+
+	void set_noise_reduction(int val);
+	int  get_noise_reduction();
+
+	void set_noise_reduction_val(int val);
+//	int  get_noise_reduction_val(); - not needed but left as a prototype for future use 
+	void get_nr_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 15; step = 1; }
 
 };
 

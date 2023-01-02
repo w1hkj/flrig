@@ -86,8 +86,15 @@ static int PCR1000_bw_vals[] = {1,2,3,4,5,WVALS_LIMIT};
 char 		RIG_PCR1000::volume_command[] 		= 		"J40XX\r\n" ;
 char 		RIG_PCR1000::squelch_command[] 		= 		"J41XX\r\n" ;
 char 		RIG_PCR1000::if_shift_command[] 	= 		"J43XX\r\n" ;
-const char  RIG_PCR1000::noise_off_command[] 	= 		"J4600\r\n" ;
-const char  RIG_PCR1000::noise_on_command[] 	= 		"J4601\r\n" ;
+char 		RIG_PCR1000::nr_level_command[] 	= 		"J8001J820X\r\n" ;
+const char  RIG_PCR1000::noise_off_command[] 	= 		"J8001J8100\r\n" ; // PCR-1000 DSP Off
+const char  RIG_PCR1000::noise_on_command[] 	= 		"J8001J8101\r\n" ; // PCR-1000 DSP On
+const char  RIG_PCR1000::agcontrol_off_command[]= 		"J4500\r\n" ;
+const char  RIG_PCR1000::agcontrol_on_command[]	= 		"J4501\r\n" ;
+const char  RIG_PCR1000::an_off_command[]       = 		"J8001J8300\r\n" ;
+const char  RIG_PCR1000::an_on_command[]	    = 		"J8001J8301\r\n" ;
+const char  RIG_PCR1000::nr_off_command[]       = 		"J8001J8200\r\n" ;
+const char  RIG_PCR1000::nr_on_command[]	    = 		"J8001J8201\r\n" ;
 const char  RIG_PCR1000::att_off_command[] 		= 		"J4700\r\n" ;
 const char  RIG_PCR1000::att_on_command[] 		= 		"J4701\r\n" ;
 char 		RIG_PCR1000::check_power_command[] 	= 		"H1?\r\n" ;
@@ -114,6 +121,10 @@ RIG_PCR1000::RIG_PCR1000()
 	modes_ = modes;
 	bandwidths_ = band_widths;
 
+	pre_to = "\x4A\x38\x30\x30\x31";
+	pre_fm = "";
+	post = "\x0D\x0A";
+
 	widgets = rig_widgets;
 
 	serial_baudrate 	= BR9600;
@@ -135,37 +146,45 @@ RIG_PCR1000::RIG_PCR1000()
 
 //	Defaults.
 
-	A.imode = 2;
+	A.imode = 3;
 	A.freq = 7025000ULL;
 	A.iBW = 0 ;
 
-	B.imode = 1;
-	B.freq = 7070000ULL;
-	B.iBW = 0 ;
+	B.imode = 4; // Check Mode definitions - the Mode Array value for NFM doesn't match (see above)
+	B.freq = 162400000ULL; // NOAA Channel 1 on VFO B - Default
+	B.iBW = 2 ;
 
 	sql 				= 127 ;		// Set squelch to a reasonable value
 	if_shift 			= 0 ;		// IF shift off
 	attenuator 			= 0 ;		// Attenuator is set to off
 	noise 				= 0 ;		// Noise blanker to off
 	current_volume 		= 10 ;		// Set volume to make at least a little noise, otherwise there is no
-									// indication when the radio is switched on.
+	preamp              = 0 ;		// indication when the radio is switched on.
+	auto_notch          = 0 ;
+	noise_reduction     = 0 ;
+	nr_level            = 0 ;
 
 	has_micgain_control =
-	has_notch_control =
+	has_notch_control = false;
+	has_preamp_control = true;
 	has_swr_control = false;
 
-	can_change_alt_vfo =
-	has_smeter =
-	has_bandwidth_control =
+	can_change_alt_vfo = true;
+	has_smeter = true;
+	has_bandwidth_control = true;
 	has_volume_control =
-	has_mode_control =
-	has_sql_control =
-	has_noise_control =
-	has_attenuator_control =
+	has_mode_control = true;
+	has_sql_control = true;
+	has_noise_control = true;
+	has_noise_reduction = true;
+	has_noise_reduction_control = true;
+	has_attenuator_control = true;
 	has_ifshift_control = true;
-
+	has_auto_notch = true;
+   
 	precision = 10 ;
 	ndigits = 9 ;
+	
 
 }
 
@@ -212,6 +231,7 @@ void RIG_PCR1000::initialize()
 //	sendCommand("G105\r\n");
 //	RigSerial->Baud(38400);
 //	MilliSleep(500);
+	
 
 	selectA();
 
@@ -344,6 +364,7 @@ int RIG_PCR1000::hexTo(const char c) const
  * 37 is converted to "25"
  *
  */
+
 
 void RIG_PCR1000::set2Hex(int ival, char *cptr)
 {
@@ -553,23 +574,57 @@ int  RIG_PCR1000::get_attenuator() {
 	return attenuator ;
 }
 
+//======================================================================
+// AGC commands - modified Preamp button
+//======================================================================
+//----------------------------------------------------------------------
+
+
+void RIG_PCR1000::set_preamp(int val) {
+	if( val != preamp ) {
+		if( val ) {
+			// Turn agc on
+			set_trace(1, "AGC ON");
+			wait_crlf(cmd = agcontrol_on_command, "preamp ON");
+		sett("");
+		preamp = 1 ;
+	} else {
+		// Turn agc off
+			set_trace(1, "AGC OFF");
+			wait_crlf(cmd = agcontrol_off_command, "preamp OFF");
+			sett("");
+			preamp = 0 ;
+		}
+	}
+}
+
+int  RIG_PCR1000::get_preamp() {
+	return preamp ;
+}
+
 
 //======================================================================
-// Noise reduction commands (Doesn't do much on PCR-1000 :-( )
+// Noise reduction commands - UT-106 Module required
+// The PCR-1000 doesn't acknowledge any of these commands, so they're
+// sent "best-effort". The slider function in the NR Level section required
+// suppression if NR is "Off" due to program looping constantly setting its
+// value - and with it, the command.
 //======================================================================
 //----------------------------------------------------------------------
 
 void RIG_PCR1000::set_noise(bool on) {
 	if( on ) {
 		// Turn on
-		set_trace(1, "set noise reduction ON");
-		wait_crlf(cmd = noise_on_command, "noise red' ON");
+		sendCommand("G301\r\n"); //Auto-Update required for DSP functions
+		set_trace(1, "set DSP ON");
+		wait_crlf(cmd = noise_on_command, "DSP ON");
 		sett("");
 		noise = 1 ;
 	} else {
 		// Turn off
-		set_trace(1, "set noise reduction OFF");
-		wait_crlf(cmd = noise_off_command, "noise red' OFF");
+		set_trace(1, "set DSP OFF");
+		wait_crlf(cmd = noise_off_command, "DSP OFF");
+		sendCommand("G300\r\n"); //Auto-Update OFF
 		sett("");
 		noise = 0 ;
 	}
@@ -577,6 +632,74 @@ void RIG_PCR1000::set_noise(bool on) {
 
 int  RIG_PCR1000::get_noise() {
 	return noise ;
+}
+
+void RIG_PCR1000::set_auto_notch(int val) {
+	if( val != auto_notch ) {
+		if( val ) {
+			// Turn auto-notch on
+			set_trace(1, "set AN ON");
+			wait_crlf(cmd = an_on_command, "AN ON");
+		sett("");
+		auto_notch = 1 ;
+	} else {
+		// Turn auto-notch off
+			set_trace(1, "set AN OFF");
+			wait_crlf(cmd = an_off_command, "AN OFF");
+			sett("");
+		 auto_notch = 0 ;
+		}
+	}
+}
+
+int  RIG_PCR1000::get_auto_notch() {
+	return auto_notch ;
+}
+
+
+
+void RIG_PCR1000::set_noise_reduction(int val) {
+	if( val != noise_reduction ) {
+		if( val ) {
+			// Turn NR on
+			set_trace(1, "set NR ON");
+			wait_crlf(cmd = nr_on_command, "NR ON");
+		sett("");
+		noise_reduction = 1 ;
+		nr_on = 1 ;
+	} else {
+		// Turn NR off
+			nr_level = 0 ;
+			set_trace(1, "set NR OFF");
+			wait_crlf(cmd = nr_off_command, "NR OFF");
+			sett("");
+		 noise_reduction = 0 ;
+		 nr_on = 0 ;
+		}
+	}
+}
+
+int  RIG_PCR1000::get_noise_reduction() {
+	return noise_reduction ;
+}
+
+
+void RIG_PCR1000::set_noise_reduction_val(int val)
+{
+	if (nr_on) {
+	nr_level = val ;
+	set2Hex(nr_level, &(nr_level_command[8])) ;
+	set_trace(1, "set_NR Level");
+	wait_crlf(cmd = nr_level_command, "NR Level");
+	sett("");
+
+	}
+
+else 
+ {
+   wait_crlf(cmd = nr_off_command, "NR Off"); //Forces the slider routine to adhere to "Off"
+											  // if NR deactivated
+}
 }
 
 //======================================================================
@@ -1254,19 +1377,19 @@ LD864? (always 0)
 LD842? returns the current signal strength level, same as for I1?
 
 LD84A? returns the previous signal strength. I believe this is what the
-       radio uses to determine if the signal strength level has changed (as
-       you probably noticed, it only kicks out a new I1xx message in G301 mode
-       when the signal strength changes).
+	   radio uses to determine if the signal strength level has changed (as
+	   you probably noticed, it only kicks out a new I1xx message in G301 mode
+	   when the signal strength changes).
 
 LD844? returns something relevant to frequency. If I set the PCR-1000 to
-       144.35, NBFM, 6Khz filter, and set my HT for 144.35 Mhz, when I
-       transmit on the HT, this value goes to 0x25. Moving the HT to
-       144.355 causes the value to increase to a nominal 0x37, and moving
-       the HT to 144.345 causes the value to decrease to a nominal 0x15.
-       Interesting relationship between these values: 0x37 - 0x25 = 0x12,
-       and 0x25 - 0x15 = 0x10. This is 18 decimal and 16 decimal respectively.
-       Two pretty close numbers for shifting +/- 5Khz. I expect this register
-       has something to do with the centering information.
+	   144.35, NBFM, 6Khz filter, and set my HT for 144.35 Mhz, when I
+	   transmit on the HT, this value goes to 0x25. Moving the HT to
+	   144.355 causes the value to increase to a nominal 0x37, and moving
+	   the HT to 144.345 causes the value to decrease to a nominal 0x15.
+	   Interesting relationship between these values: 0x37 - 0x25 = 0x12,
+	   and 0x25 - 0x15 = 0x10. This is 18 decimal and 16 decimal respectively.
+	   Two pretty close numbers for shifting +/- 5Khz. I expect this register
+	   has something to do with the centering information.
 
 I'm not completely sure about this, but every document except 1 has the auto
 tracking register mis-coded. It's generally listed as LD8200 to turn off, and

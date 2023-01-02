@@ -1897,17 +1897,25 @@ void TRACED(init_agc_control)
 void TRACED(init_preamp_control)
 
 	if (selrig->has_preamp_control) {
-		if (selrig->name_ == rig_FT891.name_) {
+
+	   if (selrig->name_ == rig_FT891.name_) {
 			btnPreamp->label("IPO");
 			btnPreamp->redraw_label();
 		}
-		switch (progStatus.UIsize) {
+
+   if (selrig->name_ == rig_PCR1000.name_) {
+			btnPreamp->label("AGC");
+			btnPreamp->redraw_label();
+		}
+
+ 		switch (progStatus.UIsize) {
 			case small_ui :
 				btnPreamp->show();
 				break;
 			case wide_ui : case touch_ui : default :
 			btnPreamp->activate();
 		}
+
 		if (xcvr_name == rig_IC9700.name_) {
 			btnPreamp->tooltip("\
 Internal/External preamp\n\
@@ -1917,9 +1925,17 @@ P0/E1 off/on\n\
 P1/E1  on/on");
 			btnPreamp->label("P0/E0");
 			btnPreamp->redraw_label();
-		} else {
+		}
+
+	 else {
+
+	if (selrig->name_ == rig_PCR1000.name_) { 
+		   btnPreamp->tooltip("On/Off"); //Kludge necessary to get the tooltip verbiage for the PCR-1000 correct. Feel free to re-order the if-else statements
+	   }
+	 else
 			btnPreamp->tooltip("On/Off/Level");
 		}
+
 	} else {
 		switch (progStatus.UIsize) {
 			case small_ui :
@@ -1956,6 +1972,12 @@ void TRACED(init_noise_control)
 			// mapping to appropriate cat controls in the FT891.xx class.
 			btnNOISE->label("DNR");
 			btnNOISE->tooltip(_("DSP Noise Reduction On/Off.  See RX tab for DNR level."));
+		}
+		if (selrig->name_ == rig_PCR1000.name_) {
+			// The PCR-1000 has no Noise Blanker. This control is used to activate its UT-106 DSP
+			// Module, which has NR and Auto-Notch features.
+			btnNOISE->label("DSP");
+			btnNOISE->tooltip(_("DSP Noise Reduction On/Off. Set NR operation and level with NR section."));
 		}
 
 		btnNOISE->show();
