@@ -133,6 +133,7 @@ extern void set_bandwidth_control();
 extern void updateBandwidthControl(void *d = NULL);
 extern void updateUI(void *);
 extern void update_split(void *);
+extern void updateTCI(void *);
 extern void setBWControl(void *);
 extern void setNotchControl(void *);
 extern void adjust_if_shift_control(void *);

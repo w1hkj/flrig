@@ -45,6 +45,8 @@ struct XCVR_STATE {
 	unsigned long long freq;
 	int  imode;
 	int  iBW;
+	int  FilterInner;
+	int  FilterOuter;
 	int  filter;
 	int  src;
 
@@ -73,6 +75,8 @@ struct XCVR_STATE {
 		freq = 0;
 		imode = 0;
 		iBW = 0;
+		FilterInner = 0;
+		FilterOuter = 0;
 		filter = 0;
 		src = UI;
 
@@ -491,6 +495,7 @@ int nr_, nrval_;
 
 	virtual void set_pbt_inner(int val) {}
 	virtual void set_pbt_outer(int val) {}
+	virtual void set_pbt(int inner, int outer) {}
 	virtual int  get_pbt_inner() {return 0;}
 	virtual int  get_pbt_outer() {return 0;}
 

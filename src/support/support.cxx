@@ -280,11 +280,13 @@ void TRACED(update_vfoAorB, void *d)
 		vfoB.freq = selrig->get_vfoB();
 		vfoB.imode = selrig->get_modeB();
 		vfoB.iBW = selrig->get_bwB();
+//		updateTCI((void *)0);
 	} else {
 		vfoA.src = RIG;
 		vfoA.freq = selrig->get_vfoA();
 		vfoA.imode = selrig->get_modeA();
 		vfoA.iBW = selrig->get_bwA();
+//		updateTCI((void *)0);
 	}
 	updateUI((void*)0);
 }
@@ -350,7 +352,7 @@ void read_vfo()
 			}
 		}
 	}
-
+	Fl::awake(updateTCI);
 }
 
 void update_ifshift(void *d);
@@ -375,6 +377,7 @@ void TRACED(updateUI, void *)
 	if (spnrIFSHIFT) spnrIFSHIFT->redraw();
 	update_ifshift((void *)0);
 
+//	updateTCI((void *)0);
 }
 
 void TRACED(setModeControl, void *)
@@ -434,6 +437,7 @@ void read_mode()
 			vfoA.iBW = vfo->iBW = nu_BW;
 			Fl::awake(updateBandwidthControl);
 		}
+		Fl::awake(updateTCI);
 		if (selrig->twovfos()) {
 			vfoB.imode = selrig->get_modeB();
 			vfoB.filter = selrig->get_FILT(vfoB.imode);
@@ -454,6 +458,7 @@ void read_mode()
 			vfoB.iBW = vfo->iBW = nu_BW;
 			Fl::awake(updateBandwidthControl);
 		}
+		Fl::awake(updateTCI);
 
 		if (selrig->twovfos()) {
 			vfoA.imode = selrig->get_modeA();
@@ -491,31 +496,17 @@ void TRACED(setBWControl, void *)
 			opBW->show();
 			opBW->redraw();
 		}
-	} else if (selrig->name_ == rig_tci_sundx.name_ ||
-			   selrig->name_ == rig_tci_sunpro.name_) {
-		std::string smode = opMODE->value();
-		if (smode == "USB" || smode == "LSB") {
-			btnCENTER->activate();
-			btnCENTER->redraw();
-			opBW->index(vfo->iBW);
-			opBW->show();
-			opBW->redraw();
-		} else {
-			btnCENTER->label("W");
-			btnCENTER->redraw_label();
-			btnCENTER->deactivate();
-			opCENTER->hide();
+	}
+	else {
+		opDSP_lo->hide();
+		opDSP_hi->hide();
+		btnDSP->hide();
+		if (!(	selrig->name_ == rig_tci_sundx.name_ ||
+				selrig->name_ == rig_tci_sunpro.name_) ) {
 			opBW->index(vfo->iBW);
 			opBW->show();
 			opBW->redraw();
 		}
-	} else {
-		opDSP_lo->hide();
-		opDSP_hi->hide();
-		btnDSP->hide();
-		opBW->index(vfo->iBW);
-		opBW->show();
-		opBW->redraw();
 	}
 }
 
@@ -539,6 +530,7 @@ void TRACED(read_bandwidth)
 	}
 	s << vfo->iBW;
 	trace(1, s.str().c_str());
+	Fl::awake(updateTCI);
 }
 
 // read current signal level
@@ -1412,6 +1404,7 @@ void serviceA(XCVR_STATE nuvals)
 					selrig->set_modeA(nuvals.imode);
 					selrig->get_modeA();
 				}
+				A_changed = true;
 			}
 			if (vfoA.iBW != nuvals.iBW) {
 				selrig->set_bwA(nuvals.iBW);
@@ -1447,8 +1440,9 @@ void serviceA(XCVR_STATE nuvals)
 			selrig->selectB();
 			vfoA = nuvals;
 		}
-		if (A_changed)
+		if (A_changed) {
 			Fl::awake(setFreqDispA);
+		}
 		return;
 	}
 
@@ -1506,6 +1500,7 @@ void serviceB(XCVR_STATE nuvals)
 					selrig->set_modeB(nuvals.imode);
 					selrig->get_modeB();
 				}
+				B_changed = true;
 			}
 			if (vfoB.iBW != nuvals.iBW) {
 				selrig->set_bwB(nuvals.iBW);
@@ -1824,12 +1819,98 @@ void selectCENTER()
 	} else {
 		btnCENTER->label("C");
 		opBW->hide();
+		opCENTER->index(progStatus.tci_center);
+std::cout << "tci_center: " << progStatus.tci_center << ", " << opCENTER->value() << std::endl;
 		opCENTER->show();
 	}
 	opBW->redraw();
 	opCENTER->redraw();
 	btnCENTER->redraw_label();
 }
+
+static int lastTCI_bw = -1;
+static int lastTCI_inner = -1;
+static int lastTCI_outer = -1;
+static int lastTCI_mode = -1;
+
+void updateTCI(void *d)
+{
+	if (!(	selrig->name_ == rig_tci_sundx.name_ ||
+			selrig->name_ == rig_tci_sunpro.name_) )
+		return;
+
+	vfo->FilterInner = selrig->get_pbt_inner();
+	vfo->FilterOuter = selrig->get_pbt_outer();
+
+	if (lastTCI_mode != vfo->imode) {
+		lastTCI_mode = vfo->imode;
+		switch (vfo->imode) {
+			case TCI_AM: case TCI_SAM: case TCI_DSB: case TCI_NFM:
+				opFilterInner->minimum(-8000);	opFilterInner->maximum(0);
+				opFilterOuter->minimum(0); 		opFilterOuter->maximum(8000);
+				break;
+			case TCI_LSB:
+				opFilterInner->minimum(-4000);	opFilterInner->maximum(0);
+				opFilterOuter->minimum(-4000); 	opFilterOuter->maximum(0);
+				break;
+			case TCI_USB:
+				opFilterInner->minimum(0);	opFilterInner->maximum(4000);
+				opFilterOuter->minimum(0);	opFilterOuter->maximum(4000);
+				break;
+			default: case TCI_CW:
+				opFilterInner->minimum(-1000);	opFilterInner->maximum(0);
+				opFilterOuter->minimum(0);	opFilterOuter->maximum(1000);
+				break;
+			case TCI_DIGL: case TCI_DIGU:
+				opFilterInner->minimum(-4000);	opFilterInner->maximum(0);
+				opFilterOuter->minimum(0); 		opFilterOuter->maximum(4000);
+				break;
+			case TCI_WFM:
+				opFilterInner->minimum(-9000);	opFilterInner->maximum(0);
+				opFilterOuter->minimum(0); 		opFilterOuter->maximum(9000);
+				break;
+			case TCI_DRM:
+				opFilterInner->minimum(-5000);	opFilterInner->maximum(0);
+				opFilterOuter->minimum(0); 		opFilterOuter->maximum(5000);
+				break;
+		}
+
+		updateBandwidthControl((void *)0);
+	}
+
+	if (lastTCI_bw != vfo->iBW) opBW->index(lastTCI_bw = vfo->iBW);
+	if (lastTCI_inner != vfo->FilterInner) opFilterInner->value(lastTCI_inner = vfo->FilterInner);
+	if (lastTCI_outer != vfo->FilterOuter) opFilterOuter->value(lastTCI_outer = vfo->FilterOuter);
+
+	std::string smode = opMODE->value();
+	if (smode == "USB" || smode == "LSB") {
+		btnCENTER->activate();
+		btnCENTER->redraw();
+		btnCENTER->show();
+		if (btnCENTER->label()[0] == 'C') {
+			opCENTER->index(progStatus.tci_center);
+			opCENTER->show();
+			opBW->hide();
+		} else {
+			opBW->show();
+			opCENTER->hide();
+		}
+		opBW->resize(opDSP_lo->x(), opDSP_lo->y(), opDSP_lo->w(), opDSP_lo->h());
+		opCENTER->resize(opDSP_lo->x(), opDSP_lo->y(), opDSP_lo->w(), opDSP_lo->h());
+		opCENTER->redraw();
+		opBW->redraw();
+	} else {
+		btnCENTER->label("W");
+		btnCENTER->redraw_label();
+		btnCENTER->deactivate();
+		btnCENTER->show();
+		opCENTER->hide();
+		opBW->index(vfo->iBW);
+		opBW->resize(opDSP_lo->x(), opDSP_lo->y(), opDSP_lo->w(), opDSP_lo->h());
+		opBW->redraw();
+		opBW->show();
+	}
+} 
 
 // set_bandwidth_control updates iBW and then posts the call for
 // the UI thread to updateBandwidthControl
@@ -1849,10 +1930,11 @@ void set_bandwidth_control()
 		i--;
 		if (vfo->iBW > i) vfo->iBW = selrig->def_bandwidth(vfo->imode);
 	}
-	if (selrig->inuse == onB)
+	if (selrig->inuse == onB) {
 		vfoB.iBW = vfo->iBW = selrig->get_bwB();
-	else
+	} else {
 		vfoA.iBW = vfo->iBW = selrig->get_bwA();
+	}
 
 	Fl::awake(updateBandwidthControl);
 }
@@ -1897,10 +1979,13 @@ void TRACED ( updateBandwidthControl, void *d )
 		btnDSP->hide();
 		opBW->clear();
 		selrig->bandwidths_ = selrig->bwtable(vfo->imode);
-		for (int i = 0; selrig->bandwidths_[i] != NULL; i++)
+
+		for (int i = 0; selrig->bandwidths_[i] != NULL; i++) {
 			opBW->add(selrig->bandwidths_[i]);
+	}
 		opBW->index(vfo->iBW);
 		opBW->redraw();
+
 		if (selrig->has_FILTER) {
 			btnFILT->show();
 			btnFILT->label(
@@ -1909,15 +1994,6 @@ void TRACED ( updateBandwidthControl, void *d )
 			btnFILT->redraw_label();
 			opBW->resize(opDSP_lo->x(), opDSP_lo->y(), opDSP_lo->w(), opDSP_lo->h());
 			opBW->redraw();
-		} else if (selrig->name_ == rig_tci_sundx.name_ ||
-				   selrig->name_ == rig_tci_sunpro.name_) {
-			btnCENTER->show();
-			opBW->resize(opCENTER->x(), opCENTER->y(), opCENTER->w(), opCENTER->h());
-			opBW->redraw();
-			opBW->show();
-			opBW->redraw();
-			opCENTER->hide();
-			opCENTER->redraw();
 		} else {
 			opBW->show();
 		}
@@ -2595,9 +2671,9 @@ void setPreampControl(void *d)
 
 void cbAN()
 {
-	progStatus.auto_notch = btnAutoNotch->value();
 	guard_lock serial_lock(&mutex_serial);
 	trace(1, "cbAN()");
+	progStatus.auto_notch = btnAutoNotch->value();
 	selrig->set_auto_notch(progStatus.auto_notch);
 }
 
@@ -2606,9 +2682,9 @@ void cbbtnNotch()
 	if (!selrig->has_notch_control) return;
 
 	int val = 0, cnt = 0;
-	progStatus.notch = btnNotch->value();
 	{
 		guard_lock serial_lock(&mutex_serial);
+		progStatus.notch = btnNotch->value();
 		selrig->set_notch(progStatus.notch, progStatus.notch_val);
 	}
 
@@ -2629,13 +2705,14 @@ void setNotch()
 	int ev = Fl::event();
 	if (ev == FL_LEAVE || ev == FL_ENTER) return;
 
+	guard_lock lock( &mutex_serial);
+
 	if (sldrNOTCH) {
 		progStatus.notch_val = sldrNOTCH->value();
 	} else {
 		progStatus.notch_val = spnrNOTCH->value();
 	}
 
-	guard_lock lock( &mutex_serial);
 	selrig->set_notch(progStatus.notch, progStatus.notch_val);
 }
 

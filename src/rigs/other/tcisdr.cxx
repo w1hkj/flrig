@@ -24,11 +24,6 @@
 static const char TCI_SUNDX_name_[] = "SunSDR2-DX/TCI";
 static const char TCI_SUNPRO_name_[] = "SunSDR2-Pro/TCI";
 
-enum TCI_MODES {
-TCI_AM, TCI_SAM, TCI_DSB, TCI_LSB, TCI_USB,
-TCI_CW, TCI_NFM, TCI_DIGL, TCI_DIGU, TCI_WFM,
-TCI_DRM };
-
 static const char *TCI_modes[] = {
 "AM", "SAM", "DSB", "LSB", "USB", "CW", "NFM", "DIGL", "DIGU", "WFM", "DRM", NULL };
 //static int tci_nbr_modes = 11;
@@ -151,6 +146,7 @@ void tci_adjust_widths()
 	int  tci_freq;
 
 	if (tci_center != progStatus.tci_center) {
+		tci_center = progStatus.tci_center;
 		tci_freq = tci_centers[tci_center];
 
 		for (int i = 0; i < tci_nbr_usb; i++ ) {
@@ -489,6 +485,11 @@ void RIG_TCI_SDR::set_bwA(int val)
 	slice_0.A.bw = pairs;
 
 	tci_send(tcicmd);
+
+	FilterInner_A = atoi(pairs.c_str());
+	size_t pos = pairs.find(",");
+	if (pos != std::string::npos) pairs.erase(0,pos);
+	FilterOuter_A = atoi(pairs.c_str());
 }
 
 int RIG_TCI_SDR::get_bwA()
@@ -516,6 +517,13 @@ int RIG_TCI_SDR::get_bwA()
 		n++;
 	}
 	if (!tbl[n].empty()) A.iBW = n;
+
+	FilterInner_A = atoi(sbw.c_str());
+	size_t pos = sbw.find(",");
+	if (pos != std::string::npos) {
+		sbw.erase(0, pos + 1);
+		FilterOuter_A = atoi(sbw.c_str());
+	}
 	return A.iBW;
 }
 
@@ -542,6 +550,11 @@ void RIG_TCI_SDR::set_bwB(int val)
 	B.iBW = val;
 	slice_0.B.bw = pairs;
 	tci_send(tcicmd);
+
+	FilterInner_B = atoi(pairs.c_str());
+	size_t pos = pairs.find(",");
+	if (pos != std::string::npos) pairs.erase(0,pos);
+	FilterOuter_B = atoi(pairs.c_str());
 }
 
 int RIG_TCI_SDR::get_bwB()
@@ -569,6 +582,12 @@ int RIG_TCI_SDR::get_bwB()
 		n++;
 	}
 	if (!tbl[n].empty()) B.iBW = n;
+
+	FilterInner_B = atoi(sbw.c_str());
+	size_t pos = sbw.find(",");
+	if (pos != std::string::npos) sbw.erase(0,pos + 1);
+	FilterOuter_B = atoi(sbw.c_str());
+
 	return B.iBW;
 }
 
@@ -595,6 +614,30 @@ int RIG_TCI_SDR::def_bandwidth(int val)
 int RIG_TCI_SDR::adjust_bandwidth(int val)
 {
 	return def_bandwidth(val);
+}
+
+void RIG_TCI_SDR::set_pbt(int inner, int outer)
+{
+	char cmdstr[50];
+	snprintf(cmdstr, sizeof(cmdstr), "rx_filter_band:%c,%d,%d;",
+		onA ? '0' : '1', inner, outer);
+	tci_send(cmdstr);
+}
+
+int RIG_TCI_SDR::get_pbt_inner()
+{
+	if (onA)
+		return FilterInner_A;
+	else
+		return FilterInner_B;
+}
+
+int RIG_TCI_SDR::get_pbt_outer()
+{
+	if (onA)
+		return FilterOuter_A;
+	else
+		return FilterOuter_B;
 }
 
 void RIG_TCI_SDR::set_attenuator(int val)
@@ -698,15 +741,15 @@ void RIG_TCI_SDR::get_rf_min_max_step(int &min, int &max, int &step)
 	min = 0; max = 100; step = 1;
 }
 
-//void RIG_TCI_SDR::selectA()
-//{
-//	inuse = onA;
-//}
+void RIG_TCI_SDR::selectA()
+{
+	inuse = onA;
+}
 
-//void RIG_TCI_SDR::selectB()
-//{
-//	inuse = onB;
-//}
+void RIG_TCI_SDR::selectB()
+{
+	inuse = onB;
+}
 
 void RIG_TCI_SDR::set_split(bool val)
 {

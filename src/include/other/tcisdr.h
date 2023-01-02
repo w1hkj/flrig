@@ -33,6 +33,11 @@ extern void tci_adjust_widths();
 
 enum SDR2_TYPE { UNK, PRO, DX };
 
+enum TCI_MODES {
+TCI_AM, TCI_SAM, TCI_DSB, TCI_LSB, TCI_USB,
+TCI_CW, TCI_NFM, TCI_DIGL, TCI_DIGU, TCI_WFM,
+TCI_DRM };
+
 // class RIG_TCI_SDR is never directly declared.  used as a base class for
 // RIG_TCI_SUNDX and RIG_TCI_SUNPRO
 
@@ -41,6 +46,11 @@ private:
 	bool preamp_on;
 	bool att_on;
 	const char *_mode_type;
+	int FilterInner_A;
+	int FilterOuter_A;
+	int FilterInner_B;
+	int FilterOuter_B;
+
 public:
 	RIG_TCI_SDR();
 	~RIG_TCI_SDR(){}
@@ -66,8 +76,8 @@ public:
 
 	int  adjust_bandwidth(int val);
 
-//	void selectA();
-//	void selectB();
+	void selectA();
+	void selectB();
 
 	void set_split(bool val);
 	bool can_split();
@@ -123,6 +133,10 @@ public:
 
 	int  def_bandwidth(int m);
 	int  set_widths(int val);
+
+	int  get_pbt_inner();
+	int  get_pbt_outer();
+	void set_pbt(int inner, int outer);
 
 	void set_noise_reduction_val(int val);
 	int  get_noise_reduction_val();

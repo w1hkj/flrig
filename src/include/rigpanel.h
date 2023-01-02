@@ -45,12 +45,13 @@
 #include <FL/Fl_Browser.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Int_Input.H>
-#include <FL/Fl_Value_Input.H>
+#include <FL/Fl_Counter.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Counter.H>
 #include <FL/Fl_Simple_Counter.H>
 #include <FL/Fl_Progress.H>
 #include <FL/Fl_Input_Choice.H>
+#include <FL/Fl_Counter.H>
 
 #include "flinput2.h"
 #include "flbrowser2.h"
@@ -116,6 +117,8 @@ extern Fl_ComboBox *opBW;
 extern Fl_Button *btnDSP;
 extern Fl_ComboBox *opDSP_lo;
 extern Fl_ComboBox *opDSP_hi;
+extern Fl_Counter *opFilterInner;
+extern Fl_Counter *opFilterOuter;
 extern Fl_Button *btnFILT;
 extern Fl_Button *btnCENTER;
 extern Fl_ComboBox *opMODE;

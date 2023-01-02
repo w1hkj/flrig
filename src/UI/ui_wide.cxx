@@ -406,6 +406,24 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 				opDSP_hi->readonly();
 				opDSP_hi->end();
 
+				opFilterInner = new Fl_Counter(xpos + 20, ypos, w1a - 20, 20, _("Inner cutoff"));
+				opFilterInner->minimum(-4000);
+				opFilterInner->maximum(4000);
+				opFilterInner->step(10);
+				opFilterInner->lstep(100);
+				opFilterInner->align(Fl_Align(FL_ALIGN_LEFT));
+				opFilterInner->tooltip("Inner cutoff");
+				opFilterInner->hide();
+
+				opFilterOuter = new Fl_Counter(xpos + 20, ypos, w1a - 20, 20, _("Inner cutoff"));
+				opFilterOuter->minimum(-4000);
+				opFilterOuter->maximum(4000);
+				opFilterOuter->step(10);
+				opFilterOuter->lstep(100);
+				opFilterOuter->align(Fl_Align(FL_ALIGN_LEFT));
+				opFilterOuter->tooltip("Outer cutoff");
+				opFilterOuter->hide();
+
 				opMODE = new Fl_ComboBox(
 					opBW->x() + opBW->w() + 2, ypos, 
 					w1a, 20, _("Mode"));

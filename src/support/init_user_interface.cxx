@@ -1248,6 +1248,11 @@ void TRACED(init_bfo)
 	}
 }
 
+static void cb_pbt(Fl_Counter *, void *)
+{
+	selrig->set_pbt( opFilterInner->value(), opFilterOuter->value() );
+}
+
 void TRACED(init_dsp_controls)
 
 	if (selrig->has_dsp_controls) {
@@ -1300,13 +1305,17 @@ void TRACED(init_dsp_controls)
 				opCENTER->add(TCI_centers[i]);
 			opCENTER->show();
 			opCENTER->index(progStatus.tci_center);
+			if (progStatus.UIsize == small_ui) {
+				opFilterInner->resize(214, 103, 100, 18);
+				opFilterInner->redraw();
+				opFilterOuter->resize(320, 103, 100, 18);
+				opFilterOuter->redraw();
+			}
+			opFilterInner->callback((Fl_Callback*)cb_pbt);
+			opFilterInner->show();
+			opFilterOuter->callback((Fl_Callback*)cb_pbt);
+			opFilterOuter->show();
 		}
-//		switch (progStatus.UIsize) {
-//			case small_ui :
-//				opCENTER->resize(opBW->x(), opBW->y() + opBW->h() + 2, opCENTER->w(), opCENTER->h());
-//				break;
-//			case wide_ui : case touch_ui : default : break;
-//		}
 	}
 }
 

@@ -263,6 +263,8 @@ Fl_Group *grp_row1a = (Fl_Group *)0;
 Fl_ComboBox *opBW = (Fl_ComboBox *)0;
 Fl_ComboBox *opDSP_lo = (Fl_ComboBox *)0;
 Fl_ComboBox *opCENTER = (Fl_ComboBox *)0;
+Fl_Counter *opFilterInner = (Fl_Counter *)0;
+Fl_Counter *opFilterOuter = (Fl_Counter *)0;
 Fl_Button *btnDSP = (Fl_Button *)0;
 Fl_ComboBox *opDSP_hi = (Fl_ComboBox *)0;
 Fl_Button *btnFILT= (Fl_Button*)0;
@@ -663,10 +665,10 @@ static void cb_btnCENTER(Fl_Button *, void *) {
 }
 
 static void cb_opCENTER(Fl_ComboBox*, void*) {
-	progStatus.tci_center = tci_center = opCENTER->index();
+	progStatus.tci_center = opCENTER->index();
 	tci_adjust_widths();
-	if (onA) selrig->set_bwA(vfoA.iBW);
-	else     selrig->set_bwB(vfoB.iBW);
+	if (selrig->inuse == onA) selrig->set_bwA(vfoA.iBW);
+	else                      selrig->set_bwB(vfoB.iBW);
 }
 
 static void cb_opBW(Fl_ComboBox*, void*) {

@@ -405,6 +405,24 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		opDSP_hi->hide();
 		opDSP_hi->end();
 
+		opFilterInner = new Fl_Counter(xpos+30, ypos, opBW->w() - 30, 35, _("Inner cutoff"));
+		opFilterInner->minimum(-4000);
+		opFilterInner->maximum(4000);
+		opFilterInner->step(10);
+		opFilterInner->lstep(100);
+		opFilterInner->align(Fl_Align(FL_ALIGN_LEFT));
+		opFilterInner->tooltip("Inner cutoff");
+		opFilterInner->hide();
+
+		opFilterOuter = new Fl_Counter(xpos+30, ypos, opBW->w() - 30, 35, _("Inner cutoff"));
+		opFilterOuter->minimum(-4000);
+		opFilterOuter->maximum(4000);
+		opFilterOuter->step(10);
+		opFilterOuter->lstep(100);
+		opFilterOuter->align(Fl_Align(FL_ALIGN_LEFT));
+		opFilterOuter->tooltip("Outer cutoff");
+		opFilterOuter->hide();
+
 		grpcombos->end();
 // end of bw / mode selector group
 
