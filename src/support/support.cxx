@@ -721,12 +721,17 @@ void read_compression()
 // preamp - attenuator
 void update_preamp(void *d)
 {
-	btnPreamp->value(progStatus.preamp);
+	btnPreamp->value(progStatus.preamp > 0 ? 1 : 0);
+	btnPreamp->label(selrig->PRE_label());
+	btnPreamp->redraw_label();
+	btnPreamp->redraw();
 }
 
 void update_attenuator(void *d)
 {
-	btnAttenuator->value(progStatus.attenuator);
+	btnAttenuator->value(progStatus.attenuator > 0 ? 1 : 0);
+	btnAttenuator->label(selrig->ATT_label());
+	btnAttenuator->redraw_label();
 	btnAttenuator->redraw();
 }
 
@@ -1597,14 +1602,14 @@ struct POLL_PAIR {
 POLL_PAIR RX_poll_group_1[] = {
 	{&progStatus.poll_smeter, read_smeter, "SMETER"},
 	{&progStatus.poll_frequency, read_vfo, "FREQ"},
-	{NULL, NULL}
+	{NULL, NULL, ""}
 };
 
 POLL_PAIR RX_poll_group_2[] = {
 	{&progStatus.poll_mode, read_mode, "MODE"},
 	{&progStatus.poll_bandwidth, read_bandwidth, "BW"},
 //	{&progStatus.poll_vfoAorB, read_vfoAorB, "A/B"},
-	{NULL, NULL}
+	{NULL, NULL, ""}
 };
 
 POLL_PAIR RX_poll_group_3[] = {
@@ -1637,7 +1642,7 @@ POLL_PAIR TX_poll_pairs[] = {
 	{&progStatus.poll_alc, read_idd, "idd"},
 	{&progStatus.poll_mode, read_voltmeter, "voltage"},
 	{&progStatus.poll_split, read_split, "split"},
-	{NULL, NULL}
+	{NULL, NULL, ""}
 };
 
 static int menu1 = 0, menu2 = 1;
@@ -1719,57 +1724,40 @@ void * serial_thread_loop(void *d)
 				read_vfo();
 			}
 
-			if (!bypass_serial_thread_loop) {
+			if ( tx_polling->poll != NULL && *(tx_polling->poll) ) {
 				guard_lock lk(&mutex_serial);
-				if (tx_polling->poll == NULL)
-					tx_polling = &TX_poll_pairs[0];
-				if (*(tx_polling->poll)) {
-					(tx_polling->pollfunc)();
-				}
-				++tx_polling;
+				(tx_polling->pollfunc)();
 			}
+			if ((++tx_polling)->poll == NULL)
+				tx_polling = &TX_poll_pairs[0];
 
 		} else {
+
 			if (!isRX) {
 				isRX = true;
 				Fl::awake(update_UI_PTT);
 				Fl::awake(zeroXmtMeters, 0);
 			}
 
-			while (rx_poll_group_1->poll != NULL) {
-				if (bypass_serial_thread_loop)
-					break;
-				if (*(rx_poll_group_1->poll)) {
-					guard_lock lk(&mutex_serial);
-					(rx_poll_group_1->pollfunc)();
-				}
-				++rx_poll_group_1;
+			if ( rx_poll_group_1->poll != NULL && *(rx_poll_group_1->poll) ) {
+				guard_lock lk(&mutex_serial);
+				(rx_poll_group_1->pollfunc)();
 			}
-			if (rx_poll_group_1->poll == NULL)
+			if ((++rx_poll_group_1)->poll == NULL)
 				rx_poll_group_1 = &RX_poll_group_1[0];
 
-			while (rx_poll_group_2->poll != NULL) {
-				if (bypass_serial_thread_loop)
-					break;
-				if (*(rx_poll_group_2->poll)) {
-					guard_lock lk(&mutex_serial);
-					(rx_poll_group_2->pollfunc)();
-				}
-				++rx_poll_group_2;
+			if ( rx_poll_group_2->poll != NULL && *(rx_poll_group_2->poll) ) {
+				guard_lock lk(&mutex_serial);
+				(rx_poll_group_2->pollfunc)();
 			}
-			if (rx_poll_group_2->poll == NULL)
+			if ((++rx_poll_group_2)->poll == NULL)
 				rx_poll_group_2 = &RX_poll_group_2[0];
 
-			while (rx_poll_group_3->poll != NULL) {
-				if (bypass_serial_thread_loop) 
-					break;
-				if (*(rx_poll_group_3->poll)) {
-					guard_lock lk(&mutex_serial);
-					(rx_poll_group_3->pollfunc)();
-				}
-				++rx_poll_group_3;
+			if ( rx_poll_group_3->poll != NULL && *(rx_poll_group_3->poll) ) {
+				guard_lock lk(&mutex_serial);
+				(rx_poll_group_3->pollfunc)();
 			}
-			if (rx_poll_group_3->poll == NULL)
+			if ((++rx_poll_group_3)->poll == NULL)
 				rx_poll_group_3 = &RX_poll_group_3[0];
 
 			if (menu1 < 9  && selrig->name_ == rig_QCXP.name_) {
@@ -2575,16 +2563,13 @@ void cbAttenuator()
 	guard_lock serial_lock(&mutex_serial);
 	trace(1, "cbAttenuator()");
 
-//	int chk = selrig->get_attenuator();
-	progStatus.attenuator = selrig->next_attenuator();
-	selrig->set_attenuator (progStatus.attenuator);
-//	MilliSleep(50);
-//	for (int n = 0; n < 100; n++) {
-//		chk = selrig->get_attenuator();
-//		if (chk == progStatus.attenuator) break;
-//		MilliSleep(progStatus.serial_post_write_delay);
-//		Fl::awake();
-//	}
+	selrig->set_attenuator ( progStatus.attenuator = selrig->next_attenuator() );
+
+	btnAttenuator->value( progStatus.attenuator > 0 ? 1 : 0);
+	btnAttenuator->label( selrig->ATT_label() );
+	btnAttenuator->redraw_label();
+	btnAttenuator->redraw();
+
 	return;
 }
 
@@ -2599,16 +2584,13 @@ void cbPreamp()
 	guard_lock serial_lock(&mutex_serial);
 	trace(1, "cbPreamp()");
 
-//	int chk = selrig->get_preamp();
-	progStatus.preamp = selrig->next_preamp();
-	selrig->set_preamp (progStatus.preamp);
-//	MilliSleep(5 + progStatus.serial_post_write_delay);
-//	for (int n = 0; n < 100; n++) {
-//		chk = selrig->get_preamp();
-//		if (chk == progStatus.preamp) break;
-//		MilliSleep(progStatus.serial_post_write_delay);
-//		Fl::awake();
-//	}
+	selrig->set_preamp ( progStatus.preamp = selrig->next_preamp() );
+
+	btnPreamp->value( progStatus.preamp > 0 ? 1 : 0);
+	btnPreamp->label( selrig->PRE_label() );
+	btnPreamp->redraw_label();
+	btnPreamp->redraw();
+
 	return;
 }
 

@@ -443,6 +443,7 @@ int tune_;
 		return atten_level;
 	}
 	virtual int  get_attenuator() {return atten_level;}
+	virtual const char *ATT_label() { return "ATT"; }
 
 	virtual void set_preamp(int val) {preamp_level = val;}
 	virtual int  next_preamp() { 
@@ -451,6 +452,7 @@ int tune_;
 		return preamp_level;
 	}
 	virtual int  get_preamp() {return preamp_level;}
+	virtual const char *PRE_label() { return "PRE"; }
 
 // CTCSS tones / offset
 	virtual void set_tones(int tx_tone, int rx_tone) { return; }

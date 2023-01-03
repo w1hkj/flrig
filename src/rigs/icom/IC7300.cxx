@@ -1755,6 +1755,19 @@ void RIG_IC7300::get_rf_min_max_step(double &min, double &max, double &step)
 	min = 0; max = 100; step = 1;
 }
 
+const char *RIG_IC7300::PRE_label()
+{
+	switch (preamp_level) {
+		case 0: default:
+			return "PRE"; break;
+		case 1:
+			return "Amp 1"; break;
+		case 2:
+			return "Amp 2"; break;
+	}
+	return "PRE";
+}
+
 int RIG_IC7300::next_preamp()
 {
 	if (atten_level == 1)
@@ -1762,6 +1775,7 @@ int RIG_IC7300::next_preamp()
 	switch (preamp_level) {
 		case 0: return 1;
 		case 1: return 2;
+		
 		case 2: return 0;
 	}
 	return 0;
@@ -1771,33 +1785,24 @@ void RIG_IC7300::set_preamp(int val)
 {
 	if (val) {
 		atten_level = 0;
-		atten_label("ATT", false);
 	}
 
 	cmd = pre_to;
 	cmd += '\x16';
 	cmd += '\x02';
 
-	preamp_level = val;
-	switch (val) {
-		case 1: 
-			preamp_label("Amp 1", true);
-			break;
-		case 2:
-			preamp_label("Amp 2", true);
-			break;
-		case 0:
-		default:
-			preamp_label("PRE", false);
-	}
-
-	cmd += (unsigned char)preamp_level;
+	cmd += (unsigned char)val;
 	cmd.append( post );
 	set_trace(1, "set_preamp");
 	waitFB(	(preamp_level == 0) ? "set Preamp OFF" :
 			(preamp_level == 1) ? "set Preamp Level 1" :
 			"set Preamp Level 2");
 	seth();
+	int tries = 50;
+	while (get_preamp() != val && tries) {
+		MilliSleep(1);
+		tries--;
+	}
 }
 
 int RIG_IC7300::get_preamp()
@@ -1817,29 +1822,24 @@ int RIG_IC7300::get_preamp()
 		size_t p = replystr.rfind(resp);
 		if (p != std::string::npos) {
 			preamp_level = replystr[p+6];
-			if (preamp_level == 1) {
-				preamp_label("Amp 1", preamp_level);
-			} else if (preamp_level == 2) {
-				preamp_label("Amp 2", preamp_level);
-			} else {
-				preamp_level = 0;
-				preamp_label("PRE", preamp_level);
-			}
 		}
 	}
 	return preamp_level;
+}
+
+const char *RIG_IC7300::ATT_label()
+{
+	if (atten_level == 1) return "20 dB";
+	return "ATT";
 }
 
 void RIG_IC7300::set_attenuator(int val)
 {
 	if (val) {
 		atten_level = 1;
-		atten_label("20 dB", atten_level);
 		preamp_level = 0;
-		preamp_label("PRE", 0);
 	} else {
 		atten_level = 0;
-		atten_label("ATT", atten_level);
 	}
 
 	cmd = pre_to;
@@ -1874,10 +1874,8 @@ int RIG_IC7300::get_attenuator()
 		if (p != std::string::npos) {
 			if (replystr[p+5] == 0x20) {
 				atten_level = 1;
-				atten_label("20 dB", atten_level);
 			} else {
 				atten_level = 0;
-				atten_label("ATT", atten_level);
 			}
 		}
 	}
