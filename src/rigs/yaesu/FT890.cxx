@@ -138,8 +138,8 @@ bool RIG_FT890::get_info()
 			afreq = afreq * 256 + (unsigned char)replystr[p + n];
 			bfreq = bfreq * 256 + (unsigned char)replystr[p + 14 + n];
 		}
-		afreq = afreq * 1.25;
-		bfreq = bfreq * 1.25;
+		afreq *= 10;
+		bfreq *= 10;
 		int md = replystr[p+5];
 		switch (md) {
 			case 0 : 
