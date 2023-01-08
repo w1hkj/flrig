@@ -51,6 +51,9 @@ public:
 	void set_attenuator(int val);
 	int  get_attenuator();
 
+//	const char * PRE_label();
+	const char * ATT_label();
+
 	int  get_smeter();
 	void set_noise(bool on);
 	int  get_noise();

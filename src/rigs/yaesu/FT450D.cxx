@@ -630,11 +630,10 @@ int RIG_FT450D::get_attenuator()
 	gett("get_attenuator");
 
 	size_t p = replystr.rfind(rsp);
-	int val = attval;
+	atten_level = 0;
 	if (p != std::string::npos)
-		val = (replystr[p+3] == '3' ? 1 : 0);
-	attval = val;
-	return val;
+		atten_level = (replystr[p+3] == '3' ? 1 : 0);
+	return atten_level;
 }
 
 static int preval = 0;
@@ -663,15 +662,24 @@ int RIG_FT450D::get_preamp()
 	if (replystr.empty()) return preval;
 
 	size_t p = replystr.rfind("PA00;");
-	if (p != std::string::npos) {
+	preval = 0;
+	if (p != std::string::npos)
 		preval = 1;
-		preamp_label("IPO", true);
-	} else if (replystr.rfind("PA01;") != std::string::npos) {
-		preval = 0;
-		preamp_label("IPO", false);
-	}
-
 	return preval;
+}
+
+const char *RIG_FT450D::ATT_label()
+{
+	if (atten_level == 1)
+		return "12 dB";
+	return "ATT";
+}
+
+const char *RIG_FT450D::PRE_label()
+{
+	if (preamp_level == 1)
+		return "Amp 1";
+	return "IPO";
 }
 
 int RIG_FT450D::adjust_bandwidth(int val)

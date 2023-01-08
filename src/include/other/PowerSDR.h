@@ -81,10 +81,12 @@ enum PowerSDRMODES { LSB, USB, DSB, CWL, CWU, FM, AM, DIGU, SPEC, DIGL, SAM, DRM
 		min = 5; max =  100; step = 1; }
 
 	void tune_rig(int val);
-    int get_tune();
+	int get_tune();
+
 //	void set_preamp(int val);
 //	int  get_preamp();
-//  int next_preamp();
+//	int next_preamp();
+//	const char * PRE_label();
 
 	int  get_agc();
 	int  incr_agc();

@@ -111,6 +111,9 @@ public:
 	int  next_preamp();
 	int  get_preamp();
 
+	const char * PRE_label();
+//	const char * ATT_label();
+
 //	void set_attenuator(int val);
 //	int  next_attenuator();
 //	int  get_attenuator();

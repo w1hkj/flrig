@@ -713,6 +713,12 @@ void read_compression()
 // preamp - attenuator
 void update_preamp(void *d)
 {
+	if (selrig->name_ == rig_FLEX1500.name_ ) {
+		cbo_preamp->index(progStatus.preamp);
+		cbo_preamp->redraw();
+		return;
+	}
+
 	btnPreamp->value(progStatus.preamp > 0 ? 1 : 0);
 	btnPreamp->label(selrig->PRE_label());
 	btnPreamp->redraw_label();
@@ -721,6 +727,11 @@ void update_preamp(void *d)
 
 void update_attenuator(void *d)
 {
+	if (selrig->name_ == rig_IC7610.name_) {
+		ic7610att->index(progStatus.index_ic7610att);
+		return;
+	}
+
 	btnAttenuator->value(progStatus.attenuator > 0 ? 1 : 0);
 	btnAttenuator->label(selrig->ATT_label());
 	btnAttenuator->redraw_label();
@@ -2653,6 +2664,11 @@ void cbPreamp()
 {
 	trace(1, "cbPreamp()");
 
+	if (selrig->name_ == rig_FLEX1500.name_) {
+		selrig->set_preamp(progStatus.preamp = cbo_preamp->index());
+		return;
+	}
+
 	selrig->set_preamp ( progStatus.preamp = selrig->next_preamp() );
 
 	btnPreamp->value( progStatus.preamp > 0 ? 1 : 0);
@@ -2945,10 +2961,11 @@ void index_att()
 	selrig->set_index_att(progStatus.index_ic7610att);
 }
 
-void set_ic7610_index_att(void *)
-{
-	ic7610att->index(progStatus.index_ic7610att);
-}
+//void set_ic7610_index_att(void *)
+//{
+//	ic7610att->index(progStatus.index_ic7610att);
+//}
+
 
 //----------------------------------------------------------------------
 
@@ -3912,44 +3929,6 @@ void nb_label(const char * l, int on)
 	nb_state_ = on;
 	progStatus.noise = on;
 	Fl::awake(do_nb_label);
-}
-
-// preamp label
-static std::string preamp_label_;
-static bool preamp_state_;
-
-void do_preamp_label(void *)
-{
-	btnPreamp->value(preamp_state_ ? 1 : 0);
-	btnPreamp->label(preamp_label_.c_str());
-	btnPreamp->redraw_label();
-}
-
-void preamp_label(const char * l, int on)
-{
-	preamp_label_ = l;
-	preamp_state_ = on;
-	progStatus.preamp = on;
-	Fl::awake(do_preamp_label);
-}
-
-// atten label
-static std::string atten_label_;
-static bool atten_state_;
-
-void do_atten_label(void *)
-{
-	btnAttenuator->value(atten_state_ ? 1 : 0);
-	btnAttenuator->label(atten_label_.c_str());
-	btnAttenuator->redraw_label();
-}
-
-void atten_label(const char * l, int on)
-{
-	atten_label_ = l;
-	atten_state_ = on;
-	progStatus.attenuator = on;
-	Fl::awake(do_atten_label);
 }
 
 // break-in label

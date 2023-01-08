@@ -553,7 +553,6 @@ void RIG_IC7800::set_attenuator(int val)
 	atten_level = val;
 
 	int cmdval = atten_level;
-	atten_label(atten_labels[atten_level], true);
 	cmd = pre_to;
 	cmd += '\x11';
 	cmd += cmdval;
@@ -568,13 +567,17 @@ int RIG_IC7800::get_attenuator()
 	cmd += '\x11';
 	cmd.append( post );
 	if (sendICcommand(cmd,7)) {
-		if (replystr[4] == 0x06) {
+		if (replystr[4] == 0x06)
 			atten_level = replystr[5];
-			if (atten_level >= 0 && atten_level <= 7)
-				atten_label(atten_labels[atten_level], true);
-		}
 	}
 	return atten_level;
+}
+
+const char *RIG_IC7800::ATT_label()
+{
+	if (atten_level >= 0 && atten_level <= 7)
+		return atten_labels[atten_level];
+	return atten_labels[0];
 }
 
 void RIG_IC7800::set_compression(int on, int val)

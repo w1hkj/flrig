@@ -51,11 +51,15 @@ public:
 	virtual int  get_noise_reduction();
 	virtual void set_noise_reduction_val(int val);
 	virtual int  get_noise_reduction_val();
+
 	virtual void set_attenuator(int val);
 	virtual int  get_attenuator();
 	virtual int  next_preamp();
 	virtual void set_preamp(int val);
 	virtual int  get_preamp();
+
+	virtual const char * PRE_label();
+	virtual const char * ATT_label();
 
 	virtual int  get_modetype(int n);
 	virtual void set_modeA(int val);
@@ -125,6 +129,9 @@ public:
 	virtual int  get_attenuator();
 	virtual void set_preamp(int val);
 	virtual int  get_preamp();
+
+	virtual const char * PRE_label();
+	virtual const char * ATT_label();
 
 	virtual void set_mic_gain(int val);
 	virtual int  get_mic_gain();

@@ -79,6 +79,9 @@ public:
 	int  get_preamp();
 	int  next_preamp();
 
+	const char * PRE_label();
+	const char * ATT_label();
+
 	int  get_smeter();
 
 	void set_noise(bool on);

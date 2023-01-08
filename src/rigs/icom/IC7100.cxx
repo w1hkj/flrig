@@ -977,12 +977,9 @@ void RIG_IC7100::get_mic_gain_min_max_step(int &min, int &max, int &step)
 void RIG_IC7100::set_attenuator(int val)
 {
    if (val) {
-		atten_label("12 dB", true);
 		atten_level = 1;
-		preamp_label("PRE", false);
 	} else {
 		atten_level = 0;
-		atten_label("ATT", false);
 	}
 
 	cmd = pre_to;
@@ -1010,10 +1007,8 @@ int RIG_IC7100::get_attenuator()
 		size_t p = replystr.rfind(resp);
 		if (replystr[p+5] == 0x12) {
 			atten_level = 1;
-			atten_label("12 dB", true);
 		} else {
 			atten_level = 0;
-			atten_label("ATT", false);
 		}
 	}
 	return atten_level;
@@ -1049,11 +1044,6 @@ int RIG_IC7100::next_preamp()
 
 void RIG_IC7100::set_preamp(int val)
 {
-	if (val) {
-		atten_level = 0;
-		atten_label("ATT", false);
-	}
-
 	cmd = pre_to;
 	cmd += '\x16';
 	cmd += '\x02';
@@ -1061,17 +1051,6 @@ void RIG_IC7100::set_preamp(int val)
 	preamp_level = val;
 	if (inuse == onA && A.freq > 100000000 && val > 1) val = 1;
 	if (inuse == onB && B.freq > 100000000 && val > 1) val = 1;
-	switch (val) {
-		case 1: 
-			preamp_label("Pre 1", true);
-			break;
-		case 2:
-			preamp_label("Pre 2", true);
-			break;
-		case 0:
-		default:
-			preamp_label("Pre", false);
-	}
 
 	cmd += (unsigned char)preamp_level;
 	cmd.append( post );
@@ -1099,16 +1078,27 @@ int RIG_IC7100::get_preamp()
 		size_t p = replystr.rfind(resp);
 		if (p != std::string::npos)
 			preamp_level = replystr[p+6];
-		if (preamp_level == 1) {
-			preamp_label("Pre 1", true);
-		} else if (preamp_level == 2) {
-			preamp_label("Pre 2", true);
-		} else {
-			preamp_label("Pre", false);
-			preamp_level = 0;
-		}
 	}
 	return preamp_level;
+}
+
+const char *RIG_IC7100::PRE_label()
+{
+	switch (preamp_level) {
+		case 0: default:
+			return "PRE"; break;
+		case 1:
+			return "Pre 1"; break;
+		case 2:
+			return "Pre 2"; break;
+	}
+	return "PRE";
+}
+
+const char *RIG_IC7100::ATT_label()
+{
+	if (atten_level == 1) return "12 dB";
+	return "ATT";
 }
 
 void RIG_IC7100::set_compression(int on, int val)

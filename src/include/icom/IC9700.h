@@ -156,6 +156,9 @@ public:
 	int get_preamp();
 	int next_preamp();
 
+	const char * PRE_label();
+	const char * ATT_label();
+
 	void set_pbt_inner(int val);
 	void set_pbt_outer(int val);
 

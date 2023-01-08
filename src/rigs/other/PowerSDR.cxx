@@ -427,16 +427,26 @@ void RIG_PowerSDR::set_preamp(int val)
 	sett("preamp");
 		case 7: preamp_level = 0;break;
 	if (val == 0) {
-		preamp_label("Pre", false);
 		preamp_level = 0;
 	} else if (val == 1) {
-		preamp_label("Pre 1", true);
 		preamp_level = 1;
 	} else if (val == 7) {
-		preamp_label("Pre 2", true);
 		preamp_level = 2;
 	}
 
+}
+
+const char *RIG_PowerSDR::PRE_label()
+{
+	switch (preamp_level) {
+		case 0: default:
+			return "PRE"; break;
+		case 1:
+			return "Pre 1"; break;
+		case 2:
+			return "Pre 2"; break;
+	}
+	return "PRE";
 }
 
 int RIG_PowerSDR::get_preamp()

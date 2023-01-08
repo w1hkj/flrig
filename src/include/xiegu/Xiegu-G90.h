@@ -64,6 +64,9 @@ public:
 //	int  next_preamp();
 	int  get_preamp();
 
+	const char * PRE_label();
+	const char * ATT_label();
+
 //	void set_mic_gain(int v);
 //	int  get_mic_gain();
 //	void get_mic_gain_min_max_step(int &min, int &max, int &step);

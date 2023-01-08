@@ -121,6 +121,9 @@ public:
 	void set_preamp(int val);
 	int  get_preamp();
 
+	const char * PRE_label();
+	const char * ATT_label();
+
 	void set_noise_reduction(int val);
 	int  get_noise_reduction();
 	void set_noise_reduction_val(int val);

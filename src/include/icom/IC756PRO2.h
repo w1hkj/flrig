@@ -99,6 +99,9 @@ public:
 	void set_preamp(int val);
 	int  get_preamp();
 
+	const char * PRE_label();
+	const char * ATT_label();
+
 	int  adjust_bandwidth(int);
 	int  def_bandwidth(int);
 	int  get_swr();

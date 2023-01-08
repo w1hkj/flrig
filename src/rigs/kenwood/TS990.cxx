@@ -468,17 +468,13 @@ void RIG_TS990::set_attenuator(int val)
 	if (inuse == onB) {
 		if (atten_level == 1) {			// If attenuator level = 0 (off)
 			cmd = "RA11;";				// this is the command...
-			atten_label("Att 6", true);	// show it in the button...
 		}
 		else if (atten_level == 2) {		// If attenuator level = 1 (6dB)
 			cmd = "RA12;";
-			atten_label("Att 12", true);
 		} else if (atten_level == 3) {		// if it's 12dB
 			cmd = "RA13;";
-			atten_label("Att 18", true);
 		} else if (atten_level == 0) {		// If it's 18dB
 			cmd = "RA10;";
-			atten_label("Att", false);
 		}
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set Att B", cmd, "");
@@ -486,17 +482,13 @@ void RIG_TS990::set_attenuator(int val)
 	} else {
 		if (atten_level == 1) {
 			cmd = "RA01;";
-			atten_label("Att 6", true);
 		}
 		else if (atten_level == 2) {
 			cmd = "RA02;";
-			atten_label("Att 12", true);
 		} else if (atten_level == 3) {
 			cmd = "RA03;";
-			atten_label("Att 18", true);
 		} else if (atten_level == 0) {
 			cmd = "RA00;";
-			atten_label("Att", false);
 		}
 		sendCommand(cmd);
 		showresp(INFO, ASC, "set Att A", cmd, "");
@@ -520,19 +512,15 @@ int RIG_TS990::get_attenuator() {
 		if (replystr[p + 2] == '1' && replystr[p + 3] == '0') {
 			att_on = 0;						// Attenuator is OFF
 			atten_level = 0;					// remember it...
-			atten_label("Att", false);		// show it...
 		} else if (replystr[p + 2] == '1' && replystr[p + 3] == '1') {
 			att_on = 1;						// Attenuator is ON, 6dB
 			atten_level = 1;					// remember the level
-			atten_label("Att 6", true);		// show it...
 		} else if (replystr[p + 2] == '1' && replystr[p + 3] == '2') {
 			att_on = 1;						// .. still ON, 12dB
 			atten_level = 2;					// remember this level
-			atten_label("Att 12", true);	// show it.
 		} else if (replystr[p + 2] == '1' && replystr[p + 3] == '3') {
 			att_on = 1;						// .. still ON 18dB
 			atten_level = 3;					// remember...
-			atten_label("Att 18", true);	// show this too..
 		}
 	} else {
 		cmd = "RA0;";
@@ -544,19 +532,15 @@ int RIG_TS990::get_attenuator() {
 		if (replystr[p + 2] == '0' && replystr[p + 3] == '0') {
 			att_on = 0;
 			atten_level = 0;
-			atten_label("Att", false);
 		} else if (replystr[p + 2] == '0' && replystr[p + 3] == '1') {
 			att_on = 1;
 			atten_level = 1;
-			atten_label("Att 6", true);
 		} else if (replystr[p + 2] == '0' && replystr[p + 3] == '2') {
 			att_on = 1;
 			atten_level = 2;
-			atten_label("Att 12", true);
 		} else if (replystr[p + 2] == '0' && replystr[p + 3] == '3') {
 			att_on = 1;
 			atten_level = 3;
-			atten_label("Att 18", true);
 		}
 	}
 	return att_on;
@@ -624,6 +608,21 @@ int RIG_TS990::get_preamp()
 
 	return preamp_level;
 }
+
+const char *RIG_TS990::PRE_label()
+{
+	if (preamp_level == 1) return "Pre 1";
+	return "PRE";
+}
+
+const char *RIG_TS990::ATT_label()
+{
+	if (atten_level == 1) return "6 dB";
+	if (atten_level == 2) return "12 dB";
+	if (atten_level == 3) return "18 dB";
+	return "ATT";
+}
+
 
 //==============================================================================
 

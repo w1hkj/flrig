@@ -441,12 +441,6 @@ void RIG_TT588::set_attenuator(int val)
 	cmd = TT588setATT;
 
 	cmd[2] = '0' + atten_level;
-	switch (atten_level) {
-		case 0: atten_label("0 dB", false); break;
-		case 1: atten_label("6 dB", true); break;
-		case 2: atten_label("12 dB", true); break;
-		case 3: atten_label("18 dB", true); break;
-	}
 	sendCommand(cmd);
 	showresp(WARN, HEX, "set att", cmd, replystr);
 }
@@ -462,13 +456,16 @@ int RIG_TT588::get_attenuator()
 		if (p != std::string::npos) val = (replystr[p + 1] - '0');
 	}
 	if (atten_level != val) atten_level = val;
-	switch (atten_level) {
-		case 0: atten_label("0 dB", false); break;
-		case 1: atten_label("6 dB", true); break;
-		case 2: atten_label("12 dB", true); break;
-		case 3: atten_label("18 dB", true); break;
-	}
 	return atten_level;
+}
+
+const char *RIG_TT588::ATT_label()
+{
+	if (atten_level == 0) return "0 dB";
+	if (atten_level == 1) return "6 dB";
+	if (atten_level == 2) return "12 dB";
+	if (atten_level == 3) return "18 dB";
+	return "ATT";
 }
 
 int RIG_TT588::get_smeter()

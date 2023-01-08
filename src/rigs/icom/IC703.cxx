@@ -287,12 +287,6 @@ int  RIG_IC703::next_preamp()
 void RIG_IC703::set_preamp(int val)
 {
 	preamp_level = val;
-	if (preamp_level == 1)
-		preamp_label("Pre 1", true);
-	else if (preamp_level == 2)
-		preamp_label("Pre 2", true);
-	else if (preamp_level == 0)
-		preamp_label("Pre", false);
 
 	cmd = pre_to;
 	cmd += '\x16';
@@ -314,19 +308,29 @@ int RIG_IC703::get_preamp()
 	if (waitFOR(8, "get preamp")) {
 		size_t p = replystr.rfind(resp);
 		if (p != std::string::npos) {
-			if (replystr[p+6] == 0x01) {
-				preamp_label("Pre 1", true);
-				preamp_level = 1;
-			} else if (replystr[p+6] == 0x02) {
-				preamp_label("Pre 2", true);
-				preamp_level = 2;
-			} else {
-				preamp_label("Pre", false);
-				preamp_level = 0;
-			}
+			preamp_level = replystr[p+6];
 		}
 	}
 	return preamp_level;
+}
+
+const char *RIG_IC703::PRE_label()
+{
+	switch (preamp_level) {
+		case 0: default:
+			return "PRE"; break;
+		case 1:
+			return "Pre 1"; break;
+		case 2:
+			return "Pre 2"; break;
+	}
+	return "PRE";
+}
+
+const char *RIG_IC703::ATT_label()
+{
+	if (atten_level == 1) return "20 dB";
+	return "ATT";
 }
 
 int RIG_IC703::get_smeter()

@@ -1462,10 +1462,8 @@ int  RIG_IC9700::agc_val()
 void RIG_IC9700::set_attenuator(int val)
 {
 	if (val) {
-		atten_label("10 dB", true);
 		atten_level = 1;
 	} else {
-		atten_label("ATT", false);
 		atten_level = 0;
 	}
 
@@ -1497,11 +1495,9 @@ int RIG_IC9700::get_attenuator()
 		size_t p = replystr.rfind(resp);
 		if (p != std::string::npos) {
 			if (!replystr[p+5]) {
-				atten_label("ATT", false);
 				atten_level = 0;
 				return 0;
 			} else {
-				atten_label("10 dB", true);
 				atten_level = 1;
 				return 1;
 			}
@@ -1525,31 +1521,12 @@ int RIG_IC9700::next_preamp()
 
 void RIG_IC9700::set_preamp(int val)
 {
+	preamp_level = val;
+
 	cmd = pre_to;
 	cmd += '\x16';
 	cmd += '\x02';
-
-	switch (val) {
-		default:
-		case 0 :
-			preamp_label("P0/E0", false);
-			preamp_level = 0;
-			break;
-		case 1 :
-			preamp_label("P1/E0", true);
-			preamp_level = 1;
-			break;
-		case 2 :
-			preamp_label("P0/E1", true);
-			preamp_level = 2;
-			break;
-		case 3 :
-			preamp_label("P1/E1", true);
-			preamp_level = 3;
-			break;
-	}
 	cmd += preamp_level;
-
 	cmd.append( post );
 	waitFB("set Pre");
 
@@ -1569,31 +1546,37 @@ int RIG_IC9700::get_preamp()
 	cmd.append( post );
 	if (waitFOR(8, "get Pre")) {
 		size_t p = replystr.rfind(resp);
-		if (p != std::string::npos) {
-			switch (replystr[p+6]) {
-			default:
-			case 0 :
-				preamp_label("P0/E0", false);
-				preamp_level = 0;
-				break;
-			case 1 :
-				preamp_label("P1/E0", true);
-				preamp_level = 1;
-				break;
-			case 2 :
-				preamp_label("P0/E1", true);
-				preamp_level = 2;
-				break;
-			case 3 :
-				preamp_label("P1/E1", true);
-				preamp_level = 3;
-				break;
-			}
-		}
+		if (p != std::string::npos)
+			preamp_level = replystr[p+6];
 	}
 	get_trace(2, "get_preamp()", str2hex(replystr.c_str(), replystr.length()));
 
 	return preamp_level;
+}
+
+const char *RIG_IC9700::PRE_label()
+{
+	switch (preamp_level) {
+		case 0 : default:
+			break;
+		case 1 :
+			return("P1/E0");
+			break;
+		case 2 :
+			return("P0/E1");
+			break;
+		case 3 :
+			return("P1/E1");
+			break;
+	}
+	return("P0/E0");
+}
+
+const char *RIG_IC9700::ATT_label()
+{
+	if (atten_level == 1)
+		return("10 dB");
+	return "ATT";
 }
 
 // Tranceiver PTT on/off

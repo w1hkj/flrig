@@ -1524,27 +1524,11 @@ int RIG_IC705::next_preamp()
 
 void RIG_IC705::set_preamp(int val)
 {
-	if (val) {
-		atten_level = 0;
-		atten_label("ATT", false);
-	}
-
 	cmd = pre_to;
 	cmd += '\x16';
 	cmd += '\x02';
 
 	preamp_level = val;
-	switch (val) {
-		case 1:
-			preamp_label("Amp 1", true);
-			break;
-		case 2:
-			preamp_label("Amp 2", true);
-			break;
-		case 0:
-		default:
-			preamp_label("PRE", false);
-	}
 
 	cmd += (unsigned char)preamp_level;
 	cmd.append( post );
@@ -1565,14 +1549,6 @@ int RIG_IC705::get_preamp()
 		size_t p = replystr.rfind(resp);
 		if (p != std::string::npos) {
 			preamp_level = replystr[p+6];
-			if (preamp_level == 1) {
-				preamp_label("Amp 1", true);
-			} else if (preamp_level == 2) {
-				preamp_label("Amp 2", true);
-			} else {
-				preamp_label("PRE", false);
-				preamp_level = 0;
-			}
 		}
 	}
 	return preamp_level;
@@ -1581,12 +1557,9 @@ int RIG_IC705::get_preamp()
 void RIG_IC705::set_attenuator(int val)
 {
 	if (val) {
-		atten_label("20 dB", true);
 		atten_level = 1;
-		preamp_label("PRE", false);
 	} else {
 		atten_level = 0;
-		atten_label("ATT", false);
 	}
 
 	cmd = pre_to;
@@ -1613,17 +1586,34 @@ int RIG_IC705::get_attenuator()
 		size_t p = replystr.rfind(resp);
 		if (p != std::string::npos) {
 			if (replystr[p+5] == 0x20) {
-				atten_label("20 dB", true);
 				atten_level = 1;
 				return 1;
 			} else {
-				atten_label("ATT", false);
 				atten_level = 0;
 				return 0;
 			}
 		}
 	}
 	return 0;
+}
+
+const char *RIG_IC705::PRE_label()
+{
+	switch (preamp_level) {
+		case 0: default:
+			return "PRE"; break;
+		case 1:
+			return "Pre 1"; break;
+		case 2:
+			return "Pre 2"; break;
+	}
+	return "PRE";
+}
+
+const char *RIG_IC705::ATT_label()
+{
+	if (atten_level == 1) return "20 dB";
+	return "ATT";
 }
 
 void RIG_IC705::set_noise(bool val)

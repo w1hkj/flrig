@@ -625,11 +625,6 @@ int  RIG_FT991::next_attenuator()
 void RIG_FT991::set_attenuator(int val)
 {
 	atten_level = val;
-	if (atten_level == 1) {
-		atten_label("12 dB", true);
-	} else if (atten_level == 0) {
-		atten_label("Att", false);
-	}
 	cmd = "RA00;";
 	cmd[3] += atten_level;
 	sendCommand(cmd);
@@ -646,12 +641,6 @@ int RIG_FT991::get_attenuator()
 	if (p == std::string::npos) return progStatus.attenuator;
 	if (p + 3 >= replystr.length()) return progStatus.attenuator;
 	atten_level = replystr[p+3] - '0';
-	if (atten_level == 1) {
-		atten_label("12 dB", true);
-	} else {
-		atten_level = 0;
-		atten_label("Att", false);
-	}
 	return atten_level;
 }
 
@@ -669,13 +658,6 @@ void RIG_FT991::set_preamp(int val)
 {
 	preamp_level = val;
 	cmd = "PA00;";
-	if (preamp_level == 1) {
-		preamp_label("Amp 1", true);
-	} else if (preamp_level == 2) {
-		preamp_label("Amp 2", true);
-	} else if (preamp_level == 0) {
-		preamp_label("IPO", false);
-	}
 	cmd[3] = '0' + preamp_level;
 	sendCommand (cmd);
 	showresp(WARN, ASC, "SET preamp", cmd, replystr);
@@ -690,15 +672,23 @@ int RIG_FT991::get_preamp()
 	size_t p = replystr.rfind(rsp);
 	if (p != std::string::npos)
 		preamp_level = replystr[p+3] - '0';
-	if (preamp_level == 1) {
-		preamp_label("Amp 1", true);
-	} else if (preamp_level == 2) {
-		preamp_label("Amp 2", true);
-	} else {
-		preamp_label("IPO", false);
-		preamp_level = 0;
-	}
 	return preamp_level;
+}
+
+const char *RIG_FT991::ATT_label()
+{
+	if (atten_level == 1)
+		return "12 dB";
+	return "ATT";
+}
+
+const char *RIG_FT991::PRE_label()
+{
+	if (preamp_level == 1)
+		return "Amp 1";
+	if (preamp_level == 2)
+		return "Amp 2";
+	return "IPO";
 }
 
 int RIG_FT991::adjust_bandwidth(int val)

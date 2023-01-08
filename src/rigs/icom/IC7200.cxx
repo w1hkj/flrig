@@ -720,11 +720,8 @@ int RIG_IC7200::get_noise_reduction_val()
 void RIG_IC7200::set_attenuator(int val)
 {
 	if (val) {
-		atten_label("20 dB", true);
 		atten_level = 1;
-		set_preamp(0);
 	} else {
-		atten_label("ATT", false);
 		atten_level = 0;
 	}
 
@@ -739,8 +736,9 @@ void RIG_IC7200::set_attenuator(int val)
 
 int RIG_IC7200::next_attenuator()
 {
-	if (atten_level) return 0;
-	return 1;
+	if (atten_level)
+		atten_level = 0;
+	return atten_level;
 }
 
 int RIG_IC7200::get_attenuator()
@@ -757,20 +755,14 @@ int RIG_IC7200::get_attenuator()
 		size_t p = replystr.rfind(resp);
 		if (p != std::string::npos) {
 			if (!replystr[p+5]) {
-				atten_label("ATT", false);
 				atten_level = 0;
-				geth();
-				return 0;
 			} else {
-				atten_label("20 dB", true);
 				atten_level = 1;
-				geth();
-				return 1;
 			}
 		}
+		geth();
 	}
-	geth();
-	return 0;
+	return atten_level;
 }
 
 int RIG_IC7200::next_preamp()
@@ -783,14 +775,8 @@ int RIG_IC7200::next_preamp()
 void RIG_IC7200::set_preamp(int val)
 {
 	if (val) {
-		preamp_label("Pre ON", true);
 		preamp_level = 1;
-		if (atten_level == 1) {
-			atten_label("ATT", false);
-			atten_level = 0;
-		}
 	} else {
-		preamp_label("Pre", false);
 		preamp_level = 0;
 	}
 
@@ -818,16 +804,29 @@ int RIG_IC7200::get_preamp()
 		size_t p = replystr.rfind(resp);
 		if (p != std::string::npos) {
 			if (replystr[p+6] == 0x01) {
-				preamp_label("Pre ON", true);
-				preamp_level = 1;
-			} else {
-				preamp_label("Pre", false);
-				preamp_level = 0;
+				preamp_level = replystr[p+6];
 			}
 		}
 	}
 	geth();
 	return preamp_level; //progStatus.preamp;
+}
+
+const char *RIG_IC7200::PRE_label()
+{
+	switch (preamp_level) {
+		case 0: default:
+			return "PRE"; break;
+		case 1:
+			return "P ON"; break;
+	}
+	return "PRE";
+}
+
+const char *RIG_IC7200::ATT_label()
+{
+	if (atten_level == 1) return "20 dB";
+	return "ATT";
 }
 
 void RIG_IC7200::set_rf_gain(int val)

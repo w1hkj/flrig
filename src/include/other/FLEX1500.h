@@ -68,11 +68,11 @@ enum FLEX1500MODES { LSB, USB, DSB, CWL, CWU, FM, AM, DIGU, SPEC, DIGL, SAM, DRM
 	int  set_widths(int val);
 
 	int  get_smeter();
-//	int  get_swr();
-//	int  get_alc();
+	int  get_swr();
+	int  get_alc();
+	int  get_power_out();
 //	void select_swr();
 //	void select_alc();
-//	int  get_power_out();
 
 	double get_power_control();
 //	void set_volume_control(int val);
@@ -82,10 +82,13 @@ enum FLEX1500MODES { LSB, USB, DSB, CWL, CWU, FM, AM, DIGU, SPEC, DIGL, SAM, DRM
 		min = 5; max =  100; step = 1; }
 
 	void tune_rig(int val);
-    int get_tune();
-//	void set_preamp(int val);
-//	int  get_preamp();
-//  int next_preamp();
+	int get_tune();
+
+	int  get_preamp();
+	void set_preamp(int);
+
+//	int next_preamp();
+//	const char * PRE_label();
 
 //	void set_if_shift(int val);
 //	bool get_if_shift(int &val);

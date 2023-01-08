@@ -136,6 +136,9 @@ extern Fl_Box *bx_row1_expander2;
 extern Fl_Group *grp_row2;
 extern Fl_Group *grp_row2a;
 
+extern Fl_ComboBox *cbo_attenuator;
+extern Fl_ComboBox *cbo_preamp;
+
 extern Fl_Wheel_Value_Slider *sldrSQUELCH;
 extern Fl_Wheel_Value_Slider *sldrMICGAIN;
 extern Fl_Box *bx_sep2a;

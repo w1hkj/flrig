@@ -1585,17 +1585,6 @@ void RIG_IC7610::set_preamp(int val)
 	cmd += '\x02';
 
 	preamp_level = val;
-	switch (val) {
-		case 1: 
-			preamp_label("Amp 1", true);
-			break;
-		case 2:
-			preamp_label("Amp 2", true);
-			break;
-		case 0:
-		default:
-			preamp_label("Pre", false);
-	}
 
 	cmd += (unsigned char)preamp_level;
 	cmd.append( post );
@@ -1617,18 +1606,77 @@ int RIG_IC7610::get_preamp()
 		size_t p = replystr.rfind(resp);
 		if (p != std::string::npos) {
 			preamp_level = replystr[p+6];
-			if (preamp_level == 1) {
-				preamp_label("Amp 1", true);
-			} else if (preamp_level == 2) {
-				preamp_label("Amp 2", true);
-			} else {
-				preamp_label("Pre", false);
-				preamp_level = 0;
-			}
 		}
 	}
 	get_trace(2, "get_preamp() ", str2hex(replystr.c_str(), replystr.length()));
 	return preamp_level;
+}
+
+static char attval[] = {
+'\x00', '\x03', '\x06', '\x09', '\x12',
+'\x15', '\x18', '\x21', '\x24', '\x27',
+'\x30', '\x33', '\x36', '\x39', '\x42',
+'\x45' };
+
+std::string attstr[] = {
+"OFF","3db","6db","9db","12db","15db","18db","21db",
+"24db","27db","30db","33db","36db","39db","42db","45db"
+};
+
+void RIG_IC7610::set_index_att(int v)
+{
+	if (v < 0) return;
+	if (v >= (int)sizeof(attval)) return;
+	progStatus.index_ic7610att = v;
+
+	cmd.assign(pre_to);
+	cmd += '\x11';
+	cmd += attval[v];
+	cmd.append(post);
+	waitFB("SET attenuator");
+	set_trace(2, "set_index_att()", str2hex(cmd.c_str(), cmd.length()));
+}
+
+int RIG_IC7610::get_attenuator()
+{
+	cmd = pre_to;
+	cmd += '\x11';
+	cmd.append( post );
+	std::string resp = pre_fm;
+	resp += '\x11';
+	if (waitFOR(7, "get ATT")) {
+		size_t p = replystr.rfind(resp);
+		if (p != std::string::npos) {
+			atten_level = replystr[p+5];
+			size_t i = 0;
+			for (i = 0; i < sizeof(attval); i++) {
+				if (attval[i] == atten_level) {
+					progStatus.index_ic7610att = i;
+					break;
+				}
+			}
+		}
+	}
+	get_trace(2, "get_attenuator() ", str2hex(replystr.c_str(), replystr.length()));
+	return progStatus.index_ic7610att;
+}
+
+const char *RIG_IC7610::PRE_label()
+{
+	switch (preamp_level) {
+		case 0: default:
+			return "PRE"; break;
+		case 1:
+			return "Amp 1"; break;
+		case 2:
+			return "Amp 2"; break;
+	}
+	return "PRE";
+}
+
+const char *RIG_IC7610::ATT_label()
+{
+	return attstr[progStatus.index_ic7610att].c_str();
 }
 
 void RIG_IC7610::set_noise(bool val)
@@ -2148,50 +2196,6 @@ int RIG_IC7610::get_dual_watch()
 	get_trace(2, "get_dual_watch()", str2hex(replystr.c_str(), replystr.length()));
 	Fl::awake(set_ic7610_dual_watch);
 	return progStatus.dual_watch;
-}
-
-static char attval[] = {
-'\x00', '\x03', '\x06', '\x09', '\x12',
-'\x15', '\x18', '\x21', '\x24', '\x27',
-'\x30', '\x33', '\x36', '\x39', '\x42',
-'\x45' };
-
-void RIG_IC7610::set_index_att(int v)
-{
-	if (v < 0) return;
-	if (v >= (int)sizeof(attval)) return;
-
-	cmd.assign(pre_to);
-	cmd += '\x11';
-	cmd += attval[v];
-	cmd.append(post);
-	waitFB("SET attenuator");
-	set_trace(2, "set_index_att()", str2hex(cmd.c_str(), cmd.length()));
-}
-
-int RIG_IC7610::get_attenuator()
-{
-	cmd = pre_to;
-	cmd += '\x11';
-	cmd.append( post );
-	std::string resp = pre_fm;
-	resp += '\x11';
-	if (waitFOR(7, "get ATT")) {
-		size_t p = replystr.rfind(resp);
-		if (p != std::string::npos) {
-			atten_level = replystr[p+5];
-			size_t i = 0;
-			for (i = 0; i < sizeof(attval); i++) {
-				if (attval[i] == atten_level) {
-					progStatus.index_ic7610att = i;
-					Fl::awake(set_ic7610_index_att);
-					break;
-				}
-			}
-		}
-	}
-	get_trace(2, "get_attenuator() ", str2hex(replystr.c_str(), replystr.length()));
-	return progStatus.index_ic7610att;
 }
 
 // Read/Write band stack registers

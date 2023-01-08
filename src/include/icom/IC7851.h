@@ -68,6 +68,8 @@ public:
 	void set_attenuator( int val );
 	int  get_attenuator();
 
+	const char * ATT_label();
+
 	void set_mic_gain(int v);
 
 	void set_volume_control(int val);

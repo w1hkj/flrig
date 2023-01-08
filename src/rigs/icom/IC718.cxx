@@ -258,6 +258,7 @@ int RIG_IC718::get_smeter()
 
 void RIG_IC718::set_attenuator(int val)
 {
+	atten_level = val;
 	cmd = pre_to;
 	cmd += '\x11';
 	cmd += val ? '\x20' : '\x00';
@@ -352,6 +353,7 @@ int RIG_IC718::get_noise_reduction_val()
 
 void RIG_IC718::set_preamp(int val)
 {
+	preamp_level = val;
 	cmd = pre_to;
 	cmd += '\x16';
 	cmd += '\x02';
@@ -372,16 +374,26 @@ int RIG_IC718::get_preamp()
 	if (waitFOR(8, "get pre")) {
 		size_t p = replystr.rfind(resp);
 		if (p != std::string::npos) {
-			if (replystr[p+6] == 0x01) {
-				preamp_label("Pre", true);
-				return 1;
-			} else {
-				preamp_label("Pre", false);
-				return 0;
-			}
+			preamp_level = replystr[p+6];
 		}
 	}
 	return 0;
+}
+const char *RIG_IC718::PRE_label()
+{
+	switch (preamp_level) {
+		case 0: default:
+			return "PRE"; break;
+		case 1:
+			return "P ON"; break;
+	}
+	return "PRE";
+}
+
+const char *RIG_IC718::ATT_label()
+{
+	if (atten_level == 1) return "20 dB";
+	return "ATT";
 }
 
 void RIG_IC718::set_rf_gain(int val)

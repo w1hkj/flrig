@@ -81,11 +81,16 @@ public:
 	void set_PTT_control(int val);
 	int  get_PTT();
 	void tune_rig(int);
+
 	int  get_tune();
 	void set_attenuator(int val);
 	int  get_attenuator();
 	void set_preamp(int val);
 	int  get_preamp();
+
+	const char * ATT_label();
+	const char * PRE_label();
+
 	void set_if_shift(int val);
 	bool get_if_shift(int &val);
 	void get_if_min_max_step(int &min, int &max, int &step);

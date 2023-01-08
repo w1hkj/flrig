@@ -88,12 +88,16 @@ public:
 	virtual int  get_PTT();
 	virtual void tune_rig(int);
 	virtual int  get_tune();
+
 	virtual int  next_attenuator();
 	virtual void set_attenuator(int val);
 	virtual int  get_attenuator();
 	virtual int  next_preamp();
 	virtual void set_preamp(int val);
 	virtual int  get_preamp();
+
+	const char * ATT_label();
+	const char * PRE_label();
 
 	virtual void set_if_shift(int val);
 	virtual bool get_if_shift(int &val);

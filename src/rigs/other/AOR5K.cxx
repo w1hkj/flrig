@@ -372,23 +372,19 @@ void RIG_AOR5K::set_attenuator(int val)
 	switch (atten_level) {
 		case 1:
 			cmd = "AT1\r";
-			atten_label("10 dB", true);
 			break;
 		case 2:
 			cmd = "AT2\r";
-			atten_label("20 dB", true);
 			break;
 		case 22:
 			cmd = "ATF\r";
-			atten_label("AUTO", true);
 			break;
 		case 0:
 		default:
 			cmd = "AT0\r";
-			atten_label("0 dB", false);
 			break;
 	}
-	wait_char('\r', 1, AOR5K_WAIT_TIME, "set BW A", ASC);
+	wait_char('\r', 1, AOR5K_WAIT_TIME, "set attenuator", ASC);
 }
 
 int RIG_AOR5K::get_attenuator()
@@ -403,13 +399,19 @@ int RIG_AOR5K::get_attenuator()
 		atten_level = 22;
 	else atten_level = replystr[p + 3] - '0';
 
-	switch (atten_level) {
-		case 0:	atten_label("0 dB", false); break;
-		case 1: atten_label("10 dB", true); break;
-		case 2: atten_label("20 dB", true); break;
-		case 22: atten_label("AUTO", true); break;
-	}
 	return atten_level;
+}
+
+const char *RIG_AOR5K::ATT_label()
+{
+	switch (atten_level) {
+		default:
+		case 0:	return "0 dB"; break;
+		case 1: return "10 dB"; break;
+		case 2: return "20 dB"; break;
+		case 22: return "AUTO"; break;
+	}
+	return "0 dB";
 }
 
 //SM $ (S-meter Read; GET only)

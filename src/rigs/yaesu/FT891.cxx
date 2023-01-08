@@ -635,11 +635,6 @@ void RIG_FT891::set_preamp(int val)
 {
 	if (val) cmd = "PA01;";
 	else     cmd = "PA00;";
-	if (val) {
-		preamp_label("AMP", true);
-	} else {
-		preamp_label("IPO", false);
-	}
 	preamp_level = val;
 
 	set_trace(1, "set_preamp()");
@@ -659,14 +654,21 @@ int RIG_FT891::get_preamp()
 	size_t p = replystr.rfind(rsp);
 	if (p != std::string::npos)
 		preamp_level = replystr[p+3] - '0';
-
-	if (preamp_level == 1) {
-		preamp_label("Amp", true);
-	} else {
-		preamp_label("IPO", false);
-	}
-
 	return preamp_level;
+}
+
+const char *RIG_FT891::ATT_label()
+{
+	if (atten_level == 1)
+		return "12 dB";
+	return "ATT";
+}
+
+const char *RIG_FT891::PRE_label()
+{
+	if (preamp_level == 1)
+		return "Amp";
+	return "IPO";
 }
 
 int RIG_FT891::adjust_bandwidth(int val)

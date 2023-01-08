@@ -230,6 +230,9 @@ void TRACED(adjust_small_ui)
 	btn_tune_on_off->position( btn_tune_on_off->x(), y);
 	btn_tune_on_off->redraw();
 
+	cbo_preamp->resize( btnAttenuator->x(), btnAttenuator->y(), cbo_preamp->w(), btnAttenuator->h());
+	cbo_preamp->redraw();
+
 	if (selrig->has_noise_reduction) {
 		btnNOISE->show();
 	} else {
@@ -1907,12 +1910,19 @@ void TRACED(init_preamp_control)
 
 	if (selrig->has_preamp_control) {
 
-	   if (selrig->name_ == rig_FT891.name_) {
+		if (selrig->name_ == rig_FLEX1500.name_ ) {
+			btnAttenuator->hide();
+			btnPreamp->hide();
+			cbo_preamp->show();
+			return;
+		}
+
+		if (selrig->name_ == rig_FT891.name_) {
 			btnPreamp->label("IPO");
 			btnPreamp->redraw_label();
 		}
 
-   if (selrig->name_ == rig_PCR1000.name_) {
+		if (selrig->name_ == rig_PCR1000.name_) {
 			btnPreamp->label("AGC");
 			btnPreamp->redraw_label();
 		}

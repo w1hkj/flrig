@@ -1256,11 +1256,9 @@ int  RIG_IC9100::agc_val()
 void RIG_IC9100::set_attenuator(int val)
 {
 	if (val) {
-		atten_label("20 dB", true);
 		atten_level = 1;
 		set_preamp(0);
 	} else {
-		atten_label("ATT", false);
 		atten_level = 0;
 	}
 
@@ -1292,11 +1290,9 @@ int RIG_IC9100::get_attenuator()
 		size_t p = replystr.rfind(resp);
 		if (p != std::string::npos) {
 			if (!replystr[p+5]) {
-				atten_label("ATT", false);
 				atten_level = 0;
 				return 0;
 			} else {
-				atten_label("20 dB", true);
 				atten_level = 1;
 				return 1;
 			}
@@ -1324,13 +1320,10 @@ void RIG_IC9100::set_preamp(int val)
 	cmd += '\x02';
 
 	if (val == 0) {
-		preamp_label("Pre", false);
 		preamp_level = 0;
 	} else if (val == 1) {
-		preamp_label("Pre 1", true);
 		preamp_level = 1;
 	} else {
-		preamp_label("Pre 2", true);
 		preamp_level = 2;
 	}
 	cmd += preamp_level;
@@ -1359,13 +1352,10 @@ int RIG_IC9100::get_preamp()
 		size_t p = replystr.rfind(resp);
 		if (p != std::string::npos) {
 			if (replystr[p+6] == 0x01) {
-				preamp_label("Pre 1", true);
 				preamp_level = 1;
 			} else if (replystr[p+6] == 0x02) {
-				preamp_label("Pre 2", true);
 				preamp_level = 2;
 			} else {
-				preamp_label("Pre", false);
 				preamp_level = 0;
 			}
 		}
@@ -1373,6 +1363,30 @@ int RIG_IC9100::get_preamp()
 	get_trace(2, "get_preamp()", str2hex(replystr.c_str(), replystr.length()));
 
 	return preamp_level;
+}
+
+const char *RIG_IC9100::PRE_label()
+{
+	switch (preamp_level) {
+		case 0: default:
+			return "PRE"; break;
+		case 1:
+			return "Amp 1"; break;
+		case 2:
+			return "Amp 2"; break;
+	}
+	return "PRE";
+}
+
+const char *RIG_IC9100::ATT_label()
+{
+	if (atten_level == 0x06)
+		return("6 dB");
+	if (atten_level == 0x12)
+		return("12 dB");
+	if (atten_level == 0x18)
+		return("18 dB");
+	return "ATT";
 }
 
 // Tranceiver PTT on/off

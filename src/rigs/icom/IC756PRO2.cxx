@@ -1027,20 +1027,18 @@ int  RIG_IC756PRO2::next_attenuator()
 void RIG_IC756PRO2::set_attenuator(int val)
 {
 	atten_level = val;
+
 	int cmdval = 0;
 	if (atten_level == 1) {
-		atten_label("6 dB", true);
 		cmdval = 0x06;
 	} else if (atten_level == 2) {
-		atten_label("12 dB", true);
 		cmdval = 0x12;
 	} else if (atten_level == 3) {
-		atten_label("18 dB", true);
 		cmdval = 0x18;
 	} else if (atten_level == 0) {
-		atten_label("Att", false);
 		cmdval = 0x00;
 	}
+
 	cmd = pre_to;
 	cmd += '\x11';
 	cmd += cmdval;
@@ -1061,16 +1059,12 @@ int RIG_IC756PRO2::get_attenuator()
 		if (p != std::string::npos) {
 			if (replystr[p+5] == 0x06) {
 				atten_level = 1;
-				atten_label("6 dB", true);
 			} else if (replystr[p+5] == 0x12) {
 				atten_level = 2;
-				atten_label("12 dB", true);
 			} else if (replystr[p+5] == 0x18) {
 				atten_level = 3;
-				atten_label("18 dB", true);
 			} else if (replystr[p+5] == 0x00) {
 				atten_level = 0;
-				atten_label("Att", false);
 			}
 		}
 	}
@@ -1090,13 +1084,8 @@ int  RIG_IC756PRO2::next_preamp()
 
 void RIG_IC756PRO2::set_preamp(int val)
 {
-	if (preamp_level == 1) {
-		preamp_label("Pre 1", true);
-	} else if (preamp_level == 2) {
-		preamp_label("Pre 2", true);
-	} else if (preamp_level == 0) {
-		preamp_label("Pre", false);
-	}
+	preamp_level = val;
+
 	cmd = pre_to;
 	cmd += '\x16';
 	cmd += '\x02';
@@ -1116,21 +1105,36 @@ int RIG_IC756PRO2::get_preamp()
 	cmd.append( post );
 	if (waitFOR(8, "get preamp")) {
 		size_t p = replystr.rfind(resp);
-		if (p != std::string::npos) {
-			if (replystr[p+6] == 0x01) {
-				preamp_label("Pre 1", true);
-				preamp_level = 1;
-			} else if (replystr[p+6] == 0x02) {
-				preamp_label("Pre 2", true);
-				preamp_level = 2;
-			} else {
-				preamp_label("Pre", false);
-				preamp_level = 0;
-			}
-		}
+		if (p != std::string::npos)
+			preamp_level = replystr[p+6];
 	}
 	get_trace(2, "get_preamp()", str2hex(replystr.c_str(), replystr.length()));
 	return preamp_level;
+}
+
+const char *RIG_IC756PRO2::PRE_label()
+{
+	switch (preamp_level) {
+		case 0: default:
+			return "PRE"; break;
+		case 1:
+			return "Pre 1"; break;
+		case 2:
+			return "Pre 2"; break;
+	}
+	return "PRE";
+}
+
+const char *RIG_IC756PRO2::ATT_label()
+{
+	switch (atten_level) {
+		default:
+		case 0: break;
+		case 1: return "6 dB"; break;
+		case 2: return "12 dB"; break;
+		case 3: return "18 dB"; break;
+	}
+	return "ATT";
 }
 
 const char *RIG_IC756PRO2::FILT(int &val)

@@ -53,11 +53,15 @@ public:
 	int  get_PTT();
 
 	int  get_modetype(int n);
+
 	void set_preamp(int);
 	int  get_preamp();
 	int  next_attenuator();
 	void set_attenuator(int val);
 	int  get_attenuator();
+
+	const char * PRE_label();
+	const char * ATT_label();
 
 	void set_noise(bool);
 	int  get_noise();

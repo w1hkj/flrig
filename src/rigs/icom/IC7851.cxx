@@ -776,12 +776,12 @@ void RIG_IC7851::set_attenuator(int val)
 	atten_level = val;
 
 	int cmdval = atten_level;
-	atten_label(atten_labels[atten_level], true);
 	cmd = pre_to;
 	cmd += '\x11';
 	cmd += cmdval;
 	cmd.append( post );
-	waitFB("set_attenuator");
+	sendICcommand(cmd,6);
+	checkresponse();
 }
 
 int RIG_IC7851::get_attenuator()
@@ -789,15 +789,20 @@ int RIG_IC7851::get_attenuator()
 	cmd = pre_to;
 	cmd += '\x11';
 	cmd.append( post );
-	if (waitFOR(7, "get attenuator")) {
-		if (replystr[4] == 0x06) {
+	if (sendICcommand(cmd,7)) {
+		if (replystr[4] == 0x06)
 			atten_level = replystr[5];
-			if (atten_level >= 0 && atten_level <= 7)
-				atten_label(atten_labels[atten_level], true);
-		}
 	}
 	return atten_level;
 }
+
+const char *RIG_IC7851::ATT_label()
+{
+	if (atten_level >= 0 && atten_level <= 7)
+		return atten_labels[atten_level];
+	return atten_labels[0];
+}
+
 
 void RIG_IC7851::set_compression(int on, int val)
 {

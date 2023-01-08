@@ -766,6 +766,18 @@ int RIG_TS480SAT::get_preamp()
 	return preamp_level;
 }
 
+const char *RIG_TS480SAT::PRE_label()
+{
+	if (preamp_level == 1) return "Pre 1";
+	return "PRE";
+}
+
+const char *RIG_TS480SAT::ATT_label()
+{
+	if (atten_level == 1) return "ON";
+	return "ATT";
+}
+
 void RIG_TS480SAT::set_if_shift(int val)
 {
 	cmd = "IS+";

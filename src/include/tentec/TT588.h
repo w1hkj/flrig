@@ -70,6 +70,9 @@ public:
 	void set_attenuator(int val);
 	int  get_attenuator();
 
+//	const char * PRE_label();
+	const char * ATT_label();
+
 	void set_rf_gain(int val);
 	int  get_rf_gain();
 	void set_if_shift(int val);

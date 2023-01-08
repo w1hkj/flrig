@@ -844,15 +844,12 @@ void RIG_ICF8101::set_preamp(int val)
 	cmd += '\x00';
 	switch (val) {
 		case 0:
-			preamp_label("OFF", false);
 			cmd += '\x01';
 			break;
 		case 1:
-			preamp_label("PRE", true);
 			cmd += '\x00';
 			break;
 		case 2:
-			preamp_label("ATT", true);
 			cmd += '\x02';
 	}
 	cmd.append( post );
@@ -873,21 +870,31 @@ int RIG_ICF8101::get_preamp()
 		if (p != std::string::npos) {
 			switch (replystr[p+9]) {
 			case 0:
-				preamp_label("PRE", false);
 				preamp_level = 1;
 				break;
 			case 1:
-				preamp_label("OFF", true);
 				preamp_level = 0;
 				break;
 			case 2:
-				preamp_label("ATT", true);
 				preamp_level = 2;
 			}
 		}
 	}
 	get_trace(2, "get_preamp_attenuator()", str2hex(replystr.c_str(), replystr.length()));
 	return preamp_level;
+}
+
+const char *RIG_ICF8101::PRE_label()
+{
+	switch (preamp_level) {
+		case 0: default:
+			return "OFF"; break;
+		case 1:
+			return "PRE"; break;
+		case 2:
+			return "ATT"; break;
+	}
+	return "PRE";
 }
 
 void RIG_ICF8101::set_compression(int on, int val)

@@ -82,6 +82,9 @@ enum TS590MODES { LSB, USB, CW, FM, AM, FSK, CWR, FSKR, LSBD, USBD, FMD };
 	void set_preamp(int val);
 	int  get_preamp();
 
+	const char * PRE_label();
+	const char * ATT_label();
+
 	void set_if_shift(int val);
 	bool get_if_shift(int &val);
 	void get_if_min_max_step(int &min, int &max, int &step);

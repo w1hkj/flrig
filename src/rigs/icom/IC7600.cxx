@@ -1072,17 +1072,6 @@ void RIG_IC7600::set_preamp(int val)
 	cmd += '\x02';
 
 	preamp_level = val;
-	switch (val) { 
-		case 1: 
-		preamp_label("Amp 1", true);
-			break;
-		case 2:
-		preamp_label("Amp 2", true);
-			break;
-		case 0:
-		default:
-			preamp_label("Pre", false);
-	}
 
 	cmd += (unsigned char)preamp_level;
 	cmd.append( post );
@@ -1104,14 +1093,6 @@ int RIG_IC7600::get_preamp()
 		size_t p = replystr.rfind(resp);
 		if (p != std::string::npos) {
 			preamp_level = replystr[p+6];
-			if (preamp_level == 1) {
-				preamp_label("Amp 1", true);
-			} else if (preamp_level == 2) {
-				preamp_label("Amp 2", true);
-			} else {
-				preamp_label("OFF", false);
-				preamp_level = 0;
-			}
 		}
 	}
 	get_trace(2, "get_preamp() ", str2hex(replystr.c_str(), replystr.length()));
@@ -1132,15 +1113,7 @@ int  RIG_IC7600::next_attenuator()
 void RIG_IC7600::set_attenuator(int val)
 {
 	atten_level = val;
-	if (atten_level == 0x06) {
-		atten_label("6 dB", true);
-	} else if (atten_level == 0x12) {
-		atten_label("12 dB", true);
-	} else if (atten_level == 0x18) {
-		atten_label("18 dB", true);
-	} else if (atten_level == 0x00) {
-		atten_label("ATT", false);
-	}
+
 	cmd = pre_to;
 	cmd += '\x11';
 	cmd += atten_level;
@@ -1162,20 +1135,33 @@ int RIG_IC7600::get_attenuator()
 		size_t p = replystr.rfind(resp);
 		if (p != std::string::npos)
 			atten_level = replystr[p+5];
-		if (atten_level == 0x06) {
-			atten_label("6 dB", true);
-		} else if (atten_level == 0x12) {
-			atten_label("12 dB", true);
-		} else if (atten_level == 0x18) {
-			atten_label("18 dB", true);
-		} else {
-			atten_level = 0x00;
-			atten_label("ATT", false);
-		}
 	}
 	return atten_level;
 }
 
+const char *RIG_IC7600::PRE_label()
+{
+	switch (preamp_level) {
+		case 0: default:
+			return "PRE"; break;
+		case 1:
+			return "Amp 1"; break;
+		case 2:
+			return "Amp 2"; break;
+	}
+	return "PRE";
+}
+
+const char *RIG_IC7600::ATT_label()
+{
+	if (atten_level == 0x06)
+		return("6 dB");
+	if (atten_level == 0x12)
+		return("12 dB");
+	if (atten_level == 0x18)
+		return("18 dB");
+	return "ATT";
+}
 
 void RIG_IC7600::set_noise(bool val)
 {

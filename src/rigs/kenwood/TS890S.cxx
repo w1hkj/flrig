@@ -346,11 +346,6 @@ void RIG_TS890S::set_attenuator(int val)
 		cmd = "RA0";
 		cmd[2] = '0' + att_level;
 		sendCommand(cmd, 0);
-		atten_label(
-			(val == 0 ? "OFF" :
-			val == 1 ? "6 dB" :
-			val == 2 ? "12 dB" : "18 dB"),
-			(val == 0 ? false : true));
 	}
 }
 
@@ -383,10 +378,6 @@ void RIG_TS890S::set_preamp(int val)
 	if (val) cmd = "PA1;";
 	else     cmd = "PA0;";
 	sendCommand(cmd, 0);
-	if (val)
-		preamp_label("OFF", false);
-	else
-		preamp_label("ON", true);
 }
 
 int RIG_TS890S::get_preamp()
@@ -402,6 +393,20 @@ int RIG_TS890S::get_preamp()
 	else
 		preamp_level = 0;
 	return preamp_level;
+}
+
+const char *RIG_TS890S::PRE_label()
+{
+	if (preamp_level == 1) return "Pre 1";
+	return "PRE";
+}
+
+const char *RIG_TS890S::ATT_label()
+{
+	if (atten_level == 1) return "6 dB";
+	if (atten_level == 2) return "12 dB";
+	if (atten_level == 3) return "18 dB";
+	return "ATT";
 }
 
 //======================================================================

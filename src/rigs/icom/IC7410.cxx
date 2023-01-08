@@ -450,11 +450,9 @@ void RIG_IC7410::set_attenuator(int val)
 	int cmdval = 0;
 	if (atten_level == 0) {
 		atten_level = 1;
-		atten_label("20 dB", true);
 		cmdval = 0x20;
 	} else if (atten_level == 1) {
 		atten_level = 0;
-		atten_label("Att", false);
 		cmdval = 0x00;
 	}
 	cmd = pre_to;
@@ -475,13 +473,17 @@ int RIG_IC7410::get_attenuator()
 		size_t p = replystr.rfind(resp);
 		if (replystr[p+6] == 0x20) {
 			atten_level = 1;
-			atten_label("20 dB", true);
 		} else {
 			atten_level = 0;
-			atten_label("Att", false);
 		}
 	}
 	return atten_level;
+}
+
+const char *RIG_IC7410::ATT_label()
+{
+	if (atten_level == 1) return "20 dB";
+	return "ATT";
 }
 
 void RIG_IC7410::set_compression(int on, int val)

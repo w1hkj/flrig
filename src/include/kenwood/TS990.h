@@ -153,6 +153,9 @@ public:
 	void set_preamp(int val);
 	int  get_preamp();
 
+	const char * PRE_label();
+	const char * ATT_label();
+
 	void set_ssbfilter(int val);
 	int  get_ssbfilter();
 

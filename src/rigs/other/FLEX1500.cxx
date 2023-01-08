@@ -184,10 +184,10 @@ RIG_FLEX1500::RIG_FLEX1500() {
 	can_change_alt_vfo = true;
 
 	has_dsp_controls =
-	has_preamp_control =
-	has_power_out = false;
+	false;
 
-	has_swr_control = true;
+	has_power_out =
+	has_swr_control =
 	has_alc_control =
 	has_split =
 	has_split_AB =
@@ -195,7 +195,7 @@ RIG_FLEX1500::RIG_FLEX1500() {
 	has_auto_notch =
 	has_ifshift_control =
 	has_smeter =
-	has_noise_reduction = true;
+	has_noise_reduction =
 	has_noise_reduction_control =
 	has_noise_control =
 	has_micgain_control =
@@ -205,8 +205,9 @@ RIG_FLEX1500::RIG_FLEX1500() {
 	has_mode_control =
 	has_bandwidth_control =
 	has_sql_control =
-	has_ptt_control = 
-	has_extras = true;
+	has_ptt_control =
+	has_extras =
+	has_preamp_control = true;
 
 	rxona = true;
 
@@ -284,17 +285,17 @@ void RIG_FLEX1500::set_power_control(double val)
 	sett("pwr control");
 }
 
-//int RIG_FLEX1500::get_power_out()
-//{
-//	float mtr = 0.0;
-//	cmd = "ZZRM5;";
-//	get_trace(1, "get_power_out");
-//	ret = wait_char(';', 11, 100, "get power", ASC);
-//	gett("");
-//	if (ret < 11) return 0;
-//	sscanf(&replystr[0],"ZZRM5%f", &mtr);
-//	return (int)(10 * mtr);
-//}
+int RIG_FLEX1500::get_power_out()
+{
+	float mtr = 0.0;
+	cmd = "ZZRM5;";
+	get_trace(1, "get_power_out");
+	ret = wait_char(';', 11, 100, "get power", ASC);
+	gett("");
+	if (ret < 11) return 0;
+	sscanf(&replystr[0],"ZZRM5%f", &mtr);
+	return (int)(10 * mtr);
+}
 
 double RIG_FLEX1500::get_power_control()
 {
@@ -313,131 +314,81 @@ double RIG_FLEX1500::get_power_control()
 }
 
 struct meterpair {float mtr; float val;};
-//static meterpair swr_tbl[] = {
-//	{ 1,   0  },
-//	{ 1.5,  12.5  },
-//	{ 2,  25 },
-//	{ 3,  50 },
-//	{ 20, 100 }
-//};
+static meterpair swr_tbl[] = {
+	{ 1,   0  },
+	{ 1.5,  12.5  },
+	{ 2,  25 },
+	{ 3,  50 },
+	{ 20, 100 }
+};
 
-//int RIG_FLEX1500::get_swr()
-//{
-//	double mtr = 0;
-//	if (get_tune() != 0) return 0; // swr only works when tuning
-//	cmd = "ZZRM8;";
-//	get_trace(1, "get_swr");
-//	ret = wait_char(';', 8, 100, "get SWR", ASC);
-//	gett("");
-//	if (ret < 8) return (int)mtr;
-//	if (sscanf(&replystr[0], "ZZRM8%lf", &mtr)!=1) {
-//		return 0;
-//	}
-//	size_t i = 0;
-//	for (i = 0; i < sizeof(swr_tbl) / sizeof(meterpair) - 1; i++)
-//		if (mtr >= swr_tbl[i].mtr && mtr < swr_tbl[i+1].mtr)
-//			break;
-//	if (mtr > 19) mtr = 19;
-//	mtr = (int)round(swr_tbl[i].val +
-//		(swr_tbl[i+1].val - swr_tbl[i].val)*(mtr - swr_tbl[i].mtr)/(swr_tbl[i+1].mtr - swr_tbl[i].mtr));
-//	if (mtr > 100) mtr = 100;
-//	return mtr;
-//}
-
-//int RIG_FLEX1500::get_alc()
-//{
-//	double alc = 0;
-//	cmd = "ZZRM4;";
-//	get_trace(1, "get_alc");
-//	ret = wait_char(';', 8, 100, "get ALC", ASC);
-//	gett("");
-//	if (ret < 8) return (int)alc;
-//	if (sscanf(&replystr[0], "ZZRM4%lf", &alc) != 1) alc=0;
-//	return alc;
-//}
-
-#if 0
-/* disabling this as Thetis ZZPA command is screwy and won't work on all the models
-Using the selector
-0dB = ZZPA1
--10dB = ZZPA2 = -140
--20dB = ZZPA0 = -130
--30dB = ZZPA8 = -120 yet ZZPA8; does nothing
-
-If I look at the signal level for what the level is now.
-ZZPA0 = -130
-ZZPA1 = -150
-ZZPA2 = -140 -- but ZZPA then reports ZZPA7;
-ZZPA3 = -130
-ZZPA4 = -120
-ZZPA5 = -110
-ZZPA6 = -100
-ZZPA7 does nothing
-*/
-
-int  RIG_FLEX1500::next_preamp()
-{   
-	// strange sequence for ANAN 7000DLE MKII
-	switch(preamp_level)
-	{
-		case 0: preamp_level = 1;break;
-		case 1: preamp_level = 2;break;
-		case 7: preamp_level = 3;break;
-		case 3: preamp_level = 4;break;
-		case 4: preamp_level = 5;break;
-		case 5: preamp_level = 6;break;
-		default:
-		case 6: preamp_level = 0;break;
+int RIG_FLEX1500::get_swr()
+{
+	double mtr = 0;
+	if (get_tune() != 0) return 0; // swr only works when tuning
+	cmd = "ZZRM8;";
+	get_trace(1, "get_swr");
+	ret = wait_char(';', 8, 100, "get SWR", ASC);
+	gett("");
+	if (ret < 8) return (int)mtr;
+	if (sscanf(&replystr[0], "ZZRM8%lf", &mtr)!=1) {
+		return 0;
 	}
-	return preamp_level;
+	size_t i = 0;
+	for (i = 0; i < sizeof(swr_tbl) / sizeof(meterpair) - 1; i++)
+		if (mtr >= swr_tbl[i].mtr && mtr < swr_tbl[i+1].mtr)
+			break;
+	if (mtr > 19) mtr = 19;
+	mtr = (int)round(swr_tbl[i].val +
+		(swr_tbl[i+1].val - swr_tbl[i].val)*(mtr - swr_tbl[i].mtr)/(swr_tbl[i+1].mtr - swr_tbl[i].mtr));
+	if (mtr > 100) mtr = 100;
+	return mtr;
 }
+
+int RIG_FLEX1500::get_alc()
+{
+	double alc = 0;
+	cmd = "ZZRM4;";
+	get_trace(1, "get_alc");
+	ret = wait_char(';', 8, 100, "get ALC", ASC);
+	gett("");
+	if (ret < 8) return (int)alc;
+	if (sscanf(&replystr[0], "ZZRM4%lf", &alc) != 1) alc=0;
+	return alc;
+}
+
+/*
+  ZZPA0 : -10 dB
+  ZZPA1 : 0 dB
+  ZZPA2 : 10 dB
+  ZZPA3 : 20 dB
+  ZZPA4 : 30 dB
+*/
 
 void RIG_FLEX1500::set_preamp(int val)
 {
 	preamp_level = val;
 	cmd = "ZZPA";
-	cmd.append(to_decimal(val, 1)).append(";");
+	cmd += (val + '0');
+	cmd += ';';
 	sendCommand(cmd);
 	showresp(WARN, ASC, "set PRE", cmd, "");
 	sett("preamp");
-		case 7: preamp_level = 0;break;
-	if (val == 0) {
-		preamp_label("Pre", false);
-		preamp_level = 0;
-	} else if (val == 1) {
-		preamp_label("Pre 1", true);
-		preamp_level = 1;
-	} else if (val == 7) {
-		preamp_label("Pre 2", true);
-		preamp_level = 2;
-	}
-
 }
 
 int RIG_FLEX1500::get_preamp()
 {
-	int preamp_level;
 	cmd = "ZZPA;";
-	std::stringstream str;
-	sendCommand(cmd);
 	get_trace(1, "get_preamp");
 	ret = wait_char(';', 6, 100, "get PRE", ASC);
 	gett("");
-	if (ret == 6) {
-		size_t p = replystr.rfind("PA");
-		str << "ZZPA #2 replystr=" << replystr << ", p=" << p;
-		trace(2, "get_preamp", replystr.c_str());
-		if (p != std::string::npos && (p+2 < replystr.length())) {
-			preamp_level = fm_decimal(replystr.substr(p+2),1);
-			// need to map 7 to 2 to keep FLRig cbPreamp happy
-			// when ZZPA2; is sent ZZPA7; comes back
-			if (preamp_level == 7) preamp_level = 2; 
-		}
-	}
-	else preamp_level = 0;
+	if (ret < 6) return preamp_level;
+
+	size_t p = replystr.rfind("PA");
+	if (p != std::string::npos)
+		preamp_level = (unsigned char)replystr[p+2] - '0';
 	return preamp_level;
 }
-#endif
 
 int RIG_FLEX1500::set_widths(int val)
 {
@@ -672,7 +623,7 @@ int RIG_FLEX1500::get_bwA()
 		A.iBW = 0;
 		gett("get_bwA Wideband");
 	}
-	else if (A.imode == LSB || A.imode == USB) {  
+	else if (A.imode == LSB || A.imode == USB) {
 		cmd = "ZZFI;";
 		get_trace(1, "get_bw SSB");
 		ret = wait_char(';', 7, 100, "get ZZFI", ASC);
@@ -688,7 +639,7 @@ int RIG_FLEX1500::get_bwA()
 				A.iBW = i;
 			}
 		}
-	} 
+	}
 	else if (A.imode == CWL || A.imode == CWU) {
 		cmd = "ZZFI;";
 		get_trace(1, "get_bw CW");
@@ -703,7 +654,7 @@ int RIG_FLEX1500::get_bwA()
 				A.iBW = i;
 			}
 		}
-	} 
+	}
 	else if (A.imode == DIGU || A.imode == DIGL) {
 		cmd = "ZZFI;";
 		get_trace(1, "get_bw DIGI");

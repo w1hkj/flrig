@@ -704,13 +704,7 @@ void RIG_TT566::set_attenuator(int val)
 {
 	atten_level = val;
 	cmd = TT566setATTa;
-
-	switch (atten_level) {
-		case 0: atten_label("0 dB", false); cmd += '0'; break;
-		case 1: atten_label("6 dB", true); 	cmd += '1'; break;
-		case 2: atten_label("12 dB", true); cmd += '2'; break;
-		case 3: atten_label("18 dB", true); cmd += '3'; break;
-	}
+	cmd += (atten_level + '0');
 	cmd += '\r';
 	sendCommand(cmd);
 	setcr("set attenuator");
@@ -731,12 +725,6 @@ int RIG_TT566::get_attenuator()
 	val = (replystr[p + strlen(TT566rspATTa)] - '0');
 
 	if (atten_level != val) atten_level = val;
-	switch (atten_level) {
-		case 0: atten_label("0 dB", false); break;
-		case 1: atten_label("6 dB", true); break;
-		case 2: atten_label("12 dB", true); break;
-		case 3: atten_label("18 dB", true); break;
-	}
 	return atten_level;
 }
 
@@ -758,6 +746,21 @@ int RIG_TT566::get_preamp()
 	if (p == std::string::npos) return 0;
 
 	return replystr[p + strlen(TT566rspPREAMP)] - '0';
+}
+
+const char *RIG_TT566::PRE_label()
+{
+	if (preamp_level == 1) return "Pr ON";
+	return "Pre";
+}
+
+const char *RIG_TT566::ATT_label()
+{
+	if (atten_level == 0) return "0 dB";
+	if (atten_level == 1) return "6 dB";
+	if (atten_level == 2) return "12 dB";
+	if (atten_level == 3) return "18 dB";
+	return "ATT";
 }
 
 void RIG_TT566::set_noise(bool val)

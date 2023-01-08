@@ -126,6 +126,9 @@ public:
 	void set_attenuator(int val);
 	int  get_attenuator();
 
+	const char * PRE_label();
+	const char * ATT_label();
+
 	void set_noise(bool val);
 	int  get_noise();
 	void set_noise_reduction(int val);

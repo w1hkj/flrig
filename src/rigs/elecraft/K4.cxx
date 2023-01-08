@@ -525,16 +525,6 @@ n = 1 (10 dB regular preamp)
 n = 2 (160-15 m: 18 dB regular preamp; 12-6 m: 20 dB LNA)
 n = 3 (12-6 m only: 10 dB regular preamp + 20 dB LNA)
 */
-void K4_preamp_label(int val)
-{
-	switch (val) {
-		default:
-		case 0: preamp_label("Pre", false); break;
-		case 1: preamp_label("Pre1", true); break;
-		case 2: preamp_label("Pre2", true); break;
-//		case 3: preamp_label("Pre3", true); break;
-	}
-}
 
 void RIG_K4::set_preamp(int val)
 {
@@ -542,15 +532,13 @@ void RIG_K4::set_preamp(int val)
 	if (isOnA()) cmd = "PA";
 	else cmd = "PA$";
 	switch (val) {
-		case 0: cmd.append("00;"); preamp_label("Pre", false); break;
-		case 1: cmd.append("11;"); preamp_label("Pre1", true); break;
-		case 2: cmd.append("21;"); preamp_label("Pre2", true); break;
-//		case 3: cmd.append("31;"); preamp_label("Pre3", true); break;
+		case 0: cmd.append("00;"); break;
+		case 1: cmd.append("11;"); break;
+		case 2: cmd.append("21;"); break;
 	}
 	preamp_level = val;
 	sendCommand(cmd);
 	sett("");
-	K4_preamp_label(val);
 }
 
 int RIG_K4::get_preamp()
@@ -580,24 +568,12 @@ int RIG_K4::get_preamp()
 	}
 
 	preamp_level = val;
-	K4_preamp_label(val);
 	return val;
 }
 
 
-void K4_atten_label(int val)
+void K4_return(int val)
 {
-	switch (val) {
-		default:
-		case 0: atten_label("OFF", false); break;
-		case 1: atten_label("3 db", true); break;
-		case 2: atten_label("6 db", true); break;
-		case 3: atten_label("9 db", true); break;
-		case 4: atten_label("12 db", true); break;
-		case 5: atten_label("15 db", true); break;
-		case 6: atten_label("18 db", true); break;
-		case 7: atten_label("21 db", true); break;
-	}
 }
 
 int RIG_K4::next_attenuator()
@@ -615,6 +591,34 @@ int RIG_K4::next_preamp()
 
 	return preamp_level;
 }
+
+const char *RIG_K4::PRE_label()
+{
+	switch (preamp_level) {
+		default:
+		case 0: break;
+		case 1: return("Pre1"); break;
+		case 2: return("Pre2"); break;
+	}
+	return("PRE");
+}
+
+const char *RIG_K4::ATT_label()
+{
+	switch (atten_level) {
+		default:
+		case 0: break;
+		case 1: return("3 db"); break;
+		case 2: return("6 db"); break;
+		case 3: return("9 db"); break;
+		case 4: return("12 db"); break;
+		case 5: return("15 db"); break;
+		case 6: return("18 db"); break;
+		case 7: return("21 db"); break;
+	}
+	return("OFF");
+}
+
 
 /*
   RA$nnm; where nn is 0/3/6/9/12/15/18/21 (dB) and m = 0 (off), 1 (on)
@@ -639,7 +643,7 @@ void RIG_K4::set_attenuator(int val)
 	set_trace(1, "set attenuator");
 	sendCommand(cmd);
 	sett("");
-	K4_atten_label(val);
+	K4_return(val);
 }
 
 int RIG_K4::get_attenuator()
@@ -678,7 +682,7 @@ int RIG_K4::get_attenuator()
 		case 21: atten_level = 7; break;
 	}
 	
-	K4_atten_label(atten_level);
+	K4_return(atten_level);
 	return atten_level;
 }
 

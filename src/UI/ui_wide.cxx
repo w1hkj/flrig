@@ -464,6 +464,18 @@ Fl_Group *wide_main_group(int X, int Y, int W, int H)
 						btnAttenuator->labelsize(12);
 						btnAttenuator->callback((Fl_Callback*)cb_btnAttenuator);
 
+						cbo_preamp = new Fl_ComboBox(bx_row1b1a->x() + bx_row1b1a->w(), ypos, 140, 20, "");
+						cbo_preamp->tooltip(_("Preamp in dB"));
+						cbo_preamp->labelsize(12);
+						cbo_preamp->add("-10 dB|0 dB|10 dB|20 dB|30 dB");
+						cbo_preamp->color(FL_BACKGROUND2_COLOR);
+						cbo_preamp->selection_color(FL_BACKGROUND_COLOR);
+						cbo_preamp->align(FL_ALIGN_LEFT);
+						cbo_preamp->index(progStatus.preamp);
+						cbo_preamp->readonly();
+						cbo_preamp->callback((Fl_Callback*)cb_cbo_preamp);
+						cbo_preamp->hide();
+
 						btnPreamp = new Fl_Light_Button(
 							btnAttenuator->x() + btnAttenuator->w() + 2, ypos, 
 							70, 20, _("PRE"));

@@ -482,11 +482,8 @@ void RIG_Xiegu_G90::set_attenuator(int val)
 {
    if (val) {
 		atten_level = 1;
-		atten_label("ATT", true);
-		preamp_label("PRE", false);
 	} else {
 		atten_level = 0;
-		atten_label("ATT", false);
 	}
 
 	cmd = pre_to;
@@ -511,11 +508,8 @@ int RIG_Xiegu_G90::get_attenuator()
 		size_t p = replystr.rfind(resp);
 		if (replystr[p+5] == 0x00) {
 			atten_level = 0;
-			atten_label("ATT", false);
 		} else {
 			atten_level = 1;
-			atten_label("ATT", true);
-			preamp_label("PRE", false);
 		}
 	}
 	return atten_level;
@@ -528,11 +522,8 @@ void RIG_Xiegu_G90::set_preamp(int val)
 	cmd += '\x02';
 
 	if (val) {
-		preamp_label("PRE", true);
-		atten_label("ATT", false);
 		cmd += '\x01';
 	} else {
-		preamp_label("PRE", false);
 		cmd += '\x00';
 	}
 
@@ -557,13 +548,26 @@ int RIG_Xiegu_G90::get_preamp()
 		size_t p = replystr.rfind(resp);
 		if (p != std::string::npos)
 			preamp_level = replystr[p+6];
-		if (preamp_level == 1) {
-			preamp_label("PRE", true);
-			atten_label("ATT", false);
-		} else
-			preamp_label("PRE", false);
 	}
 	return preamp_level;
+}
+
+const char *RIG_Xiegu_G90::PRE_label()
+{
+	switch (preamp_level) {
+		case 0: default:
+			return "PRE"; break;
+		case 1:
+			return "ON"; break;
+	}
+	return "PRE";
+}
+
+const char *RIG_Xiegu_G90::ATT_label()
+{
+	if (atten_level)
+		return "ON";
+	return "ATT";
 }
 
 static int compon = 0;

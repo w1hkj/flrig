@@ -524,6 +524,18 @@ CTRL  click: FreqB -> FreqA\
 	btnAttenuator->labelsize(12);
 	btnAttenuator->callback((Fl_Callback*)cb_btnAttenuator);
 
+	cbo_preamp = new Fl_ComboBox(26, 325, 80, 18, "");
+	cbo_preamp->tooltip(_("Preamp in dB"));
+	cbo_preamp->labelsize(12);
+	cbo_preamp->add("-10 dB|0 dB|10 dB|20 dB|30 dB");
+	cbo_preamp->color(FL_BACKGROUND2_COLOR);
+	cbo_preamp->selection_color(FL_BACKGROUND_COLOR);
+	cbo_preamp->align(FL_ALIGN_LEFT);
+	cbo_preamp->index(progStatus.preamp);
+	cbo_preamp->readonly();
+	cbo_preamp->callback((Fl_Callback*)cb_cbo_preamp);
+	cbo_preamp->hide();
+
 	btnPreamp = new Fl_Light_Button(93, 325, 60, 18, _("PRE"));
 	btnPreamp->tooltip(_("Preamp On/Off"));
 	btnPreamp->down_box(FL_THIN_DOWN_BOX);

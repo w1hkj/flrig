@@ -299,13 +299,11 @@ extern void open_tmate2_tab();
 
 extern void cb_close_TT550_setup();
 extern void cbUseRepeatButtons(bool on);
+
 extern void nr_label(const char *, int on = 0);
 extern void nb_label(const char *, int on = 0);
-extern void preamp_label(const char *, int on = 0);
-extern void atten_label(const char *, int on = 0);
 extern void auto_notch_label(const char *, int on = 0);
 extern void enable_yaesu_bandselect(int btn_num, bool enable = true);
-
 extern void break_in_label(const char *);
 
 extern void synchronize_now();

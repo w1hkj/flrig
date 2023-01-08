@@ -445,20 +445,16 @@ void RIG_FT2000::set_attenuator(int val)
 	atten_level = val;
 	switch (val) {
 		case 1 :
-			atten_label("6 dB", true);
 			cmd = "RA01;";
 			break;
 		case 2 :
-			atten_label("12 dB", true);
 			cmd = "RA02;";
 			break;
 		case 3 :
-			atten_label("18 dB", true);
 			cmd = "RA03;";
 			break;
 		case 0 :
 		default :
-			atten_label("Att", false);
 			cmd = "RA00;";
 	}
 	sendCommand(cmd, 0);
@@ -472,31 +468,25 @@ int RIG_FT2000::get_attenuator()
 	rig_trace(2, "get_attenuator()", replystr.c_str());
 
 	if (ret < 5) {
-		atten_label("Att", false);
 		return 0;
 	}
 	size_t p = replystr.rfind("RA");
 	if (p == std::string::npos) {
-		atten_label("Att", false);
 		atten_level = 0;
 		return 0;
 	}
 	int reply = replystr[p + 3];
 	switch (reply) {
 		case '1' :
-			atten_label("6 dB", true);
 			atten_level = 1;
 			break;
 		case '2' :
-			atten_label("12 dB", true);
 			atten_level = 2;
 			break;
 		case '3' :
-			atten_label("18 dB", true);
 			atten_level = 3;
 			break;
 		default :
-			atten_label("Att", false);
 			atten_level = 0;
 			break;
 	}
@@ -518,16 +508,13 @@ void RIG_FT2000::set_preamp(int val)
 	preamp_level = val;
 	switch (preamp_level) {
 		case 1 :
-			preamp_label("Pre 1", true);
 			cmd = "PA01;";
 			break;
 		case 2 :
-			preamp_label("Pre 2", true);
 			cmd = "PA02;";
 			break;
 		case 0 :
 		default :
-			preamp_label("Pre", false);
 			cmd = "PA00;";
 	}
 	sendCommand(cmd, 0);
@@ -541,13 +528,11 @@ int RIG_FT2000::get_preamp()
 	rig_trace(2, "get_preamp()", replystr.c_str());
 
 	if (ret < 5) {
-		preamp_label("Pre", false);
 		preamp_level = 0;
 		return 0;
 	}
 	size_t p = replystr.rfind("PA");
 	if (p == std::string::npos) {
-		preamp_label("Pre", false);
 		preamp_level = 0;
 		return 0;
 	}
@@ -555,20 +540,36 @@ int RIG_FT2000::get_preamp()
 	switch (reply) {
 		case '1' :
 			preamp_level = 1;
-			preamp_label("Pre 1", true);
 			break;
 		case '2' :
 			preamp_level = 2;
-			preamp_label("Pre 2", true);
 			break;
 		case '0' :
 		default :
 			preamp_level = 0;
-			preamp_label("Pre", false);
 	}
 	return preamp_level;
 }
 
+const char *RIG_FT2000::ATT_label()
+{
+	if (atten_level == 1)
+		return "6 dB";
+	if (atten_level == 2)
+		return "12 dB";
+	if (atten_level == 3)
+		return "18 dB";
+	return "ATT";
+}
+
+const char *RIG_FT2000::PRE_label()
+{
+	if (preamp_level == 1)
+		return "Amp 1";
+	if (preamp_level == 2)
+		return "Amp 2";
+	return "PRE";
+}
 
 void RIG_FT2000::set_modeA(int val)
 {

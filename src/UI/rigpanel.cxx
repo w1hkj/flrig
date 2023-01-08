@@ -274,6 +274,9 @@ Fl_Group *grp_row1b = (Fl_Group *)0;
 Fl_Group *grp_row1b1 = (Fl_Group *)0;
 Fl_Light_Button *btnAttenuator = (Fl_Light_Button *)0;
 
+Fl_ComboBox *cbo_attenuator = (Fl_ComboBox *)0;
+Fl_ComboBox *cbo_preamp = (Fl_ComboBox *)0;
+
 Fl_Check_Button *btn_use_bpf_center = (Fl_Check_Button *)0;
 Fl_Group *genericMisc = (Fl_Group *)0;
 Hspinner *spnr_vfo_adj = (Hspinner *)0;
@@ -1019,6 +1022,18 @@ static void cb_dual_watch(Fl_Light_Button *o, void *d) {
 static void cb_ic7610_att(Fl_ComboBox *o, void *d) {
 	progStatus.index_ic7610att = o->index();
 	index_att();
+}
+
+//static void cb_cbo_attenuator(Fl_ComboBox *o, void *d) {
+//	progStatus.attenuator = o->index();
+//	guard_lock serial(&mutex_serial);
+//	selrig->set_attenuator(progStatus.attenuator);
+//}
+
+static void cb_cbo_preamp(Fl_ComboBox *o, void *d) {
+	progStatus.preamp = o->index();
+	guard_lock serial(&mutex_serial);
+	selrig->set_preamp(progStatus.preamp);
 }
 
 static void cb_cntRIT(Hspinner*, void*) {

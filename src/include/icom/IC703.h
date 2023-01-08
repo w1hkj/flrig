@@ -48,9 +48,14 @@ public:
 
 	void set_attenuator(int val);
 	int  get_attenuator();
+
 	int  next_preamp();
 	void set_preamp(int val);
 	int  get_preamp();
+
+	const char * PRE_label();
+	const char * ATT_label();
+
 	void set_compression(int, int);
 	void get_comp_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 10; step = 1; }
