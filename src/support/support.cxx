@@ -280,13 +280,11 @@ void TRACED(update_vfoAorB, void *d)
 		vfoB.freq = selrig->get_vfoB();
 		vfoB.imode = selrig->get_modeB();
 		vfoB.iBW = selrig->get_bwB();
-//		updateTCI((void *)0);
 	} else {
 		vfoA.src = RIG;
 		vfoA.freq = selrig->get_vfoA();
 		vfoA.imode = selrig->get_modeA();
 		vfoA.iBW = selrig->get_bwA();
-//		updateTCI((void *)0);
 	}
 	updateUI((void*)0);
 }
@@ -353,6 +351,7 @@ void read_vfo()
 		}
 	}
 	Fl::awake(updateTCI);
+	Fl::awake(updateFLEX1500);
 }
 
 void update_ifshift(void *d);
@@ -377,7 +376,6 @@ void TRACED(updateUI, void *)
 	if (spnrIFSHIFT) spnrIFSHIFT->redraw();
 	update_ifshift((void *)0);
 
-//	updateTCI((void *)0);
 }
 
 void TRACED(setModeControl, void *)
@@ -437,7 +435,10 @@ void read_mode()
 			vfoA.iBW = vfo->iBW = nu_BW;
 			Fl::awake(updateBandwidthControl);
 		}
+
 		Fl::awake(updateTCI);
+		Fl::awake(updateFLEX1500);
+
 		if (selrig->twovfos()) {
 			vfoB.imode = selrig->get_modeB();
 			vfoB.filter = selrig->get_FILT(vfoB.imode);
@@ -459,6 +460,7 @@ void read_mode()
 			Fl::awake(updateBandwidthControl);
 		}
 		Fl::awake(updateTCI);
+		Fl::awake(updateFLEX1500);
 
 		if (selrig->twovfos()) {
 			vfoA.imode = selrig->get_modeA();
@@ -502,7 +504,8 @@ void TRACED(setBWControl, void *)
 		opDSP_hi->hide();
 		btnDSP->hide();
 		if (!(	selrig->name_ == rig_tci_sundx.name_ ||
-				selrig->name_ == rig_tci_sunpro.name_) ) {
+				selrig->name_ == rig_tci_sunpro.name_ ||
+				selrig->name_ == rig_FLEX1500.name_) ) {
 			opBW->index(vfo->iBW);
 			opBW->show();
 			opBW->redraw();
@@ -531,6 +534,7 @@ void TRACED(read_bandwidth)
 	s << vfo->iBW;
 	trace(1, s.str().c_str());
 	Fl::awake(updateTCI);
+	Fl::awake(updateFLEX1500);
 }
 
 // read current signal level
@@ -1831,7 +1835,6 @@ void selectCENTER()
 		btnCENTER->label("C");
 		opBW->hide();
 		opCENTER->index(progStatus.tci_center);
-std::cout << "tci_center: " << progStatus.tci_center << ", " << opCENTER->value() << std::endl;
 		opCENTER->show();
 	}
 	opBW->redraw();
@@ -1923,6 +1926,90 @@ void updateTCI(void *d)
 	}
 } 
 
+static int last_FLEX1500_bw = -1;
+static int last_FLEX1500_inner = -1;
+static int last_FLEX1500_outer = -1;
+static int last_FLEX1500_mode = -1;
+
+void updateFLEX1500(void *d)
+{
+	if (!(	selrig->name_ == rig_FLEX1500.name_) )
+		return;
+
+	vfo->FilterInner = selrig->get_pbt_inner();
+	vfo->FilterOuter = selrig->get_pbt_outer();
+
+	if (last_FLEX1500_mode != vfo->imode) {
+		last_FLEX1500_mode = vfo->imode;
+		switch (vfo->imode) {
+			case RIG_FLEX1500::AM :
+			case RIG_FLEX1500::SAM :
+			case RIG_FLEX1500::DSB :
+			case RIG_FLEX1500::FM :
+				opFilterInner->minimum(-8000);	opFilterInner->maximum(0);
+				opFilterInner->step(10); opFilterInner->lstep(510);
+				opFilterOuter->minimum(0); 		opFilterOuter->maximum(8000);
+				opFilterOuter->step(10); opFilterOuter->lstep(500);
+				break;
+			case RIG_FLEX1500::LSB :
+				opFilterInner->minimum(-4000);	opFilterInner->maximum(0);
+				opFilterInner->step(10); opFilterInner->lstep(100);
+				opFilterOuter->minimum(-4000); 	opFilterOuter->maximum(0);
+				opFilterOuter->step(10); opFilterOuter->lstep(100);
+				break;
+			case RIG_FLEX1500::USB :
+				opFilterInner->minimum(0);	opFilterInner->maximum(4000);
+				opFilterInner->step(10); opFilterInner->lstep(100);
+				opFilterOuter->minimum(0);	opFilterOuter->maximum(4000);
+				opFilterOuter->step(10); opFilterOuter->lstep(100);
+				break;
+			default: case RIG_FLEX1500::CWL :
+				opFilterInner->minimum(-1500);	opFilterInner->maximum(0);
+				opFilterInner->step(5); opFilterInner->lstep(25);
+				opFilterOuter->minimum(-1500);	opFilterOuter->maximum(0);
+				opFilterOuter->step(5); opFilterOuter->lstep(25);
+				break;
+			case RIG_FLEX1500::CWU:
+				opFilterInner->minimum(0);	opFilterInner->maximum(1500);
+				opFilterInner->step(5); opFilterInner->lstep(25);
+				opFilterOuter->minimum(0);	opFilterOuter->maximum(1500);
+				opFilterOuter->step(5); opFilterOuter->lstep(25);
+				break;
+			case RIG_FLEX1500::DIGL: case RIG_FLEX1500::DIGU:
+				opFilterInner->minimum(0);	opFilterInner->maximum(1500);
+				opFilterInner->step(10); opFilterInner->lstep(100);
+				opFilterOuter->minimum(0); 		opFilterOuter->maximum(1500);
+				opFilterOuter->step(10); opFilterOuter->lstep(100);
+				break;
+			case RIG_FLEX1500::DRM:
+				opFilterInner->minimum(-5000);	opFilterInner->maximum(0);
+				opFilterInner->step(10); opFilterInner->lstep(100);
+				opFilterOuter->minimum(0); 		opFilterOuter->maximum(5000);
+				opFilterOuter->step(10); opFilterOuter->lstep(100);
+				break;
+		}
+
+		updateBandwidthControl((void *)0);
+	}
+
+	if (last_FLEX1500_bw != vfo->iBW) opBW->index(last_FLEX1500_bw = vfo->iBW);
+	if (last_FLEX1500_inner != vfo->FilterInner) opFilterInner->value(last_FLEX1500_inner = vfo->FilterInner);
+	if (last_FLEX1500_outer != vfo->FilterOuter) opFilterOuter->value(last_FLEX1500_outer = vfo->FilterOuter);
+
+	std::string smode = opMODE->value();
+
+	btnCENTER->hide();
+	opCENTER->hide();
+
+	opFilterInner->redraw();
+	opFilterOuter->redraw();
+
+	opBW->redraw();
+	opBW->show();
+
+
+} 
+
 // set_bandwidth_control updates iBW and then posts the call for
 // the UI thread to updateBandwidthControl
 // changes to the UI cannot come from any thread other than the
@@ -1990,10 +2077,10 @@ void TRACED ( updateBandwidthControl, void *d )
 		btnDSP->hide();
 		opBW->clear();
 		selrig->bandwidths_ = selrig->bwtable(vfo->imode);
-
 		for (int i = 0; selrig->bandwidths_[i] != NULL; i++) {
 			opBW->add(selrig->bandwidths_[i]);
 	}
+
 		opBW->index(vfo->iBW);
 		opBW->redraw();
 

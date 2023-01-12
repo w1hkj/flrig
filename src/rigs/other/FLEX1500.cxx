@@ -95,15 +95,15 @@ static char *varwidths[] = {
 //------------------------------------------------------------------------------
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 }, // 0
-	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 }, // 1
+	{ (Fl_Widget *)sldrVOLUME,   54, 125, 368 }, // 1
 	{ (Fl_Widget *)sldrRFGAIN,   54, 145, 156 }, // 2
-	{ (Fl_Widget *)btnIFsh,     214, 105,  50 }, // 3
-	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 }, // 4
-	{ (Fl_Widget *)btnNotch,    214, 125,  50 }, // 5
-	{ (Fl_Widget *)sldrNOTCH,   266, 125, 156 }, // 6
-	{ (Fl_Widget *)sldrSQUELCH, 266, 145, 156 }, // 7
+	{ (Fl_Widget *)btnIFsh,       2, 165,  50 }, // 3
+	{ (Fl_Widget *)sldrIFSHIFT,  54, 165, 156 }, // 4
+	{ (Fl_Widget *)btnNotch,    214, 145,  50 }, // 5
+	{ (Fl_Widget *)sldrNOTCH,   266, 145, 156 }, // 6
+	{ (Fl_Widget *)sldrSQUELCH, 266, 165, 156 }, // 7
 	{ (Fl_Widget *)sldrMICGAIN, 266, 165, 156 }, // 8
-	{ (Fl_Widget *)sldrPOWER,    54, 165, 368 }, // 9
+	{ (Fl_Widget *)sldrPOWER,    54, 185, 368 }, // 9
 	{ (Fl_Widget *)NULL,          0,   0,   0 }
 };
 
@@ -453,6 +453,18 @@ int RIG_FLEX1500::set_widths(int val)
 
 const char **RIG_FLEX1500::bwtable(int val)
 {
+	switch (val) {
+	case LSB: case USB:
+		bandwidths_ = FLEX1500_USBwidths; break;
+	case DIGU: case DIGL:
+		bandwidths_ = FLEX1500_DIGwidths; break;
+	case FM: case SPEC: case DRM:
+		bandwidths_ = FLEX1500_WIDEwidths; break;
+	case CWL: case CWU:
+		bandwidths_ = FLEX1500_CWwidths; break;
+	case AM: case SAM: case DSB: default:
+		bandwidths_ = FLEX1500_AMwidths; break;
+	}
 	return bandwidths_;
 }
 
@@ -482,6 +494,45 @@ const char **RIG_FLEX1500::hitable(int val)
 }
 #endif
 
+void RIG_FLEX1500::set_pbt(int inner, int outer)
+{
+	char cmdstr[50];
+	snprintf(cmdstr, sizeof(cmdstr), "ZZFL%c%04d;",
+			inner < 0 ? '-' : '+', inner);
+	sendCommand(cmd = cmdstr);
+	sett("");
+	snprintf(cmdstr, sizeof(cmdstr), "ZZFH%c%04d;",
+			outer < 0 ? '-' : '+', outer);
+	sendCommand(cmd = cmdstr);
+	sett("");
+}
+
+int RIG_FLEX1500::get_pbt_inner()
+{
+	cmd = "ZZFL;";
+	get_trace(1, "get_pbt_inner (lower)");
+	ret = wait_char(';', 10, 100, "get PBT lower", ASC);
+	gett("");
+	size_t p = replystr.find("ZZFL");
+	if (p != std::string::npos) {
+		FilterInner = atoi(replystr.substr(p+4).c_str());
+	}
+	return FilterInner;
+}
+
+int RIG_FLEX1500::get_pbt_outer()
+{
+	cmd = "ZZFH;";
+	get_trace(1, "get_pbt_inner (upper)");
+	ret = wait_char(';', 10, 100, "get PBT upper", ASC);
+	gett("");
+	size_t p = replystr.find("ZZFH");
+	if (p != std::string::npos) {
+		FilterOuter = atoi(replystr.substr(p+4).c_str());
+	}
+	return FilterOuter;
+}
+
 void RIG_FLEX1500::set_modeA(int val)
 {
 	if (val >= (int)(sizeof(FLEX1500_mode_chr)/sizeof(*FLEX1500_mode_chr))) return;
@@ -501,7 +552,7 @@ int RIG_FLEX1500::get_modeA()
 	if (tuning()) return A.imode;
 	cmd = "ZZMD;";
 	get_trace(1, "get_modeA");
-	ret = wait_char(';', 7, 100, "get mode A", 7);
+	ret = wait_char(';', 7, 100, "get mode A", ASC);
 	gett("");
 	if (ret == 7) {
 		size_t p = replystr.rfind("MD");
@@ -611,80 +662,47 @@ void RIG_FLEX1500::set_bwA(int val)
 	}
 }
 
-int RIG_FLEX1500::get_bwA()
+int RIG_FLEX1500::get_bw(int mode)
 {
 	size_t i = 0;
-	size_t p;
-	std::stringstream str;
-	str << "get_bwA" ;
-	A.iBW = 0;
-	trace(2, __func__, str.str().c_str());
-	if (A.imode == FM || A.imode == DRM || A.imode == SPEC) {
-		A.iBW = 0;
+	int bw = 0;
+	const char **tbl;
+	if (mode == FM || mode == DRM || mode == SPEC) 
 		gett("get_bwA Wideband");
-	}
-	else if (A.imode == LSB || A.imode == USB) {
+	else {
 		cmd = "ZZFI;";
-		get_trace(1, "get_bw SSB");
+		get_trace(3, "get ", FLEX1500modes_[mode], " bandwidth");
 		ret = wait_char(';', 7, 100, "get ZZFI", ASC);
 		gett("");
-		if (ret == 7) {
-			p = replystr.rfind("ZZFI");
-			if (p != std::string::npos) {
-				for (i = 0; FLEX1500_CAT_USB[i] != NULL; i++)
-				{
-					if (replystr.find(FLEX1500_CAT_USB[i]) == p)
-						break;
-				}
-				A.iBW = i;
+		if (ret) {
+			switch (mode) {
+				default:
+				case LSB : case USB :
+					tbl = FLEX1500_CAT_USB;
+					break;
+				case CWL : case CWU :
+					tbl = FLEX1500_CAT_CW;
+					break;
+				case DIGU : case DIGL :
+					tbl = FLEX1500_CAT_DIG;
+					break;
+				case AM : case SAM : case DSB :
+					tbl = FLEX1500_CAT_AM;
+					break;
+			}
+			for (i = 0; tbl[i] != NULL; i++)
+				if (replystr.find(tbl[i]) != std::string::npos) {
+					bw = i;
+					break;
 			}
 		}
 	}
-	else if (A.imode == CWL || A.imode == CWU) {
-		cmd = "ZZFI;";
-		get_trace(1, "get_bw CW");
-		ret = wait_char(';', 7, 100, "get ZZFI", ASC);
-		gett("");
-		if (ret == 7) {
-			p = replystr.rfind("ZZFI");
-			if (p != std::string::npos) {
-				for (i = 0; FLEX1500_CAT_CW[i] != NULL; i++)
-					if (replystr.find(FLEX1500_CAT_CW[i]) == p)
-						break;
-				A.iBW = i;
-			}
-		}
-	}
-	else if (A.imode == DIGU || A.imode == DIGL) {
-		cmd = "ZZFI;";
-		get_trace(1, "get_bw DIGI");
-		ret = wait_char(';', 7, 100, "get ZZFI", ASC);
-		gett("");
-		if (ret == 7) {
-				for (i = 0; FLEX1500_CAT_DIG[i] != NULL; i++) {
-					if (replystr.compare(FLEX1500_CAT_DIG[i]) == 0) {
-						break;
-					}
-				}
-				A.iBW = i;
-		}
-	}
-	else if (A.imode == AM || A.imode == SAM || A.imode == DSB) {
-		cmd = "ZZFI;";
-		get_trace(1, "get_bw AM");
-		ret = wait_char(';', 7, 100, "get ZZFI", ASC);
-		gett("");
-		if (ret == 7) {
-			p = replystr.rfind("ZZFI");
-			if (p != std::string::npos) {
-				for (i = 0; FLEX1500_CAT_AM[i] != NULL; i++)
-					if (replystr.find(FLEX1500_CAT_AM[i]) == p)
-						break;
-				A.iBW = i;
-			}
-		}
-	}
-	vfoA.iBW = A.iBW;
+	return bw;
+}
+
+int RIG_FLEX1500::get_bwA()
+{
+	vfoA.iBW = A.iBW = get_bw(A.imode);
 	progStatus.iBW_A = A.iBW;
 	return A.iBW;
 }
@@ -701,11 +719,7 @@ void RIG_FLEX1500::set_bwB(int val)
 
 int RIG_FLEX1500::get_bwB() // same as A
 {
-	B.iBW =  get_bwA();
-	std::stringstream str;
-	str << "B.iBW = " << B.iBW;
-	trace(2, __func__, str.str().c_str());
-	vfoB.iBW = B.iBW;
+	vfoB.iBW = B.iBW = get_bw(B.imode);
 	progStatus.iBW_B = B.iBW;
 	return B.iBW;
 }

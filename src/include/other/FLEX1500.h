@@ -25,6 +25,10 @@
 #include "kenwood/KENWOOD.h"
 
 class RIG_FLEX1500 : public KENWOOD {
+private:
+	int FilterInner;
+	int FilterOuter;
+
 public:
 
 enum FLEX1500MODES { LSB, USB, DSB, CWL, CWU, FM, AM, DIGU, SPEC, DIGL, SAM, DRM };
@@ -54,14 +58,22 @@ enum FLEX1500MODES { LSB, USB, DSB, CWL, CWU, FM, AM, DIGU, SPEC, DIGL, SAM, DRM
 	void set_modeA(int val);
 	int  get_modeA();
 
+	int  get_bw(int);
+
 	void set_bwA(int val);
 	int  get_bwA();
 
 	void set_modeB(int val);
 	int  get_modeB();
+
 	void set_bwB(int val);
 	int  get_bwB();
+
 	int  def_bandwidth(int);
+
+	int  get_pbt_inner();
+	int  get_pbt_outer();
+	void set_pbt(int inner, int outer);
 
 	int  get_modetype(int n);
 	int  adjust_bandwidth(int val);
