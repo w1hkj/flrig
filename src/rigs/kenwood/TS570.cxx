@@ -313,15 +313,15 @@ int RIG_TS570::get_smeter()
 	cmd = "SM;";
 
 	get_trace(1, "get_smeter()");
-	int n = wait_char(';', 6, 100, "get smeter", ASC);
+	int n = wait_char(';', 7, 100, "get smeter", ASC);
 	gett("");
 
-	if (n < 6) return 0;
+	if (n < 7) return 0;
 	size_t p = replystr.rfind("SM");
 	if (p == std::string::npos) return -1;
 
-	size_t len = replystr.length();
-	replystr[len - 1] = 0;
+//	size_t len = replystr.length();
+//	replystr[len - 1] = 0;
 
 	int mtr = atoi(&replystr[p + 2]);
 	if (mtr <= 9)
