@@ -149,7 +149,7 @@ RIG_SDR2_PRO::RIG_SDR2_PRO() {
 	has_ptt_control = true;
 
 	precision = 1;
-	ndigits = 8;
+	ndigits = 9;
 
 	_noise_reduction_level = 0;
 	_nrval1 = 2;
