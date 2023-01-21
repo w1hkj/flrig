@@ -251,7 +251,7 @@ RIG_IC705::RIG_IC705() {
 	has_xcvr_auto_on_off = true;
 
 	precision = 1;
-	ndigits = 8;
+	ndigits = 9;
 
 	has_vfo_adj = true;
 
