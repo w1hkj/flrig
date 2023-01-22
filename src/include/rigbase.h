@@ -45,6 +45,7 @@ struct XCVR_STATE {
 	unsigned long long freq;
 	int  imode;
 	int  iBW;
+	int  bw_val;
 	int  FilterInner;
 	int  FilterOuter;
 	int  filter;
@@ -191,9 +192,11 @@ public:
 
 	int  modeA;
 	int  bwA;
+	int  bwA_val;
 	unsigned long long freqA;
 	int  modeB;
 	int  bwB;
+	int  bwB_val;
 	unsigned long long freqB;
 	int  precision;
 	int  ndigits;
@@ -375,8 +378,10 @@ public:
 
 	virtual void set_bwA(int val) {A.iBW = val;}
 	virtual int  get_bwA() {return A.iBW;}
+	virtual int  get_bwA_val() { return bwA_val; }
 	virtual void set_bwB(int val) {B.iBW = val; set_bwA(val);}
 	virtual int  get_bwB() {return B.iBW;}
+	virtual int  get_bwB_val() { return bwB_val; }
 	virtual int  adjust_bandwidth(int m) {return 0;}
 	virtual int  def_bandwidth(int m) {return 0;}
 	virtual const char **bwtable(int m) {return bandwidths_;}

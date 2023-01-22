@@ -36,12 +36,12 @@ static const char *K3_widths[] = {
    "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
   "550",  "600",  "650",  "700",  "750",  "800",  "850",  "900",  "950", "1000",
  "1100", "1200", "1300", "1400", "1500", "1600", "1700", "1800", "1900", "2000",
- "2200", "2400", "2600", "2800", "3000", "3200", "3400", "3600", NULL};
+ "2200", "2400", "2600", "2800", "3000", "3200", "3400", "3600", "3800", "4000"};
 static int K3_bw_vals[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
 21,22,23,24,25,26,27,28,29,30,
-31,32,33,34,35,36,37,38, 39,40, WVALS_LIMIT};
+31,32,33,34,35,36,37,38,39,40, WVALS_LIMIT};
 
 static int def_mode_width[] = { 34, 34, 15, 37, 37, 34, 15, 34 };
 
@@ -84,6 +84,7 @@ RIG_K3::RIG_K3() {
 	def_freq = freqA = freqB = 14070000ULL;
 	def_mode = modeA = modeB = 1;
 	def_bw = bwA = bwB = 34;
+	bwA_val = bwB_val = 2800;
 
 	can_change_alt_vfo =
 
@@ -607,77 +608,110 @@ int RIG_K3::get_noise()
 	return (replystr[p+2] == '1' ? 1 : 0);
 }
 
-// FW $ (Filter Bandwidth and Number; GET/SET)
-// K3 Extended SET/RSP format (K31): FWxxxx; where xxxx is 0-9999, the bandwidth
-// in 10-Hz units. May be quantized and/or range limited based on the present
-// operating mode.
-
 void RIG_K3::set_bwA(int val)
 {
-	cmd = "FW0000;";
-	bwA = val;
-	val = atoi(K3_widths[val]);
-	val /= 10; cmd[5] += val % 10;
-	val /= 10; cmd[4] += val % 10;
-	val /= 10; cmd[3] += val % 10;
-	val /= 10; cmd[2] += val % 10;
+    char command[10];
+    cmd = "BW";
+    bwA = val;
+    if (val < (int)(sizeof(K3_widths)/sizeof(char*)-2)) // then it's an index
+    {
+      std::cout << "val==" <<  val << std::endl;
+      std::string w = K3_widths[val];
+      w.erase(w.length() - 1);
+      while (w.length() < 4) w.insert(0, "0");
+      cmd.append(w).append(";");
+    }
+    else // otherwise it's s real width
+    {
+      short bw = val;
+      if (bw > 4000) bw = 4000;
+      snprintf(command, sizeof(command), "BW%04d;", (bw/10));
+      cmd = command;
+      std::cout << command << std::endl;
+    }
+    std::cout << command << std::endl;
 
-	set_trace(1, "set bwA");
-	sendCommand(cmd);
-	sett("");
+    set_trace(1, "set bwA");
+    sendCommand(cmd);
+    sett("");
+    set_pbt_values(val);
 }
 
 int RIG_K3::get_bwA()
 {
+	cmd = "BW;";
+	get_trace(1, "get bwA val");
+	wait_char(';', 7, K3_WAIT_TIME, "get bwA val", ASC);
+	gett("");
+
+	size_t p = replystr.rfind("BW");
+	if (p != std::string::npos) {
+		bwA_val = atoi(&replystr[2]) * 10;
+    }
+
 	cmd = "FW;";
 	get_trace(1, "get bwA");
 	int ret = wait_char(';', 7, K3_WAIT_TIME, "get bandwidth A", ASC);
 	gett("");
-
+ 
 	if (ret < 7) return bwA;
-	size_t p = replystr.rfind("FW");
+	p = replystr.rfind("FW");
 	if (p == std::string::npos) return bwA;
-	int bw = 0;
-	for (int i = 2; i < 6; i++) bw = bw * 10 + replystr[p+i] - '0';
-	bw *= 10;
+	int bw = atoi(&replystr[3]) * 10;
 	for (bwA = 0; bwA < 36; bwA++)
 		if (bw <= atoi(K3_widths[bwA])) break;
 	return bwA;
-
 }
 
 void RIG_K3::set_bwB(int val)
 {
-	if (split_on == false) {
-		LOG_INFO("split on");
-		return;
-	}
-	cmd = "FW$0000;";
-	bwA = val;
-	val = atoi(K3_widths[val]);
-	val /= 10; cmd[6] += val % 10;
-	val /= 10; cmd[5] += val % 10;
-	val /= 10; cmd[4] += val % 10;
-	val /= 10; cmd[3] += val % 10;
+    char command[10];
+    cmd = "BW$";
+    bwA = val;
+    if (val < (int)(sizeof(K3_widths)/sizeof(char*)-2)) // then it's an index
+    {
+      std::cout << "val==" <<  val << std::endl;
+      std::string w = K3_widths[val];
+      w.erase(w.length() - 1);
+      while (w.length() < 4) w.insert(0, "0");
+      cmd.append(w).append(";");
+    }
+    else // otherwise it's s real width
+    {
+      short bw = val;
+      if (bw > 4000) bw = 4000;
+      snprintf(command, sizeof(command), "BW$%04d;", (bw/10));
+      cmd = command;
+      std::cout << command << std::endl;
+    }
+    std::cout << command << std::endl;
 
-	set_trace(1, "set bwB");
-	sendCommand(cmd);
-	sett("");
+    set_trace(1, "set bwB");
+    sendCommand(cmd);
+    sett("");
+    set_pbt_values(val);
 }
 
 int RIG_K3::get_bwB()
 {
+	cmd = "BW$;";
+	get_trace(1, "get bwB val");
+	wait_char(';', 8, K3_WAIT_TIME, "get bwB val", ASC);
+	gett("");
+
+	size_t p = replystr.rfind("BW$");
+	if (p != std::string::npos) {
+		bwB_val = atoi(&replystr[3]) * 10;
+    }
+
 	cmd = "FW$;";
 	get_trace(1, "get bwB");
 	int ret = wait_char(';', 8, K3_WAIT_TIME, "get bandwidth B", ASC);
 	gett("");
-
-	if (ret < 8) return bwB;
-	size_t p = replystr.rfind("FW$");
+ 
+	p = replystr.rfind("FW$");
 	if (p == std::string::npos) return bwB;
-	int bw = 0;
-	for (int i = 3; i < 7; i++) bw = bw * 10 + replystr[p+i] - '0';
-	bw *= 10;
+	int bw = atoi(&replystr[3]) * 10;
 	for (bwB = 0; bwB < 36; bwB++)
 		if (bw <= atoi(K3_widths[bwB])) break;
 	return bwB;

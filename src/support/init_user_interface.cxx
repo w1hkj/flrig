@@ -2222,7 +2222,18 @@ Slider controls TX monitor level");
 	}
 }
 
+static void cb_bw_A(Fl_Counter *, void *)
+{
+	selrig->set_bwA( opBW_A->value() );
+}
+
+static void cb_bw_B(Fl_Counter *, void *)
+{
+	selrig->set_bwB( opBW_B->value() );
+}
+
 void TRACED(init_K3_KX3_special)
+	if (!(xcvr_name == rig_K3.name_ || xcvr_name == rig_KX3.name_)) return;
 
 	if (xcvr_name == rig_K3.name_) {
 		btnB->hide();
@@ -2249,6 +2260,17 @@ void TRACED(init_K3_KX3_special)
 		btnA->show();
 		btnAswapB->show();
 	}
+
+	if (progStatus.UIsize == small_ui) {
+		opBW_A->resize(214, 103, 100, 18);
+		opBW_A->redraw();
+		opBW_B->resize(320, 103, 100, 18);
+		opBW_B->redraw();
+	}
+	opBW_A->callback((Fl_Callback*)cb_bw_A);
+	opBW_A->show();
+	opBW_B->callback((Fl_Callback*)cb_bw_B);
+	opBW_B->show();
 }
 
 extern void read_menus();

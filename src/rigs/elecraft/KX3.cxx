@@ -928,67 +928,110 @@ static std::string KX3_bws = "\
 
 void RIG_KX3::set_bwA(int val)
 {
-	cmd.assign("BW0").append(KX3_bws.substr(val*4, 4));
+    char command[10];
+    cmd = "BW";
+    bwA = val;
+    if (val < (int)(sizeof(KX3_widths)/sizeof(char*)-2)) // then it's an index
+    {
+      std::cout << "val==" <<  val << std::endl;
+      std::string w = KX3_widths[val];
+      w.erase(w.length() - 1);
+      while (w.length() < 4) w.insert(0, "0");
+      cmd.append(w).append(";");
+    }
+    else // otherwise it's s real width
+    {
+      short bw = val;
+      if (bw > 4000) bw = 4000;
+      snprintf(command, sizeof(command), "BW%04d;", (bw/10));
+      cmd = command;
+      std::cout << command << std::endl;
+    }
+    std::cout << command << std::endl;
 
-	set_trace(2, "set bwA", KX3_widths[val]);
-	sendCommand(cmd, 0, 50);
-	sett("");
-	showresp(INFO, ASC, "set bw A", cmd, replystr);
+    set_trace(1, "set bwA");
+    sendCommand(cmd);
+    sett("");
+    //set_pbt_values(val);
 }
 
 int RIG_KX3::get_bwA()
 {
 	cmd = "BW;";
+	get_trace(1, "get bwA val");
+	wait_char(';', 7, KX3_WAIT_TIME, "get bwA val", ASC);
+	gett("");
 
+	size_t p = replystr.rfind("BW");
+	if (p != std::string::npos) {
+		bwA_val = atoi(&replystr[2]) * 10;
+    }
+
+	cmd = "FW;";
 	get_trace(1, "get bwA");
 	int ret = wait_char(';', 7, KX3_WAIT_TIME, "get bandwidth A", ASC);
 	gett("");
-
+ 
 	if (ret < 7) return bwA;
-	std::string bw = replystr.substr( replystr.length() - 4, 4 );
-
-	size_t p = 0;
-	while (p < KX3_bws.length()) {
-		if (bw <= KX3_bws.substr(p, 4)) break;
-		p += 4;
-	}
-	if ((bw < KX3_bws.substr(p,4)) && bw[2] < '5') p -= 4;
-	if (p < 0) p = 0;
-	if (p < KX3_bws.length()) bwA = p / 4;
-
+	p = replystr.rfind("FW");
+	if (p == std::string::npos) return bwA;
+	int bw = atoi(&replystr[3]) * 10;
+	for (bwA = 0; bwA < 36; bwA++)
+		if (bw <= atoi(KX3_widths[bwA])) break;
 	return bwA;
 }
 
 void RIG_KX3::set_bwB(int val)
 {
-	cmd.assign("BW0").append(KX3_bws.substr(val*4, 4));
+    char command[10];
+    cmd = "BW$";
+    bwA = val;
+    if (val < (int)(sizeof(KX3_widths)/sizeof(char*)-2)) // then it's an index
+    {
+      std::cout << "val==" <<  val << std::endl;
+      std::string w = KX3_widths[val];
+      w.erase(w.length() - 1);
+      while (w.length() < 4) w.insert(0, "0");
+      cmd.append(w).append(";");
+    }
+    else // otherwise it's s real width
+    {
+      short bw = val;
+      if (bw > 4000) bw = 4000;
+      snprintf(command, sizeof(command), "BW$%04d;", (bw/10));
+      cmd = command;
+      std::cout << command << std::endl;
+    }
+    std::cout << command << std::endl;
 
-	set_trace(2, "set bwB", KX3_widths[val]);
-	sendCommand(cmd, 0, 50);
-	sett("");
-	showresp(INFO, ASC, "set bw B", cmd, replystr);
+    set_trace(1, "set bwB");
+    sendCommand(cmd);
+    sett("");
+    //set_pbt_values(val);
 }
 
 int RIG_KX3::get_bwB()
 {
-	cmd = "BW;";
-
-	get_trace(1, "get bwA");
-	int ret = wait_char(';', 7, KX3_WAIT_TIME, "get bandwidth B", ASC);
+	cmd = "BW$;";
+	get_trace(1, "get bwB val");
+	wait_char(';', 8, KX3_WAIT_TIME, "get bwB val", ASC);
 	gett("");
 
-	if (ret < 7) return bwB;
-	std::string bw = replystr.substr( replystr.length() - 4, 4 );
+	size_t p = replystr.rfind("BW$");
+	if (p != std::string::npos) {
+		bwB_val = atoi(&replystr[3]) * 10;
+    }
 
-	size_t p = 0;
-	while (p < KX3_bws.length()) {
-		if (bw <= KX3_bws.substr(p, 4)) break;
-		p += 4;
-	}
-	if ((bw < KX3_bws.substr(p,4)) && bw[2] < '5') p -= 4;
-	if (p < 0) p = 0;
-	if (p < KX3_bws.length()) bwB = p / 4;
-
+	cmd = "FW$;";
+	get_trace(1, "get bwB");
+	int ret = wait_char(';', 8, KX3_WAIT_TIME, "get bandwidth B", ASC);
+	gett("");
+ 
+	p = replystr.rfind("FW$");
+	if (p == std::string::npos) return bwB;
+	int bw = atoi(&replystr[3]) * 10;
+	for (bwB = 0; bwB < 36; bwB++)
+		if (bw <= atoi(KX3_widths[bwB])) break;
 	return bwB;
 }
 

@@ -499,6 +499,24 @@ CTRL  click: FreqB -> FreqA\
 	opFilterOuter->tooltip("Outer cutoff");
 	opFilterOuter->hide();
 
+	opBW_A = new Fl_Counter(231, 84, 86, 18, "");
+	opBW_A->minimum(0);
+	opBW_A->maximum(9990);
+	opBW_A->step(10);
+	opBW_A->lstep(100);
+	opBW_A->align(Fl_Align(FL_ALIGN_INSIDE));
+	opBW_A->tooltip("BW vfoA");
+	opBW_A->hide();
+
+	opBW_B = new Fl_Counter(231, 84, 86, 18, "");
+	opBW_B->minimum(0);
+	opBW_B->maximum(9990);
+	opBW_B->step(10);
+	opBW_B->lstep(100);
+	opBW_B->align(Fl_Align(FL_ALIGN_INSIDE));
+	opBW_B->tooltip("BW vfoB");
+	opBW_B->hide();
+
 	opMODE = new Fl_ComboBox(318, 84, 105, 18, _("Mode"));
 	opMODE->tooltip(_("Select transceiver operating mode"));
 	opMODE->box(FL_NO_BOX);

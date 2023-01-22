@@ -116,8 +116,13 @@ void TRACED(restore_xcvr_vals)
 	if (progStatus.restore_frequency)
 		selrig->set_vfoA(xcvr_vfoA.freq);
 
-	if (progStatus.restore_bandwidth)
-		selrig->set_bwA(xcvr_vfoA.iBW);
+	if (progStatus.restore_bandwidth) {
+		if (selrig->name_ == rig_K3.name_) {
+			selrig->set_bwA(xcvr_vfoA.iBW);
+			selrig->set_bwB(xcvr_vfoB.iBW);
+		} else
+			selrig->set_bwA(xcvr_vfoA.iBW);
+	}
 
 	restore_rig_vals_(xcvr_vfoA);
 

@@ -423,6 +423,24 @@ Fl_Group *touch_main_group(int X, int Y, int W, int H)
 		opFilterOuter->tooltip("Outer cutoff");
 		opFilterOuter->hide();
 
+		opBW_A = new Fl_Counter(xpos+30, ypos, opBW->w() - 30, 35, _("BW vfoA"));
+		opBW_A->minimum(0);
+		opBW_A->maximum(9990);
+		opBW_A->step(10);
+		opBW_A->lstep(100);
+		opBW_A->align(Fl_Align(FL_ALIGN_LEFT));
+		opBW_A->tooltip("BW vfoA");
+		opBW_A->hide();
+
+		opBW_B = new Fl_Counter(xpos+30, ypos, opBW->w() - 30, 35, _("BW vfoB"));
+		opBW_B->minimum(0);
+		opBW_B->maximum(9990);
+		opBW_B->step(10);
+		opBW_B->lstep(100);
+		opBW_B->align(Fl_Align(FL_ALIGN_LEFT));
+		opBW_B->tooltip("Bw vfoB");
+		opBW_B->hide();
+
 		grpcombos->end();
 // end of bw / mode selector group
 

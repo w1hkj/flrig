@@ -922,77 +922,110 @@ int RIG_K4::get_noise()
 
 void RIG_K4::set_bwA(int val)
 {
-	cmd = "BW";
-	bwA = val;
-	std::string w = K4_widths[val];
-	w.erase(w.length() - 1);
-	while (w.length() < 4) w.insert(0, "0");
-	cmd.append(w).append(";");
+    char command[10];
+    cmd = "BW";
+    bwA = val;
+    if (val < (int)(sizeof(K4_widths)/sizeof(char*)-2)) // then it's an index
+    {
+      std::cout << "val==" <<  val << std::endl;
+      std::string w = K4_widths[val];
+      w.erase(w.length() - 1);
+      while (w.length() < 4) w.insert(0, "0");
+      cmd.append(w).append(";");
+    }
+    else // otherwise it's s real width
+    {
+      short bw = val;
+      if (bw > 4000) bw = 4000;
+      snprintf(command, sizeof(command), "BW%04d;", (bw/10));
+      cmd = command;
+      std::cout << command << std::endl;
+    }
+    std::cout << command << std::endl;
 
-	set_trace(1, "set bwA");
-	sendCommand(cmd);
-	sett("");
-	set_pbt_values(val);
-
+    set_trace(1, "set bwA");
+    sendCommand(cmd);
+    sett("");
+    set_pbt_values(val);
 }
 
 int RIG_K4::get_bwA()
 {
 	cmd = "BW;";
-	get_trace(1, "get bwA");
-	wait_char(';', 7, K4_WAIT_TIME, "get bandwidth A", ASC);
+	get_trace(1, "get bwA val");
+	wait_char(';', 7, K4_WAIT_TIME, "get bwA val", ASC);
 	gett("");
 
 	size_t p = replystr.rfind("BW");
+	if (p != std::string::npos) {
+		bwA_val = atoi(&replystr[2]) * 10;
+    }
+
+	cmd = "FW;";
+	get_trace(1, "get bwA");
+	wait_char(';', 7, K4_WAIT_TIME, "get bandwidth A", ASC);
+	gett("");
+ 
+	p = replystr.rfind("FW");
 	if (p == std::string::npos) return bwA;
-
-	std::string w = replystr.substr(2);
-	w[w.length() -1] = '0';
-	while (w[0] == '0') w.erase(0, 1);
-
-	bwA = 0;
-	while (K4_widths[bwA] != NULL && w != K4_widths[bwA]) bwA++;
-	if (K4_widths[bwA] == NULL) bwA = 0;
-
+	int bw = atoi(&replystr[3]) * 10;
+	for (bwA = 0; bwA < 36; bwA++)
+		if (bw <= atoi(K4_widths[bwA])) break;
 	return bwA;
-
 }
 
 void RIG_K4::set_bwB(int val)
 {
-	cmd = "BW$";
-	bwB = val;
-	std::string w = K4_widths[val];
-	w.erase(w.length() - 1);
-	while (w.length() < 4) w.insert(0, "0");
-	cmd.append(w).append(";");
+    char command[10];
+    cmd = "BW$";
+    bwA = val;
+    if (val < (int)(sizeof(K4_widths)/sizeof(char*)-2)) // then it's an index
+    {
+      std::cout << "val==" <<  val << std::endl;
+      std::string w = K4_widths[val];
+      w.erase(w.length() - 1);
+      while (w.length() < 4) w.insert(0, "0");
+      cmd.append(w).append(";");
+    }
+    else // otherwise it's s real width
+    {
+      short bw = val;
+      if (bw > 4000) bw = 4000;
+      snprintf(command, sizeof(command), "BW$%04d;", (bw/10));
+      cmd = command;
+      std::cout << command << std::endl;
+    }
+    std::cout << command << std::endl;
 
-	set_trace(1, "set bwB");
-	sendCommand(cmd);
-	sett("");
-	set_pbt_values(val);
-
+    set_trace(1, "set bwB");
+    sendCommand(cmd);
+    sett("");
+    set_pbt_values(val);
 }
 
 int RIG_K4::get_bwB()
 {
 	cmd = "BW$;";
-	get_trace(1, "get bwB");
-	wait_char(';', 8, K4_WAIT_TIME, "get bandwidth B", ASC);
+	get_trace(1, "get bwB val");
+	wait_char(';', 8, K4_WAIT_TIME, "get bwB val", ASC);
 	gett("");
 
 	size_t p = replystr.rfind("BW$");
+	if (p != std::string::npos) {
+		bwB_val = atoi(&replystr[3]) * 10;
+    }
+
+	cmd = "FW$;";
+	get_trace(1, "get bwB");
+	wait_char(';', 8, K4_WAIT_TIME, "get bandwidth B", ASC);
+	gett("");
+ 
+	p = replystr.rfind("FW$");
 	if (p == std::string::npos) return bwB;
-	std::string w = replystr.substr(3);
-	w[w.length() -1] = '0';
-	while (w[0] == '0') w.erase(0, 1);
-
-	bwB = 0;
-	while (K4_widths[bwB] != NULL && w != K4_widths[bwB]) bwB++;
-	if (K4_widths[bwB] == NULL) bwB = 0;
-
+	int bw = atoi(&replystr[3]) * 10;
+	for (bwB = 0; bwB < 36; bwB++)
+		if (bw <= atoi(K4_widths[bwB])) break;
 	return bwB;
-
 }
 
 int RIG_K4::get_power_out()

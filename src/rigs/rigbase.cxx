@@ -148,9 +148,11 @@ rigbase::rigbase()
 	A.freq = 14070000ULL;
 	A.imode = 1;
 	A.iBW = 0;
+	A.bw_val = 800;
 	B.freq = 14070000ULL;
 	B.imode = 1;
 	B.iBW = 0;
+	B.bw_val = 800;
 	inuse = onA;
 	precision = 1;
 	ndigits = 10;

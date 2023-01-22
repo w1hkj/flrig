@@ -77,19 +77,19 @@ void read_K3_mode()
 	}
 }
 
-void read_K3_bw()
-{
-	int nu_BW;
-	nu_BW = selrig->get_bwA();
-	if (nu_BW != vfoA.iBW) {
-		vfoA.iBW = vfo->iBW = nu_BW;
-		Fl::awake(setBWControl);
-	}
-	nu_BW = selrig->get_bwB();
-	if (nu_BW != vfoB.iBW) {
-		vfoB.iBW = nu_BW;
-	}
-}
+//void read_K3_bw()
+//{
+//	int nu_BW;
+//	nu_BW = selrig->get_bwA();
+//	if (nu_BW != vfoA.iBW) {
+//		vfoA.iBW = vfo->iBW = nu_BW;
+//		Fl::awake(setBWControl);
+//	}
+//	nu_BW = selrig->get_bwB();
+//	if (nu_BW != vfoB.iBW) {
+//		vfoB.iBW = nu_BW;
+//	}
+//}
 
 
 void K3_set_split(int val)

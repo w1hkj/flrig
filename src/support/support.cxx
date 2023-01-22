@@ -169,11 +169,15 @@ std::string printXCVR_STATE(XCVR_STATE data)
 				str << ", " << (dsphi ? dsphi[(data.iBW >> 8) & 0x7F] : "??");
 			}
 		} else {
-			const char **bwt = selrig->bwtable(data.imode);
-			if (bwt)
-				str << ", " << bwt[data.iBW];
-			else
-				str << ", n/a";
+			if (selrig->name_ == rig_K3.name_) {
+				str << data.iBW;
+			} else {
+				const char **bwt = selrig->bwtable(data.imode);
+				if (bwt)
+					str << ", " << bwt[data.iBW];
+				else
+					str << ", n/a";
+			}
 		}
 	} else
 		str << ", modes n/a";
@@ -213,24 +217,30 @@ Data Source: %s\n\
 	prstr.assign(str);
 	str[0] = 0;
 	if (selrig->has_FILTER) {
-		if (bwt && dsplo && dsphi) {
+		if (selrig->name_ == rig_K3.name_) {
 			snprintf(str, sizeof(str), "\
+  bandwidth ...... %d\n",
+				data.iBW);
+		} else {
+			if (bwt && dsplo && dsphi) {
+				snprintf(str, sizeof(str), "\
   filter ......... %s\n\
   bwt index ...... %2d, [%s] [%s]\n",
-			selrig->FILT(selrig->get_FILT(data.imode)),
-			data.iBW,
-			(data.iBW > 256 && selrig->has_dsp_controls) ?
-				(dsplo ? dsplo[data.iBW & 0x7F] : "??") : (bwt ? bwt[data.iBW] : "n/a"),
-			(data.iBW > 256 && selrig->has_dsp_controls) ?
-				(dsphi ? dsphi[(data.iBW >> 8) & 0x7F] : "??") : ""
-			);
-		} else if (bwt) {
-			snprintf(str, sizeof(str), "\
+				selrig->FILT(selrig->get_FILT(data.imode)),
+				data.iBW,
+				(data.iBW > 256 && selrig->has_dsp_controls) ?
+					(dsplo ? dsplo[data.iBW & 0x7F] : "??") : (bwt ? bwt[data.iBW] : "n/a"),
+				(data.iBW > 256 && selrig->has_dsp_controls) ?
+					(dsphi ? dsphi[(data.iBW >> 8) & 0x7F] : "??") : ""
+				);
+			} else if (bwt) {
+				snprintf(str, sizeof(str), "\
   filter ......... %s\n\
   bwt index ...... %2d, [%s]\n",
-			selrig->FILT(selrig->get_FILT(data.imode)),
-			data.iBW,
-			bwt[data.iBW] );
+				selrig->FILT(selrig->get_FILT(data.imode)),
+				data.iBW,
+				bwt[data.iBW] );
+			}
 		}
 		prstr.append(str);
 		str[0] = 0;
@@ -473,7 +483,9 @@ void read_mode()
 }
 
 void TRACED(setBWControl, void *)
-	if (selrig->has_dsp_controls) {
+	if (selrig->name_ == rig_K3.name_) {
+	}
+	else if (selrig->has_dsp_controls) {
 		if (vfo->iBW > 256) {
 			opBW->hide();
 			opDSP_hi->index((vfo->iBW >> 8) & 0x7F);
@@ -513,9 +525,32 @@ void TRACED(setBWControl, void *)
 	}
 }
 
+void set_Kx_bandwidths(void *)
+{
+	opBW_A->value(vfoA.bw_val);
+	opBW_B->value(vfoB.bw_val);
+	opBW_A->redraw();
+	opBW_B->redraw();
+}
+
 void TRACED(read_bandwidth)
-	if (xcvr_name == rig_K3.name_) {
-		read_K3_bw();
+	if (xcvr_name == rig_K3.name_ ||
+		xcvr_name == rig_KX3.name_ ||
+		xcvr_name == rig_K4.name_) {
+//		read_K3_bw();
+		int nu_BW;
+		nu_BW = selrig->get_bwA();
+		if (nu_BW != vfoA.iBW) {
+			vfoA.iBW = vfo->iBW = nu_BW;
+			Fl::awake(setBWControl);
+		}
+		nu_BW = selrig->get_bwB();
+		if (nu_BW != vfoB.iBW) {
+			vfoB.iBW = nu_BW;
+		}
+		vfoA.bw_val = selrig->get_bwA_val();
+		vfoB.bw_val = selrig->get_bwB_val();
+		Fl::awake(set_Kx_bandwidths);
 		return;
 	}
 
@@ -2020,13 +2055,14 @@ void set_bandwidth_control()
 {
 	if (!selrig->has_bandwidth_control) return;
 
-	vfo->iBW = selrig->def_bandwidth(vfo->imode);
-
-	if (vfo->iBW < 256) {
-		int i = 0;
-		while (selrig->bandwidths_[i]) i++;
-		i--;
-		if (vfo->iBW > i) vfo->iBW = selrig->def_bandwidth(vfo->imode);
+	if (selrig->name_ != rig_K3.name_) {
+		vfo->iBW = selrig->def_bandwidth(vfo->imode);
+		if (vfo->iBW < 256) {
+			int i = 0;
+			while (selrig->bandwidths_[i]) i++;
+			i--;
+			if (vfo->iBW > i) vfo->iBW = selrig->def_bandwidth(vfo->imode);
+		}
 	}
 	if (selrig->inuse == onB) {
 		vfoB.iBW = vfo->iBW = selrig->get_bwB();
@@ -2079,7 +2115,7 @@ void TRACED ( updateBandwidthControl, void *d )
 		selrig->bandwidths_ = selrig->bwtable(vfo->imode);
 		for (int i = 0; selrig->bandwidths_[i] != NULL; i++) {
 			opBW->add(selrig->bandwidths_[i]);
-	}
+		}
 
 		opBW->index(vfo->iBW);
 		opBW->redraw();

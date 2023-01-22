@@ -260,11 +260,17 @@ Fl_Box *bx_row0_expander=(Fl_Box *)0;
 Fl_Button *btn_show_controls = (Fl_Button *)0;
 Fl_Group *grp_row1 = (Fl_Group *)0;
 Fl_Group *grp_row1a = (Fl_Group *)0;
+
 Fl_ComboBox *opBW = (Fl_ComboBox *)0;
 Fl_ComboBox *opDSP_lo = (Fl_ComboBox *)0;
 Fl_ComboBox *opCENTER = (Fl_ComboBox *)0;
+
+Fl_Counter *opBW_A = (Fl_Counter *)0;
+Fl_Counter *opBW_B = (Fl_Counter *)0;
+
 Fl_Counter *opFilterInner = (Fl_Counter *)0;
 Fl_Counter *opFilterOuter = (Fl_Counter *)0;
+
 Fl_Button *btnDSP = (Fl_Button *)0;
 Fl_ComboBox *opDSP_hi = (Fl_ComboBox *)0;
 Fl_Button *btnFILT= (Fl_Button*)0;
