@@ -33,15 +33,11 @@ static const char *QDX_BW[] = {
 //static const char *QDX_BW_tooltip = "Fixed bandwidth";
 
 static GUI rig_widgets[]= {
-	{ (Fl_Widget *)btnVol,        2, 125,  50 }, // 0
-	{ (Fl_Widget *)sldrVOLUME,   54, 125, 156 }, // 1
 	{ (Fl_Widget *)NULL,          0,   0,   0 }
 };
 
 void RIG_QDX::initialize()
 {
-	rig_widgets[0].W = btnVol;
-	rig_widgets[1].W = sldrVOLUME;
 }
 
 RIG_QDX::RIG_QDX() {
@@ -98,12 +94,32 @@ void RIG_QDX::shutdown()
 {
 }
 
+bool pre_106 = false;
+
+bool RIG_QDX::check()
+{
+	cmd = "VN;";  // version number query; re VN1_05;
+	get_trace(1, "get version");
+	wait_char(';', 8, 100, "get version", ASC);
+	gett("");
+//std::cout << ztime() << "::" << "get version %: " << cmd << ", reply: " << replystr << std::endl;
+
+	if (replystr.find("VN") == std::string::npos) return 0;
+	if (replystr.substr(2,4) < "1_06") {
+		pre_106 = true;
+//std::cout << "version < 1_06" << std::endl;
+	}
+	return 1;
+}
+
 unsigned long long RIG_QDX::get_vfoA ()
 {
 	cmd = "FA;";
 	get_trace(1, "get vfoA");
 	if (wait_char(';', 14, 100, "get vfo A", ASC) < 14) return A.freq;
 	gett("");
+
+//std::cout << ztime() << "::" << "get vfoA: " << cmd << ", reply: " << replystr << std::endl;
 
 	size_t p = replystr.rfind("FA");
 
@@ -116,11 +132,14 @@ unsigned long long RIG_QDX::get_vfoA ()
 void RIG_QDX::set_vfoA (unsigned long long freq)
 {
 	A.freq = freq;
-	snprintf(cmdstr, sizeof(cmdstr), "FA%llu;", A.freq);
+	snprintf(cmdstr, sizeof(cmdstr), "FA%011llu;", A.freq);
 	cmd = cmdstr;
 	set_trace(1, "set vfoA");
 	sendCommand(cmd);
 	sett("");
+
+//std::cout << ztime() << "::" << "set_vfoA: " << cmd << ", reply: " << replystr << std::endl;
+
 	showresp(WARN, ASC, "set vfo A", cmd, "");
 }
 
@@ -130,6 +149,8 @@ unsigned long long RIG_QDX::get_vfoB ()
 	get_trace(1, "get vfoB");
 	if (wait_char(';', 14, 100, "get vfo B", ASC) < 14) return B.freq;
 	gett("");
+
+//std::cout << ztime() << "::" << "get vfoB: " << cmd << ", reply: " << replystr << std::endl;
 
 	size_t p = replystr.rfind("FB");
 
@@ -142,10 +163,13 @@ unsigned long long RIG_QDX::get_vfoB ()
 void RIG_QDX::set_vfoB (unsigned long long freq)
 {
 	B.freq = freq;
-	snprintf(cmdstr, sizeof(cmdstr), "FB%llu;", B.freq);
+	snprintf(cmdstr, sizeof(cmdstr), "FB%011llu;", B.freq);
 	cmd = cmdstr;
 	set_trace(1, "set vfoB");
 	sendCommand(cmd);
+
+//std::cout << ztime() << "::" << "set_vfoB: " << cmd << ", reply: " << replystr << std::endl;
+
 	sett("");
 
 	showresp(WARN, ASC, "set vfo B", cmd, "");
@@ -158,6 +182,8 @@ void RIG_QDX::selectA()
 	sendCommand(cmd);
 	sett("");
 
+//std::cout << ztime() << "::" << "select A: " << cmd << ", reply: " << replystr << std::endl;
+
 	showresp(WARN, ASC, "Rx on A, Tx on A", cmd, "");
 	inuse = onA;
 }
@@ -168,6 +194,8 @@ void RIG_QDX::selectB()
 	set_trace(1, "select B");
 	sendCommand(cmd);
 	sett("");
+
+//std::cout << ztime() << "::" << "select B: " << cmd << ", reply: " << replystr << std::endl;
 
 	showresp(WARN, ASC, "Rx on B, Tx on B", cmd, "");
 	inuse = onB;
@@ -180,6 +208,9 @@ void RIG_QDX::set_split(bool val)
 	set_trace(1, "set split on/off");
 	sendCommand(cmd);
 	sett("");
+
+//std::cout << ztime() << "::" << "set bplit: " << cmd << ", reply: " << replystr << std::endl;
+
 	showresp(WARN, ASC, "set split", cmd, "");
 	split_ = val;
 }
@@ -195,6 +226,9 @@ int RIG_QDX::get_split()
 	get_trace(1, "get split");
 	ret = wait_char(';', 4, 100, "get split", ASC);
 	gett("");
+
+//std::cout << ztime() << "::" << "get_split: " << cmd << ", reply: " << replystr << std::endl;
+
 	split_ = replystr[2] == '1';
 	return split_;
 }
@@ -228,6 +262,8 @@ void RIG_QDX::set_PTT_control(int val)
 	sendCommand(cmd);
 	sett("");
 
+//std::cout << ztime() << "::" << "set PTT: " << cmd << ", reply: " << replystr << std::endl;
+
 	showresp(WARN, ASC, "set PTT", cmd, "");
 	ptt_ = val;
 }
@@ -238,6 +274,9 @@ int RIG_QDX::get_PTT()
 	get_trace(1, "get PTT");
 	ret = wait_char(';', 4, 100, "get PTT", ASC);
 	gett("");
+
+//std::cout << ztime() << "::" << "get PTT: " << cmd << ", reply: " << replystr << std::endl;
+
 	if (ret < 4) return ptt_;
 	return ptt_ = replystr[2] == '1';
 }
@@ -276,6 +315,8 @@ int RIG_QDX::get_IF()
 	ret = wait_char(';', 38, 100, "get VFO", ASC);
 	gett("");
 
+//std::cout << ztime() << "::" << "get IF: " << cmd << ", reply: " << replystr << std::endl;
+
 	if (ret < 38) return ptt_;
 
 	rit_ = 0;
@@ -294,10 +335,12 @@ int RIG_QDX::get_IF()
 void RIG_QDX::set_modeA(int val)
 {
 	if (val == 0) cmd = "MD1;"; // LSB
-	else          cmd = "MD3;";
+	else          cmd = "MD2;"; // USB
 	set_trace(1, "set mode A");
 	sendCommand(cmd);
 	sett("");
+
+//std::cout << ztime() << "::" << "set modeA: " << cmd << ", reply: " << replystr << std::endl;
 
 	showresp(WARN, ASC, "set mode A", cmd, "");
 	A.imode = val;
@@ -311,6 +354,8 @@ int RIG_QDX::get_modeA()
 	gett("");
 	if (ret < 4) return A.imode;
 
+//std::cout << ztime() << "::" << "get modeA: " << cmd << ", reply: " << replystr << std::endl;
+
 	if (replystr[2] == '1') A.imode = 0; // LSB
 	else                    A.imode = 1; // USB
 	return A.imode;
@@ -319,11 +364,13 @@ int RIG_QDX::get_modeA()
 void RIG_QDX::set_modeB(int val)
 {
 	if (val == 0) cmd = "MD1;"; // LSB
-	else          cmd = "MD3;";
+	else          cmd = "MD2;"; // USB
 	B.imode = val;
 	set_trace(1, "set mode B");
 	sendCommand(cmd);
 	sett("");
+
+//std::cout << ztime() << "::" << "set modeB: " << cmd << ", reply: " << replystr << std::endl;
 
 	showresp(WARN, ASC, "set mode B", cmd, "");
 }
@@ -334,6 +381,9 @@ int RIG_QDX::get_modeB()
 	get_trace(1, "get_modeB");
 	ret = wait_char(';', 4, 100, "get modeB", ASC);
 	gett("");
+
+//std::cout << ztime() << "::" << "get modeB: " << cmd << ", reply: " << replystr << std::endl;
+
 	if (ret < 4) return B.imode;
 
 	if (replystr[2] == '1') B.imode = 0; // LSB
@@ -352,6 +402,9 @@ void RIG_QDX::setVfoAdj(double v)
 	set_trace(1, "set TCXO ref freq");
 	sendCommand(cmd);
 	sett("");
+
+//std::cout << ztime() << "::" << "set vfoAdj: " << cmd << ", reply: " << replystr << std::endl;
+
 }
 
 double RIG_QDX::getVfoAdj()
@@ -359,6 +412,9 @@ double RIG_QDX::getVfoAdj()
 	cmd = "Q0;";
 	get_trace(1, "get TCXO ref freq");
 	ret = wait_char(';', 12, 100, "get TCXO ref freq", ASC);
+
+//std::cout << ztime() << "::" << "get vfoAdj: " << cmd << ", reply: " << replystr << std::endl;
+
 	if (ret < 11) return vfo_;
 	int vfo;
 	sscanf( (&replystr[2]), "%d", &vfo);
@@ -374,20 +430,25 @@ void RIG_QDX::get_vfoadj_min_max_step(double &min, double &max, double &step)
 
 void RIG_QDX::set_vox_onoff()
 {
-	if (progStatus.vox_onoff) cmd = "Q41;";
-	else                      cmd = "Q40;";
+	if (progStatus.vox_onoff) cmd = pre_106 ? "Q41;" : "Q31;";
+	else                      cmd = pre_106 ? "Q40;" : "Q30;";
 	set_trace(1, "set vox on/off");
 	sendCommand(cmd);
 	sett("");
+
+//std::cout << ztime() << "::" << "set vox: " << cmd << ", reply: " << replystr << std::endl;
+
 	showresp(WARN, ASC, "SET vox gain", cmd, replystr);
 }
 
 int RIG_QDX::get_vox_onoff()
 {
-	cmd = "Q4;";
+	cmd = pre_106 ? "Q4;" : "Q3;";
 	get_trace(1, "get vox onoff");
 	ret = wait_char(';', 4, 100, "get vox on/off", ASC);
 	gett("");
+
+//std::cout << ztime() << "::" << "get vox: " << cmd << ", reply: " << replystr << std::endl;
 
 	if (ret < 4) return progStatus.vox_onoff;
 	progStatus.vox_onoff = (replystr[2] == '1');
@@ -404,6 +465,9 @@ void RIG_QDX::set_volume_control(int val)
 	set_trace(1, "set vol control");
 	sendCommand(cmd);
 	sett("");
+
+//std::cout << ztime() << "::" << "set vol: " << cmd << ", reply: " << replystr << std::endl;
+
 }
 
 int RIG_QDX::get_volume_control()
@@ -413,6 +477,8 @@ int RIG_QDX::get_volume_control()
 	get_trace(1, "get vol control");
 	ret = wait_char(';', 5, 100, "get vol", ASC);
 	gett("");
+
+//std::cout << ztime() << "::" << "get vol: " << cmd << ", reply: " << replystr << std::endl;
 
 	size_t p = replystr.rfind("AG");
 	if (p == std::string::npos) return val;
@@ -436,6 +502,9 @@ void RIG_QDX::setRit(int val)
 	set_trace(1, "set RIT");
 	sendCommand(cmd);
 	sett("");
+
+//std::cout << ztime() << "::" << "set rit: " << cmd << ", reply: " << replystr << std::endl;
+
 }
 
 int RIG_QDX::getRit()

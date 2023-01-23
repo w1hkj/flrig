@@ -39,6 +39,8 @@ public:
 	void initialize();
 	void shutdown();
 
+	bool check();
+
 	unsigned long long get_vfoA ();
 	void set_vfoA (unsigned long long freq);
 	unsigned long long get_vfoB ();
