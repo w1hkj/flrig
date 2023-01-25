@@ -61,8 +61,7 @@ int cwio_process = NONE;
 bool cwio_thread_running = false;
 
 static std::string new_text;
-static std::string cwio_text;
-
+std::string cwio_text;
 
 // return current tick time in seconds
 double cw_now()

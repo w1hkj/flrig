@@ -40,6 +40,8 @@ extern Fl_Double_Window *cwio_editor;
 extern Fl_Double_Window *cwio_configure;
 
 extern pthread_mutex_t cwio_text_mutex;
+extern std::string cwio_text;
+
 extern int cwio_process;
 
 extern Cserial *cwio_serial;

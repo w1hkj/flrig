@@ -3191,19 +3191,19 @@ public:
 // Set cwio transmit on (1) or off (0)
 //------------------------------------------------------------------------------
 
-//static void set_cwio_send_button(void *val)
-//{
-//	if (val == (void *)1) {
-//		btn_cwioSEND->value(1);
-//	} else {
-//		btn_cwioSEND->value(0);
-//		guard_lock lck(&cwio_text_mutex);
+static void set_cwio_send_button(void *val)
+{
+	if (val == (void *)1) {
+		btn_cwioSEND->value(1);
+	} else {
+		btn_cwioSEND->value(0);
+		guard_lock lck(&cwio_text_mutex);
 //		cwio_text.clear();
-//	}
-//	btn_cwioSEND->redraw();
-//}
+		cwio_clear_text();
+	}
+	btn_cwioSEND->redraw();
+}
 
-/*
 class rig_set_verify_cwio_send : public XmlRpcServerMethod {
 public:
 	rig_set_verify_cwio_send(XmlRpcServer* s) : XmlRpcServerMethod("rig.cwio_send", s) {}
@@ -3217,7 +3217,6 @@ public:
 	std::string help() { return std::string("sets cwio transmit on (1) or off (0)"); }
 
 } rig_set_verify_cwio_send(&rig_server);
-*/
 
 //------------------------------------------------------------------------------
 
@@ -3333,8 +3332,7 @@ struct MLIST {
 	{ "rig.shutdown",     "i:n", "shutdown xcvr & flrig" },
 	{ "rig.cwio_set_wpm", "n:i", "set cwio WPM" },
 	{ "rig.cwio_text",    "i:s", "send text via cwio interface" },
-//	{ "rig.cwio_char",    "n:i", "send char via cwio interface" },
-//	{ "rig.cwio_send",    "n:i", "cwio transmit 1/0 (on/off)"},
+	{ "rig.cwio_send",    "n:i", "cwio transmit 1/0 (on/off)"},
 	{ "rig.fskio_text",   "i:s", "send text via fskio interface" },
 
 	{ "rig.mod_vfoA",     "d:d", "modify vfo A +/- NNN Hz" },
