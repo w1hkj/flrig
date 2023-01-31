@@ -101,6 +101,7 @@ struct XCVR_STATE {
 		squelch = 0;
 		compression = 0;
 		compON = 0;
+		bw_val = 0;
 	}
 	XCVR_STATE(unsigned long long a, int b, int c, int d) {
 		XCVR_STATE();

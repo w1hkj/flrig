@@ -706,7 +706,7 @@ int RIG_K3::get_bwB()
 
 	cmd = "FW$;";
 	get_trace(1, "get bwB");
-	int ret = wait_char(';', 8, K3_WAIT_TIME, "get bandwidth B", ASC);
+	wait_char(';', 8, K3_WAIT_TIME, "get bandwidth B", ASC);
 	gett("");
  
 	p = replystr.rfind("FW$");

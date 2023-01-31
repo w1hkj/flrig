@@ -1024,7 +1024,7 @@ int RIG_KX3::get_bwB()
 
 	cmd = "FW$;";
 	get_trace(1, "get bwB");
-	int ret = wait_char(';', 8, KX3_WAIT_TIME, "get bandwidth B", ASC);
+	wait_char(';', 8, KX3_WAIT_TIME, "get bandwidth B", ASC);
 	gett("");
  
 	p = replystr.rfind("FW$");
