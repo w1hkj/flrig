@@ -2,6 +2,8 @@
 
 #include "gettext.h"
 #include "cwioUI.h"
+#include "config.h"
+#include "compat.h"
 #include "dialogs.h"
 Fl_Double_Window *cwlog_viewer; 
 #include "cwio.h"
@@ -102,7 +104,7 @@ static void cb_btn_view_cwlog(Fl_Button*, void*) {
 
 Fl_Double_Window* new_cwio_dialog() {
   Fl_Double_Window* w;
-  { Fl_Double_Window* o = new Fl_Double_Window(670, 126, _("CW keying"));
+  { Fl_Double_Window* o = new Fl_Double_Window(670, 125, _("CW keying"));
     w = o; if (w) {/* empty */}
     { txt_to_send = new Fl_Input2(2, 2, 666, 68);
       txt_to_send->type(4);
@@ -1053,7 +1055,7 @@ static void cb_btn_cw_dtr_calibrate(Fl_Light_Button*, void*) {
 Fl_Counter *cnt_cwio_comp=(Fl_Counter *)0;
 
 static void cb_cnt_cwio_comp(Fl_Counter* o, void*) {
-  progStatus.cwio_comp = int(o->value());
+  progStatus.cwio_comp = o->value();
 }
 
 Fl_Check_Button *btn_cwioINVERTED=(Fl_Check_Button *)0;
@@ -1145,12 +1147,13 @@ Fl_Double_Window* new_cwio_config_dialog() {
       } // Fl_Light_Button* btn_cw_dtr_calibrate
       { Fl_Counter* o = cnt_cwio_comp = new Fl_Counter(400, 8, 130, 24, _("WPM Comp"));
         cnt_cwio_comp->tooltip(_("Timing compensation msec"));
-        cnt_cwio_comp->minimum(0);
-        cnt_cwio_comp->maximum(10);
+        cnt_cwio_comp->minimum(-5);
+        cnt_cwio_comp->maximum(5);
+        cnt_cwio_comp->step(0.001);
         cnt_cwio_comp->callback((Fl_Callback*)cb_cnt_cwio_comp);
         cnt_cwio_comp->align(Fl_Align(FL_ALIGN_LEFT));
         o->value(progStatus.cwio_comp);
-        o->lstep(1.0);
+        o->lstep(0.1);
       } // Fl_Counter* cnt_cwio_comp
       { Fl_Check_Button* o = btn_cwioINVERTED = new Fl_Check_Button(160, 46, 18, 15, _("Inverted"));
         btn_cwioINVERTED->tooltip(_("DTR/RTS signaling is inverted\n(-) keying"));
@@ -1332,7 +1335,7 @@ static void cb_brwsr_cwlog_entries(Fl_Browser*, void*) {
 
 Fl_Double_Window* new_cwlogbook_dialog() {
   Fl_Double_Window* w;
-  { Fl_Double_Window* o = new Fl_Double_Window(670, 284, _("Flrig CW Log"));
+  { Fl_Double_Window* o = new Fl_Double_Window(670, 280, _("Flrig CW Log"));
     w = o; if (w) {/* empty */}
     { CWlog_menubar = new Fl_Menu_Bar(0, 0, 670, 20);
       if (!menu_CWlog_menubar_i18n_done) {

@@ -32,7 +32,7 @@ decl {const char szProsigns[] = "~|%|&|+|=|{|}|<|>|@";} {private local
 Function {new_cwio_dialog()} {} {
   Fl_Window {} {
     label {CW keying} open
-    xywh {530 24 670 126} type Double resizable
+    xywh {530 25 670 125} type Double resizable
     code0 {\#include "status.h"}
     code1 {\#include "cwio.h"}
     code2 {\#include "ValueSlider.h"} visible
@@ -623,10 +623,10 @@ progStatus.cwioSHARED = 0;}
       }
       Fl_Counter cnt_cwio_comp {
         label {WPM Comp}
-        callback {progStatus.cwio_comp = int(o->value());}
-        tooltip {Timing compensation msec} xywh {400 8 130 24} align 4 minimum 0 maximum 10
+        callback {progStatus.cwio_comp = o->value();} selected
+        tooltip {Timing compensation msec} xywh {400 8 130 24} align 4 minimum -5 maximum 5 step 0.001
         code0 {o->value(progStatus.cwio_comp);}
-        code1 {o->lstep(1.0);}
+        code1 {o->lstep(0.1);}
       }
       Fl_Check_Button btn_cwioINVERTED {
         label Inverted
@@ -651,13 +651,13 @@ Function {new_cwlogbook_dialog()} {open
 } {
   Fl_Window {} {
     label {Flrig CW Log} open
-    xywh {529 314 670 284} type Double visible
+    xywh {529 314 670 280} type Double visible
   } {
     Fl_Menu_Bar CWlog_menubar {open
       xywh {0 0 670 20}
     } {
       Submenu CWlog_files {
-        label Files open selected
+        label Files open
         xywh {0 0 70 21}
       } {
         MenuItem cwlog_menu_open {

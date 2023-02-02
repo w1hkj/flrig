@@ -63,50 +63,46 @@ bool cwio_thread_running = false;
 static std::string new_text;
 std::string cwio_text;
 
-// return current tick time in seconds
-double cw_now()
-{
-	static struct timeval t1;
-	gettimeofday(&t1, NULL);
-	return t1.tv_sec + t1.tv_usec / 1e6;
-}
-
+//======================================================================
 // sub millisecond accurate sleep function
 // sleep_time in seconds
+
+extern double monotonic_seconds();
+
 #ifdef CWIO_DEBUG
 FILE *fcwio = (FILE *)0;
+FILE *fcwio2 = (FILE *)0;
 #endif
+
+static double lasterr = 0;
 
 int cw_sleep (double sleep_time)
 {
-	struct timespec tv;
-	double start_at = cw_now();
+	struct timespec tv1, tv2;
+	double start_at = monotonic_seconds();
 	double end_at = start_at + sleep_time;
-	double delay = sleep_time - 0.005;
-	tv.tv_sec = (time_t) delay;
-	tv.tv_nsec = (long) ((delay - tv.tv_sec) * 1e+9);
-	int rval = 0;
+	double delay = sleep_time - 0.010;
+
+	tv1.tv_sec = (time_t) delay;
+	tv1.tv_nsec = (long) ((delay - tv1.tv_sec) * 1e+9);
+	tv2.tv_sec = 0;
+	tv2.tv_nsec = 10;
+
 #ifdef __WIN32__
 	timeBeginPeriod(1);
-	end_at -= 0.0005;
-#endif
-	while (1) {
-		rval = nanosleep (&tv, &tv);
-		if (rval == 0)
-			break;
-		else if (errno == EINTR)
-			continue;
-		else 
-			return rval;
-	}
-	while (cw_now() < end_at);
-#ifdef __WIN32__
+	nanosleep (&tv1, NULL);
+	while ((lasterr = end_at - monotonic_seconds()) > 0)
+		nanosleep(&tv2, NULL);
 	timeEndPeriod(1);
+#else
+	nanosleep (&tv1, NULL);
+	while (((lasterr = end_at - monotonic_seconds()) > 0))
+		nanosleep(&tv2, NULL);
 #endif
 
 #ifdef CWIO_DEBUG
 	if (fcwio)
-		fprintf(fcwio, "%f\n", cw_now() - start_at - sleep_time);
+		fprintf(fcwio, "%f, %f\n", sleep_time, (end_at - lasterr - start_at));
 #endif
 	return 0;
 }
@@ -132,7 +128,7 @@ void cwio_key(bool state)
 		doPTT(state);
 
 	if (progStatus.cwioKEYLINE == 2) {
-			port->setDTR(progStatus.cwioINVERTED ? !state : state);
+		port->setDTR(progStatus.cwioINVERTED ? !state : state);
 	} else if (progStatus.cwioKEYLINE == 1) {
 		port->setRTS(progStatus.cwioINVERTED ? !state : state);
 	}
@@ -140,17 +136,19 @@ void cwio_key(bool state)
 	return;
 }
 
+double start_at2;
+
 void send_cwkey(char c)
 {
-#ifdef CWIO_DEBUG
-	if (!fcwio) fcwio = fopen("cwio_timing.txt", "a");
-#endif
+	start_at2 = monotonic_seconds();
 
-	static std::string code = "";
-	static double tc = 0;
-	static double tch = 0;
-	static double twd = 0;
-	static double xcvr_corr = 0;
+	std::string code = "";
+	double tc = 0;
+	double tch = 0;
+	double twd = 0;
+	double xcvr_corr = 0;
+	double comp = progStatus.cwio_comp * 1e-3;
+	double requested = 0;
 	Cserial *port = cwio_serial;
 
 	switch (progStatus.cwioSHARED) {
@@ -160,27 +158,24 @@ void send_cwkey(char c)
 		default: port = cwio_serial;
 	}
 
-	if (!port) 
+	if (!port)
 		goto exit_send_cwkey;
 
-	if (!port->IsOpen()) 
+	if (!port->IsOpen())
 		goto exit_send_cwkey;
 
 	tc = 1.2 / progStatus.cwioWPM;
+
+	if (comp < tc) tc -= comp;
 	tch = 3 * tc;
 	twd = 4 * tc;
-
-	if ((progStatus.cwio_comp > 0) && (progStatus.cwio_comp < tc)) {
-		tc = tc - progStatus.cwio_comp;
-		tch = tch - 3 * progStatus.cwio_comp;
-		twd = twd - 4 * progStatus.cwio_comp;
-	}
 
 	xcvr_corr = progStatus.cwio_keycorr * 1e-3;
 	if (xcvr_corr < -tc / 2) xcvr_corr = - tc / 2;
 	else if (xcvr_corr > tc / 2) xcvr_corr = tc / 2;
 
 	if (c == ' ' || c == 0x0a) {
+		requested += twd;
 		cw_sleep(twd);
 		goto exit_send_cwkey;
 	}
@@ -191,27 +186,41 @@ void send_cwkey(char c)
 			goto exit_send_cwkey;
 		}
 		if (progStatus.cwioKEYLINE == 2) {
-			port->setDTR(progStatus.cwioINVERTED ? 0 : 1);
+			cwio_key(progStatus.cwioINVERTED ? 0 : 1);
 		} else if (progStatus.cwioKEYLINE == 1) {
-			port->setRTS(progStatus.cwioINVERTED ? 0 : 1);
+			cwio_key(progStatus.cwioINVERTED ? 0 : 1);
 		}
-		if (code[n] == '.')
-			cw_sleep(tc + xcvr_corr);
-		else
+		if (code[n] == '.') {
+			requested += (tc + xcvr_corr);
+			cw_sleep((tc + xcvr_corr));
+		} else {
+			requested += tch;
 			cw_sleep(tch);
+		}
 
 		if (progStatus.cwioKEYLINE == 2) {
-			port->setDTR(progStatus.cwioINVERTED ? 1 : 0);
+			cwio_key(progStatus.cwioINVERTED ? 1 : 0);
 		} else if (progStatus.cwioKEYLINE == 1) {
-			port->setRTS(progStatus.cwioINVERTED ? 1 : 0);
+			cwio_key(progStatus.cwioINVERTED ? 1 : 0);
 		}
-		if (n == code.length() -1)
+		if (n == code.length() -1) {
+			requested += tch;
 			cw_sleep(tch);
-		else
-			cw_sleep(tc - xcvr_corr);
+		} else {
+			requested += (tc - xcvr_corr);
+			cw_sleep((tc - xcvr_corr));
+		}
 	}
 
 exit_send_cwkey:
+
+#ifdef CWIO_DEBUG
+	if (fcwio2) {
+		double duration = monotonic_seconds() - start_at2;
+		fprintf(fcwio2, "%f, %f, %f\n", duration, requested, duration - requested);
+	}
+#endif
+
 	return;
 }
 
@@ -279,11 +288,12 @@ void sending_text()
 	char c = 0;
 	if (progStatus.cwioPTT) {
 		doPTT(1);
-		cw_sleep(progStatus.cwioPTT / 1000.0);
+		MilliSleep(50);
 	}
 	while (cwio_process == SEND) {
 		c = 0;
-		{	guard_lock lck(&cwio_text_mutex);
+		{
+			guard_lock lck(&cwio_text_mutex);
 			if (!cwio_text.empty()) {
 				c = cwio_text[0];
 				cwio_text.erase(0,1);
@@ -299,16 +309,15 @@ void sending_text()
 		}
 		if (c == ']') {
 			cwio_process = END;
-			cw_sleep(0.005);
 			Fl::awake(terminate_sending);
 			return;
 		}
 		if (c) send_cwkey(c);
-		else cw_sleep(0.005);
+		else MilliSleep(50);
 	}
 	if (progStatus.cwioPTT) {
 		doPTT(0);
-		cw_sleep(progStatus.cwioPTT / 1000.0);
+		MilliSleep(50);
 	}
 }
 
@@ -324,8 +333,8 @@ void do_calibration()
 {
 	std::string paris = "PARIS ";
 	std::string teststr;
-	unsigned long start_time = 0;
-	unsigned long end_time = 0;
+	double start_time = 0;
+	double end_time = 0;
 
 	progStatus.cwio_comp = 0;
 
@@ -334,14 +343,15 @@ void do_calibration()
 
 	txt_to_send->value();
 
-	start_time = zmsec();
+	start_time = monotonic_seconds();
 	for (size_t n = 0; n < teststr.length(); n++) {
 		send_cwkey(teststr[n]);
 	}
 
-	end_time = zmsec();
+	end_time = monotonic_seconds();
+	double corr = 1000.0 * (end_time - start_time - 60.0) / (50.0 * progStatus.cwioWPM);
 
-	progStatus.cwio_comp = 50 * (1.0 - 60000.0 / (end_time - start_time));
+	progStatus.cwio_comp = corr;
 
 	Fl::awake(update_comp_value);
 }
@@ -382,6 +392,20 @@ int start_cwio_thread()
 	memset((void *) &cwio_mutex,   0, sizeof(cwio_mutex));
 	memset((void *) &cwio_cond,    0, sizeof(cwio_cond));
 
+#ifdef CWIO_DEBUG
+	if (!fcwio) {
+		std::string debug_fname;
+		debug_fname.assign(RigHomeDir).append("cwio_timing.txt");
+		fcwio = fopen(debug_fname.c_str(), "a");
+	}
+
+	if (!fcwio2) {
+		std::string debug_fname2;
+		debug_fname2.assign(RigHomeDir).append("cwio_bits.txt");
+		fcwio2 = fopen(debug_fname2.c_str(), "a");
+	}
+#endif
+
 	if(pthread_cond_init(&cwio_cond, NULL)) {
 		LOG_ERROR("cwio thread create fail (pthread_cond_init)");
 		return 1;
@@ -400,7 +424,7 @@ int start_cwio_thread()
 
 	LOG_INFO("started cwio thread");
 
-	cw_sleep(0.010); // Give the CPU time to set 'cwio_thread_running'
+	MilliSleep(50); // Give the CPU time to set 'cwio_thread_running'
 	return 0;
 }
 
@@ -431,6 +455,17 @@ void stop_cwio_thread()
 	cwio_process = NONE;
 
 	close_cwkey();
+
+#ifdef CWIO_DEBUG
+	if (fcwio) {
+		fclose(fcwio);
+		fcwio = 0;
+	}
+	if (fcwio2) {
+		fclose(fcwio2);
+		fcwio2 = 0;
+	}
+#endif
 
 	if (cwio_serial) {
 		delete cwio_serial;

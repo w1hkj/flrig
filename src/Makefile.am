@@ -124,6 +124,7 @@ flrig_SOURCES += \
 	cwio/cwio.cxx \
 	cwio/morse.cxx \
 	cwio/cwioUI.cxx \
+	cwio/precise_time.cxx \
 	cmedia/cmedia.cxx \
 	cmedia/hid.cxx \
 	cmedia/tmate2.cxx \
