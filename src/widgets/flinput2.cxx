@@ -24,6 +24,14 @@
 
 #include "config.h"
 
+#define FLTK_VER (FLRIG_FLTK_API_MAJOR * 10000 + FLRIG_FLTK_API_MINOR * 100)
+
+#if FLTK_VER >= 10400
+#	define FLPOS insert_position
+#else
+#	define FLPOS position
+#endif
+
 #include <cctype>
 
 #include <iostream>
@@ -71,7 +79,7 @@ int Fl_Input2::handle(int event)
 	switch (event) {
 		case FL_KEYBOARD: {
 			int b = Fl::event_key();
-			int p = position();
+			int p = FLPOS();
 			// stop the move-to-next-field madness, we have Tab for that!
 			if (unlikely((b == FL_Left && p == 0) || (b == FL_Right && p == size()) ||
 						 (b == FL_Up && line_start(p) == 0) ||
@@ -89,7 +97,7 @@ int Fl_Input2::handle(int event)
 							return 1;
 						char c = toupper(*(value() + p));
 						replace(p, p + 1, &c, 1);
-						position(word_end(p));
+						FLPOS(word_end(p));
 					}
 						return 1;
 					case 'u': case 'l': { // upper/lower case
@@ -110,7 +118,7 @@ int Fl_Input2::handle(int event)
 							for (int i = 0; i < n; i++)
 								s[i] = tolower(s[i]);
 						replace(p, p + n, s, n);
-						position(p + n);
+						FLPOS(p + n);
 						delete [] s;
 						return 1;
 					}
@@ -136,7 +144,7 @@ int Fl_Input2::handle(int event)
 				return Fl_Input::handle(event);
 			if (Fl::focus() != this)
 				take_focus();
-			up_down_position(d + (d > 0 ? line_end(position()) : line_start(position())));
+			up_down_position(d + (d > 0 ? line_end(FLPOS()) : line_start(FLPOS())));
 			return 1;
 		}
 		case FL_PUSH:
@@ -147,7 +155,7 @@ int Fl_Input2::handle(int event)
 			return Fl_Input::handle(event);
 	}
 
-	bool sel = position() != mark(), ro = readonly();
+	bool sel = FLPOS() != mark(), ro = readonly();
 	icons::set_active(&cmenu[OP_UNDO], !ro);
 	icons::set_active(&cmenu[OP_CUT], !ro && sel);
 	icons::set_active(&cmenu[OP_COPY], sel);
@@ -186,7 +194,7 @@ int Fl_Input2::handle(int event)
 			cut(0, size());
 			break;
 		case OP_SELECT_ALL:
-			position(0, size());
+			FLPOS(0, size());
 			break;
 	}
 	
