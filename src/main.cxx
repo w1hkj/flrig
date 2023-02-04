@@ -139,6 +139,8 @@ bool testmode = false;
   void set_platform_ui(void);
 #endif
 
+bool iconified = false;
+
 //----------------------------------------------------------------------
 void about()
 {
@@ -196,6 +198,11 @@ void visit_URL(void* arg)
 #endif
 }
 
+//----------------------------------------------------------------------
+// set __RESIZE_UI__ as a configuration parameter for compile
+// Fl::screen_dpi(...)
+// Fl::screen_scale(...)
+//   are new functionality in fltk 1.4x
 //----------------------------------------------------------------------
 
 #if defined(__RESIZE_UI__)
@@ -337,6 +344,10 @@ void startup(void*)
 {
 	initStatusConfigDialog();
 
+	if (iconified)
+		for (Fl_Window* w = Fl::first_window(); w; w = Fl::next_window(w))
+			w->iconize();
+
 	switch (progStatus.UIsize) {
 		case touch_ui :
 			mainwindow->size(progStatus.mainW, TOUCH_MAINH);
@@ -355,6 +366,7 @@ void startup(void*)
 			break;
 	}
 	start_server(xmlport);
+
 }
 
 void rotate_log(std::string filename)
@@ -672,7 +684,7 @@ int parse_args(int argc, char **argv, int& idx)
 	std::string helpstr =
 "Usage: \n\
   --help this help text\n\
-  --version\n\
+  --version {-v}\n\
   --config-dir [fully qualified pathname to <DIR>]\n\
   --debug-level N (0..4)\n\
   --serial-debug \n\
@@ -680,6 +692,7 @@ int parse_args(int argc, char **argv, int& idx)
   --xml-help\n\
   --xml-trace\n\
   --exp (expand menu tab controls)\n\
+  --iconify {-i}\n\
   --test\n";
 
 	if (strcasecmp("--help", argv[idx]) == 0) {
@@ -690,7 +703,7 @@ int parse_args(int argc, char **argv, int& idx)
 #endif
 		exit(0);
 	}
-	if (strcasecmp("--version", argv[idx]) == 0) {
+	if (!strcasecmp(argv[idx], "--version") || !strcasecmp(argv[idx], "-v")) {
 		std::string ver = "Version: ";
 		ver.append(VERSION).append("\n");
 		std::cout << ver;
@@ -711,6 +724,12 @@ int parse_args(int argc, char **argv, int& idx)
 		idx++;
 		return 1;
 	}
+	if (!strcasecmp(argv[idx], "-i") || !strcasecmp(argv[idx], "--iconify")) {
+		iconified = true;
+		idx++;
+		return 1;
+	}
+
 	if (strcasecmp("--debug-level", argv[idx]) == 0) {
 		std::string level = argv[idx + 1];
 		switch (level[0]) {
