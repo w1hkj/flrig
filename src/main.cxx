@@ -135,6 +135,9 @@ bool EXPAND_CONTROLS = false;
 int xmlport = 12345;
 
 bool testmode = false;
+#if defined(__RESIZE_UI__)
+  void set_platform_ui(void);
+#endif
 
 //----------------------------------------------------------------------
 void about()
@@ -194,6 +197,38 @@ void visit_URL(void* arg)
 }
 
 //----------------------------------------------------------------------
+
+#if defined(__RESIZE_UI__)
+void set_platform_ui(void)
+{
+
+#if defined(__APPLE__)
+	   FL_NORMAL_SIZE = 12;
+	   progdefaults.WaterfallFontsize = 12;
+	   progdefaults.RxFontsize = 12;
+	   progdefaults.TxFontsize = 12;
+#elif defined(__WOE32__)
+	   Fl::set_font(FL_HELVETICA, "Tahoma");
+	   FL_NORMAL_SIZE = 11;
+	   progdefaults.WaterfallFontnbr = FL_HELVETICA;
+	   progdefaults.WaterfallFontsize = 12;
+	   progdefaults.RxFontsize = 12;
+	   progdefaults.TxFontsize = 12;
+#else
+	   FL_NORMAL_SIZE = 12;
+#endif
+
+float dpx, dpy;
+    Fl::screen_dpi ( dpx, dpy );
+
+// std::cout << "current screen scale factor: " << Fl::screen_scale(0) << std::endl;
+
+float scrn_scale = dpx / 90.0;
+
+// std::cout << "new screen scale factor: " << scrn_scale << std::endl;
+    Fl::screen_scale(0, scrn_scale);
+}
+#endif
 
 extern void saveFreqList();
 
@@ -433,6 +468,9 @@ int main (int argc, char *argv[])
 		exit(1);
 	}
 
+#if defined(__RESIZE_UI__)
+	set_platform_ui();
+#endif
 	progStatus.loadLastState();
 
 	if (use_trace) progStatus.trace = true;
