@@ -300,7 +300,7 @@ void Address::lookup(const char* proto_name)
 	struct addrinfo hints;
 	memset(&hints, 0, sizeof(hints));
 #  ifdef AI_ADDRCONFIG
-	hints.ai_flags = AI_ADDRCONFIG;
+	hints.ai_flags = AI_PASSIVE;
 #  endif
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = (proto == IPPROTO_TCP ? SOCK_STREAM : SOCK_DGRAM);
