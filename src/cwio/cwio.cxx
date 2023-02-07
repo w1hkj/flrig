@@ -373,7 +373,8 @@ if (PRIORITY) {
 	std::string erfname = RigHomeDir;
 	erfname.append("priority.txt");
 	FILE *erfile = fopen(erfname.c_str(),"w");
-#ifndef __WIN32__
+#if 0
+//#ifndef __WIN32__
 	int erc = nice(-10);
 	if (erc == -1)
 		snprintf(estr, sizeof(estr), "%d: errno: %d, %s", __LINE__, errno, strerror(errno));
