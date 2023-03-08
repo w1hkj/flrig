@@ -1562,15 +1562,24 @@ public:
 
 		PTT = int(params[0]);
 		xml_trace(1, (PTT ? "rig_ptt ON" : "rig_ptt OFF"));
-		if (ptt_pending) {
-			ptt_pending = false;
-			return;
-		}
+
 		rigPTT(PTT);
-		Fl::awake(update_UI_PTT);
+		{
+			bool get = ptt_state();
+			int cnt = 0;
+			while ((get != PTT) && (cnt++ < 100)) {
+				MilliSleep(10);
+				get = ptt_state();
+			}
+			PTT = get;
+			std::stringstream s;
+			s << "ptt returned " << get << " in " << cnt * 10 << " msec";
+			xml_trace(1, s.str().c_str());
+			Fl::awake(update_UI_PTT);
+		}
 	}
 
-	std::string help() { return std::string("sets PTT on (1) or off (0), NO read request"); }
+	std::string help() { return std::string("sets PTT on (1) or off (0)"); }
 
 } rig_set_ptt(&rig_server);
 
