@@ -927,7 +927,6 @@ void RIG_K4::set_bwA(int val)
     bwA = val;
     if (val < (int)(sizeof(K4_widths)/sizeof(char*)-2)) // then it's an index
     {
-      std::cout << "val==" <<  val << std::endl;
       std::string w = K4_widths[val];
       w.erase(w.length() - 1);
       while (w.length() < 4) w.insert(0, "0");
@@ -939,9 +938,7 @@ void RIG_K4::set_bwA(int val)
       if (bw > 4000) bw = 4000;
       snprintf(command, sizeof(command), "BW%04d;", (bw/10));
       cmd = command;
-      std::cout << command << std::endl;
     }
-    std::cout << command << std::endl;
 
     set_trace(1, "set bwA");
     sendCommand(cmd);
@@ -981,7 +978,6 @@ void RIG_K4::set_bwB(int val)
     bwA = val;
     if (val < (int)(sizeof(K4_widths)/sizeof(char*)-2)) // then it's an index
     {
-      std::cout << "val==" <<  val << std::endl;
       std::string w = K4_widths[val];
       w.erase(w.length() - 1);
       while (w.length() < 4) w.insert(0, "0");
@@ -993,9 +989,7 @@ void RIG_K4::set_bwB(int val)
       if (bw > 4000) bw = 4000;
       snprintf(command, sizeof(command), "BW$%04d;", (bw/10));
       cmd = command;
-      std::cout << command << std::endl;
     }
-    std::cout << command << std::endl;
 
     set_trace(1, "set bwB");
     sendCommand(cmd);
