@@ -60,7 +60,7 @@ static const char FTdx10_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '8',
 static const char FTdx10_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L', 'U', 'U', 'U', 'U', 'U', 'U', 'U' };
 
 static const char *FTdx10_widths_SSB[] = {
-"Default",										// default width for mode
+//"Default",										// default width for mode
  "300",  "400",  "600",  "850", "1100", 	// 1 ... 5
 "1200", "1500", "1650", "1800", "1950",		// 6 ... 10
 "2100", "2250", "2400", "2450", "2500",		// 7 ... 15
@@ -68,37 +68,41 @@ static const char *FTdx10_widths_SSB[] = {
 "3200", "3500", "4000", NULL };				// 21 ... 23
 
 static int FTdx10_wvals_SSB[] = {
-0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23, WVALS_LIMIT};
+//0,
+1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23, WVALS_LIMIT};
 
 static const char *FTdx10_widths_CW[] = {
-"Default",										// default for mode
+//"Default",										// default for mode
   "50",  "100",  "150",  "200",  "250",		// 1 ... 5
  "300",  "350",  "400",  "450",  "500",		// 6 ... 10
  "600",  "800", "1200", "1400", "1700",		// 11 ... 15
 "2000", "2400", "3000", NULL };				// 16 ... 18
 
 static int FTdx10_wvals_CW[] = {
-0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18, WVALS_LIMIT };
+//0,
+1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18, WVALS_LIMIT };
 
 static const char *FTdx10_widths_RTTY[] = {
-"Default",										// default for mode
+//"Default",										// default for mode
   "50",  "100",  "150",  "200",  "250",		// 1 ... 5
  "300",  "350",  "400",  "450",  "500",		// 6 ... 10
  "600",  "800", "1200", "1400", "1700",		// 11 ... 15
 "2000", "2400", "3000", NULL };				// 16 ... 18
 
 static int FTdx10_wvals_RTTY[] = {
-0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18, WVALS_LIMIT };
+//0,
+1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18, WVALS_LIMIT };
 
 static const char *FTdx10_widths_DATA[] = {
-"Default",										// default for mode
+//"Default",										// default for mode
   "50",  "100",  "150",  "200",  "250",		// 1 ... 5
  "300",  "350",  "400",  "450",  "500",		// 6 ... 10
  "600",  "800", "1200", "1400", "1700",		// 11 ... 15
 "2000", "2400", "3000", NULL };				// 16 ... 18
 
 static int FTdx10_wvals_PSK[] = {
-0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18, WVALS_LIMIT };
+//0,
+1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18, WVALS_LIMIT };
 
 static const int FTdx10_wvals_AMFM[] = { 0, WVALS_LIMIT };
 
@@ -428,7 +432,7 @@ int RIG_FTdx10::get_vfoAorB()
 	wait_char(';', 4, 100, "get vfoAorB()", ASC);
 	gett("get vfoAorB()");
 	size_t p = replystr.rfind(rsp);
-	inuse = onA;
+//	inuse = onA;
 	if (p != std::string::npos)
 		inuse = (replystr[p + 2] == '1') ? onB : onA;
 	return inuse;

@@ -129,6 +129,13 @@ pthread_mutex_t mutex_srvc_reqs = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_trace = PTHREAD_MUTEX_INITIALIZER;
 
 int use_trace = 0;
+int use_rig_trace = 0;
+int use_get_trace = 0;
+int use_set_trace = 0;
+int use_serial_trace = 0;
+int use_xml_trace = 0;
+int use_rpc_trace = 0;
+int use_tci_trace = 0;
 
 bool EXPAND_CONTROLS = false;
 
@@ -486,6 +493,13 @@ int main (int argc, char *argv[])
 	progStatus.loadLastState();
 
 	if (use_trace) progStatus.trace = true;
+	if (use_rig_trace) progStatus.rigtrace = true;
+	if (use_get_trace) progStatus.gettrace = true;
+	if (use_set_trace) progStatus.settrace = true;
+	if (use_serial_trace) progStatus.serialtrace = true;
+	if (use_xml_trace) progStatus.xmltrace = true;
+	if (use_rpc_trace) progStatus.rpctrace = true;
+	if (use_tci_trace) progStatus.tcitrace = true;
 
 	switch (progStatus.UIsize) {
 		case touch_ui :
@@ -688,7 +702,7 @@ int parse_args(int argc, char **argv, int& idx)
   --config-dir [fully qualified pathname to <DIR>]\n\
   --debug-level N (0..4)\n\
   --serial-debug \n\
-  --trace\n\
+  --trace { rig / get / set / serial / xml / rpc / tci }\n\
   --xml-help\n\
   --xml-trace\n\
   --exp (expand menu tab controls)\n\
@@ -711,7 +725,15 @@ int parse_args(int argc, char **argv, int& idx)
 		exit (0);
 	}
 	if (strcasecmp("--trace", argv[idx]) == 0) {
-		use_trace = true;
+		std::string which = argv[idx + 1];
+		if (which == "rig") { use_rig_trace = 1; idx++; }
+		else if (which == "get") { use_get_trace = 1; idx++; }
+		else if (which == "set") { use_set_trace = 1; idx++; }
+		else if (which == "serial") { use_serial_trace = 1; idx++; }
+		else if (which == "xml") { use_xml_trace = 1; idx++; }
+		else if (which == "rpc") { use_rpc_trace = 1; idx++; }
+		else if (which == "tci") { use_tci_trace = 1; idx++; }
+		else use_trace = true;
 		idx++;
 		return 1;
 	}

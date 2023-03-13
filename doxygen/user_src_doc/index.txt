@@ -19,7 +19,7 @@
 
 /*!
 
-\mainpage FLRIG Users Manual - Version 1.4.7
+\mainpage FLRIG Users Manual - Version 1.4.8
 
 \tableofcontents
 
@@ -630,7 +630,7 @@ frequency values outside of the ham band limits in the BSR for a given band.
 Select the User Interface menu item to configure various user preferences including \ref config_fonts_colors.
 <br>
 
-\section sOpControls Operating Controls
+\section sFrequencyControls Frequency Controls
 
 <center>
 \image latex ui/frequency-control.png "Frequency Control" width=4.6in
@@ -669,7 +669,7 @@ then move the mouse cursor over the control and press the middle mouse button to
 
 <B> With Focus </B>
 
-Click (left mouse button) in the control to set focus.  The foreground and background
+<b>Shift-Left-Click</b> (hold keyboard SHIFT button and press left mouse button) in the control to set focus.  The foreground and background
 colors reverse to indicate the control has focus.
 
 <br>
@@ -738,9 +738,9 @@ using either the number keys or the keypad.  You may use any legal floating poin
 For example:
 
 <ul>
-<li>7070
-<li>14070.235
-<li>14.07e3 (Remember that the numeric value is in kHz so this example is 14070 kHz or 14.070 MHz)
+<li>7070</li>
+<li>14070.235</li>
+<li>14.07e3 (Remember that the numeric value is in kHz so this example is 14070 kHz or 14.070 MHz)</li>
 </ul>
 
 
