@@ -1185,26 +1185,16 @@ int RIG_TS890S::get_swr(void)
 {
 	int mtr = 0;
 
-	read_alc = false;
-
 	cmd = "RM21;";
-	if (wait_char(';', 8, 100, "get swr/alc", ASC) < 8) return 0;
+	sendCommand(cmd);
+	showresp(INFO, ASC, "set SWR meter", cmd, "");
 
-	size_t p = replystr.find("RM2");
-	if (p != std::string::npos) {
-		replystr[p + 7] = 0;
-		alc_val = atoi(&replystr[p + 3]);
-		alc_val *= 100;
-		alc_val /= 15;
-		if (alc_val > 100) alc_val = 100;
-		read_alc = true;
-	}
+	cmd = "RM;";
+	sendCommand(cmd);
+	if (wait_char(';', 8, 100, "get SWR", ASC) < 8) return 0;
 
-	p = replystr.find("RM1");
-	if (p == std::string::npos) return 0;
+	sscanf(replystr.c_str(), "RM2%d", &mtr);
 
-	replystr[p + 7] = 0;
-	mtr = atoi(&replystr[p + 3]);
 	mtr *= 50;
 	mtr /= 15;
 	if (mtr > 100) mtr = 100;
@@ -1218,17 +1208,21 @@ int RIG_TS890S::get_alc(void)
 		read_alc = false;
 		return alc_val;
 	}
+
 	cmd = "RM11;";
-	if (wait_char(';', 8, 100, "get alc", ASC) < 8) return 0;
+	sendCommand(cmd);
+	showresp(INFO, ASC, "set ALC meter", cmd, "");
 
-	size_t p = replystr.find("RM3");
-	if (p == std::string::npos) return 0;
+	cmd = "RM;";
+	sendCommand(cmd);
+	if (wait_char(';', 8, 100, "get ALC", ASC) < 8) return 0;
 
-	replystr[p + 7] = 0;
-	alc_val = atoi(&replystr[p + 3]);
+	sscanf(replystr.c_str(), "RM1%d", &alc_val);
+
 	alc_val *= 100;
 	alc_val /= 15;
 	if (alc_val > 100) alc_val = 100;
+
 	return alc_val;
 }
 

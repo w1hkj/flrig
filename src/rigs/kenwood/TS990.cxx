@@ -803,10 +803,9 @@ int RIG_TS990::get_smeter()
 	int mtr = 0;
 	if (wait_char(';', 8, TS990_WAIT, "get", ASC) < 8)
 		return 0;
-	size_t p = replystr.find("SM");
-	if (p == std::string::npos)
-		return 0;
-	mtr = fm_decimal(replystr.substr(p+3), 4);
+
+	char b;
+	sscanf(replystr.c_str(), "SM%c%d", &b, &mtr);
 	mtr *= 10;
 	mtr /= 7;
 
@@ -831,11 +830,9 @@ int RIG_TS990::get_power_out()
 	int mtr = 0;
 	if (wait_char(';', 8, TS990_WAIT, "get", ASC) < 8)
 		return 0;
-	size_t p = replystr.find("SM");
-	if (p == std::string::npos)
-		return 0;
-	mtr = fm_decimal(replystr.substr(p+3), 4);
 
+	char b;
+	sscanf(replystr.c_str(), "SM%c%d", &b, &mtr);
 	int i = 0;
 	while (i < 9 && (mtr > meter[i])) i++;
 	float value = val[i] + (val[i+1] - val[i]) * (mtr - meter[i]) / (meter[i+1] - meter[i]);
@@ -861,10 +858,7 @@ int RIG_TS990::get_swr(void)
 	sendCommand(cmd);
 	if (wait_char(';', 8, TS990_WAIT, "get swr", ASC) < 8) return 0;
 
-	size_t p = replystr.find("RM2");
-	if (p == std::string::npos) return 0;
-
-	mtr = fm_decimal(replystr.substr(p+3), 4);
+	sscanf(replystr.c_str(), "RM21%d", &mtr);
 	mtr *= 10;
 	mtr /= 7;
 	if (mtr > 100) mtr = 100;
@@ -891,10 +885,12 @@ int RIG_TS990::get_alc(void)
 	size_t p = replystr.find("RM1");
 	if (p == std::string::npos) return 0;
 
-	int alc_val = fm_decimal(replystr.substr(p+3), 4);
+	int alc_val = 0;
+	sscanf(replystr.c_str(), "RM11%d", &alc_val);
 	alc_val *= 10;
 	alc_val /= 7;
 	if (alc_val > 100) alc_val = 100;
+
 	return alc_val;
 }
 
