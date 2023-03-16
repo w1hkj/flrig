@@ -235,8 +235,7 @@ void RIG_IC7700::set_modeA(int val)
 // digital set / clear
 	if (val == LSBD7700 || val == USBD7700 || val == AMD7700 || val == FMD7700) {
 		cmd = pre_to;
-		cmd += '\x1A'; cmd += '\x06';
-		cmd += '\x01'; cmd += '\x01';
+		cmd += '\x1A'; cmd += '\x06'; cmd += '\x01';
 		cmd += filA;
 		cmd.append( post);
 		waitFB("set digital");
@@ -299,8 +298,7 @@ void RIG_IC7700::set_modeB(int val)
 	isett("set mode B");
 	if (val == LSBD7700 || val == USBD7700 || val == AMD7700 || val == FMD7700) {
 		cmd = pre_to;
-		cmd += '\x1A'; cmd += '\x06';
-		cmd += '\x01'; cmd += '\x01';
+		cmd += '\x1A'; cmd += '\x06'; cmd += '\x01';
 		cmd += filB;
 		cmd.append( post);
 		waitFB("set digital");
