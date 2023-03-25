@@ -342,6 +342,7 @@ public:
 
 		wait();
 		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_vfo");
+		guard_lock serial_lock(&mutex_serial, "xml rig_get_vfo");
 
 		if (selrig->ICOMmainsub) {
 			if (progStatus.split && PTT) freq = vfoB.freq;
@@ -439,6 +440,8 @@ public:
 
 		wait();
 		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_AB");
+		guard_lock serial_lock(&mutex_serial, "xml rig_get_AB");
+
 		xml_trace(2, "rig_get_AB: " , ((selrig->inuse == onB) ? "B" : "A"));
 		result = (selrig->inuse == onB) ? "B" : "A";
 	}
@@ -850,6 +853,7 @@ public :
 
 		wait();
 		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_modes");
+		guard_lock serial_lock(&mutex_serial, "xml rig_get_modes");
 
 		xml_trace(1, "rig_get_modes");
 
@@ -882,6 +886,7 @@ public:
 
 		wait();
 		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_sideband");
+		guard_lock serial_lock(&mutex_serial, "xml rig_get_sideband");
 
 		mode = vfo->imode;
 
@@ -913,6 +918,7 @@ public:
 		int mode;
 		wait();
 		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_mode");
+		guard_lock serial_lock(&mutex_serial, "xml rig_get_mode");
 
 		mode = vfo->imode;
 
@@ -944,11 +950,20 @@ public:
 		int mode;
 		wait();
 		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_mode");
+		guard_lock serial_lock(&mutex_serial, "xml rig_get_mode");
 
 		mode = vfoA.imode;
 
-		std::string result_string = "none";
-		if (selrig->modes_) result_string = selrig->modes_[mode];
+		std::string result_string;
+
+std::cout << "mode #: " << mode << " @ " << selrig->modes_ << " => ";
+std::cout.flush();
+std::cout << selrig->modes_[mode] << std::endl;
+
+		if (selrig->modes_)
+			result_string = selrig->modes_[mode];
+		else
+			result_string = "none";
 		xml_trace(2, "mode A ", result_string.c_str());
 		result = result_string;
 
@@ -1010,6 +1025,7 @@ public :
 
 		wait();
 		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_bws");
+		guard_lock serial_lock(&mutex_serial, "xml rig_get_bws");
 
 		int mode = (selrig->inuse == onB) ? vfoB.imode : vfoA.imode;
 		const char **bwt = selrig->bwtable(mode);
@@ -1072,6 +1088,7 @@ public:
 
 		wait();
 		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_bw");
+		guard_lock serial_lock(&mutex_serial, "xml rig_get_bw");
 
 		int BW = (selrig->inuse == onB) ? vfoB.iBW : vfoA.iBW;
 		int mode = (selrig->inuse == onB) ? vfoB.imode : vfoA.imode;
@@ -1131,6 +1148,7 @@ public:
 
 		wait();
 		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_bwA");
+		guard_lock serial_lock(&mutex_serial, "xml rig_get_bwA");
 
 		int BW = vfoA.iBW;
 		int mode = vfoA.imode;
@@ -1191,6 +1209,7 @@ public:
 
 		wait();
 		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_bwB");
+		guard_lock serial_lock(&mutex_serial, "xml rig_get_bwB");
 
 		int BW = vfoB.iBW;
 		int mode = vfoB.imode;
@@ -1623,6 +1642,8 @@ public:
 			return;
 		}
 		guard_lock lock(&mutex_srvc_reqs, "xml rig_swap");
+		guard_lock serial_lock(&mutex_serial, "xml rig_swap");
+
 		VFOQUEUE xcvr;
 		xcvr.change = SWAP;
 		xml_trace(1, "xmlrpc SWAP");
@@ -1646,6 +1667,8 @@ public:
 		}
 
 		guard_lock lock(&mutex_srvc_reqs, "xml rig_set_swap");
+		guard_lock serial_lock(&mutex_serial, "xml rig_set_swap");
+
 		VFOQUEUE xcvr;
 		xcvr.change = SWAP;
 		xml_trace(1, "xmlrpc SWAP");
@@ -1668,6 +1691,8 @@ public:
 		}
 
 		guard_lock lock(&mutex_srvc_reqs, "xml rig_set_verify_swap");
+		guard_lock serial_lock(&mutex_serial, "xml rig_set_verify_swap");
+
 		VFOQUEUE xcvr;
 		xcvr.change = SWAP;
 		xml_trace(1, "xmlrpc SWAP");
@@ -1695,6 +1720,8 @@ public:
 		int state = int(params[0]);
 		{
 			guard_lock lock(&mutex_srvc_reqs, "xml rig_set_verify_split");
+			guard_lock serial_lock(&mutex_serial, "xml rig_set_verify_split");
+
 			VFOQUEUE xcvr_split;
 			if (state) xcvr_split.change = sON;
 			else       xcvr_split.change = sOFF;
@@ -1723,6 +1750,8 @@ public:
 		int state = int(params[0]);
 		{
 			guard_lock lock(&mutex_srvc_reqs, "xml rig_set_verify_split");
+			guard_lock serial_lock(&mutex_serial, "xml rig_set_verify_split");
+
 			VFOQUEUE xcvr_split;
 			if (state) xcvr_split.change = sON;
 			else       xcvr_split.change = sOFF;
@@ -1774,6 +1803,8 @@ public:
 		}
 
 		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_set_AB");
+		guard_lock serial_lock(&mutex_serial, "xml rig_set_AB");
+
 		XCVR_STATE vfo = vfoA;
 
 		vfo.src = SRVR;
@@ -1807,6 +1838,8 @@ public:
 		}
 
 		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_set_verify_AB");
+		guard_lock serial_lock(&mutex_serial, "xml rig_set_verify_AB");
+
 		XCVR_STATE vfo = vfoA;
 
 		vfo.src = SRVR;
@@ -2572,6 +2605,7 @@ public:
 		int bw = (int)params[0];
 
 		guard_lock lock(&mutex_srvc_reqs, "xml rig_set_bandwidth");
+		guard_lock serial_lock(&mutex_serial, "xml rig_set_bandwidth");
 
 		int i = 0;
 		while (	selrig->bandwidths_[i] &&
@@ -2614,6 +2648,7 @@ public:
 		int bw = int(params[0]);
 
 		guard_lock lock(&mutex_srvc_reqs, "xml rig_set_verify_bandwidth");
+		guard_lock serial_lock(&mutex_serial, "xml rig_set_verify_bandwidth");
 
 		int i = 0;
 		while (	selrig->bandwidths_[i] &&
@@ -2661,6 +2696,8 @@ public:
 		int bw = (int)params[0];
 
 		guard_lock que_lock ( &mutex_srvc_reqs, "xml rig_set_bw" );
+		guard_lock serial_lock(&mutex_serial, "xml rig_get_bw");
+
 		XCVR_STATE nuvals;
 		nuvals.iBW = bw;
 		if (selrig->inuse == onB) {
@@ -2691,6 +2728,7 @@ public:
 
 		int bw = (int)params[0];
 		guard_lock que_lock ( &mutex_srvc_reqs, "xml rig_set_verify_bw" );
+		guard_lock serial_lock(&mutex_serial, "xml rig_get_bw");
 
 		XCVR_STATE nuvals;
 		int retbw;
@@ -2725,6 +2763,7 @@ public:
 
 		int bw = (int)params[0];
 		guard_lock que_lock ( &mutex_srvc_reqs, "xml rig_set_BW" );
+		guard_lock serial_lock(&mutex_serial, "xml rig_get_BW");
 
 		const char **widths = selrig->bandwidths_;
 		int n = 0;
@@ -2765,6 +2804,7 @@ public:
 
 		int bw = (int)params[0];
 		guard_lock que_lock ( &mutex_srvc_reqs, "xml rig_set_BW" );
+		guard_lock serial_lock(&mutex_serial, "xml rig_get_BW");
 
 		const char **widths = selrig->bandwidths_;
 		int n = 0;
@@ -2810,6 +2850,7 @@ public:
 		int bwch = (int)params[0];
 
 		guard_lock lock(&mutex_srvc_reqs, "xml rig_mod_bandwidth");
+		guard_lock serial_lock(&mutex_serial, "xml rig_mod_bandwidth");
 
 		if (selrig->inuse == onB) {
 			nuvals.freq  = vfoB.freq;
@@ -2873,6 +2914,7 @@ public:
 
 		wait();
 		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_");
+		guard_lock serial_lock(&mutex_serial, "xml rig_get_");
 
 		char inner[10];
 		char outer[10];
@@ -2903,6 +2945,7 @@ public:
 
 		wait();
 		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_");
+		guard_lock serial_lock(&mutex_serial, "xml rig_get_");
 
 		char inner[10];
 		snprintf(inner, sizeof(inner), "%d", progStatus.pbt_inner);
@@ -2930,6 +2973,7 @@ public:
 
 		wait();
 		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_");
+		guard_lock serial_lock(&mutex_serial, "xml rig_get_");
 
 		char outer[10];
 		snprintf(outer, sizeof(outer), "%d", progStatus.pbt_outer);
