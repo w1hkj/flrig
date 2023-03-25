@@ -43,7 +43,9 @@ static int K3_bw_vals[] = {
 21,22,23,24,25,26,27,28,29,30,
 31,32,33,34,35,36,37,38,39,40, WVALS_LIMIT};
 
-static int def_mode_width[] = { 34, 34, 15, 37, 37, 34, 15, 34 };
+static int mode_bwA[] = { -1, -1, -1, -1, -1, -1, -1, -1 };
+static int mode_bwB[] = { -1, -1, -1, -1, -1, -1, -1, -1 };
+static int mode_def_bw[] =  { 2800, 2800, 800, 3600, 3600, 2800, 800, 2800 };
 
 static GUI k3_widgets[]= {
 	{ (Fl_Widget *)btnVol, 2, 125,  50 },
@@ -83,15 +85,15 @@ RIG_K3::RIG_K3() {
 
 	def_freq = freqA = freqB = 14070000ULL;
 	def_mode = modeA = modeB = 1;
-	def_bw = bwA = bwB = 34;
-	bwA_val = bwB_val = 2800;
+	def_bw = bwA = bwB = 2800;
 
 	can_change_alt_vfo =
 
 	has_split_AB =
 	has_micgain_control =
 	has_rf_control =
-	has_bandwidth_control =
+//	has_bandwidth_control =
+	has_int_bandwidth_control =
 	has_power_control =
 	has_volume_control =
 	has_mode_control =
@@ -120,12 +122,18 @@ RIG_K3::RIG_K3() {
 
 int  RIG_K3::adjust_bandwidth(int m)
 {
-	return def_mode_width[m];
+	int width = (inuse == onA ? mode_bwA[m] : mode_bwB[m]);
+	if (width == -1)
+		return mode_def_bw[m];
+	return width;
 }
 
 int  RIG_K3::def_bandwidth(int m)
 {
-	return def_mode_width[m];
+	int width = (inuse == onA ? mode_bwA[m] : mode_bwB[m]);
+	if (width == -1)
+		return mode_def_bw[m];
+	return width;
 }
 
 #define K3_WAIT_TIME 800
@@ -174,14 +182,6 @@ void RIG_K3::initialize()
 			steppwr = 1;
 		}
 	}
-
-	get_vfoA();
-	get_modeA();
-	get_bwA();
-
-	get_vfoB();
-	get_modeB();
-	get_bwB();
 
 	set_split(false); // normal ops
 
@@ -608,113 +608,66 @@ int RIG_K3::get_noise()
 	return (replystr[p+2] == '1' ? 1 : 0);
 }
 
+// BW $ (Filter Bandwidth and Number; GET/SET)
+// KX3 Extended SET/RSP format (K31): BWxxxx; where xxxx is 0-9999, the bandwidth in 10-Hz units. May be
+// quantized and/or range limited based on the present operating mode.
+// BW00050 => BW0005;
+// 50 - 1000 in 50 Hz increments
+// 1000 - 3000 in 100 Hz increments
+// 3000 - 4000 in 200 Hz increments
+
 void RIG_K3::set_bwA(int val)
 {
-    char command[10];
-    cmd = "BW";
-    bwA = val;
-    if (val < (int)(sizeof(K3_widths)/sizeof(char*)-2)) // then it's an index
-    {
-      std::cout << "val==" <<  val << std::endl;
-      std::string w = K3_widths[val];
-      w.erase(w.length() - 1);
-      while (w.length() < 4) w.insert(0, "0");
-      cmd.append(w).append(";");
-    }
-    else // otherwise it's s real width
-    {
-      short bw = val;
-      if (bw > 4000) bw = 4000;
-      snprintf(command, sizeof(command), "BW%04d;", (bw/10));
-      cmd = command;
-      std::cout << command << std::endl;
-    }
-    std::cout << command << std::endl;
+	char command[10];
+	short bw = val;
+	if (bw > 4000) bw = 4000;
+	snprintf(command, sizeof(command), "BW%04d;", (bw/10));
+	cmd = command;
 
-    set_trace(1, "set bwA");
-    sendCommand(cmd);
-    sett("");
-    set_pbt_values(val);
+	set_trace(1, "set bwA");
+	sendCommand(cmd);
+	sett("");
+	bwA = val;
+	mode_bwA[vfoA.imode] = bwA;
 }
 
 int RIG_K3::get_bwA()
 {
 	cmd = "BW;";
 	get_trace(1, "get bwA val");
-	wait_char(';', 7, K3_WAIT_TIME, "get bwA val", ASC);
+	wait_char(';', 7, KX3_WAIT_TIME, "get bwA val", ASC);
 	gett("");
-
-	size_t p = replystr.rfind("BW");
-	if (p != std::string::npos) {
-		bwA_val = atoi(&replystr[2]) * 10;
-    }
-
-	cmd = "FW;";
-	get_trace(1, "get bwA");
-	int ret = wait_char(';', 7, K3_WAIT_TIME, "get bandwidth A", ASC);
-	gett("");
- 
-	if (ret < 7) return bwA;
-	p = replystr.rfind("FW");
-	if (p == std::string::npos) return bwA;
-	int bw = atoi(&replystr[3]) * 10;
-	for (bwA = 0; bwA < 36; bwA++)
-		if (bw <= atoi(K3_widths[bwA])) break;
-	return bwA;
+	int bw = bwA / 10;
+	sscanf(replystr.c_str(), "BW%d", &bw);
+	bw *= 10;
+	return bwA = bw;
 }
 
 void RIG_K3::set_bwB(int val)
 {
-    char command[10];
-    cmd = "BW$";
-    bwA = val;
-    if (val < (int)(sizeof(K3_widths)/sizeof(char*)-2)) // then it's an index
-    {
-      std::cout << "val==" <<  val << std::endl;
-      std::string w = K3_widths[val];
-      w.erase(w.length() - 1);
-      while (w.length() < 4) w.insert(0, "0");
-      cmd.append(w).append(";");
-    }
-    else // otherwise it's s real width
-    {
-      short bw = val;
-      if (bw > 4000) bw = 4000;
-      snprintf(command, sizeof(command), "BW$%04d;", (bw/10));
-      cmd = command;
-      std::cout << command << std::endl;
-    }
-    std::cout << command << std::endl;
+	char command[10];
+	short bw = val;
+	if (bw > 4000) bw = 4000;
+	snprintf(command, sizeof(command), "BW$%04d;", (bw/10));
+	cmd = command;
 
-    set_trace(1, "set bwB");
-    sendCommand(cmd);
-    sett("");
-    set_pbt_values(val);
+	set_trace(1, "set bwB");
+	sendCommand(cmd);
+	sett("");
+	bwB = val;
+	mode_bwB[vfoB.imode] = bwB;
 }
 
 int RIG_K3::get_bwB()
 {
 	cmd = "BW$;";
 	get_trace(1, "get bwB val");
-	wait_char(';', 8, K3_WAIT_TIME, "get bwB val", ASC);
+	wait_char(';', 7, KX3_WAIT_TIME, "get bwB val", ASC);
 	gett("");
-
-	size_t p = replystr.rfind("BW$");
-	if (p != std::string::npos) {
-		bwB_val = atoi(&replystr[3]) * 10;
-    }
-
-	cmd = "FW$;";
-	get_trace(1, "get bwB");
-	wait_char(';', 8, K3_WAIT_TIME, "get bandwidth B", ASC);
-	gett("");
- 
-	p = replystr.rfind("FW$");
-	if (p == std::string::npos) return bwB;
-	int bw = atoi(&replystr[3]) * 10;
-	for (bwB = 0; bwB < 36; bwB++)
-		if (bw <= atoi(K3_widths[bwB])) break;
-	return bwB;
+	int bw = bwB /10;
+	sscanf(replystr.c_str(), "BW$%d", &bw);
+	bw *= 10;
+	return bwB = bw;
 }
 
 int RIG_K3::get_power_out()

@@ -157,30 +157,32 @@ int  powerlevel = 0;
 std::string printXCVR_STATE(XCVR_STATE data)
 {
 	std::stringstream str;
+
 	str << data.freq;
 
-	if (selrig->modes_) {
+	if (selrig->modes_)
 		str << ", " << selrig->modes_[data.imode];
-		if (selrig->has_dsp_controls) {
-			const char **dsplo = selrig->lotable(data.imode);
-			const char **dsphi = selrig->hitable(data.imode);
-			if (data.iBW > 256) {
-				str << ", " << (dsplo ? dsplo[data.iBW & 0x7F] : "??");
-				str << ", " << (dsphi ? dsphi[(data.iBW >> 8) & 0x7F] : "??");
-			}
-		} else {
-			if (selrig->name_ == rig_K3.name_) {
-				str << data.iBW;
-			} else {
-				const char **bwt = selrig->bwtable(data.imode);
-				if (bwt)
-					str << ", " << bwt[data.iBW];
-				else
-					str << ", n/a";
-			}
-		}
-	} else
+	else
 		str << ", modes n/a";
+
+	if (selrig->has_int_bandwidth_control) {
+		str << ", " << data.iBW;
+	} else if (selrig->has_dsp_controls) {
+		const char **dsplo = selrig->lotable(data.imode);
+		const char **dsphi = selrig->hitable(data.imode);
+		if (data.iBW > 256) {
+			str << ", " << (dsplo ? dsplo[data.iBW & 0x7F] : "??");
+			str << ", " << (dsphi ? dsphi[(data.iBW >> 8) & 0x7F] : "??");
+		}
+	} else {
+		const char **bwt = selrig->bwtable(data.imode);
+		if (bwt)
+			str << ", " << bwt[data.iBW];
+		else
+			str << ", n/a";
+	}
+
+	str << std::endl;
 	return str.str();
 }
 
@@ -189,7 +191,7 @@ std::string print_ab()
 	std::string s;
 	s.assign("VFO-A: ");
 	s.append(printXCVR_STATE(vfoA));
-	s.append("; VFO-B: ");
+	s.append("VFO-B: ");
 	s.append(printXCVR_STATE(vfoB));
 	return s;
 }
@@ -198,6 +200,7 @@ const char *print(XCVR_STATE data)
 {
 	static std::string prstr;
 	static char str[1024];
+    if (data.imode < 0) data.imode = 0;
 	const char **bwt = selrig->bwtable(data.imode);
 	const char **dsplo = selrig->lotable(data.imode);
 	const char **dsphi = selrig->hitable(data.imode);
@@ -216,35 +219,33 @@ Data Source: %s\n\
 		selrig->modes_ ? selrig->modes_[data.imode] : "modes n/a");
 	prstr.assign(str);
 	str[0] = 0;
-	if (selrig->has_FILTER) {
-		if (selrig->name_ == rig_K3.name_) {
-			snprintf(str, sizeof(str), "\
+	if (selrig->has_int_bandwidth_control) {
+		snprintf(str, sizeof(str), "\
   bandwidth ...... %d\n",
-				data.iBW);
-		} else {
-			if (bwt && dsplo && dsphi) {
-				snprintf(str, sizeof(str), "\
+		data.iBW);
+	} else if (selrig->has_FILTER) {
+		if (bwt && dsplo && dsphi) {
+			snprintf(str, sizeof(str), "\
   filter ......... %s\n\
   bwt index ...... %2d, [%s] [%s]\n",
-				selrig->FILT(selrig->get_FILT(data.imode)),
+			selrig->FILT(selrig->get_FILT(data.imode)),
 				data.iBW,
 				(data.iBW > 256 && selrig->has_dsp_controls) ?
 					(dsplo ? dsplo[data.iBW & 0x7F] : "??") : (bwt ? bwt[data.iBW] : "n/a"),
 				(data.iBW > 256 && selrig->has_dsp_controls) ?
 					(dsphi ? dsphi[(data.iBW >> 8) & 0x7F] : "??") : ""
-				);
-			} else if (bwt) {
-				snprintf(str, sizeof(str), "\
+			);
+		} else if (bwt) {
+			snprintf(str, sizeof(str), "\
   filter ......... %s\n\
   bwt index ...... %2d, [%s]\n",
 				selrig->FILT(selrig->get_FILT(data.imode)),
 				data.iBW,
 				bwt[data.iBW] );
-			}
 		}
-		prstr.append(str);
-		str[0] = 0;
 	}
+	prstr.append(str);
+	str[0] = 0;
 	snprintf( str, sizeof(str), "\
   split .......... %4d, power_control . %4.1f, volume_control  %4d\n\
   attenuator ..... %4d, preamp ........ %4d, rf gain ....... %4d\n\
@@ -277,6 +278,18 @@ Data Source: %s\n\
 	return prstr.c_str();
 }
 
+std::string print_all()
+{
+	std::string s;
+	s.assign("\
+=======================================================================\n");
+	s.append(print(vfoA)).append("\n");
+	s.append("\
+-----------------------------------------------------------------------\n");
+	s.append(print(vfoB)).append("\n");
+	return s;
+}
+
 void read_info()
 {
 	trace(1,"read_info()");
@@ -305,11 +318,6 @@ void read_vfo()
 		read_K3_vfo();
 		return;
 	}
-
-//	if (xcvr_name == rig_KX3.name_) {
-//		read_KX3_vfo();
-//		return;
-//	}
 
 // transceiver changed ?
 	trace(1,"read_vfo()");
@@ -483,7 +491,11 @@ void read_mode()
 }
 
 void TRACED(setBWControl, void *)
-	if (selrig->name_ == rig_K3.name_) {
+	if (selrig->has_int_bandwidth_control) {
+		opBW->hide();
+		opBW_A->show();
+		opBW_B->show();
+		return;
 	}
 	else if (selrig->has_dsp_controls) {
 		if (vfo->iBW > 256) {
@@ -527,6 +539,7 @@ void TRACED(setBWControl, void *)
 
 void set_Kx_bandwidths(void *)
 {
+	opBW->hide();
 	opBW_A->value(vfoA.bw_val);
 	opBW_B->value(vfoB.bw_val);
 	opBW_A->redraw();
@@ -534,10 +547,10 @@ void set_Kx_bandwidths(void *)
 }
 
 void TRACED(read_bandwidth)
-	if (xcvr_name == rig_K3.name_ ||
+	if (xcvr_name == rig_K2.name_ ||
+		xcvr_name == rig_K3.name_ ||
 		xcvr_name == rig_KX3.name_ ||
 		xcvr_name == rig_K4.name_) {
-//		read_K3_bw();
 		int nu_BW;
 		nu_BW = selrig->get_bwA();
 		if (nu_BW != vfoA.iBW) {
@@ -548,8 +561,8 @@ void TRACED(read_bandwidth)
 		if (nu_BW != vfoB.iBW) {
 			vfoB.iBW = nu_BW;
 		}
-		vfoA.bw_val = selrig->get_bwA_val();
-		vfoB.bw_val = selrig->get_bwB_val();
+		vfoA.bw_val = selrig->get_bwA();
+		vfoB.bw_val = selrig->get_bwB();
 		Fl::awake(set_Kx_bandwidths);
 		return;
 	}
@@ -935,7 +948,9 @@ void read_ifshift()
 	trace(1,"read_if_shift()");
 	on = selrig->get_if_shift(val);
 
-	if (xcvr_name == rig_KX3.name_) {
+	if (xcvr_name == rig_K3.name_ ||
+		xcvr_name == rig_KX3.name_ ||
+		xcvr_name == rig_K4.name_) {
 		vfo->shift_val = progStatus.shift_val = val;
 		Fl::awake(update_ifshift, (void*)0);
 	} else if ((on != progStatus.shift) || (val != progStatus.shift_val)) {
@@ -1022,7 +1037,7 @@ void update_power_control(void *d)
 {
 	double min, max, step;
 
-	if (xcvr_name == rig_K2.name_ || xcvr_name == rig_KX3.name_ || xcvr_name == rig_K4.name_) {
+	if (selrig->has_power_control) {
 		selrig->get_pc_min_max_step(min, max, step);
 
 		if (sldrPOWER) {
@@ -1416,6 +1431,10 @@ void serviceQUE()
 
 void find_bandwidth(XCVR_STATE &nuvals)
 {
+	if (selrig->has_int_bandwidth_control) {
+		nuvals.iBW  = (onA ? selrig->bwA : selrig->bwB);
+		return;
+	}
 	if (nuvals.iBW == 255) return;
 	if (!selrig->has_bandwidth_control) {
 		nuvals.iBW = 255;
@@ -1862,6 +1881,13 @@ void selectFILT()
 
 void selectCENTER()
 {
+	if (xcvr_name == rig_K2.name_ ||
+		xcvr_name == rig_K3.name_ ||
+		xcvr_name == rig_KX3.name_ ||
+		xcvr_name == rig_K4.name_) {
+		return;
+	}
+
 	if (btnCENTER->label()[0] == 'C') {
 		btnCENTER->label("W");
 		opBW->show();
@@ -2074,6 +2100,11 @@ void set_bandwidth_control()
 }
 
 void TRACED ( updateBandwidthControl, void *d )
+	if (xcvr_name == rig_K3.name_ ||
+		xcvr_name == rig_KX3.name_ ||
+		xcvr_name == rig_K4.name_) {
+		return;
+	}
 	if (selrig->has_dsp_controls) {
 		if (vfo->iBW > 256) {
 			opDSP_lo->clear();
@@ -2093,7 +2124,7 @@ void TRACED ( updateBandwidthControl, void *d )
 			btnDSP->show();
 			btnDSP->redraw();
 			btnFILT->hide();
-		} else {
+		} else  {
 			opDSP_lo->hide();
 			opDSP_hi->hide();
 			btnDSP->hide();
@@ -2480,7 +2511,7 @@ void execute_A2B()
 {
 	if (xcvr_name == rig_K3.name_) {
 		K3_A2B();
-	} else if (xcvr_name == rig_KX3.name_) {
+	} else if (xcvr_name == rig_KX3.name_ || xcvr_name == rig_K4.name_) {
 		cb_KX3_A2B();
 	} else if (xcvr_name == rig_K2.name_) {
 		trace(1,"execute A2B() 1");

@@ -51,16 +51,20 @@ static int KX3_bw_vals[] = {
 31,32,33,34,35,36,37,38,39,40, 
 41,42,43,44,45, WVALS_LIMIT};
 
-static int def_mode_width[] = { 34, 34, 15, 37, 37, 34, 15, 34 };
+static int mode_bwA[] = { -1, -1, -1, -1, -1, -1, -1, -1 };
+static int mode_bwB[] = { -1, -1, -1, -1, -1, -1, -1, -1 };
+static int mode_def_bw[] =  { 2800, 2800, 800, 3600, 3600, 2800, 800, 2800 };
 
-static GUI k3_widgets[]= {
+static int ret = 0;
+
+static GUI kx3_widgets[]= {
 	{ (Fl_Widget *)btnVol, 2, 125,  50 },
 	{ (Fl_Widget *)sldrVOLUME, 54, 125, 156 },
-	{ (Fl_Widget *)sldrRFGAIN, 54, 145, 156 },
-	{ (Fl_Widget *)btn_KX3_IFsh, 214, 105,  50 },
-	{ (Fl_Widget *)sldrIFSHIFT, 266, 105, 156 },
-	{ (Fl_Widget *)sldrMICGAIN, 266, 125, 156 },
-	{ (Fl_Widget *)sldrPOWER, 266, 145, 156 },
+	{ (Fl_Widget *)sldrRFGAIN, 266, 125, 156 },
+	{ (Fl_Widget *)sldrMICGAIN, 54, 145, 156 },
+	{ (Fl_Widget *)btn_KX3_IFsh, 212, 145,  50 },
+	{ (Fl_Widget *)sldrIFSHIFT, 266, 145, 156 },
+	{ (Fl_Widget *)sldrPOWER, 54, 165, 366 },
 	{ (Fl_Widget *)NULL, 0, 0, 0 }
 };
 
@@ -72,13 +76,10 @@ RIG_KX3::RIG_KX3() {
 	bw_vals_ = KX3_bw_vals;
 	serial_baudrate = BR38400;
 
-	widgets = k3_widgets;
+	widgets = kx3_widgets;
 
 	stopbits = 1;
 	serial_retries = 2;
-
-//	serial_write_delay = 0;
-//	serial_post_write_delay = 0;
 
 	serial_timeout = 50;
 	serial_rtscts = false;
@@ -90,14 +91,15 @@ RIG_KX3::RIG_KX3() {
 
 	def_freq = freqA = freqB = 14070000ULL;
 	def_mode = modeA = modeB = 1;
-	def_bw = bwA = bwB = 34;
+	def_bw = bwA = bwB = 3000;
 
 	can_change_alt_vfo =
 
 	has_split_AB =
 	has_micgain_control =
 	has_rf_control =
-	has_bandwidth_control =
+//	has_bandwidth_control =
+	has_int_bandwidth_control =
 	has_power_control =
 	has_volume_control =
 	has_mode_control =
@@ -128,42 +130,27 @@ RIG_KX3::RIG_KX3() {
 
 int  RIG_KX3::adjust_bandwidth(int m)
 {
-	return def_mode_width[m];
+	int width = (inuse == onA ? mode_bwA[m] : mode_bwB[m]);
+	if (width == -1)
+		return mode_def_bw[m];
+	return width;
 }
 
 int  RIG_KX3::def_bandwidth(int m)
 {
-	return def_mode_width[m];
+	int width = (inuse == onA ? mode_bwA[m] : mode_bwB[m]);
+	if (width == -1)
+		return mode_def_bw[m];
+	return width;
 }
 
 static int isok = false;
-
-static void init_trace()
-{
-	debug::level = debug::DEBUG_LEVEL;
-
-	progStatus.gettrace   = 
-	progStatus.settrace   = 
-	progStatus.serialtrace =
-	progStatus.rigtrace    =
-	progStatus.xmltrace    =
-	progStatus.trace       = false;
-
-	progStatus.gettrace   = true;
-	progStatus.settrace   = true;
-//	progStatus.serialtrace = true;
-//	progStatus.rigtrace    = true;
-//	progStatus.xmltrace    = true;
-//	progStatus.trace       = true;
-
-
-}
 
 /*
  * OM (Option Module; GET)
 
 OM APF---TBXI0n;
-    |
+	|
 0123456789012345
 0.........1.....
 
@@ -175,8 +162,8 @@ B = internal NiMH battery charger/real-time clock
 X = KX3-2M or KX3-4M transverter module
 I = KXIO2 RTC I/O module
 0n = product identifer
-     1 - KX2
-     2 - KX3
+	 1 - KX2
+	 2 - KX3
 */
 static struct KX3_OPTIONS {
 	bool ATU;
@@ -201,7 +188,7 @@ void RIG_KX3::get_options()
 {
 	cmd = "OM;";
 	get_trace(1, "get options");
-	int ret = wait_char(';', 16, KX3_WAIT_TIME, "get options", ASC);
+	ret = wait_char(';', 16, KX3_WAIT_TIME, "get options", ASC);
 	gett("");
 	if (ret < 16)
 		return;
@@ -218,18 +205,17 @@ void RIG_KX3::get_options()
 
 void RIG_KX3::initialize()
 {
-	init_trace();
-
 	RigSerial->Timeout(50);
 
 	LOG_INFO("KX3");
-	k3_widgets[0].W = btnVol;
-	k3_widgets[1].W = sldrVOLUME;
-	k3_widgets[2].W = sldrRFGAIN;
-	k3_widgets[3].W = btn_KX3_IFsh;
-	k3_widgets[4].W = sldrIFSHIFT;
-	k3_widgets[5].W = sldrMICGAIN;
-	k3_widgets[6].W = sldrPOWER;
+
+	kx3_widgets[0].W = btnVol;
+	kx3_widgets[1].W = sldrVOLUME;
+	kx3_widgets[2].W = sldrRFGAIN;
+	kx3_widgets[3].W = sldrMICGAIN;
+	kx3_widgets[4].W = btn_KX3_IFsh;
+	kx3_widgets[5].W = sldrIFSHIFT;
+	kx3_widgets[6].W = sldrPOWER;
 
 	check();
 
@@ -254,8 +240,8 @@ void RIG_KX3::shutdown()
 }
 
 // from programming notes:
-// vfo change to also incurs a band change will disable CAT responses for up
-// to 500 msec (UGH)
+// vfo change which also incurs a band change will disable CAT responses
+// for up to 500 msec (UGH)
 // use check after all vfo changes
 
 bool RIG_KX3::check ()
@@ -265,7 +251,7 @@ bool RIG_KX3::check ()
 	if (isok) return true;
 
 // try reading vfoA
-	int ret = 0, wait = 10;
+	int wait = 10;
 
 	while ( ( ret < 14) && (wait > 0) ) {
 		snprintf(sztemp, sizeof(sztemp), "check() %d", 11 - wait);
@@ -289,7 +275,7 @@ unsigned long long RIG_KX3::get_vfoA ()
 	cmd = "FA;";
 
 	get_trace(1, "get vfoA");
-	int ret = wait_char(';', 14, KX3_WAIT_TIME, "get vfo A", ASC);
+	ret = wait_char(';', 14, KX3_WAIT_TIME, "get vfo A", ASC);
 	gett("");
 
 	if (ret < 14) return freqA;
@@ -324,7 +310,7 @@ unsigned long long RIG_KX3::get_vfoB ()
 {
 	cmd = "FB;";
 	get_trace(1, "get vfoB");
-	int ret = wait_char(';', 14, KX3_WAIT_TIME, "get vfo B", ASC);
+	ret = wait_char(';', 14, KX3_WAIT_TIME, "get vfo B", ASC);
 	gett("");
 
 	if (ret < 14) return freqB;
@@ -376,7 +362,7 @@ int RIG_KX3::get_volume_control()
 	cmd = "AG;";
 
 	get_trace(1, "get volume control");
-	int ret = wait_char(';', 6, KX3_WAIT_TIME, "get volume", ASC);
+	ret = wait_char(';', 6, KX3_WAIT_TIME, "get volume", ASC);
 	gett("");
 
 	if (ret < 6) return progStatus.volume;
@@ -491,7 +477,7 @@ int RIG_KX3::get_modeA()
 	cmd = "MD;";
 
 	get_trace(1, "get modeA");
-	int ret = wait_char(';', 4, KX3_WAIT_TIME, "get mode A", ASC);
+	ret = wait_char(';', 4, KX3_WAIT_TIME, "get mode A", ASC);
 	gett("");
 
 	if (ret < 4) return modeA;
@@ -499,6 +485,7 @@ int RIG_KX3::get_modeA()
 	if (p == std::string::npos) return modeA;
 	int md = replystr[p + 2] - '1';
 	if (md == 8) md--;
+	if (md < 0 || md > 7) return modeA;
 	return (modeA = md);
 }
 
@@ -520,7 +507,7 @@ int RIG_KX3::get_modeB()
 	cmd = "MD$;";
 
 	get_trace(1, "get modeB");
-	int ret = wait_char(';', 4, KX3_WAIT_TIME, "get mode B", ASC);
+	ret = wait_char(';', 4, KX3_WAIT_TIME, "get mode B", ASC);
 	gett("");
 
 	if (ret < 4) return modeB;
@@ -528,6 +515,7 @@ int RIG_KX3::get_modeB()
 	if (p == std::string::npos) return modeB;
 	int md = replystr[p + 3] - '1';
 	if (md == 8) md--;
+	if (md < 0 || md > 7) return modeB;
 	return (modeB = md);
 }
 
@@ -550,7 +538,7 @@ int RIG_KX3::get_preamp()
 	cmd = "PA;";
 
 	get_trace(1, "get preamp");
-	int ret = wait_char(';', 4, KX3_WAIT_TIME, "get preamp", ASC);
+	ret = wait_char(';', 4, KX3_WAIT_TIME, "get preamp", ASC);
 	gett("");
 
 	if (ret < 4) return progStatus.preamp;
@@ -580,12 +568,12 @@ int RIG_KX3::get_attenuator()
 	cmd = "RA;";
 
 	get_trace(1, "get attenuator");
-	int ret = wait_char(';', 5, KX3_WAIT_TIME, "get ATT", ASC);
+	ret = wait_char(';', 5, KX3_WAIT_TIME, "get ATT", ASC);
 	gett("");
 
 	if (ret < 5) return progStatus.attenuator;
 	size_t p = replystr.rfind("RA");
-	if (p == std::string::npos) return 0;
+	if (p == std::string::npos) return progStatus.attenuator;
 	return (replystr[p + 3] == '1' ? 1 : 0);
 }
 
@@ -637,7 +625,7 @@ double RIG_KX3::get_power_control()
 	cmd = "PC;";
 
 	get_trace(1, "get power control");
-	int ret = wait_char(';', 6, KX3_WAIT_TIME, "get power level", ASC);
+	ret = wait_char(';', 6, KX3_WAIT_TIME, "get power level", ASC);
 	gett("");
 
 	if (ret < 6) return progStatus.power_level;
@@ -669,7 +657,6 @@ int RIG_KX3::power_scale()
 
 int RIG_KX3::get_power_out()
 {
-	int ret = 0;
 	size_t p = 0;
 	int mtr = 0;
 
@@ -734,7 +721,7 @@ int RIG_KX3::get_rf_gain()
 	cmd = "RG;";
 
 	get_trace(1, "get rf gain");
-	int ret = wait_char(';', 6, KX3_WAIT_TIME, "get RF gain", ASC);
+	ret = wait_char(';', 6, KX3_WAIT_TIME, "get RF gain", ASC);
 	gett("");
 
 	if (ret < 6) return progStatus.rfgain;
@@ -775,7 +762,7 @@ int RIG_KX3::get_mic_gain()
 	cmd = "MG;";
 
 	get_trace(1, "get mic gain");
-	int ret = wait_char(';', 6, KX3_WAIT_TIME, "get MIC gain", ASC);
+	ret = wait_char(';', 6, KX3_WAIT_TIME, "get MIC gain", ASC);
 	gett("");
 
 	if (ret < 6) return progStatus.mic_gain;
@@ -843,7 +830,7 @@ int RIG_KX3::get_PTT()
 {
 	cmd = "IF;";
 	get_trace(1, "get PTT");
-	int ret = wait_char(';', 38, KX3_WAIT_TIME, "get split", ASC);
+	ret = wait_char(';', 38, KX3_WAIT_TIME, "get split", ASC);
 	gett("");
 	if (ret < 38) return ptt_;
 	size_t p = replystr.rfind("IF");
@@ -872,7 +859,7 @@ int RIG_KX3::get_smeter()
 	cmd = "SM;";
 
 	get_trace(1, "get smeter");
-	int ret = wait_char(';', 7, KX3_WAIT_TIME, "get Smeter", ASC);
+	ret = wait_char(';', 7, KX3_WAIT_TIME, "get Smeter", ASC);
 	gett("");
 
 	if (ret < 7) return 0;
@@ -902,7 +889,7 @@ int RIG_KX3::get_noise()
 	cmd = "NB;";
 
 	get_trace(1, "get noise blanker");
-	int ret = wait_char(';', 4, KX3_WAIT_TIME, "get Noise Blanker", ASC);
+	ret = wait_char(';', 4, KX3_WAIT_TIME, "get Noise Blanker", ASC);
 	gett("");
 
 	if (ret < 4) return progStatus.noise;
@@ -919,120 +906,58 @@ int RIG_KX3::get_noise()
 // 1000 - 3000 in 100 Hz increments
 // 3000 - 4000 in 200 Hz increments
 
-static std::string KX3_bws = "\
-005;010;015;020;025;030;035;040;045;050;\
-055;060;065;070;075;080;085;090;095;100;\
-110;120;130;140;150;160;170;180;190;200;\
-210;220;230;240;250;260;270;280;290;300;\
-320;340;360;380;400;";
-
 void RIG_KX3::set_bwA(int val)
 {
-    char command[10];
-    cmd = "BW";
-    bwA = val;
-    if (val < (int)(sizeof(KX3_widths)/sizeof(char*)-2)) // then it's an index
-    {
-      std::cout << "val==" <<  val << std::endl;
-      std::string w = KX3_widths[val];
-      w.erase(w.length() - 1);
-      while (w.length() < 4) w.insert(0, "0");
-      cmd.append(w).append(";");
-    }
-    else // otherwise it's s real width
-    {
-      short bw = val;
-      if (bw > 4000) bw = 4000;
-      snprintf(command, sizeof(command), "BW%04d;", (bw/10));
-      cmd = command;
-      std::cout << command << std::endl;
-    }
-    std::cout << command << std::endl;
+	char command[10];
+	short bw = val;
+	if (bw > 4000) bw = 4000;
+	snprintf(command, sizeof(command), "BW%04d;", (bw/10));
+	cmd = command;
 
-    set_trace(1, "set bwA");
-    sendCommand(cmd);
-    sett("");
-    //set_pbt_values(val);
+	set_trace(1, "set bwA");
+	sendCommand(cmd);
+	sett("");
+	bwA = val;
+	mode_bwA[vfoA.imode] = bwA;
 }
 
 int RIG_KX3::get_bwA()
 {
 	cmd = "BW;";
 	get_trace(1, "get bwA val");
-	wait_char(';', 7, KX3_WAIT_TIME, "get bwA val", ASC);
+	ret = wait_char(';', 7, KX3_WAIT_TIME, "get bwA val", ASC);
 	gett("");
-
-	size_t p = replystr.rfind("BW");
-	if (p != std::string::npos) {
-		bwA_val = atoi(&replystr[2]) * 10;
-    }
-
-	cmd = "FW;";
-	get_trace(1, "get bwA");
-	int ret = wait_char(';', 7, KX3_WAIT_TIME, "get bandwidth A", ASC);
-	gett("");
- 
 	if (ret < 7) return bwA;
-	p = replystr.rfind("FW");
-	if (p == std::string::npos) return bwA;
-	int bw = atoi(&replystr[3]) * 10;
-	for (bwA = 0; bwA < 36; bwA++)
-		if (bw <= atoi(KX3_widths[bwA])) break;
-	return bwA;
+	int bw = bwA / 10;
+	if (sscanf(replystr.c_str(), "BW%d", &bw) != 1) return bwA;
+	return bwA = bw * 10;
 }
 
 void RIG_KX3::set_bwB(int val)
 {
-    char command[10];
-    cmd = "BW$";
-    bwA = val;
-    if (val < (int)(sizeof(KX3_widths)/sizeof(char*)-2)) // then it's an index
-    {
-      std::cout << "val==" <<  val << std::endl;
-      std::string w = KX3_widths[val];
-      w.erase(w.length() - 1);
-      while (w.length() < 4) w.insert(0, "0");
-      cmd.append(w).append(";");
-    }
-    else // otherwise it's s real width
-    {
-      short bw = val;
-      if (bw > 4000) bw = 4000;
-      snprintf(command, sizeof(command), "BW$%04d;", (bw/10));
-      cmd = command;
-      std::cout << command << std::endl;
-    }
-    std::cout << command << std::endl;
+	char command[10];
+	short bw = val;
+	if (bw > 4000) bw = 4000;
+	snprintf(command, sizeof(command), "BW$%04d;", (bw/10));
+	cmd = command;
 
-    set_trace(1, "set bwB");
-    sendCommand(cmd);
-    sett("");
-    //set_pbt_values(val);
+	set_trace(1, "set bwB");
+	sendCommand(cmd);
+	sett("");
+	bwB = val;
+	mode_bwB[vfoB.imode] = bwB;
 }
 
 int RIG_KX3::get_bwB()
 {
 	cmd = "BW$;";
 	get_trace(1, "get bwB val");
-	wait_char(';', 8, KX3_WAIT_TIME, "get bwB val", ASC);
+	ret = wait_char(';', 7, KX3_WAIT_TIME, "get bwB val", ASC);
 	gett("");
-
-	size_t p = replystr.rfind("BW$");
-	if (p != std::string::npos) {
-		bwB_val = atoi(&replystr[3]) * 10;
-    }
-
-	cmd = "FW$;";
-	get_trace(1, "get bwB");
-	wait_char(';', 8, KX3_WAIT_TIME, "get bandwidth B", ASC);
-	gett("");
- 
-	p = replystr.rfind("FW$");
-	if (p == std::string::npos) return bwB;
-	int bw = atoi(&replystr[3]) * 10;
-	for (bwB = 0; bwB < 36; bwB++)
-		if (bw <= atoi(KX3_widths[bwB])) break;
-	return bwB;
+	if (ret < 7) return bwB;
+	int bw = bwB /10;
+	if (sscanf(replystr.c_str(), "BW$%d", &bw) != 1) return bwB;
+	return bwB = bw * 10;
 }
 
 bool RIG_KX3::can_split()
@@ -1069,13 +994,14 @@ int RIG_KX3::get_split()
 	cmd = "IF;";
 
 	get_trace(1, "get split");
-	int ret = wait_char(';', 38, KX3_WAIT_TIME, "get split", ASC);
+	ret = wait_char(';', 38, KX3_WAIT_TIME, "get split", ASC);
 	gett("");
 
 	if (ret < 38) return split_on;
 	size_t p = replystr.rfind("IF");
 	if (p == std::string::npos) return split_on;
-	split_on = replystr[p+32] - '0';
+	if (replystr[p+32] == '1') split_on = 1;
+	if (replystr[p+32] == '0') split_on = 0;
 	return split_on;
 }
 
@@ -1138,7 +1064,7 @@ void  RIG_KX3::get_if_mid()
 
 	cmd = "IS;";
 	get_trace(1, "get center pbt");
-	int ret = wait_char(';', 8, 500, "get PBT center", ASC);
+	ret = wait_char(';', 8, 500, "get PBT center", ASC);
 	gett("");
 
 	if (ret < 8) return;
@@ -1187,7 +1113,7 @@ int RIG_KX3::get_swr()
 	if (options.KXPA) {
 		cmd = "^OP;";
 		get_trace(1, "test KXPA");
-		int ret = wait_char(';', 5, KX3_WAIT_TIME, "test KXPA", ASC);
+		ret = wait_char(';', 5, KX3_WAIT_TIME, "test KXPA", ASC);
 		gett("");
 		if (ret >= 5) {
 			powerScale = 1;
@@ -1213,7 +1139,7 @@ int RIG_KX3::get_swr()
 	cmd = "SW;";
 
 	get_trace(1, "get swr");
-	int ret = wait_char(';', 6, KX3_WAIT_TIME, "get Smeter", ASC);
+	ret = wait_char(';', 6, KX3_WAIT_TIME, "get Smeter", ASC);
 	gett("");
 
 	if (ret < 6) return 0;

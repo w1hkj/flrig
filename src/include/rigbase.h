@@ -241,6 +241,7 @@ public:
 	bool has_volume_control;
 	bool has_mode_control;
 	bool has_bandwidth_control;
+	bool has_int_bandwidth_control;
 	bool has_dsp_controls;
 	bool has_FILTER;
 	bool has_micgain_control;

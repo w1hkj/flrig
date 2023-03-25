@@ -81,6 +81,7 @@ rigbase::rigbase()
 	has_volume_control =
 	has_mode_control =
 	has_bandwidth_control =
+	has_int_bandwidth_control =
 	has_dsp_controls =
 	has_micgain_control =
 	has_mic_line_control =

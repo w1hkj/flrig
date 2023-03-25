@@ -80,7 +80,7 @@ RIG_K2::RIG_K2() {
 	has_preamp_control =
 	has_power_control =
 	has_mode_control =
-	has_bandwidth_control =
+//	has_bandwidth_control =
 	has_ptt_control =
 	has_split =
 	has_smeter =

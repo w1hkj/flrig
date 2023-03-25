@@ -1788,9 +1788,14 @@ Fl_Color flrig_def_color(int n)
 	return (Fl_Color)flrig_cmap[n];
 }
 
+extern std::string print_all();
 
 void cb_send_command(std::string command, Fl_Output *resp)
 {
+	if (command == "PRINT") {
+		std::cout << print_all();
+		return;
+	}
 	if (command.empty()) return;
 	bool usehex = false;
 

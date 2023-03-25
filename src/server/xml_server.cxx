@@ -956,9 +956,9 @@ public:
 
 		std::string result_string;
 
-std::cout << "mode #: " << mode << " @ " << selrig->modes_ << " => ";
-std::cout.flush();
-std::cout << selrig->modes_[mode] << std::endl;
+//std::cout << "mode #: " << mode << " @ " << selrig->modes_ << " => ";
+//std::cout.flush();
+//std::cout << selrig->modes_[mode] << std::endl;
 
 		if (selrig->modes_)
 			result_string = selrig->modes_[mode];
@@ -1093,6 +1093,15 @@ public:
 		int BW = (selrig->inuse == onB) ? vfoB.iBW : vfoA.iBW;
 		int mode = (selrig->inuse == onB) ? vfoB.imode : vfoA.imode;
 
+		if (selrig->has_int_bandwidth_control) {
+				char reply[10];
+				snprintf(reply, sizeof(reply), "%d", BW);
+				result[0] = reply;
+				std::string s1 = result[0], s2 = result[1];
+				xml_trace( 5, "bandwidth on ", ((selrig->inuse == onB) ? "B " : "A "), s1.c_str(), " | ", s2.c_str());
+				return;
+			}
+
 		const char **bwt = selrig->bwtable(mode);
 		const char **dsplo = selrig->lotable(mode);
 		const char **dsphi = selrig->hitable(mode);
@@ -1152,6 +1161,15 @@ public:
 
 		int BW = vfoA.iBW;
 		int mode = vfoA.imode;
+
+		if (selrig->has_int_bandwidth_control) {
+				char reply[10];
+				snprintf(reply, sizeof(reply), "%d", BW);
+				result[0] = reply;
+				std::string s1 = result[0], s2 = result[1];
+				xml_trace( 4, "bandwidth on A", s1.c_str(), " | ", s2.c_str());
+				return;
+			}
 
 		const char **bwt = selrig->bwtable(mode);
 		const char **dsplo = selrig->lotable(mode);
@@ -1213,6 +1231,15 @@ public:
 
 		int BW = vfoB.iBW;
 		int mode = vfoB.imode;
+
+		if (selrig->has_int_bandwidth_control) {
+				char reply[10];
+				snprintf(reply, sizeof(reply), "%d", BW);
+				result[0] = reply;
+				std::string s1 = result[0], s2 = result[1];
+				xml_trace( 4, "bandwidth on B", s1.c_str(), " | ", s2.c_str());
+				return;
+			}
 
 		const char **bwt = selrig->bwtable(mode);
 		const char **dsplo = selrig->lotable(mode);
@@ -2607,20 +2634,34 @@ public:
 		guard_lock lock(&mutex_srvc_reqs, "xml rig_set_bandwidth");
 		guard_lock serial_lock(&mutex_serial, "xml rig_set_bandwidth");
 
-		int i = 0;
-		while (	selrig->bandwidths_[i] &&
-			atol(selrig->bandwidths_[i]) < bw) {
-			i++;
-		}
-		if (!selrig->bandwidths_[i]) i--;
-		bw = atol(selrig->bandwidths_[i]);
-
-		std::ostringstream s;
-		s << "nearest bandwidth " << selrig->bandwidths_[i];
-		xml_trace(2,"Set to ", s.str().c_str());
-
 		XCVR_STATE nuvals;
-		nuvals.iBW = i;
+
+		if (selrig->has_int_bandwidth_control) {
+
+			int bwmod = bw % 10;
+			bw /= 10;
+			if (bwmod >= 5) ++bw;
+			bw *= 10;
+			if (bw < 50) bw = 50;
+			if (bw > 4000) bw = 4000;
+			nuvals.iBW = bw;
+
+		} else {
+
+			int i = 0;
+			while (	selrig->bandwidths_[i] &&
+				atol(selrig->bandwidths_[i]) < bw) {
+				i++;
+			}
+			if (!selrig->bandwidths_[i]) i--;
+			bw = atol(selrig->bandwidths_[i]);
+			nuvals.iBW = i;
+
+			std::ostringstream s;
+			s << "nearest bandwidth " << selrig->bandwidths_[i];
+			xml_trace(2,"Set to ", s.str().c_str());
+
+		}
 		if (selrig->inuse == onB) {
 			nuvals.freq = vfoB.freq;
 			nuvals.imode = vfoB.imode;
@@ -2650,21 +2691,35 @@ public:
 		guard_lock lock(&mutex_srvc_reqs, "xml rig_set_verify_bandwidth");
 		guard_lock serial_lock(&mutex_serial, "xml rig_set_verify_bandwidth");
 
-		int i = 0;
-		while (	selrig->bandwidths_[i] &&
-			atol(selrig->bandwidths_[i]) < bw) {
-			i++;
-		}
-		if (!selrig->bandwidths_[i]) i--;
-		bw = atol(selrig->bandwidths_[i]);
-
-		std::ostringstream s;
-		s << "nearest bandwidth " << selrig->bandwidths_[i];
-		xml_trace(2,"Set to ", s.str().c_str());
-
 		XCVR_STATE nuvals;
+
+		if (selrig->has_int_bandwidth_control) {
+
+			int bwmod = bw % 10;
+			bw /= 10;
+			if (bwmod >= 5) ++bw;
+			bw *= 10;
+			if (bw < 50) bw = 50;
+			if (bw > 4000) bw = 4000;
+			nuvals.iBW = bw;
+
+		} else {
+
+			int i = 0;
+			while (	selrig->bandwidths_[i] &&
+				atol(selrig->bandwidths_[i]) < bw) {
+				i++;
+			}
+			if (!selrig->bandwidths_[i]) i--;
+			bw = atol(selrig->bandwidths_[i]);
+			nuvals.iBW = i;
+
+			std::ostringstream s;
+			s << "nearest bandwidth " << selrig->bandwidths_[i];
+			xml_trace(2,"Set to ", s.str().c_str());
+
+		}
 		int retbw;
-		nuvals.iBW = i;
 		if (selrig->inuse == onB) {
 			nuvals.freq = vfoB.freq;
 			nuvals.imode = vfoB.imode;
@@ -2676,7 +2731,7 @@ public:
 			serviceA(nuvals);
 			retbw = selrig->get_bwA();
 		}
-		result = (retbw == i);
+		result = retbw;
 	}
 
 	std::string help() { return std::string("set_bw to nearest requested"); }

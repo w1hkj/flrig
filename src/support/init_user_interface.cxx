@@ -1258,6 +1258,17 @@ static void cb_pbt(Fl_Counter *, void *)
 
 void TRACED(init_dsp_controls)
 
+	if (selrig->has_int_bandwidth_control) {
+		opBW->hide();
+		opDSP_lo->hide();
+		opDSP_hi->hide();
+		btnDSP->hide();
+		btnFILT->hide();
+		opBW_A->show();
+		opBW_B->show();
+		return;
+	}
+
 	if (selrig->has_dsp_controls) {
 		opDSP_lo->clear();
 		opDSP_hi->clear();
@@ -1278,7 +1289,7 @@ void TRACED(init_dsp_controls)
 			opBW->hide();
 			opBW->index(0);
 			btnFILT->hide();
-		} else {
+		} else { //if ( (xcvr_name != rig_KX3.name_ )){
 			opDSP_lo->index(0);
 			opDSP_hi->index(0);
 			btnDSP->hide();
@@ -1287,7 +1298,7 @@ void TRACED(init_dsp_controls)
 			btnFILT->hide();
 			opBW->show();
 		}
-	} else if (selrig->has_FILTER) {
+	} else if (selrig->has_FILTER) { // && (xcvr_name != rig_KX3.name_) ) {
 		btnDSP->hide();
 		opDSP_lo->hide();
 		opDSP_hi->hide();
@@ -1295,7 +1306,7 @@ void TRACED(init_dsp_controls)
 		opBW->resize(opDSP_lo->x(), opDSP_lo->y(), opDSP_lo->w(), opDSP_lo->h());
 		opBW->redraw();
 		opBW->show();
-	} else {
+	} else { //if ( (xcvr_name != rig_KX3.name_) ){
 		btnDSP->hide();
 		opDSP_lo->hide();
 		opDSP_hi->hide();
@@ -2233,7 +2244,9 @@ static void cb_bw_B(Fl_Counter *, void *)
 }
 
 void TRACED(init_K3_KX3_special)
-	if (!(xcvr_name == rig_K3.name_ || xcvr_name == rig_KX3.name_)) return;
+	if (!(xcvr_name == rig_K3.name_ || 
+		  xcvr_name == rig_KX3.name_ ||
+		  xcvr_name == rig_K4.name_ ) ) return;
 
 	if (xcvr_name == rig_K3.name_) {
 		btnB->hide();
@@ -2262,9 +2275,9 @@ void TRACED(init_K3_KX3_special)
 	}
 
 	if (progStatus.UIsize == small_ui) {
-		opBW_A->resize(214, 103, 100, 18);
+		opBW_A->resize(212, 103, 104, 18);
 		opBW_A->redraw();
-		opBW_B->resize(320, 103, 100, 18);
+		opBW_B->resize(318, 103, 104, 18);
 		opBW_B->redraw();
 	}
 	opBW_A->callback((Fl_Callback*)cb_bw_A);
