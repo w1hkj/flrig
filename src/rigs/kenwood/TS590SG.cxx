@@ -204,7 +204,7 @@ RIG_TS590SG::RIG_TS590SG() {
 	stopbits = 1;
 	serial_retries = 2;
 
-//	serial_write_delay = 0;
+	serial_write_delay = 5;
 //	serial_post_write_delay = 0;
 
 	serial_timeout = 50;
