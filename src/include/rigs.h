@@ -90,6 +90,7 @@
 #include "yaesu/FT100D.h"
 #include "yaesu/FT450.h"
 #include "yaesu/FT450D.h"
+#include "yaesu/FT710.h"
 #include "yaesu/FT736R.h"
 #include "yaesu/FT747.h"
 #include "yaesu/FT767.h"
@@ -132,6 +133,7 @@ extern RIG_FDMDUO		rig_FDMDUO;		// 1
 extern RIG_FT100D		rig_FT100D;		// 2
 extern RIG_FT450		rig_FT450;		// 3
 extern RIG_FT450D		rig_FT450D;		// 4
+extern RIG_FT710		rig_FT710;		// 105
 extern RIG_FT747		rig_FT747;		// 5
 extern RIG_FT736R		rig_FT736R;		// 6
 extern RIG_FT757GX2		rig_FT757GX2;	// 7

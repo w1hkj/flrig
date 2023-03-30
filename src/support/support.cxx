@@ -640,7 +640,7 @@ void read_power_out()
 		trace(1,"read_power_out()");
 		sig = selrig->get_power_out();
 	}
-	if (sig == -1) return;
+	if (sig < 0) sig = 0;
 	pwrval = sig;
 	Fl::awake(updateFwdPwr);
 }
@@ -648,14 +648,13 @@ void read_power_out()
 // read swr
 void read_swr()
 {
-	if ((meter_image != SWR_IMAGE) ||
-		!selrig->has_swr_control) return;
+	if (!selrig->has_swr_control) return;
 	int sig;
 	{
 		trace(1,"read_swr()");
 		sig = selrig->get_swr();
 	}
-	if (sig == -1) return;
+	if (sig < 0) sig = 0;
 	swrval = sig;
 	Fl::awake(updateSWR);
 }
@@ -663,14 +662,15 @@ void read_swr()
 // alc
 void read_alc()
 {
-	if ((meter_image != ALC_IMAGE) ||
-		!selrig->has_alc_control) return;
+	if (!selrig->has_alc_control) {
+		return;
+	}
 	int sig;
 	{
 		trace(1,"read_alc()");
 		sig = selrig->get_alc();
 	}
-	if (sig < 0) return;
+	if (sig < 0) sig = 0;
 	alcval = sig;
 	Fl::awake(updateALC);
 }
@@ -678,14 +678,15 @@ void read_alc()
 // IDD
 void read_idd()
 {
-	if ((meter_image != IDD_IMAGE) ||
-		!selrig->has_idd_control) return;
+	if (!selrig->has_idd_control) {
+		return;
+	}
 	double sig;
 	{
 		trace(1,"read_idd()");
 		sig = selrig->get_idd();
 	}
-	if (sig < 0) return;
+	if (sig < 0) sig = 0;
 	iddval = sig;
 	Fl::awake(updateIDD);
 }
@@ -3665,9 +3666,14 @@ void zeroXmtMeters(void *d)
 	pwrval = 0; updateFwdPwr();
 	alcval = 0; updateALC();
 	swrval = 0; updateSWR();
+	iddval = 0; updateIDD();
 	sldrFwdPwr->clear();
 	sldrALC->clear();
 	sldrSWR->clear();
+	sigbar_IDD->value(0);
+	sigbar_IDD->redraw();
+	sldrIDD->value(0);
+	sldrIDD->redraw();
 }
 
 void setFreqDispA(void *d)

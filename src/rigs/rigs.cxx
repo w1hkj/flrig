@@ -34,6 +34,7 @@ RIG_FDMDUO		rig_FDMDUO;
 RIG_FT100D		rig_FT100D;
 RIG_FT450		rig_FT450;
 RIG_FT450D		rig_FT450D;
+RIG_FT710		rig_FT710;
 RIG_FT736R		rig_FT736R;
 RIG_FT747		rig_FT747;
 RIG_FT757GX2	rig_FT757GX2;
@@ -142,6 +143,7 @@ rigbase *rigs[] = {
 	&rig_FT100D,	// 2
 	&rig_FT450,		// 3
 	&rig_FT450D,	// 4
+	&rig_FT710,		// 105
 	&rig_FT736R,	// 5
 	&rig_FT747,		// 6
 	&rig_FT757GX2,	// 7

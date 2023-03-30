@@ -213,6 +213,7 @@ flrig_SOURCES += \
 	rigs/yaesu/FT100D.cxx \
 	rigs/yaesu/FT450.cxx \
 	rigs/yaesu/FT450D.cxx \
+	rigs/yaesu/FT710.cxx \
 	rigs/yaesu/FT736R.cxx \
 	rigs/yaesu/FT747.cxx \
 	rigs/yaesu/FT757GX2.cxx \
@@ -433,6 +434,7 @@ EXTRA_DIST = \
 	include/yaesu/FT100D.h \
 	include/yaesu/FT450.h \
 	include/yaesu/FT450D.h \
+	include/yaesu/FT710.h \
 	include/yaesu/FT736R.h \
 	include/yaesu/FT747.h \
 	include/yaesu/FT757GX2.h \
