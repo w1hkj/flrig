@@ -206,7 +206,7 @@ void Fl_PopBrowser::popshow (int x, int y)
 			i = 0;
 	}
 
-	popbrwsr->select (i ? i : 1);//+1);
+	popbrwsr->select (i ? i + 1: 1);
 
 	keystrokes.clear();
 
