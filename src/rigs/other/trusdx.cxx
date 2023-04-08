@@ -185,7 +185,7 @@ int RIG_TRUSDX::get_modetype(int n)
 
 void RIG_TRUSDX::set_PTT_control(int val)
 {
-	set_trace(4, "set_PTT(", (val ? "ON" : "OFF"), ")");
+	set_trace(3, "set_PTT(", (val ? "ON" : "OFF"), ")");
 	if (val) sendCommand("TX;");
 	else	 sendCommand("RX;");
 	sett("");
