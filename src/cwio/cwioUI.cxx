@@ -38,6 +38,8 @@ Fl_Light_Button *btn_cwioKEY=(Fl_Light_Button *)0;
 
 static void cb_btn_cwioKEY(Fl_Light_Button* o, void*) {
   cwio_key (o->value());
+if (o->value()) cwio_process = KEYDOWN;
+else            cwio_process = NONE;
 }
 
 Fl_Light_Button *btn_cwioSEND=(Fl_Light_Button *)0;

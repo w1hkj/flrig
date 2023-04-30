@@ -571,6 +571,7 @@ extern Fl_Check_Button *poll_noise;
 extern Fl_Check_Button *poll_nr;
 extern Fl_Check_Button *poll_compression;
 extern Fl_Check_Button *poll_ptt;
+extern Fl_Check_Button *poll_tuner;
 extern Fl_Check_Button *poll_break_in;
 extern Fl_Button *btnClearAddControls;
 extern Fl_Check_Button *poll_all;

@@ -1,6 +1,8 @@
 // ----------------------------------------------------------------------------
 // Copyright (C) 2014
 //              David Freese, W1HKJ
+// Modified: January 2017
+//              Andy Stewart, KB1OIQ
 //
 // This file is part of flrig.
 //
@@ -21,87 +23,53 @@
 #ifndef _X6100_H
 #define _X6100_H
 
-#include "icom/ICbase.h"
+#include "icom/IC746.h"
 
-class RIG_X6100 : public RIG_ICOM {
+class RIG_X6100 : public RIG_ICOM  {
 public:
 	RIG_X6100();
 	~RIG_X6100(){}
 
+	bool CW_sense;
+
 	void initialize();
-
-	bool check();
-
-	unsigned long long get_vfoA(void);
-	void set_vfoA(unsigned long long f);
-	int  get_bwA();
-	void set_bwA(int);
-	int  get_modeA();
-	void set_modeA(int val);
-
-	unsigned long long get_vfoB(void);
-	void set_vfoB(unsigned long long f);
-	int  get_bwB();
-	void set_bwB(int);
-	void set_modeB(int val);
-	int  get_modeB();
 
 	void selectA();
 	void selectB();
 
-	int  adjust_bandwidth(int m);
-	int  def_bandwidth(int m);
-	void set_attenuator( int val );
-	int  get_attenuator();
-	void set_preamp(int val);
-	int  get_preamp();
-	int  next_preamp() { 
-		if (preamp_level) return 0;
-		return 1;
-	}
+	bool check();
 
-	void set_volume_control(int val);
-	int  get_volume_control();
-	void get_vol_min_max_step(int &min, int &max, int &step);
-	void set_rf_gain(int val);
-	int  get_rf_gain();
-	void set_squelch(int val);
-	int  get_squelch();
+	unsigned long long get_vfoA ();
+	void set_vfoA (unsigned long long freq);
 
-	void set_power_control(double val);
-	double get_power_control();
-	void get_pc_min_max_step(double &min, double &max, double &step);
+	unsigned long long get_vfoB(void);
+	void set_vfoB(unsigned long long f);
 
-	int  get_auto_notch();
-	void set_auto_notch(int v);
-	int  get_smeter();
-	int  get_power_out();
-	int  get_alc();
+	void set_modeA(int val);
+	int  get_modeA();
 
-	void set_split(bool v);
+	void set_modeB(int val);
+	int  get_modeB();
+
+	bool can_split();
+	void set_split(bool);
 	int  get_split();
 
 	bool canswap() { return true; }
+	void swapAB();
 
-	int  get_mic_gain();
-	void set_mic_gain(int val);
-	void get_mic_gain_min_max_step(int &min, int &max, int &step);
+	void set_bwA(int val);
+	int  get_bwA();
 
-	void set_notch(bool on, int val);
-	bool get_notch(int &val);
-	void get_notch_min_max_step(int &min, int &max, int &step);
+	void set_bwB(int val);
+	int  get_bwB();
 
-	void set_noise(bool val);
-	int  get_noise();
+	int  adjust_bandwidth(int m);
+	int  def_bandwidth(int m);
 
-	void set_noise_reduction(int val);
-	int  get_noise_reduction();
-
-	void set_noise_reduction_val(int val);
-	int  get_noise_reduction_val();
-	void set_compression(int, int);
-	void get_comp_min_max_step(int &min, int &max, int &step) {
-		min = 0; max = 10; step = 1; }
+	void set_if_shift(int val);
+	void get_if_min_max_step(int &min, int &max, int &step);
+	bool get_if_shift(int &val);
 
 	void set_pbt_inner(int val);
 	void set_pbt_outer(int val);
@@ -109,16 +77,123 @@ public:
 	int  get_pbt_inner();
 	int  get_pbt_outer();
 
+	const char *FILT(int val);
+	const char *nextFILT();
+
+	int  get_FILT(int mode);
+	void set_FILT(int filter);
+
+	void set_FILTERS(std::string s);
+	std::string get_FILTERS();
+
+	void set_BANDWIDTHS(std::string s);
+	std::string get_BANDWIDTHS();
+
+	void set_mic_gain(int v);
+	void get_mic_gain_min_max_step(int &min, int &max, int &step);
+	int  get_mic_gain();
+
+	void set_compression(int, int);
+	void get_compression(int &on, int &val);
+	void get_comp_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 10; step = 1; }
+
+	void set_vox_onoff();
+
+	void set_vox_gain();
+	void get_vox_gain_min_max_step(int &min, int &max, int &step);
+
+	void set_vox_hang();
+	void get_vox_hang_min_max_step(int &min, int &max, int &step);
+
+	void set_vox_anti();
+	void get_vox_anti_min_max_step(int &min, int &max, int &step);
+
+	void set_cw_wpm();
+	void get_cw_wpm_min_max(int &min, int &max);
+
+	void set_break_in();
+	int  get_break_in();
+	void set_cw_qsk();
+	void get_cw_qsk_min_max_step(double &min, double &max, double &step);
+
+	void set_cw_spot_tone();
+	void get_cw_spot_tone_min_max_step(int &min, int &max, int &step);
+
+	void set_cw_vol();
+
+	std::vector<std::string>& bwtable(int m);
+
 	void set_PTT_control(int val);
 	int  get_PTT();
 
-	void tune_rig(int how);
-	int  get_tune();
+	void set_volume_control(int val);
+	int  get_volume_control();
+	void get_vol_min_max_step(int &min, int &max, int &step);
+
+	int  get_smeter();
+	int  get_power_out(void);
+	int  get_swr(void);
+	int  get_alc(void);
+
+	double get_voltmeter(void);
+
+	void set_power_control(double val);
+	double get_power_control();
+	void get_pc_min_max_step(double &min, double &max, double &step);
+
+	void set_rf_gain(int val);
+	int  get_rf_gain();
+	void get_rf_min_max_step(double &min, double &max, double &step);
+
+	void set_preamp(int val);
+	int  get_preamp();
+	int  next_preamp();
+
+	void set_attenuator(int val);
+	int  get_attenuator();
+	int  next_attenuator();
+
+	const char * PRE_label();
+	const char * ATT_label();
+
+	void set_noise(bool val);
+	int  get_noise();
+	void set_nb_level(int val);
+	int  get_nb_level();
+
+	void set_noise_reduction(int val);
+	int  get_noise_reduction();
+	void set_noise_reduction_val(int val);
+	int  get_noise_reduction_val();
+	void get_nr_min_max_step(int &min, int &max, int &step) {
+		min = 0; max = 15; step = 1; }
+
+	void set_squelch(int val);
+	int  get_squelch();
+
+	void set_notch(bool on, int val);
+	bool get_notch(int &val);
+	void get_notch_min_max_step(int &min, int &max, int &step);
+
+	void set_auto_notch(int val);
+	int  get_auto_notch();
+
+	int  get_agc();
+	int  incr_agc();
+	const char *agc_label();
+	int  agc_val();
+
+	void setVfoAdj(double v);
+	double getVfoAdj();
+	void get_vfoadj_min_max_step(double &min, double &max, double &step) {
+		min = 0; max = 100; step = 1; }
 
 	void set_band_selection(int v);
 	void get_band_selection(int v);
-	std::vector<std::string>&  bwtable(int m);
-};
 
+	void set_xcvr_auto_on();
+	void set_xcvr_auto_off();
+};
 
 #endif

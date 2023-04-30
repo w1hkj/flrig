@@ -33,7 +33,7 @@
 #include "serial.h"
 #include "threads.h"
 
-enum { NONE, START, ADD, SEND, END, TERMINATE, CALIBRATE };
+enum { NONE, START, ADD, SEND, END, TERMINATE, CALIBRATE, KEYDOWN };
 
 extern Fl_Double_Window *cwio_keyer_dialog;
 extern Fl_Double_Window *cwio_editor;

@@ -29,7 +29,8 @@ decl {const char ps[] = "~%&+={}<>@";} {private local
 decl {const char szProsigns[] = "~|%|&|+|=|{|}|<|>|@";} {private local
 }
 
-Function {new_cwio_dialog()} {} {
+Function {new_cwio_dialog()} {open
+} {
   Fl_Window {} {
     label {CW keying} open
     xywh {530 25 670 125} type Double resizable
@@ -66,7 +67,9 @@ Function {new_cwio_dialog()} {} {
       }
       Fl_Light_Button btn_cwioKEY {
         label KEY
-        callback {cwio_key (o->value());}
+        callback {cwio_key (o->value());
+if (o->value()) cwio_process = KEYDOWN;
+else            cwio_process = NONE;} selected
         tooltip {Key Down / Up} xywh {503 73 50 22}
       }
       Fl_Light_Button btn_cwioSEND {
@@ -623,7 +626,7 @@ progStatus.cwioSHARED = 0;}
       }
       Fl_Counter cnt_cwio_comp {
         label {WPM Comp}
-        callback {progStatus.cwio_comp = o->value();} selected
+        callback {progStatus.cwio_comp = o->value();}
         tooltip {Timing compensation msec} xywh {400 8 130 24} align 4 minimum -5 maximum 5 step 0.001
         code0 {o->value(progStatus.cwio_comp);}
         code1 {o->lstep(0.1);}

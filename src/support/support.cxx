@@ -1779,7 +1779,10 @@ void * serial_thread_loop(void *d)
 			check_ptt();
 		}
 
-		if (PTT || cwio_process == SEND || cwio_process == CALIBRATE) {
+		if (PTT ||
+			cwio_process == SEND ||
+			cwio_process == CALIBRATE ||
+			cwio_process == KEYDOWN ) {
 			if (isRX) {
 				isRX = false;
 				smtrval = 0;
@@ -1807,25 +1810,40 @@ void * serial_thread_loop(void *d)
 				Fl::awake(zeroXmtMeters, 0);
 			}
 
-			if ( rx_poll_group_1->poll != NULL && *(rx_poll_group_1->poll) ) {
-				guard_lock lk(&mutex_serial);
-				(rx_poll_group_1->pollfunc)();
+			while ( rx_poll_group_1->poll != NULL ) {
+				if ( *(rx_poll_group_1->poll) ) {
+					guard_lock lk(&mutex_serial);
+					(rx_poll_group_1->pollfunc)();
+					++rx_poll_group_1;
+					break;
+				}
+				++rx_poll_group_1;
 			}
-			if ((++rx_poll_group_1)->poll == NULL)
+			if ((rx_poll_group_1)->poll == NULL)
 				rx_poll_group_1 = &RX_poll_group_1[0];
 
-			if ( rx_poll_group_2->poll != NULL && *(rx_poll_group_2->poll) ) {
-				guard_lock lk(&mutex_serial);
-				(rx_poll_group_2->pollfunc)();
+			while ( rx_poll_group_2->poll != NULL ) {
+				if ( *(rx_poll_group_2->poll) ) {
+					guard_lock lk(&mutex_serial);
+					(rx_poll_group_2->pollfunc)();
+					++rx_poll_group_2;
+					break;
+				}
+				++rx_poll_group_2;
 			}
-			if ((++rx_poll_group_2)->poll == NULL)
+			if ((rx_poll_group_2)->poll == NULL)
 				rx_poll_group_2 = &RX_poll_group_2[0];
 
-			if ( rx_poll_group_3->poll != NULL && *(rx_poll_group_3->poll) ) {
-				guard_lock lk(&mutex_serial);
-				(rx_poll_group_3->pollfunc)();
+			while ( rx_poll_group_3->poll != NULL ) {
+				if ( *(rx_poll_group_3->poll) ) {
+					guard_lock lk(&mutex_serial);
+					(rx_poll_group_3->pollfunc)();
+					++rx_poll_group_3;
+					break;
+				}
+				++rx_poll_group_3;
 			}
-			if ((++rx_poll_group_3)->poll == NULL)
+			if ((rx_poll_group_3)->poll == NULL)
 				rx_poll_group_3 = &RX_poll_group_3[0];
 
 			if (menu1 < 9  && selrig->name_ == rig_QCXP.name_) {

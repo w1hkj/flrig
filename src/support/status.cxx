@@ -468,7 +468,7 @@ status progStatus = {
 
 	false,		// bool	 tooltips;
 
-	"gtk+",		// std::string ui_scheme
+	"base",		// std::string ui_scheme
 
 //	"7362",		// std::string server_port
 //	"127.0.0.1",// std::string server_address
