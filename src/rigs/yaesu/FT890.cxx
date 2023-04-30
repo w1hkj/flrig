@@ -44,9 +44,9 @@ RIG_FT890::RIG_FT890() {
 	serial_baudrate = BR4800;
 	stopbits = 2;
 	serial_retries = 2;
-	
-	serial_write_delay = 50;
-	serial_post_write_delay = 5;
+
+	serial_write_delay = 5;
+	serial_post_write_delay = 50;
 
 	serial_timeout = 50;
 	serial_rtscts = false;
@@ -149,7 +149,7 @@ bool RIG_FT890::get_info()
 		bfreq *= 10;
 		int md = replystr[p+5];
 		switch (md) {
-			case 0 : 
+			case 0 :
 				amode = (md & 0x40) ? 1 : 0;
 				break;
 			case 1 :
@@ -174,7 +174,7 @@ bool RIG_FT890::get_info()
 
 		md = replystr[p + 19];
 		switch (md) {
-			case 0 : 
+			case 0 :
 				bmode = (md & 0x40) ? 1 : 0;
 				break;
 			case 1 :
