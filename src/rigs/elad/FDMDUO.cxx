@@ -25,21 +25,25 @@ static const char FDMDUOname_[] = "FDM DUO";
 
 enum { duoLSB, duoUSB, duoCW, duoFM, duoAM, duoCWR};
 
-static const char *FDMDUOmodes_[] = {
-		"LSB", "USB", "CW", "FM", "AM", "CW-R", NULL};
+static std::vector<std::string>FDMDUOmodes_;
+static const char* vm[]  = {
+		"LSB", "USB", "CW", "FM", "AM", "CW-R"};
 static const char FDMDUO_mode_chr[] =  { '1', '2', '3', '4', '5', '7' };
 static const char FDMDUO_mode_type[] = { 'L', 'U', 'L', 'U', 'U', 'U' };
 
-static const char *FDMDUO_empty[] = { "N/A", NULL };
+static std::vector<std::string>FDMDUO_empty;
+static const char *ve[] = { "N/A" };
 
-static const char *FDMDUO_SSBwidths[] = {
+static std::vector<std::string>FDMDUO_SSBwidths;
+static const char *vssb[] = {
 "1600", "1700", "1800", "1900", "2000",
 "2100", "2200", "2300", "2400", "2500",
 "2600", "2700", "2800", "2900", "3000",
 "3100", "4000", "5000", "6000", "D-300",
-"D-600", "D-1000", NULL };
+"D-600", "D-1000" };
 
-static std::string FDMDUO_LSBvals[] = {
+static std::vector<std::string>FDMDUO_LSBvals;
+static const char *vlsb[] = {
 "RF100;", "RF101;", "RF102;", "RF103;", "RF104;",
 "RF105;", "RF106;", "RF107;", "RF108;", "RF109;",
 "RF110;", "RF111;", "RF112;", "RF113;", "RF114;",
@@ -47,7 +51,8 @@ static std::string FDMDUO_LSBvals[] = {
 "RF120;", "RF121;", "RF122;" };
 static const int duoLSBvals = 23;
 
-static std::string FDMDUO_USBvals[] = {
+static std::vector<std::string>FDMDUO_USBvals;
+static const char *vusb[] = {
 "RF200;", "RF201;", "RF202;", "RF203;", "RF204;",
 "RF205;", "RF206;", "RF207;", "RF208;", "RF209;",
 "RF210;", "RF211;", "RF212;", "RF213;", "RF214;",
@@ -55,36 +60,44 @@ static std::string FDMDUO_USBvals[] = {
 "RF220;", "RF221;", "RF222;" };
 static const int duoUSBvals = 23;
 
-static const char *FDMDUO_AMwidths[] = {
+static std::vector<std::string>FDMDUO_AMwidths;
+static const char *vamw[] = {
 "2500", "3000", "3500", "4000", "4500",
-"5000", "5500", "6000", NULL };
+"5000", "5500", "6000" };
 
-static std::string FDMDUO_AMvals[] = {
+static std::vector<std::string>FDMDUO_AMvals;
+static const char *vamv[] = {
 "RF500;", "RF501;", "RF502;", "RF503;", "RF504;",
 "RF505;", "RF506;", "RF507;" };
 static const int duoAMvals = 8;
 
-static const char *FDMDUO_CWwidths[] = {
+static std::vector<std::string>FDMDUO_CWwidths;
+static const char *vcww[] = {
 "100.4", "100.3", "100.2", "100.1", "100",
-"300",   "500",   "1000",  "1500",  "2600", NULL};
+"300",   "500",   "1000",  "1500",  "2600"};
 
-static std::string FDMDUO_CWvals[] = {
+static std::vector<std::string>FDMDUO_CWvals;
+static const char *vcwv[] = {
 "RF307;", "RF308;", "RF309;", "RF310;", "RF311;",
 "RF312;", "RF313;", "RF314;", "RF315;", "RF316;" };
 
-static const char *FDMDUO_CWRwidths[] = {
+static std::vector<std::string>FDMDUO_CWRwidths;
+static const char *vcwrw[] = {
 "100.4", "100.3", "100.2", "100.1", "100",
-"300",   "500",   "1000",  "1500",  "2600", NULL};
+"300",   "500",   "1000",  "1500",  "2600"};
 
-static std::string FDMDUO_CWRvals[] = {
+static std::vector<std::string>FDMDUO_CWRvals;
+static const char *vcwrv[] = {
 "RF707;", "RF708;", "RF709;", "RF710;", "RF711;",
 "RF712;", "RF713;", "RF714;", "RF715;", "RF716;" };
 static const int duoCWvals = 10;
 
-static const char *FDMDUO_FMwidths[] = {
-"Narrow", "Wide", "Data", NULL };
+static std::vector<std::string>FDMDUO_FMwidths;
+static const char *vfmw[] = {
+"Narrow", "Wide", "Data" };
 
-static std::string FDMDUO_FMvals[] = {
+static std::vector<std::string>FDMDUO_FMvals;
+static const char *vfmv[] = {
 "RF400;", "RF401;", "RF402;" };
 static const int duoFMvals = 3;
 
@@ -102,6 +115,10 @@ static GUI rig_widgets[]= {
 
 void RIG_FDMDUO::initialize()
 {
+	modes_ = FDMDUOmodes_;
+	_mode_type = FDMDUO_mode_type;
+	bandwidths_ = FDMDUO_empty;
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = sldrSQUELCH;
@@ -112,6 +129,21 @@ void RIG_FDMDUO::initialize()
 RIG_FDMDUO::RIG_FDMDUO() {
 // base class values
 	name_ = FDMDUOname_;
+
+	VECTOR(FDMDUOmodes_, vm);
+	VECTOR(FDMDUO_empty, ve);
+	VECTOR(FDMDUO_SSBwidths, vssb);
+	VECTOR(FDMDUO_LSBvals, vlsb);
+	VECTOR(FDMDUO_USBvals, vusb);
+	VECTOR(FDMDUO_AMwidths, vamw);
+	VECTOR(FDMDUO_AMvals, vamv);
+	VECTOR(FDMDUO_CWwidths, vcww);
+	VECTOR(FDMDUO_CWvals, vcwv);
+	VECTOR(FDMDUO_CWRwidths, vcwrw);
+	VECTOR(FDMDUO_CWRvals, vcwrv);
+	VECTOR(FDMDUO_FMwidths, vfmw);
+	VECTOR(FDMDUO_FMvals, vfmv);
+
 	modes_ = FDMDUOmodes_;
 	_mode_type = FDMDUO_mode_type;
 	bandwidths_ = FDMDUO_empty;
@@ -176,25 +208,29 @@ static int ret = 0;
 const char * RIG_FDMDUO::get_bwname_(int n, int md) 
 {
 	const char *name = "NIL";
-	switch (md) {
+	try  {
+		switch (md) {
 		case duoLSB:
-			if (n < duoLSBvals) name = FDMDUO_SSBwidths[n];
+			if (n < duoLSBvals) name = FDMDUO_SSBwidths.at(n).c_str();
 			break;
 		case duoUSB:
-			if (n < duoUSBvals) name = FDMDUO_SSBwidths[n];
+			if (n < duoUSBvals) name = FDMDUO_SSBwidths.at(n).c_str();
 			break;
 		case duoCW:
-			if (n < duoCWvals) name = FDMDUO_CWwidths[n];
+			if (n < duoCWvals) name = FDMDUO_CWwidths.at(n).c_str();
 			break;
 		case duoCWR:
-			if (n < duoCWvals) name = FDMDUO_CWwidths[n];
+			if (n < duoCWvals) name = FDMDUO_CWwidths.at(n).c_str();
 			break;
 		case duoAM:
-			if (n < duoAMvals) name = FDMDUO_AMwidths[n];
+			if (n < duoAMvals) name = FDMDUO_AMwidths.at(n).c_str();
 			break;
 		case duoFM:
-			if (n < duoFMvals) name = FDMDUO_FMwidths[n];
+			if (n < duoFMvals) name = FDMDUO_FMwidths.at(n).c_str();
 			break;
+		}
+	} catch (const std::exception& e) {
+		std::cout << e.what() << '\n';
 	}
 	return name;
 }
@@ -296,7 +332,7 @@ int RIG_FDMDUO::set_widths(int val)
 	return bw;
 }
 
-const char **RIG_FDMDUO::bwtable(int m)
+std::vector<std::string>& RIG_FDMDUO::bwtable(int m)
 {
 	switch (m) {
 		case duoLSB: 
@@ -388,17 +424,21 @@ int RIG_FDMDUO::get_modetype(int n)
 
 void RIG_FDMDUO::set_bwA(int val)
 {
-	switch (A.imode) {
-		case duoLSB: cmd.assign(FDMDUO_LSBvals[val > -1 ? (val < duoLSBvals ? val : 0) : 0]); break;
-		case duoUSB: cmd.assign(FDMDUO_USBvals[val > -1 ? (val < duoUSBvals ? val : 0) : 0]); break;
-		case duoCW:  cmd.assign(FDMDUO_CWvals[val > -1 ? (val < duoCWvals ? val : 0) : 0]); break;
-		case duoFM:  cmd.assign(FDMDUO_FMvals[val > -1 ? (val < duoFMvals ? val : 0) : 0]); break;
-		case duoAM:  cmd.assign(FDMDUO_AMvals[val > -1 ? (val < duoAMvals ? val : 0) : 0]); break;
-		case duoCWR: cmd.assign(FDMDUO_CWRvals[val > -1 ? (val < duoCWvals ? val : 0) : 0]); break;
+	try {
+		switch (A.imode) {
+			case duoLSB: cmd.assign(FDMDUO_LSBvals.at(val)); break;
+			case duoUSB: cmd.assign(FDMDUO_USBvals.at(val)); break;
+			case duoCW:  cmd.assign(FDMDUO_CWvals.at(val)); break;
+			case duoFM:  cmd.assign(FDMDUO_FMvals.at(val)); break;
+			case duoAM:  cmd.assign(FDMDUO_AMvals.at(val)); break;
+			case duoCWR: cmd.assign(FDMDUO_CWRvals.at(val)); break;
+		}
+		set_trace(1, "set bwA");
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set bwA", cmd, "");
+	} catch (const std::exception& e) {
+		std::cout << e.what() << '\n';
 	}
-	set_trace(1, "set bwA");
-	sendCommand(cmd);
-	showresp(WARN, ASC, "set bwA", cmd, "");
 }
 
 int RIG_FDMDUO::get_bwA()
@@ -497,17 +537,21 @@ int RIG_FDMDUO::get_bwA()
 
 void RIG_FDMDUO::set_bwB(int val)
 {
-	switch (B.imode) {
-		case duoLSB: cmd.assign(FDMDUO_LSBvals[val > -1 ? (val < duoLSBvals ? val : 0) : 0]); break;
-		case duoUSB: cmd.assign(FDMDUO_USBvals[val > -1 ? (val < duoUSBvals ? val : 0) : 0]); break;
-		case duoCW:  cmd.assign(FDMDUO_CWvals[val > -1 ? (val < duoCWvals ? val : 0) : 0]); break;
-		case duoFM:  cmd.assign(FDMDUO_FMvals[val > -1 ? (val < duoFMvals ? val : 0) : 0]); break;
-		case duoAM:  cmd.assign(FDMDUO_AMvals[val > -1 ? (val < duoAMvals ? val : 0) : 0]); break;
-		case duoCWR: cmd.assign(FDMDUO_CWRvals[val > -1 ? (val < duoCWvals ? val : 0) : 0]); break;
+	try {
+		switch (B.imode) {
+			case duoLSB: cmd.assign(FDMDUO_LSBvals.at(val)); break;
+			case duoUSB: cmd.assign(FDMDUO_USBvals.at(val)); break;
+			case duoCW:  cmd.assign(FDMDUO_CWvals.at(val)); break;
+			case duoFM:  cmd.assign(FDMDUO_FMvals.at(val)); break;
+			case duoAM:  cmd.assign(FDMDUO_AMvals.at(val)); break;
+			case duoCWR: cmd.assign(FDMDUO_CWRvals.at(val)); break;
+		}
+		set_trace(1, "set bwB");
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set bwB", cmd, "");
+	} catch (const std::exception& e) {
+		std::cout << e.what() << '\n';
 	}
-	set_trace(1, "set bwB");
-	sendCommand(cmd);
-	showresp(WARN, ASC, "set bwB", cmd, "");
 }
 
 int RIG_FDMDUO::get_bwB()
@@ -745,8 +789,8 @@ int RIG_FDMDUO::incr_agc()
 }
 
 
-static const char *agcstrs[] = {"FM", "AGC", "FST", "SLO"};
-const char *RIG_FDMDUO::agc_label()
+const char * agcstrs[] = {"FM", "AGC", "FST", "SLO"};
+const char * RIG_FDMDUO::agc_label()
 {
 	return agcstrs[1];
 }

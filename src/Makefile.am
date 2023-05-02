@@ -121,24 +121,13 @@ clean-local:
 
 # Sources that we build. It is OK to have headers here.
 flrig_SOURCES += \
-	cwio/cwio.cxx \
-	cwio/morse.cxx \
-	cwio/cwioUI.cxx \
-	cwio/precise_time.cxx \
-	cmedia/cmedia.cxx \
-	cmedia/hid.cxx \
-	cmedia/tmate2.cxx \
-	fskio/fsk.cxx \
-	fskio/fskioUI.cxx \
-	log/cwlog.cxx \
-	log/fsklog.cxx \
-	graphics/pixmaps.cxx \
-	graphics/icons.cxx \
-	graphics/images.cxx \
-	main.cxx \
 	rigs/rigbase.cxx \
 	rigs/rigs.cxx \
 	rigs/elad/FDMDUO.cxx \
+	rigs/elecraft/K2.cxx \
+	rigs/elecraft/K3.cxx \
+	rigs/elecraft/KX3.cxx \
+	rigs/elecraft/K4.cxx \
 	rigs/icom/ICbase.cxx \
 	rigs/icom/IC703.cxx \
 	rigs/icom/IC705.cxx \
@@ -166,11 +155,6 @@ flrig_SOURCES += \
 	rigs/icom/IC7700.cxx \
 	rigs/icom/ICF8101.cxx \
 	rigs/icom/ICR71.cxx \
-	rigs/elecraft/K2.cxx \
-	rigs/elecraft/K3.cxx \
-	rigs/elecraft/KX3.cxx \
-	rigs/elecraft/K4.cxx \
-	rigs/lab599/TX500.cxx \
 	rigs/kenwood/KENWOOD.cxx \
 	rigs/kenwood/TS140.cxx \
 	rigs/kenwood/TS440.cxx \
@@ -188,6 +172,7 @@ flrig_SOURCES += \
 	rigs/kenwood/TS950.cxx \
 	rigs/kenwood/TS990.cxx \
 	rigs/kenwood/TS2000.cxx \
+	rigs/lab599/TX500.cxx \
 	rigs/other/AOR5K.cxx \
 	rigs/other/FLEX1500.cxx \
 	rigs/other/PCR1000.cxx \
@@ -279,7 +264,22 @@ flrig_SOURCES += \
 	widgets/ValueSlider.cxx \
 	widgets/hspinner.cxx \
 	support/tod_clock.cxx \
-	server/xml_server.cxx 
+	server/xml_server.cxx \
+	cwio/cwio.cxx \
+	cwio/morse.cxx \
+	cwio/cwioUI.cxx \
+	cwio/precise_time.cxx \
+	cmedia/cmedia.cxx \
+	cmedia/hid.cxx \
+	cmedia/tmate2.cxx \
+	fskio/fsk.cxx \
+	fskio/fskioUI.cxx \
+	log/cwlog.cxx \
+	log/fsklog.cxx \
+	graphics/pixmaps.cxx \
+	graphics/icons.cxx \
+	graphics/images.cxx \
+	main.cxx
 
 # Additional source files that are distributed
 EXTRA_DIST = \

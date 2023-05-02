@@ -23,72 +23,88 @@
 
 static const char TS480HXname_[] = "TS-480HX";
 
-static const char *TS480HXmodes_[] = {
-		"LSB", "USB", "CW", "FM", "AM", "FSK", "CW-R", "FSK-R", NULL};
+static std::vector<std::string>TS480HXmodes_;
+static const char *vTS480HXmodes_[] =
+{ "LSB", "USB", "CW", "FM", "AM", "FSK", "CW-R", "FSK-R"};
 static const char TS480HX_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '9' };
 static const char TS480HX_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'U' };
 
-static const char *TS480HX_empty[] = { "N/A", NULL };
+static std::vector<std::string>TS480HX_empty;
+static const char *vTS480HX_empty[] =
+{ "N/A" };
 static int TS480HX_bw_vals[] = {1, WVALS_LIMIT};
 
 // SL command is lo cut when menu 045 OFF
-static const char *TS480HX_SL[] = {
+static std::vector<std::string>TS480HX_SL;
+static const char *vTS480HX_SL[] =
+{
   "0",   "50", "100", "200", "300", 
 "400",  "500", "600", "700", "800", 
-"900", "1000", NULL };
+"900", "1000" };
 static const char *TS480HX_SL_tooltip = "lo cut";
 static const char *TS480HX_btn_SL_label = "L";
 
 // SH command is hi cut when menu 045 OFF
-static const char *TS480HX_SH[] = {
+static std::vector<std::string>TS480HX_SH;
+static const char *vTS480HX_SH[] =
+{
 "1000", "1200", "1400", "1600", "1800", 
 "2000", "2200", "2400", "2600", "2800", 
-"3000", "3400", "4000", "5000", NULL };
+"3000", "3400", "4000", "5000" };
 static int TS480HX_HI_bw_vals[] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,WVALS_LIMIT};
 
 static const char *TS480HX_SH_tooltip = "hi cut";
 static const char *TS480HX_btn_SH_label = "H";
 
 // SL command is width when menu 045 ON
-static const char *TS480HX_dataW[] = {
-"50", "100", "250", "500", "1000", "1500", "2400", NULL };
+static std::vector<std::string>TS480HX_dataW;
+static const char *vTS480HX_dataW[] =
+{ "50", "100", "250", "500", "1000", "1500", "2400" };
 static int TS480HX_data_bw_vals[] = {1,2,3,4,5,6,7, WVALS_LIMIT};
 
 static const char *TS480HX_dataW_tooltip = "width";
 static const char *TS480HX_dataW_label = "W";
 
 // SH command is center when menu 045 ON
-static const char *TS480HX_dataC[] = {
-"1000", "1500", "2210", NULL };
+static std::vector<std::string>TS480HX_dataC;
+static const char *vTS480HX_dataC[] =
+{ "1000", "1500", "2210" };
 static const char *TS480HX_dataC_tooltip = "center";
 static const char *TS480HX_dataC_label = "C";
 
-static const char *TS480HX_AM_SL[] = {
-"10", "100", "200", "500",
-NULL };
+static std::vector<std::string>TS480HX_AM_SL;
+static const char *vTS480HX_AM_SL[] =
+{ "10", "100", "200", "500"};
 
-static const char *TS480HX_AM_SH[] = {
-"2500", "3000", "4000", "5000",
-NULL };
+static std::vector<std::string>TS480HX_AM_SH;
+static const char *vTS480HX_AM_SH[] =
+{ "2500", "3000", "4000", "5000"};
 //static int TS480HX_AM_bw_vals[] = {1,2,3,4,WVALS_LIMIT};
 
-static const char *TS480HX_CWwidths[] = {
+static std::vector<std::string>TS480HX_CWwidths;
+static const char *vTS480HX_CWwidths[] =
+{
 "50", "80", "100", "150", "200", 
 "300", "400", "500", "600", "1000", 
-"2000", NULL};
+"2000"};
 static int TS480HX_CW_bw_vals[] = {1,2,3,4,5,6,7,8,9,10,11,WVALS_LIMIT};
 
-static const char *TS480HX_CWbw[] = {
+static std::vector<std::string>TS480HX_CWbw;
+static const char *vTS480HX_CWbw[] =
+{
 "FW0050;", "FW0080;", "FW0100;", "FW0150;", "FW0200;", 
 "FW0300;", "FW0400;", "FW0500;", "FW0600;", "FW1000;", 
 "FW2000;" };
 
-static const char *TS480HX_FSKwidths[] = {
-"250", "500", "1000", "1500", NULL};
+static std::vector<std::string>TS480HX_FSKwidths;
+static const char *vTS480HX_FSKwidths[] =
+{
+"250", "500", "1000", "1500"};
 static int TS480HX_FSK_bw_vals[] = { 1,2,3,4,WVALS_LIMIT};
 
-static const char *TS480HX_FSKbw[] = {
-"FW0250;", "FW0500;", "FW1000;", "FW1500;" };
+static std::vector<std::string>TS480HX_FSKbw;
+static const char *vTS480HX_FSKbw[] =
+{ "FW0250;", "FW0500;", "FW1000;", "FW1500;" };
 
 static int agcval = 1;
 static bool fm_mode = false;
@@ -110,6 +126,24 @@ static std::string menu012 = "EX01200004";
 
 void RIG_TS480HX::initialize()
 {
+	VECTOR (TS480HXmodes_, vTS480HXmodes_);
+	VECTOR (TS480HX_empty, vTS480HX_empty);
+	VECTOR (TS480HX_SL, vTS480HX_SL);
+	VECTOR (TS480HX_SH, vTS480HX_SH);
+	VECTOR (TS480HX_dataW, vTS480HX_dataW);
+	VECTOR (TS480HX_dataC, vTS480HX_dataC);
+	VECTOR (TS480HX_AM_SL, vTS480HX_AM_SL);
+	VECTOR (TS480HX_AM_SH, vTS480HX_AM_SH);
+	VECTOR (TS480HX_CWwidths, vTS480HX_CWwidths);
+	VECTOR (TS480HX_CWbw, vTS480HX_CWbw);
+	VECTOR (TS480HX_FSKwidths, vTS480HX_FSKwidths);
+	VECTOR (TS480HX_FSKbw, vTS480HX_FSKbw);
+
+	modes_ = TS480HXmodes_;
+	_mode_type = TS480HX_mode_type;
+	bandwidths_ = TS480HX_empty;
+	bw_vals_ = TS480HX_bw_vals;
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = sldrRFGAIN;
@@ -218,11 +252,11 @@ const char * RIG_TS480HX::get_bwname_(int n, int md)
 		int hi = (n >> 8) & 0x7F;
 		int lo = n & 0xFF;
 		snprintf(bwname, sizeof(bwname), "%s/%s",
-			(md == 0 || md == 1 || md == 3) ? dsp_SL[lo] : TS480HX_AM_SL[lo],
-			(md == 0 || md == 1 || md == 3) ? dsp_SH[hi] : TS480HX_AM_SH[hi] );
+			(md == 0 || md == 1 || md == 3) ? dsp_SL[lo].c_str() : TS480HX_AM_SL[lo].c_str(),
+			(md == 0 || md == 1 || md == 3) ? dsp_SH[hi].c_str() : TS480HX_AM_SH[hi].c_str() );
 	} else {
 		snprintf(bwname, sizeof(bwname), "%s",
-			(md == 2 || md == 6) ? TS480HX_CWwidths[n] : TS480HX_FSKwidths[n]);
+			(md == 2 || md == 6) ? TS480HX_CWwidths[n].c_str() : TS480HX_FSKwidths[n].c_str());
 	}
 	return bwname;
 }
@@ -400,7 +434,7 @@ int RIG_TS480HX::set_widths(int val)
 	return bw;
 }
 
-const char **RIG_TS480HX::bwtable(int m)
+std::vector<std::string>& RIG_TS480HX::bwtable(int m)
 {
 	if (m == 0 || m == 1 || m == 3)
 		return TS480HX_empty;
@@ -412,25 +446,25 @@ const char **RIG_TS480HX::bwtable(int m)
 	return TS480HX_empty;
 }
 
-const char **RIG_TS480HX::lotable(int m)
+std::vector<std::string>& RIG_TS480HX::lotable(int m)
 {
 	if (m == 0 || m == 1 || m == 3)
 		return TS480HX_SL;
 	else if (m == 2 || m == 6)
-		return NULL;
+		return vNOBWS;
 	else if (m == 5 || m == 7)
-		return NULL;
+		return vNOBWS;
 	return TS480HX_AM_SL;
 }
 
-const char **RIG_TS480HX::hitable(int m)
+std::vector<std::string>& RIG_TS480HX::hitable(int m)
 {
 	if (m == 0 || m == 1 || m == 3)
 		return TS480HX_SH;
 	else if (m == 2 || m == 6)
-		return NULL;
+		return vNOBWS;
 	else if (m == 5 || m == 7)
-		return NULL;
+		return vNOBWS;
 	return TS480HX_AM_SH;
 }
 

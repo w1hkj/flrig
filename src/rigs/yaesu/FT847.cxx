@@ -22,8 +22,9 @@
 #include "rig.h"
 
 static const char FT847name_[] = "FT-847";
-static const char *FT847modes_[] = 
-{ "LSB", "USB", "CW", "CW-R", "AM", "FM", "CW-N", "CW-NR", "AM-N", "FM-N", NULL};
+static std::vector<std::string>FT847modes_;
+static const char *vFT847modes_[] = 
+{ "LSB", "USB", "CW", "CW-R", "AM", "FM", "CW-N", "CW-NR", "AM-N", "FM-N"};
 
 static const int FT847_mode_val[] =
 { 0x00, 0x01, 0x02, 0x03, 0x04, 0x08, 0x82, 0x83, 0x84, 0x88 };
@@ -32,7 +33,8 @@ static const char FT847_mode_type[] =
 { 'L', 'U', 'L', 'U', 'U', 'U', 'L', 'U', 'U', 'U' };
 
 //static const int FT847_def_bw[] = { 2, 2, 1, 1, 3, 2, 2, 3 };
-//static const char *FT847widths_[] = { "300", "500", "2400", "6000", NULL};
+//static std::vector<std::string>FT847widths_;
+//static const char *vFT847widths_[] = { "300", "500", "2400", "6000"};
 //static const int FT847_bw_val[] = { 0, 1, 2, 3 };
 
 static const int sm[] = {0,2,4,6,8,11,14,16,19,22,25,28,31,34,37,40,
@@ -84,6 +86,10 @@ void RIG_FT847::init_cmd()
 
 void RIG_FT847::initialize()
 {
+	VECTOR (FT847modes_, vFT847modes_);
+
+	modes_ = FT847modes_;
+
 	init_cmd();
 	sendCommand(cmd, 0); // CAT on
 	cmd[4] = 0x8E; // satellite mode off

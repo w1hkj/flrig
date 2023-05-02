@@ -33,42 +33,48 @@ static const char FT2000name_[] = "FT-2000";
 static int mode_bwA[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 static int mode_bwB[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 
-static const char *FT2000modes_[] = {
-"LSB", "USB", "CW", "FM", "AM", "RTTY-L", "CW-R", "PKT-L", "RTTY-U", "PKT-FM", "FM-N", "PKT-U", NULL};
+static std::vector<std::string>FT2000modes_;
+static const char *vFT2000modes_[] = {
+"LSB", "USB", "CW", "FM", "AM", "RTTY-L", "CW-R", "PKT-L", "RTTY-U", "PKT-FM", "FM-N", "PKT-U"};
 
 static const char FT2000_mode_chr[] =  { 
 '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C' };
 static const char FT2000_mode_type[] = { 
 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L', 'U', 'U', 'U', 'U' };
 
-static const char *FT2000_SSBwidths[] = {
-"NORM", "200", "400", "600", "850", "1100", "1350", "1500", "1650", "1800", "1950", "2100", "2250", NULL};
+static std::vector<std::string>FT2000_SSBwidths;
+static const char *vFT2000_SSBwidths[] = {
+"NORM", "200", "400", "600", "850", "1100", "1350", "1500", "1650", "1800", "1950", "2100", "2250"};
 static int FT2000_wvals_SSBwidths[] = {
 1,2,3,4,5,6,7,8,9,10,11,12,13, WVALS_LIMIT};
 
-static const char *FT2000_CWwidths[] = {
-"NORM", "50", "100", "200", "300", "400", "500", "800", "1200", "1400", "1700", "2000", NULL};
+static std::vector<std::string>FT2000_CWwidths;
+static const char *vFT2000_CWwidths[] = {
+"NORM", "50", "100", "200", "300", "400", "500", "800", "1200", "1400", "1700", "2000"};
 static int FT2000_wvals_CWwidths[] = {
 1,2,3,4,5,6,7,8,9,10,11,12, WVALS_LIMIT};
 
-static const char *FT2000_PKT_RTTYwidths[] = {
-"NORM", "25", "50", "100", "200", "300", "400", NULL};
+static std::vector<std::string>FT2000_PKT_RTTYwidths;
+static const char *vFT2000_PKT_RTTYwidths[] = {
+"NORM", "25", "50", "100", "200", "300", "400"};
 static int FT2000_wvals_PKT_RTTYwidths[] = {
 1,2,3,4,5,6,7, WVALS_LIMIT};
 
-static const char *FT2000_AMFMwidths[] = {
-"NORM", "NARR", NULL};
+static std::vector<std::string>FT2000_AMFMwidths;
+static const char *vFT2000_AMFMwidths[] = {
+"NORM", "NARR"};
 static int FT2000_wvals_AMFMwidths[] = {
 1,2, WVALS_LIMIT};
 
 
-static const char *FT2000_US_60m[] = {NULL, "126", "127", "128", "130", NULL};
+static std::vector<std::string>FT2000_US_60m;
+static const char *vFT2000_US_60m[] = {"", "126", "127", "128", "130"};
 // US has 5 60M presets. Using dummy numbers for all.
-// First NULL means skip 60m sets in get_band_selection().
+// First "" means skip 60m sets in get_band_selection().
 // Maybe someone can do a cat command MC; on all 5 presets and add returned numbers above.
 // To send cat commands in flrig goto menu Config->Xcvr select->Send Cmd.
 
-static const char **Channels_60m = FT2000_US_60m;
+static std::vector<std::string>& Channels_60m = FT2000_US_60m;
 
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
@@ -84,6 +90,17 @@ static GUI rig_widgets[]= {
 
 void RIG_FT2000::initialize()
 {
+	VECTOR (FT2000modes_, vFT2000modes_);
+	VECTOR (FT2000_SSBwidths, vFT2000_SSBwidths);
+	VECTOR (FT2000_CWwidths, vFT2000_CWwidths);
+	VECTOR (FT2000_PKT_RTTYwidths, vFT2000_PKT_RTTYwidths);
+	VECTOR (FT2000_AMFMwidths, vFT2000_AMFMwidths);
+	VECTOR (FT2000_US_60m, vFT2000_US_60m);
+
+	modes_ = FT2000modes_;
+	bandwidths_ = FT2000_SSBwidths;
+	bw_vals_ = FT2000_wvals_SSBwidths;
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = btnIFsh;
@@ -170,10 +187,9 @@ void RIG_FT2000::get_band_selection(int v)
 	}
 
 	if (v == 12) {	// 5MHz 60m presets
-		if (Channels_60m[0] == NULL) return;	// no 60m Channels so skip
+		if (Channels_60m[0].empty()) return;	// no 60m Channels so skip
 		if (inc_60m) {
-			if (Channels_60m[++m_60m_indx] == NULL)
-				m_60m_indx = 0;
+			if (++m_60m_indx > (int)Channels_60m.size()) m_60m_indx = 0;
 		}
 		cmd.assign("MC").append(Channels_60m[m_60m_indx]).append(";");
 	} else {		// v == 1..11 band selection OR return to vfo mode == 0
@@ -657,7 +673,7 @@ int RIG_FT2000::def_bandwidth(int m)
 	return mode_bwA[m];
 }
 
-const char **RIG_FT2000::bwtable(int m)
+std::vector<std::string>& RIG_FT2000::bwtable(int m)
 {
 	switch (m) {
 		case 0 : case 1 :

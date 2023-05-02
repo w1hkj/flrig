@@ -48,11 +48,15 @@ static int mode_filterB[NUM_MODES] = {1,1,1,1,1,1,1,1,1};
 static int mode_bwA[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,};
 static int mode_bwB[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,};
 
-static const char *szfilter[NUM_FILTERS] = {"W", "M", "N"};
+static std::vector<std::string>szfilter;
+static const char *vszfilter[] =
+{"W", "M", "N"};
 
-const char *IC7200modes_[] = { 
+static std::vector<std::string>IC7200modes_;
+static const char *vIC7200modes_[] =
+{ 
 "LSB", "USB", "AM", "CW", "RTTY", "CW-R", "RTTY-R", 
-"LSB-D", "USB-D", NULL};
+"LSB-D", "USB-D"};
 
 const char mdval[] = { 0, 1, 2, 3, 4, 7, 8, 0, 1};
 
@@ -60,13 +64,14 @@ static char IC7200_mode_type[] = {
 'L', 'U', 'U', 'L', 'L', 'U', 'U',
 'L', 'U' };
 
-const char *IC7200_SSBwidths[] = {
+static std::vector<std::string>IC7200_SSBwidths;
+static const char *vIC7200_SSBwidths[] =
+{
   "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
 "600",   "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
 "2600", "2700", "2800", "2900", "3000", "3100", "3200", "3300", "3400", "3500",
-"3600",
-NULL};
+"3600"};
 static int IC7200_bw_vals_SSB[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
@@ -74,24 +79,26 @@ static int IC7200_bw_vals_SSB[] = {
 31,32,33,34,35,36,37,38,39,40,
 41, WVALS_LIMIT};
 
-const char *IC7200_RTTYwidths[] = {
+static std::vector<std::string>IC7200_RTTYwidths;
+static const char *vIC7200_RTTYwidths[] =
+{
   "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
  "600",  "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
-"2600", "2700",
-NULL};
+"2600", "2700"};
 static int IC7200_bw_vals_RTTY[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
 21,22,23,24,25,26,27,28,29,30,
 31,32, WVALS_LIMIT};
 
-const char *IC7200_AMwidths[] = {
+static std::vector<std::string>IC7200_AMwidths;
+static const char *vIC7200_AMwidths[] =
+{
   "200",  "400",  "600",  "800", "1000", "1200", "1400", "1600", "1800", "2000",
  "2200", "2400", "2600", "2800", "3000", "3200", "3400", "3600", "3800", "4000",
  "4200", "4400", "4600", "4800", "5000", "5200", "5400", "5600", "5800", "5000",
- "6200", "6400", "6600", "6800", "7000", "7200", "7400", "7600", "7800", "8000",
-NULL};
+ "6200", "6400", "6600", "6800", "7000", "7200", "7400", "7600", "7800", "8000"};
 static int IC7200_bw_vals_AM[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
@@ -124,6 +131,17 @@ static GUI IC7200_widgets[]= {
 
 void RIG_IC7200::initialize()
 {
+	VECTOR (szfilter, vszfilter);
+	VECTOR (IC7200modes_, vIC7200modes_);
+	VECTOR (IC7200_SSBwidths, vIC7200_SSBwidths);
+	VECTOR (IC7200_RTTYwidths, vIC7200_RTTYwidths);
+	VECTOR (IC7200_AMwidths, vIC7200_AMwidths);
+
+	modes_ = IC7200modes_;
+	_mode_type = IC7200_mode_type;
+	bandwidths_ = IC7200_SSBwidths;
+	bw_vals_ = IC7200_bw_vals_SSB;
+
 	IC7200_widgets[0].W = btnVol;
 	IC7200_widgets[1].W = sldrVOLUME;
 	IC7200_widgets[2].W = btnAGC;
@@ -1223,7 +1241,7 @@ const char *RIG_IC7200::FILT(int val)
 {
 	if (val < 1) val = 1;
 	if (val > 3) val = 3;
-	return(szfilter[val - 1]);
+	return szfilter[val - 1].c_str();
 }
 
 const char *RIG_IC7200::nextFILT()
@@ -1233,7 +1251,7 @@ const char *RIG_IC7200::nextFILT()
 	val++;
 	if (val > 3) val = 1;
 	set_FILT(val);
-	return szfilter[val - 1];
+	return szfilter[val - 1].c_str();
 }
 
 void RIG_IC7200::set_FILTERS(std::string s)
@@ -1333,7 +1351,7 @@ int RIG_IC7200::def_bandwidth(int m)
 	return mode_bwA[m];
 }
 
-const char ** RIG_IC7200::bwtable(int m)
+std::vector<std::string>& RIG_IC7200::bwtable(int m)
 {
 	switch (m) {
 		case 2: // AM

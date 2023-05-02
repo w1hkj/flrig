@@ -26,19 +26,21 @@
 const char K4name_[] = "K4";
 
 // 0=N/A, 1=LSB, 2=USB, 3=CW, 4=FM, 5=AM, 6=DATA, 7=CW REV, 8=N/A, 9=DATA REV.
-const char *K4modes_[] =
-	{ "LSB", "USB", "CW", "FM", "AM", "DATA", "CW-R", "DATA-R", NULL};
+static std::vector<std::string>K4modes_;
+static const char *vK4modes_[] =
+	{ "LSB", "USB", "CW", "FM", "AM", "DATA", "CW-R", "DATA-R"};
 const char modenbr[] =
 	{ '1', '2', '3', '4', '5', '6', '7', '9' };
 static const char K4_mode_type[] =
 	{ 'L', 'U', 'L', 'U', 'U', 'U', 'U', 'L' };
 
-static const char *K4_widths[] = {
+static std::vector<std::string>K4_widths;
+static const char *vK4_widths[] = {
    "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
   "550",  "600",  "650",  "700",  "750",  "800",  "850",  "900",  "950", "1000",
  "1100", "1200", "1300", "1400", "1500", "1600", "1700", "1800", "1900", "2000",
  "2200", "2400", "2600", "2800", "3000", "3100", "3200", "3300", "3400", "3500",
- "3600", "3700", "3800", "3900", "4000", NULL};
+ "3600", "3700", "3800", "3900", "4000"};
 static int K4_bw_vals[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
@@ -155,7 +157,12 @@ int  RIG_K4::def_bandwidth(int m)
 
 void RIG_K4::initialize()
 {
-	debug::level = debug::INFO_LEVEL;
+	VECTOR (K4modes_, vK4modes_);
+	VECTOR (K4_widths, vK4_widths);
+
+	modes_ = K4modes_;
+	bandwidths_ = K4_widths;
+	bw_vals_ = K4_bw_vals;
 
 	LOG_INFO("K4");
 	k4_widgets[0].W = btnVol;

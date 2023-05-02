@@ -102,7 +102,7 @@ public:
 	int  get_pbt_inner();
 	int  get_pbt_outer();
 
-	const char **bwtable(int m);
+	std::vector<std::string>& bwtable(int m);
 
 	void get_pc_min_max_step(double &min, double &max, double &step);
 

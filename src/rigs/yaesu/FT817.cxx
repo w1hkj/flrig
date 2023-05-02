@@ -29,8 +29,9 @@
 //=============================================================================
 
 static const char FT817name_[] = "FT-817";
-static const char *FT817modes_[] = {
-		"LSB", "USB", "CW", "CW-R", "AM", "FM", "DIG", "PKT", NULL};
+static std::vector<std::string>FT817modes_;
+static const char *vFT817modes_[] = {
+		"LSB", "USB", "CW", "CW-R", "AM", "FM", "DIG", "PKT"};
 static const int FT817_mode_val[] =  { 0, 1, 2, 3, 4, 8, 0x0A, 0x0C };
 static const char FT817_mode_type[] = { 'L', 'U', 'U', 'L', 'U', 'U', 'U', 'U' };
 
@@ -69,6 +70,12 @@ RIG_FT817::RIG_FT817() {
 	ndigits = 8;
 
 	inuse = onNIL;
+}
+
+void RIG_FT817::initialize()
+{
+	VECTOR(FT817modes_, vFT817modes_);
+	modes_ = FT817modes_;
 }
 
 void RIG_FT817::init_cmd()
@@ -133,7 +140,7 @@ unsigned long long RIG_FT817::get_vfoA()
 			break;
 		}
 	static char msg[50];
-	snprintf(msg, sizeof(msg), "get vfoA: %llu, %s", freqA, FT817modes_[i]);
+	snprintf(msg, sizeof(msg), "get vfoA: %llu, %s", freqA, FT817modes_[i].c_str());
 	getr(msg);
 
 	return freqA;
@@ -205,7 +212,7 @@ unsigned long long RIG_FT817::get_vfoB ()
 			break;
 		}
 	static char msg[50];
-	snprintf(msg, sizeof(msg), "get vfoB: %llu, %s", freqB, FT817modes_[i]);
+	snprintf(msg, sizeof(msg), "get vfoB: %llu, %s", freqB, FT817modes_[i].c_str());
 	getr(msg);
 
 	return freqB;

@@ -24,9 +24,16 @@
 // IC-R71
 //
 const char ICR71name_[] = "IC-R71";
-const char *ICR71modes_[] = { "LSB", "USB", "AM", "CW", "RTTY", "FM", NULL};
+
+static std::vector<std::string>ICR71modes_;
+static const char *vICR71modes_[] =
+{ "LSB", "USB", "AM", "CW", "RTTY", "FM"};
+
 const char ICR71_mode_type[] = { 'L', 'U', 'U', 'L', 'L', 'U' };
-//const char *ICR71_widths[] = { "NARR", "WIDE", NULL};
+
+//static std::vector<std::string>ICR71_widths;
+//static const char *vICR71_widths[] =
+//{ "NARR", "WIDE"};
 //static int ICR71_bw_vals[] = {1,2, WVALS_LIMIT};
 
 RIG_ICR71::RIG_ICR71() {
@@ -65,6 +72,14 @@ RIG_ICR71::RIG_ICR71() {
 };
 
 //=============================================================================
+
+void RIG_ICR71::initialize()
+{
+	VECTOR (ICR71modes_, vICR71modes_);
+
+	modes_ = ICR71modes_;
+	_mode_type = ICR71_mode_type;
+}
 
 bool RIG_ICR71::check ()
 {

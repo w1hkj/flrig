@@ -28,18 +28,22 @@
 
 const char K2name_[] = "K2";
 
-static const char *K2modes_[] = 
-	{ "LSB",  "USB",  "CW",   "RTTY", "CW-R", "RTTY-R", NULL};
+static std::vector<std::string>K2modes_;
+static const char *vK2modes_[] = 
+	{ "LSB",  "USB",  "CW",   "RTTY", "CW-R", "RTTY-R"};
 
 static const char K2_mode_type[] =
 	{ 'L',    'U',    'L',    'L',     'U',   'U' };
 
-static const char *K2_mode_str[] =
+static std::vector<std::string>K2_mode_str;
+static const char *vK2_mode_str[] =
 	{ "MD1;", "MD2;", "MD3;", "MD6;", "MD7;", "MD9;" };
 
 static int K2_num_modes = 6;
 
-const char *K2_widths[] = {"FL1", "FL2", "FL3", "FL4", NULL};
+static std::vector<std::string>K2_widths;
+static const char *vK2_widths[] = {
+	"FL1", "FL2", "FL3", "FL4"};
 static int K2_bw_vals[] = { 1, 2, 3, 4, WVALS_LIMIT};
 
 static GUI k2_widgets[]= {
@@ -108,8 +112,13 @@ int  RIG_K2::adjust_bandwidth(int m)
 
 void RIG_K2::initialize()
 {
-	progStatus.gettrace = 1;
-	progStatus.settrace = 1;
+	VECTOR (K2modes_, vK2modes_);
+	VECTOR (K2_mode_str, vK2_mode_str);
+	VECTOR (K2_widths, vK2_widths);
+
+	modes_ = K2modes_;
+	bandwidths_ = K2_widths;
+	bw_vals_ = K2_bw_vals;
 
 	k2_widgets[0].W = sldrPOWER;
 

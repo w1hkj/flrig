@@ -41,10 +41,11 @@ static const char FT950name_[] = "FT-950";
 static int mode_bwA[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 static int mode_bwB[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 
-static const char *FT950modes_[] = {
+static std::vector<std::string>FT950modes_;
+static const char *vFT950modes_[] = {
 "LSB", "USB", "CW", "FM", "AM", "RTTY-L",
 "CW-R", "PKT-L", "RTTY-U", "PKT-FM",
-"FM-N", "PKT-U", "AM-N", NULL};
+"FM-N", "PKT-U", "AM-N"};
 
 static const char FT950_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D' };
 static const char FT950_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L', 'U', 'U', 'U', 'U', 'U' };
@@ -54,47 +55,57 @@ static const int FT950_def_bw[] = {
     18,   18,   5,   0,   0,   5,       5,     10,     5,       0,       0,     10,     0 };
 // mLSB, mUSB, mCW, mFM, mAM, mRTTY_L, mCW_R, mPKT_L, mRTTY_U, mPKT_FM, mFM_N, mPKT_U, mAM_N
 
-static const char *FT950_widths_SSB[] = {
+static std::vector<std::string>FT950_widths_SSB;
+static const char *vFT950_widths_SSB[] = {
 "200", "400", "600", "850", "1100", "1350", "1500", "1650", "1800",
 "1950", "2100", "2250", "2400", "2500", "2600", "2700",
-"2800", "2900", "3000", NULL };
+"2800", "2900", "3000" };
 
 static int FT950_wvals_SSB[] = {
 1,2,3,4,5,6,7,8,9,10,11,12,13,15,16,17,18,19,20, WVALS_LIMIT};
 
-static const char *FT950_widths_SSBD[] = {
-"100", "200", "300", "400", "500", "800", "1200", "1400", "1700", "2000", "2400", NULL };
+static std::vector<std::string>FT950_widths_SSBD;
+static const char *vFT950_widths_SSBD[] = {
+"100", "200", "300", "400", "500", "800", "1200", "1400", "1700", "2000", "2400" };
 
 static int FT950_wvals_SSBD[] = {
 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, WVALS_LIMIT};
 
-static const char *FT950_widths_CW[] = {
-"100", "200", "300", "400", "500", "800", "1200", "1400", "1700", "2000", "2400", NULL };
+static std::vector<std::string>FT950_widths_CW;
+static const char *vFT950_widths_CW[] = {
+"100", "200", "300", "400", "500", "800", "1200", "1400", "1700", "2000", "2400" };
 
 static int FT950_wvals_CW[] = {
 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, WVALS_LIMIT };
 
 // Single bandwidth modes
-static const char *FT950_widths_AMFMnar[]  = { "NARR", NULL };
-static const char *FT950_widths_AMFMnorm[] = { "NORM", NULL };
+static std::vector<std::string>FT950_widths_AMFMnar;
+static const char *vFT950_widths_AMFMnar[]  = { "NARR" };
+static std::vector<std::string>FT950_widths_AMFMnorm;
+static const char *vFT950_widths_AMFMnorm[] = { "NORM" };
 
 static const int FT950_wvals_AMFM[] = { 0, WVALS_LIMIT };
 
 // mPKT_FM Multi bandwidth mode
-static const char *FT950_widths_NN[] = {"NORM", "NARR", NULL };
+static std::vector<std::string>FT950_widths_NN;
+static const char *vFT950_widths_NN[] = {"NORM", "NARR" };
 
 static const int FT950_wvals_NN[] = {0, 1, WVALS_LIMIT};
 
 // US 60M 5-USB, 5-CW
-static const char *US_60m_chan[]  = {"000","125","126","127","128","130","141","142","143","144","146",NULL};
-static const char *US_60m_label[] = {"VFO","U51","U52","U53","U54","U55","U56","U57","U58","U59","U50",NULL};
+static std::vector<std::string>US_60m_chan;
+static const char *vUS_60m_chan[]  = {"000","125","126","127","128","130","141","142","143","144","146"};
+static std::vector<std::string>US_60m_label;
+static const char *vUS_60m_label[] = {"VFO","U51","U52","U53","U54","U55","U56","U57","U58","U59","U50"};
 
 // UK 60m channel numbers by Brian, G8SEZ
-static const char *UK_60m_chan[]  = {"000","118","120","121","127","128","129","130",NULL};
-static const char *UK_60m_label[] = {"VFO","U51","U52","U53","U54","U55","U56","U57",NULL};
+static std::vector<std::string>UK_60m_chan;
+static const char *vUK_60m_chan[]  = {"000","118","120","121","127","128","129","130"};
+static std::vector<std::string>UK_60m_label;
+static const char *vUK_60m_label[] = {"VFO","U51","U52","U53","U54","U55","U56","U57"};
 
-static const char **Channels_60m = US_60m_chan;
-static const char **label_60m    = US_60m_label;
+static std::vector<std::string>& Channels_60m = US_60m_chan;
+static std::vector<std::string>& label_60m    = US_60m_label;
 
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
@@ -204,6 +215,22 @@ RIG_FT950::RIG_FT950() {
 
 void RIG_FT950::initialize()
 {
+	VECTOR (FT950modes_, vFT950modes_);
+	VECTOR (FT950_widths_SSB, vFT950_widths_SSB);
+	VECTOR (FT950_widths_SSBD, vFT950_widths_SSBD);
+	VECTOR (FT950_widths_CW, vFT950_widths_CW);
+	VECTOR (FT950_widths_AMFMnar, vFT950_widths_AMFMnar);
+	VECTOR (FT950_widths_AMFMnorm, vFT950_widths_AMFMnorm);
+	VECTOR (FT950_widths_NN, vFT950_widths_NN);
+	VECTOR (US_60m_chan, vUS_60m_chan);
+	VECTOR (US_60m_label, vUS_60m_label);
+	VECTOR (UK_60m_chan, vUK_60m_chan);
+	VECTOR (UK_60m_label, vUK_60m_label);
+
+	modes_ = FT950modes_;
+	bandwidths_ = FT950_widths_SSB;
+	bw_vals_ = FT950_wvals_SSB;
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = sldrRFGAIN;
@@ -242,15 +269,15 @@ void RIG_FT950::initialize()
 		Channels_60m = US_60m_chan;
 		label_60m    = US_60m_label;
 		op_yaesu_select60->clear();
-		char **p = (char **)US_60m_label;
-		while (*p) op_yaesu_select60->add(*p++);
+		for (size_t n = 0; n < US_60m_label.size(); n++)
+			op_yaesu_select60->add(US_60m_label.at(n).c_str());
 	}
 	else {
 		Channels_60m = UK_60m_chan;
 		label_60m    = UK_60m_label;
 		op_yaesu_select60->clear();
-		char **p = (char **)UK_60m_label;
-		while (*p) op_yaesu_select60->add(*p++);
+		for (size_t n = 0; n < UK_60m_label.size(); n++)
+			op_yaesu_select60->add(UK_60m_label.at(n).c_str());
 	}
 	op_yaesu_select60->index(m_60m_indx);
 	op_yaesu_select60->activate();
@@ -847,7 +874,7 @@ int RIG_FT950::def_bandwidth(int m)
 	return mode_bwA[m];
 }
 
-const char ** RIG_FT950::bwtable(int n)
+std::vector<std::string>& RIG_FT950::bwtable(int n)
 {
 	switch (n) {
 		case mPKT_FM : return FT950_widths_NN;

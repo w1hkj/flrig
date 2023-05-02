@@ -3,12 +3,11 @@
 
 #include "other/TMD710.h"
 
-#define AOR5K_WAIT_TIME 200
-
 const char TMD710name_[] = "TMD710";
 
-const char *TMD710modes_[] = {
-		"FM", "NFM", "AM", NULL};
+static std::vector<std::string>TMD710modes_;
+static const char *vTMD710modes_[] = {
+		"FM", "NFM", "AM"};
 
 //gibts nicht
 static const char TMD710_mode_type[] =
@@ -18,7 +17,7 @@ RIG_TMD710::RIG_TMD710() {
 // base class values	
 	name_ = TMD710name_;
 	modes_ = TMD710modes_;
-	bandwidths_ = NULL;
+	bandwidths_ = vNOBWS;
 	serial_baudrate = BR38400;
 	stopbits = 1;
 	serial_retries = 3;
@@ -59,6 +58,14 @@ RIG_TMD710::RIG_TMD710() {
 
 }
 
+void RIG_TMD710::initialize()
+{
+	VECTOR (TMD710modes_, vTMD710modes_);
+
+	modes_ = TMD710modes_;
+	bandwidths_ = vNOBWS;
+}
+
 bool RIG_TMD710::check ()
 {
 	cmd = "DL 0\r"; // Enable dual mode
@@ -76,13 +83,11 @@ unsigned long long RIG_TMD710::get_vfoA ()
 
 	gett("get_vfoA");
 	char frequency[11];
-	unsigned long long f = 0;
 	int p = 5;
 	int n = 0;
 	for (n = 0; n < 10; n++) frequency[n] = (replystr[p + n]);
 	frequency[10] = '\0';
-	f = strtoull(frequency, NULL, 10);
-	freqA = f;
+	sscanf(frequency, "%lld", &freqA);
 
 	char mode[2];
 	mode[0] = (replystr[47]);
@@ -231,13 +236,11 @@ unsigned long long RIG_TMD710::get_vfoB ()
 
 	gett("get_vfoB");
 	char frequency[11];
-	unsigned long long f = 0;
 	int p = 5;
 	int n = 0;
 	for (n = 0; n < 10; n++) frequency[n] = (replystr[p + n]);
 	frequency[10] = '\0';
-	f = strtoull(frequency, NULL, 10);
-	freqB = f;
+	sscanf(frequency, "%lld", &freqB);
 
 	char mode[2];
 	mode[0] = (replystr[47]);

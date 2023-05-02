@@ -25,10 +25,8 @@
 
 #include "tci_io.h"
 
-extern int tci_centers[];
-extern int tci_center;
+extern std::vector<std::string> TCI_centers;
 extern int tci_nbr_centers;
-extern const char *TCI_centers[];
 extern void tci_adjust_widths();
 
 enum SDR2_TYPE { UNK, PRO, DX };
@@ -148,7 +146,7 @@ public:
 //	void set_auto_notch(int v);
 //	int  get_auto_notch();
 
-	const char **bwtable(int);
+	std::vector<std::string>& bwtable(int);
 	const char *get_bwname_(int bw, int md);
 
 	int		sdrtype;

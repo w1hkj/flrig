@@ -127,23 +127,26 @@ static void freq_mode_bw()
 	int BW = 0;
 	static char szval[20];
 
-	snprintf(szval, sizeof(szval), "%d", freq);
-	tempfreq.assign("F").append((selrig->inuse == onB) ? "B:" : "A:").append(szval).append("\n");
+	try {
+		snprintf(szval, sizeof(szval), "%d", freq);
+		tempfreq.assign("F").append((selrig->inuse == onB) ? "B:" : "A:").append(szval).append("\n");
 
-	BW = (selrig->inuse == onB) ? vfoB.iBW : vfoA.iBW;
-	mode = (selrig->inuse == onB) ? vfoB.imode : vfoA.imode;
-	const char **bwt = selrig->bwtable(mode);
-	const char **dsplo = selrig->lotable(mode);
-	const char **dsphi = selrig->hitable(mode);
+		BW = (selrig->inuse == onB) ? vfoB.iBW : vfoA.iBW;
+		mode = (selrig->inuse == onB) ? vfoB.imode : vfoA.imode;
+		std::vector<std::string>& bwt = selrig->bwtable(mode);
+		std::vector<std::string>& dsplo = selrig->lotable(mode);
+		std::vector<std::string>& dsphi = selrig->hitable(mode);
 
-	tempmode.assign("M:").append(selrig->modes_ ? selrig->modes_[mode] : "none").append("\n");
+		tempmode.assign("M:").append(selrig->modes_.at(mode)).append("\n");
 
-	tempbw.assign("L:").append((BW > 256 && selrig->has_dsp_controls) ?
-						(dsplo ? dsplo[BW & 0x7F] : "") :
-						(bwt && bwt[BW]) ? bwt[BW] : "" ).append("\n");
-	tempbw.append("U:").append((BW > 256 && selrig->has_dsp_controls) ?
-						(dsphi ? dsphi[(BW >> 8) & 0x7F] : "") :
-						"").append("\n");
+		tempbw.assign("L:").append((BW > 256) ?
+							dsplo.at(BW & 0x7F) :
+							bwt.at(BW & 0x7F)).append("\n");
+		tempbw.append("U:").append((BW > 256) ?
+							dsphi.at((BW >> 8) & 0x7F) : "n/a").append("\n");
+	} catch (const std::exception& e) {
+		LOG_ERROR("%s", e.what());
+	}
 }
 
 static std::string snotch()
@@ -844,7 +847,7 @@ public :
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 		XmlRpcValue modes;
 
-		if (!xcvr_online || disable_xmlrpc->value() || !selrig->modes_) {
+		if (!xcvr_online) {
 			modes[0] = "CW";
 			modes[1] = "LSB";
 			modes[2] = "USB";
@@ -856,11 +859,19 @@ public :
 		guard_lock serial_lock(&mutex_serial, "xml rig_get_modes");
 
 		xml_trace(1, "rig_get_modes");
-
-		int i = 0;
-		for (const char** mode = selrig->modes_; *mode; mode++, i++)
-			modes[i] = *mode;
-		result = modes;
+		try {
+			int n = 0;
+			for (size_t i = 0; i < selrig->modes_.size(); i++)
+				if (!selrig->modes_.at(i).empty())
+					modes[n++] = selrig->modes_.at(i);
+			result = modes;
+		} catch (const std::exception& e) {
+			LOG_ERROR("%s", e.what());
+			modes[0] = "CW";
+			modes[1] = "LSB";
+			modes[2] = "USB";
+			return;
+		}
 
 		}
 
@@ -910,23 +921,26 @@ public:
 	rig_get_mode(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_mode", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_online || disable_xmlrpc->value()) {
+		if (!xcvr_online) {
 			result = "USB";
 			return;
 		}
 
 		int mode;
 		wait();
-		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_mode");
-		guard_lock serial_lock(&mutex_serial, "xml rig_get_mode");
+		try {
+			guard_lock serial_lock(&mutex_serial, "xml rig_get_mode");
 
-		mode = vfo->imode;
+			mode = vfo->imode;
 
-		std::string result_string = "none";
-		if (selrig->modes_) result_string = selrig->modes_[mode];
-		xml_trace(2, "mode on ", ((selrig->inuse == onB) ? "B " : "A "), result_string.c_str());
-		result = result_string;
-
+			std::string result_string = "none";
+			result_string = selrig->modes_.at(mode);
+			xml_trace(2, "mode on ", ((selrig->inuse == onB) ? "B " : "A "), result_string.c_str());
+			result = result_string;
+		} catch (const std::exception& e) {
+			LOG_ERROR("%s", e.what());
+			result = "USB";
+		}
 	}
 
 	std::string help() { return std::string("returns current xcvr mode"); }
@@ -942,30 +956,26 @@ public:
 	rig_get_modeA(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_modeA", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_online || disable_xmlrpc->value()) {
+		if (!xcvr_online) {
 			result = "USB";
 			return;
 		}
 
 		int mode;
 		wait();
-		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_mode");
-		guard_lock serial_lock(&mutex_serial, "xml rig_get_mode");
+		try {
+			guard_lock serial_lock(&mutex_serial, "xml rig_get_mode");
 
-		mode = vfoA.imode;
+			mode = vfoA.imode;
 
-		std::string result_string;
-
-//std::cout << "mode #: " << mode << " @ " << selrig->modes_ << " => ";
-//std::cout.flush();
-//std::cout << selrig->modes_[mode] << std::endl;
-
-		if (selrig->modes_)
-			result_string = selrig->modes_[mode];
-		else
-			result_string = "none";
-		xml_trace(2, "mode A ", result_string.c_str());
-		result = result_string;
+			std::string result_string = "none";
+			result_string = selrig->modes_.at(mode);
+			xml_trace(2, "mode A ", result_string.c_str());
+			result = result_string;
+		} catch (const std::exception& e) {
+			LOG_ERROR("%s", e.what());
+			result = "USB";
+		}
 
 	}
 
@@ -982,21 +992,26 @@ public:
 	rig_get_modeB(XmlRpcServer* s) : XmlRpcServerMethod("rig.get_modeB", s) {}
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
-		if (!xcvr_online || disable_xmlrpc->value()) {
+		if (!xcvr_online) {
 			result = "USB";
 			return;
 		}
 
 		int mode;
 		wait();
-		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_mode");
+		try {
+			guard_lock serial_lock(&mutex_serial, "xml rig_get_mode");
 
-		mode = vfoB.imode;
+			mode = vfoB.imode;
 
-		std::string result_string = "none";
-		if (selrig->modes_) result_string = selrig->modes_[mode];
-		xml_trace(2, "mode B ", result_string.c_str());
-		result = result_string;
+			std::string result_string = "none";
+			result_string = selrig->modes_.at(mode);
+			xml_trace(2, "mode B ", result_string.c_str());
+			result = result_string;
+		} catch (const std::exception& e) {
+			LOG_ERROR("%s", e.what());
+			result = "USB";
+		}
 
 	}
 
@@ -1014,7 +1029,7 @@ public :
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result) {
 
-		if (!xcvr_online || disable_xmlrpc->value() || !selrig->bandwidths_) {
+		if (!xcvr_online) {
 			XmlRpcValue bws;
 			bws[0][0] = "Bandwidth";
 			bws[0][1] = "NONE";
@@ -1027,41 +1042,42 @@ public :
 		guard_lock service_lock(&mutex_srvc_reqs, "xml rig_get_bws");
 		guard_lock serial_lock(&mutex_serial, "xml rig_get_bws");
 
-		int mode = (selrig->inuse == onB) ? vfoB.imode : vfoA.imode;
-		const char **bwt = selrig->bwtable(mode);
-		const char **dsplo = selrig->lotable(mode);
-		const char **dsphi = selrig->hitable(mode);
+		try {
+			int mode = (selrig->inuse == onB) ? vfoB.imode : vfoA.imode;
+			std::vector<std::string>& bwt = selrig->bwtable(mode);
+			std::vector<std::string>& dsplo = selrig->lotable(mode);
+			std::vector<std::string>& dsphi = selrig->hitable(mode);
 
-// single bandwidth table
-		if (!selrig->has_dsp_controls || !dsplo || !dsphi) {
-			int i = 0;
-			bws[0][0] = "Bandwidth";
-			while (*bwt) {
-				bws[0][i+1] = *bwt;
-				bwt++;
-				i++;
+	// single bandwidth table
+			if (!selrig->has_dsp_controls) {
+				bws[0][0] = "Bandwidth";
+				int n = 1;
+				for (size_t i = 0; i < bwt.size(); i++) {
+					if (!bwt.at(i).empty())
+						bws[0][n++] = bwt.at(i);
+				}
 			}
-		}
-// double table either lo/hi or center/width
-		if (selrig->has_dsp_controls && dsplo && dsphi) {
-			int i = 0;
-			int n = 1;
-			std::string control_label = selrig->SL_label;
-			control_label.append("|").append(selrig->SL_tooltip);
-			bws[0][0] = control_label.c_str();
-			while (dsplo[i]) {
-				bws[0][n] = dsplo[i];
-				n++; i++;
+	// double table either lo/hi or center/width
+			if (selrig->has_dsp_controls) {
+				int n = 1;
+				std::string control_label = selrig->SL_label;
+				control_label.append("|").append(selrig->SL_tooltip);
+				bws[0][0] = control_label.c_str();
+				for (size_t i = 0; i < dsplo.size(); i++) {
+					if (!dsplo.at(i).empty())
+						bws[0][n++] = dsplo[i];
+				}
+				control_label.assign(selrig->SH_label);
+				control_label.append("|").append(selrig->SH_tooltip);
+				bws[1][0] = control_label.c_str();
+				n = 1;
+				for (size_t i = 0; i < dsphi.size(); i++) {
+					if (!dsphi.at(i).empty())
+						bws[1][n++] = dsphi[i];
+				}
 			}
-			i = 0;
-			control_label.assign(selrig->SH_label);
-			control_label.append("|").append(selrig->SH_tooltip);
-			bws[1][0] = control_label.c_str();
-			n = 1;
-			while (dsphi[i]) {
-				bws[1][n] = dsphi[i];
-				n++; i++;
-			}
+		} catch (const std::exception& e) {
+			LOG_ERROR("%s", e.what());
 		}
 
 		result = bws;
@@ -1093,7 +1109,8 @@ public:
 		int BW = (selrig->inuse == onB) ? vfoB.iBW : vfoA.iBW;
 		int mode = (selrig->inuse == onB) ? vfoB.imode : vfoA.imode;
 
-		if (selrig->has_int_bandwidth_control) {
+		try {
+			if (selrig->has_int_bandwidth_control) {
 				char reply[10];
 				snprintf(reply, sizeof(reply), "%d", BW);
 				result[0] = reply;
@@ -1102,35 +1119,21 @@ public:
 				return;
 			}
 
-		const char **bwt = selrig->bwtable(mode);
-		const char **dsplo = selrig->lotable(mode);
-		const char **dsphi = selrig->hitable(mode);
+			std::vector<std::string>& bwt = selrig->bwtable(mode);
+			std::vector<std::string>& dsplo = selrig->lotable(mode);
+			std::vector<std::string>& dsphi = selrig->hitable(mode);
 
-		int max_bwt = 0,
-			max_lotable = 0,
-			max_hitable = 0;
-		if (bwt)   while (bwt[max_bwt] != NULL) max_bwt++;
-		if (dsplo) while (dsplo[max_lotable] != NULL) max_lotable++;
-		if (dsphi) while (dsphi[max_hitable] != NULL) max_hitable++;
-
-		result[0] = result[1] = "";
-		if (BW < 256 && bwt) {
-			int SB = BW & 0x7F;
-			if (SB < 0) SB = 0;
-			if (SB >= max_bwt) SB = max_bwt-1;
-			result[0] = bwt[SB];
-		}
-		else if (dsplo && dsphi) {
-			int SL = BW & 0x7F;
-			if (SL >= max_lotable) SL = max_lotable - 1;
-			if (SL < 0) SL = 0;
-
-			int SH = (BW >> 8) & 0x7F;
-			if (SH >= max_hitable) SH = max_hitable - 1;
-			if (SH < 0) SH = 0;
-
-			if (dsplo) result[0] = dsplo[SL];
-			if (dsphi) result[1] = dsphi[SH];
+			result[0] = result[1] = "";
+			if (BW < 256) {
+				result[0] = bwt[BW & 0x7F];
+			}
+			else {
+				result[0] = dsplo.at(BW & 0x7F);
+				result[1] = dsphi.at((BW >> 8) & 0x7F);
+			}
+		} catch (const std::exception& e) {
+			LOG_ERROR("%s", e.what());
+			result[0] = result[1] = "";
 		}
 		std::string s1 = result[0], s2 = result[1];
 		xml_trace( 5, "bandwidth on ", ((selrig->inuse == onB) ? "B " : "A "), s1.c_str(), " | ", s2.c_str());
@@ -1162,7 +1165,8 @@ public:
 		int BW = vfoA.iBW;
 		int mode = vfoA.imode;
 
-		if (selrig->has_int_bandwidth_control) {
+		try {
+			if (selrig->has_int_bandwidth_control) {
 				char reply[10];
 				snprintf(reply, sizeof(reply), "%d", BW);
 				result[0] = reply;
@@ -1171,35 +1175,21 @@ public:
 				return;
 			}
 
-		const char **bwt = selrig->bwtable(mode);
-		const char **dsplo = selrig->lotable(mode);
-		const char **dsphi = selrig->hitable(mode);
+			std::vector<std::string>& bwt = selrig->bwtable(mode);
+			std::vector<std::string>& dsplo = selrig->lotable(mode);
+			std::vector<std::string>& dsphi = selrig->hitable(mode);
 
-		int max_bwt = 0,
-			max_lotable = 0,
-			max_hitable = 0;
-		if (bwt)   while (bwt[max_bwt] != NULL) max_bwt++;
-		if (dsplo) while (dsplo[max_lotable] != NULL) max_lotable++;
-		if (dsphi) while (dsphi[max_hitable] != NULL) max_hitable++;
-
-		result[0] = result[1] = "";
-		if (BW < 256 && bwt) {
-			int SB = BW & 0x7F;
-			if (SB < 0) SB = 0;
-			if (SB >= max_bwt) SB = max_bwt-1;
-			result[0] = bwt[SB];
-		}
-		else if (dsplo && dsphi) {
-			int SL = BW & 0x7F;
-			if (SL >= max_lotable) SL = max_lotable - 1;
-			if (SL < 0) SL = 0;
-
-			int SH = (BW >> 8) & 0x7F;
-			if (SH >= max_hitable) SH = max_hitable - 1;
-			if (SH < 0) SH = 0;
-
-			if (dsplo) result[0] = dsplo[SL];
-			if (dsphi) result[1] = dsphi[SH];
+			result[0] = result[1] = "";
+			if (BW < 256) {
+				result[0] = bwt.at(BW & 0x7F);
+			}
+			else {
+				result[0] = dsplo.at(BW & 0x7F);
+				result[1] = dsphi.at((BW >> 8) & 0x7F);
+			}
+		} catch (const std::exception& e) {
+			LOG_ERROR("%s", e.what());
+			result[0] = result[1] = "";
 		}
 		std::string s1 = result[0], s2 = result[1];
 		xml_trace( 4, "bandwidth on A", s1.c_str(), " | ", s2.c_str());
@@ -1231,45 +1221,33 @@ public:
 
 		int BW = vfoB.iBW;
 		int mode = vfoB.imode;
-
-		if (selrig->has_int_bandwidth_control) {
-				char reply[10];
-				snprintf(reply, sizeof(reply), "%d", BW);
-				result[0] = reply;
-				std::string s1 = result[0], s2 = result[1];
-				xml_trace( 4, "bandwidth on B", s1.c_str(), " | ", s2.c_str());
-				return;
-			}
-
-		const char **bwt = selrig->bwtable(mode);
-		const char **dsplo = selrig->lotable(mode);
-		const char **dsphi = selrig->hitable(mode);
-
-		int max_bwt = 0,
-			max_lotable = 0,
-			max_hitable = 0;
-		if (bwt)   while (bwt[max_bwt] != NULL) max_bwt++;
-		if (dsplo) while (dsplo[max_lotable] != NULL) max_lotable++;
-		if (dsphi) while (dsphi[max_hitable] != NULL) max_hitable++;
-
 		result[0] = result[1] = "";
-		if (BW < 256 && bwt) {
-			int SB = BW & 0x7F;
-			if (SB < 0) SB = 0;
-			if (SB >= max_bwt) SB = max_bwt-1;
-			result[0] = bwt[SB];
-		}
-		else if (dsplo && dsphi) {
-			int SL = BW & 0x7F;
-			if (SL >= max_lotable) SL = max_lotable - 1;
-			if (SL < 0) SL = 0;
 
-			int SH = (BW >> 8) & 0x7F;
-			if (SH >= max_hitable) SH = max_hitable - 1;
-			if (SH < 0) SH = 0;
+		try {
+			
+			if (selrig->has_int_bandwidth_control) {
+					char reply[10];
+					snprintf(reply, sizeof(reply), "%d", BW);
+					result[0] = reply;
+					std::string s1 = result[0], s2 = result[1];
+					xml_trace( 4, "bandwidth on B", s1.c_str(), " | ", s2.c_str());
+					return;
+				}
 
-			if (dsplo) result[0] = dsplo[SL];
-			if (dsphi) result[1] = dsphi[SH];
+			std::vector<std::string>& bwt = selrig->bwtable(mode);
+			std::vector<std::string>& dsplo = selrig->lotable(mode);
+			std::vector<std::string>& dsphi = selrig->hitable(mode);
+
+			if (BW < 256) {
+				result[0] = bwt.at(BW & 0x7F);
+			}
+			else {
+				result[0] = dsplo.at(BW & 0x7F);
+				result[1] = dsphi.at((BW >> 8) & 0x7F);
+			}
+		} catch (const std::exception& e) {
+			LOG_ERROR("%s", e.what());
+			result[0] = result[1] = "";
 		}
 		std::string s1 = result[0], s2 = result[1];
 		xml_trace( 4, "bandwidth on B", s1.c_str(), " | ", s2.c_str());
@@ -2366,28 +2344,25 @@ public:
 		nuvals.iBW = 255;
 
 		std::string numode = (std::string)params[0];
-		int i = 0;
 
-		if (!selrig->modes_) {
-			result = 0;
-			return;
-		}
-
-		while (selrig->modes_[i] != NULL) {
-			if (numode == selrig->modes_[i]) {
-				nuvals.imode = i;
-				nuvals.iBW = selrig->def_bandwidth(i);
-				guard_lock serial_lock(&mutex_serial);
-				if (selrig->inuse == onB) {
-					serviceB(nuvals);
-				} else {
-					serviceA(nuvals);
+		try {
+			for (size_t i = 0; i < selrig->modes_.size(); i++) {
+				if (numode == selrig->modes_.at(i))  {
+					nuvals.imode = i;
+					nuvals.iBW = selrig->def_bandwidth(i);
+					guard_lock serial_lock(&mutex_serial);
+					if (selrig->inuse == onB) {
+						serviceB(nuvals);
+					} else {
+						serviceA(nuvals);
+					}
+					Fl::awake(updateUI);
+					result = 1;
+					break;
 				}
-				Fl::awake(updateUI);
-				result = 1;
-				break;
 			}
-			i++;
+		} catch (const std::exception& e) {
+			LOG_ERROR("%s", e.what());
 		}
 
 	}
@@ -2412,29 +2387,28 @@ public:
 		nuvals.iBW = 255;
 
 		std::string numode = (std::string)params[0];
-		int i = 0;
 
-		if (!selrig->modes_) {
-			return;
-		}
-
-		while (selrig->modes_[i] != NULL) {
-			if (numode == selrig->modes_[i]) {
-				nuvals.imode = i;
-				nuvals.iBW = selrig->def_bandwidth(i);
-				guard_lock serial_lock(&mutex_serial);
-				if (selrig->inuse == onB) {
-					serviceB(nuvals);
-					result = (i == selrig->get_modeB());
-				} else {
-					serviceA(nuvals);
-					result = (i == selrig->get_modeA());
+		try {
+			for (size_t i = 0; i < selrig->modes_.size(); i++) {
+				if (numode == selrig->modes_.at(i))  {
+					nuvals.imode = i;
+					nuvals.iBW = selrig->def_bandwidth(i);
+					guard_lock serial_lock(&mutex_serial);
+					if (selrig->inuse == onB) {
+						serviceB(nuvals);
+						result = (i == (size_t)selrig->get_modeB());
+					} else {
+						serviceA(nuvals);
+						result = (i == (size_t)selrig->get_modeA());
+					}
+					Fl::awake(updateUI);
+					break;
 				}
-				Fl::awake(updateUI);
-				break;
 			}
-			i++;
+		} catch (const std::exception& e) {
+			LOG_ERROR("%s", e.what());
 		}
+
 		return;
 
 	}
@@ -2464,24 +2438,21 @@ public:
 		nuvals.iBW = 255;
 
 		std::string numode = (std::string)params[0];
-		int i = 0;
 
-		if (!selrig->modes_) {
-			result = 0;
-			return;
-		}
-
-		while (selrig->modes_[i] != NULL) {
-			if (numode == selrig->modes_[i]) {
-				nuvals.imode = i;
-				nuvals.iBW = selrig->def_bandwidth(i);
-				guard_lock serial_lock(&mutex_serial);
-				serviceA(nuvals);
-				Fl::awake(updateUI);
-				result = 1;
-				break;
+		try {
+			for (size_t i = 0; i < selrig->modes_.size(); i++) {
+				if (numode == selrig->modes_.at(i))  {
+					nuvals.imode = i;
+					nuvals.iBW = selrig->def_bandwidth(i);
+					guard_lock serial_lock(&mutex_serial);
+					serviceB(nuvals);
+					Fl::awake(updateUI);
+					result = 1;
+					break;
+				}
 			}
-			i++;
+		} catch (const std::exception& e) {
+			LOG_ERROR("%s", e.what());
 		}
 
 	}
@@ -2506,23 +2477,21 @@ public:
 		nuvals.iBW = 255;
 
 		std::string numode = (std::string)params[0];
-		int i = 0;
 
-		if (!selrig->modes_) {
-			return;
-		}
-
-		while (selrig->modes_[i] != NULL) {
-			if (numode == selrig->modes_[i]) {
-				nuvals.imode = i;
-				nuvals.iBW = selrig->def_bandwidth(i);
-				guard_lock serial_lock(&mutex_serial);
-				serviceA(nuvals);
-				Fl::awake(updateUI);
-				result = (i == selrig->get_modeA());
-				break;
+		try {
+			for (size_t i = 0; i < selrig->modes_.size(); i++) {
+				if (numode == selrig->modes_.at(i))  {
+					nuvals.imode = i;
+					nuvals.iBW = selrig->def_bandwidth(i);
+					guard_lock serial_lock(&mutex_serial);
+					serviceB(nuvals);
+					Fl::awake(updateUI);
+					result = (nuvals.imode == selrig->get_modeA());
+					break;
+				}
 			}
-			i++;
+		} catch (const std::exception& e) {
+			LOG_ERROR("%s", e.what());
 		}
 
 	}
@@ -2551,24 +2520,21 @@ public:
 		nuvals.iBW = 255;
 
 		std::string numode = (std::string)params[0];
-		int i = 0;
 
-		if (!selrig->modes_) {
-			result = 0;
-			return;
-		}
-
-		while (selrig->modes_[i] != NULL) {
-			if (numode == selrig->modes_[i]) {
-				nuvals.imode = i;
-				nuvals.iBW = selrig->def_bandwidth(i);
-				guard_lock serial_lock(&mutex_serial);
-				serviceB(nuvals);
-				Fl::awake(updateUI);
-				result = 1;
-				break;
+		try {
+			for (size_t i = 0; i < selrig->modes_.size(); i++) {
+				if (numode == selrig->modes_.at(i))  {
+					nuvals.imode = i;
+					nuvals.iBW = selrig->def_bandwidth(i);
+					guard_lock serial_lock(&mutex_serial);
+					serviceB(nuvals);
+					Fl::awake(updateUI);
+					result = 1;
+					break;
+				}
 			}
-			i++;
+		} catch (const std::exception& e) {
+			LOG_ERROR("%s", e.what());
 		}
 
 	}
@@ -2592,23 +2558,21 @@ public:
 		nuvals.iBW = 255;
 
 		std::string numode = (std::string)params[0];
-		int i = 0;
 
-		if (!selrig->modes_) {
-			return;
-		}
-
-		while (selrig->modes_[i] != NULL) {
-			if (numode == selrig->modes_[i]) {
-				nuvals.imode = i;
-				nuvals.iBW = selrig->def_bandwidth(i);
-				guard_lock serial_lock(&mutex_serial);
-				serviceB(nuvals);
-				Fl::awake(updateUI);
-				result = (i == selrig->get_modeB());
-				break;
+		try {
+			for (size_t i = 0; i < selrig->modes_.size(); i++) {
+				if (numode == selrig->modes_.at(i))  {
+					nuvals.imode = i;
+					nuvals.iBW = selrig->def_bandwidth(i);
+					guard_lock serial_lock(&mutex_serial);
+					serviceB(nuvals);
+					Fl::awake(updateUI);
+					result = (nuvals.imode == selrig->get_modeB());
+					break;
+				}
 			}
-			i++;
+		} catch (const std::exception& e) {
+			LOG_ERROR("%s", e.what());
 		}
 
 	}
@@ -2647,20 +2611,19 @@ public:
 			nuvals.iBW = bw;
 
 		} else {
-
-			int i = 0;
-			while (	selrig->bandwidths_[i] &&
-				atol(selrig->bandwidths_[i]) < bw) {
-				i++;
+			try {
+				size_t i = 0;
+				for (i = 0; i < selrig->bandwidths_.size(); i++)
+					if (atol (selrig->bandwidths_.at(i).c_str()) > bw) break;
+				if (--i < 0) i = 0;
+				bw = atol(selrig->bandwidths_.at(i).c_str());
+				nuvals.iBW = i;
+				std::ostringstream s;
+				s << "nearest bandwidth " << selrig->bandwidths_[i];
+				xml_trace(2,"Set to ", s.str().c_str());
+			} catch (const std::exception& e) {
+				LOG_ERROR("%s", e.what());
 			}
-			if (!selrig->bandwidths_[i]) i--;
-			bw = atol(selrig->bandwidths_[i]);
-			nuvals.iBW = i;
-
-			std::ostringstream s;
-			s << "nearest bandwidth " << selrig->bandwidths_[i];
-			xml_trace(2,"Set to ", s.str().c_str());
-
 		}
 		if (selrig->inuse == onB) {
 			nuvals.freq = vfoB.freq;
@@ -2704,19 +2667,19 @@ public:
 			nuvals.iBW = bw;
 
 		} else {
-
-			int i = 0;
-			while (	selrig->bandwidths_[i] &&
-				atol(selrig->bandwidths_[i]) < bw) {
-				i++;
+			try {
+				size_t i = 0;
+				for (i = 0; i < selrig->bandwidths_.size(); i++)
+					if (atol (selrig->bandwidths_.at(i).c_str()) > bw) break;
+				if (--i < 0) i = 0;
+				bw = atol(selrig->bandwidths_.at(i).c_str());
+				nuvals.iBW = i;
+				std::ostringstream s;
+				s << "nearest bandwidth " << selrig->bandwidths_.at(i);
+				xml_trace(2,"Set to ", s.str().c_str());
+			} catch (const std::exception& e) {
+				LOG_ERROR("%s", e.what());
 			}
-			if (!selrig->bandwidths_[i]) i--;
-			bw = atol(selrig->bandwidths_[i]);
-			nuvals.iBW = i;
-
-			std::ostringstream s;
-			s << "nearest bandwidth " << selrig->bandwidths_[i];
-			xml_trace(2,"Set to ", s.str().c_str());
 
 		}
 		int retbw;
@@ -2749,6 +2712,11 @@ public:
 			return;
 		}
 		int bw = (int)params[0];
+		std::vector<std::string>& widths = selrig->bandwidths_;
+		if (bw < 0 || bw >= (int) widths.size()) {
+			result = 0;
+			return;
+		}
 
 		guard_lock que_lock ( &mutex_srvc_reqs, "xml rig_set_bw" );
 		guard_lock serial_lock(&mutex_serial, "xml rig_get_bw");
@@ -2782,6 +2750,12 @@ public:
 		std::string bwstr = params;
 
 		int bw = (int)params[0];
+		std::vector<std::string>& widths = selrig->bandwidths_;
+		if (bw < 0 || bw >= (int) widths.size()) {
+			result = 0;
+			return;
+		}
+
 		guard_lock que_lock ( &mutex_srvc_reqs, "xml rig_set_verify_bw" );
 		guard_lock serial_lock(&mutex_serial, "xml rig_get_bw");
 
@@ -2817,16 +2791,15 @@ public:
 		std::string bwstr = params;
 
 		int bw = (int)params[0];
-		guard_lock que_lock ( &mutex_srvc_reqs, "xml rig_set_BW" );
-		guard_lock serial_lock(&mutex_serial, "xml rig_get_BW");
-
-		const char **widths = selrig->bandwidths_;
-		int n = 0;
-		while (widths[n]) { n++; }
-		if (bw >= n || bw < 0) {
+		std::vector<std::string>& widths = selrig->bandwidths_;
+		if (bw < 0 || bw >= (int) widths.size()) {
 			result = 0;
 			return;
 		}
+
+		guard_lock que_lock ( &mutex_srvc_reqs, "xml rig_set_BW" );
+		guard_lock serial_lock(&mutex_serial, "xml rig_get_BW");
+
 		XCVR_STATE nuvals;
 		if (selrig->inuse == onB) {
 			nuvals.freq = vfoB.freq;
@@ -2858,16 +2831,14 @@ public:
 		std::string bwstr = params;
 
 		int bw = (int)params[0];
-		guard_lock que_lock ( &mutex_srvc_reqs, "xml rig_set_BW" );
-		guard_lock serial_lock(&mutex_serial, "xml rig_get_BW");
-
-		const char **widths = selrig->bandwidths_;
-		int n = 0;
-		while (widths[n]) { n++; }
-		if (bw >= n || bw < 0) {
+		std::vector<std::string>& widths = selrig->bandwidths_;
+		if (bw < 0 || bw >= (int) widths.size()) {
 			result = 0;
 			return;
 		}
+
+		guard_lock que_lock ( &mutex_srvc_reqs, "xml rig_set_BW" );
+		guard_lock serial_lock(&mutex_serial, "xml rig_get_BW");
 
 		XCVR_STATE nuvals;
 		int retbw;
@@ -2917,28 +2888,28 @@ public:
 			nuvals.iBW   = vfoA.iBW;
 		}
 
-		const char **widths = selrig->bandwidths_;
-		int n = 0;
-		while (widths[n]) { n++; }
+		std::vector<std::string>& widths = selrig->bandwidths_;
+		int bw = atol(widths.at(0).c_str());
+		try {
+			bw = atol(widths.at(nuvals.iBW).c_str()) + bwch;
 
-		int bw = atol(widths[nuvals.iBW]) + bwch;
-		if (bw <= 0 || bw > atol(widths[n-1])) {
-			result = 0;
-			return;
+			size_t i = 0;
+			int bwval;
+			for (i = 0; i < widths.size(); i++) {
+				if ((bwval = atol(widths.at(i).c_str())) >= bw)
+					break;
+			}
+			if (bwval > bw && i > 0) bw = atol(widths.at(--i).c_str());
+
+			std::ostringstream s;
+			s << "nearest bandwidth " << widths[i];
+			xml_trace(2,"Set to ", s.str().c_str());
+
+			nuvals.iBW = i;
+		} catch (const std::exception& e) {
+			std::cout << e.what() << '\n';
 		}
 
-		int i = 0;
-		while (	widths[i] && atol(widths[i]) < bw) {
-			i++;
-		}
-		if (!widths[i]) i--;
-		bw = atol(widths[i]);
-
-		std::ostringstream s;
-		s << "nearest bandwidth " << widths[i];
-		xml_trace(2,"Set to ", s.str().c_str());
-
-		nuvals.iBW = i;
 		if (selrig->inuse == onB) {
 			serviceB(nuvals);
 		} else {

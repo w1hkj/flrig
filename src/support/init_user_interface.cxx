@@ -1274,12 +1274,16 @@ void TRACED(init_dsp_controls)
 		opDSP_hi->clear();
 		btnDSP->label(selrig->SL_label);
 		btnDSP->redraw_label();
-		for (int i = 0; selrig->dsp_SL[i] != NULL; i++)
-			opDSP_lo->add(selrig->dsp_SL[i]);
-		opDSP_lo->tooltip(selrig->SL_tooltip);
-		for (int i = 0; selrig->dsp_SH[i] != NULL; i++)
-			opDSP_hi->add(selrig->dsp_SH[i]);
-		opDSP_hi->tooltip(selrig->SH_tooltip);
+		try {
+			for (size_t i = 0; i < selrig->dsp_SL.size(); i++)
+				opDSP_lo->add(selrig->dsp_SL.at(i).c_str());
+			opDSP_lo->tooltip(selrig->SL_tooltip);
+			for (size_t i = 0; i < selrig->dsp_SH.size(); i++)
+				opDSP_hi->add(selrig->dsp_SH.at(i).c_str());
+			opDSP_hi->tooltip(selrig->SH_tooltip);
+		} catch (const std::exception& e) {
+			std::cout << e.what() << '\n';
+		}
 		if (vfo->iBW > 256) {
 			opDSP_lo->index(vfo->iBW & 0xFF);
 			opDSP_hi->index((vfo->iBW >> 8) & 0x7F);
@@ -1317,7 +1321,7 @@ void TRACED(init_dsp_controls)
 			selrig->name_ == rig_FLEX1500.name_ ) {
 			opCENTER->clear();
 			for (int i = 0; i < tci_nbr_centers; i++)
-				opCENTER->add(TCI_centers[i]);
+				opCENTER->add(TCI_centers[i].c_str());
 			opCENTER->show();
 			opCENTER->index(progStatus.tci_center);
 			if (progStatus.UIsize == small_ui) {
@@ -2353,6 +2357,9 @@ void TRACED(initRig)
 		}
 	}
 
+trace(1, "selrig->initialize()");
+		selrig->initialize();
+
 // disable the serial thread
 	{
 		guard_lock gl_serial(&mutex_serial);
@@ -2392,12 +2399,10 @@ void TRACED(initRig)
 			progress->redraw_label();
 			update_progress(0);
 		}
-trace(1, "selrig->initialize()");
-		selrig->initialize();
 
 		if (selrig->name_ == rig_QCXP.name_) read_menus();
 
-if (!testmode) {
+if (!testmode && xcvr_name != rig_null.name_) {
 	trace(1, "selrig->check()");
 		if (!selrig->check()) {
 			trace(1, "FAILED");
@@ -2529,10 +2534,9 @@ void TRACED(init_title)
 }
 
 void TRACED(initConfigDialog)
-
-	int picked = selectRig->index();
-	rigbase *srig = rigs[picked];
+	rigbase *srig = (rigbase *)(selectRig->data());
 	xcvr_name = srig->name_;
+	LOG_INFO("picked %s", xcvr_name.c_str());
 
 	if (!progStatus.loadXcvrState(xcvr_name) ) {
 		selectCommPort->index(0);
@@ -2680,10 +2684,12 @@ void TRACED(initRigCombo)
 	selectRig->clear();
 	int i = 0;
 	while (rigs[i] != NULL) {
-		selectRig->add(rigs[i]->name_.c_str());
+		selectRig->add(rigs[i]->name_.c_str(), (void*)rigs[i]);
+//std::cout << i+1 << " : " << rigs[i]->name_ << std::endl;
 		i++;
 	}
 
-	selectRig->index(0);
+	selectRig->sort();
+	selectRig->index(selectRig->find_index(szNORIG));
 }
 

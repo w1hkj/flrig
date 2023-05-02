@@ -34,12 +34,13 @@
 
 static const char TS990name_[] = "TS-990";
 
-static const char *TS990modes_[] = {
+static std::vector<std::string>TS990modes_;
+static const char *vTS990modes_[] = {
 "LSB",    "USB",    "CW",    "FM",     "AM",
 "FSK",    "PSK",    "CW-R",  "FSK-R",  "PSK-R",
 "LSB-D1", "USB-D1", "FM-D1", "AM-D1",
 "LSB-D2", "USB-D2", "FM-D2",  "AM-D2",
-"LSB-D3", "USB-D3", "FM-D3",  "AM-D3",  NULL};
+"LSB-D3", "USB-D3", "FM-D3",  "AM-D3"};
 
 static const char TS990_mode_chr[] =  {
 '1', '2', '3', '4', '5',
@@ -56,7 +57,8 @@ static const char TS990_mode_type[] = {
 'L', 'U', 'U', 'U' };
 
 //==============================================================================
-static const char *TS990_empty[] = { "N/A", NULL };
+static std::vector<std::string>TS990_empty;
+static const char *vTS990_empty[] = { "N/A" };
 
 //==============================================================================
 // SSB - Width / Shift  filters
@@ -66,31 +68,35 @@ static const char *TS990_empty[] = { "N/A", NULL };
 // Default BW value 0x9005
 //==============================================================================
 
-static const char *TS990_filt_width[] = {
+static std::vector<std::string>TS990_filt_width;
+static const char *vTS990_filt_width[] = {
   "50",   "80",  "100",  "150",  "200",
  "250",  "300",  "400",  "500",  "600",
 "1000", "1500", "2000", "2200", "2400",
-"2600", "2800", "3000", NULL };
+"2600", "2800", "3000" };
 static int TS990_WIDTH_bw_vals[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,WVALS_LIMIT};
 
-static const char *TS990_CAT_filt_width[] = {
+static std::vector<std::string>TS990_CAT_filt_width;
+static const char *vTS990_CAT_filt_width[] = {
 "00;", "01;", "02;", "03;", "04;",
 "05;", "06;", "07;", "08;", "09;",
 "10;", "11;", "12;", "13;", "14;",
-"15;", "16;", "17;", NULL };
+"15;", "16;", "17;" };
 
 static const char *TS990_filt_width_tooltip = "width";
 static const char *TS990_filt_width_label = "W";
 
-static const char *TS990_filt_shift[] = {
+static std::vector<std::string>TS990_filt_shift;
+static const char *vTS990_filt_shift[] = {
 "1000", "1100", "1200", "1300", "1400",
 "1500", "1600", "1700", "1800", "1900",
-"2000", "2100", "2210", NULL };
+"2000", "2100", "2210" };
 
-static const char *TS990_CAT_filt_shift[] = {
+static std::vector<std::string>TS990_CAT_filt_shift;
+static const char *vTS990_CAT_filt_shift[] = {
 "00;", "01;", "02;", "03;", "04;",
 "05;", "06;", "07;", "08;", "09;",
-"10;", "11;", "12;", NULL };
+"10;", "11;", "12;" };
 
 static const char *TS990_filt_shift_tooltip = "shift";
 static const char *TS990_filt_shift_label = "S";
@@ -106,29 +112,33 @@ static const char *TS990_filt_shift_label = "S";
 // BW indicates 0x8000 & (SH << 8) & SL
 //==============================================================================
 
-static const char *TS990_filt_SH[] = {
+static std::vector<std::string>TS990_filt_SH;
+static const char *vTS990_filt_SH[] = {
 "1000", "1200", "1400", "1600", "1800",
 "2000", "2200", "2400", "2600", "2800",
-"3000", "3400", "4000", "5000", NULL };
+"3000", "3400", "4000", "5000" };
 static int TS990_HI_bw_vals[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,WVALS_LIMIT};
 
-static const char *TS990_CAT_filt_SH[] = {
+static std::vector<std::string>TS990_CAT_filt_SH;
+static const char *vTS990_CAT_filt_SH[] = {
 "00;", "01;", "02;", "03;", "04;",
 "05;", "06;", "07;", "08;", "09;",
-"10;", "11;", "12;", "13;", NULL };
+"10;", "11;", "12;", "13;" };
 
 static const char *TS990_filt_SH_tooltip = "hi cut";
 static const char *TS990_filt_SH_label = "H";
 
-static const char *TS990_filt_SL[] = {
+static std::vector<std::string>TS990_filt_SL;
+static const char *vTS990_filt_SL[] = {
 "0", "50", "100", "200", "300",
 "400", "500", "600", "700", "800",
-"900", "1000", NULL };
+"900", "1000" };
 
-static const char *TS990_CAT_filt_SL[] = {
+static std::vector<std::string>TS990_CAT_filt_SL;
+static const char *vTS990_CAT_filt_SL[] = {
 "00;", "01;", "02;", "03;", "04;",
 "05;", "06;", "07;", "08;", "09;",
-"10;", "11;", NULL };
+"10;", "11;" };
 
 static const char *TS990_filt_SL_tooltip = "lo cut";
 static const char *TS990_filt_SL_label = "L";
@@ -147,37 +157,41 @@ static const char *TS990_filt_SL_label = "L";
 // Default BW value 0x8810 --> no shift, bandwidth = 500 Hz
 //==============================================================================
 
-static const char *TS990_CW_width[] = {
+static std::vector<std::string>TS990_CW_width;
+static const char *vTS990_CW_width[] = {
   "50",   "80",  "100",  "150", "200",
  "250",  "300",  "400",  "500", "600",
-"1000", "1500", "2000", "2500",  NULL };
+"1000", "1500", "2000", "2500" };
 static int TS990_CW_bw_vals[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,WVALS_LIMIT};
 
-static const char *TS990_CAT_CW_width[] = {
+static std::vector<std::string>TS990_CAT_CW_width;
+static const char *vTS990_CAT_CW_width[] = {
 "00;", "01;", "02;", "03;", "04;",
 "05;", "06;", "07;", "08;", "09;",
-"10;", "11;", "12;", "13;", NULL };
+"10;", "11;", "12;", "13;" };
 
 static const char *TS990_CW_W_tooltip = "width";
 static const char *TS990_CW_W_btn_label = "W";
 
-static const char *TS990_CW_shift[] = {
+static std::vector<std::string>TS990_CW_shift;
+static const char *vTS990_CW_shift[] = {
 "-800", "-750", "-700", "-650", "-600",
 "-550", "-500", "-450", "-400", "-350",
 "-300", "-250", "-200", "-150", "-100",
 "-50",  "0",    "50",   "100",  "150",
 "200",  "250",  "300",  "350",  "400",
 "450",  "500",  "550",  "600",  "650",
-"700",  "750",  "800", NULL };
+"700",  "750",  "800" };
 
-static const char *TS990_CAT_CW_shift[] = {
+static std::vector<std::string>TS990_CAT_CW_shift;
+static const char *vTS990_CAT_CW_shift[] = {
 "00;", "01;", "02;", "03;", "04;",
 "05;", "06;", "07;", "08;", "09;",
 "10;", "11;", "12;", "13;", "14;",
 "15;", "16;", "17;", "18;", "19;",
 "20;", "21;", "22;", "23;", "24;",
 "25;", "26;", "27;", "28;", "29;",
-"30;", "31;", "32;", NULL };
+"30;", "31;", "32;" };
 
 static const char *TS990_CW_S_tooltip = "shift";
 static const char *TS990_CW_S_btn_label = "S";
@@ -186,21 +200,25 @@ static const char *TS990_CW_S_btn_label = "S";
 
 //==============================================================================
 
-static const char *TS990_AM_SL[] = {
-"0", "100", "200", "300", NULL };
+static std::vector<std::string>TS990_AM_SL;
+static const char *vTS990_AM_SL[] = {
+"0", "100", "200", "300" };
 
-static const char *TS990_CAT_AM_SL[] = {
-"00;", "01;", "02;", "03;", NULL};
+static std::vector<std::string>TS990_CAT_AM_SL;
+static const char *vTS990_CAT_AM_SL[] = {
+"00;", "01;", "02;", "03;"};
 
 static const char *TS990_AM_SL_tooltip = "lo cut";
 static const char *TS990_AM_btn_SL_label = "L";
 
-static const char *TS990_AM_SH[] = {
-"2500", "3000", "4000", "5000", NULL };
+static std::vector<std::string>TS990_AM_SH;
+static const char *vTS990_AM_SH[] = {
+"2500", "3000", "4000", "5000" };
 static int TS990_AM_HI_bw_vals[] = { 1,2,3,4,WVALS_LIMIT};
 
-static const char *TS990_CAT_AM_SH[] = {
-"00;", "01;", "02;", "03;", NULL};
+static std::vector<std::string>TS990_CAT_AM_SH;
+static const char *vTS990_CAT_AM_SH[] = {
+"00;", "01;", "02;", "03;"};
 
 static const char *TS990_AM_SH_tooltip = "hi cut";
 static const char *TS990_AM_btn_SH_label = "H";
@@ -211,27 +229,31 @@ static const char *TS990_AM_btn_SH_label = "H";
 #define DEFAULT_AM_D3     0x8200 // LO 200, HI 2500
 //==============================================================================
 
-static const char *TS990_FSK_filt[] = {
-"250", "300", "400", "500", "1000", "1500", NULL};
+static std::vector<std::string>TS990_FSK_filt;
+static const char *vTS990_FSK_filt[] = {
+"250", "300", "400", "500", "1000", "1500"};
 static int TS990_FSK_bw_vals[] = {1,2,3,4,5,6,WVALS_LIMIT};
 
-static const char *TS990_CAT_FSK_filt[] = {
-"00;", "01;", "02;", "03;", "04;", "05;", NULL };
+static std::vector<std::string>TS990_CAT_FSK_filt;
+static const char *vTS990_CAT_FSK_filt[] = {
+"00;", "01;", "02;", "03;", "04;", "05;" };
 
 #define DEFAULT_FSK       0x03 // WIDTH 300
 
 //==============================================================================
 
-static const char *TS990_PSK_filt[] = {
+static std::vector<std::string>TS990_PSK_filt;
+static const char *vTS990_PSK_filt[] = {
 "50",   "80",  "100",  "150", "200", 
 "250",  "300",  "400",  "500", "600",
-"1000", "1500", NULL};
+"1000", "1500"};
 static int TS990_PSK_bw_vals[] = {1,2,3,4,5,6,7,8,9,10,11,12,WVALS_LIMIT};
 
-static const char *TS990_CAT_PSK_filt[] = {
+static std::vector<std::string>TS990_CAT_PSK_filt;
+static const char *vTS990_CAT_PSK_filt[] = {
 "00;", "01;", "02;", "03;", "04;",
 "05;", "06;", "07;", "08;", "09;",
-"10;", "11;", NULL };
+"10;", "11;" };
 
 #define DEFAULT_PSK       0x06 // WIDTH 300
 
@@ -256,6 +278,35 @@ static std::string menu_0001;
 
 void RIG_TS990::initialize()
 {
+	VECTOR (TS990modes_, vTS990modes_);
+	VECTOR (TS990_empty, vTS990_empty);
+	VECTOR (TS990_filt_width, vTS990_filt_width);
+	VECTOR (TS990_CAT_filt_width, vTS990_CAT_filt_width);
+	VECTOR (TS990_filt_shift, vTS990_filt_shift);
+	VECTOR (TS990_CAT_filt_shift, vTS990_CAT_filt_shift);
+	VECTOR (TS990_filt_SH, vTS990_filt_SH);
+	VECTOR (TS990_CAT_filt_SH, vTS990_CAT_filt_SH);
+	VECTOR (TS990_filt_SL, vTS990_filt_SL);
+	VECTOR (TS990_CAT_filt_SL, vTS990_CAT_filt_SL);
+	VECTOR (TS990_CW_width, vTS990_CW_width);
+	VECTOR (TS990_CAT_CW_width, vTS990_CAT_CW_width);
+	VECTOR (TS990_CW_shift, vTS990_CW_shift);
+	VECTOR (TS990_CAT_CW_shift, vTS990_CAT_CW_shift);
+	VECTOR (TS990_AM_SL, vTS990_AM_SL);
+	VECTOR (TS990_CAT_AM_SL, vTS990_CAT_AM_SL);
+	VECTOR (TS990_AM_SH, vTS990_AM_SH);
+	VECTOR (TS990_CAT_AM_SH, vTS990_CAT_AM_SH);
+	VECTOR (TS990_FSK_filt, vTS990_FSK_filt);
+	VECTOR (TS990_CAT_FSK_filt, vTS990_CAT_FSK_filt);
+	VECTOR (TS990_PSK_filt, vTS990_PSK_filt);
+	VECTOR (TS990_CAT_PSK_filt, vTS990_CAT_PSK_filt);
+
+	modes_ = TS990modes_;
+	bw_vals_    = TS990_HI_bw_vals;
+
+	dsp_SL      = TS990_filt_SL;
+	dsp_SH      = TS990_filt_SH;
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = sldrRFGAIN;
@@ -692,18 +743,18 @@ const char * RIG_TS990::get_bwname_(int n, int md)
 		int SH = (n >> 8) & 0x7F;
 		int SL = n & 0x7F;
 		snprintf(bwname, sizeof(bwname), "%s/%s",
-			(md == LSB || md == USB || md == FM) ? TS990_filt_SL[SL] :
-			(md == AM || md == AMD1 || md == AMD2 || md == AMD3) ? TS990_AM_SL[SL] :
-			(md == CW ||md == CWR) ? TS990_CAT_CW_width [SL]:
-			(md == FSK ||md == FSKR) ? TS990_FSK_filt [SL]:
-			(md == PSK ||md == PSKR) ? TS990_PSK_filt [SL]:
-			TS990_filt_shift[SL],
-			(md == LSB || md == USB || md == FM) ? TS990_filt_SH[SH] :
-			(md == AM || md == AMD1 || md == AMD2 || md == AMD3) ? TS990_AM_SH[SH] :
-			(md == CW ||md == CWR) ? TS990_CAT_CW_shift [SH]:
-			(md == FSK ||md == FSKR) ? TS990_FSK_filt [SH]:
-			(md == PSK ||md == PSKR) ? TS990_PSK_filt [SH]:
-			TS990_filt_width[SH] );
+			(md == LSB || md == USB || md == FM) ? TS990_filt_SL[SL].c_str() :
+			(md == AM || md == AMD1 || md == AMD2 || md == AMD3) ? TS990_AM_SL[SL].c_str() :
+			(md == CW ||md == CWR) ? TS990_CAT_CW_width [SL].c_str():
+			(md == FSK ||md == FSKR) ? TS990_FSK_filt [SL].c_str():
+			(md == PSK ||md == PSKR) ? TS990_PSK_filt [SL].c_str():
+			TS990_filt_shift[SL].c_str(),
+			(md == LSB || md == USB || md == FM) ? TS990_filt_SH[SH].c_str() :
+			(md == AM || md == AMD1 || md == AMD2 || md == AMD3) ? TS990_AM_SH[SH].c_str() :
+			(md == CW ||md == CWR) ? TS990_CAT_CW_shift [SH].c_str():
+			(md == FSK ||md == FSKR) ? TS990_FSK_filt [SH].c_str():
+			(md == PSK ||md == PSKR) ? TS990_PSK_filt [SH].c_str():
+			TS990_filt_width[SH].c_str() );
 	}
 	return bwname;
 }
@@ -1092,7 +1143,7 @@ int RIG_TS990::get_modeA()
 		ss << "get_modeB(" <<  md << ") " << TS990modes_[md];
 		gett(ss.str().c_str());
 
-		LOG_INFO("get mode A: %s", TS990modes_[md]);
+		LOG_INFO("get mode A: %s", TS990modes_[md].c_str());
 		A.imode = md;
 		set_widths(md);
 	}
@@ -1371,14 +1422,14 @@ int RIG_TS990::set_widths(int val)
 }
 
 
-const char **RIG_TS990::bwtable(int m)
+std::vector<std::string>& RIG_TS990::bwtable(int m)
 {
 	std::stringstream ss;
 	ss << "bwtable( " << m << " )";
 	gett(ss.str().c_str());
 
 
-	const char **filter = TS990_filt_SH;
+	std::vector<std::string>& filter = TS990_filt_SH;
 	switch (m) {
 		case LSB: case USB:
 			if (menu_0607)
@@ -1409,18 +1460,16 @@ const char **RIG_TS990::bwtable(int m)
 			filter = TS990_PSK_filt;
 			break;
 	}
-	ss << "filter address: " << filter;
-	gett(ss.str().c_str());
 	return filter;
 }
 
-const char **RIG_TS990::lotable(int m)
+std::vector<std::string>& RIG_TS990::lotable(int m)
 {
 	std::stringstream ss;
 	ss << "lotable( " << m << " )";
 	gett(ss.str().c_str());
 
-	const char **filter = TS990_filt_SL;
+	std::vector<std::string>& filter = TS990_filt_SL;
 	switch (m) {
 		case LSB: case USB:
 			if (menu_0607)
@@ -1442,27 +1491,25 @@ const char **RIG_TS990::lotable(int m)
 			filter = TS990_CW_width;
 			break;
 		case FSK: case FSKR:
-			filter = NULL;//TS990_FSK_filt;
+			filter = vNOBWS;//TS990_FSK_filt;
 			break;
 		case PSK: case PSKR:
-			filter = NULL;//TS990_PSK_filt;
+			filter = vNOBWS;//TS990_PSK_filt;
 			break;
 		case AM: case AMD1: case AMD2: case AMD3:
 			filter = TS990_AM_SL;
 			break;
 	}
-	ss << "filter address: " << filter;
-	gett(ss.str().c_str());
 	return filter;
 }
 
-const char **RIG_TS990::hitable(int m)
+std::vector<std::string>& RIG_TS990::hitable(int m)
 {
 	std::stringstream ss;
 	ss << "hitable( " << m << " )";
 	sett(ss.str().c_str());
 
-	const char **filter = TS990_filt_SH;
+	std::vector<std::string>& filter = TS990_filt_SH;
 	switch (m) {
 		case LSB: case USB:
 			if (menu_0607)
@@ -1484,18 +1531,15 @@ const char **RIG_TS990::hitable(int m)
 			filter = TS990_filt_SH;
 			break;
 		case FSK: case FSKR:
-			filter = NULL;
+			filter = vNOBWS;
 			break;
 		case PSK: case PSKR:
-			filter = NULL;
+			filter = vNOBWS;
 			break;
 		case AM: case AMD1: case AMD2: case AMD3:
 			filter = TS990_AM_SH;
 			break;
 	}
-	ss << "filter address: " << filter;
-	sett(ss.str().c_str());
-
 	return filter;
 }
 
@@ -1578,7 +1622,6 @@ int RIG_TS990::def_bandwidth(int val)
 void RIG_TS990::set_bwA(int val)
 {
 	size_t SL = 0, SH = 0;
-	size_t sl = 0, sh = 0;
 
 	SL = val & 0x7F;
 	if (SL < 0) SL = 0;
@@ -1593,33 +1636,33 @@ void RIG_TS990::set_bwA(int val)
 	case LSB: case USB:
 		if (val < 256) break;
 		if (menu_0607) {
-			sl = sizeof(TS990_CAT_filt_width)/sizeof(*TS990_CAT_filt_width) - 1;
-			sh = sizeof(TS990_CAT_filt_shift)/sizeof(*TS990_CAT_filt_shift) - 1;
-			if (SL > sl) SL = sl;
-			if (SH > sh) SH = sh;
-			cmd = "SL0";
-			cmd += TS990_CAT_filt_width[SL];
-			sendCommand(cmd);
-			showresp(INFO, ASC, "set width", cmd, "");
-			cmd = "SH0";
-			cmd += TS990_CAT_filt_shift[SH];
-			sendCommand(cmd);
-			showresp(INFO, ASC, "set filter shift", cmd, "");
-			A.iBW = ((SH << 8) & SL) & 0x8000;
+			try {
+				cmd = "SL0";
+				cmd += TS990_CAT_filt_width.at(SL);
+				sendCommand(cmd);
+				showresp(INFO, ASC, "set width", cmd, "");
+				cmd = "SH0";
+				cmd += TS990_CAT_filt_shift.at(SH);
+				sendCommand(cmd);
+				showresp(INFO, ASC, "set filter shift", cmd, "");
+				A.iBW = ((SH << 8) & SL) & 0x8000;
+			} catch (const std::exception& e) {
+				std::cout << e.what() << '\n';
+			}
 		} else {
-			sh = sizeof(TS990_CAT_filt_SH)/sizeof(*TS990_CAT_filt_SH) - 1;
-			sl = sizeof(TS990_CAT_filt_SL)/sizeof(*TS990_CAT_filt_SL) - 1;
-			if (SL > sl) SL = sl;
-			if (SH > sh) SH = sh;
-			cmd = "SL0";
-			cmd += TS990_CAT_filt_SL[SL];
-			sendCommand(cmd);
-			showresp(INFO, ASC, "set filter lower cutoff", cmd, "");
-			cmd = "SH0";
-			cmd += TS990_CAT_filt_SH[SH];
-			sendCommand(cmd);
-			showresp(INFO, ASC, "set filter upper cutoff", cmd, "");
-			A.iBW = ((SH << 8) & SL) & 0x8000;
+			try {
+				cmd = "SL0";
+				cmd += TS990_CAT_filt_SL.at(SL);
+				sendCommand(cmd);
+				showresp(INFO, ASC, "set filter lower cutoff", cmd, "");
+				cmd = "SH0";
+				cmd += TS990_CAT_filt_SH.at(SH);
+				sendCommand(cmd);
+				showresp(INFO, ASC, "set filter upper cutoff", cmd, "");
+				A.iBW = ((SH << 8) & SL) & 0x8000;
+			} catch (const std::exception& e) {
+				std::cout << e.what() << '\n';
+			}
 		}
 		break;
 
@@ -1627,107 +1670,111 @@ void RIG_TS990::set_bwA(int val)
 	case USBD1: case USBD2: case USBD3:
 		if (val < 256) break;
 		if (menu_0608) {
-			sl = sizeof(TS990_CAT_filt_width)/sizeof(*TS990_CAT_filt_width) - 1;
-			sh = sizeof(TS990_CAT_filt_shift)/sizeof(*TS990_CAT_filt_shift) - 1;
-			if (SL > sl) SL = sl;
-			if (SH > sh) SH = sh;
-			cmd = "SL0";
-			cmd += TS990_CAT_filt_width[SL];
-			sendCommand(cmd);
-			showresp(INFO, ASC, "set data width", cmd, "");
-			cmd = "SH0";
-			cmd += TS990_CAT_filt_shift[SH];
-			sendCommand(cmd);
-			showresp(INFO, ASC, "set data shift", cmd, "");
-			A.iBW = ((SH << 8) & SL) & 0x8000;
+			try {
+				cmd = "SL0";
+				cmd += TS990_CAT_filt_width.at(SL);
+				sendCommand(cmd);
+				showresp(INFO, ASC, "set data width", cmd, "");
+				cmd = "SH0";
+				cmd += TS990_CAT_filt_shift.at(SH);
+				sendCommand(cmd);
+				showresp(INFO, ASC, "set data shift", cmd, "");
+				A.iBW = ((SH << 8) & SL) & 0x8000;
+			} catch (const std::exception& e) {
+				std::cout << e.what() << '\n';
+			}
 		} else {
-			sh = sizeof(TS990_CAT_filt_SH)/sizeof(*TS990_CAT_filt_SH) - 1;
-			sl = sizeof(TS990_CAT_filt_SL)/sizeof(*TS990_CAT_filt_SL) - 1;
-			if (SL > sl) SL = sl;
-			if (SH > sh) SH = sh;
-			cmd = "SL0";
-			cmd += TS990_CAT_filt_SL[SL];
-			sendCommand(cmd);
-			showresp(INFO, ASC, "set data lower cutoff", cmd, "");
-			cmd = "SH0";
-			cmd += TS990_CAT_filt_SH[SH];
-			sendCommand(cmd);
-			showresp(INFO, ASC, "set data upper cutoff", cmd, "");
-			A.iBW = ((SH << 8) & SL) & 0x8000;
+			try {
+				cmd = "SL0";
+				cmd += TS990_CAT_filt_SL.at(SL);
+				sendCommand(cmd);
+				showresp(INFO, ASC, "set data lower cutoff", cmd, "");
+				cmd = "SH0";
+				cmd += TS990_CAT_filt_SH.at(SH);
+				sendCommand(cmd);
+				showresp(INFO, ASC, "set data upper cutoff", cmd, "");
+				A.iBW = ((SH << 8) & SL) & 0x8000;
+			} catch (const std::exception& e) {
+				std::cout << e.what() << '\n';
+			}
 		}
 		break;
 
 	case AM: case AMD1: case AMD2: case AMD3:
 		if (val < 256) break;
-		sh = sizeof(TS990_CAT_AM_SH) / sizeof(*TS990_CAT_AM_SH) - 1;
-		sl = sizeof(TS990_CAT_AM_SL) / sizeof(*TS990_CAT_AM_SL) - 1;
-		if (SL > sl) SL = sl;
-		if (SH > sh) SH = sh;
-		cmd = "SL0";
-		cmd += TS990_CAT_AM_SL[SL];
-		sendCommand(cmd);
-		showresp(INFO, ASC, "set AM lower", cmd, "");
-		cmd = "SH0";
-		cmd += TS990_CAT_AM_SH[SH];
-		sendCommand(cmd);
-		showresp(INFO, ASC, "set AM upper", cmd, "");
-		A.iBW = ((SH << 8) & SL) & 0x8000;
+		try {
+			cmd = "SL0";
+			cmd += TS990_CAT_AM_SL.at(SL);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set AM lower", cmd, "");
+			cmd = "SH0";
+			cmd += TS990_CAT_AM_SH.at(SH);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set AM upper", cmd, "");
+			A.iBW = ((SH << 8) & SL) & 0x8000;
+		} catch (const std::exception& e) {
+			std::cout << e.what() << '\n';
+		}
 		break;
 
 	case FM: case FMD1: case FMD2: case FMD3:
 		if (val < 256) break;
-		sh = sizeof(TS990_CAT_filt_SH) / sizeof(*TS990_CAT_filt_SH) - 1;
-		sl = sizeof(TS990_CAT_filt_SL) / sizeof(*TS990_CAT_filt_SL) - 1;
-		if (SL > sl) SL = sl;
-		if (SH > sh) SH = sh;
-		cmd = "SL0";
-		cmd += TS990_CAT_filt_SL[SL];
-		sendCommand(cmd);
-		showresp(INFO, ASC, "set FM lower", cmd, "");
-		cmd = "SH0";
-		cmd += TS990_CAT_filt_SH[SH];
-		sendCommand(cmd);
-		showresp(INFO, ASC, "set FM upper", cmd, "");
-		A.iBW = ((SH << 8) & SL) & 0x8000;
+		try {
+			cmd = "SL0";
+			cmd += TS990_CAT_filt_SL.at(SL);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set FM lower", cmd, "");
+			cmd = "SH0";
+			cmd += TS990_CAT_filt_SH.at(SH);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set FM upper", cmd, "");
+			A.iBW = ((SH << 8) & SL) & 0x8000;
+		} catch (const std::exception& e) {
+			std::cout << e.what() << '\n';
+		}
 		break;
 
 	case CW: case CWR:
 		if (val < 256) break;
-		sl = sizeof(TS990_CAT_CW_width) / sizeof(*TS990_CAT_CW_width) - 1;
-		sh = sizeof(TS990_CAT_CW_shift) / sizeof(*TS990_CAT_CW_shift) - 1;
-		if (SL > sl) SL = sl;
-		if (SH > sh) SH = sh;
-		cmd = "SL0";
-		cmd += TS990_CAT_CW_width[SL];
-		sendCommand(cmd);
-		showresp(INFO, ASC, "set cw width", cmd, "");
-		cmd = "SH0";
-		cmd += TS990_CAT_CW_shift[SH];
-		sendCommand(cmd);
-		showresp(INFO, ASC, "set cw shift", cmd, "");
-		A.iBW = ((SH << 8) & SL) & 0x8000;
+		try {
+			cmd = "SL0";
+			cmd += TS990_CAT_CW_width.at(SL);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set cw width", cmd, "");
+			cmd = "SH0";
+			cmd += TS990_CAT_CW_shift.at(SH);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set cw shift", cmd, "");
+			A.iBW = ((SH << 8) & SL) & 0x8000;
+		} catch (const std::exception& e) {
+			std::cout << e.what() << '\n';
+		}
 		break;
 
 	case FSK: case FSKR:
 		if (val > 256) break;
-		sl = sizeof(TS990_CAT_FSK_filt) / sizeof(*TS990_CAT_FSK_filt) - 1;
-		if (SL > sl) SL = sl;
-		cmd = "SL0";
-		cmd += TS990_CAT_FSK_filt[SL];
-		sendCommand(cmd);
-		showresp(INFO, ASC, "set FSK bw", cmd, "");
-		A.iBW = SL;
+		try {
+			cmd = "SL0";
+			cmd += TS990_CAT_FSK_filt.at(SL);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set FSK bw", cmd, "");
+			A.iBW = SL;
+		} catch (const std::exception& e) {
+			std::cout << e.what() << '\n';
+		}
 		break;
 
 	case PSK: case PSKR:
 		if (val > 256) break;
-		sl = sizeof(TS990_CAT_PSK_filt) / sizeof(*TS990_CAT_PSK_filt) - 1;
-		if (SL > sl) SL = sl;
-		cmd = "SL0";
-		cmd += TS990_CAT_PSK_filt[SL];
-		sendCommand(cmd);
-		showresp(INFO, ASC, "set PSK bw", cmd, "");
-		A.iBW = SL;
+		try {
+			cmd = "SL0";
+			cmd += TS990_CAT_PSK_filt.at(SL);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set PSK bw", cmd, "");
+			A.iBW = SL;
+		} catch (const std::exception& e) {
+			std::cout << e.what() << '\n';
+		}
 		break;
 	}
 }
@@ -1735,7 +1782,6 @@ void RIG_TS990::set_bwA(int val)
 void RIG_TS990::set_bwB(int val)
 {
 	size_t SL = 0, SH = 0;
-	size_t sl = 0, sh = 0;
 	SL = val & 0x7F;
 	if (SL < 0) SL = 0;
 	SH = (val >> 8) & 0x7F;
@@ -1749,33 +1795,33 @@ void RIG_TS990::set_bwB(int val)
 	case LSB: case USB:
 		if (val < 256) break;
 		if (menu_0607) {
-			sl = sizeof(TS990_CAT_filt_width)/sizeof(*TS990_CAT_filt_width) - 1;
-			sh = sizeof(TS990_CAT_filt_shift)/sizeof(*TS990_CAT_filt_shift) - 1;
-			if (SL > sl) SL = sl;
-			if (SH > sh) SH = sh;
-			cmd = "SL0";
-			cmd += TS990_CAT_filt_width[SL];
-			sendCommand(cmd);
-			showresp(INFO, ASC, "set width", cmd, "");
-			cmd = "SH0";
-			cmd += TS990_CAT_filt_shift[SH];
-			sendCommand(cmd);
-			showresp(INFO, ASC, "set filter shift", cmd, "");
-			B.iBW = ((SH << 8) & SL) & 0x8000;
+			try {
+				cmd = "SL0";
+				cmd += TS990_CAT_filt_width.at(SL);
+				sendCommand(cmd);
+				showresp(INFO, ASC, "set width", cmd, "");
+				cmd = "SH0";
+				cmd += TS990_CAT_filt_shift.at(SH);
+				sendCommand(cmd);
+				showresp(INFO, ASC, "set filter shift", cmd, "");
+				B.iBW = ((SH << 8) & SL) & 0x8000;
+			} catch (const std::exception& e) {
+				std::cout << e.what() << '\n';
+			}
 		} else {
-			sl = sizeof(TS990_CAT_filt_SL)/sizeof(*TS990_CAT_filt_SL) - 1;
-			sh = sizeof(TS990_CAT_filt_SH)/sizeof(*TS990_CAT_filt_SH) - 1;
-			if (SL > sl) SL = sl;
-			if (SH > sh) SH = sh;
-			cmd = "SL0";
-			cmd += TS990_CAT_filt_SL[SL];
-			sendCommand(cmd);
-			showresp(INFO, ASC, "set filter lower cutoff", cmd, "");
-			cmd = "SH0";
-			cmd += TS990_CAT_filt_SH[SH];
-			sendCommand(cmd);
-			showresp(INFO, ASC, "set filter upper cutoff", cmd, "");
-			B.iBW = ((SH << 8) & SL) & 0x8000;
+			try {
+				cmd = "SL0";
+				cmd += TS990_CAT_filt_SL.at(SL);
+				sendCommand(cmd);
+				showresp(INFO, ASC, "set filter lower cutoff", cmd, "");
+				cmd = "SH0";
+				cmd += TS990_CAT_filt_SH.at(SH);
+				sendCommand(cmd);
+				showresp(INFO, ASC, "set filter upper cutoff", cmd, "");
+				B.iBW = ((SH << 8) & SL) & 0x8000;
+			} catch (const std::exception& e) {
+				std::cout << e.what() << '\n';
+			}
 		}
 		break;
 
@@ -1783,107 +1829,111 @@ void RIG_TS990::set_bwB(int val)
 	case USBD1: case USBD2: case USBD3:
 		if (val < 256) break;
 		if (menu_0608) {
-			sl = sizeof(TS990_CAT_filt_width)/sizeof(*TS990_CAT_filt_width) - 1;
-			sh = sizeof(TS990_CAT_filt_shift)/sizeof(*TS990_CAT_filt_shift) - 1;
-			if (SL > sl) SL = sl;
-			if (SH > sh) SH = sh;
-			cmd = "SL0";
-			cmd += TS990_CAT_filt_width[SL];
-			sendCommand(cmd);
-			showresp(INFO, ASC, "set data width", cmd, "");
-			cmd = "SH0";
-			cmd += TS990_CAT_filt_shift[SH];
-			sendCommand(cmd);
-			showresp(INFO, ASC, "set data shift", cmd, "");
-			B.iBW = ((SH << 8) & SL) & 0x8000;
+			try {
+				cmd = "SL0";
+				cmd += TS990_CAT_filt_width.at(SL);
+				sendCommand(cmd);
+				showresp(INFO, ASC, "set data width", cmd, "");
+				cmd = "SH0";
+				cmd += TS990_CAT_filt_shift.at(SH);
+				sendCommand(cmd);
+				showresp(INFO, ASC, "set data shift", cmd, "");
+				B.iBW = ((SH << 8) & SL) & 0x8000;
+			} catch (const std::exception& e) {
+				std::cout << e.what() << '\n';
+			}
 		} else {
-			sh = sizeof(TS990_CAT_filt_SH)/sizeof(*TS990_CAT_filt_SH) - 1;
-			sl = sizeof(TS990_CAT_filt_SL)/sizeof(*TS990_CAT_filt_SL) - 1;
-			if (SL > sl) SL = sl;
-			if (SH > sh) SH = sh;
-			cmd = "SL0";
-			cmd += TS990_CAT_filt_SL[SL];
-			sendCommand(cmd);
-			showresp(INFO, ASC, "set data lower cutoff", cmd, "");
-			cmd = "SH0";
-			cmd += TS990_CAT_filt_SH[SH];
-			sendCommand(cmd);
-			showresp(INFO, ASC, "set data upper cutoff", cmd, "");
-			B.iBW = ((SH << 8) & SL) & 0x8000;
+			try{
+				cmd = "SL0";
+				cmd += TS990_CAT_filt_SL.at(SL);
+				sendCommand(cmd);
+				showresp(INFO, ASC, "set data lower cutoff", cmd, "");
+				cmd = "SH0";
+				cmd += TS990_CAT_filt_SH.at(SH);
+				sendCommand(cmd);
+				showresp(INFO, ASC, "set data upper cutoff", cmd, "");
+				B.iBW = ((SH << 8) & SL) & 0x8000;
+			} catch (const std::exception& e) {
+				std::cout << e.what() << '\n';
+			}
 		}
 		break;
 
 	case AM: case AMD1: case AMD2: case AMD3:
 		if (val < 256) break;
-		sh = sizeof(TS990_CAT_AM_SH) / sizeof(*TS990_CAT_AM_SH) - 1;
-		sl = sizeof(TS990_CAT_AM_SL) / sizeof(*TS990_CAT_AM_SL) - 1;
-		if (SL > sl) SL = sl;
-		if (SH > sh) SH = sh;
-		cmd = "SL0";
-		cmd += TS990_CAT_AM_SL[SL];
-		sendCommand(cmd);
-		showresp(INFO, ASC, "set AM lower", cmd, "");
-		cmd = "SH0";
-		cmd += TS990_CAT_AM_SH[SH];
-		sendCommand(cmd);
-		showresp(INFO, ASC, "set AM upper", cmd, "");
-		B.iBW = ((SH << 8) & SL) & 0x8000;
+		try {
+			cmd = "SL0";
+			cmd += TS990_CAT_AM_SL.at(SL);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set AM lower", cmd, "");
+			cmd = "SH0";
+			cmd += TS990_CAT_AM_SH.at(SH);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set AM upper", cmd, "");
+			B.iBW = ((SH << 8) & SL) & 0x8000;
+		} catch (const std::exception& e) {
+			std::cout << e.what() << '\n';
+		}
 		break;
 
 	case FM: case FMD1: case FMD2: case FMD3:
 		if (val < 256) break;
-		sh = sizeof(TS990_CAT_filt_SH) / sizeof(*TS990_CAT_filt_SH) - 1;
-		sl = sizeof(TS990_CAT_filt_SL) / sizeof(*TS990_CAT_filt_SL) - 1;
-		if (SL > sl) SL = sl;
-		if (SH > sh) SH = sh;
-		cmd = "SL0";
-		cmd += TS990_CAT_filt_SL[SL];
-		sendCommand(cmd);
-		showresp(INFO, ASC, "set FM lower", cmd, "");
-		cmd = "SH0";
-		cmd += TS990_CAT_filt_SH[SH];
-		sendCommand(cmd);
-		showresp(INFO, ASC, "set FM upper", cmd, "");
-		B.iBW = ((SH << 8) & SL) & 0x8000;
+		try {
+			cmd = "SL0";
+			cmd += TS990_CAT_filt_SL.at(SL);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set FM lower", cmd, "");
+			cmd = "SH0";
+			cmd += TS990_CAT_filt_SH.at(SH);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set FM upper", cmd, "");
+			B.iBW = ((SH << 8) & SL) & 0x8000;
+		} catch (const std::exception& e) {
+			std::cout << e.what() << '\n';
+		}
 		break;
 
 	case CW: case CWR:
 		if (val < 256) break;
-		sl = sizeof(TS990_CAT_CW_width) / sizeof(*TS990_CAT_CW_width) - 1;
-		sh = sizeof(TS990_CAT_CW_shift) / sizeof(*TS990_CAT_CW_shift) - 1;
-		if (SL > sl) SL = sl;
-		if (SH > sh) SH = sh;
-		cmd = "SL0";
-		cmd += TS990_CAT_CW_width[SL];
-		sendCommand(cmd);
-		showresp(INFO, ASC, "set cw width", cmd, "");
-		cmd = "SH0";
-		cmd += TS990_CAT_CW_shift[SH];
-		sendCommand(cmd);
-		showresp(INFO, ASC, "set cw shift", cmd, "");
-		B.iBW = ((SH << 8) & SL) & 0x8000;
+		try {
+			cmd = "SL0";
+			cmd += TS990_CAT_CW_width.at(SL);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set cw width", cmd, "");
+			cmd = "SH0";
+			cmd += TS990_CAT_CW_shift.at(SH);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set cw shift", cmd, "");
+			B.iBW = ((SH << 8) & SL) & 0x8000;
+		} catch (const std::exception& e) {
+			std::cout << e.what() << '\n';
+		}
 		break;
 
 	case FSK: case FSKR:
 		if (val > 256) break;
-		sl = sizeof(TS990_CAT_FSK_filt) / sizeof(*TS990_CAT_FSK_filt) - 1;
-		if (SL > sl) SL = sl;
-		cmd = "SL0";
-		cmd += TS990_CAT_FSK_filt[SL];
-		sendCommand(cmd);
-		showresp(INFO, ASC, "set FSK bw", cmd, "");
-		B.iBW = SL;
+		try {
+			cmd = "SL0";
+			cmd += TS990_CAT_FSK_filt.at(SL);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set FSK bw", cmd, "");
+			B.iBW = SL;
+		} catch (const std::exception& e) {
+			std::cout << e.what() << '\n';
+		}
 		break;
 
 	case PSK: case PSKR:
 		if (val > 256) break;
-		sl = sizeof(TS990_CAT_PSK_filt) / sizeof(*TS990_CAT_PSK_filt) - 1;
-		if (SL > sl) SL = sl;
-		cmd = "SL0";
-		cmd += TS990_CAT_PSK_filt[SL];
-		sendCommand(cmd);
-		showresp(INFO, ASC, "set PSK bw", cmd, "");
-		B.iBW = SL;
+		try {
+			cmd = "SL0";
+			cmd += TS990_CAT_PSK_filt.at(SL);
+			sendCommand(cmd);
+			showresp(INFO, ASC, "set PSK bw", cmd, "");
+			B.iBW = SL;
+		} catch (const std::exception& e) {
+			std::cout << e.what() << '\n';
+		}
 		break;
 	}
 }

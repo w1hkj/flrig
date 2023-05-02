@@ -29,7 +29,8 @@
 
 const char RIG_RAY152name_[] = "RAY 152";
 
-const char *RIG_RAY152modes_[] = { "USB", "LSB", "H3E", "A1A", "F1B", NULL};
+static std::vector<std::string>RIG_RAY152modes_;
+static const char *vRIG_RAY152modes_[] = { "USB", "LSB", "H3E", "A1A", "F1B"};
 static const char RIG_RAY152_mode_type[] = {'U', 'L', 'U', 'L', 'U'};
 
 static GUI rig_widgets[]= {
@@ -182,6 +183,10 @@ void RIG_RAY152::get_data()
 
 void RIG_RAY152::initialize()
 {
+	VECTOR (RIG_RAY152modes_, vRIG_RAY152modes_);
+
+	modes_ = RIG_RAY152modes_;
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = sldrRFGAIN;

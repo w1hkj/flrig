@@ -57,10 +57,11 @@ CW705, CWR705, RTTY705, RTTYR705,
 LSBD705, USBD705, AMD705, FMD705, DV705
 };
 
-const char *IC705modes_[] = {
-	"LSB", "USB", "AM", "FM",
+static std::vector<std::string>IC705modes_;
+static const char *vIC705modes_[] =
+{	"LSB", "USB", "AM", "FM",
 	"CW", "CW-R", "RTTY", "RTTY-R",
-	"LSB-D", "USB-D", "AM-D", "FM-D", "DV", NULL};
+	"LSB-D", "USB-D", "AM-D", "FM-D", "DV"};
 
 char IC705_mode_type[] = {
 	'L', 'U', 'U', 'U',
@@ -72,12 +73,14 @@ const char IC705_mode_nbr[] = {
 	0x03, 0x07, 0x04, 0x08,
 	0x00, 0x01, 0x02, 0x05, 0x17 };
 
-const char *IC705_ssb_bws[] = {
+static std::vector<std::string>IC705_ssb_bws;
+static const char *vIC705_ssb_bws[] =
+{
 "50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
 "600",   "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
 "2600", "2700", "2800", "2900", "3000", "3100", "3200", "3300", "3400", "3500",
-"3600", NULL };
+"3600" };
 static int IC705_bw_vals_SSB[] = {
  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
 10,11,12,13,14,15,16,17,18,19,
@@ -85,23 +88,27 @@ static int IC705_bw_vals_SSB[] = {
 30,31,32,33,34,35,36,37,38,39,
 40, WVALS_LIMIT};
 
-const char *IC705_rtty_bws[] = {
+static std::vector<std::string>IC705_rtty_bws;
+static const char *vIC705_rtty_bws[] =
+{
 "50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
 "600",   "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
-"2600", "2700", NULL };
+"2600", "2700" };
 static int IC705_bw_vals_RTTY[] = {
  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
 10,11,12,13,14,15,16,17,18,19,
 20,21,22,23,24,25,26,27,28,29,
 30,31, WVALS_LIMIT};
 
-const char *IC705_am_bws[] = {
+static std::vector<std::string>IC705_am_bws;
+static const char *vIC705_am_bws[] =
+{
 "200",   "400",  "600",  "800", "1000", "1200", "1400", "1600", "1800", "2000",
 "2200", "2400", "2600", "2800", "3000", "3200", "3400", "3600", "3800", "4000",
 "4200", "4400", "4600", "4800", "5000", "5200", "5400", "5600", "5800", "6000",
 "6200", "6400", "6600", "6800", "7000", "705", "7400", "705", "7800", "8000",
-"8200", "8400", "8600", "8800", "9000", "9200", "9400", "9600", "9800", "10000", NULL };
+"8200", "8400", "8600", "8800", "9000", "9200", "9400", "9600", "9800", "10000" };
 static int IC705_bw_vals_AM[] = {
  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
 10,11,12,13,14,15,16,17,18,19,
@@ -110,7 +117,9 @@ static int IC705_bw_vals_AM[] = {
 40,41,42,43,44,45,46,47,48,49
 WVALS_LIMIT};
 
-const char *IC705_fm_bws[] = { "FIXED", NULL };
+static std::vector<std::string>IC705_fm_bws;
+static const char *vIC705_fm_bws[] =
+{ "FIXED" };
 static int IC705_bw_vals_FM[] = { 1, WVALS_LIMIT};
 
 static GUI IC705_widgets[]= {
@@ -134,6 +143,18 @@ static GUI IC705_widgets[]= {
 
 void RIG_IC705::initialize()
 {
+	VECTOR (IC705modes_, vIC705modes_);
+	VECTOR (IC705_ssb_bws, vIC705_ssb_bws);
+	VECTOR (IC705_rtty_bws, vIC705_rtty_bws);
+	VECTOR (IC705_am_bws, vIC705_am_bws);
+	VECTOR (IC705_fm_bws, vIC705_fm_bws);
+
+	modes_ = IC705modes_;
+	bandwidths_ = IC705_ssb_bws;
+	bw_vals_ = IC705_bw_vals_SSB;
+
+	_mode_type = IC705_mode_type;
+
 	IC705_widgets[0].W = btnVol;
 	IC705_widgets[1].W = sldrVOLUME;
 	IC705_widgets[2].W = btnAGC;
@@ -521,7 +542,7 @@ int RIG_IC705::get_modeA()
 
 end_wait_modeA:
 
-	get_trace(4, "get mode A[", IC705modes_[A.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
+	get_trace(4, "get mode A[", IC705modes_[A.imode].c_str(), "] ", str2hex(replystr.c_str(), replystr.length()));
 
 	if (A.imode == CW705 || A.imode == CWR705) {
 		cmd.assign(pre_to).append("\x1A\x05");
@@ -567,7 +588,7 @@ void RIG_IC705::set_modeA(int val)
 	cmd.append( post );
 	waitFB("set mode A");
 
-	set_trace(4, "set mode A[", IC705modes_[A.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(4, "set mode A[", IC705modes_[A.imode].c_str(), "] ", str2hex(replystr.c_str(), replystr.length()));
 }
 
 int RIG_IC705::get_modeB()
@@ -608,12 +629,12 @@ int RIG_IC705::get_modeB()
 
 end_wait_modeB:
 
-	get_trace(4, "get mode B[", IC705modes_[B.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
+	get_trace(4, "get mode B[", IC705modes_[B.imode].c_str(), "] ", str2hex(replystr.c_str(), replystr.length()));
 
 	if (B.filter > 0 && B.filter < 4)
 		mode_filterB[B.imode] = B.filter;
 
-	get_trace(4, "get mode A[", IC705modes_[B.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
+	get_trace(4, "get mode A[", IC705modes_[B.imode].c_str(), "] ", str2hex(replystr.c_str(), replystr.length()));
 	if (B.imode == CW705 || B.imode == CWR705) {
 		cmd.assign(pre_to).append("\x1A\x05");
 		cmd += '\x00'; cmd += '\x53';
@@ -655,7 +676,7 @@ void RIG_IC705::set_modeB(int val)
 	cmd.append( post );
 	waitFB("set mode B");
 
-	set_trace(4, "set mode B[", IC705modes_[B.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(4, "set mode B[", IC705modes_[B.imode].c_str(), "] ", str2hex(replystr.c_str(), replystr.length()));
 }
 
 int RIG_IC705::get_FILT(int mode)
@@ -682,7 +703,7 @@ void RIG_IC705::set_FILT(int filter)
 		cmd.append( post );
 		waitFB("set mode/filter B");
 
-		set_trace(4, "set mode/filter B[", IC705modes_[B.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
+		set_trace(4, "set mode/filter B[", IC705modes_[B.imode].c_str(), "] ", str2hex(replystr.c_str(), replystr.length()));
 	} else {
 		A.filter = filter;
 		mode_filterA[A.imode] = filter;
@@ -696,7 +717,7 @@ void RIG_IC705::set_FILT(int filter)
 		cmd.append( post );
 		waitFB("set mode/filter A");
 
-		set_trace(4, "set mode/filter A[", IC705modes_[A.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
+		set_trace(4, "set mode/filter A[", IC705modes_[A.imode].c_str(), "] ", str2hex(replystr.c_str(), replystr.length()));
 	}
 }
 
@@ -946,26 +967,25 @@ int RIG_IC705::adjust_bandwidth(int m)
 	return bw;
 }
 
-const char ** RIG_IC705::bwtable(int m)
+std::vector<std::string>& RIG_IC705::bwtable(int m)
 {
-	const char **table;
 	switch (m) {
 		case 2: case 10: // AM, AM-D
-			table = IC705_am_bws;
+			return IC705_am_bws;
 			break;
 		case 3: case 11: // FM, FM-D
-			table = IC705_fm_bws;
+			return IC705_fm_bws;
 			break;
 		case 6: case 7: // RTTY, RTTY-R
-			table = IC705_rtty_bws;
+			return IC705_rtty_bws;
 			break;
 		case 4: case 5: // CW, CW -R
 		case 0: case 1: // LSB, USB
 		case 8: case 9: // LSB-D, USB-D
 		default:
-			table = IC705_ssb_bws;
+			return IC705_ssb_bws;
 	}
-	return table;
+	return IC705_ssb_bws;
 }
 
 int RIG_IC705::def_bandwidth(int m)

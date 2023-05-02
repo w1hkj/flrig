@@ -27,16 +27,18 @@
 
 const char RIG_TT599name_[] = "Eagle";
 
-const char *RIG_TT599modes_[] = {
-		"USB", "LSB", "CW", "AM", "FM", NULL};
+static std::vector<std::string>RIG_TT599modes_;
+static const char *vRIG_TT599modes_[] = {
+		"USB", "LSB", "CW", "AM", "FM"};
 const char RIG_TT599mchar_[] = {
 		'0', '1', '3', '4', '5', 0 };
 static const int  RIG_TT599_def_bw[] = { 19, 19, 7, 24, 19 };
 static const char RIG_TT599_mode_type[] = {'U', 'L', 'L', 'U', 'U'};
 
-const char *RIG_TT599widths[] = { 
+static std::vector<std::string>RIG_TT599widths;
+static const char *vRIG_TT599widths[] = { 
 "100",  "200",  "300",  "400",  "500", "600",  "700",  "800",  "900",  "1000",
-"1200", "1400", "1600", "1800", "2000", "2200", "2400", "2600", "2800", "3000", NULL};
+"1200", "1400", "1600", "1800", "2000", "2200", "2400", "2600", "2800", "3000"};
 static int TT599_bw_vals[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
@@ -112,6 +114,14 @@ static void wait(int msec)
 
 void RIG_TT599::initialize()
 {
+	VECTOR (RIG_TT599modes_, vRIG_TT599modes_);
+	VECTOR (RIG_TT599widths, vRIG_TT599widths); 
+
+	name_ = RIG_TT599name_;
+	modes_ = RIG_TT599modes_;
+	bandwidths_ = RIG_TT599widths;
+	bw_vals_ = TT599_bw_vals;
+
 	rig_widgets[0].W = sldrPOWER;
 
 	cmd = "X\r";
@@ -152,7 +162,7 @@ unsigned long long RIG_TT599::get_vfoA ()
 	cmd = "?AF\r";
 	if ( waitCommand( cmd, 12, "get vfoA") ) {
 		if ((p = replystr.rfind("@AF")) != std::string::npos)
-			freqA =  strtoull(&replystr[p+3], NULL, 10);
+			sscanf(replystr.substr(p+3).c_str(), "%lld", &freqA);
 	}
 	getcr("get vfoA");
 	return freqA;
@@ -175,7 +185,7 @@ unsigned long long RIG_TT599::get_vfoB ()
 	cmd = "?BF\r";
 	if ( waitCommand( cmd, 12, "get vfoB") ) {
 		if ((p = replystr.rfind("@BF")) != std::string::npos)
-			freqB = strtoull(&replystr[p+3], NULL, 10);
+			sscanf(replystr.substr(p+3).c_str(), "%lld", &freqB);
 	}
 	getcr("get vfoB");
 	return freqB;

@@ -42,20 +42,23 @@
 
 static const char TT538name_[] = "TT-538";
 
-//static const char *TT538modes_[] = { "D-USB", "USB", "LSB", "CW", "AM", "FM", NULL}
+//static std::vector<std::string>TT538modes_ = { "D-USB", "USB", "LSB", "CW", "AM", "FM"}
 //static const char TT538mode_chr[] =  { '1', '1', '2', '3', '0', '4' };
 //static const char TT538mode_type[] = { 'U', 'U', 'L', 'L', 'U', 'U' };
-static const char *TT538modes_[] = {
-		"AM", "USB", "LSB", "CW", "FM", NULL};
+
+static std::vector<std::string>TT538modes_;
+static const char *vTT538modes_[] = {
+		"AM", "USB", "LSB", "CW", "FM"};
 static const char TT538mode_chr[] =  { '0', '1', '2', '3', '4' };
 static const char TT538mode_type[] = { 'U', 'U', 'L', 'U', 'U' };
 
 // filter # is 38 - index
-static const char *TT538_widths[] = {
+static std::vector<std::string>TT538_widths;
+static const char *vTT538_widths[] = {
 "150",   "165",  "180",  "225",  "260",  "300",  "330",  "375",  "450",  "525",
 "600",   "675",  "750",  "900", "1050", "1200", "1350", "1500", "1650", "1800",
 "1950", "2100", "2250", "2400", "2550", "2700", "2850", "3000", "3300", "3600",
-"3900", "4200", "4500", "4800", "5100", "5400", "5700", "6000", "8000", NULL};
+"3900", "4200", "4500", "4800", "5100", "5400", "5700", "6000", "8000"};
 static int TT538_bw_vals[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
@@ -183,6 +186,13 @@ void RIG_TT538::checkresponse(std::string s)
 
 void RIG_TT538::initialize()
 {
+	VECTOR (TT538modes_, vTT538modes_);
+	VECTOR (TT538_widths, vTT538_widths);
+
+	modes_ = TT538modes_;
+	bandwidths_ = TT538_widths;
+	bw_vals_ = TT538_bw_vals;
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = sldrRFGAIN;

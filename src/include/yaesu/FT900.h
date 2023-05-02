@@ -26,10 +26,6 @@
 
 #include "rigbase.h"
 
-extern const char FT900name_[];
-extern const char *FT900modes_[];
-extern const char *FT900_widths[];
-
 class RIG_FT900 : public rigbase {
 private:
 	double fwdpwr;

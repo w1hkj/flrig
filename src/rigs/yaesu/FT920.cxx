@@ -22,9 +22,10 @@
 #include "rig.h"
 
 static const char FT920name_[] = "FT-920";
-static const char *FT920modes_[] = 
+static std::vector<std::string>FT920modes_;
+static const char *vFT920modes_[] = 
 { "LSB", "USB", "CW-USB", "CW-LSB", "AM", "AM-2", "FM", "FM-N",
-"DATA-LSB", "DATA2-LSB", "DATA-USB", "DATA-FM", NULL};
+"DATA-LSB", "DATA2-LSB", "DATA-USB", "DATA-FM"};
 
 static const int FT920_def_bw[] = { 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -34,8 +35,9 @@ static const int FT920_mode_val[] =
 static const char FT920_mode_type[] =
 { 'L', 'U', 'U', 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'U', 'U' };
 
-static const char *FT920widths_[] =
-{ "wide", "narr", NULL};
+static std::vector<std::string>FT920widths_;
+static const char *vFT920widths_[] =
+{ "wide", "narr"};
 
 static const int FT920_bw_val[] =
 { 0, 1 };
@@ -92,6 +94,12 @@ void RIG_FT920::init_cmd()
 
 void RIG_FT920::initialize()
 {
+	VECTOR(FT920modes_, vFT920modes_);
+	VECTOR(FT920widths_, vFT920widths_);
+
+	modes_ = FT920modes_;
+	bandwidths_ = FT920widths_;
+	bw_vals_ = FT920_bw_val;
 }
 
 void RIG_FT920::selectA()

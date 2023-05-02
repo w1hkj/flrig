@@ -41,29 +41,32 @@
 
 static const char TT516name_[] = "TT-516";
 
-static const char *TT516modes_[] = {
-		"AM", "USB", "LSB", "CW", "FM", NULL};
+static std::vector<std::string>TT516modes_;
+static const char *vTT516modes_[] = {
+		"AM", "USB", "LSB", "CW", "FM"};
 
 static int TT516_def_bw[] = { 26, 36, 36, 12, 36 };
 static const char TT516mode_chr[] =  { '0', '1', '2', '3', '4' };
 static const char TT516mode_type[] = { 'U', 'U', 'L', 'U', 'U' };
 
-static const char *TT516_widths[] = {
+static std::vector<std::string>TT516_widths;
+static const char *vTT516_widths[] = {
 "200", "250", "300", "350", "400", "450", "500", "550", "600", "650",
 "700", "750", "800", "850", "900", "950", "1000", "1100", "1200", "1300",
 "1400", "1500", "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300",
-"2400", "2500", "2600", "2700", "2800", "2900", "3000", NULL};
+"2400", "2500", "2600", "2700", "2800", "2900", "3000"};
 static int TT516_WIDTH_bw_vals[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
 21,22,23,24,25,26,27,28,29,30,
 31,32,33,34,35,36,37, WVALS_LIMIT};
 
-static const char *TT516_AM_widths[] = {
+static std::vector<std::string>TT516_AM_widths;
+static const char *vTT516_AM_widths[] = {
 "400", "500", "600", "700", "800", "900", "1000", "1100", "1200", "1350",
 "1400", "1500", "1600", "1700", "1800", "1900", "2000", "2200", "2400", "2600",
 "2800", "3000", "3200", "3400", "3600", "3800", "4000", "4200", "4400", "4600",
-"4800", "5000", "5200", "5400", "5600", "5800", "6000", NULL};
+"4800", "5000", "5200", "5400", "5600", "5800", "6000"};
 static int TT516_AM_bw_vals[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
@@ -155,6 +158,14 @@ RIG_TT516::RIG_TT516() {
 
 void RIG_TT516::initialize()
 {
+	VECTOR (TT516modes_, vTT516modes_);
+	VECTOR (TT516_widths, vTT516_widths);
+	VECTOR (TT516_AM_widths, vTT516_AM_widths);
+
+	modes_ = TT516modes_;
+	bandwidths_ = TT516_widths;
+	bw_vals_ = TT516_WIDTH_bw_vals;
+
 	rig_widgets[0].W = btnIFsh;
 	rig_widgets[1].W = sldrIFSHIFT;
 }
@@ -269,7 +280,7 @@ int RIG_TT516::get_modetype(int n)
 	return TT516mode_type[n];
 }
 
-const char **RIG_TT516::bwtable(int m)
+std::vector<std::string>& RIG_TT516::bwtable(int m)
 {
 	if (m == 0) {
 		bandwidths_ = TT516_AM_widths;

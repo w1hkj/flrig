@@ -228,9 +228,9 @@ void TRACED(init_generic_rig)
 	rigmodes_.clear();
 	opMODE->clear();
 	if (selrig->has_mode_control) {
-		for (int i = 0; selrig->modes_[i] != NULL; i++) {
-			rigmodes_.push_back(selrig->modes_[i]);
-			opMODE->add(selrig->modes_[i]);
+		for (size_t i = 0; i < selrig->modes_.size(); i++) {
+			rigmodes_.push_back(selrig->modes_.at(i));
+			opMODE->add(selrig->modes_.at(i).c_str());
 		}
 		opMODE->activate();
 		opMODE->index(progStatus.imode_A);
@@ -251,11 +251,11 @@ void TRACED(init_generic_rig)
 		if ( (selrig->name_ == rig_K3.name_ && progStatus.iBW_A < 41) ||
 			 (selrig->name_ == rig_KX3.name_ && progStatus.iBW_A < 46) ||
 			 (selrig->name_ == rig_K4.name_ && progStatus.iBW_A < 46) )
-			progStatus.iBW_A = atol(selrig->bandwidths_[progStatus.iBW_A - 1]);
+			progStatus.iBW_A = atol(selrig->bandwidths_[progStatus.iBW_A - 1].c_str());
 		if ( (selrig->name_ == rig_K3.name_ && progStatus.iBW_B < 41) ||
 			 (selrig->name_ == rig_KX3.name_ && progStatus.iBW_B < 46) ||
 			 (selrig->name_ == rig_K4.name_ && progStatus.iBW_B < 46) )
-			progStatus.iBW_B = atol(selrig->bandwidths_[progStatus.iBW_B - 1]);
+			progStatus.iBW_B = atol(selrig->bandwidths_[progStatus.iBW_B - 1].c_str());
 		opBW_A->value(selrig->bwA = vfoA.iBW = progStatus.iBW_A);
 		opBW_B->value(selrig->bwB = vfoB.iBW = progStatus.iBW_B);
 		opBW_A->redraw();
@@ -264,9 +264,12 @@ void TRACED(init_generic_rig)
 	else if (selrig->has_bandwidth_control) {
 		opBW->clear();
 		opBW->show();
-		old_bws = selrig->bandwidths_;
-		for (int i = 0; selrig->bandwidths_[i] != NULL; i++) {
-			opBW->add(selrig->bandwidths_[i]);
+		try {
+			for (size_t i = 0; i < selrig->bandwidths_.size(); i++) {
+				opBW->add(selrig->bandwidths_.at(i).c_str());
+			}
+		} catch (const std::exception& e) {
+			LOG_ERROR("%s", e.what());
 		}
 		opBW->activate();
 		if (progStatus.iBW_A == -1) progStatus.iBW_A = selrig->def_bandwidth(vfoA.imode);

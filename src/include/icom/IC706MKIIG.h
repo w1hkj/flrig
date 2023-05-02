@@ -53,7 +53,7 @@ public:
 //	int  get_swr();
 	void set_attenuator(int val);
 
-	const char **bwtable(int);
+	std::vector<std::string>& bwtable(int);
 
 //	void set_split(bool val);
 //	bool can_split() { return true; }

@@ -64,7 +64,8 @@ enum TX500MODES { LSB, USB, CW, FM, AM, DIG, CWR };
 	void set_PTT_control(int val);
 	int  get_PTT();
 
-//	void initialize();
+	void initialize();
+
 //	void shutdown();
 
 //	double get_power_control();
@@ -127,9 +128,9 @@ enum TX500MODES { LSB, USB, CW, FM, AM, DIG, CWR };
 
 //	bool sendTScommand(string, int, bool);
 
-//	const char **bwtable(int);
-//	const char **lotable(int);
-//	const char **hitable(int);
+//	std::vector<std::string>& bwtable(int);
+//	std::vector<std::string>& lotable(int);
+//	std::vector<std::string>& hitable(int);
 
 //	const char * get_bwname_(int bw, int md);
 

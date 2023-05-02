@@ -38,19 +38,20 @@ enum {
 
 const char IC7000name_[] = "IC-7000";
 
-const char *IC7000modes_[] = {
-		"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R", NULL};
+static std::vector<std::string>IC7000modes_;
+static const char *vIC7000modes_[] = {
+		"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R"};
 
 const char IC7000_mode_type[] =
 	{ 'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U' };
 
-const char *IC7000_SSB_CWwidths[] = {
+static std::vector<std::string>IC7000_SSB_CWwidths;
+static const char *vIC7000_SSB_CWwidths[] = {
   "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
  "600",  "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
 "2600", "2700", "2800", "2900", "3000", "3100", "3200", "3300", "3400", "3500",
-"3600",
-NULL};
+"3600"};
 static int IC7000_bw_vals_SSB[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
@@ -58,25 +59,25 @@ static int IC7000_bw_vals_SSB[] = {
 31,32,33,34,35,36,37,38,39,40,
 41, WVALS_LIMIT};
 
-const char *IC7000_RTTYwidths[] = {
+static std::vector<std::string>IC7000_RTTYwidths;
+static const char *vIC7000_RTTYwidths[] = {
   "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
  "600",  "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
-"2600", "2700",
-NULL};
+"2600", "2700"};
 static int IC7000_bw_vals_RTTY[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
 21,22,23,24,25,26,27,28,29,30,
 31,32, WVALS_LIMIT};
 
-const char *IC7000_AMwidths[] = {
+static std::vector<std::string>IC7000_AMwidths;
+static const char *vIC7000_AMwidths[] = {
  "200",  "400",  "600",  "800", "1000", "1200", "1400", "1600", "1800", "2000",
 "2200", "2400", "2600", "2800", "3000", "3200", "3400", "3600", "3800", "4000",
 "4200", "4400", "4600", "4800", "5000", "5200", "5400", "5600", "5800", "6000",
 "6200", "6400", "6600", "6800", "7000", "7200", "7400", "7600", "7800", "8000",
-"8200", "8400", "8600", "8800", "9000", "9200", "9400", "9600", "9800", "10000",
-NULL};
+"8200", "8400", "8600", "8800", "9000", "9200", "9400", "9600", "9800", "10000"};
 static int IC7000_bw_vals_AM[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
@@ -85,7 +86,9 @@ static int IC7000_bw_vals_AM[] = {
 41,42,43,44,45,46,47,48,49,50,
 WVALS_LIMIT};
 
-const char *IC7000_FMwidths[] = { "FIXED", NULL };
+static std::vector<std::string>IC7000_FMwidths;
+static const char *vIC7000_FMwidths[] = {
+	"FIXED" };
 static int IC7000_bw_vals_FM[] = {
 1, WVALS_LIMIT};
 
@@ -110,6 +113,16 @@ static GUI IC7000_widgets[]= {
 
 void RIG_IC7000::initialize()
 {
+	VECTOR (IC7000modes_, vIC7000modes_);
+	VECTOR (IC7000_SSB_CWwidths, vIC7000_SSB_CWwidths);
+	VECTOR (IC7000_RTTYwidths, vIC7000_RTTYwidths);
+	VECTOR (IC7000_AMwidths, vIC7000_AMwidths);
+	VECTOR (IC7000_FMwidths, vIC7000_FMwidths);
+
+	modes_ = IC7000modes_;
+	bandwidths_ = IC7000_SSB_CWwidths;
+	bw_vals_ = IC7000_bw_vals_SSB;
+
 	IC7000_widgets[0].W = btnVol;
 	IC7000_widgets[1].W = sldrVOLUME;
 	IC7000_widgets[2].W = btnAGC;
@@ -1197,27 +1210,26 @@ void RIG_IC7000::set_band_selection(int v)
 	igett("");
 }
 
-const char ** RIG_IC7000::bwtable(int m)
+std::vector<std::string>& RIG_IC7000::bwtable(int m)
 {
-	const char **table;
 	switch (m) {
 		case AM7000: case AMD7000:
-			table = IC7000_AMwidths;
+			return IC7000_AMwidths;
 			break;
 		case DV7000:
 		case FM7000: case WFM7000: case FMD7000:
-			table = IC7000_SSB_CWwidths;
+			return IC7000_SSB_CWwidths;
 			break;
 		case RTTY7000: case RTTYR7000:
-			table = IC7000_RTTYwidths;
+			return IC7000_RTTYwidths;
 			break;
 		case CW7000: case CWR7000:
 		case USB7000: case LSB7000: case USBD7000: case LSBD7000:
-			table = IC7000_SSB_CWwidths;
+			return IC7000_SSB_CWwidths;
 			break;
 		default:
-			table = IC7000_SSB_CWwidths;
+			return IC7000_SSB_CWwidths;
 			break;
 	}
-	return table;
+	return IC7000_SSB_CWwidths;
 }

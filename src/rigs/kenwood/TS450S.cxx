@@ -23,17 +23,21 @@
 
 static const char TS450Sname_[] = "TS-450S";
 
-static const char *TS450Smodes_[] = {
-		"LSB", "USB", "CW", "FM", "AM", "FSK", "CW-R", "FSK-R", NULL};
+static std::vector<std::string>TS450Smodes_;
+static const char *vTS450Smodes_[] =
+{ "LSB", "USB", "CW", "FM", "AM", "FSK", "CW-R", "FSK-R"};
 static const char TS450S_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '9' };
 static const char TS450S_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'U' };
 
-static const char *TS450S_widths[] = {
-"NONE", "FM-W", "FM-N", "AM", "SSB", "CW", NULL};
+static std::vector<std::string>TS450S_widths;
+static const char *vTS450S_widths[] =
+{ "NONE", "FM-W", "FM-N", "AM", "SSB", "CW"};
 static int TS450S_bw_vals[] = { 1,2,3,4,5,6, WVALS_LIMIT};
 
-static const char *TS450S_filters[] = {
-"000", "002", "003", "005", "007", "009", NULL};
+static std::vector<std::string>TS450S_filters;
+static const char *vTS450S_filters[] =
+{
+"000", "002", "003", "005", "007", "009"};
 
 RIG_TS450S::RIG_TS450S() {
 // base class values
@@ -85,6 +89,15 @@ RIG_TS450S::RIG_TS450S() {
 
 void RIG_TS450S::initialize()
 {
+	VECTOR (TS450Smodes_, vTS450Smodes_);
+	VECTOR (TS450S_widths, vTS450S_widths);
+	VECTOR (TS450S_filters, vTS450S_filters);
+
+	modes_ = TS450Smodes_;
+	_mode_type = TS450S_mode_type;
+	bandwidths_ = TS450S_widths;
+	bw_vals_ = TS450S_bw_vals;
+
 	cmd = "RM1;"; // select measurement '1' (swr)
 	sendCommand(cmd);
 }
@@ -134,7 +147,7 @@ unsigned long long RIG_TS450S::get_vfoB ()
 
 	size_t p = replystr.rfind("FB");
 	if (p == std::string::npos) return freqB;
-	
+
 	unsigned long long f = 0;
 	for (size_t n = 2; n < 13; n++)
 		f = f*10 + replystr[p + n] - '0';
@@ -179,7 +192,7 @@ int RIG_TS450S::get_swr()
 
 	size_t p = replystr.rfind("RM");
 	if (p == std::string::npos) return 0;
-	
+
 	replystr[p + 7] = 0;
 	int mtr = atoi(&replystr[p + 3]);
 	mtr = (mtr * 50) / 30;
@@ -260,14 +273,12 @@ int RIG_TS450S::get_bwA()
 	bw_str = replystr;
 	size_t p = replystr.rfind("FL");
 	if (p == std::string::npos) return bwA;
-	
+
 	replystr[p + 8] = 0;
-	int bw = 0;
-	while (TS450S_filters[bw]) {
-		if (strcmp(&replystr[p + 5], TS450S_filters[bw]) == 0)
+	size_t bw = 0;
+	for (bw = 0; bw < TS450S_filters.size(); bw++)
+		if (TS450S_filters[bw] == replystr.substr(p+5))
 			return bwA = bw;
-		bw++;
-	}
 	return bwA;
 }
 
@@ -289,14 +300,12 @@ int RIG_TS450S::get_bwB()
 	bw_str = replystr;
 	size_t p = replystr.rfind("FL");
 	if (p == std::string::npos) return bwB;
-	
+
 	replystr[p + 8] = 0;
-	int bw = 0;
-	while (TS450S_filters[bw]) {
-		if (strcmp(&replystr[p + 5], TS450S_filters[bw]) == 0)
+	size_t bw = 0;
+	for (bw = 0; bw < TS450S_filters.size(); bw++)
+		if (TS450S_filters[bw] == replystr.substr(p+5))
 			return bwB = bw;
-		bw++;
-	}
 	return bwB;
 }
 
@@ -398,9 +407,9 @@ void RIG_TS450S::set_PTT_control(int val)
 			l => tone off /on
 			m => tone number
 			X => unused characters
-		 
+
 ========================================================================
-*/ 
+*/
 
 int RIG_TS450S::get_PTT()
 {

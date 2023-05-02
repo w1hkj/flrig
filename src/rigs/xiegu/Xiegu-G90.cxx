@@ -48,13 +48,14 @@ const char Xiegu_G90name_[] = "Xiegu-G90";
 enum {
 	LSB_g90, USB_g90, AM_g90, CW_g90, CWR_g90 };
 
-const char *Xiegu_G90modes_[] = {
-"LSB", "USB", "AM", "CW", "CW-R", NULL};
+static std::vector<std::string>Xiegu_G90modes_;
+static const char *vXiegu_G90modes_[] = {
+"LSB", "USB", "AM", "CW", "CW-R"};
 
 static char Xiegu_G90_mode_type[] = {
 	'L', 'U', 'U', 'L', 'U', 'L' };
 
-const char Xiegu_G90_mode_nbr[] = {
+static const char Xiegu_G90_mode_nbr[] = {
 	0x00, // Select the LSB mode
 	0x01, // Select the USB mode
 	0x02, // Select the AM mode
@@ -62,7 +63,8 @@ const char Xiegu_G90_mode_nbr[] = {
 	0x07, // Select the CW-R mode
 };
 
-const char *Xiegu_G90_ssb_bws[] = { "N/A", NULL };
+static std::vector<std::string>Xiegu_G90_ssb_bws;
+static const char *vXiegu_G90_ssb_bws[] = { "N/A" };
 static int Xiegu_G90_vals_ssb_bws[] = { 1, WVALS_LIMIT };
 
 struct bpair {Fl_Widget *widget; std::string lbl;};
@@ -97,6 +99,14 @@ static GUI Xiegu_G90_widgets[]= {
 
 void RIG_Xiegu_G90::initialize()
 {
+	VECTOR (Xiegu_G90modes_, vXiegu_G90modes_);
+	VECTOR (Xiegu_G90_ssb_bws, vXiegu_G90_ssb_bws);
+
+	modes_ = Xiegu_G90modes_;
+	bandwidths_ = Xiegu_G90_ssb_bws;
+	bw_vals_ = Xiegu_G90_vals_ssb_bws;
+	_mode_type = Xiegu_G90_mode_type;
+
 	Xiegu_G90_widgets[0].W = btnVol;
 	Xiegu_G90_widgets[1].W = sldrVOLUME;
 	Xiegu_G90_widgets[2].W = btnAGC;

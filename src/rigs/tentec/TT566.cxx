@@ -34,17 +34,18 @@
 static int cur_modeA = 0;
 static int cur_modeB = 0;
 
-const char RIG_TT566name_[] = "Orion-II";
+static const char RIG_TT566name_[] = "Orion-II";
 
-const char *RIG_TT566modes_[] = {
-		"USB", "LSB", "UCW", "LCW", "AM", "FM", "FSK", NULL};
+static std::vector<std::string>RIG_TT566modes_;
+static const char *vRIG_TT566modes_[] = {
+		"USB", "LSB", "UCW", "LCW", "AM", "FM", "FSK"};
 static const char RIG_TT566_mode_type[] = {'U', 'L', 'U', 'L', 'U', 'U', 'L'};
 
-const char *RIG_TT566widths[] = { 
+static std::vector<std::string>RIG_TT566widths;
+static const char *vRIG_TT566widths[] = { 
 "100",  "200",  "300",  "400",  "500", "600",  "700",  "800",  "900",  "1000",
 "1200", "1400", "1600", "1800", "2000", "2200", "2400", "2600", "2800", "3000",
-"3200", "3400", "3600", "3800", "4000", "4500", "5000", "5500", "6000",
-NULL};
+"3200", "3400", "3600", "3800", "4000", "4500", "5000", "5500", "6000"};
 static int RIG_TT566_bw_vals[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
@@ -240,6 +241,13 @@ RIG_TT566::RIG_TT566() {
 
 void RIG_TT566::initialize()
 {
+	VECTOR (RIG_TT566modes_, vRIG_TT566modes_);
+	VECTOR (RIG_TT566widths, vRIG_TT566widths); 
+
+	modes_ = RIG_TT566modes_;
+	bandwidths_ = RIG_TT566widths;
+	bw_vals_ = RIG_TT566_bw_vals;
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = sldrRFGAIN;
@@ -404,13 +412,12 @@ int RIG_TT566::get_bwA()
 
 	if (replystr.empty()) return A.iBW;
 
-	int i = 0;
-	while( RIG_TT566widths[i] != NULL) {
+	size_t i = 0;
+	for (i = 0; i < RIG_TT566widths.size(); i++) {
 		if (bwstr == RIG_TT566widths[i]) {
 			A.iBW = i;
 			break;
 		}
-		i++;
 	}
 
 	return A.iBW;
@@ -440,13 +447,12 @@ int RIG_TT566::get_bwB()
 	if (bwstr[bwstr.length() - 1] == '\r') bwstr.erase(bwstr.length() - 1);
 	if (replystr.empty()) return B.iBW;
 
-	int i = 0;
-	while( RIG_TT566widths[i] != NULL) {
+	size_t i = 0;
+	for (i = 0; i < RIG_TT566widths.size(); i++) {
 		if (bwstr == RIG_TT566widths[i]) {
 			B.iBW = i;
 			break;
 		}
-		i++;
 	}
 
 	return B.iBW;

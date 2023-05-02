@@ -38,8 +38,9 @@
 
 static const char FT757GX2name_[] = "FT-757GX2";
 
-static const char *FT757GX2modes_[] = {
-		"LSB", "USB", "CW", "CWN", "AM", "FM", NULL};
+static std::vector<std::string>FT757GX2modes_;
+static const char *vFT757GX2modes_[] = {
+		"LSB", "USB", "CW", "CWN", "AM", "FM"};
 static const char FT757GX2_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'U' };
 
 RIG_FT757GX2::RIG_FT757GX2() {
@@ -78,6 +79,12 @@ RIG_FT757GX2::RIG_FT757GX2() {
 	precision = 10;
 	ndigits = 8;
 };
+
+void RIG_FT757GX2::initialize()
+{
+	VECTOR(FT757GX2modes_, vFT757GX2modes_);
+	modes_ = FT757GX2modes_;
+}
 
 void RIG_FT757GX2::init_cmd() {
 	cmd = "00000";

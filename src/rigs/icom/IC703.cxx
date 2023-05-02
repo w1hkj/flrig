@@ -26,11 +26,14 @@
 // IC-703
 //
 const char IC703name_[] = "IC-703";
-const char *IC703modes_[] = { "LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R",
-	"D-LSB", "D-USB", NULL};
+static std::vector<std::string>IC703modes_;
+static const char *vIC703modes_[] = 
+{ "LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R", "D-LSB", "D-USB"};
 const char IC703_mode_type[] = {'L', 'U', 'U', 'L', 'L', 'U', 'U', 'U', 'L', 'U' };
 
-const char *IC703_widths[] = { "NARR", "MED", "WIDE", NULL};
+static std::vector<std::string>IC703_widths;
+static const char *vIC703_widths[] = 
+{ "NARR", "MED", "WIDE"};
 static int IC703_bw_vals[] = {1,2,3, WVALS_LIMIT};
 
 static GUI IC703_widgetsdgets[]= {
@@ -52,6 +55,14 @@ static GUI IC703_widgetsdgets[]= {
 
 void RIG_IC703::initialize()
 {
+	VECTOR (IC703modes_, vIC703modes_); 
+	VECTOR (IC703_widths, vIC703_widths); 
+
+	modes_ = IC703modes_;
+ 	_mode_type = IC703_mode_type;
+	bandwidths_ = IC703_widths;
+	bw_vals_ = IC703_bw_vals;
+
 	IC703_widgetsdgets[0].W = btnVol;
 	IC703_widgetsdgets[1].W = sldrVOLUME;
 	IC703_widgetsdgets[2].W = btnAGC;

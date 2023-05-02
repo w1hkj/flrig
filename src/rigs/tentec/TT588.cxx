@@ -38,20 +38,23 @@
 
 static const char TT588name_[] = "Omni-VII";
 
-//static const char *TT588modes_[] = { "D-USB", "USB", "LSB", "CW", "AM", "FM", NULL}
+//static std::vector<std::string>TT588modes_ = { "D-USB", "USB", "LSB", "CW", "AM", "FM"}
 //static const char TT588mode_chr[] =  { '1', '1', '2', '3', '0', '4' };
 //static const char TT588mode_type[] = { 'U', 'U', 'L', 'L', 'U', 'U' };
-static const char *TT588modes_[] = {
-		"AM", "USB", "LSB", "CWU", "FM", "CWL", "FSK", NULL};
+
+static std::vector<std::string>TT588modes_;
+static const char *vTT588modes_[] = {
+		"AM", "USB", "LSB", "CWU", "FM", "CWL", "FSK"};
 static const char TT588mode_chr[] =  { '0', '1', '2', '3', '4', '5', '6' };
 static const char TT588mode_type[] = { 'U', 'U', 'L', 'U', 'U', 'L', 'L' };
 
 // filter # is 37 - index
-static const char *TT588_widths[] = {
+static std::vector<std::string>TT588_widths;
+static const char *vTT588_widths[] = {
 "200",   "250",  "300",  "350",  "400",  "450",  "500",  "600",  "700",  "800",
 "900",  "1000", "1200", "1400", "1600", "1800", "2000", "2200", "2400", "2500",
 "2600", "2800", "3000", "3200", "3400", "3600", "3800", "4000", "4500", "5000",
-"5500", "6000", "6500", "7000", "7500", "8000", "9000", "12000", NULL};
+"5500", "6000", "6500", "7000", "7500", "8000", "9000", "12000"};
 static int TT588_bw_vals[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
@@ -190,6 +193,13 @@ RIG_TT588::RIG_TT588() {
 
 void RIG_TT588::initialize()
 {
+	VECTOR (TT588modes_, vTT588modes_);
+	VECTOR (TT588_widths, vTT588_widths);
+
+	modes_ = TT588modes_;
+	bandwidths_ = TT588_widths;
+	bw_vals_ = TT588_bw_vals;
+
 	tt588_widgets[0].W = btnVol;
 	tt588_widgets[1].W = sldrVOLUME;
 	tt588_widgets[2].W = sldrRFGAIN;

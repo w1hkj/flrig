@@ -30,10 +30,11 @@ enum mFT991 {
 
 static const char FT991name_[] = "FT-991";
 
-static const char *FT991modes_[] = {
+static std::vector<std::string>FT991modes_;
+static const char *vFT991modes_[] = {
 "LSB", "USB", "CW-U", "FM", "AM", "RTTY-L",
 "CW-L", "DATA-L", "RTTY-U", "DATA-FM",
-"FM-N", "DATA-U", "AM-N", "C4FM", NULL};
+"FM-N", "DATA-U", "AM-N", "C4FM"};
 
 static const char FT991_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E' };
 static const char FT991_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L', 'U', 'U', 'U', 'U', 'U', 'U' };
@@ -42,53 +43,63 @@ static const int FT991_def_bw[] = {
     17,   17,   5,   0,   0,   10,       5,     16,     10,       0,       0,     16,     0,      0 };
 // mLSB, mUSB, mCW, mFM, mAM, mRTTY_L, mCW_R, mPKT_L, mRTTY_U, mPKT_FM, mFM_N, mPKT_U, mAM_N, mC4FM
 
-static const char *FT991_widths_SSB[] = {
+static std::vector<std::string>FT991_widths_SSB;
+static const char *vFT991_widths_SSB[] = {
 "200",   "400",  "600",  "850", "1100", "1350", "1500", "1650", "1800", "1950", 
 "2100", "2200", "2300", "2400", "2500", "2600", "2700", "2800", "2900", "3000",
-"3200", NULL };
+"3200" };
 
 static int FT991_wvals_SSB[] = {
  1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
 21, WVALS_LIMIT};
 
-static const char *FT991_widths_SSBD[] = {
+static std::vector<std::string>FT991_widths_SSBD;
+static const char *vFT991_widths_SSBD[] = {
    "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
-  "800", "1200", "1400", "1700", "2000", "2400", "3000", NULL };
+  "800", "1200", "1400", "1700", "2000", "2400", "3000" };
 
 static int FT991_wvals_SSBD[] = {
  1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
 11, 12, 13, 14, 15, 16, 17, WVALS_LIMIT};
 
-static const char *FT991_widths_CW[] = {
+static std::vector<std::string>FT991_widths_CW;
+static const char *vFT991_widths_CW[] = {
    "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
-  "800", "1200", "1400", "1700", "2000", "2400", "3000", NULL };
+  "800", "1200", "1400", "1700", "2000", "2400", "3000" };
 
 static int FT991_wvals_CW[] = {
  1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
 11, 12, 13, 14, 15, 16, 17, WVALS_LIMIT};
 
 // Single bandwidth modes
-static const char *FT991_widths_AMFMnar[]  = { "NARR", NULL };
-static const char *FT991_widths_AMFMnorm[] = { "NORM", NULL };
+static std::vector<std::string>FT991_widths_AMFMnar;
+static const char *vFT991_widths_AMFMnar[]  = { "NARR" };
+static std::vector<std::string>FT991_widths_AMFMnorm;
+static const char *vFT991_widths_AMFMnorm[] = { "NORM" };
 
 static const int FT991_wvals_AMFM[] = { 0, WVALS_LIMIT };
 
 // mPKT_FM Multi bandwidth mode
-static const char *FT991_widths_NN[] = {"NORM", "NARR", NULL };
+static std::vector<std::string>FT991_widths_NN;
+static const char *vFT991_widths_NN[] = {"NORM", "NARR" };
 
 static const int FT991_wvals_NN[] = {0, 1, WVALS_LIMIT};
 
 // US 60M 5-USB, 5-CW
-static const char *US_60m_chan[]  = {"000","125","126","127","128","130","141","142","143","144","146",NULL};
-static const char *US_60m_label[] = {"VFO","U51","U52","U53","U54","U55","U56","U57","U58","U59","U50",NULL};
+static std::vector<std::string>US_60m_chan;
+static const char *vUS_60m_chan[]  = {"000","125","126","127","128","130","141","142","143","144","146"};
+static std::vector<std::string>US_60m_label;
+static const char *vUS_60m_label[] = {"VFO","U51","U52","U53","U54","U55","U56","U57","U58","U59","U50"};
 
 // UK 60m channel numbers by Brian, G8SEZ
-static const char *UK_60m_chan[]  = {"000","118","120","121","127","128","129","130",NULL};
-static const char *UK_60m_label[] = {"VFO","U51","U52","U53","U54","U55","U56","U57",NULL};
+static std::vector<std::string>UK_60m_chan;
+static const char *vUK_60m_chan[]  = {"000","118","120","121","127","128","129","130"};
+static std::vector<std::string>UK_60m_label;
+static const char *vUK_60m_label[] = {"VFO","U51","U52","U53","U54","U55","U56","U57"};
 
-static const char **Channels_60m = US_60m_chan;
-static const char **label_60m    = US_60m_label;
+static std::vector<std::string>& Channels_60m = US_60m_chan;
+static std::vector<std::string>& label_60m    = US_60m_label;
 
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
@@ -199,6 +210,22 @@ RIG_FT991::RIG_FT991() {
 
 void RIG_FT991::initialize()
 {
+	VECTOR (FT991modes_, vFT991modes_);
+	VECTOR (FT991_widths_SSB, vFT991_widths_SSB);
+	VECTOR (FT991_widths_SSBD, vFT991_widths_SSBD);
+	VECTOR (FT991_widths_CW, vFT991_widths_CW);
+	VECTOR (FT991_widths_AMFMnar, vFT991_widths_AMFMnar);
+	VECTOR (FT991_widths_AMFMnorm, vFT991_widths_AMFMnorm);
+	VECTOR (FT991_widths_NN, vFT991_widths_NN);
+	VECTOR (US_60m_chan, vUS_60m_chan);
+	VECTOR (US_60m_label, vUS_60m_label);
+	VECTOR (UK_60m_chan, vUK_60m_chan);
+	VECTOR (UK_60m_label, vUK_60m_label)
+
+	modes_ = FT991modes_;
+	bandwidths_ = FT991_widths_SSB;
+	bw_vals_ = FT991_wvals_SSB;
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = sldrRFGAIN;
@@ -237,15 +264,15 @@ void RIG_FT991::initialize()
 		Channels_60m = US_60m_chan;
 		label_60m    = US_60m_label;
 		op_yaesu_select60->clear();
-		char **p = (char **)US_60m_label;
-		while (*p) op_yaesu_select60->add(*p++);
+		for (size_t n = 0; n < US_60m_label.size(); n++)
+			op_yaesu_select60->add(US_60m_label.at(n).c_str());
 	}
 	else {
 		Channels_60m = UK_60m_chan;
 		label_60m    = UK_60m_label;
 		op_yaesu_select60->clear();
-		char **p = (char **)UK_60m_label;
-		while (*p) op_yaesu_select60->add(*p++);
+		for (size_t n = 0; n < UK_60m_label.size(); n++)
+			op_yaesu_select60->add(UK_60m_label.at(n).c_str());
 	}
 	op_yaesu_select60->index(m_60m_indx);
 
@@ -732,7 +759,7 @@ int RIG_FT991::def_bandwidth(int val)
 	return FT991_def_bw[val];
 }
 
-const char ** RIG_FT991::bwtable(int n)
+std::vector<std::string>& RIG_FT991::bwtable(int n)
 {
 	switch (n) {
 		case mPKT_FM : return FT991_widths_NN;

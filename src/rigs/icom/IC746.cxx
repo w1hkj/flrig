@@ -28,13 +28,16 @@
 
 const char IC746name_[] = "IC-746";
 
-const char *IC746modes_[] = {
-		"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R", NULL};
+static std::vector<std::string>IC746modes_;
+static const char *vIC746modes_[] = {
+		"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R"};
 // mode values are 0, 1, 2, 3, 4, 5, 7, 8
 const char IC746_mode_type[] =
 	{ 'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U'};
 
-const char *IC746_widths[] = { "NORM", "NARR", NULL};
+static std::vector<std::string>IC746_widths;
+static const char *vIC746_widths[] =
+{ "NORM", "NARR"};
 static int IC746_bw_vals[] = { 1, 2, WVALS_LIMIT};
 
 static GUI IC746_widgetsdgets[]= {
@@ -58,6 +61,14 @@ static GUI IC746_widgetsdgets[]= {
 
 void RIG_IC746::initialize()
 {
+	VECTOR (IC746modes_, vIC746modes_);
+	VECTOR (IC746_widths, vIC746_widths);
+
+	modes_ = IC746modes_;
+	bandwidths_ = IC746_widths;
+	bw_vals_ = IC746_bw_vals;
+	_mode_type = IC746_mode_type;
+
 	IC746_widgetsdgets[0].W = btnVol;
 	IC746_widgetsdgets[1].W = sldrVOLUME;
 	IC746_widgetsdgets[2].W = btnAGC;
@@ -720,21 +731,24 @@ int RIG_IC746::get_split()
 // 746PRO
 const char IC746PROname_[] = "IC-746PRO";
 
-const char *IC746PROmodes_[] = {
-		"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R",
-		"D-LSB", "D-USB", "D-FM", NULL};
+static std::vector<std::string>IC746PROmodes_;
+static const char *vIC746PROmodes_[] =
+{
+	"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R",
+	"D-LSB", "D-USB", "D-FM"};
 
 const char IC746PRO_mode_type[] =
 	{ 'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U',
 	  'L', 'U', 'U' };
 
-const char *IC746PRO_SSBwidths[] = {
+static std::vector<std::string>IC746PRO_SSBwidths;
+static const char *vIC746PRO_SSBwidths[] =
+{
   "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
 "600",   "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
 "2600", "2700", "2800", "2900", "3000", "3100", "3200", "3300", "3400", "3500",
-"3600",
-NULL};
+"3600"};
 static int IC746PRO_bw_vals_SSB[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
@@ -742,24 +756,36 @@ static int IC746PRO_bw_vals_SSB[] = {
 31,32,33,34,35,36,37,38,39,40,
 41, WVALS_LIMIT};
 
-const char *IC746PRO_RTTYwidths[] = {
+static std::vector<std::string>IC746PRO_RTTYwidths;
+static const char *vIC746PRO_RTTYwidths[] =
+{
   "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
  "600",  "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
-"2600", "2700",
-NULL};
+"2600", "2700"};
 static int IC746PRO_bw_vals_RTTY[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
 21,22,23,24,25,26,27,28,29,30,
 31,32, WVALS_LIMIT};
 
-const char *IC746PRO_AMFMwidths[] = { "FILT-1", "FILT-2", "FILT-3", NULL };
+static std::vector<std::string>IC746PRO_AMFMwidths;
+static const char *vIC746PRO_AMFMwidths[] =
+{ "FILT-1", "FILT-2", "FILT-3" };
 static int IC746PRO_bw_vals_AMFM[] = {
 1,2,3,WVALS_LIMIT};
 
 void RIG_IC746PRO::initialize()
 {
+	VECTOR (IC746PROmodes_, vIC746PROmodes_);
+	VECTOR (IC746PRO_SSBwidths, vIC746PRO_SSBwidths);
+	VECTOR (IC746PRO_RTTYwidths, vIC746PRO_RTTYwidths);
+	VECTOR (IC746PRO_AMFMwidths, vIC746PRO_AMFMwidths);
+
+	modes_ = IC746PROmodes_;
+	bandwidths_ = IC746PRO_SSBwidths;
+	bw_vals_ = IC746PRO_bw_vals_SSB;
+
 	IC746_widgetsdgets[0].W = btnVol;
 	IC746_widgetsdgets[1].W = sldrVOLUME;
 	IC746_widgetsdgets[2].W = btnAGC;
@@ -999,7 +1025,7 @@ int RIG_IC746PRO::def_bandwidth(int m)
 	return (0);
 }
 
-const char **RIG_IC746PRO::bwtable(int m)
+std::vector<std::string>& RIG_IC746PRO::bwtable(int m)
 {
 	if (m == 0 || m == 1 || m == 8 || m == 9) //SSB
 		return IC746PRO_SSBwidths;

@@ -23,8 +23,9 @@
 
 static const char TS440name_[] = "TS-440";
 
-static const char *TS440modes_[] = {
-		"LSB", "USB", "CW", "FM", "AM", "FSK", NULL};
+static std::vector<std::string>TS440modes_;
+static const char *vTS440modes_[] =
+{ "LSB", "USB", "CW", "FM", "AM", "FSK"};
 static const char TS440_mode_chr[] =  { '1', '2', '3', '4', '5', '6' };
 static const char TS440_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L' };
 
@@ -64,6 +65,11 @@ RIG_TS440::RIG_TS440() {
 
 void RIG_TS440::initialize()
 {
+	VECTOR (TS440modes_, vTS440modes_);
+
+	modes_ = TS440modes_;
+	_mode_type = TS440_mode_type;
+
 	cmd = "AI0;"; // disable auto status
 	sett("");
 	sendCommand(cmd);

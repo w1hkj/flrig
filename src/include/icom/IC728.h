@@ -28,6 +28,8 @@ public:
 	RIG_IC728();
 	~RIG_IC728(){}
 
+	void initialize();
+
 	bool check();
 
 	unsigned long long get_vfoA();

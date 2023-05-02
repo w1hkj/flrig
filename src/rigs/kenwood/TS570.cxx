@@ -23,32 +23,39 @@
 
 static const char TS570name_[] = "TS-570";
 
-static const char *TS570modes_[] = {
-		"LSB", "USB", "CW", "FM", "AM", "FSK", "CW-R", "FSK-R", NULL};
+static std::vector<std::string>TS570modes_;
+static const char *vTS570modes_[] = {
+		"LSB", "USB", "CW", "FM", "AM", "FSK", "CW-R", "FSK-R"};
 static const char TS570_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '9' };
 static const char TS570_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'U' };
 
-static const char *TS570_SSBwidths[] = { // same for AM and FM
-"NARR", "WIDE", NULL};
+static std::vector<std::string>TS570_SSBwidths;
+static const char *vTS570_SSBwidths[] = { // same for AM and FM
+"NARR", "WIDE"};
 static int TS570_SSB_bw_vals[] = { 1,2, WVALS_LIMIT};
 
-static const char *TS570_SSBbw[] = {
-"FW0000;", "FW0001;", NULL};
+static std::vector<std::string>TS570_SSBbw;
+static const char *vTS570_SSBbw[] = {
+"FW0000;", "FW0001;"};
 
-static const char *TS570_CWwidths[] = {
-"50", "100", "200", "300", "400", "600", "1000", "2000", NULL};
+static std::vector<std::string>TS570_CWwidths;
+static const char *vTS570_CWwidths[] = {
+"50", "100", "200", "300", "400", "600", "1000", "2000"};
 static int TS570_CW_bw_vals[] = { 1,2,3,4,5,6,7,8, WVALS_LIMIT};
 
-static const char *TS570_CWbw[] = {
+static std::vector<std::string>TS570_CWbw;
+static const char *vTS570_CWbw[] = {
 "FW0050;", "FW0100;", "FW0200;", "FW0300;",
-"FW0400;", "FW0600;", "FW1000;", "FW2000;", NULL};
+"FW0400;", "FW0600;", "FW1000;", "FW2000;"};
 
-static const char *TS570_FSKwidths[] = {
-"250", "500", "1000", "1500", NULL};
+static std::vector<std::string>TS570_FSKwidths;
+static const char *vTS570_FSKwidths[] = {
+"250", "500", "1000", "1500"};
 static int TS570_FSK_bw_vals[] = { 1,2,3,4, WVALS_LIMIT};
 
-static const char *TS570_FSKbw[] = {
-  "FW0250;", "FW0500;", "FW1000;", "FW1500;", NULL};
+static std::vector<std::string>TS570_FSKbw;
+static const char *vTS570_FSKbw[] = {
+  "FW0250;", "FW0500;", "FW1000;", "FW1500;"};
 
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol, 2, 125,  50 },
@@ -64,6 +71,18 @@ static GUI rig_widgets[]= {
 
 void RIG_TS570::initialize()
 {
+	VECTOR (TS570modes_, vTS570modes_);
+	VECTOR (TS570_SSBwidths, vTS570_SSBwidths);
+	VECTOR (TS570_SSBbw, vTS570_SSBbw);
+	VECTOR (TS570_CWwidths, vTS570_CWwidths);
+	VECTOR (TS570_CWbw, vTS570_CWbw);
+	VECTOR (TS570_FSKwidths, vTS570_FSKwidths);
+	VECTOR (TS570_FSKbw, vTS570_FSKbw);
+
+	modes_ = TS570modes_;
+	bandwidths_ = TS570_SSBwidths;
+	bw_vals_ = TS570_SSB_bw_vals;
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = sldrRFGAIN;
@@ -526,7 +545,7 @@ void RIG_TS570::set_widths()
 	}
 }
 
-const char **RIG_TS570::bwtable(int m)
+std::vector<std::string>& RIG_TS570::bwtable(int m)
 {
 	switch (m) {
 		case 0:
@@ -681,8 +700,6 @@ void RIG_TS570::set_bwA(int val)
 
 int RIG_TS570::get_bwA()
 {
-	int i;
-
 	cmd = "FW;";
 
 	get_trace(1, "get_bwA()");
@@ -700,24 +717,21 @@ int RIG_TS570::get_bwA()
 	case 1:
 	case 3:
 	case 4:
-		for (i = 0; TS570_SSBbw[i] != NULL; i++)
-			if (test == TS570_SSBbw[i])  break;
-		if (TS570_SSBbw[i] != NULL) A.iBW = i;
-		else A.iBW = 1;
+		for (size_t bw = 0; bw < TS570_SSBbw.size(); bw++)
+			if (test == TS570_SSBbw[bw]) 
+				return A.iBW = bw;
 		break;
 	case 2:
 	case 6:
-		for (i = 0; TS570_CWbw[i] != NULL; i++)
-			if (test == TS570_CWbw[i])  break;
-		if (TS570_CWbw[i] != NULL) A.iBW = i;
-		else A.iBW = 1;
+		for (size_t bw = 0; bw < TS570_CWbw.size(); bw++)
+			if (test == TS570_CWbw[bw]) 
+				return A.iBW = bw;
 		break;
 	case 5:
 	case 7:
-		for (i = 0; TS570_FSKbw[i] != NULL; i++)
-			if (test == TS570_FSKbw[i])  break;
-		if (TS570_FSKbw[i] != NULL) A.iBW = i;
-		else A.iBW = 1;
+		for (size_t bw = 0; bw < TS570_FSKbw.size(); bw++)
+			if (test == TS570_FSKbw[bw]) 
+				return A.iBW = bw;
 		break;
 	default:
 	break;
@@ -756,8 +770,6 @@ void RIG_TS570::set_bwB(int val)
 
 int RIG_TS570::get_bwB()
 {
-	int i;
-
 	cmd = "FW;";
 
 	get_trace(1, "get_bwB()");
@@ -775,24 +787,21 @@ int RIG_TS570::get_bwB()
 	case 1:
 	case 3:
 	case 4:
-		for (i = 0; TS570_SSBbw[i] != NULL; i++)
-			if (test == TS570_SSBbw[i])  break;
-		if (TS570_SSBbw[i] != NULL) B.iBW = i;
-		else B.iBW = 1;
+		for (size_t bw = 0; bw < TS570_SSBbw.size(); bw++)
+			if (test == TS570_SSBbw[bw]) 
+				return B.iBW = bw;
 		break;
 	case 2:
 	case 6:
-		for (i = 0; TS570_CWbw[i] != NULL; i++)
-			if (test == TS570_CWbw[i])  break;
-		if (TS570_CWbw[i] != NULL) B.iBW = i;
-		else B.iBW = 1;
+		for (size_t bw = 0; bw < TS570_CWbw.size(); bw++)
+			if (test == TS570_CWbw[bw]) 
+				return B.iBW = bw;
 		break;
 	case 5:
 	case 7:
-		for (i = 0; TS570_FSKbw[i] != NULL; i++)
-			if (test == TS570_FSKbw[i])  break;
-		if (TS570_FSKbw[i] != NULL) B.iBW = i;
-		else B.iBW = 1;
+		for (size_t bw = 0; bw < TS570_FSKbw.size(); bw++)
+			if (test == TS570_FSKbw[bw]) 
+				return B.iBW = bw;
 		break;
 	default:
 	break;

@@ -24,9 +24,15 @@
 // IC-728
 //
 const char IC728name_[] = "IC-728";
-const char *IC728modes_[] = { "LSB", "USB", "AM", "CW", "RTTY", "FM", NULL};
+
+static std::vector<std::string>IC728modes_;
+static const char *vIC728modes_[] =
+{ "LSB", "USB", "AM", "CW", "RTTY", "FM"};
 const char IC728_mode_type[] = { 'L', 'U', 'U', 'L', 'L', 'U' };
-const char *IC728_widths[] = { "NARR", "WIDE", NULL};
+
+static std::vector<std::string>IC728_widths;
+static const char *vIC728_widths[] =
+{ "NARR", "WIDE"};
 static int IC728_bw_vals[] = {1,2, WVALS_LIMIT};
 
 RIG_IC728::RIG_IC728() {
@@ -60,6 +66,16 @@ RIG_IC728::RIG_IC728() {
 };
 
 //=============================================================================
+void RIG_IC728::initialize()
+{
+	VECTOR (IC728modes_, vIC728modes_);
+	VECTOR (IC728_widths, vIC728_widths);
+
+	modes_ = IC728modes_;
+	_mode_type = IC728_mode_type;
+	bandwidths_ = IC728_widths;
+	bw_vals_ = IC728_bw_vals;
+}
 
 bool RIG_IC728::check ()
 {

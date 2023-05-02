@@ -39,7 +39,7 @@
 #include "ui.h"
 #include "debug.h"
 
-std::string xcvr_name = "NONE";
+std::string xcvr_name = rig_null.name_;
 
 int current_ui_size = -1;
 

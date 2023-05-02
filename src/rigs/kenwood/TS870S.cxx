@@ -36,11 +36,13 @@
 static const char TS870Sname_[] = "TS-870S";
 
 //	   mode array Index Values :-         0      1      2     3     4     5      6       7
-static const char *TS870Smodes_[] = {   "LSB", "USB", "CW", "FM", "AM", "FSK", "CW-R", "FSK-R", NULL};
+static std::vector<std::string>TS870Smodes_;
+static const char *vTS870Smodes_[] = {   "LSB", "USB", "CW", "FM", "AM", "FSK", "CW-R", "FSK-R"};
 static const char TS870S_mode_type[] = { 'L',   'U',   'U',  'U',  'U',  'L',   'L',    'U' };
 
 //----------------------------------------------------------------------
-static const char *TS870S_empty[] = { "N/A", NULL };
+static std::vector<std::string>TS870S_empty;
+static const char *vTS870S_empty[] = { "N/A" };
 
 //----------------------------------------------------------------------
 // FWnnnn; command structure
@@ -63,45 +65,53 @@ static const char *TS870S_empty[] = { "N/A", NULL };
 
 static int DEF_CW_BW = 4;
 
-static const char *TS870S_CWwidths[] = { // Available CW bandwidths
-"50", "100", "200", "400", "600", "1000", NULL};
+static std::vector<std::string>TS870S_CWwidths;
+static const char *vTS870S_CWwidths[] = { // Available CW bandwidths
+"50", "100", "200", "400", "600", "1000"};
 
-static const char *TS870S_CWbw[] = { // Corresponding commands.
-"FW0005;", "FW0010;", "FW0020;", "FW0040;", "FW0060;", "FW0100;", NULL};
+static std::vector<std::string>TS870S_CWbw;
+static const char *vTS870S_CWbw[] = { // Corresponding commands.
+"FW0005;", "FW0010;", "FW0020;", "FW0040;", "FW0060;", "FW0100;"};
 
 //----------------------------------------------------------------------
 // FSK: 25, 50, 100, 150 (bandwidth)
 static int DEF_FSK_BW = 2;
 
-static const char *TS870S_FSKwidths[] = { // Available FSK bandwidths
-"250", "500", "1000", "1500", NULL};
+static std::vector<std::string>TS870S_FSKwidths;
+static const char *vTS870S_FSKwidths[] = { // Available FSK bandwidths
+"250", "500", "1000", "1500"};
 
-static const char *TS870S_FSKbw[] = { // Corresponding commands.
-"FW0025;", "FW0050;", "FW0100;", "FW0150;", NULL };
+static std::vector<std::string>TS870S_FSKbw;
+static const char *vTS870S_FSKbw[] = { // Corresponding commands.
+"FW0025;", "FW0050;", "FW0100;", "FW0150;" };
 
 //----------------------------------------------------------------------
 // SSB: 0, 5, 10, 20, 30, 40, 50, 60, 80, 100  (high pass freq)
 
 static int DEF_SL_SH = 0x8704;
 
-static const char *TS870S_SSB_SL[] = { 			// MD1; and MD2;
+static std::vector<std::string>TS870S_SSB_SL;
+static const char *vTS870S_SSB_SL[] = { 			// MD1; and MD2;
   "0",   "50", "100", "200", "300", 			// Available settings (Hz)
-"400",  "500", "600", "800", "1000", NULL };
+"400",  "500", "600", "800", "1000" };
 
-static const char *TS870S_CAT_ssb_SL[] = {		// Corresponding commands.
+static std::vector<std::string>TS870S_CAT_ssb_SL;
+static const char *vTS870S_CAT_ssb_SL[] = {		// Corresponding commands.
 "FW0000;", "FW0005;", "FW0010;", "FW0020;", "FW0030;",
-"FW0040;", "FW0050;", "FW0060;", "FW0080;", "FW0100;", NULL };
+"FW0040;", "FW0050;", "FW0060;", "FW0080;", "FW0100;" };
 
 static const char *TS870S_SSB_SL_tooltip = "lo cut";
 static const char *TS870S_SSB_btn_SL_label = "L";
 
-static const char *TS870S_SSB_SH[] = { 			// MD1; and MD2;
+static std::vector<std::string>TS870S_SSB_SH;
+static const char *vTS870S_SSB_SH[] = { 			// MD1; and MD2;
 "1400", "1600", "1800", "2000", "2200", "2400", // Available settings (Hz)
-"2600", "2800", "3000", "3400", "4600", "6000", NULL };
+"2600", "2800", "3000", "3400", "4600", "6000" };
 
-static const char *TS870S_CAT_ssb_SH[] = {		// Corresponding commands.
+static std::vector<std::string>TS870S_CAT_ssb_SH;
+static const char *vTS870S_CAT_ssb_SH[] = {		// Corresponding commands.
 "IS 1400;", "IS 1600;", "IS 1800;", "IS 2000;", "IS 2200;", "IS 2400;",
-"IS 2600;", "IS 2800;", "IS 3000;", "IS 3400;", "IS 4600;", "IS 6000;", NULL };
+"IS 2600;", "IS 2800;", "IS 3000;", "IS 3400;", "IS 4600;", "IS 6000;" };
 
 static const char *TS870S_SSB_SH_tooltip = "hi cut";
 static const char *TS870S_SSB_btn_SH_label = "H";
@@ -109,31 +119,37 @@ static const char *TS870S_SSB_btn_SH_label = "H";
 //----------------------------------------------------------------------
 static int DEF_AM_SL_SH = 0x8401;
 
-static const char *TS870S_AM_SL[] = { // Available values...
-"0", "100", "200", "500", NULL };
+static std::vector<std::string>TS870S_AM_SL;
+static const char *vTS870S_AM_SL[] = { // Available values...
+"0", "100", "200", "500" };
 
-static const char *TS870S_CAT_am_SL[] = { // ... Corresponding commands.
-"FW0000;", "FW0010;", "FW0020;", "FW0050;", NULL};
+static std::vector<std::string>TS870S_CAT_am_SL;
+static const char *vTS870S_CAT_am_SL[] = { // ... Corresponding commands.
+"FW0000;", "FW0010;", "FW0020;", "FW0050;"};
 
 static const char *TS870S_AM_SL_tooltip = "lo cut";
 static const char *TS870S_AM_btn_SL_label = "L";
 
-static const char *TS870S_AM_SH[] = {
-"2500", "3000", "4000", "5000", "6000", "7000", NULL };
+static std::vector<std::string>TS870S_AM_SH;
+static const char *vTS870S_AM_SH[] = {
+"2500", "3000", "4000", "5000", "6000", "7000" };
 
-static const char *TS870S_CAT_am_SH[] = {
-"IS 2500;", "IS 3000;", "IS 4000;", "IS 5000;", "IS 6000;", "IS 7000;", NULL};
+static std::vector<std::string>TS870S_CAT_am_SH;
+static const char *vTS870S_CAT_am_SH[] = {
+"IS 2500;", "IS 3000;", "IS 4000;", "IS 5000;", "IS 6000;", "IS 7000;"};
 
 static const char *TS870S_AM_SH_tooltip = "hi cut";
 static const char *TS870S_AM_btn_SH_label = "H";
 
 //----------------------------------------------------------------------
 static int DEF_FM_BW = 4;
-static const char *TS870S_FMwidths[] = { // Available FM bandwidths
-"5000", "6000", "8000", "10000", "12000", "14000", NULL};
+static std::vector<std::string>TS870S_FMwidths;
+static const char *vTS870S_FMwidths[] = { // Available FM bandwidths
+"5000", "6000", "8000", "10000", "12000", "14000"};
 
-static const char *TS870S_FMbw[] = { // Corresponding commands.
-"FW0500;", "FW0600;", "FW0800;", "FW1000;", "FW1200;", "FW1400;", NULL };
+static std::vector<std::string>TS870S_FMbw;
+static const char *vTS870S_FMbw[] = { // Corresponding commands.
+"FW0500;", "FW0600;", "FW0800;", "FW1000;", "FW1200;", "FW1400;" };
 
 //----------------------------------------------------------------------
 //----------------------------------------------------------------------
@@ -151,6 +167,29 @@ static GUI rig_widgets[]= {
 //----------------------------------------------------------------------
 void RIG_TS870S::initialize()
 {
+	VECTOR (TS870Smodes_, vTS870Smodes_);
+	VECTOR (TS870S_empty, vTS870S_empty);
+	VECTOR (TS870S_CWwidths, vTS870S_CWwidths);
+	VECTOR (TS870S_CWbw, vTS870S_CWbw);
+	VECTOR (TS870S_FSKwidths, vTS870S_FSKwidths);
+	VECTOR (TS870S_FSKbw, vTS870S_FSKbw);
+	VECTOR (TS870S_SSB_SL, vTS870S_SSB_SL);
+	VECTOR (TS870S_CAT_ssb_SL, vTS870S_CAT_ssb_SL);
+	VECTOR (TS870S_SSB_SH, vTS870S_SSB_SH);
+	VECTOR (TS870S_CAT_ssb_SH, vTS870S_CAT_ssb_SH);
+	VECTOR (TS870S_AM_SL, vTS870S_AM_SL);
+	VECTOR (TS870S_CAT_am_SL, vTS870S_CAT_am_SL);
+	VECTOR (TS870S_AM_SH, vTS870S_AM_SH);
+	VECTOR (TS870S_CAT_am_SH, vTS870S_CAT_am_SH);
+	VECTOR (TS870S_FMwidths, vTS870S_FMwidths);
+	VECTOR (TS870S_FMbw, vTS870S_FMbw);
+
+	modes_ = TS870Smodes_;
+	bandwidths_ = TS870S_SSB_SH;
+
+	dsp_SL     = TS870S_SSB_SL;
+	dsp_SH     = TS870S_SSB_SH;
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = btnIFsh;
@@ -273,16 +312,16 @@ const char * RIG_TS870S::get_bwname_(int n, int md)
 		int hi = (n >> 8) & 0x7F; // hi byte (not MSB)
 		int lo = n & 0xFF;        // lo byte
 		snprintf(bwname, sizeof(bwname), "%s/%s",
-			(md == 0 || md == 1) ? TS870S_SSB_SL[lo] :	// SSB lo
-			(md == 4) ? TS870S_AM_SL[lo] : "N/A",		//  AM lo
-			(md == 0 || md == 1) ? TS870S_SSB_SH[hi] :	// SSB hi
-			(md == 4) ? TS870S_AM_SH[hi] : "N/A" );		//  AM hi
+			(md == 0 || md == 1) ? TS870S_SSB_SL[lo].c_str() :	// SSB lo
+			(md == 4) ? TS870S_AM_SL[lo].c_str() : "N/A",		//  AM lo
+			(md == 0 || md == 1) ? TS870S_SSB_SH[hi].c_str() :	// SSB hi
+			(md == 4) ? TS870S_AM_SH[hi].c_str() : "N/A" );		//  AM hi
 
 	} else { // plain vanilla single bandwidth mode.
 		snprintf(bwname, sizeof(bwname), "%s",
-			(md == 2 || md == 6) ? TS870S_CWwidths[n] :	//  CW or CW-R
-		    (md == 5 || md == 7) ? TS870S_FSKwidths[n]:	// FSK or FSK-R
-			(md == 3 ) ? TS870S_FMwidths[n] : "N/A" );  //  FM
+			(md == 2 || md == 6) ? TS870S_CWwidths[n].c_str() :	//  CW or CW-R
+		    (md == 5 || md == 7) ? TS870S_FSKwidths[n].c_str():	// FSK or FSK-R
+			(md == 3 ) ? TS870S_FMwidths[n].c_str() : "N/A" );  //  FM
 	}
 	return bwname;
 }
@@ -809,7 +848,7 @@ int RIG_TS870S::set_widths(int val) // val is from the mode list index, as selec
 }
 
 //----------------------------------------------------------------------
-const char **RIG_TS870S::bwtable(int m)
+std::vector<std::string>& RIG_TS870S::bwtable(int m)
 {
 	if (m == tsLSB || m == tsUSB || m == tsAM)
 // these modes have lo and hi settings. BUT MUST RETURN A VALID pointer
@@ -829,7 +868,7 @@ const char **RIG_TS870S::bwtable(int m)
 		return TS870S_SSB_SH;
 }
 
-const char **RIG_TS870S::lotable(int m)
+std::vector<std::string>& RIG_TS870S::lotable(int m)
 {
 	if (m == tsLSB || m == tsUSB)
 		return TS870S_SSB_SL;  // these modes have lo and hi settings.
@@ -837,10 +876,10 @@ const char **RIG_TS870S::lotable(int m)
 	if (m == tsAM)
 		return TS870S_AM_SL;
 
-	return NULL;//TS870S_empty;
+	return vNOBWS;//TS870S_empty;
 }
 
-const char **RIG_TS870S::hitable(int m)
+std::vector<std::string>& RIG_TS870S::hitable(int m)
 {
 	if (m == tsLSB || m == tsUSB)
 		return TS870S_SSB_SH;  // these modes have lo and hi settings.
@@ -848,7 +887,7 @@ const char **RIG_TS870S::hitable(int m)
 	if (m == tsAM)
 		return TS870S_AM_SH;
 
-	return NULL;
+	return TS870S_SSB_SH;
 }
 
 //----------------------------------------------------------------------
@@ -1046,7 +1085,7 @@ void RIG_TS870S::set_bwB(int val)
 //----------------------------------------------------------------------
 int RIG_TS870S::get_bwA() {
 
-	int i = 0;
+	size_t i = 0;
 	int ret;
 	size_t p;
 
@@ -1064,7 +1103,7 @@ int RIG_TS870S::get_bwA() {
 			if (p == std::string::npos)
 				return A.iBW;
 
-			for (i = 0; TS870S_FMbw[i] != NULL; i++)
+			for (i = 0; i < TS870S_FMbw.size(); i++)
 				if (replystr.find(TS870S_FMbw[i]) == p) {
 					A.iBW = i;
 					break; 	// Found returned data, in std::string array.
@@ -1085,7 +1124,7 @@ int RIG_TS870S::get_bwA() {
 			p = replystr.rfind("FW");
 			if (p == std::string::npos)
 				return A.iBW;
-			for (i = 0; TS870S_CWbw[i] != NULL; i++)
+			for (i = 0; i < TS870S_CWbw.size(); i++)
 				if (replystr.find(TS870S_CWbw[i]) == p) {
 					A.iBW = i;
 					break; 	// Found returned data, in std::string array.
@@ -1107,7 +1146,7 @@ int RIG_TS870S::get_bwA() {
 			if (p == std::string::npos)
 				return A.iBW;
 
-			for (i = 0; TS870S_FSKbw[i] != NULL; i++)
+			for (i = 0; i < TS870S_FSKbw.size(); i++)
 				if (replystr.find(TS870S_FSKbw[i]) == p) {
 					A.iBW = i;
 					break; 	// Found returned data, in std::string array.
@@ -1131,7 +1170,7 @@ int RIG_TS870S::get_bwA() {
 			if (p == std::string::npos)
 				return A.iBW;
 
-			for (i = 0; TS870S_CAT_am_SL[i] != NULL; i++)
+			for (i = 0; i < TS870S_CAT_am_SL.size(); i++)
 				if (replystr.find(TS870S_CAT_am_SL[i]) == p) {
 					lo = i;
 					break; 	// Found returned data, in std::string array.
@@ -1148,7 +1187,7 @@ int RIG_TS870S::get_bwA() {
 			if (p == std::string::npos)
 				return A.iBW;
 
-			for (i = 0; TS870S_CAT_am_SH[i] != NULL; i++)
+			for (i = 0; i < TS870S_CAT_am_SH.size(); i++)
 				if (replystr.find(TS870S_CAT_am_SH[i]) == p) {
 					hi = i;
 					break; 	// Found returned data, in std::string array.
@@ -1174,7 +1213,7 @@ int RIG_TS870S::get_bwA() {
 			if (p == std::string::npos)
 				return A.iBW;
 
-			for (i = 0; TS870S_CAT_ssb_SL[i] != NULL; i++)
+			for (i = 0; i < TS870S_CAT_ssb_SL.size(); i++)
 				if (replystr.find(TS870S_CAT_ssb_SL[i]) == p) {
 					lo = i;
 					break; 	// Found returned data, in std::string array.
@@ -1192,7 +1231,7 @@ int RIG_TS870S::get_bwA() {
 			if (p == std::string::npos)
 				return A.iBW;
 
-			for (i = 0; TS870S_CAT_ssb_SH[i] != NULL; i++)
+			for (i = 0; i < TS870S_CAT_ssb_SH.size(); i++)
 				if (replystr.find(TS870S_CAT_ssb_SH[i]) == p) {
 					hi = i;
 					break; 	// Found returned data, in std::string array.
@@ -1209,7 +1248,7 @@ int RIG_TS870S::get_bwA() {
 //----------------------------------------------------------------------
 int RIG_TS870S::get_bwB() {
 
-	int i = 0;
+	size_t i = 0;
 	int ret;
 	size_t p;
 
@@ -1227,7 +1266,7 @@ int RIG_TS870S::get_bwB() {
 			if (p == std::string::npos)
 				return B.iBW;
 
-			for (i = 0; TS870S_FMbw[i] != NULL; i++)
+			for (i = 0; i < TS870S_FMbw.size(); i++)
 				if (replystr.find(TS870S_FMbw[i]) == p) {
 					B.iBW = i;
 					break; 	// Found returned data, in std::string array.
@@ -1248,7 +1287,7 @@ int RIG_TS870S::get_bwB() {
 			p = replystr.rfind("FW");
 			if (p == std::string::npos)
 				return B.iBW;
-			for (i = 0; TS870S_CWbw[i] != NULL; i++)
+			for (i = 0; i < TS870S_CWbw.size(); i++)
 				if (replystr.find(TS870S_CWbw[i]) == p) {
 					B.iBW = i;
 					break; 	// Found returned data, in std::string array.
@@ -1270,7 +1309,7 @@ int RIG_TS870S::get_bwB() {
 			if (p == std::string::npos)
 				return B.iBW;
 
-			for (i = 0; TS870S_FSKbw[i] != NULL; i++)
+			for (i = 0; i < TS870S_FSKbw.size(); i++)
 				if (replystr.find(TS870S_FSKbw[i]) == p) {
 					B.iBW = i;
 					break; 	// Found returned data, in std::string array.
@@ -1294,7 +1333,7 @@ int RIG_TS870S::get_bwB() {
 			if (p == std::string::npos)
 				return B.iBW;
 
-			for (i = 0; TS870S_CAT_am_SL[i] != NULL; i++)
+			for (i = 0; i < TS870S_CAT_am_SL.size(); i++)
 				if (replystr.find(TS870S_CAT_am_SL[i]) == p) {
 					lo = i;
 					break; 	// Found returned data, in std::string array.
@@ -1311,7 +1350,7 @@ int RIG_TS870S::get_bwB() {
 			if (p == std::string::npos)
 				return B.iBW;
 
-			for (i = 0; TS870S_CAT_am_SH[i] != NULL; i++)
+			for (i = 0; i < TS870S_CAT_am_SH.size(); i++)
 				if (replystr.find(TS870S_CAT_am_SH[i]) == p) {
 					hi = i;
 					break; 	// Found returned data, in std::string array.
@@ -1337,7 +1376,7 @@ int RIG_TS870S::get_bwB() {
 			if (p == std::string::npos)
 				return B.iBW;
 
-			for (i = 0; TS870S_CAT_ssb_SL[i] != NULL; i++)
+			for (i = 0; i < TS870S_CAT_ssb_SL.size(); i++)
 				if (replystr.find(TS870S_CAT_ssb_SL[i]) == p) {
 					lo = i;
 					break; 	// Found returned data, in std::string array.
@@ -1355,7 +1394,7 @@ int RIG_TS870S::get_bwB() {
 			if (p == std::string::npos)
 				return B.iBW;
 
-			for (i = 0; TS870S_CAT_ssb_SH[i] != NULL; i++)
+			for (i = 0; i < TS870S_CAT_ssb_SH.size(); i++)
 				if (replystr.find(TS870S_CAT_ssb_SH[i]) == p) {
 					hi = i;
 					break; 	// Found returned data, in std::string array.

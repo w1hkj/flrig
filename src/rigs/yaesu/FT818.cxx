@@ -29,8 +29,9 @@
 //=============================================================================
 
 static const char FT818NDname_[] = "FT-818ND";
-static const char *FT818NDmodes_[] = {
-		"LSB", "USB", "CW", "CW-R", "AM", "FM", "DIG", "PKT", NULL};
+static std::vector<std::string>FT818NDmodes_;
+static const char *vFT818NDmodes_[] = {
+		"LSB", "USB", "CW", "CW-R", "AM", "FM", "DIG", "PKT"};
 static const int FT818ND_mode_val[] =  { 0, 1, 2, 3, 4, 8, 0x0A, 0x0C };
 static const char FT818ND_mode_type[] = { 'L', 'U', 'U', 'L', 'U', 'U', 'U', 'U' };
 
@@ -67,6 +68,12 @@ RIG_FT818ND::RIG_FT818ND() {
 	ndigits = 8;
 
 	inuse = onNIL;
+}
+
+void RIG_FT818ND::initialize()
+{
+	VECTOR (FT818NDmodes_, vFT818NDmodes_);
+	modes_ = FT818NDmodes_;
 }
 
 static void settle(int n)
@@ -135,7 +142,7 @@ unsigned long long RIG_FT818ND::get_vfoA ()
 			break;
 		}
 	static char msg[50];
-	snprintf(msg, sizeof(msg), "get vfoA: %llu, %s", freqA, FT818NDmodes_[i]);
+	snprintf(msg, sizeof(msg), "get vfoA: %llu, %s", freqA, FT818NDmodes_[i].c_str());
 	gett(msg);
 
 	return freqA;
@@ -211,7 +218,7 @@ unsigned long long RIG_FT818ND::get_vfoB ()
 			break;
 		}
 	static char msg[50];
-	snprintf(msg, sizeof(msg), "get vfoB: %llu, %s", freqB, FT818NDmodes_[i]);
+	snprintf(msg, sizeof(msg), "get vfoB: %llu, %s", freqB, FT818NDmodes_[i].c_str());
 	gett(msg);
 
 	return freqB;

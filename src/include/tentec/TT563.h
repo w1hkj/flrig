@@ -28,6 +28,7 @@ public:
 	RIG_TT563();
 	~RIG_TT563(){}
 
+	void initialize();
 	bool check();
 
 	void selectA();

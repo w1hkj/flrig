@@ -23,13 +23,16 @@
 #include "support.h"
 
 const char IC910Hname_[] = "IC-910H";
-const char *IC910Hmodes_[] = {
-		"LSB", "USB", "AM", "CW", "FM", NULL};
+static std::vector<std::string>IC910Hmodes_;
+static const char *vIC910Hmodes_[] =
+{ "LSB", "USB", "AM", "CW", "FM"};
 // mode values are 0, 1, 2, 3, 4, 5, 7, 8
 const char IC910H_mode_type[] =
 	{ 'L', 'U', 'U', 'U', 'L', 'U'};
 
-const char *IC910H_widths[] = {"none", NULL};
+static std::vector<std::string>IC910H_widths;
+static const char *vIC910H_widths[] =
+{"none"};
 static int IC910H_bw_val[] = {1, WVALS_LIMIT};
 
 static GUI IC910_widgets[]= {
@@ -51,6 +54,14 @@ static GUI IC910_widgets[]= {
 
 void RIG_IC910H::initialize()
 {
+	VECTOR (IC910Hmodes_, vIC910Hmodes_);
+	VECTOR (IC910H_widths, vIC910H_widths);
+
+	modes_ = IC910Hmodes_;
+	_mode_type = IC910H_mode_type;
+	bandwidths_ = IC910H_widths;
+	bw_vals_ = IC910H_bw_val;
+
 	IC910_widgets[0].W = btnVol;
 	IC910_widgets[1].W = sldrVOLUME;
 	IC910_widgets[2].W = btnAGC;

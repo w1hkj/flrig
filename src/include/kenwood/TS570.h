@@ -64,7 +64,7 @@ public:
 	int  def_bandwidth(int val);
 	void set_widths();
 
-	const char **bwtable(int);
+	std::vector<std::string>& bwtable(int);
 
 	int  get_smeter();
 	int  get_swr();

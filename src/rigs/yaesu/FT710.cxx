@@ -32,7 +32,7 @@ enum mFT710 {
    mLSB, mUSB, mCW_U, mFM, mAM, mRTTY_L, mCW_L, mDATA_L, mRTTY_U, mDATA_FM, mFM_N, mDATA_U, mAM_N, mPSK, mDATA_FMN };
 //  0,    1,    2,    3,    4,    5,       6,     7,      8,       9,        10,    11,      12,    13,      14		// mode index
 
-static const char FT710name_[] = "FT710";
+static const char FT710name_[] = "FT-710";
 
 #undef  NUM_MODES
 #define NUM_MODES  15
@@ -51,74 +51,87 @@ static int defBW_wide[NUM_MODES] = {
 static int mode_bwA[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 static int mode_bwB[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 
-static const char *FT710modes_[] = {
+static std::vector<std::string>FT710modes_;
+static const char *vmd[] = {
 "LSB", "USB", "CW-U", "FM", "AM", 
 "RTTY-L", "CW-L", "DATA-L", "RTTY-U", "DATA-FM",
-"FM-N", "DATA-U", "AM-N", "PSK", "DATA-FMN", NULL};
+"FM-N", "DATA-U", "AM-N", "PSK", "DATA-FMN"};
 
 static const char FT710_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 static const char FT710_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L', 'U', 'U', 'U', 'U', 'U', 'U', 'U' };
 
-static const char *FT710_widths_SSB[] = {
+static std::vector<std::string>FT710_widths_SSB;
+static const char *vssb[] = {
  "300",  "400",  "600",  "850", "1100", 	// 1 ... 5
 "1200", "1500", "1650", "1800", "1950",		// 6 ... 10
 "2100", "2250", "2400", "2450", "2500",		// 7 ... 15
 "2600", "2700", "2800", "2900", "3000",		// 16 ... 20
-"3200", "3500", "4000", NULL };				// 21 ... 23
+"3200", "3500", "4000" };				// 21 ... 23
 
 static int FT710_wvals_SSB[] = {
 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23, WVALS_LIMIT};
 
-static const char *FT710_widths_CW[] = {
+static std::vector<std::string>FT710_widths_CW;
+static const char *vcww[] = {
   "50",  "100",  "150",  "200",  "250",		// 1 ... 5
  "300",  "350",  "400",  "450",  "500",		// 6 ... 10
  "600",  "800", "1200", "1400", "1700",		// 11 ... 15
 "2000", "2400", "3000", "3200", "3500",		// 16 .. 20
-"4000", NULL };								// 21
+"4000" };								// 21
 
 static int FT710_wvals_CW[] = {
 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18, 19, 20, 21, WVALS_LIMIT };
 
-static const char *FT710_widths_RTTY[] = {
+static std::vector<std::string>FT710_widths_RTTY;
+static const char *vrtty[] = {
   "50",  "100",  "150",  "200",  "250",		// 1 ... 5
  "300",  "350",  "400",  "450",  "500",		// 6 ... 10
  "600",  "800", "1200", "1400", "1700",		// 11 ... 15
 "2000", "2400", "3000", "3200", "3500",		// 16 .. 20
-"4000", NULL };								// 21
+"4000" };								// 21
 
 static int FT710_wvals_RTTY[] = {
 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18, 19, 20, 21, WVALS_LIMIT };
 
-static const char *FT710_widths_DATA[] = {
+static std::vector<std::string>FT710_widths_DATA;
+static const char *vdata[] = {
   "50",  "100",  "150",  "200",  "250",		// 1 ... 5
  "300",  "350",  "400",  "450",  "500",		// 6 ... 10
  "600",  "800", "1200", "1400", "1700",		// 11 ... 15
 "2000", "2400", "3000", "3200", "3500",		// 16 .. 20
-"4000", NULL };								// 21
+"4000" };								// 21
 
 static int FT710_wvals_PSK[] = {
 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18, 19, 20, 21, WVALS_LIMIT };
 
 static const int FT710_wvals_AMFM[] = { 0, WVALS_LIMIT };
 
-static const char *FT710_widths_AMwide[] = { "9000", NULL };
-static const char *FT710_widths_AMnar[]  = { "6000", NULL };
-static const char *FT710_widths_FMnar[]  = { "9000", NULL };
-static const char *FT710_widths_FMwide[] = { "16000", NULL };
-static const char *FT710_widths_DATA_FM[]  = { "16000", NULL };
-static const char *FT710_widths_DATA_FMN[] = { "9000", NULL };
+static std::vector<std::string>FT710_widths_AMwide;
+static const char *vamw[] = { "9000" };
+static std::vector<std::string>FT710_widths_AMnar;
+static const char *vamn[] = { "6000" };
+static std::vector<std::string>FT710_widths_FMnar;
+static const char *vfmn[] = { "9000" };
+static std::vector<std::string>FT710_widths_FMwide;
+static const char *vfmw[] = { "16000" };
+static std::vector<std::string>FT710_widths_DATA_FM;
+static const char *vfmd[]  = { "16000" };
+static std::vector<std::string>FT710_widths_DATA_FMN;
+static const char *vfmdn[] = { "9000" };
 
-static const char *FT710_US_60m[] = {NULL, "126", "127", "128", "130", NULL};
 // US has 5 60M presets. Using dummy numbers for all.
-// First NULL means skip 60m sets in get_band_selection().
+// First "" means skip 60m sets in get_band_selection().
 // Maybe someone can do a cat command MC; on all 5 presets and add returned numbers above.
 // To send cat commands in flrig goto menu Config->Xcvr select->Send Cmd.
 //
 // UK has 7 60M presets. Using dummy numbers for all.  If you want support,
 // Maybe someone can do a cat command MC; on all 7 presets and add returned numbers below.
-// static const char *FT710_UK_60m[] = {NULL, "126", "127", "128", "130", "131", "132", NULL};
+// static const char *FT710_UK_60m[] = {"", "126", "127", "128", "130", "131", "132"};
 
-static const char **Channels_60m = FT710_US_60m;
+static std::vector<std::string>FT710_US_60m;
+static const char *v60m[] = {"", "126", "127", "128", "130"};
+
+static std::vector<std::string>& Channels_60m = FT710_US_60m;
 
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
@@ -137,6 +150,25 @@ static GUI rig_widgets[]= {
 
 void RIG_FT710::initialize()
 {
+	name_ = FT710name_;
+
+	VECTOR(FT710modes_, vmd);
+	VECTOR(FT710_widths_SSB, vssb);
+	VECTOR(FT710_widths_CW, vcww);
+	VECTOR(FT710_widths_RTTY, vrtty);
+	VECTOR(FT710_widths_DATA, vdata);
+	VECTOR(FT710_widths_AMwide, vamw);
+	VECTOR(FT710_widths_AMnar, vamn);
+	VECTOR(FT710_widths_FMnar, vfmn);
+	VECTOR(FT710_widths_FMwide, vfmw);
+	VECTOR(FT710_widths_DATA_FM, vfmd);
+	VECTOR(FT710_widths_DATA_FMN, vfmdn);
+	VECTOR(FT710_US_60m, v60m);
+
+	modes_ = FT710modes_;
+	bandwidths_ = FT710_widths_SSB;
+	bw_vals_ = FT710_wvals_SSB;
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = sldrRFGAIN;
@@ -148,7 +180,7 @@ void RIG_FT710::initialize()
 	rig_widgets[8].W = sldrPOWER;
 	rig_widgets[9].W = btnNR;
 	rig_widgets[10].W = sldrNR;
-return;
+
 	cmd = "AI0;";
 	sendCommand(cmd);
 	showresp(WARN, ASC, "Auto Info OFF", cmd, replystr);
@@ -317,10 +349,9 @@ void RIG_FT710::get_band_selection(int v)
 	}
 
 	if (v == 12) {	// 5MHz 60m presets
-		if (Channels_60m[0] == NULL) return;	// no 60m Channels so skip
+		if (Channels_60m[0].empty()) return;	// no 60m Channels so skip
 		if (inc_60m) {
-			if (Channels_60m[++m_60m_indx] == NULL)
-				m_60m_indx = 0;
+			if (++m_60m_indx > (int)Channels_60m.size()) m_60m_indx = 0;
 		}
 		cmd.assign("MC").append(Channels_60m[m_60m_indx]).append(";");
 	} else {		// v == 1..11 band selection OR return to vfo mode == 0
@@ -893,7 +924,7 @@ int RIG_FT710::def_bandwidth(int m)
 	return mode_bwA[m];
 }
 
-const char ** RIG_FT710::bwtable(int n)
+std::vector<std::string>& RIG_FT710::bwtable(int n)
 {
 	switch (n) {
 		case mCW_U: case mCW_L:

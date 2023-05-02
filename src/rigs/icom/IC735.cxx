@@ -24,7 +24,11 @@
 // IC-735
 //
 const char IC735name_[] = "IC-735";
-const char *IC735modes_[] = { "LSB", "USB", "AM", "CW", "RTTY", "FM", NULL};
+
+static std::vector<std::string>IC735modes_;
+static const char *vIC735modes_[] =
+{ "LSB", "USB", "AM", "CW", "RTTY", "FM"};
+
 const char IC735_mode_type[] = { 'L', 'U', 'U', 'L', 'L', 'U' };
 
 RIG_IC735::RIG_IC735() {
@@ -57,6 +61,14 @@ RIG_IC735::RIG_IC735() {
 	ndigits = 7;
 
 };
+
+void RIG_IC735::initialize()
+{
+	VECTOR (IC735modes_, vIC735modes_);
+
+	modes_ = IC735modes_;
+	_mode_type = IC735_mode_type;
+}
 
 //=============================================================================
 void RIG_IC735::selectA()

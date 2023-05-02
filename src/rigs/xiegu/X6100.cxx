@@ -35,21 +35,22 @@ enum {
 	LSB_6100, USB_6100, AM_6100, CW_6100, RTTY_6100,
 	FM_6100, WFM_6100, CWR_6100, RTTYR_6100 };
 
-const char X6100name_[] = "Xiegu X6100";
+const char X6100name_[] = "Xiegu-6100";
 
-const char *X6100modes_[] = {
-		"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R", NULL};
+static std::vector<std::string>X6100modes_;
+static const char *vX6100modes_[] = {
+		"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R"};
 
-const char X6100_mode_type[] =
+static const char X6100_mode_type[] =
 	{ 'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U' };
 
-const char *X6100_SSB_CWwidths[] = {
+static std::vector<std::string>X6100_SSB_CWwidths;
+static const char *vX6100_SSB_CWwidths[] = {
   "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
  "600",  "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
 "2600", "2700", "2800", "2900", "3000", "3100", "3200", "3300", "3400", "3500",
-"3600",
-NULL};
+"3600"};
 static int X6100_bw_vals_SSB[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
@@ -57,25 +58,25 @@ static int X6100_bw_vals_SSB[] = {
 31,32,33,34,35,36,37,38,39,40,
 41, WVALS_LIMIT};
 
-const char *X6100_RTTYwidths[] = {
+static std::vector<std::string>X6100_RTTYwidths;
+static const char *vX6100_RTTYwidths[] = {
   "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
  "600",  "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
-"2600", "2700",
-NULL};
+"2600", "2700"};
 static int X6100_bw_vals_RTTY[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
 21,22,23,24,25,26,27,28,29,30,
 31,32, WVALS_LIMIT};
 
-const char *X6100_AMwidths[] = {
+static std::vector<std::string>X6100_AMwidths;
+static const char *vX6100_AMwidths[] = {
  "200",  "400",  "600",  "800", "1000", "1200", "1400", "1600", "1800", "2000",
 "2200", "2400", "2600", "2800", "3000", "3200", "3400", "3600", "3800", "4000",
 "4200", "4400", "4600", "4800", "5000", "5200", "5400", "5600", "5800", "6000",
 "6200", "6400", "6600", "6800", "7000", "7200", "7400", "7600", "7800", "8000",
-"8200", "8400", "8600", "8800", "9000", "9200", "9400", "9600", "9800", "10000",
-NULL};
+"8200", "8400", "8600", "8800", "9000", "9200", "9400", "9600", "9800", "10000"};
 static int X6100_bw_vals_AM[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
@@ -84,7 +85,8 @@ static int X6100_bw_vals_AM[] = {
 41,42,43,44,45,46,47,48,49,50,
 WVALS_LIMIT};
 
-const char *X6100_FMwidths[] = { "FIXED", NULL };
+static std::vector<std::string>X6100_FMwidths;
+static const char *vX6100_FMwidths[] = { "FIXED" };
 static int X6100_bw_vals_FM[] = {
 1, WVALS_LIMIT};
 
@@ -109,6 +111,16 @@ static GUI X6100_widgets[]= {
 
 void RIG_X6100::initialize()
 {
+	VECTOR (X6100modes_, vX6100modes_);
+	VECTOR (X6100_SSB_CWwidths, vX6100_SSB_CWwidths);
+	VECTOR (X6100_RTTYwidths, vX6100_RTTYwidths);
+	VECTOR (X6100_AMwidths, vX6100_AMwidths);
+	VECTOR (X6100_FMwidths, vX6100_FMwidths);
+
+	modes_ = X6100modes_;
+	bandwidths_ = X6100_SSB_CWwidths;
+	bw_vals_ = X6100_bw_vals_SSB;
+
 	X6100_widgets[0].W = btnVol;
 	X6100_widgets[1].W = sldrVOLUME;
 	X6100_widgets[2].W = btnAGC;
@@ -1164,28 +1176,27 @@ void RIG_X6100::set_band_selection(int v)
 	igett("");
 }
 
-const char ** RIG_X6100::bwtable(int m)
+std::vector<std::string>& RIG_X6100::bwtable(int m)
 {
-	const char **table;
 	switch (m) {
 		case AM_6100:
-			table = X6100_AMwidths;
+			return X6100_AMwidths;
 			break;
 		case FM_6100: case WFM_6100:
-			table = X6100_SSB_CWwidths;
+			return X6100_SSB_CWwidths;
 			break;
 		case RTTY_6100: case RTTYR_6100:
-			table = X6100_RTTYwidths;
+			return X6100_RTTYwidths;
 			break;
 		case CW_6100: case CWR_6100:
 		case USB_6100: case LSB_6100:
-			table = X6100_SSB_CWwidths;
+			return X6100_SSB_CWwidths;
 			break;
 		default:
-			table = X6100_SSB_CWwidths;
+			return X6100_SSB_CWwidths;
 			break;
 	}
-	return table;
+	return X6100_SSB_CWwidths;
 }
 
 // Tranceiver PTT on/off

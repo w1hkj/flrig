@@ -112,8 +112,6 @@ extern std::vector<std::string> rigmodes_;
 
 extern rigbase *selrig;
 
-extern const char **old_bws;
-
 extern std::string printXCVR_STATE(XCVR_STATE data);
 extern std::string print_ab();
 extern const char *print(XCVR_STATE data);

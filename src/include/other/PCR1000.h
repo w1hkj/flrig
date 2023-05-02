@@ -49,13 +49,6 @@ private:
 	static const char		noise_off_command[];
 	static const char		noise_on_command[];
 
-	static const char name[];
-
-	static const char *modes[];
-	static const char mode_chr[];
-	static const char mode_type[];
-	static const char *band_widths[];
-
 	int current_volume;
 	int att_level;
 	int nb_level;

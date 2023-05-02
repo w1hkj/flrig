@@ -22,8 +22,10 @@
 
 const char TS140name_[] = "TS140";
 
-const char *TS140modes_[] = {
-		"LSB", "USB", "CW", "FM", "AM", "CWN", NULL};
+static std::vector<std::string>TS140modes_;
+static const char *vTS140modes_[] =
+{
+		"LSB", "USB", "CW", "FM", "AM", "CWN"};
 static const char TS140_mode_type[] =
 	{'L', 'U', 'U', 'U', 'U', 'U'};
 
@@ -31,7 +33,7 @@ RIG_TS140::RIG_TS140() {
 // base class values	
 	name_ = TS140name_;
 	modes_ = TS140modes_;
-	bandwidths_ = NULL;
+	bandwidths_ = vNOBWS;
 	serial_baudrate = BR9600;
 	stopbits = 2;
 	serial_retries = 2;
@@ -66,6 +68,14 @@ RIG_TS140::RIG_TS140() {
 	precision = 10;
 	ndigits = 7;
 
+}
+
+void RIG_TS140::initialize()
+{
+	VECTOR (TS140modes_, vTS140modes_);
+
+	modes_ = TS140modes_;
+	bandwidths_ = vNOBWS;
 }
 
 /*

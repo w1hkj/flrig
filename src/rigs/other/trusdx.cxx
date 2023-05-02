@@ -21,12 +21,13 @@
 #include "other/trusdx.h"
 #include "support.h"
 
-static const char TRUSDXname_[] = "(tr)uSDX";
+static const char TRUSDXname_[] = "truSDX";
 
 enum { SDR2_LSB, SDR2_USB, SDR2_CW, SDR2_FM, SDR2_AM };
 
-static const char *TRUSDXmodes_[] = {
-"LSB", "USB", "CW", "FM", "AM", NULL};
+static std::vector<std::string>TRUSDXmodes_;
+static const char *vTRUSDXmodes_[] = {
+"LSB", "USB", "CW", "FM", "AM"};
 
 static const char TRUSDX_mode_type[] = { 'L', 'U', 'U', 'U', 'U' };
 
@@ -35,7 +36,7 @@ RIG_TRUSDX::RIG_TRUSDX() {
 	name_ = TRUSDXname_;
 	modes_ = TRUSDXmodes_;
 
-	bandwidths_ = NULL;
+	bandwidths_ = vNOBWS;
 
 	serial_baudrate = BR38400;
 	stopbits = 1;
@@ -67,6 +68,10 @@ static int ret = 0;
 
 void RIG_TRUSDX::initialize()
 {
+	VECTOR (TRUSDXmodes_, vTRUSDXmodes_);
+
+	modes_ = TRUSDXmodes_;
+	bandwidths_ = vNOBWS;
 }
 
 void RIG_TRUSDX::shutdown()

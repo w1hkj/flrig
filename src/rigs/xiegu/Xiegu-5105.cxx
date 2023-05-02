@@ -27,11 +27,13 @@
 // Xiegu 5105
 //
 const char XI5105name_[] = "Xiegu-5105";
-const char *XI5105modes_[] = { "LSB", "USB", "AM", "CW", NULL};
-//"RTTY", "CW-R", "RTTY-R", NULL};
-const char XI5105_mode_type[] = { 'L', 'U', 'U', 'L'};
+static std::vector<std::string>XI5105modes_;
+static const char *vXI5105modes_[] = { "LSB", "USB", "AM", "CW"};
+//"RTTY", "CW-R", "RTTY-R"};
+static const char XI5105_mode_type[] = { 'L', 'U', 'U', 'L'};
 //, 'L', 'U', 'U'};
-const char *XI5105_widths[] = { "Wide", "Med", "Narr", NULL};
+static std::vector<std::string>XI5105_widths;
+static const char *vXI5105_widths[] = { "Wide", "Med", "Narr"};
 static int XI5105_bw_vals[] = {1,2,3,WVALS_LIMIT};
 
 /*
@@ -106,6 +108,13 @@ RIG_XI5105::RIG_XI5105() {
 
 void RIG_XI5105::initialize()
 {
+	VECTOR (XI5105modes_, vXI5105modes_);
+	VECTOR (XI5105_widths, vXI5105_widths);
+
+	modes_ = XI5105modes_;
+	_mode_type = XI5105_mode_type;
+	bandwidths_ = XI5105_widths;
+	bw_vals_ = XI5105_bw_vals;
 /*
 	XI5105_widgets[0].W = btnVol;
 	XI5105_widgets[1].W = sldrVOLUME;

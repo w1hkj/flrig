@@ -28,6 +28,7 @@ public:
 	RIG_FT817BB();
 	~RIG_FT817BB(){};
 
+	void initialize();
 	bool check();
 
 	unsigned long long get_vfoA();

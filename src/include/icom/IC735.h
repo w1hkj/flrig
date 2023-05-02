@@ -31,6 +31,8 @@ public:
 	void selectA();
 	void selectB();
 
+	void initialize();
+
 	bool check();
 
 	unsigned long long get_vfoA();

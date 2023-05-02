@@ -22,14 +22,15 @@
 
 const char FT890name_[] = "FT-890";
 
-const char *FT890modes_[] = {
-		"LSB", "USB", "CW", "CW-N", "AM", "AM-N", "FM", NULL};
+static std::vector<std::string>FT890modes_;
+static const char *vFT890modes_[] = {
+		"LSB", "USB", "CW", "CW-N", "AM", "AM-N", "FM"};
 static const int FT890_mode_val[] =  { 0, 1, 2, 3, 4, 5, 6 };
 
 static const char FT890_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'U', 'U' };
 
-static const char *FT890widths_[] =
-{ "wide", "narr", NULL};
+static std::vector<std::string>FT890widths_;
+static const char *vFT890widths_[] = { "wide", "narr"};
 
 static const int FT890_bw_val[] =
 { 0, 1 };
@@ -79,6 +80,12 @@ void RIG_FT890::init_cmd()
 
 void RIG_FT890::initialize()
 {
+	VECTOR (FT890modes_, vFT890modes_);
+	VECTOR (FT890widths_, vFT890widths_);
+
+	modes_ = FT890modes_;
+	bandwidths_ = FT890widths_;
+	bw_vals_ = FT890_bw_val;
 }
 
 void RIG_FT890::selectA()

@@ -133,7 +133,6 @@ extern RIG_FDMDUO		rig_FDMDUO;		// 1
 extern RIG_FT100D		rig_FT100D;		// 2
 extern RIG_FT450		rig_FT450;		// 3
 extern RIG_FT450D		rig_FT450D;		// 4
-extern RIG_FT710		rig_FT710;		// 105
 extern RIG_FT747		rig_FT747;		// 5
 extern RIG_FT736R		rig_FT736R;		// 6
 extern RIG_FT757GX2		rig_FT757GX2;	// 7
@@ -236,5 +235,6 @@ extern RIG_TCI_SUNDX	rig_tci_sundx;	// 103
 extern RIG_TCI_SUNPRO	rig_tci_sunpro;	// 104
 extern RIG_TRUSDX		rig_trusdx;		// 105
 extern RIG_QDX			rig_qdx;		// 106
+extern RIG_FT710		rig_FT710;		// 107
 
 #endif

@@ -91,8 +91,12 @@ void init_TT550_tabs()
 	sel_tt550_F3_func->value(progStatus.tt550_F3_func);
 	progStatus.use_rig_data = false;
 	op_tt550_XmtBW->clear();
-	for (int i = 0; TT550_xmt_widths[i] != NULL; i++) {
-		op_tt550_XmtBW->add(TT550_xmt_widths[i]);
+	try {
+		for (size_t i = 0; i < TT550_xmt_widths.size(); i++) {
+			op_tt550_XmtBW->add(TT550_xmt_widths.at(i).c_str());
+		}
+	} catch (const std::exception& e) {
+		LOG_ERROR("%s", e.what());
 	}
 	op_tt550_XmtBW->activate();
 	op_tt550_XmtBW->index(progStatus.tt550_xmt_bw);
@@ -163,18 +167,25 @@ void init_TT550()
 
 	rigmodes_.clear();
 	opMODE->clear();
-	for (int i = 0; selrig->modes_[i] != NULL; i++) {
-		rigmodes_.push_back(selrig->modes_[i]);
-		opMODE->add(selrig->modes_[i]);
+	try {
+		for (size_t i = 0; i < selrig->modes_.size(); i++) {
+			rigmodes_.push_back(selrig->modes_.at(i).c_str());
+			opMODE->add(selrig->modes_.at(i).c_str());
+		}
+	} catch (const std::exception& e) {
+		LOG_ERROR("%s", e.what());
 	}
 	opMODE->activate();
 	opMODE->index(vfoA.imode);
 
 	opBW->show();
 	opBW->clear();
-	old_bws = selrig->bandwidths_;
-	for (int i = 0; selrig->bandwidths_[i] != NULL; i++) {
-		opBW->add(selrig->bandwidths_[i]);
+	try {
+		for (size_t i = 0; i < selrig->bandwidths_.size(); i++) {
+			opBW->add(selrig->bandwidths_.at(i).c_str());
+		}
+	} catch (const std::exception& e) {
+		LOG_ERROR("%s", e.what());
 	}
 	opBW->activate();
 	opBW->index(vfoA.iBW);

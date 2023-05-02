@@ -31,33 +31,36 @@ const char IC9100name_[] = "IC-9100";
 
 static int nummodes = 9;
 
-const char *IC9100modes_[] = {
+static std::vector<std::string>IC9100modes_;
+static const char *vIC9100modes_[] =
+{
 "LSB", "USB", "AM", "FM", "DV", 
 "CW", "CW-R", "RTTY", "RTTY-R",
-"LSB-D", "USB-D", "AM-D", "FM-D", "DV-R", NULL};
+"LSB-D", "USB-D", "AM-D", "FM-D", "DV-R"};
 
 enum {
 	LSB9100, USB9100, AM9100, FM9100, DV9100,
 	CW9100, CW9100R, RTTY9100, RTTY9100R,
 	LSB9100D, USB9100D, AM9100D, FM9100D, DVR9100 };
 
-const char IC9100_mode_type[] = {
+static const char IC9100_mode_type[] = {
 	'L', 'U', 'U', 'U', 'U',
 	'L', 'U', 'L', 'U',
 	'L', 'U', 'U', 'U' };
 
-const char IC9100_mode_nbr[] = {
+static const char IC9100_mode_nbr[] = {
 	0x00, 0x01, 0x02, 0x05, 0x17,
 	0x03, 0x07, 0x04, 0x08,
 	0x00, 0x01, 0x02, 0x05, 0x17 };
 
-const char *IC9100_ssb_bws[] = {
+static std::vector<std::string>IC9100_ssb_bws;
+static const char *vIC9100_ssb_bws[] =
+{
 "50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
 "600",   "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
 "2600", "2700", "2800", "2900", "3000", "3100", "3200", "3300", "3400", "3500",
-"3600",
-NULL };
+"3600"};
 static int IC9100_bw_vals_SSB[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
@@ -65,13 +68,14 @@ static int IC9100_bw_vals_SSB[] = {
 31,32,33,34,35,36,37,38,39,40,
 41, WVALS_LIMIT};
 
-const char *IC9100_am_bws[] = {
+static std::vector<std::string>IC9100_am_bws;
+static const char *vIC9100_am_bws[] =
+{
 "200",   "400",  "600",  "800", "1000", "1200", "1400", "1600", "1800", "2000",
 "2200", "2400", "2600", "2800", "3000", "3200", "3400", "3600", "3800", "4000",
 "4200", "4400", "4600", "4800", "5000", "5200", "5400", "5600", "5800", "6000",
 "6200", "6400", "6600", "6800", "7000", "7200", "7400", "9100", "7800", "8000",
-"8200", "8400", "8600", "8800", "9000", "9200", "9400", "9600", "9800", "10000", 
-NULL };
+"8200", "8400", "8600", "8800", "9000", "9200", "9400", "9600", "9800", "10000"};
 static int IC9100_bw_vals_AM[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
@@ -80,19 +84,22 @@ static int IC9100_bw_vals_AM[] = {
 41,42,43,44,45,46,47,48,49,50,
  WVALS_LIMIT};
 
-const char *IC9100_rtty_bws[] = {
+static std::vector<std::string>IC9100_rtty_bws;
+static const char *vIC9100_rtty_bws[] =
+{
 "50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
 "600",   "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
-"2600", "2700",
-NULL };
+"2600", "2700"};
 static int IC9100_bw_vals_RTTY[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
 21,22,23,24,25,26,27,28,29,30,
 31,32, WVALS_LIMIT};
 
-const char *IC9100_fixed_bws[] = { "FIXED", NULL };
+static std::vector<std::string>IC9100_fixed_bws;
+static const char *vIC9100_fixed_bws[] =
+{ "FIXED" };
 static int IC9100_bw_vals_fixed[] = { 1, WVALS_LIMIT};
 
 static GUI IC9100_widgets[]= {
@@ -116,6 +123,19 @@ static GUI IC9100_widgets[]= {
 
 void RIG_IC9100::initialize()
 {
+	VECTOR (IC9100modes_, vIC9100modes_);
+	VECTOR (IC9100_ssb_bws, vIC9100_ssb_bws);
+	VECTOR (IC9100_am_bws, vIC9100_am_bws);
+	VECTOR (IC9100_rtty_bws, vIC9100_rtty_bws);
+	VECTOR (IC9100_fixed_bws, vIC9100_fixed_bws);
+
+	modes_ = IC9100modes_;
+
+	bandwidths_ = IC9100_ssb_bws;
+	bw_vals_ = IC9100_bw_vals_SSB;
+
+	_mode_type = IC9100_mode_type;
+
 	IC9100_widgets[0].W = btnVol;
 	IC9100_widgets[1].W = sldrVOLUME;
 	IC9100_widgets[2].W = btnAGC;
@@ -350,7 +370,7 @@ void RIG_IC9100::set_modeA(int val)
 	cmd.append( post );
 	waitFB("set mode A");
 	std::stringstream ss;
-	ss << "set_modeA(" << val << ") [" << IC9100modes_[val] << "] " <<
+	ss << "set_modeA(" << val << ") [" << IC9100modes_[val].c_str() << "] " <<
 		str2hex(replystr.c_str(), replystr.length());
 	set_trace(1, ss.str().c_str());
 
@@ -431,7 +451,7 @@ void RIG_IC9100::set_modeB(int val)
 	cmd.append( post );
 	waitFB("set mode B");
 	std::stringstream ss;
-	ss << "set_modeB(" << val << ") [" << IC9100modes_[val] << "] " <<
+	ss << "set_modeB(" << val << ") [" << IC9100modes_[val].c_str() << "] " <<
 		str2hex(replystr.c_str(), replystr.length());
 	set_trace(1, ss.str().c_str());
 
@@ -538,9 +558,9 @@ void RIG_IC9100::set_bwA(int val)
 	waitFB("set bw A");
 
 	std::stringstream ss;
-	const char *bwstr = IC9100_ssb_bws[val];
-	if ((A.imode == AM9100) || (A.imode == AM9100D)) bwstr = IC9100_am_bws[val];
-	if ((A.imode == RTTY9100) || (A.imode == RTTY9100R)) bwstr = IC9100_rtty_bws[val];
+	const char *bwstr = IC9100_ssb_bws[val].c_str();
+	if ((A.imode == AM9100) || (A.imode == AM9100D)) bwstr = IC9100_am_bws[val].c_str();
+	if ((A.imode == RTTY9100) || (A.imode == RTTY9100R)) bwstr = IC9100_rtty_bws[val].c_str();
 	 ss << "set_bwA(" << val << ") [" << bwstr << "] " <<
 		str2hex(replystr.data(), replystr.length());
 	set_trace(1, ss.str().c_str());
@@ -582,9 +602,9 @@ void RIG_IC9100::set_bwB(int val)
 	waitFB("set bw B");
 
 	std::stringstream ss;
-	const char *bwstr = IC9100_ssb_bws[val];
-	if ((B.imode == AM9100) || (B.imode == AM9100D)) bwstr = IC9100_am_bws[val];
-	if ((B.imode == RTTY9100) || (B.imode == RTTY9100R)) bwstr = IC9100_rtty_bws[val];
+	const char *bwstr = IC9100_ssb_bws[val].c_str();
+	if ((B.imode == AM9100) || (B.imode == AM9100D)) bwstr = IC9100_am_bws[val].c_str();
+	if ((B.imode == RTTY9100) || (B.imode == RTTY9100R)) bwstr = IC9100_rtty_bws[val].c_str();
 	ss << "set_bwB(" << val << ") [" << bwstr << "] " <<
 		str2hex(replystr.data(), replystr.length());
 	set_trace(1, ss.str().c_str());
@@ -626,25 +646,24 @@ int RIG_IC9100::adjust_bandwidth(int m)
 	return bw;
 }
 
-const char ** RIG_IC9100::bwtable(int m)
+std::vector<std::string>& RIG_IC9100::bwtable(int m)
 {
-	const char ** table;
 	switch (m) {
 		case AM9100: case AM9100D:
-			table = IC9100_am_bws;
+			return IC9100_am_bws;
 			break;
 		case FM9100: case FM9100D :
 		case DV9100: case DVR9100 :
-			table = IC9100_fixed_bws;
+			return IC9100_fixed_bws;
 			break;
 		case CW9100: case CW9100R:
 		case RTTY9100: case RTTY9100R:
 		case LSB9100: case USB9100:
 		case LSB9100D: case USB9100D:
 		default:
-			table = IC9100_ssb_bws;
+			return IC9100_ssb_bws;
 	}
-	return table;
+	return IC9100_ssb_bws;
 }
 
 int RIG_IC9100::def_bandwidth(int m)

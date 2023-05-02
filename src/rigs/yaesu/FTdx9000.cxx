@@ -40,10 +40,11 @@ static int mode_bwB[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 
 static const char FTdx9000name_[] = "FTdx9000";
 
-static const char *FTdx9000modes_[] = {
+static std::vector<std::string>FTdx9000modes_;
+static const char *vFTdx9000modes_[] = {
 "LSB", "USB", "CW", "FM", "AM", 
 "RTTY-L", "CW-R", "PSK-L", "RTTY-U", "PKT-FM",
-"FM-N", "PSK-U", "AM-N",  NULL};
+"FM-N", "PSK-U", "AM-N"};
 
 static const int FTdx9000_def_bw[] = {
 20, 20, 9, 0, 0, 
@@ -53,62 +54,72 @@ static const int FTdx9000_def_bw[] = {
 static const char FTdx9000_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D' };
 static const char FTdx9000_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L', 'U', 'U', 'U', 'U', 'U' };
 
-static const char *FTdx9000_widths_SSB[] = {
+static std::vector<std::string>FTdx9000_widths_SSB;
+static const char *vFTdx9000_widths_SSB[] = {
  "200",  "400",  "600",  "850", "1100", 
 "1350", "1500", "1650", "1800", "1950",
 "2100", "2250", "2400", "2500", "2600",
 "2700", "2800", "2900", "3000", "3200", 
-"3400", "3600", "3800", "4000", NULL };
+"3400", "3600", "3800", "4000" };
 
 static int FTdx9000_wvals_SSB[] = {
 1,2,3,4,5,6,7,  8,9,10,11,12,13,  15,16,17,18,19,20,  21,22,23,24,25, WVALS_LIMIT};
 
-static const char *FTdx9000_widths_CW[] = {
+static std::vector<std::string>FTdx9000_widths_CW;
+static const char *vFTdx9000_widths_CW[] = {
   "50",  "100",  "150",  "200",  "250",
  "300",  "350",  "400",  "450",  "500", 
  "800", "1200", "1400", "1700", "2000",
-"2400", NULL };
+"2400" };
 
 static int FTdx9000_wvals_CW[] = {
 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, WVALS_LIMIT };
 
-static const char *FTdx9000_widths_RTTY[] = {
+static std::vector<std::string>FTdx9000_widths_RTTY;
+static const char *vFTdx9000_widths_RTTY[] = {
   "50",  "100",  "150",  "200",  "250",
  "300",  "350",  "400",  "450",  "500",
  "800", "1200", "1400", "1700", "2000", 
-"2400", NULL };
+"2400" };
 
 static int FTdx9000_wvals_RTTY[] = {
 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, WVALS_LIMIT };
 
-static const char *FTdx9000_widths_PSK[] = {
+static std::vector<std::string>FTdx9000_widths_PSK;
+static const char *vFTdx9000_widths_PSK[] = {
  "50",  "100",  "150",  "200",  "250", 
 "300",  "350",  "400",  "450",  "500",
 "800", "1200", "1400", "1700", "2000",
-"2400", NULL };
+"2400" };
 
 static int FTdx9000_wvals_PSK[] = {
 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, WVALS_LIMIT };
 
 static const int FTdx9000_wvals_AMFM[] = { 0, WVALS_LIMIT };
 
-static const char *FTdx9000_widths_AMwide[] = { "AM-bw", NULL };
-static const char *FTdx9000_widths_AMnar[]  = { "AM-nar", NULL };
-static const char *FTdx9000_widths_FMnar[]  = { "FM-nar", NULL };
-static const char *FTdx9000_widths_FMwide[] = { "FM-wid", NULL };
-static const char *FTdx9000_widths_FMpkt[]  = { "FM-pkt", NULL };
+static std::vector<std::string>FTdx9000_widths_AMwide;
+static const char *vFTdx9000_widths_AMwide[] = { "AM-bw" };
+static std::vector<std::string>FTdx9000_widths_AMnar;
+static const char *vFTdx9000_widths_AMnar[]  = { "AM-nar" };
+static std::vector<std::string>FTdx9000_widths_FMnar;
+static const char *vFTdx9000_widths_FMnar[]  = { "FM-nar" };
+static std::vector<std::string>FTdx9000_widths_FMwide;
+static const char *vFTdx9000_widths_FMwide[] = { "FM-wid" };
+static std::vector<std::string>FTdx9000_widths_FMpkt;
+static const char *vFTdx9000_widths_FMpkt[]  = { "FM-pkt" };
 
-static const char *FTdx9000_US_60m[] = {NULL, "126", "127", "128", "130", NULL};
+static std::vector<std::string>FTdx9000_US_60m;
+static const char *vFTdx9000_US_60m[] = {"", "126", "127", "128", "130"};
 // US has 5 60M presets. Using dummy numbers for all.
-// First NULL means skip 60m sets in get_band_selection().
+// First "" means skip 60m sets in get_band_selection().
 // Maybe someone can do a cat command MC; on all 5 presets and add returned numbers above.
 // To send cat commands in flrig goto menu Config->Xcvr select->Send Cmd.
 //
 // UK has 7 60M presets. Using dummy numbers for all.  If you want support,
 // Maybe someone can do a cat command MC; on all 7 presets and add returned numbers below.
-// static const char *FTdx9000_UK_60m[] = {NULL, "126", "127", "128", "130", "131", "132", NULL};
+// static std::vector<std::string>FTdx9000_UK_60m = {"", "126", "127", "128", "130", "131", "132"};
 
-static const char **Channels_60m = FTdx9000_US_60m;
+static std::vector<std::string>& Channels_60m = FTdx9000_US_60m;
 
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
@@ -125,6 +136,22 @@ static GUI rig_widgets[]= {
 
 void RIG_FTdx9000::initialize()
 {
+	VECTOR (FTdx9000modes_, vFTdx9000modes_);
+	VECTOR (FTdx9000_widths_SSB, vFTdx9000_widths_SSB);
+	VECTOR (FTdx9000_widths_CW, vFTdx9000_widths_CW);
+	VECTOR (FTdx9000_widths_RTTY, vFTdx9000_widths_RTTY);
+	VECTOR (FTdx9000_widths_PSK, vFTdx9000_widths_PSK)
+	VECTOR (FTdx9000_widths_AMwide, vFTdx9000_widths_AMwide);
+	VECTOR (FTdx9000_widths_AMnar, vFTdx9000_widths_AMnar);
+	VECTOR (FTdx9000_widths_FMnar, vFTdx9000_widths_FMnar);
+	VECTOR (FTdx9000_widths_FMwide, vFTdx9000_widths_FMwide);
+	VECTOR (FTdx9000_widths_FMpkt, vFTdx9000_widths_FMpkt);
+	VECTOR (FTdx9000_US_60m, vFTdx9000_US_60m);
+
+	modes_ = FTdx9000modes_;
+	bandwidths_ = FTdx9000_widths_SSB;
+	bw_vals_ = FTdx9000_wvals_SSB;
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = sldrRFGAIN;
@@ -257,10 +284,9 @@ void RIG_FTdx9000::get_band_selection(int v)
 	}
 
 	if (v == 12) {	// 5MHz 60m presets
-		if (Channels_60m[0] == NULL) return;	// no 60m Channels so skip
+		if (Channels_60m[0].empty()) return;	// no 60m Channels so skip
 		if (inc_60m) {
-			if (Channels_60m[++m_60m_indx] == NULL)
-				m_60m_indx = 0;
+			if (++m_60m_indx > (int)Channels_60m.size()) m_60m_indx = 0;
 		}
 		cmd.assign("MC").append(Channels_60m[m_60m_indx]).append(";");
 	} else {		// v == 1..11 band selection OR return to vfo mode == 0
@@ -726,7 +752,7 @@ int RIG_FTdx9000::def_bandwidth(int m)
 	return mode_bwA[m];
 }
 
-const char ** RIG_FTdx9000::bwtable(int n)
+std::vector<std::string>& RIG_FTdx9000::bwtable(int n)
 {
 	switch (n) {
 		case mCW: case mCW_R: return FTdx9000_widths_CW;

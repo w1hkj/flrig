@@ -143,7 +143,6 @@ rigbase *rigs[] = {
 	&rig_FT100D,	// 2
 	&rig_FT450,		// 3
 	&rig_FT450D,	// 4
-	&rig_FT710,		// 105
 	&rig_FT736R,	// 5
 	&rig_FT747,		// 6
 	&rig_FT757GX2,	// 7
@@ -169,8 +168,8 @@ rigbase *rigs[] = {
 	&rig_FT2000,	// 27
 	&rig_FTdx10,	// 28
 	&rig_FTdx101D,	// 29
-	&rig_FTdx101MP,	// 20
-	&rig_FTdx1200,	// 21
+	&rig_FTdx101MP,	// 30
+	&rig_FTdx1200,	// 31
 	&rig_FTdx3000,	// 32
 	&rig_FT5000,	// 33
 	&rig_FTdx9000,	// 34
@@ -179,7 +178,7 @@ rigbase *rigs[] = {
 	&rig_IC706MKIIG,// 37
 	&rig_IC718,		// 38
 	&rig_IC728,		// 39
-	&rig_IC735,		// 30
+	&rig_IC735,		// 40
 	&rig_IC746,		// 41
 	&rig_IC746PRO,	// 42
 	&rig_IC751,		// 43
@@ -210,42 +209,43 @@ rigbase *rigs[] = {
 	&rig_RAY152,	// 68
 	&rig_TMD710,	// 69
 	&rig_TS140,		// 70
-	&rig_TS440,		// 79
-	&rig_TS450S,	// 70
-	&rig_TS480HX,	// 71
-	&rig_TS480SAT,	// 72
-	&rig_TS570,		// 73
-	&rig_TS590S,	// 74
-	&rig_TS590SG,	// 75
-	&rig_TS790,		// 76
-	&rig_TS850,		// 77
-	&rig_TS870S,	// 78
-	&rig_TS890S,	// 79
-	&rig_TS940S,	// 80
-	&rig_TS950,		// 81
-	&rig_TS990,		// 82
-	&rig_TS2000,	// 83
-	&rig_TT516,		// 84
-	&rig_TT535,		// 85
-	&rig_TT538,		// 86
-	&rig_TT550,		// 87
-	&rig_TT563,		// 88
-	&rig_TT566,		// 89
-	&rig_TT588,		// 90
-	&rig_TT599,		// 91
-	&rig_AOR5K,		// 92
-	&rig_XI5105,	// 93
-	&rig_XIG90,		// 94
-	&rig_X6100,		// 95
-	&rig_PowerSDR,	// 96
-	&rig_FLEX1500,	// 97
-	&rig_TX500,		// 98
-	&rig_QCXP,		// 99
-	&rig_sdr2,		// 100
-	&rig_tci_sundx,	// 101
-	&rig_tci_sunpro,// 102
-	&rig_trusdx,	// 103
-	&rig_qdx,		// 104
+	&rig_TS440,		// 71
+	&rig_TS450S,	// 72
+	&rig_TS480HX,	// 73
+	&rig_TS480SAT,	// 74
+	&rig_TS570,		// 75
+	&rig_TS590S,	// 76
+	&rig_TS590SG,	// 77
+	&rig_TS790,		// 78
+	&rig_TS850,		// 79
+	&rig_TS870S,	// 80
+	&rig_TS890S,	// 81
+	&rig_TS940S,	// 82
+	&rig_TS950,		// 83
+	&rig_TS990,		// 84
+	&rig_TS2000,	// 85
+	&rig_TT516,		// 86
+	&rig_TT535,		// 87
+	&rig_TT538,		// 88
+	&rig_TT550,		// 89
+	&rig_TT563,		// 90
+	&rig_TT566,		// 91
+	&rig_TT588,		// 92
+	&rig_TT599,		// 93
+	&rig_AOR5K,		// 94
+	&rig_XI5105,	// 95
+	&rig_XIG90,		// 96
+	&rig_X6100,		// 97
+	&rig_PowerSDR,	// 98
+	&rig_FLEX1500,	// 99
+	&rig_TX500,		// 100
+	&rig_QCXP,		// 101
+	&rig_sdr2,		// 102
+	&rig_tci_sundx,	// 103
+	&rig_tci_sunpro,// 104
+	&rig_trusdx,	// 105
+	&rig_qdx,		// 106
+	&rig_FT710,		// 107
 	NULL
 
 };

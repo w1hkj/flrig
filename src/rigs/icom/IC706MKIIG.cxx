@@ -29,18 +29,29 @@
 // "FL-101", "FL-232", "FL-100", "FL-223", "FL-272", "FL-103", "FL-94"
 
 const char IC706MKIIGname_[] = "IC-706MKIIG";
-const char *IC706MKIIGmodes_[] = { "LSB", "USB", "AM", "CW", "RTTY", "FM", "WFM", NULL};
+static std::vector<std::string>IC706MKIIGmodes_;
+static const char *vIC706MKIIGmodes_[] =
+{ "LSB", "USB", "AM", "CW", "RTTY", "FM", "WFM"};
 
 enum {
 	LSB706, USB706, AM706, CW706, RTTY706, FM706, WFM706 };
 
 const char IC706MKIIG_mode_type[] =
 	{ 'L', 'U', 'U', 'L', 'L', 'U', 'U'};
-const char *IC706MKIIG_ssb_cw_rtty_bws[] = { "WIDE", "NORMAL", "NARROW", NULL};
+
+static std::vector<std::string>IC706MKIIG_ssb_cw_rtty_bws;
+static const char *vIC706MKIIG_ssb_cw_rtty_bws[] =
+{ "WIDE", "NORMAL", "NARROW"};
 static int IC706MKIIG_vals_ssb_cw_rtty_bws[] = { 1, 2, 3, WVALS_LIMIT };
-const char *IC706MKIIG_am_fm_bws[] = { "NORMAL", "NARROW", NULL};
+
+static std::vector<std::string>IC706MKIIG_am_fm_bws;
+static const char *vIC706MKIIG_am_fm_bws[] =
+{ "NORMAL", "NARROW"};
 static int IC706MKIIG_vals_am_fm_bws[] = { 1, 2, WVALS_LIMIT };
-const char *IC706MKIIG_wfm_bws[] = { "FIXED", NULL};
+
+static std::vector<std::string>IC706MKIIG_wfm_bws;
+static const char *vIC706MKIIG_wfm_bws[] =
+{ "FIXED"};
 static int IC706MKIIG_vals_wfm_bws[] = { 1, WVALS_LIMIT};
 
 RIG_IC706MKIIG::RIG_IC706MKIIG() {
@@ -87,15 +98,25 @@ RIG_IC706MKIIG::RIG_IC706MKIIG() {
 
 void RIG_IC706MKIIG::initialize()
 {
+	VECTOR (IC706MKIIGmodes_, vIC706MKIIGmodes_);
+	VECTOR (IC706MKIIG_ssb_cw_rtty_bws, vIC706MKIIG_ssb_cw_rtty_bws);
+	VECTOR (IC706MKIIG_am_fm_bws, vIC706MKIIG_am_fm_bws);
+	VECTOR (IC706MKIIG_wfm_bws, vIC706MKIIG_wfm_bws);
+
+	modes_ = IC706MKIIGmodes_;
+	bandwidths_ = IC706MKIIG_ssb_cw_rtty_bws;
+	bw_vals_ = IC706MKIIG_vals_ssb_cw_rtty_bws;
+	_mode_type = IC706MKIIG_mode_type;
+
 	if (progStatus.use706filters) {
 		if (!progStatus.ssb_cw_wide.empty())   IC706MKIIG_ssb_cw_rtty_bws[0] = progStatus.ssb_cw_wide.c_str();
 		if (!progStatus.ssb_cw_normal.empty()) IC706MKIIG_ssb_cw_rtty_bws[1] = progStatus.ssb_cw_normal.c_str();
 		if (!progStatus.ssb_cw_narrow.empty()) IC706MKIIG_ssb_cw_rtty_bws[2] = progStatus.ssb_cw_narrow.c_str();
 	} else {
-		IC706MKIIG_ssb_cw_rtty_bws[0] = "FIXED";
-		IC706MKIIG_ssb_cw_rtty_bws[1] = NULL;
-	  IC706MKIIG_vals_ssb_cw_rtty_bws[0] = 1;
-	  IC706MKIIG_vals_ssb_cw_rtty_bws[1] = WVALS_LIMIT;
+		IC706MKIIG_ssb_cw_rtty_bws.clear();
+		IC706MKIIG_ssb_cw_rtty_bws.push_back("FIXED");
+		IC706MKIIG_vals_ssb_cw_rtty_bws[0] = 1;
+		IC706MKIIG_vals_ssb_cw_rtty_bws[1] = WVALS_LIMIT;
 	}
 }
 
@@ -313,7 +334,7 @@ int RIG_IC706MKIIG::def_bandwidth(int m)
 	return 1;
 }
 
-const char **RIG_IC706MKIIG::bwtable(int m)
+std::vector<std::string>& RIG_IC706MKIIG::bwtable(int m)
 {
 	switch (m) {
 		case LSB706: case USB706: case CW706: case RTTY706: 
@@ -326,9 +347,9 @@ const char **RIG_IC706MKIIG::bwtable(int m)
 			return IC706MKIIG_wfm_bws;
 			break;
 		default:
-			return IC706MKIIG_ssb_cw_rtty_bws;
 			break;
 	}
+	return IC706MKIIG_ssb_cw_rtty_bws;
 }   
 
 void RIG_IC706MKIIG::set_attenuator(int val)

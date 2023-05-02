@@ -108,7 +108,7 @@ public:
 
 //	void set_cw_vol();
 
-//	const char **bwtable(int m);
+//	std::vector<std::string>& bwtable(int m);
 
 	bool  canswap() { return true; }
 

@@ -433,8 +433,10 @@ void init_port_combos()
 void cbCIVdefault()
 {
 	char hexstr[8];
-	int picked = selectRig->index();
-	rigbase *srig = rigs[picked];
+	rigbase *srig = (rigbase *)(selectRig->data());
+	xcvr_name = srig->name_;
+	LOG_INFO("picked %s", xcvr_name.c_str());
+
 	snprintf(hexstr, sizeof(hexstr), "0x%02X", srig->defaultCIV);
 	txtCIV->value(hexstr);
 	progStatus.CIV = srig->defaultCIV;

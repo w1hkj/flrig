@@ -27,21 +27,24 @@
 const char IC756PRO2name_[] = "IC-756PRO-II";
 
 //=============================================================================
-const char *IC756PRO2modes_[] = {
-		"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R",
-		"D-LSB", "D-USB", "D-FM", NULL};
+static std::vector<std::string>IC756PRO2modes_;
+static const char *vIC756PRO2modes_[] =
+{
+	"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R",
+	"D-LSB", "D-USB", "D-FM"};
 
 const char IC756PRO2_mode_type[] =
 	{ 'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U',
 	  'L', 'U', 'U' };
 
-const char *IC756PRO2_SSBwidths[] = {
+static std::vector<std::string>IC756PRO2_SSBwidths;
+static const char *vIC756PRO2_SSBwidths[] =
+{
   "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
 "600",   "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
 "2600", "2700", "2800", "2900", "3000", "3100", "3200", "3300", "3400", "3500",
-"3600",
-NULL};
+"3600"};
 static int IC756PRO2_bw_vals_SSB[] = {
  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
 10,11,12,13,14,15,16,17,18,19,
@@ -49,19 +52,22 @@ static int IC756PRO2_bw_vals_SSB[] = {
 30,31,32,33,34,35,36,37,38,39,
 40, WVALS_LIMIT};
 
-const char *IC756PRO2_RTTYwidths[] = {
+static std::vector<std::string>IC756PRO2_RTTYwidths;
+static const char *vIC756PRO2_RTTYwidths[] =
+{
   "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
  "600",  "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
-"2600", "2700",
-NULL};
+"2600", "2700"};
 static int IC756PRO2_bw_vals_RTTY[] = {
  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
 10,11,12,13,14,15,16,17,18,19,
 20,21,22,23,24,25,26,27,28,29,
 30,31, WVALS_LIMIT};
 
-const char *IC756PRO2_AMFMwidths[] = { "FILT-1", "FILT-2", "FILT-3", NULL };
+static std::vector<std::string>IC756PRO2_AMFMwidths;
+static const char *vIC756PRO2_AMFMwidths[] =
+{ "FILT-1", "FILT-2", "FILT-3" };
 static int IC756PRO2_bw_vals_AMFM[] = { 0, 1, 2, WVALS_LIMIT};
 
 static GUI IC756PRO2_widgets[]= {
@@ -85,6 +91,15 @@ static GUI IC756PRO2_widgets[]= {
 
 void RIG_IC756PRO2::initialize()
 {
+	VECTOR (IC756PRO2modes_, vIC756PRO2modes_);
+	VECTOR (IC756PRO2_SSBwidths, vIC756PRO2_SSBwidths);
+	VECTOR (IC756PRO2_RTTYwidths, vIC756PRO2_RTTYwidths);
+	VECTOR (IC756PRO2_AMFMwidths, vIC756PRO2_AMFMwidths);
+
+	modes_ = IC756PRO2modes_;
+	bandwidths_ = IC756PRO2_SSBwidths;
+	bw_vals_ = IC756PRO2_bw_vals_SSB;
+
 	IC756PRO2_widgets[0].W = btnVol;
 	IC756PRO2_widgets[1].W = sldrVOLUME;
 	IC756PRO2_widgets[2].W = btnAGC;
@@ -638,7 +653,7 @@ void RIG_IC756PRO2::set_modeA(int val)
 	cmd.append( post );
 	waitFB("set mode A");
 
-	set_trace(4, "set mode A[", IC756PRO2modes_[A.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(4, "set mode A[", IC756PRO2modes_[A.imode].c_str(), "] ", str2hex(replystr.c_str(), replystr.length()));
 
 	if (datamode) { // LSB / USB ==> use DATA mode
 		cmd = pre_to;
@@ -717,7 +732,7 @@ void RIG_IC756PRO2::set_modeB(int val)
 	cmd.append( post );
 	waitFB("set mode B");
 
-	set_trace(4, "set mode B[", IC756PRO2modes_[A.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(4, "set mode B[", IC756PRO2modes_[A.imode].c_str(), "] ", str2hex(replystr.c_str(), replystr.length()));
 
 	if (datamode) { // LSB / USB ==> use DATA mode
 		cmd = pre_to;
@@ -810,7 +825,7 @@ int RIG_IC756PRO2::def_bandwidth(int m)
 	return (0);
 }
 
-const char **RIG_IC756PRO2::bwtable(int m)
+std::vector<std::string>& RIG_IC756PRO2::bwtable(int m)
 {
 	if (m == 0 || m == 1 || m == 8 || m == 9) //SSB
 		return IC756PRO2_SSBwidths;
@@ -890,7 +905,7 @@ void RIG_IC756PRO2::set_bwA(int val)
 	cmd.append(to_bcd(A.iBW,2));
 	cmd.append( post );
 	waitFB("set bw A");
-	set_trace(4, "set_bwA() ", bwtable(A.imode)[val], ": ", str2hex(cmd.c_str(), cmd.length()));
+	set_trace(4, "set_bwA() ", bwtable(A.imode)[val].c_str(), ": ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int  RIG_IC756PRO2::get_bwA()
@@ -928,7 +943,7 @@ void RIG_IC756PRO2::set_bwB(int val)
 	cmd.append(to_bcd(B.iBW,2));
 	cmd.append( post );
 	waitFB("set bw B");
-	set_trace(4, "set_bwB() ", bwtable(B.imode)[val], ": ", str2hex(cmd.c_str(), cmd.length()));
+	set_trace(4, "set_bwB() ", bwtable(B.imode)[val].c_str(), ": ", str2hex(cmd.c_str(), cmd.length()));
 }
 
 int  RIG_IC756PRO2::get_bwB()

@@ -31,8 +31,9 @@
 #include "rigpanel.h"
 
 static const char FT817BBname_[] = "FT-817BB";
-static const char *FT817BBmodes_[] = {
-		"LSB", "USB", "CW", "CW-R", "AM", "FM", "DIG", "PKT", NULL};
+static std::vector<std::string>FT817BBmodes_;
+static const char *vFT817BBmodes_[] = {
+		"LSB", "USB", "CW", "CW-R", "AM", "FM", "DIG", "PKT"};
 static const int FT817BB_mode_val[] =  { 0, 1, 2, 3, 4, 8, 0x0A, 0x0C };
 static const char FT817BB_mode_type[] = { 'L', 'U', 'U', 'L', 'U', 'U', 'U', 'U' };
 
@@ -86,6 +87,12 @@ RIG_FT817BB::RIG_FT817BB() {
 static void settle(int n)
 {
 	for (int i = 0; i < n/50; i++) {MilliSleep(50); Fl::awake();}
+}
+
+void RIG_FT817BB::initialize()
+{
+	VECTOR(FT817BBmodes_, vFT817BBmodes_);
+	modes_ = FT817BBmodes_;
 }
 
 void RIG_FT817BB::init_cmd()
@@ -196,7 +203,7 @@ unsigned long long RIG_FT817BB::get_vfoA ()
 			break;
 		}
 	static char msg[50];
-	snprintf(msg, sizeof(msg), "get vfoA: %llu, %s", freqA, FT817BBmodes_[i]);
+	snprintf(msg, sizeof(msg), "get vfoA: %llu, %s", freqA, FT817BBmodes_[i].c_str());
 	getr(msg);
 
 	return freqA;
@@ -275,7 +282,7 @@ unsigned long long RIG_FT817BB::get_vfoB ()
 			break;
 		}
 	static char msg[50];
-	snprintf(msg, sizeof(msg), "get vfoB: %llu, %s", freqB, FT817BBmodes_[i]);
+	snprintf(msg, sizeof(msg), "get vfoB: %llu, %s", freqB, FT817BBmodes_[i].c_str());
 	getr(msg);
 
 	return freqB;

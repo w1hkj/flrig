@@ -28,14 +28,15 @@
 
 static const char FT1000MP_Aname_[] = "FT-1000MP-A";
 
-static const char *FT1000MP_A_modes[] = {
+static std::vector<std::string>FT1000MP_A_modes;
+static const char *vFT1000MP_A_modes[] = {
 	"LSB",    "USB",
 	"CW-U",   "CW-L",
 	"AM",     "AM-syn",
 	"FM",     "FM-W",
 	"RTTY-L", "RTTY-U",
 	"PKT-L",  "PKT-U",
-	"PKT-FM", NULL
+	"PKT-FM"
 };
 
 static const char FT1000MP_A_setmode[] = {
@@ -99,12 +100,13 @@ static const mode_pair FT1000MP_A_mode[] = {
 //PKT-U  : 11 01 57 81 80 00 00 86 11 20 11 31 11 91 11 00
 //         11 01 57 81 80 00 00 86 11 20 11 11 91 11 11 00
 
-static const char *FT1000MP_A_widths[] = {
+static std::vector<std::string>FT1000MP_A_widths;
+static const char *vFT1000MP_A_widths[] = {
 "---/6.0", "---/2.4", "---/2.0", "---/500", "---/250",
 "2.4/6.0", "2.4/2.4", "2.4/2.0", "2.4/500", "2.4/250",
 "2.0/6.0", "2.0/2.4", "2.0/2.0", "2.0/500", "2.0/250",
 "500/6.0", "500/2.4", "500/2.0", "500/500", "500/250",
-"250/6.0", "250/2.4", "250/2.0", "250/500", "250/250", NULL };
+"250/6.0", "250/2.4", "250/2.0", "250/500", "250/250" };
 
 static int FT1000MP_A_bw_vals[] = {
 1,2,3,4,5,6,7,8,9,0,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25, WVALS_LIMIT};
@@ -180,11 +182,12 @@ void RIG_FT1000MP_A::init_cmd()
 
 void RIG_FT1000MP_A::initialize()
 {
-//	init_cmd();
-//	cmd[4] = 0x81; // switch antenna tuner on
-//	sendCommand(cmd,0);
-//LOG_DEBUG("%s", str2hex(cmd.c_str(), 5));
-//	selectA();
+	VECTOR (FT1000MP_A_modes, vFT1000MP_A_modes);
+	VECTOR (FT1000MP_A_widths, vFT1000MP_A_widths);
+
+	modes_ = FT1000MP_A_modes;
+	bandwidths_ = FT1000MP_A_widths;
+	bw_vals_ = FT1000MP_A_bw_vals;
 }
 
 /*

@@ -70,15 +70,17 @@ inline std::string str(std::string s)
 
 //----------------------------------------------------------------------
 
-const char RIG_PCR1000::name[] = "PCR-1000";
+static const char name[] = "PCR-1000";
 
 //	   mode array Index Values :-         0      1      2     3     4     5
-const char *RIG_PCR1000::modes[] =    { "LSB", "USB", "AM", "CW", "NFM", "WFM", NULL};
-const char RIG_PCR1000::mode_chr[] =  { '0',   '1',   '2',  '3',  '5',   '6' };
-const char RIG_PCR1000::mode_type[] = { 'L',   'U',   'U',  'U',  'U',   'U' };
+static std::vector<std::string>modes;
+static const char *vmodes[] =    { "LSB", "USB", "AM", "CW", "NFM", "WFM"};
+static const char mode_chr[] =  { '0',   '1',   '2',  '3',  '5',   '6' };
+static const char mode_type[] = { 'L',   'U',   'U',  'U',  'U',   'U' };
 
 //	   band width array Index Values :-    0      1    2     3     4
-const char *RIG_PCR1000::band_widths[] = { "2.8k","6k","15k","50k","230k",NULL};
+static std::vector<std::string>band_widths;
+static const char *vband_widths[] = { "2.8k","6k","15k","50k","230k"};
 static int PCR1000_bw_vals[] = {1,2,3,4,5,WVALS_LIMIT};
 
 //----------------------------------------------------------------------
@@ -204,6 +206,12 @@ bool RIG_PCR1000::check()
  */
 void RIG_PCR1000::initialize()
 {
+	VECTOR (modes, vmodes);
+	VECTOR (band_widths, vband_widths);
+
+	modes_ = modes;
+	bandwidths_ = band_widths;
+
 	rig_widgets[0].W = sldrSQUELCH;
 	rig_widgets[1].W = btnIFsh;
 	rig_widgets[2].W = sldrIFSHIFT;

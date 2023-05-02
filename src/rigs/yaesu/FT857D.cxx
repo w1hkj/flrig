@@ -30,16 +30,18 @@
 
 static const char FT857Dname_[] = "FT-857D";
 
-static const char *FT857Dmodes_[] = {
-		"LSB", "USB", "CW", "CW-R", "AM", "FM", "FM-N", "DIG", "PKT", NULL};
+static std::vector<std::string>FT857Dmodes_;
+static const char *vFT857Dmodes_[] = {
+		"LSB", "USB", "CW", "CW-R", "AM", "FM", "FM-N", "DIG", "PKT"};
 static const int FT857D_mode_val[] =  { 0x00, 0x01, 0x02, 0x03, 0x04, 0x08, 0X88, 0x0A, 0x0C };
 static const char FT857D_mode_type[] = { 'L', 'U', 'U', 'L', 'U', 'U', 'U', 'U', 'U' };
 
 
 static const char FT897Dname_[] = "FT-897D";
 
-static const char *FT897Dmodes_[] = {
-		"LSB", "USB", "CW", "CW-R", "AM", "FM", "FM-N", "DIG", "PKT", NULL};
+static std::vector<std::string>FT897Dmodes_;
+static const char *vFT897Dmodes_[] = {
+		"LSB", "USB", "CW", "CW-R", "AM", "FM", "FM-N", "DIG", "PKT"};
 static const int FT897D_mode_val[] =  { 0x00, 0x01, 0x02, 0x03, 0x04, 0x08, 0x88, 0x0A, 0x0C };
 static const char FT897D_mode_type[] = { 'L', 'U', 'U', 'L', 'U', 'U', 'U', 'U', 'U' };
 // note:
@@ -88,14 +90,26 @@ RIG_FT857D::RIG_FT857D() {
 
 };
 
-RIG_FT897D::RIG_FT897D() {
-	name_ = FT897Dname_;
+void RIG_FT857D::initialize() {
+	VECTOR (FT857Dmodes_, vFT857Dmodes_);
+
+	modes_ = FT857Dmodes_;
+	mode_vals = FT857D_mode_val;
+	mode_type = FT857D_mode_type;
+};
+
+RIG_FT897D::RIG_FT897D()
+{
+}
+
+void RIG_FT897D::initialize()
+{
+	VECTOR (FT897Dmodes_, vFT897Dmodes_);
+
 	modes_ = FT897Dmodes_;
 	mode_vals = FT897D_mode_val;
 	mode_type = FT897D_mode_type;
-
-	num_modes = 9;
-};
+}
 
 static void settle(int n)
 {
@@ -145,7 +159,7 @@ unsigned long long RIG_FT857D::get_vfoA ()
 	}
 
 	static char msg[50];
-	snprintf(msg, sizeof(msg), "get vfoA: %llu, %s", freqA, modes_[modeA]);
+	snprintf(msg, sizeof(msg), "get vfoA: %llu, %s", freqA, modes_[modeA].c_str());
 	getr(msg);
 
 	return freqA;
@@ -184,7 +198,7 @@ unsigned long long RIG_FT857D::get_vfoB ()
 	}
 
 	static char msg[50];
-	snprintf(msg, sizeof(msg), "get vfoB: %llu, %s", freqA, modes_[modeB]);
+	snprintf(msg, sizeof(msg), "get vfoB: %llu, %s", freqA, modes_[modeB].c_str());
 	getr(msg);
 
 	return freqB;

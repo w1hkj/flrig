@@ -26,8 +26,9 @@
 
 const char RIG_TT535name_[] = "DELTA-II";
 
-const char *RIG_TT535modes_[] = {
-		"LSB", "USB", "AM", "CW", "FM", NULL};
+static std::vector<std::string>RIG_TT535modes_;
+static const char *vRIG_TT535modes_[] =
+{ "LSB", "USB", "AM", "CW", "FM"};
 static const char RIG_TT535_mode_type[] = {'L', 'U', 'U', 'L', 'U'};
 
 RIG_TT535::RIG_TT535() {
@@ -57,6 +58,13 @@ RIG_TT535::RIG_TT535() {
 	pre_to[2] = ok[3] = bad[3] = pre_fm[3] = 0x01;
 
 };
+
+void RIG_TT535::initialize()
+{
+	VECTOR (RIG_TT535modes_, vRIG_TT535modes_);
+
+	modes_ = RIG_TT535modes_;
+}
 
 int  RIG_TT535::adjust_bandwidth(int m)
 {

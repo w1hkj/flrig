@@ -24,10 +24,11 @@
 
 static const char MARK_Vname_[] = "Mark-V";
 
-static const char *MARK_Vmodes_[] = {
+static std::vector<std::string>MARK_Vmodes_;
+static const char *vMARK_Vmodes_[] = {
 	"LSB", "USB", "CW", "CW-R", "AM", 
 	"AM(Sync)", "FM", "FM-M", "RTTY-L", "RTTY-U",
-	"PKT-L", "PKT", NULL};
+	"PKT-L", "PKT"};
 
 static const char MARK_V_mode_type[] = {
 	'L', 'U', 'U', 'L', 'U', 
@@ -66,6 +67,12 @@ RIG_MARK_V::RIG_MARK_V() {
 	ndigits = 8;
 
 };
+
+void RIG_MARK_V::initialize()
+{
+	VECTOR( MARK_Vmodes_, vMARK_Vmodes_);
+	modes_ = MARK_Vmodes_;
+}
 
 void RIG_MARK_V::init_cmd()
 {

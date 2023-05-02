@@ -25,46 +25,58 @@ static const char SUNSDR2name_[] = "SunSDR";
 
 enum { SDR2_LSB, SDR2_USB, SDR2_CW, SDR2_FM, SDR2_AM, SDR2_DIGL, SDR2_CWR, SDR2_SAM, SDR2_DIGU, SDR2_DRM };
 
-static const char *SUNSDR2modes_[] = {
-"LSB", "USB", "CW", "FM", "AM", "DIGL", "CW-R", "SAM", "DIGU", "DRM", NULL};
-static const char *SUNSDR2_mode_cat[] = {
-"MD1;", "MD2;", "MD3;", "MD4;", "MD5;", "MD6;", "MD7;", "MD8;", "MD9;", "MD0;", NULL};
+static std::vector<std::string>SUNSDR2modes_;
+static const char *vSUNSDR2modes_[] = {
+"LSB", "USB", "CW", "FM", "AM", "DIGL", "CW-R", "SAM", "DIGU", "DRM"};
+static std::vector<std::string>SUNSDR2_mode_cat;
+static const char *vSUNSDR2_mode_cat[] = {
+"MD1;", "MD2;", "MD3;", "MD4;", "MD5;", "MD6;", "MD7;", "MD8;", "MD9;", "MD0;"};
 int SUNSDR2_num_modes = 10;
  
-static const char *SUNSDR2_ssb_widths[] = {
+static std::vector<std::string>SUNSDR2_ssb_widths;
+static const char *vSUNSDR2_ssb_widths[] = {
 "1000", "1200", "1400", "1600", "1800", 
 "2000", "2200", "2400", "2600", "2800", 
-"3000", "3400", "4000", "5000", NULL };
-static const char *SUNSDR2_ssb_cat[] = {
+"3000", "3400", "4000", "5000" };
+static std::vector<std::string>SUNSDR2_ssb_cat;
+static const char *vSUNSDR2_ssb_cat[] = {
 "SH00;", "SH01;", "SH02;", "SH03;", "SH04;",
 "SH05;", "SH06;", "SH07;", "SH08;", "SH09;",
-"SH10;", "SH11;", "SH12;", "SH13;", NULL };
+"SH10;", "SH11;", "SH12;", "SH13;" };
 int SUNSDR2_num_ssb = 14;
 
-static const char *SUNSDR2_am_widths[] = {
-"5 KHz", "6 KHz", "8 KHz", "10 KHz", NULL };
-static const char *SUNSDR2_am_cat[] = {
-"SH00", "SH01", "SH02", "SH03", NULL };
+static std::vector<std::string>SUNSDR2_am_widths;
+static const char *vSUNSDR2_am_widths[] = {
+"5 KHz", "6 KHz", "8 KHz", "10 KHz" };
+static std::vector<std::string>SUNSDR2_am_cat;
+static const char *vSUNSDR2_am_cat[] = {
+"SH00", "SH01", "SH02", "SH03" };
 int SUNSDR2_num_am = 4;
 
-static const char *SUNSDR2_cw_widths[] = {
+static std::vector<std::string>SUNSDR2_cw_widths;
+static const char *vSUNSDR2_cw_widths[] = {
 "50", "80", "100", "150", "200", 
-"300", "400", "500", "600", "1000", NULL};
-static const char *SUNSDR2_cw_cat[] = {
+"300", "400", "500", "600", "1000"};
+static std::vector<std::string>SUNSDR2_cw_cat;
+static const char *vSUNSDR2_cw_cat[] = {
 "FW0050;", "FW0080;", "FW0100;", "FW0150;", "FW0200;", 
-"FW0300;", "FW0400;", "FW0500;", "FW0600;", "FW1000;", NULL };
+"FW0300;", "FW0400;", "FW0500;", "FW0600;", "FW1000;" };
 int SUNSDR2_num_cw = 10;
 
-static const char *SUNSDR2_digi_widths[] = {
-"250", "500", "1000", "1500", NULL};
-static const char *SUNSDR2_digi_cat[] = {
-"FW0250;", "FW0500;", "FW1000;", "FW1500;", NULL };
+static std::vector<std::string>SUNSDR2_digi_widths;
+static const char *vSUNSDR2_digi_widths[] = {
+"250", "500", "1000", "1500"};
+static std::vector<std::string>SUNSDR2_digi_cat;
+static const char *vSUNSDR2_digi_cat[] = {
+"FW0250;", "FW0500;", "FW1000;", "FW1500;" };
 int SUNSDR2_num_digi = 4;
 
-static const char *SUNSDR2_other_widths[] = {
-"FIXED", NULL };
-static const char *SUNSDR2_other_cat[] = {
-"FW0000;", NULL };
+static std::vector<std::string>SUNSDR2_other_widths;
+static const char *vSUNSDR2_other_widths[] = {
+"FIXED" };
+static std::vector<std::string>SUNSDR2_other_cat;
+static const char *vSUNSDR2_other_cat[] = {
+"FW0000;" };
 int SUNSDR2_num_other = 1;
 
 static int agcval = 1;
@@ -83,6 +95,23 @@ static GUI rig_widgets[]= {
 
 void RIG_SDR2_PRO::initialize()
 {
+	VECTOR (SUNSDR2modes_, vSUNSDR2modes_);
+	VECTOR (SUNSDR2_mode_cat, vSUNSDR2_mode_cat);
+	VECTOR (SUNSDR2_ssb_widths, vSUNSDR2_ssb_widths);
+	VECTOR (SUNSDR2_ssb_cat, vSUNSDR2_ssb_cat);
+	VECTOR (SUNSDR2_am_widths, vSUNSDR2_am_widths);
+	VECTOR (SUNSDR2_cw_widths, vSUNSDR2_cw_widths);
+	VECTOR (SUNSDR2_cw_cat, vSUNSDR2_cw_cat);
+	VECTOR (SUNSDR2_digi_widths, vSUNSDR2_digi_widths);
+	VECTOR (SUNSDR2_digi_cat, vSUNSDR2_digi_cat);
+	VECTOR (SUNSDR2_other_widths, vSUNSDR2_other_widths);
+	VECTOR (SUNSDR2_am_cat, vSUNSDR2_am_cat);
+	VECTOR (SUNSDR2_other_cat, vSUNSDR2_other_cat);
+
+	modes_ = SUNSDR2modes_;
+	bandwidths_ = SUNSDR2_cw_widths;
+	bw_vals_ = NULL;
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = sldrRFGAIN;
@@ -161,14 +190,18 @@ static int ret = 0;
 
 const char * RIG_SDR2_PRO::get_bwname_(int n, int md) 
 {
-	if (md == SDR2_LSB || md == SDR2_USB || md == SDR2_FM)
-		return SUNSDR2_ssb_widths[n];
-	if (md == SDR2_CW || md == SDR2_CWR)
-		return SUNSDR2_cw_widths[n];
-	if (md == SDR2_AM)
-		return SUNSDR2_am_widths[n];
-	if (md == SDR2_DIGU || md == SDR2_DIGL)
-		return SUNSDR2_digi_widths[n];
+	try {
+		if (md == SDR2_LSB || md == SDR2_USB || md == SDR2_FM)
+			return SUNSDR2_ssb_widths.at(n).c_str();
+		if (md == SDR2_CW || md == SDR2_CWR)
+			return SUNSDR2_cw_widths.at(n).c_str();
+		if (md == SDR2_AM)
+			return SUNSDR2_am_widths.at(n).c_str();
+		if (md == SDR2_DIGU || md == SDR2_DIGL)
+			return SUNSDR2_digi_widths.at(n).c_str();
+	} catch (const std::exception& e) {
+		std::cout << e.what() << '\n';
+	}
 	return "UNKNOWN";
 }
 
@@ -214,7 +247,7 @@ int RIG_SDR2_PRO::set_widths(int val)
 	return bw;
 }
 
-const char **RIG_SDR2_PRO::bwtable(int m)
+std::vector<std::string>& RIG_SDR2_PRO::bwtable(int m)
 {
 	if (m == SDR2_LSB || m == SDR2_USB || m == SDR2_FM)
 		return SUNSDR2_ssb_widths;
@@ -247,14 +280,13 @@ int RIG_SDR2_PRO::get_modeA()
 	size_t p = replystr.rfind("MD");
 	if (p != std::string::npos) {
 		replystr = replystr.substr(p);
-		int i = 0;
-		while (SUNSDR2_mode_cat[i] != NULL) {
+		size_t i = 0;
+		for (i = 0; i < SUNSDR2_mode_cat.size(); i++) {
 			if (replystr == SUNSDR2_mode_cat[i]){
 				A.imode = i;
 				A.iBW = set_widths(i);
 				return A.imode;
 			}
-			i++;
 		}
 	}
 	return A.imode;
@@ -281,14 +313,13 @@ int RIG_SDR2_PRO::get_modeB()
 	size_t p = replystr.rfind("MD");
 	if (p != std::string::npos) {
 		replystr = replystr.substr(p);
-		int i = 0;
-		while (SUNSDR2_mode_cat[i] != NULL) {
-			if (replystr == SUNSDR2_mode_cat[i]) {
+		size_t i = 0;
+		for (i = 0; i < SUNSDR2_mode_cat.size(); i++) {
+			if (replystr == SUNSDR2_mode_cat[i]){
 				B.imode = i;
 				B.iBW = set_widths(i);
 				return B.imode;
 			}
-			i++;
 		}
 	}
 	return B.imode;
@@ -301,25 +332,29 @@ int RIG_SDR2_PRO::get_modetype(int n)
 
 void RIG_SDR2_PRO::set_bwA(int val)
 {
-	int md = A.imode;
-	if (md == SDR2_LSB || md == SDR2_USB || md == SDR2_FM)
-		cmd = SUNSDR2_ssb_cat[val < SUNSDR2_num_ssb ? val : SUNSDR2_num_ssb];
-	else if (md == SDR2_CW || md == SDR2_CWR)
-		cmd = SUNSDR2_cw_cat[val < SUNSDR2_num_cw ? val : SUNSDR2_num_cw];
-	else if (md == SDR2_DIGU || md == SDR2_DIGL)
-		cmd = SUNSDR2_digi_cat[val < SUNSDR2_num_digi ? val : SUNSDR2_num_digi];
-	else if (md == SDR2_AM)
-		cmd = SUNSDR2_am_cat[val < SUNSDR2_num_am ? val : SUNSDR2_num_am];
-	else
-		cmd = SUNSDR2_other_cat[0];
-	sendCommand(cmd);
-	sett("");
-	showresp(WARN, ASC, "set SDR2_DIGU bw", cmd, "");
+	try {
+		int md = A.imode;
+		if (md == SDR2_LSB || md == SDR2_USB || md == SDR2_FM)
+			cmd = SUNSDR2_ssb_cat.at(val);
+		else if (md == SDR2_CW || md == SDR2_CWR)
+			cmd = SUNSDR2_cw_cat.at(val);
+		else if (md == SDR2_DIGU || md == SDR2_DIGL)
+			cmd = SUNSDR2_digi_cat.at(val);
+		else if (md == SDR2_AM)
+			cmd = SUNSDR2_am_cat.at(val);
+		else
+			cmd = SUNSDR2_other_cat.at(0);
+		sendCommand(cmd);
+		sett("");
+		showresp(WARN, ASC, "set SDR2_DIGU bw", cmd, "");
+	} catch (const std::exception& e) {
+		std::cout << e.what() << '\n';
+	}
 }
 
 int RIG_SDR2_PRO::get_bwA()
 {
-	int i = 0;
+	size_t i = 0;
 	size_t p;
 
 	if (A.imode == SDR2_LSB || A.imode == SDR2_USB) {
@@ -330,10 +365,9 @@ int RIG_SDR2_PRO::get_bwA()
 			p = replystr.rfind("SH");
 			if (p != std::string::npos) {
 				replystr = replystr.substr(p);
-				while (SUNSDR2_ssb_cat[i] != NULL) {
+				for (i = 0; i < SUNSDR2_ssb_cat.size(); i++) {
 					if (replystr == SUNSDR2_ssb_cat[i])
 						return A.iBW = i;
-					i++;
 				}
 			}
 		}
@@ -346,10 +380,9 @@ int RIG_SDR2_PRO::get_bwA()
 			p = replystr.rfind("FW");
 			if (p != std::string::npos) {
 				replystr = replystr.substr(p);
-				while (SUNSDR2_cw_cat[i] != NULL) {
+				for (i = 0; i < SUNSDR2_cw_cat.size(); i++) {
 					if (replystr == SUNSDR2_cw_cat[i])
 						return A.iBW = i;
-					i++;
 				}
 			}
 		}
@@ -361,10 +394,9 @@ int RIG_SDR2_PRO::get_bwA()
 			p = replystr.rfind("FW");
 			if (p != std::string::npos) {
 				replystr = replystr.substr(p);
-				while (SUNSDR2_digi_cat[i] != NULL) {
+				for (i = 0; i < SUNSDR2_digi_cat.size(); i++) {
 					if (replystr == SUNSDR2_digi_cat[i])
 						return A.iBW = i;
-					i++;
 				}
 			}
 		}
@@ -374,25 +406,29 @@ int RIG_SDR2_PRO::get_bwA()
 
 void RIG_SDR2_PRO::set_bwB(int val)
 {
-	int md = B.imode;
-	if (md == SDR2_LSB || md == SDR2_USB || md == SDR2_FM)
-		cmd = SUNSDR2_ssb_cat[val < SUNSDR2_num_ssb ? val : SUNSDR2_num_ssb];
-	else if (md == SDR2_CW || md == SDR2_CWR)
-		cmd = SUNSDR2_cw_cat[val < SUNSDR2_num_cw ? val : SUNSDR2_num_cw];
-	else if (md == SDR2_DIGU || md == SDR2_DIGL)
-		cmd = SUNSDR2_digi_cat[val < SUNSDR2_num_digi ? val : SUNSDR2_num_digi];
-	else if (md == SDR2_AM)
-		cmd = SUNSDR2_am_cat[val < SUNSDR2_num_am ? val : SUNSDR2_num_am];
-	else
-		cmd = SUNSDR2_other_cat[0];
-	sendCommand(cmd);
-	showresp(WARN, ASC, "set SDR2_DIGU bw", cmd, "");
-	sett("");
+	try {
+		int md = B.imode;
+		if (md == SDR2_LSB || md == SDR2_USB || md == SDR2_FM)
+			cmd = SUNSDR2_ssb_cat.at(val);
+		else if (md == SDR2_CW || md == SDR2_CWR)
+			cmd = SUNSDR2_cw_cat.at(val);
+		else if (md == SDR2_DIGU || md == SDR2_DIGL)
+			cmd = SUNSDR2_digi_cat.at(val);
+		else if (md == SDR2_AM)
+			cmd = SUNSDR2_am_cat[val < SUNSDR2_num_am ? val : SUNSDR2_num_am];
+		else
+			cmd = SUNSDR2_other_cat[0];
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set SDR2_DIGU bw", cmd, "");
+		sett("");
+	} catch (const std::exception& e) {
+		std::cout << e.what() << '\n';
+	}
 }
 
 int RIG_SDR2_PRO::get_bwB()
 {
-	int i = 0;
+	size_t i = 0;
 	size_t p;
 
 	if (B.imode == SDR2_LSB || B.imode == SDR2_USB) {
@@ -403,10 +439,9 @@ int RIG_SDR2_PRO::get_bwB()
 			p = replystr.rfind("SH");
 			if (p != std::string::npos) {
 				replystr = replystr.substr(p);
-				while (SUNSDR2_ssb_cat[i] != NULL) {
+				for (i = 0; i < SUNSDR2_ssb_cat.size(); i++) {
 					if (replystr == SUNSDR2_ssb_cat[i])
 						return B.iBW = i;
-					i++;
 				}
 			}
 		}
@@ -419,10 +454,9 @@ int RIG_SDR2_PRO::get_bwB()
 			p = replystr.rfind("FW");
 			if (p != std::string::npos) {
 				replystr = replystr.substr(p);
-				while (SUNSDR2_cw_cat[i] != NULL) {
+				for (i = 0; i < SUNSDR2_cw_cat.size(); i++) {
 					if (replystr == SUNSDR2_cw_cat[i])
 						return B.iBW = i;
-					i++;
 				}
 			}
 		}
@@ -434,10 +468,9 @@ int RIG_SDR2_PRO::get_bwB()
 			p = replystr.rfind("FW");
 			if (p != std::string::npos) {
 				replystr = replystr.substr(p);
-				while (SUNSDR2_digi_cat[i] != NULL) {
+				for (i = 0; i < SUNSDR2_digi_cat.size(); i++) {
 					if (replystr == SUNSDR2_digi_cat[i])
 						return B.iBW = i;
-					i++;
 				}
 			}
 		}

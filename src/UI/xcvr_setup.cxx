@@ -964,7 +964,7 @@ trace(1, "close serial port");
 trace(1, "clear frequency list");
 	clearList();
 	saveFreqList();
-	selrig = rigs[selectRig->index()];
+	selrig = (rigbase *)(selectRig->data());
 	xcvr_name = selrig->name_;
 
 	progStatus.xcvr_serial_port = selectCommPort->value();

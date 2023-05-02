@@ -29,21 +29,24 @@
 
 const char IC756PRO3name_[] = "IC-756PRO-III";
 
-const char *IC756PRO3modes_[] = {
-		"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R",
-		"D-LSB", "D-USB", "D-FM", NULL};
+static std::vector<std::string>IC756PRO3modes_;
+static const char *vIC756PRO3modes_[] =
+{
+	"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R",
+	"D-LSB", "D-USB", "D-FM"};
 
 const char IC756PRO3_mode_type[] =
 	{ 'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U',
 	  'L', 'U', 'U' };
 
-const char *IC756PRO3_SSBwidths[] = {
+static std::vector<std::string>IC756PRO3_SSBwidths;
+static const char *vIC756PRO3_SSBwidths[] =
+{
   "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
 "600",   "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
 "2600", "2700", "2800", "2900", "3000", "3100", "3200", "3300", "3400", "3500",
-"3600",
-NULL};
+"3600"};
 static int IC756PRO3_bw_vals_SSB[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
@@ -51,19 +54,22 @@ static int IC756PRO3_bw_vals_SSB[] = {
 31,32,33,34,35,36,37,38,39,40,
 41, WVALS_LIMIT};
 
-const char *IC756PRO3_RTTYwidths[] = {
+static std::vector<std::string>IC756PRO3_RTTYwidths;
+static const char *vIC756PRO3_RTTYwidths[] =
+{
   "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
  "600",  "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
-"2600", "2700",
-NULL};
+"2600", "2700"};
 static int IC756PRO3_bw_vals_RTTY[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
 21,22,23,24,25,26,27,28,29,30,
 31,32, WVALS_LIMIT};
 
-const char *IC756PRO3_AMFMwidths[] = { "FILT-1", "FILT-2", "FILT-3", NULL };
+static std::vector<std::string>IC756PRO3_AMFMwidths;
+static const char *vIC756PRO3_AMFMwidths[] =
+{ "FILT-1", "FILT-2", "FILT-3" };
 static int IC756PRO3_bw_vals_AMFM[] = { 1,2,3, WVALS_LIMIT};
 
 static GUI IC756PRO3_widgets[]= {
@@ -87,6 +93,15 @@ static GUI IC756PRO3_widgets[]= {
 
 void RIG_IC756PRO3::initialize()
 {
+	VECTOR (IC756PRO3modes_, vIC756PRO3modes_);
+	VECTOR (IC756PRO3_SSBwidths, vIC756PRO3_SSBwidths);
+	VECTOR (IC756PRO3_RTTYwidths, vIC756PRO3_RTTYwidths);
+	VECTOR (IC756PRO3_AMFMwidths, vIC756PRO3_AMFMwidths);
+
+	modes_ = IC756PRO3modes_;
+	bandwidths_ = IC756PRO3_SSBwidths;
+	bw_vals_ = IC756PRO3_bw_vals_SSB;
+
 	IC756PRO3_widgets[0].W = btnVol;
 	IC756PRO3_widgets[1].W = sldrVOLUME;
 	IC756PRO3_widgets[2].W = btnAGC;
@@ -748,7 +763,7 @@ int RIG_IC756PRO3::def_bandwidth(int m)
 	return (0);
 }
 
-const char **RIG_IC756PRO3::bwtable(int m)
+std::vector<std::string>& RIG_IC756PRO3::bwtable(int m)
 {
 	if (m == 0 || m == 1 || m == 8 || m == 9) //SSB
 		return IC756PRO3_SSBwidths;

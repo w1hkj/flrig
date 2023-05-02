@@ -123,7 +123,7 @@ public:
 	virtual void set_rf_gain(int val);
 	virtual int  get_rf_gain();
 	virtual void get_rf_min_max_step(int &min, int &max, int &step);
-	virtual const char **bwtable(int);
+	virtual std::vector<std::string>& bwtable(int);
 
 	virtual void set_vox_onoff();
 	virtual void set_vox_gain();

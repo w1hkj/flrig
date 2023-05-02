@@ -28,8 +28,9 @@
 
 static const char FT747name_[] = "FT-747";
 
-static const char *FT747modes_[] = {
-		"LSB", "USB", "CW", "CWN", "AMW", "AMN", "FMW", "FMN", NULL};
+static std::vector<std::string>FT747modes_;
+static const char *vFT747modes_[] = {
+		"LSB", "USB", "CW", "CWN", "AMW", "AMN", "FMW", "FMN"};
 static const char FT747_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'U', 'U', 'U' };
 
 RIG_FT747::RIG_FT747() {
@@ -63,6 +64,12 @@ RIG_FT747::RIG_FT747() {
 	ndigits = 8;
 
 };
+
+void RIG_FT747::initialize()
+{
+	VECTOR( FT747modes_, vFT747modes_);
+	modes_ = FT747modes_;
+}
 
 void RIG_FT747::init_cmd()
 {

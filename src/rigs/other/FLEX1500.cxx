@@ -25,72 +25,87 @@
 
 static const char FLEX1500name_[] = "FLEX1500";
 
-static const char *FLEX1500modes_[] = {
-	"LSB", "USB", "DSB", "CWL", "CWU", "FM", "AM", "DIGU", "SPEC", "DIGL", "SAM", "DRM", NULL};
+static std::vector<std::string>FLEX1500modes_;
+static const char *vFLEX1500modes_[] =
+{ "LSB", "USB", "DSB", "CWL", "CWU", "FM", "AM", "DIGU", "SPEC", "DIGL", "SAM", "DRM"};
 
-static const char *FLEX1500_mode_chr[] =  { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", NULL };
+static std::vector<std::string>FLEX1500_mode_chr;
+static const char *vFLEX1500_mode_chr[] =
+{ "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11" };
 static const char FLEX1500_mode_type[] = { 'L', 'U', 'U', 'L', 'U', 'U', 'U', 'U', 'U', 'L', 'U', 'U' };
 
-static const char *FLEX1500_empty[] = { NULL, NULL };
+static std::vector<std::string>FLEX1500_empty;
+static const char *vFLEX1500_empty[] =
+{ "NONE" };
 //------------------------------------------------------------------------
-static const char *FLEX1500_USBwidths[] = {
+static std::vector<std::string>FLEX1500_USBwidths;
+static const char *vFLEX1500_USBwidths[] =
+{
 " 5000", " 4400", " 3800", " 3300", " 2900",
 " 2700", " 2400", " 2100", " 1800", " 1000",
-" Var1", " Var2", NULL };
-static const char *FLEX1500_CAT_USB[] = {
+" Var1", " Var2" };
+static std::vector<std::string>FLEX1500_CAT_USB;
+static const char *vFLEX1500_CAT_USB[] =
+{
 "ZZFI00;", "ZZFI01;", "ZZFI02;", "ZZFI03;", "ZZFI04;",
 "ZZFI05;", "ZZFI06;", "ZZFI07;", "ZZFI08;", "ZZFI09;",
-"ZZFI10;", "ZZFI11;", NULL };
+"ZZFI10;", "ZZFI11;" };
 //static const char *FLEX1500_SH_tooltip = "hi cut";
 //static const char *FLEX1500_SSB_btn_SH_label = "H";
 //------------------------------------------------------------------------
-static const char *FLEX1500_WIDEwidths[] = {
-"Wideband", NULL };
-//static const char *FLEX1500_CAT_WIDE[] = {
+static std::vector<std::string>FLEX1500_WIDEwidths;
+static const char *vFLEX1500_WIDEwidths[] =
+{
+"Wideband" };
+//static std::vector<std::string>FLEX1500_CAT_WIDE = {
 //"ZZFI12;" };
 //------------------------------------------------------------------------
-static const char *FLEX1500_DIGwidths[] = {
+static std::vector<std::string>FLEX1500_DIGwidths;
+static const char *vFLEX1500_DIGwidths[] =
+{
 " 3000", " 2500", " 2000", " 1500", " 1000",
 "  800", "  600", "  300", "  150", "   75",
-" Var1", " Var2", NULL };
-static const char *FLEX1500_CAT_DIG[] = {
+" Var1", " Var2" };
+static std::vector<std::string>FLEX1500_CAT_DIG;
+static const char *vFLEX1500_CAT_DIG[] =
+{
 "ZZFI00;", "ZZFI01;", "ZZFI02;", "ZZFI03;", "ZZFI04;",
 "ZZFI05;", "ZZFI06;", "ZZFI07;", "ZZFI08;", "ZZFI09;",
-"ZZFI10;", "ZZFI11;", NULL };
+"ZZFI10;", "ZZFI11;" };
 //------------------------------------------------------------------------------
-static const char *FLEX1500_AMwidths[] = {
+static std::vector<std::string>FLEX1500_AMwidths;
+static const char *vFLEX1500_AMwidths[] =
+{
 "16000", "12000", "10000", " 8000", " 6600",
 " 5200", " 4000", " 3100", " 2900", " 2400",
-"Var1", "Var2", NULL };
-static const char *FLEX1500_CAT_AM[] = {
+"Var1", "Var2" };
+static std::vector<std::string>FLEX1500_CAT_AM;
+static const char *vFLEX1500_CAT_AM[] =
+{
 "ZZFI00;", "ZZFI01;", "ZZFI02;", "ZZFI03;", "ZZFI04;",
 "ZZFI05;", "ZZFI06;", "ZZFI07;", "ZZFI08;", "ZZFI09;",
-"ZZFI10;", "ZZFI11;", NULL };
+"ZZFI10;", "ZZFI11;" };
 //------------------------------------------------------------------------------
-static const char *FLEX1500_CWwidths[] = {
+static std::vector<std::string>FLEX1500_CWwidths;
+static const char *vFLEX1500_CWwidths[] =
+{
 " 1000", "  800", "  750", "  600", "  500",
 "  400", "  250", "  100", "   50", "   25",
-" Var1", " Var2", NULL};
-static const char *FLEX1500_CAT_CW[] = {
+" Var1", " Var2"};
+static std::vector<std::string>FLEX1500_CAT_CW;
+static const char *vFLEX1500_CAT_CW[] =
+{
 "ZZFI00;", "ZZFI01;", "ZZFI02;", "ZZFI03;", "ZZFI04;",
 "ZZFI05;", "ZZFI06;", "ZZFI07;", "ZZFI08;", "ZZFI09;",
-"ZZFI10;", "ZZFI11;", NULL };
+"ZZFI10;", "ZZFI11;" };
 //------------------------------------------------------------------------------
 
-static char *varwidths[] = {
-	new char[6],
-	new char[6],
-	new char[6],
-	new char[6],
-	new char[6],
-	new char[6],
-	new char[6],
-	new char[6],
-	new char[6],
-	new char[6],
-	new char[6],
-	new char[6],
-	NULL };
+static std::vector<std::string>varwidths;
+static const char *vvarwidths[] =
+{
+" 5000", " 4400", " 3800", " 3300", " 2900",
+" 2700", " 2400", " 2100", " 1800", " 1000",
+"  500", "  200" };
 
 //------------------------------------------------------------------------------
 static GUI rig_widgets[]= {
@@ -112,6 +127,23 @@ static std::string menu012 = "EX01200004";
 
 void RIG_FLEX1500::initialize()
 {
+	VECTOR (FLEX1500modes_, vFLEX1500modes_);
+	VECTOR (FLEX1500_mode_chr, vFLEX1500_mode_chr);
+	VECTOR (FLEX1500_empty, vFLEX1500_empty);
+	VECTOR (FLEX1500_USBwidths, vFLEX1500_USBwidths);
+	VECTOR (FLEX1500_CAT_USB, vFLEX1500_CAT_USB);
+	VECTOR (FLEX1500_WIDEwidths, vFLEX1500_WIDEwidths);
+	VECTOR (FLEX1500_DIGwidths, vFLEX1500_DIGwidths);
+	VECTOR (FLEX1500_CAT_DIG, vFLEX1500_CAT_DIG);
+	VECTOR (FLEX1500_AMwidths, vFLEX1500_AMwidths);
+	VECTOR (FLEX1500_CAT_AM, vFLEX1500_CAT_AM);
+	VECTOR (FLEX1500_CWwidths, vFLEX1500_CWwidths);
+	VECTOR (FLEX1500_CAT_CW, vFLEX1500_CAT_CW);
+	VECTOR (varwidths, vvarwidths);
+
+	modes_ = FLEX1500modes_;
+	bandwidths_ = FLEX1500_empty;
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = sldrRFGAIN;
@@ -123,8 +155,10 @@ void RIG_FLEX1500::initialize()
 	rig_widgets[8].W = sldrMICGAIN;
 	rig_widgets[9].W = sldrPOWER;
 
-	for (int i = 0; i < 12; i++)
-		strcpy(varwidths[i], FLEX1500_USBwidths[i]);
+//	for (int i = 0; i < 12; i++) {
+//		memset(const_cast<char *>(varwidths.at(i)), ' ', 5);
+//		strncpy(const_cast<char *>(varwidths.at(i)), FLEX1500_USBwidths.at(i), 5);
+//	}
 
 // get current noise reduction values for NR1 and NR2
 	std::string current_nr;
@@ -227,30 +261,24 @@ static int ret = 0;
 
 const char * RIG_FLEX1500::get_bwname_(int n, int md)
 {
-	static char bwname[20];
 	std::stringstream str;
 	str << "n=" << n << ", md=" << md;
 	trace(2, __func__, str.str().c_str());
-	if (md == USB || md == LSB) {
-		if (FLEX1500_USBwidths[n] != NULL)
-			snprintf(bwname, sizeof(bwname), "%s", FLEX1500_USBwidths[n]);
+	try {
+		if (md == USB || md == LSB)
+			return FLEX1500_USBwidths.at(n).c_str();
+		if (md == FM || md == DRM || md == SPEC)
+			return FLEX1500_WIDEwidths.at(n).c_str();
+		if (md == DIGU || md == DIGL)
+			return FLEX1500_DIGwidths.at(n).c_str();
+		if (md == CWU || md == CWL)
+			return FLEX1500_CWwidths.at(n).c_str();
+		else
+			return FLEX1500_AMwidths.at(n).c_str();
+	} catch (const std::exception& e) {
+		std::cout << e.what() << '\n';
 	}
-	else if (md == FM || md == DRM || md == SPEC) {
-		if (FLEX1500_WIDEwidths[n] != NULL)
-			snprintf(bwname, sizeof(bwname), "%s", FLEX1500_WIDEwidths[n]);
-	}
-	else if (md == DIGU || md == DIGL) {
-		if (FLEX1500_DIGwidths[n] != NULL)
-			snprintf(bwname, sizeof(bwname), "%s", FLEX1500_DIGwidths[n]);
-	}
-	else if (md == CWU || md == CWL) {
-		if (FLEX1500_CWwidths[n] != NULL)
-			snprintf(bwname, sizeof(bwname), "%s", FLEX1500_CWwidths[n]);
-	} else {
-		if (FLEX1500_AMwidths[n] != NULL)
-			snprintf(bwname, sizeof(bwname), "%s", FLEX1500_AMwidths[n]);
-	}
-	return bwname;
+	return "UNKNOWN";
 }
 
 int RIG_FLEX1500::get_smeter()
@@ -438,20 +466,23 @@ int RIG_FLEX1500::set_widths(int val)
 	}
 	if (fill_widths) {
 		if (p != std::string::npos) {
-			std::string tocopy;
+			if (replystr.length() < 187)
+				return bw;
+			varwidths.clear();
+			static std::string widths;
+			widths = replystr.substr(p + 6);
+
 			for (int i = 0; i < 12; i++) {
-				tocopy = replystr.substr(p, 5);
-				while (tocopy.length() && tocopy[0] == ' ') tocopy.erase(0,1);
-				strcpy(varwidths[i], tocopy.c_str());
-				p += 15;
+				widths[i*15 + 6] = 0;
+				varwidths.push_back(&widths[i*15]);
 			}
+			bandwidths_ = varwidths;
 		}
-		bandwidths_ = (const char**)(varwidths);
 	}
 	return bw;
 }
 
-const char **RIG_FLEX1500::bwtable(int val)
+std::vector<std::string>& RIG_FLEX1500::bwtable(int val)
 {
 	switch (val) {
 	case LSB: case USB:
@@ -469,7 +500,7 @@ const char **RIG_FLEX1500::bwtable(int val)
 }
 
 #if 0
-const char **RIG_FLEX1500::lotable(int val)
+std::vector<std::string>& RIG_FLEX1500::lotable(int val)
 {
 	if (val == LSB || val == USB || val == FM || val == DRM || val == SPEC)
 		return FLEX1500_USBwidths;
@@ -477,7 +508,7 @@ const char **RIG_FLEX1500::lotable(int val)
 		return FLEX1500_DIGwidths;
 	else if (val == AM || val == SAM || val == DSB)
 		return FLEX1500_AMwidths;
-	return NULL;
+	return FLEX1500_USBwidths;
 }
 
 const char **RIG_FLEX1500::hitable(int val)
@@ -490,7 +521,7 @@ const char **RIG_FLEX1500::hitable(int val)
 		return FLEX1500_CWwidths;
 	else if (val == AM || val == SAM || val == DSB)
 		return FLEX1500_AMwidths;
-	return NULL;
+	return FLEX1500_USBwidths;
 }
 #endif
 
@@ -535,16 +566,19 @@ int RIG_FLEX1500::get_pbt_outer()
 
 void RIG_FLEX1500::set_modeA(int val)
 {
-	if (val >= (int)(sizeof(FLEX1500_mode_chr)/sizeof(*FLEX1500_mode_chr))) return;
-	_currmode = A.imode = val;
-	cmd = "ZZMD";
-	cmd += FLEX1500_mode_chr[val];
-	cmd += ';';
-	sendCommand(cmd);
-	showresp(WARN, ASC, "set mode", cmd, "");
-	sett("modeA");
-	A.iBW = set_widths(val);
-	vfoA.iBW = A.iBW;
+	try {
+		_currmode = A.imode = val;
+		cmd = "ZZMD";
+		cmd += FLEX1500_mode_chr[val];
+		cmd += ';';
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set mode", cmd, "");
+		sett("modeA");
+		A.iBW = set_widths(val);
+		vfoA.iBW = A.iBW;
+	} catch (const std::exception& e) {
+		std::cout << e.what() << '\n';
+	}
 }
 
 int RIG_FLEX1500::get_modeA()
@@ -572,17 +606,20 @@ int RIG_FLEX1500::get_modeA()
 
 void RIG_FLEX1500::set_modeB(int val)
 {
-	if (val >= (int)(sizeof(FLEX1500_mode_chr)/sizeof(*FLEX1500_mode_chr))) return;
-	_currmode = B.imode = val;
-	cmd = "MD";
-	cmd += FLEX1500_mode_chr[val];
-	cmd += ';';
-	sendCommand(cmd);
-	showresp(WARN, ASC, "set mode B", cmd, "");
-	sett("modeB");
-	MilliSleep(100); // give rig a chance to change width
-	B.iBW = set_widths(val);
-	vfoB.iBW = B.iBW;
+	try {
+		_currmode = B.imode = val;
+		cmd = "MD";
+		cmd += FLEX1500_mode_chr[val];
+		cmd += ';';
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set mode B", cmd, "");
+		sett("modeB");
+		MilliSleep(100); // give rig a chance to change width
+		B.iBW = set_widths(val);
+		vfoB.iBW = B.iBW;
+	} catch (const std::exception& e) {
+		std::cout << e.what() << '\n';
+	}
 }
 
 int RIG_FLEX1500::get_modeB()
@@ -626,39 +663,51 @@ void RIG_FLEX1500::set_bwA(int val)
 	std::stringstream str;
 	if (A.imode == FM || A.imode == DRM || A.imode == SPEC) return; // mode is fixed
 	else if (A.imode == LSB || A.imode == USB) {
-		A.iBW = val;
-		if (val >= (int)(sizeof(FLEX1500_CAT_USB)/sizeof(*FLEX1500_CAT_USB))) return;
-		cmd = FLEX1500_CAT_USB[val];
-		sendCommand(cmd);
-		showresp(WARN, ASC, "set_bwA USB", cmd, "");
-		sett("bwA USB");
+		try {
+			cmd = FLEX1500_CAT_USB.at(val);
+			sendCommand(cmd);
+			showresp(WARN, ASC, "set_bwA USB", cmd, "");
+			sett("bwA USB");
+			A.iBW = val;
+		} catch (const std::exception& e) {
+			std::cout << e.what() << '\n';
+		}
 	}
 	else if (A.imode == DIGU || A.imode == DIGL) {
-		A.iBW = val;
-	std::stringstream str;
-	str << "val =" << val ;
-	trace(2, __func__, str.str().c_str());
-		if (val >= (int)(sizeof(FLEX1500_CAT_DIG)/sizeof(*FLEX1500_CAT_DIG))) return;
-		cmd = FLEX1500_CAT_DIG[val];
-		sendCommand(cmd);
-		showresp(WARN, ASC, "set_bwA DIG", cmd, "");
-		sett("bwA DIG");
+		std::stringstream str;
+		str << "val =" << val ;
+		trace(2, __func__, str.str().c_str());
+		try {
+			cmd = FLEX1500_CAT_DIG.at(val);
+			sendCommand(cmd);
+			showresp(WARN, ASC, "set_bwA DIG", cmd, "");
+			sett("bwA DIG");
+			A.iBW = val;
+		} catch (const std::exception& e) {
+			std::cout << e.what() << '\n';
+		}
 	}
 	else if (A.imode == CWU || A.imode == CWL) {
-		A.iBW = val;
-		if (val >= (int)(sizeof(FLEX1500_CAT_CW)/sizeof(*FLEX1500_CAT_CW))) return;
-		cmd = FLEX1500_CAT_CW[val];
-		sendCommand(cmd);
-		showresp(WARN, ASC, "set_bwA CW", cmd, "");
-		sett("bwA CW");
+		try {
+			cmd = FLEX1500_CAT_CW.at(val);
+			sendCommand(cmd);
+			showresp(WARN, ASC, "set_bwA CW", cmd, "");
+			sett("bwA CW");
+			A.iBW = val;
+		} catch (const std::exception& e) {
+			std::cout << e.what() << '\n';
+		}
 	}
 	else if (A.imode == AM || A.imode == SAM || A.imode == DSB) {
-		A.iBW = val;
-		if (val >= (int)(sizeof(FLEX1500_CAT_AM)/sizeof(*FLEX1500_CAT_AM))) return;
-		cmd = FLEX1500_CAT_AM[val];
-		sendCommand(cmd);
-		showresp(WARN, ASC, "set_bwA AM", cmd, "");
-		sett("bwA AM");
+		try {
+			cmd = FLEX1500_CAT_AM.at(val);
+			sendCommand(cmd);
+			showresp(WARN, ASC, "set_bwA AM", cmd, "");
+			sett("bwA AM");
+			A.iBW = val;
+		} catch (const std::exception& e) {
+			std::cout << e.what() << '\n';
+		}
 	}
 }
 
@@ -666,12 +715,12 @@ int RIG_FLEX1500::get_bw(int mode)
 {
 	size_t i = 0;
 	int bw = 0;
-	const char **tbl;
+	std::vector<std::string>& tbl = FLEX1500_CAT_USB;
 	if (mode == FM || mode == DRM || mode == SPEC) 
 		gett("get_bwA Wideband");
 	else {
 		cmd = "ZZFI;";
-		get_trace(3, "get ", FLEX1500modes_[mode], " bandwidth");
+		get_trace(3, "get ", FLEX1500modes_[mode].c_str(), " bandwidth");
 		ret = wait_char(';', 7, 100, "get ZZFI", ASC);
 		gett("");
 		if (ret) {
@@ -690,10 +739,11 @@ int RIG_FLEX1500::get_bw(int mode)
 					tbl = FLEX1500_CAT_AM;
 					break;
 			}
-			for (i = 0; tbl[i] != NULL; i++)
+			for (i = 0; i < tbl.size(); i++) {
 				if (replystr.find(tbl[i]) != std::string::npos) {
 					bw = i;
 					break;
+				}
 			}
 		}
 	}

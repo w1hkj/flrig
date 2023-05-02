@@ -28,7 +28,7 @@ public:
 	RIG_TS940S();
 	~RIG_TS940S(){}
 
-	void initialize () {}
+	void initialize ();
 	void shutdown () {}
 
 	unsigned long long get_vfoA();

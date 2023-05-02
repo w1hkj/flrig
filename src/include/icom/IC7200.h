@@ -147,7 +147,7 @@ public:
 	void set_split(bool);
 	int  get_split();
 	bool can_split();
-	const char **bwtable(int);
+	std::vector<std::string>& bwtable(int);
 
 	bool  canswap() { return true; }
 

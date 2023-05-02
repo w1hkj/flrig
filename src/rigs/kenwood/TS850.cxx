@@ -23,17 +23,20 @@
 
 static const char TS850name_[] = "TS-850";
 
-static const char *TS850modes_[] = {
-		"LSB", "USB", "CW", "FM", "AM", "FSK", "CW-R", "FSK-R", NULL};
+static std::vector<std::string>TS850modes_;
+static const char *vTS850modes_[] = {
+		"LSB", "USB", "CW", "FM", "AM", "FSK", "CW-R", "FSK-R"};
 static const char TS850_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '9' };
 static const char TS850_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'U' };
 
-static const char *TS850_widths[] = {
-"NONE", "FM-W", "FM-N", "AM", "SSB", "CW", "CW-N", NULL};
+static std::vector<std::string>TS850_widths;
+static const char *vTS850_widths[] = {
+"NONE", "FM-W", "FM-N", "AM", "SSB", "CW", "CW-N"};
 static int TS850_bw_vals[] = { 1,2,3,4,5,6,7, WVALS_LIMIT};
 
-static const char *TS850_filters[] = {
-"000", "002", "003", "005", "007", "009", "010", NULL};
+static std::vector<std::string>TS850_filters;
+static const char *vTS850_filters[] = {
+"000", "002", "003", "005", "007", "009", "010"};
 
 RIG_TS850::RIG_TS850() {
 // base class values
@@ -85,6 +88,15 @@ RIG_TS850::RIG_TS850() {
 
 void RIG_TS850::initialize()
 {
+	VECTOR (TS850modes_, vTS850modes_);
+	VECTOR (TS850_widths, vTS850_widths);
+	VECTOR (TS850_filters, vTS850_filters);
+
+	modes_ = TS850modes_;
+	_mode_type = TS850_mode_type;
+	bandwidths_ = TS850_widths;
+	bw_vals_ = TS850_bw_vals;
+
 	cmd = "AI0;"; // auto information OFF
 	sendCommand(cmd);
 	MilliSleep(100);
@@ -289,12 +301,10 @@ int RIG_TS850::get_bwA()
 	if (p == std::string::npos) return bwA;
 
 	replystr[p + 8] = 0;
-	int bw = 0;
-	while (TS850_filters[bw]) {
-		if (strcmp(&replystr[p + 5], TS850_filters[bw]) == 0)
+	size_t bw = 0;
+	for (bw = 0; bw < TS850_filters.size(); bw++)
+		if (TS850_filters[bw] == replystr.substr(p + 5))
 			return bwA = bw;
-		bw++;
-	}
 	return bwA;
 }
 
@@ -318,12 +328,10 @@ int RIG_TS850::get_bwB()
 	if (p == std::string::npos) return bwB;
 
 	replystr[p + 8] = 0;
-	int bw = 0;
-	while (TS850_filters[bw]) {
-		if (strcmp(&replystr[p + 5], TS850_filters[bw]) == 0)
+	size_t bw = 0;
+	for (bw = 0; bw < TS850_filters.size(); bw++)
+		if (TS850_filters[bw] == replystr.substr(p + 5))
 			return bwB = bw;
-		bw++;
-	}
 	return bwB;
 }
 

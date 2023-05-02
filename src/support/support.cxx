@@ -87,8 +87,6 @@ enum {VOL, MIC, PWR, SQL, IFSH, NOTCH, RFGAIN, NR, NB };
 
 std::queue<VFOQUEUE> srvc_reqs;
 
-const char **old_bws = NULL;
-
 // Add alpha-tag to XCVR_STATE;
 struct ATAG_XCVR_STATE {
 	unsigned long long freq;
@@ -156,34 +154,31 @@ int  powerlevel = 0;
 
 std::string printXCVR_STATE(XCVR_STATE data)
 {
-	std::stringstream str;
+	try {
+		std::stringstream str;
 
-	str << data.freq;
-
-	if (selrig->modes_)
-		str << ", " << selrig->modes_[data.imode];
-	else
-		str << ", modes n/a";
-
-	if (selrig->has_int_bandwidth_control) {
-		str << ", " << data.iBW;
-	} else if (selrig->has_dsp_controls) {
-		const char **dsplo = selrig->lotable(data.imode);
-		const char **dsphi = selrig->hitable(data.imode);
-		if (data.iBW > 256) {
-			str << ", " << (dsplo ? dsplo[data.iBW & 0x7F] : "??");
-			str << ", " << (dsphi ? dsphi[(data.iBW >> 8) & 0x7F] : "??");
+		str << data.freq;
+		str << ", " << selrig->modes_.at(data.imode);
+		if (selrig->has_int_bandwidth_control) {
+			str << ", " << data.iBW;
+		} else if (selrig->has_dsp_controls) {
+			std::vector<std::string>& dsplo = selrig->lotable(data.imode);
+			std::vector<std::string>& dsphi = selrig->hitable(data.imode);
+			if (data.iBW > 256) {
+				str << ", " << dsplo.at(data.iBW & 0x7F);
+				str << ", " << dsphi.at((data.iBW >> 8) & 0x7F);
+			}
+		} else {
+			std::vector<std::string>& bwt = selrig->bwtable(data.imode);
+			str << ", " << bwt.at(data.iBW);
 		}
-	} else {
-		const char **bwt = selrig->bwtable(data.imode);
-		if (bwt)
-			str << ", " << bwt[data.iBW];
-		else
-			str << ", n/a";
-	}
+		str << std::endl;
+		return str.str();
 
-	str << std::endl;
-	return str.str();
+	} catch (const std::exception& e) {
+		LOG_ERROR("%s", e.what());
+	}
+	return "";
 }
 
 std::string print_ab()
@@ -200,53 +195,52 @@ const char *print(XCVR_STATE data)
 {
 	static std::string prstr;
 	static char str[1024];
-    if (data.imode < 0) data.imode = 0;
-	const char **bwt = selrig->bwtable(data.imode);
-	const char **dsplo = selrig->lotable(data.imode);
-	const char **dsphi = selrig->hitable(data.imode);
 
-	str[0] = 0;
-	prstr.clear();
-	snprintf(
-		str, sizeof(str), "\
+	try {
+		std::vector<std::string>& bwt = selrig->bwtable(data.imode);
+		std::vector<std::string>& dsplo = selrig->lotable(data.imode);
+		std::vector<std::string>& dsphi = selrig->hitable(data.imode);
+
+		str[0] = 0;
+		prstr.clear();
+		snprintf(
+			str, sizeof(str), "\
 Data Source: %s\n\
   freq ........... %llu\n\
   mode ........... %d [%s]\n",
-		data.src == XML ? "XML" : data.src == UI ? "UI" :
-			data.src == SRVR ? "SRVR" : "RIG",
-		data.freq,
-		data.imode,
-		selrig->modes_ ? selrig->modes_[data.imode] : "modes n/a");
-	prstr.assign(str);
-	str[0] = 0;
-	if (selrig->has_int_bandwidth_control) {
-		snprintf(str, sizeof(str), "\
+				data.src == XML ? "XML" : data.src == UI ? "UI" :
+					data.src == SRVR ? "SRVR" : "RIG",
+				data.freq,
+				data.imode,
+				selrig->modes_.at(data.imode).c_str());
+		prstr.assign(str);
+		str[0] = 0;
+		if (selrig->has_int_bandwidth_control) {
+			snprintf(str, sizeof(str), "\
   bandwidth ...... %d\n",
-		data.iBW);
-	} else if (selrig->has_FILTER) {
-		if (bwt && dsplo && dsphi) {
+				data.iBW);
+		} else if (selrig->has_FILTER) {
 			snprintf(str, sizeof(str), "\
   filter ......... %s\n\
   bwt index ...... %2d, [%s] [%s]\n",
-			selrig->FILT(selrig->get_FILT(data.imode)),
-				data.iBW,
-				(data.iBW > 256 && selrig->has_dsp_controls) ?
-					(dsplo ? dsplo[data.iBW & 0x7F] : "??") : (bwt ? bwt[data.iBW] : "n/a"),
-				(data.iBW > 256 && selrig->has_dsp_controls) ?
-					(dsphi ? dsphi[(data.iBW >> 8) & 0x7F] : "??") : ""
-			);
-		} else if (bwt) {
-			snprintf(str, sizeof(str), "\
+				selrig->FILT(selrig->get_FILT(data.imode)),
+					data.iBW,
+					(data.iBW > 256 && selrig->has_dsp_controls) ?
+						dsplo.at(data.iBW & 0x7F).c_str() : bwt.at(data.iBW).c_str(),
+					(data.iBW > 256 && selrig->has_dsp_controls) ?
+						dsphi.at((data.iBW >> 8) & 0x7F).c_str() : ""
+				);
+			} else {
+				snprintf(str, sizeof(str), "\
   filter ......... %s\n\
   bwt index ...... %2d, [%s]\n",
-				selrig->FILT(selrig->get_FILT(data.imode)),
-				data.iBW,
-				bwt[data.iBW] );
-		}
-	}
-	prstr.append(str);
-	str[0] = 0;
-	snprintf( str, sizeof(str), "\
+					selrig->FILT(selrig->get_FILT(data.imode)),
+					data.iBW,
+					bwt.at(data.iBW).c_str() );
+			}
+		prstr.append(str);
+		str[0] = 0;
+		snprintf( str, sizeof(str), "\
   split .......... %4d, power_control . %4.1f, volume_control  %4d\n\
   attenuator ..... %4d, preamp ........ %4d, rf gain ....... %4d\n\
   if_shift ....... %4d, shift val ..... %4d\n\
@@ -254,28 +248,32 @@ Data Source: %s\n\
   noise .......... %4d, nr ............ %4d, nr val ........ %4d\n\
   mic gain ....... %4d, agc level ..... %4d, squelch ....... %4d\n\
   compression .... %4d, compON ........ %4d",
-		data.split,
-		data.power_control,
-		data.volume_control,
-		data.attenuator,
-		data.preamp,
-		data.rf_gain,
-		data.if_shift,
-		data.shift_val,
-		data.auto_notch,
-		data.notch,
-		data.notch_val,
-		data.noise,
-		data.nr,
-		data.nr_val,
-		data.mic_gain,
-		data.agc_level,
-		data.squelch,
-		data.compression,
-		data.compON
-	);
-	prstr.append(str);
-	return prstr.c_str();
+			data.split,
+			data.power_control,
+			data.volume_control,
+			data.attenuator,
+			data.preamp,
+			data.rf_gain,
+			data.if_shift,
+			data.shift_val,
+			data.auto_notch,
+			data.notch,
+			data.notch_val,
+			data.noise,
+			data.nr,
+			data.nr_val,
+			data.mic_gain,
+			data.agc_level,
+			data.squelch,
+			data.compression,
+			data.compON
+		);
+		prstr.append(str);
+		return prstr.c_str();
+	} catch (const std::exception& e) {
+		LOG_ERROR("%s", e.what());
+	}
+	return "";
 }
 
 std::string print_all()
@@ -1444,12 +1442,18 @@ void find_bandwidth(XCVR_STATE &nuvals)
 	if (nuvals.iBW > 65536) {
 		nuvals.iBW /= 256;
 		nuvals.iBW /= 256;
-		int i = 0;
-		while (	selrig->bandwidths_[i] &&
-				atol(selrig->bandwidths_[i]) < nuvals.iBW) {
-			i++;
+		size_t i = 0;
+		int bwval = 0;
+		for (i = 0; i < selrig->bandwidths_.size(); i++) {
+			if ((bwval = atol(selrig->bandwidths_[i].c_str())) == nuvals.iBW)
+				break;
+			if (bwval > nuvals.iBW) {
+				i--;
+				break;
+			}
 		}
-		if (!selrig->bandwidths_[i]) i--;
+		if (i < 0) i = 0;
+		if (i >= selrig->bandwidths_.size()) i = selrig->bandwidths_.size() - 1;
 		nuvals.iBW = i;
 	}
 }
@@ -2085,10 +2089,7 @@ void set_bandwidth_control()
 	if (selrig->name_ != rig_K3.name_) {
 		vfo->iBW = selrig->def_bandwidth(vfo->imode);
 		if (vfo->iBW < 256) {
-			int i = 0;
-			while (selrig->bandwidths_[i]) i++;
-			i--;
-			if (vfo->iBW > i) vfo->iBW = selrig->def_bandwidth(vfo->imode);
+			vfo->iBW = selrig->def_bandwidth(vfo->imode);
 		}
 	}
 	if (selrig->inuse == onB) {
@@ -2110,10 +2111,14 @@ void TRACED ( updateBandwidthControl, void *d )
 		if (vfo->iBW > 256) {
 			opDSP_lo->clear();
 			opDSP_hi->clear();
-			for (int i = 0; selrig->dsp_SL[i] != NULL; i++)
-				opDSP_lo->add(selrig->dsp_SL[i]);
-			for (int i = 0; selrig->dsp_SH[i] != NULL; i++)
-				opDSP_hi->add(selrig->dsp_SH[i]);
+			try {
+				for (size_t i = 0; i < selrig->dsp_SL.size(); i++)
+					opDSP_lo->add(selrig->dsp_SL.at(i).c_str());
+				for (size_t i = 0; i < selrig->dsp_SH.size(); i++)
+					opDSP_hi->add(selrig->dsp_SH.at(i).c_str());
+			} catch (const std::exception& e) {
+				LOG_ERROR("%s", e.what());
+			}
 			opBW->hide();
 			opBW->hide();
 			opDSP_lo->index(vfo->iBW & 0xFF);
@@ -2131,10 +2136,15 @@ void TRACED ( updateBandwidthControl, void *d )
 			btnDSP->hide();
 			btnFILT->hide();
 			opBW->clear();
-			selrig->bandwidths_ = selrig->bwtable(vfo->imode);
-			for (int i = 0; selrig->bandwidths_[i] != NULL; i++)
-				opBW->add(selrig->bandwidths_[i]);
-			opBW->index(vfo->iBW);
+			try {
+				selrig->bandwidths_ = selrig->bwtable(vfo->imode);
+				for (size_t i = 0; i < selrig->bandwidths_.size(); i++)
+					opBW->add(selrig->bandwidths_.at(i).c_str());
+				opBW->index(vfo->iBW);
+			} catch (const std::exception& e) {
+				LOG_ERROR("%s", e.what());
+				opBW->index(0);
+			}
 			opBW->redraw();
 			opBW->show();
 		}
@@ -2144,12 +2154,16 @@ void TRACED ( updateBandwidthControl, void *d )
 		opDSP_hi->hide();
 		btnDSP->hide();
 		opBW->clear();
+		try {
 		selrig->bandwidths_ = selrig->bwtable(vfo->imode);
-		for (int i = 0; selrig->bandwidths_[i] != NULL; i++) {
-			opBW->add(selrig->bandwidths_[i]);
+			for (size_t i = 0; i < selrig->bandwidths_.size(); i++) { 
+				opBW->add(selrig->bandwidths_.at(i).c_str());
+			}
+			opBW->index(vfo->iBW);
+		} catch (const std::exception& e) {
+			LOG_ERROR("%s", e.what());
+			opBW->index(0);
 		}
-
-		opBW->index(vfo->iBW);
 		opBW->redraw();
 
 		if (selrig->has_FILTER) {

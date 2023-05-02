@@ -38,37 +38,43 @@ enum mFT450 {
 static int mode_bwA[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 static int mode_bwB[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 
-static const char *FT450modes_[] = {
-		"LSB", "USB", "CW", "FM", "AM", "RTTY-L", "CW-R", "USER-L", "RTTY-U", "FM-N", "USER-U", NULL};
+static std::vector<std::string>FT450modes_;
+static const char *vFT450modes_[] = {
+		"LSB", "USB", "CW", "FM", "AM", "RTTY-L", "CW-R", "USER-L", "RTTY-U", "FM-N", "USER-U"};
 static const char mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '8', '9', 'B', 'C' };
 static const char mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L', 'U', 'U', 'U' };
 
-static const char *FT450_ssb_widths[]  = {"1800", "2400", "3000", NULL};
+static std::vector<std::string>FT450_ssb_widths;
+static const char *vFT450_ssb_widths[]  = {"1800", "2400", "3000"};
 static int FT450_wvals_ssb_widths[] = {1, 2, 3, WVALS_LIMIT};
 
-static const char *FT450_cw_widths[]   = {"300", "500", "2400", NULL};
+static std::vector<std::string>FT450_cw_widths;
+static const char *vFT450_cw_widths[]   = {"300", "500", "2400"};
 static int FT450_wvals_cw_widths[] = {1, 2, 3, WVALS_LIMIT};
 
-static const char *FT450_data_widths[] = {"300", "2400", "3000", NULL};
+static std::vector<std::string>FT450_data_widths;
+static const char *vFT450_data_widths[] = {"300", "2400", "3000"};
 static int FT450_wvals_data_widths[] = {1, 2, 3, WVALS_LIMIT};
 
-static const char *FT450_am_widths[]   = {"3000", "6000", "9000", NULL};
+static std::vector<std::string>FT450_am_widths;
+static const char *vFT450_am_widths[]   = {"3000", "6000", "9000"};
 static int FT450_wvals_am_widths[] = {1, 2, 3, WVALS_LIMIT};
 
-static const char *FT450_fm_widths[]   = {"2500", "5000", NULL};
+static std::vector<std::string>FT450_fm_widths;
+static const char *vFT450_fm_widths[]   = {"2500", "5000"};
 static int FT450_wvals_fm_widths[] = {1, 2, WVALS_LIMIT};
 
 static const int FT450_def_bw[] = {
   2, 2, 0, 1, 1, 0, 0, 1, 0, 1, 1 };
 
 /*
-static const char *FT450_US_60m[] = {NULL, "126", "127", "128", "130", NULL};
+static std::vector<std::string>FT450_US_60m = {"", "126", "127", "128", "130"};
 // US has 5 60M presets. Using dummy numbers for all.
-// First NULL means skip 60m sets in get_band_selection().
+// First "" means skip 60m sets in get_band_selection().
 // Maybe someone can do a cat command MC; on all 5 presets and add returned numbers above.
 // To send cat commands in flrig goto menu Config->Xcvr select->Send Cmd.
 
-static const char **Channels_60m = FT450_US_60m;
+static std::vector<std::string>& Channels_60m = FT450_US_60m;
 */
 
 static GUI rig_widgets[]= {
@@ -168,6 +174,17 @@ RIG_FT450::RIG_FT450() {
 
 void RIG_FT450::initialize()
 {
+	VECTOR( FT450modes_, vFT450modes_);
+	VECTOR( FT450_ssb_widths, vFT450_ssb_widths);
+	VECTOR( FT450_cw_widths, vFT450_cw_widths);
+	VECTOR( FT450_data_widths, vFT450_data_widths);
+	VECTOR( FT450_am_widths, vFT450_am_widths);
+	VECTOR( FT450_fm_widths, vFT450_fm_widths);
+
+	modes_ = FT450modes_;
+	bandwidths_ = FT450_ssb_widths;
+	bw_vals_ = FT450_wvals_ssb_widths;
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = btnAGC;
@@ -552,7 +569,7 @@ int RIG_FT450::get_preamp()
 	return (replystr[p+3] == '1' ? 1 : 0);
 }
 
-const char ** RIG_FT450::bwtable(int n)
+std::vector<std::string>& RIG_FT450::bwtable(int n)
 {
 	switch (n) {
 		case mCW     :
@@ -1205,9 +1222,9 @@ void RIG_FT450::get_band_selection(int v)
 	}
 
 	if (v == 12) {	// 5MHz 60m presets
-		if (Channels_60m[0] == NULL) return;	// no 60m Channels so skip
+		if (Channels_60m[0].empty()) return;	// no 60m Channels so skip
 		if (inc_60m) {
-			if (Channels_60m[++m_60m_indx] == NULL)
+			if (++m_60m_indx >= Channels_60m.size())
 				m_60m_indx = 0;
 		}
 		cmd.assign("MC").append(Channels_60m[m_60m_indx]).append(";");

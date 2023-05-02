@@ -28,6 +28,7 @@ public:
 	RIG_ICR71();
 	~RIG_ICR71(){}
 
+	void initialize();
 	bool check();
 
 	unsigned long long get_vfoA();

@@ -115,7 +115,7 @@ public:
 	void swapAB();
 	void A2B();
 
-	const char **bwtable(int);
+	std::vector<std::string>& bwtable(int);
 
 	void set_band_selection(int v);
 	void get_band_selection(int v);

@@ -34,26 +34,30 @@ enum {
 	FM7800,  CWR7800, RTTYR7800, PSK7800, PSKR7800,
 	LSBD7800, USBD7800, AMD7800 };
 
-const char *IC7800modes_[] = {
+static std::vector<std::string>IC7800modes_;
+static const char *vIC7800modes_[] =
+{
 	"LSB", "USB", "AM", "CW", "RTTY",
 	"FM", "CW-R", "RTTY-R", "PSK", "PSK-R", 
-	"LSB-D", "USB-D", "AM-D", NULL};
+	"LSB-D", "USB-D", "AM-D"};
 
-const char IC7800_mode_type[] = {
+static const char IC7800_mode_type[] = {
 	'L', 'U', 'U', 'U', 'L',
 	'U', 'L', 'U', 'U', 'L',
 	'L', 'U', 'U' };
 
-const char IC7800_mode_nbr[] = {
+static const char IC7800_mode_nbr[] = {
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x07, 0x08, 0x12, 0x13,
 	0X00, 0X01, 0X02 };
 
-const char *IC7800_ssb_bws[] = {
+static std::vector<std::string>IC7800_ssb_bws;
+static const char *vIC7800_ssb_bws[] =
+{
 "50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
 "600",   "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
 "2600", "2700", "2800", "2900", "3000", "3100", "3200", "3300", "3400", "3500",
-"3600", NULL };
+"3600" };
 static int IC7800_bw_vals_SSB[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
@@ -61,23 +65,27 @@ static int IC7800_bw_vals_SSB[] = {
 31,32,33,34,35,36,37,38,39,40,
 41, WVALS_LIMIT};
 
-const char *IC7800_rtty_bws[] = {
+static std::vector<std::string>IC7800_rtty_bws;
+static const char *vIC7800_rtty_bws[] =
+{
 "50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
 "600",   "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
-"2600", "2700", NULL };
+"2600", "2700" };
 static int IC7800_bw_vals_RTTY[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
 21,22,23,24,25,26,27,28,29,30,
 31,32, WVALS_LIMIT};
 
-const char *IC7800_am_bws[] = {
+static std::vector<std::string>IC7800_am_bws;
+static const char *vIC7800_am_bws[] =
+{
 "200",   "400",  "600",  "800", "1000", "1200", "1400", "1600", "1800", "2000",
 "2200", "2400", "2600", "2800", "3000", "3200", "3400", "3600", "3800", "4000",
 "4200", "4400", "4600", "4800", "5000", "5200", "5400", "5600", "5800", "6000",
 "6200", "6400", "6600", "6800", "7000", "7200", "7400", "7800", "7800", "8000",
-"8200", "8400", "8600", "8800", "9000", "9200", "9400", "9600", "9800", "10000", NULL };
+"8200", "8400", "8600", "8800", "9000", "9200", "9400", "9600", "9800", "10000" };
 static int IC7800_bw_vals_AM[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
@@ -86,7 +94,9 @@ static int IC7800_bw_vals_AM[] = {
 41,42,43,44,45,46,47,48,49,50,
 WVALS_LIMIT};
 
-const char *IC7800_fm_bws[] = { "FIXED", NULL };
+static std::vector<std::string>IC7800_fm_bws;
+static const char *vIC7800_fm_bws[] =
+{ "FIXED" };
 static int IC7800_bw_vals_FM[] = { 1, WVALS_LIMIT};
 
 static GUI IC7800_widgets[]= {
@@ -110,6 +120,18 @@ static GUI IC7800_widgets[]= {
 
 void RIG_IC7800::initialize()
 {
+	VECTOR (IC7800modes_, vIC7800modes_);
+	VECTOR (IC7800_ssb_bws, vIC7800_ssb_bws);
+	VECTOR (IC7800_rtty_bws, vIC7800_rtty_bws);
+	VECTOR (IC7800_am_bws, vIC7800_am_bws);
+	VECTOR (IC7800_fm_bws, vIC7800_fm_bws);
+
+	modes_ = IC7800modes_;
+	bandwidths_ = IC7800_ssb_bws;
+	bw_vals_ = IC7800_bw_vals_SSB;
+
+	_mode_type = IC7800_mode_type;
+
 	IC7800_widgets[0].W = btnVol;
 	IC7800_widgets[1].W = sldrVOLUME;
 	IC7800_widgets[2].W = btnAGC;
@@ -473,27 +495,26 @@ int RIG_IC7800::adjust_bandwidth(int m)
 	return bw;
 }
 
-const char ** RIG_IC7800::bwtable(int m)
+std::vector<std::string>& RIG_IC7800::bwtable(int m)
 {
-	const char **table;
 	switch (m) {
 		case 2: // AM
-			table = IC7800_am_bws;
+			return IC7800_am_bws;
 			break;
 		case 5: // FM
-			table = IC7800_fm_bws;
+			return IC7800_fm_bws;
 			break;
 		case 4: case 8: // RTTY
-			table = IC7800_rtty_bws;
+			return IC7800_rtty_bws;
 			break;
 		case 3: case 7: // CW
 		case 0: case 1: // SSB
 		case 12: case 13: // PKT
 		default:
-			table = IC7800_ssb_bws;
+			return IC7800_ssb_bws;
 			break;
 	}
-	return table;
+	return IC7800_ssb_bws;
 }
 
 int RIG_IC7800::def_bandwidth(int m)

@@ -28,6 +28,7 @@ public:
 	RIG_FT818ND();
 	~RIG_FT818ND(){};
 
+	void initialize();
 	bool check();
 
 	unsigned long long get_vfoA();

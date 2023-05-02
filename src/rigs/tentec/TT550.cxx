@@ -43,19 +43,21 @@ static const char TT550name_[] = "TT-550";
 enum TT550_MODES {
 TT550_AM_MODE, TT550_USB_MODE, TT550_LSB_MODE, TT550_CW_MODE, TT550_DIGI_MODE, TT550_FM_MODE };
 
-static const char *TT550modes_[] = {
-		"AM", "USB", "LSB", "CW", "DIGI", "FM", NULL};
+static std::vector<std::string>TT550modes_;
+static const char *vTT550modes_[] = {
+		"AM", "USB", "LSB", "CW", "DIGI", "FM"};
 
 static const int TT550_def_bw[] = { 32, 20, 20, 10, 20, 32 };
 
 static const char TT550mode_chr[] =  { '0', '1', '2', '3', '1', '4' };
 static const char TT550mode_type[] = { 'U', 'U', 'L', 'L', 'U', 'U' };
 
-static const char *TT550_widths[] = {
+static std::vector<std::string>TT550_widths;
+static const char *vTT550_widths[] = {
 "300",  "330",  "375",  "450",  "525",   "600",  "675",  "750",  "900", "1050",
 "1200", "1350", "1500", "1650", "1800", "1950", "2100", "2250", "2400", "2550",
 "2700", "2850", "3000", "3300", "3600", "3900", "4200", "4500", "4800", "5100",
-"5400", "5700", "6000", "8000", NULL};
+"5400", "5700", "6000", "8000"};
 static int TT550_bw_vals[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 11,12,13,14,15,16,17,18,19,20,
@@ -75,9 +77,10 @@ static const int TT550_filter_width[] = {
 2700, 2850, 3000, 3300, 3600, 3900, 4200, 4500, 4800, 5100,
 5400, 5700, 6000, 8000 };
 
-const char *TT550_xmt_widths[] = {
+std::vector<std::string>TT550_xmt_widths;
+static const char *vTT550_xmt_widths[] = {
 "900", "1050",  "1200", "1350", "1500", "1650", "1800", "1950", "2100", "2250",
-"2400", "2550", "2700", "2850", "3000", "3300", "3600", "3900", NULL};
+"2400", "2550", "2700", "2850", "3000", "3300", "3600", "3900"};
 
 static const int TT550_xmt_filter_nbr[] = {
 24, 23, 22, 21, 20, 19, 18, 17, 16,
@@ -271,6 +274,15 @@ void RIG_TT550::showASCII(std::string s1, std::string s)
 
 void RIG_TT550::initialize()
 {
+	VECTOR (TT550modes_, vTT550modes_);
+	VECTOR (TT550_widths, vTT550_widths);
+	VECTOR (TT550_xmt_widths, vTT550_xmt_widths);
+
+
+	modes_ = TT550modes_;
+	bandwidths_ = TT550_widths;
+	bw_vals_ = TT550_bw_vals;
+
 	progStatus.settrace = true;
 
 	rig_widgets[0].W = btnVol;
@@ -852,7 +864,7 @@ static void update_encA(void *d)
 
 void RIG_TT550::selectA()
 {
-	Fl::awake(hide_encA, NULL);
+	Fl::awake(hide_encA);
 	xcvrstream.clear();
 	set_trace(1, "Select A");
 
@@ -866,7 +878,7 @@ void RIG_TT550::selectA()
 
 void RIG_TT550::selectB()
 {
-	Fl::awake(hide_encA, NULL);
+	Fl::awake(hide_encA);
 	xcvrstream.clear();
 	set_trace(1, "Select B");
 	freqB = vfoB.freq;
@@ -891,7 +903,7 @@ void RIG_TT550::process_freq_entry(char c)
 				xcvrstream.clear();
 				have_decimal = false;
 				keypad_timeout = 0;
-				Fl::awake(hide_encA, NULL);
+				Fl::awake(hide_encA);
 				return;
 			}
 			ffreq = 0;
@@ -899,7 +911,7 @@ void RIG_TT550::process_freq_entry(char c)
 			if (have_decimal) ffreq *= 1000;
 			freq = (unsigned long long) ffreq;
 			if (!txt_encA->visible())
-				Fl::awake(show_encA, NULL);
+				Fl::awake(show_encA);
 			Fl::awake(update_encA, (void*)xcvrstream.c_str());
 //			LOG_INFO("%s => %ld", str2hex(xcvrstream.c_str(), xcvrstream.length()), freq);
 			keypad_timeout = progStatus.tt550_keypad_timeout / progStatus.serloop_timing;
@@ -912,7 +924,7 @@ void RIG_TT550::process_freq_entry(char c)
 		if (have_decimal) ffreq *= 1000;
 		freq = (unsigned long long) ffreq;
 		if (freq < 50000) freq *= 1000;
-		Fl::awake(hide_encA, NULL);
+		Fl::awake(hide_encA);
 		if (inuse == onA) {
 			freqA = freq;
 		} else {
@@ -930,7 +942,7 @@ void RIG_TT550::fkey_clear()
 //	LOG_INFO("%s", tt550_fkey_std::strings[1]);
 	xcvrstream.clear();
 	keypad_timeout = 0;
-	Fl::awake(hide_encA, NULL);
+	Fl::awake(hide_encA);
 }
 
 void RIG_TT550::fkey_cw_plus()
@@ -1074,7 +1086,7 @@ void RIG_TT550::get_302()
 		keypad_timeout--;
 		if (keypad_timeout == 0) {
 			xcvrstream.clear();
-			Fl::awake(hide_encA, NULL);
+			Fl::awake(hide_encA);
 		}
 	}
 // reading any pending encoder / keyboard std::strings

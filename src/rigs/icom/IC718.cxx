@@ -28,9 +28,15 @@ bool DEBUG_718 = true;
 // IC-718
 //
 const char IC718name_[] = "IC-718";
-const char *IC718modes_[] = { "LSB", "USB", "AM", "CW", "RTTY", "CW-R", "RTTY-R", NULL};
+
+static std::vector<std::string>IC718modes_;
+static const char *vIC718modes_[] =
+{ "LSB", "USB", "AM", "CW", "RTTY", "CW-R", "RTTY-R"};
 const char IC718_mode_type[] = { 'L', 'U', 'U', 'L', 'L', 'U', 'U'};
-const char *IC718_widths[] = { "Wide", "Med", "Narr", NULL};
+
+static std::vector<std::string>IC718_widths;
+static const char *vIC718_widths[] =
+{ "Wide", "Med", "Narr"};
 static int IC718_bw_vals[] = {1,2,3,WVALS_LIMIT};
 
 static GUI IC718_widgetsdgets[]= {
@@ -99,6 +105,14 @@ RIG_IC718::RIG_IC718() {
 
 void RIG_IC718::initialize()
 {
+	VECTOR (IC718modes_, vIC718modes_);
+	VECTOR (IC718_widths, vIC718_widths);
+
+	modes_ = IC718modes_;
+	_mode_type = IC718_mode_type;
+	bandwidths_ = IC718_widths;
+	bw_vals_ = IC718_bw_vals;
+
 	IC718_widgetsdgets[0].W = btnVol;
 	IC718_widgetsdgets[1].W = sldrVOLUME;
 	IC718_widgetsdgets[2].W = sldrRFGAIN;

@@ -29,10 +29,11 @@ FT990A_AM1, FT990A_AM2, FT990A_FM1, FT990A_FM2,
 FT990A_TTYL, FT990A_TTYU, FT990A_PKTL, FT990A_PKTU
 };
 
-static const char *FT990Amodes_[] =
+static std::vector<std::string>FT990Amodes_;
+static const char *vFT990Amodes_[] =
 { "LSB", "USB", "CW2.4", "CW500",
   "AM6.0", "AM2.4", "FM(1)", "FM(2)",
-  "RTTY(L)", "RTTY(U)", "PKT(L)", "PKT(FM)", NULL};
+  "RTTY(L)", "RTTY(U)", "PKT(L)", "PKT(FM)"};
 
 static const int FT990A_def_bw[] = {
 0, 0, 0, 2,
@@ -49,8 +50,9 @@ static const char FT990A_mode_type[] = {
 'U', 'U', 'U', 'U',
 'L', 'U', 'L', 'U' };
 
-static const char *FT990Awidths_[] =
-{ "2400", "2000", "500", "250", NULL};
+static std::vector<std::string>FT990Awidths_;
+static const char *vFT990Awidths_[] =
+{ "2400", "2000", "500", "250"};
 
 static int FT990A_bw_vals[] = {
 0,1,2,3,WVALS_LIMIT};
@@ -116,6 +118,13 @@ void RIG_FT990A::init_cmd()
 
 void RIG_FT990A::initialize()
 {
+	VECTOR (FT990Amodes_, vFT990Amodes_);
+	VECTOR (FT990Awidths_, vFT990Awidths_);
+
+	modes_ = FT990Amodes_;
+	bandwidths_ = FT990Awidths_;
+	bw_vals_ = FT990A_bw_vals;
+
 	init_cmd();
 	cmd[4] = 0x0E;
 	sendCommand(cmd);

@@ -115,7 +115,7 @@ public:
 	void set_rf_gain(int val);
 	int  get_rf_gain();
 	void get_rf_min_max_step(int &min, int &max, int &step);
-	const char **bwtable(int);
+	std::vector<std::string>& bwtable(int);
 
 	void set_vox_onoff();
 	void set_vox_gain();

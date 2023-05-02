@@ -68,7 +68,11 @@ void rigPTT(bool on)
 		fake_split(on);
 
 	std::string smode = "";
-	if (selrig->modes_) smode = selrig->modes_[vfo->imode];
+	try {
+		smode = selrig->modes_[vfo->imode];
+	} catch (const std::exception& e) {
+		std::cout << e.what() << '\n';
+	}
 	if ((smode.find("CW") != std::string::npos) && progStatus.disable_CW_ptt)
 		return;
 

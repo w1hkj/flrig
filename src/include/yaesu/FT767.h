@@ -28,6 +28,7 @@ public:
 	RIG_FT767();
 	~RIG_FT767(){};
 
+	void initialize();
 	bool check();
 
 	unsigned long long get_vfoA();

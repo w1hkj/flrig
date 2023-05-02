@@ -28,6 +28,7 @@ public:
 	RIG_FT857D();
 	~RIG_FT857D(){};
 
+	void initialize();
 	bool check();
 
 	unsigned long long get_vfoA();
@@ -73,6 +74,8 @@ class RIG_FT897D : public RIG_FT857D {
 public :
 	RIG_FT897D();
 	~RIG_FT897D() {};
+
+	void initialize();
 };
 
 #endif

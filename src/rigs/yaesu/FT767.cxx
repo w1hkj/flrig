@@ -25,8 +25,9 @@
 
 static const char FT767name_[] = "FT-767";
 
-static const char *FT767modes_[] = {
-		"LSB", "USB", "CW", "AM", "FM", "FSK", NULL};
+static std::vector<std::string>FT767modes_;
+static const char *vFT767modes_[] = {
+		"LSB", "USB", "CW", "AM", "FM", "FSK"};
 static const char FT767_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'U' };
 
 RIG_FT767::RIG_FT767() {
@@ -55,6 +56,12 @@ RIG_FT767::RIG_FT767() {
 	ndigits = 8;
 
 };
+
+void RIG_FT767::initialize()
+{
+	VECTOR(FT767modes_, vFT767modes_);
+	modes_ = FT767modes_;
+}
 
 void RIG_FT767::init_cmd()
 {

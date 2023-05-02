@@ -165,21 +165,11 @@ public:
 
 	bool twovfos() { return false; }
 
-	const char **bwtable(int);
+	std::vector<std::string>& bwtable(int);
 
 	void set_band_selection(int v);
 	void get_band_selection(int v);
 
 };
-
-extern const char *IC746modes_[];
-extern const char IC746_mode_type[];
-extern const char *IC746_widths[];
-extern const char *IC746PROmodes_[];
-extern const char IC746PRO_mode_type[];
-extern const char *IC746PRO_SSBwidths[];
-extern const char *IC746PRO_RTTYwidths[];
-extern const char *IC746PRO_AMFMwidths[];
-
 
 #endif

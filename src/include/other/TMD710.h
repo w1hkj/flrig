@@ -10,6 +10,7 @@ public:
 	RIG_TMD710();
 	~RIG_TMD710(){}
 
+	void initialize();
 	bool check();
 
 	unsigned long long get_vfoA();

@@ -28,7 +28,7 @@ public:
 	RIG_TS140();
 	~RIG_TS140(){}
 
-	void initialize() {}
+	void initialize();
 	void shutdown() {}
 
 	bool check();

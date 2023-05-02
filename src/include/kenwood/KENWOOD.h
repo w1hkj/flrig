@@ -139,9 +139,9 @@ enum TS590MODES { LSB, USB, CW, FM, AM, FSK, CWR, FSKR, LSBD, USBD, FMD };
 //	virtual void set_auto_notch(int v);
 //	virtual int  get_auto_notch();
 
-//	virtual const char **bwtable(int);
-//	virtual const char **lotable(int);
-//	virtual const char **hitable(int);
+//	virtual std::vector<std::string>& bwtable(int);
+//	virtual std::vector<std::string>& lotable(int);
+//	virtual std::vector<std::string>& hitable(int);
 
 //	virtual const char * get_bwname_(int bw, int md);
 

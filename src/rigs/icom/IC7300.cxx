@@ -55,10 +55,12 @@ LSB7300, USB7300, AM7300, FM7300, CW7300, CWR7300, RTTY7300, RTTYR7300,
 LSBD7300, USBD7300, AMD7300, FMD7300
 };
 
-const char *IC7300modes_[] = {
+static std::vector<std::string>IC7300modes_;
+static const char *vIC7300modes_[] =
+{
 	"LSB", "USB", "AM", "FM",
 	"CW", "CW-R", "RTTY", "RTTY-R",
-	"LSB-D", "USB-D", "AM-D", "FM-D", NULL};
+	"LSB-D", "USB-D", "AM-D", "FM-D"};
 
 char IC7300_mode_type[] = {
 	'L', 'U', 'U', 'U',
@@ -69,12 +71,14 @@ const char IC7300_mode_nbr[] = {
 	0x00, 0x01, 0x02, 0x05, 0x03, 0x07, 0x04, 0x08,
 	0x00, 0x01, 0x02, 0x05 };
 
-const char *IC7300_ssb_bws[] = {
+static std::vector<std::string>IC7300_ssb_bws;
+static const char *vIC7300_ssb_bws[] =
+{
 "50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
 "600",   "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
 "2600", "2700", "2800", "2900", "3000", "3100", "3200", "3300", "3400", "3500",
-"3600", NULL };
+"3600" };
 static int IC7300_bw_vals_SSB[] = {
  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
 10,11,12,13,14,15,16,17,18,19,
@@ -82,23 +86,27 @@ static int IC7300_bw_vals_SSB[] = {
 30,31,32,33,34,35,36,37,38,39,
 40, WVALS_LIMIT};
 
-const char *IC7300_rtty_bws[] = {
+static std::vector<std::string>IC7300_rtty_bws;
+static const char *vIC7300_rtty_bws[] =
+{
 "50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
 "600",   "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
-"2600", "2700", NULL };
+"2600", "2700" };
 static int IC7300_bw_vals_RTTY[] = {
  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
 10,11,12,13,14,15,16,17,18,19,
 20,21,22,23,24,25,26,27,28,29,
 30,31, WVALS_LIMIT};
 
-const char *IC7300_am_bws[] = {
+static std::vector<std::string>IC7300_am_bws;
+static const char *vIC7300_am_bws[] =
+{
 "200",   "400",  "600",  "800", "1000", "1200", "1400", "1600", "1800", "2000",
 "2200", "2400", "2600", "2800", "3000", "3200", "3400", "3600", "3800", "4000",
 "4200", "4400", "4600", "4800", "5000", "5200", "5400", "5600", "5800", "6000",
 "6200", "6400", "6600", "6800", "7000", "7300", "7400", "7300", "7800", "8000",
-"8200", "8400", "8600", "8800", "9000", "9200", "9400", "9600", "9800", "10000", NULL };
+"8200", "8400", "8600", "8800", "9000", "9200", "9400", "9600", "9800", "10000" };
 static int IC7300_bw_vals_AM[] = {
  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
 10,11,12,13,14,15,16,17,18,19,
@@ -107,7 +115,9 @@ static int IC7300_bw_vals_AM[] = {
 40,41,42,43,44,45,46,47,48,49
 WVALS_LIMIT};
 
-const char *IC7300_fm_bws[] = { "FIXED", NULL };
+static std::vector<std::string>IC7300_fm_bws;
+static const char *vIC7300_fm_bws[] =
+{ "FIXED" };
 static int IC7300_bw_vals_FM[] = { 1, WVALS_LIMIT};
 
 static GUI IC7300_widgets[]= {
@@ -131,6 +141,19 @@ static GUI IC7300_widgets[]= {
 
 void RIG_IC7300::initialize()
 {
+	VECTOR (IC7300modes_, vIC7300modes_);
+	VECTOR (IC7300_ssb_bws, vIC7300_ssb_bws);
+	VECTOR (IC7300_rtty_bws, vIC7300_rtty_bws);
+	VECTOR (IC7300_am_bws, vIC7300_am_bws);
+	VECTOR (IC7300_fm_bws, vIC7300_fm_bws);
+
+	name_ = IC7300name_;
+	modes_ = IC7300modes_;
+	bandwidths_ = IC7300_ssb_bws;
+	bw_vals_ = IC7300_bw_vals_SSB;
+
+	_mode_type = IC7300_mode_type;
+
 	IC7300_widgets[0].W = btnVol;
 	IC7300_widgets[1].W = sldrVOLUME;
 	IC7300_widgets[2].W = btnAGC;
@@ -617,7 +640,7 @@ int RIG_IC7300::get_modeA()
 
 end_wait_modeA:
 
-	get_trace(4, "get mode A [", IC7300modes_[A.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
+	get_trace(4, "get mode A [", IC7300modes_[A.imode].c_str(), "] ", str2hex(replystr.c_str(), replystr.length()));
 
 	if (A.imode == CW7300 || A.imode == CWR7300) {
 		cmd.assign(pre_to).append("\x1A\x05");
@@ -712,7 +735,7 @@ int RIG_IC7300::get_modeB()
 
 end_wait_modeB:
 
-	get_trace(4, "get mode B [", IC7300modes_[B.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
+	get_trace(4, "get mode B [", IC7300modes_[B.imode].c_str(), "] ", str2hex(replystr.c_str(), replystr.length()));
 
 	if (B.filter > 0 && B.filter < 4)
 		mode_filterB[B.imode] = B.filter;
@@ -1075,26 +1098,25 @@ int RIG_IC7300::adjust_bandwidth(int m)
 	return bw;
 }
 
-const char ** RIG_IC7300::bwtable(int m)
+std::vector<std::string>& RIG_IC7300::bwtable(int m)
 {
-	const char **table;
 	switch (m) {
 		case AM7300: case AMD7300: // AM, AM-D
-			table = IC7300_am_bws;
+			return IC7300_am_bws;
 			break;
 		case FM7300: case FMD7300: // FM, FM-D
-			table = IC7300_fm_bws;
+			return IC7300_fm_bws;
 			break;
 		case RTTY7300: case RTTYR7300: // RTTY, RTTY-R
-			table = IC7300_rtty_bws;
+			return IC7300_rtty_bws;
 			break;
 		case CW7300: case CWR7300: // CW, CW -R
 		case LSB7300: case USB7300: // LSB, USB
 		case LSBD7300: case USBD7300: // LSB-D, USB-D
 		default:
-			table = IC7300_ssb_bws;
+			return IC7300_ssb_bws;
 	}
-	return table;
+	return IC7300_ssb_bws;
 }
 
 int RIG_IC7300::def_bandwidth(int m)

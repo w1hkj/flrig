@@ -24,17 +24,24 @@
 // IC-751
 //
 const char IC751name_[] = "IC-751";
-const char *IC751modes_[] = { "LSB", "USB", "AM", "CW", "RTTY", "FM", NULL};
+
+static std::vector<std::string>IC751modes_;
+static const char *vIC751modes_[] =
+{ "LSB", "USB", "AM", "CW", "RTTY", "FM"};
 const char IC751_mode_type[] = { 'L', 'U', 'U', 'L', 'L', 'U' };
-//const char *IC751_widths[] = { "NARR", "WIDE", NULL};
-//static int IC751_bw_vals[] = {1,2, WVALS_LIMIT};
+
+static std::vector<std::string>IC751_widths;
+static const char *vIC751_widths[] =
+{ "NARR", "WIDE"};
+static int IC751_bw_vals[] = {1,2, WVALS_LIMIT};
 
 RIG_IC751::RIG_IC751() {
 	name_ = IC751name_;
 	modes_ = IC751modes_;
 	_mode_type = IC751_mode_type;
-//	bandwidths_ = IC751_widths;
-//	bw_vals_ = IC751_bw_vals;
+	bandwidths_ = IC751_widths;
+	bw_vals_ = IC751_bw_vals;
+
 	serial_baudrate = BR9600;
 	stopbits = 2;
 	serial_retries = 2;
@@ -65,6 +72,17 @@ RIG_IC751::RIG_IC751() {
 };
 
 //=============================================================================
+
+void RIG_IC751::initialize()
+{
+	VECTOR (IC751modes_, vIC751modes_);
+	VECTOR (IC751_widths, vIC751_widths);
+
+	modes_ = IC751modes_;
+	_mode_type = IC751_mode_type;
+	bandwidths_ = IC751_widths;
+	bw_vals_ = IC751_bw_vals;
+}
 
 bool RIG_IC751::check ()
 {

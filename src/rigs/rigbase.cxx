@@ -32,26 +32,43 @@
 #include "rigs.h"
 
 const char *szNORIG = "NONE";
-const char *szNOMODES[] = {"LSB", "USB", NULL};
-const char *szNOBWS[] = {"NONE", NULL};
-const char *szDSPLO[] = {"NONE", NULL};
-const char *szDSPHI[] = {"NONE", NULL};
+
+std::vector<std::string> vNOMODES;
+const char *NOMODES[] = {"LSB", "USB"};
+std::vector<std::string> vNOBWS;
+const char *NOBWS[] = {"NONE"};
+std::vector<std::string> vDSPLO;
+const char *DSPLO[] = {"NONE"};
+std::vector<std::string> vDSPHI;
+const char *DSPHI[] = {"NONE"};
+
 const char *szdsptooltip = "dsp tooltip";
 const char *szbtnlabel = " ";
 const int  ibw_val = -1;
 
 static GUI basewidgets[] = { {NULL, 0, 0} };
 
+std::vector<std::string> &rigbase::modes_ = vNOMODES;
+std::vector<std::string> &rigbase::bandwidths_ = vNOBWS;
+std::vector<std::string> &rigbase::dsp_SL = vDSPLO;
+std::vector<std::string> &rigbase::dsp_SH = vDSPHI;
+
 rigbase::rigbase()
 {
 	IDstr = "";
 	name_ = szNORIG;
-	modes_ = szNOMODES;
-	bandwidths_ = szNOBWS;
-	dsp_SL = szDSPLO;
+
+	VECTOR(vNOMODES, NOMODES);
+	VECTOR(vNOBWS, NOBWS);
+	VECTOR(vDSPLO, DSPLO);
+	VECTOR(vDSPHI, DSPHI);
+
+	modes_ = vNOMODES;
+	bandwidths_ = vNOBWS;
+	dsp_SL = vDSPLO;
 	SL_tooltip = szdsptooltip;
 	SL_label = szbtnlabel;
-	dsp_SH = szDSPHI;
+	dsp_SH = vDSPHI;
 	SH_tooltip = szdsptooltip;
 	SH_label = szbtnlabel;
 	bw_vals_ = &ibw_val;

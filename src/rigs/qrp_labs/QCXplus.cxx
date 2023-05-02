@@ -23,13 +23,15 @@
 
 static const char QCXPname_[] = "QCX+";
 
-static const char *QCXPmodes_[] = {
-		"CW", "CW-R", NULL};
+static std::vector<std::string>QCXPmodes_;
+static const char *vQCXPmodes_[] = {
+		"CW", "CW-R"};
 static const char QCXP_mode_chr[] =  { '1', '2' };
 static const char QCXP_mode_type[] = { 'U', 'L' };
 
-static const char *QCXP_CWwidths[] = {
-"200", NULL};
+static std::vector<std::string>QCXP_CWwidths;
+static const char *vQCXP_CWwidths[] = {
+"200"};
 static int QCXP_CW_bw_vals[] = {1, WVALS_LIMIT};
 
 static GUI rig_widgets[]= {
@@ -113,6 +115,14 @@ std::string RIG_QCXP::read_menu(int m1, int m2)
 
 void RIG_QCXP::initialize()
 {
+	VECTOR (QCXPmodes_, vQCXPmodes_);
+	VECTOR (QCXP_CWwidths, vQCXP_CWwidths);
+
+	modes_ = QCXPmodes_;
+	_mode_type = QCXP_mode_type;
+	bandwidths_ = QCXP_CWwidths;
+	bw_vals_ = QCXP_CW_bw_vals;
+
 	sendCommand("QU0;");
 	sendCommand("RX;");
 	return;

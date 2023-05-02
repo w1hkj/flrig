@@ -34,6 +34,7 @@ public:
 	int  get_split();
 	bool twovfos() {return false;}
 
+	void initialize();
 	bool check();
 	
 	int  get_smeter();

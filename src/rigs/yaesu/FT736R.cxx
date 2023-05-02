@@ -32,15 +32,14 @@
 
 static const char FT736Rname_[] = "FT-736R";
 
-static const char *FT736Rmodes_[] = {
-	"LSB", "USB", "CW", "CW-N", "FM", "FM-N", NULL};
+static std::vector<std::string>FT736Rmodes_;
+static const char *vFT736Rmodes_[] = {
+	"LSB", "USB", "CW", "CW-N", "FM", "FM-N"};
 	
 static const int FT736Rmode_val_[] = {
 	0x00, 0x01, 0x02, 0x82, 0x08, 0x88 };
 
 static const char FT736R_mode_type[] = { 'L', 'U', 'L', 'L', 'U', 'U' };
-
-
 
 RIG_FT736R::RIG_FT736R() {
 // base class values
@@ -91,6 +90,9 @@ void RIG_FT736R::send()
 
 void RIG_FT736R::initialize()
 {
+	VECTOR(FT736Rmodes_, vFT736Rmodes_);
+	modes_ = FT736Rmodes_;
+
 	rig_smin = 0x11;
 	rig_smax = 0x8A;
 	init_cmd();

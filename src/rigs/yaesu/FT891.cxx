@@ -32,8 +32,9 @@ enum mFT891 {
 
 static const char FT891name_[] = "FT-891";
 
-static const char *FT891modes_[] = {
-"LSB", "USB", "CW-U", "FM", "AM", "RTTY-L", "CW-L", "DATA-L", "RTTY-U", "FM-N", "DATA-U", "AM-N", NULL};
+static std::vector<std::string>FT891modes_;
+static const char *vFT891modes_[] = {
+"LSB", "USB", "CW-U", "FM", "AM", "RTTY-L", "CW-L", "DATA-L", "RTTY-U", "FM-N", "DATA-U", "AM-N"};
 
 static const char FT891_mode_chr[] =  {
  '1', '2', '3', '4', '5', '6', '7', '8', '9', 'B', 'C', 'D' };
@@ -45,35 +46,40 @@ static const int FT891_def_bw[] = {
     17,   17,   5,   0,   0,   10,       5,     16,     10,     0,     16,     0 };
 // mLSB, mUSB, mCW, mFM, mAM, mTTYL, mCWR, mDATAL, mTTYU, mFMN, mDATAU, mAMN
 
-static const char *FT891_widths_SSB[] = {
+static std::vector<std::string>FT891_widths_SSB;
+static const char *vFT891_widths_SSB[] = {
 "200",   "400",  "600",  "850", "1100", "1350", "1500", "1650", "1800", "1950",
 "2100", "2200", "2300", "2400", "2500", "2600", "2700", "2800", "2900", "3000",
-"3200", NULL };
+"3200" };
 
 static int FT891_wvals_SSB[] = {
  1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
 21, WVALS_LIMIT};
 
-static const char *FT891_widths_SSBD[] = {
+static std::vector<std::string>FT891_widths_SSBD;
+static const char *vFT891_widths_SSBD[] = {
    "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
-  "800", "1200", "1400", "1700", "2000", "2400", "3000", NULL };
+  "800", "1200", "1400", "1700", "2000", "2400", "3000" };
 
 static int FT891_wvals_SSBD[] = {
  1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
 11, 12, 13, 14, 15, 16, 17, WVALS_LIMIT};
 
-static const char *FT891_widths_CW[] = {
+static std::vector<std::string>FT891_widths_CW;
+static const char *vFT891_widths_CW[] = {
    "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
-  "800", "1200", "1400", "1700", "2000", "2400", "3000", NULL };
+  "800", "1200", "1400", "1700", "2000", "2400", "3000" };
 
 static int FT891_wvals_CW[] = {
  1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
 11, 12, 13, 14, 15, 16, 17, WVALS_LIMIT};
 
 // Single bandwidth modes
-static const char *FT891_widths_AMFMnar[]  = { "NARR", NULL };
-static const char *FT891_widths_AMFMnorm[] = { "NORM", NULL };
+static std::vector<std::string>FT891_widths_AMFMnar;
+static const char *vFT891_widths_AMFMnar[]  = { "NARR" };
+static std::vector<std::string>FT891_widths_AMFMnorm;
+static const char *vFT891_widths_AMFMnorm[] = { "NORM" };
 
 static const int FT891_wvals_AMFM[] = { 0, WVALS_LIMIT };
 
@@ -186,6 +192,17 @@ RIG_FT891::RIG_FT891() {
 
 void RIG_FT891::initialize()
 {
+	VECTOR (FT891modes_, vFT891modes_);
+	VECTOR (FT891_widths_SSB, vFT891_widths_SSB);
+	VECTOR (FT891_widths_SSBD, vFT891_widths_SSBD);
+	VECTOR (FT891_widths_CW, vFT891_widths_CW);
+	VECTOR (FT891_widths_AMFMnar, vFT891_widths_AMFMnar);
+	VECTOR (FT891_widths_AMFMnorm, vFT891_widths_AMFMnorm);
+
+	modes_ = FT891modes_;
+	bandwidths_ = FT891_widths_SSB;
+	bw_vals_ = FT891_wvals_SSB;
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = sldrRFGAIN;
@@ -708,7 +725,7 @@ int RIG_FT891::def_bandwidth(int val)
 	return FT891_def_bw[val];
 }
 
-const char ** RIG_FT891::bwtable(int n)
+std::vector<std::string>& RIG_FT891::bwtable(int n)
 {
 	switch (n) {
 		case mFM     :

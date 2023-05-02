@@ -23,12 +23,14 @@
 //=============================================================================
 // TT-563
 
-const char RIG_TT563name_[] = "OMNI-VI";
+static const char RIG_TT563name_[] = "OMNI-VI";
 
-const char *RIG_TT563modes_[] = {
-		"LSB", "USB", "AM", "CW", "RTTY", "FM", NULL};
+static std::vector<std::string>RIG_TT563modes_;
+static const char *vRIG_TT563modes_[] = {
+		"LSB", "USB", "AM", "CW", "RTTY", "FM"};
 static const char RIG_TT563_mode_type[] = {'L', 'U', 'U', 'U', 'L', 'U'};
-const char *RIG_TT563widths[] = { "NARR", "WIDE", NULL};
+static std::vector<std::string>RIG_TT563widths;
+static const char *vRIG_TT563widths[] = { "NARR", "WIDE"};
 static int TT563_bw_vals[] = {1, 2, WVALS_LIMIT};
 
 RIG_TT563::RIG_TT563() {
@@ -75,6 +77,16 @@ RIG_TT563::RIG_TT563() {
 	ndigits = 7;
 
 };
+
+void RIG_TT563::initialize()
+{
+	VECTOR (RIG_TT563modes_, vRIG_TT563modes_);
+	VECTOR (RIG_TT563widths, vRIG_TT563widths);
+
+	modes_ = RIG_TT563modes_;
+	bandwidths_ = RIG_TT563widths;
+	bw_vals_ = TT563_bw_vals;
+}
 
 void RIG_TT563::selectA()
 {

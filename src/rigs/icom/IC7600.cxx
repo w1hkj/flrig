@@ -30,10 +30,12 @@ bool IC7600_DEBUG = true;
 
 const char IC7600name_[] = "IC-7600";
 
-const char *IC7600modes_[] = {
+static std::vector<std::string>IC7600modes_;
+static const char *vIC7600modes_[] =
+{
 	"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R", "PSK", "PSK-R", 
 	"LSB-D1", "LSB-D2", "LSB-D3",
-	"USB-D1", "USB-D2", "USB-D3", NULL};
+	"USB-D1", "USB-D2", "USB-D3"};
 
 const char IC7600_mode_type[] = {
 	'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U', 'U', 'L', 
@@ -45,12 +47,14 @@ const char IC7600_mode_nbr[] = {
 	0x00, 0x00, 0x00,
 	0x01, 0x01, 0x01 };
 
-const char *IC7600_ssb_bws[] = {
+static std::vector<std::string>IC7600_ssb_bws;
+static const char *vIC7600_ssb_bws[] =
+{
 "50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
 "600",   "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
 "2600", "2700", "2800", "2900", "3000", "3100", "3200", "3300", "3400", "3500",
-"3600", NULL };
+"3600" };
 static int IC7600_bw_vals_SSB[] = {
  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
 10,11,12,13,14,15,16,17,18,19,
@@ -58,23 +62,27 @@ static int IC7600_bw_vals_SSB[] = {
 30,31,32,33,34,35,36,37,38,39,
 40, WVALS_LIMIT};
 
-const char *IC7600_rtty_bws[] = {
+static std::vector<std::string>IC7600_rtty_bws;
+static const char *vIC7600_rtty_bws[] =
+{
 "50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
 "600",   "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
-"2600", "2700", NULL };
+"2600", "2700" };
 static int IC7600_bw_vals_RTTY[] = {
  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
 10,11,12,13,14,15,16,17,18,19,
 20,21,22,23,24,25,26,27,28,29,
 30,31, WVALS_LIMIT};
 
-const char *IC7600_am_bws[] = {
+static std::vector<std::string>IC7600_am_bws;
+static const char *vIC7600_am_bws[] =
+{
 "200",   "400",  "600",  "800", "1000", "1200", "1400", "1600", "1800", "2000",
 "2200", "2400", "2600", "2800", "3000", "3200", "3400", "3600", "3800", "4000",
 "4200", "4400", "4600", "4800", "5000", "5200", "5400", "5600", "5800", "6000",
 "6200", "6400", "6600", "6800", "7000", "7600", "7400", "7600", "7800", "8000",
-"8200", "8400", "8600", "8800", "9000", "9200", "9400", "9600", "9800", "10000", NULL };
+"8200", "8400", "8600", "8800", "9000", "9200", "9400", "9600", "9800", "10000" };
 static int IC7600_bw_vals_AM[] = {
  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
 10,11,12,13,14,15,16,17,18,19,
@@ -83,7 +91,9 @@ static int IC7600_bw_vals_AM[] = {
 40,41,42,43,44,45,46,47,48,49
 WVALS_LIMIT};
 
-const char *IC7600_fm_bws[] = { "FIXED", NULL };
+static std::vector<std::string>IC7600_fm_bws;
+static const char *vIC7600_fm_bws[] =
+{ "FIXED" };
 static int IC7600_bw_vals_FM[] = { 1, WVALS_LIMIT};
 
 static GUI IC7600_widgets[]= {
@@ -107,6 +117,16 @@ static GUI IC7600_widgets[]= {
 
 void RIG_IC7600::initialize()
 {
+	VECTOR (IC7600modes_, vIC7600modes_);
+	VECTOR (IC7600_ssb_bws, vIC7600_ssb_bws);
+	VECTOR (IC7600_rtty_bws, vIC7600_rtty_bws);
+	VECTOR (IC7600_am_bws, vIC7600_am_bws);
+	VECTOR (IC7600_fm_bws, vIC7600_fm_bws);
+
+	modes_ = IC7600modes_;
+	bandwidths_ = IC7600_ssb_bws;
+	bw_vals_ = IC7600_bw_vals_SSB;
+
 	IC7600_widgets[0].W = btnVol;
 	IC7600_widgets[1].W = sldrVOLUME;
 	IC7600_widgets[2].W = btnAGC;
@@ -359,7 +379,7 @@ void RIG_IC7600::set_modeA(int val)
 	cmd += filA;
 	cmd.append( post );
 	waitFB("set modeA");
-	set_trace(4, "set mode A[", IC7600modes_[A.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(4, "set mode A[", IC7600modes_[A.imode].c_str(), "] ", str2hex(replystr.c_str(), replystr.length()));
 
 // digital set / clear
 	if (val >= 10) {
@@ -425,7 +445,7 @@ void RIG_IC7600::set_modeB(int val)
 	cmd += filB;
 	cmd.append( post );
 	waitFB("set modeB");
-	set_trace(4, "set mode B[", IC7600modes_[A.imode], "] ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(4, "set mode B[", IC7600modes_[A.imode].c_str(), "] ", str2hex(replystr.c_str(), replystr.length()));
 
 // digital set / clear
 	if (val >= 10) {
@@ -574,18 +594,17 @@ int RIG_IC7600::adjust_bandwidth(int m)
 	return bw;
 }
 
-const char ** RIG_IC7600::bwtable(int m)
+std::vector<std::string>& RIG_IC7600::bwtable(int m)
 {
-	const char **table;
 	switch (m) {
 		case 2: // AM
-			table = IC7600_am_bws;
+			return IC7600_am_bws;
 			break;
 		case 5: // FM
-			table = IC7600_fm_bws;
+			return IC7600_fm_bws;
 			break;
 		case 4: case 7: // RTTY
-			table = IC7600_rtty_bws;
+			return IC7600_rtty_bws;
 			break;
 		case 3: case 6: // CW
 		case 8: case 9: // PKT
@@ -593,9 +612,9 @@ const char ** RIG_IC7600::bwtable(int m)
 		case 10: case 11 : case 12 :
 		case 13: case 14 : case 15 :
 		default:
-			table = IC7600_ssb_bws;
+			return IC7600_ssb_bws;
 	}
-	return table;
+	return IC7600_ssb_bws;
 }
 
 int RIG_IC7600::def_bandwidth(int m)

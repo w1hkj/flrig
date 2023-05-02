@@ -52,7 +52,7 @@ public:
 
 	void set_BANDWIDTHS(std::string s);
 	std::string get_BANDWIDTHS();
-	const char **bwtable(int);
+	std::vector<std::string>& bwtable(int);
 
 	int  adjust_bandwidth(int m);
 	int  def_bandwidth(int m);

@@ -25,9 +25,10 @@
 
 static const char TS890Sname_[] = "TS-890S";
 
-static const char *TS890Smodes_[] = {
+static std::vector<std::string>TS890Smodes_;
+static const char *vTS890Smodes_[] = {
 "LSB", "USB",  "CW", "FM", "AM", "FSK", "CW-R", "FSK-R", 
-"LSB-D", "USB-D", "FM-D", NULL};
+"LSB-D", "USB-D", "FM-D"};
 
 static const char TS890S_mode_chr[] =  { 
 '1', '2', '3', '4', '5', '6', '7', '9',
@@ -37,97 +38,114 @@ static const char TS890S_mode_type[] = {
 'L', 'U', 'U' };
 
 //----------------------------------------------------------------------
-static const char *TS890S_empty[] = { "N/A", NULL };
+static std::vector<std::string>TS890S_empty;
+static const char *vTS890S_empty[] = { "N/A" };
 
 //----------------------------------------------------------------------
 static int DEF_SL_SH = 0x8A03;
-static const char *TS890S_SSB_SL[] = {
+static std::vector<std::string>TS890S_SSB_SL;
+static const char *vTS890S_SSB_SL[] = {
   "0",   "50", "100", "200", "300", 
 "400",  "500", "600", "700", "800", 
-"900", "1000", NULL };
+"900", "1000" };
 
-static const char *TS890S_CAT_ssb_SL[] = {
+static std::vector<std::string>TS890S_CAT_ssb_SL;
+static const char *vTS890S_CAT_ssb_SL[] = {
 "SL00;", "SL01;", "SL02;", "SL03;", "SL04;", 
 "SL05;", "SL06;", "SL07;", "SL08;", "SL09;",
-"SL10;", "SL11;", NULL };
+"SL10;", "SL11;" };
 static const char *TS890S_SSB_SL_tooltip = "lo cut";
 static const char *TS890S_SSB_btn_SL_label = "L";
 
-static const char *TS890S_SSB_SH[] = {
+static std::vector<std::string>TS890S_SSB_SH;
+static const char *vTS890S_SSB_SH[] = {
 "1000", "1200", "1400", "1600", "1800", 
 "2000", "2200", "2400", "2600", "2800", 
-"3000", "3400", "4000", "5000", NULL };
+"3000", "3400", "4000", "5000" };
 
-static const char *TS890S_CAT_ssb_SH[] = {
+static std::vector<std::string>TS890S_CAT_ssb_SH;
+static const char *vTS890S_CAT_ssb_SH[] = {
 "SH00;", "SH01;", "SH02;", "SH03;", "SH04;", 
 "SH05;", "SH06;", "SH07;", "SH08;", "SH09;",
-"SH10;", "SH11;", "SH12;", "SH13;", NULL };
+"SH10;", "SH11;", "SH12;", "SH13;" };
 static const char *TS890S_SSB_SH_tooltip = "hi cut";
 static const char *TS890S_SSB_btn_SH_label = "H";
 
 //----------------------------------------------------------------------
 static int DEF_width_shift = 0x8D05;
-static const char *TS890S_DATA_width[] = {
+static std::vector<std::string>TS890S_DATA_width;
+static const char *vTS890S_DATA_width[] = {
   "50",   "80",  "100",  "150", "200", 
  "250",  "300",  "400",  "500", "600", 
-"1000", "1500", "2000", "2500",  NULL };
+"1000", "1500", "2000", "2500" };
 
-static const char *TS890S_CAT_data_width[] = {
+static std::vector<std::string>TS890S_CAT_data_width;
+static const char *vTS890S_CAT_data_width[] = {
 "SL00;", "SL01;", "SL02;", "SL03;", "SL04;", 
 "SL05;", "SL06;", "SL07;", "SL08;", "SL09;",
-"SL10;", "SL11;", "SL12;", "SL13;", NULL };
+"SL10;", "SL11;", "SL12;", "SL13;" };
 static const char *TS890S_DATA_W_tooltip = "width";
 static const char *TS890S_DATA_W_btn_label = "W";
 
-static const char *TS890S_DATA_shift[] = {
+static std::vector<std::string>TS890S_DATA_shift;
+static const char *vTS890S_DATA_shift[] = {
 "1000", "1100", "1200", "1300", "1400", 
 "1500", "1600", "1700", "1800", "1900", 
-"2000", "2100", "2210", NULL };
+"2000", "2100", "2210" };
 
-static const char *TS890S_CAT_data_shift[] = {
+static std::vector<std::string>TS890S_CAT_data_shift;
+static const char *vTS890S_CAT_data_shift[] = {
 "SH00;", "SH01;", "SH02;", "SH03;", "SH04;", 
 "SH05;", "SH06;", "SH07;", "SH08;", "SH09;",
-"SH10;", "SH11;", "SH12;", NULL };
+"SH10;", "SH11;", "SH12;" };
 static const char *TS890S_DATA_S_tooltip = "shift";
 static const char *TS890S_DATA_S_btn_label = "S";
 
 //----------------------------------------------------------------------
 static int DEF_am = 0x8201;
-static const char *TS890S_AM_SL[] = {
-"10", "100", "200", "500", NULL };
+static std::vector<std::string>TS890S_AM_SL;
+static const char *vTS890S_AM_SL[] = {
+"10", "100", "200", "500" };
 
-static const char *TS890S_CAT_am_SL[] = {
-"SL00;", "SL01;", "SL02;", "SL03;", NULL}; 
+static std::vector<std::string>TS890S_CAT_am_SL;
+static const char *vTS890S_CAT_am_SL[] = {
+"SL00;", "SL01;", "SL02;", "SL03;"}; 
 static const char *TS890S_AM_SL_tooltip = "lo cut";
 static const char *TS890S_AM_btn_SL_label = "L";
 
-static const char *TS890S_AM_SH[] = {
-"2500", "3000", "4000", "5000", NULL };
+static std::vector<std::string>TS890S_AM_SH;
+static const char *vTS890S_AM_SH[] = {
+"2500", "3000", "4000", "5000" };
 
-static const char *TS890S_CAT_am_SH[] = {
-"SH00;", "SH01;", "SH02;", "SH03;", NULL}; 
+static std::vector<std::string>TS890S_CAT_am_SH;
+static const char *vTS890S_CAT_am_SH[] = {
+"SH00;", "SH01;", "SH02;", "SH03;"}; 
 static const char *TS890S_AM_SH_tooltip = "hi cut";
 static const char *TS890S_AM_btn_SH_label = "H";
 
 //----------------------------------------------------------------------
 static int  DEF_cw = 7;
-static const char *TS890S_CWwidths[] = {
+static std::vector<std::string>TS890S_CWwidths;
+static const char *vTS890S_CWwidths[] = {
   "50",   "80",  "100",  "150", "200", 
  "250",  "300",  "400",  "500", "600", 
-"1000", "1500", "2000", "2500",  NULL};
+"1000", "1500", "2000", "2500"};
 
-static const char *TS890S_CWbw[] = {
+static std::vector<std::string>TS890S_CWbw;
+static const char *vTS890S_CWbw[] = {
 "FW0050;", "FW0080;", "FW0100;", "FW0150;", "FW0200;",
 "FW0250;", "FW0300;", "FW0400;", "FW0500;", "FW0600;", 
-"FW1000;", "FW1500;", "FW2000;", "FW2500;", NULL};
+"FW1000;", "FW1500;", "FW2000;", "FW2500;"};
 
 //----------------------------------------------------------------------
 static int  DEF_fsk = 1;
-static const char *TS890S_FSKwidths[] = {
-"250", "500", "1000", "1500", NULL};
+static std::vector<std::string>TS890S_FSKwidths;
+static const char *vTS890S_FSKwidths[] = {
+"250", "500", "1000", "1500"};
 
-static const char *TS890S_FSKbw[] = {
-"FW0250;", "FW0500;", "FW1000;", "FW1500;", NULL };
+static std::vector<std::string>TS890S_FSKbw;
+static const char *vTS890S_FSKbw[] = {
+"FW0250;", "FW0500;", "FW1000;", "FW1500;" };
 
 //----------------------------------------------------------------------
 
@@ -151,6 +169,31 @@ static std::string menu005;
 
 void RIG_TS890S::initialize()
 {
+	VECTOR (TS890Smodes_, vTS890Smodes_);
+	VECTOR (TS890S_empty, vTS890S_empty);
+	VECTOR (TS890S_SSB_SL, vTS890S_SSB_SL);
+	VECTOR (TS890S_CAT_ssb_SL, vTS890S_CAT_ssb_SL);
+	VECTOR (TS890S_SSB_SH, vTS890S_SSB_SH);
+	VECTOR (TS890S_CAT_ssb_SH, vTS890S_CAT_ssb_SH);
+	VECTOR (TS890S_DATA_width, vTS890S_DATA_width);
+	VECTOR (TS890S_CAT_data_width, vTS890S_CAT_data_width);
+	VECTOR (TS890S_DATA_shift, vTS890S_DATA_shift);
+	VECTOR (TS890S_CAT_data_shift, vTS890S_CAT_data_shift);
+	VECTOR (TS890S_AM_SL, vTS890S_AM_SL);
+	VECTOR (TS890S_CAT_am_SL, vTS890S_CAT_am_SL);
+	VECTOR (TS890S_AM_SH, vTS890S_AM_SH);
+	VECTOR (TS890S_CAT_am_SH, vTS890S_CAT_am_SH);
+	VECTOR (TS890S_CWwidths, vTS890S_CWwidths);
+	VECTOR (TS890S_CWbw, vTS890S_CWbw);
+	VECTOR (TS890S_FSKwidths, vTS890S_FSKwidths);
+	VECTOR (TS890S_FSKbw, vTS890S_FSKbw);
+
+	modes_ = TS890Smodes_;
+	bandwidths_ = TS890S_SSB_SH;
+
+	dsp_SL     = TS890S_SSB_SL;
+	dsp_SH     = TS890S_SSB_SH;
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = sldrRFGAIN;
@@ -267,15 +310,15 @@ const char * RIG_TS890S::get_bwname_(int n, int md)
 		int hi = (n >> 8) & 0x7F;
 		int lo = n & 0xFF;
 		snprintf(bwname, sizeof(bwname), "%s/%s",
-			(md == LSB || md == USB || md == FM) ? TS890S_SSB_SL[lo] :
-			(md == AM) ? TS890S_AM_SL[lo] :
-			TS890S_DATA_width[lo],
-			(md == LSB || md == USB || md == FM) ? TS890S_SSB_SH[hi] :
-			(md == AM) ? TS890S_AM_SH[hi] :
-			TS890S_DATA_shift[hi] );
+			(md == LSB || md == USB || md == FM) ? TS890S_SSB_SL[lo].c_str() :
+			(md == AM) ? TS890S_AM_SL[lo].c_str() :
+			TS890S_DATA_width[lo].c_str(),
+			(md == LSB || md == USB || md == FM) ? TS890S_SSB_SH[hi].c_str() :
+			(md == AM) ? TS890S_AM_SH[hi].c_str() :
+			TS890S_DATA_shift[hi].c_str() );
 	} else {
 		snprintf(bwname, sizeof(bwname), "%s",
-			(md == CW || md == CWR) ? TS890S_CWwidths[n] : TS890S_FSKwidths[n]);
+			(md == CW || md == CWR) ? TS890S_CWwidths[n].c_str() : TS890S_FSKwidths[n].c_str());
 	}
 	return bwname;
 }
@@ -588,7 +631,7 @@ int RIG_TS890S::set_widths(int val)
 	return bw;
 }
 
-const char **RIG_TS890S::bwtable(int m)
+std::vector<std::string>& RIG_TS890S::bwtable(int m)
 {
 	if (m == LSB || m == USB || m == FM || m == FMD)
 		return TS890S_SSB_SH;
@@ -602,7 +645,7 @@ const char **RIG_TS890S::bwtable(int m)
 		return TS890S_DATA_width;
 }
 
-const char **RIG_TS890S::lotable(int m)
+std::vector<std::string>& RIG_TS890S::lotable(int m)
 {
 	if (m == LSB || m == USB || m == FM || m == FMD)
 		return TS890S_SSB_SL;
@@ -611,10 +654,10 @@ const char **RIG_TS890S::lotable(int m)
 	else if (m == LSBD || m == USBD)
 		return TS890S_DATA_shift;
 // CW CWR FSK FSKR
-	return NULL;
+	return vNOBWS;
 }
 
-const char **RIG_TS890S::hitable(int m)
+std::vector<std::string>& RIG_TS890S::hitable(int m)
 {
 	if (m == LSB || m == USB || m == FM || m == FMD)
 		return TS890S_SSB_SH;
@@ -623,7 +666,7 @@ const char **RIG_TS890S::hitable(int m)
 	else if (m == LSBD || m == USBD)
 		return TS890S_DATA_width;
 // CW CWR FSK FSKR
-	return NULL;
+	return vNOBWS;
 }
 
 int RIG_TS890S::adjust_bandwidth(int val)

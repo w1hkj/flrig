@@ -39,8 +39,10 @@ enum F81_modes {
 	F81_LSBD2, F81_USBD2,
 	F81_LSBD3, F81_USBD3 };
 
-const char *ICF8101modes_[NUM_MODES + 1] = { 
-"LSB", "USB", "AM", "CW", "RTTY", "LSB-D1", "USB-D1", "LSB-D2", "USB-D2", "LSB-D3", "USB-D3", NULL};
+static std::vector<std::string>ICF8101modes_;
+static const char *vICF8101modes_[] =
+{ 
+"LSB", "USB", "AM", "CW", "RTTY", "LSB-D1", "USB-D1", "LSB-D2", "USB-D2", "LSB-D3", "USB-D3"};
 
 const char mdval[NUM_MODES] = { 0X00, 0X01, 0X02, 0X03, 0X04, 0x18, 0x19, 0x20, 0x21, 0x22, 0x23};
 
@@ -50,11 +52,12 @@ const char ICF8101_mode_type[NUM_MODES] = {
 static int mode_bwA[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 static int mode_bwB[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 
-static const char *ICF8101_CW_SSB_widths[] = {
+static std::vector<std::string>ICF8101_CW_SSB_widths;
+static const char *vICF8101_CW_SSB_widths[] =
+{
 "100",   "200",  "300",  "400",  "500",  "600",  "700",  "800",  "900", "1000",
 "1100", "1200", "1300", "1400", "1500", "1600", "1700", "1800", "1900", "2000", 
-"2100", "2200", "2300", "2400", "2500", "2600", "2700", "2800", "2900", "3000",
-NULL};
+"2100", "2200", "2300", "2400", "2500", "2600", "2700", "2800", "2900", "3000"};
 
 static const char ICF8101_CW_SSB_width_vals[] = {
 '\x01', '\x02', '\x03', '\x04', '\x05', '\x06', '\x07', '\x08', '\x09', '\x10',
@@ -63,16 +66,18 @@ static const char ICF8101_CW_SSB_width_vals[] = {
 };
 #define NUM_CW_SSB_WIDTHS 30
 
-static const char *ICF8101_RTTY_widths[] = {
-  "NONE", NULL};
+static std::vector<std::string>ICF8101_RTTY_widths;
+static const char *vICF8101_RTTY_widths[] =
+{ "NONE"};
 
-static const char *ICF8101_AM_widths[] = {
+static std::vector<std::string>ICF8101_AM_widths;
+static const char *vICF8101_AM_widths[] =
+{
   "200",  "400",  "600",  "800", "1000", "1200", "1400", "1600", "1800", "2000",
  "2200", "2400", "2600", "2800", "3000", "3200", "3400", "3600", "3800", "4000",
  "4200", "4400", "4600", "4800", "5000", "5200", "5400", "5600", "5800", "5000",
  "6200", "6400", "6600", "6800", "7000", "7200", "7400", "7600", "7800", "8000",
- "8200", "8400", "8600", "8800", "9000", "9200", "9400", "9600", "9800", "10000",
-NULL};
+ "8200", "8400", "8600", "8800", "9000", "9200", "9400", "9600", "9800", "10000"};
 
 static const char ICF8101_bw_vals_AM[] = {
 '\x01', '\x02', '\x03', '\x04', '\x05', '\x06', '\x07', '\x08', '\x09', '\x10',
@@ -111,6 +116,15 @@ static GUI ICF8101_widgets[]= {
 
 void RIG_ICF8101::initialize()
 {
+	VECTOR (ICF8101modes_, vICF8101modes_);
+	VECTOR (ICF8101_CW_SSB_widths, vICF8101_CW_SSB_widths);
+	VECTOR (ICF8101_RTTY_widths, vICF8101_RTTY_widths);
+	VECTOR (ICF8101_AM_widths, vICF8101_AM_widths);
+
+	modes_ = ICF8101modes_;
+	_mode_type = ICF8101_mode_type;
+	bandwidths_ = ICF8101_CW_SSB_widths;
+
 	ICF8101_widgets[0].W = btnVol;
 	ICF8101_widgets[1].W = sldrVOLUME;
 	ICF8101_widgets[2].W = btnAGC;
@@ -156,8 +170,8 @@ RIG_ICF8101::RIG_ICF8101() {
 	name_ = ICF8101name_;
 	modes_ = ICF8101modes_;
 	_mode_type = ICF8101_mode_type;
-//	bandwidths_ = ICF8101_CW_SSB_widths;
-//	bw_vals_ = ICF8101_bw_vals_SSB;
+	bandwidths_ = ICF8101_CW_SSB_widths;
+
 	widgets = ICF8101_widgets;
 
 	serial_baudrate = BR9600;
@@ -1070,7 +1084,7 @@ int RIG_ICF8101::def_bandwidth(int m)
 	return mode_bwA[m];
 }
 
-const char ** RIG_ICF8101::bwtable(int m)
+std::vector<std::string>& RIG_ICF8101::bwtable(int m)
 {
 	switch (m) {
 		case F81_AM:
@@ -1162,7 +1176,7 @@ void RIG_ICF8101::set_bwA(int val)
 	set_BW(val);
 	waitFB("set BW A");
 	mode_bwA[A.imode] = val;
-	set_trace(4, "set_bwA() ", bwtable(A.imode)[val], ": ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(4, "set_bwA() ", bwtable(A.imode)[val].c_str(), ": ", str2hex(replystr.c_str(), replystr.length()));
 }
 
 void RIG_ICF8101::set_bwB(int val)
@@ -1171,7 +1185,7 @@ void RIG_ICF8101::set_bwB(int val)
 	set_BW(val);
 	waitFB("set BW B");
 	mode_bwB[B.imode] = val;
-	set_trace(4, "set_bwB() ", bwtable(B.imode)[val], ": ", str2hex(replystr.c_str(), replystr.length()));
+	set_trace(4, "set_bwB() ", bwtable(B.imode)[val].c_str(), ": ", str2hex(replystr.c_str(), replystr.length()));
 }
 
 int  RIG_ICF8101::get_BW(int m)

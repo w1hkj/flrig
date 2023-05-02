@@ -28,18 +28,21 @@ static const char TS950name_[] = "TS-950";
 
 enum {LSB950, USB950, CW950, FM950, AM950, FSK950};
 
-static const char *TS950modes_[] = {
-		"LSB", "USB", "CW", "FM", "AM", "FSK", NULL};
+static std::vector<std::string>TS950modes_;
+static const char *vTS950modes_[] = {
+		"LSB", "USB", "CW", "FM", "AM", "FSK"};
 static const char TS950_mode_chr[] =  { '1', '2', '3', '4', '5', '6' };
 static const char TS950_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L' };
 
 enum {NONE_950, FM_W_950, FM_N_950, AM_950, SSB_950, SSB_N_950, CW_950, CW_N_950};
-static const char *TS950_widths[] = {
-"NONE", "FM-W", "FM-N", "AM", "SSB", "SSB-N", "CW", "CW-N", NULL};
+static std::vector<std::string>TS950_widths;
+static const char *vTS950_widths[] = {
+"NONE", "FM-W", "FM-N", "AM", "SSB", "SSB-N", "CW", "CW-N"};
 static int TS950_bw_vals[] = { 1,2,3,4,5,6,7,8, WVALS_LIMIT};
 
-static const char *TS950_filters[] = {
-"000", "002", "003", "005", "007", "008", "009", "010", NULL};
+static std::vector<std::string>TS950_filters;
+static const char *vTS950_filters[] = {
+"000", "002", "003", "005", "007", "008", "009", "010"};
 
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnDataPort, 214, 105,  50 },
@@ -52,6 +55,15 @@ static int selected_meter = NO_METER;
 
 void RIG_TS950::initialize()
 {
+	VECTOR (TS950modes_, vTS950modes_);
+	VECTOR (TS950_widths, vTS950_widths);
+	VECTOR (TS950_filters, vTS950_filters);
+
+	modes_ = TS950modes_;
+	_mode_type = TS950_mode_type;
+	bandwidths_ = TS950_widths;
+	bw_vals_ = TS950_bw_vals;
+
 	rig_widgets[0].W = btnDataPort;
 
 	cmd = "AI0;"; // auto information OFF
@@ -390,12 +402,12 @@ int RIG_TS950::get_bwA()
 	if (p == std::string::npos) return bwA;
 
 	replystr[p + 8] = 0;
-	int bw = 0;
-	while (TS950_filters[bw]) {
-		if (strcmp(&replystr[p + 5], TS950_filters[bw]) == 0)
-			return bwA = bw;
-		bw++;
-	}
+	size_t bw = 0;
+	for (bw = 0; bw < TS950_filters.size(); bw++)
+		if (TS950_filters[bw] == replystr.substr(p+5)) {
+			bwA = bw;
+			break;
+		}
 	gett("BW A");
 	return bwA;
 }
@@ -420,12 +432,12 @@ int RIG_TS950::get_bwB()
 	if (p == std::string::npos) return bwB;
 
 	replystr[p + 8] = 0;
-	int bw = 0;
-	while (TS950_filters[bw]) {
-		if (strcmp(&replystr[p + 5], TS950_filters[bw]) == 0)
-			return bwB = bw;
-		bw++;
-	}
+	size_t bw = 0;
+	for (bw = 0; bw < TS950_filters.size(); bw++)
+		if (TS950_filters[bw] == replystr.substr(p+5)) {
+			bwB = bw;
+			break;
+		}
 	gett("BW B");
 	return bwB;
 }

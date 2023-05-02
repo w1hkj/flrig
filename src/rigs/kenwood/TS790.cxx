@@ -23,13 +23,14 @@
 
 static const char TS790name_[] = "TS-790";
 
-static const char *TS790modes_[] = {
-		"LSB", "USB", "CW", "FM", "CWN", NULL};
+static std::vector<std::string>TS790modes_;
+static const char *vTS790modes_[] = {
+		"LSB", "USB", "CW", "FM", "CWN"};
 static const char TS790_mode_chr[] =  { '1', '2', '3', '4', '7' };
 static const char TS790_mode_type[] = { 'L', 'U', 'L', 'U', 'L' };
 
-//static const char *TS790_widths[] = {
-//"NONE", "FM-W", "FM-N", "AM", "SSB", "CW", "CWN", NULL};
+//static std::vector<std::string>TS790_widths = {
+//"NONE", "FM-W", "FM-N", "AM", "SSB", "CW", "CWN"};
 //static int TS790_bw_vals[] = { 1,2,3,4,5,6,7, WVALS_LIMIT};
 
 RIG_TS790::RIG_TS790() {
@@ -37,7 +38,7 @@ RIG_TS790::RIG_TS790() {
 	name_ = TS790name_;
 	modes_ = TS790modes_;
 	_mode_type = TS790_mode_type;
-	bandwidths_ = NULL;
+	bandwidths_ = vNOBWS;
 	serial_baudrate = BR4800;
 	stopbits = 2;
 	serial_retries = 2;
@@ -80,6 +81,11 @@ RIG_TS790::RIG_TS790() {
 
 void RIG_TS790::initialize()
 {
+	VECTOR (TS790modes_, vTS790modes_);
+
+	modes_ = TS790modes_;
+	_mode_type = TS790_mode_type;
+	bandwidths_ = vNOBWS;
 }
 
 bool RIG_TS790::check ()

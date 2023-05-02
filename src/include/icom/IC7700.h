@@ -94,7 +94,7 @@ public:
 	const char *FILT(int &val);
 	const char *nextFILT();
 
-	const char **bwtable(int m);
+	std::vector<std::string>& bwtable(int m);
 
 	void set_band_selection(int v);
 	void get_band_selection(int v);

@@ -37,8 +37,9 @@ static const char FTdx1200name_[] = "FTdx1200";
 static int mode_bwA[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 static int mode_bwB[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 
-static const char *FTdx1200modes_[] = {
-"LSB", "USB", "CW", "FM", "AM", "RTTY-L", "CW-R", "DATA-L", "RTTY-U", "FM-N", "DATA-U", NULL};
+static std::vector<std::string>FTdx1200modes_;
+static const char *vFTdx1200modes_[] = {
+"LSB", "USB", "CW", "FM", "AM", "RTTY-L", "CW-R", "DATA-L", "RTTY-U", "FM-N", "DATA-U"};
 
 static const char FTdx1200_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '8', '9', 'B', 'C' };
 static const char FTdx1200_mode_type[] = { 'L', 'U', 'L', 'U', 'U', 'L', 'U', 'L', 'U', 'U', 'U' };
@@ -48,50 +49,59 @@ static const int FTdx1200_def_bw[] = {
     18,   18,   10,   0,   0,   6,       10,     15,     6,        0,     15    };
 // mLSB, mUSB, mCW, mFM, mAM, mRTTY_L, mCW_R, mDATA_L, mRTTY_U, mFM_N, mDATA_U
 
-static const char *FTdx1200_widths_SSB[] = {
+static std::vector<std::string>FTdx1200_widths_SSB;
+static const char *vFTdx1200_widths_SSB[] = {
  "200",  "400",  "600",  "850", "1100",
 "1350", "1500", "1650", "1800", "1950",
 "2100", "2200", "2300", "2400", "2500",
 "2600", "2700", "2800", "2900", "3000",
-"3200", "3400", "3600", "3800", "4000", NULL }; // def_bw = 18
+"3200", "3400", "3600", "3800", "4000" }; // def_bw = 18
 
 static int FTdx1200_wvals_SSB[] = {
 1,2,3,4,5,6,7,8,9,10,11,12,13,15,16,17,18,19,20,21,22,23, 24, 25, WVALS_LIMIT};
 
-static const char *FTdx1200_widths_SSBD[] = {
+static std::vector<std::string>FTdx1200_widths_SSBD;
+static const char *vFTdx1200_widths_SSBD[] = {
   "50",  "100",  "150",  "200",  "250",
  "300",  "350",  "400",  "450",  "500",
  "800", "1200", "1400", "1700", "2000",
-"2400",  NULL }; // def_bw = 16 for DATA, 6 for RTTY
+"2400" }; // def_bw = 16 for DATA, 6 for RTTY
 
 static int FTdx1200_wvals_SSBD[] = {
 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, WVALS_LIMIT};
 
-static const char *FTdx1200_widths_CW[] = {
+static std::vector<std::string>FTdx1200_widths_CW;
+static const char *vFTdx1200_widths_CW[] = {
   "50",  "100",  "150",  "200",  "250",
  "300",  "350",  "400",  "450",  "500",
  "800", "1200", "1400", "1700", "2000",
-"2400",  NULL }; // def_bw = 10
+"2400" }; // def_bw = 10
 
 static int FTdx1200_wvals_CW[] = {
 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, WVALS_LIMIT};
 
 // Single bandwidth modes
-static const char *FTdx1200_widths_FMnar[] = { "NARR", NULL };
-static const char *FTdx1200_widths_AMFM[]  = { "NORM", NULL };
+static std::vector<std::string>FTdx1200_widths_FMnar;
+static const char *vFTdx1200_widths_FMnar[] = { "NARR" };
+static std::vector<std::string>FTdx1200_widths_AMFM;
+static const char *vFTdx1200_widths_AMFM[]  = { "NORM" };
 
 static const int FTdx1200_wvals_AMFM[] = { 0, WVALS_LIMIT };
 
 // US 60M 5-USB, 5-CW
-static const char *US_60m_chan[]  = {"000","125","126","127","128","130","141","142","143","144","146",NULL};
-static const char *US_60m_label[] = {"VFO","U51","U52","U53","U54","U55","U56","U57","U58","U59","U50",NULL};
+static std::vector<std::string>US_60m_chan;
+static const char *vUS_60m_chan[]  = {"000","125","126","127","128","130","141","142","143","144","146"};
+static std::vector<std::string>US_60m_label;
+static const char *vUS_60m_label[] = {"VFO","U51","U52","U53","U54","U55","U56","U57","U58","U59","U50"};
 
 // UK 60m channel numbers by Brian, G8SEZ
-static const char *UK_60m_chan[]  = {"000","118","120","121","127","128","129","130",NULL};
-static const char *UK_60m_label[] = {"VFO","U51","U52","U53","U54","U55","U56","U57",NULL};
+static std::vector<std::string>UK_60m_chan;
+static const char *vUK_60m_chan[]  = {"000","118","120","121","127","128","129","130"};
+static std::vector<std::string>UK_60m_label;
+static const char *vUK_60m_label[] = {"VFO","U51","U52","U53","U54","U55","U56","U57"};
 
-static const char **Channels_60m = US_60m_chan;
-static const char **label_60m    = US_60m_label;
+static std::vector<std::string>& Channels_60m = US_60m_chan;
+static std::vector<std::string>& label_60m    = US_60m_label;
 
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
@@ -197,6 +207,21 @@ RIG_FTdx1200::RIG_FTdx1200() {
 
 void RIG_FTdx1200::initialize()
 {
+	VECTOR (FTdx1200modes_, vFTdx1200modes_);
+	VECTOR (FTdx1200_widths_SSB, vFTdx1200_widths_SSB);
+	VECTOR (FTdx1200_widths_SSBD, vFTdx1200_widths_SSBD);
+	VECTOR (FTdx1200_widths_CW, vFTdx1200_widths_CW);
+	VECTOR (FTdx1200_widths_FMnar, vFTdx1200_widths_FMnar);
+	VECTOR (FTdx1200_widths_AMFM, vFTdx1200_widths_AMFM);
+	VECTOR (US_60m_chan, vUS_60m_chan);
+	VECTOR (US_60m_label, vUS_60m_label);
+	VECTOR (UK_60m_chan, vUK_60m_chan);
+	VECTOR (UK_60m_label, vUK_60m_label);
+
+	modes_ = FTdx1200modes_;
+	bandwidths_ = FTdx1200_widths_SSB;
+	bw_vals_ = FTdx1200_wvals_SSB;
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = sldrRFGAIN;
@@ -235,15 +260,15 @@ void RIG_FTdx1200::initialize()
 		Channels_60m = US_60m_chan;
 		label_60m    = US_60m_label;
 		op_yaesu_select60->clear();
-		char **p = (char **)US_60m_label;
-		while (*p) op_yaesu_select60->add(*p++);
+		for (size_t n = 0; n < US_60m_label.size(); n++)
+			op_yaesu_select60->add(US_60m_label.at(n).c_str());
 	}
 	else {
 		Channels_60m = UK_60m_chan;
 		label_60m    = UK_60m_label;
 		op_yaesu_select60->clear();
-		char **p = (char **)UK_60m_label;
-		while (*p) op_yaesu_select60->add(*p++);
+		for (size_t n = 0; n < UK_60m_label.size(); n++)
+			op_yaesu_select60->add(UK_60m_label.at(n).c_str());
 	}
 	op_yaesu_select60->index(m_60m_indx);
 
@@ -836,7 +861,7 @@ int RIG_FTdx1200::def_bandwidth(int m)
 	return mode_bwA[m];
 }
 
-const char ** RIG_FTdx1200::bwtable(int n)
+std::vector<std::string>& RIG_FTdx1200::bwtable(int n)
 {
 	switch (n) {
 		case mFM     : return FTdx1200_widths_AMFM;

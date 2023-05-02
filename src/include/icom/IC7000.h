@@ -111,7 +111,7 @@ public:
 
 	void set_band_selection(int v);
 	void get_band_selection(int v);
-	const char ** bwtable(int m);
+	std::vector<std::string>&  bwtable(int m);
 };
 
 

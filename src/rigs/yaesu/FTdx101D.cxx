@@ -48,75 +48,87 @@ static int defBW_wide[NUM_MODES] = {
 static int mode_bwA[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 static int mode_bwB[NUM_MODES] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 
-static const char *FTdx101Dmodes_[] = {
+static std::vector<std::string>FTdx101Dmodes_;
+static const char *vFTdx101Dmodes_[] = {
 "LSB", "USB", "CW-U", "FM", "AM", 
 "RTTY-L", "CW-L", "DATA-L", "RTTY-U", "DATA-FM",
-"FM-N", "DATA-U", "AM-N", "PKT", "DATA-FMN", NULL};
+"FM-N", "DATA-U", "AM-N", "PKT", "DATA-FMN"};
 
 static const char FTdx101D_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 static const char FTdx101D_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L', 'U', 'U', 'U', 'U', 'U', 'U', 'U' };
 
-static const char *FTdx101D_widths_SSB[] = {
+static std::vector<std::string>FTdx101D_widths_SSB;
+static const char *vFTdx101D_widths_SSB[] = {
 "Default",
  "300",  "400",  "600",  "850", "1100", 
 "1200", "1500", "1650", "1800", "1950",
 "2100", "2200", "2300", "2400", "2500",
 "2600", "2700", "2800", "2900", "3000",
-"3200", "3500", "4000", NULL };
+"3200", "3500", "4000" };
 
 static int FTdx101D_wvals_SSB[] = {
 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23, WVALS_LIMIT};
 
-static const char *FTdx101D_widths_CW[] = {
+static std::vector<std::string>FTdx101D_widths_CW;
+static const char *vFTdx101D_widths_CW[] = {
 "Default",
   "50",  "100",  "150",  "200",  "250",
  "300",  "350",  "400",  "450",  "500", 
  "600",  "800", "1200", "1400", "1700",
-"2000", "2400", "3000", NULL };
+"2000", "2400", "3000" };
 
 static int FTdx101D_wvals_CW[] = {
 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18, WVALS_LIMIT };
 
-static const char *FTdx101D_widths_RTTY[] = {
+static std::vector<std::string>FTdx101D_widths_RTTY;
+static const char *vFTdx101D_widths_RTTY[] = {
 "Default",
   "50",  "100",  "150",  "200",  "250",
  "300",  "350",  "400",  "450",  "500",
  "600",  "800", "1200", "1400", "1700",
-"2000", "2400", "3000", NULL };
+"2000", "2400", "3000" };
 
 static int FTdx101D_wvals_RTTY[] = {
 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18, WVALS_LIMIT };
 
-static const char *FTdx101D_widths_DATA[] = {
+static std::vector<std::string>FTdx101D_widths_DATA;
+static const char *vFTdx101D_widths_DATA[] = {
 "Default",
   "50",  "100",  "150",  "200",  "250", 
  "300",  "350",  "400",  "450",  "500",
  "600",  "800", "1200", "1400", "1700",
-"2000", "2400", "3000", NULL };
+"2000", "2400", "3000" };
 
 static int FTdx101D_wvals_PSK[] = {
 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, WVALS_LIMIT };
 
 static const int FTdx101D_wvals_AMFM[] = { 0, WVALS_LIMIT };
 
-static const char *FTdx101D_widths_AMwide[] = { "9000", NULL };
-static const char *FTdx101D_widths_AMnar[]  = { "6000", NULL };
-static const char *FTdx101D_widths_FMnar[]  = { "9000", NULL };
-static const char *FTdx101D_widths_FMwide[] = { "16000", NULL };
-static const char *FTdx101D_widths_DATA_FM[]  = { "16000", NULL };
-static const char *FTdx101D_widths_DATA_FMN[] = { "9000", NULL };
+static std::vector<std::string>FTdx101D_widths_AMwide;
+static const char *vFTdx101D_widths_AMwide[] = { "9000" };
+static std::vector<std::string>FTdx101D_widths_AMnar;
+static const char *vFTdx101D_widths_AMnar[]  = { "6000" };
+static std::vector<std::string>FTdx101D_widths_FMnar;
+static const char *vFTdx101D_widths_FMnar[]  = { "9000" };
+static std::vector<std::string>FTdx101D_widths_FMwide;
+static const char *vFTdx101D_widths_FMwide[] = { "16000" };
+static std::vector<std::string>FTdx101D_widths_DATA_FM;
+static const char *vFTdx101D_widths_DATA_FM[]  = { "16000" };
+static std::vector<std::string>FTdx101D_widths_DATA_FMN;
+static const char *vFTdx101D_widths_DATA_FMN[] = { "9000" };
 
-static const char *FTdx101D_US_60m[] = {NULL, "126", "127", "128", "130", NULL};
+static std::vector<std::string>FTdx101D_US_60m;
+static const char *vFTdx101D_US_60m[] = {"", "126", "127", "128", "130"};
 // US has 5 60M presets. Using dummy numbers for all.
-// First NULL means skip 60m sets in get_band_selection().
+// First "" means skip 60m sets in get_band_selection().
 // Maybe someone can do a cat command MC; on all 5 presets and add returned numbers above.
 // To send cat commands in flrig goto menu Config->Xcvr select->Send Cmd.
 //
 // UK has 7 60M presets. Using dummy numbers for all.  If you want support,
 // Maybe someone can do a cat command MC; on all 7 presets and add returned numbers below.
-// static const char *FTdx101D_UK_60m[] = {NULL, "126", "127", "128", "130", "131", "132", NULL};
+// static std::vector<std::string>FTdx101D_UK_60m = {"", "126", "127", "128", "130", "131", "132"};
 
-static const char **Channels_60m = FTdx101D_US_60m;
+static std::vector<std::string>& Channels_60m = FTdx101D_US_60m;
 
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
@@ -133,6 +145,23 @@ static GUI rig_widgets[]= {
 
 void RIG_FTdx101D::initialize()
 {
+	VECTOR (FTdx101Dmodes_, vFTdx101Dmodes_);
+	VECTOR (FTdx101D_widths_SSB, vFTdx101D_widths_SSB);
+	VECTOR (FTdx101D_widths_CW, vFTdx101D_widths_CW);
+	VECTOR (FTdx101D_widths_RTTY, vFTdx101D_widths_RTTY);
+	VECTOR (FTdx101D_widths_DATA, vFTdx101D_widths_DATA);
+	VECTOR (FTdx101D_widths_AMwide, vFTdx101D_widths_AMwide);
+	VECTOR (FTdx101D_widths_AMnar, vFTdx101D_widths_AMnar);
+	VECTOR (FTdx101D_widths_FMnar, vFTdx101D_widths_FMnar);
+	VECTOR (FTdx101D_widths_FMwide, vFTdx101D_widths_FMwide);
+	VECTOR (FTdx101D_widths_DATA_FM, vFTdx101D_widths_DATA_FM);
+	VECTOR (FTdx101D_widths_DATA_FMN, vFTdx101D_widths_DATA_FMN);
+	VECTOR (FTdx101D_US_60m, vFTdx101D_US_60m);
+
+	modes_ = FTdx101Dmodes_;
+	bandwidths_ = FTdx101D_widths_SSB;
+	bw_vals_ = FTdx101D_wvals_SSB;
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = sldrRFGAIN;
@@ -276,10 +305,9 @@ void RIG_FTdx101D::get_band_selection(int v)
 	}
 
 	if (v == 12) {	// 5MHz 60m presets
-		if (Channels_60m[0] == NULL) return;	// no 60m Channels so skip
+		if (Channels_60m[0].empty()) return;	// no 60m Channels so skip
 		if (inc_60m) {
-			if (Channels_60m[++m_60m_indx] == NULL)
-				m_60m_indx = 0;
+			if (++m_60m_indx > (int)Channels_60m.size()) m_60m_indx = 0;
 		}
 		cmd.assign("MC").append(Channels_60m[m_60m_indx]).append(";");
 	} else {		// v == 1..11 band selection OR return to vfo mode == 0
@@ -780,7 +808,7 @@ int RIG_FTdx101D::def_bandwidth(int m)
 	return mode_bwA[m];
 }
 
-const char ** RIG_FTdx101D::bwtable(int n)
+std::vector<std::string>& RIG_FTdx101D::bwtable(int n)
 {
 	switch (n) {
 		case mCW_U: case mCW_L:

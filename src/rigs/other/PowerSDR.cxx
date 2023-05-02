@@ -25,72 +25,75 @@
 
 static const char PowerSDRname_[] = "PowerSDR";
 
-static const char *PowerSDRmodes_[] = {
-	"LSB", "USB", "DSB", "CWL", "CWU", "FM", "AM", "DIGU", "SPEC", "DIGL", "SAM", "DRM", NULL};
+static std::vector<std::string>PowerSDRmodes_;
+static const char *vPowerSDRmodes_[] = {
+	"LSB", "USB", "DSB", "CWL", "CWU", "FM", "AM", "DIGU", "SPEC", "DIGL", "SAM", "DRM"};
 
-static const char *PowerSDR_mode_chr[] =  { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", NULL };
+static std::vector<std::string>PowerSDR_mode_chr;
+static const char *vPowerSDR_mode_chr[] =  { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11" };
 static const char PowerSDR_mode_type[] = { 'L', 'U', 'U', 'L', 'U', 'U', 'U', 'U', 'U', 'L', 'U', 'U' };
 
-static const char *PowerSDR_empty[] = { NULL, NULL };
+static std::vector<std::string>PowerSDR_empty;
+static const char *vPowerSDR_empty[] = { "NONE" };
 //------------------------------------------------------------------------
-static const char *PowerSDR_USBwidths[] = {
+static std::vector<std::string>PowerSDR_USBwidths;
+static const char *vPowerSDR_USBwidths[] = {
 " 5000", " 4400", " 3800", " 3300", " 2900",
 " 2700", " 2400", " 2100", " 1800", " 1000",
-" Var1", " Var2", NULL };
-static const char *PowerSDR_CAT_USB[] = {
+" Var1", " Var2" };
+static std::vector<std::string>PowerSDR_CAT_USB;
+static const char *vPowerSDR_CAT_USB[] = {
 "ZZFI00;", "ZZFI01;", "ZZFI02;", "ZZFI03;", "ZZFI04;",
 "ZZFI05;", "ZZFI06;", "ZZFI07;", "ZZFI08;", "ZZFI09;",
-"ZZFI10;", "ZZFI11;", NULL };
+"ZZFI10;", "ZZFI11;" };
 //static const char *PowerSDR_SH_tooltip = "hi cut";
 //static const char *PowerSDR_SSB_btn_SH_label = "H";
 //------------------------------------------------------------------------
-static const char *PowerSDR_WIDEwidths[] = {
-"Wideband", NULL };
-//static const char *PowerSDR_CAT_WIDE[] = {
-//"ZZFI12;", NULL };
+static std::vector<std::string>PowerSDR_WIDEwidths;
+static const char *vPowerSDR_WIDEwidths[] = {
+"Wideband" };
+//static std::vector<std::string>PowerSDR_CAT_WIDE = {
+//"ZZFI12;" };
 //------------------------------------------------------------------------
-static const char *PowerSDR_DIGwidths[] = {
+static std::vector<std::string>PowerSDR_DIGwidths;
+static const char *vPowerSDR_DIGwidths[] = {
 " 3000", " 2500", " 2000", " 1500", " 1000",
 "  800", "  600", "  300", "  150", "   75",
-" Var1", " Var2", NULL };
-static const char *PowerSDR_CAT_DIG[] = {
+" Var1", " Var2" };
+static std::vector<std::string>PowerSDR_CAT_DIG;
+static const char *vPowerSDR_CAT_DIG[] = {
 "ZZFI00;", "ZZFI01;", "ZZFI02;", "ZZFI03;", "ZZFI04;",
 "ZZFI05;", "ZZFI06;", "ZZFI07;", "ZZFI08;", "ZZFI09;",
-"ZZFI10;", "ZZFI11;", NULL };
+"ZZFI10;", "ZZFI11;" };
 //------------------------------------------------------------------------------
-static const char *PowerSDR_AMwidths[] = {
+static std::vector<std::string>PowerSDR_AMwidths;
+static const char *vPowerSDR_AMwidths[] = {
 "16000", "12000", "10000", " 8000", " 6600",
 " 5200", " 4000", " 3100", " 2900", " 2400",
-"Var1", "Var2", NULL };
-static const char *PowerSDR_CAT_AM[] = {
+"Var1", "Var2" };
+static std::vector<std::string>PowerSDR_CAT_AM;
+static const char *vPowerSDR_CAT_AM[] = {
 "ZZFI00;", "ZZFI01;", "ZZFI02;", "ZZFI03;", "ZZFI04;",
 "ZZFI05;", "ZZFI06;", "ZZFI07;", "ZZFI08;", "ZZFI09;",
-"ZZFI10;", "ZZFI11;", NULL };
+"ZZFI10;", "ZZFI11;" };
 //------------------------------------------------------------------------------
-static const char *PowerSDR_CWwidths[] = {
+static std::vector<std::string>PowerSDR_CWwidths;
+static const char *vPowerSDR_CWwidths[] = {
 " 1000", "  800", "  750", "  600", "  500",
 "  400", "  250", "  100", "   50", "   25",
-" Var1", " Var2", NULL};
-static const char *PowerSDR_CAT_CW[] = {
+" Var1", " Var2"};
+static std::vector<std::string>PowerSDR_CAT_CW;
+static const char *vPowerSDR_CAT_CW[] = {
 "ZZFI00;", "ZZFI01;", "ZZFI02;", "ZZFI03;", "ZZFI04;",
 "ZZFI05;", "ZZFI06;", "ZZFI07;", "ZZFI08;", "ZZFI09;",
-"ZZFI10;", "ZZFI11;", NULL };
+"ZZFI10;", "ZZFI11;" };
 //------------------------------------------------------------------------------
 
-static char *varwidths[] = {
-	new char[6],
-	new char[6],
-	new char[6],
-	new char[6],
-	new char[6],
-	new char[6],
-	new char[6],
-	new char[6],
-	new char[6],
-	new char[6],
-	new char[6],
-	new char[6],
-	NULL };
+static std::vector<std::string>varwidths;
+static const char *vvarwidths[] = {
+" 5000", " 4400", " 3800", " 3300", " 2900",
+" 2700", " 2400", " 2100", " 1800", " 1000",
+"  500", "  200" };
 
 //------------------------------------------------------------------------------
 static GUI rig_widgets[]= {
@@ -113,6 +116,23 @@ static std::string menu012 = "EX01200004";
 
 void RIG_PowerSDR::initialize()
 {
+	VECTOR (PowerSDRmodes_, vPowerSDRmodes_);
+	VECTOR (PowerSDR_mode_chr, vPowerSDR_mode_chr);
+	VECTOR (PowerSDR_empty, vPowerSDR_empty);
+	VECTOR (PowerSDR_USBwidths, vPowerSDR_USBwidths);
+	VECTOR (PowerSDR_CAT_USB, vPowerSDR_CAT_USB);
+	VECTOR (PowerSDR_WIDEwidths, vPowerSDR_WIDEwidths);
+	VECTOR (PowerSDR_DIGwidths, vPowerSDR_DIGwidths);
+	VECTOR (PowerSDR_CAT_DIG, vPowerSDR_CAT_DIG);
+	VECTOR (PowerSDR_AMwidths, vPowerSDR_AMwidths);
+	VECTOR (PowerSDR_CAT_AM, vPowerSDR_CAT_AM);
+	VECTOR (PowerSDR_CWwidths, vPowerSDR_CWwidths);
+	VECTOR (PowerSDR_CAT_CW, vPowerSDR_CAT_CW);
+	VECTOR (varwidths, vvarwidths);
+
+	modes_ = PowerSDRmodes_;
+	bandwidths_ = PowerSDR_empty;
+
 	std::stringstream str;
 	str << "PowerSDR";
 	trace(2, __func__, str.str().c_str());
@@ -128,8 +148,10 @@ void RIG_PowerSDR::initialize()
 	rig_widgets[8].W = sldrMICGAIN;
 	rig_widgets[9].W = sldrPOWER;
 
-	for (int i = 0; i < 12; i++)
-		strcpy(varwidths[i], PowerSDR_USBwidths[i]);
+//	varwidths.clear();
+//	for (int i = 0; i < 12; i++) {
+//		varwidths.push_back(PowerSDR_USBwidths.at(i));
+//	}
 
 // get current noise reduction values for NR1 and NR2
 	std::string current_nr;
@@ -233,30 +255,25 @@ static int ret = 0;
 
 const char * RIG_PowerSDR::get_bwname_(int n, int md)
 {
-	static char bwname[20] = "unknown";
 	std::stringstream str;
 	str << "n=" << n << ", md=" << md;
 	trace(2, __func__, str.str().c_str());
-	if (md == USB || md == LSB) {
-		if (PowerSDR_USBwidths[n] != NULL)
-			snprintf(bwname, sizeof(bwname), "%s", PowerSDR_USBwidths[n]);
+	try {
+		if (md == USB || md == LSB) 
+			return PowerSDR_USBwidths.at(n).c_str();
+		if (md == FM || md == DRM || md == SPEC) {
+			return PowerSDR_WIDEwidths.at(n).c_str();
+		if (md == DIGU || md == DIGL)
+			return PowerSDR_DIGwidths.at(n).c_str();
+		if (md == CWU || md == CWL)
+			return PowerSDR_CWwidths.at(n).c_str();
+		else
+			return PowerSDR_AMwidths.at(n).c_str();
+		}
+	} catch (const std::exception& e) {
+		std::cout << e.what() << '\n';
 	}
-	else if (md == FM || md == DRM || md == SPEC) {
-		if (PowerSDR_WIDEwidths[n] != NULL)
-			snprintf(bwname, sizeof(bwname), "%s", PowerSDR_WIDEwidths[n]);
-	}
-	else if (md == DIGU || md == DIGL) {
-		if (PowerSDR_DIGwidths[n] != NULL)
-			snprintf(bwname, sizeof(bwname), "%s", PowerSDR_DIGwidths[n]);
-	}
-	else if (md == CWU || md == CWL) {
-		if (PowerSDR_CWwidths[n] != NULL)
-			snprintf(bwname, sizeof(bwname), "%s", PowerSDR_CWwidths[n]);
-	} else {
-		if (PowerSDR_AMwidths[n] != NULL)
-			snprintf(bwname, sizeof(bwname), "%s", PowerSDR_AMwidths[n]);
-	}
-	return bwname;
+	return "UNKNOWN";
 }
 
 int RIG_PowerSDR::get_smeter()
@@ -529,28 +546,26 @@ int RIG_PowerSDR::set_widths(int val)
 
 	if (replystr.length() < 187)
 		return bw;
+	varwidths.clear();
+	static std::string widths;
+	widths = replystr.substr(p + 6);
 
-	p += 6;
-
-	std::string tocopy;
 	for (int i = 0; i < 12; i++) {
-		tocopy = replystr.substr(p, 5);
-		while (tocopy.length() && tocopy[0] == ' ') tocopy.erase(0,1);
-		strcpy(varwidths[i], tocopy.c_str());
-		p += 15;
+		widths[i*15 + 6] = 0;
+		varwidths.push_back(&widths[i*15]);
 	}
-	bandwidths_ = (const char**)(varwidths);
+	bandwidths_ = varwidths;
 
 	return bw;
 }
 
-const char **RIG_PowerSDR::bwtable(int val)
+std::vector<std::string>& RIG_PowerSDR::bwtable(int val)
 {
 	return bandwidths_;
 }
 
 #if 0
-const char **RIG_PowerSDR::lotable(int val)
+std::vector<std::string>& RIG_PowerSDR::lotable(int val)
 {
 	if (val == LSB || val == USB || val == FM || val == DRM || val == SPEC)
 		return PowerSDR_USBwidths;
@@ -558,10 +573,10 @@ const char **RIG_PowerSDR::lotable(int val)
 		return PowerSDR_DIGwidths;
 	else if (val == AM || val == SAM || val == DSB)
 		return PowerSDR_AMwidths;
-	return NULL;
+	return PowerSDR_USBwidths;
 }
 
-const char **RIG_PowerSDR::hitable(int val)
+std::vector<std::string>& RIG_PowerSDR::hitable(int val)
 {
 	if (val == LSB || val == USB || val == FM || val == DRM || val == SPEC)
 		return PowerSDR_USBwidths;
@@ -571,22 +586,25 @@ const char **RIG_PowerSDR::hitable(int val)
 		return PowerSDR_CWwidths;
 	else if (val == AM || val == SAM || val == DSB)
 		return PowerSDR_AMwidths;
-	return NULL;
+	return PowerSDR_USBwidths;
 }
 #endif
 
 void RIG_PowerSDR::set_modeA(int val)
 {
-	if (val >= (int)(sizeof(PowerSDR_mode_chr)/sizeof(*PowerSDR_mode_chr))) return;
-	_currmode = A.imode = val;
-	cmd = "ZZMD";
-	cmd += PowerSDR_mode_chr[val];
-	cmd += ';';
-	sendCommand(cmd);
-	showresp(WARN, ASC, "set mode", cmd, "");
-	sett("modeA");
-	A.iBW = set_widths(val);
-	vfoA.iBW = A.iBW;
+	try  {
+		_currmode = A.imode = val;
+		cmd = "ZZMD";
+		cmd += PowerSDR_mode_chr.at(val);
+		cmd += ';';
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set mode", cmd, "");
+		sett("modeA");
+		A.iBW = set_widths(val);
+		vfoA.iBW = A.iBW;
+	} catch (const std::exception& e) {
+		std::cout << e.what() << '\n';
+	}
 }
 
 int RIG_PowerSDR::get_modeA()
@@ -614,17 +632,20 @@ int RIG_PowerSDR::get_modeA()
 
 void RIG_PowerSDR::set_modeB(int val)
 {
-	if (val >= (int)(sizeof(PowerSDR_mode_chr)/sizeof(*PowerSDR_mode_chr))) return;
-	_currmode = B.imode = val;
-	cmd = "MD";
-	cmd += PowerSDR_mode_chr[val];
-	cmd += ';';
-	sendCommand(cmd);
-	showresp(WARN, ASC, "set mode B", cmd, "");
-	sett("modeB");
-	MilliSleep(100); // give rig a chance to change width
-	B.iBW = set_widths(val);
-	vfoB.iBW = B.iBW;
+	try {
+		_currmode = B.imode = val;
+		cmd = "MD";
+		cmd += PowerSDR_mode_chr.at(val);
+		cmd += ';';
+		sendCommand(cmd);
+		showresp(WARN, ASC, "set mode B", cmd, "");
+		sett("modeB");
+		MilliSleep(100); // give rig a chance to change width
+		B.iBW = set_widths(val);
+		vfoB.iBW = B.iBW;
+	} catch (const std::exception& e) {
+		std::cout << e.what() << '\n';
+	}
 }
 
 int RIG_PowerSDR::get_modeB()
@@ -665,42 +686,38 @@ int RIG_PowerSDR::def_bandwidth(int val)
 
 void RIG_PowerSDR::set_bwA(int val)
 {
-	std::stringstream str;
-	if (A.imode == FM || A.imode == DRM || A.imode == SPEC) return; // mode is fixed
-	else if (A.imode == LSB || A.imode == USB) {
-		A.iBW = val;
-		if (val >= (int)(sizeof(PowerSDR_CAT_USB)/sizeof(PowerSDR_CAT_USB[0]))-1) return;
-		cmd = PowerSDR_CAT_USB[val];
-		sendCommand(cmd);
-		showresp(WARN, ASC, "set_bwA USB", cmd, "");
-		sett("bwA USB");
-	}
-	else if (A.imode == DIGU || A.imode == DIGL) {
-		A.iBW = val;
-	std::stringstream str;
-	str << "val =" << val ;
-	trace(2, __func__, str.str().c_str());
-	if (val >= (int)(sizeof(PowerSDR_CAT_DIG)/sizeof(PowerSDR_CAT_DIG[0]))-1) return;
-		cmd = PowerSDR_CAT_DIG[val];
-		sendCommand(cmd);
-		showresp(WARN, ASC, "set_bwA DIG", cmd, "");
-		sett("bwA DIG");
-	}
-	else if (A.imode == CWU || A.imode == CWL) {
-		A.iBW = val;
-		if (val >= (int)(sizeof(PowerSDR_CAT_CW)/sizeof(PowerSDR_CAT_CW[0]))-1) return;
-		cmd = PowerSDR_CAT_CW[val];
-		sendCommand(cmd);
-		showresp(WARN, ASC, "set_bwA CW", cmd, "");
-		sett("bwA CW");
-	}
-	else if (A.imode == AM || A.imode == SAM || A.imode == DSB) {
-		A.iBW = val;
-		if (val >= (int)(sizeof(PowerSDR_CAT_AM)/sizeof(PowerSDR_CAT_AM[0]))-1) return;
-		cmd = PowerSDR_CAT_AM[val];
-		sendCommand(cmd);
-		showresp(WARN, ASC, "set_bwA AM", cmd, "");
-		sett("bwA AM");
+	try {
+		if (A.imode == FM || A.imode == DRM || A.imode == SPEC) return; // mode is fixed
+		else if (A.imode == LSB || A.imode == USB) {
+			cmd = PowerSDR_CAT_USB.at(val);
+			sendCommand(cmd);
+			showresp(WARN, ASC, "set_bwA USB", cmd, "");
+			sett("bwA USB");
+			A.iBW = val;
+		}
+		else if (A.imode == DIGU || A.imode == DIGL) {
+			cmd = PowerSDR_CAT_DIG.at(val);
+			sendCommand(cmd);
+			showresp(WARN, ASC, "set_bwA DIG", cmd, "");
+			sett("bwA DIG");
+			A.iBW = val;
+		}
+		else if (A.imode == CWU || A.imode == CWL) {
+			cmd = PowerSDR_CAT_CW.at(val);
+			sendCommand(cmd);
+			showresp(WARN, ASC, "set_bwA CW", cmd, "");
+			sett("bwA CW");
+			A.iBW = val;
+		}
+		else if (A.imode == AM || A.imode == SAM || A.imode == DSB) {
+			cmd = PowerSDR_CAT_AM.at(val);
+			sendCommand(cmd);
+			showresp(WARN, ASC, "set_bwA AM", cmd, "");
+			sett("bwA AM");
+			A.iBW = val;
+		}
+	} catch (const std::exception& e) {
+		std::cout << e.what() << '\n';
 	}
 }
 
@@ -724,12 +741,12 @@ int RIG_PowerSDR::get_bwA()
 		if (ret == 7) {
 			p = replystr.rfind("ZZFI");
 			if (p != std::string::npos) {
-				for (i = 0; PowerSDR_CAT_USB[i] != NULL; i++)
-				{
-					if (replystr.find(PowerSDR_CAT_USB[i]) == p)
+				for (i = 0; i < PowerSDR_CAT_USB.size(); i++) {
+					if (replystr.find(PowerSDR_CAT_USB[i]) == p) {
+						A.iBW = i;
 						break;
+					}
 				}
-				A.iBW = i;
 			}
 		}
 	}
@@ -741,10 +758,12 @@ int RIG_PowerSDR::get_bwA()
 		if (ret == 7) {
 			p = replystr.rfind("ZZFI");
 			if (p != std::string::npos) {
-				for (i = 0; PowerSDR_CAT_CW[i] != NULL; i++)
-					if (replystr.find(PowerSDR_CAT_CW[i]) == p)
+				for (i = 0; i < PowerSDR_CAT_CW.size(); i++) {
+					if (replystr.find(PowerSDR_CAT_CW[i]) == p) {
+						A.iBW = i;
 						break;
-				A.iBW = i;
+					}
+				}
 			}
 		}
 	}
@@ -754,12 +773,15 @@ int RIG_PowerSDR::get_bwA()
 		ret = wait_char(';', 7, 100, "get ZZFI", ASC);
 		gett("");
 		if (ret == 7) {
-				for (i = 0; PowerSDR_CAT_DIG[i] != NULL; i++) {
-					if (replystr.compare(PowerSDR_CAT_DIG[i]) == 0) {
+			p = replystr.rfind("ZZFI");
+			if (p != std::string::npos) {
+				for (i = 0; i < PowerSDR_CAT_DIG.size(); i++) {
+					if (replystr.find(PowerSDR_CAT_DIG[i]) == p) {
+						A.iBW = i;
 						break;
 					}
 				}
-				A.iBW = i;
+			}
 		}
 	}
 	else if (A.imode == AM || A.imode == SAM || A.imode == DSB) {
@@ -770,10 +792,12 @@ int RIG_PowerSDR::get_bwA()
 		if (ret == 7) {
 			p = replystr.rfind("ZZFI");
 			if (p != std::string::npos) {
-				for (i = 0; PowerSDR_CAT_AM[i] != NULL; i++)
-					if (replystr.find(PowerSDR_CAT_AM[i]) == p)
+				for (i = 0; i < PowerSDR_CAT_AM.size(); i++) {
+					if (replystr.find(PowerSDR_CAT_AM[i]) == p) {
+						A.iBW = i;
 						break;
-				A.iBW = i;
+					}
+				}
 			}
 		}
 	}
@@ -1205,7 +1229,7 @@ int RIG_PowerSDR::incr_agc()
 }
 
 
-static const char *agcstrs[] = {"AGC", "FIXED", "LONG", "SLOW", "MED", "FAST", "CUSTOM"};
+static const char *agcstrs[] = {"AGC", "FIX", "LNG", "SLW", "MED", "FST", "CST"};
 
 const char *RIG_PowerSDR::agc_label()
 {

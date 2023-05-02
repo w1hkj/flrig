@@ -22,7 +22,8 @@
 
 const char TS940Sname_[] = "TS940S";
 
-const char *TS940Smodes_[] =             {"LSB", "USB", "CW", "FM", "AM", "FSK", NULL};
+static std::vector<std::string>TS940Smodes_;
+static const char *vTS940Smodes_[] =             {"LSB", "USB", "CW", "FM", "AM", "FSK"};
 static const char TS940S_mode_type[] =   {'L',   'U',   'U',  'U',  'U',  'L'        };
 static const char TS940S_mode_chr[] =    {'1',   '2',   '3',  '4',  '5',  '6',       };
 
@@ -30,7 +31,7 @@ RIG_TS940S::RIG_TS940S() {
 // base class values
 	name_ = TS940Sname_;
 	modes_ = TS940Smodes_;
-	bandwidths_ = NULL;
+	bandwidths_ = vNOBWS;
 	serial_baudrate = BR4800;
 	stopbits = 2;
 	serial_retries = 2;
@@ -67,6 +68,14 @@ RIG_TS940S::RIG_TS940S() {
 	precision = 10;
 	ndigits = 7;
 
+}
+
+void RIG_TS940S::initialize()
+{
+	VECTOR (TS940Smodes_, vTS940Smodes_);
+
+	modes_ = TS940Smodes_;
+	bandwidths_ = vNOBWS;
 }
 
 /*

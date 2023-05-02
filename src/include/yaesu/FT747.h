@@ -32,6 +32,7 @@ public:
 	void set_split(bool val);
 	bool twovfos() {return false;}
 
+	void initialize();
 	bool check();
 
 	unsigned long long get_vfoA();

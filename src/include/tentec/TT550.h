@@ -209,6 +209,6 @@ public:
 
 };
 
-extern const char *TT550_xmt_widths[];
+extern std::vector<std::string>TT550_xmt_widths;
 
 #endif

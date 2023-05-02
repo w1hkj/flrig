@@ -24,8 +24,9 @@
 #include "support.h"
 
 static const char FT100Dname_[] = "FT-100D";
-static const char *FT100Dmodes_[] = 
-{ "LSB", "USB", "CW", "CW-R", "AM", "DIG", "FM", "W-FM", NULL};
+static std::vector<std::string>FT100Dmodes_;
+static const char *vFT100Dmodes_[] = 
+{ "LSB", "USB", "CW", "CW-R", "AM", "DIG", "FM", "W-FM"};
 
 static const int FT100D_def_bw[] = { 2, 2, 1, 1, 3, 1, 2, 3 };
 
@@ -35,8 +36,9 @@ static const int FT100D_mode_val[] =
 static const char FT100D_mode_type[] =
 { 'L', 'U', 'U', 'L', 'U', 'U', 'U', 'U' };
 
-static const char *FT100Dwidths_[] =
-{ "300", "500", "2400", "6000", NULL};
+static std::vector<std::string>FT100Dwidths_;
+static const char *vFT100Dwidths_[] =
+{ "300", "500", "2400", "6000"};
 
 static const int FT100D_bw_val[] =
 { 0, 1, 2, 3 };
@@ -97,6 +99,12 @@ void RIG_FT100D::init_cmd()
 
 void RIG_FT100D::initialize()
 {
+	VECTOR (FT100Dmodes_, vFT100Dmodes_);
+	VECTOR (FT100Dwidths_, vFT100Dwidths_);
+
+	modes_ = FT100Dmodes_;
+	bandwidths_ = FT100Dwidths_;
+	bw_vals_ = FT100D_bw_val;
 }
 
 void RIG_FT100D::selectA()

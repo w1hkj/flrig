@@ -27,24 +27,30 @@
 
 const char AOR5Kname_[] = "AOR-5000";
 
-const char *AOR5Kmodes_[] = 
-	{ "FM", "AM", "LSB", "USB", "CW", "SAM", "SAL", "SAH", NULL};
+static std::vector<std::string>AOR5Kmodes_;
+static const char *vAOR5Kmodes_[] =
+	{ "FM", "AM", "LSB", "USB", "CW", "SAM", "SAL", "SAH"};
 const char modenbr[] = 
 	{ '0', '1', '2', '3', '4', '5', '6', '7' };
 static const char AOR5K_mode_type[] =
 	{ 'U', 'U', 'L', 'U', 'U', 'U', 'U', 'L' };
 
-static const char *AOR5K_IF_widths[] = {
-   "500",  "3000",  "6000",  "15000",  "40000",  "110000",  "220000",  NULL};
+static std::vector<std::string>AOR5K_IF_widths;
+static const char *vAOR5K_IF_widths[] =
+{ "500",  "3000",  "6000",  "15000",  "40000",  "110000",  "220000"};
 static int AOR5K_IF_bw_vals[] = {
    0, 1, 2, 3, 4, 5, 6, WVALS_LIMIT};
 
 static int def_mode_width[] = { 3, 2, 1, 1, 0, 1, 1, 1 };
 
 static const char *AOR5K_SL_label = "HPF";
-static const char *AOR5K_SL[] = { "50", "200", "300", "400", NULL };
+static std::vector<std::string>AOR5K_SL;
+static const char *vAOR5K_SL[] =
+{ "50", "200", "300", "400" };
 static const char *AOR5K_SH_label = "LPF";
-static const char *AOR5K_SH[] = { "3000", "4000", "6000", "12000", NULL };
+static std::vector<std::string>AOR5K_SH;
+static const char *vAOR5K_SH[] =
+{ "3000", "4000", "6000", "12000" };
 
 static GUI aor5k_widgets[]= {
 	{ (Fl_Widget *)btnVol, 2, 125,  50 },
@@ -179,9 +185,18 @@ int  RIG_AOR5K::def_bandwidth(int m)
 
 void RIG_AOR5K::initialize()
 {
-	debug::level = debug::INFO_LEVEL;
+	VECTOR (AOR5Kmodes_, vAOR5Kmodes_);
+	VECTOR (AOR5K_IF_widths, vAOR5K_IF_widths);
+	VECTOR (AOR5K_SL, vAOR5K_SL);
+	VECTOR (AOR5K_SH, vAOR5K_SH);
 
-	LOG_INFO("AOR5K");
+	modes_ = AOR5Kmodes_;
+	bandwidths_ = AOR5K_IF_widths;
+	bw_vals_ = AOR5K_IF_bw_vals;
+
+	dsp_SL = AOR5K_SL;
+	dsp_SH = AOR5K_SH;
+
 	aor5k_widgets[0].W = btnVol;
 	aor5k_widgets[1].W = sldrVOLUME;
 //	aor5k_widgets[2].W = btnAGC;
@@ -426,7 +441,8 @@ int RIG_AOR5K::get_smeter()
 	replystr[p+5] ='\0';	
 
 
-	int mtr = strtoul(&replystr[p+3], NULL, 16);  // encoded in hex. S-Meter mapping TBD
+	int mtr;
+	sscanf(replystr.c_str(), "LM%d;", &mtr);
 
 	return int(floor(float(mtr)/2.55));  // 0...100 is legal range
 }

@@ -23,53 +23,65 @@
 
 static const char TS2000name_[] = "TS-2000";
 
-static const char *TS2000modes_[] = {
-	"LSB", "USB", "CW", "FM", "AM", "FSK", "CW-R", "FSK-R", NULL};
+static std::vector<std::string>TS2000modes_;
+static const char *vTS2000modes_[] = {
+	"LSB", "USB", "CW", "FM", "AM", "FSK", "CW-R", "FSK-R"};
 
 static const char TS2000_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '9' };
 static const char TS2000_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'U' };
 
-static const char *TS2000_empty[] = { "N/A", NULL };
+static std::vector<std::string>TS2000_empty;
+static const char *vTS2000_empty[] = { "N/A" };
 //------------------------------------------------------------------------------
-static const char *TS2000_SL[] = {
+static std::vector<std::string>TS2000_SL;
+static const char *vTS2000_SL[] = {
  "0",   "50", "100", "200", "300",
 "400",  "500", "600", "700", "800",
-"900", "1000", NULL };
-static const char *TS2000_CAT_SL[] = {
+"900", "1000" };
+static std::vector<std::string>TS2000_CAT_SL;
+static const char *vTS2000_CAT_SL[] = {
 "SL00;", "SL01;", "SL02;", "SL03;", "SL04;",
 "SL05;", "SL06;", "SL07;", "SL08;", "SL09;",
 "SL10;", "SL11;" };
 static const char *TS2000_SL_tooltip = "lo cut";
 static const char *TS2000_SSB_btn_SL_label = "L";
 //------------------------------------------------------------------------------
-static const char *TS2000_SH[] = {
+static std::vector<std::string>TS2000_SH;
+static const char *vTS2000_SH[] = {
 "1400", "1600", "1800", "2000", "2200",
 "2400", "2600", "2800", "3000", "3400",
-"4000", "5000", NULL };
-static const char *TS2000_CAT_SH[] = {
+"4000", "5000" };
+static std::vector<std::string>TS2000_CAT_SH;
+static const char *vTS2000_CAT_SH[] = {
 "SH00;", "SH01;", "SH02;", "SH03;", "SH04;",
 "SH05;", "SH06;", "SH07;", "SH08;", "SH09;",
 "SH10;", "SH11;" };
 static const char *TS2000_SH_tooltip = "hi cut";
 static const char *TS2000_SSB_btn_SH_label = "H";
 //------------------------------------------------------------------------------
-static const char *TS2000_AM_SL[] = {
-"0", "100", "200", "500", NULL };
-static const char *TS2000_AM_SH[] = {
+static std::vector<std::string>TS2000_AM_SL;
+static const char *vTS2000_AM_SL[] = {
+"0", "100", "200", "500" };
+static std::vector<std::string>TS2000_AM_SH;
+static const char *vTS2000_AM_SH[] = {
 "2500", "3000", "4000", "5000" };
 //------------------------------------------------------------------------------
-static const char *TS2000_CWwidths[] = {
+static std::vector<std::string>TS2000_CWwidths;
+static const char *vTS2000_CWwidths[] = {
 "50", "80", "100", "150", "200",
 "300", "400", "500", "600", "1000",
-"2000", NULL};
-static const char *TS2000_CWbw[] = {
+"2000"};
+static std::vector<std::string>TS2000_CWbw;
+static const char *vTS2000_CWbw[] = {
 "FW0050;", "FW0080;", "FW0100;", "FW0150;", "FW0200;",
 "FW0300;", "FW0400;", "FW0500;", "FW0600;", "FW1000;",
 "FW2000;" };
 //------------------------------------------------------------------------------
-static const char *TS2000_FSKwidths[] = {
-"250", "500", "1000", "1500", NULL};
-static const char *TS2000_FSKbw[] = {
+static std::vector<std::string>TS2000_FSKwidths;
+static const char *vTS2000_FSKwidths[] = {
+"250", "500", "1000", "1500"};
+static std::vector<std::string>TS2000_FSKbw;
+static const char *vTS2000_FSKbw[] = {
 "FW0250;", "FW0500;", "FW1000;", "FW1500;" };
 //------------------------------------------------------------------------------
 
@@ -92,6 +104,25 @@ static std::string menu012 = "EX01200004";
 
 void RIG_TS2000::initialize()
 {
+	VECTOR (TS2000modes_, vTS2000modes_);
+	VECTOR (TS2000_empty, vTS2000_empty);
+	VECTOR (TS2000_SL, vTS2000_SL);
+	VECTOR (TS2000_SH, vTS2000_SH);
+	VECTOR (TS2000_CAT_SL, vTS2000_CAT_SL);
+	VECTOR (TS2000_CAT_SH, vTS2000_CAT_SH);
+	VECTOR (TS2000_AM_SL, vTS2000_AM_SL);
+	VECTOR (TS2000_AM_SH, vTS2000_AM_SH);
+	VECTOR (TS2000_CWwidths, vTS2000_CWwidths);
+	VECTOR (TS2000_CWbw, vTS2000_CWbw);
+	VECTOR (TS2000_FSKwidths, vTS2000_FSKwidths);
+	VECTOR (TS2000_FSKbw, vTS2000_FSKbw);
+
+	modes_ = TS2000modes_;
+	bandwidths_ = TS2000_empty;
+
+	dsp_SL     = TS2000_SL;
+	dsp_SH     = TS2000_SH;
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = sldrRFGAIN;
@@ -248,11 +279,11 @@ const char * RIG_TS2000::get_bwname_(int n, int md)
 		int hi = (n >> 8) & 0x7F;
 		int lo = n & 0xFF;
 		snprintf(bwname, sizeof(bwname), "%s/%s",
-			(md == LSB || md == USB || md == FM) ? TS2000_SL[lo] : TS2000_AM_SL[lo],
-			(md == LSB || md == USB || md == FM) ? TS2000_SH[hi] : TS2000_AM_SH[hi] );
+			(md == LSB || md == USB || md == FM) ? TS2000_SL[lo].c_str() : TS2000_AM_SL[lo].c_str(),
+			(md == LSB || md == USB || md == FM) ? TS2000_SH[hi].c_str() : TS2000_AM_SH[hi].c_str() );
 	} else {
 		snprintf(bwname, sizeof(bwname), "%s",
-			(md == CW || md == CWR) ? TS2000_CWwidths[n] : TS2000_FSKwidths[n]);
+			(md == CW || md == CWR) ? TS2000_CWwidths[n].c_str() : TS2000_FSKwidths[n].c_str());
 	}
 	return bwname;
 }
@@ -421,7 +452,7 @@ int RIG_TS2000::set_widths(int val)
 	return bw;
 }
 
-const char **RIG_TS2000::bwtable(int val)
+std::vector<std::string>& RIG_TS2000::bwtable(int val)
 {
 	if (val == LSB || val == USB || val == FM)
 		return TS2000_SH;
@@ -433,22 +464,22 @@ const char **RIG_TS2000::bwtable(int val)
 	return TS2000_AM_SH;
 }
 
-const char **RIG_TS2000::lotable(int val)
+std::vector<std::string>& RIG_TS2000::lotable(int val)
 {
 	if (val == LSB || val == USB || val == FM)
 		return TS2000_SL;
 	if (val == AM)
 		return TS2000_AM_SL;
-	return NULL;
+	return vNOBWS;
 }
 
-const char **RIG_TS2000::hitable(int val)
+std::vector<std::string>& RIG_TS2000::hitable(int val)
 {
 	if (val == LSB || val == USB || val == FM)
 		return TS2000_SH;
 	if (val == AM)
 		return TS2000_AM_SH;
-	return NULL;
+	return vNOBWS;
 }
 
 void RIG_TS2000::set_modeA(int val)
@@ -550,38 +581,48 @@ void RIG_TS2000::set_bwA(int val)
 	if (A.imode == LSB || A.imode == USB || A.imode == FM || A.imode == AM) {
 		if (val < 256) return;
 		A.iBW = val;
-		cmd = "SL";
 		int index = A.iBW & 0x7F;
-		if (index >= (int)(sizeof(TS2000_CAT_SL)/sizeof(*TS2000_CAT_SL))) return;
-		cmd = TS2000_CAT_SL[index];
-		sendCommand(cmd);
-		showresp(WARN, ASC, "set lower", cmd, "");
-		sett("bwA lower");
-		cmd = "SH";
+		try {
+			cmd = TS2000_CAT_SL[index];
+			sendCommand(cmd);
+			showresp(WARN, ASC, "set lower", cmd, "");
+			sett("bwA lower");
+		} catch (const std::exception& e) {
+			std::cout << e.what() << '\n';
+		}
 		index = (A.iBW >> 8) & 0x7F;
-		if (index >= (int)(sizeof(TS2000_CAT_SH)/sizeof(*TS2000_CAT_SH))) return;
-		cmd = TS2000_CAT_SH[index];
-		sendCommand(cmd);
-		showresp(WARN, ASC, "set upper", cmd, "");
-		sett("bwA upper");
+		try {
+			cmd = TS2000_CAT_SH[index];
+			sendCommand(cmd);
+			showresp(WARN, ASC, "set upper", cmd, "");
+			sett("bwA upper");
+		} catch (const std::exception& e) {
+			std::cout << e.what() << '\n';
+		}
 	}
 	if (val > 256) return;
 	else if (A.imode == CW || A.imode == CWR) {
 		A.iBW = val;
 		int index = A.iBW & 0x7F;
-		if (index >= (int)(sizeof(TS2000_CWbw)/sizeof(*TS2000_CWbw))) return;
-		cmd = TS2000_CWbw[index];
-		sendCommand(cmd);
-		showresp(WARN, ASC, "set CW bw", cmd, "");
-		sett("CW bw");
-	}else if (A.imode == FSK || A.imode == FSKR) {
+		try {
+			cmd = TS2000_CWbw[index];
+			sendCommand(cmd);
+			showresp(WARN, ASC, "set CW bw", cmd, "");
+			sett("CW bw");
+		} catch (const std::exception& e) {
+			std::cout << e.what() << '\n';
+		}
+	} else if (A.imode == FSK || A.imode == FSKR) {
 		A.iBW = val;
 		int index = A.iBW & 0x7F;
-		if (index >= (int)(sizeof(TS2000_FSKbw)/sizeof(*TS2000_FSKbw))) return;
-		cmd = TS2000_FSKbw[index];
-		sendCommand(cmd);
-		showresp(WARN, ASC, "set FSK bw", cmd, "");
-		sett("FSK bw");
+		try {
+			cmd = TS2000_FSKbw[index];
+			sendCommand(cmd);
+			showresp(WARN, ASC, "set FSK bw", cmd, "");
+			sett("FSK bw");
+		} catch (const std::exception& e) {
+			std::cout << e.what() << '\n';
+		}
 	}
 }
 
@@ -589,7 +630,6 @@ int RIG_TS2000::get_bwA()
 {
 	if (tuning()) return A.iBW;
 	if (skip_get) return A.iBW;
-	size_t i = 0;
 	size_t p;
 	if (A.imode == LSB || A.imode == USB || A.imode == FM || A.imode == AM) {
 		int lo = A.iBW & 0xFF, hi = (A.iBW >> 8) & 0x7F;
@@ -620,10 +660,13 @@ int RIG_TS2000::get_bwA()
 		if (ret == 7) {
 			p = replystr.rfind("FW");
 			if (p != std::string::npos) {
-				for (i = 0; i < sizeof(TS2000_CWbw)/sizeof(*TS2000_CWbw); i++)
-					if (replystr.find(TS2000_CWbw[i]) == p)
-						break;
-				A.iBW = i;
+				try {
+					for (A.iBW = 0; A.iBW < (int)TS2000_CWbw.size(); A.iBW++)
+						if (replystr == TS2000_CWbw.at(A.iBW))
+							break;
+				} catch (const std::exception& e) {
+					std::cout << e.what() << '\n';
+				}
 			}
 		}
 	} else if (A.imode == FSK || A.imode == FSKR) {
@@ -634,10 +677,13 @@ int RIG_TS2000::get_bwA()
 		if (ret == 7) {
 			p = replystr.rfind("FW");
 			if (p != std::string::npos) {
-				for (i = 0; i < sizeof(TS2000_FSKbw)/sizeof(*TS2000_FSKbw); i++)
-					if (replystr.find(TS2000_FSKbw[i]) == p)
-						break;
-				A.iBW = i;
+				try {
+					for (A.iBW = 0; A.iBW < (int)TS2000_FSKbw.size(); A.iBW++)
+						if (replystr == TS2000_FSKbw.at(A.iBW))
+							break;
+				} catch (const std::exception& e) {
+					std::cout << e.what() << '\n';
+				}
 			}
 		}
 	}
@@ -649,38 +695,48 @@ void RIG_TS2000::set_bwB(int val)
 	if (B.imode == LSB || B.imode == USB || B.imode == FM || B.imode == AM) {
 		if (val < 256) return;
 		B.iBW = val;
-		cmd = "SL";
 		int index = B.iBW & 0x7F;
-		if (index >= (int)(sizeof(TS2000_CAT_SL)/sizeof(*TS2000_CAT_SL))) return;
-		cmd = TS2000_CAT_SL[index];
-		sendCommand(cmd);
-		showresp(WARN, ASC, "set lower", cmd, "");
-		sett("bwB lower");
-		cmd = "SH";
+		try {
+			cmd = TS2000_CAT_SL[index];
+			sendCommand(cmd);
+			showresp(WARN, ASC, "set lower", cmd, "");
+			sett("bwB lower");
+		} catch (const std::exception& e) {
+			std::cout << e.what() << '\n';
+		}
 		index = (B.iBW >> 8) & 0x7F;
-		if (index >= (int)(sizeof(TS2000_CAT_SH)/sizeof(*TS2000_CAT_SH))) return;
-		cmd = TS2000_CAT_SH[index];
-		sendCommand(cmd);
-		showresp(WARN, ASC, "set upper", cmd, "");
-		sett("bwB upper");
+		try {
+			cmd = TS2000_CAT_SH[index];
+			sendCommand(cmd);
+			showresp(WARN, ASC, "set upper", cmd, "");
+			sett("bwB upper");
+		} catch (const std::exception& e) {
+			std::cout << e.what() << '\n';
+		}
 	}
 	if (val > 256) return;
 	else if (B.imode == CW || B.imode == CWR) {
 		B.iBW = val;
 		int index = B.iBW & 0x7F;
-		if (index >= (int)(sizeof(TS2000_CWbw)/sizeof(*TS2000_CWbw))) return;
-		cmd = TS2000_CWbw[index];
-		sendCommand(cmd);
-		showresp(WARN, ASC, "set CW bw", cmd, "");
-		sett("bwB CW");
-	}else if (B.imode == FSK || B.imode == FSKR) {
+		try {
+			cmd = TS2000_CWbw[index];
+			sendCommand(cmd);
+			showresp(WARN, ASC, "set CW bw", cmd, "");
+			sett("bwB CW");
+		} catch (const std::exception& e) {
+			std::cout << e.what() << '\n';
+		}
+	} else if (B.imode == FSK || B.imode == FSKR) {
 		B.iBW = val;
 		int index = B.iBW & 0x7F;
-		if (index >= (int)(sizeof(TS2000_FSKbw)/sizeof(*TS2000_FSKbw))) return;
-		cmd = TS2000_FSKbw[index];
-		sendCommand(cmd);
-		showresp(WARN, ASC, "set FSK bw", cmd, "");
-		sett("bwB FSK");
+		try {
+			cmd = TS2000_FSKbw[index];
+			sendCommand(cmd);
+			showresp(WARN, ASC, "set FSK bw", cmd, "");
+			sett("bwB FSK");
+		} catch (const std::exception& e) {
+			std::cout << e.what() << '\n';
+		}
 	}
 }
 
@@ -688,7 +744,6 @@ int RIG_TS2000::get_bwB()
 {
 	if (tuning()) return B.iBW;
 	if (skip_get) return B.iBW;
-	size_t i = 0;
 	size_t p;
 	if (B.imode == LSB || B.imode == USB || B.imode == FM || B.imode == AM) {
 		int lo = B.iBW & 0xFF, hi = (B.iBW >> 8) & 0x7F;
@@ -719,10 +774,13 @@ int RIG_TS2000::get_bwB()
 		if (ret == 7) {
 			p = replystr.rfind("FW");
 			if (p != std::string::npos) {
-				for (i = 0; i < sizeof(TS2000_CWbw)/sizeof(*TS2000_CWbw); i++)
-					if (replystr.find(TS2000_CWbw[i]) == p)
-						break;
-				B.iBW = i;
+				try {
+					for (B.iBW = 0; B.iBW < (int)TS2000_CWbw.size(); B.iBW++)
+						if (replystr == TS2000_CWbw.at(B.iBW))
+							break;
+				} catch (const std::exception& e) {
+					std::cout << e.what() << '\n';
+				}
 			}
 		}
 	} else if (B.imode == FSK || B.imode == FSKR) {
@@ -733,10 +791,14 @@ int RIG_TS2000::get_bwB()
 		if (ret == 7) {
 			p = replystr.rfind("FW");
 			if (p != std::string::npos) {
-				for (i = 0; i < sizeof(TS2000_FSKbw)/sizeof(*TS2000_FSKbw); i++)
-					if (replystr.find(TS2000_FSKbw[i]) == p)
-						break;
-				B.iBW = i;
+				replystr = replystr.substr(p);
+				try {
+					for (B.iBW = 0; B.iBW < (int)TS2000_FSKbw.size(); B.iBW++)
+						if (replystr == TS2000_FSKbw.at(B.iBW))
+							break;
+				} catch (const std::exception& e) {
+					std::cout << e.what() << '\n';
+				}
 			}
 		}
 	}

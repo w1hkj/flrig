@@ -73,14 +73,14 @@ m7610LSBD2, m7610USBD2, m7610AMD2, m7610FMD2,				// 14..17
 m7610LSBD3, m7610USBD3, m7610AMD3, m7610FMD3				// 18..21
 };
 
-const char *IC7610modes_[] = {
+static std::vector<std::string>IC7610modes_;
+static const char *vIC7610modes_[] =
+{
 	"LSB", "USB", "AM", "FM", "CW", 
 	"CW-R", "RTTY", "RTTY-R", "PSK", "PSK-R",
 	"LSB-D1", "USB-D1", "AM-D1", "FM-D1",
 	"LSB-D2", "USB-D2", "AM-D2", "FM-D2",
-	"LSB-D3", "USB-D3", "AM-D3", "FM-D3",
-	NULL
-};
+	"LSB-D3", "USB-D3", "AM-D3", "FM-D3"};
 
 const char IC7610_mode_type[] = {
 	'L', 'U', 'U', 'U', 'L',
@@ -98,12 +98,14 @@ const char IC7610_mode_nbr[] = {
 	0x00, 0x01, 0x02, 0x05,       // lsb-d3, usb-d3, am-d3, fm-3d
 };
 
-const char *IC7610_ssb_bws[] = {
+static std::vector<std::string>IC7610_ssb_bws;
+static const char *vIC7610_ssb_bws[] =
+{
 "50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
 "600",   "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
 "2600", "2700", "2800", "2900", "3000", "3100", "3200", "3300", "3400", "3500",
-"3600", NULL };
+"3600" };
 static int IC7610_bw_vals_SSB[] = {
  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
 10,11,12,13,14,15,16,17,18,19,
@@ -111,23 +113,27 @@ static int IC7610_bw_vals_SSB[] = {
 30,31,32,33,34,35,36,37,38,39,
 40, WVALS_LIMIT};
 
-const char *IC7610_rtty_bws[] = {
+static std::vector<std::string>IC7610_rtty_bws;
+static const char *vIC7610_rtty_bws[] =
+{
 "50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
 "600",   "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
-"2600", "2700", NULL };
+"2600", "2700" };
 static int IC7610_bw_vals_RTTY[] = {
  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
 10,11,12,13,14,15,16,17,18,19,
 20,21,22,23,24,25,26,27,28,29,
 30,31, WVALS_LIMIT};
 
-const char *IC7610_am_bws[] = {
+static std::vector<std::string>IC7610_am_bws;
+static const char *vIC7610_am_bws[] =
+{
 "200",   "400",  "600",  "800", "1000", "1200", "1400", "1600", "1800", "2000",
 "2200", "2400", "2600", "2800", "3000", "3200", "3400", "3600", "3800", "4000",
 "4200", "4400", "4600", "4800", "5000", "5200", "5400", "5600", "5800", "6000",
 "6200", "6400", "6600", "6800", "7000", "7610", "7400", "7610", "7800", "8000",
-"8200", "8400", "8600", "8800", "9000", "9200", "9400", "9600", "9800", "10000", NULL };
+"8200", "8400", "8600", "8800", "9000", "9200", "9400", "9600", "9800", "10000" };
 static int IC7610_bw_vals_AM[] = {
  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
 10,11,12,13,14,15,16,17,18,19,
@@ -136,7 +142,7 @@ static int IC7610_bw_vals_AM[] = {
 40,41,42,43,44,45,46,47,48,49
 WVALS_LIMIT};
 
-const char *IC7610_bcd_vals[] = {
+static const char *IC7610_bcd_vals[] = {
 "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
 "10", "11", "12", "13", "14", "15", "16", "17", "18", "19",
 "20", "21", "22", "23", "24", "25", "26", "27", "28", "29",
@@ -164,7 +170,9 @@ const char *IC7610_bcd_vals[] = {
 "240", "241", "242", "243", "244", "245", "246", "247", "248", "249",
 "250", "251", "252", "253", "254", "255" };
 
-const char *IC7610_fm_bws[] = { "FIXED", NULL };
+static std::vector<std::string>IC7610_fm_bws;
+static const char *vIC7610_fm_bws[] =
+{ "FIXED" };
 static int IC7610_bw_vals_FM[] = { 1, WVALS_LIMIT};
 
 static GUI IC7610_widgets[]= {
@@ -188,6 +196,18 @@ static GUI IC7610_widgets[]= {
 
 void RIG_IC7610::initialize()
 {
+	VECTOR (IC7610modes_, vIC7610modes_);
+	VECTOR (IC7610_ssb_bws, vIC7610_ssb_bws);
+	VECTOR (IC7610_rtty_bws, vIC7610_rtty_bws);
+	VECTOR (IC7610_am_bws, vIC7610_am_bws);
+	VECTOR (IC7610_fm_bws, vIC7610_fm_bws);
+
+	modes_ = IC7610modes_;
+	bandwidths_ = IC7610_ssb_bws;
+	bw_vals_ = IC7610_bw_vals_SSB;
+
+	_mode_type = IC7610_mode_type;
+
 	IC7610_widgets[0].W = btnVol;
 	IC7610_widgets[1].W = sldrVOLUME;
 	IC7610_widgets[2].W = btnAGC;
@@ -548,7 +568,7 @@ int RIG_IC7610::get_modeA()
 end_wait_modeA:
 	get_trace(4, 
 		"get mode A[",
-		IC7610modes_[A.imode], 
+		IC7610modes_[A.imode].c_str(), 
 		"] ", 
 		str2hex(replystr.c_str(), replystr.length()));
 
@@ -581,7 +601,7 @@ void RIG_IC7610::set_modeA(int val)
 
 	set_trace(4, 
 		"set mode A[",
-		IC7610modes_[A.imode], 
+		IC7610modes_[A.imode].c_str(), 
 		"] ", 
 		str2hex(cmd.c_str(), cmd.length()));
 }
@@ -625,7 +645,7 @@ int RIG_IC7610::get_modeB()
 end_wait_modeB:
 	get_trace(4, 
 		"get mode B[",
-		IC7610modes_[B.imode], 
+		IC7610modes_[B.imode].c_str(), 
 		"] ", 
 		str2hex(replystr.c_str(), replystr.length()));
 
@@ -655,7 +675,7 @@ void RIG_IC7610::set_modeB(int val)
 
 	set_trace(4, 
 		"set mode B[",
-		IC7610modes_[B.imode], 
+		IC7610modes_[B.imode].c_str(), 
 		"] ", 
 		str2hex(cmd.c_str(), cmd.length()));
 }
@@ -689,7 +709,7 @@ void RIG_IC7610::set_FILT(int filter)
 
 		set_trace(4, 
 			"set mode/filter B[",
-			IC7610modes_[B.imode], 
+			IC7610modes_[B.imode].c_str(), 
 			"] ", 
 			str2hex(cmd.c_str(), cmd.length()));
 	} else {
@@ -712,7 +732,7 @@ void RIG_IC7610::set_FILT(int filter)
 		waitFB("set mode/filter A");
 
 		set_trace(4, "set mode/filter A[",
-			IC7610modes_[A.imode], 
+			IC7610modes_[A.imode].c_str(), 
 			"] ", 
 			str2hex(cmd.c_str(), cmd.length()));
 	}
@@ -961,18 +981,17 @@ int RIG_IC7610::adjust_bandwidth(int m)
 	return bw;
 }
 
-const char ** RIG_IC7610::bwtable(int m)
+std::vector<std::string>& RIG_IC7610::bwtable(int m)
 {
-	const char **table;
 	switch (m) {
 		case 2: case 12: case 16: case 20: // AM, AM-D
-			table = IC7610_am_bws;
+			return IC7610_am_bws;
 			break;
 		case 3: case 13: case 17: case 21: // FM, FM-D
-			table = IC7610_fm_bws;
+			return IC7610_fm_bws;
 			break;
 		case 6: case 7: // RTTY, RTTY-R
-			table = IC7610_rtty_bws;
+			return IC7610_rtty_bws;
 			break;
 		case 4: case 5: // CW, CW -R
 		case 0: case 1: case 8: case 9: // LSB, USB, PSK, PSK-R
@@ -980,9 +999,9 @@ const char ** RIG_IC7610::bwtable(int m)
 		case 14: case 15: // DATA-1
 		case 18: case 19: // DATA-1
 		default:
-			table = IC7610_ssb_bws;
+			return IC7610_ssb_bws;
 	}
-	return table;
+	return IC7610_ssb_bws;
 }
 
 int RIG_IC7610::def_bandwidth(int m)

@@ -146,7 +146,7 @@ public:
 	void get_squelch_min_max_step(int &min, int &max, int &step) {
 		min = 0; max = 100; step = 5; }
 	
-	const char **bwtable(int);
+	std::vector<std::string>& bwtable(int);
 
 	void set_vox_onoff();
 	void set_vox_gain();

@@ -126,9 +126,9 @@ public:
 	void set_auto_notch(int v);
 	int  get_auto_notch();
 
-	const char **bwtable(int);
-	const char **lotable(int);
-	const char **hitable(int);
+	std::vector<std::string>& bwtable(int);
+	std::vector<std::string>& lotable(int);
+	std::vector<std::string>& hitable(int);
 
 	const char * get_bwname_(int bw, int md);
 

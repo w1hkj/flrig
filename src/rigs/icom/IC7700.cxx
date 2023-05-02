@@ -29,21 +29,23 @@
 
 const char IC7700name_[] = "IC-7700";
 
-const char *IC7700modes_[] = {
+static std::vector<std::string>IC7700modes_;
+static const char *vIC7700modes_[] =
+{
 	"LSB", "USB", "AM", "CW", "RTTY", 
 	"FM",  "CW-R", "RTTY-R", "PSK", "PSK-R", 
-	"LSB-D", "USB-D", "AM-D", "FM-D", NULL};
+	"LSB-D", "USB-D", "AM-D", "FM-D"};
 
 enum {
 	LSB7700, USB7700, AM7700, CW7700, RTTY7700,
 	FM7700,  CWR7700, RTTYR7700, PSK7700, PSKR7700,
 	LSBD7700, USBD7700, AMD7700, FMD7700 };
 
-const char IC7700_mode_type[] = {
+static const char IC7700_mode_type[] = {
 	'L', 'U', 'U', 'L', 'L', 'U', 'L', 'U', 'U', 'L',
 	'L', 'U', 'U', 'U' };
 
-const char IC7700_mode_nbr[] = {
+static const char IC7700_mode_nbr[] = {
 	0x00, // Select the LSB mode
 	0x01, // Select the USB mode
 	0x02, // Select the AM mode
@@ -60,31 +62,35 @@ const char IC7700_mode_nbr[] = {
 	0x05 // FMD
 };
 
-const char *IC7700_ssb_bws[] = {
+static std::vector<std::string>IC7700_ssb_bws;
+static const char *vIC7700_ssb_bws[] =
+{
 "50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
 "600",   "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
 "2600", "2700", "2800", "2900", "3000", "3100", "3200", "3300", "3400", "3500",
-"3600",
-NULL };
+"3600"};
 
-const char *IC7700_rtty_bws[] = {
+static std::vector<std::string>IC7700_rtty_bws;
+static const char *vIC7700_rtty_bws[] =
+{
 "50",    "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
 "600",   "700",  "800",  "900", "1000", "1100", "1200", "1300", "1400", "1500",
 "1600", "1700", "1800", "1900", "2000", "2100", "2200", "2300", "2400", "2500",
-"2600", "2700",
-NULL };
+"2600", "2700"};
 
-const char *IC7700_am_bws[] = {
+static std::vector<std::string>IC7700_am_bws;
+static const char *vIC7700_am_bws[] =
+{
 "200",   "400",  "600",  "800", "1000", "1200", "1400", "1600", "1800", "2000",
 "2200", "2400", "2600", "2800", "3000", "3200", "3400", "3600", "3800", "4000",
 "4200", "4400", "4600", "4800", "5000", "5200", "5400", "5600", "5800", "6000",
 "6200", "6400", "6600", "6800", "7000", "7200", "7400", "7700", "7800", "8000",
-"8200", "8400", "8600", "8800", "9000", "9200", "9400", "9600", "9800", "10000", 
-NULL };
+"8200", "8400", "8600", "8800", "9000", "9200", "9400", "9600", "9800", "10000"};
 
-const char *IC7700_fm_bws[] = {
-"FIXED", NULL };
+static std::vector<std::string>IC7700_fm_bws;
+static const char *vIC7700_fm_bws[] =
+{ "FIXED" };
 
 static GUI IC7700_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },	//0
@@ -107,6 +113,16 @@ static GUI IC7700_widgets[]= {
 
 void RIG_IC7700::initialize()
 {
+	VECTOR (IC7700modes_, vIC7700modes_);
+	VECTOR (IC7700_ssb_bws, vIC7700_ssb_bws);
+	VECTOR (IC7700_rtty_bws, vIC7700_rtty_bws);
+	VECTOR (IC7700_am_bws, vIC7700_am_bws);
+	VECTOR (IC7700_fm_bws, vIC7700_fm_bws);
+
+	modes_ = IC7700modes_;
+	bandwidths_ = IC7700_ssb_bws;
+	_mode_type = IC7700_mode_type;
+
 	IC7700_widgets[0].W = btnVol;
 	IC7700_widgets[1].W = sldrVOLUME;
 	IC7700_widgets[2].W = btnAGC;
@@ -429,25 +445,24 @@ int RIG_IC7700::adjust_bandwidth(int m)
 	return 0;
 }
 
-const char ** RIG_IC7700::bwtable(int m)
+std::vector<std::string>& RIG_IC7700::bwtable(int m)
 {
-	const char **table;
 	switch (m) {
 		case AM7700:
-			table = IC7700_am_bws;
+			return IC7700_am_bws;
 			break;
 		case FM7700: case FMD7700:
-			table = IC7700_fm_bws;
+			return IC7700_fm_bws;
 			break;
 		case RTTY7700: case RTTYR7700:
-			table = IC7700_rtty_bws;
+			return IC7700_rtty_bws;
 			break;
 		case CW7700: case CWR7700:
 		case USB7700: case LSB7700: case LSBD7700 : case USBD7700:
 		default:
-			table = IC7700_ssb_bws;
+			return IC7700_ssb_bws;
 	}
-	return table;
+	return IC7700_ssb_bws;
 }
 
 int RIG_IC7700::def_bandwidth(int m)

@@ -27,6 +27,8 @@
 #include <string>
 #include <cmath>
 #include <cstdlib>
+#include <vector>
+#include <iostream>
 
 #include <FL/Fl.H>
 #include "util.h"
@@ -36,10 +38,20 @@
 
 #include "rigpanel.h"
 
+#define VECTOR(a,b) { a.clear(); for (size_t n = 0; n < sizeof(b)/sizeof(*b); n++) {a.push_back(b[n]);} }
+
 enum {onNIL, onA, onB};
 enum {UI, XML, SRVR, RIG};
 enum {DT_BINARY, DT_STRING};
 enum {SERIAL, TCPIP, TCI};
+
+extern const char *szNORIG;
+extern std::vector<std::string>vNOMODES;
+extern std::vector<std::string>vNOBWS;
+extern std::vector<std::string>vDSPLO;
+extern std::vector<std::string>vDSPHI;
+extern const char *szdsptooltip;
+extern const char *szbtnlabel;
 
 struct XCVR_STATE {
 	unsigned long long freq;
@@ -154,12 +166,12 @@ class rigbase {
 #define WVALS_LIMIT -1
 public:
 	std::string name_;
-	const char ** modes_;
-	const char ** bandwidths_;
-	const char ** dsp_SL;
+	static std::vector<std::string>& modes_;// = vNOMODES;
+	static std::vector<std::string>& bandwidths_;// = vNOBWS;
+	static std::vector<std::string>& dsp_SL;// = vDSPLO;
 	const char *  SL_tooltip;
 	const char *  SL_label;
-	const char ** dsp_SH;
+	static std::vector<std::string>& dsp_SH;// = vDSPHI;
 	const char *  SH_tooltip;
 	const char *  SH_label;
 	const int  * bw_vals_;
@@ -386,9 +398,9 @@ public:
 	virtual int  get_bwB_val() { return bwB_val; }
 	virtual int  adjust_bandwidth(int m) {return 0;}
 	virtual int  def_bandwidth(int m) {return 0;}
-	virtual const char **bwtable(int m) {return bandwidths_;}
-	virtual const char **lotable(int m) {return NULL;}
-	virtual const char **hitable(int m) {return NULL;}
+	virtual std::vector<std::string>&bwtable(int m) {return vNOBWS;}
+	virtual std::vector<std::string>&lotable(int m) {return vDSPLO;}
+	virtual std::vector<std::string>&hitable(int m) {return vDSPHI;}
 
 	virtual const char *FILT(int val) { return "1"; }
 	virtual const char *nextFILT() { return "1";}
@@ -526,26 +538,23 @@ int rfg_;
 		min = 0; max = 100; step = 1; }
 
 	virtual const char * get_modename_(int n){
-		if (modes_ == NULL) return "";
-		int nmodes = 0;
-		while (modes_[nmodes] != NULL) nmodes++;
-		if (n < nmodes && n > -1)
-			return modes_[n];
-		else
-			return modes_[0];
+		try {
+			return modes_.at(n).c_str();
+		} catch (const std::exception& e) {
+			LOG_ERROR("%s", e.what());
+		}
+		return "";
 	}
 
 	virtual const char * get_bwname_(int bw, int md) {
 // read bw based on mode
-		const char ** pbwt;
-		pbwt = bwtable(md);
-		if (pbwt == NULL) return "";
-		int nbw = 0;
-		while (pbwt[nbw] != NULL) nbw++;
-		if (bw < nbw && bw > -1)
-			return pbwt[bw];
-		else
-			return pbwt[0];
+		try {
+			static std::vector<std::string>& pbwt = bwtable(md);
+			return pbwt.at(bw).c_str();
+		} catch (const std::exception& e) {
+			LOG_ERROR("%s", e.what());
+		}
+		return "";
 	}
 
 int ritval_;
@@ -716,10 +725,6 @@ double vfo_;
 };
 
 extern rigbase *rigs[];
-
-extern const char *szNORIG;
-extern const char *szNOMODES[];
-extern const char *szNOBWS[];
 
 extern char bcdval[];
 

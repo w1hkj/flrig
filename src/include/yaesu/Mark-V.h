@@ -28,6 +28,9 @@ class RIG_MARK_V : public rigbase {
 public :
 	RIG_MARK_V();
 	~RIG_MARK_V() {};
+
+	void initialize();
+	
 	unsigned long long get_vfoA();
 	void set_vfoA(unsigned long long);
 	void set_PTT_control(int val);

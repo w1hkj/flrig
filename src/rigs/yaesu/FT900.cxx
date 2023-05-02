@@ -32,14 +32,16 @@
 
 const char FT900name_[] = "FT-900";
 
-const char *FT900modes_[] = {
-		"LSB", "USB", "CW", "CW-N", "AM", "AM-N", "FM", NULL};
+std::vector<std::string>FT900modes_;
+static const char *vFT900modes_[] = {
+		"LSB", "USB", "CW", "CW-N", "AM", "AM-N", "FM"};
 static const int FT900_mode_val[] =  { 0, 1, 2, 3, 4, 5, 6 };
 
 static const char FT900_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'U', 'U' };
 
-static const char *FT900widths_[] =
-{ "wide", "narr", NULL};
+static std::vector<std::string>FT900widths_;
+static const char *vFT900widths_[] =
+{ "wide", "narr"};
 
 static const int FT900_bw_val[] =
 { 0, 1 };
@@ -84,6 +86,12 @@ RIG_FT900::RIG_FT900() {
 
 void RIG_FT900::initialize()
 {
+	VECTOR (FT900modes_, vFT900modes_);
+	VECTOR (FT900widths_, vFT900widths_);
+
+	modes_ = FT900modes_;
+	bandwidths_ = FT900widths_;
+
 	progStatus.poll_split = 1;     // allow pollimg for split info
 //	progStatus.poll_vfoAorB = 1;   // allow pollimg for vfo info
 }

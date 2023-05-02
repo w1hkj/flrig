@@ -24,20 +24,21 @@
 static const char TCI_SUNDX_name_[] = "SunSDR2-DX/TCI";
 static const char TCI_SUNPRO_name_[] = "SunSDR2-Pro/TCI";
 
-static const char *TCI_modes[] = {
-"AM", "SAM", "DSB", "LSB", "USB", "CW", "NFM", "DIGL", "DIGU", "WFM", "DRM", NULL };
-//static int tci_nbr_modes = 11;
-//static int tci_def_mode = 4;
+static std::vector<std::string>TCI_modes;
+static const char *vTCI_modes[] = {
+"AM", "SAM", "DSB", "LSB", "USB", "CW", "NFM", "DIGL", "DIGU", "WFM", "DRM" };
 
 static const char TCI_mode_type[] = {
 'U', 'U', 'U', 'L', 'U', 'U', 'U', 'L', 'U', 'U', 'U' };
 
 // pairs set up for a nominal 700 Hz CW note
 // default is 800 Hz bandwidth
-static const char *TCI_CWwidths[] = {
+static std::vector<std::string>TCI_CWwidths;
+static const char *vTCI_CWwidths[] = {
  "50", "100",  "250",  "400", "500",
 "650", "800", "1000", "1500", "2000",
-"3000", "4000", NULL};
+"3000", "4000"};
+
 static std::string TCI_CWpairs[] = {
   "-25,25;",   "-50,50;", "-125,125;", "-200,200;", "-250,250;",
 "-325,325;", "-400,400;", "-500,500;", " -600,900;", "-600,1400;",
@@ -46,28 +47,34 @@ static int tci_nbr_cw = 12;
 static int tci_def_cw = 6;
 static int tci_cw_tone = 0;
 
-static const char *TCI_AMwidths[] = {
+static std::vector<std::string>TCI_AMwidths;
+static const char *vTCI_AMwidths[] = {
 "3000", "3500", "4000", "5000", "6000",
-"8000", "10000", "12000", "16000", NULL };
+"8000", "10000", "12000", "16000" };
+
 static std::string TCI_AMpairs[] = {
 "-1500,1500;", "-1750,1750;", "-2000,2000;", "-2500,2500;", "-3000,3000;",
 "-4000,4000;", "-5000,5000;", "-6000,6000;", "-8000,8000;", "" };
 static int tci_nbr_am = 9;
 static int tci_def_am = 4;
 
-static const char *TCI_DSBwidths[] = {
+static std::vector<std::string>TCI_DSBwidths;
+static const char *vTCI_DSBwidths[] = {
 "3000", "3500", "4000", "5000", "6000",
-"8000", "10000", "12000", "16000", NULL };
+"8000", "10000", "12000", "16000" };
+
 static std::string TCI_DSBpairs[] = {
 "-1500,1500;", "-1750,1750;", "-2000,2000;", "-2500,2500;", "-3000,3000;",
 "-4000,4000;", "-5000,5000;", "-6000,6000;", "-8000,8000;", "" };
 static int tci_nbr_dsb = 9;
 static int tci_def_dsb = 4;
 
-static const char *TCI_LSBwidths[] = {
+static std::vector<std::string>TCI_LSBwidths;
+static const char *vTCI_LSBwidths[] = {
  "100",  "200",  "400",  "800", "1000",
 "1500", "1800", "2000", "2200", "2500",
-"2700", "2900", "3000", "3300", "3500", NULL };
+"2700", "2900", "3000", "3300", "3500" };
+
 static std::string TCI_LSBpairs[] = {
 "-1550,-1450;", "-1600,-1400;", "-1700,-1300;", "-1900,-1100;", "-2000,-1000;",
  "-2250,-750;",   "-1800,-70;",   "-2000,-70;",   "-2200,-70;",   "-2500,-70;",
@@ -75,19 +82,22 @@ static std::string TCI_LSBpairs[] = {
 static int tci_nbr_lsb = 15;
 static int tci_def_lsb = 12;
 
-int tci_centers[] = {
+static int tci_centers[] = {
 	500, 550, 600, 650, 700, 750, 800, 900, 1000,
 	1250, 1500, 1750, 2000, 2250, 2500 };
-const char *TCI_centers[] = {
+std::vector<std::string>TCI_centers;
+static const char *vTCI_centers[] = {
  "500", "550", "600", "650", "700", "750", "800", "900", "1000",
-"1250", "1500", "1750", "2000", "2250", "2500", NULL };
+"1250", "1500", "1750", "2000", "2250", "2500" };
 int tci_nbr_centers = 15;
 int tci_center = -1; //1500 Hz default
 
-static const char *TCI_USBwidths[] = {
+static std::vector<std::string>TCI_USBwidths;
+static const char *vTCI_USBwidths[] = {
  "100",  "200",  "400", "800", "1000", 
 "1500", "1800", "2000", "2200", "2500",
-"2700", "2900", "3000", "3300", "3500", NULL };
+"2700", "2900", "3000", "3300", "3500" };
+
 static std::string TCI_USBpairs[] = {
 "1450,1550;", "1400,1600;", "1300,1700;", "1100,1900;", "1000,2000;",
 " 750,2250;", "  70,1800;", "  70,2000;", "  70,2200;", "  70,2500;",
@@ -95,42 +105,52 @@ static std::string TCI_USBpairs[] = {
 static int tci_nbr_usb = 15;
 static int tci_def_usb = 12;
 
-static const char *TCI_NFMwidths[] = {
+static std::vector<std::string>TCI_NFMwidths;
+static const char *vTCI_NFMwidths[] = {
 "3000", "3500", "4000", "5000", "6000",
-"8000", "10000", "12000", "16000", NULL };
+"8000", "10000", "12000", "16000" };
+
 static std::string TCI_NFMpairs[] = {
 "-1500,1500;", "-1750,1750;", "-2000,2000;", "-2500,2500;", "-3000,3000;",
 "-4000,4000;", "-5000,5000;", "-6000,6000;", "-8000,8000;",  "" };
 static int tci_nbr_nfm = 9;
 static int tci_def_nfm = 3;
 
-static const char *TCI_WFMwidths[] = {
-"WIDE", NULL };
+static std::vector<std::string>TCI_WFMwidths;
+static const char *vTCI_WFMwidths[] = {
+"WIDE" };
+
 static std::string TCI_WFMpairs[] = {
 "-18000,18000;", "" };
 static int tci_nbr_wfm = 1;
 static int tci_def_wfm = 0;
 
-static const char *TCI_DIGLwidths[] = {
+static std::vector<std::string>TCI_DIGLwidths;
+static const char *vTCI_DIGLwidths[] = {
 "1800", "2000", "2200", "2500", "2700",
-"2900", "3000", "3300", "3500", NULL };
+"2900", "3000", "3300", "3500" };
+
 static std::string TCI_DIGLpairs[] = {
 "-1800,-70;", "-2000,-70;", "-2200,-70;", "-2500,-70;", "-2700,-70;",
 "-2900,-70;", "-3000,-70;", "-3300,-70;", "-3500,-70;", "" };
 static int tci_nbr_digl = 9;
 static int tci_def_digl = 1;
 
-static const char *TCI_DIGUwidths[] = {
+static std::vector<std::string>TCI_DIGUwidths;
+static const char *vTCI_DIGUwidths[] = {
 "1800", "2000", "2200", "2500", "2700",
-"2900", "3000", "3300", "3500", NULL };
+"2900", "3000", "3300", "3500" };
+
 static std::string TCI_DIGUpairs[] = {
 "70,1800;", "70,2000;", "70,2200;", "70,2500;", "70,2700;",
 "70,2900;", "70,3000;", "70,3300;", "70,3500;", "" };
 static int tci_nbr_digu = 9;
 static int tci_def_digu = 1;
 
-static const char *TCI_DRMwidths[] = {
-"FIXED", NULL };
+static std::vector<std::string>TCI_DRMwidths;
+static const char *vTCI_DRMwidths[] = {
+"FIXED" };
+
 static std::string TCI_DRMpairs[] = {
 "-5000,5000;", "" };
 static int tci_nbr_drm = 1;
@@ -150,7 +170,7 @@ void tci_adjust_widths()
 		tci_freq = tci_centers[tci_center];
 
 		for (int i = 0; i < tci_nbr_usb; i++ ) {
-			width = atol(TCI_USBwidths[i])/2;
+			width = atol(TCI_USBwidths[i].c_str())/2;
 			lo = tci_freq - width;
 			hi = tci_freq + width;
 			if (lo < 0) {
@@ -162,7 +182,7 @@ void tci_adjust_widths()
 		}
 
 		for (int i = 0; i < tci_nbr_lsb; i++ ) {
-			width = atol(TCI_LSBwidths[i])/2;
+			width = atol(TCI_LSBwidths[i].c_str())/2;
 			lo = -(tci_freq + width);
 			hi = -(tci_freq - width);
 			if (hi > 0) {
@@ -177,7 +197,7 @@ void tci_adjust_widths()
 	if (tci_cw_tone != progStatus.cw_spot_tone) {
 		tci_cw_tone = progStatus.cw_spot_tone;
 		for (int i = 0; i < 11; i++) {
-			width = atol(TCI_CWwidths[i]);
+			width = atol(TCI_CWwidths[i].c_str());
 			lo = - width / 2;
 			hi = width / 2;
 			if (width/2 > tci_cw_tone) {
@@ -190,6 +210,7 @@ void tci_adjust_widths()
 	}
 }
 
+/*
 int match( std::string &needle, const char **haystack)
 {
 	int n = 0;
@@ -201,6 +222,7 @@ int match( std::string &needle, const char **haystack)
 	}
 	return -1;
 }
+*/
 
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 }, // 2
@@ -212,6 +234,24 @@ static GUI rig_widgets[]= {
 
 void RIG_TCI_SDR::initialize()
 {
+	VECTOR (TCI_modes, vTCI_modes);
+	VECTOR (TCI_CWwidths, vTCI_CWwidths);
+	VECTOR (TCI_AMwidths, vTCI_AMwidths);
+	VECTOR (TCI_DSBwidths, vTCI_DSBwidths);
+	VECTOR (TCI_LSBwidths, vTCI_LSBwidths);
+	VECTOR (TCI_centers, vTCI_centers);
+	VECTOR (TCI_USBwidths, vTCI_USBwidths);
+	VECTOR (TCI_NFMwidths, vTCI_NFMwidths);
+	VECTOR (TCI_WFMwidths, vTCI_WFMwidths);
+	VECTOR (TCI_DIGLwidths, vTCI_DIGLwidths);
+	VECTOR (TCI_DIGUwidths, vTCI_DIGUwidths);
+	VECTOR (TCI_DRMwidths, vTCI_DRMwidths);
+
+	modes_ = TCI_modes;
+	_mode_type = TCI_mode_type;
+	bandwidths_ = TCI_USBwidths;
+	bw_vals_ = NULL;
+
 	tci_open(progStatus.tci_addr, progStatus.tci_port);
 
 	rig_widgets[0].W = btnVol;
@@ -306,20 +346,25 @@ RIG_TCI_SDR::RIG_TCI_SDR() {
 
 const char * RIG_TCI_SDR::get_bwname_(int n, int md)
 {
-	switch (md) {
-		case TCI_AM:	return TCI_AMwidths[n < tci_nbr_am ? n : tci_def_am];
-		case TCI_SAM:	return TCI_AMwidths[n < tci_nbr_am ? n : tci_def_am];
-		case TCI_DSB:	return TCI_DSBwidths[n < tci_nbr_dsb ? n : tci_def_dsb];
-		case TCI_LSB:	return TCI_LSBwidths[n < tci_nbr_lsb ? n : tci_def_lsb];
-		case TCI_USB:	return TCI_USBwidths[n < tci_nbr_usb ? n : tci_def_usb];
-		case TCI_CW:	return TCI_CWwidths[n < tci_nbr_cw ? n : tci_def_cw];
-		case TCI_NFM:	return TCI_NFMwidths[n < tci_nbr_nfm ? n : tci_def_nfm];
-		case TCI_DIGL:	return TCI_DIGLwidths[n < tci_nbr_digl ? n : tci_def_digl];
-		case TCI_DIGU:	return TCI_DIGUwidths[n < tci_nbr_digu ? n : tci_def_digu];
-		case TCI_WFM:	return TCI_WFMwidths[n < tci_nbr_wfm ? n : tci_def_wfm];
-		case TCI_DRM:	return TCI_DRMwidths[n < tci_nbr_drm ? n : tci_def_drm];
-		default:		return TCI_USBwidths[n < tci_nbr_usb ? n : tci_def_usb];
+	try {
+		switch (md) {
+			case TCI_AM:	return TCI_AMwidths.at(n).c_str();
+			case TCI_SAM:	return TCI_AMwidths.at(n).c_str();
+			case TCI_DSB:	return TCI_DSBwidths.at(n).c_str();
+			case TCI_LSB:	return TCI_LSBwidths.at(n).c_str();
+			case TCI_USB:	return TCI_USBwidths.at(n).c_str();
+			case TCI_CW:	return TCI_CWwidths.at(n).c_str();
+			case TCI_NFM:	return TCI_NFMwidths.at(n).c_str();
+			case TCI_DIGL:	return TCI_DIGLwidths.at(n).c_str();
+			case TCI_DIGU:	return TCI_DIGUwidths.at(n).c_str();
+			case TCI_WFM:	return TCI_WFMwidths.at(n).c_str();
+			case TCI_DRM:	return TCI_DRMwidths.at(n).c_str();
+			default:		return TCI_USBwidths.at(n).c_str();
+		}
+	} catch (const std::exception& e) {
+		std::cout << e.what() << '\n';
 	}
+	return "UNKNOWN";
 }
 
 // SM cmd 0 ... 100 (rig values 0 ... 15)
@@ -367,7 +412,7 @@ int RIG_TCI_SDR::set_widths(int mode)
 	return bw;
 }
 
-const char **RIG_TCI_SDR::bwtable(int md)
+std::vector<std::string>& RIG_TCI_SDR::bwtable(int md)
 {
 	switch (md) {
 		case TCI_AM:   bandwidths_ = TCI_AMwidths;   break;
@@ -392,14 +437,18 @@ int wait_on_mode = 0;
 
 void RIG_TCI_SDR::set_modeA(int mode)
 {
-	std::string tcicmd = "modulation:0,";
-	tcicmd.append(TCI_modes[mode]).append(";");
-	tci_send(tcicmd);
+	try {
+		std::string tcicmd = "modulation:0,";
+		tcicmd.append(TCI_modes.at(mode)).append(";");
+		tci_send(tcicmd);
 
-	A.imode = mode;
+		A.imode = mode;
 
-	bwtable(A.imode);
-	wait_on_mode = WAIT_ON_MODE;
+		bwtable(A.imode);
+		wait_on_mode = WAIT_ON_MODE;
+	} catch (const std::exception& e) {
+		std::cout << e.what() << '\n';
+	}
 
 }
 
@@ -409,31 +458,39 @@ int RIG_TCI_SDR::get_modeA()
 
 	std::string tcicmd = slice_0.A.mod;
 
-	int n = 0;
-	while (TCI_modes[n] != NULL) {
-		if (tcicmd.find(TCI_modes[n]) == 0) {
-			if (n != A.imode) {
-				A.imode = n;
-				A.iBW = set_widths(n);
+	try {
+		size_t n = 0;
+		for (n = 0; n < TCI_modes.size(); n++) {
+			if (tcicmd.find(TCI_modes.at(n)) == 0) {
+				if (n != (size_t)A.imode) {
+					A.imode = n;
+					A.iBW = set_widths(n);
+				}
+				return A.imode;
 			}
-			return A.imode;
+			n++;
 		}
-		n++;
+	} catch (const std::exception& e) {
+		std::cout << e.what() << '\n';
 	}
 	return A.imode;
 }
 
 void RIG_TCI_SDR::set_modeB(int mode)
 {
-	std::string tcicmd = "MODULATION:1,";
-	tcicmd.append(TCI_modes[mode]).append(";");
-	tci_send(tcicmd);
+	try {
+		std::string tcicmd = "MODULATION:1,";
+		tcicmd.append(TCI_modes.at(mode)).append(";");
+		tci_send(tcicmd);
 
-	B.imode = mode;
+		B.imode = mode;
 
-	bwtable(B.imode);
+		bwtable(B.imode);
 
-	wait_on_mode = WAIT_ON_MODE;
+		wait_on_mode = WAIT_ON_MODE;
+	} catch (const std::exception& e) {
+		std::cout << e.what() << '\n';
+	}
 }
 
 int RIG_TCI_SDR::get_modeB()
@@ -441,16 +498,20 @@ int RIG_TCI_SDR::get_modeB()
 	if (--wait_on_mode > 0) return B.imode;
 
 	std::string tcicmd = slice_0.B.mod;
-	int n = 0;
-	while (TCI_modes[n] != NULL) {
-		if (tcicmd.find(TCI_modes[n]) == 0) {
-			if (n != B.imode) {
-				B.imode = n;
-				B.iBW = set_widths(n);
+	try {
+		size_t n = 0;
+		for (n = 0; n < TCI_modes.size(); n++) {
+			if (tcicmd.find(TCI_modes.at(n)) == 0) {
+				if (n != (size_t)B.imode) {
+					B.imode = n;
+					B.iBW = set_widths(n);
+				}
+				return B.imode;
 			}
-			return B.imode;
+			n++;
 		}
-		n++;
+	} catch (const std::exception& e) {
+		std::cout << e.what() << '\n';
 	}
 	return B.imode;
 }
@@ -465,6 +526,7 @@ void RIG_TCI_SDR::set_bwA(int val)
 	tci_adjust_widths();
 	std::string tcicmd = "rx_filter_band:0,";
 	std::string pairs;
+
 	switch (A.imode) {
 		case TCI_AM:	pairs = TCI_AMpairs[val < tci_nbr_am ? val : tci_def_am];		break;
 		case TCI_SAM:	pairs = TCI_AMpairs[val < tci_nbr_am ? val : tci_def_am];		break;

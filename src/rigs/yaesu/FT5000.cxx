@@ -32,10 +32,11 @@ enum mFTdx5000 {
 
 static const char FT5000name_[] = "FTdx5000";
 
-static const char *FT5000modes_[] = {
+static std::vector<std::string>FT5000modes_;
+static const char *vFT5000modes_[] = {
 "LSB", "USB", "CW", "FM", "AM",
 "RTTY-L", "CW-R", "PKT-L", "RTTY-U", "PKT-FM",
-"FM-N", "PKT-U", NULL};
+"FM-N", "PKT-U"};
 
 #undef  NUM_MODES
 #define NUM_MODES  12
@@ -51,57 +52,62 @@ static const int FT5000_def_bw[] = {
 static const char FT5000_mode_chr[] =  { '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C' };
 static const char FT5000_mode_type[] = { 'L', 'U', 'U', 'U', 'U', 'L', 'L', 'L', 'U', 'U', 'U', 'U' };
 
-static const char *FT5000_widths_SSB[] = {
+static std::vector<std::string>FT5000_widths_SSB;
+static const char *vFT5000_widths_SSB[] = {
 "200",   "400",  "600",  "850", "1100", "1350", "1500", "1650", "1800", "1950", // 0..9
 "2100", "2250", "2400", "2500", "2600", "2700", "2800", "2900", "3000", "3200", // 10..19
-"3400", "3600", "3800", "4000", // 20..23
-NULL };
+"3400", "3600", "3800", "4000"};
 
 static int FT5000_wvals_SSB[] = {
 1,2,3,4,5,6,7,  8,9,10,11,12,13,  15,16,17,18,19,20,  21,22,23,24,25, WVALS_LIMIT};
 
-static const char *FT5000_widths_CW[] = {
+static std::vector<std::string>FT5000_widths_CW;
+static const char *vFT5000_widths_CW[] = {
 "50",   "100",  "150",  "200",  "250", "300",  "350", "400",  "450", "500", // NA1
-"800", "1200", "1400", "1700", "2000", "2400",				  // NA0
-NULL };
+"800", "1200", "1400", "1700", "2000", "2400"};
 
 static int FT5000_wvals_CW[] = {
 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, WVALS_LIMIT };
 
-static const char *FT5000_widths_RTTY[] = {
+static std::vector<std::string>FT5000_widths_RTTY;
+static const char *vFT5000_widths_RTTY[] = {
 "50",   "100",  "150",  "200",  "250", "300",  "350", "400",  "450", "500", // NA1
-"800", "1200", "1400", "1700", "2000", "2400",				  // NA0
-NULL };
+"800", "1200", "1400", "1700", "2000", "2400"};
 
 static int FT5000_wvals_RTTY[] = {
 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, WVALS_LIMIT };
 
-static const char *FT5000_widths_PSK[] = {
+static std::vector<std::string>FT5000_widths_PSK;
+static const char *vFT5000_widths_PSK[] = {
 "50",   "100",  "150",  "200",  "250", "300",  "350", "400",  "450", "500", // NA1
-"800", "1200", "1400", "1700", "2000", "2400",				  // NA0
-NULL };
+"800", "1200", "1400", "1700", "2000", "2400"};
 
 static int FT5000_wvals_PSK[] = {
 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, WVALS_LIMIT };
 
 static const int FT5000_wvals_AMFM[] = { 0, WVALS_LIMIT };
 
-static const char *FT5000_widths_AMwide[] = { "AM-bw", NULL };
-static const char *FT5000_widths_FMnar[]  = { "FM-nar", NULL };
-static const char *FT5000_widths_FMwide[] = { "FM-wid", NULL };
-static const char *FT5000_widths_FMpkt[]  = { "FM-pkt", NULL };
+static std::vector<std::string>FT5000_widths_AMwide;
+static const char *vFT5000_widths_AMwide[] = { "AM-bw" };
+static std::vector<std::string>FT5000_widths_FMnar;
+static const char *vFT5000_widths_FMnar[]  = { "FM-nar" };
+static std::vector<std::string>FT5000_widths_FMwide;
+static const char * vFT5000_widths_FMwide[] = { "FM-wid" };
+static std::vector<std::string>FT5000_widths_FMpkt;
+static const char *vFT5000_widths_FMpkt[]  = { "FM-pkt" };
 
-static const char *FT5000_US_60m[] = {NULL, "126", "127", "128", "130", NULL};
+static std::vector<std::string>FT5000_US_60m;
+static const char *vFT5000_US_60m[] = {"", "126", "127", "128", "130"};
 // US has 5 60M presets. Using dummy numbers for all.
-// First NULL means skip 60m sets in get_band_selection().
+// First "" means skip 60m sets in get_band_selection().
 // Maybe someone can do a cat command MC; on all 5 presets and add returned numbers above.
 // To send cat commands in flrig goto menu Config->Xcvr select->Send Cmd.
 //
 // UK has 7 60M presets. Using dummy numbers for all.  If you want support,
 // Maybe someone can do a cat command MC; on all 7 presets and add returned numbers below.
-// static const char *FT5000_UK_60m[] = {NULL, "126", "127", "128", "130", "131", "132", NULL};
+// static std::vector<std::string>FT5000_UK_60m = {"", "126", "127", "128", "130", "131", "132"};
 
-static const char **Channels_60m = FT5000_US_60m;
+static std::vector<std::string>& Channels_60m = FT5000_US_60m;
 
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,	 2, 125,  50 },
@@ -118,7 +124,20 @@ static GUI rig_widgets[]= {
 
 void RIG_FT5000::initialize()
 {
-	progStatus.settrace = true;
+	VECTOR (FT5000modes_, vFT5000modes_);
+	VECTOR (FT5000_widths_SSB, vFT5000_widths_SSB);
+	VECTOR (FT5000_widths_CW, vFT5000_widths_CW);
+	VECTOR (FT5000_widths_RTTY, vFT5000_widths_RTTY);
+	VECTOR (FT5000_widths_PSK, vFT5000_widths_PSK);
+	VECTOR (FT5000_widths_AMwide, vFT5000_widths_AMwide);
+	VECTOR (FT5000_widths_FMnar, vFT5000_widths_FMnar);
+	VECTOR (FT5000_widths_FMwide, vFT5000_widths_FMwide);
+	VECTOR (FT5000_widths_FMpkt, vFT5000_widths_FMpkt);
+	VECTOR (FT5000_US_60m, vFT5000_US_60m);
+
+	modes_ = FT5000modes_;
+	bandwidths_ = FT5000_widths_SSB;
+	bw_vals_ = FT5000_wvals_SSB;
 
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
@@ -234,10 +253,9 @@ void RIG_FT5000::get_band_selection(int v)
 	}
 
 	if (v == 12) {	// 5MHz 60m presets
-		if (Channels_60m[0] == NULL) return;	// no 60m Channels so skip
+		if (Channels_60m[0].empty()) return;	// no 60m Channels so skip
 		if (inc_60m) {
-			if (Channels_60m[++m_60m_indx] == NULL)
-				m_60m_indx = 0;
+			if (++m_60m_indx > (int)Channels_60m.size()) m_60m_indx = 0;
 		}
 		cmd.assign("MC").append(Channels_60m[m_60m_indx]).append(";");
 	} else {		// v == 1..11 band selection OR return to vfo mode == 0
@@ -762,7 +780,7 @@ int RIG_FT5000::def_bandwidth(int m)
 	return mode_bwA[m];
 }
 
-const char ** RIG_FT5000::bwtable(int n)
+std::vector<std::string>& RIG_FT5000::bwtable(int n)
 {
 	switch (n) {
 		case mCW: case mCW_R: return FT5000_widths_CW;

@@ -494,7 +494,7 @@ int Fl_ComboBox::index() {
 }
 
 void * Fl_ComboBox::data() {
-	return retdata;
+	return datalist[idx]->d;//retdata;
 }
 
 void Fl_ComboBox::insert(const char *str, void *d)
@@ -503,7 +503,7 @@ void Fl_ComboBox::insert(const char *str, void *d)
 	datalist[listsize]->s = new char [strlen(str) + 1];
 	datalist[listsize]->s[0] = 0;
 	strcpy (datalist[listsize]->s, str);
-	datalist[listsize]->d = 0;
+	datalist[listsize]->d = d;
 	Brwsr->add(datalist[listsize]->s,d);
 	listsize++;
 	if (listsize == maxsize) {
@@ -548,7 +548,7 @@ void Fl_ComboBox::add( const char *s, void * d)
 				}
 			}
 			// not in list, so add this entry
-			if (!found) insert(sinsert.c_str(), 0);
+			if (!found) insert(sinsert.c_str(), d);
 
 				// if not the last item, erase entry in original string
 			if (last_one) break;
@@ -581,7 +581,7 @@ void Fl_ComboBox::add( const char *s, void * d)
 			}
 		}
 		// Single entry - not in list, so add this entry
-		if (!found) insert(str.c_str(), 0);
+		if (!found) insert(str.c_str(), d);
 	}
 }
 
@@ -620,11 +620,11 @@ int AlphaCompare( const void *x1, const void *x2 )
 	size_t len = str1.length();
 	if (len > str2.length()) len = str2.length();
 	for (size_t p = 0; p < len; p++) {
-		if (str1[p] < str2[p]) return -1;
-		if (str1[p] > str2[p]) return 1;
+		if (toupper(str1[p]) < toupper(str2[p])) return -1;
+		if (toupper(str1[p]) > toupper(str2[p])) return 1;
 	}
-	if (str1.length() < str2.length()) return -1;
-	if (str1.length() > str2.length()) return 1; 
+//	if (str1.length() < str2.length()) return -1;
+//	if (str1.length() > str2.length()) return 1; 
 	return 0;
 }
 

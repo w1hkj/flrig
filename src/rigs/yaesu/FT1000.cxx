@@ -27,21 +27,23 @@
 
 static const char FT1000name_[] = "FT-1000/D";
 
-static const char *FT1000modes_[] = {
+static std::vector<std::string>FT1000modes_;
+static const char *vFT1000modes_[] = {
 	"LSB", "USB", "CW2.4", "CW500", "AM6.0",
 	"AM2.4", "FM1","FM2", "RTTY(L)", "RTTY(U)",
-	"PKT(L)", "PKT(FM)", NULL};
+	"PKT(L)", "PKT(FM)"};
 
 static const int FT1000_mode_val[] = {
 	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
 
-static const char *FT1000widths_[] = {
-	"2400", "2000", "500", "250", "6000", NULL};
+static std::vector<std::string>FT1000widths_;
+static const char *vFT1000widths_[] = {
+	"2400", "2000", "500", "250", "6000"};
 
 static int FT1000_bw_vals[] = {0,1,2,3,4,WVALS_LIMIT};
 
-//static const char *FT1000_US_60m[] = {NULL, "126", "127", "128", "130", NULL};
-//static const char **Channels_60m = FT1000_US_60m;
+//static std::vector<std::string>FT1000_US_60m = {"", "126", "127", "128", "130"};
+//static std::vector<std::string>& Channels_60m = FT1000_US_60m;
 
 static GUI rig_widgets[]= {
 	{ (Fl_Widget *)btnVol,        2, 125,  50 },
@@ -60,7 +62,13 @@ static GUI rig_widgets[]= {
 
 void RIG_FT1000::initialize()
 {
-	//return
+	VECTOR (FT1000modes_, vFT1000modes_);
+	VECTOR (FT1000widths_, vFT1000widths_);
+
+	modes_ = FT1000modes_;
+	bandwidths_ = FT1000widths_;
+	bw_vals_ = FT1000_bw_vals;
+
 	rig_widgets[0].W = btnVol;
 	rig_widgets[1].W = sldrVOLUME;
 	rig_widgets[2].W = btnIFsh;

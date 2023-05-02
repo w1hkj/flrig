@@ -39,13 +39,16 @@ static inline void minmax(int min, int max, int &val)
 
 const char IC756name_[] = "IC-756";
 
-const char *IC756modes_[] = {
-		"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R", NULL};
+static std::vector<std::string>IC756modes_;
+static const char *vIC756modes_[] =
+{ "LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R"};
 // mode values are 0, 1, 2, 3, 4, 5, 7, 8
 const char IC756_mode_type[] =
 	{ 'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U'};
 
-const char *IC756_widths[] = { "NORM", "NARR", NULL};
+static std::vector<std::string>IC756_widths;
+static const char *vIC756_widths[] =
+{ "NORM", "NARR"};
 static int IC756_bw_vals[] = {1, 2, WVALS_LIMIT};
 
 static GUI IC756_widgets[]= {
@@ -69,6 +72,14 @@ static GUI IC756_widgets[]= {
 
 void RIG_IC756::initialize()
 {
+	VECTOR (IC756modes_, vIC756modes_);
+	VECTOR (IC756_widths, vIC756_widths);
+
+	modes_ = IC756modes_;
+	bandwidths_ = IC756_widths;
+	bw_vals_ = IC756_bw_vals;
+	_mode_type = IC756_mode_type;
+
 	IC756_widgets[0].W = btnVol;
 	IC756_widgets[1].W = sldrVOLUME;
 	IC756_widgets[2].W = btnAGC;
@@ -229,13 +240,16 @@ static int mode_filterB[NUM_MODES] = {1,1,1,1,1,1,1,1,1};
 
 static const char *szfilter[NUM_FILTERS] = {"1", "2", "3"};
 
-const char *IC756PROmodes_[] = {
-	"LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R", NULL};
+static std::vector<std::string>IC756PROmodes_;
+static const char *vIC756PROmodes_[] =
+{ "LSB", "USB", "AM", "CW", "RTTY", "FM", "CW-R", "RTTY-R"};
 
 const char IC756PRO_mode_type[] =
 	{ 'L', 'U', 'U', 'U', 'L', 'U', 'L', 'U' };
 
-const char *IC756PRO_bw_vals[] = { "FIXED", NULL};
+static std::vector<std::string>IC756PRO_bw_vals;
+static const char *vIC756PRO_bw_vals[] =
+{ "FIXED"};
 
 // IC756_widgets[] declared in RIG_IC756
 
@@ -317,6 +331,13 @@ RIG_IC756PRO::RIG_IC756PRO() {
 
 void RIG_IC756PRO::initialize()
 {
+	VECTOR (IC756PROmodes_, vIC756PROmodes_);
+	VECTOR (IC756PRO_bw_vals, vIC756PRO_bw_vals);
+
+	modes_ = IC756PROmodes_;
+	bandwidths_ = IC756PRO_bw_vals;
+	_mode_type = IC756PRO_mode_type;
+
 	IC756PRO_widgets[0].W = btnVol;
 	IC756PRO_widgets[1].W = sldrVOLUME;
 	IC756PRO_widgets[2].W = btnAGC;
@@ -935,7 +956,7 @@ int RIG_IC756PRO::def_bandwidth(int m)
 	return A.iBW;
 }
 
-const char **RIG_IC756PRO::bwtable(int m)
+std::vector<std::string>& RIG_IC756PRO::bwtable(int m)
 {
 	return IC756PRO_bw_vals;
 }

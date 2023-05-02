@@ -25,14 +25,16 @@
 
 const char K3name_[] = "K3";
 
-const char *K3modes_[] =
-	{ "LSB", "USB", "CW", "FM", "AM", "DATA", "CW-R", "DATA-R", NULL};
+static std::vector<std::string>K3modes_;
+static const char *vK3modes_[] =
+	{ "LSB", "USB", "CW", "FM", "AM", "DATA", "CW-R", "DATA-R"};
 const char modenbr[] =
 	{ '1', '2', '3', '4', '5', '6', '7', '9' };
 static const char K3_mode_type[] =
 	{ 'L', 'U', 'L', 'U', 'U', 'U', 'U', 'L' };
 
-static const char *K3_widths[] = {
+static std::vector<std::string>K3_widths;
+static const char *vK3_widths[] = {
    "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
   "550",  "600",  "650",  "700",  "750",  "800",  "850",  "900",  "950", "1000",
  "1100", "1200", "1300", "1400", "1500", "1600", "1700", "1800", "1900", "2000",
@@ -140,7 +142,12 @@ int  RIG_K3::def_bandwidth(int m)
 
 void RIG_K3::initialize()
 {
-	debug::level = debug::INFO_LEVEL;
+	VECTOR (K3modes_, vK3modes_);
+	VECTOR (K3_widths, vK3_widths);
+
+	modes_ = K3modes_;
+	bandwidths_ = K3_widths;
+	bw_vals_ = K3_bw_vals;
 
 	LOG_INFO("K3");
 	k3_widgets[0].W = btnVol;

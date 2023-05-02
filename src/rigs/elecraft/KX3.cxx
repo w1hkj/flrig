@@ -28,8 +28,9 @@ const char KX3name_[] = "KX3";
 
 enum {KX3_LSB, KX3_USB, KX3_CW, KX3_FM, KX3_AM, KX3_DATA, KX3_CWR, KX3_DATAR};
 
-const char *KX3modes_[] =
-	{ "LSB", "USB", "CW", "FM", "AM", "DATA", "CW-R", "DATA-R", NULL};
+static std::vector<std::string>KX3modes_;
+static const char *vKX3modes_[] =
+	{ "LSB", "USB", "CW", "FM", "AM", "DATA", "CW-R", "DATA-R"};
 const char modenbr[] =
 	{ '1', '2', '3', '4', '5', '6', '7', '9' };
 static const char KX3_mode_type[] =
@@ -37,12 +38,13 @@ static const char KX3_mode_type[] =
 
 #define KX3_BWS 45
 
-static const char *KX3_widths[] = {
+static std::vector<std::string>KX3_widths;
+static const char *vKX3_widths[] = {
    "50",  "100",  "150",  "200",  "250",  "300",  "350",  "400",  "450",  "500",
   "550",  "600",  "650",  "700",  "750",  "800",  "850",  "900",  "950", "1000",
  "1100", "1200", "1300", "1400", "1500", "1600", "1700", "1800", "1900", "2000",
  "2100", "2200", "2300", "2400", "2500", "2600", "2700", "2800", "2900", "3000",
- "3200", "3400", "3600", "3800", "4000", NULL};
+ "3200", "3400", "3600", "3800", "4000"};
 
 static int KX3_bw_vals[] = {
  1, 2, 3, 4, 5, 6, 7, 8, 9,10,
@@ -205,6 +207,13 @@ void RIG_KX3::get_options()
 
 void RIG_KX3::initialize()
 {
+	VECTOR (KX3modes_, vKX3modes_);
+	VECTOR (KX3_widths, vKX3_widths);
+
+	modes_ = KX3modes_;
+	bandwidths_ = KX3_widths;
+	bw_vals_ = KX3_bw_vals;
+
 	RigSerial->Timeout(50);
 
 	LOG_INFO("KX3");

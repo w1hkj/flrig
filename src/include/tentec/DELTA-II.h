@@ -28,6 +28,7 @@ public:
 	RIG_TT535();
 	~RIG_TT535(){}
 
+	void initialize();
 	bool check();
 
 	unsigned long long get_vfoA();
