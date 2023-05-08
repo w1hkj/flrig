@@ -127,8 +127,8 @@ Fl_Double_Window* new_cwio_dialog() {
         sldr_cwioWPM->tooltip(_("My transmit CW WPM"));
         sldr_cwioWPM->type(5);
         sldr_cwioWPM->box(FL_DOWN_BOX);
-        sldr_cwioWPM->color((Fl_Color)246);
-        sldr_cwioWPM->selection_color((Fl_Color)4);
+        sldr_cwioWPM->color(FL_BACKGROUND_COLOR);
+        sldr_cwioWPM->selection_color(FL_BACKGROUND_COLOR);
         sldr_cwioWPM->labeltype(FL_NORMAL_LABEL);
         sldr_cwioWPM->labelfont(0);
         sldr_cwioWPM->labelsize(14);

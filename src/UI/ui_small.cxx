@@ -1135,64 +1135,51 @@ Fl_Double_Window *tabs_window()
 {
 			btn_yaesu_select_1 = new Fl_Button(4, 40, 60, 18, _("1.8"));
 			btn_yaesu_select_1->tooltip(_("160m Band"));
-			btn_yaesu_select_1->color((Fl_Color)246);
 			btn_yaesu_select_1->callback((Fl_Callback*)cb_btn_band_select, (void *)1);
 
 			btn_yaesu_select_2 = new Fl_Button(74, 40, 60, 18, _("3.5"));
 			btn_yaesu_select_2->tooltip(_("80m band"));
-			btn_yaesu_select_2->color((Fl_Color)246);
 			btn_yaesu_select_2->callback((Fl_Callback*)cb_btn_band_select, (void *)2);
 
 			btn_yaesu_select_3 = new Fl_Button(145, 40, 60, 18, _("7"));
 			btn_yaesu_select_3->tooltip(_("40m band"));
-			btn_yaesu_select_3->color((Fl_Color)246);
 			btn_yaesu_select_3->callback((Fl_Callback*)cb_btn_band_select, (void *)3);
-			btn_yaesu_select_3->align(Fl_Align(FL_ALIGN_CLIP));
 
 			btn_yaesu_select_4 = new Fl_Button(216, 40, 60, 18, _("10"));
 			btn_yaesu_select_4->tooltip(_("30m band"));
-			btn_yaesu_select_4->color((Fl_Color)246);
 			btn_yaesu_select_4->callback((Fl_Callback*)cb_btn_band_select, (void *)4);
 
 			btn_yaesu_select_5 = new Fl_Button(287, 40, 60, 18, _("14"));
 			btn_yaesu_select_5->tooltip(_("20m band"));
-			btn_yaesu_select_5->color((Fl_Color)246);
 			btn_yaesu_select_5->callback((Fl_Callback*)cb_btn_band_select, (void *)5);
 
 			btn_yaesu_select_6 = new Fl_Button(358, 40, 60, 18, _("18"));
 			btn_yaesu_select_6->tooltip(_("17m band"));
-			btn_yaesu_select_6->color((Fl_Color)246);
 			btn_yaesu_select_6->callback((Fl_Callback*)cb_btn_band_select, (void *)6);
 
 			btn_yaesu_select_7 = new Fl_Button(4, 60, 60, 18, _("21"));
 			btn_yaesu_select_7->tooltip(_("15m band"));
-			btn_yaesu_select_7->color((Fl_Color)246);
 			btn_yaesu_select_7->callback((Fl_Callback*)cb_btn_band_select, (void *)7);
 
 			btn_yaesu_select_8 = new Fl_Button(74, 60, 60, 18, _("24"));
 			btn_yaesu_select_8->tooltip(_("12m band"));
-			btn_yaesu_select_8->color((Fl_Color)246);
 			btn_yaesu_select_8->callback((Fl_Callback*)cb_btn_band_select, (void *)8);
 
 			btn_yaesu_select_9 = new Fl_Button(145, 60, 60, 18, _("28"));
 			btn_yaesu_select_9->tooltip(_("10m band"));
-			btn_yaesu_select_9->color((Fl_Color)246);
 			btn_yaesu_select_9->callback((Fl_Callback*)cb_btn_band_select, (void *)9);
 
 			btn_yaesu_select_10 = new Fl_Button(216, 60, 60, 18, _("50"));
 			btn_yaesu_select_10->tooltip(_("6m band"));
-			btn_yaesu_select_10->color((Fl_Color)246);
 			btn_yaesu_select_10->callback((Fl_Callback*)cb_btn_band_select, (void *)10);
 
 			btn_yaesu_select_11 = new Fl_Button(287, 60, 60, 18, _("GEN"));
 			btn_yaesu_select_11->tooltip(_("General RX"));
-			btn_yaesu_select_11->color((Fl_Color)246);
 			btn_yaesu_select_11->callback((Fl_Callback*)cb_btn_band_select, (void *)11);
 
 			op_yaesu_select60 = new Fl_ComboBox(358, 60, 60, 18, _("combo"));
 			op_yaesu_select60->tooltip(_("vfo / 60 meter channel"));
 			op_yaesu_select60->box(FL_NO_BOX);
-			op_yaesu_select60->color((Fl_Color)246);
 			op_yaesu_select60->selection_color(FL_BACKGROUND_COLOR);
 			op_yaesu_select60->labeltype(FL_NORMAL_LABEL);
 			op_yaesu_select60->labelfont(0);
@@ -1210,67 +1197,54 @@ Fl_Double_Window *tabs_window()
 {
 			btn_ft991_select_1 = new Fl_Button(4, 30, 60, 18, _("1.8"));
 			btn_ft991_select_1->tooltip(_("Left click - get"));
-			btn_ft991_select_1->color((Fl_Color)246);
 			btn_ft991_select_1->callback((Fl_Callback*)cb_btn_band_select, (void *)1);
 
 			btn_ft991_select_2 = new Fl_Button(74, 30, 60, 18, _("3.5"));
 			btn_ft991_select_2->tooltip(_("Left click - get"));
-			btn_ft991_select_2->color((Fl_Color)246);
 			btn_ft991_select_2->callback((Fl_Callback*)cb_btn_band_select, (void *)2);
 
 			btn_ft991_select_3 = new Fl_Button(145, 30, 60, 18, _("7"));
 			btn_ft991_select_3->tooltip(_("Left click - get"));
-			btn_ft991_select_3->color((Fl_Color)246);
 			btn_ft991_select_3->callback((Fl_Callback*)cb_btn_band_select, (void *)3);
 
 			btn_ft991_select_4 = new Fl_Button(216, 30, 60, 18, _("10"));
 			btn_ft991_select_4->tooltip(_("Left click - get"));
-			btn_ft991_select_4->color((Fl_Color)246);
 			btn_ft991_select_4->callback((Fl_Callback*)cb_btn_band_select, (void *)4);
 
 			btn_ft991_select_5 = new Fl_Button(287, 30, 60, 18, _("14"));
 			btn_ft991_select_5->tooltip(_("Left click - get"));
-			btn_ft991_select_5->color((Fl_Color)246);
 			btn_ft991_select_5->callback((Fl_Callback*)cb_btn_band_select, (void *)5);
 
 			btn_ft991_select_6 = new Fl_Button(358, 30, 60, 18, _("18"));
 			btn_ft991_select_6->tooltip(_("Left click - get"));
-			btn_ft991_select_6->color((Fl_Color)246);
 			btn_ft991_select_6->callback((Fl_Callback*)cb_btn_band_select, (void *)6);
 
 			btn_ft991_select_7 = new Fl_Button(4, 50, 60, 18, _("21"));
 			btn_ft991_select_7->tooltip(_("Left click - get"));
-			btn_ft991_select_7->color((Fl_Color)246);
 			btn_ft991_select_7->callback((Fl_Callback*)cb_btn_band_select, (void *)7);
 
 			btn_ft991_select_8 = new Fl_Button(74, 50, 60, 18, _("24"));
 			btn_ft991_select_8->tooltip(_("Left click - get"));
-			btn_ft991_select_8->color((Fl_Color)246);
 			btn_ft991_select_8->callback((Fl_Callback*)cb_btn_band_select, (void *)8);
 
 			btn_ft991_select_9 = new Fl_Button(145, 50, 60, 18, _("28"));
 			btn_ft991_select_9->tooltip(_("Left click - get"));
-			btn_ft991_select_9->color((Fl_Color)246);
 			btn_ft991_select_9->callback((Fl_Callback*)cb_btn_band_select, (void *)9);
 
 			btn_ft991_select_10 = new Fl_Button(216, 50, 60, 18, _("50"));
 			btn_ft991_select_10->tooltip(_("Left click - get"));
-			btn_ft991_select_10->color((Fl_Color)246);
 			btn_ft991_select_10->callback((Fl_Callback*)cb_btn_band_select, (void *)10);
 
 			btn_ft991_select_11 = new Fl_Button(287, 50, 60, 18, _("144"));
 			btn_ft991_select_11->tooltip(_("Left click - get"));
-			btn_ft991_select_11->color((Fl_Color)246);
 			btn_ft991_select_11->callback((Fl_Callback*)cb_btn_band_select, (void *)11);
 
 			btn_ft991_select_12 = new Fl_Button(358, 50, 60, 18, _("430"));
 			btn_ft991_select_12->tooltip(_("Left click - get"));
-			btn_ft991_select_12->color((Fl_Color)246);
 			btn_ft991_select_12->callback((Fl_Callback*)cb_btn_band_select, (void *)12);
 
 			btn_ft991_select_13 = new Fl_Button(4, 70, 60, 18, _("Gen"));
 			btn_ft991_select_13->tooltip(_("Left click - get"));
-			btn_ft991_select_13->color((Fl_Color)246);
 			btn_ft991_select_13->callback((Fl_Callback*)cb_btn_band_select, (void *)13);
 
 			choice_ft991_tTONE = new Fl_PL_tone(145, 70, 75, 18, _("tTONE"));
@@ -1292,62 +1266,50 @@ Fl_Double_Window *tabs_window()
 		static const char setsave[] = _("Left click - set\nRight click - save");
 			btn_FT8n_select_1 = new Fl_Button(4, 30, 60, 18, _("1.8"));
 			btn_FT8n_select_1->tooltip(setsave);
-			btn_FT8n_select_1->color((Fl_Color)246);
 			btn_FT8n_select_1->callback((Fl_Callback*)cb_btn_band_select, (void *)1);
 
 			btn_FT8n_select_2 = new Fl_Button(74, 30, 60, 18, _("3.5"));
 			btn_FT8n_select_2->tooltip(setsave);
-			btn_FT8n_select_2->color((Fl_Color)246);
 			btn_FT8n_select_2->callback((Fl_Callback*)cb_btn_band_select, (void *)2);
 
 			btn_FT8n_select_3 = new Fl_Button(145, 30, 60, 18, _("7"));
 			btn_FT8n_select_3->tooltip(setsave);
-			btn_FT8n_select_3->color((Fl_Color)246);
 			btn_FT8n_select_3->callback((Fl_Callback*)cb_btn_band_select, (void *)3);
 
 			btn_FT8n_select_4 = new Fl_Button(216, 30, 60, 18, _("10"));
 			btn_FT8n_select_4->tooltip(setsave);
-			btn_FT8n_select_4->color((Fl_Color)246);
 			btn_FT8n_select_4->callback((Fl_Callback*)cb_btn_band_select, (void *)4);
 
 			btn_FT8n_select_5 = new Fl_Button(287, 30, 60, 18, _("14"));
 			btn_FT8n_select_5->tooltip(setsave);
-			btn_FT8n_select_5->color((Fl_Color)246);
 			btn_FT8n_select_5->callback((Fl_Callback*)cb_btn_band_select, (void *)5);
 
 			btn_FT8n_select_6 = new Fl_Button(358, 30, 60, 18, _("18"));
 			btn_FT8n_select_6->tooltip(setsave);
-			btn_FT8n_select_6->color((Fl_Color)246);
 			btn_FT8n_select_6->callback((Fl_Callback*)cb_btn_band_select, (void *)6);
 
 			btn_FT8n_select_7 = new Fl_Button(4, 50, 60, 18, _("21"));
 			btn_FT8n_select_7->tooltip(setsave);
-			btn_FT8n_select_7->color((Fl_Color)246);
 			btn_FT8n_select_7->callback((Fl_Callback*)cb_btn_band_select, (void *)7);
 
 			btn_FT8n_select_8 = new Fl_Button(74, 50, 60, 18, _("24"));
 			btn_FT8n_select_8->tooltip(setsave);
-			btn_FT8n_select_8->color((Fl_Color)246);
 			btn_FT8n_select_8->callback((Fl_Callback*)cb_btn_band_select, (void *)8);
 
 			btn_FT8n_select_9 = new Fl_Button(145, 50, 60, 18, _("28"));
 			btn_FT8n_select_9->tooltip(setsave);
-			btn_FT8n_select_9->color((Fl_Color)246);
 			btn_FT8n_select_9->callback((Fl_Callback*)cb_btn_band_select, (void *)9);
 
 			btn_FT8n_select_10 = new Fl_Button(216, 50, 60, 18, _("50"));
 			btn_FT8n_select_10->tooltip(setsave);
-			btn_FT8n_select_10->color((Fl_Color)246);
 			btn_FT8n_select_10->callback((Fl_Callback*)cb_btn_band_select, (void *)10);
 
 			btn_FT8n_select_11 = new Fl_Button(287, 50, 60, 18, _("144"));
 			btn_FT8n_select_11->tooltip(setsave);
-			btn_FT8n_select_11->color((Fl_Color)246);
 			btn_FT8n_select_11->callback((Fl_Callback*)cb_btn_band_select, (void *)11);
 
 			btn_FT8n_select_12 = new Fl_Button(358, 50, 60, 18, _("430"));
 			btn_FT8n_select_12->tooltip(setsave);
-			btn_FT8n_select_12->color((Fl_Color)246);
 			btn_FT8n_select_12->callback((Fl_Callback*)cb_btn_band_select, (void *)12);
 
 		tab_FT8n_bands->end();
@@ -1390,67 +1352,54 @@ Fl_Double_Window *tabs_window()
 {
 			btn_icom_select_1 = new Fl_Button(4, 30, 60, 18, _("1.8"));
 			btn_icom_select_1->tooltip(_("Left click - get\nRight click - set"));
-			btn_icom_select_1->color((Fl_Color)246);
 			btn_icom_select_1->callback((Fl_Callback*)cb_btn_band_select, (void *)1);
 
 			btn_icom_select_2 = new Fl_Button(74, 30, 60, 18, _("3.5"));
 			btn_icom_select_2->tooltip(_("Left click - get\nRight click - set"));
-			btn_icom_select_2->color((Fl_Color)246);
 			btn_icom_select_2->callback((Fl_Callback*)cb_btn_band_select, (void *)2);
 
 			btn_icom_select_3 = new Fl_Button(145, 30, 60, 18, _("7"));
 			btn_icom_select_3->tooltip(_("Left click - get\nRight click - set"));
-			btn_icom_select_3->color((Fl_Color)246);
 			btn_icom_select_3->callback((Fl_Callback*)cb_btn_band_select, (void *)3);
 
 			btn_icom_select_4 = new Fl_Button(216, 30, 60, 18, _("10"));
 			btn_icom_select_4->tooltip(_("Left click - get\nRight click - set"));
-			btn_icom_select_4->color((Fl_Color)246);
 			btn_icom_select_4->callback((Fl_Callback*)cb_btn_band_select, (void *)4);
 
 			btn_icom_select_5 = new Fl_Button(287, 30, 60, 18, _("14"));
 			btn_icom_select_5->tooltip(_("Left click - get\nRight click - set"));
-			btn_icom_select_5->color((Fl_Color)246);
 			btn_icom_select_5->callback((Fl_Callback*)cb_btn_band_select, (void *)5);
 
 			btn_icom_select_6 = new Fl_Button(358, 30, 60, 18, _("18"));
 			btn_icom_select_6->tooltip(_("Left click - get\nRight click - set"));
-			btn_icom_select_6->color((Fl_Color)246);
 			btn_icom_select_6->callback((Fl_Callback*)cb_btn_band_select, (void *)6);
 
 			btn_icom_select_7 = new Fl_Button(4, 50, 60, 18, _("21"));
 			btn_icom_select_7->tooltip(_("Left click - get\nRight click - set"));
-			btn_icom_select_7->color((Fl_Color)246);
 			btn_icom_select_7->callback((Fl_Callback*)cb_btn_band_select, (void *)7);
 
 			btn_icom_select_8 = new Fl_Button(74, 50, 60, 18, _("24"));
 			btn_icom_select_8->tooltip(_("Left click - get\nRight click - set"));
-			btn_icom_select_8->color((Fl_Color)246);
 			btn_icom_select_8->callback((Fl_Callback*)cb_btn_band_select, (void *)8);
 
 			btn_icom_select_9 = new Fl_Button(145, 50, 60, 18, _("28"));
 			btn_icom_select_9->tooltip(_("Left click - get\nRight click - set"));
-			btn_icom_select_9->color((Fl_Color)246);
 			btn_icom_select_9->callback((Fl_Callback*)cb_btn_band_select, (void *)9);
 
 			btn_icom_select_10 = new Fl_Button(216, 50, 60, 18, _("50"));
 			btn_icom_select_10->tooltip(_("Left click - get\nRight click - set"));
-			btn_icom_select_10->color((Fl_Color)246);
 			btn_icom_select_10->callback((Fl_Callback*)cb_btn_band_select, (void *)10);
 
 			btn_icom_select_11 = new Fl_Button(287, 50, 60, 18, _("144"));
 			btn_icom_select_11->tooltip(_("Left click - get\nRight click - set"));
-			btn_icom_select_11->color((Fl_Color)246);
 			btn_icom_select_11->callback((Fl_Callback*)cb_btn_band_select, (void *)11);
 
 			btn_icom_select_12 = new Fl_Button(358, 50, 60, 18, _("430"));
 			btn_icom_select_12->tooltip(_("Left click - get\nRight click - set"));
-			btn_icom_select_12->color((Fl_Color)246);
 			btn_icom_select_12->callback((Fl_Callback*)cb_btn_band_select, (void *)12);
 
 			btn_icom_select_13 = new Fl_Button(4, 70, 60, 18, _("1.2 G"));
 			btn_icom_select_13->tooltip(_("Left click - get\nRight click - set"));
-			btn_icom_select_13->color((Fl_Color)246);
 			btn_icom_select_13->callback((Fl_Callback*)cb_btn_band_select, (void *)13);
 
 			choice_tTONE = new Fl_PL_tone(145, 70, 75, 18, _("tTONE"));
