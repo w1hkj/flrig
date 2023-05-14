@@ -950,10 +950,8 @@ static void cb_btn_xcvr_synch_now( Fl_Button *o, void *) {
 //	progStatus.kxpa = o->value();
 //}
 
-static void cb_btnUser( Fl_Button * o, void *d) {
-	size_t val = reinterpret_cast<size_t>(d);
-	if (((Fl::event_state() & FL_SHIFT) == FL_SHIFT) ||
-		(Fl::event_button() == FL_RIGHT_MOUSE)) {
+void exec_btnUser( int val, bool shift) {
+	if (shift) {
 		switch (val) {
 			case 1: cb_send_command(progStatus.shftcmd1, cmdResponse); break;
 			case 2: cb_send_command(progStatus.shftcmd2, cmdResponse); break;
@@ -1008,6 +1006,13 @@ static void cb_btnUser( Fl_Button * o, void *d) {
 			case 24: cb_send_command(progStatus.command24, cmdResponse); break;
 		}
 	}
+}
+
+static void cb_btnUser( Fl_Button * o, void *d) {
+	size_t val = reinterpret_cast<size_t>(d);
+	bool shift = (((Fl::event_state() & FL_SHIFT) == FL_SHIFT) ||
+		(Fl::event_button() == FL_RIGHT_MOUSE));
+	exec_btnUser(val, shift);
 }
 
 static void cb_digi_sel_on_off(Fl_Light_Button *o, void *d) {

@@ -641,4 +641,6 @@ extern Fl_ComboBox *cbo_tmate2_dev;
 
 extern Fl_Group *tabs;
 
+extern void exec_btnUser(int val, bool shift = 0);
+
 #endif

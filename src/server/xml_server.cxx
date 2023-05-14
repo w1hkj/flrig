@@ -50,6 +50,8 @@
 #include "cwioUI.h"
 #include "ptt.h"
 
+#include "rigpanel.h"
+
 // The server
 using namespace XmlRpc;
 
@@ -3320,6 +3322,44 @@ public:
 
 } rig_shutdown(&rig_server);
 
+//------------------------------------------------------------------------------
+// Execute command button, 1..24
+// Execute command button SHIFT, 25..48
+//------------------------------------------------------------------------------
+
+static int exec_btn = 0;
+static bool exec_shift = false;
+
+void btn_user(void *)
+{
+	exec_btnUser(exec_btn, exec_shift);
+}
+
+class rig_cmd : public XmlRpcServerMethod {
+public:
+	rig_cmd (XmlRpcServer* s) : XmlRpcServerMethod("rig.cmd", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result) {
+		if (!xcvr_online || disable_xmlrpc->value()) {
+			result = 0;
+			return;
+		}
+
+		exec_btn = int(params[0]);
+		exec_shift = false;
+		if (exec_btn >= 25) {
+			exec_btn -= 24;
+			exec_shift = true;
+			
+			}
+		if (exec_btn < 0 || exec_btn > 24) return;
+		Fl::awake(btn_user, (void *)0);
+
+	}
+	std::string help() { return std::string("execute command button 1..24; (shift)25..48"); }
+
+} rig_cmd(&rig_server);
+
 
 struct MLIST {
 	std::string name; std::string signature; std::string help;
@@ -3423,8 +3463,9 @@ struct MLIST {
 	{ "rig.mod_bw",       "i:i", "modify bandwidth +- to nearest new value" },
 	{ "rig.vfoA2B",       "n:n", "set vfo B to vfo A freq/mode" },
 	{ "rig.freqA2B",      "n:n", "set freq B to freq A" },
-	{ "rig.modeA2B",      "n:n", "set mode B to mode A" }
+	{ "rig.modeA2B",      "n:n", "set mode B to mode A" },
 
+	{ "rig.cmd",          "n:i", "execute command button 1..24; 25..48(shift)"}
 };
 
 class rig_list_methods : public XmlRpcServerMethod {
