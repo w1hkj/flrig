@@ -1,6 +1,21 @@
-2023-03-10  dave-w1hkj  <w1hkj@bellsouth.net>
+2023-05-15  dave-w1hkj  <w1hkj@bellsouth.net>
 
-	c6cbaacc: Version 1.4.8
+	2365f15e: Version 2.0.0   * Update release
+	18c37870: xml command button
+	badde39a: button colors
+	ad188cff: string vectors
+	22e7d265: FT890 update
+	1c209bb4: X6100 update
+	b401cf13: trusdx seg fault
+	d67bde7b: combo highlight
+	6d65eec9: TS590S/SG
+	71609348: Yaesu FT710
+	2ed6af50: Elecraft BW interface
+	22553a44: xmlrpc server
+	91cde455: IC7700 set BW
+	23644911: Kenwood meter readings
+	8968415b: FTdx10 bandwidths
+	dcacfc1f: Version 1.4.8
 
 2023-03-10  Harry McGavran  <w5pny@w5pny.com>
 
